@@ -3,16 +3,18 @@
 
 #include <memory>
 
+namespace ctoot {
+	namespace mpc {
+		class MpcSoundPlayerChannel;
+	}
+}
+
 namespace mpc {
 
 	class Mpc;
 
 	namespace sampler {
 		class Sampler;
-	}
-
-	namespace ctootextensions {
-		class MpcSoundPlayerChannel;
 	}
 
 	namespace lcdgui {
@@ -40,7 +42,7 @@ namespace mpc {
 				std::weak_ptr<mpc::lcdgui::Field> currentValField{};
 				mpc::Mpc* mpc{ nullptr };
 				std::weak_ptr<mpc::sampler::Sampler> sampler{};
-				mpc::ctootextensions::MpcSoundPlayerChannel* mpcSoundPlayerChannel{ nullptr };
+				ctoot::mpc::MpcSoundPlayerChannel* mpcSoundPlayerChannel{ nullptr };
 				std::weak_ptr<mpc::lcdgui::Label> valueLabel{};
 
 			private:

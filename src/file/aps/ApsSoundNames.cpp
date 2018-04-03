@@ -33,7 +33,7 @@ ApsSoundNames::ApsSoundNames(mpc::sampler::Sampler* sampler)
 	for (int i = 0; i < sampler->getSoundCount(); i++) {
 		int offset = i * ApsParser::SOUND_NAME_LENGTH;
 		for (int j = 0; j < NAME_STRING_LENGTH; j++)
-			saveBytes[offset + j] = StrUtil::padRight(sampler->getSound(i).lock()->getName(), " ", NAME_STRING_LENGTH)[j];
+			saveBytes[offset + j] = StrUtil::padRight(dynamic_pointer_cast<mpc::sampler::Sound>(sampler->getSound(i).lock())->getName(), " ", NAME_STRING_LENGTH)[j];
 
 		saveBytes[offset + NAME_STRING_LENGTH] = ApsParser::NAME_TERMINATOR;
 	}

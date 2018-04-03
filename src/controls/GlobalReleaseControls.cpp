@@ -18,7 +18,7 @@
 #include <sequencer/Track.hpp>
 #include <sequencer/NoteEvent.hpp>
 #include <sequencer/Sequencer.hpp>
-#include <ctootextensions/MpcSoundPlayerChannel.hpp>
+#include <mpc/MpcSoundPlayerChannel.hpp>
 
 using namespace mpc::controls;
 using namespace std;

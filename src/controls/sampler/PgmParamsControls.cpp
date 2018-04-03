@@ -6,7 +6,7 @@
 #include <sampler/NoteParameters.hpp>
 #include <sampler/Sampler.hpp>
 #include <sampler/Sound.hpp>
-#include <ctootextensions/MpcSoundPlayerChannel.hpp>
+#include <mpc/MpcSoundPlayerChannel.hpp>
 
 using namespace mpc::controls::sampler;
 using namespace std;

@@ -5,6 +5,12 @@
 #include <vector>
 #include <string>
 
+namespace ctoot {
+	namespace mpc {
+		class MpcSoundPlayerChannel;
+	}
+}
+
 namespace mpc {
 
 	class Mpc;
@@ -12,10 +18,6 @@ namespace mpc {
 	namespace lcdgui {
 		class LayeredScreen;
 		class Field;
-	}
-
-	namespace ctootextensions {
-		class MpcSoundPlayerChannel;
 	}
 
 	namespace sequencer {
@@ -47,7 +49,7 @@ namespace mpc {
 				MixerSetupGui* mixerSetupGui{ nullptr };
 				MixerGui* mixGui{ nullptr };
 				int bank = 0;
-				mpc::ctootextensions::MpcSoundPlayerChannel* mpcSoundPlayerChannel{ nullptr };
+				ctoot::mpc::MpcSoundPlayerChannel* mpcSoundPlayerChannel{ nullptr };
 				std::weak_ptr<mpc::sampler::Program> program{};
 				std::weak_ptr<mpc::lcdgui::LayeredScreen> ls{};
 				std::weak_ptr<mpc::lcdgui::Field> noteField{};

@@ -5,12 +5,17 @@
 #include <vector>
 #include <string>
 
+namespace ctoot {
+	namespace mpc {
+		class MpcStereoMixerChannel;
+		class MpcIndivFxMixerChannel;
+	}
+}
+
 namespace mpc {
 
 	namespace sampler {
 		class Program;
-		class StereoMixerChannel;
-		class IndivFxMixerChannel;
 	}
 
 	namespace file {
@@ -61,8 +66,8 @@ namespace mpc {
 
 			public:
 				std::vector<char> getBytes();
-				mpc::sampler::StereoMixerChannel* getStereoMixerChannel(int note);
-				mpc::sampler::IndivFxMixerChannel* getIndivFxMixerChannel(int note);
+				ctoot::mpc::MpcStereoMixerChannel* getStereoMixerChannel(int note);
+				ctoot::mpc::MpcIndivFxMixerChannel* getIndivFxMixerChannel(int note);
 
 			public:
 				ApsProgram(std::vector<char> loadBytes);

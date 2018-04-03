@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mpc/MpcSampler.hpp>
+
 #include <observer/Observable.hpp>
 #include <audio/server/AudioClient.hpp>
 #include <audio/system/AudioDevice.hpp>
@@ -13,13 +15,17 @@
 
 #include <memory>
 
+namespace ctoot {
+	namespace mpc {
+		class MpcSound;
+		class MpcProgram;
+		class MpcSoundPlayerChannel;
+	}
+}
+
 namespace mpc {
 
 	class Mpc;
-
-	namespace ctootextensions {
-		class MpcSoundPlayerChannel;
-	}
 
 	namespace sequencer {
 		class NoteEvent;
@@ -28,13 +34,19 @@ namespace mpc {
 	namespace sampler {
 
 		class MonitorOutput;
-		class StereoMixerChannel;
-		class IndivFxMixerChannel;
 
 		class Sampler
-			: public virtual ctoot::audio::server::AudioClient
+			: public virtual ctoot::mpc::MpcSampler
+			, public virtual ctoot::audio::server::AudioClient
 			, public virtual ctoot::audio::system::AudioDevice
 		{
+
+		public:
+			std::weak_ptr<ctoot::mpc::MpcSound> getPreviewSound() override;
+			std::weak_ptr<ctoot::mpc::MpcSound> getPlayXSound() override;
+			std::weak_ptr<ctoot::mpc::MpcSound> getClickSound() override;
+			std::weak_ptr<ctoot::mpc::MpcSound> getSound(int sampleNumber) override;
+			std::weak_ptr<ctoot::mpc::MpcProgram> getProgram(int programNumber) override;
 
 		private:
 			int inputLevel = 0;
@@ -98,7 +110,6 @@ namespace mpc {
 			void init();
 			void playMetronome(mpc::sequencer::NoteEvent* event, int framePos);
 			void playPreviewSample(int start, int end, int loopTo, int overlapMode);
-			std::weak_ptr<Program> getProgram(int programNumber);
 			int getProgramCount();
 			std::weak_ptr<Program> addProgram();
 			std::weak_ptr<Program> addProgram(int i);
@@ -114,10 +125,7 @@ namespace mpc {
 			std::string getPadName(int i);
 			std::vector<std::weak_ptr<Program>> getPrograms();
 			std::vector<float>* getClickSample();
-			std::weak_ptr<Sound> getSound(int sampleNumber);
 			void deleteSound(std::weak_ptr<Sound> sound);
-			std::weak_ptr<Sound> getPreviewSound();
-			std::weak_ptr<Sound> getPlayXSound();
 			void setLoopEnabled(int sampleIndex, bool b);
 			void trimSample(int sampleNumber, int start, int end);
 			void deleteSection(const unsigned int sampleNumber, const unsigned int start, const unsigned int end);
@@ -157,8 +165,7 @@ namespace mpc {
 			void mergeToStereo(std::vector<float>* sourceLeft, std::vector<float>* sourceRight, std::vector<float>* dest);
 			void setDrumBusProgramNumber(int busNumber, int programNumber);
 			int getDrumBusProgramNumber(int busNumber);
-			mpc::ctootextensions::MpcSoundPlayerChannel* getDrum(int i);
-			std::weak_ptr<Sound> getClickSound();
+			ctoot::mpc::MpcSoundPlayerChannel* getDrum(int i);
 
 			void arm();
 			void stopRecordingEarlier();
@@ -200,8 +207,8 @@ namespace mpc {
 			int getNextSoundIndex(int j, bool up);
 			void setSoundGuiPrevSound();
 			void setSoundGuiNextSound();
-			std::vector<std::weak_ptr<mpc::sampler::StereoMixerChannel>> getDrumStereoMixerChannels(int i);
-			std::vector<std::weak_ptr<mpc::sampler::IndivFxMixerChannel>> getDrumIndivFxMixerChannels(int i);
+			std::vector<std::weak_ptr<ctoot::mpc::MpcStereoMixerChannel>> getDrumStereoMixerChannels(int i);
+			std::vector<std::weak_ptr<ctoot::mpc::MpcIndivFxMixerChannel>> getDrumIndivFxMixerChannels(int i);
 			std::weak_ptr<Sound> copySound(std::weak_ptr<Sound> source);
 			void setActiveInput(ctoot::audio::server::IOAudioProcess* input);
 

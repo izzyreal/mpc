@@ -47,7 +47,7 @@ void StereoToMonoControls::function(int i)
 		lLs->openScreen("sound");
 		break;
 	case 4:
-		sound = lSampler->getSound(soundGui->getSoundIndex());
+		sound = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound(soundGui->getSoundIndex()).lock());
 		auto lSound = sound.lock();
 		if (lSound->isMono()) return;
 

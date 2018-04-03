@@ -58,7 +58,7 @@ void ConvertSoundControls::function(int i)
 		}
 		else {
 			lLs->openScreen("resample");
-			soundGui->setNewFs(lSampler->getSound(soundGui->getSoundIndex()).lock()->getSampleRate());
+			soundGui->setNewFs(dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound(soundGui->getSoundIndex()).lock())->getSampleRate());
 			auto newSampleName = lSampler->getSoundName(soundGui->getSoundIndex());
 			//newSampleName = newSampleName->replaceAll("\\s+$", "");
 			newSampleName = lSampler->addOrIncreaseNumber(newSampleName);

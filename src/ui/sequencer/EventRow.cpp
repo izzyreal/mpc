@@ -21,7 +21,7 @@
 #include <sequencer/PolyPressureEvent.hpp>
 #include <sequencer/ProgramChangeEvent.hpp>
 #include <sequencer/SystemExclusiveEvent.hpp>
-#include <ctootextensions/MpcSoundPlayerChannel.hpp>
+#include <mpc/MpcSoundPlayerChannel.hpp>
 
 #include <file/File.hpp>
 
@@ -70,7 +70,7 @@ EventRow::EventRow(mpc::Mpc* mpc, int bus, weak_ptr<mpc::sequencer::Event> e, in
 	auto lSampler = sampler.lock();
 	if (bus != 0) {
 		mpcSoundPlayerChannel = lSampler->getDrum(bus - 1);
-		program = lSampler->getProgram(mpcSoundPlayerChannel->getProgram());
+		program = dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
 	}
 	midi = false;
 	event = e;

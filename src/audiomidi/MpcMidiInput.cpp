@@ -121,7 +121,7 @@ void MpcMidiInput::transport(ctoot::midi::core::MidiMessage* msg, int timeStamp)
 		auto p = lSampler->getProgram(lSampler->getDrumBusProgramNumber(track->getBusNumber())).lock();
 		auto controls = mpc->getActiveControls();
 
-		controls->setSliderNoteVar(note.get(), p);
+		controls->setSliderNoteVar(note.get(), dynamic_pointer_cast<mpc::sampler::Program>(p));
 
 		auto pad = p->getPadNumberFromNote(note->getNote());
 		mpc->getUis().lock()->getSamplerGui()->setPadAndNote(pad, note->getNote());

@@ -5,6 +5,12 @@
 
 #include <lcdgui/Component.hpp>
 
+namespace ctoot {
+	namespace mpc {
+		class MpcSoundPlayerChannel;
+	}
+}
+
 namespace mpc {
 
 	class Mpc;
@@ -16,10 +22,6 @@ namespace mpc {
 	namespace sampler {
 		class Sampler;
 		class Program;
-	}
-
-	namespace ctootextensions {
-		class MpcSoundPlayerChannel;
 	}
 
 	namespace lcdgui {
@@ -50,7 +52,7 @@ namespace mpc {
 				std::vector<std::weak_ptr<mpc::lcdgui::Field>> tfArray;
 				std::vector<std::weak_ptr<mpc::lcdgui::Label>> labelArray;
 				std::weak_ptr<mpc::sampler::Sampler> sampler;
-				mpc::ctootextensions::MpcSoundPlayerChannel* mpcSoundPlayerChannel{ nullptr };
+				ctoot::mpc::MpcSoundPlayerChannel* mpcSoundPlayerChannel{ nullptr };
 				std::weak_ptr<mpc::sampler::Program> program;
 				mpc::ui::sampler::SamplerGui* samplerGui{ nullptr };
 

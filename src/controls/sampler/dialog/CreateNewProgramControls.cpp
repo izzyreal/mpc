@@ -3,7 +3,7 @@
 #include <ui/sampler/window/SamplerWindowGui.hpp>
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>
-#include <ctootextensions/MpcSoundPlayerChannel.hpp>
+#include <mpc/MpcSoundPlayerChannel.hpp>
 
 using namespace mpc::controls::sampler::dialog;
 using namespace std;

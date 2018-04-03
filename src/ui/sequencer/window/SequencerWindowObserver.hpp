@@ -6,13 +6,15 @@
 #include <memory>
 #include <vector>
 
+namespace ctoot {
+	namespace mpc {
+		class MpcSoundPlayerChannel;
+	}
+}
+
 namespace mpc {
 
 	class Mpc;
-
-	namespace ctootextensions {
-		class MpcSoundPlayerChannel;
-	}
 
 	namespace sequencer {
 		class Sequencer;
@@ -137,7 +139,7 @@ namespace mpc {
 					std::weak_ptr<mpc::lcdgui::Field> amountField{};
 					std::weak_ptr<mpc::lcdgui::Label> swingLabel{};
 					std::weak_ptr<mpc::lcdgui::Label> notes1Label{};
-					mpc::ctootextensions::MpcSoundPlayerChannel* mpcSoundPlayerChannel{};
+					ctoot::mpc::MpcSoundPlayerChannel* mpcSoundPlayerChannel{};
 					mpc::lcdgui::FunctionKeys* fb{};
 					std::weak_ptr<mpc::lcdgui::Field> bar0Field{};
 					std::weak_ptr<mpc::lcdgui::Field> bar1Field{};

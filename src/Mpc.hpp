@@ -10,6 +10,14 @@
 #include <disk/ProgramLoader.hpp>
 #include "DiskController.hpp"
 
+namespace ctoot {
+	namespace mpc {
+		class MpcSoundPlayerChannel;
+		class MpcBasicSoundPlayerChannel;
+		class MpcMultiMidiSynth;
+	}
+}
+
 namespace mpc {
 
 	namespace ui {
@@ -34,12 +42,6 @@ namespace mpc {
 
 	namespace lcdgui {
 		class LayeredScreen;
-	}
-
-	namespace ctootextensions {
-		class MpcSoundPlayerChannel;
-		class MpcBasicSoundPlayerChannel;
-		class MpcMultiMidiSynth;
 	}
 
 	namespace audiomidi {
@@ -98,12 +100,12 @@ namespace mpc {
 	public:
 		std::weak_ptr<sequencer::Sequencer> getSequencer();
 		std::weak_ptr<sampler::Sampler> getSampler();
-		ctootextensions::MpcSoundPlayerChannel* getDrum(int i);
-		ctootextensions::MpcBasicSoundPlayerChannel* getBasicPlayer();
+		ctoot::mpc::MpcSoundPlayerChannel* getDrum(int i);
+		ctoot::mpc::MpcBasicSoundPlayerChannel* getBasicPlayer();
 		std::weak_ptr<audiomidi::AudioMidiServices> getAudioMidiServices();
-		std::vector<ctootextensions::MpcSoundPlayerChannel*> getDrums();
+		std::vector<ctoot::mpc::MpcSoundPlayerChannel*> getDrums();
 		std::weak_ptr<audiomidi::EventHandler> getEventHandler();
-		mpc::ctootextensions::MpcMultiMidiSynth* getMms();
+		ctoot::mpc::MpcMultiMidiSynth* getMms();
 		std::weak_ptr<mpc::audiomidi::MpcMidiPorts> getMidiPorts();
 		mpc::audiomidi::MpcMidiInput* getMpcMidiInput(int i);
 

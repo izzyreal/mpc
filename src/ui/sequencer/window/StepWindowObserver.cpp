@@ -19,7 +19,7 @@
 #include <sequencer/PolyPressureEvent.hpp>
 #include <sequencer/ProgramChangeEvent.hpp>
 #include <sequencer/Sequencer.hpp>
-#include <ctootextensions/MpcSoundPlayerChannel.hpp>
+#include <mpc/MpcSoundPlayerChannel.hpp>
 
 using namespace mpc::ui::sequencer::window;
 using namespace mpc::sequencer;
@@ -52,7 +52,7 @@ StepWindowObserver::StepWindowObserver(mpc::Mpc* mpc)
 	auto lSampler = sampler.lock();
 	if (track.lock()->getBusNumber() != 0) {
 		mpcSoundPlayerChannel = lSampler->getDrum(track.lock()->getBusNumber() - 1);
-		program = lSampler->getProgram(mpcSoundPlayerChannel->getProgram());
+		program = dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
 	}
 	lSequencer->addObserver(this);
 	auto ls = mpc->getLayeredScreen().lock();

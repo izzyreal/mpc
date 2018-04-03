@@ -5,9 +5,9 @@
 
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>
-#include <ctootextensions/MpcSoundPlayerChannel.hpp>
-#include <sampler/StereoMixerChannel.hpp>
-#include <sampler/IndivFxMixerChannel.hpp>
+#include <mpc/MpcSoundPlayerChannel.hpp>
+#include <mpc/MpcStereoMixerChannel.hpp>
+#include <mpc/MpcIndivFxMixerChannel.hpp>
 
 #include <VecUtil.hpp>
 
@@ -82,7 +82,7 @@ ApsParser::ApsParser(mpc::Mpc* mpc, string apsNameString)
 	for (int i = 0; i < 24; i++) {
 		auto p = sampler->getProgram(i).lock();
 		if (!p) continue;
-		auto program = ApsProgram(p.get(), i);
+		auto program = ApsProgram(dynamic_cast<mpc::sampler::Program*>(p.get()), i);
 		chunks.push_back(program.getBytes());
 	}
 	chunks.push_back(vector<char>{ (char)255, (char)255 });

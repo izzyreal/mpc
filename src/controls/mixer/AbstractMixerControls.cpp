@@ -4,8 +4,8 @@
 #include <ui/sampler/MixerGui.hpp>
 #include <ui/sampler/MixerSetupGui.hpp>
 #include <ui/sampler/SamplerGui.hpp>
-#include <sampler/StereoMixerChannel.hpp>
-#include <sampler/IndivFxMixerChannel.hpp>
+#include <mpc/MpcStereoMixerChannel.hpp>
+#include <mpc/MpcIndivFxMixerChannel.hpp>
 #include <sampler/Pad.hpp>
 #include <sampler/Program.hpp>
 

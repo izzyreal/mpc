@@ -19,7 +19,7 @@
 #include <sequencer/SeqUtil.hpp>
 #include <sequencer/Sequencer.hpp>
 #include <sequencer/TempoChangeEvent.hpp>
-#include <ctootextensions/MpcSoundPlayerChannel.hpp>
+#include <mpc/MpcSoundPlayerChannel.hpp>
 #include <lcdgui/Field.hpp>
 #include <lcdgui/Label.hpp>
 
@@ -76,7 +76,7 @@ SequencerWindowObserver::SequencerWindowObserver(mpc::Mpc* mpc)
 	auto lSampler = sampler.lock();
 	int drum = track.lock()->getBusNumber() - 1;
 	mpcSoundPlayerChannel = drum >= 0 ? lSampler->getDrum(drum) : nullptr;
-	program = drum >= 0 ? lSampler->getProgram(mpcSoundPlayerChannel->getProgram()) : weak_ptr<mpc::sampler::Program>();
+	program = drum >= 0 ? dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(mpcSoundPlayerChannel->getProgram()).lock()) : weak_ptr<mpc::sampler::Program>();
 	sequenceNameFirstLetterField = ls->lookupField("sequencenamefirstletter");
 	defaultSequenceNameFirstLetterField = ls->lookupField("defaultnamefirstletter");
 	sequenceNameRestLabel = ls->lookupLabel("sequencenamerest");

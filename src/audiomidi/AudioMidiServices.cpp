@@ -7,19 +7,20 @@
 #include <audiomidi/ExportAudioProcessAdapter.hpp>
 #include <audiomidi/MpcMidiPorts.hpp>
 #include <ui/sampler/SamplerGui.hpp>
+#include <ui/sampler/MixerSetupGui.hpp>
 #include <nvram/NvRam.hpp>
 #include <nvram/AudioMidiConfig.hpp>
 #include <sampler/Sampler.hpp>
 #include <sequencer/Sequencer.hpp>
-#include <ctootextensions/Voice.hpp>
-#include <ctootextensions/MpcBasicSoundPlayerChannel.hpp>
-#include <ctootextensions/MpcBasicSoundPlayerControls.hpp>
-#include <ctootextensions/MpcFaderControl.hpp>
-#include <ctootextensions/MpcMixerControls.hpp>
-#include <ctootextensions/MpcMultiMidiSynth.hpp>
-#include <ctootextensions/MpcMultiSynthControls.hpp>
-#include <ctootextensions/MpcSoundPlayerChannel.hpp>
-#include <ctootextensions/MpcSoundPlayerControls.hpp>
+#include <mpc/MpcVoice.hpp>
+#include <mpc/MpcBasicSoundPlayerChannel.hpp>
+#include <mpc/MpcBasicSoundPlayerControls.hpp>
+#include <mpc/MpcFaderControl.hpp>
+#include <mpc/MpcMixerControls.hpp>
+#include <mpc/MpcMultiMidiSynth.hpp>
+#include <mpc/MpcMultiSynthControls.hpp>
+#include <mpc/MpcSoundPlayerChannel.hpp>
+#include <mpc/MpcSoundPlayerControls.hpp>
 
 // ctoot
 #include <audio/core/AudioFormat.hpp>
@@ -63,10 +64,17 @@
 #include <audio/core/AudioServices.hpp>
 #include <audio/spi/AudioServiceProvider.hpp>
 
+#include <synth/synths/multi/MultiSynthServiceProvider.hpp>
+#include <synth/SynthServices.hpp>
+#include <synth/SynthChannelServices.hpp>
+
 // moduru
 #include <file/File.hpp>
 #include <file/FileUtil.hpp>
 #include <lang/StrUtil.hpp>
+
+#include <mpc/MpcSampler.hpp>
+#include <mpc/MpcMixerSetupGui.hpp>
 
 #include <Logger.hpp>
 
@@ -83,6 +91,8 @@ AudioMidiServices::AudioMidiServices(mpc::Mpc* mpc)
 	frameSeq = make_shared<mpc::sequencer::FrameSeq>(mpc);
 	disabled = true;
 	ctoot::audio::core::AudioServices::scan();
+	ctoot::synth::SynthServices::scan();
+	ctoot::synth::SynthChannelServices::scan();
 }
 
 void AudioMidiServices::start(std::string mode, int sampleRate) {
@@ -162,7 +172,7 @@ weak_ptr<ctoot::audio::server::AudioServer> AudioMidiServices::getAudioServer() 
 
 void AudioMidiServices::setupMixer()
 {
-	mixerControls = make_shared<ctootextensions::MpcMixerControls>("MpcMixerControls", 1.f);
+	mixerControls = make_shared<ctoot::mpc::MpcMixerControls>("MpcMixerControls", 1.f);
 	
 	// AUX#1 - #4 represent ASSIGNABLE MIX OUT 1/2, 3/4, 5/6 and 7/8
 	mixerControls->createAuxBusControls("AUX#1", ctoot::audio::core::ChannelFormat::STEREO());
@@ -211,13 +221,13 @@ void AudioMidiServices::setMasterLevel(int i)
 {
 	auto sc = mixer->getMixerControls().lock()->getStripControls("L-R").lock();
 	auto cc = dynamic_pointer_cast<ctoot::control::CompoundControl>(sc->find("Main").lock());
-	dynamic_pointer_cast<ctootextensions::MpcFaderControl>(cc->find("Level").lock())->setValue(i);
+	dynamic_pointer_cast<ctoot::mpc::MpcFaderControl>(cc->find("Level").lock())->setValue(i);
 }
 
 int AudioMidiServices::getMasterLevel() {
 	auto sc = mixer->getMixerControls().lock()->getStripControls("L-R").lock();
 	auto cc = dynamic_pointer_cast<ctoot::control::CompoundControl>(sc->find("Main").lock());
-	auto val = dynamic_pointer_cast<ctootextensions::MpcFaderControl>(cc->find("Level").lock())->getValue();
+	auto val = dynamic_pointer_cast<ctoot::mpc::MpcFaderControl>(cc->find("Level").lock())->getValue();
 	return (int)(val);
 }
 
@@ -238,7 +248,7 @@ void AudioMidiServices::setAssignableMixOutLevels()
 		string name = "AUX#" + to_string(j);
 		auto sc = mixer->getMixerControls().lock()->getStripControls(name).lock();
 		auto cc = dynamic_pointer_cast<ctoot::control::CompoundControl>(sc->find(name).lock());
-		dynamic_pointer_cast<ctootextensions::MpcFaderControl>(cc->find("Level").lock())->setValue(100);
+		dynamic_pointer_cast<ctoot::mpc::MpcFaderControl>(cc->find("Level").lock())->setValue(100);
 	}
 }
 
@@ -254,7 +264,7 @@ vector<string> AudioMidiServices::getOutputNames()
 	return server->getAvailableOutputNames();
 }
 
-weak_ptr<mpc::ctootextensions::MpcMultiMidiSynth> AudioMidiServices::getMms()
+weak_ptr<ctoot::mpc::MpcMultiMidiSynth> AudioMidiServices::getMms()
 {
 	return mms;
 }
@@ -263,17 +273,18 @@ void AudioMidiServices::createSynth(int sampleRate)
 {
 	synthRackControls = make_shared<ctoot::synth::SynthRackControls>(1);
 	synthRack = make_shared<ctoot::synth::SynthRack>(synthRackControls, midiSystem, audioSystem);
-	msc = make_shared<ctootextensions::MpcMultiSynthControls>();
+	msc = make_shared<ctoot::mpc::MpcMultiSynthControls>();
 	msc->setSampleRate(sampleRate);
 	synthRackControls->setSynthControls(0, msc);
-	mms = dynamic_pointer_cast<mpc::ctootextensions::MpcMultiMidiSynth>(synthRack->getMidiSynth(0).lock());
+	mms = dynamic_pointer_cast<ctoot::mpc::MpcMultiMidiSynth>(synthRack->getMidiSynth(0).lock());
+	auto msGui = mpc->getUis().lock()->getMixerSetupGui();
 	for (int i = 0; i < 4; i++) {
-		auto m = make_shared<ctootextensions::MpcSoundPlayerControls>(mms, mpc->getSampler(), i, mixer, server, mpc->getUis().lock()->getMixerSetupGui());
+		auto m = make_shared<ctoot::mpc::MpcSoundPlayerControls>(mms, dynamic_pointer_cast<ctoot::mpc::MpcSampler>(mpc->getSampler().lock()), i, mixer, server, dynamic_cast<ctoot::mpc::MpcMixerSetupGui*>(msGui));
 		msc->setChannelControls(i, m);
 		synthChannelControls.push_back(m);
 	}
-	basicVoice = make_shared<mpc::ctootextensions::Voice>(65, true, sampleRate);
-	auto m = make_shared<mpc::ctootextensions::MpcBasicSoundPlayerControls>(mpc->getSampler(), mixer, basicVoice);
+	basicVoice = make_shared<ctoot::mpc::MpcVoice>(65, true, sampleRate);
+	auto m = make_shared<ctoot::mpc::MpcBasicSoundPlayerControls>(mpc->getSampler(), mixer, basicVoice);
 	msc->setChannelControls(4, m);
 	synthChannelControls.push_back(std::move(m));
 }

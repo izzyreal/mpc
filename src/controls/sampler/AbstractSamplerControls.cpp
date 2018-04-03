@@ -17,7 +17,7 @@
 #include <sequencer/Sequence.hpp>
 #include <sequencer/Track.hpp>
 #include <sequencer/Sequencer.hpp>
-#include <ctootextensions/MpcSoundPlayerChannel.hpp>
+#include <mpc/MpcSoundPlayerChannel.hpp>
 
 #include <cmath>
 
@@ -40,15 +40,15 @@ void AbstractSamplerControls::init()
 	super::init();
 	auto lSampler = sampler.lock();
 	if (lSampler->getSoundCount() != 0)
-		sound = lSampler->getSound(soundGui->getSoundIndex());
+		sound = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound(soundGui->getSoundIndex()).lock());
 
 	mpcSoundPlayerChannel = lSampler->getDrum(samplerGui->getSelectedDrum());
-	program = lSampler->getProgram(mpcSoundPlayerChannel->getProgram());
+	program = dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
 	auto lProgram = program.lock();
 	if (csn.compare("programassign") == 0) {
 		lastPad = lSampler->getLastPad(lProgram.get());
 		auto note = lastPad->getNote();
-		lastNp = lProgram->getNoteParameters(note);
+		lastNp = dynamic_cast<mpc::sampler::NoteParameters*>(lProgram->getNoteParameters(note));
 	}
 	else {
 		lastNp = lSampler->getLastNp(lProgram.get());

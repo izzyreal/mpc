@@ -4,6 +4,12 @@
 #include <memory>
 #include <vector>
 
+namespace ctoot {
+	namespace mpc {
+		class MpcSoundPlayerChannel;
+	}
+}
+
 namespace mpc {
 
 	class Mpc;
@@ -17,10 +23,6 @@ namespace mpc {
 		class Sequencer;
 		class Sequence;
 		class Track;
-	}
-
-	namespace ctootextensions {
-		class MpcSoundPlayerChannel;
 	}
 
 	namespace lcdgui {
@@ -68,7 +70,7 @@ namespace mpc {
 					int yPosSingle{};
 					std::weak_ptr<mpc::sampler::Sampler> sampler{};
 					std::weak_ptr<mpc::sampler::Program> program{};
-					mpc::ctootextensions::MpcSoundPlayerChannel* mpcSoundPlayerChannel{};
+					ctoot::mpc::MpcSoundPlayerChannel* mpcSoundPlayerChannel{};
 					mpc::ui::sampler::SamplerGui* samplerGui{};
 
 				public:

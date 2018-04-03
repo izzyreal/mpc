@@ -1,19 +1,21 @@
 #pragma once
+#include <mpc/MpcSound.hpp>
 #include <observer/Observable.hpp>
-#include <ctootextensions/MpcSoundOscillatorControls.hpp>
+#include <mpc/MpcSoundOscillatorControls.hpp>
 
 namespace mpc {
 	namespace sampler {
 
 		class Sound
-			: public moduru::observer::Observable
+			: public virtual ctoot::mpc::MpcSound
+			, public moduru::observer::Observable
 		{
 
 		private:
 			std::string name{ "" };
 			int memoryIndex{ -1 };
 			int numberOfBeats{ 4 };
-			ctootextensions::MpcSoundOscillatorControls* msoc{ nullptr };
+			ctoot::mpc::MpcSoundOscillatorControls* msoc{ nullptr };
 
 		public:
 			void setName(std::string s);
@@ -44,7 +46,7 @@ namespace mpc {
 			void setLoopEnabled(bool loopEnabled);
 			void setLoopTo(int loopTo);
 			void setTune(int tune);
-			ctootextensions::MpcSoundOscillatorControls* getMsoc();
+			ctoot::mpc::MpcSoundOscillatorControls* getMsoc();
 			void insertFrame(std::vector<float> frame, unsigned int index);
 
 		public:

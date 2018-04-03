@@ -2,7 +2,7 @@
 
 #include <Mpc.hpp>
 #include <sampler/Sampler.hpp>
-#include <ctootextensions/MpcSoundOscillatorControls.hpp>
+#include <mpc/MpcSoundOscillatorControls.hpp>
 
 using namespace mpc::sampler;
 using namespace std;
@@ -10,12 +10,12 @@ using namespace std;
 Sound::Sound(int rate, int index) 
 {
 	this->memoryIndex = index;
-	msoc = new ctootextensions::MpcSoundOscillatorControls(memoryIndex, 0);
+	msoc = new ctoot::mpc::MpcSoundOscillatorControls(memoryIndex, 0);
 }
 
 Sound::Sound() 
 {
-	msoc = new ctootextensions::MpcSoundOscillatorControls(-1, 0);
+	msoc = new ctoot::mpc::MpcSoundOscillatorControls(-1, 0);
 	msoc->setName("click");
 }
 
@@ -145,7 +145,7 @@ void Sound::setTune(int tune)
     msoc->setTune(tune);
 }
 
-mpc::ctootextensions::MpcSoundOscillatorControls* Sound::getMsoc()
+ctoot::mpc::MpcSoundOscillatorControls* Sound::getMsoc()
 {
     return msoc;
 }

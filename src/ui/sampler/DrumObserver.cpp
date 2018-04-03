@@ -1,4 +1,4 @@
-#include <ui/sampler/DrumObserver.hpp>\
+#include <ui/sampler/DrumObserver.hpp>
 
 #include <Mpc.hpp>
 #include <Util.hpp>
@@ -7,7 +7,7 @@
 #include <ui/sampler/SamplerGui.hpp>
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>
-#include <ctootextensions/MpcSoundPlayerChannel.hpp>
+#include <mpc/MpcSoundPlayerChannel.hpp>
 
 #include <lang/StrUtil.hpp>
 
@@ -55,7 +55,7 @@ void DrumObserver::displayPadToInternalSound()
 void DrumObserver::displayPgm()
 {
     auto pn = mpcSoundPlayerChannel->getProgram();
-    pgmField.lock()->setText(moduru::lang::StrUtil::padLeft(to_string(pn + 1), " ", 2) + "-" +  sampler.lock()->getProgram(pn).lock()->getName());
+    pgmField.lock()->setText(moduru::lang::StrUtil::padLeft(to_string(pn + 1), " ", 2) + "-" +  dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(pn).lock())->getName());
 }
 
 void DrumObserver::displayPgmChange()

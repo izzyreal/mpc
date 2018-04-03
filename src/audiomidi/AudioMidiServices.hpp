@@ -11,6 +11,14 @@
 #include <memory>
 
 namespace ctoot {
+
+	namespace mpc {
+		class MpcMixerControls;
+		class MpcMultiMidiSynth;
+		class MpcMultiSynthControls;
+		class MpcVoice;
+	}
+
 	namespace audio {
 
 		namespace core {
@@ -44,13 +52,6 @@ namespace ctoot {
 
 namespace mpc {
 
-	namespace ctootextensions {
-		class MpcMixerControls;
-		class MpcMultiMidiSynth;
-		class MpcMultiSynthControls;
-		class Voice;
-	}
-
 	namespace audiomidi {
 
 		class MpcMidiPorts;
@@ -67,8 +68,8 @@ namespace mpc {
 			bool bouncing{ false };
 
 			std::shared_ptr<ctoot::audio::core::AudioFormat> format;
-			std::vector<std::shared_ptr<mpc::ctootextensions::Voice>> voices;
-			std::shared_ptr<mpc::ctootextensions::Voice> basicVoice;
+			std::vector<std::shared_ptr<ctoot::mpc::MpcVoice>> voices;
+			std::shared_ptr<ctoot::mpc::MpcVoice> basicVoice;
 			std::vector<std::shared_ptr<ctoot::synth::SynthChannelControls>> synthChannelControls;
 			std::shared_ptr<ctoot::audio::server::AudioServer> server;
 			std::shared_ptr<ctoot::audio::server::NonRealTimeAudioServer> offlineServer;
@@ -77,9 +78,9 @@ namespace mpc {
 			std::shared_ptr<ctoot::audio::mixer::AudioMixer> mixer;
 			std::shared_ptr<ctoot::synth::SynthRackControls> synthRackControls;
 			std::shared_ptr<ctoot::synth::SynthRack> synthRack;
-			std::shared_ptr<ctootextensions::MpcMultiSynthControls> msc;
-			std::shared_ptr<ctootextensions::MpcMixerControls> mixerControls;
-			std::weak_ptr<ctootextensions::MpcMultiMidiSynth> mms;
+			std::shared_ptr<ctoot::mpc::MpcMultiSynthControls> msc;
+			std::shared_ptr<ctoot::mpc::MpcMixerControls> mixerControls;
+			std::weak_ptr<ctoot::mpc::MpcMultiMidiSynth> mms;
 			std::shared_ptr<ctoot::audio::server::CompoundAudioClient> cac;
 			std::shared_ptr<MpcMidiPorts> mpcMidiPorts;
 			Mpc* mpc{ nullptr };
@@ -112,7 +113,7 @@ namespace mpc {
 			int getRecordLevel();
 			std::vector<std::string> getInputNames();
 			std::vector<std::string> getOutputNames();
-			std::weak_ptr<ctootextensions::MpcMultiMidiSynth> getMms();
+			std::weak_ptr<ctoot::mpc::MpcMultiMidiSynth> getMms();
 			void initializeDiskWriter();
 			void closeIO();
 			void disable();

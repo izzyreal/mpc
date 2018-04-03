@@ -45,7 +45,7 @@ void SaveASoundControls::function(int i)
 		ls.lock()->openScreen("save");
 		break;
 	case 4:
-		s = lSampler->getSound(soundGui->getSoundIndex());
+		s = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound(soundGui->getSoundIndex()).lock());
 		type = diskGui->getFileTypeSaveSound();
 		ext = type == 0 ? ".SND" : ".WAV";
 		fileName = mpc::Util::getFileName(nameGui->getName()) + ext;

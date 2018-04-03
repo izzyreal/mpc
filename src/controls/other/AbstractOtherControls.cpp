@@ -31,7 +31,7 @@ void AbstractOtherControls::init()
     track = sequence.lock()->getTrack(trackNum);
 	auto lSampler = sampler.lock();
 	auto lTrk = track.lock();
-    program = lTrk->getBusNumber() == 0 ? weak_ptr<mpc::sampler::Program>() : lSampler->getProgram(lSampler->getDrumBusProgramNumber(lTrk->getBusNumber()));
+    program = lTrk->getBusNumber() == 0 ? weak_ptr<mpc::sampler::Program>() : dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(lSampler->getDrumBusProgramNumber(lTrk->getBusNumber())).lock());
 }
 
 AbstractOtherControls::~AbstractOtherControls() {

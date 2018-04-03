@@ -14,7 +14,7 @@
 #include <sequencer/Sequence.hpp>
 #include <sequencer/Track.hpp>
 #include <sequencer/Sequencer.hpp>
-#include <ctootextensions/MpcSoundPlayerChannel.hpp>
+#include <mpc/MpcSoundPlayerChannel.hpp>
 
 using namespace mpc::controls::sampler::window;
 using namespace std;
@@ -66,7 +66,7 @@ void EditSoundControls::function(int j)
 	switch (j) {
 
 	case 4:
-		sound = lSampler->getSound(soundGui->getSoundIndex()).lock();
+		sound = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound(soundGui->getSoundIndex()).lock());
 		
 		if (editSoundGui->getEdit() == 0) {
 			auto newLength = sound->getEnd() - sound->getStart();
@@ -104,7 +104,7 @@ void EditSoundControls::function(int j)
 		}
 		else if (editSoundGui->getEdit() == 3) {
 			auto source = lSampler->getSound(editSoundGui->getInsertSndNr()).lock();
-			auto destination = lSampler->getSound(soundGui->getSoundIndex()).lock();
+			auto destination = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound(soundGui->getSoundIndex()).lock());
 			int destinationStart = sound->getStart();
 			int sourceLength = source->getSampleData()->size();
 			if (!source->isMono()) sourceLength /= 2;
@@ -224,7 +224,7 @@ void EditSoundControls::function(int j)
 		}	
 		else if (editSoundGui->getEdit() == 8) {
 			auto endMargin = editSoundGui->getEndMargin();
-			auto source = lSampler->getSound(soundGui->getSoundIndex());
+			auto source = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound(soundGui->getSoundIndex()).lock());
 			for (int i = 0; i < soundGui->getNumberOfZones(); i++) {
 				auto start = soundGui->getZoneStart(i);
 				auto end = soundGui->getZoneEnd(i);
@@ -238,12 +238,12 @@ void EditSoundControls::function(int j)
 			soundGui->initZones(lSampler->getSound(soundGui->getSoundIndex()).lock()->getLastFrameIndex());
 			if (editSoundGui->getCreateNewProgram()) {
 				auto p = lSampler->addProgram().lock();
-				p->setName(source.lock()->getName());
+				p->setName(source->getName());
 				for (int i = 0; i < soundGui->getNumberOfZones(); i++) {
 					auto pad = p->getPad(i);
 					auto note = pad->getNote();
 					auto n = p->getNoteParameters(note);
-					n->setSoundNumber(lSampler->getSoundCount() - soundGui->getNumberOfZones() + i);
+					dynamic_cast<mpc::sampler::NoteParameters*>(n)->setSoundNumber(lSampler->getSoundCount() - soundGui->getNumberOfZones() + i);
 				}
 				auto lSequencer = sequencer.lock();
 				auto s = lSequencer->getSequence(lSequencer->getActiveSequenceIndex()).lock();

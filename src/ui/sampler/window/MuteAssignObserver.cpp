@@ -23,7 +23,7 @@ MuteAssignObserver::MuteAssignObserver(mpc::Mpc* mpc)
 	note0Field = ls->lookupField("note0");
 	note1Field = ls->lookupField("note1");
 	auto lSampler = sampler.lock();
-	program = lSampler->getProgram(lSampler->getDrumBusProgramNumber(uis->getSamplerGui()->getSelectedDrum() + 1));
+	program = dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(lSampler->getDrumBusProgramNumber(uis->getSamplerGui()->getSelectedDrum() + 1)).lock());
 	auto lProgram = program.lock();
 	np = lSampler->getLastNp(lProgram.get());
 	np->addObserver(this);

@@ -42,7 +42,7 @@ void LoadASoundControls::function(int i)
 		if (controls->isF3Pressed()) return;
 		controls->setF3Pressed(true);
 		//lSampler->stopAllVoices();
-		s = lSampler->getPreviewSound().lock();
+		s = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getPreviewSound().lock());
 		start = s->getStart();
 		end = s->getSampleData()->size();
 		loopTo = -1;
@@ -58,11 +58,11 @@ void LoadASoundControls::function(int i)
 		break;
 	case 3:
 		lSampler->finishBasicVoice(); // Here we make sure the sound is not being played, so it can be removed from memory.
-		lSampler->deleteSound(lSampler->getPreviewSound());
+		lSampler->deleteSound(dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getPreviewSound().lock()));
 		ls.lock()->openScreen("load");
 		break;
 	case 4:
-		auto command = mpc::command::KeepSound(mpc, lSampler->getPreviewSound());
+		auto command = mpc::command::KeepSound(mpc, dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getPreviewSound().lock()));
 		command.execute();
 		ls.lock()->openScreen("load");
 		break;

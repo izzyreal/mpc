@@ -19,14 +19,15 @@
 #include <ui/sampler/MixerSetupGui.hpp>
 #include <ui/sampler/SamplerGui.hpp>
 #include <ui/sampler/SoundGui.hpp>
-#include <sampler/StereoMixerChannel.hpp>
-#include <sampler/IndivFxMixerChannel.hpp>
 #include <sampler/NoteParameters.hpp>
 #include <sampler/Pad.hpp>
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>
 #include <sampler/PgmSlider.hpp>
-#include <ctootextensions/MpcSoundPlayerChannel.hpp>
+
+#include <mpc/MpcSoundPlayerChannel.hpp>
+#include <mpc/MpcStereoMixerChannel.hpp>
+#include <mpc/MpcIndivFxMixerChannel.hpp>
 
 #include <lang/StrUtil.hpp>
 
@@ -111,7 +112,7 @@ void ApsLoader::load()
 			ifmc->setVolumeIndividualOut(apsifmc->getVolumeIndividualOut());
 			ifmc->setFxSendLevel(apsifmc->getFxSendLevel());
 			ifmc->setOutput(apsifmc->getOutput());
-			auto np = newProgram->getNoteParameters(i + 35);
+			auto np = dynamic_cast<mpc::sampler::NoteParameters*>(newProgram->getNoteParameters(i + 35));
 			auto anp = p->getNoteParameters(i + 35);
 			np->setSoundNumber(anp->getSoundNumber());
 			np->setTune(anp->getTune());

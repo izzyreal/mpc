@@ -1,4 +1,6 @@
 #pragma once
+#include <mpc/MpcProgram.hpp>
+
 #include <sampler/NoteParameters.hpp>
 #include <sampler/PgmSlider.hpp>
 
@@ -6,20 +8,33 @@
 
 #include <memory>
 
+namespace ctoot {
+	namespace mpc {
+		class MpcSampler;
+		class MpcStereoMixerChannel;
+		class MpcIndivFxMixerChannel;
+		class MpcNoteParameters;
+	}
+}
+
 namespace mpc {
 
 	class Mpc;
 
 	namespace sampler {
 
-		class StereoMixerChannel;
-		class IndivFxMixerChannel;
 		class Pad;
-		class Sampler;
 
 		class Program
-			: public moduru::observer::Observable
+			: public virtual ctoot::mpc::MpcProgram
+			, public moduru::observer::Observable
 		{
+
+		public:
+			std::weak_ptr<ctoot::mpc::MpcStereoMixerChannel> getStereoMixerChannel(int pad) override;
+			std::weak_ptr<ctoot::mpc::MpcIndivFxMixerChannel> getIndivFxMixerChannel(int pad) override;
+			int getPadNumberFromNote(int note) override;
+			ctoot::mpc::MpcNoteParameters* getNoteParameters(int i) override;
 
 		private:
 			Sampler* sampler{ nullptr };
@@ -35,11 +50,7 @@ namespace mpc {
 			int getNumberOfSamples();
 			void setName(std::string s);
 			std::string getName();
-			NoteParameters* getNoteParameters(int i);
 			Pad* getPad(int i);
-			std::weak_ptr<StereoMixerChannel> getStereoMixerChannel(int pad);
-			std::weak_ptr<IndivFxMixerChannel> getIndivFxMixerChannel(int pad);
-			int getPadNumberFromNote(int note);
 			std::vector<NoteParameters*> getNotesParameters();
 			mpc::sampler::PgmSlider* getSlider();
 			void setNoteParameters(int i, NoteParameters* nn);

@@ -3,12 +3,15 @@
 
 #include <memory>
 
+namespace ctoot {
+	namespace mpc {
+		class MpcStereoMixerChannel;
+		class MpcIndivFxMixerChannel;
+	}
+}
+
 namespace mpc {
 	class Mpc;
-	namespace sampler {
-		class StereoMixerChannel;
-		class IndivFxMixerChannel;
-	}
 
 	namespace ui {
 		namespace sampler {
@@ -30,8 +33,8 @@ namespace mpc {
 			protected:
 				mpc::ui::sampler::MixerGui* mixerGui{ nullptr };
 				mpc::ui::sampler::MixerSetupGui* mixerSetupGui{ nullptr };
-				std::weak_ptr<mpc::sampler::StereoMixerChannel> stereoMixerChannel;
-				std::weak_ptr<mpc::sampler::IndivFxMixerChannel> indivFxMixerChannel;
+				std::weak_ptr<ctoot::mpc::MpcStereoMixerChannel> stereoMixerChannel;
+				std::weak_ptr<ctoot::mpc::MpcIndivFxMixerChannel> indivFxMixerChannel;
 
 			protected:
 				void init() override;

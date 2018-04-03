@@ -5,6 +5,12 @@
 #include <vector>
 #include <string>
 
+namespace ctoot {
+	namespace mpc {
+		class MpcSoundPlayerChannel;
+	}
+}
+
 namespace mpc {
 
 	class Mpc;
@@ -12,10 +18,6 @@ namespace mpc {
 	namespace sampler {
 		class Sampler;
 		class Program;
-	}
-
-	namespace ctootextensions {
-		class MpcSoundPlayerChannel;
 	}
 
 	namespace lcdgui {
@@ -42,7 +44,7 @@ namespace mpc {
 					std::vector<std::string> letters{};
 					mpc::Mpc* mpc{ nullptr };
 					std::weak_ptr<mpc::sampler::Sampler> sampler{};
-					mpc::ctootextensions::MpcSoundPlayerChannel* mpcSoundPlayerChannel{ nullptr };
+					ctoot::mpc::MpcSoundPlayerChannel* mpcSoundPlayerChannel{ nullptr };
 					std::weak_ptr<mpc::sampler::Program> program{};
 					std::string csn{ "" };
 					mpc::ui::sampler::SamplerGui* samplerGui{ nullptr };

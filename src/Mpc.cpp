@@ -19,9 +19,9 @@
 #include <sequencer/Sequence.hpp>
 #include <sequencer/Track.hpp>
 #include <sequencer/Sequencer.hpp>
-#include <ctootextensions/MpcBasicSoundPlayerChannel.hpp>
-#include <ctootextensions/MpcMultiMidiSynth.hpp>
-#include <ctootextensions/MpcSoundPlayerChannel.hpp>
+#include <mpc/MpcBasicSoundPlayerChannel.hpp>
+#include <mpc/MpcMultiMidiSynth.hpp>
+#include <mpc/MpcSoundPlayerChannel.hpp>
 
 #include <midi/core/MidiTransport.hpp>
 #include <synth/SynthChannel.hpp>
@@ -128,27 +128,27 @@ weak_ptr<sampler::Sampler> Mpc::getSampler()
     return sampler;
 }
 
-mpc::ctootextensions::MpcSoundPlayerChannel* Mpc::getDrum(int i)
+ctoot::mpc::MpcSoundPlayerChannel* Mpc::getDrum(int i)
 {
 	auto mms = audioMidiServices->getMms().lock();
 	auto channel = mms->getChannel(i).lock().get();
-	return dynamic_cast< mpc::ctootextensions::MpcSoundPlayerChannel*>(channel);
+	return dynamic_cast< ctoot::mpc::MpcSoundPlayerChannel*>(channel);
 }
 
-vector<mpc::ctootextensions::MpcSoundPlayerChannel*> Mpc::getDrums()
+vector<ctoot::mpc::MpcSoundPlayerChannel*> Mpc::getDrums()
 {
-	auto drums = vector<mpc::ctootextensions::MpcSoundPlayerChannel*>(4);
+	auto drums = vector<ctoot::mpc::MpcSoundPlayerChannel*>(4);
 	for (int i = 0; i < 4; i++) {
 		drums[i] = getDrum(i);
 	}
 	return drums;
 }
 
-mpc::ctootextensions::MpcBasicSoundPlayerChannel* Mpc::getBasicPlayer()
+ctoot::mpc::MpcBasicSoundPlayerChannel* Mpc::getBasicPlayer()
 {
 	auto mms = audioMidiServices->getMms().lock();
 	auto channel = mms->getChannel(4).lock().get();
-	return dynamic_cast< mpc::ctootextensions::MpcBasicSoundPlayerChannel*>(channel);
+	return dynamic_cast< ctoot::mpc::MpcBasicSoundPlayerChannel*>(channel);
 }
 
 weak_ptr<audiomidi::AudioMidiServices> Mpc::getAudioMidiServices()
@@ -220,7 +220,7 @@ void Mpc::importLoadedProgram()
 	}
 }
 
-mpc::ctootextensions::MpcMultiMidiSynth* Mpc::getMms()
+ctoot::mpc::MpcMultiMidiSynth* Mpc::getMms()
 {
 	return audioMidiServices->getMms().lock().get();
 }

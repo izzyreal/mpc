@@ -18,9 +18,9 @@ MidiNotes::MidiNotes(mpc::sampler::Program* program, vector<int> snConvTable)
 			setSampleSelect(i, snConvTable[nn->getSndNumber()]);
 		}
 		setSoundGenerationMode(i, nn->getSoundGenerationMode());
-		setVelocityRangeLower(i, nn->getVelocityRangeLower());
+		setVelocityRangeLower(i, dynamic_cast<mpc::sampler::NoteParameters*>(nn)->getVelocityRangeLower());
 		setAlsoPlayUse1(i, nn->getOptionalNoteA());
-		setVelocityRangeUpper(i, nn->getVelocityRangeUpper());
+		setVelocityRangeUpper(i, dynamic_cast<mpc::sampler::NoteParameters*>(nn)->getVelocityRangeUpper());
 		setAlsoPlayUse2(i, nn->getOptionalNoteB());
 		setVoiceOverlap(i, nn->getVoiceOverlap());
 		setMuteAssign1(i, nn->getMuteAssignA() == 34 ? 0 : nn->getMuteAssignA());
@@ -38,8 +38,8 @@ MidiNotes::MidiNotes(mpc::sampler::Program* program, vector<int> snConvTable)
 		setVelocityToAttack(i, nn->getVelocityToAttack());
 		setVelocityToStart(i, nn->getVelocityToStart());
 		setVelocityToCutoff(i, nn->getVelocityToFilterFrequency());
-		setSliderParameter(i, nn->getSliderParameterNumber());
-		setVelocityToPitch(i, nn->getVelocityToPitch());
+		setSliderParameter(i, dynamic_cast<mpc::sampler::NoteParameters*>(nn)->getSliderParameterNumber());
+		setVelocityToPitch(i, dynamic_cast<mpc::sampler::NoteParameters*>(nn)->getVelocityToPitch());
 	}
 	midiNotesArray[1600] = 6;
 }

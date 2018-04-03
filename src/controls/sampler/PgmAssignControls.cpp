@@ -4,13 +4,14 @@
 #include <ui/sampler/SamplerGui.hpp>
 #include <ui/sampler/SoundGui.hpp>
 #include <ui/sampler/window/SamplerWindowGui.hpp>
-#include <sampler/StereoMixerChannel.hpp>
 #include <sampler/NoteParameters.hpp>
 #include <sampler/Pad.hpp>
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>
 #include <sampler/Sound.hpp>
-#include <ctootextensions/MpcSoundPlayerChannel.hpp>
+
+#include <mpc/MpcSoundPlayerChannel.hpp>
+#include <mpc/MpcStereoMixerChannel.hpp>
 
 using namespace mpc::controls::sampler;
 using namespace std;

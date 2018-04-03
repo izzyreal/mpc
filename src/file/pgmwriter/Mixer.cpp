@@ -1,7 +1,7 @@
 #include <file/pgmwriter/Mixer.hpp>
 
-#include <sampler/StereoMixerChannel.hpp>
-#include <sampler/IndivFxMixerChannel.hpp>
+#include <mpc/MpcStereoMixerChannel.hpp>
+#include <mpc/MpcIndivFxMixerChannel.hpp>
 #include <sampler/Pad.hpp>
 #include <sampler/Program.hpp>
 

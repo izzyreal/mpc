@@ -1,12 +1,14 @@
 #include <sampler/Program.hpp>
-#include <sampler/StereoMixerChannel.hpp>
 #include <sampler/Sampler.hpp>
 #include <sampler/Pad.hpp>
+
+#include <mpc/MpcStereoMixerChannel.hpp>
+#include <mpc/MpcIndivFxMixerChannel.hpp>
 
 #include <Mpc.hpp>
 
 using namespace mpc::sampler;
-using namespace mpc::ctootextensions;
+using namespace ctoot::mpc;
 using namespace std;
 
 Program::Program(mpc::Mpc* mpc, mpc::sampler::Sampler* sampler) 
@@ -49,7 +51,7 @@ string Program::getName()
     return name;
 }
 
-NoteParameters* Program::getNoteParameters(int i)
+MpcNoteParameters* Program::getNoteParameters(int i)
 {
 	if (i < 35 || i > 98) {
 		return nullptr;
@@ -62,14 +64,14 @@ Pad* Program::getPad(int i)
 	return pads[i];
 }
 
-weak_ptr<StereoMixerChannel> Program::getStereoMixerChannel(int pad)
+weak_ptr<MpcStereoMixerChannel> Program::getStereoMixerChannel(int pad)
 {
-	return pads[pad]->getStereoMixerChannel();
+	return dynamic_pointer_cast<MpcStereoMixerChannel>(pads[pad]->getStereoMixerChannel().lock());
 }
 
-weak_ptr<IndivFxMixerChannel> Program::getIndivFxMixerChannel(int pad)
+weak_ptr<MpcIndivFxMixerChannel> Program::getIndivFxMixerChannel(int pad)
 {
-	return pads[pad]->getIndivFxMixerChannel();
+	return dynamic_pointer_cast<MpcIndivFxMixerChannel>(pads[pad]->getIndivFxMixerChannel().lock());
 }
 
 int Program::getPadNumberFromNote(int note)

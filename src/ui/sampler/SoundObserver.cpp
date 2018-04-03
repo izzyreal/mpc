@@ -216,7 +216,7 @@ void SoundObserver::displayRate()
 		rateLabel.lock()->setText("");
 		return;
 	}
-	rateLabel.lock()->setText("Rate: " + to_string(sampler.lock()->getSound(soundGui->getSoundIndex()).lock()->getSampleRate()) + "Hz");
+	rateLabel.lock()->setText("Rate: " + to_string(dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getSound(soundGui->getSoundIndex()).lock())->getSampleRate()) + "Hz");
 }
 
 void SoundObserver::displaySize()

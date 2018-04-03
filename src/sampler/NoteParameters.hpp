@@ -1,5 +1,5 @@
 #pragma once
-
+#include <mpc/MpcNoteParameters.hpp>
 #include <observer/Observable.hpp>
 
 namespace mpc {
@@ -9,8 +9,30 @@ namespace mpc {
 		class Sampler;
 
 		class NoteParameters
-			: public moduru::observer::Observable
+			: public virtual ctoot::mpc::MpcNoteParameters
+			, public moduru::observer::Observable
 		{
+		public:
+			int getSndNumber() override;
+			int getSoundGenerationMode() override;
+			int getOptionalNoteA() override;
+			int getOptionalNoteB() override;
+			int getMuteAssignA() override;
+			int getMuteAssignB() override;
+			int getTune() override;
+			int getVelocityToStart() override;
+			int getAttack() override;
+			int getDecay() override;
+			int getVelocityToAttack() override;
+			int getDecayMode() override;
+			int getVeloToLevel() override;
+			int getFilterFrequency() override;
+			int getVelocityToFilterFrequency() override;
+			int getFilterAttack() override;
+			int getFilterDecay() override;
+			int getFilterResonance() override;
+			int getFilterEnvelopeAmount() override;
+			int getVoiceOverlap() override;
 
 		private:
 			int soundNumber{ -1 };
@@ -40,51 +62,31 @@ namespace mpc {
 			int number{ 0 };
 
 		public:
-			int getSndNumber();
 			void setSoundNumberNoLimit(int i);
 			void setSoundNumber(int i);
 			void setSoundGenMode(int i);
-			int getSoundGenerationMode();
 			void setVeloRangeLower(int i);
 			int getVelocityRangeLower();
 			void setOptNoteA(int i);
-			int getOptionalNoteA();
 			void setVeloRangeUpper(int i);
 			int getVelocityRangeUpper();
 			void setOptionalNoteB(int i);
-			int getOptionalNoteB();
-			int getVoiceOverlap();
 			void setVoiceOverlap(int i);
 			void setMuteAssignA(int i);
-			int getMuteAssignA();
 			void setMuteAssignB(int i);
-			int getMuteAssignB();
 			void setTune(int i);
-			int getTune();
 			void setAttack(int i);
-			int getAttack();
 			void setDecay(int i);
-			int getDecay();
 			void setDecayMode(int i);
-			int getDecayMode();
 			void setFilterFrequency(int i);
-			int getFilterFrequency();
 			void setFilterResonance(int i);
-			int getFilterResonance();
 			void setFilterAttack(int i);
-			int getFilterAttack();
 			void setFilterDecay(int i);
-			int getFilterDecay();
 			void setFilterEnvelopeAmount(int i);
-			int getFilterEnvelopeAmount();
 			void setVeloToLevel(int i);
-			int getVeloToLevel();
 			void setVelocityToAttack(int i);
-			int getVelocityToAttack();
 			void setVelocityToStart(int i);
-			int getVelocityToStart();
 			void setVelocityToFilterFrequency(int i);
-			int getVelocityToFilterFrequency();
 			void setSliderParameterNumber(int i);
 			int getSliderParameterNumber();
 			void setVelocityToPitch(int i);

@@ -5,12 +5,13 @@
 #include <lcdgui/Field.hpp>
 #include <lcdgui/EnvGraph.hpp>
 #include <ui/sampler/SamplerGui.hpp>
-#include <sampler/StereoMixerChannel.hpp>
 #include <sampler/NoteParameters.hpp>
 #include <sampler/Pad.hpp>
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>
-#include <ctootextensions/MpcSoundPlayerChannel.hpp>
+
+#include <mpc/MpcSoundPlayerChannel.hpp>
+#include <mpc/MpcStereoMixerChannel.hpp>
 
 #include <lang/StrUtil.hpp>
 
@@ -28,7 +29,7 @@ PgmParamsObserver::PgmParamsObserver(mpc::Mpc* mpc)
 	ls = mpc->getLayeredScreen().lock().get();
 	auto lSampler = sampler.lock();
 	mpcSoundPlayerChannel = lSampler->getDrum(samplerGui->getSelectedDrum());
-	program = lSampler->getProgram(mpcSoundPlayerChannel->getProgram());
+	program = dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
 	auto lProgram = program.lock();
 	lProgram->addObserver(this);
 	mpcSoundPlayerChannel->addObserver(this);
@@ -64,7 +65,7 @@ void PgmParamsObserver::update(moduru::observer::Observable* o, boost::any arg)
 	lastNp->deleteObserver(this);
 
 	mpcSoundPlayerChannel = lSampler->getDrum(samplerGui->getSelectedDrum());
-	program = lSampler->getProgram(mpcSoundPlayerChannel->getProgram());
+	program = dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
 	lProgram = program.lock();
 
 	lastNp = lSampler->getLastNp(lProgram.get());

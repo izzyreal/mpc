@@ -246,7 +246,7 @@ void NameControls::saveName() {
 		lLs->openScreen("saveapsfile");
 	}
 	else if (prevScreen.compare("keeporretry") == 0) {
-		sampler.lock()->getPreviewSound().lock()->setName(nameGui->getName());
+		dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getPreviewSound().lock())->setName(nameGui->getName());
 		nameGui->setNameBeingEdited(false);
 		lLs->setLastFocus("name", "0");
 		lLs->openScreen("keeporretry");
@@ -285,7 +285,7 @@ void NameControls::saveName() {
 		return;
 	}
 	else if (prevScreen.compare("sound") == 0) {
-		mpc->getSampler().lock()->getSound(soundGui->getSoundIndex()).lock()->setName(nameGui->getName());
+		dynamic_pointer_cast<mpc::sampler::Sound>(mpc->getSampler().lock()->getSound(soundGui->getSoundIndex()).lock())->setName(nameGui->getName());
 		nameGui->setNameBeingEdited(false);
 		lLs->setLastFocus("name", "0");
 		lLs->openScreen("sound");

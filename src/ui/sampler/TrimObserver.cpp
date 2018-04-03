@@ -9,7 +9,7 @@
 #include <ui/sampler/SoundGui.hpp>
 #include <sampler/Sampler.hpp>
 #include <sampler/Sound.hpp>
-#include <ctootextensions/MpcSoundOscillatorControls.hpp>
+#include <mpc/MpcSoundOscillatorControls.hpp>
 
 using namespace mpc::ui::sampler;
 using namespace std;
@@ -26,7 +26,7 @@ TrimObserver::TrimObserver(mpc::Mpc* mpc)
 
 	auto lSampler = sampler.lock();
 	if (lSampler->getSoundCount() != 0) {
-		sound = lSampler->getSound(soundGui->getSoundIndex());
+		sound = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound(soundGui->getSoundIndex()).lock());
 		auto lSound = sound.lock();
 		lSound->addObserver(this);
 		lSound->getMsoc()->addObserver(this);
@@ -79,7 +79,7 @@ void TrimObserver::displaySnd()
 		auto lSound = sound.lock();
 		lSound->deleteObserver(this);
 		lSound->getMsoc()->deleteObserver(this);
-		sound = lSampler->getSound(soundGui->getSoundIndex());
+		sound = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound(soundGui->getSoundIndex()).lock());
 		lSound = sound.lock();
 		lSound->addObserver(this);
 		lSound->getMsoc()->addObserver(this);

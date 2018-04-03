@@ -26,7 +26,7 @@ void DeleteProgramControls::function(int i)
         break;
     case 4:
         if (lSampler->getProgramCount() > 1) {
-			lSampler->deleteProgram(lSampler->getProgram(swGui->getDeletePgm()));
+			lSampler->deleteProgram(dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(swGui->getDeletePgm()).lock()));
         } else {
 			const bool initPgms = true;
 			lSampler->deleteAllPrograms(initPgms);

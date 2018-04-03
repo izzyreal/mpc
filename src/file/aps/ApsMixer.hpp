@@ -3,12 +3,14 @@
 #include <vector>
 #include <memory>
 
-namespace mpc {
-
-	namespace sampler {
-		class StereoMixerChannel;
-		class IndivFxMixerChannel;
+namespace ctoot {
+	namespace mpc {
+		class MpcStereoMixerChannel;
+		class MpcIndivFxMixerChannel;
 	}
+}
+
+namespace mpc {
 
 	namespace file {
 		namespace aps {
@@ -26,8 +28,8 @@ namespace mpc {
 				std::vector<char> saveBytes = std::vector<char>(384);
 				
 			public: 
-				mpc::sampler::StereoMixerChannel* getStereoMixerChannel(int note);
-				mpc::sampler::IndivFxMixerChannel* getIndivFxMixerChannel(int note);
+				ctoot::mpc::MpcStereoMixerChannel* getStereoMixerChannel(int note);
+				ctoot::mpc::MpcIndivFxMixerChannel* getIndivFxMixerChannel(int note);
 				int getFxPath(int note);
 				int getLevel(int note);
 				int getPanning(int note);
@@ -38,7 +40,7 @@ namespace mpc {
 
 			public:
 				ApsMixer(std::vector<char> loadBytes);
-				ApsMixer(std::vector<std::weak_ptr<mpc::sampler::StereoMixerChannel>> smc, std::vector<std::weak_ptr<mpc::sampler::IndivFxMixerChannel>> ifmc);
+				ApsMixer(std::vector<std::weak_ptr<ctoot::mpc::MpcStereoMixerChannel>> smc, std::vector<std::weak_ptr<ctoot::mpc::MpcIndivFxMixerChannel>> ifmc);
                 
 			};
 

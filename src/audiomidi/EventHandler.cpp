@@ -25,9 +25,7 @@
 #include <hardware/HwPad.hpp>
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>
-#include <sampler/StereoMixerChannel.hpp>
-#include <ctootextensions/MpcMultiMidiSynth.hpp>
-#include <ctootextensions/MpcSoundPlayerChannel.hpp>
+#include <mpc/MpcStereoMixerChannel.hpp>
 //#include <midi/InvalidMidiDataException.hpp>
 #include <midi/core/MidiMessage.hpp>
 #include <midi/core/ShortMessage.hpp>
@@ -37,6 +35,11 @@
 
 #include <file/File.hpp>
 #include <thirdp/bcmath/bcmath_stl.h>
+
+#include <mpc/MpcMultiMidiSynth.hpp>
+#include <mpc/MpcSoundPlayerChannel.hpp>
+#include <mpc/MpcStereoMixerChannel.hpp>
+#include <mpc/MpcIndivFxMixerChannel.hpp>
 
 using namespace mpc::audiomidi;
 using namespace std;

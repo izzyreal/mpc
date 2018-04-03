@@ -54,7 +54,7 @@ StepEditorObserver::StepEditorObserver(mpc::Mpc* mpc)
 
 	if (lTrk->getBusNumber() != 0) {
 		int pgm = sampler.lock()->getDrumBusProgramNumber(lTrk->getBusNumber());
-		program = sampler.lock()->getProgram(pgm);
+		program = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(pgm).lock());
 	}
 
 	refreshViewModeNotes();

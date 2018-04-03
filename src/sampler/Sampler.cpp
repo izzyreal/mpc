@@ -13,19 +13,20 @@
 #include <sampler/NoteParameters.hpp>
 #include <sampler/Pad.hpp>
 #include <sampler/Program.hpp>
-#include <sampler/StereoMixerChannel.hpp>
-#include <sampler/IndivFxMixerChannel.hpp>
 #include <sampler/MonitorOutput.hpp>
 #include <sampler/Sound.hpp>
 #include <sequencer/NoteEvent.hpp>
 #include <sequencer/Sequencer.hpp>
 #include <sequencer/Track.hpp>
 #include <sequencer/Sequence.hpp>
-#include <ctootextensions/MpcBasicSoundPlayerChannel.hpp>
-#include <ctootextensions/MpcSoundPlayerChannel.hpp>
 #include <audio/core/ChannelFormat.hpp>
 #include <audio/server/IOAudioProcess.hpp>
 #include <synth/SynthChannel.hpp>
+
+#include <mpc/MpcBasicSoundPlayerChannel.hpp>
+#include <mpc/MpcSoundPlayerChannel.hpp>
+#include <mpc/MpcStereoMixerChannel.hpp>
+#include <mpc/MpcIndivFxMixerChannel.hpp>
 
 #include <file/File.hpp>
 
@@ -66,12 +67,12 @@ int Sampler::getInputLevel() {
 	return inputLevel;
 }
 
-vector<weak_ptr<mpc::sampler::StereoMixerChannel>> Sampler::getDrumStereoMixerChannels(int i)
+vector<weak_ptr<ctoot::mpc::MpcStereoMixerChannel>> Sampler::getDrumStereoMixerChannels(int i)
 {
 	return mpc->getDrums()[i]->getStereoMixerChannels();
 }
 
-vector<weak_ptr<mpc::sampler::IndivFxMixerChannel>> Sampler::getDrumIndivFxMixerChannels(int i)
+vector<weak_ptr<ctoot::mpc::MpcIndivFxMixerChannel>> Sampler::getDrumIndivFxMixerChannels(int i)
 {
 	return mpc->getDrums()[i]->getIndivFxMixerChannels();
 }
@@ -218,7 +219,7 @@ void Sampler::playPreviewSample(int start, int end, int loopTo, int overlapMode)
 	previewSound->setLoopTo(oldLoopTo);
 }
 
-weak_ptr<Program> Sampler::getProgram(int programNumber)
+weak_ptr<ctoot::mpc::MpcProgram> Sampler::getProgram(int programNumber)
 {
 	return programs[programNumber];
 }
@@ -338,7 +339,7 @@ vector<float>* Sampler::getClickSample()
 	return &clickSample;
 }
 
-weak_ptr<Sound> Sampler::getSound(int sampleNumber)
+weak_ptr<ctoot::mpc::MpcSound> Sampler::getSound(int sampleNumber)
 {
 	if (sampleNumber == -1)
 		return weak_ptr<Sound>();
@@ -349,7 +350,7 @@ weak_ptr<Sound> Sampler::getSound(int sampleNumber)
 	return sounds[sampleNumber];
 }
 
-weak_ptr<Sound> Sampler::getPreviewSound()
+weak_ptr<ctoot::mpc::MpcSound> Sampler::getPreviewSound()
 {
 	if (sounds.size() == 0) return weak_ptr<Sound>();
 	return sounds[sounds.size() - 1];
@@ -365,7 +366,7 @@ void Sampler::setLoopEnabled(int sampleIndex, bool enabled)
 		if (!p) continue;
 		for (int i = 0; i < 64; i++) {
 			if (p->getNoteParameters(i + 35)->getSndNumber() == sampleIndex) {
-				p->getNoteParameters(i + 35)->setVoiceOverlap(2);
+				dynamic_cast<mpc::sampler::NoteParameters*>(p->getNoteParameters(i + 35))->setVoiceOverlap(2);
 			}
 		}
 	}
@@ -539,7 +540,7 @@ void Sampler::stopAllVoices()
 }
 
 void Sampler::stopAllVoices(int frameOffset) {
-	dynamic_cast<ctootextensions::MpcSoundPlayerChannel*>(mpc->getDrums()[0])->allSoundOff(frameOffset);
+	dynamic_cast<ctoot::mpc::MpcSoundPlayerChannel*>(mpc->getDrums()[0])->allSoundOff(frameOffset);
 }
 
 void Sampler::finishBasicVoice() {
@@ -580,7 +581,7 @@ void Sampler::playX(int playXMode, vector<int>* zone)
 	sound->setEnd(oldEnd);
 }
 
-weak_ptr<Sound> Sampler::getPlayXSound() {
+weak_ptr<ctoot::mpc::MpcSound> Sampler::getPlayXSound() {
 	return sounds[mpc->getUis().lock()->getSoundGui()->getSoundIndex()];
 }
 
@@ -666,7 +667,7 @@ NoteParameters* Sampler::getLastNp(Program* program)
 	auto sGui = mpc->getUis().lock()->getSamplerGui();
 	auto lastValidNote = sGui->getNote();
 	if (lastValidNote == 34) lastValidNote = sGui->getPrevNote();
-	return program->getNoteParameters(lastValidNote);
+	return dynamic_cast<mpc::sampler::NoteParameters*>(program->getNoteParameters(lastValidNote));
 }
 
 int Sampler::getUnusedSampleAmount()
@@ -824,12 +825,12 @@ int Sampler::getDrumBusProgramNumber(int busNumber)
 	return mpc->getDrums()[busNumber - 1]->getProgram();
 }
 
-mpc::ctootextensions::MpcSoundPlayerChannel* Sampler::getDrum(int i)
+ctoot::mpc::MpcSoundPlayerChannel* Sampler::getDrum(int i)
 {
 	return mpc->getDrum(i);
 }
 
-weak_ptr<Sound> Sampler::getClickSound()
+weak_ptr<ctoot::mpc::MpcSound> Sampler::getClickSound()
 {
 	return clickSound;
 }

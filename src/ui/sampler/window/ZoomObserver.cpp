@@ -8,7 +8,7 @@
 #include <ui/sampler/window/ZoomGui.hpp>
 #include <sampler/Sampler.hpp>
 #include <sampler/Sound.hpp>
-#include <ctootextensions/MpcSoundOscillatorControls.hpp>
+#include <mpc/MpcSoundOscillatorControls.hpp>
 
 #include <cmath>
 
@@ -26,8 +26,8 @@ ZoomObserver::ZoomObserver(mpc::Mpc* mpc)
 	soundGui->addObserver(this);
 	auto ls = mpc->getLayeredScreen().lock();
 	csn = ls->getCurrentScreenName();
-	sound = sampler.lock()->getSound(soundGui->getSoundIndex());
-	auto lSound = sound.lock();
+	sound = dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getSound(soundGui->getSoundIndex()).lock());
+;	auto lSound = sound.lock();
 	lSound->deleteObservers();
 	lSound->getMsoc()->deleteObservers();
 	lSound->addObserver(this);

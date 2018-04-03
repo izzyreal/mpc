@@ -5,6 +5,12 @@
 #include <vector>
 #include <string>
 
+namespace ctoot {
+	namespace mpc {
+		class MpcSoundPlayerChannel;
+	}
+}
+
 namespace mpc {
 
 	class Mpc;
@@ -13,11 +19,6 @@ namespace mpc {
 		class MixerStrip;
 		class LayeredScreen;
 		class Field;
-	}
-
-
-	namespace ctootextensions {
-		class MpcSoundPlayerChannel;
 	}
 
 	namespace sequencer {
@@ -53,7 +54,7 @@ namespace mpc {
 				std::vector<std::string> monoNames{};
 				std::weak_ptr<mpc::lcdgui::LayeredScreen> ls{};
 				int bank{};
-				mpc::ctootextensions::MpcSoundPlayerChannel* mpcSoundPlayerChannel{ nullptr };
+				ctoot::mpc::MpcSoundPlayerChannel* mpcSoundPlayerChannel{ nullptr };
 				std::weak_ptr<mpc::sampler::Program> program{};
 				std::vector<mpc::lcdgui::MixerStrip*> mixerStrips{};
 				std::weak_ptr<mpc::lcdgui::Field> masterLevelField{};

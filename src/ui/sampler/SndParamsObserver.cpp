@@ -8,7 +8,7 @@
 #include <ui/sampler/SoundGui.hpp>
 #include <sampler/Sampler.hpp>
 #include <sampler/Sound.hpp>
-#include <ctootextensions/MpcSoundOscillatorControls.hpp>
+#include <mpc/MpcSoundOscillatorControls.hpp>
 
 #include <lang/StrUtil.hpp>
 #include <cmath>
@@ -26,7 +26,7 @@ SndParamsObserver::SndParamsObserver(mpc::Mpc* mpc)
 	soundGui->addObserver(this);
 	auto lSampler = sampler.lock();
 	if (lSampler->getSoundCount() != 0) {
-		sound = lSampler->getSound(soundGui->getSoundIndex());
+		sound = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound(soundGui->getSoundIndex()).lock());
 		auto lSound = sound.lock();
 		lSound->addObserver(this);
 		lSound->getMsoc()->addObserver(this);
@@ -160,7 +160,7 @@ void SndParamsObserver::update(moduru::observer::Observable* o, boost::any arg)
 		auto lSound = sound.lock();
 		lSound->deleteObserver(this);
 		lSound->getMsoc()->deleteObserver(this);
-		sound = lSampler->getSound(soundGui->getSoundIndex());
+		sound = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound(soundGui->getSoundIndex()).lock());
 		lSound = sound.lock();
 		lSound->addObserver(this);
 		lSound->getMsoc()->addObserver(this);
@@ -197,7 +197,7 @@ SndParamsObserver::~SndParamsObserver() {
 	soundGui->deleteObserver(this);
 	auto lSampler = sampler.lock();
 	if (lSampler->getSoundCount() != 0) {
-		sound = lSampler->getSound(soundGui->getSoundIndex());
+		sound = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound(soundGui->getSoundIndex()).lock());
 		auto lSound = sound.lock();
 		lSound->deleteObserver(this);
 		lSound->getMsoc()->deleteObserver(this);

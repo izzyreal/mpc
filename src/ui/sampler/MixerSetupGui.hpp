@@ -1,4 +1,5 @@
 #pragma once
+#include <mpc/MpcMixerSetupGui.hpp>
 #include <observer/Observable.hpp>
 
 #include <vector>
@@ -9,7 +10,8 @@ namespace mpc {
 		namespace sampler {
 
 			class MixerSetupGui
-				: public moduru::observer::Observable
+				: public virtual ctoot::mpc::MpcMixerSetupGui
+				, public moduru::observer::Observable
 			{
 
 			private:
@@ -27,8 +29,8 @@ namespace mpc {
 				int getFxDrum();
 				void setFxDrum(int i);
 				bool isStereoMixSourceDrum();
-				void setStereoMixSourceDrum(bool b);
 				bool isIndivFxSourceDrum();
+				void setStereoMixSourceDrum(bool b);
 				void setIndivFxSourceDrum(bool b);
 				bool isCopyPgmMixToDrumEnabled();
 				void setCopyPgmMixToDrumEnabled(bool b);

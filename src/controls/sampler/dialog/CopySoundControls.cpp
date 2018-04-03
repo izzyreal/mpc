@@ -26,7 +26,7 @@ void CopySoundControls::function(int i)
 		lLs->openScreen("sound");
 		break;
 	case 4:
-		sound = lSampler->getSound(soundGui->getSoundIndex());
+		sound = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound(soundGui->getSoundIndex()).lock());
 		newSound = lSampler->copySound(sound);
 		newSound.lock()->setName(soundGui->getNewName());
 		soundGui->setSoundIndex(lSampler->getSoundCount() - 1, lSampler->getSoundCount());

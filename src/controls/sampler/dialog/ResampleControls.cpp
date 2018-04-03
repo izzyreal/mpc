@@ -59,13 +59,13 @@ void ResampleControls::function(int i)
 
 		auto source = snd->getSampleData();
 
-		if (soundGui->getNewFs() != snd->getSampleRate()) {
+		if (soundGui->getNewFs() != dynamic_pointer_cast<mpc::sampler::Sound>(snd)->getSampleRate()) {
 			float* srcArray = &(*source)[0];
 
 			SRC_DATA srcData;
 			srcData.data_in = srcArray;
 			srcData.input_frames = source->size();
-			srcData.src_ratio = (double)(soundGui->getNewFs()) / (double)(snd->getSampleRate());
+			srcData.src_ratio = (double)(soundGui->getNewFs()) / (double)(dynamic_pointer_cast<mpc::sampler::Sound>(snd)->getSampleRate());
 			srcData.output_frames = (floor)(source->size() * srcData.src_ratio);
 
 			auto dest = destSnd->getSampleData();

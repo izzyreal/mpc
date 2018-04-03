@@ -5,13 +5,15 @@
 #include <vector>
 #include <string>
 
+namespace ctoot {
+	namespace mpc {
+		class MpcSoundPlayerChannel;
+	}
+}
+
 namespace mpc {
 
 	class Mpc;
-
-	namespace ctootextensions {
-		class MpcSoundPlayerChannel;
-	}
 
 	namespace sampler {
 		class Sampler;
@@ -40,7 +42,7 @@ namespace mpc {
 				mpc::sampler::Pad* lastPad = nullptr;
 				std::weak_ptr<mpc::sampler::Sampler> sampler{ };
 				SamplerGui* samplerGui{ nullptr };
-				mpc::ctootextensions::MpcSoundPlayerChannel* mpcSoundPlayerChannel{ nullptr };
+				ctoot::mpc::MpcSoundPlayerChannel* mpcSoundPlayerChannel{ nullptr };
 				std::weak_ptr<mpc::sampler::Program> program{};
 				std::weak_ptr<mpc::lcdgui::Field> velocityRangeLowerField{};
 				std::weak_ptr<mpc::lcdgui::Field> velocityRangeUpperField{};

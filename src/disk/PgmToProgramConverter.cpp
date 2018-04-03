@@ -8,12 +8,13 @@
 #include <file/pgmreader/ProgramName.hpp>
 #include <file/pgmreader/PRSlider.hpp>
 #include <file/pgmreader/SoundNames.hpp>
-#include <sampler/StereoMixerChannel.hpp>
-#include <sampler/NoteParameters.hpp>
 #include <sampler/Pad.hpp>
 #include <sampler/Program.hpp>
 #include <sampler/PgmSlider.hpp>
 #include <sampler/Sampler.hpp>
+
+#include <mpc/MpcStereoMixerChannel.hpp>
+#include <mpc/MpcNoteParameters.hpp>
 
 using namespace mpc::disk;
 using namespace std;
@@ -65,7 +66,7 @@ void PgmToProgramConverter::setNoteParameters()
 		pmn = pgmPads->getNote(i);
 		nn = pmn == -1 ? 34 : pmn;
 		lProgram->getPad(i)->setNote(nn);
-		programNoteParameters = lProgram->getNoteParameters(i + 35);
+		programNoteParameters = dynamic_cast<mpc::sampler::NoteParameters*>(lProgram->getNoteParameters(i + 35));
 		programNoteParameters->setAttack(pgmNoteParameters->getAttack(i));
 		programNoteParameters->setDecay(pgmNoteParameters->getDecay(i));
 		programNoteParameters->setDecayMode(pgmNoteParameters->getDecayMode(i));

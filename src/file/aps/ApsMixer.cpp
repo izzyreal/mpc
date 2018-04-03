@@ -1,7 +1,7 @@
 #include <file/aps/ApsMixer.hpp>
 
-#include <sampler/StereoMixerChannel.hpp>
-#include <sampler/IndivFxMixerChannel.hpp>
+#include <mpc/MpcStereoMixerChannel.hpp>
+#include <mpc/MpcIndivFxMixerChannel.hpp>
 
 using namespace mpc::file::aps;
 using namespace std;
@@ -18,7 +18,7 @@ ApsMixer::ApsMixer(vector<char> loadBytes)
 	}
 }
 
-ApsMixer::ApsMixer(vector<weak_ptr<mpc::sampler::StereoMixerChannel>> smcs, vector<weak_ptr<mpc::sampler::IndivFxMixerChannel>> ifmcs)
+ApsMixer::ApsMixer(vector<weak_ptr<ctoot::mpc::MpcStereoMixerChannel>> smcs, vector<weak_ptr<ctoot::mpc::MpcIndivFxMixerChannel>> ifmcs)
 {
 	for (int i = 0; i < 64; i++) {
 		auto mixerChannel = smcs[i].lock();
@@ -32,17 +32,17 @@ ApsMixer::ApsMixer(vector<weak_ptr<mpc::sampler::StereoMixerChannel>> smcs, vect
 	}
 }
 
-mpc::sampler::StereoMixerChannel* ApsMixer::getStereoMixerChannel(int noteNumber)
+ctoot::mpc::MpcStereoMixerChannel* ApsMixer::getStereoMixerChannel(int noteNumber)
 {
-	auto params = new mpc::sampler::StereoMixerChannel();
+	auto params = new ctoot::mpc::MpcStereoMixerChannel();
 	params->setLevel(getLevel(noteNumber));
 	params->setPanning(getPanning(noteNumber));
 	return params;
 }
 
-mpc::sampler::IndivFxMixerChannel* ApsMixer::getIndivFxMixerChannel(int noteNumber)
+ctoot::mpc::MpcIndivFxMixerChannel* ApsMixer::getIndivFxMixerChannel(int noteNumber)
 {
-	auto params = new mpc::sampler::IndivFxMixerChannel();
+	auto params = new ctoot::mpc::MpcIndivFxMixerChannel();
 	params->setVolumeIndividualOut(getIndividualLevel(noteNumber));
 	params->setOutput(getIndividualOutput(noteNumber));
 	params->setFxSendLevel(getSendLevel(noteNumber));

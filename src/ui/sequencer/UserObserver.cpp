@@ -162,7 +162,7 @@ void UserObserver::displayDeviceName()
 	auto lUd = ud.lock();
 	if (lUd->getBus() != 0) {
 		if (lUd->getDeviceNumber() == 0) {
-			auto p = sampler->getProgram(sampler->getDrumBusProgramNumber(lUd->getBus())).lock();
+			auto p = dynamic_pointer_cast<mpc::sampler::Program>(sampler->getProgram(sampler->getDrumBusProgramNumber(lUd->getBus())).lock());
 			deviceNameLabel.lock()->setText(p->getName());
 		}
 		else {

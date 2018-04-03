@@ -21,7 +21,7 @@ AssignObserver::AssignObserver(mpc::Mpc* mpc)
 	auto seq = sequencer->getActiveSequence().lock();
 	sampler = mpc->getSampler();
 	auto lSampler = sampler.lock();
-	program = lSampler->getProgram(lSampler->getDrumBusProgramNumber(seq->getTrack(sequencer->getActiveTrackIndex()).lock()->getBusNumber()));
+	program = dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(lSampler->getDrumBusProgramNumber(seq->getTrack(sequencer->getActiveTrackIndex()).lock()->getBusNumber())).lock());
 	slider = program.lock()->getSlider();
 	slider->deleteObservers();
 	slider->addObserver(this);

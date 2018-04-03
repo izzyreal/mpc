@@ -41,7 +41,7 @@
 #include <sequencer/Track.hpp>
 #include <sequencer/NoteEvent.hpp>
 #include <sequencer/Sequencer.hpp>
-#include <ctootextensions/MpcSoundPlayerChannel.hpp>
+#include <mpc/MpcSoundPlayerChannel.hpp>
 
 using namespace mpc;
 using namespace mpc::controls;
@@ -69,7 +69,7 @@ void AbstractControls::init()
 	if(lTrk->getBusNumber() != 0 && !mpc->getAudioMidiServices().lock()->isDisabled()) {
 		auto lSampler = sampler.lock();
         mpcSoundPlayerChannel = lSampler->getDrum(lTrk->getBusNumber() - 1);
-        program = lSampler->getProgram(mpcSoundPlayerChannel->getProgram());
+		program = dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
     }
     bank_ = samplerGui->getBank();
 }

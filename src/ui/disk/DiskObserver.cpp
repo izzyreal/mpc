@@ -18,7 +18,7 @@
 #include <sequencer/Sequence.hpp>
 #include <sequencer/Sequencer.hpp>
 #include <sequencer/Track.hpp>
-#include <ctootextensions/MpcSoundPlayerChannel.hpp>
+#include <mpc/MpcSoundPlayerChannel.hpp>
 
 #include <lang/StrUtil.hpp>
 #include <file/FileUtil.hpp>
@@ -59,7 +59,7 @@ DiskObserver::DiskObserver(mpc::Mpc* mpc)
 
 		mpcSoundPlayerChannel = lSampler->getDrum(candidate);
 		mpcSoundPlayerChannel->addObserver(this);
-		program = lSampler->getProgram(mpcSoundPlayerChannel->getProgram());
+		program = dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
 	}
 
 	csn = mpc->getLayeredScreen().lock()->getCurrentScreenName();
@@ -314,10 +314,10 @@ void DiskObserver::displayFile()
 			file = "ALL_PROGRAM";
 			break;
 		case 3:
-			file = lSampler->getProgram(mpcSoundPlayerChannel->getProgram()).lock()->getName();
+			file = dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(mpcSoundPlayerChannel->getProgram()).lock())->getName();
 			break;
 		case 4:
-			file = lSampler->getSoundCount() == 0 ? "" : lSampler->getSound(soundGui->getSoundIndex()).lock()->getName();
+			file = lSampler->getSoundCount() == 0 ? "" : dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound(soundGui->getSoundIndex()).lock())->getName();
 			break;
 		}
 		lFileField->setText(file);

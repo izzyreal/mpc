@@ -175,7 +175,7 @@ void SequencerObserver::displayDeviceName()
 	if (lTrk->getBusNumber() != 0) {
 		if (lTrk->getDevice() == 0) {
 			int pgm = mpc->getAudioMidiServices().lock()->isDisabled() ? 0 : lSampler->getDrumBusProgramNumber(lTrk->getBusNumber());
-			auto p = lSampler->getProgram(pgm).lock();
+			auto p = dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(pgm).lock());
 			deviceNameLabel.lock()->setText(p->getName());
 		}
 		else {

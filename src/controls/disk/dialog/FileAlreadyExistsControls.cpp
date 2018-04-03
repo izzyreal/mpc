@@ -82,9 +82,9 @@ void FileAlreadyExistsControls::function(int i)
 			lDisk->initFiles();
 			auto f = lDisk->newFile(fileName);
 			if(type == 0) {
-				disk.lock()->writeSound(s.lock().get(), f);
+				disk.lock()->writeSound(dynamic_pointer_cast<mpc::sampler::Sound>(s.lock()).get(), f);
 			} else {
-				disk.lock()->writeWav(s.lock().get(), f);
+				disk.lock()->writeWav(dynamic_pointer_cast<mpc::sampler::Sound>(s.lock()).get(), f);
 			}
 			lDisk->flush();
 			lDisk->initFiles();

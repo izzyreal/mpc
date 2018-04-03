@@ -7,13 +7,14 @@
 #include <ui/sampler/MixerGui.hpp>
 #include <ui/sampler/MixerSetupGui.hpp>
 #include <ui/sampler/SamplerGui.hpp>
-#include <sampler/StereoMixerChannel.hpp>
-#include <sampler/IndivFxMixerChannel.hpp>
 #include <sampler/NoteParameters.hpp>
 #include <sampler/Pad.hpp>
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>
-#include <ctootextensions/MpcSoundPlayerChannel.hpp>
+
+#include <mpc/MpcSoundPlayerChannel.hpp>
+#include <mpc/MpcStereoMixerChannel.hpp>
+#include <mpc/MpcIndivFxMixerChannel.hpp>
 
 #include <lang/StrUtil.hpp>
 
@@ -40,7 +41,7 @@ ChannelSettingsObserver::ChannelSettingsObserver(mpc::Mpc* mpc)
 	mixerSetupGui->addObserver(this);
 	auto lSampler = sampler.lock();
 	mpcSoundPlayerChannel = lSampler->getDrum(samplerGui->getSelectedDrum());
-	program = lSampler->getProgram(mpcSoundPlayerChannel->getProgram());
+	program = dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
 
 	for (int i = (bank * 16); i < (bank * 16) + 16; i++) {
 		auto pad = program.lock()->getPad(i);

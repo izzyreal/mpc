@@ -15,7 +15,7 @@
 #include <sequencer/Track.hpp>
 #include <sequencer/SeqUtil.hpp>
 #include <sequencer/Sequencer.hpp>
-#include <ctootextensions/MpcSoundPlayerChannel.hpp>
+#include <mpc/MpcSoundPlayerChannel.hpp>
 
 #include <lang/StrUtil.hpp>
 
@@ -55,7 +55,7 @@ EraseObserver::EraseObserver(mpc::Mpc* mpc)
 	int drum = bus - 1;
 	auto lSampler = sampler.lock();
 	auto mpcSoundPlayerChannel = drum >= 0 ? lSampler->getDrum(drum) : nullptr;
-	program = drum >= 0 ? lSampler->getProgram(mpcSoundPlayerChannel->getProgram()) : weak_ptr<mpc::sampler::Program>();
+	program = drum >= 0 ? dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(mpcSoundPlayerChannel->getProgram()).lock()) : weak_ptr<mpc::sampler::Program>();
 	displayTrack();
 	displayTime();
 	displayErase();

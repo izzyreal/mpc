@@ -4,7 +4,7 @@
 #include <file/aps/ApsNoteParameters.hpp>
 #include <file/aps/ApsSlider.hpp>
 #include <file/pgmwriter/Pads.hpp>
-#include <sampler/StereoMixerChannel.hpp>
+#include <mpc/MpcStereoMixerChannel.hpp>
 #include <sampler/Program.hpp>
 
 #include <lang/StrUtil.hpp>
@@ -48,12 +48,12 @@ ApsProgram::ApsProgram(mpc::sampler::Program* program, int index)
 	byteList.push_back(slider->getBytes());
 	byteList.push_back(vector<char>{ 35, 64, 0, 26, 0 });
 	for (int i = 0; i < 64; i++) {
-		auto np = new ApsNoteParameters(program->getNoteParameters(i + 35));
+		auto np = new ApsNoteParameters(dynamic_cast<mpc::sampler::NoteParameters*>(program->getNoteParameters(i + 35)));
 		byteList.push_back(np->getBytes());
 	}
 	byteList.push_back(vector<char>{ 6 });
-	auto smcs = vector<weak_ptr<mpc::sampler::StereoMixerChannel>>(64);
-	auto ifmcs = vector<weak_ptr<mpc::sampler::IndivFxMixerChannel>>(64);
+	auto smcs = vector<weak_ptr<ctoot::mpc::MpcStereoMixerChannel>>(64);
+	auto ifmcs = vector<weak_ptr<ctoot::mpc::MpcIndivFxMixerChannel>>(64);
 	for (int i = 0; i < 64; i++) {
 		smcs[i] = program->getStereoMixerChannel(i);
 		ifmcs[i] = program->getIndivFxMixerChannel(i);
@@ -128,12 +128,12 @@ vector<char> ApsProgram::getBytes()
     return saveBytes;
 }
 
-mpc::sampler::StereoMixerChannel* ApsProgram::getStereoMixerChannel(int note)
+ctoot::mpc::MpcStereoMixerChannel* ApsProgram::getStereoMixerChannel(int note)
 {
 	return mixer->getStereoMixerChannel(note);
 }
 
-mpc::sampler::IndivFxMixerChannel* ApsProgram::getIndivFxMixerChannel(int note)
+ctoot::mpc::MpcIndivFxMixerChannel* ApsProgram::getIndivFxMixerChannel(int note)
 {
 	return mixer->getIndivFxMixerChannel(note);
 }

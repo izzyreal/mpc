@@ -1,7 +1,7 @@
 #include <controls/sampler/DrumControls.hpp>
 
 #include <ui/sampler/SamplerGui.hpp>
-#include <ctootextensions/MpcSoundPlayerChannel.hpp>
+#include <mpc/MpcSoundPlayerChannel.hpp>
 
 using namespace mpc::controls::sampler;
 using namespace std;

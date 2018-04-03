@@ -18,7 +18,7 @@ KeepOrRetryControls::KeepOrRetryControls(mpc::Mpc* mpc)
 
 void KeepOrRetryControls::mainScreen() {
 	auto lSampler = sampler.lock();
-	lSampler->deleteSound(lSampler->getPreviewSound());
+	lSampler->deleteSound(dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getPreviewSound().lock()));
 	super::mainScreen();
 }
 
@@ -29,7 +29,7 @@ void KeepOrRetryControls::function(int i)
 	auto lLs = ls.lock();
 	switch (i) {
 	case 1:
-		lSampler->deleteSound(lSampler->getPreviewSound());
+		lSampler->deleteSound(dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getPreviewSound().lock()));
 		lLs->openScreen("sample");
 		break;
 	case 3 :
@@ -50,7 +50,7 @@ void KeepOrRetryControls::turnWheel(int i)
 {
     init();
 	auto lLs = ls.lock();
-    nameGui->setName(sampler.lock()->getPreviewSound().lock()->getName());
+    nameGui->setName(dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getPreviewSound().lock())->getName());
     nameGui->setParameterName(param);
     lLs->openScreen("name");
 }

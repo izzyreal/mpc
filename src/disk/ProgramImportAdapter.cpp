@@ -1,7 +1,7 @@
 #include <disk/ProgramImportAdapter.hpp>
 
 #include <Mpc.hpp>
-#include <sampler/StereoMixerChannel.hpp>
+#include <mpc/MpcStereoMixerChannel.hpp>
 #include <sampler/NoteParameters.hpp>
 #include <sampler/Pad.hpp>
 #include <sampler/Program.hpp>
@@ -18,7 +18,7 @@ ProgramImportAdapter::ProgramImportAdapter(weak_ptr<mpc::sampler::Sampler> sampl
 	result = inputProgram;
 	auto lResult = result.lock();
 	for (int i = 35; i <= 98; i++) {
-		processNoteParameters(lResult->getNoteParameters(i));
+		processNoteParameters(dynamic_cast<mpc::sampler::NoteParameters*>(lResult->getNoteParameters(i)));
 		initMixer(i);
 	}
 }

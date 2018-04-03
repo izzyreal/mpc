@@ -3,8 +3,8 @@
 #include <ui/sampler/MixerGui.hpp>
 #include <ui/sampler/SamplerGui.hpp>
 #include <sampler/Program.hpp>
-#include <sampler/StereoMixerChannel.hpp>
-#include <sampler/IndivFxMixerChannel.hpp>
+#include <mpc/MpcStereoMixerChannel.hpp>
+#include <mpc/MpcIndivFxMixerChannel.hpp>
 
 using namespace mpc::controls::mixer::window;
 using namespace std;
