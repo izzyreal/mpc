@@ -26,7 +26,7 @@ namespace mpc {
 				void displayTapAveraging();
 
 			public:
-				void update(moduru::observer::Observable* o, boost::any a) override;
+				void update(moduru::observer::Observable* o, std::any a) override;
 
 			public:
 				OthersObserver(mpc::Mpc* mpc);

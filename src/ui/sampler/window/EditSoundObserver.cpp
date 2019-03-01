@@ -251,9 +251,9 @@ void EditSoundObserver::displayVariable()
 	}
 }
 
-void EditSoundObserver::update(moduru::observer::Observable* o, boost::any arg)
+void EditSoundObserver::update(moduru::observer::Observable* o, std::any arg)
 {
-	string s = boost::any_cast<string>(arg);
+	string s = std::any_cast<string>(arg);
 	if (s.compare("edit") == 0) {
 		displayEdit();
 	}

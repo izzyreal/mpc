@@ -16,14 +16,14 @@ using namespace moduru::lang;
 using namespace moduru::file;
 using namespace std;
 
-MpcFile::MpcFile(boost::any fileObject)
+MpcFile::MpcFile(std::any fileObject)
 {
 	//raw = dynamic_cast< ::de::waldheinz::fs::fat::AkaiFatLfnDirectoryEntry* >(fileObject) != nullptr;
 	try {
-		stdEntry = boost::any_cast<shared_ptr<FsNode>>(fileObject);
+		stdEntry = std::any_cast<shared_ptr<FsNode>>(fileObject);
 		std = true;
 	}
-	catch (boost::bad_any_cast e) {
+	catch (std::bad_any_cast e) {
 		e.what();
 		std = false;
 	}

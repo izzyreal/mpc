@@ -33,9 +33,9 @@ PunchObserver::PunchObserver(mpc::Mpc* mpc)
 	displayTime();
 }
 
-void PunchObserver::update(moduru::observer::Observable* o, boost::any a)
+void PunchObserver::update(moduru::observer::Observable* o, std::any a)
 {
-	string param = boost::any_cast<string>(a);
+	string param = std::any_cast<string>(a);
 	if (param.compare("autopunch") == 0) {
 		displayBackground();
 		displayAutoPunch();

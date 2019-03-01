@@ -76,9 +76,9 @@ void Assign16LevelsObserver::displayOriginalKeyPad()
     originalKeyPadField.lock()->setTextPadded(sGui->getOriginalKeyPad() + 1, " ");
 }
 
-void Assign16LevelsObserver::update(moduru::observer::Observable* o, boost::any arg)
+void Assign16LevelsObserver::update(moduru::observer::Observable* o, std::any arg)
 {
-	string s = boost::any_cast<string>(arg);
+	string s = std::any_cast<string>(arg);
 	if (s.compare("note") == 0) {
 		displayNote();
 	}

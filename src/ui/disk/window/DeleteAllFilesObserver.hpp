@@ -34,7 +34,7 @@ namespace mpc {
 					void displayDelete();
 
 				public:
-					void update(moduru::observer::Observable* o, boost::any a) override;
+					void update(moduru::observer::Observable* o, std::any a) override;
 
 					DeleteAllFilesObserver(mpc::Mpc* mpc);
 					~DeleteAllFilesObserver();

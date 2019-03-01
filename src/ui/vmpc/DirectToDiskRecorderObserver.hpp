@@ -51,7 +51,7 @@ namespace mpc {
 				void displayTime();
 
 			public:
-				void update(moduru::observer::Observable* o, boost::any a) override;
+				void update(moduru::observer::Observable* o, std::any a) override;
 
 				DirectToDiskRecorderObserver(mpc::Mpc* mpc);
 				~DirectToDiskRecorderObserver();

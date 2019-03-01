@@ -89,10 +89,10 @@ void AudioObserver::displayDev1()
 	//dev0Field->enableScrolling(vector<mpc::lcdgui::Field*>{ dev0Field, inField });
 }
 
-void AudioObserver::update(moduru::observer::Observable* o, boost::any a)
+void AudioObserver::update(moduru::observer::Observable* o, std::any a)
 {
 
-	string param = boost::any_cast<string>(a);
+	string param = std::any_cast<string>(a);
 
 	if (param.compare("server") == 0) {
 		displayServer();

@@ -10,11 +10,6 @@ include_directories( ${PARENT_DIR}/moduru/src )
 include_directories( ${PARENT_DIR}/ctoot/src )
 include_directories( ${PARENT_DIR}/rapidjson/include )
 
-find_package(Boost 1.36.0)
-if(Boost_FOUND)
-  include_directories(${Boost_INCLUDE_DIRS})
-endif()
-
 file(
     GLOB_RECURSE _source_list 
     LIST_DIRECTORIES false
@@ -24,8 +19,8 @@ file(
 )
 
 if(APPLE)
-  set(CMAKE_OSX_ARCHITECTURES "x86_64;i386")
-  set(CMAKE_CXX_STANDARD 14)
+  set(CMAKE_OSX_ARCHITECTURES "x86_64")
+  set(CMAKE_CXX_STANDARD 17)
 endif(APPLE)
 
 if(UNIX AND NOT APPLE)
@@ -34,7 +29,7 @@ endif()
 
 if (LINUX)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 endif()
 

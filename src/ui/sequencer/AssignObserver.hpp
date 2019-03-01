@@ -42,7 +42,7 @@ namespace mpc {
 				void displayAssignNv();
 
 			public:
-				void update(moduru::observer::Observable* o, boost::any arg) override;
+				void update(moduru::observer::Observable* o, std::any arg) override;
 
 			public:
 				AssignObserver(mpc::Mpc* mpc);

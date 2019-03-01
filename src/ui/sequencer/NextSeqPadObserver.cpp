@@ -132,9 +132,9 @@ void NextSeqPadObserver::setSeqColor(int i)
 	}
 }
 
-void NextSeqPadObserver::update(moduru::observer::Observable* o, boost::any arg)
+void NextSeqPadObserver::update(moduru::observer::Observable* o, std::any arg)
 {
-	string s = boost::any_cast<string>(arg);
+	string s = std::any_cast<string>(arg);
 	if (s.compare("soloenabled") == 0 || s.compare("bank") == 0) {
 		displayBank();
 		displaySeqNumbers();

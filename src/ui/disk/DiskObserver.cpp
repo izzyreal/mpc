@@ -324,13 +324,13 @@ void DiskObserver::displayFile()
 	}
 }
 
-void DiskObserver::update(moduru::observer::Observable* o, boost::any a)
+void DiskObserver::update(moduru::observer::Observable* o, std::any a)
 {
 	string param = "";
 	try {
-		param = boost::any_cast<string>(a);
+		param = std::any_cast<string>(a);
 	}
-	catch (boost::bad_any_cast e) {
+	catch (std::bad_any_cast e) {
 		return;
 	}
 

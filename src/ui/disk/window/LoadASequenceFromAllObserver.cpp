@@ -45,9 +45,9 @@ void LoadASequenceFromAllObserver::displayLoadInto()
 	loadIntoLabel.lock()->setText("-" + mpc->getSequencer().lock()->getSequence(diskWindowGui->getLoadInto()).lock()->getName());
 }
 
-void LoadASequenceFromAllObserver::update(moduru::observer::Observable* o, boost::any a)
+void LoadASequenceFromAllObserver::update(moduru::observer::Observable* o, std::any a)
 {
-	string param = boost::any_cast<string>(a);
+	string param = std::any_cast<string>(a);
 	if (param.compare("fileload") == 0) {
 		displayFile();
 	}

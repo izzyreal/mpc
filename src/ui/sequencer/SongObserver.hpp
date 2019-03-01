@@ -59,7 +59,7 @@ namespace mpc {
 				void displaySongName();
 
 			public:
-				void update(moduru::observer::Observable* o, boost::any arg) override;
+				void update(moduru::observer::Observable* o, std::any arg) override;
 
 				SongObserver(mpc::Mpc* mpc);
 				~SongObserver();

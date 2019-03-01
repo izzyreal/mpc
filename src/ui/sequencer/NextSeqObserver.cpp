@@ -132,9 +132,9 @@ void NextSeqObserver::displayTiming()
     timingField.lock()->setText(SequencerObserver::timingCorrectNames()->at(mpc->getUis().lock()->getSequencerWindowGui()->getNoteValue()));
 }
 
-void NextSeqObserver::update(moduru::observer::Observable* o, boost::any arg)
+void NextSeqObserver::update(moduru::observer::Observable* o, std::any arg)
 {
-	string s = boost::any_cast<string>(arg);
+	string s = std::any_cast<string>(arg);
 	if (s.compare("seqnumbername") == 0) {
 		displaySq();
 	}

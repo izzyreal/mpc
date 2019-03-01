@@ -46,9 +46,9 @@ void TransObserver::displayBars()
     bar1Field.lock()->setText(to_string(transGui->getBar1() + 1));
 }
 
-void TransObserver::update(moduru::observer::Observable* o, boost::any a)
+void TransObserver::update(moduru::observer::Observable* o, std::any a)
 {
-	string param = boost::any_cast<string>(a);
+	string param = std::any_cast<string>(a);
 	if (param.compare("amount") == 0) {
 		displayTransposeAmount();
 	}

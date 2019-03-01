@@ -1,6 +1,6 @@
 #pragma once
 
-#include <boost/any.hpp>
+#include <any>
 
 #include <vector>
 #include <string>
@@ -38,7 +38,7 @@ namespace mpc {
 			//::de::waldheinz::fs::fat::AkaiFatLfnDirectoryEntry* getEntry();
 			std::vector<char> getBytes();
 
-			MpcFile(boost::any a);
+			MpcFile(std::any a);
 			~MpcFile();
 
 		};

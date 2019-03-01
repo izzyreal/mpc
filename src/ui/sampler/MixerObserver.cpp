@@ -158,7 +158,7 @@ void MixerObserver::displayMixerStrips()
 	}
 }
 
-void MixerObserver::update(moduru::observer::Observable* o, boost::any arg)
+void MixerObserver::update(moduru::observer::Observable* o, std::any arg)
 {
 	auto lLs = ls.lock();
 	auto lProgram = program.lock();
@@ -184,7 +184,7 @@ void MixerObserver::update(moduru::observer::Observable* o, boost::any arg)
 		indivFxMixerChannel->addObserver(this);
 	}
 
-	string s = boost::any_cast<string>(arg);
+	string s = std::any_cast<string>(arg);
 
 	if (s.compare("tab") == 0) {
 		initPadNameLabels();

@@ -74,7 +74,7 @@ namespace mpc {
 					mpc::ui::sampler::SamplerGui* samplerGui{};
 
 				public:
-					void update(moduru::observer::Observable* o, boost::any arg) override;
+					void update(moduru::observer::Observable* o, std::any arg) override;
 
 				private:
 					void updateEditMultiple();

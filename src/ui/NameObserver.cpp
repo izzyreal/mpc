@@ -80,10 +80,10 @@ void NameObserver::displayName()
 	}
 }
 
-void NameObserver::update(moduru::observer::Observable* o, boost::any arg)
+void NameObserver::update(moduru::observer::Observable* o, std::any arg)
 {
 	auto ls = mpc->getLayeredScreen().lock();
-	string s = boost::any_cast<string>(arg);
+	string s = std::any_cast<string>(arg);
 	string str;
 	shared_ptr<Field> tf;
 	if (s.compare("name") == 0) {

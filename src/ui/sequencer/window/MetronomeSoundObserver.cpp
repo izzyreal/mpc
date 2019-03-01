@@ -105,9 +105,9 @@ void MetronomeSoundObserver::displayVelocityNormal()
     //veloNormalField.lock()->setText(rightPad(to_string(swGui->getNormalVelo()), 3));
 }
 
-void MetronomeSoundObserver::update(moduru::observer::Observable* o, boost::any arg)
+void MetronomeSoundObserver::update(moduru::observer::Observable* o, std::any arg)
 {
-	string s = boost::any_cast<string>(arg);
+	string s = std::any_cast<string>(arg);
 	if (s.compare("clickvolume") == 0) {
 		displayVolume();
 	}

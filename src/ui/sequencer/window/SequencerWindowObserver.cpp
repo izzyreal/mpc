@@ -794,9 +794,9 @@ void SequencerWindowObserver::displayFrameRate()
     frameRateField.lock()->setText(frameRateNames[swGui->getFrameRate()]);
 }
 
-void SequencerWindowObserver::update(moduru::observer::Observable* o, boost::any arg)
+void SequencerWindowObserver::update(moduru::observer::Observable* o, std::any arg)
 {
-	string s = boost::any_cast<string>(arg);
+	string s = std::any_cast<string>(arg);
 	auto seq = sequence.lock();
 	auto lTrk = track.lock();
 	lTrk->deleteObserver(this);

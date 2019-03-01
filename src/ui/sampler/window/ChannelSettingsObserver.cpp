@@ -62,7 +62,7 @@ ChannelSettingsObserver::ChannelSettingsObserver(mpc::Mpc* mpc)
 	displayChannel();
 }
 
-void ChannelSettingsObserver::update(moduru::observer::Observable* o, boost::any arg)
+void ChannelSettingsObserver::update(moduru::observer::Observable* o, std::any arg)
 {
 	auto lLs = ls.lock();
 	auto lProgram = program.lock();
@@ -86,7 +86,7 @@ void ChannelSettingsObserver::update(moduru::observer::Observable* o, boost::any
 	}
 
 
-	string s = boost::any_cast<string>(arg);
+	string s = std::any_cast<string>(arg);
 
 	if (s.compare("padandnote") == 0) {
 		displayChannel();

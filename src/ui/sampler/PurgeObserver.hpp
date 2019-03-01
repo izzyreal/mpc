@@ -31,7 +31,7 @@ namespace mpc {
 				void displayValue();
 
 			public:
-				void update(moduru::observer::Observable* o, boost::any arg) override;
+				void update(moduru::observer::Observable* o, std::any arg) override;
 
 				PurgeObserver(mpc::Mpc* mpc);
 				~PurgeObserver();

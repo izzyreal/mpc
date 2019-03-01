@@ -72,13 +72,13 @@ void DrumObserver::displayCurrentVal()
 {
 }
 
-void DrumObserver::update(moduru::observer::Observable* o, boost::any arg)
+void DrumObserver::update(moduru::observer::Observable* o, std::any arg)
 {
 	mpcSoundPlayerChannel->deleteObserver(this);
 	mpcSoundPlayerChannel = sampler.lock()->getDrum(samplerGui->getSelectedDrum());
 	mpcSoundPlayerChannel->addObserver(this);
 
-	string s = boost::any_cast<string>(arg);
+	string s = std::any_cast<string>(arg);
 
 	if (s.compare("drum") == 0) {
 		displayDrum();

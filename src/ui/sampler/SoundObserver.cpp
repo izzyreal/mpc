@@ -228,9 +228,9 @@ void SoundObserver::displaySize()
 	sizeLabel.lock()->setText("Size:" + moduru::lang::StrUtil::padLeft(to_string(sampler.lock()->getSound(soundGui->getSoundIndex()).lock()->getSampleData()->size() / 500), " ", 4) + "kbytes");
 }
 
-void SoundObserver::update(moduru::observer::Observable* o, boost::any arg)
+void SoundObserver::update(moduru::observer::Observable* o, std::any arg)
 {
-	string s = boost::any_cast<string>(arg);
+	string s = std::any_cast<string>(arg);
 	if (s.compare("soundnumber") == 0) {
 		if (csn.compare("sound") == 0) {
 			displaySoundName();

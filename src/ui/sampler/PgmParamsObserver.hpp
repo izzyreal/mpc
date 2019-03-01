@@ -57,7 +57,7 @@ namespace mpc {
 				SamplerGui* samplerGui{ nullptr };
 
 			public:
-				void update(moduru::observer::Observable* o, boost::any arg) override;
+				void update(moduru::observer::Observable* o, std::any arg) override;
 
 			private:
 				void displayReson();

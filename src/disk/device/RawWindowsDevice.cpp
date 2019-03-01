@@ -38,13 +38,13 @@ de::waldheinz::fs::FileSystem* RawWindowsDevice::fs_;
 */
 
 
-boost::any RawWindowsDevice::getFileSystem()
+std::any RawWindowsDevice::getFileSystem()
 {
     //return fs_;
 	return nullptr;
 }
 
-boost::any RawWindowsDevice::getRoot()
+std::any RawWindowsDevice::getRoot()
 {
 	//return fs_->getRoot();
 	return nullptr;

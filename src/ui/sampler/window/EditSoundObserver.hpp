@@ -65,7 +65,7 @@ namespace mpc {
 					void displayVariable();
 
 				public:
-					void update(moduru::observer::Observable* o, boost::any arg) override;
+					void update(moduru::observer::Observable* o, std::any arg) override;
 
 					EditSoundObserver(mpc::Mpc* mpc);
 					~EditSoundObserver();

@@ -54,8 +54,8 @@ Sampler::Sampler(mpc::Mpc* mpc)
 void Sampler::setSampleRate(int rate) {
 	sampleRate = rate;
 	recordBuffer = make_unique<ctoot::audio::core::AudioBuffer>("record", 2, 8192*4, rate);
-	preRecBufferL = boost::circular_buffer<float>(rate / 10);
-	preRecBufferR = boost::circular_buffer<float>(rate / 10);
+//    preRecBufferL = boost::circular_buffer<float>(rate / 10);
+//    preRecBufferR = boost::circular_buffer<float>(rate / 10);
 }
 
 void Sampler::setInputLevel(int i) {
@@ -125,8 +125,8 @@ void Sampler::work(int nFrames)
 			if (recordFrame == recordBufferL.size()) stopRecording();
 		}
 		else {
-			preRecBufferL.push_back((*monitorBufferL)[i]);
-			preRecBufferR.push_back((*monitorBufferR)[i]);
+//            preRecBufferL.push_back((*monitorBufferL)[i]);
+//            preRecBufferR.push_back((*monitorBufferR)[i]);
 		}
 
 		if (monitorBufferL->at(i) > 0 && vuCounter++ == 5) {
@@ -905,7 +905,8 @@ void Sampler::stopRecordingEarlier()
 {
 	stopRecordingBasic();
 	auto s = getPreviewSound().lock();
-	auto stopFrameIndex = (floor)(recordFrame + preRecBufferL.size()) * (44100.0 / sampleRate);
+        auto stopFrameIndex = (floor)(recordFrame) * (44100.0 / sampleRate);
+//    auto stopFrameIndex = (floor)(recordFrame + preRecBufferL.size()) * (44100.0 / sampleRate);
 	int newSize = s->isMono() ? stopFrameIndex : stopFrameIndex * 2;
 	auto sampleData = s->getSampleData();
 	sampleData->resize(newSize);
@@ -924,27 +925,29 @@ void Sampler::stopRecordingBasic()
 	auto counter = 0;
 	auto s = addSound().lock();
 	s->setName(addOrIncreaseNumber("sound"));
-	auto sampleDataL = vector<float>(preRecBufferL.size() + recordBufferL.size());
-	auto sampleDataR = vector<float>(preRecBufferR.size() + recordBufferR.size());
-	auto preRecCounter = 0;
-	for (float f : preRecBufferL) {
-		while (preRecCounter != (sampleRate/10) - (samplerGui->getPreRec() * (sampleRate/1000.0))) {
-			preRecCounter++;
-		}
-		sampleDataL[counter++] = f;
-	}
+//    auto sampleDataL = vector<float>(preRecBufferL.size() + recordBufferL.size());
+//    auto sampleDataR = vector<float>(preRecBufferR.size() + recordBufferR.size());
+    auto sampleDataL = vector<float>(recordBufferL.size());
+	auto sampleDataR = vector<float>(recordBufferR.size());
+    auto preRecCounter = 0;
+//    for (float f : preRecBufferL) {
+//        while (preRecCounter != (sampleRate/10) - (samplerGui->getPreRec() * (sampleRate/1000.0))) {
+//            preRecCounter++;
+//        }
+//        sampleDataL[counter++] = f;
+//    }
 	for (auto f : recordBufferL) {
 		sampleDataL[counter++] = f;
 	}
 	counter = 0;
 	preRecCounter = 0;
-	for (float f : preRecBufferR) {
-		while (preRecCounter != (sampleRate/10) - (samplerGui->getPreRec() * (sampleRate/1000.0))) {
-			preRecCounter++;
-		}
-
-		sampleDataR[counter++] = f;
-	}
+//    for (float f : preRecBufferR) {
+//        while (preRecCounter != (sampleRate/10) - (samplerGui->getPreRec() * (sampleRate/1000.0))) {
+//            preRecCounter++;
+//        }
+//
+//        sampleDataR[counter++] = f;
+//    }
 	for (auto f : recordBufferR)
 		sampleDataR[counter++] = f;
 	auto mode = samplerGui->getMode();

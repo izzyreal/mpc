@@ -40,7 +40,7 @@ namespace mpc {
 			void displayName();
 
 		public:
-			void update(moduru::observer::Observable* o, boost::any arg) override;
+			void update(moduru::observer::Observable* o, std::any arg) override;
 
 			NameObserver(mpc::Mpc* mpc);
 			~NameObserver();

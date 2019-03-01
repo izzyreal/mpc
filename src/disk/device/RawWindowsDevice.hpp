@@ -24,8 +24,8 @@ namespace mpc {
 			public:
 				//::de::waldheinz::fs::FileSystem* getFileSystem() override;
 				//::de::waldheinz::fs::fat::AkaiFatLfnDirectory* getRoot() override;
-				boost::any getFileSystem() override;
-				boost::any getRoot() override;
+				std::any getFileSystem() override;
+				std::any getRoot() override;
 				void close() override;
 				void flush() override;
 				std::string getAbsolutePath() override;

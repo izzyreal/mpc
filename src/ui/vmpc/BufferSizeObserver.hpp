@@ -27,7 +27,7 @@ namespace mpc {
 				mpc::audiomidi::AudioMidiServices* ams{ nullptr };
 
 			public:
-				void update(moduru::observer::Observable* o, boost::any a) override;
+				void update(moduru::observer::Observable* o, std::any a) override;
 
 			private:
 				void displayFrames();

@@ -11,7 +11,7 @@
 #include <audio/server/IOAudioProcess.hpp>
 #include <audio/core/AudioBuffer.hpp>
 
-#include <boost/circular_buffer.hpp>
+//#include <boost/circular_buffer.hpp>
 
 #include <memory>
 
@@ -76,8 +76,8 @@ namespace mpc {
 			ctoot::audio::server::IOAudioProcess* digitalInput{ nullptr };
 			ctoot::audio::server::IOAudioProcess* input{ nullptr };
 			ctoot::audio::server::IOAudioProcess* inputSwap{ nullptr };
-			boost::circular_buffer<float> preRecBufferL{};
-			boost::circular_buffer<float> preRecBufferR{};
+//            boost::circular_buffer<float> preRecBufferL{};
+//            boost::circular_buffer<float> preRecBufferR{};
 			std::shared_ptr<MonitorOutput> monitorOutput{};
 			std::vector<std::shared_ptr<Sound>> sounds{};
 			std::vector<std::shared_ptr<Program>> programs{};

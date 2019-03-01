@@ -5,10 +5,6 @@
 #include <fstream>
 #include <thread>
 
-//#include <io/CircularBuffer.hpp>
-
-//#include <boost/circular_buffer.hpp>
-
 #include <io/TSCircularBuffer.hpp>
 
 namespace moduru {
@@ -32,8 +28,7 @@ namespace mpc {
 			typedef ctoot::audio::core::AudioProcessAdapter super;
 
 		private:
-			std::string name{ "" };
-			//std::unique_ptr<moduru::io::CircularBuffer> circularBuffer{};
+			std::string name;
 			circular_buffer<char>* circularBuffer = new circular_buffer<char>(2000000);
 			std::weak_ptr<ctoot::audio::core::AudioFormat> format{ };
 			bool reading{ false };

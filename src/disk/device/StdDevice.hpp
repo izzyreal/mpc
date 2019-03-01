@@ -22,11 +22,11 @@ namespace mpc {
 				std::shared_ptr<moduru::file::Directory> root{};
 
 			public:
-				boost::any getRoot() override;
+				std::any getRoot() override;
 				virtual bool isValid();
 				void close() override;
 				void flush() override;
-				boost::any getFileSystem() override;
+				std::any getFileSystem() override;
 				std::string getAbsolutePath() override;
 				int getSize() override;
 				std::string getVolumeName() override;

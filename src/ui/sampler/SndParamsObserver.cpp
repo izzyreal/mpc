@@ -152,7 +152,7 @@ void SndParamsObserver::displayPlayX()
 	playXField.lock()->setText(playXNames[soundGui->getPlayX()]);
 }
 
-void SndParamsObserver::update(moduru::observer::Observable* o, boost::any arg)
+void SndParamsObserver::update(moduru::observer::Observable* o, std::any arg)
 {
 	auto lSampler = sampler.lock();
 	
@@ -166,7 +166,7 @@ void SndParamsObserver::update(moduru::observer::Observable* o, boost::any arg)
 		lSound->getMsoc()->addObserver(this);
 	}
 
-	string s = boost::any_cast<string>(arg);
+	string s = std::any_cast<string>(arg);
 
 	if (s.compare("soundnumber") == 0) {
 		auto lSound = sound.lock();

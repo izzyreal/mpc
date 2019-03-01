@@ -56,7 +56,7 @@ namespace mpc {
 					void displayVelocityNormal();
 
 				public:
-					void update(moduru::observer::Observable* o, boost::any arg) override;
+					void update(moduru::observer::Observable* o, std::any arg) override;
 
 					MetronomeSoundObserver(mpc::Mpc* mpc);
 					~MetronomeSoundObserver();

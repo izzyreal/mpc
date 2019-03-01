@@ -27,7 +27,7 @@ void SaveAllFileObserver::displayFile()
 	fileLabel.lock()->setText(moduru::lang::StrUtil::padRight(mpc->getUis().lock()->getNameGui()->getName().substr(1), " ", 15) + ".ALL");
 }
 
-void SaveAllFileObserver::update(moduru::observer::Observable* o, boost::any a)
+void SaveAllFileObserver::update(moduru::observer::Observable* o, std::any a)
 {
 }
 

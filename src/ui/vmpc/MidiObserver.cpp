@@ -58,9 +58,9 @@ void MidiObserver::displayOut()
 	displayDev1();
 }
 
-void MidiObserver::update(moduru::observer::Observable* o, boost::any a)
+void MidiObserver::update(moduru::observer::Observable* o, std::any a)
 {
-	string param = boost::any_cast<string>(a);
+	string param = std::any_cast<string>(a);
 	if (param.compare("in") == 0) {
 		displayIn();
 	}

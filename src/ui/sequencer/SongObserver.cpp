@@ -137,9 +137,9 @@ void SongObserver::displaySongName()
 	songField.lock()->setText(moduru::lang::StrUtil::padLeft(to_string(songGui->getSelectedSongIndex() + 1), "0", 2) + "-" + song.lock()->getName());
 }
 
-void SongObserver::update(moduru::observer::Observable* o, boost::any arg)
+void SongObserver::update(moduru::observer::Observable* o, std::any arg)
 {
-	string s = boost::any_cast<string>(arg);
+	string s = std::any_cast<string>(arg);
 	if (s.compare("loop") == 0) {
 		displayLoop();
 	}

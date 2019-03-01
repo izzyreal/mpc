@@ -29,7 +29,7 @@ namespace mpc {
 				mpc::Mpc* mpc{};
 
 			public:
-				void update(moduru::observer::Observable* o, boost::any a) override;
+				void update(moduru::observer::Observable* o, std::any a) override;
 
 			private:
 				void displayScsi();

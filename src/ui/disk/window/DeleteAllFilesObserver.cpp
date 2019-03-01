@@ -22,9 +22,9 @@ void DeleteAllFilesObserver::displayDelete()
 	deleteField.lock()->setText(views[diskWindowGui->getDelete()]);
 }
 
-void DeleteAllFilesObserver::update(moduru::observer::Observable* o, boost::any a)
+void DeleteAllFilesObserver::update(moduru::observer::Observable* o, std::any a)
 {
-	string param = boost::any_cast<string>(a);
+	string param = std::any_cast<string>(a);
 	if (param.compare("delete") == 0) {
 		displayDelete();
 	}

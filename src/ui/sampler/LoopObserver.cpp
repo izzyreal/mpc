@@ -145,9 +145,9 @@ void LoopObserver::displayLoop()
 	loopField.lock()->setText(sound.lock()->isLoopEnabled() ? "ON" : "OFF");
 }
 
-void LoopObserver::update(moduru::observer::Observable* o, boost::any arg)
+void LoopObserver::update(moduru::observer::Observable* o, std::any arg)
 {
-	string s = boost::any_cast<string>(arg);
+	string s = std::any_cast<string>(arg);
 	if (s.compare("soundnumber") == 0) {
 		auto lSound = sound.lock();
 		displaySnd();

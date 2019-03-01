@@ -1,7 +1,5 @@
 #include <controls/sampler/dialog/ResampleControls.hpp>
 
-//#include <disk/MpcFile.hpp>
-//#include <disk/SoundLoader.hpp>
 #include <ui/NameGui.hpp>
 #include <lcdgui/Field.hpp>
 #include <ui/sampler/SoundGui.hpp>
@@ -11,9 +9,7 @@
 #include <Logger.hpp>
 #include <thirdp/libsamplerate/samplerate.h>
 
-#ifdef __linux__
 #include <cmath>
-#endif
 
 using namespace mpc::controls::sampler::dialog;
 using namespace std;
