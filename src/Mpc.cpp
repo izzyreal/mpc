@@ -94,7 +94,7 @@ void Mpc::init(std::string mode, int sampleRate)
 		this_thread::sleep_for(chrono::milliseconds(10));
 	}
 	delete apsLoader;
-	//sequencer->playFromStart();
+	sequencer->playFromStart();
 
 	hardware->getSlider().lock()->setValue(mpc::nvram::NvRam::getSlider());
 
