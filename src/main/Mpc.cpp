@@ -83,6 +83,7 @@ void Mpc::init(std::string mode, int sampleRate)
 	diskController = make_unique<DiskController>(this);
 	diskController->initDisks();
 
+	/*
 	getDisk().lock()->moveForward("TEST2");
 	getDisk().lock()->initFiles();
 	mpc::disk::MpcFile* f = getDisk().lock()->getFile("FRUTZLE.ALL");
@@ -95,15 +96,14 @@ void Mpc::init(std::string mode, int sampleRate)
 	}
 	delete apsLoader;
 	sequencer->playFromStart();
+	*/
 
 	hardware->getSlider().lock()->setValue(mpc::nvram::NvRam::getSlider());
-
 	layeredScreen->openScreen("sequencer");
 }
 
 void Mpc::powerOn() {
-	mpc::StartUp foo;
-	foo.runStartUpRoutine(this);
+	mpc::StartUp().runStartUpRoutine(this);
 }
 
 weak_ptr<ui::Uis> Mpc::getUis() {
