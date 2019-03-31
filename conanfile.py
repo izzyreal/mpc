@@ -8,7 +8,8 @@ class Pkg(ConanFile):
     generators = "cmake"
     exports_sources = "src/*"
     requires = ("ctoot/0.1@izmar/dev", "moduru/0.1@izmar/dev", "rapidjson/1.1.0@bincrafters/stable", "Catch2/2.7.0@catchorg/stable")
-
+    url = "https://github.com/izzyreal/mpc.git"
+	
     def build(self):
         cmake = CMake(self)
         cmake.configure(source_folder="src")
