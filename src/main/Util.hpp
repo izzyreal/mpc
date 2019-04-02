@@ -11,7 +11,7 @@ namespace mpc {
 
 	public:
 
-		static std::vector<char> getPadAndVelo(int x, int y);
+		static std::vector<int> getPadAndVelo(int x, int y);
 		static std::string getFileName(std::string s);
 		static std::string* splitName(std::string s);
 		static std::string distributeTimeSig(std::string s);

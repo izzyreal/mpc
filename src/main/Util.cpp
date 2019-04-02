@@ -16,7 +16,7 @@ std::string Util::replaceDotWithSmallSpaceDot(std::string s) {
 	return res;
 }
 
-vector<char> Util::getPadAndVelo(int x, int y)
+vector<int> Util::getPadAndVelo(int x, int y)
 {
 	int velocity;
 	int padSize = 93;
@@ -43,19 +43,19 @@ vector<char> Util::getPadAndVelo(int x, int y)
 			}
 		}
 	}
-	if (yPos == -1 || yPos == -1) return vector<char>{ -1, -1 };
+	if (yPos == -1 || yPos == -1) return vector<int>{ -1, -1 };
 	int padNumber = -1;
-	vector<char> column0 = { 12, 8, 4, 0 };
-	vector<char> column1 = { 13, 9, 5, 1 };
-	vector<char> column2 = { 14, 10, 6, 2 };
-	vector<char> column3 = { 15, 11, 7, 3 };
-	auto columns = vector < vector<char>>(4);
+	vector<int> column0 = { 12, 8, 4, 0 };
+	vector<int> column1 = { 13, 9, 5, 1 };
+	vector<int> column2 = { 14, 10, 6, 2 };
+	vector<int> column3 = { 15, 11, 7, 3 };
+	auto columns = vector<vector<int>>(4);
 	columns[0] = column0;
 	columns[1] = column1;
 	columns[2] = column2;
 	columns[3] = column3;
 	padNumber = columns[xPos][yPos];
-	return vector<char>{ (char)padNumber, (char)velocity };
+	return vector<int>{ (int)padNumber, (int)velocity };
 }
 
 string Util::getFileName(string s)
