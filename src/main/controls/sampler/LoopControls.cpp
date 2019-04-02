@@ -9,7 +9,8 @@
 #include <sampler/Sampler.hpp>
 #include <sampler/Sound.hpp>
 
-#include <limits>
+#include <stdint.h>
+#include <limits.h>
 
 using namespace mpc::controls::sampler;
 using namespace std;
