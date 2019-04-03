@@ -14,6 +14,10 @@
 
 #include <lang/StrUtil.hpp>
 
+#ifdef __linux__
+#include <pthread.h>
+#endif // __linux__
+
 using namespace moduru::lang;
 
 using namespace mpc::disk;
