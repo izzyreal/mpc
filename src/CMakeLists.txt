@@ -58,4 +58,11 @@ foreach(_source IN ITEMS ${_source_list_test})
 endforeach()
 
 add_executable(mpc-tests ${_source_list_test})
-target_link_libraries(mpc-tests mpc)
+
+if (UNIX)
+    set(THREADS_PREFER_PTHREAD_FLAG ON)
+    find_package(Threads REQUIRED)
+    target_link_libraries(mpc-tests Threads::Threads mpc)
+else()
+    target_link_libraries(mpc-tests mpc)
+endif (UNIX)

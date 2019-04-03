@@ -36,7 +36,7 @@
 #include <lang/StrUtil.hpp>
 #include <file/ByteUtil.hpp>
 
-#include <set>;
+#include <set>
 
 using namespace mpc::midi::event;
 using namespace mpc::file::mid;
