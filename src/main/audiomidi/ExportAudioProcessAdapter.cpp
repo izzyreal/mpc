@@ -17,6 +17,10 @@
 #include <chrono>
 #include <thread>
 
+#ifdef __linux__
+#include <pthread.h>
+#endif // __linux__
+
 using namespace mpc::audiomidi;
 using namespace std;
 using namespace moduru::io;

@@ -5,6 +5,10 @@
 #include <ui/disk/window/DirectoryGui.hpp>
 #include <ui/disk/DiskGui.hpp>
 
+#ifdef __linux__
+#include <pthread.h>
+#endif // __linux__
+
 using namespace mpc::controls::disk::dialog;
 using namespace std;
 

@@ -6,6 +6,10 @@
 
 #include <Logger.hpp>
 
+#ifdef __linux__
+#include <pthread.h>
+#endif // __linux__
+
 using namespace mpc::controls::disk::dialog;
 using namespace std;
 
