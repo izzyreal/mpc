@@ -114,6 +114,7 @@ namespace mpc {
 		void loadSound(bool replace);
 		void loadProgram();
 		void importLoadedProgram();
+		void loadDemoBeat();
 
 	private:
 		void runLoadSoundThread(int size);
