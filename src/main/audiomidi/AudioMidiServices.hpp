@@ -28,7 +28,7 @@ namespace ctoot {
 		namespace server {
 			class NonRealTimeAudioServer;
 			class CompoundAudioClient;
-			class RtAudioServer;
+			class ExternalAudioServer;
 			class UnrealAudioServer;
 		}
 
@@ -92,7 +92,7 @@ namespace mpc {
 
 		public:
 			ctoot::audio::server::UnrealAudioServer* getUnrealAudioServer();
-			ctoot::audio::server::RtAudioServer* getRtAudioServer();
+			ctoot::audio::server::ExternalAudioServer* getExternalAudioServer();
 
 		private:
 			void destroySynth();

@@ -38,7 +38,7 @@
 #include <audio/server/IOAudioProcess.hpp>
 #include <audio/server/NonRealTimeAudioServer.hpp>
 #include <audio/server/UnrealAudioServer.hpp>
-#include <audio/server/RtAudioServer.hpp>
+#include <audio/server/ExternalAudioServer.hpp>
 
 #include <audio/system/MixerConnectedAudioSystem.hpp>
 #include <audio/system/AudioDevice.hpp>
@@ -83,6 +83,8 @@
 #include <string>
 
 using namespace mpc::audiomidi;
+using namespace ctoot::audio::server;
+using namespace ctoot::audio::core;
 using namespace std;
 
 AudioMidiServices::AudioMidiServices(mpc::Mpc* mpc)
@@ -90,27 +92,27 @@ AudioMidiServices::AudioMidiServices(mpc::Mpc* mpc)
 	this->mpc = mpc;
 	frameSeq = make_shared<mpc::sequencer::FrameSeq>(mpc);
 	disabled = true;
-	ctoot::audio::core::AudioServices::scan();
+	AudioServices::scan();
 	ctoot::synth::SynthServices::scan();
 	ctoot::synth::SynthChannelServices::scan();
 }
 
 void AudioMidiServices::start(std::string mode, int sampleRate) {
-	format = make_shared<ctoot::audio::core::AudioFormat>(sampleRate, 16, 2, true, false);
+	format = make_shared<AudioFormat>(sampleRate, 16, 2, true, false);
 	setupMidi();
 
 	if (mode.compare("rtaudio") == 0) {
-		server = make_shared<ctoot::audio::server::RtAudioServer>();
+		server = make_shared<ExternalAudioServer>();
 	}
 	else if (mode.compare("unreal") == 0) {
-		server = make_shared<ctoot::audio::server::UnrealAudioServer>();
+		server = make_shared<UnrealAudioServer>();
 	}
 	server->setSampleRate(sampleRate);
-	offlineServer = make_shared<ctoot::audio::server::NonRealTimeAudioServer>(server);
+	offlineServer = make_shared<NonRealTimeAudioServer>(server);
 	MLOG("AMS start, samplerate " + std::to_string(offlineServer->getSampleRate()));
 	setupMixer();
-	inputProcesses = vector<ctoot::audio::server::IOAudioProcess*>(1);
-	outputProcesses = vector<ctoot::audio::server::IOAudioProcess*>(5);
+	inputProcesses = vector<IOAudioProcess*>(1);
+	outputProcesses = vector<IOAudioProcess*>(5);
 
 	for (auto& p : inputProcesses)
 		p = nullptr;
@@ -142,7 +144,7 @@ void AudioMidiServices::start(std::string mode, int sampleRate) {
 	sampler->setActiveInput(inputProcesses[mpc->getUis().lock()->getSamplerGui()->getInput()]);
 	mixer->getStrip("66").lock()->setInputProcess(sampler->getAudioOutputs()[0]);
 	initializeDiskWriter();
-	cac = make_shared<ctoot::audio::server::CompoundAudioClient>();
+	cac = make_shared<CompoundAudioClient>();
 	cac->add(frameSeq.get());
 	cac->add(mixer.get());
 	//cac->add(midiSystem.get());
@@ -162,11 +164,11 @@ void AudioMidiServices::setupMidi()
 	midiSystem = make_shared<ctoot::midi::core::DefaultConnectedMidiSystem>();
 }
 
-ctoot::audio::server::NonRealTimeAudioServer* AudioMidiServices::getOfflineServer() {
+NonRealTimeAudioServer* AudioMidiServices::getOfflineServer() {
 	return offlineServer.get();
 }
 
-weak_ptr<ctoot::audio::server::AudioServer> AudioMidiServices::getAudioServer() {
+weak_ptr<AudioServer> AudioMidiServices::getAudioServer() {
 	return offlineServer;
 }
 
@@ -175,17 +177,17 @@ void AudioMidiServices::setupMixer()
 	mixerControls = make_shared<ctoot::mpc::MpcMixerControls>("MpcMixerControls", 1.f);
 	
 	// AUX#1 - #4 represent ASSIGNABLE MIX OUT 1/2, 3/4, 5/6 and 7/8
-	mixerControls->createAuxBusControls("AUX#1", ctoot::audio::core::ChannelFormat::STEREO());
-	mixerControls->createAuxBusControls("AUX#2", ctoot::audio::core::ChannelFormat::STEREO());
-	mixerControls->createAuxBusControls("AUX#3", ctoot::audio::core::ChannelFormat::STEREO());
-	mixerControls->createAuxBusControls("AUX#4", ctoot::audio::core::ChannelFormat::STEREO());
+	mixerControls->createAuxBusControls("AUX#1", ChannelFormat::STEREO());
+	mixerControls->createAuxBusControls("AUX#2", ChannelFormat::STEREO());
+	mixerControls->createAuxBusControls("AUX#3", ChannelFormat::STEREO());
+	mixerControls->createAuxBusControls("AUX#4", ChannelFormat::STEREO());
 	
 	// FX#1 Represents the MPC2000XL's only FX send bus
-	mixerControls->createFxBusControls("FX#1", ctoot::audio::core::ChannelFormat::STEREO());
+	mixerControls->createFxBusControls("FX#1", ChannelFormat::STEREO());
 	int nReturns = 1;
 	
 	// L/R represents STEREO OUT L/R
-	ctoot::audio::mixer::MixerControlsFactory::createBusStrips(dynamic_pointer_cast<ctoot::audio::mixer::MixerControls>(mixerControls), "L-R", ctoot::audio::core::ChannelFormat::STEREO(), nReturns);
+	ctoot::audio::mixer::MixerControlsFactory::createBusStrips(dynamic_pointer_cast<ctoot::audio::mixer::MixerControls>(mixerControls), "L-R", ChannelFormat::STEREO(), nReturns);
 	
 	/*
 	* There are 32 voices. Each voice has one channel for mixing to STEREO OUT L/R, and one channel for mixing to an ASSIGNABLE MIX OUT. These are strips 1-64.
@@ -212,7 +214,7 @@ void AudioMidiServices::setupFX() {
 	//acs->insert("class ctoot::audio::delay::TempoDelayControls", "Main");
 	//acs->insert("class ctoot::audio::delay::PhaserControls", "Main");
 	//acs->insert("class ctoot::audio::delay::CabMicingControls", "Main"); doesn't seem to work at all
-	//auto controls = ctoot::audio::core::AudioServices::getAvailableControls();
+	//auto controls = AudioServices::getAvailableControls();
 	//MLOG("Available controls:");
 	//MLOG(controls);
 }
@@ -325,7 +327,7 @@ void AudioMidiServices::destroyServices()
 	cac.reset();
 	destroyDiskWriter();
 	mpc->getSampler().lock()->setActiveInput(nullptr);
-	mixer->getStrip("66").lock()->setInputProcess(weak_ptr<ctoot::audio::core::AudioProcess>());
+	mixer->getStrip("66").lock()->setInputProcess(weak_ptr<AudioProcess>());
 	mpcMidiPorts->close();
 	mpcMidiPorts.reset();
 	closeIO();
@@ -446,7 +448,7 @@ bool AudioMidiServices::isDisabled()
 	return disabled;
 }
 
-ctoot::audio::server::IOAudioProcess* AudioMidiServices::getAudioInput(int input)
+IOAudioProcess* AudioMidiServices::getAudioInput(int input)
 {
 	return inputProcesses[input];
 }
@@ -456,12 +458,12 @@ int AudioMidiServices::getBufferSize()
 	return server->getOutputLatencyFrames();
 }
 
-ctoot::audio::server::UnrealAudioServer* AudioMidiServices::getUnrealAudioServer() {
-	return dynamic_pointer_cast<ctoot::audio::server::UnrealAudioServer>(server).get();
+UnrealAudioServer* AudioMidiServices::getUnrealAudioServer() {
+	return dynamic_pointer_cast<UnrealAudioServer>(server).get();
 }
 
-ctoot::audio::server::RtAudioServer* AudioMidiServices::getRtAudioServer() {
-	return dynamic_pointer_cast<ctoot::audio::server::RtAudioServer>(server).get();
+ExternalAudioServer* AudioMidiServices::getExternalAudioServer() {
+	return dynamic_pointer_cast<ExternalAudioServer>(server).get();
 }
 
 AudioMidiServices::~AudioMidiServices() {
