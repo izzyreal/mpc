@@ -34,7 +34,7 @@ void VmpcDiskControls::turnWheel(int i)
 		deviceGui->setAccessType(deviceGui->getScsi(), deviceGui->getAccessType(deviceGui->getScsi()) + i);
 	}
 	else if(param.compare("root") == 0) {
-        auto raw = deviceGui->isRaw(deviceGui->getScsi());
+        //auto raw = deviceGui->isRaw(deviceGui->getScsi());
         //auto max = raw ? mpc->getRawStoresAmount() : mpc->getStdStoresAmount();
 		//if (deviceGui->getStore(deviceGui->getScsi()) == max - 1) {
 			//return;

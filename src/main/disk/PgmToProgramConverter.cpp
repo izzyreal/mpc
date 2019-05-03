@@ -27,9 +27,7 @@ PgmToProgramConverter::PgmToProgramConverter(MpcFile* file, weak_ptr<mpc::sample
 	auto pgmSoundNames = reader->getSampleNames();
 	for (int i = 0; i < reader->getHeader()->getNumberOfSamples(); i++)
 		soundNames.push_back(pgmSoundNames->getSampleName(i));
-	auto const pgmHeader = reader->getHeader();
 	auto const programName = reader->getProgramName();
-	auto const numberOfSamples = pgmHeader->getNumberOfSamples();
 	program.lock()->setName(programName->getProgramNameASCII());
 	setNoteParameters();
 	setMixer();

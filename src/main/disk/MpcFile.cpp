@@ -85,12 +85,12 @@ int MpcFile::length()
 void MpcFile::setFileData(std::vector<char>* data)
 {
 	if (raw) {
+        /*
 		auto toWrite = data->size();
 		auto sectorSize = 512;
 		auto written = 0;
 		auto sector = 0;
 		auto block = vector<char>(sectorSize);
-		/*
 		try {
 			while (toWrite - written > sectorSize) {
 				::java::lang::System::arraycopy(data, sector * sectorSize, block, 0, sectorSize);
@@ -108,7 +108,6 @@ void MpcFile::setFileData(std::vector<char>* data)
 		*/
 	}
 	else {
-
 		auto fos = make_unique<moduru::io::FileOutputStream>(dynamic_pointer_cast<moduru::file::File>(stdEntry).get());
 		fos->writeBytes(*data, 0, data->size());
 		fos->close();

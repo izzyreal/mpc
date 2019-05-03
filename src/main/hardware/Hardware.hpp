@@ -19,7 +19,7 @@ namespace mpc {
 		class Slider;
 		class HwPad;
 
-		class Hardware
+		class Hardware final
 			: public moduru::observer::Observable
 		{
 

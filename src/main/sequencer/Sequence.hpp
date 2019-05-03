@@ -13,7 +13,7 @@ namespace mpc {
 		class Track;
 		class TimeSignature;
 		class TempoChangeEvent;
-		class Sequence
+		class Sequence final
 			: public moduru::observer::Observable
 		{
 

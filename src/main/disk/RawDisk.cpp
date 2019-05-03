@@ -43,9 +43,9 @@ RawDisk::RawDisk(weak_ptr<Store> store, mpc::Mpc* mpc)
 void RawDisk::initFiles()
 {
     //root = dynamic_cast< ::de::waldheinz::fs::fat::AkaiFatLfnDirectory* >(device->getRoot());
-    refreshPath();
-	files.clear();
-    auto view = 0;
+//    refreshPath();
+//    files.clear();
+//    auto view = 0;
 
 	//if (lGui) {
         //auto diskGui = lGui->getDiskGui();

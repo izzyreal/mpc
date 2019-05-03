@@ -37,8 +37,8 @@ ApsGlobalParameters::ApsGlobalParameters(mpc::Mpc* mpc)
 	auto const indivFxSourceDrumVal = uis->getMixerSetupGui()->isIndivFxSourceDrum();
 	auto const copyPgmMixToDrumVal = uis->getMixerSetupGui()->isCopyPgmMixToDrumEnabled();
 	auto const recordMixChangesVal = uis->getMixerSetupGui()->isRecordMixChangesEnabled();
-	auto const masterLevelVal = uis->getMixerSetupGui()->getMasterLevel();
-	auto const fxDrumVal = uis->getMixerSetupGui()->getFxDrum();
+	//auto const masterLevelVal = uis->getMixerSetupGui()->getMasterLevel();
+	//auto const fxDrumVal = uis->getMixerSetupGui()->getFxDrum();
 	saveBytes[0] = BitUtil::setBits(1, saveBytes[0], padToInternalSoundVal);
 	saveBytes[1] = BitUtil::setBits(1, saveBytes[1], padAssignMasterVal);
 	saveBytes[2] = BitUtil::setBits(1, saveBytes[2], stereoMixSourceDrumVal);
@@ -46,6 +46,8 @@ ApsGlobalParameters::ApsGlobalParameters(mpc::Mpc* mpc)
 	saveBytes[3] = BitUtil::setBits(1, saveBytes[3], copyPgmMixToDrumVal);
 	saveBytes[3] = BitUtil::setBits(16, saveBytes[3], recordMixChangesVal);
 	/*
+    Not sure why this is commented and not deleted, but leaving it in in case we want
+    to further refine the proprietary file parsers.
 	saveBytes[0] = BitUtil::setBit(saveBytes[0], 7, padToInternalSound);
 	saveBytes[1] = BitUtil::setBit(saveBytes[1], 0, padAssignMaster);
 	saveBytes[2] = BitUtil::setBit(saveBytes[2], 0, stereoMixSourceDrum);

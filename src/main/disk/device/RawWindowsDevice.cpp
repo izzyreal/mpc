@@ -11,16 +11,16 @@ using namespace std;
 
 RawWindowsDevice::RawWindowsDevice(string driveLetter, mpc::disk::RawDisk* disk, int totalSpace)
 {
-	this->driveLetter = driveLetter;
-	this->totalSpace = totalSpace;
-	auto readOnly = true;
-	//rawVolume_ = new ::de::waldheinz::fs::util::RawWindowsVolume(driveLetter, readOnly, totalSpace);
-	try {
-		//fs_ = ::de::waldheinz::fs::FileSystemFactory::createAkai(rawVolume_, readOnly);
-	}
-	catch (exception e) {
-		e.what();
-	}
+//    this->driveLetter = driveLetter;
+//    this->totalSpace = totalSpace;
+//    auto readOnly = true;
+//    rawVolume_ = new ::de::waldheinz::fs::util::RawWindowsVolume(driveLetter, readOnly, totalSpace);
+//    try {
+//        fs_ = ::de::waldheinz::fs::FileSystemFactory::createAkai(rawVolume_, readOnly);
+//    }
+//    catch (exception e) {
+//        e.what();
+//    }
 }
 
 /*

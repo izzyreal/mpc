@@ -137,7 +137,6 @@ AllLoader::AllLoader(mpc::Mpc* mpc, mpc::disk::MpcFile* file)
 
 void AllLoader::convertSequences(const bool indiv)
 {
-	auto counter = 0;
 	int index = -1;
 	if (!indiv) mpc->getSequencer().lock()->purgeAllSequences();
 	for (auto& as : sequencesALL) {

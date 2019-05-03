@@ -19,7 +19,7 @@ namespace mpc {
 				//static ::de::waldheinz::fs::util::RawWindowsVolume* rawVolume_;
 				//static ::de::waldheinz::fs::FileSystem* fs_;
 				std::string driveLetter{ "" };
-				int totalSpace{ 0 };
+				//int totalSpace{ 0 };
 
 			public:
 				//::de::waldheinz::fs::FileSystem* getFileSystem() override;

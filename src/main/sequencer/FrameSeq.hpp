@@ -10,7 +10,7 @@ namespace mpc {
 
 		class Sequencer;
 
-		class FrameSeq
+		class FrameSeq final
 			: public ctoot::audio::server::AudioClient
 		{
 

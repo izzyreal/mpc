@@ -28,7 +28,7 @@ void HwPad::release() {
 	auto c = mpc->getReleaseControls();
 	auto controls = mpc->getControls();
 	if (!c) return;
-	c->pad(index);
+	c->simplePad(index);
 }
 
 HwPad::~HwPad() {

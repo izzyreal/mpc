@@ -58,7 +58,7 @@ namespace mpc {
 		class DirectToDiskSettings;
 		class ExportAudioProcessAdapter;
 
-		class AudioMidiServices
+		class AudioMidiServices final
 			: public moduru::observer::Observable
 		{
 

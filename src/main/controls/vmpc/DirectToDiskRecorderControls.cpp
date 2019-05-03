@@ -76,8 +76,6 @@ void DirectToDiskRecorderControls::function(int i)
 		split = false;
 		sequence = lSequencer->getSequence(seq).lock();
 		bool offline = d2dRecorderGui->isOffline();
-		auto sequenceRaw = sequence.get();
-		auto lastTick = sequence->getLastTick();
 		shared_ptr<mpc::sequencer::Song> song;
 
 		lSequencer->setPreBounceRate(lAms->getOfflineServer()->getSampleRate());

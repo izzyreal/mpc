@@ -55,7 +55,7 @@ void MidiControls::turnWheel(int i)
 	else if (param.compare("dev0") == 0) {
 		if (midiGui->getIn() == 0) {
 			auto prevTransmitterNumber = midiGui->getIn1TransmitterNumber();
-			auto candidate = prevTransmitterNumber + i;
+			//auto candidate = prevTransmitterNumber + i;
 			//midiGui->setIn1TransmitterNumber(candidate, mpcMidiPorts->getTransmitters().size()-1);
 			auto newTransmitterNumber = midiGui->getIn1TransmitterNumber();
 			if (newTransmitterNumber != prevTransmitterNumber) {
@@ -66,7 +66,7 @@ void MidiControls::turnWheel(int i)
 		}
 		else if (midiGui->getIn() == 1) {
 			auto prevTransmitterNumber = midiGui->getIn2TransmitterNumber();
-			auto candidate = prevTransmitterNumber + i;
+			//auto candidate = prevTransmitterNumber + i;
 			//midiGui->setIn2TransmitterNumber(candidate, mpcMidiPorts->getTransmitters().size() - 1);
 			auto newTransmitterNumber = midiGui->getIn2TransmitterNumber();
 			if (newTransmitterNumber != prevTransmitterNumber) {
@@ -82,7 +82,7 @@ void MidiControls::turnWheel(int i)
 	else if (param.compare("dev1") == 0) {
 		if (midiGui->getOut() == 0) {
 			auto prevReceiverNumber = midiGui->getOutAReceiverIndex();
-			auto candidate = prevReceiverNumber + i;
+			//auto candidate = prevReceiverNumber + i;
 			//midiGui->setOutAReceiverNumber(candidate, mpcMidiPorts->getReceivers().size() - 1);
 			auto newReceiverNumber = midiGui->getOutAReceiverIndex();
 			if (newReceiverNumber != prevReceiverNumber) {
@@ -93,7 +93,7 @@ void MidiControls::turnWheel(int i)
 		}
 		else if (midiGui->getOut() == 1) {
 			auto prevReceiverNumber = midiGui->getOutBReceiverIndex();
-			auto candidate = prevReceiverNumber + i;
+			//auto candidate = prevReceiverNumber + i;
 			//midiGui->setOutBReceiverNumber(candidate, mpcMidiPorts->getReceivers().size() - 1);
 			auto newReceiverNumber = midiGui->getOutBReceiverIndex();
 			if (newReceiverNumber != prevReceiverNumber) {

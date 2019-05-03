@@ -95,14 +95,15 @@ int AllNoteEvent::readDuration(vector<char> b)
     auto b1 = b[DURATION_BYTE1_OFFSET];
     auto b2 = b[DURATION_BYTE2_OFFSET];
     auto b3 = b[DURATION_BYTE3_OFFSET];
-    if(b1 == 255 && b2 == 255 && b3 == 255)
+    if (static_cast<unsigned char>(b1) == 255 && static_cast<unsigned char>(b2) == 255 && static_cast<unsigned char>(b3) == 255) {
         return -1;
+    }
 
     b1 = moduru::file::BitUtil::removeUnusedBits(b1, DURATION_BYTE1_BIT_RANGE);
     b2 = moduru::file::BitUtil::removeUnusedBits(b2, DURATION_BYTE2_BIT_RANGE);
-    auto i1 = static_cast< int >((b1 & 255));
-    auto i2 = static_cast< int >((b2 & 255));
-    auto i3 = static_cast< int >((b3 & 255));
+    auto i1 = static_cast<int>(b1 & 255);
+    auto i2 = static_cast<int>(b2 & 255);
+    auto i3 = static_cast<int>(b3 & 255);
     return (i1 << 6) + (i2 << 2) + i3;
 }
 

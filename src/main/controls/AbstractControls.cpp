@@ -326,7 +326,7 @@ void AbstractControls::numpad(int i)
 	auto lDisk = mpc->getDisk().lock();
 	if (controls->isShiftPressed()) {
 		auto lAms = mpc->getAudioMidiServices().lock();
-		auto audioGui = mpc->getUis().lock()->getAudioGui();
+		//auto audioGui = mpc->getUis().lock()->getAudioGui();
 		switch (i) {
 		case 0:
 			if (!lAms->isDisabled()) {

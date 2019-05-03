@@ -35,7 +35,7 @@ namespace mpc {
 
 		class MonitorOutput;
 
-		class Sampler
+		class Sampler final
 			: public virtual ctoot::mpc::MpcSampler
 			, public virtual ctoot::audio::server::AudioClient
 			, public virtual ctoot::audio::system::AudioDevice

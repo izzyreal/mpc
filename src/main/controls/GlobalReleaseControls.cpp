@@ -66,7 +66,7 @@ void GlobalReleaseControls::function(int i) {
 	}
 }
 
-void GlobalReleaseControls::pad(int i)
+void GlobalReleaseControls::simplePad(int i)
 {
 	init();
 	auto bank = samplerGui->getBank();

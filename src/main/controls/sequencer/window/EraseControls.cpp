@@ -97,7 +97,7 @@ void EraseControls::function(int i)
 							break;
 						case 1:
 							excludeClass = eventClassNames[type];
-							if (!string(typeid(e).name()).compare(excludeClass) == 0) {
+							if (string(typeid(e).name()).compare(excludeClass) != 0) {
 								if (ne) {
 									auto nn = ne->getNote();
 									if (midi && nn >= notea && nn <= noteb) {

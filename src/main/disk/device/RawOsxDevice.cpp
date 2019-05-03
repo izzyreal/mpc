@@ -11,10 +11,10 @@ using namespace std;
 
 RawOsxDevice::RawOsxDevice(string fileName)
 {
-	this->absolutePath = fileName;
-	auto readOnly = true;
-	//rawVolume_ = ::de::waldheinz::fs::util::RawOsxVolume(fileName, readOnly);
-	//fs_ = ::de::waldheinz::fs::FileSystemFactory::createAkai(rawVolume_, readOnly);
+//    this->absolutePath = fileName;
+//    auto readOnly = true;
+//    rawVolume_ = ::de::waldheinz::fs::util::RawOsxVolume(fileName, readOnly);
+//    fs_ = ::de::waldheinz::fs::FileSystemFactory::createAkai(rawVolume_, readOnly);
 }
 
 /*

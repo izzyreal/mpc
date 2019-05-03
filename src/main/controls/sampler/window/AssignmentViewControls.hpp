@@ -10,6 +10,9 @@ namespace mpc {
 					: public mpc::controls::sampler::AbstractSamplerControls
 				{
 
+                public:
+                    AssignmentViewControls(mpc::Mpc* mpc);
+                    
 				public:
 					typedef mpc::controls::sampler::AbstractSamplerControls super;
 					void up() override;
@@ -17,10 +20,7 @@ namespace mpc {
 					void left() override;
 					void right() override;
 					void turnWheel(int i) override;
-					virtual void pad(int i, int velo);
-
-					AssignmentViewControls(mpc::Mpc* mpc);
-
+                    
 				};
 
 			}

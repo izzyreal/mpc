@@ -116,7 +116,6 @@ void EditSoundControls::function(int j)
 			if (!destination->isMono()) newSampleLength *= 2;
 
 			auto sourceData = source->getSampleData();
-			auto destinationData = destination->getSampleData();
 			vector<float> frame{ 0 };
 			if (destination->isMono()) {
 				for (int i = destinationStart; i < destinationStart + sourceLength; i++) {

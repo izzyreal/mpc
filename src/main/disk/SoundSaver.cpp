@@ -41,7 +41,7 @@ void SoundSaver::saveSounds()
 		mpc->getLayeredScreen().lock()->createPopup("Writing " + StrUtil::toUpper(fileName), 85);
 		if (lDisk->checkExists(fileName)) {
 			if (diskGui->getSaveReplaceSameSounds()) {
-				auto success = lDisk->getFile(fileName)->del();
+                lDisk->getFile(fileName)->del(); // possibly prepend auto success =
 			}
 			else {
 				skip = true;

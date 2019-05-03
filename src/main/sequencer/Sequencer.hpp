@@ -36,7 +36,7 @@ namespace mpc {
 
 		class Song;
 
-		class Sequencer
+		class Sequencer final
 			: public moduru::observer::Observable
 		{
 

@@ -24,7 +24,7 @@ void DeleteSoundControls::function(int i)
         break;
     case 4:
         lSampler->deleteSample(soundGui->getSoundIndex());
-		if (!soundGui->getSoundIndex() < lSampler->getSoundCount()) {
+		if (soundGui->getSoundIndex() > lSampler->getSoundCount() - 1) {
 			soundGui->setSoundIndex(lSampler->getSoundCount() - 1, lSampler->getSoundCount());
 		}
 		if (lSampler->getSoundCount() > 0) {

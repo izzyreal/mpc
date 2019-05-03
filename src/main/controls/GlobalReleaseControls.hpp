@@ -31,9 +31,7 @@ namespace mpc {
 		{
 
 		public:
-			//void keyEvent(unsigned char c);
-			//void pad(int i, int velo, bool repeat, int tick) override;
-			void pad(int i);
+			void simplePad(int i);
 
 		private:
 			void generateNoteOff(int nn);

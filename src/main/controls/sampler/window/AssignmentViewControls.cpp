@@ -69,10 +69,3 @@ void AssignmentViewControls::turnWheel(int i)
 	auto lProgram = program.lock();
 	lSampler->getLastPad(lProgram.get())->setNote(lSampler->getLastPad(lProgram.get())->getNote() + i);
 }
-
-void AssignmentViewControls::pad(int i, int velo)
-{
-	super::pad(i, velo, false, 0);
-	auto padFocus = mpc::ui::sampler::window::SamplerWindowGui::padFocusNames[i];
-	ls.lock()->setFocus(padFocus);
-}

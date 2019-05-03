@@ -9,7 +9,7 @@ using namespace std;
 
 ApsNoteParameters::ApsNoteParameters(vector<char> loadBytes)
 {
-	soundNumber = (loadBytes[0]) == 255 ? -1 : (loadBytes[0]);
+	soundNumber = static_cast<int>(loadBytes[0]) == 255 ? -1 : (loadBytes[0]);
 	soundGenerationMode = loadBytes[2];
 	velocityRangeLower = loadBytes[3];
 	alsoPlay1 = loadBytes[4];

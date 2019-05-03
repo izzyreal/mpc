@@ -27,7 +27,7 @@ namespace mpc {
 
 	namespace audiomidi {
 
-		class EventHandler
+		class EventHandler final
 			: public moduru::observer::Observable
 		{
 
