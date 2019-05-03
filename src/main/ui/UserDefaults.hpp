@@ -10,7 +10,7 @@ namespace mpc {
 
 	namespace ui {
 
-		class UserDefaults
+		class UserDefaults final
 			: public moduru::observer::Observable
 		{
 

@@ -100,7 +100,7 @@ void TwoDots::Draw(std::vector<std::vector<bool> >* pixels)
 	int yoff = 0;
 
 	vector<int> offsetxy{ xoff, yoff };
-	mpc::Util::drawLines(pixels, &lines, colors);
+	mpc::Util::drawLines(*pixels, lines, colors);
 	dirty = false;
 }
 

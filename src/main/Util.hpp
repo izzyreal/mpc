@@ -3,7 +3,8 @@
 #include <vector>
 
 #include <lang/StrUtil.hpp>
-//#include <IGraphics.h>
+
+using namespace std;
 
 namespace mpc {
 
@@ -11,18 +12,18 @@ namespace mpc {
 
 	public:
 
-		static std::vector<int> getPadAndVelo(int x, int y);
-		static std::string getFileName(std::string s);
-		static std::string* splitName(std::string s);
-		static std::string distributeTimeSig(std::string s);
-		static std::string replaceDotWithSmallSpaceDot(std::string s);
-		static void drawLine(std::vector<std::vector<bool> >* pixels, std::vector<std::vector<int> >* line, bool color);
-		static void drawLine(std::vector<std::vector<bool> >* pixels, std::vector<std::vector<int> >* line, bool color, std::vector<int>* offsetxy);
-		static void drawLines(std::vector<std::vector<bool> >* pixels, std::vector<std::vector<std::vector<int> > >* lines, std::vector<bool> colors);
-		static void drawLines(std::vector<std::vector<bool> >* pixels, std::vector<std::vector<std::vector<int> > >* lines, std::vector<bool> colors, std::vector<int>* offsetxy);
-		//static void drawScaled(IGraphics* g, std::vector<std::vector<int>> line, unsigned int scale, IColor* color, std::vector<int> offsetxy);
-		//static void drawScaled(IGraphics* g, std::vector<std::vector<std::vector<int>>> lines, unsigned int scale, IColor* color, std::vector<int> offsetxy);
-		//static void drawScaled(IGraphics* g, std::vector<std::vector<std::vector<int>>> lines, unsigned int scale, std::vector<IColor*> colors, std::vector<int> offsetxy);
+		static vector<int> getPadAndVelo(const int x, const int y);
+		static string getFileName(const string& s);
+		static vector<string> splitName(const string& s);
+		static string distributeTimeSig(const string& s);
+		static string replaceDotWithSmallSpaceDot(const string& s);
+		static void drawLine(vector<vector<bool>>& pixels, const vector<vector<int>>& line, const bool color);
+		static void drawLine(vector<vector<bool>>& pixels, const vector<vector<int>>& line, const bool color, const vector<int>& offsetxy);
+		static void drawLines(vector<vector<bool>>& pixels, const vector<vector<vector<int>>>& lines, const vector<bool>& colors);
+		static void drawLines(vector<vector<bool>>& pixels, const vector<vector<vector<int>>>& lines, const vector<bool>& colors, const vector<int>& offsetxy);
+		//static void drawScaled(IGraphics* g, vector<vector<int>> line, unsigned int scale, IColor* color, vector<int> offsetxy);
+		//static void drawScaled(IGraphics* g, vector<vector<vector<int>>> lines, unsigned int scale, IColor* color, vector<int> offsetxy);
+		//static void drawScaled(IGraphics* g, vector<vector<vector<int>>> lines, unsigned int scale, vector<IColor*> colors, vector<int> offsetxy);
 		
 	};
 }

@@ -34,7 +34,7 @@ namespace mpc {
 			void initParentFiles();
 
 		protected:
-			int getPathDepth();
+            int getPathDepth() override;
 
 		public:
 			std::string getDirectoryName() override;

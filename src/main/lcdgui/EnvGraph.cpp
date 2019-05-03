@@ -43,7 +43,7 @@ void EnvGraph::Draw(std::vector<std::vector<bool> >* pixels)
 
 	for (auto& c : coordinates) {
 		auto linePixels = moduru::gui::Bressenham::Line(c[0] + xoff, c[1] + yoff, c[2] + xoff, c[3] + yoff);
-		mpc::Util::drawLine(pixels, &linePixels, true);
+		mpc::Util::drawLine(*pixels, linePixels, true);
 	}
 	dirty = false;
 }

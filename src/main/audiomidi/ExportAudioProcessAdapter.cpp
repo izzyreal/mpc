@@ -21,8 +21,8 @@
 #include <pthread.h>
 #endif // __linux__
 
-using namespace mpc::audiomidi;
 using namespace std;
+using namespace mpc::audiomidi;
 using namespace moduru::io;
 using namespace moduru::file;
 
@@ -67,7 +67,7 @@ void ExportAudioProcessAdapter::prepare(moduru::file::File* file, int lengthInFr
 	if (file->exists()) file->del();
 
 	file->create();
-	moduru::io::FileOutputStream tempFileFos(file);
+	FileOutputStream tempFileFos(file);
 
 	int written = 0;
 	vector<char> buffer(512);
@@ -82,7 +82,7 @@ void ExportAudioProcessAdapter::prepare(moduru::file::File* file, int lengthInFr
 	}
 	int remaining = lengthInBytes - written;
 	for (int i = 0; i < remaining; i++) {
-		tempFileFos.write(0);
+        tempFileFos.write(0);
 	}
 
 	tempFileRaf = fstream(file->getPath().c_str(), ios_base::out | ios_base::in | ios_base::binary);

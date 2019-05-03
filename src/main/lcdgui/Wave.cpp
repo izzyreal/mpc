@@ -184,7 +184,7 @@ void Wave::makeLine(std::vector<std::vector<std::vector<int> > >* lines, std::ve
 void Wave::Draw(std::vector<std::vector<bool> >* pixels) {
 	if (sampleData == nullptr) return;
 	if (IsHidden()) return;
-	vector<vector<vector<int> > > lines;
+	vector<vector<vector<int>>> lines;
 	vector<bool> colors;
 	vector<int> offsetxy{ fine ? 23 : 1 , fine ? 16 : 21 };
 	for (int i = 0; i < width; i++) {
@@ -197,7 +197,7 @@ void Wave::Draw(std::vector<std::vector<bool> >* pixels) {
 		makeLine(&lines, &colors, i);
 		int counter = 0;
 		for (auto& l : lines) {
-			mpc::Util::drawLine(pixels, &l, colors[counter++], &offsetxy);
+			mpc::Util::drawLine(*pixels, l, colors[counter++], offsetxy);
 		}
 	}
 	dirty = false;

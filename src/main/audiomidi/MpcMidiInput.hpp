@@ -57,7 +57,7 @@ namespace mpc {
 
 		public:
 			MpcMidiInput(int index, Mpc* mpc);
-			~MpcMidiInput();
+			virtual ~MpcMidiInput();
 
 		};
 

@@ -6,17 +6,15 @@
 using namespace std;
 using namespace mpc;
 
-std::string Util::replaceDotWithSmallSpaceDot(std::string s) {
-	string res;
-	string tempodot = u8"\u00CB";
-	auto dotindex = (int)(s.find('.'));
-	auto part1 = s.substr(0, dotindex);
-	auto part2 = s.substr(dotindex + 1);
-	res = part1 + tempodot + part2;
-	return res;
+string Util::replaceDotWithSmallSpaceDot(const string& s) {
+	const auto dotindex = static_cast<int>(s.find('.'));
+	const auto part1 = s.substr(0, dotindex);
+	const auto part2 = s.substr(dotindex + 1);
+    const string tempoDot = u8"\u00CB";
+    return part1 + tempoDot + part2;
 }
 
-vector<int> Util::getPadAndVelo(int x, int y)
+vector<int> Util::getPadAndVelo(const int x, const int y)
 {
 	int velocity;
 	int padSize = 93;
@@ -43,7 +41,9 @@ vector<int> Util::getPadAndVelo(int x, int y)
 			}
 		}
 	}
-	if (yPos == -1 || yPos == -1) return vector<int>{ -1, -1 };
+    if (yPos == -1 || yPos == -1) {
+        return vector<int>{ -1, -1 };
+    }
 	int padNumber = -1;
 	vector<int> column0 = { 12, 8, 4, 0 };
 	vector<int> column1 = { 13, 9, 5, 1 };
@@ -58,83 +58,85 @@ vector<int> Util::getPadAndVelo(int x, int y)
 	return vector<int>{ (int)padNumber, (int)velocity };
 }
 
-string Util::getFileName(string s)
+string Util::getFileName(const string& s)
 {
 	string copy = s;
 	copy = moduru::lang::StrUtil::trim(copy);
 	for (auto c : copy) {
 		c = toupper(c);
-		if (c == ' ') c = '_';
+        if (c == ' ') {
+            c = '_';
+        }
 	}
 	return copy;
 }
 
-string* Util::splitName(string s) {
+vector<string> Util::splitName(const string& s) {
 	if (s.find(".") == string::npos) {
-		string res[2];
+		vector<string> res(2);
 		res[0] = s;
 		res[1] = "";
 		return res;
 	}
 	size_t i = s.find_last_of(".");
-	string res[2];
+	vector<string> res(2);
 	res[0] = s.substr(0, i);
 	res[1] = s.substr(i + 1);
 	return res;
 }
 
-string Util::distributeTimeSig(string s) {
-	auto pos = s.find("/");
-	if (pos == string::npos) return s;
+string Util::distributeTimeSig(const string& s) {
+	const auto pos = s.find("/");
+    if (pos == string::npos) {
+        return s;
+    }
 	auto s0 = s.substr(0, pos);
 	auto s1 = s.substr(pos + 1, s.length());
-	if (s0.length() == 1) s0 = u8"\u00CE" + s0 + u8"\u00CE";
-	if (s1.length() == 1) s1 = u8"\u00CE" + s1;
+    if (s0.length() == 1) {
+        s0 = u8"\u00CE" + s0 + u8"\u00CE";
+    }
+    if (s1.length() == 1) {
+        s1 = u8"\u00CE" + s1;
+    }
 	return s0 + "/" + s1;
 }
 
-void Util::drawLine(std::vector<std::vector<bool> >* pixels, std::vector<std::vector<int> >* line, bool color) {
-	for (auto& l : *line) {
-		(*pixels)[l[0]][l[1]] = color;
+void Util::drawLine(vector<vector<bool>>& pixels,
+                    const vector<vector<int>>& line,
+                    const bool color)
+{
+	for (auto& l : line) {
+		pixels[l[0]][l[1]] = color;
 	}
 }
 
-void Util::drawLine(std::vector<std::vector<bool> >* pixels, std::vector<std::vector<int> >* line, bool color, std::vector<int>* offsetxy) {
-	for (auto& l : *line) {
-		(*pixels)[l[0] + offsetxy->at(0)][l[1] + offsetxy->at(1)] = color;
+void Util::drawLine(vector<vector<bool>>& pixels,
+                    const vector<vector<int>>& line,
+                    const bool color,
+                    const vector<int>& offsetxy)
+{
+	for (auto& l : line) {
+		pixels[l[0] + offsetxy[0]][l[1] + offsetxy[1]] = color;
 	}
 }
 
-void Util::drawLines(std::vector<std::vector<bool> >* pixels, vector<vector<vector<int>>>* lines, vector<bool> colors) {
+void Util::drawLines(vector<vector<bool>>& pixels,
+                     const vector<vector<vector<int>>>& lines,
+                     const vector<bool>& colors)
+{
 	int colorCounter = 0;
-	for (auto line : *lines) {
-		drawLine(pixels, &line, colors[colorCounter++]);
+	for (auto& l : lines) {
+		drawLine(pixels, l, colors[colorCounter++]);
 	}
 }
 
-void Util::drawLines(std::vector<std::vector<bool> >* pixels, vector<vector<vector<int>>>* lines, vector<bool> colors, std::vector<int>* offsetxy) {
+void Util::drawLines(vector<vector<bool>>& pixels,
+                     const vector<vector<vector<int>>>& lines,
+                     const vector<bool>& colors,
+                     const vector<int>& offsetxy)
+{
 	int colorCounter = 0;
-	for (auto line : *lines) {
-		drawLine(pixels, &line, colors[colorCounter++], offsetxy);
+	for (auto& l : lines) {
+		drawLine(pixels, l, colors[colorCounter++], offsetxy);
 	}
 }
-
-/*
-void Util::drawScaled(IGraphics* g, std::vector<std::vector<int>> line, unsigned int scale, IColor* color, vector<int> offsetxy) {
-	int x, y;
-	for (auto& v : line) {
-		x = (v[0] * scale) + offsetxy[0];
-		y = (v[1] * scale) + offsetxy[1];
-		IRECT r(x, y, x + (scale-1), y + (scale-1));
-		g->DrawRect(color, &r);
-		if (scale > 2) g->FillIRect(color, &r);
-	}
-}
-
-void Util::drawScaled(IGraphics* g, vector<vector<vector<int>>> lines, unsigned int scale, IColor* color, vector<int> offsetxy) {
-	for (auto& line : lines) {
-		drawScaled(g, line, scale, color, offsetxy);
-	}
-}
-
-*/
