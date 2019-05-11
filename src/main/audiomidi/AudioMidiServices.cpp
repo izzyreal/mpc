@@ -114,8 +114,8 @@ void AudioMidiServices::start(const int sampleRate, const int inputCount, const 
 	MLOG("AMS start, samplerate " + std::to_string(offlineServer->getSampleRate()));
 	setupMixer();
 
-	inputProcesses = vector<IOAudioProcess*>(inputCount <= 2 ? inputCount : 2);
-	outputProcesses = vector<IOAudioProcess*>(outputCount <= 10 ? outputCount : 10);
+	inputProcesses = vector<IOAudioProcess*>(inputCount <= 1 ? inputCount : 1);
+	outputProcesses = vector<IOAudioProcess*>(outputCount <= 5 ? outputCount : 5);
 
 	for (auto& p : inputProcesses)
 		p = nullptr;
