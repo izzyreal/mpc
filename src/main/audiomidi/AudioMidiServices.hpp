@@ -133,7 +133,7 @@ namespace mpc {
 			int getBufferSize();
 
 		public:
-			void start(std::string mode, int sampleRate);
+			void start(const int sampleRate, const int inputCount, const int outputCount);
 			void setDisabled(bool b);
 
 		public:

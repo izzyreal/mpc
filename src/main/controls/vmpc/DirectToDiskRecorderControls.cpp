@@ -91,7 +91,7 @@ void DirectToDiskRecorderControls::function(int i)
 				lAms->setDisabled(true);
 				std::this_thread::sleep_for(chrono::milliseconds(1000));
 				lAms->destroyServices();
-				lAms->start("rtaudio", rate);
+				//lAms->start("rtaudio", rate);
 			}
 			lAms->prepareBouncing(settings.get());
 			lSequencer->playFromStart();
@@ -108,7 +108,7 @@ void DirectToDiskRecorderControls::function(int i)
 				lAms->setDisabled(true);
 				std::this_thread::sleep_for(chrono::milliseconds(1000));
 				lAms->destroyServices();
-				lAms->start("rtaudio", rate);
+				//lAms->start("rtaudio", rate);
 			}
 			lAms->prepareBouncing(settings.get());
 			lSequencer->play();
@@ -125,7 +125,7 @@ void DirectToDiskRecorderControls::function(int i)
 				lAms->setDisabled(true);
 				std::this_thread::sleep_for(chrono::milliseconds(1000));
 				lAms->destroyServices();
-				lAms->start("rtaudio", rate);
+//				lAms->start("rtaudio", rate);
 			}
 			lAms->prepareBouncing(settings.get());
 			lSequencer->play();
@@ -145,7 +145,7 @@ void DirectToDiskRecorderControls::function(int i)
 				lAms->setDisabled(true);
 				std::this_thread::sleep_for(chrono::milliseconds(1000));
 				lAms->destroyServices();
-				lAms->start("rtaudio", rate);
+	//			lAms->start("rtaudio", rate);
 			}
 			lAms->prepareBouncing(settings.get());
 			lSequencer->playFromStart();

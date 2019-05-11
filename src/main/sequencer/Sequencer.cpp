@@ -560,7 +560,7 @@ void Sequencer::runStopBounceThread() {
 		ams->setDisabled(true);
 		std::this_thread::sleep_for(chrono::milliseconds(1000));
 		ams->destroyServices();
-		ams->start("rtaudio", preBounceRate);
+		//ams->start("rtaudio", preBounceRate);
 		ams->setDisabled(false);
 	}
 }

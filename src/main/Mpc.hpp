@@ -85,7 +85,7 @@ namespace mpc {
 		std::shared_ptr<hardware::Hardware> hardware;
 
 	public:
-		void init(std::string mode, int sampleRate);
+		void init(const int sampleRate, const int inputCount, const int outputCount);
 		void powerOn();
 		//void startMidi();
 

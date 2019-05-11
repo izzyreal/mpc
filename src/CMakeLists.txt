@@ -33,12 +33,12 @@ foreach(_source IN ITEMS ${_source_list_main})
     source_group("${_source_path_msvc}" FILES "${_source}")
 endforeach()
 
+add_library(mpc ${_source_list_main})
+conan_target_link_libraries(mpc)
+
 if(MSVC)
 	target_compile_options(mpc PRIVATE "/MP")
 endif()
-
-add_library(mpc ${_source_list_main})
-conan_target_link_libraries(mpc)
 
 ## Configure test suite application ##
 

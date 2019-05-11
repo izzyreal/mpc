@@ -49,7 +49,7 @@ Mpc::Mpc()
 
 }
 
-void Mpc::init(std::string mode, int sampleRate)
+void Mpc::init(const int sampleRate, const int inputCount, const int outputCount)
 {
 	sequencer = make_shared<mpc::sequencer::Sequencer>(this);
 	MLOG("sequencer created.");
@@ -74,7 +74,7 @@ void Mpc::init(std::string mode, int sampleRate)
 	eventHandler = make_shared<mpc::audiomidi::EventHandler>(this);
 	MLOG("eventhandler created.");
 
-	audioMidiServices->start(mode, sampleRate);
+	audioMidiServices->start(sampleRate, inputCount, outputCount);
 	audioMidiServices->setDisabled(false);
 	MLOG("audioMidiServices test mode started.");
 

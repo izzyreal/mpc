@@ -97,22 +97,25 @@ AudioMidiServices::AudioMidiServices(mpc::Mpc* mpc)
 	ctoot::synth::SynthChannelServices::scan();
 }
 
-void AudioMidiServices::start(std::string mode, int sampleRate) {
+void AudioMidiServices::start(const int sampleRate, const int inputCount, const int outputCount) {
 	format = make_shared<AudioFormat>(sampleRate, 16, 2, true, false);
 	setupMidi();
+	server = make_shared<ExternalAudioServer>();
 
+	/*
 	if (mode.compare("rtaudio") == 0) {
-		server = make_shared<ExternalAudioServer>();
 	}
 	else if (mode.compare("unreal") == 0) {
 		server = make_shared<UnrealAudioServer>();
 	}
+	*/
 	server->setSampleRate(sampleRate);
 	offlineServer = make_shared<NonRealTimeAudioServer>(server);
 	MLOG("AMS start, samplerate " + std::to_string(offlineServer->getSampleRate()));
 	setupMixer();
-	inputProcesses = vector<IOAudioProcess*>(1);
-	outputProcesses = vector<IOAudioProcess*>(5);
+
+	inputProcesses = vector<IOAudioProcess*>(inputCount <= 2 ? inputCount : 2);
+	outputProcesses = vector<IOAudioProcess*>(outputCount <= 10 ? outputCount : 10);
 
 	for (auto& p : inputProcesses)
 		p = nullptr;
@@ -141,8 +144,10 @@ void AudioMidiServices::start(std::string mode, int sampleRate) {
 	mpcMidiPorts->setMidiOutA(-1);
 	mpcMidiPorts->setMidiOutB(-1);
 	auto sampler = mpc->getSampler().lock();
-	sampler->setActiveInput(inputProcesses[mpc->getUis().lock()->getSamplerGui()->getInput()]);
-	mixer->getStrip("66").lock()->setInputProcess(sampler->getAudioOutputs()[0]);
+	if (inputProcesses.size() >= 1) {
+		sampler->setActiveInput(inputProcesses[mpc->getUis().lock()->getSamplerGui()->getInput()]);
+		mixer->getStrip("66").lock()->setInputProcess(sampler->getAudioOutputs()[0]);
+	}
 	initializeDiskWriter();
 	cac = make_shared<CompoundAudioClient>();
 	cac->add(frameSeq.get());
@@ -153,7 +158,6 @@ void AudioMidiServices::start(std::string mode, int sampleRate) {
 	offlineServer->setWeakPtr(offlineServer);
 	offlineServer->setClient(cac);
 	offlineServer->resizeBuffers(8192*4);
-	//offlineServer->resizeBuffers(1024);
 	offlineServer->start();
 	//disabled = false;
 	MLOG("audio midi services started");
@@ -308,7 +312,7 @@ void AudioMidiServices::initializeDiskWriter()
 	mixer->getMainBus()->setOutputProcess(diskWriter);
 	exportProcesses.push_back(std::move(diskWriter));
 
-	for (int i = 1; i <= 4; i++) {
+	for (int i = 1; i < outputProcesses.size(); i++) {
 		diskWriter = make_shared<ExportAudioProcessAdapter>(outputProcesses[i], format, "diskwriter");
 		mixer->getStrip(string("AUX#" + to_string(i))).lock()->setDirectOutputProcess(diskWriter);
 		exportProcesses.push_back(std::move(diskWriter));
