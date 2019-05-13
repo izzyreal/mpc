@@ -149,7 +149,9 @@ void AbstractControls::function(int i)
 				}
 			}
 		}
-		lsLocked->openScreen(lsLocked->getPreviousScreenName());
+		if (lsLocked->getCurrentLayer() == 1 || lsLocked->getCurrentLayer() == 2 || lsLocked->getCurrentLayer() == 3) {
+			lsLocked->openScreen(lsLocked->getPreviousScreenName());
+		}
 		break;
 	case 5:
 		mpc->getControls().lock()->setF6Pressed(true);
