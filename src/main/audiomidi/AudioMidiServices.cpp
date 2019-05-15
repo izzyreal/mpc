@@ -210,8 +210,8 @@ void AudioMidiServices::setupMixer()
 }
 
 void AudioMidiServices::setupFX() {
-	//auto acs = mixer->getMixerControls().lock()->getStripControls("FX#1").lock();
-	//acs->insert("class ctoot::audio::reverb::BarrControls", "Main");
+	auto acs = mixer->getMixerControls().lock()->getStripControls("FX#1").lock();
+	acs->insert("ctoot::audio::reverb::BarrControls", "Main");
 	//acs->insert("class ctoot::audio::delay::WowFlutterControls", "Main");
 	//acs->insert("class ctoot::audio::delay::ModulatedDelayControls", "Main");
 	//acs->insert("class ctoot::audio::delay::MultiTapDelayStereoControls", "Main"); // doesn't seem to work at all
