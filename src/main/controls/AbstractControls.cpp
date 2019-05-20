@@ -336,7 +336,7 @@ void AbstractControls::numpad(int i)
 				//audioGui->setInputDevs(lAms->getSelectedInputs());
 				//audioGui->setOutputDevs(lAms->getSelectedOutputs());
 			}
-			//ls.lock()->openScreen("audio");
+			ls.lock()->openScreen("audio");
 			return;
 		case 1:
 			if (lSequencer->isPlaying()) return;
