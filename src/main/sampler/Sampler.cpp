@@ -151,8 +151,8 @@ void Sampler::work(int nFrames)
 				levelL = highestl;
 				levelR = highestr;
 				mpc->getUis().lock()->getSamplerGui()->notify("vumeter");
-				vuBufferL = vector<float>(VU_BUFFER_SIZE);
-				vuBufferR = vector<float>(VU_BUFFER_SIZE);
+				vuBufferL.clear();
+				vuBufferR.clear();
 			}
 		}
 	}
