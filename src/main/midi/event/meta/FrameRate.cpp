@@ -1,5 +1,7 @@
 #include <midi/event/meta/FrameRate.hpp>
 
+#include <stdexcept>
+
 #ifdef __linux__
 #include <stdexcept>
 #endif // __linux__

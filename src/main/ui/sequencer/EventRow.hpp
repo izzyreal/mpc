@@ -1,9 +1,10 @@
 #pragma once
 
+#include <lcdgui/Component.hpp>
+
 #include <memory>
 #include <vector>
-
-#include <lcdgui/Component.hpp>
+#include <string>
 
 namespace ctoot {
 	namespace mpc {

@@ -10,6 +10,8 @@
 
 #include <io/ByteArrayInputStream.hpp>
 
+#include <stdexcept>
+
 using namespace mpc::midi;
 using namespace mpc::midi::event;
 using namespace std;
