@@ -8,6 +8,6 @@ using namespace mpc;
 
 TEST_CASE("Mpc is instantiated and booted", "[mpc-boot]") {
 	Mpc mpc;
-	//mpc.init("rtaudio", 44100);
+	mpc.init(44100, 1, 1);
 	REQUIRE(mpc.getSequencer().lock());
 }
