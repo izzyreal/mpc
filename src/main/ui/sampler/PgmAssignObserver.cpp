@@ -107,7 +107,7 @@ void PgmAssignObserver::displayPadNote()
 	padNoteField.lock()->setText(to_string(lSampler->getLastPad(lProgram.get())->getNote()));
 }
 
-void PgmAssignObserver::update(moduru::observer::Observable* o, std::any arg)
+void PgmAssignObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 {
 	auto lSampler = sampler.lock();
 	auto lProgram = program.lock();
@@ -128,7 +128,7 @@ void PgmAssignObserver::update(moduru::observer::Observable* o, std::any arg)
 	lProgram->addObserver(this);
 	mpcSoundPlayerChannel->addObserver(this);
 
-	string s = std::any_cast<string>(arg);
+	string s = nonstd::any_cast<string>(arg);
 
 	if (s.compare("pgm") == 0 || s.compare("padandnote") == 0 || s.compare("padnotenumber") == 0) {
 		displayPgm();

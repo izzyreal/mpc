@@ -64,7 +64,7 @@ namespace mpc {
 				void updateVU();
 
 			public:
-				void update(moduru::observer::Observable* o, std::any arg) override;
+				void update(moduru::observer::Observable* o, nonstd::any arg) override;
 
 			public:
 				SampleObserver(mpc::Mpc* mpc);

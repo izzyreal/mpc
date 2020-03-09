@@ -132,9 +132,9 @@ void TrimObserver::displayView()
 	}
 }
 
-void TrimObserver::update(moduru::observer::Observable* o, std::any arg)
+void TrimObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 {
-	string s = std::any_cast<string>(arg);
+	string s = nonstd::any_cast<string>(arg);
 	if (s.compare("soundnumber") == 0) {
 		displaySnd();
 		displaySt();

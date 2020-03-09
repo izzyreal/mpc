@@ -29,7 +29,7 @@ namespace mpc {
 				void displaySq();
 
 			public:
-				void update(moduru::observer::Observable* o, std::any a) override;
+				void update(moduru::observer::Observable* o, nonstd::any a) override;
 
 				SecondSeqObserver(mpc::Mpc* mpc);
 				~SecondSeqObserver();

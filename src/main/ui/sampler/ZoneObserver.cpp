@@ -133,9 +133,9 @@ void ZoneObserver::displayZone()
 	zoneField.lock()->setText(to_string(soundGui->getZoneNumber() + 1));
 }
 
-void ZoneObserver::update(moduru::observer::Observable* o, std::any arg)
+void ZoneObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 {
-	string s = std::any_cast<string>(arg);
+	string s = nonstd::any_cast<string>(arg);
 	if (s.compare("soundnumber") == 0) {
 		displaySnd();
 		soundGui->initZones(sampler.lock()->getSound(soundGui->getSoundIndex()).lock()->getLastFrameIndex());

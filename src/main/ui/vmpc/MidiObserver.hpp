@@ -44,7 +44,7 @@ namespace mpc {
 				void displayIn();
 
 			public:
-				void update(moduru::observer::Observable* o, std::any a) override;
+				void update(moduru::observer::Observable* o, nonstd::any a) override;
 
 			public:
 				MidiObserver(mpc::Mpc* mpc);

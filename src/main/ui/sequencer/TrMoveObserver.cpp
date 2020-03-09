@@ -118,9 +118,9 @@ void TrMoveObserver::displayTrFields()
 	}
 }
 
-void TrMoveObserver::update(moduru::observer::Observable* o, std::any arg)
+void TrMoveObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 {
-	string s = std::any_cast<string>(arg);
+	string s = nonstd::any_cast<string>(arg);
 
 	if (s.compare("sq") == 0) {
 		displaySq();

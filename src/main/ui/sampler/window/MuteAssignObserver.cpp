@@ -80,7 +80,7 @@ void MuteAssignObserver::displayNote1()
 	note1Field.lock()->setText(to_string(note1) + "/" + lSampler->getPadName(pad) + "-" + soundName);
 }
 
-void MuteAssignObserver::update(moduru::observer::Observable* o, std::any arg)
+void MuteAssignObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 {
 	auto lSampler = sampler.lock();
 	auto lProgram = program.lock();
@@ -88,7 +88,7 @@ void MuteAssignObserver::update(moduru::observer::Observable* o, std::any arg)
 	np = lSampler->getLastNp(lProgram.get());
 	np->addObserver(this);
 
-	string s = std::any_cast<string>(arg);
+	string s = nonstd::any_cast<string>(arg);
 
 	if (s.compare("padandnote") == 0) {
 		displayNote();

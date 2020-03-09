@@ -103,7 +103,7 @@ namespace mpc {
 				void displayFile();
 
 			public:
-				void update(moduru::observer::Observable* o, std::any a) override;
+				void update(moduru::observer::Observable* o, nonstd::any a) override;
 
 			private:
 				void displayType();

@@ -339,7 +339,7 @@ void SamplerWindowObserver::displayInitPadAssign()
 	initPadAssignField.lock()->setText(swGui->isInitPadAssignMaster() ? "MASTER" : "PROGRAM");
 }
 
-void SamplerWindowObserver::update(moduru::observer::Observable* o, std::any arg)
+void SamplerWindowObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 {
 	auto lSampler = sampler.lock();
 	auto lProgram = program.lock();
@@ -357,7 +357,7 @@ void SamplerWindowObserver::update(moduru::observer::Observable* o, std::any arg
 	lProgram->addObserver(this);
 	mpcSoundPlayerChannel->addObserver(this);
 
-	string s = std::any_cast<string>(arg);
+	string s = nonstd::any_cast<string>(arg);
 
 	if (s.compare("newprogramchange") == 0 || s.compare("midiprogramchange") == 0) {
 		displayMidiProgramChange();

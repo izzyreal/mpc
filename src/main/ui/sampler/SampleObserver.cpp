@@ -69,9 +69,9 @@ void SampleObserver::displayPreRec()
     preRecField.lock()->setText(to_string(samplerGui->getPreRec()) + "ms");
 }
 
-void SampleObserver::update(moduru::observer::Observable* o, std::any arg)
+void SampleObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 {
-	string s = std::any_cast<string>(arg);
+	string s = nonstd::any_cast<string>(arg);
 	if (s.compare("vumeter") == 0) {
 		if (vu_ready) updateVU();
 	}

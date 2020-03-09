@@ -84,9 +84,9 @@ StepEditorObserver::StepEditorObserver(mpc::Mpc* mpc)
 	refreshSelection();
 }
 
-void StepEditorObserver::update(moduru::observer::Observable* o, std::any arg)
+void StepEditorObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 {
-	string s = std::any_cast<string>(arg);
+	string s = nonstd::any_cast<string>(arg);
 	auto ls = mpc->getLayeredScreen().lock();
 	if (s.compare("viewmodestext") == 0) {
 		setViewModeNotesText();

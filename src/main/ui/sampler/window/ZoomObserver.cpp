@@ -166,10 +166,10 @@ void ZoomObserver::displayPlayX()
     playXField.lock()->setText(playXNames[soundGui->getPlayX()]);
 }
 
-void ZoomObserver::update(moduru::observer::Observable* o, std::any arg)
+void ZoomObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 {
 
-	string s = std::any_cast<string>(arg);
+	string s = nonstd::any_cast<string>(arg);
 
 	if (s.compare("end") == 0) {
 		if (csn.compare("startfine") == 0 || csn.compare("endfine") == 0) {

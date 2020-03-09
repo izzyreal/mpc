@@ -34,7 +34,7 @@ namespace mpc {
 				void displayBars();
 
 			public:
-				void update(moduru::observer::Observable* o, std::any a) override;
+				void update(moduru::observer::Observable* o, nonstd::any a) override;
 
 			public:
 				TransObserver(mpc::Mpc* mpc);

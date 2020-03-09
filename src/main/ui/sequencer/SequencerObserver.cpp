@@ -218,7 +218,7 @@ void SequencerObserver::displayTempoLabel()
 	}
 }
 
-void SequencerObserver::update(moduru::observer::Observable* o, std::any arg)
+void SequencerObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 {
     auto lSequencer = sequencer.lock();
 
@@ -239,7 +239,7 @@ void SequencerObserver::update(moduru::observer::Observable* o, std::any arg)
 		track.lock()->addObserver(this);
 	}
 
-	string s = std::any_cast<string>(arg);
+	string s = nonstd::any_cast<string>(arg);
 
 	auto lNextSqField = nextSqField.lock();
 

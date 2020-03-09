@@ -41,7 +41,7 @@ namespace mpc {
 				void displayCopies();
 
 			public:
-				void update(moduru::observer::Observable* o, std::any arg) override;
+				void update(moduru::observer::Observable* o, nonstd::any arg) override;
 
 			private:
 				void displayToSq();

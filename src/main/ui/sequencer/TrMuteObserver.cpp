@@ -139,9 +139,9 @@ void TrMuteObserver::setTrackColor(int i)
 	}
 }
 
-void TrMuteObserver::update(moduru::observer::Observable* o, std::any arg)
+void TrMuteObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 {
-	string s = std::any_cast<string>(arg);
+	string s = nonstd::any_cast<string>(arg);
 	if (s.compare("soloenabled") == 0 ) {
 		for (auto& l : mpc->getLayeredScreen().lock()->getLayer(0)->getAllLabelsAndFields()) {
 			l.lock()->SetDirty();

@@ -53,7 +53,7 @@ namespace mpc {
 				void displayPlayX();
 
 			public:
-				void update(moduru::observer::Observable* o, std::any arg) override;
+				void update(moduru::observer::Observable* o, nonstd::any arg) override;
 
 				SndParamsObserver(mpc::Mpc* mpc);
 				~SndParamsObserver();

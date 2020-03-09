@@ -29,9 +29,9 @@ void SecondSeqObserver::displaySq()
 	sequenceNameLabel.lock()->setText("-" + sqName);
 }
 
-void SecondSeqObserver::update(moduru::observer::Observable* o, std::any a)
+void SecondSeqObserver::update(moduru::observer::Observable* o, nonstd::any a)
 {
-	string param = std::any_cast<string>(a);
+	string param = nonstd::any_cast<string>(a);
 	if (param.compare("sq") == 0) {
 		displaySq();
 	}

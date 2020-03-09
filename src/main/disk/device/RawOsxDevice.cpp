@@ -33,7 +33,7 @@ de::waldheinz::fs::FileSystem*& RawOsxDevice::fs()
 de::waldheinz::fs::FileSystem* RawOsxDevice::fs_;
 */
 
-std::any RawOsxDevice::getRoot()
+nonstd::any RawOsxDevice::getRoot()
 {
     try {
         //return java_cast< ::de::waldheinz::fs::fat::AkaiFatLfnDirectory* >(fs_->getRoot());
@@ -43,7 +43,7 @@ std::any RawOsxDevice::getRoot()
     return nullptr;
 }
 
-std::any RawOsxDevice::getFileSystem()
+nonstd::any RawOsxDevice::getFileSystem()
 {
 	//return fs_;
 	return nullptr;

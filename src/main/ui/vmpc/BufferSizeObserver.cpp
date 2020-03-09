@@ -15,9 +15,9 @@ BufferSizeObserver::BufferSizeObserver(mpc::Mpc* mpc)
 	displayFrames();
 }
 
-void BufferSizeObserver::update(moduru::observer::Observable* o, std::any a)
+void BufferSizeObserver::update(moduru::observer::Observable* o, nonstd::any a)
 {
-	string param = std::any_cast<string>(a);
+	string param = nonstd::any_cast<string>(a);
 	if (param.compare("buffersize") == 0) {
 		displayFrames();
 	}

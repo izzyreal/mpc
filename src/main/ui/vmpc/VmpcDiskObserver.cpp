@@ -26,7 +26,7 @@ VmpcDiskObserver::VmpcDiskObserver(mpc::Mpc* mpc)
 	displayRoot();
 }
 
-void VmpcDiskObserver::update(moduru::observer::Observable* o, std::any a)
+void VmpcDiskObserver::update(moduru::observer::Observable* o, nonstd::any a)
 {
 	displayScsi();
 	displayAccessType();

@@ -91,9 +91,9 @@ void DirectoryObserver::updateRight()
 	directoryGui->displayRightFields(right);
 }
 
-void DirectoryObserver::update(moduru::observer::Observable* o, std::any a)
+void DirectoryObserver::update(moduru::observer::Observable* o, nonstd::any a)
 {
-	string param = std::any_cast<string>(a);
+	string param = nonstd::any_cast<string>(a);
 
 	if (param.compare("disk") == 0) {
 		updateLeft();

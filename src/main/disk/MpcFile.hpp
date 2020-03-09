@@ -1,6 +1,6 @@
 #pragma once
 
-#include <any>
+#include <thirdp/any.hpp>
 
 #include <vector>
 #include <string>
@@ -38,7 +38,7 @@ namespace mpc {
 			//::de::waldheinz::fs::fat::AkaiFatLfnDirectoryEntry* getEntry();
 			std::vector<char> getBytes();
 
-			MpcFile(std::any a);
+			MpcFile(nonstd::any a);
 			~MpcFile();
 
 		};

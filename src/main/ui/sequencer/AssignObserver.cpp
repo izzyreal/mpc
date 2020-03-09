@@ -105,9 +105,9 @@ void AssignObserver::displayAssignNv()
     assignNvField.lock()->setTextPadded(assignNvString, " ");
 }
 
-void AssignObserver::update(moduru::observer::Observable* o, std::any arg)
+void AssignObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 {
-	string s = std::any_cast<string>(arg);
+	string s = nonstd::any_cast<string>(arg);
 	if (s.compare("assignnote") == 0) {
 		displayAssignNote();
 	}

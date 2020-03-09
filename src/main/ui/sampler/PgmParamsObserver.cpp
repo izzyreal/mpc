@@ -55,9 +55,9 @@ PgmParamsObserver::PgmParamsObserver(mpc::Mpc* mpc)
 	ls->getEnvGraph().lock()->Hide(false);
 }
 
-void PgmParamsObserver::update(moduru::observer::Observable* o, std::any arg)
+void PgmParamsObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 {
-	string s = std::any_cast<string>(arg);
+	string s = nonstd::any_cast<string>(arg);
 	auto lProgram = program.lock();
 	auto lSampler = sampler.lock();
 	lProgram->deleteObserver(this);

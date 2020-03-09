@@ -21,9 +21,9 @@ void OthersObserver::displayTapAveraging()
 	tapAveragingField.lock()->setText(to_string(othersGui->getTapAveraging()));
 }
 
-void OthersObserver::update(moduru::observer::Observable* o, std::any a)
+void OthersObserver::update(moduru::observer::Observable* o, nonstd::any a)
 {
-	string param = std::any_cast<string>(a);
+	string param = nonstd::any_cast<string>(a);
     if (param.compare("tapaveraging") == 0) {
         displayTapAveraging();
     }

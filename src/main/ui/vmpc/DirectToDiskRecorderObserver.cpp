@@ -112,10 +112,10 @@ void DirectToDiskRecorderObserver::displayTime()
 	time5Field.lock()->setTextPadded(mpc::ui::sequencer::EditSequenceGui::getClockNumber(sequence.get(), d2dRecorderGui->getTime1()), "0");
 }
 
-void DirectToDiskRecorderObserver::update(moduru::observer::Observable* o, std::any a)
+void DirectToDiskRecorderObserver::update(moduru::observer::Observable* o, nonstd::any a)
 {
 	mpc->getLayeredScreen().lock()->lookupLabel("sq").lock()->SetDirty();
-	string param = std::any_cast<string>(a);
+	string param = nonstd::any_cast<string>(a);
 	if (param.compare("rate") == 0) {
 		displayRate();
 	}

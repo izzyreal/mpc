@@ -70,9 +70,9 @@ void SyncObserver::displaySendMMC()
     sendMMCField.lock()->setText(mmc);
 }
 
-void SyncObserver::update(moduru::observer::Observable* o, std::any arg)
+void SyncObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 {
-	string s = std::any_cast<string>(arg);
+	string s = nonstd::any_cast<string>(arg);
 	if (s.compare("in") == 0) {
 		displayIn();
 	}

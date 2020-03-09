@@ -21,7 +21,7 @@ void PurgeObserver::displayValue()
 	valueLabel.lock()->setTextPadded(sampler.lock()->getUnusedSampleAmount(), " ");
 }
 
-void PurgeObserver::update(moduru::observer::Observable* o, std::any arg)
+void PurgeObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 {
 }
 

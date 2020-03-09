@@ -62,9 +62,9 @@ void MidiMonitorObserver::initTimer(std::weak_ptr<mpc::lcdgui::Label> label)
 	thread* foo = new thread(&MidiMonitorObserver::static_blink, this, label);
 }
 
-void MidiMonitorObserver::update(moduru::observer::Observable* o, std::any arg)
+void MidiMonitorObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 {
-	string s = std::any_cast<string>(arg);
+	string s = nonstd::any_cast<string>(arg);
 	int deviceNumber = stoi(s.substr(1));
 	if (s[0] == 'b') deviceNumber += 16;
 	auto label = mpc->getLayeredScreen().lock()->lookupLabel(to_string(deviceNumber));

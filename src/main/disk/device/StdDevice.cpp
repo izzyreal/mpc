@@ -16,7 +16,7 @@ StdDevice::StdDevice(string rootPath)
 	valid = true;
 }
 
-std::any StdDevice::getRoot()
+nonstd::any StdDevice::getRoot()
 {
 	return weak_ptr<moduru::file::Directory>(root);
 }
@@ -34,7 +34,7 @@ void StdDevice::flush()
 {
 }
 
-std::any StdDevice::getFileSystem()
+nonstd::any StdDevice::getFileSystem()
 {
     return nullptr;
 }

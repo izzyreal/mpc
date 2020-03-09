@@ -39,9 +39,9 @@ void BarCopyObserver::displayCopies()
     copiesField.lock()->setTextPadded(bcGui->getCopies(), " ");
 }
 
-void BarCopyObserver::update(moduru::observer::Observable* o, std::any arg)
+void BarCopyObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 {
-	string s = std::any_cast<string>(arg);
+	string s = nonstd::any_cast<string>(arg);
 
 	if (s.compare("fromsq") == 0) {
 		displayFromSq();

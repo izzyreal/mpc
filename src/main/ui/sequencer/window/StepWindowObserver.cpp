@@ -74,9 +74,9 @@ StepWindowObserver::StepWindowObserver(mpc::Mpc* mpc)
 	}
 }
 
-void StepWindowObserver::update(moduru::observer::Observable* o, std::any arg)
+void StepWindowObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 {
-	string s = std::any_cast<string>(arg);
+	string s = nonstd::any_cast<string>(arg);
 	if (s.compare("notevalue") == 0) {
 		tcValueField.lock()->setText(timingCorrectNames[swGui->getNoteValue()]);
 	}

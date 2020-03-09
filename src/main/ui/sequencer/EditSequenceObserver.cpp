@@ -227,7 +227,7 @@ void EditSequenceObserver::setEditFunctionValue()
     }
 }
 
-void EditSequenceObserver::update(moduru::observer::Observable* o, std::any arg)
+void EditSequenceObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 {
 	auto lSequencer = sequencer.lock();
 	auto lTrk = track.lock();
@@ -245,7 +245,7 @@ void EditSequenceObserver::update(moduru::observer::Observable* o, std::any arg)
 	seq->addObserver(this);
 	timeSig.addObserver(this);
 
-	string s = std::any_cast<string>(arg);
+	string s = nonstd::any_cast<string>(arg);
 
 	if (s.compare("modevalue") == 0) {
 		setModeValue();
