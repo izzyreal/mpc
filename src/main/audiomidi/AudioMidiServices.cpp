@@ -393,7 +393,7 @@ void AudioMidiServices::prepareBouncing(DirectToDiskSettings* settings)
 {
 	auto indivFileNames = std::vector<string>{ "L-R", "1-2", "3-4", "5-6", "7-8" };
 	string sep = moduru::file::FileUtil::getSeparator();
-	for (int i = 0; i < 5; i++) {
+	for (int i = 0; i < exportProcesses.size(); i++) {
 		auto eapa = exportProcesses[i];
 		auto file = new moduru::file::File(mpc::StartUp::home + sep + "vMPC" + sep + "recordings" + sep + indivFileNames[i], nullptr);
 		eapa->prepare(file, settings->lengthInFrames, settings->sampleRate);
