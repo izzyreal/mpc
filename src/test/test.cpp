@@ -51,3 +51,12 @@ SCENARIO("A Sequence initializes correctly", "[sequence]") {
 	    	REQUIRE( seq.getInitialTempo().toDouble() == 120.0 );
 	}
 }
+
+SCENARIO("UserDefaults have sane values", "[userdefaults]") {
+
+	GIVEN("Some UserDefaults") {
+		mpc::ui::UserDefaults defaults;
+		BCMath tempo = defaults.getTempo();
+		REQUIRE( tempo.toDouble() == 120.0 );
+	}
+}
