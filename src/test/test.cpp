@@ -21,9 +21,9 @@ TEST_CASE("Mpc is instantiated and booted", "[mpc-boot]")
 TEST_CASE("BCMath functions as expected", "[bcmath]")
 {
 	auto str = to_string(BCMath("120.0").toDouble());
-	printf("BCMath(\"120.0\").toDouble() as string: %s\n", str);
+	printf("BCMath(\"120.0\").toDouble() as string: %s\n", str.c_str());
 	if (str.find(".") == string::npos) str += ".0";
-	printf("After appending .0 if there was no period: %s\n", str);
+	printf("After appending .0 if there was no period: %s\n", str.c_str());
 	auto length = (int)(str.find(".")) + 2;
 	printf("Reported length of tempo string, should be 4 or 5: %d\n", length);
 	auto tempo = BCMath(str.substr(0, length));
