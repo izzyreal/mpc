@@ -36,6 +36,18 @@ TEST_CASE("BCMath functions as expected", "[bcmath]")
 	REQUIRE( tempo.toDouble() == 120.0 );
 }
 
+SCENARIO("A Sequencer initializes correctly", "[sequencer]") {
+
+	GIVEN("A Sequencer") {
+		mpc::Mpc mpc;
+		mpc.init(44100, 1, 1);
+		mpc::sequencer::Sequencer seq(&mpc);
+		seq.init();
+
+		REQUIRE( seq.getTempo().toDouble() == 120 );
+	}
+}
+
 SCENARIO("A Sequence initializes correctly", "[sequence]") {
 
 	GIVEN("An initialized Sequence") {
