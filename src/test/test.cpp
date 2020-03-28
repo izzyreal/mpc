@@ -3,6 +3,8 @@
 
 #include <Mpc.hpp>
 #include <sequencer/Sequencer.hpp>
+#include <sequencer/Sequence.hpp>
+#include <ui/UserDefaults.hpp>
 
 #include <thirdp/bcmath/bcmath_stl.h>
 
@@ -26,10 +28,26 @@ TEST_CASE("BCMath functions as expected", "[bcmath]")
 	printf("After appending .0 if there was no period: %s\n", str.c_str());
 	auto length = (int)(str.find(".")) + 2;
 	printf("Reported length of tempo string, should be 4 or 5: %d\n", length);
-	auto tempo = BCMath(str.substr(0, length));
-	printf("New BCMath tempo as double: %f", tempo.toDouble()); 
-        if (tempo.toDouble() < 30.0) tempo = BCMath("30.0");
-	if (tempo.toDouble() > 300.0) tempo = BCMath("300.0");
+	
+	REQUIRE( (length == 4 || length == 5) );
 
+	auto tempo = BCMath(str.substr(0, length));
+        
+	REQUIRE( tempo.toDouble() == 120.0 );
 }
 
+SCENARIO("A Sequence initializes correctly", "[sequence]") {
+
+	GIVEN("An initialized Sequence") {
+		mpc::Mpc mpc;
+		mpc.init(44100, 1, 1);
+		std::vector<string> trackNames;
+		mpc::ui::UserDefaults defaults;
+		for (int i = 0; i < 64; i++) {
+		       trackNames.push_back(defaults.getTrackName(i));
+		}	       
+		mpc::sequencer::Sequence seq(&mpc, trackNames);
+		seq.init(1);
+	    	REQUIRE( seq.getInitialTempo().toDouble() == 120.0 );
+	}
+}
