@@ -148,8 +148,6 @@ namespace mpc {
 			void setTimeDisplayStyle(int i);
 			int getTimeDisplayStyle();
 			void setRecordingModeMulti(bool b);
-			void setFrameRate(int i);
-			int getFrameRate();
 			bool isRecordingModeMulti();
 			int getActiveTrackIndex();
 			void trackUp();

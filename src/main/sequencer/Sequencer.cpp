@@ -296,16 +296,6 @@ void Sequencer::setRecordingModeMulti(bool b)
     notifyObservers(string("recordingmode"));
 }
 
-void Sequencer::setFrameRate(int i)
-{
-    frameRate = i;
-}
-
-int Sequencer::getFrameRate()
-{
-    return frameRate;
-}
-
 bool Sequencer::isRecordingModeMulti()
 {
     return recordingModeMulti;
