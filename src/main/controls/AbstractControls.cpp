@@ -41,7 +41,9 @@
 #include <sequencer/Track.hpp>
 #include <sequencer/NoteEvent.hpp>
 #include <sequencer/Sequencer.hpp>
+
 #include <mpc/MpcSoundPlayerChannel.hpp>
+#include <audio/server/ExternalAudioServer.hpp>
 
 using namespace mpc;
 using namespace mpc::controls;
@@ -66,7 +68,7 @@ void AbstractControls::init()
 	auto lSequencer = sequencer.lock();
     track = lSequencer->getActiveSequence().lock()->getTrack(lSequencer->getActiveTrackIndex());
 	auto lTrk = track.lock();
-	if(lTrk->getBusNumber() != 0 && !mpc->getAudioMidiServices().lock()->isDisabled()) {
+	if (lTrk->getBusNumber() != 0 && mpc->getAudioMidiServices().lock()->getExternalAudioServer()->isRunning()) {
 		auto lSampler = sampler.lock();
         mpcSoundPlayerChannel = lSampler->getDrum(lTrk->getBusNumber() - 1);
 		program = dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
@@ -331,11 +333,11 @@ void AbstractControls::numpad(int i)
 		//auto audioGui = mpc->getUis().lock()->getAudioGui();
 		switch (i) {
 		case 0:
-			if (!lAms->isDisabled()) {
+			//if (!lAms->isDisabled()) {
 				//audioGui->setServer(lAms->getServerIndex());
 				//audioGui->setInputDevs(lAms->getSelectedInputs());
 				//audioGui->setOutputDevs(lAms->getSelectedOutputs());
-			}
+			//}
 			ls.lock()->openScreen("audio");
 			return;
 		case 1:

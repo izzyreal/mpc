@@ -18,6 +18,8 @@
 
 #include <file/File.hpp>
 
+#include <audio/server/ExternalAudioServer.hpp>
+
 using namespace mpc::ui::sequencer;
 using namespace std;
 
@@ -174,7 +176,7 @@ void SequencerObserver::displayDeviceName()
 	auto lTrk = track.lock();
 	if (lTrk->getBusNumber() != 0) {
 		if (lTrk->getDevice() == 0) {
-			int pgm = mpc->getAudioMidiServices().lock()->isDisabled() ? 0 : lSampler->getDrumBusProgramNumber(lTrk->getBusNumber());
+			int pgm = mpc->getAudioMidiServices().lock()->getExternalAudioServer()->isRunning() ? lSampler->getDrumBusProgramNumber(lTrk->getBusNumber()) : 0;
 			auto p = dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(pgm).lock());
 			deviceNameLabel.lock()->setText(p->getName());
 		}

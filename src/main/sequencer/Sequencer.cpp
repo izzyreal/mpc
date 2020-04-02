@@ -26,12 +26,11 @@
 
 // ctoot
 #include <audio/server/NonRealTimeAudioServer.hpp>
+#include <audio/server/ExternalAudioServer.hpp>
 
 // moduru
 #include <System.hpp>
 #include <lang/StrUtil.hpp>
-
-#include <Logger.hpp>
 
 using namespace mpc::sequencer;
 using namespace std;
@@ -322,11 +321,13 @@ void Sequencer::trackDown()
 
 bool Sequencer::isPlaying()
 {
-	auto lAms = mpc->getAudioMidiServices().lock();
-	if (lAms->isDisabled() || !lAms->getFrameSequencer().lock())
+	auto ams = mpc->getAudioMidiServices().lock();
+	auto frameSequencer = ams->getFrameSequencer().lock();
+	auto server = ams->getExternalAudioServer();
+	if (!server->isRunning() || !frameSequencer)
 		return false;
 
-	return lAms->getFrameSequencer().lock()->isRunning();
+	return ams->getFrameSequencer().lock()->isRunning();
 }
 
 void Sequencer::play(bool fromStart)
@@ -385,15 +386,15 @@ void Sequencer::play(bool fromStart)
 		}
 	}
 	hw->getLed("play").lock()->light(true);
-	auto lAms = mpc->getAudioMidiServices().lock();
+	auto ams = mpc->getAudioMidiServices().lock();
 	bool offline = mpc->getUis().lock()->getD2DRecorderGui()->isOffline();
-	int rate = lAms->getOfflineServer()->getSampleRate();
-	lAms->getFrameSequencer().lock()->start(rate);
-	if (lAms->isBouncePrepared()) {
-		lAms->startBouncing();
+	int rate = ams->getOfflineServer()->getSampleRate();
+	ams->getFrameSequencer().lock()->start(rate);
+	if (ams->isBouncePrepared()) {
+		ams->startBouncing();
 	}
 	else {
-		lAms->getOfflineServer()->setRealTime(true);
+		ams->getOfflineServer()->setRealTime(true);
 	}
 	setChanged();
     notifyObservers(string("play"));
@@ -491,9 +492,9 @@ void Sequencer::stop(int tick)
 	auto pos = getTickPosition();
 	if (pos > s1->getLastTick())
 		pos = s1->getLastTick();
-	auto lAms = mpc->getAudioMidiServices().lock();
-	int frameOffset = tick == -1 ? 0 : lAms->getFrameSequencer().lock()->getEventFrameOffset(tick);
-	lAms->getFrameSequencer().lock()->stop();
+	auto ams = mpc->getAudioMidiServices().lock();
+	int frameOffset = tick == -1 ? 0 : ams->getFrameSequencer().lock()->getEventFrameOffset(tick);
+	ams->getFrameSequencer().lock()->stop();
     if (recording || overdubbing)
         s2->getTrack(activeTrackIndex).lock()->correctTimeRange(0, s2->getLastTick(), TICK_VALUES[mpc->getUis().lock()->getSequencerWindowGui()->getNoteValue()]);
 
@@ -507,63 +508,42 @@ void Sequencer::stop(int tick)
     overdubbing = false;
     
     move(pos);
-	if (!lAms->isBouncing()) mpc->getSampler().lock()->stopAllVoices(frameOffset);
+	if (!ams->isBouncing()) {
+		mpc->getSampler().lock()->stopAllVoices(frameOffset);
+	}
 	for (int i = 0; i < 16; i++) {
 		mpc->getHardware().lock()->getPad(i).lock()->notifyObservers(255);
 	}
-    if(notifynextsq) {
+    if (notifynextsq) {
         setChanged();
         notifyObservers(string("nextsqoff"));
     }
-    notifyTimeDisplay();
+    
+	notifyTimeDisplay();
+	
 	auto songGui = mpc->getUis().lock()->getSongGui();
     if (endOfSong) {
-		if (stopSongThread.joinable()) stopSongThread.join();
-		stopSongThread = thread(&Sequencer::static_stopSong, this);
+		auto songGui = mpc->getUis().lock()->getSongGui();
+		songGui->setOffset(songGui->getOffset() + 1);
     }
-	if (lAms->isBouncing()) {
-		if (stopBounceThread.joinable()) stopBounceThread.join();
-		stopBounceThread = thread(&Sequencer::static_stopBounce, this);
+	
+	if (ams->isBouncing()) {
+		ams->stopBouncing();
+		if (mpc->getUis().lock()->getD2DRecorderGui()->isOffline()) {
+			ams->getOfflineServer()->setRealTime(true);
+		}
+		if (preBounceRate != ams->getExternalAudioServer()->getSampleRate()) {
+			ams->getExternalAudioServer()->setSampleRate(preBounceRate);
+		}
 	}
+	
 	auto hw = mpc->getHardware().lock();
 	hw->getLed("overdub").lock()->light(false);
 	hw->getLed("play").lock()->light(false);
 	hw->getLed("rec").lock()->light(false);
+
     setChanged();
     notifyObservers(string("stop"));
-}
-
-void Sequencer::static_stopBounce(void * args)
-{
-	static_cast<Sequencer*>(args)->runStopBounceThread();
-}
-
-void Sequencer::runStopBounceThread() {
-	this_thread::sleep_for(chrono::milliseconds(100));
-	auto ams = mpc->getAudioMidiServices().lock();
-	ams->stopBouncing();
-	if (mpc->getUis().lock()->getD2DRecorderGui()->isOffline()) {
-		ams->getOfflineServer()->setRealTime(true);
-	}
-	if (preBounceRate != mpc->getAudioMidiServices().lock()->getOfflineServer()->getSampleRate()) {
-		MLOG("Trying to change sample rate from " + to_string(mpc->getAudioMidiServices().lock()->getOfflineServer()->getSampleRate()) + " back to " + to_string(preBounceRate));
-		ams->setDisabled(true);
-		std::this_thread::sleep_for(chrono::milliseconds(1000));
-		ams->destroyServices();
-		//ams->start("rtaudio", preBounceRate);
-		ams->setDisabled(false);
-	}
-}
-
-void Sequencer::static_stopSong(void * args)
-{
-	static_cast<Sequencer*>(args)->runStopSongThread();
-}
-
-void Sequencer::runStopSongThread() {
-	this_thread::sleep_for(chrono::milliseconds(10));
-	auto songGui = mpc->getUis().lock()->getSongGui();
-	songGui->setOffset(songGui->getOffset() + 1);
 }
 
 bool Sequencer::isCountingIn()
@@ -1398,10 +1378,4 @@ weak_ptr<Sequence> Sequencer::getPlaceHolder() {
 }
 
 Sequencer::~Sequencer() {
-	if (stopBounceThread.joinable()) {
-		stopBounceThread.join();
-	}
-	if (stopSongThread.joinable()) {
-		stopSongThread.join();
-	}
 }

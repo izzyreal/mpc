@@ -1,7 +1,5 @@
 #include <audiomidi/ExportAudioProcessAdapter.hpp>
 
-//#include <Util.hpp>
-//#include <disk/MpcFile.hpp>
 #include <file/wav/WavFile.hpp>
 #include <StartUp.hpp>
 #include <audio/core/AudioFormat.hpp>
@@ -26,7 +24,7 @@ using namespace mpc::audiomidi;
 using namespace moduru::io;
 using namespace moduru::file;
 
-ExportAudioProcessAdapter::ExportAudioProcessAdapter(ctoot::audio::core::AudioProcess* process, weak_ptr<ctoot::audio::core::AudioFormat> format, string name)
+ExportAudioProcessAdapter::ExportAudioProcessAdapter(ctoot::audio::core::AudioProcess* process, shared_ptr<ctoot::audio::core::AudioFormat> format, string name)
 	: AudioProcessAdapter(process)
 {
 	reading = false;
@@ -39,9 +37,8 @@ int ExportAudioProcessAdapter::processAudio(ctoot::audio::core::AudioBuffer* buf
 {
 	auto ret = super::processAudio(buf);
 	if (reading) {
-		auto lFormat = format.lock();
-		vector<char> ba(buf->getByteArrayBufferSize(lFormat.get(), buf->getSampleCount()));
-		buf->convertToByteArray_(0, buf->getSampleCount(), &ba, 0, lFormat.get());
+		vector<char> ba(buf->getByteArrayBufferSize(format.get(), buf->getSampleCount()));
+		buf->convertToByteArray_(0, buf->getSampleCount(), &ba, 0, format.get());
 		for (auto& b : ba)
 			circularBuffer->put(b);
 	}
@@ -60,7 +57,6 @@ void ExportAudioProcessAdapter::prepare(moduru::file::File* file, int lengthInFr
 		throw std::invalid_argument("Can't setFile() when already exporting");
 	}
 	this->file = file;
-	//MLOG("Preparing eapa " + file->getName());
 	circularBuffer->reset();
 	lengthInBytes = lengthInFrames * 2 * 2; // assume 16 bit stereo for now
 
@@ -87,7 +83,6 @@ void ExportAudioProcessAdapter::prepare(moduru::file::File* file, int lengthInFr
 
 	tempFileRaf = fstream(file->getPath().c_str(), ios_base::out | ios_base::in | ios_base::binary);
 	tempFileRaf.seekp(0);
-	//MLOG("Finished preparing eapa " + file->getName());
 }
 
 void ExportAudioProcessAdapter::start()

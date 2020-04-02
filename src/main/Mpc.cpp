@@ -75,8 +75,7 @@ void Mpc::init(const int sampleRate, const int inputCount, const int outputCount
 	MLOG("eventhandler created.");
 
 	audioMidiServices->start(sampleRate, inputCount, outputCount);
-	audioMidiServices->setDisabled(false);
-	MLOG("audioMidiServices test mode started.");
+	MLOG("audioMidiServices test started.");
 
 	controls = make_shared<controls::Controls>(this);
 

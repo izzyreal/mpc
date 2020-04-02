@@ -84,19 +84,10 @@ void DirectToDiskRecorderControls::function(int i)
 		case 0:
 			ls.lock()->openScreen("sequencer");
 			sequence->setLoopEnabled(false);
-
 			lengthInFrames = mpc::sequencer::SeqUtil::sequenceFrameLength(sequence.get(), 0, sequence->getLastTick(), rate);
             settings = make_unique<mpc::audiomidi::DirectToDiskSettings>(lengthInFrames, outputFolder, split, rate);
-			if (offline) {
-				lAms->setDisabled(true);
-				std::this_thread::sleep_for(chrono::milliseconds(1000));
-				lAms->destroyServices();
-				//lAms->start("rtaudio", rate);
-			}
 			lAms->prepareBouncing(settings.get());
 			lSequencer->playFromStart();
-			lAms->getOfflineServer()->setRealTime(!offline);
-			lAms->setDisabled(false);
 			break;
 		case 1:
 			ls.lock()->openScreen("sequencer");
@@ -104,16 +95,8 @@ void DirectToDiskRecorderControls::function(int i)
             settings = make_unique<mpc::audiomidi::DirectToDiskSettings>(lengthInFrames, outputFolder, split, rate);
 			sequence->setLoopEnabled(false);
 			lSequencer->move(sequence->getLoopStart());
-			if (offline) {
-				lAms->setDisabled(true);
-				std::this_thread::sleep_for(chrono::milliseconds(1000));
-				lAms->destroyServices();
-				//lAms->start("rtaudio", rate);
-			}
 			lAms->prepareBouncing(settings.get());
 			lSequencer->play();
-			lAms->getOfflineServer()->setRealTime(!offline);
-			lAms->setDisabled(false);
 			break;
 		case 2:
 			ls.lock()->openScreen("sequencer");
@@ -121,16 +104,8 @@ void DirectToDiskRecorderControls::function(int i)
             settings = make_unique<mpc::audiomidi::DirectToDiskSettings>(lengthInFrames, outputFolder, split, rate);
 			sequence->setLoopEnabled(false);
 			lSequencer->move(d2dRecorderGui->getTime0());
-			if (offline) {
-				lAms->setDisabled(true);
-				std::this_thread::sleep_for(chrono::milliseconds(1000));
-				lAms->destroyServices();
-//				lAms->start("rtaudio", rate);
-			}
 			lAms->prepareBouncing(settings.get());
 			lSequencer->play();
-			lAms->getOfflineServer()->setRealTime(!offline);
-			lAms->setDisabled(false);
 			break;
 		case 3:
 			song = lSequencer->getSong(d2dRecorderGui->getSong()).lock();
@@ -141,16 +116,8 @@ void DirectToDiskRecorderControls::function(int i)
 			ls.lock()->openScreen("song");
 			lSequencer->setSongModeEnabled(true);
 			mpc->getUis().lock()->getSongGui()->setLoop(false);
-			if (offline) {
-				lAms->setDisabled(true);
-				std::this_thread::sleep_for(chrono::milliseconds(1000));
-				lAms->destroyServices();
-	//			lAms->start("rtaudio", rate);
-			}
 			lAms->prepareBouncing(settings.get());
 			lSequencer->playFromStart();
-			lAms->getOfflineServer()->setRealTime(!offline);
-			lAms->setDisabled(false);
 			break;
 		case 4:
 			ls.lock()->openScreen("recordjam");

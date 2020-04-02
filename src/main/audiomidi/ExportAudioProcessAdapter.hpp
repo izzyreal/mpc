@@ -30,7 +30,7 @@ namespace mpc {
 		private:
 			std::string name;
 			circular_buffer<char>* circularBuffer = new circular_buffer<char>(2000000);
-			std::weak_ptr<ctoot::audio::core::AudioFormat> format{ };
+			std::shared_ptr<ctoot::audio::core::AudioFormat> format{ };
 			bool reading{ false };
 			bool writing{ false };
 			moduru::file::File* file{ nullptr };
@@ -54,7 +54,7 @@ namespace mpc {
 			void writeWav();
 
 		public:
-			ExportAudioProcessAdapter(ctoot::audio::core::AudioProcess* process, std::weak_ptr<ctoot::audio::core::AudioFormat> format, std::string name);
+			ExportAudioProcessAdapter(ctoot::audio::core::AudioProcess* process, std::shared_ptr<ctoot::audio::core::AudioFormat> format, std::string name);
 			~ExportAudioProcessAdapter();
 
 		};

@@ -63,11 +63,9 @@ namespace mpc {
 		{
 
 		private:
-			bool disabled{ true };
 			bool bouncePrepared{ false };
 			bool bouncing{ false };
 
-			std::shared_ptr<ctoot::audio::core::AudioFormat> format;
 			std::vector<std::shared_ptr<ctoot::mpc::MpcVoice>> voices;
 			std::shared_ptr<ctoot::mpc::MpcVoice> basicVoice;
 			std::vector<std::shared_ptr<ctoot::synth::SynthChannelControls>> synthChannelControls;
@@ -100,7 +98,7 @@ namespace mpc {
 			void setupMidi();
 			void setupMixer();
 			void setAssignableMixOutLevels();
-			void createSynth(int sampleRate);
+			void createSynth();
 
 			void setupFX();
 
@@ -116,7 +114,6 @@ namespace mpc {
 			std::weak_ptr<ctoot::mpc::MpcMultiMidiSynth> getMms();
 			void initializeDiskWriter();
 			void closeIO();
-			void disable();
 
 		public:
 			void connectVoices();
@@ -128,13 +125,11 @@ namespace mpc {
 			std::weak_ptr<mpc::sequencer::FrameSeq> getFrameSequencer();
 			bool isBouncePrepared();
 			bool isBouncing();
-			bool isDisabled();
 			ctoot::audio::server::IOAudioProcess* getAudioInput(int input);
 			int getBufferSize();
 
 		public:
 			void start(const int sampleRate, const int inputCount, const int outputCount);
-			void setDisabled(bool b);
 
 		public:
 			AudioMidiServices(Mpc* mpc);

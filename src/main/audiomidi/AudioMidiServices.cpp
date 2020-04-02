@@ -8,6 +8,7 @@
 #include <audiomidi/MpcMidiPorts.hpp>
 #include <ui/sampler/SamplerGui.hpp>
 #include <ui/sampler/MixerSetupGui.hpp>
+#include <ui/vmpc/DirectToDiskRecorderGui.hpp>
 #include <nvram/NvRam.hpp>
 #include <nvram/AudioMidiConfig.hpp>
 #include <sampler/Sampler.hpp>
@@ -91,27 +92,18 @@ AudioMidiServices::AudioMidiServices(mpc::Mpc* mpc)
 {
 	this->mpc = mpc;
 	frameSeq = make_shared<mpc::sequencer::FrameSeq>(mpc);
-	disabled = true;
 	AudioServices::scan();
 	ctoot::synth::SynthServices::scan();
 	ctoot::synth::SynthChannelServices::scan();
 }
 
 void AudioMidiServices::start(const int sampleRate, const int inputCount, const int outputCount) {
-	format = make_shared<AudioFormat>(sampleRate, 16, 2, true, false);
-	setupMidi();
-	server = make_shared<ExternalAudioServer>();
 
-	/*
-	if (mode.compare("rtaudio") == 0) {
-	}
-	else if (mode.compare("unreal") == 0) {
-		server = make_shared<UnrealAudioServer>();
-	}
-	*/
-	server->setSampleRate(sampleRate);
+	setupMidi();
+
+	server = make_shared<ExternalAudioServer>();
 	offlineServer = make_shared<NonRealTimeAudioServer>(server);
-	MLOG("AMS start, samplerate " + std::to_string(offlineServer->getSampleRate()));
+
 	setupMixer();
 
 	inputProcesses = vector<IOAudioProcess*>(inputCount <= 1 ? inputCount : 1);
@@ -131,7 +123,8 @@ void AudioMidiServices::start(const int sampleRate, const int inputCount, const 
 		outputProcesses[i] = server->openAudioOutput(getOutputNames()[i], "mpc_out" + to_string(i));
 	}
 
-	createSynth(sampleRate);
+	createSynth();
+
 	if (oldPrograms.size() != 0) {
 		for (int i = 0; i < 4; i++) {
 			mpc->getDrum(i)->setProgram(oldPrograms[i]);
@@ -148,19 +141,20 @@ void AudioMidiServices::start(const int sampleRate, const int inputCount, const 
 		sampler->setActiveInput(inputProcesses[mpc->getUis().lock()->getSamplerGui()->getInput()]);
 		mixer->getStrip("66").lock()->setInputProcess(sampler->getAudioOutputs()[0]);
 	}
-	initializeDiskWriter();
 	cac = make_shared<CompoundAudioClient>();
 	cac->add(frameSeq.get());
 	cac->add(mixer.get());
 	//cac->add(midiSystem.get());
+	// TODO Should be set when sample rate changes
 	sampler->setSampleRate(sampleRate);
 	cac->add(sampler.get());
 	offlineServer->setWeakPtr(offlineServer);
 	offlineServer->setClient(cac);
 	offlineServer->resizeBuffers(8192*4);
+
+	initializeDiskWriter();
+
 	offlineServer->start();
-	//disabled = false;
-	MLOG("audio midi services started");
 }
 
 void AudioMidiServices::setupMidi()
@@ -275,12 +269,11 @@ weak_ptr<ctoot::mpc::MpcMultiMidiSynth> AudioMidiServices::getMms()
 	return mms;
 }
 
-void AudioMidiServices::createSynth(int sampleRate)
+void AudioMidiServices::createSynth()
 {
 	synthRackControls = make_shared<ctoot::synth::SynthRackControls>(1);
 	synthRack = make_shared<ctoot::synth::SynthRack>(synthRackControls, midiSystem, audioSystem);
 	msc = make_shared<ctoot::mpc::MpcMultiSynthControls>();
-	msc->setSampleRate(sampleRate);
 	synthRackControls->setSynthControls(0, msc);
 	mms = dynamic_pointer_cast<ctoot::mpc::MpcMultiMidiSynth>(synthRack->getMidiSynth(0).lock());
 	auto msGui = mpc->getUis().lock()->getMixerSetupGui();
@@ -289,7 +282,7 @@ void AudioMidiServices::createSynth(int sampleRate)
 		msc->setChannelControls(i, m);
 		synthChannelControls.push_back(m);
 	}
-	basicVoice = make_shared<ctoot::mpc::MpcVoice>(65, true, sampleRate);
+	basicVoice = make_shared<ctoot::mpc::MpcVoice>(65, true);
 	auto m = make_shared<ctoot::mpc::MpcBasicSoundPlayerControls>(mpc->getSampler(), mixer, basicVoice);
 	msc->setChannelControls(4, m);
 	synthChannelControls.push_back(std::move(m));
@@ -308,24 +301,25 @@ weak_ptr<MpcMidiPorts> AudioMidiServices::getMidiPorts()
 
 void AudioMidiServices::initializeDiskWriter()
 {
-	auto diskWriter = make_shared<ExportAudioProcessAdapter>(outputProcesses[0], format, "diskwriter");
-	mixer->getMainBus()->setOutputProcess(diskWriter);
-	exportProcesses.push_back(std::move(diskWriter));
-
-	for (int i = 1; i < outputProcesses.size(); i++) {
-		diskWriter = make_shared<ExportAudioProcessAdapter>(outputProcesses[i], format, "diskwriter");
-		mixer->getStrip(string("AUX#" + to_string(i))).lock()->setDirectOutputProcess(diskWriter);
+	auto directToDiskRecorderGui = mpc->getUis().lock()->getD2DRecorderGui();
+	auto sampleRate = server->getSampleRate();
+	if (directToDiskRecorderGui->isOffline()) {
+		sampleRate = directToDiskRecorderGui->getSampleRate();
+	}
+	for (int i = 0; i < outputProcesses.size(); i++) {
+		auto diskWriter = make_shared<ExportAudioProcessAdapter>(outputProcesses[i], std::move(make_shared<AudioFormat>(sampleRate, 16, 2, true, false)), "diskwriter");
+		if (i == 0) {
+			mixer->getMainBus()->setOutputProcess(diskWriter);
+		}
+		else {
+			mixer->getStrip(string("AUX#" + to_string(i))).lock()->setDirectOutputProcess(diskWriter);
+		}
 		exportProcesses.push_back(std::move(diskWriter));
 	}
 }
 
-void AudioMidiServices::setDisabled(bool b) {
-	disabled = b;
-}
-
 void AudioMidiServices::destroyServices()
 {
-	disabled = true;
 	MLOG("Trying to destroy services...");
 	offlineServer->stop();
 	cac.reset();
@@ -391,10 +385,13 @@ void AudioMidiServices::closeIO()
 
 void AudioMidiServices::prepareBouncing(DirectToDiskSettings* settings)
 {
+	destroyDiskWriter();
+	initializeDiskWriter();
 	auto indivFileNames = std::vector<string>{ "L-R", "1-2", "3-4", "5-6", "7-8" };
 	string sep = moduru::file::FileUtil::getSeparator();
 	for (int i = 0; i < exportProcesses.size(); i++) {
 		auto eapa = exportProcesses[i];
+		// MEMORY LEAK
 		auto file = new moduru::file::File(mpc::StartUp::home + sep + "vMPC" + sep + "recordings" + sep + indivFileNames[i], nullptr);
 		eapa->prepare(file, settings->lengthInFrames, settings->sampleRate);
 	}
@@ -440,16 +437,6 @@ bool AudioMidiServices::isBouncePrepared()
 bool AudioMidiServices::isBouncing()
 {
 	return bouncing;
-}
-
-void AudioMidiServices::disable()
-{
-	disabled = true;
-}
-
-bool AudioMidiServices::isDisabled()
-{
-	return disabled;
 }
 
 IOAudioProcess* AudioMidiServices::getAudioInput(int input)
