@@ -27,7 +27,6 @@ using namespace moduru::file;
 ExportAudioProcessAdapter::ExportAudioProcessAdapter(ctoot::audio::core::AudioProcess* process, shared_ptr<ctoot::audio::core::AudioFormat> format, string name)
 	: AudioProcessAdapter(process)
 {
-	reading = false;
 	writing = false;
 	this->format = format;
 	this->name = name;
@@ -35,34 +34,43 @@ ExportAudioProcessAdapter::ExportAudioProcessAdapter(ctoot::audio::core::AudioPr
 
 int ExportAudioProcessAdapter::processAudio(ctoot::audio::core::AudioBuffer* buf)
 {
-	auto ret = super::processAudio(buf);
-	if (reading) {
+	auto ret = AudioProcessAdapter::processAudio(buf);
+
+	if (writing) {
 		vector<char> ba(buf->getByteArrayBufferSize(format.get(), buf->getSampleCount()));
 		buf->convertToByteArray_(0, buf->getSampleCount(), &ba, 0, format.get());
-		for (auto& b : ba)
-			circularBuffer->put(b);
+		bool close = false;
+		if (ba.size() + written >= lengthInBytes) {
+			ba.resize(lengthInBytes - written);
+			writing = false;
+		}
+		tempFileRaf.seekp(written);
+		tempFileRaf.write(&ba[0], ba.size());
+		tempFileRaf.flush();
+		written += ba.size();
 	}
-	return ret;
-}
 
-void ExportAudioProcessAdapter::static_startWriting(void * args)
-{
-	static_cast<ExportAudioProcessAdapter*>(args)->startWriting();
+	return ret;
 }
 
 void ExportAudioProcessAdapter::prepare(moduru::file::File* file, int lengthInFrames, int sampleRate)
 {
 	this->sampleRate = sampleRate;
-	if (reading || writing) {
-		throw std::invalid_argument("Can't setFile() when already exporting");
+
+	if (writing) {
+		throw std::invalid_argument("Can't prepare when already exporting");
 	}
+
 	this->file = file;
-	circularBuffer->reset();
+	
 	lengthInBytes = lengthInFrames * 2 * 2; // assume 16 bit stereo for now
 
-	if (file->exists()) file->del();
+	if (file->exists()) {
+		file->del();
+	}
 
 	file->create();
+	
 	FileOutputStream tempFileFos(file);
 
 	int written = 0;
@@ -87,58 +95,11 @@ void ExportAudioProcessAdapter::prepare(moduru::file::File* file, int lengthInFr
 
 void ExportAudioProcessAdapter::start()
 {
-	//MLOG("Start() " + file->getName());
 	if (file == nullptr) {
 		throw std::invalid_argument("null export file");
 	}
-
-	if (reading || writing) return;
-
-	if (writeThread.joinable()) writeThread.join();
-	reading = true;
-	writeThread = thread(&ExportAudioProcessAdapter::static_startWriting, this);
-	//MLOG("writeThread = new thread successful for " + file->getName());
-}
-
-void ExportAudioProcessAdapter::stop()
-{
-	if (!reading) return;
-	reading = false;
-}
-
-void ExportAudioProcessAdapter::startWriting()
-{
-	//MLOG("eapa " + file->getName() + " startWriting() thread started");
-	//circularBuffer.clear();
-
-	int written = 0;
+	written = 0;
 	writing = true;
-	// how to set thread priority to low?
-	while (reading || !circularBuffer->empty()) {
-		auto close = false;
-		vector<char> ba;
-		while (!circularBuffer->empty()) {
-			ba.push_back(circularBuffer->get());
-		}
-		if (ba.size() + written >= lengthInBytes) {
-			ba.resize(lengthInBytes - written);
-			close = true;
-		}
-		if (ba.size() == 0) {
-			this_thread::sleep_for(chrono::milliseconds(2));
-			continue;
-		}
-		tempFileRaf.seekp(written);
-		tempFileRaf.write(&ba[0], ba.size());
-		tempFileRaf.flush();
-		if (close) {
-			break;
-		}
-		written += ba.size();
-	}
-	writing = false;
-	reading = false;
-	//MLOG("eapa " + file->getName() + " startWriting() thread stopped");
 }
 
 void ExportAudioProcessAdapter::writeWav()
@@ -204,7 +165,6 @@ void ExportAudioProcessAdapter::writeWav()
 		wavFos.close();
 		//resultWavFile.close();
 	}
-	//MLOG("finished writing wav for " + file->getName());
 }
 
 ExportAudioProcessAdapter::~ExportAudioProcessAdapter() {
@@ -213,6 +173,4 @@ ExportAudioProcessAdapter::~ExportAudioProcessAdapter() {
 		file->close();
 		delete file;
 	}
-	if (writeThread.joinable()) writeThread.join();
-	delete circularBuffer;
 }

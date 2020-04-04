@@ -38,7 +38,6 @@
 #include <audio/server/CompoundAudioClient.hpp>
 #include <audio/server/IOAudioProcess.hpp>
 #include <audio/server/NonRealTimeAudioServer.hpp>
-#include <audio/server/UnrealAudioServer.hpp>
 #include <audio/server/ExternalAudioServer.hpp>
 
 #include <audio/system/MixerConnectedAudioSystem.hpp>
@@ -151,8 +150,10 @@ void AudioMidiServices::start(const int sampleRate, const int inputCount, const 
 	cac->add(frameSeq.get());
 	cac->add(mixer.get());
 	//cac->add(midiSystem.get());
+
 	// TODO Should be set when sample rate changes
 	sampler->setSampleRate(sampleRate);
+
 	cac->add(sampler.get());
 	offlineServer->setWeakPtr(offlineServer);
 	offlineServer->setClient(cac);
@@ -412,7 +413,7 @@ void AudioMidiServices::startBouncing()
 	bouncePrepared = false;
 
 	for (auto& eapa : exportProcesses) {
-		eapa->start();
+//		eapa->start();
 	}
 
 	bouncing.store(true);
@@ -426,8 +427,9 @@ void AudioMidiServices::stopBouncing()
 	}
 
 	for (auto& eapa : exportProcesses) {
-		eapa->stop();
+	//	eapa->stop();
 	}
+
 	for (auto& eapa : exportProcesses) {
 		eapa->writeWav();
 	}
@@ -460,10 +462,6 @@ IOAudioProcess* AudioMidiServices::getAudioInput(int input)
 int AudioMidiServices::getBufferSize()
 {
 	return server->getOutputLatencyFrames();
-}
-
-UnrealAudioServer* AudioMidiServices::getUnrealAudioServer() {
-	return dynamic_pointer_cast<UnrealAudioServer>(server).get();
 }
 
 ExternalAudioServer* AudioMidiServices::getExternalAudioServer() {

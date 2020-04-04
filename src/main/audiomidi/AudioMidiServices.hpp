@@ -83,14 +83,13 @@ namespace mpc {
 			std::shared_ptr<ctoot::audio::server::CompoundAudioClient> cac;
 			std::shared_ptr<MpcMidiPorts> mpcMidiPorts;
 			Mpc* mpc{ nullptr };
-			std::vector<std::shared_ptr<ExportAudioProcessAdapter>> exportProcesses;
 			std::vector<ctoot::audio::server::IOAudioProcess*> inputProcesses;
 			std::vector<ctoot::audio::server::IOAudioProcess*> outputProcesses;
 			std::shared_ptr<mpc::sequencer::FrameSeq> frameSeq;
 			std::vector<int> oldPrograms;
 
 		public:
-			ctoot::audio::server::UnrealAudioServer* getUnrealAudioServer();
+			std::vector<std::shared_ptr<ExportAudioProcessAdapter>> exportProcesses;
 			ctoot::audio::server::ExternalAudioServer* getExternalAudioServer();
 
 		private:
