@@ -143,7 +143,7 @@ void ExportAudioProcessAdapter::startWriting()
 
 void ExportAudioProcessAdapter::writeWav()
 {
-	//MLOG("writing wav for " + file->getName());
+	MLOG("writing wav for " + file->getName());
 	auto ints = vector<int>(lengthInBytes / 2);
 	int  read = 0;
 	int converted = 0;
@@ -169,8 +169,15 @@ void ExportAudioProcessAdapter::writeWav()
 	tempFileRaf.seekg(read);
 	tempFileRaf.read(&remainder[0], remain);
 	tempFileRaf.close();
-	//	tempFileFos->close();
 	file->del();
+
+	if (nonZeroDetected) {
+		MLOG("nonZeroDetected == true");
+	}
+	else {
+		MLOG("nonZeroDetected == false");
+	}
+
 	for (int i = 0; i < remain; i += 2) {
 		auto ba = vector<char>{ remainder[i], remainder[i + 1] };
 		auto value = moduru::file::ByteUtil::bytes2short(ba);

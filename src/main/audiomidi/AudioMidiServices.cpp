@@ -90,6 +90,12 @@ using namespace std;
 
 AudioMidiServices::AudioMidiServices(mpc::Mpc* mpc)
 {
+	if (bouncing.load()) {
+		MLOG("bouncing == true");
+	}
+	else {
+		MLOG("bouncing == false");
+	}
 	this->mpc = mpc;
 	frameSeq = make_shared<mpc::sequencer::FrameSeq>(mpc);
 	AudioServices::scan();
@@ -391,7 +397,6 @@ void AudioMidiServices::prepareBouncing(DirectToDiskSettings* settings)
 	string sep = moduru::file::FileUtil::getSeparator();
 	for (int i = 0; i < exportProcesses.size(); i++) {
 		auto eapa = exportProcesses[i];
-		// MEMORY LEAK
 		auto file = new moduru::file::File(mpc::StartUp::home + sep + "vMPC" + sep + "recordings" + sep + indivFileNames[i], nullptr);
 		eapa->prepare(file, settings->lengthInFrames, settings->sampleRate);
 	}
@@ -400,18 +405,25 @@ void AudioMidiServices::prepareBouncing(DirectToDiskSettings* settings)
 
 void AudioMidiServices::startBouncing()
 {
-	if (!bouncePrepared)
+	if (!bouncePrepared) {
 		return;
+	}
+
 	bouncePrepared = false;
-	bouncing = true;
+
 	for (auto& eapa : exportProcesses) {
 		eapa->start();
 	}
+
+	bouncing.store(true);
 }
 
 void AudioMidiServices::stopBouncing()
 {
-	if (!bouncing) return;
+	MLOG("AMS stop bouncing");
+	if (!bouncing.load()) {
+		return;
+	}
 
 	for (auto& eapa : exportProcesses) {
 		eapa->stop();
@@ -419,9 +431,10 @@ void AudioMidiServices::stopBouncing()
 	for (auto& eapa : exportProcesses) {
 		eapa->writeWav();
 	}
-	mpc->getSequencer().lock()->stop();
+	
 	mpc->getLayeredScreen().lock()->openScreen("recordingfinished");
-	bouncing = false;
+	
+	bouncing.store(false);
 }
 
 weak_ptr<mpc::sequencer::FrameSeq> AudioMidiServices::getFrameSequencer()
@@ -434,9 +447,9 @@ bool AudioMidiServices::isBouncePrepared()
 	return bouncePrepared;
 }
 
-bool AudioMidiServices::isBouncing()
+const bool AudioMidiServices::isBouncing()
 {
-	return bouncing;
+	return bouncing.load();
 }
 
 IOAudioProcess* AudioMidiServices::getAudioInput(int input)

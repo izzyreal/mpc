@@ -27,6 +27,7 @@ FrameSeq::FrameSeq(mpc::Mpc* mpc) {
 }
 
 void FrameSeq::start(float sampleRate) {
+	MLOG("frameSeq starting with sampleRate " + to_string(sampleRate));
 	if (running) {
 		return;
 	}
@@ -53,12 +54,14 @@ void FrameSeq::work(int nFrames) {
 	auto lSequencer = sequencer.lock();
 	
 	frameCounter += nFrames;
+	
 	if (frameCounter > 2048) {
 		if (!lSequencer->isCountingIn() && !metronome) {
 			lSequencer->notifyTimeDisplayRealtime();
 		}
 		frameCounter = 0;
 	}
+
 	auto seq = lSequencer->getCurrentlyPlayingSequence().lock();
 	double tempo = lSequencer->getTempo().toDouble();
 	if (tempo != clock.getBpm()) {
@@ -167,6 +170,7 @@ void FrameSeq::work(int nFrames) {
 				}
 				else {
 					if (getTickPosition() >= seq->getLastTick()) {
+						MLOG("seq lastTick " + to_string(seq->getLastTick()));
 						lSequencer->stop(seq->getLastTick());
 						lSequencer->move(seq->getLastTick());
 					}
@@ -182,7 +186,9 @@ int FrameSeq::getEventFrameOffset(int tick) {
 }
 
 void FrameSeq::stop() {
+	MLOG("frameSeq stop")
 	if (!running) {
+		MLOG("... but it's not running")
 		return;
 	}
 	running = false;

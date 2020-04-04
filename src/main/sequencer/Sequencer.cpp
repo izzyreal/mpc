@@ -40,10 +40,6 @@ Sequencer::Sequencer(mpc::Mpc* mpc)
 	this->mpc = mpc;
 }
 
-void Sequencer::setPreBounceRate(int rate) {
-	this->preBounceRate = rate;
-}
-
 void Sequencer::init()
 {
 	TICK_VALUES = vector<int>{ 0, 48, 32, 24, 16, 12, 8 };
@@ -95,6 +91,7 @@ int Sequencer::getActiveSequenceIndex()
 
 void Sequencer::playToTick(int targetTick)
 {
+	MLOG("sequencer playToTick " + to_string(targetTick));
 	auto seqIndex = songMode ? getSongSequenceIndex() : currentlyPlayingSequenceIndex;
 	auto tc = metronomeOnly ? metronomeSeq.get() : sequences[seqIndex].get();
 	for (auto& trk : tc->getTracks()) {
@@ -393,9 +390,6 @@ void Sequencer::play(bool fromStart)
 	if (ams->isBouncePrepared()) {
 		ams->startBouncing();
 	}
-	else {
-		ams->getOfflineServer()->setRealTime(true);
-	}
 	setChanged();
     notifyObservers(string("play"));
 }
@@ -478,8 +472,17 @@ void Sequencer::stop(){
 
 void Sequencer::stop(int tick)
 {
-    if(!isPlaying()) {
-        if(position != 0)
+	MLOG("sequencer stop")
+	auto ams = mpc->getAudioMidiServices().lock();
+	bool bouncing = ams->isBouncing();
+	if (bouncing) {
+		MLOG("bouncing");
+	}
+	else {
+		MLOG("not bouncing");
+	}
+    if (!isPlaying() && !bouncing) {
+		if (position != 0)
             setBar(0); // real 2kxl doesn't do this
         return;
     }
@@ -492,7 +495,6 @@ void Sequencer::stop(int tick)
 	auto pos = getTickPosition();
 	if (pos > s1->getLastTick())
 		pos = s1->getLastTick();
-	auto ams = mpc->getAudioMidiServices().lock();
 	int frameOffset = tick == -1 ? 0 : ams->getFrameSequencer().lock()->getEventFrameOffset(tick);
 	ams->getFrameSequencer().lock()->stop();
     if (recording || overdubbing)
@@ -508,7 +510,7 @@ void Sequencer::stop(int tick)
     overdubbing = false;
     
     move(pos);
-	if (!ams->isBouncing()) {
+	if (!bouncing) {
 		mpc->getSampler().lock()->stopAllVoices(frameOffset);
 	}
 	for (int i = 0; i < 16; i++) {
@@ -527,14 +529,8 @@ void Sequencer::stop(int tick)
 		songGui->setOffset(songGui->getOffset() + 1);
     }
 	
-	if (ams->isBouncing()) {
+	if (bouncing) {
 		ams->stopBouncing();
-		if (mpc->getUis().lock()->getD2DRecorderGui()->isOffline()) {
-			ams->getOfflineServer()->setRealTime(true);
-		}
-		if (preBounceRate != ams->getExternalAudioServer()->getSampleRate()) {
-			ams->getExternalAudioServer()->setSampleRate(preBounceRate);
-		}
 	}
 	
 	auto hw = mpc->getHardware().lock();

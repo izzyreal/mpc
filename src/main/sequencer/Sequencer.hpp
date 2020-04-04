@@ -40,12 +40,6 @@ namespace mpc {
 		{
 
 		private:
-			int preBounceRate;
-
-		public:
-			void setPreBounceRate(int rate);
-
-		private:
 			int lastNotifiedBar = -1;
 			int lastNotifiedBeat = -1;
 			int lastNotifiedClock = -1;

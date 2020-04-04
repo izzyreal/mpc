@@ -9,6 +9,7 @@
 
 #include <set>
 #include <memory>
+#include <atomic>
 
 namespace ctoot {
 
@@ -64,7 +65,7 @@ namespace mpc {
 
 		private:
 			bool bouncePrepared{ false };
-			bool bouncing{ false };
+			std::atomic<bool> bouncing = ATOMIC_VAR_INIT(false);
 
 			std::vector<std::shared_ptr<ctoot::mpc::MpcVoice>> voices;
 			std::shared_ptr<ctoot::mpc::MpcVoice> basicVoice;
@@ -124,7 +125,7 @@ namespace mpc {
 			void stopBouncing();
 			std::weak_ptr<mpc::sequencer::FrameSeq> getFrameSequencer();
 			bool isBouncePrepared();
-			bool isBouncing();
+			const bool isBouncing();
 			ctoot::audio::server::IOAudioProcess* getAudioInput(int input);
 			int getBufferSize();
 

@@ -417,6 +417,7 @@ int Track::getNextTick()
 
 void Track::playNext()
 {
+	MLOG("playNext");
 	if (eventIndex + 1 > events.size() && noteOffs.size() == 0) return;
 	auto lSequencer = sequencer.lock();
 	multi = lSequencer->isRecordingModeMulti();
@@ -447,6 +448,7 @@ void Track::playNext()
 		events.erase(events.begin() + eventIndex);
 		return;
 	}
+	MLOG("sending to eventhandler");
 	mpc->getEventHandler().lock()->handle(lEvent, this);
 	auto ne = dynamic_pointer_cast<NoteEvent>(lEvent);
 	if (ne) {
