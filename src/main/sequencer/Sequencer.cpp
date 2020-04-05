@@ -91,7 +91,6 @@ int Sequencer::getActiveSequenceIndex()
 
 void Sequencer::playToTick(int targetTick)
 {
-	MLOG("sequencer playToTick " + to_string(targetTick));
 	auto seqIndex = songMode ? getSongSequenceIndex() : currentlyPlayingSequenceIndex;
 	auto tc = metronomeOnly ? metronomeSeq.get() : sequences[seqIndex].get();
 	for (auto& trk : tc->getTracks()) {

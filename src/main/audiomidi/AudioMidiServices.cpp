@@ -89,12 +89,6 @@ using namespace std;
 
 AudioMidiServices::AudioMidiServices(mpc::Mpc* mpc)
 {
-	if (bouncing.load()) {
-		MLOG("bouncing == true");
-	}
-	else {
-		MLOG("bouncing == false");
-	}
 	this->mpc = mpc;
 	frameSeq = make_shared<mpc::sequencer::FrameSeq>(mpc);
 	AudioServices::scan();
@@ -146,6 +140,7 @@ void AudioMidiServices::start(const int sampleRate, const int inputCount, const 
 		sampler->setActiveInput(inputProcesses[mpc->getUis().lock()->getSamplerGui()->getInput()]);
 		mixer->getStrip("66").lock()->setInputProcess(sampler->getAudioOutputs()[0]);
 	}
+	initializeDiskWriter();
 	cac = make_shared<CompoundAudioClient>();
 	cac->add(frameSeq.get());
 	cac->add(mixer.get());
@@ -155,12 +150,10 @@ void AudioMidiServices::start(const int sampleRate, const int inputCount, const 
 	sampler->setSampleRate(sampleRate);
 
 	cac->add(sampler.get());
+	
 	offlineServer->setWeakPtr(offlineServer);
 	offlineServer->setClient(cac);
 	offlineServer->resizeBuffers(8192*4);
-
-	initializeDiskWriter();
-
 	offlineServer->start();
 }
 
@@ -212,7 +205,7 @@ void AudioMidiServices::setupMixer()
 
 void AudioMidiServices::setupFX() {
 	auto acs = mixer->getMixerControls().lock()->getStripControls("FX#1").lock();
-	acs->insert("ctoot::audio::reverb::BarrControls", "Main");
+	//acs->insert("ctoot::audio::reverb::BarrControls", "Main");
 	//acs->insert("class ctoot::audio::delay::WowFlutterControls", "Main");
 	//acs->insert("class ctoot::audio::delay::ModulatedDelayControls", "Main");
 	//acs->insert("class ctoot::audio::delay::MultiTapDelayStereoControls", "Main"); // doesn't seem to work at all
@@ -308,15 +301,15 @@ weak_ptr<MpcMidiPorts> AudioMidiServices::getMidiPorts()
 
 void AudioMidiServices::initializeDiskWriter()
 {
-	auto directToDiskRecorderGui = mpc->getUis().lock()->getD2DRecorderGui();
+	//auto directToDiskRecorderGui = mpc->getUis().lock()->getD2DRecorderGui();
 	auto sampleRate = server->getSampleRate();
-	if (directToDiskRecorderGui->isOffline()) {
-		sampleRate = directToDiskRecorderGui->getSampleRate();
-	}
+	//if (directToDiskRecorderGui->isOffline()) {
+		//sampleRate = directToDiskRecorderGui->getSampleRate();
+	//}
 	for (int i = 0; i < outputProcesses.size(); i++) {
-		auto diskWriter = make_shared<ExportAudioProcessAdapter>(outputProcesses[i], std::move(make_shared<AudioFormat>(sampleRate, 16, 2, true, false)), "diskwriter");
+		auto diskWriter = make_shared<ExportAudioProcessAdapter>(outputProcesses[i], std::move(make_shared<AudioFormat>(sampleRate, 16, 2, true, false)), "diskwriter" + to_string(i));
 		if (i == 0) {
-			mixer->getMainBus()->setOutputProcess(diskWriter);
+			mixer->getMainStrip().lock()->setDirectOutputProcess(diskWriter);
 		}
 		else {
 			mixer->getStrip(string("AUX#" + to_string(i))).lock()->setDirectOutputProcess(diskWriter);
@@ -392,8 +385,6 @@ void AudioMidiServices::closeIO()
 
 void AudioMidiServices::prepareBouncing(DirectToDiskSettings* settings)
 {
-	destroyDiskWriter();
-	initializeDiskWriter();
 	auto indivFileNames = std::vector<string>{ "L-R", "1-2", "3-4", "5-6", "7-8" };
 	string sep = moduru::file::FileUtil::getSeparator();
 	for (int i = 0; i < exportProcesses.size(); i++) {
@@ -433,7 +424,7 @@ void AudioMidiServices::stopBouncing()
 	for (auto& eapa : exportProcesses) {
 		eapa->writeWav();
 	}
-	
+
 	mpc->getLayeredScreen().lock()->openScreen("recordingfinished");
 	
 	bouncing.store(false);

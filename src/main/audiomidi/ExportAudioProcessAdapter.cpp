@@ -30,6 +30,7 @@ ExportAudioProcessAdapter::ExportAudioProcessAdapter(ctoot::audio::core::AudioPr
 	writing = false;
 	this->format = format;
 	this->name = name;
+	MLOG("constructed " + name);
 }
 
 int ExportAudioProcessAdapter::processAudio(ctoot::audio::core::AudioBuffer* buf)
@@ -132,13 +133,6 @@ void ExportAudioProcessAdapter::writeWav()
 	tempFileRaf.close();
 	file->del();
 
-	if (nonZeroDetected) {
-		MLOG("nonZeroDetected == true");
-	}
-	else {
-		MLOG("nonZeroDetected == false");
-	}
-
 	for (int i = 0; i < remain; i += 2) {
 		auto ba = vector<char>{ remainder[i], remainder[i + 1] };
 		auto value = moduru::file::ByteUtil::bytes2short(ba);
@@ -173,4 +167,5 @@ ExportAudioProcessAdapter::~ExportAudioProcessAdapter() {
 		file->close();
 		delete file;
 	}
+	MLOG("destroyed " + name);
 }

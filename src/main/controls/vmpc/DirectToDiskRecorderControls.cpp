@@ -74,10 +74,11 @@ void DirectToDiskRecorderControls::function(int i)
 		outputFolder = d2dRecorderGui->getOutputfolder();
 		vector<int> rates{ 44100, 48000, 88200 };
 		rate = rates[d2dRecorderGui->getSampleRate()];
-		if (!d2dRecorderGui->isOffline()) rate = lAms->getOfflineServer()->getSampleRate();
+		if (!d2dRecorderGui->isOffline()) {
+			rate = lAms->getOfflineServer()->getSampleRate();
+		}
 		split = false;
 		sequence = lSequencer->getSequence(seq).lock();
-		bool offline = d2dRecorderGui->isOffline();
 		shared_ptr<mpc::sequencer::Song> song;
 
 		switch (d2dRecorderGui->getRecord()) {

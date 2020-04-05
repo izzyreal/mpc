@@ -200,7 +200,7 @@ void Sampler::playMetronome(mpc::sequencer::NoteEvent* event, int framePos)
 		auto accent = event->getVelocity() == swGui->getAccentVelo();
 		soundNumber = programs[program]->getNoteParameters(accent ? swGui->getAccentNote() : swGui->getNormalNote())->getSndNumber();
 	}
-	//MLOG("Trying to play metronome with velocity " + to_string(event->getVelocity()) + " and framePos " + to_string(framePos));
+	MLOG("Trying to play metronome with velocity " + to_string(event->getVelocity()) + " and framePos " + to_string(framePos));
 	//MLOG("soundNumber " + to_string(soundNumber));
 	mpc->getBasicPlayer()->mpcNoteOn(soundNumber, event->getVelocity(), framePos);
 }

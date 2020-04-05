@@ -82,7 +82,6 @@ void EventHandler::handleNoThru(weak_ptr<mpc::sequencer::Event> e, mpc::sequence
 
 		auto fs = mpc->getAudioMidiServices().lock()->getFrameSequencer().lock();
 		auto eventFrame = fs->getEventFrameOffset(event->getTick());
-		MLOG("handleNoThru click");
 		sampler.lock()->playMetronome(ne.get(), eventFrame);
 		return;
 	}
