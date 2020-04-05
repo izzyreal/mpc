@@ -392,7 +392,6 @@ void Sequencer::play(bool fromStart)
 			vector<int> rates{ 44100, 48000, 88200 };
 			rate = rates[directToDiskRecordGui->getSampleRate()];
 		}
-		ams->getFrameSequencer().lock()->start(rate);
 		ams->startBouncing();
 	}
 	else {
