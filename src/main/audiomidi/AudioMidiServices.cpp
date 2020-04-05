@@ -301,13 +301,8 @@ weak_ptr<MpcMidiPorts> AudioMidiServices::getMidiPorts()
 
 void AudioMidiServices::initializeDiskWriter()
 {
-	//auto directToDiskRecorderGui = mpc->getUis().lock()->getD2DRecorderGui();
-	auto sampleRate = server->getSampleRate();
-	//if (directToDiskRecorderGui->isOffline()) {
-		//sampleRate = directToDiskRecorderGui->getSampleRate();
-	//}
 	for (int i = 0; i < outputProcesses.size(); i++) {
-		auto diskWriter = make_shared<ExportAudioProcessAdapter>(outputProcesses[i], std::move(make_shared<AudioFormat>(sampleRate, 16, 2, true, false)), "diskwriter" + to_string(i));
+		auto diskWriter = make_shared<ExportAudioProcessAdapter>(outputProcesses[i], "diskwriter" + to_string(i));
 		if (i == 0) {
 			mixer->getMainStrip().lock()->setDirectOutputProcess(diskWriter);
 		}

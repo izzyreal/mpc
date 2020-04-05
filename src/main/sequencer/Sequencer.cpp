@@ -383,12 +383,22 @@ void Sequencer::play(bool fromStart)
 	}
 	hw->getLed("play").lock()->light(true);
 	auto ams = mpc->getAudioMidiServices().lock();
-	bool offline = mpc->getUis().lock()->getD2DRecorderGui()->isOffline();
-	int rate = ams->getOfflineServer()->getSampleRate();
-	ams->getFrameSequencer().lock()->start(rate);
+	auto directToDiskRecordGui = mpc->getUis().lock()->getD2DRecorderGui();
+	bool offline = directToDiskRecordGui->isOffline();
+	
+	int rate = ams->getExternalAudioServer()->getSampleRate();
 	if (ams->isBouncePrepared()) {
+		if (offline) {
+			vector<int> rates{ 44100, 48000, 88200 };
+			rate = rates[directToDiskRecordGui->getSampleRate()];
+		}
+		ams->getFrameSequencer().lock()->start(rate);
 		ams->startBouncing();
 	}
+	else {
+		ams->getFrameSequencer().lock()->start(rate);
+	}
+
 	setChanged();
     notifyObservers(string("play"));
 }

@@ -15,7 +15,7 @@ namespace mpc {
 
 		private:
 			std::string name;
-			std::shared_ptr<ctoot::audio::core::AudioFormat> format;
+			ctoot::audio::core::AudioFormat* format = nullptr;
 			std::ofstream fileStream;
 			bool writing = false;
 			int written = 0;
@@ -29,7 +29,7 @@ namespace mpc {
 			int processAudio(ctoot::audio::core::AudioBuffer* buf) override;
 
 		public:
-			ExportAudioProcessAdapter(ctoot::audio::core::AudioProcess* process, std::shared_ptr<ctoot::audio::core::AudioFormat> format, std::string name);
+			ExportAudioProcessAdapter(ctoot::audio::core::AudioProcess* process, std::string name);
 			~ExportAudioProcessAdapter();
 
 		};

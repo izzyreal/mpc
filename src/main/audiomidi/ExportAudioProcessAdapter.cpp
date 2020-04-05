@@ -25,10 +25,9 @@ using namespace mpc::audiomidi;
 using namespace moduru::io;
 using namespace moduru::file;
 
-ExportAudioProcessAdapter::ExportAudioProcessAdapter(ctoot::audio::core::AudioProcess* process, shared_ptr<ctoot::audio::core::AudioFormat> format, string name)
+ExportAudioProcessAdapter::ExportAudioProcessAdapter(ctoot::audio::core::AudioProcess* process, string name)
 	: AudioProcessAdapter(process)
 {
-	this->format = format;
 	this->name = name;
 }
 
@@ -50,15 +49,17 @@ void ExportAudioProcessAdapter::prepare(const std::string& absolutePath, int len
 	
 	lengthInBytes = lengthInFrames * 2 * 2; // assume 16 bit stereo for now
 	
+	format = new ctoot::audio::core::AudioFormat(sampleRate, 16, 2, true, false);
 }
 
 int ExportAudioProcessAdapter::processAudio(ctoot::audio::core::AudioBuffer* buf)
 {
 	auto ret = AudioProcessAdapter::processAudio(buf);
 
+	
 	if (writing) {
-		vector<char> audioBufferAsBytes (buf->getByteArrayBufferSize(format.get(), buf->getSampleCount()));		
-		buf->convertToByteArray_(0, buf->getSampleCount(), &audioBufferAsBytes, 0, format.get());
+		vector<char> audioBufferAsBytes (buf->getByteArrayBufferSize(format, buf->getSampleCount()));
+		buf->convertToByteArray_(0, buf->getSampleCount(), &audioBufferAsBytes, 0, format);
 		if (audioBufferAsBytes.size() + written >= lengthInBytes) {
 			audioBufferAsBytes.resize(lengthInBytes - written);
 			writing = false;
@@ -72,6 +73,7 @@ int ExportAudioProcessAdapter::processAudio(ctoot::audio::core::AudioBuffer* buf
 			lengthInBytes = 0;
 			lengthInFrames = 0;
 			sampleRate = 0;
+			format = nullptr;
 		}
 	}
 
@@ -90,6 +92,9 @@ void ExportAudioProcessAdapter::start()
 ExportAudioProcessAdapter::~ExportAudioProcessAdapter() {
 	if (fileStream.is_open()) {
 		fileStream.close();
+	}
+	if (format != nullptr) {
+		delete format;
 	}
 	MLOG("destroyed " + name);
 }
