@@ -3,15 +3,7 @@
 #include <audio/core/AudioProcess.hpp>
 
 #include <fstream>
-
-namespace moduru {
-	namespace io {
-		class FileOutputStream;
-	}
-	namespace file {
-		class File;
-	}
-}
+#include <string>
 
 namespace mpc {
 	namespace audiomidi {
@@ -24,18 +16,17 @@ namespace mpc {
 		private:
 			std::string name;
 			std::shared_ptr<ctoot::audio::core::AudioFormat> format;
+			std::ofstream fileStream;
 			bool writing = false;
 			int written = 0;
-			moduru::file::File* file = nullptr;
-			std::fstream tempFileRaf;
-			int lengthInBytes;
-			int sampleRate;
+			int lengthInFrames = 0;
+			int lengthInBytes = 0;
+			int sampleRate = 0;
 
 		public:
 			void start();
-			void prepare(moduru::file::File* file, int lengthInFrames, int sampleRate);
+			void prepare(const std::string& absolutePath, int lengthInFrames, int sampleRate);
 			int processAudio(ctoot::audio::core::AudioBuffer* buf) override;
-			void writeWav();
 
 		public:
 			ExportAudioProcessAdapter(ctoot::audio::core::AudioProcess* process, std::shared_ptr<ctoot::audio::core::AudioFormat> format, std::string name);

@@ -385,12 +385,12 @@ void AudioMidiServices::closeIO()
 
 void AudioMidiServices::prepareBouncing(DirectToDiskSettings* settings)
 {
-	auto indivFileNames = std::vector<string>{ "L-R", "1-2", "3-4", "5-6", "7-8" };
+	auto indivFileNames = std::vector<string>{ "L-R.wav", "1-2.wav", "3-4.wav", "5-6.wav", "7-8.wav" };
 	string sep = moduru::file::FileUtil::getSeparator();
 	for (int i = 0; i < exportProcesses.size(); i++) {
 		auto eapa = exportProcesses[i];
-		auto file = new moduru::file::File(mpc::StartUp::home + sep + "vMPC" + sep + "recordings" + sep + indivFileNames[i], nullptr);
-		eapa->prepare(file, settings->lengthInFrames, settings->sampleRate);
+		auto absolutePath = mpc::StartUp::home + sep + "vMPC" + sep + "recordings" + sep + indivFileNames[i];
+		eapa->prepare(absolutePath, settings->lengthInFrames, settings->sampleRate);
 	}
 	bouncePrepared = true;
 }
@@ -402,31 +402,16 @@ void AudioMidiServices::startBouncing()
 	}
 
 	bouncePrepared = false;
-
-	for (auto& eapa : exportProcesses) {
-//		eapa->start();
-	}
-
 	bouncing.store(true);
 }
 
 void AudioMidiServices::stopBouncing()
 {
-	MLOG("AMS stop bouncing");
 	if (!bouncing.load()) {
 		return;
 	}
 
-	for (auto& eapa : exportProcesses) {
-	//	eapa->stop();
-	}
-
-	for (auto& eapa : exportProcesses) {
-		eapa->writeWav();
-	}
-
-	mpc->getLayeredScreen().lock()->openScreen("recordingfinished");
-	
+	mpc->getLayeredScreen().lock()->openScreen("recordingfinished");	
 	bouncing.store(false);
 }
 
