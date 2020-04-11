@@ -24,7 +24,7 @@
 #include <file/FileUtil.hpp>
 #include <file/File.hpp>
 
-#include <audio/server/ExternalAudioServer.hpp>
+#include <audio/server/NonRealTimeAudioServer.hpp>
 
 using namespace mpc::ui::disk;
 using namespace std;
@@ -54,7 +54,7 @@ DiskObserver::DiskObserver(mpc::Mpc* mpc)
 	auto lSampler = sampler.lock();
 	int activeTrack = lSequencer->getActiveTrackIndex();
 	int drum = lSequencer->getActiveSequence().lock()->getTrack(activeTrack).lock()->getBusNumber() - 1;
-	if (mpc->getAudioMidiServices().lock()->getExternalAudioServer()->isRunning()) {
+	if (mpc->getAudioMidiServices().lock()->getAudioServer()->isRunning()) {
 		int candidate = drum;
 		if (candidate < 0)
 			candidate = 0;

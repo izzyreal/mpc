@@ -4,7 +4,6 @@
 #include <sequencer/FrameSeq.hpp>
 #include "SamplerAudioIO.hpp"
 
-#include <audio/server/AudioServer.hpp>
 #include <audio/mixer/AudioMixer.hpp>
 
 #include <observer/Observable.hpp>
@@ -25,10 +24,9 @@ namespace ctoot::audio::core {
 }
 
 namespace ctoot::audio::server {
-	class NonRealTimeAudioServer;
 	class CompoundAudioClient;
-	class ExternalAudioServer;
-	class UnrealAudioServer;
+	class NonRealTimeAudioServer;
+	class AudioServer;
 }
 
 namespace ctoot::audio::system {
@@ -55,6 +53,7 @@ namespace mpc::audiomidi {
 using namespace mpc::audiomidi;
 
 namespace mpc::audiomidi {
+
 	class AudioMidiServices final
 		: public moduru::observer::Observable
 	{
@@ -86,9 +85,8 @@ namespace mpc::audiomidi {
 		shared_ptr<mpc::sequencer::FrameSeq> frameSeq;
 		vector<int> oldPrograms;
 
-	public:
+	private:
 		vector<shared_ptr<ExportAudioProcessAdapter>> exportProcesses;
-		ctoot::audio::server::ExternalAudioServer* getExternalAudioServer();
 
 	private:
 		void destroySynth();
@@ -101,8 +99,8 @@ namespace mpc::audiomidi {
 		void setupFX();
 
 	public:
-		weak_ptr<ctoot::audio::server::AudioServer> getAudioServer();
-		ctoot::audio::server::NonRealTimeAudioServer* getOfflineServer();
+		ctoot::audio::server::NonRealTimeAudioServer* getAudioServer();
+		vector<weak_ptr<ExportAudioProcessAdapter>> getExportProcesses();
 		void setMasterLevel(int i);
 		int getMasterLevel();
 		void setRecordLevel(int i);

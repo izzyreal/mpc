@@ -37,6 +37,7 @@
 
 #include <audio/server/CompoundAudioClient.hpp>
 #include <audio/server/IOAudioProcess.hpp>
+#include <audio/server/AudioServer.hpp>
 #include <audio/server/NonRealTimeAudioServer.hpp>
 #include <audio/server/ExternalAudioServer.hpp>
 
@@ -149,17 +150,22 @@ void AudioMidiServices::start(const int sampleRate, const int inputCount, const 
 	offlineServer->start();
 }
 
+vector<weak_ptr<ExportAudioProcessAdapter>> AudioMidiServices::getExportProcesses()
+{
+	vector <weak_ptr<ExportAudioProcessAdapter>> res;
+	for (auto& eapa : exportProcesses) {
+		res.push_back(eapa);
+	}
+	return res;
+}
+
 void AudioMidiServices::setupMidi()
 {
 	midiSystem = make_shared<ctoot::midi::core::DefaultConnectedMidiSystem>();
 }
 
-NonRealTimeAudioServer* AudioMidiServices::getOfflineServer() {
+NonRealTimeAudioServer* AudioMidiServices::getAudioServer() {
 	return offlineServer.get();
-}
-
-weak_ptr<AudioServer> AudioMidiServices::getAudioServer() {
-	return offlineServer;
 }
 
 void AudioMidiServices::setupMixer()
@@ -424,10 +430,6 @@ IOAudioProcess* AudioMidiServices::getAudioInput(int input)
 int AudioMidiServices::getBufferSize()
 {
 	return server->getOutputLatencyFrames();
-}
-
-ExternalAudioServer* AudioMidiServices::getExternalAudioServer() {
-	return dynamic_pointer_cast<ExternalAudioServer>(server).get();
 }
 
 AudioMidiServices::~AudioMidiServices() {

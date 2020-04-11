@@ -75,7 +75,7 @@ void DirectToDiskRecorderControls::function(int i)
 		vector<int> rates{ 44100, 48000, 88200 };
 		rate = rates[d2dRecorderGui->getSampleRate()];
 		if (!d2dRecorderGui->isOffline()) {
-			rate = lAms->getOfflineServer()->getSampleRate();
+			rate = lAms->getAudioServer()->getSampleRate();
 		}
 		split = false;
 		sequence = lSequencer->getSequence(seq).lock();

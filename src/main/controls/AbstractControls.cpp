@@ -43,7 +43,7 @@
 #include <sequencer/Sequencer.hpp>
 
 #include <mpc/MpcSoundPlayerChannel.hpp>
-#include <audio/server/ExternalAudioServer.hpp>
+#include <audio/server/NonRealTimeAudioServer.hpp>
 
 using namespace mpc;
 using namespace mpc::controls;
@@ -68,7 +68,7 @@ void AbstractControls::init()
 	auto lSequencer = sequencer.lock();
     track = lSequencer->getActiveSequence().lock()->getTrack(lSequencer->getActiveTrackIndex());
 	auto lTrk = track.lock();
-	if (lTrk->getBusNumber() != 0 && mpc->getAudioMidiServices().lock()->getExternalAudioServer()->isRunning()) {
+	if (lTrk->getBusNumber() != 0 && mpc->getAudioMidiServices().lock()->getAudioServer()->isRunning()) {
 		auto lSampler = sampler.lock();
         mpcSoundPlayerChannel = lSampler->getDrum(lTrk->getBusNumber() - 1);
 		program = dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(mpcSoundPlayerChannel->getProgram()).lock());

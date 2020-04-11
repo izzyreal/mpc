@@ -20,6 +20,7 @@
 #include <sequencer/Sequence.hpp>
 
 #include <synth/SynthChannel.hpp>
+#include <audio/server/NonRealTimeAudioServer.hpp>
 
 #include <mpc/MpcBasicSoundPlayerChannel.hpp>
 #include <mpc/MpcSoundPlayerChannel.hpp>
@@ -27,10 +28,8 @@
 #include <mpc/MpcIndivFxMixerChannel.hpp>
 
 #include <file/File.hpp>
-
 #include <thirdp/libsamplerate/samplerate.h>
 
-#include <audio/server/ExternalAudioServer.hpp>
 
 using namespace mpc::sampler;
 using namespace std;
@@ -454,7 +453,7 @@ weak_ptr<Sound> Sampler::createZone(weak_ptr<Sound> source, int start, int end, 
 
 void Sampler::stopAllVoices()
 {
-	if (!mpc->getAudioMidiServices().lock()->getExternalAudioServer()->isRunning()) {
+	if (!mpc->getAudioMidiServices().lock()->getAudioServer()->isRunning()) {
 		return;
 	}
 	mpc->getBasicPlayer()->allSoundOff();

@@ -26,7 +26,6 @@
 
 // ctoot
 #include <audio/server/NonRealTimeAudioServer.hpp>
-#include <audio/server/ExternalAudioServer.hpp>
 
 // moduru
 #include <System.hpp>
@@ -319,9 +318,11 @@ bool Sequencer::isPlaying()
 {
 	auto ams = mpc->getAudioMidiServices().lock();
 	auto frameSequencer = ams->getFrameSequencer().lock();
-	auto server = ams->getExternalAudioServer();
-	if (!server->isRunning() || !frameSequencer)
+	auto server = ams->getAudioServer();
+	
+	if (!server->isRunning() || !frameSequencer) {
 		return false;
+	}
 
 	return ams->getFrameSequencer().lock()->isRunning();
 }
@@ -386,7 +387,7 @@ void Sequencer::play(bool fromStart)
 	auto directToDiskRecordGui = mpc->getUis().lock()->getD2DRecorderGui();
 	bool offline = directToDiskRecordGui->isOffline();
 	
-	int rate = ams->getExternalAudioServer()->getSampleRate();
+	int rate = ams->getAudioServer()->getSampleRate();
 	if (ams->isBouncePrepared()) {
 		if (offline) {
 			vector<int> rates{ 44100, 48000, 88200 };
@@ -1353,7 +1354,7 @@ void Sequencer::playMetronomeTrack()
 	auto lAms = mpc->getAudioMidiServices().lock();
 	auto fs = lAms->getFrameSequencer().lock();
 	playStartTick = 0;
-	fs->startMetronome(lAms->getOfflineServer()->getSampleRate());
+	fs->startMetronome(lAms->getAudioServer()->getSampleRate());
 }
 
 void Sequencer::stopMetronomeTrack()

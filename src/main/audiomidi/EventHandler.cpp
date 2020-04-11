@@ -129,7 +129,7 @@ void EventHandler::handleNoThru(weak_ptr<mpc::sequencer::Event> e, mpc::sequence
 					if (timeStamp != -1) eventFrame = timeStamp;
 					mpc->getMms()->mpcTransport(track->getTrackIndex(), midiAdapter.get().lock().get(), 0, ne->getVariationTypeNumber(), ne->getVariationValue(), eventFrame);
 					
-					if (mpc->getAudioMidiServices().lock()->getOfflineServer()->isRealTime()) {
+					if (mpc->getAudioMidiServices().lock()->getAudioServer()->isRealTime()) {
 						auto note = ne->getNote();
 						auto program = mpc->getSampler().lock()->getProgram(mpc->getDrum(drum)->getProgram());
 						int pad = program.lock()->getPadNumberFromNote(note);

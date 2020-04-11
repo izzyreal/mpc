@@ -6,7 +6,6 @@
 #include <string>
 
 using namespace ctoot::audio::system;
-using namespace ctoot::audio::core;
 
 using namespace std;
 
@@ -33,7 +32,7 @@ namespace mpc::audiomidi {
 	public:
 		std::string getName() override;
 		void open() override;
-		int32_t processAudio(AudioBuffer* buffer) override;
+		int32_t processAudio(ctoot::audio::core::AudioBuffer* buffer) override;
 		void close() override;
 		std::string getLocation() override;
 
