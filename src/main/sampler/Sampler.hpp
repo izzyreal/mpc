@@ -2,231 +2,151 @@
 
 #include <mpc/MpcSampler.hpp>
 
-#include <observer/Observable.hpp>
-#include <audio/server/AudioClient.hpp>
-#include <audio/system/AudioDevice.hpp>
 #include <sampler/Program.hpp>
 #include <sampler/Sound.hpp>
 
-#include <audio/server/IOAudioProcess.hpp>
-#include <audio/core/AudioBuffer.hpp>
-
-//#include <boost/circular_buffer.hpp>
-
 #include <memory>
 
-namespace ctoot {
-	namespace mpc {
-		class MpcSound;
-		class MpcProgram;
-		class MpcSoundPlayerChannel;
-	}
+namespace ctoot::mpc {
+	class MpcSound;
+	class MpcProgram;
+	class MpcSoundPlayerChannel;
 }
 
 namespace mpc {
-
 	class Mpc;
+}
 
-	namespace sequencer {
-		class NoteEvent;
-	}
+namespace mpc::sequencer {
+	class NoteEvent;
+}
 
-	namespace sampler {
+using namespace ctoot::mpc;
 
-		class MonitorOutput;
+using namespace std;
 
-		class Sampler final
-			: public virtual ctoot::mpc::MpcSampler
-			, public virtual ctoot::audio::server::AudioClient
-			, public virtual ctoot::audio::system::AudioDevice
-		{
+namespace mpc::sampler {
 
-		public:
-			std::weak_ptr<ctoot::mpc::MpcSound> getPreviewSound() override;
-			std::weak_ptr<ctoot::mpc::MpcSound> getPlayXSound() override;
-			std::weak_ptr<ctoot::mpc::MpcSound> getClickSound() override;
-			std::weak_ptr<ctoot::mpc::MpcSound> getSound(int sampleNumber) override;
-			std::weak_ptr<ctoot::mpc::MpcProgram> getProgram(int programNumber) override;
+	class Sampler final
+		: public virtual MpcSampler
+	{
 
-		private:
-			int inputLevel = 0;
-			float sampleRate;
+	public:
+		weak_ptr<MpcSound> getPreviewSound() override;
+		weak_ptr<MpcSound> getPlayXSound() override;
+		weak_ptr<MpcSound> getClickSound() override;
+		weak_ptr<MpcSound> getSound(int sampleNumber) override;
+		weak_ptr<MpcProgram> getProgram(int programNumber) override;
 
-		protected:
-			std::vector<float>* monitorBufferL{ nullptr };
-			std::vector<float>* monitorBufferR{ nullptr };
+	private:
+		int inputLevel = 0;
 
-		private:
-			std::vector<int> initMasterPadAssign{};
-			std::vector<int> masterPadAssign{};
-			std::vector<int> autoChromaticAssign{};
+	private:
+		vector<int> initMasterPadAssign{};
+		vector<int> masterPadAssign{};
+		vector<int> autoChromaticAssign{};
 
-			std::unique_ptr<ctoot::audio::core::AudioBuffer> recordBuffer{};
+		vector<shared_ptr<Sound>> sounds{};
+		vector<shared_ptr<Program>> programs{};
+		int soundSortingType{};
+		vector<string> padNames{};
+		vector<string> abcd{};
+		vector<float> clickSample{};
+		shared_ptr<Sound> clickSound{};
+		vector<string> sortNames{};
+		mpc::Mpc* mpc{ nullptr };
 
-			static const int VU_BUFFER_SIZE{ 100 };
-			int vuCounter{};
-			std::vector<float> vuBufferL{};
-			std::vector<float> vuBufferR{};
-			std::vector<float> recordBufferL{};
-			std::vector<float> recordBufferR{};
-			int vuSampleCounter{};
-			bool recording{};
-			int recordFrame{};
-			ctoot::audio::server::IOAudioProcess* analogInput{ nullptr };
-			ctoot::audio::server::IOAudioProcess* digitalInput{ nullptr };
-			ctoot::audio::server::IOAudioProcess* input{ nullptr };
-			ctoot::audio::server::IOAudioProcess* inputSwap{ nullptr };
-//            boost::circular_buffer<float> preRecBufferL{};
-//            boost::circular_buffer<float> preRecBufferR{};
-			std::shared_ptr<MonitorOutput> monitorOutput{};
-			std::vector<std::shared_ptr<Sound>> sounds{};
-			std::vector<std::shared_ptr<Program>> programs{};
-			int soundSortingType{};
-			std::vector<std::string> padNames{};
-			std::vector<std::string> abcd{};
-			std::vector<float> clickSample{};
-			std::shared_ptr<Sound> clickSound{};
-			//std::shared_ptr<Sound> previewSound{};
-			std::vector<std::string> sortNames{};
-			bool armed{};
-			float peakL{};
-			float peakR{};
-			float levelL{};
-			float levelR{};
-			mpc::Mpc* mpc{ nullptr };
+	public:
+		int getInputLevel();
+		void setInputLevel(int i);
 
-		public:
-			int getInputLevel();
-			void setInputLevel(int i);
+	public:
+		void finishBasicVoice();
+		void init();
+		void playMetronome(mpc::sequencer::NoteEvent* event, int framePos);
+		void playPreviewSample(int start, int end, int loopTo, int overlapMode);
+		int getProgramCount();
+		weak_ptr<Program> addProgram();
+		weak_ptr<Program> addProgram(int i);
+		void replaceProgram(weak_ptr<Program> p, int index);
+		void deleteProgram(weak_ptr<Program> program);
+		void deleteAllPrograms(bool init);
+		void checkProgramReferences();
+		vector<weak_ptr<Sound>> getSounds();
+		weak_ptr<Sound> addSound();
+		weak_ptr<Sound> addSound(int sampleRate);
+		int getSoundCount();
+		string getSoundName(int i);
+		string getPadName(int i);
+		vector<weak_ptr<Program>> getPrograms();
+		vector<float>* getClickSample();
+		void deleteSound(weak_ptr<Sound> sound);
+		void setLoopEnabled(int sampleIndex, bool b);
+		void trimSample(int sampleNumber, int start, int end);
+		void deleteSection(const unsigned int sampleNumber, const unsigned int start, const unsigned int end);
+		void sort();
 
-		public:
-			void work(int nFrames) override;
-			void setEnabled(bool b) override;
-			void setSampleRate(int rate);
+	private:
+		void trimSample(weak_ptr<Sound>, int start, int end);
 
-		public:
-			void silenceRecordBuffer();
-			void finishBasicVoice();
-			void init();
-			void playMetronome(mpc::sequencer::NoteEvent* event, int framePos);
-			void playPreviewSample(int start, int end, int loopTo, int overlapMode);
-			int getProgramCount();
-			std::weak_ptr<Program> addProgram();
-			std::weak_ptr<Program> addProgram(int i);
-			void replaceProgram(std::weak_ptr<Program> p, int index);
-			void deleteProgram(std::weak_ptr<Program> program);
-			void deleteAllPrograms(bool init);
-			void checkProgramReferences();
-			std::vector<std::weak_ptr<Sound>> getSounds();
-			std::weak_ptr<Sound> addSound();
-			std::weak_ptr<Sound> addSound(int sampleRate);
-			int getSoundCount();
-			std::string getSoundName(int i);
-			std::string getPadName(int i);
-			std::vector<std::weak_ptr<Program>> getPrograms();
-			std::vector<float>* getClickSample();
-			void deleteSound(std::weak_ptr<Sound> sound);
-			void setLoopEnabled(int sampleIndex, bool b);
-			void trimSample(int sampleNumber, int start, int end);
-			void deleteSection(const unsigned int sampleNumber, const unsigned int start, const unsigned int end);
-			void sort();
+	private:
+		static bool compareMemoryIndex(weak_ptr<Sound> a, weak_ptr<Sound> b);
+		static bool compareName(weak_ptr<Sound> a, weak_ptr<Sound> b);
+		static bool compareSize(weak_ptr<Sound> a, weak_ptr<Sound> b);
 
-		private:
-			void trimSample(std::weak_ptr<Sound>, int start, int end);
+	public:
+		void deleteSample(int sampleIndex);
+		void deleteAllSamples();
+		void process12Bit(vector<float>* fa);
+		void process8Bit(vector<float>* fa);
+		void resample(vector<float>*, int srcRate, vector<float>* dest, int destRate);
+		weak_ptr<Sound> createZone(weak_ptr<Sound> source, int start, int end, int endMargin);
+		void stopAllVoices();
+		void stopAllVoices(int frameOffset);
+		void playX(int playXMode, vector<int>* zone);
+		int getFreeSampleSpace();
 
-		private:
-			static bool memIndexCmp(std::weak_ptr<Sound> a, std::weak_ptr<Sound> b);
-			static bool nameCmp(std::weak_ptr<Sound> a, std::weak_ptr<Sound> b);
-			static bool sizeCmp(std::weak_ptr<Sound> a, std::weak_ptr<Sound> b);
+	private:
+		int getLastInt(string s);
+		string addOrIncreaseNumber2(string s);
 
-		public:
-			void deleteSample(int sampleIndex);
-			void deleteAllSamples();
-			void process12Bit(std::vector<float>* fa);
-			void process8Bit(std::vector<float>* fa);
-			void resample(std::vector<float>*, int srcRate, std::vector<float>* dest, int destRate);
-			std::weak_ptr<Sound> createZone(std::weak_ptr<Sound> source, int start, int end, int endMargin);
-			void stopAllVoices();
-			void stopAllVoices(int frameOffset);
-			void playX(int playXMode, std::vector<int>* zone);
-			int getFreeSampleSpace();
+	public:
+		string addOrIncreaseNumber(string s);
+		Pad* getLastPad(Program* program);
+		NoteParameters* getLastNp(Program* program);
+		int getUnusedSampleAmount();
+		void purge();
+		static vector<float> mergeToStereo(vector<float> fa0, vector<float> fa1);
+		void mergeToStereo(vector<float>* sourceLeft, vector<float>* sourceRight, vector<float>* dest);
+		void setDrumBusProgramNumber(int busNumber, int programNumber);
+		int getDrumBusProgramNumber(int busNumber);
+		ctoot::mpc::MpcSoundPlayerChannel* getDrum(int i);
 
-		private:
-			int getLastInt(std::string s);
-			std::string addOrIncreaseNumber2(std::string s);
+	public:
+		int getUsedProgram(int startIndex, bool up);
 
-		public:
-			std::string addOrIncreaseNumber(std::string s);
-			Pad* getLastPad(Program* program);
-			NoteParameters* getLastNp(Program* program);
-			int getUnusedSampleAmount();
-			void purge();
-			static std::vector<float> mergeToStereo(std::vector<float> fa0, std::vector<float> fa1);
-			void mergeToStereo(std::vector<float>* sourceLeft, std::vector<float>* sourceRight, std::vector<float>* dest);
-			void setDrumBusProgramNumber(int busNumber, int programNumber);
-			int getDrumBusProgramNumber(int busNumber);
-			ctoot::mpc::MpcSoundPlayerChannel* getDrum(int i);
+	private:
+		void setSampleBackground();
 
-			void arm();
-			void stopRecordingEarlier();
+	public:
+		int checkExists(string soundName);
+		int getNextSoundIndex(int j, bool up);
+		void setSoundGuiPrevSound();
+		void setSoundGuiNextSound();
+		vector<weak_ptr<ctoot::mpc::MpcStereoMixerChannel>> getDrumStereoMixerChannels(int i);
+		vector<weak_ptr<ctoot::mpc::MpcIndivFxMixerChannel>> getDrumIndivFxMixerChannels(int i);
+		weak_ptr<Sound> copySound(weak_ptr<Sound> source);
 
-		public:
-			int getUsedProgram(int startIndex, bool up);
-
-		private:
-			void record();
-			void stopRecording();
-			void stopRecordingBasic();
+	public:
+		vector<int>* getInitMasterPadAssign();
+		vector<int>* getMasterPadAssign();
+		void setMasterPadAssign(vector<int> v);
+		vector<int>* getAutoChromaticAssign();
 
 
-			/*
-			* Implement ctoot::audio::system::AudioDevice
-			*/
-		public:
-			std::string getName() override;
-			std::vector<std::weak_ptr<ctoot::audio::system::AudioInput>> getAudioInputs() override;
-			std::vector<std::weak_ptr<ctoot::audio::system::AudioOutput>> getAudioOutputs() override;
-			void closeAudio() override;
+	public:
+		Sampler(mpc::Mpc* mpc);
+		~Sampler();
 
-		public:
-			int getPeakL();
-			int getPeakR();
-			int getLevelL();
-			int getLevelR();
-			void resetPeak();
-			bool isArmed();
-			bool isRecording();
-			void unArm();
-			void cancelRecording();
-
-		private:
-			void setSampleBackground();
-
-		public:
-			int checkExists(std::string soundName);
-			int getNextSoundIndex(int j, bool up);
-			void setSoundGuiPrevSound();
-			void setSoundGuiNextSound();
-			std::vector<std::weak_ptr<ctoot::mpc::MpcStereoMixerChannel>> getDrumStereoMixerChannels(int i);
-			std::vector<std::weak_ptr<ctoot::mpc::MpcIndivFxMixerChannel>> getDrumIndivFxMixerChannels(int i);
-			std::weak_ptr<Sound> copySound(std::weak_ptr<Sound> source);
-			void setActiveInput(ctoot::audio::server::IOAudioProcess* input);
-
-		public:
-			std::vector<int>* getInitMasterPadAssign();
-			std::vector<int>* getMasterPadAssign();
-			void setMasterPadAssign(std::vector<int> v);
-			std::vector<int>* getAutoChromaticAssign();
-
-
-		public:
-			Sampler(mpc::Mpc* mpc);
-			~Sampler();
-
-		private:
-			friend class MonitorOutput;
-
-		};
-
-	}
+	};
 }

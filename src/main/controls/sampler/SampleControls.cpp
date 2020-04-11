@@ -14,22 +14,22 @@ SampleControls::SampleControls(mpc::Mpc* mpc)
 }
 
 void SampleControls::left() {
-	if (sampler.lock()->isArmed() || sampler.lock()->isRecording()) return;
+	//if (sampler.lock()->isArmed() || sampler.lock()->isRecording()) return;
 	super::left();
 }
 
 void SampleControls::right() {
-	if (sampler.lock()->isArmed() || sampler.lock()->isRecording()) return;
+	//if (sampler.lock()->isArmed() || sampler.lock()->isRecording()) return;
 	super::right();
 }
 
 void SampleControls::up() {
-	if (sampler.lock()->isArmed() || sampler.lock()->isRecording()) return;
+	//if (sampler.lock()->isArmed() || sampler.lock()->isRecording()) return;
 	super::up();
 }
 
 void SampleControls::down() {
-	if (sampler.lock()->isArmed() || sampler.lock()->isRecording()) return;
+	//if (sampler.lock()->isArmed() || sampler.lock()->isRecording()) return;
 	super::down();
 }
 
@@ -39,28 +39,28 @@ void SampleControls::function(int i)
 	auto lSampler = sampler.lock();
 	switch (i) {
 	case 0:
-		if (!lSampler->isRecording() && !lSampler->isArmed())
-			lSampler->resetPeak();
+		//if (!lSampler->isRecording() && !lSampler->isArmed())
+			//lSampler->resetPeak();
 		break;
 	case 4:
-		if (lSampler->isRecording()) {
-			lSampler->cancelRecording();
-			return;
-		}
-		if (lSampler->isArmed()) {
-			lSampler->unArm();
-			return;
-		}
+		//if (lSampler->isRecording()) {
+		//	lSampler->cancelRecording();
+		//	return;
+		//}
+		//if (lSampler->isArmed()) {
+		//	lSampler->unArm();
+		//	return;
+		//}
 		break;
 	case 5:
-		if (!lSampler->isRecording()) {
-			lSampler->arm();
-			return;
-		}
-		if (lSampler->isRecording()) {
-			lSampler->stopRecordingEarlier();
-			return;
-		}
+		//if (!lSampler->isRecording()) {
+			//lSampler->arm();
+			//return;
+		//}
+		//if (lSampler->isRecording()) {
+			//lSampler->stopRecordingEarlier();
+			//return;
+		//}
 		break;
 	}
 }
@@ -69,7 +69,8 @@ void SampleControls::turnWheel(int i)
 {
     init();
 	auto lSampler = sampler.lock();
-    if(!lSampler->isRecording() && !lSampler->isArmed()) {
+    /*
+	if(!lSampler->isRecording() && !lSampler->isArmed()) {
         if(param.compare("input") == 0) {
             auto oldInput = samplerGui->getInput();
             samplerGui->setInput(samplerGui->getInput() + i);
@@ -93,4 +94,5 @@ void SampleControls::turnWheel(int i)
 			samplerGui->setPreRec(samplerGui->getPreRec() + i);
 		}
     }
+	*/
 }

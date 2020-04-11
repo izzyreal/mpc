@@ -1,8 +1,4 @@
 #pragma once
-#include <vector>
-#include <string>
-#include <thread>
-#include <memory>
 
 #include <lcdgui/LayeredScreen.hpp>
 #include <ui/Uis.hpp>
@@ -10,55 +6,57 @@
 #include <disk/ProgramLoader.hpp>
 #include "DiskController.hpp"
 
-namespace ctoot {
-	namespace mpc {
-		class MpcSoundPlayerChannel;
-		class MpcBasicSoundPlayerChannel;
-		class MpcMultiMidiSynth;
-	}
+#include <vector>
+#include <string>
+#include <thread>
+#include <memory>
+
+namespace ctoot::mpc {
+	class MpcSoundPlayerChannel;
+	class MpcBasicSoundPlayerChannel;
+	class MpcMultiMidiSynth;
+}
+
+namespace mpc::ui {
+	class UserDefaults;
+	class Uis;
+}
+
+namespace mpc::hardware {
+	class Hardware;
+}
+
+namespace mpc::disk {
+	class Stores;
+	class AbstractDisk;
+}
+
+namespace mpc::controls {
+	class Controls;
+	class AbstractControls;
+	class GlobalReleaseControls;
+}
+
+namespace mpc::lcdgui {
+	class LayeredScreen;
+}
+
+namespace mpc::audiomidi {
+	class EventHandler;
+	class AudioMidiServices;
+	class MpcMidiInput;
+	class MpcMidiPorts;
+}
+
+namespace mpc::sequencer {
+	class Sequencer;
+}
+
+namespace mpc::sampler {
+	class Sampler;
 }
 
 namespace mpc {
-
-	namespace ui {
-		class UserDefaults;
-		class Uis;
-	}
-
-	namespace hardware {
-		class Hardware;
-	}
-
-	namespace disk {
-		class Stores;
-		class AbstractDisk;
-	}
-
-	namespace controls {
-		class Controls;
-		class AbstractControls;
-		class GlobalReleaseControls;
-	}
-
-	namespace lcdgui {
-		class LayeredScreen;
-	}
-
-	namespace audiomidi {
-		class EventHandler;
-		class AudioMidiServices;
-		class MpcMidiInput;
-		class MpcMidiPorts;
-	}
-
-	namespace sequencer {
-		class Sequencer;
-	}
-
-	namespace sampler {
-		class Sampler;
-	}
-
 	class Mpc
 	{
 
@@ -67,7 +65,7 @@ namespace mpc {
 		std::unique_ptr<mpc::disk::ProgramLoader> programLoader{};
 
 	private:
-		std::shared_ptr<ui::Uis> uis;
+		std::shared_ptr<mpc::ui::Uis> uis;
 		std::shared_ptr<lcdgui::LayeredScreen> layeredScreen;
 		std::shared_ptr<controls::Controls> controls;
 
@@ -133,5 +131,4 @@ namespace mpc {
 		static std::vector<std::string> akaiAscii;
 
 	};
-
 }

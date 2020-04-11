@@ -118,5 +118,5 @@ void mpc::controls::vmpc::AudioControls::function(int i)
 	}
 }
 
-AudioControls::~AudioControls() {
+mpc::controls::vmpc::AudioControls::~AudioControls() {
 }

@@ -1,26 +1,23 @@
 #pragma once
-#include <controls/vmpc/AbstractVmpcControls.hpp>
 
-namespace mpc {
-	namespace controls {
-		namespace vmpc {
+#include "AbstractVmpcControls.hpp"
 
-			class AudioControls
-				: public AbstractVmpcControls
-			{
+namespace mpc::controls::vmpc {
 
-			public:
-				typedef AbstractVmpcControls super;
-				void openWindow() override;
-				void turnWheel(int i) override;
-				void function(int i) override;
+	class AudioControls
+		: public AbstractVmpcControls
+	{
 
-			public:
-				AudioControls(mpc::Mpc* mpc);
-				~AudioControls();
+	public:
+		typedef AbstractVmpcControls super;
+		void openWindow() override;
+		void turnWheel(int i) override;
+		void function(int i) override;
 
-			};
+	public:
+		AudioControls(mpc::Mpc* mpc);
+		~AudioControls();
 
-		}
-	}
+	};
 }
+

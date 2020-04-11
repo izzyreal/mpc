@@ -1,9 +1,11 @@
 #pragma once
-#include <observer/Observable.hpp>
+
 #include <Mpc.hpp>
+#include <sequencer/FrameSeq.hpp>
+#include "SamplerAudioIO.hpp"
+
 #include <audio/server/AudioServer.hpp>
 #include <audio/mixer/AudioMixer.hpp>
-#include <sequencer/FrameSeq.hpp>
 
 #include <observer/Observable.hpp>
 
@@ -11,131 +13,125 @@
 #include <memory>
 #include <atomic>
 
-namespace ctoot {
-
-	namespace mpc {
-		class MpcMixerControls;
-		class MpcMultiMidiSynth;
-		class MpcMultiSynthControls;
-		class MpcVoice;
-	}
-
-	namespace audio {
-
-		namespace core {
-			class AudioFormat;
-		}
-
-		namespace server {
-			class NonRealTimeAudioServer;
-			class CompoundAudioClient;
-			class ExternalAudioServer;
-			class UnrealAudioServer;
-		}
-
-		namespace system {
-			class DefaultAudioSystem;
-		}
-	}
-
-	namespace midi {
-		namespace core {
-			class DefaultConnectedMidiSystem;
-		}
-	}
-
-	namespace synth {
-		class SynthRack;
-		class SynthRackControls;
-		class SynthChannelControls;
-	}
+namespace ctoot::mpc {
+	class MpcMixerControls;
+	class MpcMultiMidiSynth;
+	class MpcMultiSynthControls;
+	class MpcVoice;
 }
 
-namespace mpc {
+namespace ctoot::audio::core {
+	class AudioFormat;
+}
 
-	namespace audiomidi {
+namespace ctoot::audio::server {
+	class NonRealTimeAudioServer;
+	class CompoundAudioClient;
+	class ExternalAudioServer;
+	class UnrealAudioServer;
+}
 
-		class MpcMidiPorts;
-		class DirectToDiskSettings;
-		class ExportAudioProcessAdapter;
+namespace ctoot::audio::system {
+	class DefaultAudioSystem;
+}
 
-		class AudioMidiServices final
-			: public moduru::observer::Observable
-		{
+namespace ctoot::midi::core {
+	class DefaultConnectedMidiSystem;
+}
 
-		private:
-			bool bouncePrepared{ false };
-			std::atomic<bool> bouncing = ATOMIC_VAR_INIT(false);
+namespace ctoot::synth {
+	class SynthRack;
+	class SynthRackControls;
+	class SynthChannelControls;
+}
 
-			std::vector<std::shared_ptr<ctoot::mpc::MpcVoice>> voices;
-			std::shared_ptr<ctoot::mpc::MpcVoice> basicVoice;
-			std::vector<std::shared_ptr<ctoot::synth::SynthChannelControls>> synthChannelControls;
-			std::shared_ptr<ctoot::audio::server::AudioServer> server;
-			std::shared_ptr<ctoot::audio::server::NonRealTimeAudioServer> offlineServer;
-			std::shared_ptr<ctoot::audio::system::DefaultAudioSystem> audioSystem;
-			std::shared_ptr<ctoot::midi::core::DefaultConnectedMidiSystem> midiSystem;
-			std::shared_ptr<ctoot::audio::mixer::AudioMixer> mixer;
-			std::shared_ptr<ctoot::synth::SynthRackControls> synthRackControls;
-			std::shared_ptr<ctoot::synth::SynthRack> synthRack;
-			std::shared_ptr<ctoot::mpc::MpcMultiSynthControls> msc;
-			std::shared_ptr<ctoot::mpc::MpcMixerControls> mixerControls;
-			std::weak_ptr<ctoot::mpc::MpcMultiMidiSynth> mms;
-			std::shared_ptr<ctoot::audio::server::CompoundAudioClient> cac;
-			std::shared_ptr<MpcMidiPorts> mpcMidiPorts;
-			Mpc* mpc{ nullptr };
-			std::vector<ctoot::audio::server::IOAudioProcess*> inputProcesses;
-			std::vector<ctoot::audio::server::IOAudioProcess*> outputProcesses;
-			std::shared_ptr<mpc::sequencer::FrameSeq> frameSeq;
-			std::vector<int> oldPrograms;
 
-		public:
-			std::vector<std::shared_ptr<ExportAudioProcessAdapter>> exportProcesses;
-			ctoot::audio::server::ExternalAudioServer* getExternalAudioServer();
+namespace mpc::audiomidi {
+	class MpcMidiPorts;
+	class DirectToDiskSettings;
+	class ExportAudioProcessAdapter;
+}
 
-		private:
-			void destroySynth();
-			void destroyDiskWriter();
-			void setupMidi();
-			void setupMixer();
-			void setAssignableMixOutLevels();
-			void createSynth();
+using namespace mpc::audiomidi;
 
-			void setupFX();
+namespace mpc::audiomidi {
+	class AudioMidiServices final
+		: public moduru::observer::Observable
+	{
 
-		public:
-			std::weak_ptr<ctoot::audio::server::AudioServer> getAudioServer();
-			ctoot::audio::server::NonRealTimeAudioServer* getOfflineServer();
-			void setMasterLevel(int i);
-			int getMasterLevel();
-			void setRecordLevel(int i);
-			int getRecordLevel();
-			std::vector<std::string> getInputNames();
-			std::vector<std::string> getOutputNames();
-			std::weak_ptr<ctoot::mpc::MpcMultiMidiSynth> getMms();
-			void initializeDiskWriter();
-			void closeIO();
+	private:
+		bool bouncePrepared{ false };
+		atomic<bool> bouncing = ATOMIC_VAR_INIT(false);
+		// Whenever we're in the "Sample" screen, we're sampling, regardless of whether we're recording
+		atomic<bool> sampling = ATOMIC_VAR_INIT(false);
 
-		public:
-			void connectVoices();
-			std::weak_ptr<MpcMidiPorts> getMidiPorts();
-			void destroyServices();
-			void prepareBouncing(DirectToDiskSettings* settings);
-			void startBouncing();
-			void stopBouncing();
-			std::weak_ptr<mpc::sequencer::FrameSeq> getFrameSequencer();
-			bool isBouncePrepared();
-			const bool isBouncing();
-			ctoot::audio::server::IOAudioProcess* getAudioInput(int input);
-			int getBufferSize();
+		vector<shared_ptr<ctoot::mpc::MpcVoice>> voices;
+		shared_ptr<ctoot::mpc::MpcVoice> basicVoice;
+		vector<shared_ptr<ctoot::synth::SynthChannelControls>> synthChannelControls;
+		shared_ptr<ctoot::audio::server::AudioServer> server;
+		shared_ptr<ctoot::audio::server::NonRealTimeAudioServer> offlineServer;
+		shared_ptr<ctoot::audio::system::DefaultAudioSystem> audioSystem;
+		shared_ptr<ctoot::midi::core::DefaultConnectedMidiSystem> midiSystem;
+		shared_ptr<ctoot::audio::mixer::AudioMixer> mixer;
+		shared_ptr<ctoot::synth::SynthRackControls> synthRackControls;
+		shared_ptr<ctoot::synth::SynthRack> synthRack;
+		shared_ptr<ctoot::mpc::MpcMultiSynthControls> msc;
+		shared_ptr<ctoot::mpc::MpcMixerControls> mixerControls;
+		weak_ptr<ctoot::mpc::MpcMultiMidiSynth> mms;
+		shared_ptr<ctoot::audio::server::CompoundAudioClient> cac;
+		shared_ptr<MpcMidiPorts> mpcMidiPorts;
+		Mpc* mpc{ nullptr };
+		vector<ctoot::audio::server::IOAudioProcess*> inputProcesses;
+		vector<ctoot::audio::server::IOAudioProcess*> outputProcesses;
+		shared_ptr<mpc::sequencer::FrameSeq> frameSeq;
+		vector<int> oldPrograms;
 
-		public:
-			void start(const int sampleRate, const int inputCount, const int outputCount);
+	public:
+		vector<shared_ptr<ExportAudioProcessAdapter>> exportProcesses;
+		ctoot::audio::server::ExternalAudioServer* getExternalAudioServer();
 
-		public:
-			AudioMidiServices(Mpc* mpc);
-			~AudioMidiServices();
+	private:
+		void destroySynth();
+		void destroyDiskWriter();
+		void setupMidi();
+		void setupMixer();
+		void setAssignableMixOutLevels();
+		void createSynth();
 
-		};
+		void setupFX();
 
-	}
+	public:
+		weak_ptr<ctoot::audio::server::AudioServer> getAudioServer();
+		ctoot::audio::server::NonRealTimeAudioServer* getOfflineServer();
+		void setMasterLevel(int i);
+		int getMasterLevel();
+		void setRecordLevel(int i);
+		int getRecordLevel();
+		vector<string> getInputNames();
+		vector<string> getOutputNames();
+		weak_ptr<ctoot::mpc::MpcMultiMidiSynth> getMms();
+		void initializeDiskWriter();
+		void closeIO();
+
+	public:
+		void connectVoices();
+		weak_ptr<MpcMidiPorts> getMidiPorts();
+		void destroyServices();
+		void prepareBouncing(DirectToDiskSettings* settings);
+		void startBouncing();
+		void stopBouncing();
+		weak_ptr<mpc::sequencer::FrameSeq> getFrameSequencer();
+		bool isBouncePrepared();
+		const bool isBouncing();
+		ctoot::audio::server::IOAudioProcess* getAudioInput(int input);
+		int getBufferSize();
+
+	public:
+		void start(const int sampleRate, const int inputCount, const int outputCount);
+
+	public:
+		AudioMidiServices(Mpc* mpc);
+		~AudioMidiServices();
+
+	};
 }

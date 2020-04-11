@@ -13,14 +13,12 @@
 #include <sampler/NoteParameters.hpp>
 #include <sampler/Pad.hpp>
 #include <sampler/Program.hpp>
-#include <sampler/MonitorOutput.hpp>
 #include <sampler/Sound.hpp>
 #include <sequencer/NoteEvent.hpp>
 #include <sequencer/Sequencer.hpp>
 #include <sequencer/Track.hpp>
 #include <sequencer/Sequence.hpp>
-#include <audio/core/ChannelFormat.hpp>
-#include <audio/server/IOAudioProcess.hpp>
+
 #include <synth/SynthChannel.hpp>
 
 #include <mpc/MpcBasicSoundPlayerChannel.hpp>
@@ -40,24 +38,13 @@ using namespace std;
 Sampler::Sampler(mpc::Mpc* mpc)
 {
 	this->mpc = mpc;
-	vuCounter = 0;
-	vuBufferL = vector<float>(VU_BUFFER_SIZE);
-	vuBufferR = vector<float>(VU_BUFFER_SIZE);
 	soundSortingType = 0;
 	abcd = vector<string>{ "A", "B", "C", "D" };
 	sortNames = vector<string>{ "MEMORY", "NAME", "SIZE" };
-	monitorOutput = make_shared<MonitorOutput>(mpc);
 	auto ud = mpc::StartUp::getUserDefaults().lock();
 	initMasterPadAssign = ud->getPadNotes();
 
 	programs = vector<shared_ptr<Program>>(24);
-}
-
-void Sampler::setSampleRate(int rate) {
-	sampleRate = rate;
-	recordBuffer = make_unique<ctoot::audio::core::AudioBuffer>("record", 2, 8192*4, rate);
-//    preRecBufferL = boost::circular_buffer<float>(rate / 10);
-//    preRecBufferR = boost::circular_buffer<float>(rate / 10);
 }
 
 void Sampler::setInputLevel(int i) {
@@ -79,8 +66,6 @@ vector<weak_ptr<ctoot::mpc::MpcIndivFxMixerChannel>> Sampler::getDrumIndivFxMixe
 	return mpc->getDrums()[i]->getIndivFxMixerChannels();
 }
 
-const int Sampler::VU_BUFFER_SIZE;
-
 vector<int>* Sampler::getInitMasterPadAssign()
 {
 	return &initMasterPadAssign;
@@ -100,77 +85,10 @@ vector<int>* Sampler::getAutoChromaticAssign()
 	return &autoChromaticAssign;
 }
 
-void Sampler::work(int nFrames)
-{
-	if (input == nullptr && inputSwap == nullptr) return;
-	auto ls = mpc->getLayeredScreen().lock();
-	if (!ls) return;
-	if (ls->getCurrentScreenName().compare("sample") != 0) return;
-
-	auto arm = false;
-	if (inputSwap != nullptr) {
-		input = inputSwap;
-		inputSwap = nullptr;
-	}
-	if (recordBuffer->getSampleCount() != nFrames) recordBuffer->changeSampleCount(nFrames, false);
-	input->processAudio(recordBuffer.get());
-	monitorBufferL = recordBuffer->getChannel(0);
-	monitorBufferR = recordBuffer->getChannel(1);
-	for (int i = 0; i < nFrames; i++) {
-		monitorBufferL->at(i) *= inputLevel / 100.0;
-		monitorBufferR->at(i) *= inputLevel / 100.0;
-		if (armed && abs(monitorBufferL->at(i)) >(mpc->getUis().lock()->getSamplerGui()->getThreshold() + 64) / 64.0) arm = true;
-
-		if (recording) {
-			recordBufferL[recordFrame] = (*monitorBufferL)[i];
-			recordBufferR[recordFrame++] = (*monitorBufferR)[i];
-			if (recordFrame == recordBufferL.size()) stopRecording();
-		}
-		else {
-//            preRecBufferL.push_back((*monitorBufferL)[i]);
-//            preRecBufferR.push_back((*monitorBufferR)[i]);
-		}
-
-		if (monitorBufferL->at(i) > 0 && vuCounter++ == 5) {
-			vuCounter = 0;
-			if (monitorBufferL->at(i) > peakL)
-				peakL = monitorBufferL->at(i);
-
-			if (monitorBufferR->at(i) > peakR)
-				peakR = monitorBufferR->at(i);
-
-			vuBufferL[vuSampleCounter] = monitorBufferL->at(i) < 0.01 ? 0 : monitorBufferL->at(i);
-			vuBufferR[vuSampleCounter++] = monitorBufferR->at(i) < 0.01 ? 0 : monitorBufferR->at(i);
-			if (vuSampleCounter == VU_BUFFER_SIZE) {
-				vuSampleCounter = 0;
-				float highestl = 0;
-
-				for (auto fl : vuBufferL) if (fl > highestl) highestl = fl;
-
-				float highestr = 0;
-				for (auto fl : vuBufferR) if (fl > highestr) highestr = fl;
-
-				levelL = highestl;
-				levelR = highestr;
-				mpc->getUis().lock()->getSamplerGui()->notify("vumeter");
-				vuBufferL.clear();
-				vuBufferR.clear();
-			}
-		}
-	}
-
-	if (arm) {
-		arm = false;
-		armed = false;
-		record();
-	}
-}
-
 void Sampler::init()
 {
 	auto program = addProgram().lock();;
 	program->setName("NewPgm-A");
-	//program->initPadAssign();
 	for (int i = 0; i < 4; i++) {
 		for (auto j = 0; j < 16; j++) {
 			string result = "";
@@ -200,14 +118,15 @@ void Sampler::playMetronome(mpc::sequencer::NoteEvent* event, int framePos)
 		auto accent = event->getVelocity() == swGui->getAccentVelo();
 		soundNumber = programs[program]->getNoteParameters(accent ? swGui->getAccentNote() : swGui->getNormalNote())->getSndNumber();
 	}
-	MLOG("Trying to play metronome with velocity " + to_string(event->getVelocity()) + " and framePos " + to_string(framePos));
-	//MLOG("soundNumber " + to_string(soundNumber));
 	mpc->getBasicPlayer()->mpcNoteOn(soundNumber, event->getVelocity(), framePos);
 }
 
 void Sampler::playPreviewSample(int start, int end, int loopTo, int overlapMode)
 {
-	if (sounds.size() == 0) return;
+	if (sounds.size() == 0) {
+		return;
+	}
+
 	auto previewSound = sounds[sounds.size() - 1];
 	auto oldStart = previewSound->getStart();
 	auto oldEnd = previewSound->getEnd();
@@ -424,13 +343,13 @@ void Sampler::sort()
 	if (soundSortingType > 2) soundSortingType = 0;
 	switch (soundSortingType) {
 	case 0:
-		stable_sort(sounds.begin(), sounds.end(), memIndexCmp);
+		stable_sort(sounds.begin(), sounds.end(), compareMemoryIndex);
 		break;
 	case 1:
-		stable_sort(sounds.begin(), sounds.end(), nameCmp);
+		stable_sort(sounds.begin(), sounds.end(), compareName);
 		break;
 	case 2:
-		stable_sort(sounds.begin(), sounds.end(), sizeCmp);
+		stable_sort(sounds.begin(), sounds.end(), compareSize);
 		break;
 	}
 	for (int i = 0; i < sounds.size(); i++) {
@@ -740,7 +659,7 @@ void Sampler::deleteSound(weak_ptr<Sound> sound) {
 		}
 	}
 
-	stable_sort(sounds.begin(), sounds.end(), memIndexCmp);
+	stable_sort(sounds.begin(), sounds.end(), compareMemoryIndex);
 
 	for (int i = 0; i < sounds.size(); i++) {
 		sounds[i]->setMemoryIndex(i);
@@ -748,41 +667,20 @@ void Sampler::deleteSound(weak_ptr<Sound> sound) {
 
 	switch (soundSortingType) {
 	case 0:
-		stable_sort(sounds.begin(), sounds.end(), memIndexCmp);
+		stable_sort(sounds.begin(), sounds.end(), compareMemoryIndex);
 		break;
 	case 1:
-		stable_sort(sounds.begin(), sounds.end(), nameCmp);
+		stable_sort(sounds.begin(), sounds.end(), compareName);
 		break;
 	case 2:
-		stable_sort(sounds.begin(), sounds.end(), sizeCmp);
+		stable_sort(sounds.begin(), sounds.end(), compareSize);
 		break;
 	}
 }
 
 vector<float> Sampler::mergeToStereo(vector<float> fa0, vector<float> fa1)
 {
-	/*
-	int newSampleLength = fa0.size() * 2;
-	if (fa1.size() > fa0.size()) {
-	newSampleLength = fa1.size() * 2;
-	}
-	auto newSampleData = vector<float>(newSampleLength);
-	int k = 0;
-	for (int i = 0; i < newSampleLength; i = i + 2) {
-	if (fa0.size() > k) {
-	newSampleData[i] = fa0[k];
-	}
-	else {
-	newSampleData[i] = 0.0f;
-	}
-	if (fa1.size() > k) {
-	newSampleData[i + 1] = fa1[k++];
-	}
-	else {
-	newSampleData[i + 1] = 0.0f;
-	}
-	}*/
-	int newLengthFrames = fa0.size() > fa1.size() ? fa0.size() : fa1.size();
+	const int newLengthFrames = fa0.size() > fa1.size() ? fa0.size() : fa1.size();
 	vector<float> newSampleData = vector<float>(newLengthFrames * 2);
 	for (int i = 0; i < newLengthFrames; i++) {
 		if (i < fa0.size()) {
@@ -839,41 +737,6 @@ weak_ptr<ctoot::mpc::MpcSound> Sampler::getClickSound()
 	return clickSound;
 }
 
-void Sampler::arm()
-{
-	if (recording) return;
-
-	if (armed) {
-		armed = false;
-		record();
-		return;
-	}
-	mpc->getLayeredScreen().lock()->getCurrentBackground()->setName("waitingforinputsignal");
-	auto components = mpc->getLayeredScreen().lock()->getLayer(0)->getAllLabelsAndFields();
-	for (auto& c : components) {
-		c.lock()->SetDirty();
-	}
-	mpc->getLayeredScreen().lock()->getFunctionKeys()->SetDirty();
-	armed = true;
-}
-
-void Sampler::record()
-{
-	int recSize = 0;
-	auto samplerGui = mpc->getUis().lock()->getSamplerGui();
-	recSize = samplerGui->getTime() * (sampleRate/10);
-	mpc->getLayeredScreen().lock()->getCurrentBackground()->setName("recording");
-	auto components = mpc->getLayeredScreen().lock()->getLayer(0)->getAllLabelsAndFields();
-	for (auto& c : components) {
-		c.lock()->SetDirty();
-	}
-	mpc->getLayeredScreen().lock()->getFunctionKeys()->SetDirty();
-	recordBufferL = vector<float>(recSize);
-	recordBufferR = vector<float>(recSize);
-	recordFrame = 0;
-	recording = true;
-}
-
 void Sampler::resample(std::vector<float>* src, int srcRate, std::vector<float>* dest, int destRate) {
 
 	float* srcArray = &(*src)[0];
@@ -905,156 +768,6 @@ void Sampler::resample(std::vector<float>* src, int srcRate, std::vector<float>*
 	}
 }
 
-void Sampler::stopRecordingEarlier()
-{
-	stopRecordingBasic();
-	auto s = getPreviewSound().lock();
-        auto stopFrameIndex = (floor)(recordFrame) * (44100.0 / sampleRate);
-//    auto stopFrameIndex = (floor)(recordFrame + preRecBufferL.size()) * (44100.0 / sampleRate);
-	int newSize = s->isMono() ? stopFrameIndex : stopFrameIndex * 2;
-	auto sampleData = s->getSampleData();
-	sampleData->resize(newSize);
-	mpc->getLayeredScreen().lock()->openScreen("keeporretry");
-}
-
-void Sampler::stopRecording()
-{
-	stopRecordingBasic();
-	mpc->getLayeredScreen().lock()->openScreen("keeporretry");
-}
-
-void Sampler::stopRecordingBasic()
-{
-	auto samplerGui = mpc->getUis().lock()->getSamplerGui();
-	auto counter = 0;
-	auto s = addSound().lock();
-	s->setName(addOrIncreaseNumber("sound"));
-//    auto sampleDataL = vector<float>(preRecBufferL.size() + recordBufferL.size());
-//    auto sampleDataR = vector<float>(preRecBufferR.size() + recordBufferR.size());
-    auto sampleDataL = vector<float>(recordBufferL.size());
-	auto sampleDataR = vector<float>(recordBufferR.size());
-    auto preRecCounter = 0;
-//    for (float f : preRecBufferL) {
-//        while (preRecCounter != (sampleRate/10) - (samplerGui->getPreRec() * (sampleRate/1000.0))) {
-//            preRecCounter++;
-//        }
-//        sampleDataL[counter++] = f;
-//    }
-	for (auto f : recordBufferL) {
-		sampleDataL[counter++] = f;
-	}
-	counter = 0;
-	preRecCounter = 0;
-//    for (float f : preRecBufferR) {
-//        while (preRecCounter != (sampleRate/10) - (samplerGui->getPreRec() * (sampleRate/1000.0))) {
-//            preRecCounter++;
-//        }
-//
-//        sampleDataR[counter++] = f;
-//    }
-	for (auto f : recordBufferR)
-		sampleDataR[counter++] = f;
-	auto mode = samplerGui->getMode();
-	auto data = s->getSampleData();
-	data->clear();
-	if (mode == 2) {
-		data->resize(sampleDataL.size() * 2);
-		for (int i = 0; i < sampleDataL.size(); i++) {
-			(*data)[i] = sampleDataL[i];
-			(*data)[i + sampleDataL.size()] = sampleDataR[i];
-		}
-		s->setMono(false);
-	}
-	else {
-		data->resize(sampleDataL.size());
-		auto src = mode == 0 ? &sampleDataL : &sampleDataR;
-		for (int i = 0; i < src->size(); i++)
-			(*data)[i] = (*src)[i];
-		s->setMono(true);
-	}
-
-	vector<float> resampled;
-	resample(s->getSampleData(), sampleRate, &resampled, 44100.0);
-	s->getSampleData()->swap(resampled);
-	int lastFrameIndex = s->isMono() ? s->getSampleData()->size() : s->getSampleData()->size() / 2;
-	s->setEnd(lastFrameIndex + 1);
-
-	recording = false;
-}
-
-void Sampler::setEnabled(bool enabled)
-{
-}
-
-string Sampler::getName()
-{
-	return "sampler";
-}
-
-vector<weak_ptr<ctoot::audio::system::AudioInput>> Sampler::getAudioInputs()
-{
-	return {};
-}
-
-vector<weak_ptr<ctoot::audio::system::AudioOutput>> Sampler::getAudioOutputs()
-{
-	return vector<weak_ptr<ctoot::audio::system::AudioOutput>>{ monitorOutput };
-}
-
-void Sampler::closeAudio()
-{
-	monitorOutput->close();
-}
-
-int Sampler::getPeakL()
-{
-	return (int)(peakL * 34.0);
-}
-
-int Sampler::getPeakR()
-{
-	return (int)(peakR * 34.0);
-}
-
-int Sampler::getLevelL()
-{
-	return (int)(levelL * 34.0);
-}
-
-int Sampler::getLevelR()
-{
-	return (int)(levelR * 34.0);
-}
-
-void Sampler::resetPeak()
-{
-	peakL = 0;
-	peakR = 0;
-	setChanged();
-	notifyObservers(string("vumeter"));
-}
-
-bool Sampler::isArmed()
-{
-	return armed;
-}
-
-bool Sampler::isRecording()
-{
-	return recording;
-}
-
-void Sampler::unArm()
-{
-	armed = false;
-	setSampleBackground();
-}
-
-void Sampler::cancelRecording()
-{
-	recording = false;
-	setSampleBackground();
-}
 
 void Sampler::setSampleBackground()
 {
@@ -1112,30 +825,15 @@ weak_ptr<Sound> Sampler::copySound(weak_ptr<Sound> source)
 	return newSound;
 }
 
-void Sampler::setActiveInput(ctoot::audio::server::IOAudioProcess* input)
-{
-	this->input = nullptr;
-	monitorBufferL = nullptr;
-	monitorBufferR = nullptr;
-	inputSwap = input;
-}
-
-void Sampler::silenceRecordBuffer() {
-	recordBuffer->makeSilence();
-	levelL = 0;
-	levelR = 0;
-	resetPeak();
-}
-
-bool Sampler::memIndexCmp(weak_ptr<Sound> a, weak_ptr<Sound> b) {
+bool Sampler::compareMemoryIndex(weak_ptr<Sound> a, weak_ptr<Sound> b) {
 	return a.lock()->getMemoryIndex() < b.lock()->getMemoryIndex();
 }
 
-bool Sampler::nameCmp(weak_ptr<Sound> a, weak_ptr<Sound> b) {
+bool Sampler::compareName(weak_ptr<Sound> a, weak_ptr<Sound> b) {
 	return a.lock()->getName() < b.lock()->getName();
 }
 
-bool Sampler::sizeCmp(weak_ptr<Sound> a, weak_ptr<Sound> b) {
+bool Sampler::compareSize(weak_ptr<Sound> a, weak_ptr<Sound> b) {
 	return a.lock()->getLastFrameIndex() < b.lock()->getLastFrameIndex();
 }
 

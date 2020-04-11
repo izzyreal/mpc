@@ -83,8 +83,10 @@
 #include <string>
 
 using namespace mpc::audiomidi;
+
 using namespace ctoot::audio::server;
 using namespace ctoot::audio::core;
+
 using namespace std;
 
 AudioMidiServices::AudioMidiServices(mpc::Mpc* mpc)
@@ -135,25 +137,15 @@ void AudioMidiServices::start(const int sampleRate, const int inputCount, const 
 	mpcMidiPorts->setMidiIn2(-1);
 	mpcMidiPorts->setMidiOutA(-1);
 	mpcMidiPorts->setMidiOutB(-1);
-	auto sampler = mpc->getSampler().lock();
-	if (inputProcesses.size() >= 1) {
-		sampler->setActiveInput(inputProcesses[mpc->getUis().lock()->getSamplerGui()->getInput()]);
-		mixer->getStrip("66").lock()->setInputProcess(sampler->getAudioOutputs()[0]);
-	}
+
 	initializeDiskWriter();
+
 	cac = make_shared<CompoundAudioClient>();
 	cac->add(frameSeq.get());
 	cac->add(mixer.get());
-	//cac->add(midiSystem.get());
-
-	// TODO Should be set when sample rate changes
-	sampler->setSampleRate(sampleRate);
-
-	cac->add(sampler.get());
 	
 	offlineServer->setWeakPtr(offlineServer);
 	offlineServer->setClient(cac);
-	offlineServer->resizeBuffers(8192*4);
 	offlineServer->start();
 }
 
@@ -204,7 +196,7 @@ void AudioMidiServices::setupMixer()
 }
 
 void AudioMidiServices::setupFX() {
-	auto acs = mixer->getMixerControls().lock()->getStripControls("FX#1").lock();
+	//auto acs = mixer->getMixerControls().lock()->getStripControls("FX#1").lock();
 	//acs->insert("ctoot::audio::reverb::BarrControls", "Main");
 	//acs->insert("class ctoot::audio::delay::WowFlutterControls", "Main");
 	//acs->insert("class ctoot::audio::delay::ModulatedDelayControls", "Main");
@@ -319,7 +311,6 @@ void AudioMidiServices::destroyServices()
 	offlineServer->stop();
 	cac.reset();
 	destroyDiskWriter();
-	mpc->getSampler().lock()->setActiveInput(nullptr);
 	mixer->getStrip("66").lock()->setInputProcess(weak_ptr<AudioProcess>());
 	mpcMidiPorts->close();
 	mpcMidiPorts.reset();
@@ -380,7 +371,7 @@ void AudioMidiServices::closeIO()
 
 void AudioMidiServices::prepareBouncing(DirectToDiskSettings* settings)
 {
-	auto indivFileNames = std::vector<string>{ "L-R.wav", "1-2.wav", "3-4.wav", "5-6.wav", "7-8.wav" };
+	auto indivFileNames = vector<string>{ "L-R.wav", "1-2.wav", "3-4.wav", "5-6.wav", "7-8.wav" };
 	string sep = moduru::file::FileUtil::getSeparator();
 	for (int i = 0; i < exportProcesses.size(); i++) {
 		auto eapa = exportProcesses[i];
