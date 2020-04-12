@@ -2,7 +2,6 @@
 
 #include <Mpc.hpp>
 #include <sequencer/FrameSeq.hpp>
-#include "SamplerAudioIO.hpp"
 
 #include <audio/mixer/AudioMixer.hpp>
 
@@ -47,7 +46,8 @@ namespace ctoot::synth {
 namespace mpc::audiomidi {
 	class MpcMidiPorts;
 	class DirectToDiskSettings;
-	class ExportAudioProcessAdapter;
+	class DiskRecorder;
+	class SoundRecorder;
 }
 
 using namespace mpc::audiomidi;
@@ -65,10 +65,13 @@ namespace mpc::audiomidi {
 	public:
 		const bool isBouncing();
 		const bool isSampling();
+		void startBouncing();
+		void stopBouncing();
+		void startSampling();
+		void stopSampling();
 
 	private:
 		bool bouncePrepared = false;
-		shared_ptr<SamplerAudioIO> samplerAudioIO;
 		vector<shared_ptr<ctoot::mpc::MpcVoice>> voices;
 		shared_ptr<ctoot::mpc::MpcVoice> basicVoice;
 		vector<shared_ptr<ctoot::synth::SynthChannelControls>> synthChannelControls;
@@ -85,11 +88,12 @@ namespace mpc::audiomidi {
 		shared_ptr<ctoot::audio::server::CompoundAudioClient> cac;
 		shared_ptr<MpcMidiPorts> mpcMidiPorts;
 		Mpc* mpc{ nullptr };
-		vector<ctoot::audio::server::IOAudioProcess*> inputProcesses;
+		vector<shared_ptr<ctoot::audio::server::IOAudioProcess>> inputProcesses;
 		vector<ctoot::audio::server::IOAudioProcess*> outputProcesses;
 		shared_ptr<mpc::sequencer::FrameSeq> frameSeq;
 		vector<int> oldPrograms;
-		vector<shared_ptr<ExportAudioProcessAdapter>> exportProcesses;
+		vector<shared_ptr<DiskRecorder>> diskRecorders;
+		shared_ptr<SoundRecorder> soundRecorder;
 
 	private:
 		void destroySynth();
@@ -101,14 +105,14 @@ namespace mpc::audiomidi {
 
 	public:
 		ctoot::audio::server::NonRealTimeAudioServer* getAudioServer();
-		vector<weak_ptr<ExportAudioProcessAdapter>> getExportProcesses();
-		weak_ptr<SamplerAudioIO> getSamplerAudioIO();
+		vector<weak_ptr<DiskRecorder>> getDiskRecorders();
+		weak_ptr<SoundRecorder> getSoundRecorder();
 		void setMasterLevel(int i);
 		int getMasterLevel();
 		void setRecordLevel(int i);
 		int getRecordLevel();
 		weak_ptr<ctoot::mpc::MpcMultiMidiSynth> getMms();
-		void initializeDiskWriter();
+		void initializeDiskRecorders();
 		void closeIO();
 
 	public:
@@ -116,11 +120,8 @@ namespace mpc::audiomidi {
 		weak_ptr<MpcMidiPorts> getMidiPorts();
 		void destroyServices();
 		void prepareBouncing(DirectToDiskSettings* settings);
-		void startBouncing();
-		void stopBouncing();
 		weak_ptr<mpc::sequencer::FrameSeq> getFrameSequencer();
 		bool isBouncePrepared();
-		ctoot::audio::server::IOAudioProcess* getAudioInput(int input);
 
 	public:
 		void start(const int sampleRate, const int inputCount, const int outputCount);

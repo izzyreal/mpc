@@ -140,8 +140,9 @@ int SamplerGui::getThreshold()
 
 void SamplerGui::setThreshold(int i)
 {
-    if(i < -int (64) || i > 0)
+    if (i < -64 || i > 0) {
         return;
+    }
 
     threshold = i;
     setChanged();
@@ -155,8 +156,9 @@ int SamplerGui::getMode()
 
 void SamplerGui::setMode(int i)
 {
-    if(i < 0 || i > 2)
+    if (i < 0 || i > 2) {
         return;
+    }
 
     mode = i;
     setChanged();

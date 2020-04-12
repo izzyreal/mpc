@@ -328,18 +328,9 @@ void AbstractControls::numpad(int i)
 
 	auto lSequencer = sequencer.lock();
 	auto lDisk = mpc->getDisk().lock();
+
 	if (controls->isShiftPressed()) {
-		auto lAms = mpc->getAudioMidiServices().lock();
-		//auto audioGui = mpc->getUis().lock()->getAudioGui();
 		switch (i) {
-		case 0:
-			//if (!lAms->isDisabled()) {
-				//audioGui->setServer(lAms->getServerIndex());
-				//audioGui->setInputDevs(lAms->getSelectedInputs());
-				//audioGui->setOutputDevs(lAms->getSelectedOutputs());
-			//}
-			ls.lock()->openScreen("audio");
-			return;
 		case 1:
 			if (lSequencer->isPlaying()) return;
 			ls.lock()->openScreen("song");
@@ -361,6 +352,7 @@ void AbstractControls::numpad(int i)
 			return;
 		case 4:
 			if (lSequencer->isPlaying()) return;
+			mpc->getAudioMidiServices().lock()->startSampling();
 			ls.lock()->openScreen("sample");
 			return;
 		case 5:
@@ -540,6 +532,10 @@ void AbstractControls::playStart()
 void AbstractControls::mainScreen()
 {
     init();
+	auto ams = mpc->getAudioMidiServices().lock();
+	if (ams->isSampling()) {
+		ams->stopSampling();
+	}
 	ls.lock()->openScreen("sequencer");
 	auto lSequencer = sequencer.lock();
     lSequencer->setSoloEnabled(lSequencer->isSoloEnabled());

@@ -10,13 +10,13 @@ using namespace std;
 Sound::Sound(int rate, int index) 
 {
 	this->memoryIndex = index;
-	msoc = new ctoot::mpc::MpcSoundOscillatorControls(memoryIndex, 0);
+	oscillatorControls = new ctoot::mpc::MpcSoundOscillatorControls(memoryIndex, 0);
 }
 
 Sound::Sound() 
 {
-	msoc = new ctoot::mpc::MpcSoundOscillatorControls(-1, 0);
-	msoc->setName("click");
+	oscillatorControls = new ctoot::mpc::MpcSoundOscillatorControls(-1, 0);
+	oscillatorControls->setName("click");
 }
 
 void Sound::setName(string s)
@@ -58,102 +58,102 @@ string Sound::getName()
 
 vector<float>* Sound::getSampleData()
 {
-    return msoc->getSampleData();
+    return oscillatorControls->getSampleData();
 }
 
 int Sound::getSndLevel()
 {
-    return msoc->getSndLevel();
+    return oscillatorControls->getSndLevel();
 }
 
 int Sound::getTune()
 {
-    return msoc->getTune();
+    return oscillatorControls->getTune();
 }
 
 int Sound::getStart()
 {
-    return msoc->getStart();
+    return oscillatorControls->getStart();
 }
 
 int Sound::getEnd()
 {
-    return msoc->getEnd();
+    return oscillatorControls->getEnd();
 }
 
 bool Sound::isLoopEnabled()
 {
-    return msoc->isLoopEnabled();
+    return oscillatorControls->isLoopEnabled();
 }
 
 int Sound::getLoopTo()
 {
-    return msoc->getLoopTo();
+    return oscillatorControls->getLoopTo();
 }
 
 bool Sound::isMono()
 {
-    return msoc->isMono();
+    return oscillatorControls->isMono();
 }
 
 int Sound::getSampleRate()
 {
-    return msoc->getSampleRate();
+    return oscillatorControls->getSampleRate();
 }
 
 void Sound::setSampleRate(int sr) {
-	msoc->setSampleRate(sr);
+	oscillatorControls->setSampleRate(sr);
 }
 
 int Sound::getLastFrameIndex()
 {
-    return msoc->getLastFrameIndex();
+    return oscillatorControls->getLastFrameIndex();
 }
 
 void Sound::setMono(bool mono)
 {
-    msoc->setMono(mono);
+    oscillatorControls->setMono(mono);
 }
 
 void Sound::setEnd(int end)
 {
-    msoc->setEnd(end);
+    oscillatorControls->setEnd(end);
 }
 
 void Sound::setLevel(int level)
 {
-    msoc->setSndLevel(level);
+    oscillatorControls->setSndLevel(level);
 }
 
 void Sound::setStart(int start)
 {
-    msoc->setStart(start);
+    oscillatorControls->setStart(start);
 }
 
 void Sound::setLoopEnabled(bool loopEnabled)
 {
-    msoc->setLoopEnabled(loopEnabled);
+    oscillatorControls->setLoopEnabled(loopEnabled);
 }
 
 void Sound::setLoopTo(int loopTo)
 {
-    msoc->setLoopTo(loopTo);
+    oscillatorControls->setLoopTo(loopTo);
 }
 
 void Sound::setTune(int tune)
 {
-    msoc->setTune(tune);
+    oscillatorControls->setTune(tune);
 }
 
-ctoot::mpc::MpcSoundOscillatorControls* Sound::getMsoc()
+ctoot::mpc::MpcSoundOscillatorControls* Sound::getOscillatorControls()
 {
-    return msoc;
+    return oscillatorControls;
 }
 
 void Sound::insertFrame(vector<float> frame, unsigned int index) {
-	msoc->insertFrame(frame, index);
+	oscillatorControls->insertFrame(frame, index);
 }
 
 Sound::~Sound() {
-	delete msoc;
+	delete oscillatorControls;
 }

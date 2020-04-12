@@ -29,9 +29,9 @@ ZoomObserver::ZoomObserver(mpc::Mpc* mpc)
 	sound = dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getSound(soundGui->getSoundIndex()).lock());
 ;	auto lSound = sound.lock();
 	lSound->deleteObservers();
-	lSound->getMsoc()->deleteObservers();
+	lSound->getOscillatorControls()->deleteObservers();
 	lSound->addObserver(this);
-	lSound->getMsoc()->addObserver(this);
+	lSound->getOscillatorControls()->addObserver(this);
 	twoDots = ls->getTwoDots();
 	twoDots.lock()->Hide(false);
 	twoDots.lock()->setVisible(0, false);
@@ -235,6 +235,6 @@ ZoomObserver::~ZoomObserver() {
 	soundGui->deleteObserver(this);
 	auto lSound = sound.lock();
 	lSound->deleteObserver(this);
-	lSound->getMsoc()->deleteObserver(this);
+	lSound->getOscillatorControls()->deleteObserver(this);
 	if (twoDots.lock()) twoDots.lock()->Hide(true);
 }

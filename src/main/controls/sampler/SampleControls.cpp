@@ -2,6 +2,8 @@
 
 #include <Mpc.hpp>
 #include <audiomidi/AudioMidiServices.hpp>
+#include <audiomidi/SoundRecorder.hpp>
+
 #include <ui/sampler/SamplerGui.hpp>
 #include <sampler/Sampler.hpp>
 
@@ -53,6 +55,10 @@ void SampleControls::function(int i)
 		//}
 		break;
 	case 5:
+		auto sound = lSampler->addSound();
+		sound.lock()->setName(lSampler->addOrIncreaseNumber("sound"));
+		auto lengthInFrames = samplerGui->getTime() * 44100;
+		mpc->getAudioMidiServices().lock()->getSoundRecorder().lock()->start(sound, lengthInFrames, samplerGui->getMode());
 		//if (!lSampler->isRecording()) {
 			//lSampler->arm();
 			//return;
@@ -69,14 +75,11 @@ void SampleControls::turnWheel(int i)
 {
     init();
 	auto lSampler = sampler.lock();
-    /*
-	if(!lSampler->isRecording() && !lSampler->isArmed()) {
-        if(param.compare("input") == 0) {
+
+	//if (!lSampler->isRecording() && !lSampler->isArmed()) {
+        if (param.compare("input") == 0) {
             auto oldInput = samplerGui->getInput();
             samplerGui->setInput(samplerGui->getInput() + i);
-            if(samplerGui->getInput() != oldInput) {
-                lSampler->setActiveInput(mpc->getAudioMidiServices().lock()->getAudioInput(samplerGui->getInput()));
-            }
         }
 		else if (param.compare("threshold") == 0) {
 			samplerGui->setThreshold(samplerGui->getThreshold() + i);
@@ -93,6 +96,5 @@ void SampleControls::turnWheel(int i)
 		else if (param.compare("prerec") == 0) {
 			samplerGui->setPreRec(samplerGui->getPreRec() + i);
 		}
-    }
-	*/
+    //}
 }

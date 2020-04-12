@@ -15,7 +15,7 @@ namespace mpc {
 			std::string name{ "" };
 			int memoryIndex{ -1 };
 			int numberOfBeats{ 4 };
-			ctoot::mpc::MpcSoundOscillatorControls* msoc{ nullptr };
+			ctoot::mpc::MpcSoundOscillatorControls* oscillatorControls{ nullptr };
 
 		public:
 			void setName(std::string s);
@@ -46,7 +46,7 @@ namespace mpc {
 			void setLoopEnabled(bool loopEnabled);
 			void setLoopTo(int loopTo);
 			void setTune(int tune);
-			ctoot::mpc::MpcSoundOscillatorControls* getMsoc();
+			ctoot::mpc::MpcSoundOscillatorControls* getOscillatorControls();
 			void insertFrame(std::vector<float> frame, unsigned int index);
 
 		public:

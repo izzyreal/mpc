@@ -35,7 +35,7 @@ ZoneObserver::ZoneObserver(mpc::Mpc* mpc)
 		sound = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound(soundGui->getSoundIndex()).lock());
 		auto lSound = sound.lock();
 		lSound->addObserver(this);
-		lSound->getMsoc()->addObserver(this);
+		lSound->getOscillatorControls()->addObserver(this);
 		waveformLoadData();
 	}
 	
@@ -82,11 +82,11 @@ void ZoneObserver::displaySnd()
 		if (ls->getFocus().compare("dummy") == 0) ls->setFocus(sndField.lock()->getName());
 		auto lSound = sound.lock();
 		lSound->deleteObserver(this);
-		lSound->getMsoc()->deleteObserver(this);
+		lSound->getOscillatorControls()->deleteObserver(this);
 		sound = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound(soundGui->getSoundIndex()).lock());
 		lSound = sound.lock();
 		lSound->addObserver(this);
-		lSound->getMsoc()->addObserver(this);
+		lSound->getOscillatorControls()->addObserver(this);
 		auto sampleName = lSound->getName();
 		if (!lSound->isMono()) {
 			sampleName = moduru::lang::StrUtil::padRight(sampleName, " ", 16) + "(ST)";
@@ -183,6 +183,6 @@ ZoneObserver::~ZoneObserver() {
 	auto lSound = sound.lock();
 	if (lSound) {
 		lSound->deleteObserver(this);
-		lSound->getMsoc()->deleteObserver(this);
+		lSound->getOscillatorControls()->deleteObserver(this);
 	}
 }

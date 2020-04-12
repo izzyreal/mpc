@@ -4,7 +4,8 @@
 #include <StartUp.hpp>
 #include <Mpc.hpp>
 #include <audiomidi/DirectToDiskSettings.hpp>
-#include <audiomidi/ExportAudioProcessAdapter.hpp>
+#include <audiomidi/DiskRecorder.hpp>
+#include <audiomidi/SoundRecorder.hpp>
 #include <audiomidi/MpcMidiPorts.hpp>
 #include <ui/sampler/SamplerGui.hpp>
 #include <ui/sampler/MixerSetupGui.hpp>
@@ -34,6 +35,7 @@
 #include <audio/mixer/AudioMixerStrip.hpp>
 #include <audio/mixer/MixerControlsFactory.hpp>
 #include <audio/mixer/MixerControls.hpp>
+#include <audio/mixer/MainMixControls.hpp>
 
 #include <audio/server/CompoundAudioClient.hpp>
 #include <audio/server/IOAudioProcess.hpp>
@@ -107,7 +109,7 @@ void AudioMidiServices::start(const int sampleRate, const int inputCount, const 
 
 	setupMixer();
 
-	inputProcesses = vector<IOAudioProcess*>(inputCount <= 1 ? inputCount : 1);
+	inputProcesses = vector<shared_ptr<IOAudioProcess>>(inputCount <= 1 ? inputCount : 1);
 	outputProcesses = vector<IOAudioProcess*>(outputCount <= 5 ? outputCount : 5);
 
 	for (auto& p : inputProcesses)
@@ -117,7 +119,7 @@ void AudioMidiServices::start(const int sampleRate, const int inputCount, const 
 		p = nullptr;
 
 	for (int i = 0; i < inputProcesses.size(); i++) {
-		inputProcesses[i] = server->openAudioInput(getInputNames()[i], "mpc_in" + to_string(i));
+		inputProcesses[i] = shared_ptr<IOAudioProcess>(server->openAudioInput(getInputNames()[i], "mpc_in" + to_string(i)));
 	}
 
 	for (int i = 0; i < outputProcesses.size(); i++) {
@@ -136,31 +138,34 @@ void AudioMidiServices::start(const int sampleRate, const int inputCount, const 
 
 	mpcMidiPorts = make_shared<MpcMidiPorts>();
 
-	initializeDiskWriter();
+	initializeDiskRecorders();
 
-	samplerAudioIO = make_shared<SamplerAudioIO>(mpc);
+	soundRecorder = make_shared<SoundRecorder>();
+	mixer->getStrip(string("66")).lock()->setDirectOutputProcess(soundRecorder);
 
 	cac = make_shared<CompoundAudioClient>();
 	cac->add(frameSeq.get());
 	cac->add(mixer.get());
-	cac->add(samplerAudioIO.get());
+
+	mixer->getStrip("66").lock()->setInputProcess(inputProcesses[0]);
 	
 	offlineServer->setWeakPtr(offlineServer);
 	offlineServer->setClient(cac);
+
 	offlineServer->start();
 }
 
-vector<weak_ptr<ExportAudioProcessAdapter>> AudioMidiServices::getExportProcesses()
+vector<weak_ptr<DiskRecorder>> AudioMidiServices::getDiskRecorders()
 {
-	vector <weak_ptr<ExportAudioProcessAdapter>> res;
-	for (auto& eapa : exportProcesses) {
-		res.push_back(eapa);
+	vector <weak_ptr<DiskRecorder>> res;
+	for (auto& diskRecorder : diskRecorders) {
+		res.push_back(diskRecorder);
 	}
 	return res;
 }
 
-weak_ptr<SamplerAudioIO> AudioMidiServices::getSamplerAudioIO() {
-	return samplerAudioIO;
+weak_ptr<SoundRecorder> AudioMidiServices::getSoundRecorder() {
+	return soundRecorder;
 }
 
 NonRealTimeAudioServer* AudioMidiServices::getAudioServer() {
@@ -187,7 +192,7 @@ void AudioMidiServices::setupMixer()
 	/*
 	* There are 32 voices. Each voice has one channel for mixing to STEREO OUT L/R, and one channel for mixing to an ASSIGNABLE MIX OUT. These are strips 1-64.
 	* There's one channel for the MpcBasicSoundPlayerChannel, which plays the metronome, preview and playX sounds. This is strip 65.
-	* Finally there's one channel to monitor sampler input. This is strip 66. Hence nMixerChans = 66;
+	* Finally there's one channel to receive and monitor sampler input. This is strip 66. Hence nMixerChans = 66;
 	*/
 	int nMixerChans = 66;
 	ctoot::audio::mixer::MixerControlsFactory::createChannelStrips(mixerControls, nMixerChans);
@@ -214,11 +219,15 @@ int AudioMidiServices::getMasterLevel() {
 }
 
 void AudioMidiServices::setRecordLevel(int i) {
-	mpc->getSampler().lock()->setInputLevel(i);
+	auto sc = mixer->getMixerControls().lock()->getStripControls("66").lock();
+	auto mmc = dynamic_pointer_cast<ctoot::audio::mixer::MainMixControls>(sc->find("Main").lock());
+	dynamic_pointer_cast<ctoot::audio::fader::FaderControl>(mmc->find("Level").lock())->setValue(static_cast<float>(i));
 }
 
 int AudioMidiServices::getRecordLevel() {
-	return mpc->getSampler().lock()->getInputLevel();
+	auto sc = mixer->getMixerControls().lock()->getStripControls("66").lock();
+	auto mmc = dynamic_pointer_cast<ctoot::audio::mixer::MainMixControls>(sc->find("Main").lock());
+	return static_cast<int>(dynamic_pointer_cast<ctoot::audio::fader::FaderControl>(mmc->find("Level").lock())->getValue());
 }
 
 void AudioMidiServices::setAssignableMixOutLevels()
@@ -281,17 +290,17 @@ weak_ptr<MpcMidiPorts> AudioMidiServices::getMidiPorts()
 	return mpcMidiPorts;
 }
 
-void AudioMidiServices::initializeDiskWriter()
+void AudioMidiServices::initializeDiskRecorders()
 {
 	for (int i = 0; i < outputProcesses.size(); i++) {
-		auto diskWriter = make_shared<ExportAudioProcessAdapter>(outputProcesses[i], "diskwriter" + to_string(i));
+		auto diskRecorder = make_shared<DiskRecorder>(outputProcesses[i], "diskwriter" + to_string(i));
 		if (i == 0) {
-			mixer->getMainStrip().lock()->setDirectOutputProcess(diskWriter);
+			mixer->getMainStrip().lock()->setDirectOutputProcess(diskRecorder);
 		}
 		else {
-			mixer->getStrip(string("AUX#" + to_string(i))).lock()->setDirectOutputProcess(diskWriter);
+			mixer->getStrip(string("AUX#" + to_string(i))).lock()->setDirectOutputProcess(diskRecorder);
 		}
-		exportProcesses.push_back(std::move(diskWriter));
+		diskRecorders.push_back(std::move(diskRecorder));
 	}
 }
 
@@ -317,11 +326,11 @@ void AudioMidiServices::destroySynth() {
 void AudioMidiServices::closeIO()
 {
 	for (auto j = 0; j < inputProcesses.size(); j++) {
-		if (inputProcesses[j] == nullptr) {
-			continue;
+		if (inputProcesses[j]) {
+			server->closeAudioInput(inputProcesses[j].get());
 		}
-		server->closeAudioInput(inputProcesses[j]);
 	}
+
 	for (auto j = 0; j < outputProcesses.size(); j++) {
 		if (outputProcesses[j] == nullptr) {
 			continue;
@@ -334,8 +343,8 @@ void AudioMidiServices::prepareBouncing(DirectToDiskSettings* settings)
 {
 	auto indivFileNames = vector<string>{ "L-R.wav", "1-2.wav", "3-4.wav", "5-6.wav", "7-8.wav" };
 	string sep = moduru::file::FileUtil::getSeparator();
-	for (int i = 0; i < exportProcesses.size(); i++) {
-		auto eapa = exportProcesses[i];
+	for (int i = 0; i < diskRecorders.size(); i++) {
+		auto eapa = diskRecorders[i];
 		auto absolutePath = mpc::StartUp::home + sep + "vMPC" + sep + "recordings" + sep + indivFileNames[i];
 		eapa->prepare(absolutePath, settings->lengthInFrames, settings->sampleRate);
 	}
@@ -362,6 +371,14 @@ void AudioMidiServices::stopBouncing()
 	bouncing.store(false);
 }
 
+void AudioMidiServices::startSampling() {
+	sampling.store(true);
+}
+
+void AudioMidiServices::stopSampling() {
+	sampling.store(false);
+}
+
 weak_ptr<mpc::sequencer::FrameSeq> AudioMidiServices::getFrameSequencer()
 {
 	return frameSeq;
@@ -379,11 +396,6 @@ const bool AudioMidiServices::isBouncing()
 
 const bool AudioMidiServices::isSampling() {
 	return sampling.load();
-}
-
-IOAudioProcess* AudioMidiServices::getAudioInput(int input)
-{
-	return inputProcesses[input];
 }
 
 AudioMidiServices::~AudioMidiServices() {
