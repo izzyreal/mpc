@@ -59,11 +59,16 @@ namespace mpc::audiomidi {
 	{
 
 	private:
-		bool bouncePrepared{ false };
 		atomic<bool> bouncing = ATOMIC_VAR_INIT(false);
-		// Whenever we're in the "Sample" screen, we're sampling, regardless of whether we're recording
 		atomic<bool> sampling = ATOMIC_VAR_INIT(false);
 
+	public:
+		const bool isBouncing();
+		const bool isSampling();
+
+	private:
+		bool bouncePrepared = false;
+		shared_ptr<SamplerAudioIO> samplerAudioIO;
 		vector<shared_ptr<ctoot::mpc::MpcVoice>> voices;
 		shared_ptr<ctoot::mpc::MpcVoice> basicVoice;
 		vector<shared_ptr<ctoot::synth::SynthChannelControls>> synthChannelControls;
@@ -84,29 +89,24 @@ namespace mpc::audiomidi {
 		vector<ctoot::audio::server::IOAudioProcess*> outputProcesses;
 		shared_ptr<mpc::sequencer::FrameSeq> frameSeq;
 		vector<int> oldPrograms;
-
-	private:
 		vector<shared_ptr<ExportAudioProcessAdapter>> exportProcesses;
 
 	private:
 		void destroySynth();
-		void destroyDiskWriter();
-		void setupMidi();
 		void setupMixer();
 		void setAssignableMixOutLevels();
 		void createSynth();
-
-		void setupFX();
+		vector<string> getInputNames();
+		vector<string> getOutputNames();
 
 	public:
 		ctoot::audio::server::NonRealTimeAudioServer* getAudioServer();
 		vector<weak_ptr<ExportAudioProcessAdapter>> getExportProcesses();
+		weak_ptr<SamplerAudioIO> getSamplerAudioIO();
 		void setMasterLevel(int i);
 		int getMasterLevel();
 		void setRecordLevel(int i);
 		int getRecordLevel();
-		vector<string> getInputNames();
-		vector<string> getOutputNames();
 		weak_ptr<ctoot::mpc::MpcMultiMidiSynth> getMms();
 		void initializeDiskWriter();
 		void closeIO();
@@ -120,9 +120,7 @@ namespace mpc::audiomidi {
 		void stopBouncing();
 		weak_ptr<mpc::sequencer::FrameSeq> getFrameSequencer();
 		bool isBouncePrepared();
-		const bool isBouncing();
 		ctoot::audio::server::IOAudioProcess* getAudioInput(int input);
-		int getBufferSize();
 
 	public:
 		void start(const int sampleRate, const int inputCount, const int outputCount);

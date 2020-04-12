@@ -11,9 +11,7 @@ namespace mpc {
 
 		namespace vmpc {
 			class DirectToDiskRecorderGui;
-			class AudioGui;
 			class DeviceGui;
-			class MidiGui;
 		}
 
 		namespace misc {
@@ -103,8 +101,6 @@ namespace mpc {
 			ui::misc::TransGui* transGui{ nullptr };
 
 			ui::vmpc::DeviceGui* deviceGui{ nullptr };
-			ui::vmpc::MidiGui* midiGui{ nullptr };
-			ui::vmpc::AudioGui* audioGui{ nullptr };
 			ui::vmpc::DirectToDiskRecorderGui* d2dRecorderGui{ nullptr };
 
 		public:
@@ -130,9 +126,8 @@ namespace mpc {
 			ui::sequencer::window::EraseGui* getEraseGui();
 
 			ui::other::OthersGui* getOthersGui();
+
 			ui::vmpc::DeviceGui* getDeviceGui();
-			ui::vmpc::AudioGui* getAudioGui();
-			ui::vmpc::MidiGui* getMidiGui();
 			ui::vmpc::DirectToDiskRecorderGui* getD2DRecorderGui();
 
 			ui::misc::TransGui* getTransGui();

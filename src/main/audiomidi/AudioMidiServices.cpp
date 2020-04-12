@@ -49,7 +49,6 @@
 #include <control/Control.hpp>
 
 #include <midi/core/MidiSystem.hpp>
-#include <midi/core/ConnectedMidiSystem.hpp>
 #include <midi/core/DefaultConnectedMidiSystem.hpp>
 
 #include <synth/MidiChannel.hpp>
@@ -101,7 +100,7 @@ AudioMidiServices::AudioMidiServices(mpc::Mpc* mpc)
 
 void AudioMidiServices::start(const int sampleRate, const int inputCount, const int outputCount) {
 
-	setupMidi();
+	midiSystem = make_shared<ctoot::midi::core::DefaultConnectedMidiSystem>();
 
 	server = make_shared<ExternalAudioServer>();
 	offlineServer = make_shared<NonRealTimeAudioServer>(server);
@@ -132,18 +131,19 @@ void AudioMidiServices::start(const int sampleRate, const int inputCount, const 
 			mpc->getDrum(i)->setProgram(oldPrograms[i]);
 		}
 	}
+	
 	connectVoices();
-	mpcMidiPorts = make_shared<MpcMidiPorts>(mpc);
-	mpcMidiPorts->setMidiIn1(-1);
-	mpcMidiPorts->setMidiIn2(-1);
-	mpcMidiPorts->setMidiOutA(-1);
-	mpcMidiPorts->setMidiOutB(-1);
+
+	mpcMidiPorts = make_shared<MpcMidiPorts>();
 
 	initializeDiskWriter();
+
+	samplerAudioIO = make_shared<SamplerAudioIO>(mpc);
 
 	cac = make_shared<CompoundAudioClient>();
 	cac->add(frameSeq.get());
 	cac->add(mixer.get());
+	cac->add(samplerAudioIO.get());
 	
 	offlineServer->setWeakPtr(offlineServer);
 	offlineServer->setClient(cac);
@@ -159,9 +159,8 @@ vector<weak_ptr<ExportAudioProcessAdapter>> AudioMidiServices::getExportProcesse
 	return res;
 }
 
-void AudioMidiServices::setupMidi()
-{
-	midiSystem = make_shared<ctoot::midi::core::DefaultConnectedMidiSystem>();
+weak_ptr<SamplerAudioIO> AudioMidiServices::getSamplerAudioIO() {
+	return samplerAudioIO;
 }
 
 NonRealTimeAudioServer* AudioMidiServices::getAudioServer() {
@@ -198,21 +197,6 @@ void AudioMidiServices::setupMixer()
 	setMasterLevel(nvram::NvRam::getMasterLevel());
 	setRecordLevel(nvram::NvRam::getRecordLevel());
 	setAssignableMixOutLevels();
-	setupFX();
-}
-
-void AudioMidiServices::setupFX() {
-	//auto acs = mixer->getMixerControls().lock()->getStripControls("FX#1").lock();
-	//acs->insert("ctoot::audio::reverb::BarrControls", "Main");
-	//acs->insert("class ctoot::audio::delay::WowFlutterControls", "Main");
-	//acs->insert("class ctoot::audio::delay::ModulatedDelayControls", "Main");
-	//acs->insert("class ctoot::audio::delay::MultiTapDelayStereoControls", "Main"); // doesn't seem to work at all
-	//acs->insert("class ctoot::audio::delay::TempoDelayControls", "Main");
-	//acs->insert("class ctoot::audio::delay::PhaserControls", "Main");
-	//acs->insert("class ctoot::audio::delay::CabMicingControls", "Main"); doesn't seem to work at all
-	//auto controls = AudioServices::getAvailableControls();
-	//MLOG("Available controls:");
-	//MLOG(controls);
 }
 
 void AudioMidiServices::setMasterLevel(int i)
@@ -313,27 +297,13 @@ void AudioMidiServices::initializeDiskWriter()
 
 void AudioMidiServices::destroyServices()
 {
-	MLOG("Trying to destroy services...");
 	offlineServer->stop();
-	cac.reset();
-	destroyDiskWriter();
-	mixer->getStrip("66").lock()->setInputProcess(weak_ptr<AudioProcess>());
-	mpcMidiPorts->close();
-	mpcMidiPorts.reset();
 	closeIO();
-	inputProcesses.clear();
-	outputProcesses.clear();
 	audioSystem->close();
-	audioSystem.reset();
 	destroySynth();
 	mixer->close();
-	mixer.reset();
-	mixerControls.reset();
 	offlineServer->close();
-	offlineServer.reset();
-	server.reset();
 	midiSystem->close();
-	midiSystem.reset();
 }
 
 void AudioMidiServices::destroySynth() {
@@ -341,22 +311,7 @@ void AudioMidiServices::destroySynth() {
 	for (int i = 0; i < 4; i++) {
 		oldPrograms[i] = mpc->getDrum(i)->getProgram();
 	}
-	for (auto& s : synthChannelControls) {
-		s.reset();
-	}
-	synthChannelControls.clear();
-	voices.clear();
-	basicVoice.reset();
-	msc.reset();
-
 	synthRack->close();
-	synthRack.reset();
-
-	synthRackControls.reset();
-}
-
-void AudioMidiServices::destroyDiskWriter() {
-	exportProcesses.clear();
 }
 
 void AudioMidiServices::closeIO()
@@ -422,14 +377,13 @@ const bool AudioMidiServices::isBouncing()
 	return bouncing.load();
 }
 
+const bool AudioMidiServices::isSampling() {
+	return sampling.load();
+}
+
 IOAudioProcess* AudioMidiServices::getAudioInput(int input)
 {
 	return inputProcesses[input];
-}
-
-int AudioMidiServices::getBufferSize()
-{
-	return server->getOutputLatencyFrames();
 }
 
 AudioMidiServices::~AudioMidiServices() {

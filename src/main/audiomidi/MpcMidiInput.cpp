@@ -11,7 +11,6 @@
 #include <ui/midisync/MidiSyncGui.hpp>
 #include <ui/sampler/SamplerGui.hpp>
 #include <ui/sequencer/window/SequencerWindowGui.hpp>
-#include <ui/vmpc/MidiGui.hpp>
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>
 #include <sequencer/Event.hpp>
@@ -20,6 +19,7 @@
 #include <sequencer/Track.hpp>
 #include <sequencer/NoteEvent.hpp>
 #include <sequencer/Sequencer.hpp>
+
 #include <midi/core/MidiMessage.hpp>
 #include <midi/core/ShortMessage.hpp>
 #include <midi/core/MidiInput.hpp>
@@ -37,7 +37,6 @@ MpcMidiInput::MpcMidiInput(int index, mpc::Mpc* mpc)
 	eventAdapter = make_unique<mpc::sequencer::EventAdapter>(sequencer);
 	msGui = mpc->getUis().lock()->getMidiSyncGui();
 	swGui = mpc->getUis().lock()->getSequencerWindowGui();
-	midiGui = mpc->getUis().lock()->getMidiGui();
 }
 
 string MpcMidiInput::getName()
@@ -173,34 +172,14 @@ void MpcMidiInput::midiOut(weak_ptr<mpc::sequencer::Event> e, mpc::sequencer::Tr
 		midiAdapter->process(event, channel, -1);
 		msg = midiAdapter->get().lock().get();
 	}
-	//ctoot::midi::core::MidiInput* r = nullptr;
 	auto mpcMidiPorts = mpc->getMidiPorts().lock();
-	try {
-		//r = (midiGui->getOutAReceiverIndex() == -1 || mpcMidiPorts->getReceivers().size() == 0) ? nullptr : mpcMidiPorts->getReceivers()[midiGui->getOutAReceiverIndex()];
-	}
-	catch (exception* e) {
-		string msg = "couldn't send midi";
-	}
+
 	notify_ = "a";
 	if (deviceNumber > 15) {
 		deviceNumber -= 16;
-		try {
-			//r = midiGui->getOutBReceiverIndex() == -1 ? nullptr : mpcMidiPorts->getReceivers()[midiGui->getOutBReceiverIndex()];
-		}
-		catch (exception* e) {
-			string msg = "couldn't send midi";
-		}
 		notify_ = "b";
 	}
-	/*
-	if (r != nullptr && track->getDevice() != 0) {
-		try {
-			r->transport(msg, -1);
-		}
-		catch (exception* e) {
-		}
-	}
-	*/
+
 	if (mpc->getLayeredScreen().lock()->getCurrentScreenName().compare("midioutputmonitor") == 0) {
 		setChanged();
 		notifyObservers(notify_ + to_string(deviceNumber));
@@ -210,8 +189,7 @@ void MpcMidiInput::midiOut(weak_ptr<mpc::sequencer::Event> e, mpc::sequencer::Tr
 void MpcMidiInput::transportOmni(ctoot::midi::core::MidiMessage* msg, string outputLetter)
 {
 	auto mpcMidiPorts = mpc->getMidiPorts().lock();
-	//auto r = dynamic_cast<ctoot::midi::core::MidiInput*>(mpcMidiPorts->getReceivers()[outputLetter.compare("a") == 0 ? midiGui->getOutAReceiverIndex() : midiGui->getOutBReceiverIndex()]);
-	//r->transport(msg, 0);
+
 	if (dynamic_cast<ctoot::midi::core::ShortMessage*>(msg) != nullptr) {
 		if (mpc->getLayeredScreen().lock()->getCurrentScreenName().compare("midioutputmonitor") == 0) {
 			setChanged();

@@ -74,10 +74,7 @@
 
 #include <ui/other/OthersObserver.hpp>
 
-#include <ui/vmpc/AudioObserver.hpp>
-#include <ui/vmpc/BufferSizeObserver.hpp>
 #include <ui/vmpc/DirectToDiskRecorderObserver.hpp>
-#include <ui/vmpc/MidiObserver.hpp>
 #include <ui/vmpc/VmpcDiskObserver.hpp>
 
 #include <file/FileUtil.hpp>
@@ -884,16 +881,7 @@ void LayeredScreen::initObserver()
 		activeObserver.reset();
 	}
 
-	if (csn.compare("audio") == 0) {
-		activeObserver = make_unique<AudioObserver>(mpc);
-	}
-	else if (csn.compare("buffersize") == 0) {
-		activeObserver = make_unique<BufferSizeObserver>(mpc);
-	}
-	else if (csn.compare("midi") == 0) {
-		activeObserver = make_unique<MidiObserver>(mpc);
-	}
-	else if (csn.compare("directtodiskrecorder") == 0) {
+	if (csn.compare("directtodiskrecorder") == 0) {
 		activeObserver = make_unique<DirectToDiskRecorderObserver>(mpc);
 	}
 	else if (csn.compare("disk") == 0) {

@@ -112,6 +112,7 @@ void SamplerAudioIO::work(int nFrames)
 
 void SamplerAudioIO::setEnabled(bool enabled)
 {
+	this->enabled = enabled;
 }
 
 string SamplerAudioIO::getName()

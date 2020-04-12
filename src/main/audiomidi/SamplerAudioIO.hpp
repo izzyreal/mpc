@@ -12,7 +12,6 @@
 #include <memory>
 #include <vector>
 #include <string>
-#include <atomic>
 
 using namespace ctoot::audio::server;
 using namespace ctoot::audio::system;
@@ -36,6 +35,7 @@ namespace mpc::audiomidi {
 
 	private:
 		shared_ptr<MonitorOutput> monitorOutput{};
+		bool enabled = false;
 
 	private:
 		void changeSampleRate(int newRate);

@@ -129,12 +129,7 @@
 #include <controls/mixer/FxEditControls.hpp>
 #include <controls/mixer/window/ChannelSettingsControls.hpp>
 
-#include <controls/vmpc/AudioControls.hpp>
-
-#include <controls/vmpc/AudioMidiDisabledControls.hpp>
-#include <controls/vmpc/BufferSizeControls.hpp>
 #include <controls/vmpc/DirectToDiskRecorderControls.hpp>
-#include <controls/vmpc/MidiControls.hpp>
 #include <controls/vmpc/RecordJamControls.hpp>
 #include <controls/vmpc/RecordingFinishedControls.hpp>
 #include <controls/vmpc/VmpcDiskControls.hpp>
@@ -292,10 +287,6 @@ Controls::Controls(mpc::Mpc* mpc)
 	controls["sync"] = new midisync::SyncControls(mpc);
 
 	controls["disk"] = new vmpc::VmpcDiskControls(mpc);
-	controls["midi"] = new vmpc::MidiControls(mpc);
-	controls["audio"] = new vmpc::AudioControls(mpc);
-	controls["buffersize"] = new vmpc::BufferSizeControls(mpc);
-	controls["audiomididisabled"] = new vmpc::AudioMidiDisabledControls(mpc);
 	controls["directtodiskrecorder"] = new vmpc::DirectToDiskRecorderControls(mpc);
 	controls["recordjam"] = new vmpc::RecordJamControls(mpc);
 	controls["recordingfinished"] = new vmpc::RecordingFinishedControls(mpc);

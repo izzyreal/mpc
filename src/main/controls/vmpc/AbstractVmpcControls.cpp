@@ -1,12 +1,9 @@
-#include <controls/vmpc/AbstractVmpcControls.hpp>
+#include "AbstractVmpcControls.hpp"
 
 #include <Mpc.hpp>
 #include <audiomidi/AudioMidiServices.hpp>
-//#include <audiomidi/MpcMidiPorts.hpp>
 #include <ui/midisync/MidiSyncGui.hpp>
-#include <ui/vmpc/AudioGui.hpp>
 #include <ui/vmpc/DirectToDiskRecorderGui.hpp>
-#include <ui/vmpc/MidiGui.hpp>
 #include <sequencer/Sequence.hpp>
 #include <sequencer/SeqUtil.hpp>
 #include <sequencer/Sequencer.hpp>
@@ -18,9 +15,6 @@ AbstractVmpcControls::AbstractVmpcControls(mpc::Mpc* mpc)
 	: AbstractControls(mpc)
 {
 	midiSyncGui = mpc->getUis().lock()->getMidiSyncGui();
-	//mpcMidiPorts = mpc->getMidiPorts().lock().get();
-	midiGui = mpc->getUis().lock()->getMidiGui();
-	audioGui = mpc->getUis().lock()->getAudioGui();
 	d2dRecorderGui = mpc->getUis().lock()->getD2DRecorderGui();
 	ams = mpc->getAudioMidiServices();
 }

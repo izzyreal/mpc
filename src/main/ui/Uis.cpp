@@ -35,10 +35,8 @@
 #include <ui/sampler/window/SamplerWindowGui.hpp>
 #include <ui/sampler/window/EditSoundGui.hpp>
 
-#include <ui/vmpc/AudioGui.hpp>
 #include <ui/vmpc/DeviceGui.hpp>
 #include <ui/vmpc/DirectToDiskRecorderGui.hpp>
-#include <ui/vmpc/MidiGui.hpp>
 
 using namespace mpc::ui;
 using namespace std;
@@ -96,8 +94,6 @@ Uis::Uis(mpc::Mpc* mpc)
 	secondSeqGui = new mpc::ui::misc::SecondSeqGui();
 
 	d2dRecorderGui = new mpc::ui::vmpc::DirectToDiskRecorderGui(mpc);
-	audioGui = new mpc::ui::vmpc::AudioGui(mpc->getAudioMidiServices());
-	midiGui = new mpc::ui::vmpc::MidiGui();
 	deviceGui = new mpc::ui::vmpc::DeviceGui();
 
 	othersGui = new mpc::ui::other::OthersGui(mpc);
@@ -215,16 +211,6 @@ mpc::ui::other::OthersGui* Uis::getOthersGui()
 	return othersGui;
 }
 
-mpc::ui::vmpc::AudioGui* Uis::getAudioGui()
-{
-	return audioGui;
-}
-
-mpc::ui::vmpc::MidiGui* Uis::getMidiGui()
-{
-	return midiGui;
-}
-
 mpc::ui::vmpc::DirectToDiskRecorderGui* Uis::getD2DRecorderGui()
 {
 	return d2dRecorderGui;
@@ -266,8 +252,6 @@ Uis::~Uis() {
 	if (mixerSetupGui != nullptr) delete mixerSetupGui;
 	if (eraseGui != nullptr) delete eraseGui;
 	if (punchGui != nullptr) delete punchGui;
-	if (midiGui != nullptr) delete midiGui;
-	if (audioGui != nullptr) delete audioGui;
 	if (d2dRecorderGui != nullptr) delete d2dRecorderGui;
 	if (transGui != nullptr) delete transGui;
 	if (secondSeqGui != nullptr) delete secondSeqGui;
