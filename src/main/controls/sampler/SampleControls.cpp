@@ -57,7 +57,7 @@ void SampleControls::function(int i)
 	case 5:
 		auto sound = lSampler->addSound();
 		sound.lock()->setName(lSampler->addOrIncreaseNumber("sound"));
-		auto lengthInFrames = samplerGui->getTime() * 44100;
+		auto lengthInFrames = samplerGui->getTime() * (44100 * 0.1);
 		mpc->getAudioMidiServices().lock()->getSoundRecorder().lock()->start(sound, lengthInFrames, samplerGui->getMode());
 		//if (!lSampler->isRecording()) {
 			//lSampler->arm();
