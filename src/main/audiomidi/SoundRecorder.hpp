@@ -4,6 +4,9 @@
 
 #include <sampler/Sound.hpp>
 
+#include <io/TSCircularBuffer.hpp>
+#include <thirdp/libsamplerate/samplerate.h>
+
 #include <memory>
 
 using namespace mpc::sampler;
@@ -27,6 +30,12 @@ namespace mpc::audiomidi {
 		int lengthInFrames = 0;
 		int mode = 0;
 		weak_ptr<Sound> sound;
+		circular_buffer<float> resampleBufferLeft = circular_buffer<float>(10000);
+		circular_buffer<float> resampleBufferRight = circular_buffer<float>(10000);
+		SRC_STATE* srcLeft = NULL;
+		SRC_STATE* srcRight = NULL;
+		int srcLeftError = 0;
+		int srcRightError = 0;
 
 	public:
 		void prepare(const weak_ptr<Sound>, int lengthInFrames, int mode);
@@ -35,6 +44,10 @@ namespace mpc::audiomidi {
 		int processAudio(ctoot::audio::core::AudioBuffer* buf) override;
 		void open() {};
 		void close() {};
+
+	private:
+		void initSrc();
+		vector<float> resampleChannel(bool left, vector<float>* input, int sourceSampleRate);
 
 	public:
 		SoundRecorder();
