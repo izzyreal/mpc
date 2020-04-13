@@ -2,7 +2,7 @@
 
 #include <Mpc.hpp>
 
-#include <controls/AbstractControls.hpp>
+#include <controls/BaseControls.hpp>
 
 #include <controls/GlobalReleaseControls.hpp>
 
@@ -396,7 +396,7 @@ void Controls::setF6Pressed(bool b) {
 	f6Pressed = b;
 }
 
-AbstractControls* Controls::getControls(std::string s)
+BaseControls* Controls::getControls(std::string s)
 {
 	return controls[s];
 }

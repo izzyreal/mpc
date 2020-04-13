@@ -1,5 +1,5 @@
 #pragma once
-#include <controls/AbstractControls.hpp>
+#include <controls/BaseControls.hpp>
 
 namespace mpc {
 
@@ -13,14 +13,14 @@ namespace mpc {
 		namespace other {
 
 			class OthersControls
-				: public mpc::controls::AbstractControls
+				: public mpc::controls::BaseControls
 			{
 
 			private:
 				mpc::ui::other::OthersGui* othersGui;
 
 			public:
-				typedef mpc::controls::AbstractControls super;
+				typedef mpc::controls::BaseControls super;
 				void function(int i) override;
 				void turnWheel(int i) override;
 

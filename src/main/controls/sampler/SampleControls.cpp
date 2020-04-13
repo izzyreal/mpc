@@ -55,10 +55,16 @@ void SampleControls::function(int i)
 		//}
 		break;
 	case 5:
+		auto ams = mpc->getAudioMidiServices().lock();
+		if (ams->isRecordingSound()) {
+			ams->stopSoundRecorder();
+			return;
+		}
 		auto sound = lSampler->addSound();
 		sound.lock()->setName(lSampler->addOrIncreaseNumber("sound"));
 		auto lengthInFrames = samplerGui->getTime() * (44100 * 0.1);
-		mpc->getAudioMidiServices().lock()->getSoundRecorder().lock()->start(sound, lengthInFrames, samplerGui->getMode());
+		ams->getSoundRecorder().lock()->prepare(sound, lengthInFrames, samplerGui->getMode());
+		ams->startRecordingSound();
 		//if (!lSampler->isRecording()) {
 			//lSampler->arm();
 			//return;

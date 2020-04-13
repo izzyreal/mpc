@@ -167,7 +167,7 @@ weak_ptr<lcdgui::LayeredScreen> Mpc::getLayeredScreen() {
 	return layeredScreen;
 }
 
-controls::AbstractControls* Mpc::getActiveControls() {
+controls::BaseControls* Mpc::getActiveControls() {
 	return controls->getControls(layeredScreen->getCurrentScreenName());
 }
 

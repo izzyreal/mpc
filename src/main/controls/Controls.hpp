@@ -11,7 +11,7 @@ namespace mpc {
 
 	namespace controls {
 
-		class AbstractControls;
+		class BaseControls;
 		class GlobalReleaseControls;
 
 		class Controls
@@ -67,10 +67,10 @@ namespace mpc {
 			std::vector<int>* getPressedPadVelos();
 
 		private:
-			std::unordered_map<std::string, controls::AbstractControls*> controls{};
+			std::unordered_map<std::string, controls::BaseControls*> controls{};
 
 		public:
-			mpc::controls::AbstractControls* getControls(std::string s);
+			mpc::controls::BaseControls* getControls(std::string s);
 			mpc::controls::GlobalReleaseControls* getReleaseControls();
 
 		public:

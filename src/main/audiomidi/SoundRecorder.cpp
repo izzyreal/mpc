@@ -16,7 +16,7 @@ SoundRecorder::SoundRecorder()
 
 
 // modes: 0 = MONO L, 1 = MONO R, 2 = STEREO
-void SoundRecorder::start(const weak_ptr<Sound> sound, int lengthInFrames, int mode)
+void SoundRecorder::prepare(const weak_ptr<Sound> sound, int lengthInFrames, int mode)
 {
 	this->sound = sound;
 	this->lengthInFrames = lengthInFrames;
@@ -25,9 +25,17 @@ void SoundRecorder::start(const weak_ptr<Sound> sound, int lengthInFrames, int m
 	if (mode != 2) {
 		sound.lock()->setMono(true);
 	}
-	
-	recordedFrameCount = 0;
+}
+
+// Should be called from the audio thread
+void SoundRecorder::start() {
 	recording = true;
+}
+
+void SoundRecorder::stop() {
+	recording = false;
+	auto s = sound.lock();
+	s->setEnd(s->getLastFrameIndex() + 1);
 }
 
 int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf)
@@ -63,7 +71,6 @@ int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf)
 			if (mode == 0 || mode == 2) {
 				s->getOscillatorControls()->insertFrames(trimmedLeft, currentLength);
 			}
-
 			recording = false;
 		}
 		return AUDIO_SILENCE;

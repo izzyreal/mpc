@@ -1,7 +1,7 @@
 #include "DataWheel.hpp"
 
 #include <Mpc.hpp>
-#include <controls/AbstractControls.hpp>
+#include <controls/BaseControls.hpp>
 #include <disk/AbstractDisk.hpp>
 
 using namespace mpc::hardware;

@@ -1,5 +1,5 @@
 #pragma once
-#include <controls/AbstractControls.hpp>
+#include <controls/BaseControls.hpp>
 
 namespace mpc {
 
@@ -24,11 +24,11 @@ namespace mpc {
 		namespace sampler {
 
 			class AbstractSamplerControls
-				: public mpc::controls::AbstractControls
+				: public mpc::controls::BaseControls
 			{
 
 			public:
-				typedef mpc::controls::AbstractControls super;
+				typedef mpc::controls::BaseControls super;
 
 			protected:
 				mpc::ui::sampler::window::ZoomGui* zoomGui{ nullptr };

@@ -7,7 +7,7 @@ namespace mpc {
 	class Mpc;
 
 	namespace controls {
-		class AbstractControls;
+		class BaseControls;
 	}
 
 	namespace hardware {
@@ -19,7 +19,7 @@ namespace mpc {
 		private:
 			mpc::Mpc* mpc;
 			int index;
-			std::weak_ptr<mpc::controls::AbstractControls> controls;
+			std::weak_ptr<mpc::controls::BaseControls> controls;
 
 		public:
 			int getIndex();

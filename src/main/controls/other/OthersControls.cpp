@@ -9,7 +9,7 @@ using namespace mpc::controls::other;
 using namespace std;
 
 OthersControls::OthersControls(mpc::Mpc* mpc) 
-	: AbstractControls(mpc)
+	: BaseControls(mpc)
 {
 	othersGui = mpc->getUis().lock()->getOthersGui();
 }

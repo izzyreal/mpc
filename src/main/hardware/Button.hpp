@@ -9,7 +9,7 @@ namespace mpc {
 	class Mpc;
 
 	namespace controls {
-		class AbstractControls;
+		class BaseControls;
 	}
 
 	namespace hardware {
@@ -21,7 +21,7 @@ namespace mpc {
 		private:
 			mpc::Mpc* mpc;
 			std::string label{ "" };
-			std::weak_ptr<mpc::controls::AbstractControls> controls;
+			std::weak_ptr<mpc::controls::BaseControls> controls;
 
 		public:
 			std::string getLabel();

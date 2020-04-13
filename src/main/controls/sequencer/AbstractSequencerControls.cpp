@@ -19,7 +19,7 @@ using namespace mpc::sequencer;
 using namespace std;
 
 AbstractSequencerControls::AbstractSequencerControls(mpc::Mpc* mpc)
-	: AbstractControls(mpc)
+	: BaseControls(mpc)
 {
 	swGui = mpc->getUis().lock()->getSequencerWindowGui();
 	seGui = mpc->getUis().lock()->getStepEditorGui();

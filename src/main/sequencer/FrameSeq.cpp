@@ -2,7 +2,7 @@
 
 #include <Mpc.hpp>
 #include <controls/Controls.hpp>
-#include <controls/AbstractControls.hpp>
+#include <controls/BaseControls.hpp>
 
 #include <sequencer/Sequencer.hpp>
 #include <sequencer/Clock.hpp>
@@ -16,7 +16,7 @@
 #include <ui/sequencer/SongGui.hpp>
 #include <ui/sequencer/window/SequencerWindowGui.hpp>
 
-//#include <controls/AbstractControls.hpp>
+//#include <controls/BaseControls.hpp>
 
 using namespace mpc::sequencer;
 using namespace std;

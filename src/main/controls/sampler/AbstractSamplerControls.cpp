@@ -25,7 +25,7 @@ using namespace mpc::controls::sampler;
 using namespace std;
 
 AbstractSamplerControls::AbstractSamplerControls(mpc::Mpc* mpc) 
-	: AbstractControls(mpc)
+	: BaseControls(mpc)
 {
 	splitInc = vector<int>{ 10000000, 1000000, 100000, 10000, 1000, 100, 10, 1 };
 	auto uis = mpc->getUis().lock();

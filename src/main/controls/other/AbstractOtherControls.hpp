@@ -1,5 +1,5 @@
 #pragma once
-#include <controls/AbstractControls.hpp>
+#include <controls/BaseControls.hpp>
 
 #include <memory>
 
@@ -29,11 +29,11 @@ namespace mpc {
 		namespace other {
 
 			class AbstractOtherControls
-				: public mpc::controls::AbstractControls
+				: public mpc::controls::BaseControls
 			{
 
 			public:
-				typedef mpc::controls::AbstractControls super;
+				typedef mpc::controls::BaseControls super;
 
 			protected:
 				mpc::ui::sequencer::window::SequencerWindowGui* swGui{ nullptr };

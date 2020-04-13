@@ -11,7 +11,7 @@ using namespace mpc::controls::misc;
 using namespace std;
 
 AbstractMiscControls::AbstractMiscControls(mpc::Mpc* mpc) 
-	: AbstractControls(mpc)
+	: BaseControls(mpc)
 {
 	punchGui = mpc->getUis().lock()->getPunchGui();
 	transGui = mpc->getUis().lock()->getTransGui();

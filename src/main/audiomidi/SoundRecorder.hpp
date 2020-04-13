@@ -29,7 +29,9 @@ namespace mpc::audiomidi {
 		weak_ptr<Sound> sound;
 
 	public:
-		void start(const weak_ptr<Sound>, int lengthInFrames, int mode);
+		void prepare(const weak_ptr<Sound>, int lengthInFrames, int mode);
+		void start();
+		void stop();
 		int processAudio(ctoot::audio::core::AudioBuffer* buf) override;
 		void open() {};
 		void close() {};

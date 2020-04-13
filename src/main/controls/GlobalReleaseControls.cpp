@@ -24,7 +24,7 @@ using namespace mpc::controls;
 using namespace std;
 
 GlobalReleaseControls::GlobalReleaseControls(mpc::Mpc* mpc)
-	: AbstractControls(mpc)
+	: BaseControls(mpc)
 {
 }
 

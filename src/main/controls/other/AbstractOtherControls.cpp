@@ -14,7 +14,7 @@ using namespace mpc::controls::other;
 using namespace std;
 
 AbstractOtherControls::AbstractOtherControls(mpc::Mpc* mpc) 
-	: AbstractControls(mpc)
+	: BaseControls(mpc)
 {
 	akaiAsciiChar = mpc::Mpc::akaiAsciiChar;
 	nameGui = mpc->getUis().lock()->getNameGui();

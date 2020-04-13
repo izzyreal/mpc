@@ -69,7 +69,7 @@ void SequencerControls::pressEnter()
 void SequencerControls::function(int i)
 {
 	init();
-	AbstractControls::function(i);
+	BaseControls::function(i);
 	auto seq = sequence.lock();
 	auto lSequencer = sequencer.lock();
 	auto lTrk = track.lock();

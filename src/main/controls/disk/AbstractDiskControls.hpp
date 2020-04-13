@@ -1,5 +1,5 @@
 #pragma once
-#include <controls/AbstractControls.hpp>
+#include <controls/BaseControls.hpp>
 
 #include <memory>
 
@@ -37,11 +37,11 @@ namespace mpc {
 		namespace disk {
 
 			class AbstractDiskControls
-				: public mpc::controls::AbstractControls
+				: public mpc::controls::BaseControls
 			{
 
 			public:
-				typedef mpc::controls::AbstractControls super;
+				typedef mpc::controls::BaseControls super;
 
 			protected:
 				mpc::ui::disk::window::DirectoryGui* directoryGui{ nullptr };

@@ -1,4 +1,4 @@
-#include "AbstractControls.hpp"
+#include "BaseControls.hpp"
 
 #include <Mpc.hpp>
 
@@ -49,7 +49,7 @@ using namespace mpc;
 using namespace mpc::controls;
 using namespace std;
 
-AbstractControls::AbstractControls(Mpc* mpc)
+BaseControls::BaseControls(Mpc* mpc)
 {
 	this->mpc = mpc;
 	sequencer = mpc->getSequencer();
@@ -60,7 +60,7 @@ AbstractControls::AbstractControls(Mpc* mpc)
 	samplerGui = mpc->getUis().lock()->getSamplerGui();
 }
 
-void AbstractControls::init()
+void BaseControls::init()
 {
 	csn = ls.lock()->getCurrentScreenName();
 	param = ls.lock()->getFocus();
@@ -76,7 +76,7 @@ void AbstractControls::init()
     bank_ = samplerGui->getBank();
 }
 
-void AbstractControls::left()
+void BaseControls::left()
 {
 	init();
 	if (!activeField.lock()) return;
@@ -84,7 +84,7 @@ void AbstractControls::left()
 	ls.lock()->transferFocus(true);
 }
 
-void AbstractControls::right()
+void BaseControls::right()
 {
 	init();
 	if (!activeField.lock()) return;
@@ -92,7 +92,7 @@ void AbstractControls::right()
 	ls.lock()->transferFocus(false);
 }
 
-void AbstractControls::up()
+void BaseControls::up()
 {
     init();
 	auto aboveCandidate = ls.lock()->findAbove(param);
@@ -101,7 +101,7 @@ void AbstractControls::up()
 	}
 }
 
-void AbstractControls::down()
+void BaseControls::down()
 {
     init();
 	auto belowCandidate = ls.lock()->findBelow(param);
@@ -110,7 +110,7 @@ void AbstractControls::down()
 	}
 }
 
-void AbstractControls::function(int i)
+void BaseControls::function(int i)
 {
 	init();
 	auto lsLocked = ls.lock();
@@ -161,15 +161,15 @@ void AbstractControls::function(int i)
 	}
 }
 
-void AbstractControls::openWindow()
+void BaseControls::openWindow()
 {
 }
 
-void AbstractControls::turnWheel(int i)
+void BaseControls::turnWheel(int i)
 {
 }
 
-void AbstractControls::pad(int i, int velo, bool repeat, int tick)
+void BaseControls::pad(int i, int velo, bool repeat, int tick)
 {
 	init();
 	auto lTrk = track.lock();
@@ -220,7 +220,7 @@ void AbstractControls::pad(int i, int velo, bool repeat, int tick)
 	}
 }
 
-void AbstractControls::generateNoteOn(int nn, int padVelo, int tick)
+void BaseControls::generateNoteOn(int nn, int padVelo, int tick)
 {
 	init();
 	auto lTrk = track.lock();
@@ -311,7 +311,7 @@ void AbstractControls::generateNoteOn(int nn, int padVelo, int tick)
 	mpc->getEventHandler().lock()->handle(noteEvent, lTrk.get());
 }
 
-void AbstractControls::numpad(int i)
+void BaseControls::numpad(int i)
 {
 	init();
 	auto controls = mpc->getControls().lock();
@@ -342,21 +342,29 @@ void AbstractControls::numpad(int i)
 			mpc->getUis().lock()->getPunchGui()->setTime1(lSequencer->getActiveSequence().lock()->getLastTick());
 			return;
 		case 3:
-			if (lSequencer->isPlaying()) return;
-			if (mpc != nullptr && lDisk != nullptr) lDisk->initFiles();
+			if (lSequencer->isPlaying()) {
+				return;
+			}
+			
+			if (mpc != nullptr && lDisk != nullptr) {
+				lDisk->initFiles();
+			}
 
-			if (mpc->getUis().lock()->getDiskGui()->getFileLoad() + 1 > lDisk->getFiles().size()) {
-				mpc->getUis().lock()->getDiskGui()->setFileLoad((int)(lDisk->getFiles().size()) - 1);
+			if (mpc->getUis().lock()->getDiskGui()->getFileLoad() + 1 > (int) (lDisk->getFiles().size())) {
+				mpc->getUis().lock()->getDiskGui()->setFileLoad((int)(lDisk->getFiles().size() - 1));
 			}
 			ls.lock()->openScreen("load");
 			return;
 		case 4:
-			if (lSequencer->isPlaying()) return;
-			mpc->getAudioMidiServices().lock()->startSampling();
+			if (lSequencer->isPlaying()) {
+				return;
+			}
 			ls.lock()->openScreen("sample");
 			return;
 		case 5:
-			if (lSequencer->isPlaying()) return;
+			if (lSequencer->isPlaying()) {
+				return;
+			}
 			ls.lock()->openScreen("trim");
 			return;
 		case 6:
@@ -367,11 +375,15 @@ void AbstractControls::numpad(int i)
 			ls.lock()->openScreen("selectdrum_mixer");
 			return;
 		case 8:
-			if (lSequencer->isPlaying()) return;
+			if (lSequencer->isPlaying()) {
+				return;
+			}
 			ls.lock()->openScreen("others");
 			return;
 		case 9:
-			if (lSequencer->isPlaying()) return;
+			if (lSequencer->isPlaying()) {
+				return;
+			}
 			ls.lock()->openScreen("sync");
 			return;
 		}
@@ -379,7 +391,7 @@ void AbstractControls::numpad(int i)
 	}
 }
 
-void AbstractControls::pressEnter()
+void BaseControls::pressEnter()
 {
 	init();
 	auto controls = mpc->getControls().lock();
@@ -388,7 +400,7 @@ void AbstractControls::pressEnter()
 	}
 }
 
-void AbstractControls::rec()
+void BaseControls::rec()
 {
 	auto controls = mpc->getControls().lock();
 	controls->setRecPressed(true);
@@ -407,7 +419,7 @@ void AbstractControls::rec()
     }
 }
 
-void AbstractControls::overDub()
+void BaseControls::overDub()
 {
 	auto controls = mpc->getControls().lock();
 	controls->setOverDubPressed(true);
@@ -427,7 +439,7 @@ void AbstractControls::overDub()
 	}
 }
 
-void AbstractControls::stop()
+void BaseControls::stop()
 {
 	init();
 	auto lSequencer = sequencer.lock();
@@ -437,7 +449,7 @@ void AbstractControls::stop()
 		mpc->getAudioMidiServices().lock()->stopBouncing();
 }
 
-void AbstractControls::play()
+void BaseControls::play()
 {
 	init();
 	auto controls = mpc->getControls().lock();
@@ -489,7 +501,7 @@ void AbstractControls::play()
 	}
 }
 
-void AbstractControls::playStart()
+void BaseControls::playStart()
 {
 	init();
 	auto hw = mpc->getHardware().lock();
@@ -529,19 +541,19 @@ void AbstractControls::playStart()
 	hw->getLed("overdub").lock()->light(lSequencer->isOverDubbing());
 }
 
-void AbstractControls::mainScreen()
+void BaseControls::mainScreen()
 {
     init();
 	auto ams = mpc->getAudioMidiServices().lock();
-	if (ams->isSampling()) {
-		ams->stopSampling();
+	if (ams->isRecordingSound()) {
+		ams->stopSoundRecorder();
 	}
 	ls.lock()->openScreen("sequencer");
 	auto lSequencer = sequencer.lock();
     lSequencer->setSoloEnabled(lSequencer->isSoloEnabled());
 }
 
-void AbstractControls::tap()
+void BaseControls::tap()
 {
 	init();
 	auto controls = mpc->getControls().lock();
@@ -549,36 +561,36 @@ void AbstractControls::tap()
 	sequencer.lock()->tap();
 }
 
-void AbstractControls::prevStepEvent()
+void BaseControls::prevStepEvent()
 {
 }
 
-void AbstractControls::nextStepEvent()
+void BaseControls::nextStepEvent()
 {
 }
 
-void AbstractControls::goTo()
+void BaseControls::goTo()
 {
 	init();
 	auto controls = mpc->getControls().lock();
 	controls->setGoToPressed(true);
 }
 
-void AbstractControls::prevBarStart()
+void BaseControls::prevBarStart()
 {
 }
 
-void AbstractControls::nextBarEnd()
+void BaseControls::nextBarEnd()
 {
 }
 
-void AbstractControls::nextSeq()
+void BaseControls::nextSeq()
 {
 	init();
 	ls.lock()->openScreen("nextseq");
 }
 
-void AbstractControls::trackMute()
+void BaseControls::trackMute()
 {
 	init();
 	if (csn.compare("trackmute") == 0) {
@@ -590,7 +602,7 @@ void AbstractControls::trackMute()
 	mpc->getHardware().lock()->getLed("trackmute").lock()->light(true);
 }
 
-void AbstractControls::bank(int i)
+void BaseControls::bank(int i)
 {
 	init();
 	auto oldBank = samplerGui->getBank();
@@ -603,7 +615,7 @@ void AbstractControls::bank(int i)
 		mpc->getHardware().lock()->getPad(i).lock()->notifyObservers(255);
 }
 
-void AbstractControls::fullLevel()
+void BaseControls::fullLevel()
 {
     init();
     sequencerGui->setFullLevelEnabled(!sequencerGui->isFullLevelEnabled());
@@ -611,7 +623,7 @@ void AbstractControls::fullLevel()
 	hw->getLed("fulllevel").lock()->light(sequencerGui->isFullLevelEnabled());
 }
 
-void AbstractControls::sixteenLevels()
+void BaseControls::sixteenLevels()
 {
 	init();
 	auto hw = mpc->getHardware().lock();
@@ -624,7 +636,7 @@ void AbstractControls::sixteenLevels()
 	}
 }
 
-void AbstractControls::after()
+void BaseControls::after()
 {
 	init();
 	auto hw = mpc->getHardware().lock();
@@ -638,7 +650,7 @@ void AbstractControls::after()
 	}
 }
 
-void AbstractControls::shift()
+void BaseControls::shift()
 {
 	auto controls = mpc->getControls().lock();
 	if (controls->isShiftPressed())
@@ -647,12 +659,12 @@ void AbstractControls::shift()
 	controls->setShiftPressed(true);
 }
 
-void AbstractControls::undoSeq()
+void BaseControls::undoSeq()
 {
 	sequencer.lock()->undoSeq();
 }
 
-void AbstractControls::setSliderNoteVar(mpc::sequencer::NoteEvent* n, weak_ptr<mpc::sampler::Program> program)
+void BaseControls::setSliderNoteVar(mpc::sequencer::NoteEvent* n, weak_ptr<mpc::sampler::Program> program)
 {
 	auto lProgram = program.lock();
 	if (n->getNote() != lProgram->getSlider()->getNote())
@@ -704,7 +716,7 @@ void AbstractControls::setSliderNoteVar(mpc::sequencer::NoteEvent* n, weak_ptr<m
 	}
 }
 
-bool AbstractControls::isTypable()
+bool BaseControls::isTypable()
 {
 	if (typableParams.size() == 0)
 		return false;
@@ -715,7 +727,7 @@ bool AbstractControls::isTypable()
 	return false;
 }
 
-void AbstractControls::erase()
+void BaseControls::erase()
 {
 	init();
 	auto controls = mpc->getControls().lock();
@@ -734,5 +746,5 @@ void AbstractControls::erase()
 	}
 }
 
-AbstractControls::~AbstractControls() {
+BaseControls::~BaseControls() {
 }

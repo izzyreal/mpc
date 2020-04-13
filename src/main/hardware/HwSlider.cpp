@@ -1,7 +1,7 @@
 #include "HwSlider.hpp"
 
 #include <Mpc.hpp>
-#include <controls/AbstractControls.hpp>
+#include <controls/BaseControls.hpp>
 
 using namespace mpc::hardware;
 using namespace std;

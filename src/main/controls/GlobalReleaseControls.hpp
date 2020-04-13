@@ -3,7 +3,7 @@
 #include <string>
 #include <memory>
 
-#include "AbstractControls.hpp"
+#include "BaseControls.hpp"
 
 namespace mpc {
 	class Mpc;
@@ -27,7 +27,7 @@ namespace mpc {
 	namespace controls {
 
 		class GlobalReleaseControls
-			: public AbstractControls
+			: public BaseControls
 		{
 
 		public:
@@ -45,7 +45,7 @@ namespace mpc {
 			void function(int i) override;
 
 		public:
-			// Not implemented, in case a release is triggered. We don't want AbstractControls to start processing these.
+			// Not implemented, in case a release is triggered. We don't want BaseControls to start processing these.
 			void left() override {};
 			void right() override {};
 			void up() override {};

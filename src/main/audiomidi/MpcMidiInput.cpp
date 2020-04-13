@@ -5,7 +5,7 @@
 #include <hardware/HwSlider.hpp>
 #include <audiomidi/EventHandler.hpp>
 #include <audiomidi/MpcMidiPorts.hpp>
-#include <controls/AbstractControls.hpp>
+#include <controls/BaseControls.hpp>
 #include <controls/Controls.hpp>
 #include <lcdgui/LayeredScreen.hpp>
 #include <ui/midisync/MidiSyncGui.hpp>

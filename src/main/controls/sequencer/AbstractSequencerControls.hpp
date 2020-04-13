@@ -1,5 +1,5 @@
 #pragma once
-#include <controls/AbstractControls.hpp>
+#include <controls/BaseControls.hpp>
 
 namespace mpc {
 
@@ -26,12 +26,12 @@ namespace mpc {
 		namespace sequencer {
 
 			class AbstractSequencerControls
-				: public AbstractControls
+				: public BaseControls
 
 			{
 
 			public:
-				typedef AbstractControls super;
+				typedef BaseControls super;
 
 			protected:
 				std::weak_ptr<mpc::sequencer::Sequence> sequence{};

@@ -15,7 +15,7 @@ using namespace mpc::controls::disk;
 using namespace std;
 
 AbstractDiskControls::AbstractDiskControls(mpc::Mpc* mpc)
-	: AbstractControls(mpc)
+	: BaseControls(mpc)
 {
 	auto uis = mpc->getUis().lock();
 	directoryGui = mpc->getUis().lock()->getDirectoryGui();

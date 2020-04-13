@@ -1,5 +1,5 @@
 #pragma once
-#include <controls/AbstractControls.hpp>
+#include <controls/BaseControls.hpp>
 
 namespace mpc {
 	class Mpc;
@@ -17,11 +17,11 @@ namespace mpc {
 		namespace midisync {
 
 			class AbstractMidiSyncControls
-				: public mpc::controls::AbstractControls
+				: public mpc::controls::BaseControls
 			{
 
 			public:
-				typedef mpc::controls::AbstractControls super;
+				typedef mpc::controls::BaseControls super;
 
 			protected:
 				mpc::ui::midisync::MidiSyncGui* midiSyncGui{ nullptr };

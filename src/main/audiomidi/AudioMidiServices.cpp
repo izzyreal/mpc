@@ -371,12 +371,12 @@ void AudioMidiServices::stopBouncing()
 	bouncing.store(false);
 }
 
-void AudioMidiServices::startSampling() {
-	sampling.store(true);
+void AudioMidiServices::startRecordingSound() {
+	recordingSound.store(true);
 }
 
-void AudioMidiServices::stopSampling() {
-	sampling.store(false);
+void AudioMidiServices::stopSoundRecorder() {
+	recordingSound.store(false);
 }
 
 weak_ptr<mpc::sequencer::FrameSeq> AudioMidiServices::getFrameSequencer()
@@ -394,8 +394,8 @@ const bool AudioMidiServices::isBouncing()
 	return bouncing.load();
 }
 
-const bool AudioMidiServices::isSampling() {
-	return sampling.load();
+const bool AudioMidiServices::isRecordingSound() {
+	return recordingSound.load();
 }
 
 AudioMidiServices::~AudioMidiServices() {

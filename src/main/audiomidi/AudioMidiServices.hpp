@@ -60,15 +60,15 @@ namespace mpc::audiomidi {
 
 	private:
 		atomic<bool> bouncing = ATOMIC_VAR_INIT(false);
-		atomic<bool> sampling = ATOMIC_VAR_INIT(false);
+		atomic<bool> recordingSound = ATOMIC_VAR_INIT(false);
 
 	public:
 		const bool isBouncing();
-		const bool isSampling();
+		const bool isRecordingSound();
 		void startBouncing();
 		void stopBouncing();
-		void startSampling();
-		void stopSampling();
+		void startRecordingSound();
+		void stopSoundRecorder();
 
 	private:
 		bool bouncePrepared = false;

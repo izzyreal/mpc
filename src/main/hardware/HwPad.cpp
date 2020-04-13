@@ -2,7 +2,7 @@
 
 #include <Mpc.hpp>
 
-#include <controls/AbstractControls.hpp>
+#include <controls/BaseControls.hpp>
 #include <controls/GlobalReleaseControls.hpp>
 
 using namespace mpc::hardware;

@@ -33,7 +33,7 @@ namespace mpc::disk {
 
 namespace mpc::controls {
 	class Controls;
-	class AbstractControls;
+	class BaseControls;
 	class GlobalReleaseControls;
 }
 
@@ -91,7 +91,7 @@ namespace mpc {
 		std::weak_ptr<ui::Uis> getUis();
 		std::weak_ptr<lcdgui::LayeredScreen> getLayeredScreen();
 		std::weak_ptr<controls::Controls> getControls();
-		controls::AbstractControls* getActiveControls();
+		controls::BaseControls* getActiveControls();
 		controls::GlobalReleaseControls* getReleaseControls();
 		std::weak_ptr<hardware::Hardware> getHardware();
 

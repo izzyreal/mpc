@@ -1,5 +1,5 @@
 #pragma once
-#include <controls/AbstractControls.hpp>
+#include <controls/BaseControls.hpp>
 
 namespace mpc {
 	class Mpc;
@@ -15,11 +15,11 @@ namespace mpc {
 		namespace misc {
 
 			class AbstractMiscControls
-				: public mpc::controls::AbstractControls
+				: public mpc::controls::BaseControls
 			{
 
 			public:
-				typedef mpc::controls::AbstractControls super;
+				typedef mpc::controls::BaseControls super;
 
 			protected:
 				mpc::ui::misc::PunchGui* punchGui{ nullptr };

@@ -13,7 +13,7 @@ using namespace mpc::controls::mixer;
 using namespace std;
 
 AbstractMixerControls::AbstractMixerControls(mpc::Mpc* mpc) 
-	: AbstractControls(mpc)
+	: BaseControls(mpc)
 {
 	mixerGui = mpc->getUis().lock()->getMixerGui();
 	mixerSetupGui = mpc->getUis().lock()->getMixerSetupGui();
