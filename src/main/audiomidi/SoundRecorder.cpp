@@ -34,6 +34,17 @@ void SoundRecorder::start() {
 void SoundRecorder::stop() {
 	recording = false;
 	auto s = sound.lock();
+
+	auto frameCount = s->getOscillatorControls()->getFrameCount();
+	auto overflow = frameCount - lengthInFrames;
+
+	if (overflow > 0) {
+		s->getSampleData()->erase(s->getSampleData()->end() - overflow, s->getSampleData()->end());
+		if (mode == 2) {
+			s->getSampleData()->erase(s->getSampleData()->begin() + lengthInFrames , s->getSampleData()->begin() + frameCount);
+		}
+	}
+
 	s->setEnd(s->getOscillatorControls()->getFrameCount());
 
 	if (srcLeft != NULL) {
