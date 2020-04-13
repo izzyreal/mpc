@@ -31,6 +31,10 @@ void SoundRecorder::start() {
 	recording = true;
 }
 
+bool SoundRecorder::isRecording() {
+	return recording;
+}
+
 void SoundRecorder::stop() {
 	recording = false;
 	auto s = sound.lock();
@@ -60,6 +64,10 @@ void SoundRecorder::stop() {
 
 int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf)
 {
+
+	setChanged();
+	notifyObservers(buf->square());
+
 	if (recording) {
 
 		auto s = sound.lock();
@@ -102,6 +110,10 @@ int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf)
 		}
 		else if (mode == 2) {
 			osc->insertFrames(*left, *right, currentLength);
+		}
+
+		if (osc->getFrameCount() >= lengthInFrames) {
+			recording = false;
 		}
 
 		return AUDIO_SILENCE;

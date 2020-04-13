@@ -17,21 +17,33 @@ SampleControls::SampleControls(mpc::Mpc* mpc)
 
 void SampleControls::left() {
 	//if (sampler.lock()->isArmed() || sampler.lock()->isRecording()) return;
+	if (mpc->getAudioMidiServices().lock()->isRecordingSound()) {
+		return;
+	}
 	super::left();
 }
 
 void SampleControls::right() {
 	//if (sampler.lock()->isArmed() || sampler.lock()->isRecording()) return;
+	if (mpc->getAudioMidiServices().lock()->isRecordingSound()) {
+		return;
+	}
 	super::right();
 }
 
 void SampleControls::up() {
 	//if (sampler.lock()->isArmed() || sampler.lock()->isRecording()) return;
+	if (mpc->getAudioMidiServices().lock()->isRecordingSound()) {
+		return;
+	}
 	super::up();
 }
 
 void SampleControls::down() {
 	//if (sampler.lock()->isArmed() || sampler.lock()->isRecording()) return;
+	if (mpc->getAudioMidiServices().lock()->isRecordingSound()) {
+		return;
+	}
 	super::down();
 }
 
@@ -41,10 +53,16 @@ void SampleControls::function(int i)
 	auto lSampler = sampler.lock();
 	switch (i) {
 	case 0:
+		if (mpc->getAudioMidiServices().lock()->isRecordingSound()) {
+			return;
+		}
 		//if (!lSampler->isRecording() && !lSampler->isArmed())
 			//lSampler->resetPeak();
 		break;
 	case 4:
+		if (mpc->getAudioMidiServices().lock()->isRecordingSound()) {
+			return;
+		}
 		//if (lSampler->isRecording()) {
 		//	lSampler->cancelRecording();
 		//	return;
@@ -56,15 +74,18 @@ void SampleControls::function(int i)
 		break;
 	case 5:
 		auto ams = mpc->getAudioMidiServices().lock();
+
 		if (ams->isRecordingSound()) {
 			ams->stopSoundRecorder();
 			return;
 		}
+
 		auto sound = lSampler->addSound();
 		sound.lock()->setName(lSampler->addOrIncreaseNumber("sound"));
 		auto lengthInFrames = samplerGui->getTime() * (44100 * 0.1);
 		ams->getSoundRecorder().lock()->prepare(sound, lengthInFrames, samplerGui->getMode());
 		ams->startRecordingSound();
+
 		//if (!lSampler->isRecording()) {
 			//lSampler->arm();
 			//return;

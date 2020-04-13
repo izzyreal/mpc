@@ -7,6 +7,8 @@
 #include <io/TSCircularBuffer.hpp>
 #include <thirdp/libsamplerate/samplerate.h>
 
+#include <observer/Observable.hpp>
+
 #include <memory>
 
 using namespace mpc::sampler;
@@ -22,6 +24,7 @@ namespace mpc::audiomidi {
 
 	class SoundRecorder
 		: public AudioProcess
+		, public moduru::observer::Observable
 	{
 
 	private:
@@ -44,6 +47,7 @@ namespace mpc::audiomidi {
 		int processAudio(ctoot::audio::core::AudioBuffer* buf) override;
 		void open() {};
 		void close() {};
+		bool isRecording();
 
 	private:
 		void initSrc();

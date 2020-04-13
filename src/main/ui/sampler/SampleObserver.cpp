@@ -3,7 +3,8 @@
 #include <Mpc.hpp>
 #include <lcdgui/Field.hpp>
 #include <ui/sampler/SamplerGui.hpp>
-#include <sampler/Sampler.hpp>
+#include <audiomidi/AudioMidiServices.hpp>
+#include <audiomidi/SoundRecorder.hpp>
 
 #include <file/File.hpp>
 
@@ -14,6 +15,8 @@ SampleObserver::SampleObserver(mpc::Mpc* mpc)
 {
 	samplerGui = mpc->getUis().lock()->getSamplerGui();
 	samplerGui->addObserver(this);
+
+	mpc->getAudioMidiServices().lock()->getSoundRecorder().lock()->addObserver(this);
 
 	auto ls = mpc->getLayeredScreen().lock();
 	inputField = ls->lookupField("input");
@@ -68,7 +71,19 @@ void SampleObserver::displayPreRec()
 
 void SampleObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 {
+	if (dynamic_cast<mpc::audiomidi::SoundRecorder*>(o) != nullptr) {
+		try {
+			auto vuValue = nonstd::any_cast<float>(arg);
+			updateVU(vuValue * 100);
+		}
+		catch (const std::exception& e) {
+			// nothing to do
+		}
+		return;
+	}
+
 	string s = nonstd::any_cast<string>(arg);
+
 	if (s.compare("input") == 0) {
 		displayInput();
 	}
@@ -87,6 +102,49 @@ void SampleObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 	else if (s.compare("prerec") == 0) {
 		displayPreRec();
 	}
+}
+
+void SampleObserver::updateVU(float value)
+{
+	string lString = "";
+	string rString = "";
+	auto peaklValue = value;
+	auto peakrValue = value;
+	int thresholdValue = (samplerGui->getThreshold() + 63) * 0.53125;
+	int levell = value;
+	int levelr = value;
+	for (int i = 0; i < 34; i++) {
+		string l = " ";
+		string r = " ";
+		bool normall = i <= levell;
+		bool normalr = i <= levelr;
+		bool threshold = i == thresholdValue;
+		bool peakl = i == peaklValue;
+		bool peakr = i == peakrValue;
+		if (threshold && peakl) l = vu_peak_threshold;
+		if (threshold && peakr) r = vu_peak_threshold;
+
+		if (threshold && normall && !peakl) l = vu_normal_threshold;
+		if (threshold && normalr && !peakr) r = vu_normal_threshold;
+
+		if (threshold && !peakl && !normall) l = vu_threshold;
+		if (threshold && !peakr && !normalr) r = vu_threshold;
+
+		if (normall && !peakl && !threshold) l = vu_normal;
+		if (normalr && !peakr && !threshold) r = vu_normal;
+
+		if (peakl && !threshold) l = vu_peak;
+		if (peakr && !threshold) r = vu_peak;
+
+		if (peakl && threshold && levell == 33) l = vu_peak_threshold_normal;
+		if (peakr && threshold && levelr == 33) r = vu_peak_threshold_normal;
+
+		lString += l;
+		rString += r;
+	}
+
+	vuLeftLabel.lock()->setText(lString);
+	vuRightLabel.lock()->setText(lString);
 }
 
 SampleObserver::~SampleObserver() {

@@ -55,6 +55,7 @@ namespace mpc::ui::sampler {
 		void displayTime();
 		void displayMonitor();
 		void displayPreRec();
+		void updateVU(float value);
 
 	public:
 		void update(moduru::observer::Observable* o, nonstd::any arg) override;
