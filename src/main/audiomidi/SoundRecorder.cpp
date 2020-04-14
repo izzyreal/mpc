@@ -3,6 +3,8 @@
 #include <audio/core/AudioFormat.hpp>
 #include <audio/core/AudioBuffer.hpp>
 
+#include <cmath>
+
 using namespace std;
 using namespace mpc::sampler;
 using namespace mpc::audiomidi;
