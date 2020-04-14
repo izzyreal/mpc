@@ -61,7 +61,7 @@ namespace mpc::audiomidi {
 	private:
 		atomic<bool> bouncing = ATOMIC_VAR_INIT(false);
 		atomic<bool> recordingSound = ATOMIC_VAR_INIT(false);
-
+		
 	public:
 		const bool isBouncing();
 		const bool isRecordingSound();
@@ -69,7 +69,7 @@ namespace mpc::audiomidi {
 		void stopBouncing();
 		void startRecordingSound();
 		void stopSoundRecorder();
-
+		
 	private:
 		bool bouncePrepared = false;
 		vector<shared_ptr<ctoot::mpc::MpcVoice>> voices;
@@ -102,6 +102,7 @@ namespace mpc::audiomidi {
 		void createSynth();
 		vector<string> getInputNames();
 		vector<string> getOutputNames();
+		void setMonitorLevel(int level);
 
 	public:
 		ctoot::audio::server::NonRealTimeAudioServer* getAudioServer();
@@ -111,6 +112,7 @@ namespace mpc::audiomidi {
 		int getMasterLevel();
 		void setRecordLevel(int i);
 		int getRecordLevel();
+		void muteMonitor(bool mute);
 		weak_ptr<ctoot::mpc::MpcMultiMidiSynth> getMms();
 		void initializeDiskRecorders();
 		void closeIO();

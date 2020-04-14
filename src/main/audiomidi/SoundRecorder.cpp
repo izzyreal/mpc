@@ -11,6 +11,18 @@ SoundRecorder::SoundRecorder()
 {
 }
 
+unsigned int SoundRecorder::getInputGain()
+{
+	return inputGain;
+}
+
+void SoundRecorder::setInputGain(unsigned int gain)
+{
+	if (gain < 0 || gain > 100) {
+		return;
+	}
+	inputGain = gain;
+}
 
 // modes: 0 = MONO L, 1 = MONO R, 2 = STEREO
 void SoundRecorder::prepare(const weak_ptr<Sound> sound, int lengthInFrames, int mode)
@@ -62,11 +74,30 @@ void SoundRecorder::stop() {
 	}
 }
 
+void applyGain(float gain, vector<float>* data)
+{
+	for (int i = 0; i < data->size(); i++) {
+		(*data)[i] *= gain;
+	}
+}
+
+void SoundRecorder::setVuMeterActive(bool active)
+{
+	vuMeterActive.store(active);
+}
+
 int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf)
 {
+	auto left = buf->getChannel(0);
+	auto right = buf->getChannel(1);
 
-	setChanged();
-	notifyObservers(buf->square());
+	applyGain(inputGain / 100.f, left);
+	applyGain(inputGain / 100.f, right);
+
+	if (vuMeterActive.load()) {
+		setChanged();
+		notifyObservers(buf->square());
+	}
 
 	if (recording) {
 
@@ -82,7 +113,6 @@ int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf)
 			}
 		}
 
-		auto left = buf->getChannel(0);
 		vector<float> resampledLeft;
 
 		if (mode == 0 || mode == 2) {
@@ -92,7 +122,6 @@ int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf)
 			}
 		}
 
-		auto right = buf->getChannel(1);
 		vector<float> resampledRight;
 
 		if (mode == 1 || mode == 2) {

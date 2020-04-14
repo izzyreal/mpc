@@ -119,6 +119,8 @@ void SampleControls::turnWheel(int i)
 		}
 		else if (param.compare("monitor") == 0) {
 			samplerGui->setMonitor(samplerGui->getMonitor() + i);
+			bool muteMonitor = samplerGui->getMonitor() == 0 ? true : false;
+			mpc->getAudioMidiServices().lock()->muteMonitor(muteMonitor);
 		}
 		else if (param.compare("prerec") == 0) {
 			samplerGui->setPreRec(samplerGui->getPreRec() + i);

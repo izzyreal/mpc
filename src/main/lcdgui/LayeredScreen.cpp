@@ -7,6 +7,9 @@
 
 #include "Field.hpp"
 
+#include <audiomidi/AudioMidiServices.hpp>
+#include <audiomidi/SoundRecorder.hpp>
+
 #include <lcdgui/EnvGraph.hpp>
 #include <lcdgui/Label.hpp>
 #include <lcdgui/Underline.hpp>
@@ -20,6 +23,8 @@
 #include <lcdgui/Popup.hpp>
 #include <lcdgui/SelectedEventBar.hpp>
 #include <lcdgui/Effect.hpp>
+
+#include <ui/Uis.hpp>
 
 #include <ui/sequencer/AssignObserver.hpp>
 #include <ui/sequencer/BarCopyObserver.hpp>
@@ -51,6 +56,8 @@
 #include <ui/sampler/SoundObserver.hpp>
 #include <ui/sampler/TrimObserver.hpp>
 #include <ui/sampler/ZoneObserver.hpp>
+
+#include <ui/sampler/SamplerGui.hpp>
 
 #include <ui/sampler/window/ChannelSettingsObserver.hpp>
 #include <ui/sampler/window/EditSoundObserver.hpp>
@@ -305,8 +312,21 @@ void LayeredScreen::transferFocus(bool backwards) {
 }
 
 int LayeredScreen::openScreen(string screenName) {
-	if (currentScreenName.compare(screenName) == 0) return -1;
-	
+	if (currentScreenName.compare(screenName) == 0) {
+		return -1;
+	}
+
+	auto ams = mpc->getAudioMidiServices().lock();
+	if (currentScreenName.compare("sample") == 0) {
+		ams->muteMonitor(true);
+		ams->getSoundRecorder().lock()->setVuMeterActive(false);
+	}
+	else if (screenName.compare("sample") == 0) {
+		bool muteMonitor = mpc->getUis().lock()->getSamplerGui()->getMonitor() == 0 ? true : false;
+		ams->muteMonitor(muteMonitor);
+		ams->getSoundRecorder().lock()->setVuMeterActive(true);
+	}
+
 	setLastFocus(currentScreenName, getFocus());
 
 	previousScreenName = currentScreenName;

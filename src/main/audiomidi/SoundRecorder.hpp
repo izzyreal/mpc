@@ -10,6 +10,7 @@
 #include <observer/Observable.hpp>
 
 #include <memory>
+#include <atomic>
 
 using namespace mpc::sampler;
 using namespace ctoot::audio::core;
@@ -39,8 +40,11 @@ namespace mpc::audiomidi {
 		SRC_STATE* srcRight = NULL;
 		int srcLeftError = 0;
 		int srcRightError = 0;
+		unsigned int inputGain = 0;
+		atomic<bool> vuMeterActive = ATOMIC_VAR_INIT(false);
 
 	public:
+		void setVuMeterActive(bool active);
 		void prepare(const weak_ptr<Sound>, int lengthInFrames, int mode);
 		void start();
 		void stop();
@@ -48,6 +52,8 @@ namespace mpc::audiomidi {
 		void open() {};
 		void close() {};
 		bool isRecording();
+		unsigned int getInputGain();
+		void setInputGain(unsigned int);
 
 	private:
 		void initSrc();

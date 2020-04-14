@@ -88,6 +88,7 @@ using namespace mpc::audiomidi;
 
 using namespace ctoot::audio::server;
 using namespace ctoot::audio::core;
+using namespace ctoot::audio::mixer;
 
 using namespace std;
 
@@ -106,6 +107,8 @@ void AudioMidiServices::start(const int sampleRate, const int inputCount, const 
 
 	server = make_shared<ExternalAudioServer>();
 	offlineServer = make_shared<NonRealTimeAudioServer>(server);
+
+	soundRecorder = make_shared<SoundRecorder>();
 
 	setupMixer();
 
@@ -140,9 +143,8 @@ void AudioMidiServices::start(const int sampleRate, const int inputCount, const 
 
 	initializeDiskRecorders();
 
-	soundRecorder = make_shared<SoundRecorder>();
 	mixer->getStrip(string("66")).lock()->setDirectOutputProcess(soundRecorder);
-
+	
 	cac = make_shared<CompoundAudioClient>();
 	cac->add(frameSeq.get());
 	cac->add(mixer.get());
@@ -153,6 +155,21 @@ void AudioMidiServices::start(const int sampleRate, const int inputCount, const 
 	offlineServer->setClient(cac);
 
 	offlineServer->start();
+}
+
+void AudioMidiServices::setMonitorLevel(int level) {
+	auto sc = mixer->getMixerControls().lock()->getStripControls("66").lock();
+	auto mmc = dynamic_pointer_cast<MainMixControls>(sc->find("Main").lock());
+	dynamic_pointer_cast<ctoot::audio::fader::FaderControl>(mmc->find("Level").lock())->setValue(static_cast<float>(level));
+}
+
+void AudioMidiServices::muteMonitor(bool mute)
+{
+	auto sc = mixer->getMixerControls().lock()->getStripControls("66").lock();
+	auto mmc = dynamic_pointer_cast<MainMixControls>(sc->find("Main").lock());
+	auto controlRow = dynamic_pointer_cast<CompoundControl>(mmc->find("ControlRow").lock());
+	auto mc = dynamic_pointer_cast<BooleanControl>(controlRow->find("Mute").lock());
+	mc->setValue(mute);
 }
 
 vector<weak_ptr<DiskRecorder>> AudioMidiServices::getDiskRecorders()
@@ -201,6 +218,7 @@ void AudioMidiServices::setupMixer()
 	audioSystem->setAutoConnect(false);
 	setMasterLevel(nvram::NvRam::getMasterLevel());
 	setRecordLevel(nvram::NvRam::getRecordLevel());
+	muteMonitor(true);
 	setAssignableMixOutLevels();
 }
 
@@ -219,15 +237,18 @@ int AudioMidiServices::getMasterLevel() {
 }
 
 void AudioMidiServices::setRecordLevel(int i) {
-	auto sc = mixer->getMixerControls().lock()->getStripControls("66").lock();
-	auto mmc = dynamic_pointer_cast<ctoot::audio::mixer::MainMixControls>(sc->find("Main").lock());
-	dynamic_pointer_cast<ctoot::audio::fader::FaderControl>(mmc->find("Level").lock())->setValue(static_cast<float>(i));
+	soundRecorder->setInputGain(i);
+	setMonitorLevel(i);
 }
 
 int AudioMidiServices::getRecordLevel() {
+	return soundRecorder->getInputGain();
+	/*
+	// This is how we can get monitor output level
 	auto sc = mixer->getMixerControls().lock()->getStripControls("66").lock();
 	auto mmc = dynamic_pointer_cast<ctoot::audio::mixer::MainMixControls>(sc->find("Main").lock());
 	return static_cast<int>(dynamic_pointer_cast<ctoot::audio::fader::FaderControl>(mmc->find("Level").lock())->getValue());
+	*/
 }
 
 void AudioMidiServices::setAssignableMixOutLevels()

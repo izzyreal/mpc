@@ -29,7 +29,7 @@ namespace mpc {
 				int threshold{ -20 };
 				int mode{ 1 };
 				int time{ 100 };
-				int monitor{ 1 };
+				int monitor{ 0 };
 				int preRec{ 100 };
 				std::string newName{ "" };
 				int selectedDrum{ 0 };

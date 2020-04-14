@@ -13,10 +13,13 @@ using namespace std;
 
 SampleObserver::SampleObserver(mpc::Mpc* mpc) 
 {
+	this->mpc = mpc;
+
 	samplerGui = mpc->getUis().lock()->getSamplerGui();
 	samplerGui->addObserver(this);
 
-	mpc->getAudioMidiServices().lock()->getSoundRecorder().lock()->addObserver(this);
+	auto ams = mpc->getAudioMidiServices().lock();	
+	ams->getSoundRecorder().lock()->addObserver(this);
 
 	auto ls = mpc->getLayeredScreen().lock();
 	inputField = ls->lookupField("input");
@@ -149,4 +152,6 @@ void SampleObserver::updateVU(float value)
 
 SampleObserver::~SampleObserver() {
 	samplerGui->deleteObserver(this);
+	auto ams = mpc->getAudioMidiServices().lock();
+	ams->getSoundRecorder().lock()->deleteObserver(this);
 }
