@@ -30,7 +30,7 @@
 #include <hardware/HwSlider.hpp>
 
 #include <file/all/AllLoader.hpp>
-#include <file/aps/ApsLoader.hpp>
+#include <disk/ApsLoader.hpp>
 
 #include <disk/MpcFile.hpp>
 
@@ -95,14 +95,14 @@ void Mpc::loadDemoBeat() {
 	mpc::disk::MpcFile* f = getDisk().lock()->getFile("FRUTZLE.ALL");
 	auto allLoader = new mpc::file::all::AllLoader(this, f);
 	f = getDisk().lock()->getFile("FRUTZLE.APS");
-	auto apsLoader = new mpc::file::aps::ApsLoader(this, f);
+	auto apsLoader = new mpc::disk::ApsLoader(this, f);
 	delete allLoader;
 	*/
 	while (getDisk().lock()->isBusy()) {
 		this_thread::sleep_for(chrono::milliseconds(10));
 	}
 	auto f = getDisk().lock()->getFile("ALL_PGMS.APS");
-	auto apsLoader = new mpc::file::aps::ApsLoader(this, f);
+	auto apsLoader = new mpc::disk::ApsLoader(this, f);
 	delete apsLoader;
 	//sequencer->playFromStart();
 }

@@ -30,9 +30,12 @@ void Popup::setText(string text, int pos)
 	SetDirty();
 }
 
-void Popup::Draw(std::vector<std::vector<bool> >* pixels)
+void Popup::Draw(std::vector<std::vector<bool>>* pixels)
 {
-	if (IsHidden()) return;
+	if (IsHidden()) {
+		return;
+	}
+
 	bg->Draw(pixels);
 	lcdgui::Label l(atlas, font);
 	l.initialize("popup", text, 43, 23, text.size());

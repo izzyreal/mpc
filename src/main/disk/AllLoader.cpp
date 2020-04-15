@@ -1,4 +1,4 @@
-#include <file/all/AllLoader.hpp>
+#include "AllLoader.hpp"
 
 #include <Mpc.hpp>
 #include <file/all/AllParser.hpp>
@@ -30,6 +30,7 @@
 
 #include <thirdp/bcmath/bcmath_stl.h>
 
+using namespace mpc::disk;
 using namespace mpc::file::all;
 using namespace std;
 

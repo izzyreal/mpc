@@ -1,4 +1,4 @@
-#include <file/aps/ApsLoader.hpp>
+#include "ApsLoader.hpp"
 
 #include <Mpc.hpp>
 #include <disk/AbstractDisk.hpp>
@@ -31,6 +31,7 @@
 
 #include <lang/StrUtil.hpp>
 
+using namespace mpc::disk;
 using namespace mpc::file::aps;
 using namespace moduru::lang;
 using namespace std;
@@ -195,13 +196,14 @@ void ApsLoader::loadSound(string soundFileName, string ext, mpc::disk::MpcFile* 
 
 void ApsLoader::showPopup(string name, string ext, int sampleSize)
 {
+	mpc->getUis().lock()->getDiskGui()->removePopup();
 	mpc->getUis().lock()->getDiskGui()->openPopup(StrUtil::padRight(name, " ", 16), ext);
 	if (dynamic_pointer_cast<mpc::disk::StdDisk>(mpc->getDisk().lock())) {
 		auto sleepTime = sampleSize / 400;
 		if (sleepTime < 300)
 			sleepTime = 300;
 		//this_thread::sleep_for(chrono::milliseconds((int)(sleepTime*mpc::maingui::Constants::TFACTOR)));
-		this_thread::sleep_for(chrono::milliseconds((int)(sleepTime* 0.1)));
+		this_thread::sleep_for(chrono::milliseconds((int)(sleepTime * 0.2)));
 	}
 }
 

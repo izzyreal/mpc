@@ -1,32 +1,25 @@
 #pragma once
 #include <controls/disk/AbstractDiskControls.hpp>
 
-#include <file/aps/ApsLoader.hpp>
+#include <disk/ApsLoader.hpp>
 
 #include <memory>
 
-namespace mpc {
+namespace mpc::controls::disk::window {
 
-	namespace controls {
-		namespace disk {
-			namespace window {
+	class LoadApsFileControls
+		: public mpc::controls::disk::AbstractDiskControls
+	{
 
-				class LoadApsFileControls
-					: public mpc::controls::disk::AbstractDiskControls
-				{
+	private:
+		std::unique_ptr<mpc::disk::ApsLoader> apsLoader;
 
-				private:
-					std::unique_ptr<mpc::file::aps::ApsLoader> apsLoader;
+	public:
+		typedef mpc::controls::disk::AbstractDiskControls super;
+		void function(int i) override;
 
-				public:
-					typedef mpc::controls::disk::AbstractDiskControls super;
-					void function(int i) override;
+		LoadApsFileControls(mpc::Mpc* mpc);
 
-					LoadApsFileControls(mpc::Mpc* mpc);
+	};
 
-				};
-
-			}
-		}
-	}
 }

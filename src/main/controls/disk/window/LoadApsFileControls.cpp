@@ -19,7 +19,7 @@ void LoadApsFileControls::function(int i)
 		ls.lock()->openScreen("load");
 		break;
 	case 4:
-		apsLoader = make_unique<mpc::file::aps::ApsLoader>(mpc, diskGui->getSelectedFile());
+		apsLoader = make_unique<mpc::disk::ApsLoader>(mpc, diskGui->getSelectedFile());
 		break;
 	}
 }
