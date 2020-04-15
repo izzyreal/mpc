@@ -151,15 +151,6 @@ int SoundLoader::loadSound(MpcFile* f)
 	return -1;
 }
 
-std::vector<float> SoundLoader::getSampleDataFromWav(weak_ptr<moduru::file::File> soundFile)
-{
-	mpc::file::wav::WavFile wavFile;
-	wavFile.openWavFile(soundFile);
-	std::vector<float> floatData;
-	wavFile.readFrames(&floatData, wavFile.getNumFrames());
-	return floatData;
-}
-
 void SoundLoader::getSampleDataFromWav(weak_ptr<moduru::file::File> soundFile, vector<float>* dest)
 {
 	mpc::file::wav::WavFile wavFile;
