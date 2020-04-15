@@ -110,13 +110,14 @@ void ProgramLoader::loadSound(string soundFileName, string ext, MpcFile* soundFi
 
 void ProgramLoader::showPopup(string name, string ext, int sampleSize)
 {
+	mpc->getUis().lock()->getDiskGui()->removePopup();
 	mpc->getUis().lock()->getDiskGui()->openPopup(StrUtil::padRight(name, " ", 16), ext);
 	if (dynamic_pointer_cast<StdDisk>(mpc->getDisk().lock()) != nullptr) {
 		try {
 			auto sleepTime = sampleSize / 400;
 			if (sleepTime < 300) sleepTime = 300;
 			//this_thread::sleep_for(chrono::milliseconds((int)(sleepTime * mpc::maingui::Constants::TFACTOR)));
-			this_thread::sleep_for(chrono::milliseconds((int)(sleepTime * 1.0)));
+			this_thread::sleep_for(chrono::milliseconds((int)(sleepTime * 0.2)));
 		}
 		catch (exception e) {
 			e.what();
