@@ -34,6 +34,8 @@
 
 #include <disk/MpcFile.hpp>
 
+#include <string>
+
 using namespace mpc;
 using namespace std;
 
@@ -190,14 +192,28 @@ vector<string> Mpc::akaiAscii { " ", "!", "#", "$", "%", "&", "'", "(", ")", "-"
 
 void Mpc::loadSound(bool replace)
 {
-	if (loadSoundThread.joinable()) loadSoundThread.join();
+	if (loadSoundThread.joinable()) {
+		loadSoundThread.join();
+	}
 	auto lDisk = getDisk().lock();
 	lDisk->setBusy(true);
 	auto soundLoader = mpc::disk::SoundLoader(this, sampler->getSounds(), replace);
 	soundLoader.setPreview(true);
 	soundLoader.setPartOfProgram(false);
-	auto exists = soundLoader.loadSound(uis->getDiskGui()->getSelectedFile()) != -1;
-	if (!exists) {
+	bool hasNotBeenLoadedAlready = true;
+	
+	try {
+		hasNotBeenLoadedAlready = soundLoader.loadSound(uis->getDiskGui()->getSelectedFile()) == -1;
+	}
+	catch (const invalid_argument& exception) {
+		MLOG("A problem occurred when trying to load " + uis->getDiskGui()->getSelectedFile()->getName() + ": " + std::string(exception.what()));
+		lDisk->setBusy(false);
+		uis->getDiskGui()->removePopup();
+		layeredScreen->getLayer(0)->setDirty();
+		return;
+	}
+	
+	if (hasNotBeenLoadedAlready) {
 		loadSoundThread = thread(&Mpc::static_loadSound, this, soundLoader.getSize());
 	}
 	else {

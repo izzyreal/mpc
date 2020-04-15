@@ -58,16 +58,19 @@ int SoundLoader::loadSound(MpcFile* f)
 	}
 	
 	auto sampler = mpc->getSampler().lock();
-	auto existIndex = sampler->checkExists(soundName);
-	if (!partOfProgram && existIndex == -1) {
+	auto existingSoundIndex = sampler->checkExists(soundName);
+	if (!partOfProgram && existingSoundIndex == -1) {
 		mpc->getUis().lock()->getDiskGui()->openPopup(soundFileName, extension);
 	}
 
 	auto sound = sampler->addSound(sampleRate).lock();
 	std::vector<float>* fa = sound->getSampleData();
+
 	if (StrUtil::eqIgnoreCase(extension, "wav")) {
+
 		auto file = soundFile->getFile().lock();
 		mpc::file::wav::WavFile wavFile;
+
 		wavFile.openWavFile(file);
 
 		int numChannels = wavFile.getNumChannels();
@@ -129,24 +132,24 @@ int SoundLoader::loadSound(MpcFile* f)
 	sound->setTune(tune);
 	sound->setNumberOfBeats(beats);
 	if (!preview) {
-		if (existIndex == -1) {
+		if (existingSoundIndex == -1) {
 			if (partOfProgram) return (int)(sampler->getSoundCount()) - 1;
 		}
 		else {
 			if (replace) {
-				sound->setMemoryIndex(existIndex);
-				sampler->deleteSample(existIndex);
+				sound->setMemoryIndex(existingSoundIndex);
+				sampler->deleteSample(existingSoundIndex);
 				sampler->sort();
 			}
 			else {
 				sampler->deleteSample((int)(sampler->getSoundCount()) - 1);
 			}
 			if (partOfProgram)
-				return existIndex;
+				return existingSoundIndex;
 		}
 	}
 	else {
-		return existIndex;
+		return existingSoundIndex;
 	}
 	return -1;
 }
