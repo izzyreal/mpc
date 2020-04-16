@@ -29,7 +29,7 @@
 #include <hardware/Hardware.hpp>
 #include <hardware/HwSlider.hpp>
 
-#include <file/all/AllLoader.hpp>
+#include <disk/AllLoader.hpp>
 #include <disk/ApsLoader.hpp>
 
 #include <disk/MpcFile.hpp>

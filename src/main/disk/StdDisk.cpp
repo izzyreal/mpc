@@ -7,7 +7,8 @@
 #include <disk/device/Device.hpp>
 #include <disk/device/StdDevice.hpp>
 #include <ui/disk/DiskGui.hpp>
-#include <file/AkaiNameGenerator.hpp>
+#include <file/AkaiName.hpp>
+
 #include <raw/fat/ShortName.hpp>
 #include <raw/fat/ShortNameGenerator.hpp>
 
@@ -17,9 +18,11 @@
 #include <file/Directory.hpp>
 #include <file/FileUtil.hpp>
 
+
 using namespace moduru::lang;
 using namespace moduru::file;
 using namespace mpc::disk;
+using namespace mpc::file;
 using namespace std;
 
 StdDisk::StdDisk(weak_ptr<Store> store, mpc::Mpc* mpc)
@@ -33,29 +36,61 @@ StdDisk::StdDisk(weak_ptr<Store> store, mpc::Mpc* mpc)
 }
 
 void StdDisk::renameFilesToAkai() {
-	auto fileArray = getDir().lock()->listFiles();
-	set<string> usedNames;
-	for (auto& f : fileArray) {
-		if (f->isFile()) {
-			auto ang = mpc::file::AkaiNameGenerator(usedNames);
-			string akaiName = ang.generateAkaiName(f->getName());
-			usedNames.emplace(akaiName);
-			if (akaiName.compare(f->getName()) != 0) {
-				f->renameTo(akaiName);
-			}
-		}
+
+	auto dirContent = getDir().lock()->listFiles(true);
+	
+	vector<shared_ptr<FsNode>> files;
+	vector<shared_ptr<FsNode>> directories;
+
+	copy_if(dirContent.begin(), dirContent.end(), back_inserter(files), [](const shared_ptr<FsNode> f) { return f->isFile(); });
+	copy_if(dirContent.begin(), dirContent.end(), back_inserter(files), [](const shared_ptr<FsNode> f) { return f->isDirectory(); });
+
+	vector<string> filesWithAkaiName;
+	transform(files.begin(), files.end(), back_inserter(filesWithAkaiName), [](const shared_ptr<FsNode> f) { return f->getName(); });
+	remove_if(filesWithAkaiName.begin(), filesWithAkaiName.end(), [](const string& s) { return !AkaiName::isAkaiName(s); });
+
+	vector<string> directoriesWithAkaiName;
+	transform(directories.begin(), directories.end(), back_inserter(directoriesWithAkaiName), [](const shared_ptr<FsNode> dir) { return dir->getName(); });
+	// Should check against ShortNameGenerator!!
+	remove_if(directoriesWithAkaiName.begin(), directoriesWithAkaiName.end(), [](const string& s) { return !AkaiName::isAkaiName(s); });
+
+	vector<shared_ptr<FsNode>> filesWithNoAkaiName;
+	copy_if(files.begin(), files.end(), back_inserter(filesWithNoAkaiName), [](const shared_ptr<FsNode> f) { return !AkaiName::isAkaiName(f->getName()); });
+
+	vector<shared_ptr<FsNode>> directoriesWithNoAkaiName;
+	// Should check against ShortNameGenerator!!
+	copy_if(directories.begin(), directories.end(), back_inserter(directoriesWithNoAkaiName), [](const shared_ptr<FsNode> dir) { return !AkaiName::isAkaiName(dir->getName()); });
+
+	vector<string> allAkaiNames = filesWithAkaiName;
+	copy(directoriesWithAkaiName.begin(), directoriesWithAkaiName.end(), back_inserter(allAkaiNames));
+
+	for (auto& file : filesWithNoAkaiName) {
+		auto akaiName = AkaiName::generate(file->getName(), allAkaiNames);
+		file->renameTo(akaiName);
+		allAkaiNames.push_back(akaiName);
+	}
+
+	for (auto& dir : directoriesWithNoAkaiName) {
+		// Should use ShortNameGenerator!!
+		auto akaiName = AkaiName::generate(dir->getName(), allAkaiNames);
+		dir->renameTo(akaiName);
+		allAkaiNames.push_back(akaiName);
+	}
+
+	/*
 		else {
-			auto sng = moduru::raw::fat::ShortNameGenerator(usedNames);
-			string sn = sng.generateShortName(f->getName())->asSimpleString();
-			if (sn.find(".") != string::npos) {
-				sn = sn.substr(0, sn.find_last_of("."));
-			}
-			usedNames.emplace(sn);
-			if (sn.compare(f->getName()) != 0) {
-				f->renameTo(sn);
-			}
+			//auto shortNameGenerator = moduru::raw::fat::ShortNameGenerator(usedNames);
+			//string sn = shortNameGenerator.generateShortName(f->getName())->asSimpleString();
+			//if (sn.find(".") != string::npos) {
+			//	sn = sn.substr(0, sn.find_last_of("."));
+			//}
+			//usedNames.emplace(StrUtil::toLower(sn));
+			//if (sn.compare(f->getName()) != 0) {
+			//	f->renameTo(sn);
+			//}
 		}
 	}
+	*/
 }
 
 void StdDisk::initFiles()
