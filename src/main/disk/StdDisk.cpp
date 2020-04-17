@@ -45,15 +45,11 @@ void StdDisk::renameFilesToAkai() {
 	vector<shared_ptr<FsNode>> directories;
 
 	for (auto& f : files) {
-		if (f->getName().length() <= 16) {
-			f->renameTo(StrUtil::toUpper(f->getName()));
-		}
+		f->renameTo(StrUtil::toUpper(f->getName()));
 	}
 
 	for (auto& d : directories) {
-		if (d->getName().length() <= 8) {
-			d->renameTo(StrUtil::toUpper(d->getName()));
-		}
+		d->renameTo(StrUtil::toUpper(d->getName()));
 	}
 
 	copy_if(dirContent.begin(), dirContent.end(), back_inserter(files), [](const shared_ptr<FsNode> f) { return f->isFile(); });
@@ -62,7 +58,12 @@ void StdDisk::renameFilesToAkai() {
 	vector<string> filesWithAkaiName;
 	transform(files.begin(), files.end(), back_inserter(filesWithAkaiName), [](const shared_ptr<FsNode> f) { return f->getName(); });
 	remove_if(filesWithAkaiName.begin(), filesWithAkaiName.end(), [](const string& s) {
-		if (s.length() <= 16) {
+		auto name = s;
+		auto extIndex = name.find_last_of('.');
+		if (extIndex != string::npos) {
+			name = name.substr(0, extIndex);
+		}
+		if (name.length() <= 16) {
 			return false;
 		}
 		return !AkaiName::isAkaiName(s);
@@ -88,7 +89,7 @@ void StdDisk::renameFilesToAkai() {
 
 	for (auto& file : files) {
 
-		if (file->getName().length() <= 16) {
+		if (file->getNameWithoutExtension().length() <= 16) {
 			continue;
 		}
 
