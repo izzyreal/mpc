@@ -44,60 +44,35 @@ void StdDisk::renameFilesToAkai() {
 	vector<shared_ptr<FsNode>> files;
 	vector<shared_ptr<FsNode>> directories;
 
-	for (auto& f : files) {
-		auto upper = StrUtil::toUpper(f->getName());
-		if (upper.compare(f->getName()) != 0) {
-			f->renameTo(upper);
-		}
-	}
-
-	for (auto& d : directories) {
-		auto upper = StrUtil::toUpper(d->getName());
-		if (upper.compare(d->getName()) != 0) {
-			d->renameTo(upper);
-		}
-	}
-
 	copy_if(dirContent.begin(), dirContent.end(), back_inserter(files), [](const shared_ptr<FsNode> f) { return f->isFile(); });
 	copy_if(dirContent.begin(), dirContent.end(), back_inserter(directories), [](const shared_ptr<FsNode> f) { return f->isDirectory(); });
 
-	vector<string> filesWithAkaiName;
-	transform(files.begin(), files.end(), back_inserter(filesWithAkaiName), [](const shared_ptr<FsNode> f) { return f->getName(); });
-	remove_if(filesWithAkaiName.begin(), filesWithAkaiName.end(), [](const string& s) {
-		return !AkaiName::isAkaiName(s);
-	});
-
-	vector<string> directoriesWithAkaiName;
-	transform(directories.begin(), directories.end(), back_inserter(directoriesWithAkaiName), [](const shared_ptr<FsNode> dir) { return dir->getName(); });
-	
-	ShortNameGenerator generator = ShortNameGenerator(set<string>{});
-	
-	remove_if(directoriesWithAkaiName.begin(), directoriesWithAkaiName.end(), [ &generator ](const string& s) {
-		auto shortName = generator.generateShortName(s).asSimpleString();
-		return shortName.compare(s) != 0; 
-	});
-
-	vector<string> allCompatibleNames = filesWithAkaiName;
-	copy(directoriesWithAkaiName.begin(), directoriesWithAkaiName.end(), back_inserter(allCompatibleNames));
-
 	dirContent.clear();
 
+	vector<string> allCompatibleNames;
+
 	for (auto& file : files) {
-		auto akaiName = AkaiName::generate(file->getName(), allCompatibleNames);
+		
+		auto namesExcludingItself = allCompatibleNames;
+
+		auto itself = find(namesExcludingItself.begin(), namesExcludingItself.end(), file->getName());
+		
+		if (itself != namesExcludingItself.end()) {
+			namesExcludingItself.erase(itself);
+		}
+
+		auto akaiName = AkaiName::generate(file->getName(), namesExcludingItself);
+		
 		if (akaiName.compare(file->getName()) == 0) {
 			allCompatibleNames.push_back(akaiName);
 			continue;
 		}
+
+		allCompatibleNames.push_back(akaiName);
 		file->renameTo(akaiName);
 	}
 	
 	for (auto& dir : directories) {
-		MLOG("");
-		MLOG("Checking dir " + dir->getName() + ", allCompatibleNames has:");
-		for (auto& s : allCompatibleNames) {
-			MLOG(s);
-		}
-		
 		set<string> namesAsSet(allCompatibleNames.begin(), allCompatibleNames.end());
 		
 		auto itself = namesAsSet.find(dir->getName());
@@ -117,7 +92,8 @@ void StdDisk::renameFilesToAkai() {
 		if (akaiName.find(".") != string::npos) {
 			akaiName = akaiName.substr(0, akaiName.find_last_of("."));
 		}
-		
+
+		allCompatibleNames.push_back(akaiName);
 		dir->renameTo(akaiName);
 	}
 }
