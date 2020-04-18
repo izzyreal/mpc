@@ -147,8 +147,11 @@ unsigned int TextComp::GetTextEntryLength() {
 	return text.length();
 }
 
-void TextComp::setText(string s)
+void TextComp::setText(const string& s)
 {
+	if (text.compare(s) == 0) {
+		return;
+	}
 	text = s;
 	//bool wasScrolling = scrolling;
 	//if (scrolling) setScrolling(false);

@@ -50,7 +50,7 @@ namespace mpc {
 		public:
 			virtual void setSize(int width, int height);
 			virtual void setLocation(int x, int y);
-			virtual void setText(std::string s);
+			virtual void setText(const std::string& s);
 
 		public:
 			void setOpaque(bool b);

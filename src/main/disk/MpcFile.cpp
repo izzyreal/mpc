@@ -32,11 +32,19 @@ MpcFile::MpcFile(nonstd::any fileObject)
 
 bool MpcFile::isDirectory()
 {
-	if (raw)
+	if (raw) {
 		//return rawEntry->isDirectory();
 		return false;
-	else
-		return getFsNode().lock()->isDirectory();
+	}
+	else {
+		auto dir = dynamic_pointer_cast<Directory>(getFsNode().lock());
+		if (dir) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
 }
 
 string MpcFile::getName()
@@ -46,7 +54,7 @@ string MpcFile::getName()
 		return "";
 	}
 	else
-		return StrUtil::toUpper(stdEntry->getName());
+		return stdEntry->getName();
 }
 
 bool MpcFile::setName(string s)

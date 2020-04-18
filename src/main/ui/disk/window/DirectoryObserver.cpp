@@ -165,6 +165,7 @@ void DirectoryObserver::drawGraphicsLeft()
 
 		lastVisibleFile = directoryGui->getFileFromGrid(0, lastVisibleFileNumber);
 	}
+
 	auto lDisk = disk.lock();
 	auto dirName = lDisk->getDirectoryName();
 	int visibleListLength = lastVisibleFileNumber + 1;
@@ -250,7 +251,6 @@ void DirectoryObserver::drawGraphicsLeft()
 				a4->setText(dirIcons[1]);
 			}
 		}
-		return;
 	}
 }
 

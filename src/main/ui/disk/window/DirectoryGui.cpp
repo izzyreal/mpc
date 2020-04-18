@@ -159,10 +159,14 @@ void DirectoryGui::down()
 {
 	auto lDisk = mpc->getDisk().lock();
 	if (xPos == 0) {
-		if (lDisk->isRoot()) return;
-
-		if (yOffset0 + yPos0 + 1 >= lDisk->getParentFileNames().size())
+		
+		if (lDisk->isRoot()) {
 			return;
+		}
+
+		if (yOffset0 + yPos0 + 1 >= lDisk->getParentFileNames().size()) {
+			return;
+		}
 
 		if (yPos0 == 4) {
 			yOffset0++;
@@ -178,6 +182,7 @@ void DirectoryGui::down()
 			return;
 		}
 		auto newDirectoryName = lDisk->getParentFileNames()[yPos0 + 1 + yOffset0];
+
 		if (lDisk->moveBack()) {
 			lDisk->initFiles();
 			lDisk->moveForward(newDirectoryName);

@@ -65,18 +65,6 @@ void Field::setSize(int width, int height) {
 	setText(text);
 }
 
-void Field::setText(string s)
-{
-	/*
-	if (split) {
-		for (int i = 0; i < letters.size(); i++) {
-			letters[i]->setText(string(text.substr(i, i + 1)).c_str());
-		}
-	}
-	*/
-	TextComp::setText(s);
-}
-
 const int Field::BLINKING_RATE;
 
 void Field::takeFocus(string prev)
