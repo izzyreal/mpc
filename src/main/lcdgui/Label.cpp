@@ -18,8 +18,8 @@ void Label::initialize(string name, string text, int x, int y, int columns) {
 	this->name = name;
 	this->columns = columns;
 	setText(text);
-	setSize(columns * TEXT_WIDTH + 1, TEXT_HEIGHT + 1);
-	setLocation(x, y);
+	setLocation(x, y, false);
+	setSize(columns * TEXT_WIDTH + 1, TEXT_HEIGHT + 1, false);
 	clearRects.clear();
 }
 

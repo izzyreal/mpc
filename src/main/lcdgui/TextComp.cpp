@@ -63,15 +63,26 @@ void TextComp::Draw(std::vector<std::vector<bool> >* pixels) {
 		}
 		delete tempText;
 	}
-	dirtyRect = dirtyRect.Union(&rect);
+
+
+//	if (name.find("c0i") == 0) {
+	//	dirtyRect = MRECT(0, 0, 0, 1);
+	//}
+	//else {
+		dirtyRect = dirtyRect.Union(&rect);
+	//}
+
 	dirty = false;
 }
 
-void TextComp::setSize(int w, int h) {
+void TextComp::setSize(int w, int h, bool clear) {
 	const int margin = noLeftMargin ? 0 : 1;
-	MRECT clearRect(x, y, x + this->w + margin, y + TEXT_HEIGHT + 1);
-	clearRects.push_back(clearRect);
-	dirtyRect = dirtyRect.Union(&clearRect);
+	
+	if (clear) {
+		MRECT clearRect(x, y, x + this->w + margin, y + TEXT_HEIGHT + 1);
+		clearRects.push_back(clearRect);
+		dirtyRect = dirtyRect.Union(&clearRect);
+	}
 
 	this->w = w;
 	this->h = h;
@@ -79,11 +90,14 @@ void TextComp::setSize(int w, int h) {
 	SetDirty();
 }
 
-void TextComp::setLocation(int x, int y) {
-	const int margin = noLeftMargin ? 0 : 1;
-	MRECT clearRect(this->x, this->y, this->x + w + margin, this->y + TEXT_HEIGHT + 1);
-	clearRects.push_back(clearRect);
-	dirtyRect = dirtyRect.Union(&clearRect);
+void TextComp::setLocation(int x, int y, bool clear) {
+	
+	if (clear) {
+		const int margin = noLeftMargin ? 0 : 1;
+		MRECT clearRect(this->x, this->y, this->x + w + margin, this->y + TEXT_HEIGHT + 1);
+		clearRects.push_back(clearRect);
+		dirtyRect = dirtyRect.Union(&clearRect);
+	}
 
 	this->x = x;
 	this->y = y;
@@ -149,9 +163,6 @@ unsigned int TextComp::GetTextEntryLength() {
 
 void TextComp::setText(const string& s)
 {
-	if (text.compare(s) == 0) {
-		return;
-	}
 	text = s;
 	//bool wasScrolling = scrolling;
 	//if (scrolling) setScrolling(false);

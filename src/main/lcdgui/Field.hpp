@@ -36,8 +36,8 @@ namespace mpc {
 			bool blinking{ false };
 
 		public:
-			void setSize(int x, int y) override;
-			void Draw(std::vector<std::vector<bool> >* pixels) override;
+			void setSize(int x, int y, bool clear = true) override;
+			void Draw(std::vector<std::vector<bool>>* pixels) override;
 
 		public:
 			bool hasFocus();

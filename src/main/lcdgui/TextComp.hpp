@@ -48,8 +48,8 @@ namespace mpc {
 			static void static_scroll(void * args);
 
 		public:
-			virtual void setSize(int width, int height);
-			virtual void setLocation(int x, int y);
+			virtual void setSize(int width, int height, bool clear = true);
+			virtual void setLocation(int x, int y, bool clear = true);
 			virtual void setText(const std::string& s);
 
 		public:

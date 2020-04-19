@@ -4,6 +4,8 @@
 
 #include "LayeredScreen.hpp"
 
+#include <Logger.hpp>
+
 #include <string>
 
 using namespace rapidjson;
@@ -18,7 +20,7 @@ Layer::Layer(mpc::lcdgui::LayeredScreen* ls, std::vector<std::vector<bool>>* atl
 	for (int i = 0; i < 100; i++) {
 		unusedFields.push_back(make_shared<mpc::lcdgui::Field>(ls, atlas, font));
 	}
-	for (int i = 0; i < 100; i++) {
+	for (int i = 0; i < 1000; i++) {
 		unusedLabels.push_back(make_shared<mpc::lcdgui::Label>(atlas, font));
 	}
 	blinkLabel = make_shared<mpc::lcdgui::BlinkLabel>("SOLO", atlas, font);

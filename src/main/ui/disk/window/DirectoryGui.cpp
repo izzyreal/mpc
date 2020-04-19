@@ -172,6 +172,7 @@ void DirectoryGui::down()
 			yOffset0++;
 			auto newDirectoryName = lDisk->getParentFileNames()[4 + yOffset0];
 			if (lDisk->moveBack()) {
+				lDisk->initFiles();
 				lDisk->moveForward(newDirectoryName);
 				lDisk->initFiles();
 				diskGui->setFileLoad(0);

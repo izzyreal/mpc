@@ -39,8 +39,8 @@ void Field::initialize(std::string name, int x, int y, int columns) {
 	this->columns = columns;
 
 	setText("");
-	setSize(columns * TEXT_WIDTH + 1, TEXT_HEIGHT + 1);
-	setLocation(x, y);
+	setLocation(x, y, false);
+	setSize(columns * TEXT_WIDTH + 1, TEXT_HEIGHT + 1, false);
 	clearRects.clear();
 	//loseFocus(name);
 }
@@ -60,8 +60,8 @@ void Field::Draw(vector<vector<bool> >* pixels) {
 	TextComp::Draw(pixels);
 }
 
-void Field::setSize(int width, int height) {
-	TextComp::setSize(width, height);
+void Field::setSize(int width, int height, bool clear) {
+	TextComp::setSize(width, height, clear);
 	setText(text);
 }
 
@@ -99,9 +99,9 @@ void Field::takeFocus(string prev)
 			layeredScreen->getTwoDots().lock()->setSelected(3, true);
 		}
 	}
-//	if (csn.compare("directory") == 0) {
+	//if (csn.compare("directory") == 0) {
 //		focusField.lock()->setOpaque(true);
-//	}
+	//}
 	//if (!csn.compare("name") == 0) {
 //		focusField.lock()->setOpaque(true);
 	//}
@@ -175,12 +175,17 @@ void Field::loseFocus(string next)
 	////	if (focusEvent.compare("tr1") == 0 && !lGui->getTrMoveGui()->isSelected())
 	////		lLs->drawFunctionKeys("trmove");
 	//}
-	//else if (csn.compare("directory") == 0 || csn.compare("save") == 0) {
+	//else if (csn.compare("save") == 0) {
 	//	setOpaque(false);
 	//}
 	//else if (csn.compare("assignmentview") == 0) {
 	//	setOpaque(false);
 	//}
+
+	//if (csn.compare("directory") == 0) {
+		//setOpaque(false);
+	//}
+
 	SetDirty();
 }
 

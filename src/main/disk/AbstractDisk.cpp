@@ -80,9 +80,7 @@ MpcFile* AbstractDisk::getFile(int i)
 vector<string> AbstractDisk::getFileNames()
 {
 	vector<string> res;
-	for (auto& f : files) {
-		res.push_back(f->getName());
-	}
+	transform(files.begin(), files.end(), back_inserter(res), [](MpcFile* f) { return f->getName(); });
 	return res;
 }
 
