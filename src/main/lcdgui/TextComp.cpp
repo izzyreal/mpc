@@ -64,13 +64,7 @@ void TextComp::Draw(std::vector<std::vector<bool> >* pixels) {
 		delete tempText;
 	}
 
-
-//	if (name.find("c0i") == 0) {
-	//	dirtyRect = MRECT(0, 0, 0, 1);
-	//}
-	//else {
-		dirtyRect = dirtyRect.Union(&rect);
-	//}
+	dirtyRect = dirtyRect.Union(&rect);
 
 	dirty = false;
 }
