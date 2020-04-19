@@ -56,6 +56,11 @@ void GlobalReleaseControls::function(int i) {
 		break;
 	case 4:
 		controls->setF5Pressed(false);
+		if (csn.compare("load") == 0) {
+			sampler.lock()->finishBasicVoice();
+			sampler.lock()->deleteSound(dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getPreviewSound().lock()));
+		}
+		break;
 	case 5:
 		controls->setF6Pressed(false);
 		if (!sequencer.lock()->isPlaying() && csn.compare("sequencer") != 0) {
@@ -66,6 +71,10 @@ void GlobalReleaseControls::function(int i) {
 				ls.lock()->setCurrentBackground("trackmute");
 			}
 			sequencer.lock()->setSoloEnabled(sequencer.lock()->isSoloEnabled());
+		}
+		if (csn.compare("directory") == 0) {
+			sampler.lock()->finishBasicVoice();
+			sampler.lock()->deleteSound(dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getPreviewSound().lock()));
 		}
 		break;
 	}

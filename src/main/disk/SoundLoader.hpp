@@ -3,6 +3,8 @@
 #include <memory>
 #include <vector>
 
+using namespace std;
+
 namespace moduru::file {
 	class File;
 }
@@ -32,13 +34,13 @@ namespace mpc::disk {
 
 		bool partOfProgram{ false };
 		MpcFile* soundFile{ nullptr };
-		std::vector<std::weak_ptr<mpc::sampler::Sound>> sounds{};
+		vector<weak_ptr<mpc::sampler::Sound>> sounds{};
 		bool preview{ false };
 		bool replace{ false };
 		int size{ 0 };
 
 	public:
-		static void getSampleDataFromWav(std::weak_ptr<moduru::file::File> wavFile, std::vector<float>* dest);
+		static void getSampleDataFromWav(weak_ptr<moduru::file::File> wavFile, vector<float>* dest);
 
 		void setPartOfProgram(bool b);
 		int loadSound(MpcFile* f);
@@ -47,7 +49,7 @@ namespace mpc::disk {
 		int getSize();
 
 		SoundLoader(mpc::Mpc* mpc);
-		SoundLoader(mpc::Mpc* mpc, std::vector<std::weak_ptr<mpc::sampler::Sound>> sounds, bool replace);
+		SoundLoader(mpc::Mpc* mpc, vector<weak_ptr<mpc::sampler::Sound>> sounds, bool replace);
 
 	};
 }

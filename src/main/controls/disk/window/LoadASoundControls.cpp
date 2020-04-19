@@ -39,7 +39,11 @@ void LoadASoundControls::function(int i)
 	auto lSampler = sampler.lock();
 	switch (i) {
 	case 2:
-		if (controls->isF3Pressed()) return;
+		
+		if (controls->isF3Pressed()) {
+			return;
+		}
+
 		controls->setF3Pressed(true);
 		//lSampler->stopAllVoices();
 		s = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getPreviewSound().lock());

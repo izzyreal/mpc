@@ -1,20 +1,29 @@
 #include <controls/disk/LoadControls.hpp>
 
 #include <Mpc.hpp>
+#include <controls/Controls.hpp>
+
 #include <disk/AbstractDisk.hpp>
 #include <disk/MpcFile.hpp>
+#include <disk/SoundLoader.hpp>
+
 #include <file/mid/MidiReader.hpp>
 #include <ui/disk/DiskGui.hpp>
 #include <ui/disk/window/DirectoryGui.hpp>
 #include <ui/disk/window/DiskWindowGui.hpp>
+
 #include <sequencer/Sequence.hpp>
 #include <sequencer/Sequencer.hpp>
+
+#include <sampler/Sampler.hpp>
+#include <sampler/Sound.hpp>
 
 #include <file/FileUtil.hpp>
 #include <lang/StrUtil.hpp>
 
 using namespace moduru::lang;
 using namespace mpc::controls::disk;
+using namespace mpc::sampler;
 using namespace std;
 
 LoadControls::LoadControls(mpc::Mpc* mpc)
@@ -26,6 +35,7 @@ void LoadControls::function(int i)
 {
 	init();
 	auto lDisk = disk.lock();
+	
 	string ext;
 	switch (i) {
 	case 1:
@@ -37,10 +47,53 @@ void LoadControls::function(int i)
 	case 3:
 		ls.lock()->openScreen("setup");
 		break;
-	case 5:
-		if (!lDisk) return;
-		if (lDisk->getFileNames().size() == 0) return;
+	case 4: {
+		auto controls = mpc->getControls().lock();
 
+		if (controls->isF5Pressed()) {
+			return;
+		}
+
+		controls->setF5Pressed(true);
+
+		auto soundLoader = mpc::disk::SoundLoader(mpc, vector<weak_ptr<Sound>>(), false);
+
+		soundLoader.setPreview(true);
+		soundLoader.setPartOfProgram(true); // hack to disable popups
+
+		try {
+			soundLoader.loadSound(mpc->getUis().lock()->getDiskGui()->getSelectedFile()) == -1;
+		}
+		catch (const invalid_argument& exception) {
+			lDisk->setBusy(false);
+			return;
+		}
+
+		lDisk->setBusy(false);
+
+		auto lSampler = sampler.lock();
+		auto s = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getPreviewSound().lock());
+		auto start = s->getStart();
+		auto end = s->getSampleData()->size();
+		auto loopTo = -1;
+		auto overlapMode = 1;
+
+		if (s->isLoopEnabled()) {
+			loopTo = s->getLoopTo();
+			overlapMode = 2;
+		}
+
+		if (!s->isMono()) {
+			end /= 2;
+		}
+
+		lSampler->playPreviewSample(start, end, loopTo, overlapMode);
+		break;
+	}
+	case 5:
+		if (!lDisk || lDisk->getFileNames().size() == 0) {
+			return;
+		}
 		selectedFile = diskGui->getSelectedFile();
 		ext = moduru::file::FileUtil::splitName(selectedFile->getName())[1];
 		if (StrUtil::eqIgnoreCase(ext, "snd") || StrUtil::eqIgnoreCase(ext, "wav")) {

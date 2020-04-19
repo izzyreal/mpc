@@ -155,9 +155,6 @@ void BaseControls::function(int i)
 			lsLocked->openScreen(lsLocked->getPreviousScreenName());
 		}
 		break;
-	case 5:
-		mpc->getControls().lock()->setF6Pressed(true);
-		break;
 	}
 }
 

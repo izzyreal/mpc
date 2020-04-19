@@ -1,6 +1,8 @@
 #include <controls/sampler/SampleControls.hpp>
 
 #include <Mpc.hpp>
+#include <controls/Controls.hpp>
+
 #include <audiomidi/AudioMidiServices.hpp>
 #include <audiomidi/SoundRecorder.hpp>
 
@@ -73,6 +75,13 @@ void SampleControls::function(int i)
 		//}
 		break;
 	case 5:
+		
+		if (mpc->getControls().lock()->isF6Pressed()) {
+			return;
+		}
+
+		mpc->getControls().lock()->setF6Pressed(true);
+
 		auto ams = mpc->getAudioMidiServices().lock();
 
 		if (ams->isRecordingSound()) {

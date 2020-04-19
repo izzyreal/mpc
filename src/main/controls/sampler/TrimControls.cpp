@@ -71,8 +71,12 @@ void TrimControls::function(int f)
 		lLs->openScreen("editsound");
 		break;
 	case 5:
-		if (mpc->getControls().lock()->isF6Pressed()) return;
+		if (mpc->getControls().lock()->isF6Pressed()) {
+			return;
+		}
+		
 		mpc->getControls().lock()->setF6Pressed(true);
+		
 		zone = vector<int>{ soundGui->getZoneStart(soundGui->getZoneNumber()), soundGui->getZoneEnd(soundGui->getZoneNumber()) };
 		lSampler->playX(soundGui->getPlayX(), &zone);
 		break;
