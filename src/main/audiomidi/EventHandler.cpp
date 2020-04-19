@@ -186,12 +186,15 @@ void EventHandler::midiOut(weak_ptr<mpc::sequencer::Event> e, mpc::sequencer::Tr
 		auto deviceNumber = track->getDevice() - 1;
 		if (deviceNumber < 0) return;
 		auto channel = deviceNumber;
-		if (channel > 15) channel -= 16;
+		if (channel > 15) {
+			channel -= 16;
+		}
 		mpc::sequencer::MidiAdapter midiAdapter;
 		midiAdapter.process(event, channel, -1);
 		ctoot::midi::core::ShortMessage msg = *midiAdapter.get().lock().get();
 		
 		auto mpcMidiPorts = mpc->getMidiPorts().lock();
+
 		vector<ctoot::midi::core::ShortMessage>* r;
 
 		r = &mpcMidiPorts->getReceivers()[0];
@@ -203,12 +206,15 @@ void EventHandler::midiOut(weak_ptr<mpc::sequencer::Event> e, mpc::sequencer::Tr
 			r = &mpcMidiPorts->getReceivers()[1];
 			notifyLetter = "b";
 		}
+
 		if (!(mpc->getAudioMidiServices().lock()->isBouncing() && mpc->getUis().lock()->getD2DRecorderGui()->isOffline()) && r != nullptr && track->getDevice() != 0) {
 			if (r != nullptr) {
 				auto fs = mpc->getAudioMidiServices().lock()->getFrameSequencer().lock();
 				auto eventFrame = fs->getEventFrameOffset(event->getTick());
 				msg.bufferPos = eventFrame;
-				r->push_back(msg);
+				if (r->size() < 100) {
+					r->push_back(msg);
+				}
 			}
 		}
 
