@@ -196,6 +196,9 @@ void Button::release() {
 	else if (label.compare("tap") == 0) {
 		c->tap();
 	}
+	else if (label.compare("goto") == 0) {
+		c->goTo();
+	}
 }
 
 Button::~Button() {

@@ -28,6 +28,11 @@ GlobalReleaseControls::GlobalReleaseControls(mpc::Mpc* mpc)
 {
 }
 
+void GlobalReleaseControls::goTo() {
+	auto controls = mpc->getControls().lock();
+	controls->setGoToPressed(false);
+}
+
 void GlobalReleaseControls::function(int i) {
 	init();
 	auto controls = mpc->getControls().lock();

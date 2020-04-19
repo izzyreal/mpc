@@ -41,7 +41,7 @@ Sequencer::Sequencer(mpc::Mpc* mpc)
 
 void Sequencer::init()
 {
-	TICK_VALUES = vector<int>{ 0, 48, 32, 24, 16, 12, 8 };
+	TICK_VALUES = vector<int>{ 1, 48, 32, 24, 16, 12, 8 };
 	repeats = 0;
 	sequences = vector<shared_ptr<Sequence>>(99);
 	taps = make_unique<moduru::io::CircularIntBuffer>(4, true, true);
@@ -1042,16 +1042,21 @@ void Sequencer::goToPreviousStep()
 	auto pos = getTickPosition();
 	auto stepAmt = static_cast<int>(ceil(getActiveSequence().lock()->getLastTick() / stepSize)) + 1;
 	auto stepGrid = vector<int>(stepAmt);
-	for (int i = 0; i < stepGrid.size(); i++)
+
+	for (int i = 0; i < stepGrid.size(); i++) {
 		stepGrid[i] = i * stepSize;
+	}
 
 	auto currentStep = 0;
+
 	for (auto l : stepGrid) {
 		if (pos <= l) break;
 		currentStep++;
 	}
-	if (currentStep == 0)
+
+	if (currentStep == 0) {
 		return;
+	}
 
 	currentStep--;
 	move(currentStep * stepSize);
@@ -1062,17 +1067,23 @@ void Sequencer::goToNextStep()
 	auto swGui = mpc->getUis().lock()->getSequencerWindowGui();
 	auto stepSize = TICK_VALUES[swGui->getNoteValue()];
 	auto pos = getTickPosition();
+
 	auto stepGrid = vector<int>(ceil(getActiveSequence().lock()->getLastTick() / stepSize));
+
 	for (int i = 0; i < stepGrid.size(); i++)
 		stepGrid[i] = i * stepSize;
 
 	auto currentStep = -1;
 	for (auto l : stepGrid) {
-		if (pos < l) break;
+		if (pos < l) {
+			break;
+		}
 		currentStep++;
 	}
-	if (currentStep == stepGrid.size())
+
+	if (currentStep == stepGrid.size()) {
 		return;
+	}
 
 	currentStep++;
 	move(currentStep * stepSize);

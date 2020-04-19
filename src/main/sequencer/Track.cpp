@@ -45,21 +45,26 @@ void Track::move(int tick, int oldTick)
 	}
 	sort(noteOffs.begin(), noteOffs.end(), tickCmp);
 	for (auto& no : noteOffs) {
-		auto lNo = no.lock();
-		lNo->setTick((lNo->getTick() - oldTick) + tick);
+		no->setTick((no->getTick() - oldTick) + tick);
 	}
 
-	if (tick == oldTick) return;
+	if (tick == oldTick) {
+		return;
+	}
 
 	auto startIndex = 0;
+	
 	if (tick > oldTick) {
 		if (eventIndex == events.size()) return;
 		startIndex = eventIndex;
 	}
+
 	if (tick < oldTick && eventIndex == 0) {
 		return;
 	}
+	
 	eventIndex = events.size();
+	
 	for (int i = startIndex; i < events.size(); i++) {
 		if (events[i]->getTick() >= tick) {
 			eventIndex = i;
@@ -91,19 +96,26 @@ weak_ptr<NoteEvent> Track::recordNoteOn()
 {
 	auto lSequencer = sequencer.lock();
 	auto n = make_shared<NoteEvent>();
+	
 	n->setTick(lSequencer->getTickPosition());
-	for (auto& ne : queuedNoteOnEvents) {
-		if (ne->getNote() == n->getNote()) {
-			auto nne = new NoteEvent();
-			nne->setNote(n->getNote());
-			nne->setVelocity(0);
-			nne->setTick(lSequencer->getTickPosition());
-			recordNoteOff(nne);
+	
+	for (auto& noteOnEvent : queuedNoteOnEvents) {
+		if (noteOnEvent->getNote() == n->getNote()) {
+			auto noteOffEvent = new NoteEvent();
+			noteOffEvent->setNote(n->getNote());
+			noteOffEvent->setVelocity(0);
+			noteOffEvent->setTick(lSequencer->getTickPosition());
+			recordNoteOff(noteOffEvent);
 			break;
 		}
 	}
-	if (n->getTick() >= lSequencer->getCurrentlyPlayingSequence().lock()->getLastTick()) n->setTick(0);
+
+	if (n->getTick() >= lSequencer->getCurrentlyPlayingSequence().lock()->getLastTick()) {
+		n->setTick(0);
+	}
+	
 	queuedNoteOnEvents.push_back(n);
+	
 	return n;
 }
 
@@ -125,7 +137,9 @@ void Track::recordNoteOff(NoteEvent* n)
 		}
 	}
 
-	if (!noteOn) return;
+	if (!noteOn) {
+		return;
+	}
 
 	if (eraseIndex != -1 && eraseIndex != queuedNoteOnEvents.size()) queuedNoteOnEvents.erase(queuedNoteOnEvents.begin() + eraseIndex);
 	
@@ -394,49 +408,58 @@ int Track::getNextTick()
 	if (eventIndex + 1 > events.size() && noteOffs.size() == 0) {
 		return MAX_TICK;
 	}
+	
 	eventAvailable = eventIndex < events.size();
 	sort(noteOffs.begin(), noteOffs.end(), tickCmp);
+	
 	if (noteOffs.size() != 0) {
 		for (auto& no : noteOffs) {
-				auto lNo = no.lock();
 			if (eventAvailable) {
-				if (lNo->getTick() < events[eventIndex]->getTick()) {
-					return lNo->getTick();
+				if (no->getTick() < events[eventIndex]->getTick()) {
+					return no->getTick();
 				}
 			}
 			else {
-				return lNo->getTick();
+				return no->getTick();
 			}
 		}
 	}
+
 	if (eventAvailable) {
 		return events[eventIndex]->getTick();
 	}
+	
 	return MAX_TICK;
 }
 
 void Track::playNext()
 {
-	if (eventIndex + 1 > events.size() && noteOffs.size() == 0) return;
+	if (eventIndex + 1 > events.size() && noteOffs.size() == 0) {
+		return;
+	}
+	
 	auto lSequencer = sequencer.lock();
 	multi = lSequencer->isRecordingModeMulti();
 	delete_ = lSequencer->isRecording() && (trackIndex == lSequencer->getActiveTrackIndex() || multi) && (trackIndex < 64);
-	if (lSequencer->isOverDubbing() && mpc->getControls().lock()->isErasePressed() && (trackIndex == lSequencer->getActiveTrackIndex() || multi) && trackIndex < 64)
+
+	if (lSequencer->isOverDubbing() && mpc->getControls().lock()->isErasePressed() && (trackIndex == lSequencer->getActiveTrackIndex() || multi) && trackIndex < 64) {
 		delete_ = true;
+	}
 
 	int counter = 0;
 	sort(noteOffs.begin(), noteOffs.end(), tickCmp);
-	for (auto& no : noteOffs) {
-		auto lNo = no.lock();
-		if (eventIndex + 1 > events.size() || lNo->getTick() < events[eventIndex]->getTick()) {
+	
+	for (auto& no : noteOffs) {	
+		if (eventIndex + 1 > events.size() || no->getTick() < events[eventIndex]->getTick()) {
 			if (!delete_) {
-				mpc->getEventHandler().lock()->handle(lNo, this);
+				mpc->getEventHandler().lock()->handle(no, this);
 			}
 			noteOffs.erase(noteOffs.begin() + counter);
 			return;
 		}
 		counter++;
 	}
+
 	event = events[eventIndex];
 	auto lEvent = event.lock();
 	auto note = dynamic_pointer_cast<NoteEvent>(lEvent);

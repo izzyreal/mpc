@@ -43,6 +43,7 @@ namespace mpc {
 			void shift() override;
 			void erase() override;
 			void function(int i) override;
+			void goTo() override;
 
 		public:
 			// Not implemented, in case a release is triggered. We don't want BaseControls to start processing these.
@@ -59,7 +60,6 @@ namespace mpc {
 			void mainScreen() override {};
 			void prevStepEvent() override {};
 			void nextStepEvent() override {};
-			void goTo() override {};
 			void prevBarStart() override {};
 			void nextBarEnd() override {};
 			void nextSeq() override {};
