@@ -3,7 +3,7 @@
 #include <audio/core/AudioFormat.hpp>
 #include <audio/core/AudioBuffer.hpp>
 
-#include <audiomidi/WavStream.h>
+#include <audiomidi/WavOutputFileStream.hpp>
 
 using namespace std;
 using namespace mpc::audiomidi;
@@ -27,8 +27,8 @@ void DiskRecorder::prepare(const std::string& absolutePath, int lengthInFrames, 
 		fileStream.close();
 	}
 
-	fileStream = ws_init(absolutePath);
-	ws_writeHeader(fileStream, sampleRate);
+	fileStream = wav_init_ofstream(absolutePath);
+	wav_writeHeader(fileStream, sampleRate);
 	
 	lengthInBytes = lengthInFrames * 2 * 2; // assume 16 bit stereo for now
 	
@@ -48,11 +48,11 @@ int DiskRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf)
 			writing = false;
 		}
 		
-		ws_write_bytes(fileStream, audioBufferAsBytes);
+		wav_write_bytes(fileStream, audioBufferAsBytes);
 		written += audioBufferAsBytes.size();
 		
 		if (!writing) {
-			ws_close(fileStream, sampleRate, lengthInFrames);
+			wav_close(fileStream, sampleRate, lengthInFrames);
 			lengthInBytes = 0;
 			lengthInFrames = 0;
 			sampleRate = 0;
