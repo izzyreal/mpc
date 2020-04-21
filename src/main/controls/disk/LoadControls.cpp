@@ -48,6 +48,7 @@ void LoadControls::function(int i)
 		ls.lock()->openScreen("setup");
 		break;
 	case 4: {
+		/*
 		auto controls = mpc->getControls().lock();
 
 		if (controls->isF5Pressed()) {
@@ -88,6 +89,7 @@ void LoadControls::function(int i)
 		}
 
 		lSampler->playPreviewSample(start, end, loopTo, overlapMode);
+		*/
 		break;
 	}
 	case 5:

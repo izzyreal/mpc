@@ -61,6 +61,7 @@ void DirectoryControls::function(int f)
 		break;
 	case 5:
 	{
+		/*
 		auto controls = mpc->getControls().lock();
 
 		if (controls->isF6Pressed()) {
@@ -101,6 +102,8 @@ void DirectoryControls::function(int f)
 		}
 
 		lSampler->playPreviewSample(start, end, loopTo, overlapMode);
+		*/
+		break;
 	}
 	}
 }
