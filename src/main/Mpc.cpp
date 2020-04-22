@@ -217,6 +217,7 @@ void Mpc::loadSound(bool replace)
 		loadSoundThread = thread(&Mpc::static_loadSound, this, soundLoader.getSize());
 	}
 	else {
+		sampler->deleteSample(sampler->getSoundCount() - 1);
 		lDisk->setBusy(false);
 	}
 }

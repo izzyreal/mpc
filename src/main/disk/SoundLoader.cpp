@@ -131,7 +131,12 @@ int SoundLoader::loadSound(MpcFile* f)
 	sound->setLevel(level);
 	sound->setTune(tune);
 	sound->setNumberOfBeats(beats);
-	if (!preview) {
+
+	bool alreadyLoaded = existingSoundIndex != -1;
+	if (preview) {
+		return existingSoundIndex;
+	}
+	else {
 		if (existingSoundIndex == -1) {
 			if (partOfProgram) return (int)(sampler->getSoundCount()) - 1;
 		}
@@ -147,9 +152,6 @@ int SoundLoader::loadSound(MpcFile* f)
 			if (partOfProgram)
 				return existingSoundIndex;
 		}
-	}
-	else {
-		return existingSoundIndex;
 	}
 	return -1;
 }

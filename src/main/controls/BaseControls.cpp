@@ -32,7 +32,6 @@
 #include <ui/sequencer/SequencerGui.hpp>
 #include <ui/sequencer/window/SequencerWindowGui.hpp>
 #include <ui/vmpc/DirectToDiskRecorderGui.hpp>
-//#include <ui/vmpc/AudioGui.hpp>
 #include <sampler/Pad.hpp>
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>
@@ -44,6 +43,8 @@
 
 #include <mpc/MpcSoundPlayerChannel.hpp>
 #include <audio/server/NonRealTimeAudioServer.hpp>
+
+#include <Logger.hpp>
 
 using namespace mpc;
 using namespace mpc::controls;
@@ -541,6 +542,11 @@ void BaseControls::playStart()
 void BaseControls::mainScreen()
 {
     init();
+
+	//auto sampler = mpc->getSampler().lock();
+	//auto numSounds = sampler->getSoundCount();
+	//MLOG("Current number of sounds: " + to_string(numSounds));
+
 	auto ams = mpc->getAudioMidiServices().lock();
 	if (ams->isRecordingSound()) {
 		ams->stopSoundRecorder();
