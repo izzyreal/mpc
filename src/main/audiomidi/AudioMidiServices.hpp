@@ -48,6 +48,7 @@ namespace mpc::audiomidi {
 	class DirectToDiskSettings;
 	class DiskRecorder;
 	class SoundRecorder;
+	class SoundPlayer;
 }
 
 using namespace mpc::audiomidi;
@@ -94,6 +95,7 @@ namespace mpc::audiomidi {
 		vector<int> oldPrograms;
 		vector<shared_ptr<DiskRecorder>> diskRecorders;
 		shared_ptr<SoundRecorder> soundRecorder;
+		shared_ptr<SoundPlayer> soundPlayer;
 
 	private:
 		void destroySynth();

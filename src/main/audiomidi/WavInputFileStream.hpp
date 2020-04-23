@@ -24,14 +24,14 @@ int wav_getLE(ifstream& stream, int numBytes)
         return 0;
     }
 
-   unsigned int pos = 0;
+   int pos = 0;
     char buffer[4];
 
     for (int i = 0; i < numBytes; i++) {
         stream >> buffer[i];
     }
-
-    pos = numBytes - 1;
+    numBytes--;
+    pos = numBytes;
     
     int val = buffer[pos] & 255;
     
@@ -44,14 +44,19 @@ int wav_getLE(ifstream& stream, int numBytes)
 
 bool wav_readHeader(ifstream& stream, int& sampleRate, int& validBits, int& numChannels, int& dataChunkSize, int& numFrames) {
     
+    stream.seekg(0, stream.end);
+    auto tell = stream.tellg();
+
     if (stream.tellg() < EXPECTED_HEADER_SIZE) {
         return false;
     }
+    stream.seekg(0, stream.beg);
 
     auto riffChunkId = wav_getLE(stream, 4);         // Offset 0
     auto mainChunkSize = wav_getLE(stream, 4);       // Offset 4;
     auto riffTypeId = wav_getLE(stream, 4);          // Offset 8
-    auto fmtChunkId = wav_getLE(stream, 4);          // Offset 12
+    auto fmtChunkId = wav_getLE(stream, 3);          // Offset 12
+    //wav_getLE(stream, 1);
     auto lengthOfFormatData = wav_getLE(stream, 4);  // Offset 16
     auto isPCM = wav_getLE(stream, 2) == 1;          // Offset 20
     numChannels = wav_getLE(stream, 2);         // Offset 22
@@ -66,9 +71,9 @@ bool wav_readHeader(ifstream& stream, int& sampleRate, int& validBits, int& numC
         return false;
     }
 
-    if (fmtChunkId != FMT_CHUNK_ID) {
-        return false;
-    }
+    //if (fmtChunkId != FMT_CHUNK_ID) {
+        //return false;
+    //}
 
     if (lengthOfFormatData != EXPECTED_FMT_DATA_SIZE) {
         return false;
@@ -90,8 +95,8 @@ bool wav_readHeader(ifstream& stream, int& sampleRate, int& validBits, int& numC
         return false;
     }
 
-    if (EXPECTED_HEADER_SIZE + dataChunkSize != stream.tellg()) {
-        return false;
+    if (EXPECTED_HEADER_SIZE + dataChunkSize != tell) {
+//        return false;
     }
 
     numFrames = (dataChunkSize / (validBits / 8)) / numChannels;
@@ -100,7 +105,7 @@ bool wav_readHeader(ifstream& stream, int& sampleRate, int& validBits, int& numC
 }
 
 void wav_read_bytes(ifstream& stream, const vector<char>& bytes) {
-    stream.read((char*)(&bytes[0]), bytes.size());
+   stream.read((char*)(&bytes[0]), bytes.size());
 }
 
 void wav_close(ifstream& stream) {

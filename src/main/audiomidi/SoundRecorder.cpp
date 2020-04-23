@@ -93,8 +93,8 @@ int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf)
 	auto left = buf->getChannel(0);
 	auto right = buf->getChannel(1);
 
-	applyGain(inputGain / 100.f, left);
-	applyGain(inputGain / 100.f, right);
+	applyGain(inputGain * 0.01, left);
+	applyGain(inputGain * 0.01, right);
 
 	if (vuMeterActive.load()) {
 		setChanged();
@@ -117,20 +117,16 @@ int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf)
 
 		vector<float> resampledLeft;
 
-		if (mode == 0 || mode == 2) {
-			if (resample) {
-				resampledLeft = resampleChannel(true, left, buf->getSampleRate());
-				left = &resampledLeft;
-			}
+		if ((mode == 0 || mode == 2) && resample) {
+			resampledLeft = resampleChannel(true, left, buf->getSampleRate());
+			left = &resampledLeft;
 		}
 
 		vector<float> resampledRight;
 
-		if (mode == 1 || mode == 2) {
-			if (resample) {
-				resampledRight = resampleChannel(false, right, buf->getSampleRate());
-				right = &resampledRight;
-			}
+		if ((mode == 1 || mode == 2) && resample) {
+			resampledRight = resampleChannel(false, right, buf->getSampleRate());
+			right = &resampledRight;
 		}
 
 		if (mode == 0) {
@@ -195,13 +191,4 @@ void SoundRecorder::initSrc() {
 }
 
 SoundRecorder::~SoundRecorder() {
-/*
-	if (srcLeft != NULL) {
-		src_delete(srcLeft);
-	}
-
-	if (srcRight != NULL) {
-		src_delete(srcRight);
-	}
-	*/
 }

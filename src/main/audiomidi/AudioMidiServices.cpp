@@ -6,6 +6,7 @@
 #include <audiomidi/DirectToDiskSettings.hpp>
 #include <audiomidi/DiskRecorder.hpp>
 #include <audiomidi/SoundRecorder.hpp>
+#include <audiomidi/SoundPlayer.hpp>
 #include <audiomidi/MpcMidiPorts.hpp>
 #include <ui/sampler/SamplerGui.hpp>
 #include <ui/sampler/MixerSetupGui.hpp>
@@ -109,6 +110,7 @@ void AudioMidiServices::start(const int sampleRate, const int inputCount, const 
 	offlineServer = make_shared<NonRealTimeAudioServer>(server);
 
 	soundRecorder = make_shared<SoundRecorder>();
+	soundPlayer = make_shared<SoundPlayer>();
 
 	setupMixer();
 
@@ -144,6 +146,10 @@ void AudioMidiServices::start(const int sampleRate, const int inputCount, const 
 	initializeDiskRecorders();
 
 	mixer->getStrip(string("66")).lock()->setDirectOutputProcess(soundRecorder);
+	mixer->getStrip(string("67")).lock()->setInputProcess(soundPlayer);
+	auto sc = mixer->getMixerControls().lock()->getStripControls("67").lock();
+	auto mmc = dynamic_pointer_cast<MainMixControls>(sc->find("Main").lock());
+	dynamic_pointer_cast<ctoot::audio::fader::FaderControl>(mmc->find("Level").lock())->setValue(static_cast<float>(100));
 	
 	cac = make_shared<CompoundAudioClient>();
 	cac->add(frameSeq.get());
@@ -155,6 +161,7 @@ void AudioMidiServices::start(const int sampleRate, const int inputCount, const 
 	offlineServer->setClient(cac);
 
 	offlineServer->start();
+	soundPlayer->start("C:/temp/ambient.wav");
 }
 
 void AudioMidiServices::setMonitorLevel(int level) {
@@ -209,9 +216,10 @@ void AudioMidiServices::setupMixer()
 	/*
 	* There are 32 voices. Each voice has one channel for mixing to STEREO OUT L/R, and one channel for mixing to an ASSIGNABLE MIX OUT. These are strips 1-64.
 	* There's one channel for the MpcBasicSoundPlayerChannel, which plays the metronome, preview and playX sounds. This is strip 65.
-	* Finally there's one channel to receive and monitor sampler input. This is strip 66. Hence nMixerChans = 66;
+	* Finally there's one channel to receive and monitor sampler input, this is strip 66, and one for playing quick previews, on strip 67.
+	* Hence nMixerChans = 67
 	*/
-	int nMixerChans = 66;
+	int nMixerChans = 67;
 	ctoot::audio::mixer::MixerControlsFactory::createChannelStrips(mixerControls, nMixerChans);
 	mixer = make_shared<ctoot::audio::mixer::AudioMixer>(mixerControls, offlineServer);
 	audioSystem = make_shared<ctoot::audio::system::MixerConnectedAudioSystem>(mixer);
