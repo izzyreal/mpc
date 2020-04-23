@@ -161,7 +161,6 @@ void AudioMidiServices::start(const int sampleRate, const int inputCount, const 
 	offlineServer->setClient(cac);
 
 	offlineServer->start();
-	soundPlayer->start("C:/temp/ambient.wav");
 }
 
 void AudioMidiServices::setMonitorLevel(int level) {
@@ -188,8 +187,14 @@ vector<weak_ptr<DiskRecorder>> AudioMidiServices::getDiskRecorders()
 	return res;
 }
 
-weak_ptr<SoundRecorder> AudioMidiServices::getSoundRecorder() {
+weak_ptr<SoundRecorder> AudioMidiServices::getSoundRecorder()
+{
 	return soundRecorder;
+}
+
+weak_ptr<SoundPlayer> AudioMidiServices::getSoundPlayer()
+{
+	return soundPlayer;
 }
 
 NonRealTimeAudioServer* AudioMidiServices::getAudioServer() {

@@ -110,6 +110,7 @@ namespace mpc::audiomidi {
 		ctoot::audio::server::NonRealTimeAudioServer* getAudioServer();
 		vector<weak_ptr<DiskRecorder>> getDiskRecorders();
 		weak_ptr<SoundRecorder> getSoundRecorder();
+		weak_ptr<SoundPlayer> getSoundPlayer();
 		void setMasterLevel(int i);
 		int getMasterLevel();
 		void setRecordLevel(int i);
