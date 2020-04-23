@@ -73,44 +73,41 @@ int SoundPlayer::processAudio(AudioBuffer* buf)
 			}
 		}
 
-		auto samplesToRead = (int) ceil((44100.0 / 48000.0)* buf->getSampleCount());
+		auto samplesToRead = (int) ceil((sourceFormat->getSampleRate() / buf->getSampleRate()) * buf->getSampleCount());
 
-		auto sourceBuffer = make_shared<AudioBuffer>("temp", 2, samplesToRead, sourceFormat->getSampleRate());
+		auto sourceBuffer = make_shared<AudioBuffer>("temp", sourceFormat->getChannels(), samplesToRead, sourceFormat->getSampleRate());
 		vector<char> byteBuffer(sourceBuffer->getByteArrayBufferSize(sourceFormat.get()));
 
 		wav_read_bytes(stream, byteBuffer);
 		sourceBuffer->initFromByteArray_(byteBuffer, 0, byteBuffer.size(), sourceFormat.get());
 
-		if (sourceFormat->getChannels() >= 1 && resample) {
+		if (resample) {
 
-			resampleChannel(true, sourceBuffer->getChannel(0), sourceFormat->getSampleRate(), buf->getSampleRate());
-
-			if (resampleOutputBufferLeft.available() < buf->getSampleCount()) {
-				buf->makeSilence();
-				return AUDIO_OK;
+			if (sourceFormat->getChannels() >= 1) {
+				resampleChannel(true, sourceBuffer->getChannel(0), sourceFormat->getSampleRate(), buf->getSampleRate());
 			}
 
-			for (int i = 0; i < buf->getSampleCount(); i++) {
-				(*left)[i] = resampleOutputBufferLeft.get();
+			if (sourceFormat->getChannels() >= 2) {
+				resampleChannel(false, sourceBuffer->getChannel(1), sourceFormat->getSampleRate(), buf->getSampleRate());
 			}
+			
+			if (resampleOutputBufferLeft.available() >= buf->getSampleCount()) {
 
-			if (sourceFormat->getChannels() == 1) {
-				buf->copyChannel(0, 1);
-				playedFrameCount += buf->getSampleCount();
-				return AUDIO_OK;
-			}
-		}
+				for (int i = 0; i < buf->getSampleCount(); i++) {
+					(*left)[i] = resampleOutputBufferLeft.get();
+				}
 
-		if (sourceFormat->getChannels() >= 2 && resample) {
-
-			resampleChannel(false, sourceBuffer->getChannel(1), sourceFormat->getSampleRate(), buf->getSampleRate());
-
-			for (int i = 0; i < left->size(); i++) {
-				(*right)[i] = resampleOutputBufferRight.get();
+				if (sourceFormat->getChannels() == 1) {
+					buf->copyChannel(0, 1);
+				}
+				else {
+					for (int i = 0; i < buf->getSampleCount(); i++) {
+						(*right)[i] = resampleOutputBufferRight.get();
+					}
+				}
 			}
 		}
-
-		if (!resample) {
+		else {
 			buf->copyFrom(sourceBuffer.get());
 		}
 
