@@ -26,7 +26,7 @@ namespace mpc::audiomidi {
 	
 	private:
 		atomic<bool> playing = ATOMIC_VAR_INIT(false);
-		int playedFrameCount = 0;
+		int playedSourceFrameCount = 0;
 		string filePath = "";
 		circular_buffer<float> resampleInputBufferLeft = circular_buffer<float>(5000);
 		circular_buffer<float> resampleInputBufferRight = circular_buffer<float>(5000);

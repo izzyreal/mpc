@@ -26,11 +26,16 @@ void SoundPlayer::start(const string& filePath) {
 	int sourceNumChannels;
 
 	if (wav_readHeader(stream, sourceSampleRate, validBits, sourceNumChannels, dataChunkSize, numFrames)) {
+		
 		sourceFormat = make_shared<AudioFormat>(sourceSampleRate, validBits, sourceNumChannels, true, false);
+		
 		resampleInputBufferLeft.reset();
 		resampleInputBufferRight.reset();
 		resampleOutputBufferLeft.reset();
 		resampleOutputBufferRight.reset();
+
+		playedSourceFrameCount = 0;
+
 		playing.store(true);
 	}
 }
@@ -111,9 +116,9 @@ int SoundPlayer::processAudio(AudioBuffer* buf)
 			buf->copyFrom(sourceBuffer.get());
 		}
 
-		playedFrameCount += buf->getSampleCount();
+		playedSourceFrameCount += samplesToRead;
 
-		if (playedFrameCount >= numFrames) {
+		if (playedSourceFrameCount >= numFrames) {
 			playing.store(false);
 		}
 
