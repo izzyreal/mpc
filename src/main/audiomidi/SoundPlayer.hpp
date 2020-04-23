@@ -22,8 +22,6 @@ namespace mpc::audiomidi {
 	{
 
 	private:
-		int sourceSampleRate = 0;
-		int numChannels = 0;
 		int numFrames = 0;
 	
 	private:
@@ -39,7 +37,7 @@ namespace mpc::audiomidi {
 		int srcLeftError = 0;
 		int srcRightError = 0;
 		ifstream stream;
-		shared_ptr<AudioFormat> format;
+		shared_ptr<AudioFormat> sourceFormat;
 	
 	public:
 		void start(const string& filePath);

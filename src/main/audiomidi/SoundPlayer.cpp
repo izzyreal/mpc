@@ -22,9 +22,11 @@ void SoundPlayer::start(const string& filePath) {
 
 	int validBits;
 	int dataChunkSize;
+	int sourceSampleRate;
+	int sourceNumChannels;
 
-	if (wav_readHeader(stream, sourceSampleRate, validBits, numChannels, dataChunkSize, numFrames)) {
-		format = make_shared<AudioFormat>(sourceSampleRate, validBits, numChannels, true, false);
+	if (wav_readHeader(stream, sourceSampleRate, validBits, sourceNumChannels, dataChunkSize, numFrames)) {
+		sourceFormat = make_shared<AudioFormat>(sourceSampleRate, validBits, sourceNumChannels, true, false);
 		playing.store(true);
 	}
 }
@@ -40,7 +42,7 @@ void SoundPlayer::stop() {
 	}
 
 	playing.store(false);
-	
+
 	if (srcLeft != NULL) {
 		src_delete(srcLeft);
 		srcLeft = NULL;
@@ -57,6 +59,9 @@ int SoundPlayer::processAudio(AudioBuffer* buf)
 	auto left = buf->getChannel(0);
 	auto right = buf->getChannel(1);
 
+	MLOG("");
+	buf->makeSilence();
+
 	try {
 		if (playing.load()) {
 
@@ -69,41 +74,54 @@ int SoundPlayer::processAudio(AudioBuffer* buf)
 				}
 			}
 
-			vector<char> byteBuffer(buf->getByteArrayBufferSize(format.get()));
+			vector<char> byteBuffer(buf->getByteArrayBufferSize(sourceFormat.get()));
 			wav_read_bytes(stream, byteBuffer);
-			auto sourceBuffer = make_shared<AudioBuffer>("temp", 2, 0, sourceSampleRate);
-			sourceBuffer->initFromByteArray_(byteBuffer, 0, byteBuffer.size(), format.get());
 
-			if (numChannels >= 1 && resample) {
-				resampleChannel(true, sourceBuffer->getChannel(0), sourceSampleRate, buf->getSampleRate());
+			auto sourceBuffer = make_shared<AudioBuffer>("temp", 2, buf->getSampleCount(), sourceFormat->getSampleRate());
+			sourceBuffer->initFromByteArray_(byteBuffer, 0, byteBuffer.size(), sourceFormat.get());
+
+			/*
+			if (sourceBuffer->isSilent()) {
+				MLOG("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!sourceBuffer is silent");
+			}
+			else {
+				MLOG("sourceBuffer is ok :):):):):):):):):):):):):):)");
+			}
+			*/
+
+			if (sourceFormat->getChannels() >= 1 && resample) {
+
+				resampleChannel(true, sourceBuffer->getChannel(0), sourceFormat->getSampleRate(), buf->getSampleRate());
+
+				//MLOG("available " + to_string(resampleOutputBufferLeft.available()));
+
+				if (resampleOutputBufferLeft.available() < buf->getSampleCount()) {
+					MLOG("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Not enough available");
+					buf->makeSilence();
+					return AUDIO_OK;
+				}
 
 				for (int i = 0; i < left->size(); i++) {
-					if (resampleOutputBufferLeft.empty()) {
-						// If this happens it will cause a glitch. We must implement an alternative getSize on circular_buffer that returns the difference between head and tail.
-						// Then we can skip the first processAudio call if it's not full enough. This would cause latency. If it's too much we can implement the same linear interpolation as in MpcVoice.
-						break;
-					}
-					else {
-						(*left)[i] = resampleOutputBufferLeft.get();
-					}
+					auto val = resampleOutputBufferLeft.get();
+					(*left)[i] = val;
+					(*right)[i] = (*left)[i];
+				}
+				if (buf->isSilent()) {
+					MLOG("Buffer is silent!");
 				}
 			}
 
 			vector<float> resampledRight;
 
-			if (numChannels >= 2 && resample) {
+			if (sourceFormat->getChannels() >= 2 && resample) {
 				//resampleChannel(false, sourceBuffer->getChannel(1), sourceSampleRate, buf->getSampleRate());
 				for (int i = 0; i < left->size(); i++) {
-					if (resampleOutputBufferRight.empty()) {
-						break;
-					}
-					else {
-						(*right)[i] = resampleOutputBufferRight.get();
-					}
+					//(*right)[i] = resampleOutputBufferRight.get();
 				}
 			}
 
 			if (playedFrameCount >= numFrames) {
+				MLOG("Stopping...");
 				playing.store(false);
 			}
 
@@ -114,7 +132,8 @@ int SoundPlayer::processAudio(AudioBuffer* buf)
 		auto msg = e.what();
 		MLOG(msg);
 	}
-
+	
+	MLOG("Making the buffer silent...!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 	buf->makeSilence();
 	return AUDIO_SILENCE;
 }
@@ -125,9 +144,14 @@ void SoundPlayer::resampleChannel(bool left, vector<float>* inputBuffer, int sou
 	auto circularInputBuffer = left ? &resampleInputBufferLeft : &resampleInputBufferRight;
 	auto circularOutputBuffer = left ? &resampleOutputBufferLeft : &resampleOutputBufferRight;
 
+	//MLOG("circularInputBuffer size before inputBuffer insertion: " + to_string(circularInputBuffer->available()));
+
 	for (auto f : (*inputBuffer)) {
 		circularInputBuffer->put(f);
 	}
+
+	//MLOG("inputBuffer size: " + to_string(inputBuffer->size()));
+	//MLOG("circularInputBuffer size after inputBuffer insertion: " + to_string(circularInputBuffer->available()));
 
 	vector<float> input;
 	while (!circularInputBuffer->empty()) {
@@ -135,6 +159,9 @@ void SoundPlayer::resampleChannel(bool left, vector<float>* inputBuffer, int sou
 	}
 
 	auto output = vector<float>(ceil(input.size() * ratio));
+
+	//MLOG("input size: " + to_string(input.size()));
+	//MLOG("output size: " + to_string(output.size()));
 
 	SRC_DATA data;
 	data.data_in = &input[0];
@@ -146,21 +173,22 @@ void SoundPlayer::resampleChannel(bool left, vector<float>* inputBuffer, int sou
 
 	src_process(left ? srcLeft : srcRight, &data);
 
-	circularInputBuffer->move(-(input.size() - data.input_frames_used));
-	
-	output.resize(data.output_frames_gen);
+	//MLOG("input frames used: " + to_string(data.input_frames_used) + ", output frames generated: " + to_string(data.output_frames_gen));
 
-	for (auto f : output) {
-		circularOutputBuffer->put(f);
+	circularInputBuffer->move(-(input.size() - data.input_frames_used));
+
+	for (int i = 0; i < data.output_frames_gen; i++) {
+		circularOutputBuffer->put(output[i]);
 	}
 }
 
 void SoundPlayer::initSrc() {
-	if (numChannels >= 1) {
+	MLOG("initSrc");
+	if (sourceFormat->getChannels() >= 1) {
 		srcLeft = src_new(0, 1, &srcLeftError);
 	}
-	
-	if (!numChannels >= 2) {
+
+	if (sourceFormat->getChannels() >= 2) {
 		srcRight = src_new(0, 1, &srcRightError);
 	}
 }
