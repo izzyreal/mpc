@@ -105,6 +105,11 @@ bool wav_readHeader(ifstream& stream, int& sampleRate, int& validBits, int& numC
         return false;
     }
 
+    // Some wav writers don't word align properly...
+    if (mainChunkSize % 2 == 1) {
+        mainChunkSize += 1;
+    }
+
     if (mainChunkSize + 8 != tell) {
         return false;
     }

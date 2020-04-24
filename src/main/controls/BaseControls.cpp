@@ -555,7 +555,7 @@ void BaseControls::mainScreen()
 	ls.lock()->openScreen("sequencer");
 	auto lSequencer = sequencer.lock();
     lSequencer->setSoloEnabled(lSequencer->isSoloEnabled());
-	mpc->getAudioMidiServices().lock()->getSoundPlayer().lock()->start("C:/temp/hat-mono.wav");
+	mpc->getAudioMidiServices().lock()->getSoundPlayer().lock()->start("C:/temp/hat.wav");
 }
 
 void BaseControls::tap()
