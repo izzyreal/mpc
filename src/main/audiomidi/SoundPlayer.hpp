@@ -28,10 +28,10 @@ namespace mpc::audiomidi {
 		atomic<bool> playing = ATOMIC_VAR_INIT(false);
 		int playedSourceFrameCount = 0;
 		string filePath = "";
-		circular_buffer<float> resampleInputBufferLeft = circular_buffer<float>(5000);
-		circular_buffer<float> resampleInputBufferRight = circular_buffer<float>(5000);
-		circular_buffer<float> resampleOutputBufferLeft = circular_buffer<float>(5000);
-		circular_buffer<float> resampleOutputBufferRight = circular_buffer<float>(5000);
+		circular_buffer<float> resampleInputBufferLeft = circular_buffer<float>(20000);
+		circular_buffer<float> resampleInputBufferRight = circular_buffer<float>(20000);
+		circular_buffer<float> resampleOutputBufferLeft = circular_buffer<float>(20000);
+		circular_buffer<float> resampleOutputBufferRight = circular_buffer<float>(20000);
 		SRC_STATE* srcLeft = nullptr;
 		SRC_STATE* srcRight = nullptr;
 		int srcLeftError = 0;
