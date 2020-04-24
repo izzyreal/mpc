@@ -4,10 +4,10 @@
 
 using namespace std;
 
-static const int FMT_CHUNK_ID{ 544501094 };
-static const int DATA_CHUNK_ID{ 1635017060 };
 static const int RIFF_CHUNK_ID{ 1179011410 };
 static const int RIFF_TYPE_ID{ 1163280727 };
+static const int FMT_CHUNK_ID{ 544501094 };
+static const int DATA_CHUNK_ID{ 1635017060 };
 
 ofstream wav_init_ofstream(const string& path) {
     ofstream result(path.c_str(), ios::out | ios::binary);
