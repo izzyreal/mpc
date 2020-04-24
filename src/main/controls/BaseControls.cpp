@@ -555,7 +555,7 @@ void BaseControls::mainScreen()
 	ls.lock()->openScreen("sequencer");
 	auto lSequencer = sequencer.lock();
     lSequencer->setSoloEnabled(lSequencer->isSoloEnabled());
-	mpc->getAudioMidiServices().lock()->getSoundPlayer().lock()->start("C:/temp/raprev.wav");
+	mpc->getAudioMidiServices().lock()->getSoundPlayer().lock()->start("C:/temp/raprev-mono.wav");
 }
 
 void BaseControls::tap()

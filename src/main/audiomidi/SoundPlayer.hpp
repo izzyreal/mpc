@@ -22,7 +22,7 @@ namespace mpc::audiomidi {
 	{
 
 	private:
-		int numFrames = 0;
+		int sourceFrameCount = 0;
 	
 	private:
 		atomic<bool> playing = ATOMIC_VAR_INIT(false);

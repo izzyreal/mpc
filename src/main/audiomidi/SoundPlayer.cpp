@@ -25,7 +25,7 @@ void SoundPlayer::start(const string& filePath) {
 	int sourceSampleRate;
 	int sourceNumChannels;
 
-	if (wav_readHeader(stream, sourceSampleRate, validBits, sourceNumChannels, dataChunkSize, numFrames)) {
+	if (wav_readHeader(stream, sourceSampleRate, validBits, sourceNumChannels, dataChunkSize, sourceFrameCount)) {
 		
 		sourceFormat = make_shared<AudioFormat>(sourceSampleRate, validBits, sourceNumChannels, true, false);
 		
@@ -50,6 +50,10 @@ void SoundPlayer::stop() {
 		return;
 	}
 
+	if (stream.is_open()) {
+		wav_close(stream);
+	}
+
 	playing.store(false);
 
 	if (srcLeft != nullptr) {
@@ -68,65 +72,101 @@ int SoundPlayer::processAudio(AudioBuffer* buf)
 	auto left = buf->getChannel(0);
 	auto right = buf->getChannel(1);
 
-	if (playing.load()) {
-
-		auto resample = buf->getSampleRate() != sourceFormat->getSampleRate();
-
-		if (resample) {
-			if (srcLeft == nullptr || (sourceFormat->getChannels() >= 2 && srcRight == nullptr)) {
-				initSrc();
-			}
-		}
-
-		auto samplesToRead = (int) ceil((sourceFormat->getSampleRate() / buf->getSampleRate()) * buf->getSampleCount());
-
-		auto sourceBuffer = make_shared<AudioBuffer>("temp", sourceFormat->getChannels(), samplesToRead, sourceFormat->getSampleRate());
-		vector<char> byteBuffer(sourceBuffer->getByteArrayBufferSize(sourceFormat.get()));
-
-		wav_read_bytes(stream, byteBuffer);
-		sourceBuffer->initFromByteArray_(byteBuffer, 0, byteBuffer.size(), sourceFormat.get());
-
-		if (resample) {
-
-			if (sourceFormat->getChannels() >= 1) {
-				resampleChannel(true, sourceBuffer->getChannel(0), sourceFormat->getSampleRate(), buf->getSampleRate());
-			}
-
-			if (sourceFormat->getChannels() >= 2) {
-				resampleChannel(false, sourceBuffer->getChannel(1), sourceFormat->getSampleRate(), buf->getSampleRate());
-			}
-			
-			if (resampleOutputBufferLeft.available() >= buf->getSampleCount()) {
-
-				for (int i = 0; i < buf->getSampleCount(); i++) {
-					(*left)[i] = resampleOutputBufferLeft.get();
-				}
-
-				if (sourceFormat->getChannels() == 1) {
-					buf->copyChannel(0, 1);
-				}
-				else {
-					for (int i = 0; i < buf->getSampleCount(); i++) {
-						(*right)[i] = resampleOutputBufferRight.get();
-					}
-				}
-			}
-		}
-		else {
-			buf->copyFrom(sourceBuffer.get());
-		}
-
-		playedSourceFrameCount += samplesToRead;
-
-		if (playedSourceFrameCount >= numFrames) {
-			playing.store(false);
-		}
-
-		return AUDIO_OK;
+	if (!playing.load()) {
+		buf->makeSilence();
+		return AUDIO_SILENCE;
 	}
 
-	buf->makeSilence();
-	return AUDIO_SILENCE;
+	auto resample = buf->getSampleRate() != sourceFormat->getSampleRate();
+
+	if (resample) {
+		if (srcLeft == nullptr || (sourceFormat->getChannels() >= 2 && srcRight == nullptr)) {
+			initSrc();
+		}
+	}
+
+	bool shouldClose = false;
+	auto samplesToRead = (int)ceil((sourceFormat->getSampleRate() / buf->getSampleRate()) * buf->getSampleCount());
+
+	if (playedSourceFrameCount + samplesToRead >= sourceFrameCount) {
+		shouldClose = true;
+		samplesToRead = sourceFrameCount - playedSourceFrameCount;
+	}
+
+	auto sourceBuffer = make_shared<AudioBuffer>("temp", sourceFormat->getChannels(), samplesToRead, sourceFormat->getSampleRate());
+	vector<char> byteBuffer(sourceBuffer->getByteArrayBufferSize(sourceFormat.get()));
+
+	wav_read_bytes(stream, byteBuffer);
+	sourceBuffer->initFromByteArray_(byteBuffer, 0, byteBuffer.size(), sourceFormat.get());
+
+	if (shouldClose) {
+		buf->makeSilence();
+	}
+
+	if (resample) {
+
+		if (sourceFormat->getChannels() >= 1) {
+			resampleChannel(true, sourceBuffer->getChannel(0), sourceFormat->getSampleRate(), buf->getSampleRate());
+		}
+
+		if (sourceFormat->getChannels() >= 2) {
+			resampleChannel(false, sourceBuffer->getChannel(1), sourceFormat->getSampleRate(), buf->getSampleRate());
+		}
+
+		if (resampleOutputBufferLeft.available() >= buf->getSampleCount()) {
+
+			for (int i = 0; i < buf->getSampleCount(); i++) {
+				(*left)[i] = resampleOutputBufferLeft.get();
+			}
+
+			if (sourceFormat->getChannels() == 1) {
+				buf->copyChannel(0, 1);
+			}
+			else {
+				for (int i = 0; i < buf->getSampleCount(); i++) {
+					(*right)[i] = resampleOutputBufferRight.get();
+				}
+			}
+		}
+		else if (shouldClose && resampleOutputBufferLeft.available() > 0) {
+
+			auto remaining = resampleOutputBufferLeft.available();
+
+			for (int i = 0; i < remaining; i++) {
+				(*left)[i] = resampleOutputBufferLeft.get();
+			}
+
+			if (sourceFormat->getChannels() == 1) {
+				buf->copyChannel(0, 1);
+			}
+			else {
+				for (int i = 0; i < remaining; i++) {
+					(*right)[i] = resampleOutputBufferRight.get();
+				}
+			}
+		}
+	}
+	else {
+
+		if (sourceBuffer->getSampleCount() < buf->getSampleCount()) {
+			sourceBuffer->changeSampleCount(buf->getSampleCount(), true);
+		}
+
+		if (sourceBuffer->getChannelCount() == 1) {
+			sourceBuffer->addChannel(false);
+			sourceBuffer->copyChannel(0, 1);
+		}
+
+		buf->copyFrom(sourceBuffer.get());
+	}
+
+	playedSourceFrameCount += samplesToRead;
+
+	if (shouldClose) {
+		stop();
+	}
+
+	return AUDIO_OK;
 }
 
 void SoundPlayer::resampleChannel(bool left, vector<float>* inputBuffer, int sourceSampleRate, int destinationSampleRate)
