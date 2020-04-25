@@ -3,40 +3,38 @@
 #include <vector>
 #include <string>
 
-namespace mpc {
-	namespace file {
-		namespace sndwriter {
-			
-			class SndWriter;
+using namespace std;
 
-			class SndHeaderWriter
-			{
+namespace mpc::file::sndwriter {
+	class SndWriter;
+}
 
-			private:
-				std::vector<char> headerArray{};
+namespace mpc::file::sndwriter {
 
-			public:
-				std::vector<char> getHeaderArray();
-				void setFirstTwoBytes();
-				void setName(std::string s);
-				void setLevel(int i);
-				void setTune(int i);
-				void setMono(bool b);
-				void setStart(int i);
-				void setEnd(int i);
-				void setFrameCount(int i);
-				void setLoopLength(int i);
-				void setLoopEnabled(bool b);
-				void setBeatCount(int i);
-				void setSampleRate(int i);
+	class SndHeaderWriter
+	{
+	private:
+		vector<char> headerArray = vector<char>(42);
 
-			private:
-				void putLE(int offset, int value);
+	public:
+		vector<char>& getHeaderArray();
+		void setFirstTwoBytes();
+		void setName(const string& name);
+		void setLevel(int i);
+		void setTune(int i);
+		void setMono(bool b);
+		void setStart(int i);
+		void setEnd(int i);
+		void setFrameCount(int i);
+		void setLoopLength(int i);
+		void setLoopEnabled(bool b);
+		void setBeatCount(int i);
+		void setSampleRate(int i);
 
-			public:
-				SndHeaderWriter(SndWriter* sndWriter);
-			};
+	private:
+		void putLE(int offset, int value);
 
-		}
-	}
+	public:
+		SndHeaderWriter(SndWriter* sndWriter);
+	};
 }

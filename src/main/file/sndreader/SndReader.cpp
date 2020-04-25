@@ -13,69 +13,69 @@ SndReader::SndReader(mpc::disk::MpcFile* soundFile)
 {
 	sndFile = soundFile;
 	sndFileArray = sndFile->getBytes();
-	sndHeader = new SndHeaderReader(this);
+	sndHeaderReader = make_shared<SndHeaderReader>(this);
 }
 
 string SndReader::getName()
 {
-    return sndHeader->getName();
+    return sndHeaderReader->getName();
 }
 
 bool SndReader::isMono()
 {
-    return sndHeader->isMono();
+    return sndHeaderReader->isMono();
 }
 
 int SndReader::getNumberOfFrames()
 {
-    return sndHeader->getNumberOfFrames();
+    return sndHeaderReader->getNumberOfFrames();
 }
 
 int SndReader::getSampleRate()
 {
-    return sndHeader->getSampleRate();
+    return sndHeaderReader->getSampleRate();
 }
 
 int SndReader::getLevel()
 {
-    return sndHeader->getLevel();
+    return sndHeaderReader->getLevel();
 }
 
 int SndReader::getStart()
 {
-    return sndHeader->getStart();
+    return sndHeaderReader->getStart();
 }
 
 int SndReader::getEnd()
 {
-    return sndHeader->getEnd();
+    return sndHeaderReader->getEnd();
 }
 
 int SndReader::getLoopLength()
 {
-    return sndHeader->getLoopLength();
+    return sndHeaderReader->getLoopLength();
 }
 
 bool SndReader::isLoopEnabled()
 {
-    return sndHeader->isLoopEnabled();
+    return sndHeaderReader->isLoopEnabled();
 }
 
 int SndReader::getTune()
 {
-    return sndHeader->getTune();
+    return sndHeaderReader->getTune();
 }
 
 int SndReader::getNumberOfBeats()
 {
-    return sndHeader->getNumberOfBeats();
+    return sndHeaderReader->getNumberOfBeats();
 }
 
 void SndReader::getSampleData(vector<float>* dest)
 {
-	int length = sndHeader->getNumberOfFrames();
+	int length = sndHeaderReader->getNumberOfFrames();
 
-	bool mono = sndHeader->isMono();
+	bool mono = sndHeaderReader->isMono();
 
 	if (!mono) length *= 2;
 
@@ -96,7 +96,7 @@ void SndReader::getSampleData(vector<float>* dest)
 	}
 }
 
-vector<char> SndReader::getSndFileArray()
+vector<char>& SndReader::getSndFileArray()
 {
 	return sndFileArray;
 }

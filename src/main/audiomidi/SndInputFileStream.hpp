@@ -127,6 +127,14 @@ bool snd_read_header(ifstream& stream, int& sampleRate, int& validBits, int& num
 
     validBits = 16;
 
+    if (numChannels != 1 && numChannels != 2) {
+        return false;
+    }
+
+    if (sampleRate < 11025 || sampleRate > 48000) {
+        return false;
+    }
+
     return true;
 }
 

@@ -11,7 +11,7 @@ using namespace std;
 SndWriter::SndWriter(mpc::sampler::Sound* sound) 
 {
     this->sound = sound;
-    sndHeaderWriter = new SndHeaderWriter(this);
+    sndHeaderWriter = make_shared<SndHeaderWriter>(this);
     setValues();
 }
 const int SndWriter::HEADER_SIZE;
@@ -87,18 +87,20 @@ void SndWriter::setBeatCount(int i)
     sndHeaderWriter->setBeatCount(i);
 }
 
-void SndWriter::setSampleData(vector<float> fa, bool mono)
+void SndWriter::setSampleData(const vector<float>& fa, bool mono)
 {
 	sndFileArray = vector<char>(HEADER_SIZE + (fa.size() * 2));
-	auto frames = mono ? fa.size() : fa.size() / 2;
+	auto frames = mono ? fa.size() : fa.size() * 0.5;
 	sndHeaderWriter->setFrameCount(frames);
-	auto ba = vector<char>(2);
+	
+	vector<char> buffer(2);
 	auto sPos = 0;
+	
 	auto bytePos = SndWriter::HEADER_SIZE;
 	for (int i = 0; i < fa.size(); i++) {
-		ba = moduru::file::ByteUtil::short2bytes(fa[sPos++] * 32768);
-		sndFileArray[bytePos++] = ba[0];
-		sndFileArray[bytePos++] = ba[1];
+		buffer = moduru::file::ByteUtil::short2bytes(fa[sPos++] * 32768);
+		sndFileArray[bytePos++] = buffer[0];
+		sndFileArray[bytePos++] = buffer[1];
 	}
 	/*
 	for (int i = 0; i < frames; i++) {
@@ -118,8 +120,9 @@ void SndWriter::setSampleData(vector<float> fa, bool mono)
 vector<char> SndWriter::getSndFileArray()
 {
 	auto header = sndHeaderWriter->getHeaderArray();
-	for (int i = 0; i < header.size(); i++)
+	for (int i = 0; i < header.size(); i++) {
 		sndFileArray[i] = header[i];
+	}
 
 	return sndFileArray;
 }

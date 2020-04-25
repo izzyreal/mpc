@@ -6,11 +6,10 @@ using namespace std;
 
 SndHeaderWriter::SndHeaderWriter(SndWriter* sndWriter) 
 {
-    headerArray = std::vector<char>(42);
     setFirstTwoBytes();
 }
 
-std::vector<char> SndHeaderWriter::getHeaderArray()
+vector<char>& SndHeaderWriter::getHeaderArray()
 {
     return headerArray;
 }
@@ -21,33 +20,36 @@ void SndHeaderWriter::setFirstTwoBytes()
     headerArray[1] = 4;
 }
 
-void SndHeaderWriter::setName(string s)
+void SndHeaderWriter::setName(const string& name)
 {
-	std::vector<char> nameArray = std::vector<char>(16);
-	for (int i = 0; i < s.length(); i++)
-		nameArray[i] = s[i];
+	vector<char> nameArray(16);
+	
+    for (int i = 0; i < name.length(); i++) {
+        nameArray[i] = name[i];
+    }
 
-	for (int i = s.length(); i < nameArray.size(); i++)
-		nameArray[i] = 32;
+    for (int i = name.length(); i < nameArray.size(); i++) {
+        nameArray[i] = 32;
+    }
 
-	for (int i = 0; i < nameArray.size(); i++)
-		headerArray[i + 2] = nameArray[i];
-
+    for (int i = 0; i < nameArray.size(); i++) {
+        headerArray[i + 2] = nameArray[i];
+    }
 }
 
 void SndHeaderWriter::setLevel(int i)
 {
-    headerArray[19] = static_cast< int8_t >(i);
+    headerArray[19] = static_cast<int8_t>(i);
 }
 
 void SndHeaderWriter::setTune(int i)
 {
-    headerArray[20] = static_cast< int8_t >(i);
+    headerArray[20] = static_cast<int8_t>(i);
 }
 
 void SndHeaderWriter::setMono(bool b)
 {
-    headerArray[21] = static_cast< int8_t >((b ? 0 : 1));
+    headerArray[21] = static_cast<int8_t>(b ? 0 : 1);
 }
 
 void SndHeaderWriter::setStart(int i)
@@ -83,12 +85,14 @@ void SndHeaderWriter::setBeatCount(int i)
 void SndHeaderWriter::setSampleRate(int i)
 {
 	auto shortBytes = moduru::file::ByteUtil::short2bytes(i - 65536);
-	// figure out samplerate offset in header and write 2 bytes
+    headerArray[40] = shortBytes[0];
+    headerArray[41] = shortBytes[1];
 }
 
 void SndHeaderWriter::putLE(int offset, int value)
 {
 	auto ba = moduru::file::ByteUtil::uint2bytes(value);
-	for (auto j = 0; j < ba.size(); j++)
-		headerArray[j + offset] = ba[j];
+    for (auto j = 0; j < ba.size(); j++) {
+        headerArray[j + offset] = ba[j];
+    }
 }

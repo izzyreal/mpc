@@ -44,9 +44,6 @@
 #include <mpc/MpcSoundPlayerChannel.hpp>
 #include <audio/server/NonRealTimeAudioServer.hpp>
 
-#include <Logger.hpp>
-#include <audiomidi/SoundPlayer.hpp>
-
 using namespace mpc;
 using namespace mpc::controls;
 using namespace std;
@@ -551,7 +548,6 @@ void BaseControls::mainScreen()
 	ls.lock()->openScreen("sequencer");
 	auto lSequencer = sequencer.lock();
     lSequencer->setSoloEnabled(lSequencer->isSoloEnabled());
-	mpc->getAudioMidiServices().lock()->getSoundPlayer().lock()->start("C:/temp/guitlp-mono.snd");
 }
 
 void BaseControls::tap()

@@ -1,4 +1,4 @@
-#include <file/sndreader/SndHeaderReader.hpp>
+#include "SndHeaderReader.hpp"
 
 #include <file/sndreader/SndReader.hpp>
 
@@ -15,33 +15,34 @@ SndHeaderReader::SndHeaderReader(SndReader* sndReader)
 	headerArray = moduru::VecUtil::CopyOfRange(&sndFileArray, 0, 42);
 }
 
-vector<char>* SndHeaderReader::getHeaderArray()
+vector<char>& SndHeaderReader::getHeaderArray()
 {
-    return &headerArray;
+    return headerArray;
 }
 
-bool SndHeaderReader::verifyFirstTwoBytes()
+bool SndHeaderReader::hasValidId()
 {
     auto verifyFirstTwoBytes = false;
+
     int i = headerArray[0];
     int j = headerArray[1];
-    if(i == 1 && j < 5) {
-        verifyFirstTwoBytes = true;
-    }
-    return verifyFirstTwoBytes;
+
+	return (i == 1 && j < 5);
 }
 
 string SndHeaderReader::getName()
 {
 	string name = "";
+	
 	for (int i = 2; i < 18; i++) {
 		if (headerArray[i] == 0x00) {
 			break;
 		}
 		name.push_back(headerArray[i]);
 	}
-	name = moduru::lang::StrUtil::trim(name);
-	return name;
+
+
+	return moduru::lang::StrUtil::trim(name);
 }
 
 int SndHeaderReader::getLevel()

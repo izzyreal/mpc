@@ -4,48 +4,47 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
-namespace mpc {
+namespace mpc::disk {
+	class MpcFile;
+}
 
-	namespace disk {
-		class MpcFile;
-	}
+namespace mpc::file::sndreader {
+	class SndHeaderReader;
+}
 
-	namespace file {
-		namespace sndreader {
+using namespace std;
 
-			class SndHeaderReader;
+namespace mpc::file::sndreader {
 
-			class SndReader
-			{
+	class SndReader
+	{
 
-			private:
-				std::vector<char> sndFileArray{};
-				SndHeaderReader* sndHeader{};
-				mpc::disk::MpcFile* sndFile{};
+	private:
+		vector<char> sndFileArray;
+		shared_ptr<SndHeaderReader> sndHeaderReader;
+		mpc::disk::MpcFile* sndFile;
 
-			public:
-				std::string getName();
-				bool isMono();
-				int getNumberOfFrames();
-				int getSampleRate();
-				int getLevel();
-				int getStart();
-				int getEnd();
-				int getLoopLength();
-				bool isLoopEnabled();
-				int getTune();
-				int getNumberOfBeats();
-				void getSampleData(std::vector<float>* dest);
+	public:
+		string getName();
+		bool isMono();
+		int getNumberOfFrames();
+		int getSampleRate();
+		int getLevel();
+		int getStart();
+		int getEnd();
+		int getLoopLength();
+		bool isLoopEnabled();
+		int getTune();
+		int getNumberOfBeats();
+		void getSampleData(vector<float>* dest);
 
-			public:
-				std::vector<char> getSndFileArray();
+	public:
+		vector<char>& getSndFileArray();
 
-			public:
-				SndReader(mpc::disk::MpcFile* soundFile);
+	public:
+		SndReader(mpc::disk::MpcFile* soundFile);
 
-			};
-
-		}
-	}
+	};
 }

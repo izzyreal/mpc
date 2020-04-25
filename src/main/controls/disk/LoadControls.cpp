@@ -3,6 +3,9 @@
 #include <Mpc.hpp>
 #include <controls/Controls.hpp>
 
+#include <audiomidi/AudioMidiServices.hpp>
+#include <audiomidi/SoundPlayer.hpp>
+
 #include <disk/AbstractDisk.hpp>
 #include <disk/MpcFile.hpp>
 #include <disk/SoundLoader.hpp>
@@ -48,7 +51,6 @@ void LoadControls::function(int i)
 		ls.lock()->openScreen("setup");
 		break;
 	case 4: {
-		/*
 		auto controls = mpc->getControls().lock();
 
 		if (controls->isF5Pressed()) {
@@ -57,39 +59,12 @@ void LoadControls::function(int i)
 
 		controls->setF5Pressed(true);
 
-		auto soundLoader = mpc::disk::SoundLoader(mpc, vector<weak_ptr<Sound>>(), false);
+		auto file = mpc->getUis().lock()->getDiskGui()->getSelectedFile();
 
-		soundLoader.setPreview(true);
-		soundLoader.setPartOfProgram(true); // hack to disable popups
-
-		try {
-			soundLoader.loadSound(mpc->getUis().lock()->getDiskGui()->getSelectedFile()) == -1;
-		}
-		catch (const invalid_argument& exception) {
-			lDisk->setBusy(false);
-			return;
+		if (!file->isDirectory()) {
+			mpc->getAudioMidiServices().lock()->getSoundPlayer().lock()->start(file->getFile().lock()->getPath());
 		}
 
-		lDisk->setBusy(false);
-
-		auto lSampler = sampler.lock();
-		auto s = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getPreviewSound().lock());
-		auto start = s->getStart();
-		auto end = s->getSampleData()->size();
-		auto loopTo = -1;
-		auto overlapMode = 1;
-
-		if (s->isLoopEnabled()) {
-			loopTo = s->getLoopTo();
-			overlapMode = 2;
-		}
-
-		if (!s->isMono()) {
-			end /= 2;
-		}
-
-		lSampler->playPreviewSample(start, end, loopTo, overlapMode);
-		*/
 		break;
 	}
 	case 5:

@@ -154,8 +154,8 @@ bool AbstractDisk::isDirectory(MpcFile* f)
 
 void AbstractDisk::writeSound(mpc::sampler::Sound* s, MpcFile* f)
 {
-	auto sw = new mpc::file::sndwriter::SndWriter(s);
-	auto sndArray = sw->getSndFileArray();
+	auto sw = mpc::file::sndwriter::SndWriter(s);
+	auto sndArray = sw.getSndFileArray();
 	f->setFileData(&sndArray);
 	flush();
 	initFiles();

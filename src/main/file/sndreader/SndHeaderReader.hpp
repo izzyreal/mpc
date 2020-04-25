@@ -3,38 +3,37 @@
 #include <string>
 #include <vector>
 
-namespace mpc {
-	namespace file {
-		namespace sndreader {
+namespace mpc::file::sndreader {
+	class SndReader;
+}
 
-			class SndReader;
+using namespace std;
 
-			class SndHeaderReader
-			{
+namespace mpc::file::sndreader {
 
-			private:
-				std::vector<char> headerArray{};
-			
-			public:
-				std::vector<char>* getHeaderArray();
-				bool verifyFirstTwoBytes();
-				std::string getName();
-				int getLevel();
-				int getTune();
-				bool isMono();
-				int getStart();
-				int getEnd();
-				int getNumberOfFrames();
-				int getLoopLength();
-				bool isLoopEnabled();
-				int getNumberOfBeats();
-				int getSampleRate();
+	class SndHeaderReader
+	{
 
-			public:
-				SndHeaderReader(SndReader* sndReader);
+	private:
+		vector<char> headerArray = vector<char>(42);
 
-			};
+	public:
+		vector<char>& getHeaderArray();
+		bool hasValidId();
+		string getName();
+		int getLevel();
+		int getTune();
+		bool isMono();
+		int getStart();
+		int getEnd();
+		int getNumberOfFrames();
+		int getLoopLength();
+		bool isLoopEnabled();
+		int getNumberOfBeats();
+		int getSampleRate();
 
-		}
-	}
+	public:
+		SndHeaderReader(SndReader* sndReader);
+
+	};
 }
