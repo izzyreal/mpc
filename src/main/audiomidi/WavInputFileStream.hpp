@@ -18,15 +18,7 @@ ifstream wav_init_ifstream(const string& path) {
 	return result;
 }
 
-int byteArrayToLE(char* bytes) {
-   int value = 0;
-   for (unsigned int i = 0; i < sizeof(int); ++i) {
-       value |= *(bytes + i) << 8 * i;
-   }
-   return value;
-}
-
-int wav_getLE(ifstream& stream, int numBytes)
+int wav_get_LE(ifstream& stream, int numBytes)
 {
 
     if (numBytes < 1 || numBytes > 4) {
@@ -53,7 +45,7 @@ int wav_getLE(ifstream& stream, int numBytes)
     return val;
 }
 
-bool wav_readHeader(ifstream& stream, int& sampleRate, int& validBits, int& numChannels, int& dataChunkSize, int& numFrames) {
+bool wav_read_header(ifstream& stream, int& sampleRate, int& validBits, int& numChannels, int& numFrames) {
     
     stream.seekg(0, stream.end);
     auto tell = stream.tellg();
@@ -61,21 +53,22 @@ bool wav_readHeader(ifstream& stream, int& sampleRate, int& validBits, int& numC
     if (tell < EXPECTED_HEADER_SIZE) {
         return false;
     }
+
     stream.seekg(0, stream.beg);
 
-    auto riffChunkId = wav_getLE(stream, 4);         // Offset 0
-    auto mainChunkSize = wav_getLE(stream, 4);       // Offset 4;
-    auto riffTypeId = wav_getLE(stream, 4);          // Offset 8
-    auto fmtChunkId = wav_getLE(stream, 4);          // Offset 12
-    auto lengthOfFormatData = wav_getLE(stream, 4);  // Offset 16
-    auto isPCM = wav_getLE(stream, 2) == 1;          // Offset 20
-    numChannels = wav_getLE(stream, 2);         // Offset 22
-    sampleRate = wav_getLE(stream, 4);               // Offset 24
-    auto avgBytesPerSecond = wav_getLE(stream, 4);   // Offset 28
-    auto blockAlign = wav_getLE(stream, 2);          // Offset 32
-    validBits = wav_getLE(stream, 2);           // Offset 34
-    auto dataChunkId = wav_getLE(stream, 4);         // Ofset 36
-    dataChunkSize = wav_getLE(stream, 4);       // Offset 40
+    auto riffChunkId = wav_get_LE(stream, 4);         // Offset 0
+    auto mainChunkSize = wav_get_LE(stream, 4);       // Offset 4;
+    auto riffTypeId = wav_get_LE(stream, 4);          // Offset 8
+    auto fmtChunkId = wav_get_LE(stream, 4);          // Offset 12
+    auto lengthOfFormatData = wav_get_LE(stream, 4);  // Offset 16
+    auto isPCM = wav_get_LE(stream, 2) == 1;          // Offset 20
+    numChannels = wav_get_LE(stream, 2);         // Offset 22
+    sampleRate = wav_get_LE(stream, 4);               // Offset 24
+    auto avgBytesPerSecond = wav_get_LE(stream, 4);   // Offset 28
+    auto blockAlign = wav_get_LE(stream, 2);          // Offset 32
+    validBits = wav_get_LE(stream, 2);           // Offset 34
+    auto dataChunkId = wav_get_LE(stream, 4);         // Ofset 36
+    auto dataChunkSize = wav_get_LE(stream, 4);       // Offset 40
 
     if (riffChunkId != RIFF_CHUNK_ID) {
         return false;

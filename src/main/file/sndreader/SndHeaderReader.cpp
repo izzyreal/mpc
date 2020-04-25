@@ -51,19 +51,13 @@ int SndHeaderReader::getLevel()
 
 int SndHeaderReader::getTune()
 {
-	char tune = headerArray[20];
-	char result = tune;
-    return result;
+    return headerArray[20];
 }
 
 bool SndHeaderReader::isMono()
 {
-    auto channels = headerArray[21] + 1;
-    auto mono = false;
-    if(channels == 1)
-        mono = true;
-
-    return mono;
+    auto channels = headerArray[21];
+    return channels == 0;
 }
 
 int SndHeaderReader::getStart()
@@ -97,11 +91,7 @@ int SndHeaderReader::getLoopLength()
 bool SndHeaderReader::isLoopEnabled()
 {
     int loop = headerArray[38];
-    auto loopEnabled = false;
-    if(loop == 1)
-        loopEnabled = true;
-
-    return loopEnabled;
+    return loop == 1;
 }
 
 int SndHeaderReader::getNumberOfBeats()

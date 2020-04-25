@@ -544,10 +544,6 @@ void BaseControls::mainScreen()
 {
     init();
 
-	//auto sampler = mpc->getSampler().lock();
-	//auto numSounds = sampler->getSoundCount();
-	//MLOG("Current number of sounds: " + to_string(numSounds));
-
 	auto ams = mpc->getAudioMidiServices().lock();
 	if (ams->isRecordingSound()) {
 		ams->stopSoundRecorder();
@@ -555,7 +551,7 @@ void BaseControls::mainScreen()
 	ls.lock()->openScreen("sequencer");
 	auto lSequencer = sequencer.lock();
     lSequencer->setSoloEnabled(lSequencer->isSoloEnabled());
-	mpc->getAudioMidiServices().lock()->getSoundPlayer().lock()->start("C:/temp/hat.wav");
+	mpc->getAudioMidiServices().lock()->getSoundPlayer().lock()->start("C:/temp/guitlp-mono.snd");
 }
 
 void BaseControls::tap()

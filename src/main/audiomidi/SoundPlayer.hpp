@@ -38,7 +38,9 @@ namespace mpc::audiomidi {
 		int srcRightError = 0;
 		ifstream stream;
 		shared_ptr<AudioFormat> sourceFormat;
-	
+		bool isWav = false;
+		bool isSnd = false;
+
 	public:
 		void start(const string& filePath);
 		void stop();

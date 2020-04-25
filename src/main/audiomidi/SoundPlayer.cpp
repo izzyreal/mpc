@@ -6,6 +6,7 @@
 #include <cmath>
 
 #include "WavInputFileStream.hpp"
+#include "SndInputFileStream.hpp"
 
 using namespace std;
 using namespace mpc::sampler;
@@ -18,17 +19,40 @@ SoundPlayer::SoundPlayer()
 // Should be called from the audio thread
 void SoundPlayer::start(const string& filePath) {
 
-	stream = wav_init_ifstream(filePath);
+	auto dot = filePath.find_last_of('.');
+
+	if (dot == string::npos) {
+		return;
+	}
+
+	auto extension = filePath.substr(dot + 1);
+	transform(begin(extension), end(extension), begin(extension), [](char& c) { return tolower(c); });
+
+	isWav = extension.compare("wav") == 0;
+	isSnd = extension.compare("snd") == 0;
+
+	if (!isWav && !isSnd) {
+		return;
+	}
 
 	int validBits;
-	int dataChunkSize;
 	int sourceSampleRate;
 	int sourceNumChannels;
 
-	if (wav_readHeader(stream, sourceSampleRate, validBits, sourceNumChannels, dataChunkSize, sourceFrameCount)) {
-		
+	bool valid = false;
+
+	if (isWav) {
+		stream = wav_init_ifstream(filePath);
+		valid = wav_read_header(stream, sourceSampleRate, validBits, sourceNumChannels, sourceFrameCount);
+		}
+	else {
+		stream = snd_init_ifstream(filePath);
+		valid = snd_read_header(stream, sourceSampleRate, validBits, sourceNumChannels, sourceFrameCount);
+	}
+
+	if (valid) {
 		sourceFormat = make_shared<AudioFormat>(sourceSampleRate, validBits, sourceNumChannels, true, false);
-		
+
 		resampleInputBufferLeft.reset();
 		resampleInputBufferRight.reset();
 		resampleOutputBufferLeft.reset();
@@ -38,6 +62,10 @@ void SoundPlayer::start(const string& filePath) {
 
 		playing.store(true);
 	}
+	else {
+		stream.close();
+	}
+
 }
 
 bool SoundPlayer::isPlaying() {
@@ -51,7 +79,7 @@ void SoundPlayer::stop() {
 	}
 
 	if (stream.is_open()) {
-		wav_close(stream);
+		stream.close();
 	}
 
 	playing.store(false);
@@ -96,8 +124,35 @@ int SoundPlayer::processAudio(AudioBuffer* buf)
 	auto sourceBuffer = make_shared<AudioBuffer>("temp", sourceFormat->getChannels(), samplesToRead, sourceFormat->getSampleRate());
 	vector<char> byteBuffer(sourceBuffer->getByteArrayBufferSize(sourceFormat.get()));
 
-	wav_read_bytes(stream, byteBuffer);
+	if (isWav || (isSnd && sourceFormat->getChannels() == 1)) {
+		stream.read(&byteBuffer[0], byteBuffer.size());
+	}
+	else {
+		auto bytesPerChannel = byteBuffer.size() * 0.5;
+		
+		vector<char> byteBufferLeft(bytesPerChannel);
+		vector<char> byteBufferRight(bytesPerChannel);
+		
+		stream.read(&byteBufferLeft[0], bytesPerChannel);
+		stream.seekg(byteBuffer.size(), ios_base::cur);
+		stream.seekg(-bytesPerChannel, ios_base::cur);
+		stream.read(&byteBufferRight[0], bytesPerChannel);
+		stream.seekg(-byteBuffer.size(), ios_base::cur);
+		
+		int byteCounter = 0;
+
+		for (int i = 0; i < byteBuffer.size(); i += 4) {
+			byteBuffer[i] = byteBufferLeft[byteCounter];
+			byteBuffer[i + 1] = byteBufferLeft[byteCounter + 1];
+			byteBuffer[i + 2] = byteBufferRight[byteCounter];
+			byteBuffer[i + 3] = byteBufferRight[byteCounter + 1];
+			byteCounter += 2;
+		}
+	}
+	
 	sourceBuffer->initFromByteArray_(byteBuffer, 0, byteBuffer.size(), sourceFormat.get());
+
+	auto silent = sourceBuffer->isSilent();
 
 	if (shouldClose) {
 		buf->makeSilence();
@@ -158,8 +213,11 @@ int SoundPlayer::processAudio(AudioBuffer* buf)
 		}
 
 		buf->copyFrom(sourceBuffer.get());
+
+
 	}
 
+	auto bufSilent = buf->isSilent();
 	playedSourceFrameCount += samplesToRead;
 
 	if (shouldClose) {
