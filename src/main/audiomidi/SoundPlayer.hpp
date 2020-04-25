@@ -23,7 +23,7 @@ namespace mpc::audiomidi {
 	{
 
 	private:
-		int playedSourceFrameCount = 0;
+		int ingestedSourceFrameCount = 0;
 		int sourceFrameCount = 0;
 		shared_ptr<AudioFormat> sourceFormat;
 		bool isWav = false;
@@ -51,7 +51,6 @@ namespace mpc::audiomidi {
 		void close() {};
 
 	private:
-		void initSrc();
 		void resampleChannel(bool left, vector<float>* input, int sourceSampleRate, int destinationSampleRate, bool endOfInput);
 
 	public:
