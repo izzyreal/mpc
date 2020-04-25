@@ -118,8 +118,10 @@ void DiskGui::setFileLoad(int i)
 
 void DiskGui::openPopup(string soundFileName, string ext)
 {
-	for (auto & c : ext)
-		c = toupper(c);
+    for (auto& c : ext) {
+        c = toupper(c);
+    }
+
 	mpc->getLayeredScreen().lock()->createPopup("LOADING " + soundFileName + "." + ext, 85);
 }
 

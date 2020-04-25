@@ -58,6 +58,8 @@ void GlobalReleaseControls::function(int i) {
 	case 4:
 		controls->setF5Pressed(false);
 		if (csn.compare("load") == 0) {
+			mpc->getLayeredScreen().lock()->removePopup();
+			mpc->getLayeredScreen().lock()->getLayer(0)->setDirty();
 			mpc->getAudioMidiServices().lock()->getSoundPlayer().lock()->stop();
 		}
 		break;
@@ -73,6 +75,8 @@ void GlobalReleaseControls::function(int i) {
 			sequencer.lock()->setSoloEnabled(sequencer.lock()->isSoloEnabled());
 		}
 		else if (csn.compare("directory") == 0) {
+			mpc->getLayeredScreen().lock()->removePopup();
+			mpc->getLayeredScreen().lock()->getLayer(1)->setDirty();
 			mpc->getAudioMidiServices().lock()->getSoundPlayer().lock()->stop();
 		}
 		break;

@@ -18,18 +18,18 @@ SoundPlayer::SoundPlayer()
 	srcRight = src_new(0, 1, &srcRightError);
 }
 
-void SoundPlayer::start(const string& filePath) {
+bool SoundPlayer::start(const string& filePath) {
 
 	unique_lock<mutex> guard(_playing);
 
 	if (playing) {
-		return;
+		return false;
 	}
 
 	auto dot = filePath.find_last_of('.');
 
 	if (dot == string::npos) {
-		return;
+		return false;
 	}
 
 	auto extension = filePath.substr(dot + 1);
@@ -39,7 +39,7 @@ void SoundPlayer::start(const string& filePath) {
 	isSnd = extension.compare("snd") == 0;
 
 	if (!isWav && !isSnd) {
-		return;
+		return false;
 	}
 
 	int validBits;
@@ -52,7 +52,7 @@ void SoundPlayer::start(const string& filePath) {
 		stream = wav_init_ifstream(filePath);
 
 		if (!stream.is_open()) {
-			return;
+			return false;
 		}
 
 		valid = wav_read_header(stream, sourceSampleRate, validBits, sourceNumChannels, sourceFrameCount);
@@ -64,7 +64,7 @@ void SoundPlayer::start(const string& filePath) {
 
 	if (!valid) {
 		stream.close();
-		return;
+		return false;
 	}
 
 	sourceFormat = make_shared<AudioFormat>(sourceSampleRate, validBits, sourceNumChannels, true, false);
@@ -73,6 +73,8 @@ void SoundPlayer::start(const string& filePath) {
 	src_reset(srcRight);
 
 	playing = true;
+	
+	return true;
 }
 
 void SoundPlayer::stop() {

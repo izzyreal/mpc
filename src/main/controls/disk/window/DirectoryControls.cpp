@@ -77,7 +77,17 @@ void DirectoryControls::function(int f)
 		auto file = directoryGui->getSelectedFile();
 
 		if (!file->isDirectory()) {
-			mpc->getAudioMidiServices().lock()->getSoundPlayer().lock()->start(file->getFile().lock()->getPath());
+			
+			bool started = mpc->getAudioMidiServices().lock()->getSoundPlayer().lock()->start(file->getFile().lock()->getPath());
+			
+			auto name = file->getFsNode().lock()->getNameWithoutExtension();
+
+			if (started) {
+				mpc->getLayeredScreen().lock()->createPopup("Playing " + name, 45);
+			}
+			else {
+				mpc->getLayeredScreen().lock()->createPopup("Can't play " + name, 35);
+			}
 		}
 
 		break;

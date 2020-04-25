@@ -44,7 +44,7 @@ namespace mpc::audiomidi {
 		ifstream stream;
 
 	public:
-		void start(const string& filePath);
+		bool start(const string& filePath);
 		void stop();
 		int processAudio(ctoot::audio::core::AudioBuffer* buf) override;
 		void open() {};
