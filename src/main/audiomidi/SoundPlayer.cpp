@@ -114,14 +114,14 @@ int SoundPlayer::processAudio(AudioBuffer* buf)
 	}
 
 	bool shouldClose = false;
-	auto samplesToRead = (int)ceil((sourceFormat->getSampleRate() / buf->getSampleRate()) * buf->getSampleCount());
+	auto frameCountToRead = (int)ceil((sourceFormat->getSampleRate() / buf->getSampleRate()) * buf->getSampleCount());
 
-	if (playedSourceFrameCount + samplesToRead >= sourceFrameCount) {
+	if (playedSourceFrameCount + frameCountToRead >= sourceFrameCount) {
 		shouldClose = true;
-		samplesToRead = sourceFrameCount - playedSourceFrameCount;
+		frameCountToRead = sourceFrameCount - playedSourceFrameCount;
 	}
 
-	auto sourceBuffer = make_shared<AudioBuffer>("temp", sourceFormat->getChannels(), samplesToRead, sourceFormat->getSampleRate());
+	auto sourceBuffer = make_shared<AudioBuffer>("temp", sourceFormat->getChannels(), frameCountToRead, sourceFormat->getSampleRate());
 	vector<char> byteBuffer(sourceBuffer->getByteArrayBufferSize(sourceFormat.get()));
 
 	if (isWav || (isSnd && sourceFormat->getChannels() == 1)) {
@@ -152,8 +152,6 @@ int SoundPlayer::processAudio(AudioBuffer* buf)
 	
 	sourceBuffer->initFromByteArray_(byteBuffer, 0, byteBuffer.size(), sourceFormat.get());
 
-	auto silent = sourceBuffer->isSilent();
-
 	if (shouldClose) {
 		buf->makeSilence();
 	}
@@ -161,11 +159,11 @@ int SoundPlayer::processAudio(AudioBuffer* buf)
 	if (resample) {
 
 		if (sourceFormat->getChannels() >= 1) {
-			resampleChannel(true, sourceBuffer->getChannel(0), sourceFormat->getSampleRate(), buf->getSampleRate());
+			resampleChannel(true, sourceBuffer->getChannel(0), sourceFormat->getSampleRate(), buf->getSampleRate(), false);
 		}
 
 		if (sourceFormat->getChannels() >= 2) {
-			resampleChannel(false, sourceBuffer->getChannel(1), sourceFormat->getSampleRate(), buf->getSampleRate());
+			resampleChannel(false, sourceBuffer->getChannel(1), sourceFormat->getSampleRate(), buf->getSampleRate(), false);
 		}
 
 		if (resampleOutputBufferLeft.available() >= buf->getSampleCount()) {
@@ -208,17 +206,21 @@ int SoundPlayer::processAudio(AudioBuffer* buf)
 		}
 
 		if (sourceBuffer->getChannelCount() == 1) {
-			sourceBuffer->addChannel(false);
-			sourceBuffer->copyChannel(0, 1);
+			
+			for (int i = 0; i < buf->getSampleCount(); i++) {
+				(*left)[i] = (*sourceBuffer->getChannel(0))[i];
+				(*right)[i] = (*left)[i];
+			}
 		}
-
-		buf->copyFrom(sourceBuffer.get());
-
-
+		else {
+			for (int i = 0; i < buf->getSampleCount(); i++) {
+				(*left)[i] = (*sourceBuffer->getChannel(0))[i];
+				(*right)[i] = (*sourceBuffer->getChannel(1))[i];
+			}
+		}
 	}
 
-	auto bufSilent = buf->isSilent();
-	playedSourceFrameCount += samplesToRead;
+	playedSourceFrameCount += frameCountToRead;
 
 	if (shouldClose) {
 		stop();
@@ -227,7 +229,7 @@ int SoundPlayer::processAudio(AudioBuffer* buf)
 	return AUDIO_OK;
 }
 
-void SoundPlayer::resampleChannel(bool left, vector<float>* inputBuffer, int sourceSampleRate, int destinationSampleRate)
+void SoundPlayer::resampleChannel(bool left, vector<float>* inputBuffer, int sourceSampleRate, int destinationSampleRate, bool endOfInput)
 {
 	auto ratio = static_cast<float>(destinationSampleRate) / static_cast<float>(sourceSampleRate);
 	auto circularInputBuffer = left ? &resampleInputBufferLeft : &resampleInputBufferRight;

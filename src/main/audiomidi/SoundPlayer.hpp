@@ -51,7 +51,7 @@ namespace mpc::audiomidi {
 
 	private:
 		void initSrc();
-		void resampleChannel(bool left, vector<float>* input, int sourceSampleRate, int destinationSampleRate);
+		void resampleChannel(bool left, vector<float>* input, int sourceSampleRate, int destinationSampleRate, bool endOfInput);
 
 	public:
 		SoundPlayer();
