@@ -10,6 +10,7 @@
 #include <fstream>
 #include <memory>
 #include <atomic>
+#include <mutex>
 
 using namespace mpc::sampler;
 using namespace ctoot::audio::core;
@@ -22,11 +23,15 @@ namespace mpc::audiomidi {
 	{
 
 	private:
-		int sourceFrameCount = 0;
-	
-	private:
-		atomic<bool> playing = ATOMIC_VAR_INIT(false);
 		int playedSourceFrameCount = 0;
+		int sourceFrameCount = 0;
+		shared_ptr<AudioFormat> sourceFormat;
+		bool isWav = false;
+		bool isSnd = false;
+
+	private:
+		mutex _playing;
+		atomic<bool> playing = ATOMIC_VAR_INIT(false);
 		string filePath = "";
 		circular_buffer<float> resampleInputBufferLeft = circular_buffer<float>(20000);
 		circular_buffer<float> resampleInputBufferRight = circular_buffer<float>(20000);
@@ -37,9 +42,6 @@ namespace mpc::audiomidi {
 		int srcLeftError = 0;
 		int srcRightError = 0;
 		ifstream stream;
-		shared_ptr<AudioFormat> sourceFormat;
-		bool isWav = false;
-		bool isSnd = false;
 
 	public:
 		void start(const string& filePath);

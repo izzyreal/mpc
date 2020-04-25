@@ -3,6 +3,9 @@
 #include <Mpc.hpp>
 #include <controls/Controls.hpp>
 
+#include <audiomidi/AudioMidiServices.hpp>
+#include <audiomidi/SoundPlayer.hpp>
+
 #include <sampler/Sampler.hpp>
 #include <sampler/Sound.hpp>
 
@@ -16,6 +19,8 @@
 #include <ui/disk/window/DirectoryGui.hpp>
 
 #include <lcdgui/Field.hpp>
+
+#include <file/File.hpp>
 
 using namespace mpc::controls::disk::window;
 using namespace std;
@@ -61,7 +66,6 @@ void DirectoryControls::function(int f)
 		break;
 	case 5:
 	{
-		/*
 		auto controls = mpc->getControls().lock();
 
 		if (controls->isF6Pressed()) {
@@ -70,39 +74,12 @@ void DirectoryControls::function(int f)
 
 		controls->setF6Pressed(true);
 
-		auto soundLoader = mpc::disk::SoundLoader(mpc, vector<weak_ptr<mpc::sampler::Sound>>(), false);
+		auto file = directoryGui->getSelectedFile();
 
-		soundLoader.setPreview(true);
-		soundLoader.setPartOfProgram(true); // hack to disable popups
-
-		try {
-			soundLoader.loadSound(directoryGui->getSelectedFile()) == -1;
-		}
-		catch (const invalid_argument& exception) {
-			mpc->getDisk().lock()->setBusy(false);
-			return;
+		if (!file->isDirectory()) {
+			mpc->getAudioMidiServices().lock()->getSoundPlayer().lock()->start(file->getFile().lock()->getPath());
 		}
 
-		mpc->getDisk().lock()->setBusy(false);
-
-		auto lSampler = sampler.lock();
-		auto s = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getPreviewSound().lock());
-		auto start = s->getStart();
-		auto end = s->getSampleData()->size();
-		auto loopTo = -1;
-		auto overlapMode = 1;
-
-		if (s->isLoopEnabled()) {
-			loopTo = s->getLoopTo();
-			overlapMode = 2;
-		}
-
-		if (!s->isMono()) {
-			end /= 2;
-		}
-
-		lSampler->playPreviewSample(start, end, loopTo, overlapMode);
-		*/
 		break;
 	}
 	}

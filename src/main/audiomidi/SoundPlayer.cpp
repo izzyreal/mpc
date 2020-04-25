@@ -19,6 +19,10 @@ SoundPlayer::SoundPlayer()
 // Should be called from the audio thread
 void SoundPlayer::start(const string& filePath) {
 
+	if (playing.load()) {
+		return;
+	}
+
 	auto dot = filePath.find_last_of('.');
 
 	if (dot == string::npos) {
@@ -41,6 +45,8 @@ void SoundPlayer::start(const string& filePath) {
 
 	bool valid = false;
 
+	unique_lock<mutex> guard(_playing);
+
 	if (isWav) {
 		stream = wav_init_ifstream(filePath);
 		valid = wav_read_header(stream, sourceSampleRate, validBits, sourceNumChannels, sourceFrameCount);
@@ -52,14 +58,6 @@ void SoundPlayer::start(const string& filePath) {
 
 	if (valid) {
 		sourceFormat = make_shared<AudioFormat>(sourceSampleRate, validBits, sourceNumChannels, true, false);
-
-		resampleInputBufferLeft.reset();
-		resampleInputBufferRight.reset();
-		resampleOutputBufferLeft.reset();
-		resampleOutputBufferRight.reset();
-
-		playedSourceFrameCount = 0;
-
 		playing.store(true);
 	}
 	else {
@@ -78,11 +76,13 @@ void SoundPlayer::stop() {
 		return;
 	}
 
+	unique_lock<mutex> guard(_playing);
+
+	playing.store(false);
+
 	if (stream.is_open()) {
 		stream.close();
 	}
-
-	playing.store(false);
 
 	if (srcLeft != nullptr) {
 		src_delete(srcLeft);
@@ -93,6 +93,14 @@ void SoundPlayer::stop() {
 		src_delete(srcRight);
 		srcRight = nullptr;
 	}
+
+	playedSourceFrameCount = 0;
+
+	resampleInputBufferLeft.reset();
+	resampleInputBufferRight.reset();
+	resampleOutputBufferLeft.reset();
+	resampleOutputBufferRight.reset();
+
 }
 
 int SoundPlayer::processAudio(AudioBuffer* buf)
@@ -106,6 +114,8 @@ int SoundPlayer::processAudio(AudioBuffer* buf)
 	}
 
 	auto resample = buf->getSampleRate() != sourceFormat->getSampleRate();
+
+	unique_lock<mutex> guard(_playing);
 
 	if (resample) {
 		if (srcLeft == nullptr || (sourceFormat->getChannels() >= 2 && srcRight == nullptr)) {
@@ -221,6 +231,9 @@ int SoundPlayer::processAudio(AudioBuffer* buf)
 	}
 
 	playedSourceFrameCount += frameCountToRead;
+
+	
+	guard.unlock();
 
 	if (shouldClose) {
 		stop();

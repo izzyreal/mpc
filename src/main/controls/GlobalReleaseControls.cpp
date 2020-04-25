@@ -4,6 +4,7 @@
 
 #include <Mpc.hpp>
 #include <audiomidi/AudioMidiServices.hpp>
+#include <audiomidi/SoundPlayer.hpp>
 #include <audiomidi/EventHandler.hpp>
 #include <ui/sequencer/StepEditorGui.hpp>
 #include <ui/sequencer/window/SequencerWindowGui.hpp>
@@ -56,12 +57,9 @@ void GlobalReleaseControls::function(int i) {
 		break;
 	case 4:
 		controls->setF5Pressed(false);
-		/*
 		if (csn.compare("load") == 0) {
-			sampler.lock()->finishBasicVoice();
-			sampler.lock()->deleteSound(dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getPreviewSound().lock()));
+			mpc->getAudioMidiServices().lock()->getSoundPlayer().lock()->stop();
 		}
-		*/
 		break;
 	case 5:
 		controls->setF6Pressed(false);
@@ -74,12 +72,9 @@ void GlobalReleaseControls::function(int i) {
 			}
 			sequencer.lock()->setSoloEnabled(sequencer.lock()->isSoloEnabled());
 		}
-		/*
-		if (csn.compare("directory") == 0) {
-			sampler.lock()->finishBasicVoice();
-			sampler.lock()->deleteSound(dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getPreviewSound().lock()));
+		else if (csn.compare("directory") == 0) {
+			mpc->getAudioMidiServices().lock()->getSoundPlayer().lock()->stop();
 		}
-		*/
 		break;
 	}
 }

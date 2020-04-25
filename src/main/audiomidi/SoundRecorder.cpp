@@ -29,6 +29,10 @@ void SoundRecorder::setInputGain(unsigned int gain)
 // modes: 0 = MONO L, 1 = MONO R, 2 = STEREO
 void SoundRecorder::prepare(const weak_ptr<Sound> sound, int lengthInFrames, int mode)
 {
+	if (recording) {
+		return;
+	}
+
 	this->sound = sound;
 	this->lengthInFrames = lengthInFrames;
 	this->mode = mode;
@@ -40,6 +44,11 @@ void SoundRecorder::prepare(const weak_ptr<Sound> sound, int lengthInFrames, int
 
 // Should be called from the audio thread
 void SoundRecorder::start() {
+
+	if (recording) {
+		return;
+	}
+
 	resampleBufferLeft.reset();
 	resampleBufferRight.reset();
 	recording = true;
