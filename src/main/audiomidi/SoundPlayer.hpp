@@ -28,6 +28,8 @@ namespace mpc::audiomidi {
 		shared_ptr<AudioFormat> sourceFormat;
 		bool isWav = false;
 		bool isSnd = false;
+		float fadeFactor = -1.0f;
+		bool stopEarly = false;
 
 	private:
 		mutex _playing;
@@ -45,12 +47,15 @@ namespace mpc::audiomidi {
 
 	public:
 		bool start(const string& filePath);
-		void stop();
 		int processAudio(ctoot::audio::core::AudioBuffer* buf) override;
 		void open() {};
 		void close() {};
+		
+	public:
+		void enableStopEarly();
 
 	private:
+		void stop();
 		void resampleChannel(bool left, vector<float>* input, int sourceSampleRate, int destinationSampleRate, bool endOfInput);
 
 	public:

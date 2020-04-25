@@ -60,7 +60,7 @@ void GlobalReleaseControls::function(int i) {
 		if (csn.compare("load") == 0) {
 			mpc->getLayeredScreen().lock()->removePopup();
 			mpc->getLayeredScreen().lock()->getLayer(0)->setDirty();
-			mpc->getAudioMidiServices().lock()->getSoundPlayer().lock()->stop();
+			mpc->getAudioMidiServices().lock()->getSoundPlayer().lock()->enableStopEarly();
 		}
 		break;
 	case 5:
@@ -77,7 +77,7 @@ void GlobalReleaseControls::function(int i) {
 		else if (csn.compare("directory") == 0) {
 			mpc->getLayeredScreen().lock()->removePopup();
 			mpc->getLayeredScreen().lock()->getLayer(1)->setDirty();
-			mpc->getAudioMidiServices().lock()->getSoundPlayer().lock()->stop();
+			mpc->getAudioMidiServices().lock()->getSoundPlayer().lock()->enableStopEarly();
 		}
 		break;
 	}

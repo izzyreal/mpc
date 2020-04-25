@@ -71,13 +71,26 @@ bool SoundPlayer::start(const string& filePath) {
 
 	src_reset(srcLeft);
 	src_reset(srcRight);
+	
+	fadeFactor = -1.0f;
+	stopEarly = false;
 
 	playing = true;
 	
 	return true;
 }
 
-void SoundPlayer::stop() {
+void SoundPlayer::enableStopEarly()
+{
+
+	unique_lock<mutex> guard(_playing);
+
+	stopEarly = true;
+	fadeFactor = 1.0f;
+}
+
+void SoundPlayer::stop()
+{
 
 	unique_lock<mutex> guard(_playing);
 
@@ -90,7 +103,7 @@ void SoundPlayer::stop() {
 	}
 
 	playing = false;
-
+	
 	ingestedSourceFrameCount = 0;
 
 	resampleInputBufferLeft.reset();
@@ -116,11 +129,12 @@ int SoundPlayer::processAudio(AudioBuffer* buf)
 	auto resample = buf->getSampleRate() != sourceFormat->getSampleRate();
 	auto resampleRatio = (int) ceil(sourceFormat->getSampleRate() / buf->getSampleRate());
 
-	bool shouldClose = false;
 	auto frameCountToRead = resampleRatio * buf->getSampleCount();
+	
+	auto shouldStop = false;
 
 	if (ingestedSourceFrameCount + frameCountToRead >= sourceFrameCount) {
-		shouldClose = true;
+		shouldStop = true;
 		frameCountToRead = sourceFrameCount - ingestedSourceFrameCount;
 	}
 
@@ -159,7 +173,7 @@ int SoundPlayer::processAudio(AudioBuffer* buf)
 	
 	sourceBuffer->initFromByteArray_(byteBuffer, 0, byteBuffer.size(), sourceFormat.get());
 
-	if (shouldClose) {
+	if (shouldStop) {
 		buf->makeSilence();
 	}
 
@@ -188,7 +202,7 @@ int SoundPlayer::processAudio(AudioBuffer* buf)
 				}
 			}
 		}
-		else if (shouldClose && resampleOutputBufferLeft.available() > 0) {
+		else if (shouldStop && resampleOutputBufferLeft.available() > 0) {
 
 			auto remaining = resampleOutputBufferLeft.available();
 
@@ -208,11 +222,6 @@ int SoundPlayer::processAudio(AudioBuffer* buf)
 	}
 	else {
 
-		/*
-		if (sourceBuffer->getSampleCount() < buf->getSampleCount()) {
-			sourceBuffer->changeSampleCount(buf->getSampleCount(), true);
-		}
-		*/
 		auto frameCountToWrite = min(sourceBuffer->getSampleCount(), buf->getSampleCount());
 		if (sourceBuffer->getChannelCount() == 1) {
 			
@@ -231,10 +240,31 @@ int SoundPlayer::processAudio(AudioBuffer* buf)
 
 	ingestedSourceFrameCount += frameCountToRead;
 
-	guard.unlock();
+	if (stopEarly) {
+		int bufferIndex = 0;
 
-	if (shouldClose) {
+		while (fadeFactor >= 0.0f && bufferIndex < buf->getSampleCount()) {
+			(*left)[bufferIndex] = (*left)[bufferIndex] * fadeFactor;
+			(*right)[bufferIndex] = (*right)[bufferIndex] * fadeFactor;
+			fadeFactor -= 0.002f;
+			bufferIndex++;
+		}
+
+		if (bufferIndex != buf->getSampleCount()) {
+			for (int i = bufferIndex; i < buf->getSampleCount(); i++) {
+				(*left)[i] = 0;
+				(*right)[i] = 0;
+			}
+		}
+	}
+
+
+	if (shouldStop || (stopEarly && fadeFactor < 0) ) {
+		guard.unlock();
 		stop();
+	}
+	else {
+		guard.unlock();
 	}
 
 	return AUDIO_OK;
