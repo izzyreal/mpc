@@ -55,7 +55,7 @@ string snd_get_string(ifstream& stream, const int maxLength)
 
 uint16_t snd_get_unsigned_short_LE(ifstream& stream)
 {
-    char buffer[2];
+    unsigned char buffer[2];
     stream >> buffer[0];
     stream >> buffer[1];
     return static_cast<uint16_t>((buffer[1] << 8) | buffer[0]);

@@ -104,5 +104,5 @@ int SndHeaderReader::getSampleRate()
 {
 	auto rateArray = moduru::VecUtil::CopyOfRange(&headerArray, 40, 42);
 	auto rate = moduru::file::ByteUtil::bytes2ushort(rateArray);
-	return static_cast<int>(rate) + 65536;
+	return static_cast<int>(rate);
 }

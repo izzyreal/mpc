@@ -31,7 +31,7 @@ namespace mpc::audiomidi {
 
 	private:
 		mutex _playing;
-		atomic<bool> playing = ATOMIC_VAR_INIT(false);
+		bool playing = false;
 		string filePath = "";
 		circular_buffer<float> resampleInputBufferLeft = circular_buffer<float>(20000);
 		circular_buffer<float> resampleInputBufferRight = circular_buffer<float>(20000);
@@ -49,7 +49,6 @@ namespace mpc::audiomidi {
 		int processAudio(ctoot::audio::core::AudioBuffer* buf) override;
 		void open() {};
 		void close() {};
-		bool isPlaying();
 
 	private:
 		void initSrc();

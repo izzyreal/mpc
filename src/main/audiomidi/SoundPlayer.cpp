@@ -19,7 +19,9 @@ SoundPlayer::SoundPlayer()
 // Should be called from the audio thread
 void SoundPlayer::start(const string& filePath) {
 
-	if (playing.load()) {
+	unique_lock<mutex> guard(_playing);
+
+	if (playing) {
 		return;
 	}
 
@@ -45,40 +47,31 @@ void SoundPlayer::start(const string& filePath) {
 
 	bool valid = false;
 
-	unique_lock<mutex> guard(_playing);
-
 	if (isWav) {
 		stream = wav_init_ifstream(filePath);
 		valid = wav_read_header(stream, sourceSampleRate, validBits, sourceNumChannels, sourceFrameCount);
-		}
+	}
 	else {
 		stream = snd_init_ifstream(filePath);
 		valid = snd_read_header(stream, sourceSampleRate, validBits, sourceNumChannels, sourceFrameCount);
 	}
 
-	if (valid) {
-		sourceFormat = make_shared<AudioFormat>(sourceSampleRate, validBits, sourceNumChannels, true, false);
-		playing.store(true);
-	}
-	else {
+	if (!valid) {
 		stream.close();
+		return;
 	}
 
-}
-
-bool SoundPlayer::isPlaying() {
-	return playing.load();
+	sourceFormat = make_shared<AudioFormat>(sourceSampleRate, validBits, sourceNumChannels, true, false);
+	playing = true;
 }
 
 void SoundPlayer::stop() {
 
-	if (!playing.load()) {
-		return;
-	}
-
 	unique_lock<mutex> guard(_playing);
 
-	playing.store(false);
+	if (!playing) {
+		return;
+	}
 
 	if (stream.is_open()) {
 		stream.close();
@@ -101,21 +94,24 @@ void SoundPlayer::stop() {
 	resampleOutputBufferLeft.reset();
 	resampleOutputBufferRight.reset();
 
+	playing = false;
+
 }
 
 int SoundPlayer::processAudio(AudioBuffer* buf)
 {
+
+	unique_lock<mutex> guard(_playing);
+
 	auto left = buf->getChannel(0);
 	auto right = buf->getChannel(1);
 
-	if (!playing.load()) {
+	if (!playing) {
 		buf->makeSilence();
 		return AUDIO_SILENCE;
 	}
 
 	auto resample = buf->getSampleRate() != sourceFormat->getSampleRate();
-
-	unique_lock<mutex> guard(_playing);
 
 	if (resample) {
 		if (srcLeft == nullptr || (sourceFormat->getChannels() >= 2 && srcRight == nullptr)) {
