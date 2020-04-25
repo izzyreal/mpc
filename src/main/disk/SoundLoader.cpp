@@ -72,7 +72,12 @@ int SoundLoader::loadSound(MpcFile* f)
 		mpc::file::wav::WavFile wavFile;
 
 		wavFile.openWavFile(file);
-
+		
+		if (wavFile.getValidBits() != 16) {
+			wavFile.close();
+			throw invalid_argument("Only 16 bit supported");
+		}
+		
 		int numChannels = wavFile.getNumChannels();
 		if (numChannels == 1) {
 			wavFile.readFrames(fa, wavFile.getNumFrames());
