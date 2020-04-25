@@ -113,9 +113,9 @@ void DirectoryControls::turnWheel(int i)
 {
 	init();
 	if (i > 0) {
-		directoryGui->up();
+		directoryGui->down();
 	}
 	else {
-		directoryGui->down();
+		directoryGui->up();
 	}
 }
