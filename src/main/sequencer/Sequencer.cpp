@@ -377,7 +377,8 @@ void Sequencer::play(bool fromStart)
 		s->initLoop();
 
 		if (recording || overdubbing) {
-			undoPlaceHolder.swap(copySequence(s));
+			auto copy = copySequence(s);
+			undoPlaceHolder.swap(copy);
 			lastRecordingActive = true;
 			recordStartTick = getTickPosition();
 			hw->getLed("undoseq").lock()->light(lastRecordingActive);
@@ -416,8 +417,8 @@ void Sequencer::undoSeq()
 	}
 
 	auto s = copySequence(undoPlaceHolder);
-	
-	undoPlaceHolder.swap(copySequence(sequences[activeSequenceIndex]));
+	auto copy = copySequence(sequences[activeSequenceIndex]);	
+	undoPlaceHolder.swap(copy);
 
 	sequences[activeSequenceIndex].swap(s);
 	
@@ -632,7 +633,8 @@ void Sequencer::purgeAllSequences()
 
 void Sequencer::purgeSequence(int i) {
 	sequences[i].reset();
-	sequences[i].swap(make_shared<Sequence>(mpc, defaultTrackNames));
+	auto sequence = make_shared<Sequence>(mpc, defaultTrackNames);
+	sequences[i].swap(sequence);
 	sequences[i]->resetTrackEventIndices(position);
 	string res = defaultSequenceName;
 	res.append(moduru::lang::StrUtil::padLeft(to_string(i + 1), "0", 2));
@@ -641,7 +643,8 @@ void Sequencer::purgeSequence(int i) {
 
 void Sequencer::copySequence(int source, int destination)
 {
-	sequences[destination].swap(copySequence(sequences[source]));
+	auto copy = copySequence(sequences[source]);
+	sequences[destination].swap(copy);
 	sequences[destination]->resetTrackEventIndices(position);
 	sequences[destination]->initLoop();
 }
@@ -1370,7 +1373,8 @@ void Sequencer::flushTrackNoteCache()
 
 void Sequencer::storeActiveSequenceInPlaceHolder()
 {
-	undoPlaceHolder.swap(copySequence(sequences[activeSequenceIndex]));
+	auto copy = copySequence(sequences[activeSequenceIndex]);
+	undoPlaceHolder.swap(copy);
 
 	lastRecordingActive = true;
 	auto hw = mpc->getHardware().lock();
