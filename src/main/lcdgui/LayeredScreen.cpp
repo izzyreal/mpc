@@ -109,6 +109,8 @@ using namespace mpc::ui::other;
 using namespace mpc::ui::disk;
 using namespace mpc::ui::disk::window;
 
+using namespace moduru::file;
+
 static vector<string> samplerWindowNames = vector<string>{ "program", "deleteprogram", "deleteallprograms", "createnewprogram",
 "copyprogram", "assignmentview", "initpadassign", "copynoteparameters", "velocitymodulation",
 "veloenvfilter", "velopitch", "autochromaticassignment", "keeporretry" };
@@ -243,10 +245,10 @@ LayeredScreen::LayeredScreen(mpc::Mpc* mpc)
 		effects.push_back(move(effect));
 	}
 
-	FILE* fp0 = fopen(string(mpc::StartUp::resPath + "mainpanel.json").c_str(), "r"); // non-Windows use "r"
-	FILE* fp1 = fopen(string(mpc::StartUp::resPath + "windowpanel.json").c_str(), "r"); // non-Windows use "r"
-	FILE* fp2 = fopen(string(mpc::StartUp::resPath + "dialogpanel.json").c_str(), "r"); // non-Windows use "r"
-	FILE* fp3 = fopen(string(mpc::StartUp::resPath + "dialog2panel.json").c_str(), "r"); // non-Windows use "r"
+	FILE* fp0 = FileUtil::fopenw(string(mpc::StartUp::resPath + "mainpanel.json").c_str(), "r");
+	FILE* fp1 = FileUtil::fopenw(string(mpc::StartUp::resPath + "windowpanel.json").c_str(), "r");
+	FILE* fp2 = FileUtil::fopenw(string(mpc::StartUp::resPath + "dialogpanel.json").c_str(), "r");
+	FILE* fp3 = FileUtil::fopenw(string(mpc::StartUp::resPath + "dialog2panel.json").c_str(), "r");
 
 	FILE* fPointers[LAYER_COUNT]{ fp0, fp1, fp2, fp3 };
 

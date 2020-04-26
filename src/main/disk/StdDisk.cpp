@@ -171,8 +171,9 @@ bool StdDisk::moveForward(string directoryName)
 
 weak_ptr<moduru::file::Directory> StdDisk::getDir()
 {
-	if (path.size() == 0)
+	if (path.size() == 0) {
 		return root;
+	}
 
 	return path[(int) (path.size()) - 1];
 }
