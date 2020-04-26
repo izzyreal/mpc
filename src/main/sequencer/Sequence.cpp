@@ -654,5 +654,24 @@ int Sequence::getLastTickOfBar(int index) {
 	return getFirstTickOfBar(index) + barLengths[index] - 1;
 }
 
+void Sequence::resetTrackEventIndices(int tick) {
+
+	if (!isUsed()) {
+		return;
+	}
+
+	for (auto& t : tracks) {
+		if (t->isUsed()) {
+			t->move(tick, tick);
+		}
+	}
+	
+	for (auto& t : metaTracks) {
+		if (t->isUsed()) {
+			t->move(tick, tick);
+		}
+	}
+}
+
 Sequence::~Sequence() {
 }

@@ -6,126 +6,129 @@
 
 #include <memory>
 
-namespace mpc {
+namespace mpc::sequencer {
+	class Track;
+	class TimeSignature;
+	class TempoChangeEvent;
+}
 
-	namespace sequencer {
+using namespace std;
 
-		class Track;
-		class TimeSignature;
-		class TempoChangeEvent;
-		class Sequence final
-			: public moduru::observer::Observable
-		{
+namespace mpc::sequencer {
 
-		public:
-			typedef moduru::observer::Observable super;
+	class Sequence final
+		: public moduru::observer::Observable
+	{
 
-		private:
-			Mpc* mpc{ nullptr };
+	public:
+		typedef moduru::observer::Observable super;
 
-			BCMath initialTempo = BCMath("120.0");
+	private:
+		Mpc* mpc{ nullptr };
 
-			std::vector<std::shared_ptr<Track>> tracks{};
-			std::vector<std::shared_ptr<Track>> metaTracks{};
+		BCMath initialTempo = BCMath("120.0");
 
-			std::vector<std::string> deviceNames{};
-			std::vector<std::string> defaultTrackNames{};
+		vector<shared_ptr<Track>> tracks{};
+		vector<shared_ptr<Track>> metaTracks{};
 
-			std::vector<int> barLengths{ };
-			std::vector<int> numerators{ };
-			std::vector<int> denominators{ };
+		vector<string> deviceNames{};
+		vector<string> defaultTrackNames{};
 
-			std::string name{""};
-			bool loopEnabled{false};
-			int lastBar{ -1 };
-			bool used{ false };
-			bool tempoChangeOn{ false };
-			int loopStart{ 0 };
-			int loopEnd{ 0 };
-			int firstLoopBar{ 0 };
-			int lastLoopBar{ 0 };
-			bool lastLoopBarEnd{ false };
+		vector<int> barLengths{ };
+		vector<int> numerators{ };
+		vector<int> denominators{ };
 
-			//file::all::AllParser* allFile{};
+		string name{ "" };
+		bool loopEnabled{ false };
+		int lastBar{ -1 };
+		bool used{ false };
+		bool tempoChangeOn{ false };
+		int loopStart{ 0 };
+		int loopEnd{ 0 };
+		int firstLoopBar{ 0 };
+		int lastLoopBar{ 0 };
+		bool lastLoopBarEnd{ false };
 
-		public:
-			BCMath getInitialTempo();
-			void setInitialTempo(BCMath bd);
+		//file::all::AllParser* allFile{};
 
-			void setLoopStart(int l);
-			int getLoopStart();
-			void setLoopEnd(int l);
-			int getLoopEnd();
-			void setFirstLoopBar(int i);
-			int getFirstLoopBar();
-			void setLastLoopBar(int i);
-			int getLastLoopBar();
-			void initMetaTracks();
+	public:
+		BCMath getInitialTempo();
+		void setInitialTempo(BCMath bd);
 
-		private:
-			void createClickTrack();
-			void createMidiClockTrack();
-			void createTempoChangeTrack();
+		void setLoopStart(int l);
+		int getLoopStart();
+		void setLoopEnd(int l);
+		int getLoopEnd();
+		void setFirstLoopBar(int i);
+		int getFirstLoopBar();
+		void setLastLoopBar(int i);
+		int getLastLoopBar();
+		void initMetaTracks();
 
-			static bool trackIndexComparator(std::weak_ptr<Track> t0, std::weak_ptr<Track> t1);
+	private:
+		void createClickTrack();
+		void createMidiClockTrack();
+		void createTempoChangeTrack();
 
-		public:
-			bool isLoopEnabled();
-			void setName(std::string s);
-			std::string getName();
-			void setDeviceName(int i, std::string s);
-			std::string getDeviceName(int i);
-			void setLastBar(int i);
-			int getLastBar();
-			void setLoopEnabled(bool b);
-			void copyBars(int fromSequence, int firstBar, int lastBar, int toSequence, int afterBar, int copies);
-			std::weak_ptr<Track> getTrack(int i);
-			void setUsed(bool b);
-			bool isUsed();
-			void init(int lastBarIndex);
-			void setTimeSignature(int firstBar, int tsLastBar, int num, int den);
-			void setTimeSignature(int bar, int num, int den);
-			std::vector<std::weak_ptr<Track>> getTracks();
-			std::vector<std::weak_ptr<Track>> getMetaTracks();
-			std::vector<std::string> getDeviceNames();
-			void setDeviceNames(std::vector<std::string> sa);
-			std::vector<std::weak_ptr<TempoChangeEvent>> getTempoChangeEvents();
-			std::weak_ptr<TempoChangeEvent> addTempoChangeEvent();
-			void removeTempoChangeEvent(int i);
-			void removeTempoChangeEvent(std::weak_ptr<TempoChangeEvent> tce);
+		static bool trackIndexComparator(weak_ptr<Track> t0, weak_ptr<Track> t1);
 
-			bool isTempoChangeOn();
-			void setTempoChangeOn(bool b);
-			int getLastTick();
-			TimeSignature getTimeSignature();
-			void sortTempoChangeEvents();
-			void sortTracks();
-			void purgeAllTracks();
-			std::weak_ptr<Track> purgeTrack(int i);
-			int getDenominator(int i);
-			int getNumerator(int i);
-			std::vector<int>* getBarLengths();
-			void deleteBars(int firstBar, int lBar);
-			void insertBars(int numberOfBars, int afterBar);
-			void moveTrack(int source, int destination);
-			bool isLastLoopBarEnd();
-			//void setTempoChangeEvents(std::vector<TempoChangeEvent*>* tceList);
+	public:
+		bool isLoopEnabled();
+		void setName(string s);
+		string getName();
+		void setDeviceName(int i, string s);
+		string getDeviceName(int i);
+		void setLastBar(int i);
+		int getLastBar();
+		void setLoopEnabled(bool b);
+		void copyBars(int fromSequence, int firstBar, int lastBar, int toSequence, int afterBar, int copies);
+		weak_ptr<Track> getTrack(int i);
+		void setUsed(bool b);
+		bool isUsed();
+		void init(int lastBarIndex);
+		void setTimeSignature(int firstBar, int tsLastBar, int num, int den);
+		void setTimeSignature(int bar, int num, int den);
+		vector<weak_ptr<Track>> getTracks();
+		vector<weak_ptr<Track>> getMetaTracks();
+		vector<string> getDeviceNames();
+		void setDeviceNames(vector<string> sa);
+		vector<weak_ptr<TempoChangeEvent>> getTempoChangeEvents();
+		weak_ptr<TempoChangeEvent> addTempoChangeEvent();
+		void removeTempoChangeEvent(int i);
+		void removeTempoChangeEvent(weak_ptr<TempoChangeEvent> tce);
 
-			int getEventCount();
-			void initLoop();
-			std::vector<int>* getNumerators();
-			std::vector<int>* getDenominators();
-			void removeFirstMetronomeClick();
-			int getNoteEventCount();
+		bool isTempoChangeOn();
+		void setTempoChangeOn(bool b);
+		int getLastTick();
+		TimeSignature getTimeSignature();
+		void sortTempoChangeEvents();
+		void sortTracks();
+		void purgeAllTracks();
+		weak_ptr<Track> purgeTrack(int i);
+		int getDenominator(int i);
+		int getNumerator(int i);
+		vector<int>* getBarLengths();
+		void deleteBars(int firstBar, int lBar);
+		void insertBars(int numberOfBars, int afterBar);
+		void moveTrack(int source, int destination);
+		bool isLastLoopBarEnd();
+		//void setTempoChangeEvents(vector<TempoChangeEvent*>* tceList);
 
-			int getFirstTickOfBar(int index);
-			int getLastTickOfBar(int index);
+		int getEventCount();
+		void initLoop();
+		vector<int>* getNumerators();
+		vector<int>* getDenominators();
+		void removeFirstMetronomeClick();
+		int getNoteEventCount();
 
-		public:
-			Sequence(Mpc* mpc, std::vector<std::string> defaultTrackNames);
-			~Sequence();
+		int getFirstTickOfBar(int index);
+		int getLastTickOfBar(int index);
 
-		};
+		void resetTrackEventIndices(int tick);
 
-	}
+	public:
+		Sequence(Mpc* mpc, vector<string> defaultTrackNames);
+		~Sequence();
+
+	};
 }

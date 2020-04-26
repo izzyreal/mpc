@@ -226,20 +226,24 @@ void SequencerObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 
 	bool seqChanged = false;
 	
-	if (seqNum != lSequencer->getActiveSequenceIndex()) {
-		seq.lock()->deleteObserver(this);
+	//if (seqNum != lSequencer->getActiveSequenceIndex()) {
+		if (seq.lock()) {
+			seq.lock()->deleteObserver(this);
+		}
 		seqNum = lSequencer->getActiveSequenceIndex();
 		seq = lSequencer->getSequence(seqNum);
 		seq.lock()->addObserver(this);
 		seqChanged = true;
-	}
+	//}
 
-	if (seqChanged || trackNum != lSequencer->getActiveTrackIndex()) {
+	//if (seqChanged || trackNum != lSequencer->getActiveTrackIndex()) {
+		if (track.lock()) {
+			track.lock()->deleteObserver(this);
+		}
 		trackNum = lSequencer->getActiveTrackIndex();
-		track.lock()->deleteObserver(this);
 		track = seq.lock()->getTrack(trackNum);
 		track.lock()->addObserver(this);
-	}
+	//}
 
 	string s = nonstd::any_cast<string>(arg);
 

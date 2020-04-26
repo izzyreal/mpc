@@ -375,12 +375,14 @@ void Sequencer::play(bool fromStart)
 			return;
 		}
 		s->initLoop();
+
 		if (recording || overdubbing) {
-			undoPlaceHolder = copySequence(s);
+			undoPlaceHolder.swap(copySequence(s));
 			lastRecordingActive = true;
 			recordStartTick = getTickPosition();
 			hw->getLed("undoseq").lock()->light(lastRecordingActive);
 		}
+
 	}
 	hw->getLed("play").lock()->light(true);
 	auto ams = mpc->getAudioMidiServices().lock();
@@ -405,12 +407,22 @@ void Sequencer::play(bool fromStart)
 
 void Sequencer::undoSeq()
 {
-	if (isPlaying()) return;
-	if (undoPlaceHolder == nullptr) return;
+	if (isPlaying()) {
+		return;
+	}
+	
+	if (!undoPlaceHolder) {
+		return;
+	}
 
 	auto s = copySequence(undoPlaceHolder);
-	undoPlaceHolder = copySequence(sequences[activeSequenceIndex]);
-	sequences[activeSequenceIndex] = s;
+	
+	undoPlaceHolder.swap(copySequence(sequences[activeSequenceIndex]));
+
+	sequences[activeSequenceIndex].swap(s);
+	
+	sequences[activeSequenceIndex]->resetTrackEventIndices(position);
+
 	lastRecordingActive = !lastRecordingActive;
 	auto hw = mpc->getHardware().lock();
 	hw->getLed("undoseq").lock()->light(lastRecordingActive);
@@ -418,8 +430,12 @@ void Sequencer::undoSeq()
 
 void Sequencer::clearUndoSeq()
 {
-    if(isPlaying()) return;
-    undoPlaceHolder = nullptr;
+	if (isPlaying()) {
+		return;
+	}
+	
+	undoPlaceHolder.reset();
+
     lastRecordingActive = false;
 	auto hw = mpc->getHardware().lock();
 	hw->getLed("undoseq").lock()->light(false);
@@ -427,40 +443,54 @@ void Sequencer::clearUndoSeq()
 
 void Sequencer::playFromStart()
 {
-	if (isPlaying()) return;
+	if (isPlaying()) {
+		return;
+	}
 	play(true);
 }
 
 void Sequencer::play()
 {
-	if (isPlaying()) return;
+	if (isPlaying()) {
+		return;
+	}
 	play(false);
 }
 
 void Sequencer::rec()
 {
-	if (isPlaying()) return;
+	if (isPlaying()) {
+		return;
+	}
+
 	recording = true;
+	
 	play(false);
 }
 
 void Sequencer::recFromStart()
 {
-	if (isPlaying()) return;
+	if (isPlaying()) {
+		return;
+	}
 	recording = true;
 	play(true);
 }
 
 void Sequencer::overdub()
 {
-	if (isPlaying()) return;
+	if (isPlaying()) {
+		return;
+	}
 	overdubbing = true;
 	play(false);
 }
 
 void Sequencer::switchRecordToOverDub()
 {
-	if (!isRecording()) return;
+	if (!isRecording()) {
+		return;
+	}
 	recording = false;
 	overdubbing = true;
 	auto hw = mpc->getHardware().lock();
@@ -470,7 +500,9 @@ void Sequencer::switchRecordToOverDub()
 
 void Sequencer::overdubFromStart()
 {
-	if (isPlaying()) return;
+	if (isPlaying()) {
+		return;
+	}
 	overdubbing = true;
 	play(true);
 }
@@ -481,20 +513,15 @@ void Sequencer::stop(){
 
 void Sequencer::stop(int tick)
 {
-	MLOG("sequencer stop")
 	auto ams = mpc->getAudioMidiServices().lock();
 	bool bouncing = ams->isBouncing();
-	if (bouncing) {
-		MLOG("bouncing");
-	}
-	else {
-		MLOG("not bouncing");
-	}
-    if (!isPlaying() && !bouncing) {
+
+	if (!isPlaying() && !bouncing) {
 		if (position != 0)
             setBar(0); // real 2kxl doesn't do this
         return;
     }
+	
 	lastNotifiedBar = -1;
 	lastNotifiedBeat = -1;
 	lastNotifiedClock = -1;
@@ -502,8 +529,11 @@ void Sequencer::stop(int tick)
 	auto s1 = getActiveSequence().lock();
 	auto s2 = getCurrentlyPlayingSequence().lock();
 	auto pos = getTickPosition();
-	if (pos > s1->getLastTick())
+	
+	if (pos > s1->getLastTick()) {
 		pos = s1->getLastTick();
+	}
+
 	int frameOffset = tick == -1 ? 0 : ams->getFrameSequencer().lock()->getEventFrameOffset(tick);
 	ams->getFrameSequencer().lock()->stop();
     if (recording || overdubbing)
@@ -587,6 +617,7 @@ void Sequencer::notifyTrack()
 void Sequencer::setSequence(int i, shared_ptr<Sequence> s)
 {
 	sequences[i].swap(s);
+	sequences[i]->resetTrackEventIndices(position);
 }
 
 void Sequencer::purgeAllSequences()
@@ -599,16 +630,18 @@ void Sequencer::purgeAllSequences()
 
 void Sequencer::purgeSequence(int i) {
 	sequences[i].reset();
-	sequences[i] = make_shared<Sequence>(mpc, defaultTrackNames);
+	sequences[i].swap(make_shared<Sequence>(mpc, defaultTrackNames));
+	sequences[i]->resetTrackEventIndices(position);
 	string res = defaultSequenceName;
 	res.append(moduru::lang::StrUtil::padLeft(to_string(i + 1), "0", 2));
 	sequences[i]->setName(res);
 }
 
-void Sequencer::copySequence(int sq0, int sq1)
+void Sequencer::copySequence(int source, int destination)
 {
-	sequences[sq1] = copySequence(sequences[sq0]);
-    sequences[sq1]->initLoop();
+	sequences[destination].swap(copySequence(sequences[source]));
+	sequences[destination]->resetTrackEventIndices(position);
+	sequences[destination]->initLoop();
 }
 
 shared_ptr<Sequence> Sequencer::copySequence(weak_ptr<Sequence> src)
@@ -1135,18 +1168,7 @@ void Sequencer::move(int tick)
 		s = sequences[getSongSequenceIndex()];
 	}
 
-	if (s->isUsed()) {
-		for (auto& t : s->getTracks()) {
-			auto lTrk = t.lock();
-			if (!lTrk->isUsed()) continue;
-			lTrk->move(tick, oldTick);
-		}
-		for (auto& t : s->getMetaTracks()) {
-			auto lTrk = t.lock();
-			if (!lTrk->isUsed()) continue;
-			lTrk->move(tick, oldTick);
-		}
-	}
+	s->resetTrackEventIndices(position);
 
 	notifyTimeDisplay();
 	if (getTempo().toDouble() != previousTempo.toDouble()) {
@@ -1317,7 +1339,8 @@ void Sequencer::flushTrackNoteCache()
 
 void Sequencer::storeActiveSequenceInPlaceHolder()
 {
-	undoPlaceHolder = copySequence(sequences[activeSequenceIndex]);
+	undoPlaceHolder.swap(copySequence(sequences[activeSequenceIndex]));
+
 	lastRecordingActive = true;
 	auto hw = mpc->getHardware().lock();
 	hw->getLed("undoseq").lock()->light(lastRecordingActive);
@@ -1386,6 +1409,7 @@ void Sequencer::clearPlaceHolder() {
 
 void Sequencer::movePlaceHolderTo(int destIndex) {
 	sequences[destIndex].swap(placeHolder);
+	sequences[destIndex]->resetTrackEventIndices(position);
 	clearPlaceHolder();
 }
 

@@ -48,14 +48,12 @@ void Track::move(int tick, int oldTick)
 		no->setTick((no->getTick() - oldTick) + tick);
 	}
 
-	if (tick == oldTick) {
-		return;
-	}
-
 	auto startIndex = 0;
 	
 	if (tick > oldTick) {
-		if (eventIndex == events.size()) return;
+		if (eventIndex == events.size()) {
+			return;
+		}
 		startIndex = eventIndex;
 	}
 
