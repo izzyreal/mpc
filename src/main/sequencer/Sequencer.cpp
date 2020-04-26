@@ -1259,18 +1259,28 @@ void Sequencer::resetNextSq() {
 
 void Sequencer::setNextSq(int i)
 {
-	auto firstnotify = nextsq == -1;
-	auto up = i > nextsq;
-	if (firstnotify) up = i > currentlyPlayingSequenceIndex;
-
-	auto result = up ? getFirstUsedSeqUp(i) : getFirstUsedSeqDown(i);
-
-	if (result == -1)
+	if (!isPlaying()) {
 		return;
+	}
 
-	nextsq = result;
+	auto firstNotification = nextsq == -1;
+	
+	auto up = i > nextsq;
+	
+	if (firstNotification) {
+		up = i > currentlyPlayingSequenceIndex;
+	}
+
+	auto candidate = up ? getFirstUsedSeqUp(i) : getFirstUsedSeqDown(i);
+
+	if (candidate == -1) {
+		return;
+	}
+
+	nextsq = candidate;
 	setChanged();
-	if (firstnotify) {
+
+	if (firstNotification) {
 		notifyObservers(string("nextsq"));
 	}
 	else {
@@ -1280,14 +1290,21 @@ void Sequencer::setNextSq(int i)
 
 void Sequencer::setNextSqPad(int i)
 {
+	if (!isPlaying()) {
+		return;
+	}
+
 	if (!sequences[i]->isUsed()) {
 		nextsq = -1;
 		setChanged();
 		notifyObservers(string("nextsqoff"));
 		return;
 	}
+
 	auto firstnotify = nextsq == -1;
+	
 	nextsq = i;
+	
 	if (firstnotify) {
 		setChanged();
 		notifyObservers(string("nextsq"));

@@ -28,14 +28,14 @@ SequencerControls::SequencerControls(mpc::Mpc* mpc)
 
 void SequencerControls::init()
 {
-    super::init();
+    AbstractSequencerControls::init();
     //const char* _typableParams[] = { "tempo", "now0", "now1", "now2", "velo"};
 	//this->typableParams = vector<string>(_typableParams, _typableParams + sizeof(_typableParams));
 }
 
 void SequencerControls::pressEnter()
 {
-	super::pressEnter();
+	AbstractSequencerControls::pressEnter();
 	init();
 	if (!isTypable()) return;
 	auto lSequencer = sequencer.lock();
@@ -278,18 +278,28 @@ void SequencerControls::openWindow()
 void SequencerControls::left()
 {
     init();
+	
 	auto lSequencer = sequencer.lock();
-	if(lSequencer->getNextSq() != -1) return;
-	super::left();
+	
+	if (lSequencer->getNextSq() != -1) {
+		return;
+	}
 
+	BaseControls::left();
 }
 
 void SequencerControls::right()
 {
 	init();
+	
 	auto lSequencer = sequencer.lock();
-    if(lSequencer->getNextSq() != -1) return;
+	
+	if (lSequencer->getNextSq() != -1) {
+		return;
+	}
+
 	auto seq = sequence.lock();
+	
 	if (!seq->isUsed()) {
         seq->init(mpc::StartUp::getUserDefaults().lock()->getLastBarIndex());
 		int index = lSequencer->getActiveSequenceIndex();
@@ -297,21 +307,30 @@ void SequencerControls::right()
 		seq->setName(name);
 		lSequencer->setActiveSequenceIndex(lSequencer->getActiveSequenceIndex());
     }
-	super::right();
+	BaseControls::right();
 }
 
 void SequencerControls::up()
 {
     init();
-	if (sequencer.lock()->getNextSq() != -1) return;
-    super::up();
+	
+	if (sequencer.lock()->getNextSq() != -1) {
+		return;
+	}
+	
+	BaseControls::up();
 }
 
 void SequencerControls::down()
 {
 	init();
+	
 	auto lSequencer = sequencer.lock();
-	if(lSequencer->getNextSq() != -1) return;
+	
+	if (lSequencer->getNextSq() != -1) {
+		return;
+	}
+
 	auto seq = sequence.lock();
 	if (!seq->isUsed()) {
         seq->init(mpc::StartUp::getUserDefaults().lock()->getLastBarIndex());
@@ -320,5 +339,5 @@ void SequencerControls::down()
 		seq->setName(name);
 		lSequencer->setActiveSequenceIndex(lSequencer->getActiveSequenceIndex());
     }
-    super::down();
+	BaseControls::down();
 }

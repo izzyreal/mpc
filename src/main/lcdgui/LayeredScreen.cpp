@@ -346,7 +346,11 @@ int LayeredScreen::openScreen(string screenName) {
 			break;
 		}
 	}
-	if (oldLayer == 0 && oldLayer == currentLayer) wave->Hide(true);
+	
+	if (oldLayer == 0 && oldLayer == currentLayer) {
+		wave->Hide(true);
+	}
+	
 	returnToLastFocus(firstField);
 
 	initObserver();
@@ -567,12 +571,14 @@ void LayeredScreen::setPopupText(string text)
 void LayeredScreen::returnToLastFocus(string firstFieldOfThisScreen)
 {
 	auto focusCounter = 0;
+	
 	for (auto& lf : lastFocus) {
 		if (lf[0].compare(currentScreenName) == 0) {
 			focusCounter++;
 			setFocus(lf[1]);
 		}
 	}
+
 	if (focusCounter == 0) {
 		vector<string> sa(2);
 		sa[0] = currentScreenName;
@@ -1050,7 +1056,6 @@ string LayeredScreen::getFocus() {
 }
 
 void LayeredScreen::setFocus(string focus) {
-	string oldFocus = getFocus();
 	layers[currentLayer]->setFocus(focus);
 }
 

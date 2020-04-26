@@ -121,7 +121,7 @@ string Layer::getFocus() {
 }
 
 string Layer::openScreen(Value& screenJson, string screenName) {
-	focus = "";
+	//focus = "";
 	bg->Hide(false);
 	bg->setName(screenName);
 	Value& labels = screenJson["labels"];

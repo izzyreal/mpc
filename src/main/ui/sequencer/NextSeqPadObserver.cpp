@@ -17,7 +17,7 @@ using namespace std;
 NextSeqPadObserver::NextSeqPadObserver(mpc::Mpc* mpc)
 {
 	seqs = vector<weak_ptr<mpc::lcdgui::Label>>(16);
-	this->sequencer = sequencer;
+	this->sequencer = mpc->getSequencer();
 	auto lSequencer = sequencer.lock();
 	lSequencer->deleteObservers();
 	lSequencer->addObserver(this);
