@@ -1,6 +1,8 @@
 #include "Background.hpp"
 #include <StartUp.hpp>
 
+#include <file/FileUtil.hpp>
+
 using namespace mpc::lcdgui;
 using namespace std;
 
@@ -15,15 +17,21 @@ void Background::setName(std::string name)
 	SetDirty();
 }
 
-void Background::Draw(std::vector< std::vector<bool> >* pixels)
+void Background::Draw(std::vector< std::vector<bool>>* pixels)
 {
-	if (IsHidden()) return;
+	if (IsHidden()) {
+		return;
+	}
 
-	string bgNameStr = mpc::StartUp::resPath + "bmp/" + name + ".bmp";
+	string backgroundPath = mpc::StartUp::resPath + "bmp/" + name + ".bmp";
 	const int infosize = 54;
 
-	FILE* f = fopen(bgNameStr.c_str(), "rb");
-	if (f == nullptr) return;
+	FILE* f = moduru::file::FileUtil::fopenw(backgroundPath, "rb");
+	
+	if (f == NULL) {
+		return;
+	}
+
 	unsigned char info[infosize];
 	fread(info, sizeof(unsigned char), infosize, f); // read the 54-byte header
 	int imageDataOffset = info[10];

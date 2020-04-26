@@ -11,6 +11,8 @@
 #include <file/File.hpp>
 #include <io/FileOutputStream.hpp>
 
+#include <Logger.hpp>
+
 using namespace mpc::disk;
 using namespace moduru::lang;
 using namespace moduru::file;
@@ -203,7 +205,7 @@ vector<char> MpcFile::getBytes()
 		bytes = vector<char>(length());
 		dynamic_pointer_cast<moduru::file::File>(stdEntry)->getData(&bytes);
     } catch (exception e) {
-		e.what();
+		MLOG("Exception while getting file bytes: " + string(e.what()));
     }
     return bytes;
 }
