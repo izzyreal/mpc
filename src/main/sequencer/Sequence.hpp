@@ -81,7 +81,6 @@ namespace mpc::sequencer {
 		void setLastBar(int i);
 		int getLastBar();
 		void setLoopEnabled(bool b);
-		void copyBars(int fromSequence, int firstBar, int lastBar, int toSequence, int afterBar, int copies);
 		weak_ptr<Track> getTrack(int i);
 		void setUsed(bool b);
 		bool isUsed();
@@ -108,6 +107,8 @@ namespace mpc::sequencer {
 		int getDenominator(int i);
 		int getNumerator(int i);
 		vector<int>* getBarLengths();
+		void setBarLengths(vector<int>&);
+		void setNumeratorsAndDenominators(vector<int>& numerators, vector<int>& denominators);
 		void deleteBars(int firstBar, int lBar);
 		void insertBars(int numberOfBars, int afterBar);
 		void moveTrack(int source, int destination);

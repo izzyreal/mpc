@@ -64,7 +64,7 @@ void Sequencer::init()
 
 	recordingModeMulti = userDefaults->isRecordingModeMulti();
 	soloEnabled = false;
-	tempoSourceSequence = true;
+	tempoSourceSequenceEnabled = true;
 	countEnabled = true;
 	recording = false;
 	tempo = userDefaults->getTempo();
@@ -117,7 +117,7 @@ void Sequencer::setTempo(BCMath i)
 {
 	if (i.toDouble() < 30.0 || i.toDouble() > 300.0) return;
 	auto s = getActiveSequence().lock();
-	if (s && s->isUsed() && tempoSourceSequence) {
+	if (s && s->isUsed() && tempoSourceSequenceEnabled) {
 		auto tce = getCurrentTempoChangeEvent().lock();
 		if (tce->getTick() == 0) {
 			s->setInitialTempo(i);
@@ -142,7 +142,7 @@ BCMath Sequencer::getTempo()
 	if (!isPlaying() && !getActiveSequence().lock()->isUsed()) {
 		return tempo;
 	}
-	if (tempoSourceSequence) {
+	if (tempoSourceSequenceEnabled) {
 		auto tce = getCurrentTempoChangeEvent().lock();
 		if (tce) {
 			return tce->getTempo();
@@ -169,14 +169,14 @@ weak_ptr<TempoChangeEvent> Sequencer::getCurrentTempoChangeEvent()
 	return s->getTempoChangeEvents()[index];
 }
 
-bool Sequencer::isTempoSourceSequence()
+bool Sequencer::isTempoSourceSequenceEnabled()
 {
-    return tempoSourceSequence;
+    return tempoSourceSequenceEnabled;
 }
 
 void Sequencer::setTempoSourceSequence(bool b)
 {
-	tempoSourceSequence = b;
+	tempoSourceSequenceEnabled = b;
 	setChanged();
 	notifyObservers(string("temposource"));
 	setChanged();
@@ -423,6 +423,8 @@ void Sequencer::undoSeq()
 	
 	sequences[activeSequenceIndex]->resetTrackEventIndices(position);
 
+	MLOG("After performing undo, the initial tempo is " + sequences[activeSequenceIndex]->getInitialTempo().toString());
+
 	lastRecordingActive = !lastRecordingActive;
 	auto hw = mpc->getHardware().lock();
 	hw->getLed("undoseq").lock()->light(lastRecordingActive);
@@ -650,17 +652,22 @@ shared_ptr<Sequence> Sequencer::copySequence(weak_ptr<Sequence> src)
 	auto copy = make_shared<Sequence>(mpc, defaultTrackNames);
 	copy->init(source->getLastBar());
 	copySequenceParameters(source, copy);
+	
 	for (int i = 0; i < 64; i++) {
 		copyTrack(source->getTrack(i), copy->getTrack(i));
 	}
+
+	for (int i = 0; i < source->getMetaTracks().size(); i++) {
+		copy->getMetaTracks()[i].lock()->removeEvents();
+		copyTrack(source->getMetaTracks()[i], copy->getMetaTracks()[i]);
+	}
+
+	for (auto& tempo : copy->getTempoChangeEvents()) {
+		tempo.lock()->setParent(copy.get());
+	}
+
 	return copy;
 }
-
-void Sequencer::copySequenceParameters(int sq0, int sq1)
-{
-    copySequenceParameters(sequences[sq0], sequences[sq1]);
-}
-
 
 void Sequencer::copySequenceParameters(weak_ptr<Sequence> src, weak_ptr<Sequence> dst)
 {
@@ -671,6 +678,11 @@ void Sequencer::copySequenceParameters(weak_ptr<Sequence> src, weak_ptr<Sequence
 	dest->setLoopEnabled(source->isLoopEnabled());
 	dest->setUsed(source->isUsed());
 	dest->setDeviceNames(source->getDeviceNames());
+	dest->setInitialTempo(source->getInitialTempo());
+	dest->setBarLengths(*source->getBarLengths());
+	dest->setNumeratorsAndDenominators(*source->getNumerators(), *source->getDenominators());
+	dest->setLoopStart(source->getLoopStart());
+	dest->setLoopEnd(source->getLoopEnd());
 }
 
 void Sequencer::copyTempoChangeEvents(weak_ptr<Sequence> src, weak_ptr<Sequence> dst) {
@@ -678,10 +690,10 @@ void Sequencer::copyTempoChangeEvents(weak_ptr<Sequence> src, weak_ptr<Sequence>
 	
 }
 
-void Sequencer::copyTrack(int tr0, int tr1, int sq0, int sq1)
+void Sequencer::copyTrack(int sourceTrackIndex, int destinationTrackIndex, int sourceSequenceIndex, int destinationSequenceIndex)
 {
-	auto src = sequences[sq0]->getTrack(tr0).lock();
-	auto dest = sequences[sq1]->purgeTrack(tr1).lock();
+	auto src = sequences[sourceSequenceIndex]->getTrack(sourceTrackIndex).lock();
+	auto dest = sequences[destinationSequenceIndex]->purgeTrack(destinationTrackIndex).lock();
 	copyTrack(src, dest);
 }
 
@@ -689,16 +701,18 @@ void Sequencer::copyTrack(weak_ptr<Track> src, weak_ptr<Track> dest)
 {
 	auto lSrc = src.lock();
 	auto lDest = dest.lock();
+	
 	lDest->setTrackIndex(lSrc->getTrackIndex());
+	
+	MLOG("Copying track " + src.lock()->getActualName() + " to " + dest.lock()->getActualName());
+	MLOG("Setting lDest index to " + to_string(lDest->getTrackIndex()));
+
 	for (auto& e : lSrc->getEvents()) {
+		MLOG("Cloning event " + to_string(e.lock()->getTick()));
 		lDest->cloneEvent(e);
 	}
-	copyTrackParameters(src, dest);
-}
 
-void Sequencer::copyTrackParameters(int tr0, int tr1, int sq0, int sq1)
-{
-	copyTrackParameters(sequences[sq0]->getTrack(tr0), sequences[sq1]->getTrack(tr1));
+	copyTrackParameters(src, dest);
 }
 
 void Sequencer::copyTrackParameters(weak_ptr<Track> source, weak_ptr<Track> dest)

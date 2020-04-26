@@ -22,6 +22,10 @@ TempoChangeEvent::TempoChangeEvent(Sequence* parent, int ratio, int step)
 	this->stepNumber = step;
 }
 
+void TempoChangeEvent::setParent(Sequence* newParent) {
+	parent = newParent;
+}
+
 void TempoChangeEvent::plusOneBar(int numerator, int denominator, TempoChangeEvent* next)
 {
     if (stepNumber == 0) return;

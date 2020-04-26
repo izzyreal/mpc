@@ -277,10 +277,6 @@ void Sequence::setLoopEnabled(bool b)
 	notifyObservers(string("loop"));
 }
 
-void Sequence::copyBars(int fromSequence, int firstBar, int lastBar, int toSequence, int afterBar, int copies)
-{
-}
-
 weak_ptr<Track> Sequence::getTrack(int i)
 {
 	return tracks[i];
@@ -459,6 +455,10 @@ vector<int>* Sequence::getBarLengths()
 	return &barLengths;
 }
 
+void Sequence::setBarLengths(vector<int>& newBarLengths) {
+	barLengths = newBarLengths;
+}
+
 void Sequence::deleteBars(int firstBar, int lBar)
 {
 	lBar++;
@@ -622,6 +622,12 @@ vector<int>* Sequence::getNumerators()
 vector<int>* Sequence::getDenominators()
 {
 	return &denominators;
+}
+
+void Sequence::setNumeratorsAndDenominators(vector<int>& numerators, vector<int>& denominators)
+{
+	this->numerators = numerators;
+	this->denominators = denominators;
 }
 
 void Sequence::removeFirstMetronomeClick()

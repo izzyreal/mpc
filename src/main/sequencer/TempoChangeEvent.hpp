@@ -35,6 +35,11 @@ namespace mpc {
 
 			void CopyValuesTo(std::weak_ptr<Event> dest);
 
+		public:
+			// Smelly smelly smelly
+			void setParent(Sequence* newParent);
+
+		public:
 			TempoChangeEvent(Sequence* parent);
 			TempoChangeEvent(Sequence* parent, int ratio);
 			TempoChangeEvent(Sequence* parent, int ratio, int step);

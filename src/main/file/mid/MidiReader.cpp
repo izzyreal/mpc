@@ -111,7 +111,7 @@ void MidiReader::parseSequence()
 	auto length = initialTempoString.find(".") + 2;
 	auto initialTempoBd = BCMath(initialTempoString.substr(0, length));
 	sequence->setInitialTempo(initialTempoBd);
-	if (!lSequencer->isTempoSourceSequence()) {
+	if (!lSequencer->isTempoSourceSequenceEnabled()) {
 		lSequencer->setTempo(initialTempoBd);
 	}
 	for (int i = 1; i < tempoChanges.size(); i++) {

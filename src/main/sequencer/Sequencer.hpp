@@ -73,7 +73,7 @@ namespace mpc {
 			int frameRate{ 0 };
 			bool countEnabled{ false };
 			bool soloEnabled{ false };
-			bool tempoSourceSequence{ false };
+			bool tempoSourceSequenceEnabled{ false };
 			
 			bool countingIn{ false };
 			int reposition{ 0 };
@@ -114,7 +114,7 @@ namespace mpc {
 			void init();
 			void setTempo(BCMath t);
 			BCMath getTempo();
-			bool isTempoSourceSequence();
+			bool isTempoSourceSequenceEnabled();
 			void setTempoSourceSequence(bool b);
 			bool isRecordingOrOverdubbing();
 			bool isRecording();
@@ -161,10 +161,7 @@ namespace mpc {
 			void copySequence(int sq0, int sq1);
 
 		public:
-			void copySequenceParameters(int sq0, int sq1);
-			void copyTrackParameters(int tr0, int tr1, int sq0, int sq1);
-			void copyTrack(int tr0, int tr1, int sq0, int sq1);
-
+			void copyTrack(int sourceTrackIndex, int destinationTrackIndex, int sourceSequenceIndex, int destinationSequenceIndex);
 			std::vector<std::string> getDefaultTrackNames();
 			std::string getDefaultTrackName(int i);
 			void setDefaultTrackName(std::string s, int i);

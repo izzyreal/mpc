@@ -116,7 +116,7 @@ void SongControls::turnWheel(int i)
 		init();
 		if (lS->isUsed() && lS->getStepAmount() != 0)	lSequencer->setActiveSequenceIndex(lS->getStep(0)->getSequence());
 	}
-	else if (param.compare("tempo") == 0 && !lSequencer->isTempoSourceSequence()) {
+	else if (param.compare("tempo") == 0 && !lSequencer->isTempoSourceSequenceEnabled()) {
 		lSequencer->setTempo(BCMath(lSequencer->getTempo().toDouble() + (i / 10.0)));
 	}
 	else if (param.compare("temposource") == 0) {

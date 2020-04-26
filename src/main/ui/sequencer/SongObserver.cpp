@@ -114,7 +114,7 @@ void SongObserver::displaySteps()
 
 void SongObserver::displayTempoSource()
 {
-    tempoSourceField.lock()->setText(sequencer.lock()->isTempoSourceSequence() ? "SEQ" : "MAS");
+    tempoSourceField.lock()->setText(sequencer.lock()->isTempoSourceSequenceEnabled() ? "SEQ" : "MAS");
 }
 
 void SongObserver::displayNow0()

@@ -124,7 +124,7 @@ void NextSeqObserver::displayTempoLabel()
 
 void NextSeqObserver::displayTempoSource()
 {
-	tempoSourceField.lock()->setText(sequencer.lock()->isTempoSourceSequence() ? "(SEQ)" : "(MAS)");
+	tempoSourceField.lock()->setText(sequencer.lock()->isTempoSourceSequenceEnabled() ? "(SEQ)" : "(MAS)");
 }
 
 void NextSeqObserver::displayTiming()

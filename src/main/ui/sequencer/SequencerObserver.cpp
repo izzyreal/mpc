@@ -108,7 +108,7 @@ vector<string> SequencerObserver::timingCorrectNames_ = vector<string>{ "OFF", "
 
 void SequencerObserver::displayTempoSource()
 {
-    tempoSourceField.lock()->setText(sequencer.lock()->isTempoSourceSequence() ? "(SEQ)" : "(MAS)");
+    tempoSourceField.lock()->setText(sequencer.lock()->isTempoSourceSequenceEnabled() ? "(SEQ)" : "(MAS)");
 }
 
 void SequencerObserver::displaySq()
