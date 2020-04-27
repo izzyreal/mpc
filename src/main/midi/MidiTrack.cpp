@@ -61,6 +61,7 @@ MidiTrack* MidiTrack::createTempoTrack()
 void MidiTrack::readTrackData(vector<char>& data)
 {
 	stringstream in(string(data.begin(), data.end()));
+	in.unsetf(ios_base::skipws);
 
 	int totalTicks = 0;
 
