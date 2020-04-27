@@ -29,6 +29,7 @@ MidiFile::MidiFile(int resolution, vector<MidiTrack*> tracks)
 
 MidiFile::MidiFile(istream& stream)
 {
+	stream.unsetf(ios_base::skipws);
 	auto buffer = vector<char>(HEADER_SIZE);
 	stream.read(&buffer[0], buffer.size());
 	initFromBuffer(buffer);

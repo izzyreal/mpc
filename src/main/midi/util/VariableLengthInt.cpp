@@ -50,6 +50,8 @@ void VariableLengthInt::parseBytes(stringstream& in)
 	
 	auto b = in.get();
 
+	auto firstB = to_string(b);
+
 	while (mSizeInBytes < 4) {
 		mSizeInBytes++;
 		auto variable = (b & 128) > 0;
@@ -73,8 +75,8 @@ void VariableLengthInt::parseBytes(stringstream& in)
 		mValue += ints[i] << shift;
 		shift -= 7;
 	}
-	if (mValue > 10000) {
-		printf("bar");
+	if (mValue == 36) {
+		printf("foo");
 	}
 }
 

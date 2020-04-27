@@ -95,6 +95,7 @@ shared_ptr<MetaEvent> MetaEvent::parseMetaEvent(int tick, int delta, stringstrea
 		}
 
 	}
+
 	switch (eventData.type) {
 	case SEQUENCE_NUMBER:
 		return SequenceNumber::parseSequenceNumber(tick, delta, &eventData);

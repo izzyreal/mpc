@@ -31,7 +31,8 @@ MidiTrack::MidiTrack(istream& in)
 	mSizeNeedsRecalculating = false;
 	mClosed = false;
 	mEndOfTrackDelta = 0;
-	auto buffer = vector<char>(4);
+	vector<char> buffer(4);
+	
 	in.read(&buffer[0], buffer.size());
 	
 	if (!mpc::midi::util::MidiUtil::bytesEqual(buffer, IDENTIFIER, 0, 4)) {
@@ -42,8 +43,12 @@ MidiTrack::MidiTrack(istream& in)
 	in.read(&buffer[0], buffer.size());
 	
 	mSize = mpc::midi::util::MidiUtil::bytesToInt(buffer, 0, 4);
+	buffer.clear();
 	buffer.resize(mSize);
-	in.read(&buffer[0], buffer.size());
+	in.read(&buffer[0], mSize);
+
+	MLOG("trackData size " + to_string(mSize));
+
 	readTrackData(buffer);
 }
 const bool MidiTrack::VERBOSE;
@@ -67,10 +72,20 @@ void MidiTrack::readTrackData(vector<char>& data)
 
 	auto available = (int) in.rdbuf()->in_avail();
 
+	int eventCounter = 0;
+
+	MLOG("\n\nBeginning of a track");
+
 	while (available > 0) {
 		auto delta = mpc::midi::util::VariableLengthInt(in);
 		int value = delta.getValue();
 		totalTicks += value;
+		
+
+			MLOG("\nEvent " + to_string(eventCounter++));
+			MLOG("Delta " + std::to_string(value));
+			MLOG("Tick " + std::to_string(totalTicks));
+		
 		auto event = MidiEvent::parseEvent(totalTicks, value, in);
 
 		if (!event) {
@@ -79,12 +94,12 @@ void MidiTrack::readTrackData(vector<char>& data)
 		}
 		
 		if (dynamic_pointer_cast<meta::EndOfTrack>(event)) {
+			MLOG("endOfTrack Delta " + to_string(event->getDelta()));
 			mEndOfTrackDelta = event->getDelta();
 			break;
 		}
 		
 		mEvents.push_back(event);
-		MLOG("Pushed event at tick " + to_string(event->getTick()));
 		available--;
 	}
 }

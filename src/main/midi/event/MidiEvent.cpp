@@ -68,6 +68,7 @@ shared_ptr<MidiEvent> MidiEvent::parseEvent(int tick, int delta, stringstream& i
 	auto id = (int) (in.get() & 0xFF);
 	
 	if (!verifyIdentifier(id)) {
+		MLOG("Couldn't verify identifier " + to_string(id));
 		in.seekp(ios_base::cur - 1);
 		reset = true;
 	}
