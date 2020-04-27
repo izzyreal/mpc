@@ -3,12 +3,14 @@
 #include <midi/util/MidiUtil.hpp>
 
 #include <io/BufferedInputStream.hpp>
-#include <io/BufferedOutputStream.hpp>
-#include <io/FileOutputStream.hpp>
 #include <io/FileInputStream.hpp>
-#include <io/CachedOutputStream.hpp>
+
+#include <file/FileUtil.hpp>
+
+#include <sstream>
 
 using namespace mpc::midi;
+using namespace mpc::midi::util;
 using namespace std;
 
 MidiFile::MidiFile() 
@@ -132,22 +134,31 @@ void MidiFile::removeTrack(int pos)
 	mType = mTrackCount > 1 ? 1 : 0;
 }
 
-void MidiFile::writeToFile(moduru::file::File* outFile)
+void MidiFile::writeToOutputStream(ostream& stream)
 {
-    auto fout = new moduru::io::FileOutputStream(outFile);
-    fout->write(IDENTIFIER);
-    fout->write(midi::util::MidiUtil::intToBytes(6, 4));
-    fout->write(midi::util::MidiUtil::intToBytes(mType, 2));
-    fout->write(midi::util::MidiUtil::intToBytes(mTrackCount, 2));
-    fout->write(midi::util::MidiUtil::intToBytes(mResolution, 2));
-    for (auto& T : mTracks) {
-		T->writeToFile(fout);
-    }
-    fout->flush();
-    fout->close();
+	stream.write(&IDENTIFIER[0], IDENTIFIER.size());
+	auto val1 = MidiUtil::intToBytes(6, 4);
+	stream.write(&val1[0], val1.size());
+	auto type = MidiUtil::intToBytes(mType, 2);
+	stream.write(&type[0], type.size());
+	auto trackCount = MidiUtil::intToBytes(mTrackCount, 2);
+	stream.write(&trackCount[0], trackCount.size());
+	auto resolution = MidiUtil::intToBytes(mResolution, 2);
+	stream.write(&resolution[0], resolution.size());
+
+	for (auto& track : mTracks) {
+		track->writeToOutputStream(stream);
+	}
 }
 
-void MidiFile::initFromBuffer(vector<char> buffer)
+void MidiFile::writeToFile(moduru::file::File* outFile)
+{
+	auto fout = moduru::file::FileUtil::ofstreamw(outFile->getPath(), ios::out | ios::binary);
+	writeToOutputStream(fout);
+	fout.close();
+}
+
+void MidiFile::initFromBuffer(vector<char>& buffer)
 {
     if(!mpc::midi::util::MidiUtil::bytesEqual(buffer, IDENTIFIER, 0, 4)) {
 		string error = "File identifier not MThd. Exiting.\n";
@@ -156,29 +167,17 @@ void MidiFile::initFromBuffer(vector<char> buffer)
         mResolution = DEFAULT_RESOLUTION;
         return;
     }
-	mType = midi::util::MidiUtil::bytesToInt(buffer, 8, 2);
-    mTrackCount = midi::util::MidiUtil::bytesToInt(buffer, 10, 2);
-    mResolution = midi::util::MidiUtil::bytesToInt(buffer, 12, 2);
+	mType = MidiUtil::bytesToInt(buffer, 8, 2);
+    mTrackCount = MidiUtil::bytesToInt(buffer, 10, 2);
+    mResolution = MidiUtil::bytesToInt(buffer, 12, 2);
 }
 
 vector<char> MidiFile::getBytes()
 {
-	auto cos = moduru::io::CachedOutputStream();
-	auto bos = moduru::io::BufferedOutputStream(&cos);
-	bos.write(IDENTIFIER);
-	bos.write(midi::util::MidiUtil::intToBytes(6, 4));
-	bos.write(midi::util::MidiUtil::intToBytes(mType, 2));
-	auto tc = midi::util::MidiUtil::intToBytes(mTrackCount, 2);
-	bos.write(midi::util::MidiUtil::intToBytes(mTrackCount, 2));
-	bos.write(midi::util::MidiUtil::intToBytes(mResolution, 2));
-	for (auto& T : mTracks) {
-		T->writeToFile(&bos);
-	}
-	bos.flush();
-	bos.close();
-	cos.flush();
-	cos.close();
-	return cos.get();
+	ostringstream stream;
+	writeToOutputStream(stream);
+	auto buffer = stream.str();
+	return vector<char>(buffer.begin(), buffer.end());
 }
 
 MidiFile::~MidiFile() {

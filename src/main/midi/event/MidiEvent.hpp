@@ -7,48 +7,46 @@
 
 #include <string>
 #include <memory>
+#include <fstream>
 
-namespace mpc {
-	namespace midi {
-		namespace event {
+using namespace std;
 
-			class MidiEvent
-			{
+namespace mpc::midi::event {
 
-			public:
-				int mTick{ 0 };
-				mpc::midi::util::VariableLengthInt* mDelta{ nullptr };
+	class MidiEvent
+	{
 
-			public:
-				virtual int getTick();
-				virtual int getDelta();
-				virtual void setDelta(int d);
+	public:
+		int mTick{ 0 };
+		mpc::midi::util::VariableLengthInt* mDelta{ nullptr };
 
-			public:
-				virtual int getEventSize() = 0;
+	public:
+		virtual int getTick();
+		virtual int getDelta();
+		virtual void setDelta(int d);
 
-			public:
-				virtual int getSize();
-				virtual bool requiresStatusByte(MidiEvent* prevEvent);
-				virtual void writeToFile(moduru::io::OutputStream* out, bool writeType);
+	public:
+		virtual int getEventSize() = 0;
 
-			private:
-				static int sId;
-				static int sType;
-				static int sChannel;
+	public:
+		virtual int getSize();
+		virtual bool requiresStatusByte(MidiEvent* prevEvent);
+		virtual void writeToOutputStream(ostream& out, bool writeType);
 
-			public:
-				static std::shared_ptr<MidiEvent> parseEvent(int tick, int delta, moduru::io::InputStream* in);
+	private:
+		static int sId;
+		static int sType;
+		static int sChannel;
 
-			private:
-				static bool verifyIdentifier(int id);
+	public:
+		static shared_ptr<MidiEvent> parseEvent(int tick, int delta, moduru::io::InputStream* in);
 
-			public:
-				virtual std::string toString();
+	private:
+		static bool verifyIdentifier(int id);
 
-				MidiEvent(int tick, int delta);
-			};
+	public:
+		virtual string toString();
 
-		}
-	}
+		MidiEvent(int tick, int delta);
+	};
 }

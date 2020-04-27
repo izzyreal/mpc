@@ -91,15 +91,15 @@ int SmpteOffset::getEventSize()
     return 8;
 }
 
-void SmpteOffset::writeToFile(moduru::io::OutputStream* out)
+void SmpteOffset::writeToOutputStream(ostream& out)
 {
-    MetaEvent::writeToFile(out);
-    out->write(5);
-    out->write(mHours);
-    out->write(mMinutes);
-    out->write(mSeconds);
-    out->write(mFrames);
-    out->write(mSubFrames);
+    MetaEvent::writeToOutputStream(out);
+    out << 5;
+    out << mHours;
+    out << mMinutes;
+    out << mSeconds;
+    out << mFrames;
+    out << mSubFrames;
 }
 
 shared_ptr<MetaEvent> SmpteOffset::parseSmpteOffset(int tick, int delta, MetaEventData* info)
@@ -130,9 +130,4 @@ int SmpteOffset::compareTo(mpc::midi::event::MidiEvent* other)
 		return 1;
 	}
 	return 0;
-}
-
-void SmpteOffset::writeToFile(moduru::io::OutputStream* out, bool writeType)
-{
-    MetaEvent::writeToFile(out, writeType);
 }

@@ -200,33 +200,6 @@ void AbstractDisk::writeWav(mpc::sampler::Sound* s, MpcFile* f)
 	initFiles();
 }
 
-void AbstractDisk::writeWavToTemp(mpc::sampler::Sound* s)
-{
-	/*
-    auto f = new File(("user.home"))->append("/Mpc/temp/")
-        ->append(s->getName())
-        ->append(".WAV")->toString());
-    auto fa = s->getSampleData();
-    auto faDouble = new ::doubleArray(fa->length);
-    for (int i = 0; i < faDouble.size(); i++)
-                (*faDouble)[i] = (*fa)[i];
-
-    try {
-        auto fos = new ::java::io::FileOutputStream(f->getPath());
-        auto wavFile = mpc::file::wav::WavFile::newWavFile(s->isMono() ? 1 : 2, faDouble.size() / (s->isMono() ? 1 : 2), 16, s->getSampleRate());
-        wavFile->writeFrames(faDouble, faDouble.size() / (s->isMono() ? 1 : 2));
-        wavFile->close();
-        auto wavBytes = wavFile->getResult();
-        fos->write(wavBytes);
-        fos->close();
-    } catch (::java::lang::Exception* e) {
-        e->printStackTrace();
-    }
-	*/
-	flush();
-    initFiles();
-}
-
 void AbstractDisk::writeSequence(mpc::sequencer::Sequence* s, string fileName)
 {
 	if (checkExists(fileName)) return;

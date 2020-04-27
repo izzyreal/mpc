@@ -4,24 +4,17 @@
 
 #include <io/InputStream.hpp>
 
-namespace mpc {
-	namespace midi {
-		namespace event {
-			namespace meta {
+namespace mpc::midi::event::meta {
 
-				class MetaEventData
-				{
+	class MetaEventData
+	{
 
-				public:
-					int type{};
-					mpc::midi::util::VariableLengthInt* length{};
-					std::vector<char> data{};
+	public:
+		int type{};
+		mpc::midi::util::VariableLengthInt* length{};
+		std::vector<char> data{};
 
-				public:
-					MetaEventData(moduru::io::InputStream* in);
-					//friend class MetaEvent;
-				};
-			}
-		}
-	}
+	public:
+		MetaEventData(moduru::io::InputStream* in);
+	};
 }

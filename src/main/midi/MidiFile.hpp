@@ -4,59 +4,63 @@
 
 #include <io/InputStream.hpp>
 
+#include <ostream>
 #include <vector>
 #include <memory>
 
-namespace mpc {
-	namespace midi {
+namespace mpc::midi {
+	class MidiTrack;
+}
 
-		class MidiTrack;
+using namespace std;
 
-		class MidiFile
-		{
+namespace mpc::midi {
 
-		public:
-			static const int HEADER_SIZE{ 14 };
+	class MidiFile
+	{
 
-		private:
-			static std::vector<char> IDENTIFIER;
+	public:
+		static const int HEADER_SIZE{ 14 };
 
-		public:
-			static const int DEFAULT_RESOLUTION{ 480 };
+	private:
+		static std::vector<char> IDENTIFIER;
 
-		private:
-			int mType{};
-			int mTrackCount{};
-			int mResolution{};
-			std::vector<std::shared_ptr<MidiTrack>> mTracks{};
+	public:
+		static const int DEFAULT_RESOLUTION{ 480 };
 
-		public:
-			void setType(int type);
-			int getType();
-			int getTrackCount();
-			void setResolution(int res);
-			int getResolution();
-			int getLengthInTicks();
-			std::vector<std::weak_ptr<MidiTrack>> getTracks();
-			void addTrack(std::shared_ptr<MidiTrack> T);
-			void addTrack(std::shared_ptr<MidiTrack> T, int pos);
-			void removeTrack(int pos);
-			void writeToFile(moduru::file::File* outFile);
+	private:
+		int mType{};
+		int mTrackCount{};
+		int mResolution{};
+		std::vector<std::shared_ptr<MidiTrack>> mTracks{};
 
-		private:
-			void initFromBuffer(std::vector<char> buffer);
+	public:
+		void setType(int type);
+		int getType();
+		int getTrackCount();
+		void setResolution(int res);
+		int getResolution();
+		int getLengthInTicks();
+		std::vector<std::weak_ptr<MidiTrack>> getTracks();
+		void addTrack(std::shared_ptr<MidiTrack> T);
+		void addTrack(std::shared_ptr<MidiTrack> T, int pos);
+		void removeTrack(int pos);
+		void writeToFile(moduru::file::File* outFile);
+		void writeToOutputStream(ostream& stream);
 
-		public:
-			std::vector<char> getBytes();
+	private:
+		void initFromBuffer(std::vector<char>& buffer);
 
-			MidiFile();
-			MidiFile(int resolution);
-			MidiFile(int resolution, std::vector<MidiTrack*> tracks);
-			MidiFile(std::weak_ptr<moduru::file::File> fileIn);
-			MidiFile(std::unique_ptr<moduru::io::InputStream> rawIn);
-			~MidiFile();
+	public:
+		std::vector<char> getBytes();
 
-		};
+	public:
+		MidiFile();
+		MidiFile(int resolution);
+		MidiFile(int resolution, std::vector<MidiTrack*> tracks);
+		MidiFile(std::weak_ptr<moduru::file::File> fileIn);
+		MidiFile(std::unique_ptr<moduru::io::InputStream> rawIn);
+		~MidiFile();
 
-	}
+	};
 }

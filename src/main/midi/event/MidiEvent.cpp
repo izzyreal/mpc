@@ -47,9 +47,10 @@ bool MidiEvent::requiresStatusByte(MidiEvent* prevEvent)
 	return true;
 }
 
-void MidiEvent::writeToFile(moduru::io::OutputStream* out, bool writeType)
+void MidiEvent::writeToOutputStream(ostream& out, bool writeType)
 {
-	out->write(mDelta->getBytes());
+	auto bytes = mDelta->getBytes();
+	out.write(&bytes[0], bytes.size());
 }
 
 int MidiEvent::sId = -1;

@@ -21,24 +21,25 @@
 using namespace mpc::midi::event::meta;
 using namespace std;
 
-MetaEvent::MetaEvent(int tick, int delta, int type, mpc::midi::util::VariableLengthInt* length) 
-: mpc::midi::event::MidiEvent(tick, delta)
+MetaEvent::MetaEvent(int tick, int delta, int type, mpc::midi::util::VariableLengthInt* length)
+	: mpc::midi::event::MidiEvent(tick, delta)
 {
 	mType = type & 255;
 	mLength = length;
 }
 
-void MetaEvent::writeToFile(moduru::io::OutputStream* out, bool writeType)
+void MetaEvent::writeToOutputStream(ostream& out, bool writeType)
 {
-    writeToFile(out);
+	MetaEvent::writeToOutputStream(out);
 }
 
-void MetaEvent::writeToFile(moduru::io::OutputStream* out)
+void MetaEvent::writeToOutputStream(ostream& out)
 {
-	mpc::midi::event::MidiEvent::writeToFile(out, true);
-	out->write(255);
-	out->write(mType);
+	MidiEvent::writeToOutputStream(out, true);
+	out << 0xFF;
+	out << mType;
 }
+
 
 shared_ptr<MetaEvent> MetaEvent::parseMetaEvent(int tick, int delta, moduru::io::InputStream* in)
 {

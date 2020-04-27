@@ -65,14 +65,14 @@ int TimeSignature::getEventSize()
     return 7;
 }
 
-void TimeSignature::writeToFile(moduru::io::OutputStream* out) 
+void TimeSignature::writeToOutputStream(ostream& out) 
 {
-    MetaEvent::writeToFile(out);
-    out->write(4);
-    out->write(mNumerator);
-    out->write(mDenominator);
-    out->write(mMeter);
-    out->write(mDivision);
+    MetaEvent::writeToOutputStream(out);
+    out << 4;
+    out << mNumerator;
+    out << mDenominator;
+    out << mMeter;
+    out << mDivision;
 }
 
 shared_ptr<MetaEvent> TimeSignature::parseTimeSignature(int tick, int delta, MetaEventData* info)
@@ -130,9 +130,4 @@ int TimeSignature::compareTo(mpc::midi::event::MidiEvent* other)
         return mDenominator < o->mDenominator ? -1 : 1;
     }
     return 0;
-}
-
-void TimeSignature::writeToFile(moduru::io::OutputStream* out, bool writeType)
-{
-    MetaEvent::writeToFile(out, writeType);
 }

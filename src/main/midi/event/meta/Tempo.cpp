@@ -49,11 +49,12 @@ int Tempo::getEventSize()
     return 6;
 }
 
-void Tempo::writeToFile(moduru::io::OutputStream* out) 
+void Tempo::writeToOutputStream(ostream& out) 
 {
-    MetaEvent::writeToFile(out);
-    out->write(3);
-    out->write(mpc::midi::util::MidiUtil::intToBytes(mMPQN, 3));
+    MetaEvent::writeToOutputStream(out);
+	out << 3;
+	auto mpqn = mpc::midi::util::MidiUtil::intToBytes(mMPQN, 3);
+	out.write(&mpqn[0], mpqn.size());
 }
 
 shared_ptr<MetaEvent> Tempo::parseTempo(int tick, int delta, MetaEventData* info)
@@ -81,9 +82,4 @@ int Tempo::compareTo(mpc::midi::event::MidiEvent* other)
 		return mMPQN < o->mMPQN ? -1 : 1;
 	}
 	return 0;
-}
-
-void Tempo::writeToFile(moduru::io::OutputStream* out, bool writeType)
-{
-    MetaEvent::writeToFile(out, writeType);
 }

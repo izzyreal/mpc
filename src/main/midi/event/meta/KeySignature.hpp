@@ -1,48 +1,37 @@
 #pragma once
 #include <midi/event/meta/MetaEvent.hpp>
 
-#include <io/OutputStream.hpp>
+namespace mpc::midi::event::meta {
 
-namespace mpc {
-	namespace midi {
-		namespace event {
-			namespace meta {
+	class MetaEventData;
 
-				class MetaEventData;
+	class KeySignature
+		: public MetaEvent
+	{
 
-				class KeySignature
-					: public MetaEvent
-				{
+	public:
+		static const int SCALE_MAJOR{ 0 };
+		static const int SCALE_MINOR{ 1 };
 
-				public:
-					static const int SCALE_MAJOR{ 0 };
-					static const int SCALE_MINOR{ 1 };
+	private:
+		int mKey{};
+		int mScale{};
 
-				private:
-					int mKey{};
-					int mScale{};
+	public:
+		void setKey(int key);
+		int getKey();
+		void setScale(int scale);
+		int getScale();
 
-				public:
-					void setKey(int key);
-					int getKey();
-					void setScale(int scale);
-					int getScale();
+	public:
+		int getEventSize() override;
 
-				public:
-					int getEventSize() override;
+	public:
+		void writeToOutputStream(ostream& out)  override;
+		static std::shared_ptr<MetaEvent> parseKeySignature(int tick, int delta, MetaEventData* info);
+		int compareTo(mpc::midi::event::MidiEvent* other);
 
-				public:
-					void writeToFile(moduru::io::OutputStream* out)  override;
-					static std::shared_ptr<MetaEvent> parseKeySignature(int tick, int delta, MetaEventData* info);
-					int compareTo(mpc::midi::event::MidiEvent* other);
+		KeySignature(int tick, int delta, int key, int scale);
 
-					KeySignature(int tick, int delta, int key, int scale);
-
-				public:
-					void writeToFile(moduru::io::OutputStream* out, bool writeType);
-				};
-
-			}
-		}
-	}
+	};
 }

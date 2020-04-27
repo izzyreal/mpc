@@ -2,6 +2,8 @@
 #include <fstream>
 #include <vector>
 
+#include <file/FileUtil.hpp>
+
 using namespace std;
 const char ID[2] = { 0x01, 0x04 };
 
@@ -23,7 +25,7 @@ using namespace std;
 
 ifstream snd_init_ifstream(const string& path)
 {
-    ifstream result(path.c_str(), ios::in | ios::binary);
+    auto result = moduru::file::FileUtil::ifstreamw(path.c_str(), ios::in | ios::binary);
     result.unsetf(ios_base::skipws);
 	return result;
 }

@@ -9,7 +9,6 @@
 #include <lang/StrUtil.hpp>
 #include <file/FsNode.hpp>
 #include <file/File.hpp>
-#include <io/FileOutputStream.hpp>
 
 #include <Logger.hpp>
 
@@ -118,9 +117,7 @@ void MpcFile::setFileData(std::vector<char>* data)
 		*/
 	}
 	else {
-		auto fos = make_unique<moduru::io::FileOutputStream>(dynamic_pointer_cast<moduru::file::File>(stdEntry).get());
-		fos->writeBytes(*data, 0, data->size());
-		fos->close();
+		dynamic_pointer_cast<moduru::file::File>(stdEntry)->setData(data);
 	}
 }
 

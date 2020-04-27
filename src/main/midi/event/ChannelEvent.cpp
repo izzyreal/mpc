@@ -75,16 +75,19 @@ bool ChannelEvent::requiresStatusByte(MidiEvent* prevEvent)
 	return !(mType == ce->getType() && mChannel == ce->getChannel());
 }
 
-void ChannelEvent::writeToFile(moduru::io::OutputStream* out, bool writeType)
+void ChannelEvent::writeToOutputStream(ostream& out, bool writeType)
 {
-	MidiEvent::writeToFile(out, writeType);
+	MidiEvent::writeToOutputStream(out, writeType);
+	
 	if (writeType) {
 		auto typeChannel = (mType << 4) + mChannel;
-		out->write(typeChannel);
+		out << typeChannel;
 	}
-	out->write(mValue1);
+	
+	out << mValue1;
+
 	if (mType != PROGRAM_CHANGE && mType != CHANNEL_AFTERTOUCH) {
-		out->write(mValue2);
+		out << mValue2;
 	}
 }
 

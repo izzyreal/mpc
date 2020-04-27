@@ -30,11 +30,11 @@ int MidiChannelPrefix::getEventSize()
     return 4;
 }
 
-void MidiChannelPrefix::writeToFile(moduru::io::OutputStream* out) 
+void MidiChannelPrefix::writeToOutputStream(ostream& out) 
 {
-    MetaEvent::writeToFile(out);
-    out->write(1);
-    out->write(mChannel);
+    MetaEvent::writeToOutputStream(out);
+    out << 1;
+    out << mChannel;
 }
 
 shared_ptr<MetaEvent> MidiChannelPrefix::parseMidiChannelPrefix(int tick, int delta, MetaEventData* info)
@@ -48,25 +48,5 @@ shared_ptr<MetaEvent> MidiChannelPrefix::parseMidiChannelPrefix(int tick, int de
 
 int MidiChannelPrefix::compareTo(mpc::midi::event::MidiEvent* other)
 {
-	/*
-	if(mTick != npc(other)->getTick()) {
-        return mTick < npc(other)->getTick() ? -1 : 1;
-    }
-    if(npc(mDelta)->getValue() != npc(other)->getDelta()) {
-        return npc(mDelta)->getValue() < npc(other)->getDelta() ? 1 : -1;
-    }
-    if(!(dynamic_cast< MidiChannelPrefix* >(other) != nullptr)) {
-        return 1;
-    }
-    auto o = java_cast< MidiChannelPrefix* >(other);
-    if(mChannel != npc(o)->mChannel) {
-        return mChannel < npc(o)->mChannel ? -1 : 1;
-    }
-	*/
     return 0;
-}
-
-void MidiChannelPrefix::writeToFile(moduru::io::OutputStream* out, bool writeType)
-{
-    MetaEvent::writeToFile(out, writeType);
 }

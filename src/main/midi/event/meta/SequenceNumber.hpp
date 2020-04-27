@@ -1,42 +1,31 @@
 #pragma once
 #include <midi/event/meta/MetaEvent.hpp>
 
-#include <io/OutputStream.hpp>
+namespace mpc::midi::event::meta {
 
-namespace mpc {
-	namespace midi {
-		namespace event {
-			namespace meta {
+	class MetaEventData;
 
-				class MetaEventData;
+	class SequenceNumber
+		: public MetaEvent
+	{
 
-				class SequenceNumber
-					: public MetaEvent
-				{
+	private:
+		int mNumber{};
 
-				private:
-					int mNumber{};
+	public:
+		int getMostSignificantBits();
+		int getLeastSignificantBits();
+		int getSequenceNumber();
+		void writeToOutputStream(ostream& out)  override;
+		static std::shared_ptr<MetaEvent> parseSequenceNumber(int tick, int delta, MetaEventData* info);
 
-				public:
-					int getMostSignificantBits();
-					int getLeastSignificantBits();
-					int getSequenceNumber();
-					void writeToFile(moduru::io::OutputStream* out)  override;
-					static std::shared_ptr<MetaEvent> parseSequenceNumber(int tick, int delta, MetaEventData* info);
+	public:
+		int getEventSize() override;
 
-				public:
-					int getEventSize() override;
+	public:
+		int compareTo(mpc::midi::event::MidiEvent* other);
 
-				public:
-					int compareTo(mpc::midi::event::MidiEvent* other);
+		SequenceNumber(int tick, int delta, int number);
 
-					SequenceNumber(int tick, int delta, int number);
-
-				public:
-					void writeToFile(moduru::io::OutputStream* out, bool writeType);
-				};
-
-			}
-		}
-	}
+	};
 }

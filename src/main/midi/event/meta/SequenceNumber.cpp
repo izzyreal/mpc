@@ -30,12 +30,12 @@ int SequenceNumber::getSequenceNumber()
     return mNumber;
 }
 
-void SequenceNumber::writeToFile(moduru::io::OutputStream* out) 
+void SequenceNumber::writeToOutputStream(ostream& out) 
 {
-    MetaEvent::writeToFile(out);
-    out->write(2);
-    out->write(getMostSignificantBits());
-    out->write(getLeastSignificantBits());
+    MetaEvent::writeToOutputStream(out);
+    out << 2;
+    out << getMostSignificantBits();
+    out << getLeastSignificantBits();
 }
 
 shared_ptr<MetaEvent> SequenceNumber::parseSequenceNumber(int tick, int delta, MetaEventData* info)
@@ -72,7 +72,3 @@ int SequenceNumber::compareTo(mpc::midi::event::MidiEvent* other)
     return 0;
 }
 
-void SequenceNumber::writeToFile(moduru::io::OutputStream* out, bool writeType)
-{
-    MetaEvent::writeToFile(out, writeType);
-}

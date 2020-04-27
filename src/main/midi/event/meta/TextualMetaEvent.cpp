@@ -27,14 +27,12 @@ int TextualMetaEvent::getEventSize()
     return 1 + 1 + mLength->getByteCount()+ mLength->getValue();
 }
 
-void TextualMetaEvent::writeToFile(moduru::io::OutputStream* out)
+void TextualMetaEvent::writeToOutputStream(ostream& out)
 {
-	MetaEvent::writeToFile(out);
-	out->write(mLength->getBytes());
-	vector<char> mTextVec;
-	for (char c : mText)
-		mTextVec.push_back(c);
-	out->write(mTextVec);
+	MetaEvent::writeToOutputStream(out);
+	auto length = mLength->getBytes();
+	out.write(&length[0], length.size());
+	out.write(&mText[0], mText.size());
 }
 
 int TextualMetaEvent::compareTo(mpc::midi::event::MidiEvent* other)
@@ -57,7 +55,3 @@ string TextualMetaEvent::toString()
 	return MetaEvent::toString() + ": " + mText;
 }
 
-void TextualMetaEvent::writeToFile(moduru::io::OutputStream* out, bool writeType)
-{
-    MetaEvent::writeToFile(out, writeType);
-}

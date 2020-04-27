@@ -28,11 +28,12 @@ int SequencerSpecificEvent::getEventSize()
 	return 1 + 1 + mLength->getByteCount() + mData.size();
 }
 
-void SequencerSpecificEvent::writeToFile(moduru::io::OutputStream* out)
+void SequencerSpecificEvent::writeToOutputStream(ostream& out)
 {
-	MetaEvent::writeToFile(out);
-	out->write(mLength->getBytes());
-	out->write(mData);
+	MetaEvent::writeToOutputStream(out);
+	auto length = mLength->getBytes();
+	out.write(&length[0], length.size());
+	out.write(&mData[0], mData.size());
 }
 
 int SequencerSpecificEvent::compareTo(mpc::midi::event::MidiEvent* other)
@@ -51,9 +52,4 @@ int SequencerSpecificEvent::compareTo(mpc::midi::event::MidiEvent* other)
 		return 0;
 	}
 	return 1;
-}
-
-void SequencerSpecificEvent::writeToFile(moduru::io::OutputStream* out, bool writeType)
-{
-    MetaEvent::writeToFile(out, writeType);
 }

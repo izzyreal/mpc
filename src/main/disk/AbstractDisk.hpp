@@ -64,7 +64,6 @@ namespace mpc {
 			void writeWav(std::weak_ptr<mpc::sampler::Sound> s);
 			void writeSound(mpc::sampler::Sound* s, MpcFile* f);
 			void writeWav(mpc::sampler::Sound* s, MpcFile* f);
-			void writeWavToTemp(mpc::sampler::Sound* s);
 			void writeSequence(mpc::sequencer::Sequence* s, std::string fileName);
 			bool checkExists(std::string fileName);
 			MpcFile* getFile(std::string fileName);

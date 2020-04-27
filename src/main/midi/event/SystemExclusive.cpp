@@ -37,12 +37,12 @@ bool SystemExclusiveEvent::requiresStatusByte(MidiEvent* prevEvent)
     return true;
 }
 
-void SystemExclusiveEvent::writeToFile(moduru::io::OutputStream* out, bool writeType)
+void SystemExclusiveEvent::writeToOutputStream(ostream& out, bool writeType)
 {
-	MidiEvent::writeToFile(out, writeType);
-	out->write(mType);
-	out->write(mLength->getBytes());
-	out->write(mData);
+	MidiEvent::writeToOutputStream(out, writeType);
+	out << mType;
+	out.write(&mLength->getBytes()[0], mLength->getBytes().size());
+	out.write(&mData[0], mData.size());
 }
 
 int SystemExclusiveEvent::compareTo(MidiEvent* other)

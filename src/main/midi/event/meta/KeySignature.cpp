@@ -47,12 +47,12 @@ int KeySignature::getEventSize()
     return 5;
 }
 
-void KeySignature::writeToFile(moduru::io::OutputStream* out) 
+void KeySignature::writeToOutputStream(ostream& out) 
 {
-    MetaEvent::writeToFile(out);
-    out->write(2);
-    out->write(mKey);
-    out->write(mScale);
+    MetaEvent::writeToOutputStream(out);
+    out << 0x02;
+    out << mKey;
+    out << mScale;
 }
 
 shared_ptr<MetaEvent> KeySignature::parseKeySignature(int tick, int delta, MetaEventData* info)
@@ -84,9 +84,4 @@ int KeySignature::compareTo(mpc::midi::event::MidiEvent* other)
         return mKey < o->mScale ? -1 : 1;
     }
     return 0;
-}
-
-void KeySignature::writeToFile(moduru::io::OutputStream* out, bool writeType)
-{
-    MetaEvent::writeToFile(out, writeType);
 }

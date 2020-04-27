@@ -1,35 +1,26 @@
 #pragma once
 #include <midi/event/meta/MetaEvent.hpp>
 
-namespace mpc {
-	namespace midi {
-		namespace event {
-			namespace meta {
+namespace mpc::midi::event::meta {
 
-				class MetaEventData;
-				
-				class GenericMetaEvent
-					: public MetaEvent
-				{
+	class MetaEventData;
 
-				private:
-					std::vector<char> mData{};
+	class GenericMetaEvent
+		: public MetaEvent
+	{
 
-				public:
-					int getEventSize() override;
-					void writeToFile(moduru::io::OutputStream* out)  override;
+	private:
+		std::vector<char> mData{};
 
-				public:
-					virtual int compareTo(mpc::midi::event::MidiEvent* other);
+	public:
+		int getEventSize() override;
+		void writeToOutputStream(ostream& out)  override;
 
-				public:
-					GenericMetaEvent(int tick, int delta, MetaEventData* info);
+	public:
+		virtual int compareTo(mpc::midi::event::MidiEvent* other);
 
-				public:
-					void writeToFile(moduru::io::OutputStream* out, bool writeType);
+	public:
+		GenericMetaEvent(int tick, int delta, MetaEventData* info);
 
-				};
-			}
-		}
-	}
+	};
 }

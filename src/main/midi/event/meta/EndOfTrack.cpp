@@ -15,10 +15,10 @@ int EndOfTrack::getEventSize()
     return 3;
 }
 
-void EndOfTrack::writeToFile(moduru::io::OutputStream* out) 
+void EndOfTrack::writeToOutputStream(ostream& out) 
 {
-    MetaEvent::writeToFile(out);
-    out->write(0);
+	MetaEvent::writeToOutputStream(out);
+	out << 0x00;
 }
 
 int EndOfTrack::compareTo(mpc::midi::event::MidiEvent* other)
@@ -35,7 +35,3 @@ int EndOfTrack::compareTo(mpc::midi::event::MidiEvent* other)
 	return 0;
 }
 
-void EndOfTrack::writeToFile(moduru::io::OutputStream* out, bool writeType)
-{
-    MetaEvent::writeToFile(out, writeType);
-}

@@ -1,60 +1,59 @@
 #pragma once
 
 #include <io/InputStream.hpp>
-#include <io/OutputStream.hpp>
 
 #include <memory>
 #include <vector>
+#include <fstream>
 
-namespace mpc {
-	namespace midi {
+namespace mpc::midi::event {
+	class MidiEvent;
+}
 
-		namespace event {
-			class MidiEvent;
-		}
+using namespace std;
 
-		class MidiTrack
-		{
+namespace mpc::midi {
+	class MidiTrack
+	{
 
-		private:
-			static const bool VERBOSE{ false };
-			static std::vector<char> IDENTIFIER;
-			
-		private:
-			int mSize{};
-			bool mSizeNeedsRecalculating{};
-			bool mClosed{};
-			int mEndOfTrackDelta{};
-			std::vector<std::shared_ptr<mpc::midi::event::MidiEvent>> mEvents{};
+	private:
+		static const bool VERBOSE{ false };
+		static vector<char> IDENTIFIER;
 
-		public:
-			static MidiTrack* createTempoTrack();
+	private:
+		int mSize{};
+		bool mSizeNeedsRecalculating{};
+		bool mClosed{};
+		int mEndOfTrackDelta{};
+		vector<shared_ptr<mpc::midi::event::MidiEvent>> mEvents{};
 
-		private:
-			void readTrackData(std::vector<char> data);
+	public:
+		static MidiTrack* createTempoTrack();
 
-		public:
-			std::vector<std::weak_ptr<mpc::midi::event::MidiEvent>> getEvents();
-			int getEventCount();
-			int getSize();
-			int getLengthInTicks();
-			int getEndOfTrackDelta();
-			void setEndOfTrackDelta(int delta);
-			void insertNote(int channel, int pitch, int velocity, int tick, int duration);
-			void insertEvent(std::weak_ptr<mpc::midi::event::MidiEvent> newEvent);
-			bool removeEvent(mpc::midi::event::MidiEvent* E);
-			void closeTrack();
-			void dumpEvents();
+	private:
+		void readTrackData(vector<char> data);
 
-		private:
-			void recalculateSize();
+	public:
+		vector<weak_ptr<mpc::midi::event::MidiEvent>> getEvents();
+		int getEventCount();
+		int getSize();
+		int getLengthInTicks();
+		int getEndOfTrackDelta();
+		void setEndOfTrackDelta(int delta);
+		void insertNote(int channel, int pitch, int velocity, int tick, int duration);
+		void insertEvent(weak_ptr<mpc::midi::event::MidiEvent> newEvent);
+		bool removeEvent(mpc::midi::event::MidiEvent* E);
+		void closeTrack();
+		void dumpEvents();
 
-		public:
-			void writeToFile(moduru::io::OutputStream* out);
+	private:
+		void recalculateSize();
 
-			MidiTrack();
-			MidiTrack(moduru::io::InputStream* in);
-		};
+	public:
+		void writeToOutputStream(ostream& stream);
 
-	}
+	public:
+		MidiTrack();
+		MidiTrack(moduru::io::InputStream* in);
+	};
 }

@@ -2,6 +2,8 @@
 #include <fstream>
 #include <vector>
 
+#include <file/FileUtil.hpp>
+
 using namespace std;
 
 static const int RIFF_CHUNK_ID{ 1179011410 };
@@ -13,9 +15,15 @@ static const int EXPECTED_HEADER_SIZE = 44;
 static const int EXPECTED_FMT_DATA_SIZE = 16;
 
 ifstream wav_init_ifstream(const string& path) {
+#ifdef _WIN32
+    auto result = moduru::file::FileUtil::ifstreamw(path, ios::in | ios::binary);
+    result.unsetf(ios_base::skipws);
+    return result;
+#else
     ifstream result(path.c_str(), ios::in | ios::binary);
     result.unsetf(ios_base::skipws);
 	return result;
+#endif
 }
 
 int wav_get_LE(ifstream& stream, int numBytes)

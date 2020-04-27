@@ -24,11 +24,12 @@ int GenericMetaEvent::getEventSize()
 	return 1 + 1 + mLength->getByteCount() + mLength->getValue();
 }
 
-void GenericMetaEvent::writeToFile(moduru::io::OutputStream* out)
+void GenericMetaEvent::writeToOutputStream(ostream& out)
 {
-	MetaEvent::writeToFile(out);
-	out->write(mLength->getBytes());
-	out->write(mData);
+	MetaEvent::writeToOutputStream(out);
+	auto length = mLength->getBytes();
+	out.write(&length[0], length.size());
+	out.write(&mData[0], mData.size());
 }
 
 int GenericMetaEvent::compareTo(mpc::midi::event::MidiEvent* other)
@@ -40,9 +41,4 @@ int GenericMetaEvent::compareTo(mpc::midi::event::MidiEvent* other)
 		return mDelta->getValue() < other->getDelta() ? 1 : -1;
 	}
 	return 1;
-}
-
-void GenericMetaEvent::writeToFile(moduru::io::OutputStream* out, bool writeType)
-{
-    MetaEvent::writeToFile(out, writeType);
 }

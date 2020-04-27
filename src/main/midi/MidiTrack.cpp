@@ -234,7 +234,7 @@ void MidiTrack::recalculateSize()
 	mSizeNeedsRecalculating = false;
 }
 
-void MidiTrack::writeToFile(moduru::io::OutputStream* out)
+void MidiTrack::writeToOutputStream(ostream& out)
 {
 	if (!mClosed) {
 		closeTrack();
@@ -242,15 +242,14 @@ void MidiTrack::writeToFile(moduru::io::OutputStream* out)
 	if (mSizeNeedsRecalculating) {
 		recalculateSize();
 	}
-	out->write(IDENTIFIER);
-	out->write(::util::MidiUtil::intToBytes(mSize, 4));
-	//auto it = mEvents->iterator();
+
+	out.write(&IDENTIFIER[0], IDENTIFIER.size());
+	auto size = mpc::midi::util::MidiUtil::intToBytes(mSize, 4);
+	out.write(&size[0], size.size());
+
 	shared_ptr<MidiEvent> lastEvent;
 	for (auto& event : mEvents) {
-		if (VERBOSE) {
-			//"Writing: "_j)->append(event)->toString());
-		}
-		event->writeToFile(out, event->requiresStatusByte(lastEvent.get()));
+		event->writeToOutputStream(out, event->requiresStatusByte(lastEvent.get()));
 		lastEvent = event;
 	}
 }
