@@ -72,6 +72,9 @@ shared_ptr<MidiEvent> MidiEvent::parseEvent(int tick, int delta, stringstream& i
 		in.seekp(ios_base::cur - 1);
 		reset = true;
 	}
+	else {
+		MLOG("Verified identifier " + to_string(id));
+	}
 
 	if (sType >= 8 && sType <= 14) {
 		return ChannelEvent::parseChannelEvent(tick, delta, sType, sChannel, in);
