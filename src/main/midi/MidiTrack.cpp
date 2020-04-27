@@ -81,9 +81,9 @@ void MidiTrack::readTrackData(vector<char>& data)
 		int value = delta.getValue();
 		totalTicks += value;
 
-		MLOG("\nEvent " + to_string(eventCounter++));
-		MLOG("Delta " + std::to_string(value));
-		MLOG("Tick " + std::to_string(totalTicks));
+		//MLOG("\nEvent " + to_string(eventCounter++));
+		//MLOG("Delta " + std::to_string(value));
+		//MLOG("Tick " + std::to_string(totalTicks));
 	
 		auto event = MidiEvent::parseEvent(totalTicks, value, in);
 
