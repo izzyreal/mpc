@@ -31,6 +31,7 @@
 #include <sequencer/TempoChangeEvent.hpp>
 
 #include <file/File.hpp>
+#include <file/FileUtil.hpp>
 
 using namespace moduru::file;
 using namespace mpc::file::mid;
@@ -41,12 +42,13 @@ using namespace std;
 MidiReader::MidiReader(mpc::Mpc* mpc, mpc::disk::MpcFile* file, weak_ptr<Sequence> dest)
 {
 	this->mpc = mpc;
-	this->midiFile = nullptr;
 	this->dest = dest;
 	auto sequence = dest.lock();
 	sequence->setUsed(true);
 	try {
-		midiFile = make_unique<mpc::midi::MidiFile>(dynamic_pointer_cast<moduru::file::File>(file->getFsNode().lock()));
+		auto path = file->getFile().lock()->getPath();
+		auto stream = FileUtil::ifstreamw(path, ios::in | ios::binary);
+		midiFile = make_unique<mpc::midi::MidiFile>(stream);
 	}
 	catch (exception* e) {
 		string logmsg = e->what();

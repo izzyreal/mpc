@@ -30,21 +30,16 @@ MidiFile::MidiFile(int resolution, vector<MidiTrack*> tracks)
 	mType = mTrackCount > 1 ? 1 : 0;
 }
 
-MidiFile::MidiFile(unique_ptr<moduru::io::InputStream> rawIn)
+MidiFile::MidiFile(istream& stream)
 {
-	auto in = moduru::io::BufferedInputStream(rawIn.get());
 	auto buffer = vector<char>(HEADER_SIZE);
-	in.read(&buffer);
+	stream.read(&buffer[0], buffer.size());
 	initFromBuffer(buffer);
 	mTracks.clear();
-	for (int i = 0; i < mTrackCount; i++) {
-		mTracks.push_back(std::move(make_shared<MidiTrack>(&in)));
-	}
-}
 
-MidiFile::MidiFile(weak_ptr<moduru::file::File> fileIn)
-	: MidiFile(make_unique<moduru::io::FileInputStream>(fileIn))
-{
+	for (int i = 0; i < mTrackCount; i++) {
+		mTracks.push_back(std::move(make_shared<MidiTrack>(stream)));
+	}
 }
 
 vector<char> MidiFile::IDENTIFIER = { 'M', 'T', 'h', 'd' };

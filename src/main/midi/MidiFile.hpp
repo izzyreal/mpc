@@ -2,9 +2,8 @@
 
 #include <file/File.hpp>
 
-#include <io/InputStream.hpp>
-
 #include <ostream>
+#include <istream>
 #include <vector>
 #include <memory>
 
@@ -58,8 +57,7 @@ namespace mpc::midi {
 		MidiFile();
 		MidiFile(int resolution);
 		MidiFile(int resolution, std::vector<MidiTrack*> tracks);
-		MidiFile(std::weak_ptr<moduru::file::File> fileIn);
-		MidiFile(std::unique_ptr<moduru::io::InputStream> rawIn);
+		MidiFile(istream& stream);
 		~MidiFile();
 
 	};

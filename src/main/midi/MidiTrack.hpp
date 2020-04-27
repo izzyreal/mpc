@@ -1,7 +1,7 @@
 #pragma once
 
-#include <io/InputStream.hpp>
-
+#include <ostream>
+#include <istream>
 #include <memory>
 #include <vector>
 #include <fstream>
@@ -54,6 +54,6 @@ namespace mpc::midi {
 
 	public:
 		MidiTrack();
-		MidiTrack(moduru::io::InputStream* in);
+		MidiTrack(istream& in);
 	};
 }

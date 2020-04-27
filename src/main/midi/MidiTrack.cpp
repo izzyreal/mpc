@@ -24,22 +24,25 @@ MidiTrack::MidiTrack()
 	mEndOfTrackDelta = 0;
 }
 
-MidiTrack::MidiTrack(moduru::io::InputStream* in)
+MidiTrack::MidiTrack(istream& in)
 {
 	mSize = 0;
 	mSizeNeedsRecalculating = false;
 	mClosed = false;
 	mEndOfTrackDelta = 0;
 	auto buffer = vector<char>(4);
-	in->read(&buffer);
+	in.read(&buffer[0], buffer.size());
+	
 	if (!mpc::midi::util::MidiUtil::bytesEqual(buffer, IDENTIFIER, 0, 4)) {
 		string error = "Track identifier did not match MTrk!";
 		throw std::invalid_argument(error.c_str());
 	}
-	in->read(&buffer);
+
+	in.read(&buffer[0], buffer.size());
+	
 	mSize = mpc::midi::util::MidiUtil::bytesToInt(buffer, 0, 4);
 	buffer.resize(mSize);
-	in->read(&buffer);
+	in.read(&buffer[0], buffer.size());
 	readTrackData(buffer);
 }
 const bool MidiTrack::VERBOSE;

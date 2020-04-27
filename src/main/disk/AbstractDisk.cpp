@@ -16,10 +16,14 @@
 #include <sampler/Sampler.hpp>
 #include <sampler/Sound.hpp>
 
+#include <file/FileUtil.hpp>
 #include <lang/StrUtil.hpp>
 
 using namespace mpc::disk;
+
 using namespace moduru::lang;
+using namespace moduru::file;
+
 using namespace std;
 
 AbstractDisk::AbstractDisk(weak_ptr<mpc::disk::Store> store, mpc::Mpc* mpc)
@@ -180,13 +184,14 @@ weak_ptr<mpc::disk::Store> AbstractDisk::getStore()
 void AbstractDisk::writeWav(mpc::sampler::Sound* s, MpcFile* f)
 {
 	auto data = s->getSampleData();
-	mpc::file::wav::WavFile wavFile;
-	wavFile.newWavFile(s->isMono() ? 1 : 2, data->size() / (s->isMono() ? 1 : 2), 16, s->getSampleRate());
+	
+	auto wavFile = mpc::file::wav::WavFile::newWavFile(f->getFile().lock()->getPath(), s->isMono() ? 1 : 2, data->size() / (s->isMono() ? 1 : 2), 16, s->getSampleRate());
+
 	if (!s->isMono()) {
 		vector<float> interleaved;
-		for (int i = 0; i < data->size() / 2; i++) {
+		for (int i = 0; i < (int) (data->size() * 0.5); i++) {
 			interleaved.push_back((*data)[i]);
-			interleaved.push_back((*data)[i + data->size() / 2]);
+			interleaved.push_back((*data)[(int) (i + data->size() * 0.5)]);
 		}
 		wavFile.writeFrames(&interleaved, data->size() / (s->isMono() ? 1 : 2));
 	}
@@ -194,8 +199,6 @@ void AbstractDisk::writeWav(mpc::sampler::Sound* s, MpcFile* f)
 		wavFile.writeFrames(data, data->size() / (s->isMono() ? 1 : 2));
 	}
 	wavFile.close();
-	auto wavBytes = wavFile.getResult();
-	f->setFileData(&wavBytes);
 	flush();
 	initFiles();
 }

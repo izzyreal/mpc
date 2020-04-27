@@ -10,6 +10,7 @@
 #include <sampler/Sound.hpp>
 
 #include <lang/StrUtil.hpp>
+#include <file/File.hpp>
 
 #include <cmath>
 
@@ -69,9 +70,7 @@ int SoundLoader::loadSound(MpcFile* f)
 	if (StrUtil::eqIgnoreCase(extension, "wav")) {
 
 		auto file = soundFile->getFile().lock();
-		mpc::file::wav::WavFile wavFile;
-
-		wavFile.openWavFile(file);
+		auto wavFile = mpc::file::wav::WavFile::openWavFile(file->getPath());
 		
 		if (wavFile.getValidBits() != 16) {
 			wavFile.close();
@@ -163,8 +162,7 @@ int SoundLoader::loadSound(MpcFile* f)
 
 void SoundLoader::getSampleDataFromWav(weak_ptr<moduru::file::File> soundFile, vector<float>* dest)
 {
-	mpc::file::wav::WavFile wavFile;
-	wavFile.openWavFile(soundFile);
+	auto wavFile = mpc::file::wav::WavFile::openWavFile(soundFile.lock()->getPath());
 	wavFile.readFrames(dest, wavFile.getNumFrames());
 }
 
