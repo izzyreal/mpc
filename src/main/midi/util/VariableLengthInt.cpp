@@ -5,12 +5,17 @@
 using namespace mpc::midi::util;
 using namespace std;
 
+VariableLengthInt::VariableLengthInt()
+	: VariableLengthInt::VariableLengthInt(0)
+{
+}
+
 VariableLengthInt::VariableLengthInt(int value) 
 {
 	setValue(value);
 }
 
-VariableLengthInt::VariableLengthInt(moduru::io::InputStream* in)
+VariableLengthInt::VariableLengthInt(stringstream& in)
 {
 	parseBytes(in);
 }
@@ -36,31 +41,40 @@ vector<char> VariableLengthInt::getBytes()
     return mBytes;
 }
 
-void VariableLengthInt::parseBytes(moduru::io::InputStream* in)
+void VariableLengthInt::parseBytes(stringstream& in)
 {
 	auto ints = vector<int>(4);
 	mSizeInBytes = 0;
 	mValue = 0;
 	int shift = 0;
-	auto b = in->read();
+	
+	auto b = in.get();
+
 	while (mSizeInBytes < 4) {
 		mSizeInBytes++;
 		auto variable = (b & 128) > 0;
+
 		if (!variable) {
 			ints[mSizeInBytes - 1] = (b & 127);
 			break;
 		}
+		
 		ints[mSizeInBytes - 1] = (b & 127);
-		b = in->read();
+		b = in.get();
 	}
+	
 	for (int i = 1; i < mSizeInBytes; i++) {
 		shift += 7;
 	}
 	mBytes = vector<char>(mSizeInBytes);
+	
 	for (int i = 0; i < mSizeInBytes; i++) {
 		mBytes[i] = static_cast<char>(ints[i]);
 		mValue += ints[i] << shift;
 		shift -= 7;
+	}
+	if (mValue > 10000) {
+		printf("bar");
 	}
 }
 

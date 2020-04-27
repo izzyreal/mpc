@@ -7,7 +7,8 @@
 
 using namespace mpc::midi::event::meta;
 
-SequencerSpecificEvent::SequencerSpecificEvent(int tick, int delta, std::vector<char> data) : MetaEvent(tick, delta, MetaEvent::SEQUENCER_SPECIFIC, new mpc::midi::util::VariableLengthInt(data.size()))
+SequencerSpecificEvent::SequencerSpecificEvent(int tick, int delta, std::vector<char> data)
+	: MetaEvent(tick, delta, MetaEvent::SEQUENCER_SPECIFIC, mpc::midi::util::VariableLengthInt(data.size()))
 {
 	mData = data;
 }
@@ -15,7 +16,7 @@ SequencerSpecificEvent::SequencerSpecificEvent(int tick, int delta, std::vector<
 void SequencerSpecificEvent::setData(std::vector<char> data)
 {
 	mData = data;
-	mLength->setValue(mData.size());
+	mLength.setValue(mData.size());
 }
 
 std::vector<char> SequencerSpecificEvent::getData()
@@ -25,13 +26,13 @@ std::vector<char> SequencerSpecificEvent::getData()
 
 int SequencerSpecificEvent::getEventSize()
 {
-	return 1 + 1 + mLength->getByteCount() + mData.size();
+	return 1 + 1 + mLength.getByteCount() + mData.size();
 }
 
 void SequencerSpecificEvent::writeToOutputStream(ostream& out)
 {
 	MetaEvent::writeToOutputStream(out);
-	auto length = mLength->getBytes();
+	auto length = mLength.getBytes();
 	out.write(&length[0], length.size());
 	out.write(&mData[0], mData.size());
 }
@@ -41,8 +42,8 @@ int SequencerSpecificEvent::compareTo(mpc::midi::event::MidiEvent* other)
 	if (mTick != other->getTick()) {
 		return mTick < other->getTick() ? -1 : 1;
 	}
-	if (mDelta->getValue() != other->getDelta()) {
-		return mDelta->getValue() < other->getDelta() ? 1 : -1;
+	if (mDelta.getValue() != other->getDelta()) {
+		return mDelta.getValue() < other->getDelta() ? 1 : -1;
 	}
 	if (!(dynamic_cast<SequencerSpecificEvent*>(other) != nullptr)) {
 		return 1;

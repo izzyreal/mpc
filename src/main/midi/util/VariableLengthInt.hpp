@@ -1,38 +1,35 @@
 #pragma once
 
-#include <io/InputStream.hpp>
-
 #include <string>
 #include <vector>
+#include <sstream>
 
-namespace mpc {
-	namespace midi {
-		namespace util {
+using namespace std;
 
-			class VariableLengthInt
-			{
+namespace mpc::midi::util {
 
-			private:
-				int mValue{};
-				std::vector<char> mBytes{};
-				int mSizeInBytes{};
+	class VariableLengthInt
+	{
 
-			public:
-				void setValue(int value);
-				int getValue();
-				int getByteCount();
-				std::vector<char> getBytes();
-				std::string toString();
+	private:
+		int mValue = 0;
+		vector<char> mBytes;
+		int mSizeInBytes = 0;
 
-			private:
-				void parseBytes(moduru::io::InputStream* in);
-				void buildBytes();
+	public:
+		void setValue(int value);
+		int getValue();
+		int getByteCount();
+		vector<char> getBytes();
+		string toString();
 
-			public:
-				VariableLengthInt(int value);
-				VariableLengthInt(moduru::io::InputStream* in);
-			};
+	private:
+		void parseBytes(stringstream& in);
+		void buildBytes();
 
-		}
-	}
+	public:
+		VariableLengthInt();
+		VariableLengthInt(int value);
+		VariableLengthInt(stringstream& in);
+	};
 }

@@ -6,7 +6,8 @@
 
 using namespace mpc::midi::event::meta;
 
-EndOfTrack::EndOfTrack(int tick, int delta) : MetaEvent(tick, delta, MetaEvent::END_OF_TRACK, new mpc::midi::util::VariableLengthInt(0))
+EndOfTrack::EndOfTrack(int tick, int delta)
+	: MetaEvent(tick, delta, MetaEvent::END_OF_TRACK, mpc::midi::util::VariableLengthInt(0))
 {
 }
 
@@ -26,8 +27,8 @@ int EndOfTrack::compareTo(mpc::midi::event::MidiEvent* other)
 	if (mTick != other->getTick()) {
 		return mTick < other->getTick() ? -1 : 1;
 	}
-	if (mDelta->getValue() != other->getDelta()) {
-		return mDelta->getValue() < other->getDelta() ? 1 : -1;
+	if (mDelta.getValue() != other->getDelta()) {
+		return mDelta.getValue() < other->getDelta() ? 1 : -1;
 	}
 	if (dynamic_cast<EndOfTrack*>(other) == nullptr) {
 		return 1;

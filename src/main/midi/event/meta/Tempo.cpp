@@ -14,7 +14,8 @@ Tempo::Tempo() : Tempo(0, 0, DEFAULT_MPQN)
 {
 }
 
-Tempo::Tempo(int tick, int delta, int mpqn) : MetaEvent(tick, delta, MetaEvent::TEMPO, new mpc::midi::util::VariableLengthInt(3))
+Tempo::Tempo(int tick, int delta, int mpqn)
+	: MetaEvent(tick, delta, MetaEvent::TEMPO, mpc::midi::util::VariableLengthInt(3))
 {
 	setMpqn(mpqn);
 }
@@ -59,7 +60,7 @@ void Tempo::writeToOutputStream(ostream& out)
 
 shared_ptr<MetaEvent> Tempo::parseTempo(int tick, int delta, MetaEventData* info)
 {
-	if (info->length->getValue() != 3) {
+	if (info->length.getValue() != 3) {
 		return make_shared<GenericMetaEvent>(tick, delta, info);
 	}
 	auto mpqn = mpc::midi::util::MidiUtil::bytesToInt(info->data, 0, 3);
@@ -71,8 +72,8 @@ int Tempo::compareTo(mpc::midi::event::MidiEvent* other)
 	if (mTick != other->getTick()) {
 		return mTick < other->getTick() ? -1 : 1;
 	}
-	if (mDelta->getValue() != other->getDelta()) {
-		return mDelta->getValue() < other->getDelta() ? 1 : -1;
+	if (mDelta.getValue() != other->getDelta()) {
+		return mDelta.getValue() < other->getDelta() ? 1 : -1;
 	}
 	if (!(dynamic_cast<Tempo*>(other) != nullptr)) {
 		return 1;

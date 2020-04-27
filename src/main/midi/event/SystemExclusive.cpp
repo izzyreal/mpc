@@ -50,23 +50,34 @@ int SystemExclusiveEvent::compareTo(MidiEvent* other)
 	if (this->mTick < other->mTick) {
 		return -1;
 	}
+	
 	if (this->mTick > other->mTick) {
 		return 1;
 	}
-	if (this->mDelta->getValue() > other->mDelta->getValue()) {
+	
+	if (mDelta.getValue() > other->mDelta.getValue()) {
 		return -1;
 	}
-	if (this->mDelta->getValue() < other->mDelta->getValue()) {
+
+	if (mDelta.getValue() < other->mDelta.getValue()) {
 		return 1;
 	}
+
     if(dynamic_cast< SystemExclusiveEvent* >(other) != nullptr) {
 		string curr = "";
-		for (char c : mData)
+		
+		for (char c : mData) {
 			curr.push_back(c);
+		}
+		
 		auto tmp = dynamic_cast<SystemExclusiveEvent*>(other)->mData;
+		
 		string comp = "";
-		for (char c : tmp)
+		
+		for (char c : tmp) {
 			comp.push_back(c);
+		}
+
 		return curr.compare(comp);
     }
     return 1;

@@ -6,7 +6,8 @@
 using namespace mpc::midi::event::meta;
 using namespace std;
 
-TextualMetaEvent::TextualMetaEvent(int tick, int delta, int type, string text) : MetaEvent(tick, delta, type, new mpc::midi::util::VariableLengthInt(text.length()))
+TextualMetaEvent::TextualMetaEvent(int tick, int delta, int type, string text)
+	: MetaEvent(tick, delta, type, mpc::midi::util::VariableLengthInt(text.length()))
 {
 	setText(text);
 }
@@ -14,7 +15,7 @@ TextualMetaEvent::TextualMetaEvent(int tick, int delta, int type, string text) :
 void TextualMetaEvent::setText(string t)
 {
 	mText = t;
-	mLength->setValue(t.length());
+	mLength.setValue(t.length());
 }
 
 string TextualMetaEvent::getText()
@@ -24,13 +25,13 @@ string TextualMetaEvent::getText()
 
 int TextualMetaEvent::getEventSize()
 {
-    return 1 + 1 + mLength->getByteCount()+ mLength->getValue();
+    return 1 + 1 + mLength.getByteCount()+ mLength.getValue();
 }
 
 void TextualMetaEvent::writeToOutputStream(ostream& out)
 {
 	MetaEvent::writeToOutputStream(out);
-	auto length = mLength->getBytes();
+	auto length = mLength.getBytes();
 	out.write(&length[0], length.size());
 	out.write(&mText[0], mText.size());
 }
@@ -40,8 +41,8 @@ int TextualMetaEvent::compareTo(mpc::midi::event::MidiEvent* other)
 	if (mTick != other->getTick()) {
 		return mTick < other->getTick() ? -1 : 1;
 	}
-	if (mDelta->getValue() != other->getDelta()) {
-		return mDelta->getValue() < other->getDelta() ? 1 : -1;
+	if (mDelta.getValue() != other->getDelta()) {
+		return mDelta.getValue() < other->getDelta() ? 1 : -1;
 	}
 	if (!(dynamic_cast<TextualMetaEvent*>(other) != nullptr)) {
 		return 1;

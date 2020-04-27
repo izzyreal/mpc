@@ -10,7 +10,7 @@ using namespace mpc::midi::event::meta;
 using namespace std;
 
 MidiChannelPrefix::MidiChannelPrefix(int tick, int delta, int channel)
-	: MetaEvent(tick, delta, MetaEvent::MIDI_CHANNEL_PREFIX, new mpc::midi::util::VariableLengthInt(4))
+	: MetaEvent(tick, delta, MetaEvent::MIDI_CHANNEL_PREFIX, mpc::midi::util::VariableLengthInt(4))
 {
 	mChannel = channel;
 }
@@ -39,7 +39,7 @@ void MidiChannelPrefix::writeToOutputStream(ostream& out)
 
 shared_ptr<MetaEvent> MidiChannelPrefix::parseMidiChannelPrefix(int tick, int delta, MetaEventData* info)
 {
-	if (info->length->getValue() != 1) {
+	if (info->length.getValue() != 1) {
 		return make_shared<GenericMetaEvent>(tick, delta, info);
 	}
 	int channel = info->data[0];

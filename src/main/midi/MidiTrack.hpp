@@ -31,7 +31,7 @@ namespace mpc::midi {
 		static MidiTrack* createTempoTrack();
 
 	private:
-		void readTrackData(vector<char> data);
+		void readTrackData(vector<char>& data);
 
 	public:
 		vector<weak_ptr<mpc::midi::event::MidiEvent>> getEvents();

@@ -1,36 +1,34 @@
 #pragma once
 
+#include <memory>
+
 namespace mpc {
 	class Mpc;
+}
 
-	namespace ui {
-		class UserDefaults;
-	}
+namespace mpc::ui {
+	class UserDefaults;
+}
 
-	namespace nvram {
+namespace mpc::nvram {
+	class KnobPositions;
+}
 
-		class KnobPositions;
+namespace mpc::nvram {
 
-		class NvRam
-		{
+	class NvRam
+	{
 
-		public:
-			static mpc::ui::UserDefaults* load();
-			static void saveUserDefaults();
-			static void saveKnobPositions(mpc::Mpc* mpc);
-			static int getMasterLevel();
-			static int getRecordLevel();
-			static int getSlider();
+	public:
+		static std::shared_ptr<mpc::ui::UserDefaults> load();
+		static void saveUserDefaults();
+		static void saveKnobPositions(mpc::Mpc* mpc);
+		static int getMasterLevel();
+		static int getRecordLevel();
+		static int getSlider();
 
-		private:
-			static KnobPositions* getKnobPositions();
+	public:
+		NvRam();
 
-		public:
-			NvRam();
-
-		private:
-			//friend class KnobPositions;
-		};
-
-	}
+	};
 }

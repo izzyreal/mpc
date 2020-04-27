@@ -4,13 +4,15 @@
 #include <midi/event/SystemExclusive.hpp>
 #include <midi/event/meta/MetaEvent.hpp>
 
+#include <Logger.hpp>
+
 using namespace mpc::midi::event;
 using namespace std;
 
 MidiEvent::MidiEvent(int tick, int delta)
 {
 	mTick = tick;
-	mDelta = new mpc::midi::util::VariableLengthInt(delta);
+	mDelta = mpc::midi::util::VariableLengthInt(delta);
 }
 
 int MidiEvent::getTick()
@@ -20,17 +22,17 @@ int MidiEvent::getTick()
 
 int MidiEvent::getDelta()
 {
-    return mDelta->getValue();
+    return mDelta.getValue();
 }
 
 void MidiEvent::setDelta(int d)
 {
-    mDelta->setValue(d);
+    mDelta.setValue(d);
 }
 
 int MidiEvent::getSize()
 {
-    return getEventSize() + mDelta->getByteCount();
+    return getEventSize() + mDelta.getByteCount();
 }
 
 bool MidiEvent::requiresStatusByte(MidiEvent* prevEvent)
@@ -38,18 +40,21 @@ bool MidiEvent::requiresStatusByte(MidiEvent* prevEvent)
 	if (prevEvent == nullptr) {
 		return true;
 	}
+
 	if (dynamic_cast<mpc::midi::event::meta::MetaEvent*>(this) != nullptr) {
 		return true;
 	}
+
 	if (typeid(this) == typeid(prevEvent)) {
 		return false;
 	}
+
 	return true;
 }
 
 void MidiEvent::writeToOutputStream(ostream& out, bool writeType)
 {
-	auto bytes = mDelta->getBytes();
+	auto bytes = mDelta.getBytes();
 	out.write(&bytes[0], bytes.size());
 }
 
@@ -57,15 +62,16 @@ int MidiEvent::sId = -1;
 int MidiEvent::sType = -1;
 int MidiEvent::sChannel = -1;
 
-shared_ptr<MidiEvent> MidiEvent::parseEvent(int tick, int delta, moduru::io::InputStream* in)
+shared_ptr<MidiEvent> MidiEvent::parseEvent(int tick, int delta, stringstream& in)
 {
-	in->mark(1);
 	auto reset = false;
-	auto id = (int) (in->read() & 0xFF);
+	auto id = (int) (in.get() & 0xFF);
+	
 	if (!verifyIdentifier(id)) {
-		in->reset();
+		in.seekp(ios_base::cur - 1);
 		reset = true;
 	}
+
 	if (sType >= 8 && sType <= 14) {
 		return ChannelEvent::parseChannelEvent(tick, delta, sType, sChannel, in);
 	}
@@ -75,16 +81,17 @@ shared_ptr<MidiEvent> MidiEvent::parseEvent(int tick, int delta, moduru::io::Inp
 	else if (sId == 240 || sId == 247) {
 		auto size = mpc::midi::util::VariableLengthInt(in);
 		auto data = vector<char>(size.getValue());
-		in->read(&data);
+		in.read(&data[0], data.size());
 		return make_shared<SystemExclusiveEvent>(sId, tick, delta, data);
 	}
 	else {
 		string error = "Unable to handle status byte, skipping: " + to_string(sId);
 		if (reset) {
-			in->read();
+			in.ignore(1);
 		}
 	}
-	return nullptr;
+
+	return shared_ptr<MidiEvent>();
 }
 
 bool MidiEvent::verifyIdentifier(int id)
@@ -115,5 +122,5 @@ bool MidiEvent::verifyIdentifier(int id)
 
 string MidiEvent::toString()
 {
-	return to_string(mTick) + " (" + to_string(mDelta->getValue()) + "): " + typeid(this).name();
+	return to_string(mTick) + " (" + to_string(mDelta.getValue()) + "): " + typeid(this).name();
 }

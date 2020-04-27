@@ -31,7 +31,7 @@ namespace mpc::midi::event {
 		virtual int compareTo(MidiEvent* other);
 		virtual bool requiresStatusByte(MidiEvent* prevEvent) override;
 		virtual void writeToOutputStream(ostream& out, bool writeType) override;
-		static std::shared_ptr<ChannelEvent> parseChannelEvent(int tick, int delta, int type, int channel, moduru::io::InputStream* in);
+		static std::shared_ptr<ChannelEvent> parseChannelEvent(int tick, int delta, int type, int channel, stringstream& in);
 
 	private:
 		static void buildOrderMap();

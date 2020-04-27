@@ -8,22 +8,17 @@
 using namespace mpc::nvram;
 using namespace std;
 
-DefaultsParser::DefaultsParser(moduru::file::File* file)
+mpc::file::all::Defaults DefaultsParser::AllDefaultsFromFile(moduru::file::File& file)
 {
 	vector<char> data;
-	file->getData(&data);
-	defaults = new mpc::file::all::Defaults(moduru::VecUtil::CopyOfRange(&data, 0, mpc::file::all::AllParser::DEFAULTS_LENGTH));
+	file.getData(&data);
+	return mpc::file::all::Defaults(moduru::VecUtil::CopyOfRange(&data, 0, mpc::file::all::AllParser::DEFAULTS_LENGTH));
 }
 
-DefaultsParser::DefaultsParser(mpc::ui::UserDefaults* ud)
+DefaultsParser::DefaultsParser(weak_ptr<mpc::ui::UserDefaults> ud)
 {
-	auto defaults = new mpc::file::all::Defaults(ud);
-	saveBytes = defaults->getBytes();
-}
-
-mpc::file::all::Defaults* DefaultsParser::getDefaults()
-{
-    return defaults;
+	auto defaults = mpc::file::all::Defaults(ud.lock().get());
+	saveBytes = defaults.getBytes();
 }
 
 vector<char> DefaultsParser::getBytes()

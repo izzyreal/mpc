@@ -9,7 +9,8 @@
 using namespace mpc::midi::event::meta;
 using namespace std;
 
-KeySignature::KeySignature(int tick, int delta, int key, int scale) : MetaEvent(tick, delta, MetaEvent::KEY_SIGNATURE, new mpc::midi::util::VariableLengthInt(2))
+KeySignature::KeySignature(int tick, int delta, int key, int scale)
+    : MetaEvent(tick, delta, MetaEvent::KEY_SIGNATURE, mpc::midi::util::VariableLengthInt(2))
 {
 	this->setKey(key);
 	mScale = scale;
@@ -57,7 +58,7 @@ void KeySignature::writeToOutputStream(ostream& out)
 
 shared_ptr<MetaEvent> KeySignature::parseKeySignature(int tick, int delta, MetaEventData* info)
 {
-	if (info->length->getValue() != 2) {
+	if (info->length.getValue() != 2) {
 		return make_shared<GenericMetaEvent>(tick, delta, info);
 	}
 	int key = info->data[0];
@@ -70,8 +71,8 @@ int KeySignature::compareTo(mpc::midi::event::MidiEvent* other)
     if(mTick != other->getTick()) {
         return mTick < other->getTick() ? -1 : 1;
     }
-    if(mDelta->getValue() != other->getDelta()) {
-        return mDelta->getValue() < other->getDelta() ? 1 : -1;
+    if(mDelta.getValue() != other->getDelta()) {
+        return mDelta.getValue() < other->getDelta() ? 1 : -1;
     }
     if(!(dynamic_cast< KeySignature* >(other) != nullptr)) {
         return 1;

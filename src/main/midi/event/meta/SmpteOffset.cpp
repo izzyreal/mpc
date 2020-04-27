@@ -11,7 +11,8 @@
 using namespace mpc::midi::event::meta;
 using namespace std;
 
-SmpteOffset::SmpteOffset(int tick, int delta, FrameRate* fps, int hour, int min, int sec, int fr, int subfr) : MetaEvent(tick, delta, MetaEvent::SMPTE_OFFSET, new mpc::midi::util::VariableLengthInt(5))
+SmpteOffset::SmpteOffset(int tick, int delta, FrameRate* fps, int hour, int min, int sec, int fr, int subfr)
+	: MetaEvent(tick, delta, MetaEvent::SMPTE_OFFSET, mpc::midi::util::VariableLengthInt(5))
 {
 	mFrameRate = fps;
 	mHours = hour;
@@ -104,7 +105,7 @@ void SmpteOffset::writeToOutputStream(ostream& out)
 
 shared_ptr<MetaEvent> SmpteOffset::parseSmpteOffset(int tick, int delta, MetaEventData* info)
 {
-	if (info->length->getValue() != 5) {
+	if (info->length.getValue() != 5) {
 		return make_shared<GenericMetaEvent>(tick, delta, info);
 	}
 	int rrHours = info->data[0];
@@ -123,8 +124,8 @@ int SmpteOffset::compareTo(mpc::midi::event::MidiEvent* other)
 	if (mTick != other->getTick()) {
 		return mTick < other->getTick() ? -1 : 1;
 	}
-	if (mDelta->getValue() != other->getDelta()) {
-		return mDelta->getValue() < other->getDelta() ? 1 : -1;
+	if (mDelta.getValue() != other->getDelta()) {
+		return mDelta.getValue() < other->getDelta() ? 1 : -1;
 	}
 	if (!(dynamic_cast<SmpteOffset*>(other) != nullptr)) {
 		return 1;

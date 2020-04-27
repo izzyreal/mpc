@@ -91,12 +91,12 @@ void ChannelEvent::writeToOutputStream(ostream& out, bool writeType)
 	}
 }
 
-shared_ptr<ChannelEvent> ChannelEvent::parseChannelEvent(int tick, int delta, int type, int channel, moduru::io::InputStream* in)
+shared_ptr<ChannelEvent> ChannelEvent::parseChannelEvent(int tick, int delta, int type, int channel, stringstream& in)
 {
-    int val1 = in->read();
+    int val1 = in.get();
     int val2 = 0;
 	if (type != PROGRAM_CHANGE && type != CHANNEL_AFTERTOUCH) {
-		val2 = in->read();
+		val2 = in.get();
 	}
     switch (type) {
     case NOTE_OFF:

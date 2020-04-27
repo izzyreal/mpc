@@ -11,11 +11,13 @@
 using namespace mpc::midi::event::meta;
 using namespace std;
 
-TimeSignature::TimeSignature() : TimeSignature(0, 0, 4, 4, DEFAULT_METER, DEFAULT_DIVISION)
+TimeSignature::TimeSignature()
+    : TimeSignature(0, 0, 4, 4, DEFAULT_METER, DEFAULT_DIVISION)
 {
 }
 
-TimeSignature::TimeSignature(int tick, int delta, int num, int den, int meter, int div) : MetaEvent(tick, delta, MetaEvent::TIME_SIGNATURE, new mpc::midi::util::VariableLengthInt(4))
+TimeSignature::TimeSignature(int tick, int delta, int num, int den, int meter, int div)
+    : MetaEvent(tick, delta, MetaEvent::TIME_SIGNATURE, mpc::midi::util::VariableLengthInt(4))
 {
 	setTimeSignature(num, den, meter, div);
 }
@@ -77,7 +79,7 @@ void TimeSignature::writeToOutputStream(ostream& out)
 
 shared_ptr<MetaEvent> TimeSignature::parseTimeSignature(int tick, int delta, MetaEventData* info)
 {
-	if (info->length->getValue() != 4) {
+	if (info->length.getValue() != 4) {
 		return make_shared<GenericMetaEvent>(tick, delta, info);
 	}
 	int num = info->data[0];
@@ -116,8 +118,8 @@ int TimeSignature::compareTo(mpc::midi::event::MidiEvent* other)
     if(mTick != other->getTick()) {
         return mTick < other->getTick() ? -1 : 1;
     }
-    if(mDelta->getValue() != other->getDelta()) {
-        return mDelta->getValue() < other->getDelta() ? 1 : -1;
+    if(mDelta.getValue() != other->getDelta()) {
+        return mDelta.getValue() < other->getDelta() ? 1 : -1;
     }
     if(!(dynamic_cast< TimeSignature* >(other) != nullptr)) {
         return 1;

@@ -8,9 +8,10 @@
 #include <midi/util/MidiUtil.hpp>
 #include <midi/util/VariableLengthInt.hpp>
 
-#include <io/ByteArrayInputStream.hpp>
-
 #include <stdexcept>
+#include <sstream>
+
+#include <Logger.hpp>
 
 using namespace mpc::midi;
 using namespace mpc::midi::event;
@@ -57,24 +58,33 @@ MidiTrack* MidiTrack::createTempoTrack()
 	return T;
 }
 
-void MidiTrack::readTrackData(vector<char> data)
+void MidiTrack::readTrackData(vector<char>& data)
 {
-	auto in = moduru::io::ByteArrayInputStream(&data);
+	stringstream in(string(data.begin(), data.end()));
+
 	int totalTicks = 0;
-	while (in.available() > 0) {
-		auto delta = mpc::midi::util::VariableLengthInt(&in);
+
+	auto available = (int) in.rdbuf()->in_avail();
+
+	while (available > 0) {
+		auto delta = mpc::midi::util::VariableLengthInt(in);
 		int value = delta.getValue();
 		totalTicks += value;
-		auto E = MidiEvent::parseEvent(totalTicks, value, &in);
-		if (E == nullptr) {
+		auto event = MidiEvent::parseEvent(totalTicks, value, in);
+
+		if (!event) {
 			string error = "Event skipped!\n";
 			continue;
 		}
-		if (dynamic_pointer_cast<meta::EndOfTrack>(E)) {
-			mEndOfTrackDelta = E->getDelta();
+		
+		if (dynamic_pointer_cast<meta::EndOfTrack>(event)) {
+			mEndOfTrackDelta = event->getDelta();
 			break;
 		}
-		mEvents.push_back(E);
+		
+		mEvents.push_back(event);
+		MLOG("Pushed event at tick " + to_string(event->getTick()));
+		available--;
 	}
 }
 

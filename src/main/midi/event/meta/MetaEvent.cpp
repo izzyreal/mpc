@@ -21,7 +21,7 @@
 using namespace mpc::midi::event::meta;
 using namespace std;
 
-MetaEvent::MetaEvent(int tick, int delta, int type, mpc::midi::util::VariableLengthInt* length)
+MetaEvent::MetaEvent(int tick, int delta, int type, mpc::midi::util::VariableLengthInt& length)
 	: mpc::midi::event::MidiEvent(tick, delta)
 {
 	mType = type & 255;
@@ -41,7 +41,7 @@ void MetaEvent::writeToOutputStream(ostream& out)
 }
 
 
-shared_ptr<MetaEvent> MetaEvent::parseMetaEvent(int tick, int delta, moduru::io::InputStream* in)
+shared_ptr<MetaEvent> MetaEvent::parseMetaEvent(int tick, int delta, stringstream& in)
 {
 	auto eventData = MetaEventData(in);
 	auto isText = false;

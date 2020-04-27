@@ -3,8 +3,7 @@
 
 #include <midi/util/VariableLengthInt.hpp>
 
-#include <io/InputStream.hpp>
-
+#include <sstream>
 #include <ostream>
 
 namespace mpc::midi::event::meta {
@@ -14,8 +13,8 @@ namespace mpc::midi::event::meta {
 	{
 
 	public:
-		int mType{};
-		mpc::midi::util::VariableLengthInt* mLength{};
+		int mType = 0;
+		mpc::midi::util::VariableLengthInt mLength;
 
 	public:
 		int getEventSize() = 0;
@@ -25,7 +24,7 @@ namespace mpc::midi::event::meta {
 		void writeToOutputStream(ostream& out, bool writeType) override;
 
 	public:
-		static std::shared_ptr<MetaEvent> parseMetaEvent(int tick, int delta, moduru::io::InputStream* in);
+		static std::shared_ptr<MetaEvent> parseMetaEvent(int tick, int delta, stringstream& in);
 		static const int SEQUENCE_NUMBER{ 0 };
 		static const int TEXT_EVENT{ 1 };
 		static const int COPYRIGHT_NOTICE{ 2 };
@@ -43,7 +42,7 @@ namespace mpc::midi::event::meta {
 		static const int SEQUENCER_SPECIFIC{ 127 };
 
 	public:
-		MetaEvent(int tick, int delta, int type, mpc::midi::util::VariableLengthInt* length);
+		MetaEvent(int tick, int delta, int type, mpc::midi::util::VariableLengthInt& length);
 
 	};
 }

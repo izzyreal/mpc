@@ -2,7 +2,7 @@
 
 #include <midi/util/VariableLengthInt.hpp>
 
-#include <io/InputStream.hpp>
+#include <sstream>
 
 namespace mpc::midi::event::meta {
 
@@ -10,11 +10,11 @@ namespace mpc::midi::event::meta {
 	{
 
 	public:
-		int type{};
-		mpc::midi::util::VariableLengthInt* length{};
-		std::vector<char> data{};
+		int type = 0;
+		mpc::midi::util::VariableLengthInt length;
+		std::vector<char> data;
 
 	public:
-		MetaEventData(moduru::io::InputStream* in);
+		MetaEventData(stringstream& in);
 	};
 }

@@ -2,12 +2,10 @@
 
 #include <midi/util/VariableLengthInt.hpp>
 
-#include <io/OutputStream.hpp>
-#include <io/InputStream.hpp>
-
 #include <string>
 #include <memory>
 #include <fstream>
+#include <sstream>
 
 using namespace std;
 
@@ -18,7 +16,7 @@ namespace mpc::midi::event {
 
 	public:
 		int mTick{ 0 };
-		mpc::midi::util::VariableLengthInt* mDelta{ nullptr };
+		mpc::midi::util::VariableLengthInt mDelta;
 
 	public:
 		virtual int getTick();
@@ -39,7 +37,7 @@ namespace mpc::midi::event {
 		static int sChannel;
 
 	public:
-		static shared_ptr<MidiEvent> parseEvent(int tick, int delta, moduru::io::InputStream* in);
+		static shared_ptr<MidiEvent> parseEvent(int tick, int delta, stringstream& in);
 
 	private:
 		static bool verifyIdentifier(int id);

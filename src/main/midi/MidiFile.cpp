@@ -2,9 +2,6 @@
 #include <midi/MidiTrack.hpp>
 #include <midi/util/MidiUtil.hpp>
 
-#include <io/BufferedInputStream.hpp>
-#include <io/FileInputStream.hpp>
-
 #include <file/FileUtil.hpp>
 
 #include <sstream>

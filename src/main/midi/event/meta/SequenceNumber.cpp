@@ -10,7 +10,7 @@ using namespace mpc::midi::event::meta;
 using namespace std;
 
 SequenceNumber::SequenceNumber(int tick, int delta, int number)
-	: MetaEvent(tick, delta, MetaEvent::SEQUENCE_NUMBER, new mpc::midi::util::VariableLengthInt(2))
+	: MetaEvent(tick, delta, MetaEvent::SEQUENCE_NUMBER, mpc::midi::util::VariableLengthInt(2))
 {
 	mNumber = number;
 }
@@ -40,7 +40,7 @@ void SequenceNumber::writeToOutputStream(ostream& out)
 
 shared_ptr<MetaEvent> SequenceNumber::parseSequenceNumber(int tick, int delta, MetaEventData* info)
 {
-	if (info->length->getValue() != 2) {
+	if (info->length.getValue() != 2) {
 		return make_shared<GenericMetaEvent>(tick, delta, info);
 	}
 	int msb = info->data[0];
@@ -59,8 +59,8 @@ int SequenceNumber::compareTo(mpc::midi::event::MidiEvent* other)
     if(mTick != other->getTick()) {
         return mTick < other->getTick() ? -1 : 1;
     }
-    if(mDelta->getValue() != other->getDelta()) {
-        return mDelta->getValue() < other->getDelta() ? 1 : -1;
+    if(mDelta.getValue() != other->getDelta()) {
+        return mDelta.getValue() < other->getDelta() ? 1 : -1;
     }
     if(!(dynamic_cast< SequenceNumber* >(other) != nullptr)) {
         return 1;
