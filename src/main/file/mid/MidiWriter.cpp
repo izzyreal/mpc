@@ -35,6 +35,7 @@
 
 #include <lang/StrUtil.hpp>
 #include <file/ByteUtil.hpp>
+#include <file/FileUtil.hpp>
 
 #include <set>
 
@@ -225,26 +226,29 @@ void MidiWriter::addNoteOn(shared_ptr<NoteOn> noteOn)
 void MidiWriter::createDeltas(weak_ptr<mpc::midi::MidiTrack> midiTrack)
 {
 	auto mt = midiTrack.lock();
-	shared_ptr<mpc::midi::event::MidiEvent> pme;
+	shared_ptr<mpc::midi::event::MidiEvent> previousEvent;
 	for (auto& me : mt->getEvents()) {
-		auto E = dynamic_pointer_cast<mpc::midi::event::NoteOn>(me.lock());
-		if (E) {
-			if (pme) {
-				if (E->getTick() != pme->getTick()) {
-					E->setDelta(E->getTick() - pme->getTick());
+		auto event = dynamic_pointer_cast<mpc::midi::event::NoteOn>(me.lock());
+		if (event) {
+			if (previousEvent) {
+				if (event->getTick() != previousEvent->getTick()) {
+					event->setDelta(event->getTick() - previousEvent->getTick());
 				}
 				else {
-					E->setDelta(0);
+					event->setDelta(0);
 				}
 			}
-			pme = E;
+			previousEvent = event;
 		}
 	}
-	auto pmeTick = !pme ? 0 : pme->getTick();
-	mt->setEndOfTrackDelta(sequence->getLastTick() - pmeTick);
+	auto previousTick = !previousEvent ? 0 : previousEvent->getTick();
+	mt->setEndOfTrackDelta(sequence->getLastTick() - previousTick);
 }
 
-vector<char> MidiWriter::getBytes()
+void MidiWriter::writeToFile(string path)
 {
-    return mf->getBytes();
+	auto fout = moduru::file::FileUtil::ofstreamw(path, ios::out | ios::binary);
+	fout.unsetf(ios::skipws);
+	mf->writeToOutputStream(fout);
+	fout.close();
 }

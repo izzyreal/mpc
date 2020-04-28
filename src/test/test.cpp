@@ -41,10 +41,10 @@ SCENARIO("A Sequencer initializes correctly", "[sequencer]") {
 	GIVEN("A Sequencer") {
 		mpc::Mpc mpc;
 		mpc.init(44100, 1, 1);
-		mpc::sequencer::Sequencer seq(&mpc);
-		seq.init();
+		auto seq = mpc.getSequencer().lock();
+		seq->init();
 
-		REQUIRE( seq.getTempo().toDouble() == 120 );
+		REQUIRE( seq->getTempo().toDouble() == 120 );
 	}
 }
 

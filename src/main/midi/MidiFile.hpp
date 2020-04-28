@@ -44,14 +44,10 @@ namespace mpc::midi {
 		void addTrack(std::shared_ptr<MidiTrack> T);
 		void addTrack(std::shared_ptr<MidiTrack> T, int pos);
 		void removeTrack(int pos);
-		void writeToFile(moduru::file::File* outFile);
 		void writeToOutputStream(ostream& stream);
 
 	private:
 		void initFromBuffer(std::vector<char>& buffer);
-
-	public:
-		std::vector<char> getBytes();
 
 	public:
 		MidiFile();

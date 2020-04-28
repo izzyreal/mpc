@@ -22,6 +22,13 @@ void EndOfTrack::writeToOutputStream(ostream& out)
 	out << 0x00;
 }
 
+
+void EndOfTrack::writeToOutputStream(ostream& out, bool writeType)
+{
+	MetaEvent::writeToOutputStream(out, writeType);
+}
+
+
 int EndOfTrack::compareTo(mpc::midi::event::MidiEvent* other)
 {
 	if (mTick != other->getTick()) {

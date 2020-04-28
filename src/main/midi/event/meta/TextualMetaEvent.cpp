@@ -36,6 +36,11 @@ void TextualMetaEvent::writeToOutputStream(ostream& out)
 	out.write(&mText[0], mText.size());
 }
 
+void TextualMetaEvent::writeToOutputStream(ostream& out, bool writeType)
+{
+	MetaEvent::writeToOutputStream(out, writeType);
+}
+
 int TextualMetaEvent::compareTo(mpc::midi::event::MidiEvent* other)
 {
 	if (mTick != other->getTick()) {

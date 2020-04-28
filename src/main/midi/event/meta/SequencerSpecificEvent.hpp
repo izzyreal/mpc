@@ -2,8 +2,6 @@
 
 #include <midi/event/meta/MetaEvent.hpp>
 
-#include <io/OutputStream.hpp>
-
 namespace mpc::midi::event::meta {
 
 	class SequencerSpecificEvent
@@ -18,11 +16,13 @@ namespace mpc::midi::event::meta {
 
 	public:
 		int getEventSize() override;
-
-	public:
 		void writeToOutputStream(ostream& out)  override;
+		void writeToOutputStream(ostream& out, bool writeType) override;
+		
+	public:
 		virtual int compareTo(mpc::midi::event::MidiEvent* other);
 
+	public:
 		SequencerSpecificEvent(int tick, int delta, std::vector<char> data);
 
 	};

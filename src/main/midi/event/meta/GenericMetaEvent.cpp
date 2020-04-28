@@ -26,6 +26,11 @@ void GenericMetaEvent::writeToOutputStream(ostream& out)
 	out.write(&mData[0], mData.size());
 }
 
+void GenericMetaEvent::writeToOutputStream(ostream& out, bool writeType)
+{
+	MetaEvent::writeToOutputStream(out, writeType);
+}
+
 int GenericMetaEvent::compareTo(mpc::midi::event::MidiEvent* other)
 {
 	if (mTick != other->getTick()) {

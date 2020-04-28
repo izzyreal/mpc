@@ -77,6 +77,11 @@ void TimeSignature::writeToOutputStream(ostream& out)
     out << mDivision;
 }
 
+void TimeSignature::writeToOutputStream(ostream& out, bool writeType)
+{
+    MetaEvent::writeToOutputStream(out, writeType);
+}
+
 shared_ptr<MetaEvent> TimeSignature::parseTimeSignature(int tick, int delta, MetaEventData* info)
 {
 	if (info->length.getValue() != 4) {

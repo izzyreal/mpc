@@ -58,6 +58,11 @@ void Tempo::writeToOutputStream(ostream& out)
 	out.write(&mpqn[0], mpqn.size());
 }
 
+void Tempo::writeToOutputStream(ostream& out, bool writeType)
+{
+	MetaEvent::writeToOutputStream(out, writeType);
+}
+
 shared_ptr<MetaEvent> Tempo::parseTempo(int tick, int delta, MetaEventData* info)
 {
 	if (info->length.getValue() != 3) {

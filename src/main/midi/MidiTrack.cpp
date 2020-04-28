@@ -5,6 +5,7 @@
 #include <midi/event/meta/EndOfTrack.hpp>
 #include <midi/event/meta/Tempo.hpp>
 #include <midi/event/meta/TimeSignatureEvent.hpp>
+#include <midi/event/meta/TextualMetaEvent.hpp>
 #include <midi/util/MidiUtil.hpp>
 #include <midi/util/VariableLengthInt.hpp>
 
@@ -47,8 +48,6 @@ MidiTrack::MidiTrack(istream& in)
 	buffer.resize(mSize);
 	in.read(&buffer[0], mSize);
 
-	MLOG("trackData size " + to_string(mSize));
-
 	readTrackData(buffer);
 }
 const bool MidiTrack::VERBOSE;
@@ -74,17 +73,11 @@ void MidiTrack::readTrackData(vector<char>& data)
 
 	int eventCounter = 0;
 
-	MLOG("\n\nBeginning of a track");
-
 	while (available = (int)in.rdbuf()->in_avail() > 0) {
 		auto delta = mpc::midi::util::VariableLengthInt(in);
 		int value = delta.getValue();
 		totalTicks += value;
 
-		//MLOG("\nEvent " + to_string(eventCounter++));
-		//MLOG("Delta " + std::to_string(value));
-		//MLOG("Tick " + std::to_string(totalTicks));
-	
 		auto event = MidiEvent::parseEvent(totalTicks, value, in);
 
 		if (!event) {
@@ -93,7 +86,6 @@ void MidiTrack::readTrackData(vector<char>& data)
 		}
 		
 		if (dynamic_pointer_cast<meta::EndOfTrack>(event)) {
-			MLOG("endOfTrack Delta " + to_string(event->getDelta()));
 			mEndOfTrackDelta = event->getDelta();
 			break;
 		}
@@ -251,7 +243,6 @@ void MidiTrack::recalculateSize()
 	mSize = 0;
 	shared_ptr<MidiEvent> last;
 	for (auto& E : mEvents) {
-		string str = typeid(*E.get()).name();
 		mSize += E->getSize();
 		if (last && !E->requiresStatusByte(last.get())) {
 			mSize--;
@@ -271,8 +262,9 @@ void MidiTrack::writeToOutputStream(ostream& out)
 	}
 
 	out.write(&IDENTIFIER[0], IDENTIFIER.size());
-	auto size = mpc::midi::util::MidiUtil::intToBytes(mSize, 4);
-	out.write(&size[0], size.size());
+
+	auto trackSizeBuffer = mpc::midi::util::MidiUtil::intToBytes(mSize, 4);
+	out.write(&trackSizeBuffer[0], trackSizeBuffer.size());
 
 	shared_ptr<MidiEvent> lastEvent;
 	for (auto& event : mEvents) {

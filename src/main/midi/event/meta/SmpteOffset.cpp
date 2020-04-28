@@ -6,7 +6,6 @@
 #include <midi/event/meta/MetaEvent.hpp>
 #include <midi/event/meta/FrameRate.hpp>
 #include <midi/util/VariableLengthInt.hpp>
-#include <io/OutputStream.hpp>
 
 using namespace mpc::midi::event::meta;
 using namespace std;
@@ -101,6 +100,11 @@ void SmpteOffset::writeToOutputStream(ostream& out)
     out << mSeconds;
     out << mFrames;
     out << mSubFrames;
+}
+
+void SmpteOffset::writeToOutputStream(ostream& out, bool writeType)
+{
+	MetaEvent::writeToOutputStream(out, writeType);
 }
 
 shared_ptr<MetaEvent> SmpteOffset::parseSmpteOffset(int tick, int delta, MetaEventData* info)

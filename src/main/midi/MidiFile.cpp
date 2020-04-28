@@ -2,8 +2,6 @@
 #include <midi/MidiTrack.hpp>
 #include <midi/util/MidiUtil.hpp>
 
-#include <file/FileUtil.hpp>
-
 #include <sstream>
 
 using namespace mpc::midi;
@@ -130,25 +128,22 @@ void MidiFile::removeTrack(int pos)
 void MidiFile::writeToOutputStream(ostream& stream)
 {
 	stream.write(&IDENTIFIER[0], IDENTIFIER.size());
+	
 	auto val1 = MidiUtil::intToBytes(6, 4);
 	stream.write(&val1[0], val1.size());
+
 	auto type = MidiUtil::intToBytes(mType, 2);
 	stream.write(&type[0], type.size());
+
 	auto trackCount = MidiUtil::intToBytes(mTrackCount, 2);
 	stream.write(&trackCount[0], trackCount.size());
+
 	auto resolution = MidiUtil::intToBytes(mResolution, 2);
 	stream.write(&resolution[0], resolution.size());
 
 	for (auto& track : mTracks) {
 		track->writeToOutputStream(stream);
 	}
-}
-
-void MidiFile::writeToFile(moduru::file::File* outFile)
-{
-	auto fout = moduru::file::FileUtil::ofstreamw(outFile->getPath(), ios::out | ios::binary);
-	writeToOutputStream(fout);
-	fout.close();
 }
 
 void MidiFile::initFromBuffer(vector<char>& buffer)
@@ -163,14 +158,6 @@ void MidiFile::initFromBuffer(vector<char>& buffer)
 	mType = MidiUtil::bytesToInt(buffer, 8, 2);
     mTrackCount = MidiUtil::bytesToInt(buffer, 10, 2);
     mResolution = MidiUtil::bytesToInt(buffer, 12, 2);
-}
-
-vector<char> MidiFile::getBytes()
-{
-	ostringstream stream;
-	writeToOutputStream(stream);
-	auto buffer = stream.str();
-	return vector<char>(buffer.begin(), buffer.end());
 }
 
 MidiFile::~MidiFile() {

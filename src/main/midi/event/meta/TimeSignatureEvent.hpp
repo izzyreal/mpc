@@ -33,9 +33,10 @@ namespace mpc::midi::event::meta {
 
 	public:
 		int getEventSize() override;
+		void writeToOutputStream(ostream& out)  override;
+		void writeToOutputStream(ostream& out, bool writeType) override;
 
 	public:
-		void writeToOutputStream(ostream& out)  override;
 		static std::shared_ptr<MetaEvent> parseTimeSignature(int tick, int delta, MetaEventData* info);
 
 	private:
@@ -45,6 +46,7 @@ namespace mpc::midi::event::meta {
 		std::string toString();
 		virtual int compareTo(mpc::midi::event::MidiEvent* other);
 
+	public:
 		TimeSignature();
 		TimeSignature(int tick, int delta, int num, int den, int meter, int div);
 

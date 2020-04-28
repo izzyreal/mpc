@@ -27,12 +27,16 @@ namespace mpc::midi::event::meta {
 
 	public:
 		int getEventSize() override;
+		void writeToOutputStream(ostream& out) override;
+		void writeToOutputStream(ostream& out, bool writeType) override;
 
 	public:
-		void writeToOutputStream(ostream& out) override;
 		static std::shared_ptr<MetaEvent> parseTempo(int tick, int delta, MetaEventData* info);
+
+	public:
 		virtual int compareTo(mpc::midi::event::MidiEvent* other);
 
+	public:
 		Tempo();
 		Tempo(int tick, int delta, int mpqn);
 

@@ -205,11 +205,15 @@ void AbstractDisk::writeWav(mpc::sampler::Sound* s, MpcFile* f)
 
 void AbstractDisk::writeSequence(mpc::sequencer::Sequence* s, string fileName)
 {
-	if (checkExists(fileName)) return;
-	auto mw = mpc::file::mid::MidiWriter(s);
-	auto mfArray_ = mw.getBytes();
+	if (checkExists(fileName)) {
+		return;
+	}
+	
 	auto newMidFile = newFile(fileName);
-	newMidFile->setFileData(&mfArray_);
+	
+	auto writer = mpc::file::mid::MidiWriter(s);
+	writer.writeToFile(newMidFile->getFile().lock()->getPath());
+
 	flush();
 	initFiles();
 }
@@ -217,10 +221,8 @@ void AbstractDisk::writeSequence(mpc::sequencer::Sequence* s, string fileName)
 bool AbstractDisk::checkExists(string fileName)
 {
 	for (auto& str : getFileNames()) {
-		{
-			if (StrUtil::eqIgnoreCase(str, fileName)) {
-				return true;
-			}
+		if (StrUtil::eqIgnoreCase(str, fileName)) {
+			return true;
 		}
 	}
 	return false;
@@ -230,12 +232,14 @@ MpcFile* AbstractDisk::getFile(string fileName)
 {
 	auto tempfileName = StrUtil::replaceAll(fileName, ' ', "");
 	for (auto& f : files) {
-		if (StrUtil::eqIgnoreCase(StrUtil::replaceAll(f->getName(), ' ', ""), tempfileName))
+		if (StrUtil::eqIgnoreCase(StrUtil::replaceAll(f->getName(), ' ', ""), tempfileName)) {
 			return f;
+		}
 	}
 	for (auto& f : allFiles) {
-		if (StrUtil::eqIgnoreCase(StrUtil::replaceAll(f->getName(), ' ', ""), tempfileName))
+		if (StrUtil::eqIgnoreCase(StrUtil::replaceAll(f->getName(), ' ', ""), tempfileName)) {
 			return f;
+		}
 	}
 	return nullptr;
 }

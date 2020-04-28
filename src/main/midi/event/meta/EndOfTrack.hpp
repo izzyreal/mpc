@@ -11,11 +11,13 @@ namespace mpc::midi::event::meta {
 
 	public:
 		int getEventSize() override;
+		void writeToOutputStream(ostream& out) override;
+		void writeToOutputStream(ostream& out, bool writeType) override;
 
 	public:
-		void writeToOutputStream(ostream& out) override;
-		virtual int compareTo(mpc::midi::event::MidiEvent* other);
+		int compareTo(mpc::midi::event::MidiEvent* other);
 
+	public:
 		EndOfTrack(int tick, int delta);
 
 	};

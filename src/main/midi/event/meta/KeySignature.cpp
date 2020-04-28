@@ -56,6 +56,11 @@ void KeySignature::writeToOutputStream(ostream& out)
     out << mScale;
 }
 
+void KeySignature::writeToOutputStream(ostream& out, bool writeType)
+{
+    MetaEvent::writeToOutputStream(out, writeType);
+}
+
 shared_ptr<MetaEvent> KeySignature::parseKeySignature(int tick, int delta, MetaEventData* info)
 {
 	if (info->length.getValue() != 2) {

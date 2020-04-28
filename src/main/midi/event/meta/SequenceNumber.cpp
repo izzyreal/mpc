@@ -38,6 +38,11 @@ void SequenceNumber::writeToOutputStream(ostream& out)
     out << getLeastSignificantBits();
 }
 
+void SequenceNumber::writeToOutputStream(ostream& out, bool writeType)
+{
+    MetaEvent::writeToOutputStream(out, writeType);
+}
+
 shared_ptr<MetaEvent> SequenceNumber::parseSequenceNumber(int tick, int delta, MetaEventData* info)
 {
 	if (info->length.getValue() != 2) {

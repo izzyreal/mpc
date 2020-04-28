@@ -16,15 +16,19 @@ namespace mpc::midi::event::meta {
 		int getMostSignificantBits();
 		int getLeastSignificantBits();
 		int getSequenceNumber();
-		void writeToOutputStream(ostream& out)  override;
+
+	public:
 		static std::shared_ptr<MetaEvent> parseSequenceNumber(int tick, int delta, MetaEventData* info);
 
 	public:
+		void writeToOutputStream(ostream& out)  override;
+		void writeToOutputStream(ostream& out, bool writeType) override;
 		int getEventSize() override;
 
 	public:
 		int compareTo(mpc::midi::event::MidiEvent* other);
 
+	public:
 		SequenceNumber(int tick, int delta, int number);
 
 	};
