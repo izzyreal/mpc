@@ -7,9 +7,10 @@ using namespace mpc::midi::event::meta;
 using namespace std;
 
 TextualMetaEvent::TextualMetaEvent(int tick, int delta, int type, string text)
-	: MetaEvent(tick, delta, type, move(mpc::midi::util::VariableLengthInt(text.length())))
+	: MetaEvent(tick, delta, type)
 {
 	setText(text);
+	mLength = mpc::midi::util::VariableLengthInt(text.length());
 }
 
 void TextualMetaEvent::setText(string t)

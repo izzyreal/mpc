@@ -8,9 +8,10 @@ using namespace mpc::midi::event::meta;
 using namespace std;
 
 GenericMetaEvent::GenericMetaEvent(int tick, int delta, MetaEventData* info) 
-	: MetaEvent(tick, delta, info->type, info->length)
+	: MetaEvent(tick, delta, info->type)
 {
 	mData = info->data;
+	mLength = info->length;
 }
 
 int GenericMetaEvent::getEventSize()

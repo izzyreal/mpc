@@ -10,10 +10,11 @@ using namespace mpc::midi::event::meta;
 using namespace std;
 
 KeySignature::KeySignature(int tick, int delta, int key, int scale)
-    : MetaEvent(tick, delta, MetaEvent::KEY_SIGNATURE, move(mpc::midi::util::VariableLengthInt(2)))
+    : MetaEvent(tick, delta, MetaEvent::KEY_SIGNATURE)
 {
-	this->setKey(key);
+	setKey(key);
 	mScale = scale;
+    mLength = mpc::midi::util::VariableLengthInt(2);
 }
 
 const int KeySignature::SCALE_MAJOR;

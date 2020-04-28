@@ -7,8 +7,9 @@
 using namespace mpc::midi::event::meta;
 
 EndOfTrack::EndOfTrack(int tick, int delta)
-	: MetaEvent(tick, delta, MetaEvent::END_OF_TRACK, move(mpc::midi::util::VariableLengthInt(0)))
+	: MetaEvent(tick, delta, MetaEvent::END_OF_TRACK)
 {
+	mLength = mpc::midi::util::VariableLengthInt(0);
 }
 
 int EndOfTrack::getEventSize()

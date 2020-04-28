@@ -8,9 +8,10 @@
 using namespace mpc::midi::event::meta;
 
 SequencerSpecificEvent::SequencerSpecificEvent(int tick, int delta, std::vector<char> data)
-	: MetaEvent(tick, delta, MetaEvent::SEQUENCER_SPECIFIC, move(mpc::midi::util::VariableLengthInt(data.size())))
+	: MetaEvent(tick, delta, MetaEvent::SEQUENCER_SPECIFIC)
 {
 	mData = data;
+	mpc::midi::util::VariableLengthInt(data.size());
 }
 
 void SequencerSpecificEvent::setData(std::vector<char> data)

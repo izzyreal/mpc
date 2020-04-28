@@ -15,9 +15,10 @@ Tempo::Tempo() : Tempo(0, 0, DEFAULT_MPQN)
 }
 
 Tempo::Tempo(int tick, int delta, int mpqn)
-	: MetaEvent(tick, delta, MetaEvent::TEMPO, move(mpc::midi::util::VariableLengthInt(3)))
+	: MetaEvent(tick, delta, MetaEvent::TEMPO)
 {
 	setMpqn(mpqn);
+	mLength = mpc::midi::util::VariableLengthInt(3);
 }
 
 float Tempo::DEFAULT_BPM = 120.0f;

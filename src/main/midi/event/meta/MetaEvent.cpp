@@ -21,11 +21,10 @@
 using namespace mpc::midi::event::meta;
 using namespace std;
 
-MetaEvent::MetaEvent(int tick, int delta, int type, mpc::midi::util::VariableLengthInt& length)
+MetaEvent::MetaEvent(int tick, int delta, int type)
 	: mpc::midi::event::MidiEvent(tick, delta)
 {
 	mType = type & 255;
-	mLength = length;
 }
 
 void MetaEvent::writeToOutputStream(ostream& out, bool writeType)

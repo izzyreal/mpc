@@ -12,7 +12,7 @@ namespace mpc::midi::event::meta {
 		: public mpc::midi::event::MidiEvent
 	{
 
-	public:
+	protected:
 		int mType = 0;
 		mpc::midi::util::VariableLengthInt mLength;
 
@@ -39,7 +39,7 @@ namespace mpc::midi::event::meta {
 		static const int SEQUENCER_SPECIFIC{ 127 };
 
 	public:
-		MetaEvent(int tick, int delta, int type, mpc::midi::util::VariableLengthInt& length);
+		MetaEvent(int tick, int delta, int type);
 
 	};
 }
