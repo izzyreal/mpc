@@ -17,9 +17,6 @@ namespace mpc::midi::event::meta {
 		mpc::midi::util::VariableLengthInt mLength;
 
 	public:
-		int getEventSize() = 0;
-
-	public:
 		virtual void writeToOutputStream(ostream& output);
 		void writeToOutputStream(ostream& out, bool writeType) override;
 
