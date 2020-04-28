@@ -33,8 +33,8 @@ int MidiChannelPrefix::getEventSize()
 void MidiChannelPrefix::writeToOutputStream(ostream& out) 
 {
     MetaEvent::writeToOutputStream(out);
-    out << 1;
-    out << mChannel;
+    out << (char) 1;
+    out << (char) mChannel;
 }
 
 shared_ptr<MetaEvent> MidiChannelPrefix::parseMidiChannelPrefix(int tick, int delta, MetaEventData* info)

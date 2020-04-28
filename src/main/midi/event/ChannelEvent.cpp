@@ -81,13 +81,13 @@ void ChannelEvent::writeToOutputStream(ostream& out, bool writeType)
 	
 	if (writeType) {
 		auto typeChannel = (mType << 4) + mChannel;
-		out << typeChannel;
+		out << (char) typeChannel;
 	}
 	
-	out << mValue1;
+	out << (char) mValue1;
 
 	if (mType != PROGRAM_CHANGE && mType != CHANNEL_AFTERTOUCH) {
-		out << mValue2;
+		out << (char) mValue2;
 	}
 }
 

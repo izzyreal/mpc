@@ -19,7 +19,7 @@ int EndOfTrack::getEventSize()
 void EndOfTrack::writeToOutputStream(ostream& out) 
 {
 	MetaEvent::writeToOutputStream(out);
-	out << 0x00;
+	out << (char) 0x00;
 }
 
 

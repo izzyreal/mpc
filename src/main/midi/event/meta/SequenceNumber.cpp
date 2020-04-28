@@ -33,9 +33,9 @@ int SequenceNumber::getSequenceNumber()
 void SequenceNumber::writeToOutputStream(ostream& out) 
 {
     MetaEvent::writeToOutputStream(out);
-    out << 2;
-    out << getMostSignificantBits();
-    out << getLeastSignificantBits();
+    out << (char) 2;
+    out << (char) getMostSignificantBits();
+    out << (char) getLeastSignificantBits();
 }
 
 void SequenceNumber::writeToOutputStream(ostream& out, bool writeType)

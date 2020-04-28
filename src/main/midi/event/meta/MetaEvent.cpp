@@ -30,14 +30,14 @@ MetaEvent::MetaEvent(int tick, int delta, int type, mpc::midi::util::VariableLen
 
 void MetaEvent::writeToOutputStream(ostream& out, bool writeType)
 {
-	MetaEvent::writeToOutputStream(out);
+	writeToOutputStream(out);
 }
 
 void MetaEvent::writeToOutputStream(ostream& out)
 {
 	MidiEvent::writeToOutputStream(out, true);
-	out << 0xFF;
-	out << mType;
+	out << (char) 0xFF;
+	out << (char) mType;
 }
 
 

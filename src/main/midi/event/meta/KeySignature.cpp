@@ -51,9 +51,9 @@ int KeySignature::getEventSize()
 void KeySignature::writeToOutputStream(ostream& out) 
 {
     MetaEvent::writeToOutputStream(out);
-    out << 0x02;
-    out << mKey;
-    out << mScale;
+    out << (char) 0x02;
+    out << (char) mKey;
+    out << (char) mScale;
 }
 
 void KeySignature::writeToOutputStream(ostream& out, bool writeType)

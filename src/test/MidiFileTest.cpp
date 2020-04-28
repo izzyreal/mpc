@@ -35,41 +35,51 @@ using namespace std;
 SCENARIO("A MidiFile can be written", "[file]") {
 
 	GIVEN("An Mpc with a Sequence") {
-		
+
 		mpc::Mpc mpc;
 		mpc.init(44100, 1, 1);
 		auto sequencer = mpc.getSequencer().lock();
-		auto sequence = sequencer->getActiveSequence().lock();
+		auto sequence = sequencer->getSequence(0).lock();
+		sequence->init(1);
 		auto track = sequence->getTrack(0).lock();
+		track->setUsed(true);
 		auto disk = mpc.getDisk().lock();
 
-		track->addNoteEvent(0, 100);
+		auto noteEvent = track->addNoteEvent(0, 37).lock();
+		noteEvent->setDuration(10);
+		noteEvent->setVelocity(127);
 
 		auto name = string("foo.mid");
 		auto path = mpc::StartUp::storesPath + "MPC2000XL/" + name;
 		auto fileToDelete = File(path, nullptr);
 		fileToDelete.del();
 		fileToDelete.close();
-		/*
-		disk->writeSequence(sequence.get(), name);
-		auto files = disk->getFiles();
-		auto fileIterator = find_if(begin(files), end(files), [](MpcFile* f) { return f->getName().compare("FOO.MID") == 0; });
-		
-		REQUIRE(fileIterator != files.end());
-
-		auto mpcFile = (*fileIterator);
-		auto file = mpcFile->getFile().lock();
-		
-		REQUIRE(file->exists());
-		*/
 
 		auto midiWriter = MidiWriter(sequence.get());
 
 		midiWriter.writeToFile(path);
 
-		//auto midiReader = MidiReader(&mpc, mpcFile, sequence);
+		auto files = disk->getFiles();
+		auto fileIterator = find_if(begin(files), end(files), [](MpcFile* f) { return f->getName().compare("FOO.MID") == 0; });
 
-		//midiReader.parseSequence();
+		REQUIRE(fileIterator != files.end());
+
+		auto mpcFile = (*fileIterator);
+		auto file = mpcFile->getFile().lock();
+
+		REQUIRE(file->exists());
+	
+		auto midiReader = MidiReader(&mpc, mpcFile, sequence);
+
+		track = sequence->getTrack(0).lock();
+
+		auto events = track->getNoteEvents();
+
+		REQUIRE(events.size() == 1);
+		
+		auto event = events[0];
+
+		printf("foo");
 		
 	}
 }

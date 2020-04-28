@@ -70,11 +70,11 @@ int TimeSignature::getEventSize()
 void TimeSignature::writeToOutputStream(ostream& out) 
 {
     MetaEvent::writeToOutputStream(out);
-    out << 4;
-    out << mNumerator;
-    out << mDenominator;
-    out << mMeter;
-    out << mDivision;
+    out << (char) 4;
+    out << (char) mNumerator;
+    out << (char) mDenominator;
+    out << (char) mMeter;
+    out << (char) mDivision;
 }
 
 void TimeSignature::writeToOutputStream(ostream& out, bool writeType)

@@ -93,13 +93,13 @@ int SmpteOffset::getEventSize()
 
 void SmpteOffset::writeToOutputStream(ostream& out)
 {
-    MetaEvent::writeToOutputStream(out);
-    out << 5;
-    out << mHours;
-    out << mMinutes;
-    out << mSeconds;
-    out << mFrames;
-    out << mSubFrames;
+	MetaEvent::writeToOutputStream(out);
+	out << (char)5;
+	out << (char)mHours;
+	out << (char)mMinutes;
+	out << (char)mSeconds;
+	out << (char)mFrames;
+	out << (char)mSubFrames;
 }
 
 void SmpteOffset::writeToOutputStream(ostream& out, bool writeType)

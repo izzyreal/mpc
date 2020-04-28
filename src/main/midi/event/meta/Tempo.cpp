@@ -53,7 +53,7 @@ int Tempo::getEventSize()
 void Tempo::writeToOutputStream(ostream& out) 
 {
     MetaEvent::writeToOutputStream(out);
-	out << 3;
+	out << (char)3;
 	auto mpqn = mpc::midi::util::MidiUtil::intToBytes(mMPQN, 3);
 	out.write(&mpqn[0], mpqn.size());
 }
