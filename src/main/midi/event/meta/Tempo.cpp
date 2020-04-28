@@ -15,7 +15,7 @@ Tempo::Tempo() : Tempo(0, 0, DEFAULT_MPQN)
 }
 
 Tempo::Tempo(int tick, int delta, int mpqn)
-	: MetaEvent(tick, delta, MetaEvent::TEMPO, mpc::midi::util::VariableLengthInt(3))
+	: MetaEvent(tick, delta, MetaEvent::TEMPO, move(mpc::midi::util::VariableLengthInt(3)))
 {
 	setMpqn(mpqn);
 }

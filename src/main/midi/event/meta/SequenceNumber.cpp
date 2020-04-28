@@ -10,7 +10,7 @@ using namespace mpc::midi::event::meta;
 using namespace std;
 
 SequenceNumber::SequenceNumber(int tick, int delta, int number)
-	: MetaEvent(tick, delta, MetaEvent::SEQUENCE_NUMBER, mpc::midi::util::VariableLengthInt(2))
+	: MetaEvent(tick, delta, MetaEvent::SEQUENCE_NUMBER, move(mpc::midi::util::VariableLengthInt(2)))
 {
 	mNumber = number;
 }

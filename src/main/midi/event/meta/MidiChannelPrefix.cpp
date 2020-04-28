@@ -10,7 +10,7 @@ using namespace mpc::midi::event::meta;
 using namespace std;
 
 MidiChannelPrefix::MidiChannelPrefix(int tick, int delta, int channel)
-	: MetaEvent(tick, delta, MetaEvent::MIDI_CHANNEL_PREFIX, mpc::midi::util::VariableLengthInt(4))
+	: MetaEvent(tick, delta, MetaEvent::MIDI_CHANNEL_PREFIX, move(mpc::midi::util::VariableLengthInt(4)))
 {
 	mChannel = channel;
 }

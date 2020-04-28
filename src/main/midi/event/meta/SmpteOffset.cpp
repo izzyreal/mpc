@@ -11,7 +11,7 @@ using namespace mpc::midi::event::meta;
 using namespace std;
 
 SmpteOffset::SmpteOffset(int tick, int delta, FrameRate* fps, int hour, int min, int sec, int fr, int subfr)
-	: MetaEvent(tick, delta, MetaEvent::SMPTE_OFFSET, mpc::midi::util::VariableLengthInt(5))
+	: MetaEvent(tick, delta, MetaEvent::SMPTE_OFFSET, move(mpc::midi::util::VariableLengthInt(5)))
 {
 	mFrameRate = fps;
 	mHours = hour;

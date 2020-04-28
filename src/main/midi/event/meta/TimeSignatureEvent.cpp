@@ -17,7 +17,7 @@ TimeSignature::TimeSignature()
 }
 
 TimeSignature::TimeSignature(int tick, int delta, int num, int den, int meter, int div)
-    : MetaEvent(tick, delta, MetaEvent::TIME_SIGNATURE, mpc::midi::util::VariableLengthInt(4))
+    : MetaEvent(tick, delta, MetaEvent::TIME_SIGNATURE, move(mpc::midi::util::VariableLengthInt(4)))
 {
 	setTimeSignature(num, den, meter, div);
 }
