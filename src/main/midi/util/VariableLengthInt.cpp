@@ -75,9 +75,6 @@ void VariableLengthInt::parseBytes(stringstream& in)
 		mValue += ints[i] << shift;
 		shift -= 7;
 	}
-	if (mValue == 36) {
-		printf("foo");
-	}
 }
 
 void VariableLengthInt::buildBytes()

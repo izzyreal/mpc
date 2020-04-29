@@ -78,8 +78,6 @@ SCENARIO("A MidiFile can be written", "[file]") {
 		REQUIRE(events.size() == 1);
 		
 		auto event = events[0];
-
-		printf("foo");
 		
 	}
 }
