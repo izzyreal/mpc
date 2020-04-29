@@ -148,6 +148,10 @@ WavFile WavFile::openWavFile(const string& path)
         throw std::invalid_argument("Invalid Wav Header data, incorrect riff type ID");
     }
 
+    if (chunkSize % 2 != 0) {
+        chunkSize += 1;
+    }
+
     if (fileSize != chunkSize + 8) {
         throw std::invalid_argument("Invalid Wav Header data, incorrect chunk size");
     }
