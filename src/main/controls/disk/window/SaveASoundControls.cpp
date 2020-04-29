@@ -47,7 +47,7 @@ void SaveASoundControls::function(int i)
 	case 4:
 		s = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound(soundGui->getSoundIndex()).lock());
 		type = diskGui->getFileTypeSaveSound();
-		ext = type == 0 ? ".SND" : ".WAV";
+		ext = string(type == 0 ? ".SND" : ".WAV");
 		fileName = mpc::Util::getFileName(nameGui->getName()) + ext;
 		if (disk.lock()->checkExists(fileName)) {
 			ls.lock()->openScreen("filealreadyexists");

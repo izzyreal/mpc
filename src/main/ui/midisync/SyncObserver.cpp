@@ -60,13 +60,13 @@ void SyncObserver::displayModeOut()
 
 void SyncObserver::displayReceiveMMC()
 {
-    auto mmc = msGui->isReceiveMMCEnabled() ? "ON" : "OFF";
+	auto mmc = string(msGui->isReceiveMMCEnabled() ? "ON" : "OFF");
     receiveMMCField.lock()->setText(mmc);
 }
 
 void SyncObserver::displaySendMMC()
 {
-    auto mmc = msGui->isSendMMCEnabled() ? "ON" : "OFF";
+	auto mmc = string(msGui->isSendMMCEnabled() ? "ON" : "OFF");
     sendMMCField.lock()->setText(mmc);
 }
 

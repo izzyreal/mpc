@@ -55,7 +55,7 @@ namespace mpc {
 					std::weak_ptr<mpc::lcdgui::Label> createNewProgramLabel{};
 					std::weak_ptr<mpc::lcdgui::Field> createNewProgramField{};
 
-					std::vector<std::string> editNames = std::vector<std::string>{ "DISCARD", "LOOP FROM ST TO END", "SECTION \u00C4 NEW SOUND", "INSERT SOUND \u00C4 SECTION START", "DELETE SECTION", "SILENCE SECTION", "REVERSE SECTION", "TIME STRETCH", "SLICE SOUND" };
+					std::vector<std::string> editNames = std::vector<std::string>{ "DISCARD", "LOOP FROM ST TO END", u8"SECTION \u00C4 NEW SOUND", u8"INSERT SOUND \u00C4 SECTION START", "DELETE SECTION", "SILENCE SECTION", "REVERSE SECTION", "TIME STRETCH", "SLICE SOUND" };
 					std::vector<std::string> timeStretchPresetNames{};
 
 				private:

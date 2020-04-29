@@ -35,7 +35,7 @@ void TransObserver::displayTransposeAmount()
 
 void TransObserver::displayTr()
 {
-	auto trName = transGui->getTr() == -1 ? "ALL" : mpc->getSequencer().lock()->getActiveSequence().lock()->getTrack(transGui->getTr()).lock()->getName();
+	auto trName = string(transGui->getTr() == -1 ? "ALL" : mpc->getSequencer().lock()->getActiveSequence().lock()->getTrack(transGui->getTr()).lock()->getName());
 	trField.lock()->setTextPadded(transGui->getTr() + 1, "0");
 	trackNameLabel.lock()->setText(trName);
 }

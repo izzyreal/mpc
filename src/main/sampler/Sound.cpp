@@ -110,6 +110,11 @@ int Sound::getLastFrameIndex()
     return oscillatorControls->getLastFrameIndex();
 }
 
+int Sound::getFrameCount()
+{
+    return oscillatorControls->getFrameCount();
+}
+
 void Sound::setMono(bool mono)
 {
     oscillatorControls->setMono(mono);

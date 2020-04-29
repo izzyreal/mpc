@@ -81,7 +81,8 @@ NextSeqPadObserver::NextSeqPadObserver(mpc::Mpc* mpc)
 void NextSeqPadObserver::displayNextSq()
 {
 	auto lSequencer = sequencer.lock();
-    nextSqLabel.lock()->setText(lSequencer->getNextSq() == -1 ? "" : moduru::lang::StrUtil::padLeft(to_string(lSequencer->getNextSq() + 1), "0", 2) + "-" + lSequencer->getSequence(lSequencer->getNextSq()).lock()->getName());
+	auto number = string(lSequencer->getNextSq() == -1 ? "" : moduru::lang::StrUtil::padLeft(to_string(lSequencer->getNextSq() + 1), "0", 2));
+    nextSqLabel.lock()->setText(number + "-" + lSequencer->getSequence(lSequencer->getNextSq()).lock()->getName());
 }
 
 int NextSeqPadObserver::bankoffset()

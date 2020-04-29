@@ -161,7 +161,7 @@ void DiskObserver::displaySaveAs()
 
 void DiskObserver::displayFileType()
 {
-	fileTypeField.lock()->setText(diskGui->getFileTypeSaveSound() == 0 ? "MPC2000" : "WAV");
+	fileTypeField.lock()->setText(string(diskGui->getFileTypeSaveSound() == 0 ? "MPC2000" : "WAV"));
 }
 
 void DiskObserver::displaySave()
@@ -176,7 +176,7 @@ void DiskObserver::displaySave()
 
 void DiskObserver::displayReplaceSameSounds()
 {
-	replaceSameSoundsField.lock()->setText(diskGui->getSaveReplaceSameSounds() ? "YES" : "NO");
+	replaceSameSoundsField.lock()->setText(string(diskGui->getSaveReplaceSameSounds() ? "YES" : "NO"));
 }
 
 void DiskObserver::displayFree()
@@ -202,8 +202,8 @@ void DiskObserver::displayAssignToNote()
 {
 	auto nn = samplerGui->getNote();
 	auto pn = program.lock()->getPadNumberFromNote(nn);
-	auto padName = pn == -1 ? "OFF" : sampler.lock()->getPadName(pn);
-	auto noteName = nn == 34 ? "--" : to_string(nn);
+	auto padName = string(pn == -1 ? "OFF" : sampler.lock()->getPadName(pn));
+	auto noteName = string(nn == 34 ? "--" : to_string(nn));
 	assignToNoteField.lock()->setText(noteName + "/" + padName);
 }
 
@@ -319,7 +319,7 @@ void DiskObserver::displayFile()
 			file = dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(mpcSoundPlayerChannel->getProgram()).lock())->getName();
 			break;
 		case 4:
-			file = lSampler->getSoundCount() == 0 ? "" : dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound(soundGui->getSoundIndex()).lock())->getName();
+			file = string(lSampler->getSoundCount() == 0 ? "" : dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound(soundGui->getSoundIndex()).lock())->getName());
 			break;
 		}
 		lFileField->setText(file);
@@ -393,7 +393,7 @@ void DiskObserver::displayType()
 
 void DiskObserver::displayLoadReplaceSound()
 {
-	loadReplaceSoundField.lock()->setText(diskGui->getLoadReplaceSound() ? "YES" : "NO(FASTER)");
+	loadReplaceSoundField.lock()->setText(string(diskGui->getLoadReplaceSound() ? "YES" : "NO(FASTER)"));
 }
 
 void DiskObserver::displayView()

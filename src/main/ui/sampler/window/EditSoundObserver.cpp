@@ -31,8 +31,8 @@ EditSoundObserver::EditSoundObserver(mpc::Mpc* mpc)
 		}
 	}
 	timeStretchPresetNames = newTimeStretchPresetNames;
-	//timeStretchPresetNames->set(int (52), " SLOW ORCH.  B");
-	auto uis = mpc->getUis().lock();
+
+    auto uis = mpc->getUis().lock();
 	editSoundGui = uis->getEditSoundGui();
 	editSoundGui->addObserver(this);
 	sequencerWindowGui = uis->getSequencerWindowGui();

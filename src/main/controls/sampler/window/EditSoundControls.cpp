@@ -103,39 +103,60 @@ void EditSoundControls::function(int j)
 			soundGui->setSoundIndex(lSampler->getSoundCount() - 1, lSampler->getSoundCount());
 		}
 		else if (editSoundGui->getEdit() == 3) {
-			auto source = lSampler->getSound(editSoundGui->getInsertSndNr()).lock();
+			// Insert sound into section start
+			auto source = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound(editSoundGui->getInsertSndNr()).lock());
 			auto destination = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound(soundGui->getSoundIndex()).lock());
-			int destinationStart = sound->getStart();
-			int sourceLength = source->getSampleData()->size();
-			if (!source->isMono()) sourceLength /= 2;
-
-			int destinationLength = destination->getSampleData()->size();
-			if (!destination->isMono()) destinationLength /= 2;
-
-			auto newSampleLength = sourceLength + destinationLength;
-			if (!destination->isMono()) newSampleLength *= 2;
-
+			
+			int destinationStartFrame = sound->getStart();
+	
+			int sourceFrameCount = source->getFrameCount();
+			int destinationFrameCount = destination->getFrameCount();
+			
+			auto newSoundFrameCount = sourceFrameCount + destinationFrameCount;
+			auto newSoundSampleCount = newSoundFrameCount;
+			
 			auto sourceData = source->getSampleData();
-			vector<float> frame{ 0 };
-			if (destination->isMono()) {
-				for (int i = destinationStart; i < destinationStart + sourceLength; i++) {
-					frame[0] = sourceData->at(i - destinationStart);
-					destination->insertFrame(frame, i);
+			auto destinationData = destination->getSampleData();
+
+			if (!destination->isMono()) {
+				newSoundSampleCount *= 2;
+			}
+
+			vector<float> newData(newSoundSampleCount);
+			int sourceFrameCounter = 0;
+			int destinationFrameCounter = 0;
+			for (int i = 0; i < newSoundFrameCount; i++) {
+				if (i < destinationStartFrame) {
+					newData[i] = (*destinationData)[destinationFrameCounter];
+					if (!destination->isMono()) {
+						newData[i + newSoundFrameCount] = (*destinationData)[destinationFrameCounter + destinationFrameCount];
+					}
+					destinationFrameCounter++;
+				}
+				else if (i < destinationStartFrame + sourceFrameCount) {
+					newData[i] = (*sourceData)[sourceFrameCounter];
+					if (!destination->isMono()) {
+						if (source->isMono()) {
+							newData[i + newSoundFrameCount] = newData[i];
+						}
+						else {
+							newData[i + newSoundFrameCount] = (*sourceData)[sourceFrameCounter + sourceFrameCount];
+						}
+						
+					}
+					sourceFrameCounter++;
+				}
+				else {
+					newData[i] = (*destinationData)[destinationFrameCounter];
+					if (!destination->isMono()) {
+						newData[i + newSoundFrameCount] = (*destinationData)[destinationFrameCounter + destinationFrameCount];
+					}
+					destinationFrameCounter++;
 				}
 			}
-			else  {
-				frame.resize(2);
-				for (int i = destinationStart; i < destinationStart + sourceLength; i++) {
-					frame[0] = sourceData->at(i - destinationStart);
-					if (source->isMono()) {
-						frame[1] = frame[0];
-					}
-					else {
-						frame[1] = sourceData->at(i - destinationStart + (source->getLastFrameIndex() + 1));
-					}
-					destination->insertFrame(frame, i);
-				}
-			}
+			
+			(*destination->getSampleData()) = newData;
+			destination->setEnd(newSoundFrameCount);
 			destination->setStart(0);
 			destination->setMono(destination->isMono());
 			destination->setLoopTo(destination->getEnd());
@@ -143,15 +164,15 @@ void EditSoundControls::function(int j)
 		else if (editSoundGui->getEdit() == 4) {
 			lSampler->deleteSection(soundGui->getSoundIndex(), sound->getStart(), sound->getEnd());
 			sound->setStart(0);
-			sound->setEnd(sound->getLastFrameIndex() + 1);
-			sound->setLoopTo(sound->getLastFrameIndex() + 1);
+			sound->setEnd(sound->getFrameCount());
+			sound->setLoopTo(sound->getFrameCount());
 		}
 		else if (editSoundGui->getEdit() == 5) {
 			auto start = sound->getStart();
 			auto end = sound->getEnd();
 			for (int i = start; i < end; i++) {
 				sound->getSampleData()->at(i) = 0.0f;
-				if (!sound->isMono()) sound->getSampleData()->at(i + sound->getLastFrameIndex() + 1) = 0.0f;
+				if (!sound->isMono()) sound->getSampleData()->at(i + sound->getFrameCount()) = 0.0f;
 			}
 			lLs->openScreen(editSoundGui->getPreviousScreenName());
 			break;
@@ -167,16 +188,16 @@ void EditSoundControls::function(int j)
 				auto sampleData = sound->getSampleData();
 				for (int i = 0; i < start; i++) {
 					newSampleDataLeft[i] = (*sampleData)[i];
-					newSampleDataRight[i] = (*sampleData)[i + sound->getLastFrameIndex()];
+					newSampleDataRight[i] = (*sampleData)[i + sound->getFrameCount()];
 				}
 				for (int i = start; i < end; i++) {
 					newSampleDataLeft[i] = (*sampleData)[reverseCounter];
-					newSampleDataRight[i] = (*sampleData)[reverseCounter + sound->getLastFrameIndex()];
+					newSampleDataRight[i] = (*sampleData)[reverseCounter + sound->getFrameCount()];
 					reverseCounter--;
 				}
-				for (int i = end; i < sound->getLastFrameIndex(); i++) {
+				for (int i = end; i < sound->getFrameCount(); i++) {
 					newSampleDataLeft[i] = (*sampleData)[i];
-					newSampleDataRight[i] = (*sampleData)[i + sound->getLastFrameIndex()];
+					newSampleDataRight[i] = (*sampleData)[i + sound->getFrameCount()];
 				}
 				newSampleData = mpc::sampler::Sampler::mergeToStereo(newSampleDataLeft, newSampleDataRight);
 			}
@@ -234,7 +255,7 @@ void EditSoundControls::function(int j)
 				zone.lock()->setName(editSoundGui->getNewName() + to_string(i+1));
 			}
 			soundGui->setSoundIndex(lSampler->getSoundCount() - soundGui->getNumberOfZones(), lSampler->getSoundCount());
-			soundGui->initZones(lSampler->getSound(soundGui->getSoundIndex()).lock()->getLastFrameIndex());
+			soundGui->initZones(lSampler->getSound(soundGui->getSoundIndex()).lock()->getLastFrameIndex() + 1);
 			if (editSoundGui->getCreateNewProgram()) {
 				auto p = lSampler->addProgram().lock();
 				p->setName(source->getName());
@@ -253,7 +274,7 @@ void EditSoundControls::function(int j)
 			}
 		}
 		soundGui->setSoundIndex(lSampler->getSoundCount() - 1, lSampler->getSoundCount());
-		soundGui->initZones(lSampler->getSound(soundGui->getSoundIndex()).lock()->getLastFrameIndex());
+		soundGui->initZones(lSampler->getSound(soundGui->getSoundIndex()).lock()->getLastFrameIndex() + 1);
 		lLs->openScreen(editSoundGui->getPreviousScreenName());
 		break;
 	}

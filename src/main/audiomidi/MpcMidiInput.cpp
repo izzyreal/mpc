@@ -49,7 +49,7 @@ void MpcMidiInput::transport(ctoot::midi::core::MidiMessage* msg, int timeStamp)
 	eventAdapter->process(msg, swGui);
 	auto status = msg->getStatus();
 	auto lSampler = sampler.lock();
-	string notify_ = index == 0 ? "a" : "b";
+	string notify_ = string(index == 0 ? "a" : "b");
 	auto channel = dynamic_cast<ctoot::midi::core::ShortMessage*>(msg)->getChannel();
 	notify_ += to_string(channel);
 	setChanged();

@@ -33,7 +33,7 @@ void SoundSaver::static_saveSounds(void* this_p)
 
 void SoundSaver::saveSounds()
 {
-    string const ext = wav ? ".WAV" : ".SND";
+	string const ext = string(wav ? ".WAV" : ".SND");
 	auto lDisk = disk.lock();
 	for (auto s : sounds) {
 		auto skip = false;

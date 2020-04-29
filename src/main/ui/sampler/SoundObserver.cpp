@@ -207,7 +207,8 @@ void SoundObserver::displayType()
 		typeLabel.lock()->setText("");
 		return;
 	}
-	typeLabel.lock()->setText("Type:" + sampler.lock()->getSound(soundGui->getSoundIndex()).lock()->isMono() ? "MONO" : "STEREO");
+	auto mono = sampler.lock()->getSound(soundGui->getSoundIndex()).lock()->isMono();
+	typeLabel.lock()->setText("Type:" + string(mono ? "MONO" : "STEREO"));
 }
 
 void SoundObserver::displayRate()

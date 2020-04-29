@@ -8,3 +8,5 @@ conan install -s build_type=Release -g cmake_multi ../../ mpc/0.1@izmar/dev --bu
 conan build ../../
 conan install -s build_type=Debug -g cmake_multi ../../ mpc/0.1@izmar/dev
 conan build ../../
+
+cd ../../

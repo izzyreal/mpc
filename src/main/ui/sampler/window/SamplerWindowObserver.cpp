@@ -202,12 +202,12 @@ void SamplerWindowObserver::displayTune()
 	auto lProgram = program.lock();
 	if (csn.compare("autochromaticassignment") == 0) {
 		int value = swGui->getTune();
-		auto prefix = value < 0 ? "-" : " ";
+		string prefix = value < 0 ? "-" : " ";
 		tuneField.lock()->setText(prefix + moduru::lang::StrUtil::padLeft(to_string(abs(value)), " ", 3));
 	}
 	else {
 		auto value = lSampler->getLastNp(lProgram.get())->getTune();
-		auto prefix = value < 0 ? "-" : " ";
+		string prefix = value < 0 ? "-" : " ";
 		tuneField.lock()->setText(prefix + moduru::lang::StrUtil::padLeft(to_string(abs(value)), " ", 3));
 	}
 }
@@ -217,7 +217,7 @@ void SamplerWindowObserver::displayVeloPitch()
 	auto lSampler = sampler.lock();
 	auto lProgram = program.lock();
 	auto value = lSampler->getLastNp(lProgram.get())->getVelocityToPitch();
-	auto prefix = value < 0 ? "-" : " ";
+	string prefix = value < 0 ? "-" : " ";
 	veloPitchField.lock()->setText(prefix + moduru::lang::StrUtil::padLeft(to_string(abs(value)), " ", 3));
 }
 
@@ -265,7 +265,7 @@ void SamplerWindowObserver::displayNote()
 	auto pad = lProgram->getPad(pn);
 	auto padName = pn != -1 ? lSampler->getPadName(pn) : "OFF";
 	auto sampleName = sn != -1 ? lSampler->getSoundName(sn) : "OFF";
-	auto stereo = pad->getStereoMixerChannel().lock()->isStereo() && sn != -1 ? "(ST)" : "";
+	string stereo = pad->getStereoMixerChannel().lock()->isStereo() && sn != -1 ? "(ST)" : "";
 	noteField.lock()->setText(to_string(noteParameters->getNumber()) + "/" + padName + "-" + moduru::lang::StrUtil::padRight(sampleName, " ", 16) + stereo);
 }
 
@@ -488,7 +488,7 @@ void SamplerWindowObserver::displayAutoChromAssSnd()
 	auto lSampler = sampler.lock();
 	auto sn = swGui->getAutoChromAssSnd();
 	auto sampleName = sn == -1 ? "OFF" : lSampler->getSoundName(sn);
-	auto stereo = sn == -1 ? "" : lSampler->getSound(sn).lock()->isMono() ? "" : "(ST)";
+	string stereo = sn == -1 ? "" : lSampler->getSound(sn).lock()->isMono() ? "" : "(ST)";
 	autoChromAssSndField.lock()->setText(moduru::lang::StrUtil::padRight(sampleName, " ", 16) + stereo);
 }
 

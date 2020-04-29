@@ -75,7 +75,7 @@ void FileAlreadyExistsControls::function(int i)
 		else if (ls.lock()->getPreviousScreenName().compare("saveasound") == 0) {
 			auto s = sampler.lock()->getSound(soundGui->getSoundIndex());
 			auto type = diskGui->getFileTypeSaveSound();
-			auto ext = type == 0 ? ".SND" : ".WAV";
+			auto ext = string(type == 0 ? ".SND" : ".WAV");
 			auto fileName = mpc::Util::getFileName(nameGui->getName()) + ext;
 			lDisk->getFile(fileName)->del();
 			lDisk->flush();

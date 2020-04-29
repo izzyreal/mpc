@@ -39,6 +39,7 @@ namespace mpc {
 			int getSampleRate();
 			void setSampleRate(int sr);
 			int getLastFrameIndex();
+			int getFrameCount();
 			void setMono(bool mono);
 			void setEnd(int end);
 			void setLevel(int level);

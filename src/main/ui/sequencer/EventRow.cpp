@@ -305,7 +305,7 @@ void EventRow::setMixerEventValues()
 	}
 	tfArray[0].lock()->setText(mixerParamNames[me->getParameter()]);
 	auto nn = program.lock()->getPad(me->getPad())->getNote();
-	tfArray[1].lock()->setText(nn == 34 ? "--" : to_string(nn) + "/" + lSampler->getPadName(me->getPad()));
+	tfArray[1].lock()->setText(string(nn == 34 ? "--" : to_string(nn)) + "/" + lSampler->getPadName(me->getPad()));
 	if (me->getParameter() == 1) {
 		labelArray[2].lock()->setText("P:");
 		auto panning = "L";
