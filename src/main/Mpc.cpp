@@ -42,7 +42,6 @@ using namespace std;
 Mpc::Mpc()
 {
 	moduru::Logger::l.setPath(mpc::StartUp::logFilePath);
-	MLOG("Mpc constructor");
 
 	hardware = make_shared<hardware::Hardware>(this);
 
@@ -54,10 +53,10 @@ Mpc::Mpc()
 void Mpc::init(const int sampleRate, const int inputCount, const int outputCount)
 {
 	sequencer = make_shared<mpc::sequencer::Sequencer>(this);
-	MLOG("sequencer created.");
+	MLOG("Sequencer created");
 
 	sampler = make_shared<mpc::sampler::Sampler>(this);
-	MLOG("sampler created.");
+	MLOG("Sampler created");
 
 	mpcMidiInputs = vector<mpc::audiomidi::MpcMidiInput*>{ new mpc::audiomidi::MpcMidiInput(0, this), new mpc::audiomidi::MpcMidiInput(1, this) };
 
@@ -65,19 +64,19 @@ void Mpc::init(const int sampleRate, const int inputCount, const int outputCount
 	* AudioMidiServices requires sampler to exist.
 	*/
 	audioMidiServices = make_shared<mpc::audiomidi::AudioMidiServices>(this);
-	MLOG("audio-midi-services created.");
+	MLOG("AudioMidiServices created");
 
 	sequencer->init();
-	MLOG("sequencer initialized.");
+	MLOG("Sequencer initialized");
 
 	sampler->init();
-	MLOG("sampler initialized.");
+	MLOG("Sampler initialized");
 
 	eventHandler = make_shared<mpc::audiomidi::EventHandler>(this);
-	MLOG("eventhandler created.");
+	MLOG("Eeventhandler created");
 
 	audioMidiServices->start(sampleRate, inputCount, outputCount);
-	MLOG("audioMidiServices test started.");
+	MLOG("AudioMidiServices started");
 
 	controls = make_shared<controls::Controls>(this);
 
@@ -85,6 +84,7 @@ void Mpc::init(const int sampleRate, const int inputCount, const int outputCount
 	diskController->initDisks();
 
 	hardware->getSlider().lock()->setValue(mpc::nvram::NvRam::getSlider());
+	MLOG("Mpc is ready")
 }
 
 void Mpc::loadDemoBeat() {
