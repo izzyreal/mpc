@@ -45,10 +45,10 @@ void UserControls::turnWheel(int i)
 	}
 	else if (param.compare("tsig") == 0) {
 		if (i > 0) {
-			lUd->getTimeSig()->increase();
+			lUd->getTimeSig().increase();
 		}
 		else {
-			lUd->getTimeSig()->decrease();
+			lUd->getTimeSig().decrease();
 		}
 	}
 	else if (param.compare("bars") == 0) {

@@ -8,7 +8,6 @@
 #include <lcdgui/Field.hpp>
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>
-#include <sequencer/TimeSignature.hpp>
 #include <lcdgui/Label.hpp>
 
 #include <cmath>
@@ -19,15 +18,15 @@ using namespace mpc::ui::sequencer;
 using namespace std;
 
 UserObserver::UserObserver(mpc::Mpc* mpc)
+	: timeSig(mpc::StartUp::getUserDefaults().lock()->getTimeSig())
 {
 	busNames = { "MIDI", "DRUM1", "DRUM2", "DRUM3", "DRUM4" };
 	this->mpc = mpc;
 	ud = mpc::StartUp::getUserDefaults();
 	auto lUd = ud.lock();
-	timeSig = lUd->getTimeSig();
-	timeSig->deleteObservers();
-	timeSig->addObserver(this);
-	lUd->deleteObservers();
+	
+	timeSig.addObserver(this);
+	
 	lUd->addObserver(this);
 	auto ls = mpc->getLayeredScreen().lock();
 	tempoField = ls->lookupField("tempo");
@@ -69,7 +68,7 @@ void UserObserver::displayLoop()
 void UserObserver::displayTsig()
 {
 	auto lUd = ud.lock(); 
-	tsigField.lock()->setText(to_string(lUd->getTimeSig()->getNumerator()) + "/" + to_string(lUd->getTimeSig()->getDenominator()));
+	tsigField.lock()->setText(to_string(timeSig.getNumerator()) + "/" + to_string(timeSig.getDenominator()));
 }
 
 void UserObserver::displayBars()
@@ -181,4 +180,5 @@ void UserObserver::displayDeviceName()
 
 UserObserver::~UserObserver() {
 	ud.lock()->deleteObserver(this);
+	timeSig.deleteObserver(this);
 }

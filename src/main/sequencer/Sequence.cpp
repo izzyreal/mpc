@@ -308,7 +308,7 @@ void Sequence::init(int lastBarIndex)
 	setLastBar(lastBarIndex);
 	initMetaTracks();
 	initLoop();
-	setTimeSignature(0, getLastBar(), lUserDefaults->getTimeSig()->getNumerator(), lUserDefaults->getTimeSig()->getDenominator());
+	setTimeSignature(0, getLastBar(), lUserDefaults->getTimeSig().getNumerator(), lUserDefaults->getTimeSig().getDenominator());
 }
 
 void Sequence::setTimeSignature(int firstBar, int tsLastBar, int num, int den)

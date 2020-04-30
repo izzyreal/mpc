@@ -210,8 +210,8 @@ void Defaults::setBarCount(mpc::ui::UserDefaults* ud)
 
 void Defaults::setTimeSig(mpc::ui::UserDefaults* ud)
 {
-	saveBytes[TIMESIG_NUM_OFFSET] = (ud->getTimeSig()->getNumerator());
-	saveBytes[TIMESIG_DEN_OFFSET] = (ud->getTimeSig()->getDenominator());
+	saveBytes[TIMESIG_NUM_OFFSET] = (ud->getTimeSig().getNumerator());
+	saveBytes[TIMESIG_DEN_OFFSET] = (ud->getTimeSig().getDenominator());
 }
 
 void Defaults::setNames(mpc::ui::UserDefaults* ud)

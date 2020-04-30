@@ -1,6 +1,5 @@
 #include <ui/UserDefaults.hpp>
 
-#include <sequencer/TimeSignature.hpp>
 #include <lang/StrUtil.hpp>
 
 using namespace mpc::ui;
@@ -24,9 +23,8 @@ UserDefaults::UserDefaults()
 	}
 
 	lastBar = 1;
-	timeSig = new mpc::sequencer::TimeSignature();
-	timeSig->setNumerator(4);
-	timeSig->setDenominator(4);
+	timeSig.setNumerator(4);
+	timeSig.setDenominator(4);
 	deviceNames.push_back(string("        "));
 
 	for (int i = 1; i < 33; i++) {
@@ -220,7 +218,7 @@ int UserDefaults::getLastBarIndex()
     return lastBar;
 }
 
-mpc::sequencer::TimeSignature* UserDefaults::getTimeSig()
+mpc::sequencer::TimeSignature& UserDefaults::getTimeSig()
 {
     return timeSig;
 }
@@ -252,13 +250,8 @@ void UserDefaults::setSequenceName(string name)
 
 void UserDefaults::setTimeSig(int num, int den)
 {
-	if (timeSig != nullptr) {
-		delete timeSig;
-	}
-
-    timeSig = new mpc::sequencer::TimeSignature();
-    timeSig->setNumerator(num);
-    timeSig->setDenominator(den);
+    timeSig.setNumerator(num);
+    timeSig.setDenominator(den);
 }
 
 void UserDefaults::setTrackName(int i, string s)
@@ -267,5 +260,4 @@ void UserDefaults::setTrackName(int i, string s)
 }
 
 UserDefaults::~UserDefaults() {
-	delete timeSig;
 }
