@@ -13,7 +13,7 @@ namespace ctoot {
 
 namespace mpc {
 
-	class Mpc;
+	
 
 	namespace lcdgui {
 		class LayeredScreen;
@@ -43,7 +43,7 @@ namespace mpc {
 			{
 
 			private:
-				mpc::Mpc* mpc;
+				
 				std::weak_ptr<mpc::sampler::Sampler> sampler{};
 				SamplerGui* samplerGui{ nullptr };
 				MixerSetupGui* mixerSetupGui{ nullptr };
@@ -78,7 +78,7 @@ namespace mpc {
 				void update(moduru::observer::Observable* o, nonstd::any arg) override;
 
 			public:
-				ChannelSettingsObserver(mpc::Mpc* mpc);
+				ChannelSettingsObserver();
 				~ChannelSettingsObserver();
 
 			};

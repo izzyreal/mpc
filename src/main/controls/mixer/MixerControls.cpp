@@ -17,8 +17,8 @@
 using namespace mpc::controls::mixer;
 using namespace std;
 
-MixerControls::MixerControls(mpc::Mpc* mpc) 
-	: AbstractMixerControls(mpc)
+MixerControls::MixerControls() 
+	: AbstractMixerControls()
 {
 }
 
@@ -90,7 +90,7 @@ void MixerControls::turnWheel(int i)
 
 	bool sSrcDrum = mixerSetupGui->isStereoMixSourceDrum();
 	bool iSrcDrum = mixerSetupGui->isIndivFxSourceDrum();
-	auto drum = mpc->getDrum(samplerGui->getSelectedDrum());
+	auto drum = Mpc::instance().getDrum(samplerGui->getSelectedDrum());
 
 	auto smc = sSrcDrum ? drum->getStereoMixerChannels().at(pad).lock() : lProgram->getPad(pad)->getStereoMixerChannel().lock();
 	auto smcs = sSrcDrum ? drum->getStereoMixerChannels() : vector<weak_ptr<ctoot::mpc::MpcStereoMixerChannel>>(16);

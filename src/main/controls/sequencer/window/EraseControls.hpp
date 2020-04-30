@@ -20,7 +20,7 @@ namespace mpc {
 					void turnWheel(int i) override;
 					void function(int i) override;
 
-					EraseControls(mpc::Mpc* mpc);
+					EraseControls();
 
 				};
 

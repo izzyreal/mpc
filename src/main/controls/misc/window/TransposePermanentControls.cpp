@@ -9,8 +9,8 @@
 using namespace mpc::controls::misc::window;
 using namespace std;
 
-TransposePermanentControls::TransposePermanentControls(mpc::Mpc* mpc)
-	: AbstractMiscControls(mpc)
+TransposePermanentControls::TransposePermanentControls()
+	: AbstractMiscControls()
 {
 }
 

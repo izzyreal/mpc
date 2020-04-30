@@ -9,8 +9,8 @@
 using namespace mpc::controls::sequencer::window;
 using namespace std;
 
-PasteEventControls::PasteEventControls(mpc::Mpc* mpc)
-	: AbstractSequencerControls(mpc)
+PasteEventControls::PasteEventControls()
+	: AbstractSequencerControls()
 {
 }
 

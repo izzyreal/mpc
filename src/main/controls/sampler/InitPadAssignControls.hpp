@@ -14,7 +14,7 @@ namespace mpc {
 				void turnWheel(int i) override;
 				void function(int i) override;
 
-				InitPadAssignControls(mpc::Mpc* mpc);
+				InitPadAssignControls();
 
 			};
 

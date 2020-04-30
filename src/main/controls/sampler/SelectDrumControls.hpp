@@ -13,7 +13,7 @@ namespace mpc {
 				typedef AbstractSamplerControls super;
 				void function(int i) override;
 
-				SelectDrumControls(mpc::Mpc* mpc);
+				SelectDrumControls();
 
 			};
 

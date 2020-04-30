@@ -10,8 +10,8 @@ using namespace mpc::controls::sequencer::window;
 using namespace mpc::sequencer;
 using namespace std;
 
-EditVelocityControls::EditVelocityControls(mpc::Mpc* mpc)
-	: AbstractSequencerControls(mpc)
+EditVelocityControls::EditVelocityControls()
+	: AbstractSequencerControls()
 {
 }
 

@@ -9,8 +9,8 @@
 using namespace mpc::controls::mixer::window;
 using namespace std;
 
-ChannelSettingsControls::ChannelSettingsControls(mpc::Mpc* mpc)
-	: AbstractMixerControls(mpc)
+ChannelSettingsControls::ChannelSettingsControls()
+	: AbstractMixerControls()
 {
 }
 

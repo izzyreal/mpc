@@ -10,13 +10,13 @@
 using namespace mpc::ui::vmpc;
 using namespace std;
 
-VmpcDiskObserver::VmpcDiskObserver(mpc::Mpc* mpc) 
+VmpcDiskObserver::VmpcDiskObserver() 
 {
-	this->mpc = mpc;
-	deviceGui = mpc->getUis().lock()->getDeviceGui();
+	
+	deviceGui = Mpc::instance().getUis().lock()->getDeviceGui();
 	deviceGui->deleteObservers();
 	deviceGui->addObserver(this);
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	scsiField = ls ->lookupField("scsi");
 	accessTypeField = ls->lookupField("accesstype");
 	rootField = ls->lookupField("root");
@@ -48,7 +48,7 @@ void VmpcDiskObserver::displayRoot()
 {
 	string root = "< SCSI-" + to_string(deviceGui->getScsi() + 1) + " disconnected >";
 	int store = deviceGui->getStore(deviceGui->getScsi());
-	auto stores = mpc->getStores().lock();
+	auto stores = Mpc::instance().getStores().lock();
 	if (store != -1) {
 		if (deviceGui->isRaw(deviceGui->getScsi())) {
 			root = stores->getRawStore(store).lock()->volumeLabel;

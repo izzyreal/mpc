@@ -3,8 +3,8 @@
 using namespace mpc::controls::vmpc;
 using namespace std;
 
-RecordingFinishedControls::RecordingFinishedControls(mpc::Mpc* mpc)
-	: AbstractVmpcControls(mpc)
+RecordingFinishedControls::RecordingFinishedControls()
+	: AbstractVmpcControls()
 {
 }
 

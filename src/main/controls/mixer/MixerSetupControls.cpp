@@ -6,8 +6,8 @@
 using namespace mpc::controls::mixer;
 using namespace std;
 
-MixerSetupControls::MixerSetupControls(mpc::Mpc* mpc) 
-	: AbstractMixerControls(mpc)
+MixerSetupControls::MixerSetupControls() 
+	: AbstractMixerControls()
 {
 }
 

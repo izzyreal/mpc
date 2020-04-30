@@ -8,7 +8,7 @@
 
 namespace mpc {
 
-	class Mpc;
+	
 
 	namespace sampler {
 
@@ -17,7 +17,7 @@ namespace mpc {
 		{
 
 		private:
-			mpc::Mpc* mpc;
+			
 
 		private:
 			int note{ 0 };
@@ -33,7 +33,7 @@ namespace mpc {
 			int getNumber();
 
 		public:
-			Pad(mpc::Mpc* mpc, int number);
+			Pad(int number);
 			~Pad();
 
 		};

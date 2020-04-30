@@ -22,7 +22,7 @@ namespace mpc {
 				void checkEffects();
 
 			public:
-				FxEditControls(mpc::Mpc* mpc);
+				FxEditControls();
 				~FxEditControls();
 
 			};

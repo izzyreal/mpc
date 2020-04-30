@@ -8,8 +8,8 @@
 using namespace mpc::controls::sampler::dialog;
 using namespace std;
 
-CreateNewProgramControls::CreateNewProgramControls(mpc::Mpc* mpc) 
-	: AbstractSamplerControls(mpc)
+CreateNewProgramControls::CreateNewProgramControls() 
+	: AbstractSamplerControls()
 {
 }
 

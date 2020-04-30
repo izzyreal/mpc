@@ -14,7 +14,7 @@ namespace ctoot {
 
 namespace mpc {
 
-	class Mpc;
+	
 
 	namespace sequencer {
 		class Event;
@@ -45,7 +45,7 @@ namespace mpc {
 			{
 
 			private:
-				mpc::Mpc* mpc;
+				
 				std::vector<std::weak_ptr<mpc::lcdgui::Component>> eventRow;
 				std::weak_ptr<mpc::sequencer::Event> event;
 				std::weak_ptr<mpc::lcdgui::HorizontalBar> horizontalBar;
@@ -118,7 +118,7 @@ namespace mpc {
 				bool isSelected();
 
 			public:
-				EventRow(mpc::Mpc* mpc, int bus, std::weak_ptr<mpc::sequencer::Event> e, int rowNumber);
+				EventRow(int bus, std::weak_ptr<mpc::sequencer::Event> e, int rowNumber);
 				~EventRow();
 
 			};

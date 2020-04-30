@@ -16,7 +16,7 @@ namespace mpc {
 					void function(int i) override;
 
 				public:
-					LoadASoundControls(mpc::Mpc* mpc);
+					LoadASoundControls();
 					~LoadASoundControls();
 
 				};

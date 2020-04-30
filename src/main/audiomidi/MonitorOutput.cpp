@@ -10,9 +10,9 @@ using namespace mpc::audiomidi;
 
 using namespace std;
 
-MonitorOutput::MonitorOutput(mpc::Mpc* mpc)
+MonitorOutput::MonitorOutput()
 {
-	this->mpc = mpc;
+	
 }
 
 string MonitorOutput::getName()
@@ -28,7 +28,7 @@ void MonitorOutput::open()
 int32_t MonitorOutput::processAudio(ctoot::audio::core::AudioBuffer* buffer)
 {
 	/*
-	auto sampler = mpc->getSampler().lock();
+	auto sampler = Mpc::instance().getSampler().lock();
 	
 	if (!sampler) {
 		return AUDIO_SILENCE;
@@ -36,13 +36,13 @@ int32_t MonitorOutput::processAudio(ctoot::audio::core::AudioBuffer* buffer)
 
 	if (sampler->monitorBufferL == nullptr ||
 		sampler->monitorBufferR == nullptr ||
-		mpc->getUis().lock()->getSamplerGui()->getMonitor() == 0 ||
-		mpc->getLayeredScreen().lock()->getCurrentScreenName().compare("sample") != 0 ||
+		Mpc::instance().getUis().lock()->getSamplerGui()->getMonitor() == 0 ||
+		Mpc::instance().getLayeredScreen().lock()->getCurrentScreenName().compare("sample") != 0 ||
 		closed) {
 		buffer->makeSilence();
 		return AUDIO_SILENCE;
 	}
-	auto mode = mpc->getUis().lock()->getSamplerGui()->getMode();
+	auto mode = Mpc::instance().getUis().lock()->getSamplerGui()->getMode();
 	auto left = buffer->getChannel(0);
 	auto right = buffer->getChannel(1);
 	for (int i = 0; i < buffer->getSampleCount(); i++) {

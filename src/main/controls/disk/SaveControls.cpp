@@ -14,8 +14,8 @@
 using namespace mpc::controls::disk;
 using namespace std;
 
-SaveControls::SaveControls(mpc::Mpc* mpc) 
-	: AbstractDiskControls(mpc)
+SaveControls::SaveControls() 
+	: AbstractDiskControls()
 {
 }
 

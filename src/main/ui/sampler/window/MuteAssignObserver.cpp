@@ -10,15 +10,15 @@
 using namespace mpc::ui::sampler::window;
 using namespace std;
 
-MuteAssignObserver::MuteAssignObserver(mpc::Mpc* mpc) 
+MuteAssignObserver::MuteAssignObserver() 
 {
-	auto uis = mpc->getUis().lock();
+	auto uis = Mpc::instance().getUis().lock();
 	samplerGui = uis->getSamplerGui();
 	samplerGui->addObserver(this);
-	this->mpc = mpc;
-	sampler = mpc->getSampler();
+	
+	sampler = Mpc::instance().getSampler();
 	auto drum = uis->getSamplerGui()->getSelectedDrum();
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	noteField = ls->lookupField("note");
 	note0Field = ls->lookupField("note0");
 	note1Field = ls->lookupField("note1");

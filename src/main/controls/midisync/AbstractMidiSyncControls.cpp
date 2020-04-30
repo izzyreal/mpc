@@ -7,11 +7,11 @@
 using namespace mpc::controls::midisync;
 using namespace std;
 
-AbstractMidiSyncControls::AbstractMidiSyncControls(mpc::Mpc* mpc) 
-	: BaseControls(mpc)
+AbstractMidiSyncControls::AbstractMidiSyncControls() 
+	: BaseControls()
 {
-	midiSyncGui = mpc->getUis().lock()->getMidiSyncGui();
-	//mpcMidiPorts = mpc->getMidiPorts();
+	midiSyncGui = Mpc::instance().getUis().lock()->getMidiSyncGui();
+	//mpcMidiPorts = Mpc::instance().getMidiPorts();
 }
 
 AbstractMidiSyncControls::~AbstractMidiSyncControls() {

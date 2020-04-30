@@ -3,7 +3,7 @@
 using namespace mpc::controls::sequencer::window;
 using namespace std;
 
-MidiMonitorControls::MidiMonitorControls(mpc::Mpc* mpc)
-	: AbstractSequencerControls(mpc)
+MidiMonitorControls::MidiMonitorControls()
+	: AbstractSequencerControls()
 {
 }

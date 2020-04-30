@@ -21,8 +21,8 @@
 using namespace mpc::controls::sequencer;
 using namespace std;
 
-SequencerControls::SequencerControls(mpc::Mpc* mpc)
-	: AbstractSequencerControls(mpc)
+SequencerControls::SequencerControls()
+	: AbstractSequencerControls()
 {
 }
 
@@ -179,7 +179,7 @@ void SequencerControls::turnWheel(int i)
 		lSequencer->setNextSq(lSequencer->getNextSq() + i);
 	}
 	else if (param.compare("bars") == 0) {
-		mpc->getUis().lock()->getSequencerWindowGui()->setNewBars(lSequencer->getActiveSequence().lock()->getLastBar());
+		Mpc::instance().getUis().lock()->getSequencerWindowGui()->setNewBars(lSequencer->getActiveSequence().lock()->getLastBar());
 		ls.lock()->openScreen("changebars2");
 	}
 	else if (param.compare("tempo") == 0) {
@@ -192,7 +192,7 @@ void SequencerControls::turnWheel(int i)
 		auto oldTs = seq->getTimeSignature();
 		ts.setNumerator(oldTs.getNumerator());
 		ts.setDenominator(oldTs.getDenominator());
-		mpc->getUis().lock()->getSequencerWindowGui()->setNewTimeSignature(ts);
+		Mpc::instance().getUis().lock()->getSequencerWindowGui()->setNewTimeSignature(ts);
 		ls.lock()->openScreen("changetsig");
 	}
 	else if (param.compare("temposource") == 0) {
@@ -235,7 +235,7 @@ void SequencerControls::openWindow()
 		auto oldTs = seq->getTimeSignature();
 		ts.setNumerator(oldTs.getNumerator());
 		ts.setDenominator(oldTs.getDenominator());
-		mpc->getUis().lock()->getSequencerWindowGui()->setNewTimeSignature(ts);
+		Mpc::instance().getUis().lock()->getSequencerWindowGui()->setNewTimeSignature(ts);
 		ls.lock()->openScreen("changetsig");
 	}
 	else if (param.compare("count") == 0) {
@@ -269,8 +269,8 @@ void SequencerControls::openWindow()
 		ls.lock()->openScreen("changebars");
 	}
 	else if (param.compare("velo") == 0) {
-		mpc->getUis().lock()->getSequencerWindowGui()->setTime0(0);
-		mpc->getUis().lock()->getSequencerWindowGui()->setTime1(seq->getLastTick());
+		Mpc::instance().getUis().lock()->getSequencerWindowGui()->setTime0(0);
+		Mpc::instance().getUis().lock()->getSequencerWindowGui()->setTime1(seq->getLastTick());
 		ls.lock()->openScreen("editvelocity");
 	}
 }

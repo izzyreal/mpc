@@ -12,11 +12,11 @@
 using namespace mpc::controls::mixer;
 using namespace std;
 
-AbstractMixerControls::AbstractMixerControls(mpc::Mpc* mpc) 
-	: BaseControls(mpc)
+AbstractMixerControls::AbstractMixerControls() 
+	: BaseControls()
 {
-	mixerGui = mpc->getUis().lock()->getMixerGui();
-	mixerSetupGui = mpc->getUis().lock()->getMixerSetupGui();
+	mixerGui = Mpc::instance().getUis().lock()->getMixerGui();
+	mixerSetupGui = Mpc::instance().getUis().lock()->getMixerSetupGui();
 }
 
 void AbstractMixerControls::init()

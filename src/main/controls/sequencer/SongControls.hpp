@@ -35,7 +35,7 @@ namespace mpc {
 				void turnWheel(int i) override;
 				void function(int i) override;
 
-				SongControls(mpc::Mpc* mpc);
+				SongControls();
 
 			};
 

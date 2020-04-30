@@ -6,7 +6,7 @@
 #include <string>
 
 namespace mpc {
-	class Mpc;
+	
 	namespace sampler {
 		class Sampler;
 		class Sound;
@@ -29,7 +29,7 @@ namespace mpc {
 			{
 
 			private:
-				mpc::Mpc* mpc;
+				
 				SoundGui* soundGui{ nullptr };
 				std::vector<std::string> playXNames{};
 				std::weak_ptr<mpc::sampler::Sampler> sampler{ };
@@ -59,7 +59,7 @@ namespace mpc {
 				void waveformLoadData();
 
 			public:
-				LoopObserver(mpc::Mpc* mpc);
+				LoopObserver();
 				~LoopObserver();
 
 			};

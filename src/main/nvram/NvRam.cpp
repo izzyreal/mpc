@@ -79,10 +79,10 @@ void NvRam::saveUserDefaults()
 	stream.close();
 }
 
-void NvRam::saveKnobPositions(mpc::Mpc* mpc)
+void NvRam::saveKnobPositions()
 {
-    auto ams = mpc->getAudioMidiServices().lock();
-    auto hw = mpc->getHardware().lock();
+    auto ams = Mpc::instance().getAudioMidiServices().lock();
+    auto hw = Mpc::instance().getHardware().lock();
     
 	std::shared_ptr<mpc::hardware::Slider> slider;
     

@@ -4,7 +4,7 @@
 #include <vector>
 
 namespace mpc {
-	class Mpc;
+	
 	namespace file {
 
 		namespace all {
@@ -35,7 +35,7 @@ namespace mpc {
 				std::vector<char> getBytes();
 
 				Sequencer(std::vector<char> loadBytes);
-				Sequencer(mpc::Mpc* mpc);
+				Sequencer();
 
 			};
 		}

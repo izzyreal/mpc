@@ -6,7 +6,7 @@
 
 namespace mpc {
 
-	class Mpc;
+	
 
 	namespace ui {
 
@@ -27,7 +27,7 @@ namespace mpc {
 		{
 
 		public:
-			mpc::Mpc* mpc{};
+			
 			std::weak_ptr<AbstractDisk> disk{};
 			mpc::ui::disk::DiskGui* diskGui{};
 
@@ -41,7 +41,7 @@ namespace mpc {
 			void saveSounds();
 
 		public:
-			SoundSaver(mpc::Mpc* mpc, std::vector<std::weak_ptr<mpc::sampler::Sound> > sounds, bool wav);
+			SoundSaver(std::vector<std::weak_ptr<mpc::sampler::Sound> > sounds, bool wav);
 			~SoundSaver();
 
 		};

@@ -15,7 +15,7 @@ namespace mpc {
 				void openWindow() override;
 				void turnWheel(int i) override;
 
-				LoadControls(mpc::Mpc* mpc);
+				LoadControls();
 
 			};
 

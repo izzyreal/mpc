@@ -14,10 +14,10 @@
 using namespace mpc;
 using namespace std;
 
-DiskController::DiskController(mpc::Mpc* mpc)
+DiskController::DiskController()
 {
-	this->mpc = mpc;
-	disks = vector<shared_ptr<mpc::disk::AbstractDisk> >(MAX_DISKS);
+	
+	disks = vector<shared_ptr<mpc::disk::AbstractDisk>>(MAX_DISKS);
 	stores = make_shared<mpc::disk::Stores>();
 }
 
@@ -26,8 +26,8 @@ const int DiskController::MAX_DISKS;
 void DiskController::initDisks()
 {
 	disks.clear();
-	disks = vector<shared_ptr<mpc::disk::AbstractDisk> >(MAX_DISKS);
-	auto deviceGui = mpc->getUis().lock()->getDeviceGui();
+	disks = vector<shared_ptr<mpc::disk::AbstractDisk>>(MAX_DISKS);
+	auto deviceGui = Mpc::instance().getUis().lock()->getDeviceGui();
 	for (int i = 0; i < MAX_DISKS; i++) {
 		auto oldDisk = disks[i];
 		if (!deviceGui->isEnabled(i) && oldDisk) {
@@ -49,20 +49,20 @@ void DiskController::initDisks()
 		}
 		if (deviceGui->isRaw(i) && stores->getRawStores().size() > deviceGui->getStore(i)) {
 			try {
-				disks[i] = make_shared<mpc::disk::RawDisk>(stores->getRawStore(deviceGui->getStore(i)), mpc);
+				disks[i] = make_shared<mpc::disk::RawDisk>(stores->getRawStore(deviceGui->getStore(i)));
 			}
 			catch (exception e) {
 				deviceGui->setAccessType(i, mpc::ui::vmpc::DeviceGui::STD);
 				deviceGui->setStore(i, 0);
 				deviceGui->saveSettings();
-				disks[i] = make_shared<mpc::disk::StdDisk>(stores->getStdStore(deviceGui->getStore(i)), mpc);
+				disks[i] = make_shared<mpc::disk::StdDisk>(stores->getStdStore(deviceGui->getStore(i)));
 			}
 		}
 		else {
 			deviceGui->setAccessType(i, mpc::ui::vmpc::DeviceGui::STD);
 			deviceGui->setStore(i, 0);
 			deviceGui->saveSettings();
-			disks[i] = make_shared<mpc::disk::StdDisk>(stores->getStdStore(deviceGui->getStore(i)), mpc);
+			disks[i] = make_shared<mpc::disk::StdDisk>(stores->getStdStore(deviceGui->getStore(i)));
 		}
 	}
 }
@@ -75,7 +75,7 @@ weak_ptr<mpc::disk::Stores> DiskController::getStores()
 weak_ptr<mpc::disk::AbstractDisk> DiskController::getDisk()
 {
 	if (disks.size() == 0) return weak_ptr<mpc::disk::AbstractDisk>();
-	return disks[mpc->getUis().lock()->getDeviceGui()->getScsi()];
+	return disks[Mpc::instance().getUis().lock()->getDeviceGui()->getScsi()];
 }
 
 weak_ptr<mpc::disk::AbstractDisk> DiskController::getDisk(int i)

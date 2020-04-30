@@ -20,7 +20,7 @@ namespace mpc {
 				void function(int f) override;
 				void turnWheel(int i) override;
 
-				ZoneControls(mpc::Mpc* mpc);
+				ZoneControls();
 
 			};
 

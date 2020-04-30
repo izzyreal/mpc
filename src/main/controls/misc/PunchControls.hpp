@@ -2,7 +2,7 @@
 #include <controls/misc/AbstractMiscControls.hpp>
 
 namespace mpc {
-	class Mpc;
+	
 	namespace controls {
 		namespace misc {
 
@@ -16,7 +16,7 @@ namespace mpc {
 				void function(int i) override;
 
 			public:
-				PunchControls(mpc::Mpc* mpc);
+				PunchControls();
 				~PunchControls();
 
 			};

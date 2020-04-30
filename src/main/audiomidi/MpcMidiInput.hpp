@@ -34,7 +34,7 @@ namespace mpc::audiomidi {
 		std::weak_ptr<mpc::sampler::Sampler> sampler;
 		mpc::ui::midisync::MidiSyncGui* msGui = nullptr;
 		mpc::ui::sequencer::window::SequencerWindowGui* swGui = nullptr;
-		mpc::Mpc* mpc{ nullptr };
+		
 		std::unique_ptr<mpc::sequencer::MidiAdapter> midiAdapter;
 		std::unique_ptr<mpc::sequencer::EventAdapter> eventAdapter;
 		std::string notify = "";
@@ -48,7 +48,7 @@ namespace mpc::audiomidi {
 		void transportOmni(ctoot::midi::core::MidiMessage* msg, std::string outputLetter);
 
 	public:
-		MpcMidiInput(int index, Mpc* mpc);
+		MpcMidiInput(int index);
 		~MpcMidiInput();
 
 	};

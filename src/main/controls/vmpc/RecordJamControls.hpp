@@ -13,7 +13,7 @@ namespace mpc {
 				typedef AbstractVmpcControls super;
 				void function(int i) override;
 
-				RecordJamControls(mpc::Mpc* mpc);
+				RecordJamControls();
 
 			private:
 //				friend class RecordJamControls_function_1;

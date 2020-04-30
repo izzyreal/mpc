@@ -7,7 +7,7 @@
 
 namespace mpc {
 
-	class Mpc;
+	
 
 	namespace ui {
 		namespace sequencer {
@@ -26,7 +26,7 @@ namespace mpc {
 				private:
 					static std::vector<std::string> PARAM_NAMES;
 
-					mpc::Mpc* mpc{ nullptr };
+					
 					std::weak_ptr<mpc::lcdgui::Field> noteField{};
 					std::weak_ptr<mpc::lcdgui::Field> paramField{};
 					std::weak_ptr<mpc::lcdgui::Field> typeField{};
@@ -44,7 +44,7 @@ namespace mpc {
 				public:
 					void update(moduru::observer::Observable* o, nonstd::any arg) override;
 
-					Assign16LevelsObserver(mpc::Mpc* mpc);
+					Assign16LevelsObserver();
 					~Assign16LevelsObserver();
 
 				};

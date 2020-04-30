@@ -5,8 +5,8 @@
 using namespace mpc::controls::sequencer::window;
 using namespace std;
 
-TimeDisplayControls::TimeDisplayControls(mpc::Mpc* mpc)
-	: AbstractSequencerControls(mpc)
+TimeDisplayControls::TimeDisplayControls()
+	: AbstractSequencerControls()
 {
 }
 

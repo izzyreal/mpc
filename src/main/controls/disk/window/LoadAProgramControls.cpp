@@ -6,8 +6,8 @@
 using namespace mpc::controls::disk::window;
 using namespace std;
 
-LoadAProgramControls::LoadAProgramControls(mpc::Mpc* mpc) 
-	: AbstractDiskControls(mpc)
+LoadAProgramControls::LoadAProgramControls() 
+	: AbstractDiskControls()
 {
 }
 
@@ -25,14 +25,14 @@ void LoadAProgramControls::function(int i)
 	switch (i) {
 	case 2:
 		diskGui->setClearProgramWhenLoading(true);
-		mpc->loadProgram();
+		Mpc::instance().loadProgram();
 		break;
 	case 3:
 		ls.lock()->openScreen("load");
 		break;
 	case 4:
 		diskGui->setClearProgramWhenLoading(false);
-		mpc->loadProgram();
+		Mpc::instance().loadProgram();
 		break;
 	}
 }

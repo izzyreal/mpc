@@ -11,8 +11,8 @@
 using namespace mpc::controls::sequencer::window;
 using namespace std;
 
-MultiRecordingSetupControls::MultiRecordingSetupControls(mpc::Mpc* mpc)
-	: AbstractSequencerControls(mpc)
+MultiRecordingSetupControls::MultiRecordingSetupControls()
+	: AbstractSequencerControls()
 {
 }
 

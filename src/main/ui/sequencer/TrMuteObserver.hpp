@@ -5,7 +5,7 @@
 #include <memory>
 
 namespace mpc {
-	class Mpc;
+	
 	namespace sequencer {
 		class Sequencer;
 	}
@@ -27,7 +27,7 @@ namespace mpc {
 			{
 
 			private:
-				mpc::Mpc* mpc;
+				
 				std::weak_ptr<mpc::sequencer::Sequencer> sequencer{};
 				mpc::ui::sampler::SamplerGui* samplerGui{};
 				std::weak_ptr<mpc::lcdgui::Field> sqField{};
@@ -73,7 +73,7 @@ namespace mpc {
 				void refreshTracks();
 
 			public:
-				TrMuteObserver(mpc::Mpc* mpc);
+				TrMuteObserver();
 				~TrMuteObserver();
 
 			};

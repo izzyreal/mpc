@@ -10,9 +10,9 @@
 using namespace mpc::sampler;
 using namespace std;
 
-Pad::Pad(mpc::Mpc* mpc, int number)
+Pad::Pad(int number)
 {
-	this->mpc = mpc;
+	
 	this->number = number;
 	note = mpc::StartUp::getUserDefaults().lock()->getPadNotes()[number];
 	stereoMixerChannel = make_shared<ctoot::mpc::MpcStereoMixerChannel>();
@@ -23,8 +23,8 @@ void Pad::setNote(int i)
 {
 	if (i < 34 || i > 98) return;
 
-	if (mpc->getUis().lock()->getSamplerGui()->isPadAssignMaster()) {
-		(*mpc->getSampler().lock()->getMasterPadAssign())[number] = i;
+	if (Mpc::instance().getUis().lock()->getSamplerGui()->isPadAssignMaster()) {
+		(*Mpc::instance().getSampler().lock()->getMasterPadAssign())[number] = i;
 	}
 	else {
 		note = i;
@@ -39,8 +39,8 @@ void Pad::setNote(int i)
 
 int Pad::getNote()
 {
-	if (mpc->getUis().lock()->getSamplerGui()->isPadAssignMaster()) {
-		return (*mpc->getSampler().lock()->getMasterPadAssign())[number];
+	if (Mpc::instance().getUis().lock()->getSamplerGui()->isPadAssignMaster()) {
+		return (*Mpc::instance().getSampler().lock()->getMasterPadAssign())[number];
 	}
 	return note;
 }

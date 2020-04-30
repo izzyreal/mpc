@@ -13,17 +13,17 @@
 using namespace mpc::controls::other;
 using namespace std;
 
-AbstractOtherControls::AbstractOtherControls(mpc::Mpc* mpc) 
-	: BaseControls(mpc)
+AbstractOtherControls::AbstractOtherControls() 
+	: BaseControls()
 {
 	akaiAsciiChar = mpc::Mpc::akaiAsciiChar;
-	nameGui = mpc->getUis().lock()->getNameGui();
+	nameGui = Mpc::instance().getUis().lock()->getNameGui();
 }
 
 void AbstractOtherControls::init()
 {
     super::init();
-	tickValues = mpc->getSequencer().lock()->getTickValues();
+	tickValues = Mpc::instance().getSequencer().lock()->getTickValues();
 	auto lSequencer = sequencer.lock();
     seqNum = lSequencer->getActiveSequenceIndex();
     sequence = lSequencer->getSequence(seqNum);

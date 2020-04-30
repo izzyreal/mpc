@@ -6,7 +6,7 @@
 using namespace moduru::file;
 
 namespace mpc {
-	class Mpc;
+	
 	namespace disk {
 
 		class Store;
@@ -60,7 +60,7 @@ namespace mpc {
 			MpcFile* newFile(std::string newFileName) override;
 			std::string getAbsolutePath() override;
 
-			RawDisk(std::weak_ptr<Store> store, mpc::Mpc* mpc);
+			RawDisk(std::weak_ptr<Store> store);
 
 		};
 

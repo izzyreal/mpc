@@ -11,7 +11,7 @@ namespace ctoot {
 }
 
 namespace mpc {
-	class Mpc;
+	
 
 	namespace ui {
 		namespace sampler {
@@ -40,7 +40,7 @@ namespace mpc {
 				void init() override;
 
 			public:
-				AbstractMixerControls(mpc::Mpc* mpc);
+				AbstractMixerControls();
 				virtual ~AbstractMixerControls();
 
 			};

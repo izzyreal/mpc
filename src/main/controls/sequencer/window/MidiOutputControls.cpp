@@ -8,8 +8,8 @@
 using namespace mpc::controls::sequencer::window;
 using namespace std;
 
-MidiOutputControls::MidiOutputControls(mpc::Mpc* mpc)
-	: AbstractSequencerControls(mpc)
+MidiOutputControls::MidiOutputControls()
+	: AbstractSequencerControls()
 {
 }
 

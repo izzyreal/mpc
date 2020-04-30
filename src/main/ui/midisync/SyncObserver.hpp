@@ -41,7 +41,7 @@ namespace mpc {
 			public:
 				void update(moduru::observer::Observable* o, nonstd::any arg) override;
 
-				SyncObserver(mpc::Mpc* mpc);
+				SyncObserver();
 				~SyncObserver();
 
 			};

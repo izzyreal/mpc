@@ -6,7 +6,7 @@
 #include "BaseControls.hpp"
 
 namespace mpc {
-	class Mpc;
+	
 	namespace ctootextensions {
 		class MpcSoundPlayerChannel;
 	}
@@ -71,7 +71,7 @@ namespace mpc {
 			void undoSeq() override {};
 
 		public:
-			GlobalReleaseControls(mpc::Mpc* mpc);
+			GlobalReleaseControls();
 			virtual ~GlobalReleaseControls();
 
 		};

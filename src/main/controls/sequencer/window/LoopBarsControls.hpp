@@ -14,7 +14,7 @@ namespace mpc {
 					typedef AbstractSequencerControls super;
 					void turnWheel(int i) override;
 
-					LoopBarsControls(mpc::Mpc* mpc);
+					LoopBarsControls();
 
 				};
 

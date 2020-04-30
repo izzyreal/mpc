@@ -5,8 +5,8 @@
 using namespace mpc::controls::disk::dialog;
 using namespace std;
 
-CantFindFileControls::CantFindFileControls(mpc::Mpc* mpc) 
-	: AbstractDiskControls(mpc)
+CantFindFileControls::CantFindFileControls() 
+	: AbstractDiskControls()
 {
 }
 

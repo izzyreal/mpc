@@ -7,14 +7,14 @@
 using namespace mpc::hardware;
 using namespace std;
 
-DataWheel::DataWheel(mpc::Mpc* mpc)
+DataWheel::DataWheel()
 {
-	this->mpc = mpc;
+	
 }
 
 void DataWheel::turn(int increment) {
-	if (!mpc->getDisk().lock()->isBusy()) {
-		mpc->getActiveControls()->turnWheel(increment);
+	if (!Mpc::instance().getDisk().lock()->isBusy()) {
+		Mpc::instance().getActiveControls()->turnWheel(increment);
 	}
 	notifyObservers(increment);
 }

@@ -7,13 +7,13 @@
 using namespace mpc::ui::disk::window;
 using namespace std;
 
-DeleteAllFilesObserver::DeleteAllFilesObserver(mpc::Mpc* mpc)
+DeleteAllFilesObserver::DeleteAllFilesObserver()
 {
 	views = vector<string>{ "All Files", ".SND", ".PGM", ".APS", ".MID", ".ALL", ".WAV", ".SEQ", ".SET" };
-	diskWindowGui = mpc->getUis().lock()->getDiskWindowGui();
-	csn = mpc->getLayeredScreen().lock()->getCurrentScreenName();
+	diskWindowGui = Mpc::instance().getUis().lock()->getDiskWindowGui();
+	csn = Mpc::instance().getLayeredScreen().lock()->getCurrentScreenName();
 	diskWindowGui->addObserver(this);
-	deleteField = mpc->getLayeredScreen().lock()->lookupField("delete");
+	deleteField = Mpc::instance().getLayeredScreen().lock()->lookupField("delete");
 	displayDelete();
 }
 

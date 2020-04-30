@@ -4,7 +4,7 @@
 #include <memory>
 
 namespace mpc {
-	class Mpc;
+	
 	namespace lcdgui {
 		class Field;
 		class Label;
@@ -20,7 +20,7 @@ namespace mpc {
 			{
 
 			private:
-				mpc::Mpc* mpc;
+				
 				std::weak_ptr<mpc::lcdgui::Field> sqField{};
 				std::weak_ptr<mpc::lcdgui::Label> sequenceNameLabel{};
 				SecondSeqGui* secondSeqGui{ nullptr };
@@ -31,7 +31,7 @@ namespace mpc {
 			public:
 				void update(moduru::observer::Observable* o, nonstd::any a) override;
 
-				SecondSeqObserver(mpc::Mpc* mpc);
+				SecondSeqObserver();
 				~SecondSeqObserver();
 			
 			};

@@ -10,8 +10,8 @@
 using namespace mpc::controls::sampler::window;
 using namespace std;
 
-AssignmentViewControls::AssignmentViewControls(mpc::Mpc* mpc) 
-	: AbstractSamplerControls(mpc)
+AssignmentViewControls::AssignmentViewControls() 
+	: AbstractSamplerControls()
 {
 }
 

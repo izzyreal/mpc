@@ -7,8 +7,8 @@
 using namespace mpc::controls::sequencer;
 using namespace std;
 
-AssignControls::AssignControls(mpc::Mpc* mpc)
-	: AbstractSequencerControls(mpc)
+AssignControls::AssignControls()
+	: AbstractSequencerControls()
 {
 }
 

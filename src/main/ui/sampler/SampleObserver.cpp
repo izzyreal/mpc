@@ -11,17 +11,17 @@
 using namespace mpc::ui::sampler;
 using namespace std;
 
-SampleObserver::SampleObserver(mpc::Mpc* mpc) 
+SampleObserver::SampleObserver() 
 {
-	this->mpc = mpc;
+	
 
-	samplerGui = mpc->getUis().lock()->getSamplerGui();
+	samplerGui = Mpc::instance().getUis().lock()->getSamplerGui();
 	samplerGui->addObserver(this);
 
-	auto ams = mpc->getAudioMidiServices().lock();	
+	auto ams = Mpc::instance().getAudioMidiServices().lock();	
 	ams->getSoundRecorder().lock()->addObserver(this);
 
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	inputField = ls->lookupField("input");
 	thresholdField = ls->lookupField("threshold");
 	modeField = ls->lookupField("mode");
@@ -152,6 +152,6 @@ void SampleObserver::updateVU(float value)
 
 SampleObserver::~SampleObserver() {
 	samplerGui->deleteObserver(this);
-	auto ams = mpc->getAudioMidiServices().lock();
+	auto ams = Mpc::instance().getAudioMidiServices().lock();
 	ams->getSoundRecorder().lock()->deleteObserver(this);
 }

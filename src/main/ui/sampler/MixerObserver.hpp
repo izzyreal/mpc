@@ -13,7 +13,7 @@ namespace ctoot {
 
 namespace mpc {
 
-	class Mpc;
+	
 
 	namespace lcdgui {
 		class MixerStrip;
@@ -44,7 +44,7 @@ namespace mpc {
 			{
 
 			private:
-				mpc::Mpc* mpc;
+				
 				std::weak_ptr<mpc::sampler::Sampler> sampler{};
 				SamplerGui* samplerGui{ nullptr };
 				MixerSetupGui* mixerSetupGui{ nullptr };
@@ -80,7 +80,7 @@ namespace mpc {
 				void displayFunctionKeys();
 
 			public:
-				MixerObserver(mpc::Mpc* mpc);
+				MixerObserver();
 				~MixerObserver();
 
 			};

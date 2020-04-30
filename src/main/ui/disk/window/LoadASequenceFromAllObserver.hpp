@@ -4,7 +4,7 @@
 #include <memory>
 
 namespace mpc {
-	class Mpc;
+	
 	namespace lcdgui {
 		class Field;
 		class Label;
@@ -25,7 +25,7 @@ namespace mpc {
 			{
 
 			private:
-				mpc::Mpc* mpc;
+				
 				std::weak_ptr<mpc::lcdgui::Field> fileField{};
 				std::weak_ptr<mpc::lcdgui::Label> fileLabel{};
 				std::weak_ptr<mpc::lcdgui::Field> loadIntoField{};
@@ -40,7 +40,7 @@ namespace mpc {
 			public:
 				void update(moduru::observer::Observable* o, nonstd::any a) override;
 
-				LoadASequenceFromAllObserver(mpc::Mpc* mpc);
+				LoadASequenceFromAllObserver();
 				~LoadASequenceFromAllObserver();
 			};
 

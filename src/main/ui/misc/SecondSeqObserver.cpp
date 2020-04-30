@@ -11,12 +11,12 @@
 using namespace mpc::ui::misc;
 using namespace std;
 
-SecondSeqObserver::SecondSeqObserver(mpc::Mpc* mpc)
+SecondSeqObserver::SecondSeqObserver()
 {
-	this->mpc = mpc;
-	secondSeqGui = mpc->getUis().lock()->getSecondSeqGui();
+	
+	secondSeqGui = Mpc::instance().getUis().lock()->getSecondSeqGui();
 	secondSeqGui->addObserver(this);
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	sqField = ls->lookupField("sq");
 	sequenceNameLabel = ls->lookupLabel("sequencename");
 	displaySq();
@@ -24,7 +24,7 @@ SecondSeqObserver::SecondSeqObserver(mpc::Mpc* mpc)
 
 void SecondSeqObserver::displaySq()
 {
-	auto sqName = mpc->getSequencer().lock()->getSequence(secondSeqGui->getSq()).lock()->getName();
+	auto sqName = Mpc::instance().getSequencer().lock()->getSequence(secondSeqGui->getSq()).lock()->getName();
 	sqField.lock()->setTextPadded(secondSeqGui->getSq() + 1, "0");
 	sequenceNameLabel.lock()->setText("-" + sqName);
 }

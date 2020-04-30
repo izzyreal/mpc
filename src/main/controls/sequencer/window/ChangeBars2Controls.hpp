@@ -15,7 +15,7 @@ namespace mpc {
 					void function(int i) override;
 					void turnWheel(int i) override;
 
-					ChangeBars2Controls(mpc::Mpc* mpc);
+					ChangeBars2Controls();
 
 				};
 

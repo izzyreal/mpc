@@ -14,7 +14,7 @@ namespace mpc {
 					typedef mpc::controls::sequencer::AbstractSequencerControls super;
 					void function(int i) override;
 
-					DeleteAllTracksControls(mpc::Mpc* mpc);
+					DeleteAllTracksControls();
 
 				};
 

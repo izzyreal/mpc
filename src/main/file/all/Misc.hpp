@@ -4,7 +4,7 @@
 #include <vector>
 
 namespace mpc {
-	class Mpc;
+	
 	namespace file {
 		namespace all {
 
@@ -44,7 +44,7 @@ namespace mpc {
 
 			public:
 				Misc(std::vector<char> b);
-				Misc(mpc::Mpc* mpc);
+				Misc();
 			};
 
 		}

@@ -15,8 +15,8 @@ using namespace mpc::controls::sequencer;
 using namespace mpc::sequencer;
 using namespace std;
 
-EditSequenceControls::EditSequenceControls(mpc::Mpc* mpc)
-	: AbstractSequencerControls(mpc)
+EditSequenceControls::EditSequenceControls()
+	: AbstractSequencerControls()
 {
 }
 
@@ -27,7 +27,7 @@ void EditSequenceControls::function(int i)
 	auto lToSeq = toSeq.lock();
 	int sourceStart, sourceEnd, destStart, segLength;
 	shared_ptr<Track> sourceTrack;
-	auto uis = mpc->getUis().lock();
+	auto uis = Mpc::instance().getUis().lock();
 	switch (i) {
 	case 1:
 		uis->getBarCopyGui()->setFromSq(editSequenceGui->getFromSq());

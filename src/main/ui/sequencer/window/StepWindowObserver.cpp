@@ -25,9 +25,9 @@ using namespace mpc::ui::sequencer::window;
 using namespace mpc::sequencer;
 using namespace std;
 
-StepWindowObserver::StepWindowObserver(mpc::Mpc* mpc)
+StepWindowObserver::StepWindowObserver()
 {
-	this->mpc = mpc;
+	
 	timingCorrectNames = { "OFF", "1/8", "1/8(3)", "1/16", "1/16(3)", "1/32", "1/32(3)" };
 	eventTypeNames = { "NOTE", "PITCH BEND", "CONTROL CHANGE", "PROGRAM CHANGE", "CH PRESSURE", "POLY PRESSURE", "EXCLUSIVE", "MIXER" };
 	noteVariationParameterNames = { "Tun", "Dcy", "Atk", "Flt" };
@@ -38,11 +38,11 @@ StepWindowObserver::StepWindowObserver(mpc::Mpc* mpc)
 	xPosDouble = { 60, 84 };
 	yPosDouble = { 22, 33 };
 	doubleLabels = { "Edit type:", "Value:" };
-	sequencer = mpc->getSequencer();
-	sampler = mpc->getSampler();
-	seqGui = mpc->getUis().lock()->getStepEditorGui();
-	samplerGui = mpc->getUis().lock()->getSamplerGui();
-	swGui = mpc->getUis().lock()->getSequencerWindowGui();
+	sequencer = Mpc::instance().getSequencer();
+	sampler = Mpc::instance().getSampler();
+	seqGui = Mpc::instance().getUis().lock()->getStepEditorGui();
+	samplerGui = Mpc::instance().getUis().lock()->getSamplerGui();
+	swGui = Mpc::instance().getUis().lock()->getSequencerWindowGui();
 	swGui->addObserver(this);
 	seqGui->addObserver(this);
 	auto lSequencer = sequencer.lock();
@@ -55,7 +55,7 @@ StepWindowObserver::StepWindowObserver(mpc::Mpc* mpc)
 		program = dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
 	}
 	lSequencer->addObserver(this);
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	auto csn = ls->getCurrentScreenName();
 	if (csn.compare("step_tc") == 0) {
 		tcValueField = ls->lookupField("tcvalue");

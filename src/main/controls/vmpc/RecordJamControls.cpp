@@ -5,8 +5,8 @@
 using namespace mpc::controls::vmpc;
 using namespace std;
 
-RecordJamControls::RecordJamControls(mpc::Mpc* mpc)
-	: AbstractVmpcControls(mpc)
+RecordJamControls::RecordJamControls()
+	: AbstractVmpcControls()
 {
 }
 

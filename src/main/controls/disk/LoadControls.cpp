@@ -29,8 +29,8 @@ using namespace mpc::controls::disk;
 using namespace mpc::sampler;
 using namespace std;
 
-LoadControls::LoadControls(mpc::Mpc* mpc)
-	: AbstractDiskControls(mpc)
+LoadControls::LoadControls()
+	: AbstractDiskControls()
 {
 }
 
@@ -51,7 +51,7 @@ void LoadControls::function(int i)
 		ls.lock()->openScreen("setup");
 		break;
 	case 4: {
-		auto controls = mpc->getControls().lock();
+		auto controls = Mpc::instance().getControls().lock();
 
 		if (controls->isF5Pressed()) {
 			return;
@@ -59,19 +59,19 @@ void LoadControls::function(int i)
 
 		controls->setF5Pressed(true);
 
-		auto file = mpc->getUis().lock()->getDiskGui()->getSelectedFile();
+		auto file = Mpc::instance().getUis().lock()->getDiskGui()->getSelectedFile();
 
 		if (!file->isDirectory()) {
 			
-			bool started = mpc->getAudioMidiServices().lock()->getSoundPlayer().lock()->start(file->getFile().lock()->getPath());
+			bool started = Mpc::instance().getAudioMidiServices().lock()->getSoundPlayer().lock()->start(file->getFile().lock()->getPath());
 			
 			auto name = file->getFsNode().lock()->getNameWithoutExtension();
 
 			if (started) {
-				mpc->getLayeredScreen().lock()->createPopup("Playing " + name, 45);
+				Mpc::instance().getLayeredScreen().lock()->createPopup("Playing " + name, 45);
 			}
 			else {
-				mpc->getLayeredScreen().lock()->createPopup("Can't play " + name, 35);
+				Mpc::instance().getLayeredScreen().lock()->createPopup("Can't play " + name, 35);
 			}
 		}
 
@@ -84,7 +84,7 @@ void LoadControls::function(int i)
 		selectedFile = diskGui->getSelectedFile();
 		ext = moduru::file::FileUtil::splitName(selectedFile->getName())[1];
 		if (StrUtil::eqIgnoreCase(ext, "snd") || StrUtil::eqIgnoreCase(ext, "wav")) {
-			mpc->loadSound(false);
+			Mpc::instance().loadSound(false);
 			return;
 		}
 		else if (StrUtil::eqIgnoreCase(ext, "pgm")) {
@@ -95,7 +95,7 @@ void LoadControls::function(int i)
 			auto lSequencer = sequencer.lock();
 			auto newSeq = lSequencer->createSeqInPlaceHolder().lock();
 			newSeq->init(2);
-			auto mr = mpc::file::mid::MidiReader(mpc, selectedFile, newSeq);
+			auto mr = mpc::file::mid::MidiReader(selectedFile, newSeq);
 			mr.parseSequence();
 			ls.lock()->openScreen("loadasequence");
 			auto usedSeqs = lSequencer->getUsedSequenceIndexes();

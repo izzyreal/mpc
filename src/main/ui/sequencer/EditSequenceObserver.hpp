@@ -9,7 +9,7 @@
 #include <sequencer/TimeSignature.hpp>
 
 namespace mpc {
-	class Mpc;
+	
 	namespace sampler {
 		class Sampler;
 	}
@@ -93,7 +93,7 @@ namespace mpc {
 				void setDrumNoteValue();
 
 			public:
-				EditSequenceObserver(mpc::Mpc* mpc);
+				EditSequenceObserver();
 				~EditSequenceObserver();
 			};
 

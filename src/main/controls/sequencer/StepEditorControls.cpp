@@ -28,10 +28,10 @@ using namespace mpc::controls::sequencer;
 using namespace mpc::sequencer;
 using namespace std;
 
-StepEditorControls::StepEditorControls(mpc::Mpc* mpc)
-	: AbstractSequencerControls(mpc)
+StepEditorControls::StepEditorControls()
+	: AbstractSequencerControls()
 {
-	seGui = mpc->getUis().lock()->getStepEditorGui();
+	seGui = Mpc::instance().getUis().lock()->getStepEditorGui();
 }
 
 void StepEditorControls::init()
@@ -172,7 +172,7 @@ void StepEditorControls::function(int i)
 				if (!empty) {
 					auto tick = event->getTick();
 					event->setTick(-1);
-					mpc->getEventHandler().lock()->handle(event, lTrk.get());
+					Mpc::instance().getEventHandler().lock()->handle(event, lTrk.get());
 					event->setTick(tick);
 				}
 			}
@@ -335,7 +335,7 @@ void StepEditorControls::prevStepEvent()
 {
 	init();
 	auto lSequencer = sequencer.lock();
-	auto controls = mpc->getControls().lock();
+	auto controls = Mpc::instance().getControls().lock();
 	if (controls->isGoToPressed()) {
 		lSequencer->goToPreviousEvent();
 	}
@@ -348,7 +348,7 @@ void StepEditorControls::nextStepEvent()
 {
 	init();
 	auto lSequencer = sequencer.lock();
-	auto controls = mpc->getControls().lock();
+	auto controls = Mpc::instance().getControls().lock();
 	if (controls->isGoToPressed()) {
 		lSequencer->goToNextEvent();
 	}
@@ -360,7 +360,7 @@ void StepEditorControls::nextStepEvent()
 void StepEditorControls::prevBarStart()
 {
 	init();
-	auto controls = mpc->getControls().lock();
+	auto controls = Mpc::instance().getControls().lock();
 	auto lSequencer = sequencer.lock();
 	if (controls->isGoToPressed()) {
 		lSequencer->setBar(0);
@@ -374,7 +374,7 @@ void StepEditorControls::nextBarEnd()
 {
 	init();
 	auto lSequencer = sequencer.lock();
-	auto controls = mpc->getControls().lock();
+	auto controls = Mpc::instance().getControls().lock();
 	if (controls->isGoToPressed()) {
 		lSequencer->setBar(lSequencer->getActiveSequence().lock()->getLastBar() + 1);
 	}
@@ -405,7 +405,7 @@ void StepEditorControls::up() {
 		auto srcLetter = src.substr(0, 1);
 		int srcNumber = stoi(src.substr(1, 2));
 		auto increment = 0;
-		auto controls = mpc->getControls().lock();
+		auto controls = Mpc::instance().getControls().lock();
 		if (!controls->isShiftPressed() && srcNumber == 0 && seGui->getyOffset() == 0) {
 			seGui->clearSelection();
 			lLs->setFocus("viewmodenumber");
@@ -453,7 +453,7 @@ void StepEditorControls::down() {
 		auto srcLetter = src.substr(0, 1);
 		int srcNumber = stoi(src.substr(1, 2));
 		auto increment = 0;
-		auto controls = mpc->getControls().lock();
+		auto controls = Mpc::instance().getControls().lock();
 		if (srcNumber == 3) {
 			if (seGui->getyOffset() + 4 == seGui->getEventsAtCurrentTick().size()) return;
 			seGui->setyOffset(seGui->getyOffset() + 1);
@@ -484,7 +484,7 @@ void StepEditorControls::downOrUp(int increment) {
 		auto src = param;
 		auto srcLetter = src.substr(0, 1);
 		int srcNumber = stoi(src.substr(1, 2));
-		auto controls = mpc->getControls().lock();
+		auto controls = Mpc::instance().getControls().lock();
 		auto destination = srcLetter + to_string(srcNumber + increment);
 		if (srcNumber + increment != -1) {
 			if (!(controls->isShiftPressed() && dynamic_pointer_cast<EmptyEvent>(visibleEvents[(int)(srcNumber + increment)].lock()))) {

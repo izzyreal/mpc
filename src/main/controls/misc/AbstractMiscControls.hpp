@@ -2,7 +2,7 @@
 #include <controls/BaseControls.hpp>
 
 namespace mpc {
-	class Mpc;
+	
 	namespace ui {
 		namespace misc {
 			class PunchGui;
@@ -27,7 +27,7 @@ namespace mpc {
 				mpc::ui::misc::SecondSeqGui* secondSeqGui{ nullptr };
 
 			public:
-				AbstractMiscControls(mpc::Mpc* mpc);
+				AbstractMiscControls();
 				virtual ~AbstractMiscControls();
 
 			};

@@ -24,7 +24,7 @@ namespace mpc {
 				void right() override;
 				void pressEnter() override;
 
-				LoopControls(mpc::Mpc* mpc);
+				LoopControls();
 
 			};
 

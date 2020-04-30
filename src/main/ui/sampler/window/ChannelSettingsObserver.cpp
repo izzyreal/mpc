@@ -23,20 +23,20 @@
 using namespace mpc::ui::sampler;
 using namespace std;
 
-ChannelSettingsObserver::ChannelSettingsObserver(mpc::Mpc* mpc)
+ChannelSettingsObserver::ChannelSettingsObserver()
 {
-	this->mpc = mpc;
+	
 	fxPathNames = { "--", "M1", "M2", "R1", "R2" };
 	stereoNamesSlash = { "-", "1/2", "1/2", "3/4", "3/4", "5/6", "5/6", "7/8", "7/8" };
-	auto uis = mpc->getUis().lock();
+	auto uis = Mpc::instance().getUis().lock();
 	samplerGui = uis->getSamplerGui();
 	samplerGui->addObserver(this);
 	bank = samplerGui->getBank();
 	mixGui = uis->getMixerGui();
 	mixGui->addObserver(this);
-	ls = mpc->getLayeredScreen();
+	ls = Mpc::instance().getLayeredScreen();
 	auto lLs = ls.lock();
-	sampler = mpc->getSampler();
+	sampler = Mpc::instance().getSampler();
 	mixerSetupGui = uis->getMixerSetupGui();
 	mixerSetupGui->addObserver(this);
 	auto lSampler = sampler.lock();

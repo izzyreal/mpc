@@ -12,14 +12,14 @@
 using namespace mpc::controls::sampler;
 using namespace std;
 
-SampleControls::SampleControls(mpc::Mpc* mpc)
-	: AbstractSamplerControls(mpc)
+SampleControls::SampleControls()
+	: AbstractSamplerControls()
 {
 }
 
 void SampleControls::left() {
 	//if (sampler.lock()->isArmed() || sampler.lock()->isRecording()) return;
-	if (mpc->getAudioMidiServices().lock()->isRecordingSound()) {
+	if (Mpc::instance().getAudioMidiServices().lock()->isRecordingSound()) {
 		return;
 	}
 	super::left();
@@ -27,7 +27,7 @@ void SampleControls::left() {
 
 void SampleControls::right() {
 	//if (sampler.lock()->isArmed() || sampler.lock()->isRecording()) return;
-	if (mpc->getAudioMidiServices().lock()->isRecordingSound()) {
+	if (Mpc::instance().getAudioMidiServices().lock()->isRecordingSound()) {
 		return;
 	}
 	super::right();
@@ -35,7 +35,7 @@ void SampleControls::right() {
 
 void SampleControls::up() {
 	//if (sampler.lock()->isArmed() || sampler.lock()->isRecording()) return;
-	if (mpc->getAudioMidiServices().lock()->isRecordingSound()) {
+	if (Mpc::instance().getAudioMidiServices().lock()->isRecordingSound()) {
 		return;
 	}
 	super::up();
@@ -43,7 +43,7 @@ void SampleControls::up() {
 
 void SampleControls::down() {
 	//if (sampler.lock()->isArmed() || sampler.lock()->isRecording()) return;
-	if (mpc->getAudioMidiServices().lock()->isRecordingSound()) {
+	if (Mpc::instance().getAudioMidiServices().lock()->isRecordingSound()) {
 		return;
 	}
 	super::down();
@@ -55,14 +55,14 @@ void SampleControls::function(int i)
 	auto lSampler = sampler.lock();
 	switch (i) {
 	case 0:
-		if (mpc->getAudioMidiServices().lock()->isRecordingSound()) {
+		if (Mpc::instance().getAudioMidiServices().lock()->isRecordingSound()) {
 			return;
 		}
 		//if (!lSampler->isRecording() && !lSampler->isArmed())
 			//lSampler->resetPeak();
 		break;
 	case 4:
-		if (mpc->getAudioMidiServices().lock()->isRecordingSound()) {
+		if (Mpc::instance().getAudioMidiServices().lock()->isRecordingSound()) {
 			return;
 		}
 		//if (lSampler->isRecording()) {
@@ -76,13 +76,13 @@ void SampleControls::function(int i)
 		break;
 	case 5:
 		
-		if (mpc->getControls().lock()->isF6Pressed()) {
+		if (Mpc::instance().getControls().lock()->isF6Pressed()) {
 			return;
 		}
 
-		mpc->getControls().lock()->setF6Pressed(true);
+		Mpc::instance().getControls().lock()->setF6Pressed(true);
 
-		auto ams = mpc->getAudioMidiServices().lock();
+		auto ams = Mpc::instance().getAudioMidiServices().lock();
 
 		if (ams->isRecordingSound()) {
 			ams->stopSoundRecorder();
@@ -129,7 +129,7 @@ void SampleControls::turnWheel(int i)
 		else if (param.compare("monitor") == 0) {
 			samplerGui->setMonitor(samplerGui->getMonitor() + i);
 			bool muteMonitor = samplerGui->getMonitor() == 0 ? true : false;
-			mpc->getAudioMidiServices().lock()->muteMonitor(muteMonitor);
+			Mpc::instance().getAudioMidiServices().lock()->muteMonitor(muteMonitor);
 		}
 		else if (param.compare("prerec") == 0) {
 			samplerGui->setPreRec(samplerGui->getPreRec() + i);

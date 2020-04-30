@@ -14,7 +14,7 @@ namespace mpc {
 					typedef mpc::controls::sampler::AbstractSamplerControls super;
 					void function(int j) override;
 
-					DeleteAllProgramsControls(mpc::Mpc* mpc);
+					DeleteAllProgramsControls();
 
 				};
 

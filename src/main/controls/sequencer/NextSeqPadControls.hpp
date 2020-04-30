@@ -15,7 +15,7 @@ namespace mpc {
 				void turnWheel(int i) override;
 				void function(int i) override;
 
-				NextSeqPadControls(mpc::Mpc* mpc);
+				NextSeqPadControls();
 
 			public:
 				void pad(int i, int velo, bool repeat, int tick) override;

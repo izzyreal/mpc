@@ -7,8 +7,8 @@
 using namespace mpc::controls::disk::window;
 using namespace std;
 
-SaveApsFileControls::SaveApsFileControls(mpc::Mpc* mpc)
-	: AbstractDiskControls(mpc)
+SaveApsFileControls::SaveApsFileControls()
+	: AbstractDiskControls()
 {
 }
 
@@ -37,7 +37,7 @@ void SaveApsFileControls::function(int i)
 		break;
 	case 4:
 		apsFileName = mpc::Util::getFileName(nameGui->getName()) + ".APS";
-		apsSaver = make_unique<mpc::file::aps::ApsSaver>(mpc, apsFileName);
+		apsSaver = make_unique<mpc::file::aps::ApsSaver>(apsFileName);
 		break;
 	}
 }

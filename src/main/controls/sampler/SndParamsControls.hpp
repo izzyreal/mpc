@@ -15,7 +15,7 @@ namespace mpc {
 				void function(int f) override;
 				void turnWheel(int i) override;
 
-				SndParamsControls(mpc::Mpc* mpc);
+				SndParamsControls();
 
 			};
 

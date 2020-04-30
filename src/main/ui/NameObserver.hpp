@@ -16,7 +16,7 @@ namespace mpc {
 		{
 
 		private:
-			mpc::Mpc* mpc;
+			
 			std::weak_ptr<mpc::lcdgui::Field> a0Field{};
 			std::weak_ptr<mpc::lcdgui::Field> a1Field{};
 			std::weak_ptr<mpc::lcdgui::Field> a2Field{};
@@ -42,7 +42,7 @@ namespace mpc {
 		public:
 			void update(moduru::observer::Observable* o, nonstd::any arg) override;
 
-			NameObserver(mpc::Mpc* mpc);
+			NameObserver();
 			~NameObserver();
 
 		};

@@ -6,7 +6,7 @@
 
 namespace mpc {
 
-	class Mpc;
+	
 
 	namespace lcdgui {
 		class Field;
@@ -24,7 +24,7 @@ namespace mpc {
 			{
 
 			private:
-				mpc::Mpc* mpc{ nullptr };
+				
 
 
 			private:
@@ -45,7 +45,7 @@ namespace mpc {
 				void update(moduru::observer::Observable* o, nonstd::any arg) override;
 
 			public:
-				FxEditObserver(mpc::Mpc* mpc);
+				FxEditObserver();
 				~FxEditObserver();
 
 			};

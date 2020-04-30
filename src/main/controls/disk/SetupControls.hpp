@@ -11,7 +11,7 @@ namespace mpc {
 			{
 			public:
 				typedef AbstractDiskControls super;
-				SetupControls(mpc::Mpc* mpc);
+				SetupControls();
 
 			};
 

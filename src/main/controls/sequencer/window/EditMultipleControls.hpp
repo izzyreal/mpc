@@ -21,7 +21,7 @@ namespace mpc {
 					void checkNotes();
 
 				public:
-					EditMultipleControls(mpc::Mpc* mpc);
+					EditMultipleControls();
 
 				};
 

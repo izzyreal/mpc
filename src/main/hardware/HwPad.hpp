@@ -4,7 +4,7 @@
 
 namespace mpc {
 
-	class Mpc;
+	
 
 	namespace controls {
 		class BaseControls;
@@ -17,7 +17,7 @@ namespace mpc {
 		{
 
 		private:
-			mpc::Mpc* mpc;
+			
 			int index;
 			std::weak_ptr<mpc::controls::BaseControls> controls;
 
@@ -27,7 +27,7 @@ namespace mpc {
 			void release();
 
 		public:
-			HwPad(mpc::Mpc* mpc, int index);
+			HwPad(int index);
 			~HwPad();
 
 		};

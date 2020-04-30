@@ -14,15 +14,15 @@
 using namespace mpc::ui::sampler;
 using namespace std;
 
-DrumObserver::DrumObserver(mpc::Mpc* mpc) 
+DrumObserver::DrumObserver() 
 {
-	this->mpc = mpc;
-	samplerGui = mpc->getUis().lock()->getSamplerGui();
-	sampler = mpc->getSampler();
+	
+	samplerGui = Mpc::instance().getUis().lock()->getSamplerGui();
+	sampler = Mpc::instance().getSampler();
 	mpcSoundPlayerChannel = sampler.lock()->getDrum(samplerGui->getSelectedDrum());
 	mpcSoundPlayerChannel->addObserver(this);
 	samplerGui->addObserver(this);
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	drumField = ls->lookupField("drum");
 	padToInternalSoundField = ls->lookupField("padtointernalsound");
 	pgmField = ls->lookupField("pgm");

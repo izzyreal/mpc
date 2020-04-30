@@ -13,8 +13,8 @@
 using namespace mpc::controls::sequencer;
 using namespace std;
 
-BarCopyControls::BarCopyControls(mpc::Mpc* mpc)
-	: AbstractSequencerControls(mpc)
+BarCopyControls::BarCopyControls()
+	: AbstractSequencerControls()
 {
 }
 
@@ -33,7 +33,7 @@ void BarCopyControls::function(int j)
 	int segmentLengthTicks;
 	auto lToSeq = toSeq.lock();
 	auto lFromSeq = fromSeq.lock();
-	auto uis = mpc->getUis().lock();
+	auto uis = Mpc::instance().getUis().lock();
 	switch (j) {
 	case 0:
 		uis->getEditSequenceGui()->setFromSq(barCopyGui->getFromSq());

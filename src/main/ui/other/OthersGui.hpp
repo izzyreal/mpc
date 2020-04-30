@@ -4,7 +4,7 @@
 #include <memory>
 
 namespace mpc {
-	class Mpc;
+	
 	namespace ui {
 		namespace other {
 
@@ -13,7 +13,7 @@ namespace mpc {
 			{
 
 			private:
-				mpc::Mpc* mpc;
+				
 				int tapAveraging{ 2 };
 				int contrast{ 10 };
 
@@ -24,7 +24,7 @@ namespace mpc {
 				int getContrast();
 
 			public:
-				OthersGui(mpc::Mpc* mpc);
+				OthersGui();
 				~OthersGui();
 
 			};

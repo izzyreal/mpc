@@ -23,14 +23,14 @@
 using namespace mpc::ui::sequencer;
 using namespace std;
 
-SequencerObserver::SequencerObserver(mpc::Mpc* mpc)
+SequencerObserver::SequencerObserver()
 {
-	this->mpc = mpc;
+	
 
-	mpc->getUis().lock()->getSequencerWindowGui()->addObserver(this);
+	Mpc::instance().getUis().lock()->getSequencerWindowGui()->addObserver(this);
 
-	ls = mpc->getLayeredScreen().lock().get();
-	sequencer = mpc->getSequencer();
+	ls = Mpc::instance().getLayeredScreen().lock().get();
+	sequencer = Mpc::instance().getSequencer();
 	auto lSequencer = sequencer.lock();
 	lSequencer->addObserver(this);
 
@@ -73,7 +73,7 @@ SequencerObserver::SequencerObserver(mpc::Mpc* mpc)
 	lSeq->addObserver(this);
 
 	busNames = vector<string>{ "MIDI", "DRUM1", "DRUM2", "DRUM3", "DRUM4" };
-	sampler = mpc->getSampler();
+	sampler = Mpc::instance().getSampler();
 	trackNum = lSequencer->getActiveTrackIndex();
 	track = lSeq->getTrack(trackNum);
 	auto lTrk = track.lock();
@@ -176,7 +176,7 @@ void SequencerObserver::displayDeviceName()
 	auto lTrk = track.lock();
 	if (lTrk->getBusNumber() != 0) {
 		if (lTrk->getDevice() == 0) {
-			int pgm = mpc->getAudioMidiServices().lock()->getAudioServer()->isRunning() ? lSampler->getDrumBusProgramNumber(lTrk->getBusNumber()) : 0;
+			int pgm = Mpc::instance().getAudioMidiServices().lock()->getAudioServer()->isRunning() ? lSampler->getDrumBusProgramNumber(lTrk->getBusNumber()) : 0;
 			auto p = dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(pgm).lock());
 			deviceNameLabel.lock()->setText(p->getName());
 		}
@@ -382,12 +382,12 @@ void SequencerObserver::displayCount() {
 }
 
 void SequencerObserver::displayTiming() {
-	timingField.lock()->setText(timingCorrectNames_[mpc->getUis().lock()->getSequencerWindowGui()->getNoteValue()]);
+	timingField.lock()->setText(timingCorrectNames_[Mpc::instance().getUis().lock()->getSequencerWindowGui()->getNoteValue()]);
 }
 
 SequencerObserver::~SequencerObserver() {
 	seq.lock()->deleteObserver(this);
 	sequencer.lock()->deleteObserver(this);
 	track.lock()->deleteObserver(this);
-	mpc->getUis().lock()->getSequencerWindowGui()->deleteObserver(this);
+	Mpc::instance().getUis().lock()->getSequencerWindowGui()->deleteObserver(this);
 }

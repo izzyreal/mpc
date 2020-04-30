@@ -6,7 +6,7 @@
 
 namespace mpc {
 
-	class Mpc;
+	
 
 	namespace disk {
 		class MpcFile;
@@ -84,7 +84,7 @@ namespace mpc {
 
 			public:
 				AllParser(mpc::disk::MpcFile* file);
-				AllParser(mpc::Mpc* mpc, std::string allName);
+				AllParser(std::string allName);
 				~AllParser();
 
 			};

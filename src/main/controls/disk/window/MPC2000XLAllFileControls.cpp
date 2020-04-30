@@ -6,8 +6,8 @@
 using namespace mpc::controls::disk::window;
 using namespace std;
 
-MPC2000XLAllFileControls::MPC2000XLAllFileControls(mpc::Mpc* mpc) 
-	: AbstractDiskControls(mpc)
+MPC2000XLAllFileControls::MPC2000XLAllFileControls() 
+	: AbstractDiskControls()
 {
 }
 
@@ -17,18 +17,24 @@ void MPC2000XLAllFileControls::function(int i)
 	mpc::disk::AllLoader* allLoader = nullptr;
 	switch (i) {
 	case 2:
-		allLoader = new mpc::disk::AllLoader(diskGui->getSelectedFile());
-		diskGui->setSequencesFromAllFile(allLoader->getSequences());
+	{
+		auto sequencesOnly = true;
+		mpc::disk::AllLoader allLoader(diskGui->getSelectedFile(), sequencesOnly);
+		diskGui->setSequencesFromAllFile(allLoader.getSequences());
 		diskGui->setFileLoad(0);
 		ls.lock()->openScreen("loadasequencefromall");
 		break;
+	}
 	case 3:
 		ls.lock()->openScreen("load");
 		break;
 	case 4:
-		allLoader = new mpc::disk::AllLoader(mpc, diskGui->getSelectedFile());
+	{
+		auto sequencesOnly = false;
+		mpc::disk::AllLoader allLoader(diskGui->getSelectedFile(), sequencesOnly);
 		ls.lock()->openScreen("sequencer");
 		break;
+	}
 	}
 
 	if (allLoader != nullptr) {

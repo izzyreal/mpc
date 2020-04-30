@@ -14,7 +14,7 @@ namespace mpc {
 					typedef mpc::controls::sampler::AbstractSamplerControls super;
 					void function(int i) override;
 
-					CreateNewProgramControls(mpc::Mpc* mpc);
+					CreateNewProgramControls();
 
 				};
 

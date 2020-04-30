@@ -7,7 +7,7 @@
 
 namespace mpc {
 
-	class Mpc;
+	
 
 	namespace sampler {
 		class Program;
@@ -23,7 +23,7 @@ namespace mpc {
 		private:
 			std::thread loadProgramThread{};
 			std::weak_ptr<mpc::sampler::Program> result{};
-			mpc::Mpc* mpc{ nullptr };
+			
 			MpcFile* file{ nullptr };
 			bool replace{ false };
 
@@ -33,14 +33,14 @@ namespace mpc {
 		private:
 			static void static_loadProgram(void* this_p);
 			
-			void loadSound(std::string soundFileName, std::string ext, MpcFile* soundFile, std::vector<int>* soundsDestIndex, mpc::Mpc* mpc, bool replace, int loadSoundIndex);
+			void loadSound(std::string soundFileName, std::string ext, MpcFile* soundFile, std::vector<int>* soundsDestIndex, bool replace, int loadSoundIndex);
 			void showPopup(std::string name, std::string ext, int sampleSize);
 			void notfound(std::string soundFileName, std::string ext);
 
 		public:
 			std::weak_ptr<mpc::sampler::Program> get();
 
-			ProgramLoader(mpc::Mpc* mpc, MpcFile* file, bool replace);
+			ProgramLoader(MpcFile* file, bool replace);
 			~ProgramLoader();
 		};
 

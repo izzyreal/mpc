@@ -17,18 +17,18 @@
 using namespace mpc::ui::sequencer;
 using namespace std;
 
-UserObserver::UserObserver(mpc::Mpc* mpc)
+UserObserver::UserObserver()
 	: timeSig(mpc::StartUp::getUserDefaults().lock()->getTimeSig())
 {
 	busNames = { "MIDI", "DRUM1", "DRUM2", "DRUM3", "DRUM4" };
-	this->mpc = mpc;
+	
 	ud = mpc::StartUp::getUserDefaults();
 	auto lUd = ud.lock();
 	
 	timeSig.addObserver(this);
 	
 	lUd->addObserver(this);
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	tempoField = ls->lookupField("tempo");
 	tempoField.lock()->setSize(28, 9);
 	loopField = ls->lookupField("loop");
@@ -157,7 +157,7 @@ void UserObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 
 void UserObserver::displayDeviceName()
 {
-	auto sampler = mpc->getSampler().lock();
+	auto sampler = Mpc::instance().getSampler().lock();
 	auto lUd = ud.lock();
 	if (lUd->getBus() != 0) {
 		if (lUd->getDeviceNumber() == 0) {

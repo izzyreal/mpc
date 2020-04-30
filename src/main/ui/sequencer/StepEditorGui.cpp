@@ -7,9 +7,9 @@
 using namespace mpc::ui::sequencer;
 using namespace std;
 
-StepEditorGui::StepEditorGui(mpc::Mpc* mpc) 
+StepEditorGui::StepEditorGui() 
 {
-	this->mpc = mpc;
+	
 	viewModeNumber = 0;
 	noteA = 0;
 	noteB = 127;
@@ -275,7 +275,7 @@ vector<weak_ptr<mpc::sequencer::Event>> StepEditorGui::getPlaceHolder()
 
 void StepEditorGui::checkSelection()
 {
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	string focus = ls->getFocus();
 	if (focus.length() == 2) {
 		int eventNumber = stoi(focus.substr(1, 2));

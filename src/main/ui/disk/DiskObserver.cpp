@@ -1,8 +1,8 @@
 #include <ui/disk/DiskObserver.hpp>
 
 #include <Mpc.hpp>
+#include <StartUp.hpp>
 #include <Util.hpp>
-#include <audiomidi/AudioMidiServices.hpp>
 #include <disk/AbstractDisk.hpp>
 #include <disk/MpcFile.hpp>
 #include <lcdgui/LayeredScreen.hpp>
@@ -24,47 +24,45 @@
 #include <file/FileUtil.hpp>
 #include <file/File.hpp>
 
-#include <audio/server/NonRealTimeAudioServer.hpp>
-
 using namespace mpc::ui::disk;
 using namespace std;
 
-DiskObserver::DiskObserver(mpc::Mpc* mpc)
+DiskObserver::DiskObserver()
 {
-	this->mpc = mpc;
-	views = vector<string>{ "All Files", ".SND", ".PGM", ".APS", ".MID", ".ALL", ".WAV", ".SEQ", ".SET" };
 	
+	views = vector<string>{ "All Files", ".SND", ".PGM", ".APS", ".MID", ".ALL", ".WAV", ".SEQ", ".SET" };
+
 	types = vector<string>{ "Save All Sequences & Songs", "Save a Sequence", "Save All Program and Sounds", "Save a Program & Sounds", "Save a Sound", "Copy Operating System" };
 	pgmSaveNames = vector<string>{ "PROGRAM ONLY", "WITH SOUNDS", "WITH .WAV" };
 	apsSaveNames = vector<string>{ "APS ONLY", "WITH SOUNDS", "WITH .WAV" };
-	auto uis = mpc->getUis().lock();
+	auto uis = Mpc::instance().getUis().lock();
 	samplerGui = uis->getSamplerGui();
 	soundGui = uis->getSoundGui();
 	diskWindowGui = uis->getDiskWindowGui();
 	diskWindowGui->addObserver(this);
 	samplerGui->addObserver(this);
 	soundGui->addObserver(this);
-	disk = mpc->getDisk();
-	sampler = mpc->getSampler();
-	sequencer = mpc->getSequencer();
+	disk = Mpc::instance().getDisk();
+	sampler = Mpc::instance().getSampler();
+	sequencer = Mpc::instance().getSequencer();
 	auto lSequencer = sequencer.lock();
 	lSequencer->addObserver(this);
-	diskGui = mpc->getUis().lock()->getDiskGui();
+	diskGui = Mpc::instance().getUis().lock()->getDiskGui();
 	diskGui->addObserver(this);
 	auto lSampler = sampler.lock();
 	int activeTrack = lSequencer->getActiveTrackIndex();
 	int drum = lSequencer->getActiveSequence().lock()->getTrack(activeTrack).lock()->getBusNumber() - 1;
-	if (mpc->getAudioMidiServices().lock()->getAudioServer()->isRunning()) {
-		int candidate = drum;
-		if (candidate < 0)
-			candidate = 0;
+	int candidate = drum;
 
-		mpcSoundPlayerChannel = lSampler->getDrum(candidate);
-		mpcSoundPlayerChannel->addObserver(this);
-		program = dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
+	if (candidate < 0) {
+		candidate = 0;
 	}
 
-	csn = mpc->getLayeredScreen().lock()->getCurrentScreenName();
+	mpcSoundPlayerChannel = lSampler->getDrum(candidate);
+	mpcSoundPlayerChannel->addObserver(this);
+	program = dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
+
+	csn = Mpc::instance().getLayeredScreen().lock()->getCurrentScreenName();
 
 	auto lDisk = disk.lock();
 	
@@ -72,7 +70,7 @@ DiskObserver::DiskObserver(mpc::Mpc* mpc)
 		lDisk->addObserver(this);
 	}
 	
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	
 	if (csn.compare("load") == 0) {
 		viewField = ls->lookupField("view");
@@ -181,11 +179,8 @@ void DiskObserver::displayReplaceSameSounds()
 
 void DiskObserver::displayFree()
 {
-	//auto space = stringBuilder().append("")->append(npc((*::java::io::File::listRoots())[0])->getFreeSpace())->toString();
-	//if(npc(space)->length() > 9)
-   //     space = stringBuilder().append(npc(space)->substring(0, 3))->append("GB")->toString();
-
-	freeLabel.lock()->setText("-1GB");
+	//auto freeFormatted = moduru::file::FileUtil::getFreeDiskSpaceFormatted(mpc::StartUp::storesPath);
+	freeLabel.lock()->setText("0GB");
 }
 
 void DiskObserver::displayDevice()
@@ -261,7 +256,7 @@ void DiskObserver::displayFile()
 	auto lDisk = disk.lock();
 	auto lFileField = fileField.lock();
 	auto lFileLabel = fileLabel.lock();
-	auto nameGui = mpc->getUis().lock()->getNameGui();
+	auto nameGui = Mpc::instance().getUis().lock()->getNameGui();
 	if (csn.compare("saveapsfile") == 0) {
 		lFileField->setText(nameGui->getName());
 	}
@@ -373,7 +368,7 @@ void DiskObserver::update(moduru::observer::Observable* o, nonstd::any a)
 		displayLoadReplaceSound();
 	}
 	else if (param.compare("removepopup") == 0) {
-		mpc->getLayeredScreen().lock()->removePopup();
+		Mpc::instance().getLayeredScreen().lock()->removePopup();
 	}
 
 	else if (param.compare("padandnote") == 0 || param.compare("note") == 0) {

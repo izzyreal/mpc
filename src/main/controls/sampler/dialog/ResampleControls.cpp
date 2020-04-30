@@ -14,8 +14,8 @@
 using namespace mpc::controls::sampler::dialog;
 using namespace std;
 
-ResampleControls::ResampleControls(mpc::Mpc* mpc)
-	: AbstractSamplerControls(mpc)
+ResampleControls::ResampleControls()
+	: AbstractSamplerControls()
 {
 }
 

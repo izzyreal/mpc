@@ -2,7 +2,7 @@
 #include <controls/midisync/AbstractMidiSyncControls.hpp>
 
 namespace mpc {
-	class Mpc;
+	
 	namespace controls {
 		namespace midisync {
 
@@ -16,7 +16,7 @@ namespace mpc {
 				void function(int i) override;
 
 			public:
-				SyncControls(mpc::Mpc* mpc);
+				SyncControls();
 				~SyncControls();
 	
 			};

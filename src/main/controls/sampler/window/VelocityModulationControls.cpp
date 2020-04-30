@@ -6,8 +6,8 @@
 using namespace mpc::controls::sampler::window;
 using namespace std;
 
-VelocityModulationControls::VelocityModulationControls(mpc::Mpc* mpc)
-	: AbstractSamplerControls(mpc)
+VelocityModulationControls::VelocityModulationControls()
+	: AbstractSamplerControls()
 {
 }
 

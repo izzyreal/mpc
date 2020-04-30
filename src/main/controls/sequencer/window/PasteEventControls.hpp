@@ -14,7 +14,7 @@ namespace mpc {
 					typedef AbstractSequencerControls super;
 					void function(int i) override;
 
-					PasteEventControls(mpc::Mpc* mpc);
+					PasteEventControls();
 
 				};
 

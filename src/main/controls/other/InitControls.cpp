@@ -5,8 +5,8 @@
 using namespace mpc::controls::other;
 using namespace std;
 
-InitControls::InitControls(mpc::Mpc* mpc) 
-	: AbstractOtherControls(mpc)
+InitControls::InitControls() 
+	: AbstractOtherControls()
 {
 }
 

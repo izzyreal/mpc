@@ -14,8 +14,8 @@ using namespace mpc::controls::sequencer::window;
 using namespace mpc::sequencer;
 using namespace std;
 
-EditMultipleControls::EditMultipleControls(mpc::Mpc* mpc)
-	: AbstractSequencerControls(mpc)
+EditMultipleControls::EditMultipleControls()
+	: AbstractSequencerControls()
 {
 }
 

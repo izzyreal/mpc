@@ -11,8 +11,8 @@
 using namespace mpc::controls::sampler::window;
 using namespace std;
 
-KeepOrRetryControls::KeepOrRetryControls(mpc::Mpc* mpc) 
-	: AbstractSamplerControls(mpc)
+KeepOrRetryControls::KeepOrRetryControls() 
+	: AbstractSamplerControls()
 {
 }
 
@@ -33,8 +33,8 @@ void KeepOrRetryControls::function(int i)
 		lLs->openScreen("sample");
 		break;
 	case 3 :
-		if (mpc->getControls().lock()->isF4Pressed()) return;
-		mpc->getControls().lock()->setF4Pressed(true);
+		if (Mpc::instance().getControls().lock()->isF4Pressed()) return;
+		Mpc::instance().getControls().lock()->setF4Pressed(true);
 		lSampler->playPreviewSample(0, lSampler->getPreviewSound().lock()->getLastFrameIndex(), 0, 2);
 		break;
 	case 4:

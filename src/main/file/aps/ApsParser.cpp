@@ -43,9 +43,9 @@ ApsParser::ApsParser(mpc::disk::MpcFile* file)
 	}
 }
 
-ApsParser::ApsParser(mpc::Mpc* mpc, string apsNameString)
+ApsParser::ApsParser(string apsNameString)
 {
-	auto sampler = mpc->getSampler().lock();
+	auto sampler = Mpc::instance().getSampler().lock();
 	vector<vector<char>> chunks;
 	programCount = sampler->getProgramCount();
 	int const soundCount = sampler->getSoundCount();
@@ -56,7 +56,7 @@ ApsParser::ApsParser(mpc::Mpc* mpc, string apsNameString)
 	chunks.push_back(vector<char>{ 24, 0 });
 	auto apsName = ApsName(apsNameString);
 	chunks.push_back(apsName.getBytes());
-	auto parameters = ApsGlobalParameters(mpc);
+	auto parameters = ApsGlobalParameters();
 	chunks.push_back(parameters.getBytes());
 	auto masterTable = ApsAssignTable(*sampler->getMasterPadAssign());
 	chunks.push_back(masterTable.getBytes());

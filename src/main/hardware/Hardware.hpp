@@ -8,7 +8,7 @@
 
 namespace mpc {
 
-	class Mpc;
+	
 
 	namespace hardware {
 
@@ -44,7 +44,7 @@ namespace mpc {
 			std::weak_ptr<Slider> getSlider();
 
 		public:
-			Hardware(mpc::Mpc* mpc);
+			Hardware();
 			~Hardware();
 
 		};

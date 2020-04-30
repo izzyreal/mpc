@@ -14,7 +14,7 @@ namespace mpc {
 				void function(int i) override;
 
 			public:
-				SelectDrumMixerControls(mpc::Mpc* mpc);
+				SelectDrumMixerControls();
 				~SelectDrumMixerControls();
 
 			};

@@ -6,8 +6,8 @@
 using namespace mpc::controls::sampler;
 using namespace std;
 
-DrumControls::DrumControls(mpc::Mpc* mpc) 
-	: AbstractSamplerControls(mpc)
+DrumControls::DrumControls() 
+	: AbstractSamplerControls()
 {
 }
 

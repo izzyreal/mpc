@@ -9,8 +9,8 @@
 using namespace mpc::controls::sequencer::window;
 using namespace std;
 
-TimingCorrectControls::TimingCorrectControls(mpc::Mpc* mpc)
-	: AbstractSequencerControls(mpc)
+TimingCorrectControls::TimingCorrectControls()
+	: AbstractSequencerControls()
 {
 }
 

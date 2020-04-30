@@ -13,16 +13,16 @@
 using namespace mpc::ui::disk;
 using namespace std;
 
-LoadASequenceFromAllObserver::LoadASequenceFromAllObserver(mpc::Mpc* mpc)
+LoadASequenceFromAllObserver::LoadASequenceFromAllObserver()
 {
-	this->mpc = mpc;
-	diskGui = mpc->getUis().lock()->getDiskGui();
-	diskWindowGui = mpc->getUis().lock()->getDiskWindowGui();
+	
+	diskGui = Mpc::instance().getUis().lock()->getDiskGui();
+	diskWindowGui = Mpc::instance().getUis().lock()->getDiskWindowGui();
 	diskGui->deleteObservers();
 	diskGui->addObserver(this);
 	diskWindowGui->deleteObservers();
 	diskWindowGui->addObserver(this);
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	fileField = ls->lookupField("file");
 	fileLabel = ls->lookupLabel("file0");
 	loadIntoField = ls->lookupField("loadinto");
@@ -42,7 +42,7 @@ void LoadASequenceFromAllObserver::displayFile()
 void LoadASequenceFromAllObserver::displayLoadInto()
 {
 	loadIntoField.lock()->setTextPadded(diskWindowGui->getLoadInto() + 1, "0");
-	loadIntoLabel.lock()->setText("-" + mpc->getSequencer().lock()->getSequence(diskWindowGui->getLoadInto()).lock()->getName());
+	loadIntoLabel.lock()->setText("-" + Mpc::instance().getSequencer().lock()->getSequence(diskWindowGui->getLoadInto()).lock()->getName());
 }
 
 void LoadASequenceFromAllObserver::update(moduru::observer::Observable* o, nonstd::any a)

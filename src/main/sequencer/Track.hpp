@@ -25,7 +25,7 @@ namespace mpc::sequencer {
 		vector<shared_ptr<NoteEvent>> noteOffs;
 
 		mpc::sequencer::Sequence* parent{ nullptr };
-		Mpc* mpc{ nullptr };
+		
 		weak_ptr<Sequencer> sequencer{};
 		int busNumber{ 0 };
 		string name{ "" };
@@ -127,7 +127,7 @@ namespace mpc::sequencer {
 		string getActualName();
 
 	public:
-		Track(mpc::sequencer::Sequence* parent, Mpc* mpc, int i);
+		Track(mpc::sequencer::Sequence* parent, int i);
 		~Track();
 
 	private:

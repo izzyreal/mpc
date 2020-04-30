@@ -6,8 +6,8 @@
 using namespace mpc::controls::mixer;
 using namespace std;
 
-SelectDrumMixerControls::SelectDrumMixerControls(mpc::Mpc* mpc) 
-	: AbstractMixerControls(mpc)
+SelectDrumMixerControls::SelectDrumMixerControls() 
+	: AbstractMixerControls()
 {
 }
 

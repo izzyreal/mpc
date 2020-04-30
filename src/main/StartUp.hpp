@@ -7,7 +7,7 @@
 #include <memory>
 
 namespace mpc {
-	class Mpc;
+	
 	class StartUp
 	{
 
@@ -26,7 +26,7 @@ namespace mpc {
 		static std::string logFilePath;
 
 	public:
-		void runStartUpRoutine(mpc::Mpc* mpc);
+		void runStartUpRoutine();
 
 	public:
 		static std::weak_ptr<ui::UserDefaults> getUserDefaults();

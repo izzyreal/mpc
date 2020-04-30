@@ -22,7 +22,7 @@ namespace mpc {
 					typedef mpc::controls::disk::AbstractDiskControls super;
 					void function(int i) override;
 
-					DeleteFileControls(mpc::Mpc* mpc);
+					DeleteFileControls();
 
 				private:
 					friend class DeleteFileThread;

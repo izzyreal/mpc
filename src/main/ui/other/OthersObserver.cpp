@@ -7,11 +7,11 @@
 using namespace mpc::ui::other;
 using namespace std;
 
-OthersObserver::OthersObserver(mpc::Mpc* mpc) 
+OthersObserver::OthersObserver() 
 {
-	othersGui = mpc->getUis().lock()->getOthersGui();
+	othersGui = Mpc::instance().getUis().lock()->getOthersGui();
 	othersGui->addObserver(this);
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	tapAveragingField = ls->lookupField("tapaveraging");
 	displayTapAveraging();
 }

@@ -9,9 +9,9 @@
 using namespace mpc::ui::sampler;
 using namespace std;
 
-SamplerGui::SamplerGui(mpc::Mpc* mpc) 
+SamplerGui::SamplerGui() 
 {
-	this->mpc = mpc;
+	
 }
 
 void SamplerGui::setPadAndNote(int pad, int note)
@@ -57,7 +57,7 @@ void SamplerGui::setBank(int i)
 	if (i < 0 || i > 3) return;
 
 	bank = i;
-	auto hw = mpc->getHardware().lock();
+	auto hw = Mpc::instance().getHardware().lock();
 	hw->getLed("padbanka").lock()->light(i == 0);
 	hw->getLed("padbankb").lock()->light(i == 1);
 	hw->getLed("padbankc").lock()->light(i == 2);

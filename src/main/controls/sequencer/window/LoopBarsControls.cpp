@@ -5,8 +5,8 @@
 using namespace mpc::controls::sequencer::window;
 using namespace std;
 
-LoopBarsControls::LoopBarsControls(mpc::Mpc* mpc)
-	: AbstractSequencerControls(mpc)
+LoopBarsControls::LoopBarsControls()
+	: AbstractSequencerControls()
 {
 }
 

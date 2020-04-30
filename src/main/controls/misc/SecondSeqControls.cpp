@@ -5,8 +5,8 @@
 using namespace mpc::controls::misc;
 using namespace std;
 
-SecondSeqControls::SecondSeqControls(mpc::Mpc* mpc)
-	: AbstractMiscControls(mpc)
+SecondSeqControls::SecondSeqControls()
+	: AbstractMiscControls()
 {
 }
 

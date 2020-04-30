@@ -7,29 +7,29 @@
 using namespace mpc::hardware;
 using namespace std;
 
-Pot::Pot(string label, mpc::Mpc* mpc)
+Pot::Pot(string label)
 {
 	this->label = label;
-	this->mpc = mpc;
+	
 }
 
 void Pot::setValue(int i) {
 	if (i < 0 || i > 100) return;
 	if (label.compare("vol") == 0) {
-		mpc->getAudioMidiServices().lock()->setMasterLevel(i);
+		Mpc::instance().getAudioMidiServices().lock()->setMasterLevel(i);
 	}
 	else if (label.compare("rec") == 0) {
-		mpc->getAudioMidiServices().lock()->setRecordLevel(i);
+		Mpc::instance().getAudioMidiServices().lock()->setRecordLevel(i);
 	}
 //	notifyObservers(i);
 }
 
 int Pot::getValue() {
 	if (label.compare("vol") == 0) {
-		return mpc->getAudioMidiServices().lock()->getMasterLevel();
+		return Mpc::instance().getAudioMidiServices().lock()->getMasterLevel();
 	}
 	else if (label.compare("rec") == 0) {
-		return mpc->getAudioMidiServices().lock()->getRecordLevel();
+		return Mpc::instance().getAudioMidiServices().lock()->getRecordLevel();
 	}
 	return 0;
 }

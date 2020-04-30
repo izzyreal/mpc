@@ -9,8 +9,8 @@
 using namespace mpc::controls::misc;
 using namespace std;
 
-TransControls::TransControls(mpc::Mpc* mpc) 
-	: AbstractMiscControls(mpc)
+TransControls::TransControls() 
+	: AbstractMiscControls()
 {
 }
 

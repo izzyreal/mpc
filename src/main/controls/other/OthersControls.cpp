@@ -8,10 +8,10 @@
 using namespace mpc::controls::other;
 using namespace std;
 
-OthersControls::OthersControls(mpc::Mpc* mpc) 
-	: BaseControls(mpc)
+OthersControls::OthersControls() 
+	: BaseControls()
 {
-	othersGui = mpc->getUis().lock()->getOthersGui();
+	othersGui = Mpc::instance().getUis().lock()->getOthersGui();
 }
 
 void OthersControls::function(int i)
@@ -30,7 +30,7 @@ void OthersControls::function(int i)
 void OthersControls::turnWheel(int i)
 {
     init();
-	auto controls = mpc->getControls().lock();
+	auto controls = Mpc::instance().getControls().lock();
 	if (param.compare("tapaveraging") == 0) {
 		othersGui->setTapAveraging(othersGui->getTapAveraging() + i);
 	}

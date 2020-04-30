@@ -15,8 +15,8 @@
 using namespace mpc::controls::disk::dialog;
 using namespace std;
 
-FileAlreadyExistsControls::FileAlreadyExistsControls(mpc::Mpc* mpc) 
-	: AbstractDiskControls(mpc)
+FileAlreadyExistsControls::FileAlreadyExistsControls() 
+	: AbstractDiskControls()
 {
 }
 
@@ -53,7 +53,7 @@ void FileAlreadyExistsControls::function(int i)
 			if(success) {
 				lDisk->flush();
 				lDisk->initFiles();
-				mpc::file::aps::ApsSaver(mpc, apsName);
+				mpc::file::aps::ApsSaver apsSaver(apsName);
 			}
 		}
 		else if (ls.lock()->getPreviousScreenName().compare("saveallfile") == 0) {
@@ -63,7 +63,7 @@ void FileAlreadyExistsControls::function(int i)
 			if(success) {
 				lDisk->flush();
 				lDisk->initFiles();
-				auto allParser = mpc::file::all::AllParser(mpc, mpc::Util::getFileName(nameGui->getName()));
+				auto allParser = mpc::file::all::AllParser(mpc::Util::getFileName(nameGui->getName()));
 				auto f = lDisk->newFile(allName);
                 auto bytes = allParser.getBytes();
 				f->setFileData(&bytes);

@@ -5,8 +5,8 @@
 using namespace mpc::controls::sequencer::window;
 using namespace std;
 
-TransmitProgramChangesControls::TransmitProgramChangesControls(mpc::Mpc* mpc)
-	: AbstractSequencerControls(mpc)
+TransmitProgramChangesControls::TransmitProgramChangesControls()
+	: AbstractSequencerControls()
 {
 }
 

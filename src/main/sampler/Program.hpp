@@ -19,7 +19,7 @@ namespace ctoot {
 
 namespace mpc {
 
-	class Mpc;
+	
 
 	namespace sampler {
 
@@ -60,7 +60,7 @@ namespace mpc {
 			int getNoteFromPad(int i);
 
 		public:
-			Program(mpc::Mpc* mpc, mpc::sampler::Sampler* sampler);
+			Program(mpc::sampler::Sampler* sampler);
 			~Program();
 
 		};

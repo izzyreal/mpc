@@ -13,7 +13,7 @@
 using namespace std;
 using namespace mpc::lcdgui;
 
-MixerStrip::MixerStrip(int columnIndex, int bank, mpc::Mpc* mpc)
+MixerStrip::MixerStrip(int columnIndex, int bank)
 {
 	this->columnIndex = columnIndex;
 	abcd = vector<string>{ "A", "B", "C", "D" };
@@ -27,8 +27,8 @@ MixerStrip::MixerStrip(int columnIndex, int bank, mpc::Mpc* mpc)
 	yPos0fx = 2;
 	yPos1fx = 2;
 	selection = -1;
-	mixGui = mpc->getUis().lock()->getMixerGui();
-	auto lLs = mpc->getLayeredScreen().lock();
+	mixGui = Mpc::instance().getUis().lock()->getMixerGui();
+	auto lLs = Mpc::instance().getLayeredScreen().lock();
 	verticalBar = lLs->getVerticalBarsMixer()[columnIndex];
 	verticalBar.lock()->Hide(false);
 	knob = lLs->getKnobs()[columnIndex];

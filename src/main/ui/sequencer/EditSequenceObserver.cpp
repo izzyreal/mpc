@@ -18,13 +18,13 @@
 using namespace mpc::ui::sequencer;
 using namespace std;
 
-EditSequenceObserver::EditSequenceObserver(mpc::Mpc* mpc)
+EditSequenceObserver::EditSequenceObserver()
 {
-	sequencer = mpc->getSequencer();
-	sampler = mpc->getSampler();
+	sequencer = Mpc::instance().getSequencer();
+	sampler = Mpc::instance().getSampler();
 	functionNames = { "COPY", "DURATION", "VELOCITY", "TRANSPOSE" };
 	modeNames = { "ADD VALUE", "SUB VALUE", "MULTI VAL%", "SET TO VAL" };
-	editSequenceGui = mpc->getUis().lock()->getEditSequenceGui();
+	editSequenceGui = Mpc::instance().getUis().lock()->getEditSequenceGui();
 	editSequenceGui->addObserver(this);
 	auto lSequencer = sequencer.lock();
 	seqNum = lSequencer->getActiveSequenceIndex();
@@ -33,7 +33,7 @@ EditSequenceObserver::EditSequenceObserver(mpc::Mpc* mpc)
 	auto seq = sequence.lock();
 	track = seq->getTrack(trackNum);
 	timeSig = seq->getTimeSignature();
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	editFunctionField = ls->lookupField("editfunction");
 	editFunctionField.lock()->setSize(52 + 4, 9);
 	time0Field = ls->lookupField("time0");

@@ -7,7 +7,7 @@
 
 namespace mpc {
 
-	class Mpc;
+	
 
 	namespace sampler {
 		class Sampler;
@@ -30,7 +30,7 @@ namespace mpc {
 			{
 
 			private:
-				mpc::Mpc* mpc;
+				
 				SoundGui* soundGui{ nullptr };
 				std::weak_ptr<mpc::sampler::Sampler> sampler{ };
 				std::weak_ptr<mpc::lcdgui::Field> soundNameField{};
@@ -76,7 +76,7 @@ namespace mpc {
 			public:
 				void update(moduru::observer::Observable* o, nonstd::any arg) override;
 
-				SoundObserver(mpc::Mpc* mpc);
+				SoundObserver();
 				~SoundObserver();
 
 			};

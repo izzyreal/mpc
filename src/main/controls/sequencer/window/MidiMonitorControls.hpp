@@ -13,7 +13,7 @@ namespace mpc {
 				public:
 					typedef mpc::controls::sequencer::AbstractSequencerControls super;
 
-					MidiMonitorControls(mpc::Mpc* mpc);
+					MidiMonitorControls();
 
 				};
 

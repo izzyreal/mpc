@@ -8,8 +8,8 @@
 using namespace mpc::controls::sequencer;
 using namespace std;
 
-TrMuteControls::TrMuteControls(mpc::Mpc* mpc)
-	: AbstractSequencerControls(mpc)
+TrMuteControls::TrMuteControls()
+	: AbstractSequencerControls()
 {
 }
 
@@ -22,7 +22,7 @@ void TrMuteControls::pad(int i, int velo, bool repeat, int tick)
 	init();
 	auto lSequencer = sequencer.lock();
 	auto lLs = ls.lock();
-	auto controls = mpc->getControls().lock();
+	auto controls = Mpc::instance().getControls().lock();
 	if (controls->isF6Pressed() || lSequencer->isSoloEnabled()) {
 		if (!lSequencer->isSoloEnabled())
 			lSequencer->setSoloEnabled(true);

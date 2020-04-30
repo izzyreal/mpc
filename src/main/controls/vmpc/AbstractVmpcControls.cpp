@@ -11,12 +11,12 @@
 using namespace mpc::controls::vmpc;
 using namespace std;
 
-AbstractVmpcControls::AbstractVmpcControls(mpc::Mpc* mpc)
-	: BaseControls(mpc)
+AbstractVmpcControls::AbstractVmpcControls()
+	: BaseControls()
 {
-	midiSyncGui = mpc->getUis().lock()->getMidiSyncGui();
-	d2dRecorderGui = mpc->getUis().lock()->getD2DRecorderGui();
-	ams = mpc->getAudioMidiServices();
+	midiSyncGui = Mpc::instance().getUis().lock()->getMidiSyncGui();
+	d2dRecorderGui = Mpc::instance().getUis().lock()->getD2DRecorderGui();
+	ams = Mpc::instance().getAudioMidiServices();
 }
 
 void AbstractVmpcControls::init()

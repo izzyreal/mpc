@@ -14,7 +14,7 @@ namespace mpc {
 					typedef mpc::controls::sampler::AbstractSamplerControls super;
 					void turnWheel(int i) override;
 
-					VelocityModulationControls(mpc::Mpc* mpc);
+					VelocityModulationControls();
 
 				};
 

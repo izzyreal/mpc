@@ -14,7 +14,7 @@ namespace ctoot::mpc {
 }
 
 namespace mpc {
-	class Mpc;
+	
 }
 
 namespace mpc::sequencer {
@@ -54,7 +54,7 @@ namespace mpc::sampler {
 		vector<float> clickSample{};
 		shared_ptr<Sound> clickSound{};
 		vector<string> sortNames{};
-		mpc::Mpc* mpc{ nullptr };
+		
 
 	public:
 		int getInputLevel();
@@ -145,7 +145,7 @@ namespace mpc::sampler {
 
 
 	public:
-		Sampler(mpc::Mpc* mpc);
+		Sampler();
 		~Sampler();
 
 	};

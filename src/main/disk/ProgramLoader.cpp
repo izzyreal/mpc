@@ -23,9 +23,9 @@ using namespace moduru::lang;
 using namespace mpc::disk;
 using namespace std;
 
-ProgramLoader::ProgramLoader(mpc::Mpc* mpc, MpcFile* file, bool replace)
+ProgramLoader::ProgramLoader(MpcFile* file, bool replace)
 {
-	this->mpc = mpc;
+	
 	this->file = file;
 	this->replace = replace;
 	if (loadProgramThread.joinable()) loadProgramThread.join();
@@ -39,11 +39,11 @@ void ProgramLoader::static_loadProgram(void* this_p)
 
 void ProgramLoader::loadProgram()
 {
-	auto converter = PgmToProgramConverter(file, mpc->getSampler());
+	auto converter = PgmToProgramConverter(file, Mpc::instance().getSampler());
 	auto p = converter.get();
 	auto pgmSoundNames = converter.getSoundNames();
 	auto soundsDestIndex = vector<int>(pgmSoundNames.size());
-	auto lDisk = mpc->getDisk().lock();
+	auto lDisk = Mpc::instance().getDisk().lock();
 	for (int i = 0; i < pgmSoundNames.size(); i++) {
 		auto ext = "snd";
 		MpcFile* soundFile = nullptr;
@@ -60,7 +60,7 @@ void ProgramLoader::loadProgram()
 			ext = "wav";
 		}
 		if (soundFile != nullptr) {
-			loadSound(soundFileName, ext, soundFile, &soundsDestIndex, mpc, replace, i);
+			loadSound(soundFileName, ext, soundFile, &soundsDestIndex, replace, i);
 		}
 		else {
 			if (lDisk != nullptr) {
@@ -83,18 +83,18 @@ void ProgramLoader::loadProgram()
 		}
 	}
 
-	auto adapter = ProgramImportAdapter(mpc->getSampler(), p, soundsDestIndex);
+	auto adapter = ProgramImportAdapter(Mpc::instance().getSampler(), p, soundsDestIndex);
 	result = adapter.get();
-	mpc->importLoadedProgram();
-	mpc->getUis().lock()->getDiskGui()->removePopup();
+	Mpc::instance().importLoadedProgram();
+	Mpc::instance().getUis().lock()->getDiskGui()->removePopup();
 	lDisk->setBusy(false);
-	mpc->getLayeredScreen().lock()->openScreen("load");
+	Mpc::instance().getLayeredScreen().lock()->openScreen("load");
 }
 
-void ProgramLoader::loadSound(string soundFileName, string ext, MpcFile* soundFile, vector<int>* soundsDestIndex, mpc::Mpc* mpc, bool replace, int loadSoundIndex)
+void ProgramLoader::loadSound(string soundFileName, string ext, MpcFile* soundFile, vector<int>* soundsDestIndex, bool replace, int loadSoundIndex)
 {
 	int addedSoundIndex = -1;
-	auto sl = SoundLoader(mpc, mpc->getSampler().lock()->getSounds(), replace);
+	auto sl = SoundLoader(Mpc::instance().getSampler().lock()->getSounds(), replace);
 	sl.setPartOfProgram(true);
 	try {
 		addedSoundIndex = sl.loadSound(soundFile);
@@ -110,9 +110,9 @@ void ProgramLoader::loadSound(string soundFileName, string ext, MpcFile* soundFi
 
 void ProgramLoader::showPopup(string name, string ext, int sampleSize)
 {
-	mpc->getUis().lock()->getDiskGui()->removePopup();
-	mpc->getUis().lock()->getDiskGui()->openPopup(StrUtil::padRight(name, " ", 16), ext);
-	if (dynamic_pointer_cast<StdDisk>(mpc->getDisk().lock()) != nullptr) {
+	Mpc::instance().getUis().lock()->getDiskGui()->removePopup();
+	Mpc::instance().getUis().lock()->getDiskGui()->openPopup(StrUtil::padRight(name, " ", 16), ext);
+	if (dynamic_pointer_cast<StdDisk>(Mpc::instance().getDisk().lock()) != nullptr) {
 		try {
 			auto sleepTime = sampleSize / 400;
 			if (sleepTime < 300) sleepTime = 300;
@@ -127,7 +127,7 @@ void ProgramLoader::showPopup(string name, string ext, int sampleSize)
 
 void ProgramLoader::notfound(string soundFileName, string ext)
 {
-	auto diskGui = mpc->getUis().lock()->getDiskGui();
+	auto diskGui = Mpc::instance().getUis().lock()->getDiskGui();
 	auto skipAll = diskGui->getSkipAll();
 	if (!skipAll) {
 		diskGui->openPopup(soundFileName, ext);
@@ -137,10 +137,10 @@ void ProgramLoader::notfound(string soundFileName, string ext)
 		catch (exception e) {
 			e.what();
 		}
-		mpc->getLayeredScreen().lock()->removePopup();
+		Mpc::instance().getLayeredScreen().lock()->removePopup();
 		diskGui->setWaitingForUser(true);
 		diskGui->setCannotFindFileName(soundFileName);
-		mpc->getLayeredScreen().lock()->openScreen("cantfindfile");
+		Mpc::instance().getLayeredScreen().lock()->openScreen("cantfindfile");
 		while (diskGui->isWaitingForUser()) {
 			try {
 				this_thread::sleep_for(chrono::milliseconds(25));

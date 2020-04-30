@@ -5,7 +5,7 @@
 #include <string>
 
 namespace mpc {
-	class Mpc;
+	
 	namespace ui {
 
 		namespace vmpc {
@@ -15,7 +15,7 @@ namespace mpc {
 			{
 
 			private:
-				mpc::Mpc* mpc;
+				
 				int record{ 0 };
 				int sq{ 0 };
 				int song{ 0 };
@@ -46,7 +46,7 @@ namespace mpc {
 				void setSampleRate(int rate);
 				int getSampleRate();
 
-				DirectToDiskRecorderGui(mpc::Mpc* mpc);
+				DirectToDiskRecorderGui();
 
 			};
 

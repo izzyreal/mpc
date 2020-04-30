@@ -9,7 +9,7 @@
 
 namespace mpc {
 
-	class Mpc;
+	
 
 	namespace sequencer {
 		class Sequencer;
@@ -38,7 +38,7 @@ namespace mpc {
 			private:
 				std::vector<std::string> busNames{};
 				mpc::lcdgui::LayeredScreen* ls{};
-				mpc::Mpc* mpc;
+				
 				std::weak_ptr<mpc::sequencer::Sequencer> sequencer{};
 				std::weak_ptr<mpc::sampler::Sampler> sampler{};
 				int trackNum{};
@@ -98,7 +98,7 @@ namespace mpc {
 				void displayLoop();
 
 			public:
-				SequencerObserver(Mpc* mpc);
+				SequencerObserver();
 				~SequencerObserver();
 
 			public:

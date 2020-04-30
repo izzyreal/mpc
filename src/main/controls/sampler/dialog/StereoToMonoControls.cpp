@@ -9,8 +9,8 @@
 using namespace mpc::controls::sampler::dialog;
 using namespace std;
 
-StereoToMonoControls::StereoToMonoControls(mpc::Mpc* mpc)
-	: AbstractSamplerControls(mpc)
+StereoToMonoControls::StereoToMonoControls()
+	: AbstractSamplerControls()
 {
 }
 

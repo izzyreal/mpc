@@ -17,9 +17,9 @@
 using namespace mpc::sequencer;
 using namespace std;
 
-Sequence::Sequence(mpc::Mpc* mpc, vector<string> defaultTrackNames)
+Sequence::Sequence(vector<string> defaultTrackNames)
 {
-	this->mpc = mpc;
+	
 	this->defaultTrackNames = defaultTrackNames;
 	barLengths = vector<int>(999);
 	numerators = vector<int>(999);
@@ -32,12 +32,12 @@ Sequence::Sequence(mpc::Mpc* mpc, vector<string> defaultTrackNames)
 	loopEnabled = true;
 	lastBar = -1;
 	for (int i = 0; i < 64; i++) {
-		tracks.push_back(make_shared<Track>(this, mpc, i));
+		tracks.push_back(make_shared<Track>(this, i));
 		tracks[i]->setName(defaultTrackNames[i]);
 	}
-	metaTracks.push_back(make_shared<Track>(this, mpc, 64));
-	metaTracks.push_back(make_shared<Track>(this, mpc, 65));
-	metaTracks.push_back(make_shared<Track>(this, mpc, 66));
+	metaTracks.push_back(make_shared<Track>(this, 64));
+	metaTracks.push_back(make_shared<Track>(this, 65));
+	metaTracks.push_back(make_shared<Track>(this, 66));
 	metaTracks[0]->setUsed(true);
 	metaTracks[1]->setUsed(true);
 	metaTracks[2]->setUsed(true);
@@ -157,7 +157,7 @@ void Sequence::initMetaTracks()
 
 void Sequence::createClickTrack()
 {
-	auto swGui = mpc->getUis().lock()->getSequencerWindowGui();
+	auto swGui = Mpc::instance().getUis().lock()->getSequencerWindowGui();
 	metaTracks[0]->removeEvents();
 	auto bars = getLastBar() + 1;
 	auto den = 0;
@@ -404,7 +404,7 @@ int Sequence::getLastTick()
 TimeSignature Sequence::getTimeSignature()
 {
 	auto ts = TimeSignature();
-	int bar = mpc->getSequencer().lock()->getCurrentBarNumber();
+	int bar = Mpc::instance().getSequencer().lock()->getCurrentBarNumber();
 	ts.setNumerator(numerators[bar]);
 	ts.setDenominator(denominators[bar]);
 	return ts;
@@ -435,7 +435,7 @@ void Sequence::purgeAllTracks()
 
 weak_ptr<Track> Sequence::purgeTrack(int i)
 {
-	tracks[i] = make_shared<Track>(this, mpc, i);
+	tracks[i] = make_shared<Track>(this, i);
 	tracks[i]->setName(defaultTrackNames[i]);
 	return tracks[i];
 }

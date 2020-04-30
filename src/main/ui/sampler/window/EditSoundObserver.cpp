@@ -14,11 +14,11 @@
 using namespace mpc::ui::sampler::window;
 using namespace std;
 
-EditSoundObserver::EditSoundObserver(mpc::Mpc* mpc)  
+EditSoundObserver::EditSoundObserver()  
 {
-	this->mpc = mpc;
+	
 	timeStretchPresetNames = vector<string>{ "FEM VOX", "MALE VOX", "LOW MALE VOX", "VOCAL", "HFREQ RHYTHM", "MFREQ RHYTHM", "LFREQ RHYTHM", "PERCUSSION", "LFREQ PERC.", "STACCATO", "LFREQ SLOW", "MUSIC 1", "MUSIC 2", "MUSIC 3", "SOFT PERC.", "HFREQ ORCH.", "LFREQ ORCH.", "SLOW ORCH." };
-	sampler = mpc->getSampler();
+	sampler = Mpc::instance().getSampler();
 	vector<string> newTimeStretchPresetNames = vector<string>(54);
 	auto totalCounter = 0;
 	auto letters = vector<string>{ "A", "B", "C" };
@@ -32,12 +32,12 @@ EditSoundObserver::EditSoundObserver(mpc::Mpc* mpc)
 	}
 	timeStretchPresetNames = newTimeStretchPresetNames;
 
-    auto uis = mpc->getUis().lock();
+    auto uis = Mpc::instance().getUis().lock();
 	editSoundGui = uis->getEditSoundGui();
 	editSoundGui->addObserver(this);
 	sequencerWindowGui = uis->getSequencerWindowGui();
 	sequencerWindowGui->addObserver(this);
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	editField = ls->lookupField("edit");
 	variable0Field = ls->lookupField("variable0");
 	variable0Label = ls->lookupLabel("variable0");
@@ -57,10 +57,10 @@ EditSoundObserver::EditSoundObserver(mpc::Mpc* mpc)
 void EditSoundObserver::displayEdit()
 {
     editField.lock()->setText(editNames[editSoundGui->getEdit()]);
-	auto editLabel = mpc->getLayeredScreen().lock()->lookupLabel("edit").lock();
+	auto editLabel = Mpc::instance().getLayeredScreen().lock()->lookupLabel("edit").lock();
 	editLabel->SetDirty();
-    auto b = mpc->getLayeredScreen().lock()->getCurrentBackground();
-	auto fk = mpc->getLayeredScreen().lock()->getFunctionKeys();
+    auto b = Mpc::instance().getLayeredScreen().lock()->getCurrentBackground();
+	auto fk = Mpc::instance().getLayeredScreen().lock()->getFunctionKeys();
 	if (editSoundGui->getEdit() == 0) {
         b->setName("editsound");
 		fk->SetDirty();

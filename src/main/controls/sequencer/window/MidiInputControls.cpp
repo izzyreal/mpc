@@ -6,8 +6,8 @@
 using namespace mpc::controls::sequencer::window;
 using namespace std;
 
-MidiInputControls::MidiInputControls(mpc::Mpc* mpc)
-	: AbstractSequencerControls(mpc)
+MidiInputControls::MidiInputControls()
+	: AbstractSequencerControls()
 {
 }
 

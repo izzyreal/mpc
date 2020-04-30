@@ -25,22 +25,22 @@
 using namespace mpc::ui::sampler;
 using namespace std;
 
-MixerObserver::MixerObserver(mpc::Mpc* mpc)  
+MixerObserver::MixerObserver()  
 {
-	this->mpc = mpc;
+	
 	fxPathNames = { "--", "M1", "M2", "R1", "R2" };
 	stereoNames = { "-", "12", "12", "34", "34", "56", "56", "78", "78" };
 	monoNames = { "-", "1", "2", "3", "4", "5", "6", "7", "8" };
-	auto uis = mpc->getUis().lock();
+	auto uis = Mpc::instance().getUis().lock();
 	samplerGui = uis->getSamplerGui();
 	samplerGui->addObserver(this);
 	bank = samplerGui->getBank();
 	mixGui = uis->getMixerGui();
 	mixGui->setXPos(samplerGui->getPad());
 	mixGui->addObserver(this);
-	ls = mpc->getLayeredScreen();
+	ls = Mpc::instance().getLayeredScreen();
 	auto lLs = ls.lock();
-	sampler = mpc->getSampler();
+	sampler = Mpc::instance().getSampler();
 	mixerSetupGui = uis->getMixerSetupGui();
 	mixerSetupGui->addObserver(this);
 	auto lSampler = sampler.lock();
@@ -118,7 +118,7 @@ void MixerObserver::initMixerStrips()
 {
 	mixerStrips.clear();
 	for (int i = 0; i < 16; i++) {
-		auto mixerStrip = new mpc::lcdgui::MixerStrip(i, bank, mpc);
+		auto mixerStrip = new mpc::lcdgui::MixerStrip(i, bank);
 		mixerStrips.push_back(mixerStrip);
 	}
 	mixGui->setMixerStrips(mixerStrips);

@@ -16,13 +16,13 @@
 using namespace mpc::ui::sampler;
 using namespace std;
 
-SndParamsObserver::SndParamsObserver(mpc::Mpc* mpc)
+SndParamsObserver::SndParamsObserver()
 {
-	this->mpc = mpc;
-	sampler = mpc->getSampler();
+	
+	sampler = Mpc::instance().getSampler();
 	
 	playXNames = vector<string>{ "ALL", "ZONE", "BEFOR ST", "BEFOR TO", "AFTR END" };
-	soundGui = mpc->getUis().lock()->getSoundGui();
+	soundGui = Mpc::instance().getUis().lock()->getSoundGui();
 	soundGui->addObserver(this);
 	auto lSampler = sampler.lock();
 	if (lSampler->getSoundCount() != 0) {
@@ -32,7 +32,7 @@ SndParamsObserver::SndParamsObserver(mpc::Mpc* mpc)
 		lSound->getOscillatorControls()->addObserver(this);
 		soundGui->initZones(sampler.lock()->getSound(soundGui->getSoundIndex()).lock()->getLastFrameIndex());
 	}
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	sndField = ls->lookupField("snd");
 	playXField = ls->lookupField("playx");
 	levelField = ls->lookupField("level");
@@ -132,7 +132,7 @@ void SndParamsObserver::displaySnd()
 {
 	auto lSound = sound.lock();
 	if (sampler.lock()->getSoundCount() != 0) {
-		auto ls = mpc->getLayeredScreen().lock();
+		auto ls = Mpc::instance().getLayeredScreen().lock();
 		if (ls->getFocus().compare("dummy") == 0) ls->setFocus(sndField.lock()->getName());
 		auto sampleName = lSound->getName();
 		if (!lSound->isMono()) {

@@ -14,13 +14,13 @@
 using namespace mpc::ui::sequencer;
 using namespace std;
 
-TrMoveObserver::TrMoveObserver(mpc::Mpc* mpc)
+TrMoveObserver::TrMoveObserver()
 {
-	this->mpc = mpc;
-	sequencer = mpc->getSequencer();
-	tmGui = mpc->getUis().lock()->getTrMoveGui();
+	
+	sequencer = Mpc::instance().getSequencer();
+	tmGui = Mpc::instance().getUis().lock()->getTrMoveGui();
 	tmGui->addObserver(this);
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	sqField = ls->lookupField("sq");
 	tr0Field = ls->lookupField("tr0");
 	tr1Field = ls->lookupField("tr1");
@@ -92,7 +92,7 @@ void TrMoveObserver::displayTrLabels()
 void TrMoveObserver::displayTrFields()
 {
 	auto s = sequencer.lock()->getSequence(tmGui->getSq()).lock();
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	if (tmGui->isSelected()) {
 		selectTrackLabel.lock()->Hide(true);
 		toMoveLabel.lock()->Hide(true);
@@ -129,7 +129,7 @@ void TrMoveObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 		displayTrLabels();
 		displayTrFields();
 	}
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	ls->setCurrentBackground("trmove");
 	selectTrackLabel.lock()->setText("Select track");
 	toMoveLabel.lock()->setText("to move.");
@@ -138,7 +138,7 @@ void TrMoveObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 
 void TrMoveObserver::displaySq()
 {
-	mpc->getLayeredScreen().lock()->lookupLabel("sq").lock()->SetDirty();
+	Mpc::instance().getLayeredScreen().lock()->lookupLabel("sq").lock()->SetDirty();
 	sqField.lock()->setText(moduru::lang::StrUtil::padLeft(to_string(tmGui->getSq() + 1), "0", 2) + "-" + sequencer.lock()->getSequence(tmGui->getSq()).lock()->getName());
 }
 

@@ -5,7 +5,7 @@
 #include <memory>
 
 namespace mpc {
-	class Mpc;
+	
 	namespace sequencer {
 
 		class Sequencer;
@@ -15,7 +15,7 @@ namespace mpc {
 		{
 
 		private:
-			mpc::Mpc* mpc;
+			
 			int frameCounter = 0;
 			bool running{ false };
 			bool metronome{ false };
@@ -38,7 +38,7 @@ namespace mpc {
 			int getTickPosition();
 
 		public:
-			FrameSeq(mpc::Mpc* mpc);
+			FrameSeq();
 			~FrameSeq();
 
 		};

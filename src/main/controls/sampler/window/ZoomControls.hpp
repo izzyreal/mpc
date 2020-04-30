@@ -22,7 +22,7 @@ namespace mpc {
 					void turnWheel(int i) override;
 
 				public:
-					ZoomControls(mpc::Mpc* mpc);
+					ZoomControls();
 
 				};
 

@@ -3,7 +3,7 @@
 #include <observer/Observable.hpp>
 
 namespace mpc {
-	class Mpc;
+	
 	namespace hardware {
 
 		class Slider
@@ -11,7 +11,7 @@ namespace mpc {
 		{
 
 		private:
-			mpc::Mpc* mpc;
+			
 			int value = 0;
 
 		public:
@@ -19,7 +19,7 @@ namespace mpc {
 			int getValue();
 
 		public:
-			Slider(mpc::Mpc* mpc);
+			Slider();
 			~Slider();
 
 		};

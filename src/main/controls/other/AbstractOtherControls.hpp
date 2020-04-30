@@ -4,7 +4,7 @@
 #include <memory>
 
 namespace mpc {
-	class Mpc;
+	
 	namespace sequencer {
 		class Sequence;
 	}
@@ -52,7 +52,7 @@ namespace mpc {
 				void init() override;
 
 			public:
-				AbstractOtherControls(mpc::Mpc* mpc);
+				AbstractOtherControls();
 				virtual ~AbstractOtherControls();
 
 			};

@@ -18,7 +18,7 @@ namespace moduru {
 
 namespace mpc {
 
-	class Mpc;
+	
 
 	namespace lcdgui {
 		class SelectedEventBar;
@@ -54,7 +54,7 @@ namespace mpc {
 		private:
 			static const int LAYER_COUNT{ 4 };
 
-			mpc::Mpc* mpc;
+			
 
 			std::vector<rapidjson::Document> layerJsons = std::vector<rapidjson::Document>(LAYER_COUNT);
 			std::vector<std::unique_ptr<Layer>> layers = std::vector<std::unique_ptr<Layer>>(LAYER_COUNT);
@@ -154,7 +154,7 @@ namespace mpc {
 			//void setFocus(std::string focus, int layer);
 
 		public:
-			LayeredScreen(mpc::Mpc* mpc);
+			LayeredScreen();
 			~LayeredScreen();
 
 		};

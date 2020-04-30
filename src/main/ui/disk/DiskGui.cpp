@@ -9,9 +9,9 @@
 using namespace mpc::ui::disk;
 using namespace std;
 
-DiskGui::DiskGui(mpc::Mpc* mpc) 
+DiskGui::DiskGui() 
 {
-	this->mpc = mpc;
+	
 }
 
 void DiskGui::setType(int i)
@@ -29,13 +29,13 @@ int DiskGui::getType()
 
 mpc::disk::MpcFile* DiskGui::getSelectedFile()
 {
-	auto lDisk = mpc->getDisk().lock();
+	auto lDisk = Mpc::instance().getDisk().lock();
 	return lDisk->getFile(fileLoad);
 }
 
 string DiskGui::getSelectedFileName()
 {
-	auto lDisk = mpc->getDisk().lock();
+	auto lDisk = Mpc::instance().getDisk().lock();
 	return lDisk->getFileNames()[fileLoad];
 }
 
@@ -54,13 +54,13 @@ int DiskGui::getDelete()
 
 bool DiskGui::isSelectedFileDirectory()
 {
-	auto lDisk = mpc->getDisk().lock();
+	auto lDisk = Mpc::instance().getDisk().lock();
 	return lDisk->getFile(fileLoad)->isDirectory();
 }
 
 int DiskGui::getFileSize(int i)
 {
-	auto lDisk = mpc->getDisk().lock();
+	auto lDisk = Mpc::instance().getDisk().lock();
 	if (lDisk->getFile(i) == nullptr || lDisk->getFile(i)->isDirectory()) return 0;
 	return (int)(lDisk->getFile(i)->length() / 1024);
 }
@@ -73,7 +73,7 @@ int DiskGui::getView()
 void DiskGui::setView(int i)
 {
 	if (i < 0 || i > 8) return;
-	auto lDisk = mpc->getDisk().lock();
+	auto lDisk = Mpc::instance().getDisk().lock();
 	view = i;
 	lDisk->initFiles();
 	fileLoad = 0;
@@ -100,7 +100,7 @@ int DiskGui::getFileLoad()
 
 void DiskGui::setSelectedFileNumberLimited(int i)
 {
-	auto lDisk = mpc->getDisk().lock();
+	auto lDisk = Mpc::instance().getDisk().lock();
 	if(i < 0 || i + 1 > lDisk->getFileNames().size()) return;
     fileLoad = i;
     setChanged();
@@ -122,12 +122,12 @@ void DiskGui::openPopup(string soundFileName, string ext)
         c = toupper(c);
     }
 
-	mpc->getLayeredScreen().lock()->createPopup("LOADING " + soundFileName + "." + ext, 85);
+	Mpc::instance().getLayeredScreen().lock()->createPopup("LOADING " + soundFileName + "." + ext, 85);
 }
 
 void DiskGui::removePopup()
 {
-	mpc->getLayeredScreen().lock()->removePopup();
+	Mpc::instance().getLayeredScreen().lock()->removePopup();
 }
 
 bool DiskGui::getClearProgramWhenLoading()

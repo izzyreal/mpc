@@ -11,7 +11,7 @@ namespace ctoot::mpc {
 }
 
 namespace mpc {
-	class Mpc;
+	
 }
 
 namespace mpc::sequencer {
@@ -49,7 +49,7 @@ namespace mpc::controls {
 		std::string param{ "" };
 		std::string csn{ "" };
 
-		Mpc* mpc{ nullptr };
+		
 		std::weak_ptr<mpc::sequencer::Sequencer> sequencer{};
 		std::weak_ptr<mpc::sampler::Sampler> sampler{};
 		std::weak_ptr<mpc::sequencer::Track> track{};
@@ -110,7 +110,7 @@ namespace mpc::controls {
 		void setSliderNoteVar(mpc::sequencer::NoteEvent* n, std::weak_ptr<mpc::sampler::Program> program);
 
 	public:
-		BaseControls(Mpc* mpc);
+		BaseControls();
 		virtual ~BaseControls();
 
 	};

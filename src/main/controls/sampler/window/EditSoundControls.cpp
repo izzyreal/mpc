@@ -19,8 +19,8 @@
 using namespace mpc::controls::sampler::window;
 using namespace std;
 
-EditSoundControls::EditSoundControls(mpc::Mpc* mpc) 
-	: AbstractSamplerControls(mpc)
+EditSoundControls::EditSoundControls() 
+	: AbstractSamplerControls()
 {
 }
 

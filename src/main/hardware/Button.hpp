@@ -6,7 +6,7 @@
 
 namespace mpc {
 
-	class Mpc;
+	
 
 	namespace controls {
 		class BaseControls;
@@ -19,7 +19,7 @@ namespace mpc {
 		{
 
 		private:
-			mpc::Mpc* mpc;
+			
 			std::string label{ "" };
 			std::weak_ptr<mpc::controls::BaseControls> controls;
 
@@ -29,7 +29,7 @@ namespace mpc {
 			void release();
 
 		public:
-			Button(mpc::Mpc* mpc, std::string label);
+			Button(std::string label);
 			~Button();
 
 		};

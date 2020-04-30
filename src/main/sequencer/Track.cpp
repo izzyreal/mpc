@@ -22,11 +22,11 @@
 using namespace mpc::sequencer;
 using namespace std;
 
-Track::Track(mpc::sequencer::Sequence* parent, mpc::Mpc* mpc, int i) 
+Track::Track(mpc::sequencer::Sequence* parent, int i) 
 {
 	this->parent = parent;
-	this->mpc = mpc;
-	sequencer = mpc->getSequencer();
+	
+	sequencer = Mpc::instance().getSequencer();
 	trackIndex = i;
 	programChange = 0;
 	velocityRatio = 100;
@@ -184,7 +184,7 @@ void Track::addEventRealTime(shared_ptr<Event> event)
 			}
 		}
 	}
-    tcValue = mpc->getUis().lock()->getSequencerWindowGui()->getNoteValue();
+    tcValue = Mpc::instance().getUis().lock()->getSequencerWindowGui()->getNoteValue();
 	auto lSequencer = sequencer.lock();
 	if (tcValue > 0 && dynamic_pointer_cast<NoteEvent>(event)) {
 		timingCorrect(0, parent->getLastBar(), dynamic_cast<NoteEvent*>(event.get()), lSequencer->getTickValues()[tcValue]);
@@ -440,7 +440,7 @@ void Track::playNext()
 	multi = lSequencer->isRecordingModeMulti();
 	delete_ = lSequencer->isRecording() && (trackIndex == lSequencer->getActiveTrackIndex() || multi) && (trackIndex < 64);
 
-	if (lSequencer->isOverDubbing() && mpc->getControls().lock()->isErasePressed() && (trackIndex == lSequencer->getActiveTrackIndex() || multi) && trackIndex < 64) {
+	if (lSequencer->isOverDubbing() && Mpc::instance().getControls().lock()->isErasePressed() && (trackIndex == lSequencer->getActiveTrackIndex() || multi) && trackIndex < 64) {
 		delete_ = true;
 	}
 
@@ -450,7 +450,7 @@ void Track::playNext()
 	for (auto& no : noteOffs) {	
 		if (eventIndex + 1 > events.size() || no->getTick() < events[eventIndex]->getTick()) {
 			if (!delete_) {
-				mpc->getEventHandler().lock()->handle(no, this);
+				Mpc::instance().getEventHandler().lock()->handle(no, this);
 			}
 			noteOffs.erase(noteOffs.begin() + counter);
 			return;
@@ -469,7 +469,7 @@ void Track::playNext()
 		return;
 	}
 
-	mpc->getEventHandler().lock()->handle(lEvent, this);
+	Mpc::instance().getEventHandler().lock()->handle(lEvent, this);
 
 	auto ne = dynamic_pointer_cast<NoteEvent>(lEvent);
 	if (ne) {
@@ -533,7 +533,7 @@ vector<weak_ptr<Event>> Track::getEventRange(int startTick, int endTick)
 void Track::correctTimeRange(int startPos, int endPos, int stepLength)
 {
 	if (sequencer.expired())
-		sequencer = mpc->getSequencer();
+		sequencer = Mpc::instance().getSequencer();
 
 	auto lSequencer = sequencer.lock();
 

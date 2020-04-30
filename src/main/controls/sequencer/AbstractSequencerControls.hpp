@@ -3,7 +3,7 @@
 
 namespace mpc {
 
-	class Mpc;
+	
 
 	namespace ui {
 		namespace sequencer {
@@ -51,7 +51,7 @@ namespace mpc {
 				void checkAllTimesAndNotes(int notch);
 
 			public:
-				AbstractSequencerControls(Mpc* mpc);
+				AbstractSequencerControls();
 				virtual ~AbstractSequencerControls();
 
 			};

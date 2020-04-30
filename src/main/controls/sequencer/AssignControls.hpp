@@ -2,7 +2,7 @@
 #include <controls/sequencer/AbstractSequencerControls.hpp>
 
 namespace mpc {
-	class Mpc;
+	
 	namespace controls {
 		namespace sequencer {
 
@@ -16,7 +16,7 @@ namespace mpc {
 				void turnWheel(int i) override;
 				void pad(int i, int velo, bool repeat, int tick) override;
 
-				AssignControls(mpc::Mpc* mpc);
+				AssignControls();
 
 			};
 

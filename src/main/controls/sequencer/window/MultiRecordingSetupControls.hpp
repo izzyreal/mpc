@@ -27,7 +27,7 @@ namespace mpc {
 					void turnWheel(int i) override;
 
 				public:
-					MultiRecordingSetupControls(mpc::Mpc* mpc);
+					MultiRecordingSetupControls();
 
 				};
 

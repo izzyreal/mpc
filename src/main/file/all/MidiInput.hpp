@@ -4,7 +4,7 @@
 #include <vector>
 
 namespace mpc {
-	class Mpc;
+	
 	namespace file {
 		namespace all {
 
@@ -61,7 +61,7 @@ namespace mpc {
 				std::vector<char> getBytes();
 
 				MidiInput(std::vector<char> b);
-				MidiInput(mpc::Mpc* mpc);
+				MidiInput();
 
 			};
 

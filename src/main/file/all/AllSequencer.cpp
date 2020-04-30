@@ -16,15 +16,15 @@ mpc::file::all::Sequencer::Sequencer(vector<char> loadBytes)
 	secondSeqIndex = loadBytes[SECOND_SEQ_INDEX_OFFSET];
 }
 
-mpc::file::all::Sequencer::Sequencer(mpc::Mpc* mpc)
+mpc::file::all::Sequencer::Sequencer()
 {
 	saveBytes = vector<char>(LENGTH);
 	for (int i = 0; i < LENGTH; i++)
 		saveBytes[i] = TEMPLATE[i];
-	auto seq = mpc->getSequencer().lock();
+	auto seq = Mpc::instance().getSequencer().lock();
 	saveBytes[SEQ_OFFSET] = seq->getActiveSequenceIndex();
 	saveBytes[TR_OFFSET] = seq->getActiveTrackIndex();
-	saveBytes[TC_OFFSET] = mpc->getUis().lock()->getSequencerWindowGui()->getNoteValue();
+	saveBytes[TC_OFFSET] = Mpc::instance().getUis().lock()->getSequencerWindowGui()->getNoteValue();
 	saveBytes[SECOND_SEQ_ENABLED_OFFSET] = seq->isSecondSequenceEnabled() ? 1 : 0;
 	saveBytes[SECOND_SEQ_INDEX_OFFSET] = seq->getSecondSequenceIndex();
 }

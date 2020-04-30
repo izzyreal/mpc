@@ -6,7 +6,7 @@
 
 namespace mpc {
 
-	class Mpc;
+	
 
 	namespace file {
 		namespace aps {
@@ -48,7 +48,7 @@ namespace mpc {
 
 			public:
 				ApsGlobalParameters(std::vector<char> loadBytes);
-				ApsGlobalParameters(mpc::Mpc* mpc);
+				ApsGlobalParameters();
 
 			};
 		}

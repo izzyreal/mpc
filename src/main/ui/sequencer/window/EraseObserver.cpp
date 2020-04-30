@@ -22,18 +22,18 @@
 using namespace mpc::ui::sequencer::window;
 using namespace std;
 
-EraseObserver::EraseObserver(mpc::Mpc* mpc)
+EraseObserver::EraseObserver()
 {
 	typeNames = vector<string>{ "NOTES", "PITCH BEND", "CONTROL", "PROG CHANGE", "CH PRESSURE", "POLY PRESS", "EXCLUSIVE" };
 	eraseNames = vector<string>{ "ALL EVENTS", "ALL EXCEPT", "ONLY ERASE" };
 	bus = 0;
-	eraseGui = mpc->getUis().lock()->getEraseGui();
-	swGui = mpc->getUis().lock()->getSequencerWindowGui();
+	eraseGui = Mpc::instance().getUis().lock()->getEraseGui();
+	swGui = Mpc::instance().getUis().lock()->getSequencerWindowGui();
 	eraseGui->deleteObservers();
 	eraseGui->addObserver(this);
 	swGui->deleteObservers();
 	swGui->addObserver(this);
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	trackField = ls->lookupField("track");
 	trackNameLabel = ls->lookupLabel("trackname");
 	time0Field = ls->lookupField("time0");
@@ -48,9 +48,9 @@ EraseObserver::EraseObserver(mpc::Mpc* mpc)
 	notes0Label = ls->lookupLabel("notes0");
 	notes1Field = ls->lookupField("notes1");
 	notes1Label = ls->lookupLabel("notes1");
-	auto lSequencer = mpc->getSequencer().lock();
+	auto lSequencer = Mpc::instance().getSequencer().lock();
 	sequence = lSequencer->getActiveSequence().lock().get();
-	sampler = mpc->getSampler();
+	sampler = Mpc::instance().getSampler();
 	bus = sequence->getTrack(lSequencer->getActiveTrackIndex()).lock()->getBusNumber();
 	int drum = bus - 1;
 	auto lSampler = sampler.lock();

@@ -16,7 +16,7 @@ namespace mpc {
 				void turnWheel(int i) override;
 
 			public:
-				TransControls(mpc::Mpc* mpc);
+				TransControls();
 				~TransControls();
 
 			};

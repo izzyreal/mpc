@@ -13,15 +13,15 @@
 using namespace mpc::ui::sequencer::window;
 using namespace std;
 
-MetronomeSoundObserver::MetronomeSoundObserver(mpc::Mpc* mpc)
+MetronomeSoundObserver::MetronomeSoundObserver()
 {
-	sampler = mpc->getSampler();
+	sampler = Mpc::instance().getSampler();
 	soundNames = { "CLICK", "DRUM1", "DRUM2", "DRUM3", "DRUM4" };
-	bg = mpc->getLayeredScreen().lock()->getCurrentBackground();
-	swGui = mpc->getUis().lock()->getSequencerWindowGui();
+	bg = Mpc::instance().getLayeredScreen().lock()->getCurrentBackground();
+	swGui = Mpc::instance().getUis().lock()->getSequencerWindowGui();
 	swGui->deleteObservers();
 	swGui->addObserver(this);
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	soundField = ls->lookupField("sound");
 	volumeField = ls->lookupField("volume");
 	volumeLabel = ls->lookupLabel("volume");

@@ -19,14 +19,14 @@
 using namespace mpc::ui::sequencer;
 using namespace std;
 
-NextSeqObserver::NextSeqObserver(mpc::Mpc* mpc) 
+NextSeqObserver::NextSeqObserver() 
 {
-	this->mpc = mpc;
-	sequencer = mpc->getSequencer();
+	
+	sequencer = Mpc::instance().getSequencer();
 	auto lSequencer = sequencer.lock();
 	lSequencer->deleteObservers();
 	lSequencer->addObserver(this);
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	sqField = ls->lookupField("sq");
 	now0Field = ls->lookupField("now0");
 	now1Field = ls->lookupField("now1");
@@ -129,7 +129,7 @@ void NextSeqObserver::displayTempoSource()
 
 void NextSeqObserver::displayTiming()
 {
-    timingField.lock()->setText(SequencerObserver::timingCorrectNames()->at(mpc->getUis().lock()->getSequencerWindowGui()->getNoteValue()));
+    timingField.lock()->setText(SequencerObserver::timingCorrectNames()->at(Mpc::instance().getUis().lock()->getSequencerWindowGui()->getNoteValue()));
 }
 
 void NextSeqObserver::update(moduru::observer::Observable* o, nonstd::any arg)

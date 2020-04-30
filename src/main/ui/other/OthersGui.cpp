@@ -6,9 +6,9 @@
 using namespace mpc::ui::other;
 using namespace std;
 
-OthersGui::OthersGui(mpc::Mpc* mpc)
+OthersGui::OthersGui()
 {
-	this->mpc = mpc;
+	
 }
 
 void OthersGui::setTapAveraging(int i)

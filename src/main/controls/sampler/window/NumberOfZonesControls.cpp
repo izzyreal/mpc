@@ -6,8 +6,8 @@
 using namespace mpc::controls::sampler::window;
 using namespace std;
 
-NumberOfZonesControls::NumberOfZonesControls(mpc::Mpc* mpc) 
-	: AbstractSamplerControls(mpc)
+NumberOfZonesControls::NumberOfZonesControls() 
+	: AbstractSamplerControls()
 {
 }
 

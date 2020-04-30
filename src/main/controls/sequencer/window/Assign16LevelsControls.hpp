@@ -15,7 +15,7 @@ namespace mpc {
 					void function(int i) override;
 					void turnWheel(int i) override;
 
-					Assign16LevelsControls(mpc::Mpc* mpc);
+					Assign16LevelsControls();
 
 				};
 

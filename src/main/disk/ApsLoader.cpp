@@ -36,9 +36,9 @@ using namespace mpc::file::aps;
 using namespace moduru::lang;
 using namespace std;
 
-ApsLoader::ApsLoader(mpc::Mpc* mpc, mpc::disk::MpcFile* file) 
+ApsLoader::ApsLoader(mpc::disk::MpcFile* file) 
 {
-	this->mpc = mpc;
+	
 	this->file = file;
 	if (loadThread.joinable()) loadThread.join();
 	loadThread = thread(&ApsLoader::static_load, this);
@@ -50,10 +50,10 @@ void ApsLoader::static_load(void* this_p) {
 
 void ApsLoader::load()
 {
-	auto lDisk = mpc->getDisk().lock();
+	auto lDisk = Mpc::instance().getDisk().lock();
 	lDisk->setBusy(true);
 	auto apsParser = new ApsParser(file);
-	auto sampler = mpc->getSampler().lock();
+	auto sampler = Mpc::instance().getSampler().lock();
 	sampler->deleteAllSamples();
 	const bool initPgms = false;
 	for (int i = 0; i < apsParser->getSoundNames().size(); i++) {
@@ -72,7 +72,7 @@ void ApsLoader::load()
 			ext = "wav";
 		}
 		if (soundFile != nullptr) {
-			loadSound(soundFileName, ext, soundFile, mpc, false, i);
+			loadSound(soundFileName, ext, soundFile, false, i);
 		}
 		else {
 			if (dynamic_pointer_cast<mpc::disk::StdDisk>(lDisk)) {
@@ -155,7 +155,7 @@ void ApsLoader::load()
 
 	for (int i = 0; i < 4; i++) {
 		auto m = apsParser->getDrumMixers()[i];
-		auto drum = mpc->getDrum(i);
+		auto drum = Mpc::instance().getDrum(i);
 		for (int note = 35; note <= 98; note++) {
 			auto apssmc = m->getStereoMixerChannel(note);
 			auto apsifmc = m->getIndivFxMixerChannel(note);
@@ -173,7 +173,7 @@ void ApsLoader::load()
 		drum->setReceivePgmChange(apsParser->getDrumConfiguration(i)->getReceivePgmChange());
 		drum->setReceiveMidiVolume(apsParser->getDrumConfiguration(i)->getReceiveMidiVolume());
 	}
-	auto uis = mpc->getUis().lock();
+	auto uis = Mpc::instance().getUis().lock();
 	uis->getMixerSetupGui()->setRecordMixChangesEnabled(apsParser->getGlobalParameters()->isRecordMixChangesEnabled());
 	uis->getMixerSetupGui()->setCopyPgmMixToDrumEnabled(apsParser->getGlobalParameters()->isCopyPgmMixToDrumEnabled());
 	uis->getMixerSetupGui()->setFxDrum(apsParser->getGlobalParameters()->getFxDrum());
@@ -182,13 +182,13 @@ void ApsLoader::load()
 	uis->getSamplerGui()->setPadToIntSound(apsParser->getGlobalParameters()->isPadToIntSoundEnabled());
 	uis->getDiskGui()->removePopup();
 	uis->getSoundGui()->setSoundIndex(0, sampler->getSoundCount());
-	mpc->getLayeredScreen().lock()->openScreen("load");
+	Mpc::instance().getLayeredScreen().lock()->openScreen("load");
 	lDisk->setBusy(false);
 }
 
-void ApsLoader::loadSound(string soundFileName, string ext, mpc::disk::MpcFile* soundFile, mpc::Mpc* mpc, bool replace, int loadSoundIndex)
+void ApsLoader::loadSound(string soundFileName, string ext, mpc::disk::MpcFile* soundFile, bool replace, int loadSoundIndex)
 {
-	auto sl = mpc::disk::SoundLoader(mpc, mpc->getSampler().lock()->getSounds(), replace);
+	auto sl = mpc::disk::SoundLoader(Mpc::instance().getSampler().lock()->getSounds(), replace);
 	sl.setPartOfProgram(true);
 	sl.loadSound(soundFile);
 	showPopup(soundFileName, ext, soundFile->length());
@@ -196,9 +196,9 @@ void ApsLoader::loadSound(string soundFileName, string ext, mpc::disk::MpcFile* 
 
 void ApsLoader::showPopup(string name, string ext, int sampleSize)
 {
-	mpc->getUis().lock()->getDiskGui()->removePopup();
-	mpc->getUis().lock()->getDiskGui()->openPopup(StrUtil::padRight(name, " ", 16), ext);
-	if (dynamic_pointer_cast<mpc::disk::StdDisk>(mpc->getDisk().lock())) {
+	Mpc::instance().getUis().lock()->getDiskGui()->removePopup();
+	Mpc::instance().getUis().lock()->getDiskGui()->openPopup(StrUtil::padRight(name, " ", 16), ext);
+	if (dynamic_pointer_cast<mpc::disk::StdDisk>(Mpc::instance().getDisk().lock())) {
 		auto sleepTime = sampleSize / 400;
 		if (sleepTime < 300)
 			sleepTime = 300;

@@ -8,7 +8,7 @@
 
 namespace mpc {
 
-	class Mpc;
+	
 	
 	namespace disk {
 		class MpcFile;
@@ -32,7 +32,7 @@ namespace mpc {
 				{
 
 				private:
-					mpc::Mpc* mpc;
+					
 					mpc::ui::disk::DiskGui* diskGui{ nullptr };
 					int xPos{ 0 };
 					int yPos0{ 0 };
@@ -63,7 +63,7 @@ namespace mpc {
 					void setYOffset1(int i);
 					void setYPos0(int i);
 
-					DirectoryGui(mpc::Mpc* mpc, mpc::ui::disk::DiskGui* diskGui);
+					DirectoryGui(mpc::ui::disk::DiskGui* diskGui);
 					~DirectoryGui();
 
 				};

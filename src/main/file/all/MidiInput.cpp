@@ -27,17 +27,17 @@ MidiInput::MidiInput(vector<char> b)
 	exclusivePassEnabled = b[EXCLUSIVE_PASS_ENABLED_OFFSET] > 0;
 }
 
-MidiInput::MidiInput(mpc::Mpc* mpc)
+MidiInput::MidiInput()
 {
 	saveBytes = vector<char>(LENGTH);
 	for (int i = 0; i < LENGTH; i++)
 		saveBytes[i] = TEMPLATE[i];
-	auto swgui = mpc->getUis().lock()->getSequencerWindowGui();
+	auto swgui = Mpc::instance().getUis().lock()->getSequencerWindowGui();
 	saveBytes[RECEIVE_CH_OFFSET] = static_cast<int8_t>(swgui->getReceiveCh());
 	saveBytes[SUSTAIN_PEDAL_TO_DURATION_OFFSET] = static_cast<int8_t>(swgui->isSustainPedalToDurationEnabled() ? 1 : 0);
 	saveBytes[FILTER_ENABLED_OFFSET] = static_cast<int8_t>((swgui->isMidiFilterEnabled() ? 1 : 0));
 	saveBytes[FILTER_TYPE_OFFSET] = static_cast<int8_t>(swgui->getMidiFilterType());
-	saveBytes[MULTI_REC_ENABLED_OFFSET] = static_cast<int8_t>(mpc->getSequencer().lock()->isRecordingModeMulti() ? 1 : 0);
+	saveBytes[MULTI_REC_ENABLED_OFFSET] = static_cast<int8_t>(Mpc::instance().getSequencer().lock()->isRecordingModeMulti() ? 1 : 0);
 	for (int i = 0; i < MULTI_REC_TRACK_DESTS_LENGTH; i++)
 		saveBytes[MULTI_REC_TRACK_DESTS_OFFSET + i] = static_cast<int8_t>(swgui->getMrsLines()[i]->getTrack() + 1);
 

@@ -7,8 +7,8 @@ using namespace mpc::controls::sampler::dialog;
 using namespace std;
 
 
-DeleteAllProgramsControls::DeleteAllProgramsControls(mpc::Mpc* mpc) 
-	: AbstractSamplerControls(mpc)
+DeleteAllProgramsControls::DeleteAllProgramsControls() 
+	: AbstractSamplerControls()
 {
 }
 

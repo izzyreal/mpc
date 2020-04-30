@@ -12,12 +12,12 @@
 using namespace mpc::ui::misc;
 using namespace std;
 
-TransObserver::TransObserver(mpc::Mpc* mpc)
+TransObserver::TransObserver()
 {
-	this->mpc = mpc;
-	transGui = mpc->getUis().lock()->getTransGui();
+	
+	transGui = Mpc::instance().getUis().lock()->getTransGui();
 	transGui->addObserver(this);
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	trField = ls->lookupField("tr");
 	trackNameLabel = ls->lookupLabel("trackname");
 	transposeAmountField = ls->lookupField("transposeamount");
@@ -35,7 +35,7 @@ void TransObserver::displayTransposeAmount()
 
 void TransObserver::displayTr()
 {
-	auto trName = string(transGui->getTr() == -1 ? "ALL" : mpc->getSequencer().lock()->getActiveSequence().lock()->getTrack(transGui->getTr()).lock()->getName());
+	auto trName = string(transGui->getTr() == -1 ? "ALL" : Mpc::instance().getSequencer().lock()->getActiveSequence().lock()->getTrack(transGui->getTr()).lock()->getName());
 	trField.lock()->setTextPadded(transGui->getTr() + 1, "0");
 	trackNameLabel.lock()->setText(trName);
 }

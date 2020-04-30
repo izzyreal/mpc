@@ -13,7 +13,7 @@ namespace ctoot {
 
 namespace mpc {
 
-	class Mpc;
+	
 
 	namespace sampler {
 		class Sampler;
@@ -80,7 +80,7 @@ namespace mpc {
 				void displaySelectedPadName();
 
 			public:
-				PgmAssignObserver(mpc::Mpc* mpc);
+				PgmAssignObserver();
 				~PgmAssignObserver();
 
 			};

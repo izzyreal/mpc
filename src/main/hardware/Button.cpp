@@ -9,9 +9,9 @@
 using namespace mpc::hardware;
 using namespace std;
 
-Button::Button(mpc::Mpc* mpc, string label)
+Button::Button(string label)
 {
-	this->mpc = mpc;
+	
 	this->label = label;
 }
 
@@ -20,8 +20,8 @@ string Button::getLabel() {
 }
 
 void Button::push() {
-	if (mpc->getDisk().lock()->isBusy()) return;
-	auto c = mpc->getActiveControls();
+	if (Mpc::instance().getDisk().lock()->isBusy()) return;
+	auto c = Mpc::instance().getActiveControls();
 	if (!c) return;
 	if (label.compare("left") == 0) {
 		c->left();
@@ -164,8 +164,8 @@ void Button::push() {
 }
 
 void Button::release() {
-	if (mpc->getDisk().lock()->isBusy()) return;
-	auto c = mpc->getReleaseControls();
+	if (Mpc::instance().getDisk().lock()->isBusy()) return;
+	auto c = Mpc::instance().getReleaseControls();
 	if (label.compare("shift") == 0) {
 		c->shift();
 	}

@@ -14,7 +14,7 @@ namespace mpc {
 					typedef mpc::controls::sampler::AbstractSamplerControls super;
 					void turnWheel(int i) override;
 
-					MuteAssignControls(mpc::Mpc* mpc);
+					MuteAssignControls();
 
 				};
 

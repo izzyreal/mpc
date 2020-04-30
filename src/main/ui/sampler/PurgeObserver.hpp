@@ -5,7 +5,7 @@
 
 namespace mpc {
 
-	class Mpc;
+	
 
 	namespace sampler {
 		class Sampler;
@@ -23,7 +23,7 @@ namespace mpc {
 			{
 
 			private:
-				mpc::Mpc* mpc{ nullptr };
+				
 				std::weak_ptr<mpc::sampler::Sampler> sampler{ };
 				std::weak_ptr<mpc::lcdgui::Label> valueLabel{};
 
@@ -33,7 +33,7 @@ namespace mpc {
 			public:
 				void update(moduru::observer::Observable* o, nonstd::any arg) override;
 
-				PurgeObserver(mpc::Mpc* mpc);
+				PurgeObserver();
 				~PurgeObserver();
 
 			};

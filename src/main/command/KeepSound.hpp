@@ -4,7 +4,7 @@
 
 namespace mpc {
 
-	class Mpc;
+	
 
 	namespace sequencer {
 		class Sequencer;
@@ -28,7 +28,7 @@ namespace mpc {
 		{
 
 		private:
-			mpc::Mpc* mpc{};
+			
 			std::weak_ptr<mpc::sampler::Sound> sound{};
 			mpc::ui::sampler::SamplerGui* samplerGui{ nullptr };
 			mpc::ui::sampler::SoundGui* soundGui{ nullptr };
@@ -36,7 +36,7 @@ namespace mpc {
 		public:
 			void execute();
 
-			KeepSound(mpc::Mpc* mpc, std::weak_ptr<mpc::sampler::Sound> s);
+			KeepSound(std::weak_ptr<mpc::sampler::Sound> s);
 
 		};
 

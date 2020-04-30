@@ -19,7 +19,7 @@ namespace mpc {
 				void pad(int i, int velo, bool repeat, int tick) override;
 
 			public:
-				TrMuteControls(mpc::Mpc* mpc);
+				TrMuteControls();
 
 			};
 

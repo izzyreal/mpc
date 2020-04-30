@@ -14,14 +14,14 @@
 using namespace mpc::ui::sampler;
 using namespace std;
 
-TrimObserver::TrimObserver(mpc::Mpc* mpc)
+TrimObserver::TrimObserver()
 {
-	this->mpc = mpc;
-	sampler = mpc->getSampler();
+	
+	sampler = Mpc::instance().getSampler();
 	playXNames = vector<string>{ "ALL", "ZONE", "BEFOR ST", "BEFOR TO", "AFTR END" };
-	soundGui = mpc->getUis().lock()->getSoundGui();
+	soundGui = Mpc::instance().getUis().lock()->getSoundGui();
 	soundGui->addObserver(this);
-	samplerGui = mpc->getUis().lock()->getSamplerGui();
+	samplerGui = Mpc::instance().getUis().lock()->getSamplerGui();
 	samplerGui->addObserver(this);
 
 	auto lSampler = sampler.lock();
@@ -31,7 +31,7 @@ TrimObserver::TrimObserver(mpc::Mpc* mpc)
 		lSound->addObserver(this);
 		lSound->getOscillatorControls()->addObserver(this);
 	}
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	wave = ls->getWave();
 	wave.lock()->Hide(false);
 	twoDots = ls->getTwoDots();
@@ -74,7 +74,7 @@ void TrimObserver::displaySnd()
 {
 	auto lSampler = sampler.lock();
 	if (lSampler->getSoundCount() != 0) {
-		auto ls = mpc->getLayeredScreen().lock();
+		auto ls = Mpc::instance().getLayeredScreen().lock();
 		if (ls->getFocus().compare("dummy") == 0) ls->setFocus(sndField.lock()->getName());
 		auto lSound = sound.lock();
 		lSound->deleteObserver(this);
@@ -91,7 +91,7 @@ void TrimObserver::displaySnd()
 	}
 	else {
 		sndField.lock()->setText("(no sound)");
-		mpc->getLayeredScreen().lock()->setFocus("dummy");
+		Mpc::instance().getLayeredScreen().lock()->setFocus("dummy");
 	}
 }
 

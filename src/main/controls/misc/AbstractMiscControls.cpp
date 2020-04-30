@@ -10,12 +10,12 @@
 using namespace mpc::controls::misc;
 using namespace std;
 
-AbstractMiscControls::AbstractMiscControls(mpc::Mpc* mpc) 
-	: BaseControls(mpc)
+AbstractMiscControls::AbstractMiscControls() 
+	: BaseControls()
 {
-	punchGui = mpc->getUis().lock()->getPunchGui();
-	transGui = mpc->getUis().lock()->getTransGui();
-	secondSeqGui = mpc->getUis().lock()->getSecondSeqGui();
+	punchGui = Mpc::instance().getUis().lock()->getPunchGui();
+	transGui = Mpc::instance().getUis().lock()->getTransGui();
+	secondSeqGui = Mpc::instance().getUis().lock()->getSecondSeqGui();
 }
 
 

@@ -13,13 +13,13 @@
 using namespace mpc::ui::vmpc;
 using namespace std;
 
-DirectToDiskRecorderObserver::DirectToDiskRecorderObserver(mpc::Mpc* mpc) 
+DirectToDiskRecorderObserver::DirectToDiskRecorderObserver() 
 {
-	this->mpc = mpc;
+	
 	recordNames = vector<string>{ "SEQUENCE", "LOOP", "CUSTOM RANGE", "SONG", "JAM" };
-	d2dRecorderGui = mpc->getUis().lock()->getD2DRecorderGui();
+	d2dRecorderGui = Mpc::instance().getUis().lock()->getD2DRecorderGui();
 	d2dRecorderGui->addObserver(this);
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	recordField = ls->lookupField("record");
 	sqField = ls->lookupField("sq");
 	songField = ls->lookupField("song");
@@ -46,7 +46,7 @@ DirectToDiskRecorderObserver::DirectToDiskRecorderObserver(mpc::Mpc* mpc)
 void DirectToDiskRecorderObserver::displayRate() {
 	bool offline = d2dRecorderGui->isOffline();
 	rateField.lock()->Hide(!offline);
-	mpc->getLayeredScreen().lock()->lookupLabel("rate").lock()->Hide(!offline);
+	Mpc::instance().getLayeredScreen().lock()->lookupLabel("rate").lock()->Hide(!offline);
 	if (!offline) return;
 	vector<string> rates{ "44.1", "48.0", "88.2" };
 	string rate = Util::replaceDotWithSmallSpaceDot(rates[d2dRecorderGui->getSampleRate()]);
@@ -55,13 +55,13 @@ void DirectToDiskRecorderObserver::displayRate() {
 
 void DirectToDiskRecorderObserver::displaySong()
 {
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	songField.lock()->Hide(d2dRecorderGui->getRecord() != 3);
 	ls->lookupLabel("song").lock()->Hide(d2dRecorderGui->getRecord() != 3);
 	if (d2dRecorderGui->getRecord() != 3) return;
 
 	auto song = d2dRecorderGui->getSong();
-	songField.lock()->setText(moduru::lang::StrUtil::padLeft(to_string(song + 1), "0", 2) + "-" + mpc->getSequencer().lock()->getSong(song).lock()->getName());
+	songField.lock()->setText(moduru::lang::StrUtil::padLeft(to_string(song + 1), "0", 2) + "-" + Mpc::instance().getSequencer().lock()->getSong(song).lock()->getName());
 }
 
 void DirectToDiskRecorderObserver::displayOffline()
@@ -87,15 +87,15 @@ void DirectToDiskRecorderObserver::displayRecord()
 void DirectToDiskRecorderObserver::displaySq()
 {
 	sqField.lock()->Hide(!(d2dRecorderGui->getRecord() >= 0 && d2dRecorderGui->getRecord() <= 2));
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	ls->lookupLabel("sq").lock()->Hide(!(d2dRecorderGui->getRecord() >= 0 && d2dRecorderGui->getRecord() <= 2));
 	auto seq = d2dRecorderGui->getSq();
-	sqField.lock()->setText(moduru::lang::StrUtil::padLeft(to_string(seq + 1), "0", 2) + "-" + mpc->getSequencer().lock()->getSequence(seq).lock()->getName());
+	sqField.lock()->setText(moduru::lang::StrUtil::padLeft(to_string(seq + 1), "0", 2) + "-" + Mpc::instance().getSequencer().lock()->getSequence(seq).lock()->getName());
 }
 
 void DirectToDiskRecorderObserver::displayTime()
 {
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	for (int i = 0; i < 6; i++) {
 		ls->lookupField("time" + to_string(i)).lock()->Hide(d2dRecorderGui->getRecord() != 2);
 		ls->lookupLabel("time" + to_string(i)).lock()->Hide(d2dRecorderGui->getRecord() != 2);
@@ -103,7 +103,7 @@ void DirectToDiskRecorderObserver::displayTime()
 	if (d2dRecorderGui->getRecord() != 2) {
 		return;
 	}
-	auto sequence = mpc->getSequencer().lock()->getSequence(d2dRecorderGui->getSq()).lock();
+	auto sequence = Mpc::instance().getSequencer().lock()->getSequence(d2dRecorderGui->getSq()).lock();
 	time0Field.lock()->setTextPadded(mpc::ui::sequencer::EditSequenceGui::getBarNumber(sequence.get(), d2dRecorderGui->getTime0() + 1), "0");
 	time1Field.lock()->setTextPadded(mpc::ui::sequencer::EditSequenceGui::getBeatNumber(sequence.get(), d2dRecorderGui->getTime0() + 1), "0");
 	time2Field.lock()->setTextPadded(mpc::ui::sequencer::EditSequenceGui::getClockNumber(sequence.get(), d2dRecorderGui->getTime0()), "0");
@@ -114,7 +114,7 @@ void DirectToDiskRecorderObserver::displayTime()
 
 void DirectToDiskRecorderObserver::update(moduru::observer::Observable* o, nonstd::any a)
 {
-	mpc->getLayeredScreen().lock()->lookupLabel("sq").lock()->SetDirty();
+	Mpc::instance().getLayeredScreen().lock()->lookupLabel("sq").lock()->SetDirty();
 	string param = nonstd::any_cast<string>(a);
 	if (param.compare("rate") == 0) {
 		displayRate();

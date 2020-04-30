@@ -39,9 +39,9 @@ using namespace mpc::midi::event;
 using namespace mpc::sequencer;
 using namespace std;
 
-MidiReader::MidiReader(mpc::Mpc* mpc, mpc::disk::MpcFile* file, weak_ptr<Sequence> dest)
+MidiReader::MidiReader(mpc::disk::MpcFile* file, weak_ptr<Sequence> dest)
 {
-	this->mpc = mpc;
+	
 	this->dest = dest;
 	auto sequence = dest.lock();
 	sequence->setUsed(true);
@@ -57,7 +57,7 @@ MidiReader::MidiReader(mpc::Mpc* mpc, mpc::disk::MpcFile* file, weak_ptr<Sequenc
 
 void MidiReader::parseSequence()
 {
-	auto lSequencer = mpc->getSequencer().lock();
+	auto lSequencer = Mpc::instance().getSequencer().lock();
 	auto sequence = dest.lock();
 	auto midiTracks = midiFile->getTracks();
 	int tmp = midiFile->getLengthInTicks();

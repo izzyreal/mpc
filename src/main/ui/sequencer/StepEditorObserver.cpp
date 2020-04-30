@@ -21,22 +21,22 @@ using namespace mpc::ui::sequencer;
 using namespace mpc::sequencer;
 using namespace std;
 
-StepEditorObserver::StepEditorObserver(mpc::Mpc* mpc)
+StepEditorObserver::StepEditorObserver()
 {
-	this->mpc = mpc;
+	
 	emptyEvent = make_shared<EmptyEvent>();
 	viewNames = { "ALL EVENTS", "NOTES", "PITCH BEND", "CTRL:", "PROG CHANGE", "CH PRESSURE", "POLY PRESS", "EXCLUSIVE" };
-	stepEditorGui = mpc->getUis().lock()->getStepEditorGui();
+	stepEditorGui = Mpc::instance().getUis().lock()->getStepEditorGui();
 	stepEditorGui->addObserver(this);
-	sequencer = mpc->getSequencer();
-	sampler = mpc->getSampler();
+	sequencer = Mpc::instance().getSequencer();
+	sampler = Mpc::instance().getSampler();
 	auto lSequencer = sequencer.lock();
 	auto seqNum = lSequencer->getActiveSequenceIndex();
 	sequence = lSequencer->getSequence(seqNum);
 	auto seq = sequence.lock();
 	track = seq->getTrack(lSequencer->getActiveTrackIndex());
 	auto lTrk = track.lock();
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	viewField = ls->lookupField("viewmodenumber");
 	controlNumberField = ls->lookupField("controlnumber");
 	fromNoteField = ls->lookupField("fromnote");
@@ -68,7 +68,7 @@ StepEditorObserver::StepEditorObserver(mpc::Mpc* mpc)
 	initVisibleEvents();
 	eventRows.clear();
 	for (int i = 0; i < 4; i++) {
-		auto eventRow = make_unique<EventRow>(mpc, lTrk->getBusNumber(), visibleEvents[i], i);
+		auto eventRow = make_unique<EventRow>(lTrk->getBusNumber(), visibleEvents[i], i);
 		auto event = visibleEvents[i].lock();
 		if (event) {
 			event->addObserver(this);
@@ -87,7 +87,7 @@ StepEditorObserver::StepEditorObserver(mpc::Mpc* mpc)
 void StepEditorObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 {
 	string s = nonstd::any_cast<string>(arg);
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	if (s.compare("viewmodestext") == 0) {
 		setViewModeNotesText();
 		viewField.lock()->setText(viewNames[stepEditorGui->getViewModeNumber()]);
@@ -100,7 +100,7 @@ void StepEditorObserver::update(moduru::observer::Observable* o, nonstd::any arg
 		setViewModeNotesText();
 	}
 	else if (s.compare("stepeditor") == 0) {
-		if (mpc->getControls().lock()->getPressedPads()->size() != 0) {
+		if (Mpc::instance().getControls().lock()->getPressedPads()->size() != 0) {
 			// a note is currently being recorded by the user pressing a pad
 			initVisibleEvents();
 			refreshEventRows();
@@ -208,7 +208,7 @@ void StepEditorObserver::refreshSelection()
 			eventRows[i]->setSelected(false);
 		}
 	}
-	if (somethingSelected) mpc->getLayeredScreen().lock()->drawFunctionKeys("sequencer_step_selection");
+	if (somethingSelected) Mpc::instance().getLayeredScreen().lock()->drawFunctionKeys("sequencer_step_selection");
 }
 
 void StepEditorObserver::initVisibleEvents()

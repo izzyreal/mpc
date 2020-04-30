@@ -7,8 +7,8 @@
 using namespace mpc::controls::sequencer::dialog;
 using namespace std;
 
-CopyTrackControls::CopyTrackControls(mpc::Mpc* mpc)
-	: AbstractSequencerControls(mpc)
+CopyTrackControls::CopyTrackControls()
+	: AbstractSequencerControls()
 {
 }
 

@@ -11,8 +11,8 @@
 using namespace mpc::controls::sampler::dialog;
 using namespace std;
 
-ConvertSoundControls::ConvertSoundControls(mpc::Mpc* mpc) 
-	: AbstractSamplerControls(mpc)
+ConvertSoundControls::ConvertSoundControls() 
+	: AbstractSamplerControls()
 {
 }
 

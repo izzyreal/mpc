@@ -9,8 +9,8 @@
 using namespace mpc::controls::disk::window;
 using namespace std;
 
-SaveAProgramControls::SaveAProgramControls(mpc::Mpc* mpc) 
-	: AbstractDiskControls(mpc)
+SaveAProgramControls::SaveAProgramControls() 
+	: AbstractDiskControls()
 {
 }
 

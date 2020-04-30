@@ -15,8 +15,8 @@ using namespace mpc::controls::sequencer::window;
 using namespace mpc::sequencer;
 using namespace std;
 
-TempoChangeControls::TempoChangeControls(mpc::Mpc* mpc)
-	: AbstractSequencerControls(mpc)
+TempoChangeControls::TempoChangeControls()
+	: AbstractSequencerControls()
 {
 }
 

@@ -15,16 +15,16 @@
 using namespace mpc::ui::sampler::window;
 using namespace std;
 
-ZoomObserver::ZoomObserver(mpc::Mpc* mpc)
+ZoomObserver::ZoomObserver()
 {
-	auto sampler = mpc->getSampler();
+	auto sampler = Mpc::instance().getSampler();
 	playXNames = vector<string>{ "ALL", "ZONE", "BEFOR ST", "BEFOR TO", "AFTR END" };
-	auto uis = mpc->getUis().lock();
+	auto uis = Mpc::instance().getUis().lock();
 	zoomGui = uis->getZoomGui();
 	zoomGui->addObserver(this);
 	soundGui = uis->getSoundGui();
 	soundGui->addObserver(this);
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	csn = ls->getCurrentScreenName();
 	sound = dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getSound(soundGui->getSoundIndex()).lock());
 ;	auto lSound = sound.lock();

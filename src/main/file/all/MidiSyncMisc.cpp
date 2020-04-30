@@ -25,10 +25,10 @@ MidiSyncMisc::MidiSyncMisc(vector<char> b)
 	auto stringBuffer = moduru::VecUtil::CopyOfRange(&b, DEF_SONG_NAME_OFFSET, DEF_SONG_NAME_OFFSET + AllParser::NAME_LENGTH);
 }
 
-MidiSyncMisc::MidiSyncMisc(mpc::Mpc* mpc)
+MidiSyncMisc::MidiSyncMisc()
 {
 	saveBytes = vector<char>(LENGTH);
-	auto ms = mpc->getUis().lock()->getMidiSyncGui();
+	auto ms = Mpc::instance().getUis().lock()->getMidiSyncGui();
 	saveBytes[IN_MODE_OFFSET] = static_cast<int8_t>(ms->getModeIn());
 	saveBytes[OUT_MODE_OFFSET] = static_cast<int8_t>(ms->getModeOut());
 	saveBytes[SHIFT_EARLY_OFFSET] = static_cast<int8_t>(ms->getShiftEarly());
@@ -37,7 +37,7 @@ MidiSyncMisc::MidiSyncMisc(mpc::Mpc* mpc)
 	saveBytes[INPUT_OFFSET] = static_cast<int8_t>(ms->getIn());
 	saveBytes[OUTPUT_OFFSET] = static_cast<int8_t>(ms->getOut());
 	for (int i = 0; i < AllParser::NAME_LENGTH; i++)
-		saveBytes[DEF_SONG_NAME_OFFSET + i] = moduru::lang::StrUtil::padRight(mpc->getUis().lock()->getSongGui()->getDefaultSongName(), " ", 16)[i];
+		saveBytes[DEF_SONG_NAME_OFFSET + i] = moduru::lang::StrUtil::padRight(Mpc::instance().getUis().lock()->getSongGui()->getDefaultSongName(), " ", 16)[i];
 
 	saveBytes[DEF_SONG_NAME_OFFSET + 16] = 1;
 }

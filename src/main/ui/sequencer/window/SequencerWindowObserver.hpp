@@ -14,7 +14,7 @@ namespace ctoot {
 
 namespace mpc {
 
-	class Mpc;
+	
 
 	namespace sequencer {
 		class Sequencer;
@@ -52,7 +52,7 @@ namespace mpc {
 				{
 
 				private:
-					mpc::Mpc* mpc;
+					
 					std::vector<std::string> softThruNames{};
 					std::vector<std::string> inNames{};
 					std::vector<std::string> editTypeNames{};
@@ -240,7 +240,7 @@ namespace mpc {
 					void displayTrackNumberNames();
 
 				public:
-					SequencerWindowObserver(mpc::Mpc* mpc);
+					SequencerWindowObserver();
 					~SequencerWindowObserver();
 
 				};

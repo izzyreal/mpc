@@ -10,8 +10,8 @@
 using namespace mpc::controls::disk::window;
 using namespace std;
 
-SaveASequenceControls::SaveASequenceControls(mpc::Mpc* mpc)
-	: AbstractDiskControls(mpc)
+SaveASequenceControls::SaveASequenceControls()
+	: AbstractDiskControls()
 {
 }
 

@@ -13,7 +13,7 @@ namespace ctoot {
 
 namespace mpc {
 
-	class Mpc;
+	
 
 	namespace sampler {
 		class Sampler;
@@ -53,7 +53,7 @@ namespace mpc {
 			{
 
 			private:
-				mpc::Mpc* mpc;
+				
 				std::vector<std::string> views{};
 				std::vector<std::string> types{};
 				std::vector<std::string> pgmSaveNames{};
@@ -113,7 +113,7 @@ namespace mpc {
 				std::string padExtensionRight(std::string s);
 
 			public:
-				DiskObserver(mpc::Mpc* mpc);
+				DiskObserver();
 				~DiskObserver();
 			};
 

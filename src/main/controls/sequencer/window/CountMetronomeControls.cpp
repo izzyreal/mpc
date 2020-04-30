@@ -8,8 +8,8 @@
 using namespace mpc::controls::sequencer::window;
 using namespace std;
 
-CountMetronomeControls::CountMetronomeControls(mpc::Mpc* mpc)
-	: AbstractSequencerControls(mpc)
+CountMetronomeControls::CountMetronomeControls()
+	: AbstractSequencerControls()
 {
 }
 

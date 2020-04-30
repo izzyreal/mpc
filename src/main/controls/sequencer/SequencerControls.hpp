@@ -2,7 +2,7 @@
 #include <controls/sequencer/AbstractSequencerControls.hpp>
 
 namespace mpc {
-	class Mpc;
+	
 }
 
 namespace mpc::controls::sequencer {
@@ -25,7 +25,7 @@ namespace mpc::controls::sequencer {
 		void down() override;
 
 	public:
-		SequencerControls(mpc::Mpc* mpc);
+		SequencerControls();
 
 	};
 }

@@ -8,8 +8,8 @@
 using namespace mpc::controls::sequencer::window;
 using namespace std;
 
-ChangeTsigControls::ChangeTsigControls(mpc::Mpc* mpc)
-	: AbstractSequencerControls(mpc)
+ChangeTsigControls::ChangeTsigControls()
+	: AbstractSequencerControls()
 {
 }
 

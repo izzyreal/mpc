@@ -11,8 +11,8 @@
 using namespace mpc::controls::disk::window;
 using namespace std;
 
-SaveASoundControls::SaveASoundControls(mpc::Mpc* mpc) 
-	: AbstractDiskControls(mpc)
+SaveASoundControls::SaveASoundControls() 
+	: AbstractDiskControls()
 {
 }
 

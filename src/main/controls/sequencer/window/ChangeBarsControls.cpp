@@ -7,8 +7,8 @@
 using namespace mpc::controls::sequencer::window;
 using namespace std;
 
-ChangeBarsControls::ChangeBarsControls(mpc::Mpc* mpc)
-	: AbstractSequencerControls(mpc)
+ChangeBarsControls::ChangeBarsControls()
+	: AbstractSequencerControls()
 {
 }
 

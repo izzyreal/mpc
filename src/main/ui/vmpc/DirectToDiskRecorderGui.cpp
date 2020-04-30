@@ -7,9 +7,9 @@
 using namespace mpc::ui::vmpc;
 using namespace std;
 
-DirectToDiskRecorderGui::DirectToDiskRecorderGui(mpc::Mpc* mpc)
+DirectToDiskRecorderGui::DirectToDiskRecorderGui()
 {
-	this->mpc = mpc;
+	
 	outputFolder = "DEFAULT";
 }
 
@@ -73,7 +73,7 @@ void DirectToDiskRecorderGui::setSq(int i)
 	setChanged();
 	notifyObservers(string("sq"));
 	setTime0(0);
-	auto s = mpc->getSequencer().lock()->getSequence(sq).lock();
+	auto s = Mpc::instance().getSequencer().lock()->getSequence(sq).lock();
 	if (s->isUsed()) {
 		setTime1(s->getLastTick());
 	}

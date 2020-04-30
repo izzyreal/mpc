@@ -7,8 +7,6 @@
 
 namespace mpc {
 
-	class Mpc;
-
 	namespace file {
 		namespace aps {
 
@@ -16,7 +14,7 @@ namespace mpc {
 			{
 
 			private:
-				mpc::Mpc* mpc{ nullptr };
+				
 				std::string apsFileName{""};
 				std::unique_ptr<mpc::disk::SoundSaver> soundSaver;
 
@@ -24,7 +22,7 @@ namespace mpc {
 				void saveAps();
 
 			public:
-				ApsSaver(mpc::Mpc* mpc, std::string apsFileName);
+				ApsSaver(std::string apsFileName);
 
 			};
 

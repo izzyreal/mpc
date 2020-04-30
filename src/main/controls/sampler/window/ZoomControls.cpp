@@ -11,8 +11,8 @@
 using namespace mpc::controls::sampler::window;
 using namespace std;
 
-ZoomControls::ZoomControls(mpc::Mpc* mpc)
-	: AbstractSamplerControls(mpc)
+ZoomControls::ZoomControls()
+	: AbstractSamplerControls()
 {
 }
 

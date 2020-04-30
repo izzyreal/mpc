@@ -7,7 +7,7 @@
 
 namespace mpc {
 
-	class Mpc;
+	
 
 	namespace sampler {
 		class Sampler;
@@ -33,7 +33,7 @@ namespace mpc {
 
 			private:
 				std::vector<std::string> playXNames{};
-				mpc::Mpc* mpc;
+				
 				std::weak_ptr<mpc::sampler::Sampler> sampler{};
 				std::weak_ptr<mpc::sampler::Sound> sound{};
 				std::weak_ptr<mpc::lcdgui::Field> sndField{};
@@ -61,7 +61,7 @@ namespace mpc {
 				void waveformLoadData();
 
 			public:
-				TrimObserver(mpc::Mpc* mpc);
+				TrimObserver();
 				~TrimObserver();
 
 			};

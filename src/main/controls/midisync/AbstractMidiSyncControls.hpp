@@ -2,7 +2,7 @@
 #include <controls/BaseControls.hpp>
 
 namespace mpc {
-	class Mpc;
+	
 	namespace audiomidi {
 		class MpcMidiPorts;
 	}
@@ -28,7 +28,7 @@ namespace mpc {
 				mpc::audiomidi::MpcMidiPorts* mpcMidiPorts{ nullptr };
 
 			public:
-				AbstractMidiSyncControls(mpc::Mpc* mpc);
+				AbstractMidiSyncControls();
 				virtual ~AbstractMidiSyncControls();
 
 			};

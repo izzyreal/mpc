@@ -20,7 +20,7 @@ namespace mpc {
 					void down() override;
 					void turnWheel(int i) override;
 
-					DirectoryControls(mpc::Mpc* mpc);
+					DirectoryControls();
 
 				};
 

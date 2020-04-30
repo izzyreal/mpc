@@ -15,7 +15,7 @@ namespace moduru {
 }
 
 namespace mpc {
-	class Mpc;
+	
 	namespace disk {
 
 		namespace device {
@@ -65,7 +65,7 @@ namespace mpc {
 			MpcFile* newFile(std::string newFileName) override;
 			std::string getAbsolutePath() override;
 
-			StdDisk(std::weak_ptr<Store> store, mpc::Mpc* mpc);
+			StdDisk(std::weak_ptr<Store> store);
 			~StdDisk();
 
 		};

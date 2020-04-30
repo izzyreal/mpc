@@ -35,7 +35,7 @@ namespace mpc::controls::vmpc {
 		void checkAllTimes(int notch);
 
 	public:
-		AbstractVmpcControls(mpc::Mpc* mpc);
+		AbstractVmpcControls();
 		virtual ~AbstractVmpcControls();
 
 	};

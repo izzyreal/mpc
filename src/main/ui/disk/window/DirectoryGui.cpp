@@ -13,15 +13,14 @@
 using namespace mpc::ui::disk::window;
 using namespace std;
 
-DirectoryGui::DirectoryGui(mpc::Mpc* mpc, mpc::ui::disk::DiskGui* diskGui)
-	: mpc(mpc)
-	, diskGui(diskGui)
+DirectoryGui::DirectoryGui(mpc::ui::disk::DiskGui* diskGui)
+	: diskGui(diskGui)
 {
 }
 
 void DirectoryGui::left()
 {
-	auto lDisk = mpc->getDisk().lock();
+	auto lDisk = Mpc::instance().getDisk().lock();
 	auto prevDirName = lDisk->getDirectoryName();
 	if (xPos == 1) {
 		xPos--;
@@ -63,7 +62,7 @@ void DirectoryGui::left()
 
 void DirectoryGui::right()
 {
-	auto lDisk = mpc->getDisk().lock();
+	auto lDisk = Mpc::instance().getDisk().lock();
 	if (xPos == 0) {
 		xPos++;
 		setChanged();
@@ -103,7 +102,7 @@ void DirectoryGui::right()
 
 void DirectoryGui::up()
 {
-	auto lDisk = mpc->getDisk().lock();
+	auto lDisk = Mpc::instance().getDisk().lock();
 	if (xPos == 0) {
 		if (yOffset0 == 0 && yPos0 == 0)
 			return;
@@ -157,7 +156,7 @@ void DirectoryGui::up()
 
 void DirectoryGui::down()
 {
-	auto lDisk = mpc->getDisk().lock();
+	auto lDisk = Mpc::instance().getDisk().lock();
 	if (xPos == 0) {
 		
 		if (lDisk->isRoot()) {
@@ -230,7 +229,7 @@ mpc::disk::MpcFile* DirectoryGui::getSelectedFile()
 
 mpc::disk::MpcFile* DirectoryGui::getFileFromGrid(int x, int y)
 {
-	auto lDisk = mpc->getDisk().lock();
+	auto lDisk = Mpc::instance().getDisk().lock();
 	mpc::disk::MpcFile* f = nullptr;
 	if (x == 0 && lDisk->getParentFileNames().size() > y + yOffset0)
 		f = lDisk->getParentFile(y + yOffset0);
@@ -243,7 +242,7 @@ mpc::disk::MpcFile* DirectoryGui::getFileFromGrid(int x, int y)
 
 void DirectoryGui::displayLeftFields(vector<weak_ptr<mpc::lcdgui::Field>> tfa)
 {
-	auto lDisk = mpc->getDisk().lock();
+	auto lDisk = Mpc::instance().getDisk().lock();
 	int size = lDisk->getParentFileNames().size();
 	for (int i = 0; i < 5; i++) {
 		if (i + yOffset0 > size - 1) {
@@ -260,7 +259,7 @@ void DirectoryGui::displayLeftFields(vector<weak_ptr<mpc::lcdgui::Field>> tfa)
 
 void DirectoryGui::displayRightFields(vector<weak_ptr<mpc::lcdgui::Field>> tfa)
 {
-	auto lDisk = mpc->getDisk().lock();
+	auto lDisk = Mpc::instance().getDisk().lock();
 	int size = lDisk->getFileNames().size();
 	for (int i = 0; i < 5; i++) {
 		if (i + yOffset1 > size - 1) {
@@ -280,7 +279,7 @@ void DirectoryGui::displayRightFields(vector<weak_ptr<mpc::lcdgui::Field>> tfa)
 
 void DirectoryGui::refreshFocus(vector<weak_ptr<mpc::lcdgui::Field>> tfa0, vector<weak_ptr<mpc::lcdgui::Field>> tfa1)
 {
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	if (xPos == 0) {
 		ls->setFocus(tfa0[yPos0].lock()->getName());
 	}
@@ -301,13 +300,13 @@ int DirectoryGui::getYOffsetSecond()
 
 vector<string> DirectoryGui::getFirstColumn()
 {
-	auto lDisk = mpc->getDisk().lock();
+	auto lDisk = Mpc::instance().getDisk().lock();
 	return lDisk->getParentFileNames();
 }
 
 vector<string> DirectoryGui::getSecondColumn()
 {
-	auto lDisk = mpc->getDisk().lock();
+	auto lDisk = Mpc::instance().getDisk().lock();
 	return lDisk->getFileNames();
 }
 
@@ -333,7 +332,7 @@ string DirectoryGui::getPreviousScreenName()
 
 void DirectoryGui::findYOffset0()
 {
-	auto lDisk = mpc->getDisk().lock();
+	auto lDisk = Mpc::instance().getDisk().lock();
 	auto names = lDisk->getParentFileNames();
 	auto dirName = lDisk->getDirectoryName();
 	auto size = names.size();

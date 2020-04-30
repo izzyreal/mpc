@@ -15,17 +15,17 @@
 using namespace mpc::ui::sequencer;
 using namespace std;
 
-AssignObserver::AssignObserver(mpc::Mpc* mpc) 
+AssignObserver::AssignObserver() 
 {
-	auto sequencer = mpc->getSequencer().lock();
+	auto sequencer = Mpc::instance().getSequencer().lock();
 	auto seq = sequencer->getActiveSequence().lock();
-	sampler = mpc->getSampler();
+	sampler = Mpc::instance().getSampler();
 	auto lSampler = sampler.lock();
 	program = dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(lSampler->getDrumBusProgramNumber(seq->getTrack(sequencer->getActiveTrackIndex()).lock()->getBusNumber())).lock());
 	slider = program.lock()->getSlider();
 	slider->deleteObservers();
 	slider->addObserver(this);
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	assignNoteField = ls->lookupField("assignnote");
 	parameterField = ls->lookupField("parameter");
 	highRangeField = ls->lookupField("highrange");

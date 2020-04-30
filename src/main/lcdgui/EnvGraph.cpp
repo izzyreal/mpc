@@ -10,9 +10,9 @@
 using namespace mpc::lcdgui;
 using namespace std;
 
-EnvGraph::EnvGraph(mpc::Mpc* mpc)
+EnvGraph::EnvGraph()
 {
-	this->mpc = mpc;
+	
 	rect = MRECT(10, 10, 200, 50);
 }
 
@@ -24,7 +24,7 @@ void EnvGraph::setCoordinates(vector<vector<int> > ia)
 
 void EnvGraph::Draw(std::vector<std::vector<bool> >* pixels)
 {
-	auto csn = mpc->getLayeredScreen().lock()->getCurrentScreenName();
+	auto csn = Mpc::instance().getLayeredScreen().lock()->getCurrentScreenName();
 	int xoff = (csn.compare("programparams") == 0) ? 76 : 92;
 	int yoff = (csn.compare("programparams") == 0) ? 16 : 22;
 	int width = 44;

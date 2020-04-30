@@ -11,8 +11,8 @@
 using namespace mpc::controls::sampler;
 using namespace std;
 
-PgmParamsControls::PgmParamsControls(mpc::Mpc* mpc) 
-	: AbstractSamplerControls(mpc)
+PgmParamsControls::PgmParamsControls() 
+	: AbstractSamplerControls()
 {
 }
 

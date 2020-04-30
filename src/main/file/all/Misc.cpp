@@ -19,15 +19,15 @@ Misc::Misc(vector<char> b)
 	pgmChToSeqEnabled = b[MIDI_PGM_CHANGE_TO_SEQ_OFFSET] > 0;
 }
 
-Misc::Misc(mpc::Mpc* mpc)
+Misc::Misc()
 {
 	saveBytes = vector<char>(LENGTH);
-	saveBytes[TAP_AVG_OFFSET] = (char)(mpc->getUis().lock()->getSequencerWindowGui()->getTapAvg());
-	saveBytes[MIDI_SYNC_IN_RECEIVE_MMC_OFFSET] = (char)(mpc->getUis().lock()->getMidiSyncGui()->isReceiveMMCEnabled() ? 1 : 0);
-	saveBytes[AUTO_STEP_INCREMENT_OFFSET] = (char)(mpc->getUis().lock()->getStepEditorGui()->isAutoStepIncrementEnabled() ? 1 : 0);
-	saveBytes[DURATION_OF_REC_NOTES_OFFSET] = (char)(mpc->getUis().lock()->getStepEditorGui()->isDurationTcPercentageEnabled() ? 1 : 0);
-	saveBytes[DURATION_TC_PERCENTAGE_OFFSET] = (char)(mpc->getUis().lock()->getStepEditorGui()->getTcValueRecordedNotes());
-	saveBytes[MIDI_PGM_CHANGE_TO_SEQ_OFFSET] = (char)(mpc->getUis().lock()->getSequencerWindowGui()->isPgmChangeToSeqEnabled() ? 1 : 0);
+	saveBytes[TAP_AVG_OFFSET] = (char)(Mpc::instance().getUis().lock()->getSequencerWindowGui()->getTapAvg());
+	saveBytes[MIDI_SYNC_IN_RECEIVE_MMC_OFFSET] = (char)(Mpc::instance().getUis().lock()->getMidiSyncGui()->isReceiveMMCEnabled() ? 1 : 0);
+	saveBytes[AUTO_STEP_INCREMENT_OFFSET] = (char)(Mpc::instance().getUis().lock()->getStepEditorGui()->isAutoStepIncrementEnabled() ? 1 : 0);
+	saveBytes[DURATION_OF_REC_NOTES_OFFSET] = (char)(Mpc::instance().getUis().lock()->getStepEditorGui()->isDurationTcPercentageEnabled() ? 1 : 0);
+	saveBytes[DURATION_TC_PERCENTAGE_OFFSET] = (char)(Mpc::instance().getUis().lock()->getStepEditorGui()->getTcValueRecordedNotes());
+	saveBytes[MIDI_PGM_CHANGE_TO_SEQ_OFFSET] = (char)(Mpc::instance().getUis().lock()->getSequencerWindowGui()->isPgmChangeToSeqEnabled() ? 1 : 0);
 }
 
 const int Misc::LENGTH;

@@ -8,8 +8,8 @@
 using namespace mpc::controls::disk::window;
 using namespace std;
 
-LoadASequenceFromAllControls::LoadASequenceFromAllControls(mpc::Mpc* mpc) 
-	: AbstractDiskControls(mpc)
+LoadASequenceFromAllControls::LoadASequenceFromAllControls() 
+	: AbstractDiskControls()
 {
 }
 

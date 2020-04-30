@@ -22,17 +22,17 @@ using namespace mpc::ui::sampler::window;
 using namespace std;
 using namespace mpc::lcdgui;
 
-SamplerWindowObserver::SamplerWindowObserver(mpc::Mpc* mpc)
+SamplerWindowObserver::SamplerWindowObserver()
 {
 	letters = vector<string>{ "A" , "B", "C", "D" };
-	this->mpc = mpc;
-	auto uis = mpc->getUis().lock();
+	
+	auto uis = Mpc::instance().getUis().lock();
 	samplerGui = uis->getSamplerGui();
 	samplerGui->addObserver(this);
 	swGui = uis->getSamplerWindowGui();
 	swGui->addObserver(this);
-	sampler = mpc->getSampler();
-	auto ls = mpc->getLayeredScreen().lock();
+	sampler = Mpc::instance().getSampler();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	csn = ls->getCurrentScreenName();
 	auto lSampler = sampler.lock();
 	mpcSoundPlayerChannel = lSampler->getDrum(samplerGui->getSelectedDrum());
@@ -228,7 +228,7 @@ void SamplerWindowObserver::displayAttack()
 	auto attack = lSampler->getLastNp(lProgram.get())->getFilterAttack();
 	auto decay = lSampler->getLastNp(lProgram.get())->getFilterDecay();
 	attackField.lock()->setTextPadded(attack, " ");
-	mpc->getLayeredScreen().lock()->redrawEnvGraph(attack, decay);
+	Mpc::instance().getLayeredScreen().lock()->redrawEnvGraph(attack, decay);
 }
 
 void SamplerWindowObserver::displayDecay()
@@ -238,7 +238,7 @@ void SamplerWindowObserver::displayDecay()
 	auto attack = lSampler->getLastNp(lProgram.get())->getFilterAttack();
 	auto decay = lSampler->getLastNp(lProgram.get())->getFilterDecay();
 	decayField.lock()->setTextPadded(decay, " ");
-	mpc->getLayeredScreen().lock()->redrawEnvGraph(attack, decay);
+	Mpc::instance().getLayeredScreen().lock()->redrawEnvGraph(attack, decay);
 }
 
 void SamplerWindowObserver::displayAmount()
@@ -379,7 +379,7 @@ void SamplerWindowObserver::update(moduru::observer::Observable* o, nonstd::any 
 			displayAssignToPad();
 		}
 		else if (csn.compare("assignmentview") == 0) {
-			mpc->getLayeredScreen().lock()->setFocus(swGui->getFocusFromPadNumber(samplerGui->getPad()));
+			Mpc::instance().getLayeredScreen().lock()->setFocus(swGui->getFocusFromPadNumber(samplerGui->getPad()));
 			displayAssignmentView();
 		}
 		else if (csn.compare("velocitymodulation") == 0) {
@@ -412,7 +412,7 @@ void SamplerWindowObserver::update(moduru::observer::Observable* o, nonstd::any 
 	}
 	else if (s.compare("note") == 0) {
 		if (csn.compare("assignmentview") == 0) {
-			auto pn = swGui->getPadNumberFromFocus(mpc->getLayeredScreen().lock()->getFocus(), samplerGui->getBank());
+			auto pn = swGui->getPadNumberFromFocus(Mpc::instance().getLayeredScreen().lock()->getFocus(), samplerGui->getBank());
 			displayInfo1();
 			displayInfo2();
 			displayPad(pn);
@@ -509,7 +509,7 @@ void SamplerWindowObserver::displayInfo0()
 
 void SamplerWindowObserver::displayInfo1()
 {
-	auto focus = mpc->getLayeredScreen().lock()->getFocus();
+	auto focus = Mpc::instance().getLayeredScreen().lock()->getFocus();
 	auto pn = swGui->getPadNumberFromFocus(focus, samplerGui->getBank());
 	int nn = program.lock()->getPad(pn)->getNote();
 	info1Label.lock()->setText(nn != 34 ? to_string(nn) : "--");
@@ -517,7 +517,7 @@ void SamplerWindowObserver::displayInfo1()
 
 void SamplerWindowObserver::displayInfo2()
 {
-	auto focus = mpc->getLayeredScreen().lock()->getFocus();
+	auto focus = Mpc::instance().getLayeredScreen().lock()->getFocus();
 	auto pn = swGui->getPadNumberFromFocus(focus, samplerGui->getBank());
 	int nn = program.lock()->getPad(pn)->getNote();
 
@@ -597,8 +597,8 @@ void SamplerWindowObserver::displayMidiProgramChange()
 }
 
 SamplerWindowObserver::~SamplerWindowObserver() {
-	if (mpc->getLayeredScreen().lock()) {
-		mpc->getLayeredScreen().lock()->getEnvGraph().lock()->Hide(true);
+	if (Mpc::instance().getLayeredScreen().lock()) {
+		Mpc::instance().getLayeredScreen().lock()->getEnvGraph().lock()->Hide(true);
 	}
 	samplerGui->deleteObserver(this);
 	swGui->deleteObserver(this);

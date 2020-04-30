@@ -7,8 +7,8 @@
 using namespace mpc::controls::sequencer::window;
 using namespace std;
 
-EraseAllOffTracksControls::EraseAllOffTracksControls(mpc::Mpc* mpc)
-	: AbstractSequencerControls(mpc)
+EraseAllOffTracksControls::EraseAllOffTracksControls()
+	: AbstractSequencerControls()
 {
 }
 

@@ -20,7 +20,7 @@
 #include <sequencer/SystemExclusiveEvent.hpp>
 
 namespace mpc {
-	class Mpc;
+	
 	namespace sequencer {
 		class Sequencer;
 		class Sequence;
@@ -46,7 +46,7 @@ namespace mpc {
 			{
 
 			private:
-				mpc::Mpc* mpc;
+				
 				std::weak_ptr<mpc::sampler::Sampler> sampler{};
 				std::vector<std::string> viewNames{};
 				std::vector<std::weak_ptr<mpc::sequencer::Event>> visibleEvents;
@@ -81,7 +81,7 @@ namespace mpc {
 				void refreshViewModeNotes();
 				void setViewModeNotesText();
 
-				StepEditorObserver(mpc::Mpc* mpc);
+				StepEditorObserver();
 				~StepEditorObserver();
 
 			};

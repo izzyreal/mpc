@@ -9,8 +9,8 @@
 using namespace mpc::controls::sampler::window;
 using namespace std;
 
-ProgramControls::ProgramControls(mpc::Mpc* mpc) 
-	: AbstractSamplerControls(mpc)
+ProgramControls::ProgramControls() 
+	: AbstractSamplerControls()
 {
 }
 

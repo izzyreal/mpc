@@ -4,7 +4,7 @@
 #include <memory>
 
 namespace mpc {
-	class Mpc;
+	
 	namespace sampler {
 		class PgmSlider;
 		class Sampler;
@@ -45,7 +45,7 @@ namespace mpc {
 				void update(moduru::observer::Observable* o, nonstd::any arg) override;
 
 			public:
-				AssignObserver(mpc::Mpc* mpc);
+				AssignObserver();
 				~AssignObserver();
 			};
 

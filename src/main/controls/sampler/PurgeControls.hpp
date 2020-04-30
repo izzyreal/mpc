@@ -13,7 +13,7 @@ namespace mpc {
 				typedef AbstractSamplerControls super;
 				void function(int f) override;
 
-				PurgeControls(mpc::Mpc* mpc);
+				PurgeControls();
 
 			};
 

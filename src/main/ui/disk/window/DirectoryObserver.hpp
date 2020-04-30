@@ -7,7 +7,7 @@
 #include <vector>
 
 namespace mpc {
-	class Mpc;
+	
 	namespace disk {
 		class AbstractDisk;
 	}
@@ -33,7 +33,7 @@ namespace mpc {
 					std::weak_ptr<mpc::disk::AbstractDisk> disk{};
 					std::vector<std::weak_ptr<mpc::lcdgui::Field>> left{};
 					std::vector<std::weak_ptr<mpc::lcdgui::Field>> right{};
-					mpc::Mpc* mpc;
+					
 					std::weak_ptr<mpc::lcdgui::Field> a0Field{};
 					std::weak_ptr<mpc::lcdgui::Field> a1Field{};
 					std::weak_ptr<mpc::lcdgui::Field> a2Field{};
@@ -77,7 +77,7 @@ namespace mpc {
 					void drawGraphicsRight();
 
 				public:
-					DirectoryObserver(std::weak_ptr<mpc::disk::AbstractDisk> disk, mpc::Mpc* mpc);
+					DirectoryObserver(std::weak_ptr<mpc::disk::AbstractDisk> disk);
 					~DirectoryObserver();
 				};
 

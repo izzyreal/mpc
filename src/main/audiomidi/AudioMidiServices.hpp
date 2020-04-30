@@ -88,7 +88,6 @@ namespace mpc::audiomidi {
 		weak_ptr<ctoot::mpc::MpcMultiMidiSynth> mms;
 		shared_ptr<ctoot::audio::server::CompoundAudioClient> cac;
 		shared_ptr<MpcMidiPorts> mpcMidiPorts;
-		Mpc* mpc{ nullptr };
 		vector<shared_ptr<ctoot::audio::server::IOAudioProcess>> inputProcesses;
 		vector<ctoot::audio::server::IOAudioProcess*> outputProcesses;
 		shared_ptr<mpc::sequencer::FrameSeq> frameSeq;
@@ -132,7 +131,7 @@ namespace mpc::audiomidi {
 		void start(const int sampleRate, const int inputCount, const int outputCount);
 
 	public:
-		AudioMidiServices(Mpc* mpc);
+		AudioMidiServices();
 		~AudioMidiServices();
 
 	};

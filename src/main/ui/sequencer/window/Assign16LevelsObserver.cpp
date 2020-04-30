@@ -18,12 +18,12 @@
 using namespace mpc::ui::sequencer::window;
 using namespace std;
 
-Assign16LevelsObserver::Assign16LevelsObserver(mpc::Mpc* mpc) 
+Assign16LevelsObserver::Assign16LevelsObserver() 
 {
-	this->mpc = mpc;
-	sGui = mpc->getUis().lock()->getSequencerGui();
+	
+	sGui = Mpc::instance().getUis().lock()->getSequencerGui();
 	sGui->addObserver(this);
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	noteField = ls->lookupField("note");
 	paramField = ls->lookupField("param");
 	typeField = ls->lookupField("type");
@@ -43,8 +43,8 @@ vector<string> Assign16LevelsObserver::TYPE_NAMES { "TUNING", "DECAY", "ATTACK",
 
 void Assign16LevelsObserver::displayNote()
 {
-    auto seq = mpc->getSequencer().lock();
-	auto sampler = mpc->getSampler().lock();
+    auto seq = Mpc::instance().getSequencer().lock();
+	auto sampler = Mpc::instance().getSampler().lock();
     auto nn = sGui->getNote();
     auto track = seq->getActiveTrackIndex();
     auto pgmNumber = sampler->getDrumBusProgramNumber(seq->getActiveSequence().lock()->getTrack(track).lock()->getBusNumber());

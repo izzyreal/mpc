@@ -39,7 +39,7 @@ namespace mpc {
 				void down() override;
 				void shift() override;
 
-				StepEditorControls(mpc::Mpc* mpc);
+				StepEditorControls();
 
 			};
 

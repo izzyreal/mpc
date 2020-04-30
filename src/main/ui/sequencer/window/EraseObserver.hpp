@@ -6,7 +6,7 @@
 #include <string>
 
 namespace mpc {
-	class Mpc;
+	
 	namespace sequencer {
 		class Sequence;
 	}
@@ -67,7 +67,7 @@ namespace mpc {
 					void displayNotes();
 
 				public:
-					EraseObserver(mpc::Mpc* mpc);
+					EraseObserver();
 					~EraseObserver();
 
 				};

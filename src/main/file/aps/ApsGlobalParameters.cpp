@@ -25,12 +25,12 @@ ApsGlobalParameters::ApsGlobalParameters(vector<char> loadBytes)
 	masterLevel = loadBytes[6];
 }
 
-ApsGlobalParameters::ApsGlobalParameters(mpc::Mpc* mpc) 
+ApsGlobalParameters::ApsGlobalParameters() 
 {
 	saveBytes = vector<char>(ApsParser::PARAMETERS_LENGTH);
 	for (int i = 0; i < saveBytes.size(); i++)
 	saveBytes[i] = TEMPLATE[i];
-	auto uis = mpc->getUis().lock();
+	auto uis = Mpc::instance().getUis().lock();
 	auto const padToInternalSoundVal = uis->getSamplerGui()->isPadToIntSound();
 	auto const padAssignMasterVal = uis->getSamplerGui()->isPadAssignMaster();
 	auto const stereoMixSourceDrumVal = uis->getMixerSetupGui()->isStereoMixSourceDrum();

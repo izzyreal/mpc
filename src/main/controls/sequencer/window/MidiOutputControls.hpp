@@ -15,7 +15,7 @@ namespace mpc {
 					void turnWheel(int i) override;
 					void function(int i) override;
 
-					MidiOutputControls(mpc::Mpc* mpc);
+					MidiOutputControls();
 
 				};
 

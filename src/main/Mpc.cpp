@@ -43,27 +43,27 @@ Mpc::Mpc()
 {
 	moduru::Logger::l.setPath(mpc::StartUp::logFilePath);
 
-	hardware = make_shared<hardware::Hardware>(this);
+	hardware = make_shared<hardware::Hardware>();
 
-	uis = make_shared<ui::Uis>(this);
-	layeredScreen = make_shared<lcdgui::LayeredScreen>(this);
+	uis = make_shared<ui::Uis>();
+	layeredScreen = make_shared<lcdgui::LayeredScreen>();
 
 }
 
 void Mpc::init(const int sampleRate, const int inputCount, const int outputCount)
 {
-	sequencer = make_shared<mpc::sequencer::Sequencer>(this);
+	sequencer = make_shared<mpc::sequencer::Sequencer>();
 	MLOG("Sequencer created");
 
-	sampler = make_shared<mpc::sampler::Sampler>(this);
+	sampler = make_shared<mpc::sampler::Sampler>();
 	MLOG("Sampler created");
 
-	mpcMidiInputs = vector<mpc::audiomidi::MpcMidiInput*>{ new mpc::audiomidi::MpcMidiInput(0, this), new mpc::audiomidi::MpcMidiInput(1, this) };
+	mpcMidiInputs = vector<mpc::audiomidi::MpcMidiInput*>{ new mpc::audiomidi::MpcMidiInput(0), new mpc::audiomidi::MpcMidiInput(1) };
 
 	/*
 	* AudioMidiServices requires sampler to exist.
 	*/
-	audioMidiServices = make_shared<mpc::audiomidi::AudioMidiServices>(this);
+	audioMidiServices = make_shared<mpc::audiomidi::AudioMidiServices>();
 	MLOG("AudioMidiServices created");
 
 	sequencer->init();
@@ -72,43 +72,23 @@ void Mpc::init(const int sampleRate, const int inputCount, const int outputCount
 	sampler->init();
 	MLOG("Sampler initialized");
 
-	eventHandler = make_shared<mpc::audiomidi::EventHandler>(this);
+	eventHandler = make_shared<mpc::audiomidi::EventHandler>();
 	MLOG("Eeventhandler created");
 
 	audioMidiServices->start(sampleRate, inputCount, outputCount);
 	MLOG("AudioMidiServices started");
 
-	controls = make_shared<controls::Controls>(this);
+	controls = make_shared<controls::Controls>();
 
-	diskController = make_unique<DiskController>(this);
+	diskController = make_unique<DiskController>();
 	diskController->initDisks();
 
 	hardware->getSlider().lock()->setValue(mpc::nvram::NvRam::getSlider());
 	MLOG("Mpc is ready")
 }
 
-void Mpc::loadDemoBeat() {
-	getDisk().lock()->moveForward("TEST1");
-	getDisk().lock()->initFiles();
-	
-	/*
-	mpc::disk::MpcFile* f = getDisk().lock()->getFile("FRUTZLE.ALL");
-	auto allLoader = new mpc::file::all::AllLoader(this, f);
-	f = getDisk().lock()->getFile("FRUTZLE.APS");
-	auto apsLoader = new mpc::disk::ApsLoader(this, f);
-	delete allLoader;
-	*/
-	while (getDisk().lock()->isBusy()) {
-		this_thread::sleep_for(chrono::milliseconds(10));
-	}
-	auto f = getDisk().lock()->getFile("ALL_PGMS.APS");
-	auto apsLoader = new mpc::disk::ApsLoader(this, f);
-	delete apsLoader;
-	//sequencer->playFromStart();
-}
-
 void Mpc::powerOn() {
-	mpc::StartUp().runStartUpRoutine(this);
+	mpc::StartUp().runStartUpRoutine();
 }
 
 weak_ptr<ui::Uis> Mpc::getUis() {
@@ -197,7 +177,7 @@ void Mpc::loadSound(bool replace)
 	}
 	auto lDisk = getDisk().lock();
 	lDisk->setBusy(true);
-	auto soundLoader = mpc::disk::SoundLoader(this, sampler->getSounds(), replace);
+	auto soundLoader = mpc::disk::SoundLoader(sampler->getSounds(), replace);
 	soundLoader.setPreview(true);
 	soundLoader.setPartOfProgram(false);
 	bool hasNotBeenLoadedAlready = true;
@@ -214,7 +194,7 @@ void Mpc::loadSound(bool replace)
 	}
 	
 	if (hasNotBeenLoadedAlready) {
-		loadSoundThread = thread(&Mpc::static_loadSound, this, soundLoader.getSize());
+		loadSoundThread = thread(&Mpc::static_loadSound, soundLoader.getSize());
 	}
 	else {
 		sampler->deleteSample(sampler->getSoundCount() - 1);
@@ -225,7 +205,7 @@ void Mpc::loadSound(bool replace)
 void Mpc::loadProgram()
 {
 	programLoader.reset();
-	programLoader = make_unique<mpc::disk::ProgramLoader>(this, uis->getDiskGui()->getSelectedFile(), uis->getDiskGui()->getLoadReplaceSound());
+	programLoader = make_unique<mpc::disk::ProgramLoader>(uis->getDiskGui()->getSelectedFile(), uis->getDiskGui()->getLoadReplaceSound());
 }
 
 void Mpc::importLoadedProgram()
@@ -245,9 +225,9 @@ ctoot::mpc::MpcMultiMidiSynth* Mpc::getMms()
 	return audioMidiServices->getMms().lock().get();
 }
 
-void Mpc::static_loadSound(void* this_p, int size)
+void Mpc::static_loadSound(int size)
 {
-	static_cast<Mpc*>(this_p)->runLoadSoundThread(size);
+	Mpc::instance().runLoadSoundThread(size);
 }
 
 void Mpc::runLoadSoundThread(int size) {
@@ -272,7 +252,7 @@ audiomidi::MpcMidiInput* Mpc::getMpcMidiInput(int i)
 Mpc::~Mpc() {
 	MLOG("Mpc destructor.");
 	mpc::nvram::NvRam::saveUserDefaults();
-	mpc::nvram::NvRam::saveKnobPositions(this);
+	mpc::nvram::NvRam::saveKnobPositions();
 	for (auto& m : mpcMidiInputs) {
 		if (m != nullptr) {
 			delete m;

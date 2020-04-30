@@ -29,8 +29,8 @@ using namespace mpc::controls::other::dialog;
 using namespace std;
 using namespace moduru::lang;
 
-NameControls::NameControls(mpc::Mpc* mpc) 
-	: AbstractOtherControls(mpc)
+NameControls::NameControls() 
+	: AbstractOtherControls()
 {
 }
 
@@ -107,7 +107,7 @@ void NameControls::pressEnter() {
 }
 
 void NameControls::saveName() {
-	auto uis = mpc->getUis().lock();
+	auto uis = Mpc::instance().getUis().lock();
 	auto lLs = ls.lock();
 	auto lSequencer = sequencer.lock();
 	auto ngParam = nameGui->getParameterName();
@@ -141,7 +141,7 @@ void NameControls::saveName() {
 	else if (ngParam.compare("savingaps") == 0) {
 		string apsName = nameGui->getName();
 		apsName.append(".APS");
-		mpc::file::aps::ApsSaver(mpc, mpc::Util::getFileName(apsName));
+		mpc::file::aps::ApsSaver(mpc::Util::getFileName(apsName));
 		nameGui->setNameBeingEdited(false);
 		lLs->setLastFocus("name", "0");
 		return;
@@ -195,15 +195,15 @@ void NameControls::saveName() {
 		auto ext = mpc::Util::splitName(directoryGui->getSelectedFile()->getName())[1];
 		if (ext.length() > 0) ext = "." + ext;
 
-		success = mpc->getDisk().lock()->renameSelectedFile(StrUtil::trim(StrUtil::toUpper(nameGui->getName())) + ext);
+		success = Mpc::instance().getDisk().lock()->renameSelectedFile(StrUtil::trim(StrUtil::toUpper(nameGui->getName())) + ext);
 		if (!success) {
 			lLs->createPopup("File name exists !!", 120);
 			lLs->setPreviousScreenName("directory");
 			return;
 		}
 		else {
-			mpc->getDisk().lock()->flush();
-			mpc->getDisk().lock()->initFiles();
+			Mpc::instance().getDisk().lock()->flush();
+			Mpc::instance().getDisk().lock()->initFiles();
 			nameGui->setNameBeingEdited(false);
 			lLs->setLastFocus("name", "0");
 			lLs->openScreen("directory");
@@ -211,7 +211,7 @@ void NameControls::saveName() {
 		}
 	}
 	else if (ngParam.compare("newfolder") == 0) {
-		auto lDisk = mpc->getDisk().lock();
+		auto lDisk = Mpc::instance().getDisk().lock();
 		bool success = lDisk->newFolder(StrUtil::toUpper(nameGui->getName()));
 		if (success) {
 			lDisk->flush();
@@ -285,7 +285,7 @@ void NameControls::saveName() {
 		return;
 	}
 	else if (prevScreen.compare("sound") == 0) {
-		dynamic_pointer_cast<mpc::sampler::Sound>(mpc->getSampler().lock()->getSound(soundGui->getSoundIndex()).lock())->setName(nameGui->getName());
+		dynamic_pointer_cast<mpc::sampler::Sound>(Mpc::instance().getSampler().lock()->getSound(soundGui->getSoundIndex()).lock())->setName(nameGui->getName());
 		nameGui->setNameBeingEdited(false);
 		lLs->setLastFocus("name", "0");
 		lLs->openScreen("sound");

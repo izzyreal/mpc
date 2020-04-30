@@ -5,8 +5,8 @@
 using namespace mpc::controls::disk;
 using namespace std;
 
-FormatControls::FormatControls(mpc::Mpc* mpc)
-	: AbstractDiskControls(mpc)
+FormatControls::FormatControls()
+	: AbstractDiskControls()
 {
 }
 

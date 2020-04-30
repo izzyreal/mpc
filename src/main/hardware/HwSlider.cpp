@@ -6,16 +6,16 @@
 using namespace mpc::hardware;
 using namespace std;
 
-Slider::Slider(mpc::Mpc* mpc)
+Slider::Slider()
 {
-	this->mpc = mpc;
+	
 }
 
 void Slider::setValue(int i) {
 	if (i < 0 || i > 127) return;
 	value = i;
-	if (mpc->getActiveControls() != nullptr) {
-		mpc->getActiveControls()->setSlider(value);
+	if (Mpc::instance().getActiveControls() != nullptr) {
+		Mpc::instance().getActiveControls()->setSlider(value);
 	}
 }
 

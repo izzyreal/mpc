@@ -26,11 +26,11 @@ using namespace moduru::file;
 
 using namespace std;
 
-AbstractDisk::AbstractDisk(weak_ptr<mpc::disk::Store> store, mpc::Mpc* mpc)
+AbstractDisk::AbstractDisk(weak_ptr<mpc::disk::Store> store)
 {
 	this->store = store;
-	this->mpc = mpc;
-	this->diskGui = mpc->getUis().lock()->getDiskGui();
+	
+	this->diskGui = Mpc::instance().getUis().lock()->getDiskGui();
 	extensions = vector<string>{ "", "SND", "PGM", "APS", "MID", "ALL", "WAV", "SEQ", "SET" };
 }
 
@@ -104,8 +104,8 @@ vector<string> AbstractDisk::getParentFileNames()
 
 bool AbstractDisk::renameSelectedFile(string s)
 {
-    auto dirGui = mpc->getUis().lock()->getDirectoryGui();
-	auto diskGui = mpc->getUis().lock()->getDiskGui();
+    auto dirGui = Mpc::instance().getUis().lock()->getDirectoryGui();
+	auto diskGui = Mpc::instance().getUis().lock()->getDiskGui();
     auto left = dirGui->getXPos() == 0;
     auto fileNumber = left ? dirGui->getYpos0() + dirGui->getYOffsetFirst() : diskGui->getFileLoad();
     auto file = left ? getParentFile(fileNumber) : getFile(fileNumber);
@@ -114,7 +114,7 @@ bool AbstractDisk::renameSelectedFile(string s)
 
 bool AbstractDisk::deleteSelectedFile()
 {
-	auto diskGui = mpc->getUis().lock()->getDiskGui();
+	auto diskGui = Mpc::instance().getUis().lock()->getDiskGui();
 	return files[diskGui->getFileLoad()]->del();
 }
 
@@ -247,19 +247,19 @@ MpcFile* AbstractDisk::getFile(string fileName)
 void AbstractDisk::writeProgram(mpc::sampler::Program* program, string fileName)
 {
 	if (checkExists(fileName)) return;
-	auto writer = mpc::file::pgmwriter::PgmWriter(program, mpc->getSampler());
+	auto writer = mpc::file::pgmwriter::PgmWriter(program, Mpc::instance().getSampler());
 	auto pgmFile = newFile(fileName);
     auto bytes = writer.get();
 	pgmFile->setFileData(&bytes);
 	vector<std::weak_ptr<mpc::sampler::Sound> > sounds;
 	for (auto& n : program->getNotesParameters()) {
 		if (n->getSndNumber() != -1) {
-			sounds.push_back(dynamic_pointer_cast<mpc::sampler::Sound>(mpc->getSampler().lock()->getSound(n->getSndNumber()).lock()));
+			sounds.push_back(dynamic_pointer_cast<mpc::sampler::Sound>(Mpc::instance().getSampler().lock()->getSound(n->getSndNumber()).lock()));
 		}
 	}
-	auto save = mpc->getUis().lock()->getDiskGui()->getPgmSave();
+	auto save = Mpc::instance().getUis().lock()->getDiskGui()->getPgmSave();
 	if (save != 0) {
-		SoundSaver(mpc, sounds, save == 1 ? false : true);
+		SoundSaver(sounds, save == 1 ? false : true);
 	}
 	flush();
 	initFiles();

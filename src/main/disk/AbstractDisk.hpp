@@ -6,7 +6,7 @@
 #include <string>
 
 namespace mpc {
-	class Mpc;
+	
 	namespace sequencer {
 		class Sequence;
 	}
@@ -38,7 +38,7 @@ namespace mpc {
 		protected:
 			mpc::ui::disk::DiskGui* diskGui;
 			std::unique_ptr<mpc::disk::device::Device> device{};
-			mpc::Mpc* mpc;
+			
 
 
 		public:
@@ -91,7 +91,7 @@ namespace mpc {
 			virtual int getPathDepth() = 0;
 
 		protected:
-			AbstractDisk(std::weak_ptr<Store> store, mpc::Mpc* mpc);
+			AbstractDisk(std::weak_ptr<Store> store);
 			virtual ~AbstractDisk();
 
 		};

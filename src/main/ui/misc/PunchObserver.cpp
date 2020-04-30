@@ -13,13 +13,13 @@
 using namespace mpc::ui::misc;
 using namespace std;
 
-PunchObserver::PunchObserver(mpc::Mpc* mpc)
+PunchObserver::PunchObserver()
 {
-	this->mpc = mpc;
+	
 	autoPunchNames = vector<string>{ "PUNCH IN ONLY", "PUNCH OUT ONLY", "PUNCH IN OUT" };
-	punchGui = mpc->getUis().lock()->getPunchGui();
+	punchGui = Mpc::instance().getUis().lock()->getPunchGui();
 	punchGui->addObserver(this);
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	autoPunchField = ls->lookupField("autopunch");
 	time0Field = ls->lookupField("time0");
 	time1Field = ls->lookupField("time1");
@@ -27,7 +27,7 @@ PunchObserver::PunchObserver(mpc::Mpc* mpc)
 	time3Field = ls->lookupField("time3");
 	time4Field = ls->lookupField("time4");
 	time5Field = ls->lookupField("time5");
-	sequence = mpc->getSequencer().lock()->getActiveSequence().lock().get();
+	sequence = Mpc::instance().getSequencer().lock()->getActiveSequence().lock().get();
 	displayBackground();
 	displayAutoPunch();
 	displayTime();
@@ -53,7 +53,7 @@ void PunchObserver::displayAutoPunch()
 
 void PunchObserver::displayTime()
 {
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	for (int i = 0; i < 3; i++) {
 		ls->lookupField("time" + to_string(i)).lock()->Hide(punchGui->getAutoPunch() == 1);
 		ls->lookupLabel("time" + to_string(i)).lock()->Hide(punchGui->getAutoPunch() == 1);
@@ -78,9 +78,9 @@ void PunchObserver::displayBackground()
 	else if (punchGui->getAutoPunch() == 2) {
 		bgName = "punchinout";
 	}
-	mpc->getLayeredScreen().lock()->getCurrentBackground()->setName(bgName);
-	mpc->getLayeredScreen().lock()->lookupLabel("autopunch").lock()->SetDirty();
-	mpc->getLayeredScreen().lock()->getFunctionKeys()->SetDirty();
+	Mpc::instance().getLayeredScreen().lock()->getCurrentBackground()->setName(bgName);
+	Mpc::instance().getLayeredScreen().lock()->lookupLabel("autopunch").lock()->SetDirty();
+	Mpc::instance().getLayeredScreen().lock()->getFunctionKeys()->SetDirty();
 }
 
 PunchObserver::~PunchObserver() {

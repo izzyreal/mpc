@@ -6,7 +6,7 @@
 
 namespace mpc {
 
-	class Mpc;
+	
 
 	namespace lcdgui {
 		class Field;
@@ -23,7 +23,7 @@ namespace mpc {
 			{
 
 			private:
-				mpc::Mpc* mpc;
+				
 				std::vector<std::string> recordNames{};
 				std::weak_ptr<mpc::lcdgui::Field> recordField{};
 				std::weak_ptr<mpc::lcdgui::Field> sqField{};
@@ -53,7 +53,7 @@ namespace mpc {
 			public:
 				void update(moduru::observer::Observable* o, nonstd::any a) override;
 
-				DirectToDiskRecorderObserver(mpc::Mpc* mpc);
+				DirectToDiskRecorderObserver();
 				~DirectToDiskRecorderObserver();
 			};
 

@@ -59,6 +59,12 @@ namespace mpc::sampler {
 namespace mpc {
 	class Mpc
 	{
+	public:
+		static Mpc& instance()
+		{
+			static auto mpc = Mpc();
+			return mpc;
+		}
 
 	private:
 		std::thread loadSoundThread{};
@@ -112,11 +118,10 @@ namespace mpc {
 		void loadSound(bool replace);
 		void loadProgram();
 		void importLoadedProgram();
-		void loadDemoBeat();
 
 	private:
 		void runLoadSoundThread(int size);
-		static void static_loadSound(void* this_p, int size);
+		static void static_loadSound(int size);
 
 	public:
 		std::weak_ptr<mpc::disk::AbstractDisk> getDisk();

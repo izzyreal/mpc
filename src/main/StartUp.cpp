@@ -41,9 +41,9 @@ void StartUp::runBootSequence(weak_ptr<Gui> gui) {
 }
 */
 
-void StartUp::runStartUpRoutine(mpc::Mpc* mpc)
+void StartUp::runStartUpRoutine()
 {
-	mpc->getHardware().lock()->getLed("padbanka").lock()->light(true);
+	Mpc::instance().getHardware().lock()->getLed("padbanka").lock()->light(true);
 /*
 	auto lLs = ls.lock();
 	auto ledPanel = lMainFrame->getLedPanel().lock();

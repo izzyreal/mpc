@@ -14,7 +14,7 @@ namespace mpc {
 					typedef mpc::controls::disk::AbstractDiskControls super;
 					void function(int i) override;
 
-					MPC2000XLAllFileControls(mpc::Mpc* mpc);
+					MPC2000XLAllFileControls();
 
 				};
 

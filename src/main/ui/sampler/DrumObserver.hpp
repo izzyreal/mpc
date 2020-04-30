@@ -11,7 +11,7 @@ namespace ctoot {
 
 namespace mpc {
 
-	class Mpc;
+	
 
 	namespace sampler {
 		class Sampler;
@@ -40,7 +40,7 @@ namespace mpc {
 				std::weak_ptr<mpc::lcdgui::Field> pgmChangeField{};
 				std::weak_ptr<mpc::lcdgui::Field> midiVolumeField{};
 				std::weak_ptr<mpc::lcdgui::Field> currentValField{};
-				mpc::Mpc* mpc{ nullptr };
+				
 				std::weak_ptr<mpc::sampler::Sampler> sampler{};
 				ctoot::mpc::MpcSoundPlayerChannel* mpcSoundPlayerChannel{ nullptr };
 				std::weak_ptr<mpc::lcdgui::Label> valueLabel{};
@@ -58,7 +58,7 @@ namespace mpc {
 				void update(moduru::observer::Observable* o, nonstd::any arg) override;
 
 			public:
-				DrumObserver(mpc::Mpc* mpc);
+				DrumObserver();
 				~DrumObserver();
 
 			};

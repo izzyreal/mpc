@@ -7,7 +7,7 @@
 
 namespace mpc {
 
-	class Mpc;
+	
 
 	namespace controls {
 
@@ -74,7 +74,7 @@ namespace mpc {
 			mpc::controls::GlobalReleaseControls* getReleaseControls();
 
 		public:
-			Controls(Mpc* mpc);
+			Controls();
 			~Controls();
 		};
 	}

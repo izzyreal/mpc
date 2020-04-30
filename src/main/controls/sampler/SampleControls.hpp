@@ -19,7 +19,7 @@ namespace mpc {
 				void down() override;
 
 			public:
-				SampleControls(mpc::Mpc* mpc);
+				SampleControls();
 
 			};
 

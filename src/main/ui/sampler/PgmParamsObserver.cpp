@@ -18,15 +18,15 @@
 using namespace mpc::ui::sampler;
 using namespace std;
 
-PgmParamsObserver::PgmParamsObserver(mpc::Mpc* mpc) 
+PgmParamsObserver::PgmParamsObserver() 
 {
-	this->mpc = mpc;
+	
 	decayModes = { "END", "START" };
 	voiceOverlapModes = { "POLY", "MONO", "NOTE OFF" };
-	samplerGui = mpc->getUis().lock()->getSamplerGui();
+	samplerGui = Mpc::instance().getUis().lock()->getSamplerGui();
 	samplerGui->addObserver(this);
-	sampler = mpc->getSampler();
-	ls = mpc->getLayeredScreen().lock().get();
+	sampler = Mpc::instance().getSampler();
+	ls = Mpc::instance().getLayeredScreen().lock().get();
 	auto lSampler = sampler.lock();
 	mpcSoundPlayerChannel = lSampler->getDrum(samplerGui->getSelectedDrum());
 	program = dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
@@ -181,7 +181,7 @@ PgmParamsObserver::~PgmParamsObserver() {
 	mpcSoundPlayerChannel->deleteObserver(this);
 	lastNp->deleteObserver(this);
 
-	if (mpc->getLayeredScreen().lock()) {
-		mpc->getLayeredScreen().lock()->getEnvGraph().lock()->Hide(true);
+	if (Mpc::instance().getLayeredScreen().lock()) {
+		Mpc::instance().getLayeredScreen().lock()->getEnvGraph().lock()->Hide(true);
 	}
 }

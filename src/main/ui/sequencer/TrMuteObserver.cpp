@@ -15,16 +15,16 @@
 using namespace mpc::ui::sequencer;
 using namespace std;
 
-TrMuteObserver::TrMuteObserver(mpc::Mpc* mpc)
+TrMuteObserver::TrMuteObserver()
 {
-	this->mpc = mpc;
+	
 	tracks = vector<weak_ptr<mpc::lcdgui::Label>>(16);
-	sequencer = mpc->getSequencer();
+	sequencer = Mpc::instance().getSequencer();
 	auto lSequencer = sequencer.lock();
 	lSequencer->addObserver(this);
-	samplerGui = mpc->getUis().lock()->getSamplerGui();
+	samplerGui = Mpc::instance().getUis().lock()->getSamplerGui();
 	samplerGui->addObserver(this);
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	sqField = ls->lookupField("sq");
 	now0Field = ls->lookupField("now0");
 	now1Field = ls->lookupField("now1");
@@ -143,13 +143,13 @@ void TrMuteObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 {
 	string s = nonstd::any_cast<string>(arg);
 	if (s.compare("soloenabled") == 0 ) {
-		for (auto& l : mpc->getLayeredScreen().lock()->getLayer(0)->getAllLabelsAndFields()) {
+		for (auto& l : Mpc::instance().getLayeredScreen().lock()->getLayer(0)->getAllLabelsAndFields()) {
 			l.lock()->SetDirty();
 		}
 		refreshTracks();
 	}
 	else if (s.compare("selectedtrackindex") == 0) {
-		for (auto& l : mpc->getLayeredScreen().lock()->getLayer(0)->getAllLabelsAndFields()) {
+		for (auto& l : Mpc::instance().getLayeredScreen().lock()->getLayer(0)->getAllLabelsAndFields()) {
 			l.lock()->SetDirty();
 		}
 		refreshTracks();
@@ -211,5 +211,5 @@ TrMuteObserver::~TrMuteObserver() {
 	}
 	lSeq->deleteObserver(this);
 	samplerGui->deleteObserver(this);
-	mpc->getHardware().lock()->getLed("trackmute").lock()->light(false);
+	Mpc::instance().getHardware().lock()->getLed("trackmute").lock()->light(false);
 }

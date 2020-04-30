@@ -10,7 +10,7 @@ using namespace ctoot::audio::system;
 using namespace std;
 
 namespace mpc {
-	class Mpc;
+	
 }
 
 namespace mpc::sampler {
@@ -23,9 +23,6 @@ namespace mpc::audiomidi {
 		: public virtual AudioOutput
 	{
 
-	private:
-		mpc::Mpc* mpc;
-
 	public:
 		bool closed{ false };
 
@@ -37,7 +34,7 @@ namespace mpc::audiomidi {
 		std::string getLocation() override;
 
 	public:
-		MonitorOutput(mpc::Mpc* mpc);
+		MonitorOutput();
 		~MonitorOutput();
 
 	};

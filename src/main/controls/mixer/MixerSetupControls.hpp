@@ -15,7 +15,7 @@ namespace mpc {
 				void function(int i) override;
 
 			public:
-				MixerSetupControls(mpc::Mpc* mpc);
+				MixerSetupControls();
 				~MixerSetupControls();
 
 			};

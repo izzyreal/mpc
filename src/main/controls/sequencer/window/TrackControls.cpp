@@ -8,8 +8,8 @@
 using namespace mpc::controls::sequencer::window;
 using namespace std;
 
-TrackControls::TrackControls(mpc::Mpc* mpc)
-	: AbstractSequencerControls(mpc)
+TrackControls::TrackControls()
+	: AbstractSequencerControls()
 {
 }
 

@@ -5,7 +5,7 @@
 #include <vector>
 
 namespace mpc {
-	class Mpc;
+	
 	namespace sequencer {
 		class Sequencer;
 	}
@@ -74,7 +74,7 @@ namespace mpc {
 				void refreshSeqs();
 
 			public:
-				NextSeqPadObserver(mpc::Mpc* mpc);
+				NextSeqPadObserver();
 				~NextSeqPadObserver();
 
 			};

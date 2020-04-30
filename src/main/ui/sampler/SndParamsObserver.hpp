@@ -7,7 +7,7 @@
 
 namespace mpc {
 
-	class Mpc;
+	
 
 	namespace sampler {
 		class Sampler;
@@ -30,7 +30,7 @@ namespace mpc {
 			{
 
 			private:
-				mpc::Mpc* mpc;
+				
 				std::vector<std::string> playXNames{};
 				std::weak_ptr<mpc::sampler::Sampler> sampler{ };
 				std::weak_ptr<mpc::sampler::Sound> sound{};
@@ -55,7 +55,7 @@ namespace mpc {
 			public:
 				void update(moduru::observer::Observable* o, nonstd::any arg) override;
 
-				SndParamsObserver(mpc::Mpc* mpc);
+				SndParamsObserver();
 				~SndParamsObserver();
 
 			};

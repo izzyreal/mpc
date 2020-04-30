@@ -13,7 +13,7 @@ namespace mpc {
 				typedef AbstractDiskControls super;
 				void function(int i) override;
 
-				FormatControls(mpc::Mpc* mpc);
+				FormatControls();
 			};
 	
 		}

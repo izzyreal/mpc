@@ -51,7 +51,7 @@ namespace mpc {
 				void splitRight();
 
 			public:
-				AbstractSamplerControls(mpc::Mpc* mpc);
+				AbstractSamplerControls();
 				virtual ~AbstractSamplerControls();
 
 			};

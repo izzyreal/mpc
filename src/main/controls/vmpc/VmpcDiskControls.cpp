@@ -6,8 +6,8 @@
 using namespace mpc::controls::vmpc;
 using namespace std;
 
-VmpcDiskControls::VmpcDiskControls(mpc::Mpc* mpc)
-	: AbstractDiskControls(mpc)
+VmpcDiskControls::VmpcDiskControls()
+	: AbstractDiskControls()
 {
 }
 
@@ -35,7 +35,7 @@ void VmpcDiskControls::turnWheel(int i)
 	}
 	else if(param.compare("root") == 0) {
         //auto raw = deviceGui->isRaw(deviceGui->getScsi());
-        //auto max = raw ? mpc->getRawStoresAmount() : mpc->getStdStoresAmount();
+        //auto max = raw ? Mpc::instance().getRawStoresAmount() : Mpc::instance().getStdStoresAmount();
 		//if (deviceGui->getStore(deviceGui->getScsi()) == max - 1) {
 			//return;
 		//}

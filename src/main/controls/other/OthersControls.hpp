@@ -25,7 +25,7 @@ namespace mpc {
 				void turnWheel(int i) override;
 
 			public:
-				OthersControls(mpc::Mpc* mpc) ;
+				OthersControls() ;
 				~OthersControls();
 			};
 

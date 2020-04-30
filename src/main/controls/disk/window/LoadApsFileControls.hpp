@@ -18,7 +18,7 @@ namespace mpc::controls::disk::window {
 		typedef mpc::controls::disk::AbstractDiskControls super;
 		void function(int i) override;
 
-		LoadApsFileControls(mpc::Mpc* mpc);
+		LoadApsFileControls();
 
 	};
 

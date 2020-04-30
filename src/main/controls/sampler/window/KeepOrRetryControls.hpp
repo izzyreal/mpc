@@ -16,7 +16,7 @@ namespace mpc {
 					void mainScreen() override;
 
 				public:
-					KeepOrRetryControls(mpc::Mpc* mpc);
+					KeepOrRetryControls();
 
 				};
 

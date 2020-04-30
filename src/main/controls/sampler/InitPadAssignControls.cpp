@@ -8,8 +8,8 @@
 using namespace mpc::controls::sampler;
 using namespace std;
 
-InitPadAssignControls::InitPadAssignControls(mpc::Mpc* mpc) 
-	: AbstractSamplerControls(mpc)
+InitPadAssignControls::InitPadAssignControls() 
+	: AbstractSamplerControls()
 {
 }
 

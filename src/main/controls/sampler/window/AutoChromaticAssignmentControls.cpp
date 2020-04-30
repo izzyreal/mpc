@@ -9,8 +9,8 @@
 using namespace mpc::controls::sampler::window;
 using namespace std;
 
-AutoChromaticAssignmentControls::AutoChromaticAssignmentControls(mpc::Mpc* mpc) 
-	: AbstractSamplerControls(mpc)
+AutoChromaticAssignmentControls::AutoChromaticAssignmentControls() 
+	: AbstractSamplerControls()
 {
 }
 

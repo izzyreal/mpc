@@ -14,12 +14,12 @@
 using namespace mpc::ui::sequencer;
 using namespace std;
 
-BarCopyObserver::BarCopyObserver(mpc::Mpc* mpc)
+BarCopyObserver::BarCopyObserver()
 {
-	bcGui = mpc->getUis().lock()->getBarCopyGui();
+	bcGui = Mpc::instance().getUis().lock()->getBarCopyGui();
 	bcGui->deleteObservers();
 	bcGui->addObserver(this);
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	fromSqField = ls->lookupField("fromsq");
 	toSqField = ls->lookupField("tosq");
 	firstBarField = ls->lookupField("firstbar");

@@ -3,7 +3,7 @@
 #include <controls/misc/AbstractMiscControls.hpp>
 
 namespace mpc {
-	class Mpc;
+	
 	namespace controls {
 		namespace misc {
 			namespace window {
@@ -18,7 +18,7 @@ namespace mpc {
 					void turnWheel(int i) override;
 
 				public:
-					TransposePermanentControls(mpc::Mpc* mpc);
+					TransposePermanentControls();
 					~TransposePermanentControls();
 
 				};

@@ -24,7 +24,7 @@ namespace mpc {
 				void recordMixerEvent(int pad, int param, int value);
 
 			public:
-				MixerControls(mpc::Mpc* mpc);
+				MixerControls();
 				~MixerControls();
 
 			};

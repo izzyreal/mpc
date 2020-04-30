@@ -5,7 +5,7 @@
 #include <vector>
 
 namespace mpc {
-	class Mpc;
+	
 	namespace sampler {
 		class Sampler;
 	}
@@ -58,7 +58,7 @@ namespace mpc {
 				public:
 					void update(moduru::observer::Observable* o, nonstd::any arg) override;
 
-					MetronomeSoundObserver(mpc::Mpc* mpc);
+					MetronomeSoundObserver();
 					~MetronomeSoundObserver();
 
 				};

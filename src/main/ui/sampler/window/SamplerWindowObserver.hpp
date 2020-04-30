@@ -13,7 +13,7 @@ namespace ctoot {
 
 namespace mpc {
 
-	class Mpc;
+	
 
 	namespace sampler {
 		class Sampler;
@@ -42,7 +42,7 @@ namespace mpc {
 
 				private:
 					std::vector<std::string> letters{};
-					mpc::Mpc* mpc{ nullptr };
+					
 					std::weak_ptr<mpc::sampler::Sampler> sampler{};
 					ctoot::mpc::MpcSoundPlayerChannel* mpcSoundPlayerChannel{ nullptr };
 					std::weak_ptr<mpc::sampler::Program> program{};
@@ -136,7 +136,7 @@ namespace mpc {
 					void displayMidiProgramChange();
 
 				public:
-					SamplerWindowObserver(mpc::Mpc* mpc);
+					SamplerWindowObserver();
 					~SamplerWindowObserver();
 
 				};

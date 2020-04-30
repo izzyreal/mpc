@@ -23,7 +23,7 @@ namespace mpc {
 				void right() override;
 				void pressEnter() override;
 
-				TrimControls(mpc::Mpc* mpc);
+				TrimControls();
 
 			};
 

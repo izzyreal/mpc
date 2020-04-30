@@ -6,7 +6,7 @@
 #include <string>
 
 namespace mpc {
-	class Mpc;
+	
 	namespace sampler {
 		class Sampler;
 		class Sound;
@@ -69,7 +69,7 @@ namespace mpc {
 					void displayTo();
 
 				public:
-					ZoomObserver(mpc::Mpc* mpc);
+					ZoomObserver();
 					~ZoomObserver();
 				};
 	

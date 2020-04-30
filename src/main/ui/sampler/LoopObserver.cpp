@@ -15,12 +15,12 @@
 using namespace mpc::ui::sampler;
 using namespace std;
 
-LoopObserver::LoopObserver(mpc::Mpc* mpc)
+LoopObserver::LoopObserver()
 {
-	this->mpc = mpc;
-	this->sampler = mpc->getSampler();
+	
+	this->sampler = Mpc::instance().getSampler();
 	playXNames = vector<string>{ "ALL", "ZONE", "BEFOR ST", "BEFOR TO", "AFTR END" };
-	soundGui = mpc->getUis().lock()->getSoundGui();
+	soundGui = Mpc::instance().getUis().lock()->getSoundGui();
 	soundGui->addObserver(this);
 	auto lSampler = sampler.lock();
 	if (lSampler->getSoundCount() != 0) {
@@ -29,7 +29,7 @@ LoopObserver::LoopObserver(mpc::Mpc* mpc)
 		lSound->addObserver(this);
 		lSound->getOscillatorControls()->addObserver(this);
 	}
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	twoDots = ls->getTwoDots();
 	twoDots.lock()->Hide(false);
 	twoDots.lock()->setVisible(0, true);
@@ -74,7 +74,7 @@ LoopObserver::LoopObserver(mpc::Mpc* mpc)
 void LoopObserver::displaySnd()
 {
 	auto lSampler = sampler.lock();
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	if (lSampler->getSoundCount() != 0) {
 		if (ls->getFocus().compare("dummy") == 0) ls->setFocus(sndField.lock()->getName());
 		auto lSound = sound.lock();
@@ -117,7 +117,7 @@ void LoopObserver::displayEndLength()
 	endLengthField.lock()->setSize(31, 9);
 	endLengthField.lock()->setText(soundGui->isEndSelected() ? "  End" : "Lngth");
 	displayEndLengthValue();
-	mpc->getLayeredScreen().lock()->lookupLabel("endlengthvalue").lock()->SetDirty();
+	Mpc::instance().getLayeredScreen().lock()->lookupLabel("endlengthvalue").lock()->SetDirty();
 }
 
 void LoopObserver::displayEndLengthValue()

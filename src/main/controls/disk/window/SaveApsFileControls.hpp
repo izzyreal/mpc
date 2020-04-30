@@ -22,7 +22,7 @@ namespace mpc {
 					void turnWheel(int i) override;
 					void function(int i) override;
 
-					SaveApsFileControls(mpc::Mpc* mpc);
+					SaveApsFileControls();
 
 				};
 

@@ -8,7 +8,7 @@
 
 namespace mpc {
 
-	class Mpc;
+	
 
 	namespace disk {
 		class MpcFile;
@@ -27,7 +27,7 @@ namespace mpc {
 			{
 
 			private:
-				mpc::Mpc* mpc;
+				
 				std::vector<std::shared_ptr<mpc::sequencer::Sequence>>* sequencesFromAllFile{};
 				int fileLoad{ 0 };
 				int deleteIndex { 0 };
@@ -83,7 +83,7 @@ namespace mpc {
 				void setSequencesFromAllFile(std::vector<std::shared_ptr<mpc::sequencer::Sequence>>* sequences);
 				std::vector<std::shared_ptr<mpc::sequencer::Sequence>>* getSequencesFromAllFile();
 
-				DiskGui(mpc::Mpc* mpc);
+				DiskGui();
 				~DiskGui();
 
 			};

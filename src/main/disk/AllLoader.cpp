@@ -34,113 +34,127 @@ using namespace mpc::disk;
 using namespace mpc::file::all;
 using namespace std;
 
-AllLoader::AllLoader(mpc::disk::MpcFile* file) 
+AllLoader::AllLoader(mpc::disk::MpcFile* file, bool sequencesOnly) 
 {
-	allParser = new AllParser(file);
-	sequencesALL = allParser->getAllSequences();
-	auto allSeqNames = allParser->getSeqNames()->getNames();
-	vector<Sequence*> temp;
-	int counter = 0;
-	for (int i = 0; i < 99; i++) {
-		if (allSeqNames.at(i).find("(Unused)") != string::npos) {
-			temp.push_back(nullptr);
+	if (sequencesOnly) {
+		allParser = new AllParser(file);
+		allSequences = allParser->getAllSequences();
+		auto allSeqNames = allParser->getSeqNames()->getNames();
+		vector<Sequence*> temp;
+		int counter = 0;
+		for (int i = 0; i < 99; i++) {
+			if (allSeqNames.at(i).find("(Unused)") != string::npos) {
+				temp.push_back(nullptr);
+			}
+			else {
+				temp.push_back(allSequences[counter++]);
+			}
 		}
-		else {
-			temp.push_back(sequencesALL[counter++]);
-		}
+		allSequences = temp;
+		convertSequences(true);
 	}
-	sequencesALL = temp;
-	convertSequences(true);
+	else {
+		auto lSequencer = Mpc::instance().getSequencer().lock();
+		allParser = new AllParser(file);
+		allSequences = allParser->getAllSequences();
+		auto defaults = allParser->getDefaults();
+		auto ud = mpc::StartUp::getUserDefaults().lock();
+		ud->setLastBar(defaults->getBarCount() - 1);
+		ud->setBus(defaults->getBusses()[0]);
+		
+		for (int i = 0; i < 33; i++) {
+			ud->setDeviceName(i, defaults->getDefaultDevNames()[i]);
+		}
+
+		ud->setSequenceName(defaults->getDefaultSeqName());
+		auto defTrackNames = defaults->getDefaultTrackNames();
+		
+		for (int i = 0; i < 64; i++) {
+			ud->setTrackName(i, defTrackNames[i]);
+		}
+
+		ud->setDeviceNumber(defaults->getDevices()[0]);
+		ud->setTimeSig(defaults->getTimeSigNum(), defaults->getTimeSigDen());
+		ud->setPgm(defaults->getPgms()[0]);
+		ud->setTempo(BCMath(defaults->getTempo() / 10.0));
+		ud->setVelo(defaults->getTrVelos()[0]);
+		convertSequences(false);
+		auto allSeqNames = allParser->getSeqNames()->getNames();
+		auto sequencer = allParser->getSequencer();
+		lSequencer->setActiveSequenceIndex(sequencer->sequence);
+		lSequencer->setSelectedTrackIndex(sequencer->track);
+		auto swGui = Mpc::instance().getUis().lock()->getSequencerWindowGui();
+		swGui->setNoteValue(sequencer->tc);
+		auto count = allParser->getCount();
+		swGui->setCountIn(count->getCountInMode());
+		swGui->setAccentVelo(count->getAccentVelo());
+		swGui->setNormalVelo(count->getNormalVelo());
+		swGui->setClickOutput(count->getClickOutput());
+		swGui->setClickVolume(count->getClickVolume());
+		swGui->setRate(count->getRate());
+		swGui->setMetronomeSound(count->getSound());
+		swGui->setInPlay(count->isEnabledInPlay());
+		swGui->setInRec(count->isEnabledInRec());
+		swGui->setWaitForKey(count->isWaitForKeyEnabled());
+		lSequencer->setCountEnabled(count->isEnabled());
+		auto midiInput = allParser->getMidiInput();
+		swGui->setReceiveCh(midiInput->getReceiveCh());
+		swGui->setFilterType(midiInput->getFilterType());
+		auto trackDests = midiInput->getMultiRecTrackDests();
+		
+		for (int i = 0; i < trackDests.size(); i++) {
+			swGui->getMrsLines()[i]->setTrack(trackDests[i]);
+		}
+
+		swGui->setChPressurePassEnabled(midiInput->isChPressurePassEnabled());
+		swGui->setExclusivePassEnabled(midiInput->isExclusivePassEnabled());
+		swGui->setMidiFilterEnabled(midiInput->isFilterEnabled());
+		lSequencer->setRecordingModeMulti(midiInput->isMultiRecEnabled());
+		swGui->setNotePassEnabled(midiInput->isNotePassEnabled());
+		swGui->setPgmChangePassEnabled(midiInput->isPgmChangePassEnabled());
+		swGui->setPitchBendPassEnabled(midiInput->isPitchBendPassEnabled());
+		swGui->setPolyPressurePassEnabled(midiInput->isPolyPressurePassEnabled());
+		swGui->setSustainPedalToDuration(midiInput->isSustainPedalToDurationEnabled());
+		auto misc = allParser->getMisc();
+		auto midiSyncMisc = allParser->getMidiSync();
+		auto seGui = Mpc::instance().getUis().lock()->getStepEditorGui();
+		seGui->setAutoStepIncrementEnabled(misc->isAutoStepIncEnabled());
+		seGui->setTcValueRecordedNotes(misc->getDurationTcPercentage());
+		seGui->setDurationOfRecordedNotes(misc->isDurationOfRecNotesTc());
+		auto msGui = Mpc::instance().getUis().lock()->getMidiSyncGui();
+		msGui->setReceiveMMCEnabled(misc->isInReceiveMMCEnabled());
+		msGui->setSendMMCEnabled(midiSyncMisc->isSendMMCEnabled());
+		msGui->setModeIn(midiSyncMisc->getInMode());
+		msGui->setModeOut(midiSyncMisc->getOutMode());
+		msGui->setShiftEarly(midiSyncMisc->getShiftEarly());
+		msGui->setFrameRate(midiSyncMisc->getFrameRate());
+		msGui->setIn(midiSyncMisc->getInput());
+		msGui->setOut(midiSyncMisc->getOutput());
+		lSequencer->setSecondSequenceEnabled(sequencer->secondSeqEnabled);
+		lSequencer->setSecondSequenceIndex(sequencer->secondSeqIndex);
+		Mpc::instance().getUis().lock()->getSongGui()->setDefaultSongName(midiSyncMisc->getDefSongName());
+		swGui->setTapAvg(misc->getTapAvg());
+		auto songs = allParser->getSongs();
+		
+		for (int i = 0; i < 20; i++) {
+			lSequencer->getSong(i).lock()->setName(songs[i]->name);
+		}
+
+	}
 }
 
-AllLoader::AllLoader(mpc::Mpc* mpc, mpc::disk::MpcFile* file)
+AllLoader::~AllLoader()
 {
-	this->mpc = mpc;
-	auto lSequencer = mpc->getSequencer().lock();
-	allParser = new AllParser(file);
-	sequencesALL = allParser->getAllSequences();
-	auto defaults = allParser->getDefaults();
-	auto ud = mpc::StartUp::getUserDefaults().lock();
-	ud->setLastBar(defaults->getBarCount() - 1);
-	ud->setBus(defaults->getBusses()[0]);
-	for (int i = 0; i < 33; i++)
-		ud->setDeviceName(i, defaults->getDefaultDevNames()[i]);
-
-	ud->setSequenceName(defaults->getDefaultSeqName());
-	auto defTrackNames = defaults->getDefaultTrackNames();
-	for (int i = 0; i < 64; i++)
-		ud->setTrackName(i, defTrackNames[i]);
-
-	ud->setDeviceNumber(defaults->getDevices()[0]);
-	ud->setTimeSig(defaults->getTimeSigNum(), defaults->getTimeSigDen());
-	ud->setPgm(defaults->getPgms()[0]);
-	ud->setTempo(BCMath(defaults->getTempo() / 10.0));
-	ud->setVelo(defaults->getTrVelos()[0]);
-	convertSequences(false);
-	auto allSeqNames = allParser->getSeqNames()->getNames();
-	auto sequencer = allParser->getSequencer();
-	lSequencer->setActiveSequenceIndex(sequencer->sequence);
-	lSequencer->setSelectedTrackIndex(sequencer->track);
-	auto swGui = mpc->getUis().lock()->getSequencerWindowGui();
-	swGui->setNoteValue(sequencer->tc);
-	auto count = allParser->getCount();
-	swGui->setCountIn(count->getCountInMode());
-	swGui->setAccentVelo(count->getAccentVelo());
-	swGui->setNormalVelo(count->getNormalVelo());
-	swGui->setClickOutput(count->getClickOutput());
-	swGui->setClickVolume(count->getClickVolume());
-	swGui->setRate(count->getRate());
-	swGui->setMetronomeSound(count->getSound());
-	swGui->setInPlay(count->isEnabledInPlay());
-	swGui->setInRec(count->isEnabledInRec());
-	swGui->setWaitForKey(count->isWaitForKeyEnabled());
-	lSequencer->setCountEnabled(count->isEnabled());
-	auto midiInput = allParser->getMidiInput();
-	swGui->setReceiveCh(midiInput->getReceiveCh());
-	swGui->setFilterType(midiInput->getFilterType());
-	auto trackDests = midiInput->getMultiRecTrackDests();
-	for (int i = 0; i < trackDests.size(); i++)
-		swGui->getMrsLines()[i]->setTrack(trackDests[i]);
-
-	swGui->setChPressurePassEnabled(midiInput->isChPressurePassEnabled());
-	swGui->setExclusivePassEnabled(midiInput->isExclusivePassEnabled());
-	swGui->setMidiFilterEnabled(midiInput->isFilterEnabled());
-	lSequencer->setRecordingModeMulti(midiInput->isMultiRecEnabled());
-	swGui->setNotePassEnabled(midiInput->isNotePassEnabled());
-	swGui->setPgmChangePassEnabled(midiInput->isPgmChangePassEnabled());
-	swGui->setPitchBendPassEnabled(midiInput->isPitchBendPassEnabled());
-	swGui->setPolyPressurePassEnabled(midiInput->isPolyPressurePassEnabled());
-	swGui->setSustainPedalToDuration(midiInput->isSustainPedalToDurationEnabled());
-	auto misc = allParser->getMisc();
-	auto midiSyncMisc = allParser->getMidiSync();
-	auto seGui = mpc->getUis().lock()->getStepEditorGui();
-	seGui->setAutoStepIncrementEnabled(misc->isAutoStepIncEnabled());
-	seGui->setTcValueRecordedNotes(misc->getDurationTcPercentage());
-	seGui->setDurationOfRecordedNotes(misc->isDurationOfRecNotesTc());
-	auto msGui = mpc->getUis().lock()->getMidiSyncGui();
-	msGui->setReceiveMMCEnabled(misc->isInReceiveMMCEnabled());
-	msGui->setSendMMCEnabled(midiSyncMisc->isSendMMCEnabled());
-	msGui->setModeIn(midiSyncMisc->getInMode());
-	msGui->setModeOut(midiSyncMisc->getOutMode());
-	msGui->setShiftEarly(midiSyncMisc->getShiftEarly());
-	msGui->setFrameRate(midiSyncMisc->getFrameRate());
-	msGui->setIn(midiSyncMisc->getInput());
-	msGui->setOut(midiSyncMisc->getOutput());
-	lSequencer->setSecondSequenceEnabled(sequencer->secondSeqEnabled);
-	lSequencer->setSecondSequenceIndex(sequencer->secondSeqIndex);
-	mpc->getUis().lock()->getSongGui()->setDefaultSongName(midiSyncMisc->getDefSongName());
-	swGui->setTapAvg(misc->getTapAvg());
-	auto songs = allParser->getSongs();
-	for (int i = 0; i < 20; i++)
-		lSequencer->getSong(i).lock()->setName(songs[i]->name);
-
+	if (allParser != nullptr) {
+		delete allParser;
+	}
 }
 
 void AllLoader::convertSequences(const bool indiv)
 {
 	int index = -1;
-	if (!indiv) mpc->getSequencer().lock()->purgeAllSequences();
-	for (auto& as : sequencesALL) {
+	if (!indiv) Mpc::instance().getSequencer().lock()->purgeAllSequences();
+	for (auto& as : allSequences) {
 		index++;
 		if (as == nullptr) {
 			if (indiv) mpcSequences.push_back(nullptr);
@@ -148,10 +162,10 @@ void AllLoader::convertSequences(const bool indiv)
 		}
 		shared_ptr<mpc::sequencer::Sequence> mpcSeq;
 		if (indiv) {
-			mpcSeq = make_shared<mpc::sequencer::Sequence>(mpc, mpc->getSequencer().lock()->getDefaultTrackNames());
+			mpcSeq = make_shared<mpc::sequencer::Sequence>(Mpc::instance().getSequencer().lock()->getDefaultTrackNames());
 		}
 		else {
-			mpcSeq = mpc->getSequencer().lock()->getSequence(index).lock();
+			mpcSeq = Mpc::instance().getSequencer().lock()->getSequence(index).lock();
 		}
 		mpcSeq->init(as->barCount - 1);
 		for (int i = 0; i < as->barCount; i++) {

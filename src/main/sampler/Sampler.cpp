@@ -34,9 +34,9 @@
 using namespace mpc::sampler;
 using namespace std;
 
-Sampler::Sampler(mpc::Mpc* mpc)
+Sampler::Sampler()
 {
-	this->mpc = mpc;
+	
 	soundSortingType = 0;
 	abcd = vector<string>{ "A", "B", "C", "D" };
 	sortNames = vector<string>{ "MEMORY", "NAME", "SIZE" };
@@ -57,12 +57,12 @@ int Sampler::getInputLevel() {
 
 vector<weak_ptr<ctoot::mpc::MpcStereoMixerChannel>> Sampler::getDrumStereoMixerChannels(int i)
 {
-	return mpc->getDrums()[i]->getStereoMixerChannels();
+	return Mpc::instance().getDrums()[i]->getStereoMixerChannels();
 }
 
 vector<weak_ptr<ctoot::mpc::MpcIndivFxMixerChannel>> Sampler::getDrumIndivFxMixerChannels(int i)
 {
-	return mpc->getDrums()[i]->getIndivFxMixerChannels();
+	return Mpc::instance().getDrums()[i]->getIndivFxMixerChannels();
 }
 
 vector<int>* Sampler::getInitMasterPadAssign()
@@ -110,14 +110,14 @@ void Sampler::init()
 
 void Sampler::playMetronome(mpc::sequencer::NoteEvent* event, int framePos)
 {
-	auto swGui = mpc->getUis().lock()->getSequencerWindowGui();
+	auto swGui = Mpc::instance().getUis().lock()->getSequencerWindowGui();
 	auto soundNumber = -2;
 	if (swGui->getMetronomeSound() != 0) {
-		auto program = mpc->getDrum(swGui->getMetronomeSound() - 1)->getProgram();
+		auto program = Mpc::instance().getDrum(swGui->getMetronomeSound() - 1)->getProgram();
 		auto accent = event->getVelocity() == swGui->getAccentVelo();
 		soundNumber = programs[program]->getNoteParameters(accent ? swGui->getAccentNote() : swGui->getNormalNote())->getSndNumber();
 	}
-	mpc->getBasicPlayer()->mpcNoteOn(soundNumber, event->getVelocity(), framePos);
+	Mpc::instance().getBasicPlayer()->mpcNoteOn(soundNumber, event->getVelocity(), framePos);
 }
 
 void Sampler::playPreviewSample(int start, int end, int loopTo, int overlapMode)
@@ -133,7 +133,7 @@ void Sampler::playPreviewSample(int start, int end, int loopTo, int overlapMode)
 	previewSound->setStart(start);
 	previewSound->setEnd(end);
 	previewSound->setLoopTo(loopTo);
-	mpc->getBasicPlayer()->noteOn(-3, 127);
+	Mpc::instance().getBasicPlayer()->noteOn(-3, 127);
 	previewSound->setStart(oldStart);
 	previewSound->setEnd(oldEnd);
 	previewSound->setLoopTo(oldLoopTo);
@@ -154,7 +154,7 @@ int Sampler::getProgramCount()
 
 weak_ptr<Program> Sampler::addProgram(int i) {
 	if (programs[i]) return weak_ptr<Program>();
-	programs[i] = make_shared<Program>(mpc, this);
+	programs[i] = make_shared<Program>(this);
 	return programs[i];
 }
 
@@ -162,7 +162,7 @@ weak_ptr<Program> Sampler::addProgram()
 {
 	for (auto& p : programs) {
 		if (!p) {
-			p = make_shared<Program>(mpc, this);
+			p = make_shared<Program>(this);
 			return p;
 		}
 	}
@@ -238,7 +238,7 @@ void Sampler::deleteAllPrograms(bool init) {
 }
 
 void Sampler::checkProgramReferences() {
-	auto lSequencer = mpc->getSequencer().lock();
+	auto lSequencer = Mpc::instance().getSequencer().lock();
 	auto t = lSequencer->getActiveSequence().lock()->getTrack(lSequencer->getActiveTrackIndex()).lock();
 	auto bus = t->getBusNumber();
 	for (int i = 0; i < 4; i++) {
@@ -335,7 +335,7 @@ void Sampler::deleteSection(const unsigned int sampleNumber, const unsigned int 
 
 void Sampler::sort()
 {
-	auto soundGui = mpc->getUis().lock()->getSoundGui();
+	auto soundGui = Mpc::instance().getUis().lock()->getSoundGui();
 	auto currentSound = soundGui->getSoundIndex();
 	auto currentSoundMemIndex = sounds[currentSound]->getMemoryIndex();
 	soundSortingType++;
@@ -453,25 +453,25 @@ weak_ptr<Sound> Sampler::createZone(weak_ptr<Sound> source, int start, int end, 
 
 void Sampler::stopAllVoices()
 {
-	if (!mpc->getAudioMidiServices().lock()->getAudioServer()->isRunning()) {
+	if (!Mpc::instance().getAudioMidiServices().lock()->getAudioServer()->isRunning()) {
 		return;
 	}
-	mpc->getBasicPlayer()->allSoundOff();
-	for (auto m : mpc->getDrums())
+	Mpc::instance().getBasicPlayer()->allSoundOff();
+	for (auto m : Mpc::instance().getDrums())
 		m->allSoundOff();
 }
 
 void Sampler::stopAllVoices(int frameOffset) {
-	dynamic_cast<ctoot::mpc::MpcSoundPlayerChannel*>(mpc->getDrums()[0])->allSoundOff(frameOffset);
+	dynamic_cast<ctoot::mpc::MpcSoundPlayerChannel*>(Mpc::instance().getDrums()[0])->allSoundOff(frameOffset);
 }
 
 void Sampler::finishBasicVoice() {
-	mpc->getBasicPlayer()->finishVoice();
+	Mpc::instance().getBasicPlayer()->finishVoice();
 }
 
 void Sampler::playX(int playXMode, vector<int>* zone)
 {
-	int index = mpc->getUis().lock()->getSoundGui()->getSoundIndex();
+	int index = Mpc::instance().getUis().lock()->getSoundGui()->getSoundIndex();
 	auto sound = sounds[index];
 	auto start = 0;
 	auto end = sound->getSampleData()->size() - 1;
@@ -498,13 +498,13 @@ void Sampler::playX(int playXMode, vector<int>* zone)
 	int oldEnd = sound->getEnd();
 	sound->setStart(start);
 	sound->setEnd(end);
-	mpc->getBasicPlayer()->noteOn(-4, 127);
+	Mpc::instance().getBasicPlayer()->noteOn(-4, 127);
 	sound->setStart(oldStart);
 	sound->setEnd(oldEnd);
 }
 
 weak_ptr<ctoot::mpc::MpcSound> Sampler::getPlayXSound() {
-	return sounds[mpc->getUis().lock()->getSoundGui()->getSoundIndex()];
+	return sounds[Mpc::instance().getUis().lock()->getSoundGui()->getSoundIndex()];
 }
 
 int Sampler::getFreeSampleSpace()
@@ -578,7 +578,7 @@ string Sampler::addOrIncreaseNumber2(string s) {
 
 Pad* Sampler::getLastPad(Program* program)
 {
-	auto sGui = mpc->getUis().lock()->getSamplerGui();
+	auto sGui = Mpc::instance().getUis().lock()->getSamplerGui();
 	auto lastValidPad = sGui->getPad();
 	if (lastValidPad == -1) lastValidPad = sGui->getPrevPad();
 	return program->getPad(lastValidPad);
@@ -586,7 +586,7 @@ Pad* Sampler::getLastPad(Program* program)
 
 NoteParameters* Sampler::getLastNp(Program* program)
 {
-	auto sGui = mpc->getUis().lock()->getSamplerGui();
+	auto sGui = Mpc::instance().getUis().lock()->getSamplerGui();
 	auto lastValidNote = sGui->getNote();
 	if (lastValidNote == 34) lastValidNote = sGui->getPrevNote();
 	return dynamic_cast<mpc::sampler::NoteParameters*>(program->getNoteParameters(lastValidNote));
@@ -718,17 +718,17 @@ void Sampler::mergeToStereo(vector<float>* sourceLeft, vector<float>* sourceRigh
 
 void Sampler::setDrumBusProgramNumber(int busNumber, int programNumber)
 {
-	mpc->getDrums()[busNumber - 1]->setProgram(programNumber);
+	Mpc::instance().getDrums()[busNumber - 1]->setProgram(programNumber);
 }
 
 int Sampler::getDrumBusProgramNumber(int busNumber)
 {
-	return mpc->getDrums()[busNumber - 1]->getProgram();
+	return Mpc::instance().getDrums()[busNumber - 1]->getProgram();
 }
 
 ctoot::mpc::MpcSoundPlayerChannel* Sampler::getDrum(int i)
 {
-	return mpc->getDrum(i);
+	return Mpc::instance().getDrum(i);
 }
 
 weak_ptr<ctoot::mpc::MpcSound> Sampler::getClickSound()
@@ -770,12 +770,12 @@ void Sampler::resample(std::vector<float>* src, int srcRate, std::vector<float>*
 
 void Sampler::setSampleBackground()
 {
-	mpc->getLayeredScreen().lock()->getCurrentBackground()->setName("sample");
-	auto components = mpc->getLayeredScreen().lock()->getLayer(0)->getAllLabelsAndFields();
+	Mpc::instance().getLayeredScreen().lock()->getCurrentBackground()->setName("sample");
+	auto components = Mpc::instance().getLayeredScreen().lock()->getLayer(0)->getAllLabelsAndFields();
 	for (auto& c : components) {
 		c.lock()->SetDirty();
 	}
-	mpc->getLayeredScreen().lock()->getFunctionKeys()->SetDirty();
+	Mpc::instance().getLayeredScreen().lock()->getFunctionKeys()->SetDirty();
 }
 
 int Sampler::checkExists(string soundName)
@@ -797,13 +797,13 @@ int Sampler::getNextSoundIndex(int j, bool up)
 
 void Sampler::setSoundGuiPrevSound()
 {
-	auto soundGui = mpc->getUis().lock()->getSoundGui();
+	auto soundGui = Mpc::instance().getUis().lock()->getSoundGui();
 	soundGui->setSoundIndex(getNextSoundIndex(soundGui->getSoundIndex(), false), getSoundCount());
 }
 
 void Sampler::setSoundGuiNextSound()
 {
-	auto soundGui = mpc->getUis().lock()->getSoundGui();
+	auto soundGui = Mpc::instance().getUis().lock()->getSoundGui();
 	soundGui->setSoundIndex(getNextSoundIndex(soundGui->getSoundIndex(), true), getSoundCount());
 }
 

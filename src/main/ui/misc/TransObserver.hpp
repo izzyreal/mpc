@@ -4,7 +4,7 @@
 #include <memory>
 
 namespace mpc {
-	class Mpc;
+	
 	namespace lcdgui {
 		class Field;
 		class Label;
@@ -20,7 +20,7 @@ namespace mpc {
 			{
 
 			private:
-				mpc::Mpc* mpc;
+				
 				TransGui* transGui{ nullptr };
 				std::weak_ptr<mpc::lcdgui::Field> trField{};
 				std::weak_ptr<mpc::lcdgui::Label> trackNameLabel{};
@@ -37,7 +37,7 @@ namespace mpc {
 				void update(moduru::observer::Observable* o, nonstd::any a) override;
 
 			public:
-				TransObserver(mpc::Mpc* mpc);
+				TransObserver();
 				~TransObserver();
 			};
 

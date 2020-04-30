@@ -21,9 +21,9 @@
 using namespace mpc::sequencer;
 using namespace std;
 
-FrameSeq::FrameSeq(mpc::Mpc* mpc) {
-	this->mpc = mpc;
-	sequencer = mpc->getSequencer();
+FrameSeq::FrameSeq() {
+	
+	sequencer = Mpc::instance().getSequencer();
 }
 
 void FrameSeq::start(float sampleRate) {
@@ -48,9 +48,9 @@ void FrameSeq::work(int nFrames) {
 	if (!running) {
 		return;
 	}
-	auto controls = mpc->getControls().lock();
-	auto swGui = mpc->getUis().lock()->getSequencerWindowGui();
-	auto songGui = mpc->getUis().lock()->getSongGui();
+	auto controls = Mpc::instance().getControls().lock();
+	auto swGui = Mpc::instance().getUis().lock()->getSequencerWindowGui();
+	auto songGui = Mpc::instance().getUis().lock()->getSongGui();
 	auto lSequencer = sequencer.lock();
 	
 	frameCounter += nFrames;
@@ -210,11 +210,11 @@ void FrameSeq::move(int newTickPos) {
 }
 
 void FrameSeq::repeatPad(int tick) {
-	auto controls = mpc->getControls().lock();
+	auto controls = Mpc::instance().getControls().lock();
 	if (!controls) return;
 	auto pp = controls->getPressedPads();
 	for (auto& i : *pp) {
-		mpc->getActiveControls()->pad(i, (*controls->getPressedPadVelos())[i], true, tick);
+		Mpc::instance().getActiveControls()->pad(i, (*controls->getPressedPadVelos())[i], true, tick);
 	}
 }
 

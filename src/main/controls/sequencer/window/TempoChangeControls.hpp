@@ -35,7 +35,7 @@ namespace mpc {
 					void down() override;
 					void up() override;
 
-					TempoChangeControls(mpc::Mpc* mpc);
+					TempoChangeControls();
 
 				};
 

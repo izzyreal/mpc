@@ -18,11 +18,11 @@
 using namespace mpc::ui::sampler;
 using namespace std;
 
-PgmAssignObserver::PgmAssignObserver(mpc::Mpc* mpc)
+PgmAssignObserver::PgmAssignObserver()
 {
-	samplerGui = mpc->getUis().lock()->getSamplerGui();
+	samplerGui = Mpc::instance().getUis().lock()->getSamplerGui();
 	samplerGui->addObserver(this);
-	sampler = mpc->getSampler();
+	sampler = Mpc::instance().getSampler();
 	auto lSampler = sampler.lock();
 	mpcSoundPlayerChannel = lSampler->getDrum(samplerGui->getSelectedDrum());
 	program = dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
@@ -33,7 +33,7 @@ PgmAssignObserver::PgmAssignObserver(mpc::Mpc* mpc)
 	lastPad = lSampler->getLastPad(lProgram.get());
 	lastPad->addObserver(this);
 	mpcSoundPlayerChannel->addObserver(this);
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	velocityRangeLowerLabel = ls->lookupLabel("velocityrangelower");
 	velocityRangeLowerField = ls->lookupField("velocityrangelower");
 	velocityRangeUpperLabel = ls->lookupLabel("velocityrangeupper");

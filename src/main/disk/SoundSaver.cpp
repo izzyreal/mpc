@@ -14,11 +14,11 @@ using namespace mpc::disk;
 using namespace moduru::lang;
 using namespace std;
 
-SoundSaver::SoundSaver(mpc::Mpc* mpc, vector<weak_ptr<mpc::sampler::Sound> > sounds, bool wav) 
+SoundSaver::SoundSaver(vector<weak_ptr<mpc::sampler::Sound> > sounds, bool wav) 
 {
-	this->mpc = mpc;
-	disk = mpc->getDisk();
-	diskGui = mpc->getUis().lock()->getDiskGui();
+	
+	disk = Mpc::instance().getDisk();
+	diskGui = Mpc::instance().getUis().lock()->getDiskGui();
 	disk.lock()->setBusy(true);
 	this->sounds = sounds;
 	this->wav = wav;
@@ -38,7 +38,7 @@ void SoundSaver::saveSounds()
 	for (auto s : sounds) {
 		auto skip = false;
 		string fileName = StrUtil::replaceAll(s.lock()->getName(), ' ', "") + ext;
-		mpc->getLayeredScreen().lock()->createPopup("Writing " + StrUtil::toUpper(fileName), 85);
+		Mpc::instance().getLayeredScreen().lock()->createPopup("Writing " + StrUtil::toUpper(fileName), 85);
 		if (lDisk->checkExists(fileName)) {
 			if (diskGui->getSaveReplaceSameSounds()) {
                 lDisk->getFile(fileName)->del(); // possibly prepend auto success =
@@ -62,8 +62,8 @@ void SoundSaver::saveSounds()
 			e.what();
 		}
 	}
-    mpc->getLayeredScreen().lock()->removePopup();
-	mpc->getLayeredScreen().lock()->openScreen("save");
+    Mpc::instance().getLayeredScreen().lock()->removePopup();
+	Mpc::instance().getLayeredScreen().lock()->openScreen("save");
 	lDisk->setBusy(false);
 }
 

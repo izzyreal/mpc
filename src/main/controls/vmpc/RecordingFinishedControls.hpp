@@ -13,7 +13,7 @@ namespace mpc {
 				typedef AbstractVmpcControls super;
 				void function(int i) override;
 
-				RecordingFinishedControls(mpc::Mpc* mpc);
+				RecordingFinishedControls();
 
 			};
 

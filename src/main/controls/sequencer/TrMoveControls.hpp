@@ -34,7 +34,7 @@ namespace mpc {
 				void right() override;
 				void function(int i) override;
 
-				TrMoveControls(mpc::Mpc* mpc);
+				TrMoveControls();
 
 			};
 

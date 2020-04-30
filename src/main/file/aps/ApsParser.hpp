@@ -15,7 +15,7 @@
 
 namespace mpc {
 
-	class Mpc;
+	
 
 	namespace disk {
 		class MpcFile;
@@ -70,7 +70,7 @@ namespace mpc {
 
 			public:
 				ApsParser(mpc::disk::MpcFile* file);
-				ApsParser(mpc::Mpc* mpc, std::string apsNameString);
+				ApsParser(std::string apsNameString);
 
 				~ApsParser();
 

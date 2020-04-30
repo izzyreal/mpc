@@ -4,7 +4,7 @@
 #include <memory>
 
 namespace mpc {
-	class Mpc;
+	
 	namespace sequencer {
 		class Sequencer;
 	}
@@ -24,7 +24,7 @@ namespace mpc {
 			{
 
 			private:
-				mpc::Mpc* mpc;
+				
 				TrMoveGui* tmGui{};
 				std::weak_ptr<mpc::sequencer::Sequencer> sequencer{};
 				std::weak_ptr<mpc::lcdgui::Field> sqField{};
@@ -46,7 +46,7 @@ namespace mpc {
 				void displaySq();
 
 			public:
-				TrMoveObserver(mpc::Mpc* mpc);
+				TrMoveObserver();
 				~TrMoveObserver();
 
 			};

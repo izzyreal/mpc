@@ -4,7 +4,7 @@
 #include <memory>
 
 namespace mpc {
-	class Mpc;
+	
 	namespace lcdgui {
 		class Field;
 	}
@@ -29,7 +29,7 @@ namespace mpc {
 				void update(moduru::observer::Observable* o, nonstd::any a) override;
 
 			public:
-				OthersObserver(mpc::Mpc* mpc);
+				OthersObserver();
 				~OthersObserver();
 			};
 

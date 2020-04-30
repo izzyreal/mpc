@@ -11,15 +11,15 @@
 using namespace mpc::controls::sequencer::window;
 using namespace std;
 
-InsertEventControls::InsertEventControls(mpc::Mpc* mpc)
-	: AbstractSequencerControls(mpc)
+InsertEventControls::InsertEventControls()
+	: AbstractSequencerControls()
 {
 }
 
 void InsertEventControls::function(int i)
 {
 	super::function(i);
-	mpc::command::InsertEvent command(mpc->getUis().lock()->getStepEditorGui(), track.lock().get(), sequencer.lock().get());
+	mpc::command::InsertEvent command(Mpc::instance().getUis().lock()->getStepEditorGui(), track.lock().get(), sequencer.lock().get());
 	switch (i) {
 	case 4:
 		command.execute();

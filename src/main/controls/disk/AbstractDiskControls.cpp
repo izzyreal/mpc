@@ -14,12 +14,12 @@
 using namespace mpc::controls::disk;
 using namespace std;
 
-AbstractDiskControls::AbstractDiskControls(mpc::Mpc* mpc)
-	: BaseControls(mpc)
+AbstractDiskControls::AbstractDiskControls()
+	: BaseControls()
 {
-	auto uis = mpc->getUis().lock();
-	directoryGui = mpc->getUis().lock()->getDirectoryGui();
-	nameGui = mpc->getUis().lock()->getNameGui();
+	auto uis = Mpc::instance().getUis().lock();
+	directoryGui = Mpc::instance().getUis().lock()->getDirectoryGui();
+	nameGui = Mpc::instance().getUis().lock()->getNameGui();
 	diskGui = uis->getDiskGui();
 	diskWindowGui = uis->getDiskWindowGui();
 	deviceGui = uis->getDeviceGui();
@@ -29,7 +29,7 @@ AbstractDiskControls::AbstractDiskControls(mpc::Mpc* mpc)
 void AbstractDiskControls::init()
 {
 	super::init();
-	disk = mpc->getDisk();
+	disk = Mpc::instance().getDisk();
 	auto lDisk = disk.lock();
 	if (csn.compare("loadasequencefromall") != 0 && lDisk && lDisk->getFiles().size() > 0 && diskGui->getFileLoad() < lDisk->getFiles().size()) {
 		selectedFile = diskGui->getSelectedFile();

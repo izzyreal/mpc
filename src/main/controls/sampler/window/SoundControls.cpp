@@ -8,8 +8,8 @@
 using namespace mpc::controls::sampler::window;
 using namespace std;
 
-SoundControls::SoundControls(mpc::Mpc* mpc) 
-	: AbstractSamplerControls(mpc)
+SoundControls::SoundControls() 
+	: AbstractSamplerControls()
 {
 }
 

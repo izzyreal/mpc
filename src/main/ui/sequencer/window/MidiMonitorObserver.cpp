@@ -7,12 +7,12 @@
 using namespace mpc::ui::sequencer::window;
 using namespace std;
 
-MidiMonitorObserver::MidiMonitorObserver(mpc::Mpc* mpc) 
+MidiMonitorObserver::MidiMonitorObserver() 
 {
-	this->mpc = mpc;
-	auto lEventHandler = mpc->getEventHandler().lock();
+	
+	auto lEventHandler = Mpc::instance().getEventHandler().lock();
 	lEventHandler->addObserver(this);
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	a0 = ls->lookupLabel("0");
 	a1 = ls->lookupLabel("1");
 	a2 = ls->lookupLabel("2");
@@ -67,11 +67,11 @@ void MidiMonitorObserver::update(moduru::observer::Observable* o, nonstd::any ar
 	string s = nonstd::any_cast<string>(arg);
 	int deviceNumber = stoi(s.substr(1));
 	if (s[0] == 'b') deviceNumber += 16;
-	auto label = mpc->getLayeredScreen().lock()->lookupLabel(to_string(deviceNumber));
+	auto label = Mpc::instance().getLayeredScreen().lock()->lookupLabel(to_string(deviceNumber));
 	label.lock()->setText(u8"\u00CC");
 	initTimer(label);
 }
 
 MidiMonitorObserver::~MidiMonitorObserver() {
-	mpc->getEventHandler().lock()->deleteObserver(this);
+	Mpc::instance().getEventHandler().lock()->deleteObserver(this);
 }

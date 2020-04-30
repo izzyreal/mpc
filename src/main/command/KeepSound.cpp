@@ -18,10 +18,10 @@
 using namespace mpc::command;
 using namespace std;
 
-KeepSound::KeepSound(mpc::Mpc* mpc, weak_ptr<mpc::sampler::Sound> s) 
+KeepSound::KeepSound(weak_ptr<mpc::sampler::Sound> s) 
 {
-	this->mpc = mpc;
-	auto uis = mpc->getUis().lock();
+	
+	auto uis = Mpc::instance().getUis().lock();
 	samplerGui = uis->getSamplerGui();
 	soundGui = uis->getSoundGui();
 	sound = s;
@@ -29,9 +29,9 @@ KeepSound::KeepSound(mpc::Mpc* mpc, weak_ptr<mpc::sampler::Sound> s)
 
 void KeepSound::execute()
 {
-	auto sequencer = mpc->getSequencer().lock();
+	auto sequencer = Mpc::instance().getSequencer().lock();
 	auto sequence = sequencer->getActiveSequence().lock();
-	auto sampler = mpc->getSampler();
+	auto sampler = Mpc::instance().getSampler();
 	auto track = sequence->getTrack(sequencer->getActiveTrackIndex()).lock();
 	auto lSampler = sampler.lock();
 	auto bus = track->getBusNumber();

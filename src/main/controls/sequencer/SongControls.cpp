@@ -11,8 +11,8 @@
 using namespace mpc::controls::sequencer;
 using namespace std;
 
-SongControls::SongControls(mpc::Mpc* mpc)
-	: AbstractSequencerControls(mpc)
+SongControls::SongControls()
+	: AbstractSequencerControls()
 {
 }
 

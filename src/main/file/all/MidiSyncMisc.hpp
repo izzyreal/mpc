@@ -5,7 +5,7 @@
 #include <vector>
 
 namespace mpc {
-	class Mpc;
+	
 	namespace file {
 		namespace all {
 
@@ -50,7 +50,7 @@ namespace mpc {
 				std::vector<char> getBytes();
 
 				MidiSyncMisc(std::vector<char> b);
-				MidiSyncMisc(mpc::Mpc* mpc);
+				MidiSyncMisc();
 
 			};
 

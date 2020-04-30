@@ -15,7 +15,7 @@ namespace mpc {
 					void function(int i) override;
 
 				public:
-					CantFindFileControls(mpc::Mpc* mpc);
+					CantFindFileControls();
 
 				};
 	

@@ -8,11 +8,11 @@
 using namespace mpc::ui::sampler;
 using namespace std;
 
-PurgeObserver::PurgeObserver(mpc::Mpc* mpc) 
+PurgeObserver::PurgeObserver() 
 {
-	this->mpc = mpc;
-	sampler = mpc->getSampler();
-	valueLabel = mpc->getLayeredScreen().lock()->lookupLabel("value");
+	
+	sampler = Mpc::instance().getSampler();
+	valueLabel = Mpc::instance().getLayeredScreen().lock()->lookupLabel("value");
 	displayValue();
 }
 

@@ -18,8 +18,8 @@
 using namespace mpc::disk;
 using namespace std;
 
-RawDisk::RawDisk(weak_ptr<Store> store, mpc::Mpc* mpc)
-	: AbstractDisk(store, mpc)
+RawDisk::RawDisk(weak_ptr<Store> store)
+	: AbstractDisk(store)
 {
 	auto lStore = store.lock();
 	try {

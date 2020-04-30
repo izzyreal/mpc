@@ -6,8 +6,8 @@
 using namespace mpc::controls::sequencer;
 using namespace std;
 
-NextSeqControls::NextSeqControls(mpc::Mpc* mpc)
-	: AbstractSequencerControls(mpc)
+NextSeqControls::NextSeqControls()
+	: AbstractSequencerControls()
 {
 }
 

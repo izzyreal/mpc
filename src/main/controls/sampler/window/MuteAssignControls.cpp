@@ -6,8 +6,8 @@
 using namespace mpc::controls::sampler::window;
 using namespace std;
 
-MuteAssignControls::MuteAssignControls(mpc::Mpc* mpc)
-	: AbstractSamplerControls(mpc)
+MuteAssignControls::MuteAssignControls()
+	: AbstractSamplerControls()
 {
 }
 

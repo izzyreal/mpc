@@ -4,7 +4,7 @@
 #include <memory>
 
 namespace mpc {
-	class Mpc;
+	
 	namespace sequencer {
 		class Sequencer;
 	}
@@ -32,7 +32,7 @@ namespace mpc {
 				std::weak_ptr<mpc::lcdgui::Field> timingField{};
 				std::weak_ptr<mpc::lcdgui::Field> nextSqField{};
 				std::weak_ptr<mpc::sequencer::Sequencer> sequencer{};
-				mpc::Mpc* mpc;
+				
 
 			private:
 				void displaySq();
@@ -48,7 +48,7 @@ namespace mpc {
 			public:
 				void update(moduru::observer::Observable* o, nonstd::any arg) override;
 
-				NextSeqObserver(mpc::Mpc* mpc);
+				NextSeqObserver();
 				~NextSeqObserver();
 
 			};

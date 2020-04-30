@@ -16,8 +16,8 @@
 using namespace mpc::controls::vmpc;
 using namespace std;
 
-DirectToDiskRecorderControls::DirectToDiskRecorderControls(mpc::Mpc* mpc)
-	: AbstractVmpcControls(mpc)
+DirectToDiskRecorderControls::DirectToDiskRecorderControls()
+	: AbstractVmpcControls()
 {
 }
 
@@ -118,7 +118,7 @@ void DirectToDiskRecorderControls::function(int i)
             settings = make_unique<mpc::audiomidi::DirectToDiskSettings>(lengthInFrames, outputFolder, split, rate);
 			ls.lock()->openScreen("song");
 			lSequencer->setSongModeEnabled(true);
-			mpc->getUis().lock()->getSongGui()->setLoop(false);
+			Mpc::instance().getUis().lock()->getSongGui()->setLoop(false);
 			lAms->prepareBouncing(settings.get());
 			lSequencer->playFromStart();
 			break;

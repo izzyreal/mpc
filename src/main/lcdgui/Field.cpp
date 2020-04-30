@@ -341,7 +341,7 @@ void Field::enableScrolling(vector<CLabel> enablers)
 void Field::startBlinking()
 {
     blinking = true;
-    //(new ::java::lang::Thread(static_cast< ::java::lang::Runnable* >(new Field_Blinker(this))))->start();
+    //(new ::java::lang::Thread(static_cast< ::java::lang::Runnable* >(new Field_Blinker())))->start();
 }
 
 void Field::stopBlinking()

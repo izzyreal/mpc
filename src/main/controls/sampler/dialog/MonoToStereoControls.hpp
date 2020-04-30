@@ -15,7 +15,7 @@ namespace mpc {
 					void turnWheel(int i) override;
 					void function(int j) override;
 
-					MonoToStereoControls(mpc::Mpc* mpc);
+					MonoToStereoControls();
 
 				};
 

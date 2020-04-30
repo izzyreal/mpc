@@ -9,13 +9,13 @@
 using namespace std;
 using namespace mpc::ui::midisync;
 
-SyncObserver::SyncObserver(mpc::Mpc* mpc)
+SyncObserver::SyncObserver()
 {
 	modeNames = vector<string>{ "OFF", "MIDI CLOCK", "TIME CODE"	};
-	msGui = mpc->getUis().lock()->getMidiSyncGui();
+	msGui = Mpc::instance().getUis().lock()->getMidiSyncGui();
 	msGui->deleteObservers();
 	msGui->addObserver(this);
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	inField = ls->lookupField("in");
 	outField = ls->lookupField("out");
 	modeInField = ls->lookupField("modein");

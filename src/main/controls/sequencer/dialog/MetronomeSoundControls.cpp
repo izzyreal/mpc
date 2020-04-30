@@ -5,8 +5,8 @@
 using namespace mpc::controls::sequencer::dialog;
 using namespace std;
 
-MetronomeSoundControls::MetronomeSoundControls(mpc::Mpc* mpc)
-	: AbstractSequencerControls(mpc)
+MetronomeSoundControls::MetronomeSoundControls()
+	: AbstractSequencerControls()
 {
 }
 

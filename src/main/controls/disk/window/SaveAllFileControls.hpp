@@ -21,7 +21,7 @@ namespace mpc {
 					void turnWheel(int i) override;
 					void function(int i) override;
 
-					SaveAllFileControls(mpc::Mpc* mpc);
+					SaveAllFileControls();
 
 				};
 

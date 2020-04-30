@@ -31,9 +31,9 @@
 using namespace mpc::ui::sequencer;
 using namespace std;
 
-EventRow::EventRow(mpc::Mpc* mpc, int bus, weak_ptr<mpc::sequencer::Event> e, int rowNumber)
+EventRow::EventRow(int bus, weak_ptr<mpc::sequencer::Event> e, int rowNumber)
 {
-	this->mpc = mpc;
+	
 	letters = vector<string>{ "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m" };
 	noteVarParamNames = vector<string>{ "Tun", "Dcy", "Atk", "Flt" };
 	drumNoteEventLabels = vector<string>{ ">N: ", "", ":", "D:", "V:" };
@@ -65,8 +65,8 @@ EventRow::EventRow(mpc::Mpc* mpc, int bus, weak_ptr<mpc::sequencer::Event> e, in
 	mixerEventLabels = vector<string>{ ">", "N:", "L:" };
 	mixerEventSizes = vector<int>{ 12, 6, 3 };
 	mixerEventXPos = vector<int>{ 0, 96, 162 };
-	samplerGui = mpc->getUis().lock()->getSamplerGui();
-	sampler = mpc->getSampler();
+	samplerGui = Mpc::instance().getUis().lock()->getSamplerGui();
+	sampler = Mpc::instance().getSampler();
 	auto lSampler = sampler.lock();
 	if (bus != 0) {
 		mpcSoundPlayerChannel = lSampler->getDrum(bus - 1);
@@ -75,7 +75,7 @@ EventRow::EventRow(mpc::Mpc* mpc, int bus, weak_ptr<mpc::sequencer::Event> e, in
 	midi = false;
 	event = e;
 	this->rowNumber = rowNumber;
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	horizontalBar = ls->getHorizontalBarsStepEditor()[rowNumber];
 	horizontalBar.lock()->Hide(false);
 	selectedEventBar = ls->getSelectedEventBarsStepEditor()[rowNumber];
@@ -401,7 +401,7 @@ void EventRow::setMidiNoteEventValues()
 
 void EventRow::initLabelsAndFields()
 {
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	for (int i = 0; i < 5; i++) {
 		auto candidate = ls->lookupField(letters[i] + to_string(rowNumber));
 		tfArray.push_back(candidate);
@@ -414,7 +414,7 @@ void EventRow::initLabelsAndFields()
 
 void EventRow::setColors()
 {
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	for (int i = 0; i < 5; i++) {
 		if (selected) {
 			selectedEventBar.lock()->Hide(false);

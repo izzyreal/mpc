@@ -24,7 +24,7 @@ namespace mpc::sequencer {
 		typedef moduru::observer::Observable super;
 
 	private:
-		Mpc* mpc{ nullptr };
+		
 
 		BCMath initialTempo = BCMath("120.0");
 
@@ -128,7 +128,7 @@ namespace mpc::sequencer {
 		void resetTrackEventIndices(int tick);
 
 	public:
-		Sequence(Mpc* mpc, vector<string> defaultTrackNames);
+		Sequence(vector<string> defaultTrackNames);
 		~Sequence();
 
 	};

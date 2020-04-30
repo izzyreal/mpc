@@ -18,15 +18,15 @@ using namespace moduru::lang;
 using namespace mpc::disk;
 using namespace std;
 
-SoundLoader::SoundLoader(mpc::Mpc* mpc)
+SoundLoader::SoundLoader()
 {
-	this->mpc = mpc;
+	
 }
 float SoundLoader::rateToTuneBase = (float)(pow(2, (1.0 / 12.0)));
 
-SoundLoader::SoundLoader(mpc::Mpc* mpc, vector<weak_ptr<mpc::sampler::Sound>> sounds, bool replace)
+SoundLoader::SoundLoader(vector<weak_ptr<mpc::sampler::Sound>> sounds, bool replace)
 {
-	this->mpc = mpc;
+	
 	this->replace = replace;
 	this->sounds = sounds;
 }
@@ -58,10 +58,10 @@ int SoundLoader::loadSound(MpcFile* f)
 		soundName = soundFileName;
 	}
 	
-	auto sampler = mpc->getSampler().lock();
+	auto sampler = Mpc::instance().getSampler().lock();
 	auto existingSoundIndex = sampler->checkExists(soundName);
 	if (!partOfProgram && existingSoundIndex == -1) {
-		mpc->getUis().lock()->getDiskGui()->openPopup(soundFileName, extension);
+		Mpc::instance().getUis().lock()->getDiskGui()->openPopup(soundFileName, extension);
 	}
 
 	auto sound = sampler->addSound(sampleRate).lock();

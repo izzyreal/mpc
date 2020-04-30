@@ -56,7 +56,7 @@ namespace mpc {
 			std::unique_ptr<moduru::io::CircularIntBuffer> taps{};
 
 			std::shared_ptr<Sequence> undoPlaceHolder{ nullptr };
-			Mpc* mpc{ nullptr };
+			
 
 			bool secondSequenceEnabled{ false };
 			int secondSequenceIndex{ 0 };
@@ -214,7 +214,7 @@ namespace mpc {
 			void playMetronomeTrack();
 			void stopMetronomeTrack();
 
-			Sequencer(Mpc* mpc);
+			Sequencer();
 			~Sequencer();
 
 		public:

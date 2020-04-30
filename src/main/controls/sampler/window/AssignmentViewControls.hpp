@@ -11,7 +11,7 @@ namespace mpc {
 				{
 
                 public:
-                    AssignmentViewControls(mpc::Mpc* mpc);
+                    AssignmentViewControls();
                     
 				public:
 					typedef mpc::controls::sampler::AbstractSamplerControls super;

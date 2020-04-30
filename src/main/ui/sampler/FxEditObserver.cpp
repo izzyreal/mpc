@@ -12,12 +12,12 @@
 using namespace mpc::ui::sampler;
 using namespace std;
 
-FxEditObserver::FxEditObserver(mpc::Mpc* mpc)
+FxEditObserver::FxEditObserver()
 {
-	this->mpc = mpc;
-	auto ls = mpc->getLayeredScreen().lock();
+	
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 
-	msGui = mpc->getUis().lock()->getMixerSetupGui();
+	msGui = Mpc::instance().getUis().lock()->getMixerSetupGui();
 	msGui->addObserver(this);
 
 	drumField = ls->lookupField("drum");

@@ -6,8 +6,8 @@
 using namespace mpc::controls::sampler::window;
 using namespace std;
 
-VeloEnvFilterControls::VeloEnvFilterControls(mpc::Mpc* mpc) 
-	: AbstractSamplerControls(mpc)
+VeloEnvFilterControls::VeloEnvFilterControls() 
+	: AbstractSamplerControls()
 {
 }
 

@@ -4,7 +4,7 @@
 #include <memory>
 
 namespace mpc {
-	class Mpc;
+	
 	namespace disk {
 		class AbstractDisk;
 		class MpcFile;
@@ -57,7 +57,7 @@ namespace mpc {
 				void init() override;
 
 			public:
-				AbstractDiskControls(mpc::Mpc* mpc);
+				AbstractDiskControls();
 				virtual ~AbstractDiskControls();
 
 			};

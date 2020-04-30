@@ -24,7 +24,7 @@ namespace mpc {
 					void saveName();
 
 				public:
-					NameControls(mpc::Mpc* mpc);
+					NameControls();
 					~NameControls();
 
 				};

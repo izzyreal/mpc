@@ -18,15 +18,15 @@ using namespace mpc::controls::sequencer;
 using namespace mpc::sequencer;
 using namespace std;
 
-AbstractSequencerControls::AbstractSequencerControls(mpc::Mpc* mpc)
-	: BaseControls(mpc)
+AbstractSequencerControls::AbstractSequencerControls()
+	: BaseControls()
 {
-	swGui = mpc->getUis().lock()->getSequencerWindowGui();
-	seGui = mpc->getUis().lock()->getStepEditorGui();
-	songGui = mpc->getUis().lock()->getSongGui();
-	barCopyGui = mpc->getUis().lock()->getBarCopyGui();
-	editSequenceGui = mpc->getUis().lock()->getEditSequenceGui();
-	trMoveGui = mpc->getUis().lock()->getTrMoveGui();
+	swGui = Mpc::instance().getUis().lock()->getSequencerWindowGui();
+	seGui = Mpc::instance().getUis().lock()->getStepEditorGui();
+	songGui = Mpc::instance().getUis().lock()->getSongGui();
+	barCopyGui = Mpc::instance().getUis().lock()->getBarCopyGui();
+	editSequenceGui = Mpc::instance().getUis().lock()->getEditSequenceGui();
+	trMoveGui = Mpc::instance().getUis().lock()->getTrMoveGui();
 }
 
 void AbstractSequencerControls::init()

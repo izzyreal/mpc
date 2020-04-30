@@ -19,21 +19,21 @@
 using namespace mpc::ui::sequencer;
 using namespace std;
 
-SongObserver::SongObserver(mpc::Mpc* mpc) 
+SongObserver::SongObserver() 
 {
-	this->mpc = mpc;
-	sequencer = mpc->getSequencer();
+	
+	sequencer = Mpc::instance().getSequencer();
 	auto lSequencer = sequencer.lock();
 	lSequencer->deleteObservers();
 	lSequencer->addObserver(this);
-	songGui = mpc->getUis().lock()->getSongGui();
+	songGui = Mpc::instance().getUis().lock()->getSongGui();
 	songGui->deleteObservers();
 	songGui->addObserver(this);
 	song = lSequencer->getSong(songGui->getSelectedSongIndex());
 	auto lSong = song.lock();
 	lSong->deleteObservers();
 	lSong->addObserver(this);
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	songField = ls->lookupField("song");
 	now0Field = ls->lookupField("now0");
 	now1Field = ls->lookupField("now1");

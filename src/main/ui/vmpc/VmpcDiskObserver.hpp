@@ -5,7 +5,7 @@
 
 namespace mpc {
 
-	class Mpc;
+	
 
 	namespace lcdgui {
 		class Field;
@@ -26,7 +26,7 @@ namespace mpc {
 				std::weak_ptr<mpc::lcdgui::Field> accessTypeField{};
 				std::weak_ptr<mpc::lcdgui::Field> rootField{};
 				DeviceGui* deviceGui{};
-				mpc::Mpc* mpc{};
+				
 
 			public:
 				void update(moduru::observer::Observable* o, nonstd::any a) override;
@@ -37,7 +37,7 @@ namespace mpc {
 				void displayRoot();
 
 			public:
-				VmpcDiskObserver(mpc::Mpc* mpc);
+				VmpcDiskObserver();
 				~VmpcDiskObserver();
 
 			};

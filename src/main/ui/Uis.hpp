@@ -4,146 +4,150 @@
 #include <string>
 
 namespace mpc {
-	class Mpc;
-	namespace ui {
+	
+}
 
-		class NameGui;
+namespace mpc::ui {
+	class NameGui;
+}
 
-		namespace vmpc {
-			class DirectToDiskRecorderGui;
-			class DeviceGui;
-		}
+namespace mpc::ui::vmpc {
+	class DirectToDiskRecorderGui;
+	class DeviceGui;
+}
 
-		namespace misc {
-			class PunchGui;
-			class SecondSeqGui;
-			class TransGui;
-		}
+namespace mpc::ui::misc {
+	class PunchGui;
+	class SecondSeqGui;
+	class TransGui;
+}
 
-		namespace other {
-			class OthersGui;
-		}
+namespace mpc::ui::other {
+	class OthersGui;
+}
 
-		namespace disk {
-			class DiskGui;
-			namespace window {
-				class DiskWindowGui;
-				class DirectoryGui;
-			}
-		}
+namespace mpc::ui::disk {
+	class DiskGui;
+}
 
-		namespace sequencer {
-			class StepEditorGui;
-			class BarCopyGui;
-			class EditSequenceGui;
-			class SongGui;
-			class TrMoveGui;
-			class SequencerGui;
+namespace mpc::ui::disk::window {
+	class DiskWindowGui;
+	class DirectoryGui;
+}
 
-			namespace window {
-				class SequencerWindowGui;
-				class EraseGui;
-			}
-		}
+namespace mpc::ui::sequencer {
+	class StepEditorGui;
+	class BarCopyGui;
+	class EditSequenceGui;
+	class SongGui;
+	class TrMoveGui;
+	class SequencerGui;
+}
 
-		namespace sampler {
-			class SamplerGui;
-			class SoundGui;
-			class MixerGui;
-			class MixerSetupGui;
+namespace mpc::ui::sequencer::window {
+	class SequencerWindowGui;
+	class EraseGui;
+}
 
-			namespace window {
-				class SamplerWindowGui;
-				class EditSoundGui;
-				class ZoomGui;
-			}
-		}
+namespace mpc::ui::sampler {
+	class SamplerGui;
+	class SoundGui;
+	class MixerGui;
+	class MixerSetupGui;
+}
 
-		namespace midisync {
-			class MidiSyncGui;
-		}
+namespace mpc::ui::sampler::window {
+	class SamplerWindowGui;
+	class EditSoundGui;
+	class ZoomGui;
+}
 
-		class Uis
-		{
+namespace mpc::ui::midisync {
+	class MidiSyncGui;
+}
 
-		private:
-			ui::NameGui* nameGui{ nullptr };
+namespace mpc::ui {
 
-			ui::sequencer::SongGui* songGui{ nullptr };
-			ui::sequencer::SequencerGui* sequencerGui{ nullptr };
-			ui::sequencer::StepEditorGui* stepEditorGui{ nullptr };
-			ui::sequencer::BarCopyGui* barCopyGui{ nullptr };
-			ui::sequencer::EditSequenceGui* editSequenceGui{ nullptr };
-			ui::sequencer::TrMoveGui* trMoveGui{ nullptr };
+	class Uis
+	{
 
-			ui::sequencer::window::EraseGui* eraseGui{ nullptr };
-			ui::sequencer::window::SequencerWindowGui* sequencerWindowGui{ nullptr };
+	private:
+		mpc::ui::NameGui* nameGui{ nullptr };
 
-			ui::sampler::SoundGui* soundGui{ nullptr };
-			ui::sampler::SamplerGui* samplerGui{ nullptr };
-			ui::sampler::MixerGui* mixerGui{ nullptr };
-			ui::sampler::MixerSetupGui* mixerSetupGui{ nullptr };
+		mpc::ui::sequencer::SongGui* songGui{ nullptr };
+		mpc::ui::sequencer::SequencerGui* sequencerGui{ nullptr };
+		mpc::ui::sequencer::StepEditorGui* stepEditorGui{ nullptr };
+		mpc::ui::sequencer::BarCopyGui* barCopyGui{ nullptr };
+		mpc::ui::sequencer::EditSequenceGui* editSequenceGui{ nullptr };
+		mpc::ui::sequencer::TrMoveGui* trMoveGui{ nullptr };
 
-			ui::sampler::window::EditSoundGui* editSoundGui{ nullptr };
-			ui::sampler::window::SamplerWindowGui* samplerWindowGui{ nullptr };
-			ui::sampler::window::ZoomGui* zoomGui{ nullptr };
+		mpc::ui::sequencer::window::EraseGui* eraseGui{ nullptr };
+		mpc::ui::sequencer::window::SequencerWindowGui* sequencerWindowGui{ nullptr };
 
-			ui::disk::DiskGui* diskGui{ nullptr };
-			ui::disk::window::DirectoryGui* directoryGui{ nullptr };
-			ui::disk::window::DiskWindowGui* diskWindowGui{ nullptr };
+		mpc::ui::sampler::SoundGui* soundGui{ nullptr };
+		mpc::ui::sampler::SamplerGui* samplerGui{ nullptr };
+		mpc::ui::sampler::MixerGui* mixerGui{ nullptr };
+		mpc::ui::sampler::MixerSetupGui* mixerSetupGui{ nullptr };
 
-			ui::midisync::MidiSyncGui* midiSyncGui{ nullptr };
+		mpc::ui::sampler::window::EditSoundGui* editSoundGui{ nullptr };
+		mpc::ui::sampler::window::SamplerWindowGui* samplerWindowGui{ nullptr };
+		mpc::ui::sampler::window::ZoomGui* zoomGui{ nullptr };
 
-			ui::other::OthersGui* othersGui{ nullptr };
+		mpc::ui::disk::DiskGui* diskGui{ nullptr };
+		mpc::ui::disk::window::DirectoryGui* directoryGui{ nullptr };
+		mpc::ui::disk::window::DiskWindowGui* diskWindowGui{ nullptr };
 
-			ui::misc::PunchGui* punchGui{ nullptr };
-			ui::misc::SecondSeqGui* secondSeqGui{ nullptr };
-			ui::misc::TransGui* transGui{ nullptr };
+		mpc::ui::midisync::MidiSyncGui* midiSyncGui{ nullptr };
 
-			ui::vmpc::DeviceGui* deviceGui{ nullptr };
-			ui::vmpc::DirectToDiskRecorderGui* d2dRecorderGui{ nullptr };
+		mpc::ui::other::OthersGui* othersGui{ nullptr };
 
-		public:
-			ui::sequencer::SequencerGui* getSequencerGui();
-			ui::sequencer::StepEditorGui* getStepEditorGui();
-			ui::sampler::MixerGui* getMixerGui();
-			ui::sequencer::EditSequenceGui* getEditSequenceGui();
-			ui::sequencer::window::SequencerWindowGui* getSequencerWindowGui();
-			ui::midisync::MidiSyncGui* getMidiSyncGui();
-			ui::sequencer::BarCopyGui* getBarCopyGui();
-			ui::sequencer::TrMoveGui* getTrMoveGui();
-			ui::sampler::SoundGui* getSoundGui();
-			ui::sampler::window::EditSoundGui* getEditSoundGui();
-			ui::sampler::window::ZoomGui* getZoomGui();
-			ui::disk::DiskGui* getDiskGui();
-			ui::disk::window::DirectoryGui* getDirectoryGui();
-			ui::disk::window::DiskWindowGui* getDiskWindowGui();
-			ui::sampler::window::SamplerWindowGui* getSamplerWindowGui();
-			ui::sampler::SamplerGui* getSamplerGui();
-			ui::NameGui* getNameGui();
-			ui::sequencer::SongGui* getSongGui();
-			ui::sampler::MixerSetupGui* getMixerSetupGui();
-			ui::sequencer::window::EraseGui* getEraseGui();
+		mpc::ui::misc::PunchGui* punchGui{ nullptr };
+		mpc::ui::misc::SecondSeqGui* secondSeqGui{ nullptr };
+		mpc::ui::misc::TransGui* transGui{ nullptr };
 
-			ui::other::OthersGui* getOthersGui();
+		mpc::ui::vmpc::DeviceGui* deviceGui{ nullptr };
+		mpc::ui::vmpc::DirectToDiskRecorderGui* d2dRecorderGui{ nullptr };
 
-			ui::vmpc::DeviceGui* getDeviceGui();
-			ui::vmpc::DirectToDiskRecorderGui* getD2DRecorderGui();
+	public:
+		mpc::ui::sequencer::SequencerGui* getSequencerGui();
+		mpc::ui::sequencer::StepEditorGui* getStepEditorGui();
+		mpc::ui::sampler::MixerGui* getMixerGui();
+		mpc::ui::sequencer::EditSequenceGui* getEditSequenceGui();
+		mpc::ui::sequencer::window::SequencerWindowGui* getSequencerWindowGui();
+		mpc::ui::midisync::MidiSyncGui* getMidiSyncGui();
+		mpc::ui::sequencer::BarCopyGui* getBarCopyGui();
+		mpc::ui::sequencer::TrMoveGui* getTrMoveGui();
+		mpc::ui::sampler::SoundGui* getSoundGui();
+		mpc::ui::sampler::window::EditSoundGui* getEditSoundGui();
+		mpc::ui::sampler::window::ZoomGui* getZoomGui();
+		mpc::ui::disk::DiskGui* getDiskGui();
+		mpc::ui::disk::window::DirectoryGui* getDirectoryGui();
+		mpc::ui::disk::window::DiskWindowGui* getDiskWindowGui();
+		mpc::ui::sampler::window::SamplerWindowGui* getSamplerWindowGui();
+		mpc::ui::sampler::SamplerGui* getSamplerGui();
+		mpc::ui::NameGui* getNameGui();
+		mpc::ui::sequencer::SongGui* getSongGui();
+		mpc::ui::sampler::MixerSetupGui* getMixerSetupGui();
+		mpc::ui::sequencer::window::EraseGui* getEraseGui();
 
-			ui::misc::TransGui* getTransGui();
-			ui::misc::SecondSeqGui* getSecondSeqGui();
-			ui::misc::PunchGui* getPunchGui();
+		mpc::ui::other::OthersGui* getOthersGui();
 
-		private:
-			std::vector<std::string> someNoteNames{ "C.", "C#", "D.", "D#", "E.", "F.", "F#", "G.", "G#", "A.", "A#", "B." };
+		mpc::ui::vmpc::DeviceGui* getDeviceGui();
+		mpc::ui::vmpc::DirectToDiskRecorderGui* getD2DRecorderGui();
 
-		public:
-			static std::vector<std::string> noteNames;
+		mpc::ui::misc::TransGui* getTransGui();
+		mpc::ui::misc::SecondSeqGui* getSecondSeqGui();
+		mpc::ui::misc::PunchGui* getPunchGui();
 
-		public:
-			Uis(mpc::Mpc* mpc);
-			~Uis();
+	private:
+		std::vector<std::string> someNoteNames{ "C.", "C#", "D.", "D#", "E.", "F.", "F#", "G.", "G#", "A.", "A#", "B." };
 
-		};
-	}
+	public:
+		static std::vector<std::string> noteNames;
+
+	public:
+		Uis();
+		~Uis();
+
+	};
 }

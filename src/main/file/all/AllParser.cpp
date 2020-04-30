@@ -44,7 +44,7 @@ AllParser::AllParser(mpc::disk::MpcFile* file)
 	sequences = readSequences(moduru::VecUtil::CopyOfRange(&loadBytes, SEQUENCES_OFFSET, loadBytes.size()));
 }
 
-AllParser::AllParser(mpc::Mpc* mpc, string allName) 
+AllParser::AllParser(string allName) 
 {
 	songs = vector<Song*>(20);
 	vector<vector<char>> chunks;
@@ -53,24 +53,24 @@ AllParser::AllParser(mpc::Mpc* mpc, string allName)
 	auto defaults = new Defaults(mpc::StartUp::getUserDefaults().lock().get());
 	chunks.push_back(defaults->getBytes());
 	chunks.push_back(UNKNOWN_CHUNK);
-	sequencer = new Sequencer(mpc);
+	sequencer = new Sequencer();
 	chunks.push_back(sequencer->getBytes());
-	count = new Count(mpc);
+	count = new Count();
 	chunks.push_back(count->getBytes());
-	midiInput = new MidiInput(mpc);
+	midiInput = new MidiInput();
 	chunks.push_back(midiInput->getBytes());
 	
 	for (int i=0;i<16;i++)
 		chunks.push_back(vector<char>{ (char) 0xFF });
 
-	midiSyncMisc = new MidiSyncMisc(mpc);
+	midiSyncMisc = new MidiSyncMisc();
 	chunks.push_back(midiSyncMisc->getBytes());
-	misc = new Misc(mpc);
+	misc = new Misc();
 	chunks.push_back(misc->getBytes());
-	seqNames = new SequenceNames(mpc);
+	seqNames = new SequenceNames();
 	chunks.push_back(seqNames->getBytes());
 	songs = vector<Song*>(20);
-	auto sequencer = mpc->getSequencer().lock();
+	auto sequencer = Mpc::instance().getSequencer().lock();
 	for (int i = 0; i < 20; i++) {
 		songs[i] = new Song(sequencer->getSong(i).lock().get());
 		chunks.push_back(songs[i]->getBytes());

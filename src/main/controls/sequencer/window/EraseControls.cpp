@@ -15,8 +15,8 @@ using namespace mpc::controls::sequencer::window;
 using namespace mpc::sequencer;
 using namespace std;
 
-EraseControls::EraseControls(mpc::Mpc* mpc)
-	: AbstractSequencerControls(mpc)
+EraseControls::EraseControls()
+	: AbstractSequencerControls()
 {
 	eventClassNames = vector<string>{ "com.mpc.sequencer.NoteEvent", "com.mpc.sequencer.PitchBendEvent", "com.mpc.sequencer.ControlChangeEvent", "com.mpc.sequencer.ProgramChangeEvent", "com.mpc.sequencer.ChannelPressureEvent", "com.mpc.sequencer.PolyPressureEvent", "com.mpc.sequencer.SystemExclusiveEvent" };
 }
@@ -25,7 +25,7 @@ void EraseControls::turnWheel(int i)
 {
 	init();
 
-	auto egui = mpc->getUis().lock()->getEraseGui();
+	auto egui = Mpc::instance().getUis().lock()->getEraseGui();
 
 	if (param.compare("track") == 0) {
 		egui->setTrack(egui->getTrack() + i);
@@ -44,7 +44,7 @@ void EraseControls::turnWheel(int i)
 void EraseControls::function(int i)
 {
 	init();
-	auto egui = mpc->getUis().lock()->getEraseGui();
+	auto egui = Mpc::instance().getUis().lock()->getEraseGui();
 	shared_ptr<Sequence> seq;
 	int startIndex;
 	int lastIndex;

@@ -5,7 +5,7 @@
 
 namespace mpc {
 
-	class Mpc;
+	
 
 	namespace sequencer {
 		class Sequence;
@@ -32,7 +32,7 @@ namespace mpc {
 				static int getSegmentCount(mpc::sequencer::Sequence* seq);
 
 				SequenceNames(std::vector<char> b);
-				SequenceNames(mpc::Mpc* mpc);
+				SequenceNames();
 			};
 
 		}

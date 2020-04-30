@@ -12,7 +12,7 @@ namespace ctoot {
 
 namespace mpc {
 
-	class Mpc;
+	
 
 	namespace sampler {
 		class Sampler;
@@ -55,7 +55,7 @@ namespace mpc {
 					std::vector<int> yPosDouble{};
 					std::vector<std::string> doubleLabels{};
 
-					mpc::Mpc* mpc;
+					
 					std::weak_ptr<mpc::sequencer::Sequencer> sequencer{};
 					std::weak_ptr<mpc::sequencer::Track> track{};
 					std::weak_ptr<mpc::lcdgui::Field> tcValueField{};
@@ -81,7 +81,7 @@ namespace mpc {
 					void updateDouble();
 
 				public:
-					StepWindowObserver(mpc::Mpc* mpc);
+					StepWindowObserver();
 					~StepWindowObserver();
 
 				};

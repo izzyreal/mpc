@@ -5,8 +5,8 @@
 using namespace mpc::controls::midisync;
 using namespace std;
 
-SyncControls::SyncControls(mpc::Mpc* mpc) 
-	: AbstractMidiSyncControls(mpc)
+SyncControls::SyncControls() 
+	: AbstractMidiSyncControls()
 {
 }
 

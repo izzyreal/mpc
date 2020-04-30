@@ -6,7 +6,7 @@
 #include <string>
 
 namespace mpc {
-	class Mpc;
+	
 	namespace lcdgui {
 		class Field;
 	}
@@ -25,7 +25,7 @@ namespace mpc {
 			{
 
 			private:
-				mpc::Mpc* mpc;
+				
 				PunchGui* punchGui{ nullptr };
 				std::weak_ptr<mpc::lcdgui::Field> autoPunchField{};
 				std::weak_ptr<mpc::lcdgui::Field> time0Field{};
@@ -46,7 +46,7 @@ namespace mpc {
 				void displayBackground();
 
 			public:
-				PunchObserver(mpc::Mpc* mpc);
+				PunchObserver();
 				~PunchObserver();
 			};
 

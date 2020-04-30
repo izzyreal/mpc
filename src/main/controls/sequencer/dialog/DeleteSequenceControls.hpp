@@ -15,7 +15,7 @@ namespace mpc {
 					void turnWheel(int i) override;
 					void function(int i) override;
 
-					DeleteSequenceControls(mpc::Mpc* mpc);
+					DeleteSequenceControls();
 
 				};
 

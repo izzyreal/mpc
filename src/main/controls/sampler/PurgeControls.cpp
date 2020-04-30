@@ -5,8 +5,8 @@
 using namespace mpc::controls::sampler;
 using namespace std;
 
-PurgeControls::PurgeControls(mpc::Mpc* mpc) 
-	: AbstractSamplerControls(mpc)
+PurgeControls::PurgeControls() 
+	: AbstractSamplerControls()
 {
 }
 

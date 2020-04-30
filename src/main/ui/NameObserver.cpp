@@ -8,11 +8,11 @@ using namespace mpc::ui;
 using namespace mpc::lcdgui;
 using namespace std;
 
-NameObserver::NameObserver(mpc::Mpc* mpc)
+NameObserver::NameObserver()
 {
-	this->mpc = mpc;
-	nameGui = mpc->getUis().lock()->getNameGui();
-	auto ls = mpc->getLayeredScreen().lock();
+	
+	nameGui = Mpc::instance().getUis().lock()->getNameGui();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	a0Field = ls->lookupField("0");
 	a1Field = ls->lookupField("1");
 	a2Field = ls->lookupField("2");
@@ -82,7 +82,7 @@ void NameObserver::displayName()
 
 void NameObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 {
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	string s = nonstd::any_cast<string>(arg);
 	string str;
 	shared_ptr<Field> tf;

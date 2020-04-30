@@ -8,8 +8,8 @@
 using namespace mpc::controls::sequencer;
 using namespace std;
 
-UserControls::UserControls(mpc::Mpc* mpc) 
-	: AbstractSequencerControls(mpc)
+UserControls::UserControls() 
+	: AbstractSequencerControls()
 {
 	ud = mpc::StartUp::getUserDefaults();
 }

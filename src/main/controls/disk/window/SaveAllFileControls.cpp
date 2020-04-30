@@ -9,8 +9,8 @@
 using namespace mpc::controls::disk::window;
 using namespace std;
 
-SaveAllFileControls::SaveAllFileControls(mpc::Mpc* mpc)
-	: AbstractDiskControls(mpc)
+SaveAllFileControls::SaveAllFileControls()
+	: AbstractDiskControls()
 {
 }
 
@@ -41,7 +41,7 @@ void SaveAllFileControls::function(int i)
 			ls.lock()->openScreen("filealreadyexists");
 			return;
 		}
-		allParser = make_unique<mpc::file::all::AllParser>(mpc, mpc::Util::getFileName(nameGui->getName()));
+		allParser = make_unique<mpc::file::all::AllParser>(mpc::Util::getFileName(nameGui->getName()));
 		f = lDisk->newFile(allName + ".ALL");
         auto bytes = allParser->getBytes();
 		f->setFileData(&bytes);

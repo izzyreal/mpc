@@ -7,8 +7,8 @@
 using namespace mpc::controls::mixer;
 using namespace std;
 
-FxEditControls::FxEditControls(mpc::Mpc* mpc) 
-	: AbstractMixerControls(mpc)
+FxEditControls::FxEditControls() 
+	: AbstractMixerControls()
 {
 }
 

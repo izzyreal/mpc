@@ -5,7 +5,7 @@
 
 namespace mpc {
 
-	class Mpc;
+	
 
 	namespace lcdgui {
 		class Field;
@@ -25,7 +25,7 @@ namespace mpc {
 				{
 
 				private:
-					mpc::Mpc* mpc;
+					
 					std::weak_ptr<mpc::lcdgui::Field> fileField{};
 					std::weak_ptr<mpc::lcdgui::Label> fileLabel{};
 					mpc::ui::disk::DiskGui* diskGui{ nullptr };
@@ -36,7 +36,7 @@ namespace mpc {
 				public:
 					void update(moduru::observer::Observable* o, nonstd::any a) override;
 
-					SaveAllFileObserver(mpc::Mpc* mpc);
+					SaveAllFileObserver();
 					~SaveAllFileObserver();
 				};
 

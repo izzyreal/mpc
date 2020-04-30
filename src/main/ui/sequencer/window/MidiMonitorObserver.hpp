@@ -5,7 +5,7 @@
 
 namespace mpc {
 
-	class Mpc;
+	
 
 	namespace lcdgui {
 		class Label;
@@ -21,7 +21,7 @@ namespace mpc {
 				{
 
 				private:
-					mpc::Mpc* mpc;
+					
 					std::weak_ptr<mpc::lcdgui::Label> a0{};
 					std::weak_ptr<mpc::lcdgui::Label> a1{};
 					std::weak_ptr<mpc::lcdgui::Label> a2{};
@@ -63,7 +63,7 @@ namespace mpc {
 					void update(moduru::observer::Observable* o, nonstd::any arg) override;
 
 				public:
-					MidiMonitorObserver(mpc::Mpc* mpc);
+					MidiMonitorObserver();
 					~MidiMonitorObserver();
 
 				};

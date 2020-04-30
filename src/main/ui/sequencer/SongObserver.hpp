@@ -5,7 +5,7 @@
 
 namespace mpc {
 	
-	class Mpc;
+	
 
 	namespace sequencer {
 		class Song;
@@ -27,7 +27,7 @@ namespace mpc {
 			{
 
 			private:
-				mpc::Mpc* mpc{ nullptr };
+				
 				std::weak_ptr<mpc::sequencer::Song> song{};
 				std::weak_ptr<mpc::sequencer::Sequencer> sequencer{};
 				std::weak_ptr<mpc::lcdgui::Field> songField{};
@@ -61,7 +61,7 @@ namespace mpc {
 			public:
 				void update(moduru::observer::Observable* o, nonstd::any arg) override;
 
-				SongObserver(mpc::Mpc* mpc);
+				SongObserver();
 				~SongObserver();
 			};
 

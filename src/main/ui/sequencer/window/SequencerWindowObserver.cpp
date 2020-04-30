@@ -29,9 +29,9 @@ using namespace mpc::sequencer;
 using namespace mpc::ui::sequencer::window;
 using namespace std;
 
-SequencerWindowObserver::SequencerWindowObserver(mpc::Mpc* mpc)
+SequencerWindowObserver::SequencerWindowObserver()
 {
-	this->mpc = mpc;
+	
 	softThruNames = {"OFF", "AS TRACK", "OMNI-A", "OMNI-B", "OMNI-AB" };
 	editTypeNames = { "ADD VALUE", "SUB VALUE", "MULT VAL%", "SET TO VAL" };
 	typeNames = { "NOTES", "PITCH BEND", "PROG CHANGE", "CH PRESSURE", "POLY PRESS", "EXCLUSIVE", "BANK SEL MSB", "MOD WHEEL", "BREATH CONT", "03", "FOOT CONTROL", "PORTA TIME", "DATA ENTRY", "MAIN VOLUME", "BALANCE", "09", "PAN", "EXPRESSION", "EFFECT 1"	, "EFFECT 2", "14", "15", "GEN.PUR. 1", "GEN.PUR. 2", "GEN.PUR. 3", "GEN.PUR. 4", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "BANK SEL LSB", "MOD WHEL LSB", "BREATH LSB", "35", "FOOT CNT LSB", "PORT TIME LS", "DATA ENT LSB", "MAIN VOL LSB", "BALANCE LSB", "41", "PAN LSB", "EXPRESS LSB", "EFFECT 1 LSB", "EFFECT 2 MSB", "46", "47", "GEN.PUR.1 LS", "GEN.PUR.2 LS", "GEN.PUR.3 LS", "GEN.PUR.4 LS", "52", "53", "54", "55", "56", "57", "58", "59", "60", "61", "62", "63", "SUSTAIN PDL", "PORTA PEDAL", "SOSTENUTO", "SOFT PEDAL", "LEGATO FT SW", "HOLD 2", "SOUND VARI", "TIMBER/HARMO", "RELEASE TIME", "ATTACK TIME", "BRIGHTNESS", "SOUND CONT 6", "SOUND CONT 7", "SOUND CONT 8", "SOUND CONT 9", "SOUND CONT10", "GEN.PUR. 5", "GEN.PUR. 6", "GEN.PUR. 7", "GEN.PUR. 8", "PORTA CNTRL", "85", "86", "87", "88", "89", "90", "EXT EFF DPTH", "TREMOLO DPTH", "CHORUS DEPTH", " DETUNE DEPTH", "PHASER DEPTH", "DATA INCRE", "DATA DECRE", "NRPN LSB", "NRPN MSB", "RPN LSB", "RPN MSB", "102", "103", "104", "105", "106", "107" "108", "109", "110", "111", "112", "113", "114", "115", "116", "117", "118", "119", "ALL SND OFF", "RESET CONTRL", "LOCAL ON/OFF", "ALL NOTE OFF", "OMNI OFF", "OMNI ON", "MONO MODE ON", "POLY MODE ON" };
@@ -40,8 +40,8 @@ SequencerWindowObserver::SequencerWindowObserver(mpc::Mpc* mpc)
 	frameRateNames = { "24", "25", "30D", "30" };
 	rateNames = { "1/4", "1/4(3)", "1/8", "1/8(3)", "1/16", "1/16(3)", "1/32", "1/32(3)" };
 	countInNames = { "OFF", "REC ONLY", "REC+PLAY" };
-	nameGui = mpc->getUis().lock()->getNameGui();
-	samplerGui = mpc->getUis().lock()->getSamplerGui();
+	nameGui = Mpc::instance().getUis().lock()->getNameGui();
+	samplerGui = Mpc::instance().getUis().lock()->getSamplerGui();
 	inNames = vector<string>(34);
 	for (int i = 0; i < 34; i++) {
 		if (i < 16) {
@@ -57,13 +57,13 @@ SequencerWindowObserver::SequencerWindowObserver(mpc::Mpc* mpc)
 			inNames[i] = "2-Ex";
 		}
 	}
-	sequencer = mpc->getSequencer();
-	sampler = mpc->getSampler();
-	auto ls = mpc->getLayeredScreen().lock();
+	sequencer = Mpc::instance().getSequencer();
+	sampler = Mpc::instance().getSampler();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	csn = ls->getCurrentScreenName();
 	fb = ls->getFunctionKeys();
 	hBars =ls->getHorizontalBarsTempoChangeEditor();
-	swGui = mpc->getUis().lock()->getSequencerWindowGui();
+	swGui = Mpc::instance().getUis().lock()->getSequencerWindowGui();
 	auto lSequencer = sequencer.lock();
 	seqNum = lSequencer->getActiveSequenceIndex();
 	sequence = lSequencer->getSequence(seqNum);
@@ -849,13 +849,13 @@ void SequencerWindowObserver::update(moduru::observer::Observable* o, nonstd::an
 	}
 	else if (s.compare("tempochange") == 0) {
 		initVisibleEvents();
-		//if (mpc->getLayeredScreen().lock()->getFocus().find("0") != string::npos) {
+		//if (Mpc::instance().getLayeredScreen().lock()->getFocus().find("0") != string::npos) {
 			displayTempoChange0();
 		//}
-		//else if (mpc->getLayeredScreen().lock()->getFocus().find("1") != string::npos) {
+		//else if (Mpc::instance().getLayeredScreen().lock()->getFocus().find("1") != string::npos) {
 			displayTempoChange1();
 		//}
-		//else if (mpc->getLayeredScreen().lock()->getFocus().find("2") != string::npos) {
+		//else if (Mpc::instance().getLayeredScreen().lock()->getFocus().find("2") != string::npos) {
 			displayTempoChange2();
 		//}
 	}
@@ -943,7 +943,7 @@ void SequencerWindowObserver::update(moduru::observer::Observable* o, nonstd::an
 		displayNewBars();
 	}
 	else if (s.compare("mrsline") == 0) {
-		yPos = stoi(mpc->getLayeredScreen().lock()->getFocus().substr(1, 2));
+		yPos = stoi(Mpc::instance().getLayeredScreen().lock()->getFocus().substr(1, 2));
 		displayMrsLine(yPos);
 	}
 	else if (s.compare("multirecordingsetup") == 0) {

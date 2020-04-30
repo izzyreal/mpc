@@ -129,13 +129,13 @@ static vector<string> soundNames = vector<string>{ "sound", "deletesound", "dele
 
 static vector<string> soundGuiNames = vector<string>{ "trim", "loop", "zone" };
 
-LayeredScreen::LayeredScreen(mpc::Mpc* mpc) 
+LayeredScreen::LayeredScreen() 
 {
 	moduru::gui::BMFParser bmfParser(mpc::StartUp::resPath + moduru::file::FileUtil::getSeparator() + "font.fnt");
 	atlas = bmfParser.getAtlas();
 	font = bmfParser.getLoadedFont();
 
-	this->mpc = mpc;
+	
 	pixels = std::vector < std::vector <bool>>(248, std::vector<bool>(60));
 	popup = make_unique<mpc::lcdgui::Popup>(&atlas, &font);
 	popup->Hide(true);
@@ -151,7 +151,7 @@ LayeredScreen::LayeredScreen(mpc::Mpc* mpc)
 
 
 	underline = make_shared<mpc::lcdgui::Underline>();
-	envGraph = make_shared<mpc::lcdgui::EnvGraph>(mpc);
+	envGraph = make_shared<mpc::lcdgui::EnvGraph>();
 
 	int x, y, w, h;
 	MRECT rect;
@@ -318,13 +318,13 @@ int LayeredScreen::openScreen(string screenName) {
 		return -1;
 	}
 
-	auto ams = mpc->getAudioMidiServices().lock();
+	auto ams = Mpc::instance().getAudioMidiServices().lock();
 	if (currentScreenName.compare("sample") == 0) {
 		ams->muteMonitor(true);
 		ams->getSoundRecorder().lock()->setVuMeterActive(false);
 	}
 	else if (screenName.compare("sample") == 0) {
-		bool muteMonitor = mpc->getUis().lock()->getSamplerGui()->getMonitor() == 0 ? true : false;
+		bool muteMonitor = Mpc::instance().getUis().lock()->getSamplerGui()->getMonitor() == 0 ? true : false;
 		ams->muteMonitor(muteMonitor);
 		ams->getSoundRecorder().lock()->setVuMeterActive(true);
 	}
@@ -910,146 +910,146 @@ void LayeredScreen::initObserver()
 	}
 
 	if (csn.compare("directtodiskrecorder") == 0) {
-		activeObserver = make_unique<DirectToDiskRecorderObserver>(mpc);
+		activeObserver = make_unique<DirectToDiskRecorderObserver>();
 	}
 	else if (csn.compare("disk") == 0) {
-		activeObserver = make_unique<VmpcDiskObserver>(mpc);
+		activeObserver = make_unique<VmpcDiskObserver>();
 	}
 	else if (csn.compare("punch") == 0) {
-		activeObserver = make_unique<PunchObserver>(mpc);
+		activeObserver = make_unique<PunchObserver>();
 	}
 	else if (csn.compare("trans") == 0) {
-		activeObserver = make_unique<TransObserver>(mpc);
+		activeObserver = make_unique<TransObserver>();
 	}
 	else if (csn.compare("2ndseq") == 0) {
-		activeObserver = make_unique<SecondSeqObserver>(mpc);
+		activeObserver = make_unique<SecondSeqObserver>();
 	}
 	else if (csn.compare("others") == 0) {
-		activeObserver = make_unique<OthersObserver>(mpc);
+		activeObserver = make_unique<OthersObserver>();
 	}
 	else if (csn.compare("erase") == 0) {
-		activeObserver = make_unique<EraseObserver>(mpc);
+		activeObserver = make_unique<EraseObserver>();
 	}
 	else if (csn.compare("sync") == 0) {
-		activeObserver = make_unique<SyncObserver>(mpc);
+		activeObserver = make_unique<SyncObserver>();
 	}
 	else if (csn.compare("assign") == 0) {
-		activeObserver = make_unique<AssignObserver>(mpc);
+		activeObserver = make_unique<AssignObserver>();
 	}
 	else if (csn.compare("assign16levels") == 0) {
-		activeObserver = make_unique<Assign16LevelsObserver>(mpc);
+		activeObserver = make_unique<Assign16LevelsObserver>();
 	}
 	else if (csn.compare("metronomesound") == 0) {
-		activeObserver = make_unique<MetronomeSoundObserver>(mpc);
+		activeObserver = make_unique<MetronomeSoundObserver>();
 	}
 	else if (csn.compare("saveallfile") == 0) {
-		activeObserver = make_unique<SaveAllFileObserver>(mpc);
+		activeObserver = make_unique<SaveAllFileObserver>();
 	}
 	else if (csn.compare("loadasequencefromall") == 0) {
-		activeObserver = make_unique<LoadASequenceFromAllObserver>(mpc);
+		activeObserver = make_unique<LoadASequenceFromAllObserver>();
 	}
 	else if (csn.compare("nextseqpad") == 0) {
-		activeObserver = make_unique<NextSeqPadObserver>(mpc);
+		activeObserver = make_unique<NextSeqPadObserver>();
 	}
 	else if (csn.compare("nextseq") == 0) {
-		activeObserver = make_unique<NextSeqObserver>(mpc);
+		activeObserver = make_unique<NextSeqObserver>();
 	}
 	else if (csn.compare("song") == 0) {
-		activeObserver = make_unique<SongObserver>(mpc);
+		activeObserver = make_unique<SongObserver>();
 	}
 	else if (csn.compare("trackmute") == 0) {
-		activeObserver = make_unique<TrMuteObserver>(mpc);
+		activeObserver = make_unique<TrMuteObserver>();
 	}
 	else if (checkActiveScreen(&diskNames, currentScreenName)) {
-		activeObserver = make_unique<DiskObserver>(mpc);
+		activeObserver = make_unique<DiskObserver>();
 	}
 	else if (checkActiveScreen(&seqWindowNames, currentScreenName)) {
-		activeObserver = make_unique<SequencerWindowObserver>(mpc);
+		activeObserver = make_unique<SequencerWindowObserver>();
 	}
 	else if (checkActiveScreen(&soundNames, currentScreenName)) {
-		activeObserver = make_unique<SoundObserver>(mpc);
+		activeObserver = make_unique<SoundObserver>();
 	}
 	else if (csn.compare("sample") == 0) {
-		activeObserver = make_unique<SampleObserver>(mpc);
+		activeObserver = make_unique<SampleObserver>();
 	}
 	else 
 	if (csn.compare("sequencer") == 0) {
-		activeObserver = make_unique<SequencerObserver>(mpc);
+		activeObserver = make_unique<SequencerObserver>();
 	}
 	else if (csn.compare("directory") == 0) {
-		activeObserver = make_unique<DirectoryObserver>(mpc->getDisk(), mpc);
+		activeObserver = make_unique<DirectoryObserver>(Mpc::instance().getDisk());
 	}
 	else if (csn.compare("programparams") == 0) {
-		activeObserver = make_unique<PgmParamsObserver>(mpc);
+		activeObserver = make_unique<PgmParamsObserver>();
 	}
 	else if (csn.compare("programassign") == 0) {
-		activeObserver = make_unique<PgmAssignObserver>(mpc);
+		activeObserver = make_unique<PgmAssignObserver>();
 	}
 	else if (csn.compare("sequencer_step") == 0) {
-		activeObserver = make_unique<StepEditorObserver>(mpc);
+		activeObserver = make_unique<StepEditorObserver>();
 	}
 	else if (csn.compare("step_tc") == 0 || csn.compare("editmultiple") == 0 || csn.compare("insertevent") == 0) {
-		activeObserver = make_unique<StepWindowObserver>(mpc);
+		activeObserver = make_unique<StepWindowObserver>();
 	}
 	else if (csn.compare("mixerv2") == 0 || csn.compare("mixersetup") == 0) {
-		activeObserver = make_unique<MixerObserver>(mpc);
+		activeObserver = make_unique<MixerObserver>();
 	}
 	else if (csn.compare("fxedit") == 0) {
-		activeObserver = make_unique<FxEditObserver>(mpc);
+		activeObserver = make_unique<FxEditObserver>();
 	}
 	else if (csn.compare("channelsettings") == 0) {
-		activeObserver = make_unique<ChannelSettingsObserver>(mpc);
+		activeObserver = make_unique<ChannelSettingsObserver>();
 	}
 	else if (csn.compare("edit") == 0) {
-		activeObserver = make_unique<EditSequenceObserver>(mpc);
+		activeObserver = make_unique<EditSequenceObserver>();
 	}
 	else if (csn.compare("name") == 0) {
-		activeObserver = make_unique<ui::NameObserver>(mpc);
+		activeObserver = make_unique<ui::NameObserver>();
 	}
 	else if (csn.compare("midiinputmonitor") == 0 || csn.compare("midioutputmonitor") == 0) {
-		activeObserver = make_unique<MidiMonitorObserver>(mpc);
+		activeObserver = make_unique<MidiMonitorObserver>();
 	}
 	else if (csn.compare("barcopy") == 0) {
-		activeObserver = make_unique<BarCopyObserver>(mpc);
+		activeObserver = make_unique<BarCopyObserver>();
 	}
 	else if (csn.compare("trmove") == 0) {
-		activeObserver = make_unique<TrMoveObserver>(mpc);
+		activeObserver = make_unique<TrMoveObserver>();
 	}
 	else if (csn.compare("user") == 0) {
-		activeObserver = make_unique<UserObserver>(mpc);
+		activeObserver = make_unique<UserObserver>();
 	}
 	else if (csn.compare("trim") == 0) {
-		activeObserver = make_unique<TrimObserver>(mpc);
+		activeObserver = make_unique<TrimObserver>();
 	}
 	else if (csn.compare("loop") == 0) {
-		activeObserver = make_unique<LoopObserver>(mpc);
+		activeObserver = make_unique<LoopObserver>();
 	}
 	else if (csn.compare("editsound") == 0) {
-		activeObserver = make_unique<EditSoundObserver>(mpc);
+		activeObserver = make_unique<EditSoundObserver>();
 	}
 	else if (csn.find("startfine") != string::npos || csn.find("endfine") != string::npos || csn.compare("looptofine") == 0) {
-		activeObserver = make_unique<ZoomObserver>(mpc);
+		activeObserver = make_unique<ZoomObserver>();
 	}
 	else if (csn.compare("zone") == 0 || csn.compare("numberofzones") == 0) {
-		activeObserver = make_unique<ZoneObserver>(mpc);
+		activeObserver = make_unique<ZoneObserver>();
 	}
 	else if (csn.compare("params") == 0) {
-		activeObserver = make_unique<SndParamsObserver>(mpc);
+		activeObserver = make_unique<SndParamsObserver>();
 	}
 	else if (csn.compare("deleteallfiles") == 0) {
-		activeObserver = make_unique<DeleteAllFilesObserver>(mpc);
+		activeObserver = make_unique<DeleteAllFilesObserver>();
 	}
 	else if (checkActiveScreen(&samplerWindowNames, csn)) {
-		activeObserver = make_unique<SamplerWindowObserver>(mpc);
+		activeObserver = make_unique<SamplerWindowObserver>();
 	}
 	else if (csn.compare("purge") == 0) {
-		activeObserver = make_unique<PurgeObserver>(mpc);
+		activeObserver = make_unique<PurgeObserver>();
 	}
 	else if (csn.compare("drum") == 0) {
-		activeObserver = make_unique<DrumObserver>(mpc);
+		activeObserver = make_unique<DrumObserver>();
 	}
 	else if (csn.compare("muteassign") == 0) {
-		activeObserver = make_unique<MuteAssignObserver>(mpc);
+		activeObserver = make_unique<MuteAssignObserver>();
 	}
 }
 

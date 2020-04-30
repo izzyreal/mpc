@@ -6,7 +6,7 @@
 #include <string>
 
 namespace mpc {
-	class Mpc;
+	
 	namespace ui {
 		namespace sampler {
 			class MixerGui;
@@ -60,7 +60,7 @@ namespace mpc {
 			void setValueAString(std::string str);
 
 		public:
-			MixerStrip(int columnIndex, int bank, mpc::Mpc* mpc);
+			MixerStrip(int columnIndex, int bank);
 			~MixerStrip();
 
 		};

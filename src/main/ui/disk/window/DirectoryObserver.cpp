@@ -15,15 +15,15 @@
 using namespace mpc::ui::disk::window;
 using namespace std;
 
-DirectoryObserver::DirectoryObserver(weak_ptr<mpc::disk::AbstractDisk> disk, mpc::Mpc* mpc)
+DirectoryObserver::DirectoryObserver(weak_ptr<mpc::disk::AbstractDisk> disk)
 {
-	this->mpc = mpc;
+	
 	this->disk = disk;
 	auto lDisk = disk.lock();
 	lDisk->addObserver(this);
-	directoryGui = mpc->getUis().lock()->getDirectoryGui();
+	directoryGui = Mpc::instance().getUis().lock()->getDirectoryGui();
 	directoryGui->addObserver(this);
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	a0Field = ls->lookupField("a0");
 	a1Field = ls->lookupField("a1");
 	a2Field = ls->lookupField("a2");

@@ -10,8 +10,8 @@
 using namespace mpc::controls::sampler;
 using namespace std;
 
-SndParamsControls::SndParamsControls(mpc::Mpc* mpc) 
-	: AbstractSamplerControls(mpc)
+SndParamsControls::SndParamsControls() 
+	: AbstractSamplerControls()
 {
 }
 
@@ -58,11 +58,11 @@ void SndParamsControls::function(int f)
 		lLs->openScreen("editsound");
 		break;
 	case 5:
-		if (mpc->getControls().lock()->isF6Pressed()) {
+		if (Mpc::instance().getControls().lock()->isF6Pressed()) {
 			return;
 		}
 		
-		mpc->getControls().lock()->setF6Pressed(true);
+		Mpc::instance().getControls().lock()->setF6Pressed(true);
 		
 		zone = vector<int>{ soundGui->getZoneStart(soundGui->getZoneNumber()) , soundGui->getZoneEnd(soundGui->getZoneNumber()) };
 		lSampler->playX(soundGui->getPlayX(), &zone);

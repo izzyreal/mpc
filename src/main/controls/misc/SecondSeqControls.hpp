@@ -2,7 +2,7 @@
 #include <controls/misc/AbstractMiscControls.hpp>
 
 namespace mpc {
-	class Mpc;
+	
 	namespace controls {
 		namespace misc {
 
@@ -16,7 +16,7 @@ namespace mpc {
 				void turnWheel(int i) override;
 
 			public:
-				SecondSeqControls(mpc::Mpc* mpc);
+				SecondSeqControls();
 				~SecondSeqControls();
 
 			};

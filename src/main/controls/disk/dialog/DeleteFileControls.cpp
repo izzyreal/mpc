@@ -12,8 +12,8 @@
 using namespace mpc::controls::disk::dialog;
 using namespace std;
 
-DeleteFileControls::DeleteFileControls(mpc::Mpc* mpc)
-	: AbstractDiskControls(mpc)
+DeleteFileControls::DeleteFileControls()
+	: AbstractDiskControls()
 {
 }
 

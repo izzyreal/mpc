@@ -9,8 +9,8 @@
 using namespace mpc::controls::sampler::dialog;
 using namespace std;
 
-CopySoundControls::CopySoundControls(mpc::Mpc* mpc) 
-	: AbstractSamplerControls(mpc)
+CopySoundControls::CopySoundControls() 
+	: AbstractSamplerControls()
 {
 }
 

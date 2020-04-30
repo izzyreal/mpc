@@ -4,7 +4,7 @@
 #include <memory>
 
 namespace mpc {
-	class Mpc;
+	
 	namespace ui {
 
 		namespace sampler {
@@ -14,7 +14,7 @@ namespace mpc {
 			{
 				
 			private:
-				mpc::Mpc* mpc;
+				
 
 			private:
 				bool padAssignMaster{ false };
@@ -67,7 +67,7 @@ namespace mpc {
 				void notify(std::string str);
 
 			public:
-				SamplerGui(mpc::Mpc* mpc);
+				SamplerGui();
 				~SamplerGui();
 
 			};

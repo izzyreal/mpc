@@ -11,20 +11,20 @@
 using namespace mpc::ui::disk::window;
 using namespace std;
 
-SaveAllFileObserver::SaveAllFileObserver(mpc::Mpc* mpc)
+SaveAllFileObserver::SaveAllFileObserver()
 {
-	this->mpc = mpc;
-	auto ls = mpc->getLayeredScreen().lock();
+	
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	fileField = ls->lookupField("file");
 	fileLabel = ls->lookupLabel("file1");
-	diskGui = mpc->getUis().lock()->getDiskGui();
+	diskGui = Mpc::instance().getUis().lock()->getDiskGui();
 	displayFile();
 }
 
 void SaveAllFileObserver::displayFile()
 {
-	fileField.lock()->setText(mpc->getUis().lock()->getNameGui()->getName().substr(0, 1));
-	fileLabel.lock()->setText(moduru::lang::StrUtil::padRight(mpc->getUis().lock()->getNameGui()->getName().substr(1), " ", 15) + ".ALL");
+	fileField.lock()->setText(Mpc::instance().getUis().lock()->getNameGui()->getName().substr(0, 1));
+	fileLabel.lock()->setText(moduru::lang::StrUtil::padRight(Mpc::instance().getUis().lock()->getNameGui()->getName().substr(1), " ", 15) + ".ALL");
 }
 
 void SaveAllFileObserver::update(moduru::observer::Observable* o, nonstd::any a)

@@ -8,7 +8,7 @@
 
 namespace mpc {
 
-	class Mpc;
+	
 
 	namespace midi {
 
@@ -35,7 +35,7 @@ namespace mpc {
 			private:
 				std::unique_ptr<mpc::midi::MidiFile> midiFile{};
 				std::weak_ptr<mpc::sequencer::Sequence> dest{};
-				mpc::Mpc* mpc{};
+				
 
 			public:
 				void parseSequence();
@@ -46,7 +46,7 @@ namespace mpc {
 				int getNumberOfNotes(int noteValue, std::vector<std::shared_ptr<mpc::sequencer::NoteEvent>> allNotes);
 
 			public:
-				MidiReader(mpc::Mpc* mpc, mpc::disk::MpcFile* file, std::weak_ptr<mpc::sequencer::Sequence> dest);
+				MidiReader(mpc::disk::MpcFile* file, std::weak_ptr<mpc::sequencer::Sequence> dest);
 			};
 
 		}

@@ -14,7 +14,7 @@ namespace mpc {
 				void function(int f) override;
 				void turnWheel(int i) override;
 
-				DrumControls(mpc::Mpc* mpc);
+				DrumControls();
 
 			};
 

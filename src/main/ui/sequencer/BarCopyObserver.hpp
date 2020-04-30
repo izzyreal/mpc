@@ -4,7 +4,7 @@
 #include <memory>
 
 namespace mpc {
-	class Mpc;
+	
 	namespace sequencer {
 		class Sequencer;
 		class Sequence;
@@ -51,7 +51,7 @@ namespace mpc {
 				void displayFirstBar();
 
 			public:
-				BarCopyObserver(mpc::Mpc* mpc);
+				BarCopyObserver();
 				~BarCopyObserver();
 			};
 

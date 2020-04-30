@@ -12,8 +12,8 @@
 using namespace mpc::controls::disk::window;
 using namespace std;
 
-LoadASoundControls::LoadASoundControls(mpc::Mpc* mpc) 
-	: AbstractDiskControls(mpc)
+LoadASoundControls::LoadASoundControls() 
+	: AbstractDiskControls()
 {
 }
 
@@ -30,7 +30,7 @@ void LoadASoundControls::turnWheel(int i)
 void LoadASoundControls::function(int i)
 {
 	init();
-	auto controls = mpc->getControls().lock();
+	auto controls = Mpc::instance().getControls().lock();
 	shared_ptr<mpc::sampler::Sound> s;
 	int start;
 	int end;
@@ -66,7 +66,7 @@ void LoadASoundControls::function(int i)
 		ls.lock()->openScreen("load");
 		break;
 	case 4:
-		auto command = mpc::command::KeepSound(mpc, dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getPreviewSound().lock()));
+		auto command = mpc::command::KeepSound(dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getPreviewSound().lock()));
 		command.execute();
 		ls.lock()->openScreen("load");
 		break;

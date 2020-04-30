@@ -7,7 +7,7 @@
 
 namespace mpc {
 	
-	class Mpc;
+	
 
 	namespace lcdgui {
 		class Field;
@@ -36,7 +36,7 @@ namespace mpc {
 				public:
 					void update(moduru::observer::Observable* o, nonstd::any a) override;
 
-					DeleteAllFilesObserver(mpc::Mpc* mpc);
+					DeleteAllFilesObserver();
 					~DeleteAllFilesObserver();
 				};
 

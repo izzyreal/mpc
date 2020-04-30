@@ -14,7 +14,7 @@ namespace mpc {
 					typedef mpc::controls::sampler::AbstractSamplerControls super;
 					void function(int i) override;
 
-					DeleteAllSoundControls(mpc::Mpc* mpc);
+					DeleteAllSoundControls();
 
 				};
 

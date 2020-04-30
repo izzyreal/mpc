@@ -13,7 +13,7 @@ namespace ctoot {
 
 namespace mpc {
 
-	class Mpc;
+	
 
 	namespace sampler {
 		class Sampler;
@@ -38,7 +38,7 @@ namespace mpc {
 
 			private:
 				mpc::sampler::NoteParameters* lastNp = nullptr;
-				mpc::Mpc* mpc;
+				
 				std::vector<std::string> decayModes{};
 				std::vector<std::string> voiceOverlapModes{};
 				std::weak_ptr<mpc::sampler::Sampler> sampler{ };
@@ -70,7 +70,7 @@ namespace mpc {
 				void displayVoiceOverlap();
 
 			public:
-				PgmParamsObserver(mpc::Mpc* mpc);
+				PgmParamsObserver();
 				~PgmParamsObserver();
 
 			};

@@ -6,7 +6,7 @@
 #include <string>
 
 namespace mpc {
-	class Mpc;
+	
 }
 
 namespace mpc::lcdgui {
@@ -26,8 +26,6 @@ namespace mpc::ui::sampler {
 	{
 
 	private:
-		mpc::Mpc* mpc = nullptr;
-
 		const string vu_normal = u8"\u00F5";
 		const string vu_threshold = u8"\u00F6";
 		const string vu_peak = u8"\u00F8";
@@ -63,7 +61,7 @@ namespace mpc::ui::sampler {
 		void update(moduru::observer::Observable* o, nonstd::any arg) override;
 
 	public:
-		SampleObserver(mpc::Mpc* mpc);
+		SampleObserver();
 		~SampleObserver();
 
 	};

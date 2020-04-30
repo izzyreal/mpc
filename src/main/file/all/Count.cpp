@@ -24,10 +24,10 @@ Count::Count(vector<char> b)
 	normalVelo = b[NORMAL_VELO_OFFSET];
 }
 
-Count::Count(mpc::Mpc* mpc) 
+Count::Count() 
 {
-	auto swgui = mpc->getUis().lock()->getSequencerWindowGui();
-	auto lSequencer = mpc->getSequencer().lock();
+	auto swgui = Mpc::instance().getUis().lock()->getSequencerWindowGui();
+	auto lSequencer = Mpc::instance().getSequencer().lock();
 	saveBytes = vector<char>(AllParser::COUNT_LENGTH);
 	saveBytes[ENABLED_OFFSET] = static_cast< int8_t >((lSequencer->isCountEnabled() ? 1 : 0));
 	saveBytes[COUNT_IN_MODE_OFFSET] = static_cast< int8_t >(swgui->getCountInMode());

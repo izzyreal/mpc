@@ -4,7 +4,7 @@
 #include <vector>
 
 namespace mpc {
-	class Mpc;
+	
 	namespace file {
 		namespace all {
 
@@ -53,7 +53,7 @@ namespace mpc {
 				std::vector<char> getBytes();
 
 				Count(std::vector<char> b);
-				Count(mpc::Mpc* mpc);
+				Count();
 			};
 
 		}

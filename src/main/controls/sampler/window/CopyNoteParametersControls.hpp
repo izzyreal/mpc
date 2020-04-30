@@ -15,7 +15,7 @@ namespace mpc {
 					void turnWheel(int i) override;
 					void function(int i) override;
 
-					CopyNoteParametersControls(mpc::Mpc* mpc);
+					CopyNoteParametersControls();
 
 				};
 

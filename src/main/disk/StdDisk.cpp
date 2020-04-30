@@ -27,8 +27,8 @@ using namespace mpc::disk;
 using namespace mpc::file;
 using namespace std;
 
-StdDisk::StdDisk(weak_ptr<Store> store, mpc::Mpc* mpc)
-	: AbstractDisk(store, mpc)
+StdDisk::StdDisk(weak_ptr<Store> store)
+	: AbstractDisk(store)
 {
 	device = make_unique<mpc::disk::device::StdDevice>(store.lock()->path);
 	if (device) {

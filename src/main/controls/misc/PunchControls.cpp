@@ -8,8 +8,8 @@
 using namespace mpc::controls::misc;
 using namespace std;
 
-PunchControls::PunchControls(mpc::Mpc* mpc)
-	: AbstractMiscControls(mpc)
+PunchControls::PunchControls()
+	: AbstractMiscControls()
 {
 }
 

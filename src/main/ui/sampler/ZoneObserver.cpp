@@ -14,14 +14,14 @@
 using namespace mpc::ui::sampler;
 using namespace std;
 
-ZoneObserver::ZoneObserver(mpc::Mpc* mpc)
+ZoneObserver::ZoneObserver()
 {
-	this->mpc = mpc;
-	sampler = mpc->getSampler();
+	
+	sampler = Mpc::instance().getSampler();
 	playXNames = { "ALL", "ZONE", "BEFOR ST", "BEFOR TO", "AFTR END" };
-	soundGui = mpc->getUis().lock()->getSoundGui();
+	soundGui = Mpc::instance().getUis().lock()->getSoundGui();
 	soundGui->addObserver(this);
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	csn = ls->getCurrentScreenName();
 	auto lSampler = sampler.lock();
 	twoDots = ls->getTwoDots();
@@ -78,7 +78,7 @@ void ZoneObserver::displaySnd()
 {
 	auto lSampler = sampler.lock();
 	if (lSampler->getSoundCount() != 0) {
-		auto ls = mpc->getLayeredScreen().lock();
+		auto ls = Mpc::instance().getLayeredScreen().lock();
 		if (ls->getFocus().compare("dummy") == 0) ls->setFocus(sndField.lock()->getName());
 		auto lSound = sound.lock();
 		lSound->deleteObserver(this);
@@ -95,7 +95,7 @@ void ZoneObserver::displaySnd()
 	}
 	else {
 		sndField.lock()->setText("(no sound)");
-		mpc->getLayeredScreen().lock()->setFocus("dummy");
+		Mpc::instance().getLayeredScreen().lock()->setFocus("dummy");
 	}
 }
 
@@ -179,7 +179,7 @@ ZoneObserver::~ZoneObserver() {
 		twoDots.lock()->Hide(true);
 	}
 	soundGui->deleteObserver(this);
-	if (mpc->getUis().lock()->getEditSoundGui()->getEdit() == 8) mpc->getUis().lock()->getEditSoundGui()->setEdit(0);
+	if (Mpc::instance().getUis().lock()->getEditSoundGui()->getEdit() == 8) Mpc::instance().getUis().lock()->getEditSoundGui()->setEdit(0);
 	auto lSound = sound.lock();
 	if (lSound) {
 		lSound->deleteObserver(this);

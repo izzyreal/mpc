@@ -12,10 +12,10 @@
 using namespace mpc::controls::sequencer;
 using namespace std;
 
-TrMoveControls::TrMoveControls(mpc::Mpc* mpc)
-	: AbstractSequencerControls(mpc)
+TrMoveControls::TrMoveControls()
+	: AbstractSequencerControls()
 {
-	tmGui = mpc->getUis().lock()->getTrMoveGui();
+	tmGui = Mpc::instance().getUis().lock()->getTrMoveGui();
 }
 
 void TrMoveControls::init()
@@ -87,11 +87,11 @@ void TrMoveControls::function(int i)
 	init();
 	switch (i) {
 	case 0:
-		mpc->getUis().lock()->getEditSequenceGui()->setFromSq(tmGui->getSq());
+		Mpc::instance().getUis().lock()->getEditSequenceGui()->setFromSq(tmGui->getSq());
 		ls.lock()->openScreen("edit");
 		break;
 	case 1:
-		mpc->getUis().lock()->getBarCopyGui()->setFromSq(tmGui->getSq());
+		Mpc::instance().getUis().lock()->getBarCopyGui()->setFromSq(tmGui->getSq());
 		ls.lock()->openScreen("barcopy");
 		break;
 	case 3:

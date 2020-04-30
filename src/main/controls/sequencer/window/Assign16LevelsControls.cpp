@@ -9,8 +9,8 @@
 using namespace mpc::controls::sequencer::window;
 using namespace std;
 
-Assign16LevelsControls::Assign16LevelsControls(mpc::Mpc* mpc)
-	: AbstractSequencerControls(mpc)
+Assign16LevelsControls::Assign16LevelsControls()
+	: AbstractSequencerControls()
 {
 }
 
@@ -20,7 +20,7 @@ void Assign16LevelsControls::function(int i)
 	switch (i) {
     case 4:
 		sequencerGui->setSixteenLevelsEnabled(true);
-		mpc->getHardware().lock()->getLed("sixteenlevels").lock()->light(true);
+		Mpc::instance().getHardware().lock()->getLed("sixteenlevels").lock()->light(true);
         ls.lock()->openScreen(ls.lock()->getPreviousScreenName());
         break;
     }

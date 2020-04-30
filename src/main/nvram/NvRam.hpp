@@ -3,7 +3,7 @@
 #include <memory>
 
 namespace mpc {
-	class Mpc;
+	
 }
 
 namespace mpc::ui {
@@ -22,7 +22,7 @@ namespace mpc::nvram {
 	public:
 		static std::shared_ptr<mpc::ui::UserDefaults> load();
 		static void saveUserDefaults();
-		static void saveKnobPositions(mpc::Mpc* mpc);
+		static void saveKnobPositions();
 		static int getMasterLevel();
 		static int getRecordLevel();
 		static int getSlider();

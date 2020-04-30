@@ -3,8 +3,8 @@
 using namespace mpc::controls::other;
 using namespace std;
 
-VerControls::VerControls(mpc::Mpc* mpc) 
-	: AbstractOtherControls(mpc)
+VerControls::VerControls() 
+	: AbstractOtherControls()
 {
 }
 

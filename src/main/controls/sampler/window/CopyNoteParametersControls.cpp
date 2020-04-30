@@ -8,8 +8,8 @@
 using namespace mpc::controls::sampler::window;
 using namespace std;
 
-CopyNoteParametersControls::CopyNoteParametersControls(mpc::Mpc* mpc)
-	: AbstractSamplerControls(mpc)
+CopyNoteParametersControls::CopyNoteParametersControls()
+	: AbstractSamplerControls()
 {
 }
 

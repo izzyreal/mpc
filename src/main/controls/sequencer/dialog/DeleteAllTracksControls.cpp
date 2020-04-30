@@ -5,8 +5,8 @@
 using namespace mpc::controls::sequencer::dialog;
 using namespace std;
 
-DeleteAllTracksControls::DeleteAllTracksControls(mpc::Mpc* mpc)
-	: AbstractSequencerControls(mpc)
+DeleteAllTracksControls::DeleteAllTracksControls()
+	: AbstractSequencerControls()
 {
 }
 

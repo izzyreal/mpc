@@ -14,17 +14,17 @@
 using namespace mpc::ui::sequencer;
 using namespace std;
 
-NextSeqPadObserver::NextSeqPadObserver(mpc::Mpc* mpc)
+NextSeqPadObserver::NextSeqPadObserver()
 {
 	seqs = vector<weak_ptr<mpc::lcdgui::Label>>(16);
-	this->sequencer = mpc->getSequencer();
+	this->sequencer = Mpc::instance().getSequencer();
 	auto lSequencer = sequencer.lock();
 	lSequencer->deleteObservers();
 	lSequencer->addObserver(this);
-	samplerGui = mpc->getUis().lock()->getSamplerGui();
+	samplerGui = Mpc::instance().getUis().lock()->getSamplerGui();
 	samplerGui->deleteObservers();
 	samplerGui->addObserver(this);
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	sqField = ls->lookupField("sq");
 	nextSqLabel = ls->lookupLabel("nextsq");
 	now0Field = ls->lookupField("now0");

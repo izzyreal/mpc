@@ -13,7 +13,7 @@ namespace mpc {
 				typedef mpc::controls::other::AbstractOtherControls super;
 				void function(int i) override;
 
-				InitControls(mpc::Mpc* mpc) ;
+				InitControls() ;
 			};
 
 		}

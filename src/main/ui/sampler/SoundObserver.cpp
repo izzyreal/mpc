@@ -13,16 +13,16 @@
 using namespace mpc::ui::sampler;
 using namespace std;
 
-SoundObserver::SoundObserver(mpc::Mpc* mpc)
+SoundObserver::SoundObserver()
 {
-	this->mpc = mpc;
-	sampler = mpc->getSampler();
+	
+	sampler = Mpc::instance().getSampler();
 	convertNames = vector<string>{ "STEREO TO MONO", "RE-SAMPLE" };
 	qualityNames = vector<string>{ "LOW", "MED", "HIGH" };
 	bitNames = vector<string>{ "16", "12", "8" };
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	csn = ls->getCurrentScreenName();
-	soundGui = mpc->getUis().lock()->getSoundGui();
+	soundGui = Mpc::instance().getUis().lock()->getSoundGui();
 	soundGui->addObserver(this);
 	if (csn.compare("sound") == 0) {
 		soundNameField = ls->lookupField("soundname");
@@ -84,7 +84,7 @@ void SoundObserver::displaySnd()
 void SoundObserver::displayLSource()
 {
 	auto lSampler = sampler.lock();
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	lSourceField.lock()->setText(lSampler->getSoundName(soundGui->getSoundIndex()));
 	if (lSampler->getSound(soundGui->getSoundIndex()).lock()->isMono() && lSampler->getSound(soundGui->getRSource()).lock()->isMono()) {
 		ls->drawFunctionKeys("monotostereo");
@@ -105,7 +105,7 @@ void SoundObserver::displayLSource()
 void SoundObserver::displayRSource()
 {
 	auto lSampler = sampler.lock();
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	rSourceField.lock()->setText(lSampler->getSoundName(soundGui->getRSource()));
 	if (lSampler->getSound(soundGui->getSoundIndex()).lock()->isMono() && lSampler->getSound(soundGui->getRSource()).lock()->isMono()) {
 		ls->drawFunctionKeys("monotostereo");
@@ -131,7 +131,7 @@ void SoundObserver::displayNewStName()
 void SoundObserver::displayStereoSource()
 {
 	auto lSampler = sampler.lock();
-	auto ls = mpc->getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen().lock();
 	stereoSourceField.lock()->setText(lSampler->getSoundName(soundGui->getSoundIndex()));
 	if (lSampler->getSound(soundGui->getSoundIndex()).lock()->isMono()) {
 		ls->drawFunctionKeys("convertnodoit");

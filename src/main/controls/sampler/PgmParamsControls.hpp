@@ -15,7 +15,7 @@ namespace mpc {
 				void turnWheel(int i) override;
 				void openWindow() override;
 
-				PgmParamsControls(mpc::Mpc* mpc);
+				PgmParamsControls();
 
 			};
 

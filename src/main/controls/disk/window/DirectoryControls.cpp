@@ -25,8 +25,8 @@
 using namespace mpc::controls::disk::window;
 using namespace std;
 
-DirectoryControls::DirectoryControls(mpc::Mpc* mpc)
-	: AbstractDiskControls(mpc)
+DirectoryControls::DirectoryControls()
+	: AbstractDiskControls()
 {
 }
 
@@ -66,7 +66,7 @@ void DirectoryControls::function(int f)
 		break;
 	case 5:
 	{
-		auto controls = mpc->getControls().lock();
+		auto controls = Mpc::instance().getControls().lock();
 
 		if (controls->isF6Pressed()) {
 			return;
@@ -78,15 +78,15 @@ void DirectoryControls::function(int f)
 
 		if (!file->isDirectory()) {
 			
-			bool started = mpc->getAudioMidiServices().lock()->getSoundPlayer().lock()->start(file->getFile().lock()->getPath());
+			bool started = Mpc::instance().getAudioMidiServices().lock()->getSoundPlayer().lock()->start(file->getFile().lock()->getPath());
 			
 			auto name = file->getFsNode().lock()->getNameWithoutExtension();
 
 			if (started) {
-				mpc->getLayeredScreen().lock()->createPopup("Playing " + name, 45);
+				Mpc::instance().getLayeredScreen().lock()->createPopup("Playing " + name, 45);
 			}
 			else {
-				mpc->getLayeredScreen().lock()->createPopup("Can't play " + name, 35);
+				Mpc::instance().getLayeredScreen().lock()->createPopup("Can't play " + name, 35);
 			}
 		}
 

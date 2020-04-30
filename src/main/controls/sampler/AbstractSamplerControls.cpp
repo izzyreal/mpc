@@ -24,11 +24,11 @@
 using namespace mpc::controls::sampler;
 using namespace std;
 
-AbstractSamplerControls::AbstractSamplerControls(mpc::Mpc* mpc) 
-	: BaseControls(mpc)
+AbstractSamplerControls::AbstractSamplerControls() 
+	: BaseControls()
 {
 	splitInc = vector<int>{ 10000000, 1000000, 100000, 10000, 1000, 100, 10, 1 };
-	auto uis = mpc->getUis().lock();
+	auto uis = Mpc::instance().getUis().lock();
 	zoomGui = uis->getZoomGui();
 	soundGui = uis->getSoundGui();
 	editSoundGui = uis->getEditSoundGui();
@@ -69,7 +69,7 @@ void AbstractSamplerControls::splitLeft()
 {
 	init();
 	auto mtf = ls.lock()->lookupField(param).lock();
-	auto controls = mpc->getControls().lock();
+	auto controls = Mpc::instance().getControls().lock();
 	if (controls->isShiftPressed()) {
 		if (splittable) {
 			if (!mtf->isSplit()) {
@@ -89,7 +89,7 @@ void AbstractSamplerControls::splitRight()
 {
 	init();
 	auto mtf = ls.lock()->lookupField(param).lock();
-	auto controls = mpc->getControls().lock();
+	auto controls = Mpc::instance().getControls().lock();
 	if (controls->isShiftPressed()) {
 		if (splittable && mtf->isSplit()) {
 			if (!mtf->setActiveSplit(mtf->getActiveSplit() + 1))

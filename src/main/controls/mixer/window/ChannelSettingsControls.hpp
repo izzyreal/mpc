@@ -15,7 +15,7 @@ namespace mpc {
 					void turnWheel(int increment) override;
 
 				public:
-					ChannelSettingsControls(mpc::Mpc* mpc);
+					ChannelSettingsControls();
 					~ChannelSettingsControls();
 
 				};

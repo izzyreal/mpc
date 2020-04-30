@@ -7,7 +7,7 @@
 #include <string>
 
 namespace mpc {
-	class Mpc;
+	
 }
 
 namespace mpc::lcdgui {
@@ -28,7 +28,7 @@ namespace mpc::ui::sequencer {
 	private:
 		std::weak_ptr<mpc::ui::UserDefaults> ud;
 		std::vector<std::string> busNames;;
-		mpc::Mpc* mpc;;
+		;
 		mpc::sequencer::TimeSignature& timeSig;
 		std::weak_ptr<mpc::lcdgui::Field> tempoField;
 		std::weak_ptr<mpc::lcdgui::Field> loopField;
@@ -59,7 +59,7 @@ namespace mpc::ui::sequencer {
 		void displayDeviceName();
 
 	public:
-		UserObserver(mpc::Mpc* mpc);
+		UserObserver();
 		~UserObserver();
 
 	};
