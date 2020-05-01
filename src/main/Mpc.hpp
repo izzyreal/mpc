@@ -127,7 +127,7 @@ namespace mpc {
 		std::weak_ptr<mpc::disk::AbstractDisk> getDisk();
 		std::weak_ptr<mpc::disk::Stores> getStores();
 
-	public:
+	private:
 		Mpc();
 		~Mpc();
 
