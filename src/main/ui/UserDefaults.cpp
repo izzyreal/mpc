@@ -7,8 +7,6 @@ using namespace std;
 
 UserDefaults::UserDefaults() 
 {
-	padNotes = vector<int>{
-		37, 36, 42, 82, 40, 38, 46, 44, 48, 47, 45, 43, 49, 55, 51, 53, 54, 69, 81, 80, 65, 66, 76, 77, 56, 62, 63, 64, 73, 74, 71, 39, 52, 57, 58, 59, 60, 61, 67, 68, 70, 72, 75, 78, 79, 35, 41, 50, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98 };
 	sequenceName = string("Sequence");
 	bus = 1;
 	tempo = BCMath("120.0");
@@ -221,16 +219,6 @@ int UserDefaults::getLastBarIndex()
 mpc::sequencer::TimeSignature& UserDefaults::getTimeSig()
 {
     return timeSig;
-}
-
-vector<int> UserDefaults::getPadNotes()
-{
-    return padNotes;
-}
-
-void UserDefaults::setPadNotes(vector<int> ia)
-{
-    padNotes = ia;
 }
 
 int8_t UserDefaults::getTrackStatus()

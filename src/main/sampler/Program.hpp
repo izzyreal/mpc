@@ -8,62 +8,54 @@
 
 #include <memory>
 
-namespace ctoot {
-	namespace mpc {
-		class MpcSampler;
-		class MpcStereoMixerChannel;
-		class MpcIndivFxMixerChannel;
-		class MpcNoteParameters;
-	}
+namespace ctoot::mpc {
+	class MpcSampler;
+	class MpcStereoMixerChannel;
+	class MpcIndivFxMixerChannel;
+	class MpcNoteParameters;
 }
 
-namespace mpc {
+namespace mpc::sampler {
 
-	
+	class Pad;
 
-	namespace sampler {
+	class Program
+		: public virtual ctoot::mpc::MpcProgram
+		, public moduru::observer::Observable
+	{
 
-		class Pad;
+	public:
+		std::weak_ptr<ctoot::mpc::MpcStereoMixerChannel> getStereoMixerChannel(int pad) override;
+		std::weak_ptr<ctoot::mpc::MpcIndivFxMixerChannel> getIndivFxMixerChannel(int pad) override;
+		int getPadNumberFromNote(int note) override;
+		ctoot::mpc::MpcNoteParameters* getNoteParameters(int i) override;
 
-		class Program
-			: public virtual ctoot::mpc::MpcProgram
-			, public moduru::observer::Observable
-		{
+	private:
+		Sampler* sampler{ nullptr };
+		std::string name{ "" };
+		std::vector<NoteParameters*> noteParameters{ };
+		std::vector<Pad*> pads{ };
+		PgmSlider* slider{ nullptr };
+		int midiProgramChange{ 0 };
 
-		public:
-			std::weak_ptr<ctoot::mpc::MpcStereoMixerChannel> getStereoMixerChannel(int pad) override;
-			std::weak_ptr<ctoot::mpc::MpcIndivFxMixerChannel> getIndivFxMixerChannel(int pad) override;
-			int getPadNumberFromNote(int note) override;
-			ctoot::mpc::MpcNoteParameters* getNoteParameters(int i) override;
+		void init();
 
-		private:
-			Sampler* sampler{ nullptr };
-			std::string name{ "" };
-			std::vector<NoteParameters*> noteParameters{ };
-			std::vector<Pad*> pads{ };
-			PgmSlider* slider{ nullptr };
-			int midiProgramChange{ 0 };
+	public:
+		int getNumberOfSamples();
+		void setName(std::string s);
+		std::string getName();
+		Pad* getPad(int i);
+		std::vector<NoteParameters*> getNotesParameters();
+		mpc::sampler::PgmSlider* getSlider();
+		void setNoteParameters(int i, NoteParameters* nn);
+		int getMidiProgramChange();
+		void setMidiProgramChange(int i);
+		void initPadAssign();
+		int getNoteFromPad(int i);
 
-			void init();
+	public:
+		Program(mpc::sampler::Sampler* sampler);
+		~Program();
 
-		public:
-			int getNumberOfSamples();
-			void setName(std::string s);
-			std::string getName();
-			Pad* getPad(int i);
-			std::vector<NoteParameters*> getNotesParameters();
-			mpc::sampler::PgmSlider* getSlider();
-			void setNoteParameters(int i, NoteParameters* nn);
-			int getMidiProgramChange();
-			void setMidiProgramChange(int i);
-			void initPadAssign();
-			int getNoteFromPad(int i);
-
-		public:
-			Program(mpc::sampler::Sampler* sampler);
-			~Program();
-
-		};
-
-	}
+	};
 }

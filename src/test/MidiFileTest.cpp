@@ -36,7 +36,7 @@ SCENARIO("A MidiFile can be written", "[file]") {
 
 	GIVEN("An Mpc with a Sequence") {
 
-		mpc::Mpc mpc;
+		mpc::Mpc& mpc = mpc::Mpc::instance();
 		mpc.init(44100, 1, 1);
 		auto sequencer = mpc.getSequencer().lock();
 		auto sequence = sequencer->getSequence(0).lock();
@@ -69,7 +69,7 @@ SCENARIO("A MidiFile can be written", "[file]") {
 
 		REQUIRE(file->exists());
 	
-		auto midiReader = MidiReader(&mpc, mpcFile, sequence);
+		auto midiReader = MidiReader(mpcFile, sequence);
 
 		track = sequence->getTrack(0).lock();
 

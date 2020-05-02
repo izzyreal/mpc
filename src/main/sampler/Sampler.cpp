@@ -40,8 +40,7 @@ Sampler::Sampler()
 	soundSortingType = 0;
 	abcd = vector<string>{ "A", "B", "C", "D" };
 	sortNames = vector<string>{ "MEMORY", "NAME", "SIZE" };
-	auto ud = mpc::StartUp::getUserDefaults().lock();
-	initMasterPadAssign = ud->getPadNotes();
+	initMasterPadAssign = Pad::getPadNotes();
 
 	programs = vector<shared_ptr<Program>>(24);
 }
@@ -153,7 +152,9 @@ int Sampler::getProgramCount()
 }
 
 weak_ptr<Program> Sampler::addProgram(int i) {
-	if (programs[i]) return weak_ptr<Program>();
+	if (programs[i]) {
+		return weak_ptr<Program>();
+	}
 	programs[i] = make_shared<Program>(this);
 	return programs[i];
 }

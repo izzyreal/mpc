@@ -15,7 +15,7 @@ using namespace std;
 
 TEST_CASE("Mpc is instantiated and booted", "[mpc-boot]")
 {
-	Mpc mpc;
+	auto& mpc = mpc::Mpc::instance();
 	mpc.init(44100, 1, 1);
 	REQUIRE(mpc.getSequencer().lock());
 }
@@ -39,7 +39,7 @@ TEST_CASE("BCMath functions as expected", "[bcmath]")
 SCENARIO("A Sequencer initializes correctly", "[sequencer]") {
 
 	GIVEN("A Sequencer") {
-		mpc::Mpc mpc;
+		auto& mpc = mpc::Mpc::instance();
 		mpc.init(44100, 1, 1);
 		auto seq = mpc.getSequencer().lock();
 		seq->init();
@@ -51,14 +51,14 @@ SCENARIO("A Sequencer initializes correctly", "[sequencer]") {
 SCENARIO("A Sequence initializes correctly", "[sequence]") {
 
 	GIVEN("An initialized Sequence") {
-		mpc::Mpc mpc;
+		auto& mpc = mpc::Mpc::instance();
 		mpc.init(44100, 1, 1);
 		std::vector<string> trackNames;
 		mpc::ui::UserDefaults defaults;
 		for (int i = 0; i < 64; i++) {
 		       trackNames.push_back(defaults.getTrackName(i));
 		}	       
-		mpc::sequencer::Sequence seq(&mpc, trackNames);
+		mpc::sequencer::Sequence seq(trackNames);
 		seq.init(1);
 	    	REQUIRE( seq.getInitialTempo().toDouble() == 120.0 );
 	}

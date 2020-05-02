@@ -11,7 +11,6 @@ namespace mpc::ui {
 	{
 
 	private:
-		std::vector<int> padNotes{};
 		int diskDevice{ 0 };
 		int autoLoadType{ 0 };
 		BCMath tempo{ 0 };
@@ -56,8 +55,6 @@ namespace mpc::ui {
 		std::string getTrackName(int i);
 		int getLastBarIndex();
 		mpc::sequencer::TimeSignature& getTimeSig();
-		std::vector<int> getPadNotes();
-		void setPadNotes(std::vector<int> ia);
 		int8_t getTrackStatus();
 		void setDeviceName(int i, std::string s);
 		void setSequenceName(std::string name);
