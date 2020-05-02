@@ -82,6 +82,7 @@
 #include <ui/other/OthersObserver.hpp>
 
 #include <ui/vmpc/DirectToDiskRecorderObserver.hpp>
+#include <ui/vmpc/VmpcSettingsObserver.hpp>
 #include <ui/vmpc/VmpcDiskObserver.hpp>
 
 #include <file/FileUtil.hpp>
@@ -952,27 +953,27 @@ void LayeredScreen::initObserver()
 		activeObserver = make_unique<NextSeqPadObserver>();
 	}
 	else if (csn.compare("nextseq") == 0) {
-		activeObserver = make_unique<NextSeqObserver>();
+	activeObserver = make_unique<NextSeqObserver>();
 	}
 	else if (csn.compare("song") == 0) {
-		activeObserver = make_unique<SongObserver>();
+	activeObserver = make_unique<SongObserver>();
 	}
 	else if (csn.compare("trackmute") == 0) {
-		activeObserver = make_unique<TrMuteObserver>();
+	activeObserver = make_unique<TrMuteObserver>();
 	}
 	else if (checkActiveScreen(&diskNames, currentScreenName)) {
-		activeObserver = make_unique<DiskObserver>();
+	activeObserver = make_unique<DiskObserver>();
 	}
 	else if (checkActiveScreen(&seqWindowNames, currentScreenName)) {
-		activeObserver = make_unique<SequencerWindowObserver>();
+	activeObserver = make_unique<SequencerWindowObserver>();
 	}
 	else if (checkActiveScreen(&soundNames, currentScreenName)) {
-		activeObserver = make_unique<SoundObserver>();
+	activeObserver = make_unique<SoundObserver>();
 	}
 	else if (csn.compare("sample") == 0) {
-		activeObserver = make_unique<SampleObserver>();
+	activeObserver = make_unique<SampleObserver>();
 	}
-	else 
+	else
 	if (csn.compare("sequencer") == 0) {
 		activeObserver = make_unique<SequencerObserver>();
 	}
@@ -1050,6 +1051,9 @@ void LayeredScreen::initObserver()
 	}
 	else if (csn.compare("muteassign") == 0) {
 		activeObserver = make_unique<MuteAssignObserver>();
+	}
+	else if (csn.compare("settings") == 0) {
+		activeObserver = make_unique<VmpcSettingsObserver>();
 	}
 }
 

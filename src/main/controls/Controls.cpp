@@ -133,6 +133,7 @@
 #include <controls/vmpc/RecordJamControls.hpp>
 #include <controls/vmpc/RecordingFinishedControls.hpp>
 #include <controls/vmpc/VmpcDiskControls.hpp>
+#include <controls/vmpc/VmpcSettingsControls.hpp>
 
 using namespace mpc::controls;
 
@@ -158,9 +159,8 @@ Controls::Controls()
 	controls["user"] = new sequencer::UserControls();
 	controls["assign"] = new sequencer::AssignControls();
 
-	auto sec = new sequencer::StepEditorControls();
-	controls["sequencer_step"] = sec;
-	controls["step_tc"] = sec;
+	controls["sequencer_step"] = new sequencer::StepEditorControls();
+	controls["step_tc"] = new sequencer::StepEditorControls();
 
 	controls["changebars"] = new sequencer::window::ChangeBarsControls();
 	controls["changebars2"] = new sequencer::window::ChangeBars2Controls();
@@ -231,13 +231,12 @@ Controls::Controls()
 	controls["resample"] = new sampler::dialog::ResampleControls();
 	controls["stereotomono"] = new sampler::dialog::StereoToMonoControls();
 
-	auto zc = new sampler::window::ZoomControls();
-	controls["startfine"] = zc;
-	controls["endfine"] = zc;
-	controls["looptofine"] = zc;
-	controls["loopendfine"] = zc;
-	controls["zonestartfine"] = zc;
-	controls["zoneendfine"] = zc;
+	controls["startfine"] = new sampler::window::ZoomControls();
+	controls["endfine"] = new sampler::window::ZoomControls();
+	controls["looptofine"] = new sampler::window::ZoomControls();
+	controls["loopendfine"] = new sampler::window::ZoomControls();
+	controls["zonestartfine"] = new sampler::window::ZoomControls();
+	controls["zoneendfine"] = new sampler::window::ZoomControls();
 
 	controls["selectdrum"] = new sampler::SelectDrumControls();
 
@@ -290,6 +289,7 @@ Controls::Controls()
 	controls["directtodiskrecorder"] = new vmpc::DirectToDiskRecorderControls();
 	controls["recordjam"] = new vmpc::RecordJamControls();
 	controls["recordingfinished"] = new vmpc::RecordingFinishedControls();
+	controls["settings"] = new vmpc::VmpcSettingsControls();
 }
 
 void Controls::setCtrlPressed(bool b) {
@@ -408,4 +408,8 @@ GlobalReleaseControls* Controls::getReleaseControls()
 
 Controls::~Controls()
 {
+	for (auto c : controls)
+	{
+		delete c.second;
+	}
 }

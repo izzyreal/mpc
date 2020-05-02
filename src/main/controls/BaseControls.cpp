@@ -327,19 +327,25 @@ void BaseControls::numpad(int i)
 
 	if (controls->isShiftPressed()) {
 		switch (i) {
+		case 0:
+			ls.lock()->openScreen("settings");
+			break;
 		case 1:
-			if (lSequencer->isPlaying()) return;
+			if (lSequencer->isPlaying())
+			{
+				return;
+			}
 			ls.lock()->openScreen("song");
-			return;
+			break;
 		case 2:
-			if (lSequencer->isPlaying()) return;
+			if (lSequencer->isPlaying()) break;
 			ls.lock()->openScreen("punch");
 			Mpc::instance().getUis().lock()->getPunchGui()->setTime0(0);
 			Mpc::instance().getUis().lock()->getPunchGui()->setTime1(lSequencer->getActiveSequence().lock()->getLastTick());
-			return;
+			break;
 		case 3:
 			if (lSequencer->isPlaying()) {
-				return;
+				break;
 			}
 			
 			if (lDisk != nullptr) {
@@ -350,38 +356,38 @@ void BaseControls::numpad(int i)
 				Mpc::instance().getUis().lock()->getDiskGui()->setFileLoad((int)(lDisk->getFiles().size() - 1));
 			}
 			ls.lock()->openScreen("load");
-			return;
+			break;
 		case 4:
 			if (lSequencer->isPlaying()) {
-				return;
+				break;
 			}
 			ls.lock()->openScreen("sample");
-			return;
+			break;
 		case 5:
 			if (lSequencer->isPlaying()) {
-				return;
+				break;
 			}
 			ls.lock()->openScreen("trim");
-			return;
+			break;
 		case 6:
 		case 130:
 			ls.lock()->openScreen("selectdrum");
-			return;
+			break;
 		case 7:
 			ls.lock()->openScreen("selectdrum_mixer");
-			return;
+			break;
 		case 8:
 			if (lSequencer->isPlaying()) {
-				return;
+				break;
 			}
 			ls.lock()->openScreen("others");
-			return;
+			break;
 		case 9:
 			if (lSequencer->isPlaying()) {
-				return;
+				break;
 			}
 			ls.lock()->openScreen("sync");
-			return;
+			break;
 		}
 
 	}
