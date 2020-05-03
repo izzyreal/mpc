@@ -56,6 +56,7 @@ int wav_get_LE(ifstream& stream, int numBytes)
 bool wav_read_header(ifstream& stream, int& sampleRate, int& validBits, int& numChannels, int& numFrames) {
     
     stream.seekg(0, stream.end);
+
     auto tell = stream.tellg();
 
     if (tell < EXPECTED_HEADER_SIZE) {
@@ -75,7 +76,20 @@ bool wav_read_header(ifstream& stream, int& sampleRate, int& validBits, int& num
     auto avgBytesPerSecond = wav_get_LE(stream, 4);   // Offset 28
     auto blockAlign = wav_get_LE(stream, 2);          // Offset 32
     validBits = wav_get_LE(stream, 2);           // Offset 34
+    if (lengthOfFormatData != 16) {
+        stream.ignore(lengthOfFormatData - 16);
+    }
     auto dataChunkId = wav_get_LE(stream, 4);         // Ofset 36
+
+    // Skip fact and smpl chunks
+    const int maxRetries = 10;
+    int retryCounter = 0;
+    while (dataChunkId != DATA_CHUNK_ID && retryCounter++ != maxRetries) {
+        auto factOrOtherChunkSize = wav_get_LE(stream, 4);
+        stream.ignore(factOrOtherChunkSize);
+        dataChunkId = wav_get_LE(stream, 4);
+    }
+
     auto dataChunkSize = wav_get_LE(stream, 4);       // Offset 40
 
     if (riffChunkId != RIFF_CHUNK_ID) {
@@ -86,9 +100,9 @@ bool wav_read_header(ifstream& stream, int& sampleRate, int& validBits, int& num
         return false;
     }
 
-    if (lengthOfFormatData != EXPECTED_FMT_DATA_SIZE) {
-        return false;
-    }
+    //if (lengthOfFormatData != EXPECTED_FMT_DATA_SIZE) {
+        //return false;
+    //}
 
     if (!isPCM) {
         return false;
