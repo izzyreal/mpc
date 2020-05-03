@@ -143,6 +143,8 @@ void MetronomeSoundObserver::update(moduru::observer::Observable* o, nonstd::any
 	}
 }
 
-MetronomeSoundObserver::~MetronomeSoundObserver() {
+MetronomeSoundObserver::~MetronomeSoundObserver()
+{
+	swGui->deleteObserver(this);
 }
 
