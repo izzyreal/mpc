@@ -1,3 +1,9 @@
+## v0.1.1
+
+* FXedit screen doesn't crash (the screen is still useless because there is no EB16 emulation)
+* WAV-files that have non-data chunks will now quick-preview correctly
+* No more crash after visiting the Metronome Sound screen
+
 ## v.0.1.0
 * Initial versioned release
 * Version number displayed in top right
