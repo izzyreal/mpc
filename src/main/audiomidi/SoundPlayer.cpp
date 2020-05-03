@@ -4,6 +4,8 @@
 #include <audio/core/AudioBuffer.hpp>
 
 #include <cmath>
+#include <algorithm>
+
 
 #include "WavInputFileStream.hpp"
 #include "SndInputFileStream.hpp"
