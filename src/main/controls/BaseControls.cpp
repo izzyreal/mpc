@@ -171,6 +171,12 @@ void BaseControls::pad(int i, int velo, bool repeat, int tick)
 	auto lTrk = track.lock();
 	auto controls = Mpc::instance().getControls().lock();
 	auto lSequencer = sequencer.lock();
+
+	if (sequencerGui->isFullLevelEnabled())
+	{
+		velo = 127;
+	}
+
 	if (controls->getPressedPads()->find(i) == controls->getPressedPads()->end()) {
 		controls->getPressedPads()->emplace(i);
 		controls->getPressedPadVelos()->at(i) = velo;
