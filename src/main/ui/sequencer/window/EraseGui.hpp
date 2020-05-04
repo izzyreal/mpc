@@ -2,34 +2,27 @@
 #include <observer/Observable.hpp>
 
 
-namespace mpc {
-	namespace ui {
-		namespace sequencer {
-			namespace window {
+namespace mpc::ui::sequencer::window {
 
-				class EraseGui
-					: public moduru::observer::Observable
-				{
+	class EraseGui
+		: public moduru::observer::Observable
+	{
 
-				public:
-					int track{};
-					int erase{};
-					int type{};
-					int notes0{};
-					int notes1{};
+	private:
+		int track = 0;
+		int erase = 0;
+		int type = 0;
+		int notes0 = 0;
+		int notes1 = 0;
 
-				public:
-					void setTrack(int i);
-					void setErase(int i);
-					void setType(int i);
-					int getTrack();
-					int getErase();
-					int getType();
+	public:
+		void setTrack(int i);
+		void setErase(int i);
+		void setType(int i);
+		int getTrack();
+		int getErase();
+		int getType();
 
-					EraseGui();
-				};
-
-			}
-		}
-	}
+		EraseGui();
+	};
 }

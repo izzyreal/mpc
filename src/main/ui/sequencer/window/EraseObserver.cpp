@@ -29,9 +29,7 @@ EraseObserver::EraseObserver()
 	bus = 0;
 	eraseGui = Mpc::instance().getUis().lock()->getEraseGui();
 	swGui = Mpc::instance().getUis().lock()->getSequencerWindowGui();
-	eraseGui->deleteObservers();
 	eraseGui->addObserver(this);
-	swGui->deleteObservers();
 	swGui->addObserver(this);
 	auto ls = Mpc::instance().getLayeredScreen().lock();
 	trackField = ls->lookupField("track");
@@ -48,6 +46,10 @@ EraseObserver::EraseObserver()
 	notes0Label = ls->lookupLabel("notes0");
 	notes1Field = ls->lookupField("notes1");
 	notes1Label = ls->lookupLabel("notes1");
+	
+	//notes1Label.lock()->setNoLeftMargin(true);
+	//notes1Field.lock()->setNoLeftMargin(true);
+	
 	auto lSequencer = Mpc::instance().getSequencer().lock();
 	sequence = lSequencer->getActiveSequence().lock().get();
 	sampler = Mpc::instance().getSampler();
@@ -89,12 +91,15 @@ void EraseObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 void EraseObserver::displayTrack()
 {
     string trackName = "";
-    if(eraseGui->track == -1) {
+    if (eraseGui->getTrack() == -1)
+	{
         trackName = "ALL";
-    } else {
-        trackName = sequence->getTrack(eraseGui->track).lock()->getActualName();
+    } 
+	else 
+	{
+        trackName = sequence->getTrack(eraseGui->getTrack()).lock()->getActualName();
     }
-    trackField.lock()->setTextPadded(eraseGui->track + 1, " ");
+    trackField.lock()->setTextPadded(eraseGui->getTrack() + 1, " ");
     trackNameLabel.lock()->setText("-" + trackName);
 }
 
@@ -110,20 +115,20 @@ void EraseObserver::displayTime()
 
 void EraseObserver::displayErase()
 {
-    eraseField.lock()->setText(eraseNames[eraseGui->erase]);
+    eraseField.lock()->setText(eraseNames[eraseGui->getErase()]);
 }
 
 void EraseObserver::displayType()
 {
-	typeField.lock()->Hide(eraseGui->getErase() < 0);
-	if (eraseGui->erase > 0)
-		typeField.lock()->setText(typeNames[eraseGui->type]);
+	typeField.lock()->Hide(eraseGui->getErase() == 0);
+	if (eraseGui->getErase() > 0)
+		typeField.lock()->setText(typeNames[eraseGui->getType()]);
 }
 
 void EraseObserver::displayNotes()
 {
 	auto lSampler = sampler.lock();
-    if(eraseGui->erase != 0 && ((eraseGui->erase == 1 && eraseGui->type != 0) || (eraseGui->erase == 2 && eraseGui->type != 0))) {
+    if(eraseGui->getErase() != 0 && ((eraseGui->getErase() == 1 && eraseGui->getType() != 0) || (eraseGui->getErase() == 2 && eraseGui->getType() != 0))) {
 	    notes0Field.lock()->Hide(true);
         notes0Label.lock()->Hide(true);
         notes1Field.lock()->Hide(true);
@@ -134,19 +139,28 @@ void EraseObserver::displayNotes()
     notes0Label.lock()->Hide(false);
     notes1Field.lock()->Hide(bus != 0);
     notes1Label.lock()->Hide(bus != 0);
-	if(bus > 0) {
-        notes0Field.lock()->setSize(6 * 6 * 2 + 4, 18);
-        if(swGui->getDrumNote() != 34) {
+	
+	if (bus > 0)
+	{
+        notes0Field.lock()->setSize(6 * 6 + 2, 8);
+        
+		if (swGui->getDrumNote() != 34)
+		{
 			notes0Field.lock()->setText(to_string(swGui->getDrumNote()) + "/" + lSampler->getPadName(program.lock()->getPadNumberFromNote(swGui->getDrumNote())));
         } else {
             notes0Field.lock()->setText("ALL");
         }
-    } else {
-        notes0Field.lock()->setSize(8 * 6 * 2, 18);
-        //notes0Field.lock()->setText((moduru::lang::StrUtil::padLeft(to_string(swGui->getMidiNote0()), " ", 3) + mpc::ui::Uis::noteNames[swGui->getMidiNote0()]) + u8"\u00D4");
-        //notes1Field.lock()->setText((moduru::lang::StrUtil::padLeft(to_string(swGui->getMidiNote1()), " ", 3) + mpc::ui::Uis::noteNames[swGui->getMidiNote1()]) + u8"\u00D4");
+
+    } 
+	else 
+	{
+        notes0Field.lock()->setSize(8 * 6, 8);
+        notes0Field.lock()->setText((moduru::lang::StrUtil::padLeft(to_string(swGui->getMidiNote0()), " ", 3) + "(" + mpc::ui::Uis::noteNames[swGui->getMidiNote0()]) + ")");
+        notes1Field.lock()->setText((moduru::lang::StrUtil::padLeft(to_string(swGui->getMidiNote1()), " ", 3) + "(" + mpc::ui::Uis::noteNames[swGui->getMidiNote1()]) + ")");
     }
 }
 
 EraseObserver::~EraseObserver() {
+	swGui->deleteObserver(this);
+	eraseGui->deleteObserver(this);
 }

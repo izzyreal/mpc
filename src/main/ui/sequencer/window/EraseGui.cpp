@@ -9,7 +9,10 @@ EraseGui::EraseGui()
 
 void EraseGui::setTrack(int i)
 {
-    if(i < -1 || i > 63) return;
+    if (i < -1 || i > 63)
+    {
+        return;
+    }
 
     track = i;
     setChanged();
@@ -18,7 +21,9 @@ void EraseGui::setTrack(int i)
 
 void EraseGui::setErase(int i)
 {
-    if(i < 0 || i > 2) return;
+    if (i < 0 || i > 2) {
+        return;
+    }
 
     erase = i;
     setChanged();
@@ -27,7 +32,9 @@ void EraseGui::setErase(int i)
 
 void EraseGui::setType(int i)
 {
-    if(i < 0 || i > 6) return;
+    if (i < 0 || i > 6) {
+        return;
+    }
 
     type = i;
     setChanged();

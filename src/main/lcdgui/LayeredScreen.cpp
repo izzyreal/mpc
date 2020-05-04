@@ -330,6 +330,17 @@ int LayeredScreen::openScreen(string screenName) {
 		ams->getSoundRecorder().lock()->setVuMeterActive(true);
 	}
 
+	if (currentScreenName.compare("erase") == 0)
+	{
+		// This field may not be visible the next time we visit this screen.
+		// Like the real 2KXL we always set focus to the first Notes: field
+		// if the current focus is hte second Notes: field.
+		if (getFocus().compare("notes1") == 0)
+		{
+			setFocus("notes0");
+		}
+	}
+
 	setLastFocus(currentScreenName, getFocus());
 
 	previousScreenName = currentScreenName;
