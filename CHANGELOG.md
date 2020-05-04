@@ -1,3 +1,6 @@
+## v0.1.3 (not released yet)
+* Honor full-level when clicking pads with the mouse
+
 ## v0.1.2
 * Fix Erase screen crashes and cosmetic issues
 
