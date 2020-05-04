@@ -1,3 +1,6 @@
+## v0.1.2
+* Fix Erase screen crashes and cosmetic issues
+
 ## v0.1.1
 
 * FXedit screen doesn't crash (the screen is still useless because there is no EB16 emulation)
