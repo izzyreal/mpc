@@ -2,6 +2,7 @@
 
 #include <lcdgui/LayeredScreen.hpp>
 #include <ui/sequencer/window/SequencerWindowGui.hpp>
+#include <ui/sampler/SamplerGui.hpp>
 #include <sequencer/Sequence.hpp>
 #include <sequencer/Track.hpp>
 #include <sequencer/Sequencer.hpp>
@@ -28,9 +29,9 @@ void TimingCorrectControls::function(int i)
 		vector<int> noteRange(2);
 
 		if (lTrk->getBusNumber() != 0) {
-			if (swGui->getDrumNote() != 34) {
-				noteRange[0] = swGui->getDrumNote();
-				noteRange[1] = swGui->getDrumNote();
+			if (samplerGui->getNote() != 34) {
+				noteRange[0] = samplerGui->getNote();
+				noteRange[1] = samplerGui->getNote();
 			}
 			else {
 				noteRange[0] = 0;

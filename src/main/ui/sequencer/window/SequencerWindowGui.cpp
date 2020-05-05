@@ -1,4 +1,4 @@
-#include <ui/sequencer/window/SequencerWindowGui.hpp>
+#include "SequencerWindowGui.hpp"
 
 #include <ui/sequencer/window/MultiRecordingSetupLine.hpp>
 #include <sequencer/Event.hpp>
@@ -10,7 +10,6 @@ using namespace std;
 SequencerWindowGui::SequencerWindowGui() 
 {
 	newBars = 1;
-	drumNote = 34;
 	swing = 50;
 	noteValue = 3;
 	inPlay = true;
@@ -22,6 +21,7 @@ SequencerWindowGui::SequencerWindowGui()
 	accentNote = 35;
 	normalVelo = 64;
 	normalNote = 35;
+
 	mrsLines = vector<MultiRecordingSetupLine*>(34);
 	for (int i = 0; i < 34; i++) {
 		auto mrsLine = new MultiRecordingSetupLine(i);
@@ -282,21 +282,6 @@ void SequencerWindowGui::setShiftTimingLater(bool b)
     notifyObservers(string("shifttiming"));
 }
 
-int SequencerWindowGui::getDrumNote()
-{
-    return drumNote;
-}
-
-void SequencerWindowGui::setDrumNote(int i)
-{
-    if(i < 34 || i > 98)
-        return;
-
-    drumNote = i;
-    setChanged();
-    notifyObservers(string("notes"));
-}
-
 int SequencerWindowGui::getMidiNote0()
 {
     return midiNote0;
@@ -304,8 +289,10 @@ int SequencerWindowGui::getMidiNote0()
 
 void SequencerWindowGui::setMidiNote0(int i)
 {
-    if(i < 0 || i > 127)
+    if (i < 0 || i > 127)
+    {
         return;
+    }
 
     midiNote0 = i;
     setChanged();
@@ -319,8 +306,10 @@ int SequencerWindowGui::getMidiNote1()
 
 void SequencerWindowGui::setMidiNote1(int i)
 {
-    if(i < 0 || i > 127)
+    if (i < 0 || i > 127)
+    {
         return;
+    }
 
     midiNote1 = i;
     setChanged();

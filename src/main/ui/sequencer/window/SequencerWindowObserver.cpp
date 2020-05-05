@@ -1,6 +1,8 @@
-#include <ui/sequencer/window/SequencerWindowObserver.hpp>
+#include "SequencerWindowObserver.hpp"
+
 #include <Mpc.hpp>
 #include <Util.hpp>
+
 #include <lcdgui/FunctionKeys.hpp>
 #include <ui/Uis.hpp>
 #include <lcdgui/LayeredScreen.hpp>
@@ -190,11 +192,15 @@ SequencerWindowObserver::SequencerWindowObserver()
 	deviceNameLabel = ls->lookupLabel("devicename");
 	editTypeField = ls->lookupField("edittype");
 	valueField = ls->lookupField("value");
+	
 	swGui->addObserver(this);
 	nameGui->addObserver(this);
+	samplerGui->addObserver(this);
 	lSequencer->addObserver(this);
 	seq->addObserver(this);
+
 	seq->getMetaTracks().at(2).lock()->addObserver(this);
+	
 	auto lTrk = track.lock();
 	lTrk->addObserver(this);
 	timeSig.addObserver(this);
@@ -522,7 +528,6 @@ void SequencerWindowObserver::displayNewTsig()
 	}
 	auto result = to_string(newTimeSignature->getNumerator()) + "/" + to_string(newTimeSignature->getDenominator());
 	newTsigField.lock()->setText(mpc::Util::distributeTimeSig(result));
-	//newTsigField.lock()->setText(result);
 }
 
 void SequencerWindowObserver::displayNoteValue()
@@ -560,8 +565,8 @@ void SequencerWindowObserver::displayNotes()
 	}
 	else {
 		notes0Field.lock()->setSize(6 * 6 + 2, 9);
-		if (swGui->getDrumNote() != 34) {
-			notes0Field.lock()->setText(to_string(swGui->getDrumNote()) + "/" + lSampler->getPadName(program.lock()->getPadNumberFromNote(swGui->getDrumNote())));
+		if (samplerGui->getNote() != 34) {
+			notes0Field.lock()->setText(to_string(samplerGui->getNote()) + "/" + lSampler->getPadName(samplerGui->getPad()));
 		}
 		else {
 			notes0Field.lock()->setText("ALL");
@@ -813,41 +818,60 @@ void SequencerWindowObserver::update(moduru::observer::Observable* o, nonstd::an
 	seq->addObserver(this);
 	timeSig.addObserver(this);
 	int yPos;
-	if (s.compare("initialtempo") == 0) {
+
+	if (s.compare("padandnote") == 0)
+	{
+		if (csn.compare("erase") == 0 || csn.compare("timingcorrect") == 0)
+		{
+			displayNotes();
+		}
+	}
+	else if (s.compare("initialtempo") == 0)
+	{
 		displayInitialTempo();
 		initVisibleEvents();
 		displayTempoChange0();
 		displayTempoChange1();
 		displayTempoChange2();
 	}
-	else if (s.compare("seqnumbername") == 0) {
+	else if (s.compare("seqnumbername") == 0)
+	{
 		displaySequenceNumberName();
 	}
-	else if (s.compare("tracknumber") == 0) {
+	else if (s.compare("tracknumber") == 0)
+	{
 		displayTrackNumber();
 	}
-	else if (s.compare("tr0") == 0) {
+	else if (s.compare("tr0") == 0)
+	{
 		displayTrackNumberNames();
 	}
-	else if (s.compare("tr1") == 0) {
+	else if (s.compare("tr1") == 0)
+	{
 		displayTrackNumberNames();
 	}
-	else if (s.compare("sq0") == 0) {
+	else if (s.compare("sq0") == 0)
+	{
 		displaySequenceNumberNames();
 	}
-	else if (s.compare("sq1") == 0) {
+	else if (s.compare("sq1") == 0)
+	{
 		displaySequenceNumberNames();
 	}
-	else if (s.compare("starttime") == 0) {
+	else if (s.compare("starttime") == 0)
+	{
 		displayStartTime();
 	}
-	else if (s.compare("displaystyle") == 0) {
+	else if (s.compare("displaystyle") == 0)
+	{
 		displayDisplayStyle();
 	}
-	else if (s.compare("framerate") == 0) {
+	else if (s.compare("framerate") == 0)
+	{
 		displayFrameRate();
 	}
-	else if (s.compare("tempochange") == 0) {
+	else if (s.compare("tempochange") == 0)
+	{
 		initVisibleEvents();
 		//if (Mpc::instance().getLayeredScreen().lock()->getFocus().find("0") != string::npos) {
 			displayTempoChange0();
@@ -859,7 +883,8 @@ void SequencerWindowObserver::update(moduru::observer::Observable* o, nonstd::an
 			displayTempoChange2();
 		//}
 	}
-	else if (s.compare("offset") == 0 || s.compare("tempochangeadded") == 0 || s.compare("tick") == 0) {
+	else if (s.compare("offset") == 0 || s.compare("tempochangeadded") == 0 || s.compare("tick") == 0)
+	{
 		if (csn.compare("tempochange") == 0) {
 			initVisibleEvents();
 			displayTempoChange0();
@@ -867,118 +892,154 @@ void SequencerWindowObserver::update(moduru::observer::Observable* o, nonstd::an
 			displayTempoChange2();
 		}
 	}
-	else if (s.compare("tempochangeon") == 0) {
+	else if (s.compare("tempochangeon") == 0)
+	{
 		displayTempoChangeOn();
 	}
-	else if (s.compare("tempo") == 0) {
+	else if (s.compare("tempo") == 0)
+	{
 		displayInitialTempo();
 	}
-	else if (s.compare("time") == 0) {
+	else if (s.compare("time") == 0)
+	{
 		displayTime();
 	}
-	else if (s.compare("notevalue") == 0) {
+	else if (s.compare("notevalue") == 0)
+	{
 		displayNoteValue();
 	}
-	else if (s.compare("swing") == 0) {
+	else if (s.compare("swing") == 0)
+	{
 		displaySwing();
 	}
-	else if (s.compare("shifttiming") == 0) {
+	else if (s.compare("shifttiming") == 0)
+	{
 		displayShiftTiming();
 	}
-	else if (s.compare("amount") == 0) {
+	else if (s.compare("amount") == 0)
+	{
 		displayAmount();
 	}
-	else if (s.compare("notes") == 0) {
+	else if (s.compare("notes") == 0)
+	{
 		displayNotes();
 	}
-	else if (s.compare("bars") == 0) {
+	else if (s.compare("bars") == 0)
+{
 		displayBars();
 	}
-	else if (s.compare("timesignature") == 0) {
+	else if (s.compare("timesignature") == 0)
+{
 		displayNewTsig();
 	}
-	else if (s.compare("countin") == 0) {
+	else if (s.compare("countin") == 0)
+{
 		displayCountIn();
 	}
-	else if (s.compare("inplay") == 0) {
+	else if (s.compare("inplay") == 0)
+{
 		displayInPlay();
 	}
-	else if (s.compare("rate") == 0) {
+	else if (s.compare("rate") == 0)
+{
 		displayRate();
 	}
-	else if (s.compare("inrec") == 0) {
+	else if (s.compare("inrec") == 0)
+{
 		displayInRec();
 	}
-	else if (s.compare("waitforkey") == 0) {
+	else if (s.compare("waitforkey") == 0)
+{
 		displayWaitForKey();
 	}
-	else if (s.compare("firstloopbar") == 0) {
+	else if (s.compare("firstloopbar") == 0)
+{
 		displayFirstBar();
 		displayNumberOfBars();
 	}
-	else if (s.compare("lastloopbar") == 0) {
+	else if (s.compare("lastloopbar") == 0)
+{
 		displayLastBar();
 		displayNumberOfBars();
 	}
-	else if (s.compare("numberofbars") == 0) {
+	else if (s.compare("numberofbars") == 0)
+{
 		displayNumberOfBars();
 		displayLastBar();
 	}
-	else if (s.compare("transmitprogramchangesinthistrack") == 0) {
+	else if (s.compare("transmitprogramchangesinthistrack") == 0)
+{
 		displayTransmitProgramChangesInThisTrack();
 	}
-	else if (s.compare("changebarsafterbar") == 0) {
+	else if (s.compare("changebarsafterbar") == 0)
+{
 		displayChangeBarsAfterBar();
 	}
-	else if (s.compare("changebarsnumberofbars") == 0) {
+	else if (s.compare("changebarsnumberofbars") == 0)
+{
 		displayChangeBarsNumberOfBars();
 	}
-	else if (s.compare("changebarsfirstbar") == 0) {
+	else if (s.compare("changebarsfirstbar") == 0)
+{
 		displayChangeBarsFirstBar();
 	}
-	else if (s.compare("changebarslastbar") == 0) {
+	else if (s.compare("changebarslastbar") == 0)
+{
 		displayChangeBarsLastBar();
 	}
-	else if (s.compare("newbars") == 0) {
+	else if (s.compare("newbars") == 0)
+{
 		displayNewBars();
 	}
-	else if (s.compare("mrsline") == 0) {
+	else if (s.compare("mrsline") == 0)
+	{
 		yPos = stoi(Mpc::instance().getLayeredScreen().lock()->getFocus().substr(1, 2));
 		displayMrsLine(yPos);
 	}
-	else if (s.compare("multirecordingsetup") == 0) {
+	else if (s.compare("multirecordingsetup") == 0)
+{
 		displayMrsLine(0);
 		displayMrsLine(1);
 		displayMrsLine(2);
 	}
-	else if (s.compare("receivech") == 0) {
+	else if (s.compare("receivech") == 0)
+{
 		displayReceiveCh();
 	}
-	else if (s.compare("progchangeseq") == 0) {
+	else if (s.compare("progchangeseq") == 0)
+{
 		displayProgChangeSeq();
 	}
-	else if (s.compare("sustainpedaltoduration") == 0) {
+	else if (s.compare("sustainpedaltoduration") == 0)
+{
 		displaySustainPedalToDuration();
 	}
-	else if (s.compare("midifilter") == 0) {
+	else if (s.compare("midifilter") == 0)
+{
 		displayMidiFilter();
 	}
-	else if (s.compare("type") == 0) {
+	else if (s.compare("type") == 0)
+{
 		displayType();
 	}
-	else if (s.compare("pass") == 0) {
+	else if (s.compare("pass") == 0)
+{
 		displayPass();
 	}
-	else if (s.compare("softthru") == 0) {
+	else if (s.compare("softthru") == 0)
+{
 		displaySoftThru();
 	}
-	else if (s.compare("devicenumber") == 0) {
+	else if (s.compare("devicenumber") == 0)
+{
 		displayDeviceName();
 	}
-	else if (s.compare("edittype") == 0) {
+	else if (s.compare("edittype") == 0)
+{
 		displayEditType();
 	}
-	else if (s.compare("value") == 0) {
+	else if (s.compare("value") == 0)
+	{
 		displayValue();
 	}
 }
@@ -1052,6 +1113,7 @@ SequencerWindowObserver::~SequencerWindowObserver() {
 	newTimeSignature->deleteObserver(this);
 	swGui->deleteObserver(this);
 	nameGui->deleteObserver(this);
+	samplerGui->deleteObserver(this);
 	if (sequence.lock()) {
 		sequence.lock()->deleteObserver(this);
 		sequence.lock()->getMetaTracks().at(2).lock()->deleteObserver(this);

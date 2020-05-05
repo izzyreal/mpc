@@ -29,9 +29,14 @@ EraseObserver::EraseObserver()
 	bus = 0;
 	eraseGui = Mpc::instance().getUis().lock()->getEraseGui();
 	swGui = Mpc::instance().getUis().lock()->getSequencerWindowGui();
+	samplerGui = Mpc::instance().getUis().lock()->getSamplerGui();
+
 	eraseGui->addObserver(this);
 	swGui->addObserver(this);
+	samplerGui->addObserver(this);
+
 	auto ls = Mpc::instance().getLayeredScreen().lock();
+
 	trackField = ls->lookupField("track");
 	trackNameLabel = ls->lookupLabel("trackname");
 	time0Field = ls->lookupField("time0");
@@ -47,17 +52,20 @@ EraseObserver::EraseObserver()
 	notes1Field = ls->lookupField("notes1");
 	notes1Label = ls->lookupLabel("notes1");
 	
-	//notes1Label.lock()->setNoLeftMargin(true);
-	//notes1Field.lock()->setNoLeftMargin(true);
-	
 	auto lSequencer = Mpc::instance().getSequencer().lock();
 	sequence = lSequencer->getActiveSequence().lock().get();
 	sampler = Mpc::instance().getSampler();
 	bus = sequence->getTrack(lSequencer->getActiveTrackIndex()).lock()->getBusNumber();
+	
 	int drum = bus - 1;
 	auto lSampler = sampler.lock();
-	auto mpcSoundPlayerChannel = drum >= 0 ? lSampler->getDrum(drum) : nullptr;
-	program = drum >= 0 ? dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(mpcSoundPlayerChannel->getProgram()).lock()) : weak_ptr<mpc::sampler::Program>();
+	
+	if (drum >= 0)
+	{
+		auto mpcSoundPlayerChannel = lSampler->getDrum(drum);
+		program = dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
+	}
+	
 	displayTrack();
 	displayTime();
 	displayErase();
@@ -68,22 +76,32 @@ EraseObserver::EraseObserver()
 void EraseObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 {
 	string s = nonstd::any_cast<string>(arg);
-	if (s.compare("track") == 0) {
+
+	if (s.compare("padandnote") == 0)
+	{
+		displayNotes();
+	}
+	else if (s.compare("track") == 0)
+	{
 		displayTrack();
 	}
-	else if (s.compare("time") == 0) {
+	else if (s.compare("time") == 0)
+	{
 		displayTime();
 	}
-	else if (s.compare("erase") == 0) {
+	else if (s.compare("erase") == 0)
+	{
 		displayErase();
 		displayType();
 		displayNotes();
 	}
-	else if (s.compare("type") == 0) {
+	else if (s.compare("type") == 0)
+	{
 		displayType();
 		displayNotes();
 	}
-	else if (s.compare("notes") == 0) {
+	else if (s.compare("notes") == 0)
+	{
 		displayNotes();
 	}
 }
@@ -144,9 +162,9 @@ void EraseObserver::displayNotes()
 	{
         notes0Field.lock()->setSize(6 * 6 + 2, 8);
         
-		if (swGui->getDrumNote() != 34)
+		if (samplerGui->getNote() != 34)
 		{
-			notes0Field.lock()->setText(to_string(swGui->getDrumNote()) + "/" + lSampler->getPadName(program.lock()->getPadNumberFromNote(swGui->getDrumNote())));
+			notes0Field.lock()->setText(to_string(samplerGui->getNote()) + "/" + lSampler->getPadName(samplerGui->getPad()));
         } else {
             notes0Field.lock()->setText("ALL");
         }
@@ -155,12 +173,15 @@ void EraseObserver::displayNotes()
 	else 
 	{
         notes0Field.lock()->setSize(8 * 6, 8);
-        notes0Field.lock()->setText((moduru::lang::StrUtil::padLeft(to_string(swGui->getMidiNote0()), " ", 3) + "(" + mpc::ui::Uis::noteNames[swGui->getMidiNote0()]) + ")");
-        notes1Field.lock()->setText((moduru::lang::StrUtil::padLeft(to_string(swGui->getMidiNote1()), " ", 3) + "(" + mpc::ui::Uis::noteNames[swGui->getMidiNote1()]) + ")");
+		auto note0 = swGui->getMidiNote0();
+		auto note1 = swGui->getMidiNote1();
+        notes0Field.lock()->setText((moduru::lang::StrUtil::padLeft(to_string(note0), " ", 3) + "(" + mpc::ui::Uis::noteNames[note0]) + ")");
+        notes1Field.lock()->setText((moduru::lang::StrUtil::padLeft(to_string(note1), " ", 3) + "(" + mpc::ui::Uis::noteNames[note1]) + ")");
     }
 }
 
 EraseObserver::~EraseObserver() {
 	swGui->deleteObserver(this);
 	eraseGui->deleteObserver(this);
+	samplerGui->deleteObserver(this);
 }

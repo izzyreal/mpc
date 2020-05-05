@@ -16,12 +16,24 @@ SamplerGui::SamplerGui()
 
 void SamplerGui::setPadAndNote(int pad, int note)
 {
-    if (pad < -1 || pad > 63 || note < 34 | note > 98) return;
-    if (prevPad != pad && pad != -1) prevPad = pad;
+    if (pad < -1 || pad > 63 || note < 34 || note > 98)
+    {
+        return;
+    }
+
+    if (prevPad != pad && pad != -1)
+    {
+        prevPad = pad;
+    }
 
     this->pad = pad;
-    if (note != 34) prevNote = note;
+    
+    if (note != 34) {
+        prevNote = note;
+    }
+
     this->note = note;
+    
     setChanged();
     notifyObservers(string("padandnote"));
 }

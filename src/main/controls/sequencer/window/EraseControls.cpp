@@ -61,23 +61,29 @@ void EraseControls::function(int i)
 		seq = sequencer.lock()->getActiveSequence().lock();
 		startIndex = egui->getTrack() - 1;
 		lastIndex = egui->getTrack() - 1;
-		if (startIndex < 0) {
+		
+		if (startIndex < 0)
+		{
 			startIndex = 0;
 			lastIndex = 63;
 		}
+		
 		erase = egui->getErase();
 		type = egui->getType();
 		midi = track.lock()->getBusNumber() == 0;
-		notea = midi ? swGui->getMidiNote0() : swGui->getDrumNote();
+		
+		notea = midi ? swGui->getMidiNote0() : samplerGui->getNote();
 		noteb = midi ? swGui->getMidiNote1() : -1;
+		
 		for (auto j = startIndex; j < lastIndex + 1; j++) {
 			vector<int> removalIndices;
 			auto t = seq->getTrack(j).lock();
 			for (auto k = 0; k < t->getEvents().size(); k++) {
 				auto e = t->getEvent(k).lock();
 				auto ne = dynamic_pointer_cast<NoteEvent>(e);
-				if (e->getTick() >= swGui->getTime0() && e->getTick() <= swGui->getTime1()) {
-					{
+				
+				if (e->getTick() >= swGui->getTime0() && e->getTick() <= swGui->getTime1())
+				{
 						string excludeClass;
 						string includeClass;
 						switch (erase) {
@@ -130,12 +136,13 @@ void EraseControls::function(int i)
 							}
 							break;
 						}
-					}
-
+				
 				}
 			}
-			//Collections::sort(removalIndices);
-			//Collections::reverse(removalIndices);
+
+			sort(begin(removalIndices), end(removalIndices));
+			reverse(begin(removalIndices), end(removalIndices));
+
 			for (int integer : removalIndices) {
 				t->getEvents().erase(t->getEvents().begin() + integer);
 			}

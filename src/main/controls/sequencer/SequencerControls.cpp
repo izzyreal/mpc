@@ -166,6 +166,7 @@ void SequencerControls::turnWheel(int i)
 	}
 	else if (param.compare("timing") == 0) {
 		swGui->setNoteValue(swGui->getNoteValue() + i);
+		ls.lock()->setLastFocus("timingcorrect", "notevalue");
 	}
 	else if (param.compare("sq") == 0) {
 		if (lSequencer->isPlaying()) {

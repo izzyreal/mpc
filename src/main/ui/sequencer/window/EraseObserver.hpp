@@ -5,74 +5,74 @@
 #include <vector>
 #include <string>
 
-namespace mpc {
+namespace mpc::sequencer {
+	class Sequence;
+}
+
+namespace mpc::sampler {
+	class Sampler;
+	class Program;
+}
+
+namespace mpc::lcdgui {
+	class Field;
+	class Label;
+}
+
+namespace mpc::ui::sampler {
+	class SamplerGui;
+}
 	
-	namespace sequencer {
-		class Sequence;
-	}
+namespace mpc::ui::sequencer::window {
+	class EraseGui;
+	class SequencerWindowGui;
+}
 
-	namespace sampler {
-		class Sampler;
-		class Program;
-	}
+namespace mpc::ui::sequencer::window {
 
-	namespace lcdgui {
-		class Field;
-		class Label;
-	}
-	
-	namespace ui {
-		namespace sequencer {
-			namespace window {
+	class EraseObserver
+		: public moduru::observer::Observer
+	{
 
-				class EraseGui;
-				class SequencerWindowGui;
+	private:
+		std::vector<std::string> typeNames;
+		std::vector<std::string> eraseNames;
+		std::weak_ptr<mpc::sampler::Sampler> sampler;;
+		std::weak_ptr<mpc::sampler::Program> program;
+		EraseGui* eraseGui = nullptr;
+		SequencerWindowGui* swGui = nullptr;
+		mpc::ui::sampler::SamplerGui* samplerGui = nullptr;
 
-				class EraseObserver
-					: public moduru::observer::Observer
-				{
+		std::weak_ptr<mpc::lcdgui::Field> trackField;
+		std::weak_ptr<mpc::lcdgui::Label> trackNameLabel;
+		std::weak_ptr<mpc::lcdgui::Field> time0Field;
+		std::weak_ptr<mpc::lcdgui::Field> time1Field;
+		std::weak_ptr<mpc::lcdgui::Field> time2Field;
+		std::weak_ptr<mpc::lcdgui::Field> time3Field;
+		std::weak_ptr<mpc::lcdgui::Field> time4Field;
+		std::weak_ptr<mpc::lcdgui::Field> time5Field;
+		std::weak_ptr<mpc::lcdgui::Field> eraseField;
+		std::weak_ptr<mpc::lcdgui::Field> typeField;
+		std::weak_ptr<mpc::lcdgui::Field> notes0Field;
+		std::weak_ptr<mpc::lcdgui::Label> notes0Label;
+		std::weak_ptr<mpc::lcdgui::Field> notes1Field;
+		std::weak_ptr<mpc::lcdgui::Label> notes1Label;
+		mpc::sequencer::Sequence* sequence = nullptr;
+		int bus = 0;
 
-				private:
-					std::vector<std::string> typeNames{};
-					std::vector<std::string> eraseNames{};
-					std::weak_ptr<mpc::sampler::Sampler> sampler{ };
-					std::weak_ptr<mpc::sampler::Program> program{};
-					EraseGui* eraseGui{ nullptr };
-					SequencerWindowGui* swGui{ nullptr };
-					std::weak_ptr<mpc::lcdgui::Field> trackField{};
-					std::weak_ptr<mpc::lcdgui::Label> trackNameLabel{};
-					std::weak_ptr<mpc::lcdgui::Field> time0Field{};
-					std::weak_ptr<mpc::lcdgui::Field> time1Field{};
-					std::weak_ptr<mpc::lcdgui::Field> time2Field{};
-					std::weak_ptr<mpc::lcdgui::Field> time3Field{};
-					std::weak_ptr<mpc::lcdgui::Field> time4Field{};
-					std::weak_ptr<mpc::lcdgui::Field> time5Field{};
-					std::weak_ptr<mpc::lcdgui::Field> eraseField{};
-					std::weak_ptr<mpc::lcdgui::Field> typeField{};
-					std::weak_ptr<mpc::lcdgui::Field> notes0Field{};
-					std::weak_ptr<mpc::lcdgui::Label> notes0Label{};
-					std::weak_ptr<mpc::lcdgui::Field> notes1Field{};
-					std::weak_ptr<mpc::lcdgui::Label> notes1Label{};
-					mpc::sequencer::Sequence* sequence{ nullptr };
-					int bus{ 0 };
+	public:
+		void update(moduru::observer::Observable* o, nonstd::any arg) override;
 
-				public:
-					void update(moduru::observer::Observable* o, nonstd::any arg) override;
+	private:
+		void displayTrack();
+		void displayTime();
+		void displayErase();
+		void displayType();
+		void displayNotes();
 
-				private:
-					void displayTrack();
-					void displayTime();
-					void displayErase();
-					void displayType();
-					void displayNotes();
+	public:
+		EraseObserver();
+		~EraseObserver();
 
-				public:
-					EraseObserver();
-					~EraseObserver();
-
-				};
-
-			}
-		}
-	}
+	};
 }

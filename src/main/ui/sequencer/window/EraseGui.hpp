@@ -12,8 +12,6 @@ namespace mpc::ui::sequencer::window {
 		int track = 0;
 		int erase = 0;
 		int type = 0;
-		int notes0 = 0;
-		int notes1 = 0;
 
 	public:
 		void setTrack(int i);

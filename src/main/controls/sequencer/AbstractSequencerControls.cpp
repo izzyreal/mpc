@@ -3,12 +3,14 @@
 #include <Mpc.hpp>
 
 #include <ui/Uis.hpp>
+#include <ui/sampler/SamplerGui.hpp>
 #include <ui/sequencer/BarCopyGui.hpp>
 #include <ui/sequencer/EditSequenceGui.hpp>
 #include <ui/sequencer/SongGui.hpp>
 #include <ui/sequencer/StepEditorGui.hpp>
 #include <ui/sequencer/TrMoveGui.hpp>
 #include <ui/sequencer/window/SequencerWindowGui.hpp>
+#include <sampler/Program.hpp>
 #include <sequencer/Sequence.hpp>
 #include <sequencer/Track.hpp>
 #include <sequencer/SeqUtil.hpp>
@@ -68,7 +70,10 @@ void AbstractSequencerControls::checkAllTimesAndNotes(int i)
 	}
 	else if (param.compare("notes0") == 0) {
 		if (track.lock()->getBusNumber() != 0) {
-			swGui->setDrumNote(swGui->getDrumNote() + i);
+			auto samplerGui = mpc::Mpc::instance().getUis().lock()->getSamplerGui();
+			auto note = samplerGui->getNote() + i;
+			auto pad = program.lock()->getPadNumberFromNote(note);
+			samplerGui->setPadAndNote(pad, samplerGui->getNote());
 		}
 		else {
 			swGui->setMidiNote0(swGui->getMidiNote0() + i);

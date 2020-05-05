@@ -208,6 +208,7 @@ void BaseControls::pad(int i, int velo, bool repeat, int tick)
 			samplerGui->setPadAndNote(pad, note);
 		}
 	}
+
 	if (csn.compare("assign16levels") == 0 && note != 34) {
 		Mpc::instance().getUis().lock()->getSequencerGui()->setNote(note);
 	}
