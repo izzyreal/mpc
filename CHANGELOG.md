@@ -2,6 +2,7 @@
 * Fix various Timing Correct screen cosmetic issues and some functionality
 * Honor full-level when clicking pads with the mouse
 * Fix an UNDO + Timing Correct related crash
+* Fix MASTER tempo source (currently no tempo changes are supported)
 
 ## v0.1.2
 * Fix Erase screen crashes and cosmetic issues
