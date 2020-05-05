@@ -482,7 +482,9 @@ void LayeredScreen::Draw() {
 		}
 	}
 
-	if (popup->IsDirty() && !popup->IsHidden()) popup->Draw(&pixels);
+	if (popup->IsDirty() && !popup->IsHidden()) {
+		popup->Draw(&pixels);
+	}
 
 	for (auto& c : dirtyComponents) {
 		dirtyArea = dirtyArea.Union(c->getDirtyArea());

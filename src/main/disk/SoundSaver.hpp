@@ -4,47 +4,40 @@
 #include <vector>
 #include <thread>
 
-namespace mpc {
+namespace mpc::ui::disk {
+	class DiskGui;
+}
 
-	
+namespace mpc::sampler {
+	class Sound;
+}
 
-	namespace ui {
+namespace mpc::disk {
+	class AbstractDisk;
+}
 
-		namespace disk {
-			class DiskGui;
-		}
-	}
+namespace mpc::disk {
 
-	namespace sampler {
-		class Sound;
-	}
+	class SoundSaver
+	{
 
-	namespace disk {
+	public:
 
-		class AbstractDisk;
+		std::weak_ptr<AbstractDisk> disk{};
+		mpc::ui::disk::DiskGui* diskGui{};
 
-		class SoundSaver
-		{
+	private:
+		std::vector<std::weak_ptr<mpc::sampler::Sound>> sounds{};
+		bool wav{ false };
 
-		public:
-			
-			std::weak_ptr<AbstractDisk> disk{};
-			mpc::ui::disk::DiskGui* diskGui{};
+	private:
+		std::thread saveSoundsThread{};
+		static void static_saveSounds(void* this_p);
+		void saveSounds();
 
-		private:
-			std::vector<std::weak_ptr<mpc::sampler::Sound>> sounds{};
-			bool wav{ false };
+	public:
+		SoundSaver(std::vector<std::weak_ptr<mpc::sampler::Sound>> sounds, bool wav);
+		~SoundSaver();
 
-		private:
-			std::thread saveSoundsThread{};
-			static void static_saveSounds(void* this_p);
-			void saveSounds();
-
-		public:
-			SoundSaver(std::vector<std::weak_ptr<mpc::sampler::Sound>> sounds, bool wav);
-			~SoundSaver();
-
-		};
-
-	}
+	};
 }

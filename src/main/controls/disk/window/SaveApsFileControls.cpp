@@ -30,14 +30,16 @@ void SaveApsFileControls::turnWheel(int i)
 void SaveApsFileControls::function(int i)
 {
 	init();
-	string apsFileName;
-	switch (i) {
+	switch (i)
+	{
 	case 3:
 		ls.lock()->openScreen("save");
 		break;
 	case 4:
-		apsFileName = mpc::Util::getFileName(nameGui->getName()) + ".APS";
-		apsSaver = make_unique<mpc::file::aps::ApsSaver>(apsFileName);
+	{
+		string apsFileName = mpc::Util::getFileName(nameGui->getName()) + ".APS";
+		apsSaver = make_unique<mpc::disk::ApsSaver>(apsFileName);
 		break;
+	}
 	}
 }

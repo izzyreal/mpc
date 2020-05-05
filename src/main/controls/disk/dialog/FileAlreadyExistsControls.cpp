@@ -1,10 +1,9 @@
-#include <controls/disk/dialog/FileAlreadyExistsControls.hpp>
+#include "FileAlreadyExistsControls.hpp"
 
 #include <Util.hpp>
 #include <disk/AbstractDisk.hpp>
 #include <disk/MpcFile.hpp>
 #include <file/all/AllParser.hpp>
-#include <file/aps/ApsSaver.hpp>
 #include <ui/NameGui.hpp>
 #include <ui/disk/DiskGui.hpp>
 #include <ui/sampler/SoundGui.hpp>
@@ -50,10 +49,11 @@ void FileAlreadyExistsControls::function(int i)
 		else if (ls.lock()->getPreviousScreenName().compare("saveapsfile") == 0) {
 			auto apsName = mpc::Util::getFileName(nameGui->getName()) + ".APS";
 			auto success = lDisk->getFile(apsName)->del();
-			if(success) {
+			if (success)
+			{
 				lDisk->flush();
 				lDisk->initFiles();
-				mpc::file::aps::ApsSaver apsSaver(apsName);
+				apsSaver = make_unique<mpc::disk::ApsSaver>(apsName);
 			}
 		}
 		else if (ls.lock()->getPreviousScreenName().compare("saveallfile") == 0) {

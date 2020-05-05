@@ -1,24 +1,24 @@
 #pragma once
 #include <controls/disk/AbstractDiskControls.hpp>
 
-namespace mpc {
-	namespace controls {
-		namespace disk {
-			namespace dialog {
+#include <disk/ApsSaver.hpp>
 
-				class FileAlreadyExistsControls
-					: public mpc::controls::disk::AbstractDiskControls
-				{
+#include <memory>
 
-				public:
-					typedef mpc::controls::disk::AbstractDiskControls super;
-					void function(int i) override;
+namespace mpc::controls::disk::dialog {
 
-					FileAlreadyExistsControls();
+	class FileAlreadyExistsControls
+		: public mpc::controls::disk::AbstractDiskControls
+	{
 
-				};
+	private:
+		std::unique_ptr<mpc::disk::ApsSaver> apsSaver;
 
-			}
-		}
-	}
+	public:
+		typedef mpc::controls::disk::AbstractDiskControls super;
+		void function(int i) override;
+		
+		FileAlreadyExistsControls();
+
+	};
 }

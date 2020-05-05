@@ -4,7 +4,7 @@
 #include <Util.hpp>
 #include <disk/AbstractDisk.hpp>
 #include <disk/MpcFile.hpp>
-#include <file/aps/ApsSaver.hpp>
+#include <disk/ApsSaver.hpp>
 #include <ui/NameGui.hpp>
 #include <lcdgui/Field.hpp>
 #include <lcdgui/Underline.hpp>
@@ -141,7 +141,7 @@ void NameControls::saveName() {
 	else if (ngParam.compare("savingaps") == 0) {
 		string apsName = nameGui->getName();
 		apsName.append(".APS");
-		mpc::file::aps::ApsSaver(mpc::Util::getFileName(apsName));
+		mpc::disk::ApsSaver(mpc::Util::getFileName(apsName));
 		nameGui->setNameBeingEdited(false);
 		lLs->setLastFocus("name", "0");
 		return;

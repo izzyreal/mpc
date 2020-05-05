@@ -22,7 +22,6 @@ SoundSaver::SoundSaver(vector<weak_ptr<mpc::sampler::Sound>> sounds, bool wav)
 	disk.lock()->setBusy(true);
 	this->sounds = sounds;
 	this->wav = wav;
-	if (saveSoundsThread.joinable()) saveSoundsThread.join();
 	saveSoundsThread = thread(&SoundSaver::static_saveSounds, this);
 }
 
@@ -35,38 +34,49 @@ void SoundSaver::saveSounds()
 {
 	string const ext = string(wav ? ".WAV" : ".SND");
 	auto lDisk = disk.lock();
+	
 	for (auto s : sounds) {
-		auto skip = false;
-		string fileName = StrUtil::replaceAll(s.lock()->getName(), ' ', "") + ext;
-		Mpc::instance().getLayeredScreen().lock()->createPopup("Writing " + StrUtil::toUpper(fileName), 85);
-		if (lDisk->checkExists(fileName)) {
-			if (diskGui->getSaveReplaceSameSounds()) {
+		string fileName = StrUtil::replaceAll(s.lock()->getName(), ' ', "");
+
+		Mpc::instance().getLayeredScreen().lock()->removePopup();
+		Mpc::instance().getLayeredScreen().lock()->createPopup("SAVING " + (StrUtil::padRight(fileName, " ", 16) + ext), 85);
+
+		if (lDisk->checkExists(fileName))
+		{
+			if (diskGui->getSaveReplaceSameSounds())
+			{
                 lDisk->getFile(fileName)->del(); // possibly prepend auto success =
 			}
-			else {
-				skip = true;
+			else
+			{
+				continue;
 			}
 		}
-		if (skip) continue;
-
-		if (!wav) {
+		
+		if (!wav)
+		{
 			lDisk->writeSound(s);
 		}
-		else {
+		else
+		{
 			lDisk->writeWav(s);
 		}
-		try {
-			this_thread::sleep_for(chrono::milliseconds(500));
+		try
+		{
+			this_thread::sleep_for(chrono::milliseconds(300));
 		}
 		catch (exception e) {
 			e.what();
 		}
 	}
+
     Mpc::instance().getLayeredScreen().lock()->removePopup();
 	Mpc::instance().getLayeredScreen().lock()->openScreen("save");
 	lDisk->setBusy(false);
 }
 
 SoundSaver::~SoundSaver() {
-	if (saveSoundsThread.joinable()) saveSoundsThread.join();
+	if (saveSoundsThread.joinable()) {
+		saveSoundsThread.join();
+	}
 }

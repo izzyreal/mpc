@@ -1,32 +1,26 @@
 #pragma once
 #include <controls/disk/AbstractDiskControls.hpp>
 
+#include <disk/ApsSaver.hpp>
+
 #include <memory>
-#include <file/aps/ApsSaver.hpp>
 
-namespace mpc {
+namespace mpc::controls::disk::window
+{
 
-	namespace controls {
-		namespace disk {
-			namespace window {
+	class SaveApsFileControls
+		: public mpc::controls::disk::AbstractDiskControls
+	{
 
-				class SaveApsFileControls
-					: public mpc::controls::disk::AbstractDiskControls
-				{
+	private:
+		std::unique_ptr<mpc::disk::ApsSaver> apsSaver;
 
-				private:
-					std::unique_ptr<mpc::file::aps::ApsSaver> apsSaver{};
+	public:
+		typedef mpc::controls::disk::AbstractDiskControls super;
+		void turnWheel(int i) override;
+		void function(int i) override;
 
-				public:
-					typedef mpc::controls::disk::AbstractDiskControls super;
-					void turnWheel(int i) override;
-					void function(int i) override;
+		SaveApsFileControls();
 
-					SaveApsFileControls();
-
-				};
-
-			}
-		}
-	}
+	};
 }
