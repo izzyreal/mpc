@@ -35,7 +35,6 @@ void SaveAllFileControls::function(int i)
 		break;
 	case 4:
 		allName = mpc::Util::getFileName(nameGui->getName());
-		lDisk->initFiles();
 		auto existStr = allName + ".ALL";
 		if (lDisk->checkExists(existStr)) {
 			ls.lock()->openScreen("filealreadyexists");

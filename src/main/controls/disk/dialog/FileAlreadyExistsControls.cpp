@@ -25,20 +25,25 @@ void FileAlreadyExistsControls::function(int i)
 	auto lDisk = disk.lock();
 	switch (i) {
 	case 2:
-		if (ls.lock()->getPreviousScreenName().compare("saveaprogram") == 0) {
+		if (ls.lock()->getPreviousScreenName().compare("saveaprogram") == 0)
+		{
 			auto pfileName = mpc::Util::getFileName(nameGui->getName()) + ".PGM";
 			auto success = lDisk->getFile(pfileName)->del();
-			if(success) {
+		
+			if (success)
+			{
 				lDisk->flush();
 				lDisk->initFiles();
 				lDisk->writeProgram(program.lock().get(), pfileName);
 			}
-			ls.lock()->openScreen("save");
 		}
-		else if (ls.lock()->getPreviousScreenName().compare("saveasequence") == 0) {
+		else if (ls.lock()->getPreviousScreenName().compare("saveasequence") == 0)
+		{
 			auto sfileName = mpc::Util::getFileName(nameGui->getName()) + ".MID";
 			auto success = lDisk->getFile(sfileName)->del();
-			if(success) {
+			
+			if (success)
+			{
 				lDisk->flush();
 				lDisk->initFiles();
 				lDisk->writeSequence(sequencer.lock()->getActiveSequence().lock().get(), sfileName);
@@ -46,7 +51,8 @@ void FileAlreadyExistsControls::function(int i)
 			}
 			ls.lock()->openScreen("save");
 		}
-		else if (ls.lock()->getPreviousScreenName().compare("saveapsfile") == 0) {
+		else if (ls.lock()->getPreviousScreenName().compare("saveapsfile") == 0)
+		{
 			auto apsName = mpc::Util::getFileName(nameGui->getName()) + ".APS";
 			auto success = lDisk->getFile(apsName)->del();
 			if (success)
@@ -56,7 +62,8 @@ void FileAlreadyExistsControls::function(int i)
 				apsSaver = make_unique<mpc::disk::ApsSaver>(apsName);
 			}
 		}
-		else if (ls.lock()->getPreviousScreenName().compare("saveallfile") == 0) {
+		else if (ls.lock()->getPreviousScreenName().compare("saveallfile") == 0)
+		{
 			auto allName = mpc::Util::getFileName(nameGui->getName()) + ".ALL";
 			lDisk->initFiles();
 			auto success = lDisk->getFile(allName)->del();
@@ -72,7 +79,8 @@ void FileAlreadyExistsControls::function(int i)
 				ls.lock()->openScreen("save");
 			}
 		}
-		else if (ls.lock()->getPreviousScreenName().compare("saveasound") == 0) {
+		else if (ls.lock()->getPreviousScreenName().compare("saveasound") == 0)
+		{
 			auto s = sampler.lock()->getSound(soundGui->getSoundIndex());
 			auto type = diskGui->getFileTypeSaveSound();
 			auto ext = string(type == 0 ? ".SND" : ".WAV");
@@ -92,23 +100,28 @@ void FileAlreadyExistsControls::function(int i)
 		}
 		break;
 	case 4:
-		if (ls.lock()->getPreviousScreenName().compare("saveaprogram") == 0) {
+		if (ls.lock()->getPreviousScreenName().compare("saveaprogram") == 0)
+		{
 			nameGui->setParameterName("savingpgm");
 			ls.lock()->openScreen("name");
 		}
-		else if (ls.lock()->getPreviousScreenName().compare("saveasequence") == 0) {
+		else if (ls.lock()->getPreviousScreenName().compare("saveasequence") == 0)
+		{
 			nameGui->setParameterName("savingmid");
 			ls.lock()->openScreen("name");
 		}
-		else if (ls.lock()->getPreviousScreenName().compare("saveapsfile") == 0) {
+		else if (ls.lock()->getPreviousScreenName().compare("saveapsfile") == 0)
+		{
 			nameGui->setParameterName("savingaps");
 			ls.lock()->openScreen("name");
 		}
-		else if (ls.lock()->getPreviousScreenName().compare("saveallfile") == 0) {
+		else if (ls.lock()->getPreviousScreenName().compare("saveallfile") == 0)
+		{
 			nameGui->setParameterName("saveallfile");
 			ls.lock()->openScreen("name");
 		}
-		else if (ls.lock()->getPreviousScreenName().compare("saveasound") == 0) {
+		else if (ls.lock()->getPreviousScreenName().compare("saveasound") == 0)
+		{
 			nameGui->setParameterName("saveasound");
 			ls.lock()->openScreen("name");
 		}

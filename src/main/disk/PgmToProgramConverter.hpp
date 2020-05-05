@@ -4,43 +4,39 @@
 #include <vector>
 #include <string>
 
-namespace mpc {
+namespace mpc::sampler {
+	class Sampler;
+	class Program;
+}
 
-	namespace sampler {
-		class Sampler;
-		class Program;
-	}
+namespace mpc::file::pgmreader {
+	class ProgramFileReader;
+}
 
-	namespace file {
-		namespace pgmreader {
-			class ProgramFileReader;
-		}
-	}
+namespace mpc::disk {
+	class MpcFile;
+}
 
-	namespace disk {
-	
-		class MpcFile;
+namespace mpc::disk {
+	class PgmToProgramConverter
+	{
 
-		class PgmToProgramConverter
-		{
+	private:
+		mpc::file::pgmreader::ProgramFileReader* reader{ nullptr };
+		std::weak_ptr<mpc::sampler::Program> program{};
+		bool done{ false };
+		std::vector<std::string> soundNames{};
 
-		private:
-			mpc::file::pgmreader::ProgramFileReader* reader{ nullptr };
-			std::weak_ptr<mpc::sampler::Program> program{};
-			bool done{ false };
-			std::vector<std::string> soundNames{};
+	public:
+		void setSlider();
+		void setNoteParameters();
+		void setMixer();
 
-		public:
-			void setSlider();
-			void setNoteParameters();
-			void setMixer();
+	public:
+		std::weak_ptr<mpc::sampler::Program> get();
+		std::vector<std::string> getSoundNames();
 
-		public:
-			std::weak_ptr<mpc::sampler::Program> get();
-			std::vector<std::string> getSoundNames();
-
-			PgmToProgramConverter(MpcFile* file, std::weak_ptr<mpc::sampler::Sampler> sampler);
-		};
-
-	}
+		PgmToProgramConverter(MpcFile* file, std::weak_ptr<mpc::sampler::Sampler> sampler);
+		~PgmToProgramConverter();
+	};
 }

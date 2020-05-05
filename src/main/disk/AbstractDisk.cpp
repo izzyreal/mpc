@@ -1,10 +1,9 @@
-#include <disk/AbstractDisk.hpp>
+#include "AbstractDisk.hpp"
 
 #include <Mpc.hpp>
 #include <Util.hpp>
 #include <disk/MpcFile.hpp>
 #include <file/wav/WavFile.hpp>
-#include <disk/SoundSaver.hpp>
 #include <file/mid/MidiWriter.hpp>
 #include <file/pgmwriter/PgmWriter.hpp>
 #include <file/sndwriter/SndWriter.hpp>
@@ -220,6 +219,7 @@ void AbstractDisk::writeSequence(mpc::sequencer::Sequence* s, string fileName)
 
 bool AbstractDisk::checkExists(string fileName)
 {
+	initFiles();
 	for (auto& str : getFileNames()) {
 		if (StrUtil::eqIgnoreCase(str, fileName)) {
 			return true;
@@ -246,7 +246,10 @@ MpcFile* AbstractDisk::getFile(string fileName)
 
 void AbstractDisk::writeProgram(mpc::sampler::Program* program, string fileName)
 {
-	if (checkExists(fileName)) return;
+	if (checkExists(fileName)) {
+		return;
+	}
+
 	auto writer = mpc::file::pgmwriter::PgmWriter(program, Mpc::instance().getSampler());
 	auto pgmFile = newFile(fileName);
     auto bytes = writer.get();
@@ -259,7 +262,7 @@ void AbstractDisk::writeProgram(mpc::sampler::Program* program, string fileName)
 	}
 	auto save = Mpc::instance().getUis().lock()->getDiskGui()->getPgmSave();
 	if (save != 0) {
-		SoundSaver(sounds, save == 1 ? false : true);
+		soundSaver = make_unique<SoundSaver>(sounds, save == 1 ? false : true);
 	}
 	flush();
 	initFiles();

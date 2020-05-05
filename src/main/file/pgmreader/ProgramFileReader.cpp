@@ -18,11 +18,21 @@ ProgramFileReader::ProgramFileReader(mpc::disk::MpcFile* f)
     pgmHeader = new PgmHeader(this);
     programName = new ProgramName(this);
     sampleNames = new SoundNames(this);
-    programName = new ProgramName(this);
     midiNotes = new PgmAllNoteParameters(this);
     mixer = new Mixer(this);
     slider = new Slider(this);
     pads = new Pads(this);
+}
+
+ProgramFileReader::~ProgramFileReader()
+{
+    delete pgmHeader;
+    delete programName;
+    delete sampleNames;
+    delete midiNotes;
+    delete mixer;
+    delete slider;
+    delete pads;
 }
 
 std::vector<char> ProgramFileReader::readProgramFileArray()

@@ -15,20 +15,20 @@ using namespace std;
 PgmWriter::PgmWriter(mpc::sampler::Program* program, weak_ptr<mpc::sampler::Sampler> sampler)
 {
 	this->program = program;
-	auto sn = new SampleNames(program, sampler);
-	sampleNames = sn->getSampleNamesArray();
-	auto pwheader = new PWHeader(sn->getNumberOfSamples());
-	header = pwheader->getHeaderArray();
-	auto pwpgmname = new PgmName(program);
-	pgmName = pwpgmname->getPgmNameArray();
-	auto pwslider = new Slider(program);
-	slider = pwslider->getSliderArray();
-	auto pwmidinotes = new MidiNotes(program, sn->getSnConvTable());
-	midiNotes = pwmidinotes->midiNotesArray;
-	auto pwmixer = new Mixer(program);
-	mixer = pwmixer->getMixerArray();
-	auto pwpads = new Pads(program);
-	pads = pwpads->getPadsArray();
+	auto sn = SampleNames(program, sampler);
+	sampleNames = sn.getSampleNamesArray();
+	auto pwheader = PWHeader(sn.getNumberOfSamples());
+	header = pwheader.getHeaderArray();
+	auto pwpgmname = PgmName(program);
+	pgmName = pwpgmname.getPgmNameArray();
+	auto pwslider = Slider(program);
+	slider = pwslider.getSliderArray();
+	auto pwmidinotes = MidiNotes(program, sn.getSnConvTable());
+	midiNotes = pwmidinotes.midiNotesArray;
+	auto pwmixer = Mixer(program);
+	mixer = pwmixer.getMixerArray();
+	auto pwpads = Pads(program);
+	pads = pwpads.getPadsArray();
 }
 
 vector<char> PgmWriter::get()

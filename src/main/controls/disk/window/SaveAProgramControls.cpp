@@ -40,10 +40,9 @@ void SaveAProgramControls::function(int i)
 		if (lDisk->checkExists(fileName)) {
 			nameGui->setName(lProgram->getName());
 			ls.lock()->openScreen("filealreadyexists");
-			return;
+			break;
 		}
 		lDisk->writeProgram(lProgram.get(), fileName);
-		ls.lock()->openScreen("save");
 		break;
 	}
 }

@@ -35,6 +35,11 @@ PgmToProgramConverter::PgmToProgramConverter(MpcFile* file, weak_ptr<mpc::sample
 	done = true;
 }
 
+PgmToProgramConverter::~PgmToProgramConverter()
+{
+	delete reader;
+}
+
 void PgmToProgramConverter::setSlider()
 {
 	auto slider = reader->getSlider();

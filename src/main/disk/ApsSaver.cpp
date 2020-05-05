@@ -16,7 +16,7 @@ ApsSaver::ApsSaver(string apsFileName)
 	
 	this->apsFileName = apsFileName;
 	auto lDisk = Mpc::instance().getDisk().lock();
-	lDisk->initFiles();
+
 	if (lDisk->checkExists(apsFileName)) {
 		Mpc::instance().getLayeredScreen().lock()->openScreen("filealreadyexists");
 	}

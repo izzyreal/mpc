@@ -5,51 +5,48 @@
 #include <vector>
 #include <memory>
 
-namespace mpc {
+namespace mpc::disk {
+	class MpcFile;
+}
 
-	namespace disk {
-		class MpcFile;
-	}
+namespace mpc::file::pgmreader {
+	class PgmHeader;
+	class SoundNames;
+	class ProgramName;
+	class PgmAllNoteParameters;
+	class Mixer;
+	class Slider;
+	class Pads;
+}
 
-	namespace file {
-		namespace pgmreader {
+namespace mpc::file::pgmreader {
 
-			class PgmHeader;
-			class SoundNames;
-			class ProgramName;
-			class PgmAllNoteParameters;
-			class Mixer;
-			class Slider;
-			class Pads;
+	class ProgramFileReader
+	{
 
-			class ProgramFileReader
-			{
+	private:
+		PgmHeader* pgmHeader{};
+		SoundNames* sampleNames{};
+		ProgramName* programName{};
+		PgmAllNoteParameters* midiNotes{};
+		Mixer* mixer{};
+		Slider* slider{};
+		Pads* pads{};
+		std::weak_ptr<moduru::file::File> programFile{};
 
-			private:
-				PgmHeader* pgmHeader{};
-				SoundNames* sampleNames{};
-				ProgramName* programName{};
-				PgmAllNoteParameters* midiNotes{};
-				Mixer* mixer{};
-				Slider* slider{};
-				Pads* pads{};
-				std::weak_ptr<moduru::file::File> programFile{};
+	public:
+		std::vector<char> readProgramFileArray();
 
-			public:
-				std::vector<char> readProgramFileArray();
+	public:
+		PgmHeader* getHeader();
+		SoundNames* getSampleNames();
+		PgmAllNoteParameters* getAllNoteParameters();
+		Mixer* getMixer();
+		Pads* getPads();
+		ProgramName* getProgramName();
+		Slider* getSlider();
 
-			public:
-				PgmHeader* getHeader();
-				SoundNames* getSampleNames();
-				PgmAllNoteParameters* getAllNoteParameters();
-				Mixer* getMixer();
-				Pads* getPads();
-				ProgramName* getProgramName();
-				Slider* getSlider();
-
-				ProgramFileReader(mpc::disk::MpcFile* f);
-			};
-
-		}
-	}
+		ProgramFileReader(mpc::disk::MpcFile* f);
+		~ProgramFileReader();
+	};
 }

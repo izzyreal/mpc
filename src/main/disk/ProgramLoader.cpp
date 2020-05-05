@@ -97,9 +97,9 @@ void ProgramLoader::loadSound(string soundFileName, string ext, MpcFile* soundFi
 	auto sl = SoundLoader(Mpc::instance().getSampler().lock()->getSounds(), replace);
 	sl.setPartOfProgram(true);
 	try {
+		showPopup(soundFileName, ext, soundFile->length());
 		addedSoundIndex = sl.loadSound(soundFile);
 		if (addedSoundIndex != -1) {
-			showPopup(soundFileName, ext, soundFile->length());
 			(*soundsDestIndex)[loadSoundIndex] = addedSoundIndex;
 		}
 	}
