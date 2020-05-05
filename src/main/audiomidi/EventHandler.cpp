@@ -83,8 +83,10 @@ void EventHandler::handleNoThru(weak_ptr<mpc::sequencer::Event> e, mpc::sequence
 		sampler.lock()->playMetronome(ne.get(), eventFrame);
 		return;
 	}
-	else {
-		if (lSequencer->isCountingIn() && event->getTick() != -1) {
+	else
+	{
+		if (lSequencer->isCountingIn() && event->getTick() != -1)
+		{
 			return;
 		}
 	}
@@ -93,11 +95,21 @@ void EventHandler::handleNoThru(weak_ptr<mpc::sequencer::Event> e, mpc::sequence
 	auto ne = dynamic_pointer_cast<mpc::sequencer::NoteEvent>(event);
 	auto me = dynamic_pointer_cast<mpc::sequencer::MixerEvent>(event);
 
-	if (tce && tce->getTempo().toDouble() != lSequencer->getTempo().toDouble()) {
-		lSequencer->setTempo(tce->getTempo());
+	if (tce && tce->getTempo().toDouble() != lSequencer->getTempo().toDouble())
+	{
+		// Currently unsure whether MASTER tempo mode supports tempo changes.
+		// I suspect it does. This would mean Sequencer would need to house a
+		// master tempo change meta track.  We'd need to route some get/set
+		// tempo calls probably. Until further notice we only allow
+		// tempo change events if the tempo source is SEQUENCE.
+		if (lSequencer->isTempoSourceSequenceEnabled())
+		{
+			lSequencer->setTempo(tce->getTempo());
+		}
 		return;
 	}
-	else if (mce) {
+	else if (mce)
+	{
 		auto mpcMidiPorts = Mpc::instance().getMidiPorts().lock();
 		auto clockMsg = dynamic_cast<ctoot::midi::core::ShortMessage*>(mce->getShortMessage());
 		clockMsg->setMessage(mce->getStatus());

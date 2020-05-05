@@ -115,7 +115,11 @@ bool Sequencer::endOfSong = false;
 
 void Sequencer::setTempo(BCMath i)
 {
-	if (i.toDouble() < 30.0 || i.toDouble() > 300.0) return;
+	if (i.toDouble() < 30.0 || i.toDouble() > 300.0)
+	{
+		return;
+	}
+
 	auto s = getActiveSequence().lock();
 	if (s && s->isUsed() && tempoSourceSequenceEnabled) {
 		auto tce = getCurrentTempoChangeEvent().lock();
@@ -142,9 +146,12 @@ BCMath Sequencer::getTempo()
 	if (!isPlaying() && !getActiveSequence().lock()->isUsed()) {
 		return tempo;
 	}
-	if (tempoSourceSequenceEnabled) {
+
+	if (tempoSourceSequenceEnabled)
+	{
 		auto tce = getCurrentTempoChangeEvent().lock();
-		if (tce) {
+		if (tce)
+		{
 			return tce->getTempo();
 		}
 		return getActiveSequence().lock()->getInitialTempo();
@@ -156,16 +163,24 @@ weak_ptr<TempoChangeEvent> Sequencer::getCurrentTempoChangeEvent()
 {
 	auto index = -1;
 	auto s = getActiveSequence().lock();
-	for (auto& tce : s->getTempoChangeEvents()) {
+	
+	for (auto& tce : s->getTempoChangeEvents())
+	{
 		auto lTce = tce.lock();
-		if (getTickPosition() >= lTce->getTick()) {
+		if (getTickPosition() >= lTce->getTick())
+		{
 			index++;
 		}
-		else {
+		else
+		{
 			break;
 		}
 	}
-	if (index == -1) index++;
+	
+	if (index == -1)
+	{
+		index++;
+	}
 	return s->getTempoChangeEvents()[index];
 }
 
@@ -335,25 +350,40 @@ bool Sequencer::isPlaying()
 
 void Sequencer::play(bool fromStart)
 {
-    if (isPlaying()) return;
+	if (isPlaying())
+	{
+		return;
+	}
+
     endOfSong = false;
     repeats = 0;
 	auto songGui = Mpc::instance().getUis().lock()->getSongGui();
 	auto currentSong = songs[songGui->getSelectedSongIndex()];
     Step* currentStep = nullptr;
-	if (songMode) {
-		if (!currentSong->isUsed()) return;
-
-		if (fromStart) {
-			songGui->setOffset(-1);
-		}
-		if (songGui->getOffset() + 1 > currentSong->getStepAmount() - 1) {
+	if (songMode)
+	{
+		if (!currentSong->isUsed())
+		{
 			return;
 		}
+
+		if (fromStart)
+		{
+			songGui->setOffset(-1);
+		}
+		
+		if (songGui->getOffset() + 1 > currentSong->getStepAmount() - 1)
+		{
+			return;
+		}
+		
 		int step = songGui->getOffset() + 1;
-		if (step > currentSong->getStepAmount()) {
+		
+		if (step > currentSong->getStepAmount())
+		{
 			step = currentSong->getStepAmount() - 1;
 		}
+		
 		currentStep = currentSong->getStep(step);
 	}
 	move(position);
@@ -362,24 +392,31 @@ void Sequencer::play(bool fromStart)
 	auto swGui = Mpc::instance().getUis().lock()->getSequencerWindowGui();
 
 
-    if (!countEnabled || swGui->getCountInMode() == 0 || (swGui->getCountInMode() == 1 && recording == false)) {
-		if (fromStart) {
+    if (!countEnabled || swGui->getCountInMode() == 0 || (swGui->getCountInMode() == 1 && recording == false))
+	{
+		if (fromStart)
+		{
 			move(0);
 		}
     }
 	auto s = getActiveSequence().lock();
-	if (countEnabled && !songMode) {
-		if (swGui->getCountInMode() == 2 || (swGui->getCountInMode() == 1 && recording == true)) {
+	if (countEnabled && !songMode)
+	{
+		if (swGui->getCountInMode() == 2 || (swGui->getCountInMode() == 1 && recording == true))
+		{
 			move(s->getLoopStart());
 			startCountingIn();
 		}
 	}
 
 	auto hw = Mpc::instance().getHardware().lock();
-	if (!songMode) {
-		if (!s->isUsed()) {
+	if (!songMode)
+	{
+		if (!s->isUsed())
+		{
 			return;
 		}
+
 		s->initLoop();
 
 		if (recording || overdubbing) {
@@ -391,17 +428,21 @@ void Sequencer::play(bool fromStart)
 		}
 
 	}
+
 	hw->getLed("play").lock()->light(true);
 	auto ams = Mpc::instance().getAudioMidiServices().lock();
 	auto directToDiskRecordGui = Mpc::instance().getUis().lock()->getD2DRecorderGui();
 	bool offline = directToDiskRecordGui->isOffline();
 	
 	int rate = ams->getAudioServer()->getSampleRate();
-	if (ams->isBouncePrepared()) {
-		if (offline) {
+	if (ams->isBouncePrepared())
+	{
+		if (offline)
+		{
 			vector<int> rates{ 44100, 48000, 88200 };
 			rate = rates[directToDiskRecordGui->getSampleRate()];
 		}
+
 		ams->startBouncing();
 	}
 	else {
@@ -1194,6 +1235,7 @@ void Sequencer::move(int tick)
 	s->resetTrackEventIndices(position);
 
 	notifyTimeDisplay();
+
 	if (getTempo().toDouble() != previousTempo.toDouble()) {
 		previousTempo = getTempo();
 		setChanged();
