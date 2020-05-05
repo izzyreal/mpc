@@ -246,19 +246,20 @@ LayeredScreen::LayeredScreen()
 		effects.push_back(move(effect));
 	}
 
-	FILE* fp0 = FileUtil::fopenw(string(mpc::StartUp::resPath + "mainpanel.json").c_str(), "r");
-	FILE* fp1 = FileUtil::fopenw(string(mpc::StartUp::resPath + "windowpanel.json").c_str(), "r");
-	FILE* fp2 = FileUtil::fopenw(string(mpc::StartUp::resPath + "dialogpanel.json").c_str(), "r");
-	FILE* fp3 = FileUtil::fopenw(string(mpc::StartUp::resPath + "dialog2panel.json").c_str(), "r");
+	auto path0 = string(mpc::StartUp::resPath + "mainpanel.json");
+	auto path1 = string(mpc::StartUp::resPath + "windowpanel.json");
+	auto path2 = string(mpc::StartUp::resPath + "dialogpanel.json");
+	auto path3 = string(mpc::StartUp::resPath + "dialog2panel.json");
 
-	FILE* fPointers[4]{ fp0, fp1, fp2, fp3 };
+	vector<string> paths = { path0, path1, path2, path3 };
 
 	for (int i = 0; i < LAYER_COUNT; i++) {
-		char readBuffer[65536 * 2];
+		char readBuffer[256];
 		layers[i] = make_unique<Layer>(this, &atlas, &font);
-		FileReadStream is(fPointers[i], readBuffer, sizeof(readBuffer));
+		auto fp = FileUtil::fopenw(paths[i], "r");;
+		FileReadStream is(fp, readBuffer, sizeof(readBuffer));
 		layerJsons[i].ParseStream(is);
-		fclose(fPointers[i]);
+		fclose(fp);
 	}
 }
 
