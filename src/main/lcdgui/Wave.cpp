@@ -76,7 +76,7 @@ void Wave::setSelection(unsigned int start, unsigned int end) {
 	SetDirty();
 }
 
-void Wave::makeLine(std::vector<std::vector<std::vector<int> > >* lines, std::vector<bool>* colors, unsigned int x) {
+void Wave::makeLine(std::vector<std::vector<std::vector<int>> >* lines, std::vector<bool>* colors, unsigned int x) {
 	int offset = 0;
 	float peakPos = 0;
 	float peakNeg = 0;
@@ -181,7 +181,7 @@ void Wave::makeLine(std::vector<std::vector<std::vector<int> > >* lines, std::ve
 	}
 }
 
-void Wave::Draw(std::vector<std::vector<bool> >* pixels) {
+void Wave::Draw(std::vector<std::vector<bool>>* pixels) {
 	if (sampleData == nullptr) return;
 	if (IsHidden()) return;
 	vector<vector<vector<int>>> lines;

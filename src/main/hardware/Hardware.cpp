@@ -67,7 +67,7 @@ weak_ptr<Led> Hardware::getLed(std::string label) {
 	return weak_ptr<Led>();
 }
 
-vector<shared_ptr<Led> > Hardware::getLeds() {
+vector<shared_ptr<Led>> Hardware::getLeds() {
 	return leds;
 }
 

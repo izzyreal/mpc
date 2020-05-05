@@ -70,7 +70,7 @@ namespace mpc {
 			unsigned int GetTextEntryLength();
 
 		public:
-			void Draw(std::vector<std::vector<bool> >* pixels) override;
+			void Draw(std::vector<std::vector<bool>>* pixels) override;
 			void Hide(bool b) override;
 
 		public:

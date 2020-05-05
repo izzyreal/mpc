@@ -8,7 +8,7 @@ MixerTopBackground::MixerTopBackground(MRECT rect)
 }
 
 
-void MixerTopBackground::Draw(std::vector<std::vector<bool> >* pixels)
+void MixerTopBackground::Draw(std::vector<std::vector<bool>>* pixels)
 {
 	for (int i = rect.L; i < rect.R + 1; i++) {
 		for (int j = rect.T; j < rect.B + 1; j++) {

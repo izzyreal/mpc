@@ -18,7 +18,7 @@ void HorizontalBar::setValue(int value)
 	SetDirty();
 }
 
-void HorizontalBar::Draw(std::vector<std::vector<bool> >* pixels) {
+void HorizontalBar::Draw(std::vector<std::vector<bool>>* pixels) {
 	if (IsHidden()) return;
 	int x = rect.L;
 	int y = rect.T;

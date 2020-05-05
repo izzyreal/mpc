@@ -35,7 +35,7 @@ void TwoDots::setVisible(int i, bool b)
 	SetDirty();
 }
 
-void TwoDots::Draw(std::vector<std::vector<bool> >* pixels)
+void TwoDots::Draw(std::vector<std::vector<bool>>* pixels)
 {
 	vector<vector<vector<int>>> lines;
 	vector<bool> colors;

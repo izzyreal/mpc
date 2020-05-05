@@ -16,13 +16,13 @@ EnvGraph::EnvGraph()
 	rect = MRECT(10, 10, 200, 50);
 }
 
-void EnvGraph::setCoordinates(vector<vector<int> > ia)
+void EnvGraph::setCoordinates(vector<vector<int>> ia)
 {
 	coordinates = ia;
 	SetDirty();
 }
 
-void EnvGraph::Draw(std::vector<std::vector<bool> >* pixels)
+void EnvGraph::Draw(std::vector<std::vector<bool>>* pixels)
 {
 	auto csn = Mpc::instance().getLayeredScreen().lock()->getCurrentScreenName();
 	int xoff = (csn.compare("programparams") == 0) ? 76 : 92;

@@ -14,7 +14,7 @@ using namespace mpc::disk;
 using namespace moduru::lang;
 using namespace std;
 
-SoundSaver::SoundSaver(vector<weak_ptr<mpc::sampler::Sound> > sounds, bool wav) 
+SoundSaver::SoundSaver(vector<weak_ptr<mpc::sampler::Sound>> sounds, bool wav) 
 {
 	
 	disk = Mpc::instance().getDisk();

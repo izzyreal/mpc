@@ -21,7 +21,7 @@ void VerticalBar::setColor(bool on)
 	SetDirty();
 }
 
-void VerticalBar::Draw(std::vector<std::vector<bool> >* pixels)
+void VerticalBar::Draw(std::vector<std::vector<bool>>* pixels)
 {
 	//if (value > 2) {
 		int valuePixels = (int)((value - 2) / 3);

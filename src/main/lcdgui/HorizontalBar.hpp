@@ -15,7 +15,7 @@ namespace mpc {
 			void setValue(int value);
 
 		public:
-			void Draw(std::vector<std::vector<bool> >* pixels) override;
+			void Draw(std::vector<std::vector<bool>>* pixels) override;
 
 		public:
 			HorizontalBar(MRECT rect, int value);

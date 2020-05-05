@@ -41,7 +41,7 @@ bool Component::NeedsClearing()
 	return clearRects.size() != 0;
 }
 
-void Component::Clear(std::vector<std::vector<bool> >* pixels) {
+void Component::Clear(std::vector<std::vector<bool>>* pixels) {
 	for (int k = 0; k < clearRects.size(); k++) {
 		auto r = clearRects[k];
 		bool alreadyDone = false;

@@ -11,7 +11,7 @@ Underline::Underline()
 	rect = MRECT(0, 0, 247, 50);
 }
 
-void Underline::Draw(vector<vector<bool> >* pixels)
+void Underline::Draw(vector<vector<bool>>* pixels)
 {
 	if (IsHidden()) return;
 	for (int i = 0; i < 16; i++) {

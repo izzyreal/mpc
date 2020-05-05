@@ -28,7 +28,7 @@ void TextComp::Hide(bool b) {
 	Component::Hide(b);
 }
 
-void TextComp::Draw(std::vector<std::vector<bool> >* pixels) {
+void TextComp::Draw(std::vector<std::vector<bool>>* pixels) {
 
 	int textx = x;
 	int texty = y;

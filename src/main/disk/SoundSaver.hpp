@@ -32,7 +32,7 @@ namespace mpc {
 			mpc::ui::disk::DiskGui* diskGui{};
 
 		private:
-			std::vector<std::weak_ptr<mpc::sampler::Sound> > sounds{};
+			std::vector<std::weak_ptr<mpc::sampler::Sound>> sounds{};
 			bool wav{ false };
 
 		private:
@@ -41,7 +41,7 @@ namespace mpc {
 			void saveSounds();
 
 		public:
-			SoundSaver(std::vector<std::weak_ptr<mpc::sampler::Sound> > sounds, bool wav);
+			SoundSaver(std::vector<std::weak_ptr<mpc::sampler::Sound>> sounds, bool wav);
 			~SoundSaver();
 
 		};

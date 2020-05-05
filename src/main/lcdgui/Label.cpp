@@ -27,7 +27,7 @@ void Label::enableRigorousClearing() {
 	rigorousClearing = true;
 }
 
-void Label::Draw(vector<vector<bool> >* pixels) {
+void Label::Draw(vector<vector<bool>>* pixels) {
 	const int margin = noLeftMargin ? 0 : 1;
 	if (rigorousClearing) {
 		for (int j = 0; j < w; j++) {

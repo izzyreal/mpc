@@ -45,7 +45,7 @@ void Field::initialize(std::string name, int x, int y, int columns) {
 	//loseFocus(name);
 }
 
-void Field::Draw(vector<vector<bool> >* pixels) {
+void Field::Draw(vector<vector<bool>>* pixels) {
 	const int margin = noLeftMargin ? 0 : 1;
 	if (opaque) {
 		for (int j = 0; j < w; j++) {

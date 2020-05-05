@@ -69,7 +69,7 @@ void FunctionKeys::enable(int i)
 	SetDirty();
 }
 
-void FunctionKeys::clearAll(std::vector<std::vector<bool> >* pixels) {
+void FunctionKeys::clearAll(std::vector<std::vector<bool>>* pixels) {
 	for (int j = 0; j < 248; j++) {
 		for (int k = 51; k < 60; k++) {
 			(*pixels)[j][k] = false;
@@ -77,7 +77,7 @@ void FunctionKeys::clearAll(std::vector<std::vector<bool> >* pixels) {
 	}
 }
 
-void FunctionKeys::Draw(std::vector<std::vector<bool> >* pixels) {
+void FunctionKeys::Draw(std::vector<std::vector<bool>>* pixels) {
 	vector<int> xPos = vector<int>{ 2, 43, 84, 125, 166, 207 };
 	vector<int> types = vector<int>{ box0, box1, box2, box3, box4, box5 };
 	bool border = false;

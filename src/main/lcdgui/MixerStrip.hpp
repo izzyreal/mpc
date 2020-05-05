@@ -48,10 +48,10 @@ namespace mpc {
 			std::weak_ptr<MixerFaderBackground> mixerFaderBackground;
 			int selection;
 			mpc::ui::sampler::MixerGui* mixGui{ nullptr };
-			std::vector<std::weak_ptr<Label> > labels;
+			std::vector<std::weak_ptr<Label>> labels;
 
 		public:
-			std::vector<std::weak_ptr<Component> > getMixerStrip();
+			std::vector<std::weak_ptr<Component>> getMixerStrip();
 			void setValueA(int i);
 			void setValueB(int i);
 			void initLabels();

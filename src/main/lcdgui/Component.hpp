@@ -28,8 +28,8 @@ namespace mpc {
 			MRECT* getDirtyArea();
 
 		public:
-			virtual void Draw(std::vector<std::vector<bool> >* pixels) {}
-			virtual void Clear(std::vector<std::vector<bool> >* pixels);
+			virtual void Draw(std::vector<std::vector<bool>>* pixels) {}
+			virtual void Clear(std::vector<std::vector<bool>>* pixels);
 
 			MRECT* GetRECT();
 

@@ -34,10 +34,10 @@ namespace mpc {
 			void initialize(rapidjson::Value& fbLabels, rapidjson::Value& fbTypes);
 			void disable(int i);
 			void enable(int i);
-			void clearAll(std::vector<std::vector<bool> >* pixels);
+			void clearAll(std::vector<std::vector<bool>>* pixels);
 
 		public:
-			void Draw(std::vector<std::vector<bool> >* pixels) override;
+			void Draw(std::vector<std::vector<bool>>* pixels) override;
 
 		public:
 			FunctionKeys(std::vector<std::vector<bool>>* atlas, moduru::gui::bmfont* font);

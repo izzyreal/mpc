@@ -251,7 +251,7 @@ void AbstractDisk::writeProgram(mpc::sampler::Program* program, string fileName)
 	auto pgmFile = newFile(fileName);
     auto bytes = writer.get();
 	pgmFile->setFileData(&bytes);
-	vector<std::weak_ptr<mpc::sampler::Sound> > sounds;
+	vector<std::weak_ptr<mpc::sampler::Sound>> sounds;
 	for (auto& n : program->getNotesParameters()) {
 		if (n->getSndNumber() != -1) {
 			sounds.push_back(dynamic_pointer_cast<mpc::sampler::Sound>(Mpc::instance().getSampler().lock()->getSound(n->getSndNumber()).lock()));

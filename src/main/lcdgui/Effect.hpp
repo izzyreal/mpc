@@ -15,7 +15,7 @@ namespace mpc {
 			void setFilled(bool b);
 
 		public:
-			void Draw(std::vector<std::vector<bool> >* pixels) override;
+			void Draw(std::vector<std::vector<bool>>* pixels) override;
 
 		public:
 			Effect(MRECT rect);

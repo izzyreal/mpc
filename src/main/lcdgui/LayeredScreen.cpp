@@ -92,10 +92,6 @@
 #include <cmath>
 #include <set>
 
-using namespace std;
-
-using namespace rapidjson;
-
 using namespace mpc::ui;
 using namespace mpc::lcdgui;
 
@@ -111,6 +107,10 @@ using namespace mpc::ui::disk;
 using namespace mpc::ui::disk::window;
 
 using namespace moduru::file;
+
+using namespace rapidjson;
+
+using namespace std;
 
 static vector<string> samplerWindowNames = vector<string>{ "program", "deleteprogram", "deleteallprograms", "createnewprogram",
 "copyprogram", "assignmentview", "initpadassign", "copynoteparameters", "velocitymodulation",
@@ -137,7 +137,7 @@ LayeredScreen::LayeredScreen()
 	font = bmfParser.getLoadedFont();
 
 	
-	pixels = std::vector < std::vector <bool>>(248, std::vector<bool>(60));
+	pixels = vector<vector<bool>>(248, vector<bool>(60));
 	popup = make_unique<mpc::lcdgui::Popup>(&atlas, &font);
 	popup->Hide(true);
 
@@ -345,7 +345,7 @@ int LayeredScreen::openScreen(string screenName) {
 
 	previousScreenName = currentScreenName;
 	currentScreenName = screenName;
-	std::string firstField = "";
+	string firstField = "";
 	int oldLayer = currentLayer;
 	for (int i = 0; i < LAYER_COUNT; i++) {
 		if (layerJsons[i].HasMember(screenName.c_str())) {
@@ -371,12 +371,12 @@ int LayeredScreen::openScreen(string screenName) {
 	return currentLayer;
 }
 
-std::vector<std::vector<bool> >* LayeredScreen::getPixels() {
+vector<vector<bool>>* LayeredScreen::getPixels() {
 	return &pixels;
 }
 
 void LayeredScreen::Draw() {
-	std::set<std::shared_ptr<mpc::lcdgui::Component>> dirtyComponents;
+	set<shared_ptr<mpc::lcdgui::Component>> dirtyComponents;
 	for (int i = 0; i <= currentLayer; i++) {
 
 		auto components = layers[i]->getComponentsThatNeedClearing();
@@ -607,7 +607,7 @@ void LayeredScreen::redrawEnvGraph(int attack, int decay)
 	vector<int> line1 { 75, 43, 75 + (int)(attack * 0.17), 24 };
 	vector<int> line2 { 119 - (int)(decay * 0.17), 24, 119, 43 };
 	vector<int> line3  { 75 + (int)(attack * 0.17), 24, 119 - (int)(decay * 0.17), 24 };
-	vector<vector<int> > lines = { line1, line2, line3 };
+	vector<vector<int>> lines = { line1, line2, line3 };
 	envGraph->setCoordinates(lines);
 }
 
@@ -746,16 +746,16 @@ void LayeredScreen::drawFunctionKeys(string screenName)
 	getFunctionKeys()->initialize(fblabels, fbtypes);
 }
 
-std::weak_ptr<mpc::lcdgui::TwoDots> LayeredScreen::getTwoDots()
+weak_ptr<mpc::lcdgui::TwoDots> LayeredScreen::getTwoDots()
 {
 	return twoDots;
 }
 
-std::weak_ptr<Wave> LayeredScreen::getWave() {
+weak_ptr<Wave> LayeredScreen::getWave() {
 	return wave;
 }
 
-std::weak_ptr<Wave> LayeredScreen::getFineWave()
+weak_ptr<Wave> LayeredScreen::getFineWave()
 {
 	return fineWave;
 }
@@ -877,11 +877,11 @@ string LayeredScreen::findAbove(string tf0) {
 	return result;
 }
 
-std::weak_ptr<mpc::lcdgui::Underline> LayeredScreen::getUnderline() {
+weak_ptr<mpc::lcdgui::Underline> LayeredScreen::getUnderline() {
 	return underline;
 }
 
-std::weak_ptr<Field> LayeredScreen::lookupField(std::string s)
+weak_ptr<Field> LayeredScreen::lookupField(string s)
 {
 	for (auto& a : layers[currentLayer]->getAllFields() ) {
 		auto candidate = dynamic_pointer_cast<Field>(a.lock());
@@ -892,7 +892,7 @@ std::weak_ptr<Field> LayeredScreen::lookupField(std::string s)
 	return weak_ptr<Field>();
 }
 
-std::weak_ptr<Label> LayeredScreen::lookupLabel(std::string s)
+weak_ptr<Label> LayeredScreen::lookupLabel(string s)
 {
 	for (auto& a : layers[currentLayer]->getAllLabels()) {
 		auto candidate = dynamic_pointer_cast<Label>(a.lock());

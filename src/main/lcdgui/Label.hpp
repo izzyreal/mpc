@@ -21,7 +21,7 @@ namespace mpc {
 			void enableRigorousClearing();
 
 		public:
-			void Draw(std::vector<std::vector<bool> >* pixels) override;
+			void Draw(std::vector<std::vector<bool>>* pixels) override;
 
 		public:
 			Label(std::vector<std::vector<bool>>* atlas, moduru::gui::bmfont* font);

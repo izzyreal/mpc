@@ -22,7 +22,7 @@ namespace mpc {
 			void setVisible(int i, bool b);
 
 		public:
-			void Draw(std::vector<std::vector<bool> >* pixels) override;
+			void Draw(std::vector<std::vector<bool>>* pixels) override;
 
 		public:
 			TwoDots();

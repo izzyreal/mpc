@@ -15,7 +15,7 @@ void Effect::setFilled(bool b)
 	SetDirty();
 }
 
-void Effect::Draw(std::vector<std::vector<bool> >* pixels) {
+void Effect::Draw(std::vector<std::vector<bool>>* pixels) {
 	if (IsHidden()) return;
 	int x = rect.L;
 	int y = rect.T;

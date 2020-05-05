@@ -17,7 +17,7 @@ namespace mpc {
 
 		public:
 			virtual void setCoordinates(std::vector<std::vector<int>> ia);
-			void Draw(std::vector<std::vector<bool> >* pixels) override;
+			void Draw(std::vector<std::vector<bool>>* pixels) override;
 
 		public:
 			EnvGraph();

@@ -212,7 +212,7 @@ vector<weak_ptr<mpc::lcdgui::Component>> Layer::getComponentsThatNeedClearing() 
 }
 
 vector<weak_ptr<mpc::lcdgui::Component>> Layer::getAllLabelsAndFields() {
-	vector<weak_ptr<mpc::lcdgui::Component> > result;
+	vector<weak_ptr<mpc::lcdgui::Component>> result;
 	for (auto& c : getAllLabels()) {
 		result.push_back(c);
 	}

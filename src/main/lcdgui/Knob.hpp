@@ -17,7 +17,7 @@ namespace mpc {
 			void setColor(bool on);
 
 		public:
-			void Draw(std::vector<std::vector<bool> >* pixels) override;
+			void Draw(std::vector<std::vector<bool>>* pixels) override;
 
 		public:
 			Knob(MRECT rect);

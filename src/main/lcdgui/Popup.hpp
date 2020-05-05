@@ -26,7 +26,7 @@ namespace mpc {
 			void setText(std::string text, int pos);
 
 		public:
-			void Draw(std::vector<std::vector<bool> >* pixels) override;
+			void Draw(std::vector<std::vector<bool>>* pixels) override;
 
 		public:
 			Popup(std::vector<std::vector<bool>>* atlas, moduru::gui::bmfont* font);
