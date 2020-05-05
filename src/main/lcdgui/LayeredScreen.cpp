@@ -251,7 +251,7 @@ LayeredScreen::LayeredScreen()
 	FILE* fp2 = FileUtil::fopenw(string(mpc::StartUp::resPath + "dialogpanel.json").c_str(), "r");
 	FILE* fp3 = FileUtil::fopenw(string(mpc::StartUp::resPath + "dialog2panel.json").c_str(), "r");
 
-	FILE* fPointers[LAYER_COUNT]{ fp0, fp1, fp2, fp3 };
+	FILE* fPointers[4]{ fp0, fp1, fp2, fp3 };
 
 	for (int i = 0; i < LAYER_COUNT; i++) {
 		char readBuffer[65536 * 2];

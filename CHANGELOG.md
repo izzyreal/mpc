@@ -1,4 +1,5 @@
 ## v0.1.3 (not released yet)
+* Fix various Timing Correct screen cosmetic issues and some functionality
 * Honor full-level when clicking pads with the mouse
 * Fix an UNDO + Timing Correct related crash
 
