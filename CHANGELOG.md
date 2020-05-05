@@ -3,6 +3,7 @@
 * Honor full-level when clicking pads with the mouse
 * Fix an UNDO + Timing Correct related crash
 * Fix MASTER tempo source (currently no tempo changes are supported)
+* Popups when saving SND/WAV as part of a PGM or APS
 
 ## v0.1.2
 * Fix Erase screen crashes and cosmetic issues
