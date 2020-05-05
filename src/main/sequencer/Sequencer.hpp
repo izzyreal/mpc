@@ -203,7 +203,7 @@ namespace mpc {
 			int getSecondSequenceIndex();
 			void setSecondSequenceIndex(int i);
 			void flushTrackNoteCache();
-			void storeActiveSequenceInPlaceHolder();
+			void storeActiveSequenceInUndoPlaceHolder();
 			bool isOverDubbing();
 			int getPlayStartTick();
 

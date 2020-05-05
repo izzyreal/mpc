@@ -3,10 +3,6 @@
 #include <memory>
 #include <vector>
 
-namespace mpc {
-	
-}
-
 namespace mpc::ui {
 	class Uis;
 }

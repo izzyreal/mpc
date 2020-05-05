@@ -232,14 +232,20 @@ void Sequencer::setDefaultSequenceName(string s)
 
 void Sequencer::setActiveSequenceIndex(int i)
 {
-	if (i < 0 || i > 98) return;
+	if (i < 0 || i > 98)
+	{
+		return;
+	}
 
 	activeSequenceIndex = i;
-	if (!isPlaying()) {
+	
+	if (!isPlaying())
+	{
 		position = 0;
 		setChanged();
 		notifyObservers(string("now"));
 	}
+	
 	setChanged();
 	notifyObservers(string("seqnumbername"));
 	setChanged();
@@ -424,11 +430,11 @@ void Sequencer::undoSeq()
 	
 	sequences[activeSequenceIndex]->resetTrackEventIndices(position);
 
-	MLOG("After performing undo, the initial tempo is " + sequences[activeSequenceIndex]->getInitialTempo().toString());
-
 	lastRecordingActive = !lastRecordingActive;
 	auto hw = Mpc::instance().getHardware().lock();
 	hw->getLed("undoseq").lock()->light(lastRecordingActive);
+
+	setActiveSequenceIndex(getActiveSequenceIndex()); // Shortcut to notifying SequencerObserver
 }
 
 void Sequencer::clearUndoSeq()
@@ -1371,7 +1377,7 @@ void Sequencer::flushTrackNoteCache()
 	}
 }
 
-void Sequencer::storeActiveSequenceInPlaceHolder()
+void Sequencer::storeActiveSequenceInUndoPlaceHolder()
 {
 	auto copy = copySequence(sequences[activeSequenceIndex]);
 	undoPlaceHolder.swap(copy);

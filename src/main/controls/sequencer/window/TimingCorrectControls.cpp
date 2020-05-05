@@ -17,15 +17,16 @@ TimingCorrectControls::TimingCorrectControls()
 void TimingCorrectControls::function(int i)
 {
 	super::function(i);
-	vector<int> noteRange;
-	auto lTrk = track.lock();
 	switch (i) {
 	case 4:
-		if (swGui->getNoteValue() == 0)
-			return;
+	{
+		sequencer.lock()->storeActiveSequenceInUndoPlaceHolder();
 
+		auto lTrk = track.lock();
 		lTrk->correctTimeRange(swGui->getTime0(), swGui->getTime1(), sequencer.lock()->getTickValues()[swGui->getNoteValue()]);
-		noteRange = vector<int>(2);
+
+		vector<int> noteRange(2);
+
 		if (lTrk->getBusNumber() != 0) {
 			if (swGui->getDrumNote() != 34) {
 				noteRange[0] = swGui->getDrumNote();
@@ -44,6 +45,7 @@ void TimingCorrectControls::function(int i)
 		lTrk->shiftTiming(lTrk->getEventRange(swGui->getTime0(), swGui->getTime1()), swGui->isShiftTimingLater(), swGui->getAmount(), sequence.lock()->getLastTick());
 		ls.lock()->openScreen("sequencer");
 		break;
+	}
 	}
 }
 

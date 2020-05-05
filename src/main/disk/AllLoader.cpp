@@ -153,7 +153,11 @@ AllLoader::~AllLoader()
 void AllLoader::convertSequences(const bool indiv)
 {
 	int index = -1;
-	if (!indiv) Mpc::instance().getSequencer().lock()->purgeAllSequences();
+	
+	if (!indiv) {
+		Mpc::instance().getSequencer().lock()->purgeAllSequences();
+	}
+
 	for (auto& as : allSequences) {
 		index++;
 		if (as == nullptr) {
