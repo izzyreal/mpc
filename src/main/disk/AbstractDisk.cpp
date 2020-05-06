@@ -261,9 +261,15 @@ void AbstractDisk::writeProgram(mpc::sampler::Program* program, string fileName)
 		}
 	}
 	auto save = Mpc::instance().getUis().lock()->getDiskGui()->getPgmSave();
+	
 	if (save != 0) {
-		soundSaver = make_unique<SoundSaver>(sounds, save == 1 ? false : true);
+		auto isWav = save == 1;
+		soundSaver = make_unique<SoundSaver>(sounds, isWav);
 	}
+	else {
+		mpc::Mpc::instance().getLayeredScreen().lock()->openScreen("save");
+	}
+
 	flush();
 	initFiles();
 	setBusy(false);
