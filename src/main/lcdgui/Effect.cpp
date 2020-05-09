@@ -5,6 +5,7 @@
 using namespace mpc::lcdgui;
 
 Effect::Effect(MRECT rect)
+	: Component("effect")
 {
 	this->rect = rect;
 }

@@ -1,9 +1,6 @@
 #pragma once
 #include <lcdgui/Layer.hpp>
 
-#include <rapidjson/rapidjson.h>
-#include <rapidjson/document.h>
-
 #include <memory>
 #include <vector>
 #include <string>
@@ -41,8 +38,10 @@ namespace mpc::lcdgui {
 		MRECT dirtyArea;
 		std::vector<std::vector<bool>> pixels;
 		std::unique_ptr<moduru::observer::Observer> activeObserver;
-		std::vector<std::vector<bool>> atlas;
-		moduru::gui::bmfont font;
+
+	public:
+		static std::vector<std::vector<bool>> atlas;
+		static moduru::gui::bmfont font;
 
 	private:
 		void initObserver();
@@ -50,7 +49,6 @@ namespace mpc::lcdgui {
 	private:
 		const int LAYER_COUNT = 4;
 
-		std::vector<rapidjson::Document> layerJsons = std::vector<rapidjson::Document>(LAYER_COUNT);
 		std::vector<std::unique_ptr<Layer>> layers = std::vector<std::unique_ptr<Layer>>(LAYER_COUNT);
 
 		int getCurrentParamIndex();

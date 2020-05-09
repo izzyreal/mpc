@@ -1,29 +1,36 @@
 #pragma once
 #include <string>
 #include<memory>
-//#include <IPlugBase.h>
 
-namespace mpc {
-	
-	namespace lcdgui {
+#include "Component.hpp"
 
-		class Label;
-		class Field;
-		class Parameter {
+namespace mpc::lcdgui
+{
+	class Label;
+	class Field;
+}
 
-		private:
-			std::weak_ptr<Field> tf;
-			std::weak_ptr<Label> label;
+namespace mpc::lcdgui
+{
 
-		public:
-			std::weak_ptr<Field> getTf();
-			std::weak_ptr<Label> getLabel();
+	class Parameter
+		: public Component
+	{
 
-		public:
-			Parameter(std::weak_ptr<Field> tf, std::weak_ptr<Label> label, std::string labelStr, std::string name, int x, int y, int size);
-			~Parameter();
+	private:
+		std::shared_ptr<Field> tf;
+		std::shared_ptr<Label> label;
 
-		};
+	public:
+		std::weak_ptr<Field> getTf();
+		std::weak_ptr<Label> getLabel();
 
-	}
+	public:
+		void Draw(std::vector<std::vector<bool>>* pixels) override;
+
+	public:
+		Parameter(std::string labelStr, std::string name, int x, int y, int size);
+		~Parameter();
+
+	};
 }

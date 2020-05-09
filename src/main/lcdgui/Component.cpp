@@ -7,6 +7,16 @@
 using namespace std;
 using namespace mpc::lcdgui;
 
+Component::Component(const string& name)
+{
+	this->name = name;
+}
+
+const string& Component::getName()
+{
+	return name;
+}
+
 void Component::Hide(bool b) 
 { 
 	if (hidden != b) { 

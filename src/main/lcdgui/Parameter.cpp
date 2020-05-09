@@ -5,19 +5,24 @@
 using namespace mpc::lcdgui;
 using namespace std;
 
-Parameter::Parameter(weak_ptr<Field> tf, std::weak_ptr<Label> label, string labelStr, string name, int x, int y, int tfColumns) {
-	this->label = label;
-	auto lLabel = label.lock();
-	lLabel->initialize(name, labelStr, x, y - 1, labelStr.size());
+Parameter::Parameter(string labelStr, string name, int x, int y, int tfColumns)
+	: Component(name)
+{
+	label = make_shared<Label>(name, labelStr, x, y - 1, labelStr.size());
 
 	const char* p = labelStr.c_str();
 	int count = 0;
 	for (p; *p != 0; ++p)
 		count += ((*p & 0xc0) != 0x80);
 	int tfOffset = (count * 6);
-	this->tf = tf;
-	auto lTf = tf.lock();
-	lTf->initialize(name, x + tfOffset, y - 1, tfColumns);
+
+	tf = make_shared<Field>(name, x + tfOffset, y - 1, tfColumns);
+}
+
+void Parameter::Draw(std::vector<std::vector<bool>>* pixels)
+{
+	label->Draw(pixels);
+	tf->Draw(pixels);
 }
 
 weak_ptr<Field> Parameter::getTf() {

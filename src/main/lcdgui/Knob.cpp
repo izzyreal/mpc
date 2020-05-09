@@ -11,7 +11,8 @@ using namespace mpc::lcdgui;
 using namespace moduru::gui;
 using namespace std;
 
-Knob::Knob(MRECT rect) 
+Knob::Knob(MRECT rect)
+	: Component("knob")
 {
 	this->rect = rect;
 }

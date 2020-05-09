@@ -12,19 +12,18 @@ using namespace rapidjson;
 using namespace mpc::lcdgui;
 using namespace std;
 
-Layer::Layer(mpc::lcdgui::LayeredScreen* ls, std::vector<std::vector<bool>>* atlas, moduru::gui::bmfont* font)
+Layer::Layer(mpc::lcdgui::LayeredScreen* ls)
 {
 	this->ls = ls;
 	bg = std::make_shared<Background>();
-	fk = std::make_shared<FunctionKeys>(atlas, font);
+	fk = std::make_shared<FunctionKeys>();
 	for (int i = 0; i < 100; i++) {
-		unusedFields.push_back(make_shared<mpc::lcdgui::Field>(ls, atlas, font));
+		//unusedFields.push_back(make_shared<mpc::lcdgui::Field>(ls));
 	}
 	for (int i = 0; i < 1000; i++) {
-		unusedLabels.push_back(make_shared<mpc::lcdgui::Label>(atlas, font));
+		//unusedLabels.push_back(make_shared<mpc::lcdgui::Label>());
 	}
-	blinkLabel = make_shared<mpc::lcdgui::BlinkLabel>("SOLO", atlas, font);
-	blinkLabel->initialize("soloblink", "SOLO", 133, 51, 4);
+	blinkLabel = make_shared<mpc::lcdgui::BlinkLabel>("soloblink", "SOLO", 133, 51, 4);
 }
 
 weak_ptr<mpc::lcdgui::Field> Layer::getUnusedField() {
@@ -137,7 +136,7 @@ string Layer::openScreen(Value& screenJson, string screenName) {
 		if (i == 0) {
 			firstField = parameters[i].GetString();
 		}
-		params.push_back(make_unique<lcdgui::Parameter>(getUnusedField(), getUnusedLabel(), labels[i].GetString()
+		params.push_back(make_unique<lcdgui::Parameter>(labels[i].GetString()
 			, parameters[i].GetString()
 			, x[i].GetInt()
 			, y[i].GetInt()
@@ -151,7 +150,7 @@ string Layer::openScreen(Value& screenJson, string screenName) {
 		Value& infoX = screenJson["infox"];
 		Value& infoY = screenJson["infoy"];
 		for (int i = 0; i < infoNames.Size(); i++) {
-			infos.push_back(make_unique<lcdgui::Info>(getUnusedLabel(), infoNames[i].GetString()
+			infos.push_back(make_unique<lcdgui::Info>(infoNames[i].GetString()
 				, infoX[i].GetInt()
 				, infoY[i].GetInt()
 				, infoSize[i].GetInt()));

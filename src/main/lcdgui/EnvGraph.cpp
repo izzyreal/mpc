@@ -11,6 +11,7 @@ using namespace mpc::lcdgui;
 using namespace std;
 
 EnvGraph::EnvGraph()
+	: Component("env-graph")
 {
 	
 	rect = MRECT(10, 10, 200, 50);

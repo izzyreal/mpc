@@ -12,10 +12,9 @@ using namespace mpc::lcdgui;
 using namespace moduru::lang;
 using namespace std;
 
-TextComp::TextComp(std::vector<std::vector<bool>>* atlas, moduru::gui::bmfont* font)
+TextComp::TextComp(const std::string& name)
+	: Component(name)
 {
-	this->atlas = atlas;
-	this->font = font;
 }
 
 void TextComp::Hide(bool b) {
@@ -29,6 +28,9 @@ void TextComp::Hide(bool b) {
 }
 
 void TextComp::Draw(std::vector<std::vector<bool>>* pixels) {
+
+	auto font = &LayeredScreen::font;
+	auto atlas = &LayeredScreen::atlas;
 
 	int textx = x;
 	int texty = y;

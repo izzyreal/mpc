@@ -1,26 +1,29 @@
 #pragma once
 #include "Label.hpp"
 
+#include "Component.hpp"
+
 #include <memory>
 #include <string>
 
-namespace mpc {
-	namespace lcdgui {
+namespace mpc::lcdgui {
 
-		class Info
-		{
+	class Info
+		: public Component
+	{
 
-		private:
-			std::weak_ptr<Label> label{};
+	private:
+		std::shared_ptr<Label> label{};
 
-		public:
-			std::weak_ptr<Label> getLabel();
+	public:
+		std::weak_ptr<Label> getLabel();
 
-			Info(std::weak_ptr<Label> label, std::string name, int x, int y, int size);
-			~Info();
+	public:
+		void Draw(std::vector<std::vector<bool>>* pixels) override;
 
-		};
+	public:
+		Info(const std::string& name, int x, int y, int size);
+		~Info();
 
-	}
-
+	};
 }

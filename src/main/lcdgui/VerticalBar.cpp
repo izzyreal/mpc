@@ -4,7 +4,8 @@
 
 using namespace mpc::lcdgui;
 
-VerticalBar::VerticalBar(MRECT rect) 
+VerticalBar::VerticalBar(MRECT rect)
+	: Component("vertical-bar")
 {
 	this->rect = rect;
 }

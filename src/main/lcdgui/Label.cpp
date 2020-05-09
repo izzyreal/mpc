@@ -3,12 +3,9 @@
 using namespace mpc::lcdgui;
 using namespace std;
 
-Label::Label(std::vector<std::vector<bool>>* atlas, moduru::gui::bmfont* font)
-	: TextComp(atlas, font)
+Label::Label(const string& name, string text, int x, int y, int columns)
+	: TextComp(name)
 {
-}
-
-void Label::initialize(string name, string text, int x, int y, int columns) {
 	rigorousClearing = false;
 	noLeftMargin = false;
 	opaque = true;

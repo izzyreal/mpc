@@ -3,6 +3,7 @@
 using namespace mpc::lcdgui;
 
 SelectedEventBar::SelectedEventBar(MRECT rect)
+	: Component("selected-event-bar")
 {
 	this->rect = rect;
 }

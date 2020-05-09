@@ -5,15 +5,11 @@
 using namespace mpc::lcdgui;
 using namespace std;
 
-BlinkLabel::BlinkLabel(string text, std::vector<std::vector<bool>>* atlas, moduru::gui::bmfont* font)
-	: Label(atlas, font)
+BlinkLabel::BlinkLabel(const string& name, const string& text, int x, int y, int columns)
+	: Label(name, text, x, y, columns)
 {
-	setText(text);
-}
-
-void BlinkLabel::initialize(std::string name, std::string text, int x, int y, int columns) {
-	Label::initialize(name, text, x, y, columns);
 	this->rect = MRECT(133, 52, 158, 58);
+	setText(text);
 }
 
 void BlinkLabel::static_blink(void * args)

@@ -1,5 +1,7 @@
 #include "lcdgui/LayeredScreen.hpp"
 
+#include "ScreenArrangements.hpp"
+
 #include <gui/BasicStructs.hpp>
 
 #include <Mpc.hpp>
@@ -130,15 +132,15 @@ static vector<string> soundNames = vector<string>{ "sound", "deletesound", "dele
 
 static vector<string> soundGuiNames = vector<string>{ "trim", "loop", "zone" };
 
-LayeredScreen::LayeredScreen() 
-{
-	moduru::gui::BMFParser bmfParser(mpc::StartUp::resPath + moduru::file::FileUtil::getSeparator() + "font.fnt");
-	atlas = bmfParser.getAtlas();
-	font = bmfParser.getLoadedFont();
+static moduru::gui::BMFParser _bmfParser = moduru::gui::BMFParser(string(mpc::StartUp::altResPath() + moduru::file::FileUtil::getSeparator() + "font.fnt"));
 
-	
+std::vector<std::vector<bool>> LayeredScreen::atlas = _bmfParser.getAtlas();
+moduru::gui::bmfont LayeredScreen::font = _bmfParser.getLoadedFont();
+
+LayeredScreen::LayeredScreen() 
+{	
 	pixels = vector<vector<bool>>(248, vector<bool>(60));
-	popup = make_unique<mpc::lcdgui::Popup>(&atlas, &font);
+	popup = make_unique<mpc::lcdgui::Popup>();
 	popup->Hide(true);
 
 	horizontalBarsTempoChangeEditor = vector<shared_ptr<HorizontalBar>>(4);
@@ -246,20 +248,9 @@ LayeredScreen::LayeredScreen()
 		effects.push_back(move(effect));
 	}
 
-	auto path0 = string(mpc::StartUp::resPath + "mainpanel.json");
-	auto path1 = string(mpc::StartUp::resPath + "windowpanel.json");
-	auto path2 = string(mpc::StartUp::resPath + "dialogpanel.json");
-	auto path3 = string(mpc::StartUp::resPath + "dialog2panel.json");
-
-	vector<string> paths = { path0, path1, path2, path3 };
-
-	for (int i = 0; i < LAYER_COUNT; i++) {
-		char readBuffer[256];
-		layers[i] = make_unique<Layer>(this, &atlas, &font);
-		auto fp = FileUtil::fopenw(paths[i], "r");;
-		FileReadStream is(fp, readBuffer, sizeof(readBuffer));
-		layerJsons[i].ParseStream(is);
-		fclose(fp);
+	for (int i = 0; i < LAYER_COUNT; i++)
+	{
+		layers[i] = make_unique<Layer>(this);
 	}
 }
 
@@ -346,29 +337,28 @@ int LayeredScreen::openScreen(string screenName) {
 
 	previousScreenName = currentScreenName;
 	currentScreenName = screenName;
-	string firstField = "";
-	int oldLayer = currentLayer;
-	for (int i = 0; i < LAYER_COUNT; i++) {
-		if (layerJsons[i].HasMember(screenName.c_str())) {
-			currentLayer = i;
-			if (oldLayer > currentLayer) {
-				for (int j = oldLayer; j > currentLayer; j--) {
-					layers[j]->clear();
-				}
-			}
-			layers[currentLayer]->clear();
-			firstField = layers[currentLayer]->openScreen(layerJsons[i][screenName.c_str()], screenName);
-			break;
-		}
-	}
+	string firstField = "sq";
 	
+	int oldLayer = currentLayer;
+
+	currentLayer = -1;
+
+	auto& screenComponent = ScreenArrangements::getScreenComponent(currentScreenName, currentLayer);
+
+	if (currentLayer == -1)
+	{
+		return -1;
+	}
+
+	screenComponent->Draw(&pixels);
+
 	if (oldLayer == 0 && oldLayer == currentLayer) {
 		wave->Hide(true);
 	}
 	
 	returnToLastFocus(firstField);
 
-	initObserver();
+	//initObserver();
 	return currentLayer;
 }
 
@@ -377,6 +367,7 @@ vector<vector<bool>>* LayeredScreen::getPixels() {
 }
 
 void LayeredScreen::Draw() {
+	return;
 	set<shared_ptr<mpc::lcdgui::Component>> dirtyComponents;
 	for (int i = 0; i <= currentLayer; i++) {
 
@@ -497,6 +488,7 @@ MRECT* LayeredScreen::getDirtyArea() {
 }
 
 bool LayeredScreen::IsDirty() {
+	return true;
 	for (int i = 0; i <= currentLayer; i++) {
 		//MLOG("\n checking for dirty components in layer " + to_string(i));
 		if (layers[i]->getBackground()->IsDirty() || layers[i]->getFunctionKeys()->IsDirty()) {
@@ -741,12 +733,12 @@ vector<weak_ptr<mpc::lcdgui::MixerTopBackground>> LayeredScreen::getMixerTopBack
 
 void LayeredScreen::drawFunctionKeys(string screenName)
 {
-	auto& screenJson = layerJsons[currentLayer][screenName.c_str()];
-	Value& fblabels = screenJson["fblabels"];
-	Value& fbtypes = screenJson["fbtypes"];
-	getFunctionKeys()->clearAll(&pixels);
+	//auto& screenJson = layerJsons[currentLayer][screenName.c_str()];
+	//Value& fblabels = screenJson["fblabels"];
+	//Value& fbtypes = screenJson["fbtypes"];
+	//getFunctionKeys()->clearAll(&pixels);
 	//getCurrentBackground()->SetDirty(); // only redraw fk area
-	getFunctionKeys()->initialize(fblabels, fbtypes);
+	//getFunctionKeys()->initialize(fblabels, fbtypes);
 }
 
 weak_ptr<mpc::lcdgui::TwoDots> LayeredScreen::getTwoDots()

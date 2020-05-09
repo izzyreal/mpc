@@ -4,42 +4,42 @@
 #include <gui/BasicStructs.hpp>
 
 #include <vector>
+#include <string>
 
-namespace mpc {
-	namespace lcdgui {
-		class Component {
+namespace mpc::lcdgui {
 
-		protected:
-			MRECT rect;
-			MRECT dirtyRect;
-			std::vector<MRECT> clearRects;
-			bool hidden = false;
+	class Component {
 
-		protected:
-			bool dirty = false;
+	protected:
+		MRECT rect;
+		MRECT dirtyRect;
+		std::vector<MRECT> clearRects;
+		bool hidden = false;
+		bool dirty = false;
+		std::string name{ "" };
 
-		public:
-			virtual void Hide(bool b);
-			void SetDirty();
+	public:
+		virtual void Hide(bool b);
+		void SetDirty();
 
-			bool IsHidden();
-			bool IsDirty();
-			bool NeedsClearing();
-			MRECT* getDirtyArea();
+		bool IsHidden();
+		bool IsDirty();
+		bool NeedsClearing();
+		MRECT* getDirtyArea();
 
-		public:
-			virtual void Draw(std::vector<std::vector<bool>>* pixels) {}
-			virtual void Clear(std::vector<std::vector<bool>>* pixels);
+		const std::string& getName();
 
-			MRECT* GetRECT();
+	public:
+		virtual void Draw(std::vector<std::vector<bool>>* pixels) {}
+		virtual void Clear(std::vector<std::vector<bool>>* pixels);
 
-		public:
-			virtual ~Component() {}
+		MRECT* GetRECT();
 
-		};
+	public:
+		Component(const std::string& name);
+		virtual ~Component() {}
 
-	}
+	};
 }
-
 
 #endif // !COMPONENT

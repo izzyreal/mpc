@@ -6,7 +6,8 @@
 using namespace mpc::lcdgui;
 using namespace std;
 
-Background::Background() 
+Background::Background()
+	: Component("background")
 {
 	rect = MRECT(0, 0, 247, 59);
 }

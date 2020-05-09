@@ -7,6 +7,7 @@
 using namespace mpc::lcdgui;
 
 HorizontalBar::HorizontalBar(MRECT rect, int value)
+	: Component("horizontal-bar")
 {
 	this->rect = rect;
 	this->value = value;

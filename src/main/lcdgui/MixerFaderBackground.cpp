@@ -2,7 +2,8 @@
 
 using namespace mpc::lcdgui;
 
-MixerFaderBackground::MixerFaderBackground(MRECT rect) 
+MixerFaderBackground::MixerFaderBackground(MRECT rect)
+	: Component("mixer-fader-background")
 {
 	this->rect = rect;
 }

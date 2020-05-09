@@ -6,6 +6,7 @@ using namespace mpc::lcdgui;
 using namespace std;
 
 Underline::Underline()
+	: Component("underline")
 {
 	states = vector<bool>(16);
 	rect = MRECT(0, 0, 247, 50);

@@ -27,10 +27,9 @@ namespace mpc {
 
 		public:
 			void Hide(bool b) override;
-			void initialize(std::string name, std::string text, int x, int y, int columns) override;
 
 		public:
-			BlinkLabel(std::string text, std::vector<std::vector<bool>>* atlas, moduru::gui::bmfont* font);
+			BlinkLabel(const std::string& name, const std::string& text, int x, int y, int columns);
 			~BlinkLabel();
 
 		};

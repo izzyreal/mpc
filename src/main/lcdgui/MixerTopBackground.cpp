@@ -2,7 +2,8 @@
 
 using namespace mpc::lcdgui;
 
-MixerTopBackground::MixerTopBackground(MRECT rect) 
+MixerTopBackground::MixerTopBackground(MRECT rect)
+	: Component("mixer-top-background")
 {
 	this->rect = rect;
 }

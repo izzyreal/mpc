@@ -1,17 +1,13 @@
 #include "Field.hpp"
+
 #include "Label.hpp"
-//#include <maingui/Constants.hpp>
-//#include <StartUp.hpp>
+
+#include <Mpc.hpp>
 #include <lcdgui/LayeredScreen.hpp>
 #include <ui/NameGui.hpp>
-//#include <lcdgui/Field_Blinker.hpp>
-//#include <lcdgui/Field_Scroller.hpp>
 #include <lcdgui/TwoDots.hpp>
-//#include <ui/sequencer/TrMoveGui.hpp>
 
 #include <lang/StrUtil.hpp>
-
-//#include <Util.hpp>
 
 #include <file/File.hpp>
 
@@ -22,13 +18,10 @@
 using namespace mpc::lcdgui;
 using namespace std;
 
-Field::Field(LayeredScreen* layeredScreen, std::vector<std::vector<bool>>* atlas, moduru::gui::bmfont* font)
-	: TextComp(atlas, font) {
-	this->layeredScreen = layeredScreen;
-}
+Field::Field(const string& name, int x, int y, int columns)
+	: TextComp(name)
+{
 
-void Field::initialize(std::string name, int x, int y, int columns) {
-	noLeftMargin = false;
 	split = false;
 	focusable = true;
 	opaque = true;
@@ -42,7 +35,6 @@ void Field::initialize(std::string name, int x, int y, int columns) {
 	setLocation(x, y, false);
 	setSize(columns * TEXT_WIDTH + 1, TEXT_HEIGHT + 1, false);
 	clearRects.clear();
-	//loseFocus(name);
 }
 
 void Field::Draw(vector<vector<bool>>* pixels) {
@@ -69,12 +61,11 @@ const int Field::BLINKING_RATE;
 
 void Field::takeFocus(string prev)
 {
+	auto layeredScreen = mpc::Mpc::instance().getLayeredScreen().lock();
 	csn = layeredScreen->getCurrentScreenName();
 	focus = true;
 	inverted = true;
-	//if (csn.compare("name") == 0) setOpaque(true);
-	//	//auto lMainFrame = lGui->getMainFrame().lock();
-	//auto lMainFrame = mainFrame;
+	
 	auto focusEvent = layeredScreen->getFocus();
 	auto focusField = layeredScreen->lookupField(focusEvent);
 	if (csn.compare("trim") == 0 || csn.compare("loop") == 0) {
@@ -132,6 +123,9 @@ void Field::loseFocus(string next)
 //	}
 	auto focusEvent = getName();
 	//setSplit(false);
+
+	auto layeredScreen = mpc::Mpc::instance().getLayeredScreen().lock();
+
 	csn = layeredScreen->getCurrentScreenName();
 	if (csn.compare("trim") == 0 || csn.compare("loop") == 0) {
 		if (focusEvent.compare("st") == 0 || focusEvent.compare("to") == 0) {

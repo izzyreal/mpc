@@ -9,6 +9,7 @@ using namespace moduru::gui;
 using namespace std;
 
 TwoDots::TwoDots()
+	: Component("two-dots")
 {
 	selected = vector<bool>(4);
 	visible = vector<bool>(4);

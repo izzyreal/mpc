@@ -1,6 +1,5 @@
 #pragma once
 
-//#include <lcdgui/LayeredScreen.hpp>
 #include <ui/UserDefaults.hpp>
 
 #include <thread>
@@ -24,6 +23,9 @@ namespace mpc {
 		static std::string tempPath;
 		static std::string storesPath;
 		static std::string logFilePath;
+
+	public:
+		static std::string altResPath();
 
 	public:
 		void runStartUpRoutine();

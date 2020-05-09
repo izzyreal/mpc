@@ -15,6 +15,7 @@ using namespace moduru::gui;
 using namespace std;
 
 Wave::Wave()
+	: Component("wave")
 {
 	rect = MRECT(0, 0, 247, 59);
 }
