@@ -1,3 +1,12 @@
+## v0.1.4 (9-5-2020)
+* [Plugin compatibility matrix](https://github.com/izzyreal/vmpc-juce/blob/master/plugin-compatibility-matrix.md)
+* Logic Pro X support (experimental)
+* Cubase 10 support (experimental)
+* Ableton support (experimental)
+* Reaper support (experimental)
+* Fix ASSIGNABLE MIX OUT bugs
+* Return to SAVE screen after saving PGM
+
 ## v0.1.3 (5-5-2020)
 * Fix various Timing Correct screen cosmetic issues and some functionality
 * Honor full-level when clicking pads with the mouse
