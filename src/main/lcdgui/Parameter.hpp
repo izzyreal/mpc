@@ -18,10 +18,6 @@ namespace mpc::lcdgui
 	{
 
 	public:
-		std::weak_ptr<Field> getField();
-		std::weak_ptr<Label> getLabel();
-
-	public:
 		Parameter(std::string labelStr, std::string name, int x, int y, int size);
 		~Parameter();
 

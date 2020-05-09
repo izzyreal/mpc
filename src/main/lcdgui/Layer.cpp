@@ -171,12 +171,12 @@ string Layer::openScreen(Value& screenJson, string screenName) {
 
 void Layer::clear() {
 	for (auto& p : params) {
-		unuseField(p->getField());
-		unuseLabel(p->getLabel());
+		//unuseField(p->getField());
+		//unuseLabel(p->getLabel());
 	}
 	params.clear();
 	for (auto& i : infos) {
-		unuseLabel(i->getLabel());
+		//unuseLabel(i->getLabel());
 	}
 	infos.clear();
 	bg->Hide(true);
@@ -187,11 +187,11 @@ void Layer::setDirty() {
 	bg->SetDirty();
 	fk->SetDirty();
 	for (auto& i : infos) {
-		i->getLabel().lock()->SetDirty();
+		//i->getLabel().lock()->SetDirty();
 	}
 	for (auto& p : params) {
-		p->getField().lock()->SetDirty();
-		p->getLabel().lock()->SetDirty();
+		//p->getField().lock()->SetDirty();
+		//p->getLabel().lock()->SetDirty();
 	}
 }
 

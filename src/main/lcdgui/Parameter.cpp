@@ -20,13 +20,5 @@ Parameter::Parameter(string labelStr, string name, int x, int y, int tfColumns)
 	addChild(make_shared<Field>(name, x + tfOffset, y - 1, tfColumns));
 }
 
-weak_ptr<Field> Parameter::getField() {
-	return findField(name);
-}
-
-weak_ptr<Label> Parameter::getLabel() {
-	return findLabel(name);
-}
-
 Parameter::~Parameter() {
 }

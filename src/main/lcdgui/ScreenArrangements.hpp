@@ -10,6 +10,7 @@
 namespace mpc::lcdgui
 {
 	class Component;
+	class ScreenComponent;
 }
 
 namespace mpc::lcdgui
@@ -24,7 +25,7 @@ namespace mpc::lcdgui
 
 	public:
 		static std::vector<std::shared_ptr<Component>> get(const std::string& screenName, int& foundInLayer);
-		static std::shared_ptr<Component> getScreenComponent(const std::string& screenName, int& foundInLayer);
+		static std::shared_ptr<ScreenComponent> getScreenComponent(const std::string& screenName, int& foundInLayer);
 
 	};
 }

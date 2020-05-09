@@ -84,6 +84,7 @@ namespace mpc {
 			std::vector<int> getTickValues();
 			void playToTick(int targetTick);
 			int getActiveSequenceIndex();
+			std::weak_ptr<Track> getActiveTrack();
 			std::weak_ptr<Sequence> createSeqInPlaceHolder();
 			void clearPlaceHolder();
 			void movePlaceHolderTo(int destIndex);

@@ -88,6 +88,11 @@ int Sequencer::getActiveSequenceIndex()
 	return activeSequenceIndex;
 }
 
+weak_ptr<Track> Sequencer::getActiveTrack()
+{
+	return getActiveSequence().lock()->getTrack(activeTrackIndex);
+}
+
 void Sequencer::playToTick(int targetTick)
 {
 	auto seqIndex = songMode ? getSongSequenceIndex() : currentlyPlayingSequenceIndex;

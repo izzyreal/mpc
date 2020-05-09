@@ -6,12 +6,13 @@
 #include <lcdgui/Parameter.hpp>
 #include <lcdgui/Info.hpp>
 #include <lcdgui/FunctionKeys.hpp>
+#include <lcdgui/ScreenComponent.hpp>
+#include <lcdgui/screens/SequencerScreen.hpp>
 
 #include <file/FileUtil.hpp>
 
 #include <rapidjson/filereadstream.h>
 
-#include <lcdgui/screens/SequencerScreen.hpp>
 
 using namespace mpc::lcdgui;
 
@@ -73,7 +74,8 @@ vector<shared_ptr<Component>> ScreenArrangements::get(const string& screenName, 
 		Value& infoX = arrangement["infox"];
 		Value& infoY = arrangement["infoy"];
 		for (int i = 0; i < infoNames.Size(); i++) {
-			components.push_back(make_shared<Info>(infoNames[i].GetString()
+			components.push_back(make_shared<Label>(infoNames[i].GetString()
+				, ""
 				, infoX[i].GetInt()
 				, infoY[i].GetInt()
 				, infoSize[i].GetInt()));
@@ -92,7 +94,7 @@ vector<shared_ptr<Component>> ScreenArrangements::get(const string& screenName, 
 		functionKeysComponent->Hide(true);
 	}
 
-	components.push_back(move(functionKeysComponent));
+	//components.push_back(move(functionKeysComponent));
 
 	return components;
 }
@@ -121,7 +123,7 @@ void ScreenArrangements::init()
 	}
 }
 
-std::shared_ptr<Component> ScreenArrangements::getScreenComponent(const string& screenName, int& foundInLayer)
+std::shared_ptr<ScreenComponent> ScreenArrangements::getScreenComponent(const string& screenName, int& foundInLayer)
 {
 	if (screenName.compare("sequencer") == 0)
 	{

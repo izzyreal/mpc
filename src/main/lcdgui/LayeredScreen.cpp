@@ -12,6 +12,7 @@
 #include <audiomidi/AudioMidiServices.hpp>
 #include <audiomidi/SoundRecorder.hpp>
 
+#include <lcdgui/ScreenComponent.hpp>
 #include <lcdgui/EnvGraph.hpp>
 #include <lcdgui/Label.hpp>
 #include <lcdgui/Underline.hpp>
@@ -274,7 +275,7 @@ int LayeredScreen::getCurrentParamIndex() {
 	int size = params.size();
 	for (currentIndex = 0; currentIndex <= size; currentIndex++) {
 		if (currentIndex == size) break;
-		if (params[currentIndex]->getField().lock()->getName().compare(l->getFocus()) == 0) {
+		if (params[currentIndex]->getName().compare(l->getFocus()) == 0) {
 			break;
 		}
 	}
@@ -295,7 +296,7 @@ void LayeredScreen::transferFocus(bool backwards) {
 	while (success == false) {
 		candidateIndex = backwards ? currentIndex-- - 1 : currentIndex++ + 1;
 		if (candidateIndex >= 0 && candidateIndex < size) {
-			if (!params[candidateIndex]->getField().lock()->IsHidden()) {
+			if (!params[candidateIndex]->IsHidden()) {
 				success = true;
 			}
 		}
@@ -305,7 +306,7 @@ void LayeredScreen::transferFocus(bool backwards) {
 	}
 	if (!success) return;
 
-	layers[currentLayer]->setFocus(params[candidateIndex]->getField().lock()->getName());
+	layers[currentLayer]->setFocus(params[candidateIndex]->getName());
 }
 
 int LayeredScreen::openScreen(string screenName) {

@@ -20,11 +20,20 @@ std::weak_ptr<Label> Component::findLabel(const std::string& name)
 	for (auto& c : children)
 	{
 		auto candidate = dynamic_pointer_cast<Label>(c);
+
 		if (candidate && candidate->getName().compare(name) == 0)
 		{
 			return candidate;
 		}
+
+		auto secondCandidate = c->findLabel(name).lock();
+
+		if (secondCandidate)
+		{
+			return secondCandidate;
+		}
 	}
+
 	return {};
 }
 
@@ -33,13 +42,21 @@ std::weak_ptr<Field> Component::findField(const std::string& name)
 	for (auto& c : children)
 	{
 		auto candidate = dynamic_pointer_cast<Field>(c);
+
 		if (candidate && candidate->getName().compare(name) == 0)
 		{
 			return candidate;
 		}
-	}
-	return {};
 
+		auto secondCandidate = c->findField(name).lock();
+
+		if (secondCandidate)
+		{
+			return secondCandidate;
+		}
+	}
+
+	return {};
 }
 
 weak_ptr<Component> Component::addChild(std::shared_ptr<Component> child)
