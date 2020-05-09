@@ -171,7 +171,7 @@ string Layer::openScreen(Value& screenJson, string screenName) {
 
 void Layer::clear() {
 	for (auto& p : params) {
-		unuseField(p->getTf());
+		unuseField(p->getField());
 		unuseLabel(p->getLabel());
 	}
 	params.clear();
@@ -190,7 +190,7 @@ void Layer::setDirty() {
 		i->getLabel().lock()->SetDirty();
 	}
 	for (auto& p : params) {
-		p->getTf().lock()->SetDirty();
+		p->getField().lock()->SetDirty();
 		p->getLabel().lock()->SetDirty();
 	}
 }

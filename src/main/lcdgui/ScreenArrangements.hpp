@@ -6,7 +6,6 @@
 #include <vector>
 #include <string>
 #include <memory>
-#include <map>
 
 namespace mpc::lcdgui
 {
@@ -24,8 +23,8 @@ namespace mpc::lcdgui
 		static void init();
 
 	public:
-		static std::map<std::string, std::unique_ptr<Component>> get(const std::string& screenName, int& foundInLayer);
-		static std::unique_ptr<Component> getScreenComponent(const std::string& screenName, int& foundInLayer);
+		static std::vector<std::shared_ptr<Component>> get(const std::string& screenName, int& foundInLayer);
+		static std::shared_ptr<Component> getScreenComponent(const std::string& screenName, int& foundInLayer);
 
 	};
 }

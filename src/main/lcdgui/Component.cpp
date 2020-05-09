@@ -1,5 +1,8 @@
 #include "Component.hpp"
 
+#include "Label.hpp"
+#include "Field.hpp"
+
 #include <Mpc.hpp>
 
 #include <string>
@@ -10,6 +13,69 @@ using namespace mpc::lcdgui;
 Component::Component(const string& name)
 {
 	this->name = name;
+}
+
+std::weak_ptr<Label> Component::findLabel(const std::string& name)
+{
+	for (auto& c : children)
+	{
+		auto candidate = dynamic_pointer_cast<Label>(c);
+		if (candidate && candidate->getName().compare(name) == 0)
+		{
+			return candidate;
+		}
+	}
+	return {};
+}
+
+std::weak_ptr<Field> Component::findField(const std::string& name)
+{
+	for (auto& c : children)
+	{
+		auto candidate = dynamic_pointer_cast<Field>(c);
+		if (candidate && candidate->getName().compare(name) == 0)
+		{
+			return candidate;
+		}
+	}
+	return {};
+
+}
+
+weak_ptr<Component> Component::addChild(std::shared_ptr<Component> child)
+{
+	children.push_back(move(child));
+	return children.back();
+}
+
+void Component::addChildren(std::vector<std::shared_ptr<Component>> children)
+{
+	for (auto& c : children)
+	{
+		this->children.push_back(std::move(c));
+	}
+}
+
+std::weak_ptr<Component> Component::findChild(const std::string& name)
+{
+	for (auto& c : children)
+	{
+		if (c->getName().compare(name) == 0)
+		{
+			return c;
+		}
+	}
+	return {};
+}
+
+void Component::Draw(std::vector<std::vector<bool>>* pixels)
+{
+	MLOG("Drawing Component " + getName());
+
+	for (auto& c : children)
+	{
+		c->Draw(pixels);
+	}
 }
 
 const string& Component::getName()
@@ -29,8 +95,18 @@ void Component::Hide(bool b)
 	} 
 }
 
-MRECT* Component::getDirtyArea() {
-	return &dirtyRect;
+MRECT Component::getDirtyArea() {
+	MRECT res;
+	for (auto c : children)
+	{
+		res = res.Union(&c->getDirtyArea());
+	}
+
+	res = res.Union(&dirtyRect);
+
+	dirtyRect.Clear();
+
+	return res;
 }
 
 void Component::SetDirty() 
@@ -44,7 +120,27 @@ bool Component::IsHidden()
 	return hidden; 
 }
 
-bool Component::IsDirty() { return dirty; }
+bool Component::IsDirty()
+{ 
+	auto dirtyChild = false;
+
+	for (auto& c : children)
+	{
+		if (c->IsDirty())
+		{
+			dirtyChild = true;
+			break;
+		}
+
+	}
+
+	if (dirtyChild)
+	{
+		return true;
+	}
+
+	return dirty;
+}
 
 bool Component::NeedsClearing()
 {

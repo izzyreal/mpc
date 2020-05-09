@@ -23,7 +23,7 @@ using namespace std;
 
 vector<unique_ptr<Document>> ScreenArrangements::layerDocuments;
 
-map<string, unique_ptr<Component>> ScreenArrangements::get(const string& screenName, int& foundInLayer)
+vector<shared_ptr<Component>> ScreenArrangements::get(const string& screenName, int& foundInLayer)
 {
 	if (ScreenArrangements::layerDocuments.empty())
 	{
@@ -52,7 +52,7 @@ map<string, unique_ptr<Component>> ScreenArrangements::get(const string& screenN
 	Value& parameters = arrangement["parameters"];
 	Value& tfsize = arrangement["tfsize"];
 
-	vector<unique_ptr<Component>> components;
+	vector<shared_ptr<Component>> components;
 
 	string firstField = "";
 	for (int i = 0; i < labels.Size(); i++) {
@@ -73,7 +73,7 @@ map<string, unique_ptr<Component>> ScreenArrangements::get(const string& screenN
 		Value& infoX = arrangement["infox"];
 		Value& infoY = arrangement["infoy"];
 		for (int i = 0; i < infoNames.Size(); i++) {
-			components.push_back(make_unique<Info>(infoNames[i].GetString()
+			components.push_back(make_shared<Info>(infoNames[i].GetString()
 				, infoX[i].GetInt()
 				, infoY[i].GetInt()
 				, infoSize[i].GetInt()));
@@ -94,14 +94,7 @@ map<string, unique_ptr<Component>> ScreenArrangements::get(const string& screenN
 
 	components.push_back(move(functionKeysComponent));
 
-	map<string, unique_ptr<Component>> result;
-
-	for (auto& c : components)
-	{
-		result[c->getName()] = move(c);
-	}
-
-	return result;
+	return components;
 }
 
 void ScreenArrangements::init()
@@ -128,10 +121,10 @@ void ScreenArrangements::init()
 	}
 }
 
-std::unique_ptr<Component> ScreenArrangements::getScreenComponent(const string& screenName, int& foundInLayer)
+std::shared_ptr<Component> ScreenArrangements::getScreenComponent(const string& screenName, int& foundInLayer)
 {
 	if (screenName.compare("sequencer") == 0)
 	{
-		return make_unique<mpc::lcdgui::screens::SequencerScreen>(get(screenName, foundInLayer));
+		return make_shared<mpc::lcdgui::screens::SequencerScreen>(get(screenName, foundInLayer));
 	}
 }

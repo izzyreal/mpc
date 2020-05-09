@@ -3,6 +3,8 @@
 using namespace mpc::lcdgui;
 using namespace std;
 
+#include <Logger.hpp>
+
 Label::Label(const string& name, string text, int x, int y, int columns)
 	: TextComp(name)
 {
@@ -25,6 +27,7 @@ void Label::enableRigorousClearing() {
 }
 
 void Label::Draw(vector<vector<bool>>* pixels) {
+	MLOG("Drawing Label " + getName());
 	const int margin = noLeftMargin ? 0 : 1;
 	if (rigorousClearing) {
 		for (int j = 0; j < w; j++) {

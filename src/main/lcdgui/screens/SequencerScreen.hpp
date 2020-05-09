@@ -14,13 +14,10 @@ namespace mpc::lcdgui::screens
 	{
 
 	private:
-		std::map<std::string, std::unique_ptr<Component>> componentMap;
+		void displaySq();
 
 	public:
-		void Draw(std::vector<std::vector<bool>> *pixels);
-
-	public:
-		SequencerScreen(std::map<std::string, std::unique_ptr<Component>> componentMap);
+		SequencerScreen(std::vector<std::shared_ptr<Component>> componentMap);
 
 	};
 

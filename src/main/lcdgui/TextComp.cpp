@@ -28,6 +28,8 @@ void TextComp::Hide(bool b) {
 }
 
 void TextComp::Draw(std::vector<std::vector<bool>>* pixels) {
+	
+	Component::Draw(pixels);
 
 	auto font = &LayeredScreen::font;
 	auto atlas = &LayeredScreen::atlas;

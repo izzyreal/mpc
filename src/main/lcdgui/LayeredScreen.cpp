@@ -139,6 +139,8 @@ moduru::gui::bmfont LayeredScreen::font = _bmfParser.getLoadedFont();
 
 LayeredScreen::LayeredScreen() 
 {	
+	root = make_unique<Component>("root");
+
 	pixels = vector<vector<bool>>(248, vector<bool>(60));
 	popup = make_unique<mpc::lcdgui::Popup>();
 	popup->Hide(true);
@@ -272,7 +274,7 @@ int LayeredScreen::getCurrentParamIndex() {
 	int size = params.size();
 	for (currentIndex = 0; currentIndex <= size; currentIndex++) {
 		if (currentIndex == size) break;
-		if (params[currentIndex]->getTf().lock()->getName().compare(l->getFocus()) == 0) {
+		if (params[currentIndex]->getField().lock()->getName().compare(l->getFocus()) == 0) {
 			break;
 		}
 	}
@@ -293,7 +295,7 @@ void LayeredScreen::transferFocus(bool backwards) {
 	while (success == false) {
 		candidateIndex = backwards ? currentIndex-- - 1 : currentIndex++ + 1;
 		if (candidateIndex >= 0 && candidateIndex < size) {
-			if (!params[candidateIndex]->getTf().lock()->IsHidden()) {
+			if (!params[candidateIndex]->getField().lock()->IsHidden()) {
 				success = true;
 			}
 		}
@@ -303,7 +305,7 @@ void LayeredScreen::transferFocus(bool backwards) {
 	}
 	if (!success) return;
 
-	layers[currentLayer]->setFocus(params[candidateIndex]->getTf().lock()->getName());
+	layers[currentLayer]->setFocus(params[candidateIndex]->getField().lock()->getName());
 }
 
 int LayeredScreen::openScreen(string screenName) {
@@ -343,14 +345,12 @@ int LayeredScreen::openScreen(string screenName) {
 
 	currentLayer = -1;
 
-	auto& screenComponent = ScreenArrangements::getScreenComponent(currentScreenName, currentLayer);
+	root->addChild(ScreenArrangements::getScreenComponent(currentScreenName, currentLayer));
 
 	if (currentLayer == -1)
 	{
 		return -1;
 	}
-
-	screenComponent->Draw(&pixels);
 
 	if (oldLayer == 0 && oldLayer == currentLayer) {
 		wave->Hide(true);
@@ -367,6 +367,10 @@ vector<vector<bool>>* LayeredScreen::getPixels() {
 }
 
 void LayeredScreen::Draw() {
+	MLOG("LayeredScreen::Draw()");
+
+	root->Draw(&pixels);
+
 	return;
 	set<shared_ptr<mpc::lcdgui::Component>> dirtyComponents;
 	for (int i = 0; i <= currentLayer; i++) {
@@ -476,19 +480,18 @@ void LayeredScreen::Draw() {
 	if (popup->IsDirty() && !popup->IsHidden()) {
 		popup->Draw(&pixels);
 	}
-
-	for (auto& c : dirtyComponents) {
-		dirtyArea = dirtyArea.Union(c->getDirtyArea());
-		c->getDirtyArea()->Clear();
-	}
 }
 
-MRECT* LayeredScreen::getDirtyArea() {
-	return &dirtyArea;
+MRECT LayeredScreen::getDirtyArea() {
+	return root->getDirtyArea();
 }
 
 bool LayeredScreen::IsDirty() {
-	return true;
+	if (root->IsDirty())
+	{
+		MLOG("Dirty!");
+	}
+	return root->IsDirty();
 	for (int i = 0; i <= currentLayer; i++) {
 		//MLOG("\n checking for dirty components in layer " + to_string(i));
 		if (layers[i]->getBackground()->IsDirty() || layers[i]->getFunctionKeys()->IsDirty()) {

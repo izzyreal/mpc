@@ -35,7 +35,7 @@ namespace mpc::lcdgui {
 	{
 
 	private:
-		MRECT dirtyArea;
+		std::unique_ptr<Component> root;
 		std::vector<std::vector<bool>> pixels;
 		std::unique_ptr<moduru::observer::Observer> activeObserver;
 
@@ -137,7 +137,7 @@ namespace mpc::lcdgui {
 	public:
 		std::vector<std::vector<bool>>* getPixels();
 		bool IsDirty();
-		MRECT* getDirtyArea();
+		MRECT getDirtyArea();
 		void Draw();
 
 	public:
