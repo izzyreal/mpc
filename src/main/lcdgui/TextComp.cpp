@@ -18,7 +18,6 @@ TextComp::TextComp(const std::string& name)
 }
 
 void TextComp::Draw(std::vector<std::vector<bool>>* pixels) {
-
 	if (hidden || !IsDirty())
 	{
 		return;
@@ -38,29 +37,26 @@ void TextComp::Draw(std::vector<std::vector<bool>>* pixels) {
 
 	int next = utf8_decode_next();
 	int charCounter = 0;
-	if (!IsHidden()) {
-		while (next != UTF8_END && next >= 0) {
-			moduru::gui::bmfont_char current_char;
-			current_char = font->chars[next];
-			atlasx = current_char.x;
-			atlasy = current_char.y;
-			for (int x1 = 0; x1 < current_char.width; x1++) {
-				for (int y1 = 0; y1 < current_char.height; y1++) {
-					bool on = (*atlas)[atlasx + x1][atlasy + y1 + 1];
-					if (on) {
-						int xpos = textx + x1 + current_char.xoffset;
-						int ypos = texty + y1 + current_char.yoffset;
-						if (xpos < 0 || xpos > 247 || ypos < 0 || ypos > 247) continue;
-						(*pixels)[xpos][ypos] = inverted ? false : true;
-					}
+	while (next != UTF8_END && next >= 0) {
+		moduru::gui::bmfont_char current_char;
+		current_char = font->chars[next];
+		atlasx = current_char.x;
+		atlasy = current_char.y;
+		for (int x1 = 0; x1 < current_char.width; x1++) {
+			for (int y1 = 0; y1 < current_char.height; y1++) {
+				bool on = (*atlas)[atlasx + x1][atlasy + y1 + 1];
+				if (on) {
+					int xpos = textx + x1 + current_char.xoffset;
+					int ypos = texty + y1 + current_char.yoffset;
+					if (xpos < 0 || xpos > 247 || ypos < 0 || ypos > 247) continue;
+					(*pixels)[xpos][ypos] = inverted ? false : true;
 				}
 			}
-			textx += current_char.xadvance;
-			next = utf8_decode_next();
 		}
-		delete[] tempText;
+		textx += current_char.xadvance;
+		next = utf8_decode_next();
 	}
-
+	delete[] tempText;
 	dirty = false;
 }
 

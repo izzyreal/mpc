@@ -29,8 +29,6 @@ Field::Field(const string& name, int x, int y, int width)
 	Hide(false);
 	this->name = name;
 	this->columns = width;
-
-	setText("");
 	setLocation(x, y);
 	setSize(width, FONT_HEIGHT);
 }

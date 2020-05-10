@@ -18,7 +18,7 @@ namespace mpc::lcdgui
 	{
 
 	public:
-		Parameter(std::string labelStr, std::string name, int x, int y, int size);
+		Parameter(std::string labelStr, std::string name, int x, int y, int fieldWidth);
 		~Parameter();
 
 	};
