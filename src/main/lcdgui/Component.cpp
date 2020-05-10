@@ -16,6 +16,28 @@ Component::Component(const string& name)
 	this->name = name;
 }
 
+weak_ptr<Parameter> Component::findParameter(const string& name)
+{
+	for (auto& c : children)
+	{
+		auto candidate = dynamic_pointer_cast<Parameter>(c);
+
+		if (candidate && candidate->getName().compare(name) == 0)
+		{
+			return candidate;
+		}
+
+		auto secondCandidate = c->findParameter(name).lock();
+
+		if (secondCandidate)
+		{
+			return secondCandidate;
+		}
+	}
+
+	return {};
+}
+
 weak_ptr<Label> Component::findLabel(const string& name)
 {
 	for (auto& c : children)

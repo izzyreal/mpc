@@ -32,6 +32,17 @@ Parameter::Parameter(string labelStr, string name, int x, int y, int fieldWidth)
 
 void Parameter::Draw(std::vector<std::vector<bool>>* pixels)
 {
-	dynamic_pointer_cast<Rectangle>(findChild("rectangle").lock())->setOn(findField(name).lock()->hasFocus());
 	Component::Draw(pixels);
+}
+
+void Parameter::takeFocus()
+{
+	dynamic_pointer_cast<Rectangle>(findChild("rectangle").lock())->setOn(true);
+	findField(name).lock()->takeFocus("");
+}
+
+void Parameter::loseFocus()
+{
+	dynamic_pointer_cast<Rectangle>(findChild("rectangle").lock())->setOn(false);
+	findField(name).lock()->loseFocus("");
 }

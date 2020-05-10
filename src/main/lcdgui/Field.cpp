@@ -32,7 +32,7 @@ Field::Field(const string& name, int x, int y, int width)
 	this->name = name;
 	this->width = width - 1;
 	setLocation(x, y);
-	setSize(width, FONT_HEIGHT);
+	setSize(width, 7);
 }
 
 const int Field::BLINKING_RATE;
@@ -43,7 +43,7 @@ void Field::takeFocus(string prev)
 	csn = layeredScreen->getCurrentScreenName();
 	focus = true;
 	inverted = true;
-	
+	/*
 	auto focusEvent = layeredScreen->getFocus();
 	auto focusField = layeredScreen->lookupField(focusEvent);
 	if (csn.compare("trim") == 0 || csn.compare("loop") == 0) {
@@ -68,6 +68,7 @@ void Field::takeFocus(string prev)
 			layeredScreen->getTwoDots().lock()->setSelected(3, true);
 		}
 	}
+	*/
 	SetDirty();
 }
 
@@ -75,8 +76,9 @@ void Field::loseFocus(string next)
 {
 	focus = false;
 	inverted = false;
+	/*
 	auto focusEvent = getName();
-
+	
 	auto layeredScreen = mpc::Mpc::instance().getLayeredScreen().lock();
 
 	csn = layeredScreen->getCurrentScreenName();
@@ -102,7 +104,7 @@ void Field::loseFocus(string next)
 			layeredScreen->getTwoDots().lock()->setSelected(3, false);
 		}
 	}
-
+	*/
 	SetDirty();
 }
 

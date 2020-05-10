@@ -8,7 +8,7 @@ namespace mpc::lcdgui {
 	{
 
 	private:
-		bool on = true;
+		bool on = false;
 
 	public:
 		void setOn(bool on);

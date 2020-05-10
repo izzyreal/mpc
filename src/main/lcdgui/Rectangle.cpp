@@ -11,8 +11,6 @@ Rectangle::Rectangle(MRECT rect)
 {
 	setSize(rect.W(), rect.H());
 	setLocation(rect.L, rect.T);
-	auto resultingRect = getRect();
-	int foo = 0;
 }
 
 void Rectangle::Draw(std::vector< std::vector<bool>>* pixels)

@@ -35,6 +35,7 @@ namespace mpc::lcdgui {
 		std::weak_ptr<Component> findChild(const std::string& name);
 		std::weak_ptr<Label> findLabel(const std::string& name);
 		std::weak_ptr<Field> findField(const std::string& name);
+		std::weak_ptr<Parameter> findParameter(const std::string& name);
 		std::vector<std::weak_ptr<Label>> findLabels();
 		std::vector<std::weak_ptr<Field>> findFields();
 		std::vector<std::weak_ptr<Parameter>> findParameters();

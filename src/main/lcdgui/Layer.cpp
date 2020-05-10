@@ -39,7 +39,7 @@ void Layer::setFocus(string textFieldName) {
 	for (auto& a : findFields()) {
 		auto tf = dynamic_pointer_cast<Field>(a.lock());
 		if (tf->getName().compare(focus) == 0 && tf->isFocusable()) {
-			tf->loseFocus(textFieldName);
+			findParameter(tf->getName()).lock()->loseFocus();
 			break;
 		}
 	}
@@ -49,7 +49,7 @@ void Layer::setFocus(string textFieldName) {
 	for (auto& a : findFields()) {
 		auto tf = dynamic_pointer_cast<Field>(a.lock());
 		if (tf->getName().compare(textFieldName) == 0 && tf->isFocusable()) {
-			tf->takeFocus(oldFocus);
+			findParameter(tf->getName()).lock()->takeFocus();
 			break;
 		}
 	}
