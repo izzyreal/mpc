@@ -125,9 +125,6 @@ namespace mpc::sampler {
 	public:
 		int getUsedProgram(int startIndex, bool up);
 
-	private:
-		void setSampleBackground();
-
 	public:
 		int checkExists(string soundName);
 		int getNextSoundIndex(int j, bool up);

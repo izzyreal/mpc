@@ -9,7 +9,10 @@ using namespace std;
 Background::Background()
 	: Component("background")
 {
-	rect = MRECT(0, 0, 247, 59);
+	x = 0;
+	y = 0;
+	w = 248;
+	h = 60;
 }
 
 void Background::setName(std::string name)

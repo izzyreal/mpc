@@ -197,6 +197,7 @@ void Layer::setDirty() {
 
 vector<weak_ptr<mpc::lcdgui::Component>> Layer::getComponentsThatNeedClearing() {
 	vector<weak_ptr<mpc::lcdgui::Component>> result;
+/*
 	for (auto& c : usedFields) {
 		if (c->NeedsClearing()) {
 			result.push_back(c);
@@ -218,6 +219,7 @@ vector<weak_ptr<mpc::lcdgui::Component>> Layer::getAllLabelsAndFields() {
 	for (auto& c : getAllFields()) {
 		result.push_back(c);
 	}
+	*/
 	return result;
 }
 

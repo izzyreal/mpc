@@ -87,7 +87,10 @@ std::weak_ptr<Component> Component::findChild(const std::string& name)
 
 void Component::Draw(std::vector<std::vector<bool>>* pixels)
 {
-	MLOG("Drawing Component " + getName());
+	if (hidden || !IsDirty())
+	{
+		return;
+	}
 
 	for (auto& c : children)
 	{
@@ -105,11 +108,19 @@ void Component::Hide(bool b)
 	if (hidden != b) { 
 		hidden = b;
 		SetDirty();
-		if (!rect.Empty()) {
-			clearRects.push_back(rect);
-			dirtyRect = dirtyRect.Union(&rect);
-		}
 	} 
+}
+
+void Component::setSize(int w, int h) {
+	this->w = w;
+	this->h = h;
+	SetDirty();
+}
+
+void Component::setLocation(int x, int y) {
+	this->x = x;
+	this->y = y;
+	SetDirty();
 }
 
 MRECT Component::getDirtyArea() {
@@ -119,16 +130,16 @@ MRECT Component::getDirtyArea() {
 		res = res.Union(&c->getDirtyArea());
 	}
 
-	res = res.Union(&dirtyRect);
-
-	dirtyRect.Clear();
+	if (dirty) {
+		auto rect = getRect();
+		res = res.Union(&rect);
+	}
 
 	return res;
 }
 
 void Component::SetDirty() 
 { 
-	dirtyRect = dirtyRect.Union(&rect);
 	dirty = true; 
 }
 
@@ -159,33 +170,16 @@ bool Component::IsDirty()
 	return dirty;
 }
 
-bool Component::NeedsClearing()
-{
-	return clearRects.size() != 0;
+MRECT Component::getRect() {
+	return MRECT(x, y, x + w, y + h);
 }
 
 void Component::Clear(std::vector<std::vector<bool>>* pixels) {
-	for (int k = 0; k < clearRects.size(); k++) {
-		auto r = clearRects[k];
-		bool alreadyDone = false;
-		for (int k1 = 0; k1 < k; k1++) {
-			if (clearRects[k1] == r) {
-				alreadyDone = true;
-				break;
-			}
-		}
-		if (alreadyDone) continue;
-		for (int i = r.L; i < r.R + 1; i++) {
-			for (int j = r.T; j < r.B + 1; j++) {
-				if (i < 0 || i > 247 || j < 0 || j > 59) continue;
-				(*pixels)[i][j] = false;
-			}
+	auto r = getRect();
+	for (int i = r.L; i < r.R + 1; i++) {
+		for (int j = r.T; j < r.B + 1; j++) {
+			if (i < 0 || i > 247 || j < 0 || j > 59) continue;
+			(*pixels)[i][j] = false;
 		}
 	}
-	clearRects.clear();
-}
-
-MRECT* Component::GetRECT()
-{ 
-	return &rect;
 }

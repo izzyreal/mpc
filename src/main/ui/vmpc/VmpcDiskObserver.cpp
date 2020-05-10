@@ -20,7 +20,6 @@ VmpcDiskObserver::VmpcDiskObserver()
 	scsiField = ls ->lookupField("scsi");
 	accessTypeField = ls->lookupField("accesstype");
 	rootField = ls->lookupField("root");
-	rootField.lock()->setScrolling(true);
 	displayScsi();
 	displayAccessType();
 	displayRoot();
@@ -61,5 +60,4 @@ void VmpcDiskObserver::displayRoot()
 }
 
 VmpcDiskObserver::~VmpcDiskObserver() {
-	rootField.lock()->setScrolling(false);
 }

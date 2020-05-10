@@ -18,43 +18,21 @@
 using namespace mpc::lcdgui;
 using namespace std;
 
-Field::Field(const string& name, int x, int y, int columns)
+Field::Field(const string& name, int x, int y, int width)
 	: TextComp(name)
 {
 
 	split = false;
 	focusable = true;
-	opaque = true;
 	inverted = false;
 	focus = false;
 	Hide(false);
 	this->name = name;
-	this->columns = columns;
+	this->columns = width;
 
 	setText("");
-	setLocation(x, y, false);
-	setSize(columns * TEXT_WIDTH + 1, TEXT_HEIGHT + 1, false);
-	clearRects.clear();
-}
-
-void Field::Draw(vector<vector<bool>>* pixels) {
-	const int margin = noLeftMargin ? 0 : 1;
-	if (opaque) {
-		for (int j = 0; j < w; j++) {
-			for (int k = 0; k < TEXT_HEIGHT + 2; k++) {
-				int x1 = x + j - margin;
-				int y1 = y + k;
-				if (x1 < 0 || x1 > 247 || y1 < 0 || y1 > 59) continue;
-				(*pixels)[x1][y1] = inverted ? true : false;
-			}
-		}
-	}
-	TextComp::Draw(pixels);
-}
-
-void Field::setSize(int width, int height, bool clear) {
-	TextComp::setSize(width, height, clear);
-	setText(text);
+	setLocation(x, y);
+	setSize(width, FONT_HEIGHT);
 }
 
 const int Field::BLINKING_RATE;
@@ -90,27 +68,6 @@ void Field::takeFocus(string prev)
 			layeredScreen->getTwoDots().lock()->setSelected(3, true);
 		}
 	}
-	//if (csn.compare("directory") == 0) {
-//		focusField.lock()->setOpaque(true);
-	//}
-	//if (!csn.compare("name") == 0) {
-//		focusField.lock()->setOpaque(true);
-	//}
-	//if (csn.compare("name") == 0) {
-		//		//if (!lGui->getNameGui()->isNameBeingEdited()) {
-		//focusField.lock()->setOpaque(true);
-	//}
-	//if (!(csn.compare("name") == 0 && nameGui->isNameBeingEdited())) {
-	//		focusField.lock()->setForeground(false);
-	//}
-	//	}
-	//	if (csn.compare("tempochange") == 0) {
-//		focusField.lock()->setOpaque(true);
-//	}
-//	if (csn.compare("trmove") == 0) {
-//		//if (focusEvent.compare("tr1") == 0 && !lGui->getTrMoveGui()->isSelected())
-//		//	lLs->drawFunctionKeys("trmove_notselected");
-//	}
 	SetDirty();
 }
 
@@ -118,11 +75,7 @@ void Field::loseFocus(string next)
 {
 	focus = false;
 	inverted = false;
-	//if (csn.compare("name") == 0) {
-//		setOpaque(false);
-//	}
 	auto focusEvent = getName();
-	//setSplit(false);
 
 	auto layeredScreen = mpc::Mpc::instance().getLayeredScreen().lock();
 
@@ -149,36 +102,6 @@ void Field::loseFocus(string next)
 			layeredScreen->getTwoDots().lock()->setSelected(3, false);
 		}
 	}
-
-
-	//if (csn.compare("tempochange") == 0) {
-	//	setOpaque(false);
-	//	setForeground(false);
-	//}
-
-	//if (csn.compare("name") == 0) {
-//		setOpaque(false);
-//	}
-
-	////if ((!lGui->getNameGui()->isNameBeingEdited() && csn.compare("name") == 0))
-	//	setOpaque(false);
-	////if (!(csn.compare("name") == 0 && lGui->getNameGui()->isNameBeingEdited())) {
-	//	setForeground(!getForeground());
-	////}
-	//if (csn.compare("trmove") == 0) {
-	////	if (focusEvent.compare("tr1") == 0 && !lGui->getTrMoveGui()->isSelected())
-	////		lLs->drawFunctionKeys("trmove");
-	//}
-	//else if (csn.compare("save") == 0) {
-	//	setOpaque(false);
-	//}
-	//else if (csn.compare("assignmentview") == 0) {
-	//	setOpaque(false);
-	//}
-
-	//if (csn.compare("directory") == 0) {
-		//setOpaque(false);
-	//}
 
 	SetDirty();
 }

@@ -13,9 +13,9 @@ TwoDots::TwoDots()
 {
 	selected = vector<bool>(4);
 	visible = vector<bool>(4);
-	for (int i = 0; i < 4; i++)
-		visible[i] = false;
-	rect = MRECT(25, 19, 210, 30);
+	
+	setSize(185, 11);
+	setLocation(25, 19);
 }
 
 void TwoDots::setInverted(bool b)
@@ -38,9 +38,15 @@ void TwoDots::setVisible(int i, bool b)
 
 void TwoDots::Draw(std::vector<std::vector<bool>>* pixels)
 {
+	if (hidden || !IsDirty())
+	{
+		return;
+	}
+
 	vector<vector<vector<int>>> lines;
 	vector<bool> colors;
-    for (int i = 0; i < 4; i++) {
+    
+	for (int i = 0; i < 4; i++) {
         if (selected[i]) {
             color = inverted ? true : false;
         } else {

@@ -20,12 +20,13 @@ namespace mpc::lcdgui {
 		std::vector<std::shared_ptr<Component>> children;
 
 	protected:
-		MRECT rect;
-		MRECT dirtyRect;
-		std::vector<MRECT> clearRects;
+		std::string name{ "" };
 		bool hidden = false;
 		bool dirty = false;
-		std::string name{ "" };
+		unsigned int x{ 0 };
+		unsigned int y{ 0 };
+		unsigned int w{ 0 };
+		unsigned int h{ 0 };
 
 	public:
 		std::weak_ptr<Component> addChild(std::shared_ptr<Component> child);
@@ -33,24 +34,21 @@ namespace mpc::lcdgui {
 		std::weak_ptr<Component> findChild(const std::string& name);
 		std::weak_ptr<Label> findLabel(const std::string& name);
 		std::weak_ptr<Field> findField(const std::string& name);
-		std::weak_ptr<Component> getDirtyChildren();
+		MRECT getRect();
 
 	public:
 		virtual void Hide(bool b);
 		void SetDirty();
-
 		bool IsHidden();
 		bool IsDirty();
-		bool NeedsClearing();
 		MRECT getDirtyArea();
-
+		void setSize(int width, int height);
+		void setLocation(int x, int y);
 		const std::string& getName();
 
 	public:
 		virtual void Draw(std::vector<std::vector<bool>>* pixels);
 		virtual void Clear(std::vector<std::vector<bool>>* pixels);
-
-		MRECT* GetRECT();
 
 	public:
 		Component(const std::string& name);

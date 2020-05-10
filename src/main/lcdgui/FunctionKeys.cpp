@@ -14,7 +14,8 @@ FunctionKeys::FunctionKeys()
 {
 	enabled = vector<bool>{ false, false, false, false, false, false };
 	names = vector<string>{ "", "", "", "", "", "" };
-	rect = MRECT(0, 30, 247, 59);
+	setSize(248, 10);
+	setLocation(0, 50);
 }
 
 void FunctionKeys::initialize(rapidjson::Value& fbLabels, rapidjson::Value& fbTypes) {
@@ -77,6 +78,12 @@ void FunctionKeys::clearAll(std::vector<std::vector<bool>>* pixels) {
 }
 
 void FunctionKeys::Draw(std::vector<std::vector<bool>>* pixels) {
+
+	if (hidden || !IsDirty())
+	{
+		return;
+	}
+
 	vector<int> xPos = vector<int>{ 2, 43, 84, 125, 166, 207 };
 	vector<int> types = vector<int>{ box0, box1, box2, box3, box4, box5 };
 	bool border = false;
@@ -85,14 +92,6 @@ void FunctionKeys::Draw(std::vector<std::vector<bool>>* pixels) {
 
 	for (int i = 0; i < xPos.size(); i++) {
 		if (names[i] == "" || !enabled[i]) {
-			/*
-			for (int j = 0; j < 39; j++) {
-				for (int k = 51; k < 60; k++) {
-					int x1 = j + xPos[i];
-					pixels->at(x1).at(k) = false;
-				}
-			}
-			*/
 			continue;
 		}
 
@@ -117,20 +116,21 @@ void FunctionKeys::Draw(std::vector<std::vector<bool>>* pixels) {
 
 		for (int j = 0; j < 39; j++) {
 			int x1 = j + xPos[i];
-			pixels->at(x1).at(51) = border;
-			pixels->at(x1).at(59) = border;
+			(*pixels)[x1][51] = border;
+			(*pixels)[x1][59] = border;
 		}
 		
 		for (int j = 52; j < 59; j++) {
-			pixels->at(xPos[i]).at(j) = border;
-			pixels->at(xPos[i] + 38).at(j) = border;
+			(*pixels)[xPos[i]][j] = border;
+			(*pixels)[xPos[i] + 38][j] = border;
 		}
 
 		for (int j = 1; j < 38; j++) {
 			for (int k = 52; k < 59; k++) {
-				pixels->at(xPos[i] + j).at(k) = bg;
+				(*pixels)[xPos[i] + j][k] = bg;
 			}
 		}
+
 		lcdgui::Label labelComponent("fk" + to_string(i), names[i], xPos[i] + offsetx, 51, stringSize);
 		labelComponent.setInverted(!label);
 		labelComponent.setOpaque(false);

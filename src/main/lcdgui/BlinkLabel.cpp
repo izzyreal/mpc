@@ -5,10 +5,9 @@
 using namespace mpc::lcdgui;
 using namespace std;
 
-BlinkLabel::BlinkLabel(const string& name, const string& text, int x, int y, int columns)
-	: Label(name, text, x, y, columns)
+BlinkLabel::BlinkLabel(const string& name, const string& text, int x, int y, int width)
+	: Label(name, text, x, y, width)
 {
-	this->rect = MRECT(133, 52, 158, 58);
 	setText(text);
 }
 

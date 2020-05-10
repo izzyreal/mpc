@@ -10,17 +10,9 @@ namespace mpc::lcdgui {
 		: public TextComp
 
 	{
-	private:
-		bool rigorousClearing = false;
 
 	public:
-		void enableRigorousClearing();
-
-	public:
-		void Draw(std::vector<std::vector<bool>>* pixels) override;
-
-	public:
-		Label(const std::string& name, std::string text, int x, int y, int columns);
+		Label(const std::string& name, std::string text, int x, int y, int width);
 		~Label() override;
 
 	};

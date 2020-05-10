@@ -768,17 +768,6 @@ void Sampler::resample(std::vector<float>* src, int srcRate, std::vector<float>*
 	}
 }
 
-
-void Sampler::setSampleBackground()
-{
-	Mpc::instance().getLayeredScreen().lock()->getCurrentBackground()->setName("sample");
-	auto components = Mpc::instance().getLayeredScreen().lock()->getLayer(0)->getAllLabelsAndFields();
-	for (auto& c : components) {
-		c.lock()->SetDirty();
-	}
-	Mpc::instance().getLayeredScreen().lock()->getFunctionKeys()->SetDirty();
-}
-
 int Sampler::checkExists(string soundName)
 {
 	for (int i = 0; i < getSoundCount(); i++) {

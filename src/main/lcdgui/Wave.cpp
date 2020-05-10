@@ -6,8 +6,6 @@
 
 #include <gui/Bressenham.hpp>
 
-#include <Logger.hpp>
-
 #include <cmath>
 
 using namespace mpc::lcdgui;
@@ -17,7 +15,8 @@ using namespace std;
 Wave::Wave()
 	: Component("wave")
 {
-	rect = MRECT(0, 0, 247, 59);
+	setSize(248, 60);
+	setLocation(0, 0);
 }
 
 void Wave::setFine(bool fine) {
@@ -151,7 +150,6 @@ void Wave::makeLine(std::vector<std::vector<std::vector<int>> >* lines, std::vec
 		}
 		if (peakPos > invisible) {
 			if (fine) {
-				//MLOG("samplePos " + to_string(samplePos));
 				if (samplePos + samplesPerPixel >= frames) {
 					colors->push_back(false);
 				}
@@ -183,8 +181,16 @@ void Wave::makeLine(std::vector<std::vector<std::vector<int>> >* lines, std::vec
 }
 
 void Wave::Draw(std::vector<std::vector<bool>>* pixels) {
-	if (sampleData == nullptr) return;
-	if (IsHidden()) return;
+	
+	if (hidden || !IsDirty())
+	{
+		return;
+	}
+	
+	if (sampleData == nullptr) {
+		return;
+	}
+
 	vector<vector<vector<int>>> lines;
 	vector<bool> colors;
 	vector<int> offsetxy{ fine ? 23 : 1 , fine ? 16 : 21 };

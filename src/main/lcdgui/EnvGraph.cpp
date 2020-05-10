@@ -13,8 +13,8 @@ using namespace std;
 EnvGraph::EnvGraph()
 	: Component("env-graph")
 {
-	
-	rect = MRECT(10, 10, 200, 50);
+	setSize(190, 40);
+	setLocation(10, 10);
 }
 
 void EnvGraph::setCoordinates(vector<vector<int>> ia)

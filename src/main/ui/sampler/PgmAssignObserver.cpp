@@ -43,8 +43,8 @@ PgmAssignObserver::PgmAssignObserver()
 	optionalNoteBLabel = ls->lookupLabel("optionalnotenumberb");
 	optionalNoteBField = ls->lookupField("optionalnotenumberb");
 
-	optionalNoteALabel.lock()->enableRigorousClearing();
-	optionalNoteBLabel.lock()->enableRigorousClearing();
+	//optionalNoteALabel.lock()->enableRigorousClearing();
+	//optionalNoteBLabel.lock()->enableRigorousClearing();
 
 	pgmField = ls->lookupField("pgm");
 	selectedPadNumberField = ls->lookupField("pad");

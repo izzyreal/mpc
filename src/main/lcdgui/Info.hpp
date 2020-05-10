@@ -14,7 +14,6 @@ namespace mpc::lcdgui {
 
 	public:
 		Info(const std::string& name, int x, int y, int size);
-		~Info();
 
 	};
 }

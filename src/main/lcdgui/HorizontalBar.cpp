@@ -9,7 +9,8 @@ using namespace mpc::lcdgui;
 HorizontalBar::HorizontalBar(MRECT rect, int value)
 	: Component("horizontal-bar")
 {
-	this->rect = rect;
+	setSize(rect.W(), rect.H());
+	setLocation(rect.L, rect.T);
 	this->value = value;
 }
 
@@ -20,7 +21,12 @@ void HorizontalBar::setValue(int value)
 }
 
 void HorizontalBar::Draw(std::vector<std::vector<bool>>* pixels) {
-	if (IsHidden()) return;
+	if (hidden || !IsDirty())
+	{
+		return;
+	}
+
+	auto rect = getRect();
 	int x = rect.L;
 	int y = rect.T;
 	int x2 = x + ((int)(floor((value - 1) / 2.55))) + 1;

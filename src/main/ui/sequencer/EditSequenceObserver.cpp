@@ -63,9 +63,9 @@ EditSequenceObserver::EditSequenceObserver()
 	start1Label = ls->lookupLabel("start1");
 	start2Label = ls->lookupLabel("start2");
 	copiesLabel = ls->lookupLabel("copies");
-	copiesLabel.lock()->enableRigorousClearing();
+	//copiesLabel.lock()->enableRigorousClearing();
 	modeLabel = ls->lookupLabel("mode");
-	modeLabel.lock()->enableRigorousClearing();
+	//modeLabel.lock()->enableRigorousClearing();
 	lSequencer->deleteObservers();
 	lSequencer->addObserver(this);
 	seq->addObserver(this);

@@ -17,19 +17,12 @@ TextComp::TextComp(const std::string& name)
 {
 }
 
-void TextComp::Hide(bool b) {
-	const int margin = noLeftMargin ? 0 : 1;
-	if (b) {
-		MRECT clearRect(x, y, x + (TEXT_WIDTH * columns) + margin, y + TEXT_HEIGHT + 1);
-		clearRects.push_back(clearRect);
-		dirtyRect = dirtyRect.Union(&clearRect);
-	}
-	Component::Hide(b);
-}
-
 void TextComp::Draw(std::vector<std::vector<bool>>* pixels) {
-	
-	Component::Draw(pixels);
+
+	if (hidden || !IsDirty())
+	{
+		return;
+	}
 
 	auto font = &LayeredScreen::font;
 	auto atlas = &LayeredScreen::atlas;
@@ -65,47 +58,10 @@ void TextComp::Draw(std::vector<std::vector<bool>>* pixels) {
 			textx += current_char.xadvance;
 			next = utf8_decode_next();
 		}
-		delete tempText;
+		delete[] tempText;
 	}
-
-	dirtyRect = dirtyRect.Union(&rect);
 
 	dirty = false;
-}
-
-void TextComp::setSize(int w, int h, bool clear) {
-	const int margin = noLeftMargin ? 0 : 1;
-	
-	if (clear) {
-		MRECT clearRect(x, y, x + this->w + margin, y + TEXT_HEIGHT + 1);
-		clearRects.push_back(clearRect);
-		dirtyRect = dirtyRect.Union(&clearRect);
-	}
-
-	this->w = w;
-	this->h = h;
-	initRECT();
-	SetDirty();
-}
-
-void TextComp::setLocation(int x, int y, bool clear) {
-	
-	if (clear) {
-		const int margin = noLeftMargin ? 0 : 1;
-		MRECT clearRect(this->x, this->y, this->x + w + margin, this->y + TEXT_HEIGHT + 1);
-		clearRects.push_back(clearRect);
-		dirtyRect = dirtyRect.Union(&clearRect);
-	}
-
-	this->x = x;
-	this->y = y;
-	initRECT();
-	SetDirty();
-}
-
-void TextComp::initRECT() {
-	rect = MRECT(x, y, x + w, y + h);
-	dirtyRect = dirtyRect.Union(&rect);
 }
 
 int TextComp::getX() {
@@ -134,11 +90,6 @@ void TextComp::setInverted(bool b) {
 	SetDirty();
 }
 
-void TextComp::setNoLeftMargin(bool b) {
-	noLeftMargin = true;
-	SetDirty();
-}
-
 string TextComp::getName() {
 	return name;
 }
@@ -162,20 +113,6 @@ unsigned int TextComp::GetTextEntryLength() {
 void TextComp::setText(const string& s)
 {
 	text = s;
-	//bool wasScrolling = scrolling;
-	//if (scrolling) setScrolling(false);
-	//auto typeName = typeid(*this).name();
-	//auto typeStr = string(typeName);
-	//text = s;
-	//int len = 0;
-	//auto s1 = text.c_str();
-	//while (*s1) len += (*s1++ & 0xc0) != 0x80;
-
-	//if (len > getColumns()) s = StrUtil::subStr(s, 0, getColumns());
-	////if (textControl) {
-	////	textControl->SetTextFromPlug(&s[0]);
-	////}
-	//if (wasScrolling) setScrolling(true);
 	SetDirty();
 }
 
@@ -188,51 +125,5 @@ void TextComp::setTextPadded(int i, string padding) {
 	setTextPadded(to_string(i), padding);
 }
 
-void TextComp::setScrolling(bool scrolling) {
-	this->scrolling = scrolling;
-	if (scrolling) {
-		if (text.length() <= columns) {
-			scrolling = false;
-			return;
-		}
-		scrollThread = thread(&TextComp::static_scroll, this);
-	}
-	else {
-		if (scrollThread.joinable()) scrollThread.join();
-	}
-}
-
-void TextComp::scroll() {
-	auto origText = this->text;
-	int len = 0;
-	auto s = origText.c_str();
-	while (*s) len += (*s++ & 0xc0) != 0x80;
-	int clmns = getColumns();
-	bool left = false;
-	int offset = 0;
-	while (scrolling) {
-		if (offset + clmns == len || offset == 0) {
-			left = !left;
-			const unsigned int repeats = 100;
-			unsigned int counter = 0;
-			while (scrolling && counter++ < repeats)
-				this_thread::sleep_for(chrono::milliseconds(5));
-		}
-		offset = left ? offset + 1 : offset - 1;
-		auto tmp = StrUtil::subStr(origText, offset, offset + clmns);
-		//textControl->SetTextFromPlug(&tmp[0]);
-		//SetDirty(true);
-		const unsigned int repeats = 100;
-		unsigned int counter = 0;
-		while (scrolling && counter++ < repeats)
-			this_thread::sleep_for(chrono::milliseconds(3));
-	}
-}
-
-void TextComp::static_scroll(void * args) {
-	static_cast<TextComp*>(args)->scroll();
-}
-
 TextComp::~TextComp() {
-	if (scrollThread.joinable()) scrollThread.join();
 }

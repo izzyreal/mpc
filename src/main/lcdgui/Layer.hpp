@@ -60,7 +60,6 @@ namespace mpc::lcdgui
 		std::vector<std::weak_ptr<mpc::lcdgui::Component>> getAllFields();
 		std::vector<std::weak_ptr<mpc::lcdgui::Component>> getAllLabels();
 		std::vector<std::weak_ptr<mpc::lcdgui::Component>> getComponentsThatNeedClearing();
-		std::vector<std::weak_ptr<mpc::lcdgui::Component>> getAllLabelsAndFields();
 		void setFocus(std::string textFieldName);
 		std::string getFocus();
 

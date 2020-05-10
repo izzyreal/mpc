@@ -35,10 +35,6 @@ namespace mpc::lcdgui
 		bool blinking{ false };
 
 	public:
-		void setSize(int x, int y, bool clear = true) override;
-		void Draw(std::vector<std::vector<bool>>* pixels) override;
-
-	public:
 		bool hasFocus();
 		void setFocusable(bool b);
 		bool isFocusable();

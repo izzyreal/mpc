@@ -101,7 +101,7 @@ vector<shared_ptr<Component>> ScreenArrangements::get(const string& screenName, 
 
 void ScreenArrangements::init()
 {
-	auto path0 = string(mpc::StartUp::resPath + "mainpanel.json");
+	auto path0 = string(mpc::StartUp::resPath + "mainpanel-mod.json");
 	auto path1 = string(mpc::StartUp::resPath + "windowpanel.json");
 	auto path2 = string(mpc::StartUp::resPath + "dialogpanel.json");
 	auto path3 = string(mpc::StartUp::resPath + "dialog2panel.json");

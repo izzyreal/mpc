@@ -143,15 +143,19 @@ void TrMuteObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 {
 	string s = nonstd::any_cast<string>(arg);
 	if (s.compare("soloenabled") == 0 ) {
+		/*
 		for (auto& l : Mpc::instance().getLayeredScreen().lock()->getLayer(0)->getAllLabelsAndFields()) {
 			l.lock()->SetDirty();
 		}
+		*/
 		refreshTracks();
 	}
 	else if (s.compare("selectedtrackindex") == 0) {
+		/*
 		for (auto& l : Mpc::instance().getLayeredScreen().lock()->getLayer(0)->getAllLabelsAndFields()) {
 			l.lock()->SetDirty();
 		}
+		*/
 		refreshTracks();
 	}
 	else if (s.compare("bank") == 0) {
