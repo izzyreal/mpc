@@ -14,6 +14,8 @@
 #include <mpc/MpcIndivFxMixerChannel.hpp>
 #include <mpc/MpcStereoMixerChannel.hpp>
 
+#include <lcdgui/Background.hpp>
+
 using namespace mpc::controls::mixer;
 using namespace std;
 

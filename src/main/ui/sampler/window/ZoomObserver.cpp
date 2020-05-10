@@ -3,6 +3,7 @@
 #include <Mpc.hpp>
 #include <lcdgui/Wave.hpp>
 #include <lcdgui/Field.hpp>
+#include <lcdgui/Label.hpp>
 #include <lcdgui/TwoDots.hpp>
 #include <ui/sampler/SoundGui.hpp>
 #include <ui/sampler/window/ZoomGui.hpp>

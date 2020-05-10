@@ -1,9 +1,10 @@
 #include "EditSoundObserver.hpp"
 
-//#include <disk/AbstractDisk.hpp>
 #include <Mpc.hpp>
 #include <lcdgui/Background.hpp>
 #include <lcdgui/Field.hpp>
+#include <lcdgui/Label.hpp>
+#include <lcdgui/FunctionKeys.hpp>
 #include <ui/sampler/window/EditSoundGui.hpp>
 #include <ui/sequencer/window/SequencerWindowGui.hpp>
 #include <sampler/Sampler.hpp>

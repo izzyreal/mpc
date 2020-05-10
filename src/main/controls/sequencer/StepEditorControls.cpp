@@ -8,6 +8,7 @@
 #include <command/CopySelectedNotes.hpp>
 #include <command/RemoveEvents.hpp>
 #include <lcdgui/Field.hpp>
+#include <lcdgui/Label.hpp>
 #include <ui/sequencer/StepEditorGui.hpp>
 #include <ui/sequencer/window/SequencerWindowGui.hpp>
 #include <sequencer/ChannelPressureEvent.hpp>

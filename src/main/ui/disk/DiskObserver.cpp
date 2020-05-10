@@ -8,6 +8,7 @@
 #include <lcdgui/LayeredScreen.hpp>
 #include <ui/NameGui.hpp>
 #include <lcdgui/Field.hpp>
+#include <lcdgui/Label.hpp>
 #include <ui/disk/DiskGui.hpp>
 #include <ui/disk/window/DiskWindowGui.hpp>
 #include <ui/sampler/SamplerGui.hpp>

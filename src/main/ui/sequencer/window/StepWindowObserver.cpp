@@ -5,6 +5,7 @@
 #include <ui/Uis.hpp>
 #include <lcdgui/LayeredScreen.hpp>
 #include <lcdgui/Field.hpp>
+#include <lcdgui/Label.hpp>
 #include <ui/sampler/SamplerGui.hpp>
 #include <ui/sequencer/StepEditorGui.hpp>
 #include <ui/sequencer/window/SequencerWindowGui.hpp>

@@ -62,7 +62,7 @@ SequencerObserver::SequencerObserver()
 	nextSqField.lock()->Hide(true);
 	nextSqLabel.lock()->Hide(true);
 
-	soloLabel = dynamic_pointer_cast<mpc::lcdgui::BlinkLabel>(ls->lookupLabel("soloblink").lock());
+	//soloLabel = dynamic_pointer_cast<mpc::lcdgui::BlinkLabel>(ls->lookupLabel("soloblink").lock());
 
 	seqNum = lSequencer->getActiveSequenceIndex();
 	seq = lSequencer->getSequence(seqNum);
@@ -350,7 +350,7 @@ void SequencerObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 	}
 	else if (s.compare("soloenabled") == 0)
 {
-		soloLabel.lock()->setBlinking(lSequencer->isSoloEnabled());
+		//soloLabel.lock()->setBlinking(lSequencer->isSoloEnabled());
 	}
 }
 

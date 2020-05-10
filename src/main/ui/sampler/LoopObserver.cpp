@@ -2,9 +2,9 @@
 
 #include <Mpc.hpp>
 #include <Util.hpp>
-#include <disk/AbstractDisk.hpp>
 #include <lcdgui/LayeredScreen.hpp>
 #include <lcdgui/Field.hpp>
+#include <lcdgui/Label.hpp>
 #include <lcdgui/TwoDots.hpp>
 #include <lcdgui/Wave.hpp>
 #include <ui/sampler/SoundGui.hpp>

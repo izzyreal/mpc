@@ -1,5 +1,4 @@
 #pragma once
-#include <lcdgui/Layer.hpp>
 
 #include <memory>
 #include <vector>
@@ -7,11 +6,14 @@
 
 #include <gui/BMFParser.hpp>
 
+#include <gui/BasicStructs.hpp>
+
 namespace moduru::observer {
 	class Observer;
 }
 
 namespace mpc::lcdgui {
+	class FunctionKeys;
 	class SelectedEventBar;
 	class Background;
 	class EnvGraph;
@@ -27,6 +29,8 @@ namespace mpc::lcdgui {
 	class Effect;
 	class Field;
 	class Label;
+	class Layer;
+	class Component;
 }
 
 namespace mpc::lcdgui {
@@ -49,7 +53,7 @@ namespace mpc::lcdgui {
 	private:
 		const int LAYER_COUNT = 4;
 
-		std::vector<std::unique_ptr<Layer>> layers = std::vector<std::unique_ptr<Layer>>(LAYER_COUNT);
+		std::vector<std::weak_ptr<Layer>> layers;
 
 		int getCurrentParamIndex();
 		std::weak_ptr<mpc::lcdgui::Field> findBelow(std::weak_ptr<mpc::lcdgui::Field> tf);
@@ -60,7 +64,8 @@ namespace mpc::lcdgui {
 		std::string findAbove(std::string tf);
 		void transferFocus(bool backwards);
 		Layer* getLayer(int i);
-		int getCurrentLayer();
+		int getFocusedLayerIndex();
+		std::weak_ptr<Layer> getFocusedLayer();
 		int openScreen(std::string name); // returns layer number
 		std::weak_ptr<Field> lookupField(std::string s);
 		std::weak_ptr<Label> lookupLabel(std::string s);
@@ -68,7 +73,7 @@ namespace mpc::lcdgui {
 	private:
 		std::vector<std::vector<std::string>> lastFocus{};
 
-		int currentLayer{ 0 };
+		int focusedLayer{ 0 };
 		std::string currentScreenName{ "" };
 		std::string previousScreenName{ "" };
 
@@ -142,11 +147,10 @@ namespace mpc::lcdgui {
 
 	public:
 		std::string getFocus();
-		void setFocus(std::string focus);
+		void setFocus(const std::string& focus);
 
 	public:
 		LayeredScreen();
-		~LayeredScreen();
 
 	};
 }

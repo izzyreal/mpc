@@ -42,17 +42,11 @@ void ConvertSoundControls::function(int i)
 			if (lSampler->getSound(soundGui->getSoundIndex()).lock()->isMono()) {
 				soundGui->setNewStName(name + "-S");
 				soundGui->setRSource(soundGui->getSoundIndex(), lSampler->getSoundCount());
-				lLs->getWave().lock()->SetDirty();
-				lLs->getLayer(0)->setDirty();
-				lLs->getLayer(1)->setDirty();
 				lLs->openScreen("monotostereo");
 			}
 			else {
 				soundGui->setNewLName(name + "-L");
 				soundGui->setNewRName(name + "-R");
-				lLs->getWave().lock()->SetDirty();
-				lLs->getLayer(0)->setDirty();
-				lLs->getLayer(1)->setDirty();
 				lLs->openScreen("stereotomono");
 			}
 		}

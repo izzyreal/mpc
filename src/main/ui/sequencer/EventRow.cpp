@@ -5,6 +5,7 @@
 #include <lcdgui/LayeredScreen.hpp>
 #include <lcdgui/HorizontalBar.hpp>
 #include <lcdgui/Field.hpp>
+#include <lcdgui/Label.hpp>
 #include <ui/Uis.hpp>
 #include <ui/sampler/SamplerGui.hpp>
 #include <lcdgui/SelectedEventBar.hpp>

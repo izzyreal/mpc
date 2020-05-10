@@ -4,6 +4,7 @@
 #include <Util.hpp>
 #include <StartUp.hpp>
 #include <lcdgui/MixerStrip.hpp>
+#include <lcdgui/Layer.hpp>
 #include <lcdgui/Field.hpp>
 #include <lcdgui/Label.hpp>
 #include <ui/sampler/MixerGui.hpp>
@@ -88,7 +89,7 @@ void MixerObserver::initPadNameLabels()
 {
 	int lCounter3 = 0;
 	int lCounter4 = 0;
-	for (auto label : ls.lock()->getLayer(0)->getAllLabels()) {
+	for (auto label : ls.lock()->getLayer(0)->findLabels()) {
 		auto l = dynamic_pointer_cast<mpc::lcdgui::Label>(label.lock());
 		if (l) {
 			if (l->getName().compare("e3") == 0 || l->getName().compare("e4") == 0) {

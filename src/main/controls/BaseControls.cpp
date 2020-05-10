@@ -115,7 +115,7 @@ void BaseControls::function(int i)
 	auto lsLocked = ls.lock();
 	switch (i) {
 	case 3:
-		if (lsLocked->getCurrentLayer() == 1) {
+		if (lsLocked->getFocusedLayerIndex() == 1) {
 			if (csn.compare("sequence") == 0) {
 				lsLocked->setPreviousScreenName("sequencer");
 			}
@@ -150,7 +150,7 @@ void BaseControls::function(int i)
 				}
 			}
 		}
-		if (lsLocked->getCurrentLayer() == 1 || lsLocked->getCurrentLayer() == 2 || lsLocked->getCurrentLayer() == 3) {
+		if (lsLocked->getFocusedLayerIndex() == 1 || lsLocked->getFocusedLayerIndex() == 2 || lsLocked->getFocusedLayerIndex() == 3) {
 			lsLocked->openScreen(lsLocked->getPreviousScreenName());
 		}
 		break;

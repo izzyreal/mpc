@@ -2,6 +2,7 @@
 
 #include "Label.hpp"
 #include "Field.hpp"
+#include "Parameter.hpp"
 
 #include <Mpc.hpp>
 
@@ -15,7 +16,7 @@ Component::Component(const string& name)
 	this->name = name;
 }
 
-std::weak_ptr<Label> Component::findLabel(const std::string& name)
+weak_ptr<Label> Component::findLabel(const string& name)
 {
 	for (auto& c : children)
 	{
@@ -37,7 +38,7 @@ std::weak_ptr<Label> Component::findLabel(const std::string& name)
 	return {};
 }
 
-std::weak_ptr<Field> Component::findField(const std::string& name)
+weak_ptr<Field> Component::findField(const string& name)
 {
 	for (auto& c : children)
 	{
@@ -59,21 +60,72 @@ std::weak_ptr<Field> Component::findField(const std::string& name)
 	return {};
 }
 
-weak_ptr<Component> Component::addChild(std::shared_ptr<Component> child)
+vector<weak_ptr<Label>> Component::findLabels()
+{
+	vector<weak_ptr<Label>> result;
+	for (auto& c : children)
+	{
+		for (auto& childLabel : c->findLabels())
+		{
+			auto candidate = dynamic_pointer_cast<Label>(childLabel.lock());
+			if (candidate)
+			{
+				result.push_back(candidate);
+			}
+		}
+	}
+	return result;
+}
+
+vector<weak_ptr<Field>> Component::findFields()
+{
+	vector<weak_ptr<Field>> result;
+	for (auto& c : children)
+	{
+		for (auto& childField : c->findFields())
+		{
+			auto candidate = dynamic_pointer_cast<Field>(childField.lock());
+			if (candidate)
+			{
+				result.push_back(candidate);
+			}
+		}
+	}
+	return result;
+}
+
+vector<weak_ptr<Parameter>> Component::findParameters()
+{
+	vector<weak_ptr<Parameter>> result;
+	for (auto& c : children)
+	{
+		for (auto& childParameter : c->findParameters())
+		{
+			auto candidate = dynamic_pointer_cast<Parameter>(childParameter.lock());
+			if (candidate)
+			{
+				result.push_back(candidate);
+			}
+		}
+	}
+	return result;
+}
+
+weak_ptr<Component> Component::addChild(shared_ptr<Component> child)
 {
 	children.push_back(move(child));
 	return children.back();
 }
 
-void Component::addChildren(std::vector<std::shared_ptr<Component>> children)
+void Component::addChildren(vector<shared_ptr<Component>> children)
 {
 	for (auto& c : children)
 	{
-		this->children.push_back(std::move(c));
+		this->children.push_back(move(c));
 	}
 }
 
-std::weak_ptr<Component> Component::findChild(const std::string& name)
+weak_ptr<Component> Component::findChild(const string& name)
 {
 	for (auto& c : children)
 	{
@@ -85,7 +137,7 @@ std::weak_ptr<Component> Component::findChild(const std::string& name)
 	return {};
 }
 
-void Component::Draw(std::vector<std::vector<bool>>* pixels)
+void Component::Draw(vector<vector<bool>>* pixels)
 {
 	if (hidden || !IsDirty())
 	{
@@ -180,7 +232,7 @@ MRECT Component::getRect() {
 	return MRECT(x, y, x + w, y + h);
 }
 
-void Component::Clear(std::vector<std::vector<bool>>* pixels) {
+void Component::Clear(vector<vector<bool>>* pixels) {
 	auto r = getRect();
 	for (int i = r.L; i < r.R + 1; i++) {
 		for (int j = r.T; j < r.B + 1; j++) {

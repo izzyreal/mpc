@@ -2,6 +2,7 @@
 
 #include <Mpc.hpp>
 #include <lcdgui/Field.hpp>
+#include <lcdgui/Label.hpp>
 #include <ui/sampler/SamplerGui.hpp>
 #include <audiomidi/AudioMidiServices.hpp>
 #include <audiomidi/SoundRecorder.hpp>

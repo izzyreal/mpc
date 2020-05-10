@@ -1,5 +1,7 @@
 #include "Mpc.hpp"
 
+#include <lcdgui/Component.hpp>
+
 #include "StartUp.hpp"
 #include <nvram/NvRam.hpp>
 
@@ -47,7 +49,6 @@ Mpc::Mpc()
 
 	uis = make_shared<ui::Uis>();
 	layeredScreen = make_shared<lcdgui::LayeredScreen>();
-
 }
 
 void Mpc::init(const int sampleRate, const int inputCount, const int outputCount)
@@ -189,7 +190,6 @@ void Mpc::loadSound(bool replace)
 		MLOG("A problem occurred when trying to load " + uis->getDiskGui()->getSelectedFile()->getName() + ": " + std::string(exception.what()));
 		lDisk->setBusy(false);
 		uis->getDiskGui()->removePopup();
-		layeredScreen->getLayer(0)->setDirty();
 		return;
 	}
 	

@@ -59,7 +59,6 @@ void GlobalReleaseControls::function(int i) {
 		controls->setF5Pressed(false);
 		if (csn.compare("load") == 0) {
 			Mpc::instance().getLayeredScreen().lock()->removePopup();
-			Mpc::instance().getLayeredScreen().lock()->getLayer(0)->setDirty();
 			Mpc::instance().getAudioMidiServices().lock()->getSoundPlayer().lock()->enableStopEarly();
 		}
 		break;
@@ -76,7 +75,6 @@ void GlobalReleaseControls::function(int i) {
 		}
 		else if (csn.compare("directory") == 0) {
 			Mpc::instance().getLayeredScreen().lock()->removePopup();
-			Mpc::instance().getLayeredScreen().lock()->getLayer(1)->setDirty();
 			Mpc::instance().getAudioMidiServices().lock()->getSoundPlayer().lock()->enableStopEarly();
 		}
 		break;

@@ -15,6 +15,8 @@
 #include <climits>
 #endif // __linux__
 
+#include <stdexcept>
+
 using namespace mpc::lcdgui;
 using namespace std;
 

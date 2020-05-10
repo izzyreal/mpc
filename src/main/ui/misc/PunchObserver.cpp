@@ -5,6 +5,7 @@
 #include <lcdgui/Background.hpp>
 #include <lcdgui/Field.hpp>
 #include <lcdgui/Label.hpp>
+#include <lcdgui/FunctionKeys.hpp>
 #include <ui/misc/PunchGui.hpp>
 #include <ui/sequencer/EditSequenceGui.hpp>
 #include <sequencer/Sequence.hpp>

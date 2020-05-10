@@ -24,7 +24,7 @@ using namespace std;
 
 vector<unique_ptr<Document>> ScreenArrangements::layerDocuments;
 
-vector<shared_ptr<Component>> ScreenArrangements::get(const string& screenName, int& foundInLayer)
+vector<shared_ptr<Component>> ScreenArrangements::get(const string& screenName, int& foundInLayer, string& firstField)
 {
 	if (ScreenArrangements::layerDocuments.empty())
 	{
@@ -55,7 +55,6 @@ vector<shared_ptr<Component>> ScreenArrangements::get(const string& screenName, 
 
 	vector<shared_ptr<Component>> components;
 
-	string firstField = "";
 	for (int i = 0; i < labels.Size(); i++) {
 		if (i == 0) {
 			firstField = parameters[i].GetString();
@@ -123,10 +122,10 @@ void ScreenArrangements::init()
 	}
 }
 
-std::shared_ptr<ScreenComponent> ScreenArrangements::getScreenComponent(const string& screenName, int& foundInLayer)
+std::shared_ptr<ScreenComponent> ScreenArrangements::getScreenComponent(const string& screenName, int& foundInLayer, string& firstField)
 {
 	if (screenName.compare("sequencer") == 0)
 	{
-		return make_shared<mpc::lcdgui::screens::SequencerScreen>(get(screenName, foundInLayer));
+		return make_shared<mpc::lcdgui::screens::SequencerScreen>(get(screenName, foundInLayer, firstField));
 	}
 }

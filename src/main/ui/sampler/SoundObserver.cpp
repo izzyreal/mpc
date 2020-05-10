@@ -3,6 +3,7 @@
 #include <Util.hpp>
 #include <Mpc.hpp>
 #include <lcdgui/Field.hpp>
+#include <lcdgui/Label.hpp>
 #include <lcdgui/Wave.hpp>
 #include <ui/sampler/SoundGui.hpp>
 #include <sampler/Sampler.hpp>
@@ -88,17 +89,17 @@ void SoundObserver::displayLSource()
 	lSourceField.lock()->setText(lSampler->getSoundName(soundGui->getSoundIndex()));
 	if (lSampler->getSound(soundGui->getSoundIndex()).lock()->isMono() && lSampler->getSound(soundGui->getRSource()).lock()->isMono()) {
 		ls->drawFunctionKeys("monotostereo");
-		ls->getWave().lock()->SetDirty();
-		ls->getLayer(0)->setDirty();
-		ls->getLayer(1)->setDirty();
-		ls->getLayer(2)->setDirty();
+		//ls->getWave().lock()->SetDirty();
+		//ls->getLayer(0)->setDirty();
+		//ls->getLayer(1)->setDirty();
+		//ls->getLayer(2)->setDirty();
 	}
 	else {
 		ls->drawFunctionKeys("convertnodoit");
-		ls->getWave().lock()->SetDirty();
-		ls->getLayer(0)->setDirty();
-		ls->getLayer(1)->setDirty();
-		ls->getLayer(2)->setDirty();
+		//ls->getWave().lock()->SetDirty();
+		//ls->getLayer(0)->setDirty();
+		//ls->getLayer(1)->setDirty();
+		//ls->getLayer(2)->setDirty();
 	}
 }
 
@@ -109,17 +110,17 @@ void SoundObserver::displayRSource()
 	rSourceField.lock()->setText(lSampler->getSoundName(soundGui->getRSource()));
 	if (lSampler->getSound(soundGui->getSoundIndex()).lock()->isMono() && lSampler->getSound(soundGui->getRSource()).lock()->isMono()) {
 		ls->drawFunctionKeys("monotostereo");
-		ls->getWave().lock()->SetDirty();
-		ls->getLayer(0)->setDirty();
-		ls->getLayer(1)->setDirty();
-		ls->getLayer(2)->setDirty();
+		//ls->getWave().lock()->SetDirty();
+		//ls->getLayer(0)->setDirty();
+		//ls->getLayer(1)->setDirty();
+		//ls->getLayer(2)->setDirty();
 	}
 	else {
 		ls->drawFunctionKeys("convertnodoit");
-		ls->getWave().lock()->SetDirty();
-		ls->getLayer(0)->setDirty();
-		ls->getLayer(1)->setDirty();
-		ls->getLayer(2)->setDirty();
+		//ls->getWave().lock()->SetDirty();
+		//ls->getLayer(0)->setDirty();
+		//ls->getLayer(1)->setDirty();
+		//ls->getLayer(2)->setDirty();
 	}
 }
 
@@ -135,17 +136,17 @@ void SoundObserver::displayStereoSource()
 	stereoSourceField.lock()->setText(lSampler->getSoundName(soundGui->getSoundIndex()));
 	if (lSampler->getSound(soundGui->getSoundIndex()).lock()->isMono()) {
 		ls->drawFunctionKeys("convertnodoit");
-		ls->getWave().lock()->SetDirty();
-		ls->getLayer(0)->setDirty();
-		ls->getLayer(1)->setDirty();
-		ls->getLayer(2)->setDirty();
+		//ls->getWave().lock()->SetDirty();
+		//ls->getLayer(0)->setDirty();
+		//ls->getLayer(1)->setDirty();
+		//ls->getLayer(2)->setDirty();
 	}
 	else {
 		ls->drawFunctionKeys("stereotomono");
-		ls->getWave().lock()->SetDirty();
-		ls->getLayer(0)->setDirty();
-		ls->getLayer(1)->setDirty();
-		ls->getLayer(2)->setDirty();
+		//ls->getWave().lock()->SetDirty();
+		//ls->getLayer(0)->setDirty();
+		//ls->getLayer(1)->setDirty();
+		//ls->getLayer(2)->setDirty();
 	}
 }
 

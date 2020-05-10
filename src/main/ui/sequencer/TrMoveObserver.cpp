@@ -3,6 +3,7 @@
 #include <ui/Uis.hpp>
 #include <lcdgui/LayeredScreen.hpp>
 #include <lcdgui/Field.hpp>
+#include <lcdgui/Label.hpp>
 #include <ui/sequencer/TrMoveGui.hpp>
 #include <sequencer/Sequence.hpp>
 #include <sequencer/Track.hpp>

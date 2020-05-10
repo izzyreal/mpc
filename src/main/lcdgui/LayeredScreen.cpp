@@ -8,10 +8,12 @@
 #include <StartUp.hpp>
 
 #include "Field.hpp"
+#include "Component.hpp"
 
 #include <audiomidi/AudioMidiServices.hpp>
 #include <audiomidi/SoundRecorder.hpp>
 
+#include <lcdgui/Layer.hpp>
 #include <lcdgui/ScreenComponent.hpp>
 #include <lcdgui/EnvGraph.hpp>
 #include <lcdgui/Label.hpp>
@@ -143,12 +145,12 @@ LayeredScreen::LayeredScreen()
 	root = make_unique<Component>("root");
 
 	pixels = vector<vector<bool>>(248, vector<bool>(60));
-	popup = make_unique<mpc::lcdgui::Popup>();
+	popup = make_unique<Popup>();
 	popup->Hide(true);
 
 	horizontalBarsTempoChangeEditor = vector<shared_ptr<HorizontalBar>>(4);
 	horizontalBarsStepEditor = vector<shared_ptr<HorizontalBar>>(4);
-	selectedEventBarsStepEditor = vector<shared_ptr<mpc::lcdgui::SelectedEventBar>>(4);
+	selectedEventBarsStepEditor = vector<shared_ptr<SelectedEventBar>>(4);
 
 	verticalBarsMixer = vector<shared_ptr<VerticalBar>>(16);
 	mixerFaderBackgrounds = vector<shared_ptr<MixerFaderBackground>>(16);
@@ -156,8 +158,8 @@ LayeredScreen::LayeredScreen()
 	knobs = vector<shared_ptr<Knob>>(16);
 
 
-	underline = make_shared<mpc::lcdgui::Underline>();
-	envGraph = make_shared<mpc::lcdgui::EnvGraph>();
+	underline = make_shared<Underline>();
+	envGraph = make_shared<EnvGraph>();
 
 	int x, y, w, h;
 	MRECT rect;
@@ -167,7 +169,7 @@ LayeredScreen::LayeredScreen()
 		x = 0;
 		y = 11 + (i * 9);
 		rect = MRECT(x, y, x + w, y + h);
-		selectedEventBarsStepEditor[i] = make_shared<mpc::lcdgui::SelectedEventBar>(rect);
+		selectedEventBarsStepEditor[i] = make_shared<SelectedEventBar>(rect);
 		selectedEventBarsStepEditor[i]->Hide(true);
 		nonTextComps.push_back(selectedEventBarsStepEditor[i]);
 
@@ -224,11 +226,11 @@ LayeredScreen::LayeredScreen()
 		knobs[i]->Hide(true);
 	}
 
-	fineWave = make_shared <mpc::lcdgui::Wave>();
+	fineWave = make_shared <Wave>();
 	fineWave->setFine(true);
 	//fineWave->Hide(true);
 
-	wave = make_shared<mpc::lcdgui::Wave>();
+	wave = make_shared<Wave>();
 	wave->Hide(true);
 	wave->setFine(false);
 	nonTextComps.push_back(wave);
@@ -253,11 +255,13 @@ LayeredScreen::LayeredScreen()
 
 	for (int i = 0; i < LAYER_COUNT; i++)
 	{
-		layers[i] = make_unique<Layer>(this);
+		auto layer = make_shared<Layer>();
+		layers.push_back(layer);
+		root->addChild(layer);
 	}
 }
 
-weak_ptr<mpc::lcdgui::EnvGraph> LayeredScreen::getEnvGraph() {
+weak_ptr<EnvGraph> LayeredScreen::getEnvGraph() {
 	return envGraph;
 }
 
@@ -270,12 +274,12 @@ vector<weak_ptr<Effect>> LayeredScreen::getEffects() {
 
 int LayeredScreen::getCurrentParamIndex() {
 	int currentIndex;
-	Layer* l = layers[currentLayer].get();
-	auto params = l->getParameters();
+	auto layer = layers[focusedLayer].lock();
+	auto params = layer->findParameters();
 	int size = params.size();
 	for (currentIndex = 0; currentIndex <= size; currentIndex++) {
 		if (currentIndex == size) break;
-		if (params[currentIndex]->getName().compare(l->getFocus()) == 0) {
+		if (params[currentIndex].lock()->getName().compare(layer->getFocus()) == 0) {
 			break;
 		}
 	}
@@ -285,18 +289,36 @@ int LayeredScreen::getCurrentParamIndex() {
 
 void LayeredScreen::transferFocus(bool backwards) {
 	int currentIndex, candidateIndex;
-	auto params = layers[currentLayer]->getParameters();
+	auto layer = layers[focusedLayer].lock();
+	auto params = layer->findParameters();
 	int size = params.size();
+	
 	currentIndex = getCurrentParamIndex();
-	if (currentIndex == -1) return;
-	if (backwards && currentIndex == 0) return;
-	if (!backwards && currentIndex == size - 1) return;
+	
+	if (currentIndex == -1)
+	{
+		return;
+	}
+	
+	if (backwards && currentIndex == 0)
+	{
+		return;
+	}
+
+	if (!backwards && currentIndex == size - 1)
+	{
+		return;
+	}
 
 	bool success = false;
-	while (success == false) {
+	
+	while (!success)
+	{
+	
 		candidateIndex = backwards ? currentIndex-- - 1 : currentIndex++ + 1;
+		
 		if (candidateIndex >= 0 && candidateIndex < size) {
-			if (!params[candidateIndex]->IsHidden()) {
+			if (!params[candidateIndex].lock()->IsHidden()) {
 				success = true;
 			}
 		}
@@ -304,9 +326,13 @@ void LayeredScreen::transferFocus(bool backwards) {
 			break;
 		}
 	}
-	if (!success) return;
 
-	layers[currentLayer]->setFocus(params[candidateIndex]->getName());
+	if (!success)
+	{
+		return;
+	}
+
+	layer->setFocus(params[candidateIndex].lock()->getName());
 }
 
 int LayeredScreen::openScreen(string screenName) {
@@ -340,27 +366,24 @@ int LayeredScreen::openScreen(string screenName) {
 
 	previousScreenName = currentScreenName;
 	currentScreenName = screenName;
-	string firstField = "sq";
 	
-	int oldLayer = currentLayer;
+	int oldLayer = focusedLayer;
 
-	currentLayer = -1;
+	focusedLayer = -1;
 
-	root->addChild(ScreenArrangements::getScreenComponent(currentScreenName, currentLayer));
+	string firstField;
+	auto screenComponent = ScreenArrangements::getScreenComponent(currentScreenName, focusedLayer, firstField);
 
-	if (currentLayer == -1)
+	if (focusedLayer == -1)
 	{
 		return -1;
 	}
 
-	if (oldLayer == 0 && oldLayer == currentLayer) {
-		wave->Hide(true);
-	}
+	getFocusedLayer().lock()->addChild(screenComponent);
 	
 	returnToLastFocus(firstField);
 
-	//initObserver();
-	return currentLayer;
+	return focusedLayer;
 }
 
 vector<vector<bool>>* LayeredScreen::getPixels() {
@@ -384,7 +407,7 @@ bool LayeredScreen::IsDirty() {
 }
 
 Layer* LayeredScreen::getLayer(int i) {
-	return layers[i].get();
+	return layers[i].lock().get();
 }
 
 void LayeredScreen::createPopup(string text, int textXPos)
@@ -393,14 +416,14 @@ void LayeredScreen::createPopup(string text, int textXPos)
 	popup->setText(text, textXPos);
 }
 
-mpc::lcdgui::Background* LayeredScreen::getCurrentBackground()
+Background* LayeredScreen::getCurrentBackground()
 {
-	return layers[currentLayer]->getBackground();
+	return getFocusedLayer().lock()->getBackground();
 }
 
 void LayeredScreen::removeCurrentBackground()
 {
-	layers[currentLayer]->getBackground()->setName("");
+	getFocusedLayer().lock()->getBackground()->setName("");
 }
 
 void LayeredScreen::setCurrentBackground(string s)
@@ -487,7 +510,7 @@ string LayeredScreen::getPreviousScreenName()
 	return previousScreenName;
 }
 
-mpc::lcdgui::Popup* LayeredScreen::getPopup() {
+Popup* LayeredScreen::getPopup() {
 	return popup.get();
 }
 
@@ -511,33 +534,33 @@ string LayeredScreen::getPreviousViewModeText()
 	return previousViewModeText;
 }
 
-vector<weak_ptr<mpc::lcdgui::HorizontalBar>> LayeredScreen::getHorizontalBarsTempoChangeEditor()
+vector<weak_ptr<HorizontalBar>> LayeredScreen::getHorizontalBarsTempoChangeEditor()
 {
-	auto res = vector<weak_ptr<mpc::lcdgui::HorizontalBar>>();
+	auto res = vector<weak_ptr<HorizontalBar>>();
 	for (auto& b : horizontalBarsTempoChangeEditor)
 		res.push_back(b);
 	return res;
 }
 
-vector<weak_ptr<mpc::lcdgui::HorizontalBar>> LayeredScreen::getHorizontalBarsStepEditor()
+vector<weak_ptr<HorizontalBar>> LayeredScreen::getHorizontalBarsStepEditor()
 {
-	auto res = vector<weak_ptr<mpc::lcdgui::HorizontalBar>>();
+	auto res = vector<weak_ptr<HorizontalBar>>();
 	for (auto& b : horizontalBarsStepEditor)
 		res.push_back(b);
 	return res;
 }
 
-vector<weak_ptr<mpc::lcdgui::VerticalBar>> LayeredScreen::getVerticalBarsMixer()
+vector<weak_ptr<VerticalBar>> LayeredScreen::getVerticalBarsMixer()
 {
-	auto res = vector<weak_ptr<mpc::lcdgui::VerticalBar>>();
+	auto res = vector<weak_ptr<VerticalBar>>();
 	for (auto& b : verticalBarsMixer)
 		res.push_back(b);
 	return res;
 }
 
-vector<weak_ptr<mpc::lcdgui::SelectedEventBar>> LayeredScreen::getSelectedEventBarsStepEditor()
+vector<weak_ptr<SelectedEventBar>> LayeredScreen::getSelectedEventBarsStepEditor()
 {
-	auto res = vector<weak_ptr<mpc::lcdgui::SelectedEventBar>>();
+	auto res = vector<weak_ptr<SelectedEventBar>>();
 	for (auto& b : selectedEventBarsStepEditor)
 		res.push_back(b);
 	return res;
@@ -545,28 +568,28 @@ vector<weak_ptr<mpc::lcdgui::SelectedEventBar>> LayeredScreen::getSelectedEventB
 
 FunctionKeys* LayeredScreen::getFunctionKeys()
 {
-	return layers[currentLayer]->getFunctionKeys();
+	return getFocusedLayer().lock()->getFunctionKeys();
 }
 
-vector<weak_ptr<mpc::lcdgui::Knob>> LayeredScreen::getKnobs()
+vector<weak_ptr<Knob>> LayeredScreen::getKnobs()
 {
-	auto res = vector<weak_ptr<mpc::lcdgui::Knob>>();
+	auto res = vector<weak_ptr<Knob>>();
 	for (auto& b : knobs)
 		res.push_back(b);
 	return res;
 }
 
-vector<weak_ptr<mpc::lcdgui::MixerFaderBackground>> LayeredScreen::getMixerFaderBackgrounds()
+vector<weak_ptr<MixerFaderBackground>> LayeredScreen::getMixerFaderBackgrounds()
 {
-	auto res = vector<weak_ptr<mpc::lcdgui::MixerFaderBackground>>();
+	auto res = vector<weak_ptr<MixerFaderBackground>>();
 	for (auto& b : mixerFaderBackgrounds)
 		res.push_back(b);
 	return res;
 }
 
-vector<weak_ptr<mpc::lcdgui::MixerTopBackground>> LayeredScreen::getMixerTopBackgrounds()
+vector<weak_ptr<MixerTopBackground>> LayeredScreen::getMixerTopBackgrounds()
 {
-	auto res = vector<weak_ptr<mpc::lcdgui::MixerTopBackground>>();
+	auto res = vector<weak_ptr<MixerTopBackground>>();
 	for (auto& b : mixerTopBackgrounds)
 		res.push_back(b);
 	return res;
@@ -582,12 +605,13 @@ void LayeredScreen::drawFunctionKeys(string screenName)
 	//getFunctionKeys()->initialize(fblabels, fbtypes);
 }
 
-weak_ptr<mpc::lcdgui::TwoDots> LayeredScreen::getTwoDots()
+weak_ptr<TwoDots> LayeredScreen::getTwoDots()
 {
 	return twoDots;
 }
 
-weak_ptr<Wave> LayeredScreen::getWave() {
+weak_ptr<Wave> LayeredScreen::getWave()
+{
 	return wave;
 }
 
@@ -596,9 +620,16 @@ weak_ptr<Wave> LayeredScreen::getFineWave()
 	return fineWave;
 }
 
-int LayeredScreen::getCurrentLayer() {
-	return currentLayer;
+int LayeredScreen::getFocusedLayerIndex()
+{
+	return focusedLayer;
 }
+
+std::weak_ptr<Layer> LayeredScreen::getFocusedLayer()
+{
+	return layers[focusedLayer];
+}
+
 
 weak_ptr<Field> LayeredScreen::findBelow(weak_ptr<Field> tf0) {
 	int marginChars = 8;
@@ -606,8 +637,8 @@ weak_ptr<Field> LayeredScreen::findBelow(weak_ptr<Field> tf0) {
 	int maxDistH = 6 * marginChars;
 	weak_ptr<Field> result = tf0;
 	auto lTf0 = tf0.lock();
-	for (auto& a : layers[currentLayer]->getAllFields()) {
-		auto tf1 = dynamic_pointer_cast<Field>(a.lock());
+	for (auto& a : getFocusedLayer().lock()->findFields()) {
+		auto tf1 = a.lock();
 		auto B1 = tf1->getY() + tf1->getH();
 		auto B0 = lTf0->getY() + lTf0->getH();
 		auto MW1 = 0.5f * (float)(tf1->getX()*2 + tf1->getW());
@@ -625,8 +656,8 @@ weak_ptr<Field> LayeredScreen::findBelow(weak_ptr<Field> tf0) {
 	if (result.lock() == lTf0) {
 		marginChars = 16;
 		maxDistH = 6 * marginChars;
-		for (auto& a : layers[currentLayer]->getAllFields()) {
-			auto tf1 = dynamic_pointer_cast<Field>(a.lock());
+		for (auto& a : getFocusedLayer().lock()->findFields()) {
+			auto tf1 = a.lock();
 			auto B1 = tf1->getY() + tf1->getH();
 			auto B0 = lTf0->getY() + lTf0->getH();
 			auto MW1 = 0.5f * (float)(tf1->getX() * 2 + tf1->getW());
@@ -650,10 +681,12 @@ weak_ptr<Field> LayeredScreen::findAbove(weak_ptr<Field> tf0) {
 	int maxDistH = 6 * marginChars;
 	weak_ptr<Field> result = tf0;
 	auto lTf0 = tf0.lock();
-	auto revComponents = layers[currentLayer]->getAllFields();
+	
+	auto revComponents = getFocusedLayer().lock()->findFields();
+
 	reverse(revComponents.begin(), revComponents.end());
 	for (auto& a : revComponents) {
-		auto tf1 = dynamic_pointer_cast<Field>(a.lock());
+		auto tf1 = a.lock();
 		auto B1 = tf1->getY() + tf1->getH();
 		auto B0 = lTf0->getY() + lTf0->getH();
 		auto MW1 = 0.5f * (float)(tf1->getX() * 2 + tf1->getW());
@@ -671,7 +704,7 @@ weak_ptr<Field> LayeredScreen::findAbove(weak_ptr<Field> tf0) {
 		marginChars = 16;
 		maxDistH = 6 * marginChars;
 		for (auto& a : revComponents) {
-			auto tf1 = dynamic_pointer_cast<Field>(a.lock());
+			auto tf1 = a.lock();
 			auto B1 = tf1->getY() + tf1->getH();
 			auto B0 = lTf0->getY() + lTf0->getH();
 			auto MW1 = 0.5f * (float)(tf1->getX() * 2 + tf1->getW());
@@ -691,8 +724,8 @@ weak_ptr<Field> LayeredScreen::findAbove(weak_ptr<Field> tf0) {
 
 string LayeredScreen::findBelow(string tf0) {
 	string result = tf0;
-	for (auto& a : layers[currentLayer]->getAllFields()) {
-		auto candidate = dynamic_pointer_cast<Field>(a.lock());
+	for (auto& a : getFocusedLayer().lock()->findFields()) {
+		auto candidate = a.lock();
 		if (candidate->getName().compare(tf0) == 0) {
 			result = findBelow(candidate).lock()->getName();
 			break;
@@ -703,8 +736,8 @@ string LayeredScreen::findBelow(string tf0) {
 
 string LayeredScreen::findAbove(string tf0) {
 	string result = tf0;
-	for (auto& a : layers[currentLayer]->getAllFields()) {
-		auto candidate = dynamic_pointer_cast<Field>(a.lock());
+	for (auto& a : getFocusedLayer().lock()->findFields()) {
+		auto candidate = a.lock();
 		if (candidate->getName().compare(tf0) == 0) {
 			result = findAbove(candidate).lock()->getName();
 			break;
@@ -713,30 +746,18 @@ string LayeredScreen::findAbove(string tf0) {
 	return result;
 }
 
-weak_ptr<mpc::lcdgui::Underline> LayeredScreen::getUnderline() {
+weak_ptr<Underline> LayeredScreen::getUnderline() {
 	return underline;
 }
 
 weak_ptr<Field> LayeredScreen::lookupField(string s)
 {
-	for (auto& a : layers[currentLayer]->getAllFields() ) {
-		auto candidate = dynamic_pointer_cast<Field>(a.lock());
-		if (candidate->getName().compare(s) == 0) {
-			return candidate;
-		}
-	}
-	return weak_ptr<Field>();
+	return root->findField(s);
 }
 
 weak_ptr<Label> LayeredScreen::lookupLabel(string s)
 {
-	for (auto& a : layers[currentLayer]->getAllLabels()) {
-		auto candidate = dynamic_pointer_cast<Label>(a.lock());
-		if (candidate->getName().compare(s) == 0) {
-			return candidate;
-		}
-	}
-	return weak_ptr<Label>();
+	return root->findLabel(s);
 }
 
 static inline bool checkActiveScreen(vector<string>* sa, string csn)
@@ -905,16 +926,9 @@ void LayeredScreen::initObserver()
 }
 
 string LayeredScreen::getFocus() {
-	return layers[currentLayer]->getFocus();
+	return getFocusedLayer().lock()->getFocus();
 }
 
-void LayeredScreen::setFocus(string focus) {
-	layers[currentLayer]->setFocus(focus);
-}
-
-LayeredScreen::~LayeredScreen() {
-	/*
-	* We want to make sure the active observer's destructor can still access Components
-	*/ 
-	activeObserver.reset();
+void LayeredScreen::setFocus(const string& focus) {
+	getFocusedLayer().lock()->setFocus(focus);
 }

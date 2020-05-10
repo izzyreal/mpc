@@ -2,6 +2,7 @@
 
 #include <Mpc.hpp>
 #include <lcdgui/Field.hpp>
+#include <lcdgui/Label.hpp>
 #include <lcdgui/EnvGraph.hpp>
 #include <ui/sampler/SamplerGui.hpp>
 #include <ui/sampler/window/SamplerWindowGui.hpp>
