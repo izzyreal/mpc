@@ -28,7 +28,7 @@ Field::Field(const string& name, int x, int y, int width)
 	focus = false;
 	Hide(false);
 	this->name = name;
-	this->columns = width;
+	this->width = width - 1;
 	setLocation(x, y);
 	setSize(width, FONT_HEIGHT);
 }
@@ -209,15 +209,6 @@ int Field::enter()
 
 void Field::type(int i)
 {
-	/*
-	string str = getText();
-	remove_if(str.begin(), str.end(), isspace);
-    if(str.length() == getColumns())
-        str = "";
-	string newStr = str.append(to_string(i));
-	pad_left(newStr, getColumns());
-    setText(newStr.c_str());
-	*/
 }
 
 bool Field::isTypeModeEnabled()
@@ -231,32 +222,14 @@ void Field::disableTypeMode()
         return;
 
     typeModeEnabled = false;
-    //setFont(Constants::mpc2000xlFont);
     //setFontColor(Constants::LCD_OFF);
 	//setTransparency(false);
     //setText(oldText.c_str());
 }
 
-/*
-void Field::enableScrolling(vector<CLabel> enablers)
-{
-    if(scroller != nullptr)
-        scroller->stopped = true;
-
-	// check if sizeof gets the right amount
-    if(getColumns() > sizeof(getText()))
-        return;
-
-    //scroller = new Field_Scroller(this, this, enablers);
-    //(new ::java::lang::Thread(static_cast< ::java::lang::Runnable* >(scroller)))->start();
-    scrolling = true;
-}
-*/
-
 void Field::startBlinking()
 {
     blinking = true;
-    //(new ::java::lang::Thread(static_cast< ::java::lang::Runnable* >(new Field_Blinker())))->start();
 }
 
 void Field::stopBlinking()

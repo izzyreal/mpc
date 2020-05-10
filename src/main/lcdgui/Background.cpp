@@ -23,7 +23,7 @@ void Background::setName(std::string name)
 
 void Background::Draw(std::vector< std::vector<bool>>* pixels)
 {
-	if (IsHidden()) {
+	if (hidden || !IsDirty()) {
 		return;
 	}
 
@@ -71,7 +71,4 @@ void Background::Draw(std::vector< std::vector<bool>>* pixels)
 		}
 	}
 	dirty = false;
-}
-
-Background::~Background() {
 }

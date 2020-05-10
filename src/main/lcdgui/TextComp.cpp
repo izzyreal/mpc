@@ -27,7 +27,7 @@ void TextComp::Draw(std::vector<std::vector<bool>>* pixels) {
 	auto atlas = &LayeredScreen::atlas;
 
 	int textx = x;
-	int texty = y;
+	int texty = y - 1;
 
 	int atlasx, atlasy;
 
@@ -94,14 +94,6 @@ string TextComp::getText() {
 	return text;
 }
 
-int TextComp::getColumns() {
-	return columns;
-}
-
-void TextComp::setColumns(int i) {
-	columns = i;
-}
-
 unsigned int TextComp::GetTextEntryLength() {
 	return text.length();
 }
@@ -113,7 +105,7 @@ void TextComp::setText(const string& s)
 }
 
 void TextComp::setTextPadded(string s, string padding) {
-	string padded = StrUtil::padLeft(s, padding, columns);
+	string padded = StrUtil::padLeft(s, padding, ceil(float(width) / float(6)));
 	setText(padded);
 }
 

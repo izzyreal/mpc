@@ -59,8 +59,6 @@ SequencerObserver::SequencerObserver()
 	nextSqField = ls->lookupField("nextsq");
 	nextSqLabel = ls->lookupLabel("nextsq");
 
-	tsigField.lock()->setColumns(7);
-
 	nextSqField.lock()->Hide(true);
 	nextSqLabel.lock()->Hide(true);
 

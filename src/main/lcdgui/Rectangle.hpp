@@ -1,24 +1,23 @@
 #pragma once
 #include "Component.hpp"
-#include <string>
 
 namespace mpc::lcdgui {
 
-	class Background
+	class Rectangle
 		: public Component
 	{
 
 	private:
-		std::string name{ "" };
+		bool on = true;
 
 	public:
-		void setName(std::string name);
+		void setOn(bool on);
 
 	public:
 		void Draw(std::vector< std::vector<bool>>* pixels) override;
 
 	public:
-		Background();
+		Rectangle(MRECT rect);
 
 	};
 }

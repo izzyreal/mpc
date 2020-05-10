@@ -23,7 +23,7 @@ namespace mpc::lcdgui
 
 	protected:
 		std::string text{ "" };
-		int columns{ 0 }; // characters
+		int width = 0; // pixels
 		bool opaque{ false };
 
 	public:
@@ -37,8 +37,6 @@ namespace mpc::lcdgui
 		int getW();
 		int getH();
 		std::string getText();
-		int getColumns();
-		void setColumns(int i);
 		std::string getName();
 		void setTextPadded(std::string s, std::string padding);
 		void setTextPadded(int i, std::string padding);

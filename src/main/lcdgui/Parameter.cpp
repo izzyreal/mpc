@@ -1,5 +1,6 @@
 #include "Parameter.hpp"
 
+#include "Rectangle.hpp"
 #include "Field.hpp"
 #include "Label.hpp"
 
@@ -9,7 +10,8 @@ using namespace std;
 Parameter::Parameter(string labelStr, string name, int x, int y, int fieldWidth)
 	: Component(name)
 {
-	addChild(make_shared<Label>(name, labelStr, x, y - 1, labelStr.size() * 6));
+
+	addChild(make_shared<Label>(name, labelStr, x, y, labelStr.size() * 6));
 
 	const char* p = labelStr.c_str();
 	int count = 0;
@@ -17,8 +19,19 @@ Parameter::Parameter(string labelStr, string name, int x, int y, int fieldWidth)
 		count += ((*p & 0xc0) != 0x80);
 	int tfOffset = (count * 6);
 
-	addChild(make_shared<Field>(name, x + tfOffset, y - 1, fieldWidth));
+	auto field = make_shared<Field>(name, x + tfOffset, y, fieldWidth);
+	auto rect = field->getRect();
+	rect.L -= 1;
+	rect.T -= 1;
+	rect.B += 1;
+
+	addChild(make_shared<Rectangle>(rect));
+
+	addChild(field);
 }
 
-Parameter::~Parameter() {
+void Parameter::Draw(std::vector<std::vector<bool>>* pixels)
+{
+	dynamic_pointer_cast<Rectangle>(findChild("rectangle").lock())->setOn(findField(name).lock()->hasFocus());
+	Component::Draw(pixels);
 }
