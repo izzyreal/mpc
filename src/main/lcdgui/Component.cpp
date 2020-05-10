@@ -65,13 +65,15 @@ vector<weak_ptr<Label>> Component::findLabels()
 	vector<weak_ptr<Label>> result;
 	for (auto& c : children)
 	{
-		for (auto& childLabel : c->findLabels())
+		auto candidate = dynamic_pointer_cast<Label>(c);
+		if (candidate)
 		{
-			auto candidate = dynamic_pointer_cast<Label>(childLabel.lock());
-			if (candidate)
-			{
-				result.push_back(candidate);
-			}
+			result.push_back(candidate);
+		}
+
+		for (auto& Label : c->findLabels())
+		{
+			result.push_back(Label);
 		}
 	}
 	return result;
@@ -82,13 +84,15 @@ vector<weak_ptr<Field>> Component::findFields()
 	vector<weak_ptr<Field>> result;
 	for (auto& c : children)
 	{
-		for (auto& childField : c->findFields())
+		auto candidate = dynamic_pointer_cast<Field>(c);
+		if (candidate)
 		{
-			auto candidate = dynamic_pointer_cast<Field>(childField.lock());
-			if (candidate)
-			{
-				result.push_back(candidate);
-			}
+			result.push_back(candidate);
+		}
+
+		for (auto& field : c->findFields())
+		{
+			result.push_back(field);
 		}
 	}
 	return result;
