@@ -125,13 +125,14 @@ vector<weak_ptr<Parameter>> Component::findParameters()
 	vector<weak_ptr<Parameter>> result;
 	for (auto& c : children)
 	{
-		for (auto& childParameter : c->findParameters())
+		if (dynamic_pointer_cast<Parameter>(c))
 		{
-			auto candidate = dynamic_pointer_cast<Parameter>(childParameter.lock());
-			if (candidate)
-			{
-				result.push_back(candidate);
-			}
+			result.push_back(dynamic_pointer_cast<Parameter>(c));
+		}
+		
+		for (auto& parameter : c->findParameters())
+		{
+			result.push_back(parameter);
 		}
 	}
 	return result;

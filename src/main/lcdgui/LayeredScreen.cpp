@@ -277,13 +277,17 @@ int LayeredScreen::getCurrentParamIndex() {
 	auto layer = layers[focusedLayer].lock();
 	auto params = layer->findParameters();
 	int size = params.size();
+	
 	for (currentIndex = 0; currentIndex <= size; currentIndex++) {
 		if (currentIndex == size) break;
 		if (params[currentIndex].lock()->getName().compare(layer->getFocus()) == 0) {
 			break;
 		}
 	}
-	if (currentIndex == size) return -1;
+	
+	if (currentIndex == size) {
+		return -1;
+	}
 	return currentIndex;
 }
 

@@ -78,16 +78,31 @@ void BaseControls::init()
 void BaseControls::left()
 {
 	init();
-	if (!activeField.lock()) return;
-	if (param.compare("dummy") == 0) return;
+	
+	if (!activeField.lock()) {
+		return;
+	}
+	
+	if (param.compare("dummy") == 0)
+	{
+		return;
+	}
+	
 	ls.lock()->transferFocus(true);
 }
 
 void BaseControls::right()
 {
 	init();
-	if (!activeField.lock()) return;
-	if (param.compare("dummy") == 0) return;
+	
+	if (!activeField.lock()) {
+		return;
+	}
+	
+	if (param.compare("dummy") == 0) {
+		return;
+	}
+	
 	ls.lock()->transferFocus(false);
 }
 
