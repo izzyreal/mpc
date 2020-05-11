@@ -55,7 +55,7 @@ namespace mpc::lcdgui {
 
 		std::vector<std::weak_ptr<Layer>> layers;
 
-		int getCurrentParamIndex();
+		int getCurrentFieldIndex();
 		std::weak_ptr<mpc::lcdgui::Field> findBelow(std::weak_ptr<mpc::lcdgui::Field> tf);
 		std::weak_ptr<mpc::lcdgui::Field> findAbove(std::weak_ptr<mpc::lcdgui::Field> tf);
 

@@ -272,15 +272,15 @@ vector<weak_ptr<Effect>> LayeredScreen::getEffects() {
 	return res;
 }
 
-int LayeredScreen::getCurrentParamIndex() {
+int LayeredScreen::getCurrentFieldIndex() {
 	int currentIndex;
 	auto layer = layers[focusedLayer].lock();
-	auto params = layer->findParameters();
-	int size = params.size();
+	auto fields = layer->findFields();
+	int size = fields.size();
 	
 	for (currentIndex = 0; currentIndex <= size; currentIndex++) {
 		if (currentIndex == size) break;
-		if (params[currentIndex].lock()->getName().compare(layer->getFocus()) == 0) {
+		if (fields[currentIndex].lock()->getName().compare(layer->getFocus()) == 0) {
 			break;
 		}
 	}
@@ -294,10 +294,10 @@ int LayeredScreen::getCurrentParamIndex() {
 void LayeredScreen::transferFocus(bool backwards) {
 	int currentIndex, candidateIndex;
 	auto layer = layers[focusedLayer].lock();
-	auto params = layer->findParameters();
-	int size = params.size();
+	auto fields = layer->findFields();
+	int size = fields.size();
 	
-	currentIndex = getCurrentParamIndex();
+	currentIndex = getCurrentFieldIndex();
 	
 	if (currentIndex == -1)
 	{
@@ -318,11 +318,10 @@ void LayeredScreen::transferFocus(bool backwards) {
 	
 	while (!success)
 	{
-	
 		candidateIndex = backwards ? currentIndex-- - 1 : currentIndex++ + 1;
 		
 		if (candidateIndex >= 0 && candidateIndex < size) {
-			if (!params[candidateIndex].lock()->IsHidden()) {
+			if (!fields[candidateIndex].lock()->IsHidden()) {
 				success = true;
 			}
 		}
@@ -336,7 +335,7 @@ void LayeredScreen::transferFocus(bool backwards) {
 		return;
 	}
 
-	layer->setFocus(params[candidateIndex].lock()->getName());
+	layer->setFocus(fields[candidateIndex].lock()->getName());
 }
 
 int LayeredScreen::openScreen(string screenName) {
