@@ -14,13 +14,13 @@
 
 #include <ui/midisync/MidiSyncGui.hpp>
 
-#include <ui/sequencer/SequencerGui.hpp>
 #include <ui/sequencer/SongGui.hpp>
 #include <ui/sequencer/TrMoveGui.hpp>
 #include <ui/sequencer/EditSequenceGui.hpp>
 #include <ui/sequencer/BarCopyGui.hpp>
 #include <ui/sequencer/StepEditorGui.hpp>
 
+#include <ui/sequencer/window/Assign16LevelsGui.hpp>
 #include <ui/sequencer/window/EraseGui.hpp>
 #include <ui/sequencer/window/SequencerWindowGui.hpp>
 
@@ -45,30 +45,42 @@ Uis::Uis()
 		noteNames = vector<string>(128);
 		int octave = -2;
 		int noteCounter = 0;
-		for (int j = 0; j < 128; j++) {
+		
+		for (int j = 0; j < 128; j++)
+		{
 			string octaveString = to_string(octave);
+		
 			if (octave == -2)
+			{
 				octaveString = u8"\u00D2";
+			}
 
 			if (octave == -1)
+			{
 				octaveString = u8"\u00D3";
+			}
 
 			noteNames[j] = someNoteNames[noteCounter] + octaveString;
 			noteCounter++;
-			if (noteCounter == 12) {
+			
+			if (noteCounter == 12)
+			{
 				noteCounter = 0;
 				octave++;
 			}
+
 		}
 	}
-	sequencerGui = new ui::sequencer::SequencerGui();
+
 	stepEditorGui = new mpc::ui::sequencer::StepEditorGui();
 	editSequenceGui = new mpc::ui::sequencer::EditSequenceGui();
 	songGui = new mpc::ui::sequencer::SongGui();
 	barCopyGui = new mpc::ui::sequencer::BarCopyGui();
 	trMoveGui = new mpc::ui::sequencer::TrMoveGui();
+
 	eraseGui = new mpc::ui::sequencer::window::EraseGui();
 	sequencerWindowGui = new mpc::ui::sequencer::window::SequencerWindowGui();
+	assign16LevelsGui = new mpc::ui::sequencer::window::Assign16LevelsGui();
 
 	samplerGui = new mpc::ui::sampler::SamplerGui();
 	nameGui = new mpc::ui::NameGui();
@@ -98,9 +110,9 @@ Uis::Uis()
 }
 vector<string> Uis::noteNames;
 
-mpc::ui::sequencer::SequencerGui* Uis::getSequencerGui()
+mpc::ui::sequencer::window::Assign16LevelsGui* Uis::getAssign16LevelsGui()
 {
-	return sequencerGui;
+	return assign16LevelsGui;
 }
 
 mpc::ui::sequencer::StepEditorGui* Uis::getStepEditorGui()
@@ -229,9 +241,11 @@ mpc::ui::sampler::window::EditSoundGui* Uis::getEditSoundGui() {
 
 
 Uis::~Uis() {
-	if (stepEditorGui != nullptr) delete stepEditorGui;
 	if (sequencerWindowGui != nullptr) delete sequencerWindowGui;
-	if (sequencerGui != nullptr) delete sequencerGui;
+	if (assign16LevelsGui != nullptr) delete assign16LevelsGui;
+	if (eraseGui != nullptr) delete eraseGui;
+
+	if (stepEditorGui != nullptr) delete stepEditorGui;
 	if (editSequenceGui != nullptr) delete editSequenceGui;
 	if (barCopyGui != nullptr) delete barCopyGui;
 	if (trMoveGui != nullptr) delete trMoveGui;
@@ -247,7 +261,6 @@ Uis::~Uis() {
 	if (midiSyncGui != nullptr) delete midiSyncGui;
 	if (nameGui != nullptr) delete nameGui;
 	if (mixerSetupGui != nullptr) delete mixerSetupGui;
-	if (eraseGui != nullptr) delete eraseGui;
 	if (punchGui != nullptr) delete punchGui;
 	if (d2dRecorderGui != nullptr) delete d2dRecorderGui;
 	if (transGui != nullptr) delete transGui;

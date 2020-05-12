@@ -162,12 +162,12 @@ void TrimControls::setSlider(int i)
 
 void TrimControls::left()
 {
-    super::splitLeft();
+	AbstractSamplerControls::splitLeft();
 }
 
 void TrimControls::right()
 {
-    super::splitRight();
+	AbstractSamplerControls::splitRight();
 }
 
 void TrimControls::pressEnter()

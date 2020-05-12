@@ -5,15 +5,11 @@
 #include <hardware/Hardware.hpp>
 #include <hardware/TopPanel.hpp>
 #include <hardware/Led.hpp>
-#include <ui/sequencer/SequencerGui.hpp>
+
+#include <ui/sequencer/window/Assign16LevelsGui.hpp>
 
 using namespace mpc::controls::sequencer::window;
 using namespace std;
-
-Assign16LevelsControls::Assign16LevelsControls()
-	: AbstractSequencerControls()
-{
-}
 
 void Assign16LevelsControls::function(int i)
 {
@@ -33,16 +29,17 @@ void Assign16LevelsControls::function(int i)
 void Assign16LevelsControls::turnWheel(int i)
 {
 	init();
+	
 	if (param.compare("note") == 0) {
-		sequencerGui->setNote(sequencerGui->getNote() + i);
+		assign16LevelsGui->setNote(assign16LevelsGui->getNote() + i);
 	}
 	else if (param.compare("param") == 0) {
-		sequencerGui->setParameter(sequencerGui->getParameter() + i);
+		assign16LevelsGui->setParameter(assign16LevelsGui->getParameter() + i);
 	}
 	else if (param.compare("type") == 0) {
-		sequencerGui->setType(sequencerGui->getType() + i);
+		assign16LevelsGui->setType(assign16LevelsGui->getType() + i);
 	}
 	else if (param.compare("originalkeypad") == 0) {
-		sequencerGui->setOriginalKeyPad(sequencerGui->getOriginalKeyPad() + i);
+		assign16LevelsGui->setOriginalKeyPad(assign16LevelsGui->getOriginalKeyPad() + i);
 	}
 }

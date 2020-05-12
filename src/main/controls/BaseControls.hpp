@@ -10,10 +10,6 @@ namespace ctoot::mpc {
 	class MpcSoundPlayerChannel;
 }
 
-namespace mpc {
-	
-}
-
 namespace mpc::sequencer {
 	class Sequencer;
 	class Track;
@@ -34,8 +30,8 @@ namespace mpc::ui {
 	class NameGui;
 }
 
-namespace mpc::ui::sequencer {
-	class SequencerGui;
+namespace mpc::ui::sequencer::window {
+	class Assign16LevelsGui;
 }
 
 namespace mpc::ui::sampler {
@@ -50,20 +46,20 @@ namespace mpc::controls {
 		std::string csn{ "" };
 
 		
-		std::weak_ptr<mpc::sequencer::Sequencer> sequencer{};
-		std::weak_ptr<mpc::sampler::Sampler> sampler{};
-		std::weak_ptr<mpc::sequencer::Track> track{};
-		std::weak_ptr<mpc::sampler::Program> program{};
-		ctoot::mpc::MpcSoundPlayerChannel* mpcSoundPlayerChannel{ nullptr };
+		std::weak_ptr<mpc::sequencer::Sequencer> sequencer;
+		std::weak_ptr<mpc::sampler::Sampler> sampler;
+		std::weak_ptr<mpc::sequencer::Track> track;
+		std::weak_ptr<mpc::sampler::Program> program;
+		ctoot::mpc::MpcSoundPlayerChannel* mpcSoundPlayerChannel = nullptr;
 
-		std::weak_ptr<mpc::lcdgui::LayeredScreen> ls{};
-		mpc::ui::NameGui* nameGui{ nullptr };
-		ui::sequencer::SequencerGui* sequencerGui{ nullptr };
-		ui::sampler::SamplerGui* samplerGui{ nullptr };
-		std::weak_ptr<mpc::lcdgui::Field> activeField{};
+		std::weak_ptr<mpc::lcdgui::LayeredScreen> ls;
+		mpc::ui::NameGui* nameGui = nullptr;
+		ui::sampler::SamplerGui* samplerGui = nullptr;
+		ui::sequencer::window::Assign16LevelsGui* assign16LevelsGui = nullptr;
+		std::weak_ptr<mpc::lcdgui::Field> activeField;
 
 		int bank_{ 0 };
-		std::vector<std::string> typableParams{};
+		std::vector<std::string> typableParams;
 
 	protected:
 		virtual void init();
@@ -76,7 +72,6 @@ namespace mpc::controls {
 		virtual void function(int i);
 		virtual void openWindow();
 		virtual void turnWheel(int i);
-		//virtual void keyEvent(unsigned char c) {};
 		virtual void numpad(int i);
 		virtual void pressEnter();
 		virtual void rec();
@@ -100,8 +95,8 @@ namespace mpc::controls {
 		virtual void shift();
 		virtual void undoSeq();
 		virtual void erase();
-
 		virtual void setSlider(int i) {};
+
 		virtual bool isTypable();
 
 		virtual void pad(int i, int velo, bool repeat, int tick);
@@ -111,7 +106,6 @@ namespace mpc::controls {
 
 	public:
 		BaseControls();
-		virtual ~BaseControls();
 
 	};
 }

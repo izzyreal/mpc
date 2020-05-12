@@ -1,11 +1,11 @@
-#include <ui/sequencer/window/Assign16LevelsObserver.hpp>
+#include "Assign16LevelsObserver.hpp"
 
 #include <Mpc.hpp>
 #include <ui/Uis.hpp>
 #include <lcdgui/LayeredScreen.hpp>
 #include <lcdgui/Field.hpp>
 #include <lcdgui/Label.hpp>
-#include <ui/sequencer/SequencerGui.hpp>
+#include <ui/sequencer/window/Assign16LevelsGui.hpp>
 #include <sampler/NoteParameters.hpp>
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>
@@ -21,8 +21,8 @@ using namespace std;
 Assign16LevelsObserver::Assign16LevelsObserver() 
 {
 	
-	sGui = Mpc::instance().getUis().lock()->getSequencerGui();
-	sGui->addObserver(this);
+	gui = Mpc::instance().getUis().lock()->getAssign16LevelsGui();
+	gui->addObserver(this);
 	auto ls = Mpc::instance().getLayeredScreen().lock();
 	noteField = ls->lookupField("note");
 	paramField = ls->lookupField("param");
@@ -32,7 +32,7 @@ Assign16LevelsObserver::Assign16LevelsObserver()
 	originalKeyPadLabel = ls->lookupLabel("originalkeypad");
 	displayNote();
 	displayParameter();
-	if (sGui->getParameter() == 1) {
+	if (gui->getParameter() == 1) {
 		displayType();
 		displayOriginalKeyPad();
 	}
@@ -45,7 +45,7 @@ void Assign16LevelsObserver::displayNote()
 {
     auto seq = Mpc::instance().getSequencer().lock();
 	auto sampler = Mpc::instance().getSampler().lock();
-    auto nn = sGui->getNote();
+    auto nn = gui->getNote();
     auto track = seq->getActiveTrackIndex();
     auto pgmNumber = sampler->getDrumBusProgramNumber(seq->getActiveSequence().lock()->getTrack(track).lock()->getBusNumber());
 	auto program = sampler->getProgram(pgmNumber).lock();
@@ -57,23 +57,23 @@ void Assign16LevelsObserver::displayNote()
 
 void Assign16LevelsObserver::displayParameter()
 {
-    paramField.lock()->setText(PARAM_NAMES[sGui->getParameter()]);
-    typeField.lock()->Hide(sGui->getParameter() != 1);
-	typeLabel.lock()->Hide(sGui->getParameter() != 1);
-    originalKeyPadField.lock()->Hide(!(sGui->getParameter() == 1 && sGui->getType() == 0));
-    originalKeyPadLabel.lock()->Hide(!(sGui->getParameter() == 1 && sGui->getType() == 0));
+    paramField.lock()->setText(PARAM_NAMES[gui->getParameter()]);
+    typeField.lock()->Hide(gui->getParameter() != 1);
+	typeLabel.lock()->Hide(gui->getParameter() != 1);
+    originalKeyPadField.lock()->Hide(!(gui->getParameter() == 1 && gui->getType() == 0));
+    originalKeyPadLabel.lock()->Hide(!(gui->getParameter() == 1 && gui->getType() == 0));
 }
 
 void Assign16LevelsObserver::displayType()
 {
-    typeField.lock()->setText(TYPE_NAMES[sGui->getType()]);
-    originalKeyPadField.lock()->Hide(sGui->getType() != 0);
-    originalKeyPadLabel.lock()->Hide(sGui->getType() != 0);
+    typeField.lock()->setText(TYPE_NAMES[gui->getType()]);
+    originalKeyPadField.lock()->Hide(gui->getType() != 0);
+    originalKeyPadLabel.lock()->Hide(gui->getType() != 0);
 }
 
 void Assign16LevelsObserver::displayOriginalKeyPad()
 {
-    originalKeyPadField.lock()->setTextPadded(sGui->getOriginalKeyPad() + 1, " ");
+    originalKeyPadField.lock()->setTextPadded(gui->getOriginalKeyPad() + 1, " ");
 }
 
 void Assign16LevelsObserver::update(moduru::observer::Observable* o, nonstd::any arg)
@@ -84,7 +84,7 @@ void Assign16LevelsObserver::update(moduru::observer::Observable* o, nonstd::any
 	}
 	else if (s.compare("parameter") == 0) {
 		displayParameter();
-		if (sGui->getParameter() == 1) {
+		if (gui->getParameter() == 1) {
 			displayType();
 			displayOriginalKeyPad();
 		}
@@ -98,5 +98,5 @@ void Assign16LevelsObserver::update(moduru::observer::Observable* o, nonstd::any
 }
 
 Assign16LevelsObserver::~Assign16LevelsObserver() {
-	sGui->deleteObserver(this);
+	gui->deleteObserver(this);
 }

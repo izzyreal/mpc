@@ -19,7 +19,7 @@ KeepOrRetryControls::KeepOrRetryControls()
 void KeepOrRetryControls::mainScreen() {
 	auto lSampler = sampler.lock();
 	lSampler->deleteSound(dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getPreviewSound().lock()));
-	super::mainScreen();
+	AbstractSamplerControls::mainScreen();
 }
 
 void KeepOrRetryControls::function(int i)

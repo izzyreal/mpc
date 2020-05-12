@@ -15,14 +15,9 @@
 using namespace mpc::controls::sampler;
 using namespace std;
 
-LoopControls::LoopControls()
-	: AbstractSamplerControls()
-{
-}
-
 void LoopControls::init()
 {
-	super::init();
+	AbstractSamplerControls::init();
 	typableParams = vector<string>{	"to", "endlengthvalue" };
 }
 
@@ -137,7 +132,11 @@ void LoopControls::turnWheel(int i)
 
 void LoopControls::setSlider(int i)
 {
-	if (!Mpc::instance().getControls().lock()->isShiftPressed()) return;
+	if (!Mpc::instance().getControls().lock()->isShiftPressed())
+	{
+		return;
+	}
+
 	init();
 	auto lSound = sound.lock();
 	auto const oldLength = lSound->getEnd() - lSound->getLoopTo();
@@ -170,44 +169,59 @@ void LoopControls::setSlider(int i)
 
 void LoopControls::left()
 {
-    super::splitLeft();
+    AbstractSamplerControls::splitLeft();
 }
 
 void LoopControls::right()
 {
-	super::splitRight();
+	AbstractSamplerControls::splitRight();
 }
 
 void LoopControls::pressEnter()
 {
 	init();
-	if (!isTypable()) return;
+	
+	if (!isTypable())
+	{
+		return;
+	}
+	
 	auto lLs = ls.lock();
 	auto mtf = lLs->lookupField(param).lock();
 	if (!mtf->isTypeModeEnabled())
+	{
 		return;
+	}
 
 	auto candidate = mtf->enter();
 	auto lSound = sound.lock();
 	auto const oldLength = lSound->getEnd() - lSound->getLoopTo();
 	auto const lengthFix = zoomGui->isLoopLngthFix();
+
 	if (candidate != INT_MAX) {
 		if (param.compare("to") == 0) {
-			if (lengthFix && candidate + oldLength > lSound->getLastFrameIndex()) {
+			if (lengthFix && candidate + oldLength > lSound->getLastFrameIndex())
+			{
 				return;
 			}
+	
 			lSound->setLoopTo(candidate);
-			if (lengthFix) {
+			
+			if (lengthFix)
+			{
 				lSound->setEnd(lSound->getLoopTo() + oldLength);
 			}
 		}
-		else if (param.compare("endlengthvalue") == 0) {
-			if (lengthFix && candidate - oldLength < 0) {
+		else if (param.compare("endlengthvalue") == 0)
+		{
+			if (lengthFix && candidate - oldLength < 0)
+			{
 				return;
 			}
 
 			lSound->setEnd(candidate);
-			if (lengthFix) {
+			if (lengthFix)
+			{
 				lSound->setLoopTo(lSound->getEnd() - oldLength);
 			}
 		}

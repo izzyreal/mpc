@@ -37,7 +37,7 @@ AbstractSamplerControls::AbstractSamplerControls()
 
 void AbstractSamplerControls::init()
 {
-	super::init();
+	BaseControls::init();
 	auto lSampler = sampler.lock();
 	if (lSampler->getSoundCount() != 0)
 		sound = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound(soundGui->getSoundIndex()).lock());
@@ -81,7 +81,7 @@ void AbstractSamplerControls::splitLeft()
 		}
 	}
 	else {
-		super::left();
+		BaseControls::left();
 	}
 }
 
@@ -97,9 +97,6 @@ void AbstractSamplerControls::splitRight()
 		}
 	}
 	else {
-		super::right();
+		BaseControls::right();
 	}
-}
-
-AbstractSamplerControls::~AbstractSamplerControls() {
 }

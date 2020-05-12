@@ -5,51 +5,41 @@
 #include <vector>
 #include <string>
 
-namespace mpc {
+namespace mpc::ui::sequencer::window {
+	class Assign16LevelsGui;
+}
 
-	
+namespace mpc::ui::sequencer::window {
 
-	namespace ui {
-		namespace sequencer {
+	class Assign16LevelsObserver
+		: public moduru::observer::Observer
+	{
 
-			class SequencerGui;
+	public:
+		static std::vector<std::string> TYPE_NAMES;
 
-			namespace window {
+	private:
+		static std::vector<std::string> PARAM_NAMES;
 
-				class Assign16LevelsObserver
-					: public moduru::observer::Observer
-				{
+		std::weak_ptr<mpc::lcdgui::Field> noteField;
+		std::weak_ptr<mpc::lcdgui::Field> paramField;
+		std::weak_ptr<mpc::lcdgui::Field> typeField;
+		std::weak_ptr<mpc::lcdgui::Field> originalKeyPadField;
+		mpc::ui::sequencer::window::Assign16LevelsGui* gui = nullptr;
+		std::weak_ptr<mpc::lcdgui::Label> typeLabel;
+		std::weak_ptr<mpc::lcdgui::Label> originalKeyPadLabel;
 
-				public:
-					static std::vector<std::string> TYPE_NAMES;
+	private:
+		void displayNote();
+		void displayParameter();
+		void displayType();
+		void displayOriginalKeyPad();
 
-				private:
-					static std::vector<std::string> PARAM_NAMES;
+	public:
+		void update(moduru::observer::Observable* o, nonstd::any arg) override;
 
-					
-					std::weak_ptr<mpc::lcdgui::Field> noteField{};
-					std::weak_ptr<mpc::lcdgui::Field> paramField{};
-					std::weak_ptr<mpc::lcdgui::Field> typeField{};
-					std::weak_ptr<mpc::lcdgui::Field> originalKeyPadField{};
-					mpc::ui::sequencer::SequencerGui* sGui{ nullptr };
-					std::weak_ptr<mpc::lcdgui::Label> typeLabel{};
-					std::weak_ptr<mpc::lcdgui::Label> originalKeyPadLabel{};
+		Assign16LevelsObserver();
+		~Assign16LevelsObserver();
 
-				private:
-					void displayNote();
-					void displayParameter();
-					void displayType();
-					void displayOriginalKeyPad();
-
-				public:
-					void update(moduru::observer::Observable* o, nonstd::any arg) override;
-
-					Assign16LevelsObserver();
-					~Assign16LevelsObserver();
-
-				};
-
-			}
-		}
-	}
+	};
 }

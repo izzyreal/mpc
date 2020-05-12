@@ -30,7 +30,7 @@
 #include <ui/sampler/SamplerGui.hpp>
 #include <ui/sampler/SoundGui.hpp>
 #include <ui/sampler/window/EditSoundGui.hpp>
-#include <ui/sequencer/SequencerGui.hpp>
+#include <ui/sequencer/window/Assign16LevelsGui.hpp>
 #include <ui/sequencer/window/SequencerWindowGui.hpp>
 #include <ui/vmpc/DirectToDiskRecorderGui.hpp>
 #include <sampler/Pad.hpp>
@@ -51,13 +51,13 @@ using namespace std;
 
 BaseControls::BaseControls()
 {
-	
-	sequencer = Mpc::instance().getSequencer();
-	sampler = Mpc::instance().getSampler();
-	ls = Mpc::instance().getLayeredScreen();
-	sequencerGui = Mpc::instance().getUis().lock()->getSequencerGui();
-	nameGui = Mpc::instance().getUis().lock()->getNameGui();
-	samplerGui = Mpc::instance().getUis().lock()->getSamplerGui();
+	auto& mpc = Mpc::instance();
+	sequencer = mpc.getSequencer();
+	sampler = mpc.getSampler();
+	ls = mpc.getLayeredScreen();
+	assign16LevelsGui = mpc.getUis().lock()->getAssign16LevelsGui();
+	nameGui = mpc.getUis().lock()->getNameGui();
+	samplerGui = mpc.getUis().lock()->getSamplerGui();
 }
 
 void BaseControls::init()
@@ -209,9 +209,9 @@ void BaseControls::pad(int i, int velo, bool repeat, int tick)
 
 	if (mpc.getHardware().lock()->getTopPanel().lock()->isSixteenLevelsEnabled())
 	{
-		if (mpc.getUis().lock()->getSequencerGui()->getParameter() == 0)
+		if (assign16LevelsGui->getParameter() == 0)
 		{
-			note = mpc.getUis().lock()->getSequencerGui()->getNote();
+			note = assign16LevelsGui->getNote();
 			velocity = (int)(i * (127.0 / 16.0));
 			
 			if (velocity == 0)
@@ -236,7 +236,7 @@ void BaseControls::pad(int i, int velo, bool repeat, int tick)
 
 	if (csn.compare("assign16levels") == 0 && note != 34)
 	{
-		mpc.getUis().lock()->getSequencerGui()->setNote(note);
+		assign16LevelsGui->setNote(note);
 	}
 
 	if (controls->isTapPressed() && lSequencer->isPlaying())
@@ -294,11 +294,11 @@ void BaseControls::generateNoteOn(int nn, int padVelo, int tick)
 		n->setVelocity(padVelo);
 		n->setDuration(step ? 1 : -1);
 		
-		if (mpc.getHardware().lock()->getTopPanel().lock()->isSixteenLevelsEnabled() && sequencerGui->getParameter() == 1) {
-			auto type = sequencerGui->getType();
-			auto key = sequencerGui->getOriginalKeyPad();
+		if (mpc.getHardware().lock()->getTopPanel().lock()->isSixteenLevelsEnabled() && assign16LevelsGui->getParameter() == 1) {
+			auto type = assign16LevelsGui->getType();
+			auto key = assign16LevelsGui->getOriginalKeyPad();
 			auto diff = lProgram->getPadNumberFromNote(nn) - (bank_ * 16) - key;
-			n->setNote(sequencerGui->getNote());
+			n->setNote(assign16LevelsGui->getNote());
 			n->setVariationTypeNumber(type);
 			n->setVariationValue(diff * 5);
 		}
@@ -317,10 +317,10 @@ void BaseControls::generateNoteOn(int nn, int padVelo, int tick)
 	noteEvent->setVariationValue(64);
 	noteEvent->setTick(tick);
 
-	if (mpc.getHardware().lock()->getTopPanel().lock()->isSixteenLevelsEnabled() && sequencerGui->getParameter() == 1) {
+	if (mpc.getHardware().lock()->getTopPanel().lock()->isSixteenLevelsEnabled() && assign16LevelsGui->getParameter() == 1) {
 
-		auto type = sequencerGui->getType();
-		auto key = sequencerGui->getOriginalKeyPad();
+		auto type = assign16LevelsGui->getType();
+		auto key = assign16LevelsGui->getOriginalKeyPad();
 		auto padnr = program.lock()->getPadNumberFromNote(nn) - (bank_ * 16);
 
 		if (type == 0) {
@@ -337,7 +337,7 @@ void BaseControls::generateNoteOn(int nn, int padVelo, int tick)
 		else {
 			noteEvent->setVariationValue((100 / 16) * padnr);
 		}
-		noteEvent->setNote(sequencerGui->getNote());
+		noteEvent->setNote(assign16LevelsGui->getNote());
 		noteEvent->setVariationTypeNumber(type);
 	}
 
@@ -801,7 +801,4 @@ void BaseControls::erase()
 		Mpc::instance().getUis().lock()->getSequencerWindowGui()->setTime1(lSequencer->getActiveSequence().lock()->getLastTick());
 		ls.lock()->openScreen("erase");
 	}
-}
-
-BaseControls::~BaseControls() {
 }

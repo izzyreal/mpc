@@ -1,25 +1,17 @@
 #pragma once
 #include <controls/sequencer/AbstractSequencerControls.hpp>
 
-namespace mpc {
-	namespace controls {
-		namespace sequencer {
-			namespace window {
+#include <memory>
 
-				class Assign16LevelsControls
-					: public AbstractSequencerControls
-				{
+namespace mpc::controls::sequencer::window {
 
-				public:
-					typedef mpc::controls::sequencer::AbstractSequencerControls super;
-					void function(int i) override;
-					void turnWheel(int i) override;
+	class Assign16LevelsControls
+		: public AbstractSequencerControls
+	{
 
-					Assign16LevelsControls();
+	public:
+		void function(int i) override;
+		void turnWheel(int i) override;
 
-				};
-
-			}
-		}
-	}
+	};
 }
