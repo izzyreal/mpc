@@ -14,13 +14,14 @@
 #include <file/all/AllSequencer.hpp>
 #include <file/all/AllSong.hpp>
 #include <file/all/Tracks.hpp>
-#include <StartUp.hpp>
+
 #include <ui/UserDefaults.hpp>
 #include <ui/midisync/MidiSyncGui.hpp>
 #include <ui/sequencer/SongGui.hpp>
 #include <ui/sequencer/StepEditorGui.hpp>
 #include <ui/sequencer/window/MultiRecordingSetupLine.hpp>
 #include <ui/sequencer/window/SequencerWindowGui.hpp>
+
 #include <sequencer/Event.hpp>
 #include <sequencer/Sequence.hpp>
 #include <sequencer/Track.hpp>
@@ -58,26 +59,28 @@ AllLoader::AllLoader(mpc::disk::MpcFile* file, bool sequencesOnly)
 		allParser = new AllParser(file);
 		allSequences = allParser->getAllSequences();
 		auto defaults = allParser->getDefaults();
-		auto ud = mpc::StartUp::getUserDefaults().lock();
-		ud->setLastBar(defaults->getBarCount() - 1);
-		ud->setBus(defaults->getBusses()[0]);
+		
+		auto& ud = mpc::ui::UserDefaults::instance();
+		
+		ud.setLastBar(defaults->getBarCount() - 1);
+		ud.setBus(defaults->getBusses()[0]);
 		
 		for (int i = 0; i < 33; i++) {
-			ud->setDeviceName(i, defaults->getDefaultDevNames()[i]);
+			ud.setDeviceName(i, defaults->getDefaultDevNames()[i]);
 		}
 
-		ud->setSequenceName(defaults->getDefaultSeqName());
+		ud.setSequenceName(defaults->getDefaultSeqName());
 		auto defTrackNames = defaults->getDefaultTrackNames();
 		
 		for (int i = 0; i < 64; i++) {
-			ud->setTrackName(i, defTrackNames[i]);
+			ud.setTrackName(i, defTrackNames[i]);
 		}
 
-		ud->setDeviceNumber(defaults->getDevices()[0]);
-		ud->setTimeSig(defaults->getTimeSigNum(), defaults->getTimeSigDen());
-		ud->setPgm(defaults->getPgms()[0]);
-		ud->setTempo(BCMath(defaults->getTempo() / 10.0));
-		ud->setVelo(defaults->getTrVelos()[0]);
+		ud.setDeviceNumber(defaults->getDevices()[0]);
+		ud.setTimeSig(defaults->getTimeSigNum(), defaults->getTimeSigDen());
+		ud.setPgm(defaults->getPgms()[0]);
+		ud.setTempo(BCMath(defaults->getTempo() / 10.0));
+		ud.setVelo(defaults->getTrVelos()[0]);
 		convertSequences(false);
 		auto allSeqNames = allParser->getSeqNames()->getNames();
 		auto sequencer = allParser->getSequencer();

@@ -1,18 +1,20 @@
 #include "Sequencer.hpp"
 
 #include <Mpc.hpp>
+
+#include <audiomidi/AudioMidiServices.hpp>
+
 #include <hardware/Hardware.hpp>
 #include <hardware/Led.hpp>
 #include <hardware/HwPad.hpp>
+
 #include <ui/Uis.hpp>
 #include <ui/sequencer/window/SequencerWindowGui.hpp>
 #include <ui/vmpc/DirectToDiskRecorderGui.hpp>
 #include <ui/sequencer/SongGui.hpp>
-#include <StartUp.hpp>
 #include <ui/UserDefaults.hpp>
-#include <lcdgui/LayeredScreen.hpp>
 
-#include <audiomidi/AudioMidiServices.hpp>
+#include <lcdgui/LayeredScreen.hpp>
 
 #include <sequencer/Event.hpp>
 #include <sequencer/TempoChangeEvent.hpp>
@@ -34,11 +36,6 @@
 using namespace mpc::sequencer;
 using namespace std;
 
-Sequencer::Sequencer() 
-{
-	
-}
-
 void Sequencer::init()
 {
 	TICK_VALUES = vector<int>{ 1, 48, 32, 24, 16, 12, 8 };
@@ -48,9 +45,12 @@ void Sequencer::init()
 	reposition = -1;
 	nextsq = -1;
 	previousTempo = BCMath("0.0");
-	auto userDefaults = mpc::StartUp::getUserDefaults().lock();
-	defaultSequenceName = moduru::lang::StrUtil::trim(userDefaults->getSequenceName());
-	for (int i = 0; i < 64; i++) {
+
+	auto& userDefaults = mpc::ui::UserDefaults::instance();
+
+	defaultSequenceName = moduru::lang::StrUtil::trim(userDefaults.getSequenceName());
+	for (int i = 0; i < 64; i++)
+	{
 		string name = "Track-";
 		name = name.append(moduru::lang::StrUtil::padLeft(to_string(i + 1), "0", 2));
 		defaultTrackNames.push_back(name);
@@ -59,15 +59,19 @@ void Sequencer::init()
 	activeTrackIndex = 0;
 	songs = vector<shared_ptr<Song>>(20);
 	defaultDeviceNames = vector<string>(33);
+	
 	for (int i = 0; i < 33; i++)
-		defaultDeviceNames[i] = userDefaults->getDeviceName(i);
+	{
+		defaultDeviceNames[i] = userDefaults.getDeviceName(i);
+	}
 
-	recordingModeMulti = userDefaults->isRecordingModeMulti();
+	recordingModeMulti = userDefaults.isRecordingModeMulti();
+
 	soloEnabled = false;
 	tempoSourceSequenceEnabled = true;
 	countEnabled = true;
 	recording = false;
-	tempo = userDefaults->getTempo();
+	tempo = userDefaults.getTempo();
 	tempo = BCMath("120.0");
 
 	metronomeOnly = false;
@@ -77,7 +81,9 @@ void Sequencer::init()
 	songMode = false;
 
 	purgeAllSequences();
-	for (int i = 0; i < 20; i++) {
+	
+	for (int i = 0; i < 20; i++)
+	{
 		songs[i] = make_shared<Song>(this);
 		songs[i]->setName("Song" + moduru::lang::StrUtil::padLeft(to_string(i + 1), "0", 2));
 	}
@@ -1503,7 +1509,4 @@ void Sequencer::movePlaceHolderTo(int destIndex) {
 
 weak_ptr<Sequence> Sequencer::getPlaceHolder() {
 	return placeHolder;
-}
-
-Sequencer::~Sequencer() {
 }

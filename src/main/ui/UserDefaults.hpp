@@ -4,27 +4,36 @@
 #include <thirdp/bcmath/bcmath_stl.h>
 #include <sequencer/TimeSignature.hpp>
 
+#include <nvram/NvRam.hpp>
+
 namespace mpc::ui {
 
 	class UserDefaults final
 		: public moduru::observer::Observable
 	{
 
+	public:
+		static UserDefaults& instance()
+		{
+			static auto userDefaults = UserDefaults();
+			return userDefaults;
+		}
+
 	private:
-		int diskDevice{ 0 };
-		int autoLoadType{ 0 };
-		BCMath tempo{ 0 };
-		bool loop{ false };
-		int bus{ 0 };
-		int deviceNumber{ 0 };
-		int pgm{ 0 };
-		int velo{ 0 };
-		bool recordingModeMulti{ false };
-		std::string sequenceName{ "" };
-		std::vector<std::string> trackNames{};
-		int lastBar{ 0 };
+		int diskDevice = 0;
+		int autoLoadType = 0;
+		BCMath tempo = 0;
+		bool loop = false;
+		int bus = 0;
+		int deviceNumber = 0;
+		int pgm = 0;
+		int velo = 0;
+		bool recordingModeMulti = false;
+		std::string sequenceName = "";
+		std::vector<std::string> trackNames;
+		int lastBar = 0;
 		mpc::sequencer::TimeSignature timeSig;
-		std::vector<std::string> deviceNames{};
+		std::vector<std::string> deviceNames;
 
 	public:
 		std::string getDeviceName(int i);
@@ -62,8 +71,16 @@ namespace mpc::ui {
 		void setTrackName(int i, std::string s);
 
 	public:
+		void initialize();
+
+	private:
 		UserDefaults();
+
+	public:
 		~UserDefaults();
 
+
+	private:
+		friend class mpc::nvram::NvRam;
 	};
 }

@@ -1,4 +1,4 @@
-#include <nvram/NvRam.hpp>
+#include "NvRam.hpp"
 
 #include <file/all/Defaults.hpp>
 #include <hardware/Hardware.hpp>
@@ -23,12 +23,12 @@ NvRam::NvRam()
 {
 }
 
-shared_ptr<mpc::ui::UserDefaults> NvRam::load()
+mpc::ui::UserDefaults NvRam::load()
 {
 	string path = mpc::StartUp::resPath + "nvram.vmp";
 	auto file = File(path, nullptr);
 
-	auto ud = make_shared<mpc::ui::UserDefaults>();
+	auto ud = mpc::ui::UserDefaults();
 	
 	if (!file.exists()) {
 		file.create();
@@ -41,29 +41,29 @@ shared_ptr<mpc::ui::UserDefaults> NvRam::load()
 	else {
 		auto defaults = DefaultsParser::AllDefaultsFromFile(file);
 		
-		ud->setLastBar(defaults.getBarCount() - 1);
-		ud->setBus((defaults.getBusses())[0]);
+		ud.setLastBar(defaults.getBarCount() - 1);
+		ud.setBus((defaults.getBusses())[0]);
 		
 		for (int i = 0; i < 33; i++) {
-			ud->setDeviceName(i, defaults.getDefaultDevNames()[i]);
+			ud.setDeviceName(i, defaults.getDefaultDevNames()[i]);
 		}
-		ud->setSequenceName(defaults.getDefaultSeqName());
+		ud.setSequenceName(defaults.getDefaultSeqName());
 		auto defTrackNames = defaults.getDefaultTrackNames();
 		for (int i = 0; i < 64; i++) {
-			ud->setTrackName(i, defTrackNames[i]);
+			ud.setTrackName(i, defTrackNames[i]);
 		}
-		ud->setDeviceNumber(defaults.getDevices()[0]);
-		ud->setTimeSig(defaults.getTimeSigNum(), defaults.getTimeSigDen());
-		ud->setPgm(defaults.getPgms()[0]);
-		ud->setTempo(defaults.getTempo() / 10.0);
-		ud->setVelo(defaults.getTrVelos()[0]);
+		ud.setDeviceNumber(defaults.getDevices()[0]);
+		ud.setTimeSig(defaults.getTimeSigNum(), defaults.getTimeSigDen());
+		ud.setPgm(defaults.getPgms()[0]);
+		ud.setTempo(defaults.getTempo() / 10.0);
+		ud.setVelo(defaults.getTrVelos()[0]);
 	}
     return ud;
 }
 
 void NvRam::saveUserDefaults()
 {
-	auto dp = DefaultsParser(mpc::StartUp::getUserDefaults());
+	auto dp = DefaultsParser(mpc::ui::UserDefaults::instance());
 	
 	string fileName = mpc::StartUp::resPath + "nvram.vmp";
 	

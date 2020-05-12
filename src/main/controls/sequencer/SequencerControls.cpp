@@ -1,8 +1,8 @@
-#include <controls/sequencer/SequencerControls.hpp>
+#include "SequencerControls.hpp"
+
 #include <ui/Uis.hpp>
-#include <StartUp.hpp>
 #include <lcdgui/LayeredScreen.hpp>
-////#include <ui/UserDefaults.hpp>
+#include <ui/UserDefaults.hpp>
 #include <lcdgui/Field.hpp>
 #include <ui/sequencer/EditSequenceGui.hpp>
 #include <ui/sequencer/StepEditorGui.hpp>
@@ -20,11 +20,6 @@
 
 using namespace mpc::controls::sequencer;
 using namespace std;
-
-SequencerControls::SequencerControls()
-	: AbstractSequencerControls()
-{
-}
 
 void SequencerControls::init()
 {
@@ -302,7 +297,7 @@ void SequencerControls::right()
 	auto seq = sequence.lock();
 	
 	if (!seq->isUsed()) {
-        seq->init(mpc::StartUp::getUserDefaults().lock()->getLastBarIndex());
+        seq->init(mpc::ui::UserDefaults::instance().getLastBarIndex());
 		int index = lSequencer->getActiveSequenceIndex();
 		string name = moduru::lang::StrUtil::trim(lSequencer->getDefaultSequenceName()) + moduru::lang::StrUtil::padLeft(to_string(index + 1), "0", 2);
 		seq->setName(name);
@@ -334,7 +329,7 @@ void SequencerControls::down()
 
 	auto seq = sequence.lock();
 	if (!seq->isUsed()) {
-        seq->init(mpc::StartUp::getUserDefaults().lock()->getLastBarIndex());
+        seq->init(mpc::ui::UserDefaults::instance().getLastBarIndex());
 		int index = lSequencer->getActiveSequenceIndex();
 		string name = moduru::lang::StrUtil::trim(lSequencer->getDefaultSequenceName()) + moduru::lang::StrUtil::padLeft(to_string(index + 1), "0", 2);
 		seq->setName(name);

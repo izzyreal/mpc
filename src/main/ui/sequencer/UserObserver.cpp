@@ -1,8 +1,7 @@
-#include <ui/sequencer/UserObserver.hpp>
+#include "UserObserver.hpp"
 
 #include <Mpc.hpp>
 #include <Util.hpp>
-#include <StartUp.hpp>
 #include <lcdgui/LayeredScreen.hpp>
 #include <ui/UserDefaults.hpp>
 #include <lcdgui/Field.hpp>
@@ -18,17 +17,16 @@ using namespace mpc::ui::sequencer;
 using namespace std;
 
 UserObserver::UserObserver()
-	: timeSig(mpc::StartUp::getUserDefaults().lock()->getTimeSig())
+	: timeSig(mpc::ui::UserDefaults::instance().getTimeSig()), ud(mpc::ui::UserDefaults::instance())
 {
 	busNames = { "MIDI", "DRUM1", "DRUM2", "DRUM3", "DRUM4" };
-	
-	ud = mpc::StartUp::getUserDefaults();
-	auto lUd = ud.lock();
-	
+		
 	timeSig.addObserver(this);
 	
-	lUd->addObserver(this);
+	ud.addObserver(this);
+
 	auto ls = Mpc::instance().getLayeredScreen().lock();
+	
 	tempoField = ls->lookupField("tempo");
 	tempoField.lock()->setSize(28, 9);
 	loopField = ls->lookupField("loop");
@@ -40,6 +38,7 @@ UserObserver::UserObserver()
 	deviceNumberField = ls->lookupField("devicenumber");
 	deviceNameLabel = ls->lookupLabel("devicename");
 	veloField = ls->lookupField("velo");
+	
 	displayTempo();
 	displayLoop();
 	displayTsig();
@@ -53,7 +52,7 @@ UserObserver::UserObserver()
 
 void UserObserver::displayTempo()
 {
-	auto tempo = ud.lock()->getTempo().toString();
+	auto tempo = ud.getTempo().toString();
 	tempo = moduru::lang::StrUtil::padLeft(tempo, " ", 5);
 	tempo = Util::replaceDotWithSmallSpaceDot(tempo);
 	tempoField.lock()->setText(tempo);
@@ -61,65 +60,64 @@ void UserObserver::displayTempo()
 
 void UserObserver::displayLoop()
 {
-	auto lUd = ud.lock();
-    loopField.lock()->setText(lUd->isLoopEnabled() ? "ON" : "OFF");
+    loopField.lock()->setText(ud.isLoopEnabled() ? "ON" : "OFF");
 }
 
 void UserObserver::displayTsig()
 {
-	auto lUd = ud.lock(); 
 	tsigField.lock()->setText(to_string(timeSig.getNumerator()) + "/" + to_string(timeSig.getDenominator()));
 }
 
 void UserObserver::displayBars()
 {
-	auto lUd = ud.lock(); 
-	barsField.lock()->setText(to_string(lUd->getLastBarIndex() + 1));
+	barsField.lock()->setText(to_string(ud.getLastBarIndex() + 1));
 }
 
 void UserObserver::displayPgm()
 {
-	auto lUd = ud.lock();
-	if(lUd->getPgm() == 0) {
+	if(ud.getPgm() == 0)
+	{
         pgmField.lock()->setText("OFF");
-    } else {
-        pgmField.lock()->setText(to_string(lUd->getPgm()));
+    }
+	else
+	{
+        pgmField.lock()->setText(to_string(ud.getPgm()));
     }
 }
 
 void UserObserver::displayRecordingMode()
 {
-	auto lUd = ud.lock();
-	recordingModeField.lock()->setText(lUd->isRecordingModeMulti() ? "M" : "S");
+	recordingModeField.lock()->setText(ud.isRecordingModeMulti() ? "M" : "S");
 }
 
 void UserObserver::displayBus()
 {
-	auto lUd = ud.lock();
-	busField.lock()->setText(busNames[lUd->getBus()]);
+	busField.lock()->setText(busNames[ud.getBus()]);
     displayDeviceName();
 }
 
 void UserObserver::displayDeviceNumber()
 {
-	auto lUd = ud.lock();
-	if (lUd->getDeviceNumber() == 0) {
+	if (ud.getDeviceNumber() == 0)
+	{
 		deviceNumberField.lock()->setText("OFF");
 	}
-	else {
-		if (lUd->getDeviceNumber() >= 17) {
-			deviceNumberField.lock()->setTextPadded(to_string(lUd->getDeviceNumber() - 16) + "B", " ");
+	else
+	{
+		if (ud.getDeviceNumber() >= 17)
+		{
+			deviceNumberField.lock()->setTextPadded(to_string(ud.getDeviceNumber() - 16) + "B", " ");
 		}
-		else {
-			deviceNumberField.lock()->setTextPadded(to_string(lUd->getDeviceNumber()) + "A", " ");
+		else
+		{
+			deviceNumberField.lock()->setTextPadded(to_string(ud.getDeviceNumber()) + "A", " ");
 		}
 	}
 }
 
 void UserObserver::displayVelo()
 {
-	auto lUd = ud.lock();
-	veloField.lock()->setText(to_string(lUd->getVeloRatio()));
+	veloField.lock()->setText(to_string(ud.getVeloRatio()));
 }
 
 void UserObserver::update(moduru::observer::Observable* o, nonstd::any arg)
@@ -158,27 +156,35 @@ void UserObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 void UserObserver::displayDeviceName()
 {
 	auto sampler = Mpc::instance().getSampler().lock();
-	auto lUd = ud.lock();
-	if (lUd->getBus() != 0) {
-		if (lUd->getDeviceNumber() == 0) {
-			auto p = dynamic_pointer_cast<mpc::sampler::Program>(sampler->getProgram(sampler->getDrumBusProgramNumber(lUd->getBus())).lock());
+
+	if (ud.getBus() != 0)
+	{
+		if (ud.getDeviceNumber() == 0)
+		{
+			auto p = dynamic_pointer_cast<mpc::sampler::Program>(sampler->getProgram(sampler->getDrumBusProgramNumber(ud.getBus())).lock());
 			deviceNameLabel.lock()->setText(p->getName());
 		}
-		else {
-			deviceNameLabel.lock()->setText(lUd->getDeviceName(lUd->getDeviceNumber()));
+		else
+		{
+			deviceNameLabel.lock()->setText(ud.getDeviceName(ud.getDeviceNumber()));
 		}
 	}
-	if (lUd->getBus() == 0) {
-		if (lUd->getDeviceNumber() != 0) {
-			deviceNameLabel.lock()->setText(lUd->getDeviceName(lUd->getDeviceNumber()));
+
+	if (ud.getBus() == 0)
+	{
+		if (ud.getDeviceNumber() != 0)
+		{
+			deviceNameLabel.lock()->setText(ud.getDeviceName(ud.getDeviceNumber()));
 		}
-		else {
+		else
+		{
 			deviceNameLabel.lock()->setText("");
 		}
 	}
 }
 
-UserObserver::~UserObserver() {
-	ud.lock()->deleteObserver(this);
+UserObserver::~UserObserver()
+{
+	ud.deleteObserver(this);
 	timeSig.deleteObserver(this);
 }

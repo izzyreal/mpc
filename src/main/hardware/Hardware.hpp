@@ -6,48 +6,45 @@
 #include <memory>
 #include <string>
 
-namespace mpc {
+namespace mpc::hardware
+{
+	class Button;
+	class DataWheel;
+	class Pot;
+	class Led;
+	class Slider;
+	class HwPad;
+}
 
-	
+namespace mpc::hardware
+{
+	class Hardware final
+		: public moduru::observer::Observable
+	{
 
-	namespace hardware {
+	private:
+		std::vector<std::shared_ptr<HwPad>> pads;
+		std::vector<std::shared_ptr<Button>> buttons;
+		std::vector<std::shared_ptr<Led>> leds;
 
-		class Button;
-		class DataWheel;
-		class Pot;
-		class Led;
-		class Slider;
-		class HwPad;
+		std::shared_ptr<DataWheel> dataWheel;
+		std::shared_ptr<Slider> slider;
+		std::shared_ptr<Pot> recPot;
+		std::shared_ptr<Pot> volPot;
 
-		class Hardware final
-			: public moduru::observer::Observable
-		{
+	public:
+		std::weak_ptr<HwPad> getPad(int index);
+		std::weak_ptr<Button> getButton(std::string label);
+		std::weak_ptr<Led> getLed(std::string label);
+		std::vector<std::shared_ptr<Led>> getLeds();
+		std::weak_ptr<DataWheel> getDataWheel();
+		std::weak_ptr<Pot> getRecPot();
+		std::weak_ptr<Pot> getVolPot();
+		std::weak_ptr<Slider> getSlider();
 
-		private:
-			std::vector<std::shared_ptr<HwPad>> pads;
-			std::vector<std::shared_ptr<Button>> buttons;
-			std::vector<std::shared_ptr<Led>> leds;
+	public:
+		Hardware();
+		~Hardware();
 
-			std::shared_ptr<DataWheel> dataWheel;
-			std::shared_ptr<Slider> slider;
-			std::shared_ptr<Pot> recPot;
-			std::shared_ptr<Pot> volPot;
-
-		public:
-			std::weak_ptr<HwPad> getPad(int index);
-			std::weak_ptr<Button> getButton(std::string label);
-			std::weak_ptr<Led> getLed(std::string label);
-			std::vector<std::shared_ptr<Led>> getLeds();
-			std::weak_ptr<DataWheel> getDataWheel();
-			std::weak_ptr<Pot> getRecPot();
-			std::weak_ptr<Pot> getVolPot();
-			std::weak_ptr<Slider> getSlider();
-
-		public:
-			Hardware();
-			~Hardware();
-
-		};
-
-	}
+	};
 }

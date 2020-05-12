@@ -1,5 +1,7 @@
 #include <ui/UserDefaults.hpp>
 
+#include <nvram/NvRam.hpp>
+
 #include <lang/StrUtil.hpp>
 
 using namespace mpc::ui;
@@ -7,30 +9,45 @@ using namespace std;
 
 UserDefaults::UserDefaults() 
 {
-	sequenceName = string("Sequence");
-	bus = 1;
-	tempo = BCMath("120.0");
-	velo = 100;
-	pgm = 0;
-	recordingModeMulti = false;
-	loop = true;
-	deviceNumber = 0;
+    initialize();
+}
 
-	for (int i = 0; i < 64; i++) {
-		trackNames.push_back(string("Track-" + moduru::lang::StrUtil::padLeft(to_string((int)(i + 1)), "0", 2)));
-	}
+UserDefaults::~UserDefaults()
+{
+    mpc::nvram::NvRam::saveUserDefaults();
+}
 
-	lastBar = 1;
-	timeSig.setNumerator(4);
-	timeSig.setDenominator(4);
-	deviceNames.push_back(string("        "));
+void UserDefaults::initialize()
+{
+    sequenceName = string("Sequence");
+    bus = 1;
+    tempo = BCMath("120.0");
+    velo = 100;
+    pgm = 0;
+    recordingModeMulti = false;
+    loop = true;
+    deviceNumber = 0;
 
-	for (int i = 1; i < 33; i++) {
-		deviceNames.push_back("Device" + moduru::lang::StrUtil::padLeft(to_string(i), "0", 2));
-	}
-	
+    trackNames.clear();
+
+    for (int i = 0; i < 64; i++) {
+        trackNames.push_back(string("Track-" + moduru::lang::StrUtil::padLeft(to_string((int)(i + 1)), "0", 2)));
+    }
+
+    lastBar = 1;
+    timeSig.setNumerator(4);
+    timeSig.setDenominator(4);
+
+    deviceNames.clear();
+
+    deviceNames.push_back(string("        "));
+
+    for (int i = 1; i < 33; i++) {
+        deviceNames.push_back("Device" + moduru::lang::StrUtil::padLeft(to_string(i), "0", 2));
+    }
+
     autoLoadType = 0;
-	diskDevice = 0;
+    diskDevice = 0;
 }
 
 string UserDefaults::getDeviceName(int i)
@@ -245,7 +262,4 @@ void UserDefaults::setTimeSig(int num, int den)
 void UserDefaults::setTrackName(int i, string s)
 {
 	trackNames[i] = s;
-}
-
-UserDefaults::~UserDefaults() {
 }

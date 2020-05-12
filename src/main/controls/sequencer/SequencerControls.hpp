@@ -1,9 +1,5 @@
 #pragma once
-#include <controls/sequencer/AbstractSequencerControls.hpp>
-
-namespace mpc {
-	
-}
+#include "AbstractSequencerControls.hpp"
 
 namespace mpc::controls::sequencer {
 
@@ -23,9 +19,6 @@ namespace mpc::controls::sequencer {
 		void right() override;
 		void up() override;
 		void down() override;
-
-	public:
-		SequencerControls();
 
 	};
 }

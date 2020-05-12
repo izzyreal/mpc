@@ -1,9 +1,11 @@
-#include <file/all/AllParser.hpp>
+#include "AllParser.hpp"
 
 #include <Mpc.hpp>
+
+#include <ui/UserDefaults.hpp>
+
 #include <Util.hpp>
 #include <disk/MpcFile.hpp>
-//#include <file/Definitions.hpp>
 #include <file/all/Count.hpp>
 #include <file/all/Defaults.hpp>
 #include <file/all/Header.hpp>
@@ -14,7 +16,6 @@
 #include <file/all/SequenceNames.hpp>
 #include <file/all/AllSequencer.hpp>
 #include <file/all/AllSong.hpp>
-#include <StartUp.hpp>
 #include <sequencer/Sequence.hpp>
 #include <sequencer/Sequencer.hpp>
 
@@ -28,7 +29,7 @@ AllParser::AllParser(mpc::disk::MpcFile* file)
 {
 	songs = vector<Song*>(20);
 	auto loadBytes = file->getBytes();
-	header = new Header(moduru::VecUtil::CopyOfRange(&loadBytes, HEADER_OFFSET, HEADER_OFFSET + HEADER_LENGTH));
+	auto header = new Header(moduru::VecUtil::CopyOfRange(&loadBytes, HEADER_OFFSET, HEADER_OFFSET + HEADER_LENGTH));
 	header->verifyFileID();
 	defaults = new Defaults(moduru::VecUtil::CopyOfRange(&loadBytes, DEFAULTS_OFFSET, DEFAULTS_OFFSET + DEFAULTS_LENGTH));
 	sequencer = new Sequencer(moduru::VecUtil::CopyOfRange(&loadBytes, SEQUENCER_OFFSET, SEQUENCER_OFFSET + Sequencer::LENGTH));
@@ -48,10 +49,10 @@ AllParser::AllParser(string allName)
 {
 	songs = vector<Song*>(20);
 	vector<vector<char>> chunks;
-	auto header = new Header();
-	chunks.push_back(header->getBytes());
-	auto defaults = new Defaults(mpc::StartUp::getUserDefaults().lock().get());
-	chunks.push_back(defaults->getBytes());
+	auto header = Header();
+	chunks.push_back(header.getBytes());
+	auto defaults = Defaults(mpc::ui::UserDefaults::instance());
+	chunks.push_back(defaults.getBytes());
 	chunks.push_back(UNKNOWN_CHUNK);
 	sequencer = new Sequencer();
 	chunks.push_back(sequencer->getBytes());
@@ -60,8 +61,10 @@ AllParser::AllParser(string allName)
 	midiInput = new MidiInput();
 	chunks.push_back(midiInput->getBytes());
 	
-	for (int i=0;i<16;i++)
-		chunks.push_back(vector<char>{ (char) 0xFF });
+	for (int i = 0; i < 16; i++)
+	{
+		chunks.push_back(vector<char>{ (char)0xFF });
+	}
 
 	midiSyncMisc = new MidiSyncMisc();
 	chunks.push_back(midiSyncMisc->getBytes());

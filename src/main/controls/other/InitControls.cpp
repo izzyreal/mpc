@@ -1,6 +1,6 @@
 #include <controls/other/InitControls.hpp>
 
-#include <StartUp.hpp>
+#include <ui/UserDefaults.hpp>
 
 using namespace mpc::controls::other;
 using namespace std;
@@ -21,7 +21,7 @@ void InitControls::function(int i)
 		ls.lock()->openScreen("ver");
 		break;
 	case 5:
-		mpc::StartUp::initUserDefaults();
+		mpc::ui::UserDefaults::instance().initialize();
 		ls.lock()->openScreen("sequencer");
 		break;
 	}

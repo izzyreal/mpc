@@ -88,10 +88,6 @@ void Mpc::init(const int sampleRate, const int inputCount, const int outputCount
 	MLOG("Mpc is ready")
 }
 
-void Mpc::powerOn() {
-	mpc::StartUp().runStartUpRoutine();
-}
-
 weak_ptr<ui::Uis> Mpc::getUis() {
 	return uis;
 }
@@ -251,8 +247,7 @@ audiomidi::MpcMidiInput* Mpc::getMpcMidiInput(int i)
 
 Mpc::~Mpc() {
 	MLOG("Mpc destructor.");
-	mpc::nvram::NvRam::saveUserDefaults();
-	mpc::nvram::NvRam::saveKnobPositions();
+
 	for (auto& m : mpcMidiInputs) {
 		if (m != nullptr) {
 			delete m;

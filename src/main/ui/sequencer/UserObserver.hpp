@@ -6,10 +6,6 @@
 #include <vector>
 #include <string>
 
-namespace mpc {
-	
-}
-
 namespace mpc::lcdgui {
 	class Field;
 	class Label;
@@ -26,7 +22,7 @@ namespace mpc::ui::sequencer {
 	{
 
 	private:
-		std::weak_ptr<mpc::ui::UserDefaults> ud;
+		mpc::ui::UserDefaults& ud;
 		std::vector<std::string> busNames;;
 		;
 		mpc::sequencer::TimeSignature& timeSig;

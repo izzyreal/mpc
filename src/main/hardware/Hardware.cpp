@@ -1,7 +1,5 @@
 #include "Hardware.hpp"
 
-#include <Mpc.hpp>
-
 #include "Button.hpp"
 #include "DataWheel.hpp"
 #include "HwPad.hpp"
@@ -9,32 +7,39 @@
 #include "Pot.hpp"
 #include "HwSlider.hpp"
 
+#include <Mpc.hpp>
+#include <nvram/NvRam.hpp>
+
 using namespace mpc::hardware;
 using namespace std;
 
 Hardware::Hardware()
 {
 	vector<string> buttonLabels{ "left", "right", "up", "down",	"rec", "overdub", "stop", "play", "playstart", "mainscreen", "prevstepevent", "nextstepevent",	"goto",	"prevbarstart",	"nextbarend", "tap", "nextseq",	"trackmute", "openwindow", "fulllevel", "sixteenlevels", "f1", "f2", "f3", "f4", "f5", "f6", "shift", "enter", "undoseq", "erase", "after", "banka", "bankb", "bankc", "bankd" };
-	/*
-	static std::vector<int> bankKeys",
-	static std::vector<int> padKeys",
-	static std::vector<int> altNumPad",
-	*/
+
 	for (auto& l : buttonLabels)
+	{
 		buttons.push_back(std::make_shared<Button>(l));
+	}
 
 	for (int i = 0; i <= 9; i++)
+	{
 		buttons.push_back(std::make_shared<Button>(std::to_string(i)));
+	}
 	
 	for (int i = 0; i <= 15; i++)
+	{
 		pads.push_back(std::make_shared<HwPad>(i));
+	}
 
 	dataWheel = make_shared<DataWheel>();
 
 	vector<string> ledLabels{ "fulllevel", "sixteenlevels", "nextseq", "trackmute", "padbanka", "padbankb", "padbankc", "padbankd", "after", "undoseq", "rec", "overdub", "play" };
 
 	for (auto& l : ledLabels)
+	{
 		leds.push_back(std::make_shared<Led>(l));
+	}
 
 	recPot = make_shared<Pot>("rec");
 	volPot = make_shared<Pot>("vol");
@@ -80,4 +85,5 @@ weak_ptr<Slider> Hardware::getSlider() {
 }
 
 Hardware::~Hardware() {
+	mpc::nvram::NvRam::saveKnobPositions();
 }

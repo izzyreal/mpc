@@ -1,21 +1,11 @@
 #pragma once
 
-#include <ui/UserDefaults.hpp>
-
-#include <thread>
-#include <memory>
+#include <string>
 
 namespace mpc {
 	
 	class StartUp
 	{
-
-	private:
-		std::thread startupThread;
-
-	private:
-		//std::thread spawn();
-		static std::shared_ptr<ui::UserDefaults> userDefaults;
 
 	public:
 		static std::string home;
@@ -27,19 +17,5 @@ namespace mpc {
 	public:
 		static std::string altResPath();
 
-	public:
-		void runStartUpRoutine();
-
-	public:
-		static std::weak_ptr<ui::UserDefaults> getUserDefaults();
-		static void initUserDefaults();
-
-		//void runBootSequence(std::weak_ptr<Gui> gui);
-
-	public:
-		StartUp();
-		~StartUp();
-
 	};
-
 }

@@ -2,10 +2,6 @@
 
 #include <memory>
 
-namespace mpc {
-	
-}
-
 namespace mpc::ui {
 	class UserDefaults;
 }
@@ -20,7 +16,7 @@ namespace mpc::nvram {
 	{
 
 	public:
-		static std::shared_ptr<mpc::ui::UserDefaults> load();
+		static mpc::ui::UserDefaults load();
 		static void saveUserDefaults();
 		static void saveKnobPositions();
 		static int getMasterLevel();

@@ -90,8 +90,6 @@ namespace mpc {
 
 	public:
 		void init(const int sampleRate, const int inputCount, const int outputCount);
-		void powerOn();
-		//void startMidi();
 
 	public:
 		std::weak_ptr<ui::Uis> getUis();

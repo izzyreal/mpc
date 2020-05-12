@@ -1,30 +1,21 @@
 #pragma once
 #include "AbstractSequencerControls.hpp"
 
-namespace mpc {
+namespace mpc::ui {
+	class UserDefaults;
+}
 
-	namespace ui {
-		class UserDefaults;
-	}
+namespace mpc::controls::sequencer {
 
-	namespace controls {
-		namespace sequencer {
+	class UserControls
+		: public AbstractSequencerControls
+	{
 
-			class UserControls
-				: public AbstractSequencerControls
-			{
+	public:
+		void function(int i) override;
+		void turnWheel(int i) override;
 
-			private:
-				std::weak_ptr<mpc::ui::UserDefaults> ud{};
-
-			public:
-				typedef mpc::controls::sequencer::AbstractSequencerControls super;
-				void function(int i) override;
-				void turnWheel(int i) override;
-
-				UserControls();
-			};
-
-		}
-	}
+	public:
+		UserControls();
+	};
 }

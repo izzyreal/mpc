@@ -215,9 +215,6 @@ namespace mpc {
 			void playMetronomeTrack();
 			void stopMetronomeTrack();
 
-			Sequencer();
-			~Sequencer();
-
 		public:
 			static int repeats;
 

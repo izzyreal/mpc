@@ -30,7 +30,7 @@ Defaults::Defaults(vector<char> loadBytes)
 	}
 }
 
-Defaults::Defaults(mpc::ui::UserDefaults* ud)
+Defaults::Defaults(mpc::ui::UserDefaults& ud)
 {
 	saveBytes = vector<char>(AllParser::DEFAULTS_LENGTH);
 	setNames(ud);
@@ -40,7 +40,7 @@ Defaults::Defaults(mpc::ui::UserDefaults* ud)
 	setTimeSig(ud);
 	setBarCount(ud);
 	setLastTick(ud);
-	auto lastBar = ud->getLastBarIndex();
+	auto lastBar = ud.getLastBarIndex();
 	if (lastBar == 1) {
 		saveBytes[LAST_TICK_BYTE1_OFFSET] = 0;
 		saveBytes[LAST_TICK_BYTE2_OFFSET] = 0;
@@ -182,47 +182,47 @@ vector<int> Defaults::getTrVelos()
     return trVelos;
 }
 
-void Defaults::setTrackSettings(mpc::ui::UserDefaults* ud)
+void Defaults::setTrackSettings(mpc::ui::UserDefaults& ud)
 {
     for (int i = 0; i < 64; i++) {
-        saveBytes[DEVICES_OFFSET + i] = (ud->getDeviceNumber());
-        saveBytes[BUSSES_OFFSET + i] = (ud->getBus());
-        saveBytes[PGMS_OFFSET + i] = (ud->getPgm());
-        saveBytes[TR_VELOS_OFFSET + i] = (ud->getVeloRatio());
-        saveBytes[TR_STATUS_OFFSET + i] = (ud->getTrackStatus());
+        saveBytes[DEVICES_OFFSET + i] = (ud.getDeviceNumber());
+        saveBytes[BUSSES_OFFSET + i] = (ud.getBus());
+        saveBytes[PGMS_OFFSET + i] = (ud.getPgm());
+        saveBytes[TR_VELOS_OFFSET + i] = (ud.getVeloRatio());
+        saveBytes[TR_STATUS_OFFSET + i] = (ud.getTrackStatus());
     }
 }
 
-void Defaults::setLastTick(mpc::ui::UserDefaults* ud)
+void Defaults::setLastTick(mpc::ui::UserDefaults& ud)
 {
-	auto lastTick = (ud->getLastBarIndex() + 1) * 384;
+	auto lastTick = (ud.getLastBarIndex() + 1) * 384;
 	auto b = moduru::file::ByteUtil::ushort2bytes(lastTick);
 	saveBytes[LAST_TICK_BYTE1_OFFSET] = b[0];
 	saveBytes[LAST_TICK_BYTE2_OFFSET] = b[1];
 }
 
-void Defaults::setBarCount(mpc::ui::UserDefaults* ud)
+void Defaults::setBarCount(mpc::ui::UserDefaults& ud)
 {
-	auto ba = moduru::file::ByteUtil::ushort2bytes(ud->getLastBarIndex() + 1);
+	auto ba = moduru::file::ByteUtil::ushort2bytes(ud.getLastBarIndex() + 1);
 	saveBytes[BAR_COUNT_BYTE1_OFFSET] = ba[0];
 	saveBytes[BAR_COUNT_BYTE2_OFFSET] = ba[1];
 }
 
-void Defaults::setTimeSig(mpc::ui::UserDefaults* ud)
+void Defaults::setTimeSig(mpc::ui::UserDefaults& ud)
 {
-	saveBytes[TIMESIG_NUM_OFFSET] = (ud->getTimeSig().getNumerator());
-	saveBytes[TIMESIG_DEN_OFFSET] = (ud->getTimeSig().getDenominator());
+	saveBytes[TIMESIG_NUM_OFFSET] = (ud.getTimeSig().getNumerator());
+	saveBytes[TIMESIG_DEN_OFFSET] = (ud.getTimeSig().getDenominator());
 }
 
-void Defaults::setNames(mpc::ui::UserDefaults* ud)
+void Defaults::setNames(mpc::ui::UserDefaults& ud)
 {
-	auto const defSeqName = moduru::lang::StrUtil::padRight(ud->getSequenceName(), " ", AllParser::NAME_LENGTH);
+	auto const defSeqName = moduru::lang::StrUtil::padRight(ud.getSequenceName(), " ", AllParser::NAME_LENGTH);
 	for (int i = 0; i < 16; i++)
 		saveBytes[DEF_SEQ_NAME_OFFSET + i] = defSeqName[i];
 
 	string stringBuffer;
 	for (int i = 0; i < 33; i++) {
-		auto const defDevName = ud->getDeviceName(i);
+		auto const defDevName = ud.getDeviceName(i);
 		stringBuffer = moduru::lang::StrUtil::padRight(defDevName, " ", AllParser::DEV_NAME_LENGTH);
 		auto offset = DEV_NAMES_OFFSET + (i * AllParser::DEV_NAME_LENGTH);
 		for (int j = offset; j < offset + AllParser::DEV_NAME_LENGTH; j++)
@@ -230,7 +230,7 @@ void Defaults::setNames(mpc::ui::UserDefaults* ud)
 
 	}
 	for (int i = 0; i < 64; i++) {
-		auto const defTrackName = ud->getTrackName(i);
+		auto const defTrackName = ud.getTrackName(i);
 		stringBuffer = moduru::lang::StrUtil::padRight(defTrackName, " ", AllParser::NAME_LENGTH);
 		auto offset = TR_NAMES_OFFSET + (i * AllParser::NAME_LENGTH);
 		for (int j = offset; j < offset + AllParser::NAME_LENGTH; j++)
@@ -239,9 +239,9 @@ void Defaults::setNames(mpc::ui::UserDefaults* ud)
 	}
 }
 
-void Defaults::setTempo(mpc::ui::UserDefaults* ud)
+void Defaults::setTempo(mpc::ui::UserDefaults& ud)
 {
-	auto tempo = static_cast<int>(ud->getTempo().toDouble() * 10.0);
+	auto tempo = static_cast<int>(ud.getTempo().toDouble() * 10.0);
 	auto tempoBytes = moduru::file::ByteUtil::ushort2bytes(tempo);
 	saveBytes[TEMPO_BYTE1_OFFSET] = tempoBytes[0];
 	saveBytes[TEMPO_BYTE2_OFFSET] = tempoBytes[1];
