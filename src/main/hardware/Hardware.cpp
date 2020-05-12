@@ -1,5 +1,6 @@
 #include "Hardware.hpp"
 
+#include "TopPanel.hpp"
 #include "Button.hpp"
 #include "DataWheel.hpp"
 #include "HwPad.hpp"
@@ -15,6 +16,9 @@ using namespace std;
 
 Hardware::Hardware()
 {
+
+	topPanel = make_shared<TopPanel>();
+
 	vector<string> buttonLabels{ "left", "right", "up", "down",	"rec", "overdub", "stop", "play", "playstart", "mainscreen", "prevstepevent", "nextstepevent",	"goto",	"prevbarstart",	"nextbarend", "tap", "nextseq",	"trackmute", "openwindow", "fulllevel", "sixteenlevels", "f1", "f2", "f3", "f4", "f5", "f6", "shift", "enter", "undoseq", "erase", "after", "banka", "bankb", "bankc", "bankd" };
 
 	for (auto& l : buttonLabels)
@@ -45,6 +49,11 @@ Hardware::Hardware()
 	volPot = make_shared<Pot>("vol");
 
 	slider = make_shared<Slider>();
+}
+
+std::weak_ptr<TopPanel> Hardware::getTopPanel()
+{
+	return topPanel;
 }
 
 weak_ptr<Pot> Hardware::getRecPot() {

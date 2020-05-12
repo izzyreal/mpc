@@ -10,6 +10,7 @@
 #include <hardware/Led.hpp>
 #include <hardware/HwSlider.hpp>
 #include <hardware/HwPad.hpp>
+#include <hardware/TopPanel.hpp>
 
 #include <sequencer/Sequencer.hpp>
 #include <sampler/Sampler.hpp>
@@ -184,10 +185,11 @@ void BaseControls::pad(int i, int velo, bool repeat, int tick)
 {
 	init();
 	auto lTrk = track.lock();
-	auto controls = Mpc::instance().getControls().lock();
+	auto& mpc = Mpc::instance();
+	auto controls = mpc.getControls().lock();
 	auto lSequencer = sequencer.lock();
 
-	if (sequencerGui->isFullLevelEnabled())
+	if (mpc.getHardware().lock()->getTopPanel().lock()->isFullLevelEnabled())
 	{
 		velo = 127;
 	}
@@ -204,18 +206,26 @@ void BaseControls::pad(int i, int velo, bool repeat, int tick)
 	auto note = lTrk->getBusNumber() > 0 ? program.lock()->getPad(i + (bank_ * 16))->getNote() : i + (bank_ * 16) + 35;
 	auto velocity = velo;
 	auto pad = i + (bank_ * 16);
-	if (Mpc::instance().getUis().lock()->getSequencerGui()->isSixteenLevelsEnabled()) {
-		if (Mpc::instance().getUis().lock()->getSequencerGui()->getParameter() == 0) {
-			note = Mpc::instance().getUis().lock()->getSequencerGui()->getNote();
+
+	if (mpc.getHardware().lock()->getTopPanel().lock()->isSixteenLevelsEnabled())
+	{
+		if (mpc.getUis().lock()->getSequencerGui()->getParameter() == 0)
+		{
+			note = mpc.getUis().lock()->getSequencerGui()->getNote();
 			velocity = (int)(i * (127.0 / 16.0));
-			if (velocity == 0) {
+			
+			if (velocity == 0)
+			{
 				velocity = 1;
 			}
 		}
 	}
-	else {
-		if (csn.compare("programparams") == 0) {
-			if (note > 34) {
+	else
+	{
+		if (csn.compare("programparams") == 0)
+		{
+			if (note > 34)
+			{
 				samplerGui->setPadAndNote(pad, note);
 			}
 		}
@@ -224,12 +234,15 @@ void BaseControls::pad(int i, int velo, bool repeat, int tick)
 		}
 	}
 
-	if (csn.compare("assign16levels") == 0 && note != 34) {
-		Mpc::instance().getUis().lock()->getSequencerGui()->setNote(note);
+	if (csn.compare("assign16levels") == 0 && note != 34)
+	{
+		mpc.getUis().lock()->getSequencerGui()->setNote(note);
 	}
 
-	if (controls->isTapPressed() && lSequencer->isPlaying()) {
-		if (repeat) {
+	if (controls->isTapPressed() && lSequencer->isPlaying())
+	{
+		if (repeat)
+		{
 			generateNoteOn(note, velocity, tick);
 		}
 	}
@@ -241,6 +254,7 @@ void BaseControls::pad(int i, int velo, bool repeat, int tick)
 void BaseControls::generateNoteOn(int nn, int padVelo, int tick)
 {
 	init();
+	auto& mpc = mpc::Mpc::instance();
 	auto lTrk = track.lock();
 	auto lProgram = program.lock();
 	bool slider = lProgram && nn == lProgram->getSlider()->getNote();
@@ -249,12 +263,17 @@ void BaseControls::generateNoteOn(int nn, int padVelo, int tick)
 	bool step = csn.compare("sequencer_step") == 0 && !posIsLastTick;
 	auto swGui = Mpc::instance().getUis().lock()->getSequencerWindowGui();
 	bool recMainWithoutPlaying = csn.compare("sequencer") == 0 && !lSequencer->isPlaying() && Mpc::instance().getControls().lock()->isRecPressed() && swGui->getNoteValue() != 0 && !posIsLastTick;
+
 	shared_ptr<mpc::sequencer::NoteEvent> n;
-	if (lSequencer->isRecordingOrOverdubbing() || step || recMainWithoutPlaying) {
-		if (step) {
+	
+	if (lSequencer->isRecordingOrOverdubbing() || step || recMainWithoutPlaying)
+	{
+		if (step)
+		{
 			n = lTrk->addNoteEvent(lSequencer->getTickPosition(), nn).lock();
 		}
-		else if (recMainWithoutPlaying) {
+		else if (recMainWithoutPlaying)
+		{
 			n = lTrk->addNoteEvent(lSequencer->getTickPosition(), nn).lock();
 			int noteVal = swGui->getNoteValue();
 			int stepLength = lSequencer->getTickValues()[noteVal];
@@ -275,7 +294,7 @@ void BaseControls::generateNoteOn(int nn, int padVelo, int tick)
 		n->setVelocity(padVelo);
 		n->setDuration(step ? 1 : -1);
 		
-		if (sequencerGui->isSixteenLevelsEnabled() && sequencerGui->getParameter() == 1) {
+		if (mpc.getHardware().lock()->getTopPanel().lock()->isSixteenLevelsEnabled() && sequencerGui->getParameter() == 1) {
 			auto type = sequencerGui->getType();
 			auto key = sequencerGui->getOriginalKeyPad();
 			auto diff = lProgram->getPadNumberFromNote(nn) - (bank_ * 16) - key;
@@ -298,7 +317,7 @@ void BaseControls::generateNoteOn(int nn, int padVelo, int tick)
 	noteEvent->setVariationValue(64);
 	noteEvent->setTick(tick);
 
-	if (sequencerGui->isSixteenLevelsEnabled() && sequencerGui->getParameter() == 1) {
+	if (mpc.getHardware().lock()->getTopPanel().lock()->isSixteenLevelsEnabled() && sequencerGui->getParameter() == 1) {
 
 		auto type = sequencerGui->getType();
 		auto key = sequencerGui->getOriginalKeyPad();
@@ -643,18 +662,22 @@ void BaseControls::bank(int i)
 void BaseControls::fullLevel()
 {
     init();
-    sequencerGui->setFullLevelEnabled(!sequencerGui->isFullLevelEnabled());
-	auto hw = Mpc::instance().getHardware().lock();
-	hw->getLed("fulllevel").lock()->light(sequencerGui->isFullLevelEnabled());
+	auto hardware = mpc::Mpc::instance().getHardware().lock();
+	auto topPanel = hardware->getTopPanel().lock();
+    
+	topPanel->setFullLevelEnabled(!topPanel->isFullLevelEnabled());
+
+	hardware->getLed("fulllevel").lock()->light(topPanel->isFullLevelEnabled());
 }
 
 void BaseControls::sixteenLevels()
 {
 	init();
-	auto hw = Mpc::instance().getHardware().lock();
-	if (sequencerGui->isSixteenLevelsEnabled()) {
-		sequencerGui->setSixteenLevelsEnabled(false);
-		hw->getLed("sixteenlevels").lock()->light(false);
+	auto hardware = Mpc::instance().getHardware().lock();
+	auto topPanel = hardware->getTopPanel().lock();
+	if (topPanel->isSixteenLevelsEnabled()) {
+		topPanel->setSixteenLevelsEnabled(false);
+		hardware->getLed("sixteenlevels").lock()->light(false);
 	}
 	else {
 		ls.lock()->openScreen("assign16levels");
@@ -665,13 +688,16 @@ void BaseControls::after()
 {
 	init();
 	auto hw = Mpc::instance().getHardware().lock();
+	auto topPanel = hw->getTopPanel().lock();
 	auto controls = Mpc::instance().getControls().lock();
-	if (controls->isShiftPressed()) {
+
+	if (controls->isShiftPressed())
+	{
 		ls.lock()->openScreen("assign");
 	}
 	else {
-		sequencerGui->setAfterEnabled(!sequencerGui->isAfterEnabled());
-		hw->getLed("after").lock()->light(sequencerGui->isAfterEnabled());
+		topPanel->setAfterEnabled(!topPanel->isAfterEnabled());
+		hw->getLed("after").lock()->light(topPanel->isAfterEnabled());
 	}
 }
 
@@ -679,7 +705,9 @@ void BaseControls::shift()
 {
 	auto controls = Mpc::instance().getControls().lock();
 	if (controls->isShiftPressed())
+	{
 		return;
+	}
 
 	controls->setShiftPressed(true);
 }
@@ -692,8 +720,11 @@ void BaseControls::undoSeq()
 void BaseControls::setSliderNoteVar(mpc::sequencer::NoteEvent* n, weak_ptr<mpc::sampler::Program> program)
 {
 	auto lProgram = program.lock();
+
 	if (n->getNote() != lProgram->getSlider()->getNote())
+	{
 		return;
+	}
 
 	auto sliderParam = lProgram->getSlider()->getParameter();
 	int rangeLow = 0, rangeHigh = 0, sliderRange = 0;
@@ -704,7 +735,8 @@ void BaseControls::setSliderNoteVar(mpc::sequencer::NoteEvent* n, weak_ptr<mpc::
 	int decayValue;
 	int attackValue;
 	int filterValue;
-	switch (sliderParam) {
+	switch (sliderParam)
+	{
 	case 0:
 		rangeLow = lProgram->getSlider()->getTuneLowRange();
 		rangeHigh = lProgram->getSlider()->getTuneHighRange();

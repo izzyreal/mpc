@@ -9,36 +9,6 @@ SequencerGui::SequencerGui()
 	originalKeyPad = 0;
 }
 
-bool SequencerGui::isAfterEnabled()
-{
-    return afterEnabled;
-}
-
-void SequencerGui::setAfterEnabled(bool b)
-{
-    afterEnabled = b;
-}
-
-bool SequencerGui::isFullLevelEnabled()
-{
-    return fullLevelEnabled;
-}
-
-void SequencerGui::setFullLevelEnabled(bool b)
-{
-    fullLevelEnabled = b;
-}
-
-bool SequencerGui::isSixteenLevelsEnabled()
-{
-    return sixteenLevelsEnabled;
-}
-
-void SequencerGui::setSixteenLevelsEnabled(bool b)
-{
-    sixteenLevelsEnabled = b;
-}
-
 int SequencerGui::getNote()
 {
     return note;

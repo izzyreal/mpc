@@ -8,6 +8,7 @@
 
 namespace mpc::hardware
 {
+	class TopPanel;
 	class Button;
 	class DataWheel;
 	class Pot;
@@ -23,6 +24,7 @@ namespace mpc::hardware
 	{
 
 	private:
+		std::shared_ptr<TopPanel> topPanel;
 		std::vector<std::shared_ptr<HwPad>> pads;
 		std::vector<std::shared_ptr<Button>> buttons;
 		std::vector<std::shared_ptr<Led>> leds;
@@ -33,6 +35,7 @@ namespace mpc::hardware
 		std::shared_ptr<Pot> volPot;
 
 	public:
+		std::weak_ptr<TopPanel> getTopPanel();
 		std::weak_ptr<HwPad> getPad(int index);
 		std::weak_ptr<Button> getButton(std::string label);
 		std::weak_ptr<Led> getLed(std::string label);
