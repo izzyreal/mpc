@@ -1,7 +1,7 @@
 #include <ui/disk/DiskObserver.hpp>
 
 #include <Mpc.hpp>
-#include <StartUp.hpp>
+#include <Paths.hpp>
 #include <Util.hpp>
 #include <disk/AbstractDisk.hpp>
 #include <disk/MpcFile.hpp>

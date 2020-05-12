@@ -2,7 +2,7 @@
 
 #include <lcdgui/Component.hpp>
 
-#include "StartUp.hpp"
+#include "Paths.hpp"
 #include <nvram/NvRam.hpp>
 
 #include <disk/AbstractDisk.hpp>
@@ -43,7 +43,7 @@ using namespace std;
 
 Mpc::Mpc()
 {
-	moduru::Logger::l.setPath(mpc::StartUp::logFilePath);
+	moduru::Logger::l.setPath(mpc::Paths::logFilePath());
 
 	hardware = make_shared<hardware::Hardware>();
 

@@ -5,7 +5,7 @@
 #include <gui/BasicStructs.hpp>
 
 #include <Mpc.hpp>
-#include <StartUp.hpp>
+#include <Paths.hpp>
 
 #include "Field.hpp"
 #include "Component.hpp"
@@ -135,7 +135,7 @@ static vector<string> soundNames = vector<string>{ "sound", "deletesound", "dele
 
 static vector<string> soundGuiNames = vector<string>{ "trim", "loop", "zone" };
 
-static moduru::gui::BMFParser _bmfParser = moduru::gui::BMFParser(string(mpc::StartUp::altResPath() + moduru::file::FileUtil::getSeparator() + "font.fnt"));
+static moduru::gui::BMFParser _bmfParser = moduru::gui::BMFParser(string(mpc::Paths::resPath() + moduru::file::FileUtil::getSeparator() + "font.fnt"));
 
 std::vector<std::vector<bool>> LayeredScreen::atlas = _bmfParser.getAtlas();
 moduru::gui::bmfont LayeredScreen::font = _bmfParser.getLoadedFont();

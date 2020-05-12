@@ -5,7 +5,7 @@
 #include <ui/sampler/SamplerGui.hpp>
 #include <ui/sampler/MixerSetupGui.hpp>
 #include <ui/vmpc/VmpcSettingsGui.hpp>
-#include <StartUp.hpp>
+#include <Paths.hpp>
 #include <sampler/Sampler.hpp>
 
 using namespace mpc::sampler;

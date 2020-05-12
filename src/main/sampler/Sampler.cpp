@@ -3,7 +3,7 @@
 #include <Mpc.hpp>
 #include <audiomidi/AudioMidiServices.hpp>
 #include <disk/SoundLoader.hpp>
-#include <StartUp.hpp>
+#include <Paths.hpp>
 #include <ui/Uis.hpp>
 #include <ui/UserDefaults.hpp>
 #include <lcdgui/Background.hpp>
@@ -96,9 +96,9 @@ void Sampler::init()
 		}
 	}
 
-	auto f = make_shared<moduru::file::File>(mpc::StartUp::resPath + "click.wav", nullptr);
+	auto file = make_shared<moduru::file::File>(mpc::Paths::resPath() + "click.wav", nullptr);
 	clickSound = make_shared<Sound>();
-	mpc::disk::SoundLoader::getSampleDataFromWav(f, clickSound->getSampleData());
+	mpc::disk::SoundLoader::getSampleDataFromWav(file, clickSound->getSampleData());
 	clickSound->setMono(true);
 	clickSound->setLevel(100);
 	masterPadAssign = initMasterPadAssign;

@@ -1,5 +1,5 @@
 #include "Background.hpp"
-#include <StartUp.hpp>
+#include <Paths.hpp>
 
 #include <file/FileUtil.hpp>
 
@@ -27,7 +27,7 @@ void Background::Draw(std::vector< std::vector<bool>>* pixels)
 		return;
 	}
 
-	string backgroundPath = mpc::StartUp::resPath + "bmp/" + name + ".bmp";
+	string backgroundPath = mpc::Paths::resPath() + "bmp/" + name + ".bmp";
 	const int infosize = 54;
 
 	FILE* f = moduru::file::FileUtil::fopenw(backgroundPath, "rb");

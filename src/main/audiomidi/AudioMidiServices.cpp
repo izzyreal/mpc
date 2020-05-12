@@ -1,7 +1,7 @@
 #include "AudioMidiServices.hpp"
 
 // mpc
-#include <StartUp.hpp>
+#include <Paths.hpp>
 #include <Mpc.hpp>
 #include <audiomidi/DirectToDiskSettings.hpp>
 #include <audiomidi/DiskRecorder.hpp>
@@ -379,7 +379,7 @@ void AudioMidiServices::prepareBouncing(DirectToDiskSettings* settings)
 	string sep = moduru::file::FileUtil::getSeparator();
 	for (int i = 0; i < diskRecorders.size(); i++) {
 		auto eapa = diskRecorders[i];
-		auto absolutePath = mpc::StartUp::home + sep + "vMPC" + sep + "recordings" + sep + indivFileNames[i];
+		auto absolutePath = mpc::Paths::home() + sep + "vMPC" + sep + "recordings" + sep + indivFileNames[i];
 		eapa->prepare(absolutePath, settings->lengthInFrames, settings->sampleRate);
 	}
 	bouncePrepared = true;

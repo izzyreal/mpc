@@ -1,7 +1,7 @@
 #include <disk/Stores.hpp>
 
 #include <disk/Store.hpp>
-#include <StartUp.hpp>
+#include <Paths.hpp>
 
 #include <file/FileSystem.hpp>
 
@@ -34,7 +34,7 @@ Stores::Stores()
 	*/
 
 	string defaultStdStoreLabel = "MPC2000XL";
-	string defaultStdStorePath = mpc::StartUp::storesPath + defaultStdStoreLabel;
+	string defaultStdStorePath = mpc::Paths::storesPath() + defaultStdStoreLabel;
 	int size = 0;
 	size = 512 * 1024 * 1024;
 	stores.push_back(make_shared<Store>(this, defaultStdStorePath, size, defaultStdStoreLabel, false));

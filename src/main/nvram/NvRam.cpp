@@ -3,7 +3,7 @@
 #include <file/all/Defaults.hpp>
 #include <hardware/Hardware.hpp>
 #include <hardware/HwSlider.hpp>
-#include <StartUp.hpp>
+#include <Paths.hpp>
 #include <Mpc.hpp>
 #include <audiomidi/AudioMidiServices.hpp>
 #include <ui/UserDefaults.hpp>
@@ -25,7 +25,7 @@ NvRam::NvRam()
 
 mpc::ui::UserDefaults NvRam::load()
 {
-	string path = mpc::StartUp::resPath + "nvram.vmp";
+	string path = mpc::Paths::resPath() + "nvram.vmp";
 	auto file = File(path, nullptr);
 
 	auto ud = mpc::ui::UserDefaults();
@@ -65,7 +65,7 @@ void NvRam::saveUserDefaults()
 {
 	auto dp = DefaultsParser(mpc::ui::UserDefaults::instance());
 	
-	string fileName = mpc::StartUp::resPath + "nvram.vmp";
+	string fileName = mpc::Paths::resPath() + "nvram.vmp";
 	
 	auto file = moduru::file::File(fileName, nullptr);
 	
@@ -93,7 +93,7 @@ void NvRam::saveKnobPositions()
 
     if (ams && hw && slider) {
         
-		auto file = moduru::file::File(mpc::StartUp::resPath + "knobpositions.vmp", nullptr);
+		auto file = moduru::file::File(mpc::Paths::resPath() + "knobpositions.vmp", nullptr);
 		
 		if (!file.exists()) {
 			file.create();

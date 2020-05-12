@@ -2,7 +2,7 @@
 
 #include <Mpc.hpp>
 #include <Util.hpp>
-#include <StartUp.hpp>
+#include <Paths.hpp>
 #include <lcdgui/MixerStrip.hpp>
 #include <lcdgui/Layer.hpp>
 #include <lcdgui/Field.hpp>

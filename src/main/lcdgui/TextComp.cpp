@@ -1,7 +1,7 @@
 #include "TextComp.hpp"
 
 #include <Mpc.hpp>
-#include <StartUp.hpp>
+#include <Paths.hpp>
 
 #include <lang/StrUtil.hpp>
 #include <lang/utf8_decode.h>

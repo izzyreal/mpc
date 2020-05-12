@@ -1,5 +1,5 @@
 #include "Rectangle.hpp"
-#include <StartUp.hpp>
+#include <Paths.hpp>
 
 #include <file/FileUtil.hpp>
 

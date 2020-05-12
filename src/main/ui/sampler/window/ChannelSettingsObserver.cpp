@@ -2,7 +2,7 @@
 
 #include <Mpc.hpp>
 #include <Util.hpp>
-#include <StartUp.hpp>
+#include <Paths.hpp>
 #include <lcdgui/Field.hpp>
 #include <ui/sampler/MixerGui.hpp>
 #include <ui/sampler/MixerSetupGui.hpp>

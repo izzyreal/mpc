@@ -1,7 +1,7 @@
 #include <controls/other/AbstractOtherControls.hpp>
 
 #include <Mpc.hpp>
-#include <StartUp.hpp>
+#include <Paths.hpp>
 #include <ui/NameGui.hpp>
 #include <ui/UserDefaults.hpp>
 #include <sampler/Program.hpp>

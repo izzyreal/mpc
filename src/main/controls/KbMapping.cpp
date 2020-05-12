@@ -2,7 +2,7 @@
 #include <thirdp/wrpkey/key.hxx>
 
 #include <file/File.hpp>
-#include <StartUp.hpp>
+#include <Paths.hpp>
 
 #include <Logger.hpp>
 
@@ -63,7 +63,7 @@ KbMapping::KbMapping()
 const key_helper_t* mpc::controls::KbMapping::kh = &key_helper_t::instance();
 
 void KbMapping::exportMapping() {
-	auto path = mpc::StartUp::resPath + "/keys.txt";
+	auto path = mpc::Paths::resPath() + "/keys.txt";
 	moduru::file::File f(path, nullptr);
 	if (f.exists()) {
 		f.del();

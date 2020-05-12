@@ -15,7 +15,7 @@
 #include <sampler/Sampler.hpp>
 #include <sampler/Program.hpp>
 
-#include <StartUp.hpp>
+#include <Paths.hpp>
 
 #include <audiomidi/AudioMidiServices.hpp>
 #include <audiomidi/EventHandler.hpp>

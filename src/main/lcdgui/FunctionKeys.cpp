@@ -2,7 +2,7 @@
 
 #include <lcdgui/Label.hpp>
 
-#include <StartUp.hpp>
+#include <Paths.hpp>
 
 #include <Mpc.hpp>
 

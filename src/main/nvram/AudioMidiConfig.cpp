@@ -1,6 +1,6 @@
 #include "AudioMidiConfig.hpp"
 
-#include <StartUp.hpp>
+#include <Paths.hpp>
 #include <lang/StrUtil.hpp>
 
 #include <file/ByteUtil.hpp>
@@ -9,12 +9,8 @@
 using namespace mpc::nvram;
 using namespace std;
 
-AudioMidiConfig::AudioMidiConfig() {
-
-}
-
 void AudioMidiConfig::loadIO(vector<string>* ioNames) {
-	moduru::file::File configFile(mpc::StartUp::resPath + "config.vmp", nullptr);
+	moduru::file::File configFile(mpc::Paths::resPath() + "config.vmp", nullptr);
 	if (!configFile.exists() || configFile.getLength() != 514) return;
 	configFile.openRead();
 	string name;
@@ -30,7 +26,7 @@ void AudioMidiConfig::loadIO(vector<string>* ioNames) {
 }
 
 void AudioMidiConfig::load(string& serverName, int& bufferSize) {
-	moduru::file::File configFile(mpc::StartUp::resPath + "config.vmp", nullptr);
+	moduru::file::File configFile(mpc::Paths::resPath() + "config.vmp", nullptr);
 	if (!configFile.exists() || configFile.getLength() != 514) return;
 	configFile.openRead();
 	for (int i = 0; i < 64; i++) {
@@ -43,7 +39,7 @@ void AudioMidiConfig::load(string& serverName, int& bufferSize) {
 }
 
 void AudioMidiConfig::save(const vector<string>& names, const int& bufferSize) {
-	moduru::file::File configFile(mpc::StartUp::resPath + "config.vmp", nullptr);
+	moduru::file::File configFile(mpc::Paths::resPath() + "config.vmp", nullptr);
 	if (configFile.exists()) configFile.del();
 	configFile.create();
 
@@ -63,8 +59,4 @@ void AudioMidiConfig::save(const vector<string>& names, const int& bufferSize) {
 
 	configFile.setData(&buf);
 	configFile.close();
-}
-
-AudioMidiConfig::~AudioMidiConfig() {
-
 }
