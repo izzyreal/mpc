@@ -249,9 +249,6 @@ bool Component::IsDirty()
 		return true;
 	}
 
-	if (dirty && !hidden) {
-			//MLOG(getName() + " is dirty");
-	}
 	return dirty && !hidden;
 }
 
@@ -261,9 +258,8 @@ MRECT Component::getRect() {
 
 void Component::Clear(vector<vector<bool>>* pixels) {
 	auto r = getRect();
-	for (int i = r.L; i < r.R + 1; i++) {
-		for (int j = r.T; j < r.B + 1; j++) {
-			if (i < 0 || i > 247 || j < 0 || j > 59) continue;
+	for (int i = r.L; i < r.R - 1; i++) {
+		for (int j = r.T; j < r.B; j++) {
 			(*pixels)[i][j] = false;
 		}
 	}

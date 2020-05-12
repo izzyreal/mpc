@@ -1,5 +1,4 @@
 #pragma once
-
 #include <lcdgui/ScreenComponent.hpp>
 #include <lcdgui/Component.hpp>
 
@@ -8,6 +7,12 @@
 
 #include <memory>
 #include <vector>
+
+namespace mpc::sequencer
+{
+	class Sequence;
+	class Track;
+}
 
 namespace mpc::lcdgui::screens
 {
@@ -18,10 +23,13 @@ namespace mpc::lcdgui::screens
 
 	public:
 		SequencerScreen(std::vector<std::shared_ptr<Component>> componentMap);
+		~SequencerScreen();
 
 	private:
 		mpc::sequencer::Sequencer& sequencer;
 		mpc::sampler::Sampler& sampler;
+		std::weak_ptr<mpc::sequencer::Sequence> sequence;
+		std::weak_ptr<mpc::sequencer::Track> track;
 
 	private:
 		void displaySq();
@@ -39,8 +47,11 @@ namespace mpc::lcdgui::screens
 		void displayCount();
 		void displayTiming();
 
-	private:
+	public:
+		// Shared with NextSeqObserver, find better home
 		static std::vector<std::string> timingCorrectNames;
+
+	private:
 		static std::vector<std::string> busNames;
 		void displayNow0();
 		void displayNow1();
@@ -49,6 +60,8 @@ namespace mpc::lcdgui::screens
 		void displayTsig();
 		void displayLoop();
 
+	public:
+		void update(moduru::observer::Observable* o, nonstd::any arg);
 
 	};
 

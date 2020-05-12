@@ -36,7 +36,6 @@
 #include <ui/sequencer/EditSequenceObserver.hpp>
 #include <ui/sequencer/NextSeqObserver.hpp>
 #include <ui/sequencer/NextSeqPadObserver.hpp>
-#include <ui/sequencer/SequencerObserver.hpp>
 #include <ui/sequencer/SongObserver.hpp>
 #include <ui/sequencer/StepEditorObserver.hpp>
 #include <ui/sequencer/TrMoveObserver.hpp>
@@ -843,10 +842,6 @@ void LayeredScreen::initObserver()
 	}
 	else if (csn.compare("sample") == 0) {
 	activeObserver = make_unique<SampleObserver>();
-	}
-	else
-	if (csn.compare("sequencer") == 0) {
-		activeObserver = make_unique<SequencerObserver>();
 	}
 	else if (csn.compare("directory") == 0) {
 		activeObserver = make_unique<DirectoryObserver>(Mpc::instance().getDisk());

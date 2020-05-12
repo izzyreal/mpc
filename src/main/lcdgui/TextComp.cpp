@@ -23,6 +23,8 @@ void TextComp::Draw(std::vector<std::vector<bool>>* pixels) {
 		return;
 	}
 
+	Clear(pixels);
+
 	auto font = &LayeredScreen::font;
 	auto atlas = &LayeredScreen::atlas;
 

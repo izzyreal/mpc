@@ -93,7 +93,7 @@ vector<shared_ptr<Component>> ScreenArrangements::get(const string& screenName, 
 		functionKeysComponent->Hide(true);
 	}
 
-	components.push_back(move(functionKeysComponent));
+	//components.push_back(move(functionKeysComponent));
 
 	return components;
 }

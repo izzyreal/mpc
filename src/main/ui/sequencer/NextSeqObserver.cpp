@@ -5,8 +5,8 @@
 #include <ui/Uis.hpp>
 #include <ui/sequencer/window/SequencerWindowGui.hpp>
 #include <lcdgui/LayeredScreen.hpp>
+#include <lcdgui/screens/SequencerScreen.hpp>
 #include <lcdgui/Field.hpp>
-#include <ui/sequencer/SequencerObserver.hpp>
 #include <sequencer/Sequence.hpp>
 #include <sequencer/Sequencer.hpp>
 #include <sequencer/TempoChangeEvent.hpp>
@@ -129,7 +129,8 @@ void NextSeqObserver::displayTempoSource()
 
 void NextSeqObserver::displayTiming()
 {
-    timingField.lock()->setText(SequencerObserver::timingCorrectNames()->at(Mpc::instance().getUis().lock()->getSequencerWindowGui()->getNoteValue()));
+	auto noteValue = Mpc::instance().getUis().lock()->getSequencerWindowGui()->getNoteValue();
+    timingField.lock()->setText(mpc::lcdgui::screens::SequencerScreen::timingCorrectNames[noteValue]);
 }
 
 void NextSeqObserver::update(moduru::observer::Observable* o, nonstd::any arg)
