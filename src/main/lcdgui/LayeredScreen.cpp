@@ -260,6 +260,11 @@ LayeredScreen::LayeredScreen()
 	}
 }
 
+weak_ptr<ScreenComponent> LayeredScreen::findScreenComponent()
+{
+	return getFocusedLayer().lock()->findScreenComponent();
+}
+
 weak_ptr<EnvGraph> LayeredScreen::getEnvGraph() {
 	return envGraph;
 }
@@ -338,16 +343,20 @@ void LayeredScreen::transferFocus(bool backwards) {
 }
 
 int LayeredScreen::openScreen(string screenName) {
+
 	if (currentScreenName.compare(screenName) == 0) {
 		return -1;
 	}
 
 	auto ams = Mpc::instance().getAudioMidiServices().lock();
-	if (currentScreenName.compare("sample") == 0) {
+
+	if (currentScreenName.compare("sample") == 0)
+	{
 		ams->muteMonitor(true);
 		ams->getSoundRecorder().lock()->setVuMeterActive(false);
 	}
-	else if (screenName.compare("sample") == 0) {
+	else if (screenName.compare("sample") == 0)
+	{
 		bool muteMonitor = Mpc::instance().getUis().lock()->getSamplerGui()->getMonitor() == 0 ? true : false;
 		ams->muteMonitor(muteMonitor);
 		ams->getSoundRecorder().lock()->setVuMeterActive(true);
@@ -371,11 +380,17 @@ int LayeredScreen::openScreen(string screenName) {
 	
 	int oldLayer = focusedLayer;
 
+	if (getFocusedLayer().lock())
+	{
+		getFocusedLayer().lock()->removeChild(getFocusedLayer().lock()->findScreenComponent());
+	}
+
 	focusedLayer = -1;
 
 	string firstField;
+	
 	auto screenComponent = ScreenArrangements::getScreenComponent(currentScreenName, focusedLayer, firstField);
-
+	
 	if (focusedLayer == -1)
 	{
 		return -1;
@@ -447,7 +462,7 @@ void LayeredScreen::returnToLastFocus(string firstFieldOfThisScreen)
 {
 	auto focusCounter = 0;
 	
-	for (auto& lf : lastFocus) {
+	for (auto& lf : lastFocuses) {
 		if (lf[0].compare(currentScreenName) == 0) {
 			focusCounter++;
 			setFocus(lf[1]);
@@ -458,7 +473,7 @@ void LayeredScreen::returnToLastFocus(string firstFieldOfThisScreen)
 		vector<string> sa(2);
 		sa[0] = currentScreenName;
 		sa[1] = firstFieldOfThisScreen;
-		lastFocus.push_back(sa);
+		lastFocuses.push_back(sa);
 		setFocus(firstFieldOfThisScreen);
 	}
 }
@@ -472,11 +487,13 @@ void LayeredScreen::redrawEnvGraph(int attack, int decay)
 	envGraph->setCoordinates(lines);
 }
 
-void LayeredScreen::setLastFocus(string screenName, string tfName)
+void LayeredScreen::setLastFocus(string screenName, string newLastFocus)
 {
-	for (auto& lf : lastFocus) {
-		if (lf[0].compare(screenName) == 0) {
-			lf[1] = tfName;
+	for (auto& lastFocus : lastFocuses)
+	{
+		if (lastFocus[0].compare(screenName) == 0)
+		{
+			lastFocus[1] = newLastFocus;
 		}
 	}
 }
@@ -484,7 +501,7 @@ void LayeredScreen::setLastFocus(string screenName, string tfName)
 string LayeredScreen::getLastFocus(string screenName)
 {
 	string tfName = "";
-	for (auto& lf : lastFocus) {
+	for (auto& lf : lastFocuses) {
 		if (lf[0].compare(screenName) == 0) {
 			tfName = lf[1];
 		}

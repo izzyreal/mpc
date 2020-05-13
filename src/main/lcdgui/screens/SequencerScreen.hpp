@@ -63,6 +63,15 @@ namespace mpc::lcdgui::screens
 	public:
 		void update(moduru::observer::Observable* o, nonstd::any arg);
 
+	public:
+		void pressEnter() override;
+		void function(int i) override;
+		void turnWheel(int i) override;
+		void openWindow() override;
+		void left() override;
+		void right() override;
+		void up() override;
+		void down() override;
 	};
 
 }

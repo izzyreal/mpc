@@ -5,6 +5,7 @@
 #include <sequencer/Sequence.hpp>
 #include <sequencer/Track.hpp>
 #include <sequencer/TempoChangeEvent.hpp>
+#include <sequencer/NoteEvent.hpp>
 
 #include <sampler/Sampler.hpp>
 
@@ -13,6 +14,9 @@
 #include <lcdgui/Field.hpp>
 
 #include <ui/sequencer/window/SequencerWindowGui.hpp>
+#include <ui/sequencer/EditSequenceGui.hpp>
+#include <ui/sequencer/StepEditorGui.hpp>
+#include <ui/UserDefaults.hpp>
 
 #include <Util.hpp>
 
@@ -24,6 +28,12 @@ using namespace mpc::lcdgui::screens;
 SequencerScreen::SequencerScreen(std::vector<std::shared_ptr<Component>> components)
 	: ScreenComponent("sequencer"), sequencer(*mpc::Mpc::instance().getSequencer().lock().get()), sampler(*mpc::Mpc::instance().getSampler().lock().get())
 {
+
+	auto& mpc = mpc::Mpc::instance();
+
+	sequence = mpc.getSequencer().lock()->getActiveSequence();
+	track = mpc.getSequencer().lock()->getActiveTrack();
+
 	for (auto component : components)
 	{
 		addChild(move(component));
@@ -51,17 +61,22 @@ SequencerScreen::SequencerScreen(std::vector<std::shared_ptr<Component>> compone
 	displayBus();
 	displayDeviceNumber();
 
-	auto& mpc = mpc::Mpc::instance();
 	mpc.getUis().lock()->getSequencerWindowGui()->addObserver(this);
 	mpc.getSequencer().lock()->addObserver(this);
 
-	sequence = mpc.getSequencer().lock()->getActiveSequence();
 	sequence.lock()->addObserver(this);
-		
-	track = mpc.getSequencer().lock()->getActiveTrack();
 	track.lock()->addObserver(this);
 }
 
+SequencerScreen::~SequencerScreen()
+{
+	auto& mpc = mpc::Mpc::instance();
+	mpc.getSequencer().lock()->deleteObserver(this);
+	mpc.getUis().lock()->getSequencerWindowGui()->deleteObserver(this);
+
+	sequence.lock()->deleteObserver(this);
+	track.lock()->deleteObserver(this);
+}
 
 void SequencerScreen::displayVelo()
 {
@@ -70,16 +85,15 @@ void SequencerScreen::displayVelo()
 
 void SequencerScreen::displayDeviceNumber()
 {
-	auto track = sequencer.getActiveTrack().lock();
-	if (track->getDevice() == 0) {
+	if (track.lock()->getDevice() == 0) {
 		findField("devicenumber").lock()->setText("OFF");
 	}
 	else {
-		if (track->getDevice() >= 17) {
-			findField("devicenumber").lock()->setText(to_string(track->getDevice() - 16) + "B");
+		if (track.lock()->getDevice() >= 17) {
+			findField("devicenumber").lock()->setText(to_string(track.lock()->getDevice() - 16) + "B");
 		}
 		else {
-			findField("devicenumber").lock()->setText(to_string(track->getDevice()) + "A");
+			findField("devicenumber").lock()->setText(to_string(track.lock()->getDevice()) + "A");
 		}
 	}
 }
@@ -99,34 +113,32 @@ void SequencerScreen::displayBars()
 
 void SequencerScreen::displayPgm()
 {
-	auto track = sequencer.getActiveTrack().lock();
-	if (track->getProgramChange() == 0) {
+	if (track.lock()->getProgramChange() == 0) {
 		findField("pgm").lock()->setText("OFF");
 	}
 	else {
-		findField("pgm").lock()->setText(to_string(track->getProgramChange()));
+		findField("pgm").lock()->setText(to_string(track.lock()->getProgramChange()));
 	}
 }
 
 void SequencerScreen::displayDeviceName()
 {
-	auto track = sequencer.getActiveTrack().lock();
-	if (track->getBusNumber() != 0) {
-		if (track->getDevice() == 0) {
-			int pgm = sampler.getDrumBusProgramNumber(track->getBusNumber());
+	if (track.lock()->getBusNumber() != 0) {
+		if (track.lock()->getDevice() == 0) {
+			int pgm = sampler.getDrumBusProgramNumber(track.lock()->getBusNumber());
 			auto p = dynamic_pointer_cast<mpc::sampler::Program>(sampler.getProgram(pgm).lock());
 			findLabel("devicename").lock()->setText(p->getName());
 		}
 		else {
-			findLabel("devicename").lock()->setText(sequencer.getActiveSequence().lock()->getDeviceName(track->getDevice()));
+			findLabel("devicename").lock()->setText(sequencer.getActiveSequence().lock()->getDeviceName(track.lock()->getDevice()));
 		}
 	}
-	else if (track->getBusNumber() == 0) {
-		if (track->getDevice() == 0) {
+	else if (track.lock()->getBusNumber() == 0) {
+		if (track.lock()->getDevice() == 0) {
 			findLabel("devicename").lock()->setText("NewPgm-A");
 		}
 		else {
-			findLabel("devicename").lock()->setText(sequencer.getActiveSequence().lock()->getDeviceName(track->getDevice()));
+			findLabel("devicename").lock()->setText(sequencer.getActiveSequence().lock()->getDeviceName(track.lock()->getDevice()));
 		}
 	}
 }
@@ -166,17 +178,17 @@ void SequencerScreen::displayTempoSource()
 void SequencerScreen::displaySq()
 {
 	string result{ "" };
-	auto lSequencer = mpc::Mpc::instance().getSequencer().lock();
-	if (lSequencer->isPlaying()) {
-		result.append(moduru::lang::StrUtil::padLeft(to_string(lSequencer->getCurrentlyPlayingSequenceIndex() + 1), "0", 2));
+
+	if (sequencer.isPlaying()) {
+		result.append(moduru::lang::StrUtil::padLeft(to_string(sequencer.getCurrentlyPlayingSequenceIndex() + 1), "0", 2));
 		result.append("-");
-		result.append(lSequencer->getCurrentlyPlayingSequence().lock()->getName());
+		result.append(sequencer.getCurrentlyPlayingSequence().lock()->getName());
 		findField("sq").lock()->setText(result);
 	}
 	else {
-		result.append(moduru::lang::StrUtil::padLeft(to_string(lSequencer->getActiveSequenceIndex() + 1), "0", 2));
+		result.append(moduru::lang::StrUtil::padLeft(to_string(sequencer.getActiveSequenceIndex() + 1), "0", 2));
 		result.append("-");
-		result.append(lSequencer->getActiveSequence().lock()->getName());
+		result.append(sequencer.getActiveSequence().lock()->getName());
 		findField("sq").lock()->setText(result);
 	}
 }
@@ -205,8 +217,7 @@ void SequencerScreen::displayRecordingMode()
 void SequencerScreen::displayTsig()
 {
 	string result = "";
-	auto seq = sequencer.getActiveSequence().lock();
-	auto ts = seq->getTimeSignature();
+	auto ts = sequence.lock()->getTimeSignature();
 	result.append(to_string(ts.getNumerator()));
 	result.append("/");
 	result.append(to_string(ts.getDenominator()));
@@ -215,8 +226,7 @@ void SequencerScreen::displayTsig()
 
 void SequencerScreen::displayLoop()
 {
-	auto seq = sequencer.getActiveSequence();
-	findField("loop").lock()->setText(seq.lock()->isLoopEnabled() ? "ON" : "OFF");
+	findField("loop").lock()->setText(sequence.lock()->isLoopEnabled() ? "ON" : "OFF");
 }
 
 void SequencerScreen::displayOn() {
@@ -248,11 +258,8 @@ void SequencerScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 	track.lock()->deleteObserver(this);
 	sequence.lock()->deleteObserver(this);
 	
-	auto& mpc = mpc::Mpc::instance();
-	
-	auto sequencer = mpc.getSequencer().lock();
-	sequence = sequencer->getActiveSequence();
-	track = sequencer->getActiveTrack();
+	sequence = sequencer.getActiveSequence();
+	track = sequencer.getActiveTrack();
 
 	sequence.lock()->addObserver(this);
 	track.lock()->addObserver(this);
@@ -262,28 +269,28 @@ void SequencerScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 	auto nextSqField = findField("nextsq").lock();
 	auto nextSqLabel = findLabel("nextsq").lock();
 
-	auto ls = mpc.getLayeredScreen().lock();
+
 
 	if (s.compare("nextsqvalue") == 0)
 	{
-		nextSqField->setTextPadded(sequencer->getNextSq() + 1, " ");
+		nextSqField->setTextPadded(sequencer.getNextSq() + 1, " ");
 	}
 	else if (s.compare("nextsq") == 0)
 	{
-		ls->drawFunctionKeys("nextsq");
+		//ls->drawFunctionKeys("nextsq");
 		if (nextSqField->IsHidden()) {
 			nextSqField->Hide(false);
 			nextSqLabel->Hide(false);
-			ls->setFocus("nextsq");
+			//ls->setFocus("nextsq");
 		}
-		nextSqField->setTextPadded(sequencer->getNextSq() + 1, " ");
+		nextSqField->setTextPadded(sequencer.getNextSq() + 1, " ");
 	}
 	else if (s.compare("nextsqoff") == 0)
 	{
 		nextSqField->Hide(true);
 		nextSqLabel->Hide(true);
-		ls->drawFunctionKeys("sequencer");
-		ls->setFocus("sq");
+		//ls->drawFunctionKeys("sequencer");
+		//ls->setFocus("sq");
 	}
 	else if (s.compare("notevalue") == 0)
 	{
@@ -364,20 +371,363 @@ void SequencerScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 	}
 	else if (s.compare("soloenabled") == 0)
 	{
-		//soloLabel.lock()->setBlinking(lSequencer->isSoloEnabled());
+		//soloLabel.lock()->setBlinking(sequencer.isSoloEnabled());
 	}
 }
 
-
-SequencerScreen::~SequencerScreen()
+void SequencerScreen::pressEnter()
 {
-	auto& mpc = mpc::Mpc::instance();
-	mpc.getSequencer().lock()->deleteObserver(this);
-	mpc.getUis().lock()->getSequencerWindowGui()->deleteObserver(this);
+	BaseControls::pressEnter();
 
-	auto seq = mpc.getSequencer().lock()->getActiveSequence().lock();
-	seq->deleteObserver(this);
+	if (!isTypable())
+	{
+		return;
+	}
+
+	auto focusedField = findFocus().lock();
+	auto focus = focusedField->getName();
+
+	if (!focusedField->isTypeModeEnabled())
+	{
+		return;
+	}
+
+	auto candidate = focusedField->enter();
+
+	if (candidate != INT_MAX) {	
+
+		if (focus.compare("now0") == 0)
+		{
+			sequencer.setBar(candidate - 1);
+			setLastFocus("sequencer_step", "viewmodenumber");
+		}
+		else if (focus.compare("now1") == 0)
+		{
+			sequencer.setBeat(candidate - 1);
+			setLastFocus("sequencer_step", "viewmodenumber");
+		}
+		else if (focus.compare("now2") == 0)
+		{
+			sequencer.setClock(candidate);
+			setLastFocus("sequencer_step", "viewmodenumber");
+		}
+		else if (focus.compare("tempo") == 0)
+		{
+			sequencer.setTempo(BCMath(candidate / 10.0));
+		}
+		else if (focus.compare("velo") == 0)
+		{
+			track.lock()->setVelocityRatio(candidate);
+		}
+	}
+}
+
+void SequencerScreen::function(int i)
+{
+	init();
+	BaseControls::function(i);
+
+	auto editSequenceGui = mpc::Mpc::instance().getUis().lock()->getEditSequenceGui();
+
+	switch (i) {
+	case 0:
+		openScreen("sequencer_step");
+		break;
+	case 1:
+		editSequenceGui->setTime1(sequence.lock()->getLastTick());
+		openScreen("edit");
+		break;
+	case 2:
+		track.lock()->setOn(!track.lock()->isOn());
+		break;
+	case 3:
+		sequencer.setSoloEnabled(!sequencer.isSoloEnabled());
+		break;
+	case 4:
+		sequencer.trackDown();
+		break;
+	case 5:
+		sequencer.trackUp();
+		break;
+	}
+}
+
+void SequencerScreen::turnWheel(int i)
+{
+	init();
+
+	auto focus = findFocus().lock()->getName();
+
+	if (focus.size() >= 3 && focus.substr(0, 3).compare("now") == 0) {
+		setLastFocus("sequencer_step", "viewmodenumber");
+	}
+
+	if (focus.compare("now0") == 0) {
+		sequencer.setBar(sequencer.getCurrentBarNumber() + i);
+	}
+	else if (focus.compare("now1") == 0) {
+		sequencer.setBeat(sequencer.getCurrentBeatNumber() + i);
+	}
+	else if (focus.compare("now2") == 0) {
+		sequencer.setClock(sequencer.getCurrentClockNumber() + i);
+	}
+	else if (focus.compare("devicenumber") == 0) {
+		track.lock()->setDeviceNumber(track.lock()->getDevice() + i);
+	}
+	else if (focus.compare("tr") == 0)
+	{
+		if (i > 0)
+		{
+			sequencer.trackUp();
+		}
+		else if (i < 0)
+		{
+			sequencer.trackDown();
+		}
+	}
+	else if (focus.compare("tracktype") == 0)
+	{
+		track.lock()->setBusNumber(track.lock()->getBusNumber() + i);
+		
+		auto lastFocus = getLastFocus("sequencer_step");
+
+		if (lastFocus.length() == 2)
+		{
+			auto eventNumber = stoi(lastFocus.substr(1, 2));
+
+			auto stepEditorgui = mpc::Mpc::instance().getUis().lock()->getStepEditorGui();
+
+			if (dynamic_pointer_cast<mpc::sequencer::NoteEvent>(stepEditorgui->getVisibleEvents()[eventNumber].lock())) {
+				if (track.lock()->getBusNumber() == 0) {
+					if (lastFocus[0] == 'd' || lastFocus[0] == 'e') {
+						setLastFocus("sequencer_step", "a" + to_string(eventNumber));
+					}
+				}
+			}
+		}
+
+		lastFocus = getLastFocus("edit");
+
+		string midinote = "midinote";
+		string drumnote = "drumnote";
+
+		if (lastFocus.compare("") != 0) {
+			if (std::mismatch(midinote.begin(), midinote.end(), lastFocus.begin()).first == midinote.end()) {
+				if (track.lock()->getBusNumber() != 0) {
+					setLastFocus("edit", "drumnote");
+				}
+			}
+			else if (std::mismatch(drumnote.begin(), drumnote.end(), lastFocus.begin()).first == drumnote.end()) {
+				if (track.lock()->getBusNumber() == 0) {
+					setLastFocus("edit", "midinote0");
+				}
+			}
+		}
+	}
+	else if (focus.compare("pgm") == 0) {
+		track.lock()->setProgramChange(track.lock()->getProgramChange() + i);
+	}
+	else if (focus.compare("velo") == 0) {
+		track.lock()->setVelocityRatio(track.lock()->getVelocityRatio() + i);
+	}
+	else if (focus.compare("timing") == 0) {
+		auto sequencerWindowGui = mpc::Mpc::instance().getUis().lock()->getSequencerWindowGui();
+		sequencerWindowGui->setNoteValue(sequencerWindowGui->getNoteValue() + i);
+		setLastFocus("timingcorrect", "notevalue");
+	}
+	else if (focus.compare("sq") == 0) {
+		if (sequencer.isPlaying()) {
+			sequencer.setNextSq(sequencer.getCurrentlyPlayingSequenceIndex() + i);
+		}
+		else {
+			sequencer.setActiveSequenceIndex(sequencer.getActiveSequenceIndex() + i);
+		}
+	}
+	else if (focus.compare("nextsq") == 0) {
+		sequencer.setNextSq(sequencer.getNextSq() + i);
+	}
+	else if (focus.compare("bars") == 0) {
+		Mpc::instance().getUis().lock()->getSequencerWindowGui()->setNewBars(sequencer.getActiveSequence().lock()->getLastBar());
+		openScreen("changebars2");
+	}
+	else if (focus.compare("tempo") == 0) {
+		double oldTempo = sequencer.getTempo().toDouble();
+		double newTempo = oldTempo + (i / 10.0);
+		sequencer.setTempo(BCMath(newTempo));
+	}
+	else if (focus.compare("tsig") == 0) {
+		mpc::sequencer::TimeSignature ts;
+		auto oldTs = sequence.lock()->getTimeSignature();
+		ts.setNumerator(oldTs.getNumerator());
+		ts.setDenominator(oldTs.getDenominator());
+		Mpc::instance().getUis().lock()->getSequencerWindowGui()->setNewTimeSignature(ts);
+		openScreen("changetsig");
+	}
+	else if (focus.compare("temposource") == 0) {
+		sequencer.setTempoSourceSequence(i > 0);
+	}
+	else if (focus.compare("count") == 0) {
+		sequencer.setCountEnabled(i > 0);
+	}
+	else if (focus.compare("loop") == 0) {
+		sequence.lock()->setLoopEnabled(i > 0);
+	}
+	else if (focus.compare("recordingmode") == 0) {
+		sequencer.setRecordingModeMulti(i > 0);
+	}
+	else if (focus.compare("on") == 0) {
+		track.lock()->setOn(i > 0);
+	}
+}
+
+void SequencerScreen::openWindow()
+{
+	init();
+
+	if (sequencer.isPlaying())
+	{
+		return;
+	}
+
+	auto focus = findFocus().lock()->getName();
 	
-	auto track = mpc.getSequencer().lock()->getActiveTrack().lock();
-	track->deleteObserver(this);
+	auto sequencerWindowGui = mpc::Mpc::instance().getUis().lock()->getSequencerWindowGui();
+
+	if (focus.compare("sq") == 0)
+	{
+		openScreen("sequence");
+	}
+	else if (focus.find("now") != string::npos)
+	{
+		openScreen("timedisplay");
+	}
+	else if (focus.find("tempo") != string::npos)
+	{
+		openScreen("tempochange");
+	}
+	else if (focus.compare("timing") == 0)
+	{
+		openScreen("timingcorrect");
+	}
+	else if (focus.compare("tsig") == 0)
+	{
+		auto oldTs = sequence.lock()->getTimeSignature();
+		auto newTs = Mpc::instance().getUis().lock()->getSequencerWindowGui()->getNewTimeSignature();
+		newTs->setNumerator(oldTs.getNumerator());
+		newTs->setDenominator(oldTs.getDenominator());
+		openScreen("changetsig");
+	}
+	else if (focus.compare("count") == 0)
+	{
+		openScreen("countmetronome");
+	}
+	else if (focus.compare("loop") == 0)
+	{
+		openScreen("loopbarswindow");
+	}
+	else if (focus.compare("tr") == 0)
+	{
+		openScreen("track");
+	}
+	else if (focus.compare("on") == 0)
+	{
+		openScreen("eraseallofftracks");
+	}
+	else if (focus.compare("pgm") == 0)
+	{
+		openScreen("transmitprogramchanges");
+	}
+	else if (focus.compare("recordingmode") == 0)
+	{
+		openScreen("multirecordingsetup");
+	}
+	else if (focus.compare("tracktype") == 0)
+	{
+		openScreen("midiinput");
+	}
+	else if (focus.compare("devicenumber") == 0)
+	{
+		openScreen("midioutput");
+	}
+	else if (focus.compare("bars") == 0)
+	{
+		if (sequencerWindowGui->getChangeBarsAfterBar() > sequence.lock()->getLastBar() + 1)
+		{
+			sequencerWindowGui->setChangeBarsAfterBar(sequence.lock()->getLastBar() + 1, sequence.lock()->getLastBar());
+		}
+		
+		if (sequencerWindowGui->getChangeBarsFirstBar() > sequence.lock()->getLastBar())
+		{
+			sequencerWindowGui->setChangeBarsFirstBar(sequence.lock()->getLastBar(), sequence.lock()->getLastBar());
+		}
+
+		if (sequencerWindowGui->getChangeBarsLastBar() > sequence.lock()->getLastBar())
+		{
+			sequencerWindowGui->setChangeBarsLastBar(sequence.lock()->getLastBar(), sequence.lock()->getLastBar());
+		}
+		openScreen("changebars");
+	}
+	else if (focus.compare("velo") == 0) {
+		Mpc::instance().getUis().lock()->getSequencerWindowGui()->setTime0(0);
+		Mpc::instance().getUis().lock()->getSequencerWindowGui()->setTime1(sequence.lock()->getLastTick());
+		openScreen("editvelocity");
+	}
+}
+
+void SequencerScreen::left()
+{
+	init();
+
+	if (sequencer.getNextSq() != -1) {
+		return;
+	}
+
+	BaseControls::left();
+}
+
+void SequencerScreen::right()
+{
+	init();
+
+	if (sequencer.getNextSq() != -1) {
+		return;
+	}
+
+	if (!sequence.lock()->isUsed()) {
+		sequence.lock()->init(mpc::ui::UserDefaults::instance().getLastBarIndex());
+		int index = sequencer.getActiveSequenceIndex();
+		string name = moduru::lang::StrUtil::trim(sequencer.getDefaultSequenceName()) + moduru::lang::StrUtil::padLeft(to_string(index + 1), "0", 2);
+		sequence.lock()->setName(name);
+		sequencer.setActiveSequenceIndex(sequencer.getActiveSequenceIndex());
+	}
+	BaseControls::right();
+}
+
+void SequencerScreen::up()
+{
+	init();
+
+	if (sequencer.getNextSq() != -1) {
+		return;
+	}
+
+	BaseControls::up();
+}
+
+void SequencerScreen::down()
+{
+	init();
+
+	if (sequencer.getNextSq() != -1) {
+		return;
+	}
+
+	if (!sequence.lock()->isUsed()) {
+		sequence.lock()->init(mpc::ui::UserDefaults::instance().getLastBarIndex());
+		int index = sequencer.getActiveSequenceIndex();
+		string name = moduru::lang::StrUtil::trim(sequencer.getDefaultSequenceName()) + moduru::lang::StrUtil::padLeft(to_string(index + 1), "0", 2);
+		sequence.lock()->setName(name);
+		sequencer.setActiveSequenceIndex(sequencer.getActiveSequenceIndex());
+	}
+	BaseControls::down();
 }

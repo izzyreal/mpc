@@ -31,6 +31,7 @@ namespace mpc::lcdgui {
 	class Label;
 	class Layer;
 	class Component;
+	class ScreenComponent;
 }
 
 namespace mpc::lcdgui {
@@ -69,9 +70,10 @@ namespace mpc::lcdgui {
 		int openScreen(std::string name); // returns layer number
 		std::weak_ptr<Field> lookupField(std::string s);
 		std::weak_ptr<Label> lookupLabel(std::string s);
+		std::weak_ptr<ScreenComponent> findScreenComponent();
 
 	private:
-		std::vector<std::vector<std::string>> lastFocus{};
+		std::vector<std::vector<std::string>> lastFocuses{};
 
 		int focusedLayer{ 0 };
 		std::string currentScreenName{ "" };

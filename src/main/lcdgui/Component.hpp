@@ -11,6 +11,7 @@ namespace mpc::lcdgui {
 	class Label;
 	class Field;
 	class Parameter;
+	class ScreenComponent;
 }
 
 namespace mpc::lcdgui {
@@ -31,6 +32,7 @@ namespace mpc::lcdgui {
 
 	public:
 		std::weak_ptr<Component> addChild(std::shared_ptr<Component> child);
+		void removeChild(std::weak_ptr<Component> child);
 		void addChildren(std::vector<std::shared_ptr<Component>> children);
 		std::weak_ptr<Component> findChild(const std::string& name);
 		std::weak_ptr<Label> findLabel(const std::string& name);
@@ -39,6 +41,7 @@ namespace mpc::lcdgui {
 		std::vector<std::weak_ptr<Label>> findLabels();
 		std::vector<std::weak_ptr<Field>> findFields();
 		std::vector<std::weak_ptr<Parameter>> findParameters();
+		std::weak_ptr<ScreenComponent> findScreenComponent();
 		MRECT getRect();
 
 	public:

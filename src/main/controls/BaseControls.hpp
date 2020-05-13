@@ -39,6 +39,7 @@ namespace mpc::ui::sampler {
 }
 
 namespace mpc::controls {
+
 	class BaseControls
 	{
 	protected:

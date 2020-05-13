@@ -6,7 +6,6 @@
 
 #include <controls/GlobalReleaseControls.hpp>
 
-#include <controls/sequencer/SequencerControls.hpp>
 #include <controls/sequencer/AssignControls.hpp>
 #include <controls/sequencer/BarCopyControls.hpp>
 #include <controls/sequencer/EditSequenceControls.hpp>
@@ -144,7 +143,6 @@ Controls::Controls()
 
 	controls["release"] = new GlobalReleaseControls();
 
-	controls["sequencer"] = new sequencer::SequencerControls();
 	controls["barcopy"] = new sequencer::BarCopyControls();
 	controls["edit"] = new sequencer::EditSequenceControls();
 	controls["nextseq"] = new sequencer::NextSeqControls();

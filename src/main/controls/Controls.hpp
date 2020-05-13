@@ -5,77 +5,74 @@
 #include <string>
 #include <set>
 
-namespace mpc {
+namespace mpc::controls {
+	class BaseControls;
+	class GlobalReleaseControls;
+}
 
-	
+namespace mpc::controls {
 
-	namespace controls {
+	class Controls
+	{
+	private:
+		bool ctrlPressed{ false };
+		bool altPressed{ false };
 
-		class BaseControls;
-		class GlobalReleaseControls;
+	public:
+		void setCtrlPressed(bool b);
+		void setAltPressed(bool b);
+		bool isCtrlPressed();
+		bool isAltPressed();
 
-		class Controls
-		{
-		private:
-			bool ctrlPressed{ false };
-			bool altPressed{ false };
+	private:
+		bool shiftPressed{ false };
+		bool recPressed{ false };
+		bool overDubPressed{ false };
+		bool tapPressed{ false };
+		bool goToPressed{ false };
+		bool erasePressed{ false };
+		bool f3Pressed{ false };
+		bool f4Pressed{ false };
+		bool f5Pressed{ false };
+		bool f6Pressed{ false };
+		std::set<int> pressedPads;
+		std::vector<int> pressedPadVelos;
 
-		public:
-			void setCtrlPressed(bool b);
-			void setAltPressed(bool b);
-			bool isCtrlPressed();
-			bool isAltPressed();
+	public:
+		void setErasePressed(bool b);
+		void setRecPressed(bool b);
+		void setOverDubPressed(bool b);
+		void setTapPressed(bool b);
+		void setGoToPressed(bool b);
+		void setShiftPressed(bool b);
+		void setF3Pressed(bool b);
+		void setF4Pressed(bool b);
+		void setF5Pressed(bool b);
+		void setF6Pressed(bool b);
 
-		private:
-			bool shiftPressed{ false };
-			bool recPressed{ false };
-			bool overDubPressed{ false };
-			bool tapPressed{ false };
-			bool goToPressed{ false };
-			bool erasePressed{ false };
-			bool f3Pressed{ false };
-			bool f4Pressed{ false };
-			bool f5Pressed{ false };
-			bool f6Pressed{ false };
-			std::set<int> pressedPads;
-			std::vector<int> pressedPadVelos;
+		bool isErasePressed();
+		bool isRecPressed();
+		bool isOverDubPressed();
+		bool isTapPressed();
+		bool isGoToPressed();
+		bool isShiftPressed();
+		bool isF3Pressed();
+		bool isF4Pressed();
+		bool isF5Pressed();
+		bool isF6Pressed();
 
-		public:
-			void setErasePressed(bool b);
-			void setRecPressed(bool b);
-			void setOverDubPressed(bool b);
-			void setTapPressed(bool b);
-			void setGoToPressed(bool b);
-			void setShiftPressed(bool b);
-			void setF3Pressed(bool b);
-			void setF4Pressed(bool b);
-			void setF5Pressed(bool b);
-			void setF6Pressed(bool b);
+		std::set<int>* getPressedPads();
+		std::vector<int>* getPressedPadVelos();
 
-			bool isErasePressed();
-			bool isRecPressed();
-			bool isOverDubPressed();
-			bool isTapPressed();
-			bool isGoToPressed();
-			bool isShiftPressed();
-			bool isF3Pressed();
-			bool isF4Pressed();
-			bool isF5Pressed();
-			bool isF6Pressed();
+	private:
+		std::unordered_map<std::string, controls::BaseControls*> controls{};
 
-			std::set<int>* getPressedPads();
-			std::vector<int>* getPressedPadVelos();
+	public:
+		mpc::controls::BaseControls* getControls(std::string s);
+		mpc::controls::GlobalReleaseControls* getReleaseControls();
 
-		private:
-			std::unordered_map<std::string, controls::BaseControls*> controls{};
-
-		public:
-			mpc::controls::BaseControls* getControls(std::string s);
-			mpc::controls::GlobalReleaseControls* getReleaseControls();
-
-		public:
-			Controls();
-			~Controls();
-		};
-	}
+	public:
+		Controls();
+		~Controls();
+	};
 }

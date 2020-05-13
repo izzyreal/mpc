@@ -3,6 +3,7 @@
 #include "Label.hpp"
 #include "Field.hpp"
 #include "Parameter.hpp"
+#include "ScreenComponent.hpp"
 
 #include <Mpc.hpp>
 
@@ -144,6 +145,23 @@ weak_ptr<Component> Component::addChild(shared_ptr<Component> child)
 	return children.back();
 }
 
+void Component::removeChild(weak_ptr<Component> child)
+{
+	if (!child.lock())
+	{
+		return;
+	}
+
+	for (auto& c : children)
+	{
+		if (c == child.lock())
+		{
+			children.erase(find(begin(children), end(children), child.lock()));
+			break;
+		}
+	}
+}
+
 void Component::addChildren(vector<shared_ptr<Component>> children)
 {
 	for (auto& c : children)
@@ -263,4 +281,26 @@ void Component::Clear(vector<vector<bool>>* pixels) {
 			(*pixels)[i][j] = false;
 		}
 	}
+}
+
+weak_ptr<ScreenComponent> Component::findScreenComponent()
+{
+	for (auto& c : children)
+	{
+		auto candidate = dynamic_pointer_cast<ScreenComponent>(c);
+		
+		if (candidate)
+		{
+			return candidate;
+		}
+
+		auto childCandidate = c->findScreenComponent().lock();
+
+		if (childCandidate)
+		{
+			return childCandidate;
+		}
+	}
+	
+	return {};
 }
