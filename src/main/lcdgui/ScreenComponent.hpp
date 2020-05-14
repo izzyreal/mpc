@@ -50,9 +50,6 @@ namespace mpc::lcdgui
 		const std::string getLastFocus(const std::string& screenName);
 
 	public:
-		void SetDirty() override;
-
-	public:
 		virtual void open() {}
 		virtual void close() {}
 

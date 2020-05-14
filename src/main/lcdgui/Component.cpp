@@ -193,6 +193,8 @@ void Component::Draw(vector<vector<bool>>* pixels)
 	{
 		c->Draw(pixels);
 	}
+
+	dirty = false;
 }
 
 const string& Component::getName()
@@ -245,14 +247,12 @@ void Component::SetDirty()
 
 void Component::SetDirtyRecursive()
 {
+	
 	for (auto& c : children)
 	{
 		c->SetDirtyRecursive();
 	}
-	if (!hidden)
-	{
-		SetDirty();
-	}
+	SetDirty();
 }
 
 bool Component::IsHidden()

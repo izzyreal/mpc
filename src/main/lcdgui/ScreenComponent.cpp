@@ -1,8 +1,7 @@
 #include "ScreenComponent.hpp"
 
 #include "Background.hpp"
-#include "Label.hpp"
-
+#
 #include <Mpc.hpp>
 #include <sequencer/Sequencer.hpp>
 #include <sampler/Sampler.hpp>
@@ -16,22 +15,6 @@ ScreenComponent::ScreenComponent(const string& name, const int layer)
 {
 	auto background = dynamic_pointer_cast<Background>(addChild(make_shared<Background>()).lock());
 	background->setName(name);
-}
-
-void ScreenComponent::SetDirty()
-{
-	for (auto& f : findFields())
-	{
-		f.lock()->SetDirty();
-	}
-
-	for (auto& l : findLabels())
-	{
-		l.lock()->SetDirty();
-	}
-
-	findChild("background").lock()->SetDirty();
-	findChild("function-keys").lock()->SetDirty();
 }
 
 const int& ScreenComponent::getLayerIndex()
