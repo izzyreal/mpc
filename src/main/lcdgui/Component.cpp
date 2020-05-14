@@ -240,7 +240,19 @@ MRECT Component::getDirtyArea() {
 
 void Component::SetDirty() 
 { 
-	dirty = true; 
+	dirty = true;
+}
+
+void Component::SetDirtyRecursive()
+{
+	for (auto& c : children)
+	{
+		c->SetDirtyRecursive();
+	}
+	if (!hidden)
+	{
+		SetDirty();
+	}
 }
 
 bool Component::IsHidden()

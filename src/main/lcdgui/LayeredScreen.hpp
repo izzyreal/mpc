@@ -75,7 +75,7 @@ namespace mpc::lcdgui {
 	private:
 		std::vector<std::vector<std::string>> lastFocuses{};
 
-		int focusedLayer{ 0 };
+		int focusedLayerIndex{ 0 };
 		std::string currentScreenName{ "" };
 		std::string previousScreenName{ "" };
 

@@ -18,7 +18,7 @@ namespace mpc::lcdgui {
 
 	class Component {
 
-	private:
+	protected:
 		std::vector<std::shared_ptr<Component>> children;
 
 	protected:
@@ -46,7 +46,8 @@ namespace mpc::lcdgui {
 
 	public:
 		virtual void Hide(bool b);
-		void SetDirty();
+		virtual void SetDirty();
+		void SetDirtyRecursive();
 		bool IsHidden();
 		bool IsDirty();
 		MRECT getDirtyArea();

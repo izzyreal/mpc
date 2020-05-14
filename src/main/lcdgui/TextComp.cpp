@@ -1,7 +1,5 @@
 #include "TextComp.hpp"
 
-#include "Field.hpp"
-
 #include <Mpc.hpp>
 #include <Paths.hpp>
 
@@ -25,8 +23,6 @@ void TextComp::Draw(std::vector<std::vector<bool>>* pixels) {
 	{
 		return;
 	}
-
-	auto field = dynamic_cast<Field*>(this) != nullptr;
 
 	auto font = &LayeredScreen::font;
 	auto atlas = &LayeredScreen::atlas;

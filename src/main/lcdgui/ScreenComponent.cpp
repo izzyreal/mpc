@@ -1,5 +1,7 @@
 #include "ScreenComponent.hpp"
+
 #include "Background.hpp"
+#include "Label.hpp"
 
 #include <Mpc.hpp>
 #include <sequencer/Sequencer.hpp>
@@ -16,7 +18,23 @@ ScreenComponent::ScreenComponent(const string& name, const int layer)
 	background->setName(name);
 }
 
-const int& ScreenComponent::getLayer()
+void ScreenComponent::SetDirty()
+{
+	for (auto& f : findFields())
+	{
+		f.lock()->SetDirty();
+	}
+
+	for (auto& l : findLabels())
+	{
+		l.lock()->SetDirty();
+	}
+
+	findChild("background").lock()->SetDirty();
+	findChild("function-keys").lock()->SetDirty();
+}
+
+const int& ScreenComponent::getLayerIndex()
 {
 	return layer;
 }

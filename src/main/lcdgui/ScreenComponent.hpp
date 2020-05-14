@@ -41,7 +41,7 @@ namespace mpc::lcdgui
 		const std::shared_ptr<mpc::sampler::Sampler> sampler;
 
 	public:
-		const int& getLayer();
+		const int& getLayerIndex();
 
 	protected:
 		std::weak_ptr<Field> findFocus();
@@ -50,8 +50,11 @@ namespace mpc::lcdgui
 		const std::string getLastFocus(const std::string& screenName);
 
 	public:
+		void SetDirty() override;
+
+	public:
 		virtual void open() {}
-			virtual void close() {}
+		virtual void close() {}
 
 	public:
 		ScreenComponent(const std::string& name, const int layer);

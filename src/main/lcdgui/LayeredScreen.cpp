@@ -252,11 +252,21 @@ LayeredScreen::LayeredScreen()
 		effects.push_back(move(effect));
 	}
 
+	shared_ptr<Layer> previousLayer;
+
 	for (int i = 0; i < LAYER_COUNT; i++)
 	{
 		auto layer = make_shared<Layer>();
 		layers.push_back(layer);
-		root->addChild(layer);
+		if (previousLayer)
+		{
+			previousLayer->addChild(layer);
+		}
+		else
+		{
+			root->addChild(layer);
+		}
+		previousLayer = layer;
 	}
 }
 
@@ -278,7 +288,7 @@ vector<weak_ptr<Effect>> LayeredScreen::getEffects() {
 
 int LayeredScreen::getCurrentFieldIndex() {
 	int currentIndex;
-	auto layer = layers[focusedLayer].lock();
+	auto layer = layers[focusedLayerIndex].lock();
 	auto fields = layer->findFields();
 	int size = fields.size();
 	
@@ -297,7 +307,7 @@ int LayeredScreen::getCurrentFieldIndex() {
 
 void LayeredScreen::transferFocus(bool backwards) {
 	int currentIndex, candidateIndex;
-	auto layer = layers[focusedLayer].lock();
+	auto layer = layers[focusedLayerIndex].lock();
 	auto fields = layer->findFields();
 	int size = fields.size();
 	
@@ -393,15 +403,17 @@ int LayeredScreen::openScreen(string screenName) {
 		getFocusedLayer().lock()->removeChild(oldScreenComponent);
 	}
 
-	focusedLayer = screenComponent->getLayer();
+	focusedLayerIndex = screenComponent->getLayerIndex();
 
 	getFocusedLayer().lock()->addChild(screenComponent);
+
+	screenComponent->SetDirty();
 	
 	screenComponent->open();
 
 	returnToLastFocus(screenComponent->findFields().front().lock()->getName());
 
-	return focusedLayer;
+	return focusedLayerIndex;
 }
 
 vector<vector<bool>>* LayeredScreen::getPixels() {
@@ -642,12 +654,12 @@ weak_ptr<Wave> LayeredScreen::getFineWave()
 
 int LayeredScreen::getFocusedLayerIndex()
 {
-	return focusedLayer;
+	return focusedLayerIndex;
 }
 
 std::weak_ptr<Layer> LayeredScreen::getFocusedLayer()
 {
-	return layers[focusedLayer];
+	return layers[focusedLayerIndex];
 }
 
 
