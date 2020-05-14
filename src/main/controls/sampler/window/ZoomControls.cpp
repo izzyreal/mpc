@@ -27,7 +27,7 @@ void ZoomControls::init()
 void ZoomControls::function(int i)
 {
 	super::function(i);
-	auto lSampler = sampler.lock();;
+	;
 	vector<int> zone;
 	switch (i) {
 	case 1:
@@ -38,7 +38,7 @@ void ZoomControls::function(int i)
 		break;
 	case 4:
 		zone = vector<int>{ soundGui->getZoneStart(soundGui->getZoneNumber()), soundGui->getZoneEnd(soundGui->getZoneNumber()) };
-		lSampler->playX(soundGui->getPlayX(), &zone);
+		sampler.lock()->playX(soundGui->getPlayX(), &zone);
 		break;
 	}
 }

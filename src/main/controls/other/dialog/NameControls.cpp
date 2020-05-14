@@ -109,7 +109,7 @@ void NameControls::pressEnter() {
 void NameControls::saveName() {
 	auto uis = Mpc::instance().getUis().lock();
 	auto lLs = ls.lock();
-	auto lSequencer = sequencer.lock();
+	
 	auto ngParam = nameGui->getParameterName();
 	auto prevScreen = lLs->getPreviousScreenName();
 	auto soundGui = uis->getSoundGui();
@@ -154,14 +154,14 @@ void NameControls::saveName() {
 	}
 	else if (ngParam.find("default") != string::npos) {
 		if (prevScreen.compare("track") == 0) {
-			lSequencer->setDefaultTrackName(nameGui->getName(), lSequencer->getActiveTrackIndex());
+			sequencer.lock()->setDefaultTrackName(nameGui->getName(), sequencer.lock()->getActiveTrackIndex());
 			nameGui->setNameBeingEdited(false);
 			lLs->setLastFocus("name", "0");
 			lLs->openScreen("sequencer");
 			return;
 		}
 		else if (prevScreen.compare("sequence") == 0) {
-			lSequencer->setDefaultSequenceName(nameGui->getName());
+			sequencer.lock()->setDefaultSequenceName(nameGui->getName());
 			nameGui->setNameBeingEdited(false);
 			lLs->setLastFocus("name", "0");
 			lLs->openScreen("sequencer");

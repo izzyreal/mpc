@@ -10,21 +10,6 @@
 #include <memory>
 #include <string>
 
-namespace mpc
-{
-	class Mpc;
-}
-
-namespace mpc::sampler
-{
-	class Sampler;
-}
-
-namespace mpc::sequencer
-{
-	class Sequencer;
-}
-
 namespace mpc::lcdgui
 {
 
@@ -34,11 +19,6 @@ namespace mpc::lcdgui
 
 	private:
 		const int layer;
-
-	protected:
-		mpc::Mpc& mpc;
-		const std::shared_ptr<mpc::sequencer::Sequencer> sequencer;
-		const std::shared_ptr<mpc::sampler::Sampler> sampler;
 
 	public:
 		const int& getLayerIndex();

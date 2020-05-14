@@ -156,7 +156,7 @@ void EditSequenceControls::turnWheel(int i)
 	init();
 	auto lFromSeq = fromSeq.lock();
 	auto lToSeq = toSeq.lock();
-	auto lSequencer = sequencer.lock();
+	
 	if (param.compare("time0") == 0) {
 		editSequenceGui->setTime0(editSequenceGui->setBarNumber(editSequenceGui->getBarNumber(lFromSeq.get(), editSequenceGui->getTime0()) + i, lFromSeq.get(), editSequenceGui->getTime0()));
 	}
@@ -198,7 +198,7 @@ void EditSequenceControls::turnWheel(int i)
 	}
 	else if (param.compare("fromsq") == 0) {
 		editSequenceGui->setFromSq(editSequenceGui->getFromSq() + i);
-		fromSeq = lSequencer->getSequence(editSequenceGui->getFromSq());
+		fromSeq = sequencer.lock()->getSequence(editSequenceGui->getFromSq());
 		lFromSeq = fromSeq.lock();
 		if (editSequenceGui->getTime1() > lFromSeq->getLastTick()) {
 			editSequenceGui->setTime1(lFromSeq->getLastTick());
@@ -209,7 +209,7 @@ void EditSequenceControls::turnWheel(int i)
 	}
 	else if (param.compare("tosq") == 0) {
 		editSequenceGui->setToSq(editSequenceGui->getToSq() + i);
-		toSeq = lSequencer->getSequence(editSequenceGui->getToSq());
+		toSeq = sequencer.lock()->getSequence(editSequenceGui->getToSq());
 		lToSeq = toSeq.lock();
 		if (editSequenceGui->getStartTicks() > lToSeq->getLastTick()) {
 			editSequenceGui->setStartTicks(lToSeq->getLastTick());

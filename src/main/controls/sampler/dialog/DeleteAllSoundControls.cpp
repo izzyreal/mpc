@@ -14,14 +14,14 @@ DeleteAllSoundControls::DeleteAllSoundControls()
 void DeleteAllSoundControls::function(int i)
 {
 	init();
-	auto lSampler = sampler.lock();
+	
 	auto lLs = ls.lock();
 	switch (i) {
 	case int(3) :
 		lLs->openScreen("deletesound");
 		break;
 	case 4:
-		lSampler->deleteAllSamples();
+		sampler.lock()->deleteAllSamples();
 		lLs->openScreen(soundGui->getPreviousScreenName());
 		break;
 	}

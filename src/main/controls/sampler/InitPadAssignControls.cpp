@@ -22,12 +22,12 @@ void InitPadAssignControls::turnWheel(int i)
 void InitPadAssignControls::function(int i)
 {
 	init();
-	auto lSampler = sampler.lock();
+	
 	auto lLs = ls.lock();
 	switch (i) {
 	case int(4) :
 		if (swGui->isInitPadAssignMaster()) {
-			lSampler->setMasterPadAssign(*lSampler->getInitMasterPadAssign());
+			sampler.lock()->setMasterPadAssign(*sampler.lock()->getInitMasterPadAssign());
 		}
 		else {
 			program.lock()->initPadAssign();

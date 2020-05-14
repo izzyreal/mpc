@@ -10,6 +10,11 @@ namespace ctoot::mpc {
 	class MpcSoundPlayerChannel;
 }
 
+namespace mpc
+{
+	class Mpc;
+}
+
 namespace mpc::sequencer {
 	class Sequencer;
 	class Track;
@@ -42,13 +47,16 @@ namespace mpc::controls {
 
 	class BaseControls
 	{
+
+	protected:
+		mpc::Mpc& mpc;
+		std::weak_ptr<mpc::sequencer::Sequencer> sequencer;
+		std::weak_ptr<mpc::sampler::Sampler> sampler;
+
 	protected:
 		std::string param{ "" };
 		std::string csn{ "" };
 
-		
-		std::weak_ptr<mpc::sequencer::Sequencer> sequencer;
-		std::weak_ptr<mpc::sampler::Sampler> sampler;
 		std::weak_ptr<mpc::sequencer::Track> track;
 		std::weak_ptr<mpc::sampler::Program> program;
 		ctoot::mpc::MpcSoundPlayerChannel* mpcSoundPlayerChannel = nullptr;

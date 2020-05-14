@@ -27,7 +27,7 @@ void ConvertSoundControls::turnWheel(int i)
 void ConvertSoundControls::function(int i)
 {
 	init();
-	auto lSampler = sampler.lock();
+	
 	auto lLs = ls.lock();
 	switch (i) {
 	case 3:
@@ -35,13 +35,13 @@ void ConvertSoundControls::function(int i)
 		break;
 	case 4:
 		if (soundGui->getConvert() == 0) {
-			string name = lSampler->getSoundName(soundGui->getSoundIndex());
+			string name = sampler.lock()->getSoundName(soundGui->getSoundIndex());
 			name = moduru::lang::StrUtil::trim(name);
 			name = moduru::lang::StrUtil::padRight(name, "_", 16);
 			name = name.substr(0, 14);
-			if (lSampler->getSound(soundGui->getSoundIndex()).lock()->isMono()) {
+			if (sampler.lock()->getSound(soundGui->getSoundIndex()).lock()->isMono()) {
 				soundGui->setNewStName(name + "-S");
-				soundGui->setRSource(soundGui->getSoundIndex(), lSampler->getSoundCount());
+				soundGui->setRSource(soundGui->getSoundIndex(), sampler.lock()->getSoundCount());
 				lLs->openScreen("monotostereo");
 			}
 			else {
@@ -52,10 +52,10 @@ void ConvertSoundControls::function(int i)
 		}
 		else {
 			lLs->openScreen("resample");
-			soundGui->setNewFs(dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound(soundGui->getSoundIndex()).lock())->getSampleRate());
-			auto newSampleName = lSampler->getSoundName(soundGui->getSoundIndex());
+			soundGui->setNewFs(dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getSound(soundGui->getSoundIndex()).lock())->getSampleRate());
+			auto newSampleName = sampler.lock()->getSoundName(soundGui->getSoundIndex());
 			//newSampleName = newSampleName->replaceAll("\\s+$", "");
-			newSampleName = lSampler->addOrIncreaseNumber(newSampleName);
+			newSampleName = sampler.lock()->addOrIncreaseNumber(newSampleName);
 			soundGui->setNewName(newSampleName);
 		}
 	}

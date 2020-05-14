@@ -15,10 +15,10 @@ CopyTrackControls::CopyTrackControls()
 void CopyTrackControls::function(int i)
 {
 	init();
-	auto lSequencer = sequencer.lock();
+	
 	switch (i) {
 	case 4:
-		lSequencer->copyTrack(swGui->getTr0(), swGui->getTr1(), lSequencer->getActiveSequenceIndex(), lSequencer->getActiveSequenceIndex());
+		sequencer.lock()->copyTrack(swGui->getTr0(), swGui->getTr1(), sequencer.lock()->getActiveSequenceIndex(), sequencer.lock()->getActiveSequenceIndex());
 		ls.lock()->openScreen("sequencer");
 		break;
 	}

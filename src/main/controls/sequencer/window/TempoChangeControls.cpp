@@ -54,7 +54,7 @@ void TempoChangeControls::function(int j)
 	int nowDetected;
 	std::shared_ptr<TempoChangeEvent> tce;
 	auto seq = sequence.lock();
-	auto lSequencer = sequencer.lock();
+	
 	auto tceList = seq->getTempoChangeEvents();
 	switch (j) {
 	case 1:
@@ -71,14 +71,14 @@ void TempoChangeControls::function(int j)
 	case 2:
 		nowDetected = -1;
 		for (int i = 0; i < tceList.size(); i++) {
-			if (tceList[i].lock()->getTick() == lSequencer->getTickPosition()) {
+			if (tceList[i].lock()->getTick() == sequencer.lock()->getTickPosition()) {
 				nowDetected = i;
 				break;
 			}
 		}
 		if (nowDetected == -1) {
 			auto tce = seq->addTempoChangeEvent().lock();
-			tce->setTick(lSequencer->getTickPosition());
+			tce->setTick(sequencer.lock()->getTickPosition());
 			seq->sortTempoChangeEvents();
 		}
 		else {

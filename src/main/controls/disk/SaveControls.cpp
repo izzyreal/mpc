@@ -38,7 +38,7 @@ void SaveControls::function(int i)
 			return;
 
 		shared_ptr<mpc::sequencer::Sequence> seq;
-		auto lSampler = sampler.lock();
+		
 		auto lProgram = program.lock();
 		switch (diskGui->getType()) {
 		case 0:
@@ -61,8 +61,8 @@ void SaveControls::function(int i)
 			ls.lock()->openScreen("saveaprogram");
 			break;
 		case 4:
-			if (lSampler->getSoundCount() == 0) break;
-			nameGui->setName(lSampler->getSoundName(soundGui->getSoundIndex()));
+			if (sampler.lock()->getSoundCount() == 0) break;
+			nameGui->setName(sampler.lock()->getSoundName(soundGui->getSoundIndex()));
 			ls.lock()->openScreen("saveasound");
 			break;
 		}
@@ -78,21 +78,21 @@ void SaveControls::turnWheel(int i)
 	else if (param.compare("file") == 0) {
 
 		int nr;
-		auto lSampler = sampler.lock();
-		auto lSequencer = sequencer.lock();
+		
+		
 		switch (diskGui->getType()) {
 		case 0:
 		case 2:
 			return;
 		case 1:
-			lSequencer->setActiveSequenceIndex(lSequencer->getActiveSequenceIndex() + i);
+			sequencer.lock()->setActiveSequenceIndex(sequencer.lock()->getActiveSequenceIndex() + i);
 			break;
 		case 3:
-			nr = lSequencer->getActiveSequence().lock()->getTrack(lSequencer->getActiveTrackIndex()).lock()->getBusNumber();
-			lSampler->setDrumBusProgramNumber(nr, lSampler->getDrumBusProgramNumber(nr) + i);
+			nr = sequencer.lock()->getActiveSequence().lock()->getTrack(sequencer.lock()->getActiveTrackIndex()).lock()->getBusNumber();
+			sampler.lock()->setDrumBusProgramNumber(nr, sampler.lock()->getDrumBusProgramNumber(nr) + i);
 			break;
 		case 4:
-			soundGui->setSoundIndex(soundGui->getSoundIndex() + i, lSampler->getSoundCount());
+			soundGui->setSoundIndex(soundGui->getSoundIndex() + i, sampler.lock()->getSoundCount());
 			break;
 		case 5:
 			break;

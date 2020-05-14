@@ -126,15 +126,18 @@ void GlobalReleaseControls::simplePad(int i)
 void GlobalReleaseControls::generateNoteOff(int nn)
 {
     init();
-	auto lSequencer = sequencer.lock();
 	auto lTrk = track.lock();
-    if(lSequencer->isRecordingOrOverdubbing()) {
+    
+	if (sequencer.lock()->isRecordingOrOverdubbing())
+	{
         auto n = new mpc::sequencer::NoteEvent();
         n->setNote(nn);
         n->setVelocity(0);
-        n->setTick(lSequencer->getTickPosition());
+        n->setTick(sequencer.lock()->getTickPosition());
         lTrk->recordNoteOff(n);
+		delete n;
     }
+
     auto noteEvent = make_shared<mpc::sequencer::NoteEvent>(nn);
     noteEvent->setVelocity(0);
     noteEvent->setDuration(0);
@@ -164,9 +167,11 @@ void GlobalReleaseControls::tap()
 {
 	auto controls = Mpc::instance().getControls().lock();
 	controls->setTapPressed(false);
-	auto lSequencer = sequencer.lock();
-    if (lSequencer->isRecordingOrOverdubbing())
-        lSequencer->flushTrackNoteCache();
+
+	if (sequencer.lock()->isRecordingOrOverdubbing())
+	{
+		sequencer.lock()->flushTrackNoteCache();
+	}
 }
 
 void GlobalReleaseControls::shift()
@@ -174,7 +179,8 @@ void GlobalReleaseControls::shift()
 	auto controls = Mpc::instance().getControls().lock();
 	controls->setShiftPressed(false);
 	init();
-	if (csn.compare("sequencer_step") == 0 && param.length() == 2) {
+	if (csn.compare("sequencer_step") == 0 && param.length() == 2)
+	{
 		auto eventNumber = stoi(param.substr(1, 2));
 		auto seGui = Mpc::instance().getUis().lock()->getStepEditorGui();
 		auto res = eventNumber + seGui->getyOffset();

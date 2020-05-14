@@ -19,12 +19,12 @@ SaveASoundControls::SaveASoundControls()
 void SaveASoundControls::turnWheel(int i)
 {
 	init();
-	auto lSampler = sampler.lock();
+	
 	if (param.compare("file") == 0 && i > 0) {
-		lSampler->setSoundGuiPrevSound();
+		sampler.lock()->setSoundGuiPrevSound();
 	}
 	else if (param.compare("file") == 0 && i < 0) {
-		lSampler->setSoundGuiNextSound();
+		sampler.lock()->setSoundGuiNextSound();
 	}
 	else if (param.compare("filetype") == 0) {
 		diskGui->setFileTypeSaveSound(diskGui->getFileTypeSaveSound() + i);
@@ -39,13 +39,13 @@ void SaveASoundControls::function(int i)
 	string ext;
 	string fileName;
 	mpc::disk::MpcFile* f;
-	auto lSampler = sampler.lock();
+	
 	switch (i) {
 	case 3:
 		ls.lock()->openScreen("save");
 		break;
 	case 4:
-		s = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound(soundGui->getSoundIndex()).lock());
+		s = dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getSound(soundGui->getSoundIndex()).lock());
 		type = diskGui->getFileTypeSaveSound();
 		ext = string(type == 0 ? ".SND" : ".WAV");
 		fileName = mpc::Util::getFileName(nameGui->getName()) + ext;

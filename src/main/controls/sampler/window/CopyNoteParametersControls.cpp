@@ -37,12 +37,12 @@ void CopyNoteParametersControls::function(int i)
 	mpc::sampler::NoteParameters* source;
 	mpc::sampler::Program* dest;
 	mpc::sampler::NoteParameters* clone;
-	auto lSampler = sampler.lock();
+	
 	auto lLs = ls.lock();
 	switch (i) {
 	case 4:
-		source = dynamic_cast<mpc::sampler::NoteParameters*>(lSampler->getProgram(swGui->getProg0()).lock()->getNoteParameters(swGui->getNote0()));
-		dest = dynamic_cast<mpc::sampler::Program*>(lSampler->getProgram(swGui->getProg1()).lock().get());
+		source = dynamic_cast<mpc::sampler::NoteParameters*>(sampler.lock()->getProgram(swGui->getProg0()).lock()->getNoteParameters(swGui->getNote0()));
+		dest = dynamic_cast<mpc::sampler::Program*>(sampler.lock()->getProgram(swGui->getProg1()).lock().get());
 		clone = source->clone();
 		dest->setNoteParameters(swGui->getNote1(), clone);
 		lLs->openScreen("programassign");

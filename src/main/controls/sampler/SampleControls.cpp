@@ -52,25 +52,25 @@ void SampleControls::down() {
 void SampleControls::function(int i)
 {
 	init();
-	auto lSampler = sampler.lock();
+	
 	switch (i) {
 	case 0:
 		if (Mpc::instance().getAudioMidiServices().lock()->isRecordingSound()) {
 			return;
 		}
-		//if (!lSampler->isRecording() && !lSampler->isArmed())
-			//lSampler->resetPeak();
+		//if (!samplerisRecording() && !samplerisArmed())
+			//samplerresetPeak();
 		break;
 	case 4:
 		if (Mpc::instance().getAudioMidiServices().lock()->isRecordingSound()) {
 			return;
 		}
-		//if (lSampler->isRecording()) {
-		//	lSampler->cancelRecording();
+		//if (samplerisRecording()) {
+		//	samplercancelRecording();
 		//	return;
 		//}
-		//if (lSampler->isArmed()) {
-		//	lSampler->unArm();
+		//if (samplerisArmed()) {
+		//	samplerunArm();
 		//	return;
 		//}
 		break;
@@ -89,18 +89,18 @@ void SampleControls::function(int i)
 			return;
 		}
 
-		auto sound = lSampler->addSound();
-		sound.lock()->setName(lSampler->addOrIncreaseNumber("sound"));
+		auto sound = sampler.lock()->addSound();
+		sound.lock()->setName(sampler.lock()->addOrIncreaseNumber("sound"));
 		auto lengthInFrames = samplerGui->getTime() * (44100 * 0.1);
 		ams->getSoundRecorder().lock()->prepare(sound, lengthInFrames, samplerGui->getMode());
 		ams->startRecordingSound();
 
-		//if (!lSampler->isRecording()) {
-			//lSampler->arm();
+		//if (!samplerisRecording()) {
+			//samplerarm();
 			//return;
 		//}
-		//if (lSampler->isRecording()) {
-			//lSampler->stopRecordingEarlier();
+		//if (samplerisRecording()) {
+			//samplerstopRecordingEarlier();
 			//return;
 		//}
 		break;
@@ -110,9 +110,9 @@ void SampleControls::function(int i)
 void SampleControls::turnWheel(int i)
 {
     init();
-	auto lSampler = sampler.lock();
+	
 
-	//if (!lSampler->isRecording() && !lSampler->isArmed()) {
+	//if (!samplerisRecording() && !samplerisArmed()) {
         if (param.compare("input") == 0) {
             auto oldInput = samplerGui->getInput();
             samplerGui->setInput(samplerGui->getInput() + i);

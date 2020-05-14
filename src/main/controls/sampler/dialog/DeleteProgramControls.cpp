@@ -15,7 +15,7 @@ DeleteProgramControls::DeleteProgramControls()
 void DeleteProgramControls::function(int i)
 {
     init();
-	auto lSampler = sampler.lock();
+	
 	auto lLs = ls.lock();
 	switch (i) {
     case 2:
@@ -25,11 +25,11 @@ void DeleteProgramControls::function(int i)
         lLs->openScreen("program");
         break;
     case 4:
-        if (lSampler->getProgramCount() > 1) {
-			lSampler->deleteProgram(dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(swGui->getDeletePgm()).lock()));
+        if (sampler.lock()->getProgramCount() > 1) {
+			sampler.lock()->deleteProgram(dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(swGui->getDeletePgm()).lock()));
         } else {
 			const bool initPgms = true;
-			lSampler->deleteAllPrograms(initPgms);
+			sampler.lock()->deleteAllPrograms(initPgms);
 		}
         lLs->openScreen("program");
         break;

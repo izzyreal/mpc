@@ -15,31 +15,31 @@ MonoToStereoControls::MonoToStereoControls()
 void MonoToStereoControls::turnWheel(int i)
 {
 	init();
-	auto lSampler = sampler.lock();
+	
 	if (param.compare("lsource") == 0 && i < 0) {
-		lSampler->setSoundGuiPrevSound();
+		sampler.lock()->setSoundGuiPrevSound();
 	}
 	else if (param.compare("lsource") == 0 && i > 0) {
-		lSampler->setSoundGuiNextSound();
+		sampler.lock()->setSoundGuiNextSound();
 	}
 	else if (param.compare("rsource") == 0) {
-		soundGui->setRSource(lSampler->getNextSoundIndex(soundGui->getRSource(), i > 0), lSampler->getSoundCount());
+		soundGui->setRSource(sampler.lock()->getNextSoundIndex(soundGui->getRSource(), i > 0), sampler.lock()->getSoundCount());
 	}
 }
 
 void MonoToStereoControls::function(int j)
 {
 	init();
-	auto lSampler = sampler.lock();
+	
 	auto lLs = ls.lock();
 	switch (j) {
 	case 3:
 		lLs->openScreen("sound");
 		break;
 	case 4:
-		if (lSampler->getSound(soundGui->getSoundIndex()).lock()->isMono() && lSampler->getSound(soundGui->getRSource()).lock()->isMono()) {
-			auto left = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound(soundGui->getSoundIndex()).lock());
-			auto right = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound(soundGui->getRSource()).lock());
+		if (sampler.lock()->getSound(soundGui->getSoundIndex()).lock()->isMono() && sampler.lock()->getSound(soundGui->getRSource()).lock()->isMono()) {
+			auto left = dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getSound(soundGui->getSoundIndex()).lock());
+			auto right = dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getSound(soundGui->getRSource()).lock());
 			vector<float> newSampleDataRight;
 			if (right->getSampleRate() > left->getSampleRate()) {
 				newSampleDataRight = vector<float>(left->getSampleData()->size());
@@ -51,10 +51,10 @@ void MonoToStereoControls::function(int j)
 				newSampleDataRight = *right->getSampleData();
 
 			}
-			auto newSound = lSampler->addSound(left->getSampleRate()).lock();
+			auto newSound = sampler.lock()->addSound(left->getSampleRate()).lock();
 			newSound->setName(soundGui->getNewStName());
 			newSound->setMono(false);
-			lSampler->mergeToStereo(left->getSampleData(), &newSampleDataRight, newSound->getSampleData());
+			sampler.lock()->mergeToStereo(left->getSampleData(), &newSampleDataRight, newSound->getSampleData());
 			lLs->openScreen("sound");
 		}
 		else {

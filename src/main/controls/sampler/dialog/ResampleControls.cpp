@@ -42,15 +42,15 @@ void ResampleControls::turnWheel(int i)
 void ResampleControls::function(int i)
 {
 	init();
-	auto lSampler = sampler.lock();
+	
 	auto lLs = ls.lock();
 	switch (i) {
 	case 3:
 		lLs->openScreen("sound");
 		break;
 	case 4:
-		auto snd = lSampler->getSound(soundGui->getSoundIndex()).lock();
-		auto destSnd = lSampler->addSound().lock();
+		auto snd = sampler.lock()->getSound(soundGui->getSoundIndex()).lock();
+		auto destSnd = sampler.lock()->addSound().lock();
 		destSnd->setName(soundGui->getNewName());
 
 		auto source = snd->getSampleData();
@@ -94,12 +94,12 @@ void ResampleControls::function(int i)
 		destSnd->setName(soundGui->getNewName());
 
 		if (soundGui->getNewBit() == 1) {
-			lSampler->process12Bit(destSnd->getSampleData());
+			sampler.lock()->process12Bit(destSnd->getSampleData());
 		}
 		else if (soundGui->getNewBit() == 2) {
-			lSampler->process8Bit(destSnd->getSampleData());
+			sampler.lock()->process8Bit(destSnd->getSampleData());
 		}
-		soundGui->setSoundIndex(lSampler->getSoundCount() - 1, lSampler->getSoundCount());
+		soundGui->setSoundIndex(sampler.lock()->getSoundCount() - 1, sampler.lock()->getSoundCount());
 		lLs->openScreen("sound");
 		break;
 	}

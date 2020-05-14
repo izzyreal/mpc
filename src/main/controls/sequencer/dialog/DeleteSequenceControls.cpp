@@ -14,16 +14,16 @@ DeleteSequenceControls::DeleteSequenceControls()
 void DeleteSequenceControls::turnWheel(int i)
 {
 	init();
-	auto lSequencer = sequencer.lock();
+	
 	if (param.compare("sq") == 0) {
-		lSequencer->setActiveSequenceIndex(lSequencer->getActiveSequenceIndex() + i);
+		sequencer.lock()->setActiveSequenceIndex(sequencer.lock()->getActiveSequenceIndex() + i);
 	}
 }
 
 void DeleteSequenceControls::function(int i)
 {
 	init();
-	auto lSequencer = sequencer.lock();
+	
 	switch (i) {
 	case 2:
 		ls.lock()->openScreen("deleteallsequences");
@@ -32,7 +32,7 @@ void DeleteSequenceControls::function(int i)
 		ls.lock()->openScreen("sequence");
 		break;
 	case 4:
-		lSequencer->purgeSequence(lSequencer->getActiveSequenceIndex());
+		sequencer.lock()->purgeSequence(sequencer.lock()->getActiveSequenceIndex());
 		ls.lock()->openScreen("sequencer");
 		break;
 	}

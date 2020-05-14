@@ -16,17 +16,17 @@ CreateNewProgramControls::CreateNewProgramControls()
 void CreateNewProgramControls::function(int i)
 {
 	init();
-	auto lSampler = sampler.lock();
+	
 	auto lLs = ls.lock();
 	switch (i) {
 	case int(3) :
 		lLs->openScreen("program");
 		break;
 	case 4:
-		auto newProgram = lSampler->addProgram().lock();
+		auto newProgram = sampler.lock()->addProgram().lock();
 		newProgram->setName(swGui->getNewName());
 		newProgram->setMidiProgramChange(swGui->getNewProgramChange());
-		mpcSoundPlayerChannel->setProgram(lSampler->getProgramCount() - 1);
+		mpcSoundPlayerChannel->setProgram(sampler.lock()->getProgramCount() - 1);
 		lLs->openScreen("program");
 		break;
 	}

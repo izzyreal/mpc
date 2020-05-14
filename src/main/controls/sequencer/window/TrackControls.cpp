@@ -29,9 +29,9 @@ void TrackControls::function(int i)
 void TrackControls::turnWheel(int i)
 {
 	init();
-	auto lSequencer = sequencer.lock();
+	
 	if (param.find("default") != string::npos) {
-		nameGui->setName(lSequencer->getDefaultTrackName(lSequencer->getActiveTrackIndex()));
+		nameGui->setName(sequencer.lock()->getDefaultTrackName(sequencer.lock()->getActiveTrackIndex()));
 	}
 	else {
 		nameGui->setName(track.lock()->getName());

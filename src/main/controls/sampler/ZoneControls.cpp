@@ -49,7 +49,7 @@ void ZoneControls::function(int f)
 		string newSampleName;
 	auto lLs = ls.lock();
 	vector<int> zone;
-	auto lSampler = sampler.lock();
+	
 	switch (f) {
 	case 0:
 		lLs->openScreen("trim");
@@ -58,18 +58,18 @@ void ZoneControls::function(int f)
 		lLs->openScreen("loop");
 		break;
 	case 2:
-		lSampler->sort();
+		sampler.lock()->sort();
 		break;
 	case 3:
 		lLs->openScreen("params");
 		break;
 	case 4:
-		if (lSampler->getSoundCount() == 0)
+		if (sampler.lock()->getSoundCount() == 0)
 			return;
 
-		newSampleName = lSampler->getSoundName(soundGui->getSoundIndex());
+		newSampleName = sampler.lock()->getSoundName(soundGui->getSoundIndex());
 		//newSampleName = newSampleName->replaceAll("\\s+$", "");
-		newSampleName = lSampler->addOrIncreaseNumber(newSampleName);
+		newSampleName = sampler.lock()->addOrIncreaseNumber(newSampleName);
 		editSoundGui->setNewName(newSampleName);
 		editSoundGui->setPreviousScreenName("zone");
 		lLs->openScreen("editsound");
@@ -82,7 +82,7 @@ void ZoneControls::function(int f)
 		Mpc::instance().getControls().lock()->setF6Pressed(true);
 		
 		zone = vector<int>{ soundGui->getZoneStart(soundGui->getZoneNumber()) , soundGui->getZoneEnd(soundGui->getZoneNumber()) };
-		lSampler->playX(soundGui->getPlayX(), &zone);
+		sampler.lock()->playX(soundGui->getPlayX(), &zone);
 		break;
 	}
 }
@@ -91,7 +91,7 @@ void ZoneControls::turnWheel(int i)
 {
 	init();
 	if (param == "") return;
-	auto lSampler = sampler.lock();
+	
 		auto soundInc = getSoundIncrement(i);
 	auto mtf = ls.lock()->lookupField(param).lock();
 	if (mtf->isSplit()) {
@@ -111,9 +111,9 @@ void ZoneControls::turnWheel(int i)
 		soundGui->setPlayX(soundGui->getPlayX() + i);
 	}
 	else if (param.compare("snd") == 0 && i > 0) {
-		lSampler->setSoundGuiNextSound();
+		sampler.lock()->setSoundGuiNextSound();
 	}
 	else if (param.compare("snd") == 0 && i < 0) {
-		lSampler->setSoundGuiPrevSound();
+		sampler.lock()->setSoundGuiPrevSound();
 	}
 }

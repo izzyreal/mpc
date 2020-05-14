@@ -14,14 +14,14 @@ CopySequenceControls::CopySequenceControls()
 void CopySequenceControls::function(int i)
 {
 	init();
-	auto lSequencer = sequencer.lock();
+	
 	switch (i) {
 	case 2:
-		lSequencer->copySequence(swGui->getSq0(), swGui->getSq1());
+		sequencer.lock()->copySequence(swGui->getSq0(), swGui->getSq1());
 		ls.lock()->openScreen("sequencer");
 		break;
 	case 4:
-		lSequencer->copySequence(swGui->getSq0(), swGui->getSq1());
+		sequencer.lock()->copySequence(swGui->getSq0(), swGui->getSq1());
 		ls.lock()->openScreen("sequencer");
 		break;
 	}

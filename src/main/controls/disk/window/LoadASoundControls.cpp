@@ -36,7 +36,7 @@ void LoadASoundControls::function(int i)
 	int end;
 	int loopTo;
 	int overlapMode;
-	auto lSampler = sampler.lock();
+	
 	switch (i) {
 	case 2:
 		
@@ -45,8 +45,8 @@ void LoadASoundControls::function(int i)
 		}
 
 		controls->setF3Pressed(true);
-		//lSampler->stopAllVoices();
-		s = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getPreviewSound().lock());
+		//samplerstopAllVoices();
+		s = dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getPreviewSound().lock());
 		start = s->getStart();
 		end = s->getSampleData()->size();
 		loopTo = -1;
@@ -58,15 +58,15 @@ void LoadASoundControls::function(int i)
 		if (!s->isMono()) {
 			end /= 2;
 		}
-		lSampler->playPreviewSample(start, end, loopTo, overlapMode);
+		sampler.lock()->playPreviewSample(start, end, loopTo, overlapMode);
 		break;
 	case 3:
-		lSampler->finishBasicVoice(); // Here we make sure the sound is not being played, so it can be removed from memory.
-		lSampler->deleteSound(dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getPreviewSound().lock()));
+		sampler.lock()->finishBasicVoice(); // Here we make sure the sound is not being played, so it can be removed from memory.
+		sampler.lock()->deleteSound(dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getPreviewSound().lock()));
 		ls.lock()->openScreen("load");
 		break;
 	case 4:
-		auto command = mpc::command::KeepSound(dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getPreviewSound().lock()));
+		auto command = mpc::command::KeepSound(dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getPreviewSound().lock()));
 		command.execute();
 		ls.lock()->openScreen("load");
 		break;

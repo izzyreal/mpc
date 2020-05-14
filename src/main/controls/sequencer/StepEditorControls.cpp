@@ -188,19 +188,19 @@ void StepEditorControls::function(int i)
 void StepEditorControls::turnWheel(int i)
 {
 	init();
-	auto lSequencer = sequencer.lock();
+	
 	auto lTrk = track.lock();
 	if (param.compare("viewmodenumber") == 0) {
 		seGui->setViewModeNumber(seGui->getViewModeNumber() + i);
 	}
 	else if (param.compare("now0") == 0) {
-		lSequencer->setBar(lSequencer->getCurrentBarNumber() + i);
+		sequencer.lock()->setBar(sequencer.lock()->getCurrentBarNumber() + i);
 	}
 	else if (param.compare("now1") == 0) {
-		lSequencer->setBeat(lSequencer->getCurrentBeatNumber() + i);
+		sequencer.lock()->setBeat(sequencer.lock()->getCurrentBeatNumber() + i);
 	}
 	else if (param.compare("now2") == 0) {
-		lSequencer->setClock(lSequencer->getCurrentClockNumber() + i);
+		sequencer.lock()->setClock(sequencer.lock()->getCurrentClockNumber() + i);
 	}
 	else if (param.compare("tcvalue") == 0) {
 		swGui->setNoteValue(swGui->getNoteValue() + i);
@@ -335,26 +335,26 @@ void StepEditorControls::turnWheel(int i)
 void StepEditorControls::prevStepEvent()
 {
 	init();
-	auto lSequencer = sequencer.lock();
+	
 	auto controls = Mpc::instance().getControls().lock();
 	if (controls->isGoToPressed()) {
-		lSequencer->goToPreviousEvent();
+		sequencer.lock()->goToPreviousEvent();
 	}
 	else {
-		lSequencer->goToPreviousStep();
+		sequencer.lock()->goToPreviousStep();
 	}
 }
 
 void StepEditorControls::nextStepEvent()
 {
 	init();
-	auto lSequencer = sequencer.lock();
+	
 	auto controls = Mpc::instance().getControls().lock();
 	if (controls->isGoToPressed()) {
-		lSequencer->goToNextEvent();
+		sequencer.lock()->goToNextEvent();
 	}
 	else {
-		lSequencer->goToNextStep();
+		sequencer.lock()->goToNextStep();
 	}
 }
 
@@ -362,25 +362,25 @@ void StepEditorControls::prevBarStart()
 {
 	init();
 	auto controls = Mpc::instance().getControls().lock();
-	auto lSequencer = sequencer.lock();
+	
 	if (controls->isGoToPressed()) {
-		lSequencer->setBar(0);
+		sequencer.lock()->setBar(0);
 	}
 	else {
-		lSequencer->setBar(lSequencer->getCurrentBarNumber() - 1);
+		sequencer.lock()->setBar(sequencer.lock()->getCurrentBarNumber() - 1);
 	}
 }
 
 void StepEditorControls::nextBarEnd()
 {
 	init();
-	auto lSequencer = sequencer.lock();
+	
 	auto controls = Mpc::instance().getControls().lock();
 	if (controls->isGoToPressed()) {
-		lSequencer->setBar(lSequencer->getActiveSequence().lock()->getLastBar() + 1);
+		sequencer.lock()->setBar(sequencer.lock()->getActiveSequence().lock()->getLastBar() + 1);
 	}
 	else {
-		lSequencer->setBar(lSequencer->getCurrentBarNumber() + 1);
+		sequencer.lock()->setBar(sequencer.lock()->getCurrentBarNumber() + 1);
 	}
 }
 

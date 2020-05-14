@@ -17,10 +17,10 @@ StereoToMonoControls::StereoToMonoControls()
 void StereoToMonoControls::turnWheel(int i)
 {
 	init();
-	auto lSampler = sampler.lock();
+	
 	auto lLs = ls.lock();
 	if (param.compare("stereosource") == 0) {
-		soundGui->setSoundIndex(lSampler->getNextSoundIndex(soundGui->getSoundIndex(), i > 0), lSampler->getSoundCount());
+		soundGui->setSoundIndex(sampler.lock()->getNextSoundIndex(soundGui->getSoundIndex(), i > 0), sampler.lock()->getSoundCount());
 	}
 	else if (param.compare("newlname") == 0) {
 		nameGui->setName(lLs->lookupField("newlname").lock()->getText());
@@ -37,7 +37,7 @@ void StereoToMonoControls::turnWheel(int i)
 void StereoToMonoControls::function(int i)
 {
 	init();
-	auto lSampler = sampler.lock();
+	
 	auto lLs = ls.lock();
 	weak_ptr<mpc::sampler::Sound> sound;
 	weak_ptr<mpc::sampler::Sound> left;
@@ -47,12 +47,12 @@ void StereoToMonoControls::function(int i)
 		lLs->openScreen("sound");
 		break;
 	case 4:
-		sound = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound(soundGui->getSoundIndex()).lock());
+		sound = dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getSound(soundGui->getSoundIndex()).lock());
 		auto lSound = sound.lock();
 		if (lSound->isMono()) return;
 
-		left = lSampler->addSound(lSound->getSampleRate());
-		right = lSampler->addSound(lSound->getSampleRate());
+		left = sampler.lock()->addSound(lSound->getSampleRate());
+		right = sampler.lock()->addSound(lSound->getSampleRate());
 		auto lLeft = left.lock();
 		auto lRight = right.lock();
 		lLeft->setName(soundGui->getNewLName());

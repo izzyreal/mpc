@@ -26,12 +26,12 @@ void SongControls::init()
 void SongControls::up()
 {
 	init();
-	auto lSequencer = sequencer.lock();
+	
 	if (param.compare("step1") == 0 || param.compare("sequence1") == 0 || param.compare("reps1") == 0) {
 		if (songGui->getOffset() == -1) return;
 		songGui->setOffset(songGui->getOffset() - 1);
-		lSequencer->setActiveSequenceIndex(lSequencer->getSongSequenceIndex());
-		lSequencer->setBar(0);
+		sequencer.lock()->setActiveSequenceIndex(sequencer.lock()->getSongSequenceIndex());
+		sequencer.lock()->setBar(0);
 	}
 	else {
 		super::up();
@@ -80,13 +80,13 @@ void SongControls::openWindow()
 void SongControls::down()
 {
 	init();
-	auto lSequencer = sequencer.lock();
+	
 	if (param.compare("step1") == 0 || param.compare("sequence1") == 0 || param.compare("reps1") == 0) {
 		if (step == s.lock()->getStepAmount()) return;
 
 		songGui->setOffset(songGui->getOffset() + 1);
-		lSequencer->setActiveSequenceIndex(lSequencer->getSongSequenceIndex());
-		lSequencer->setBar(0);
+		sequencer.lock()->setActiveSequenceIndex(sequencer.lock()->getSongSequenceIndex());
+		sequencer.lock()->setBar(0);
 	}
 	else {
 		super::down();
@@ -96,15 +96,15 @@ void SongControls::down()
 void SongControls::turnWheel(int i)
 {
 	init();
-	auto lSequencer = sequencer.lock();
+	
 	auto lS = s.lock();
 	if (param.find("sequence") != string::npos) {
 		if (step > lS->getStepAmount() - 1) return;
 		auto seq = lS->getStep(step)->getSequence();
-		auto up = lSequencer->getFirstUsedSeqUp(seq + 1);
-		lS->getStep(step)->setSequence(i < 0 ? lSequencer->getFirstUsedSeqDown(seq - 1) : up);
-		lSequencer->setActiveSequenceIndex(lSequencer->getSongSequenceIndex());
-		lSequencer->setBar(0);
+		auto up = sequencer.lock()->getFirstUsedSeqUp(seq + 1);
+		lS->getStep(step)->setSequence(i < 0 ? sequencer.lock()->getFirstUsedSeqDown(seq - 1) : up);
+		sequencer.lock()->setActiveSequenceIndex(sequencer.lock()->getSongSequenceIndex());
+		sequencer.lock()->setBar(0);
 	}
 	else if (param.find("reps") != string::npos) {
 		if (step > lS->getStepAmount() - 1) return;
@@ -114,13 +114,13 @@ void SongControls::turnWheel(int i)
 		songGui->setSelectedSongIndex(songGui->getSelectedSongIndex() + i);
 		songGui->setOffset(-1);
 		init();
-		if (lS->isUsed() && lS->getStepAmount() != 0)	lSequencer->setActiveSequenceIndex(lS->getStep(0)->getSequence());
+		if (lS->isUsed() && lS->getStepAmount() != 0)	sequencer.lock()->setActiveSequenceIndex(lS->getStep(0)->getSequence());
 	}
-	else if (param.compare("tempo") == 0 && !lSequencer->isTempoSourceSequenceEnabled()) {
-		lSequencer->setTempo(BCMath(lSequencer->getTempo().toDouble() + (i / 10.0)));
+	else if (param.compare("tempo") == 0 && !sequencer.lock()->isTempoSourceSequenceEnabled()) {
+		sequencer.lock()->setTempo(BCMath(sequencer.lock()->getTempo().toDouble() + (i / 10.0)));
 	}
 	else if (param.compare("temposource") == 0) {
-		lSequencer->setTempoSourceSequence(i > 0);
+		sequencer.lock()->setTempoSourceSequence(i > 0);
 	}
 	else if (param.compare("loop") == 0) {
 		songGui->setLoop(i > 0);

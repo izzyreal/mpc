@@ -27,7 +27,7 @@ void LoadASequenceFromAllControls::turnWheel(int i)
 void LoadASequenceFromAllControls::function(int i)
 {
 	init();
-	auto lSequencer = sequencer.lock();
+	
 	switch (i) {
 	case 2:
 		break;
@@ -35,7 +35,7 @@ void LoadASequenceFromAllControls::function(int i)
 		ls.lock()->openScreen("mpc2000xlallfile");
 		break;
 	case 4:
-		lSequencer->setSequence(lSequencer->getActiveSequenceIndex(), diskGui->getSequencesFromAllFile()->at(diskGui->getFileLoad()));
+		sequencer.lock()->setSequence(sequencer.lock()->getActiveSequenceIndex(), diskGui->getSequencesFromAllFile()->at(diskGui->getFileLoad()));
 		ls.lock()->openScreen("sequencer");
 		break;
 	}

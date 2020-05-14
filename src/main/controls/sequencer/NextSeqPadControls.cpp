@@ -24,9 +24,9 @@ void NextSeqPadControls::pad(int i, int velo, bool repeat, int tick)
 void NextSeqPadControls::turnWheel(int i)
 {
 	init();
-	auto lSequencer = sequencer.lock();
+	
 	if (param.compare("sq") == 0)
-		lSequencer->setActiveSequenceIndex(lSequencer->getActiveSequenceIndex() + i);
+		sequencer.lock()->setActiveSequenceIndex(sequencer.lock()->getActiveSequenceIndex() + i);
 }
 
 void NextSeqPadControls::function(int i)

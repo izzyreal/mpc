@@ -19,9 +19,9 @@ PgmParamsControls::PgmParamsControls()
 void PgmParamsControls::function(int i)
 {
 	init();
-		auto lSampler = sampler.lock();
+		
 	int letterNumber;
-	auto sc = lSampler->getSoundCount();
+	auto sc = sampler.lock()->getSoundCount();
 	string newName;
 	auto lLs = ls.lock();
 	switch (i) {
@@ -38,8 +38,8 @@ void PgmParamsControls::function(int i)
 		lLs->openScreen("purge");
 		break;
 	case 4:
-		swGui->setAutoChromAssSnd(lSampler->getLastNp(program.lock().get())->getSndNumber(), sc);
-		letterNumber = lSampler->getProgramCount() + 21;
+		swGui->setAutoChromAssSnd(sampler.lock()->getLastNp(program.lock().get())->getSndNumber(), sc);
+		letterNumber = sampler.lock()->getProgramCount() + 21;
 		newName = "NewPgm-" + mpc::Mpc::akaiAscii[letterNumber];
 		swGui->setNewName(newName);
 		samplerGui->setPrevScreenName(csn);

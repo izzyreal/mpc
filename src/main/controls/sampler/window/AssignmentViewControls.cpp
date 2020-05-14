@@ -65,7 +65,7 @@ void AssignmentViewControls::right()
 void AssignmentViewControls::turnWheel(int i)
 {
 	init();
-	auto lSampler = sampler.lock();
+	
 	auto lProgram = program.lock();
-	lSampler->getLastPad(lProgram.get())->setNote(lSampler->getLastPad(lProgram.get())->getNote() + i);
+	sampler.lock()->getLastPad(lProgram.get())->setNote(sampler.lock()->getLastPad(lProgram.get())->getNote() + i);
 }

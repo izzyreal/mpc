@@ -22,16 +22,16 @@ void LoadASequenceControls::turnWheel(int i)
 void LoadASequenceControls::function(int i)
 {
 	init();
-	auto lSequencer = sequencer.lock();
+	
 	switch (i) {
 	case 3:
 		ls.lock()->openScreen("load");
-		lSequencer->clearPlaceHolder();
+		sequencer.lock()->clearPlaceHolder();
 		break;
 	case 4:
-		lSequencer->movePlaceHolderTo(diskWindowGui->getLoadInto());
+		sequencer.lock()->movePlaceHolderTo(diskWindowGui->getLoadInto());
 		ls.lock()->openScreen("sequencer");
-		lSequencer->setActiveSequenceIndex(diskWindowGui->getLoadInto());
+		sequencer.lock()->setActiveSequenceIndex(diskWindowGui->getLoadInto());
 		break;
 	}
 }

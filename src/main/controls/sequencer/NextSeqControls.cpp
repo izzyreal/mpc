@@ -14,17 +14,17 @@ NextSeqControls::NextSeqControls()
 void NextSeqControls::turnWheel(int i)
 {
 	init();
-	auto lSequencer = sequencer.lock();
+	
 	if (param.compare("sq") == 0) {
-		if (lSequencer->isPlaying()) {
-			lSequencer->setNextSq(lSequencer->getCurrentlyPlayingSequenceIndex() + i);
+		if (sequencer.lock()->isPlaying()) {
+			sequencer.lock()->setNextSq(sequencer.lock()->getCurrentlyPlayingSequenceIndex() + i);
 		}
 		else {
-			lSequencer->setActiveSequenceIndex(lSequencer->getActiveSequenceIndex() + i);
+			sequencer.lock()->setActiveSequenceIndex(sequencer.lock()->getActiveSequenceIndex() + i);
 		}
 	}
 	if (param.compare("nextsq") == 0)
-		lSequencer->setNextSq(lSequencer->getNextSq() + i);
+		sequencer.lock()->setNextSq(sequencer.lock()->getNextSq() + i);
 }
 
 void NextSeqControls::function(int i)

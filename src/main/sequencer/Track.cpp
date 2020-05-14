@@ -139,11 +139,17 @@ void Track::recordNoteOff(NoteEvent* n)
 		return;
 	}
 
-	if (eraseIndex != -1 && eraseIndex != queuedNoteOnEvents.size()) queuedNoteOnEvents.erase(queuedNoteOnEvents.begin() + eraseIndex);
+	if (eraseIndex != -1 && eraseIndex != queuedNoteOnEvents.size())
+	{
+		queuedNoteOnEvents.erase(queuedNoteOnEvents.begin() + eraseIndex);
+	}
 	
-	if (n->getTick() >= noteOn->getTick()) {
+	if (n->getTick() >= noteOn->getTick())
+	{
 		int candidate = n->getTick() - noteOn->getTick();
-		if (candidate < 1) candidate = 1;
+		if (candidate < 1) {
+			candidate = 1;
+		}
 		noteOn->setDuration(candidate);
 	}
 	else {
@@ -156,7 +162,8 @@ void Track::recordNoteOff(NoteEvent* n)
 void Track::setUsed(bool b)
 {
     used = b;
-    if (used) {
+    if (used)
+	{
         setChanged();
         notifyObservers(string("tracknumbername"));
     }
@@ -173,10 +180,14 @@ void Track::addEventRealTime(shared_ptr<Event> event)
 {
     if (events.size() == 0) setUsed(true);
 
-	for (auto& temp : events) {
-		if (temp->getTick() == event->getTick()) {
-			if (typeid(temp) == typeid(event)) {
-				if (dynamic_pointer_cast<NoteEvent>(temp)->getNote() == dynamic_pointer_cast<NoteEvent>(event)->getNote()) {
+	for (auto& temp : events)
+	{
+		if (temp->getTick() == event->getTick())
+		{
+			if (typeid(temp) == typeid(event))
+			{
+				if (dynamic_pointer_cast<NoteEvent>(temp)->getNote() == dynamic_pointer_cast<NoteEvent>(event)->getNote())
+				{
 					dynamic_pointer_cast<NoteEvent>(temp)->setDuration(dynamic_pointer_cast<NoteEvent>(event)->getDuration());
 					dynamic_pointer_cast<NoteEvent>(temp)->setVelocity(dynamic_pointer_cast<NoteEvent>(event)->getVelocity());
 					return;

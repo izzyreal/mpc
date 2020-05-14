@@ -15,7 +15,7 @@ DeleteAllProgramsControls::DeleteAllProgramsControls()
 void DeleteAllProgramsControls::function(int j)
 {
 	init();
-	auto lSampler = sampler.lock();
+	
 	auto lLs = ls.lock();
 	switch (j) {
 	case 3:
@@ -23,7 +23,7 @@ void DeleteAllProgramsControls::function(int j)
 		break;
 	case 4:
 		const bool initPgms = true;
-		lSampler->deleteAllPrograms(initPgms);
+		sampler.lock()->deleteAllPrograms(initPgms);
 		lLs->openScreen("deleteprogram");
 		break;
 	}

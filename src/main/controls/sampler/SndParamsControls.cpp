@@ -29,7 +29,7 @@ void SndParamsControls::openWindow()
 void SndParamsControls::function(int f)
 {
 	init();
-	auto lSampler = sampler.lock();
+	
 	auto lLs = ls.lock();
 	string newSampleName;
 	vector<int> zone;
@@ -44,15 +44,15 @@ void SndParamsControls::function(int f)
 		lLs->openScreen("zone");
 		break;
 	case 3:
-		lSampler->sort();
+		sampler.lock()->sort();
 		break;
 	case 4:
-		if (lSampler->getSoundCount() == 0)
+		if (sampler.lock()->getSoundCount() == 0)
 			return;
 
-		newSampleName = lSampler->getSoundName(soundGui->getSoundIndex());
+		newSampleName = sampler.lock()->getSoundName(soundGui->getSoundIndex());
 		//newSampleName = newSampleName->replaceAll("\\s+$", "");
-		newSampleName = lSampler->addOrIncreaseNumber(newSampleName);
+		newSampleName = sampler.lock()->addOrIncreaseNumber(newSampleName);
 		editSoundGui->setNewName(newSampleName);
 		editSoundGui->setPreviousScreenName("trim");
 		lLs->openScreen("editsound");
@@ -65,7 +65,7 @@ void SndParamsControls::function(int f)
 		Mpc::instance().getControls().lock()->setF6Pressed(true);
 		
 		zone = vector<int>{ soundGui->getZoneStart(soundGui->getZoneNumber()) , soundGui->getZoneEnd(soundGui->getZoneNumber()) };
-		lSampler->playX(soundGui->getPlayX(), &zone);
+		sampler.lock()->playX(soundGui->getPlayX(), &zone);
 		break;
 	}
 }
@@ -73,16 +73,16 @@ void SndParamsControls::function(int f)
 void SndParamsControls::turnWheel(int i)
 {
 	init();
-	auto lSampler = sampler.lock();
+	
 	auto lSound = sound.lock();
 	if (param.compare("playx") == 0) {
 		soundGui->setPlayX(soundGui->getPlayX() + i);
 	}
 	else if (param.compare("snd") == 0 && i > 0) {
-		lSampler->setSoundGuiNextSound();
+		sampler.lock()->setSoundGuiNextSound();
 	}
 	else if (param.compare("snd") == 0 && i < 0) {
-		lSampler->setSoundGuiPrevSound();
+		sampler.lock()->setSoundGuiPrevSound();
 	}
 	else if (param.compare("level") == 0) {
 		lSound->setLevel(lSound->getSndLevel() + i);

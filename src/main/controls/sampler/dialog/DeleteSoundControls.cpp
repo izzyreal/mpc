@@ -13,7 +13,7 @@ DeleteSoundControls::DeleteSoundControls() : AbstractSamplerControls()
 void DeleteSoundControls::function(int i)
 {
     init();
-	auto lSampler = sampler.lock();
+	
 	auto lLs = ls.lock();
 	switch (i) {
     case 2:
@@ -23,11 +23,11 @@ void DeleteSoundControls::function(int i)
         lLs->openScreen("sound");
         break;
     case 4:
-        lSampler->deleteSample(soundGui->getSoundIndex());
-		if (soundGui->getSoundIndex() > lSampler->getSoundCount() - 1) {
-			soundGui->setSoundIndex(lSampler->getSoundCount() - 1, lSampler->getSoundCount());
+        sampler.lock()->deleteSample(soundGui->getSoundIndex());
+		if (soundGui->getSoundIndex() > sampler.lock()->getSoundCount() - 1) {
+			soundGui->setSoundIndex(sampler.lock()->getSoundCount() - 1, sampler.lock()->getSoundCount());
 		}
-		if (lSampler->getSoundCount() > 0) {
+		if (sampler.lock()->getSoundCount() > 0) {
 			lLs->openScreen("sound");
 		}
 		else {

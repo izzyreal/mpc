@@ -34,16 +34,16 @@ AbstractSequencerControls::AbstractSequencerControls()
 void AbstractSequencerControls::init()
 {
 	super::init();
-	auto lSequencer = sequencer.lock();
+	
 	if (csn.compare("barcopy") == 0) {
-		fromSeq = lSequencer->getSequence(barCopyGui->getFromSq());
-		toSeq = lSequencer->getSequence(barCopyGui->getToSq());
+		fromSeq = sequencer.lock()->getSequence(barCopyGui->getFromSq());
+		toSeq = sequencer.lock()->getSequence(barCopyGui->getToSq());
 	}
 	else {
-		fromSeq = lSequencer->getSequence(editSequenceGui->getFromSq());
-		toSeq = lSequencer->getSequence(editSequenceGui->getToSq());
+		fromSeq = sequencer.lock()->getSequence(editSequenceGui->getFromSq());
+		toSeq = sequencer.lock()->getSequence(editSequenceGui->getToSq());
 	}
-	sequence = lSequencer->getActiveSequence();
+	sequence = sequencer.lock()->getActiveSequence();
 }
 
 void AbstractSequencerControls::checkAllTimesAndNotes(int i)

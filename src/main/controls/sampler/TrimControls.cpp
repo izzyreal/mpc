@@ -45,11 +45,11 @@ void TrimControls::function(int f)
 	init();
 	string newSampleName;
 	vector<int> zone;
-	auto lSampler = sampler.lock();
+	
 	auto lLs = ls.lock();
 	switch (f) {
 	case 0:
-		lSampler->sort();
+		sampler.lock()->sort();
 		break;
 	case 1:
 		lLs->openScreen("loop");
@@ -61,11 +61,11 @@ void TrimControls::function(int f)
 		lLs->openScreen("params");
 		break;
 	case 4:
-		if (lSampler->getSoundCount() == 0)
+		if (sampler.lock()->getSoundCount() == 0)
 			return;
 
-		newSampleName = lSampler->getSoundName(soundGui->getSoundIndex());
-		newSampleName = lSampler->addOrIncreaseNumber(moduru::lang::StrUtil::trim(newSampleName));
+		newSampleName = sampler.lock()->getSoundName(soundGui->getSoundIndex());
+		newSampleName = sampler.lock()->addOrIncreaseNumber(moduru::lang::StrUtil::trim(newSampleName));
 		editSoundGui->setNewName(newSampleName);
 		editSoundGui->setPreviousScreenName("trim");
 		lLs->openScreen("editsound");
@@ -78,7 +78,7 @@ void TrimControls::function(int f)
 		Mpc::instance().getControls().lock()->setF6Pressed(true);
 		
 		zone = vector<int>{ soundGui->getZoneStart(soundGui->getZoneNumber()), soundGui->getZoneEnd(soundGui->getZoneNumber()) };
-		lSampler->playX(soundGui->getPlayX(), &zone);
+		sampler.lock()->playX(soundGui->getPlayX(), &zone);
 		break;
 	}
 }
@@ -90,7 +90,7 @@ void TrimControls::turnWheel(int i)
 	auto lSound = sound.lock();
 	auto const oldLength = lSound->getEnd() - lSound->getStart();
 	auto const lengthFix = zoomGui->isSmplLngthFix();
-	auto lSampler = sampler.lock();
+	
 	//auto notch = getNotch(increment);
 	auto soundInc = getSoundIncrement(i);
 	auto mtf = ls.lock()->lookupField(param).lock();
@@ -122,10 +122,10 @@ void TrimControls::turnWheel(int i)
 		soundGui->setPlayX(soundGui->getPlayX() + i);
 	}
 	else if (param.compare("snd") == 0 && i > 0) {
-		lSampler->setSoundGuiNextSound();
+		sampler.lock()->setSoundGuiNextSound();
 	}
 	else if (param.compare("snd") == 0 && i < 0) {
-		lSampler->setSoundGuiPrevSound();
+		sampler.lock()->setSoundGuiPrevSound();
 	}
 }
 

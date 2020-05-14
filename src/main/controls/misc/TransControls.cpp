@@ -34,7 +34,7 @@ void TransControls::function(int i)
 void TransControls::turnWheel(int i)
 {
 	init();
-	auto lSequencer = sequencer.lock();
+	
 	if (param.compare("tr") == 0) {
 		transGui->setTr(transGui->getTr() + i);
 	}
@@ -43,14 +43,14 @@ void TransControls::turnWheel(int i)
 	}
 	else if (param.compare("bar0") == 0) {
 		auto candidate = transGui->getBar0() + i;
-		if (candidate < 0 || candidate > lSequencer->getActiveSequence().lock()->getLastBar())
+		if (candidate < 0 || candidate > sequencer.lock()->getActiveSequence().lock()->getLastBar())
 			return;
 
 		transGui->setBar0(transGui->getBar0() + i);
 	}
 	else if (param.compare("bar1") == 0) {
 		auto candidate = transGui->getBar1() + i;
-		if (candidate < 0 || candidate > lSequencer->getActiveSequence().lock()->getLastBar())
+		if (candidate < 0 || candidate > sequencer.lock()->getActiveSequence().lock()->getLastBar())
 			return;
 
 		transGui->setBar1(transGui->getBar1() + i);

@@ -20,19 +20,19 @@ void TrMuteControls::right()
 void TrMuteControls::pad(int i, int velo, bool repeat, int tick)
 {
 	init();
-	auto lSequencer = sequencer.lock();
+	
 	auto lLs = ls.lock();
 	auto controls = Mpc::instance().getControls().lock();
-	if (controls->isF6Pressed() || lSequencer->isSoloEnabled()) {
-		if (!lSequencer->isSoloEnabled())
-			lSequencer->setSoloEnabled(true);
+	if (controls->isF6Pressed() || sequencer.lock()->isSoloEnabled()) {
+		if (!sequencer.lock()->isSoloEnabled())
+			sequencer.lock()->setSoloEnabled(true);
 
-		lSequencer->setSelectedTrackIndex(i + (bank_ * 16));
+		sequencer.lock()->setSelectedTrackIndex(i + (bank_ * 16));
 		lLs->removeCurrentBackground();
 		lLs->setCurrentBackground("trackmutesolo2");
 	}
 	else {
-		auto s = lSequencer->getActiveSequence().lock();
+		auto s = sequencer.lock()->getActiveSequence().lock();
 		auto t = s->getTrack(i + (bank_ * 16)).lock();
 		t->setOn(!t->isOn());
 	}
@@ -41,25 +41,25 @@ void TrMuteControls::pad(int i, int velo, bool repeat, int tick)
 void TrMuteControls::turnWheel(int i)
 {
 	init();
-	auto lSequencer = sequencer.lock();
-	if (param.compare("sq") == 0) lSequencer->setActiveSequenceIndex(lSequencer->getActiveSequenceIndex() + i);
+	
+	if (param.compare("sq") == 0) sequencer.lock()->setActiveSequenceIndex(sequencer.lock()->getActiveSequenceIndex() + i);
 }
 
 void TrMuteControls::function(int i)
 {
 	init();
 	super::function(i);
-	auto lSequencer = sequencer.lock();
+	
 	auto lLs = ls.lock();
 	switch (i) {
 	case 5:
-		if (lSequencer->isSoloEnabled()) {
+		if (sequencer.lock()->isSoloEnabled()) {
 			lLs->setCurrentBackground("trackmute");
-			lSequencer->setSoloEnabled(false);
+			sequencer.lock()->setSoloEnabled(false);
 		}
 		else {
 			lLs->setCurrentBackground("trackmutesolo1");
-			lSequencer->setSoloEnabled(lSequencer->isSoloEnabled());
+			sequencer.lock()->setSoloEnabled(sequencer.lock()->isSoloEnabled());
 		}
 		break;
 	}

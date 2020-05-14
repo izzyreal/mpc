@@ -24,7 +24,7 @@ PgmAssignControls::PgmAssignControls()
 void PgmAssignControls::function(int i)
 {
 	init();
-		auto lSampler = sampler.lock();
+		
 	auto lLs = ls.lock();
 	int letterNumber;
 	string newName;
@@ -42,8 +42,8 @@ void PgmAssignControls::function(int i)
 		lLs->openScreen("purge");
 		break;
 	case 4:
-		swGui->setAutoChromAssSnd(lSampler->getLastNp(program.lock().get())->getSndNumber(), lSampler->getSoundCount());
-		letterNumber = lSampler->getProgramCount() + 21;
+		swGui->setAutoChromAssSnd(sampler.lock()->getLastNp(program.lock().get())->getSndNumber(), sampler.lock()->getSoundCount());
+		letterNumber = sampler.lock()->getProgramCount() + 21;
 		newName = "NewPgm-" + mpc::Mpc::akaiAscii[letterNumber];
 		swGui->setNewName(newName);
 		samplerGui->setPrevScreenName(csn);
@@ -88,9 +88,9 @@ void PgmAssignControls::turnWheel(int i)
 
 	}
 	else if (param.compare("snd") == 0) {
-		auto lSampler = sampler.lock();
-		lastNp->setSoundNumber(lSampler->getNextSoundIndex(lastNp->getSndNumber(), i > 0));
-		auto sound = lSampler->getSound(lastNp->getSndNumber()).lock();
+		
+		lastNp->setSoundNumber(sampler.lock()->getNextSoundIndex(lastNp->getSndNumber(), i > 0));
+		auto sound = sampler.lock()->getSound(lastNp->getSndNumber()).lock();
 		if (sound) {
 			if (sound->isMono()) {
 				lastPad->getStereoMixerChannel().lock()->setStereo(false);
@@ -121,7 +121,7 @@ void PgmAssignControls::openWindow()
 {
 	init();
 		auto lLs = ls.lock();
-	auto lSampler = sampler.lock();
+	
 	if (param.compare("pgm") == 0) {
 		samplerGui->setPrevScreenName("programassign");
 		lLs->openScreen("program");
@@ -135,7 +135,7 @@ void PgmAssignControls::openWindow()
 	else if (param.compare("note") == 0) {
 		auto pn = mpcSoundPlayerChannel->getProgram();
 		auto nn = samplerGui->getNote();
-		auto pc = lSampler->getProgramCount();
+		auto pc = sampler.lock()->getProgramCount();
 		swGui->setProg0(pn, pc);
 		swGui->setNote0(nn);
 		swGui->setProg1(pn, pc);
@@ -143,9 +143,9 @@ void PgmAssignControls::openWindow()
 		lLs->openScreen("copynoteparameters");
 	}
 	else if (param.compare("snd") == 0) {
-		auto sn = lSampler->getLastNp(program.lock().get())->getSndNumber();
+		auto sn = sampler.lock()->getLastNp(program.lock().get())->getSndNumber();
 		if (sn != -1) {
-			soundGui->setSoundIndex(sn, lSampler->getSoundCount());
+			soundGui->setSoundIndex(sn, sampler.lock()->getSoundCount());
 			soundGui->setPreviousScreenName("programassign");
 			lLs->openScreen("sound");
 		}

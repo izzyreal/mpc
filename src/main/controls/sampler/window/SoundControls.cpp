@@ -27,7 +27,7 @@ void SoundControls::turnWheel(int i)
 void SoundControls::function(int i)
 {
 	super::function(i);
-	auto lSampler = sampler.lock();
+	
 	auto lLs = ls.lock();
 	string newSampleName;
 	switch (i) {
@@ -38,9 +38,9 @@ void SoundControls::function(int i)
 		lLs->openScreen("convertsound");
 		break;
 	case 4:
-		newSampleName = lSampler->getSoundName(soundGui->getSoundIndex());
+		newSampleName = sampler.lock()->getSoundName(soundGui->getSoundIndex());
 		//newSampleName = newSampleName->replaceAll("\\s+$", "");
-		newSampleName = lSampler->addOrIncreaseNumber(newSampleName);
+		newSampleName = sampler.lock()->addOrIncreaseNumber(newSampleName);
 		lLs->openScreen("copysound");
 		soundGui->setNewName(newSampleName);
 		break;

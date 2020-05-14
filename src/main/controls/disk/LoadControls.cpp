@@ -92,13 +92,13 @@ void LoadControls::function(int i)
 			return;
 		}
 		else if (StrUtil::eqIgnoreCase(ext, "mid")) {
-			auto lSequencer = sequencer.lock();
-			auto newSeq = lSequencer->createSeqInPlaceHolder().lock();
+			
+			auto newSeq = sequencer.lock()->createSeqInPlaceHolder().lock();
 			newSeq->init(2);
 			auto mr = mpc::file::mid::MidiReader(selectedFile, newSeq);
 			mr.parseSequence();
 			ls.lock()->openScreen("loadasequence");
-			auto usedSeqs = lSequencer->getUsedSequenceIndexes();
+			auto usedSeqs = sequencer.lock()->getUsedSequenceIndexes();
 			int index;
 			for (index = 0; index < 99; index++) {
 				bool contains = false;

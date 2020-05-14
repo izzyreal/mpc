@@ -13,7 +13,7 @@ PurgeControls::PurgeControls()
 void PurgeControls::function(int f)
 {
 	init();
-	auto lSampler = sampler.lock();
+	
 	auto lLs = ls.lock();
 	switch (f) {
 	case 0:
@@ -29,7 +29,7 @@ void PurgeControls::function(int f)
 		lLs->openScreen("selectdrum");
 		break;
 	case 4:
-		lSampler->purge();
+		sampler.lock()->purge();
 		lLs->openScreen("purge");
 		break;
 	}

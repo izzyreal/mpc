@@ -63,7 +63,7 @@ void DirectToDiskRecorderControls::function(int i)
     unique_ptr<mpc::audiomidi::DirectToDiskSettings> settings;
 
 	auto lAms = ams.lock();
-	auto lSequencer = sequencer.lock();
+	
 
 	switch (i) {
 	case 3:
@@ -78,7 +78,7 @@ void DirectToDiskRecorderControls::function(int i)
 			rate = lAms->getAudioServer()->getSampleRate();
 		}
 		split = false;
-		sequence = lSequencer->getSequence(seq).lock();
+		sequence = sequencer.lock()->getSequence(seq).lock();
 		shared_ptr<mpc::sequencer::Song> song;
 
 		switch (d2dRecorderGui->getRecord()) {
@@ -88,39 +88,39 @@ void DirectToDiskRecorderControls::function(int i)
 			lengthInFrames = mpc::sequencer::SeqUtil::sequenceFrameLength(sequence.get(), 0, sequence->getLastTick(), rate);
             settings = make_unique<mpc::audiomidi::DirectToDiskSettings>(lengthInFrames, outputFolder, split, rate);
 			lAms->prepareBouncing(settings.get());
-			lSequencer->playFromStart();
+			sequencer.lock()->playFromStart();
 			break;
 		case 1:
 			ls.lock()->openScreen("sequencer");
 			lengthInFrames = mpc::sequencer::SeqUtil::loopFrameLength(sequence.get(), rate);
             settings = make_unique<mpc::audiomidi::DirectToDiskSettings>(lengthInFrames, outputFolder, split, rate);
 			sequence->setLoopEnabled(false);
-			lSequencer->move(sequence->getLoopStart());
+			sequencer.lock()->move(sequence->getLoopStart());
 			lAms->prepareBouncing(settings.get());
-			lSequencer->play();
+			sequencer.lock()->play();
 			break;
 		case 2:
 			ls.lock()->openScreen("sequencer");
 			lengthInFrames = mpc::sequencer::SeqUtil::sequenceFrameLength(sequence.get(), d2dRecorderGui->getTime0(), d2dRecorderGui->getTime1(), rate);
             settings = make_unique<mpc::audiomidi::DirectToDiskSettings>(lengthInFrames, outputFolder, split, rate);
 			sequence->setLoopEnabled(false);
-			lSequencer->move(d2dRecorderGui->getTime0());
+			sequencer.lock()->move(d2dRecorderGui->getTime0());
 			lAms->prepareBouncing(settings.get());
-			lSequencer->play();
+			sequencer.lock()->play();
 			break;
 		case 3:
-			song = lSequencer->getSong(d2dRecorderGui->getSong()).lock();
+			song = sequencer.lock()->getSong(d2dRecorderGui->getSong()).lock();
 			if (!song->isUsed()) {
 				return;
 			}
 
-			lengthInFrames = mpc::sequencer::SeqUtil::songFrameLength(song.get(), lSequencer.get(), rate);
+			lengthInFrames = mpc::sequencer::SeqUtil::songFrameLength(song.get(), sequencer.lock().get(), rate);
             settings = make_unique<mpc::audiomidi::DirectToDiskSettings>(lengthInFrames, outputFolder, split, rate);
 			ls.lock()->openScreen("song");
-			lSequencer->setSongModeEnabled(true);
+			sequencer.lock()->setSongModeEnabled(true);
 			Mpc::instance().getUis().lock()->getSongGui()->setLoop(false);
 			lAms->prepareBouncing(settings.get());
-			lSequencer->playFromStart();
+			sequencer.lock()->playFromStart();
 			break;
 		case 4:
 			ls.lock()->openScreen("recordjam");

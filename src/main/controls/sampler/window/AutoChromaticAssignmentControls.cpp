@@ -17,12 +17,12 @@ AutoChromaticAssignmentControls::AutoChromaticAssignmentControls()
 void AutoChromaticAssignmentControls::turnWheel(int i)
 {
 	init();
-	auto lSampler = sampler.lock();
+	
 	auto lLs = ls.lock();
 	auto lProgram = program.lock();
 	if (param.compare("source") == 0) {
 		samplerGui->setPadAndNote(samplerGui->getPad(), samplerGui->getNote() + i);
-		swGui->setAutoChromAssSnd(lSampler->getLastNp(lProgram.get())->getSndNumber(), lSampler->getSoundCount());
+		swGui->setAutoChromAssSnd(sampler.lock()->getLastNp(lProgram.get())->getSndNumber(), sampler.lock()->getSoundCount());
 	}
 	else if (param.compare("programname") == 0) {
 		nameGui->setName(swGui->getNewName());
@@ -30,7 +30,7 @@ void AutoChromaticAssignmentControls::turnWheel(int i)
 		lLs->openScreen("name");
 	}
 	else if (param.compare("snd") == 0) {
-		swGui->setAutoChromAssSnd(swGui->getAutoChromAssSnd() + i, lSampler->getSoundCount());
+		swGui->setAutoChromAssSnd(swGui->getAutoChromAssSnd() + i, sampler.lock()->getSoundCount());
 	}
 	else if (param.compare("originalkey") == 0) {
 		swGui->setOriginalKey(swGui->getOriginalKey() + i);

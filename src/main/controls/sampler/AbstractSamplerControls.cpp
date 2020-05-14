@@ -38,20 +38,20 @@ AbstractSamplerControls::AbstractSamplerControls()
 void AbstractSamplerControls::init()
 {
 	BaseControls::init();
-	auto lSampler = sampler.lock();
-	if (lSampler->getSoundCount() != 0)
-		sound = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound(soundGui->getSoundIndex()).lock());
+	
+	if (sampler.lock()->getSoundCount() != 0)
+		sound = dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getSound(soundGui->getSoundIndex()).lock());
 
-	mpcSoundPlayerChannel = lSampler->getDrum(samplerGui->getSelectedDrum());
-	program = dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
+	mpcSoundPlayerChannel = sampler.lock()->getDrum(samplerGui->getSelectedDrum());
+	program = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
 	auto lProgram = program.lock();
 	if (csn.compare("programassign") == 0) {
-		lastPad = lSampler->getLastPad(lProgram.get());
+		lastPad = sampler.lock()->getLastPad(lProgram.get());
 		auto note = lastPad->getNote();
 		lastNp = dynamic_cast<mpc::sampler::NoteParameters*>(lProgram->getNoteParameters(note));
 	}
 	else {
-		lastNp = lSampler->getLastNp(lProgram.get());
+		lastNp = sampler.lock()->getLastNp(lProgram.get());
 	}
 	splittable = param.compare("st") == 0 || param.compare("end") == 0 || param.compare("to") == 0 || param.compare("endlengthvalue") == 0;
 }

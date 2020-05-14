@@ -17,30 +17,30 @@ KeepOrRetryControls::KeepOrRetryControls()
 }
 
 void KeepOrRetryControls::mainScreen() {
-	auto lSampler = sampler.lock();
-	lSampler->deleteSound(dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getPreviewSound().lock()));
+	
+	sampler.lock()->deleteSound(dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getPreviewSound().lock()));
 	AbstractSamplerControls::mainScreen();
 }
 
 void KeepOrRetryControls::function(int i)
 {
 	init();
-	auto lSampler = sampler.lock();
+	
 	auto lLs = ls.lock();
 	switch (i) {
 	case 1:
-		lSampler->deleteSound(dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getPreviewSound().lock()));
+		sampler.lock()->deleteSound(dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getPreviewSound().lock()));
 		lLs->openScreen("sample");
 		break;
 	case 3 :
 		if (Mpc::instance().getControls().lock()->isF4Pressed()) return;
 		Mpc::instance().getControls().lock()->setF4Pressed(true);
-		lSampler->playPreviewSample(0, lSampler->getPreviewSound().lock()->getLastFrameIndex(), 0, 2);
+		sampler.lock()->playPreviewSample(0, sampler.lock()->getPreviewSound().lock()->getLastFrameIndex(), 0, 2);
 		break;
 	case 4:
-		lSampler->getLastNp(program.lock().get())->setSoundNumber(lSampler->getSoundCount() - 1);
-		soundGui->initZones(lSampler->getPreviewSound().lock()->getLastFrameIndex());
-		soundGui->setSoundIndex(lSampler->getSoundCount() - 1, lSampler->getSoundCount());
+		sampler.lock()->getLastNp(program.lock().get())->setSoundNumber(sampler.lock()->getSoundCount() - 1);
+		soundGui->initZones(sampler.lock()->getPreviewSound().lock()->getLastFrameIndex());
+		soundGui->setSoundIndex(sampler.lock()->getSoundCount() - 1, sampler.lock()->getSoundCount());
 		lLs->openScreen("sample");
 		break;
 	}

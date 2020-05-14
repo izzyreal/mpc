@@ -115,10 +115,10 @@ void BarCopyControls::turnWheel(int i)
 	init();
 	auto lFromSeq = fromSeq.lock();
 	auto lToSeq = toSeq.lock();
-	auto lSequencer = sequencer.lock();
+	
 	if (param.compare("fromsq") == 0) {
 		barCopyGui->setFromSq(barCopyGui->getFromSq() + i);
-		fromSeq = lSequencer->getSequence(barCopyGui->getFromSq());
+		fromSeq = sequencer.lock()->getSequence(barCopyGui->getFromSq());
 		lFromSeq = fromSeq.lock();
 		if (barCopyGui->getLastBar() > lFromSeq->getLastBar())
 			barCopyGui->setLastBar(lFromSeq->getLastBar(), lFromSeq->getLastBar());
@@ -126,7 +126,7 @@ void BarCopyControls::turnWheel(int i)
 	}
 	else if (param.compare("tosq") == 0) {
 		barCopyGui->setToSq(barCopyGui->getToSq() + i);
-		toSeq = lSequencer->getSequence(barCopyGui->getToSq());
+		toSeq = sequencer.lock()->getSequence(barCopyGui->getToSq());
 		lToSeq = toSeq.lock();
 		if (barCopyGui->getAfterBar() > lToSeq->getLastBar())
 			barCopyGui->setAfterBar(lToSeq->getLastBar(), lToSeq->getLastBar());
