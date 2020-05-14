@@ -25,8 +25,6 @@ namespace mpc::lcdgui::screens
 		SequencerScreen(const int& layer);
 
 	private:
-		mpc::sequencer::Sequencer& sequencer;
-		mpc::sampler::Sampler& sampler;
 		std::weak_ptr<mpc::sequencer::Sequence> sequence;
 		std::weak_ptr<mpc::sequencer::Track> track;
 

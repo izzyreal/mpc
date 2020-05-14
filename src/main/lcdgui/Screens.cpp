@@ -1,4 +1,4 @@
-#include "ScreenArrangements.hpp"
+#include "Screens.hpp"
 
 #include <Paths.hpp>
 
@@ -7,7 +7,9 @@
 #include <lcdgui/Info.hpp>
 #include <lcdgui/FunctionKeys.hpp>
 #include <lcdgui/ScreenComponent.hpp>
+
 #include <lcdgui/screens/SequencerScreen.hpp>
+#include <lcdgui/screens/window/SequenceScreen.hpp>
 
 #include <file/FileUtil.hpp>
 
@@ -22,13 +24,13 @@ using namespace rapidjson;
 
 using namespace std;
 
-vector<unique_ptr<Document>> ScreenArrangements::layerDocuments;
-map<string, shared_ptr<ScreenComponent>> ScreenArrangements::screens;
+vector<unique_ptr<Document>> Screens::layerDocuments;
+map<string, shared_ptr<ScreenComponent>> Screens::screens;
 
-vector<shared_ptr<Component>> ScreenArrangements::get(const string& screenName, int& foundInLayer)
+vector<shared_ptr<Component>> Screens::get(const string& screenName, int& foundInLayer)
 {
 	
-	if (ScreenArrangements::layerDocuments.empty())
+	if (Screens::layerDocuments.empty())
 	{
 		init();
 	}
@@ -104,7 +106,7 @@ vector<shared_ptr<Component>> ScreenArrangements::get(const string& screenName, 
 	return components;
 }
 
-void ScreenArrangements::init()
+void Screens::init()
 {
 	auto path0 = string(mpc::Paths::resPath() + "mainpanel-mod.json");
 	auto path1 = string(mpc::Paths::resPath() + "windowpanel.json");
@@ -129,7 +131,7 @@ void ScreenArrangements::init()
 	}
 }
 
-shared_ptr<ScreenComponent> ScreenArrangements::getScreenComponent(const string& screenName)
+shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName)
 {
 	auto candidate = screens[screenName];
 
@@ -140,14 +142,19 @@ shared_ptr<ScreenComponent> ScreenArrangements::getScreenComponent(const string&
 
 	shared_ptr<ScreenComponent> screen;
 
+	int layerIndex = -1;
+	auto children = get(screenName, layerIndex);
+	
 	if (screenName.compare("sequencer") == 0)
 	{
-		int layerIndex = -1;
-		auto children = get(screenName, layerIndex);
 		screen = make_shared<mpc::lcdgui::screens::SequencerScreen>(layerIndex);
-		screen->addChildren(children);
+	}
+	else if (screenName.compare("sequence") == 0)
+	{
+		screen = make_shared<mpc::lcdgui::screens::window::SequenceScreen>(layerIndex);
 	}
 
+	screen->addChildren(children);
 	screens[screenName] = screen;
 
 	return screen;

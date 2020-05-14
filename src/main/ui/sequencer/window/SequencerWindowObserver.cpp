@@ -79,10 +79,6 @@ SequencerWindowObserver::SequencerWindowObserver()
 	int drum = track.lock()->getBusNumber() - 1;
 	mpcSoundPlayerChannel = drum >= 0 ? lSampler->getDrum(drum) : nullptr;
 	program = drum >= 0 ? dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(mpcSoundPlayerChannel->getProgram()).lock()) : weak_ptr<mpc::sampler::Program>();
-	sequenceNameFirstLetterField = ls->lookupField("sequencenamefirstletter");
-	defaultSequenceNameFirstLetterField = ls->lookupField("defaultnamefirstletter");
-	sequenceNameRestLabel = ls->lookupLabel("sequencenamerest");
-	defaultSequenceNameRestLabel = ls->lookupLabel("defaultnamerest");
 	trackNameFirstLetterField = ls->lookupField("tracknamefirstletter");
 	defaultTrackNameFirstLetterField = ls->lookupField("defaultnamefirstletter");
 	trackNameRestLabel = ls->lookupLabel("tracknamerest");
@@ -209,13 +205,7 @@ SequencerWindowObserver::SequencerWindowObserver()
 		h.lock()->Hide(true);
 	}
 
-	if (csn.compare("sequence") == 0) {
-		sequenceNameFirstLetterField.lock()->setText(seq->getName().substr(0, 1));
-		defaultSequenceNameFirstLetterField.lock()->setText(lSequencer->getDefaultSequenceName().substr(0, 1));
-		sequenceNameRestLabel.lock()->setText(seq->getName().substr(1, seq->getName().length()));
-		defaultSequenceNameRestLabel.lock()->setText(lSequencer->getDefaultSequenceName().substr(1, lSequencer->getDefaultSequenceName().length()));
-	}
-	else if (csn.compare("track") == 0) {
+	if (csn.compare("track") == 0) {
 		trackNameFirstLetterField.lock()->setText(lTrk->getName().substr(0, 1));
 		defaultTrackNameFirstLetterField.lock()->setText(lSequencer->getDefaultTrackName(trackNum).substr(0, 1));
 		trackNameRestLabel.lock()->setText(lTrk->getName().substr(1, lTrk->getName().length()));

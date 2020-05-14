@@ -1,6 +1,6 @@
 #include "lcdgui/LayeredScreen.hpp"
 
-#include "ScreenArrangements.hpp"
+#include "Screens.hpp"
 
 #include <gui/BasicStructs.hpp>
 
@@ -378,7 +378,7 @@ int LayeredScreen::openScreen(string screenName) {
 	previousScreenName = currentScreenName;
 	currentScreenName = screenName;
 		
-	auto screenComponent = ScreenArrangements::getScreenComponent(currentScreenName);
+	auto screenComponent = Screens::getScreenComponent(currentScreenName);
 
 	if (!screenComponent)
 	{

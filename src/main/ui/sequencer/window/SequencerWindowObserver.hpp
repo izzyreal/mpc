@@ -65,10 +65,6 @@ namespace mpc::ui::sequencer::window {
 		std::weak_ptr<mpc::sequencer::Track> track;
 		mpc::sequencer::TimeSignature timeSig;
 		mpc::sequencer::TimeSignature* newTimeSignature;
-		std::weak_ptr<mpc::lcdgui::Field> sequenceNameFirstLetterField;
-		std::weak_ptr<mpc::lcdgui::Field> defaultSequenceNameFirstLetterField;
-		std::weak_ptr<mpc::lcdgui::Label> sequenceNameRestLabel;
-		std::weak_ptr<mpc::lcdgui::Label> defaultSequenceNameRestLabel;
 		SequencerWindowGui* swGui = nullptr;
 		mpc::ui::NameGui* nameGui = nullptr;
 		std::weak_ptr<mpc::lcdgui::Field> sqField;

@@ -17,11 +17,11 @@ namespace mpc::lcdgui
 namespace mpc::lcdgui
 {
 	
-	class ScreenArrangements
+	class Screens
 	{
 
 	private:
-		static std::vector<std::unique_ptr<rapidjson::Document>> ScreenArrangements::layerDocuments;
+		static std::vector<std::unique_ptr<rapidjson::Document>> Screens::layerDocuments;
 		static std::map<std::string, std::shared_ptr<ScreenComponent>> screens;
 		static void init();
 
