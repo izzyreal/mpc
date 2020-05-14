@@ -17,6 +17,12 @@ namespace mpc::lcdgui
 		: public Component, public moduru::observer::Observer, public mpc::controls::BaseControls
 	{
 
+	private:
+		const int layer;
+
+	public:
+		const int& getLayer();
+
 	protected:
 		std::weak_ptr<Field> findFocus();
 		void openScreen(const std::string& screenName);
@@ -24,7 +30,11 @@ namespace mpc::lcdgui
 		const std::string getLastFocus(const std::string& screenName);
 
 	public:
-		ScreenComponent(const std::string& name);
+		virtual void open() = 0;
+		virtual void close() = 0;
+
+	public:
+		ScreenComponent(const std::string& name, const int layer);
 
 	};
 

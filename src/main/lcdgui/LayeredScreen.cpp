@@ -378,19 +378,18 @@ int LayeredScreen::openScreen(string screenName) {
 	previousScreenName = currentScreenName;
 	currentScreenName = screenName;
 	
-	int oldLayer = focusedLayer;
+	auto oldScreenComponent = getFocusedLayer().lock()->findScreenComponent().lock();
 
-	if (getFocusedLayer().lock())
+	if (oldScreenComponent)
 	{
-		getFocusedLayer().lock()->removeChild(getFocusedLayer().lock()->findScreenComponent());
+		oldScreenComponent->close();
+		getFocusedLayer().lock()->removeChild(oldScreenComponent);
 	}
-
-	focusedLayer = -1;
-
-	string firstField;
 	
-	auto screenComponent = ScreenArrangements::getScreenComponent(currentScreenName, focusedLayer, firstField);
-	
+	auto screenComponent = ScreenArrangements::getScreenComponent(currentScreenName);
+
+	focusedLayer = screenComponent->getLayer();
+
 	if (focusedLayer == -1)
 	{
 		return -1;
@@ -398,7 +397,9 @@ int LayeredScreen::openScreen(string screenName) {
 
 	getFocusedLayer().lock()->addChild(screenComponent);
 	
-	returnToLastFocus(firstField);
+	screenComponent->open();
+
+	returnToLastFocus(screenComponent->findFields().front().lock()->getName());
 
 	return focusedLayer;
 }

@@ -1,7 +1,6 @@
 #pragma once
 #include <observer/Observable.hpp>
 
-
 namespace mpc::ui::sequencer::window {
 
 	class EraseGui

@@ -7,11 +7,16 @@ using namespace mpc::lcdgui;
 
 using namespace std;
 
-ScreenComponent::ScreenComponent(const string& name)
-	: Component(name)
+ScreenComponent::ScreenComponent(const string& name, const int layer)
+	: Component(name), layer(layer)
 {
 	auto background = dynamic_pointer_cast<Background>(addChild(make_shared<Background>()).lock());
 	background->setName(name);
+}
+
+const int& ScreenComponent::getLayer()
+{
+	return layer;
 }
 
 weak_ptr<Field> ScreenComponent::findFocus()

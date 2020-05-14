@@ -6,6 +6,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <map>
 
 namespace mpc::lcdgui
 {
@@ -19,13 +20,14 @@ namespace mpc::lcdgui
 	class ScreenArrangements
 	{
 
-	public:
+	private:
 		static std::vector<std::unique_ptr<rapidjson::Document>> ScreenArrangements::layerDocuments;
+		static std::map<std::string, std::shared_ptr<ScreenComponent>> screens;
 		static void init();
 
 	public:
-		static std::vector<std::shared_ptr<Component>> get(const std::string& screenName, int& foundInLayer, std::string& firstField);
-		static std::shared_ptr<ScreenComponent> getScreenComponent(const std::string& screenName, int& foundInLayer, std::string& firstField);
+		static std::vector<std::shared_ptr<Component>> get(const std::string& screenName, int& foundInLayer);
+		static std::shared_ptr<ScreenComponent> getScreenComponent(const std::string& screenName);
 
 	};
 }

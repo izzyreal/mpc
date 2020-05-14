@@ -23,9 +23,11 @@ using namespace rapidjson;
 using namespace std;
 
 vector<unique_ptr<Document>> ScreenArrangements::layerDocuments;
+map<string, shared_ptr<ScreenComponent>> ScreenArrangements::screens;
 
-vector<shared_ptr<Component>> ScreenArrangements::get(const string& screenName, int& foundInLayer, string& firstField)
+vector<shared_ptr<Component>> ScreenArrangements::get(const string& screenName, int& foundInLayer)
 {
+	
 	if (ScreenArrangements::layerDocuments.empty())
 	{
 		init();
@@ -55,10 +57,8 @@ vector<shared_ptr<Component>> ScreenArrangements::get(const string& screenName, 
 
 	vector<shared_ptr<Component>> components;
 
-	for (int i = 0; i < labels.Size(); i++) {
-		if (i == 0) {
-			firstField = parameters[i].GetString();
-		}
+	for (int i = 0; i < labels.Size(); i++)
+	{
 		components.push_back(make_unique<Parameter>(labels[i].GetString()
 			, parameters[i].GetString()
 			, x[i].GetInt()
@@ -67,12 +67,16 @@ vector<shared_ptr<Component>> ScreenArrangements::get(const string& screenName, 
 			));
 	}
 
-	if (arrangement.HasMember("infowidgets")) {
+	if (arrangement.HasMember("infowidgets"))
+	{
+		
 		Value& infoNames = arrangement["infowidgets"];
 		Value& infoSize = arrangement["infosize"];
 		Value& infoX = arrangement["infox"];
 		Value& infoY = arrangement["infoy"];
-		for (int i = 0; i < infoNames.Size(); i++) {
+	
+		for (int i = 0; i < infoNames.Size(); i++)
+		{
 			components.push_back(make_shared<Label>(infoNames[i].GetString()
 				, ""
 				, infoX[i].GetInt()
@@ -83,17 +87,19 @@ vector<shared_ptr<Component>> ScreenArrangements::get(const string& screenName, 
 
 	auto functionKeysComponent = make_unique<FunctionKeys>();
 
-	if (arrangement.HasMember("fblabels")) {
+	if (arrangement.HasMember("fblabels"))
+	{
 		Value& fklabels = arrangement["fblabels"];
 		Value& fktypes = arrangement["fbtypes"];
 		functionKeysComponent->Hide(false);
 		functionKeysComponent->initialize(fklabels, fktypes);
 	}
-	else {
+	else
+	{
 		functionKeysComponent->Hide(true);
 	}
 
-	//components.push_back(move(functionKeysComponent));
+	components.push_back(move(functionKeysComponent));
 
 	return components;
 }
@@ -107,7 +113,8 @@ void ScreenArrangements::init()
 
 	vector<string> paths = { path0, path1, path2, path3 };
 
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < 4; i++)
+	{
 		
 		char readBuffer[256];
 
@@ -122,10 +129,26 @@ void ScreenArrangements::init()
 	}
 }
 
-std::shared_ptr<ScreenComponent> ScreenArrangements::getScreenComponent(const string& screenName, int& foundInLayer, string& firstField)
+shared_ptr<ScreenComponent> ScreenArrangements::getScreenComponent(const string& screenName)
 {
+	auto candidate = screens[screenName];
+
+	if (candidate)
+	{
+		return candidate;
+	}
+
+	shared_ptr<ScreenComponent> screen;
+
 	if (screenName.compare("sequencer") == 0)
 	{
-		return make_shared<mpc::lcdgui::screens::SequencerScreen>(get(screenName, foundInLayer, firstField));
+		int layerIndex = -1;
+		auto children = get(screenName, layerIndex);
+		screen = make_shared<mpc::lcdgui::screens::SequencerScreen>(layerIndex);
+		screen->addChildren(children);
 	}
+
+	screens[screenName] = screen;
+
+	return screen;
 }

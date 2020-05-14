@@ -22,8 +22,7 @@ namespace mpc::lcdgui::screens
 	{
 
 	public:
-		SequencerScreen(std::vector<std::shared_ptr<Component>> componentMap);
-		~SequencerScreen();
+		SequencerScreen(const int& layer);
 
 	private:
 		mpc::sequencer::Sequencer& sequencer;
@@ -72,6 +71,9 @@ namespace mpc::lcdgui::screens
 		void right() override;
 		void up() override;
 		void down() override;
-	};
 
+	public:
+		void open() override;
+		void close() override;
+	};
 }

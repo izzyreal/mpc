@@ -25,19 +25,17 @@
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 
-SequencerScreen::SequencerScreen(std::vector<std::shared_ptr<Component>> components)
-	: ScreenComponent("sequencer"), sequencer(*mpc::Mpc::instance().getSequencer().lock().get()), sampler(*mpc::Mpc::instance().getSampler().lock().get())
+SequencerScreen::SequencerScreen(const int& layer)
+	: ScreenComponent("sequencer", layer), sequencer(*mpc::Mpc::instance().getSequencer().lock().get()), sampler(*mpc::Mpc::instance().getSampler().lock().get())
 {
+}
 
+void SequencerScreen::open()
+{
 	auto& mpc = mpc::Mpc::instance();
 
 	sequence = mpc.getSequencer().lock()->getActiveSequence();
 	track = mpc.getSequencer().lock()->getActiveTrack();
-
-	for (auto component : components)
-	{
-		addChild(move(component));
-	}
 
 	findLabel("nextsq").lock()->Hide(true);
 	findField("nextsq").lock()->Hide(true);
@@ -68,7 +66,7 @@ SequencerScreen::SequencerScreen(std::vector<std::shared_ptr<Component>> compone
 	track.lock()->addObserver(this);
 }
 
-SequencerScreen::~SequencerScreen()
+void SequencerScreen::close()
 {
 	auto& mpc = mpc::Mpc::instance();
 	mpc.getSequencer().lock()->deleteObserver(this);
