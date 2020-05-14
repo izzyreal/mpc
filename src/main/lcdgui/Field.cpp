@@ -23,19 +23,25 @@ using namespace std;
 Field::Field(const string& name, int x, int y, int width)
 	: TextComp(name)
 {
-
-	split = false;
-	focusable = true;
-	inverted = false;
-	focus = false;
 	Hide(false);
 	this->name = name;
-	this->width = width - 1;
-	setLocation(x, y);
-	setSize(width, 7);
+	this->width = width;
+	setLocation(x - 1, y - 1);
+	setSize(width + 2, 9);
 }
 
 const int Field::BLINKING_RATE;
+
+void Field::Draw(std::vector<std::vector<bool>>* pixels)
+{
+	auto r = getRect();
+	for (int i = r.L; i < r.R - 1; i++) {
+		for (int j = r.T; j < r.B; j++) {
+			(*pixels)[i][j] = inverted;
+		}
+	}
+	TextComp::Draw(pixels);
+}
 
 void Field::takeFocus(string prev)
 {

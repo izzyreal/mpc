@@ -55,6 +55,9 @@ namespace mpc::lcdgui
 		bool getBlinking();
 
 	public:
+		void Draw(std::vector<std::vector<bool>>* pixels) override;
+
+	public:
 		Field(const std::string& name, int x, int y, int columns);
 		~Field();
 

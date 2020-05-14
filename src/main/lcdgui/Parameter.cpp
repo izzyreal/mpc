@@ -1,6 +1,5 @@
 #include "Parameter.hpp"
 
-#include "Rectangle.hpp"
 #include "Field.hpp"
 #include "Label.hpp"
 
@@ -25,24 +24,5 @@ Parameter::Parameter(string labelStr, string name, int x, int y, int fieldWidth)
 	rect.T -= 1;
 	rect.B += 1;
 
-	addChild(make_shared<Rectangle>(rect));
-
 	addChild(field);
-}
-
-void Parameter::Draw(std::vector<std::vector<bool>>* pixels)
-{
-	Component::Draw(pixels);
-}
-
-void Parameter::takeFocus()
-{
-	dynamic_pointer_cast<Rectangle>(findChild("rectangle").lock())->setOn(true);
-	findField(name).lock()->takeFocus("");
-}
-
-void Parameter::loseFocus()
-{
-	dynamic_pointer_cast<Rectangle>(findChild("rectangle").lock())->setOn(false);
-	findField(name).lock()->loseFocus("");
 }

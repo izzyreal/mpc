@@ -1,7 +1,10 @@
 #include "TextComp.hpp"
 
+#include "Field.hpp"
+
 #include <Mpc.hpp>
 #include <Paths.hpp>
+
 
 #include <lang/StrUtil.hpp>
 #include <lang/utf8_decode.h>
@@ -23,11 +26,13 @@ void TextComp::Draw(std::vector<std::vector<bool>>* pixels) {
 		return;
 	}
 
+	auto field = dynamic_cast<Field*>(this) != nullptr;
+
 	auto font = &LayeredScreen::font;
 	auto atlas = &LayeredScreen::atlas;
 
-	int textx = x;
-	int texty = y - 1;
+	int textx = x + 1;
+	int texty = y;
 
 	int atlasx, atlasy;
 

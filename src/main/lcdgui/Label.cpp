@@ -12,10 +12,10 @@ Label::Label(const string& name, string text, int x, int y, int width)
 	Hide(false);
 	this->text = text;
 	this->name = name;
-	this->width = width - 1;
+	this->width = width + 2;
 	setText(text);
-	setLocation(x, y);
-	setSize(width, FONT_HEIGHT);
+	setLocation(x - 1, y - 1);
+	setSize(width, 9);
 }
 
 Label::~Label() {

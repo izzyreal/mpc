@@ -20,7 +20,6 @@ mpc::lcdgui::FunctionKeys* Layer::getFunctionKeys() {
 
 void Layer::setFocus(string textFieldName) {
 
-	string oldFocus = focus;
 	// First make sure the desired focus field exists and is focusable
 	bool exists = false;
 	for (auto& a : findFields()) {
@@ -39,17 +38,18 @@ void Layer::setFocus(string textFieldName) {
 	for (auto& a : findFields()) {
 		auto tf = dynamic_pointer_cast<Field>(a.lock());
 		if (tf->getName().compare(focus) == 0 && tf->isFocusable()) {
-			findParameter(tf->getName()).lock()->loseFocus();
+			tf->loseFocus(textFieldName);
 			break;
 		}
 	}
 
+	string oldFocus = focus;
 	focus = textFieldName;
 
 	for (auto& a : findFields()) {
 		auto tf = dynamic_pointer_cast<Field>(a.lock());
 		if (tf->getName().compare(textFieldName) == 0 && tf->isFocusable()) {
-			findParameter(tf->getName()).lock()->takeFocus();
+			tf->takeFocus(oldFocus);
 			break;
 		}
 	}
