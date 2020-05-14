@@ -401,17 +401,14 @@ int LayeredScreen::openScreen(string screenName) {
 	{
 		oldScreenComponent->close();
 		getFocusedLayer().lock()->removeChild(oldScreenComponent);
-
-		if (oldScreenComponent->getLayerIndex() > screenComponent->getLayerIndex())
-		{
-			screenComponent->SetDirtyRecursive();
-		}
 	}
 
 	focusedLayerIndex = screenComponent->getLayerIndex();
 
 	getFocusedLayer().lock()->addChild(screenComponent);
 	
+	screenComponent->SetDirtyRecursive();
+
 	screenComponent->open();
 
 	returnToLastFocus(screenComponent->findFields().front().lock()->getName());

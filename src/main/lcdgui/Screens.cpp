@@ -109,7 +109,7 @@ vector<shared_ptr<Component>> Screens::get(const string& screenName, int& foundI
 void Screens::init()
 {
 	auto path0 = string(mpc::Paths::resPath() + "mainpanel-mod.json");
-	auto path1 = string(mpc::Paths::resPath() + "windowpanel.json");
+	auto path1 = string(mpc::Paths::resPath() + "windowpanel-mod.json");
 	auto path2 = string(mpc::Paths::resPath() + "dialogpanel.json");
 	auto path3 = string(mpc::Paths::resPath() + "dialog2panel.json");
 
