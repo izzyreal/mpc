@@ -76,8 +76,6 @@ SequencerWindowObserver::SequencerWindowObserver()
 	auto seq = sequence.lock();
 	track = seq->getTrack(trackNum);
 
-	newTimeSignature = swGui->getNewTimeSignature();
-	newTimeSignature->addObserver(this);
 	auto lSampler = sampler.lock();
 	int drum = track.lock()->getBusNumber() - 1;
 	mpcSoundPlayerChannel = drum >= 0 ? lSampler->getDrum(drum) : nullptr;
@@ -163,11 +161,6 @@ SequencerWindowObserver::SequencerWindowObserver()
 	else if (csn.compare("copytrack") == 0)
 	{
 		displayTrackNumberNames();
-	}
-	else if (csn.compare("changetsig") == 0)
-	{
-		displayBars();
-		displayNewTsig();
 	}
 	else if (csn.compare("loopbarswindow") == 0)
 	{
@@ -352,21 +345,6 @@ void SequencerWindowObserver::displayFirstBar()
     firstBarField.lock()->setText(to_string(seq->getFirstLoopBar() + 1));
 }
 
-void SequencerWindowObserver::displayBars()
-{
-    bar0Field.lock()->setText(to_string(swGui->getBar0() + 1));
-    bar1Field.lock()->setText(to_string(swGui->getBar1() + 1));
-}
-
-void SequencerWindowObserver::displayNewTsig()
-{
-	if (csn.compare("deletesequence") == 0) {
-		return;
-	}
-	auto result = to_string(newTimeSignature->getNumerator()) + "/" + to_string(newTimeSignature->getDenominator());
-	newTsigField.lock()->setText(mpc::Util::distributeTimeSig(result));
-}
-
 void SequencerWindowObserver::displayNotes()
 {
 	auto lSampler = sampler.lock();
@@ -458,14 +436,6 @@ void SequencerWindowObserver::update(moduru::observer::Observable* o, nonstd::an
 	else if (s.compare("notes") == 0)
 	{
 		displayNotes();
-	}
-	else if (s.compare("bars") == 0)
-{
-		displayBars();
-	}
-	else if (s.compare("timesignature") == 0)
-{
-		displayNewTsig();
 	}
 	else if (s.compare("firstloopbar") == 0)
 {
@@ -602,7 +572,6 @@ SequencerWindowObserver::~SequencerWindowObserver() {
 	}
 
 	sequencer.lock()->deleteObserver(this);
-	newTimeSignature->deleteObserver(this);
 	swGui->deleteObserver(this);
 	nameGui->deleteObserver(this);
 	samplerGui->deleteObserver(this);

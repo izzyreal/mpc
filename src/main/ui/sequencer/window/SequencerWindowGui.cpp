@@ -191,49 +191,6 @@ void SequencerWindowGui::setTime1(int time1)
     notifyObservers(string("time"));
 }
 
-int SequencerWindowGui::getBar0()
-{
-    return bar0;
-}
-
-void SequencerWindowGui::setBar0(int i, int max)
-{
-    if(i < 0 || i > max)
-        return;
-
-    bar0 = i;
-    if(bar0 > bar1)
-        bar1 = bar0;
-
-    setChanged();
-    notifyObservers(string("bars"));
-}
-
-int SequencerWindowGui::getBar1()
-{
-    return bar1;
-}
-
-void SequencerWindowGui::setBar1(int i, int max)
-{
-    if(i < 0 || i > max)
-        return;
-
-    bar1 = i;
-    setChanged();
-    notifyObservers(string("bars"));
-}
-
-mpc::sequencer::TimeSignature* SequencerWindowGui::getNewTimeSignature()
-{
-    return &newTimeSignature;
-}
-
-void SequencerWindowGui::setNewTimeSignature(mpc::sequencer::TimeSignature ts)
-{
-    newTimeSignature = ts;
-}
-
 int SequencerWindowGui::getCountInMode()
 {
     return countIn;

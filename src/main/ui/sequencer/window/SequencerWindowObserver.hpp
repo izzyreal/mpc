@@ -67,7 +67,7 @@ namespace mpc::ui::sequencer::window
 		int seqNum = 0;
 		std::weak_ptr<mpc::sequencer::Sequence> sequence;
 		std::weak_ptr<mpc::sequencer::Track> track;
-		mpc::sequencer::TimeSignature* newTimeSignature;
+
 		SequencerWindowGui* swGui = nullptr;
 		mpc::ui::NameGui* nameGui = nullptr;
 		std::weak_ptr<mpc::lcdgui::Field> sqField;
@@ -140,8 +140,6 @@ namespace mpc::ui::sequencer::window
 		void displayNumberOfBars();
 		void displayLastBar();
 		void displayFirstBar();
-		void displayBars();
-		void displayNewTsig();
 		void displayNotes();
 		void displayTime();
 

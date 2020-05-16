@@ -553,11 +553,6 @@ void SequencerScreen::turnWheel(int i)
 		sequencer.lock()->setTempo(BCMath(newTempo));
 	}
 	else if (focus.compare("tsig") == 0) {
-		mpc::sequencer::TimeSignature ts;
-		auto oldTs = sequence.lock()->getTimeSignature();
-		ts.setNumerator(oldTs.getNumerator());
-		ts.setDenominator(oldTs.getDenominator());
-		Mpc::instance().getUis().lock()->getSequencerWindowGui()->setNewTimeSignature(ts);
 		openScreen("changetsig");
 	}
 	else if (focus.compare("temposource") == 0) {
@@ -608,10 +603,6 @@ void SequencerScreen::openWindow()
 	}
 	else if (focus.compare("tsig") == 0)
 	{
-		auto oldTs = sequence.lock()->getTimeSignature();
-		auto newTs = Mpc::instance().getUis().lock()->getSequencerWindowGui()->getNewTimeSignature();
-		newTs->setNumerator(oldTs.getNumerator());
-		newTs->setDenominator(oldTs.getDenominator());
 		openScreen("changetsig");
 	}
 	else if (focus.compare("count") == 0)

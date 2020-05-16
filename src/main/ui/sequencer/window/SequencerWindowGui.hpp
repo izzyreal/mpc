@@ -33,9 +33,6 @@ namespace mpc::ui::sequencer::window {
 		int time1 = 0;
 		int midiNote0 = 0;
 		int midiNote1 = 127;
-		int bar0 = 0;
-		int bar1 = 0;
-		mpc::sequencer::TimeSignature newTimeSignature;
 		int countIn = 0;
 		bool inPlay = false;
 		int rate = 0;
@@ -92,12 +89,6 @@ namespace mpc::ui::sequencer::window {
 		void setTime0(int time0);
 		int getTime1();
 		void setTime1(int time1);
-		int getBar0();
-		void setBar0(int i, int max);
-		int getBar1();
-		void setBar1(int i, int max);
-		mpc::sequencer::TimeSignature* getNewTimeSignature();
-		void setNewTimeSignature(mpc::sequencer::TimeSignature ts);
 		int getCountInMode();
 		void setCountIn(int i);
 		void setInPlay(bool b);
