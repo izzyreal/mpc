@@ -21,9 +21,6 @@ namespace mpc {
 		static void drawLine(vector<vector<bool>>& pixels, const vector<vector<int>>& line, const bool color, const vector<int>& offsetxy);
 		static void drawLines(vector<vector<bool>>& pixels, const vector<vector<vector<int>>>& lines, const vector<bool>& colors);
 		static void drawLines(vector<vector<bool>>& pixels, const vector<vector<vector<int>>>& lines, const vector<bool>& colors, const vector<int>& offsetxy);
-		//static void drawScaled(IGraphics* g, vector<vector<int>> line, unsigned int scale, IColor* color, vector<int> offsetxy);
-		//static void drawScaled(IGraphics* g, vector<vector<vector<int>>> lines, unsigned int scale, IColor* color, vector<int> offsetxy);
-		//static void drawScaled(IGraphics* g, vector<vector<vector<int>>> lines, unsigned int scale, vector<IColor*> colors, vector<int> offsetxy);
-		
+
 	};
 }

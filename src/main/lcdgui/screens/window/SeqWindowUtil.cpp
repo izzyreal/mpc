@@ -1,4 +1,4 @@
-#include <lcdgui/screens/window/Util.hpp>
+#include <lcdgui/screens/window/SeqWindowUtil.hpp>
 
 #include <Mpc.hpp>
 
@@ -22,7 +22,7 @@ using namespace mpc::lcdgui::screens::window;
 
 using namespace std;
 
-void Util::checkAllTimesAndNotes(int i)
+void SeqWindowUtil::checkAllTimesAndNotes(int i)
 {
 	auto& mpc = mpc::Mpc::instance();
 	

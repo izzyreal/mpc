@@ -1,6 +1,6 @@
 #include <lcdgui/screens/window/EraseScreen.hpp>
 
-#include <lcdgui/screens/window/Util.hpp>
+#include <lcdgui/screens/window/SeqWindowUtil.hpp>
 
 #include <ui/Uis.hpp>
 #include <lcdgui/LayeredScreen.hpp>
@@ -33,7 +33,7 @@ void EraseScreen::turnWheel(int i)
 		egui->setTrack(egui->getTrack() + i);
 	}
 
-	Util::checkAllTimesAndNotes(i);
+	SeqWindowUtil::checkAllTimesAndNotes(i);
 
 	if (param.compare("erase") == 0) {
 		egui->setErase(egui->getErase() + i);

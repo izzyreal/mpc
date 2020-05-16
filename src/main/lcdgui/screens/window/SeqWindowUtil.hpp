@@ -3,7 +3,7 @@
 namespace mpc::lcdgui::screens::window
 {
 
-	class Util
+	class SeqWindowUtil
 	{
 
 	public:

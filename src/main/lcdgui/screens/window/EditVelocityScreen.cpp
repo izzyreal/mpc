@@ -1,6 +1,6 @@
 #include <lcdgui/screens/window/EditVelocityScreen.hpp>
 
-#include <lcdgui/screens/window/Util.hpp>
+#include <lcdgui/screens/window/SeqWindowUtil.hpp>
 
 #include <lcdgui/LayeredScreen.hpp>
 #include <ui/sequencer/window/SequencerWindowGui.hpp>
@@ -70,5 +70,5 @@ void EditVelocityScreen::turnWheel(int i)
 		swGui->setValue(swGui->getValue() + i);
 	}
 	
-	Util::checkAllTimesAndNotes(i);
+	SeqWindowUtil::checkAllTimesAndNotes(i);
 }

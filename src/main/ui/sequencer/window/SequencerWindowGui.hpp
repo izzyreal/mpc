@@ -52,10 +52,6 @@ namespace mpc::ui::sequencer::window {
 		int rate = 0;
 		bool waitForKey = false;
 		bool inRec = false;
-		int changeBarsLastBar = 0;
-		int changeBarsFirstBar = 0;
-		int changeBarsNumberOfBars = 0;
-		int changeBarsAfterBar = 0;
 		bool transmitProgramChangesInThisTrack = false;
 		int newBars = 0;
 		std::vector<MultiRecordingSetupLine*> visibleMrsLines;
@@ -146,14 +142,6 @@ namespace mpc::ui::sequencer::window {
 		bool isWaitForKeyEnabled();
 		void setInRec(bool b);
 		bool getInRec();
-		int getChangeBarsLastBar();
-		void setChangeBarsLastBar(int i, int max);
-		int getChangeBarsFirstBar();
-		void setChangeBarsFirstBar(int i, int max);
-		int getChangeBarsNumberOfBars();
-		void setChangeBarsNumberOfBars(int i, int max);
-		int getChangeBarsAfterBar();
-		void setChangeBarsAfterBar(int i, int max);
 		bool getTransmitProgramChangesInThisTrack();
 		void setTransmitProgramChangesInThisTrack(bool b);
 		int getNewBars();

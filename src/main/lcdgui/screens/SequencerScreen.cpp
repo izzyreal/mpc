@@ -649,20 +649,6 @@ void SequencerScreen::openWindow()
 	}
 	else if (focus.compare("bars") == 0)
 	{
-		if (sequencerWindowGui->getChangeBarsAfterBar() > sequence.lock()->getLastBar() + 1)
-		{
-			sequencerWindowGui->setChangeBarsAfterBar(sequence.lock()->getLastBar() + 1, sequence.lock()->getLastBar());
-		}
-		
-		if (sequencerWindowGui->getChangeBarsFirstBar() > sequence.lock()->getLastBar())
-		{
-			sequencerWindowGui->setChangeBarsFirstBar(sequence.lock()->getLastBar(), sequence.lock()->getLastBar());
-		}
-
-		if (sequencerWindowGui->getChangeBarsLastBar() > sequence.lock()->getLastBar())
-		{
-			sequencerWindowGui->setChangeBarsLastBar(sequence.lock()->getLastBar(), sequence.lock()->getLastBar());
-		}
 		openScreen("changebars");
 	}
 	else if (focus.compare("velo") == 0) {

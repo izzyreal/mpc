@@ -112,10 +112,6 @@ namespace mpc::ui::sequencer::window
 		std::weak_ptr<mpc::lcdgui::Field> numberOfBarsField;
 		std::weak_ptr<mpc::lcdgui::Field> lastBarField;
 		std::weak_ptr<mpc::lcdgui::Field> firstBarField;
-		std::weak_ptr<mpc::lcdgui::Field> changeBarsAfterBarField;
-		std::weak_ptr<mpc::lcdgui::Field> changeBarsNumberOfBarsField;
-		std::weak_ptr<mpc::lcdgui::Field> changeBarsFirstBarField;
-		std::weak_ptr<mpc::lcdgui::Field> changeBarsLastBarField;
 		std::weak_ptr<mpc::lcdgui::Field> inThisTrackField;
 		std::weak_ptr<mpc::lcdgui::Field> newBarsField;
 		std::weak_ptr<mpc::lcdgui::Label> message0Label;
@@ -155,10 +151,6 @@ namespace mpc::ui::sequencer::window
 		void displayMrsLine(int i);
 		void displayNewBars();
 		void displayTransmitProgramChangesInThisTrack();
-		void displayChangeBarsLastBar();
-		void displayChangeBarsFirstBar();
-		void displayChangeBarsNumberOfBars();
-		void displayChangeBarsAfterBar();
 		void displayNumberOfBars();
 		void displayLastBar();
 		void displayFirstBar();

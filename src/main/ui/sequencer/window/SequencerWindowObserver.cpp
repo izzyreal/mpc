@@ -6,7 +6,6 @@
 #include <lcdgui/FunctionKeys.hpp>
 #include <ui/Uis.hpp>
 #include <lcdgui/LayeredScreen.hpp>
-#include <lcdgui/LayeredScreen.hpp>
 #include <ui/NameGui.hpp>
 #include <lcdgui/HorizontalBar.hpp>
 #include <lcdgui/Field.hpp>
@@ -124,10 +123,6 @@ SequencerWindowObserver::SequencerWindowObserver()
 	firstBarField = ls->lookupField("firstbar");
 	lastBarField = ls->lookupField("lastbar");
 	numberOfBarsField = ls->lookupField("numberofbars");
-	changeBarsAfterBarField = ls->lookupField("afterbar");
-	changeBarsNumberOfBarsField = ls->lookupField("numberofbars");
-	changeBarsFirstBarField = ls->lookupField("firstbar");
-	changeBarsLastBarField = ls->lookupField("lastbar");
 	inThisTrackField = ls->lookupField("inthistrack");
 	newBarsField = ls->lookupField("newbars");
 	message0Label = ls->lookupLabel("message0");
@@ -166,14 +161,7 @@ SequencerWindowObserver::SequencerWindowObserver()
 	auto lTrk = track.lock();
 	lTrk->addObserver(this);
 	
-	if (csn.compare("track") == 0)
-	{
-		trackNameFirstLetterField.lock()->setText(lTrk->getName().substr(0, 1));
-		defaultTrackNameFirstLetterField.lock()->setText(lSequencer->getDefaultTrackName(trackNum).substr(0, 1));
-		trackNameRestLabel.lock()->setText(lTrk->getName().substr(1, lTrk->getName().length()));
-		defaultTrackNameRestLabel.lock()->setText(lSequencer->getDefaultTrackName(trackNum).substr(1, lSequencer->getDefaultTrackName(trackNum).length()));
-	}
-	else if (csn.compare("deletesequence") == 0)
+	if (csn.compare("deletesequence") == 0)
 	{
 		displaySequenceNumberName();
 	}
@@ -215,13 +203,6 @@ SequencerWindowObserver::SequencerWindowObserver()
 		displayFirstBar();
 		displayLastBar();
 		displayNumberOfBars();
-	}
-	else if (csn.compare("changebars") == 0)
-	{
-		displayChangeBarsAfterBar();
-		displayChangeBarsNumberOfBars();
-		displayChangeBarsFirstBar();
-		displayChangeBarsLastBar();
 	}
 	else if (csn.compare("transmitprogramchanges") == 0)
 	{
@@ -397,26 +378,6 @@ void SequencerWindowObserver::displayNewBars()
 void SequencerWindowObserver::displayTransmitProgramChangesInThisTrack()
 {
     inThisTrackField.lock()->setText(swGui->getTransmitProgramChangesInThisTrack() ? "YES" : "NO");
-}
-
-void SequencerWindowObserver::displayChangeBarsLastBar()
-{
-    changeBarsLastBarField.lock()->setText(to_string(swGui->getChangeBarsLastBar() + 1));
-}
-
-void SequencerWindowObserver::displayChangeBarsFirstBar()
-{
-    changeBarsFirstBarField.lock()->setText(to_string(swGui->getChangeBarsFirstBar() + 1));
-}
-
-void SequencerWindowObserver::displayChangeBarsNumberOfBars()
-{
-	changeBarsNumberOfBarsField.lock()->setText(to_string(swGui->getChangeBarsNumberOfBars()));
-}
-
-void SequencerWindowObserver::displayChangeBarsAfterBar()
-{
-	changeBarsAfterBarField.lock()->setText(to_string(swGui->getChangeBarsAfterBar()));
 }
 
 void SequencerWindowObserver::displayNumberOfBars()
@@ -655,22 +616,6 @@ void SequencerWindowObserver::update(moduru::observer::Observable* o, nonstd::an
 	else if (s.compare("transmitprogramchangesinthistrack") == 0)
 {
 		displayTransmitProgramChangesInThisTrack();
-	}
-	else if (s.compare("changebarsafterbar") == 0)
-{
-		displayChangeBarsAfterBar();
-	}
-	else if (s.compare("changebarsnumberofbars") == 0)
-{
-		displayChangeBarsNumberOfBars();
-	}
-	else if (s.compare("changebarsfirstbar") == 0)
-{
-		displayChangeBarsFirstBar();
-	}
-	else if (s.compare("changebarslastbar") == 0)
-{
-		displayChangeBarsLastBar();
 	}
 	else if (s.compare("newbars") == 0)
 {

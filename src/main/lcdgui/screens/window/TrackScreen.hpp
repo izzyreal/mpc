@@ -11,6 +11,10 @@ namespace mpc::lcdgui::screens::window {
 		void function(int i) override;
 		void turnWheel(int i) override;
 
+	public:
+		void open() override;
+
+	public:
 		TrackScreen(const int& layer);
 
 	};

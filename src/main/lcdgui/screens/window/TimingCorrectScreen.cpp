@@ -1,6 +1,6 @@
 #include "TimingCorrectScreen.hpp"
 
-#include <lcdgui/screens/window/Util.hpp>
+#include <lcdgui/screens/window/SeqWindowUtil.hpp>
 #include <lcdgui/LayeredScreen.hpp>
 
 #include <ui/sequencer/window/SequencerWindowGui.hpp>
@@ -78,5 +78,5 @@ void TimingCorrectScreen::turnWheel(int i)
 		swGui->setAmount(swGui->getAmount() + i);
 	}
 	
-	Util::checkAllTimesAndNotes(i);
+	SeqWindowUtil::checkAllTimesAndNotes(i);
 }
