@@ -81,15 +81,6 @@ namespace mpc::ui::sequencer::window
 		std::weak_ptr<mpc::lcdgui::Field> sq1Field;
 		std::weak_ptr<mpc::lcdgui::Field> tr0Field;
 		std::weak_ptr<mpc::lcdgui::Field> tr1Field;
-		std::weak_ptr<mpc::lcdgui::Field> displayStyleField;
-		std::weak_ptr<mpc::lcdgui::Field> startTimeField;
-		std::weak_ptr<mpc::lcdgui::Field> hField;
-		std::weak_ptr<mpc::lcdgui::Field> mField;
-		std::weak_ptr<mpc::lcdgui::Field> sField;
-		std::weak_ptr<mpc::lcdgui::Field> fField;
-		std::weak_ptr<mpc::lcdgui::Field> frameRateField;
-		std::vector<std::string> displayStyleNames;
-		std::vector<std::string> frameRateNames;
 		std::weak_ptr<mpc::lcdgui::Field> noteValueField;
 		std::weak_ptr<mpc::lcdgui::Field> swingField;
 		std::weak_ptr<mpc::lcdgui::Field> notes0Field;
@@ -146,7 +137,6 @@ namespace mpc::ui::sequencer::window
 		void displayProgChangeSeq();
 		void displayReceiveCh();
 		void displayMrsLine(int i);
-		void displayNewBars();
 		void displayTransmitProgramChangesInThisTrack();
 		void displayNumberOfBars();
 		void displayLastBar();
@@ -159,9 +149,6 @@ namespace mpc::ui::sequencer::window
 		void displayTime();
 		void displayShiftTiming();
 		void displayAmount();
-		void displayDisplayStyle();
-		void displayStartTime();
-		void displayFrameRate();
 
 	public:
 		void update(moduru::observer::Observable* o, nonstd::any arg) override;
