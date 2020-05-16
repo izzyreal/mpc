@@ -17,26 +17,6 @@
 #include <controls/sequencer/TrMuteControls.hpp>
 #include <controls/sequencer/UserControls.hpp>
 
-#include <controls/sequencer/window/EraseAllOffTracksControls.hpp>
-#include <controls/sequencer/window/Assign16LevelsControls.hpp>
-#include <controls/sequencer/window/ChangeTsigControls.hpp>
-#include <controls/sequencer/window/EditMultipleControls.hpp>
-#include <controls/sequencer/window/EditVelocityControls.hpp>
-#include <controls/sequencer/window/EraseControls.hpp>
-#include <controls/sequencer/window/InsertEventControls.hpp>
-#include <controls/sequencer/window/LoopBarsControls.hpp>
-#include <controls/sequencer/window/MidiInputControls.hpp>
-#include <controls/sequencer/window/MidiMonitorControls.hpp>
-#include <controls/sequencer/window/MidiOutputControls.hpp>
-#include <controls/sequencer/window/MultiRecordingSetupControls.hpp>
-#include <controls/sequencer/window/PasteEventControls.hpp>
-#include <controls/sequencer/window/TimeDisplayControls.hpp>
-#include <controls/sequencer/window/TimingCorrectControls.hpp>
-#include <controls/sequencer/window/TrackControls.hpp>
-#include <controls/sequencer/window/TransmitProgramChangesControls.hpp>
-#include <controls/sequencer/window/ChangeBars2Controls.hpp>
-#include <controls/sequencer/window/ChangeBarsControls.hpp>
-
 #include <controls/sequencer/dialog/CopySequenceControls.hpp>
 #include <controls/sequencer/dialog/CopyTrackControls.hpp>
 #include <controls/sequencer/dialog/DeleteAllSequencesControls.hpp>
@@ -156,27 +136,6 @@ Controls::Controls()
 
 	controls["sequencer_step"] = new sequencer::StepEditorControls();
 	controls["step_tc"] = new sequencer::StepEditorControls();
-
-	controls["changebars"] = new sequencer::window::ChangeBarsControls();
-	controls["changebars2"] = new sequencer::window::ChangeBars2Controls();
-	controls["timedisplay"] = new sequencer::window::TimeDisplayControls();
-	controls["timingcorrect"] = new sequencer::window::TimingCorrectControls();
-	controls["loopbarswindow"] = new sequencer::window::LoopBarsControls();
-	controls["editvelocity"] = new sequencer::window::EditVelocityControls();
-	controls["midioutput"] = new sequencer::window::MidiOutputControls();
-	controls["midiinput"] = new sequencer::window::MidiInputControls();
-	controls["multirecordingsetup"] = new sequencer::window::MultiRecordingSetupControls();
-	controls["transmitprogramchanges"] = new sequencer::window::TransmitProgramChangesControls();
-	controls["eraseallofftracks"] = new sequencer::window::EraseAllOffTracksControls();
-	controls["track"] = new sequencer::window::TrackControls();
-	controls["changetsig"] = new sequencer::window::ChangeTsigControls();
-	controls["editmultiple"] = new sequencer::window::EditMultipleControls();
-	controls["insertevent"] = new sequencer::window::InsertEventControls();
-	controls["pasteevent"] = new sequencer::window::PasteEventControls();
-	controls["assign16levels"] = new sequencer::window::Assign16LevelsControls();
-	controls["midiinputmonitor"] = new sequencer::window::MidiMonitorControls();
-	controls["midioutputmonitor"] = new sequencer::window::MidiMonitorControls();
-	controls["erase"] = new sequencer::window::EraseControls();
 
 	controls["metronomesound"] = new sequencer::dialog::MetronomeSoundControls();
 	controls["copytrack"] = new sequencer::dialog::CopyTrackControls();

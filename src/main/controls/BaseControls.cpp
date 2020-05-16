@@ -66,7 +66,7 @@ void BaseControls::init()
 	activeField = ls.lock()->lookupField(param);
     track = sequencer.lock()->getActiveSequence().lock()->getTrack(sequencer.lock()->getActiveTrackIndex());
 	
-	if (track.lock()->getBusNumber() != 0 && mpc.getAudioMidiServices().lock()->getAudioServer()->isRunning())
+	if (track.lock()->getBusNumber() != 0)
 	{
         mpcSoundPlayerChannel = sampler.lock()->getDrum(track.lock()->getBusNumber() - 1);
 		program = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
@@ -128,44 +128,59 @@ void BaseControls::function(int i)
 {
 	init();
 	auto lsLocked = ls.lock();
-	switch (i) {
+	switch (i)
+	{
 	case 3:
-		if (lsLocked->getFocusedLayerIndex() == 1) {
-			if (csn.compare("sequence") == 0) {
+		if (lsLocked->getFocusedLayerIndex() == 1)
+		{
+			if (csn.compare("sequence") == 0)
+			{
 				lsLocked->setPreviousScreenName("sequencer");
 			}
-			else if (csn.compare("midiinput") == 0) {
+			else if (csn.compare("midiinput") == 0)
+			{
 				lsLocked->setPreviousScreenName("sequencer");
 			}
-			else if (csn.compare("midioutput") == 0) {
+			else if (csn.compare("midioutput") == 0)
+			{
 				lsLocked->setPreviousScreenName("sequencer");
 			}
-			else if (csn.compare("editsound") == 0) {
+			else if (csn.compare("editsound") == 0)
+			{
 				lsLocked->setPreviousScreenName(mpc.getUis().lock()->getEditSoundGui()->getPreviousScreenName());
 			}
-			else if (csn.compare("sound") == 0) {
+			else if (csn.compare("sound") == 0)
+			{
 				lsLocked->setPreviousScreenName(mpc.getUis().lock()->getSoundGui()->getPreviousScreenName());
 			}
-			else if (csn.compare("program") == 0) {
+			else if (csn.compare("program") == 0)
+			{
 				lsLocked->setPreviousScreenName(mpc.getUis().lock()->getSamplerGui()->getPrevScreenName());
 			}
-			else if (csn.compare("name") == 0) {
+			else if (csn.compare("name") == 0)
+			{
 				mpc.getUis().lock()->getNameGui()->setNameBeingEdited(false);
 				lsLocked->setLastFocus("name", "0");
 			}
-			else if (csn.compare("numberofzones") == 0) {
+			else if (csn.compare("numberofzones") == 0)
+			{
 				mpc.getUis().lock()->getSoundGui()->setNumberOfZones(mpc.getUis().lock()->getSoundGui()->getPreviousNumberOfzones());
 			}
-			else if (csn.compare("directory") == 0) {
+			else if (csn.compare("directory") == 0)
+			{
 				lsLocked->setPreviousScreenName(mpc.getUis().lock()->getDirectoryGui()->getPreviousScreenName());
 			}
-			if (lsLocked->getPreviousScreenName().compare("load") == 0) {
-				if (mpc.getUis().lock()->getDiskGui()->getFileLoad() + 1 > mpc.getDisk().lock()->getFiles().size()) {
+			if (lsLocked->getPreviousScreenName().compare("load") == 0)
+			{
+				if (mpc.getUis().lock()->getDiskGui()->getFileLoad() + 1 > mpc.getDisk().lock()->getFiles().size())
+				{
 					mpc.getUis().lock()->getDiskGui()->setFileLoad(0);
 				}
 			}
 		}
-		if (lsLocked->getFocusedLayerIndex() == 1 || lsLocked->getFocusedLayerIndex() == 2 || lsLocked->getFocusedLayerIndex() == 3) {
+		
+		if (lsLocked->getFocusedLayerIndex() == 1 || lsLocked->getFocusedLayerIndex() == 2 || lsLocked->getFocusedLayerIndex() == 3)
+		{
 			lsLocked->openScreen(lsLocked->getPreviousScreenName());
 		}
 		break;
@@ -191,12 +206,14 @@ void BaseControls::pad(int i, int velo, bool repeat, int tick)
 		velo = 127;
 	}
 
-	if (controls->getPressedPads()->find(i) == controls->getPressedPads()->end()) {
+	if (controls->getPressedPads()->find(i) == controls->getPressedPads()->end())
+	{
 		controls->getPressedPads()->emplace(i);
 		controls->getPressedPadVelos()->at(i) = velo;
 	}
 	else {
-		if (!(controls->isTapPressed() && sequencer.lock()->isPlaying())) {
+		if (!(controls->isTapPressed() && sequencer.lock()->isPlaying()))
+		{
 			return;
 		}
 	}

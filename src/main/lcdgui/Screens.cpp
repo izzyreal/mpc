@@ -12,6 +12,25 @@
 #include <lcdgui/screens/window/SequenceScreen.hpp>
 #include <lcdgui/screens/window/TempoChangeScreen.hpp>
 #include <lcdgui/screens/window/CountMetronomeScreen.hpp>
+#include <lcdgui/screens/window/EditMultipleScreen.hpp>
+#include <lcdgui/screens/window/TransmitProgramChangesScreen.hpp>
+#include <lcdgui/screens/window/TimingCorrectScreen.hpp>
+#include <lcdgui/screens/window/TimeDisplayScreen.hpp>
+#include <lcdgui/screens/window/PasteEventScreen.hpp>
+#include <lcdgui/screens/window/MultiRecordingSetupScreen.hpp>
+#include <lcdgui/screens/window/MidiOutputScreen.hpp>
+#include <lcdgui/screens/window/MidiInputScreen.hpp>
+#include <lcdgui/screens/window/LoopBarsScreen.hpp>
+#include <lcdgui/screens/window/InsertEventScreen.hpp>
+#include <lcdgui/screens/window/EraseAllOffTracksScreen.hpp>
+#include <lcdgui/screens/window/ChangeTsigScreen.hpp>
+#include <lcdgui/screens/window/EditVelocityScreen.hpp>
+#include <lcdgui/screens/window/EraseScreen.hpp>
+#include <lcdgui/screens/window/ChangeBarsScreen.hpp>
+#include <lcdgui/screens/window/ChangeBars2Screen.hpp>
+#include <lcdgui/screens/window/TrackScreen.hpp>
+#include <lcdgui/screens/window/MidiMonitorScreen.hpp>
+#include <lcdgui/screens/window/Assign16LevelsScreen.hpp>
 
 #include <file/FileUtil.hpp>
 
@@ -148,7 +167,7 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 
 	int layerIndex = -1;
 	auto children = get(screenName, layerIndex);
-	
+
 	if (screenName.compare("sequencer") == 0)
 	{
 		screen = make_shared<SequencerScreen>(layerIndex);
@@ -164,6 +183,83 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	else if (screenName.compare("countmetronome") == 0)
 	{
 		screen = make_shared<CountMetronomeScreen>(layerIndex);
+	}
+
+	else if (screenName.compare("countmetronome") == 0)
+	{
+		screen = make_shared<EditMultipleScreen>(layerIndex);
+	}
+	else if (screenName.compare("countmetronome") == 0)
+	{
+		screen = make_shared<TransmitProgramChangesScreen>(layerIndex);
+	}
+	else if (screenName.compare("countmetronome") == 0)
+	{
+		screen = make_shared<TimingCorrectScreen>(layerIndex);
+	}
+	else if (screenName.compare("countmetronome") == 0)
+	{
+		screen = make_shared<TimeDisplayScreen>(layerIndex);
+	}
+	else if (screenName.compare("countmetronome") == 0)
+	{
+		screen = make_shared<PasteEventScreen>(layerIndex);
+	}
+	else if (screenName.compare("countmetronome") == 0)
+	{
+		screen = make_shared<MultiRecordingSetupScreen>(layerIndex);
+	}
+	else if (screenName.compare("countmetronome") == 0)
+	{
+		screen = make_shared<MidiOutputScreen>(layerIndex);
+	}
+	else if (screenName.compare("countmetronome") == 0)
+	{
+		screen = make_shared<MidiInputScreen>(layerIndex);
+	}
+	else if (screenName.compare("countmetronome") == 0)
+	{
+		screen = make_shared<LoopBarsScreen>(layerIndex);
+	}
+	else if (screenName.compare("countmetronome") == 0)
+	{
+		screen = make_shared<InsertEventScreen>(layerIndex);
+	}
+	else if (screenName.compare("countmetronome") == 0)
+	{
+		screen = make_shared<EraseAllOffTracksScreen>(layerIndex);
+	}
+	else if (screenName.compare("countmetronome") == 0)
+	{
+		screen = make_shared<ChangeTsigScreen>(layerIndex);
+	}
+	else if (screenName.compare("countmetronome") == 0)
+	{
+		screen = make_shared<EditVelocityScreen>(layerIndex);
+	}
+	else if (screenName.compare("countmetronome") == 0)
+	{
+		screen = make_shared<EraseScreen>(layerIndex);
+	}
+	else if (screenName.compare("countmetronome") == 0)
+	{
+		screen = make_shared<ChangeBarsScreen>(layerIndex);
+	}
+	else if (screenName.compare("countmetronome") == 0)
+	{
+		screen = make_shared<ChangeBars2Screen>(layerIndex);
+	}
+	else if (screenName.compare("countmetronome") == 0)
+	{
+		screen = make_shared<TrackScreen>(layerIndex);
+	}
+	else if (screenName.compare("countmetronome") == 0)
+	{
+		screen = make_shared<MidiMonitorScreen>(layerIndex);
+	}
+	else if (screenName.compare("countmetronome") == 0)
+	{
+		screen = make_shared<Assign16LevelsScreen>(layerIndex);
 	}
 
 	if (screen)

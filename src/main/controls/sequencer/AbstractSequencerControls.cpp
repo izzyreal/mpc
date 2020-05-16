@@ -33,7 +33,7 @@ AbstractSequencerControls::AbstractSequencerControls()
 
 void AbstractSequencerControls::init()
 {
-	super::init();
+	BaseControls::init();
 	
 	if (csn.compare("barcopy") == 0) {
 		fromSeq = sequencer.lock()->getSequence(barCopyGui->getFromSq());
@@ -44,45 +44,4 @@ void AbstractSequencerControls::init()
 		toSeq = sequencer.lock()->getSequence(editSequenceGui->getToSq());
 	}
 	sequence = sequencer.lock()->getActiveSequence();
-}
-
-void AbstractSequencerControls::checkAllTimesAndNotes(int i)
-{
-	init();
-	auto s = sequence.lock();
-	if (param.compare("time0") == 0) {
-		swGui->setTime0(SeqUtil::getTickFromBar((SeqUtil::getBarFromTick(s.get(), swGui->getTime0())) + i, s.get(), swGui->getTime0()));
-	}
-	else if (param.compare("time1") == 0) {
-		swGui->setTime0(SeqUtil::setBeat((SeqUtil::getBeat(s.get(), swGui->getTime0())) + i, s.get(), swGui->getTime0()));
-	}
-	else if (param.compare("time2") == 0) {
-		swGui->setTime0(SeqUtil::setClockNumber((SeqUtil::getClockNumber(s.get(), swGui->getTime0())) + i, s.get(), swGui->getTime0()));
-	}
-	else if (param.compare("time3") == 0) {
-		swGui->setTime1(SeqUtil::getTickFromBar((SeqUtil::getBarFromTick(s.get(), swGui->getTime1())) + i, s.get(), swGui->getTime1()));
-	}
-	else if (param.compare("time4") == 0) {
-		swGui->setTime1(SeqUtil::setBeat((SeqUtil::getBeat(s.get(), swGui->getTime1())) + i, s.get(), swGui->getTime1()));
-	}
-	else if (param.compare("time5") == 0) {
-		swGui->setTime1(SeqUtil::setClockNumber((SeqUtil::getClockNumber(s.get(), swGui->getTime1())) + i, s.get(), swGui->getTime1()));
-	}
-	else if (param.compare("notes0") == 0) {
-		if (track.lock()->getBusNumber() != 0) {
-			auto samplerGui = mpc::Mpc::instance().getUis().lock()->getSamplerGui();
-			auto note = samplerGui->getNote() + i;
-			auto pad = program.lock()->getPadNumberFromNote(note);
-			samplerGui->setPadAndNote(pad, samplerGui->getNote());
-		}
-		else {
-			swGui->setMidiNote0(swGui->getMidiNote0() + i);
-		}
-	}
-	else if (param.compare("notes1") == 0) {
-		swGui->setMidiNote1(swGui->getMidiNote1() + i);
-	}
-}
-
-AbstractSequencerControls::~AbstractSequencerControls() {
 }
