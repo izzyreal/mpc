@@ -1,6 +1,7 @@
 #include "Mpc.hpp"
 
 #include <lcdgui/Component.hpp>
+#include <lcdgui/ScreenComponent.hpp>
 
 #include "Paths.hpp"
 #include <nvram/NvRam.hpp>
@@ -147,7 +148,7 @@ weak_ptr<lcdgui::LayeredScreen> Mpc::getLayeredScreen() {
 }
 
 controls::BaseControls* Mpc::getActiveControls() {
-	return controls->getControls(layeredScreen->getCurrentScreenName());
+	return dynamic_pointer_cast<mpc::controls::BaseControls>(layeredScreen->findScreenComponent().lock()).get();
 }
 
 controls::GlobalReleaseControls* Mpc::getReleaseControls() {
