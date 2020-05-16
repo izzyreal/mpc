@@ -16,6 +16,11 @@
 
 #include <lang/StrUtil.hpp>
 
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/window/TimingCorrectScreen.hpp>
+
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens::window;
 using namespace mpc::ui::sequencer;
 using namespace std;
 
@@ -129,7 +134,8 @@ void NextSeqObserver::displayTempoSource()
 
 void NextSeqObserver::displayTiming()
 {
-	auto noteValue = Mpc::instance().getUis().lock()->getSequencerWindowGui()->getNoteValue();
+	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timingcorrect"));
+	auto noteValue = timingCorrectScreen->getNoteValue();
     timingField.lock()->setText(mpc::lcdgui::screens::SequencerScreen::timingCorrectNames[noteValue]);
 }
 

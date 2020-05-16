@@ -9,8 +9,7 @@ using namespace std;
 
 SequencerWindowGui::SequencerWindowGui() 
 {
-	swing = 50;
-	noteValue = 3;
+
 	inPlay = true;
 	inRec = true;
 	receiveCh = 0;
@@ -128,54 +127,6 @@ void SequencerWindowGui::setTempoChangeOffset(int i)
 	notifyObservers(string("offset"));
 }
 
-int SequencerWindowGui::getAmount()
-{
-    return amount;
-}
-
-void SequencerWindowGui::setAmount(int i)
-{
-    if(i < 0)
-        return;
-
-    if(noteValue == 0 && i > 0)
-        return;
-
-    if(noteValue == 1 && i > 23)
-        return;
-
-    if(noteValue == 2 && i > 15)
-        return;
-
-    if(noteValue == 3 && i > 11)
-        return;
-
-    if(noteValue == 4 && i > 7)
-        return;
-
-    if(noteValue == 5 && i > 5)
-        return;
-
-    if(noteValue == 6 && i > 3)
-        return;
-
-    amount = i;
-    setChanged();
-    notifyObservers(string("amount"));
-}
-
-bool SequencerWindowGui::isShiftTimingLater()
-{
-    return shiftTimingLater;
-}
-
-void SequencerWindowGui::setShiftTimingLater(bool b)
-{
-    shiftTimingLater = b;
-    setChanged();
-    notifyObservers(string("shifttiming"));
-}
-
 int SequencerWindowGui::getMidiNote0()
 {
     return midiNote0;
@@ -208,64 +159,6 @@ void SequencerWindowGui::setMidiNote1(int i)
     midiNote1 = i;
     setChanged();
     notifyObservers(string("notes"));
-}
-
-int SequencerWindowGui::getSwing()
-{
-    return swing;
-}
-
-void SequencerWindowGui::setSwing(int i)
-{
-    if(i < 50 || i > 75)
-        return;
-
-    swing = i;
-    setChanged();
-    notifyObservers(string("swing"));
-}
-
-int SequencerWindowGui::getNoteValue()
-{
-    return noteValue;
-}
-
-void SequencerWindowGui::setNoteValue(int i)
-{
-	if (i < 0 || i > 6)
-		return;
-
-	noteValue = i;
-	if (noteValue == 0) {
-		setAmount(0);
-	}
-	if (noteValue == 2) {
-		if (amount > 15)
-			setAmount(15);
-
-	}
-	if (noteValue == 3) {
-		if (amount > 11)
-			setAmount(11);
-
-	}
-	if (noteValue == 4) {
-		if (amount > 7)
-			setAmount(7);
-
-	}
-	if (noteValue == 5) {
-		if (amount > 5)
-			setAmount(5);
-
-	}
-	if (noteValue == 6) {
-		if (amount > 3)
-			setAmount(3);
-
-	}
-	setChanged();
-	notifyObservers(string("notevalue"));
 }
 
 int SequencerWindowGui::getTime0()

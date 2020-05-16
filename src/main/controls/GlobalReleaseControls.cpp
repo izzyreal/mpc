@@ -21,6 +21,11 @@
 #include <sequencer/Sequencer.hpp>
 #include <mpc/MpcSoundPlayerChannel.hpp>
 
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/window/TimingCorrectScreen.hpp>
+
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens::window;
 using namespace mpc::controls;
 using namespace std;
 
@@ -102,18 +107,23 @@ void GlobalReleaseControls::simplePad(int i)
 		auto newDur = static_cast<int>(Mpc::instance().getAudioMidiServices().lock()->getFrameSequencer().lock()->getTickPosition());
 		sequencer.lock()->stopMetronomeTrack();
 		bool adjustedRecordedNote = lTrk->adjustDurLastEvent(newDur);
-		if (adjustedRecordedNote && maybeRecWithoutPlaying) {
+		
+		if (adjustedRecordedNote && maybeRecWithoutPlaying)
+		{
+			auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timingcorrect"));
+			auto noteValue = timingCorrectScreen->getNoteValue();
+
 			auto swGui = Mpc::instance().getUis().lock()->getSequencerWindowGui();
-			int noteVal = swGui->getNoteValue();
+			int noteVal = timingCorrectScreen->getNoteValue();
 			int stepLength = sequencer.lock()->getTickValues()[noteVal];
 			int nextPos = sequencer.lock()->getTickPosition() + stepLength;
-			//MLOG("\nnextpos1: " + to_string(nextPos));
 			auto bar = sequencer.lock()->getCurrentBarNumber() + 1;
 			nextPos = lTrk->timingCorrectTick(0, bar, nextPos, stepLength);
-			//MLOG("nextpos2: " + to_string(nextPos));
 			auto lastTick = sequencer.lock()->getActiveSequence().lock()->getLastTick();
-			if (nextPos != 0 && nextPos < lastTick) {
-				nextPos = lTrk->swingTick(nextPos, noteVal, swGui->getSwing());
+			
+			if (nextPos != 0 && nextPos < lastTick)
+			{
+				nextPos = lTrk->swingTick(nextPos, noteVal, timingCorrectScreen->getSwing());
 				sequencer.lock()->move(nextPos);
 			}
 			else {

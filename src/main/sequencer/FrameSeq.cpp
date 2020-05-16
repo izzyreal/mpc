@@ -16,8 +16,11 @@
 #include <ui/sequencer/SongGui.hpp>
 #include <ui/sequencer/window/SequencerWindowGui.hpp>
 
-//#include <controls/BaseControls.hpp>
+#include <lcdgui/screens/window/TimingCorrectScreen.hpp>
+#include <lcdgui/Screens.hpp>
 
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 using namespace std;
 
@@ -48,11 +51,14 @@ void FrameSeq::work(int nFrames) {
 	if (!running) {
 		return;
 	}
-	auto controls = Mpc::instance().getControls().lock();
-	auto swGui = Mpc::instance().getUis().lock()->getSequencerWindowGui();
-	auto songGui = Mpc::instance().getUis().lock()->getSongGui();
+	auto& mpc = mpc::Mpc::instance();
+	
+	auto controls = mpc.getControls().lock();
+	auto swGui = mpc.getUis().lock()->getSequencerWindowGui();
+	auto songGui = mpc.getUis().lock()->getSongGui();
 	auto lSequencer = sequencer.lock();
 	
+
 	frameCounter += nFrames;
 	
 	if (frameCounter > 2048) {
@@ -64,39 +70,53 @@ void FrameSeq::work(int nFrames) {
 
 	auto seq = lSequencer->getCurrentlyPlayingSequence().lock();
 	double tempo = lSequencer->getTempo().toDouble();
-	if (tempo != clock.getBpm()) {
+	if (tempo != clock.getBpm())
+	{
 		clock.set_bpm(tempo);
 		lSequencer->notify("tempo");
 	}
+	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timingcorrect"));
 
-	for (int i = 0; i < nFrames; i++) {
-		if (clock.proc()) {
+	int tcValue = lSequencer->getTickValues()[timingCorrectScreen->getNoteValue()];
+	int swingPercentage = timingCorrectScreen->getSwing();
+	int swingOffset = (int)((swingPercentage - 50) * (4.0 * 0.01) * (tcValue * 0.5));
+	int start = (*seq->getBarLengths())[seq->getFirstLoopBar()];
+
+	for (int i = 0; i < nFrames; i++)
+	{
+		if (clock.proc())
+		{
 			tickFrameOffset = i;
 
-			if (controls && controls->isTapPressed()) {
-				int tcValue = lSequencer->getTickValues().at(swGui->getNoteValue());
-				int swingPercentage = swGui->getSwing();
-				if (tcValue == 24 || tcValue == 48) {
-					int swingOffset = (int)((swingPercentage - 50) * (4.0 / 100.0) * (tcValue / 2.0));
-					if (getTickPosition() % (tcValue * 2) == swingOffset + tcValue) {
+			if (controls && controls->isTapPressed())
+			{				
+				
+				if (tcValue == 24 || tcValue == 48)
+				{
+					if (getTickPosition() % (tcValue * 2) == swingOffset + tcValue)
+					{
 						repeatPad(getTickPosition());
 					}
-					else if (getTickPosition() % (tcValue * 2) == 0) {
+					else if (getTickPosition() % (tcValue * 2) == 0)
+					{
 						repeatPad(getTickPosition());
 					}
 				}
-				else {
-					if (getTickPosition() % tcValue == 0) {
+				else
+				{
+					if (getTickPosition() % tcValue == 0)
+					{
 						repeatPad(getTickPosition());
 					}
 				}
 			}
 
-			if (!metronome) {
-				if (lSequencer->isCountingIn()) {
-					int start = seq->getBarLengths()->at(seq->getFirstLoopBar());
-
-					if (getTickPosition() >= start - 1) {
+			if (!metronome)
+			{
+				if (lSequencer->isCountingIn())
+				{
+					if (getTickPosition() >= start - 1)
+					{
 						lSequencer->playToTick(start - 1);
 						move(seq->isLoopEnabled() ? seq->getLoopStart() : 0);
 						lSequencer->setCountingIn(false);
@@ -108,7 +128,8 @@ void FrameSeq::work(int nFrames) {
 					}
 				}
 
-				if (getTickPosition() >= seq->getLastTick() - 1 && !lSequencer->isSongModeEnabled() && lSequencer->getNextSq() != -1) {
+				if (getTickPosition() >= seq->getLastTick() - 1 && !lSequencer->isSongModeEnabled() && lSequencer->getNextSq() != -1)
+				{
 					lSequencer->playToTick(getTickPosition());
 					checkNextSq();
 					sequencer.lock()->move(0);
@@ -117,60 +138,78 @@ void FrameSeq::work(int nFrames) {
 					move(0);
 					continue;
 				}
-				else if (lSequencer->isSongModeEnabled()) {
-					if (getTickPosition() >= seq->getLastTick() - 1) {
+				else if (lSequencer->isSongModeEnabled())
+				{
+					if (getTickPosition() >= seq->getLastTick() - 1)
+					{
 						Sequencer::repeats++;
 						auto song = lSequencer->getSong(songGui->getSelectedSongIndex()).lock();
 						auto step = songGui->getOffset() + 1;
-						if (step == song->getStepAmount() - 1 && Sequencer::repeats == song->getStep(step)->getRepeats()) {
-							if (!songGui->isLoopEnabled()) {
+						if (step == song->getStepAmount() - 1 && Sequencer::repeats == song->getStep(step)->getRepeats())
+						{
+							if (!songGui->isLoopEnabled())
+							{
 								lSequencer->playToTick(seq->getLastTick() - 1);
 								Sequencer::endOfSong = true;
 								lSequencer->stop();
 								lSequencer->move(seq->getLastTick());
 								continue;
 							}
-							else {
+							else
+							{
 								lSequencer->playToTick(seq->getLastTick() - 1);
 								songGui->setOffset(-1);
 								move(0);
 								continue;
 							}
 						}
-						else {
+						else
+						{
 							lSequencer->playToTick(seq->getLastTick() - 1);
-							if (Sequencer::repeats == song->getStep(step)->getRepeats()) {
+							
+							if (Sequencer::repeats == song->getStep(step)->getRepeats())
+							{
 								Sequencer::repeats = 0;
 								songGui->setOffset(songGui->getOffset() + 1);
 							}
+							
 							move(0);
 							continue;
 						}
 					}
 				}
-				else if (seq->isLoopEnabled()) {
-					if (getTickPosition() >= seq->getLoopEnd() - 1) {
+				else if (seq->isLoopEnabled())
+				{
+					if (getTickPosition() >= seq->getLoopEnd() - 1)
+					{
 						lSequencer->playToTick(getTickPosition());
 						move(seq->getLoopStart());	
-						if (lSequencer->isRecordingOrOverdubbing()) {
-							if (lSequencer->isRecording()) {
+					
+						if (lSequencer->isRecordingOrOverdubbing())
+						{
+							if (lSequencer->isRecording())
+							{
 								lSequencer->switchRecordToOverDub();
 							}
-							if (lSequencer->isRecordingModeMulti()) {
-								for (auto& t : seq->getTracks()) {
+							if (lSequencer->isRecordingModeMulti())
+							{
+								for (auto& t : seq->getTracks())
+								{
 									t.lock()->removeDoubles();
 								}
 							}
-							else {
+							else
+							{
 								seq->getTrack(lSequencer->getActiveTrackIndex()).lock()->removeDoubles();
 							}
 						}
 						continue;
 					}
 				}
-				else {
-					if (getTickPosition() >= seq->getLastTick()) {
-						MLOG("seq lastTick " + to_string(seq->getLastTick()));
+				else
+				{
+					if (getTickPosition() >= seq->getLastTick())
+					{
 						lSequencer->stop(seq->getLastTick());
 						lSequencer->move(seq->getLastTick());
 					}
@@ -186,9 +225,7 @@ int FrameSeq::getEventFrameOffset(int tick) {
 }
 
 void FrameSeq::stop() {
-	MLOG("frameSeq stop")
 	if (!running) {
-		MLOG("... but it's not running")
 		return;
 	}
 	running = false;

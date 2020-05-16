@@ -36,7 +36,6 @@ SequencerWindowObserver::SequencerWindowObserver()
 	softThruNames = {"OFF", "AS TRACK", "OMNI-A", "OMNI-B", "OMNI-AB" };
 	editTypeNames = { "ADD VALUE", "SUB VALUE", "MULT VAL%", "SET TO VAL" };
 	typeNames = { "NOTES", "PITCH BEND", "PROG CHANGE", "CH PRESSURE", "POLY PRESS", "EXCLUSIVE", "BANK SEL MSB", "MOD WHEEL", "BREATH CONT", "03", "FOOT CONTROL", "PORTA TIME", "DATA ENTRY", "MAIN VOLUME", "BALANCE", "09", "PAN", "EXPRESSION", "EFFECT 1"	, "EFFECT 2", "14", "15", "GEN.PUR. 1", "GEN.PUR. 2", "GEN.PUR. 3", "GEN.PUR. 4", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "BANK SEL LSB", "MOD WHEL LSB", "BREATH LSB", "35", "FOOT CNT LSB", "PORT TIME LS", "DATA ENT LSB", "MAIN VOL LSB", "BALANCE LSB", "41", "PAN LSB", "EXPRESS LSB", "EFFECT 1 LSB", "EFFECT 2 MSB", "46", "47", "GEN.PUR.1 LS", "GEN.PUR.2 LS", "GEN.PUR.3 LS", "GEN.PUR.4 LS", "52", "53", "54", "55", "56", "57", "58", "59", "60", "61", "62", "63", "SUSTAIN PDL", "PORTA PEDAL", "SOSTENUTO", "SOFT PEDAL", "LEGATO FT SW", "HOLD 2", "SOUND VARI", "TIMBER/HARMO", "RELEASE TIME", "ATTACK TIME", "BRIGHTNESS", "SOUND CONT 6", "SOUND CONT 7", "SOUND CONT 8", "SOUND CONT 9", "SOUND CONT10", "GEN.PUR. 5", "GEN.PUR. 6", "GEN.PUR. 7", "GEN.PUR. 8", "PORTA CNTRL", "85", "86", "87", "88", "89", "90", "EXT EFF DPTH", "TREMOLO DPTH", "CHORUS DEPTH", " DETUNE DEPTH", "PHASER DEPTH", "DATA INCRE", "DATA DECRE", "NRPN LSB", "NRPN MSB", "RPN LSB", "RPN MSB", "102", "103", "104", "105", "106", "107" "108", "109", "110", "111", "112", "113", "114", "115", "116", "117", "118", "119", "ALL SND OFF", "RESET CONTRL", "LOCAL ON/OFF", "ALL NOTE OFF", "OMNI OFF", "OMNI ON", "MONO MODE ON", "POLY MODE ON" };
-	noteValueNames = { "OFF", "1/8", "1/8(3)", "1/16", "1/16(3)", "1/32", "1/32(3)" };
 	nameGui = Mpc::instance().getUis().lock()->getNameGui();
 	samplerGui = Mpc::instance().getUis().lock()->getSamplerGui();
 	inNames = vector<string>(34);
@@ -164,16 +163,6 @@ SequencerWindowObserver::SequencerWindowObserver()
 	else if (csn.compare("copytrack") == 0)
 	{
 		displayTrackNumberNames();
-	}
-	else if (csn.compare("timingcorrect") == 0)
-	{
-		swGui->setTime1(seq->getLastTick());
-		displayNoteValue();
-		displaySwing();
-		displayShiftTiming();
-		displayAmount();
-		displayTime();
-		displayNotes();
 	}
 	else if (csn.compare("changetsig") == 0)
 	{
@@ -378,28 +367,6 @@ void SequencerWindowObserver::displayNewTsig()
 	newTsigField.lock()->setText(mpc::Util::distributeTimeSig(result));
 }
 
-void SequencerWindowObserver::displayNoteValue()
-{
-    if(swGui->getNoteValue() != 0) {
-        fb->enable(4);
-    } else {
-        fb->disable(4);
-    }
-    noteValueField.lock()->setText(noteValueNames[swGui->getNoteValue()]);
-    if(swGui->getNoteValue() == 1 || swGui->getNoteValue() == 3) {
-        swingLabel.lock()->Hide(false);
-        swingField.lock()->Hide(false);
-    } else {
-        swingLabel.lock()->Hide(true);
-        swingField.lock()->Hide(true);
-    }
-}
-
-void SequencerWindowObserver::displaySwing()
-{
-    swingField.lock()->setText(to_string(swGui->getSwing()));
-}
-
 void SequencerWindowObserver::displayNotes()
 {
 	auto lSampler = sampler.lock();
@@ -435,17 +402,6 @@ void SequencerWindowObserver::displayTime()
 	time5Field.lock()->setTextPadded(SeqUtil::getClockNumber(s, swGui->getTime1()), "0");
 }
 
-void SequencerWindowObserver::displayShiftTiming()
-{
-    shiftTimingField.lock()->setText(swGui->isShiftTimingLater() ? "LATER" : "EARLIER");
-}
-
-void SequencerWindowObserver::displayAmount()
-{
-    amountField.lock()->setText(to_string(swGui->getAmount()));
-}
-
-
 void SequencerWindowObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 {
 	string s = nonstd::any_cast<string>(arg);
@@ -466,7 +422,7 @@ void SequencerWindowObserver::update(moduru::observer::Observable* o, nonstd::an
 
 	if (s.compare("padandnote") == 0)
 	{
-		if (csn.compare("erase") == 0 || csn.compare("timingcorrect") == 0)
+		if (csn.compare("erase") == 0)
 		{
 			displayNotes();
 		}
@@ -498,22 +454,6 @@ void SequencerWindowObserver::update(moduru::observer::Observable* o, nonstd::an
 	else if (s.compare("time") == 0)
 	{
 		displayTime();
-	}
-	else if (s.compare("notevalue") == 0)
-	{
-		displayNoteValue();
-	}
-	else if (s.compare("swing") == 0)
-	{
-		displaySwing();
-	}
-	else if (s.compare("shifttiming") == 0)
-	{
-		displayShiftTiming();
-	}
-	else if (s.compare("amount") == 0)
-	{
-		displayAmount();
 	}
 	else if (s.compare("notes") == 0)
 	{

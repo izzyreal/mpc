@@ -4,6 +4,12 @@
 #include <ui/sequencer/window/SequencerWindowGui.hpp>
 #include <sequencer/Sequencer.hpp>
 
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/window/TimingCorrectScreen.hpp>
+
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens::window;
+
 using namespace mpc::file::all;
 using namespace std;
 
@@ -24,7 +30,11 @@ mpc::file::all::Sequencer::Sequencer()
 	auto seq = Mpc::instance().getSequencer().lock();
 	saveBytes[SEQ_OFFSET] = seq->getActiveSequenceIndex();
 	saveBytes[TR_OFFSET] = seq->getActiveTrackIndex();
-	saveBytes[TC_OFFSET] = Mpc::instance().getUis().lock()->getSequencerWindowGui()->getNoteValue();
+
+	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timingcorrect"));
+	auto noteValue = timingCorrectScreen->getNoteValue();
+
+	saveBytes[TC_OFFSET] = noteValue;
 	saveBytes[SECOND_SEQ_ENABLED_OFFSET] = seq->isSecondSequenceEnabled() ? 1 : 0;
 	saveBytes[SECOND_SEQ_INDEX_OFFSET] = seq->getSecondSequenceIndex();
 }

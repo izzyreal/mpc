@@ -59,7 +59,6 @@ namespace mpc::ui::sequencer::window
 		std::vector<std::string> inNames;
 		std::vector<std::string> editTypeNames;
 		std::vector<std::string> typeNames;
-		std::vector<std::string> noteValueNames;
 		std::string csn{ "" };
 		std::weak_ptr<mpc::sequencer::Sequencer> sequencer;
 		std::weak_ptr<mpc::sampler::Sampler> sampler;
@@ -143,12 +142,8 @@ namespace mpc::ui::sequencer::window
 		void displayFirstBar();
 		void displayBars();
 		void displayNewTsig();
-		void displayNoteValue();
-		void displaySwing();
 		void displayNotes();
 		void displayTime();
-		void displayShiftTiming();
-		void displayAmount();
 
 	public:
 		void update(moduru::observer::Observable* o, nonstd::any arg) override;

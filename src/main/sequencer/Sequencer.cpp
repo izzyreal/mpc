@@ -33,6 +33,12 @@
 #include <System.hpp>
 #include <lang/StrUtil.hpp>
 
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/window/TimingCorrectScreen.hpp>
+
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens::window;
+
 using namespace mpc::sequencer;
 using namespace std;
 
@@ -602,8 +608,11 @@ void Sequencer::stop(int tick)
 
 	int frameOffset = tick == -1 ? 0 : ams->getFrameSequencer().lock()->getEventFrameOffset(tick);
 	ams->getFrameSequencer().lock()->stop();
-    if (recording || overdubbing)
-        s2->getTrack(activeTrackIndex).lock()->correctTimeRange(0, s2->getLastTick(), TICK_VALUES[Mpc::instance().getUis().lock()->getSequencerWindowGui()->getNoteValue()]);
+	if (recording || overdubbing) {
+		auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timingcorrect"));
+		auto noteValue = timingCorrectScreen->getNoteValue();
+		s2->getTrack(activeTrackIndex).lock()->correctTimeRange(0, s2->getLastTick(), TICK_VALUES[noteValue]);
+	}
 
     auto notifynextsq = false;
 	if (nextsq != -1) {
@@ -1150,8 +1159,10 @@ void Sequencer::notifyTimeDisplayRealtime()
 
 void Sequencer::goToPreviousStep()
 {
-	auto swGui = Mpc::instance().getUis().lock()->getSequencerWindowGui();
-	auto stepSize = TICK_VALUES[swGui->getNoteValue()];
+	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timingcorrect"));
+	auto noteValue = timingCorrectScreen->getNoteValue();
+
+	auto stepSize = TICK_VALUES[noteValue];
 	auto pos = getTickPosition();
 	auto stepAmt = static_cast<int>(ceil(getActiveSequence().lock()->getLastTick() / stepSize)) + 1;
 	auto stepGrid = vector<int>(stepAmt);
@@ -1177,8 +1188,10 @@ void Sequencer::goToPreviousStep()
 
 void Sequencer::goToNextStep()
 {
-	auto swGui = Mpc::instance().getUis().lock()->getSequencerWindowGui();
-	auto stepSize = TICK_VALUES[swGui->getNoteValue()];
+	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timingcorrect"));
+	auto noteValue = timingCorrectScreen->getNoteValue();
+
+	auto stepSize = TICK_VALUES[noteValue];
 	auto pos = getTickPosition();
 
 	auto stepGrid = vector<int>(ceil(getActiveSequence().lock()->getLastTick() / stepSize));

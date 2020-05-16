@@ -19,6 +19,12 @@
 #include <sequencer/ChannelPressureEvent.hpp>
 #include <sequencer/MixerEvent.hpp>
 
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/window/TimingCorrectScreen.hpp>
+
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens::window;
+
 using namespace mpc::sequencer;
 using namespace std;
 
@@ -195,9 +201,13 @@ void Track::addEventRealTime(shared_ptr<Event> event)
 			}
 		}
 	}
-    tcValue = Mpc::instance().getUis().lock()->getSequencerWindowGui()->getNoteValue();
+	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timingcorrect"));
+	tcValue = timingCorrectScreen->getNoteValue();
+	
 	auto lSequencer = sequencer.lock();
-	if (tcValue > 0 && dynamic_pointer_cast<NoteEvent>(event)) {
+	
+	if (tcValue > 0 && dynamic_pointer_cast<NoteEvent>(event))
+	{
 		timingCorrect(0, parent->getLastBar(), dynamic_cast<NoteEvent*>(event.get()), lSequencer->getTickValues()[tcValue]);
 	}
 	events.push_back(std::move(event));

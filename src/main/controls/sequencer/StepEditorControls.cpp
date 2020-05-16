@@ -7,8 +7,12 @@
 #include <command/CopySelectedNote.hpp>
 #include <command/CopySelectedNotes.hpp>
 #include <command/RemoveEvents.hpp>
+
 #include <lcdgui/Field.hpp>
 #include <lcdgui/Label.hpp>
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/window/TimingCorrectScreen.hpp>
+
 #include <ui/sequencer/StepEditorGui.hpp>
 #include <ui/sequencer/window/SequencerWindowGui.hpp>
 #include <sequencer/ChannelPressureEvent.hpp>
@@ -25,6 +29,8 @@
 #include <sequencer/Sequencer.hpp>
 #include <sequencer/SystemExclusiveEvent.hpp>
 
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens::window;
 using namespace mpc::controls::sequencer;
 using namespace mpc::sequencer;
 using namespace std;
@@ -203,7 +209,9 @@ void StepEditorControls::turnWheel(int i)
 		sequencer.lock()->setClock(sequencer.lock()->getCurrentClockNumber() + i);
 	}
 	else if (param.compare("tcvalue") == 0) {
-		swGui->setNoteValue(swGui->getNoteValue() + i);
+		auto screen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timingcorrect"));
+		auto noteValue = screen->getNoteValue();
+		screen->setNoteValue(noteValue + i);
 	}
 	else if (param.compare("fromnote") == 0) {
 		if (lTrk->getBusNumber() != 0) seGui->setFromNotePad(seGui->getFromNotePad() + i);

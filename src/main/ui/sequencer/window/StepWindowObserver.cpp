@@ -22,6 +22,11 @@
 #include <sequencer/Sequencer.hpp>
 #include <mpc/MpcSoundPlayerChannel.hpp>
 
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/window/TimingCorrectScreen.hpp>
+
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens::window;
 using namespace mpc::ui::sequencer::window;
 using namespace mpc::sequencer;
 using namespace std;
@@ -39,6 +44,7 @@ StepWindowObserver::StepWindowObserver()
 	xPosDouble = { 60, 84 };
 	yPosDouble = { 22, 33 };
 	doubleLabels = { "Edit type:", "Value:" };
+
 	sequencer = Mpc::instance().getSequencer();
 	sampler = Mpc::instance().getSampler();
 	seqGui = Mpc::instance().getUis().lock()->getStepEditorGui();
@@ -46,31 +52,45 @@ StepWindowObserver::StepWindowObserver()
 	swGui = Mpc::instance().getUis().lock()->getSequencerWindowGui();
 	swGui->addObserver(this);
 	seqGui->addObserver(this);
+	
+
 	auto lSequencer = sequencer.lock();
 	auto seqNum = lSequencer->getActiveSequenceIndex();
 	auto trackNum = lSequencer->getActiveTrackIndex();
 	track = lSequencer->getSequence(seqNum).lock()->getTrack(trackNum);
 	auto lSampler = sampler.lock();
-	if (track.lock()->getBusNumber() != 0) {
+	
+	if (track.lock()->getBusNumber() != 0)
+	{
 		mpcSoundPlayerChannel = lSampler->getDrum(track.lock()->getBusNumber() - 1);
 		program = dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
 	}
+	
 	lSequencer->addObserver(this);
+	
 	auto ls = Mpc::instance().getLayeredScreen().lock();
 	auto csn = ls->getCurrentScreenName();
-	if (csn.compare("step_tc") == 0) {
-		tcValueField = ls->lookupField("tcvalue");
-		tcValueField.lock()->setText(timingCorrectNames[swGui->getNoteValue()]);
+
+	tcValueField = ls->lookupField("tcvalue");
+	eventtypeField = ls->lookupField("eventtype");
+	editMultiParam0Label = ls->lookupLabel("value0");
+	editMultiParam1Label = ls->lookupLabel("value1");
+	editMultiValue0Field = ls->lookupField("value0");
+	editMultiValue1Field = ls->lookupField("value1");
+
+	if (csn.compare("step_tc") == 0)
+	{
+		auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timingcorrect"));
+		auto noteValue = timingCorrectScreen->getNoteValue();
+
+		tcValueField.lock()->setText(timingCorrectNames[noteValue]);
 	}
-	else if (csn.compare("insertevent") == 0) {
-		eventtypeField = ls->lookupField("eventtype");
+	else if (csn.compare("insertevent") == 0)
+	{
 		eventtypeField.lock()->setText(eventTypeNames[seqGui->getInsertEventType()]);
 	}
-	else if (csn.compare("editmultiple") == 0) {
-		editMultiParam0Label = ls->lookupLabel("value0");
-		editMultiParam1Label = ls->lookupLabel("value1");
-		editMultiValue0Field = ls->lookupField("value0");
-		editMultiValue1Field = ls->lookupField("value1");
+	else if (csn.compare("editmultiple") == 0)
+	{
 		updateEditMultiple();
 	}
 }
@@ -78,8 +98,11 @@ StepWindowObserver::StepWindowObserver()
 void StepWindowObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 {
 	string s = nonstd::any_cast<string>(arg);
+
 	if (s.compare("notevalue") == 0) {
-		tcValueField.lock()->setText(timingCorrectNames[swGui->getNoteValue()]);
+		auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timingcorrect"));
+		auto noteValue = timingCorrectScreen->getNoteValue();
+		tcValueField.lock()->setText(timingCorrectNames[noteValue]);
 	}
 	else if (s.compare("eventtype") == 0) {
 		eventtypeField.lock()->setText(eventTypeNames[seqGui->getInsertEventType()]);

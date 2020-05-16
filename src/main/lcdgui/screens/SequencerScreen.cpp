@@ -9,6 +9,8 @@
 
 #include <sampler/Sampler.hpp>
 
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <lcdgui/Parameter.hpp>
 #include <lcdgui/Label.hpp>
 #include <lcdgui/Field.hpp>
@@ -24,6 +26,7 @@
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui::screens::window;
 
 SequencerScreen::SequencerScreen(const int& layer)
 	: ScreenComponent("sequencer", layer)
@@ -248,7 +251,8 @@ vector<string> SequencerScreen::timingCorrectNames = vector<string>{ "OFF", "1/8
 
 void SequencerScreen::displayTiming()
 {
-	findField("timing").lock()->setText(timingCorrectNames[mpc::Mpc::instance().getUis().lock()->getSequencerWindowGui()->getNoteValue()]);
+	auto noteValue = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timingcorrect"))->getNoteValue();
+	findField("timing").lock()->setText(timingCorrectNames[noteValue]);
 }
 
 void SequencerScreen::update(moduru::observer::Observable* o, nonstd::any arg)
@@ -267,19 +271,17 @@ void SequencerScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 	auto nextSqField = findField("nextsq").lock();
 	auto nextSqLabel = findLabel("nextsq").lock();
 
-
-
 	if (s.compare("nextsqvalue") == 0)
 	{
 		nextSqField->setTextPadded(sequencer.lock()->getNextSq() + 1, " ");
 	}
 	else if (s.compare("nextsq") == 0)
 	{
-		//ls->drawFunctionKeys("nextsq");
+		ls.lock()->drawFunctionKeys("nextsq");
 		if (nextSqField->IsHidden()) {
 			nextSqField->Hide(false);
 			nextSqLabel->Hide(false);
-			//ls->setFocus("nextsq");
+			ls.lock()->setFocus("nextsq");
 		}
 		nextSqField->setTextPadded(sequencer.lock()->getNextSq() + 1, " ");
 	}
@@ -287,12 +289,8 @@ void SequencerScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 	{
 		nextSqField->Hide(true);
 		nextSqLabel->Hide(true);
-		//ls->drawFunctionKeys("sequencer");
-		//ls->setFocus("sq");
-	}
-	else if (s.compare("notevalue") == 0)
-	{
-		displayTiming();
+		ls.lock()->drawFunctionKeys("sequencer");
+		ls.lock()->setFocus("sq");
 	}
 	else if (s.compare("count") == 0)
 	{
@@ -529,9 +527,11 @@ void SequencerScreen::turnWheel(int i)
 		track.lock()->setVelocityRatio(track.lock()->getVelocityRatio() + i);
 	}
 	else if (focus.compare("timing") == 0) {
-		auto sequencerWindowGui = mpc::Mpc::instance().getUis().lock()->getSequencerWindowGui();
-		sequencerWindowGui->setNoteValue(sequencerWindowGui->getNoteValue() + i);
+		auto screen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timingcorrect"));
+		auto noteValue = screen->getNoteValue();
+		screen->setNoteValue(noteValue + i);
 		setLastFocus("timingcorrect", "notevalue");
+		displayTiming();
 	}
 	else if (focus.compare("sq") == 0) {
 		if (sequencer.lock()->isPlaying()) {

@@ -45,6 +45,7 @@
 #include <audio/server/NonRealTimeAudioServer.hpp>
 
 #include <lcdgui/screens/window/Assign16LevelsScreen.hpp>
+#include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <lcdgui/Screens.hpp>
 
 using namespace mpc::lcdgui;
@@ -273,14 +274,16 @@ void BaseControls::pad(int i, int velo, bool repeat, int tick)
 void BaseControls::generateNoteOn(int nn, int padVelo, int tick)
 {
 	init();
-	auto& mpc = mpc::Mpc::instance();
 
 	auto lProgram = program.lock();
 	bool slider = lProgram && nn == lProgram->getSlider()->getNote();
 	bool posIsLastTick = sequencer.lock()->getTickPosition() == sequencer.lock()->getActiveSequence().lock()->getLastTick();
 	bool step = csn.compare("sequencer_step") == 0 && !posIsLastTick;
-	auto swGui = mpc.getUis().lock()->getSequencerWindowGui();
-	bool recMainWithoutPlaying = csn.compare("sequencer") == 0 && !sequencer.lock()->isPlaying() && mpc.getControls().lock()->isRecPressed() && swGui->getNoteValue() != 0 && !posIsLastTick;
+	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timingcorrect"));
+	auto noteValue = timingCorrectScreen->getNoteValue();
+	auto swing = timingCorrectScreen->getSwing();
+
+	bool recMainWithoutPlaying = csn.compare("sequencer") == 0 && !sequencer.lock()->isPlaying() && mpc.getControls().lock()->isRecPressed() && timingCorrectScreen->getNoteValue() != 0 && !posIsLastTick;
 
 	shared_ptr<mpc::sequencer::NoteEvent> n;
 
@@ -295,26 +298,29 @@ void BaseControls::generateNoteOn(int nn, int padVelo, int tick)
 		else if (recMainWithoutPlaying)
 		{
 			n = track.lock()->addNoteEvent(sequencer.lock()->getTickPosition(), nn).lock();
-			int noteVal = swGui->getNoteValue();
+			int noteVal = timingCorrectScreen->getNoteValue();
 			int stepLength = sequencer.lock()->getTickValues()[noteVal];
 			if (stepLength != 0) {
 				int bar = sequencer.lock()->getCurrentBarNumber() + 1;
 				track.lock()->timingCorrect(0, bar, n.get(), stepLength);
 				vector<weak_ptr<mpc::sequencer::Event>> events{ n };
-				track.lock()->swing(events, noteVal, swGui->getSwing(), vector<int>{0, 127});
+				track.lock()->swing(events, noteVal, timingCorrectScreen->getSwing(), vector<int>{0, 127});
 				if (n->getTick() != sequencer.lock()->getTickPosition()) {
 					sequencer.lock()->move(n->getTick());
 				}
 			}
 		}
-		else {
+		else
+		{
 			n = track.lock()->recordNoteOn().lock();
 			n->setNote(nn);
 		}
+		
 		n->setVelocity(padVelo);
 		n->setDuration(step ? 1 : -1);
 		
-		if (mpc.getHardware().lock()->getTopPanel().lock()->isSixteenLevelsEnabled() && assign16LevelsScreen->getParameter() == 1) {
+		if (mpc.getHardware().lock()->getTopPanel().lock()->isSixteenLevelsEnabled() && assign16LevelsScreen->getParameter() == 1)
+		{
 			auto type = assign16LevelsScreen->getType();
 			auto key = assign16LevelsScreen->getOriginalKeyPad();
 			auto diff = lProgram->getPadNumberFromNote(nn) - (bank_ * 16) - key;
@@ -322,11 +328,14 @@ void BaseControls::generateNoteOn(int nn, int padVelo, int tick)
 			n->setVariationTypeNumber(type);
 			n->setVariationValue(diff * 5);
 		}
-		if (slider) {
+		
+		if (slider)
+		{
 			setSliderNoteVar(n.get(), program);
 		}
 
-		if (step || recMainWithoutPlaying) {
+		if (step || recMainWithoutPlaying)
+		{
 			sequencer.lock()->playMetronomeTrack();
 		}
 	}

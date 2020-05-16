@@ -29,8 +29,13 @@
 #include <sequencer/Song.hpp>
 #include <sequencer/TempoChangeEvent.hpp>
 
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/window/TimingCorrectScreen.hpp>
+
 #include <thirdp/bcmath/bcmath_stl.h>
 
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens::window;
 using namespace mpc::disk;
 using namespace mpc::file::all;
 using namespace std;
@@ -86,8 +91,12 @@ AllLoader::AllLoader(mpc::disk::MpcFile* file, bool sequencesOnly)
 		auto sequencer = allParser->getSequencer();
 		lSequencer->setActiveSequenceIndex(sequencer->sequence);
 		lSequencer->setSelectedTrackIndex(sequencer->track);
+		
+		auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timingcorrect"));
+		
+		timingCorrectScreen->setNoteValue(sequencer->tc);
+		
 		auto swGui = Mpc::instance().getUis().lock()->getSequencerWindowGui();
-		swGui->setNoteValue(sequencer->tc);
 		auto count = allParser->getCount();
 		swGui->setCountIn(count->getCountInMode());
 		swGui->setAccentVelo(count->getAccentVelo());
