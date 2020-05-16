@@ -58,15 +58,17 @@ void SequencerScreen::open()
 	displayBus();
 	displayDeviceNumber();
 
-	auto gui2 = mpc.getUis().lock()->getSequencerWindowGui();
+	auto gui = mpc.getUis().lock()->getSequencerWindowGui();
+	gui->addObserver(this);
 	sequencer.lock()->addObserver(this);
-
 	sequence.lock()->addObserver(this);
 	track.lock()->addObserver(this);
 }
 
 void SequencerScreen::close()
 {
+	auto gui = mpc.getUis().lock()->getSequencerWindowGui();
+	gui->deleteObserver(this);
 	sequencer.lock()->deleteObserver(this);
 	mpc.getUis().lock()->getSequencerWindowGui()->deleteObserver(this);
 

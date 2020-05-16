@@ -359,11 +359,24 @@ BCMath Sequence::getInitialTempo()
 void Sequence::setInitialTempo(BCMath bd)
 {
 	auto str = to_string(bd.toDouble());
-	if (str.find(".") == string::npos) str += ".0";
+	
+	if (str.find(".") == string::npos)
+	{
+		str += ".0";
+	}
+	
 	auto length = (int)(str.find(".")) + 2;
 	auto tempo = BCMath(str.substr(0, length));
-	if (tempo.toDouble() < 30.0) tempo = BCMath("30.0");
-	if (tempo.toDouble() > 300.0) tempo = BCMath("300.0");
+	
+	if (tempo.toDouble() < 30.0)
+	{
+		tempo = BCMath("30.0");
+	}
+	
+	if (tempo.toDouble() > 300.0)
+	{
+		tempo = BCMath("300.0");
+	}
 
 	initialTempo = tempo;
 	setChanged();

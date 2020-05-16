@@ -668,16 +668,23 @@ weak_ptr<Field> LayeredScreen::findBelow(weak_ptr<Field> tf0) {
 	int minDistV = 7;
 	int maxDistH = 6 * marginChars;
 	weak_ptr<Field> result = tf0;
+	
 	auto lTf0 = tf0.lock();
-	for (auto& a : getFocusedLayer().lock()->findFields()) {
+	
+	for (auto& a : getFocusedLayer().lock()->findFields())
+	{
 		auto tf1 = a.lock();
 		auto B1 = tf1->getY() + tf1->getH();
 		auto B0 = lTf0->getY() + lTf0->getH();
 		auto MW1 = 0.5f * (float)(tf1->getX()*2 + tf1->getW());
 		auto MW0 = 0.5f * (float)(lTf0->getX() * 2 + lTf0->getW());
-		if (B1 - B0 >= minDistV) {
-			if (abs((int)(MW1 - MW0)) <= maxDistH) {
-				if (!tf1->IsHidden() && tf1->isFocusable()) {
+
+		if (B1 - B0 >= minDistV)
+		{
+			if (abs((int)(MW1 - MW0)) <= maxDistH)
+			{
+				if (!tf1->IsHidden() && tf1->isFocusable())
+				{
 					result = tf1;
 					break;
 				}

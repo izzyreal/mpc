@@ -76,11 +76,20 @@ namespace mpc::lcdgui::screens::window
 		void close() override;
 
 	public:
-		void function(int i) override;
-		void turnWheel(int i) override;
-
+		void left() override;
+		void right() override;
+		void function(int j) override;
+		void init() override;
+		void turnWheel(int j) override;
+		void down() override;
+		void up() override;
 	public:
 		void update(moduru::observer::Observable* observable, nonstd::any message) override;
+
+	private:
+		std::weak_ptr<mpc::sequencer::TempoChangeEvent> previous;
+		std::weak_ptr<mpc::sequencer::TempoChangeEvent> current;
+		std::weak_ptr<mpc::sequencer::TempoChangeEvent> next;
 
 	};
 }

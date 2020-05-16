@@ -31,7 +31,6 @@
 #include <controls/sequencer/window/MidiOutputControls.hpp>
 #include <controls/sequencer/window/MultiRecordingSetupControls.hpp>
 #include <controls/sequencer/window/PasteEventControls.hpp>
-#include <controls/sequencer/window/TempoChangeControls.hpp>
 #include <controls/sequencer/window/TimeDisplayControls.hpp>
 #include <controls/sequencer/window/TimingCorrectControls.hpp>
 #include <controls/sequencer/window/TrackControls.hpp>
@@ -162,7 +161,6 @@ Controls::Controls()
 	controls["changebars"] = new sequencer::window::ChangeBarsControls();
 	controls["changebars2"] = new sequencer::window::ChangeBars2Controls();
 	controls["timedisplay"] = new sequencer::window::TimeDisplayControls();
-	controls["tempochange"] = new sequencer::window::TempoChangeControls();
 	controls["timingcorrect"] = new sequencer::window::TimingCorrectControls();
 	controls["loopbarswindow"] = new sequencer::window::LoopBarsControls();
 	controls["editvelocity"] = new sequencer::window::EditVelocityControls();

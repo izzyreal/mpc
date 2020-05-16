@@ -20,12 +20,7 @@ namespace mpc::sequencer {
 		: public moduru::observer::Observable
 	{
 
-	public:
-		typedef moduru::observer::Observable super;
-
 	private:
-		
-
 		BCMath initialTempo = BCMath("120.0");
 
 		vector<shared_ptr<Track>> tracks{};

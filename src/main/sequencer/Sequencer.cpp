@@ -132,12 +132,17 @@ void Sequencer::setTempo(BCMath i)
 	}
 
 	auto s = getActiveSequence().lock();
-	if (s && s->isUsed() && tempoSourceSequenceEnabled) {
+
+	if (s && s->isUsed() && tempoSourceSequenceEnabled)
+	{
 		auto tce = getCurrentTempoChangeEvent().lock();
-		if (tce->getTick() == 0) {
+	
+		if (tce->getTick() == 0)
+		{
 			s->setInitialTempo(i);
 		}
-		else {
+		else
+		{
 			auto initialTempo = s->getInitialTempo();
 			auto ratio = i.toDouble() / initialTempo.toDouble();
 			tce->setRatio((int)(ratio * 1000.0));
