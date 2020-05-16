@@ -11,6 +11,7 @@
 #include <lcdgui/screens/SequencerScreen.hpp>
 #include <lcdgui/screens/window/SequenceScreen.hpp>
 #include <lcdgui/screens/window/TempoChangeScreen.hpp>
+#include <lcdgui/screens/window/CountMetronomeScreen.hpp>
 
 #include <file/FileUtil.hpp>
 
@@ -159,6 +160,10 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	else if (screenName.compare("tempochange") == 0)
 	{
 		screen = make_shared<TempoChangeScreen>(layerIndex);
+	}
+	else if (screenName.compare("countmetronome") == 0)
+	{
+		screen = make_shared<CountMetronomeScreen>(layerIndex);
 	}
 
 	if (screen)

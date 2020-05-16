@@ -109,13 +109,6 @@ namespace mpc::ui::sequencer::window
 		std::weak_ptr<mpc::lcdgui::Field> bar0Field;
 		std::weak_ptr<mpc::lcdgui::Field> bar1Field;
 		std::weak_ptr<mpc::lcdgui::Field> newTsigField;
-		std::weak_ptr<mpc::lcdgui::Field> countInField;
-		std::weak_ptr<mpc::lcdgui::Field> inPlayField;
-		std::weak_ptr<mpc::lcdgui::Field> rateField;
-		std::weak_ptr<mpc::lcdgui::Field> inRecField;
-		std::weak_ptr<mpc::lcdgui::Field> waitForKeyField;
-		std::vector<std::string> rateNames;
-		std::vector<std::string> countInNames;
 		std::weak_ptr<mpc::lcdgui::Field> numberOfBarsField;
 		std::weak_ptr<mpc::lcdgui::Field> lastBarField;
 		std::weak_ptr<mpc::lcdgui::Field> firstBarField;
@@ -169,11 +162,6 @@ namespace mpc::ui::sequencer::window
 		void displayNumberOfBars();
 		void displayLastBar();
 		void displayFirstBar();
-		void displayWaitForKey();
-		void displayInRec();
-		void displayRate();
-		void displayInPlay();
-		void displayCountIn();
 		void displayBars();
 		void displayNewTsig();
 		void displayNoteValue();

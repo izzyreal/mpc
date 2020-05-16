@@ -40,8 +40,6 @@ SequencerWindowObserver::SequencerWindowObserver()
 	noteValueNames = { "OFF", "1/8", "1/8(3)", "1/16", "1/16(3)", "1/32", "1/32(3)" };
 	displayStyleNames = { "BAR,BEAT,CLOCK", "HOUR,MINUTE,SEC" };
 	frameRateNames = { "24", "25", "30D", "30" };
-	rateNames = { "1/4", "1/4(3)", "1/8", "1/8(3)", "1/16", "1/16(3)", "1/32", "1/32(3)" };
-	countInNames = { "OFF", "REC ONLY", "REC+PLAY" };
 	nameGui = Mpc::instance().getUis().lock()->getNameGui();
 	samplerGui = Mpc::instance().getUis().lock()->getSamplerGui();
 	inNames = vector<string>(34);
@@ -123,11 +121,6 @@ SequencerWindowObserver::SequencerWindowObserver()
 	bar0Field = ls->lookupField("bar0");
 	bar1Field = ls->lookupField("bar1");
 	newTsigField = ls->lookupField("newtsig");
-	countInField = ls->lookupField("countin");
-	inPlayField = ls->lookupField("inplay");
-	rateField = ls->lookupField("rate");
-	inRecField = ls->lookupField("inrec");
-	waitForKeyField = ls->lookupField("waitforkey");
 	firstBarField = ls->lookupField("firstbar");
 	lastBarField = ls->lookupField("lastbar");
 	numberOfBarsField = ls->lookupField("numberofbars");
@@ -216,14 +209,6 @@ SequencerWindowObserver::SequencerWindowObserver()
 	{
 		displayBars();
 		displayNewTsig();
-	}
-	else if (csn.compare("countmetronome") == 0)
-	{
-		displayCountIn();
-		displayInPlay();
-		displayRate();
-		displayInRec();
-		displayWaitForKey();
 	}
 	else if (csn.compare("loopbarswindow") == 0)
 	{
@@ -458,31 +443,6 @@ void SequencerWindowObserver::displayFirstBar()
     firstBarField.lock()->setText(to_string(seq->getFirstLoopBar() + 1));
 }
 
-void SequencerWindowObserver::displayWaitForKey()
-{
-    waitForKeyField.lock()->setText(swGui->isWaitForKeyEnabled() ? "ON" : "OFF");
-}
-
-void SequencerWindowObserver::displayInRec()
-{
-    inRecField.lock()->setText(swGui->getInRec() ? "YES" : "NO");
-}
-
-void SequencerWindowObserver::displayRate()
-{
-    rateField.lock()->setText(rateNames[swGui->getRate()]);
-}
-
-void SequencerWindowObserver::displayInPlay()
-{
-    inPlayField.lock()->setText(swGui->getInPlay() ? "YES" : "NO");
-}
-
-void SequencerWindowObserver::displayCountIn()
-{
-    countInField.lock()->setText(countInNames[swGui->getCountInMode()]);
-}
-
 void SequencerWindowObserver::displayBars()
 {
     bar0Field.lock()->setText(to_string(swGui->getBar0() + 1));
@@ -676,26 +636,6 @@ void SequencerWindowObserver::update(moduru::observer::Observable* o, nonstd::an
 	else if (s.compare("timesignature") == 0)
 {
 		displayNewTsig();
-	}
-	else if (s.compare("countin") == 0)
-{
-		displayCountIn();
-	}
-	else if (s.compare("inplay") == 0)
-{
-		displayInPlay();
-	}
-	else if (s.compare("rate") == 0)
-{
-		displayRate();
-	}
-	else if (s.compare("inrec") == 0)
-{
-		displayInRec();
-	}
-	else if (s.compare("waitforkey") == 0)
-{
-		displayWaitForKey();
 	}
 	else if (s.compare("firstloopbar") == 0)
 {

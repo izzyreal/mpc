@@ -64,7 +64,6 @@ void TempoChangeScreen::open()
 
 	initVisibleEvents();
 
-	initVisibleEvents();
 	displayInitialTempo();
 	displayTempoChange0();
 	displayTempoChange1();
@@ -82,7 +81,7 @@ void TempoChangeScreen::close()
 	for (auto& t : visibleTempoChangeEvents)
 	{
 		if (t.lock()) {
-			t.lock()->deleteObservers();
+			t.lock()->deleteObserver(this);
 		}
 	}
 }
@@ -90,6 +89,13 @@ void TempoChangeScreen::close()
 void TempoChangeScreen::initVisibleEvents()
 {
 	auto seq = sequencer.lock()->getActiveSequence().lock();
+
+	for (auto& t : visibleTempoChangeEvents)
+	{
+		if (t.lock()) {
+			t.lock()->deleteObserver(this);
+		}
+	}
 
 	visibleTempoChangeEvents = vector<weak_ptr<TempoChangeEvent>>(3);
 	

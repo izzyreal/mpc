@@ -20,7 +20,6 @@
 #include <controls/sequencer/window/EraseAllOffTracksControls.hpp>
 #include <controls/sequencer/window/Assign16LevelsControls.hpp>
 #include <controls/sequencer/window/ChangeTsigControls.hpp>
-#include <controls/sequencer/window/CountMetronomeControls.hpp>
 #include <controls/sequencer/window/EditMultipleControls.hpp>
 #include <controls/sequencer/window/EditVelocityControls.hpp>
 #include <controls/sequencer/window/EraseControls.hpp>
@@ -170,7 +169,6 @@ Controls::Controls()
 	controls["transmitprogramchanges"] = new sequencer::window::TransmitProgramChangesControls();
 	controls["eraseallofftracks"] = new sequencer::window::EraseAllOffTracksControls();
 	controls["track"] = new sequencer::window::TrackControls();
-	controls["countmetronome"] = new sequencer::window::CountMetronomeControls();
 	controls["changetsig"] = new sequencer::window::ChangeTsigControls();
 	controls["editmultiple"] = new sequencer::window::EditMultipleControls();
 	controls["insertevent"] = new sequencer::window::InsertEventControls();
