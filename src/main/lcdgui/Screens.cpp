@@ -185,79 +185,79 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 		screen = make_shared<CountMetronomeScreen>(layerIndex);
 	}
 
-	else if (screenName.compare("countmetronome") == 0)
+	else if (screenName.compare("editmultiple") == 0)
 	{
 		screen = make_shared<EditMultipleScreen>(layerIndex);
 	}
-	else if (screenName.compare("countmetronome") == 0)
+	else if (screenName.compare("transmitprogramchanges") == 0)
 	{
 		screen = make_shared<TransmitProgramChangesScreen>(layerIndex);
 	}
-	else if (screenName.compare("countmetronome") == 0)
+	else if (screenName.compare("timingcorrect") == 0)
 	{
 		screen = make_shared<TimingCorrectScreen>(layerIndex);
 	}
-	else if (screenName.compare("countmetronome") == 0)
+	else if (screenName.compare("timedisplay") == 0)
 	{
 		screen = make_shared<TimeDisplayScreen>(layerIndex);
 	}
-	else if (screenName.compare("countmetronome") == 0)
+	else if (screenName.compare("pasteevent") == 0)
 	{
 		screen = make_shared<PasteEventScreen>(layerIndex);
 	}
-	else if (screenName.compare("countmetronome") == 0)
+	else if (screenName.compare("multirecordingsetup") == 0)
 	{
 		screen = make_shared<MultiRecordingSetupScreen>(layerIndex);
 	}
-	else if (screenName.compare("countmetronome") == 0)
+	else if (screenName.compare("midioutput") == 0)
 	{
 		screen = make_shared<MidiOutputScreen>(layerIndex);
 	}
-	else if (screenName.compare("countmetronome") == 0)
+	else if (screenName.compare("midiinput") == 0)
 	{
 		screen = make_shared<MidiInputScreen>(layerIndex);
 	}
-	else if (screenName.compare("countmetronome") == 0)
+	else if (screenName.compare("loopbars") == 0)
 	{
 		screen = make_shared<LoopBarsScreen>(layerIndex);
 	}
-	else if (screenName.compare("countmetronome") == 0)
+	else if (screenName.compare("insertevent") == 0)
 	{
 		screen = make_shared<InsertEventScreen>(layerIndex);
 	}
-	else if (screenName.compare("countmetronome") == 0)
+	else if (screenName.compare("eraseallofftracks") == 0)
 	{
 		screen = make_shared<EraseAllOffTracksScreen>(layerIndex);
 	}
-	else if (screenName.compare("countmetronome") == 0)
+	else if (screenName.compare("changetsig") == 0)
 	{
 		screen = make_shared<ChangeTsigScreen>(layerIndex);
 	}
-	else if (screenName.compare("countmetronome") == 0)
+	else if (screenName.compare("editvelocity") == 0)
 	{
 		screen = make_shared<EditVelocityScreen>(layerIndex);
 	}
-	else if (screenName.compare("countmetronome") == 0)
+	else if (screenName.compare("erase") == 0)
 	{
 		screen = make_shared<EraseScreen>(layerIndex);
 	}
-	else if (screenName.compare("countmetronome") == 0)
+	else if (screenName.compare("changebars") == 0)
 	{
 		screen = make_shared<ChangeBarsScreen>(layerIndex);
 	}
-	else if (screenName.compare("countmetronome") == 0)
+	else if (screenName.compare("changebars2") == 0)
 	{
 		screen = make_shared<ChangeBars2Screen>(layerIndex);
 	}
-	else if (screenName.compare("countmetronome") == 0)
+	else if (screenName.compare("track") == 0)
 	{
 		screen = make_shared<TrackScreen>(layerIndex);
 	}
-	else if (screenName.compare("countmetronome") == 0)
+	else if (screenName.compare("midimonitor") == 0)
 	{
 		screen = make_shared<MidiMonitorScreen>(layerIndex);
 	}
-	else if (screenName.compare("countmetronome") == 0)
+	else if (screenName.compare("assign16levels") == 0)
 	{
 		screen = make_shared<Assign16LevelsScreen>(layerIndex);
 	}

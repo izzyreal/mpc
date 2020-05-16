@@ -20,7 +20,6 @@
 #include <ui/sequencer/BarCopyGui.hpp>
 #include <ui/sequencer/StepEditorGui.hpp>
 
-#include <ui/sequencer/window/Assign16LevelsGui.hpp>
 #include <ui/sequencer/window/EraseGui.hpp>
 #include <ui/sequencer/window/SequencerWindowGui.hpp>
 
@@ -80,7 +79,6 @@ Uis::Uis()
 
 	eraseGui = new mpc::ui::sequencer::window::EraseGui();
 	sequencerWindowGui = new mpc::ui::sequencer::window::SequencerWindowGui();
-	assign16LevelsGui = new mpc::ui::sequencer::window::Assign16LevelsGui();
 
 	samplerGui = new mpc::ui::sampler::SamplerGui();
 	nameGui = new mpc::ui::NameGui();
@@ -108,12 +106,8 @@ Uis::Uis()
 
 	othersGui = new mpc::ui::other::OthersGui();
 }
-vector<string> Uis::noteNames;
 
-mpc::ui::sequencer::window::Assign16LevelsGui* Uis::getAssign16LevelsGui()
-{
-	return assign16LevelsGui;
-}
+vector<string> Uis::noteNames;
 
 mpc::ui::sequencer::StepEditorGui* Uis::getStepEditorGui()
 {
@@ -242,7 +236,6 @@ mpc::ui::sampler::window::EditSoundGui* Uis::getEditSoundGui() {
 
 Uis::~Uis() {
 	if (sequencerWindowGui != nullptr) delete sequencerWindowGui;
-	if (assign16LevelsGui != nullptr) delete assign16LevelsGui;
 	if (eraseGui != nullptr) delete eraseGui;
 
 	if (stepEditorGui != nullptr) delete stepEditorGui;

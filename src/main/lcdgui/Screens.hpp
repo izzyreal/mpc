@@ -25,8 +25,10 @@ namespace mpc::lcdgui
 		static std::map<std::string, std::shared_ptr<ScreenComponent>> screens;
 		static void init();
 
-	public:
+	private:
 		static std::vector<std::shared_ptr<Component>> get(const std::string& screenName, int& foundInLayer);
+
+	public:	
 		static std::shared_ptr<ScreenComponent> getScreenComponent(const std::string& screenName);
 
 	};

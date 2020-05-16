@@ -41,7 +41,6 @@
 #include <ui/sequencer/TrMoveObserver.hpp>
 #include <ui/sequencer/TrMuteObserver.hpp>
 #include <ui/sequencer/UserObserver.hpp>
-#include <ui/sequencer/window/Assign16LevelsObserver.hpp>
 #include <ui/sequencer/window/EraseObserver.hpp>
 #include <ui/sequencer/window/MetronomeSoundObserver.hpp>
 #include <ui/sequencer/window/MidiMonitorObserver.hpp>
@@ -843,9 +842,6 @@ void LayeredScreen::initObserver()
 	}
 	else if (csn.compare("assign") == 0) {
 		activeObserver = make_unique<AssignObserver>();
-	}
-	else if (csn.compare("assign16levels") == 0) {
-		activeObserver = make_unique<Assign16LevelsObserver>();
 	}
 	else if (csn.compare("metronomesound") == 0) {
 		activeObserver = make_unique<MetronomeSoundObserver>();

@@ -36,10 +36,6 @@ namespace mpc::ui {
 	class NameGui;
 }
 
-namespace mpc::ui::sequencer::window {
-	class Assign16LevelsGui;
-}
-
 namespace mpc::ui::sampler {
 	class SamplerGui;
 }
@@ -65,7 +61,6 @@ namespace mpc::controls {
 		std::weak_ptr<mpc::lcdgui::LayeredScreen> ls;
 		mpc::ui::NameGui* nameGui = nullptr;
 		ui::sampler::SamplerGui* samplerGui = nullptr;
-		ui::sequencer::window::Assign16LevelsGui* assign16LevelsGui = nullptr;
 		std::weak_ptr<mpc::lcdgui::Field> activeField;
 
 		int bank_{ 0 };

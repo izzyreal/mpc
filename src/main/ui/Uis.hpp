@@ -78,7 +78,6 @@ namespace mpc::ui {
 
 		mpc::ui::sequencer::window::EraseGui* eraseGui = nullptr;
 		mpc::ui::sequencer::window::SequencerWindowGui* sequencerWindowGui = nullptr;
-		mpc::ui::sequencer::window::Assign16LevelsGui* assign16LevelsGui = nullptr;
 
 		mpc::ui::sampler::SoundGui* soundGui = nullptr;
 		mpc::ui::sampler::SamplerGui* samplerGui = nullptr;
@@ -125,7 +124,6 @@ namespace mpc::ui {
 
 		mpc::ui::sequencer::window::EraseGui* getEraseGui();
 		mpc::ui::sequencer::window::SequencerWindowGui* getSequencerWindowGui();
-		mpc::ui::sequencer::window::Assign16LevelsGui* getAssign16LevelsGui();
 
 		mpc::ui::other::OthersGui* getOthersGui();
 

@@ -1,9 +1,7 @@
 #include <ui/sequencer/AssignObserver.hpp>
 
 #include <Mpc.hpp>
-////#include <lcdgui/LayeredScreen.hpp>
 #include <lcdgui/Field.hpp>
-#include <ui/sequencer/window/Assign16LevelsObserver.hpp>
 #include <sampler/NoteParameters.hpp>
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>
@@ -53,9 +51,11 @@ void AssignObserver::displayAssignNote()
     assignNoteField.lock()->setText(to_string(nn) + "/" + padName + "-" + soundName);
 }
 
+vector<string> AssignObserver::TYPE_NAMES{ "TUNING", "DECAY", "ATTACK", "FILTER" };
+
 void AssignObserver::displayParameter()
 {
-    parameterField.lock()->setText(mpc::ui::sequencer::window::Assign16LevelsObserver::TYPE_NAMES[slider->getParameter()]);
+    parameterField.lock()->setText(TYPE_NAMES[slider->getParameter()]);
 }
 
 void AssignObserver::displayHighRange()
