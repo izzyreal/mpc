@@ -217,7 +217,7 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	{
 		screen = make_shared<MidiInputScreen>(layerIndex);
 	}
-	else if (screenName.compare("loopbars") == 0)
+	else if (screenName.compare("loopbarswindow") == 0)
 	{
 		screen = make_shared<LoopBarsScreen>(layerIndex);
 	}

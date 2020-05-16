@@ -162,12 +162,6 @@ SequencerWindowObserver::SequencerWindowObserver()
 	{
 		displayTrackNumberNames();
 	}
-	else if (csn.compare("loopbarswindow") == 0)
-	{
-		displayFirstBar();
-		displayLastBar();
-		displayNumberOfBars();
-	}
 	else if (csn.compare("transmitprogramchanges") == 0)
 	{
 		displayTransmitProgramChangesInThisTrack();
@@ -316,33 +310,9 @@ void SequencerWindowObserver::displayMrsLine(int i)
 	}
 }
 
-void SequencerWindowObserver::displayLastBar()
-{
-    if(csn.compare("deletesequence") == 0) return;
-	auto seq = sequence.lock();
-    if(seq->isLastLoopBarEnd()) {
-        lastBarField.lock()->setText("END");
-    } else {
-		lastBarField.lock()->setText(to_string(seq->getLastLoopBar() + 1));
-    }
-}
-
 void SequencerWindowObserver::displayTransmitProgramChangesInThisTrack()
 {
 	inThisTrackField.lock()->setText(swGui->getTransmitProgramChangesInThisTrack() ? "YES" : "NO");
-}
-
-void SequencerWindowObserver::displayNumberOfBars()
-{
-	if (csn.compare("deletesequence") == 0) return;
-	auto seq = sequence.lock();
-	numberOfBarsField.lock()->setText(to_string(seq->getLastLoopBar() - seq->getFirstLoopBar() + 1));
-}
-
-void SequencerWindowObserver::displayFirstBar()
-{
-	auto seq = sequence.lock();
-    firstBarField.lock()->setText(to_string(seq->getFirstLoopBar() + 1));
 }
 
 void SequencerWindowObserver::displayNotes()
@@ -436,21 +406,6 @@ void SequencerWindowObserver::update(moduru::observer::Observable* o, nonstd::an
 	else if (s.compare("notes") == 0)
 	{
 		displayNotes();
-	}
-	else if (s.compare("firstloopbar") == 0)
-{
-		displayFirstBar();
-		displayNumberOfBars();
-	}
-	else if (s.compare("lastloopbar") == 0)
-{
-		displayLastBar();
-		displayNumberOfBars();
-	}
-	else if (s.compare("numberofbars") == 0)
-{
-		displayNumberOfBars();
-		displayLastBar();
 	}
 	else if (s.compare("transmitprogramchangesinthistrack") == 0)
 {

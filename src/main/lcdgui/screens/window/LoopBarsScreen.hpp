@@ -10,7 +10,16 @@ namespace mpc::lcdgui::screens::window {
 	public:
 		void turnWheel(int i) override;
 
+	public:
 		LoopBarsScreen(const int& layer);
+
+	public:
+		void open() override;
+
+	private:
+		void displayNumberOfBars();
+		void displayLastBar();
+		void displayFirstBar();
 
 	};
 }
