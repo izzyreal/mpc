@@ -6,42 +6,48 @@
 #include <memory>
 #include <vector>
 
-namespace ctoot::mpc {
+namespace ctoot::mpc
+{
 	class MpcSoundPlayerChannel;
 }
 
-namespace mpc::sequencer {
+namespace mpc::sequencer
+{
 	class Sequencer;
 	class Sequence;
-	class TempoChangeEvent;
 	class Track;
 }
 
-namespace mpc::sampler {
+namespace mpc::sampler
+{
 	class Sampler;
 	class Program;
 }
 
-namespace mpc::lcdgui {
+namespace mpc::lcdgui
+{
 	class FunctionKeys;
 	class Field;
 	class Label;
-	class HorizontalBar;
 }
 
-namespace mpc::ui {
+namespace mpc::ui
+{
 	class NameGui;
 }
 
-namespace mpc::ui::sampler {
+namespace mpc::ui::sampler
+{
 	class SamplerGui;
 }
 
-namespace mpc::ui::sequencer::window {
+namespace mpc::ui::sequencer::window
+{
 	class SequencerWindowGui;
 }
 
-namespace mpc::ui::sequencer::window {
+namespace mpc::ui::sequencer::window
+{
 
 	class SequencerWindowObserver
 		: public moduru::observer::Observer
@@ -53,7 +59,6 @@ namespace mpc::ui::sequencer::window {
 		std::vector<std::string> inNames;
 		std::vector<std::string> editTypeNames;
 		std::vector<std::string> typeNames;
-		std::vector<std::weak_ptr<mpc::sequencer::TempoChangeEvent>> visibleTempoChangeEvents;
 		std::vector<std::string> noteValueNames;
 		std::string csn{ "" };
 		std::weak_ptr<mpc::sequencer::Sequencer> sequencer;
@@ -63,7 +68,6 @@ namespace mpc::ui::sequencer::window {
 		int seqNum = 0;
 		std::weak_ptr<mpc::sequencer::Sequence> sequence;
 		std::weak_ptr<mpc::sequencer::Track> track;
-		mpc::sequencer::TimeSignature timeSig;
 		mpc::sequencer::TimeSignature* newTimeSignature;
 		SequencerWindowGui* swGui = nullptr;
 		mpc::ui::NameGui* nameGui = nullptr;
@@ -86,37 +90,6 @@ namespace mpc::ui::sequencer::window {
 		std::weak_ptr<mpc::lcdgui::Field> frameRateField;
 		std::vector<std::string> displayStyleNames;
 		std::vector<std::string> frameRateNames;
-		std::weak_ptr<mpc::lcdgui::Field> a0tcField;
-		std::weak_ptr<mpc::lcdgui::Field> a1tcField;
-		std::weak_ptr<mpc::lcdgui::Field> a2tcField;
-		std::weak_ptr<mpc::lcdgui::Field> b0tcField;
-		std::weak_ptr<mpc::lcdgui::Field> b1tcField;
-		std::weak_ptr<mpc::lcdgui::Field> b2tcField;
-		std::weak_ptr<mpc::lcdgui::Field> c0tcField;
-		std::weak_ptr<mpc::lcdgui::Field> c1tcField;
-		std::weak_ptr<mpc::lcdgui::Field> c2tcField;
-		std::weak_ptr<mpc::lcdgui::Field> d0tcField;
-		std::weak_ptr<mpc::lcdgui::Field> d1tcField;
-		std::weak_ptr<mpc::lcdgui::Field> d2tcField;
-		std::weak_ptr<mpc::lcdgui::Field> e0tcField;
-		std::weak_ptr<mpc::lcdgui::Field> e1tcField;
-		std::weak_ptr<mpc::lcdgui::Field> e2tcField;
-		std::weak_ptr<mpc::lcdgui::Field> f0tcField;
-		std::weak_ptr<mpc::lcdgui::Field> f1tcField;
-		std::weak_ptr<mpc::lcdgui::Field> f2tcField;
-		std::weak_ptr<mpc::lcdgui::Field> initialTempoField;
-		std::weak_ptr<mpc::lcdgui::Field> tempoChangeField;
-		std::weak_ptr<mpc::lcdgui::Label> b2tcLabel;
-		std::weak_ptr<mpc::lcdgui::Label> c2tcLabel;
-		std::weak_ptr<mpc::lcdgui::Label> e2tcLabel;
-		std::weak_ptr<mpc::lcdgui::Label> d2tcLabel;
-		std::weak_ptr<mpc::lcdgui::Label> f2tcLabel;
-		std::weak_ptr<mpc::lcdgui::Label> b1tcLabel;
-		std::weak_ptr<mpc::lcdgui::Label> c1tcLabel;
-		std::weak_ptr<mpc::lcdgui::Label> d1tcLabel;
-		std::weak_ptr<mpc::lcdgui::Label> e1tcLabel;
-		std::weak_ptr<mpc::lcdgui::Label> f1tcLabel;
-		std::vector<std::weak_ptr<mpc::lcdgui::HorizontalBar>> hBars;
 		std::weak_ptr<mpc::lcdgui::Field> noteValueField;
 		std::weak_ptr<mpc::lcdgui::Field> swingField;
 		std::weak_ptr<mpc::lcdgui::Field> notes0Field;
@@ -209,12 +182,6 @@ namespace mpc::ui::sequencer::window {
 		void displayTime();
 		void displayShiftTiming();
 		void displayAmount();
-		void initVisibleEvents();
-		void displayInitialTempo();
-		void displayTempoChangeOn();
-		void displayTempoChange0();
-		void displayTempoChange1();
-		void displayTempoChange2();
 		void displayDisplayStyle();
 		void displayStartTime();
 		void displayFrameRate();

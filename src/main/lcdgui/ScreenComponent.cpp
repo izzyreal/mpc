@@ -3,8 +3,6 @@
 #include "Background.hpp"
 #
 #include <Mpc.hpp>
-#include <sequencer/Sequencer.hpp>
-#include <sampler/Sampler.hpp>
 
 using namespace mpc::lcdgui;
 

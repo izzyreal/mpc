@@ -65,12 +65,14 @@ void BaseControls::init()
 	param = ls.lock()->getFocus();
 	activeField = ls.lock()->lookupField(param);
     track = sequencer.lock()->getActiveSequence().lock()->getTrack(sequencer.lock()->getActiveTrackIndex());
-	auto lTrk = track.lock();
-	if (lTrk->getBusNumber() != 0 && mpc.getAudioMidiServices().lock()->getAudioServer()->isRunning()) {
-        mpcSoundPlayerChannel = sampler.lock()->getDrum(lTrk->getBusNumber() - 1);
+	
+	if (track.lock()->getBusNumber() != 0 && mpc.getAudioMidiServices().lock()->getAudioServer()->isRunning())
+	{
+        mpcSoundPlayerChannel = sampler.lock()->getDrum(track.lock()->getBusNumber() - 1);
 		program = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
     }
-    bank_ = samplerGui->getBank();
+    
+	bank_ = samplerGui->getBank();
 }
 
 void BaseControls::left()
@@ -182,7 +184,6 @@ void BaseControls::pad(int i, int velo, bool repeat, int tick)
 {
 	init();
 
-	auto lTrk = track.lock();
 	auto controls = mpc.getControls().lock();
 
 	if (mpc.getHardware().lock()->getTopPanel().lock()->isFullLevelEnabled())
@@ -199,7 +200,7 @@ void BaseControls::pad(int i, int velo, bool repeat, int tick)
 			return;
 		}
 	}
-	auto note = lTrk->getBusNumber() > 0 ? program.lock()->getPad(i + (bank_ * 16))->getNote() : i + (bank_ * 16) + 35;
+	auto note = track.lock()->getBusNumber() > 0 ? program.lock()->getPad(i + (bank_ * 16))->getNote() : i + (bank_ * 16) + 35;
 	auto velocity = velo;
 	auto pad = i + (bank_ * 16);
 
@@ -251,7 +252,7 @@ void BaseControls::generateNoteOn(int nn, int padVelo, int tick)
 {
 	init();
 	auto& mpc = mpc::Mpc::instance();
-	auto lTrk = track.lock();
+
 	auto lProgram = program.lock();
 	bool slider = lProgram && nn == lProgram->getSlider()->getNote();
 	bool posIsLastTick = sequencer.lock()->getTickPosition() == sequencer.lock()->getActiveSequence().lock()->getLastTick();
@@ -265,25 +266,25 @@ void BaseControls::generateNoteOn(int nn, int padVelo, int tick)
 	{
 		if (step)
 		{
-			n = lTrk->addNoteEvent(sequencer.lock()->getTickPosition(), nn).lock();
+			n = track.lock()->addNoteEvent(sequencer.lock()->getTickPosition(), nn).lock();
 		}
 		else if (recMainWithoutPlaying)
 		{
-			n = lTrk->addNoteEvent(sequencer.lock()->getTickPosition(), nn).lock();
+			n = track.lock()->addNoteEvent(sequencer.lock()->getTickPosition(), nn).lock();
 			int noteVal = swGui->getNoteValue();
 			int stepLength = sequencer.lock()->getTickValues()[noteVal];
 			if (stepLength != 0) {
 				int bar = sequencer.lock()->getCurrentBarNumber() + 1;
-				lTrk->timingCorrect(0, bar, n.get(), stepLength);
+				track.lock()->timingCorrect(0, bar, n.get(), stepLength);
 				vector<weak_ptr<mpc::sequencer::Event>> events{ n };
-				lTrk->swing(events, noteVal, swGui->getSwing(), vector<int>{0, 127});
+				track.lock()->swing(events, noteVal, swGui->getSwing(), vector<int>{0, 127});
 				if (n->getTick() != sequencer.lock()->getTickPosition()) {
 					sequencer.lock()->move(n->getTick());
 				}
 			}
 		}
 		else {
-			n = lTrk->recordNoteOn().lock();
+			n = track.lock()->recordNoteOn().lock();
 			n->setNote(nn);
 		}
 		n->setVelocity(padVelo);
@@ -340,7 +341,7 @@ void BaseControls::generateNoteOn(int nn, int padVelo, int tick)
 		setSliderNoteVar(noteEvent.get(), program);
 	}
 
-	mpc.getEventHandler().lock()->handle(noteEvent, lTrk.get());
+	mpc.getEventHandler().lock()->handle(noteEvent, track.lock().get());
 }
 
 void BaseControls::numpad(int i)

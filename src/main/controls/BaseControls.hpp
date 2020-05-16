@@ -2,6 +2,9 @@
 
 #include <lcdgui/LayeredScreen.hpp>
 
+#include <sequencer/Sequencer.hpp>
+#include <sampler/Sampler.hpp>
+
 #include <string>
 #include <memory>
 #include <vector>
@@ -16,13 +19,11 @@ namespace mpc
 }
 
 namespace mpc::sequencer {
-	class Sequencer;
 	class Track;
 	class NoteEvent;
 }
 
 namespace mpc::sampler {
-	class Sampler;
 	class Program;
 }
 

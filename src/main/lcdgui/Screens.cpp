@@ -10,6 +10,7 @@
 
 #include <lcdgui/screens/SequencerScreen.hpp>
 #include <lcdgui/screens/window/SequenceScreen.hpp>
+#include <lcdgui/screens/window/TempoChangeScreen.hpp>
 
 #include <file/FileUtil.hpp>
 
@@ -17,6 +18,8 @@
 
 
 using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui::screens::window;
 
 using namespace moduru::file;
 
@@ -147,15 +150,22 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	
 	if (screenName.compare("sequencer") == 0)
 	{
-		screen = make_shared<mpc::lcdgui::screens::SequencerScreen>(layerIndex);
+		screen = make_shared<SequencerScreen>(layerIndex);
 	}
 	else if (screenName.compare("sequence") == 0)
 	{
-		screen = make_shared<mpc::lcdgui::screens::window::SequenceScreen>(layerIndex);
+		screen = make_shared<SequenceScreen>(layerIndex);
+	}
+	else if (screenName.compare("tempochange") == 0)
+	{
+		screen = make_shared<TempoChangeScreen>(layerIndex);
 	}
 
-	screen->addChildren(children);
-	screens[screenName] = screen;
+	if (screen)
+	{
+		screen->addChildren(children);
+		screens[screenName] = screen;
+	}
 
 	return screen;
 }

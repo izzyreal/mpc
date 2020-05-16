@@ -45,26 +45,35 @@ SequencerWindowObserver::SequencerWindowObserver()
 	nameGui = Mpc::instance().getUis().lock()->getNameGui();
 	samplerGui = Mpc::instance().getUis().lock()->getSamplerGui();
 	inNames = vector<string>(34);
-	for (int i = 0; i < 34; i++) {
-		if (i < 16) {
+	
+	for (int i = 0; i < 34; i++)
+	{
+		if (i < 16)
+		{
 			inNames[i] = "1-" + moduru::lang::StrUtil::padLeft(to_string(i + 1), "0", 2);
 		}
-		if (i == 16) {
+		
+		if (i == 16)
+		{
 			inNames[i] = "1-Ex";
 		}
-		if (i > 16 && i < 33) {
+		
+		if (i > 16 && i < 33)
+		{
 			inNames[i] = "2-" + moduru::lang::StrUtil::padLeft(to_string(i - 16), "0", 2);
 		}
-		if (i == 33) {
+		
+		if (i == 33)
+		{
 			inNames[i] = "2-Ex";
 		}
 	}
+
 	sequencer = Mpc::instance().getSequencer();
 	sampler = Mpc::instance().getSampler();
 	auto ls = Mpc::instance().getLayeredScreen().lock();
 	csn = ls->getCurrentScreenName();
 	fb = ls->getFunctionKeys();
-	hBars =ls->getHorizontalBarsTempoChangeEditor();
 	swGui = Mpc::instance().getUis().lock()->getSequencerWindowGui();
 	auto lSequencer = sequencer.lock();
 	seqNum = lSequencer->getActiveSequenceIndex();
@@ -72,7 +81,7 @@ SequencerWindowObserver::SequencerWindowObserver()
 	trackNum = lSequencer->getActiveTrackIndex();
 	auto seq = sequence.lock();
 	track = seq->getTrack(trackNum);
-	timeSig = seq->getTimeSignature();
+
 	newTimeSignature = swGui->getNewTimeSignature();
 	newTimeSignature->addObserver(this);
 	auto lSampler = sampler.lock();
@@ -96,43 +105,7 @@ SequencerWindowObserver::SequencerWindowObserver()
 	sField = ls->lookupField("s");
 	fField = ls->lookupField("f");
 	frameRateField = ls->lookupField("framerate");
-	if (csn.compare("tempochange") == 0) {
-		a0tcField = ls->lookupField("a0");
-		a1tcField = ls->lookupField("a1");
-		a2tcField = ls->lookupField("a2");
-		b0tcField = ls->lookupField("b0");
-		b1tcField = ls->lookupField("b1");
-		b2tcField = ls->lookupField("b2");
-		c0tcField = ls->lookupField("c0");
-		c1tcField = ls->lookupField("c1");
-		c2tcField = ls->lookupField("c2");
-		d0tcField = ls->lookupField("d0");
-		d1tcField = ls->lookupField("d1");
-		d2tcField = ls->lookupField("d2");
-		e0tcField = ls->lookupField("e0");
-		e1tcField = ls->lookupField("e1");
-		e2tcField = ls->lookupField("e2");
-		f0tcField = ls->lookupField("f0");
-		f1tcField = ls->lookupField("f1");
-		f2tcField = ls->lookupField("f2");
-		f0tcField.lock()->setSize(28, 9);
-		f1tcField.lock()->setSize(28, 9);
-		f2tcField.lock()->setSize(28, 9);
-		tempoChangeField = ls->lookupField("tempochange");
-		initialTempoField = ls->lookupField("initialtempo");
-		initialTempoField.lock()->setSize(28, 9);
-	}
 
-	b1tcLabel = ls->lookupLabel("b1");
-	c1tcLabel = ls->lookupLabel("c1");
-	d1tcLabel = ls->lookupLabel("d1");
-	e1tcLabel = ls->lookupLabel("e1");
-	f1tcLabel = ls->lookupLabel("f1");
-	b2tcLabel = ls->lookupLabel("b2");
-	c2tcLabel = ls->lookupLabel("c2");
-	d2tcLabel = ls->lookupLabel("d2");
-	e2tcLabel = ls->lookupLabel("e2");
-	f2tcLabel = ls->lookupLabel("f2");
 	noteValueField = ls->lookupField("notevalue");
 	swingField = ls->lookupField("swing");
 	notes0Field = ls->lookupField("notes0");
@@ -199,44 +172,38 @@ SequencerWindowObserver::SequencerWindowObserver()
 	
 	auto lTrk = track.lock();
 	lTrk->addObserver(this);
-	timeSig.addObserver(this);
 	
-	for (auto& h : hBars) {
-		h.lock()->Hide(true);
-	}
-
-	if (csn.compare("track") == 0) {
+	if (csn.compare("track") == 0)
+	{
 		trackNameFirstLetterField.lock()->setText(lTrk->getName().substr(0, 1));
 		defaultTrackNameFirstLetterField.lock()->setText(lSequencer->getDefaultTrackName(trackNum).substr(0, 1));
 		trackNameRestLabel.lock()->setText(lTrk->getName().substr(1, lTrk->getName().length()));
 		defaultTrackNameRestLabel.lock()->setText(lSequencer->getDefaultTrackName(trackNum).substr(1, lSequencer->getDefaultTrackName(trackNum).length()));
 	}
-	else if (csn.compare("deletesequence") == 0) {
+	else if (csn.compare("deletesequence") == 0)
+	{
 		displaySequenceNumberName();
 	}
-	else if (csn.compare("deletetrack") == 0) {
+	else if (csn.compare("deletetrack") == 0)
+	{
 		displayTrackNumber();
 	}
-	else if (csn.compare("copysequence") == 0) {
+	else if (csn.compare("copysequence") == 0)
+	{
 		displaySequenceNumberNames();
 	}
-	else if (csn.compare("copytrack") == 0) {
+	else if (csn.compare("copytrack") == 0)
+	{
 		displayTrackNumberNames();
 	}
-	else if (csn.compare("timedisplay") == 0) {
+	else if (csn.compare("timedisplay") == 0)
+	{
 		displayDisplayStyle();
 		displayStartTime();
 		displayFrameRate();
 	}
-	else if (csn.compare("tempochange") == 0) {
-		initVisibleEvents();
-		displayTempoChange0();
-		displayTempoChange1();
-		displayTempoChange2();
-		displayTempoChangeOn();
-		displayInitialTempo();
-	}
-	else if (csn.compare("timingcorrect") == 0) {
+	else if (csn.compare("timingcorrect") == 0)
+	{
 		swGui->setTime1(seq->getLastTick());
 		displayNoteValue();
 		displaySwing();
@@ -245,37 +212,45 @@ SequencerWindowObserver::SequencerWindowObserver()
 		displayTime();
 		displayNotes();
 	}
-	else if (csn.compare("changetsig") == 0) {
+	else if (csn.compare("changetsig") == 0)
+	{
 		displayBars();
 		displayNewTsig();
 	}
-	else if (csn.compare("countmetronome") == 0) {
+	else if (csn.compare("countmetronome") == 0)
+	{
 		displayCountIn();
 		displayInPlay();
 		displayRate();
 		displayInRec();
 		displayWaitForKey();
 	}
-	else if (csn.compare("loopbarswindow") == 0) {
+	else if (csn.compare("loopbarswindow") == 0)
+	{
 		displayFirstBar();
 		displayLastBar();
 		displayNumberOfBars();
 	}
-	else if (csn.compare("changebars") == 0) {
+	else if (csn.compare("changebars") == 0)
+	{
 		displayChangeBarsAfterBar();
 		displayChangeBarsNumberOfBars();
 		displayChangeBarsFirstBar();
 		displayChangeBarsLastBar();
 	}
-	else if (csn.compare("transmitprogramchanges") == 0) {
+	else if (csn.compare("transmitprogramchanges") == 0)
+	{
 		displayTransmitProgramChangesInThisTrack();
 	}
-	else if (csn.compare("changebars2") == 0) {
+	else if (csn.compare("changebars2") == 0)
+	{
 		currentLabel.lock()->setText(to_string(seq->getLastBar() + 1));
 		displayNewBars();
 	}
-	else if (csn.compare("multirecordingsetup") == 0) {
-		for (auto& mrsLine : swGui->getMrsLines()) {
+	else if (csn.compare("multirecordingsetup") == 0)
+	{
+		for (auto& mrsLine : swGui->getMrsLines())
+		{
 			mrsLine->setOut(seq->getTrack(mrsLine->getTrack()).lock()->getDevice());
 		}
 		swGui->setMrsYOffset(swGui->getMrsYOffset());
@@ -283,7 +258,8 @@ SequencerWindowObserver::SequencerWindowObserver()
 		displayMrsLine(1);
 		displayMrsLine(2);
 	}
-	else if (csn.compare("midiinput") == 0) {
+	else if (csn.compare("midiinput") == 0)
+	{
 		displayReceiveCh();
 		displayProgChangeSeq();
 		displaySustainPedalToDuration();
@@ -291,11 +267,13 @@ SequencerWindowObserver::SequencerWindowObserver()
 		displayType();
 		displayPass();
 	}
-	else if (csn.compare("midioutput") == 0) {
+	else if (csn.compare("midioutput") == 0)
+	{
 		displaySoftThru();
 		displayDeviceName();
 	}
-	else if (csn.compare("editvelocity") == 0) {
+	else if (csn.compare("editvelocity") == 0)
+	{
 		displayEditType();
 		displayValue();
 		displayTime();
@@ -587,189 +565,6 @@ void SequencerWindowObserver::displayAmount()
     amountField.lock()->setText(to_string(swGui->getAmount()));
 }
 
-void SequencerWindowObserver::initVisibleEvents()
-{
-	auto seq = sequence.lock();
-	visibleTempoChangeEvents = vector<weak_ptr<mpc::sequencer::TempoChangeEvent>>(3);
-	auto allTce = seq->getTempoChangeEvents();
-	for (int i = 0; i < 3; i++) {
-		if (i + swGui->getTempoChangeOffset() <allTce.size()) {
-			visibleTempoChangeEvents[i] = allTce[i + swGui->getTempoChangeOffset()];
-			auto tce = visibleTempoChangeEvents[i].lock();
-			if (tce) {
-				tce->addObserver(this);
-			}
-		}
-		if (allTce.size() <= i + swGui->getTempoChangeOffset() + 1) {
-			for (int j = i + 1; j < 2; j++) {
-				visibleTempoChangeEvents[j] = weak_ptr<mpc::sequencer::TempoChangeEvent>();
-			}
-			break;
-		}
-	}
-	swGui->setVisibleTempoChanges(visibleTempoChangeEvents);
-}
-
-void SequencerWindowObserver::displayInitialTempo()
-{
-	if (csn.compare("deletesequence") == 0) return;
-	auto seq = sequence.lock();
-	string tempoStr = seq->getInitialTempo().toString();
-	tempoStr = Util::replaceDotWithSmallSpaceDot(tempoStr);
-	initialTempoField.lock()->setText(tempoStr);
-}
-
-void SequencerWindowObserver::displayTempoChangeOn()
-{
-    tempoChangeField.lock()->setText(sequence.lock()->isTempoChangeOn() ? "YES" : "NO");
-}
-
-void SequencerWindowObserver::displayTempoChange0()
-{
-	hBars[1].lock()->Hide(false);
-	auto tce = swGui->getVisibleTempoChanges()[0].lock();
-	a0tcField.lock()->setText(" " + to_string(tce->getStepNumber() + 1));
-	int value = tce->getBar(timeSig.getNumerator(), timeSig.getDenominator()) + 1;
-	b0tcField.lock()->setTextPadded(value, "0");
-	value = tce->getBeat(timeSig.getNumerator(), timeSig.getDenominator()) + 1;
-	c0tcField.lock()->setTextPadded(value, "0");
-	value = tce->getClock(timeSig.getNumerator(), timeSig.getDenominator());
-	d0tcField.lock()->setTextPadded(value, "0");
-	
-	string ratioStr = moduru::lang::StrUtil::TrimDecimals(tce->getRatio() / 10.0, 1);
-	ratioStr = moduru::lang::StrUtil::padLeft(ratioStr, " ", 5);
-	ratioStr = Util::replaceDotWithSmallSpaceDot(ratioStr);
-	e0tcField.lock()->setText(ratioStr);
-
-	auto tempo = sequence.lock()->getInitialTempo().toDouble() * (tce->getRatio() / 1000.0);
-	if (tempo < 30) {
-		tempo = 30.0;
-	}
-	else if (tempo > 300) {
-		tempo = 300.0;
-	}
-	string tempoStr = moduru::lang::StrUtil::TrimDecimals((tempo * 10) / 10.0, 1);
-	tempoStr = moduru::lang::StrUtil::padLeft(tempoStr, " ", 5);
-	tempoStr = Util::replaceDotWithSmallSpaceDot(tempoStr);
-	f0tcField.lock()->setText(tempoStr);
-	hBars[1].lock()->setValue((tempo - 15) * (290 / 975.0));
-}
-
-void SequencerWindowObserver::displayTempoChange1()
-{
-	int size = swGui->getVisibleTempoChanges().size();
-	auto tce = swGui->getVisibleTempoChanges()[1].lock();
-	if (!tce) {
-		a1tcField.lock()->setText("END");
-		b1tcField.lock()->Hide(true);
-		c1tcField.lock()->Hide(true);
-		d1tcField.lock()->Hide(true);
-		e1tcField.lock()->Hide(true);
-		f1tcField.lock()->Hide(true);
-		b1tcLabel.lock()->Hide(true);
-		c1tcLabel.lock()->Hide(true);
-		d1tcLabel.lock()->Hide(true);
-		e1tcLabel.lock()->Hide(true);
-		f1tcLabel.lock()->Hide(true);
-		hBars[2].lock()->Hide(true);
-		return;
-	}
-	b1tcField.lock()->Hide(false);
-	c1tcField.lock()->Hide(false);
-	d1tcField.lock()->Hide(false);
-	e1tcField.lock()->Hide(false);
-	f1tcField.lock()->Hide(false);
-	b1tcLabel.lock()->Hide(false);
-	c1tcLabel.lock()->Hide(false);
-	d1tcLabel.lock()->Hide(false);
-	e1tcLabel.lock()->Hide(false);
-	f1tcLabel.lock()->Hide(false);
-	hBars[2].lock()->Hide(false);
-	a1tcField.lock()->setText(" " + to_string(tce->getStepNumber() + 1));
-	b1tcField.lock()->setTextPadded(tce->getBar(timeSig.getNumerator(), timeSig.getDenominator()) + 1, "0");
-	c1tcField.lock()->setTextPadded(tce->getBeat(timeSig.getNumerator(), timeSig.getDenominator()) + 1, "0");
-	d1tcField.lock()->setTextPadded(tce->getClock(timeSig.getNumerator(), timeSig.getDenominator()), "0");
-
-	string ratioStr = moduru::lang::StrUtil::TrimDecimals(tce->getRatio() / 10.0, 1);
-	ratioStr = moduru::lang::StrUtil::padLeft(ratioStr, " ", 5);
-	ratioStr = Util::replaceDotWithSmallSpaceDot(ratioStr);
-	e1tcField.lock()->setText(ratioStr);
-
-	auto tempo = sequence.lock()->getInitialTempo().toDouble() * (tce->getRatio() / 1000.0);
-	if (tempo < 30) {
-		tempo = 30.0;
-	}
-	else if (tempo > 300) {
-		tempo = 300.0;
-	}
-	string tempoStr = moduru::lang::StrUtil::TrimDecimals((tempo * 10) / 10.0, 1);
-	tempoStr = moduru::lang::StrUtil::padLeft(tempoStr, " ", 5);
-	tempoStr = Util::replaceDotWithSmallSpaceDot(tempoStr);
-	f1tcField.lock()->setText(tempoStr);
-
-	hBars[2].lock()->setValue((tempo - 15) * (290 / 975.0));
-}
-
-void SequencerWindowObserver::displayTempoChange2()
-{
-	auto tce = swGui->getVisibleTempoChanges()[2].lock();
-	if (!tce) {
-		if (!swGui->getVisibleTempoChanges()[1].lock()) {
-			a2tcField.lock()->Hide(true);
-		}
-		else {
-			a2tcField.lock()->Hide(false);
-			a2tcField.lock()->setText("END");
-		}
-		b2tcField.lock()->Hide(true);
-		c2tcField.lock()->Hide(true);
-		d2tcField.lock()->Hide(true);
-		e2tcField.lock()->Hide(true);
-		f2tcField.lock()->Hide(true);
-		b2tcLabel.lock()->Hide(true);
-		c2tcLabel.lock()->Hide(true);
-		d2tcLabel.lock()->Hide(true);
-		e2tcLabel.lock()->Hide(true);
-		f2tcLabel.lock()->Hide(true);
-		hBars[3].lock()->Hide(true);
-		return;
-	}
-	b2tcField.lock()->Hide(false);
-	c2tcField.lock()->Hide(false);
-	d2tcField.lock()->Hide(false);
-	e2tcField.lock()->Hide(false);
-	f2tcField.lock()->Hide(false);
-	b2tcLabel.lock()->Hide(false);
-	c2tcLabel.lock()->Hide(false);
-	d2tcLabel.lock()->Hide(false);
-	e2tcLabel.lock()->Hide(false);
-	f2tcLabel.lock()->Hide(false);
-	hBars[3].lock()->Hide(false);
-	a2tcField.lock()->setText(" " + to_string(tce->getStepNumber() + 1));
-	b2tcField.lock()->setTextPadded(tce->getBar(timeSig.getNumerator(), timeSig.getDenominator()) + 1, "0");
-	c2tcField.lock()->setTextPadded(tce->getBeat(timeSig.getNumerator(), timeSig.getDenominator()) + 1, "0");
-	d2tcField.lock()->setTextPadded(tce->getClock(timeSig.getNumerator(), timeSig.getDenominator()), "0");
-	
-	string ratioStr = moduru::lang::StrUtil::TrimDecimals(tce->getRatio() / 10.0, 1);
-	ratioStr = moduru::lang::StrUtil::padLeft(ratioStr, " ", 5);
-	ratioStr = Util::replaceDotWithSmallSpaceDot(ratioStr);
-	e2tcField.lock()->setText(ratioStr);
-
-	auto tempo = sequence.lock()->getInitialTempo().toDouble() * (tce->getRatio() / 1000.0);
-	if (tempo < 30) {
-		tempo = 30.0;
-	}
-	else if (tempo > 300) {
-		tempo = 300.0;
-	}
-	string tempoStr = moduru::lang::StrUtil::TrimDecimals((tempo * 10) / 10.0, 1);
-	tempoStr = moduru::lang::StrUtil::padLeft(tempoStr, " ", 5);
-	tempoStr = Util::replaceDotWithSmallSpaceDot(tempoStr);
-	f2tcField.lock()->setText(tempoStr);
-
-	hBars[3].lock()->setValue((tempo - 15) * (290 / 975.0));
-}
-
 void SequencerWindowObserver::displayDisplayStyle()
 {
     displayStyleField.lock()->setText(displayStyleNames[swGui->getDisplayStyle()]);
@@ -796,17 +591,15 @@ void SequencerWindowObserver::update(moduru::observer::Observable* o, nonstd::an
 	auto lTrk = track.lock();
 	lTrk->deleteObserver(this);
 	seq->deleteObserver(this);
-	timeSig.deleteObserver(this);
 	auto lSequencer = sequencer.lock();
 	seqNum = lSequencer->getActiveSequenceIndex();
 	seq = lSequencer->getSequence(seqNum).lock();
 	trackNum = lSequencer->getActiveTrackIndex();
 	track = seq->getTrack(trackNum);
 	lTrk = track.lock();
-	timeSig = seq->getTimeSignature();
 	lTrk->addObserver(this);
 	seq->addObserver(this);
-	timeSig.addObserver(this);
+
 	int yPos;
 
 	if (s.compare("padandnote") == 0)
@@ -815,14 +608,6 @@ void SequencerWindowObserver::update(moduru::observer::Observable* o, nonstd::an
 		{
 			displayNotes();
 		}
-	}
-	else if (s.compare("initialtempo") == 0)
-	{
-		displayInitialTempo();
-		initVisibleEvents();
-		displayTempoChange0();
-		displayTempoChange1();
-		displayTempoChange2();
 	}
 	else if (s.compare("seqnumbername") == 0)
 	{
@@ -859,36 +644,6 @@ void SequencerWindowObserver::update(moduru::observer::Observable* o, nonstd::an
 	else if (s.compare("framerate") == 0)
 	{
 		displayFrameRate();
-	}
-	else if (s.compare("tempochange") == 0)
-	{
-		initVisibleEvents();
-		//if (Mpc::instance().getLayeredScreen().lock()->getFocus().find("0") != string::npos) {
-			displayTempoChange0();
-		//}
-		//else if (Mpc::instance().getLayeredScreen().lock()->getFocus().find("1") != string::npos) {
-			displayTempoChange1();
-		//}
-		//else if (Mpc::instance().getLayeredScreen().lock()->getFocus().find("2") != string::npos) {
-			displayTempoChange2();
-		//}
-	}
-	else if (s.compare("offset") == 0 || s.compare("tempochangeadded") == 0 || s.compare("tick") == 0)
-	{
-		if (csn.compare("tempochange") == 0) {
-			initVisibleEvents();
-			displayTempoChange0();
-			displayTempoChange1();
-			displayTempoChange2();
-		}
-	}
-	else if (s.compare("tempochangeon") == 0)
-	{
-		displayTempoChangeOn();
-	}
-	else if (s.compare("tempo") == 0)
-	{
-		displayInitialTempo();
 	}
 	else if (s.compare("time") == 0)
 	{
@@ -1090,23 +845,21 @@ void SequencerWindowObserver::displayTrackNumberNames()
 }
 
 SequencerWindowObserver::~SequencerWindowObserver() {
-	for (auto& t : visibleTempoChangeEvents) {
-		if (t.lock()) t.lock()->deleteObservers();
-	}
-	for (auto& h : hBars) {
-		h.lock()->Hide(true);
-	}
-	if (track.lock()) {
+
+	if (track.lock())
+	{
 		track.lock()->deleteObserver(this);
 	}
+
 	sequencer.lock()->deleteObserver(this);
 	newTimeSignature->deleteObserver(this);
 	swGui->deleteObserver(this);
 	nameGui->deleteObserver(this);
 	samplerGui->deleteObserver(this);
-	if (sequence.lock()) {
+
+	if (sequence.lock())
+	{
 		sequence.lock()->deleteObserver(this);
 		sequence.lock()->getMetaTracks().at(2).lock()->deleteObserver(this);
 	}
-	timeSig.deleteObserver(this);
 }

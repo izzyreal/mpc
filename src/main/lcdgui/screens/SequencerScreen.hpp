@@ -1,9 +1,5 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
-#include <lcdgui/Component.hpp>
-
-#include <sequencer/Sequencer.hpp>
-#include <sampler/Sampler.hpp>
 
 #include <memory>
 #include <vector>
