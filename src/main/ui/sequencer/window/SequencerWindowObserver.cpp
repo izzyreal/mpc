@@ -125,9 +125,6 @@ SequencerWindowObserver::SequencerWindowObserver()
 	numberOfBarsField = ls->lookupField("numberofbars");
 	inThisTrackField = ls->lookupField("inthistrack");
 	newBarsField = ls->lookupField("newbars");
-	message0Label = ls->lookupLabel("message0");
-	message1Label = ls->lookupLabel("message1");
-	currentLabel = ls->lookupLabel("current");
 	a0mrsField = ls->lookupField("a0");
 	a1mrsField = ls->lookupField("a1");
 	a2mrsField = ls->lookupField("a2");
@@ -207,11 +204,6 @@ SequencerWindowObserver::SequencerWindowObserver()
 	else if (csn.compare("transmitprogramchanges") == 0)
 	{
 		displayTransmitProgramChangesInThisTrack();
-	}
-	else if (csn.compare("changebars2") == 0)
-	{
-		currentLabel.lock()->setText(to_string(seq->getLastBar() + 1));
-		displayNewBars();
 	}
 	else if (csn.compare("multirecordingsetup") == 0)
 	{
@@ -357,36 +349,6 @@ void SequencerWindowObserver::displayMrsLine(int i)
 	}
 }
 
-void SequencerWindowObserver::displayNewBars()
-{
-	auto seq = sequence.lock();
-    newBarsField.lock()->setText(moduru::lang::StrUtil::padLeft(to_string(swGui->getNewBars() + 1), " ", 3));
-    if(swGui->getNewBars() == seq->getLastBar()) {
-        message0Label.lock()->setText("");
-        message1Label.lock()->setText("");
-    }
-    if(swGui->getNewBars() > seq->getLastBar()) {
-        message0Label.lock()->setText("Pressing DO IT will add");
-        message1Label.lock()->setText("blank bars after last bar.");
-    }
-    if(swGui->getNewBars() < seq->getLastBar()) {
-        message0Label.lock()->setText("Pressing DO IT will truncate");
-        message1Label.lock()->setText("bars after last bar.");
-    }
-}
-
-void SequencerWindowObserver::displayTransmitProgramChangesInThisTrack()
-{
-    inThisTrackField.lock()->setText(swGui->getTransmitProgramChangesInThisTrack() ? "YES" : "NO");
-}
-
-void SequencerWindowObserver::displayNumberOfBars()
-{
-	if (csn.compare("deletesequence") == 0) return;
-	auto seq = sequence.lock();
-	numberOfBarsField.lock()->setText(to_string(seq->getLastLoopBar() - seq->getFirstLoopBar() + 1));
-}
-
 void SequencerWindowObserver::displayLastBar()
 {
     if(csn.compare("deletesequence") == 0) return;
@@ -396,6 +358,18 @@ void SequencerWindowObserver::displayLastBar()
     } else {
 		lastBarField.lock()->setText(to_string(seq->getLastLoopBar() + 1));
     }
+}
+
+void SequencerWindowObserver::displayTransmitProgramChangesInThisTrack()
+{
+	inThisTrackField.lock()->setText(swGui->getTransmitProgramChangesInThisTrack() ? "YES" : "NO");
+}
+
+void SequencerWindowObserver::displayNumberOfBars()
+{
+	if (csn.compare("deletesequence") == 0) return;
+	auto seq = sequence.lock();
+	numberOfBarsField.lock()->setText(to_string(seq->getLastLoopBar() - seq->getFirstLoopBar() + 1));
 }
 
 void SequencerWindowObserver::displayFirstBar()
@@ -616,10 +590,6 @@ void SequencerWindowObserver::update(moduru::observer::Observable* o, nonstd::an
 	else if (s.compare("transmitprogramchangesinthistrack") == 0)
 {
 		displayTransmitProgramChangesInThisTrack();
-	}
-	else if (s.compare("newbars") == 0)
-{
-		displayNewBars();
 	}
 	else if (s.compare("mrsline") == 0)
 	{

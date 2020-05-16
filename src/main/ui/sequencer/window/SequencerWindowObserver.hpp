@@ -114,9 +114,6 @@ namespace mpc::ui::sequencer::window
 		std::weak_ptr<mpc::lcdgui::Field> firstBarField;
 		std::weak_ptr<mpc::lcdgui::Field> inThisTrackField;
 		std::weak_ptr<mpc::lcdgui::Field> newBarsField;
-		std::weak_ptr<mpc::lcdgui::Label> message0Label;
-		std::weak_ptr<mpc::lcdgui::Label> message1Label;
-		std::weak_ptr<mpc::lcdgui::Label> currentLabel;
 		std::weak_ptr<mpc::lcdgui::Field> a0mrsField;
 		std::weak_ptr<mpc::lcdgui::Field> a1mrsField;
 		std::weak_ptr<mpc::lcdgui::Field> a2mrsField;

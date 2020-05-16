@@ -15,5 +15,16 @@ namespace mpc::lcdgui::screens::window
 	public:
 		ChangeBars2Screen(const int& layer);
 
+	public:
+		void open() override;
+
+	private:
+		int newBars = 1;
+		void setNewBars(int i);
+
+	private:
+		void displayCurrent();
+		void displayNewBars();
+
 	};
 }

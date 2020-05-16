@@ -9,7 +9,6 @@ using namespace std;
 
 SequencerWindowGui::SequencerWindowGui() 
 {
-	newBars = 1;
 	swing = 50;
 	noteValue = 3;
 	inPlay = true;
@@ -532,21 +531,6 @@ void SequencerWindowGui::setTransmitProgramChangesInThisTrack(bool b)
     transmitProgramChangesInThisTrack = b;
     setChanged();
     notifyObservers(string("transmitprogramchangesinthistrack"));
-}
-
-int SequencerWindowGui::getNewBars()
-{
-    return newBars;
-}
-
-void SequencerWindowGui::setNewBars(int i)
-{
-    if(i < 0 || i > 998)
-        return;
-
-    newBars = i;
-    setChanged();
-    notifyObservers(string("newbars"));
 }
 
 vector<MultiRecordingSetupLine*>  SequencerWindowGui::getMrsLines()

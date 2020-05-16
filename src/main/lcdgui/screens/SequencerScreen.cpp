@@ -545,7 +545,6 @@ void SequencerScreen::turnWheel(int i)
 		sequencer.lock()->setNextSq(sequencer.lock()->getNextSq() + i);
 	}
 	else if (focus.compare("bars") == 0) {
-		Mpc::instance().getUis().lock()->getSequencerWindowGui()->setNewBars(sequencer.lock()->getActiveSequence().lock()->getLastBar());
 		openScreen("changebars2");
 	}
 	else if (focus.compare("tempo") == 0) {
