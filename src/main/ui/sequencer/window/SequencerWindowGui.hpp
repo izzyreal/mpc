@@ -23,13 +23,6 @@ namespace mpc::ui::sequencer::window {
 		int tr1 = 0;
 		std::vector<std::weak_ptr<mpc::sequencer::TempoChangeEvent>> visibleTempoChanges;
 		int tempoChangeOffset = 0;
-		int clickVolume = 0;
-		int clickOutput = 0;
-		int metronomeSound = 0;
-		int accentVelo = 0;
-		int accentNote = 0;
-		int normalVelo = 0;
-		int normalNote = 0;
 		bool notePassEnabled = false;
 		bool pitchBendPassEnabled = false;
 		bool pgmChangePassEnabled = false;
@@ -54,20 +47,6 @@ namespace mpc::ui::sequencer::window {
 		void setVisibleTempoChanges(std::vector<std::weak_ptr<mpc::sequencer::TempoChangeEvent>> vtc);
 		int getTempoChangeOffset();
 		void setTempoChangeOffset(int i);
-		int getClickVolume();
-		void setClickVolume(int i);
-		int getClickOutput();
-		void setClickOutput(int i);
-		int getMetronomeSound();
-		void setMetronomeSound(int i);
-		int getAccentNote();
-		void setAccentNote(int i);
-		int getAccentVelo();
-		void setAccentVelo(int i);
-		int getNormalNote();
-		void setNormalNote(int i);
-		int getNormalVelo();
-		void setNormalVelo(int i);
 		bool isNotePassEnabled();
 		void setNotePassEnabled(bool b);
 		bool isPitchBendPassEnabled();
@@ -84,8 +63,6 @@ namespace mpc::ui::sequencer::window {
 		void setTapAvg(int i);
 		bool isPgmChangeToSeqEnabled();
 		void setPgmChangeToSeqEnabled(bool b);
-
-		SequencerWindowGui();
 
 	};
 }

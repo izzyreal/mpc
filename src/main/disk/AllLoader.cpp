@@ -28,14 +28,18 @@
 #include <sequencer/TempoChangeEvent.hpp>
 
 #include <lcdgui/Screens.hpp>
+
 #include <lcdgui/screens/window/CountMetronomeScreen.hpp>
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <lcdgui/screens/window/MultiRecordingSetupScreen.hpp>
 #include <lcdgui/screens/window/MidiInputScreen.hpp>
 #include <lcdgui/screens/window/MultiRecordingSetupLine.hpp>
 
+#include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
+
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::disk;
 using namespace mpc::file::all;
 using namespace std;
@@ -104,14 +108,15 @@ AllLoader::AllLoader(mpc::disk::MpcFile* file, bool sequencesOnly)
 		auto count = allParser.getCount();
 
 		auto countMetronomeScreen = dynamic_pointer_cast<CountMetronomeScreen>(Screens::getScreenComponent("countmetronome"));
+		auto metronomeSoundScreen = dynamic_pointer_cast<MetronomeSoundScreen>(Screens::getScreenComponent("metronomesound"));
 
 		countMetronomeScreen->setCountIn(count->getCountInMode());
-		swGui->setAccentVelo(count->getAccentVelo());
-		swGui->setNormalVelo(count->getNormalVelo());
-		swGui->setClickOutput(count->getClickOutput());
-		swGui->setClickVolume(count->getClickVolume());
+		metronomeSoundScreen->setAccentVelo(count->getAccentVelo());
+		metronomeSoundScreen->setNormalVelo(count->getNormalVelo());
+		metronomeSoundScreen->setClickOutput(count->getClickOutput());
+		metronomeSoundScreen->setClickVolume(count->getClickVolume());
 		countMetronomeScreen->setRate(count->getRate());
-		swGui->setMetronomeSound(count->getSound());
+		metronomeSoundScreen->setMetronomeSound(count->getSound());
 		countMetronomeScreen->setInPlay(count->isEnabledInPlay());
 		countMetronomeScreen->setInRec(count->isEnabledInRec());
 		countMetronomeScreen->setWaitForKey(count->isWaitForKeyEnabled());

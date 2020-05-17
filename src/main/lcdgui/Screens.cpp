@@ -29,8 +29,10 @@
 #include <lcdgui/screens/window/ChangeBarsScreen.hpp>
 #include <lcdgui/screens/window/ChangeBars2Screen.hpp>
 #include <lcdgui/screens/window/TrackScreen.hpp>
-#include <lcdgui/screens/window/MidiMonitorScreen.hpp>
 #include <lcdgui/screens/window/Assign16LevelsScreen.hpp>
+
+#include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
+#include <lcdgui/screens/dialog/MidiMonitorScreen.hpp>
 
 #include <file/FileUtil.hpp>
 
@@ -40,6 +42,7 @@
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::lcdgui::screens::dialog;
 
 using namespace moduru::file;
 
@@ -133,8 +136,8 @@ void Screens::init()
 {
 	auto path0 = string(mpc::Paths::resPath() + "mainpanel-mod.json");
 	auto path1 = string(mpc::Paths::resPath() + "windowpanel-mod.json");
-	auto path2 = string(mpc::Paths::resPath() + "dialogpanel.json");
-	auto path3 = string(mpc::Paths::resPath() + "dialog2panel.json");
+	auto path2 = string(mpc::Paths::resPath() + "dialogpanel-mod.json");
+	auto path3 = string(mpc::Paths::resPath() + "dialog2panel-mod.json");
 
 	vector<string> paths = { path0, path1, path2, path3 };
 
@@ -253,13 +256,17 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	{
 		screen = make_shared<TrackScreen>(layerIndex);
 	}
+	else if (screenName.compare("assign16levels") == 0)
+	{
+		screen = make_shared<Assign16LevelsScreen>(layerIndex);
+	}
 	else if (screenName.compare("midimonitor") == 0)
 	{
 		screen = make_shared<MidiMonitorScreen>(layerIndex);
 	}
-	else if (screenName.compare("assign16levels") == 0)
+	else if (screenName.compare("metronomesound") == 0)
 	{
-		screen = make_shared<Assign16LevelsScreen>(layerIndex);
+		screen = make_shared<MetronomeSoundScreen>(layerIndex);
 	}
 
 	if (screen)

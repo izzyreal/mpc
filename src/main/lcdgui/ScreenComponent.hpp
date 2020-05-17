@@ -2,6 +2,7 @@
 
 #include "Component.hpp"
 #include "Field.hpp"
+#include "Background.hpp"
 
 #include <controls/BaseControls.hpp>
 
@@ -28,6 +29,7 @@ namespace mpc::lcdgui
 		void openScreen(const std::string& screenName);
 		void setLastFocus(const std::string& screenName, const std::string& newLastFocus);
 		const std::string getLastFocus(const std::string& screenName);
+		std::weak_ptr<Background> findBackground();
 
 	public:
 		virtual void open() {}

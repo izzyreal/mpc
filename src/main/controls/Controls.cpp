@@ -23,7 +23,6 @@
 #include <controls/sequencer/dialog/DeleteAllTracksControls.hpp>
 #include <controls/sequencer/dialog/DeleteSequenceControls.hpp>
 #include <controls/sequencer/dialog/DeleteTrackControls.hpp>
-#include <controls/sequencer/dialog/MetronomeSoundControls.hpp>
 
 #include <controls/sampler/DrumControls.hpp>
 #include <controls/sampler/InitPadAssignControls.hpp>
@@ -137,7 +136,6 @@ Controls::Controls()
 	controls["sequencer_step"] = new sequencer::StepEditorControls();
 	controls["step_tc"] = new sequencer::StepEditorControls();
 
-	controls["metronomesound"] = new sequencer::dialog::MetronomeSoundControls();
 	controls["copytrack"] = new sequencer::dialog::CopyTrackControls();
 	controls["copysequence"] = new sequencer::dialog::CopySequenceControls();
 	controls["deletealltracks"] = new sequencer::dialog::DeleteAllTracksControls();

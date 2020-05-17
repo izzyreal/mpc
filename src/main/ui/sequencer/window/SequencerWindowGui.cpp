@@ -6,16 +6,6 @@
 using namespace mpc::ui::sequencer::window;
 using namespace std;
 
-SequencerWindowGui::SequencerWindowGui() 
-{
-
-	clickVolume = 100;
-	accentVelo = 127;
-	accentNote = 35;
-	normalVelo = 64;
-	normalNote = 35;
-}
-
 int SequencerWindowGui::getTrackNumber()
 {
     return trackNumber;
@@ -114,110 +104,6 @@ void SequencerWindowGui::setTempoChangeOffset(int i)
 	notifyObservers(string("offset"));
 }
 
-int SequencerWindowGui::getClickVolume()
-{
-    return clickVolume;
-}
-
-void SequencerWindowGui::setClickVolume(int i)
-{
-    if(i < 0 || i > 100)
-        return;
-
-    clickVolume = i;
-    setChanged();
-    notifyObservers(string("clickvolume"));
-}
-
-int SequencerWindowGui::getClickOutput()
-{
-    return clickOutput;
-}
-
-void SequencerWindowGui::setClickOutput(int i)
-{
-    if(i < 0 || i > 8)
-        return;
-
-    clickOutput = i;
-    setChanged();
-    notifyObservers(string("clickoutput"));
-}
-
-int SequencerWindowGui::getMetronomeSound()
-{
-    return metronomeSound;
-}
-
-void SequencerWindowGui::setMetronomeSound(int i)
-{
-    if(i < 0 || i > 4)
-        return;
-
-    metronomeSound = i;
-    setChanged();
-    notifyObservers(string("metronomesound"));
-}
-
-int SequencerWindowGui::getAccentNote()
-{
-    return accentNote;
-}
-
-void SequencerWindowGui::setAccentNote(int i)
-{
-    if(i < 35 || i > 98)
-        return;
-
-    accentNote = i;
-    setChanged();
-    notifyObservers(string("accentnote"));
-}
-
-int SequencerWindowGui::getAccentVelo()
-{
-    return accentVelo;
-}
-
-void SequencerWindowGui::setAccentVelo(int i)
-{
-    if(i < 0 || i > 127)
-        return;
-
-    accentVelo = i;
-    setChanged();
-    notifyObservers(string("accentvelo"));
-}
-
-int SequencerWindowGui::getNormalNote()
-{
-    return normalNote;
-}
-
-void SequencerWindowGui::setNormalNote(int i)
-{
-    if(i < 35 || i > 98)
-        return;
-
-    normalNote = i;
-    setChanged();
-    notifyObservers(string("normalnote"));
-}
-
-int SequencerWindowGui::getNormalVelo()
-{
-    return normalVelo;
-}
-
-void SequencerWindowGui::setNormalVelo(int i)
-{
-    if(i < 0 || i > 127)
-        return;
-
-    normalVelo = i;
-    setChanged();
-    notifyObservers(string("normalvelo"));
-}
 
 bool SequencerWindowGui::isNotePassEnabled()
 {

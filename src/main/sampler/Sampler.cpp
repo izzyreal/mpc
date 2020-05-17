@@ -6,7 +6,7 @@
 #include <Paths.hpp>
 #include <ui/Uis.hpp>
 #include <ui/UserDefaults.hpp>
-#include <lcdgui/Background.hpp>
+
 #include <ui/sampler/SamplerGui.hpp>
 #include <ui/sampler/SoundGui.hpp>
 #include <ui/sequencer/window/SequencerWindowGui.hpp>
@@ -19,6 +19,9 @@
 #include <sequencer/Track.hpp>
 #include <sequencer/Sequence.hpp>
 
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
+
 #include <synth/SynthChannel.hpp>
 #include <audio/server/NonRealTimeAudioServer.hpp>
 
@@ -28,9 +31,11 @@
 #include <mpc/MpcIndivFxMixerChannel.hpp>
 
 #include <file/File.hpp>
+
 #include <thirdp/libsamplerate/samplerate.h>
 
-
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::sampler;
 using namespace std;
 
@@ -87,8 +92,11 @@ void Sampler::init()
 {
 	auto program = addProgram().lock();;
 	program->setName("NewPgm-A");
-	for (int i = 0; i < 4; i++) {
-		for (auto j = 0; j < 16; j++) {
+	
+	for (int i = 0; i < 4; i++)
+	{
+		for (auto j = 0; j < 16; j++)
+		{
 			string result = "";
 			result.append(abcd[i]);
 			result.append(moduru::lang::StrUtil::padLeft(to_string(j + 1), "0", 2));
@@ -109,13 +117,16 @@ void Sampler::init()
 
 void Sampler::playMetronome(mpc::sequencer::NoteEvent* event, int framePos)
 {
-	auto swGui = Mpc::instance().getUis().lock()->getSequencerWindowGui();
+	auto metronomeSoundScreen = dynamic_pointer_cast<MetronomeSoundScreen>(Screens::getScreenComponent("metronomesound"));
 	auto soundNumber = -2;
-	if (swGui->getMetronomeSound() != 0) {
-		auto program = Mpc::instance().getDrum(swGui->getMetronomeSound() - 1)->getProgram();
-		auto accent = event->getVelocity() == swGui->getAccentVelo();
-		soundNumber = programs[program]->getNoteParameters(accent ? swGui->getAccentNote() : swGui->getNormalNote())->getSndNumber();
+
+	if (metronomeSoundScreen->getMetronomeSound() != 0)
+	{
+		auto program = Mpc::instance().getDrum(metronomeSoundScreen->getMetronomeSound() - 1)->getProgram();
+		auto accent = event->getVelocity() == metronomeSoundScreen->getAccentVelo();
+		soundNumber = programs[program]->getNoteParameters(accent ? metronomeSoundScreen->getAccentNote() : metronomeSoundScreen->getNormalNote())->getSndNumber();
 	}
+	
 	Mpc::instance().getBasicPlayer()->mpcNoteOn(soundNumber, event->getVelocity(), framePos);
 }
 

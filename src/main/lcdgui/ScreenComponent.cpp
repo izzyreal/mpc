@@ -46,3 +46,8 @@ const string ScreenComponent::getLastFocus(const string& screenName)
 {
 	return mpc::Mpc::instance().getLayeredScreen().lock()->getLastFocus(screenName);
 }
+
+weak_ptr<Background> ScreenComponent::findBackground()
+{
+	return dynamic_pointer_cast<Background>(findChild("background").lock());
+}

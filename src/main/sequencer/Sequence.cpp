@@ -1,9 +1,9 @@
 #include <sequencer/Sequence.hpp>
 
 #include <Mpc.hpp>
+
 #include <ui/UserDefaults.hpp>
-#include <ui/Uis.hpp>
-#include <ui/sequencer/window/SequencerWindowGui.hpp>
+
 #include <sequencer/Event.hpp>
 #include <sequencer/Track.hpp>
 #include <sequencer/NoteEvent.hpp>
@@ -14,9 +14,11 @@
 
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/window/CountMetronomeScreen.hpp>
+#include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::sequencer;
 using namespace std;
 
@@ -167,7 +169,7 @@ void Sequence::createClickTrack()
 	auto denTicks = 0;
 
 	auto countMetronomeScreen = dynamic_pointer_cast<CountMetronomeScreen>(Screens::getScreenComponent("countmetronome"));
-	auto swGui = mpc::Mpc::instance().getUis().lock()->getSequencerWindowGui();
+	auto metronomeSoundScreen = dynamic_pointer_cast<MetronomeSoundScreen>(Screens::getScreenComponent("metronomesound"));
 
 	for (int i = 0; i < bars; i++)
 	{
@@ -212,13 +214,13 @@ void Sequence::createClickTrack()
 		
 			if (j == 0)
 			{
-				n->setVelocity(swGui->getAccentVelo());
-				n->setNote(swGui->getAccentNote());
+				n->setVelocity(metronomeSoundScreen->getAccentVelo());
+				n->setNote(metronomeSoundScreen->getAccentNote());
 			}
 			else
 			{
-				n->setVelocity(swGui->getNormalVelo());
-				n->setNote(swGui->getNormalNote());
+				n->setVelocity(metronomeSoundScreen->getNormalVelo());
+				n->setNote(metronomeSoundScreen->getNormalNote());
 		
 			}
 		}

@@ -3,14 +3,16 @@
 #include <Mpc.hpp>
 #include <ui/Uis.hpp>
 #include <file/all/AllParser.hpp>
-#include <ui/sequencer/window/SequencerWindowGui.hpp>
 #include <sequencer/Sequencer.hpp>
 
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/window/CountMetronomeScreen.hpp>
 
+#include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
+
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::file::all;
 using namespace std;
 
@@ -32,21 +34,22 @@ Count::Count(vector<char> b)
 Count::Count() 
 {
 	auto countMetronomeScreen = dynamic_pointer_cast<CountMetronomeScreen>(Screens::getScreenComponent("countmetronome"));
-	auto swgui = Mpc::instance().getUis().lock()->getSequencerWindowGui();
+	auto metronomeSoundScreen = dynamic_pointer_cast<MetronomeSoundScreen>(Screens::getScreenComponent("metronomesound"));
+
 	auto lSequencer = Mpc::instance().getSequencer().lock();
 
 	saveBytes = vector<char>(AllParser::COUNT_LENGTH);
 	saveBytes[ENABLED_OFFSET] = static_cast< int8_t >((lSequencer->isCountEnabled() ? 1 : 0));
 	saveBytes[COUNT_IN_MODE_OFFSET] = static_cast< int8_t >(countMetronomeScreen->getCountInMode());
-	saveBytes[CLICK_VOLUME_OFFSET] = static_cast< int8_t >(swgui->getClickVolume());
+	saveBytes[CLICK_VOLUME_OFFSET] = static_cast< int8_t >(metronomeSoundScreen->getClickVolume());
 	saveBytes[RATE_OFFSET] = static_cast< int8_t >(countMetronomeScreen->getRate());
 	saveBytes[ENABLED_IN_PLAY_OFFSET] = static_cast< int8_t >((countMetronomeScreen->getInPlay() ? 1 : 0));
 	saveBytes[ENABLED_IN_REC_OFFSET] = static_cast< int8_t >((countMetronomeScreen->getInRec() ? 1 : 0));
-	saveBytes[CLICK_OUTPUT_OFFSET] = static_cast< int8_t >(swgui->getClickOutput());
+	saveBytes[CLICK_OUTPUT_OFFSET] = static_cast< int8_t >(metronomeSoundScreen->getClickOutput());
 	saveBytes[WAIT_FOR_KEY_ENABLED_OFFSET] = static_cast< int8_t >((countMetronomeScreen->isWaitForKeyEnabled() ? 1 : 0));
-	saveBytes[SOUND_OFFSET] = static_cast< int8_t >(swgui->getMetronomeSound());
-	saveBytes[ACCENT_VELO_OFFSET] = static_cast< int8_t >(swgui->getAccentVelo());
-	saveBytes[NORMAL_VELO_OFFSET] = static_cast< int8_t >(swgui->getNormalVelo());
+	saveBytes[SOUND_OFFSET] = static_cast< int8_t >(metronomeSoundScreen->getMetronomeSound());
+	saveBytes[ACCENT_VELO_OFFSET] = static_cast< int8_t >(metronomeSoundScreen->getAccentVelo());
+	saveBytes[NORMAL_VELO_OFFSET] = static_cast< int8_t >(metronomeSoundScreen->getNormalVelo());
 }
 
 const int Count::ENABLED_OFFSET;
