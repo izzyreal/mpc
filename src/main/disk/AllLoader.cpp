@@ -138,19 +138,24 @@ AllLoader::AllLoader(mpc::disk::MpcFile* file, bool sequencesOnly)
 			multiRecordingSetupScreen->getMrsLines()[i]->setTrack(trackDests[i]);
 		}
 
-		swGui->setChPressurePassEnabled(midiInput->isChPressurePassEnabled());
-		swGui->setExclusivePassEnabled(midiInput->isExclusivePassEnabled());
+		midiInputScreen->setChPressurePassEnabled(midiInput->isChPressurePassEnabled());
+		midiInputScreen->setExclusivePassEnabled(midiInput->isExclusivePassEnabled());
 		lSequencer->setRecordingModeMulti(midiInput->isMultiRecEnabled());
-		swGui->setNotePassEnabled(midiInput->isNotePassEnabled());
-		swGui->setPgmChangePassEnabled(midiInput->isPgmChangePassEnabled());
-		swGui->setPitchBendPassEnabled(midiInput->isPitchBendPassEnabled());
-		swGui->setPolyPressurePassEnabled(midiInput->isPolyPressurePassEnabled());
-		auto misc = allParser.getMisc();
+		midiInputScreen->setNotePassEnabled(midiInput->isNotePassEnabled());
+		midiInputScreen->setPgmChangePassEnabled(midiInput->isPgmChangePassEnabled());
+		midiInputScreen->setPitchBendPassEnabled(midiInput->isPitchBendPassEnabled());
+		midiInputScreen->setPolyPressurePassEnabled(midiInput->isPolyPressurePassEnabled());
+		
 		auto midiSyncMisc = allParser.getMidiSync();
+		
 		auto seGui = Mpc::instance().getUis().lock()->getStepEditorGui();
+		
+		auto misc = allParser.getMisc();
 		seGui->setAutoStepIncrementEnabled(misc->isAutoStepIncEnabled());
 		seGui->setTcValueRecordedNotes(misc->getDurationTcPercentage());
 		seGui->setDurationOfRecordedNotes(misc->isDurationOfRecNotesTc());
+		swGui->setTapAvg(misc->getTapAvg());
+
 		auto msGui = Mpc::instance().getUis().lock()->getMidiSyncGui();
 		msGui->setReceiveMMCEnabled(misc->isInReceiveMMCEnabled());
 		msGui->setSendMMCEnabled(midiSyncMisc->isSendMMCEnabled());
@@ -160,10 +165,12 @@ AllLoader::AllLoader(mpc::disk::MpcFile* file, bool sequencesOnly)
 		msGui->setFrameRate(midiSyncMisc->getFrameRate());
 		msGui->setIn(midiSyncMisc->getInput());
 		msGui->setOut(midiSyncMisc->getOutput());
+		
 		lSequencer->setSecondSequenceEnabled(sequencer->secondSeqEnabled);
 		lSequencer->setSecondSequenceIndex(sequencer->secondSeqIndex);
+		
 		Mpc::instance().getUis().lock()->getSongGui()->setDefaultSongName(midiSyncMisc->getDefSongName());
-		swGui->setTapAvg(misc->getTapAvg());
+				
 		auto songs = allParser.getSongs();
 		
 		for (int i = 0; i < 20; i++)

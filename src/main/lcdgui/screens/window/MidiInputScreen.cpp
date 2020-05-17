@@ -193,3 +193,63 @@ bool MidiInputScreen::getPass()
 {
 	return pass;
 }
+
+bool MidiInputScreen::isNotePassEnabled()
+{
+	return notePassEnabled;
+}
+
+void MidiInputScreen::setNotePassEnabled(bool b)
+{
+	notePassEnabled = b;
+}
+
+bool MidiInputScreen::isPitchBendPassEnabled()
+{
+	return pitchBendPassEnabled;
+}
+
+void MidiInputScreen::setPitchBendPassEnabled(bool b)
+{
+	pitchBendPassEnabled = b;
+}
+
+bool MidiInputScreen::isPgmChangePassEnabled()
+{
+	return pgmChangePassEnabled;
+}
+
+void MidiInputScreen::setPgmChangePassEnabled(bool b)
+{
+	pgmChangePassEnabled = b;
+}
+
+bool MidiInputScreen::isChPressurePassEnabled()
+{
+	return chPressurePassEnabled;
+}
+
+void MidiInputScreen::setChPressurePassEnabled(bool b)
+{
+	chPressurePassEnabled = b;
+}
+
+bool MidiInputScreen::isPolyPressurePassEnabled()
+{
+	return polyPressurePassEnabled;
+}
+
+void MidiInputScreen::setPolyPressurePassEnabled(bool b)
+{
+	polyPressurePassEnabled = b;
+}
+
+bool MidiInputScreen::isExclusivePassEnabled()
+{
+	return exclusivePassEnabled;
+}
+
+void MidiInputScreen::setExclusivePassEnabled(bool b)
+{
+	exclusivePassEnabled = b;
+}

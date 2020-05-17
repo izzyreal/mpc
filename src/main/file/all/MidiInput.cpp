@@ -3,7 +3,6 @@
 #include <Mpc.hpp>
 #include <ui/Uis.hpp>
 #include <lcdgui/screens/window/MultiRecordingSetupLine.hpp>
-#include <ui/sequencer/window/SequencerWindowGui.hpp>
 #include <sequencer/Sequencer.hpp>
 
 #include <lcdgui/screens/window/MultiRecordingSetupScreen.hpp>
@@ -46,8 +45,6 @@ MidiInput::MidiInput()
 		saveBytes[i] = TEMPLATE[i];
 	}
 
-	auto swgui = Mpc::instance().getUis().lock()->getSequencerWindowGui();
-
 	auto midiInputScreen = dynamic_pointer_cast<MidiInputScreen>(Screens::getScreenComponent("midiinput"));
 
 	saveBytes[RECEIVE_CH_OFFSET] = static_cast<int8_t>(midiInputScreen->getReceiveCh());
@@ -63,12 +60,12 @@ MidiInput::MidiInput()
 		saveBytes[MULTI_REC_TRACK_DESTS_OFFSET + i] = static_cast<int8_t>(screen->getMrsLines()[i]->getTrack() + 1);
 	}
 
-	saveBytes[NOTE_PASS_ENABLED_OFFSET] = static_cast<int8_t>(swgui->isNotePassEnabled() ? 1 : 0);
-	saveBytes[PITCH_BEND_PASS_ENABLED_OFFSET] = static_cast<int8_t>(swgui->isPitchBendPassEnabled() ? 1 : 0);
-	saveBytes[PGM_CHANGE_PASS_ENABLED_OFFSET] = static_cast<int8_t>(swgui->isPgmChangePassEnabled() ? 1 : 0);
-	saveBytes[CH_PRESSURE_PASS_ENABLED_OFFSET] = static_cast<int8_t>(swgui->isChPressurePassEnabled() ? 1 : 0);
-	saveBytes[POLY_PRESSURE_PASS_ENABLED_OFFSET] = static_cast<int8_t>(swgui->isPolyPressurePassEnabled() ? 1 : 0);
-	saveBytes[EXCLUSIVE_PASS_ENABLED_OFFSET] = static_cast<int8_t>(swgui->isExclusivePassEnabled() ? 1 : 0);
+	saveBytes[NOTE_PASS_ENABLED_OFFSET] = static_cast<int8_t>(notePassEnabled ? 1 : 0);
+	saveBytes[PITCH_BEND_PASS_ENABLED_OFFSET] = static_cast<int8_t>(pitchBendPassEnabled ? 1 : 0);
+	saveBytes[PGM_CHANGE_PASS_ENABLED_OFFSET] = static_cast<int8_t>(pgmChangePassEnabled ? 1 : 0);
+	saveBytes[CH_PRESSURE_PASS_ENABLED_OFFSET] = static_cast<int8_t>(chPressurePassEnabled ? 1 : 0);
+	saveBytes[POLY_PRESSURE_PASS_ENABLED_OFFSET] = static_cast<int8_t>(polyPressurePassEnabled ? 1 : 0);
+	saveBytes[EXCLUSIVE_PASS_ENABLED_OFFSET] = static_cast<int8_t>(exclusivePassEnabled ? 1 : 0);
 }
 
 vector<char> MidiInput::TEMPLATE = vector<char>{ 127, 64, 1, 0, 1, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 1, 0, 0, 0, 0, 0 };
