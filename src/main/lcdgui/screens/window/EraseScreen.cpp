@@ -32,8 +32,10 @@ void EraseScreen::open()
 	auto samplerGui = Mpc::instance().getUis().lock()->getSamplerGui();
 	samplerGui->addObserver(this);
 
+	auto seq = sequencer.lock()->getActiveSequence().lock();
+
 	setTime0(0);
-	setTime1(sequencer.lock()->getActiveSequence().lock()->getLastTick());
+	setTime1(seq->getLastTick());
 	
 	displayErase();
 	displayNotes();

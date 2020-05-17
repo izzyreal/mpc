@@ -18,6 +18,7 @@ namespace mpc::lcdgui::screens::window {
 
 	public:
 		void open() override;
+		void close() override;
 
 	private:
 		int time0 = 0;
@@ -39,6 +40,9 @@ namespace mpc::lcdgui::screens::window {
 	protected:
 		void displayNotes() override;
 		void displayTime() override;
+
+	public:
+		void update(moduru::observer::Observable* observable, nonstd::any message);
 
 	};
 }

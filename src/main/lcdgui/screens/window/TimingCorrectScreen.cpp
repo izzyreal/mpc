@@ -24,10 +24,13 @@ TimingCorrectScreen::TimingCorrectScreen(const int& layer)
 
 void TimingCorrectScreen::open()
 {
-	auto seq = sequencer.lock()->getActiveSequence();
+	auto samplerGui = Mpc::instance().getUis().lock()->getSamplerGui();
+	samplerGui->addObserver(this);
+
+	auto seq = sequencer.lock()->getActiveSequence().lock();
 
 	setTime0(0);
-	setTime1(sequencer.lock()->getActiveSequence().lock()->getLastTick());
+	setTime1(seq->getLastTick());
 
 	displayNoteValue();
 	displaySwing();
@@ -35,6 +38,12 @@ void TimingCorrectScreen::open()
 	displayAmount();
 	displayTime();
 	displayNotes();
+}
+
+void TimingCorrectScreen::close()
+{
+	auto samplerGui = Mpc::instance().getUis().lock()->getSamplerGui();
+	samplerGui->deleteObserver(this);
 }
 
 void TimingCorrectScreen::function(int i)
@@ -277,4 +286,14 @@ void TimingCorrectScreen::setNoteValue(int i)
 	
 	init();
 	displayNoteValue();
+}
+
+void TimingCorrectScreen::update(moduru::observer::Observable* observable, nonstd::any message)
+{
+	auto msg = nonstd::any_cast<string>(message);
+
+	if (msg.compare("padandnote") == 0)
+	{
+		displayNotes();
+	}
 }

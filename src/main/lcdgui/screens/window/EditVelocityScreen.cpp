@@ -25,14 +25,36 @@ EditVelocityScreen::EditVelocityScreen(const int& layer)
 
 void EditVelocityScreen::open()
 {
+	auto samplerGui = Mpc::instance().getUis().lock()->getSamplerGui();
+	samplerGui->addObserver(this);
+
+	auto seq = sequencer.lock()->getActiveSequence().lock();
+
 	setTime0(0);
-	setTime1(sequencer.lock()->getActiveSequence().lock()->getLastTick());
+	setTime1(seq->getLastTick());
 	
 	displayEditType();
 	displayValue();
 	displayTime();
 	displayNotes();
 }
+
+void EditVelocityScreen::close()
+{
+	auto samplerGui = Mpc::instance().getUis().lock()->getSamplerGui();
+	samplerGui->deleteObserver(this);
+}
+
+void EditVelocityScreen::update(moduru::observer::Observable* observable, nonstd::any message)
+{
+	auto msg = nonstd::any_cast<string>(message);
+
+	if (msg.compare("padandnote") == 0)
+	{
+		displayNotes();
+	}
+}
+
 
 void EditVelocityScreen::function(int i)
 {
