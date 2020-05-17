@@ -1,4 +1,4 @@
-#include <sequencer/EventAdapter.hpp>
+#include "EventAdapter.hpp"
 
 #include <Mpc.hpp>
 #include <ui/sequencer/window/SequencerWindowGui.hpp>
@@ -39,17 +39,23 @@ weak_ptr<Event> EventAdapter::convert(ctoot::midi::core::ShortMessage* msg)
 		midiClockEvent->setStatus(msg->getStatus());
 		return midiClockEvent;
 	}
-	if (swGui->getReceiveCh() != -1 && !(msg->getChannel() == swGui->getReceiveCh())) {
-		return weak_ptr<Event>();
+	
+	if (swGui->getReceiveCh() != -1 && !(msg->getChannel() == swGui->getReceiveCh()))
+	{
+		return {};
 	}
 
-	if (msg->getStatus() == ctoot::midi::core::ShortMessage::NOTE_ON || msg->getStatus() == ctoot::midi::core::ShortMessage::NOTE_OFF) {
+	if (msg->getStatus() == ctoot::midi::core::ShortMessage::NOTE_ON || msg->getStatus() == ctoot::midi::core::ShortMessage::NOTE_OFF)
+	{
 
 		noteEvent->setNote(msg->getData1());
-		if (msg->getStatus() == ctoot::midi::core::ShortMessage::NOTE_ON) {
+	
+		if (msg->getStatus() == ctoot::midi::core::ShortMessage::NOTE_ON)
+		{
 			noteEvent->setVelocity(msg->getData2());
 		}
-		else if (msg->getStatus() == ctoot::midi::core::ShortMessage::NOTE_OFF) {
+		else if (msg->getStatus() == ctoot::midi::core::ShortMessage::NOTE_OFF)
+		{
 			noteEvent->setVelocityZero();
 		}
 
@@ -69,13 +75,10 @@ weak_ptr<Event> EventAdapter::convert(ctoot::midi::core::ShortMessage* msg)
 		noteEvent->setVariationValue(64);
 		return noteEvent;
 	}
-	return weak_ptr<Event>();
+	return {};
 }
 
 weak_ptr<Event> EventAdapter::get()
 {
     return event;
-}
-
-EventAdapter::~EventAdapter() {
 }

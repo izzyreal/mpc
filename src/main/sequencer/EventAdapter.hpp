@@ -44,7 +44,6 @@ namespace mpc::sequencer
 		std::weak_ptr<Event> get();
 
 		EventAdapter(std::weak_ptr<Sequencer> sequencer);
-		~EventAdapter();
 
 	};
 }

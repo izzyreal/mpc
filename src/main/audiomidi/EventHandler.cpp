@@ -68,13 +68,26 @@ void EventHandler::handleNoThru(weak_ptr<mpc::sequencer::Event> e, mpc::sequence
 
 	if (track->getName().compare("click") == 0) {
 		auto lSequencer = sequencer.lock();
-		if (!lSequencer->isCountEnabled()) return;
-		if (lSequencer->isRecordingOrOverdubbing() && !swGui->getInRec() && !lSequencer->isCountingIn()) return;
-		if (lSequencer->isPlaying() && !lSequencer->isRecordingOrOverdubbing() && !swGui->getInPlay() && !lSequencer->isCountingIn()) return;
+		
+		if (!lSequencer->isCountEnabled())
+		{
+			return;
+		}
+		
+		if (lSequencer->isRecordingOrOverdubbing() && !swGui->getInRec() && !lSequencer->isCountingIn())
+		{
+			return;
+		}
+		
+		if (lSequencer->isPlaying() && !lSequencer->isRecordingOrOverdubbing() && !swGui->getInPlay() && !lSequencer->isCountingIn())
+		{
+			return;
+		}
 
 		auto ne = dynamic_pointer_cast<mpc::sequencer::NoteEvent>(event);
 
-		if (ne->getVelocity() == 0) {
+		if (ne->getVelocity() == 0)
+		{
 			return;
 		}
 
@@ -117,7 +130,8 @@ void EventHandler::handleNoThru(weak_ptr<mpc::sequencer::Event> e, mpc::sequence
 		auto midiOutputStreamA = &mpcMidiPorts->getReceivers()[0];
 		auto midiOutputStreamB = &mpcMidiPorts->getReceivers()[1];
 
-		switch (msGui->getOut()) {
+		switch (msGui->getOut())
+		{
 		case 0:
 			midiOutputStreamA->push_back(*clockMsg);
 			break;
@@ -130,28 +144,44 @@ void EventHandler::handleNoThru(weak_ptr<mpc::sequencer::Event> e, mpc::sequence
 			break;
 		}
 	}
-	else if (ne) {
+	else if (ne)
+	{
 		auto busNumber = track->getBusNumber();
-		if (busNumber != 0) {
+	
+		if (busNumber != 0)
+		{
 			auto drum = busNumber - 1;
-			if (ne->getDuration() != -1) {
-				if (!(lSequencer->isSoloEnabled() && track->getTrackIndex() != lSequencer->getActiveTrackIndex())) {
-					auto newVelo = static_cast<int>(ne->getVelocity() * (track->getVelocityRatio() / 100.0));
+			if (ne->getDuration() != -1)
+			{
+				if (!(lSequencer->isSoloEnabled() && track->getTrackIndex() != lSequencer->getActiveTrackIndex()))
+				{
+					auto newVelo = static_cast<int>(ne->getVelocity() * (track->getVelocityRatio() * 0.01));
 					mpc::sequencer::MidiAdapter midiAdapter;
 					midiAdapter.process(ne, drum, newVelo);
 					auto eventFrame = Mpc::instance().getAudioMidiServices().lock()->getFrameSequencer().lock()->getEventFrameOffset(event->getTick());
-					if (timeStamp != -1) eventFrame = timeStamp;
+					
+					if (timeStamp != -1)
+					{
+						eventFrame = timeStamp;
+					}
+					
 					Mpc::instance().getMms()->mpcTransport(track->getTrackIndex(), midiAdapter.get().lock().get(), 0, ne->getVariationTypeNumber(), ne->getVariationValue(), eventFrame);
 					
-					if (Mpc::instance().getAudioMidiServices().lock()->getAudioServer()->isRealTime()) {
+					if (Mpc::instance().getAudioMidiServices().lock()->getAudioServer()->isRealTime())
+					{
 						auto note = ne->getNote();
 						auto program = Mpc::instance().getSampler().lock()->getProgram(Mpc::instance().getDrum(drum)->getProgram());
 						int pad = program.lock()->getPadNumberFromNote(note);
 						int bank = Mpc::instance().getUis().lock()->getSamplerGui()->getBank();
 						pad -= bank * 16;
-						if (pad >= 0 && pad <= 15) {
+					
+						if (pad >= 0 && pad <= 15)
+						{
 							int notifyVelo = ne->getVelocity();
-							if (notifyVelo == 0) notifyVelo = 255;
+							if (notifyVelo == 0)
+							{
+								notifyVelo = 255;
+							}
 							Mpc::instance().getHardware().lock()->getPad(pad).lock()->notifyObservers(notifyVelo);
 						}
 					}
@@ -159,26 +189,35 @@ void EventHandler::handleNoThru(weak_ptr<mpc::sequencer::Event> e, mpc::sequence
 			}
 		}
 	}
-	else if (me) {
+	else if (me)
+	{
 		auto pad = me->getPad();
 		auto lSampler = sampler.lock();
 		auto p = lSampler->getProgram(lSampler->getDrumBusProgramNumber(track->getBusNumber())).lock();
 		auto mixer = p->getStereoMixerChannel(pad).lock();
-		if (Mpc::instance().getUis().lock()->getMixerSetupGui()->isStereoMixSourceDrum()) {
+	
+		if (Mpc::instance().getUis().lock()->getMixerSetupGui()->isStereoMixSourceDrum())
+		{
 			auto busNumber = track->getBusNumber();
-			if (busNumber != 0) {
+		
+			if (busNumber != 0)
+			{
 				auto drumIndex = busNumber - 1;
 				auto drum = Mpc::instance().getDrum(drumIndex);
 				mixer = drum->getStereoMixerChannels().at(pad).lock();
 			}
-			else {
+			else
+			{
 				return;
 			}
 		}
-		if (me->getParameter() == 0) {
+		
+		if (me->getParameter() == 0)
+		{
 			mixer->setLevel(me->getValue());
 		}
-		else if (me->getParameter() == 1) {
+		else if (me->getParameter() == 1)
+		{
 			mixer->setPanning(me->getValue());
 		}
 	}
@@ -189,16 +228,26 @@ void EventHandler::midiOut(weak_ptr<mpc::sequencer::Event> e, mpc::sequencer::Tr
 	auto event = e.lock();
 	auto ne = dynamic_pointer_cast<mpc::sequencer::NoteEvent>(event);
 
-	if (ne) {
+	if (ne)
+	{
 		auto transGui = Mpc::instance().getUis().lock()->getTransGui();
-		if (transGui->getTr() == -1 || transGui->getTr() == ne->getTrack()) {
+	
+		if (transGui->getTr() == -1 || transGui->getTr() == ne->getTrack())
+		{
 			ne->setNote(ne->getNote() + transGui->getAmount());
 		}
 				
 		auto deviceNumber = track->getDevice() - 1;
-		if (deviceNumber < 0) return;
+		
+		if (deviceNumber < 0)
+		{
+			return;
+		}
+		
 		auto channel = deviceNumber;
-		if (channel > 15) {
+		
+		if (channel > 15)
+		{
 			channel -= 16;
 		}
 		mpc::sequencer::MidiAdapter midiAdapter;
@@ -213,27 +262,35 @@ void EventHandler::midiOut(weak_ptr<mpc::sequencer::Event> e, mpc::sequencer::Tr
 
 		auto notifyLetter = "a";
 
-		if (deviceNumber > 15) {
+		if (deviceNumber > 15)
+		{
 			deviceNumber -= 16;
 			r = &mpcMidiPorts->getReceivers()[1];
 			notifyLetter = "b";
 		}
 
-		if (!(Mpc::instance().getAudioMidiServices().lock()->isBouncing() && Mpc::instance().getUis().lock()->getD2DRecorderGui()->isOffline()) && r != nullptr && track->getDevice() != 0) {
-			if (r != nullptr) {
+		if (!(Mpc::instance().getAudioMidiServices().lock()->isBouncing() &&
+			Mpc::instance().getUis().lock()->getD2DRecorderGui()->isOffline()) && 
+			r != nullptr && track->getDevice() != 0)
+		{
+			if (r != nullptr)
+			{
 				auto fs = Mpc::instance().getAudioMidiServices().lock()->getFrameSequencer().lock();
 				auto eventFrame = fs->getEventFrameOffset(event->getTick());
 				msg.bufferPos = eventFrame;
-				if (r->size() < 100) {
+				if (r->size() < 100)
+				{
 					r->push_back(msg);
 				}
-				else {
+				else
+				{
 					r->clear();
 				}
 			}
 		}
 
-		if (Mpc::instance().getLayeredScreen().lock()->getCurrentScreenName().compare("midioutputmonitor") == 0) {
+		if (Mpc::instance().getLayeredScreen().lock()->getCurrentScreenName().compare("midioutputmonitor") == 0)
+		{
 			setChanged();
 			notifyObservers(string(notifyLetter + to_string(deviceNumber)));
 		}
