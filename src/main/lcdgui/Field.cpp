@@ -23,7 +23,6 @@ using namespace std;
 Field::Field(const string& name, int x, int y, int width)
 	: TextComp(name)
 {
-	Hide(false);
 	this->name = name;
 	this->width = width;
 	setLocation(x - 1, y - 1);
@@ -34,12 +33,21 @@ const int Field::BLINKING_RATE;
 
 void Field::Draw(std::vector<std::vector<bool>>* pixels)
 {
+	if (shouldNotDraw(pixels))
+	{
+		return;
+	}
+
 	auto r = getRect();
-	for (int i = r.L; i < r.R - 1; i++) {
-		for (int j = r.T; j < r.B; j++) {
+
+	for (int i = r.L; i < r.R - 1; i++)
+	{
+		for (int j = r.T; j < r.B; j++)
+		{
 			(*pixels)[i][j] = inverted;
 		}
 	}
+
 	TextComp::Draw(pixels);
 }
 

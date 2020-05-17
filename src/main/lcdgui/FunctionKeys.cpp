@@ -79,7 +79,7 @@ void FunctionKeys::clearAll(std::vector<std::vector<bool>>* pixels) {
 
 void FunctionKeys::Draw(std::vector<std::vector<bool>>* pixels) {
 
-	if (hidden || !IsDirty())
+	if (shouldNotDraw(pixels))
 	{
 		return;
 	}

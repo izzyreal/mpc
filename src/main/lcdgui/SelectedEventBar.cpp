@@ -11,7 +11,7 @@ SelectedEventBar::SelectedEventBar(MRECT rect)
 
 void SelectedEventBar::Draw(std::vector<std::vector<bool>>* pixels)
 {
-	if (hidden || !IsDirty())
+	if (shouldNotDraw(pixels))
 	{
 		return;
 	}

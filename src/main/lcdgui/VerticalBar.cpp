@@ -25,7 +25,7 @@ void VerticalBar::setColor(bool on)
 
 void VerticalBar::Draw(std::vector<std::vector<bool>>* pixels)
 {
-	if (hidden || !IsDirty())
+	if (shouldNotDraw(pixels))
 	{
 		return;
 	}

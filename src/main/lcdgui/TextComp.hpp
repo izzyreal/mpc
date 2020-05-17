@@ -11,7 +11,6 @@ namespace mpc::lcdgui
 
 	class TextComp
 		: public Component
-
 	{
 
 	protected:
@@ -47,7 +46,6 @@ namespace mpc::lcdgui
 
 	public:
 		TextComp(const std::string& name);
-		virtual ~TextComp();
 
 	};
 }

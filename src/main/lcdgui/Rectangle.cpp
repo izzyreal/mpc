@@ -15,7 +15,8 @@ Rectangle::Rectangle(MRECT rect)
 
 void Rectangle::Draw(std::vector< std::vector<bool>>* pixels)
 {
-	if (hidden || !IsDirty()) {
+	if (shouldNotDraw(pixels))
+	{
 		return;
 	}
 

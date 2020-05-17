@@ -17,6 +17,22 @@ Component::Component(const string& name)
 	this->name = name;
 }
 
+bool Component::shouldNotDraw(vector<vector<bool>>* pixels)
+{
+	if (!IsDirty()) {
+		return true;
+	}
+
+	if (hidden)
+	{
+		Clear(pixels);
+		dirty = false;
+		return true;
+	}
+
+	return false;
+}
+
 weak_ptr<Parameter> Component::findParameter(const string& name)
 {
 	for (auto& c : children)
@@ -204,8 +220,10 @@ const string& Component::getName()
 
 void Component::Hide(bool b) 
 { 
-	if (hidden != b) { 
+	if (hidden != b)
+	{
 		hidden = b;
+		SetDirty();
 	} 
 }
 
@@ -213,10 +231,6 @@ void Component::setSize(int w, int h) {
 	this->w = w;
 	this->h = h;
 	SetDirty();
-	if (248 < x + w)
-	{
-		MLOG("hey");
-	}
 }
 
 void Component::setLocation(int x, int y) {
@@ -232,7 +246,7 @@ MRECT Component::getDirtyArea() {
 		res = res.Union(&c->getDirtyArea());
 	}
 
-	if (dirty && !hidden) {
+	if (dirty) {
 		auto rect = getRect();
 		res = res.Union(&rect);
 	}
@@ -279,7 +293,7 @@ bool Component::IsDirty()
 		return true;
 	}
 
-	return dirty && !hidden;
+	return dirty;
 }
 
 MRECT Component::getRect() {

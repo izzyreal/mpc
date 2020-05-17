@@ -26,7 +26,8 @@ void Popup::setText(string text, int pos)
 
 void Popup::Draw(std::vector<std::vector<bool>>* pixels)
 {
-	if (IsHidden()) {
+	if (shouldNotDraw(pixels))
+	{
 		return;
 	}
 

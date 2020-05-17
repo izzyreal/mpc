@@ -12,7 +12,7 @@ MixerTopBackground::MixerTopBackground(MRECT rect)
 
 void MixerTopBackground::Draw(std::vector<std::vector<bool>>* pixels)
 {
-	if (hidden || !IsDirty())
+	if (shouldNotDraw(pixels))
 	{
 		return;
 	}

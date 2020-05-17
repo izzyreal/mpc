@@ -32,7 +32,7 @@ void Knob::setColor(bool on)
 
 void Knob::Draw(std::vector<std::vector<bool>>* pixels)
 {
-	if (hidden || !IsDirty())
+	if (shouldNotDraw(pixels))
 	{
 		return;
 	}

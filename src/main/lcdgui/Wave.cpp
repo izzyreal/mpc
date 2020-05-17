@@ -181,12 +181,11 @@ void Wave::makeLine(std::vector<std::vector<std::vector<int>> >* lines, std::vec
 }
 
 void Wave::Draw(std::vector<std::vector<bool>>* pixels) {
-	
-	if (hidden || !IsDirty())
+	if (shouldNotDraw(pixels))
 	{
 		return;
 	}
-	
+
 	if (sampleData == nullptr) {
 		return;
 	}

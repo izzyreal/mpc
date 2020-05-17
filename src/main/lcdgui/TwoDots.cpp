@@ -38,7 +38,7 @@ void TwoDots::setVisible(int i, bool b)
 
 void TwoDots::Draw(std::vector<std::vector<bool>>* pixels)
 {
-	if (hidden || !IsDirty())
+	if (shouldNotDraw(pixels))
 	{
 		return;
 	}

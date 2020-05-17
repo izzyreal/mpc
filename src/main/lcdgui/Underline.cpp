@@ -15,7 +15,7 @@ Underline::Underline()
 
 void Underline::Draw(vector<vector<bool>>* pixels)
 {
-	if (hidden || !IsDirty())
+	if (shouldNotDraw(pixels))
 	{
 		return;
 	}

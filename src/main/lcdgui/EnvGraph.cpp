@@ -25,6 +25,11 @@ void EnvGraph::setCoordinates(vector<vector<int>> ia)
 
 void EnvGraph::Draw(std::vector<std::vector<bool>>* pixels)
 {
+	if (shouldNotDraw(pixels))
+	{
+		return;
+	}
+
 	auto csn = Mpc::instance().getLayeredScreen().lock()->getCurrentScreenName();
 	int xoff = (csn.compare("programparams") == 0) ? 76 : 92;
 	int yoff = (csn.compare("programparams") == 0) ? 16 : 22;

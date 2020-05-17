@@ -22,7 +22,7 @@ namespace mpc::lcdgui::screens::window
 
 	private:
 		std::vector<std::weak_ptr<mpc::lcdgui::HorizontalBar>> bars;
-		std::vector<std::weak_ptr<mpc::sequencer::TempoChangeEvent>> visibleTempoChangeEvents;
+		std::vector<std::weak_ptr<mpc::sequencer::TempoChangeEvent>> visibleTempoChanges;
 		std::weak_ptr<mpc::lcdgui::Field> a0Field;
 		std::weak_ptr<mpc::lcdgui::Field> a1Field;
 		std::weak_ptr<mpc::lcdgui::Field> a2Field;
@@ -83,13 +83,12 @@ namespace mpc::lcdgui::screens::window
 		void turnWheel(int j) override;
 		void down() override;
 		void up() override;
-	public:
-		void update(moduru::observer::Observable* observable, nonstd::any message) override;
 
 	private:
 		std::weak_ptr<mpc::sequencer::TempoChangeEvent> previous;
 		std::weak_ptr<mpc::sequencer::TempoChangeEvent> current;
 		std::weak_ptr<mpc::sequencer::TempoChangeEvent> next;
-
+		int offset = 0;
+		void setTempoChangeOffset(int i);
 	};
 }

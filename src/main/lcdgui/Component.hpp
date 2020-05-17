@@ -30,6 +30,9 @@ namespace mpc::lcdgui {
 		unsigned int w{ 0 };
 		unsigned int h{ 0 };
 
+	protected:
+		bool shouldNotDraw(std::vector<std::vector<bool>>* pixels);
+
 	public:
 		std::weak_ptr<Component> addChild(std::shared_ptr<Component> child);
 		void removeChild(std::weak_ptr<Component> child);

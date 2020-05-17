@@ -18,7 +18,7 @@ void Effect::setFilled(bool b)
 }
 
 void Effect::Draw(std::vector<std::vector<bool>>* pixels) {
-	if (hidden || !IsDirty())
+	if (shouldNotDraw(pixels))
 	{
 		return;
 	}

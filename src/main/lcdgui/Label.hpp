@@ -13,7 +13,6 @@ namespace mpc::lcdgui {
 
 	public:
 		Label(const std::string& name, std::string text, int x, int y, int width);
-		~Label() override;
 
 	};
 }

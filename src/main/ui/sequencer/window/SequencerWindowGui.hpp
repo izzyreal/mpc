@@ -16,16 +16,10 @@ namespace mpc::ui::sequencer::window {
 	{
 
 	private:
-		std::vector<std::weak_ptr<mpc::sequencer::TempoChangeEvent>> visibleTempoChanges;
-		int tempoChangeOffset = 0;
 		int tapAvg = 0;
 		bool pgmChangeToSeqEnabled = false;
 
 	public:
-		std::vector<std::weak_ptr<mpc::sequencer::TempoChangeEvent>> getVisibleTempoChanges();
-		void setVisibleTempoChanges(std::vector<std::weak_ptr<mpc::sequencer::TempoChangeEvent>> vtc);
-		int getTempoChangeOffset();
-		void setTempoChangeOffset(int i);
 		int getTapAvg();
 		void setTapAvg(int i);
 		bool isPgmChangeToSeqEnabled();
