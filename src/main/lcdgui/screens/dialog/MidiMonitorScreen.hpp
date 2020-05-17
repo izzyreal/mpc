@@ -4,11 +4,13 @@
 #include <thread>
 #include <memory>
 
-namespace mpc::lcdgui {
+namespace mpc::lcdgui
+{
 	class Label;
 }
 
-namespace mpc::lcdgui::screens::dialog {
+namespace mpc::lcdgui::screens::dialog
+{
 
 	class MidiMonitorScreen
 		: public mpc::lcdgui::ScreenComponent

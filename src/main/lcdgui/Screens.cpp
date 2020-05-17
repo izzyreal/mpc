@@ -33,11 +33,16 @@
 
 #include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
 #include <lcdgui/screens/dialog/MidiMonitorScreen.hpp>
+#include <lcdgui/screens/dialog/CopySequenceScreen.hpp>
+#include <lcdgui/screens/dialog/CopyTrackScreen.hpp>
+#include <lcdgui/screens/dialog/DeleteTrackScreen.hpp>
+#include <lcdgui/screens/dialog/DeleteSequenceScreen.hpp>
+#include <lcdgui/screens/dialog/DeleteAllSequencesScreen.hpp>
+#include <lcdgui/screens/dialog/DeleteAllTracksScreen.hpp>
 
 #include <file/FileUtil.hpp>
 
 #include <rapidjson/filereadstream.h>
-
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -267,6 +272,30 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	else if (screenName.compare("metronomesound") == 0)
 	{
 		screen = make_shared<MetronomeSoundScreen>(layerIndex);
+	}
+	else if (screenName.compare("copysequence") == 0)
+	{
+		screen = make_shared<CopySequenceScreen>(layerIndex);
+	}
+	else if (screenName.compare("copytrack") == 0)
+	{
+	screen = make_shared<CopyTrackScreen>(layerIndex);
+	}
+	else if (screenName.compare("deletesequence") == 0)
+	{
+	screen = make_shared<DeleteSequenceScreen>(layerIndex);
+	}
+	else if (screenName.compare("deletetrack") == 0)
+	{
+		screen = make_shared<DeleteTrackScreen>(layerIndex);
+	}
+		else if (screenName.compare("deleteallsequences") == 0)
+	{
+	screen = make_shared<DeleteAllSequencesScreen>(layerIndex);
+	}
+	else if (screenName.compare("deletealltracks") == 0)
+	{
+		screen = make_shared<DeleteAllTracksScreen>(layerIndex);
 	}
 
 	if (screen)

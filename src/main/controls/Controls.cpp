@@ -17,13 +17,6 @@
 #include <controls/sequencer/TrMuteControls.hpp>
 #include <controls/sequencer/UserControls.hpp>
 
-#include <controls/sequencer/dialog/CopySequenceControls.hpp>
-#include <controls/sequencer/dialog/CopyTrackControls.hpp>
-#include <controls/sequencer/dialog/DeleteAllSequencesControls.hpp>
-#include <controls/sequencer/dialog/DeleteAllTracksControls.hpp>
-#include <controls/sequencer/dialog/DeleteSequenceControls.hpp>
-#include <controls/sequencer/dialog/DeleteTrackControls.hpp>
-
 #include <controls/sampler/DrumControls.hpp>
 #include <controls/sampler/InitPadAssignControls.hpp>
 #include <controls/sampler/LoopControls.hpp>
@@ -135,13 +128,6 @@ Controls::Controls()
 
 	controls["sequencer_step"] = new sequencer::StepEditorControls();
 	controls["step_tc"] = new sequencer::StepEditorControls();
-
-	controls["copytrack"] = new sequencer::dialog::CopyTrackControls();
-	controls["copysequence"] = new sequencer::dialog::CopySequenceControls();
-	controls["deletealltracks"] = new sequencer::dialog::DeleteAllTracksControls();
-	controls["deleteallsequences"] = new sequencer::dialog::DeleteAllSequencesControls();
-	controls["deletetrack"] = new sequencer::dialog::DeleteTrackControls();
-	controls["deletesequence"] = new sequencer::dialog::DeleteSequenceControls();
 
 	controls["trim"] = new sampler::TrimControls();
 	controls["loop"] = new sampler::LoopControls();

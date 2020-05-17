@@ -41,7 +41,6 @@
 #include <ui/sequencer/TrMoveObserver.hpp>
 #include <ui/sequencer/TrMuteObserver.hpp>
 #include <ui/sequencer/UserObserver.hpp>
-#include <ui/sequencer/window/SequencerWindowObserver.hpp>
 #include <ui/sequencer/window/StepWindowObserver.hpp>
 
 #include <ui/sampler/DrumObserver.hpp>
@@ -115,9 +114,6 @@ using namespace std;
 static vector<string> samplerWindowNames = vector<string>{ "program", "deleteprogram", "deleteallprograms", "createnewprogram",
 "copyprogram", "assignmentview", "initpadassign", "copynoteparameters", "velocitymodulation",
 "veloenvfilter", "velopitch", "autochromaticassignment", "keeporretry" };
-
-static vector<string> seqWindowNames = vector<string>{ "copysequence", "copytrack",
-"deletesequence", "deletetrack", "deleteallsequences", "deletealltracks" };
 
 static vector<string> diskNames = vector<string>{ "load", "save", "format", "setup", "device", "loadaprogram",
 "saveaprogram", "loadasound", "saveasound", "cantfindfile", "filealreadyexists", "loadasequence",
@@ -844,88 +840,112 @@ void LayeredScreen::initObserver()
 	else if (csn.compare("nextseqpad") == 0) {
 		activeObserver = make_unique<NextSeqPadObserver>();
 	}
-	else if (csn.compare("nextseq") == 0) {
-	activeObserver = make_unique<NextSeqObserver>();
+	else if (csn.compare("nextseq") == 0)
+	{
+		activeObserver = make_unique<NextSeqObserver>();
 	}
-	else if (csn.compare("song") == 0) {
-	activeObserver = make_unique<SongObserver>();
+	else if (csn.compare("song") == 0)
+	{
+		activeObserver = make_unique<SongObserver>();
 	}
-	else if (csn.compare("trackmute") == 0) {
-	activeObserver = make_unique<TrMuteObserver>();
+	else if (csn.compare("trackmute") == 0)
+	{
+		activeObserver = make_unique<TrMuteObserver>();
 	}
-	else if (checkActiveScreen(&diskNames, currentScreenName)) {
-	activeObserver = make_unique<DiskObserver>();
+	else if (checkActiveScreen(&diskNames, currentScreenName))
+	{
+		activeObserver = make_unique<DiskObserver>();
 	}
-	else if (checkActiveScreen(&seqWindowNames, currentScreenName)) {
-	activeObserver = make_unique<SequencerWindowObserver>();
+	else if (checkActiveScreen(&soundNames, currentScreenName))
+	{
+		activeObserver = make_unique<SoundObserver>();
 	}
-	else if (checkActiveScreen(&soundNames, currentScreenName)) {
-	activeObserver = make_unique<SoundObserver>();
+	else if (csn.compare("sample") == 0)
+	{
+		activeObserver = make_unique<SampleObserver>();
 	}
-	else if (csn.compare("sample") == 0) {
-	activeObserver = make_unique<SampleObserver>();
-	}
-	else if (csn.compare("directory") == 0) {
+	else if (csn.compare("directory") == 0)
+	{
 		activeObserver = make_unique<DirectoryObserver>(Mpc::instance().getDisk());
 	}
-	else if (csn.compare("programparams") == 0) {
+	else if (csn.compare("programparams") == 0)
+	{
 		activeObserver = make_unique<PgmParamsObserver>();
 	}
-	else if (csn.compare("programassign") == 0) {
+	else if (csn.compare("programassign") == 0)
+	{
 		activeObserver = make_unique<PgmAssignObserver>();
 	}
-	else if (csn.compare("sequencer_step") == 0) {
+	else if (csn.compare("sequencer_step") == 0)
+	{
 		activeObserver = make_unique<StepEditorObserver>();
 	}
-	else if (csn.compare("step_tc") == 0 || csn.compare("editmultiple") == 0 || csn.compare("insertevent") == 0) {
+	else if (csn.compare("step_tc") == 0 || csn.compare("editmultiple") == 0 || csn.compare("insertevent") == 0)
+	{
 		activeObserver = make_unique<StepWindowObserver>();
 	}
-	else if (csn.compare("mixerv2") == 0 || csn.compare("mixersetup") == 0) {
+	else if (csn.compare("mixerv2") == 0 || csn.compare("mixersetup") == 0)
+	{
 		activeObserver = make_unique<MixerObserver>();
 	}
-	else if (csn.compare("fxedit") == 0) {
+	else if (csn.compare("fxedit") == 0)
+	{
 		activeObserver = make_unique<FxEditObserver>();
 	}
-	else if (csn.compare("channelsettings") == 0) {
+	else if (csn.compare("channelsettings") == 0)
+	{
 		activeObserver = make_unique<ChannelSettingsObserver>();
 	}
-	else if (csn.compare("edit") == 0) {
+	else if (csn.compare("edit") == 0)
+	{
 		activeObserver = make_unique<EditSequenceObserver>();
 	}
-	else if (csn.compare("name") == 0) {
+	else if (csn.compare("name") == 0)
+	{
 		activeObserver = make_unique<ui::NameObserver>();
 	}
-	else if (csn.compare("barcopy") == 0) {
+	else if (csn.compare("barcopy") == 0)
+	{
 		activeObserver = make_unique<BarCopyObserver>();
 	}
-	else if (csn.compare("trmove") == 0) {
+	else if (csn.compare("trmove") == 0)
+	{
 		activeObserver = make_unique<TrMoveObserver>();
 	}
-	else if (csn.compare("user") == 0) {
+	else if (csn.compare("user") == 0)
+	{
 		activeObserver = make_unique<UserObserver>();
 	}
-	else if (csn.compare("trim") == 0) {
+	else if (csn.compare("trim") == 0)
+	{
 		activeObserver = make_unique<TrimObserver>();
 	}
-	else if (csn.compare("loop") == 0) {
+	else if (csn.compare("loop") == 0)
+	{
 		activeObserver = make_unique<LoopObserver>();
 	}
-	else if (csn.compare("editsound") == 0) {
+	else if (csn.compare("editsound") == 0)
+	{
 		activeObserver = make_unique<EditSoundObserver>();
 	}
-	else if (csn.find("startfine") != string::npos || csn.find("endfine") != string::npos || csn.compare("looptofine") == 0) {
+	else if (csn.find("startfine") != string::npos || csn.find("endfine") != string::npos || csn.compare("looptofine") == 0)
+	{
 		activeObserver = make_unique<ZoomObserver>();
 	}
-	else if (csn.compare("zone") == 0 || csn.compare("numberofzones") == 0) {
+	else if (csn.compare("zone") == 0 || csn.compare("numberofzones") == 0)
+	{
 		activeObserver = make_unique<ZoneObserver>();
 	}
-	else if (csn.compare("params") == 0) {
+	else if (csn.compare("params") == 0)
+	{
 		activeObserver = make_unique<SndParamsObserver>();
 	}
-	else if (csn.compare("deleteallfiles") == 0) {
+	else if (csn.compare("deleteallfiles") == 0)
+	{
 		activeObserver = make_unique<DeleteAllFilesObserver>();
 	}
-	else if (checkActiveScreen(&samplerWindowNames, csn)) {
+	else if (checkActiveScreen(&samplerWindowNames, csn))
+	{
 		activeObserver = make_unique<SamplerWindowObserver>();
 	}
 	else if (csn.compare("purge") == 0) {
@@ -934,18 +954,22 @@ void LayeredScreen::initObserver()
 	else if (csn.compare("drum") == 0) {
 		activeObserver = make_unique<DrumObserver>();
 	}
-	else if (csn.compare("muteassign") == 0) {
+	else if (csn.compare("muteassign") == 0)
+	{
 		activeObserver = make_unique<MuteAssignObserver>();
 	}
-	else if (csn.compare("settings") == 0) {
+	else if (csn.compare("settings") == 0)
+	{
 		activeObserver = make_unique<VmpcSettingsObserver>();
 	}
 }
 
-string LayeredScreen::getFocus() {
+string LayeredScreen::getFocus()
+{
 	return getFocusedLayer().lock()->getFocus();
 }
 
-void LayeredScreen::setFocus(const string& focus) {
+void LayeredScreen::setFocus(const string& focus)
+{
 	getFocusedLayer().lock()->setFocus(focus);
 }

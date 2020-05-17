@@ -1,16 +1,16 @@
-#include "DeleteAllSequencesControls.hpp"
+#include "DeleteAllSequencesScreen.hpp"
 
 #include <sequencer/Sequencer.hpp>
 
-using namespace mpc::controls::sequencer::dialog;
+using namespace mpc::lcdgui::screens::dialog;
 using namespace std;
 
-DeleteAllSequencesControls::DeleteAllSequencesControls()
-	: AbstractSequencerControls()
+DeleteAllSequencesScreen::DeleteAllSequencesScreen(const int layer)
+	: ScreenComponent("deleteallsequences", layer)
 {
 }
 
-void DeleteAllSequencesControls::function(int i)
+void DeleteAllSequencesScreen::function(int i)
 {
 	init();
 	switch (i) {

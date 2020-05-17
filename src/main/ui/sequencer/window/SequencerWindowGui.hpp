@@ -16,11 +16,6 @@ namespace mpc::ui::sequencer::window {
 	{
 
 	private:
-		int trackNumber = 0;
-		int sq0 = 0;
-		int sq1 = 0;
-		int tr0 = 0;
-		int tr1 = 0;
 		std::vector<std::weak_ptr<mpc::sequencer::TempoChangeEvent>> visibleTempoChanges;
 		int tempoChangeOffset = 0;
 		bool notePassEnabled = false;
@@ -35,14 +30,6 @@ namespace mpc::ui::sequencer::window {
 	public:
 		int getTrackNumber();
 		void setTrackNumber(int i);
-		int getSq0();
-		void setSq0(int i);
-		int getSq1();
-		void setSq1(int i);
-		int getTr0();
-		void setTr0(int i);
-		int getTr1();
-		void setTr1(int i);
 		std::vector<std::weak_ptr<mpc::sequencer::TempoChangeEvent>> getVisibleTempoChanges();
 		void setVisibleTempoChanges(std::vector<std::weak_ptr<mpc::sequencer::TempoChangeEvent>> vtc);
 		int getTempoChangeOffset();
