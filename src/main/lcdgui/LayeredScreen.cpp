@@ -119,10 +119,8 @@ static vector<string> samplerWindowNames = vector<string>{ "program", "deletepro
 "copyprogram", "assignmentview", "initpadassign", "copynoteparameters", "velocitymodulation",
 "veloenvfilter", "velopitch", "autochromaticassignment", "keeporretry" };
 
-static vector<string> seqWindowNames = vector<string>{ "copysequence", "copytrack", "countmetronome", "timedisplay",
-"tempochange", "timingcorrect", "changetsig", "changebars", "changebars2", "eraseallofftracks",
-"transmitprogramchanges", "multirecordingsetup", "midiinput", "midioutput", "editvelocity", "sequence",
-"deletesequence", "track", "deletetrack", "deleteallsequences", "deletealltracks", "loopbarswindow" };
+static vector<string> seqWindowNames = vector<string>{ "copysequence", "copytrack",
+"deletesequence", "deletetrack", "deleteallsequences", "deletealltracks" };
 
 static vector<string> diskNames = vector<string>{ "load", "save", "format", "setup", "device", "loadaprogram",
 "saveaprogram", "loadasound", "saveasound", "cantfindfile", "filealreadyexists", "loadasequence",

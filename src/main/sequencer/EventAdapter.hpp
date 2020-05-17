@@ -3,57 +3,48 @@
 #include <vector>
 #include <memory>
 
-namespace ctoot {
-	namespace midi {
-		namespace core {
-			class ShortMessage;
-			class MidiMessage;
-		}
-	}
+namespace ctoot::midi::core
+{
+	class ShortMessage;
+	class MidiMessage;
 }
 
-namespace mpc {
+namespace mpc::ui::sequencer::window
+{
+	class SequencerWindowGui;
+}
 
-	namespace ui {
-		namespace sequencer {
-			namespace window {
-				class SequencerWindowGui;
-				class MultiRecordingSetupLine;
-			}
-		}
-	}
+namespace mpc::sequencer
+{
+	class Event;
+	class NoteEvent;
+	class MidiClockEvent;
+	class Sequencer;
+}
 
-	namespace sequencer {
+namespace mpc::sequencer
+{
+	class EventAdapter
+	{
 
-		class Event;
-		class NoteEvent;
-		class MidiClockEvent;
-		class Sequencer;
+	private:
+		std::weak_ptr<Sequencer> sequencer;
+		std::weak_ptr<Event> event;
+		mpc::ui::sequencer::window::SequencerWindowGui* swGui = nullptr;
+		std::shared_ptr<MidiClockEvent> midiClockEvent;
+		std::shared_ptr<NoteEvent> noteEvent;
 
-		class EventAdapter
-		{
+	public:
+		void process(ctoot::midi::core::MidiMessage* msg, mpc::ui::sequencer::window::SequencerWindowGui* gui);
 
-		private:
-			std::weak_ptr<Sequencer> sequencer{ };
-			std::weak_ptr<Event> event {};
-			mpc::ui::sequencer::window::SequencerWindowGui* swGui{ nullptr };
-			std::vector<mpc::ui::sequencer::window::MultiRecordingSetupLine*> mrs{ nullptr };
-			std::shared_ptr<MidiClockEvent> midiClockEvent{};
-			std::shared_ptr<NoteEvent> noteEvent{};
+	private:
+		std::weak_ptr<Event> convert(ctoot::midi::core::ShortMessage* msg);
 
-		public:
-			void process(ctoot::midi::core::MidiMessage* msg, mpc::ui::sequencer::window::SequencerWindowGui* gui);
+	public:
+		std::weak_ptr<Event> get();
 
-		private:
-			std::weak_ptr<Event> convert(ctoot::midi::core::ShortMessage* msg);
+		EventAdapter(std::weak_ptr<Sequencer> sequencer);
+		~EventAdapter();
 
-		public:
-			std::weak_ptr<Event> get();
-
-			EventAdapter(std::weak_ptr<Sequencer> sequencer);
-			~EventAdapter();
-
-		};
-
-	}
+	};
 }

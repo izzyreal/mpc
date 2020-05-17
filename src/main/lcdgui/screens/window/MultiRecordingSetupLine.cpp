@@ -1,10 +1,10 @@
-#include <ui/sequencer/window/MultiRecordingSetupLine.hpp>
+#include "MultiRecordingSetupLine.hpp"
 
-using namespace mpc::ui::sequencer::window;
+using namespace mpc::lcdgui::screens::window;
 
-MultiRecordingSetupLine::MultiRecordingSetupLine(int inputNumber) 
+void MultiRecordingSetupLine::setIn(int in)
 {
-	in = inputNumber;
+    this->in = in;
 }
 
 int MultiRecordingSetupLine::getIn()
@@ -14,7 +14,10 @@ int MultiRecordingSetupLine::getIn()
 
 void MultiRecordingSetupLine::setTrack(int i)
 {
-    if(i < -1 || i > 63) return;
+    if (i < -1 || i > 63)
+    {
+        return;
+    }
     track = i;
 }
 

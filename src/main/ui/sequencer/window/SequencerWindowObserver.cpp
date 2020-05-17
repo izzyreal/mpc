@@ -10,7 +10,6 @@
 #include <lcdgui/HorizontalBar.hpp>
 #include <lcdgui/Field.hpp>
 #include <ui/sampler/SamplerGui.hpp>
-#include <ui/sequencer/window/MultiRecordingSetupLine.hpp>
 #include <ui/sequencer/window/SequencerWindowGui.hpp>
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>
@@ -38,31 +37,6 @@ SequencerWindowObserver::SequencerWindowObserver()
 	typeNames = { "NOTES", "PITCH BEND", "PROG CHANGE", "CH PRESSURE", "POLY PRESS", "EXCLUSIVE", "BANK SEL MSB", "MOD WHEEL", "BREATH CONT", "03", "FOOT CONTROL", "PORTA TIME", "DATA ENTRY", "MAIN VOLUME", "BALANCE", "09", "PAN", "EXPRESSION", "EFFECT 1"	, "EFFECT 2", "14", "15", "GEN.PUR. 1", "GEN.PUR. 2", "GEN.PUR. 3", "GEN.PUR. 4", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "BANK SEL LSB", "MOD WHEL LSB", "BREATH LSB", "35", "FOOT CNT LSB", "PORT TIME LS", "DATA ENT LSB", "MAIN VOL LSB", "BALANCE LSB", "41", "PAN LSB", "EXPRESS LSB", "EFFECT 1 LSB", "EFFECT 2 MSB", "46", "47", "GEN.PUR.1 LS", "GEN.PUR.2 LS", "GEN.PUR.3 LS", "GEN.PUR.4 LS", "52", "53", "54", "55", "56", "57", "58", "59", "60", "61", "62", "63", "SUSTAIN PDL", "PORTA PEDAL", "SOSTENUTO", "SOFT PEDAL", "LEGATO FT SW", "HOLD 2", "SOUND VARI", "TIMBER/HARMO", "RELEASE TIME", "ATTACK TIME", "BRIGHTNESS", "SOUND CONT 6", "SOUND CONT 7", "SOUND CONT 8", "SOUND CONT 9", "SOUND CONT10", "GEN.PUR. 5", "GEN.PUR. 6", "GEN.PUR. 7", "GEN.PUR. 8", "PORTA CNTRL", "85", "86", "87", "88", "89", "90", "EXT EFF DPTH", "TREMOLO DPTH", "CHORUS DEPTH", " DETUNE DEPTH", "PHASER DEPTH", "DATA INCRE", "DATA DECRE", "NRPN LSB", "NRPN MSB", "RPN LSB", "RPN MSB", "102", "103", "104", "105", "106", "107" "108", "109", "110", "111", "112", "113", "114", "115", "116", "117", "118", "119", "ALL SND OFF", "RESET CONTRL", "LOCAL ON/OFF", "ALL NOTE OFF", "OMNI OFF", "OMNI ON", "MONO MODE ON", "POLY MODE ON" };
 	nameGui = Mpc::instance().getUis().lock()->getNameGui();
 	samplerGui = Mpc::instance().getUis().lock()->getSamplerGui();
-	inNames = vector<string>(34);
-	
-	for (int i = 0; i < 34; i++)
-	{
-		if (i < 16)
-		{
-			inNames[i] = "1-" + moduru::lang::StrUtil::padLeft(to_string(i + 1), "0", 2);
-		}
-		
-		if (i == 16)
-		{
-			inNames[i] = "1-Ex";
-		}
-		
-		if (i > 16 && i < 33)
-		{
-			inNames[i] = "2-" + moduru::lang::StrUtil::padLeft(to_string(i - 16), "0", 2);
-		}
-		
-		if (i == 33)
-		{
-			inNames[i] = "2-Ex";
-		}
-	}
-
 	sequencer = Mpc::instance().getSequencer();
 	sampler = Mpc::instance().getSampler();
 	auto ls = Mpc::instance().getLayeredScreen().lock();
@@ -113,15 +87,6 @@ SequencerWindowObserver::SequencerWindowObserver()
 	numberOfBarsField = ls->lookupField("numberofbars");
 	inThisTrackField = ls->lookupField("inthistrack");
 	newBarsField = ls->lookupField("newbars");
-	a0mrsField = ls->lookupField("a0");
-	a1mrsField = ls->lookupField("a1");
-	a2mrsField = ls->lookupField("a2");
-	b0mrsField = ls->lookupField("b0");
-	b1mrsField = ls->lookupField("b1");
-	b2mrsField = ls->lookupField("b2");
-	c0mrsField = ls->lookupField("c0");
-	c1mrsField = ls->lookupField("c1");
-	c2mrsField = ls->lookupField("c2");
 	receiveChField = ls->lookupField("receivech");
 	progChangeSeqField = ls->lookupField("seq");
 	sustainPedalToDurationField = ls->lookupField("duration");
@@ -161,17 +126,6 @@ SequencerWindowObserver::SequencerWindowObserver()
 	else if (csn.compare("copytrack") == 0)
 	{
 		displayTrackNumberNames();
-	}
-	else if (csn.compare("multirecordingsetup") == 0)
-	{
-		for (auto& mrsLine : swGui->getMrsLines())
-		{
-			mrsLine->setOut(seq->getTrack(mrsLine->getTrack()).lock()->getDevice());
-		}
-		swGui->setMrsYOffset(swGui->getMrsYOffset());
-		displayMrsLine(0);
-		displayMrsLine(1);
-		displayMrsLine(2);
 	}
 	else if (csn.compare("midiinput") == 0)
 	{
@@ -233,77 +187,6 @@ void SequencerWindowObserver::displayReceiveCh()
     } else {
         receiveChField.lock()->setText(to_string(swGui->getReceiveCh() + 1));
     }
-}
-
-void SequencerWindowObserver::displayMrsLine(int i)
-{
-	auto mrsLines = *swGui->getVisibleMrsLines();
-	auto seq = sequence.lock();
-	if (i == 0) {
-		a0mrsField.lock()->setText(inNames[mrsLines[i]->getIn()]);
-		if (mrsLines[i]->getTrack() == -1) {
-			b0mrsField.lock()->setText("---OFF");
-		}
-		else {
-			string trackNumber = to_string(mrsLines[i]->getTrack() + 1);
-			trackNumber = moduru::lang::StrUtil::padLeft(trackNumber, "0", 2);
-			b0mrsField.lock()->setText(string(trackNumber + "-" + seq->getTrack(mrsLines[i]->getTrack()).lock()->getName()));
-		}
-		if (mrsLines[i]->getOut() == 0) {
-			c0mrsField.lock()->setText("OFF");
-		}
-		else {
-			if (mrsLines[i]->getOut() >= 17) {
-				string out = to_string(mrsLines[i]->getOut() - 16);
-				c0mrsField.lock()->setTextPadded(string(out + "B"), " ");
-			}
-			else {
-				string out = to_string(mrsLines[i]->getOut());
-				c0mrsField.lock()->setTextPadded(string(out + "A"), " ");
-			}
-		}
-	}
-	else if (i == 1) {
-		a1mrsField.lock()->setText(inNames[mrsLines[i]->getIn()]);
-		if (mrsLines[i]->getTrack() == -1) {
-			b1mrsField.lock()->setText("---OFF");
-		}
-		else {
-			string trStr = moduru::lang::StrUtil::padLeft(to_string(mrsLines[i]->getTrack() + 1), "0", 2);
-			b1mrsField.lock()->setText(string(trStr + "-" + seq->getTrack(mrsLines[i]->getTrack()).lock()->getName()));
-		}
-		if (mrsLines[i]->getOut() == 0) {
-			c1mrsField.lock()->setText("OFF");
-		}
-		else {
-			if (mrsLines[i]->getOut() >= 17) {
-				c1mrsField.lock()->setTextPadded(to_string(mrsLines[i]->getOut() - 16) + "B", " ");
-			}
-			else {
-				c1mrsField.lock()->setTextPadded(to_string(mrsLines[i]->getOut()) + "A", " ");
-			}
-		}
-	}
-	else if (i == 2) {
-		a2mrsField.lock()->setText(inNames[mrsLines[i]->getIn()]);
-		if (mrsLines[i]->getTrack() == -1) {
-			b2mrsField.lock()->setText("---OFF");
-		}
-		else {
-			b2mrsField.lock()->setText(moduru::lang::StrUtil::padLeft(to_string(mrsLines[i]->getTrack() + 1), "0", 2) + "-" + seq->getTrack(mrsLines[i]->getTrack()).lock()->getName());
-		}
-		if (mrsLines[i]->getOut() == 0) {
-			c2mrsField.lock()->setText("OFF");
-		}
-		else {
-			if (mrsLines[i]->getOut() >= 17) {
-				c2mrsField.lock()->setTextPadded(to_string(mrsLines[i]->getOut() - 16) + "B", " ");
-			}
-			else {
-				c2mrsField.lock()->setTextPadded(to_string(mrsLines[i]->getOut()) + "A", " ");
-			}
-		}
-	}
 }
 
 void SequencerWindowObserver::displayNotes()
@@ -397,17 +280,6 @@ void SequencerWindowObserver::update(moduru::observer::Observable* o, nonstd::an
 	else if (s.compare("notes") == 0)
 	{
 		displayNotes();
-	}
-	else if (s.compare("mrsline") == 0)
-	{
-		yPos = stoi(Mpc::instance().getLayeredScreen().lock()->getFocus().substr(1, 2));
-		displayMrsLine(yPos);
-	}
-	else if (s.compare("multirecordingsetup") == 0)
-{
-		displayMrsLine(0);
-		displayMrsLine(1);
-		displayMrsLine(2);
 	}
 	else if (s.compare("receivech") == 0)
 {

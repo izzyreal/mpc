@@ -2,10 +2,15 @@
 
 #include <Mpc.hpp>
 #include <ui/Uis.hpp>
-#include <ui/sequencer/window/MultiRecordingSetupLine.hpp>
+#include <lcdgui/screens/window/MultiRecordingSetupLine.hpp>
 #include <ui/sequencer/window/SequencerWindowGui.hpp>
 #include <sequencer/Sequencer.hpp>
 
+#include <lcdgui/screens/window/MultiRecordingSetupScreen.hpp>
+#include <lcdgui/Screens.hpp>
+
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens::window;
 using namespace mpc::file::all;
 using namespace std;
 
@@ -38,8 +43,13 @@ MidiInput::MidiInput()
 	saveBytes[FILTER_ENABLED_OFFSET] = static_cast<int8_t>((swgui->isMidiFilterEnabled() ? 1 : 0));
 	saveBytes[FILTER_TYPE_OFFSET] = static_cast<int8_t>(swgui->getMidiFilterType());
 	saveBytes[MULTI_REC_ENABLED_OFFSET] = static_cast<int8_t>(Mpc::instance().getSequencer().lock()->isRecordingModeMulti() ? 1 : 0);
+	
+	auto screen = dynamic_pointer_cast<MultiRecordingSetupScreen>(Screens::getScreenComponent("multirecordingsetup"));
+
 	for (int i = 0; i < MULTI_REC_TRACK_DESTS_LENGTH; i++)
-		saveBytes[MULTI_REC_TRACK_DESTS_OFFSET + i] = static_cast<int8_t>(swgui->getMrsLines()[i]->getTrack() + 1);
+	{
+		saveBytes[MULTI_REC_TRACK_DESTS_OFFSET + i] = static_cast<int8_t>(screen->getMrsLines()[i]->getTrack() + 1);
+	}
 
 	saveBytes[NOTE_PASS_ENABLED_OFFSET] = static_cast<int8_t>(swgui->isNotePassEnabled() ? 1 : 0);
 	saveBytes[PITCH_BEND_PASS_ENABLED_OFFSET] = static_cast<int8_t>(swgui->isPitchBendPassEnabled() ? 1 : 0);

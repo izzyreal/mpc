@@ -10,10 +10,6 @@ namespace mpc::sequencer {
 }
 
 namespace mpc::ui::sequencer::window {
-	class MultiRecordingSetupLine;
-}
-
-namespace mpc::ui::sequencer::window {
 
 	class SequencerWindowGui
 		: public moduru::observer::Observable
@@ -25,8 +21,6 @@ namespace mpc::ui::sequencer::window {
 		int sq1 = 0;
 		int tr0 = 0;
 		int tr1 = 0;
-		std::vector<MultiRecordingSetupLine*> mrsLines;
-		int mrsYOffset = 0;
 		std::vector<std::weak_ptr<mpc::sequencer::TempoChangeEvent>> visibleTempoChanges;
 		int tempoChangeOffset = 0;
 		int time0 = 0;
@@ -38,7 +32,6 @@ namespace mpc::ui::sequencer::window {
 		int rate = 0;
 		bool waitForKey = false;
 		bool inRec = false;
-		std::vector<MultiRecordingSetupLine*> visibleMrsLines;
 		int receiveCh = 0;
 		bool progChangeSeq = false;
 		bool sustainPedalToDuration = false;
@@ -98,13 +91,6 @@ namespace mpc::ui::sequencer::window {
 		bool isWaitForKeyEnabled();
 		void setInRec(bool b);
 		bool getInRec();
-		std::vector<MultiRecordingSetupLine*> getMrsLines();
-		void setMrsYOffset(int i);
-		int getMrsYOffset();
-		void setMrsTrack(int inputNumber, int newTrackNumber);
-		void setMrsOut(int inputNumber, int newOutputNumber);
-		void setVisbleMrsLines(std::vector<MultiRecordingSetupLine*>* newVisibleMrsLines);
-		std::vector<MultiRecordingSetupLine*>* getVisibleMrsLines();
 		void setReceiveCh(int i);
 		int getReceiveCh();
 		void setProgChangeSeq(bool b);
@@ -157,7 +143,6 @@ namespace mpc::ui::sequencer::window {
 		void setPgmChangeToSeqEnabled(bool b);
 
 		SequencerWindowGui();
-		~SequencerWindowGui();
 
 	};
 }

@@ -19,7 +19,7 @@
 #include <ui/midisync/MidiSyncGui.hpp>
 #include <ui/sequencer/SongGui.hpp>
 #include <ui/sequencer/StepEditorGui.hpp>
-#include <ui/sequencer/window/MultiRecordingSetupLine.hpp>
+#include <lcdgui/screens/window/MultiRecordingSetupLine.hpp>
 #include <ui/sequencer/window/SequencerWindowGui.hpp>
 
 #include <sequencer/Event.hpp>
@@ -31,6 +31,7 @@
 
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
+#include <lcdgui/screens/window/MultiRecordingSetupScreen.hpp>
 
 #include <thirdp/bcmath/bcmath_stl.h>
 
@@ -114,8 +115,10 @@ AllLoader::AllLoader(mpc::disk::MpcFile* file, bool sequencesOnly)
 		swGui->setFilterType(midiInput->getFilterType());
 		auto trackDests = midiInput->getMultiRecTrackDests();
 		
+		auto screen = dynamic_pointer_cast<MultiRecordingSetupScreen>(Screens::getScreenComponent("multirecordingsetup"));
+
 		for (int i = 0; i < trackDests.size(); i++) {
-			swGui->getMrsLines()[i]->setTrack(trackDests[i]);
+			screen->getMrsLines()[i]->setTrack(trackDests[i]);
 		}
 
 		swGui->setChPressurePassEnabled(midiInput->isChPressurePassEnabled());

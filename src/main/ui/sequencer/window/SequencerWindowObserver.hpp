@@ -56,7 +56,6 @@ namespace mpc::ui::sequencer::window
 	private:
 
 		std::vector<std::string> softThruNames;
-		std::vector<std::string> inNames;
 		std::vector<std::string> editTypeNames;
 		std::vector<std::string> typeNames;
 		std::string csn{ "" };
@@ -104,15 +103,6 @@ namespace mpc::ui::sequencer::window
 		std::weak_ptr<mpc::lcdgui::Field> firstBarField;
 		std::weak_ptr<mpc::lcdgui::Field> inThisTrackField;
 		std::weak_ptr<mpc::lcdgui::Field> newBarsField;
-		std::weak_ptr<mpc::lcdgui::Field> a0mrsField;
-		std::weak_ptr<mpc::lcdgui::Field> a1mrsField;
-		std::weak_ptr<mpc::lcdgui::Field> a2mrsField;
-		std::weak_ptr<mpc::lcdgui::Field> b0mrsField;
-		std::weak_ptr<mpc::lcdgui::Field> b1mrsField;
-		std::weak_ptr<mpc::lcdgui::Field> b2mrsField;
-		std::weak_ptr<mpc::lcdgui::Field> c0mrsField;
-		std::weak_ptr<mpc::lcdgui::Field> c1mrsField;
-		std::weak_ptr<mpc::lcdgui::Field> c2mrsField;
 		std::weak_ptr<mpc::lcdgui::Field> passField;
 		std::weak_ptr<mpc::lcdgui::Field> typeField;
 		std::weak_ptr<mpc::lcdgui::Field> midiFilterField;
@@ -135,7 +125,6 @@ namespace mpc::ui::sequencer::window
 		void displaySustainPedalToDuration();
 		void displayProgChangeSeq();
 		void displayReceiveCh();
-		void displayMrsLine(int i);
 		void displayNotes();
 		void displayTime();
 

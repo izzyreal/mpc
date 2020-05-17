@@ -1,6 +1,5 @@
 #include "SequencerWindowGui.hpp"
 
-#include <ui/sequencer/window/MultiRecordingSetupLine.hpp>
 #include <sequencer/Event.hpp>
 #include <sequencer/TempoChangeEvent.hpp>
 
@@ -19,14 +18,6 @@ SequencerWindowGui::SequencerWindowGui()
 	accentNote = 35;
 	normalVelo = 64;
 	normalNote = 35;
-
-	mrsLines = vector<MultiRecordingSetupLine*>(34);
-	for (int i = 0; i < 34; i++) {
-		auto mrsLine = new MultiRecordingSetupLine(i);
-		mrsLine->setTrack(i);
-		mrsLine->setOut(0);
-		mrsLines[i] = mrsLine;
-	}
 }
 
 int SequencerWindowGui::getTrackNumber()
@@ -266,64 +257,6 @@ bool SequencerWindowGui::getInRec()
     return inRec;
 }
 
-vector<MultiRecordingSetupLine*>  SequencerWindowGui::getMrsLines()
-{
-    return mrsLines;
-}
-
-void SequencerWindowGui::setMrsYOffset(int i)
-{
-    if(i < 0) return;
-
-    if(i + 3 > mrsLines.size())
-        return;
-
-    visibleMrsLines = vector<MultiRecordingSetupLine*>(3);
-    mrsYOffset = i;
-    for (auto j = 0; j < 3; j++) {
-		visibleMrsLines[j] = mrsLines[mrsYOffset + j];
-    }
-    setChanged();
-    notifyObservers(string("multirecordingsetup"));
-}
-
-int SequencerWindowGui::getMrsYOffset()
-{
-    return mrsYOffset;
-}
-
-void SequencerWindowGui::setMrsTrack(int inputNumber, int newTrackNumber)
-{
-    mrsLines[inputNumber]->setTrack(newTrackNumber);
-    visibleMrsLines = vector<MultiRecordingSetupLine*>(3);
-    for (auto j = 0; j < 3; j++) {
-		visibleMrsLines[j] = mrsLines[mrsYOffset + j];
-    }
-    setChanged();
-    notifyObservers(string("mrsline"));
-}
-
-void SequencerWindowGui::setMrsOut(int inputNumber, int newOutputNumber)
-{
-    mrsLines[inputNumber]->setOut(newOutputNumber);
-    visibleMrsLines = vector<MultiRecordingSetupLine*>(3);
-    for (auto j = 0; j < 3; j++) {
-		visibleMrsLines[j] = mrsLines[mrsYOffset + j];
-    }
-    setChanged();
-    notifyObservers(string("mrsline"));
-}
-
-void SequencerWindowGui::setVisbleMrsLines(vector<MultiRecordingSetupLine*>*  newVisibleMrsLines)
-{
-    visibleMrsLines = *newVisibleMrsLines;
-}
-
-vector<MultiRecordingSetupLine*>*  SequencerWindowGui::getVisibleMrsLines()
-{
-    return &visibleMrsLines;
-}
-
 void SequencerWindowGui::setReceiveCh(int i)
 {
     if(i < -1 || i > 15)
@@ -386,8 +319,10 @@ bool SequencerWindowGui::isMidiFilterEnabled()
 
 void SequencerWindowGui::setFilterType(int i)
 {
-    if(i < 0 || i > 134)
+    if (i < 0 || i > 134)
+    {
         return;
+    }
 
     filterType = i;
     setChanged();
@@ -660,12 +595,4 @@ bool SequencerWindowGui::isPgmChangeToSeqEnabled()
 void SequencerWindowGui::setPgmChangeToSeqEnabled(bool b)
 {
     pgmChangeToSeqEnabled = b;
-}
-
-SequencerWindowGui::~SequencerWindowGui() {
-	for (auto& m : mrsLines) {
-		if (m != nullptr) {
-			delete m;
-		}
-	}
 }
