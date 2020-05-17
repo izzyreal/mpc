@@ -3,6 +3,8 @@
 #include <memory>
 #include <vector>
 
+#include <file/all/AllParser.hpp>
+
 namespace mpc::ui {
 	class Uis;
 }
@@ -16,7 +18,6 @@ namespace mpc::sequencer {
 }
 
 namespace mpc::file::all {
-	class AllParser;
 	class Sequence;
 }
 
@@ -25,7 +26,7 @@ namespace mpc::disk {
 	class AllLoader {
 
 	private:
-		mpc::file::all::AllParser* allParser = nullptr;
+		mpc::file::all::AllParser allParser;
 		std::vector<mpc::file::all::Sequence*> allSequences;
 		std::vector<std::shared_ptr<mpc::sequencer::Sequence>> mpcSequences;
 		
@@ -34,10 +35,10 @@ namespace mpc::disk {
 		void convertSequences(const bool indiv);
 
 	public:
-		std::vector<std::shared_ptr<mpc::sequencer::Sequence>>* getSequences();
+		std::vector<std::shared_ptr<mpc::sequencer::Sequence>>& getSequences();
 
 	public:
 		AllLoader(mpc::disk::MpcFile* file, bool sequencesOnly);
-		~AllLoader();
+
 	};
 }

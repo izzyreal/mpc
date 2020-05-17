@@ -11,7 +11,6 @@ SequencerWindowGui::SequencerWindowGui()
 
 	inPlay = true;
 	inRec = true;
-	receiveCh = 0;
 	value = 1;
 	clickVolume = 100;
 	accentVelo = 127;
@@ -255,98 +254,6 @@ void SequencerWindowGui::setInRec(bool b)
 bool SequencerWindowGui::getInRec()
 {
     return inRec;
-}
-
-void SequencerWindowGui::setReceiveCh(int i)
-{
-    if(i < -1 || i > 15)
-        return;
-
-    receiveCh = i;
-    setChanged();
-    notifyObservers(string("receivech"));
-}
-
-int SequencerWindowGui::getReceiveCh()
-{
-    return receiveCh;
-}
-
-void SequencerWindowGui::setProgChangeSeq(bool b)
-{
-    if(progChangeSeq == b)
-        return;
-
-    progChangeSeq = b;
-    setChanged();
-    notifyObservers(string("progchangeseq"));
-}
-
-bool SequencerWindowGui::getProgChangeSeq()
-{
-    return progChangeSeq;
-}
-
-void SequencerWindowGui::setSustainPedalToDuration(bool b)
-{
-    if(sustainPedalToDuration == b)
-        return;
-
-    sustainPedalToDuration = b;
-    setChanged();
-    notifyObservers(string("sustainpedaltoduration"));
-}
-
-bool SequencerWindowGui::isSustainPedalToDurationEnabled()
-{
-    return sustainPedalToDuration;
-}
-
-void SequencerWindowGui::setMidiFilterEnabled(bool b)
-{
-    if(midiFilter == b)
-        return;
-
-    midiFilter = b;
-    setChanged();
-    notifyObservers(string("midifilter"));
-}
-
-bool SequencerWindowGui::isMidiFilterEnabled()
-{
-    return midiFilter;
-}
-
-void SequencerWindowGui::setFilterType(int i)
-{
-    if (i < 0 || i > 134)
-    {
-        return;
-    }
-
-    filterType = i;
-    setChanged();
-    notifyObservers(string("type"));
-}
-
-int SequencerWindowGui::getMidiFilterType()
-{
-    return filterType;
-}
-
-void SequencerWindowGui::setPass(bool b)
-{
-    if(pass == b)
-        return;
-
-    pass = b;
-    setChanged();
-    notifyObservers(string("pass"));
-}
-
-bool SequencerWindowGui::getPass()
-{
-    return pass;
 }
 
 void SequencerWindowGui::setSoftThru(int i)

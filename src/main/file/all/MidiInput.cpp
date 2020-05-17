@@ -1,4 +1,4 @@
-#include <file/all/MidiInput.hpp>
+#include "MidiInput.hpp"
 
 #include <Mpc.hpp>
 #include <ui/Uis.hpp>
@@ -7,6 +7,8 @@
 #include <sequencer/Sequencer.hpp>
 
 #include <lcdgui/screens/window/MultiRecordingSetupScreen.hpp>
+#include <lcdgui/screens/window/MidiInputScreen.hpp>
+
 #include <lcdgui/Screens.hpp>
 
 using namespace mpc::lcdgui;
@@ -14,15 +16,18 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::file::all;
 using namespace std;
 
-MidiInput::MidiInput(vector<char> b) 
+MidiInput::MidiInput(const vector<char>& b) 
 {
 	receiveCh = b[RECEIVE_CH_OFFSET];
 	sustainPedalToDuration = b[SUSTAIN_PEDAL_TO_DURATION_OFFSET] > 0;
 	filterEnabled = b[FILTER_ENABLED_OFFSET] > 0;
 	filterType = b[FILTER_TYPE_OFFSET];
 	multiRecEnabled = b[MULTI_REC_ENABLED_OFFSET] > 0;
+	
 	for (int i = 0; i < MULTI_REC_TRACK_DESTS_LENGTH; i++)
+	{
 		multiRecTrackDests[i] = b[MULTI_REC_TRACK_DESTS_OFFSET + i] - 1;
+	}
 
 	notePassEnabled = b[NOTE_PASS_ENABLED_OFFSET] > 0;
 	pitchBendPassEnabled = b[PITCH_BEND_PASS_ENABLED_OFFSET] > 0;
@@ -35,13 +40,20 @@ MidiInput::MidiInput(vector<char> b)
 MidiInput::MidiInput()
 {
 	saveBytes = vector<char>(LENGTH);
+	
 	for (int i = 0; i < LENGTH; i++)
+	{
 		saveBytes[i] = TEMPLATE[i];
+	}
+
 	auto swgui = Mpc::instance().getUis().lock()->getSequencerWindowGui();
-	saveBytes[RECEIVE_CH_OFFSET] = static_cast<int8_t>(swgui->getReceiveCh());
-	saveBytes[SUSTAIN_PEDAL_TO_DURATION_OFFSET] = static_cast<int8_t>(swgui->isSustainPedalToDurationEnabled() ? 1 : 0);
-	saveBytes[FILTER_ENABLED_OFFSET] = static_cast<int8_t>((swgui->isMidiFilterEnabled() ? 1 : 0));
-	saveBytes[FILTER_TYPE_OFFSET] = static_cast<int8_t>(swgui->getMidiFilterType());
+
+	auto midiInputScreen = dynamic_pointer_cast<MidiInputScreen>(Screens::getScreenComponent("midiinput"));
+
+	saveBytes[RECEIVE_CH_OFFSET] = static_cast<int8_t>(midiInputScreen->getReceiveCh());
+	saveBytes[SUSTAIN_PEDAL_TO_DURATION_OFFSET] = static_cast<int8_t>(midiInputScreen->isSustainPedalToDurationEnabled() ? 1 : 0);
+	saveBytes[FILTER_ENABLED_OFFSET] = static_cast<int8_t>((midiInputScreen->isMidiFilterEnabled() ? 1 : 0));
+	saveBytes[FILTER_TYPE_OFFSET] = static_cast<int8_t>(midiInputScreen->getType());
 	saveBytes[MULTI_REC_ENABLED_OFFSET] = static_cast<int8_t>(Mpc::instance().getSequencer().lock()->isRecordingModeMulti() ? 1 : 0);
 	
 	auto screen = dynamic_pointer_cast<MultiRecordingSetupScreen>(Screens::getScreenComponent("multirecordingsetup"));

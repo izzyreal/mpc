@@ -11,6 +11,7 @@
 
 #include <lcdgui/screens/window/MultiRecordingSetupLine.hpp>
 #include <lcdgui/screens/window/MultiRecordingSetupScreen.hpp>
+#include <lcdgui/screens/window/MidiInputScreen.hpp>
 #include <lcdgui/Screens.hpp>
 
 using namespace mpc::lcdgui;
@@ -39,8 +40,10 @@ weak_ptr<Event> EventAdapter::convert(ctoot::midi::core::ShortMessage* msg)
 		midiClockEvent->setStatus(msg->getStatus());
 		return midiClockEvent;
 	}
-	
-	if (swGui->getReceiveCh() != -1 && !(msg->getChannel() == swGui->getReceiveCh()))
+
+	auto midiInputScreen = dynamic_pointer_cast<MidiInputScreen>(Screens::getScreenComponent("midiinput"));
+
+	if (midiInputScreen->getReceiveCh() != -1 && !(msg->getChannel() == midiInputScreen->getReceiveCh()))
 	{
 		return {};
 	}

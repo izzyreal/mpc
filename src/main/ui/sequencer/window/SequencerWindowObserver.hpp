@@ -57,7 +57,6 @@ namespace mpc::ui::sequencer::window
 
 		std::vector<std::string> softThruNames;
 		std::vector<std::string> editTypeNames;
-		std::vector<std::string> typeNames;
 		std::string csn{ "" };
 		std::weak_ptr<mpc::sequencer::Sequencer> sequencer;
 		std::weak_ptr<mpc::sampler::Sampler> sampler;
@@ -119,12 +118,6 @@ namespace mpc::ui::sequencer::window
 
 	private:
 		void displaySoftThru();
-		void displayPass();
-		void displayType();
-		void displayMidiFilter();
-		void displaySustainPedalToDuration();
-		void displayProgChangeSeq();
-		void displayReceiveCh();
 		void displayNotes();
 		void displayTime();
 

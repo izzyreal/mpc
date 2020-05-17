@@ -30,11 +30,9 @@ using namespace mpc::ui::sequencer::window;
 using namespace std;
 
 SequencerWindowObserver::SequencerWindowObserver()
-{
-	
+{	
 	softThruNames = {"OFF", "AS TRACK", "OMNI-A", "OMNI-B", "OMNI-AB" };
 	editTypeNames = { "ADD VALUE", "SUB VALUE", "MULT VAL%", "SET TO VAL" };
-	typeNames = { "NOTES", "PITCH BEND", "PROG CHANGE", "CH PRESSURE", "POLY PRESS", "EXCLUSIVE", "BANK SEL MSB", "MOD WHEEL", "BREATH CONT", "03", "FOOT CONTROL", "PORTA TIME", "DATA ENTRY", "MAIN VOLUME", "BALANCE", "09", "PAN", "EXPRESSION", "EFFECT 1"	, "EFFECT 2", "14", "15", "GEN.PUR. 1", "GEN.PUR. 2", "GEN.PUR. 3", "GEN.PUR. 4", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "BANK SEL LSB", "MOD WHEL LSB", "BREATH LSB", "35", "FOOT CNT LSB", "PORT TIME LS", "DATA ENT LSB", "MAIN VOL LSB", "BALANCE LSB", "41", "PAN LSB", "EXPRESS LSB", "EFFECT 1 LSB", "EFFECT 2 MSB", "46", "47", "GEN.PUR.1 LS", "GEN.PUR.2 LS", "GEN.PUR.3 LS", "GEN.PUR.4 LS", "52", "53", "54", "55", "56", "57", "58", "59", "60", "61", "62", "63", "SUSTAIN PDL", "PORTA PEDAL", "SOSTENUTO", "SOFT PEDAL", "LEGATO FT SW", "HOLD 2", "SOUND VARI", "TIMBER/HARMO", "RELEASE TIME", "ATTACK TIME", "BRIGHTNESS", "SOUND CONT 6", "SOUND CONT 7", "SOUND CONT 8", "SOUND CONT 9", "SOUND CONT10", "GEN.PUR. 5", "GEN.PUR. 6", "GEN.PUR. 7", "GEN.PUR. 8", "PORTA CNTRL", "85", "86", "87", "88", "89", "90", "EXT EFF DPTH", "TREMOLO DPTH", "CHORUS DEPTH", " DETUNE DEPTH", "PHASER DEPTH", "DATA INCRE", "DATA DECRE", "NRPN LSB", "NRPN MSB", "RPN LSB", "RPN MSB", "102", "103", "104", "105", "106", "107" "108", "109", "110", "111", "112", "113", "114", "115", "116", "117", "118", "119", "ALL SND OFF", "RESET CONTRL", "LOCAL ON/OFF", "ALL NOTE OFF", "OMNI OFF", "OMNI ON", "MONO MODE ON", "POLY MODE ON" };
 	nameGui = Mpc::instance().getUis().lock()->getNameGui();
 	samplerGui = Mpc::instance().getUis().lock()->getSamplerGui();
 	sequencer = Mpc::instance().getSequencer();
@@ -127,15 +125,6 @@ SequencerWindowObserver::SequencerWindowObserver()
 	{
 		displayTrackNumberNames();
 	}
-	else if (csn.compare("midiinput") == 0)
-	{
-		displayReceiveCh();
-		displayProgChangeSeq();
-		displaySustainPedalToDuration();
-		displayMidiFilter();
-		displayType();
-		displayPass();
-	}
 	else if (csn.compare("midioutput") == 0)
 	{
 		displaySoftThru();
@@ -153,40 +142,6 @@ SequencerWindowObserver::SequencerWindowObserver()
 void SequencerWindowObserver::displaySoftThru()
 {
     softThruField.lock()->setText(softThruNames[swGui->getSoftThru()]);
-}
-
-void SequencerWindowObserver::displayPass()
-{
-    passField.lock()->setText(swGui->getPass() ? "YES" : "NO");
-}
-
-void SequencerWindowObserver::displayType()
-{
-    typeField.lock()->setText(typeNames[swGui->getMidiFilterType()]);
-}
-
-void SequencerWindowObserver::displayMidiFilter()
-{
-    midiFilterField.lock()->setText(swGui->isMidiFilterEnabled() ? "ON" : "OFF");
-}
-
-void SequencerWindowObserver::displaySustainPedalToDuration()
-{
-    sustainPedalToDurationField.lock()->setText(swGui->isSustainPedalToDurationEnabled() ? "ON" : "OFF");
-}
-
-void SequencerWindowObserver::displayProgChangeSeq()
-{
-    progChangeSeqField.lock()->setText(swGui->getProgChangeSeq() ? "ON" : "OFF");
-}
-
-void SequencerWindowObserver::displayReceiveCh()
-{
-    if(swGui->getReceiveCh() == -1) {
-        receiveChField.lock()->setText("ALL");
-    } else {
-        receiveChField.lock()->setText(to_string(swGui->getReceiveCh() + 1));
-    }
 }
 
 void SequencerWindowObserver::displayNotes()
@@ -280,30 +235,6 @@ void SequencerWindowObserver::update(moduru::observer::Observable* o, nonstd::an
 	else if (s.compare("notes") == 0)
 	{
 		displayNotes();
-	}
-	else if (s.compare("receivech") == 0)
-{
-		displayReceiveCh();
-	}
-	else if (s.compare("progchangeseq") == 0)
-{
-		displayProgChangeSeq();
-	}
-	else if (s.compare("sustainpedaltoduration") == 0)
-{
-		displaySustainPedalToDuration();
-	}
-	else if (s.compare("midifilter") == 0)
-{
-		displayMidiFilter();
-	}
-	else if (s.compare("type") == 0)
-{
-		displayType();
-	}
-	else if (s.compare("pass") == 0)
-{
-		displayPass();
 	}
 	else if (s.compare("softthru") == 0)
 {

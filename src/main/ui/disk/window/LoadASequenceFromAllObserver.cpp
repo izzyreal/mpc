@@ -34,7 +34,7 @@ LoadASequenceFromAllObserver::LoadASequenceFromAllObserver()
 void LoadASequenceFromAllObserver::displayFile()
 {
 	fileField.lock()->setTextPadded(diskGui->getFileLoad() + 1, "0");
-	auto candidate = diskGui->getSequencesFromAllFile()->at(diskGui->getFileLoad());
+	auto candidate = diskGui->getSequencesFromAllFile()[diskGui->getFileLoad()];
 	auto name = candidate ? candidate->getName() : "(Unused)";
 	fileLabel.lock()->setText("-" + name);
 }

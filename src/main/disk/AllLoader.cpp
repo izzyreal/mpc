@@ -1,7 +1,6 @@
 #include "AllLoader.hpp"
 
 #include <Mpc.hpp>
-#include <file/all/AllParser.hpp>
 #include <file/all/Bar.hpp>
 #include <file/all/BarList.hpp>
 #include <file/all/Count.hpp>
@@ -32,8 +31,7 @@
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <lcdgui/screens/window/MultiRecordingSetupScreen.hpp>
-
-#include <thirdp/bcmath/bcmath_stl.h>
+#include <lcdgui/screens/window/MidiInputScreen.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
@@ -41,19 +39,24 @@ using namespace mpc::disk;
 using namespace mpc::file::all;
 using namespace std;
 
-AllLoader::AllLoader(mpc::disk::MpcFile* file, bool sequencesOnly) 
+AllLoader::AllLoader(mpc::disk::MpcFile* file, bool sequencesOnly)
+	: allParser(AllParser(file))
 {
-	if (sequencesOnly) {
-		allParser = new AllParser(file);
-		allSequences = allParser->getAllSequences();
-		auto allSeqNames = allParser->getSeqNames()->getNames();
+	if (sequencesOnly)
+	{
+		allSequences = allParser.getAllSequences();
+		auto allSeqNames = allParser.getSeqNames()->getNames();
 		vector<Sequence*> temp;
 		int counter = 0;
-		for (int i = 0; i < 99; i++) {
-			if (allSeqNames.at(i).find("(Unused)") != string::npos) {
+		
+		for (int i = 0; i < 99; i++)
+		{
+			if (allSeqNames.at(i).find("(Unused)") != string::npos)
+			{
 				temp.push_back(nullptr);
 			}
-			else {
+			else
+			{
 				temp.push_back(allSequences[counter++]);
 			}
 		}
@@ -62,9 +65,8 @@ AllLoader::AllLoader(mpc::disk::MpcFile* file, bool sequencesOnly)
 	}
 	else {
 		auto lSequencer = Mpc::instance().getSequencer().lock();
-		allParser = new AllParser(file);
-		allSequences = allParser->getAllSequences();
-		auto defaults = allParser->getDefaults();
+		allSequences = allParser.getAllSequences();
+		auto defaults = allParser.getDefaults();
 		
 		auto& ud = mpc::ui::UserDefaults::instance();
 		
@@ -88,8 +90,8 @@ AllLoader::AllLoader(mpc::disk::MpcFile* file, bool sequencesOnly)
 		ud.setTempo(BCMath(defaults->getTempo() / 10.0));
 		ud.setVelo(defaults->getTrVelos()[0]);
 		convertSequences(false);
-		auto allSeqNames = allParser->getSeqNames()->getNames();
-		auto sequencer = allParser->getSequencer();
+		auto allSeqNames = allParser.getSeqNames()->getNames();
+		auto sequencer = allParser.getSequencer();
 		lSequencer->setActiveSequenceIndex(sequencer->sequence);
 		lSequencer->setSelectedTrackIndex(sequencer->track);
 		
@@ -98,7 +100,7 @@ AllLoader::AllLoader(mpc::disk::MpcFile* file, bool sequencesOnly)
 		timingCorrectScreen->setNoteValue(sequencer->tc);
 		
 		auto swGui = Mpc::instance().getUis().lock()->getSequencerWindowGui();
-		auto count = allParser->getCount();
+		auto count = allParser.getCount();
 		swGui->setCountIn(count->getCountInMode());
 		swGui->setAccentVelo(count->getAccentVelo());
 		swGui->setNormalVelo(count->getNormalVelo());
@@ -110,28 +112,32 @@ AllLoader::AllLoader(mpc::disk::MpcFile* file, bool sequencesOnly)
 		swGui->setInRec(count->isEnabledInRec());
 		swGui->setWaitForKey(count->isWaitForKeyEnabled());
 		lSequencer->setCountEnabled(count->isEnabled());
-		auto midiInput = allParser->getMidiInput();
-		swGui->setReceiveCh(midiInput->getReceiveCh());
-		swGui->setFilterType(midiInput->getFilterType());
+
+		auto midiInput = allParser.getMidiInput();
+		auto midiInputScreen = dynamic_pointer_cast<MidiInputScreen>(Screens::getScreenComponent("midiinput"));
+
+		midiInputScreen->setReceiveCh(midiInput->getReceiveCh());
+		midiInputScreen->setType(midiInput->getFilterType());
+		midiInputScreen->setMidiFilterEnabled(midiInput->isFilterEnabled());
+		midiInputScreen->setSustainPedalToDuration(midiInput->isSustainPedalToDurationEnabled());
+
 		auto trackDests = midiInput->getMultiRecTrackDests();
 		
-		auto screen = dynamic_pointer_cast<MultiRecordingSetupScreen>(Screens::getScreenComponent("multirecordingsetup"));
+		auto multiRecordingSetupScreen = dynamic_pointer_cast<MultiRecordingSetupScreen>(Screens::getScreenComponent("multirecordingsetup"));
 
 		for (int i = 0; i < trackDests.size(); i++) {
-			screen->getMrsLines()[i]->setTrack(trackDests[i]);
+			multiRecordingSetupScreen->getMrsLines()[i]->setTrack(trackDests[i]);
 		}
 
 		swGui->setChPressurePassEnabled(midiInput->isChPressurePassEnabled());
 		swGui->setExclusivePassEnabled(midiInput->isExclusivePassEnabled());
-		swGui->setMidiFilterEnabled(midiInput->isFilterEnabled());
 		lSequencer->setRecordingModeMulti(midiInput->isMultiRecEnabled());
 		swGui->setNotePassEnabled(midiInput->isNotePassEnabled());
 		swGui->setPgmChangePassEnabled(midiInput->isPgmChangePassEnabled());
 		swGui->setPitchBendPassEnabled(midiInput->isPitchBendPassEnabled());
 		swGui->setPolyPressurePassEnabled(midiInput->isPolyPressurePassEnabled());
-		swGui->setSustainPedalToDuration(midiInput->isSustainPedalToDurationEnabled());
-		auto misc = allParser->getMisc();
-		auto midiSyncMisc = allParser->getMidiSync();
+		auto misc = allParser.getMisc();
+		auto midiSyncMisc = allParser.getMidiSync();
 		auto seGui = Mpc::instance().getUis().lock()->getStepEditorGui();
 		seGui->setAutoStepIncrementEnabled(misc->isAutoStepIncEnabled());
 		seGui->setTcValueRecordedNotes(misc->getDurationTcPercentage());
@@ -149,19 +155,13 @@ AllLoader::AllLoader(mpc::disk::MpcFile* file, bool sequencesOnly)
 		lSequencer->setSecondSequenceIndex(sequencer->secondSeqIndex);
 		Mpc::instance().getUis().lock()->getSongGui()->setDefaultSongName(midiSyncMisc->getDefSongName());
 		swGui->setTapAvg(misc->getTapAvg());
-		auto songs = allParser->getSongs();
+		auto songs = allParser.getSongs();
 		
-		for (int i = 0; i < 20; i++) {
+		for (int i = 0; i < 20; i++)
+		{
 			lSequencer->getSong(i).lock()->setName(songs[i]->name);
 		}
 
-	}
-}
-
-AllLoader::~AllLoader()
-{
-	if (allParser != nullptr) {
-		delete allParser;
 	}
 }
 
@@ -169,33 +169,46 @@ void AllLoader::convertSequences(const bool indiv)
 {
 	int index = -1;
 	
-	if (!indiv) {
+	if (!indiv)
+	{
 		Mpc::instance().getSequencer().lock()->purgeAllSequences();
 	}
 
-	for (auto& as : allSequences) {
+	for (auto& as : allSequences)
+	{
 		index++;
-		if (as == nullptr) {
+	
+		if (as == nullptr)
+		{
 			if (indiv) mpcSequences.push_back(nullptr);
 			continue;
 		}
+
 		shared_ptr<mpc::sequencer::Sequence> mpcSeq;
-		if (indiv) {
+		
+		if (indiv)
+		{
 			mpcSeq = make_shared<mpc::sequencer::Sequence>(Mpc::instance().getSequencer().lock()->getDefaultTrackNames());
 		}
 		else {
 			mpcSeq = Mpc::instance().getSequencer().lock()->getSequence(index).lock();
 		}
+		
 		mpcSeq->init(as->barCount - 1);
-		for (int i = 0; i < as->barCount; i++) {
+		
+		for (int i = 0; i < as->barCount; i++)
+		{
 			auto num = dynamic_cast<Bar*>(as->barList->getBars()[i])->getNumerator();
 			auto den = dynamic_cast<Bar*>(as->barList->getBars()[i])->getDenominator();
 			mpcSeq->setTimeSignature(i, num, den);
 		}
+
 		mpcSeq->setName(as->name);
 		mpcSeq->setInitialTempo(as->tempo);
 		auto at = as->tracks;
-		for (int i = 0; i < 64; i++) {
+		
+		for (int i = 0; i < 64; i++)
+		{
 			auto t = mpcSeq->getTrack(i).lock();
 			t->setUsed(at->getStatus(i) != 6);
 			t->setName(at->getName(i));
@@ -204,7 +217,9 @@ void AllLoader::convertSequences(const bool indiv)
 			t->setOn(at->getStatus(i) != 5);
 			t->setVelocityRatio(at->getVelo(i));
 		}
-		for (int j = 0; j < as->getEventAmount(); j++) {
+
+		for (int j = 0; j < as->getEventAmount(); j++)
+		{
 			auto e = as->allEvents[j];
 			if (e == nullptr) continue;
 			int track = e->getTrack();
@@ -213,24 +228,32 @@ void AllLoader::convertSequences(const bool indiv)
 			if (track > 63) track -= 64;
 			mpcSeq->getTrack(track).lock()->cloneEvent(shared_ptr<mpc::sequencer::Event>(e));
 		}
+
 		for (int i = 0; i < 32; i++)
+		{
 			mpcSeq->setDeviceName(i, as->devNames[i]);
+		}
 
 		mpcSeq->initMetaTracks();
 		mpcSeq->setFirstLoopBar(as->loopFirst);
 		mpcSeq->setLastLoopBar(as->loopLast);
 		mpcSeq->setLastLoopBar(as->loopLast);
+		
 		if (as->loopLastEnd)
+		{
 			mpcSeq->setLastLoopBar(INT_MAX);
+		}
 
 		mpcSeq->setLoopEnabled(as->loop);
-		if (indiv) {
+		
+		if (indiv)
+		{
 			mpcSequences.push_back(mpcSeq);
 		}
 	}
 }
 
-vector<shared_ptr<mpc::sequencer::Sequence>>* AllLoader::getSequences()
+vector<shared_ptr<mpc::sequencer::Sequence>>& AllLoader::getSequences()
 {
-    return &mpcSequences;
+    return mpcSequences;
 }

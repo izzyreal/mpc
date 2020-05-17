@@ -239,12 +239,12 @@ void DiskGui::setDontAssignSoundWhenLoading(bool b)
     notifyObservers(string("padandnote"));
 }
 
-void DiskGui::setSequencesFromAllFile(vector<shared_ptr<mpc::sequencer::Sequence>>* sequences)
+void DiskGui::setSequencesFromAllFile(vector<shared_ptr<mpc::sequencer::Sequence>>& sequences)
 {
     sequencesFromAllFile = sequences;
 }
 
-vector<shared_ptr<mpc::sequencer::Sequence>>* DiskGui::getSequencesFromAllFile()
+vector<shared_ptr<mpc::sequencer::Sequence>>& DiskGui::getSequencesFromAllFile()
 {
     return sequencesFromAllFile;
 }
