@@ -1,7 +1,5 @@
 #include "TransmitProgramChangesScreen.hpp"
 
-#include <ui/sequencer/window/SequencerWindowGui.hpp>
-
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
@@ -10,12 +8,27 @@ TransmitProgramChangesScreen::TransmitProgramChangesScreen(const int& layer)
 {
 }
 
+void TransmitProgramChangesScreen::open()
+{
+	displayTransmitProgramChangesInThisTrack();
+}
+
 void TransmitProgramChangesScreen::turnWheel(int i)
 {
 	init();
-	auto swGui = mpc.getUis().lock()->getSequencerWindowGui(); 
 	if (param.compare("inthistrack") == 0)
 	{
-		swGui->setTransmitProgramChangesInThisTrack(i > 0);
+		transmitProgramChangesInThisTrack = i > 0;
+		displayTransmitProgramChangesInThisTrack();
 	}
+}
+
+void TransmitProgramChangesScreen::displayTransmitProgramChangesInThisTrack()
+{
+	findField("inthistrack").lock()->setText(transmitProgramChangesInThisTrack ? "YES" : "NO");
+}
+
+bool TransmitProgramChangesScreen::isTransmitProgramChangesInThisTrackEnabled()
+{
+	return transmitProgramChangesInThisTrack;
 }

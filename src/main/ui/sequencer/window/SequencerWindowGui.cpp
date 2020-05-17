@@ -266,18 +266,6 @@ bool SequencerWindowGui::getInRec()
     return inRec;
 }
 
-bool SequencerWindowGui::getTransmitProgramChangesInThisTrack()
-{
-    return transmitProgramChangesInThisTrack;
-}
-
-void SequencerWindowGui::setTransmitProgramChangesInThisTrack(bool b)
-{
-    transmitProgramChangesInThisTrack = b;
-    setChanged();
-    notifyObservers(string("transmitprogramchangesinthistrack"));
-}
-
 vector<MultiRecordingSetupLine*>  SequencerWindowGui::getMrsLines()
 {
     return mrsLines;

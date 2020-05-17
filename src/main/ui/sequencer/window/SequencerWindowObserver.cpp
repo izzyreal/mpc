@@ -162,10 +162,6 @@ SequencerWindowObserver::SequencerWindowObserver()
 	{
 		displayTrackNumberNames();
 	}
-	else if (csn.compare("transmitprogramchanges") == 0)
-	{
-		displayTransmitProgramChangesInThisTrack();
-	}
 	else if (csn.compare("multirecordingsetup") == 0)
 	{
 		for (auto& mrsLine : swGui->getMrsLines())
@@ -310,11 +306,6 @@ void SequencerWindowObserver::displayMrsLine(int i)
 	}
 }
 
-void SequencerWindowObserver::displayTransmitProgramChangesInThisTrack()
-{
-	inThisTrackField.lock()->setText(swGui->getTransmitProgramChangesInThisTrack() ? "YES" : "NO");
-}
-
 void SequencerWindowObserver::displayNotes()
 {
 	auto lSampler = sampler.lock();
@@ -406,10 +397,6 @@ void SequencerWindowObserver::update(moduru::observer::Observable* o, nonstd::an
 	else if (s.compare("notes") == 0)
 	{
 		displayNotes();
-	}
-	else if (s.compare("transmitprogramchangesinthistrack") == 0)
-{
-		displayTransmitProgramChangesInThisTrack();
 	}
 	else if (s.compare("mrsline") == 0)
 	{

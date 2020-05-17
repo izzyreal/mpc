@@ -38,7 +38,6 @@ namespace mpc::ui::sequencer::window {
 		int rate = 0;
 		bool waitForKey = false;
 		bool inRec = false;
-		bool transmitProgramChangesInThisTrack = false;
 		std::vector<MultiRecordingSetupLine*> visibleMrsLines;
 		int receiveCh = 0;
 		bool progChangeSeq = false;
@@ -99,8 +98,6 @@ namespace mpc::ui::sequencer::window {
 		bool isWaitForKeyEnabled();
 		void setInRec(bool b);
 		bool getInRec();
-		bool getTransmitProgramChangesInThisTrack();
-		void setTransmitProgramChangesInThisTrack(bool b);
 		std::vector<MultiRecordingSetupLine*> getMrsLines();
 		void setMrsYOffset(int i);
 		int getMrsYOffset();

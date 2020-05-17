@@ -136,7 +136,6 @@ namespace mpc::ui::sequencer::window
 		void displayProgChangeSeq();
 		void displayReceiveCh();
 		void displayMrsLine(int i);
-		void displayTransmitProgramChangesInThisTrack();
 		void displayNotes();
 		void displayTime();
 
