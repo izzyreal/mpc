@@ -1,10 +1,10 @@
 #pragma once
-#include <lcdgui/ScreenComponent.hpp>
+#include <lcdgui/screens/window/WithTimesAndNotes.hpp>
 
 namespace mpc::lcdgui::screens::window {
 
 	class TimingCorrectScreen
-		: public mpc::lcdgui::ScreenComponent
+		: public WithTimesAndNotes
 	{
 
 	public:
@@ -20,10 +20,12 @@ namespace mpc::lcdgui::screens::window {
 	private:
 		void displayNoteValue();
 		void displaySwing();
-		void displayNotes();
-		void displayTime();
 		void displayShiftTiming();
 		void displayAmount();
+
+	protected:
+		void displayNotes() override;
+		void displayTime() override;
 
 	private:
 		std::vector<std::string> noteValueNames = { "OFF", "1/8", "1/8(3)", "1/16", "1/16(3)", "1/32", "1/32(3)" };
@@ -44,11 +46,7 @@ namespace mpc::lcdgui::screens::window {
 	private:
 		void setAmount(int i);
 		void setShiftTimingLater(bool b);
-		void setMidiNote0(int i);
-		void setMidiNote1(int i);
 		void setSwing(int i);
-		void setTime0(int time0);
-		void setTime1(int time1);
-
+		
 	};
 }

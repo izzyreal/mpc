@@ -1,6 +1,5 @@
 #include "TimingCorrectScreen.hpp"
 
-#include <lcdgui/screens/window/SeqWindowUtil.hpp>
 #include <lcdgui/LayeredScreen.hpp>
 #include <lcdgui/FunctionKeys.hpp>
 #include <lcdgui/Label.hpp>
@@ -26,7 +25,10 @@ TimingCorrectScreen::TimingCorrectScreen(const int& layer)
 void TimingCorrectScreen::open()
 {
 	auto seq = sequencer.lock()->getActiveSequence();
-	//setTime1(seq->getLastTick());
+
+	setTime0(0);
+	setTime1(sequencer.lock()->getActiveSequence().lock()->getLastTick());
+
 	displayNoteValue();
 	displaySwing();
 	displayShiftTiming();
@@ -93,7 +95,7 @@ void TimingCorrectScreen::turnWheel(int i)
 		setAmount(amount + i);
 	}
 	
-	SeqWindowUtil::checkAllTimesAndNotes(i);
+	checkAllTimesAndNotes(i);
 }
 
 void TimingCorrectScreen::displayNoteValue()
@@ -202,27 +204,6 @@ void TimingCorrectScreen::setShiftTimingLater(bool b)
 	displayShiftTiming();
 }
 
-void TimingCorrectScreen::setMidiNote0(int i)
-{
-	if (i < 0 || i > 127)
-	{
-		return;
-	}
-
-	midiNote0 = i;
-	displayNotes();
-}
-
-void TimingCorrectScreen::setMidiNote1(int i)
-{
-	if (i < 0 || i > 127)
-	{
-		return;
-	}
-
-	midiNote1 = i;
-	displayNotes();
-}
 
 int TimingCorrectScreen::getSwing()
 {
@@ -296,27 +277,4 @@ void TimingCorrectScreen::setNoteValue(int i)
 	
 	init();
 	displayNoteValue();
-}
-
-void TimingCorrectScreen::setTime0(int time0)
-{
-	this->time0 = time0;
-
-	if (time0 > time1)
-	{
-		time1 = time0;
-	}
-
-	displayTime();
-}
-
-void TimingCorrectScreen::setTime1(int time1)
-{
-	this->time1 = time1;
-
-	if (time1 < time0)
-	{
-		time0 = time1;
-	}
-	displayTime();
 }

@@ -41,7 +41,6 @@
 #include <ui/sequencer/TrMoveObserver.hpp>
 #include <ui/sequencer/TrMuteObserver.hpp>
 #include <ui/sequencer/UserObserver.hpp>
-#include <ui/sequencer/window/EraseObserver.hpp>
 #include <ui/sequencer/window/MetronomeSoundObserver.hpp>
 #include <ui/sequencer/window/MidiMonitorObserver.hpp>
 #include <ui/sequencer/window/SequencerWindowObserver.hpp>
@@ -831,9 +830,6 @@ void LayeredScreen::initObserver()
 	}
 	else if (csn.compare("others") == 0) {
 		activeObserver = make_unique<OthersObserver>();
-	}
-	else if (csn.compare("erase") == 0) {
-		activeObserver = make_unique<EraseObserver>();
 	}
 	else if (csn.compare("sync") == 0) {
 		activeObserver = make_unique<SyncObserver>();

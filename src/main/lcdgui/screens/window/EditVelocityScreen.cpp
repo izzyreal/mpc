@@ -1,20 +1,37 @@
-#include <lcdgui/screens/window/EditVelocityScreen.hpp>
+#include "EditVelocityScreen.hpp"
 
-#include <lcdgui/screens/window/SeqWindowUtil.hpp>
+#include <lcdgui/Label.hpp>
 
-#include <lcdgui/LayeredScreen.hpp>
-#include <ui/sequencer/window/SequencerWindowGui.hpp>
 #include <sequencer/Event.hpp>
 #include <sequencer/Track.hpp>
 #include <sequencer/NoteEvent.hpp>
+#include <sequencer/SeqUtil.hpp>
+
+#include <ui/sampler/SamplerGui.hpp>
+
+#include <lang/StrUtil.hpp>
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
+
+using namespace moduru::lang;
+
 using namespace std;
 
 EditVelocityScreen::EditVelocityScreen(const int& layer)
 	: ScreenComponent("editvelocity", layer)
 {
+}
+
+void EditVelocityScreen::open()
+{
+	setTime0(0);
+	setTime1(sequencer.lock()->getActiveSequence().lock()->getLastTick());
+	
+	displayEditType();
+	displayValue();
+	displayTime();
+	displayNotes();
 }
 
 void EditVelocityScreen::function(int i)
@@ -30,23 +47,23 @@ void EditVelocityScreen::function(int i)
 
 			if (ne)
 			{
-				if (ne->getTick() >= swGui->getTime0() && ne->getTick() <= swGui->getTime1())
+				if (ne->getTick() >= time0 && ne->getTick() <= time1)
 				{
-					if (swGui->getEditType() == 0)
+					if (editType == 0)
 					{
-						ne->setVelocity(ne->getVelocity() + swGui->getValue());
+						ne->setVelocity(ne->getVelocity() + value);
 					} 
-					else if (swGui->getEditType() == 1)
+					else if (editType == 1)
 					{
-						ne->setVelocity(ne->getVelocity() - swGui->getValue());
+						ne->setVelocity(ne->getVelocity() - value);
 					}
-					else if (swGui->getEditType() == 2)
+					else if (editType == 2)
 					{
-						ne->setVelocity(ne->getVelocity() * (swGui->getValue() / 100.0));
+						ne->setVelocity(ne->getVelocity() * (value / 100.0));
 					}
-					else if (swGui->getEditType() == 3)
+					else if (editType == 3)
 					{
-						ne->setVelocity(swGui->getValue());
+						ne->setVelocity(value);
 					}
 				}
 			}
@@ -63,12 +80,86 @@ void EditVelocityScreen::turnWheel(int i)
 
 	if (param.compare("edittype") == 0)
 	{
-		swGui->setEditType(swGui->getEditType() + i);
+		setEditType(editType + i);
 	}
 	else if (param.compare("value") == 0)
 	{
-		swGui->setValue(swGui->getValue() + i);
+		setValue(value + i);
 	}
 	
-	SeqWindowUtil::checkAllTimesAndNotes(i);
+	checkAllTimesAndNotes(i);
+}
+
+void EditVelocityScreen::displayTime()
+{
+	auto sequence = sequencer.lock()->getActiveSequence().lock().get();
+	findField("time0").lock()->setTextPadded(SeqUtil::getBarFromTick(sequence, time0) + 1, "0");
+	findField("time1").lock()->setTextPadded(SeqUtil::getBeat(sequence, time0) + 1, "0");
+	findField("time2").lock()->setTextPadded(SeqUtil::getClockNumber(sequence, time0), "0");
+	findField("time3").lock()->setTextPadded(SeqUtil::getBarFromTick(sequence, time1) + 1, "0");
+	findField("time4").lock()->setTextPadded(SeqUtil::getBeat(sequence, time1) + 1, "0");
+	findField("time5").lock()->setTextPadded(SeqUtil::getClockNumber(sequence, time1), "0");
+}
+
+void EditVelocityScreen::displayNotes()
+{
+	init();
+	auto lSampler = sampler.lock();
+	auto samplerGui = mpc::Mpc::instance().getUis().lock()->getSamplerGui();
+
+	if (track.lock()->getBusNumber() == 0) {
+		findField("notes0").lock()->setSize(8 * 6, 9);
+		findLabel("notes1").lock()->Hide(false);
+		findField("notes1").lock()->Hide(false);
+		findField("notes0").lock()->setText(moduru::lang::StrUtil::padLeft(to_string(midiNote0), " ", 3) + "(" + mpc::ui::Uis::noteNames[midiNote0] + u8"\u00D4");
+		findField("notes1").lock()->setText(moduru::lang::StrUtil::padLeft(to_string(midiNote1), " ", 3) + "(" + mpc::ui::Uis::noteNames[midiNote1] + u8"\u00D4");
+	}
+	else {
+		findField("notes0").lock()->setSize(6 * 6 + 2, 9);
+		if (samplerGui->getNote() != 34) {
+			findField("notes0").lock()->setText(to_string(samplerGui->getNote()) + "/" + lSampler->getPadName(samplerGui->getPad()));
+		}
+		else {
+			findField("notes0").lock()->setText("ALL");
+		}
+		findLabel("notes1").lock()->Hide(true);
+		findField("notes1").lock()->Hide(true);
+	}
+}
+
+void EditVelocityScreen::setEditType(int i)
+{
+	if (i < 0 || i > 3)
+	{
+		return;
+	}
+
+	editType = i;
+	displayEditType();
+}
+
+void EditVelocityScreen::setValue(int i)
+{
+	if (i < 1 || i > 200)
+	{
+		return;
+	}
+
+	if (editType != 2 && i > 127)
+	{
+		return;
+	}
+
+	value = i;
+	displayValue();
+}
+
+void EditVelocityScreen::displayValue()
+{
+	findField("value").lock()->setText(to_string(value));
+}
+
+void EditVelocityScreen::displayEditType()
+{
+	findField("edittype").lock()->setText(editTypeNames[editType]);
 }

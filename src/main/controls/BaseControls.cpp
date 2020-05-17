@@ -873,10 +873,9 @@ void BaseControls::erase()
 		return;
 
 	if (sequencer.lock()->isOverDubbing()) {
+		// TODO
 	}
 	else {
-		mpc.getUis().lock()->getSequencerWindowGui()->setTime0(0);
-		mpc.getUis().lock()->getSequencerWindowGui()->setTime1(sequencer.lock()->getActiveSequence().lock()->getLastTick());
 		ls.lock()->openScreen("erase");
 	}
 }

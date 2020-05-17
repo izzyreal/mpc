@@ -1,4 +1,4 @@
-#include <lcdgui/screens/window/SeqWindowUtil.hpp>
+#include "WithTimesAndNotes.hpp"
 
 #include <Mpc.hpp>
 
@@ -20,52 +20,106 @@
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui::screens::window;
 
-using namespace std;
-
-void SeqWindowUtil::checkAllTimesAndNotes(int i)
+void WithTimesAndNotes::checkAllTimesAndNotes(int notch)
 {
 	auto& mpc = mpc::Mpc::instance();
-	
+
 	auto sequence = mpc.getSequencer().lock()->getActiveSequence().lock();
 	auto param = mpc.getLayeredScreen().lock()->getFocus();
 	auto gui = mpc.getUis().lock()->getSequencerWindowGui();
 
 	if (param.compare("time0") == 0) {
-		gui->setTime0(SeqUtil::getTickFromBar((SeqUtil::getBarFromTick(sequence.get(), gui->getTime0())) + i, sequence.get(), gui->getTime0()));
+		setTime0(SeqUtil::getTickFromBar((SeqUtil::getBarFromTick(sequence.get(), time0)) + notch, sequence.get(), time0));
 	}
 	else if (param.compare("time1") == 0) {
-		gui->setTime0(SeqUtil::setBeat((SeqUtil::getBeat(sequence.get(), gui->getTime0())) + i, sequence.get(), gui->getTime0()));
+		setTime0(SeqUtil::setBeat((SeqUtil::getBeat(sequence.get(), time0)) + notch, sequence.get(), time0));
 	}
 	else if (param.compare("time2") == 0) {
-		gui->setTime0(SeqUtil::setClockNumber((SeqUtil::getClockNumber(sequence.get(), gui->getTime0())) + i, sequence.get(), gui->getTime0()));
+		setTime0(SeqUtil::setClockNumber((SeqUtil::getClockNumber(sequence.get(), time0)) + notch, sequence.get(), time0));
 	}
 	else if (param.compare("time3") == 0) {
-		gui->setTime1(SeqUtil::getTickFromBar((SeqUtil::getBarFromTick(sequence.get(), gui->getTime1())) + i, sequence.get(), gui->getTime1()));
+		setTime1(SeqUtil::getTickFromBar((SeqUtil::getBarFromTick(sequence.get(), time1)) + notch, sequence.get(), time1));
 	}
 	else if (param.compare("time4") == 0) {
-		gui->setTime1(SeqUtil::setBeat((SeqUtil::getBeat(sequence.get(), gui->getTime1())) + i, sequence.get(), gui->getTime1()));
+		setTime1(SeqUtil::setBeat((SeqUtil::getBeat(sequence.get(), time1)) + notch, sequence.get(), time1));
 	}
 	else if (param.compare("time5") == 0) {
-		gui->setTime1(SeqUtil::setClockNumber((SeqUtil::getClockNumber(sequence.get(), gui->getTime1())) + i, sequence.get(), gui->getTime1()));
+		setTime1(SeqUtil::setClockNumber((SeqUtil::getClockNumber(sequence.get(), time1)) + notch, sequence.get(), time1));
 	}
 	else if (param.compare("notes0") == 0) {
 
 		auto track = mpc.getSequencer().lock()->getActiveTrack().lock();
 
 		if (track->getBusNumber() != 0) {
-			
+
 			auto samplerGui = mpc::Mpc::instance().getUis().lock()->getSamplerGui();
-			auto note = samplerGui->getNote() + i;
+			auto note = samplerGui->getNote() + notch;
 			auto mpcSoundPlayerChannel = mpc.getSampler().lock()->getDrum(track->getBusNumber() - 1);
 			auto program = dynamic_pointer_cast<mpc::sampler::Program>(mpc.getSampler().lock()->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
 			auto pad = program->getPadNumberFromNote(note);
 			samplerGui->setPadAndNote(pad, samplerGui->getNote());
 		}
 		else {
-			gui->setMidiNote0(gui->getMidiNote0() + i);
+			setMidiNote0(getMidiNote0() + notch);
 		}
 	}
 	else if (param.compare("notes1") == 0) {
-		gui->setMidiNote1(gui->getMidiNote1() + i);
+		setMidiNote1(getMidiNote1() + notch);
 	}
+}
+
+int WithTimesAndNotes::getMidiNote0()
+{
+	return note0;
+}
+
+void WithTimesAndNotes::setMidiNote0(int i)
+{
+	if (i < 0 || i > 127)
+	{
+		return;
+	}
+
+	note0 = i;
+	displayNotes();
+}
+
+int WithTimesAndNotes::getMidiNote1()
+{
+	return note1;
+}
+
+void WithTimesAndNotes::setMidiNote1(int i)
+{
+	if (i < 0 || i > 127)
+	{
+		return;
+	}
+
+	note1 = i;
+	displayNotes();
+}
+
+void WithTimesAndNotes::setTime0(int time0)
+{
+	this->time0 = time0;
+
+	if (time0 > time1)
+	{
+		time1 = time0;
+	}
+
+	displayTime();
+}
+
+void WithTimesAndNotes::setTime1(int time1)
+{
+	this->time1 = time1;
+
+	if (time1 < time0)
+	{
+		time0 = time1;
+	}
+
+	displayTime();
 }

@@ -54,7 +54,6 @@ namespace mpc::ui::sequencer::window
 	{
 
 	private:
-		std::vector<std::string> editTypeNames;
 		std::string csn{ "" };
 		std::weak_ptr<mpc::sequencer::Sequencer> sequencer;
 		std::weak_ptr<mpc::sampler::Sampler> sampler;
@@ -76,52 +75,15 @@ namespace mpc::ui::sequencer::window
 		std::weak_ptr<mpc::lcdgui::Field> sq1Field;
 		std::weak_ptr<mpc::lcdgui::Field> tr0Field;
 		std::weak_ptr<mpc::lcdgui::Field> tr1Field;
-		std::weak_ptr<mpc::lcdgui::Field> noteValueField;
-		std::weak_ptr<mpc::lcdgui::Field> swingField;
-		std::weak_ptr<mpc::lcdgui::Field> notes0Field;
-		std::weak_ptr<mpc::lcdgui::Field> notes1Field;
-		std::weak_ptr<mpc::lcdgui::Field> time0Field;
-		std::weak_ptr<mpc::lcdgui::Field> time1Field;
-		std::weak_ptr<mpc::lcdgui::Field> time2Field;
-		std::weak_ptr<mpc::lcdgui::Field> time3Field;
-		std::weak_ptr<mpc::lcdgui::Field> time4Field;
-		std::weak_ptr<mpc::lcdgui::Field> time5Field;
-		std::weak_ptr<mpc::lcdgui::Field> shiftTimingField;
-		std::weak_ptr<mpc::lcdgui::Field> amountField;
-		std::weak_ptr<mpc::lcdgui::Label> swingLabel;
-		std::weak_ptr<mpc::lcdgui::Label> notes1Label;
 		ctoot::mpc::MpcSoundPlayerChannel* mpcSoundPlayerChannel;
 		mpc::lcdgui::FunctionKeys* fb;
-		std::weak_ptr<mpc::lcdgui::Field> bar0Field;
-		std::weak_ptr<mpc::lcdgui::Field> bar1Field;
-		std::weak_ptr<mpc::lcdgui::Field> newTsigField;
-		std::weak_ptr<mpc::lcdgui::Field> numberOfBarsField;
-		std::weak_ptr<mpc::lcdgui::Field> lastBarField;
-		std::weak_ptr<mpc::lcdgui::Field> firstBarField;
 		std::weak_ptr<mpc::lcdgui::Field> inThisTrackField;
-		std::weak_ptr<mpc::lcdgui::Field> newBarsField;
-		std::weak_ptr<mpc::lcdgui::Field> passField;
-		std::weak_ptr<mpc::lcdgui::Field> typeField;
-		std::weak_ptr<mpc::lcdgui::Field> midiFilterField;
-		std::weak_ptr<mpc::lcdgui::Field> sustainPedalToDurationField;
-		std::weak_ptr<mpc::lcdgui::Field> progChangeSeqField;
-		std::weak_ptr<mpc::lcdgui::Field> receiveChField;
-		std::weak_ptr<mpc::lcdgui::Field> softThruField;
-		std::weak_ptr<mpc::lcdgui::Field> editTypeField;
-		std::weak_ptr<mpc::lcdgui::Field> valueField;
-		std::weak_ptr<mpc::lcdgui::Label> deviceNameLabel;
 		mpc::ui::sampler::SamplerGui* samplerGui = nullptr;
-
-	private:
-		void displayNotes();
-		void displayTime();
 
 	public:
 		void update(moduru::observer::Observable* o, nonstd::any arg) override;
 
 	private:
-		void displayValue();
-		void displayEditType();
 		void displayTrackNumber();
 		void displaySequenceNumberName();
 		void displaySequenceNumberNames();

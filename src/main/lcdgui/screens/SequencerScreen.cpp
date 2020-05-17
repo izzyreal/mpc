@@ -642,8 +642,6 @@ void SequencerScreen::openWindow()
 		openScreen("changebars");
 	}
 	else if (focus.compare("velo") == 0) {
-		Mpc::instance().getUis().lock()->getSequencerWindowGui()->setTime0(0);
-		Mpc::instance().getUis().lock()->getSequencerWindowGui()->setTime1(sequence.lock()->getLastTick());
 		openScreen("editvelocity");
 	}
 }

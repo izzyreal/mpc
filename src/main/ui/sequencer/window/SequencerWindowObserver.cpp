@@ -31,7 +31,6 @@ using namespace std;
 
 SequencerWindowObserver::SequencerWindowObserver()
 {	
-	editTypeNames = { "ADD VALUE", "SUB VALUE", "MULT VAL%", "SET TO VAL" };
 	nameGui = Mpc::instance().getUis().lock()->getNameGui();
 	samplerGui = Mpc::instance().getUis().lock()->getSamplerGui();
 	sequencer = Mpc::instance().getSequencer();
@@ -62,38 +61,7 @@ SequencerWindowObserver::SequencerWindowObserver()
 	sq0Field = ls->lookupField("sq0");
 	sq1Field = ls->lookupField("sq1");
 	
-	noteValueField = ls->lookupField("notevalue");
-	swingField = ls->lookupField("swing");
-	notes0Field = ls->lookupField("notes0");
-	notes1Field = ls->lookupField("notes1");
-	time0Field = ls->lookupField("time0");
-	time1Field = ls->lookupField("time1");
-	time2Field = ls->lookupField("time2");
-	time3Field = ls->lookupField("time3");
-	time4Field = ls->lookupField("time4");
-	time5Field = ls->lookupField("time5");
-	shiftTimingField = ls->lookupField("shifttiming");
-	amountField = ls->lookupField("amount");
-	swingLabel = ls->lookupLabel("swing");
-	notes1Label = ls->lookupLabel("notes1");
-	bar0Field = ls->lookupField("bar0");
-	bar1Field = ls->lookupField("bar1");
-	newTsigField = ls->lookupField("newtsig");
-	firstBarField = ls->lookupField("firstbar");
-	lastBarField = ls->lookupField("lastbar");
-	numberOfBarsField = ls->lookupField("numberofbars");
 	inThisTrackField = ls->lookupField("inthistrack");
-	newBarsField = ls->lookupField("newbars");
-	receiveChField = ls->lookupField("receivech");
-	progChangeSeqField = ls->lookupField("seq");
-	sustainPedalToDurationField = ls->lookupField("duration");
-	midiFilterField = ls->lookupField("midifilter");
-	typeField = ls->lookupField("type");
-	passField = ls->lookupField("pass");
-	softThruField = ls->lookupField("softthru");
-	deviceNameLabel = ls->lookupLabel("devicename");
-	editTypeField = ls->lookupField("edittype");
-	valueField = ls->lookupField("value");
 	
 	swGui->addObserver(this);
 	nameGui->addObserver(this);
@@ -122,48 +90,6 @@ SequencerWindowObserver::SequencerWindowObserver()
 	{
 		displayTrackNumberNames();
 	}
-	else if (csn.compare("editvelocity") == 0)
-	{
-		displayEditType();
-		displayValue();
-		displayTime();
-		displayNotes();
-	}
-}
-
-void SequencerWindowObserver::displayNotes()
-{
-	auto lSampler = sampler.lock();
-	auto lTrk = track.lock();
-	if (lTrk->getBusNumber() == 0) {
-		notes0Field.lock()->setSize(8 * 6, 9);
-		notes1Label.lock()->Hide(false);
-		notes1Field.lock()->Hide(false);
-		notes0Field.lock()->setText(moduru::lang::StrUtil::padLeft(to_string(swGui->getMidiNote0()), " ", 3) + "(" + mpc::ui::Uis::noteNames[swGui->getMidiNote0()] + u8"\u00D4");
-		notes1Field.lock()->setText(moduru::lang::StrUtil::padLeft(to_string(swGui->getMidiNote1()), " ", 3) + "(" + mpc::ui::Uis::noteNames[swGui->getMidiNote1()] + u8"\u00D4");
-	}
-	else {
-		notes0Field.lock()->setSize(6 * 6 + 2, 9);
-		if (samplerGui->getNote() != 34) {
-			notes0Field.lock()->setText(to_string(samplerGui->getNote()) + "/" + lSampler->getPadName(samplerGui->getPad()));
-		}
-		else {
-			notes0Field.lock()->setText("ALL");
-		}
-		notes1Label.lock()->Hide(true);
-		notes1Field.lock()->Hide(true);
-	}
-}
-
-void SequencerWindowObserver::displayTime()
-{
-	auto s = sequence.lock().get();
-	time0Field.lock()->setTextPadded(SeqUtil::getBarFromTick(s, swGui->getTime0()) + 1, "0");
-	time1Field.lock()->setTextPadded(SeqUtil::getBeat(s, swGui->getTime0()) + 1, "0");
-	time2Field.lock()->setTextPadded(SeqUtil::getClockNumber(s, swGui->getTime0()), "0");
-	time3Field.lock()->setTextPadded(SeqUtil::getBarFromTick(s, swGui->getTime1()) + 1, "0");
-	time4Field.lock()->setTextPadded(SeqUtil::getBeat(s, swGui->getTime1()) + 1, "0");
-	time5Field.lock()->setTextPadded(SeqUtil::getClockNumber(s, swGui->getTime1()), "0");
 }
 
 void SequencerWindowObserver::update(moduru::observer::Observable* o, nonstd::any arg)
@@ -184,14 +110,7 @@ void SequencerWindowObserver::update(moduru::observer::Observable* o, nonstd::an
 
 	int yPos;
 
-	if (s.compare("padandnote") == 0)
-	{
-		if (csn.compare("erase") == 0)
-		{
-			displayNotes();
-		}
-	}
-	else if (s.compare("seqnumbername") == 0)
+	if (s.compare("seqnumbername") == 0)
 	{
 		displaySequenceNumberName();
 	}
@@ -215,32 +134,6 @@ void SequencerWindowObserver::update(moduru::observer::Observable* o, nonstd::an
 	{
 		displaySequenceNumberNames();
 	}
-	else if (s.compare("time") == 0)
-	{
-		displayTime();
-	}
-	else if (s.compare("notes") == 0)
-	{
-		displayNotes();
-	}
-	else if (s.compare("edittype") == 0)
-{
-		displayEditType();
-	}
-	else if (s.compare("value") == 0)
-	{
-		displayValue();
-	}
-}
-
-void SequencerWindowObserver::displayValue()
-{
-    valueField.lock()->setText(to_string(swGui->getValue()));
-}
-
-void SequencerWindowObserver::displayEditType()
-{
-    editTypeField.lock()->setText(editTypeNames[swGui->getEditType()]);
 }
 
 void SequencerWindowObserver::displayTrackNumber()

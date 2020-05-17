@@ -20,7 +20,6 @@
 #include <ui/sequencer/BarCopyGui.hpp>
 #include <ui/sequencer/StepEditorGui.hpp>
 
-#include <ui/sequencer/window/EraseGui.hpp>
 #include <ui/sequencer/window/SequencerWindowGui.hpp>
 
 #include <ui/sampler/MixerSetupGui.hpp>
@@ -77,7 +76,6 @@ Uis::Uis()
 	barCopyGui = new mpc::ui::sequencer::BarCopyGui();
 	trMoveGui = new mpc::ui::sequencer::TrMoveGui();
 
-	eraseGui = new mpc::ui::sequencer::window::EraseGui();
 	sequencerWindowGui = new mpc::ui::sequencer::window::SequencerWindowGui();
 
 	samplerGui = new mpc::ui::sampler::SamplerGui();

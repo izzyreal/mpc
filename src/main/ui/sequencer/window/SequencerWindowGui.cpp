@@ -11,7 +11,6 @@ SequencerWindowGui::SequencerWindowGui()
 
 	inPlay = true;
 	inRec = true;
-	value = 1;
 	clickVolume = 100;
 	accentVelo = 127;
 	accentNote = 35;
@@ -117,69 +116,6 @@ void SequencerWindowGui::setTempoChangeOffset(int i)
 	notifyObservers(string("offset"));
 }
 
-int SequencerWindowGui::getMidiNote0()
-{
-    return midiNote0;
-}
-
-void SequencerWindowGui::setMidiNote0(int i)
-{
-    if (i < 0 || i > 127)
-    {
-        return;
-    }
-
-    midiNote0 = i;
-    setChanged();
-    notifyObservers(string("notes"));
-}
-
-int SequencerWindowGui::getMidiNote1()
-{
-    return midiNote1;
-}
-
-void SequencerWindowGui::setMidiNote1(int i)
-{
-    if (i < 0 || i > 127)
-    {
-        return;
-    }
-
-    midiNote1 = i;
-    setChanged();
-    notifyObservers(string("notes"));
-}
-
-int SequencerWindowGui::getTime0()
-{
-    return time0;
-}
-
-void SequencerWindowGui::setTime0(int time0)
-{
-    this->time0 = time0;
-    if(time0 > time1)
-        time1 = time0;
-
-    setChanged();
-    notifyObservers(string("time"));
-}
-
-int SequencerWindowGui::getTime1()
-{
-    return time1;
-}
-
-void SequencerWindowGui::setTime1(int time1)
-{
-    this->time1 = time1;
-    if(time1 < time0)
-        time0 = time1;
-
-    setChanged();
-    notifyObservers(string("time"));
-}
 
 int SequencerWindowGui::getCountInMode()
 {
@@ -254,39 +190,6 @@ void SequencerWindowGui::setInRec(bool b)
 bool SequencerWindowGui::getInRec()
 {
     return inRec;
-}
-
-int SequencerWindowGui::getEditType()
-{
-    return editType;
-}
-
-void SequencerWindowGui::setEditType(int i)
-{
-    if(i < 0 || i > 3)
-        return;
-
-    editType = i;
-    setChanged();
-    notifyObservers(string("edittype"));
-}
-
-int SequencerWindowGui::getValue()
-{
-    return value;
-}
-
-void SequencerWindowGui::setValue(int i)
-{
-    if(i < 1 || i > 200)
-        return;
-
-    if(editType != 2 && i > 127)
-        return;
-
-    value = i;
-    setChanged();
-    notifyObservers(string("value"));
 }
 
 int SequencerWindowGui::getClickVolume()

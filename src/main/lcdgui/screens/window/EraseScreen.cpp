@@ -1,52 +1,77 @@
-#include <lcdgui/screens/window/EraseScreen.hpp>
-
-#include <lcdgui/screens/window/SeqWindowUtil.hpp>
+#include "EraseScreen.hpp"
 
 #include <ui/Uis.hpp>
+
 #include <lcdgui/LayeredScreen.hpp>
+#include <lcdgui/Label.hpp>
+
 #include <ui/sampler/SamplerGui.hpp>
-#include <ui/sequencer/window/EraseGui.hpp>
-#include <ui/sequencer/window/SequencerWindowGui.hpp>
 #include <sequencer/Event.hpp>
 #include <sequencer/Sequence.hpp>
 #include <sequencer/Track.hpp>
 #include <sequencer/NoteEvent.hpp>
 #include <sequencer/Sequencer.hpp>
+#include <sequencer/SeqUtil.hpp>
+
+#include <lang/StrUtil.hpp>
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
+
+using namespace moduru::lang;
+
 using namespace std;
 
 EraseScreen::EraseScreen(const int& layer)
 	: ScreenComponent("erase", layer)
 {
-	eventClassNames = vector<string>{ "com.mpc.sequencer.NoteEvent", "com.mpc.sequencer.PitchBendEvent", "com.mpc.sequencer.ControlChangeEvent", "com.mpc.sequencer.ProgramChangeEvent", "com.mpc.sequencer.ChannelPressureEvent", "com.mpc.sequencer.PolyPressureEvent", "com.mpc.sequencer.SystemExclusiveEvent" };
+}
+
+void EraseScreen::open()
+{
+	auto samplerGui = Mpc::instance().getUis().lock()->getSamplerGui();
+	samplerGui->addObserver(this);
+
+	setTime0(0);
+	setTime1(sequencer.lock()->getActiveSequence().lock()->getLastTick());
+	
+	displayErase();
+	displayNotes();
+	displayTime();
+	displayTrack();
+	displayType();
+}
+
+void EraseScreen::close()
+{
+	auto samplerGui = Mpc::instance().getUis().lock()->getSamplerGui();
+	samplerGui->deleteObserver(this);
 }
 
 void EraseScreen::turnWheel(int i)
 {
 	init();
 
-	auto egui = Mpc::instance().getUis().lock()->getEraseGui();
-
-	if (param.compare("track") == 0) {
-		egui->setTrack(egui->getTrack() + i);
+	if (param.compare("track") == 0)
+	{
+		setTrack(track + i);
 	}
 
-	SeqWindowUtil::checkAllTimesAndNotes(i);
+	checkAllTimesAndNotes(i);
 
-	if (param.compare("erase") == 0) {
-		egui->setErase(egui->getErase() + i);
+	if (param.compare("erase") == 0)
+	{
+		setErase(erase + i);
 	}
-	else if (param.compare("type") == 0) {
-		egui->setType(egui->getType() + i);
+	else if (param.compare("type") == 0)
+	{
+		setType(type + i);
 	}
 }
 
 void EraseScreen::function(int i)
 {
 	init();
-	auto egui = Mpc::instance().getUis().lock()->getEraseGui();
 
 	switch (i)
 	{
@@ -55,17 +80,8 @@ void EraseScreen::function(int i)
 		break;
 	case 4:
 	{
-		shared_ptr<Sequence> seq;
-		int startIndex;
-		int lastIndex;
-		int erase;
-		int type;
-		bool midi;
-		int notea;
-		int noteb;
-		seq = sequencer.lock()->getActiveSequence().lock();
-		startIndex = egui->getTrack() - 1;
-		lastIndex = egui->getTrack() - 1;
+		auto startIndex = track - 1;
+		auto lastIndex = track - 1;
 
 		if (startIndex < 0)
 		{
@@ -73,23 +89,24 @@ void EraseScreen::function(int i)
 			lastIndex = 63;
 		}
 
-		erase = egui->getErase();
-		type = egui->getType();
-		midi = track.lock()->getBusNumber() == 0;
+		auto midi = sequencer.lock()->getActiveTrack().lock()->getBusNumber() == 0;
 
-		auto swGui = mpc.getUis().lock()->getSequencerWindowGui();
+		auto noteA = midi ? midiNote0 : samplerGui->getNote();
+		auto noteB = midi ? midiNote1 : -1;
 
-		notea = midi ? swGui->getMidiNote0() : samplerGui->getNote();
-		noteb = midi ? swGui->getMidiNote1() : -1;
+		auto seq = sequencer.lock()->getActiveSequence().lock();
 
-		for (auto j = startIndex; j < lastIndex + 1; j++) {
+		for (auto j = startIndex; j < lastIndex + 1; j++)
+		{
 			vector<int> removalIndices;
 			auto t = seq->getTrack(j).lock();
-			for (auto k = 0; k < t->getEvents().size(); k++) {
+			
+			for (auto k = 0; k < t->getEvents().size(); k++)
+			{
 				auto e = t->getEvent(k).lock();
 				auto ne = dynamic_pointer_cast<NoteEvent>(e);
 
-				if (e->getTick() >= swGui->getTime0() && e->getTick() <= swGui->getTime1())
+				if (e->getTick() >= time0 && e->getTick() <= time1)
 				{
 					string excludeClass;
 					string includeClass;
@@ -97,10 +114,10 @@ void EraseScreen::function(int i)
 					case 0:
 						if (ne) {
 							auto nn = ne->getNote();
-							if (midi && nn >= notea && nn <= noteb) {
+							if (midi && nn >= noteA && nn <= noteB) {
 								removalIndices.push_back(k);
 							}
-							if (!midi && (notea <= 34 || notea == nn)) {
+							if (!midi && (noteA <= 34 || noteA == nn)) {
 								removalIndices.push_back(k);
 							}
 						}
@@ -110,34 +127,49 @@ void EraseScreen::function(int i)
 						break;
 					case 1:
 						excludeClass = eventClassNames[type];
-						if (string(typeid(e).name()).compare(excludeClass) != 0) {
-							if (ne) {
+						if (string(typeid(e).name()).compare(excludeClass) != 0)
+						{
+							if (ne)
+							{
 								auto nn = ne->getNote();
-								if (midi && nn >= notea && nn <= noteb) {
+							
+								if (midi && nn >= noteA && nn <= noteB)
+								{
 									removalIndices.push_back(k);
 								}
-								if (!midi && (notea > 34 && notea != nn)) {
+								
+								if (!midi && (noteA > 34 && noteA != nn))
+								{
 									removalIndices.push_back(k);
 								}
 							}
-							else {
+							else
+							{
 								removalIndices.push_back(k);
 							}
 						}
 						break;
 					case 2:
 						includeClass = eventClassNames[type];
-						if (string(typeid(e).name()).compare(includeClass) == 0) {
-							if (ne) {
+						
+						if (string(typeid(e).name()).compare(includeClass) == 0)
+						{
+							if (ne)
+							{
 								auto nn = ne->getNote();
-								if (midi && nn >= notea && nn <= noteb) {
+							
+								if (midi && nn >= noteA && nn <= noteB)
+								{
 									removalIndices.push_back(k);
 								}
-								if (!midi && (notea <= 34 || notea == nn)) {
+								
+								if (!midi && (noteA <= 34 || noteA == nn))
+								{
 									removalIndices.push_back(k);
 								}
 							}
-							else {
+							else
+							{
 								removalIndices.push_back(k);
 							}
 						}
@@ -150,7 +182,8 @@ void EraseScreen::function(int i)
 			sort(begin(removalIndices), end(removalIndices));
 			reverse(begin(removalIndices), end(removalIndices));
 
-			for (int integer : removalIndices) {
+			for (int integer : removalIndices)
+			{
 				t->getEvents().erase(t->getEvents().begin() + integer);
 			}
 		}
@@ -158,4 +191,129 @@ void EraseScreen::function(int i)
 		break;
 	}
 	}
+}
+
+void EraseScreen::update(moduru::observer::Observable* observable, nonstd::any message)
+{
+	auto msg = nonstd::any_cast<string>(message);
+
+	if (msg.compare("padandnote") == 0)
+	{
+		displayNotes();
+	}
+}
+
+void EraseScreen::displayTrack()
+{
+	string trackName = "";
+	if (track == -1)
+	{
+		trackName = "ALL";
+	}
+	else
+	{
+		auto sequence = sequencer.lock()->getActiveSequence().lock();
+		trackName = sequence->getTrack(track).lock()->getActualName();
+	}
+	findField("track").lock()->setTextPadded(track + 1, " ");
+	findLabel("trackname").lock()->setText("-" + trackName);
+}
+
+void EraseScreen::displayTime()
+{
+	auto sequence = sequencer.lock()->getActiveSequence().lock().get();
+	findField("time0").lock()->setTextPadded(SeqUtil::getBarFromTick(sequence, time0) + 1, "0");
+	findField("time1").lock()->setTextPadded(SeqUtil::getBeat(sequence, time0) + 1, "0");
+	findField("time2").lock()->setTextPadded(SeqUtil::getClockNumber(sequence, time0), "0");
+	findField("time3").lock()->setTextPadded(SeqUtil::getBarFromTick(sequence, time1) + 1, "0");
+	findField("time4").lock()->setTextPadded(SeqUtil::getBeat(sequence, time1) + 1, "0");
+	findField("time5").lock()->setTextPadded(SeqUtil::getClockNumber(sequence, time1), "0");
+}
+
+void EraseScreen::displayErase()
+{
+	findField("erase").lock()->setText(eraseNames[erase]);
+}
+
+void EraseScreen::displayType()
+{
+	findField("type").lock()->Hide(erase == 0);
+	if (erase > 0)
+	{
+		findField("type").lock()->setText(typeNames[type]);
+	}
+}
+
+void EraseScreen::displayNotes()
+{	
+	init();
+
+	if (erase != 0 && ((erase == 1 && type != 0) || (erase == 2 && type != 0)))
+	{
+		findField("notes0").lock()->Hide(true);
+		findLabel("notes0").lock()->Hide(true);
+		findField("notes1").lock()->Hide(true);
+		findLabel("notes1").lock()->Hide(true);
+		return;
+	}
+
+	auto bus = sequencer.lock()->getActiveTrack().lock()->getBusNumber();
+
+	findField("notes0").lock()->Hide(false);
+	findLabel("notes0").lock()->Hide(false);
+	findField("notes1").lock()->Hide(bus != 0);
+	findLabel("notes1").lock()->Hide(bus != 0);
+
+	if (bus > 0)
+	{
+		findField("notes0").lock()->setSize(6 * 6 + 2, 8);
+
+		if (samplerGui->getNote() != 34)
+		{
+			findField("notes0").lock()->setText(to_string(samplerGui->getNote()) + "/" + sampler.lock()->getPadName(samplerGui->getPad()));
+		}
+		else {
+			findField("notes0").lock()->setText("ALL");
+		}
+
+	}
+	else
+	{
+		findField("notes0").lock()->setSize(8 * 6, 8);
+		findField("notes0").lock()->setText((StrUtil::padLeft(to_string(midiNote0), " ", 3) + "(" + mpc::ui::Uis::noteNames[midiNote0]) + ")");
+		findField("notes1").lock()->setText((StrUtil::padLeft(to_string(midiNote1), " ", 3) + "(" + mpc::ui::Uis::noteNames[midiNote1]) + ")");
+	}
+}
+
+void EraseScreen::setTrack(int i)
+{
+	if (i < -1 || i > 63)
+	{
+		return;
+	}
+
+	track = i;
+	displayTrack();
+}
+
+void EraseScreen::setErase(int i)
+{
+	if (i < 0 || i > 2)
+	{
+		return;
+	}
+
+	erase = i;
+	displayErase();
+}
+
+void EraseScreen::setType(int i)
+{
+	if (i < 0 || i > 6)
+	{
+		return;
+	}
+
+	type = i;
+	displayType();
 }
