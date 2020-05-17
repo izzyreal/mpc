@@ -11,14 +11,17 @@
 #include <sequencer/Sequencer.hpp>
 #include <sequencer/TempoChangeEvent.hpp>
 #include <sequencer/TimeSignature.hpp>
-#include <observer/Observable.hpp>
 
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/window/CountMetronomeScreen.hpp>
+
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 using namespace std;
 
 Sequence::Sequence(vector<string> defaultTrackNames)
 {
-	
 	this->defaultTrackNames = defaultTrackNames;
 	barLengths = vector<int>(999);
 	numerators = vector<int>(999);
@@ -158,20 +161,27 @@ void Sequence::initMetaTracks()
 
 void Sequence::createClickTrack()
 {
-	auto swGui = Mpc::instance().getUis().lock()->getSequencerWindowGui();
 	metaTracks[0]->removeEvents();
 	auto bars = getLastBar() + 1;
 	auto den = 0;
 	auto denTicks = 0;
 
-	for (int i = 0; i < bars; i++) {
+	auto countMetronomeScreen = dynamic_pointer_cast<CountMetronomeScreen>(Screens::getScreenComponent("countmetronome"));
+	auto swGui = mpc::Mpc::instance().getUis().lock()->getSequencerWindowGui();
+
+	for (int i = 0; i < bars; i++)
+	{
 		den = denominators[i];
 		denTicks = (int)(96 * (4.0 / den));
 		int barStartPos = 0;
+	
 		for (auto k = 0; k < i; k++)
+		{
 			barStartPos += barLengths[k];
+		}
 
-		switch (swGui->getRate()) {
+		switch (countMetronomeScreen->getRate())
+		{
 		case 1:
 			denTicks *= 2.0f / 3;
 			break;
@@ -195,14 +205,18 @@ void Sequence::createClickTrack()
 			break;
 		}
 
-		for (auto j = 0; j < barLengths[i]; j += denTicks) {
+		for (auto j = 0; j < barLengths[i]; j += denTicks)
+		{
 			auto n = dynamic_pointer_cast<NoteEvent>(metaTracks[0]->addEvent(barStartPos + j, "note").lock());
 			n->setDuration(1);
-			if (j == 0) {
+		
+			if (j == 0)
+			{
 				n->setVelocity(swGui->getAccentVelo());
 				n->setNote(swGui->getAccentNote());
 			}
-			else {
+			else
+			{
 				n->setVelocity(swGui->getNormalVelo());
 				n->setNote(swGui->getNormalNote());
 		
@@ -656,11 +670,13 @@ int Sequence::getNoteEventCount()
 	return eventCounter;
 }
 
-bool Sequence::trackIndexComparator(weak_ptr<Track> t0, weak_ptr<Track> t1) {
+bool Sequence::trackIndexComparator(weak_ptr<Track> t0, weak_ptr<Track> t1)
+{
 	return t0.lock()->getTrackIndex() < t1.lock()->getTrackIndex();
 }
 
-int Sequence::getFirstTickOfBar(int index) {
+int Sequence::getFirstTickOfBar(int index)
+{
 	int res = 0;
 	for (int i = 0; i < index; i++) {
 		res += barLengths[i];
@@ -668,28 +684,31 @@ int Sequence::getFirstTickOfBar(int index) {
 	return res;
 }
 
-int Sequence::getLastTickOfBar(int index) {
+int Sequence::getLastTickOfBar(int index)
+{
 	return getFirstTickOfBar(index) + barLengths[index] - 1;
 }
 
-void Sequence::resetTrackEventIndices(int tick) {
-
-	if (!isUsed()) {
+void Sequence::resetTrackEventIndices(int tick)
+{
+	if (!isUsed())
+	{
 		return;
 	}
 
-	for (auto& t : tracks) {
-		if (t->isUsed()) {
+	for (auto& t : tracks)
+	{
+		if (t->isUsed())
+		{
 			t->move(tick, tick);
 		}
 	}
 	
-	for (auto& t : metaTracks) {
-		if (t->isUsed()) {
+	for (auto& t : metaTracks)
+	{
+		if (t->isUsed())
+		{
 			t->move(tick, tick);
 		}
 	}
-}
-
-Sequence::~Sequence() {
 }

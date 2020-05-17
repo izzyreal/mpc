@@ -27,14 +27,11 @@ namespace mpc::audiomidi {
 	{
 
 	private:
-		std::weak_ptr<mpc::sequencer::Sequencer> sequencer{ };
-		std::weak_ptr<mpc::sampler::Sampler> sampler{};
-		ui::sequencer::window::SequencerWindowGui* swGui{ nullptr };
-		mpc::ui::midisync::MidiSyncGui* msGui{ nullptr };
-		ui::vmpc::MidiGui* midiGui{ nullptr };
+		std::weak_ptr<mpc::sequencer::Sequencer> sequencer;
+		std::weak_ptr<mpc::sampler::Sampler> sampler;
+		mpc::ui::midisync::MidiSyncGui* msGui = nullptr;
+		ui::vmpc::MidiGui* midiGui = nullptr;
 		
-		//mpc::sequencer::MidiAdapter midiAdapter;
-
 	public:
 		void handle(std::weak_ptr<mpc::sequencer::Event> event, mpc::sequencer::Track* track);
 		void handleNoThru(std::weak_ptr<mpc::sequencer::Event> event, mpc::sequencer::Track* track, int timeStamp);

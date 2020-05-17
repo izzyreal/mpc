@@ -1,7 +1,5 @@
 #include "CountMetronomeScreen.hpp"
 
-#include <ui/sequencer/window/SequencerWindowGui.hpp>
-
 #include <lcdgui/Label.hpp>
 
 using namespace mpc::lcdgui::screens::window;
@@ -13,9 +11,6 @@ CountMetronomeScreen::CountMetronomeScreen(const int& layer)
 
 void CountMetronomeScreen::open()
 {
-	auto swGui = mpc.getUis().lock()->getSequencerWindowGui();
-	swGui->addObserver(this);
-
 	countInField = findField("countin");
 	inPlayField = findField("inplay");
 	rateField = findField("rate");
@@ -29,72 +24,33 @@ void CountMetronomeScreen::open()
 	displayWaitForKey();
 }
 
-void CountMetronomeScreen::close()
-{
-	auto swGui = mpc.getUis().lock()->getSequencerWindowGui();
-	swGui->deleteObserver(this);
-}
-
 void CountMetronomeScreen::displayWaitForKey()
 {
-	auto swGui = mpc.getUis().lock()->getSequencerWindowGui();
-	waitForKeyField.lock()->setText(swGui->isWaitForKeyEnabled() ? "ON" : "OFF");
+	waitForKeyField.lock()->setText(waitForKey ? "ON" : "OFF");
 }
 
 void CountMetronomeScreen::displayInRec()
 {
-	auto swGui = mpc.getUis().lock()->getSequencerWindowGui();
-	inRecField.lock()->setText(swGui->getInRec() ? "YES" : "NO");
+	inRecField.lock()->setText(inRec ? "YES" : "NO");
 }
 
 void CountMetronomeScreen::displayRate()
 {
-	auto swGui = mpc.getUis().lock()->getSequencerWindowGui();
-	rateField.lock()->setText(rateNames[swGui->getRate()]);
+	rateField.lock()->setText(rateNames[rate]);
 }
 
 void CountMetronomeScreen::displayInPlay()
 {
-	auto swGui = mpc.getUis().lock()->getSequencerWindowGui();
-	inPlayField.lock()->setText(swGui->getInPlay() ? "YES" : "NO");
+	inPlayField.lock()->setText(inPlay ? "YES" : "NO");
 }
 
 void CountMetronomeScreen::displayCountIn()
 {
-	auto swGui = mpc.getUis().lock()->getSequencerWindowGui();
-	countInField.lock()->setText(countInNames[swGui->getCountInMode()]);
+	countInField.lock()->setText(countInNames[countIn]);
 }
-
-void CountMetronomeScreen::update(moduru::observer::Observable* observable, nonstd::any message)
-{
-	auto msg = nonstd::any_cast<string>(message);
-
-	if (msg.compare("countin") == 0)
-	{
-		displayCountIn();
-	}
-	else if (msg.compare("inplay") == 0)
-	{
-		displayInPlay();
-	}
-	else if (msg.compare("rate") == 0)
-	{
-		displayRate();
-	}
-	else if (msg.compare("inrec") == 0)
-	{
-		displayInRec();
-	}
-	else if (msg.compare("waitforkey") == 0)
-	{
-		displayWaitForKey();
-	}
-}
-
 
 void CountMetronomeScreen::function(int i)
 {
-	auto swGui = mpc.getUis().lock()->getSequencerWindowGui();
 	switch (i) {
 	case 3:
 		ls.lock()->openScreen("sequencer");
@@ -108,21 +64,102 @@ void CountMetronomeScreen::function(int i)
 void CountMetronomeScreen::turnWheel(int i)
 {
 	init();
-	auto swGui = mpc.getUis().lock()->getSequencerWindowGui();
-	if (param.compare("countin") == 0) {
-		swGui->setCountIn(swGui->getCountInMode() + i);
+
+	if (param.compare("countin") == 0)
+	{
+		setCountIn(countIn + i);
 	}
-	else if (param.compare("inplay") == 0) {
-		swGui->setInPlay(i > 0);
+	else if (param.compare("inplay") == 0)
+	{
+		setInPlay(i > 0);
 	}
-	else if (param.compare("rate") == 0) {
-		swGui->setRate(swGui->getRate() + i);
+	else if (param.compare("rate") == 0)
+	{
+		setRate(rate + i);
 		sequencer.lock()->getActiveSequence().lock()->initMetaTracks();
 	}
-	else if (param.compare("inrec") == 0) {
-		swGui->setInRec(i > 0);
+	else if (param.compare("inrec") == 0)
+	{
+		setInRec(i > 0);
 	}
-	else if (param.compare("waitforkey") == 0) {
-		swGui->setWaitForKey(i > 0);
+	else if (param.compare("waitforkey") == 0)
+	{
+		setWaitForKey(i > 0);
 	}
+}
+
+int CountMetronomeScreen::getCountInMode()
+{
+	return countIn;
+}
+
+void CountMetronomeScreen::setCountIn(int i)
+{
+	if (i < 0 || i > 2)
+	{
+		return;
+	}
+	countIn = i;
+	displayCountIn();
+}
+
+void CountMetronomeScreen::setInPlay(bool b)
+{
+	if (inPlay == b)
+	{
+		return;
+	}
+	inPlay = b;
+	displayInPlay();
+}
+
+bool CountMetronomeScreen::getInPlay()
+{
+	return inPlay;
+}
+
+int CountMetronomeScreen::getRate()
+{
+	return rate;
+}
+
+void CountMetronomeScreen::setRate(int i)
+{
+	if (i < 0 || i > 7)
+	{
+		return;
+	}
+
+	rate = i;
+	displayRate();
+}
+
+void CountMetronomeScreen::setWaitForKey(bool b)
+{
+	if (waitForKey == b)
+	{
+		return;
+	}
+
+	waitForKey = b;
+	displayWaitForKey();
+}
+
+bool CountMetronomeScreen::isWaitForKeyEnabled()
+{
+	return waitForKey;
+}
+
+void CountMetronomeScreen::setInRec(bool b)
+{
+	if (inRec == b)
+		return;
+
+	inRec = b;
+	displayInRec();
+}
+
+bool CountMetronomeScreen::getInRec()
+{
+	return inRec;
 }

@@ -22,6 +22,24 @@ namespace mpc::lcdgui::screens::window
 		std::weak_ptr<mpc::lcdgui::Field> inRecField;
 		std::weak_ptr<mpc::lcdgui::Field> waitForKeyField;
 
+		int countIn = 0;
+		bool inPlay = true;
+		int rate = 0;
+		bool waitForKey = false;
+		bool inRec = true;
+
+	public:
+		int getCountInMode();
+		bool getInPlay();
+		int getRate();
+		bool isWaitForKeyEnabled();
+		bool getInRec();
+		void setCountIn(int i);
+		void setInPlay(bool b);
+		void setRate(int i);
+		void setWaitForKey(bool b);
+		void setInRec(bool b);
+
 	private:
 		void displayWaitForKey();
 		void displayInRec();
@@ -31,13 +49,9 @@ namespace mpc::lcdgui::screens::window
 
 	public:
 		CountMetronomeScreen(const int& layer);
-	
-	public:
-		void update(moduru::observer::Observable* observable, nonstd::any message) override;
 
 	public:
 		void open() override;
-		void close() override;
 
 	public:
 		void function(int i) override;

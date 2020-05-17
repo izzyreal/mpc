@@ -23,11 +23,6 @@ namespace mpc::ui::sequencer::window {
 		int tr1 = 0;
 		std::vector<std::weak_ptr<mpc::sequencer::TempoChangeEvent>> visibleTempoChanges;
 		int tempoChangeOffset = 0;
-		int countIn = 0;
-		bool inPlay = false;
-		int rate = 0;
-		bool waitForKey = false;
-		bool inRec = false;
 		int clickVolume = 0;
 		int clickOutput = 0;
 		int metronomeSound = 0;
@@ -59,16 +54,6 @@ namespace mpc::ui::sequencer::window {
 		void setVisibleTempoChanges(std::vector<std::weak_ptr<mpc::sequencer::TempoChangeEvent>> vtc);
 		int getTempoChangeOffset();
 		void setTempoChangeOffset(int i);
-		int getCountInMode();
-		void setCountIn(int i);
-		void setInPlay(bool b);
-		bool getInPlay();
-		int getRate();
-		void setRate(int i);
-		void setWaitForKey(bool b);
-		bool isWaitForKeyEnabled();
-		void setInRec(bool b);
-		bool getInRec();
 		int getClickVolume();
 		void setClickVolume(int i);
 		int getClickOutput();

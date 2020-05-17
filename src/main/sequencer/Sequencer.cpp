@@ -35,6 +35,7 @@
 
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
+#include <lcdgui/screens/window/CountMetronomeScreen.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
@@ -408,23 +409,27 @@ void Sequencer::play(bool fromStart)
 		
 		currentStep = currentSong->getStep(step);
 	}
+
 	move(position);
-    currentlyPlayingSequenceIndex = activeSequenceIndex;
+    
+	currentlyPlayingSequenceIndex = activeSequenceIndex;
 
-	auto swGui = Mpc::instance().getUis().lock()->getSequencerWindowGui();
+	auto countMetronomeScreen = dynamic_pointer_cast<CountMetronomeScreen>(Screens::getScreenComponent("countmetronome"));
+	auto countInMode = countMetronomeScreen->getCountInMode();
 
-
-    if (!countEnabled || swGui->getCountInMode() == 0 || (swGui->getCountInMode() == 1 && recording == false))
+    if (!countEnabled || countInMode == 0 || (countInMode == 1 && recording == false))
 	{
 		if (fromStart)
 		{
 			move(0);
 		}
     }
+	
 	auto s = getActiveSequence().lock();
+	
 	if (countEnabled && !songMode)
 	{
-		if (swGui->getCountInMode() == 2 || (swGui->getCountInMode() == 1 && recording == true))
+		if (countInMode == 2 || (countInMode == 1 && recording == true))
 		{
 			move(s->getLoopStart());
 			startCountingIn();
@@ -432,6 +437,7 @@ void Sequencer::play(bool fromStart)
 	}
 
 	auto hw = Mpc::instance().getHardware().lock();
+	
 	if (!songMode)
 	{
 		if (!s->isUsed())
@@ -457,6 +463,7 @@ void Sequencer::play(bool fromStart)
 	bool offline = directToDiskRecordGui->isOffline();
 	
 	int rate = ams->getAudioServer()->getSampleRate();
+
 	if (ams->isBouncePrepared())
 	{
 		if (offline)
@@ -467,7 +474,8 @@ void Sequencer::play(bool fromStart)
 
 		ams->startBouncing();
 	}
-	else {
+	else
+	{
 		ams->getFrameSequencer().lock()->start(rate);
 	}
 

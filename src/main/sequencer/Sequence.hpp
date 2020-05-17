@@ -12,8 +12,6 @@ namespace mpc::sequencer {
 	class TempoChangeEvent;
 }
 
-using namespace std;
-
 namespace mpc::sequencer {
 
 	class Sequence final
@@ -23,28 +21,26 @@ namespace mpc::sequencer {
 	private:
 		BCMath initialTempo = BCMath("120.0");
 
-		vector<shared_ptr<Track>> tracks{};
-		vector<shared_ptr<Track>> metaTracks{};
+		std::vector<std::shared_ptr<Track>> tracks;
+		std::vector<std::shared_ptr<Track>> metaTracks;
 
-		vector<string> deviceNames{};
-		vector<string> defaultTrackNames{};
+		std::vector<string> deviceNames;
+		std::vector<string> defaultTrackNames;
 
-		vector<int> barLengths{ };
-		vector<int> numerators{ };
-		vector<int> denominators{ };
+		std::vector<int> barLengths;
+		std::vector<int> numerators;
+		std::vector<int> denominators;
 
-		string name{ "" };
-		bool loopEnabled{ false };
-		int lastBar{ -1 };
-		bool used{ false };
-		bool tempoChangeOn{ false };
-		int loopStart{ 0 };
-		int loopEnd{ 0 };
-		int firstLoopBar{ 0 };
-		int lastLoopBar{ 0 };
-		bool lastLoopBarEnd{ false };
-
-		//file::all::AllParser* allFile{};
+		string name = "";
+		bool loopEnabled = false;
+		int lastBar = -1;
+		bool used = false;
+		bool tempoChangeOn = false;
+		int loopStart = 0;
+		int loopEnd = 0;
+		int firstLoopBar = 0;
+		int lastLoopBar = 0;
+		bool lastLoopBarEnd = false;
 
 	public:
 		BCMath getInitialTempo();
@@ -82,11 +78,11 @@ namespace mpc::sequencer {
 		void init(int lastBarIndex);
 		void setTimeSignature(int firstBar, int tsLastBar, int num, int den);
 		void setTimeSignature(int bar, int num, int den);
-		vector<weak_ptr<Track>> getTracks();
-		vector<weak_ptr<Track>> getMetaTracks();
-		vector<string> getDeviceNames();
-		void setDeviceNames(vector<string> sa);
-		vector<weak_ptr<TempoChangeEvent>> getTempoChangeEvents();
+		std::vector<weak_ptr<Track>> getTracks();
+		std::vector<weak_ptr<Track>> getMetaTracks();
+		std::vector<string> getDeviceNames();
+		void setDeviceNames(std::vector<string> sa);
+		std::vector<weak_ptr<TempoChangeEvent>> getTempoChangeEvents();
 		weak_ptr<TempoChangeEvent> addTempoChangeEvent();
 		void removeTempoChangeEvent(int i);
 		void removeTempoChangeEvent(weak_ptr<TempoChangeEvent> tce);
@@ -101,19 +97,18 @@ namespace mpc::sequencer {
 		weak_ptr<Track> purgeTrack(int i);
 		int getDenominator(int i);
 		int getNumerator(int i);
-		vector<int>* getBarLengths();
-		void setBarLengths(vector<int>&);
-		void setNumeratorsAndDenominators(vector<int>& numerators, vector<int>& denominators);
+		std::vector<int>* getBarLengths();
+		void setBarLengths(std::vector<int>&);
+		void setNumeratorsAndDenominators(std::vector<int>& numerators, std::vector<int>& denominators);
 		void deleteBars(int firstBar, int lBar);
 		void insertBars(int numberOfBars, int afterBar);
 		void moveTrack(int source, int destination);
 		bool isLastLoopBarEnd();
-		//void setTempoChangeEvents(vector<TempoChangeEvent*>* tceList);
 
 		int getEventCount();
 		void initLoop();
-		vector<int>* getNumerators();
-		vector<int>* getDenominators();
+		std::vector<int>* getNumerators();
+		std::vector<int>* getDenominators();
 		void removeFirstMetronomeClick();
 		int getNoteEventCount();
 
@@ -123,8 +118,7 @@ namespace mpc::sequencer {
 		void resetTrackEventIndices(int tick);
 
 	public:
-		Sequence(vector<string> defaultTrackNames);
-		~Sequence();
+		Sequence(std::vector<string> defaultTrackNames);
 
 	};
 }

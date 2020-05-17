@@ -9,8 +9,6 @@ using namespace std;
 SequencerWindowGui::SequencerWindowGui() 
 {
 
-	inPlay = true;
-	inRec = true;
 	clickVolume = 100;
 	accentVelo = 127;
 	accentNote = 35;
@@ -114,82 +112,6 @@ void SequencerWindowGui::setTempoChangeOffset(int i)
 	tempoChangeOffset = i;
 	setChanged();
 	notifyObservers(string("offset"));
-}
-
-
-int SequencerWindowGui::getCountInMode()
-{
-    return countIn;
-}
-
-void SequencerWindowGui::setCountIn(int i)
-{
-	if (i < 0 || i > 2) {
-		return;
-	}
-    countIn = i;
-    setChanged();
-    notifyObservers(string("countin"));
-}
-
-void SequencerWindowGui::setInPlay(bool b)
-{
-	if (inPlay == b) {
-		return;
-	}
-    inPlay = b;
-    setChanged();
-    notifyObservers(string("inplay"));
-}
-
-bool SequencerWindowGui::getInPlay()
-{
-    return inPlay;
-}
-
-int SequencerWindowGui::getRate()
-{
-    return rate;
-}
-
-void SequencerWindowGui::setRate(int i)
-{
-    if(i < 0 || i > 7)
-        return;
-
-    rate = i;
-    setChanged();
-    notifyObservers(string("rate"));
-}
-
-void SequencerWindowGui::setWaitForKey(bool b)
-{
-    if(waitForKey == b)
-        return;
-
-    waitForKey = b;
-    setChanged();
-    notifyObservers(string("waitforkey"));
-}
-
-bool SequencerWindowGui::isWaitForKeyEnabled()
-{
-    return waitForKey;
-}
-
-void SequencerWindowGui::setInRec(bool b)
-{
-    if(inRec == b)
-        return;
-
-    inRec = b;
-    setChanged();
-    notifyObservers(string("inrec"));
-}
-
-bool SequencerWindowGui::getInRec()
-{
-    return inRec;
 }
 
 int SequencerWindowGui::getClickVolume()

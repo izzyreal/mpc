@@ -18,7 +18,6 @@
 #include <ui/midisync/MidiSyncGui.hpp>
 #include <ui/sequencer/SongGui.hpp>
 #include <ui/sequencer/StepEditorGui.hpp>
-#include <lcdgui/screens/window/MultiRecordingSetupLine.hpp>
 #include <ui/sequencer/window/SequencerWindowGui.hpp>
 
 #include <sequencer/Event.hpp>
@@ -29,9 +28,11 @@
 #include <sequencer/TempoChangeEvent.hpp>
 
 #include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/window/CountMetronomeScreen.hpp>
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <lcdgui/screens/window/MultiRecordingSetupScreen.hpp>
 #include <lcdgui/screens/window/MidiInputScreen.hpp>
+#include <lcdgui/screens/window/MultiRecordingSetupLine.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
@@ -101,16 +102,19 @@ AllLoader::AllLoader(mpc::disk::MpcFile* file, bool sequencesOnly)
 		
 		auto swGui = Mpc::instance().getUis().lock()->getSequencerWindowGui();
 		auto count = allParser.getCount();
-		swGui->setCountIn(count->getCountInMode());
+
+		auto countMetronomeScreen = dynamic_pointer_cast<CountMetronomeScreen>(Screens::getScreenComponent("countmetronome"));
+
+		countMetronomeScreen->setCountIn(count->getCountInMode());
 		swGui->setAccentVelo(count->getAccentVelo());
 		swGui->setNormalVelo(count->getNormalVelo());
 		swGui->setClickOutput(count->getClickOutput());
 		swGui->setClickVolume(count->getClickVolume());
-		swGui->setRate(count->getRate());
+		countMetronomeScreen->setRate(count->getRate());
 		swGui->setMetronomeSound(count->getSound());
-		swGui->setInPlay(count->isEnabledInPlay());
-		swGui->setInRec(count->isEnabledInRec());
-		swGui->setWaitForKey(count->isWaitForKeyEnabled());
+		countMetronomeScreen->setInPlay(count->isEnabledInPlay());
+		countMetronomeScreen->setInRec(count->isEnabledInRec());
+		countMetronomeScreen->setWaitForKey(count->isWaitForKeyEnabled());
 		lSequencer->setCountEnabled(count->isEnabled());
 
 		auto midiInput = allParser.getMidiInput();

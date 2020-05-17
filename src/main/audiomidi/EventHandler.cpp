@@ -1,4 +1,4 @@
-#include <audiomidi/EventHandler.hpp>
+#include "EventHandler.hpp"
 
 #include <Mpc.hpp>
 #include <audiomidi/AudioMidiServices.hpp>
@@ -15,15 +15,19 @@
 
 #include <ui/Uis.hpp>
 #include <ui/sampler/SamplerGui.hpp>
-#include <ui/sequencer/window/SequencerWindowGui.hpp>
 #include <ui/midisync/MidiSyncGui.hpp>
 #include <ui/misc/TransGui.hpp>
 #include <ui/vmpc/DirectToDiskRecorderGui.hpp>
 #include <ui/sampler/MixerSetupGui.hpp>
+
 #include <hardware/Hardware.hpp>
 #include <hardware/HwPad.hpp>
+
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>
+
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/window/CountMetronomeScreen.hpp>
 
 #include <midi/core/MidiMessage.hpp>
 #include <midi/core/ShortMessage.hpp>
@@ -40,16 +44,16 @@
 #include <file/File.hpp>
 #include <thirdp/bcmath/bcmath_stl.h>
 
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens::window;
 using namespace mpc::audiomidi;
 using namespace std;
 
 EventHandler::EventHandler()
 {
-	
 	sequencer = Mpc::instance().getSequencer();
 	sampler = Mpc::instance().getSampler();
 	msGui = Mpc::instance().getUis().lock()->getMidiSyncGui();
-	swGui = Mpc::instance().getUis().lock()->getSequencerWindowGui();
 }
 
 void EventHandler::handle(weak_ptr<mpc::sequencer::Event> event, mpc::sequencer::Track* track)
@@ -66,7 +70,10 @@ void EventHandler::handleNoThru(weak_ptr<mpc::sequencer::Event> e, mpc::sequence
 
 	auto lSequencer = sequencer.lock();
 
-	if (track->getName().compare("click") == 0) {
+	auto countMetronomeScreen = dynamic_pointer_cast<CountMetronomeScreen>(Screens::getScreenComponent("countmetronome"));
+
+	if (track->getName().compare("click") == 0)
+	{
 		auto lSequencer = sequencer.lock();
 		
 		if (!lSequencer->isCountEnabled())
@@ -74,12 +81,12 @@ void EventHandler::handleNoThru(weak_ptr<mpc::sequencer::Event> e, mpc::sequence
 			return;
 		}
 		
-		if (lSequencer->isRecordingOrOverdubbing() && !swGui->getInRec() && !lSequencer->isCountingIn())
+		if (lSequencer->isRecordingOrOverdubbing() && !countMetronomeScreen->getInRec() && !lSequencer->isCountingIn())
 		{
 			return;
 		}
 		
-		if (lSequencer->isPlaying() && !lSequencer->isRecordingOrOverdubbing() && !swGui->getInPlay() && !lSequencer->isCountingIn())
+		if (lSequencer->isPlaying() && !lSequencer->isRecordingOrOverdubbing() && !countMetronomeScreen->getInPlay() && !lSequencer->isCountingIn())
 		{
 			return;
 		}
