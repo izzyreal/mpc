@@ -54,8 +54,6 @@ namespace mpc::ui::sequencer::window
 	{
 
 	private:
-
-		std::vector<std::string> softThruNames;
 		std::vector<std::string> editTypeNames;
 		std::string csn{ "" };
 		std::weak_ptr<mpc::sequencer::Sequencer> sequencer;
@@ -108,16 +106,13 @@ namespace mpc::ui::sequencer::window
 		std::weak_ptr<mpc::lcdgui::Field> sustainPedalToDurationField;
 		std::weak_ptr<mpc::lcdgui::Field> progChangeSeqField;
 		std::weak_ptr<mpc::lcdgui::Field> receiveChField;
-		std::weak_ptr<mpc::lcdgui::Field> deviceNumberField;
 		std::weak_ptr<mpc::lcdgui::Field> softThruField;
 		std::weak_ptr<mpc::lcdgui::Field> editTypeField;
 		std::weak_ptr<mpc::lcdgui::Field> valueField;
 		std::weak_ptr<mpc::lcdgui::Label> deviceNameLabel;
-		std::weak_ptr<mpc::lcdgui::Field> firstLetterField;
 		mpc::ui::sampler::SamplerGui* samplerGui = nullptr;
 
 	private:
-		void displaySoftThru();
 		void displayNotes();
 		void displayTime();
 
@@ -125,7 +120,6 @@ namespace mpc::ui::sequencer::window
 		void update(moduru::observer::Observable* o, nonstd::any arg) override;
 
 	private:
-		void displayDeviceName();
 		void displayValue();
 		void displayEditType();
 		void displayTrackNumber();

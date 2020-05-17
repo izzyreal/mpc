@@ -256,36 +256,6 @@ bool SequencerWindowGui::getInRec()
     return inRec;
 }
 
-void SequencerWindowGui::setSoftThru(int i)
-{
-    if(i < 0 || i > 4)
-        return;
-
-    softThru = i;
-    setChanged();
-    notifyObservers(string("softthru"));
-}
-
-int SequencerWindowGui::getSoftThru()
-{
-    return softThru;
-}
-
-void SequencerWindowGui::setDeviceNumber(int i)
-{
-    if(i < 0 || i > 31)
-        return;
-
-    deviceNumber = i;
-    setChanged();
-    notifyObservers(string("devicenumber"));
-}
-
-int SequencerWindowGui::getDeviceNumber()
-{
-    return deviceNumber;
-}
-
 int SequencerWindowGui::getEditType()
 {
     return editType;

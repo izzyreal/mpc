@@ -32,8 +32,6 @@ namespace mpc::ui::sequencer::window {
 		int rate = 0;
 		bool waitForKey = false;
 		bool inRec = false;
-		int softThru = 0;
-		int deviceNumber = 0;
 		int value = 0;
 		int editType = 0;
 		int clickVolume = 0;
@@ -85,10 +83,6 @@ namespace mpc::ui::sequencer::window {
 		bool isWaitForKeyEnabled();
 		void setInRec(bool b);
 		bool getInRec();
-		void setSoftThru(int i);
-		int getSoftThru();
-		void setDeviceNumber(int i);
-		int getDeviceNumber();
 		int getEditType();
 		void setEditType(int i);
 		int getValue();

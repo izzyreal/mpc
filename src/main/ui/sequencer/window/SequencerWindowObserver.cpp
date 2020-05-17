@@ -31,7 +31,6 @@ using namespace std;
 
 SequencerWindowObserver::SequencerWindowObserver()
 {	
-	softThruNames = {"OFF", "AS TRACK", "OMNI-A", "OMNI-B", "OMNI-AB" };
 	editTypeNames = { "ADD VALUE", "SUB VALUE", "MULT VAL%", "SET TO VAL" };
 	nameGui = Mpc::instance().getUis().lock()->getNameGui();
 	samplerGui = Mpc::instance().getUis().lock()->getSamplerGui();
@@ -92,8 +91,6 @@ SequencerWindowObserver::SequencerWindowObserver()
 	typeField = ls->lookupField("type");
 	passField = ls->lookupField("pass");
 	softThruField = ls->lookupField("softthru");
-	deviceNumberField = ls->lookupField("devicenumber");
-	firstLetterField = ls->lookupField("firstletter");
 	deviceNameLabel = ls->lookupLabel("devicename");
 	editTypeField = ls->lookupField("edittype");
 	valueField = ls->lookupField("value");
@@ -125,11 +122,6 @@ SequencerWindowObserver::SequencerWindowObserver()
 	{
 		displayTrackNumberNames();
 	}
-	else if (csn.compare("midioutput") == 0)
-	{
-		displaySoftThru();
-		displayDeviceName();
-	}
 	else if (csn.compare("editvelocity") == 0)
 	{
 		displayEditType();
@@ -137,11 +129,6 @@ SequencerWindowObserver::SequencerWindowObserver()
 		displayTime();
 		displayNotes();
 	}
-}
-
-void SequencerWindowObserver::displaySoftThru()
-{
-    softThruField.lock()->setText(softThruNames[swGui->getSoftThru()]);
 }
 
 void SequencerWindowObserver::displayNotes()
@@ -236,14 +223,6 @@ void SequencerWindowObserver::update(moduru::observer::Observable* o, nonstd::an
 	{
 		displayNotes();
 	}
-	else if (s.compare("softthru") == 0)
-{
-		displaySoftThru();
-	}
-	else if (s.compare("devicenumber") == 0)
-{
-		displayDeviceName();
-	}
 	else if (s.compare("edittype") == 0)
 {
 		displayEditType();
@@ -252,20 +231,6 @@ void SequencerWindowObserver::update(moduru::observer::Observable* o, nonstd::an
 	{
 		displayValue();
 	}
-}
-
-void SequencerWindowObserver::displayDeviceName()
-{
-    auto devName = sequence.lock()->getDeviceName(swGui->getDeviceNumber() + 1);
-    firstLetterField.lock()->setText(devName.substr(0, 1));
-    deviceNameLabel.lock()->setText(devName.substr(1, devName.length()));
-	string devNumber = "";
-    if(swGui->getDeviceNumber() >= 16) {
-        devNumber = moduru::lang::StrUtil::padLeft(to_string(swGui->getDeviceNumber() - 15), " ", 2) + "B";
-    } else {
-		devNumber = moduru::lang::StrUtil::padLeft(to_string(swGui->getDeviceNumber() + 1), " ", 2) + "A";
-	}
-    deviceNumberField.lock()->setText(devNumber);
 }
 
 void SequencerWindowObserver::displayValue()

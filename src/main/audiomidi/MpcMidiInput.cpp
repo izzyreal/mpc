@@ -7,7 +7,11 @@
 #include <audiomidi/MpcMidiPorts.hpp>
 #include <controls/BaseControls.hpp>
 #include <controls/Controls.hpp>
+
 #include <lcdgui/LayeredScreen.hpp>
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/window/MidiOutputScreen.hpp>
+
 #include <ui/midisync/MidiSyncGui.hpp>
 #include <ui/sampler/SamplerGui.hpp>
 #include <ui/sequencer/window/SequencerWindowGui.hpp>
@@ -25,6 +29,8 @@
 #include <midi/core/MidiInput.hpp>
 
 using namespace mpc::audiomidi;
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
 MpcMidiInput::MpcMidiInput(int index)
@@ -137,7 +143,10 @@ void MpcMidiInput::transport(ctoot::midi::core::MidiMessage* msg, int timeStamp)
 				note->CopyValuesTo(recEvent);
 			}
 		}
-		switch (swGui->getSoftThru()) {
+		
+		auto midiOutputScreen = dynamic_pointer_cast<MidiOutputScreen>(Screens::getScreenComponent("midioutput"));
+
+		switch (midiOutputScreen->getSoftThru()) {
 		case 0:
 			return;
 		case 1:

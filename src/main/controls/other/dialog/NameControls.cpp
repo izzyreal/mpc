@@ -1,13 +1,17 @@
-#include <controls/other/dialog/NameControls.hpp>
+#include "NameControls.hpp"
 
 #include <Mpc.hpp>
+
+#include <lcdgui/Field.hpp>
+#include <lcdgui/Underline.hpp>
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/window/MidiOutputScreen.hpp>
+
 #include <Util.hpp>
 #include <disk/AbstractDisk.hpp>
 #include <disk/MpcFile.hpp>
 #include <disk/ApsSaver.hpp>
 #include <ui/NameGui.hpp>
-#include <lcdgui/Field.hpp>
-#include <lcdgui/Underline.hpp>
 #include <ui/disk/DiskGui.hpp>
 #include <ui/disk/window/DirectoryGui.hpp>
 #include <ui/sampler/SamplerGui.hpp>
@@ -26,13 +30,9 @@
 #include <lang/StrUtil.hpp>
 
 using namespace mpc::controls::other::dialog;
-using namespace std;
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens::window; using namespace std;
 using namespace moduru::lang;
-
-NameControls::NameControls() 
-	: AbstractOtherControls()
-{
-}
 
 void NameControls::left()
 {
@@ -270,39 +270,47 @@ void NameControls::saveName() {
 		lLs->openScreen("sequencer");
 		return;
 	}
-	else if (prevScreen.compare("midioutput") == 0) {
-		sequence.lock()->setDeviceName(swGui->getDeviceNumber() + 1, nameGui->getName().substr(0, 8));
+	else if (prevScreen.compare("midioutput") == 0)
+	{
+		auto midiOutputScreen = dynamic_pointer_cast<MidiOutputScreen>(Screens::getScreenComponent("midioutput"));
+		sequence.lock()->setDeviceName(midiOutputScreen->getDeviceNumber() + 1, nameGui->getName().substr(0, 8));
 		nameGui->setNameBeingEdited(false);
 		lLs->setLastFocus("name", "0");
 		lLs->openScreen("sequencer");
 		return;
 	}
-	else if (prevScreen.compare("editsound") == 0) {
+	else if (prevScreen.compare("editsound") == 0)
+	{
 		uis->getEditSoundGui()->setNewName(nameGui->getName());
 		nameGui->setNameBeingEdited(false);
 		lLs->setLastFocus("name", "0");
 		lLs->openScreen("editsound");
 		return;
 	}
-	else if (prevScreen.compare("sound") == 0) {
+	else if (prevScreen.compare("sound") == 0)
+	{
 		dynamic_pointer_cast<mpc::sampler::Sound>(Mpc::instance().getSampler().lock()->getSound(soundGui->getSoundIndex()).lock())->setName(nameGui->getName());
 		nameGui->setNameBeingEdited(false);
 		lLs->setLastFocus("name", "0");
 		lLs->openScreen("sound");
 		return;
 	}
-	else if (prevScreen.compare("resample") == 0) {
+	else if (prevScreen.compare("resample") == 0)
+	{
 		soundGui->setNewName(nameGui->getName());
 		nameGui->setNameBeingEdited(false);
 		lLs->setLastFocus("name", "0");
 		lLs->openScreen("resample");
 		return;
 	}
-	else if (prevScreen.compare("stereotomono") == 0) {
-		if (ngParam.compare("newlname") == 0) {
+	else if (prevScreen.compare("stereotomono") == 0)
+	{
+		if (ngParam.compare("newlname") == 0)
+		{
 			soundGui->setNewLName(nameGui->getName());
 		}
-		else if (ngParam.compare("newrname") == 0) {
+		else if (ngParam.compare("newrname") == 0)
+		{
 			soundGui->setNewRName(nameGui->getName());
 		}
 		nameGui->setNameBeingEdited(false);
@@ -310,7 +318,8 @@ void NameControls::saveName() {
 		lLs->openScreen("stereotomono");
 		return;
 	}
-	else if (prevScreen.compare("copysound") == 0) {
+	else if (prevScreen.compare("copysound") == 0)
+	{
 		soundGui->setNewName(nameGui->getName());
 		nameGui->setNameBeingEdited(false);
 		lLs->setLastFocus("name", "0");
@@ -321,15 +330,25 @@ void NameControls::saveName() {
 
 void NameControls::drawUnderline()
 {
-	if (nameGui->isNameBeingEdited()) {
+	if (nameGui->isNameBeingEdited())
+	{
 		string focus = ls.lock()->getFocus();
-		if (focus.length() != 1 && focus.length() != 2) return;
+	
+		if (focus.length() != 1 && focus.length() != 2)
+		{
+			return;
+		}
+		
 		auto u = ls.lock()->getUnderline().lock();
-		for (int i = 0; i < 16; i++) {
-			if (i == stoi(focus)) {
+		
+		for (int i = 0; i < 16; i++)
+		{
+			if (i == stoi(focus))
+			{
 				u->setState(i, true);
 			}
-			else {
+			else
+			{
 				u->setState(i, false);
 			}
 		}
@@ -338,7 +357,8 @@ void NameControls::drawUnderline()
 
 void NameControls::initEditColors()
 {
-    for (int i = 0; i < 16; i++) {
+    for (int i = 0; i < 16; i++)
+	{
 		auto field = ls.lock()->lookupField(to_string(i)).lock();
 		field->setOpaque(true);
 		field->setInverted(false);
@@ -352,7 +372,4 @@ void NameControls::resetNameGui()
 {
 	nameGui->setNameBeingEdited(false);
 	ls.lock()->setLastFocus("name", "0");
-}
-
-NameControls::~NameControls() {
 }
