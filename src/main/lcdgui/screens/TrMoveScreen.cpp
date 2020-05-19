@@ -1,14 +1,16 @@
 #include "TrMoveScreen.hpp"
 
+#include "BarCopyScreen.hpp"
+
 #include <ui/sequencer/BarCopyGui.hpp>
-#include <ui/sequencer/EditSequenceGui.hpp>
 #include <ui/sequencer/TrMoveGui.hpp>
 #include <ui/Uis.hpp>
-#include <lcdgui/LayeredScreen.hpp>
+#include <lcdgui/Screens.hpp>
 #include <lcdgui/Field.hpp>
 #include <sequencer/Sequence.hpp>
 #include <sequencer/Sequencer.hpp>
 
+using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace std;
 
@@ -23,11 +25,13 @@ void TrMoveScreen::open()
 	displaySq();
 	displayTrFields();
 	displayTrLabels();
+	auto barCopyGui = dynamic_pointer_cast<BarCopyScreen>(Screens::getScreenComponent("barcopy"));
+	setSq(barCopyGui->getFromSq());
 }
 
 void TrMoveScreen::init()
 {
-    super::init();
+    BaseControls::init();
     seq = sequencer.lock()->getSequence(tmGui->getSq());
 }
 

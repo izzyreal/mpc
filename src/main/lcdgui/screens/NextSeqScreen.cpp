@@ -1,9 +1,20 @@
-#include <lcdgui/screens/NextSeqScreen.hpp>
+#include "NextSeqScreen.hpp"
 
-#include <lcdgui/LayeredScreen.hpp>
+#include <lcdgui/Label.hpp>
+#include <lcdgui/screens/window/TimingCorrectScreen.hpp>
+#include <lcdgui/screens/SequencerScreen.hpp>
+#include <lcdgui/Screens.hpp>
+
 #include <sequencer/Sequencer.hpp>
+#include <sequencer/TempoChangeEvent.hpp>
 
+#include <lang/StrUtil.hpp>
+#include <Util.hpp>
+
+using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui::screens::window;
+using namespace moduru::lang;
 using namespace std;
 
 NextSeqScreen::NextSeqScreen(const int& layer)
@@ -21,6 +32,13 @@ void NextSeqScreen::open()
 	displayTempoSource();
 	displayTiming();
 	displayNextSq();
+	
+	sequencer.lock()->addObserver(this);
+}
+
+void NextSeqScreen::close()
+{
+	sequencer.lock()->deleteObserver(this);
 }
 
 void NextSeqScreen::turnWheel(int i)
@@ -54,16 +72,16 @@ void NextSeqScreen::displaySq()
 	string result{ "" };
 	auto lSequencer = sequencer.lock();
 	if (lSequencer->isPlaying()) {
-		result.append(moduru::lang::StrUtil::padLeft(to_string(lSequencer->getCurrentlyPlayingSequenceIndex() + 1), "0", 2));
+		result.append(StrUtil::padLeft(to_string(lSequencer->getCurrentlyPlayingSequenceIndex() + 1), "0", 2));
 		result.append("-");
 		result.append(lSequencer->getCurrentlyPlayingSequence().lock()->getName());
-		sqField.lock()->setText(result);
+		findField("sq").lock()->setText(result);
 	}
 	else {
-		result.append(moduru::lang::StrUtil::padLeft(to_string(lSequencer->getActiveSequenceIndex() + 1), "0", 2));
+		result.append(StrUtil::padLeft(to_string(lSequencer->getActiveSequenceIndex() + 1), "0", 2));
 		result.append("-");
 		result.append(lSequencer->getActiveSequence().lock()->getName());
-		sqField.lock()->setText(result);
+		findField("sq").lock()->setText(result);
 	}
 }
 
@@ -72,11 +90,14 @@ void NextSeqScreen::displayNextSq()
 	auto lSequencer = sequencer.lock();
 	auto nextSq = lSequencer->getNextSq();
 	string res = "";
-	if (nextSq != -1) {
+
+	if (nextSq != -1)
+	{
 		auto seqName = lSequencer->getSequence(nextSq).lock()->getName();
-		res = moduru::lang::StrUtil::padLeft(to_string(lSequencer->getNextSq() + 1), "0", 2) + "-" + seqName;
+		res = StrUtil::padLeft(to_string(lSequencer->getNextSq() + 1), "0", 2) + "-" + seqName;
 	}
-	nextSqField.lock()->setText(res);
+	
+	findField("nextsq").lock()->setText(res);
 }
 
 void NextSeqScreen::displayNow0()
@@ -97,7 +118,7 @@ void NextSeqScreen::displayNow2()
 void NextSeqScreen::displayTempo()
 {
 	auto tempo = sequencer.lock()->getTempo().toString();
-	tempo = Util::replaceDotWithSmallSpaceDot(tempo);
+	tempo = mpc::Util::replaceDotWithSmallSpaceDot(tempo);
 	findField("tempo").lock()->setText(tempo);
 	displayTempoLabel();
 }
@@ -107,30 +128,74 @@ void NextSeqScreen::displayTempoLabel()
 	auto currentRatio = -1;
 	auto lSequencer = sequencer.lock();
 	auto seq = lSequencer->isPlaying() ? lSequencer->getCurrentlyPlayingSequence().lock() : lSequencer->getActiveSequence().lock();
-	for (auto& e : seq->getTempoChangeEvents()) {
+	for (auto& e : seq->getTempoChangeEvents())
+	{
 		auto tce = e.lock();
-		if (tce->getTick() > lSequencer->getTickPosition()) {
+		if (tce->getTick() > lSequencer->getTickPosition())
+		{
 			break;
 		}
 		currentRatio = tce->getRatio();
 	}
 	if (currentRatio != 1000) {
-		tempoLabel.lock()->setText(u8"c\u00C0:");
+		findLabel("tempo").lock()->setText(u8"c\u00C0:");
 	}
 	else {
-		tempoLabel.lock()->setText(u8" \u00C0:");
+		findLabel("tempo").lock()->setText(u8" \u00C0:");
 	}
 }
 
 void NextSeqScreen::displayTempoSource()
 {
-	tempoSourceField.lock()->setText(sequencer.lock()->isTempoSourceSequenceEnabled() ? "(SEQ)" : "(MAS)");
+	findField("temposource").lock()->setText(sequencer.lock()->isTempoSourceSequenceEnabled() ? "(SEQ)" : "(MAS)");
 }
 
 void NextSeqScreen::displayTiming()
 {
 	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timingcorrect"));
 	auto noteValue = timingCorrectScreen->getNoteValue();
-	timingField.lock()->setText(mpc::lcdgui::screens::SequencerScreen::timingCorrectNames[noteValue]);
+	findField("timing").lock()->setText(SequencerScreen::timingCorrectNames[noteValue]);
 }
 
+void NextSeqScreen::update(moduru::observer::Observable* o, nonstd::any arg)
+{
+	string s = nonstd::any_cast<string>(arg);
+
+	if (s.compare("seqnumbername") == 0)
+	{
+		displaySq();
+	}
+	else if (s.compare("bar") == 0)
+	{
+		displayNow0();
+	}
+	else if (s.compare("beat") == 0)
+	{
+		displayNow1();
+	}
+	else if (s.compare("clock") == 0)
+	{
+		displayNow2();
+	}
+	else if (s.compare("now") == 0)
+	{
+		displayNow0();
+		displayNow1();
+		displayNow2();
+	}
+	else if (s.compare("nextsqvalue") == 0)
+	{
+		displayNextSq();
+	}
+	else if (s.compare("nextsq") == 0)
+	{
+		findField("nextsq").lock()->Hide(false);
+		displayNextSq();
+	}
+	else if (s.compare("nextsqoff") == 0) {
+		findField("nextsq").lock()->Hide(true);
+	}
+	else if (s.compare("timing") == 0) {
+		displayTiming();
+	}
+}

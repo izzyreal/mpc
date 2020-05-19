@@ -12,8 +12,10 @@ namespace mpc::lcdgui::screens
 		void function(int i) override;
 
 		NextSeqScreen(const int& layer);
-
+		
+		void update(moduru::observer::Observable*, nonstd::any) override;
 		void open() override;
+		void close() override;
 
 	private:
 		void displaySq();

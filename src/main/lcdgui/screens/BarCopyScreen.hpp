@@ -12,7 +12,7 @@ namespace mpc::lcdgui::screens
 		void turnWheel(int i) override;
 
 		BarCopyScreen(const int& layer);
-
+		void update(moduru::observer::Observable* o, nonstd::any arg) override;
 		void open() override;
 
 	private:
@@ -22,6 +22,23 @@ namespace mpc::lcdgui::screens
 		void displayAfterBar();
 		void displayLastBar();
 		void displayFirstBar();
+
+	private:
+		int fromSq = 0;
+		int toSq = 0;
+		int lastBar = 0;
+		int firstBar = 0;
+		int afterBar = 0;
+		int copies = 1;
+		void setLastBar(int i, int max);
+		void setFromSq(int i);
+		void setToSq(int i);
+		void setFirstBar(int i, int max);
+		void setAfterBar(int i, int max);
+		void setCopies(int i);
+
+	public:
+		int getFromSq();
 
 	};
 }
