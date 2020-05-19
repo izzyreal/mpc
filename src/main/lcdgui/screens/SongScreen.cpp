@@ -1,4 +1,4 @@
-#include "SongControls.hpp"
+#include "SongScreen.hpp"
 
 #include <lcdgui/LayeredScreen.hpp>
 #include <ui/sequencer/SongGui.hpp>
@@ -8,22 +8,34 @@
 
 #include <thirdp/bcmath/bcmath_stl.h>
 
-using namespace mpc::controls::sequencer;
+using namespace mpc::lcdgui::screens;
 using namespace std;
 
-SongControls::SongControls()
-	: AbstractSequencerControls()
+SongScreen::SongScreen(const int& layer)
+	: ScreenComponent("song", layer)
 {
 }
 
-void SongControls::init()
+void SongScreen::open()
+{
+	displaySongName();
+	displayNow0();
+	displayNow1();
+	displayNow2();
+	displayTempoSource();
+	displayTempo();
+	displayLoop();
+	displaySteps();
+}
+
+void SongScreen::init()
 {
 	super::init();
 	step = songGui->getOffset() + 1;
 	s = sequencer.lock()->getSong(songGui->getSelectedSongIndex());
 }
 
-void SongControls::up()
+void SongScreen::up()
 {
 	init();
 	
@@ -38,7 +50,7 @@ void SongControls::up()
 	}
 }
 
-void SongControls::left() {
+void SongScreen::left() {
 	init();
 	if (param.compare("sequence1") == 0) {
 		ls.lock()->setFocus("step1");
@@ -55,7 +67,7 @@ void SongControls::left() {
 }
 
 
-void SongControls::right() {
+void SongScreen::right() {
 	init();
 	if (param.compare("sequence1") == 0) {
 		ls.lock()->setFocus("reps1");
@@ -71,13 +83,13 @@ void SongControls::right() {
 	}
 }
 
-void SongControls::openWindow()
+void SongScreen::openWindow()
 {
 	init();
 	if (param.compare("loop") == 0) ls.lock()->openScreen("loopsongwindow");
 }
 
-void SongControls::down()
+void SongScreen::down()
 {
 	init();
 	
@@ -93,7 +105,7 @@ void SongControls::down()
 	}
 }
 
-void SongControls::turnWheel(int i)
+void SongScreen::turnWheel(int i)
 {
 	init();
 	
@@ -127,7 +139,7 @@ void SongControls::turnWheel(int i)
 	}
 }
 
-void SongControls::function(int i)
+void SongScreen::function(int i)
 {
 	init();
 	auto lS = s.lock();
@@ -140,4 +152,67 @@ void SongControls::function(int i)
 		if (!lS->isUsed()) lS->setUsed(true);
 		break;
 	}
+}
+
+void SongScreen::displayTempo()
+{
+	string tempo = sequencer.lock()->getTempo().toString();
+	tempo = moduru::lang::StrUtil::padLeft(tempo, " ", 5);
+	tempo = Util::replaceDotWithSmallSpaceDot(tempo);
+	findField("tempo").lock()->setText(tempo);
+}
+
+void SongScreen::displayLoop()
+{
+	findField("loop").lock()->setText(songGui->isLoopEnabled() ? "YES" : "NO");
+}
+
+void SongScreen::displaySteps()
+{
+	int offset = songGui->getOffset();
+	auto lSong = song.lock();
+	int steps = lSong->getStepAmount();
+	auto s = sequencer.lock();
+	auto stepArray = vector<weak_ptr<mpc::lcdgui::Field>>{ step0Field, step1Field, step2Field };
+	auto sequenceArray = vector<weak_ptr<mpc::lcdgui::Field>>{ sequence0Field, sequence1Field, sequence2Field };
+	auto repsArray = vector<weak_ptr<mpc::lcdgui::Field>>{ reps0Field, reps1Field, reps2Field };
+	for (int i = 0; i < 3; i++) {
+		int stepnr = i + offset;
+		if (stepnr >= 0 && stepnr < steps) {
+			stepArray[i].lock()->setTextPadded(stepnr + 1, " ");
+			auto seqname = s->getSequence(lSong->getStep(stepnr)->getSequence()).lock()->getName();
+			sequenceArray[i].lock()->setText(moduru::lang::StrUtil::padLeft(to_string(lSong->getStep(stepnr)->getSequence() + 1), "0", 2) + "-" + seqname);
+			repsArray[i].lock()->setText(to_string(lSong->getStep(stepnr)->getRepeats()));
+		}
+		else {
+			stepArray[i].lock()->setText("");
+			sequenceArray[i].lock()->setText(stepnr == steps ? "   (end of song)" : "");
+			repsArray[i].lock()->setText("");
+		}
+	}
+}
+
+void SongScreen::displayTempoSource()
+{
+	tempoSourceField.lock()->setText(sequencer.lock()->isTempoSourceSequenceEnabled() ? "SEQ" : "MAS");
+}
+
+void SongScreen::displayNow0()
+{
+	findField("now0").lock()->setTextPadded(sequencer.lock()->getCurrentBarNumber() + 1, "0");
+}
+
+void SongScreen::displayNow1()
+{
+	findField("now1").lock()->setTextPadded(sequencer.lock()->getCurrentBeatNumber() + 1, "0");
+}
+
+void SongScreen::displayNow2()
+{
+	findField("now2").lock()->setTextPadded(sequencer.lock()->getCurrentClockNumber(), "0");
+}
+
+void SongScreen::displaySongName()
+{
+	songField.lock()->setText(moduru::lang::StrUtil::padLeft(to_string(songGui->getSelectedSongIndex() + 1), "0", 2) + "-" + song.lock()->getName());
 }

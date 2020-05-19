@@ -1,4 +1,4 @@
-#include <controls/sequencer/BarCopyControls.hpp>
+#include "BarCopyScreen.hpp"
 
 #include <ui/Uis.hpp>
 #include <lcdgui/LayeredScreen.hpp>
@@ -10,15 +10,25 @@
 #include <sequencer/Track.hpp>
 #include <sequencer/Sequencer.hpp>
 
-using namespace mpc::controls::sequencer;
+using namespace mpc::lcdgui::screens;
 using namespace std;
 
-BarCopyControls::BarCopyControls()
-	: AbstractSequencerControls()
+BarCopyScreen::BarCopyScreen(const int& layer)
+	: ScreenComponent("barcopy", layer)
 {
 }
 
-void BarCopyControls::function(int j)
+void BarCopyScreen::open()
+{
+	displayFromSq();
+	displayToSq();
+	displayFirstBar();
+	displayLastBar();
+	displayAfterBar();
+	displayCopies();
+}
+
+void BarCopyScreen::function(int j)
 {
 	init();
 	int firstBar;
@@ -110,7 +120,7 @@ void BarCopyControls::function(int j)
 	}
 }
 
-void BarCopyControls::turnWheel(int i)
+void BarCopyScreen::turnWheel(int i)
 {
 	init();
 	auto lFromSeq = fromSeq.lock();
@@ -144,4 +154,34 @@ void BarCopyControls::turnWheel(int i)
 	else if (param.compare("copies") == 0) {
 		barCopyGui->setCopies(barCopyGui->getCopies() + i);
 	}
+}
+
+void BarCopyScreen::displayCopies()
+{
+	findField("copies").lock()->setTextPadded(bcGui->getCopies(), " ");
+}
+
+void BarCopyScreen::displayToSq()
+{
+	findField("tosq").lock()->setText(to_string(bcGui->getToSq() + 1));
+}
+
+void BarCopyScreen::displayFromSq()
+{
+	findField("fromsq").lock()->setText(to_string(bcGui->getFromSq() + 1));
+}
+
+void BarCopyScreen::displayAfterBar()
+{
+	findField("afterbar").lock()->setText(to_string(bcGui->getAfterBar()));
+}
+
+void BarCopyScreen::displayLastBar()
+{
+	findField("lastbar").lock()->setText(to_string(bcGui->getLastBar() + 1));
+}
+
+void BarCopyScreen::displayFirstBar()
+{
+	findField("firstbar").lock()->setText(to_string(bcGui->getFirstBar() + 1));
 }

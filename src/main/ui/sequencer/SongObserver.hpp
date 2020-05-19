@@ -48,16 +48,6 @@ namespace mpc {
 				std::weak_ptr<mpc::lcdgui::Field> reps2Field{};
 				mpc::ui::sequencer::SongGui* songGui{};
 
-			private:
-				void displayTempo();
-				void displayLoop();
-				void displaySteps();
-				void displayTempoSource();
-				void displayNow0();
-				void displayNow1();
-				void displayNow2();
-				void displaySongName();
-
 			public:
 				void update(moduru::observer::Observable* o, nonstd::any arg) override;
 

@@ -34,11 +34,6 @@ BarCopyObserver::BarCopyObserver()
 	displayCopies();
 }
 
-void BarCopyObserver::displayCopies()
-{
-    copiesField.lock()->setTextPadded(bcGui->getCopies(), " ");
-}
-
 void BarCopyObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 {
 	string s = nonstd::any_cast<string>(arg);
@@ -63,30 +58,6 @@ void BarCopyObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 	}
 }
 
-void BarCopyObserver::displayToSq()
-{
-    toSqField.lock()->setText(to_string(bcGui->getToSq() + 1));
-}
-
-void BarCopyObserver::displayFromSq()
-{
-    fromSqField.lock()->setText(to_string(bcGui->getFromSq() + 1));
-}
-
-void BarCopyObserver::displayAfterBar()
-{
-    afterBarField.lock()->setText(to_string(bcGui->getAfterBar()));
-}
-
-void BarCopyObserver::displayLastBar()
-{
-	lastBarField.lock()->setText(to_string(bcGui->getLastBar() + 1));
-}
-
-void BarCopyObserver::displayFirstBar()
-{
-	firstBarField.lock()->setText(to_string(bcGui->getFirstBar() + 1));
-}
 
 BarCopyObserver::~BarCopyObserver() {
 	bcGui->deleteObserver(this);

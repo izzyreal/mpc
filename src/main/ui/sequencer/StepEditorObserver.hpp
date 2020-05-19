@@ -72,15 +72,6 @@ namespace mpc {
 			public:
 				void update(moduru::observer::Observable* o, nonstd::any arg) override;
 
-			private:
-				void refreshSelection();
-				void initVisibleEvents();
-
-			public:
-				void refreshEventRows();
-				void refreshViewModeNotes();
-				void setViewModeNotesText();
-
 				StepEditorObserver();
 				~StepEditorObserver();
 

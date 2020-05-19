@@ -65,78 +65,7 @@ TrMuteObserver::TrMuteObserver()
 	tracks[13] = tr14;
 	tracks[14] = tr15;
 	tracks[15] = tr16;
-	displayBank();
-	displayTrackNumbers();
 
-	auto s = lSequencer->getActiveSequence().lock();
-	for (int i = 0; i < 64; i++) {
-		s->getTrack(i).lock()->addObserver(this);
-	}
-
-	for (int i = 0; i < 16; i++) {
-		displayTrack(i);
-		setOpaque(i);
-		setTrackColor(i);
-	}
-	displaySq();
-	displayNow0();
-	displayNow1();
-	displayNow2();
-}
-
-int TrMuteObserver::bankoffset()
-{
-    return samplerGui->getBank() * 16;
-}
-
-void TrMuteObserver::displayBank()
-{
-    auto letters = vector<string>{ "A", "B", "C", "D" };
-    bank.lock()->setText(letters[samplerGui->getBank()]);
-}
-
-void TrMuteObserver::displayTrackNumbers()
-{
-	auto trn = vector<string>{ "01-16", "17-32", "33-48", "49-64" };
-	trackNumbers.lock()->setText(trn[samplerGui->getBank()]);
-}
-
-void TrMuteObserver::displaySq()
-{
-	auto lSequencer = sequencer.lock();
-	sqField.lock()->setText(moduru::lang::StrUtil::padLeft(to_string(lSequencer->getActiveSequenceIndex() + 1), "0", 2) + "-" + lSequencer->getActiveSequence().lock()->getName());
-}
-
-void TrMuteObserver::setOpaque(int i)
-{
-    tracks[i].lock()->setOpaque(true);
-}
-
-void TrMuteObserver::displayTrack(int i)
-{
-    tracks[i].lock()->setText(sequencer.lock()->getActiveSequence().lock()->getTrack(i + bankoffset()).lock()->getName().substr(0, 8));
-}
-
-void TrMuteObserver::setTrackColor(int i)
-{
-
-	auto lSequencer = sequencer.lock();
-	if (lSequencer->isSoloEnabled()) {
-		if (i + bankoffset() == lSequencer->getActiveTrackIndex()) {
-			tracks[i].lock()->setInverted(true);
-		}
-		else {
-			tracks[i].lock()->setInverted(false);
-		}
-	}
-	else {
-		if (lSequencer->getActiveSequence().lock()->getTrack(i + bankoffset()).lock()->isOn()) {
-			tracks[i].lock()->setInverted(true);
-		}
-		else {
-			tracks[i].lock()->setInverted(false);
-		}
-	}
 }
 
 void TrMuteObserver::update(moduru::observer::Observable* o, nonstd::any arg)
@@ -182,30 +111,6 @@ void TrMuteObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 	}
 }
 
-void TrMuteObserver::displayNow0()
-{
-    now0Field.lock()->setTextPadded(sequencer.lock()->getCurrentBarNumber() + 1, "0");
-}
-
-void TrMuteObserver::displayNow1()
-{
-	now1Field.lock()->setTextPadded(sequencer.lock()->getCurrentBeatNumber() + 1, "0");
-}
-
-void TrMuteObserver::displayNow2()
-{
-	now2Field.lock()->setTextPadded(sequencer.lock()->getCurrentClockNumber(), "0");
-}
-
-void TrMuteObserver::refreshTracks()
-{
-	auto lSequencer = sequencer.lock();
-	for (int i = 0; i < 16; i++) {
-		displayTrack(i);
-		setTrackColor(i);
-		auto t = lSequencer->getActiveSequence().lock()->getTrack(i + bankoffset()).lock();
-	}
-}
 
 TrMuteObserver::~TrMuteObserver() {
 	auto lSeq = sequencer.lock();

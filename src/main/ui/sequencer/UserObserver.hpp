@@ -37,22 +37,9 @@ namespace mpc::ui::sequencer {
 		std::weak_ptr<mpc::lcdgui::Label> deviceNameLabel;
 		std::weak_ptr<mpc::lcdgui::Field> veloField;
 
-	private:
-		void displayTempo();
-		void displayLoop();
-		void displayTsig();
-		void displayBars();
-		void displayPgm();
-		void displayRecordingMode();
-		void displayBus();
-		void displayDeviceNumber();
-		void displayVelo();
 
 	public:
 		void update(moduru::observer::Observable* o, nonstd::any arg) override;
-
-	private:
-		void displayDeviceName();
 
 	public:
 		UserObserver();

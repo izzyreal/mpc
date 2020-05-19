@@ -35,15 +35,11 @@ namespace mpc {
 				std::weak_ptr<mpc::lcdgui::Label> selectTrackLabel{};
 				std::weak_ptr<mpc::lcdgui::Label> toMoveLabel{};
 
-			private:
-				void displayTrLabels();
-				void displayTrFields();
-
 			public:
 				void update(moduru::observer::Observable* o, nonstd::any arg) override;
 
 			private:
-				void displaySq();
+
 
 			public:
 				TrMoveObserver();

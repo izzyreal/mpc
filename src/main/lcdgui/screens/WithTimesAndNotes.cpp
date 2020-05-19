@@ -18,33 +18,33 @@
 #include <mpc/MpcSoundPlayerChannel.hpp>
 
 using namespace mpc::sequencer;
-using namespace mpc::lcdgui::screens::window;
+using namespace mpc::lcdgui::screens;
 
-void WithTimesAndNotes::checkAllTimesAndNotes(int notch)
+void WithTimesAndNotes::checkAllTimesAndNotes(int notch, Sequence* seq)
 {
 	auto& mpc = mpc::Mpc::instance();
 
-	auto sequence = mpc.getSequencer().lock()->getActiveSequence().lock();
+	auto sequence = seq != nullptr ? seq : mpc.getSequencer().lock()->getActiveSequence().lock().get();
 	auto param = mpc.getLayeredScreen().lock()->getFocus();
 	auto gui = mpc.getUis().lock()->getSequencerWindowGui();
 
 	if (param.compare("time0") == 0) {
-		setTime0(SeqUtil::getTickFromBar((SeqUtil::getBarFromTick(sequence.get(), time0)) + notch, sequence.get(), time0));
+		setTime0(SeqUtil::getTickFromBar((SeqUtil::getBarFromTick(sequence, time0)) + notch, sequence, time0));
 	}
 	else if (param.compare("time1") == 0) {
-		setTime0(SeqUtil::setBeat((SeqUtil::getBeat(sequence.get(), time0)) + notch, sequence.get(), time0));
+		setTime0(SeqUtil::setBeat((SeqUtil::getBeat(sequence, time0)) + notch, sequence, time0));
 	}
 	else if (param.compare("time2") == 0) {
-		setTime0(SeqUtil::setClockNumber((SeqUtil::getClockNumber(sequence.get(), time0)) + notch, sequence.get(), time0));
+		setTime0(SeqUtil::setClockNumber((SeqUtil::getClockNumber(sequence, time0)) + notch, sequence, time0));
 	}
 	else if (param.compare("time3") == 0) {
-		setTime1(SeqUtil::getTickFromBar((SeqUtil::getBarFromTick(sequence.get(), time1)) + notch, sequence.get(), time1));
+		setTime1(SeqUtil::getTickFromBar((SeqUtil::getBarFromTick(sequence, time1)) + notch, sequence, time1));
 	}
 	else if (param.compare("time4") == 0) {
-		setTime1(SeqUtil::setBeat((SeqUtil::getBeat(sequence.get(), time1)) + notch, sequence.get(), time1));
+		setTime1(SeqUtil::setBeat((SeqUtil::getBeat(sequence, time1)) + notch, sequence, time1));
 	}
 	else if (param.compare("time5") == 0) {
-		setTime1(SeqUtil::setClockNumber((SeqUtil::getClockNumber(sequence.get(), time1)) + notch, sequence.get(), time1));
+		setTime1(SeqUtil::setClockNumber((SeqUtil::getClockNumber(sequence, time1)) + notch, sequence, time1));
 	}
 	else if (param.compare("notes0") == 0) {
 

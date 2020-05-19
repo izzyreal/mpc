@@ -54,23 +54,10 @@ namespace mpc {
 				std::weak_ptr<mpc::lcdgui::Label> trackNumbers{};
 				std::weak_ptr<mpc::lcdgui::Label> bank{};
 
-			private:
-				int bankoffset();
-				void displayBank();
-				void displayTrackNumbers();
-				void displaySq();
-				void setOpaque(int i);
-				void displayTrack(int i);
-				void setTrackColor(int i);
-
 			public:
 				void update(moduru::observer::Observable* o, nonstd::any arg) override;
 
 			private:
-				void displayNow0();
-				void displayNow1();
-				void displayNow2();
-				void refreshTracks();
 
 			public:
 				TrMuteObserver();

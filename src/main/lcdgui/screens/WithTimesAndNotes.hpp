@@ -1,12 +1,14 @@
 #pragma once
 
-#include <lcdgui/ScreenComponent.hpp>
+namespace mpc::sequencer
+{
+	class Sequence;
+}
 
-namespace mpc::lcdgui::screens::window
+namespace mpc::lcdgui::screens
 {
 
 	class WithTimesAndNotes
-		: virtual public mpc::lcdgui::ScreenComponent
 	{
 
 	protected:
@@ -29,7 +31,7 @@ namespace mpc::lcdgui::screens::window
 		virtual void displayTime() = 0;
 
 	public:
-		void checkAllTimesAndNotes(int notch);
+		void checkAllTimesAndNotes(int notch, mpc::sequencer::Sequence* sequence = nullptr);
 
 	};
 }

@@ -37,18 +37,10 @@ namespace mpc {
 				std::weak_ptr<mpc::lcdgui::Field> afterBarField{};
 				std::weak_ptr<mpc::lcdgui::Field> copiesField{};
 
-			private:
-				void displayCopies();
-
 			public:
 				void update(moduru::observer::Observable* o, nonstd::any arg) override;
 
 			private:
-				void displayToSq();
-				void displayFromSq();
-				void displayAfterBar();
-				void displayLastBar();
-				void displayFirstBar();
 
 			public:
 				BarCopyObserver();

@@ -1,12 +1,12 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
-#include <lcdgui/screens/window/WithTimesAndNotes.hpp>
+#include <lcdgui/screens/WithTimesAndNotes.hpp>
 
 namespace mpc::lcdgui::screens::window {
 
 	class EditVelocityScreen
-		: public WithTimesAndNotes
+		: public mpc::lcdgui::ScreenComponent, public mpc::lcdgui::screens::WithTimesAndNotes
 	{
 
 	public:

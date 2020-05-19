@@ -1,10 +1,11 @@
 #pragma once
-#include <lcdgui/screens/window/WithTimesAndNotes.hpp>
+#include <lcdgui/ScreenComponent.hpp>
+#include <lcdgui/screens/WithTimesAndNotes.hpp>
 
 namespace mpc::lcdgui::screens::window {
 
 	class TimingCorrectScreen
-		: public WithTimesAndNotes
+		: public mpc::lcdgui::ScreenComponent, public mpc::lcdgui::screens::WithTimesAndNotes
 	{
 
 	public:

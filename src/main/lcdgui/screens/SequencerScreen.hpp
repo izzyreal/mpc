@@ -12,7 +12,6 @@ namespace mpc::sequencer
 
 namespace mpc::lcdgui::screens
 {
-
 	class SequencerScreen
 		: public mpc::lcdgui::ScreenComponent
 	{

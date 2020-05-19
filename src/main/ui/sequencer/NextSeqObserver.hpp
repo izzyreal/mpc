@@ -33,18 +33,6 @@ namespace mpc {
 				std::weak_ptr<mpc::lcdgui::Field> nextSqField{};
 				std::weak_ptr<mpc::sequencer::Sequencer> sequencer{};
 				
-
-			private:
-				void displaySq();
-				void displayNextSq();
-				void displayNow0();
-				void displayNow1();
-				void displayNow2();
-				void displayTempo();
-				void displayTempoLabel();
-				void displayTempoSource();
-				void displayTiming();
-
 			public:
 				void update(moduru::observer::Observable* o, nonstd::any arg) override;
 
