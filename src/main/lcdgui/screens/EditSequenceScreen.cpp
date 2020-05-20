@@ -2,9 +2,11 @@
 
 #include <ui/Uis.hpp>
 #include <ui/sequencer/TrMoveGui.hpp>
-#include <ui/sequencer/BarCopyGui.hpp>
 
 #include <lcdgui/Label.hpp>
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/TrMoveScreen.hpp>
+#include <lcdgui/screens/BarCopyScreen.hpp>
 
 #include <sequencer/Event.hpp>
 #include <sequencer/Sequence.hpp>
@@ -17,6 +19,7 @@
 
 #include <mpc/MpcSoundPlayerChannel.hpp>
 
+using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::sequencer;
 
@@ -55,13 +58,19 @@ void EditSequenceScreen::function(int i)
 	switch (i)
 	{
 	case 1:
-		uis->getBarCopyGui()->setFromSq(fromSq);
+	{
+		auto barCopyScreen = dynamic_pointer_cast<BarCopyScreen>(Screens::getScreenComponent("barcopy"));
+		barCopyScreen->setFromSq(fromSq);
 		ls.lock()->openScreen("barcopy");
 		break;
+	}
 	case 2:
-		uis->getTrMoveGui()->setSq(fromSq);
+	{
+		auto trMoveScreen = dynamic_pointer_cast<TrMoveScreen>(Screens::getScreenComponent("trmove"));
+		trMoveScreen->setSq(fromSq);
 		ls.lock()->openScreen("trmove");
 		break;
+	}
 	case 3:
 		ls.lock()->openScreen("user");
 		break;

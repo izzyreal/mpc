@@ -7,13 +7,6 @@ namespace mpc::lcdgui::screens
 		: public mpc::lcdgui::ScreenComponent
 	{
 
-	private:
-		std::weak_ptr<mpc::sequencer::Sequence> seq{};
-		mpc::ui::sequencer::TrMoveGui* tmGui{ nullptr };
-
-	public:
-		void init() override;
-
 	public:
 		void turnWheel(int i) override;
 		void up() override;
@@ -30,6 +23,20 @@ namespace mpc::lcdgui::screens
 		void displayTrLabels();
 		void displayTrFields();
 		void displaySq();
+
+	private:
+		int sq = 0;
+		int selectedTrackIndex = -1;
+		int currentTrackIndex = 0;
+
+	public:
+		bool isSelected();
+		void goUp();
+		void goDown();
+		void setSq(int i);
+		void select();
+		void cancel();
+		void insert(mpc::sequencer::Sequence* s);
 
 	};
 }
