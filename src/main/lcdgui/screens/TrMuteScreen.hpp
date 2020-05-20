@@ -17,8 +17,9 @@ namespace mpc::lcdgui::screens
 
 	public:
 		TrMuteScreen(const int& layer);
-
+		void update(moduru::observer::Observable* o, nonstd::any arg) override;
 		void open() override;
+		void close() override;
 
 	private:
 		int bankoffset();

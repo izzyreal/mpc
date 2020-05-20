@@ -18,7 +18,7 @@ namespace mpc::lcdgui::screens
 		TrMoveScreen(const int& layer);
 
 		void open() override;
-
+		
 	private:
 		void displayTrLabels();
 		void displayTrFields();
