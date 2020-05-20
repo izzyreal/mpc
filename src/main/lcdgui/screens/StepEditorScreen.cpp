@@ -92,6 +92,21 @@ void StepEditorScreen::open()
 	refreshSelection();
 }
 
+void StepEditorScreen::close()
+{
+	init();
+	sequencer.lock()->deleteObserver(this);
+	track.lock()->deleteObserver(this);
+
+	for (auto& e : visibleEvents)
+	{
+		if (e.lock())
+		{
+			e.lock()->deleteObserver(this);
+		}
+	}
+}
+
 void StepEditorScreen::function(int i)
 {
 	init();
