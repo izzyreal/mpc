@@ -13,8 +13,10 @@ namespace mpc::lcdgui::screens
 
 	public:
 		UserScreen(const int& layer);
-
+		
+		void update(moduru::observer::Observable* o, nonstd::any arg) override;
 		void open() override;
+		void close() override;
 
 	private:
 		void displayTempo();
@@ -28,5 +30,6 @@ namespace mpc::lcdgui::screens
 		void displayVelo();
 		void displayDeviceName();
 
+		std::vector<std::string> busNames = { "MIDI", "DRUM1", "DRUM2", "DRUM3", "DRUM4" };
 	};
 }
