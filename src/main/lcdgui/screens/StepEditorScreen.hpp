@@ -15,9 +15,6 @@ namespace mpc::lcdgui::screens
 	{
 
 	private:
-		std::vector<std::weak_ptr<mpc::sequencer::Event>> visibleEvents;
-
-	private:
 		void downOrUp(int increment);
 
 	public:
@@ -111,6 +108,7 @@ namespace mpc::lcdgui::screens
 
 	public:
 		void setAutoStepIncrementEnabled(bool b);
+		std::vector<std::weak_ptr<mpc::sequencer::Event>>& getVisibleEvents();
 
 	};
 }

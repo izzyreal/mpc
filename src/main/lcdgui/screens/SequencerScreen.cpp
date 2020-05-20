@@ -11,13 +11,12 @@
 
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
+#include <lcdgui/screens/EditSequenceScreen.hpp>
+#include <lcdgui/screens/StepEditorScreen.hpp>
 #include <lcdgui/Parameter.hpp>
 #include <lcdgui/Label.hpp>
 #include <lcdgui/Field.hpp>
 
-#include <ui/sequencer/window/SequencerWindowGui.hpp>
-#include <ui/sequencer/EditSequenceGui.hpp>
-#include <ui/sequencer/StepEditorGui.hpp>
 #include <ui/UserDefaults.hpp>
 
 #include <Util.hpp>
@@ -61,8 +60,6 @@ void SequencerScreen::open()
 	displayBus();
 	displayDeviceNumber();
 
-	auto gui = mpc.getUis().lock()->getSequencerWindowGui();
-	gui->addObserver(this);
 	sequencer.lock()->addObserver(this);
 	sequence.lock()->addObserver(this);
 	track.lock()->addObserver(this);
@@ -70,11 +67,7 @@ void SequencerScreen::open()
 
 void SequencerScreen::close()
 {
-	auto gui = mpc.getUis().lock()->getSequencerWindowGui();
-	gui->deleteObserver(this);
 	sequencer.lock()->deleteObserver(this);
-	mpc.getUis().lock()->getSequencerWindowGui()->deleteObserver(this);
-
 	sequence.lock()->deleteObserver(this);
 	track.lock()->deleteObserver(this);
 }
@@ -423,14 +416,14 @@ void SequencerScreen::function(int i)
 	init();
 	BaseControls::function(i);
 
-	auto editSequenceGui = mpc::Mpc::instance().getUis().lock()->getEditSequenceGui();
+	auto editSequenceScreen = dynamic_pointer_cast<EditSequenceScreen>(Screens::getScreenComponent("editsequence"));
 
 	switch (i) {
 	case 0:
 		openScreen("sequencer_step");
 		break;
 	case 1:
-		editSequenceGui->setTime1(sequence.lock()->getLastTick());
+		editSequenceScreen->setTime1(sequence.lock()->getLastTick());
 		openScreen("edit");
 		break;
 	case 2:
@@ -491,11 +484,14 @@ void SequencerScreen::turnWheel(int i)
 		{
 			auto eventNumber = stoi(lastFocus.substr(1, 2));
 
-			auto stepEditorgui = mpc::Mpc::instance().getUis().lock()->getStepEditorGui();
+			auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(Screens::getScreenComponent("sequencer_step"));
 
-			if (dynamic_pointer_cast<mpc::sequencer::NoteEvent>(stepEditorgui->getVisibleEvents()[eventNumber].lock())) {
-				if (track.lock()->getBusNumber() == 0) {
-					if (lastFocus[0] == 'd' || lastFocus[0] == 'e') {
+			if (dynamic_pointer_cast<mpc::sequencer::NoteEvent>(stepEditorScreen->getVisibleEvents()[eventNumber].lock()))
+			{
+				if (track.lock()->getBusNumber() == 0)
+				{
+					if (lastFocus[0] == 'd' || lastFocus[0] == 'e')
+					{
 						setLastFocus("sequencer_step", "a" + to_string(eventNumber));
 					}
 				}
@@ -583,8 +579,6 @@ void SequencerScreen::openWindow()
 
 	auto focus = findFocus().lock()->getName();
 	
-	auto sequencerWindowGui = mpc::Mpc::instance().getUis().lock()->getSequencerWindowGui();
-
 	if (focus.compare("sq") == 0)
 	{
 		openScreen("sequence");

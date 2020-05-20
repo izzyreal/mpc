@@ -9,6 +9,18 @@
 #include <lcdgui/ScreenComponent.hpp>
 
 #include <lcdgui/screens/SequencerScreen.hpp>
+#include <lcdgui/screens/AssignScreen.hpp>
+#include <lcdgui/screens/BarCopyScreen.hpp>
+#include <lcdgui/screens/EditSequenceScreen.hpp>
+#include <lcdgui/screens/NextSeqPadScreen.hpp>
+#include <lcdgui/screens/NextSeqScreen.hpp>
+#include <lcdgui/screens/SequencerScreen.hpp>
+#include <lcdgui/screens/SongScreen.hpp>
+#include <lcdgui/screens/StepEditorScreen.hpp>
+#include <lcdgui/screens/TrMoveScreen.hpp>
+#include <lcdgui/screens/TrMuteScreen.hpp>
+#include <lcdgui/screens/UserScreen.hpp>
+
 #include <lcdgui/screens/window/SequenceScreen.hpp>
 #include <lcdgui/screens/window/TempoChangeScreen.hpp>
 #include <lcdgui/screens/window/CountMetronomeScreen.hpp>
@@ -192,7 +204,6 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	{
 		screen = make_shared<CountMetronomeScreen>(layerIndex);
 	}
-
 	else if (screenName.compare("editmultiple") == 0)
 	{
 		screen = make_shared<EditMultipleScreen>(layerIndex);
@@ -279,23 +290,63 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	}
 	else if (screenName.compare("copytrack") == 0)
 	{
-	screen = make_shared<CopyTrackScreen>(layerIndex);
+		screen = make_shared<CopyTrackScreen>(layerIndex);
 	}
 	else if (screenName.compare("deletesequence") == 0)
 	{
-	screen = make_shared<DeleteSequenceScreen>(layerIndex);
+		screen = make_shared<DeleteSequenceScreen>(layerIndex);
 	}
 	else if (screenName.compare("deletetrack") == 0)
 	{
 		screen = make_shared<DeleteTrackScreen>(layerIndex);
 	}
-		else if (screenName.compare("deleteallsequences") == 0)
+	else if (screenName.compare("deleteallsequences") == 0)
 	{
-	screen = make_shared<DeleteAllSequencesScreen>(layerIndex);
+		screen = make_shared<DeleteAllSequencesScreen>(layerIndex);
 	}
 	else if (screenName.compare("deletealltracks") == 0)
 	{
 		screen = make_shared<DeleteAllTracksScreen>(layerIndex);
+	}
+	else if (screenName.compare("nextseqpad") == 0)
+	{
+		screen = make_shared<NextSeqPadScreen>(layerIndex);
+	}
+	else if (screenName.compare("nextseq") == 0)
+	{
+		screen = make_shared<NextSeqScreen>(layerIndex);
+	}
+	else if (screenName.compare("song") == 0)
+	{
+		screen = make_shared<SongScreen>(layerIndex);
+	}
+	else if (screenName.compare("trackmute") == 0)
+	{
+		screen = make_shared<TrMuteScreen>(layerIndex);
+	}
+	else if (screenName.compare("sequencer_step") == 0)
+	{
+		screen = make_shared<StepEditorScreen>(layerIndex);
+	}
+	else if (screenName.compare("edit") == 0)
+	{
+		screen = make_shared<EditSequenceScreen>(layerIndex);
+	}
+	else if (screenName.compare("barcopy") == 0)
+	{
+		screen = make_shared<BarCopyScreen>(layerIndex);
+	}
+	else if (screenName.compare("trmove") == 0)
+	{
+		screen = make_shared<TrMoveScreen>(layerIndex);
+	}
+	else if (screenName.compare("user") == 0)
+	{
+		screen = make_shared<UserScreen>(layerIndex);
+	}
+	else if (screenName.compare("assign") == 0)
+	{
+		screen = make_shared<AssignScreen>(layerIndex);
 	}
 
 	if (screen)

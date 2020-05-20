@@ -1,7 +1,6 @@
 #include "EditSequenceScreen.hpp"
 
 #include <ui/Uis.hpp>
-#include <ui/sequencer/TrMoveGui.hpp>
 
 #include <lcdgui/Label.hpp>
 #include <lcdgui/Screens.hpp>

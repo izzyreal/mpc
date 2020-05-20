@@ -31,16 +31,6 @@
 
 #include <ui/Uis.hpp>
 
-#include <ui/sequencer/AssignObserver.hpp>
-#include <ui/sequencer/BarCopyObserver.hpp>
-#include <ui/sequencer/EditSequenceObserver.hpp>
-#include <ui/sequencer/NextSeqObserver.hpp>
-#include <ui/sequencer/NextSeqPadObserver.hpp>
-#include <ui/sequencer/SongObserver.hpp>
-#include <ui/sequencer/StepEditorObserver.hpp>
-#include <ui/sequencer/TrMoveObserver.hpp>
-#include <ui/sequencer/TrMuteObserver.hpp>
-#include <ui/sequencer/UserObserver.hpp>
 #include <ui/sequencer/window/StepWindowObserver.hpp>
 
 #include <ui/sampler/DrumObserver.hpp>
@@ -828,29 +818,11 @@ void LayeredScreen::initObserver()
 	else if (csn.compare("sync") == 0) {
 		activeObserver = make_unique<SyncObserver>();
 	}
-	else if (csn.compare("assign") == 0) {
-		activeObserver = make_unique<AssignObserver>();
-	}
 	else if (csn.compare("saveallfile") == 0) {
 		activeObserver = make_unique<SaveAllFileObserver>();
 	}
 	else if (csn.compare("loadasequencefromall") == 0) {
 		activeObserver = make_unique<LoadASequenceFromAllObserver>();
-	}
-	else if (csn.compare("nextseqpad") == 0) {
-		activeObserver = make_unique<NextSeqPadObserver>();
-	}
-	else if (csn.compare("nextseq") == 0)
-	{
-		activeObserver = make_unique<NextSeqObserver>();
-	}
-	else if (csn.compare("song") == 0)
-	{
-		activeObserver = make_unique<SongObserver>();
-	}
-	else if (csn.compare("trackmute") == 0)
-	{
-		activeObserver = make_unique<TrMuteObserver>();
 	}
 	else if (checkActiveScreen(&diskNames, currentScreenName))
 	{
@@ -876,10 +848,6 @@ void LayeredScreen::initObserver()
 	{
 		activeObserver = make_unique<PgmAssignObserver>();
 	}
-	else if (csn.compare("sequencer_step") == 0)
-	{
-		activeObserver = make_unique<StepEditorObserver>();
-	}
 	else if (csn.compare("step_tc") == 0 || csn.compare("editmultiple") == 0 || csn.compare("insertevent") == 0)
 	{
 		activeObserver = make_unique<StepWindowObserver>();
@@ -896,25 +864,9 @@ void LayeredScreen::initObserver()
 	{
 		activeObserver = make_unique<ChannelSettingsObserver>();
 	}
-	else if (csn.compare("edit") == 0)
-	{
-		activeObserver = make_unique<EditSequenceObserver>();
-	}
 	else if (csn.compare("name") == 0)
 	{
 		activeObserver = make_unique<ui::NameObserver>();
-	}
-	else if (csn.compare("barcopy") == 0)
-	{
-		activeObserver = make_unique<BarCopyObserver>();
-	}
-	else if (csn.compare("trmove") == 0)
-	{
-		activeObserver = make_unique<TrMoveObserver>();
-	}
-	else if (csn.compare("user") == 0)
-	{
-		activeObserver = make_unique<UserObserver>();
 	}
 	else if (csn.compare("trim") == 0)
 	{

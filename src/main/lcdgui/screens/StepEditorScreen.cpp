@@ -1343,3 +1343,8 @@ void StepEditorScreen::update(moduru::observer::Observable*, nonstd::any message
 		setyOffset(0);
 	}
 }
+
+vector<weak_ptr<Event>>& StepEditorScreen::getVisibleEvents()
+{
+	return visibleEvents;
+}
