@@ -10,8 +10,15 @@ namespace mpc::lcdgui::screens
 	{
 
 	private:
-		int step = 0;
-		std::weak_ptr<mpc::sequencer::Song> s;
+		int offset = -1;
+		int selectedSongIndex = 0;
+		std::string defaultSongName = "Song";
+		bool loop = false;
+
+		void setLoop(bool b);
+		void setOffset(int i);
+		void setSelectedSongIndex(int i);
+		void setDefaultSongName(std::string s);
 
 	public:
 		void init() override;
@@ -28,6 +35,8 @@ namespace mpc::lcdgui::screens
 		SongScreen(const int& layer);
 
 		void open() override;
+		void close() override;
+		void update(moduru::observer::Observable*, nonstd::any message);
 
 	private:
 		void displayTempo();
