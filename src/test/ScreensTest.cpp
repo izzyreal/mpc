@@ -192,13 +192,22 @@ SCENARIO("All screens can be opened", "[gui]") {
 		mpc.getSequencer().lock()->getActiveSequence().lock()->init(1);
 		auto ls = mpc.getLayeredScreen().lock();
 
+		vector<string> good;
+		vector<string> bad;
+
 		for (auto& screenName : screenNames)
 		{
 			int layerIndex = ls->openScreen(screenName);
 			
+			// We do a check for the most important screen
+			if (screenName.compare("sequencer") == 0)
+			{
+				REQUIRE(layerIndex == 0);
+			}
+
 			if (layerIndex == -1)
 			{
-				printf("%s could not be opened!\n", screenName.c_str());
+				bad.push_back(screenName + " could not be opened.");
 				continue;
 			}
 
@@ -206,6 +215,7 @@ SCENARIO("All screens can be opened", "[gui]") {
 			vector<vector<bool>> pixels(248, vector<bool>(60));
 			layer->Draw(&pixels);
 			int blackPixelCount = 0;
+
 			for (auto& column : pixels)
 			{
 				for (auto b : column)
@@ -217,16 +227,37 @@ SCENARIO("All screens can be opened", "[gui]") {
 				}
 			}
 
+			// And another check for the most important screen
+			if (screenName.compare("sequencer") == 0)
+			{
+				REQUIRE(blackPixelCount > 0);
+			}
+
 			if (blackPixelCount > 0)
 			{
-				printf("%s has %i black pixels\n", screenName.c_str(), blackPixelCount);
+				good.push_back(screenName + " has " + to_string(blackPixelCount) + " black pixels");
 			}
 			else
 			{
-				printf("%s is completely empty!\n", screenName.c_str());
+				bad.push_back(screenName + " is openable, but has 0 black pixels");
 			}
 
 		}
+
+		MLOG("These screens are fine:");
+		for (auto& msg : good)
+		{
+			MLOG(msg);
+		}
+
+		MLOG("\nThese screens are broken:");
+		for (auto& msg : bad)
+		{
+			MLOG(msg);
+		}
+		printf("%i screens are fine and %i screens are broken. Check vmpc.log in ~/vMPC for more details.\n", good.size(), bad.size());
+
+		REQUIRE(good.size() >= 42); // This will be increased as the screens get refactored.
 
 	}
 }

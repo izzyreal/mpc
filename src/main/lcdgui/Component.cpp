@@ -188,10 +188,6 @@ void Component::addChildren(vector<shared_ptr<Component>> children)
 
 weak_ptr<Component> Component::findChild(const string& name)
 {
-	if (name.compare("background") == 0)
-	{
-		printf("foo");
-	}
 	for (auto& c : children)
 	{
 		if (c->getName().compare(name) == 0)

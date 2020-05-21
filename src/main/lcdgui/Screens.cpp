@@ -173,14 +173,14 @@ void Screens::init()
 		panelDoc->ParseStream(is);
 		fclose(fp);
 
-		static const char* kTypeNames[] =
-		{ "Null", "False", "True", "Object", "Array", "String", "Number" };
-
+		/*
+		This can be uncommented to list all screen names that are encountered in the json files.
 		for (Value::ConstMemberIterator itr = panelDoc->MemberBegin();
 			itr != panelDoc->MemberEnd(); ++itr)
 		{
 			MLOG("\"" + string(itr->name.GetString()) + "\", ");
 		}
+		*/
 
 		layerDocuments.push_back(move(panelDoc));
 	}
