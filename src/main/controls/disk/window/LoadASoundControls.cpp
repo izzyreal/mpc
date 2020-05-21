@@ -3,24 +3,30 @@
 #include <Mpc.hpp>
 #include <controls/Controls.hpp>
 
-#include <command/KeepSound.hpp>
 #include <ui/sampler/SamplerGui.hpp>
+#include <ui/Uis.hpp>
+#include <ui/sampler/SoundGui.hpp>
+
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>
 #include <sampler/Sound.hpp>
+#include <sampler/NoteParameters.hpp>
+#include <sampler/Pad.hpp>
+
+#include <sequencer/Sequence.hpp>
+#include <sequencer/Track.hpp>
+#include <sequencer/Sequencer.hpp>
+
+#include <mpc/MpcStereoMixerChannel.hpp>
 
 using namespace mpc::controls::disk::window;
 using namespace std;
 
-LoadASoundControls::LoadASoundControls() 
-	: AbstractDiskControls()
-{
-}
-
 void LoadASoundControls::turnWheel(int i)
 {
 	init();
-	if (param.compare("assigntonote") == 0) {
+	if (param.compare("assigntonote") == 0)
+	{
 		auto nextNn = samplerGui->getNote() + i;
 		auto nextPn = program.lock()->getPadNumberFromNote(nextNn);
 		samplerGui->setPadAndNote(nextPn, nextNn);
@@ -66,12 +72,51 @@ void LoadASoundControls::function(int i)
 		ls.lock()->openScreen("load");
 		break;
 	case 4:
-		auto command = mpc::command::KeepSound(dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getPreviewSound().lock()));
-		command.execute();
+		keepSound();
 		ls.lock()->openScreen("load");
 		break;
 	}
 }
 
-LoadASoundControls::~LoadASoundControls() {
+void LoadASoundControls::keepSound()
+{
+	auto sequencer = Mpc::instance().getSequencer().lock();
+	auto sequence = sequencer->getActiveSequence().lock();
+	auto sampler = Mpc::instance().getSampler();
+	auto track = sequence->getTrack(sequencer->getActiveTrackIndex()).lock();
+
+	auto bus = track->getBusNumber();
+	auto programNumber = sampler.lock()->getDrumBusProgramNumber(bus);
+	auto program = sampler.lock()->getProgram(programNumber);
+	auto sound = sampler.lock()->getPreviewSound();
+
+	if (samplerGui->getNote() != 34)
+	{
+		auto noteParameters = dynamic_cast<mpc::sampler::NoteParameters*>(program.lock()->getNoteParameters(samplerGui->getNote()));
+		noteParameters->setSoundNumber(sampler.lock()->getSoundCount() - 1);
+
+		if (sound.lock()->isLoopEnabled())
+		{
+			noteParameters->setVoiceOverlap(2);
+		}
+
+		auto pn = program.lock()->getPadNumberFromNote(samplerGui->getNote());
+
+		if (pn != -1)
+		{
+			auto pad = dynamic_pointer_cast<mpc::sampler::Program>(program.lock())->getPad(pn);
+			auto mixerChannel = pad->getStereoMixerChannel().lock();
+			
+			if (sound.lock()->isMono())
+			{
+				mixerChannel->setStereo(false);
+			}
+			else
+			{
+				mixerChannel->setStereo(true);
+			}
+		}
+	}
+
+	soundGui->initZones(sound.lock()->getLastFrameIndex());
 }

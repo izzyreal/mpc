@@ -1,27 +1,17 @@
 #pragma once
 #include <controls/disk/AbstractDiskControls.hpp>
 
-namespace mpc {
-	namespace controls {
-		namespace disk {
-			namespace window {
+namespace mpc::controls::disk::window {
 
-				class LoadASoundControls
-					: public mpc::controls::disk::AbstractDiskControls
-				{
+	class LoadASoundControls
+		: public mpc::controls::disk::AbstractDiskControls
+	{
 
-				public:
-					typedef mpc::controls::disk::AbstractDiskControls super;
-					void turnWheel(int i) override;
-					void function(int i) override;
+	private:
+		void keepSound();
 
-				public:
-					LoadASoundControls();
-					~LoadASoundControls();
-
-				};
-
-			}
-		}
-	}
+	public:
+		void turnWheel(int i) override;
+		void function(int i) override;
+	};
 }

@@ -19,5 +19,7 @@ namespace mpc::lcdgui::screens::window {
 		int insertEventType = 0;
 		void setInsertEventType(int i);
 		void displayInsertEventType();
+
+		void insertEvent();
 	};
 }
