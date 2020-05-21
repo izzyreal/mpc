@@ -15,10 +15,16 @@ namespace mpc::lcdgui::screens
 		std::string defaultSongName = "Song";
 		bool loop = false;
 
-		void setLoop(bool b);
-		void setOffset(int i);
 		void setSelectedSongIndex(int i);
+
+	public:
+		void setOffset(int i);
 		void setDefaultSongName(std::string s);
+		void setLoop(bool b);
+		std::string getDefaultSongName();
+		int getOffset();
+		int getSelectedSongIndex();
+		bool isLoopEnabled();
 
 	public:
 		void init() override;

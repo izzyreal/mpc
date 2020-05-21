@@ -3,10 +3,7 @@
 #include <Mpc.hpp>
 #include <ui/Uis.hpp>
 
-#include <ui/sequencer/StepEditorGui.hpp>
-
 #include <command/InsertEvent.hpp>
-#include <lcdgui/LayeredScreen.hpp>
 
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
@@ -16,15 +13,28 @@ InsertEventScreen::InsertEventScreen(const int& layer)
 {
 }
 
+void InsertEventScreen::open()
+{
+	displayInsertEventType();
+}
+
+void InsertEventScreen::displayInsertEventType()
+{
+	findField("eventtype").lock()->setText(eventTypeNames[insertEventType]);
+}
+
 void InsertEventScreen::function(int i)
 {
 	BaseControls::function(i);
-	mpc::command::InsertEvent command(Mpc::instance().getUis().lock()->getStepEditorGui(), track.lock().get(), sequencer.lock().get());
-	switch (i) {
+	
+	switch (i)
+	{
 	case 4:
-		command.execute();
+	{
+		mpc::command::InsertEvent(insertEventType, track.lock().get(), sequencer.lock().get()).execute();
 		ls.lock()->openScreen("sequencer_step");
 		break;
+	}
 	}
 }
 
@@ -32,10 +42,18 @@ void InsertEventScreen::turnWheel(int i)
 {
 	init();
 	
-	auto seGui = mpc.getUis().lock()->getStepEditorGui();
-
 	if (param.compare("eventtype") == 0)
 	{
-		seGui->setInsertEventType(seGui->getInsertEventType() + i);
+		setInsertEventType(insertEventType + i);
 	}
+}
+
+void InsertEventScreen::setInsertEventType(int i)
+{
+	if (i < 0 || i > 7)
+	{
+		return;
+	}
+	insertEventType = i;
+	displayInsertEventType();
 }

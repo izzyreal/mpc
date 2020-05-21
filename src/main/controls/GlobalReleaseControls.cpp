@@ -1,4 +1,4 @@
-#include <controls/GlobalReleaseControls.hpp>
+#include "GlobalReleaseControls.hpp"
 
 #include <controls/Controls.hpp>
 
@@ -6,8 +6,6 @@
 #include <audiomidi/AudioMidiServices.hpp>
 #include <audiomidi/SoundPlayer.hpp>
 #include <audiomidi/EventHandler.hpp>
-#include <ui/sequencer/StepEditorGui.hpp>
-#include <ui/sequencer/window/SequencerWindowGui.hpp>
 #include <hardware/Hardware.hpp>
 #include <hardware/Led.hpp>
 #include <ui/sampler/SamplerGui.hpp>
@@ -23,9 +21,11 @@
 
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
+#include <lcdgui/screens/StepEditorScreen.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::lcdgui::screens;
 using namespace mpc::controls;
 using namespace std;
 
@@ -189,12 +189,13 @@ void GlobalReleaseControls::shift()
 	auto controls = Mpc::instance().getControls().lock();
 	controls->setShiftPressed(false);
 	init();
+
 	if (csn.compare("sequencer_step") == 0 && param.length() == 2)
 	{
 		auto eventNumber = stoi(param.substr(1, 2));
-		auto seGui = Mpc::instance().getUis().lock()->getStepEditorGui();
-		auto res = eventNumber + seGui->getyOffset();
-		seGui->setSelectionEndIndex(res);
+		auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(Screens::getScreenComponent("sequencer_step"));
+		auto res = eventNumber + stepEditorScreen->getYOffset();
+		stepEditorScreen->setSelectionEndIndex(res);
 	}
 }
 
@@ -202,7 +203,4 @@ void GlobalReleaseControls::erase()
 {
 	auto controls = Mpc::instance().getControls().lock();
 	controls->setErasePressed(false);
-}
-
-GlobalReleaseControls::~GlobalReleaseControls() {
 }

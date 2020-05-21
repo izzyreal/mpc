@@ -35,7 +35,7 @@ void AbstractVmpcControls::checkAllTimes(int i)
 		d2dRecorderGui->setTime0(mpc::sequencer::SeqUtil::setBeat((mpc::sequencer::SeqUtil::getBeat(sequence, d2dRecorderGui->getTime0())) + i, sequence, d2dRecorderGui->getTime0()));
 	}
 	else if (param.compare("time2") == 0) {
-		d2dRecorderGui->setTime0(mpc::sequencer::SeqUtil::setClockNumber((mpc::sequencer::SeqUtil::getClockNumber(sequence, d2dRecorderGui->getTime0())) + i, sequence, d2dRecorderGui->getTime0()));
+		d2dRecorderGui->setTime0(mpc::sequencer::SeqUtil::setClock((mpc::sequencer::SeqUtil::getClock(sequence, d2dRecorderGui->getTime0())) + i, sequence, d2dRecorderGui->getTime0()));
 	}
 	else if (param.compare("time3") == 0) {
 		d2dRecorderGui->setTime1(mpc::sequencer::SeqUtil::getTickFromBar((mpc::sequencer::SeqUtil::getBarFromTick(sequence, d2dRecorderGui->getTime1())) + i, sequence, d2dRecorderGui->getTime1()));
@@ -44,7 +44,7 @@ void AbstractVmpcControls::checkAllTimes(int i)
 		d2dRecorderGui->setTime1(mpc::sequencer::SeqUtil::setBeat((mpc::sequencer::SeqUtil::getBeat(sequence, d2dRecorderGui->getTime1())) + i, sequence, d2dRecorderGui->getTime1()));
 	}
 	else if (param.compare("time5") == 0) {
-		d2dRecorderGui->setTime1(mpc::sequencer::SeqUtil::setClockNumber((mpc::sequencer::SeqUtil::getClockNumber(sequence, d2dRecorderGui->getTime1())) + i, sequence, d2dRecorderGui->getTime1()));
+		d2dRecorderGui->setTime1(mpc::sequencer::SeqUtil::setClock((mpc::sequencer::SeqUtil::getClock(sequence, d2dRecorderGui->getTime1())) + i, sequence, d2dRecorderGui->getTime1()));
 	}
 }
 

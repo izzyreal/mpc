@@ -42,6 +42,7 @@
 #include <lcdgui/screens/window/ChangeBars2Screen.hpp>
 #include <lcdgui/screens/window/TrackScreen.hpp>
 #include <lcdgui/screens/window/Assign16LevelsScreen.hpp>
+#include <lcdgui/screens/window/StepTcScreen.hpp>
 
 #include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
 #include <lcdgui/screens/dialog/MidiMonitorScreen.hpp>
@@ -347,6 +348,10 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	else if (screenName.compare("assign") == 0)
 	{
 		screen = make_shared<AssignScreen>(layerIndex);
+	}
+	else if (screenName.compare("step_tc") == 0)
+	{
+		screen = make_shared<StepTcScreen>(layerIndex);
 	}
 
 	if (screen)

@@ -898,17 +898,6 @@ void StepEditorScreen::setViewModeNotesText()
 	findField("view").lock()->setSize(findField("view").lock()->getText().length() * 6 + 1, 9);
 }
 
-// Should live in "InsertEventScreen" at window level
-void StepEditorScreen::setInsertEventType(int i)
-{
-	if (i < 0 || i > 7)
-	{
-		return;
-	}
-	insertEventType = i;
-	//displayInsertEventType();
-}
-
 void StepEditorScreen::setViewModeNumber(int i)
 {
 	if (i < 0 || i > 7)
@@ -1140,16 +1129,6 @@ void StepEditorScreen::checkSelection()
 	}
 }
 
-void StepEditorScreen::setEditTypeNumber(int i)
-{
-	if (i < 0 || i > 3)
-	{
-		return;
-	}
-	editTypeNumber = i;
-	// Should call 		updateEditMultiple(); in StepWindowObserver
-}
-
 void StepEditorScreen::setSelectedEvent(weak_ptr<Event> event)
 {
 	selectedEvent = event;
@@ -1347,4 +1326,64 @@ void StepEditorScreen::update(moduru::observer::Observable*, nonstd::any message
 vector<weak_ptr<Event>>& StepEditorScreen::getVisibleEvents()
 {
 	return visibleEvents;
+}
+
+vector<weak_ptr<Event>>& StepEditorScreen::getSelectedEvents()
+{
+	return selectedEvents;
+}
+
+string StepEditorScreen::getSelectedParameterLetter()
+{
+	return selectedParameterLetter;
+}
+
+weak_ptr<Event> StepEditorScreen::getSelectedEvent()
+{
+	return selectedEvent;
+}
+
+int StepEditorScreen::getChangeVariationTypeNumber()
+{
+	return changeVariationTypeNumber;
+}
+
+int StepEditorScreen::getChangeVariationValue()
+{
+	return changeVariationValue;
+}
+
+int StepEditorScreen::getChangeNoteToNumber()
+{
+	return changeNoteToNumber;
+}
+
+int StepEditorScreen::getEditValue()
+{
+	return editValue;
+}
+
+vector<weak_ptr<Event>>& StepEditorScreen::getPlaceHolder()
+{
+	return placeHolder;
+}
+
+int StepEditorScreen::getYOffset()
+{
+	return yOffset;
+}
+
+bool StepEditorScreen::isAutoStepIncrementEnabled()
+{
+	return autoStepIncrementEnabled;
+}
+
+bool StepEditorScreen::isDurationTcPercentageEnabled()
+{
+	return durationTcPercentageEnabled;
+}
+
+int StepEditorScreen::getTcValueRecordedNotes()
+{
+	return tcValueRecordedNotes;
 }

@@ -117,10 +117,10 @@ void EditVelocityScreen::displayTime()
 	auto sequence = sequencer.lock()->getActiveSequence().lock().get();
 	findField("time0").lock()->setTextPadded(SeqUtil::getBarFromTick(sequence, time0) + 1, "0");
 	findField("time1").lock()->setTextPadded(SeqUtil::getBeat(sequence, time0) + 1, "0");
-	findField("time2").lock()->setTextPadded(SeqUtil::getClockNumber(sequence, time0), "0");
+	findField("time2").lock()->setTextPadded(SeqUtil::getClock(sequence, time0), "0");
 	findField("time3").lock()->setTextPadded(SeqUtil::getBarFromTick(sequence, time1) + 1, "0");
 	findField("time4").lock()->setTextPadded(SeqUtil::getBeat(sequence, time1) + 1, "0");
-	findField("time5").lock()->setTextPadded(SeqUtil::getClockNumber(sequence, time1), "0");
+	findField("time5").lock()->setTextPadded(SeqUtil::getClock(sequence, time1), "0");
 }
 
 void EditVelocityScreen::displayNotes()

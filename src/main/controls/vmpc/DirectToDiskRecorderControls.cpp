@@ -3,16 +3,23 @@
 #include <Mpc.hpp>
 #include <audiomidi/AudioMidiServices.hpp>
 #include <audiomidi/DirectToDiskSettings.hpp>
+
 #include <ui/NameGui.hpp>
-#include <ui/sequencer/SongGui.hpp>
 #include <ui/vmpc/DirectToDiskRecorderGui.hpp>
+
 #include <sequencer/Sequence.hpp>
 #include <sequencer/SeqUtil.hpp>
 #include <sequencer/Sequencer.hpp>
 #include <sequencer/Song.hpp>
+
 #include <audio/server/AudioServer.hpp>
 #include <audio/server/NonRealTimeAudioServer.hpp>
 
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/SongScreen.hpp>
+
+using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui;
 using namespace mpc::controls::vmpc;
 using namespace std;
 
@@ -81,7 +88,8 @@ void DirectToDiskRecorderControls::function(int i)
 		sequence = sequencer.lock()->getSequence(seq).lock();
 		shared_ptr<mpc::sequencer::Song> song;
 
-		switch (d2dRecorderGui->getRecord()) {
+		switch (d2dRecorderGui->getRecord())
+		{
 		case 0:
 			ls.lock()->openScreen("sequencer");
 			sequence->setLoopEnabled(false);
@@ -109,19 +117,24 @@ void DirectToDiskRecorderControls::function(int i)
 			sequencer.lock()->play();
 			break;
 		case 3:
+		{
 			song = sequencer.lock()->getSong(d2dRecorderGui->getSong()).lock();
 			if (!song->isUsed()) {
 				return;
 			}
 
 			lengthInFrames = mpc::sequencer::SeqUtil::songFrameLength(song.get(), sequencer.lock().get(), rate);
-            settings = make_unique<mpc::audiomidi::DirectToDiskSettings>(lengthInFrames, outputFolder, split, rate);
+			settings = make_unique<mpc::audiomidi::DirectToDiskSettings>(lengthInFrames, outputFolder, split, rate);
 			ls.lock()->openScreen("song");
 			sequencer.lock()->setSongModeEnabled(true);
-			Mpc::instance().getUis().lock()->getSongGui()->setLoop(false);
+
+			auto songScreen = dynamic_pointer_cast<SongScreen>(Screens::getScreenComponent("song"));
+			songScreen->setLoop(false);
+
 			lAms->prepareBouncing(settings.get());
 			sequencer.lock()->playFromStart();
 			break;
+		}
 		case 4:
 			ls.lock()->openScreen("recordjam");
 			break;

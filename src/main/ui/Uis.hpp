@@ -7,6 +7,10 @@ namespace mpc::ui {
 	class NameGui;
 }
 
+namespace mpc::ui::sequencer::window {
+	class SequencerWindowGui;
+}
+
 namespace mpc::ui::vmpc {
 	class DirectToDiskRecorderGui;
 	class DeviceGui;
@@ -29,20 +33,6 @@ namespace mpc::ui::disk {
 namespace mpc::ui::disk::window {
 	class DiskWindowGui;
 	class DirectoryGui;
-}
-
-namespace mpc::ui::sequencer {
-	class StepEditorGui;
-	class BarCopyGui;
-	class EditSequenceGui;
-	class SongGui;
-	class TrMoveGui;
-}
-
-namespace mpc::ui::sequencer::window {
-	class SequencerWindowGui;
-	class EraseGui;
-	class Assign16LevelsGui;
 }
 
 namespace mpc::ui::sampler {
@@ -70,13 +60,6 @@ namespace mpc::ui {
 	private:
 		mpc::ui::NameGui* nameGui = nullptr;
 
-		mpc::ui::sequencer::SongGui* songGui = nullptr;
-		mpc::ui::sequencer::StepEditorGui* stepEditorGui = nullptr;
-		mpc::ui::sequencer::BarCopyGui* barCopyGui = nullptr;
-		mpc::ui::sequencer::EditSequenceGui* editSequenceGui = nullptr;
-		mpc::ui::sequencer::TrMoveGui* trMoveGui = nullptr;
-
-		mpc::ui::sequencer::window::EraseGui* eraseGui = nullptr;
 		mpc::ui::sequencer::window::SequencerWindowGui* sequencerWindowGui = nullptr;
 
 		mpc::ui::sampler::SoundGui* soundGui = nullptr;
@@ -104,12 +87,8 @@ namespace mpc::ui {
 		mpc::ui::vmpc::DirectToDiskRecorderGui* d2dRecorderGui = nullptr;
 
 	public:
-		mpc::ui::sequencer::StepEditorGui* getStepEditorGui();
 		mpc::ui::sampler::MixerGui* getMixerGui();
-		mpc::ui::sequencer::EditSequenceGui* getEditSequenceGui();
 		mpc::ui::midisync::MidiSyncGui* getMidiSyncGui();
-		mpc::ui::sequencer::BarCopyGui* getBarCopyGui();
-		mpc::ui::sequencer::TrMoveGui* getTrMoveGui();
 		mpc::ui::sampler::SoundGui* getSoundGui();
 		mpc::ui::sampler::window::EditSoundGui* getEditSoundGui();
 		mpc::ui::sampler::window::ZoomGui* getZoomGui();
@@ -119,10 +98,8 @@ namespace mpc::ui {
 		mpc::ui::sampler::window::SamplerWindowGui* getSamplerWindowGui();
 		mpc::ui::sampler::SamplerGui* getSamplerGui();
 		mpc::ui::NameGui* getNameGui();
-		mpc::ui::sequencer::SongGui* getSongGui();
 		mpc::ui::sampler::MixerSetupGui* getMixerSetupGui();
 
-		mpc::ui::sequencer::window::EraseGui* getEraseGui();
 		mpc::ui::sequencer::window::SequencerWindowGui* getSequencerWindowGui();
 
 		mpc::ui::other::OthersGui* getOthersGui();

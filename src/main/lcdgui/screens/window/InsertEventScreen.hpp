@@ -12,6 +12,12 @@ namespace mpc::lcdgui::screens::window {
 		void turnWheel(int i) override;
 
 		InsertEventScreen(const int& layer);
+		void open() override;
 
+	private:
+		std::vector<std::string> eventTypeNames = { "NOTE", "PITCH BEND", "CONTROL CHANGE", "PROGRAM CHANGE", "CH PRESSURE", "POLY PRESSURE", "EXCLUSIVE", "MIXER" };
+		int insertEventType = 0;
+		void setInsertEventType(int i);
+		void displayInsertEventType();
 	};
 }

@@ -4,11 +4,15 @@
 #include <file/all/AllParser.hpp>
 #include <ui/Uis.hpp>
 #include <ui/midisync/MidiSyncGui.hpp>
-#include <ui/sequencer/SongGui.hpp>
 
 #include <lang/StrUtil.hpp>
 #include <VecUtil.hpp>
 
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/SongScreen.hpp>
+
+using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui;
 using namespace mpc::file::all;
 using namespace std;
 
@@ -36,8 +40,13 @@ MidiSyncMisc::MidiSyncMisc()
 	saveBytes[FRAME_RATE_OFFSET] = static_cast<int8_t>(ms->getFrameRate());
 	saveBytes[INPUT_OFFSET] = static_cast<int8_t>(ms->getIn());
 	saveBytes[OUTPUT_OFFSET] = static_cast<int8_t>(ms->getOut());
+
+	auto songScreen = dynamic_pointer_cast<SongScreen>(Screens::getScreenComponent("song"));
+
 	for (int i = 0; i < AllParser::NAME_LENGTH; i++)
-		saveBytes[DEF_SONG_NAME_OFFSET + i] = moduru::lang::StrUtil::padRight(Mpc::instance().getUis().lock()->getSongGui()->getDefaultSongName(), " ", 16)[i];
+	{
+		saveBytes[DEF_SONG_NAME_OFFSET + i] = moduru::lang::StrUtil::padRight(songScreen->getDefaultSongName(), " ", 16)[i];
+	}
 
 	saveBytes[DEF_SONG_NAME_OFFSET + 16] = 1;
 }

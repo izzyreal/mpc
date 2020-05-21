@@ -13,6 +13,7 @@
 #include <sequencer/NoteEvent.hpp>
 #include <sequencer/Sequencer.hpp>
 #include <sequencer/TimeSignature.hpp>
+#include <sequencer/SeqUtil.hpp>
 
 #include <lang/StrUtil.hpp>
 
@@ -240,15 +241,15 @@ void EditSequenceScreen::turnWheel(int i)
 
 	if (param.compare("start0") == 0)
 	{
-		setStart(setBarNumber(getBarNumber(toSequence.get(), start) + i, toSequence.get(), start));
+		setStart(SeqUtil::setBar(SeqUtil::getBar(toSequence.get(), start) + i, toSequence.get(), start));
 	}
 	else if (param.compare("start1") == 0)
 	{
-		setStart(setBeatNumber(getBeatNumber(toSequence.get(), start) + i, toSequence.get(), start));
+		setStart(SeqUtil::setBeat(SeqUtil::getBeat(toSequence.get(), start) + i, toSequence.get(), start));
 	}
 	else if (param.compare("start2") == 0)
 	{
-		setStart(setClockNumber(getClockNumber(toSequence.get(), start) + i, toSequence.get(), start));
+		setStart(SeqUtil::setClock(SeqUtil::getClock(toSequence.get(), start) + i, toSequence.get(), start));
 	}
 	else if (param.compare("editfunction") == 0)
 	{
@@ -331,20 +332,20 @@ void EditSequenceScreen::turnWheel(int i)
 void EditSequenceScreen::displayStart()
 {
 	auto seq = sequencer.lock()->getSequence(toSq).lock();
-	findField("start0").lock()->setText(StrUtil::padLeft(to_string(EditSequenceScreen::getBarNumber(seq.get(), start) + 1), "0", 3));
-	findField("start1").lock()->setText(StrUtil::padLeft(to_string(EditSequenceScreen::getBeatNumber(seq.get(), start) + 1), "0", 2));
-	findField("start2").lock()->setText(StrUtil::padLeft(to_string(EditSequenceScreen::getClockNumber(seq.get(), start)), "0", 2));
+	findField("start0").lock()->setText(StrUtil::padLeft(to_string(SeqUtil::getBar(seq.get(), start) + 1), "0", 3));
+	findField("start1").lock()->setText(StrUtil::padLeft(to_string(SeqUtil::getBeat(seq.get(), start) + 1), "0", 2));
+	findField("start2").lock()->setText(StrUtil::padLeft(to_string(SeqUtil::getClock(seq.get(), start)), "0", 2));
 }
 
 void EditSequenceScreen::displayTime()
 {
 	auto seq = sequencer.lock()->getSequence(fromSq).lock();
-	findField("time0").lock()->setText(StrUtil::padLeft(to_string(EditSequenceScreen::getBarNumber(seq.get(), time0) + 1), "0", 3));
-	findField("time1").lock()->setText(StrUtil::padLeft(to_string(EditSequenceScreen::getBeatNumber(seq.get(), time0) + 1), "0", 2));
-	findField("time2").lock()->setText(StrUtil::padLeft(to_string(EditSequenceScreen::getClockNumber(seq.get(), time0)), "0", 2));
-	findField("time3").lock()->setText(StrUtil::padLeft(to_string(EditSequenceScreen::getBarNumber(seq.get(), time1) + 1), "0", 3));
-	findField("time4").lock()->setText(StrUtil::padLeft(to_string(EditSequenceScreen::getBeatNumber(seq.get(), time1) + 1), "0", 2));
-	findField("time5").lock()->setText(StrUtil::padLeft(to_string(EditSequenceScreen::getClockNumber(seq.get(), time1)), "0", 2));
+	findField("time0").lock()->setText(StrUtil::padLeft(to_string(SeqUtil::getBar(seq.get(), time0) + 1), "0", 3));
+	findField("time1").lock()->setText(StrUtil::padLeft(to_string(SeqUtil::getBeat(seq.get(), time0) + 1), "0", 2));
+	findField("time2").lock()->setText(StrUtil::padLeft(to_string(SeqUtil::getClock(seq.get(), time0)), "0", 2));
+	findField("time3").lock()->setText(StrUtil::padLeft(to_string(SeqUtil::getBar(seq.get(), time1) + 1), "0", 3));
+	findField("time4").lock()->setText(StrUtil::padLeft(to_string(SeqUtil::getBeat(seq.get(), time1) + 1), "0", 2));
+	findField("time5").lock()->setText(StrUtil::padLeft(to_string(SeqUtil::getClock(seq.get(), time1)), "0", 2));
 }
 
 void EditSequenceScreen::displayCopies()
@@ -688,121 +689,6 @@ void EditSequenceScreen::setStart(int i)
 {
 	start = i;
 	displayStart();
-}
-
-int EditSequenceScreen::setBarNumber(int i, mpc::sequencer::Sequence* sequence, int position)
-{
-	if (i < 0)
-	{
-		return 0;
-	}
-
-	auto difference = i - getBarNumber(sequence, position);
-	auto den = sequence->getTimeSignature().getDenominator();
-	auto denTicks = (int)(96 * (4.0 / den));
-	
-	if (position + (difference * denTicks * 4) > sequence->getLastTick())
-	{
-		position = sequence->getLastTick();
-	}
-	else {
-		position = position + (difference * denTicks * 4);
-	}
-	return position;
-}
-
-int EditSequenceScreen::setBeatNumber(int i, mpc::sequencer::Sequence* s, int position)
-{
-	if (i < 0)
-	{
-		i = 0;
-	}
-	auto difference = i - getBeatNumber(s, position);
-	auto ts = s->getTimeSignature();
-	auto num = ts.getNumerator();
-	
-	if (i >= num)
-	{
-		return position;
-	}
-	
-	auto den = ts.getDenominator();
-	auto denTicks = (int)(96 * (4.0 / den));
-	
-	if (position + (difference * denTicks) > s->getLastTick())
-	{
-		position = s->getLastTick();
-	}
-	else
-	{
-		position = position + (difference * denTicks);
-	}
-	return position;
-}
-
-int EditSequenceScreen::setClockNumber(int i, mpc::sequencer::Sequence* s, int position)
-{
-	if (i < 0)
-	{
-		i = 0;
-	}
-
-	auto difference = i - getClockNumber(s, position);
-	auto den = s->getTimeSignature().getDenominator();
-	auto denTicks = (int)(96 * (4.0 / den));
-	
-	if (i > denTicks - 1) {
-		return position;
-	}
-
-	if (position + difference > s->getLastTick())
-	{
-		position = s->getLastTick();
-	}
-	else
-	{
-		position = position + difference;
-	}
-	return position;
-}
-
-int EditSequenceScreen::getBarNumber(mpc::sequencer::Sequence* s, int position)
-{
-	if (position == 0)
-	{
-		return 0;
-	}
-	auto ts = s->getTimeSignature();
-	auto num = ts.getNumerator();
-	auto den = ts.getDenominator();
-	auto denTicks = (int)(96 * (4.0 / den));
-	auto bar = (int)(floor(position / (denTicks * num)));
-	return bar;
-}
-
-int EditSequenceScreen::getBeatNumber(mpc::sequencer::Sequence* s, int position)
-{
-	if (position == 0)
-	{
-		return 0;
-	}
-	auto den = s->getTimeSignature().getDenominator();
-	auto denTicks = (int)(96 * (4.0 / den));
-	auto beat = (int)(floor(position / (denTicks)));
-	beat = beat % den;
-	return beat;
-}
-
-int EditSequenceScreen::getClockNumber(mpc::sequencer::Sequence* s, int position)
-{
-	auto den = s->getTimeSignature().getDenominator();
-	auto denTicks = (int)(96 * (4.0 / den));
-	if (position == 0)
-	{
-		return 0;
-	}
-	auto clock = (int)(position % (denTicks));
-	return clock;
 }
 
 void EditSequenceScreen::displayTr1()

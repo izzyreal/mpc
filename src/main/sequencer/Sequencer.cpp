@@ -11,7 +11,6 @@
 #include <ui/Uis.hpp>
 #include <ui/sequencer/window/SequencerWindowGui.hpp>
 #include <ui/vmpc/DirectToDiskRecorderGui.hpp>
-#include <ui/sequencer/SongGui.hpp>
 #include <ui/UserDefaults.hpp>
 
 #include <lcdgui/LayeredScreen.hpp>
@@ -34,10 +33,12 @@
 #include <lang/StrUtil.hpp>
 
 #include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/SongScreen.hpp>
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <lcdgui/screens/window/CountMetronomeScreen.hpp>
 
 using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 
 using namespace mpc::sequencer;
@@ -380,9 +381,10 @@ void Sequencer::play(bool fromStart)
 
     endOfSong = false;
     repeats = 0;
-	auto songGui = Mpc::instance().getUis().lock()->getSongGui();
-	auto currentSong = songs[songGui->getSelectedSongIndex()];
-    Step* currentStep = nullptr;
+	auto songScreen = dynamic_pointer_cast<SongScreen>(Screens::getScreenComponent("song"));
+	auto currentSong = songs[songScreen->getSelectedSongIndex()];
+    
+	Step* currentStep = nullptr;
 	if (songMode)
 	{
 		if (!currentSong->isUsed())
@@ -392,15 +394,15 @@ void Sequencer::play(bool fromStart)
 
 		if (fromStart)
 		{
-			songGui->setOffset(-1);
+			songScreen->setOffset(-1);
 		}
 		
-		if (songGui->getOffset() + 1 > currentSong->getStepAmount() - 1)
+		if (songScreen->getOffset() + 1 > currentSong->getStepAmount() - 1)
 		{
 			return;
 		}
 		
-		int step = songGui->getOffset() + 1;
+		int step = songScreen->getOffset() + 1;
 		
 		if (step > currentSong->getStepAmount())
 		{
@@ -645,17 +647,20 @@ void Sequencer::stop(int tick)
     
 	notifyTimeDisplay();
 	
-	auto songGui = Mpc::instance().getUis().lock()->getSongGui();
-    if (endOfSong) {
-		auto songGui = Mpc::instance().getUis().lock()->getSongGui();
-		songGui->setOffset(songGui->getOffset() + 1);
+	auto songScreen = dynamic_pointer_cast<SongScreen>(Screens::getScreenComponent("song"));
+
+    if (endOfSong)
+	{
+		songScreen->setOffset(songScreen->getOffset() + 1);
     }
 	
-	if (bouncing) {
+	if (bouncing)
+	{
 		ams->stopBouncing();
 	}
 	
 	auto hw = Mpc::instance().getHardware().lock();
+
 	hw->getLed("overdub").lock()->light(false);
 	hw->getLed("play").lock()->light(false);
 	hw->getLed("rec").lock()->light(false);
@@ -1015,8 +1020,9 @@ int Sequencer::getLoopEnd()
 
 weak_ptr<Sequence> Sequencer::getActiveSequence()
 {
-	auto songGui = Mpc::instance().getUis().lock()->getSongGui();
-	if (songMode && songs[songGui->getSelectedSongIndex()]->getStepAmount() != 0) {
+	auto songScreen = dynamic_pointer_cast<SongScreen>(Screens::getScreenComponent("song"));
+	if (songMode && songs[songScreen->getSelectedSongIndex()]->getStepAmount() != 0)
+	{
 		return sequences[getSongSequenceIndex() >= 0 ? getSongSequenceIndex() : activeSequenceIndex];
 	}
 	return sequences[activeSequenceIndex];
@@ -1302,8 +1308,8 @@ void Sequencer::setSelectedTrackIndex(int i)
 
 int Sequencer::getCurrentlyPlayingSequenceIndex()
 {
-	auto songGui = Mpc::instance().getUis().lock()->getSongGui();
-	auto songSeqIndex = songMode ? songs[songGui->getSelectedSongIndex()]->getStep(songGui->getOffset() + 1)->getSequence() : -1;
+	auto songScreen = dynamic_pointer_cast<SongScreen>(Screens::getScreenComponent("song"));
+	auto songSeqIndex = songMode ? songs[songScreen->getSelectedSongIndex()]->getStep(songScreen->getOffset() + 1)->getSequence() : -1;
 	return songMode ? songSeqIndex : currentlyPlayingSequenceIndex;
 }
 
@@ -1320,8 +1326,10 @@ int Sequencer::getNextSq()
 int Sequencer::getFirstUsedSeqDown(int from)
 {
 	auto result = -1;
-	for (int i = from; i >= 0; i--) {
-		if (sequences[i]->isUsed()) {
+	for (int i = from; i >= 0; i--)
+	{
+		if (sequences[i]->isUsed())
+		{
 			result = i;
 			break;
 		}
@@ -1332,8 +1340,11 @@ int Sequencer::getFirstUsedSeqDown(int from)
 int Sequencer::getFirstUsedSeqUp(int from)
 {
 	auto result = -1;
-	for (int i = from; i < 99; i++) {
-		if (sequences[i]->isUsed()) {
+
+	for (int i = from; i < 99; i++)
+	{
+		if (sequences[i]->isUsed())
+		{
 			result = i;
 			break;
 		}
@@ -1341,13 +1352,15 @@ int Sequencer::getFirstUsedSeqUp(int from)
 	return result;
 }
 
-void Sequencer::resetNextSq() {
+void Sequencer::resetNextSq()
+{
 	nextsq = -1;
 }
 
 void Sequencer::setNextSq(int i)
 {
-	if (!isPlaying()) {
+	if (!isPlaying())
+	{
 		return;
 	}
 
@@ -1355,7 +1368,8 @@ void Sequencer::setNextSq(int i)
 	
 	auto up = i > nextsq;
 	
-	if (firstNotification) {
+	if (firstNotification)
+	{
 		up = i > currentlyPlayingSequenceIndex;
 	}
 
@@ -1368,32 +1382,37 @@ void Sequencer::setNextSq(int i)
 	nextsq = candidate;
 	setChanged();
 
-	if (firstNotification) {
+	if (firstNotification)
+	{
 		notifyObservers(string("nextsq"));
 	}
-	else {
+	else
+	{
 		notifyObservers(string("nextsqvalue"));
 	}
 }
 
 void Sequencer::setNextSqPad(int i)
 {
-	if (!isPlaying()) {
+	if (!isPlaying())
+	{
 		return;
 	}
 
-	if (!sequences[i]->isUsed()) {
+	if (!sequences[i]->isUsed())
+	{
 		nextsq = -1;
 		setChanged();
 		notifyObservers(string("nextsqoff"));
 		return;
 	}
 
-	auto firstnotify = nextsq == -1;
+	auto firstNotification = nextsq == -1;
 	
 	nextsq = i;
 	
-	if (firstnotify) {
+	if (firstNotification)
+	{
 		setChanged();
 		notifyObservers(string("nextsq"));
 	}
@@ -1420,10 +1439,12 @@ void Sequencer::setSongModeEnabled(bool b)
 
 int Sequencer::getSongSequenceIndex()
 {
-	auto songGui = Mpc::instance().getUis().lock()->getSongGui();
-	auto song = songs[songGui->getSelectedSongIndex()];
-	auto step = songGui->getOffset() + 1;
-	if (step > song->getStepAmount() - 1) {
+	auto songScreen = dynamic_pointer_cast<SongScreen>(Screens::getScreenComponent("song"));
+	auto song = songs[songScreen->getSelectedSongIndex()];
+	auto step = songScreen->getOffset() + 1;
+
+	if (step > song->getStepAmount() - 1)
+	{
 		step = song->getStepAmount() - 1;
 	}
 	return song->getStep(step)->getSequence();

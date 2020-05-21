@@ -353,3 +353,23 @@ void SongScreen::update(moduru::observer::Observable* observable, nonstd::any me
 		findField("reps1").lock()->stopBlinking();
 	}
 }
+
+string SongScreen::getDefaultSongName()
+{
+	return defaultSongName;
+}
+
+int SongScreen::getOffset()
+{
+	return offset;
+}
+
+int SongScreen::getSelectedSongIndex()
+{
+	return selectedSongIndex;
+}
+
+bool SongScreen::isLoopEnabled()
+{
+	return loop;
+}

@@ -1,12 +1,15 @@
 #include "PasteEventScreen.hpp"
 
-#include <lcdgui/LayeredScreen.hpp>
-#include <ui/sequencer/StepEditorGui.hpp>
 #include <sequencer/Event.hpp>
 #include <sequencer/Track.hpp>
 #include <sequencer/Sequencer.hpp>
 
+#include <lcdgui/screens/StepEditorScreen.hpp>
+#include <lcdgui/Screens.hpp>
+
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui;
 using namespace std;
 
 PasteEventScreen::PasteEventScreen(const int& layer)
@@ -17,12 +20,13 @@ PasteEventScreen::PasteEventScreen(const int& layer)
 void PasteEventScreen::function(int i)
 {
 	BaseControls::function(i);
-	auto seGui = mpc.getUis().lock()->getStepEditorGui();
 	
 	switch (i)
 	{
 	case 4:
-		for (auto& event : seGui->getPlaceHolder()) {
+		auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(Screens::getScreenComponent("sequencer_step"));
+		for (auto& event : stepEditorScreen->getPlaceHolder())
+		{
 			auto eventClone = track.lock()->cloneEvent(event).lock();
 			eventClone->setTick(sequencer.lock()->getTickPosition());
 		}

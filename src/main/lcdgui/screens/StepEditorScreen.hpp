@@ -64,8 +64,6 @@ namespace mpc::lcdgui::screens
 		int tcValueRecordedNotes = 100;
 		int yOffset = 0;
 		int selectedEventNumber = 0;
-		int insertEventType = 0;
-		int editTypeNumber = 0;
 		int changeNoteToNumber = 35;
 		int changeVariationTypeNumber = 0;
 		int changeVariationValue = 0;
@@ -77,29 +75,19 @@ namespace mpc::lcdgui::screens
 		bool durationTcPercentageEnabled = false;
 
 	private:
-		void setInsertEventType(int i);
 		void setViewModeNumber(int i);
 		void setNoteA(int i);
 		void setNoteB(int i);
 		void setControlNumber(int i);
-		void setDurationOfRecordedNotes(bool b);
-		void setTcValueRecordedNotes(int i);
 		void setyOffset(int i);
 		void setSelectedEventNumber(int i);
 		void setFromNotePad(int i);
 		void setSelectionStartIndex(int i);
-		void setSelectionEndIndex(int i);
 		void setSelectedEvents();
-		void setEditTypeNumber(int se_editTypeNumber);
 		void setSelectedEvent(std::weak_ptr<mpc::sequencer::Event> event);
 		void setSelectedParameterLetter(std::string str);
-		void setChangeNoteToNumber(int i);
-		void setChangeVariationTypeNumber(int i);
-		void setChangeVariationValue(int i);
-		void setEditValue(int i);
 
 		void checkSelection();
-		void clearSelection();
 		
 		void removeEvents();
 
@@ -108,7 +96,29 @@ namespace mpc::lcdgui::screens
 
 	public:
 		void setAutoStepIncrementEnabled(bool b);
+		void setChangeNoteToNumber(int i);
+		void setChangeVariationTypeNumber(int i);
+		void setChangeVariationValue(int i);
+		void setEditValue(int i);
+		void setSelectionEndIndex(int i);
+		void setDurationOfRecordedNotes(bool b);
+		void setTcValueRecordedNotes(int i);
+
+		bool isAutoStepIncrementEnabled();
+		bool isDurationTcPercentageEnabled();
+		int getTcValueRecordedNotes();
+
 		std::vector<std::weak_ptr<mpc::sequencer::Event>>& getVisibleEvents();
+		std::vector<std::weak_ptr<mpc::sequencer::Event>>& getSelectedEvents();
+		std::weak_ptr<mpc::sequencer::Event> getSelectedEvent();
+		std::string getSelectedParameterLetter();
+		int getChangeVariationTypeNumber();
+		int getChangeVariationValue();
+		void clearSelection();
+		int getChangeNoteToNumber();
+		int getEditValue();
+		int getYOffset();
+		std::vector<std::weak_ptr<mpc::sequencer::Event>>& getPlaceHolder();
 
 	};
 }

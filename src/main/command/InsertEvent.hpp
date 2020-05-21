@@ -1,32 +1,23 @@
 #pragma once
 
-namespace mpc {
+namespace mpc::sequencer {
+	class Track;
+	class Sequencer;
+}
 
-	namespace sequencer {
-		class Track;
-		class Sequencer;
-	}
+namespace mpc::command {
 
-	namespace ui {
-		namespace sequencer {
-			class StepEditorGui;
-		}
-	}
+	class InsertEvent
+	{
 
-	namespace command {
+	private:
+		mpc::sequencer::Track* track = nullptr;
+		mpc::sequencer::Sequencer* sequencer = nullptr;
+		int insertEventType = 0;
 
-		class InsertEvent
-		{
+	public:
+		virtual void execute();
 
-		private:
-			mpc::ui::sequencer::StepEditorGui* seGui{};
-			mpc::sequencer::Track* track{};
-			mpc::sequencer::Sequencer* sequencer{};
-
-		public:
-			virtual void execute();
-
-			InsertEvent(mpc::ui::sequencer::StepEditorGui* seGui, mpc::sequencer::Track* track, mpc::sequencer::Sequencer* sequencer);
-		};
-	}
+		InsertEvent(int insertEventType, mpc::sequencer::Track* track, mpc::sequencer::Sequencer* sequencer);
+	};
 }

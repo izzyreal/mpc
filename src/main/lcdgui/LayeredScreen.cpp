@@ -31,8 +31,6 @@
 
 #include <ui/Uis.hpp>
 
-#include <ui/sequencer/window/StepWindowObserver.hpp>
-
 #include <ui/sampler/DrumObserver.hpp>
 #include <ui/sampler/LoopObserver.hpp>
 #include <ui/sampler/MixerObserver.hpp>
@@ -847,10 +845,6 @@ void LayeredScreen::initObserver()
 	else if (csn.compare("programassign") == 0)
 	{
 		activeObserver = make_unique<PgmAssignObserver>();
-	}
-	else if (csn.compare("step_tc") == 0 || csn.compare("editmultiple") == 0 || csn.compare("insertevent") == 0)
-	{
-		activeObserver = make_unique<StepWindowObserver>();
 	}
 	else if (csn.compare("mixerv2") == 0 || csn.compare("mixersetup") == 0)
 	{

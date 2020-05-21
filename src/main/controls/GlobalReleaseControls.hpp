@@ -72,7 +72,6 @@ namespace mpc {
 
 		public:
 			GlobalReleaseControls();
-			virtual ~GlobalReleaseControls();
 
 		};
 

@@ -2,15 +2,19 @@
 
 #include <Mpc.hpp>
 #include <Util.hpp>
+
 #include <lcdgui/Background.hpp>
 #include <lcdgui/Field.hpp>
 #include <lcdgui/Label.hpp>
 #include <lcdgui/FunctionKeys.hpp>
+
 #include <ui/misc/PunchGui.hpp>
-#include <ui/sequencer/EditSequenceGui.hpp>
+
 #include <sequencer/Sequence.hpp>
 #include <sequencer/Sequencer.hpp>
+#include <sequencer/SeqUtil.hpp>
 
+using namespace mpc::sequencer;
 using namespace mpc::ui::misc;
 using namespace std;
 
@@ -55,19 +59,23 @@ void PunchObserver::displayAutoPunch()
 void PunchObserver::displayTime()
 {
 	auto ls = Mpc::instance().getLayeredScreen().lock();
-	for (int i = 0; i < 3; i++) {
+	
+	for (int i = 0; i < 3; i++)
+	{
 		ls->lookupField("time" + to_string(i)).lock()->Hide(punchGui->getAutoPunch() == 1);
 		ls->lookupLabel("time" + to_string(i)).lock()->Hide(punchGui->getAutoPunch() == 1);
 		ls->lookupField("time" + to_string(i + 3)).lock()->Hide(punchGui->getAutoPunch() == 0);
 		ls->lookupLabel("time" + to_string(i + 3)).lock()->Hide(punchGui->getAutoPunch() == 0);
 	}
+
 	ls->lookupLabel("time3").lock()->Hide(punchGui->getAutoPunch() != 2);
-    time0Field.lock()->setTextPadded(mpc::ui::sequencer::EditSequenceGui::getBarNumber(sequence, punchGui->getTime0()) + 1, "0");
-    time1Field.lock()->setTextPadded(mpc::ui::sequencer::EditSequenceGui::getBeatNumber(sequence, punchGui->getTime0()) + 1, "0");
-    time2Field.lock()->setTextPadded(mpc::ui::sequencer::EditSequenceGui::getClockNumber(sequence, punchGui->getTime0()), "0");
-    time3Field.lock()->setTextPadded(mpc::ui::sequencer::EditSequenceGui::getBarNumber(sequence, punchGui->getTime1()) + 1, "0");
-    time4Field.lock()->setTextPadded(mpc::ui::sequencer::EditSequenceGui::getBeatNumber(sequence, punchGui->getTime1()) + 1, "0");
-    time5Field.lock()->setTextPadded(mpc::ui::sequencer::EditSequenceGui::getClockNumber(sequence, punchGui->getTime1()), "0");
+
+    time0Field.lock()->setTextPadded(SeqUtil::getBar(sequence, punchGui->getTime0()) + 1, "0");
+    time1Field.lock()->setTextPadded(SeqUtil::getBeat(sequence, punchGui->getTime0()) + 1, "0");
+    time2Field.lock()->setTextPadded(SeqUtil::getClock(sequence, punchGui->getTime0()), "0");
+    time3Field.lock()->setTextPadded(SeqUtil::getBar(sequence, punchGui->getTime1()) + 1, "0");
+    time4Field.lock()->setTextPadded(SeqUtil::getBeat(sequence, punchGui->getTime1()) + 1, "0");
+    time5Field.lock()->setTextPadded(SeqUtil::getClock(sequence, punchGui->getTime1()), "0");
 }
 
 void PunchObserver::displayBackground()

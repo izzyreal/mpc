@@ -2,14 +2,18 @@
 
 #include <Mpc.hpp>
 #include <Util.hpp>
+
 #include <lcdgui/Field.hpp>
 #include <lcdgui/Label.hpp>
-#include <ui/sequencer/EditSequenceGui.hpp>
+
 #include <ui/vmpc/DirectToDiskRecorderGui.hpp>
+
+#include <sequencer/SeqUtil.hpp>
 #include <sequencer/Sequence.hpp>
 #include <sequencer/Sequencer.hpp>
 #include <sequencer/Song.hpp>
 
+using namespace mpc::sequencer;
 using namespace mpc::ui::vmpc;
 using namespace std;
 
@@ -58,7 +62,11 @@ void DirectToDiskRecorderObserver::displaySong()
 	auto ls = Mpc::instance().getLayeredScreen().lock();
 	songField.lock()->Hide(d2dRecorderGui->getRecord() != 3);
 	ls->lookupLabel("song").lock()->Hide(d2dRecorderGui->getRecord() != 3);
-	if (d2dRecorderGui->getRecord() != 3) return;
+	
+	if (d2dRecorderGui->getRecord() != 3)
+	{
+		return;
+	}
 
 	auto song = d2dRecorderGui->getSong();
 	songField.lock()->setText(moduru::lang::StrUtil::padLeft(to_string(song + 1), "0", 2) + "-" + Mpc::instance().getSequencer().lock()->getSong(song).lock()->getName());
@@ -100,16 +108,20 @@ void DirectToDiskRecorderObserver::displayTime()
 		ls->lookupField("time" + to_string(i)).lock()->Hide(d2dRecorderGui->getRecord() != 2);
 		ls->lookupLabel("time" + to_string(i)).lock()->Hide(d2dRecorderGui->getRecord() != 2);
 	}
-	if (d2dRecorderGui->getRecord() != 2) {
+	
+	if (d2dRecorderGui->getRecord() != 2)
+	{
 		return;
 	}
+	
 	auto sequence = Mpc::instance().getSequencer().lock()->getSequence(d2dRecorderGui->getSq()).lock();
-	time0Field.lock()->setTextPadded(mpc::ui::sequencer::EditSequenceGui::getBarNumber(sequence.get(), d2dRecorderGui->getTime0() + 1), "0");
-	time1Field.lock()->setTextPadded(mpc::ui::sequencer::EditSequenceGui::getBeatNumber(sequence.get(), d2dRecorderGui->getTime0() + 1), "0");
-	time2Field.lock()->setTextPadded(mpc::ui::sequencer::EditSequenceGui::getClockNumber(sequence.get(), d2dRecorderGui->getTime0()), "0");
-	time3Field.lock()->setTextPadded(mpc::ui::sequencer::EditSequenceGui::getBarNumber(sequence.get(), d2dRecorderGui->getTime1() + 1), "0");
-	time4Field.lock()->setTextPadded(mpc::ui::sequencer::EditSequenceGui::getBeatNumber(sequence.get(), d2dRecorderGui->getTime1() + 1), "0");
-	time5Field.lock()->setTextPadded(mpc::ui::sequencer::EditSequenceGui::getClockNumber(sequence.get(), d2dRecorderGui->getTime1()), "0");
+
+	time0Field.lock()->setTextPadded(SeqUtil::getBar(sequence.get(), d2dRecorderGui->getTime0() + 1), "0");
+	time1Field.lock()->setTextPadded(SeqUtil::getBeat(sequence.get(), d2dRecorderGui->getTime0() + 1), "0");
+	time2Field.lock()->setTextPadded(SeqUtil::getClock(sequence.get(), d2dRecorderGui->getTime0()), "0");
+	time3Field.lock()->setTextPadded(SeqUtil::getBar(sequence.get(), d2dRecorderGui->getTime1() + 1), "0");
+	time4Field.lock()->setTextPadded(SeqUtil::getBeat(sequence.get(), d2dRecorderGui->getTime1() + 1), "0");
+	time5Field.lock()->setTextPadded(SeqUtil::getClock(sequence.get(), d2dRecorderGui->getTime1()), "0");
 }
 
 void DirectToDiskRecorderObserver::update(moduru::observer::Observable* o, nonstd::any a)

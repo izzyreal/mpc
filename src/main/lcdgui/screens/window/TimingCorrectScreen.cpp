@@ -169,10 +169,10 @@ void TimingCorrectScreen::displayTime()
 	auto s = sequencer.lock()->getActiveSequence().lock().get();
 	findField("time0").lock()->setTextPadded(SeqUtil::getBarFromTick(s, time0) + 1, "0");
 	findField("time1").lock()->setTextPadded(SeqUtil::getBeat(s, time0) + 1, "0");
-	findField("time2").lock()->setTextPadded(SeqUtil::getClockNumber(s, time0), "0");
+	findField("time2").lock()->setTextPadded(SeqUtil::getClock(s, time0), "0");
 	findField("time3").lock()->setTextPadded(SeqUtil::getBarFromTick(s, time1) + 1, "0");
 	findField("time4").lock()->setTextPadded(SeqUtil::getBeat(s, time1) + 1, "0");
-	findField("time5").lock()->setTextPadded(SeqUtil::getClockNumber(s, time1), "0");
+	findField("time5").lock()->setTextPadded(SeqUtil::getClock(s, time1), "0");
 }
 
 void TimingCorrectScreen::setAmount(int i)

@@ -13,13 +13,14 @@
 
 #include <sequencer/SeqUtil.hpp>
 
-#include <ui/sequencer/SongGui.hpp>
 #include <ui/sequencer/window/SequencerWindowGui.hpp>
 
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
+#include <lcdgui/screens/SongScreen.hpp>
 #include <lcdgui/Screens.hpp>
 
 using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 using namespace std;
@@ -55,7 +56,7 @@ void FrameSeq::work(int nFrames) {
 	
 	auto controls = mpc.getControls().lock();
 	auto swGui = mpc.getUis().lock()->getSequencerWindowGui();
-	auto songGui = mpc.getUis().lock()->getSongGui();
+	auto songScreen = dynamic_pointer_cast<SongScreen>(Screens::getScreenComponent("song"));
 	auto lSequencer = sequencer.lock();
 	
 
@@ -143,11 +144,11 @@ void FrameSeq::work(int nFrames) {
 					if (getTickPosition() >= seq->getLastTick() - 1)
 					{
 						Sequencer::repeats++;
-						auto song = lSequencer->getSong(songGui->getSelectedSongIndex()).lock();
-						auto step = songGui->getOffset() + 1;
+						auto song = lSequencer->getSong(songScreen->getSelectedSongIndex()).lock();
+						auto step = songScreen->getOffset() + 1;
 						if (step == song->getStepAmount() - 1 && Sequencer::repeats == song->getStep(step)->getRepeats())
 						{
-							if (!songGui->isLoopEnabled())
+							if (!songScreen->isLoopEnabled())
 							{
 								lSequencer->playToTick(seq->getLastTick() - 1);
 								Sequencer::endOfSong = true;
@@ -158,7 +159,7 @@ void FrameSeq::work(int nFrames) {
 							else
 							{
 								lSequencer->playToTick(seq->getLastTick() - 1);
-								songGui->setOffset(-1);
+								songScreen->setOffset(-1);
 								move(0);
 								continue;
 							}
@@ -170,7 +171,7 @@ void FrameSeq::work(int nFrames) {
 							if (Sequencer::repeats == song->getStep(step)->getRepeats())
 							{
 								Sequencer::repeats = 0;
-								songGui->setOffset(songGui->getOffset() + 1);
+								songScreen->setOffset(songScreen->getOffset() + 1);
 							}
 							
 							move(0);

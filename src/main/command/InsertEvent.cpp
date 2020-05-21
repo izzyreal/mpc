@@ -1,6 +1,5 @@
 #include <command/InsertEvent.hpp>
 
-#include <ui/sequencer/StepEditorGui.hpp>
 #include <sequencer/ChannelPressureEvent.hpp>
 #include <sequencer/ControlChangeEvent.hpp>
 #include <sequencer/Event.hpp>
@@ -17,62 +16,70 @@ using namespace mpc::command;
 using namespace mpc::sequencer;
 using namespace std;
 
-InsertEvent::InsertEvent(mpc::ui::sequencer::StepEditorGui* seGui, mpc::sequencer::Track* track, mpc::sequencer::Sequencer* sequencer) 
+InsertEvent::InsertEvent(int insertEventType, mpc::sequencer::Track* track, mpc::sequencer::Sequencer* sequencer) 
 {
-	this->seGui = seGui;
+	this->insertEventType = insertEventType;
 	this->track = track;
 	this->sequencer = sequencer;
 }
 
 void InsertEvent::execute()
 {
-	weak_ptr<mpc::sequencer::Event> event;
-	if (seGui->getInsertEventType() == 0) {
-		event = track->addEvent(sequencer->getTickPosition(), "note");
-		auto lEvent = dynamic_pointer_cast<NoteEvent>(event.lock());
-		lEvent->setDuration(24);
-		lEvent->setNote(60);
-		lEvent->setVelocity(127);
-		lEvent->setVariationTypeNumber(0);
-		lEvent->setVariationValue(64);
+	shared_ptr<mpc::sequencer::Event> event;
+	if (insertEventType == 0)
+	{
+		event = track->addEvent(sequencer->getTickPosition(), "note").lock();
+		auto noteEvent = dynamic_pointer_cast<NoteEvent>(event);
+		noteEvent->setDuration(24);
+		noteEvent->setNote(60);
+		noteEvent->setVelocity(127);
+		noteEvent->setVariationTypeNumber(0);
+		noteEvent->setVariationValue(64);
 	}
-	else if (seGui->getInsertEventType() == 1) {
-		event = track->addEvent(sequencer->getTickPosition(), "pitchbend");
-		auto lEvent = dynamic_pointer_cast<PitchBendEvent>(event.lock());
-		lEvent->setAmount(0);
+	else if (insertEventType == 1)
+	{
+		event = track->addEvent(sequencer->getTickPosition(), "pitchbend").lock();
+		auto pitchBendEvent = dynamic_pointer_cast<PitchBendEvent>(event);
+		pitchBendEvent->setAmount(0);
 	}
-	else if (seGui->getInsertEventType() == 2) {
-		event = track->addEvent(sequencer->getTickPosition(), "controlchange");
-		auto lEvent = dynamic_pointer_cast<ControlChangeEvent>(event.lock());
-		lEvent->setController(0);
-		lEvent->setAmount(0);
+	else if (insertEventType == 2)
+	{
+		event = track->addEvent(sequencer->getTickPosition(), "controlchange").lock();
+		auto controlChangeEvent = dynamic_pointer_cast<ControlChangeEvent>(event);
+		controlChangeEvent->setController(0);
+		controlChangeEvent->setAmount(0);
 	}
-	else if (seGui->getInsertEventType() == 3) {
-		event = track->addEvent(sequencer->getTickPosition(), "programchange");
-		auto lEvent = dynamic_pointer_cast<ProgramChangeEvent>(event.lock());
-		lEvent->setProgram(1);
+	else if (insertEventType == 3)
+	{
+		event = track->addEvent(sequencer->getTickPosition(), "programchange").lock();
+		auto programChangeEvent = dynamic_pointer_cast<ProgramChangeEvent>(event);
+		programChangeEvent->setProgram(1);
 	}
-	else if (seGui->getInsertEventType() == 4) {
-		event = track->addEvent(sequencer->getTickPosition(), "channelpressure");
-		auto lEvent = dynamic_pointer_cast<ChannelPressureEvent>(event.lock());
-		lEvent->setAmount(0);
+	else if (insertEventType == 4)
+	{
+		event = track->addEvent(sequencer->getTickPosition(), "channelpressure").lock();
+		auto channelPressureEvent = dynamic_pointer_cast<ChannelPressureEvent>(event);
+		channelPressureEvent->setAmount(0);
 	}
-	else if (seGui->getInsertEventType() == 5) {
-		event = track->addEvent(sequencer->getTickPosition(), "polypressure");
-		auto lEvent = dynamic_pointer_cast<PolyPressureEvent>(event.lock());
-		lEvent->setNote(60);
-		lEvent->setAmount(0);
+	else if (insertEventType == 5)
+	{
+		event = track->addEvent(sequencer->getTickPosition(), "polypressure").lock();
+		auto polyPressureEvent = dynamic_pointer_cast<PolyPressureEvent>(event);
+		polyPressureEvent->setNote(60);
+		polyPressureEvent->setAmount(0);
 	}
-	else if (seGui->getInsertEventType() == 6) {
-		event = track->addEvent(sequencer->getTickPosition(), "systemexclusive");
-		auto lEvent = dynamic_pointer_cast<SystemExclusiveEvent>(event.lock());
-		lEvent->setByteB(247);
+	else if (insertEventType == 6)
+	{
+		event = track->addEvent(sequencer->getTickPosition(), "systemexclusive").lock();
+		auto systemExclusiveEvent = dynamic_pointer_cast<SystemExclusiveEvent>(event);
+		systemExclusiveEvent->setByteB(247);
 	}
-	else if (seGui->getInsertEventType() == 7) {
-		event = track->addEvent(sequencer->getTickPosition(), "mixer");
-		auto lEvent = dynamic_pointer_cast<MixerEvent>(event.lock());
-		lEvent->setPadNumber(0);
-		lEvent->setParameter(0);
-		lEvent->setValue(0);
+	else if (insertEventType == 7)
+	{
+		event = track->addEvent(sequencer->getTickPosition(), "mixer").lock();
+		auto mixerEvent = dynamic_pointer_cast<MixerEvent>(event);
+		mixerEvent->setPadNumber(0);
+		mixerEvent->setParameter(0);
+		mixerEvent->setValue(0);
 	}
 }

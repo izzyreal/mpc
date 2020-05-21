@@ -16,8 +16,7 @@
 
 #include <ui/UserDefaults.hpp>
 #include <ui/midisync/MidiSyncGui.hpp>
-#include <ui/sequencer/SongGui.hpp>
-#include <ui/sequencer/StepEditorGui.hpp>
+
 #include <ui/sequencer/window/SequencerWindowGui.hpp>
 
 #include <sequencer/Event.hpp>
@@ -34,10 +33,13 @@
 #include <lcdgui/screens/window/MultiRecordingSetupScreen.hpp>
 #include <lcdgui/screens/window/MidiInputScreen.hpp>
 #include <lcdgui/screens/window/MultiRecordingSetupLine.hpp>
+#include <lcdgui/screens/StepEditorScreen.hpp>
+#include <lcdgui/screens/SongScreen.hpp>
 
 #include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
 
 using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::disk;
@@ -147,13 +149,12 @@ AllLoader::AllLoader(mpc::disk::MpcFile* file, bool sequencesOnly)
 		midiInputScreen->setPolyPressurePassEnabled(midiInput->isPolyPressurePassEnabled());
 		
 		auto midiSyncMisc = allParser.getMidiSync();
-		
-		auto seGui = Mpc::instance().getUis().lock()->getStepEditorGui();
-		
+				
 		auto misc = allParser.getMisc();
-		seGui->setAutoStepIncrementEnabled(misc->isAutoStepIncEnabled());
-		seGui->setTcValueRecordedNotes(misc->getDurationTcPercentage());
-		seGui->setDurationOfRecordedNotes(misc->isDurationOfRecNotesTc());
+		auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(Screens::getScreenComponent("sequencer_step"));
+		stepEditorScreen->setAutoStepIncrementEnabled(misc->isAutoStepIncEnabled());
+		stepEditorScreen->setTcValueRecordedNotes(misc->getDurationTcPercentage());
+		stepEditorScreen->setDurationOfRecordedNotes(misc->isDurationOfRecNotesTc());
 		swGui->setTapAvg(misc->getTapAvg());
 
 		auto msGui = Mpc::instance().getUis().lock()->getMidiSyncGui();
@@ -169,7 +170,8 @@ AllLoader::AllLoader(mpc::disk::MpcFile* file, bool sequencesOnly)
 		lSequencer->setSecondSequenceEnabled(sequencer->secondSeqEnabled);
 		lSequencer->setSecondSequenceIndex(sequencer->secondSeqIndex);
 		
-		Mpc::instance().getUis().lock()->getSongGui()->setDefaultSongName(midiSyncMisc->getDefSongName());
+		auto songScreen = dynamic_pointer_cast<SongScreen>(Screens::getScreenComponent("song"));
+		songScreen->setDefaultSongName(midiSyncMisc->getDefSongName());
 				
 		auto songs = allParser.getSongs();
 		

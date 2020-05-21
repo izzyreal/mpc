@@ -6,17 +6,6 @@
 
 #include <controls/GlobalReleaseControls.hpp>
 
-#include <controls/sequencer/AssignControls.hpp>
-#include <controls/sequencer/BarCopyControls.hpp>
-#include <controls/sequencer/EditSequenceControls.hpp>
-#include <controls/sequencer/NextSeqControls.hpp>
-#include <controls/sequencer/NextSeqPadControls.hpp>
-#include <controls/sequencer/SongControls.hpp>
-#include <controls/sequencer/StepEditorControls.hpp>
-#include <controls/sequencer/TrMoveControls.hpp>
-#include <controls/sequencer/TrMuteControls.hpp>
-#include <controls/sequencer/UserControls.hpp>
-
 #include <controls/sampler/DrumControls.hpp>
 #include <controls/sampler/InitPadAssignControls.hpp>
 #include <controls/sampler/LoopControls.hpp>
@@ -111,23 +100,6 @@ Controls::Controls()
 	pressedPadVelos = std::vector<int>(16);
 
 	controls["release"] = new GlobalReleaseControls();
-
-	controls["barcopy"] = new sequencer::BarCopyControls();
-	controls["edit"] = new sequencer::EditSequenceControls();
-	controls["nextseq"] = new sequencer::NextSeqControls();
-	controls["nextseqpad"] = new sequencer::NextSeqPadControls();
-	controls["song"] = new sequencer::SongControls();
-	controls["trmove"] = new sequencer::TrMoveControls();
-	controls["trackmute"] = new sequencer::TrMuteControls();
-	controls["user"] = new sequencer::UserControls();
-	controls["assign"] = new sequencer::AssignControls();
-	controls["trmove"] = new sequencer::TrMoveControls();
-	controls["trackmute"] = new sequencer::TrMuteControls();
-	controls["user"] = new sequencer::UserControls();
-	controls["assign"] = new sequencer::AssignControls();
-
-	controls["sequencer_step"] = new sequencer::StepEditorControls();
-	controls["step_tc"] = new sequencer::StepEditorControls();
 
 	controls["trim"] = new sampler::TrimControls();
 	controls["loop"] = new sampler::LoopControls();

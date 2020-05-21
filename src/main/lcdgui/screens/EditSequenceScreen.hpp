@@ -68,12 +68,6 @@ namespace mpc::lcdgui::screens
 		void setDuration(int i);
 		void setVelocityValue(int i);
 		void setStart(int startTicks);
-		int setBarNumber(int i, mpc::sequencer::Sequence* s, int position);
-		int setBeatNumber(int i, mpc::sequencer::Sequence* s, int position);
-		int setClockNumber(int i, mpc::sequencer::Sequence* s, int position);
-		int getBarNumber(mpc::sequencer::Sequence* s, int position);
-		int getBeatNumber(mpc::sequencer::Sequence* s, int position);
-		int getClockNumber(mpc::sequencer::Sequence* s, int position);
 
 	};
 }

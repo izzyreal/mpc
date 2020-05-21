@@ -28,30 +28,37 @@ void WithTimesAndNotes::checkAllTimesAndNotes(int notch, Sequence* seq)
 	auto param = mpc.getLayeredScreen().lock()->getFocus();
 	auto gui = mpc.getUis().lock()->getSequencerWindowGui();
 
-	if (param.compare("time0") == 0) {
+	if (param.compare("time0") == 0)
+	{
 		setTime0(SeqUtil::getTickFromBar((SeqUtil::getBarFromTick(sequence, time0)) + notch, sequence, time0));
 	}
-	else if (param.compare("time1") == 0) {
+	else if (param.compare("time1") == 0)
+	{
 		setTime0(SeqUtil::setBeat((SeqUtil::getBeat(sequence, time0)) + notch, sequence, time0));
 	}
-	else if (param.compare("time2") == 0) {
-		setTime0(SeqUtil::setClockNumber((SeqUtil::getClockNumber(sequence, time0)) + notch, sequence, time0));
+	else if (param.compare("time2") == 0)
+	{
+		setTime0(SeqUtil::setClock((SeqUtil::getClock(sequence, time0)) + notch, sequence, time0));
 	}
-	else if (param.compare("time3") == 0) {
+	else if (param.compare("time3") == 0)
+	{
 		setTime1(SeqUtil::getTickFromBar((SeqUtil::getBarFromTick(sequence, time1)) + notch, sequence, time1));
 	}
-	else if (param.compare("time4") == 0) {
+	else if (param.compare("time4") == 0)
+	{
 		setTime1(SeqUtil::setBeat((SeqUtil::getBeat(sequence, time1)) + notch, sequence, time1));
 	}
-	else if (param.compare("time5") == 0) {
-		setTime1(SeqUtil::setClockNumber((SeqUtil::getClockNumber(sequence, time1)) + notch, sequence, time1));
+	else if (param.compare("time5") == 0)
+	{
+		setTime1(SeqUtil::setClock((SeqUtil::getClock(sequence, time1)) + notch, sequence, time1));
 	}
-	else if (param.compare("notes0") == 0) {
+	else if (param.compare("notes0") == 0)
+	{
 
 		auto track = mpc.getSequencer().lock()->getActiveTrack().lock();
 
-		if (track->getBusNumber() != 0) {
-
+		if (track->getBusNumber() != 0)
+		{
 			auto samplerGui = mpc::Mpc::instance().getUis().lock()->getSamplerGui();
 			auto note = samplerGui->getNote() + notch;
 			auto mpcSoundPlayerChannel = mpc.getSampler().lock()->getDrum(track->getBusNumber() - 1);
@@ -59,11 +66,13 @@ void WithTimesAndNotes::checkAllTimesAndNotes(int notch, Sequence* seq)
 			auto pad = program->getPadNumberFromNote(note);
 			samplerGui->setPadAndNote(pad, samplerGui->getNote());
 		}
-		else {
+		else
+		{
 			setMidiNote0(getMidiNote0() + notch);
 		}
 	}
-	else if (param.compare("notes1") == 0) {
+	else if (param.compare("notes1") == 0)
+	{
 		setMidiNote1(getMidiNote1() + notch);
 	}
 }
