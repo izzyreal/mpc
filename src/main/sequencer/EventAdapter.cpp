@@ -1,7 +1,6 @@
 #include "EventAdapter.hpp"
 
 #include <Mpc.hpp>
-#include <ui/sequencer/window/SequencerWindowGui.hpp>
 #include <sequencer/Event.hpp>
 #include <sequencer/MidiClockEvent.hpp>
 #include <sequencer/NoteEvent.hpp>
@@ -26,7 +25,7 @@ EventAdapter::EventAdapter(weak_ptr<Sequencer> sequencer)
 	noteEvent = make_shared<NoteEvent>(35);
 }
 
-void EventAdapter::process(ctoot::midi::core::MidiMessage* msg, mpc::ui::sequencer::window::SequencerWindowGui* swGui)
+void EventAdapter::process(ctoot::midi::core::MidiMessage* msg)
 {
 	if (dynamic_cast<ctoot::midi::core::ShortMessage*>(msg) != nullptr) {
 		event = convert(dynamic_cast<ctoot::midi::core::ShortMessage*>(msg));
@@ -62,13 +61,12 @@ weak_ptr<Event> EventAdapter::convert(ctoot::midi::core::ShortMessage* msg)
 			noteEvent->setVelocityZero();
 		}
 
-		auto lSequencer = sequencer.lock();
-		auto track = lSequencer->getActiveTrackIndex();
+		auto track = sequencer.lock()->getActiveTrackIndex();
 		
 		auto screen = dynamic_pointer_cast<MultiRecordingSetupScreen>(Screens::getScreenComponent("multirecordingsetup"));
 		auto mrs = screen->getMrsLines();
 
-		if (lSequencer->isRecordingModeMulti())
+		if (sequencer.lock()->isRecordingModeMulti())
 		{
 			track = mrs[msg->getChannel()]->getTrack();
 		}

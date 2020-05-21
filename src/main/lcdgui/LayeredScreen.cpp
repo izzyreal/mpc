@@ -66,8 +66,6 @@
 #include <ui/misc/SecondSeqObserver.hpp>
 #include <ui/misc/TransObserver.hpp>
 
-#include <ui/other/OthersObserver.hpp>
-
 #include <ui/vmpc/DirectToDiskRecorderObserver.hpp>
 #include <ui/vmpc/VmpcSettingsObserver.hpp>
 #include <ui/vmpc/VmpcDiskObserver.hpp>
@@ -83,8 +81,6 @@ using namespace mpc::ui;
 using namespace mpc::lcdgui;
 
 using namespace mpc::ui::vmpc;
-using namespace mpc::ui::sequencer;
-using namespace mpc::ui::sequencer::window;
 using namespace mpc::ui::sampler;
 using namespace mpc::ui::sampler::window;
 using namespace mpc::ui::midisync;
@@ -809,9 +805,6 @@ void LayeredScreen::initObserver()
 	}
 	else if (csn.compare("2ndseq") == 0) {
 		activeObserver = make_unique<SecondSeqObserver>();
-	}
-	else if (csn.compare("others") == 0) {
-		activeObserver = make_unique<OthersObserver>();
 	}
 	else if (csn.compare("sync") == 0) {
 		activeObserver = make_unique<SyncObserver>();

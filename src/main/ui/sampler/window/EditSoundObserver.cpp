@@ -1,12 +1,14 @@
 #include "EditSoundObserver.hpp"
 
 #include <Mpc.hpp>
+
 #include <lcdgui/Background.hpp>
 #include <lcdgui/Field.hpp>
 #include <lcdgui/Label.hpp>
 #include <lcdgui/FunctionKeys.hpp>
+
 #include <ui/sampler/window/EditSoundGui.hpp>
-#include <ui/sequencer/window/SequencerWindowGui.hpp>
+
 #include <sampler/Sampler.hpp>
 #include <sampler/Sound.hpp>
 
@@ -17,28 +19,31 @@ using namespace std;
 
 EditSoundObserver::EditSoundObserver()  
 {
-	
 	timeStretchPresetNames = vector<string>{ "FEM VOX", "MALE VOX", "LOW MALE VOX", "VOCAL", "HFREQ RHYTHM", "MFREQ RHYTHM", "LFREQ RHYTHM", "PERCUSSION", "LFREQ PERC.", "STACCATO", "LFREQ SLOW", "MUSIC 1", "MUSIC 2", "MUSIC 3", "SOFT PERC.", "HFREQ ORCH.", "LFREQ ORCH.", "SLOW ORCH." };
 	sampler = Mpc::instance().getSampler();
 	vector<string> newTimeStretchPresetNames = vector<string>(54);
-	auto totalCounter = 0;
+	
+    auto totalCounter = 0;
 	auto letters = vector<string>{ "A", "B", "C" };
-	for (auto s : timeStretchPresetNames) {
-		for (int i = 0; i < 3; i++) {
+	
+    for (auto s : timeStretchPresetNames)
+    {
+		for (int i = 0; i < 3; i++)
+        {
 			s = moduru::lang::StrUtil::padRight(s, " ", 13);
 			s += letters.at(i);
 			newTimeStretchPresetNames.push_back(s);
 			totalCounter++;
 		}
 	}
+
 	timeStretchPresetNames = newTimeStretchPresetNames;
 
     auto uis = Mpc::instance().getUis().lock();
 	editSoundGui = uis->getEditSoundGui();
 	editSoundGui->addObserver(this);
-	sequencerWindowGui = uis->getSequencerWindowGui();
-	sequencerWindowGui->addObserver(this);
-	auto ls = Mpc::instance().getLayeredScreen().lock();
+
+    auto ls = Mpc::instance().getLayeredScreen().lock();
 	editField = ls->lookupField("edit");
 	variable0Field = ls->lookupField("variable0");
 	variable0Label = ls->lookupLabel("variable0");
@@ -280,5 +285,4 @@ void EditSoundObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 
 EditSoundObserver::~EditSoundObserver() {
 	editSoundGui->deleteObserver(this);
-	sequencerWindowGui->deleteObserver(this);
 }

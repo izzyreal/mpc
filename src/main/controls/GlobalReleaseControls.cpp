@@ -113,7 +113,6 @@ void GlobalReleaseControls::simplePad(int i)
 			auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timingcorrect"));
 			auto noteValue = timingCorrectScreen->getNoteValue();
 
-			auto swGui = Mpc::instance().getUis().lock()->getSequencerWindowGui();
 			int noteVal = timingCorrectScreen->getNoteValue();
 			int stepLength = sequencer.lock()->getTickValues()[noteVal];
 			int nextPos = sequencer.lock()->getTickPosition() + stepLength;

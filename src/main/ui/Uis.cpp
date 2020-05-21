@@ -2,8 +2,6 @@
 
 #include <ui/NameGui.hpp>
 
-#include <ui/other/OthersGui.hpp>
-
 #include <ui/misc/PunchGui.hpp>
 #include <ui/misc/SecondSeqGui.hpp>
 #include <ui/misc/TransGui.hpp>
@@ -13,8 +11,6 @@
 #include <ui/disk/window/DiskWindowGui.hpp>
 
 #include <ui/midisync/MidiSyncGui.hpp>
-
-#include <ui/sequencer/window/SequencerWindowGui.hpp>
 
 #include <ui/sampler/MixerSetupGui.hpp>
 #include <ui/sampler/MixerGui.hpp>
@@ -33,7 +29,8 @@ using namespace std;
 
 Uis::Uis() 
 {
-	if (noteNames.size() != 128) {
+	if (noteNames.size() != 128)
+	{
 		noteNames = vector<string>(128);
 		int octave = -2;
 		int noteCounter = 0;
@@ -64,8 +61,6 @@ Uis::Uis()
 		}
 	}
 
-	sequencerWindowGui = new mpc::ui::sequencer::window::SequencerWindowGui();
-
 	samplerGui = new mpc::ui::sampler::SamplerGui();
 	nameGui = new mpc::ui::NameGui();
 	soundGui = new mpc::ui::sampler::SoundGui();
@@ -89,8 +84,6 @@ Uis::Uis()
 
 	d2dRecorderGui = new mpc::ui::vmpc::DirectToDiskRecorderGui();
 	deviceGui = new mpc::ui::vmpc::DeviceGui();
-
-	othersGui = new mpc::ui::other::OthersGui();
 }
 
 vector<string> Uis::noteNames;
@@ -98,11 +91,6 @@ vector<string> Uis::noteNames;
 mpc::ui::sampler::MixerGui* Uis::getMixerGui()
 {
 	return mixerGui;
-}
-
-mpc::ui::sequencer::window::SequencerWindowGui* Uis::getSequencerWindowGui()
-{
-	return sequencerWindowGui;
 }
 
 mpc::ui::midisync::MidiSyncGui* Uis::getMidiSyncGui()
@@ -185,14 +173,13 @@ mpc::ui::misc::SecondSeqGui* Uis::getSecondSeqGui()
 	return secondSeqGui;
 }
 
-mpc::ui::sampler::window::EditSoundGui* Uis::getEditSoundGui() {
+mpc::ui::sampler::window::EditSoundGui* Uis::getEditSoundGui()
+{
 	return editSoundGui;
 }
 
-
-Uis::~Uis() {
-	if (sequencerWindowGui != nullptr) delete sequencerWindowGui;
-
+Uis::~Uis()
+{
 	if (soundGui != nullptr) delete soundGui;
 	if (samplerGui != nullptr) delete samplerGui;
 	if (editSoundGui != nullptr) delete editSoundGui;

@@ -9,7 +9,6 @@
 #include <hardware/HwPad.hpp>
 
 #include <ui/Uis.hpp>
-#include <ui/sequencer/window/SequencerWindowGui.hpp>
 #include <ui/vmpc/DirectToDiskRecorderGui.hpp>
 #include <ui/UserDefaults.hpp>
 

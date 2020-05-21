@@ -1,7 +1,7 @@
 #include "TempoChangeScreen.hpp"
 
-#include <ui/sequencer/window/SequencerWindowGui.hpp>
 #include <sequencer/TempoChangeEvent.hpp>
+#include <sequencer/TimeSignature.hpp>
 
 #include <lcdgui/Label.hpp>
 #include <lcdgui/HorizontalBar.hpp>
@@ -92,7 +92,6 @@ void TempoChangeScreen::initVisibleEvents()
 
 	visibleTempoChanges = vector<weak_ptr<TempoChangeEvent>>(3);
 	
-	auto swGui = mpc.getUis().lock()->getSequencerWindowGui();
 	auto allTce = seq->getTempoChangeEvents();
 	
 	for (int i = 0; i < 3; i++)
@@ -132,7 +131,6 @@ void TempoChangeScreen::displayTempoChange0()
 	auto sequence = sequencer.lock()->getActiveSequence().lock();
 	bars[1].lock()->Hide(false);
 	
-	auto swGui = mpc.getUis().lock()->getSequencerWindowGui();
 	auto tce = visibleTempoChanges[0].lock();
 	a0Field.lock()->setText(" " + to_string(tce->getStepNumber() + 1));
 	auto timeSig = sequence->getTimeSignature();
@@ -236,7 +234,6 @@ void TempoChangeScreen::displayTempoChange1()
 
 void TempoChangeScreen::displayTempoChange2()
 {
-	auto swGui = mpc.getUis().lock()->getSequencerWindowGui();
 	auto tce = visibleTempoChanges[2].lock();
 	
 	if (!tce)
@@ -348,7 +345,6 @@ void TempoChangeScreen::function(int j)
 	std::shared_ptr<TempoChangeEvent> tce;
 	auto seq = sequencer.lock()->getActiveSequence().lock();
 
-	auto swGui = mpc.getUis().lock()->getSequencerWindowGui();
 	auto tceList = seq->getTempoChangeEvents();
 
 	switch (j)
@@ -463,8 +459,6 @@ void TempoChangeScreen::init()
 		return;
 	}
 
-	auto swGui = mpc.getUis().lock()->getSequencerWindowGui();
-
 	auto yPos = stoi(param.substr(1, 2));
 
 	int nextPosition = yPos + offset + 1;
@@ -571,7 +565,7 @@ void TempoChangeScreen::turnWheel(int j)
 void TempoChangeScreen::down()
 {
 	init();
-	auto swGui = mpc.getUis().lock()->getSequencerWindowGui();
+
 	auto tce1 = visibleTempoChanges[1].lock();
 	auto tce2 = visibleTempoChanges[2].lock();
 
@@ -627,7 +621,8 @@ void TempoChangeScreen::up()
 {
 	init();
 
-	if (param.length() != 2) {
+	if (param.length() != 2)
+	{
 		return;
 	}
 
@@ -635,7 +630,6 @@ void TempoChangeScreen::up()
 
 	if (yPos == 0)
 	{
-		auto swGui = mpc.getUis().lock()->getSequencerWindowGui();
 		if (offset == 0)
 		{
 			if (param.compare("e0") == 0)

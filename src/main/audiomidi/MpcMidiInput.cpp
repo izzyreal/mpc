@@ -1,4 +1,4 @@
-#include <audiomidi/MpcMidiInput.hpp>
+#include "MpcMidiInput.hpp"
 
 #include <Mpc.hpp>
 #include <hardware/Hardware.hpp>
@@ -14,7 +14,7 @@
 
 #include <ui/midisync/MidiSyncGui.hpp>
 #include <ui/sampler/SamplerGui.hpp>
-#include <ui/sequencer/window/SequencerWindowGui.hpp>
+
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>
 #include <sequencer/Event.hpp>
@@ -42,7 +42,6 @@ MpcMidiInput::MpcMidiInput(int index)
 	midiAdapter = make_unique<mpc::sequencer::MidiAdapter>();
 	eventAdapter = make_unique<mpc::sequencer::EventAdapter>(sequencer);
 	msGui = Mpc::instance().getUis().lock()->getMidiSyncGui();
-	swGui = Mpc::instance().getUis().lock()->getSequencerWindowGui();
 }
 
 string MpcMidiInput::getName()
@@ -52,7 +51,7 @@ string MpcMidiInput::getName()
 
 void MpcMidiInput::transport(ctoot::midi::core::MidiMessage* msg, int timeStamp)
 {
-	eventAdapter->process(msg, swGui);
+	eventAdapter->process(msg);
 	auto status = msg->getStatus();
 	auto lSampler = sampler.lock();
 	string notify_ = string(index == 0 ? "a" : "b");
@@ -199,13 +198,12 @@ void MpcMidiInput::transportOmni(ctoot::midi::core::MidiMessage* msg, string out
 {
 	auto mpcMidiPorts = Mpc::instance().getMidiPorts().lock();
 
-	if (dynamic_cast<ctoot::midi::core::ShortMessage*>(msg) != nullptr) {
-		if (Mpc::instance().getLayeredScreen().lock()->getCurrentScreenName().compare("midioutputmonitor") == 0) {
+	if (dynamic_cast<ctoot::midi::core::ShortMessage*>(msg) != nullptr)
+	{
+		if (Mpc::instance().getLayeredScreen().lock()->getCurrentScreenName().compare("midioutputmonitor") == 0)
+		{
 			setChanged();
 			notifyObservers(string(outputLetter + to_string(dynamic_cast<ctoot::midi::core::ShortMessage*>(msg)->getChannel())));
 		}
 	}
-}
-
-MpcMidiInput::~MpcMidiInput() {
 }

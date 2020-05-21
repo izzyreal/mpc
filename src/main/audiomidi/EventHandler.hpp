@@ -7,10 +7,6 @@
 
 #include <memory>
 
-namespace mpc::ui::sequencer::window {
-	class SequencerWindowGui;
-}
-
 namespace mpc::ui::midisync {
 	class MidiSyncGui;
 }

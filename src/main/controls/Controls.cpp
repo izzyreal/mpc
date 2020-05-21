@@ -61,7 +61,6 @@
 #include <controls/disk/window/SaveApsFileControls.hpp>
 
 #include <controls/other/InitControls.hpp>
-#include <controls/other/OthersControls.hpp>
 #include <controls/other/VerControls.hpp>
 
 #include <controls/other/dialog/NameControls.hpp>
@@ -167,7 +166,6 @@ Controls::Controls()
 
 	controls["name"] = new other::dialog::NameControls();
 
-	controls["others"] = new other::OthersControls();
 	controls["init"] = new other::InitControls();
 	controls["ver"] = new other::VerControls();
 

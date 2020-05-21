@@ -7,10 +7,6 @@ namespace mpc::ui {
 	class NameGui;
 }
 
-namespace mpc::ui::sequencer::window {
-	class SequencerWindowGui;
-}
-
 namespace mpc::ui::vmpc {
 	class DirectToDiskRecorderGui;
 	class DeviceGui;
@@ -59,9 +55,6 @@ namespace mpc::ui {
 
 	private:
 		mpc::ui::NameGui* nameGui = nullptr;
-
-		mpc::ui::sequencer::window::SequencerWindowGui* sequencerWindowGui = nullptr;
-
 		mpc::ui::sampler::SoundGui* soundGui = nullptr;
 		mpc::ui::sampler::SamplerGui* samplerGui = nullptr;
 		mpc::ui::sampler::MixerGui* mixerGui = nullptr;
@@ -99,8 +92,6 @@ namespace mpc::ui {
 		mpc::ui::sampler::SamplerGui* getSamplerGui();
 		mpc::ui::NameGui* getNameGui();
 		mpc::ui::sampler::MixerSetupGui* getMixerSetupGui();
-
-		mpc::ui::sequencer::window::SequencerWindowGui* getSequencerWindowGui();
 
 		mpc::ui::other::OthersGui* getOthersGui();
 

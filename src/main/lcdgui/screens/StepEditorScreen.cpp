@@ -31,7 +31,6 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::sequencer;
-using namespace mpc::ui::sequencer;
 using namespace moduru::lang;
 using namespace std;
 

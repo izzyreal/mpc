@@ -5,74 +5,57 @@
 #include <vector>
 #include <string>
 
-namespace mpc {
-	
-	
-
-	namespace lcdgui {
-		class Field;
-		class Label;
-	}
+namespace mpc::lcdgui {
+	class Field;
+	class Label;
+}
 
 
-	namespace sampler {
-		class Sampler;
-	}
+namespace mpc::sampler {
+	class Sampler;
+}
 
-	namespace ui {
+namespace mpc::ui::sampler::window {
+	class EditSoundGui;
+}
 
-		namespace sequencer {
-			namespace window {
-				class SequencerWindowGui;
-			}
-		}
+namespace mpc::ui::sampler::window {
 
-		namespace sampler {
-			namespace window {
+	class EditSoundObserver
+		: public moduru::observer::Observer
+	{
 
-				class EditSoundGui;
+	private:
+		EditSoundGui* editSoundGui{ nullptr };
+		std::weak_ptr<mpc::sampler::Sampler> sampler{ };
+		std::weak_ptr<mpc::lcdgui::Field> editField{};
+		std::weak_ptr<mpc::lcdgui::Field> variable0Field{};
+		std::weak_ptr<mpc::lcdgui::Label> variable0Label{};
+		std::weak_ptr<mpc::lcdgui::Field> ratioField{};
+		std::weak_ptr<mpc::lcdgui::Label> ratioLabel{};
+		std::weak_ptr<mpc::lcdgui::Field> presetField{};
+		std::weak_ptr<mpc::lcdgui::Label> presetLabel{};
+		std::weak_ptr<mpc::lcdgui::Field> adjustField{};
+		std::weak_ptr<mpc::lcdgui::Label> adjustLabel{};
+		std::weak_ptr<mpc::lcdgui::Label> endMarginLabel{};
+		std::weak_ptr<mpc::lcdgui::Field> endMarginField{};
+		std::weak_ptr<mpc::lcdgui::Label> createNewProgramLabel{};
+		std::weak_ptr<mpc::lcdgui::Field> createNewProgramField{};
 
-				class EditSoundObserver
-					: public moduru::observer::Observer
-				{
+		std::vector<std::string> editNames = std::vector<std::string>{ "DISCARD", "LOOP FROM ST TO END", u8"SECTION \u00C4 NEW SOUND", u8"INSERT SOUND \u00C4 SECTION START", "DELETE SECTION", "SILENCE SECTION", "REVERSE SECTION", "TIME STRETCH", "SLICE SOUND" };
+		std::vector<std::string> timeStretchPresetNames{};
 
-				private:
-					
-					EditSoundGui* editSoundGui{ nullptr };
-					mpc::ui::sequencer::window::SequencerWindowGui* sequencerWindowGui{ nullptr };
-					std::weak_ptr<mpc::sampler::Sampler> sampler{ };
-					std::weak_ptr<mpc::lcdgui::Field> editField{};
-					std::weak_ptr<mpc::lcdgui::Field> variable0Field{};
-					std::weak_ptr<mpc::lcdgui::Label> variable0Label{};
-					std::weak_ptr<mpc::lcdgui::Field> ratioField{};
-					std::weak_ptr<mpc::lcdgui::Label> ratioLabel{};
-					std::weak_ptr<mpc::lcdgui::Field> presetField{};
-					std::weak_ptr<mpc::lcdgui::Label> presetLabel{};
-					std::weak_ptr<mpc::lcdgui::Field> adjustField{};
-					std::weak_ptr<mpc::lcdgui::Label> adjustLabel{};
-					std::weak_ptr<mpc::lcdgui::Label> endMarginLabel{};
-					std::weak_ptr<mpc::lcdgui::Field> endMarginField{};
-					std::weak_ptr<mpc::lcdgui::Label> createNewProgramLabel{};
-					std::weak_ptr<mpc::lcdgui::Field> createNewProgramField{};
+	private:
+		void displayEdit();
+		void displayCreateNewProgram();
+		void displayEndMargin();
+		void displayVariable();
 
-					std::vector<std::string> editNames = std::vector<std::string>{ "DISCARD", "LOOP FROM ST TO END", u8"SECTION \u00C4 NEW SOUND", u8"INSERT SOUND \u00C4 SECTION START", "DELETE SECTION", "SILENCE SECTION", "REVERSE SECTION", "TIME STRETCH", "SLICE SOUND" };
-					std::vector<std::string> timeStretchPresetNames{};
+	public:
+		void update(moduru::observer::Observable* o, nonstd::any arg) override;
 
-				private:
-					void displayEdit();
-					void displayCreateNewProgram();
-					void displayEndMargin();
-					void displayVariable();
+		EditSoundObserver();
+		~EditSoundObserver();
 
-				public:
-					void update(moduru::observer::Observable* o, nonstd::any arg) override;
-
-					EditSoundObserver();
-					~EditSoundObserver();
-
-				};
-
-			}
-		}
-	}
+	};
 }

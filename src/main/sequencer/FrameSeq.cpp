@@ -13,8 +13,6 @@
 
 #include <sequencer/SeqUtil.hpp>
 
-#include <ui/sequencer/window/SequencerWindowGui.hpp>
-
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <lcdgui/screens/SongScreen.hpp>
 #include <lcdgui/Screens.hpp>
@@ -48,22 +46,26 @@ void FrameSeq::startMetronome(int sampleRate) {
 	start(sampleRate);
 }
 
-void FrameSeq::work(int nFrames) {
-	if (!running) {
+void FrameSeq::work(int nFrames)
+{
+	if (!running)
+	{
 		return;
 	}
+
 	auto& mpc = mpc::Mpc::instance();
 	
 	auto controls = mpc.getControls().lock();
-	auto swGui = mpc.getUis().lock()->getSequencerWindowGui();
 	auto songScreen = dynamic_pointer_cast<SongScreen>(Screens::getScreenComponent("song"));
 	auto lSequencer = sequencer.lock();
 	
 
 	frameCounter += nFrames;
 	
-	if (frameCounter > 2048) {
-		if (!lSequencer->isCountingIn() && !metronome) {
+	if (frameCounter > 2048)
+	{
+		if (!lSequencer->isCountingIn() && !metronome)
+		{
 			lSequencer->notifyTimeDisplayRealtime();
 		}
 		frameCounter = 0;
@@ -71,6 +73,7 @@ void FrameSeq::work(int nFrames) {
 
 	auto seq = lSequencer->getCurrentlyPlayingSequence().lock();
 	double tempo = lSequencer->getTempo().toDouble();
+
 	if (tempo != clock.getBpm())
 	{
 		clock.set_bpm(tempo);

@@ -20,6 +20,7 @@
 #include <lcdgui/screens/TrMoveScreen.hpp>
 #include <lcdgui/screens/TrMuteScreen.hpp>
 #include <lcdgui/screens/UserScreen.hpp>
+#include <lcdgui/screens/OthersScreen.hpp>
 
 #include <lcdgui/screens/window/SequenceScreen.hpp>
 #include <lcdgui/screens/window/TempoChangeScreen.hpp>
@@ -352,6 +353,10 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	else if (screenName.compare("step_tc") == 0)
 	{
 		screen = make_shared<StepTcScreen>(layerIndex);
+	}
+	else if (screenName.compare("others") == 0)
+	{
+		screen = make_shared<OthersScreen>(layerIndex);
 	}
 
 	if (screen)

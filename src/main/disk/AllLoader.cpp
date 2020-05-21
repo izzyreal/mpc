@@ -17,8 +17,6 @@
 #include <ui/UserDefaults.hpp>
 #include <ui/midisync/MidiSyncGui.hpp>
 
-#include <ui/sequencer/window/SequencerWindowGui.hpp>
-
 #include <sequencer/Event.hpp>
 #include <sequencer/Sequence.hpp>
 #include <sequencer/Track.hpp>
@@ -35,6 +33,7 @@
 #include <lcdgui/screens/window/MultiRecordingSetupLine.hpp>
 #include <lcdgui/screens/StepEditorScreen.hpp>
 #include <lcdgui/screens/SongScreen.hpp>
+#include <lcdgui/screens/OthersScreen.hpp>
 
 #include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
 
@@ -106,7 +105,6 @@ AllLoader::AllLoader(mpc::disk::MpcFile* file, bool sequencesOnly)
 		
 		timingCorrectScreen->setNoteValue(sequencer->tc);
 		
-		auto swGui = Mpc::instance().getUis().lock()->getSequencerWindowGui();
 		auto count = allParser.getCount();
 
 		auto countMetronomeScreen = dynamic_pointer_cast<CountMetronomeScreen>(Screens::getScreenComponent("countmetronome"));
@@ -155,7 +153,10 @@ AllLoader::AllLoader(mpc::disk::MpcFile* file, bool sequencesOnly)
 		stepEditorScreen->setAutoStepIncrementEnabled(misc->isAutoStepIncEnabled());
 		stepEditorScreen->setTcValueRecordedNotes(misc->getDurationTcPercentage());
 		stepEditorScreen->setDurationOfRecordedNotes(misc->isDurationOfRecNotesTc());
-		swGui->setTapAvg(misc->getTapAvg());
+
+		auto othersScreen = dynamic_pointer_cast<OthersScreen>(Screens::getScreenComponent("others"));
+
+		othersScreen->setTapAveraging(misc->getTapAvg());
 
 		auto msGui = Mpc::instance().getUis().lock()->getMidiSyncGui();
 		msGui->setReceiveMMCEnabled(misc->isInReceiveMMCEnabled());

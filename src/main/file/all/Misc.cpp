@@ -4,9 +4,9 @@
 #include <ui/Uis.hpp>
 #include <ui/midisync/MidiSyncGui.hpp>
 
-#include <ui/sequencer/window/SequencerWindowGui.hpp>
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/StepEditorScreen.hpp>
+#include <lcdgui/screens/OthersScreen.hpp>
 
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui;
@@ -26,13 +26,14 @@ Misc::Misc(vector<char> b)
 Misc::Misc()
 {
 	auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(Screens::getScreenComponent("sequencer_step"));
+	auto othersScreen = dynamic_pointer_cast<OthersScreen>(Screens::getScreenComponent("others"));
 	saveBytes = vector<char>(LENGTH);
-	saveBytes[TAP_AVG_OFFSET] = (char)(Mpc::instance().getUis().lock()->getSequencerWindowGui()->getTapAvg());
+	saveBytes[TAP_AVG_OFFSET] = (char)(othersScreen->getTapAveraging());
 	saveBytes[MIDI_SYNC_IN_RECEIVE_MMC_OFFSET] = (char)(Mpc::instance().getUis().lock()->getMidiSyncGui()->isReceiveMMCEnabled() ? 1 : 0);
 	saveBytes[AUTO_STEP_INCREMENT_OFFSET] = (char)(stepEditorScreen->isAutoStepIncrementEnabled() ? 1 : 0);
 	saveBytes[DURATION_OF_REC_NOTES_OFFSET] = (char)(stepEditorScreen->isDurationTcPercentageEnabled() ? 1 : 0);
 	saveBytes[DURATION_TC_PERCENTAGE_OFFSET] = (char)(stepEditorScreen->getTcValueRecordedNotes());
-	saveBytes[MIDI_PGM_CHANGE_TO_SEQ_OFFSET] = (char)(Mpc::instance().getUis().lock()->getSequencerWindowGui()->isPgmChangeToSeqEnabled() ? 1 : 0);
+	saveBytes[MIDI_PGM_CHANGE_TO_SEQ_OFFSET] = 0; // Unimplemented
 }
 
 const int Misc::LENGTH;

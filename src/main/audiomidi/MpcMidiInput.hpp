@@ -8,19 +8,20 @@
 #include <sequencer/MidiAdapter.hpp>
 
 #include <memory>
-
-namespace mpc::ui::sequencer::window {
-	class SequencerWindowGui;
-}
 		
-namespace mpc::ui::midisync {
+namespace mpc::ui::midisync
+{
 	class MidiSyncGui;
 }
 
-namespace mpc::audiomidi {
+namespace mpc::audiomidi
+{
 	class MpcMidiPorts;
 }
-namespace mpc::audiomidi {
+
+namespace mpc::audiomidi
+{
+
 	class MpcMidiInput
 		: public moduru::observer::Observable
 		, public virtual ctoot::midi::core::MidiInput
@@ -33,8 +34,7 @@ namespace mpc::audiomidi {
 		std::weak_ptr<mpc::sequencer::Sequencer> sequencer;
 		std::weak_ptr<mpc::sampler::Sampler> sampler;
 		mpc::ui::midisync::MidiSyncGui* msGui = nullptr;
-		mpc::ui::sequencer::window::SequencerWindowGui* swGui = nullptr;
-		
+
 		std::unique_ptr<mpc::sequencer::MidiAdapter> midiAdapter;
 		std::unique_ptr<mpc::sequencer::EventAdapter> eventAdapter;
 		std::string notify = "";
@@ -49,7 +49,6 @@ namespace mpc::audiomidi {
 
 	public:
 		MpcMidiInput(int index);
-		~MpcMidiInput();
 
 	};
 }

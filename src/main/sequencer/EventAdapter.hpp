@@ -9,11 +9,6 @@ namespace ctoot::midi::core
 	class MidiMessage;
 }
 
-namespace mpc::ui::sequencer::window
-{
-	class SequencerWindowGui;
-}
-
 namespace mpc::sequencer
 {
 	class Event;
@@ -30,12 +25,11 @@ namespace mpc::sequencer
 	private:
 		std::weak_ptr<Sequencer> sequencer;
 		std::weak_ptr<Event> event;
-		mpc::ui::sequencer::window::SequencerWindowGui* swGui = nullptr;
 		std::shared_ptr<MidiClockEvent> midiClockEvent;
 		std::shared_ptr<NoteEvent> noteEvent;
 
 	public:
-		void process(ctoot::midi::core::MidiMessage* msg, mpc::ui::sequencer::window::SequencerWindowGui* gui);
+		void process(ctoot::midi::core::MidiMessage* msg);
 
 	private:
 		std::weak_ptr<Event> convert(ctoot::midi::core::ShortMessage* msg);

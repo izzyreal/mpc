@@ -2,7 +2,6 @@
 
 #include <Mpc.hpp>
 #include <controls/Controls.hpp>
-#include <ui/sequencer/window/SequencerWindowGui.hpp>
 #include <audiomidi/EventHandler.hpp>
 #include <sequencer/Event.hpp>
 #include <sequencer/Sequence.hpp>

@@ -1,7 +1,6 @@
 #include "MultiRecordingSetupScreen.hpp"
 
 #include <lcdgui/Field.hpp>
-#include <ui/sequencer/window/SequencerWindowGui.hpp>
 #include <sequencer/Sequence.hpp>
 #include <sequencer/Track.hpp>
 
@@ -13,7 +12,8 @@ using namespace std;
 MultiRecordingSetupScreen::MultiRecordingSetupScreen(const int& layer)
 	: ScreenComponent("multirecordingsetup", layer)
 {
-	for (int i = 0; i < 34; i++) {
+	for (int i = 0; i < 34; i++)
+	{
 		mrsLines[i].setTrack(i);
 		mrsLines[i].setIn(i);
 		mrsLines[i].setOut(0);
@@ -97,8 +97,7 @@ void MultiRecordingSetupScreen::turnWheel(int i)
 	init();
 	
 	auto seq = sequencer.lock()->getActiveSequence().lock();
-	auto swGui = mpc.getUis().lock()->getSequencerWindowGui();
-
+	
 	if (param[0] == 'a')
 	{
 		if (i > 0)
@@ -148,7 +147,6 @@ void MultiRecordingSetupScreen::turnWheel(int i)
 void MultiRecordingSetupScreen::up()
 {
 	init();
-	auto swGui = mpc.getUis().lock()->getSequencerWindowGui();
 
 	if (yPos == 0)
 	{
@@ -167,7 +165,6 @@ void MultiRecordingSetupScreen::up()
 void MultiRecordingSetupScreen::down()
 {
 	init();
-	auto swGui = mpc.getUis().lock()->getSequencerWindowGui(); 
 	
 	if (yPos == 0)
 	{

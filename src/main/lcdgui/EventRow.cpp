@@ -29,7 +29,7 @@
 #include <cmath>
 #include <lang/StrUtil.hpp>
 
-using namespace mpc::ui::sequencer;
+using namespace mpc::lcdgui;
 using namespace std;
 
 EventRow::EventRow(int bus, weak_ptr<mpc::sequencer::Event> e, int rowNumber)
@@ -479,12 +479,4 @@ void EventRow::setSelected(bool b)
 bool EventRow::isSelected()
 {
     return selected;
-}
-
-EventRow::~EventRow() {
-	// hide these things exactly when they need to be hidden, so not in this dtor
-	//if (horizontalBar.lock())
-		//horizontalBar.lock()->Hide(true);
-	//if (selectedEventBar.lock())
-		//selectedEventBar.lock()->Hide(true);
 }

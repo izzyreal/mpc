@@ -22,7 +22,7 @@ AbstractOtherControls::AbstractOtherControls()
 
 void AbstractOtherControls::init()
 {
-    super::init();
+    BaseControls::init();
 	tickValues = Mpc::instance().getSequencer().lock()->getTickValues();
 	
     seqNum = sequencer.lock()->getActiveSequenceIndex();
@@ -32,7 +32,4 @@ void AbstractOtherControls::init()
 	
 	auto lTrk = track.lock();
     program = lTrk->getBusNumber() == 0 ? weak_ptr<mpc::sampler::Program>() : dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(sampler.lock()->getDrumBusProgramNumber(lTrk->getBusNumber())).lock());
-}
-
-AbstractOtherControls::~AbstractOtherControls() {
 }

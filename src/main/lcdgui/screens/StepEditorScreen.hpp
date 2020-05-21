@@ -1,7 +1,7 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
+#include <lcdgui/EventRow.hpp>
 
-#include <ui/sequencer/EventRow.hpp>
 #include <sequencer/Event.hpp>
 #include <sequencer/EmptyEvent.hpp>
 
@@ -49,7 +49,7 @@ namespace mpc::lcdgui::screens
 	private:
 		std::vector<std::string> viewNames = { "ALL EVENTS", "NOTES", "PITCH BEND", "CTRL:", "PROG CHANGE", "CH PRESSURE", "POLY PRESS", "EXCLUSIVE" };
 		std::shared_ptr<mpc::sequencer::EmptyEvent> emptyEvent = std::make_shared<mpc::sequencer::EmptyEvent>();
-		std::vector<std::unique_ptr<mpc::ui::sequencer::EventRow>> eventRows;
+		std::vector<std::unique_ptr<EventRow>> eventRows;
 		std::vector<std::weak_ptr<mpc::sequencer::Event>> visibleEvents;
 		std::vector <std::weak_ptr<mpc::sequencer::Event>> eventsAtCurrentTick;
 		std::vector<std::weak_ptr<mpc::sequencer::Event>> placeHolder;

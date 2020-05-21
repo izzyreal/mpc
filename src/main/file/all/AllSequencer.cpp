@@ -1,7 +1,6 @@
 #include <file/all/AllSequencer.hpp>
 
 #include <Mpc.hpp>
-#include <ui/sequencer/window/SequencerWindowGui.hpp>
 #include <sequencer/Sequencer.hpp>
 
 #include <lcdgui/Screens.hpp>

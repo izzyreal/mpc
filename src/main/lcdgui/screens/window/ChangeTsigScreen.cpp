@@ -1,7 +1,6 @@
 #include "ChangeTsigScreen.hpp"
 
 #include <lcdgui/LayeredScreen.hpp>
-#include <ui/sequencer/window/SequencerWindowGui.hpp>
 #include <sequencer/Sequence.hpp>
 #include <sequencer/TimeSignature.hpp>
 
@@ -25,7 +24,7 @@ void ChangeTsigScreen::open()
 void ChangeTsigScreen::function(int i)
 {
     BaseControls::function(i);
-	auto swGui = mpc.getUis().lock()->getSequencerWindowGui();
+
 	switch (i)
 	{
 	case 4:
@@ -39,7 +38,7 @@ void ChangeTsigScreen::function(int i)
 void ChangeTsigScreen::turnWheel(int i)
 {
     init();
-	auto swGui = mpc.getUis().lock()->getSequencerWindowGui();
+
 	auto seq = sequencer.lock()->getActiveSequence().lock();
 
 	if (param.compare("bar0") == 0)

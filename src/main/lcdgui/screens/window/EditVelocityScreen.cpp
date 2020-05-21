@@ -59,7 +59,7 @@ void EditVelocityScreen::update(moduru::observer::Observable* observable, nonstd
 void EditVelocityScreen::function(int i)
 {
 	BaseControls::function(i);
-	auto swGui = mpc.getUis().lock()->getSequencerWindowGui();
+	
 	switch (i)
 	{
 	case 4:
@@ -98,7 +98,6 @@ void EditVelocityScreen::function(int i)
 void EditVelocityScreen::turnWheel(int i)
 {
 	init();
-	auto swGui = mpc.getUis().lock()->getSequencerWindowGui();
 
 	if (param.compare("edittype") == 0)
 	{

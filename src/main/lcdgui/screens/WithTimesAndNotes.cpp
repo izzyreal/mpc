@@ -4,7 +4,6 @@
 
 #include <lcdgui/LayeredScreen.hpp>
 
-#include <ui/sequencer/window/SequencerWindowGui.hpp>
 #include <ui/sampler/SamplerGui.hpp>
 
 #include <sequencer/Sequencer.hpp>
@@ -26,7 +25,6 @@ void WithTimesAndNotes::checkAllTimesAndNotes(int notch, Sequence* seq)
 
 	auto sequence = seq != nullptr ? seq : mpc.getSequencer().lock()->getActiveSequence().lock().get();
 	auto param = mpc.getLayeredScreen().lock()->getFocus();
-	auto gui = mpc.getUis().lock()->getSequencerWindowGui();
 
 	if (param.compare("time0") == 0)
 	{

@@ -2,7 +2,6 @@
 
 #include <lcdgui/Label.hpp>
 #include <lcdgui/LayeredScreen.hpp>
-#include <ui/sequencer/window/SequencerWindowGui.hpp>
 #include <sequencer/Sequence.hpp>
 #include <sequencer/Sequencer.hpp>
 
@@ -35,18 +34,20 @@ void ChangeBars2Screen::function(int i)
 	BaseControls::function(i);
 	auto seq = sequencer.lock()->getActiveSequence().lock();
 
-	auto swGui = mpc.getUis().lock()->getSequencerWindowGui();
-
-	switch (i) {
+	switch (i)
+	{
 	case 2:
 		ls.lock()->openScreen("sequencer");
 		ls.lock()->openScreen("changebars");
 		break;
 	case 4:
-		if (newBars < seq->getLastBar()) {
+		if (newBars < seq->getLastBar())
+		{
 			seq->deleteBars(newBars + 1, seq->getLastBar());
 		}
-		if (newBars > seq->getLastBar()) {
+
+		if (newBars > seq->getLastBar())
+		{
 			seq->insertBars(newBars - seq->getLastBar(), seq->getLastBar() + 1);
 		}
 		ls.lock()->openScreen("sequencer");
@@ -85,8 +86,6 @@ void ChangeBars2Screen::displayNewBars()
 void ChangeBars2Screen::turnWheel(int i)
 {
 	init();
-
-	auto swGui = mpc.getUis().lock()->getSequencerWindowGui();
 
 	if (param.compare("newbars") == 0)
 	{

@@ -1,6 +1,5 @@
 #include "DeleteTrackScreen.hpp"
 
-#include <ui/sequencer/window/SequencerWindowGui.hpp>
 #include <sequencer/Sequence.hpp>
 #include <sequencer/Sequencer.hpp>
 #include <sequencer/Track.hpp>
