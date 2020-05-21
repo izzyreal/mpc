@@ -490,12 +490,13 @@ void EditSequenceScreen::displayEdit()
 
 void EditSequenceScreen::displayNotes()
 {
-	auto lTrk = track.lock();
+	init();
+
 	findField("midinote0").lock()->setSize(8 * 6, 9);
 	findField("midinote1").lock()->setSize(8 * 6, 9);
 	findField("midinote1").lock()->setLocation(62, 39);
 
-	if (lTrk->getBusNumber() == 0)
+	if (track.lock()->getBusNumber() == 0)
 	{
 		findField("drumnote").lock()->Hide(true);
 		findField("midinote0").lock()->Hide(false);

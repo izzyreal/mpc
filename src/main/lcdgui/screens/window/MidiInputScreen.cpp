@@ -78,12 +78,12 @@ void MidiInputScreen::displayMidiFilter()
 
 void MidiInputScreen::displaySustainPedalToDuration()
 {
-	findField("sustainpedaltoduration").lock()->setText(sustainPedalToDuration ? "ON" : "OFF");
+	findField("duration").lock()->setText(sustainPedalToDuration ? "ON" : "OFF");
 }
 
 void MidiInputScreen::displayProgChangeSeq()
 {
-	findField("progchangeseq").lock()->setText(progChangeSeq ? "ON" : "OFF");
+	findField("seq").lock()->setText(progChangeSeq ? "ON" : "OFF");
 }
 
 void MidiInputScreen::displayReceiveCh()

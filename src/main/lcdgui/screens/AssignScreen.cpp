@@ -104,7 +104,7 @@ void AssignScreen::displayAssignNote()
 
 	if (nn == 34)
 	{
-		findField("assignote").lock()->setText("OFF");
+		findField("assignnote").lock()->setText("OFF");
 		return;
 	}
 
@@ -113,7 +113,7 @@ void AssignScreen::displayAssignNote()
 	string padName = lSampler->getPadName(lProgram->getPadNumberFromNote(nn));
 	auto sn = lProgram->getNoteParameters(nn)->getSndNumber();
 	auto soundName = sn == -1 ? "OFF" : lSampler->getSoundName(sn);
-	findField("assignote").lock()->setText(to_string(nn) + "/" + padName + "-" + soundName);
+	findField("assignnote").lock()->setText(to_string(nn) + "/" + padName + "-" + soundName);
 }
 
 void AssignScreen::displayParameter()

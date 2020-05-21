@@ -54,20 +54,24 @@ SCENARIO("A Sequence initializes correctly", "[sequence]") {
 		auto& mpc = mpc::Mpc::instance();
 		mpc.init(44100, 1, 1);
 		std::vector<string> trackNames;
-		mpc::ui::UserDefaults defaults;
-		for (int i = 0; i < 64; i++) {
+		
+		auto& defaults = mpc::ui::UserDefaults::instance();
+		
+		for (int i = 0; i < 64; i++)
+		{
 		       trackNames.push_back(defaults.getTrackName(i));
 		}	       
+		
 		mpc::sequencer::Sequence seq(trackNames);
 		seq.init(1);
-	    	REQUIRE( seq.getInitialTempo().toDouble() == 120.0 );
+	    REQUIRE( seq.getInitialTempo().toDouble() == 120.0 );
 	}
 }
 
 SCENARIO("UserDefaults have sane values", "[userdefaults]") {
 
 	GIVEN("Some UserDefaults") {
-		mpc::ui::UserDefaults defaults;
+		auto& defaults = mpc::ui::UserDefaults::instance();
 		BCMath tempo = defaults.getTempo();
 		REQUIRE( tempo.toDouble() == 120.0 );
 	}

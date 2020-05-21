@@ -25,7 +25,7 @@ namespace mpc::lcdgui::screens
 		void displayBars();
 		void displayPgm();
 		void displayRecordingMode();
-		void displayBus();
+		void displayTrackType();
 		void displayDeviceNumber();
 		void displayVelo();
 		void displayDeviceName();

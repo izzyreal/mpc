@@ -74,9 +74,9 @@ void NextSeqPadScreen::function(int i)
 
 void NextSeqPadScreen::displayNextSq()
 {
-	auto lSequencer = sequencer.lock();
-	auto number = string(lSequencer->getNextSq() == -1 ? "" : StrUtil::padLeft(to_string(lSequencer->getNextSq() + 1), "0", 2));
-	findLabel("nextsq").lock()->setText(number + "-" + lSequencer->getSequence(lSequencer->getNextSq()).lock()->getName());
+	auto number = string(sequencer.lock()->getNextSq() == -1 ? "" : StrUtil::padLeft(to_string(sequencer.lock()->getNextSq() + 1), "0", 2));
+	auto name = sequencer.lock()->getNextSq() == -1 ? "" : sequencer.lock()->getSequence(sequencer.lock()->getNextSq()).lock()->getName();
+	findLabel("nextsq").lock()->setText(number + "-" + name);
 }
 
 int NextSeqPadScreen::bankOffset()

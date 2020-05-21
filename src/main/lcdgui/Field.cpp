@@ -42,8 +42,16 @@ void Field::Draw(std::vector<std::vector<bool>>* pixels)
 
 	for (int i = r.L; i < r.R - 1; i++)
 	{
+		if (i < 0)
+		{
+			continue;
+		}
 		for (int j = r.T; j < r.B; j++)
 		{
+			if (j < 0)
+			{
+				continue;
+			}
 			(*pixels)[i][j] = inverted;
 		}
 	}

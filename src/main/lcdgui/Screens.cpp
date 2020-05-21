@@ -96,27 +96,29 @@ vector<shared_ptr<Component>> Screens::get(const string& screenName, int& foundI
 
 	Value& arrangement = layerDocuments[foundInLayer]->GetObject()[screenName.c_str()];
 
-	Value& labels = arrangement["labels"];
-	Value& x = arrangement["x"];
-	Value& y = arrangement["y"];
-	Value& parameters = arrangement["parameters"];
-	Value& tfsize = arrangement["tfsize"];
-
 	vector<shared_ptr<Component>> components;
 
-	for (int i = 0; i < labels.Size(); i++)
+	if (arrangement.HasMember("labels"))
 	{
-		components.push_back(make_unique<Parameter>(labels[i].GetString()
-			, parameters[i].GetString()
-			, x[i].GetInt()
-			, y[i].GetInt()
-			, tfsize[i].GetInt()
-			));
+		Value& x = arrangement["x"];
+		Value& y = arrangement["y"];
+		Value& parameters = arrangement["parameters"];
+		Value& tfsize = arrangement["tfsize"];
+		Value& labels = arrangement["labels"];
+
+		for (int i = 0; i < labels.Size(); i++)
+		{
+			components.push_back(make_unique<Parameter>(labels[i].GetString()
+				, parameters[i].GetString()
+				, x[i].GetInt()
+				, y[i].GetInt()
+				, tfsize[i].GetInt()
+				));
+		}
 	}
 
 	if (arrangement.HasMember("infowidgets"))
 	{
-		
 		Value& infoNames = arrangement["infowidgets"];
 		Value& infoSize = arrangement["infosize"];
 		Value& infoX = arrangement["infox"];
@@ -169,8 +171,16 @@ void Screens::init()
 		FileReadStream is(fp, readBuffer, sizeof(readBuffer));
 		auto panelDoc = make_unique<Document>();
 		panelDoc->ParseStream(is);
-
 		fclose(fp);
+
+		static const char* kTypeNames[] =
+		{ "Null", "False", "True", "Object", "Array", "String", "Number" };
+
+		for (Value::ConstMemberIterator itr = panelDoc->MemberBegin();
+			itr != panelDoc->MemberEnd(); ++itr)
+		{
+			MLOG("\"" + string(itr->name.GetString()) + "\", ");
+		}
 
 		layerDocuments.push_back(move(panelDoc));
 	}

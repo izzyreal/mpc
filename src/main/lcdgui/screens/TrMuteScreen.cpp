@@ -155,23 +155,23 @@ void TrMuteScreen::displaySq()
 
 void TrMuteScreen::setOpaque(int i)
 {
-	findLabel("tr" + to_string(i + 1)).lock()->setOpaque(true);
+	findLabel(to_string(i + 1)).lock()->setOpaque(true);
 }
 
 void TrMuteScreen::displayTrack(int i)
 {
-	findLabel("tr" + to_string(i + 1)).lock()->setText(sequencer.lock()->getActiveSequence().lock()->getTrack(i + bankoffset()).lock()->getName().substr(0, 8));
+	findLabel(to_string(i + 1)).lock()->setText(sequencer.lock()->getActiveSequence().lock()->getTrack(i + bankoffset()).lock()->getName().substr(0, 8));
 }
 
 void TrMuteScreen::setTrackColor(int i)
 {	
 	if (sequencer.lock()->isSoloEnabled())
 	{
-		findLabel("tr" + to_string(i + 1)).lock()->setInverted(i + bankoffset() == sequencer.lock()->getActiveTrackIndex());
+		findLabel(to_string(i + 1)).lock()->setInverted(i + bankoffset() == sequencer.lock()->getActiveTrackIndex());
 	}
 	else
 	{
-		findLabel("tr" + to_string(i + 1)).lock()->setInverted(sequencer.lock()->getActiveSequence().lock()->getTrack(i + bankoffset()).lock()->isOn());
+		findLabel(to_string(i + 1)).lock()->setInverted(sequencer.lock()->getActiveSequence().lock()->getTrack(i + bankoffset()).lock()->isOn());
 	}
 }
 

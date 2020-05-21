@@ -385,8 +385,11 @@ int LayeredScreen::openScreen(string screenName) {
 
 	screenComponent->open();
 
-	returnToLastFocus(screenComponent->findFields().front().lock()->getName());
-
+	if (screenComponent->findFields().size() > 0)
+	{
+		returnToLastFocus(screenComponent->findFields().front().lock()->getName());
+	}
+	
 	return focusedLayerIndex;
 }
 

@@ -188,11 +188,21 @@ void Component::addChildren(vector<shared_ptr<Component>> children)
 
 weak_ptr<Component> Component::findChild(const string& name)
 {
+	if (name.compare("background") == 0)
+	{
+		printf("foo");
+	}
 	for (auto& c : children)
 	{
 		if (c->getName().compare(name) == 0)
 		{
 			return c;
+		}
+
+		auto candidate = c->findChild(name).lock();
+		if (candidate)
+		{
+			return candidate;
 		}
 	}
 	return {};
@@ -303,6 +313,10 @@ MRECT Component::getRect() {
 void Component::Clear(vector<vector<bool>>* pixels) {
 	auto r = getRect();
 	for (int i = r.L; i < r.R - 1; i++) {
+		if (i < 0)
+		{
+			continue;
+		}
 		for (int j = r.T; j < r.B; j++) {
 			(*pixels)[i][j] = false;
 		}

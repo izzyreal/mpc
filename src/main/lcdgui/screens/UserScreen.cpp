@@ -27,7 +27,7 @@ void UserScreen::open()
 	displayBars();
 	displayPgm();
 	displayRecordingMode();
-	displayBus();
+	displayTrackType();
 	displayDeviceNumber();
 	displayVelo();
 }
@@ -140,9 +140,9 @@ void UserScreen::displayRecordingMode()
 	findField("recordingmode").lock()->setText(mpc::ui::UserDefaults::instance().isRecordingModeMulti() ? "M" : "S");
 }
 
-void UserScreen::displayBus()
+void UserScreen::displayTrackType()
 {
-	findField("bus").lock()->setText(busNames[mpc::ui::UserDefaults::instance().getBus()]);
+	findField("tracktype").lock()->setText(busNames[mpc::ui::UserDefaults::instance().getBus()]);
 	displayDeviceName();
 }
 
@@ -229,7 +229,7 @@ void UserScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 	}
 	else if (s.compare("tracktype") == 0)
 	{
-		displayBus();
+		displayTrackType();
 	}
 	else if (s.compare("devicenumber") == 0)
 	{

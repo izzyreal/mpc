@@ -25,8 +25,8 @@ void TrackScreen::open()
 	findField("tracknamefirstletter").lock()->setText(track.lock()->getName().substr(0, 1));
 	findLabel("tracknamerest").lock()->setText(track.lock()->getName().substr(1, track.lock()->getName().length()));
 
-	findField("defaulttracknamefirstletter").lock()->setText(defaultTrackName.substr(0, 1));
-	findLabel("defaulttracknamerest").lock()->setText(defaultTrackName.substr(1, defaultTrackName.length()));
+	findField("defaultnamefirstletter").lock()->setText(defaultTrackName.substr(0, 1));
+	findLabel("defaultnamerest").lock()->setText(defaultTrackName.substr(1, defaultTrackName.length()));
 }
 
 void TrackScreen::function(int i)

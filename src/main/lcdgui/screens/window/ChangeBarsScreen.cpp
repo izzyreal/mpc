@@ -95,7 +95,7 @@ void ChangeBarsScreen::displayNumberOfBars()
 
 void ChangeBarsScreen::displayAfterBar()
 {
-	findField("after").lock()->setText(to_string(getAfterBar()));
+	findField("afterbar").lock()->setText(to_string(getAfterBar()));
 }
 
 int ChangeBarsScreen::getLastBar()
