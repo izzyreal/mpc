@@ -24,13 +24,13 @@ void PasteEventScreen::function(int i)
 	switch (i)
 	{
 	case 4:
-		auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(Screens::getScreenComponent("sequencer_step"));
+		auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(Screens::getScreenComponent("step"));
 		for (auto& event : stepEditorScreen->getPlaceHolder())
 		{
 			auto eventClone = track.lock()->cloneEvent(event).lock();
 			eventClone->setTick(sequencer.lock()->getTickPosition());
 		}
-		ls.lock()->openScreen("sequencer_step");
+		ls.lock()->openScreen("step");
 		break;
 	}
 }

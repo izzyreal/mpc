@@ -609,7 +609,6 @@ void LayeredScreen::drawFunctionKeys(string screenName)
 	//auto& screenJson = layerJsons[currentLayer][screenName.c_str()];
 	//Value& fblabels = screenJson["fblabels"];
 	//Value& fbtypes = screenJson["fbtypes"];
-	//getFunctionKeys()->clearAll(&pixels);
 	//getCurrentBackground()->SetDirty(); // only redraw fk area
 	//getFunctionKeys()->initialize(fblabels, fbtypes);
 }
@@ -790,7 +789,8 @@ void LayeredScreen::initObserver()
 
 	auto csn = currentScreenName;
 
-	if (activeObserver) {
+	if (activeObserver)
+	{
 		activeObserver.reset();
 	}
 
@@ -842,7 +842,7 @@ void LayeredScreen::initObserver()
 	{
 		activeObserver = make_unique<PgmAssignObserver>();
 	}
-	else if (csn.compare("mixerv2") == 0 || csn.compare("mixersetup") == 0)
+	else if (csn.compare("mixer") == 0 || csn.compare("mixersetup") == 0)
 	{
 		activeObserver = make_unique<MixerObserver>();
 	}

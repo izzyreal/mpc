@@ -149,7 +149,7 @@ AllLoader::AllLoader(mpc::disk::MpcFile* file, bool sequencesOnly)
 		auto midiSyncMisc = allParser.getMidiSync();
 				
 		auto misc = allParser.getMisc();
-		auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(Screens::getScreenComponent("sequencer_step"));
+		auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(Screens::getScreenComponent("step"));
 		stepEditorScreen->setAutoStepIncrementEnabled(misc->isAutoStepIncEnabled());
 		stepEditorScreen->setTcValueRecordedNotes(misc->getDurationTcPercentage());
 		stepEditorScreen->setDurationOfRecordedNotes(misc->isDurationOfRecNotesTc());

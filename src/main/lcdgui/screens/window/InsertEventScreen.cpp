@@ -42,7 +42,7 @@ void InsertEventScreen::function(int i)
 	case 4:
 	{
 		insertEvent();
-		ls.lock()->openScreen("sequencer_step");
+		ls.lock()->openScreen("step");
 		break;
 	}
 	}

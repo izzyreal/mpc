@@ -44,8 +44,8 @@ void GlobalReleaseControls::function(int i) {
 	auto controls = Mpc::instance().getControls().lock();
 	switch (i) {
 	case 0:
-		if (csn.compare("step_tc") == 0) {
-			ls.lock()->openScreen("sequencer_step");
+		if (csn.compare("step-timing-correct") == 0) {
+			ls.lock()->openScreen("step");
 		}
 		break;
 	case 2:
@@ -102,7 +102,7 @@ void GlobalReleaseControls::simplePad(int i)
 	bool posIsLastTick = sequencer.lock()->getTickPosition() == sequencer.lock()->getActiveSequence().lock()->getLastTick();
 
 	bool maybeRecWithoutPlaying = csn.compare("sequencer") == 0 && !posIsLastTick;
-	bool stepRec = csn.compare("sequencer_step") == 0 && !posIsLastTick;
+	bool stepRec = csn.compare("step") == 0 && !posIsLastTick;
 	if (stepRec || maybeRecWithoutPlaying) {
 		auto newDur = static_cast<int>(Mpc::instance().getAudioMidiServices().lock()->getFrameSequencer().lock()->getTickPosition());
 		sequencer.lock()->stopMetronomeTrack();
@@ -189,10 +189,10 @@ void GlobalReleaseControls::shift()
 	controls->setShiftPressed(false);
 	init();
 
-	if (csn.compare("sequencer_step") == 0 && param.length() == 2)
+	if (csn.compare("step") == 0 && param.length() == 2)
 	{
 		auto eventNumber = stoi(param.substr(1, 2));
-		auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(Screens::getScreenComponent("sequencer_step"));
+		auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(Screens::getScreenComponent("step"));
 		auto res = eventNumber + stepEditorScreen->getYOffset();
 		stepEditorScreen->setSelectionEndIndex(res);
 	}

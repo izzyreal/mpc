@@ -59,7 +59,7 @@ MixerObserver::MixerObserver()
 		indivFxMixerChannel->addObserver(this);
 	}
 
-	if (lLs->getCurrentScreenName().compare("mixerv2") == 0) {
+	if (lLs->getCurrentScreenName().compare("mixer") == 0) {
 		initPadNameLabels();
 		initMixerStrips();
 		for (auto& m : mixerStrips) {
@@ -211,7 +211,7 @@ void MixerObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 		}
 	}
 	else if (s.compare("volume") == 0) {
-		if (lLs->getCurrentScreenName().compare("mixerv2") == 0) {
+		if (lLs->getCurrentScreenName().compare("mixer") == 0) {
 			if (!mixGui->getLink()) {
 				int pad = mixGui->getXPos() + (bank * 16);
 				auto mixerChannel = lProgram->getPad(pad)->getStereoMixerChannel();
@@ -230,7 +230,7 @@ void MixerObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 		}
 	}
 	else if (s.compare("panning") == 0) {
-		if (lLs->getCurrentScreenName().compare("mixerv2") == 0) {
+		if (lLs->getCurrentScreenName().compare("mixer") == 0) {
 			if (!mixGui->getLink()) {
 				int pad = mixGui->getXPos() + (bank * 16);
 				auto mixerChannel = lProgram->getPad(pad)->getStereoMixerChannel();
@@ -249,7 +249,7 @@ void MixerObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 		}
 	}
 	else if (s.compare("output") == 0) {
-		if (lLs->getCurrentScreenName().compare("mixerv2") == 0) {
+		if (lLs->getCurrentScreenName().compare("mixer") == 0) {
 			if (!mixGui->getLink()) {
 				int pad = mixGui->getXPos() + (bank * 16);
 				auto smc = lProgram->getPad(pad)->getStereoMixerChannel().lock();
@@ -282,7 +282,7 @@ void MixerObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 		}
 	}
 	else if (s.compare("volumeindividual") == 0) {
-		if (lLs->getCurrentScreenName().compare("mixerv2") == 0) {
+		if (lLs->getCurrentScreenName().compare("mixer") == 0) {
 			if (!mixGui->getLink()) {
 				int pad = mixGui->getXPos() + (bank * 16);
 				auto ifmc = lProgram->getPad(pad)->getIndivFxMixerChannel().lock();
@@ -300,7 +300,7 @@ void MixerObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 		}
 	}
 	else if (s.compare("fxpath") == 0) {
-		if (lLs->getCurrentScreenName().compare("mixerv2") == 0) {
+		if (lLs->getCurrentScreenName().compare("mixer") == 0) {
 			if (!mixGui->getLink()) {
 				int pad = mixGui->getXPos() + (bank * 16);
 				auto ifmc = lProgram->getPad(pad)->getIndivFxMixerChannel().lock();
@@ -318,7 +318,7 @@ void MixerObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 		}
 	}
 	else if (s.compare("fxsendlevel") == 0) {
-		if (lLs->getCurrentScreenName().compare("mixerv2") == 0) {
+		if (lLs->getCurrentScreenName().compare("mixer") == 0) {
 			if (!mixGui->getLink()) {
 				int pad = mixGui->getXPos() + (bank * 16);
 				auto ifmc = lProgram->getPad(pad)->getIndivFxMixerChannel().lock();

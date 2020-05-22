@@ -183,7 +183,7 @@ Controls::Controls()
 
 	
 	controls["selectdrum_mixer"] = new mixer::SelectDrumMixerControls();
-	controls["mixerv2"] = new mixer::MixerControls();
+	controls["mixer"] = new mixer::MixerControls();
 	controls["mixersetup"] = new mixer::MixerSetupControls();
 	controls["fxedit"] = new mixer::FxEditControls();
 	controls["channelsettings"] = new mixer::window::ChannelSettingsControls();

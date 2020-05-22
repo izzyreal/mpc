@@ -41,7 +41,7 @@ void MixerSetupControls::function(int i)
 	if (i < 4) {
 		samplerGui->setSelectedDrum(i);
 		samplerGui->setPrevScreenName(csn);
-		ls.lock()->openScreen("mixerv2");
+		ls.lock()->openScreen("mixer");
 	}
 }
 

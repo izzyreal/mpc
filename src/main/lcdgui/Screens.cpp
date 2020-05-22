@@ -72,6 +72,41 @@ using namespace std;
 vector<unique_ptr<Document>> Screens::layerDocuments;
 map<string, shared_ptr<ScreenComponent>> Screens::screens;
 
+
+vector<int> getFunctionKeyTypes(Value& functionKeyTypes)
+{
+	vector<int> types;
+	for (int i = 0; i < 6; i++)
+	{
+		if (functionKeyTypes[i].IsNull())
+		{
+			types.push_back(-1);
+		}
+		else
+		{
+			types.push_back(functionKeyTypes[i].GetInt());
+		}
+	}
+	return types;
+}
+
+vector<string> getFunctionKeyLabels(Value& functionKeyLabels)
+{
+	vector<string> labels;
+	for (int i = 0; i < 6; i++)
+	{
+		if (functionKeyLabels[i].IsNull())
+		{
+			labels.push_back("");
+		}
+		else
+		{
+			labels.push_back(functionKeyLabels[i].GetString());
+		}
+	}
+	return labels;
+}
+
 vector<shared_ptr<Component>> Screens::get(const string& screenName, int& foundInLayer)
 {
 	
@@ -134,21 +169,36 @@ vector<shared_ptr<Component>> Screens::get(const string& screenName, int& foundI
 		}
 	}
 
-	auto functionKeysComponent = make_unique<FunctionKeys>();
-
 	if (arrangement.HasMember("fblabels"))
 	{
-		Value& fklabels = arrangement["fblabels"];
-		Value& fktypes = arrangement["fbtypes"];
-		functionKeysComponent->Hide(false);
-		functionKeysComponent->initialize(fklabels, fktypes);
-	}
-	else
-	{
-		functionKeysComponent->Hide(true);
-	}
+		Value& functionLabels = arrangement["fblabels"];
+		Value& functionTypes = arrangement["fbtypes"];
 
-	components.push_back(move(functionKeysComponent));
+	
+		vector<vector<string>> allLabels;
+		vector<vector<int>> allTypes;
+
+		if (!functionLabels[0].IsArray())
+		{
+			auto labels = getFunctionKeyLabels(functionLabels);
+			auto types = getFunctionKeyTypes(functionTypes);
+			allLabels.push_back(labels);
+			allTypes.push_back(types);
+		}
+		else
+		{
+			for (int i = 0; i < functionLabels.Size(); i++)
+			{
+				auto labels = getFunctionKeyLabels(functionLabels[i]);
+				auto types = getFunctionKeyTypes(functionTypes[i]);
+				allLabels.push_back(labels);
+				allTypes.push_back(types);
+			}
+		}
+
+		auto functionKeysComponent = make_unique<FunctionKeys>("function-keys", allLabels, allTypes);
+		components.push_back(move(functionKeysComponent));
+	}
 
 	return components;
 }
@@ -336,7 +386,7 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	{
 		screen = make_shared<TrMuteScreen>(layerIndex);
 	}
-	else if (screenName.compare("sequencer_step") == 0)
+	else if (screenName.compare("step") == 0)
 	{
 		screen = make_shared<StepEditorScreen>(layerIndex);
 	}
@@ -360,7 +410,7 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	{
 		screen = make_shared<AssignScreen>(layerIndex);
 	}
-	else if (screenName.compare("step_tc") == 0)
+	else if (screenName.compare("step-timing-correct") == 0)
 	{
 		screen = make_shared<StepTcScreen>(layerIndex);
 	}

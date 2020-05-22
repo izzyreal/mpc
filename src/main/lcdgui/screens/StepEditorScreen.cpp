@@ -113,7 +113,7 @@ void StepEditorScreen::function(int i)
 	switch (i)
 	{
 	case 0:
-		ls.lock()->openScreen("step_tc");
+		ls.lock()->openScreen("step-timing-correct");
 		break;
 	case 1:
 		if (selectionStartIndex != -1)
@@ -134,7 +134,7 @@ void StepEditorScreen::function(int i)
 		if (selectionStartIndex != -1)
 		{
 			removeEvents();
-			ls.lock()->openScreen("sequencer_step");
+			ls.lock()->openScreen("step");
 			ls.lock()->setFocus("a0");
 		}
 		else if (param.length() == 2)
@@ -151,7 +151,7 @@ void StepEditorScreen::function(int i)
 						break;
 					}
 				}
-				ls.lock()->openScreen("sequencer_step");
+				ls.lock()->openScreen("step");
 			}
 		}
 		break;
@@ -680,7 +680,7 @@ void StepEditorScreen::refreshSelection()
 
 	if (somethingSelected)
 	{
-		Mpc::instance().getLayeredScreen().lock()->drawFunctionKeys("sequencer_step_selection");
+		Mpc::instance().getLayeredScreen().lock()->drawFunctionKeys("step_selection");
 	}
 }
 
@@ -1039,7 +1039,7 @@ void StepEditorScreen::setSelectionStartIndex(int i)
 	selectionStartIndex = i;
 	selectionEndIndex = i;
 	
-	ls.lock()->drawFunctionKeys("sequencer_step_selection");
+	ls.lock()->drawFunctionKeys("step_selection");
 	refreshSelection();
 }
 
@@ -1047,7 +1047,7 @@ void StepEditorScreen::clearSelection()
 {
 	selectionStartIndex = -1;
 	selectionEndIndex = -1;
-	ls.lock()->drawFunctionKeys("sequencer_step");
+	ls.lock()->drawFunctionKeys("step");
 	refreshSelection();
 }
 
