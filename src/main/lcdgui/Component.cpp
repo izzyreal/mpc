@@ -319,6 +319,25 @@ void Component::Clear(vector<vector<bool>>* pixels) {
 	}
 }
 
+vector<weak_ptr<Component>> Component::findHiddenChildren()
+{
+	vector<weak_ptr<Component>> result;
+	for (auto& c : children)
+	{
+		if (c->IsHidden() && c->IsDirty())
+		{
+			result.push_back(c);
+		}
+
+		for (auto& c1 : c->findHiddenChildren())
+		{
+			result.push_back(c1);
+		}
+	}
+
+	return result;
+}
+
 weak_ptr<ScreenComponent> Component::findScreenComponent()
 {
 	for (auto& c : children)

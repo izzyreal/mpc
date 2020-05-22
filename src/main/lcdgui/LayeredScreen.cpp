@@ -399,6 +399,10 @@ vector<vector<bool>>* LayeredScreen::getPixels() {
 
 void LayeredScreen::Draw() {
 	MLOG("LayeredScreen::Draw()");
+	for (auto& c : root->findHiddenChildren())
+	{
+		c.lock()->Draw(&pixels);
+	}
 	root->Draw(&pixels);
 	return;
 }
@@ -606,11 +610,7 @@ vector<weak_ptr<MixerTopBackground>> LayeredScreen::getMixerTopBackgrounds()
 
 void LayeredScreen::setFunctionKeysArrangement(int arrangementIndex)
 {
-	//auto& screenJson = layerJsons[currentLayer][screenName.c_str()];
-	//Value& fblabels = screenJson["fblabels"];
-	//Value& fbtypes = screenJson["fbtypes"];
-	//getCurrentBackground()->SetDirty(); // only redraw fk area
-	//getFunctionKeys()->initialize(fblabels, fbtypes);
+	getFunctionKeys()->setActiveArrangement(arrangementIndex);
 }
 
 weak_ptr<TwoDots> LayeredScreen::getTwoDots()

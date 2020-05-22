@@ -133,6 +133,37 @@ vector<shared_ptr<Component>> Screens::get(const string& screenName, int& foundI
 
 	vector<shared_ptr<Component>> components;
 
+	if (arrangement.HasMember("fblabels"))
+	{
+		Value& functionLabels = arrangement["fblabels"];
+		Value& functionTypes = arrangement["fbtypes"];
+
+
+		vector<vector<string>> allLabels;
+		vector<vector<int>> allTypes;
+
+		if (!functionLabels[0].IsArray())
+		{
+			auto labels = getFunctionKeyLabels(functionLabels);
+			auto types = getFunctionKeyTypes(functionTypes);
+			allLabels.push_back(labels);
+			allTypes.push_back(types);
+		}
+		else
+		{
+			for (int i = 0; i < functionLabels.Size(); i++)
+			{
+				auto labels = getFunctionKeyLabels(functionLabels[i]);
+				auto types = getFunctionKeyTypes(functionTypes[i]);
+				allLabels.push_back(labels);
+				allTypes.push_back(types);
+			}
+		}
+
+		auto functionKeysComponent = make_unique<FunctionKeys>("function-keys", allLabels, allTypes);
+		components.push_back(move(functionKeysComponent));
+	}
+
 	if (arrangement.HasMember("labels"))
 	{
 		Value& x = arrangement["x"];
@@ -167,37 +198,6 @@ vector<shared_ptr<Component>> Screens::get(const string& screenName, int& foundI
 				, infoY[i].GetInt()
 				, infoSize[i].GetInt()));
 		}
-	}
-
-	if (arrangement.HasMember("fblabels"))
-	{
-		Value& functionLabels = arrangement["fblabels"];
-		Value& functionTypes = arrangement["fbtypes"];
-
-	
-		vector<vector<string>> allLabels;
-		vector<vector<int>> allTypes;
-
-		if (!functionLabels[0].IsArray())
-		{
-			auto labels = getFunctionKeyLabels(functionLabels);
-			auto types = getFunctionKeyTypes(functionTypes);
-			allLabels.push_back(labels);
-			allTypes.push_back(types);
-		}
-		else
-		{
-			for (int i = 0; i < functionLabels.Size(); i++)
-			{
-				auto labels = getFunctionKeyLabels(functionLabels[i]);
-				auto types = getFunctionKeyTypes(functionTypes[i]);
-				allLabels.push_back(labels);
-				allTypes.push_back(types);
-			}
-		}
-
-		auto functionKeysComponent = make_unique<FunctionKeys>("function-keys", allLabels, allTypes);
-		components.push_back(move(functionKeysComponent));
 	}
 
 	return components;
