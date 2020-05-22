@@ -390,13 +390,13 @@ void MixerObserver::displayFunctionKeys()
 	auto lLs = ls.lock();
 
 	if (mixGui->getTab() == 0) {
-		lLs->drawFunctionKeys("mixer_stereo" + link);
+		lLs->setFunctionKeysArrangement(mixGui->getLink() ? 3 : 0);
 	}
 	else if (mixGui->getTab() == 1) {
-		lLs->drawFunctionKeys("mixer_indiv" + link);
+		lLs->setFunctionKeysArrangement(mixGui->getLink() ? 4 : 1);
 	}
 	else if (mixGui->getTab() == 2) {
-		lLs->drawFunctionKeys("mixer_fxsend" + link);
+		lLs->setFunctionKeysArrangement(mixGui->getLink() ? 5 : 2);
 	}
 }
 

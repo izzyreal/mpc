@@ -270,7 +270,7 @@ void SequencerScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 	}
 	else if (s.compare("nextsq") == 0)
 	{
-		ls.lock()->drawFunctionKeys("nextsq");
+		ls.lock()->setFunctionKeysArrangement(1);
 		if (nextSqField->IsHidden()) {
 			nextSqField->Hide(false);
 			nextSqLabel->Hide(false);
@@ -282,7 +282,7 @@ void SequencerScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 	{
 		nextSqField->Hide(true);
 		nextSqLabel->Hide(true);
-		ls.lock()->drawFunctionKeys("sequencer");
+		ls.lock()->setFunctionKeysArrangement(0);
 		ls.lock()->setFocus("sq");
 	}
 	else if (s.compare("count") == 0)

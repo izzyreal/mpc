@@ -133,7 +133,7 @@ namespace mpc::lcdgui {
 		std::vector<std::weak_ptr<Knob>> getKnobs();
 		std::vector<std::weak_ptr<MixerFaderBackground>> getMixerFaderBackgrounds();
 		std::vector<std::weak_ptr<MixerTopBackground>> getMixerTopBackgrounds();
-		void drawFunctionKeys(std::string screenName);
+		void setFunctionKeysArrangement(int arrangementIndex);
 		std::weak_ptr<Underline> getUnderline();
 		std::weak_ptr<TwoDots> getTwoDots();
 		std::weak_ptr<Wave> getFineWave();

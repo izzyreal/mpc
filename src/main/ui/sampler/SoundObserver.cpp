@@ -88,14 +88,14 @@ void SoundObserver::displayLSource()
 	auto ls = Mpc::instance().getLayeredScreen().lock();
 	lSourceField.lock()->setText(lSampler->getSoundName(soundGui->getSoundIndex()));
 	if (lSampler->getSound(soundGui->getSoundIndex()).lock()->isMono() && lSampler->getSound(soundGui->getRSource()).lock()->isMono()) {
-		ls->drawFunctionKeys("monotostereo");
+		//ls->setFunctionKeysArrangement("monotostereo");
 		//ls->getWave().lock()->SetDirty();
 		//ls->getLayer(0)->setDirty();
 		//ls->getLayer(1)->setDirty();
 		//ls->getLayer(2)->setDirty();
 	}
 	else {
-		ls->drawFunctionKeys("convertnodoit");
+		ls->setFunctionKeysArrangement(1);
 		//ls->getWave().lock()->SetDirty();
 		//ls->getLayer(0)->setDirty();
 		//ls->getLayer(1)->setDirty();
@@ -109,14 +109,14 @@ void SoundObserver::displayRSource()
 	auto ls = Mpc::instance().getLayeredScreen().lock();
 	rSourceField.lock()->setText(lSampler->getSoundName(soundGui->getRSource()));
 	if (lSampler->getSound(soundGui->getSoundIndex()).lock()->isMono() && lSampler->getSound(soundGui->getRSource()).lock()->isMono()) {
-		ls->drawFunctionKeys("monotostereo");
+		//ls->setFunctionKeysArrangement("monotostereo");
 		//ls->getWave().lock()->SetDirty();
 		//ls->getLayer(0)->setDirty();
 		//ls->getLayer(1)->setDirty();
 		//ls->getLayer(2)->setDirty();
 	}
 	else {
-		ls->drawFunctionKeys("convertnodoit");
+		ls->setFunctionKeysArrangement(1);
 		//ls->getWave().lock()->SetDirty();
 		//ls->getLayer(0)->setDirty();
 		//ls->getLayer(1)->setDirty();
@@ -135,14 +135,14 @@ void SoundObserver::displayStereoSource()
 	auto ls = Mpc::instance().getLayeredScreen().lock();
 	stereoSourceField.lock()->setText(lSampler->getSoundName(soundGui->getSoundIndex()));
 	if (lSampler->getSound(soundGui->getSoundIndex()).lock()->isMono()) {
-		ls->drawFunctionKeys("convertnodoit");
+		ls->setFunctionKeysArrangement(1);
 		//ls->getWave().lock()->SetDirty();
 		//ls->getLayer(0)->setDirty();
 		//ls->getLayer(1)->setDirty();
 		//ls->getLayer(2)->setDirty();
 	}
 	else {
-		ls->drawFunctionKeys("stereotomono");
+		//ls->setFunctionKeysArrangement("stereotomono");
 		//ls->getWave().lock()->SetDirty();
 		//ls->getLayer(0)->setDirty();
 		//ls->getLayer(1)->setDirty();

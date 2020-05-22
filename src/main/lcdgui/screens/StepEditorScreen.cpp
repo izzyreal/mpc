@@ -680,7 +680,7 @@ void StepEditorScreen::refreshSelection()
 
 	if (somethingSelected)
 	{
-		Mpc::instance().getLayeredScreen().lock()->drawFunctionKeys("step_selection");
+		Mpc::instance().getLayeredScreen().lock()->setFunctionKeysArrangement(1);
 	}
 }
 
@@ -1039,7 +1039,7 @@ void StepEditorScreen::setSelectionStartIndex(int i)
 	selectionStartIndex = i;
 	selectionEndIndex = i;
 	
-	ls.lock()->drawFunctionKeys("step_selection");
+	ls.lock()->setFunctionKeysArrangement(1);
 	refreshSelection();
 }
 
@@ -1047,7 +1047,7 @@ void StepEditorScreen::clearSelection()
 {
 	selectionStartIndex = -1;
 	selectionEndIndex = -1;
-	ls.lock()->drawFunctionKeys("step");
+	ls.lock()->setFunctionKeysArrangement(0);
 	refreshSelection();
 }
 

@@ -89,7 +89,7 @@ void TrMoveScreen::left()
 
 	if (param.compare("sq") == 0)
 	{
-		ls.lock()->drawFunctionKeys("trmove");
+		ls.lock()->setFunctionKeysArrangement(0);
 	}
 }
 
@@ -111,7 +111,7 @@ void TrMoveScreen::right()
 	
 	if (param.compare("sq") != 0 && !isSelected())
 	{
-		ls.lock()->drawFunctionKeys("trmove_notselected");
+		ls.lock()->setFunctionKeysArrangement(1);
 	}
 }
 
@@ -153,7 +153,7 @@ void TrMoveScreen::function(int i)
 			auto sequence = sequencer.lock()->getSequence(sq).lock();
 			insert(sequence.get());
 			ls.lock()->setFocus("tr1");
-			ls.lock()->drawFunctionKeys("trmove_notselected");
+			ls.lock()->setFunctionKeysArrangement(1);
 		}
 		else
 		{
@@ -249,7 +249,7 @@ void TrMoveScreen::displayTrFields()
 		}
 		
 		findField("tr0").lock()->setText("Tr:" + StrUtil::padLeft(to_string(selectedTrackIndex + 1), "0", 2) + "-" + tr0Name);
-		ls.lock()->drawFunctionKeys("trmove_selected");
+		ls.lock()->setFunctionKeysArrangement(2);
 	}
 	else
 	{
@@ -262,11 +262,11 @@ void TrMoveScreen::displayTrFields()
 		
 		if (ls.lock()->getFocus().compare(findField("tr1").lock()->getName()) == 0)
 		{
-			ls.lock()->drawFunctionKeys("trmove_notselected");
+			ls.lock()->setFunctionKeysArrangement(1);
 		}
 		else
 		{
-			ls.lock()->drawFunctionKeys("trmove");
+			ls.lock()->setFunctionKeysArrangement(0);
 		}
 	}
 }

@@ -604,7 +604,7 @@ vector<weak_ptr<MixerTopBackground>> LayeredScreen::getMixerTopBackgrounds()
 	return res;
 }
 
-void LayeredScreen::drawFunctionKeys(string screenName)
+void LayeredScreen::setFunctionKeysArrangement(int arrangementIndex)
 {
 	//auto& screenJson = layerJsons[currentLayer][screenName.c_str()];
 	//Value& fblabels = screenJson["fblabels"];
