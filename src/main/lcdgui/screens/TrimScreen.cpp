@@ -29,7 +29,7 @@ void TrimScreen::openWindow()
 	init();
 	auto lLs = ls.lock();
 	if (param.compare("snd") == 0) {
-		soundGui->setSoundIndex(soundGui->getSoundIndex(), sampler.lock()->getSoundCount());
+		setSoundIndex(soundGui->getSoundIndex(), sampler.lock()->getSoundCount());
 		soundGui->setPreviousScreenName("trim");
 		lLs->openScreen("sound");
 	}

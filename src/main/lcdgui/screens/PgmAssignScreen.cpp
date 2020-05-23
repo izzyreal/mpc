@@ -145,7 +145,7 @@ void PgmAssignScreen::openWindow()
 	else if (param.compare("snd") == 0) {
 		auto sn = sampler.lock()->getLastNp(program.lock().get())->getSndNumber();
 		if (sn != -1) {
-			soundGui->setSoundIndex(sn, sampler.lock()->getSoundCount());
+			setSoundIndex(sn, sampler.lock()->getSoundCount());
 			soundGui->setPreviousScreenName("programassign");
 			lLs->openScreen("sound");
 		}

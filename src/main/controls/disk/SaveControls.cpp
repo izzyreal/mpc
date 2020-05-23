@@ -61,8 +61,11 @@ void SaveControls::function(int i)
 			ls.lock()->openScreen("saveaprogram");
 			break;
 		case 4:
-			if (sampler.lock()->getSoundCount() == 0) break;
-			nameGui->setName(sampler.lock()->getSoundName(soundGui->getSoundIndex()));
+			if (sampler.lock()->getSoundCount() == 0)
+			{
+				break;
+			}
+			nameGui->setName(sampler.lock()->getSoundName(sampler.lock()->getSoundIndex()));
 			ls.lock()->openScreen("saveasound");
 			break;
 		}
@@ -92,7 +95,7 @@ void SaveControls::turnWheel(int i)
 			sampler.lock()->setDrumBusProgramNumber(nr, sampler.lock()->getDrumBusProgramNumber(nr) + i);
 			break;
 		case 4:
-			soundGui->setSoundIndex(soundGui->getSoundIndex() + i, sampler.lock()->getSoundCount());
+			sampler.lock()->setSoundIndex(sampler.lock()->getSoundIndex() + i);
 			break;
 		case 5:
 			break;

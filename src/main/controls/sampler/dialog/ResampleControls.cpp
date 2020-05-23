@@ -22,7 +22,7 @@ ResampleControls::ResampleControls()
 void ResampleControls::turnWheel(int i)
 {
 	init();
-	auto lLs = ls.lock();
+
 	if (param.compare("newfs") == 0) {
 		soundGui->setNewFs(soundGui->getNewFs() + i);
 	}
@@ -33,9 +33,9 @@ void ResampleControls::turnWheel(int i)
 		soundGui->setQuality(soundGui->getQuality() + i);
 	}
 	else if (param.compare("newname") == 0) {
-		nameGui->setName(lLs->lookupField("newname").lock()->getText());
+		nameGui->setName(ls.lock()->lookupField("newname").lock()->getText());
 		nameGui->setParameterName("newname");
-		lLs->openScreen("name");
+		ls.lock()->openScreen("name");
 	}
 }
 
@@ -43,19 +43,20 @@ void ResampleControls::function(int i)
 {
 	init();
 	
-	auto lLs = ls.lock();
-	switch (i) {
+	switch (i)
+	{
 	case 3:
-		lLs->openScreen("sound");
+		ls.lock()->openScreen("sound");
 		break;
 	case 4:
-		auto snd = sampler.lock()->getSound(soundGui->getSoundIndex()).lock();
+		auto snd = sampler.lock()->getSound(sampler.lock()->getSoundIndex()).lock();
 		auto destSnd = sampler.lock()->addSound().lock();
 		destSnd->setName(soundGui->getNewName());
 
 		auto source = snd->getSampleData();
 
-		if (soundGui->getNewFs() != dynamic_pointer_cast<mpc::sampler::Sound>(snd)->getSampleRate()) {
+		if (soundGui->getNewFs() != dynamic_pointer_cast<mpc::sampler::Sound>(snd)->getSampleRate())
+		{
 			float* srcArray = &(*source)[0];
 
 			SRC_DATA srcData;
@@ -71,20 +72,26 @@ void ResampleControls::function(int i)
 			srcData.data_out = destArray;
 
 			auto error = src_simple(&srcData, 0, 1);
-			if (error != 0) {
+			if (error != 0)
+			{
 				const char* errormsg = src_strerror(error);
 				string errorStr(errormsg);
 				MLOG("libsamplerate error: " + errorStr);
 			}
 		}
-		else {
+		else
+		{
 			*destSnd->getSampleData() = *source;
 		}
-		for (auto& f : *destSnd->getSampleData()) {
-			if (f > 1) {
+		
+		for (auto& f : *destSnd->getSampleData())
+		{
+			if (f > 1)
+			{
 				f = 1;
 			}
-			else if (f < -1) {
+			else if (f < -1)
+			{
 				f = -1;
 			}
 		}
@@ -93,14 +100,17 @@ void ResampleControls::function(int i)
 		destSnd->setMono(snd->isMono());
 		destSnd->setName(soundGui->getNewName());
 
-		if (soundGui->getNewBit() == 1) {
+		if (soundGui->getNewBit() == 1)
+		{
 			sampler.lock()->process12Bit(destSnd->getSampleData());
 		}
-		else if (soundGui->getNewBit() == 2) {
+		else if (soundGui->getNewBit() == 2)
+		{
 			sampler.lock()->process8Bit(destSnd->getSampleData());
 		}
-		soundGui->setSoundIndex(sampler.lock()->getSoundCount() - 1, sampler.lock()->getSoundCount());
-		lLs->openScreen("sound");
+
+		sampler.lock()->setSoundIndex(sampler.lock()->getSoundCount() - 1);
+		ls.lock()->openScreen("sound");
 		break;
 	}
 }

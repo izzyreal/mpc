@@ -14,7 +14,6 @@ namespace mpc {
 			{
 
 			private:
-				int soundIndex{ 0 };
 				std::string previousScreenName{""};
 				int convert{};
 				int newFs{};
@@ -37,8 +36,6 @@ namespace mpc {
 			public:
 				bool isEndSelected();
 				void setEndSelected(bool b);
-				void setSoundIndex(int i, int soundCount);
-				int getSoundIndex();
 				std::string getPreviousScreenName();
 				void setPreviousScreenName(std::string s);
 				void setConvert(int i);

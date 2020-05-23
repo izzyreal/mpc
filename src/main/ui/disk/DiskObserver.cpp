@@ -376,7 +376,7 @@ void DiskObserver::update(moduru::observer::Observable* o, nonstd::any a)
 		if (csn.compare("loadasound") == 0)
 			displayAssignToNote();
 	}
-	else if (param.compare("seqnumbername") == 0 || param.compare("soundnumber") == 0) {
+	else if (param.compare("seqnumbername") == 0 || param.compare("soundindex") == 0) {
 		displayFile();
 		displaySize();
 	}

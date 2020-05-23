@@ -26,10 +26,10 @@ void CopySoundControls::function(int i)
 		lLs->openScreen("sound");
 		break;
 	case 4:
-		sound = dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getSound(soundGui->getSoundIndex()).lock());
+		sound = dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getSound(sampler.lock()->getSoundIndex()).lock());
 		newSound = sampler.lock()->copySound(sound);
 		newSound.lock()->setName(soundGui->getNewName());
-		soundGui->setSoundIndex(sampler.lock()->getSoundCount() - 1, sampler.lock()->getSoundCount());
+		sampler.lock()->setSoundIndex(sampler.lock()->getSoundCount() - 1);
 		lLs->openScreen("sound");
 		break;
 	}
@@ -39,18 +39,19 @@ void CopySoundControls::turnWheel(int i)
 {
 	init();
 	
-	if (param.compare("snd") == 0) {
-		soundGui->setSoundIndex(sampler.lock()->getNextSoundIndex(soundGui->getSoundIndex(), i > 0), sampler.lock()->getSoundCount());
-		auto newSampleName = sampler.lock()->getSoundName(soundGui->getSoundIndex());
+	if (param.compare("snd") == 0)
+	{
+		sampler.lock()->setSoundIndex(sampler.lock()->getNextSoundIndex(sampler.lock()->getSoundIndex(), i > 0));
+		auto newSampleName = sampler.lock()->getSoundName(sampler.lock()->getSoundIndex());
 		//newSampleName = newSampleName->replaceAll("\\s+$", "");
 		newSampleName = sampler.lock()->addOrIncreaseNumber(newSampleName);
 		soundGui->setNewName(newSampleName);
 	}
 
-	auto lLs = ls.lock();
-	if (param.compare("newname") == 0) {
-		nameGui->setName(lLs->lookupField("newname").lock()->getText());
+	if (param.compare("newname") == 0)
+	{
+		nameGui->setName(ls.lock()->lookupField("newname").lock()->getText());
 		nameGui->setParameterName("newname");
-		lLs->openScreen("name");
+		ls.lock()->openScreen("name");
 	}
 }

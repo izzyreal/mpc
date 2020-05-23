@@ -26,11 +26,10 @@ void KeepOrRetryControls::function(int i)
 {
 	init();
 	
-	auto lLs = ls.lock();
 	switch (i) {
 	case 1:
 		sampler.lock()->deleteSound(dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getPreviewSound().lock()));
-		lLs->openScreen("sample");
+		ls.lock()->openScreen("sample");
 		break;
 	case 3 :
 		if (Mpc::instance().getControls().lock()->isF4Pressed()) return;
@@ -40,8 +39,8 @@ void KeepOrRetryControls::function(int i)
 	case 4:
 		sampler.lock()->getLastNp(program.lock().get())->setSoundNumber(sampler.lock()->getSoundCount() - 1);
 		soundGui->initZones(sampler.lock()->getPreviewSound().lock()->getLastFrameIndex());
-		soundGui->setSoundIndex(sampler.lock()->getSoundCount() - 1, sampler.lock()->getSoundCount());
-		lLs->openScreen("sample");
+		sampler.lock()->setSoundIndex(sampler.lock()->getSoundCount() - 1);
+		ls.lock()->openScreen("sample");
 		break;
 	}
 }
@@ -49,8 +48,7 @@ void KeepOrRetryControls::function(int i)
 void KeepOrRetryControls::turnWheel(int i)
 {
     init();
-	auto lLs = ls.lock();
     nameGui->setName(dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getPreviewSound().lock())->getName());
     nameGui->setParameterName(param);
-    lLs->openScreen("name");
+    ls.lock()->openScreen("name");
 }

@@ -148,7 +148,7 @@ void LoopObserver::displayLoop()
 void LoopObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 {
 	string s = nonstd::any_cast<string>(arg);
-	if (s.compare("soundnumber") == 0) {
+	if (s.compare("soundindex") == 0) {
 		auto lSound = sound.lock();
 		displaySnd();
 		displayTo();

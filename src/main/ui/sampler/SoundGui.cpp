@@ -24,19 +24,6 @@ void SoundGui::setEndSelected(bool b)
     notifyObservers(string("endlength"));
 }
 
-void SoundGui::setSoundIndex(int i, int soundCount)
-{
-    if(i < 0 || i > soundCount - 1) return;
-    soundIndex = i;
-    setChanged();
-    notifyObservers(string("soundnumber"));
-}
-
-int SoundGui::getSoundIndex()
-{
-    return soundIndex;
-}
-
 string SoundGui::getPreviousScreenName()
 {
     return previousScreenName;

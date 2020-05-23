@@ -14,24 +14,29 @@ void DeleteSoundControls::function(int i)
 {
     init();
 	
-	auto lLs = ls.lock();
-	switch (i) {
+	switch (i)
+	{
     case 2:
-        lLs->openScreen("deleteallsound");
+        ls.lock()->openScreen("deleteallsound");
         break;
     case int (3):
-        lLs->openScreen("sound");
+        ls.lock()->openScreen("sound");
         break;
     case 4:
-        sampler.lock()->deleteSample(soundGui->getSoundIndex());
-		if (soundGui->getSoundIndex() > sampler.lock()->getSoundCount() - 1) {
-			soundGui->setSoundIndex(sampler.lock()->getSoundCount() - 1, sampler.lock()->getSoundCount());
+        sampler.lock()->deleteSample(sampler.lock()->getSoundIndex());
+
+		if (sampler.lock()->getSoundIndex() > sampler.lock()->getSoundCount() - 1)
+		{
+			sampler.lock()->setSoundIndex(sampler.lock()->getSoundCount() - 1);
 		}
-		if (sampler.lock()->getSoundCount() > 0) {
-			lLs->openScreen("sound");
+		
+		if (sampler.lock()->getSoundCount() > 0)
+		{
+			ls.lock()->openScreen("sound");
 		}
-		else {
-			lLs->openScreen(soundGui->getPreviousScreenName());
+		else
+		{
+			ls.lock()->openScreen(soundGui->getPreviousScreenName());
 		}
         break;
     }
@@ -40,7 +45,8 @@ void DeleteSoundControls::function(int i)
 void DeleteSoundControls::turnWheel(int i)
 {
 	init();
-	if (param.compare("snd") == 0) {
-		soundGui->setSoundIndex(soundGui->getSoundIndex() + i, sampler.lock()->getSoundCount());
+	if (param.compare("snd") == 0)
+	{
+		sampler.lock()->setSoundIndex(sampler.lock()->getSoundIndex() + i);
 	}
 }

@@ -136,7 +136,7 @@ void ZoneObserver::displayZone()
 void ZoneObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 {
 	string s = nonstd::any_cast<string>(arg);
-	if (s.compare("soundnumber") == 0) {
+	if (s.compare("soundindex") == 0) {
 		displaySnd();
 		soundGui->initZones(sampler.lock()->getSound(soundGui->getSoundIndex()).lock()->getLastFrameIndex());
 		displaySt();

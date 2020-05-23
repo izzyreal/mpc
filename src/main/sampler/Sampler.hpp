@@ -5,6 +5,7 @@
 #include <sampler/Program.hpp>
 #include <sampler/Sound.hpp>
 
+#include <set>
 #include <memory>
 
 namespace ctoot::mpc {
@@ -32,6 +33,12 @@ namespace mpc::sampler {
 
 	private:
 		int inputLevel = 0;
+		int soundIndex = 0;
+
+	public:
+		void setSoundIndex(int i);
+		int getSoundIndex();
+		std::weak_ptr<Sound> getSound();
 
 	private:
 		std::vector<int> initMasterPadAssign;

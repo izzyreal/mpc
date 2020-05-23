@@ -28,11 +28,9 @@ void LoopScreen::open()
 void LoopScreen::openWindow()
 {
 	init();
-	auto lLs = ls.lock();
 	
 	if (param.compare("snd") == 0)
 	{
-		soundGui->setSoundIndex(soundGui->getSoundIndex(), sampler.lock()->getSoundCount());
 		soundGui->setPreviousScreenName("loop");
 		lLs->openScreen("sound");
 	}

@@ -58,54 +58,66 @@ void EditSoundControls::turnWheel(int i)
 
 void EditSoundControls::function(int j)
 {
-	super::function(j);
+	AbstractSamplerControls::function(j);
 	
-	auto lLs = ls.lock();
-	shared_ptr<mpc::sampler::Sound> sound;
-
-	switch (j) {
+	switch (j)
+	{
 
 	case 4:
-		sound = dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getSound(soundGui->getSoundIndex()).lock());
+		auto sound = sampler.lock()->getSound().lock();
 		
-		if (editSoundGui->getEdit() == 0) {
+		if (editSoundGui->getEdit() == 0)
+		{
 			auto newLength = sound->getEnd() - sound->getStart();
-			if (sound->getStart() > sound->getLoopTo()) {
-				if (sound->getLoopTo() > newLength) {
+
+			if (sound->getStart() > sound->getLoopTo())
+			{
+				if (sound->getLoopTo() > newLength)
+				{
 					sound->setLoopTo(newLength);
 				}
-				else {
+				else
+				{
 					sound->setLoopTo(0);
 				}
 			}
-			else {
+			else
+			{
 				sound->setLoopTo(sound->getLoopTo() - sound->getStart());
 			}
-			sampler.lock()->trimSample(soundGui->getSoundIndex(), sound->getStart(), sound->getEnd());
+			
+			sampler.lock()->trimSample(sampler.lock()->getSoundIndex(), sound->getStart(), sound->getEnd());
+			
 			sound->setStart(0);
 			sound->setEnd(newLength);
 			sound->setMono(sound->isMono());
 		}
-		else if (editSoundGui->getEdit() == 1) {
+		else if (editSoundGui->getEdit() == 1)
+		{
 			sound->setLoopTo(sound->getStart());
 		}
-		else if (editSoundGui->getEdit() == 2) {
+		else if (editSoundGui->getEdit() == 2)
+		{
 			auto newSample = sampler.lock()->addSound().lock();
 			newSample->setSampleRate(sound->getSampleRate());
 			newSample->setName(editSoundGui->getNewName());
 			auto newSampleData = newSample->getSampleData();
 			newSampleData->resize(sound->getSampleData()->size());
-			for (int i = 0; i < newSampleData->size(); i++) {
+			
+			for (int i = 0; i < newSampleData->size(); i++)
+			{
 				newSampleData->at(i) = sound->getSampleData()->at(i);
 			}
+			
 			newSample->setMono(sound->isMono());
 			sampler.lock()->trimSample(sampler.lock()->getSoundCount() - 1, sound->getStart(), sound->getEnd());
-			soundGui->setSoundIndex(sampler.lock()->getSoundCount() - 1, sampler.lock()->getSoundCount());
+			sampler.lock()->setSoundIndex(sampler.lock()->getSoundCount() - 1);
 		}
-		else if (editSoundGui->getEdit() == 3) {
+		else if (editSoundGui->getEdit() == 3)
+		{
 			// Insert sound into section start
 			auto source = dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getSound(editSoundGui->getInsertSndNr()).lock());
-			auto destination = dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getSound(soundGui->getSoundIndex()).lock());
+			auto destination = sampler.lock()->getSound().lock();
 			
 			int destinationStartFrame = sound->getStart();
 	
@@ -118,37 +130,50 @@ void EditSoundControls::function(int j)
 			auto sourceData = source->getSampleData();
 			auto destinationData = destination->getSampleData();
 
-			if (!destination->isMono()) {
+			if (!destination->isMono())
+			{
 				newSoundSampleCount *= 2;
 			}
 
 			vector<float> newData(newSoundSampleCount);
 			int sourceFrameCounter = 0;
 			int destinationFrameCounter = 0;
-			for (int i = 0; i < newSoundFrameCount; i++) {
-				if (i < destinationStartFrame) {
+
+			for (int i = 0; i < newSoundFrameCount; i++)
+			{
+				if (i < destinationStartFrame)
+				{
 					newData[i] = (*destinationData)[destinationFrameCounter];
-					if (!destination->isMono()) {
+
+					if (!destination->isMono())
+					{
 						newData[i + newSoundFrameCount] = (*destinationData)[destinationFrameCounter + destinationFrameCount];
 					}
 					destinationFrameCounter++;
 				}
-				else if (i < destinationStartFrame + sourceFrameCount) {
+				else if (i < destinationStartFrame + sourceFrameCount)
+				{
 					newData[i] = (*sourceData)[sourceFrameCounter];
-					if (!destination->isMono()) {
-						if (source->isMono()) {
+				
+					if (!destination->isMono())
+					{
+						if (source->isMono())
+						{
 							newData[i + newSoundFrameCount] = newData[i];
 						}
-						else {
+						else
+						{
 							newData[i + newSoundFrameCount] = (*sourceData)[sourceFrameCounter + sourceFrameCount];
 						}
 						
 					}
 					sourceFrameCounter++;
 				}
-				else {
+				else
+				{
 					newData[i] = (*destinationData)[destinationFrameCounter];
-					if (!destination->isMono()) {
+					if (!destination->isMono())
+					{
 						newData[i + newSoundFrameCount] = (*destinationData)[destinationFrameCounter + destinationFrameCount];
 					}
 					destinationFrameCounter++;
@@ -161,67 +186,92 @@ void EditSoundControls::function(int j)
 			destination->setMono(destination->isMono());
 			destination->setLoopTo(destination->getEnd());
 		}
-		else if (editSoundGui->getEdit() == 4) {
-			sampler.lock()->deleteSection(soundGui->getSoundIndex(), sound->getStart(), sound->getEnd());
+		else if (editSoundGui->getEdit() == 4)
+		{
+			sampler.lock()->deleteSection(sampler.lock()->getSoundIndex(), sound->getStart(), sound->getEnd());
 			sound->setStart(0);
 			sound->setEnd(sound->getFrameCount());
 			sound->setLoopTo(sound->getFrameCount());
 		}
-		else if (editSoundGui->getEdit() == 5) {
+		else if (editSoundGui->getEdit() == 5)
+ {
 			auto start = sound->getStart();
 			auto end = sound->getEnd();
-			for (int i = start; i < end; i++) {
+
+			for (int i = start; i < end; i++)
+			{
 				sound->getSampleData()->at(i) = 0.0f;
-				if (!sound->isMono()) sound->getSampleData()->at(i + sound->getFrameCount()) = 0.0f;
+
+				if (!sound->isMono())
+				{
+					sound->getSampleData()->at(i + sound->getFrameCount()) = 0.0f;
+				}
 			}
-			lLs->openScreen(editSoundGui->getPreviousScreenName());
+			ls.lock()->openScreen(editSoundGui->getPreviousScreenName());
 			break;
 		}
-		else if (editSoundGui->getEdit() == 6) {
+		else if (editSoundGui->getEdit() == 6)
+		{
 			auto start = sound->getStart();
 			auto end = sound->getEnd();
 			auto reverseCounter = end - 1;
 			auto newSampleData = vector<float>(sound->getSampleData()->size());
-			if (!sound->isMono()) {
-				vector<float> newSampleDataLeft(sound->getSampleData()->size() / 2);
-				vector<float> newSampleDataRight(sound->getSampleData()->size() / 2);
+		
+			if (!sound->isMono())
+			{
+				vector<float> newSampleDataLeft(sound->getSampleData()->size() * 0.5);
+				vector<float> newSampleDataRight(sound->getSampleData()->size() * 0.5);
 				auto sampleData = sound->getSampleData();
-				for (int i = 0; i < start; i++) {
+
+				for (int i = 0; i < start; i++)
+				{
 					newSampleDataLeft[i] = (*sampleData)[i];
 					newSampleDataRight[i] = (*sampleData)[i + sound->getFrameCount()];
 				}
-				for (int i = start; i < end; i++) {
+				
+				for (int i = start; i < end; i++)
+				{
 					newSampleDataLeft[i] = (*sampleData)[reverseCounter];
 					newSampleDataRight[i] = (*sampleData)[reverseCounter + sound->getFrameCount()];
 					reverseCounter--;
 				}
-				for (int i = end; i < sound->getFrameCount(); i++) {
+
+				for (int i = end; i < sound->getFrameCount(); i++)
+				{
 					newSampleDataLeft[i] = (*sampleData)[i];
 					newSampleDataRight[i] = (*sampleData)[i + sound->getFrameCount()];
 				}
 				newSampleData = mpc::sampler::Sampler::mergeToStereo(newSampleDataLeft, newSampleDataRight);
 			}
-			else {
+			else
+			{
 				auto sampleData = sound->getSampleData();
-				for (int i = start; i < end; i++) {
+				
+				for (int i = start; i < end; i++)
+				{
 					newSampleData[i] = (*sampleData)[reverseCounter];
 					reverseCounter--;
 				}
 			}
 			sound->getSampleData()->swap(newSampleData);
 			sound->setMono(sound->isMono());
-			lLs->openScreen(editSoundGui->getPreviousScreenName());
+			ls.lock()->openScreen(editSoundGui->getPreviousScreenName());
 			break;
 		}
-		else if (editSoundGui->getEdit() == 7) {
+		else if (editSoundGui->getEdit() == 7)
+ {
 			if (editSoundGui->getTimeStretchRatio() == 10000)
+			{
 				return;
+			}
 
-			if (!sound->isMono()) {
+			if (!sound->isMono())
+			{
 				vector<float> sampleDataLeft = (*sound->getSampleData());
-				sampleDataLeft.erase(sampleDataLeft.begin() + (sampleDataLeft.size() / 2), sampleDataLeft.end());
+				sampleDataLeft.erase(sampleDataLeft.begin() + (sampleDataLeft.size() * 0.5), sampleDataLeft.end());
 				vector<float> sampleDataRight = (*sound->getSampleData());
-				sampleDataRight.erase(sampleDataRight.begin(), sampleDataRight.begin() + (sampleDataRight.size() / 2));
+				sampleDataRight.erase(sampleDataRight.begin(), sampleDataRight.begin() + (sampleDataRight.size() * 0.5));
+				
 				auto ts0 = mpc::sampler::TimeStretch(sampleDataLeft, (float)(editSoundGui->getTimeStretchRatio() / 10000.0), sound->getSampleRate(), editSoundGui->getTimeStretchAdjust());
 				auto newSampleDataLeft = ts0.getProcessedData();
 				auto ts1 = mpc::sampler::TimeStretch(sampleDataRight, (float)(editSoundGui->getTimeStretchRatio() / 10000.0), sound->getSampleRate(), editSoundGui->getTimeStretchAdjust());
@@ -233,7 +283,9 @@ void EditSoundControls::function(int j)
 				newSample->setMono(false);
 				newSample->setName(editSoundGui->getNewName());
 			}
-			if (sound->isMono()) {
+
+			if (sound->isMono())
+			{
 				auto ts = mpc::sampler::TimeStretch(*sound->getSampleData(), (float)(editSoundGui->getTimeStretchRatio() / 10000.0), sound->getSampleRate(), editSoundGui->getTimeStretchAdjust());
 				auto newSample = sampler.lock()->addSound(sound->getSampleRate()).lock();
                 auto procData = ts.getProcessedData();
@@ -242,24 +294,35 @@ void EditSoundControls::function(int j)
 				newSample->setName(editSoundGui->getNewName());
 			}
 		}	
-		else if (editSoundGui->getEdit() == 8) {
+		else if (editSoundGui->getEdit() == 8)
+ {
 			auto endMargin = editSoundGui->getEndMargin();
-			auto source = dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getSound(soundGui->getSoundIndex()).lock());
-			for (int i = 0; i < soundGui->getNumberOfZones(); i++) {
+			auto source = sampler.lock()->getSound().lock();
+
+			for (int i = 0; i < soundGui->getNumberOfZones(); i++)
+			{
 				auto start = soundGui->getZoneStart(i);
 				auto end = soundGui->getZoneEnd(i);
+			
 				if (i == soundGui->getNumberOfZones() - 1)
+				{
 					endMargin = 0;
+				}
 
 				auto zone = sampler.lock()->createZone(source, start, end, endMargin);
 				zone.lock()->setName(editSoundGui->getNewName() + to_string(i+1));
 			}
-			soundGui->setSoundIndex(sampler.lock()->getSoundCount() - soundGui->getNumberOfZones(), sampler.lock()->getSoundCount());
-			soundGui->initZones(sampler.lock()->getSound(soundGui->getSoundIndex()).lock()->getLastFrameIndex() + 1);
-			if (editSoundGui->getCreateNewProgram()) {
+
+			sampler.lock()->setSoundIndex(sampler.lock()->getSoundCount() - soundGui->getNumberOfZones());
+			soundGui->initZones(sampler.lock()->getSound().lock()->getFrameCount());
+
+			if (editSoundGui->getCreateNewProgram())
+			{
 				auto p = sampler.lock()->addProgram().lock();
 				p->setName(source->getName());
-				for (int i = 0; i < soundGui->getNumberOfZones(); i++) {
+			
+				for (int i = 0; i < soundGui->getNumberOfZones(); i++)
+				{
 					auto pad = p->getPad(i);
 					auto note = pad->getNote();
 					auto n = p->getNoteParameters(note);
@@ -268,14 +331,16 @@ void EditSoundControls::function(int j)
 				
 				auto s = sequencer.lock()->getSequence(sequencer.lock()->getActiveSequenceIndex()).lock();
 				auto t = s->getTrack(sequencer.lock()->getActiveTrackIndex()).lock();
-				if (t->getBusNumber() != 0) {
+
+				if (t->getBusNumber() != 0)
+				{
 					sampler.lock()->getDrum(t->getBusNumber() - 1)->setProgram(sampler.lock()->getProgramCount() - 1);
 				}
 			}
 		}
-		soundGui->setSoundIndex(sampler.lock()->getSoundCount() - 1, sampler.lock()->getSoundCount());
-		soundGui->initZones(sampler.lock()->getSound(soundGui->getSoundIndex()).lock()->getLastFrameIndex() + 1);
-		lLs->openScreen(editSoundGui->getPreviousScreenName());
+		sampler.lock()->setSoundIndex(sampler.lock()->getSoundCount() - 1);
+		soundGui->initZones(sampler.lock()->getSound().lock()->getFrameCount());
+		ls.lock()->openScreen(editSoundGui->getPreviousScreenName());
 		break;
 	}
 }

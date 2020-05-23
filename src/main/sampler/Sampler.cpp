@@ -1,5 +1,5 @@
-#include <sampler/Sampler.hpp>
-#include <lang/StrUtil.hpp>
+#include "Sampler.hpp"
+
 #include <Mpc.hpp>
 #include <audiomidi/AudioMidiServices.hpp>
 #include <disk/SoundLoader.hpp>
@@ -30,6 +30,7 @@
 #include <mpc/MpcIndivFxMixerChannel.hpp>
 
 #include <file/File.hpp>
+#include <lang/StrUtil.hpp>
 
 #include <thirdp/libsamplerate/samplerate.h>
 
@@ -42,6 +43,26 @@ using namespace std;
 Sampler::Sampler()
 {
 	initMasterPadAssign = Pad::getPadNotes();
+}
+
+void Sampler::setSoundIndex(int i)
+{
+	if (i < 0 || i >= sounds.size())
+	{
+		return;
+	}
+
+	soundIndex = i;
+}
+
+int Sampler::getSoundIndex()
+{
+	return soundIndex;
+}
+
+weak_ptr<Sound> Sampler::getSound()
+{
+	return sounds[soundIndex];
 }
 
 void Sampler::setInputLevel(int i)
@@ -408,8 +429,8 @@ void Sampler::deleteSection(const unsigned int sampleNumber, const unsigned int 
 void Sampler::sort()
 {
 	auto soundGui = Mpc::instance().getUis().lock()->getSoundGui();
-	auto currentSound = soundGui->getSoundIndex();
-	auto currentSoundMemIndex = sounds[currentSound]->getMemoryIndex();
+
+	auto currentSoundMemIndex = sounds[soundIndex]->getMemoryIndex();
 	soundSortingType++;
 	
 	if (soundSortingType > 2)
@@ -429,11 +450,12 @@ void Sampler::sort()
 		stable_sort(sounds.begin(), sounds.end(), compareSize);
 		break;
 	}
+
 	for (int i = 0; i < sounds.size(); i++)
 	{
 		if (sounds[i]->getMemoryIndex() == currentSoundMemIndex)
 		{
-			soundGui->setSoundIndex(i, sounds.size());
+			setSoundIndex(i);
 			break;
 		}
 	}
@@ -442,6 +464,7 @@ void Sampler::sort()
 void Sampler::deleteSample(int sampleIndex)
 {
 	sounds.erase(sounds.begin() + sampleIndex);
+
 	for (int i = sampleIndex; i < sounds.size(); i++)
 	{
 		sounds[i]->setMemoryIndex(sounds[i]->getMemoryIndex() - 1);
@@ -594,8 +617,7 @@ void Sampler::finishBasicVoice()
 
 void Sampler::playX(int playXMode, vector<int>* zone)
 {
-	int index = Mpc::instance().getUis().lock()->getSoundGui()->getSoundIndex();
-	auto sound = sounds[index];
+	auto sound = sounds[soundIndex];
 	auto start = 0;
 	auto end = sound->getSampleData()->size() - 1;
 
@@ -605,6 +627,7 @@ void Sampler::playX(int playXMode, vector<int>* zone)
 	}
 
 	auto fullEnd = end;
+
 	if (playXMode == 1)
 	{
 		start = (*zone)[0];
@@ -638,7 +661,7 @@ void Sampler::playX(int playXMode, vector<int>* zone)
 
 weak_ptr<ctoot::mpc::MpcSound> Sampler::getPlayXSound()
 {
-	return sounds[Mpc::instance().getUis().lock()->getSoundGui()->getSoundIndex()];
+	return sounds[soundIndex];
 }
 
 int Sampler::getFreeSampleSpace()
@@ -962,13 +985,13 @@ int Sampler::getNextSoundIndex(int j, bool up)
 void Sampler::setSoundGuiPrevSound()
 {
 	auto soundGui = Mpc::instance().getUis().lock()->getSoundGui();
-	soundGui->setSoundIndex(getNextSoundIndex(soundGui->getSoundIndex(), false), getSoundCount());
+	setSoundIndex(getNextSoundIndex(soundIndex, false));
 }
 
 void Sampler::setSoundGuiNextSound()
 {
 	auto soundGui = Mpc::instance().getUis().lock()->getSoundGui();
-	soundGui->setSoundIndex(getNextSoundIndex(soundGui->getSoundIndex(), true), getSoundCount());
+	setSoundIndex(getNextSoundIndex(soundIndex, true));
 }
 
 weak_ptr<Sound> Sampler::copySound(weak_ptr<Sound> source)

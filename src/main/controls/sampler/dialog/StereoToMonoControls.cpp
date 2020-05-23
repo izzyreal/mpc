@@ -18,56 +18,65 @@ void StereoToMonoControls::turnWheel(int i)
 {
 	init();
 	
-	auto lLs = ls.lock();
-	if (param.compare("stereosource") == 0) {
-		soundGui->setSoundIndex(sampler.lock()->getNextSoundIndex(soundGui->getSoundIndex(), i > 0), sampler.lock()->getSoundCount());
+	if (param.compare("stereosource") == 0)
+	{
+		sampler.lock()->setSoundIndex(sampler.lock()->getNextSoundIndex(sampler.lock()->getSoundIndex(), i > 0));
 	}
-	else if (param.compare("newlname") == 0) {
-		nameGui->setName(lLs->lookupField("newlname").lock()->getText());
+	else if (param.compare("newlname") == 0)
+	{
+		nameGui->setName(ls.lock()->lookupField("newlname").lock()->getText());
 		nameGui->setParameterName("newlname");
-		lLs->openScreen("name");
+		ls.lock()->openScreen("name");
 	}
-	else if (param.compare("newrname") == 0) {
-		nameGui->setName(lLs->lookupField("newrname").lock()->getText());
+	else if (param.compare("newrname") == 0)
+	{
+		nameGui->setName(ls.lock()->lookupField("newrname").lock()->getText());
 		nameGui->setParameterName("newrname");
-		lLs->openScreen("name");
+		ls.lock()->openScreen("name");
 	}
 }
 
 void StereoToMonoControls::function(int i)
 {
 	init();
-	
-	auto lLs = ls.lock();
-	weak_ptr<mpc::sampler::Sound> sound;
-	weak_ptr<mpc::sampler::Sound> left;
-	weak_ptr<mpc::sampler::Sound> right;
-	switch (i) {
+		
+	switch (i)
+	{
 	case 3:
-		lLs->openScreen("sound");
+		ls.lock()->openScreen("sound");
 		break;
 	case 4:
-		sound = dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getSound(soundGui->getSoundIndex()).lock());
-		auto lSound = sound.lock();
-		if (lSound->isMono()) return;
+	{
+		auto sound = sampler.lock()->getSound().lock();
 
-		left = sampler.lock()->addSound(lSound->getSampleRate());
-		right = sampler.lock()->addSound(lSound->getSampleRate());
-		auto lLeft = left.lock();
-		auto lRight = right.lock();
-		lLeft->setName(soundGui->getNewLName());
-		lRight->setName(soundGui->getNewRName());
-		lLeft->setMono(true);
-		lRight->setMono(true);
-		auto leftData = lLeft->getSampleData();
-		auto rightData = lRight->getSampleData();
-		for (int i = 0; i <= lSound->getLastFrameIndex(); i++) {
-			leftData->push_back((*lSound->getSampleData())[i]);
-			rightData->push_back((*lSound->getSampleData())[i + lSound->getLastFrameIndex() + 1]);
+		if (sound->isMono())
+		{
+			return;
 		}
-		lLeft->setEnd(lLeft->getSampleData()->size());
-		lRight->setEnd(lRight->getSampleData()->size());
-		lLs->openScreen("sound");
+
+		auto left = sampler.lock()->addSound(sound->getSampleRate()).lock();
+		auto right = sampler.lock()->addSound(sound->getSampleRate()).lock();
+
+		left->setName(soundGui->getNewLName());
+		right->setName(soundGui->getNewRName());
+
+		left->setMono(true);
+		right->setMono(true);
+		
+		auto leftData = left->getSampleData();
+		auto rightData = right->getSampleData();
+
+		for (int i = 0; i <= sound->getLastFrameIndex(); i++)
+		{
+			leftData->push_back((*sound->getSampleData())[i]);
+			rightData->push_back((*sound->getSampleData())[i + sound->getFrameCount()]);
+		}
+		
+		left->setEnd(left->getSampleData()->size());
+		right->setEnd(right->getSampleData()->size());
+		ls.lock()->openScreen("sound");
+		
 		break;
+	}
 	}
 }
