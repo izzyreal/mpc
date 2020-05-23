@@ -1,14 +1,29 @@
 #include "DrumScreen.hpp"
 
-#include <ui/sampler/SamplerGui.hpp>
 #include <mpc/MpcSoundPlayerChannel.hpp>
 
+#include <lcdgui/Label.hpp>
+
+#include <lang/StrUtil.hpp>
+
 using namespace mpc::lcdgui::screens;
+using namespace moduru::lang;
 using namespace std;
 
 DrumScreen::DrumScreen(const int layerIndex) 
 	: ScreenComponent("drum", layerIndex)
 {
+}
+
+void DrumScreen::open()
+{
+	init();
+	displayDrum();
+	displayPadToInternalSound();
+	displayPgm();
+	displayPgmChange();
+	displayMidiVolume();
+	displayCurrentVal();
 }
 
 void DrumScreen::function(int f)
@@ -39,22 +54,87 @@ void DrumScreen::turnWheel(int i)
 	
 	if (param.compare("drum") == 0)
 	{
-		samplerGui->setSelectedDrum(samplerGui->getSelectedDrum() + i);
+		setDrum(drum + i);
 	}
 	else if (param.compare("pgm") == 0)
 	{
 		mpcSoundPlayerChannel->setProgram(mpcSoundPlayerChannel->getProgram() + i);
+		displayPgm();
 	}
 	else if (param.compare("programchange") == 0)
 	{
 		mpcSoundPlayerChannel->setReceivePgmChange(i > 0);
+		displayPgmChange();
 	}
 	else if (param.compare("midivolume") == 0)
 	{
 		mpcSoundPlayerChannel->setReceiveMidiVolume(i > 0);
+		displayMidiVolume();
 	}
 	else if (param.compare("padtointernalsound") == 0)
 	{
-		samplerGui->setPadToIntSound(i > 0);
+		setPadToIntSound(i > 0);
 	}
+}
+
+void DrumScreen::displayCurrentVal()
+{
+	findLabel("currentval").lock()->setTextPadded(sampler.lock()->getUnusedSampleCount(), " ");
+}
+
+void DrumScreen::displayDrum()
+{
+	findField("drum").lock()->setText(to_string(drum + 1));
+}
+
+void DrumScreen::displayPadToInternalSound()
+{
+	findField("padtointernalsound").lock()->setText(padToInternalSound ? "ON" : "OFF");
+}
+
+void DrumScreen::displayPgm()
+{
+	auto pn = mpcSoundPlayerChannel->getProgram();
+	findField("pgm").lock()->setText(StrUtil::padLeft(to_string(pn + 1), " ", 2) + "-" + dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(pn).lock())->getName());
+}
+
+void DrumScreen::displayPgmChange()
+{
+	findField("programchange").lock()->setText(mpcSoundPlayerChannel->receivesPgmChange() ? "RECEIVE" : "IGNORE");
+}
+
+void DrumScreen::displayMidiVolume()
+{
+	findField("midivolume").lock()->setText(mpcSoundPlayerChannel->receivesMidiVolume() ? "RECEIVE" : "IGNORE");
+}
+
+bool DrumScreen::isPadToIntSound()
+{
+	return padToInternalSound;
+}
+
+void DrumScreen::setPadToIntSound(bool b)
+{
+	padToInternalSound = b;
+	displayPadToInternalSound();
+}
+
+void DrumScreen::setDrum(int i)
+{
+	if (i < 0 || i > 3)
+	{
+		return;
+	}
+
+	drum = i;
+	displayDrum();
+	displayPgm();
+	displayPgmChange();
+	displayMidiVolume();
+	displayCurrentVal();
+}
+
+int DrumScreen::getDrum()
+{
+	return drum;
 }

@@ -78,21 +78,6 @@ int SamplerGui::getBank()
     return bank;
 }
 
-void SamplerGui::setSelectedDrum(int i)
-{
-    if (i < 0 || i > 3)
-        return;
-
-    selectedDrum = i;
-    setChanged();
-    notifyObservers(string("drum"));
-}
-
-int SamplerGui::getSelectedDrum()
-{
-    return selectedDrum;
-}
-
 string SamplerGui::getPrevScreenName()
 {
     return prevScreenName;
@@ -111,18 +96,6 @@ int SamplerGui::getPrevNote()
 int SamplerGui::getPrevPad()
 {
     return prevPad;
-}
-
-bool SamplerGui::isPadToIntSound()
-{
-    return padToIntSound;
-}
-
-void SamplerGui::setPadToIntSound(bool b)
-{
-    padToIntSound = b;
-    setChanged();
-    notifyObservers(string("padtointsound"));
 }
 
 void SamplerGui::setNewName(string newName)

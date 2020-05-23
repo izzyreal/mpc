@@ -2,9 +2,14 @@
 
 #include <Mpc.hpp>
 #include <Util.hpp>
+
 #include <lcdgui/Field.hpp>
 #include <lcdgui/EnvGraph.hpp>
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/DrumScreen.hpp>
+
 #include <ui/sampler/SamplerGui.hpp>
+
 #include <sampler/NoteParameters.hpp>
 #include <sampler/Pad.hpp>
 #include <sampler/Program.hpp>
@@ -15,6 +20,8 @@
 
 #include <lang/StrUtil.hpp>
 
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens;
 using namespace mpc::ui::sampler;
 using namespace std;
 
@@ -27,13 +34,15 @@ PgmParamsObserver::PgmParamsObserver()
 	samplerGui->addObserver(this);
 	sampler = Mpc::instance().getSampler();
 	ls = Mpc::instance().getLayeredScreen().lock().get();
-	auto lSampler = sampler.lock();
-	mpcSoundPlayerChannel = lSampler->getDrum(samplerGui->getSelectedDrum());
-	program = dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
+
+	auto drumScreen = dynamic_pointer_cast<DrumScreen>(Screens::getScreenComponent("drum"));
+
+	mpcSoundPlayerChannel = sampler.lock()->getDrum(drumScreen->getDrum());
+	program = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
 	auto lProgram = program.lock();
 	lProgram->addObserver(this);
 	mpcSoundPlayerChannel->addObserver(this);
-	lastNp = lSampler->getLastNp(lProgram.get());
+	lastNp = sampler.lock()->getLastNp(lProgram.get());
 	lastNp->addObserver(this);
 	pgmField = ls->lookupField("pgm");
 	noteField = ls->lookupField("note");
@@ -59,16 +68,17 @@ void PgmParamsObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 {
 	string s = nonstd::any_cast<string>(arg);
 	auto lProgram = program.lock();
-	auto lSampler = sampler.lock();
 	lProgram->deleteObserver(this);
 	mpcSoundPlayerChannel->deleteObserver(this);
 	lastNp->deleteObserver(this);
 
-	mpcSoundPlayerChannel = lSampler->getDrum(samplerGui->getSelectedDrum());
-	program = dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
+	auto drumScreen = dynamic_pointer_cast<DrumScreen>(Screens::getScreenComponent("drum"));
+	mpcSoundPlayerChannel = sampler.lock()->getDrum(drumScreen->getDrum());
+
+	program = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
 	lProgram = program.lock();
 
-	lastNp = lSampler->getLastNp(lProgram.get());
+	lastNp = sampler.lock()->getLastNp(lProgram.get());
 	lastNp->addObserver(this);
 	lProgram->addObserver(this);
 	mpcSoundPlayerChannel->addObserver(this);
@@ -108,24 +118,21 @@ void PgmParamsObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 
 void PgmParamsObserver::displayReson()
 {
-	auto lSampler = sampler.lock();
 	auto lProgram = program.lock();
-	resonField.lock()->setText(to_string(lSampler->getLastNp(lProgram.get())->getFilterResonance()));
+	resonField.lock()->setText(to_string(sampler.lock()->getLastNp(lProgram.get())->getFilterResonance()));
 }
 
 void PgmParamsObserver::displayFreq()
 {
-	auto lSampler = sampler.lock();
 	auto lProgram = program.lock();
-	freqField.lock()->setText(to_string(lSampler->getLastNp(lProgram.get())->getFilterFrequency()));
+	freqField.lock()->setText(to_string(sampler.lock()->getLastNp(lProgram.get())->getFilterFrequency()));
 }
 
 void PgmParamsObserver::displayAttackDecay()
 {
-	auto lSampler = sampler.lock();
 	auto lProgram = program.lock();
-	auto attack = lSampler->getLastNp(lProgram.get())->getAttack();
-	auto decay = lSampler->getLastNp(lProgram.get())->getDecay();
+	auto attack = sampler.lock()->getLastNp(lProgram.get())->getAttack();
+	auto decay = sampler.lock()->getLastNp(lProgram.get())->getDecay();
 	attackField.lock()->setTextPadded(attack, " ");
 	decayField.lock()->setTextPadded(decay, " ");
 	ls->redrawEnvGraph(attack, decay);
@@ -133,15 +140,14 @@ void PgmParamsObserver::displayAttackDecay()
 
 void PgmParamsObserver::displayNote()
 {
-	auto lSampler = sampler.lock();
 	auto lProgram = program.lock();
-	auto sampleNumber = lSampler->getLastNp(lProgram.get())->getSndNumber();
-	auto note = lSampler->getLastNp(lProgram.get())->getNumber();
-	auto sampleName = sampleNumber != -1 ? lSampler->getSoundName(sampleNumber) : "OFF";
+	auto sampleNumber = sampler.lock()->getLastNp(lProgram.get())->getSndNumber();
+	auto note = sampler.lock()->getLastNp(lProgram.get())->getNumber();
+	auto sampleName = sampleNumber != -1 ? sampler.lock()->getSoundName(sampleNumber) : "OFF";
 	auto padNumber = lProgram->getPadNumberFromNote(note);
 	if (padNumber != -1) {
 		auto stereo = lProgram->getPad(padNumber)->getStereoMixerChannel().lock()->isStereo() && sampleNumber != -1 ? "(ST)" : "";
-		auto padName = lSampler->getPadName(padNumber);
+		auto padName = sampler.lock()->getPadName(padNumber);
 		noteField.lock()->setText(to_string(note) + "/" + padName + "-" + moduru::lang::StrUtil::padRight(sampleName, " ", 16) + stereo);
 	}
 	else {
@@ -156,23 +162,20 @@ void PgmParamsObserver::displayPgm()
 
 void PgmParamsObserver::displayTune()
 {
-	auto lSampler = sampler.lock();
 	auto lProgram = program.lock();
-	tuneField.lock()->setText(to_string(lSampler->getLastNp(lProgram.get())->getTune()));
+	tuneField.lock()->setText(to_string(sampler.lock()->getLastNp(lProgram.get())->getTune()));
 }
 
 void PgmParamsObserver::displayDecayMode()
 {
-	auto lSampler = sampler.lock();
 	auto lProgram = program.lock();
-	decayModeField.lock()->setText(decayModes[lSampler->getLastNp(lProgram.get())->getDecayMode()]);
+	decayModeField.lock()->setText(decayModes[sampler.lock()->getLastNp(lProgram.get())->getDecayMode()]);
 }
 
 void PgmParamsObserver::displayVoiceOverlap()
 {
-	auto lSampler = sampler.lock();
 	auto lProgram = program.lock();
-	voiceOverlapField.lock()->setText(voiceOverlapModes[lSampler->getLastNp(lProgram.get())->getVoiceOverlap()]);
+	voiceOverlapField.lock()->setText(voiceOverlapModes[sampler.lock()->getLastNp(lProgram.get())->getVoiceOverlap()]);
 }
 
 PgmParamsObserver::~PgmParamsObserver() {

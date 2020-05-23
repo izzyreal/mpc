@@ -15,7 +15,11 @@
 #include <mpc/MpcStereoMixerChannel.hpp>
 
 #include <lcdgui/Background.hpp>
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/DrumScreen.hpp>
 
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens;
 using namespace mpc::controls::mixer;
 using namespace std;
 
@@ -92,7 +96,10 @@ void MixerControls::turnWheel(int i)
 
 	bool sSrcDrum = mixerSetupGui->isStereoMixSourceDrum();
 	bool iSrcDrum = mixerSetupGui->isIndivFxSourceDrum();
-	auto drum = Mpc::instance().getDrum(samplerGui->getSelectedDrum());
+
+	auto drumScreen = dynamic_pointer_cast<DrumScreen>(Screens::getScreenComponent("drum"));
+
+	auto drum = Mpc::instance().getDrum(drumScreen->getDrum());
 
 	auto smc = sSrcDrum ? drum->getStereoMixerChannels().at(pad).lock() : lProgram->getPad(pad)->getStereoMixerChannel().lock();
 	auto smcs = sSrcDrum ? drum->getStereoMixerChannels() : vector<weak_ptr<ctoot::mpc::MpcStereoMixerChannel>>(16);

@@ -19,8 +19,13 @@
 #include <sequencer/Sequencer.hpp>
 #include <mpc/MpcSoundPlayerChannel.hpp>
 
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/DrumScreen.hpp>
+
 #include <cmath>
 
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens;
 using namespace mpc::controls::sampler;
 using namespace std;
 
@@ -43,7 +48,9 @@ void AbstractSamplerControls::init()
 		sound = dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getSound(sampler.lock()->getSoundIndex()).lock());
 	}
 
-	mpcSoundPlayerChannel = sampler.lock()->getDrum(samplerGui->getSelectedDrum());
+	auto drumScreen = dynamic_pointer_cast<DrumScreen>(Screens::getScreenComponent("drum"));
+
+	mpcSoundPlayerChannel = sampler.lock()->getDrum(drumScreen->getDrum());
 	program = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
 	auto lProgram = program.lock();
 	

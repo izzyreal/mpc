@@ -1,9 +1,12 @@
-#include <lcdgui/screens/SelectDrumScreen.hpp>
+#include "SelectDrumScreen.hpp"
 
-#include <lcdgui/LayeredScreen.hpp>
 #include <ui/sampler/SamplerGui.hpp>
 #include <sampler/Program.hpp>
 
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/DrumScreen.hpp>
+
+using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace std;
 
@@ -20,8 +23,9 @@ void SelectDrumScreen::function(int i)
 	{
 		return;
 	}
+	auto drumScreen = dynamic_pointer_cast<DrumScreen>(Screens::getScreenComponent("drum"));
+	drumScreen->setDrum(i);
 
-	samplerGui->setSelectedDrum(i);
 	auto previousScreenName = ls.lock()->getPreviousScreenName();
 	auto name = string("programassign");
 

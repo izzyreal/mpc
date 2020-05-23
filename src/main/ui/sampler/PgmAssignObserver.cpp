@@ -12,9 +12,14 @@
 #include <sampler/Sound.hpp>
 #include <mpc/MpcSoundPlayerChannel.hpp>
 
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/DrumScreen.hpp>
 
 #include <lang/StrUtil.hpp>
 
+using namespace moduru::lang;
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens; 
 using namespace mpc::ui::sampler;
 using namespace std;
 
@@ -23,14 +28,16 @@ PgmAssignObserver::PgmAssignObserver()
 	samplerGui = Mpc::instance().getUis().lock()->getSamplerGui();
 	samplerGui->addObserver(this);
 	sampler = Mpc::instance().getSampler();
-	auto lSampler = sampler.lock();
-	mpcSoundPlayerChannel = lSampler->getDrum(samplerGui->getSelectedDrum());
-	program = dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
+
+	auto drumScreen = dynamic_pointer_cast<DrumScreen>(Screens::getScreenComponent("drum"));
+
+	mpcSoundPlayerChannel = sampler.lock()->getDrum(drumScreen->getDrum());
+	program = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
 	auto lProgram = program.lock();
 	lProgram->addObserver(this);
-	lastNp = lSampler->getLastNp(lProgram.get());
+	lastNp = sampler.lock()->getLastNp(lProgram.get());
 	lastNp->addObserver(this);
-	lastPad = lSampler->getLastPad(lProgram.get());
+	lastPad = sampler.lock()->getLastPad(lProgram.get());
 	lastPad->addObserver(this);
 	mpcSoundPlayerChannel->addObserver(this);
 	auto ls = Mpc::instance().getLayeredScreen().lock();
@@ -65,27 +72,32 @@ PgmAssignObserver::PgmAssignObserver()
 
 void PgmAssignObserver::displayPgm()
 {
-	pgmField.lock()->setText(moduru::lang::StrUtil::padLeft(to_string(mpcSoundPlayerChannel->getProgram() + 1), " ", 2) + "-" + program.lock()->getName());
+	pgmField.lock()->setText(StrUtil::padLeft(to_string(mpcSoundPlayerChannel->getProgram() + 1), " ", 2) + "-" + program.lock()->getName());
 }
 
 void PgmAssignObserver::displaySoundName()
 {
-	auto lSampler = sampler.lock();
-	int sndNumber = lSampler->getLastNp(program.lock().get())->getSndNumber();
-	if (sndNumber == -1) {
+	int sndNumber = sampler.lock()->getLastNp(program.lock().get())->getSndNumber();
+
+	if (sndNumber == -1)
+	{
 		sndNumberField.lock()->setText("OFF");
 		isSoundStereoLabel.lock()->setText("");
 	}
-	else {
-		string name = lSampler->getSoundName(sndNumber);
+	else
+	{
+		string name = sampler.lock()->getSoundName(sndNumber);
 		sndNumberField.lock()->setText(name);
 	}
 
-	if (lSampler->getSoundCount() != 0 && sndNumber != -1) {
-		if (lSampler->getSound(sndNumber).lock()->isMono()) {
+	if (sampler.lock()->getSoundCount() != 0 && sndNumber != -1)
+	{
+		if (sampler.lock()->getSound(sndNumber).lock()->isMono())
+		{
 			isSoundStereoLabel.lock()->setText("");
 		}
-		else {
+		else
+		{
 			isSoundStereoLabel.lock()->setText("(ST)");
 		}
 	}
@@ -100,11 +112,14 @@ void PgmAssignObserver::displayPadNote()
 {
 	auto lSampler = sampler.lock();
 	auto lProgram = program.lock();
-	if (lSampler->getLastPad(lProgram.get())->getNote() == 34) {
+	
+	if (sampler.lock()->getLastPad(lProgram.get())->getNote() == 34)
+	{
 		padNoteField.lock()->setText("--");
 		return;
 	}
-	padNoteField.lock()->setText(to_string(lSampler->getLastPad(lProgram.get())->getNote()));
+
+	padNoteField.lock()->setText(to_string(sampler.lock()->getLastPad(lProgram.get())->getNote()));
 }
 
 void PgmAssignObserver::update(moduru::observer::Observable* o, nonstd::any arg)
@@ -117,13 +132,15 @@ void PgmAssignObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 	lProgram->deleteObserver(this);
 	mpcSoundPlayerChannel->deleteObserver(this);
 
-	mpcSoundPlayerChannel = lSampler->getDrum(samplerGui->getSelectedDrum());
-	program = dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
+	auto drumScreen = dynamic_pointer_cast<DrumScreen>(Screens::getScreenComponent("drum"));
+
+	mpcSoundPlayerChannel = sampler.lock()->getDrum(drumScreen->getDrum());
+	program = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
 	lProgram = program.lock();
 
-	lastNp = lSampler->getLastNp(lProgram.get());
+	lastNp = sampler.lock()->getLastNp(lProgram.get());
 	lastNp->addObserver(this);
-	lastPad = lSampler->getLastPad(lProgram.get());
+	lastPad = sampler.lock()->getLastPad(lProgram.get());
 	lastPad->addObserver(this);
 	lProgram->addObserver(this);
 	mpcSoundPlayerChannel->addObserver(this);
@@ -169,8 +186,8 @@ void PgmAssignObserver::displaySoundGenerationMode()
 	auto lSampler = sampler.lock();
 	auto sgm = -1;
 	auto lProgram = program.lock();
-	if (lSampler->getLastNp(lProgram.get()) != nullptr) {
-		sgm = lSampler->getLastNp(lProgram.get())->getSoundGenerationMode();
+	if (sampler.lock()->getLastNp(lProgram.get()) != nullptr) {
+		sgm = sampler.lock()->getLastNp(lProgram.get())->getSoundGenerationMode();
 		soundGenerationModeField.lock()->setText(soundGenerationModes[sgm]);
 		if (sgm != 0) {
 			velocityRangeLowerLabel.lock()->Hide(true);
@@ -199,7 +216,7 @@ void PgmAssignObserver::displaySoundGenerationMode()
 			displayVeloRangeUpper();
 		}
 	}
-	if (lSampler->getLastNp(lProgram.get()) == nullptr || sgm == -1 || sgm == 0) {
+	if (sampler.lock()->getLastNp(lProgram.get()) == nullptr || sgm == -1 || sgm == 0) {
 		velocityRangeLowerLabel.lock()->Hide(true);
 		velocityRangeLowerField.lock()->Hide(true);
 		velocityRangeUpperLabel.lock()->Hide(true);
@@ -227,10 +244,10 @@ void PgmAssignObserver::displayOptionalNoteA()
 {
 	auto lSampler = sampler.lock();
 	auto lProgram = program.lock();
-	auto noteIntA = lSampler->getLastNp(lProgram.get())->getOptionalNoteA();
+	auto noteIntA = sampler.lock()->getLastNp(lProgram.get())->getOptionalNoteA();
 	auto padIntA = lProgram->getPadNumberFromNote(noteIntA);
 	auto noteA = noteIntA != 34 ? to_string(noteIntA) : "--";
-	auto padA = padIntA != -1 ? lSampler->getPadName(padIntA) : "OFF";
+	auto padA = padIntA != -1 ? sampler.lock()->getPadName(padIntA) : "OFF";
 	optionalNoteAField.lock()->setText(noteA + "/" + padA);
 }
 
@@ -238,10 +255,10 @@ void PgmAssignObserver::displayOptionalNoteB()
 {
 	auto lSampler = sampler.lock();
 	auto lProgram = program.lock();
-	auto noteIntB = lSampler->getLastNp(lProgram.get())->getOptionalNoteB();
+	auto noteIntB = sampler.lock()->getLastNp(lProgram.get())->getOptionalNoteB();
 	auto padIntB = lProgram->getPadNumberFromNote(noteIntB);
 	auto noteB = noteIntB != 34 ? to_string(noteIntB) : "--";
-	auto padB = padIntB != -1 ? lSampler->getPadName(padIntB) : "OFF";
+	auto padB = padIntB != -1 ? sampler.lock()->getPadName(padIntB) : "OFF";
 	optionalNoteBField.lock()->setText(noteB + "/" + padB);
 }
 

@@ -1,11 +1,16 @@
 #include "SamplerWindowObserver.hpp"
 
 #include <Mpc.hpp>
+
 #include <lcdgui/Field.hpp>
 #include <lcdgui/Label.hpp>
 #include <lcdgui/EnvGraph.hpp>
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/DrumScreen.hpp>
+
 #include <ui/sampler/SamplerGui.hpp>
 #include <ui/sampler/window/SamplerWindowGui.hpp>
+
 #include <sampler/NoteParameters.hpp>
 #include <sampler/Pad.hpp>
 #include <sampler/Program.hpp>
@@ -22,6 +27,7 @@
 using namespace mpc::ui::sampler::window;
 using namespace std;
 using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens;
 
 SamplerWindowObserver::SamplerWindowObserver()
 {
@@ -35,12 +41,15 @@ SamplerWindowObserver::SamplerWindowObserver()
 	sampler = Mpc::instance().getSampler();
 	auto ls = Mpc::instance().getLayeredScreen().lock();
 	csn = ls->getCurrentScreenName();
-	auto lSampler = sampler.lock();
-	mpcSoundPlayerChannel = lSampler->getDrum(samplerGui->getSelectedDrum());
-	program = dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
+	
+	auto drumScreen = dynamic_pointer_cast<DrumScreen>(Screens::getScreenComponent("drum"));
+
+	mpcSoundPlayerChannel = sampler.lock()->getDrum(drumScreen->getDrum());
+
+	program = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
 	auto lProgram = program.lock();
-	lSampler->getLastNp(lProgram.get())->addObserver(this);
-	lSampler->getLastPad(lProgram.get())->addObserver(this);
+	sampler.lock()->getLastNp(lProgram.get())->addObserver(this);
+	sampler.lock()->getLastPad(lProgram.get())->addObserver(this);
 	lProgram->addObserver(this);
 	mpcSoundPlayerChannel->addObserver(this);
 
@@ -171,39 +180,37 @@ SamplerWindowObserver::SamplerWindowObserver()
 
 void SamplerWindowObserver::displayNameForNewSound()
 {
-	auto lSampler = sampler.lock();
-	nameForNewSoundField.lock()->setText(dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getPreviewSound().lock())->getName());
+	nameForNewSoundField.lock()->setText(dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getPreviewSound().lock())->getName());
 }
 
 void SamplerWindowObserver::displayAssignToPad()
 {
-	auto lSampler = sampler.lock();
 	auto lProgram = program.lock();
-	assignToNoteField.lock()->setText(to_string(lSampler->getLastPad(lProgram.get())->getNote()) + "/" + lSampler->getPadName(lSampler->getLastPad(lProgram.get())->getNumber()));
+	assignToNoteField.lock()->setText(to_string(sampler.lock()->getLastPad(lProgram.get())->getNote()) + "/" + sampler.lock()->getPadName(sampler.lock()->getLastPad(lProgram.get())->getNumber()));
 }
 
 void SamplerWindowObserver::displaySource()
 {
-	auto lSampler = sampler.lock();
 	auto lProgram = program.lock();
-	auto nn = lSampler->getLastNp(lProgram.get())->getNumber();
+	auto nn = sampler.lock()->getLastNp(lProgram.get())->getNumber();
 	auto pn = lProgram->getPadNumberFromNote(nn);
 	string nnName = to_string(nn);
-	auto padName = pn == -1 ? "OFF" : lSampler->getPadName(pn);
+	auto padName = pn == -1 ? "OFF" : sampler.lock()->getPadName(pn);
 	sourceField.lock()->setText(nnName + "/" + padName);
 }
 
 void SamplerWindowObserver::displayTune()
 {
-	auto lSampler = sampler.lock();
 	auto lProgram = program.lock();
-	if (csn.compare("autochromaticassignment") == 0) {
+
+	if (csn.compare("autochromaticassignment") == 0)
+	{
 		int value = swGui->getTune();
 		string prefix = value < 0 ? "-" : " ";
 		tuneField.lock()->setText(prefix + moduru::lang::StrUtil::padLeft(to_string(abs(value)), " ", 3));
 	}
 	else {
-		auto value = lSampler->getLastNp(lProgram.get())->getTune();
+		auto value = sampler.lock()->getLastNp(lProgram.get())->getTune();
 		string prefix = value < 0 ? "-" : " ";
 		tuneField.lock()->setText(prefix + moduru::lang::StrUtil::padLeft(to_string(abs(value)), " ", 3));
 	}
@@ -211,80 +218,71 @@ void SamplerWindowObserver::displayTune()
 
 void SamplerWindowObserver::displayVeloPitch()
 {
-	auto lSampler = sampler.lock();
 	auto lProgram = program.lock();
-	auto value = lSampler->getLastNp(lProgram.get())->getVelocityToPitch();
+	auto value = sampler.lock()->getLastNp(lProgram.get())->getVelocityToPitch();
 	string prefix = value < 0 ? "-" : " ";
 	veloPitchField.lock()->setText(prefix + moduru::lang::StrUtil::padLeft(to_string(abs(value)), " ", 3));
 }
 
 void SamplerWindowObserver::displayAttack()
 {
-	auto lSampler = sampler.lock();
 	auto lProgram = program.lock();
-	auto attack = lSampler->getLastNp(lProgram.get())->getFilterAttack();
-	auto decay = lSampler->getLastNp(lProgram.get())->getFilterDecay();
+	auto attack = sampler.lock()->getLastNp(lProgram.get())->getFilterAttack();
+	auto decay = sampler.lock()->getLastNp(lProgram.get())->getFilterDecay();
 	attackField.lock()->setTextPadded(attack, " ");
 	Mpc::instance().getLayeredScreen().lock()->redrawEnvGraph(attack, decay);
 }
 
 void SamplerWindowObserver::displayDecay()
 {
-	auto lSampler = sampler.lock();
 	auto lProgram = program.lock();
-	auto attack = lSampler->getLastNp(lProgram.get())->getFilterAttack();
-	auto decay = lSampler->getLastNp(lProgram.get())->getFilterDecay();
+	auto attack = sampler.lock()->getLastNp(lProgram.get())->getFilterAttack();
+	auto decay = sampler.lock()->getLastNp(lProgram.get())->getFilterDecay();
 	decayField.lock()->setTextPadded(decay, " ");
 	Mpc::instance().getLayeredScreen().lock()->redrawEnvGraph(attack, decay);
 }
 
 void SamplerWindowObserver::displayAmount()
 {
-	auto lSampler = sampler.lock();
 	auto lProgram = program.lock();
-	amountField.lock()->setTextPadded(lSampler->getLastNp(lProgram.get())->getFilterEnvelopeAmount(), " ");
+	amountField.lock()->setTextPadded(sampler.lock()->getLastNp(lProgram.get())->getFilterEnvelopeAmount(), " ");
 }
 
 void SamplerWindowObserver::displayVeloFreq()
 {
-	auto lSampler = sampler.lock();
 	auto lProgram = program.lock();
-	veloFreqField.lock()->setTextPadded(lSampler->getLastNp(lProgram.get())->getVelocityToFilterFrequency(), " ");
+	veloFreqField.lock()->setTextPadded(sampler.lock()->getLastNp(lProgram.get())->getVelocityToFilterFrequency(), " ");
 }
 
 void SamplerWindowObserver::displayNote()
 {
-	auto lSampler = sampler.lock();
 	auto lProgram = program.lock();
-	auto noteParameters = lSampler->getLastNp(lProgram.get());
+	auto noteParameters = sampler.lock()->getLastNp(lProgram.get());
 	auto sn = noteParameters->getSndNumber();
 	auto pn = lProgram->getPadNumberFromNote(noteParameters->getNumber());
 	auto pad = lProgram->getPad(pn);
-	auto padName = pn != -1 ? lSampler->getPadName(pn) : "OFF";
-	auto sampleName = sn != -1 ? lSampler->getSoundName(sn) : "OFF";
+	auto padName = pn != -1 ? sampler.lock()->getPadName(pn) : "OFF";
+	auto sampleName = sn != -1 ? sampler.lock()->getSoundName(sn) : "OFF";
 	string stereo = pad->getStereoMixerChannel().lock()->isStereo() && sn != -1 ? "(ST)" : "";
 	noteField.lock()->setText(to_string(noteParameters->getNumber()) + "/" + padName + "-" + moduru::lang::StrUtil::padRight(sampleName, " ", 16) + stereo);
 }
 
 void SamplerWindowObserver::displayVeloAttack()
 {
-	auto lSampler = sampler.lock();
 	auto lProgram = program.lock();
-	veloAttackField.lock()->setTextPadded(lSampler->getLastNp(lProgram.get())->getVelocityToAttack(), " ");
+	veloAttackField.lock()->setTextPadded(sampler.lock()->getLastNp(lProgram.get())->getVelocityToAttack(), " ");
 }
 
 void SamplerWindowObserver::displayVeloStart()
 {
-	auto lSampler = sampler.lock();
 	auto lProgram = program.lock();
-	veloStartField.lock()->setTextPadded(lSampler->getLastNp(lProgram.get())->getVelocityToStart(), " ");
+	veloStartField.lock()->setTextPadded(sampler.lock()->getLastNp(lProgram.get())->getVelocityToStart(), " ");
 }
 
 void SamplerWindowObserver::displayVeloLevel()
 {
-	auto lSampler = sampler.lock();
 	auto lProgram = program.lock();
-	veloLevelField.lock()->setTextPadded(lSampler->getLastNp(lProgram.get())->getVeloToLevel(), " ");
+	veloLevelField.lock()->setTextPadded(sampler.lock()->getLastNp(lProgram.get())->getVeloToLevel(), " ");
 }
 
 void SamplerWindowObserver::displayVelo()
@@ -293,59 +291,56 @@ void SamplerWindowObserver::displayVelo()
 
 void SamplerWindowObserver::displayProg0()
 {
-	auto lSampler = sampler.lock();
-	prog0Field.lock()->setText(moduru::lang::StrUtil::padLeft(to_string(swGui->getProg0() + 1), " ", 2) + "-" + dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(swGui->getProg0()).lock())->getName());
+	prog0Field.lock()->setText(moduru::lang::StrUtil::padLeft(to_string(swGui->getProg0() + 1), " ", 2) + "-" + dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(swGui->getProg0()).lock())->getName());
 }
 
 void SamplerWindowObserver::displayNote0()
 {
-	auto lSampler = sampler.lock();
-	auto prog = csn.compare("muteassign") == 0 ? program.lock() : dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(swGui->getProg0()).lock());
-	auto nn = csn.compare("muteassign") == 0 ? lSampler->getLastNp(prog.get())->getMuteAssignA() : swGui->getNote0();
+	auto prog = csn.compare("muteassign") == 0 ? program.lock() : dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(swGui->getProg0()).lock());
+	auto nn = csn.compare("muteassign") == 0 ? sampler.lock()->getLastNp(prog.get())->getMuteAssignA() : swGui->getNote0();
 	auto pn = prog->getPadNumberFromNote(nn);
 	auto sn = nn != 34 ? prog->getNoteParameters(nn)->getSndNumber() : -1;
 	auto nnName = nn == 34 ? "--" : to_string(nn);
-	auto padName = pn != -1 ? lSampler->getPadName(pn) : "OFF";
-	auto sampleName = sn != -1 ? "-" + lSampler->getSoundName(sn) : "-OFF";
+	auto padName = pn != -1 ? sampler.lock()->getPadName(pn) : "OFF";
+	auto sampleName = sn != -1 ? "-" + sampler.lock()->getSoundName(sn) : "-OFF";
 	if (nn == -1) sampleName = "";
 	note0Field.lock()->setText(nnName + "/" + padName + sampleName);
 }
 
 void SamplerWindowObserver::displayProg1()
 {
-	auto lSampler = sampler.lock();
-	prog1Field.lock()->setText(moduru::lang::StrUtil::padLeft(to_string(swGui->getProg1() + 1), " ", 2) + "-" + dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(swGui->getProg1()).lock())->getName());
+	prog1Field.lock()->setText(moduru::lang::StrUtil::padLeft(to_string(swGui->getProg1() + 1), " ", 2) + "-" + dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(swGui->getProg1()).lock())->getName());
 }
 
 void SamplerWindowObserver::displayNote1()
 {
-	auto lSampler = sampler.lock();
-	auto prog = csn.compare("muteassign") == 0 ? program.lock() : dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(swGui->getProg1()).lock());
-	auto nn = csn.compare("muteassign") == 0 ? lSampler->getLastNp(prog.get())->getMuteAssignB() : swGui->getNote1();
+	auto prog = csn.compare("muteassign") == 0 ? program.lock() : dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(swGui->getProg1()).lock());
+	auto nn = csn.compare("muteassign") == 0 ? sampler.lock()->getLastNp(prog.get())->getMuteAssignB() : swGui->getNote1();
 	auto pn = prog->getPadNumberFromNote(nn);
 	auto sn = nn != 34 ? prog->getNoteParameters(nn)->getSndNumber() : -1;
 	auto nnName = nn == 34 ? "--" : to_string(nn);
-	auto padName = pn != -1 ? lSampler->getPadName(pn) : "OFF";
-	auto sampleName = sn != -1 ? "-" + lSampler->getSoundName(sn) : "-OFF";
+	auto padName = pn != -1 ? sampler.lock()->getPadName(pn) : "OFF";
+	auto sampleName = sn != -1 ? "-" + sampler.lock()->getSoundName(sn) : "-OFF";
 	if (nn == 34) sampleName = "";
 	note1Field.lock()->setText(nnName + "/" + padName + sampleName);
 }
 
 void SamplerWindowObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 {
-	auto lSampler = sampler.lock();
 	auto lProgram = program.lock();
 
-	lSampler->getLastNp(lProgram.get())->deleteObserver(this);
-	lSampler->getLastPad(lProgram.get())->deleteObserver(this);
+	sampler.lock()->getLastNp(lProgram.get())->deleteObserver(this);
+	sampler.lock()->getLastPad(lProgram.get())->deleteObserver(this);
 	lProgram->deleteObserver(this);
 	mpcSoundPlayerChannel->deleteObserver(this);
 
-	mpcSoundPlayerChannel = lSampler->getDrum(samplerGui->getSelectedDrum());
-	program = dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
+	auto drumScreen = dynamic_pointer_cast<DrumScreen>(Screens::getScreenComponent("drum"));
+	mpcSoundPlayerChannel = sampler.lock()->getDrum(drumScreen->getDrum());
 
-	lSampler->getLastNp(lProgram.get())->addObserver(this);
-	lSampler->getLastPad(lProgram.get())->addObserver(this);
+	program = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
+
+	sampler.lock()->getLastNp(lProgram.get())->addObserver(this);
+	sampler.lock()->getLastPad(lProgram.get())->addObserver(this);
 	lProgram->addObserver(this);
 	mpcSoundPlayerChannel->addObserver(this);
 
@@ -464,20 +459,18 @@ void SamplerWindowObserver::update(moduru::observer::Observable* o, nonstd::any 
 
 void SamplerWindowObserver::displayOriginalKey()
 {
-	auto lSampler = sampler.lock();
 	auto nn = swGui->getOriginalKey();
 	auto lProgram = program.lock();
 	auto pad = lProgram->getPadNumberFromNote(nn);
-	auto pn = lSampler->getPadName(pad);
+	auto pn = sampler.lock()->getPadName(pad);
 	originalKeyField.lock()->setText(to_string(nn) + "/" + pn);
 }
 
 void SamplerWindowObserver::displayAutoChromAssSnd()
 {
-	auto lSampler = sampler.lock();
 	auto sn = swGui->getAutoChromAssSnd();
-	auto sampleName = sn == -1 ? "OFF" : lSampler->getSoundName(sn);
-	string stereo = sn == -1 ? "" : lSampler->getSound(sn).lock()->isMono() ? "" : "(ST)";
+	auto sampleName = sn == -1 ? "OFF" : sampler.lock()->getSoundName(sn);
+	string stereo = sn == -1 ? "" : sampler.lock()->getSound(sn).lock()->isMono() ? "" : "(ST)";
 	autoChromAssSndField.lock()->setText(moduru::lang::StrUtil::padRight(sampleName, " ", 16) + stereo);
 }
 
@@ -529,14 +522,13 @@ void SamplerWindowObserver::displayInfo2()
 
 void SamplerWindowObserver::displayPad(int i)
 {
-	auto lSampler = sampler.lock();
 	auto pads = vector<weak_ptr<Field>>{ a3Field, b3Field, c3Field, d3Field, a2Field, b2Field, c2Field, d2Field, a1Field, b1Field, c1Field, d1Field, a0Field, b0Field, c0Field, d0Field };
 	auto lProgram = program.lock();
 	auto nn = lProgram->getPad(i + (16 * samplerGui->getBank()))->getNote();
 	string sampleName = "";
 	if (nn != 34) {
 		auto sampleNumber = lProgram->getNoteParameters(nn)->getSndNumber();
-		sampleName = sampleNumber != -1 ? lSampler->getSoundName(sampleNumber) : "--";
+		sampleName = sampleNumber != -1 ? sampler.lock()->getSoundName(sampleNumber) : "--";
 		if (sampleName.length() > 8) {
 			sampleName = sampleName.substr(0, 8);
 		}
@@ -547,14 +539,12 @@ void SamplerWindowObserver::displayPad(int i)
 
 void SamplerWindowObserver::displayPgm0()
 {
-	auto lSampler = sampler.lock();
-	pgm0Field.lock()->setText(moduru::lang::StrUtil::padLeft(to_string(swGui->getPgm0() + 1), " ", 2) + "-" + dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(swGui->getPgm0()).lock())->getName());
+	pgm0Field.lock()->setText(moduru::lang::StrUtil::padLeft(to_string(swGui->getPgm0() + 1), " ", 2) + "-" + dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(swGui->getPgm0()).lock())->getName());
 }
 
 void SamplerWindowObserver::displayPgm1()
 {
-	auto lSampler = sampler.lock();
-	pgm1Field.lock()->setText(moduru::lang::StrUtil::padLeft(to_string(swGui->getPgm1() + 1), " ", 2) + "-" + dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(swGui->getPgm1()).lock())->getName());
+	pgm1Field.lock()->setText(moduru::lang::StrUtil::padLeft(to_string(swGui->getPgm1() + 1), " ", 2) + "-" + dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(swGui->getPgm1()).lock())->getName());
 }
 
 void SamplerWindowObserver::displayNewName()
@@ -564,8 +554,7 @@ void SamplerWindowObserver::displayNewName()
 
 void SamplerWindowObserver::displayPgm()
 {
-	auto lSampler = sampler.lock();
-	pgmField.lock()->setText(moduru::lang::StrUtil::padLeft(to_string(swGui->getDeletePgm() + 1), " ", 2) + "-" + dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(swGui->getDeletePgm()).lock())->getName());
+	pgmField.lock()->setText(moduru::lang::StrUtil::padLeft(to_string(swGui->getDeletePgm() + 1), " ", 2) + "-" + dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(swGui->getDeletePgm()).lock())->getName());
 }
 
 void SamplerWindowObserver::displayProgramName()

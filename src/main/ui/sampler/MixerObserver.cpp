@@ -3,13 +3,18 @@
 #include <Mpc.hpp>
 #include <Util.hpp>
 #include <Paths.hpp>
+
 #include <lcdgui/MixerStrip.hpp>
 #include <lcdgui/Layer.hpp>
 #include <lcdgui/Field.hpp>
 #include <lcdgui/Label.hpp>
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/DrumScreen.hpp>
+
 #include <ui/sampler/MixerGui.hpp>
 #include <ui/sampler/MixerSetupGui.hpp>
 #include <ui/sampler/SamplerGui.hpp>
+
 #include <sampler/NoteParameters.hpp>
 #include <sampler/Pad.hpp>
 #include <sampler/Program.hpp>
@@ -23,6 +28,9 @@
 
 #include <cmath>
 
+using namespace moduru::lang;
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens;
 using namespace mpc::ui::sampler;
 using namespace std;
 
@@ -45,7 +53,11 @@ MixerObserver::MixerObserver()
 	mixerSetupGui = uis->getMixerSetupGui();
 	mixerSetupGui->addObserver(this);
 	auto lSampler = sampler.lock();
-	mpcSoundPlayerChannel = lSampler->getDrum(samplerGui->getSelectedDrum());
+	
+	auto drumScreen = dynamic_pointer_cast<DrumScreen>(Screens::getScreenComponent("drum"));
+
+	mpcSoundPlayerChannel = lSampler->getDrum(drumScreen->getDrum());
+
 	program = dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
 
 	bool sSrcDrum = mixerSetupGui->isStereoMixSourceDrum();
@@ -402,7 +414,7 @@ void MixerObserver::displayFunctionKeys()
 
 void MixerObserver::displayMasterLevel() {
 	auto level = mixerSetupGui->getMasterLevelString();
-	if (mixerSetupGui->getMasterLevel() != -13) level = moduru::lang::StrUtil::padLeft(level, " ", 5);
+	if (mixerSetupGui->getMasterLevel() != -13) level = StrUtil::padLeft(level, " ", 5);
 	masterLevelField.lock()->setText(level);
 }
 

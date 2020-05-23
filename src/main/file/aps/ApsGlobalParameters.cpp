@@ -6,9 +6,13 @@
 #include <ui/Uis.hpp>
 #include <ui/sampler/MixerSetupGui.hpp>
 #include <ui/sampler/SamplerGui.hpp>
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/DrumScreen.hpp>
 
 #include <file/BitUtil.hpp>
 
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens; 
 using namespace moduru::file;
 using namespace mpc::file::aps;
 using namespace std;
@@ -31,7 +35,11 @@ ApsGlobalParameters::ApsGlobalParameters()
 	for (int i = 0; i < saveBytes.size(); i++)
 	saveBytes[i] = TEMPLATE[i];
 	auto uis = Mpc::instance().getUis().lock();
-	auto const padToInternalSoundVal = uis->getSamplerGui()->isPadToIntSound();
+	
+	auto drumScreen = dynamic_pointer_cast<DrumScreen>(Screens::getScreenComponent("drum"));
+
+	auto const padToInternalSoundVal = drumScreen->isPadToIntSound();
+
 	auto const padAssignMasterVal = uis->getSamplerGui()->isPadAssignMaster();
 	auto const stereoMixSourceDrumVal = uis->getMixerSetupGui()->isStereoMixSourceDrum();
 	auto const indivFxSourceDrumVal = uis->getMixerSetupGui()->isIndivFxSourceDrum();

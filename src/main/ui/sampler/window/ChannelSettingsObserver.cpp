@@ -3,14 +3,19 @@
 #include <Mpc.hpp>
 #include <Util.hpp>
 #include <Paths.hpp>
-#include <lcdgui/Field.hpp>
+
 #include <ui/sampler/MixerGui.hpp>
 #include <ui/sampler/MixerSetupGui.hpp>
 #include <ui/sampler/SamplerGui.hpp>
+
 #include <sampler/NoteParameters.hpp>
 #include <sampler/Pad.hpp>
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>
+
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/DrumScreen.hpp>
+#include <lcdgui/Field.hpp>
 
 #include <mpc/MpcSoundPlayerChannel.hpp>
 #include <mpc/MpcStereoMixerChannel.hpp>
@@ -20,6 +25,9 @@
 
 #include <cmath>
 
+using namespace moduru::lang;
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens; 
 using namespace mpc::ui::sampler;
 using namespace std;
 
@@ -39,11 +47,14 @@ ChannelSettingsObserver::ChannelSettingsObserver()
 	sampler = Mpc::instance().getSampler();
 	mixerSetupGui = uis->getMixerSetupGui();
 	mixerSetupGui->addObserver(this);
-	auto lSampler = sampler.lock();
-	mpcSoundPlayerChannel = lSampler->getDrum(samplerGui->getSelectedDrum());
-	program = dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
 
-	for (int i = (bank * 16); i < (bank * 16) + 16; i++) {
+	auto drumScreen = dynamic_pointer_cast<DrumScreen>(Screens::getScreenComponent("drum"));
+
+	mpcSoundPlayerChannel = sampler.lock()->getDrum(drumScreen->getDrum());
+	program = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
+
+	for (int i = (bank * 16); i < (bank * 16) + 16; i++)
+	{
 		auto pad = program.lock()->getPad(i);
 		auto stMixerChannel = pad->getStereoMixerChannel().lock();
 		auto indivFxMixerChannel = pad->getIndivFxMixerChannel().lock();
@@ -131,17 +142,19 @@ void ChannelSettingsObserver::displayChannel()
 
 void ChannelSettingsObserver::displayNoteField()
 {
-	auto lSampler = sampler.lock();
 	string soundString = "OFF";
 	auto lProgram = program.lock();
 	auto sampleNumber = lProgram->getNoteParameters(samplerGui->getNote())->getSndNumber();
-	if (sampleNumber > 0 && sampleNumber < lSampler->getSoundCount()) {
-		soundString = lSampler->getSoundName(sampleNumber);
-		if (!lSampler->getSound(sampleNumber).lock()->isMono()) {
-			soundString += moduru::lang::StrUtil::padLeft("(ST)", " ", 23 - soundString.length());
+
+	if (sampleNumber > 0 && sampleNumber < sampler.lock()->getSoundCount())
+	{
+		soundString = sampler.lock()->getSoundName(sampleNumber);
+		if (!sampler.lock()->getSound(sampleNumber).lock()->isMono())
+		{
+			soundString += StrUtil::padLeft("(ST)", " ", 23 - soundString.length());
 		}
 	}
-	noteField.lock()->setText(to_string(samplerGui->getNote()) + "/" + lSampler->getPadName(samplerGui->getPad()) + "-" + soundString);
+	noteField.lock()->setText(to_string(samplerGui->getNote()) + "/" + sampler.lock()->getPadName(samplerGui->getPad()) + "-" + soundString);
 }
 
 void ChannelSettingsObserver::displayStereoVolume() {
@@ -170,10 +183,12 @@ void ChannelSettingsObserver::displayPanning()
 	auto lProgram = program.lock();
 	auto mixerChannel = lProgram->getPad(samplerGui->getPad())->getStereoMixerChannel();
 	auto lMc = mixerChannel.lock();
-	if (lMc->getPanning() != 0) {
+	
+	if (lMc->getPanning() != 0)
+	{
 		auto panning = "L";
 		if (lMc->getPanning() > 0) panning = "R";
-		panningField.lock()->setText(panning + moduru::lang::StrUtil::padLeft(to_string(abs(lMc->getPanning())), " ", 2));
+		panningField.lock()->setText(panning + StrUtil::padLeft(to_string(abs(lMc->getPanning())), " ", 2));
 	}
 	else
 	{

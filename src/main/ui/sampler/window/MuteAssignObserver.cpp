@@ -6,7 +6,11 @@
 #include <sampler/NoteParameters.hpp>
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/DrumScreen.hpp>
 
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens;
 using namespace mpc::ui::sampler::window;
 using namespace std;
 
@@ -17,16 +21,22 @@ MuteAssignObserver::MuteAssignObserver()
 	samplerGui->addObserver(this);
 	
 	sampler = Mpc::instance().getSampler();
-	auto drum = uis->getSamplerGui()->getSelectedDrum();
+
+	auto drumScreen = dynamic_pointer_cast<DrumScreen>(Screens::getScreenComponent("drum"));
+
+	auto drum = drumScreen->getDrum();
+
 	auto ls = Mpc::instance().getLayeredScreen().lock();
 	noteField = ls->lookupField("note");
 	note0Field = ls->lookupField("note0");
 	note1Field = ls->lookupField("note1");
-	auto lSampler = sampler.lock();
-	program = dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(lSampler->getDrumBusProgramNumber(uis->getSamplerGui()->getSelectedDrum() + 1)).lock());
+	
+	program = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(sampler.lock()->getDrumBusProgramNumber(drum + 1)).lock());
+	
 	auto lProgram = program.lock();
-	np = lSampler->getLastNp(lProgram.get());
+	np = sampler.lock()->getLastNp(lProgram.get());
 	np->addObserver(this);
+
 	displayNote();
 	displayNote0();
 	displayNote1();

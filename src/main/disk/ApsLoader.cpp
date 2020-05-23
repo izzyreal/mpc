@@ -29,8 +29,13 @@
 #include <mpc/MpcStereoMixerChannel.hpp>
 #include <mpc/MpcIndivFxMixerChannel.hpp>
 
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/DrumScreen.hpp>
+
 #include <lang/StrUtil.hpp>
 
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens; 
 using namespace mpc::disk;
 using namespace mpc::file::aps;
 using namespace moduru::lang;
@@ -184,7 +189,10 @@ void ApsLoader::load()
 	uis->getMixerSetupGui()->setFxDrum(apsParser.getGlobalParameters()->getFxDrum());
 	uis->getMixerSetupGui()->setIndivFxSourceDrum(apsParser.getGlobalParameters()->isIndivFxSourceDrum());
 	uis->getMixerSetupGui()->setStereoMixSourceDrum(apsParser.getGlobalParameters()->isStereoMixSourceDrum());
-	uis->getSamplerGui()->setPadToIntSound(apsParser.getGlobalParameters()->isPadToIntSoundEnabled());
+
+	auto drumScreen = dynamic_pointer_cast<DrumScreen>(Screens::getScreenComponent("drum"));
+
+	drumScreen->setPadToIntSound(apsParser.getGlobalParameters()->isPadToIntSoundEnabled());
 	uis->getDiskGui()->removePopup();
 	
 	sampler->setSoundIndex(0);
