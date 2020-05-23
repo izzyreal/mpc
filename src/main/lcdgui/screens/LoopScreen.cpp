@@ -13,6 +13,7 @@
 #include <limits.h>
 
 using namespace mpc::lcdgui::screens;
+using namespace moduru::lang;
 using namespace std;
 
 LoopScreen::LoopScreen(const int layerIndex)
@@ -23,6 +24,36 @@ LoopScreen::LoopScreen(const int layerIndex)
 void LoopScreen::open()
 {
 	typableParams = vector<string>{ "to", "endlengthvalue" };
+
+	addChild(move(make_shared<TwoDots>()));
+	addChild(move(make_shared<Wave>()));
+
+	auto twoDots = findTwoDots().lock();
+	twoDots->setVisible(0, true);
+	twoDots->setVisible(1, true);
+	twoDots->setVisible(2, false);
+	twoDots->setVisible(3, false);
+
+	if (sampler.lock()->getSoundCount() != 0)
+	{
+		findField("dummy").lock()->setFocusable(false);
+		waveformLoadData();
+		
+		auto sound = sampler.lock()->getSound().lock();
+		findWave().lock()->setSelection(sound->getLoopTo(), sound->getEnd());
+		auto soundGui = mpc.getUis().lock()->getSoundGui();
+		soundGui->initZones(sampler.lock()->getSound().lock()->getFrameCount());
+	}
+	else
+	{
+		findWave().lock()->setSampleData(nullptr, false, 0);
+		findField("snd").lock()->setFocusable(false);
+		findField("playx").lock()->setFocusable(false);
+		findField("to").lock()->setFocusable(false);
+		findField("endlength").lock()->setFocusable(false);
+		findField("endlengthvalue").lock()->setFocusable(false);
+		findField("loop").lock()->setFocusable(false);
+	}
 }
 
 void LoopScreen::openWindow()
@@ -97,6 +128,7 @@ void LoopScreen::function(int f)
 void LoopScreen::turnWheel(int i)
 {
     init();
+
 	if (param == "")
 	{
 		return;
@@ -127,10 +159,15 @@ void LoopScreen::turnWheel(int i)
 		}
 
         sound->setLoopTo(sound->getLoopTo() + soundInc);
+		
 		if (loopFix)
 		{
 			sound->setEnd(sound->getLoopTo() + oldLoopLength);
 		}
+
+		displayEndLength();
+		displayEndLengthValue();
+		displayTo();
     }
     else if (param.compare("endlengthvalue") == 0)
 	{
@@ -145,22 +182,37 @@ void LoopScreen::turnWheel(int i)
 		{
 			sound->setLoopTo(sound->getEnd() - oldLoopLength);
 		}
+
+		displayEndLength();
+		displayEndLengthValue();
+		displayTo();
     }
 	else if (param.compare("playx") == 0)
 	{
 		soundGui->setPlayX(soundGui->getPlayX() + i);
+		displayPlayX();
 	}
-	else if (param.compare("loop") == 0) {
-		sampler.lock()->setLoopEnabled(sampler.lock()->getSoundIndex(), i > 0);
+	else if (param.compare("loop") == 0)
+	{
+		sound->setLoopEnabled(i > 0);
+		displayLoop();
 	}
-	else if (param.compare("endlength") == 0) {
+	else if (param.compare("endlength") == 0)
+	{
 		soundGui->setEndSelected(i > 0);
+		displayEndLength();
+		displayEndLengthValue();
+
 	}
-	else if (param.compare("snd") == 0 && i > 0) {
+	else if (param.compare("snd") == 0 && i > 0)
+	{
 		sampler.lock()->setSoundGuiNextSound();
+		displaySnd();
 	}
-	else if (param.compare("snd") == 0 && i < 0) {
+	else if (param.compare("snd") == 0 && i < 0)
+	{
 		sampler.lock()->setSoundGuiPrevSound();
+		displaySnd();
 	}
 }
 
@@ -196,6 +248,10 @@ void LoopScreen::setSlider(int i)
 		{
 			sound->setEnd(sound->getLoopTo() + oldLength);
 		}
+
+		displayEndLength();
+		displayEndLengthValue();
+		displayTo();
 	}
 	else if (param.compare("endlengthvalue") == 0)
 	{
@@ -212,6 +268,9 @@ void LoopScreen::setSlider(int i)
 		{
 			sound->setLoopTo(sound->getEnd() - oldLength);
 		}
+		displayEndLength();
+		displayEndLengthValue();
+		displayTo();
 	}
 }
 
@@ -279,4 +338,99 @@ void LoopScreen::pressEnter()
 			}
 		}
 	}
+}
+
+void LoopScreen::displaySnd()
+{
+	if (sampler.lock()->getSoundCount() != 0)
+	{
+		if (ls.lock()->getFocus().compare("dummy") == 0)
+		{
+			ls.lock()->setFocus(findField("snd").lock()->getName());
+		}
+
+		auto sound = sampler.lock()->getSound().lock();
+
+		auto sampleName = sound->getName();
+
+		if (!sound->isMono())
+		{
+			sampleName = StrUtil::padRight(sampleName, " ", 16) + "(ST)";
+		}
+		findField("snd").lock()->setText(sampleName);
+	}
+	else {
+		findField("snd").lock()->setText("(no sound)");
+		ls.lock()->setFocus("dummy");
+	}
+}
+
+void LoopScreen::displayPlayX()
+{
+	auto soundGui = mpc.getUis().lock()->getSoundGui();
+	findField("playx").lock()->setText(playXNames[soundGui->getPlayX()]);
+}
+
+void LoopScreen::displayTo()
+{
+	if (sampler.lock()->getSoundCount() != 0) {
+		auto sound = sampler.lock()->getSound().lock();
+		findField("to").lock()->setTextPadded(sound->getLoopTo(), " ");
+	}
+	else {
+		findField("to").lock()->setTextPadded("0", " ");
+	}
+
+	auto soundGui = mpc.getUis().lock()->getSoundGui();
+
+	if (!soundGui->isEndSelected())
+	{
+		displayEndLengthValue();
+	}
+}
+
+void LoopScreen::displayEndLength()
+{
+	auto soundGui = mpc.getUis().lock()->getSoundGui();
+	findField("endlength").lock()->setText(soundGui->isEndSelected() ? "  End" : "Lngth");
+}
+
+void LoopScreen::displayEndLengthValue()
+{
+	if (sampler.lock()->getSoundCount() == 0)
+	{
+		findField("endlengthvalue").lock()->setTextPadded("0", " ");
+		return;
+	}
+
+	auto soundGui = mpc.getUis().lock()->getSoundGui();
+	auto sound = sampler.lock()->getSound().lock();
+
+	if (soundGui->isEndSelected())
+	{
+		findField("endlengthvalue").lock()->setTextPadded(sound->getEnd(), " ");
+	}
+	else
+	{
+		findField("endlengthvalue").lock()->setTextPadded(sound->getEnd() - sound->getLoopTo(), " ");
+	}
+}
+
+void LoopScreen::displayLoop()
+{
+	if (sampler.lock()->getSoundCount() == 0)
+	{
+		findField("loop").lock()->setText("OFF");
+		return;
+	}
+
+	auto sound = sampler.lock()->getSound().lock();
+	findField("loop").lock()->setText(sound->isLoopEnabled() ? "ON" : "OFF");
+}
+
+void LoopScreen::waveformLoadData()
+{
+	auto sampleData = sampler.lock()->getSound().lock()->getSampleData();
+	auto soundGui = mpc.getUis().lock()->getSoundGui();
+	findWave().lock()->setSampleData(sampleData, sampler.lock()->getSound().lock()->isMono(), soundGui->getView());
 }

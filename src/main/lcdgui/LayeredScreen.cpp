@@ -33,8 +33,6 @@
 
 #include <ui/Uis.hpp>
 
-#include <ui/sampler/DrumObserver.hpp>
-#include <ui/sampler/LoopObserver.hpp>
 #include <ui/sampler/MixerObserver.hpp>
 #include <ui/sampler/FxEditObserver.hpp>
 #include <ui/sampler/PgmAssignObserver.hpp>

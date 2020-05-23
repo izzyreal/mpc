@@ -15,6 +15,16 @@ ScreenComponent::ScreenComponent(const string& name, const int layer)
 	background->setName(name);
 }
 
+weak_ptr<Wave> ScreenComponent::findWave()
+{
+	return dynamic_pointer_cast<Wave>(findChild("wave").lock());
+}
+
+weak_ptr<TwoDots> ScreenComponent::findTwoDots()
+{
+	return dynamic_pointer_cast<TwoDots>(findChild("two-dots").lock());
+}
+
 const int& ScreenComponent::getLayerIndex()
 {
 	return layer;

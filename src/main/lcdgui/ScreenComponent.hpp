@@ -3,10 +3,14 @@
 #include "Component.hpp"
 #include "Field.hpp"
 #include "Background.hpp"
+#include "Wave.hpp"
+#include "TwoDots.hpp"
 
 #include <controls/BaseControls.hpp>
 
 #include <observer/Observer.hpp>
+
+#include <lang/StrUtil.hpp>
 
 #include <memory>
 #include <string>
@@ -30,6 +34,8 @@ namespace mpc::lcdgui
 		void setLastFocus(const std::string& screenName, const std::string& newLastFocus);
 		const std::string getLastFocus(const std::string& screenName);
 		std::weak_ptr<Background> findBackground();
+		std::weak_ptr<Wave> findWave();
+		std::weak_ptr<TwoDots> findTwoDots();
 
 	public:
 		virtual void open() {}

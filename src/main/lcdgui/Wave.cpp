@@ -208,6 +208,3 @@ void Wave::Draw(std::vector<std::vector<bool>>* pixels) {
 	}
 	dirty = false;
 }
-
-Wave::~Wave() {
-}
