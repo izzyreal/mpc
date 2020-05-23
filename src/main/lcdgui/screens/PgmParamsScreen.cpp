@@ -1,4 +1,4 @@
-#include <controls/sampler/PgmParamsControls.hpp>
+#include "PgmParamsScreen.hpp"
 
 #include <Mpc.hpp>
 #include <ui/sampler/SamplerGui.hpp>
@@ -8,15 +8,15 @@
 #include <sampler/Sound.hpp>
 #include <mpc/MpcSoundPlayerChannel.hpp>
 
-using namespace mpc::controls::sampler;
+using namespace mpc::lcdgui::screens;
 using namespace std;
 
-PgmParamsControls::PgmParamsControls() 
-	: AbstractSamplerControls()
+PgmParamsScreen::PgmParamsScreen(const int layerIndex) 
+	: ScreenComponent("programparams", layerIndex)
 {
 }
 
-void PgmParamsControls::function(int i)
+void PgmParamsScreen::function(int i)
 {
 	init();
 		
@@ -50,7 +50,7 @@ void PgmParamsControls::function(int i)
 	}
 }
 
-void PgmParamsControls::turnWheel(int i)
+void PgmParamsScreen::turnWheel(int i)
 {
     init();
     	if (param.compare("tune") == 0) {
@@ -93,7 +93,7 @@ void PgmParamsControls::turnWheel(int i)
     }
 }
 
-void PgmParamsControls::openWindow()
+void PgmParamsScreen::openWindow()
 {
 	init();
 		auto lLs = ls.lock();

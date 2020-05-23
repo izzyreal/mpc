@@ -1,4 +1,4 @@
-#include <controls/sampler/TrimControls.hpp>
+#include "TrimScreen.hpp"
 
 #include <Mpc.hpp>
 #include <controls/Controls.hpp>
@@ -15,15 +15,16 @@
 #include <stdint.h>
 #include <limits.h>
 
-using namespace mpc::controls::sampler;
+using namespace mpc::lcdgui::screens;
 using namespace std;
 
-TrimControls::TrimControls() : AbstractSamplerControls()
+TrimScreen::TrimScreen(const int layerIndex)
+	: ScreenComponent("trim", layerIndex)
 {
 	typableParams = vector<string>{ "st", "end" };
 }
 
-void TrimControls::openWindow()
+void TrimScreen::openWindow()
 {
 	init();
 	auto lLs = ls.lock();
@@ -40,7 +41,7 @@ void TrimControls::openWindow()
 	}
 }
 
-void TrimControls::function(int f)
+void TrimScreen::function(int f)
 {
 	init();
 	string newSampleName;
@@ -83,7 +84,7 @@ void TrimControls::function(int f)
 	}
 }
 
-void TrimControls::turnWheel(int i)
+void TrimScreen::turnWheel(int i)
 {
 	init();
 	if (param == "") return;
@@ -129,7 +130,7 @@ void TrimControls::turnWheel(int i)
 	}
 }
 
-void TrimControls::setSlider(int i)
+void TrimScreen::setSlider(int i)
 {
 	if (!Mpc::instance().getControls().lock()->isShiftPressed()) return;
     init();
@@ -160,17 +161,17 @@ void TrimControls::setSlider(int i)
 	}
 }
 
-void TrimControls::left()
+void TrimScreen::left()
 {
 	AbstractSamplerControls::splitLeft();
 }
 
-void TrimControls::right()
+void TrimScreen::right()
 {
 	AbstractSamplerControls::splitRight();
 }
 
-void TrimControls::pressEnter()
+void TrimScreen::pressEnter()
 {
 	init();
 	if (!isTypable()) return;

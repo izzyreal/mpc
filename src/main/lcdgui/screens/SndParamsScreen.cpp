@@ -1,4 +1,4 @@
-#include <controls/sampler/SndParamsControls.hpp>
+#include <lcdgui/screens/SndParamsScreen.hpp>
 
 #include <Mpc.hpp>
 #include <controls/Controls.hpp>
@@ -7,15 +7,15 @@
 #include <sampler/Sampler.hpp>
 #include <sampler/Sound.hpp>
 
-using namespace mpc::controls::sampler;
+using namespace mpc::lcdgui::screens;
 using namespace std;
 
-SndParamsControls::SndParamsControls() 
-	: AbstractSamplerControls()
+SndParamsScreen::SndParamsScreen(const int layerIndex) 
+	: ScreenComponent("params", layerIndex)
 {
 }
 
-void SndParamsControls::openWindow()
+void SndParamsScreen::openWindow()
 {
 	init();
 	auto lLs = ls.lock();
@@ -26,7 +26,7 @@ void SndParamsControls::openWindow()
 	}
 }
 
-void SndParamsControls::function(int f)
+void SndParamsScreen::function(int f)
 {
 	init();
 	
@@ -70,7 +70,7 @@ void SndParamsControls::function(int f)
 	}
 }
 
-void SndParamsControls::turnWheel(int i)
+void SndParamsScreen::turnWheel(int i)
 {
 	init();
 	

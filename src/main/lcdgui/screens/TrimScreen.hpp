@@ -1,12 +1,12 @@
 #pragma once
-#include <controls/sampler/AbstractSamplerControls.hpp>
+#include <lcdgui/ScreenComponent.hpp>
 
 #include <memory>
 
-namespace mpc::controls::sampler {
+namespace mpc::lcdgui::screens {
 
-	class TrimControls
-		: public AbstractSamplerControls
+	class TrimScreen
+		: public mpc::lcdgui::ScreenComponent
 	{
 
 	public:
@@ -19,7 +19,7 @@ namespace mpc::controls::sampler {
 		void setSlider(int i) override;
 
 	public:
-		TrimControls();
+		TrimScreen(const int layerIndex);
 
 	};
 }

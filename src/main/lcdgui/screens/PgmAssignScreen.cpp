@@ -1,4 +1,4 @@
-#include <controls/sampler/PgmAssignControls.hpp>
+#include <lcdgui/screens/PgmAssignScreen.hpp>
 
 #include <Mpc.hpp>
 #include <ui/sampler/SamplerGui.hpp>
@@ -13,15 +13,15 @@
 #include <mpc/MpcSoundPlayerChannel.hpp>
 #include <mpc/MpcStereoMixerChannel.hpp>
 
-using namespace mpc::controls::sampler;
+using namespace mpc::lcdgui::screens;
 using namespace std;
 
-PgmAssignControls::PgmAssignControls()
-	: AbstractSamplerControls()
+PgmAssignScreen::PgmAssignScreen(const int layerIndex)
+	: ScreenComponent("programassign", layerIndex)
 {
 }
 
-void PgmAssignControls::function(int i)
+void PgmAssignScreen::function(int i)
 {
 	init();
 		
@@ -52,7 +52,7 @@ void PgmAssignControls::function(int i)
 	}
 }
 
-void PgmAssignControls::turnWheel(int i)
+void PgmAssignScreen::turnWheel(int i)
 {
 	init();
 	if (param.compare("padassign") == 0) {
@@ -117,7 +117,7 @@ void PgmAssignControls::turnWheel(int i)
 	}
 }
 
-void PgmAssignControls::openWindow()
+void PgmAssignScreen::openWindow()
 {
 	init();
 		auto lLs = ls.lock();

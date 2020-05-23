@@ -1,18 +1,18 @@
-#include <controls/sampler/SelectDrumControls.hpp>
+#include <lcdgui/screens/SelectDrumScreen.hpp>
 
 #include <lcdgui/LayeredScreen.hpp>
 #include <ui/sampler/SamplerGui.hpp>
 #include <sampler/Program.hpp>
 
-using namespace mpc::controls::sampler;
+using namespace mpc::lcdgui::screens;
 using namespace std;
 
-SelectDrumControls::SelectDrumControls() 
-	: AbstractSamplerControls()
+SelectDrumScreen::SelectDrumScreen(const int layerIndex) 
+	: ScreenComponent("selectdrum", layerIndex)
 {
 }
 
-void SelectDrumControls::function(int i)
+void SelectDrumScreen::function(int i)
 {
 	init();
 	auto lLs = ls.lock();

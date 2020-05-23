@@ -1,25 +1,25 @@
-#include "InitPadAssignControls.hpp"
+#include "InitPadAssignScreen.hpp"
 
 #include <ui/sampler/SamplerGui.hpp>
 #include <ui/sampler/window/SamplerWindowGui.hpp>
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>
 
-using namespace mpc::controls::sampler;
+using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
-InitPadAssignControls::InitPadAssignControls() 
-	: AbstractSamplerControls()
+InitPadAssignScreen::InitPadAssignScreen(const int layerIndex) 
+	: ScreenComponent("initpadassign", layerIndex)
 {
 }
 
-void InitPadAssignControls::turnWheel(int i)
+void InitPadAssignScreen::turnWheel(int i)
 {
     init();
     swGui->setInitPadAssignMaster(i > 0);
 }
 
-void InitPadAssignControls::function(int i)
+void InitPadAssignScreen::function(int i)
 {
 	init();
 	

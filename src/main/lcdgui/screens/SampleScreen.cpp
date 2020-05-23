@@ -1,4 +1,4 @@
-#include <controls/sampler/SampleControls.hpp>
+#include <lcdgui/screens/SampleScreen.hpp>
 
 #include <Mpc.hpp>
 #include <controls/Controls.hpp>
@@ -9,15 +9,15 @@
 #include <ui/sampler/SamplerGui.hpp>
 #include <sampler/Sampler.hpp>
 
-using namespace mpc::controls::sampler;
+using namespace mpc::lcdgui::screens;
 using namespace std;
 
-SampleControls::SampleControls()
-	: AbstractSamplerControls()
+SampleScreen::SampleScreen(const int layerIndex)
+	: ScreenComponent("sample", layerIndex)
 {
 }
 
-void SampleControls::left() {
+void SampleScreen::left() {
 	//if (sampler.lock()->isArmed() || sampler.lock()->isRecording()) return;
 	if (Mpc::instance().getAudioMidiServices().lock()->isRecordingSound()) {
 		return;
@@ -25,7 +25,7 @@ void SampleControls::left() {
 	super::left();
 }
 
-void SampleControls::right() {
+void SampleScreen::right() {
 	//if (sampler.lock()->isArmed() || sampler.lock()->isRecording()) return;
 	if (Mpc::instance().getAudioMidiServices().lock()->isRecordingSound()) {
 		return;
@@ -33,7 +33,7 @@ void SampleControls::right() {
 	super::right();
 }
 
-void SampleControls::up() {
+void SampleScreen::up() {
 	//if (sampler.lock()->isArmed() || sampler.lock()->isRecording()) return;
 	if (Mpc::instance().getAudioMidiServices().lock()->isRecordingSound()) {
 		return;
@@ -41,7 +41,7 @@ void SampleControls::up() {
 	super::up();
 }
 
-void SampleControls::down() {
+void SampleScreen::down() {
 	//if (sampler.lock()->isArmed() || sampler.lock()->isRecording()) return;
 	if (Mpc::instance().getAudioMidiServices().lock()->isRecordingSound()) {
 		return;
@@ -49,7 +49,7 @@ void SampleControls::down() {
 	super::down();
 }
 
-void SampleControls::function(int i)
+void SampleScreen::function(int i)
 {
 	init();
 	
@@ -107,7 +107,7 @@ void SampleControls::function(int i)
 	}
 }
 
-void SampleControls::turnWheel(int i)
+void SampleScreen::turnWheel(int i)
 {
     init();
 	

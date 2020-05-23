@@ -1,13 +1,14 @@
 #pragma once
-#include <controls/sampler/AbstractSamplerControls.hpp>
+#include <lcdgui/ScreenComponent.hpp>
 
-namespace mpc::controls::sampler {
+namespace mpc::lcdgui::screens {
 
-	class LoopControls
-		: public AbstractSamplerControls
+	class LoopScreen
+		: public mpc::lcdgui::ScreenComponent
 	{
 
 	public:
+		LoopScreen(const int layerIndex);
 		void init() override;
 
 	public:

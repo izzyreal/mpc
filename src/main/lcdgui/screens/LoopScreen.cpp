@@ -1,4 +1,4 @@
-#include <controls/sampler/LoopControls.hpp>
+#include "LoopScreen.hpp"
 
 #include <Mpc.hpp>
 #include <controls/Controls.hpp>
@@ -12,16 +12,21 @@
 #include <stdint.h>
 #include <limits.h>
 
-using namespace mpc::controls::sampler;
+using namespace mpc::lcdgui::screens;
 using namespace std;
 
-void LoopControls::init()
+LoopScreen::LoopScreen(const int layerIndex)
+	: ScreenComponent("loop", layerIndex)
+{
+}
+
+void LoopScreen::init()
 {
 	AbstractSamplerControls::init();
 	typableParams = vector<string>{	"to", "endlengthvalue" };
 }
 
-void LoopControls::openWindow()
+void LoopScreen::openWindow()
 {
 	init();
 	auto lLs = ls.lock();
@@ -38,7 +43,7 @@ void LoopControls::openWindow()
 	}
 }
 
-void LoopControls::function(int f)
+void LoopScreen::function(int f)
 {
 	init();
 	string newSampleName;
@@ -80,7 +85,7 @@ void LoopControls::function(int f)
 	}
 }
 
-void LoopControls::turnWheel(int i)
+void LoopScreen::turnWheel(int i)
 {
     init();
     if(param == "") return;
@@ -130,7 +135,7 @@ void LoopControls::turnWheel(int i)
 	}
 }
 
-void LoopControls::setSlider(int i)
+void LoopScreen::setSlider(int i)
 {
 	if (!Mpc::instance().getControls().lock()->isShiftPressed())
 	{
@@ -167,17 +172,17 @@ void LoopControls::setSlider(int i)
 	}
 }
 
-void LoopControls::left()
+void LoopScreen::left()
 {
     AbstractSamplerControls::splitLeft();
 }
 
-void LoopControls::right()
+void LoopScreen::right()
 {
 	AbstractSamplerControls::splitRight();
 }
 
-void LoopControls::pressEnter()
+void LoopScreen::pressEnter()
 {
 	init();
 	

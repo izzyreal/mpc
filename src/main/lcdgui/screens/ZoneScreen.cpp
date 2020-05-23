@@ -1,4 +1,4 @@
-#include <controls/sampler/ZoneControls.hpp>
+#include "ZoneScreen.hpp"
 
 #include <Mpc.hpp>
 #include <controls/Controls.hpp>
@@ -8,21 +8,21 @@
 #include <ui/sampler/window/EditSoundGui.hpp>
 #include <sampler/Sampler.hpp>
 
-using namespace mpc::controls::sampler;
+using namespace mpc::lcdgui::screens;
 using namespace std;
 
-ZoneControls::ZoneControls() 
-	: AbstractSamplerControls()
+ZoneScreen::ZoneScreen(const int layerIndex) 
+	: ScreenComponent("zone", layerIndex)
 {
 }
 
-void ZoneControls::init()
+void ZoneScreen::init()
 {
 	super::init();
 	this->typableParams = vector<string>{ "st", "end" };
 }
 
-void ZoneControls::openWindow()
+void ZoneScreen::openWindow()
 {
 	init();
 	auto lLs = ls.lock();
@@ -43,7 +43,7 @@ void ZoneControls::openWindow()
 	}
 }
 
-void ZoneControls::function(int f)
+void ZoneScreen::function(int f)
 {
 	init();
 		string newSampleName;
@@ -87,7 +87,7 @@ void ZoneControls::function(int f)
 	}
 }
 
-void ZoneControls::turnWheel(int i)
+void ZoneScreen::turnWheel(int i)
 {
 	init();
 	if (param == "") return;

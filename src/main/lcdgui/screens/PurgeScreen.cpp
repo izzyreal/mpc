@@ -1,16 +1,16 @@
-#include <controls/sampler/PurgeControls.hpp>
+#include <lcdgui/screens/PurgeScreen.hpp>
 
 #include <sampler/Sampler.hpp>
 
-using namespace mpc::controls::sampler;
+using namespace mpc::lcdgui::screens;
 using namespace std;
 
-PurgeControls::PurgeControls() 
-	: AbstractSamplerControls()
+PurgeScreen::PurgeScreen(const int layerIndex) 
+	: ScreenComponent("purge", layerIndex)
 {
 }
 
-void PurgeControls::function(int f)
+void PurgeScreen::function(int f)
 {
 	init();
 	
