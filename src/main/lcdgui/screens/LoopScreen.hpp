@@ -9,7 +9,8 @@ namespace mpc::lcdgui::screens {
 
 	public:
 		LoopScreen(const int layerIndex);
-		void init() override;
+
+		void open() override;
 
 	public:
 		void openWindow() override;

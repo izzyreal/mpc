@@ -20,17 +20,18 @@ LoopScreen::LoopScreen(const int layerIndex)
 {
 }
 
-void LoopScreen::init()
+void LoopScreen::open()
 {
-	AbstractSamplerControls::init();
-	typableParams = vector<string>{	"to", "endlengthvalue" };
+	typableParams = vector<string>{ "to", "endlengthvalue" };
 }
 
 void LoopScreen::openWindow()
 {
 	init();
 	auto lLs = ls.lock();
-	if (param.compare("snd") == 0) {
+	
+	if (param.compare("snd") == 0)
+	{
 		soundGui->setSoundIndex(soundGui->getSoundIndex(), sampler.lock()->getSoundCount());
 		soundGui->setPreviousScreenName("loop");
 		lLs->openScreen("sound");
