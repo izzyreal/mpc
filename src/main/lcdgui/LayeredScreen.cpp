@@ -35,13 +35,7 @@
 
 #include <ui/sampler/MixerObserver.hpp>
 #include <ui/sampler/FxEditObserver.hpp>
-#include <ui/sampler/PgmAssignObserver.hpp>
-#include <ui/sampler/PgmParamsObserver.hpp>
-#include <ui/sampler/PurgeObserver.hpp>
-#include <ui/sampler/SndParamsObserver.hpp>
 #include <ui/sampler/SoundObserver.hpp>
-#include <ui/sampler/TrimObserver.hpp>
-#include <ui/sampler/ZoneObserver.hpp>
 
 #include <ui/sampler/SamplerGui.hpp>
 

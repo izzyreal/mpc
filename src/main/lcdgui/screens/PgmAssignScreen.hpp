@@ -14,6 +14,22 @@ namespace mpc::lcdgui::screens {
 		void openWindow() override;
 
 		PgmAssignScreen(const int layerIndex);
+		void update(moduru::observer::Observable* o, nonstd::any arg);
+		
+	private:
+		const std::vector<std::string> soundGenerationModes{ "NORMAL", "SIMULT", "VEL SW", "DCY SW" };
+		void displayPgm();
+		void displaySoundName();
+		void displayPadAssign();
+		void displayPadNote();
+		void displaySoundGenerationMode();
+		void displayVeloRangeUpper();
+		void displayVeloRangeLower();
+		void displayOptionalNoteB();
+		void displayOptionalNoteA();
+		void displayNote();
+		void displayPad();
+
 
 	};
 }

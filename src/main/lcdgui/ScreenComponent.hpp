@@ -2,6 +2,7 @@
 
 #include "Component.hpp"
 #include "Field.hpp"
+#include "Label.hpp"
 #include "Background.hpp"
 #include "Wave.hpp"
 #include "TwoDots.hpp"
