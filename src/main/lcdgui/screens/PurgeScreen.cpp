@@ -1,13 +1,16 @@
 #include <lcdgui/screens/PurgeScreen.hpp>
 
-#include <sampler/Sampler.hpp>
-
 using namespace mpc::lcdgui::screens;
 using namespace std;
 
 PurgeScreen::PurgeScreen(const int layerIndex) 
 	: ScreenComponent("purge", layerIndex)
 {
+}
+
+void PurgeScreen::open()
+{
+	findLabel("value").lock()->setTextPadded(sampler.lock()->getUnusedSampleCount(), " ");
 }
 
 void PurgeScreen::function(int f)
