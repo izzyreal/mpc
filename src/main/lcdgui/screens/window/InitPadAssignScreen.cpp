@@ -13,27 +13,41 @@ InitPadAssignScreen::InitPadAssignScreen(const int layerIndex)
 {
 }
 
+void InitPadAssignScreen::open()
+{
+	displayInitPadAssign();
+}
+
 void InitPadAssignScreen::turnWheel(int i)
 {
     init();
-    swGui->setInitPadAssignMaster(i > 0);
+    setInitPadAssign(i > 0);
+}
+
+
+void InitPadAssignScreen::setInitPadAssign(bool b)
+{
+	initPadAssignIsMaster = b;
+	displayInitPadAssign();
 }
 
 void InitPadAssignScreen::function(int i)
 {
 	init();
 	
-	auto lLs = ls.lock();
-	switch (i) {
-	case int(4) :
-		if (swGui->isInitPadAssignMaster()) {
+	switch (i)
+	{
+	case 4:
+		if (initPadAssignIsMaster)
+		{
 			sampler.lock()->setMasterPadAssign(*sampler.lock()->getInitMasterPadAssign());
 		}
 		else {
 			program.lock()->initPadAssign();
 		}
-		samplerGui->setPadAssignMaster(swGui->isInitPadAssignMaster());
-		lLs->openScreen("programassign");
+		
+		samplerGui->setPadAssignMaster(initPadAssignIsMaster);
+		ls.lock()->openScreen("programassign");
 		break;
 	}
 }

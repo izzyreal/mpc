@@ -79,15 +79,15 @@ SoundObserver::SoundObserver()
 
 void SoundObserver::displaySnd()
 {
-	sndField.lock()->setText(sampler.lock()->getSoundName(soundGui->getSoundIndex()));
+	sndField.lock()->setText(sampler.lock()->getSound().lock()->getName());
 }
 
 void SoundObserver::displayLSource()
 {
 	auto lSampler = sampler.lock();
 	auto ls = Mpc::instance().getLayeredScreen().lock();
-	lSourceField.lock()->setText(lSampler->getSoundName(soundGui->getSoundIndex()));
-	if (lSampler->getSound(soundGui->getSoundIndex()).lock()->isMono() && lSampler->getSound(soundGui->getRSource()).lock()->isMono()) {
+	lSourceField.lock()->setText(lSampler->getSound().lock()->getName());
+	if (lSampler->getSound().lock()->isMono() && lSampler->getSound(soundGui->getRSource()).lock()->isMono()) {
 		//ls->setFunctionKeysArrangement("monotostereo");
 		//ls->getWave().lock()->SetDirty();
 		//ls->getLayer(0)->setDirty();
@@ -108,7 +108,7 @@ void SoundObserver::displayRSource()
 	auto lSampler = sampler.lock();
 	auto ls = Mpc::instance().getLayeredScreen().lock();
 	rSourceField.lock()->setText(lSampler->getSoundName(soundGui->getRSource()));
-	if (lSampler->getSound(soundGui->getSoundIndex()).lock()->isMono() && lSampler->getSound(soundGui->getRSource()).lock()->isMono()) {
+	if (lSampler->getSound().lock()->isMono() && lSampler->getSound(soundGui->getRSource()).lock()->isMono()) {
 		//ls->setFunctionKeysArrangement("monotostereo");
 		//ls->getWave().lock()->SetDirty();
 		//ls->getLayer(0)->setDirty();
@@ -133,8 +133,8 @@ void SoundObserver::displayStereoSource()
 {
 	auto lSampler = sampler.lock();
 	auto ls = Mpc::instance().getLayeredScreen().lock();
-	stereoSourceField.lock()->setText(lSampler->getSoundName(soundGui->getSoundIndex()));
-	if (lSampler->getSound(soundGui->getSoundIndex()).lock()->isMono()) {
+	stereoSourceField.lock()->setText(lSampler->getSound().lock()->getName());
+	if (lSampler->getSound().lock()->isMono()) {
 		ls->setFunctionKeysArrangement(1);
 		//ls->getWave().lock()->SetDirty();
 		//ls->getLayer(0)->setDirty();
@@ -183,51 +183,55 @@ void SoundObserver::displayNewName()
 void SoundObserver::displayConvert()
 {
 	convertField.lock()->setText(convertNames[soundGui->getConvert()]);
-	if (soundGui->getConvert() == 0 && sampler.lock()->getSound(soundGui->getSoundIndex()).lock()->isMono()) {
+	if (soundGui->getConvert() == 0 && sampler.lock()->getSound().lock()->isMono()) {
 		convertField.lock()->setText("MONO TO STEREO");
 	}
 }
 
 void SoundObserver::displayDeleteSoundSnd()
 {
-    sndField.lock()->setText(sampler.lock()->getSoundName(soundGui->getSoundIndex()));
+    sndField.lock()->setText(sampler.lock()->getSound().lock()->getName());
 }
 
 void SoundObserver::displaySoundName()
 {
-	if (soundGui->getSoundIndex() == -1) {
+	if (sampler.lock()->getSoundIndex() == -1)
+	{
 		soundNameField.lock()->setText("");
 		return;
 	}
-	soundNameField.lock()->setText(sampler.lock()->getSoundName(soundGui->getSoundIndex()));
+	soundNameField.lock()->setText(sampler.lock()->getSound().lock()->getName());
 }
 
 void SoundObserver::displayType()
 {
-	if (soundGui->getSoundIndex() == -1) {
+	if (sampler.lock()->getSoundIndex() == -1)
+	{
 		typeLabel.lock()->setText("");
 		return;
 	}
-	auto mono = sampler.lock()->getSound(soundGui->getSoundIndex()).lock()->isMono();
+	auto mono = sampler.lock()->getSound().lock()->isMono();
 	typeLabel.lock()->setText("Type:" + string(mono ? "MONO" : "STEREO"));
 }
 
 void SoundObserver::displayRate()
 {
-	if (soundGui->getSoundIndex() == -1) {
+	if (sampler.lock()->getSoundIndex() == -1)
+	{
 		rateLabel.lock()->setText("");
 		return;
 	}
-	rateLabel.lock()->setText("Rate: " + to_string(dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getSound(soundGui->getSoundIndex()).lock())->getSampleRate()) + "Hz");
+	rateLabel.lock()->setText("Rate: " + to_string(dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getSound().lock())->getSampleRate()) + "Hz");
 }
 
 void SoundObserver::displaySize()
 {
-	if (soundGui->getSoundIndex() == -1) {
+	if (sampler.lock()->getSoundIndex() == -1)
+	{
 		sizeLabel.lock()->setText("");
 		return;
 	}
-	sizeLabel.lock()->setText("Size:" + moduru::lang::StrUtil::padLeft(to_string(sampler.lock()->getSound(soundGui->getSoundIndex()).lock()->getSampleData()->size() / 500), " ", 4) + "kbytes");
+	sizeLabel.lock()->setText("Size:" + moduru::lang::StrUtil::padLeft(to_string(sampler.lock()->getSound().lock()->getSampleData()->size() / 500), " ", 4) + "kbytes");
 }
 
 void SoundObserver::update(moduru::observer::Observable* o, nonstd::any arg)

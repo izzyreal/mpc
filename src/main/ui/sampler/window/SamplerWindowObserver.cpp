@@ -100,10 +100,6 @@ SamplerWindowObserver::SamplerWindowObserver()
 		displayNameForNewSound();
 		displayAssignToPad();
 	}
-	else if (csn.compare("initpadassign") == 0) {
-		initPadAssignField = ls->lookupField("initpadassign");
-		displayInitPadAssign();
-	}
 	else if (csn.compare("copynoteparameters") == 0) {
 		prog0Field = ls->lookupField("prog0");
 		note0Field = ls->lookupField("note0");
@@ -335,11 +331,6 @@ void SamplerWindowObserver::displayNote1()
 	note1Field.lock()->setText(nnName + "/" + padName + sampleName);
 }
 
-void SamplerWindowObserver::displayInitPadAssign()
-{
-	initPadAssignField.lock()->setText(swGui->isInitPadAssignMaster() ? "MASTER" : "PROGRAM");
-}
-
 void SamplerWindowObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 {
 	auto lSampler = sampler.lock();
@@ -418,9 +409,6 @@ void SamplerWindowObserver::update(moduru::observer::Observable* o, nonstd::any 
 			displayInfo2();
 			displayPad(pn);
 		}
-	}
-	else if (s.compare("initpadassign") == 0) {
-		displayInitPadAssign();
 	}
 	else if (s.compare("prog0") == 0) {
 		displayProg0();

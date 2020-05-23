@@ -26,11 +26,11 @@ SndParamsObserver::SndParamsObserver()
 	soundGui->addObserver(this);
 	auto lSampler = sampler.lock();
 	if (lSampler->getSoundCount() != 0) {
-		sound = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound(soundGui->getSoundIndex()).lock());
+		sound = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound().lock());
 		auto lSound = sound.lock();
 		lSound->addObserver(this);
 		lSound->getOscillatorControls()->addObserver(this);
-		soundGui->initZones(sampler.lock()->getSound(soundGui->getSoundIndex()).lock()->getLastFrameIndex());
+		soundGui->initZones(sampler.lock()->getSound().lock()->getLastFrameIndex());
 	}
 	auto ls = Mpc::instance().getLayeredScreen().lock();
 	sndField = ls->lookupField("snd");
@@ -160,7 +160,7 @@ void SndParamsObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 		auto lSound = sound.lock();
 		lSound->deleteObserver(this);
 		lSound->getOscillatorControls()->deleteObserver(this);
-		sound = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound(soundGui->getSoundIndex()).lock());
+		sound = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound().lock());
 		lSound = sound.lock();
 		lSound->addObserver(this);
 		lSound->getOscillatorControls()->addObserver(this);
@@ -197,7 +197,7 @@ SndParamsObserver::~SndParamsObserver() {
 	soundGui->deleteObserver(this);
 	auto lSampler = sampler.lock();
 	if (lSampler->getSoundCount() != 0) {
-		sound = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound(soundGui->getSoundIndex()).lock());
+		sound = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound().lock());
 		auto lSound = sound.lock();
 		lSound->deleteObserver(this);
 		lSound->getOscillatorControls()->deleteObserver(this);

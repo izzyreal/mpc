@@ -14,23 +14,23 @@ void PurgeScreen::function(int f)
 {
 	init();
 	
-	auto lLs = ls.lock();
-	switch (f) {
+	switch (f)
+	{
 	case 0:
-		lLs->openScreen("programassign");
+		ls.lock()->openScreen("programassign");
 		break;
 	case 1:
-		lLs->openScreen("programparams");
+		ls.lock()->openScreen("programparams");
 		break;
 	case 2:
-		lLs->openScreen("drum");
+		ls.lock()->openScreen("drum");
 		break;
 	case 3:
-		lLs->openScreen("selectdrum");
+		ls.lock()->openScreen("selectdrum");
 		break;
 	case 4:
 		sampler.lock()->purge();
-		lLs->openScreen("purge");
+		ls.lock()->openScreen("purge");
 		break;
 	}
 }

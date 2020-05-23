@@ -19,10 +19,11 @@ SampleScreen::SampleScreen(const int layerIndex)
 
 void SampleScreen::left() {
 	//if (sampler.lock()->isArmed() || sampler.lock()->isRecording()) return;
-	if (Mpc::instance().getAudioMidiServices().lock()->isRecordingSound()) {
+	if (Mpc::instance().getAudioMidiServices().lock()->isRecordingSound())
+	{
 		return;
 	}
-	super::left();
+	BaseControls::left();
 }
 
 void SampleScreen::right() {
@@ -30,7 +31,7 @@ void SampleScreen::right() {
 	if (Mpc::instance().getAudioMidiServices().lock()->isRecordingSound()) {
 		return;
 	}
-	super::right();
+	BaseControls::right();
 }
 
 void SampleScreen::up() {
@@ -38,7 +39,7 @@ void SampleScreen::up() {
 	if (Mpc::instance().getAudioMidiServices().lock()->isRecordingSound()) {
 		return;
 	}
-	super::up();
+	BaseControls::up();
 }
 
 void SampleScreen::down() {
@@ -46,23 +47,26 @@ void SampleScreen::down() {
 	if (Mpc::instance().getAudioMidiServices().lock()->isRecordingSound()) {
 		return;
 	}
-	super::down();
+	BaseControls::down();
 }
 
 void SampleScreen::function(int i)
 {
 	init();
 	
-	switch (i) {
+	switch (i)
+	{
 	case 0:
-		if (Mpc::instance().getAudioMidiServices().lock()->isRecordingSound()) {
+		if (Mpc::instance().getAudioMidiServices().lock()->isRecordingSound())
+		{
 			return;
 		}
 		//if (!samplerisRecording() && !samplerisArmed())
 			//samplerresetPeak();
 		break;
 	case 4:
-		if (Mpc::instance().getAudioMidiServices().lock()->isRecordingSound()) {
+		if (Mpc::instance().getAudioMidiServices().lock()->isRecordingSound())
+		{
 			return;
 		}
 		//if (samplerisRecording()) {
@@ -75,8 +79,8 @@ void SampleScreen::function(int i)
 		//}
 		break;
 	case 5:
-		
-		if (Mpc::instance().getControls().lock()->isF6Pressed()) {
+		if (Mpc::instance().getControls().lock()->isF6Pressed())
+		{
 			return;
 		}
 
@@ -84,7 +88,8 @@ void SampleScreen::function(int i)
 
 		auto ams = Mpc::instance().getAudioMidiServices().lock();
 
-		if (ams->isRecordingSound()) {
+		if (ams->isRecordingSound())
+		{
 			ams->stopSoundRecorder();
 			return;
 		}
@@ -110,28 +115,32 @@ void SampleScreen::function(int i)
 void SampleScreen::turnWheel(int i)
 {
     init();
-	
-
 	//if (!samplerisRecording() && !samplerisArmed()) {
-        if (param.compare("input") == 0) {
+        if (param.compare("input") == 0)
+		{
             auto oldInput = samplerGui->getInput();
             samplerGui->setInput(samplerGui->getInput() + i);
         }
-		else if (param.compare("threshold") == 0) {
+		else if (param.compare("threshold") == 0)
+		{
 			samplerGui->setThreshold(samplerGui->getThreshold() + i);
 		}
-		else if (param.compare("mode") == 0) {
+		else if (param.compare("mode") == 0)
+		{
 			samplerGui->setMode(samplerGui->getMode() + i);
 		}
-		else if (param.compare("time") == 0) {
+		else if (param.compare("time") == 0)
+		{
 			samplerGui->setTime(samplerGui->getTime() + i);
 		}
-		else if (param.compare("monitor") == 0) {
+		else if (param.compare("monitor") == 0)
+		{
 			samplerGui->setMonitor(samplerGui->getMonitor() + i);
 			bool muteMonitor = samplerGui->getMonitor() == 0 ? true : false;
 			Mpc::instance().getAudioMidiServices().lock()->muteMonitor(muteMonitor);
 		}
-		else if (param.compare("prerec") == 0) {
+		else if (param.compare("prerec") == 0)
+		{
 			samplerGui->setPreRec(samplerGui->getPreRec() + i);
 		}
     //}

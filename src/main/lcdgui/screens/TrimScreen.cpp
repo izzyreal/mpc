@@ -16,10 +16,15 @@
 #include <limits.h>
 
 using namespace mpc::lcdgui::screens;
+using namespace moduru::lang;
 using namespace std;
 
 TrimScreen::TrimScreen(const int layerIndex)
 	: ScreenComponent("trim", layerIndex)
+{
+}
+
+void TrimScreen::open()
 {
 	typableParams = vector<string>{ "st", "end" };
 }
@@ -27,181 +32,251 @@ TrimScreen::TrimScreen(const int layerIndex)
 void TrimScreen::openWindow()
 {
 	init();
-	auto lLs = ls.lock();
-	if (param.compare("snd") == 0) {
-		setSoundIndex(soundGui->getSoundIndex(), sampler.lock()->getSoundCount());
-		soundGui->setPreviousScreenName("trim");
-		lLs->openScreen("sound");
+	
+	if (param.compare("snd") == 0)
+	{
+		sampler.lock()->setPreviousScreenName("trim");
+		ls.lock()->openScreen("sound");
 	}
 	else if (param.compare("st") == 0) {
-		lLs->openScreen("startfine");
+		ls.lock()->openScreen("startfine");
 	}
 	else if (param.compare("end") == 0) {
-		lLs->openScreen("endfine");
+		ls.lock()->openScreen("endfine");
 	}
 }
 
 void TrimScreen::function(int f)
 {
 	init();
-	string newSampleName;
-	vector<int> zone;
 	
-	auto lLs = ls.lock();
-	switch (f) {
+	switch (f)
+	{
 	case 0:
 		sampler.lock()->sort();
 		break;
 	case 1:
-		lLs->openScreen("loop");
+		ls.lock()->openScreen("loop");
 		break;
 	case 2:
-		lLs->openScreen("zone");
+		ls.lock()->openScreen("zone");
 		break;
 	case 3:
-		lLs->openScreen("params");
+		ls.lock()->openScreen("params");
 		break;
 	case 4:
+	{
 		if (sampler.lock()->getSoundCount() == 0)
-			return;
-
-		newSampleName = sampler.lock()->getSoundName(soundGui->getSoundIndex());
-		newSampleName = sampler.lock()->addOrIncreaseNumber(moduru::lang::StrUtil::trim(newSampleName));
-		editSoundGui->setNewName(newSampleName);
-		editSoundGui->setPreviousScreenName("trim");
-		lLs->openScreen("editsound");
-		break;
-	case 5:
-		if (Mpc::instance().getControls().lock()->isF6Pressed()) {
+		{
 			return;
 		}
+		auto editSoundGui = mpc.getUis().lock()->getEditSoundGui();
+		auto newSampleName = sampler.lock()->getSound().lock()->getName();
+		newSampleName = sampler.lock()->addOrIncreaseNumber(StrUtil::trim(newSampleName));
+
+		editSoundGui->setNewName(newSampleName);
+		editSoundGui->setPreviousScreenName("trim");
 		
+		ls.lock()->openScreen("editsound");
+		break;
+	}
+	case 5:
+	{
+		if (Mpc::instance().getControls().lock()->isF6Pressed())
+		{
+			return;
+		}
+
 		Mpc::instance().getControls().lock()->setF6Pressed(true);
-		
-		zone = vector<int>{ soundGui->getZoneStart(soundGui->getZoneNumber()), soundGui->getZoneEnd(soundGui->getZoneNumber()) };
+		auto soundGui = mpc.getUis().lock()->getSoundGui();
+		auto zone = vector<int>{ soundGui->getZoneStart(soundGui->getZoneNumber()), soundGui->getZoneEnd(soundGui->getZoneNumber()) };
 		sampler.lock()->playX(soundGui->getPlayX(), &zone);
 		break;
+	}
 	}
 }
 
 void TrimScreen::turnWheel(int i)
 {
 	init();
-	if (param == "") return;
-	auto lSound = sound.lock();
-	auto const oldLength = lSound->getEnd() - lSound->getStart();
+
+	if (param == "")
+	{
+		return;
+	}
+	
+	auto soundGui = mpc.getUis().lock()->getSoundGui();
+	auto zoomGui = mpc.getUis().lock()->getZoomGui();
+	auto sound = sampler.lock()->getSound().lock();
+	auto const oldLength = sound->getEnd() - sound->getStart();
 	auto const lengthFix = zoomGui->isSmplLngthFix();
 	
 	//auto notch = getNotch(increment);
 	auto soundInc = getSoundIncrement(i);
 	auto mtf = ls.lock()->lookupField(param).lock();
-	if (mtf->isSplit()) {
+	
+	if (mtf->isSplit())
+	{
 		soundInc = i >= 0 ? splitInc[mtf->getActiveSplit() - 1] : -splitInc[mtf->getActiveSplit() - 1];
 	}
-	if (param.compare("st") == 0) {
-		if (lengthFix && lSound->getStart() + soundInc + oldLength > lSound->getLastFrameIndex()) {
+
+	if (param.compare("st") == 0)
+	{
+		if (lengthFix && sound->getStart() + soundInc + oldLength > sound->getLastFrameIndex())
+		{
 			return;
 		}
-		lSound->setStart(lSound->getStart() + soundInc);
-		if (lengthFix) {
-			lSound->setEnd(lSound->getStart() + oldLength);
+		
+		sound->setStart(sound->getStart() + soundInc);
+		
+		if (lengthFix)
+		{
+			sound->setEnd(sound->getStart() + oldLength);
 		}
 	}
-	else if (param.compare("end") == 0) {
-		if (lengthFix && lSound->getEnd() + soundInc - oldLength < 0) {
+	else if (param.compare("end") == 0)
+	{
+		if (lengthFix && sound->getEnd() + soundInc - oldLength < 0)
+		{
 			return;
 		}
-		lSound->setEnd(lSound->getEnd() + soundInc);
-		if (lengthFix) {
-			lSound->setStart(lSound->getEnd() - oldLength);
+		
+		sound->setEnd(sound->getEnd() + soundInc);
+		
+		if (lengthFix)
+		{
+			sound->setStart(sound->getEnd() - oldLength);
 		}
 	}
-	else if (param.compare("view") == 0) {
+	else if (param.compare("view") == 0)
+	{
 		soundGui->setView(soundGui->getView() + i);
 	}
-	else if (param.compare("playx") == 0) {
+	else if (param.compare("playx") == 0)
+	{
 		soundGui->setPlayX(soundGui->getPlayX() + i);
 	}
-	else if (param.compare("snd") == 0 && i > 0) {
+	else if (param.compare("snd") == 0 && i > 0)
+	{
 		sampler.lock()->setSoundGuiNextSound();
 	}
-	else if (param.compare("snd") == 0 && i < 0) {
+	else if (param.compare("snd") == 0 && i < 0)
+	{
 		sampler.lock()->setSoundGuiPrevSound();
 	}
 }
 
 void TrimScreen::setSlider(int i)
 {
-	if (!Mpc::instance().getControls().lock()->isShiftPressed()) return;
-    init();
-	auto lSound = sound.lock();
-	auto const oldLength = lSound->getEnd() - lSound->getStart();
+	if (!Mpc::instance().getControls().lock()->isShiftPressed())
+	{
+		return;
+	}
+    
+	init();
+
+	auto zoomGui = mpc.getUis().lock()->getZoomGui();
+	auto sound = sampler.lock()->getSound().lock();
+	auto const oldLength = sound->getEnd() - sound->getStart();
     auto const lengthFix = zoomGui->isSmplLngthFix();
-    auto candidatePos = (int) ((i / 124.0) * lSound->getLastFrameIndex());
+    auto candidatePos = (int) ((i / 124.0) * sound->getLastFrameIndex());
     auto maxPos = int (0);
-	if (param.compare("st") == 0) {
-		maxPos = lengthFix ? lSound->getLastFrameIndex() - oldLength : lSound->getLastFrameIndex();
-		if (candidatePos > maxPos) {
+	
+	if (param.compare("st") == 0)
+	{
+		maxPos = lengthFix ? sound->getLastFrameIndex() - oldLength : sound->getLastFrameIndex();
+
+		if (candidatePos > maxPos)
+		{
 			candidatePos = maxPos;
 		}
-		lSound->setStart(candidatePos);
-		if (lengthFix) {
-			lSound->setEnd(lSound->getStart() + oldLength);
+		
+		sound->setStart(candidatePos);
+		
+		if (lengthFix)
+		{
+			sound->setEnd(sound->getStart() + oldLength);
 		}
 	}
-	else if (param.compare("end") == 0) {
+	else if (param.compare("end") == 0)
+	{
 		maxPos = lengthFix ? oldLength : int(0);
-		if (candidatePos < maxPos) {
+	
+		if (candidatePos < maxPos)
+		{
 			candidatePos = maxPos;
 		}
-		lSound->setEnd(candidatePos);
-		if (lengthFix) {
-			lSound->setStart(lSound->getEnd() - oldLength);
+		
+		sound->setEnd(candidatePos);
+		
+		if (lengthFix)
+		{
+			sound->setStart(sound->getEnd() - oldLength);
 		}
 	}
 }
 
 void TrimScreen::left()
 {
-	AbstractSamplerControls::splitLeft();
+	splitLeft();
 }
 
 void TrimScreen::right()
 {
-	AbstractSamplerControls::splitRight();
+	splitRight();
 }
 
 void TrimScreen::pressEnter()
 {
 	init();
-	if (!isTypable()) return;
-	auto lLs = ls.lock();
-	auto mtf = lLs->lookupField(param).lock();
-	if (!mtf->isTypeModeEnabled())
+
+	if (!isTypable())
+	{
 		return;
+	}
+	
+	auto lLs = ls.lock();
+	auto mtf = ls.lock()->lookupField(param).lock();
+	
+	if (!mtf->isTypeModeEnabled())
+	{
+		return;
+	}
 
+	auto zoomGui = mpc.getUis().lock()->getZoomGui(); 
 	auto candidate = mtf->enter();
-	auto lSound = sound.lock();
-	auto const oldLength = lSound->getEnd() - lSound->getStart();
+	auto sound = sampler.lock()->getSound().lock();
+	auto const oldLength = sound->getEnd() - sound->getStart();
 	auto const lengthFix = zoomGui->isSmplLngthFix();
-	if (candidate != INT_MAX) {
-		if (param.compare("st") == 0) {
-			if (lengthFix && candidate + oldLength > lSound->getLastFrameIndex())
+	
+	if (candidate != INT_MAX)
+	{
+		if (param.compare("st") == 0)
+		{
+			if (lengthFix && candidate + oldLength > sound->getLastFrameIndex())
+			{
 				return;
+			}
 
-			lSound->setStart(candidate);
+			sound->setStart(candidate);
+			
 			if (lengthFix)
-				lSound->setEnd(lSound->getStart() + oldLength);
-
+			{
+				sound->setEnd(sound->getStart() + oldLength);
+			}
 		}
-		if (param.compare("end") == 0) {
+		else if (param.compare("end") == 0) {
 			if (lengthFix && candidate - oldLength < 0)
+			{
 				return;
+			}
 
-			lSound->setEnd(candidate);
+			sound->setEnd(candidate);
+			
 			if (lengthFix)
-				lSound->setStart(lSound->getEnd() - oldLength);
-
+			{
+				sound->setStart(sound->getEnd() - oldLength);
+			}
 		}
 	}
 }

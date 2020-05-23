@@ -20,6 +20,7 @@ namespace mpc::lcdgui::screens {
 
 	public:
 		TrimScreen(const int layerIndex);
+		void open() override;
 
 	};
 }

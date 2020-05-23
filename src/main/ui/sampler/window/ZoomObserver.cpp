@@ -27,7 +27,7 @@ ZoomObserver::ZoomObserver()
 	soundGui->addObserver(this);
 	auto ls = Mpc::instance().getLayeredScreen().lock();
 	csn = ls->getCurrentScreenName();
-	sound = dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getSound(soundGui->getSoundIndex()).lock());
+	sound = dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getSound().lock());
 ;	auto lSound = sound.lock();
 	lSound->deleteObservers();
 	lSound->getOscillatorControls()->deleteObservers();

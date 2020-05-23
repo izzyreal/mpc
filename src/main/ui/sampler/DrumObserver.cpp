@@ -39,7 +39,7 @@ DrumObserver::DrumObserver()
 
 void DrumObserver::displayValue()
 {
-    valueLabel.lock()->setTextPadded(sampler.lock()->getUnusedSampleAmount(), " ");
+    valueLabel.lock()->setTextPadded(sampler.lock()->getUnusedSampleCount(), " ");
 }
 
 void DrumObserver::displayDrum()

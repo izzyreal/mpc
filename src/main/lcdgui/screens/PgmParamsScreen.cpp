@@ -3,9 +3,12 @@
 #include <Mpc.hpp>
 #include <ui/sampler/SamplerGui.hpp>
 #include <ui/sampler/window/SamplerWindowGui.hpp>
+
 #include <sampler/NoteParameters.hpp>
+#include <sampler/Pad.hpp>
 #include <sampler/Sampler.hpp>
 #include <sampler/Sound.hpp>
+
 #include <mpc/MpcSoundPlayerChannel.hpp>
 
 using namespace mpc::lcdgui::screens;
@@ -20,31 +23,33 @@ void PgmParamsScreen::function(int i)
 {
 	init();
 		
-	int letterNumber;
 	auto sc = sampler.lock()->getSoundCount();
-	string newName;
-	auto lLs = ls.lock();
-	switch (i) {
+
+	switch (i)
+	{
 	case 0:
-		lLs->openScreen("programassign");
+		ls.lock()->openScreen("programassign");
 		break;
 	case 1:
-		lLs->openScreen("selectdrum");
+		ls.lock()->openScreen("selectdrum");
 		break;
 	case 2:
-		lLs->openScreen("drum");
+		ls.lock()->openScreen("drum");
 		break;
 	case 3:
-		lLs->openScreen("purge");
+		ls.lock()->openScreen("purge");
 		break;
 	case 4:
-		swGui->setAutoChromAssSnd(sampler.lock()->getLastNp(program.lock().get())->getSndNumber(), sc);
-		letterNumber = sampler.lock()->getProgramCount() + 21;
-		newName = "NewPgm-" + mpc::Mpc::akaiAscii[letterNumber];
-		swGui->setNewName(newName);
+	{
+		auto samplerWindowGui = mpc.getUis().lock()->getSamplerWindowGui();
+		samplerWindowGui->setAutoChromAssSnd(sampler.lock()->getLastNp(program.lock().get())->getSndNumber(), sc);
+		auto letterNumber = sampler.lock()->getProgramCount() + 21;
+		auto newName = "NewPgm-" + mpc::Mpc::akaiAscii[letterNumber];
+		samplerWindowGui->setNewName(newName);
 		samplerGui->setPrevScreenName(csn);
-		lLs->openScreen("autochromaticassignment");
+		ls.lock()->openScreen("autochromaticassignment");
 		break;
+	}
 	case 5:
 		break;
 	}
@@ -53,77 +58,94 @@ void PgmParamsScreen::function(int i)
 void PgmParamsScreen::turnWheel(int i)
 {
     init();
-    	if (param.compare("tune") == 0) {
-		lastNp->setTune(lastNp->getTune() + i);
+    
+	auto lastPad = sampler.lock()->getLastPad(program.lock().get());
+	auto lastNoteParameters = dynamic_cast<mpc::sampler::NoteParameters*>(program.lock()->getNoteParameters(lastPad->getNote()));
+	
+	if (param.compare("tune") == 0)
+	{
+		lastNoteParameters->setTune(lastNoteParameters->getTune() + i);
 	}
 	else if (param.compare("dcymd") == 0) {
-		lastNp->setDecayMode(lastNp->getDecayMode() + i);
+		lastNoteParameters->setDecayMode(lastNoteParameters->getDecayMode() + i);
 	}
 	else if(param.compare("voiceoverlap") == 0) {
-        auto s = sampler.lock()->getSound(lastNp->getSndNumber()).lock();
-        if(s && s->isLoopEnabled())
-            return;
-
-        lastNp->setVoiceOverlap(lastNp->getVoiceOverlap() + i);
+        auto s = sampler.lock()->getSound(lastNoteParameters->getSndNumber()).lock();
+		
+		if (s && s->isLoopEnabled())
+		{
+			return;
+		}
+        
+		lastNoteParameters->setVoiceOverlap(lastNoteParameters->getVoiceOverlap() + i);
     }
-	else if (param.compare("reson") == 0) {
-		lastNp->setFilterResonance(lastNp->getFilterResonance() + i);
+	else if (param.compare("reson") == 0)
+	{
+		lastNoteParameters->setFilterResonance(lastNoteParameters->getFilterResonance() + i);
 	}
-	else if (param.compare("freq") == 0) {
-		lastNp->setFilterFrequency(lastNp->getFilterFrequency() + i);
+	else if (param.compare("freq") == 0)
+	{
+		lastNoteParameters->setFilterFrequency(lastNoteParameters->getFilterFrequency() + i);
 	}
-	else if (param.compare("decay") == 0) {
-		lastNp->setDecay(lastNp->getDecay() + i);
+	else if (param.compare("decay") == 0)
+	{
+		lastNoteParameters->setDecay(lastNoteParameters->getDecay() + i);
 	}
-	else if (param.compare("attack") == 0) {
-		lastNp->setAttack(lastNp->getAttack() + i);
+	else if (param.compare("attack") == 0)
+	{
+		lastNoteParameters->setAttack(lastNoteParameters->getAttack() + i);
 	}
-	else if (param.compare("pgm") == 0) {
+	else if (param.compare("pgm") == 0)
+	{	
 		auto pgm = mpcSoundPlayerChannel->getProgram();
 		auto candidate = sampler.lock()->getUsedProgram(pgm, i > 0);
-		if (candidate != pgm) {
+		
+		if (candidate != pgm)
+		{
 			mpcSoundPlayerChannel->setProgram(candidate);
 		}
 	}
-    else if(param.compare("note") == 0) {
+    else if(param.compare("note") == 0)
+	{
         auto candidate = samplerGui->getNote() + i;
-        if(candidate > 34)
-            samplerGui->setPadAndNote(samplerGui->getPad(), candidate);
-
+		if (candidate > 34)
+		{
+			samplerGui->setPadAndNote(samplerGui->getPad(), candidate);
+		}
     }
 }
 
 void PgmParamsScreen::openWindow()
 {
 	init();
-		auto lLs = ls.lock();
-	int pn;
-	int nn;
+
 	if (param.compare("pgm") == 0) {
 		samplerGui->setPrevScreenName(csn);
-		lLs->openScreen("program");
+		ls.lock()->openScreen("program");
 	}
 	else if (param.compare("note") == 0) {
-		pn = mpcSoundPlayerChannel->getProgram();
-		nn = samplerGui->getNote();
-		auto pc = sampler.lock()->getProgramCount();
-		swGui->setProg0(pn, pc);
-		swGui->setNote0(nn);
-		swGui->setProg1(pn, pc);
-		swGui->setNote1(nn);
+		auto programIndex = mpcSoundPlayerChannel->getProgram();
+		
+		auto note = samplerGui->getNote();
+		auto programCount = sampler.lock()->getProgramCount();
+		auto samplerWindowGui = mpc.getUis().lock()->getSamplerWindowGui();
+		samplerWindowGui->setProg0(programIndex, programCount);
+		samplerWindowGui->setNote0(note);
+		samplerWindowGui->setProg1(programIndex, programCount);
+		samplerWindowGui->setNote1(note);
 		samplerGui->setPrevScreenName(csn);
-		lLs->openScreen("copynoteparameters");
+		ls.lock()->openScreen("copynoteparameters");
 	}
 	else if (param.compare("attack") == 0 || param.compare("decay") == 0 || param.compare("dcymd") == 0) {
-		lLs->openScreen("velocitymodulation");
+		ls.lock()->openScreen("velocitymodulation");
 	}
 	else if (param.compare("freq") == 0 || param.compare("reson") == 0) {
-		lLs->openScreen("veloenvfilter");
+		ls.lock()->openScreen("veloenvfilter");
 	}
 	else if (param.compare("tune") == 0) {
-		lLs->openScreen("velopitch");
+		ls.lock()->openScreen("velopitch");
 	}
 	else if (param.compare("voiceoverlap") == 0) {
-		lLs->openScreen("muteassign");
+		ls.lock()->openScreen("muteassign");
 	}
 }

@@ -96,7 +96,7 @@ using namespace rapidjson;
 using namespace std;
 
 static vector<string> samplerWindowNames = vector<string>{ "program", "deleteprogram", "deleteallprograms", "createnewprogram",
-"copyprogram", "assignmentview", "initpadassign", "copynoteparameters", "velocitymodulation",
+"copyprogram", "assignmentview", "copynoteparameters", "velocitymodulation",
 "veloenvfilter", "velopitch", "autochromaticassignment", "keeporretry" };
 
 static vector<string> diskNames = vector<string>{ "load", "save", "format", "setup", "device", "loadaprogram",
@@ -105,8 +105,6 @@ static vector<string> diskNames = vector<string>{ "load", "save", "format", "set
 
 static vector<string> soundNames = vector<string>{ "sound", "deletesound", "deleteallsound", "convertsound", "resample",
 "stereotomono", "monotostereo", "copysound" };
-
-static vector<string> soundGuiNames = vector<string>{ "trim", "loop", "zone" };
 
 static moduru::gui::BMFParser _bmfParser = moduru::gui::BMFParser(string(mpc::Paths::resPath() + moduru::file::FileUtil::getSeparator() + "font.fnt"));
 
@@ -834,14 +832,6 @@ void LayeredScreen::initObserver()
 	{
 		activeObserver = make_unique<DirectoryObserver>(Mpc::instance().getDisk());
 	}
-	else if (csn.compare("programparams") == 0)
-	{
-		activeObserver = make_unique<PgmParamsObserver>();
-	}
-	else if (csn.compare("programassign") == 0)
-	{
-		activeObserver = make_unique<PgmAssignObserver>();
-	}
 	else if (csn.compare("mixer") == 0 || csn.compare("mixersetup") == 0)
 	{
 		activeObserver = make_unique<MixerObserver>();
@@ -858,14 +848,7 @@ void LayeredScreen::initObserver()
 	{
 		activeObserver = make_unique<ui::NameObserver>();
 	}
-	else if (csn.compare("trim") == 0)
-	{
-		activeObserver = make_unique<TrimObserver>();
-	}
-	else if (csn.compare("loop") == 0)
-	{
-		activeObserver = make_unique<LoopObserver>();
-	}
+
 	else if (csn.compare("editsound") == 0)
 	{
 		activeObserver = make_unique<EditSoundObserver>();
@@ -874,14 +857,6 @@ void LayeredScreen::initObserver()
 	{
 		activeObserver = make_unique<ZoomObserver>();
 	}
-	else if (csn.compare("zone") == 0 || csn.compare("numberofzones") == 0)
-	{
-		activeObserver = make_unique<ZoneObserver>();
-	}
-	else if (csn.compare("params") == 0)
-	{
-		activeObserver = make_unique<SndParamsObserver>();
-	}
 	else if (csn.compare("deleteallfiles") == 0)
 	{
 		activeObserver = make_unique<DeleteAllFilesObserver>();
@@ -889,12 +864,6 @@ void LayeredScreen::initObserver()
 	else if (checkActiveScreen(&samplerWindowNames, csn))
 	{
 		activeObserver = make_unique<SamplerWindowObserver>();
-	}
-	else if (csn.compare("purge") == 0) {
-		activeObserver = make_unique<PurgeObserver>();
-	}
-	else if (csn.compare("drum") == 0) {
-		activeObserver = make_unique<DrumObserver>();
 	}
 	else if (csn.compare("muteassign") == 0)
 	{

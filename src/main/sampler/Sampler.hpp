@@ -34,11 +34,15 @@ namespace mpc::sampler {
 	private:
 		int inputLevel = 0;
 		int soundIndex = 0;
+		std::string previousScreenName = "";
 
 	public:
 		void setSoundIndex(int i);
 		int getSoundIndex();
 		std::weak_ptr<Sound> getSound();
+		std::string getPreviousScreenName();
+		void setPreviousScreenName(std::string s);
+
 
 	private:
 		std::vector<int> initMasterPadAssign;
@@ -106,7 +110,7 @@ namespace mpc::sampler {
 		int getFreeSampleSpace();
 
 	private:
-		std::set<std::weak_ptr<Sound>> getUsedSounds();
+		std::vector<std::weak_ptr<Sound>> getUsedSounds();
 		int getLastInt(std::string s);
 		std::string addOrIncreaseNumber2(std::string s);
 

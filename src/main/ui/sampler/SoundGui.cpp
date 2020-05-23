@@ -24,16 +24,6 @@ void SoundGui::setEndSelected(bool b)
     notifyObservers(string("endlength"));
 }
 
-string SoundGui::getPreviousScreenName()
-{
-    return previousScreenName;
-}
-
-void SoundGui::setPreviousScreenName(string s)
-{
-    previousScreenName = s;
-}
-
 void SoundGui::setConvert(int i)
 {
     convert = i;
@@ -148,7 +138,10 @@ void SoundGui::setNewStName(string s)
 
 void SoundGui::setPlayX(int i)
 {
-    if(i < 0 || i > 4) return;
+	if (i < 0 || i > 4)
+	{
+		return;
+	}
     playX = i;
     setChanged();
     notifyObservers(string("playx"));
@@ -161,7 +154,10 @@ int SoundGui::getPlayX()
 
 void SoundGui::setView(int i)
 {
-	if (i < 0 || i > 1) return;
+	if (i < 0 || i > 1)
+	{
+		return;
+	}
 	view = i;
 	setChanged();
 	notifyObservers(string("view"));

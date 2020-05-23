@@ -32,7 +32,7 @@ ZoneObserver::ZoneObserver()
 	wave = ls->getWave();
 	wave.lock()->Hide(false);
 	if (lSampler->getSoundCount() != 0) {
-		sound = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound(soundGui->getSoundIndex()).lock());
+		sound = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound().lock());
 		auto lSound = sound.lock();
 		lSound->addObserver(this);
 		lSound->getOscillatorControls()->addObserver(this);
@@ -52,7 +52,7 @@ ZoneObserver::ZoneObserver()
 		displaySnd();
 		if (lSampler->getSoundCount() != 0) {
 			dummyField.lock()->setFocusable(false);
-			//soundGui->initZones(lSampler->getSound(soundGui->getSoundIndex()).lock()->getLastFrameIndex()); this prolly kills any changes made while zooming in
+			//soundGui->initZones(lSampler->getSound().lock()->getLastFrameIndex()); this prolly kills any changes made while zooming in
 			wave.lock()->setSelection(soundGui->getZoneStart(soundGui->getZoneNumber()), soundGui->getZoneEnd(soundGui->getZoneNumber()));
 		}
 		else {
@@ -83,7 +83,7 @@ void ZoneObserver::displaySnd()
 		auto lSound = sound.lock();
 		lSound->deleteObserver(this);
 		lSound->getOscillatorControls()->deleteObserver(this);
-		sound = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound(soundGui->getSoundIndex()).lock());
+		sound = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound().lock());
 		lSound = sound.lock();
 		lSound->addObserver(this);
 		lSound->getOscillatorControls()->addObserver(this);
@@ -138,7 +138,7 @@ void ZoneObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 	string s = nonstd::any_cast<string>(arg);
 	if (s.compare("soundindex") == 0) {
 		displaySnd();
-		soundGui->initZones(sampler.lock()->getSound(soundGui->getSoundIndex()).lock()->getLastFrameIndex());
+		soundGui->initZones(sampler.lock()->getSound().lock()->getLastFrameIndex());
 		displaySt();
 		displayEnd();
 		waveformLoadData();

@@ -339,7 +339,7 @@ void NameControls::saveName()
 	}
 	else if (prevScreen.compare("sound") == 0)
 	{
-		dynamic_pointer_cast<mpc::sampler::Sound>(Mpc::instance().getSampler().lock()->getSound(soundGui->getSoundIndex()).lock())->setName(nameGui->getName());
+		sampler.lock()->getSound().lock()->setName(nameGui->getName());
 		nameGui->setNameBeingEdited(false);
 		lLs->setLastFocus("name", "0");
 		lLs->openScreen("sound");

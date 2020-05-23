@@ -26,7 +26,7 @@ TrimObserver::TrimObserver()
 
 	auto lSampler = sampler.lock();
 	if (lSampler->getSoundCount() != 0) {
-		sound = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound(soundGui->getSoundIndex()).lock());
+		sound = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound().lock());
 		auto lSound = sound.lock();
 		lSound->addObserver(this);
 		lSound->getOscillatorControls()->addObserver(this);
@@ -57,7 +57,7 @@ TrimObserver::TrimObserver()
 		dummyField.lock()->setFocusable(false);
 		waveformLoadData();
 		wave.lock()->setSelection(lSound->getStart(), lSound->getEnd());
-		soundGui->initZones(sampler.lock()->getSound(soundGui->getSoundIndex()).lock()->getLastFrameIndex());
+		soundGui->initZones(sampler.lock()->getSound().lock()->getLastFrameIndex());
 	}
 	else {
 		wave.lock()->setSampleData(nullptr, false, 0);
@@ -79,7 +79,7 @@ void TrimObserver::displaySnd()
 		auto lSound = sound.lock();
 		lSound->deleteObserver(this);
 		lSound->getOscillatorControls()->deleteObserver(this);
-		sound = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound(soundGui->getSoundIndex()).lock());
+		sound = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound().lock());
 		lSound = sound.lock();
 		lSound->addObserver(this);
 		lSound->getOscillatorControls()->addObserver(this);

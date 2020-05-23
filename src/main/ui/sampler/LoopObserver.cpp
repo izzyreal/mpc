@@ -22,13 +22,14 @@ LoopObserver::LoopObserver()
 	playXNames = vector<string>{ "ALL", "ZONE", "BEFOR ST", "BEFOR TO", "AFTR END" };
 	soundGui = Mpc::instance().getUis().lock()->getSoundGui();
 	soundGui->addObserver(this);
-	auto lSampler = sampler.lock();
-	if (lSampler->getSoundCount() != 0) {
-		sound = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound(soundGui->getSoundIndex()).lock());
-		auto lSound = sound.lock();
-		lSound->addObserver(this);
-		lSound->getOscillatorControls()->addObserver(this);
+	
+	if (sampler.lock()->getSoundCount() != 0)
+	{
+		sound = sampler.lock()->getSound();
+		sound.lock()->addObserver(this);
+		sound.lock()->getOscillatorControls()->addObserver(this);
 	}
+	
 	auto ls = Mpc::instance().getLayeredScreen().lock();
 	twoDots = ls->getTwoDots();
 	twoDots.lock()->Hide(false);
@@ -53,14 +54,17 @@ LoopObserver::LoopObserver()
 	displayEndLength();
 	displayEndLengthValue();
 	displayLoop();
-	if (lSampler->getSoundCount() != 0) {
+	
+	if (sampler.lock()->getSoundCount() != 0) 
+	{
 		dummyField.lock()->setFocusable(false);
 		waveformLoadData();
-		auto lSound = sound.lock();
-		wave.lock()->setSelection(lSound->getLoopTo(), lSound->getEnd());
-		soundGui->initZones(sampler.lock()->getSound(soundGui->getSoundIndex()).lock()->getLastFrameIndex());
+
+		wave.lock()->setSelection(sound.lock()->getLoopTo(), sound.lock()->getEnd());
+		soundGui->initZones(sampler.lock()->getSound().lock()->getFrameCount());
 	}
-	else {
+	else
+	{
 		wave.lock()->setSampleData(nullptr, false, 0);
 		sndField.lock()->setFocusable(false);
 		playXField.lock()->setFocusable(false);
@@ -75,17 +79,24 @@ void LoopObserver::displaySnd()
 {
 	auto lSampler = sampler.lock();
 	auto ls = Mpc::instance().getLayeredScreen().lock();
-	if (lSampler->getSoundCount() != 0) {
-		if (ls->getFocus().compare("dummy") == 0) ls->setFocus(sndField.lock()->getName());
-		auto lSound = sound.lock();
-		lSound->deleteObserver(this);
-		lSound->getOscillatorControls()->deleteObserver(this);
-		sound = dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound(soundGui->getSoundIndex()).lock());
-		lSound = sound.lock();
-		lSound->addObserver(this);
-		lSound->getOscillatorControls()->addObserver(this);
-		auto sampleName = lSound->getName();
-		if (!lSound->isMono()) {
+
+	if (sampler.lock()->getSoundCount() != 0)
+	{
+		if (ls->getFocus().compare("dummy") == 0)
+		{
+			ls->setFocus(sndField.lock()->getName());
+		}
+		
+		sound.lock()->deleteObserver(this);
+		sound.lock()->getOscillatorControls()->deleteObserver(this);
+		sound = dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getSound().lock());
+		sound.lock()->addObserver(this);
+		sound.lock()->getOscillatorControls()->addObserver(this);
+		
+		auto sampleName = sound.lock()->getName();
+		
+		if (!sound.lock()->isMono())
+		{
 			sampleName = moduru::lang::StrUtil::padRight(sampleName, " ", 16) + "(ST)";
 		}
 		sndField.lock()->setText(sampleName);
@@ -122,23 +133,28 @@ void LoopObserver::displayEndLength()
 
 void LoopObserver::displayEndLengthValue()
 {
-	if (sampler.lock()->getSoundCount() != 0) {
-		if (soundGui->isEndSelected()) {
+	if (sampler.lock()->getSoundCount() != 0)
+	{
+		if (soundGui->isEndSelected())
+		{
 			endLengthValueField.lock()->setTextPadded(sound.lock()->getEnd(), " ");
 		}
-		else {
+		else
+		{
 			auto lSound = sound.lock();
-			endLengthValueField.lock()->setTextPadded(lSound->getEnd() - lSound->getLoopTo(), " ");
+			endLengthValueField.lock()->setTextPadded(sound.lock()->getEnd() - sound.lock()->getLoopTo(), " ");
 		}
 	}
-	else {
+	else
+	{
 		endLengthValueField.lock()->setTextPadded("0", " ");
 	}
 }
 
 void LoopObserver::displayLoop()
 {
-	if (sampler.lock()->getSoundCount() == 0) {
+	if (sampler.lock()->getSoundCount() == 0)
+	{
 		loopField.lock()->setText("OFF");
 		return;
 	}
@@ -148,32 +164,36 @@ void LoopObserver::displayLoop()
 void LoopObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 {
 	string s = nonstd::any_cast<string>(arg);
-	if (s.compare("soundindex") == 0) {
-		auto lSound = sound.lock();
+	
+	if (s.compare("soundindex") == 0)
+	{
 		displaySnd();
 		displayTo();
 		displayEndLength();
 		waveformLoadData();
-		wave.lock()->setSelection(lSound->getLoopTo(), lSound->getEnd());
-		soundGui->initZones(lSound->getLastFrameIndex());
+		wave.lock()->setSelection(sound.lock()->getLoopTo(), sound.lock()->getEnd());
+		soundGui->initZones(sound.lock()->getLastFrameIndex());
 	}
-	else if (s.compare("loopto") == 0) {
+	else if (s.compare("loopto") == 0)
+	{
 		displayTo();
-		auto lSound = sound.lock();
-		wave.lock()->setSelection(lSound->getLoopTo(), lSound->getEnd());
+		wave.lock()->setSelection(sound.lock()->getLoopTo(), sound.lock()->getEnd());
 	}
-	else if (s.compare("endlength") == 0) {
+	else if (s.compare("endlength") == 0)
+	{
 		displayEndLength();
 	}
-	else if (s.compare("end") == 0) {
+	else if (s.compare("end") == 0)
+	{
 		displayEndLengthValue();
-		auto lSound = sound.lock();
-		wave.lock()->setSelection(lSound->getLoopTo(), lSound->getEnd());
+		wave.lock()->setSelection(sound.lock()->getLoopTo(), sound.lock()->getEnd());
 	}
-	else if (s.compare("loopenabled") == 0) {
+	else if (s.compare("loopenabled") == 0)
+	{
 		displayLoop();
 	}
-	else if (s.compare("playx") == 0) {
+	else if (s.compare("playx") == 0)
+	{
 		displayPlayX();
 	}
 }
@@ -181,22 +201,28 @@ void LoopObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 void LoopObserver::waveformLoadData()
 {
 	auto lSound = sound.lock();
-	auto sampleData = lSound->getSampleData();
-	wave.lock()->setSampleData(sampleData, lSound->isMono(), soundGui->getView());
+	auto sampleData = sound.lock()->getSampleData();
+	wave.lock()->setSampleData(sampleData, sound.lock()->isMono(), soundGui->getView());
 }
 
-LoopObserver::~LoopObserver() {
-	if (wave.lock()) {
+LoopObserver::~LoopObserver()
+{
+	if (wave.lock())
+	{
 		//wave.lock()->Hide(true);
 		//wave.lock()->setSampleData(nullptr, false, 0);
 	}
-	if (twoDots.lock()) {
+	
+	if (twoDots.lock())
+	{
 		twoDots.lock()->Hide(true);
 	}
+
 	soundGui->deleteObserver(this);
-	auto lSound = sound.lock();
-	if (lSound) {
-		lSound->deleteObserver(this);
-		lSound->getOscillatorControls()->deleteObserver(this);
+	
+	if (sound.lock())
+	{
+		sound.lock()->deleteObserver(this);
+		sound.lock()->getOscillatorControls()->deleteObserver(this);
 	}
 }

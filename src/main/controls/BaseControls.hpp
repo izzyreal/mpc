@@ -51,6 +51,12 @@ namespace mpc::controls {
 		std::weak_ptr<mpc::sampler::Sampler> sampler;
 
 	protected:
+		bool splittable = false;
+		static vector<int> splitInc;
+		void splitLeft();
+		void splitRight();
+
+	protected:
 		std::string param{ "" };
 		std::string csn{ "" };
 
@@ -68,6 +74,7 @@ namespace mpc::controls {
 
 	protected:
 		virtual void init();
+		int getSoundIncrement(int notch);
 
 	public:
 		virtual void left();

@@ -93,18 +93,6 @@ string SamplerWindowGui::getFocusFromPadNumber(const int& padNumber) // feed it 
 	return padFocusNames[padNr];
 }
 
-void SamplerWindowGui::setInitPadAssignMaster(bool b)
-{
-	initPadAssignMaster = b;
-	setChanged();
-	notifyObservers(string("initpadassign"));
-}
-
-bool SamplerWindowGui::isInitPadAssignMaster()
-{
-    return initPadAssignMaster;
-}
-
 int SamplerWindowGui::getProg0()
 {
     return prog0;

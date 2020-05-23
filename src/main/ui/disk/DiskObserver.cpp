@@ -233,7 +233,7 @@ void DiskObserver::displaySize()
 			size = 4;
 			break;
 		case 4:
-			size = lSampler->getSoundCount() == 0 ? -1 : (lSampler->getSound(soundGui->getSoundIndex()).lock()->getSampleData()->size() * 2 / 1000);
+			size = lSampler->getSoundCount() == 0 ? -1 : (lSampler->getSound().lock()->getSampleData()->size() * 2 / 1000);
 			break;
 		case 5:
 			size = 512;
@@ -315,7 +315,7 @@ void DiskObserver::displayFile()
 			file = dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(mpcSoundPlayerChannel->getProgram()).lock())->getName();
 			break;
 		case 4:
-			file = string(lSampler->getSoundCount() == 0 ? "" : dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound(soundGui->getSoundIndex()).lock())->getName());
+			file = string(lSampler->getSoundCount() == 0 ? "" : dynamic_pointer_cast<mpc::sampler::Sound>(lSampler->getSound().lock())->getName());
 			break;
 		}
 		lFileField->setText(file);

@@ -15,18 +15,26 @@ SelectDrumScreen::SelectDrumScreen(const int layerIndex)
 void SelectDrumScreen::function(int i)
 {
 	init();
-	auto lLs = ls.lock();
-	if (i < 4) {
-		samplerGui->setSelectedDrum(i);
-		auto prevCsn = ls.lock()->getPreviousScreenName();
-		auto name = string("programassign");
-		if (prevCsn.compare("programparams") == 0 || prevCsn.compare("drum") == 0 || prevCsn.compare("purge") == 0)
-			name = prevCsn;
 
-		if (samplerGui->getNote() < 35)
-			samplerGui->setPadAndNote(program.lock()->getPadNumberFromNote(35), 35);
-
-		lLs->openScreen(name);
+	if (i >= 4)
+	{
 		return;
 	}
+
+	samplerGui->setSelectedDrum(i);
+	auto previousScreenName = ls.lock()->getPreviousScreenName();
+	auto name = string("programassign");
+
+	if (previousScreenName.compare("programparams") == 0 || previousScreenName.compare("drum") == 0 || previousScreenName.compare("purge") == 0)
+	{
+		name = previousScreenName;
+	}
+
+	if (samplerGui->getNote() < 35)
+	{
+		samplerGui->setPadAndNote(program.lock()->getPadNumberFromNote(35), 35);
+	}
+
+	ls.lock()->openScreen(name);
+	return;
 }

@@ -81,7 +81,7 @@ void FileAlreadyExistsControls::function(int i)
 		}
 		else if (ls.lock()->getPreviousScreenName().compare("saveasound") == 0)
 		{
-			auto s = sampler.lock()->getSound(soundGui->getSoundIndex());
+			auto s = sampler.lock()->getSound().lock();
 			auto type = diskGui->getFileTypeSaveSound();
 			auto ext = string(type == 0 ? ".SND" : ".WAV");
 			auto fileName = mpc::Util::getFileName(nameGui->getName()) + ext;
@@ -89,11 +89,15 @@ void FileAlreadyExistsControls::function(int i)
 			lDisk->flush();
 			lDisk->initFiles();
 			auto f = lDisk->newFile(fileName);
-			if(type == 0) {
-				disk.lock()->writeSound(dynamic_pointer_cast<mpc::sampler::Sound>(s.lock()).get(), f);
-			} else {
-				disk.lock()->writeWav(dynamic_pointer_cast<mpc::sampler::Sound>(s.lock()).get(), f);
+
+			if(type == 0)
+			{
+				disk.lock()->writeSound(s.get(), f);
+			} else
+			{
+				disk.lock()->writeWav(s.get(), f);
 			}
+
 			lDisk->flush();
 			lDisk->initFiles();
 			ls.lock()->openScreen("save");

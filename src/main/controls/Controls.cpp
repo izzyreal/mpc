@@ -6,17 +6,6 @@
 
 #include <controls/GlobalReleaseControls.hpp>
 
-#include <controls/sampler/DrumControls.hpp>
-#include <controls/sampler/InitPadAssignControls.hpp>
-#include <controls/sampler/LoopControls.hpp>
-#include <controls/sampler/PgmAssignControls.hpp>
-#include <controls/sampler/PgmParamsControls.hpp>
-#include <controls/sampler/PurgeControls.hpp>
-#include <controls/sampler/SampleControls.hpp>
-#include <controls/sampler/SelectDrumControls.hpp>
-#include <controls/sampler/SndParamsControls.hpp>
-#include <controls/sampler/TrimControls.hpp>
-#include <controls/sampler/ZoneControls.hpp>
 #include <controls/sampler/dialog/ConvertSoundControls.hpp>
 #include <controls/sampler/dialog/CopyProgramControls.hpp>
 #include <controls/sampler/dialog/CopySoundControls.hpp>
@@ -100,19 +89,8 @@ Controls::Controls()
 
 	controls["release"] = new GlobalReleaseControls();
 
-	controls["trim"] = new sampler::TrimControls();
-	controls["loop"] = new sampler::LoopControls();
-	controls["zone"] = new sampler::ZoneControls();
 	controls["numberofzones"] = new sampler::window::NumberOfZonesControls();
-	controls["params"] = new sampler::SndParamsControls();
-	controls["drum"] = new sampler::DrumControls();
-	controls["purge"] = new sampler::PurgeControls();
 	controls["editsound"] = new sampler::window::EditSoundControls();
-
-	controls["programassign"] = new sampler::PgmAssignControls();
-	controls["programparams"] = new sampler::PgmParamsControls();
-	controls["sample"] = new sampler::SampleControls();
-	controls["initpadassign"] = new sampler::InitPadAssignControls();
 
 	controls["keeporretry"] = new sampler::window::KeepOrRetryControls();
 	controls["assignmentview"] = new sampler::window::AssignmentViewControls();
@@ -143,8 +121,6 @@ Controls::Controls()
 	controls["loopendfine"] = new sampler::window::ZoomControls();
 	controls["zonestartfine"] = new sampler::window::ZoomControls();
 	controls["zoneendfine"] = new sampler::window::ZoomControls();
-
-	controls["selectdrum"] = new sampler::SelectDrumControls();
 
 	controls["load"] = new disk::LoadControls();
 	controls["save"] = new disk::SaveControls();
@@ -181,7 +157,6 @@ Controls::Controls()
 
 	controls["transposepermanent"] = new misc::window::TransposePermanentControls();
 
-	
 	controls["selectdrum_mixer"] = new mixer::SelectDrumMixerControls();
 	controls["mixer"] = new mixer::MixerControls();
 	controls["mixersetup"] = new mixer::MixerSetupControls();

@@ -65,6 +65,16 @@ weak_ptr<Sound> Sampler::getSound()
 	return sounds[soundIndex];
 }
 
+std::string Sampler::getPreviousScreenName()
+{
+	return previousScreenName;
+}
+
+void Sampler::setPreviousScreenName(std::string s)
+{
+	previousScreenName = s;
+}
+
 void Sampler::setInputLevel(int i)
 {
 	if (i < 0 || i > 100)
@@ -772,9 +782,10 @@ NoteParameters* Sampler::getLastNp(Program* program)
 	return dynamic_cast<mpc::sampler::NoteParameters*>(program->getNoteParameters(lastValidNote));
 }
 
-set<weak_ptr<Sound>> Sampler::getUsedSounds()
+vector<weak_ptr<Sound>> Sampler::getUsedSounds()
 {
-	set<weak_ptr<Sound>> usedSounds;
+	set<weak_ptr<Sound>, owner_less<weak_ptr<Sound>>> usedSounds;
+
 	for (auto& p : programs)
 	{
 		if (!p)
@@ -790,7 +801,7 @@ set<weak_ptr<Sound>> Sampler::getUsedSounds()
 			}
 		}
 	}
-	return usedSounds;
+	return vector<weak_ptr<Sound>>(begin(usedSounds), end(usedSounds));
 }
 
 int Sampler::getUnusedSampleCount()
@@ -804,7 +815,11 @@ void Sampler::purge()
 
 	for (auto& s : sounds)
 	{
-		if (find(begin(usedSounds), end(usedSounds), s) == usedSounds.end())
+		const auto pos = find_if(begin(usedSounds), end(usedSounds), [&s](const weak_ptr<Sound>& sound) {
+			return sound.lock() == s;
+		});
+		
+		if (pos == usedSounds.end())
 		{
 			deleteSound(s);
 		}

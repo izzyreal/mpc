@@ -16,32 +16,32 @@ SoundControls::SoundControls()
 void SoundControls::turnWheel(int i)
 {
 	init();
-	auto lLs = ls.lock();
-	if (param.compare("soundname") == 0) {
-		nameGui->setName(lLs->lookupField("soundname").lock()->getText());
+	
+	if (param.compare("soundname") == 0)
+	{
+		nameGui->setName(ls.lock()->lookupField("soundname").lock()->getText());
 		nameGui->setParameterName("soundname");
-		lLs->openScreen("name");
+		ls.lock()->openScreen("name");
 	}
 }
 
 void SoundControls::function(int i)
 {
-	super::function(i);
-	
-	auto lLs = ls.lock();
-	string newSampleName;
-	switch (i) {
+	BaseControls::function(i);
+
+	switch (i)
+	{
 	case 1:
-		lLs->openScreen("deletesound");
+		ls.lock()->openScreen("deletesound");
 		break;
 	case 2:
-		lLs->openScreen("convertsound");
+		ls.lock()->openScreen("convertsound");
 		break;
 	case 4:
-		newSampleName = sampler.lock()->getSoundName(soundGui->getSoundIndex());
+		auto newSampleName = sampler.lock()->getSound().lock()->getName();
 		//newSampleName = newSampleName->replaceAll("\\s+$", "");
 		newSampleName = sampler.lock()->addOrIncreaseNumber(newSampleName);
-		lLs->openScreen("copysound");
+		ls.lock()->openScreen("copysound");
 		soundGui->setNewName(newSampleName);
 		break;
 	}

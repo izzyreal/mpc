@@ -34,37 +34,42 @@ void SaveASoundControls::turnWheel(int i)
 void SaveASoundControls::function(int i)
 {
 	init();
-	weak_ptr<mpc::sampler::Sound> s;
-	int type;
-	string ext;
-	string fileName;
-	mpc::disk::MpcFile* f;
 	
-	switch (i) {
+	switch (i)
+	{
 	case 3:
 		ls.lock()->openScreen("save");
 		break;
 	case 4:
-		s = dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getSound(soundGui->getSoundIndex()).lock());
-		type = diskGui->getFileTypeSaveSound();
-		ext = string(type == 0 ? ".SND" : ".WAV");
-		fileName = mpc::Util::getFileName(nameGui->getName()) + ext;
-		if (disk.lock()->checkExists(fileName)) {
+	{
+		auto s = sampler.lock()->getSound().lock();
+		auto type = diskGui->getFileTypeSaveSound();
+		auto ext = string(type == 0 ? ".SND" : ".WAV");
+		auto fileName = mpc::Util::getFileName(nameGui->getName()) + ext;
+
+		if (disk.lock()->checkExists(fileName))
+		{
 			ls.lock()->openScreen("filealreadyexists");
 			return;
 		}
+		
 		disk.lock()->flush();
 		disk.lock()->initFiles();
-		f = disk.lock()->newFile(fileName);
-		if (type == 0) {
-			disk.lock()->writeSound(s.lock().get(), f);
+		auto f = disk.lock()->newFile(fileName);
+
+		if (type == 0)
+		{
+			disk.lock()->writeSound(s.get(), f);
 		}
-		else {
-			disk.lock()->writeWav(s.lock().get(), f);
+		else
+		{
+			disk.lock()->writeWav(s.get(), f);
 		}
+
 		disk.lock()->flush();
 		disk.lock()->initFiles();
 		ls.lock()->openScreen("save");
 		break;
+	}
 	}
 }

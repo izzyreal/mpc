@@ -6,12 +6,12 @@
 using namespace mpc::lcdgui::screens;
 using namespace std;
 
-DrumControls::DrumControls(const int layerIndex) 
+DrumScreen::DrumScreen(const int layerIndex) 
 	: ScreenComponent("drum", layerIndex)
 {
 }
 
-void DrumControls::function(int f)
+void DrumScreen::function(int f)
 {
     init();
 	
@@ -33,7 +33,7 @@ void DrumControls::function(int f)
 
 }
 
-void DrumControls::turnWheel(int i)
+void DrumScreen::turnWheel(int i)
 {
 	init();
 	

@@ -115,7 +115,6 @@ namespace mpc {
 					void displayNote0();
 					void displayProg1();
 					void displayNote1();
-					void displayInitPadAssign();
 
 				public:
 					void update(moduru::observer::Observable* o, nonstd::any arg) override;

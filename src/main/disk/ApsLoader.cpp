@@ -186,7 +186,9 @@ void ApsLoader::load()
 	uis->getMixerSetupGui()->setStereoMixSourceDrum(apsParser.getGlobalParameters()->isStereoMixSourceDrum());
 	uis->getSamplerGui()->setPadToIntSound(apsParser.getGlobalParameters()->isPadToIntSoundEnabled());
 	uis->getDiskGui()->removePopup();
-	uis->getSoundGui()->setSoundIndex(0, sampler->getSoundCount());
+	
+	sampler->setSoundIndex(0);
+	
 	Mpc::instance().getLayeredScreen().lock()->openScreen("load");
 	lDisk->setBusy(false);
 }

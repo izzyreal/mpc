@@ -36,7 +36,7 @@ void DeleteSoundControls::function(int i)
 		}
 		else
 		{
-			ls.lock()->openScreen(soundGui->getPreviousScreenName());
+			ls.lock()->openScreen(sampler.lock()->getPreviousScreenName());
 		}
         break;
     }

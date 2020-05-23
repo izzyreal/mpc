@@ -31,97 +31,127 @@ void LoopScreen::openWindow()
 	
 	if (param.compare("snd") == 0)
 	{
-		soundGui->setPreviousScreenName("loop");
-		lLs->openScreen("sound");
+		sampler.lock()->setPreviousScreenName("loop");
+		ls.lock()->openScreen("sound");
 	}
-	else if (param.compare("to") == 0) {
-		lLs->openScreen("looptofine");
+	else if (param.compare("to") == 0)
+	{
+		ls.lock()->openScreen("looptofine");
 	}
-	else if (param.compare("endlengthvalue") == 0) {
-		lLs->openScreen("loopendfine");
+	else if (param.compare("endlengthvalue") == 0)
+	{
+		ls.lock()->openScreen("loopendfine");
 	}
 }
 
 void LoopScreen::function(int f)
 {
 	init();
-	string newSampleName;
-	vector<int> zone;
 	
-	auto lLs = ls.lock();
-	switch (f) {
+	switch (f)
+	{
 	case 0:
-		lLs->openScreen("trim");
+		ls.lock()->openScreen("trim");
 		break;
 	case 1:
 		sampler.lock()->sort();
 		break;
 	case 2:
-		lLs->openScreen("zone");
+		ls.lock()->openScreen("zone");
 		break;
 	case 3:
-		lLs->openScreen("params");
+		ls.lock()->openScreen("params");
 		break;
 	case 4:
-		if (sampler.lock()->getSoundCount() == 0) {
+	{
+		if (sampler.lock()->getSoundCount() == 0)
+		{
 			return;
 		}
-		newSampleName = sampler.lock()->getSoundName(soundGui->getSoundIndex());
+		
+		auto newSoundName = sampler.lock()->getSound().lock()->getName();
 		//newSampleName = newSampleName->replaceAll("\\s+$", "");
-		newSampleName = sampler.lock()->addOrIncreaseNumber(newSampleName);
-		editSoundGui->setNewName(newSampleName);
+		newSoundName = sampler.lock()->addOrIncreaseNumber(newSoundName);
+		auto editSoundGui = mpc.getUis().lock()->getEditSoundGui();
+		editSoundGui->setNewName(newSoundName);
 		editSoundGui->setPreviousScreenName("loop");
-		lLs->openScreen("editsound");
+		ls.lock()->openScreen("editsound");
 		break;
+	}
 	case 5:
-		if (Mpc::instance().getControls().lock()->isF6Pressed()) {
+	{
+		if (mpc.getControls().lock()->isF6Pressed())
+		{
 			return;
 		}
-		Mpc::instance().getControls().lock()->setF6Pressed(true);
-		zone = vector<int>{ soundGui->getZoneStart(soundGui->getZoneNumber()), soundGui->getZoneEnd(soundGui->getZoneNumber()) };
+
+		mpc.getControls().lock()->setF6Pressed(true);
+		auto soundGui = mpc.getUis().lock()->getSoundGui();
+		vector<int> zone{ soundGui->getZoneStart(soundGui->getZoneNumber()), soundGui->getZoneEnd(soundGui->getZoneNumber()) };
 		sampler.lock()->playX(soundGui->getPlayX(), &zone);
 		break;
+	}
 	}
 }
 
 void LoopScreen::turnWheel(int i)
 {
     init();
-    if(param == "") return;
+	if (param == "")
+	{
+		return;
+	}
 	
     auto soundInc = getSoundIncrement(i);
-	auto lSound = sound.lock();
-    auto const oldLoopLength = lSound->getEnd() - lSound->getLoopTo();
-    auto const loopFix = zoomGui->isLoopLngthFix();
+	auto sound = sampler.lock()->getSound().lock();
+
+	auto const oldLoopLength = sound->getEnd() - sound->getLoopTo();
+    
+	auto zoomGui = mpc.getUis().lock()->getZoomGui();
+	auto const loopFix = zoomGui->isLoopLngthFix();
+	
 	auto mtf = ls.lock()->lookupField(param).lock();
-	if (mtf->isSplit()) {
+	
+	if (mtf->isSplit())
+	{
 		soundInc = i >= 0 ? splitInc[mtf->getActiveSplit() - 1] : -splitInc[mtf->getActiveSplit() - 1];
 	}
 
-    if (param.compare("to") == 0) {
-		if (loopFix && lSound->getLoopTo() + soundInc + oldLoopLength > lSound->getLastFrameIndex()) {
+	auto soundGui = mpc.getUis().lock()->getSoundGui();
+	
+	if (param.compare("to") == 0)
+	{
+		if (loopFix && sound->getLoopTo() + soundInc + oldLoopLength > sound->getLastFrameIndex())
+		{
 			return;
 		}
 
-        lSound->setLoopTo(lSound->getLoopTo() + soundInc);
-		if (loopFix) {
-			lSound->setEnd(lSound->getLoopTo() + oldLoopLength);
+        sound->setLoopTo(sound->getLoopTo() + soundInc);
+		if (loopFix)
+		{
+			sound->setEnd(sound->getLoopTo() + oldLoopLength);
 		}
     }
-    else if (param.compare("endlengthvalue") == 0) {
-		if (loopFix && lSound->getEnd() + soundInc - oldLoopLength < 0) {
+    else if (param.compare("endlengthvalue") == 0)
+	{
+		if (loopFix && sound->getEnd() + soundInc - oldLoopLength < 0)
+		{
 			return;
 		}
-        lSound->setEnd(lSound->getEnd() + soundInc);
-		if (loopFix) {
-			lSound->setLoopTo(lSound->getEnd() - oldLoopLength);
+        
+		sound->setEnd(sound->getEnd() + soundInc);
+		
+		if (loopFix)
+		{
+			sound->setLoopTo(sound->getEnd() - oldLoopLength);
 		}
     }
-	else if (param.compare("playx") == 0) {
+	else if (param.compare("playx") == 0)
+	{
 		soundGui->setPlayX(soundGui->getPlayX() + i);
 	}
 	else if (param.compare("loop") == 0) {
-		sampler.lock()->setLoopEnabled(soundGui->getSoundIndex(), i > 0);
+		sampler.lock()->setLoopEnabled(sampler.lock()->getSoundIndex(), i > 0);
 	}
 	else if (param.compare("endlength") == 0) {
 		soundGui->setEndSelected(i > 0);
@@ -136,49 +166,63 @@ void LoopScreen::turnWheel(int i)
 
 void LoopScreen::setSlider(int i)
 {
-	if (!Mpc::instance().getControls().lock()->isShiftPressed())
+	if (!mpc.getControls().lock()->isShiftPressed())
 	{
 		return;
 	}
 
 	init();
-	auto lSound = sound.lock();
-	auto const oldLength = lSound->getEnd() - lSound->getLoopTo();
+
+	auto zoomGui = mpc.getUis().lock()->getZoomGui();
+	auto sound = sampler.lock()->getSound().lock();
+
+	auto const oldLength = sound->getEnd() - sound->getLoopTo();
 	auto const lengthFix = zoomGui->isSmplLngthFix();
-	auto candidatePos = (int)((i / 124.0) * lSound->getLastFrameIndex());
+
+	auto candidatePos = (int)((i / 124.0) * sound->getLastFrameIndex());
 	auto maxPos = 0;
 
-	if (param.compare("to") == 0) {
-		maxPos = lengthFix ? lSound->getLastFrameIndex() - oldLength : lSound->getLastFrameIndex();
-		if (candidatePos > maxPos) {
+	if (param.compare("to") == 0)
+	{
+		maxPos = lengthFix ? sound->getLastFrameIndex() - oldLength : sound->getLastFrameIndex();
+		if (candidatePos > maxPos)
+		{
 			candidatePos = maxPos;
 		}
-		lSound->setLoopTo(candidatePos);
-		if (lengthFix) {
-			lSound->setEnd(lSound->getLoopTo() + oldLength);
+		
+		sound->setLoopTo(candidatePos);
+		
+		if (lengthFix)
+		{
+			sound->setEnd(sound->getLoopTo() + oldLength);
 		}
 	}
-	else if (param.compare("endlengthvalue") == 0) {
+	else if (param.compare("endlengthvalue") == 0)
+	{
 		maxPos = lengthFix ? oldLength : 0;
-		if (candidatePos < maxPos) {
+		
+		if (candidatePos < maxPos)
+		{
 			candidatePos = maxPos;
 		}
 
-		lSound->setEnd(candidatePos);
-		if (lengthFix) {
-			lSound->setLoopTo(lSound->getEnd() - oldLength);
+		sound->setEnd(candidatePos);
+
+		if (lengthFix)
+		{
+			sound->setLoopTo(sound->getEnd() - oldLength);
 		}
 	}
 }
 
 void LoopScreen::left()
 {
-    AbstractSamplerControls::splitLeft();
+    splitLeft();
 }
 
 void LoopScreen::right()
 {
-	AbstractSamplerControls::splitRight();
+	splitRight();
 }
 
 void LoopScreen::pressEnter()
@@ -191,29 +235,34 @@ void LoopScreen::pressEnter()
 	}
 	
 	auto lLs = ls.lock();
-	auto mtf = lLs->lookupField(param).lock();
+	auto mtf = ls.lock()->lookupField(param).lock();
+
 	if (!mtf->isTypeModeEnabled())
 	{
 		return;
 	}
 
 	auto candidate = mtf->enter();
-	auto lSound = sound.lock();
-	auto const oldLength = lSound->getEnd() - lSound->getLoopTo();
+	auto sound = sampler.lock()->getSound().lock();
+	auto zoomGui = mpc.getUis().lock()->getZoomGui();
+
+	auto const oldLength = sound->getEnd() - sound->getLoopTo();
 	auto const lengthFix = zoomGui->isLoopLngthFix();
 
-	if (candidate != INT_MAX) {
-		if (param.compare("to") == 0) {
-			if (lengthFix && candidate + oldLength > lSound->getLastFrameIndex())
+	if (candidate != INT_MAX)
+	{
+		if (param.compare("to") == 0)
+		{
+			if (lengthFix && candidate + oldLength > sound->getLastFrameIndex())
 			{
 				return;
 			}
 	
-			lSound->setLoopTo(candidate);
+			sound->setLoopTo(candidate);
 			
 			if (lengthFix)
 			{
-				lSound->setEnd(lSound->getLoopTo() + oldLength);
+				sound->setEnd(sound->getLoopTo() + oldLength);
 			}
 		}
 		else if (param.compare("endlengthvalue") == 0)
@@ -223,10 +272,10 @@ void LoopScreen::pressEnter()
 				return;
 			}
 
-			lSound->setEnd(candidate);
+			sound->setEnd(candidate);
 			if (lengthFix)
 			{
-				lSound->setLoopTo(lSound->getEnd() - oldLength);
+				sound->setLoopTo(sound->getEnd() - oldLength);
 			}
 		}
 	}

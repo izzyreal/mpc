@@ -3,7 +3,7 @@
 
 namespace mpc::lcdgui::screens {
 
-	class DrumControls
+	class DrumScreen
 		: public mpc::lcdgui::ScreenComponent
 	{
 
@@ -11,7 +11,7 @@ namespace mpc::lcdgui::screens {
 		void function(int f) override;
 		void turnWheel(int i) override;
 
-		DrumControls(const int layerIndex);
+		DrumScreen(const int layerIndex);
 
 	};
 }

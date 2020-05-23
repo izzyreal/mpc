@@ -20,10 +20,13 @@
 
 #include <audiomidi/AudioMidiServices.hpp>
 #include <audiomidi/EventHandler.hpp>
+
 #include <disk/AbstractDisk.hpp>
 
-#include <ui/NameGui.hpp>
 #include <lcdgui/Field.hpp>
+#include <lcdgui/Layer.hpp>
+
+#include <ui/NameGui.hpp>
 #include <ui/disk/DiskGui.hpp>
 #include <ui/disk/window/DirectoryGui.hpp>
 #include <ui/misc/PunchGui.hpp>
@@ -31,6 +34,7 @@
 #include <ui/sampler/SoundGui.hpp>
 #include <ui/sampler/window/EditSoundGui.hpp>
 #include <ui/vmpc/DirectToDiskRecorderGui.hpp>
+
 #include <sampler/Pad.hpp>
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>
@@ -61,6 +65,8 @@ BaseControls::BaseControls()
 	nameGui = mpc.getUis().lock()->getNameGui();
 	samplerGui = mpc.getUis().lock()->getSamplerGui();
 }
+
+vector<int> BaseControls::splitInc = vector<int>{ 10000000, 1000000, 100000, 10000, 1000, 100, 10, 1 };
 
 void BaseControls::init()
 {
@@ -154,7 +160,7 @@ void BaseControls::function(int i)
 			}
 			else if (csn.compare("sound") == 0)
 			{
-				lsLocked->setPreviousScreenName(mpc.getUis().lock()->getSoundGui()->getPreviousScreenName());
+				lsLocked->setPreviousScreenName(sampler.lock()->getPreviousScreenName());
 			}
 			else if (csn.compare("program") == 0)
 			{
@@ -876,5 +882,64 @@ void BaseControls::erase()
 	}
 	else {
 		ls.lock()->openScreen("erase");
+	}
+}
+
+int BaseControls::getSoundIncrement(int notch_inc)
+{
+	auto soundInc = notch_inc;
+	if (abs(notch_inc) != 1)
+	{
+		soundInc *= (int)(ceil(sampler.lock()->getSound().lock()->getLastFrameIndex() / 15000.0));
+	}
+	return soundInc;
+}
+
+void BaseControls::splitLeft()
+{
+	init();
+
+	auto mtf = ls.lock()->getFocusedLayer().lock()->findField(param).lock();
+	auto controls = Mpc::instance().getControls().lock();
+
+	if (!controls->isShiftPressed())
+	{
+		left();
+		return;
+	}
+
+	if (!splittable)
+	{
+		return;
+	}
+
+	if (!mtf->isSplit())
+	{
+		mtf->setSplit(true);
+	}
+	else
+	{
+		mtf->setActiveSplit(mtf->getActiveSplit() - 1);
+	}
+}
+
+void BaseControls::splitRight()
+{
+	init();
+	auto mtf = ls.lock()->lookupField(param).lock();
+	auto controls = Mpc::instance().getControls().lock();
+	
+	if (controls->isShiftPressed())
+	{
+		if (splittable && mtf->isSplit())
+		{
+			if (!mtf->setActiveSplit(mtf->getActiveSplit() + 1))
+			{
+				mtf->setSplit(false);
+			}
+		}
+	}
+	else {
+		right();
 	}
 }

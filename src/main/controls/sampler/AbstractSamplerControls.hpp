@@ -35,16 +35,10 @@ namespace mpc::controls::sampler {
 		mpc::sampler::Pad* lastPad{ nullptr };
 		mpc::sampler::NoteParameters* lastNp{ nullptr };
 
-		bool splittable{ false };
-		std::vector<int> splitInc{};
-
 	protected:
 		void init() override;
 
 	protected:
-		int getSoundIncrement(int notch_inc);
-		void splitLeft();
-		void splitRight();
 
 	public:
 		AbstractSamplerControls();

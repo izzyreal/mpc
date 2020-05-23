@@ -21,7 +21,19 @@
 #include <lcdgui/screens/TrMuteScreen.hpp>
 #include <lcdgui/screens/UserScreen.hpp>
 #include <lcdgui/screens/OthersScreen.hpp>
+#include <lcdgui/screens/DrumScreen.hpp>
+#include <lcdgui/screens/LoopScreen.hpp>
+#include <lcdgui/screens/PgmAssignScreen.hpp>
+#include <lcdgui/screens/PgmParamsScreen.hpp>
+#include <lcdgui/screens/PurgeScreen.hpp>
+#include <lcdgui/screens/SampleScreen.hpp>
+#include <lcdgui/screens/SelectDrumScreen.hpp>
+#include <lcdgui/screens/SndParamsScreen.hpp>
+#include <lcdgui/screens/TrimScreen.hpp>
+#include <lcdgui/screens/ZoneScreen.hpp>
 
+
+#include <lcdgui/screens/window/InitPadAssignScreen.hpp>
 #include <lcdgui/screens/window/SequenceScreen.hpp>
 #include <lcdgui/screens/window/TempoChangeScreen.hpp>
 #include <lcdgui/screens/window/CountMetronomeScreen.hpp>
@@ -417,6 +429,42 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	else if (screenName.compare("others") == 0)
 	{
 		screen = make_shared<OthersScreen>(layerIndex);
+	}
+	else if (screenName.compare("purge") == 0)
+	{
+		screen = make_shared<PurgeScreen>(layerIndex);
+	}
+	else if (screenName.compare("drum") == 0)
+	{
+		screen = make_shared<DrumScreen>(layerIndex);
+	}
+	else if (screenName.compare("trim") == 0)
+	{
+		screen = make_shared<TrimScreen>(layerIndex);
+	}
+	else if (screenName.compare("loop") == 0)
+	{
+		screen = make_shared<LoopScreen>(layerIndex);
+	}
+	else if (screenName.compare("zone") == 0 || screenName.compare("numberofzones") == 0)
+	{
+		screen = make_shared<ZoneScreen>(layerIndex);
+	}
+	else if (screenName.compare("params") == 0)
+	{
+		screen = make_shared<SndParamsScreen>(layerIndex);
+	}
+	else if (screenName.compare("programparams") == 0)
+	{
+		screen = make_shared<PgmParamsScreen>(layerIndex);
+	}
+	else if (screenName.compare("programassign") == 0)
+	{
+		screen = make_shared<PgmAssignScreen>(layerIndex);
+	}
+	else if (screenName.compare("selectdrum") == 0)
+	{
+		screen = make_shared<SelectDrumScreen>(layerIndex);
 	}
 
 	if (screen)
