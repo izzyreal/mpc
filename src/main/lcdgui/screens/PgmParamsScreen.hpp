@@ -14,6 +14,23 @@ namespace mpc::lcdgui::screens {
 		void openWindow() override;
 
 		PgmParamsScreen(const int layerIndex);
+		
+		void open() override;
+		void close() override;
+		void update(moduru::observer::Observable* observable, nonstd::any message);
+
+	private:
+		void displayReson();
+		void displayFreq();
+		void displayAttackDecay();
+		void displayNote();
+		void displayPgm();
+		void displayTune();
+		void displayDecayMode();
+		void displayVoiceOverlap();
+
+		std::vector<std::string> decayModes = { "END", "START" };
+		std::vector<std::string> voiceOverlapModes = { "POLY", "MONO", "NOTE OFF" };
 
 	};
 }

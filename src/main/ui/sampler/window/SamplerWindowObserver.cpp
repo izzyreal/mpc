@@ -7,6 +7,7 @@
 #include <lcdgui/EnvGraph.hpp>
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/DrumScreen.hpp>
+#include <lcdgui/Layer.hpp>
 
 #include <ui/sampler/SamplerGui.hpp>
 #include <ui/sampler/window/SamplerWindowGui.hpp>
@@ -230,7 +231,7 @@ void SamplerWindowObserver::displayAttack()
 	auto attack = sampler.lock()->getLastNp(lProgram.get())->getFilterAttack();
 	auto decay = sampler.lock()->getLastNp(lProgram.get())->getFilterDecay();
 	attackField.lock()->setTextPadded(attack, " ");
-	Mpc::instance().getLayeredScreen().lock()->redrawEnvGraph(attack, decay);
+	//Mpc::instance().getLayeredScreen().lock()->getFocusedLayer().lock()->findScreenComponent().lock()->findEnvGraph().lock()->setCoordinates(attack, decay);
 }
 
 void SamplerWindowObserver::displayDecay()
@@ -239,13 +240,12 @@ void SamplerWindowObserver::displayDecay()
 	auto attack = sampler.lock()->getLastNp(lProgram.get())->getFilterAttack();
 	auto decay = sampler.lock()->getLastNp(lProgram.get())->getFilterDecay();
 	decayField.lock()->setTextPadded(decay, " ");
-	Mpc::instance().getLayeredScreen().lock()->redrawEnvGraph(attack, decay);
+	//Mpc::instance().getLayeredScreen().lock()->getFocusedLayer().lock()->findScreenComponent().lock()->findEnvGraph().lock()->setCoordinates(attack, decay);
 }
 
 void SamplerWindowObserver::displayAmount()
 {
-	auto lProgram = program.lock();
-	amountField.lock()->setTextPadded(sampler.lock()->getLastNp(lProgram.get())->getFilterEnvelopeAmount(), " ");
+	amountField.lock()->setTextPadded(sampler.lock()->getLastNp(program.lock().get())->getFilterEnvelopeAmount(), " ");
 }
 
 void SamplerWindowObserver::displayVeloFreq()

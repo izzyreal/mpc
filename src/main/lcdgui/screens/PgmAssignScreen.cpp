@@ -22,6 +22,27 @@ PgmAssignScreen::PgmAssignScreen(const int layerIndex)
 {
 }
 
+void PgmAssignScreen::open()
+{
+	mpc.getUis().lock()->getSamplerGui()->addObserver(this);
+	displayNote();
+	displayOptionalNoteA();
+	displayOptionalNoteB();
+	displayPad();
+	displayPadAssign();
+	displayPadNote();
+	displayPgm();
+	displaySoundGenerationMode();
+	displaySoundName();
+	displayVeloRangeLower();
+	displayVeloRangeUpper();
+}
+
+void PgmAssignScreen::close()
+{
+	mpc.getUis().lock()->getSamplerGui()->deleteObserver(this);
+}
+
 void PgmAssignScreen::function(int i)
 {
 	init();
@@ -76,7 +97,17 @@ void PgmAssignScreen::turnWheel(int i)
 		if (candidate != pgm)
 		{
 			mpcSoundPlayerChannel->setProgram(candidate);
+			displayNote();
+			displayOptionalNoteA();
+			displayOptionalNoteB();
+			displayPad();
+			displayPadAssign();
+			displayPadNote();
 			displayPgm();
+			displaySoundGenerationMode();
+			displaySoundName();
+			displayVeloRangeLower();
+			displayVeloRangeUpper();
 		}
 	}
 	else if (param.compare("pad") == 0)
@@ -257,11 +288,13 @@ void PgmAssignScreen::displaySoundName()
 
 void PgmAssignScreen::displayPadAssign()
 {
+	init();
 	findField("pad-assign").lock()->setText(samplerGui->isPadAssignMaster() ? "MASTER" : "PROGRAM");
 }
 
 void PgmAssignScreen::displayPadNote()
 {
+	init();
 	auto lSampler = sampler.lock();
 	auto lProgram = program.lock();
 
@@ -276,6 +309,7 @@ void PgmAssignScreen::displayPadNote()
 
 void PgmAssignScreen::displaySoundGenerationMode()
 {
+	init();
 	auto lSampler = sampler.lock();
 	auto sgm = -1;
 	auto lProgram = program.lock();
@@ -333,18 +367,21 @@ void PgmAssignScreen::displaySoundGenerationMode()
 
 void PgmAssignScreen::displayVeloRangeUpper()
 {
+	init();
 	auto rangeB = sampler.lock()->getLastNp(program.lock().get())->getVelocityRangeUpper();
 	findField("velocity-range-upper").lock()->setTextPadded(rangeB, " ");
 }
 
 void PgmAssignScreen::displayVeloRangeLower()
 {
+	init();
 	auto rangeA = sampler.lock()->getLastNp(program.lock().get())->getVelocityRangeLower();
 	findField("velocity-range-lower").lock()->setTextPadded(rangeA, " ");
 }
 
 void PgmAssignScreen::displayOptionalNoteA()
 {
+	init();
 	auto lSampler = sampler.lock();
 	auto lProgram = program.lock();
 	auto noteIntA = sampler.lock()->getLastNp(lProgram.get())->getOptionalNoteA();
@@ -356,6 +393,7 @@ void PgmAssignScreen::displayOptionalNoteA()
 
 void PgmAssignScreen::displayOptionalNoteB()
 {
+	init();
 	auto lSampler = sampler.lock();
 	auto lProgram = program.lock();
 	auto noteIntB = sampler.lock()->getLastNp(lProgram.get())->getOptionalNoteB();
@@ -367,11 +405,13 @@ void PgmAssignScreen::displayOptionalNoteB()
 
 void PgmAssignScreen::displayNote()
 {
+	init();
 	findField("note").lock()->setText(to_string(sampler.lock()->getLastNp(program.lock().get())->getNumber()));
 }
 
 void PgmAssignScreen::displayPad()
 {
+	init();
 	findField("pad").lock()->setText(sampler.lock()->getPadName(samplerGui->getPad()));
 }
 
@@ -381,7 +421,6 @@ void PgmAssignScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 
 	if (s.compare("padandnote") == 0)
 	{
-		displayPgm();
 		displayNote();
 		displayPad();
 		displayPadNote();

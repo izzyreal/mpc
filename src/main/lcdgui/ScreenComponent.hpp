@@ -6,6 +6,7 @@
 #include "Background.hpp"
 #include "Wave.hpp"
 #include "TwoDots.hpp"
+#include "EnvGraph.hpp"
 
 #include <controls/BaseControls.hpp>
 
@@ -37,6 +38,7 @@ namespace mpc::lcdgui
 		std::weak_ptr<Background> findBackground();
 		std::weak_ptr<Wave> findWave();
 		std::weak_ptr<TwoDots> findTwoDots();
+		std::weak_ptr<EnvGraph> findEnvGraph();
 
 	public:
 		virtual void open() {}

@@ -11,12 +11,34 @@
 
 #include <mpc/MpcSoundPlayerChannel.hpp>
 
+#include <lcdgui/EnvGraph.hpp>
+
+using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace std;
 
 PgmParamsScreen::PgmParamsScreen(const int layerIndex) 
 	: ScreenComponent("programparams", layerIndex)
 {
+}
+
+void PgmParamsScreen::open()
+{
+	mpc.getUis().lock()->getSamplerGui()->addObserver(this);
+	addChild(make_shared<EnvGraph>());
+	displayPgm();
+	displayNote();
+	displayDecayMode();
+	displayFreq();
+	displayReson();
+	displayTune();
+	displayVoiceOverlap();
+	displayAttackDecay();
+}
+
+void PgmParamsScreen::close()
+{
+	mpc.getUis().lock()->getSamplerGui()->deleteObserver(this);
 }
 
 void PgmParamsScreen::function(int i)
@@ -65,11 +87,15 @@ void PgmParamsScreen::turnWheel(int i)
 	if (param.compare("tune") == 0)
 	{
 		lastNoteParameters->setTune(lastNoteParameters->getTune() + i);
+		displayTune();
 	}
-	else if (param.compare("dcymd") == 0) {
+	else if (param.compare("dcymd") == 0)
+	{
 		lastNoteParameters->setDecayMode(lastNoteParameters->getDecayMode() + i);
+		displayDecayMode();
 	}
-	else if(param.compare("voiceoverlap") == 0) {
+	else if(param.compare("voiceoverlap") == 0)
+	{
         auto s = sampler.lock()->getSound(lastNoteParameters->getSndNumber()).lock();
 		
 		if (s && s->isLoopEnabled())
@@ -78,22 +104,27 @@ void PgmParamsScreen::turnWheel(int i)
 		}
         
 		lastNoteParameters->setVoiceOverlap(lastNoteParameters->getVoiceOverlap() + i);
+		displayVoiceOverlap();
     }
 	else if (param.compare("reson") == 0)
 	{
 		lastNoteParameters->setFilterResonance(lastNoteParameters->getFilterResonance() + i);
+		displayReson();
 	}
 	else if (param.compare("freq") == 0)
 	{
 		lastNoteParameters->setFilterFrequency(lastNoteParameters->getFilterFrequency() + i);
+		displayFreq();
 	}
 	else if (param.compare("decay") == 0)
 	{
 		lastNoteParameters->setDecay(lastNoteParameters->getDecay() + i);
+		displayAttackDecay();
 	}
 	else if (param.compare("attack") == 0)
 	{
 		lastNoteParameters->setAttack(lastNoteParameters->getAttack() + i);
+		displayAttackDecay();
 	}
 	else if (param.compare("pgm") == 0)
 	{	
@@ -103,6 +134,14 @@ void PgmParamsScreen::turnWheel(int i)
 		if (candidate != pgm)
 		{
 			mpcSoundPlayerChannel->setProgram(candidate);
+			displayPgm();
+			displayAttackDecay();
+			displayDecayMode();
+			displayFreq();
+			displayNote();
+			displayReson();
+			displayTune();
+			displayVoiceOverlap();
 		}
 	}
     else if(param.compare("note") == 0)
@@ -111,6 +150,13 @@ void PgmParamsScreen::turnWheel(int i)
 		if (candidate > 34)
 		{
 			samplerGui->setPadAndNote(samplerGui->getPad(), candidate);
+			displayAttackDecay();
+			displayDecayMode();
+			displayFreq();
+			displayNote();
+			displayReson();
+			displayTune();
+			displayVoiceOverlap();
 		}
     }
 }
@@ -119,11 +165,13 @@ void PgmParamsScreen::openWindow()
 {
 	init();
 
-	if (param.compare("pgm") == 0) {
+	if (param.compare("pgm") == 0)
+	{
 		samplerGui->setPrevScreenName(csn);
 		ls.lock()->openScreen("program");
 	}
-	else if (param.compare("note") == 0) {
+	else if (param.compare("note") == 0)
+	{
 		auto programIndex = mpcSoundPlayerChannel->getProgram();
 		
 		auto note = samplerGui->getNote();
@@ -136,16 +184,109 @@ void PgmParamsScreen::openWindow()
 		samplerGui->setPrevScreenName(csn);
 		ls.lock()->openScreen("copynoteparameters");
 	}
-	else if (param.compare("attack") == 0 || param.compare("decay") == 0 || param.compare("dcymd") == 0) {
+	else if (param.compare("attack") == 0 || param.compare("decay") == 0 || param.compare("dcymd") == 0)
+	{
 		ls.lock()->openScreen("velocitymodulation");
 	}
-	else if (param.compare("freq") == 0 || param.compare("reson") == 0) {
+	else if (param.compare("freq") == 0 || param.compare("reson") == 0)
+	{
 		ls.lock()->openScreen("veloenvfilter");
 	}
-	else if (param.compare("tune") == 0) {
+	else if (param.compare("tune") == 0)
+	{
 		ls.lock()->openScreen("velopitch");
 	}
-	else if (param.compare("voiceoverlap") == 0) {
+	else if (param.compare("voiceoverlap") == 0)
+	{
 		ls.lock()->openScreen("muteassign");
 	}
+}
+
+void PgmParamsScreen::update(moduru::observer::Observable* o, nonstd::any arg)
+{
+	string s = nonstd::any_cast<string>(arg);
+
+	if (s.compare("padandnote") == 0)
+	{
+		displayAttackDecay();
+		displayDecayMode();
+		displayFreq();
+		displayNote();
+		displayReson();
+		displayTune();
+		displayVoiceOverlap();
+	}
+}
+
+void PgmParamsScreen::displayReson()
+{
+	init();
+	auto lProgram = program.lock();
+	findField("reson").lock()->setText(to_string(sampler.lock()->getLastNp(lProgram.get())->getFilterResonance()));
+}
+
+void PgmParamsScreen::displayFreq()
+{
+	init();
+	auto lProgram = program.lock();
+	findField("freq").lock()->setText(to_string(sampler.lock()->getLastNp(lProgram.get())->getFilterFrequency()));
+}
+
+void PgmParamsScreen::displayAttackDecay()
+{
+	init();
+	auto lProgram = program.lock();
+	auto attack = sampler.lock()->getLastNp(lProgram.get())->getAttack();
+	auto decay = sampler.lock()->getLastNp(lProgram.get())->getDecay();
+	findField("attack").lock()->setTextPadded(attack, " ");
+	findField("decay").lock()->setTextPadded(decay, " ");
+	findEnvGraph().lock()->setCoordinates(attack, decay);
+}
+
+void PgmParamsScreen::displayNote()
+{
+	init();
+	auto lProgram = program.lock();
+	auto sampleNumber = sampler.lock()->getLastNp(lProgram.get())->getSndNumber();
+	auto note = sampler.lock()->getLastNp(lProgram.get())->getNumber();
+	auto sampleName = sampleNumber != -1 ? sampler.lock()->getSoundName(sampleNumber) : "OFF";
+	auto padNumber = lProgram->getPadNumberFromNote(note);
+	
+	if (padNumber != -1)
+	{
+		auto stereo = lProgram->getPad(padNumber)->getStereoMixerChannel().lock()->isStereo() && sampleNumber != -1 ? "(ST)" : "";
+		auto padName = sampler.lock()->getPadName(padNumber);
+		findField("note").lock()->setText(to_string(note) + "/" + padName + "-" + moduru::lang::StrUtil::padRight(sampleName, " ", 16) + stereo);
+	}
+	else
+	{
+		findField("note").lock()->setText(to_string(note) + "/OFF-" + sampleName);
+	}
+}
+
+void PgmParamsScreen::displayPgm()
+{
+	init();
+	findField("pgm").lock()->setTextPadded(mpcSoundPlayerChannel->getProgram() + 1, " ");
+}
+
+void PgmParamsScreen::displayTune()
+{
+	init();
+	auto lProgram = program.lock();
+	findField("tune").lock()->setText(to_string(sampler.lock()->getLastNp(lProgram.get())->getTune()));
+}
+
+void PgmParamsScreen::displayDecayMode()
+{
+	init();
+	auto lProgram = program.lock();
+	findField("dcymd").lock()->setText(decayModes[sampler.lock()->getLastNp(lProgram.get())->getDecayMode()]);
+}
+
+void PgmParamsScreen::displayVoiceOverlap()
+{
+	init();
+	auto lProgram = program.lock();
+	findField("voiceoverlap").lock()->setText(voiceOverlapModes[sampler.lock()->getLastNp(lProgram.get())->getVoiceOverlap()]);
 }

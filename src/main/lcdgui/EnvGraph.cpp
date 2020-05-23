@@ -1,4 +1,4 @@
-#include <lcdgui/EnvGraph.hpp>
+#include "EnvGraph.hpp"
 
 #include <Mpc.hpp>
 #include <lcdgui/LayeredScreen.hpp>
@@ -15,6 +15,15 @@ EnvGraph::EnvGraph()
 {
 	setSize(190, 40);
 	setLocation(10, 10);
+}
+
+void EnvGraph::setCoordinates(int attack, int decay)
+{
+	vector<int> line1{ 75, 43, 75 + (int)(attack * 0.17), 24 };
+	vector<int> line2{ 119 - (int)(decay * 0.17), 24, 119, 43 };
+	vector<int> line3{ 75 + (int)(attack * 0.17), 24, 119 - (int)(decay * 0.17), 24 };
+	vector<vector<int>> lines = { line1, line2, line3 };
+	setCoordinates(lines);
 }
 
 void EnvGraph::setCoordinates(vector<vector<int>> ia)
@@ -52,7 +61,4 @@ void EnvGraph::Draw(std::vector<std::vector<bool>>* pixels)
 		mpc::Util::drawLine(*pixels, linePixels, true);
 	}
 	dirty = false;
-}
-
-EnvGraph::~EnvGraph() {
 }

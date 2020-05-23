@@ -113,7 +113,6 @@ namespace mpc::lcdgui {
 
 	public:
 		void returnToLastFocus(std::string firstFieldOfThisScreen);
-		void redrawEnvGraph(int attack, int decay);
 		void setLastFocus(std::string screenName, std::string tfName);
 		std::string getLastFocus(std::string screenName);
 		void setCurrentScreenName(std::string screenName);
