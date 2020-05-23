@@ -140,3 +140,10 @@ void ZoneScreen::turnWheel(int i)
 		sampler.lock()->setSoundGuiPrevSound();
 	}
 }
+
+void ZoneScreen::waveformLoadData()
+{
+	auto sampleData = sampler.lock()->getSound().lock()->getSampleData();
+	auto soundGui = mpc.getUis().lock()->getSoundGui();
+	findWave().lock()->setSampleData(sampleData, sampler.lock()->getSound().lock()->isMono(), soundGui->getView());
+}

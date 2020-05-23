@@ -27,6 +27,35 @@ TrimScreen::TrimScreen(const int layerIndex)
 void TrimScreen::open()
 {
 	typableParams = vector<string>{ "st", "end" };
+
+	addChild(move(make_shared<TwoDots>()));
+	addChild(move(make_shared<Wave>()));
+
+	if (sampler.lock()->getSoundCount() != 0)
+	{
+		findField("dummy").lock()->setFocusable(false);
+		displayWave();
+
+		auto sound = sampler.lock()->getSound().lock();
+		findWave().lock()->setSelection(sound->getLoopTo(), sound->getEnd());
+		auto soundGui = mpc.getUis().lock()->getSoundGui();
+		soundGui->initZones(sampler.lock()->getSound().lock()->getFrameCount());
+	}
+	else
+	{
+		findWave().lock()->setSampleData(nullptr, false, 0);
+		findField("snd").lock()->setFocusable(false);
+		findField("playx").lock()->setFocusable(false);
+		findField("end").lock()->setFocusable(false);
+		findField("view").lock()->setFocusable(false);
+		findField("st").lock()->setFocusable(false);
+	}
+
+	displaySnd();
+	displayPlayX();
+	displaySt();
+	displayEnd();
+	displayView();
 }
 
 void TrimScreen::openWindow()
@@ -129,9 +158,12 @@ void TrimScreen::turnWheel(int i)
 		
 		sound->setStart(sound->getStart() + soundInc);
 		
+		displaySt();
+
 		if (lengthFix)
 		{
 			sound->setEnd(sound->getStart() + oldLength);
+			displayEnd();
 		}
 	}
 	else if (param.compare("end") == 0)
@@ -143,26 +175,43 @@ void TrimScreen::turnWheel(int i)
 		
 		sound->setEnd(sound->getEnd() + soundInc);
 		
+		displayEnd();
+
 		if (lengthFix)
 		{
 			sound->setStart(sound->getEnd() - oldLength);
+			displaySt();
 		}
 	}
 	else if (param.compare("view") == 0)
 	{
 		soundGui->setView(soundGui->getView() + i);
+		displayView();
 	}
 	else if (param.compare("playx") == 0)
 	{
 		soundGui->setPlayX(soundGui->getPlayX() + i);
+		displayPlayX();
 	}
 	else if (param.compare("snd") == 0 && i > 0)
 	{
 		sampler.lock()->setSoundGuiNextSound();
+		displaySnd();
+		displayEnd();
+		displayPlayX();
+		displaySt();
+		displayView();
+		displayWave();
 	}
 	else if (param.compare("snd") == 0 && i < 0)
 	{
 		sampler.lock()->setSoundGuiPrevSound();
+		displaySnd();
+		displayEnd();
+		displayPlayX();
+		displaySt();
+		displayView();
+		displayWave();
 	}
 }
 
@@ -278,5 +327,82 @@ void TrimScreen::pressEnter()
 				sound->setStart(sound->getEnd() - oldLength);
 			}
 		}
+	}
+}
+
+void TrimScreen::displayWave()
+{
+	auto sound = sampler.lock()->getSound().lock();
+	auto sampleData = sound->getSampleData();
+	auto soundGui = mpc.getUis().lock()->getSoundGui();
+	findWave().lock()->setSampleData(sampleData, sound->isMono(), soundGui->getView());
+	findWave().lock()->setSelection(sound->getStart(), sound->getEnd());
+}
+
+void TrimScreen::displaySnd()
+{
+	if (sampler.lock()->getSoundCount() != 0)
+	{
+		if (ls.lock()->getFocus().compare("dummy") == 0)
+		{
+			ls.lock()->setFocus(findField("snd").lock()->getName());
+		}
+
+		auto sound = sampler.lock()->getSound().lock();
+
+		auto sampleName = sound->getName();
+
+		if (!sound->isMono())
+		{
+			sampleName = StrUtil::padRight(sampleName, " ", 16) + "(ST)";
+		}
+		findField("snd").lock()->setText(sampleName);
+	}
+	else {
+		findField("snd").lock()->setText("(no sound)");
+		ls.lock()->setFocus("dummy");
+	}
+}
+
+
+void TrimScreen::displayPlayX()
+{
+	auto soundGui = mpc.getUis().lock()->getSoundGui();
+	findField("playx").lock()->setText(playXNames[soundGui->getPlayX()]);
+}
+
+void TrimScreen::displaySt()
+{
+	if (sampler.lock()->getSoundCount() != 0)
+	{
+		auto sound = sampler.lock()->getSound().lock();
+		findField("st").lock()->setTextPadded(sound->getStart(), " ");
+	}
+	else {
+		findField("st").lock()->setTextPadded("0", " ");
+	}
+}
+
+void TrimScreen::displayEnd()
+{
+	if (sampler.lock()->getSoundCount() != 0)
+	{
+		auto sound = sampler.lock()->getSound().lock();
+		findField("end").lock()->setTextPadded(sound->getEnd(), " ");
+	}
+	else {
+		findField("end").lock()->setTextPadded("0", " ");
+	}
+}
+
+void TrimScreen::displayView()
+{
+	auto soundGui = mpc.getUis().lock()->getSoundGui();
+	if (soundGui->getView() == 0)
+	{
+		findField("view").lock()->setText("LEFT");
+	}
+	else {
+		findField("view").lock()->setText("RIGHT");
 	}
 }

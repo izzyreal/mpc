@@ -19,8 +19,8 @@ namespace mpc::ui::sampler {
 		std::string newRName = "";
 		int rSource;
 		std::string newStName = "";
-		int view;
-		int playX;
+		int view = 0;
+		int playX = 0;
 		bool endSelected;
 		int numberOfZones = 16;
 		int previousNumberOfZones = 0;

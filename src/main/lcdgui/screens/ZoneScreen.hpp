@@ -14,6 +14,7 @@ namespace mpc::lcdgui::screens {
 
 		ZoneScreen(const int layerIndex);
 		void open() override;
+		void waveformLoadData();
 
 	};
 }

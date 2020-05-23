@@ -37,7 +37,7 @@ void LoopScreen::open()
 	if (sampler.lock()->getSoundCount() != 0)
 	{
 		findField("dummy").lock()->setFocusable(false);
-		waveformLoadData();
+		displayWave();
 		
 		auto sound = sampler.lock()->getSound().lock();
 		findWave().lock()->setSelection(sound->getLoopTo(), sound->getEnd());
@@ -54,6 +54,13 @@ void LoopScreen::open()
 		findField("endlengthvalue").lock()->setFocusable(false);
 		findField("loop").lock()->setFocusable(false);
 	}
+
+	displaySnd();
+	displayPlayX();
+	displayEndLength();
+	displayEndLengthValue();
+	displayLoop();
+	displayTo();
 }
 
 void LoopScreen::openWindow()
@@ -208,11 +215,23 @@ void LoopScreen::turnWheel(int i)
 	{
 		sampler.lock()->setSoundGuiNextSound();
 		displaySnd();
+		displayPlayX();
+		displayEndLength();
+		displayEndLengthValue();
+		displayLoop();
+		displayTo();
+		displayWave();
 	}
 	else if (param.compare("snd") == 0 && i < 0)
 	{
 		sampler.lock()->setSoundGuiPrevSound();
 		displaySnd();
+		displayPlayX();
+		displayEndLength();
+		displayEndLengthValue();
+		displayLoop();
+		displayTo();
+		displayWave();
 	}
 }
 
@@ -428,9 +447,12 @@ void LoopScreen::displayLoop()
 	findField("loop").lock()->setText(sound->isLoopEnabled() ? "ON" : "OFF");
 }
 
-void LoopScreen::waveformLoadData()
+void LoopScreen::displayWave()
 {
 	auto sampleData = sampler.lock()->getSound().lock()->getSampleData();
 	auto soundGui = mpc.getUis().lock()->getSoundGui();
-	findWave().lock()->setSampleData(sampleData, sampler.lock()->getSound().lock()->isMono(), soundGui->getView());
+
+	auto sound = sampler.lock()->getSound().lock();
+	findWave().lock()->setSampleData(sampleData, sound->isMono(), soundGui->getView());
+	findWave().lock()->setSelection(sound->getStart(), sound->getLoopTo());
 }

@@ -53,6 +53,9 @@ void Sampler::setSoundIndex(int i)
 	}
 
 	soundIndex = i;
+
+	auto soundGui = Mpc::instance().getUis().lock()->getSoundGui();
+	soundGui->initZones(getSound().lock()->getLastFrameIndex());
 }
 
 int Sampler::getSoundIndex()

@@ -22,5 +22,14 @@ namespace mpc::lcdgui::screens {
 		TrimScreen(const int layerIndex);
 		void open() override;
 
+	private:
+		std::vector<std::string> playXNames = { "ALL", "ZONE", "BEFOR ST", "BEFOR TO", "AFTR END" };
+		void displaySnd();
+		void displayPlayX();
+		void displaySt();
+		void displayEnd();
+		void displayView();
+		void displayWave();
+
 	};
 }

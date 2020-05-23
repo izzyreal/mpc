@@ -30,7 +30,7 @@ namespace mpc::lcdgui::screens {
 		void displayEndLengthValue();
 		void displayLoop();
 
-		void waveformLoadData();
+		void displayWave();
 
 	};
 }
