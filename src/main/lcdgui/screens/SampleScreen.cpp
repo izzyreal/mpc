@@ -1,4 +1,4 @@
-#include <lcdgui/screens/SampleScreen.hpp>
+#include "SampleScreen.hpp"
 
 #include <Mpc.hpp>
 #include <controls/Controls.hpp>
@@ -6,7 +6,8 @@
 #include <audiomidi/AudioMidiServices.hpp>
 #include <audiomidi/SoundRecorder.hpp>
 
-#include <ui/sampler/SamplerGui.hpp>
+#include <lcdgui/Label.hpp>
+
 #include <sampler/Sampler.hpp>
 
 using namespace mpc::lcdgui::screens;
@@ -15,6 +16,26 @@ using namespace std;
 SampleScreen::SampleScreen(const int layerIndex)
 	: ScreenComponent("sample", layerIndex)
 {
+}
+
+void SampleScreen::open()
+{
+	displayInput();
+	displayThreshold();
+	displayMode();
+	displayTime();
+	displayMonitor();
+	displayPreRec();
+
+	auto ams = Mpc::instance().getAudioMidiServices().lock();
+	ams->getSoundRecorder().lock()->addObserver(this);
+}
+
+void SampleScreen::close()
+{
+	auto ams = Mpc::instance().getAudioMidiServices().lock();
+	ams->getSoundRecorder().lock()->deleteObserver(this);
+
 }
 
 void SampleScreen::left() {
@@ -96,8 +117,8 @@ void SampleScreen::function(int i)
 
 		auto sound = sampler.lock()->addSound();
 		sound.lock()->setName(sampler.lock()->addOrIncreaseNumber("sound"));
-		auto lengthInFrames = samplerGui->getTime() * (44100 * 0.1);
-		ams->getSoundRecorder().lock()->prepare(sound, lengthInFrames, samplerGui->getMode());
+		auto lengthInFrames = time * (44100 * 0.1);
+		ams->getSoundRecorder().lock()->prepare(sound, lengthInFrames, mode);
 		ams->startRecordingSound();
 
 		//if (!samplerisRecording()) {
@@ -118,30 +139,198 @@ void SampleScreen::turnWheel(int i)
 	//if (!samplerisRecording() && !samplerisArmed()) {
         if (param.compare("input") == 0)
 		{
-            auto oldInput = samplerGui->getInput();
-            samplerGui->setInput(samplerGui->getInput() + i);
+            setInput(input + i);
         }
 		else if (param.compare("threshold") == 0)
 		{
-			samplerGui->setThreshold(samplerGui->getThreshold() + i);
+			setThreshold(threshold + i);
 		}
 		else if (param.compare("mode") == 0)
 		{
-			samplerGui->setMode(samplerGui->getMode() + i);
+			setMode(mode + i);
 		}
 		else if (param.compare("time") == 0)
 		{
-			samplerGui->setTime(samplerGui->getTime() + i);
+			setTime(time + i);
 		}
 		else if (param.compare("monitor") == 0)
 		{
-			samplerGui->setMonitor(samplerGui->getMonitor() + i);
-			bool muteMonitor = samplerGui->getMonitor() == 0 ? true : false;
+			setMonitor(monitor + i);
+			bool muteMonitor = monitor == 0;
 			Mpc::instance().getAudioMidiServices().lock()->muteMonitor(muteMonitor);
 		}
 		else if (param.compare("prerec") == 0)
 		{
-			samplerGui->setPreRec(samplerGui->getPreRec() + i);
+			setPreRec(preRec + i);
 		}
     //}
+}
+
+
+void SampleScreen::setInput(int i)
+{
+	if (i < 0 || i > 1)
+	{
+		return;
+	}
+
+	input = i;
+	displayInput();
+}
+
+void SampleScreen::setThreshold(int i)
+{
+	if (i < -64 || i > 0)
+	{
+		return;
+	}
+
+	threshold = i;
+	displayThreshold();
+}
+
+void SampleScreen::setMode(int i)
+{
+	if (i < 0 || i > 2)
+	{
+		return;
+	}
+
+	mode = i;
+	displayMode();
+}
+
+void SampleScreen::setTime(int i)
+{
+	if (i < 0 || i > 3786)
+	{
+		return;
+	}
+
+	time = i;
+	displayTime();
+}
+
+void SampleScreen::setMonitor(int i)
+{
+	if (i < 0 || i > 5)
+	{
+		return;
+	}
+
+	monitor = i;
+	displayMonitor();
+}
+
+void SampleScreen::setPreRec(int i)
+{
+	if (i < 0 || i > 100)
+	{
+		return;
+	}
+
+	preRec = i;
+	displayPreRec();
+}
+
+void SampleScreen::displayInput()
+{
+	findField("input").lock()->setText(inputNames[input]);
+}
+
+void SampleScreen::displayThreshold()
+{
+	auto thresholdText = threshold == -64 ? "-\u00D9\u00DA" : to_string(threshold);
+	findField("threshold").lock()->setText(thresholdText);
+}
+
+void SampleScreen::displayMode()
+{
+	findField("mode").lock()->setText(modeNames[mode]);
+}
+
+void SampleScreen::displayTime()
+{
+	string timeText = to_string(time);
+	timeText = timeText.substr(0, timeText.length() - 1) + "." + timeText.substr(timeText.length() - 1);
+	findField("time").lock()->setText(timeText);
+}
+
+void SampleScreen::displayMonitor()
+{
+	findField("monitor").lock()->setText(monitorNames[monitor]);
+}
+
+void SampleScreen::displayPreRec()
+{
+	findField("prerec").lock()->setText(to_string(preRec) + "ms");
+}
+
+void SampleScreen::updateVU(float value)
+{
+	string lString = "";
+	string rString = "";
+	auto peaklValue = value;
+	auto peakrValue = value;
+	int thresholdValue = (threshold + 63) * 0.53125;
+	int levell = value;
+	int levelr = value;
+	for (int i = 0; i < 34; i++) {
+		string l = " ";
+		string r = " ";
+		bool normall = i <= levell;
+		bool normalr = i <= levelr;
+		bool threshold = i == thresholdValue;
+		bool peakl = i == peaklValue;
+		bool peakr = i == peakrValue;
+		if (threshold && peakl) l = vu_peak_threshold;
+		if (threshold && peakr) r = vu_peak_threshold;
+
+		if (threshold && normall && !peakl) l = vu_normal_threshold;
+		if (threshold && normalr && !peakr) r = vu_normal_threshold;
+
+		if (threshold && !peakl && !normall) l = vu_threshold;
+		if (threshold && !peakr && !normalr) r = vu_threshold;
+
+		if (normall && !peakl && !threshold) l = vu_normal;
+		if (normalr && !peakr && !threshold) r = vu_normal;
+
+		if (peakl && !threshold) l = vu_peak;
+		if (peakr && !threshold) r = vu_peak;
+
+		if (peakl && threshold && levell == 33) l = vu_peak_threshold_normal;
+		if (peakr && threshold && levelr == 33) r = vu_peak_threshold_normal;
+
+		lString += l;
+		rString += r;
+	}
+
+	findLabel("vuleft").lock()->setText(lString);
+	findLabel("vuright").lock()->setText(lString);
+}
+
+int SampleScreen::getMode()
+{
+	return mode;
+}
+
+int SampleScreen::getMonitor()
+{
+	return monitor;
+}
+
+void SampleScreen::update(moduru::observer::Observable* o, nonstd::any arg)
+{
+	if (dynamic_cast<mpc::audiomidi::SoundRecorder*>(o) != nullptr)
+	{
+		try
+		{
+			auto vuValue = nonstd::any_cast<float>(arg);
+			updateVU(vuValue * 100);
+		}
+		catch (const std::exception& e) {
+			// nothing to do
+		}
+		return;
+	}
 }

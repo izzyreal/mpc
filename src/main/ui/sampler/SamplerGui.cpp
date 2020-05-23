@@ -1,4 +1,4 @@
-#include <ui/sampler/SamplerGui.hpp>
+#include "SamplerGui.hpp"
 
 #include <Mpc.hpp>
 #include <hardware/Hardware.hpp>
@@ -8,11 +8,6 @@
 
 using namespace mpc::ui::sampler;
 using namespace std;
-
-SamplerGui::SamplerGui() 
-{
-	
-}
 
 void SamplerGui::setPadAndNote(int pad, int note)
 {
@@ -130,98 +125,6 @@ void SamplerGui::setPadToIntSound(bool b)
     notifyObservers(string("padtointsound"));
 }
 
-int SamplerGui::getInput()
-{
-    return input;
-}
-
-void SamplerGui::setInput(int i)
-{
-    if(i < 0 || i > 1)
-        return;
-
-    input = i;
-    setChanged();
-    notifyObservers(string("input"));
-}
-
-int SamplerGui::getThreshold()
-{
-    return threshold;
-}
-
-void SamplerGui::setThreshold(int i)
-{
-    if (i < -64 || i > 0) {
-        return;
-    }
-
-    threshold = i;
-    setChanged();
-    notifyObservers(string("threshold"));
-}
-
-int SamplerGui::getMode()
-{
-    return mode;
-}
-
-void SamplerGui::setMode(int i)
-{
-    if (i < 0 || i > 2) {
-        return;
-    }
-
-    mode = i;
-    setChanged();
-    notifyObservers(string("mode"));
-}
-
-int SamplerGui::getTime()
-{
-    return time;
-}
-
-void SamplerGui::setTime(int i)
-{
-    if(i < 0 || i > 3786)
-        return;
-
-    time = i;
-    setChanged();
-    notifyObservers(string("time"));
-}
-
-int SamplerGui::getMonitor()
-{
-    return monitor;
-}
-
-void SamplerGui::setMonitor(int i)
-{
-    if(i < 0 || i > 5)
-        return;
-
-    monitor = i;
-    setChanged();
-    notifyObservers(string("monitor"));
-}
-
-int SamplerGui::getPreRec()
-{
-    return preRec;
-}
-
-void SamplerGui::setPreRec(int i)
-{
-    if(i < 0 || i > 100)
-        return;
-
-    preRec = i;
-    setChanged();
-    notifyObservers(string("prerec"));
-}
-
 void SamplerGui::setNewName(string newName)
 {
     this->newName = newName;
@@ -236,7 +139,4 @@ void SamplerGui::notify(string str)
 {
     setChanged();
     notifyObservers(str);
-}
-
-SamplerGui::~SamplerGui() {
 }

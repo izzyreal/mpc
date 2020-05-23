@@ -28,6 +28,8 @@
 #include <lcdgui/Popup.hpp>
 #include <lcdgui/SelectedEventBar.hpp>
 #include <lcdgui/Effect.hpp>
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/SampleScreen.hpp>
 
 #include <ui/Uis.hpp>
 
@@ -38,7 +40,6 @@
 #include <ui/sampler/PgmAssignObserver.hpp>
 #include <ui/sampler/PgmParamsObserver.hpp>
 #include <ui/sampler/PurgeObserver.hpp>
-#include <ui/sampler/SampleObserver.hpp>
 #include <ui/sampler/SndParamsObserver.hpp>
 #include <ui/sampler/SoundObserver.hpp>
 #include <ui/sampler/TrimObserver.hpp>
@@ -79,6 +80,7 @@
 
 using namespace mpc::ui;
 using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens;
 
 using namespace mpc::ui::vmpc;
 using namespace mpc::ui::sampler;
@@ -339,7 +341,8 @@ int LayeredScreen::openScreen(string screenName) {
 	}
 	else if (screenName.compare("sample") == 0)
 	{
-		bool muteMonitor = Mpc::instance().getUis().lock()->getSamplerGui()->getMonitor() == 0 ? true : false;
+		auto sampleScreen = dynamic_pointer_cast<SampleScreen>(Screens::getScreenComponent("sample"));
+		bool muteMonitor = sampleScreen->getMonitor() == 0;
 		ams->muteMonitor(muteMonitor);
 		ams->getSoundRecorder().lock()->setVuMeterActive(true);
 	}
@@ -823,10 +826,6 @@ void LayeredScreen::initObserver()
 	else if (checkActiveScreen(&soundNames, currentScreenName))
 	{
 		activeObserver = make_unique<SoundObserver>();
-	}
-	else if (csn.compare("sample") == 0)
-	{
-		activeObserver = make_unique<SampleObserver>();
 	}
 	else if (csn.compare("directory") == 0)
 	{

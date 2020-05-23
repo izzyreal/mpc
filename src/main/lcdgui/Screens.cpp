@@ -466,6 +466,10 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	{
 		screen = make_shared<SelectDrumScreen>(layerIndex);
 	}
+	else if (screenName.compare("sample") == 0)
+	{
+		screen = make_shared<SampleScreen>(layerIndex);
+	}
 
 	if (screen)
 	{
