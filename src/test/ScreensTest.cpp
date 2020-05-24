@@ -1,12 +1,20 @@
 #include <catch2/catch.hpp>
 
 #include <Mpc.hpp>
+#include <Paths.hpp>
 
 #include <sequencer/Sequencer.hpp>
+#include <sampler/Sampler.hpp>
 
 #include <lcdgui/LayeredScreen.hpp>
 #include <lcdgui/Layer.hpp>
 
+#include <file/File.hpp>
+
+#include <disk/MpcFile.hpp>
+#include <disk/MpcFile.hpp>
+#include <disk/ApsLoader.hpp>
+#include <disk/AbstractDisk.hpp>
 
 #include <vector>
 #include <string>
@@ -181,6 +189,17 @@ SCENARIO("All screens can be opened", "[gui]") {
 		mpc::Mpc& mpc = mpc::Mpc::instance();
 		mpc.init(44100, 1, 5);
 		mpc.getSequencer().lock()->getActiveSequence().lock()->init(1);
+		mpc.getDisk().lock()->moveForward("TEST1");
+		mpc.getDisk().lock()->initFiles();
+
+		auto f = mpc.getDisk().lock()->getFile("ALL_PGMS.APS");
+		
+		auto apsLoader = mpc::disk::ApsLoader(f);
+
+		this_thread::sleep_for(chrono::milliseconds(500));
+		
+		mpc.getSampler().lock()->setSoundIndex(0);
+
 		auto ls = mpc.getLayeredScreen().lock();
 
 		vector<string> good;

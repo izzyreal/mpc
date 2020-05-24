@@ -10,14 +10,14 @@ namespace mpc::ui::sampler {
 	{
 
 	private:
-		int convert;
-		int newFs;
-		int quality;
-		int newBit;
+		int convert = 0;
+		int newFs = 44100;
+		int quality = 0;
+		int newBit = 0;
 		std::string newName = "";
 		std::string newLName = "";
 		std::string newRName = "";
-		int rSource;
+		int rSource = 0;
 		std::string newStName = "";
 		int view = 0;
 		int playX = 0;

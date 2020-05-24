@@ -60,7 +60,9 @@ namespace mpc::lcdgui::screens::dialog
 
 	public:
 		MidiMonitorScreen(const int layer);
-		~MidiMonitorScreen(const int layerIndex);
+
+		void open() override;
+		void close() override;
 
 	};
 }

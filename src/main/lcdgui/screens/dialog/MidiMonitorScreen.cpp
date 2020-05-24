@@ -2,7 +2,6 @@
 
 #include <Mpc.hpp>
 #include <audiomidi/EventHandler.hpp>
-#include <lcdgui/Label.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::dialog;
@@ -11,11 +10,10 @@ using namespace std;
 MidiMonitorScreen::MidiMonitorScreen(const int layer)
 	: ScreenComponent("midimonitor", layer)
 {	
-	auto lEventHandler = Mpc::instance().getEventHandler().lock();
-	lEventHandler->addObserver(this);
-	
-	auto ls = Mpc::instance().getLayeredScreen(const int layerIndex).lock();
+}
 
+void MidiMonitorScreen::open()
+{
 	a0 = findLabel("0");
 	a1 = findLabel("1");
 	a2 = findLabel("2");
@@ -48,6 +46,18 @@ MidiMonitorScreen::MidiMonitorScreen(const int layer)
 	b13 = findLabel("29");
 	b14 = findLabel("30");
 	b15 = findLabel("31");
+
+	mpc.getEventHandler().lock()->addObserver(this);
+}
+
+void MidiMonitorScreen::close()
+{
+	mpc.getEventHandler().lock()->deleteObserver(this);
+	
+	if (blinkThread.joinable())
+	{
+		blinkThread.join();
+	}
 }
 
 void MidiMonitorScreen::static_blink(void * arg1, weak_ptr<mpc::lcdgui::Label> label)
@@ -74,15 +84,7 @@ void MidiMonitorScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 	string s = nonstd::any_cast<string>(arg);
 	int deviceNumber = stoi(s.substr(1));
 	if (s[0] == 'b') deviceNumber += 16;
-	auto label = Mpc::instance().getLayeredScreen(const int layerIndex).lock()->lookupLabel(to_string(deviceNumber));
+	auto label = findLabel(to_string(deviceNumber));
 	label.lock()->setText(u8"\u00CC");
 	initTimer(label);
-}
-
-MidiMonitorScreen::~MidiMonitorScreen(const int layerIndex) {
-	Mpc::instance().getEventHandler().lock()->deleteObserver(this);
-	if (blinkThread.joinable())
-	{
-		blinkThread.join();
-	}
 }
