@@ -14,5 +14,10 @@ namespace mpc::lcdgui::screens::dialog
 
 		DeleteSoundScreen(const int layerIndex);
 
+		void open() override;
+
+	private:
+		void displaySnd();
+
 	};
 }

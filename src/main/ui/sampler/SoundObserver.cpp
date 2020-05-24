@@ -25,11 +25,7 @@ SoundObserver::SoundObserver()
 	soundGui = Mpc::instance().getUis().lock()->getSoundGui();
 	soundGui->addObserver(this);
 
-	if (csn.compare("deletesound") == 0) {
-		sndField = ls->lookupField("snd");
-		displayDeleteSoundSnd();
-	}
-	else if (csn.compare("resample") == 0) {
+	if (csn.compare("resample") == 0) {
 		newFsField = ls->lookupField("newfs");
 		qualityField = ls->lookupField("quality");
 		newBitField = ls->lookupField("newbit");
@@ -155,19 +151,11 @@ void SoundObserver::displayNewName()
     newNameField.lock()->setText(soundGui->getNewName());
 }
 
-void SoundObserver::displayDeleteSoundSnd()
-{
-    sndField.lock()->setText(sampler.lock()->getSound().lock()->getName());
-}
-
 void SoundObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 {
 	string s = nonstd::any_cast<string>(arg);
 	if (s.compare("soundindex") == 0) {
-		if (csn.compare("deletesound") == 0) {
-			displayDeleteSoundSnd();
-		}
-		else if (csn.compare("stereotomono") == 0) {
+		if (csn.compare("stereotomono") == 0) {
 			displayStereoSource();
 		}
 		else if (csn.compare("monotostereo") == 0) {

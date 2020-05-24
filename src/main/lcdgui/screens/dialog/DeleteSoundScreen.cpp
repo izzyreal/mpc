@@ -1,16 +1,22 @@
-#include <controls/sampler/dialog/DeleteSoundControls.hpp>
+#include "DeleteSoundScreen.hpp"
 
 #include <ui/sampler/SoundGui.hpp>
 #include <sampler/Sampler.hpp>
 
-using namespace mpc::controls::sampler::dialog;
+using namespace mpc::lcdgui::screens::dialog;
 using namespace std;
 
-DeleteSoundControls::DeleteSoundControls() : ScreenComponent("", layerIndex)
+DeleteSoundScreen::DeleteSoundScreen(const int layerIndex)
+	: ScreenComponent("deletesound", layerIndex)
 {
 }
 
-void DeleteSoundControls::function(int i)
+void DeleteSoundScreen::open()
+{
+	displaySnd();
+}
+
+void DeleteSoundScreen::function(int i)
 {
     init();
 	
@@ -42,11 +48,18 @@ void DeleteSoundControls::function(int i)
     }
 }
 
-void DeleteSoundControls::turnWheel(int i)
+void DeleteSoundScreen::turnWheel(int i)
 {
 	init();
 	if (param.compare("snd") == 0)
 	{
 		sampler.lock()->setSoundIndex(sampler.lock()->getSoundIndex() + i);
+		displaySnd();
 	}
+}
+
+
+void DeleteSoundScreen::displaySnd()
+{
+	findField("snd").lock()->setText(sampler.lock()->getSound().lock()->getName());
 }
