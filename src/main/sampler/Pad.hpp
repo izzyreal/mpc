@@ -20,8 +20,8 @@ namespace mpc::sampler {
 		
 
 	private:
-		int note{ 0 };
-		int number{ 0 };
+		int note = 0;
+		int number = 0;
 		std::shared_ptr<ctoot::mpc::MpcStereoMixerChannel> stereoMixerChannel{};
 		std::shared_ptr<ctoot::mpc::MpcIndivFxMixerChannel> indivFxMixerChannel{};
 
@@ -34,7 +34,6 @@ namespace mpc::sampler {
 
 	public:
 		Pad(int number);
-		~Pad();
 
 	};
 }

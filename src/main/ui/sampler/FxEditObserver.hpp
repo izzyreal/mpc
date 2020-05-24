@@ -17,8 +17,6 @@ namespace mpc {
 
 		namespace sampler {
 
-			class MixerSetupGui;
-
 			class FxEditObserver
 				: public moduru::observer::Observer
 			{
@@ -31,8 +29,6 @@ namespace mpc {
 				std::weak_ptr<lcdgui::Field> drumField;
 				std::weak_ptr<lcdgui::Field> pgmField;
 				std::weak_ptr<lcdgui::Field> editField;
-
-				MixerSetupGui* msGui = nullptr;
 
 				std::vector<std::weak_ptr<lcdgui::Effect>> effects;
 

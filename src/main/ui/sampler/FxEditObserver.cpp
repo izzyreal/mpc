@@ -2,23 +2,22 @@
 
 #include <Mpc.hpp>
 
-#include <ui/Uis.hpp>
-#include <ui/sampler/MixerSetupGui.hpp>
-
 #include <lcdgui/LayeredScreen.hpp>
 #include <lcdgui/Field.hpp>
 #include <lcdgui/Effect.hpp>
 
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/MixerSetupScreen.hpp>
+
 using namespace mpc::ui::sampler;
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens;
 using namespace std;
 
 FxEditObserver::FxEditObserver()
 {
 	
 	auto ls = Mpc::instance().getLayeredScreen().lock();
-
-	msGui = Mpc::instance().getUis().lock()->getMixerSetupGui();
-	msGui->addObserver(this);
 
 	drumField = ls->lookupField("drum");
 	pgmField = ls->lookupField("pgm");
@@ -43,7 +42,8 @@ FxEditObserver::FxEditObserver()
 
 void FxEditObserver::displayDrum()
 {
-	drumField.lock()->setText(to_string(msGui->getFxDrum() + 1));
+	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(Screens::getScreenComponent("mixersetup"));
+	drumField.lock()->setText(to_string(mixerSetupScreen->getFxDrum() + 1));
 }
 
 void FxEditObserver::displayPgm()
@@ -65,7 +65,6 @@ void FxEditObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 }
 
 FxEditObserver::~FxEditObserver() {
-	msGui->deleteObserver(this);
 	for (auto& e : effects) {
 		e.lock()->Hide(true);
 	}

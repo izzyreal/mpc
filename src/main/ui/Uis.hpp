@@ -34,7 +34,6 @@ namespace mpc::ui::disk::window {
 namespace mpc::ui::sampler {
 	class SamplerGui;
 	class SoundGui;
-	class MixerSetupGui;
 }
 
 namespace mpc::ui::sampler::window {
@@ -56,7 +55,6 @@ namespace mpc::ui {
 		mpc::ui::NameGui* nameGui = nullptr;
 		mpc::ui::sampler::SoundGui* soundGui = nullptr;
 		mpc::ui::sampler::SamplerGui* samplerGui = nullptr;
-		mpc::ui::sampler::MixerSetupGui* mixerSetupGui = nullptr;
 
 		mpc::ui::sampler::window::EditSoundGui* editSoundGui = nullptr;
 		mpc::ui::sampler::window::SamplerWindowGui* samplerWindowGui = nullptr;
@@ -88,7 +86,6 @@ namespace mpc::ui {
 		mpc::ui::sampler::window::SamplerWindowGui* getSamplerWindowGui();
 		mpc::ui::sampler::SamplerGui* getSamplerGui();
 		mpc::ui::NameGui* getNameGui();
-		mpc::ui::sampler::MixerSetupGui* getMixerSetupGui();
 
 		mpc::ui::other::OthersGui* getOthersGui();
 

@@ -4,7 +4,6 @@
 #include <Util.hpp>
 #include <Paths.hpp>
 
-#include <ui/sampler/MixerSetupGui.hpp>
 #include <ui/sampler/SamplerGui.hpp>
 
 #include <sampler/NoteParameters.hpp>
@@ -15,6 +14,7 @@
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/DrumScreen.hpp>
 #include <lcdgui/screens/MixerScreen.hpp>
+#include <lcdgui/screens/MixerSetupScreen.hpp>
 #include <lcdgui/Field.hpp>
 
 #include <mpc/MpcSoundPlayerChannel.hpp>
@@ -43,8 +43,6 @@ ChannelSettingsObserver::ChannelSettingsObserver()
 	ls = Mpc::instance().getLayeredScreen();
 	auto lLs = ls.lock();
 	sampler = Mpc::instance().getSampler();
-	mixerSetupGui = uis->getMixerSetupGui();
-	mixerSetupGui->addObserver(this);
 
 	auto drumScreen = dynamic_pointer_cast<DrumScreen>(Screens::getScreenComponent("drum"));
 
@@ -223,7 +221,6 @@ void ChannelSettingsObserver::displayFollowStereo() {
 }
 
 ChannelSettingsObserver::~ChannelSettingsObserver() {
-	mixerSetupGui->deleteObserver(this);
 	samplerGui->deleteObserver(this);
 
 	for (int i = (bank * 16); i < (bank * 16) + 16; i++) {

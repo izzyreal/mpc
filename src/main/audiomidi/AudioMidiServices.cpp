@@ -9,7 +9,7 @@
 #include <audiomidi/SoundPlayer.hpp>
 #include <audiomidi/MpcMidiPorts.hpp>
 #include <ui/sampler/SamplerGui.hpp>
-#include <ui/sampler/MixerSetupGui.hpp>
+
 #include <ui/vmpc/DirectToDiskRecorderGui.hpp>
 #include <nvram/NvRam.hpp>
 #include <nvram/AudioMidiConfig.hpp>
@@ -24,6 +24,9 @@
 #include <mpc/MpcMultiSynthControls.hpp>
 #include <mpc/MpcSoundPlayerChannel.hpp>
 #include <mpc/MpcSoundPlayerControls.hpp>
+
+#include <lcdgui/screens/MixerSetupScreen.hpp>
+#include <lcdgui/Screens.hpp>
 
 // ctoot
 #include <audio/core/AudioFormat.hpp>
@@ -87,6 +90,8 @@
 
 using namespace mpc;
 using namespace mpc::audiomidi;
+using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui;
 
 using namespace ctoot::audio::server;
 using namespace ctoot::audio::core;
@@ -301,12 +306,16 @@ void AudioMidiServices::createSynth()
 	msc = make_shared<ctoot::mpc::MpcMultiSynthControls>();
 	synthRackControls->setSynthControls(0, msc);
 	mms = dynamic_pointer_cast<ctoot::mpc::MpcMultiMidiSynth>(synthRack->getMidiSynth(0).lock());
-	auto msGui = Mpc::instance().getUis().lock()->getMixerSetupGui();
-	for (int i = 0; i < 4; i++) {
-		auto m = make_shared<ctoot::mpc::MpcSoundPlayerControls>(mms, dynamic_pointer_cast<ctoot::mpc::MpcSampler>(Mpc::instance().getSampler().lock()), i, mixer, server, dynamic_cast<ctoot::mpc::MpcMixerSetupGui*>(msGui));
+
+	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(Screens::getScreenComponent("mixersetup"));
+	
+	for (int i = 0; i < 4; i++)
+	{
+		auto m = make_shared<ctoot::mpc::MpcSoundPlayerControls>(mms, dynamic_pointer_cast<ctoot::mpc::MpcSampler>(Mpc::instance().getSampler().lock()), i, mixer, server, mixerSetupScreen.get());
 		msc->setChannelControls(i, m);
 		synthChannelControls.push_back(m);
 	}
+
 	basicVoice = make_shared<ctoot::mpc::MpcVoice>(65, true);
 	auto m = make_shared<ctoot::mpc::MpcBasicSoundPlayerControls>(Mpc::instance().getSampler(), mixer, basicVoice);
 	msc->setChannelControls(4, m);

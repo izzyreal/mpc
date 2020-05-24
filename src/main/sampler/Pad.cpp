@@ -3,7 +3,6 @@
 #include <Mpc.hpp>
 #include <ui/Uis.hpp>
 #include <ui/sampler/SamplerGui.hpp>
-#include <ui/sampler/MixerSetupGui.hpp>
 #include <ui/vmpc/VmpcSettingsGui.hpp>
 #include <Paths.hpp>
 #include <sampler/Sampler.hpp>
@@ -44,14 +43,20 @@ Pad::Pad(int number)
 
 void Pad::setNote(int i)
 {
-	if (i < 34 || i > 98) return;
+	if (i < 34 || i > 98)
+	{
+		return;
+	}
 
-	if (Mpc::instance().getUis().lock()->getSamplerGui()->isPadAssignMaster()) {
+	if (Mpc::instance().getUis().lock()->getSamplerGui()->isPadAssignMaster())
+	{
 		(*Mpc::instance().getSampler().lock()->getMasterPadAssign())[number] = i;
 	}
-	else {
+	else
+	{
 		note = i;
 	}
+	
 	setChanged();
 	notifyObservers(string("padnotenumber"));
 	setChanged();
@@ -62,7 +67,8 @@ void Pad::setNote(int i)
 
 int Pad::getNote()
 {
-	if (Mpc::instance().getUis().lock()->getSamplerGui()->isPadAssignMaster()) {
+	if (Mpc::instance().getUis().lock()->getSamplerGui()->isPadAssignMaster())
+	{
 		return (*Mpc::instance().getSampler().lock()->getMasterPadAssign())[number];
 	}
 	return note;
@@ -81,7 +87,4 @@ weak_ptr<ctoot::mpc::MpcIndivFxMixerChannel> Pad::getIndivFxMixerChannel()
 int Pad::getNumber()
 {
     return number;
-}
-
-Pad::~Pad() {
 }

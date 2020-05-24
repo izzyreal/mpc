@@ -1,6 +1,5 @@
 #include "MixerSetupScreen.hpp"
 
-#include <ui/sampler/MixerSetupGui.hpp>
 #include <ui/sampler/SamplerGui.hpp>
 
 #include <lcdgui/screens/DrumScreen.hpp>
@@ -28,10 +27,9 @@ void MixerSetupScreen::open()
 
 void MixerSetupScreen::displayMasterLevel() {
 
-	auto mixerSetupGui = mpc.getUis().lock()->getMixerSetupGui();
-	auto level = mixerSetupGui->getMasterLevelString();
+	auto level = getMasterLevelString();
 
-	if (mixerSetupGui->getMasterLevel() != -13)
+	if (getMasterLevel() != -13)
 	{
 		level = StrUtil::padLeft(level, " ", 5);
 	}
@@ -40,59 +38,52 @@ void MixerSetupScreen::displayMasterLevel() {
 }
 
 void MixerSetupScreen::displayFxDrum() {
-	auto mixerSetupGui = mpc.getUis().lock()->getMixerSetupGui();
-	findField("fxdrum").lock()->setText(to_string(mixerSetupGui->getFxDrum() + 1));
+	findField("fxdrum").lock()->setText(to_string(getFxDrum() + 1));
 }
 
 void MixerSetupScreen::displayStereoMixSource() {
-	auto mixerSetupGui = mpc.getUis().lock()->getMixerSetupGui();
-	findField("stereomixsource").lock()->setText(mixerSetupGui->isStereoMixSourceDrum() ? "DRUM" : "PROGRAM");
+	findField("stereomixsource").lock()->setText(isStereoMixSourceDrum() ? "DRUM" : "PROGRAM");
 }
 
 void MixerSetupScreen::displayIndivFxSource() {
-	auto mixerSetupGui = mpc.getUis().lock()->getMixerSetupGui();
-	findField("indivfxsource").lock()->setText(mixerSetupGui->isIndivFxSourceDrum() ? "DRUM" : "PROGRAM");
+	findField("indivfxsource").lock()->setText(isIndivFxSourceDrum() ? "DRUM" : "PROGRAM");
 }
 
 void MixerSetupScreen::displayCopyPgmMixToDrum() {
-	auto mixerSetupGui = mpc.getUis().lock()->getMixerSetupGui();
-	findField("copypgmmixtodrum").lock()->setText(mixerSetupGui->isCopyPgmMixToDrumEnabled() ? "YES" : "NO");
+	findField("copypgmmixtodrum").lock()->setText(isCopyPgmMixToDrumEnabled() ? "YES" : "NO");
 }
 
 void MixerSetupScreen::displayRecordMixChanges() {
-	auto mixerSetupGui = mpc.getUis().lock()->getMixerSetupGui();
-	findField("recordmixchanges").lock()->setText(mixerSetupGui->isRecordMixChangesEnabled() ? "YES" : "NO");
+	findField("recordmixchanges").lock()->setText(isRecordMixChangesEnabled() ? "YES" : "NO");
 }
 
 void MixerSetupScreen::turnWheel(int i)
 {
 	init();
 
-	auto mixerSetupGui = mpc.getUis().lock()->getMixerSetupGui();
-
 	if (param.compare("stereomixsource") == 0)
 	{
-		mixerSetupGui->setStereoMixSourceDrum(i > 0);
+		setStereoMixSourceDrum(i > 0);
 	}
 	else if (param.compare("indivfxsource") == 0)
 	{
-		mixerSetupGui->setIndivFxSourceDrum(i > 0);
+		setIndivFxSourceDrum(i > 0);
 	}
 	else if (param.compare("copypgmmixtodrum") == 0)
 	{
-		mixerSetupGui->setCopyPgmMixToDrumEnabled(i > 0);
+		setCopyPgmMixToDrumEnabled(i > 0);
 	}
 	else if (param.compare("recordmixchanges") == 0)
 	{
-		mixerSetupGui->setRecordMixChangesEnabled(i > 0);
+		setRecordMixChangesEnabled(i > 0);
 	}
 	else if (param.compare("masterlevel") == 0)
 	{
-		mixerSetupGui->setMasterLevel(mixerSetupGui->getMasterLevel() + i);
+		setMasterLevel(masterLevel + i);
 	}
 	else if (param.compare("fxdrum") == 0)
 	{
-		mixerSetupGui->setFxDrum(mixerSetupGui->getFxDrum() + i);
+		setFxDrum(fxDrum + i);
 	}
 }
 
@@ -107,4 +98,77 @@ void MixerSetupScreen::function(int i)
 		samplerGui->setPrevScreenName(csn);
 		ls.lock()->openScreen("mixer");
 	}
+}
+
+int MixerSetupScreen::getMasterLevel()
+{
+	return masterLevel;
+}
+
+void MixerSetupScreen::setMasterLevel(int i)
+{
+	if (i < -13 || i > 2) return;
+	masterLevel = i;
+	displayMasterLevel();
+}
+
+int MixerSetupScreen::getFxDrum()
+{
+	return fxDrum;
+}
+
+void MixerSetupScreen::setFxDrum(int i)
+{
+	if (i < 0 || i > 3) return;
+	fxDrum = i;
+	displayFxDrum();
+}
+
+bool MixerSetupScreen::isStereoMixSourceDrum()
+{
+	return stereoMixSourceDrum;
+}
+
+void MixerSetupScreen::setStereoMixSourceDrum(bool b)
+{
+	stereoMixSourceDrum = b;
+	displayStereoMixSource();
+}
+
+bool MixerSetupScreen::isIndivFxSourceDrum()
+{
+	return indivFxSourceDrum;
+}
+
+void MixerSetupScreen::setIndivFxSourceDrum(bool b)
+{
+	indivFxSourceDrum = b;
+	displayIndivFxSource();
+}
+
+bool MixerSetupScreen::isCopyPgmMixToDrumEnabled()
+{
+	return copyPgmMixToDrumEnabled;
+}
+
+void MixerSetupScreen::setCopyPgmMixToDrumEnabled(bool b)
+{
+	copyPgmMixToDrumEnabled = b;
+	displayCopyPgmMixToDrum();
+}
+
+bool MixerSetupScreen::isRecordMixChangesEnabled()
+{
+	return recordMixChangesEnabled;
+}
+
+void MixerSetupScreen::setRecordMixChangesEnabled(bool b)
+{
+	recordMixChangesEnabled = b;
+	displayRecordMixChanges();
+}
+
+string MixerSetupScreen::getMasterLevelString()
+{
+	return masterLevelNames[masterLevel + 13];
 }

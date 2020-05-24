@@ -16,9 +16,9 @@
 
 #include <ui/Uis.hpp>
 #include <ui/disk/DiskGui.hpp>
-#include <ui/sampler/MixerSetupGui.hpp>
 #include <ui/sampler/SamplerGui.hpp>
 #include <ui/sampler/SoundGui.hpp>
+
 #include <sampler/NoteParameters.hpp>
 #include <sampler/Pad.hpp>
 #include <sampler/Program.hpp>
@@ -31,6 +31,7 @@
 
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/DrumScreen.hpp>
+#include <lcdgui/screens/MixerSetupScreen.hpp>
 
 #include <lang/StrUtil.hpp>
 
@@ -183,16 +184,19 @@ void ApsLoader::load()
 		drum->setReceivePgmChange(apsParser.getDrumConfiguration(i)->getReceivePgmChange());
 		drum->setReceiveMidiVolume(apsParser.getDrumConfiguration(i)->getReceiveMidiVolume());
 	}
-	auto uis = Mpc::instance().getUis().lock();
-	uis->getMixerSetupGui()->setRecordMixChangesEnabled(apsParser.getGlobalParameters()->isRecordMixChangesEnabled());
-	uis->getMixerSetupGui()->setCopyPgmMixToDrumEnabled(apsParser.getGlobalParameters()->isCopyPgmMixToDrumEnabled());
-	uis->getMixerSetupGui()->setFxDrum(apsParser.getGlobalParameters()->getFxDrum());
-	uis->getMixerSetupGui()->setIndivFxSourceDrum(apsParser.getGlobalParameters()->isIndivFxSourceDrum());
-	uis->getMixerSetupGui()->setStereoMixSourceDrum(apsParser.getGlobalParameters()->isStereoMixSourceDrum());
+	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(Screens::getScreenComponent("mixersetup"));
+
+	mixerSetupScreen->setRecordMixChangesEnabled(apsParser.getGlobalParameters()->isRecordMixChangesEnabled());
+	mixerSetupScreen->setCopyPgmMixToDrumEnabled(apsParser.getGlobalParameters()->isCopyPgmMixToDrumEnabled());
+	mixerSetupScreen->setFxDrum(apsParser.getGlobalParameters()->getFxDrum());
+	mixerSetupScreen->setIndivFxSourceDrum(apsParser.getGlobalParameters()->isIndivFxSourceDrum());
+	mixerSetupScreen->setStereoMixSourceDrum(apsParser.getGlobalParameters()->isStereoMixSourceDrum());
 
 	auto drumScreen = dynamic_pointer_cast<DrumScreen>(Screens::getScreenComponent("drum"));
 
 	drumScreen->setPadToIntSound(apsParser.getGlobalParameters()->isPadToIntSoundEnabled());
+
+	auto uis = Mpc::instance().getUis().lock();
 	uis->getDiskGui()->removePopup();
 	
 	sampler->setSoundIndex(0);

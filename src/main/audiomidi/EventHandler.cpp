@@ -18,7 +18,6 @@
 #include <ui/midisync/MidiSyncGui.hpp>
 #include <ui/misc/TransGui.hpp>
 #include <ui/vmpc/DirectToDiskRecorderGui.hpp>
-#include <ui/sampler/MixerSetupGui.hpp>
 
 #include <hardware/Hardware.hpp>
 #include <hardware/HwPad.hpp>
@@ -27,6 +26,7 @@
 #include <sampler/Sampler.hpp>
 
 #include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/MixerSetupScreen.hpp>
 #include <lcdgui/screens/window/CountMetronomeScreen.hpp>
 
 #include <midi/core/MidiMessage.hpp>
@@ -45,6 +45,7 @@
 #include <thirdp/bcmath/bcmath_stl.h>
 
 using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::audiomidi;
 using namespace std;
@@ -203,7 +204,9 @@ void EventHandler::handleNoThru(weak_ptr<mpc::sequencer::Event> e, mpc::sequence
 		auto p = lSampler->getProgram(lSampler->getDrumBusProgramNumber(track->getBusNumber())).lock();
 		auto mixer = p->getStereoMixerChannel(pad).lock();
 	
-		if (Mpc::instance().getUis().lock()->getMixerSetupGui()->isStereoMixSourceDrum())
+		auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(Screens::getScreenComponent("mixersetup"));
+
+		if (mixerSetupScreen->isStereoMixSourceDrum())
 		{
 			auto busNumber = track->getBusNumber();
 		

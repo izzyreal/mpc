@@ -1,7 +1,5 @@
 #include "FxEditControls.hpp"
 
-#include <ui/sampler/MixerSetupGui.hpp>
-
 #include <lcdgui/Effect.hpp>
 
 using namespace mpc::controls::mixer;
@@ -21,7 +19,7 @@ void FxEditControls::function(int f) {
 void FxEditControls::turnWheel(int i) {
 	init();
 	if (param.compare("drum") == 0) {
-		mixerSetupGui->setFxDrum(mixerSetupGui->getFxDrum() + i);
+		//mixerSetupGui->setFxDrum(mixerSetupGui->getFxDrum() + i);
 	}
 }
 

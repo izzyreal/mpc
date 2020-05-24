@@ -11,13 +11,6 @@ namespace ctoot {
 }
 
 namespace mpc {
-	
-
-	namespace ui {
-		namespace sampler {
-			class MixerSetupGui;
-		}
-	}
 
 	namespace controls {
 		namespace mixer {
@@ -30,7 +23,6 @@ namespace mpc {
 				typedef mpc::controls::BaseControls super;
 
 			protected:
-				mpc::ui::sampler::MixerSetupGui* mixerSetupGui{ nullptr };
 				std::weak_ptr<ctoot::mpc::MpcStereoMixerChannel> stereoMixerChannel;
 				std::weak_ptr<ctoot::mpc::MpcIndivFxMixerChannel> indivFxMixerChannel;
 

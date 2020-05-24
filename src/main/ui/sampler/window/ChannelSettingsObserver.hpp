@@ -13,8 +13,6 @@ namespace ctoot {
 
 namespace mpc {
 
-	
-
 	namespace lcdgui {
 		class LayeredScreen;
 		class Field;
@@ -35,8 +33,6 @@ namespace mpc {
 		namespace sampler {
 
 			class SamplerGui;
-			class MixerGui;
-			class MixerSetupGui;
 
 			class ChannelSettingsObserver
 				: public moduru::observer::Observer
@@ -46,8 +42,6 @@ namespace mpc {
 				
 				std::weak_ptr<mpc::sampler::Sampler> sampler{};
 				SamplerGui* samplerGui{ nullptr };
-				MixerSetupGui* mixerSetupGui{ nullptr };
-				MixerGui* mixGui{ nullptr };
 				int bank = 0;
 				ctoot::mpc::MpcSoundPlayerChannel* mpcSoundPlayerChannel{ nullptr };
 				std::weak_ptr<mpc::sampler::Program> program{};

@@ -1,7 +1,6 @@
 #include <controls/mixer/AbstractMixerControls.hpp>
 
 #include <Mpc.hpp>
-#include <ui/sampler/MixerSetupGui.hpp>
 #include <ui/sampler/SamplerGui.hpp>
 #include <mpc/MpcStereoMixerChannel.hpp>
 #include <mpc/MpcIndivFxMixerChannel.hpp>
@@ -14,7 +13,6 @@ using namespace std;
 AbstractMixerControls::AbstractMixerControls() 
 	: BaseControls()
 {
-	mixerSetupGui = Mpc::instance().getUis().lock()->getMixerSetupGui();
 }
 
 void AbstractMixerControls::init()

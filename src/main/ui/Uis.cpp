@@ -12,7 +12,6 @@
 
 #include <ui/midisync/MidiSyncGui.hpp>
 
-#include <ui/sampler/MixerSetupGui.hpp>
 #include <ui/sampler/SamplerGui.hpp>
 #include <ui/sampler/SoundGui.hpp>
 
@@ -63,8 +62,6 @@ Uis::Uis()
 	samplerGui = new mpc::ui::sampler::SamplerGui();
 	nameGui = new mpc::ui::NameGui();
 	soundGui = new mpc::ui::sampler::SoundGui();
-
-	mixerSetupGui = new mpc::ui::sampler::MixerSetupGui();
 
 	editSoundGui = new mpc::ui::sampler::window::EditSoundGui();
 	zoomGui = new mpc::ui::sampler::window::ZoomGui();
@@ -136,11 +133,6 @@ mpc::ui::vmpc::DeviceGui* Uis::getDeviceGui()
 	return deviceGui;
 }
 
-mpc::ui::sampler::MixerSetupGui* Uis::getMixerSetupGui()
-{
-	return mixerSetupGui;
-}
-
 mpc::ui::misc::PunchGui* Uis::getPunchGui()
 {
 	return punchGui;
@@ -183,7 +175,6 @@ Uis::~Uis()
 	if (diskWindowGui != nullptr) delete diskWindowGui;
 	if (midiSyncGui != nullptr) delete midiSyncGui;
 	if (nameGui != nullptr) delete nameGui;
-	if (mixerSetupGui != nullptr) delete mixerSetupGui;
 	if (punchGui != nullptr) delete punchGui;
 	if (d2dRecorderGui != nullptr) delete d2dRecorderGui;
 	if (transGui != nullptr) delete transGui;
