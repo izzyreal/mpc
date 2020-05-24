@@ -6,17 +6,11 @@
 
 #include <controls/GlobalReleaseControls.hpp>
 
-#include <controls/sampler/dialog/ConvertSoundControls.hpp>
 #include <controls/sampler/dialog/CopyProgramControls.hpp>
-#include <controls/sampler/dialog/CopySoundControls.hpp>
 #include <controls/sampler/dialog/CreateNewProgramControls.hpp>
 #include <controls/sampler/dialog/DeleteAllProgramsControls.hpp>
 #include <controls/sampler/dialog/DeleteAllSoundControls.hpp>
 #include <controls/sampler/dialog/DeleteProgramControls.hpp>
-#include <controls/sampler/dialog/DeleteSoundControls.hpp>
-#include <controls/sampler/dialog/MonoToStereoControls.hpp>
-#include <controls/sampler/dialog/ResampleControls.hpp>
-#include <controls/sampler/dialog/StereoToMonoControls.hpp>
 #include <controls/sampler/window/AssignmentViewControls.hpp>
 #include <controls/sampler/window/AutoChromaticAssignmentControls.hpp>
 #include <controls/sampler/window/CopyNoteParametersControls.hpp>
@@ -103,13 +97,7 @@ Controls::Controls()
 	controls["copyprogram"] = new sampler::dialog::CopyProgramControls();
 	controls["deleteallprograms"] = new sampler::dialog::DeleteAllProgramsControls();
 	controls["deleteprogram"] = new sampler::dialog::DeleteProgramControls();
-	controls["deletesound"] = new sampler::dialog::DeleteSoundControls();
 	controls["deleteallsound"] = new sampler::dialog::DeleteAllSoundControls();
-	controls["convertsound"] = new sampler::dialog::ConvertSoundControls();
-	controls["monotostereo"] = new sampler::dialog::MonoToStereoControls();
-	controls["copysound"] = new sampler::dialog::CopySoundControls();
-	controls["resample"] = new sampler::dialog::ResampleControls();
-	controls["stereotomono"] = new sampler::dialog::StereoToMonoControls();
 
 	controls["startfine"] = new sampler::window::ZoomControls();
 	controls["endfine"] = new sampler::window::ZoomControls();

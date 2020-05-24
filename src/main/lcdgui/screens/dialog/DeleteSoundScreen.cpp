@@ -6,7 +6,7 @@
 using namespace mpc::controls::sampler::dialog;
 using namespace std;
 
-DeleteSoundControls::DeleteSoundControls() : AbstractSamplerControls()
+DeleteSoundControls::DeleteSoundControls() : ScreenComponent("", layerIndex)
 {
 }
 

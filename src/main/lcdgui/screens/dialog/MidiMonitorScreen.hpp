@@ -60,7 +60,7 @@ namespace mpc::lcdgui::screens::dialog
 
 	public:
 		MidiMonitorScreen(const int layer);
-		~MidiMonitorScreen();
+		~MidiMonitorScreen(const int layerIndex);
 
 	};
 }

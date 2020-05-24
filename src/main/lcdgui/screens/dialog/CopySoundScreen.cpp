@@ -10,7 +10,7 @@ using namespace mpc::controls::sampler::dialog;
 using namespace std;
 
 CopySoundControls::CopySoundControls() 
-	: AbstractSamplerControls()
+	: ScreenComponent("", layerIndex)
 {
 }
 

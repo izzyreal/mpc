@@ -97,9 +97,6 @@ static vector<string> diskNames = vector<string>{ "load", "save", "format", "set
 "saveaprogram", "loadasound", "saveasound", "cantfindfile", "filealreadyexists", "loadasequence",
 "saveasequence", "saveapsfile" };
 
-static vector<string> soundNames = vector<string>{ "sound", "deletesound", "deleteallsound", "convertsound", "resample",
-"stereotomono", "monotostereo", "copysound" };
-
 static moduru::gui::BMFParser _bmfParser = moduru::gui::BMFParser(string(mpc::Paths::resPath() + moduru::file::FileUtil::getSeparator() + "font.fnt"));
 
 std::vector<std::vector<bool>> LayeredScreen::atlas = _bmfParser.getAtlas();
@@ -805,10 +802,6 @@ void LayeredScreen::initObserver()
 	else if (checkActiveScreen(&diskNames, currentScreenName))
 	{
 		activeObserver = make_unique<DiskObserver>();
-	}
-	else if (checkActiveScreen(&soundNames, currentScreenName))
-	{
-		activeObserver = make_unique<SoundObserver>();
 	}
 	else if (csn.compare("directory") == 0)
 	{

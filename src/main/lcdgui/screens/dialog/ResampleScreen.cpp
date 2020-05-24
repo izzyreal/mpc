@@ -15,7 +15,7 @@ using namespace mpc::controls::sampler::dialog;
 using namespace std;
 
 ResampleControls::ResampleControls()
-	: AbstractSamplerControls()
+	: ScreenComponent("", layerIndex)
 {
 }
 

@@ -10,7 +10,7 @@ using namespace mpc::controls::sampler::dialog;
 using namespace std;
 
 StereoToMonoControls::StereoToMonoControls()
-	: AbstractSamplerControls()
+	: ScreenComponent("", layerIndex)
 {
 }
 

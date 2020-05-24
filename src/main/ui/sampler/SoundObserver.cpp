@@ -18,26 +18,17 @@ SoundObserver::SoundObserver()
 {
 	
 	sampler = Mpc::instance().getSampler();
-	convertNames = vector<string>{ "STEREO TO MONO", "RE-SAMPLE" };
+	
 	qualityNames = vector<string>{ "LOW", "MED", "HIGH" };
 	bitNames = vector<string>{ "16", "12", "8" };
 	auto ls = Mpc::instance().getLayeredScreen().lock();
 	csn = ls->getCurrentScreenName();
 	soundGui = Mpc::instance().getUis().lock()->getSoundGui();
 	soundGui->addObserver(this);
-	if (csn.compare("sound") == 0) {
-		soundNameField = ls->lookupField("soundname");
-		typeLabel = ls->lookupLabel("type");
-		rateLabel = ls->lookupLabel("rate");
-		sizeLabel = ls->lookupLabel("size");
-	}
-	else if (csn.compare("deletesound") == 0) {
+
+	if (csn.compare("deletesound") == 0) {
 		sndField = ls->lookupField("snd");
 		displayDeleteSoundSnd();
-	}
-	else if (csn.compare("convertsound") == 0) {
-		convertField = ls->lookupField("convert");
-		displayConvert();
 	}
 	else if (csn.compare("resample") == 0) {
 		newFsField = ls->lookupField("newfs");
@@ -176,14 +167,6 @@ void SoundObserver::displayNewName()
     newNameField.lock()->setText(soundGui->getNewName());
 }
 
-void SoundObserver::displayConvert()
-{
-	convertField.lock()->setText(convertNames[soundGui->getConvert()]);
-	if (soundGui->getConvert() == 0 && sampler.lock()->getSound().lock()->isMono()) {
-		convertField.lock()->setText("MONO TO STEREO");
-	}
-}
-
 void SoundObserver::displayDeleteSoundSnd()
 {
     sndField.lock()->setText(sampler.lock()->getSound().lock()->getName());
@@ -205,9 +188,6 @@ void SoundObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 		else if (csn.compare("copysound") == 0) {
 			displaySnd();
 		}
-	}
-	else if (s.compare("convert") == 0) {
-		displayConvert();
 	}
 	else if (s.compare("newfs") == 0) {
 		displayNewFs();

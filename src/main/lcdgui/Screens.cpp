@@ -56,6 +56,7 @@
 #include <lcdgui/screens/window/TrackScreen.hpp>
 #include <lcdgui/screens/window/Assign16LevelsScreen.hpp>
 #include <lcdgui/screens/window/StepTcScreen.hpp>
+#include <lcdgui/screens/window/SoundScreen.hpp>
 
 #include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
 #include <lcdgui/screens/dialog/MidiMonitorScreen.hpp>
@@ -65,6 +66,13 @@
 #include <lcdgui/screens/dialog/DeleteSequenceScreen.hpp>
 #include <lcdgui/screens/dialog/DeleteAllSequencesScreen.hpp>
 #include <lcdgui/screens/dialog/DeleteAllTracksScreen.hpp>
+#include <lcdgui/screens/dialog/ConvertSoundScreen.hpp>
+//#include <lcdgui/screens/dialog/CopySoundScreen.hpp>
+//#include <lcdgui/screens/dialog/DeleteSoundScreen.hpp>
+//#include <lcdgui/screens/dialog/MonoToStereoScreen.hpp>
+//#include <lcdgui/screens/dialog/ResampleScreen.hpp>
+//#include <lcdgui/screens/dialog/StereoToMonoScreen.hpp>
+
 
 #include <file/FileUtil.hpp>
 
@@ -474,6 +482,15 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	{
 		screen = make_shared<SampleScreen>(layerIndex);
 	}
+	else if (screenName.compare("sound") == 0)
+	{
+		screen = make_shared<SoundScreen>(layerIndex);
+	}
+	else if (screenName.compare("convertsound") == 0)
+	{
+		screen = make_shared<ConvertSoundScreen>(layerIndex);
+	}
+
 
 	if (screen)
 	{

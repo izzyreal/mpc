@@ -39,8 +39,6 @@ namespace mpc {
 				std::weak_ptr<mpc::lcdgui::Label> sizeLabel{};
 				std::string csn{ "" };
 				std::weak_ptr<mpc::lcdgui::Field> sndField{};
-				std::weak_ptr<mpc::lcdgui::Field> convertField{};
-				std::vector<std::string> convertNames{};
 				std::weak_ptr<mpc::lcdgui::Field> newFsField{};
 				std::weak_ptr<mpc::lcdgui::Field> qualityField{};
 				std::weak_ptr<mpc::lcdgui::Field> newBitField{};
@@ -66,7 +64,6 @@ namespace mpc {
 				void displayQuality();
 				void displayNewBit();
 				void displayNewName();
-				void displayConvert();
 				void displayDeleteSoundSnd();
 
 			public:

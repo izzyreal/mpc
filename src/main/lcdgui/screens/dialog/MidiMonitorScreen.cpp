@@ -14,7 +14,7 @@ MidiMonitorScreen::MidiMonitorScreen(const int layer)
 	auto lEventHandler = Mpc::instance().getEventHandler().lock();
 	lEventHandler->addObserver(this);
 	
-	auto ls = Mpc::instance().getLayeredScreen().lock();
+	auto ls = Mpc::instance().getLayeredScreen(const int layerIndex).lock();
 
 	a0 = findLabel("0");
 	a1 = findLabel("1");
@@ -74,12 +74,12 @@ void MidiMonitorScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 	string s = nonstd::any_cast<string>(arg);
 	int deviceNumber = stoi(s.substr(1));
 	if (s[0] == 'b') deviceNumber += 16;
-	auto label = Mpc::instance().getLayeredScreen().lock()->lookupLabel(to_string(deviceNumber));
+	auto label = Mpc::instance().getLayeredScreen(const int layerIndex).lock()->lookupLabel(to_string(deviceNumber));
 	label.lock()->setText(u8"\u00CC");
 	initTimer(label);
 }
 
-MidiMonitorScreen::~MidiMonitorScreen() {
+MidiMonitorScreen::~MidiMonitorScreen(const int layerIndex) {
 	Mpc::instance().getEventHandler().lock()->deleteObserver(this);
 	if (blinkThread.joinable())
 	{

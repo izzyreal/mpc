@@ -1,33 +1,39 @@
-#include <controls/sampler/dialog/ConvertSoundControls.hpp>
+#include "ConvertSoundScreen.hpp"
 
 #include <ui/sampler/SoundGui.hpp>
-#include <sampler/Sampler.hpp>
-#include <sampler/Sound.hpp>
 
-#include <lcdgui/Wave.hpp>
-
-#include <lang/StrUtil.hpp>
-
-using namespace mpc::controls::sampler::dialog;
+using namespace mpc::lcdgui::screens::dialog;
+using namespace moduru::lang;
 using namespace std;
 
-ConvertSoundControls::ConvertSoundControls() 
-	: AbstractSamplerControls()
+ConvertSoundScreen::ConvertSoundScreen(const int layerIndex) 
+	: ScreenComponent("convertsound", layerIndex)
 {
 }
 
-void ConvertSoundControls::turnWheel(int i)
+void ConvertSoundScreen::open()
+{
+	displayConvert();
+}
+
+void ConvertSoundScreen::turnWheel(int i)
 {
 	init();
-	if (param.compare("convert") == 0) {
+
+	if (param.compare("convert") == 0)
+	{
+		auto soundGui = mpc.getUis().lock()->getSoundGui();
 		soundGui->setConvert(i < 0 ? int(0) : 1);
+		displayConvert();
 	}
 }
 
-void ConvertSoundControls::function(int i)
+void ConvertSoundScreen::function(int i)
 {
 	init();
 	
+	auto soundGui = mpc.getUis().lock()->getSoundGui();
+
 	switch (i)
 	{
 	case 3:
@@ -37,8 +43,8 @@ void ConvertSoundControls::function(int i)
 		if (soundGui->getConvert() == 0)
 		{
 			string name = sampler.lock()->getSound().lock()->getName();
-			name = moduru::lang::StrUtil::trim(name);
-			name = moduru::lang::StrUtil::padRight(name, "_", 16);
+			name = StrUtil::trim(name);
+			name = StrUtil::padRight(name, "_", 16);
 			name = name.substr(0, 14);
 
 			if (sampler.lock()->getSound().lock()->isMono())
@@ -62,5 +68,19 @@ void ConvertSoundControls::function(int i)
 			newSampleName = sampler.lock()->addOrIncreaseNumber(newSampleName);
 			soundGui->setNewName(newSampleName);
 		}
+	}
+}
+
+void ConvertSoundScreen::displayConvert()
+{
+	auto soundGui = mpc.getUis().lock()->getSoundGui();
+
+	if (soundGui->getConvert() == 0 && sampler.lock()->getSound().lock()->isMono())
+	{
+		findField("convert").lock()->setText("MONO TO STEREO");
+	}
+	else
+	{
+		findField("convert").lock()->setText(convertNames[soundGui->getConvert()]);
 	}
 }
