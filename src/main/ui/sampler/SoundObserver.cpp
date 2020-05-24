@@ -16,7 +16,6 @@ using namespace std;
 
 SoundObserver::SoundObserver()
 {
-	
 	sampler = Mpc::instance().getSampler();
 	
 	qualityNames = vector<string>{ "LOW", "MED", "HIGH" };
@@ -56,17 +55,6 @@ SoundObserver::SoundObserver()
 		displayRSource();
 		displayNewStName();
 	}
-	else if (csn.compare("copysound") == 0) {
-		sndField = ls->lookupField("snd");
-		newNameField = ls->lookupField("newname");
-		displaySnd();
-		displayNewName();
-	}
-}
-
-void SoundObserver::displaySnd()
-{
-	sndField.lock()->setText(sampler.lock()->getSound().lock()->getName());
 }
 
 void SoundObserver::displayLSource()
@@ -184,9 +172,6 @@ void SoundObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 		}
 		else if (csn.compare("monotostereo") == 0) {
 			displayLSource();
-		}
-		else if (csn.compare("copysound") == 0) {
-			displaySnd();
 		}
 	}
 	else if (s.compare("newfs") == 0) {

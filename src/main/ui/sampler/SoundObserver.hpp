@@ -53,7 +53,6 @@ namespace mpc {
 				std::weak_ptr<mpc::lcdgui::Field> newStNameField{};
 
 			private:
-				void displaySnd();
 				void displayLSource();
 				void displayRSource();
 				void displayNewStName();
