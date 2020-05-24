@@ -1,26 +1,31 @@
-#include <controls/sampler/dialog/StereoToMonoControls.hpp>
+#include "StereoToMonoScreen.hpp"
 
 #include <ui/NameGui.hpp>
-#include <lcdgui/Field.hpp>
 #include <ui/sampler/SoundGui.hpp>
-#include <sampler/Sampler.hpp>
-#include <sampler/Sound.hpp>
 
-using namespace mpc::controls::sampler::dialog;
+using namespace mpc::lcdgui::screens::dialog;
 using namespace std;
 
-StereoToMonoControls::StereoToMonoControls()
-	: ScreenComponent("", layerIndex)
+StereoToMonoScreen::StereoToMonoScreen(const int layerIndex)
+	: ScreenComponent("stereotomono", layerIndex)
 {
 }
 
-void StereoToMonoControls::turnWheel(int i)
+void StereoToMonoScreen::open()
+{
+	displayNewLName();
+	displayNewRName();
+	displayStereoSource();
+}
+
+void StereoToMonoScreen::turnWheel(int i)
 {
 	init();
 	
 	if (param.compare("stereosource") == 0)
 	{
 		sampler.lock()->setSoundIndex(sampler.lock()->getNextSoundIndex(sampler.lock()->getSoundIndex(), i > 0));
+		displayStereoSource();
 	}
 	else if (param.compare("newlname") == 0)
 	{
@@ -36,7 +41,7 @@ void StereoToMonoControls::turnWheel(int i)
 	}
 }
 
-void StereoToMonoControls::function(int i)
+void StereoToMonoScreen::function(int i)
 {
 	init();
 		
@@ -57,6 +62,7 @@ void StereoToMonoControls::function(int i)
 		auto left = sampler.lock()->addSound(sound->getSampleRate()).lock();
 		auto right = sampler.lock()->addSound(sound->getSampleRate()).lock();
 
+		auto soundGui = mpc.getUis().lock()->getSoundGui();
 		left->setName(soundGui->getNewLName());
 		right->setName(soundGui->getNewRName());
 
@@ -80,3 +86,30 @@ void StereoToMonoControls::function(int i)
 	}
 	}
 }
+
+void StereoToMonoScreen::displayStereoSource()
+{
+	auto sound = sampler.lock()->getSound().lock();
+	findField("stereosource").lock()->setText(sound->getName());
+
+	if (sound->isMono())
+	{
+		ls.lock()->setFunctionKeysArrangement(1);
+	}
+	else {
+		ls.lock()->setFunctionKeysArrangement(0);
+	}
+}
+
+void StereoToMonoScreen::displayNewLName()
+{
+	auto soundGui = mpc.getUis().lock()->getSoundGui();
+	findField("newlname").lock()->setText(soundGui->getNewLName());
+}
+
+void StereoToMonoScreen::displayNewRName()
+{
+	auto soundGui = mpc.getUis().lock()->getSoundGui();
+	findField("newrname").lock()->setText(soundGui->getNewRName());
+}
+

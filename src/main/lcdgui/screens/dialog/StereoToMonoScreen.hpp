@@ -15,5 +15,10 @@ namespace mpc::lcdgui::screens::dialog
 
 		void open() override;
 
+	private:
+		void displayStereoSource();
+		void displayNewLName();
+		void displayNewRName();
+
 	};
 }

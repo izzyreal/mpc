@@ -1,4 +1,4 @@
-#include <controls/sampler/dialog/ResampleControls.hpp>
+#include "ResampleScreen.hpp"
 
 #include <ui/NameGui.hpp>
 #include <lcdgui/Field.hpp>
@@ -6,40 +6,56 @@
 #include <sampler/Sampler.hpp>
 #include <sampler/Sound.hpp>
 
-#include <Logger.hpp>
 #include <thirdp/libsamplerate/samplerate.h>
 
 #include <cmath>
 
-using namespace mpc::controls::sampler::dialog;
+using namespace mpc::lcdgui::screens::dialog;
 using namespace std;
 
-ResampleControls::ResampleControls()
-	: ScreenComponent("", layerIndex)
+ResampleScreen::ResampleScreen(const int layerIndex)
+	: ScreenComponent("resample", layerIndex)
 {
 }
 
-void ResampleControls::turnWheel(int i)
+void ResampleScreen::open()
+{
+	displayNewBit();
+	displayNewFs();
+	displayNewName();
+	displayQuality();
+}
+
+void ResampleScreen::turnWheel(int i)
 {
 	init();
 
-	if (param.compare("newfs") == 0) {
+	auto soundGui = mpc.getUis().lock()->getSoundGui();
+
+	if (param.compare("newfs") == 0)
+	{
 		soundGui->setNewFs(soundGui->getNewFs() + i);
+		displayNewFs();
 	}
-	else if (param.compare("newbit") == 0) {
+	else if (param.compare("newbit") == 0)
+	{
 		soundGui->setNewBit(soundGui->getNewBit() + i);
+		displayNewBit();
 	}
-	else if (param.compare("quality") == 0) {
+	else if (param.compare("quality") == 0)
+	{
 		soundGui->setQuality(soundGui->getQuality() + i);
+		displayQuality();
 	}
-	else if (param.compare("newname") == 0) {
+	else if (param.compare("newname") == 0)
+	{
 		nameGui->setName(ls.lock()->lookupField("newname").lock()->getText());
 		nameGui->setParameterName("newname");
 		ls.lock()->openScreen("name");
 	}
 }
 
-void ResampleControls::function(int i)
+void ResampleScreen::function(int i)
 {
 	init();
 	
@@ -49,6 +65,9 @@ void ResampleControls::function(int i)
 		ls.lock()->openScreen("sound");
 		break;
 	case 4:
+	{
+		auto soundGui = mpc.getUis().lock()->getSoundGui();
+
 		auto snd = sampler.lock()->getSound(sampler.lock()->getSoundIndex()).lock();
 		auto destSnd = sampler.lock()->addSound().lock();
 		destSnd->setName(soundGui->getNewName());
@@ -72,6 +91,7 @@ void ResampleControls::function(int i)
 			srcData.data_out = destArray;
 
 			auto error = src_simple(&srcData, 0, 1);
+
 			if (error != 0)
 			{
 				const char* errormsg = src_strerror(error);
@@ -83,7 +103,7 @@ void ResampleControls::function(int i)
 		{
 			*destSnd->getSampleData() = *source;
 		}
-		
+
 		for (auto& f : *destSnd->getSampleData())
 		{
 			if (f > 1)
@@ -113,4 +133,29 @@ void ResampleControls::function(int i)
 		ls.lock()->openScreen("sound");
 		break;
 	}
+	}
+}
+
+void ResampleScreen::displayNewFs()
+{
+	auto soundGui = mpc.getUis().lock()->getSoundGui();
+	findField("newfs").lock()->setText(to_string(soundGui->getNewFs()));
+}
+
+void ResampleScreen::displayQuality()
+{
+	auto soundGui = mpc.getUis().lock()->getSoundGui();
+	findField("quality").lock()->setText(qualityNames[soundGui->getQuality()]);
+}
+
+void ResampleScreen::displayNewBit()
+{
+	auto soundGui = mpc.getUis().lock()->getSoundGui();
+	findField("newbit").lock()->setText(bitNames[soundGui->getNewBit()]);
+}
+
+void ResampleScreen::displayNewName()
+{
+	auto soundGui = mpc.getUis().lock()->getSoundGui();
+	findField("newname").lock()->setText(soundGui->getNewName());
 }

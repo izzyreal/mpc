@@ -35,7 +35,6 @@
 
 #include <ui/sampler/MixerObserver.hpp>
 #include <ui/sampler/FxEditObserver.hpp>
-#include <ui/sampler/SoundObserver.hpp>
 
 #include <ui/sampler/SamplerGui.hpp>
 
