@@ -34,19 +34,8 @@ void LoopScreen::open()
 	twoDots->setVisible(2, false);
 	twoDots->setVisible(3, false);
 
-	if (sampler.lock()->getSoundCount() != 0)
+	if (!sampler.lock()->getSound().lock())
 	{
-		findField("dummy").lock()->setFocusable(false);
-		displayWave();
-		
-		auto sound = sampler.lock()->getSound().lock();
-		findWave().lock()->setSelection(sound->getLoopTo(), sound->getEnd());
-		auto soundGui = mpc.getUis().lock()->getSoundGui();
-		soundGui->initZones(sampler.lock()->getSound().lock()->getFrameCount());
-	}
-	else
-	{
-		findWave().lock()->setSampleData(nullptr, false, 0);
 		findField("snd").lock()->setFocusable(false);
 		findField("playx").lock()->setFocusable(false);
 		findField("to").lock()->setFocusable(false);
@@ -61,6 +50,7 @@ void LoopScreen::open()
 	displayEndLengthValue();
 	displayLoop();
 	displayTo();
+	displayWave();
 }
 
 void LoopScreen::openWindow()
@@ -175,6 +165,7 @@ void LoopScreen::turnWheel(int i)
 		displayEndLength();
 		displayEndLengthValue();
 		displayTo();
+		displayWave();
     }
     else if (param.compare("endlengthvalue") == 0)
 	{
@@ -193,6 +184,7 @@ void LoopScreen::turnWheel(int i)
 		displayEndLength();
 		displayEndLengthValue();
 		displayTo();
+		displayWave();
     }
 	else if (param.compare("playx") == 0)
 	{
@@ -209,6 +201,7 @@ void LoopScreen::turnWheel(int i)
 		soundGui->setEndSelected(i > 0);
 		displayEndLength();
 		displayEndLengthValue();
+		displayWave();
 
 	}
 	else if (param.compare("snd") == 0 && i > 0)
@@ -271,6 +264,7 @@ void LoopScreen::setSlider(int i)
 		displayEndLength();
 		displayEndLengthValue();
 		displayTo();
+		displayWave();
 	}
 	else if (param.compare("endlengthvalue") == 0)
 	{
@@ -290,6 +284,7 @@ void LoopScreen::setSlider(int i)
 		displayEndLength();
 		displayEndLengthValue();
 		displayTo();
+		displayWave();
 	}
 }
 
@@ -335,13 +330,16 @@ void LoopScreen::pressEnter()
 			{
 				return;
 			}
-	
+
 			sound->setLoopTo(candidate);
-			
+
 			if (lengthFix)
 			{
 				sound->setEnd(sound->getLoopTo() + oldLength);
 			}
+			displayEndLengthValue();
+			displayEndLength();
+			displayWave();
 		}
 		else if (param.compare("endlengthvalue") == 0)
 		{
@@ -355,33 +353,38 @@ void LoopScreen::pressEnter()
 			{
 				sound->setLoopTo(sound->getEnd() - oldLength);
 			}
+			displayEndLength();
+			displayEndLengthValue();
+			displayTo();
+			displayWave();
 		}
 	}
 }
 
 void LoopScreen::displaySnd()
 {
-	if (sampler.lock()->getSoundCount() != 0)
+	auto sound = sampler.lock()->getSound().lock();
+
+	if (!sound)
 	{
-		if (ls.lock()->getFocus().compare("dummy") == 0)
-		{
-			ls.lock()->setFocus(findField("snd").lock()->getName());
-		}
-
-		auto sound = sampler.lock()->getSound().lock();
-
-		auto sampleName = sound->getName();
-
-		if (!sound->isMono())
-		{
-			sampleName = StrUtil::padRight(sampleName, " ", 16) + "(ST)";
-		}
-		findField("snd").lock()->setText(sampleName);
-	}
-	else {
 		findField("snd").lock()->setText("(no sound)");
 		ls.lock()->setFocus("dummy");
+		return;
 	}
+
+	if (ls.lock()->getFocus().compare("dummy") == 0)
+	{
+		ls.lock()->setFocus(findField("snd").lock()->getName());
+	}
+
+	auto sampleName = sound->getName();
+
+	if (!sound->isMono())
+	{
+		sampleName = StrUtil::padRight(sampleName, " ", 16) + "(ST)";
+	}
+
+	findField("snd").lock()->setText(sampleName);
 }
 
 void LoopScreen::displayPlayX()
@@ -449,10 +452,18 @@ void LoopScreen::displayLoop()
 
 void LoopScreen::displayWave()
 {
-	auto sampleData = sampler.lock()->getSound().lock()->getSampleData();
+	auto sound = sampler.lock()->getSound().lock();
+
+	if (!sound)
+	{
+		findWave().lock()->setSampleData(nullptr, true, 0);
+		findWave().lock()->setSelection(0, 0);
+		return;
+	}
+
+	auto sampleData = sound->getSampleData();
 	auto soundGui = mpc.getUis().lock()->getSoundGui();
 
-	auto sound = sampler.lock()->getSound().lock();
 	findWave().lock()->setSampleData(sampleData, sound->isMono(), soundGui->getView());
-	findWave().lock()->setSelection(sound->getStart(), sound->getLoopTo());
+	findWave().lock()->setSelection(sound->getLoopTo(), sound->getEnd());
 }

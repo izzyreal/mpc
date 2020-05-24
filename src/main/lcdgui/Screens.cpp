@@ -32,7 +32,7 @@
 #include <lcdgui/screens/TrimScreen.hpp>
 #include <lcdgui/screens/ZoneScreen.hpp>
 
-
+#include <lcdgui/screens/window/NumberOfZonesScreen.hpp>
 #include <lcdgui/screens/window/InitPadAssignScreen.hpp>
 #include <lcdgui/screens/window/SequenceScreen.hpp>
 #include <lcdgui/screens/window/TempoChangeScreen.hpp>
@@ -446,9 +446,13 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	{
 		screen = make_shared<LoopScreen>(layerIndex);
 	}
-	else if (screenName.compare("zone") == 0 || screenName.compare("numberofzones") == 0)
+	else if (screenName.compare("zone") == 0)
 	{
 		screen = make_shared<ZoneScreen>(layerIndex);
+	}
+	else if (screenName.compare("numberofzones") == 0)
+	{
+		screen = make_shared<NumberOfZonesScreen>(layerIndex);
 	}
 	else if (screenName.compare("params") == 0)
 	{

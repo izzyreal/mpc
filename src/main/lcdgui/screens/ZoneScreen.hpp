@@ -13,8 +13,19 @@ namespace mpc::lcdgui::screens {
 		void turnWheel(int i) override;
 
 		ZoneScreen(const int layerIndex);
+
 		void open() override;
-		void waveformLoadData();
+		
+	private:
+		void displayWave();
+		void displaySnd();
+		void displayPlayX();
+		void displaySt();
+		void displayEnd();
+		void displayZone();
+
+	private:
+		const std::vector<std::string> playXNames = { "ALL", "ZONE", "BEFOR ST", "BEFOR TO", "AFTR END" };
 
 	};
 }

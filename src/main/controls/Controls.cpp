@@ -23,7 +23,6 @@
 #include <controls/sampler/window/EditSoundControls.hpp>
 #include <controls/sampler/window/KeepOrRetryControls.hpp>
 #include <controls/sampler/window/MuteAssignControls.hpp>
-#include <controls/sampler/window/NumberOfZonesControls.hpp>
 #include <controls/sampler/window/ProgramControls.hpp>
 #include <controls/sampler/window/SoundControls.hpp>
 #include <controls/sampler/window/VeloEnvFilterControls.hpp>
@@ -89,7 +88,6 @@ Controls::Controls()
 
 	controls["release"] = new GlobalReleaseControls();
 
-	controls["numberofzones"] = new sampler::window::NumberOfZonesControls();
 	controls["editsound"] = new sampler::window::EditSoundControls();
 
 	controls["keeporretry"] = new sampler::window::KeepOrRetryControls();

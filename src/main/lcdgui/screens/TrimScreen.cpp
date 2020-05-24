@@ -31,19 +31,8 @@ void TrimScreen::open()
 	addChild(move(make_shared<TwoDots>()));
 	addChild(move(make_shared<Wave>()));
 
-	if (sampler.lock()->getSoundCount() != 0)
+	if (!sampler.lock()->getSound().lock())
 	{
-		findField("dummy").lock()->setFocusable(false);
-		displayWave();
-
-		auto sound = sampler.lock()->getSound().lock();
-		findWave().lock()->setSelection(sound->getLoopTo(), sound->getEnd());
-		auto soundGui = mpc.getUis().lock()->getSoundGui();
-		soundGui->initZones(sampler.lock()->getSound().lock()->getFrameCount());
-	}
-	else
-	{
-		findWave().lock()->setSampleData(nullptr, false, 0);
 		findField("snd").lock()->setFocusable(false);
 		findField("playx").lock()->setFocusable(false);
 		findField("end").lock()->setFocusable(false);
@@ -56,6 +45,7 @@ void TrimScreen::open()
 	displaySt();
 	displayEnd();
 	displayView();
+	displayWave();
 }
 
 void TrimScreen::openWindow()
@@ -165,6 +155,7 @@ void TrimScreen::turnWheel(int i)
 			sound->setEnd(sound->getStart() + oldLength);
 			displayEnd();
 		}
+		displayWave();
 	}
 	else if (param.compare("end") == 0)
 	{
@@ -182,11 +173,13 @@ void TrimScreen::turnWheel(int i)
 			sound->setStart(sound->getEnd() - oldLength);
 			displaySt();
 		}
+		displayWave();
 	}
 	else if (param.compare("view") == 0)
 	{
 		soundGui->setView(soundGui->getView() + i);
 		displayView();
+		displayWave();
 	}
 	else if (param.compare("playx") == 0)
 	{
@@ -246,6 +239,7 @@ void TrimScreen::setSlider(int i)
 		{
 			sound->setEnd(sound->getStart() + oldLength);
 		}
+		displayWave();
 	}
 	else if (param.compare("end") == 0)
 	{
@@ -262,6 +256,7 @@ void TrimScreen::setSlider(int i)
 		{
 			sound->setStart(sound->getEnd() - oldLength);
 		}
+		displayWave();
 	}
 }
 
@@ -313,8 +308,10 @@ void TrimScreen::pressEnter()
 			{
 				sound->setEnd(sound->getStart() + oldLength);
 			}
+			displayWave();
 		}
-		else if (param.compare("end") == 0) {
+		else if (param.compare("end") == 0)
+		{
 			if (lengthFix && candidate - oldLength < 0)
 			{
 				return;
@@ -326,6 +323,7 @@ void TrimScreen::pressEnter()
 			{
 				sound->setStart(sound->getEnd() - oldLength);
 			}
+			displayWave();
 		}
 	}
 }
@@ -333,35 +331,45 @@ void TrimScreen::pressEnter()
 void TrimScreen::displayWave()
 {
 	auto sound = sampler.lock()->getSound().lock();
+
+	if (!sound)
+	{
+		findWave().lock()->setSampleData(nullptr, true, 0);
+		findWave().lock()->setSelection(0, 0);
+		return;
+	}
+
 	auto sampleData = sound->getSampleData();
 	auto soundGui = mpc.getUis().lock()->getSoundGui();
+
 	findWave().lock()->setSampleData(sampleData, sound->isMono(), soundGui->getView());
 	findWave().lock()->setSelection(sound->getStart(), sound->getEnd());
 }
 
 void TrimScreen::displaySnd()
 {
-	if (sampler.lock()->getSoundCount() != 0)
+	auto sound = sampler.lock()->getSound().lock();
+
+	if (!sound)
 	{
-		if (ls.lock()->getFocus().compare("dummy") == 0)
-		{
-			ls.lock()->setFocus(findField("snd").lock()->getName());
-		}
-
-		auto sound = sampler.lock()->getSound().lock();
-
-		auto sampleName = sound->getName();
-
-		if (!sound->isMono())
-		{
-			sampleName = StrUtil::padRight(sampleName, " ", 16) + "(ST)";
-		}
-		findField("snd").lock()->setText(sampleName);
-	}
-	else {
 		findField("snd").lock()->setText("(no sound)");
 		ls.lock()->setFocus("dummy");
+		return;
 	}
+
+	if (ls.lock()->getFocus().compare("dummy") == 0)
+	{
+		ls.lock()->setFocus(findField("snd").lock()->getName());
+	}
+
+
+	auto sampleName = sound->getName();
+
+	if (!sound->isMono())
+	{
+		sampleName = StrUtil::padRight(sampleName, " ", 16) + "(ST)";
+	}
+	findField("snd").lock()->setText(sampleName);
 }
 
 
