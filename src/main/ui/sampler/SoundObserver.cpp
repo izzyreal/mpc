@@ -30,10 +30,6 @@ SoundObserver::SoundObserver()
 		typeLabel = ls->lookupLabel("type");
 		rateLabel = ls->lookupLabel("rate");
 		sizeLabel = ls->lookupLabel("size");
-		displaySoundName();
-		displayType();
-		displayRate();
-		displaySize();
 	}
 	else if (csn.compare("deletesound") == 0) {
 		sndField = ls->lookupField("snd");
@@ -193,58 +189,11 @@ void SoundObserver::displayDeleteSoundSnd()
     sndField.lock()->setText(sampler.lock()->getSound().lock()->getName());
 }
 
-void SoundObserver::displaySoundName()
-{
-	if (sampler.lock()->getSoundIndex() == -1)
-	{
-		soundNameField.lock()->setText("");
-		return;
-	}
-	soundNameField.lock()->setText(sampler.lock()->getSound().lock()->getName());
-}
-
-void SoundObserver::displayType()
-{
-	if (sampler.lock()->getSoundIndex() == -1)
-	{
-		typeLabel.lock()->setText("");
-		return;
-	}
-	auto mono = sampler.lock()->getSound().lock()->isMono();
-	typeLabel.lock()->setText("Type:" + string(mono ? "MONO" : "STEREO"));
-}
-
-void SoundObserver::displayRate()
-{
-	if (sampler.lock()->getSoundIndex() == -1)
-	{
-		rateLabel.lock()->setText("");
-		return;
-	}
-	rateLabel.lock()->setText("Rate: " + to_string(dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getSound().lock())->getSampleRate()) + "Hz");
-}
-
-void SoundObserver::displaySize()
-{
-	if (sampler.lock()->getSoundIndex() == -1)
-	{
-		sizeLabel.lock()->setText("");
-		return;
-	}
-	sizeLabel.lock()->setText("Size:" + moduru::lang::StrUtil::padLeft(to_string(sampler.lock()->getSound().lock()->getSampleData()->size() / 500), " ", 4) + "kbytes");
-}
-
 void SoundObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 {
 	string s = nonstd::any_cast<string>(arg);
 	if (s.compare("soundindex") == 0) {
-		if (csn.compare("sound") == 0) {
-			displaySoundName();
-			displayType();
-			displayRate();
-			displaySize();
-		}
-		else if (csn.compare("deletesound") == 0) {
+		if (csn.compare("deletesound") == 0) {
 			displayDeleteSoundSnd();
 		}
 		else if (csn.compare("stereotomono") == 0) {

@@ -24,7 +24,6 @@
 #include <controls/sampler/window/KeepOrRetryControls.hpp>
 #include <controls/sampler/window/MuteAssignControls.hpp>
 #include <controls/sampler/window/ProgramControls.hpp>
-#include <controls/sampler/window/SoundControls.hpp>
 #include <controls/sampler/window/VeloEnvFilterControls.hpp>
 #include <controls/sampler/window/VeloPitchControls.hpp>
 #include <controls/sampler/window/VelocityModulationControls.hpp>
@@ -98,7 +97,6 @@ Controls::Controls()
 	controls["muteassign"] = new sampler::window::MuteAssignControls();
 	controls["velopitch"] = new sampler::window::VeloPitchControls();
 	controls["velocitymodulation"] = new sampler::window::VelocityModulationControls();
-	controls["sound"] = new sampler::window::SoundControls();
 	controls["autochromaticassignment"] = new sampler::window::AutoChromaticAssignmentControls();
 
 	controls["createnewprogram"] = new sampler::dialog::CreateNewProgramControls();

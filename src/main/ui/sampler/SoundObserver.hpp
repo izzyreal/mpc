@@ -68,10 +68,6 @@ namespace mpc {
 				void displayNewName();
 				void displayConvert();
 				void displayDeleteSoundSnd();
-				void displaySoundName();
-				void displayType();
-				void displayRate();
-				void displaySize();
 
 			public:
 				void update(moduru::observer::Observable* o, nonstd::any arg) override;
