@@ -14,10 +14,6 @@ namespace mpc {
 					typedef mpc::controls::mixer::AbstractMixerControls super;
 					void turnWheel(int increment) override;
 
-				public:
-					ChannelSettingsControls();
-					~ChannelSettingsControls();
-
 				};
 
 			}

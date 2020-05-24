@@ -4,7 +4,6 @@
 #include <Util.hpp>
 #include <Paths.hpp>
 
-#include <ui/sampler/MixerGui.hpp>
 #include <ui/sampler/MixerSetupGui.hpp>
 #include <ui/sampler/SamplerGui.hpp>
 
@@ -15,6 +14,7 @@
 
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/DrumScreen.hpp>
+#include <lcdgui/screens/MixerScreen.hpp>
 #include <lcdgui/Field.hpp>
 
 #include <mpc/MpcSoundPlayerChannel.hpp>
@@ -40,8 +40,6 @@ ChannelSettingsObserver::ChannelSettingsObserver()
 	samplerGui = uis->getSamplerGui();
 	samplerGui->addObserver(this);
 	bank = samplerGui->getBank();
-	mixGui = uis->getMixerGui();
-	mixGui->addObserver(this);
 	ls = Mpc::instance().getLayeredScreen();
 	auto lLs = ls.lock();
 	sampler = Mpc::instance().getSampler();
@@ -218,14 +216,14 @@ void ChannelSettingsObserver::displayFxPath() {
 
 void ChannelSettingsObserver::displayFollowStereo() {
 	auto lProgram = program.lock();
-	auto mixerChannel = lProgram->getPad(mixGui->getXPos() + (bank * 16))->getIndivFxMixerChannel();
+	auto mixerScreen = dynamic_pointer_cast<MixerScreen>(Screens::getScreenComponent("mixer"));
+	auto mixerChannel = lProgram->getPad(mixerScreen->getXPos() + (bank * 16))->getIndivFxMixerChannel();
 	auto lMc = mixerChannel.lock();
 	followStereoField.lock()->setText(lMc->isFollowingStereo() ? "YES" : "NO");
 }
 
 ChannelSettingsObserver::~ChannelSettingsObserver() {
 	mixerSetupGui->deleteObserver(this);
-	mixGui->deleteObserver(this);
 	samplerGui->deleteObserver(this);
 
 	for (int i = (bank * 16); i < (bank * 16) + 16; i++) {

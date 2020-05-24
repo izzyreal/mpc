@@ -33,7 +33,6 @@
 
 #include <ui/Uis.hpp>
 
-#include <ui/sampler/MixerObserver.hpp>
 #include <ui/sampler/FxEditObserver.hpp>
 
 #include <ui/sampler/SamplerGui.hpp>
@@ -805,10 +804,6 @@ void LayeredScreen::initObserver()
 	else if (csn.compare("directory") == 0)
 	{
 		activeObserver = make_unique<DirectoryObserver>(Mpc::instance().getDisk());
-	}
-	else if (csn.compare("mixer") == 0 || csn.compare("mixersetup") == 0)
-	{
-		activeObserver = make_unique<MixerObserver>();
 	}
 	else if (csn.compare("fxedit") == 0)
 	{

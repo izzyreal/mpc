@@ -1,7 +1,6 @@
 #include <controls/mixer/SelectDrumMixerControls.hpp>
 
 #include <ui/sampler/SamplerGui.hpp>
-#include <ui/sampler/MixerGui.hpp>
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/DrumScreen.hpp>
 

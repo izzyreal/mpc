@@ -34,7 +34,6 @@ namespace mpc::ui::disk::window {
 namespace mpc::ui::sampler {
 	class SamplerGui;
 	class SoundGui;
-	class MixerGui;
 	class MixerSetupGui;
 }
 
@@ -57,7 +56,6 @@ namespace mpc::ui {
 		mpc::ui::NameGui* nameGui = nullptr;
 		mpc::ui::sampler::SoundGui* soundGui = nullptr;
 		mpc::ui::sampler::SamplerGui* samplerGui = nullptr;
-		mpc::ui::sampler::MixerGui* mixerGui = nullptr;
 		mpc::ui::sampler::MixerSetupGui* mixerSetupGui = nullptr;
 
 		mpc::ui::sampler::window::EditSoundGui* editSoundGui = nullptr;
@@ -80,7 +78,6 @@ namespace mpc::ui {
 		mpc::ui::vmpc::DirectToDiskRecorderGui* d2dRecorderGui = nullptr;
 
 	public:
-		mpc::ui::sampler::MixerGui* getMixerGui();
 		mpc::ui::midisync::MidiSyncGui* getMidiSyncGui();
 		mpc::ui::sampler::SoundGui* getSoundGui();
 		mpc::ui::sampler::window::EditSoundGui* getEditSoundGui();

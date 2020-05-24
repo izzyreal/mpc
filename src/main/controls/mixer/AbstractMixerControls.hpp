@@ -15,7 +15,6 @@ namespace mpc {
 
 	namespace ui {
 		namespace sampler {
-			class MixerGui;
 			class MixerSetupGui;
 		}
 	}
@@ -31,7 +30,6 @@ namespace mpc {
 				typedef mpc::controls::BaseControls super;
 
 			protected:
-				mpc::ui::sampler::MixerGui* mixerGui{ nullptr };
 				mpc::ui::sampler::MixerSetupGui* mixerSetupGui{ nullptr };
 				std::weak_ptr<ctoot::mpc::MpcStereoMixerChannel> stereoMixerChannel;
 				std::weak_ptr<ctoot::mpc::MpcIndivFxMixerChannel> indivFxMixerChannel;
@@ -41,7 +39,6 @@ namespace mpc {
 
 			public:
 				AbstractMixerControls();
-				virtual ~AbstractMixerControls();
 
 			};
 

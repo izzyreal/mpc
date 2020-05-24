@@ -13,7 +13,6 @@
 #include <ui/midisync/MidiSyncGui.hpp>
 
 #include <ui/sampler/MixerSetupGui.hpp>
-#include <ui/sampler/MixerGui.hpp>
 #include <ui/sampler/SamplerGui.hpp>
 #include <ui/sampler/SoundGui.hpp>
 
@@ -65,7 +64,6 @@ Uis::Uis()
 	nameGui = new mpc::ui::NameGui();
 	soundGui = new mpc::ui::sampler::SoundGui();
 
-	mixerGui = new mpc::ui::sampler::MixerGui();
 	mixerSetupGui = new mpc::ui::sampler::MixerSetupGui();
 
 	editSoundGui = new mpc::ui::sampler::window::EditSoundGui();
@@ -87,11 +85,6 @@ Uis::Uis()
 }
 
 vector<string> Uis::noteNames;
-
-mpc::ui::sampler::MixerGui* Uis::getMixerGui()
-{
-	return mixerGui;
-}
 
 mpc::ui::midisync::MidiSyncGui* Uis::getMidiSyncGui()
 {
@@ -185,7 +178,6 @@ Uis::~Uis()
 	if (editSoundGui != nullptr) delete editSoundGui;
 	if (zoomGui != nullptr) delete zoomGui;
 	if (samplerWindowGui != nullptr) delete samplerWindowGui;
-	if (mixerGui != nullptr) delete mixerGui;
 	if (diskGui != nullptr) delete diskGui;
 	if (directoryGui != nullptr) delete directoryGui;
 	if (diskWindowGui != nullptr) delete diskWindowGui;

@@ -1,6 +1,5 @@
 #include <controls/mixer/window/ChannelSettingsControls.hpp>
 
-#include <ui/sampler/MixerGui.hpp>
 #include <ui/sampler/SamplerGui.hpp>
 #include <sampler/Program.hpp>
 #include <mpc/MpcStereoMixerChannel.hpp>
@@ -8,11 +7,6 @@
 
 using namespace mpc::controls::mixer::window;
 using namespace std;
-
-ChannelSettingsControls::ChannelSettingsControls()
-	: AbstractMixerControls()
-{
-}
 
 void ChannelSettingsControls::turnWheel(int i)
 {
@@ -47,7 +41,4 @@ void ChannelSettingsControls::turnWheel(int i)
 	else if (param.compare("followstereo") == 0) {
 		ifmc->setFollowStereo(true);
 	}
-}
-
-ChannelSettingsControls::~ChannelSettingsControls() {
 }

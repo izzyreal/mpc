@@ -4,14 +4,8 @@
 
 #include <ui/sampler/SamplerGui.hpp>
 
-#include <lcdgui/Label.hpp>
-
-#include <lang/StrUtil.hpp>
-
 using namespace mpc::lcdgui::screens;
-
 using namespace moduru::lang;
-
 using namespace std;
 
 NextSeqPadScreen::NextSeqPadScreen(const int& layer)

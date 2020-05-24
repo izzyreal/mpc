@@ -31,6 +31,8 @@
 #include <lcdgui/screens/SndParamsScreen.hpp>
 #include <lcdgui/screens/TrimScreen.hpp>
 #include <lcdgui/screens/ZoneScreen.hpp>
+#include <lcdgui/screens/MixerScreen.hpp>
+#include <lcdgui/screens/MixerSetupScreen.hpp>
 
 #include <lcdgui/screens/window/NumberOfZonesScreen.hpp>
 #include <lcdgui/screens/window/InitPadAssignScreen.hpp>
@@ -508,6 +510,14 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	else if (screenName.compare("stereotomono") == 0)
 	{
 		screen = make_shared<StereoToMonoScreen>(layerIndex);
+	}
+	else if (screenName.compare("mixer") == 0)
+	{
+		screen = make_shared<MixerScreen>(layerIndex);
+	}
+	else if (screenName.compare("mixersetup") == 0)
+	{
+		screen = make_shared<MixerSetupScreen>(layerIndex);
 	}
 
 	if (screen)
