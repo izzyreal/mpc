@@ -33,7 +33,7 @@ namespace mpc::sampler {
 
 	private:
 		int inputLevel = 0;
-		int soundIndex = 0;
+		int soundIndex = -1;
 		std::string previousScreenName = "";
 
 	public:

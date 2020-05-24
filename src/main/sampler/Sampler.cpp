@@ -65,7 +65,7 @@ int Sampler::getSoundIndex()
 
 weak_ptr<Sound> Sampler::getSound()
 {
-	if (soundIndex >= sounds.size())
+	if (soundIndex < 0)
 	{
 		return {};
 	}
@@ -832,15 +832,15 @@ void Sampler::purge()
 			deleteSound(s);
 		}
 	}
+
+	soundIndex = -1;
 }
 
 void Sampler::deleteSound(weak_ptr<Sound> sound)
 {
-	auto lSound = sound.lock();
-
 	for (int i = 0; i < sounds.size(); i++)
 	{
-		if (sounds[i] == lSound)
+		if (sounds[i] == sound.lock())
 		{
 			sounds.erase(sounds.begin() + i);
 			break;
@@ -865,6 +865,11 @@ void Sampler::deleteSound(weak_ptr<Sound> sound)
 	case 2:
 		stable_sort(sounds.begin(), sounds.end(), compareSize);
 		break;
+	}
+
+	if (soundIndex >= sounds.size())
+	{
+		soundIndex--;
 	}
 }
 
