@@ -69,7 +69,7 @@
 #include <lcdgui/screens/dialog/ConvertSoundScreen.hpp>
 #include <lcdgui/screens/dialog/CopySoundScreen.hpp>
 #include <lcdgui/screens/dialog/DeleteSoundScreen.hpp>
-//#include <lcdgui/screens/dialog/MonoToStereoScreen.hpp>
+#include <lcdgui/screens/dialog/MonoToStereoScreen.hpp>
 //#include <lcdgui/screens/dialog/ResampleScreen.hpp>
 //#include <lcdgui/screens/dialog/StereoToMonoScreen.hpp>
 
@@ -498,7 +498,10 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	{
 		screen = make_shared<DeleteSoundScreen>(layerIndex);
 	}
-
+	else if (screenName.compare("monotostereo") == 0)
+	{
+		screen = make_shared<MonoToStereoScreen>(layerIndex);
+	}
 
 	if (screen)
 	{

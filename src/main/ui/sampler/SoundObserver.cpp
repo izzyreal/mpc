@@ -43,62 +43,8 @@ SoundObserver::SoundObserver()
 		displayNewLName();
 		displayNewRName();
 	}
-	else if (csn.compare("monotostereo") == 0) {
-		lSourceField = ls->lookupField("lsource");
-		rSourceField = ls->lookupField("rsource");
-		newStNameField = ls->lookupField("newstname");
-		displayLSource();
-		displayRSource();
-		displayNewStName();
-	}
 }
 
-void SoundObserver::displayLSource()
-{
-	auto lSampler = sampler.lock();
-	auto ls = Mpc::instance().getLayeredScreen().lock();
-	lSourceField.lock()->setText(lSampler->getSound().lock()->getName());
-	if (lSampler->getSound().lock()->isMono() && lSampler->getSound(soundGui->getRSource()).lock()->isMono()) {
-		//ls->setFunctionKeysArrangement("monotostereo");
-		//ls->getWave().lock()->SetDirty();
-		//ls->getLayer(0)->setDirty();
-		//ls->getLayer(1)->setDirty();
-		//ls->getLayer(2)->setDirty();
-	}
-	else {
-		ls->setFunctionKeysArrangement(1);
-		//ls->getWave().lock()->SetDirty();
-		//ls->getLayer(0)->setDirty();
-		//ls->getLayer(1)->setDirty();
-		//ls->getLayer(2)->setDirty();
-	}
-}
-
-void SoundObserver::displayRSource()
-{
-	auto lSampler = sampler.lock();
-	auto ls = Mpc::instance().getLayeredScreen().lock();
-	rSourceField.lock()->setText(lSampler->getSoundName(soundGui->getRSource()));
-	if (lSampler->getSound().lock()->isMono() && lSampler->getSound(soundGui->getRSource()).lock()->isMono()) {
-		//ls->setFunctionKeysArrangement("monotostereo");
-		//ls->getWave().lock()->SetDirty();
-		//ls->getLayer(0)->setDirty();
-		//ls->getLayer(1)->setDirty();
-		//ls->getLayer(2)->setDirty();
-	}
-	else {
-		ls->setFunctionKeysArrangement(1);
-		//ls->getWave().lock()->SetDirty();
-		//ls->getLayer(0)->setDirty();
-		//ls->getLayer(1)->setDirty();
-		//ls->getLayer(2)->setDirty();
-	}
-}
-
-void SoundObserver::displayNewStName()
-{
-    newStNameField.lock()->setText(soundGui->getNewStName());
-}
 
 void SoundObserver::displayStereoSource()
 {
@@ -158,9 +104,6 @@ void SoundObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 		if (csn.compare("stereotomono") == 0) {
 			displayStereoSource();
 		}
-		else if (csn.compare("monotostereo") == 0) {
-			displayLSource();
-		}
 	}
 	else if (s.compare("newfs") == 0) {
 		displayNewFs();
@@ -176,11 +119,6 @@ void SoundObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 	}
 	else if (s.compare("stereosource") == 0) {
 		displayStereoSource();
-	}
-	else if (s.compare("rsource") == 0) {
-		if (csn.compare("monotostereo") == 0) {
-			displayRSource();
-		}
 	}
 }
 
