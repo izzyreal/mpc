@@ -65,6 +65,11 @@ int Sampler::getSoundIndex()
 
 weak_ptr<Sound> Sampler::getSound()
 {
+	if (soundIndex >= sounds.size())
+	{
+		return {};
+	}
+
 	return sounds[soundIndex];
 }
 
