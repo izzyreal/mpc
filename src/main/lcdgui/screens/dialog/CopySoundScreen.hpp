@@ -1,6 +1,11 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
+namespace mpc::controls::other::dialog
+{
+	class NameControls;
+}
+
 namespace mpc::lcdgui::screens::dialog
 {
 
@@ -19,6 +24,12 @@ namespace mpc::lcdgui::screens::dialog
 	private:
 		void displaySnd();
 		void displayNewName();
+
+		std::string newName = "";
+		void setNewName(std::string s);
+
+	private:
+		friend class mpc::controls::other::dialog::NameControls;
 
 	};
 }

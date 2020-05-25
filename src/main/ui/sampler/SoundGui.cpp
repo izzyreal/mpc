@@ -17,18 +17,6 @@ int SoundGui::getConvert()
     return convert;
 }
 
-void SoundGui::setNewName(string s)
-{
-    newName = s;
-    setChanged();
-    notifyObservers(string("newname"));
-}
-
-string SoundGui::getNewName()
-{
-    return newName;
-}
-
 void SoundGui::setNewLName(string s)
 {
     newLName = s;

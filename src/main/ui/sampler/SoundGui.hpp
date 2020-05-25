@@ -27,8 +27,6 @@ namespace mpc::ui::sampler {
 	public:
 		void setConvert(int i);
 		int getConvert();
-		void setNewName(std::string s);
-		std::string getNewName();
 		void setNewLName(std::string s);
 		std::string getNewLName();
 		void setNewRName(std::string s);

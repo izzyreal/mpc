@@ -20,6 +20,15 @@ ResampleScreen::ResampleScreen(const int layerIndex)
 
 void ResampleScreen::open()
 {
+	auto previousScreenName = ls.lock()->getPreviousScreenName();
+
+	if (previousScreenName.compare("name") != 0)
+	{
+		newName = sampler.lock()->getSound().lock()->getName();
+		//newSampleName = newSampleName->replaceAll("\\s+$", "");
+		newName = sampler.lock()->addOrIncreaseNumber(newName);
+	}
+
 	setNewFs(sampler.lock()->getSound().lock()->getSampleRate());
 	displayNewBit();
 	displayNewFs();
@@ -65,7 +74,7 @@ void ResampleScreen::function(int i)
 		auto soundGui = mpc.getUis().lock()->getSoundGui();
 		auto snd = sampler.lock()->getSound(sampler.lock()->getSoundIndex()).lock();
 		auto destSnd = sampler.lock()->addSound().lock();
-		destSnd->setName(soundGui->getNewName());
+		destSnd->setName(newName);
 
 		auto source = snd->getSampleData();
 
@@ -113,7 +122,7 @@ void ResampleScreen::function(int i)
 
 		destSnd->setSampleRate(newFs);
 		destSnd->setMono(snd->isMono());
-		destSnd->setName(soundGui->getNewName());
+		destSnd->setName(newName);
 
 		if (newBit == 1)
 		{
@@ -149,7 +158,7 @@ void ResampleScreen::displayNewBit()
 void ResampleScreen::displayNewName()
 {
 	auto soundGui = mpc.getUis().lock()->getSoundGui();
-	findField("newname").lock()->setText(soundGui->getNewName());
+	findField("newname").lock()->setText(newName);
 }
 
 void ResampleScreen::setNewFs(int i)
@@ -185,3 +194,8 @@ void ResampleScreen::setNewBit(int i)
 	displayNewBit();
 }
 
+void ResampleScreen::setNewName(string s)
+{
+	newName = s;
+	displayNewName();
+}

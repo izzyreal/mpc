@@ -1,6 +1,11 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
+namespace mpc::controls::other::dialog
+{
+	class NameControls;
+}
+
 namespace mpc::lcdgui::screens::dialog
 {
 	class ResampleScreen
@@ -27,11 +32,15 @@ namespace mpc::lcdgui::screens::dialog
 		void setNewFs(int i);
 		void setQuality(int i);
 		void setNewBit(int i);
-
+		void setNewName(std::string s);
+		
+		std::string newName = "";
 		int newFs = 44100;
 		int quality = 0;
 		int newBit = 0;
 
+	private:
+		friend class mpc::controls::other::dialog::NameControls;
 
 	};
 }

@@ -163,7 +163,7 @@ vector<string> screenNames = {
 "deletefile",
 "createnewprogram",
 "copyprogram",
-"copysound",
+"copy-sound",
 "deleteallprograms",
 "deletesound",
 "deleteallsound",

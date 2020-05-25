@@ -60,12 +60,9 @@ void ConvertSoundScreen::function(int i)
 				ls.lock()->openScreen("stereotomono");
 			}
 		}
-		else {
+		else
+		{
 			ls.lock()->openScreen("resample");
-			auto newSampleName = sampler.lock()->getSound().lock()->getName();
-			//newSampleName = newSampleName->replaceAll("\\s+$", "");
-			newSampleName = sampler.lock()->addOrIncreaseNumber(newSampleName);
-			soundGui->setNewName(newSampleName);
 		}
 	}
 }

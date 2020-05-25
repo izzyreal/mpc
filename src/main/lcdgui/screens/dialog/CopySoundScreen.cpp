@@ -7,12 +7,20 @@ using namespace mpc::lcdgui::screens::dialog;
 using namespace std;
 
 CopySoundScreen::CopySoundScreen(const int layerIndex) 
-	: ScreenComponent("copysound", layerIndex)
+	: ScreenComponent("copy-sound", layerIndex)
 {
 }
 
 void CopySoundScreen::open()
 {
+	auto previousScreenName = ls.lock()->getPreviousScreenName();
+
+	if (previousScreenName.compare("name") != 0)
+	{
+		newName = sampler.lock()->getSound().lock()->getName();
+		//newSampleName = newSampleName->replaceAll("\\s+$", "");
+		newName = sampler.lock()->addOrIncreaseNumber(newName);
+	}
 	displaySnd();
 	displayNewName();
 }
@@ -30,7 +38,7 @@ void CopySoundScreen::function(int i)
 		auto soundGui = mpc.getUis().lock()->getSoundGui();
 		auto sound = sampler.lock()->getSound().lock();
 		auto newSound = sampler.lock()->copySound(sound);
-		newSound.lock()->setName(soundGui->getNewName());
+		newSound.lock()->setName(newName);
 		sampler.lock()->setSoundIndex(sampler.lock()->getSoundCount() - 1);
 		ls.lock()->openScreen("sound");
 		break;
@@ -49,9 +57,8 @@ void CopySoundScreen::turnWheel(int i)
 		auto newSampleName = sampler.lock()->getSoundName(sampler.lock()->getSoundIndex());
 		//newSampleName = newSampleName->replaceAll("\\s+$", "");
 		newSampleName = sampler.lock()->addOrIncreaseNumber(newSampleName);
-		soundGui->setNewName(newSampleName);
+		setNewName(newSampleName);
 		displaySnd();
-		displayNewName();
 	}
 	else if (param.compare("newname") == 0)
 	{
@@ -64,11 +71,16 @@ void CopySoundScreen::turnWheel(int i)
 
 void CopySoundScreen::displayNewName()
 {
-	auto soundGui = mpc.getUis().lock()->getSoundGui();
-	findField("newname").lock()->setText(soundGui->getNewName());
+	findField("newname").lock()->setText(newName);
 }
 
 void CopySoundScreen::displaySnd()
 {
 	findField("snd").lock()->setText(sampler.lock()->getSound().lock()->getName());
+}
+
+void CopySoundScreen::setNewName(string s)
+{
+	newName = s;
+	displayNewName();
 }

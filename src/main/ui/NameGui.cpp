@@ -3,16 +3,13 @@
 #include <Mpc.hpp>
 #include <Util.hpp>
 
+using namespace moduru::lang;
 using namespace mpc::ui;
 using namespace std;
 
-NameGui::NameGui()
-{
-}
-
 void NameGui::setName(string name)
 {
-	this->name = moduru::lang::StrUtil::padRight(name, " ", 16);
+	this->name = StrUtil::padRight(name, " ", 16);
 	nameLimit = 16;
 }
 
@@ -41,7 +38,7 @@ string NameGui::getName()
 		if (s[i] == ' ') s[i] = '_';
 	}
 
-	return moduru::lang::StrUtil::padRight(s, " ", nameLimit);
+	return StrUtil::padRight(s, " ", nameLimit);
 }
 
 void NameGui::changeNameCharacter(int i, bool up)

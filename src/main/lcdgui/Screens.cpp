@@ -493,7 +493,7 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	{
 		screen = make_shared<ConvertSoundScreen>(layerIndex);
 	}
-	else if (screenName.compare("copysound") == 0)
+	else if (screenName.compare("copy-sound") == 0)
 	{
 		screen = make_shared<CopySoundScreen>(layerIndex);
 	}

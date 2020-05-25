@@ -46,12 +46,7 @@ void SoundScreen::function(int i)
 		ls.lock()->openScreen("convertsound");
 		break;
 	case 4:
-		auto newSampleName = sampler.lock()->getSound().lock()->getName();
-		//newSampleName = newSampleName->replaceAll("\\s+$", "");
-		newSampleName = sampler.lock()->addOrIncreaseNumber(newSampleName);
-		ls.lock()->openScreen("copysound");
-		auto soundGui = mpc.getUis().lock()->getSoundGui();
-		soundGui->setNewName(newSampleName);
+		ls.lock()->openScreen("copy-sound");
 		break;
 	}
 }

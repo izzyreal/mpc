@@ -6,6 +6,9 @@
 #include <lcdgui/Underline.hpp>
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/window/MidiOutputScreen.hpp>
+#include <lcdgui/screens/window/MidiOutputScreen.hpp>
+#include <lcdgui/screens/dialog/CopySoundScreen.hpp>
+#include <lcdgui/screens/dialog/ResampleScreen.hpp>
 
 #include <Util.hpp>
 #include <disk/AbstractDisk.hpp>
@@ -30,7 +33,9 @@
 
 using namespace mpc::controls::other::dialog;
 using namespace mpc::lcdgui;
-using namespace mpc::lcdgui::screens::window; using namespace std;
+using namespace mpc::lcdgui::screens::window;
+using namespace mpc::lcdgui::screens::dialog;
+using namespace std;
 using namespace moduru::lang;
 
 void NameControls::left()
@@ -347,7 +352,8 @@ void NameControls::saveName()
 	}
 	else if (prevScreen.compare("resample") == 0)
 	{
-		soundGui->setNewName(nameGui->getName());
+		auto resampleScreen = dynamic_pointer_cast<ResampleScreen>(Screens::getScreenComponent("resample"));
+		resampleScreen->setNewName(nameGui->getName());
 		nameGui->setNameBeingEdited(false);
 		lLs->setLastFocus("name", "0");
 		lLs->openScreen("resample");
@@ -368,12 +374,13 @@ void NameControls::saveName()
 		lLs->openScreen("stereotomono");
 		return;
 	}
-	else if (prevScreen.compare("copysound") == 0)
+	else if (prevScreen.compare("copy-sound") == 0)
 	{
-		soundGui->setNewName(nameGui->getName());
+		auto copySoundScreen = dynamic_pointer_cast<CopySoundScreen>(Screens::getScreenComponent("copy-sound"));
+		copySoundScreen->setNewName(nameGui->getName());
 		nameGui->setNameBeingEdited(false);
 		lLs->setLastFocus("name", "0");
-		lLs->openScreen("copysound");
+		lLs->openScreen("copy-sound");
 		return;
 	}
 }
