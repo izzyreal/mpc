@@ -33,8 +33,6 @@
 
 #include <ui/Uis.hpp>
 
-#include <ui/sampler/FxEditObserver.hpp>
-
 #include <ui/sampler/SamplerGui.hpp>
 
 #include <ui/sampler/window/ChannelSettingsObserver.hpp>
@@ -804,10 +802,6 @@ void LayeredScreen::initObserver()
 	else if (csn.compare("directory") == 0)
 	{
 		activeObserver = make_unique<DirectoryObserver>(Mpc::instance().getDisk());
-	}
-	else if (csn.compare("fxedit") == 0)
-	{
-		activeObserver = make_unique<FxEditObserver>();
 	}
 	else if (csn.compare("channelsettings") == 0)
 	{

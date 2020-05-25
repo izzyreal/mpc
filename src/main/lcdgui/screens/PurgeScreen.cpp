@@ -29,7 +29,7 @@ void PurgeScreen::function(int f)
 		ls.lock()->openScreen("drum");
 		break;
 	case 3:
-		ls.lock()->openScreen("selectdrum");
+		ls.lock()->openScreen("select-drum");
 		break;
 	case 4:
 		sampler.lock()->purge();

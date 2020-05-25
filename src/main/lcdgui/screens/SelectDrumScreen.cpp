@@ -11,7 +11,7 @@ using namespace mpc::lcdgui::screens;
 using namespace std;
 
 SelectDrumScreen::SelectDrumScreen(const int layerIndex) 
-	: ScreenComponent("selectdrum", layerIndex)
+	: ScreenComponent("select-drum", layerIndex)
 {
 }
 

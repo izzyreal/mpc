@@ -43,7 +43,7 @@ ApsGlobalParameters::ApsGlobalParameters()
 
 	auto const padAssignMasterVal = uis->getSamplerGui()->isPadAssignMaster();
 
-	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(Screens::getScreenComponent("mixersetup"));
+	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(Screens::getScreenComponent("mixer-setup"));
 	auto const stereoMixSourceDrumVal = mixerSetupScreen->isStereoMixSourceDrum();
 	auto const indivFxSourceDrumVal = mixerSetupScreen->isIndivFxSourceDrum();
 	auto const copyPgmMixToDrumVal = mixerSetupScreen->isCopyPgmMixToDrumEnabled();

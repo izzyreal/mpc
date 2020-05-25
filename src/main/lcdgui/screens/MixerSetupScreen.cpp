@@ -11,7 +11,7 @@ using namespace moduru::lang;
 using namespace std;
 
 MixerSetupScreen::MixerSetupScreen(const int& layer)
-	: ScreenComponent("mixersetup", layer)
+	: ScreenComponent("mixer-setup", layer)
 {
 }
 

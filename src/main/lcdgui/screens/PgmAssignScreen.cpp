@@ -50,7 +50,7 @@ void PgmAssignScreen::function(int i)
 	switch (i)
 	{
 	case 0:
-		ls.lock()->openScreen("selectdrum");
+		ls.lock()->openScreen("select-drum");
 		break;
 	case 1:
 		ls.lock()->openScreen("programparams");

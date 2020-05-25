@@ -1,4 +1,4 @@
-#include <controls/mixer/SelectDrumMixerControls.hpp>
+#include "SelectMixerDrumScreen.hpp"
 
 #include <ui/sampler/SamplerGui.hpp>
 #include <lcdgui/Screens.hpp>
@@ -6,17 +6,17 @@
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
-using namespace mpc::controls::mixer;
 using namespace std;
 
-SelectDrumMixerControls::SelectDrumMixerControls() 
-	: AbstractMixerControls()
+SelectMixerDrumScreen::SelectMixerDrumScreen(const int layerIndex)
+	: ScreenComponent("select-mixer-drum", layerIndex)
 {
 }
 
-void SelectDrumMixerControls::function(int i)
+void SelectMixerDrumScreen::function(int i)
 {
 	init();
+
 	if (i < 4)
 	{
 		auto drumScreen = dynamic_pointer_cast<DrumScreen>(Screens::getScreenComponent("drum"));
@@ -24,7 +24,4 @@ void SelectDrumMixerControls::function(int i)
 		samplerGui->setPrevScreenName(csn);
 		ls.lock()->openScreen("mixer");
 	}
-}
-
-SelectDrumMixerControls::~SelectDrumMixerControls() {
 }

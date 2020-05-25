@@ -60,8 +60,6 @@
 #include <controls/misc/TransControls.hpp>
 #include <controls/misc/window/TransposePermanentControls.hpp>
 
-#include <controls/mixer/SelectDrumMixerControls.hpp>
-#include <controls/mixer/FxEditControls.hpp>
 #include <controls/mixer/window/ChannelSettingsControls.hpp>
 
 #include <controls/vmpc/DirectToDiskRecorderControls.hpp>
@@ -139,8 +137,6 @@ Controls::Controls()
 
 	controls["transposepermanent"] = new misc::window::TransposePermanentControls();
 
-	controls["selectdrum_mixer"] = new mixer::SelectDrumMixerControls();
-	controls["fxedit"] = new mixer::FxEditControls();
 	controls["channelsettings"] = new mixer::window::ChannelSettingsControls();
 
 	controls["sync"] = new midisync::SyncControls();

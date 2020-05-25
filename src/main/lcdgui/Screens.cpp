@@ -33,6 +33,8 @@
 #include <lcdgui/screens/ZoneScreen.hpp>
 #include <lcdgui/screens/MixerScreen.hpp>
 #include <lcdgui/screens/MixerSetupScreen.hpp>
+#include <lcdgui/screens/FxEditScreen.hpp>
+#include <lcdgui/screens/SelectMixerDrumScreen.hpp>
 
 #include <lcdgui/screens/window/NumberOfZonesScreen.hpp>
 #include <lcdgui/screens/window/InitPadAssignScreen.hpp>
@@ -475,7 +477,7 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	{
 		screen = make_shared<PgmAssignScreen>(layerIndex);
 	}
-	else if (screenName.compare("selectdrum") == 0)
+	else if (screenName.compare("select-drum") == 0)
 	{
 		screen = make_shared<SelectDrumScreen>(layerIndex);
 	}
@@ -515,9 +517,17 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	{
 		screen = make_shared<MixerScreen>(layerIndex);
 	}
-	else if (screenName.compare("mixersetup") == 0)
+	else if (screenName.compare("mixer-setup") == 0)
 	{
 		screen = make_shared<MixerSetupScreen>(layerIndex);
+	}
+	else if (screenName.compare("select-mixer-drum") == 0)
+	{
+		screen = make_shared<SelectMixerDrumScreen>(layerIndex);
+	}
+	else if (screenName.compare("fx-edit") == 0)
+	{
+		screen = make_shared<FxEditScreen>(layerIndex);
 	}
 
 	if (screen)

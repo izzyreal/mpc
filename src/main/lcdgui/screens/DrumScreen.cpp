@@ -39,7 +39,7 @@ void DrumScreen::function(int f)
         ls.lock()->openScreen("programparams");
         break;
     case 2:
-        ls.lock()->openScreen("selectdrum");
+        ls.lock()->openScreen("select-drum");
         break;
     case int (3):
         ls.lock()->openScreen("purge");

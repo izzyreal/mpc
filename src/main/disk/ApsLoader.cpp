@@ -184,7 +184,7 @@ void ApsLoader::load()
 		drum->setReceivePgmChange(apsParser.getDrumConfiguration(i)->getReceivePgmChange());
 		drum->setReceiveMidiVolume(apsParser.getDrumConfiguration(i)->getReceiveMidiVolume());
 	}
-	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(Screens::getScreenComponent("mixersetup"));
+	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(Screens::getScreenComponent("mixer-setup"));
 
 	mixerSetupScreen->setRecordMixChangesEnabled(apsParser.getGlobalParameters()->isRecordMixChangesEnabled());
 	mixerSetupScreen->setCopyPgmMixToDrumEnabled(apsParser.getGlobalParameters()->isCopyPgmMixToDrumEnabled());

@@ -459,10 +459,10 @@ void BaseControls::numpad(int i)
 			ls.lock()->openScreen("trim");
 			break;
 		case 6:
-			ls.lock()->openScreen("selectdrum");
+			ls.lock()->openScreen("select-drum");
 			break;
 		case 7:
-			ls.lock()->openScreen("selectdrum_mixer");
+			ls.lock()->openScreen("select-mixer-drum");
 			break;
 		case 8:
 			if (sequencer.lock()->isPlaying())

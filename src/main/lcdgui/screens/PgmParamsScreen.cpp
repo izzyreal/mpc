@@ -53,7 +53,7 @@ void PgmParamsScreen::function(int i)
 		ls.lock()->openScreen("programassign");
 		break;
 	case 1:
-		ls.lock()->openScreen("selectdrum");
+		ls.lock()->openScreen("select-drum");
 		break;
 	case 2:
 		ls.lock()->openScreen("drum");
