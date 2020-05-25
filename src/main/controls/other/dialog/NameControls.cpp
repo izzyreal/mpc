@@ -9,6 +9,7 @@
 #include <lcdgui/screens/window/MidiOutputScreen.hpp>
 #include <lcdgui/screens/dialog/CopySoundScreen.hpp>
 #include <lcdgui/screens/dialog/ResampleScreen.hpp>
+#include <lcdgui/screens/dialog/StereoToMonoScreen.hpp>
 
 #include <Util.hpp>
 #include <disk/AbstractDisk.hpp>
@@ -18,7 +19,6 @@
 #include <ui/disk/DiskGui.hpp>
 #include <ui/disk/window/DirectoryGui.hpp>
 #include <ui/sampler/SamplerGui.hpp>
-#include <ui/sampler/SoundGui.hpp>
 #include <ui/sampler/window/EditSoundGui.hpp>
 #include <ui/sampler/window/SamplerWindowGui.hpp>
 #include <ui/vmpc/DirectToDiskRecorderGui.hpp>
@@ -136,39 +136,38 @@ void NameControls::saveName()
 	auto uis = Mpc::instance().getUis().lock();
 	auto lLs = ls.lock();
 	
-	auto ngParam = nameGui->getParameterName();
+	auto paramToRename = nameGui->getParameterName();
 	auto prevScreen = lLs->getPreviousScreenName();
-	auto soundGui = uis->getSoundGui();
 
-	if (ngParam.compare("outputfolder") == 0)
+	if (paramToRename.compare("outputfolder") == 0)
 	{
 		uis->getD2DRecorderGui()->setOutputFolder(nameGui->getName());
 		nameGui->setNameBeingEdited(false);
 		lLs->setLastFocus("name", "0");
 		lLs->openScreen("directtodiskrecorder");
 	}
-	else if (ngParam.compare("saveallfile") == 0)
+	else if (paramToRename.compare("saveallfile") == 0)
 	{
 		nameGui->setNameBeingEdited(false);
 		lLs->setLastFocus("name", "0");
 		lLs->openScreen("saveallfile");
 		return;
 	}
-	else if (ngParam.compare("saveasound") == 0)
+	else if (paramToRename.compare("saveasound") == 0)
 	{
 		nameGui->setNameBeingEdited(false);
 		lLs->setLastFocus("name", "0");
 		lLs->openScreen("saveasound");
 		return;
 	}
-	else if (ngParam.compare("savingpgm") == 0)
+	else if (paramToRename.compare("savingpgm") == 0)
 	{
 		nameGui->setNameBeingEdited(false);
 		lLs->setLastFocus("name", "0");
 		lLs->openScreen("saveaprogram");
 		return;
 	}
-	else if (ngParam.compare("savingaps") == 0)
+	else if (paramToRename.compare("savingaps") == 0)
 	{
 		string apsName = nameGui->getName();
 		apsName.append(".APS");
@@ -177,14 +176,14 @@ void NameControls::saveName()
 		lLs->setLastFocus("name", "0");
 		return;
 	}
-	else if (ngParam.compare("savingmid") == 0)
+	else if (paramToRename.compare("savingmid") == 0)
 	{
 		lLs->openScreen("saveasequence");
 		nameGui->setNameBeingEdited(false);
 		lLs->setLastFocus("name", "0");
 		return;
 	}
-	else if (ngParam.find("default") != string::npos)
+	else if (paramToRename.find("default") != string::npos)
 	{
 		if (prevScreen.compare("track") == 0)
 		{
@@ -203,7 +202,7 @@ void NameControls::saveName()
 			return;
 		}
 	}
-	else if (ngParam.compare("programname") == 0)
+	else if (paramToRename.compare("programname") == 0)
 	{
 		program.lock()->setName(nameGui->getName());
 		nameGui->setNameBeingEdited(false);
@@ -211,7 +210,7 @@ void NameControls::saveName()
 		lLs->openScreen("program");
 		return;
 	}
-	else if (ngParam.compare("createnewprogram") == 0)
+	else if (paramToRename.compare("createnewprogram") == 0)
 	{
 		uis->getSamplerWindowGui()->setNewName(nameGui->getName());
 		nameGui->setNameBeingEdited(false);
@@ -219,7 +218,7 @@ void NameControls::saveName()
 		lLs->openScreen("program");
 		return;
 	}
-	else if (ngParam.compare("autochrom") == 0)
+	else if (paramToRename.compare("autochrom") == 0)
 	{
 		uis->getSamplerWindowGui()->setNewName(nameGui->getName());
 		nameGui->setNameBeingEdited(false);
@@ -228,7 +227,7 @@ void NameControls::saveName()
 		lLs->setPreviousScreenName(uis->getSamplerGui()->getPrevScreenName());
 		return;
 	}
-	else if (ngParam.compare("rename") == 0)
+	else if (paramToRename.compare("rename") == 0)
 	{
 		bool success;
 		auto ext = mpc::Util::splitName(directoryGui->getSelectedFile()->getName())[1];
@@ -251,7 +250,7 @@ void NameControls::saveName()
 			return;
 		}
 	}
-	else if (ngParam.compare("newfolder") == 0)
+	else if (paramToRename.compare("newfolder") == 0)
  {
 		auto lDisk = Mpc::instance().getDisk().lock();
 		bool success = lDisk->newFolder(StrUtil::toUpper(nameGui->getName()));
@@ -359,19 +358,20 @@ void NameControls::saveName()
 		lLs->openScreen("resample");
 		return;
 	}
-	else if (prevScreen.compare("stereotomono") == 0)
+	else if (prevScreen.compare("stereo-to-mono") == 0)
 	{
-		if (ngParam.compare("newlname") == 0)
+		auto stereoToMonoScreen = dynamic_pointer_cast<StereoToMonoScreen>(Screens::getScreenComponent("stereo-to-mono"));
+		if (paramToRename.compare("newlname") == 0)
 		{
-			soundGui->setNewLName(nameGui->getName());
+			stereoToMonoScreen->setNewLName(nameGui->getName());
 		}
-		else if (ngParam.compare("newrname") == 0)
+		else if (paramToRename.compare("newrname") == 0)
 		{
-			soundGui->setNewRName(nameGui->getName());
+			stereoToMonoScreen->setNewRName(nameGui->getName());
 		}
 		nameGui->setNameBeingEdited(false);
 		lLs->setLastFocus("name", "0");
-		lLs->openScreen("stereotomono");
+		lLs->openScreen("stereo-to-mono");
 		return;
 	}
 	else if (prevScreen.compare("copy-sound") == 0)

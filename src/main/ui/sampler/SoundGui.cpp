@@ -5,61 +5,6 @@
 using namespace mpc::ui::sampler;
 using namespace std;
 
-void SoundGui::setConvert(int i)
-{
-    convert = i;
-    setChanged();
-    notifyObservers(string("convert"));
-}
-
-int SoundGui::getConvert()
-{
-    return convert;
-}
-
-void SoundGui::setNewLName(string s)
-{
-    newLName = s;
-}
-
-string SoundGui::getNewLName()
-{
-    return newLName;
-}
-
-void SoundGui::setNewRName(string s)
-{
-    newRName = s;
-}
-
-string SoundGui::getNewRName()
-{
-    return newRName;
-}
-
-int SoundGui::getRSource()
-{
-    return rSource;
-}
-
-string SoundGui::getNewStName()
-{
-    return newStName;
-}
-
-void SoundGui::setRSource(int i, int soundCount)
-{
-	if(i < 0 || i > soundCount - 1) return;
-    rSource = i;
-    setChanged();
-    notifyObservers(string("rsource"));
-}
-
-void SoundGui::setNewStName(string s)
-{
-    newStName = s;
-}
-
 void SoundGui::setPlayX(int i)
 {
 	if (i < 0 || i > 4)

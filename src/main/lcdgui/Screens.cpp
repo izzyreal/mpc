@@ -509,7 +509,7 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	{
 		screen = make_shared<ResampleScreen>(layerIndex);
 	}
-	else if (screenName.compare("stereotomono") == 0)
+	else if (screenName.compare("stereo-to-mono") == 0)
 	{
 		screen = make_shared<StereoToMonoScreen>(layerIndex);
 	}

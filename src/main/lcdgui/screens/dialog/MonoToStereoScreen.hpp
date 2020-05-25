@@ -3,7 +3,6 @@
 
 namespace mpc::lcdgui::screens::dialog
 {
-
 	class MonoToStereoScreen
 		: public mpc::lcdgui::ScreenComponent
 	{
@@ -20,6 +19,11 @@ namespace mpc::lcdgui::screens::dialog
 		void displayLSource();
 		void displayRSource();
 		void displayNewStName();
+
+		std::string newStName;
+		int rSource = 0;
+		void setRSource(int i);
+		void setNewStName(std::string s);
 
 	};
 }

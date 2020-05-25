@@ -4,15 +4,29 @@
 #include <ui/sampler/SoundGui.hpp>
 
 using namespace mpc::lcdgui::screens::dialog;
+using namespace moduru::lang;
 using namespace std;
 
 StereoToMonoScreen::StereoToMonoScreen(const int layerIndex)
-	: ScreenComponent("stereotomono", layerIndex)
+	: ScreenComponent("stereo-to-mono", layerIndex)
 {
 }
 
 void StereoToMonoScreen::open()
 {
+	auto previousScreenName = ls.lock()->getPreviousScreenName();
+
+	if (previousScreenName.compare("name") != 0)
+	{
+		string name = sampler.lock()->getSound().lock()->getName();
+		name = StrUtil::trim(name);
+		name = StrUtil::padRight(name, "_", 16);
+		name = name.substr(0, 14);
+
+		setNewLName(name + "-L");
+		setNewRName(name + "-R");
+	}
+
 	displayNewLName();
 	displayNewRName();
 	displayStereoSource();
@@ -63,8 +77,8 @@ void StereoToMonoScreen::function(int i)
 		auto right = sampler.lock()->addSound(sound->getSampleRate()).lock();
 
 		auto soundGui = mpc.getUis().lock()->getSoundGui();
-		left->setName(soundGui->getNewLName());
-		right->setName(soundGui->getNewRName());
+		left->setName(newLName);
+		right->setName(newRName);
 
 		left->setMono(true);
 		right->setMono(true);
@@ -104,12 +118,23 @@ void StereoToMonoScreen::displayStereoSource()
 void StereoToMonoScreen::displayNewLName()
 {
 	auto soundGui = mpc.getUis().lock()->getSoundGui();
-	findField("newlname").lock()->setText(soundGui->getNewLName());
+	findField("newlname").lock()->setText(newLName);
 }
 
 void StereoToMonoScreen::displayNewRName()
 {
 	auto soundGui = mpc.getUis().lock()->getSoundGui();
-	findField("newrname").lock()->setText(soundGui->getNewRName());
+	findField("newrname").lock()->setText(newRName);
 }
 
+void StereoToMonoScreen::setNewLName(string s)
+{
+	newLName = s;
+	displayNewLName();
+}
+
+void StereoToMonoScreen::setNewRName(string s)
+{
+	newRName = s;
+	displayNewRName();
+}

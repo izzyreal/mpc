@@ -169,7 +169,7 @@ vector<string> screenNames = {
 "deleteallsound",
 "convertsound",
 "monotostereo",
-"stereotomono",
+"stereo-to-mono",
 "convertnodoit",
 "resample",
 "bpmmatch",

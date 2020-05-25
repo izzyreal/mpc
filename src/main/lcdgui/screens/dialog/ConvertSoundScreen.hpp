@@ -19,5 +19,8 @@ namespace mpc::lcdgui::screens::dialog
 		const std::vector<std::string> convertNames = std::vector<std::string>{ "STEREO TO MONO", "RE-SAMPLE" };
 		void displayConvert();
 
+		int convert = 0;
+		void setConvert(int i);
+
 	};
 }
