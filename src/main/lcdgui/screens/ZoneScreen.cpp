@@ -4,13 +4,17 @@
 #include <controls/Controls.hpp>
 
 #include <lcdgui/Field.hpp>
-#include <ui/sampler/SoundGui.hpp>
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/window/NumberOfZonesScreen.hpp>
+
 #include <ui/sampler/window/EditSoundGui.hpp>
+#include <ui/sampler/SoundGui.hpp>
+
 #include <sampler/Sampler.hpp>
 
-#include <lang/StrUtil.hpp>
-
+using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui::screens::window;
 using namespace moduru::lang;
 using namespace std;
 
@@ -60,15 +64,14 @@ void ZoneScreen::openWindow()
 	}
 	else if (param.compare("zone") == 0)
 	{
-		auto soundGui = mpc.getUis().lock()->getSoundGui();
-		soundGui->setPreviousNumberOfZones(soundGui->getNumberOfZones());
-		ls.lock()->openScreen("numberofzones");
+		ls.lock()->openScreen("number-of-zones");
 	}
 	else if (param.compare("st") == 0)
 	{
 		ls.lock()->openScreen("zonestartfine");
 	}
-	else if (param.compare("end") == 0) {
+	else if (param.compare("end") == 0)
+	{
 		ls.lock()->openScreen("zoneendfine");
 	}
 }
@@ -117,8 +120,7 @@ void ZoneScreen::function(int f)
 		}
 
 		Mpc::instance().getControls().lock()->setF6Pressed(true);
-		auto zone = vector<int>{ soundGui->getZoneStart(soundGui->getZoneNumber()) , soundGui->getZoneEnd(soundGui->getZoneNumber()) };
-		sampler.lock()->playX(soundGui->getPlayX(), &zone);
+		sampler.lock()->playX();
 		break;
 	}
 	}
@@ -142,23 +144,22 @@ void ZoneScreen::turnWheel(int i)
 	}
 	
 	auto soundGui = mpc.getUis().lock()->getSoundGui();
-	auto zone = soundGui->getZoneNumber();
 	
 	if (param.compare("st") == 0)
 	{
-		soundGui->setZoneStart(zone, soundGui->getZoneStart(zone) + soundInc);
+		setZoneStart(zone, getZoneStart(zone) + soundInc);
 		displaySt();
 		displayWave();
 	}
 	else if (param.compare("end") == 0)
 	{
-		soundGui->setZoneEnd(zone, soundGui->getZoneEnd(zone) + soundInc);
+		setZoneEnd(zone, getZoneEnd(zone) + soundInc);
 		displayEnd();
 		displayWave();
 	}
 	else if (param.compare("zone") == 0)
 	{
-		soundGui->setZone(soundGui->getZoneNumber() + i);
+		setZone(zone + i);
 		displayZone();
 		displaySt();
 		displayEnd();
@@ -203,7 +204,7 @@ void ZoneScreen::displayWave()
 	auto sampleData = sound->getSampleData();
 	auto soundGui = mpc.getUis().lock()->getSoundGui();
 	findWave().lock()->setSampleData(sampleData, sampler.lock()->getSound().lock()->isMono(), soundGui->getView());
-	findWave().lock()->setSelection(soundGui->getZoneStart(soundGui->getZoneNumber()), soundGui->getZoneEnd(soundGui->getZoneNumber()));
+	findWave().lock()->setSelection(getZoneStart(zone), getZoneEnd(zone));
 }
 
 void ZoneScreen::displaySnd()
@@ -243,7 +244,7 @@ void ZoneScreen::displaySt()
 	if (sampler.lock()->getSoundCount() != 0)
 	{
 		auto soundGui = mpc.getUis().lock()->getSoundGui();
-		findField("st").lock()->setTextPadded(soundGui->getZoneStart(soundGui->getZoneNumber()), " ");
+		findField("st").lock()->setTextPadded(getZoneStart(zone), " ");
 	}
 	else {
 		findField("st").lock()->setText("       0");
@@ -255,7 +256,7 @@ void ZoneScreen::displayEnd()
 	if (sampler.lock()->getSoundCount() != 0)
 	{
 		auto soundGui = mpc.getUis().lock()->getSoundGui();
-		findField("end").lock()->setTextPadded(soundGui->getZoneEnd(soundGui->getZoneNumber()), " ");
+		findField("end").lock()->setTextPadded(getZoneEnd(zone), " ");
 	}
 	else {
 		findField("end").lock()->setText("       0");
@@ -269,5 +270,98 @@ void ZoneScreen::displayZone()
 		return;
 	}
 	auto soundGui = mpc.getUis().lock()->getSoundGui();
-	findField("zone").lock()->setText(to_string(soundGui->getZoneNumber() + 1));
+	findField("zone").lock()->setText(to_string(zone + 1));
+}
+
+void ZoneScreen::initZones(int length)
+{
+	if (zone > numberOfZones - 1)
+	{
+		zone = 0;
+	}
+
+	this->zonedSampleFrameCount = length;
+	int zoneLength = (int)floor(length / numberOfZones);
+	int zoneStart = 0;
+	zones.clear();
+	
+	for (int i = 0; i < numberOfZones - 1; i++)
+	{
+		zones.push_back(vector<int>(2));
+		zones[i][0] = zoneStart;
+		zones[i][1] = zoneStart + zoneLength - 1;
+		zoneStart += zoneLength;
+	}
+	zones.push_back(vector<int>(2));
+	zones[numberOfZones - 1][0] = zoneStart;
+	zones[numberOfZones - 1][1] = length;
+}
+
+void ZoneScreen::setZoneStart(int zoneIndex, int start)
+{
+	if (start > zones[zoneIndex][1]) {
+		start = zones[zoneIndex][1];
+	}
+	if (zoneIndex == 0 && start < 0) {
+		start = 0;
+	}
+	if (zoneIndex > 0 && start < zones[zoneIndex - 1][0]) {
+		start = zones[zoneIndex - 1][0];
+	}
+	zones[zoneIndex][0] = start;
+	if (zoneIndex != 0)
+	{
+		zones[zoneIndex - 1][1] = start;
+	}
+	displaySt();
+	displayWave();
+}
+
+int ZoneScreen::getZoneStart(int zoneIndex)
+{
+	return zones[zoneIndex][0];
+}
+
+void ZoneScreen::setZoneEnd(int zoneIndex, int end)
+{
+	if (end < zones[zoneIndex][0]) {
+		end = zones[zoneIndex][0];
+	}
+	if (zoneIndex < numberOfZones - 1 && end > zones[zoneIndex + 1][1]) {
+		end = zones[zoneIndex + 1][1];
+	}
+	if (zoneIndex == numberOfZones - 1 && end > zonedSampleFrameCount) {
+		end = zonedSampleFrameCount;
+	}
+	zones[zoneIndex][1] = end;
+	if (zoneIndex != numberOfZones - 1) {
+		zones[zoneIndex + 1][0] = end;
+	}
+	displayEnd();
+	displayWave();
+}
+
+int ZoneScreen::getZoneEnd(int zoneIndex)
+{
+	return zones[zoneIndex][1];
+}
+
+void ZoneScreen::setZone(int i)
+{
+	if (i < 0 || i >= numberOfZones)
+	{
+		return;
+	}
+
+	zone = i;
+
+	displayWave();
+	displaySt();
+	displayEnd();
+	displayZone();
+}
+
+vector<int> ZoneScreen::getZone()
+{
+	return vector<int>{ getZoneStart(zone), getZoneEnd(zone) };
 }

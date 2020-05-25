@@ -1,34 +1,39 @@
 #include "NumberOfZonesScreen.hpp"
 
-#include <ui/sampler/SoundGui.hpp>
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/ZoneScreen.hpp>
 
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
 NumberOfZonesScreen::NumberOfZonesScreen(const int& layer)
-	: ScreenComponent("numberofzones", layer)
+	: ScreenComponent("number-of-zones", layer)
 {
 }
 
 void NumberOfZonesScreen::open()
 {
+	auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(Screens::getScreenComponent("zone"));
+	numberOfZones = zoneScreen->numberOfZones;
 	displayNumberOfZones();
 }
 
 void NumberOfZonesScreen::displayNumberOfZones()
 {
-	auto soundGui = mpc.getUis().lock()->getSoundGui();
-	findField("numberofzones").lock()->setText(to_string(soundGui->getNumberOfZones()));
+	findField("number-of-zones").lock()->setText(to_string(numberOfZones));
 }
 
 void NumberOfZonesScreen::function(int i)
 {
-	auto soundGui = mpc.getUis().lock()->getSoundGui();
-	auto sound = sampler.lock()->getSound().lock();
 	switch (i)
 	{
 	case 4:
-		soundGui->initZones(sound->getLastFrameIndex());
+		auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(Screens::getScreenComponent("zone"));
+		auto sound = sampler.lock()->getSound().lock();
+		zoneScreen->numberOfZones = numberOfZones;
+		zoneScreen->initZones(sound->getLastFrameIndex());
 		ls.lock()->openScreen("zone");
 		break;
 	}
@@ -37,15 +42,18 @@ void NumberOfZonesScreen::function(int i)
 void NumberOfZonesScreen::turnWheel(int i)
 {
 	init();
-	if (param.compare("") == 0)
+	if (param.compare("number-of-zones") == 0)
 	{
-		return;
-	}
-	else if (param.compare("numberofzones") == 0)
-	{
-		auto soundGui = mpc.getUis().lock()->getSoundGui();
-		soundGui->setNumberOfZones(soundGui->getNumberOfZones() + i);
-		displayNumberOfZones();
+		setNumberOfZones(numberOfZones + i);
 	}
 }
 
+void NumberOfZonesScreen::setNumberOfZones(int i)
+{
+	if (i < 1 || i > 16)
+	{
+		return;
+	}
+	numberOfZones = i;
+	displayNumberOfZones();
+}

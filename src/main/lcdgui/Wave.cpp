@@ -55,33 +55,56 @@ void Wave::initSamplesPerPixel() {
 	}
 }
 
-void Wave::setCenterSamplePos(unsigned int centerSamplePos) {
+void Wave::setCenterSamplePos(unsigned int centerSamplePos)
+{
 	this->centerSamplePos = centerSamplePos;
 	SetDirty();
 }
 
-void Wave::setSampleData(vector<float>* sampleData, bool mono, unsigned int view) {
+void Wave::setSampleData(vector<float>* sampleData, bool mono, unsigned int view)
+{
+	if (this->sampleData == sampleData)
+	{
+		return;
+	}
+
 	this->sampleData = sampleData;
-	if (sampleData == nullptr) return;
+
+	if (sampleData == nullptr)
+	{
+		return;
+	}
+
 	this->mono = mono;
 	this->view = view;
-	frames = mono ? sampleData->size() : (sampleData->size() / 2);
+	
+	frames = mono ? sampleData->size() : (sampleData->size() * 0.5);
+	
 	initSamplesPerPixel();
 	SetDirty();
 }
 
-void Wave::setSelection(unsigned int start, unsigned int end) {
+void Wave::setSelection(unsigned int start, unsigned int end)
+{
+	if (selectionStart == start && selectionEnd == end)
+	{
+		return;
+	}
+
 	selectionStart = start;
 	selectionEnd = end;
 	SetDirty();
 }
 
-void Wave::makeLine(std::vector<std::vector<std::vector<int>> >* lines, std::vector<bool>* colors, unsigned int x) {
+void Wave::makeLine(std::vector<std::vector<std::vector<int>> >* lines, std::vector<bool>* colors, unsigned int x)
+{
 	int offset = 0;
 	float peakPos = 0;
 	float peakNeg = 0;
 	int centerSamplePixel = 0;
-	if (fine) {
+	
+	if (fine)
+	{
 		//offset += centerSamplePos;
 		centerSamplePixel = centerSamplePos / samplesPerPixel;
 	}

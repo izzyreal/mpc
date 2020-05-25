@@ -19,6 +19,7 @@
 #include <sequencer/Sequence.hpp>
 
 #include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/ZoneScreen.hpp>
 #include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
 
 #include <synth/SynthChannel.hpp>
@@ -35,6 +36,7 @@
 #include <thirdp/libsamplerate/samplerate.h>
 
 using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::sampler;
 using namespace moduru::lang;
@@ -54,9 +56,8 @@ void Sampler::setSoundIndex(int i)
 
 	soundIndex = i;
 
-	auto soundGui = Mpc::instance().getUis().lock()->getSoundGui();
-	soundGui->initZones(getSound().lock()->getLastFrameIndex());
-	soundGui->setZone(0);
+	auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(Screens::getScreenComponent("zone"));
+	zoneScreen->initZones(getSound().lock()->getLastFrameIndex());
 }
 
 int Sampler::getSoundIndex()
@@ -595,8 +596,7 @@ void Sampler::process8Bit(vector<float>* fa)
 
 weak_ptr<Sound> Sampler::createZone(weak_ptr<Sound> source, int start, int end, int endMargin)
 {
-	auto lSource = source.lock();
-	auto overlap = (int)(endMargin * lSource->getSampleRate() * 0.001);
+	auto overlap = (int)(endMargin * source.lock()->getSampleRate() * 0.001);
 	
 	if (overlap > end - start)
 	{
@@ -634,7 +634,7 @@ void Sampler::finishBasicVoice()
 	Mpc::instance().getBasicPlayer()->finishVoice();
 }
 
-void Sampler::playX(int playXMode, vector<int>* zone)
+void Sampler::playX()
 {
 	auto sound = sounds[soundIndex];
 	auto start = 0;
@@ -647,10 +647,14 @@ void Sampler::playX(int playXMode, vector<int>* zone)
 
 	auto fullEnd = end;
 
+	auto playXMode = Mpc::instance().getUis().lock()->getSoundGui()->getPlayX();
+
 	if (playXMode == 1)
 	{
-		start = (*zone)[0];
-		end = (*zone)[1];
+		auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(Screens::getScreenComponent("zone"));
+		auto zone = zoneScreen->getZone();
+		start = zone[0];
+		end = zone[1];
 	}
 
 	if (playXMode == 2)

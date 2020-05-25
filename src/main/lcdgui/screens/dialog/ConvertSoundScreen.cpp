@@ -20,7 +20,7 @@ void ConvertSoundScreen::turnWheel(int i)
 
 	if (param.compare("convert") == 0)
 	{
-		setConvert(i < 0 ? int(0) : 1);
+		setConvert(i < 0 ? 0 : 1);
 	}
 }
 

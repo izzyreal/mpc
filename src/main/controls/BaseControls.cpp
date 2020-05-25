@@ -31,7 +31,6 @@
 #include <ui/disk/window/DirectoryGui.hpp>
 #include <ui/misc/PunchGui.hpp>
 #include <ui/sampler/SamplerGui.hpp>
-#include <ui/sampler/SoundGui.hpp>
 #include <ui/sampler/window/EditSoundGui.hpp>
 #include <ui/vmpc/DirectToDiskRecorderGui.hpp>
 
@@ -170,10 +169,6 @@ void BaseControls::function(int i)
 			{
 				mpc.getUis().lock()->getNameGui()->setNameBeingEdited(false);
 				lsLocked->setLastFocus("name", "0");
-			}
-			else if (csn.compare("numberofzones") == 0)
-			{
-				mpc.getUis().lock()->getSoundGui()->setNumberOfZones(mpc.getUis().lock()->getSoundGui()->getPreviousNumberOfzones());
 			}
 			else if (csn.compare("directory") == 0)
 			{

@@ -117,6 +117,4 @@ void LoadASoundControls::keepSound()
 			}
 		}
 	}
-
-	soundGui->initZones(sound.lock()->getLastFrameIndex());
 }

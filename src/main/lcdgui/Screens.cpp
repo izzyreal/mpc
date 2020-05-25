@@ -461,7 +461,7 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	{
 		screen = make_shared<ZoneScreen>(layerIndex);
 	}
-	else if (screenName.compare("numberofzones") == 0)
+	else if (screenName.compare("number-of-zones") == 0)
 	{
 		screen = make_shared<NumberOfZonesScreen>(layerIndex);
 	}

@@ -1,19 +1,27 @@
 #include <ui/sampler/window/ZoomObserver.hpp>
 
 #include <Mpc.hpp>
+
 #include <lcdgui/Wave.hpp>
 #include <lcdgui/Field.hpp>
 #include <lcdgui/Label.hpp>
 #include <lcdgui/TwoDots.hpp>
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/ZoneScreen.hpp>
+
 #include <ui/sampler/SoundGui.hpp>
 #include <ui/sampler/window/ZoomGui.hpp>
+
 #include <sampler/Sampler.hpp>
 #include <sampler/Sound.hpp>
+
 #include <mpc/MpcSoundOscillatorControls.hpp>
 
 #include <cmath>
 
 using namespace mpc::ui::sampler::window;
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens;
 using namespace std;
 
 ZoomObserver::ZoomObserver()
@@ -109,51 +117,69 @@ void ZoomObserver::displayLngthField()
 void ZoomObserver::displayFineWaveform()
 {
 	auto lSound = sound.lock();
-	if (csn.compare("startfine") == 0) {
+	
+	auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(Screens::getScreenComponent("zone"));
+
+	if (csn.compare("startfine") == 0)
+	{
 		wave.lock()->setCenterSamplePos(lSound->getStart());
 	}
-	else if (csn.compare("zonestartfine") == 0) {
-		wave.lock()->setCenterSamplePos(soundGui->getZoneStart(soundGui->getZoneNumber()));
+	else if (csn.compare("zonestartfine") == 0)
+	{
+		wave.lock()->setCenterSamplePos(zoneScreen->getZoneStart(zoneScreen->zone));
 	}
-	else if (csn.compare("endfine") == 0 || csn.compare("loopendfine") == 0) {
+	else if (csn.compare("endfine") == 0 || csn.compare("loopendfine") == 0)
+	{
 		wave.lock()->setCenterSamplePos(lSound->getEnd());
 	}
-	else if (csn.compare("zoneendfine") == 0) {
-		wave.lock()->setCenterSamplePos(soundGui->getZoneEnd(soundGui->getZoneNumber()));
+	else if (csn.compare("zoneendfine") == 0)
+	{
+		wave.lock()->setCenterSamplePos(zoneScreen->getZoneEnd(zoneScreen->zone));
 	}
-	else if (csn.compare("looptofine") == 0) {
+	else if (csn.compare("looptofine") == 0)
+	{
 		wave.lock()->setCenterSamplePos(lSound->getLoopTo());
 	}
 }
 
 void ZoomObserver::displayStart()
 {
-	if (csn.compare("startfine") == 0) {
+
+	if (csn.compare("startfine") == 0)
+	{
 		startField.lock()->setTextPadded(sound.lock()->getStart(), " ");
 	}
-	else if (csn.compare("zonestartfine") == 0) {
-		startField.lock()->setTextPadded(soundGui->getZoneStart(soundGui->getZoneNumber()), " ");
+	else if (csn.compare("zonestartfine") == 0)
+	{
+		auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(Screens::getScreenComponent("zone"));
+		startField.lock()->setTextPadded(zoneScreen->getZoneStart(zoneScreen->zone), " ");
 	}
 }
 
 void ZoomObserver::displayEnd()
 {
-	if (csn.compare("endfine") == 0 || csn.compare("loopendfine") == 0) {
+	if (csn.compare("endfine") == 0 || csn.compare("loopendfine") == 0)
+	{
 		endField.lock()->setTextPadded(sound.lock()->getEnd(), " ");
 	}
-	else if (csn.compare("zoneendfine") == 0) {
-		endField.lock()->setTextPadded(soundGui->getZoneEnd(soundGui->getZoneNumber()), " ");
+	else if (csn.compare("zoneendfine") == 0)
+	{
+		auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(Screens::getScreenComponent("zone"));
+		endField.lock()->setTextPadded(zoneScreen->getZoneEnd(zoneScreen->zone), " ");
 	}
 }
 
 void ZoomObserver::displayLngthLabel()
 {
 	auto lSound = sound.lock();
-	if (csn.compare("startfine") == 0 || csn.compare("endfine") == 0) {
+	if (csn.compare("startfine") == 0 || csn.compare("endfine") == 0)
+	{
 		lngthLabel.lock()->setTextPadded(lSound->getEnd() - lSound->getStart(), " ");
 	}
-	else if (csn.compare("zonestartfine") == 0 || csn.compare("zoneendfine") == 0) {
-		lngthLabel.lock()->setTextPadded(soundGui->getZoneEnd(soundGui->getZoneNumber()) - soundGui->getZoneStart(soundGui->getZoneNumber()), " ");
+	else if (csn.compare("zonestartfine") == 0 || csn.compare("zoneendfine") == 0)
+	{
+		auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(Screens::getScreenComponent("zone"));
+		lngthLabel.lock()->setTextPadded(zoneScreen->getZoneEnd(zoneScreen->zone) - zoneScreen->getZoneStart(zoneScreen->zone), " ");
 	}
 }
 

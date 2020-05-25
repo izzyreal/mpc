@@ -3,6 +3,9 @@
 #include <Mpc.hpp>
 #include <ui/NameGui.hpp>
 #include <lcdgui/Field.hpp>
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/ZoneScreen.hpp>
+
 #include <ui/sampler/SoundGui.hpp>
 #include <ui/sampler/window/EditSoundGui.hpp>
 #include <sampler/NoteParameters.hpp>
@@ -17,6 +20,8 @@
 #include <mpc/MpcSoundPlayerChannel.hpp>
 
 using namespace mpc::controls::sampler::window;
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens;
 using namespace std;
 
 EditSoundControls::EditSoundControls() 
@@ -299,12 +304,15 @@ void EditSoundControls::function(int j)
 			auto endMargin = editSoundGui->getEndMargin();
 			auto source = sampler.lock()->getSound().lock();
 
-			for (int i = 0; i < soundGui->getNumberOfZones(); i++)
+			auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(Screens::getScreenComponent("zone"));
+			auto zoneCount = zoneScreen->numberOfZones;
+
+			for (int i = 0; i < zoneScreen->numberOfZones; i++)
 			{
-				auto start = soundGui->getZoneStart(i);
-				auto end = soundGui->getZoneEnd(i);
+				auto start = zoneScreen->getZoneStart(i);
+				auto end = zoneScreen->getZoneEnd(i);
 			
-				if (i == soundGui->getNumberOfZones() - 1)
+				if (i == zoneScreen->numberOfZones - 1)
 				{
 					endMargin = 0;
 				}
@@ -313,20 +321,19 @@ void EditSoundControls::function(int j)
 				zone.lock()->setName(editSoundGui->getNewName() + to_string(i+1));
 			}
 
-			sampler.lock()->setSoundIndex(sampler.lock()->getSoundCount() - soundGui->getNumberOfZones());
-			soundGui->initZones(sampler.lock()->getSound().lock()->getFrameCount());
+			sampler.lock()->setSoundIndex(sampler.lock()->getSoundCount() - zoneCount);
 
 			if (editSoundGui->getCreateNewProgram())
 			{
 				auto p = sampler.lock()->addProgram().lock();
 				p->setName(source->getName());
 			
-				for (int i = 0; i < soundGui->getNumberOfZones(); i++)
+				for (int i = 0; i < zoneCount; i++)
 				{
 					auto pad = p->getPad(i);
 					auto note = pad->getNote();
 					auto n = p->getNoteParameters(note);
-					dynamic_cast<mpc::sampler::NoteParameters*>(n)->setSoundNumber(sampler.lock()->getSoundCount() - soundGui->getNumberOfZones() + i);
+					dynamic_cast<mpc::sampler::NoteParameters*>(n)->setSoundNumber(sampler.lock()->getSoundCount() - zoneCount + i);
 				}
 				
 				auto s = sequencer.lock()->getSequence(sequencer.lock()->getActiveSequenceIndex()).lock();
@@ -339,7 +346,6 @@ void EditSoundControls::function(int j)
 			}
 		}
 		sampler.lock()->setSoundIndex(sampler.lock()->getSoundCount() - 1);
-		soundGui->initZones(sampler.lock()->getSound().lock()->getFrameCount());
 		ls.lock()->openScreen(editSoundGui->getPreviousScreenName());
 		break;
 	}

@@ -18,5 +18,9 @@ namespace mpc::lcdgui::screens::window {
 	private:
 		void displayNumberOfZones();
 
+		int numberOfZones = 0;
+
+		void setNumberOfZones(int i);
+
 	};
 }

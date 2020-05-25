@@ -107,18 +107,14 @@ void LoopScreen::function(int f)
 		break;
 	}
 	case 5:
-	{
 		if (mpc.getControls().lock()->isF6Pressed())
 		{
 			return;
 		}
 
 		mpc.getControls().lock()->setF6Pressed(true);
-		auto soundGui = mpc.getUis().lock()->getSoundGui();
-		vector<int> zone{ soundGui->getZoneStart(soundGui->getZoneNumber()), soundGui->getZoneEnd(soundGui->getZoneNumber()) };
-		sampler.lock()->playX(soundGui->getPlayX(), &zone);
+		sampler.lock()->playX();
 		break;
-	}
 	}
 }
 

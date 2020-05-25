@@ -38,7 +38,6 @@ void KeepOrRetryControls::function(int i)
 		break;
 	case 4:
 		sampler.lock()->getLastNp(program.lock().get())->setSoundNumber(sampler.lock()->getSoundCount() - 1);
-		soundGui->initZones(sampler.lock()->getPreviewSound().lock()->getLastFrameIndex());
 		sampler.lock()->setSoundIndex(sampler.lock()->getSoundCount() - 1);
 		ls.lock()->openScreen("sample");
 		break;

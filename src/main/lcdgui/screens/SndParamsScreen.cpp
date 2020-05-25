@@ -82,10 +82,7 @@ void SndParamsScreen::function(int f)
 		}
 
 		Mpc::instance().getControls().lock()->setF6Pressed(true);
-		auto soundGui = mpc.getUis().lock()->getSoundGui();
-
-		auto zone = vector<int>{ soundGui->getZoneStart(soundGui->getZoneNumber()) , soundGui->getZoneEnd(soundGui->getZoneNumber()) };
-		sampler.lock()->playX(soundGui->getPlayX(), &zone);
+		sampler.lock()->playX();
 		break;
 	}
 	}
