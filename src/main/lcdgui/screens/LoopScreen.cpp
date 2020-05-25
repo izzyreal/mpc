@@ -198,11 +198,9 @@ void LoopScreen::turnWheel(int i)
 	}
 	else if (param.compare("endlength") == 0)
 	{
-		soundGui->setEndSelected(i > 0);
+		setEndSelected(i > 0);
 		displayEndLength();
 		displayEndLengthValue();
-		displayWave();
-
 	}
 	else if (param.compare("snd") == 0 && i > 0)
 	{
@@ -395,17 +393,19 @@ void LoopScreen::displayPlayX()
 
 void LoopScreen::displayTo()
 {
-	if (sampler.lock()->getSoundCount() != 0) {
+	if (sampler.lock()->getSoundCount() != 0)
+	{
 		auto sound = sampler.lock()->getSound().lock();
 		findField("to").lock()->setTextPadded(sound->getLoopTo(), " ");
 	}
-	else {
+	else
+	{
 		findField("to").lock()->setTextPadded("0", " ");
 	}
 
 	auto soundGui = mpc.getUis().lock()->getSoundGui();
 
-	if (!soundGui->isEndSelected())
+	if (!endSelected)
 	{
 		displayEndLengthValue();
 	}
@@ -414,7 +414,7 @@ void LoopScreen::displayTo()
 void LoopScreen::displayEndLength()
 {
 	auto soundGui = mpc.getUis().lock()->getSoundGui();
-	findField("endlength").lock()->setText(soundGui->isEndSelected() ? "  End" : "Lngth");
+	findField("endlength").lock()->setText(endSelected ? "  End" : "Lngth");
 }
 
 void LoopScreen::displayEndLengthValue()
@@ -428,14 +428,8 @@ void LoopScreen::displayEndLengthValue()
 	auto soundGui = mpc.getUis().lock()->getSoundGui();
 	auto sound = sampler.lock()->getSound().lock();
 
-	if (soundGui->isEndSelected())
-	{
-		findField("endlengthvalue").lock()->setTextPadded(sound->getEnd(), " ");
-	}
-	else
-	{
-		findField("endlengthvalue").lock()->setTextPadded(sound->getEnd() - sound->getLoopTo(), " ");
-	}
+	auto text = to_string(endSelected ? sound->getEnd() : sound->getEnd() - sound->getLoopTo());
+	findField("endlengthvalue").lock()->setTextPadded(text, " ");
 }
 
 void LoopScreen::displayLoop()
@@ -466,4 +460,11 @@ void LoopScreen::displayWave()
 
 	findWave().lock()->setSampleData(sampleData, sound->isMono(), soundGui->getView());
 	findWave().lock()->setSelection(sound->getLoopTo(), sound->getEnd());
+}
+
+void LoopScreen::setEndSelected(bool b)
+{
+	endSelected = b;
+	displayEndLength();
+	displayEndLengthValue();
 }

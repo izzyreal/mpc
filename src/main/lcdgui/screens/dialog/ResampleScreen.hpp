@@ -18,10 +18,20 @@ namespace mpc::lcdgui::screens::dialog
 	private:
 		const std::vector<std::string> qualityNames = vector<string>{ "LOW", "MED", "HIGH" };
 		const std::vector<std::string> bitNames = vector<string>{ "16", "12", "8" };
+		
 		void displayNewFs();
 		void displayQuality();
 		void displayNewBit();
 		void displayNewName();
+
+		void setNewFs(int i);
+		void setQuality(int i);
+		void setNewBit(int i);
+
+		int newFs = 44100;
+		int quality = 0;
+		int newBit = 0;
+
 
 	};
 }

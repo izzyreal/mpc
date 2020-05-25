@@ -2,27 +2,8 @@
 
 #include <cmath>
 
-#include <Logger.hpp>
-
 using namespace mpc::ui::sampler;
 using namespace std;
-
-SoundGui::SoundGui()
-{
-	endSelected = true;
-}
-
-bool SoundGui::isEndSelected()
-{
-    return endSelected;
-}
-
-void SoundGui::setEndSelected(bool b)
-{
-    endSelected = b;
-    setChanged();
-    notifyObservers(string("endlength"));
-}
 
 void SoundGui::setConvert(int i)
 {
@@ -34,51 +15,6 @@ void SoundGui::setConvert(int i)
 int SoundGui::getConvert()
 {
     return convert;
-}
-
-void SoundGui::setNewFs(int i)
-{
-    if(i < 4000 || i > 65000)
-        return;
-
-    newFs = i;
-    setChanged();
-    notifyObservers(string("newfs"));
-}
-
-int SoundGui::getNewFs()
-{
-    return newFs;
-}
-
-void SoundGui::setQuality(int i)
-{
-    if(i < 0 || i > 2)
-        return;
-
-    quality = i;
-    setChanged();
-    notifyObservers(string("quality"));
-}
-
-int SoundGui::getQuality()
-{
-    return quality;
-}
-
-void SoundGui::setNewBit(int i)
-{
-    if(i < 0 || i > 2)
-        return;
-
-    newBit = i;
-    setChanged();
-    notifyObservers(string("newbit"));
-}
-
-int SoundGui::getNewBit()
-{
-    return newBit;
 }
 
 void SoundGui::setNewName(string s)

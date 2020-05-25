@@ -20,6 +20,7 @@ ResampleScreen::ResampleScreen(const int layerIndex)
 
 void ResampleScreen::open()
 {
+	setNewFs(sampler.lock()->getSound().lock()->getSampleRate());
 	displayNewBit();
 	displayNewFs();
 	displayNewName();
@@ -30,22 +31,17 @@ void ResampleScreen::turnWheel(int i)
 {
 	init();
 
-	auto soundGui = mpc.getUis().lock()->getSoundGui();
-
 	if (param.compare("newfs") == 0)
 	{
-		soundGui->setNewFs(soundGui->getNewFs() + i);
-		displayNewFs();
+		setNewFs(newFs + i);
 	}
 	else if (param.compare("newbit") == 0)
 	{
-		soundGui->setNewBit(soundGui->getNewBit() + i);
-		displayNewBit();
+		setNewBit(newBit + i);
 	}
 	else if (param.compare("quality") == 0)
 	{
-		soundGui->setQuality(soundGui->getQuality() + i);
-		displayQuality();
+		setQuality(quality + i);
 	}
 	else if (param.compare("newname") == 0)
 	{
@@ -67,21 +63,20 @@ void ResampleScreen::function(int i)
 	case 4:
 	{
 		auto soundGui = mpc.getUis().lock()->getSoundGui();
-
 		auto snd = sampler.lock()->getSound(sampler.lock()->getSoundIndex()).lock();
 		auto destSnd = sampler.lock()->addSound().lock();
 		destSnd->setName(soundGui->getNewName());
 
 		auto source = snd->getSampleData();
 
-		if (soundGui->getNewFs() != dynamic_pointer_cast<mpc::sampler::Sound>(snd)->getSampleRate())
+		if (newFs != dynamic_pointer_cast<mpc::sampler::Sound>(snd)->getSampleRate())
 		{
 			float* srcArray = &(*source)[0];
 
 			SRC_DATA srcData;
 			srcData.data_in = srcArray;
 			srcData.input_frames = source->size();
-			srcData.src_ratio = (double)(soundGui->getNewFs()) / (double)(dynamic_pointer_cast<mpc::sampler::Sound>(snd)->getSampleRate());
+			srcData.src_ratio = (double)(newFs) / (double)(dynamic_pointer_cast<mpc::sampler::Sound>(snd)->getSampleRate());
 			srcData.output_frames = (floor)(source->size() * srcData.src_ratio);
 
 			auto dest = destSnd->getSampleData();
@@ -116,15 +111,15 @@ void ResampleScreen::function(int i)
 			}
 		}
 
-		destSnd->setSampleRate(soundGui->getNewFs());
+		destSnd->setSampleRate(newFs);
 		destSnd->setMono(snd->isMono());
 		destSnd->setName(soundGui->getNewName());
 
-		if (soundGui->getNewBit() == 1)
+		if (newBit == 1)
 		{
 			sampler.lock()->process12Bit(destSnd->getSampleData());
 		}
-		else if (soundGui->getNewBit() == 2)
+		else if (newBit == 2)
 		{
 			sampler.lock()->process8Bit(destSnd->getSampleData());
 		}
@@ -138,20 +133,17 @@ void ResampleScreen::function(int i)
 
 void ResampleScreen::displayNewFs()
 {
-	auto soundGui = mpc.getUis().lock()->getSoundGui();
-	findField("newfs").lock()->setText(to_string(soundGui->getNewFs()));
+	findField("newfs").lock()->setText(to_string(newFs));
 }
 
 void ResampleScreen::displayQuality()
 {
-	auto soundGui = mpc.getUis().lock()->getSoundGui();
-	findField("quality").lock()->setText(qualityNames[soundGui->getQuality()]);
+	findField("quality").lock()->setText(qualityNames[quality]);
 }
 
 void ResampleScreen::displayNewBit()
 {
-	auto soundGui = mpc.getUis().lock()->getSoundGui();
-	findField("newbit").lock()->setText(bitNames[soundGui->getNewBit()]);
+	findField("newbit").lock()->setText(bitNames[newBit]);
 }
 
 void ResampleScreen::displayNewName()
@@ -159,3 +151,37 @@ void ResampleScreen::displayNewName()
 	auto soundGui = mpc.getUis().lock()->getSoundGui();
 	findField("newname").lock()->setText(soundGui->getNewName());
 }
+
+void ResampleScreen::setNewFs(int i)
+{
+	if (i < 4000 || i > 65000)
+	{
+		return;
+	}
+
+	newFs = i;
+	displayNewFs();
+}
+
+void ResampleScreen::setQuality(int i)
+{
+	if (i < 0 || i > 2)
+	{
+		return;
+	}
+
+	quality = i;
+	displayQuality();
+}
+
+void ResampleScreen::setNewBit(int i)
+{
+	if (i < 0 || i > 2)
+	{
+		return;
+	}
+
+	newBit = i;
+	displayNewBit();
+}
+

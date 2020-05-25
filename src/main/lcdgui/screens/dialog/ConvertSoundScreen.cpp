@@ -62,7 +62,6 @@ void ConvertSoundScreen::function(int i)
 		}
 		else {
 			ls.lock()->openScreen("resample");
-			soundGui->setNewFs(sampler.lock()->getSound().lock()->getSampleRate());
 			auto newSampleName = sampler.lock()->getSound().lock()->getName();
 			//newSampleName = newSampleName->replaceAll("\\s+$", "");
 			newSampleName = sampler.lock()->addOrIncreaseNumber(newSampleName);

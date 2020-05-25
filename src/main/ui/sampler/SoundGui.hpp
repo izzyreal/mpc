@@ -11,9 +11,6 @@ namespace mpc::ui::sampler {
 
 	private:
 		int convert = 0;
-		int newFs = 44100;
-		int quality = 0;
-		int newBit = 0;
 		std::string newName = "";
 		std::string newLName = "";
 		std::string newRName = "";
@@ -21,7 +18,6 @@ namespace mpc::ui::sampler {
 		std::string newStName = "";
 		int view = 0;
 		int playX = 0;
-		bool endSelected;
 		int numberOfZones = 16;
 		int previousNumberOfZones = 0;
 		std::vector<std::vector<int>> zones;
@@ -29,16 +25,8 @@ namespace mpc::ui::sampler {
 		int totalLength;
 
 	public:
-		bool isEndSelected();
-		void setEndSelected(bool b);
 		void setConvert(int i);
 		int getConvert();
-		void setNewFs(int i);
-		int getNewFs();
-		void setQuality(int i);
-		int getQuality();
-		void setNewBit(int i);
-		int getNewBit();
 		void setNewName(std::string s);
 		std::string getNewName();
 		void setNewLName(std::string s);
@@ -64,9 +52,6 @@ namespace mpc::ui::sampler {
 		int getNumberOfZones();
 		void setPreviousNumberOfZones(int i);
 		int getPreviousNumberOfzones();
-
-	public:
-		SoundGui();
 
 	};
 }

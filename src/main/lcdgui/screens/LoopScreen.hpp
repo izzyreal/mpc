@@ -29,8 +29,10 @@ namespace mpc::lcdgui::screens {
 		void displayEndLength();
 		void displayEndLengthValue();
 		void displayLoop();
-
 		void displayWave();
+
+		bool endSelected = true;
+		void setEndSelected(bool b);
 
 	};
 }
