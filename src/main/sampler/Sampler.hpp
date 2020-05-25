@@ -34,6 +34,7 @@ namespace mpc::sampler {
 	private:
 		int inputLevel = 0;
 		int soundIndex = -1;
+		int playX_ = 0;
 		std::string previousScreenName = "";
 
 	public:
@@ -132,8 +133,8 @@ namespace mpc::sampler {
 	public:
 		int checkExists(std::string soundName);
 		int getNextSoundIndex(int j, bool up);
-		void setSoundGuiPrevSound();
-		void setSoundGuiNextSound();
+		void selectPreviousSound();
+		void selectNextSound();
 		std::vector<std::weak_ptr<ctoot::mpc::MpcStereoMixerChannel>> getDrumStereoMixerChannels(int i);
 		std::vector<std::weak_ptr<ctoot::mpc::MpcIndivFxMixerChannel>> getDrumIndivFxMixerChannels(int i);
 		std::weak_ptr<Sound> copySound(std::weak_ptr<Sound> source);
@@ -143,7 +144,8 @@ namespace mpc::sampler {
 		std::vector<int>* getMasterPadAssign();
 		void setMasterPadAssign(std::vector<int> v);
 		std::vector<int>* getAutoChromaticAssign();
-
+		void setPlayX(int i);
+		int getPlayX();
 
 	public:
 		Sampler();

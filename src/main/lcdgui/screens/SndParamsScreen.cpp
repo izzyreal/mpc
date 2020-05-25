@@ -4,7 +4,6 @@
 #include <Util.hpp>
 #include <controls/Controls.hpp>
 
-#include <ui/sampler/SoundGui.hpp>
 #include <ui/sampler/window/EditSoundGui.hpp>
 
 #include <sampler/Sampler.hpp>
@@ -91,17 +90,16 @@ void SndParamsScreen::function(int f)
 void SndParamsScreen::turnWheel(int i)
 {
 	init();
-	auto soundGui = mpc.getUis().lock()->getSoundGui();
 	auto sound = sampler.lock()->getSound().lock();
 
 	if (param.compare("playx") == 0)
 	{
-		soundGui->setPlayX(soundGui->getPlayX() + i);
+		sampler.lock()->setPlayX(sampler.lock()->getPlayX() + i);
 		displayPlayX();
 	}
 	else if (param.compare("snd") == 0 && i > 0)
 	{
-		sampler.lock()->setSoundGuiNextSound();
+		sampler.lock()->selectNextSound();
 		displayBeat();
 		displayLevel();
 		displaySampleAndNewTempo();
@@ -110,7 +108,7 @@ void SndParamsScreen::turnWheel(int i)
 	}
 	else if (param.compare("snd") == 0 && i < 0)
 	{
-		sampler.lock()->setSoundGuiPrevSound();
+		sampler.lock()->selectPreviousSound();
 		displayBeat();
 		displayLevel();
 		displaySampleAndNewTempo();
@@ -259,6 +257,5 @@ void SndParamsScreen::displaySnd()
 
 void SndParamsScreen::displayPlayX()
 {
-	auto soundGui = mpc.getUis().lock()->getSoundGui();
-	findField("playx").lock()->setText(playXNames[soundGui->getPlayX()]);
+	findField("playx").lock()->setText(playXNames[sampler.lock()->getPlayX()]);
 }

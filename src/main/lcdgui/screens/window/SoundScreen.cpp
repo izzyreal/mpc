@@ -1,7 +1,6 @@
 #include "SoundScreen.hpp"
 
 #include <ui/NameGui.hpp>
-#include <ui/sampler/SoundGui.hpp>
 
 using namespace mpc::lcdgui::screens::window;
 using namespace moduru::lang;

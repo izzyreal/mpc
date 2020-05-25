@@ -4,7 +4,6 @@
 #include <Util.hpp>
 #include <ui/NameGui.hpp>
 #include <ui/disk/DiskGui.hpp>
-#include <ui/sampler/SoundGui.hpp>
 #include <sampler/Sampler.hpp>
 #include <sampler/Sound.hpp>
 
@@ -21,10 +20,10 @@ void SaveASoundControls::turnWheel(int i)
 	init();
 	
 	if (param.compare("file") == 0 && i > 0) {
-		sampler.lock()->setSoundGuiPrevSound();
+		sampler.lock()->selectPreviousSound();
 	}
 	else if (param.compare("file") == 0 && i < 0) {
-		sampler.lock()->setSoundGuiNextSound();
+		sampler.lock()->selectNextSound();
 	}
 	else if (param.compare("filetype") == 0) {
 		diskGui->setFileTypeSaveSound(diskGui->getFileTypeSaveSound() + i);

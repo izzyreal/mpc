@@ -37,7 +37,6 @@ namespace mpc {
 
 		namespace sampler {
 			class SamplerGui;
-			class SoundGui;
 		}
 
 		namespace disk {
@@ -60,7 +59,6 @@ namespace mpc {
 				std::vector<std::string> apsSaveNames{};
 
 				DiskGui* diskGui{ nullptr };
-				mpc::ui::sampler::SoundGui* soundGui{ nullptr };
 				std::weak_ptr<mpc::disk::AbstractDisk> disk{};
 				std::weak_ptr<mpc::sequencer::Sequencer> sequencer{};
 				std::weak_ptr<mpc::sampler::Sampler> sampler{};

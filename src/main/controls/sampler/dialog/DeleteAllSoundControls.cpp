@@ -1,6 +1,5 @@
 #include <controls/sampler/dialog/DeleteAllSoundControls.hpp>
 
-#include <ui/sampler/SoundGui.hpp>
 #include <sampler/Sampler.hpp>
 
 using namespace mpc::controls::sampler::dialog;

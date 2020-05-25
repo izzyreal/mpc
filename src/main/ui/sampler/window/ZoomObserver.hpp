@@ -23,8 +23,6 @@ namespace mpc {
 	
 		namespace sampler {
 
-			class SoundGui;
-
 			namespace window {
 
 				class ZoomGui;
@@ -37,7 +35,6 @@ namespace mpc {
 				private:
 					//std::vector<float> trimmedData;
 					ZoomGui* zoomGui{ nullptr };
-					mpc::ui::sampler::SoundGui* soundGui{ nullptr };
 					std::weak_ptr<mpc::lcdgui::TwoDots> twoDots;
 					std::weak_ptr<mpc::lcdgui::Field> startField{};
 					std::weak_ptr<mpc::lcdgui::Field> endField{};

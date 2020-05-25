@@ -1,6 +1,5 @@
 #include "DeleteSoundScreen.hpp"
 
-#include <ui/sampler/SoundGui.hpp>
 #include <sampler/Sampler.hpp>
 
 using namespace mpc::lcdgui::screens::dialog;

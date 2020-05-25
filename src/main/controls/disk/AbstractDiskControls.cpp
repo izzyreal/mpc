@@ -8,7 +8,6 @@
 #include <ui/disk/DiskGui.hpp>
 #include <ui/disk/window/DirectoryGui.hpp>
 #include <ui/disk/window/DiskWindowGui.hpp>
-#include <ui/sampler/SoundGui.hpp>
 #include <ui/vmpc/DeviceGui.hpp>
 
 using namespace mpc::controls::disk;
@@ -23,7 +22,6 @@ AbstractDiskControls::AbstractDiskControls()
 	diskGui = uis->getDiskGui();
 	diskWindowGui = uis->getDiskWindowGui();
 	deviceGui = uis->getDeviceGui();
-	soundGui = uis->getSoundGui();
 }
 
 void AbstractDiskControls::init()

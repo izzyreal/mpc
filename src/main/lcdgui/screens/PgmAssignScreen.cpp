@@ -2,7 +2,6 @@
 
 #include <Mpc.hpp>
 #include <ui/sampler/SamplerGui.hpp>
-#include <ui/sampler/SoundGui.hpp>
 #include <ui/sampler/window/SamplerWindowGui.hpp>
 #include <sampler/NoteParameters.hpp>
 #include <sampler/Pad.hpp>

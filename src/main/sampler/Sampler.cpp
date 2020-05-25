@@ -8,7 +8,6 @@
 #include <ui/UserDefaults.hpp>
 
 #include <ui/sampler/SamplerGui.hpp>
-#include <ui/sampler/SoundGui.hpp>
 #include <sampler/NoteParameters.hpp>
 #include <sampler/Pad.hpp>
 #include <sampler/Program.hpp>
@@ -448,8 +447,6 @@ void Sampler::deleteSection(const unsigned int sampleNumber, const unsigned int 
 
 void Sampler::sort()
 {
-	auto soundGui = Mpc::instance().getUis().lock()->getSoundGui();
-
 	auto currentSoundMemIndex = sounds[soundIndex]->getMemoryIndex();
 	soundSortingType++;
 	
@@ -647,27 +644,22 @@ void Sampler::playX()
 
 	auto fullEnd = end;
 
-	auto playXMode = Mpc::instance().getUis().lock()->getSoundGui()->getPlayX();
-
-	if (playXMode == 1)
+	if (playX_ == 1)
 	{
 		auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(Screens::getScreenComponent("zone"));
 		auto zone = zoneScreen->getZone();
 		start = zone[0];
 		end = zone[1];
 	}
-
-	if (playXMode == 2)
+	else if (playX_ == 2)
 	{
 		end = sound->getStart();
 	}
-	
-	if (playXMode == 3)
+	else if (playX_ == 3)
 	{
 		end = sound->getLoopTo();
 	}
-
-	if (playXMode == 4)
+	else if (playX_ == 4)
 	{
 		start = sound->getEnd();
 		end = fullEnd;
@@ -1011,19 +1003,20 @@ int Sampler::checkExists(string soundName)
 int Sampler::getNextSoundIndex(int j, bool up)
 {
 	auto inc = up ? 1 : -1;
-	if (j + inc < -1 || j + inc > getSoundCount() - 1) return j;
+	if (j + inc < -1 || j + inc > getSoundCount() - 1)
+	{
+		return j;
+	}
 	return j + inc;
 }
 
-void Sampler::setSoundGuiPrevSound()
+void Sampler::selectPreviousSound()
 {
-	auto soundGui = Mpc::instance().getUis().lock()->getSoundGui();
 	setSoundIndex(getNextSoundIndex(soundIndex, false));
 }
 
-void Sampler::setSoundGuiNextSound()
+void Sampler::selectNextSound()
 {
-	auto soundGui = Mpc::instance().getUis().lock()->getSoundGui();
 	setSoundIndex(getNextSoundIndex(soundIndex, true));
 }
 
@@ -1076,4 +1069,19 @@ int Sampler::getUsedProgram(int startIndex, bool up) {
 		}
 	}
 	return res;
+}
+
+void Sampler::setPlayX(int i)
+{
+	if (i < 0 || i > 4)
+	{
+		return;
+	}
+
+	playX_ = i;
+}
+
+int Sampler::getPlayX()
+{
+	return playX_;
 }

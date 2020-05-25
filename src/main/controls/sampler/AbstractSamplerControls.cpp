@@ -5,7 +5,6 @@
 #include <Mpc.hpp>
 #include <lcdgui/Field.hpp>
 #include <ui/sampler/SamplerGui.hpp>
-#include <ui/sampler/SoundGui.hpp>
 #include <ui/sampler/window/EditSoundGui.hpp>
 #include <ui/sampler/window/SamplerWindowGui.hpp>
 #include <ui/sampler/window/ZoomGui.hpp>
@@ -34,7 +33,6 @@ AbstractSamplerControls::AbstractSamplerControls()
 {
 	auto uis = Mpc::instance().getUis().lock();
 	zoomGui = uis->getZoomGui();
-	soundGui = uis->getSoundGui();
 	editSoundGui = uis->getEditSoundGui();
 	swGui = uis->getSamplerWindowGui();
 }

@@ -1,6 +1,5 @@
 #include "CopySoundScreen.hpp"
 
-#include <ui/sampler/SoundGui.hpp>
 #include <ui/NameGui.hpp>
 
 using namespace mpc::lcdgui::screens::dialog;
@@ -35,7 +34,6 @@ void CopySoundScreen::function(int i)
 		break;
 	case 4:
 	{
-		auto soundGui = mpc.getUis().lock()->getSoundGui();
 		auto sound = sampler.lock()->getSound().lock();
 		auto newSound = sampler.lock()->copySound(sound);
 		newSound.lock()->setName(newName);
@@ -52,7 +50,6 @@ void CopySoundScreen::turnWheel(int i)
 	
 	if (param.compare("snd") == 0)
 	{
-		auto soundGui = mpc.getUis().lock()->getSoundGui();
 		sampler.lock()->setSoundIndex(sampler.lock()->getNextSoundIndex(sampler.lock()->getSoundIndex(), i > 0));
 		auto newSampleName = sampler.lock()->getSoundName(sampler.lock()->getSoundIndex());
 		//newSampleName = newSampleName->replaceAll("\\s+$", "");
@@ -62,7 +59,6 @@ void CopySoundScreen::turnWheel(int i)
 	}
 	else if (param.compare("newname") == 0)
 	{
-		auto soundGui = mpc.getUis().lock()->getNameGui();
 		nameGui->setName(ls.lock()->lookupField("newname").lock()->getText());
 		nameGui->setParameterName("newname");
 		ls.lock()->openScreen("name");

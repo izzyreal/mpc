@@ -122,7 +122,6 @@ void TrimScreen::turnWheel(int i)
 		return;
 	}
 	
-	auto soundGui = mpc.getUis().lock()->getSoundGui();
 	auto zoomGui = mpc.getUis().lock()->getZoomGui();
 	auto sound = sampler.lock()->getSound().lock();
 	auto const oldLength = sound->getEnd() - sound->getStart();
@@ -175,18 +174,16 @@ void TrimScreen::turnWheel(int i)
 	}
 	else if (param.compare("view") == 0)
 	{
-		soundGui->setView(soundGui->getView() + i);
-		displayView();
-		displayWave();
+		setView(view + i);
 	}
 	else if (param.compare("playx") == 0)
 	{
-		soundGui->setPlayX(soundGui->getPlayX() + i);
+		sampler.lock()->setPlayX(sampler.lock()->getPlayX() + i);
 		displayPlayX();
 	}
 	else if (param.compare("snd") == 0 && i > 0)
 	{
-		sampler.lock()->setSoundGuiNextSound();
+		sampler.lock()->selectNextSound();
 		displaySnd();
 		displayEnd();
 		displayPlayX();
@@ -196,7 +193,7 @@ void TrimScreen::turnWheel(int i)
 	}
 	else if (param.compare("snd") == 0 && i < 0)
 	{
-		sampler.lock()->setSoundGuiPrevSound();
+		sampler.lock()->selectPreviousSound();
 		displaySnd();
 		displayEnd();
 		displayPlayX();
@@ -338,9 +335,8 @@ void TrimScreen::displayWave()
 	}
 
 	auto sampleData = sound->getSampleData();
-	auto soundGui = mpc.getUis().lock()->getSoundGui();
-
-	findWave().lock()->setSampleData(sampleData, sound->isMono(), soundGui->getView());
+	
+	findWave().lock()->setSampleData(sampleData, sound->isMono(), view);
 	findWave().lock()->setSelection(sound->getStart(), sound->getEnd());
 }
 
@@ -373,8 +369,7 @@ void TrimScreen::displaySnd()
 
 void TrimScreen::displayPlayX()
 {
-	auto soundGui = mpc.getUis().lock()->getSoundGui();
-	findField("playx").lock()->setText(playXNames[soundGui->getPlayX()]);
+	findField("playx").lock()->setText(playXNames[sampler.lock()->getPlayX()]);
 }
 
 void TrimScreen::displaySt()
@@ -403,12 +398,23 @@ void TrimScreen::displayEnd()
 
 void TrimScreen::displayView()
 {
-	auto soundGui = mpc.getUis().lock()->getSoundGui();
-	if (soundGui->getView() == 0)
+	if (view == 0)
 	{
 		findField("view").lock()->setText("LEFT");
 	}
 	else {
 		findField("view").lock()->setText("RIGHT");
 	}
+}
+
+void TrimScreen::setView(int i)
+{
+	if (i < 0 || i > 1)
+	{
+		return;
+	}
+	
+	view = i;
+	displayView();
+	displayWave();
 }

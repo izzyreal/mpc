@@ -8,8 +8,8 @@
 #include <lcdgui/TwoDots.hpp>
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/ZoneScreen.hpp>
+#include <lcdgui/screens/TrimScreen.hpp>
 
-#include <ui/sampler/SoundGui.hpp>
 #include <ui/sampler/window/ZoomGui.hpp>
 
 #include <sampler/Sampler.hpp>
@@ -31,8 +31,6 @@ ZoomObserver::ZoomObserver()
 	auto uis = Mpc::instance().getUis().lock();
 	zoomGui = uis->getZoomGui();
 	zoomGui->addObserver(this);
-	soundGui = uis->getSoundGui();
-	soundGui->addObserver(this);
 	auto ls = Mpc::instance().getLayeredScreen().lock();
 	csn = ls->getCurrentScreenName();
 	sound = dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getSound().lock());
@@ -51,7 +49,8 @@ ZoomObserver::ZoomObserver()
 	wave = ls->getFineWave();
 	wave.lock()->Hide(false);
 
-	wave.lock()->setSampleData(lSound->getSampleData(), lSound->isMono(), soundGui->getView());
+	auto trimScreen = dynamic_pointer_cast<TrimScreen>(Screens::getScreenComponent("trim"));
+	wave.lock()->setSampleData(lSound->getSampleData(), lSound->isMono(), trimScreen->view);
 
 	startField = ls->lookupField("start");
 	endField = ls->lookupField("end");
@@ -190,7 +189,7 @@ void ZoomObserver::displaySmplLngth()
 
 void ZoomObserver::displayPlayX()
 {
-    playXField.lock()->setText(playXNames[soundGui->getPlayX()]);
+    playXField.lock()->setText(playXNames[mpc::Mpc::instance().getSampler().lock()->getPlayX()]);
 }
 
 void ZoomObserver::update(moduru::observer::Observable* o, nonstd::any arg)
@@ -255,11 +254,11 @@ void ZoomObserver::displayTo()
 }
 
 ZoomObserver::~ZoomObserver() {
-	if (wave.lock()) {
+	if (wave.lock())
+	{
 		wave.lock()->setSampleData(nullptr, false, 0);
 	}
 	zoomGui->deleteObserver(this);
-	soundGui->deleteObserver(this);
 	auto lSound = sound.lock();
 	lSound->deleteObserver(this);
 	lSound->getOscillatorControls()->deleteObserver(this);

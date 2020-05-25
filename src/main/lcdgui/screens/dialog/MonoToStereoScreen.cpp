@@ -32,12 +32,12 @@ void MonoToStereoScreen::turnWheel(int i)
 	
 	if (param.compare("lsource") == 0 && i < 0)
 	{
-		sampler.lock()->setSoundGuiPrevSound();
+		sampler.lock()->selectPreviousSound();
 		displayLSource();
 	}
 	else if (param.compare("lsource") == 0 && i > 0)
 	{
-		sampler.lock()->setSoundGuiNextSound();
+		sampler.lock()->selectNextSound();
 		displayLSource();
 	}
 	else if (param.compare("rsource") == 0)

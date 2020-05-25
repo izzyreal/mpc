@@ -6,7 +6,6 @@
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/ZoneScreen.hpp>
 
-#include <ui/sampler/SoundGui.hpp>
 #include <ui/sampler/window/EditSoundGui.hpp>
 #include <sampler/NoteParameters.hpp>
 #include <sampler/Pad.hpp>

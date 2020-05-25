@@ -5,7 +5,6 @@
 
 #include <ui/sampler/SamplerGui.hpp>
 #include <ui/Uis.hpp>
-#include <ui/sampler/SoundGui.hpp>
 
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>

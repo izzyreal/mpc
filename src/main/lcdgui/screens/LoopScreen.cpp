@@ -3,9 +3,12 @@
 #include <Mpc.hpp>
 #include <controls/Controls.hpp>
 #include <lcdgui/Field.hpp>
-#include <ui/sampler/SoundGui.hpp>
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/TrimScreen.hpp>
+
 #include <ui/sampler/window/EditSoundGui.hpp>
 #include <ui/sampler/window/ZoomGui.hpp>
+
 #include <sampler/Sampler.hpp>
 #include <sampler/Sound.hpp>
 
@@ -13,6 +16,7 @@
 #include <limits.h>
 
 using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui;
 using namespace moduru::lang;
 using namespace std;
 
@@ -142,8 +146,6 @@ void LoopScreen::turnWheel(int i)
 		soundInc = i >= 0 ? splitInc[mtf->getActiveSplit() - 1] : -splitInc[mtf->getActiveSplit() - 1];
 	}
 
-	auto soundGui = mpc.getUis().lock()->getSoundGui();
-	
 	if (param.compare("to") == 0)
 	{
 		if (loopFix && sound->getLoopTo() + soundInc + oldLoopLength > sound->getLastFrameIndex())
@@ -184,7 +186,7 @@ void LoopScreen::turnWheel(int i)
     }
 	else if (param.compare("playx") == 0)
 	{
-		soundGui->setPlayX(soundGui->getPlayX() + i);
+		sampler.lock()->setPlayX(sampler.lock()->getPlayX() + i);
 		displayPlayX();
 	}
 	else if (param.compare("loop") == 0)
@@ -200,7 +202,7 @@ void LoopScreen::turnWheel(int i)
 	}
 	else if (param.compare("snd") == 0 && i > 0)
 	{
-		sampler.lock()->setSoundGuiNextSound();
+		sampler.lock()->selectNextSound();
 		displaySnd();
 		displayPlayX();
 		displayEndLength();
@@ -211,7 +213,7 @@ void LoopScreen::turnWheel(int i)
 	}
 	else if (param.compare("snd") == 0 && i < 0)
 	{
-		sampler.lock()->setSoundGuiPrevSound();
+		sampler.lock()->selectPreviousSound();
 		displaySnd();
 		displayPlayX();
 		displayEndLength();
@@ -383,8 +385,7 @@ void LoopScreen::displaySnd()
 
 void LoopScreen::displayPlayX()
 {
-	auto soundGui = mpc.getUis().lock()->getSoundGui();
-	findField("playx").lock()->setText(playXNames[soundGui->getPlayX()]);
+	findField("playx").lock()->setText(playXNames[sampler.lock()->getPlayX()]);
 }
 
 void LoopScreen::displayTo()
@@ -399,8 +400,6 @@ void LoopScreen::displayTo()
 		findField("to").lock()->setTextPadded("0", " ");
 	}
 
-	auto soundGui = mpc.getUis().lock()->getSoundGui();
-
 	if (!endSelected)
 	{
 		displayEndLengthValue();
@@ -409,7 +408,6 @@ void LoopScreen::displayTo()
 
 void LoopScreen::displayEndLength()
 {
-	auto soundGui = mpc.getUis().lock()->getSoundGui();
 	findField("endlength").lock()->setText(endSelected ? "  End" : "Lngth");
 }
 
@@ -421,7 +419,6 @@ void LoopScreen::displayEndLengthValue()
 		return;
 	}
 
-	auto soundGui = mpc.getUis().lock()->getSoundGui();
 	auto sound = sampler.lock()->getSound().lock();
 
 	auto text = to_string(endSelected ? sound->getEnd() : sound->getEnd() - sound->getLoopTo());
@@ -452,9 +449,8 @@ void LoopScreen::displayWave()
 	}
 
 	auto sampleData = sound->getSampleData();
-	auto soundGui = mpc.getUis().lock()->getSoundGui();
-
-	findWave().lock()->setSampleData(sampleData, sound->isMono(), soundGui->getView());
+	auto trimScreen = dynamic_pointer_cast<TrimScreen>(Screens::getScreenComponent("trim"));
+	findWave().lock()->setSampleData(sampleData, sound->isMono(), trimScreen->view);
 	findWave().lock()->setSelection(sound->getLoopTo(), sound->getEnd());
 }
 

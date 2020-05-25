@@ -5,10 +5,10 @@
 
 #include <lcdgui/Field.hpp>
 #include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/TrimScreen.hpp>
 #include <lcdgui/screens/window/NumberOfZonesScreen.hpp>
 
 #include <ui/sampler/window/EditSoundGui.hpp>
-#include <ui/sampler/SoundGui.hpp>
 
 #include <sampler/Sampler.hpp>
 
@@ -80,8 +80,6 @@ void ZoneScreen::function(int f)
 {
 	init();
 
-	auto soundGui = mpc.getUis().lock()->getSoundGui();
-
 	switch (f)
 	{
 	case 0:
@@ -143,8 +141,6 @@ void ZoneScreen::turnWheel(int i)
 		soundInc = i >= 0 ? splitInc[mtf->getActiveSplit() - 1] : -splitInc[mtf->getActiveSplit() - 1];
 	}
 	
-	auto soundGui = mpc.getUis().lock()->getSoundGui();
-	
 	if (param.compare("st") == 0)
 	{
 		setZoneStart(zone, getZoneStart(zone) + soundInc);
@@ -167,12 +163,12 @@ void ZoneScreen::turnWheel(int i)
 	}
 	else if (param.compare("playx") == 0)
 	{
-		soundGui->setPlayX(soundGui->getPlayX() + i);
+		sampler.lock()->setPlayX(sampler.lock()->getPlayX() + i);
 		displayPlayX();
 	}
 	else if (param.compare("snd") == 0 && i > 0)
 	{
-		sampler.lock()->setSoundGuiNextSound();
+		sampler.lock()->selectNextSound();
 		displayEnd();
 		displaySnd();
 		displaySt();
@@ -181,7 +177,7 @@ void ZoneScreen::turnWheel(int i)
 	}
 	else if (param.compare("snd") == 0 && i < 0)
 	{
-		sampler.lock()->setSoundGuiPrevSound();
+		sampler.lock()->selectPreviousSound();
 		displayEnd();
 		displaySnd();
 		displaySt();
@@ -202,8 +198,8 @@ void ZoneScreen::displayWave()
 	}
 
 	auto sampleData = sound->getSampleData();
-	auto soundGui = mpc.getUis().lock()->getSoundGui();
-	findWave().lock()->setSampleData(sampleData, sampler.lock()->getSound().lock()->isMono(), soundGui->getView());
+	auto trimScreen = dynamic_pointer_cast<TrimScreen>(Screens::getScreenComponent("trim"));
+	findWave().lock()->setSampleData(sampleData, sampler.lock()->getSound().lock()->isMono(), trimScreen->view);
 	findWave().lock()->setSelection(getZoneStart(zone), getZoneEnd(zone));
 }
 
@@ -235,15 +231,13 @@ void ZoneScreen::displaySnd()
 
 void ZoneScreen::displayPlayX()
 {
-	auto soundGui = mpc.getUis().lock()->getSoundGui();
-	findField("playx").lock()->setText(playXNames[soundGui->getPlayX()]);
+	findField("playx").lock()->setText(playXNames[sampler.lock()->getPlayX()]);
 }
 
 void ZoneScreen::displaySt()
 {
 	if (sampler.lock()->getSoundCount() != 0)
 	{
-		auto soundGui = mpc.getUis().lock()->getSoundGui();
 		findField("st").lock()->setTextPadded(getZoneStart(zone), " ");
 	}
 	else {
@@ -255,7 +249,6 @@ void ZoneScreen::displayEnd()
 {
 	if (sampler.lock()->getSoundCount() != 0)
 	{
-		auto soundGui = mpc.getUis().lock()->getSoundGui();
 		findField("end").lock()->setTextPadded(getZoneEnd(zone), " ");
 	}
 	else {
@@ -265,11 +258,12 @@ void ZoneScreen::displayEnd()
 
 void ZoneScreen::displayZone()
 {
-	if (sampler.lock()->getSoundCount() == 0) {
+	if (sampler.lock()->getSoundCount() == 0)
+	{
 		findField("zone").lock()->setText("1");
 		return;
 	}
-	auto soundGui = mpc.getUis().lock()->getSoundGui();
+
 	findField("zone").lock()->setText(to_string(zone + 1));
 }
 

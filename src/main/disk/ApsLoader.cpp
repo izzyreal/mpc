@@ -17,7 +17,6 @@
 #include <ui/Uis.hpp>
 #include <ui/disk/DiskGui.hpp>
 #include <ui/sampler/SamplerGui.hpp>
-#include <ui/sampler/SoundGui.hpp>
 
 #include <sampler/NoteParameters.hpp>
 #include <sampler/Pad.hpp>

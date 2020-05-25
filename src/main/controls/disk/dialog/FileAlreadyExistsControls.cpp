@@ -6,7 +6,6 @@
 #include <file/all/AllParser.hpp>
 #include <ui/NameGui.hpp>
 #include <ui/disk/DiskGui.hpp>
-#include <ui/sampler/SoundGui.hpp>
 #include <sampler/Sampler.hpp>
 #include <sampler/Sound.hpp>
 #include <sequencer/Sequencer.hpp>

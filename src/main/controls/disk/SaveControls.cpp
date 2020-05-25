@@ -4,9 +4,10 @@
 #include <disk/AbstractDisk.hpp>
 #include <ui/NameGui.hpp>
 #include <ui/disk/DiskGui.hpp>
-#include <ui/sampler/SoundGui.hpp>
+
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>
+
 #include <sequencer/Sequence.hpp>
 #include <sequencer/Track.hpp>
 #include <sequencer/Sequencer.hpp>

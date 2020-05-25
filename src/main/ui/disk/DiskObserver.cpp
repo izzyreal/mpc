@@ -12,7 +12,6 @@
 #include <ui/disk/DiskGui.hpp>
 #include <ui/disk/window/DiskWindowGui.hpp>
 #include <ui/sampler/SamplerGui.hpp>
-#include <ui/sampler/SoundGui.hpp>
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>
 #include <sampler/Sound.hpp>
@@ -38,11 +37,10 @@ DiskObserver::DiskObserver()
 	apsSaveNames = vector<string>{ "APS ONLY", "WITH SOUNDS", "WITH .WAV" };
 	auto uis = Mpc::instance().getUis().lock();
 	samplerGui = uis->getSamplerGui();
-	soundGui = uis->getSoundGui();
+
 	diskWindowGui = uis->getDiskWindowGui();
 	diskWindowGui->addObserver(this);
 	samplerGui->addObserver(this);
-	soundGui->addObserver(this);
 	disk = Mpc::instance().getDisk();
 	sampler = Mpc::instance().getSampler();
 	sequencer = Mpc::instance().getSequencer();
@@ -419,7 +417,6 @@ DiskObserver::~DiskObserver() {
 	lSequencer->deleteObserver(this);
 	diskWindowGui->deleteObserver(this);
 	samplerGui->deleteObserver(this);
-	soundGui->deleteObserver(this);
 	diskGui->deleteObserver(this);
 	mpcSoundPlayerChannel->deleteObserver(this);
 }

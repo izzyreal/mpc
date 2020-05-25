@@ -11,10 +11,6 @@ namespace mpc {
 	}
 
 	namespace ui {
-
-		namespace sampler {
-			class SoundGui;
-		}
 		
 		namespace vmpc {
 			class DeviceGui;
@@ -50,7 +46,6 @@ namespace mpc {
 				mpc::ui::NameGui* nameGui{ nullptr };
 				std::weak_ptr<mpc::disk::AbstractDisk> disk{};
 				mpc::ui::vmpc::DeviceGui* deviceGui{ nullptr };
-				mpc::ui::sampler::SoundGui* soundGui{ nullptr };
 				mpc::disk::MpcFile* selectedFile{ nullptr };
 
 			protected:

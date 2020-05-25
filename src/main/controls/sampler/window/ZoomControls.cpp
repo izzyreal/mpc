@@ -4,7 +4,6 @@
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/ZoneScreen.hpp>
 
-#include <ui/sampler/SoundGui.hpp>
 #include <ui/sampler/window/ZoomGui.hpp>
 #include <sampler/Sampler.hpp>
 #include <sampler/Sound.hpp>
@@ -140,10 +139,12 @@ void ZoomControls::turnWheel(int i)
 	{
 		zoneScreen->setZoneEnd(zoneScreen->zone, zoneScreen->getZoneEnd(zoneScreen->zone) + i);
 	}
-	else if (param.compare("smpllngth") == 0) {
+	else if (param.compare("smpllngth") == 0)
+	{
 		zoomGui->setSmplLngthFix(i > 0);
 	}
-	else if (param.compare("playx") == 0) {
-		soundGui->setPlayX(soundGui->getPlayX() + 1);
+	else if (param.compare("playx") == 0)
+	{
+		sampler.lock()->setPlayX(sampler.lock()->getPlayX() + 1);
 	}
 }

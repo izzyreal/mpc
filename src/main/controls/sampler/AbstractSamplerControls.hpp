@@ -15,11 +15,6 @@ namespace mpc::ui::sampler::window
 	class EditSoundGui;
 }
 
-namespace mpc::ui::sampler
-{
-	class SoundGui;
-}
-
 namespace mpc::controls::sampler {
 
 	class AbstractSamplerControls
@@ -28,7 +23,6 @@ namespace mpc::controls::sampler {
 
 	protected:
 		mpc::ui::sampler::window::ZoomGui* zoomGui{ nullptr };
-		mpc::ui::sampler::SoundGui* soundGui{ nullptr };
 		std::weak_ptr<mpc::sampler::Sound> sound{};
 		mpc::ui::sampler::window::SamplerWindowGui* swGui{ nullptr };
 		mpc::ui::sampler::window::EditSoundGui* editSoundGui{ nullptr };

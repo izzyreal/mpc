@@ -1,7 +1,6 @@
 #include "StereoToMonoScreen.hpp"
 
 #include <ui/NameGui.hpp>
-#include <ui/sampler/SoundGui.hpp>
 
 using namespace mpc::lcdgui::screens::dialog;
 using namespace moduru::lang;
@@ -76,7 +75,6 @@ void StereoToMonoScreen::function(int i)
 		auto left = sampler.lock()->addSound(sound->getSampleRate()).lock();
 		auto right = sampler.lock()->addSound(sound->getSampleRate()).lock();
 
-		auto soundGui = mpc.getUis().lock()->getSoundGui();
 		left->setName(newLName);
 		right->setName(newRName);
 
@@ -117,13 +115,11 @@ void StereoToMonoScreen::displayStereoSource()
 
 void StereoToMonoScreen::displayNewLName()
 {
-	auto soundGui = mpc.getUis().lock()->getSoundGui();
 	findField("newlname").lock()->setText(newLName);
 }
 
 void StereoToMonoScreen::displayNewRName()
 {
-	auto soundGui = mpc.getUis().lock()->getSoundGui();
 	findField("newrname").lock()->setText(newRName);
 }
 

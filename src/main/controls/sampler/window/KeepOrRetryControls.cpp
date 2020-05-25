@@ -3,7 +3,6 @@
 #include <Mpc.hpp>
 #include <controls/Controls.hpp>
 #include <ui/NameGui.hpp>
-#include <ui/sampler/SoundGui.hpp>
 #include <sampler/NoteParameters.hpp>
 #include <sampler/Sampler.hpp>
 #include <sampler/Sound.hpp>

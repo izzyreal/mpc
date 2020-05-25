@@ -2,7 +2,6 @@
 
 #include <ui/NameGui.hpp>
 #include <lcdgui/Field.hpp>
-#include <ui/sampler/SoundGui.hpp>
 #include <sampler/Sampler.hpp>
 #include <sampler/Sound.hpp>
 
@@ -71,7 +70,6 @@ void ResampleScreen::function(int i)
 		break;
 	case 4:
 	{
-		auto soundGui = mpc.getUis().lock()->getSoundGui();
 		auto snd = sampler.lock()->getSound(sampler.lock()->getSoundIndex()).lock();
 		auto destSnd = sampler.lock()->addSound().lock();
 		destSnd->setName(newName);
@@ -157,7 +155,6 @@ void ResampleScreen::displayNewBit()
 
 void ResampleScreen::displayNewName()
 {
-	auto soundGui = mpc.getUis().lock()->getSoundGui();
 	findField("newname").lock()->setText(newName);
 }
 

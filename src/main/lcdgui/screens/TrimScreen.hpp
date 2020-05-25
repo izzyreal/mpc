@@ -3,8 +3,19 @@
 
 #include <memory>
 
-namespace mpc::lcdgui::screens {
+namespace mpc::ui::sampler::window
+{
+	class ZoomObserver;
+}
 
+namespace mpc::lcdgui::screens
+{
+	class LoopScreen;
+	class ZoneScreen;
+}
+
+namespace mpc::lcdgui::screens
+{
 	class TrimScreen
 		: public mpc::lcdgui::ScreenComponent
 	{
@@ -30,6 +41,14 @@ namespace mpc::lcdgui::screens {
 		void displayEnd();
 		void displayView();
 		void displayWave();
+
+		int view = 0;
+		void setView(int i);
+
+	private:
+		friend class LoopScreen;
+		friend class ZoneScreen;
+		friend class mpc::ui::sampler::window::ZoomObserver;
 
 	};
 }
