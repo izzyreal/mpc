@@ -89,9 +89,15 @@ void GlobalReleaseControls::function(int i) {
 void GlobalReleaseControls::simplePad(int i)
 {
 	init();
-	auto bank = samplerGui->getBank();
+	auto bank = mpc.getBank();
+	
 	auto controls = Mpc::instance().getControls().lock();
-	if (controls->getPressedPads()->find(i) == controls->getPressedPads()->end()) return;
+	
+	if (controls->getPressedPads()->find(i) == controls->getPressedPads()->end())
+	{
+		return;
+	}
+	
 	controls->getPressedPads()->erase(controls->getPressedPads()->find(i));
 
 	//if (csn.compare("loadasound") == 0) return;
@@ -103,7 +109,9 @@ void GlobalReleaseControls::simplePad(int i)
 
 	bool maybeRecWithoutPlaying = csn.compare("sequencer") == 0 && !posIsLastTick;
 	bool stepRec = csn.compare("step") == 0 && !posIsLastTick;
-	if (stepRec || maybeRecWithoutPlaying) {
+	
+	if (stepRec || maybeRecWithoutPlaying)
+	{
 		auto newDur = static_cast<int>(Mpc::instance().getAudioMidiServices().lock()->getFrameSequencer().lock()->getTickPosition());
 		sequencer.lock()->stopMetronomeTrack();
 		bool adjustedRecordedNote = lTrk->adjustDurLastEvent(newDur);

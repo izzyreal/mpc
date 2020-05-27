@@ -43,26 +43,6 @@ int SamplerGui::getPad()
     return pad;
 }
 
-void SamplerGui::setBank(int i)
-{
-	if (i == bank) return;
-	if (i < 0 || i > 3) return;
-
-	bank = i;
-	auto hw = Mpc::instance().getHardware().lock();
-	hw->getLed("padbanka").lock()->light(i == 0);
-	hw->getLed("padbankb").lock()->light(i == 1);
-	hw->getLed("padbankc").lock()->light(i == 2);
-	hw->getLed("padbankd").lock()->light(i == 3);
-	setChanged();
-	notifyObservers(string("bank"));
-}
-
-int SamplerGui::getBank()
-{
-    return bank;
-}
-
 string SamplerGui::getPrevScreenName()
 {
     return prevScreenName;

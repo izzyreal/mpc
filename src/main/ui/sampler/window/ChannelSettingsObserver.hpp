@@ -39,10 +39,8 @@ namespace mpc {
 			{
 
 			private:
-				
 				std::weak_ptr<mpc::sampler::Sampler> sampler{};
 				SamplerGui* samplerGui{ nullptr };
-				int bank = 0;
 				ctoot::mpc::MpcSoundPlayerChannel* mpcSoundPlayerChannel{ nullptr };
 				std::weak_ptr<mpc::sampler::Program> program{};
 				std::weak_ptr<mpc::lcdgui::LayeredScreen> ls{};

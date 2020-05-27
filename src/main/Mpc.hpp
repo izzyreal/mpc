@@ -87,9 +87,12 @@ namespace mpc {
 
 	private:
 		std::shared_ptr<hardware::Hardware> hardware;
+		int bank = 0;
 
 	public:
 		void init(const int sampleRate, const int inputCount, const int outputCount);
+		void setBank(int i);
+		int getBank();
 
 	public:
 		std::weak_ptr<ui::Uis> getUis();

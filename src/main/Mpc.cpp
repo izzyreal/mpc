@@ -31,6 +31,7 @@
 
 #include <hardware/Hardware.hpp>
 #include <hardware/HwSlider.hpp>
+#include <hardware/Led.hpp>
 
 #include <disk/AllLoader.hpp>
 #include <disk/ApsLoader.hpp>
@@ -244,6 +245,31 @@ weak_ptr<audiomidi::MpcMidiPorts> Mpc::getMidiPorts()
 audiomidi::MpcMidiInput* Mpc::getMpcMidiInput(int i)
 {
 	return mpcMidiInputs[i];
+}
+
+void Mpc::setBank(int i)
+{
+	if (i == bank)
+	{
+		return;
+	}
+	
+	if (i < 0 || i > 3)
+	{
+		return;
+	}
+
+	bank = i;
+
+	hardware->getLed("padbanka").lock()->light(i == 0);
+	hardware->getLed("padbankb").lock()->light(i == 1);
+	hardware->getLed("padbankc").lock()->light(i == 2);
+	hardware->getLed("padbankd").lock()->light(i == 3);
+}
+
+int Mpc::getBank()
+{
+	return bank;
 }
 
 Mpc::~Mpc() {

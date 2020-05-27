@@ -39,9 +39,9 @@ ChannelSettingsObserver::ChannelSettingsObserver()
 	auto uis = Mpc::instance().getUis().lock();
 	samplerGui = uis->getSamplerGui();
 	samplerGui->addObserver(this);
-	bank = samplerGui->getBank();
+
 	ls = Mpc::instance().getLayeredScreen();
-	auto lLs = ls.lock();
+
 	sampler = Mpc::instance().getSampler();
 
 	auto drumScreen = dynamic_pointer_cast<DrumScreen>(Screens::getScreenComponent("drum"));
@@ -49,7 +49,7 @@ ChannelSettingsObserver::ChannelSettingsObserver()
 	mpcSoundPlayerChannel = sampler.lock()->getDrum(drumScreen->getDrum());
 	program = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
 
-	for (int i = (bank * 16); i < (bank * 16) + 16; i++)
+	for (int i = (Mpc::instance().getBank() * 16); i < (Mpc::instance().getBank() * 16) + 16; i++)
 	{
 		auto pad = program.lock()->getPad(i);
 		auto stMixerChannel = pad->getStereoMixerChannel().lock();
@@ -58,34 +58,32 @@ ChannelSettingsObserver::ChannelSettingsObserver()
 		indivFxMixerChannel->addObserver(this);
 	}
 
-	noteField = lLs->lookupField("note");
-	stereoVolumeField = lLs->lookupField("stereovolume");
-	individualVolumeField = lLs->lookupField("individualvolume");
-	fxSendLevelField = lLs->lookupField("fxsendlevel");
-	panningField = lLs->lookupField("panning");
-	outputField = lLs->lookupField("output");
-	fxPathField = lLs->lookupField("fxpath");
-	followStereoField = lLs->lookupField("followstereo");
+	noteField = ls.lock()->lookupField("note");
+	stereoVolumeField = ls.lock()->lookupField("stereovolume");
+	individualVolumeField = ls.lock()->lookupField("individualvolume");
+	fxSendLevelField = ls.lock()->lookupField("fxsendlevel");
+	panningField = ls.lock()->lookupField("panning");
+	outputField = ls.lock()->lookupField("output");
+	fxPathField = ls.lock()->lookupField("fxpath");
+	followStereoField = ls.lock()->lookupField("followstereo");
 	displayChannel();
 }
 
 void ChannelSettingsObserver::update(moduru::observer::Observable* o, nonstd::any arg)
 {
-	auto lLs = ls.lock();
-	auto lProgram = program.lock();
 
-	for (int i = (bank * 16); i < (bank * 16) + 16; i++) {
-		auto pad = lProgram->getPad(i);
+	// We will add ChannelSettingsScreen to the observers of Mpc. Upon an update all relevant components will be redrawn upon a bank change in Mpc.
+	for (int i = (Mpc::instance().getBank() * 16); i < (Mpc::instance().getBank() * 16) + 16; i++)
+	{
+		auto pad = program.lock()->getPad(i);
 		auto stMixerChannel = pad->getStereoMixerChannel().lock();
 		auto indivFxMixerChannel = pad->getIndivFxMixerChannel().lock();
 		stMixerChannel->deleteObserver(this);
 		indivFxMixerChannel->deleteObserver(this);
 	}
 
-	bank = samplerGui->getBank();
-
-	for (int i = (bank * 16); i < (bank * 16) + 16; i++) {
-		auto pad = lProgram->getPad(i);
+	for (int i = (Mpc::instance().getBank() * 16); i < (Mpc::instance().getBank() * 16) + 16; i++) {
+		auto pad = program.lock()->getPad(i);
 		auto stMixerChannel = pad->getStereoMixerChannel().lock();
 		auto indivFxMixerChannel = pad->getIndivFxMixerChannel().lock();
 		stMixerChannel->addObserver(this);
@@ -95,31 +93,40 @@ void ChannelSettingsObserver::update(moduru::observer::Observable* o, nonstd::an
 
 	string s = nonstd::any_cast<string>(arg);
 
-	if (s.compare("padandnote") == 0) {
+	if (s.compare("padandnote") == 0)
+	{
 		displayChannel();
 	}
-	else if (s.compare("volume") == 0) {
+	else if (s.compare("volume") == 0)
+	{
 		displayStereoVolume();
 	}
-	else if (s.compare("volumeindividual") == 0) {
+	else if (s.compare("volumeindividual") == 0)
+	{
 		displayIndividualVolume();
 	}
-	else if (s.compare("fxsendlevel") == 0) {
+	else if (s.compare("fxsendlevel") == 0)
+	{
 		displayFxSendLevel();
 	}
-	else if (s.compare("panning") == 0) {
+	else if (s.compare("panning") == 0)
+	{
 		displayPanning();
 	}
-	else if (s.compare("output") == 0) {
+	else if (s.compare("output") == 0)
+	{
 		displayOutput();
 	}
-	else if (s.compare("fxpath") == 0) {
+	else if (s.compare("fxpath") == 0)
+	{
 		displayFxPath();
 	}
-	else if (s.compare("followstereo") == 0) {
+	else if (s.compare("followstereo") == 0)
+	{
 		displayFollowStereo();
 	}
-	else if (s.compare("bank") == 0) {
+	else if (s.compare("bank") == 0)
+	{
 		displayChannel();
 	}
 }
@@ -215,7 +222,7 @@ void ChannelSettingsObserver::displayFxPath() {
 void ChannelSettingsObserver::displayFollowStereo() {
 	auto lProgram = program.lock();
 	auto mixerScreen = dynamic_pointer_cast<MixerScreen>(Screens::getScreenComponent("mixer"));
-	auto mixerChannel = lProgram->getPad(mixerScreen->getXPos() + (bank * 16))->getIndivFxMixerChannel();
+	auto mixerChannel = lProgram->getPad(mixerScreen->getXPos() + (Mpc::instance().getBank() * 16))->getIndivFxMixerChannel();
 	auto lMc = mixerChannel.lock();
 	followStereoField.lock()->setText(lMc->isFollowingStereo() ? "YES" : "NO");
 }
@@ -223,7 +230,7 @@ void ChannelSettingsObserver::displayFollowStereo() {
 ChannelSettingsObserver::~ChannelSettingsObserver() {
 	samplerGui->deleteObserver(this);
 
-	for (int i = (bank * 16); i < (bank * 16) + 16; i++) {
+	for (int i = (Mpc::instance().getBank() * 16); i < (Mpc::instance().getBank() * 16) + 16; i++) {
 		auto pad = program.lock()->getPad(i);
 		auto stereoMixerChannel = pad->getStereoMixerChannel().lock();
 		auto indivFxMixerChannel = pad->getIndivFxMixerChannel().lock();

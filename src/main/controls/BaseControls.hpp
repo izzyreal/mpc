@@ -69,7 +69,6 @@ namespace mpc::controls {
 		ui::sampler::SamplerGui* samplerGui = nullptr;
 		std::weak_ptr<mpc::lcdgui::Field> activeField;
 
-		int bank_{ 0 };
 		std::vector<std::string> typableParams;
 
 	protected:

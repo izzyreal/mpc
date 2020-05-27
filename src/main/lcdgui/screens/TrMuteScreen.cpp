@@ -71,14 +71,14 @@ void TrMuteScreen::pad(int i, int velo, bool repeat, int tick)
 			sequencer.lock()->setSoloEnabled(true);
 		}
 
-		sequencer.lock()->setSelectedTrackIndex(i + (bank_ * 16));
+		sequencer.lock()->setSelectedTrackIndex(i + (mpc.getBank() * 16));
 		ls.lock()->removeCurrentBackground();
 		ls.lock()->setCurrentBackground("trackmutesolo2");
 	}
 	else
 	{
 		auto s = sequencer.lock()->getActiveSequence().lock();
-		auto t = s->getTrack(i + (bank_ * 16)).lock();
+		auto t = s->getTrack(i + (mpc.getBank() * 16)).lock();
 		t->setOn(!t->isOn());
 	}
 }
@@ -130,20 +130,20 @@ void TrMuteScreen::function(int i)
 
 int TrMuteScreen::bankoffset()
 {
-	int bank = Mpc::instance().getUis().lock()->getSamplerGui()->getBank();
+	int bank = mpc.getBank();
 	return bank * 16;
 }
 
 void TrMuteScreen::displayBank()
 {
 	auto letters = vector<string>{ "A", "B", "C", "D" };
-	findLabel("bank").lock()->setText(letters[samplerGui->getBank()]);
+	findLabel("bank").lock()->setText(letters[mpc.getBank()]);
 }
 
 void TrMuteScreen::displayTrackNumbers()
 {
 	auto trn = vector<string>{ "01-16", "17-32", "33-48", "49-64" };
-	findLabel("tracknumbers").lock()->setText(trn[samplerGui->getBank()]);
+	findLabel("tracknumbers").lock()->setText(trn[mpc.getBank()]);
 }
 
 void TrMuteScreen::displaySq()

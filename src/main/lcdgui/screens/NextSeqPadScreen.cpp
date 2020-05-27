@@ -44,7 +44,7 @@ void NextSeqPadScreen::right()
 void NextSeqPadScreen::pad(int i, int velo, bool repeat, int tick)
 {
 	init();
-	sequencer.lock()->setNextSqPad(i + (bank_ * 16));
+	sequencer.lock()->setNextSqPad(i + (mpc.getBank() * 16));
 }
 
 void NextSeqPadScreen::turnWheel(int i)
@@ -52,7 +52,9 @@ void NextSeqPadScreen::turnWheel(int i)
 	init();
 	
 	if (param.compare("sq") == 0)
+	{
 		sequencer.lock()->setActiveSequenceIndex(sequencer.lock()->getActiveSequenceIndex() + i);
+	}
 }
 
 void NextSeqPadScreen::function(int i)
@@ -75,19 +77,19 @@ void NextSeqPadScreen::displayNextSq()
 
 int NextSeqPadScreen::bankOffset()
 {
-	return samplerGui->getBank() * 16;
+	return mpc.getBank() * 16;
 }
 
 void NextSeqPadScreen::displayBank()
 {
 	auto letters = vector<string>{ "A", "B", "C", "D" };
-	findLabel("bank").lock()->setText(letters[samplerGui->getBank()]);
+	findLabel("bank").lock()->setText(letters[mpc.getBank()]);
 }
 
 void NextSeqPadScreen::displaySeqNumbers()
 {
 	auto seqn = vector<string>{ "01-16", "17-32", "33-48", "49-64" };
-	findLabel("seqnumbers").lock()->setText(seqn[samplerGui->getBank()]);
+	findLabel("seqnumbers").lock()->setText(seqn[mpc.getBank()]);
 }
 
 void NextSeqPadScreen::displaySq()

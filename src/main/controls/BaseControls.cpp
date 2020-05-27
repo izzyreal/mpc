@@ -79,9 +79,7 @@ void BaseControls::init()
         mpcSoundPlayerChannel = sampler.lock()->getDrum(track.lock()->getBusNumber() - 1);
 		program = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
     }
-    
-	bank_ = samplerGui->getBank();
-}
+    }
 
 void BaseControls::left()
 {
@@ -221,9 +219,9 @@ void BaseControls::pad(int i, int velo, bool repeat, int tick)
 			return;
 		}
 	}
-	auto note = track.lock()->getBusNumber() > 0 ? program.lock()->getPad(i + (bank_ * 16))->getNote() : i + (bank_ * 16) + 35;
+	auto note = track.lock()->getBusNumber() > 0 ? program.lock()->getPad(i + (mpc.getBank() * 16))->getNote() : i + (mpc.getBank() * 16) + 35;
 	auto velocity = velo;
-	auto pad = i + (bank_ * 16);
+	auto pad = i + (mpc.getBank() * 16);
 
 	auto assign16LevelsScreen = dynamic_pointer_cast<Assign16LevelsScreen>(Screens::getScreenComponent("assign16levels"));
 
@@ -323,7 +321,7 @@ void BaseControls::generateNoteOn(int nn, int padVelo, int tick)
 		{
 			auto type = assign16LevelsScreen->getType();
 			auto key = assign16LevelsScreen->getOriginalKeyPad();
-			auto diff = lProgram->getPadNumberFromNote(nn) - (bank_ * 16) - key;
+			auto diff = lProgram->getPadNumberFromNote(nn) - (mpc.getBank() * 16) - key;
 			n->setNote(assign16LevelsScreen->getNote());
 			n->setVariationTypeNumber(type);
 			n->setVariationValue(diff * 5);
@@ -350,7 +348,7 @@ void BaseControls::generateNoteOn(int nn, int padVelo, int tick)
 
 		auto type = assign16LevelsScreen->getType();
 		auto key = assign16LevelsScreen->getOriginalKeyPad();
-		auto padnr = program.lock()->getPadNumberFromNote(nn) - (bank_ * 16);
+		auto padnr = program.lock()->getPadNumberFromNote(nn) - (mpc.getBank() * 16);
 
 		if (type == 0) {
 			auto diff = padnr - key;
@@ -728,14 +726,21 @@ void BaseControls::trackMute()
 void BaseControls::bank(int i)
 {
 	init();
-	auto oldBank = samplerGui->getBank();
-	samplerGui->setBank(i);
+	
+	auto oldBank = mpc.getBank();
+	
+	mpc.setBank(i);
+	
 	auto diff = 16 * (i - oldBank);
-	auto newPadNr = samplerGui->getPad() + diff;
-	auto newNN = program.lock()->getPad(newPadNr)->getNote();
-	samplerGui->setPadAndNote(newPadNr, newNN);
-	for (int i=0;i<16;i++)
+	auto newPadIndex = samplerGui->getPad() + diff;
+	auto newNote = program.lock()->getPad(newPadIndex)->getNote();
+	
+	samplerGui->setPadAndNote(newPadIndex, newNote);
+	
+	for (int i = 0; i < 16; i++)
+	{
 		mpc.getHardware().lock()->getPad(i).lock()->notifyObservers(255);
+	}
 }
 
 void BaseControls::fullLevel()

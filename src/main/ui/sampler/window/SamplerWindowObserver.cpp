@@ -397,9 +397,11 @@ void SamplerWindowObserver::update(moduru::observer::Observable* o, nonstd::any 
 		}
 
 	}
-	else if (s.compare("note") == 0) {
-		if (csn.compare("assignmentview") == 0) {
-			auto pn = swGui->getPadNumberFromFocus(Mpc::instance().getLayeredScreen().lock()->getFocus(), samplerGui->getBank());
+	else if (s.compare("note") == 0)
+	{
+		if (csn.compare("assignmentview") == 0)
+		{
+			auto pn = swGui->getPadNumberFromFocus(Mpc::instance().getLayeredScreen().lock()->getFocus(), Mpc::instance().getBank());
 			displayInfo1();
 			displayInfo2();
 			displayPad(pn);
@@ -486,13 +488,13 @@ void SamplerWindowObserver::displayAssignmentView()
 
 void SamplerWindowObserver::displayInfo0()
 {
-	info0Label.lock()->setText("Bank:" + letters[samplerGui->getBank()] + " Note:");
+	info0Label.lock()->setText("Bank:" + letters[Mpc::instance().getBank()] + " Note:");
 }
 
 void SamplerWindowObserver::displayInfo1()
 {
 	auto focus = Mpc::instance().getLayeredScreen().lock()->getFocus();
-	auto pn = swGui->getPadNumberFromFocus(focus, samplerGui->getBank());
+	auto pn = swGui->getPadNumberFromFocus(focus, Mpc::instance().getBank());
 	int nn = program.lock()->getPad(pn)->getNote();
 	info1Label.lock()->setText(nn != 34 ? to_string(nn) : "--");
 }
@@ -500,7 +502,7 @@ void SamplerWindowObserver::displayInfo1()
 void SamplerWindowObserver::displayInfo2()
 {
 	auto focus = Mpc::instance().getLayeredScreen().lock()->getFocus();
-	auto pn = swGui->getPadNumberFromFocus(focus, samplerGui->getBank());
+	auto pn = swGui->getPadNumberFromFocus(focus, Mpc::instance().getBank());
 	int nn = program.lock()->getPad(pn)->getNote();
 
 	if (nn == 34) {
@@ -524,7 +526,7 @@ void SamplerWindowObserver::displayPad(int i)
 {
 	auto pads = vector<weak_ptr<Field>>{ a3Field, b3Field, c3Field, d3Field, a2Field, b2Field, c2Field, d2Field, a1Field, b1Field, c1Field, d1Field, a0Field, b0Field, c0Field, d0Field };
 	auto lProgram = program.lock();
-	auto nn = lProgram->getPad(i + (16 * samplerGui->getBank()))->getNote();
+	auto nn = lProgram->getPad(i + (16 * Mpc::instance().getBank()))->getNote();
 	string sampleName = "";
 	if (nn != 34) {
 		auto sampleNumber = lProgram->getNoteParameters(nn)->getSndNumber();
