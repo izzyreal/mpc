@@ -3,10 +3,9 @@
 #include <Mpc.hpp>
 #include <controls/Controls.hpp>
 
-#include <lcdgui/Field.hpp>
-#include <ui/sampler/SoundGui.hpp>
+#include <lcdgui/Screens.hpp>
+
 #include <ui/sampler/window/EditSoundGui.hpp>
-#include <ui/sampler/window/ZoomGui.hpp>
 #include <sampler/Sampler.hpp>
 #include <sampler/Sound.hpp>
 
@@ -15,7 +14,9 @@
 #include <stdint.h>
 #include <limits.h>
 
+using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui::screens::window;
 using namespace moduru::lang;
 using namespace std;
 
@@ -122,10 +123,8 @@ void TrimScreen::turnWheel(int i)
 		return;
 	}
 	
-	auto zoomGui = mpc.getUis().lock()->getZoomGui();
 	auto sound = sampler.lock()->getSound().lock();
 	auto const oldLength = sound->getEnd() - sound->getStart();
-	auto const lengthFix = zoomGui->isSmplLngthFix();
 	
 	//auto notch = getNotch(increment);
 	auto soundInc = getSoundIncrement(i);
@@ -138,7 +137,7 @@ void TrimScreen::turnWheel(int i)
 
 	if (param.compare("st") == 0)
 	{
-		if (lengthFix && sound->getStart() + soundInc + oldLength > sound->getLastFrameIndex())
+		if (smplLngthFix && sound->getStart() + soundInc + oldLength > sound->getLastFrameIndex())
 		{
 			return;
 		}
@@ -147,7 +146,7 @@ void TrimScreen::turnWheel(int i)
 		
 		displaySt();
 
-		if (lengthFix)
+		if (smplLngthFix)
 		{
 			sound->setEnd(sound->getStart() + oldLength);
 			displayEnd();
@@ -156,7 +155,7 @@ void TrimScreen::turnWheel(int i)
 	}
 	else if (param.compare("end") == 0)
 	{
-		if (lengthFix && sound->getEnd() + soundInc - oldLength < 0)
+		if (smplLngthFix && sound->getEnd() + soundInc - oldLength < 0)
 		{
 			return;
 		}
@@ -165,7 +164,7 @@ void TrimScreen::turnWheel(int i)
 		
 		displayEnd();
 
-		if (lengthFix)
+		if (smplLngthFix)
 		{
 			sound->setStart(sound->getEnd() - oldLength);
 			displaySt();
@@ -212,16 +211,14 @@ void TrimScreen::setSlider(int i)
     
 	init();
 
-	auto zoomGui = mpc.getUis().lock()->getZoomGui();
 	auto sound = sampler.lock()->getSound().lock();
 	auto const oldLength = sound->getEnd() - sound->getStart();
-    auto const lengthFix = zoomGui->isSmplLngthFix();
     auto candidatePos = (int) ((i / 124.0) * sound->getLastFrameIndex());
     auto maxPos = int (0);
 	
 	if (param.compare("st") == 0)
 	{
-		maxPos = lengthFix ? sound->getLastFrameIndex() - oldLength : sound->getLastFrameIndex();
+		maxPos = smplLngthFix ? sound->getLastFrameIndex() - oldLength : sound->getLastFrameIndex();
 
 		if (candidatePos > maxPos)
 		{
@@ -230,7 +227,7 @@ void TrimScreen::setSlider(int i)
 		
 		sound->setStart(candidatePos);
 		
-		if (lengthFix)
+		if (smplLngthFix)
 		{
 			sound->setEnd(sound->getStart() + oldLength);
 		}
@@ -238,7 +235,7 @@ void TrimScreen::setSlider(int i)
 	}
 	else if (param.compare("end") == 0)
 	{
-		maxPos = lengthFix ? oldLength : int(0);
+		maxPos = smplLngthFix ? oldLength : int(0);
 	
 		if (candidatePos < maxPos)
 		{
@@ -247,7 +244,7 @@ void TrimScreen::setSlider(int i)
 		
 		sound->setEnd(candidatePos);
 		
-		if (lengthFix)
+		if (smplLngthFix)
 		{
 			sound->setStart(sound->getEnd() - oldLength);
 		}
@@ -282,24 +279,22 @@ void TrimScreen::pressEnter()
 		return;
 	}
 
-	auto zoomGui = mpc.getUis().lock()->getZoomGui(); 
 	auto candidate = mtf->enter();
 	auto sound = sampler.lock()->getSound().lock();
 	auto const oldLength = sound->getEnd() - sound->getStart();
-	auto const lengthFix = zoomGui->isSmplLngthFix();
 	
 	if (candidate != INT_MAX)
 	{
 		if (param.compare("st") == 0)
 		{
-			if (lengthFix && candidate + oldLength > sound->getLastFrameIndex())
+			if (smplLngthFix && candidate + oldLength > sound->getLastFrameIndex())
 			{
 				return;
 			}
 
 			sound->setStart(candidate);
 			
-			if (lengthFix)
+			if (smplLngthFix)
 			{
 				sound->setEnd(sound->getStart() + oldLength);
 			}
@@ -307,14 +302,14 @@ void TrimScreen::pressEnter()
 		}
 		else if (param.compare("end") == 0)
 		{
-			if (lengthFix && candidate - oldLength < 0)
+			if (smplLngthFix && candidate - oldLength < 0)
 			{
 				return;
 			}
 
 			sound->setEnd(candidate);
 			
-			if (lengthFix)
+			if (smplLngthFix)
 			{
 				sound->setStart(sound->getEnd() - oldLength);
 			}

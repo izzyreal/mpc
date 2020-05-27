@@ -13,8 +13,11 @@
 #include <sequencer/Sequencer.hpp>
 #include <sequencer/Song.hpp>
 
+#include <lang/StrUtil.hpp>
+
 using namespace mpc::sequencer;
 using namespace mpc::ui::vmpc;
+using namespace moduru::lang;
 using namespace std;
 
 DirectToDiskRecorderObserver::DirectToDiskRecorderObserver() 
@@ -69,7 +72,7 @@ void DirectToDiskRecorderObserver::displaySong()
 	}
 
 	auto song = d2dRecorderGui->getSong();
-	songField.lock()->setText(moduru::lang::StrUtil::padLeft(to_string(song + 1), "0", 2) + "-" + Mpc::instance().getSequencer().lock()->getSong(song).lock()->getName());
+	songField.lock()->setText(StrUtil::padLeft(to_string(song + 1), "0", 2) + "-" + Mpc::instance().getSequencer().lock()->getSong(song).lock()->getName());
 }
 
 void DirectToDiskRecorderObserver::displayOffline()
@@ -98,7 +101,7 @@ void DirectToDiskRecorderObserver::displaySq()
 	auto ls = Mpc::instance().getLayeredScreen().lock();
 	ls->lookupLabel("sq").lock()->Hide(!(d2dRecorderGui->getRecord() >= 0 && d2dRecorderGui->getRecord() <= 2));
 	auto seq = d2dRecorderGui->getSq();
-	sqField.lock()->setText(moduru::lang::StrUtil::padLeft(to_string(seq + 1), "0", 2) + "-" + Mpc::instance().getSequencer().lock()->getSequence(seq).lock()->getName());
+	sqField.lock()->setText(StrUtil::padLeft(to_string(seq + 1), "0", 2) + "-" + Mpc::instance().getSequencer().lock()->getSequence(seq).lock()->getName());
 }
 
 void DirectToDiskRecorderObserver::displayTime()

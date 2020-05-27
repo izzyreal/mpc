@@ -11,21 +11,29 @@
 #include <sequencer/SystemExclusiveEvent.hpp>
 
 #include <file/ByteUtil.hpp>
+#include <lang/StrUtil.hpp>
 #include <VecUtil.hpp>
 
 #include <cmath>
 
-using namespace std;
 using namespace mpc::file::all;
+using namespace moduru::lang;
+using namespace std; 
 
 SequenceNames::SequenceNames(vector<char> b)
 {
-	for (int i = 0; i < names.size(); i++) {
+	for (int i = 0; i < names.size(); i++)
+	{	
 		int offset = i * ENTRY_LENGTH;
 		string stringBuffer = "";
 		auto nameBytes = moduru::VecUtil::CopyOfRange(&b, offset, offset + AllParser::NAME_LENGTH);
-		for (char c : nameBytes) {
-			if (c == 0x00) break;
+
+		for (char c : nameBytes)
+		{
+			if (c == 0x00)
+			{
+				break;
+			}
 			stringBuffer.push_back(c);
 		}
 		names[i] = stringBuffer;
@@ -36,20 +44,33 @@ SequenceNames::SequenceNames()
 {
 	saveBytes = vector<char>(LENGTH);
 	auto sequencer = Mpc::instance().getSequencer().lock();
-	for (int i = 0; i < 99; i++) {
+
+	for (int i = 0; i < 99; i++)
+	{
 		auto seq = sequencer->getSequence(i).lock();
 		auto name = seq->getName();
 		auto offset = i * ENTRY_LENGTH;
+		
 		for (auto j = 0; j < AllParser::NAME_LENGTH; j++)
-			saveBytes[offset + j] = moduru::lang::StrUtil::padRight(name, " ", 16)[j];
+		{
+			saveBytes[offset + j] = StrUtil::padRight(name, " ", 16)[j];
+		}
 
-		if (name.find("(Unused)") == string::npos) {
+		if (name.find("(Unused)") == string::npos)
+		{
 			auto eventSegmentCount = getSegmentCount(seq.get());
+		
 			if ((eventSegmentCount & 1) != 0)
+			{
 				eventSegmentCount--;
+			}
 
 			auto lastEventIndex = 641 + (eventSegmentCount / 2);
-			if (lastEventIndex < 641) lastEventIndex = 641;
+			
+			if (lastEventIndex < 641)
+			{
+				lastEventIndex = 641;
+			}
 
 			auto eventCountBytes = moduru::file::ByteUtil::ushort2bytes(lastEventIndex);
 			saveBytes[offset + LAST_EVENT_INDEX_OFFSET] = eventCountBytes[0];
@@ -75,21 +96,31 @@ vector<char> SequenceNames::getBytes()
 int SequenceNames::getSegmentCount(mpc::sequencer::Sequence* seq)
 {
 	auto segmentCount = 0;
-	for (auto& track : seq->getTracks()) {
+	for (auto& track : seq->getTracks())
+	{
+	
 		auto t = track.lock();
 
-		if (t->getTrackIndex() > 63) break;
+		if (t->getTrackIndex() > 63)
+		{
+			break;
+		}
 
-		for (auto& e : t->getEvents()) {
+		for (auto& e : t->getEvents())
+		{
 			auto sysEx = dynamic_pointer_cast<mpc::sequencer::SystemExclusiveEvent>(e.lock());
-			if (sysEx) {
+		
+			if (sysEx)
+			{
 				auto dataSegments = (int)(ceil(sysEx->getBytes()->size() / 8.0));
 				segmentCount += dataSegments + 1;
 			}
-			else if (dynamic_pointer_cast<mpc::sequencer::MixerEvent>(e.lock())) {
+			else if (dynamic_pointer_cast<mpc::sequencer::MixerEvent>(e.lock()))
+			{
 				segmentCount += 2;
 			}
-			else {
+			else
+			{
 				segmentCount++;
 			}
 		}

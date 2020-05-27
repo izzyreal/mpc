@@ -61,6 +61,13 @@
 #include <lcdgui/screens/window/Assign16LevelsScreen.hpp>
 #include <lcdgui/screens/window/StepTcScreen.hpp>
 #include <lcdgui/screens/window/SoundScreen.hpp>
+#include <lcdgui/screens/window/StartFineScreen.hpp>
+#include <lcdgui/screens/window/EndFineScreen.hpp>
+#include <lcdgui/screens/window/LoopToFineScreen.hpp>
+#include <lcdgui/screens/window/LoopEndFineScreen.hpp>
+#include <lcdgui/screens/window/ZoneStartFineScreen.hpp>
+#include <lcdgui/screens/window/ZoneEndFineScreen.hpp>
+
 
 #include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
 #include <lcdgui/screens/dialog/MidiMonitorScreen.hpp>
@@ -94,7 +101,6 @@ using namespace std;
 
 vector<unique_ptr<Document>> Screens::layerDocuments;
 map<string, shared_ptr<ScreenComponent>> Screens::screens;
-
 
 vector<int> getFunctionKeyTypes(Value& functionKeyTypes)
 {
@@ -212,7 +218,7 @@ vector<shared_ptr<Component>> Screens::get(const string& screenName, int& foundI
 		Value& infoSize = arrangement["infosize"];
 		Value& infoX = arrangement["infox"];
 		Value& infoY = arrangement["infoy"];
-	
+
 		for (int i = 0; i < infoNames.Size(); i++)
 		{
 			components.push_back(make_shared<Label>(infoNames[i].GetString()
@@ -528,6 +534,30 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	else if (screenName.compare("fx-edit") == 0)
 	{
 		screen = make_shared<FxEditScreen>(layerIndex);
+	}
+	else if (screenName.compare("start-fine") == 0)
+	{
+		screen = make_shared<StartFineScreen>(layerIndex);
+	}
+	else if (screenName.compare("end-fine") == 0)
+	{
+		screen = make_shared<EndFineScreen>(layerIndex);
+	}
+	else if (screenName.compare("loop-to-fine") == 0)
+	{
+		screen = make_shared<LoopToFineScreen>(layerIndex);
+	}
+	else if (screenName.compare("loop-end-fine") == 0)
+	{
+		screen = make_shared<LoopEndFineScreen>(layerIndex);
+	}
+	else if (screenName.compare("zone-start-fine") == 0)
+	{
+		screen = make_shared<ZoneStartFineScreen>(layerIndex);
+	}
+	else if (screenName.compare("zone-end-fine") == 0)
+	{
+		screen = make_shared<ZoneEndFineScreen>(layerIndex);
 	}
 
 	if (screen)

@@ -39,7 +39,6 @@
 #include <ui/sampler/window/EditSoundObserver.hpp>
 #include <ui/sampler/window/MuteAssignObserver.hpp>
 #include <ui/sampler/window/SamplerWindowObserver.hpp>
-#include <ui/sampler/window/ZoomObserver.hpp>
 
 #include <ui/NameObserver.hpp>
 
@@ -815,10 +814,6 @@ void LayeredScreen::initObserver()
 	else if (csn.compare("editsound") == 0)
 	{
 		activeObserver = make_unique<EditSoundObserver>();
-	}
-	else if (csn.find("startfine") != string::npos || csn.find("endfine") != string::npos || csn.compare("looptofine") == 0)
-	{
-		activeObserver = make_unique<ZoomObserver>();
 	}
 	else if (csn.compare("deleteallfiles") == 0)
 	{

@@ -14,7 +14,6 @@
 
 #include <ui/sampler/SamplerGui.hpp>
 
-#include <ui/sampler/window/ZoomGui.hpp>
 #include <ui/sampler/window/SamplerWindowGui.hpp>
 #include <ui/sampler/window/EditSoundGui.hpp>
 
@@ -62,7 +61,6 @@ Uis::Uis()
 	nameGui = new mpc::ui::NameGui();
 
 	editSoundGui = new mpc::ui::sampler::window::EditSoundGui();
-	zoomGui = new mpc::ui::sampler::window::ZoomGui();
 	samplerWindowGui = new mpc::ui::sampler::window::SamplerWindowGui();
 
 	diskGui = new mpc::ui::disk::DiskGui();
@@ -84,11 +82,6 @@ vector<string> Uis::noteNames;
 mpc::ui::midisync::MidiSyncGui* Uis::getMidiSyncGui()
 {
 	return midiSyncGui;
-}
-
-mpc::ui::sampler::window::ZoomGui* Uis::getZoomGui()
-{
-	return zoomGui;
 }
 
 mpc::ui::disk::DiskGui* Uis::getDiskGui()
@@ -160,7 +153,6 @@ Uis::~Uis()
 {
 	if (samplerGui != nullptr) delete samplerGui;
 	if (editSoundGui != nullptr) delete editSoundGui;
-	if (zoomGui != nullptr) delete zoomGui;
 	if (samplerWindowGui != nullptr) delete samplerWindowGui;
 	if (diskGui != nullptr) delete diskGui;
 	if (directoryGui != nullptr) delete directoryGui;

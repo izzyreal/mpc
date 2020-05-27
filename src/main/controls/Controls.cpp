@@ -21,7 +21,6 @@
 #include <controls/sampler/window/VeloEnvFilterControls.hpp>
 #include <controls/sampler/window/VeloPitchControls.hpp>
 #include <controls/sampler/window/VelocityModulationControls.hpp>
-#include <controls/sampler/window/ZoomControls.hpp>
 
 #include <controls/disk/FormatControls.hpp>
 #include <controls/disk/LoadControls.hpp>
@@ -94,13 +93,6 @@ Controls::Controls()
 	controls["deleteallprograms"] = new sampler::dialog::DeleteAllProgramsControls();
 	controls["deleteprogram"] = new sampler::dialog::DeleteProgramControls();
 	controls["deleteallsound"] = new sampler::dialog::DeleteAllSoundControls();
-
-	controls["startfine"] = new sampler::window::ZoomControls();
-	controls["endfine"] = new sampler::window::ZoomControls();
-	controls["looptofine"] = new sampler::window::ZoomControls();
-	controls["loopendfine"] = new sampler::window::ZoomControls();
-	controls["zonestartfine"] = new sampler::window::ZoomControls();
-	controls["zoneendfine"] = new sampler::window::ZoomControls();
 
 	controls["load"] = new disk::LoadControls();
 	controls["save"] = new disk::SaveControls();

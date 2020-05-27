@@ -254,10 +254,13 @@ void MidiTrack::recalculateSize()
 
 void MidiTrack::writeToOutputStream(ostream& out)
 {
-	if (!mClosed) {
+	if (!mClosed)
+	{
 		closeTrack();
 	}
-	if (mSizeNeedsRecalculating) {
+	
+	if (mSizeNeedsRecalculating)
+	{
 		recalculateSize();
 	}
 
@@ -267,7 +270,9 @@ void MidiTrack::writeToOutputStream(ostream& out)
 	out.write(&trackSizeBuffer[0], trackSizeBuffer.size());
 
 	shared_ptr<MidiEvent> lastEvent;
-	for (auto& event : mEvents) {
+	
+	for (auto& event : mEvents)
+	{
 		event->writeToOutputStream(out, event->requiresStatusByte(lastEvent.get()));
 		lastEvent = event;
 	}

@@ -57,6 +57,10 @@ weak_ptr<Parameter> Component::findParameter(const string& name)
 
 weak_ptr<Label> Component::findLabel(const string& name)
 {
+	if (name.compare("startfine") == 0)
+	{
+		printf("");
+	}
 	for (auto& c : children)
 	{
 		auto candidate = dynamic_pointer_cast<Label>(c);
@@ -79,6 +83,10 @@ weak_ptr<Label> Component::findLabel(const string& name)
 
 weak_ptr<Field> Component::findField(const string& name)
 {
+	if (this->name.compare("endfine") == 0 && name.compare("end") == 0)
+	{
+		printf("");
+	}
 	for (auto& c : children)
 	{
 		auto candidate = dynamic_pointer_cast<Field>(c);

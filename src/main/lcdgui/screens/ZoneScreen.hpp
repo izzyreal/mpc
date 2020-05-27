@@ -1,9 +1,10 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
-namespace mpc::ui::sampler::window
+namespace mpc::lcdgui::screens::window
 {
-	class ZoomObserver;
+	class ZoneStartFineScreen;
+	class ZoneEndFineScreen;
 }
 
 namespace mpc::sampler
@@ -19,7 +20,6 @@ namespace mpc::lcdgui::screens::window
 namespace mpc::controls::sampler::window
 {
 	class EditSoundControls;
-	class ZoomControls;
 }
 
 namespace mpc::lcdgui::screens
@@ -62,9 +62,10 @@ namespace mpc::lcdgui::screens
 		std::vector<int> getZone();
 
 		friend class mpc::lcdgui::screens::window::NumberOfZonesScreen;
-		friend class mpc::ui::sampler::window::ZoomObserver;
+		friend class mpc::lcdgui::screens::window::ZoneStartFineScreen;
+		friend class mpc::lcdgui::screens::window::ZoneEndFineScreen;
 		friend class mpc::controls::sampler::window::EditSoundControls;
 		friend class mpc::sampler::Sampler;
-		friend class mpc::controls::sampler::window::ZoomControls;
+
 	};
 }

@@ -1,10 +1,6 @@
 #pragma once
 #include <observer/Observable.hpp>
 
-#include <vector>
-
-using namespace std;
-
 namespace mpc::ui::vmpc {
 
 	class VmpcSettingsGui

@@ -7,7 +7,6 @@
 #include <ui/sampler/SamplerGui.hpp>
 #include <ui/sampler/window/EditSoundGui.hpp>
 #include <ui/sampler/window/SamplerWindowGui.hpp>
-#include <ui/sampler/window/ZoomGui.hpp>
 #include <sampler/NoteParameters.hpp>
 #include <sampler/Pad.hpp>
 #include <sampler/Program.hpp>
@@ -32,7 +31,6 @@ AbstractSamplerControls::AbstractSamplerControls()
 	: BaseControls()
 {
 	auto uis = Mpc::instance().getUis().lock();
-	zoomGui = uis->getZoomGui();
 	editSoundGui = uis->getEditSoundGui();
 	swGui = uis->getSamplerWindowGui();
 }

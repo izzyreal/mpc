@@ -14,11 +14,13 @@
 #include <sequencer/TempoChangeEvent.hpp>
 
 #include <file/ByteUtil.hpp>
+#include <lang/StrUtil.hpp>
 #include <VecUtil.hpp>
 
 #include <cmath>
 
 using namespace std;
+using namespace moduru::lang;
 using namespace mpc::file::all;
 
 Sequence::Sequence(vector<char> b) 
@@ -61,7 +63,7 @@ Sequence::Sequence(mpc::sequencer::Sequence* seq, int number)
 	auto terminatorCount = (segmentCount & 1) == 0 ? 2 : 1;
 	saveBytes = vector<char>(10240 + (segmentCount * Sequence::EVENT_SEG_LENGTH) + (terminatorCount * Sequence::EVENT_SEG_LENGTH));
 	for (int i = 0; i < AllParser::NAME_LENGTH; i++)
-		saveBytes[i] = moduru::lang::StrUtil::padRight(seq->getName(), " ", AllParser::NAME_LENGTH)[i];
+		saveBytes[i] = StrUtil::padRight(seq->getName(), " ", AllParser::NAME_LENGTH)[i];
 
 	if ((segmentCountLastEventIndex & 1) != 0)
 		segmentCountLastEventIndex--;
@@ -98,7 +100,7 @@ Sequence::Sequence(mpc::sequencer::Sequence* seq, int number)
 	for (int i = 0; i < 33; i++) {
 		auto offset = DEVICE_NAMES_OFFSET + (i * AllParser::DEV_NAME_LENGTH);
 		for (int j = 0; j < AllParser::DEV_NAME_LENGTH; j++) {
-			saveBytes[offset + j] = moduru::lang::StrUtil::padRight(seq->getDeviceName(i), " ", AllParser::DEV_NAME_LENGTH)[j];
+			saveBytes[offset + j] = StrUtil::padRight(seq->getDeviceName(i), " ", AllParser::DEV_NAME_LENGTH)[j];
 		}
 	}
 	auto tracks = Tracks(seq);

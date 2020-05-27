@@ -6,8 +6,6 @@
 #include <string>
 #include <memory>
 
-using namespace std;
-
 namespace mpc::lcdgui {
 	class Field;
 }
@@ -19,7 +17,7 @@ namespace mpc::ui::vmpc {
 	{
 
 	private:
-		vector<string> initialPadMappingNames = vector<string>{ "VMPC", "ORIGINAL" };
+		std::vector<std::string> initialPadMappingNames{ "VMPC", "ORIGINAL" };
 
 		std::weak_ptr<mpc::lcdgui::Field> initialPadMappingField;
 		VmpcSettingsGui& gui;

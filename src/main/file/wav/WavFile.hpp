@@ -5,20 +5,18 @@
 
 #include <fstream>
 
-using namespace std;
-
 namespace mpc::file::wav {
 
 	class WavFile
 	{
 	public:
-		static WavFile newWavFile(const string& path, int numChannels, int numFrames, int validBits, int sampleRate);
-		static WavFile openWavFile(const string& path);
+		static WavFile newWavFile(const std::string& path, int numChannels, int numFrames, int validBits, int sampleRate);
+		static WavFile openWavFile(const std::string& path);
 
 	private:
-		vector<char> buffer;
-		ifstream iStream;
-		ofstream oStream;
+		std::vector<char> buffer;
+		std::ifstream iStream;
+		std::ofstream oStream;
 
 	private:
 		static const int BUFFER_SIZE{ 2048 };
@@ -47,28 +45,28 @@ namespace mpc::file::wav {
 		int getValidBits();
 
 	private:
-		static int getLE(vector<char>& buffer, int pos, int numBytes);
-		static void putLE(int val, vector<char>& buffer, int pos, int numBytes);
+		static int getLE(std::vector<char>& buffer, int pos, int numBytes);
+		static void putLE(int val, std::vector<char>& buffer, int pos, int numBytes);
 		void writeSample(int val);
 		int readSample();
 
 	public:
-		int readFrames(vector<int>* sampleBuffer, int numFramesToRead);
-		int readFrames(vector<int>* sampleBuffer, int offset, int numFramesToRead);
-		int readFrames(vector<vector<int>>* sampleBuffer, int numFramesToRead);
-		int readFrames(vector<vector<int>>* sampleBuffer, int offset, int numFramesToRead);
-		int writeFrames(vector<int>* sampleBuffer, int numFramesToWrite);
-		int writeFrames(vector<int>* sampleBuffer, int offset, int numFramesToWrite);
-		int writeFrames(vector<vector<int>>* sampleBuffer, int numFramesToWrite);
-		int writeFrames(vector<vector<int>>* sampleBuffer, int offset, int numFramesToWrite);
-		int readFrames(vector<float>* sampleBuffer, int numFramesToRead);
-		int readFrames(vector<float>* sampleBuffer, int offset, int numFramesToRead);
-		int readFrames(vector<vector<float>>* sampleBuffer, int numFramesToRead);
-		int readFrames(vector<vector<float>>* sampleBuffer, int offset, int numFramesToRead);
-		int writeFrames(vector<float>* sampleBuffer, int numFramesToWrite);
-		int writeFrames(vector<float>* sampleBuffer, int offset, int numFramesToWrite);
-		int writeFrames(vector<vector<float>>* sampleBuffer, int numFramesToWrite);
-		int writeFrames(vector<vector<float>>* sampleBuffer, int offset, int numFramesToWrite);
+		int readFrames(std::vector<int>* sampleBuffer, int numFramesToRead);
+		int readFrames(std::vector<int>* sampleBuffer, int offset, int numFramesToRead);
+		int readFrames(std::vector<std::vector<int>>* sampleBuffer, int numFramesToRead);
+		int readFrames(std::vector<std::vector<int>>* sampleBuffer, int offset, int numFramesToRead);
+		int writeFrames(std::vector<int>* sampleBuffer, int numFramesToWrite);
+		int writeFrames(std::vector<int>* sampleBuffer, int offset, int numFramesToWrite);
+		int writeFrames(std::vector<std::vector<int>>* sampleBuffer, int numFramesToWrite);
+		int writeFrames(std::vector<std::vector<int>>* sampleBuffer, int offset, int numFramesToWrite);
+		int readFrames(std::vector<float>* sampleBuffer, int numFramesToRead);
+		int readFrames(std::vector<float>* sampleBuffer, int offset, int numFramesToRead);
+		int readFrames(std::vector<std::vector<float>>* sampleBuffer, int numFramesToRead);
+		int readFrames(std::vector<std::vector<float>>* sampleBuffer, int offset, int numFramesToRead);
+		int writeFrames(std::vector<float>* sampleBuffer, int numFramesToWrite);
+		int writeFrames(std::vector<float>* sampleBuffer, int offset, int numFramesToWrite);
+		int writeFrames(std::vector<std::vector<float>>* sampleBuffer, int numFramesToWrite);
+		int writeFrames(std::vector<std::vector<float>>* sampleBuffer, int offset, int numFramesToWrite);
 		void close();
 
 	public:

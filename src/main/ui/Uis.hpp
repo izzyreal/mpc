@@ -38,7 +38,6 @@ namespace mpc::ui::sampler {
 namespace mpc::ui::sampler::window {
 	class SamplerWindowGui;
 	class EditSoundGui;
-	class ZoomGui;
 }
 
 namespace mpc::ui::midisync {
@@ -56,7 +55,6 @@ namespace mpc::ui {
 
 		mpc::ui::sampler::window::EditSoundGui* editSoundGui = nullptr;
 		mpc::ui::sampler::window::SamplerWindowGui* samplerWindowGui = nullptr;
-		mpc::ui::sampler::window::ZoomGui* zoomGui = nullptr;
 
 		mpc::ui::disk::DiskGui* diskGui = nullptr;
 		mpc::ui::disk::window::DirectoryGui* directoryGui = nullptr;
@@ -76,7 +74,6 @@ namespace mpc::ui {
 	public:
 		mpc::ui::midisync::MidiSyncGui* getMidiSyncGui();
 		mpc::ui::sampler::window::EditSoundGui* getEditSoundGui();
-		mpc::ui::sampler::window::ZoomGui* getZoomGui();
 		mpc::ui::disk::DiskGui* getDiskGui();
 		mpc::ui::disk::window::DirectoryGui* getDirectoryGui();
 		mpc::ui::disk::window::DiskWindowGui* getDiskWindowGui();

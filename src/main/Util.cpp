@@ -3,8 +3,11 @@
 #include <cmath>
 #include <cstdlib>
 
+#include <lang/StrUtil.hpp>
+
 using namespace std;
 using namespace mpc;
+using namespace moduru::lang;
 
 string Util::replaceDotWithSmallSpaceDot(const string& s) {
 	const auto dotindex = static_cast<int>(s.find('.'));
@@ -61,18 +64,22 @@ vector<int> Util::getPadAndVelo(const int x, const int y)
 string Util::getFileName(const string& s)
 {
 	string copy = s;
-	copy = moduru::lang::StrUtil::trim(copy);
-	for (auto c : copy) {
+	copy = StrUtil::trim(copy);
+	for (auto c : copy)
+	{
 		c = toupper(c);
-        if (c == ' ') {
+        if (c == ' ')
+		{
             c = '_';
         }
 	}
 	return copy;
 }
 
-vector<string> Util::splitName(const string& s) {
-	if (s.find(".") == string::npos) {
+vector<string> Util::splitName(const string& s)
+{
+	if (s.find(".") == string::npos)
+	{
 		vector<string> res(2);
 		res[0] = s;
 		res[1] = "";
@@ -85,17 +92,22 @@ vector<string> Util::splitName(const string& s) {
 	return res;
 }
 
-string Util::distributeTimeSig(const string& s) {
+string Util::distributeTimeSig(const string& s)
+{
 	const auto pos = s.find("/");
     if (pos == string::npos) {
         return s;
     }
 	auto s0 = s.substr(0, pos);
 	auto s1 = s.substr(pos + 1, s.length());
-    if (s0.length() == 1) {
+
+	if (s0.length() == 1)
+	{
         s0 = u8"\u00CE" + s0 + u8"\u00CE";
     }
-    if (s1.length() == 1) {
+    
+	if (s1.length() == 1)
+	{
         s1 = u8"\u00CE" + s1;
     }
 	return s0 + "/" + s1;
@@ -105,7 +117,8 @@ void Util::drawLine(vector<vector<bool>>& pixels,
                     const vector<vector<int>>& line,
                     const bool color)
 {
-	for (auto& l : line) {
+	for (auto& l : line)
+	{
 		pixels[l[0]][l[1]] = color;
 	}
 }
@@ -115,7 +128,8 @@ void Util::drawLine(vector<vector<bool>>& pixels,
                     const bool color,
                     const vector<int>& offsetxy)
 {
-	for (auto& l : line) {
+	for (auto& l : line)
+	{
 		pixels[l[0] + offsetxy[0]][l[1] + offsetxy[1]] = color;
 	}
 }
@@ -125,7 +139,9 @@ void Util::drawLines(vector<vector<bool>>& pixels,
                      const vector<bool>& colors)
 {
 	int colorCounter = 0;
-	for (auto& l : lines) {
+	
+	for (auto& l : lines)
+	{
 		drawLine(pixels, l, colors[colorCounter++]);
 	}
 }
@@ -136,7 +152,8 @@ void Util::drawLines(vector<vector<bool>>& pixels,
                      const vector<int>& offsetxy)
 {
 	int colorCounter = 0;
-	for (auto& l : lines) {
+	for (auto& l : lines)
+	{
 		drawLine(pixels, l, colors[colorCounter++], offsetxy);
 	}
 }

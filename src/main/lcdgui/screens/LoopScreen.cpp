@@ -4,10 +4,10 @@
 #include <controls/Controls.hpp>
 #include <lcdgui/Field.hpp>
 #include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/LoopScreen.hpp>
 #include <lcdgui/screens/TrimScreen.hpp>
 
 #include <ui/sampler/window/EditSoundGui.hpp>
-#include <ui/sampler/window/ZoomGui.hpp>
 
 #include <sampler/Sampler.hpp>
 #include <sampler/Sound.hpp>
@@ -16,6 +16,7 @@
 #include <limits.h>
 
 using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui;
 using namespace moduru::lang;
 using namespace std;
@@ -136,8 +137,8 @@ void LoopScreen::turnWheel(int i)
 
 	auto const oldLoopLength = sound->getEnd() - sound->getLoopTo();
     
-	auto zoomGui = mpc.getUis().lock()->getZoomGui();
-	auto const loopFix = zoomGui->isLoopLngthFix();
+	auto loopScreen = dynamic_pointer_cast<LoopScreen>(Screens::getScreenComponent("loop"));
+	auto const loopFix = loopScreen->loopLngthFix;
 	
 	auto mtf = ls.lock()->lookupField(param).lock();
 	
@@ -233,11 +234,11 @@ void LoopScreen::setSlider(int i)
 
 	init();
 
-	auto zoomGui = mpc.getUis().lock()->getZoomGui();
+	auto trimScreen = dynamic_pointer_cast<TrimScreen>(Screens::getScreenComponent("trim"));
 	auto sound = sampler.lock()->getSound().lock();
 
 	auto const oldLength = sound->getEnd() - sound->getLoopTo();
-	auto const lengthFix = zoomGui->isSmplLngthFix();
+	auto const lengthFix = trimScreen->smplLngthFix;
 
 	auto candidatePos = (int)((i / 124.0) * sound->getLastFrameIndex());
 	auto maxPos = 0;
@@ -313,10 +314,10 @@ void LoopScreen::pressEnter()
 
 	auto candidate = mtf->enter();
 	auto sound = sampler.lock()->getSound().lock();
-	auto zoomGui = mpc.getUis().lock()->getZoomGui();
+	auto loopScreen = dynamic_pointer_cast<LoopScreen>(Screens::getScreenComponent("loop"));
 
 	auto const oldLength = sound->getEnd() - sound->getLoopTo();
-	auto const lengthFix = zoomGui->isLoopLngthFix();
+	auto const lengthFix = loopScreen->loopLngthFix;
 
 	if (candidate != INT_MAX)
 	{

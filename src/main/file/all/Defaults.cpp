@@ -6,10 +6,13 @@
 #include <sequencer/TimeSignature.hpp>
 
 #include <file/ByteUtil.hpp>
+
+#include <lang/StrUtil.hpp>
 #include <VecUtil.hpp>
 
 using namespace mpc::file::all;
 using namespace moduru::file;
+using namespace moduru::lang;
 using namespace std;
 
 Defaults::Defaults(vector<char> loadBytes)
@@ -216,14 +219,14 @@ void Defaults::setTimeSig(mpc::ui::UserDefaults& ud)
 
 void Defaults::setNames(mpc::ui::UserDefaults& ud)
 {
-	auto const defSeqName = moduru::lang::StrUtil::padRight(ud.getSequenceName(), " ", AllParser::NAME_LENGTH);
+	auto const defSeqName =StrUtil::padRight(ud.getSequenceName(), " ", AllParser::NAME_LENGTH);
 	for (int i = 0; i < 16; i++)
 		saveBytes[DEF_SEQ_NAME_OFFSET + i] = defSeqName[i];
 
 	string stringBuffer;
 	for (int i = 0; i < 33; i++) {
 		auto const defDevName = ud.getDeviceName(i);
-		stringBuffer = moduru::lang::StrUtil::padRight(defDevName, " ", AllParser::DEV_NAME_LENGTH);
+		stringBuffer =StrUtil::padRight(defDevName, " ", AllParser::DEV_NAME_LENGTH);
 		auto offset = DEV_NAMES_OFFSET + (i * AllParser::DEV_NAME_LENGTH);
 		for (int j = offset; j < offset + AllParser::DEV_NAME_LENGTH; j++)
 			saveBytes[j] = stringBuffer[j - offset];
@@ -231,7 +234,7 @@ void Defaults::setNames(mpc::ui::UserDefaults& ud)
 	}
 	for (int i = 0; i < 64; i++) {
 		auto const defTrackName = ud.getTrackName(i);
-		stringBuffer = moduru::lang::StrUtil::padRight(defTrackName, " ", AllParser::NAME_LENGTH);
+		stringBuffer =StrUtil::padRight(defTrackName, " ", AllParser::NAME_LENGTH);
 		auto offset = TR_NAMES_OFFSET + (i * AllParser::NAME_LENGTH);
 		for (int j = offset; j < offset + AllParser::NAME_LENGTH; j++)
 			saveBytes[j] = stringBuffer[j - offset];

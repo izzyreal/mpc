@@ -15,6 +15,6 @@ namespace mpc::midi::event::meta {
 		std::vector<char> data;
 
 	public:
-		MetaEventData(stringstream& in);
+		MetaEventData(std::stringstream& in);
 	};
 }
