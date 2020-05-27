@@ -4,11 +4,11 @@
 #include <file/aps/ApsParser.hpp>
 
 #include <ui/Uis.hpp>
-#include <ui/sampler/SamplerGui.hpp>
 
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/MixerSetupScreen.hpp>
 #include <lcdgui/screens/DrumScreen.hpp>
+#include <lcdgui/screens/PgmAssignScreen.hpp>
 
 #include <file/BitUtil.hpp>
 
@@ -41,7 +41,8 @@ ApsGlobalParameters::ApsGlobalParameters()
 
 	auto const padToInternalSoundVal = drumScreen->isPadToIntSound();
 
-	auto const padAssignMasterVal = uis->getSamplerGui()->isPadAssignMaster();
+	auto pgmAssignScreen = dynamic_pointer_cast<PgmAssignScreen>(Screens::getScreenComponent("pgmassign"));
+	auto const padAssignMasterVal = pgmAssignScreen->padAssign;
 
 	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(Screens::getScreenComponent("mixer-setup"));
 	auto const stereoMixSourceDrumVal = mixerSetupScreen->isStereoMixSourceDrum();

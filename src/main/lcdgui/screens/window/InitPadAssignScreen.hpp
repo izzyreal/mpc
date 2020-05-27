@@ -8,7 +8,6 @@ namespace mpc::lcdgui::screens::window {
 	{
 
 	private:
-		void setInitPadAssign(bool b);
 		void displayInitPadAssign();
 		bool initPadAssignIsMaster = false;
 

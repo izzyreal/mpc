@@ -1,4 +1,4 @@
-#include <lcdgui/screens/PgmAssignScreen.hpp>
+#include "PgmAssignScreen.hpp"
 
 #include <Mpc.hpp>
 #include <ui/sampler/SamplerGui.hpp>
@@ -85,7 +85,7 @@ void PgmAssignScreen::turnWheel(int i)
 
 	if (param.compare("pad-assign") == 0)
 	{
-		samplerGui->setPadAssignMaster(i > 0);
+		padAssign = i > 0;
 		displayPadAssign();
 	}
 	else if (param.compare("pgm") == 0)
@@ -288,7 +288,7 @@ void PgmAssignScreen::displaySoundName()
 void PgmAssignScreen::displayPadAssign()
 {
 	init();
-	findField("pad-assign").lock()->setText(samplerGui->isPadAssignMaster() ? "MASTER" : "PROGRAM");
+	findField("pad-assign").lock()->setText(padAssign ? "MASTER" : "PROGRAM");
 }
 
 void PgmAssignScreen::displayPadNote()

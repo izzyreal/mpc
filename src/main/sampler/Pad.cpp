@@ -7,7 +7,12 @@
 #include <Paths.hpp>
 #include <sampler/Sampler.hpp>
 
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/PgmAssignScreen.hpp>
+
 using namespace mpc::sampler;
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens;
 using namespace std;
 
 std::vector<int> Pad::originalPadNotes = {	37, 36, 42, 82, 40, 38, 46, 44, 48, 47, 45, 43, 49, 55, 51, 53,
@@ -48,7 +53,9 @@ void Pad::setNote(int i)
 		return;
 	}
 
-	if (Mpc::instance().getUis().lock()->getSamplerGui()->isPadAssignMaster())
+	auto pgmAssignScreen = dynamic_pointer_cast<PgmAssignScreen>(Screens::getScreenComponent("pgmassign"));
+
+	if (pgmAssignScreen->padAssign)
 	{
 		(*Mpc::instance().getSampler().lock()->getMasterPadAssign())[number] = i;
 	}
@@ -67,7 +74,8 @@ void Pad::setNote(int i)
 
 int Pad::getNote()
 {
-	if (Mpc::instance().getUis().lock()->getSamplerGui()->isPadAssignMaster())
+	auto pgmAssignScreen = dynamic_pointer_cast<PgmAssignScreen>(Screens::getScreenComponent("pgmassign"));
+	if (pgmAssignScreen->padAssign)
 	{
 		return (*Mpc::instance().getSampler().lock()->getMasterPadAssign())[number];
 	}

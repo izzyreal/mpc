@@ -10,7 +10,6 @@ namespace mpc::ui::sampler
 	{
 
 	private:
-		bool padAssignMaster = false;
 		int bank = 0;
 		int pad = 0;
 		int note = 60;
@@ -23,8 +22,6 @@ namespace mpc::ui::sampler
 		void setPadAndNote(int pad, int note);
 		int getNote();
 		int getPad();
-		void setPadAssignMaster(bool b);
-		bool isPadAssignMaster();
 		void setBank(int i);
 		int getBank();
 		std::string getPrevScreenName();

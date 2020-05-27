@@ -21,14 +21,11 @@ void InitPadAssignScreen::open()
 void InitPadAssignScreen::turnWheel(int i)
 {
     init();
-    setInitPadAssign(i > 0);
-}
-
-
-void InitPadAssignScreen::setInitPadAssign(bool b)
-{
-	initPadAssignIsMaster = b;
-	displayInitPadAssign();
+	if (param.compare("initpadassign") == 0)
+	{
+		initPadAssignIsMaster = i > 0;
+		displayInitPadAssign();
+	}
 }
 
 void InitPadAssignScreen::function(int i)
@@ -46,8 +43,12 @@ void InitPadAssignScreen::function(int i)
 			program.lock()->initPadAssign();
 		}
 		
-		samplerGui->setPadAssignMaster(initPadAssignIsMaster);
 		ls.lock()->openScreen("programassign");
 		break;
 	}
+}
+
+void InitPadAssignScreen::displayInitPadAssign()
+{
+	findField("initpadassign").lock()->setText(initPadAssignIsMaster ? "MASTER" : "PROGRAM");
 }

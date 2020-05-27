@@ -1,6 +1,16 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
+namespace mpc::sampler
+{
+	class Pad;
+}
+
+namespace mpc::file::aps
+{
+	class ApsGlobalParameters;
+}
+
 namespace mpc::lcdgui::screens {
 
 	class PgmAssignScreen
@@ -20,6 +30,7 @@ namespace mpc::lcdgui::screens {
 
 	private:
 		const std::vector<std::string> soundGenerationModes{ "NORMAL", "SIMULT", "VEL SW", "DCY SW" };
+		bool padAssign = false;
 		void displayPgm();
 		void displaySoundName();
 		void displayPadAssign();
@@ -32,6 +43,9 @@ namespace mpc::lcdgui::screens {
 		void displayNote();
 		void displayPad();
 
+	private:
+		friend class mpc::sampler::Pad;
+		friend class mpc::file::aps::ApsGlobalParameters;
 
 	};
 }

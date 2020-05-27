@@ -43,21 +43,6 @@ int SamplerGui::getPad()
     return pad;
 }
 
-void SamplerGui::setPadAssignMaster(bool b)
-{
-    if (padAssignMaster == b)
-        return;
-
-    padAssignMaster = b;
-    setChanged();
-    notifyObservers(string("padassignmode"));
-}
-
-bool SamplerGui::isPadAssignMaster()
-{
-    return padAssignMaster;
-}
-
 void SamplerGui::setBank(int i)
 {
 	if (i == bank) return;
