@@ -3,12 +3,9 @@
 #include <Mpc.hpp>
 #include <controls/Controls.hpp>
 
-#include <lcdgui/Field.hpp>
-#include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/TrimScreen.hpp>
 #include <lcdgui/screens/window/NumberOfZonesScreen.hpp>
-
-#include <ui/sampler/window/EditSoundGui.hpp>
+#include <lcdgui/screens/window/EditSoundScreen.hpp>
 
 #include <sampler/Sampler.hpp>
 
@@ -101,13 +98,9 @@ void ZoneScreen::function(int f)
 			return;
 		}
 
-		auto editSoundGui = mpc.getUis().lock()->getEditSoundGui();
-		auto newSampleName = sampler.lock()->getSound().lock()->getName();
-		//newSampleName = newSampleName->replaceAll("\\s+$", "");
-		newSampleName = sampler.lock()->addOrIncreaseNumber(newSampleName);
-		editSoundGui->setNewName(newSampleName);
-		editSoundGui->setPreviousScreenName("zone");
-		ls.lock()->openScreen("editsound");
+		auto editSoundScreen = dynamic_pointer_cast<EditSoundScreen>(Screens::getScreenComponent("edit-sound"));
+		editSoundScreen->setPreviousScreenName("zone");
+		ls.lock()->openScreen("edit-sound");
 		break;
 	}
 	case 5:

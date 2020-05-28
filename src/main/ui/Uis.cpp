@@ -13,7 +13,6 @@
 #include <ui/midisync/MidiSyncGui.hpp>
 
 #include <ui/sampler/window/SamplerWindowGui.hpp>
-#include <ui/sampler/window/EditSoundGui.hpp>
 
 #include <ui/vmpc/DeviceGui.hpp>
 #include <ui/vmpc/DirectToDiskRecorderGui.hpp>
@@ -57,7 +56,6 @@ Uis::Uis()
 
 	nameGui = new mpc::ui::NameGui();
 
-	editSoundGui = new mpc::ui::sampler::window::EditSoundGui();
 	samplerWindowGui = new mpc::ui::sampler::window::SamplerWindowGui();
 
 	diskGui = new mpc::ui::disk::DiskGui();
@@ -136,14 +134,8 @@ mpc::ui::misc::SecondSeqGui* Uis::getSecondSeqGui()
 	return secondSeqGui;
 }
 
-mpc::ui::sampler::window::EditSoundGui* Uis::getEditSoundGui()
-{
-	return editSoundGui;
-}
-
 Uis::~Uis()
 {
-	if (editSoundGui != nullptr) delete editSoundGui;
 	if (samplerWindowGui != nullptr) delete samplerWindowGui;
 	if (diskGui != nullptr) delete diskGui;
 	if (directoryGui != nullptr) delete directoryGui;

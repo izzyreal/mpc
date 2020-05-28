@@ -1,10 +1,7 @@
 #include "UserScreen.hpp"
 
-#include <lcdgui/Label.hpp>
 #include <ui/UserDefaults.hpp>
 #include <sequencer/TimeSignature.hpp>
-
-#include <lang/StrUtil.hpp>
 
 #include <Util.hpp>
 

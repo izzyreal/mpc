@@ -2,7 +2,6 @@
 
 #include <lcdgui/Effect.hpp>
 #include <lcdgui/screens/MixerSetupScreen.hpp>
-#include <lcdgui/Screens.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;

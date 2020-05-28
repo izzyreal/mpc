@@ -30,7 +30,6 @@
 #include <ui/disk/DiskGui.hpp>
 #include <ui/disk/window/DirectoryGui.hpp>
 #include <ui/misc/PunchGui.hpp>
-#include <ui/sampler/window/EditSoundGui.hpp>
 #include <ui/vmpc/DirectToDiskRecorderGui.hpp>
 
 #include <sampler/Pad.hpp>
@@ -42,12 +41,13 @@
 #include <sequencer/NoteEvent.hpp>
 #include <sequencer/Sequencer.hpp>
 
-#include <mpc/MpcSoundPlayerChannel.hpp>
-#include <audio/server/NonRealTimeAudioServer.hpp>
-
 #include <lcdgui/screens/window/Assign16LevelsScreen.hpp>
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
+#include <lcdgui/screens/window/EditSoundScreen.hpp>
 #include <lcdgui/Screens.hpp>
+
+#include <mpc/MpcSoundPlayerChannel.hpp>
+#include <audio/server/NonRealTimeAudioServer.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
@@ -131,46 +131,47 @@ void BaseControls::down()
 void BaseControls::function(int i)
 {
 	init();
-	auto lsLocked = ls.lock();
+
 	switch (i)
 	{
 	case 3:
-		if (lsLocked->getFocusedLayerIndex() == 1)
+		if (ls.lock()->getFocusedLayerIndex() == 1)
 		{
 			if (currentScreenName.compare("sequence") == 0)
 			{
-				lsLocked->setPreviousScreenName("sequencer");
+				ls.lock()->setPreviousScreenName("sequencer");
 			}
 			else if (currentScreenName.compare("midiinput") == 0)
 			{
-				lsLocked->setPreviousScreenName("sequencer");
+				ls.lock()->setPreviousScreenName("sequencer");
 			}
 			else if (currentScreenName.compare("midioutput") == 0)
 			{
-				lsLocked->setPreviousScreenName("sequencer");
+				ls.lock()->setPreviousScreenName("sequencer");
 			}
-			else if (currentScreenName.compare("editsound") == 0)
+			else if (currentScreenName.compare("edit-sound") == 0)
 			{
-				lsLocked->setPreviousScreenName(mpc.getUis().lock()->getEditSoundGui()->getPreviousScreenName());
+				auto editSoundScreen = dynamic_pointer_cast<EditSoundScreen>(Screens::getScreenComponent("edit-sound"));
+				ls.lock()->setPreviousScreenName(editSoundScreen->getPreviousScreenName());
 			}
 			else if (currentScreenName.compare("sound") == 0)
 			{
-				lsLocked->setPreviousScreenName(sampler.lock()->getPreviousScreenName());
+				ls.lock()->setPreviousScreenName(sampler.lock()->getPreviousScreenName());
 			}
 			else if (currentScreenName.compare("program") == 0)
 			{
-				lsLocked->setPreviousScreenName(mpc.getPreviousSamplerScreenName());
+				ls.lock()->setPreviousScreenName(mpc.getPreviousSamplerScreenName());
 			}
 			else if (currentScreenName.compare("name") == 0)
 			{
 				mpc.getUis().lock()->getNameGui()->setNameBeingEdited(false);
-				lsLocked->setLastFocus("name", "0");
+				ls.lock()->setLastFocus("name", "0");
 			}
 			else if (currentScreenName.compare("directory") == 0)
 			{
-				lsLocked->setPreviousScreenName(mpc.getUis().lock()->getDirectoryGui()->getPreviousScreenName());
+				ls.lock()->setPreviousScreenName(mpc.getUis().lock()->getDirectoryGui()->getPreviousScreenName());
 			}
-			if (lsLocked->getPreviousScreenName().compare("load") == 0)
+			if (ls.lock()->getPreviousScreenName().compare("load") == 0)
 			{
 				if (mpc.getUis().lock()->getDiskGui()->getFileLoad() + 1 > mpc.getDisk().lock()->getFiles().size())
 				{
@@ -179,9 +180,9 @@ void BaseControls::function(int i)
 			}
 		}
 		
-		if (lsLocked->getFocusedLayerIndex() == 1 || lsLocked->getFocusedLayerIndex() == 2 || lsLocked->getFocusedLayerIndex() == 3)
+		if (ls.lock()->getFocusedLayerIndex() == 1 || ls.lock()->getFocusedLayerIndex() == 2 || ls.lock()->getFocusedLayerIndex() == 3)
 		{
-			lsLocked->openScreen(lsLocked->getPreviousScreenName());
+			ls.lock()->openScreen(ls.lock()->getPreviousScreenName());
 		}
 		break;
 	}

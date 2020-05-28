@@ -3,13 +3,10 @@
 #include <Mpc.hpp>
 #include <controls/Controls.hpp>
 
-#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/window/EditSoundScreen.hpp>
 
-#include <ui/sampler/window/EditSoundGui.hpp>
 #include <sampler/Sampler.hpp>
 #include <sampler/Sound.hpp>
-
-#include <lang/StrUtil.hpp>
 
 #include <stdint.h>
 #include <limits.h>
@@ -90,14 +87,11 @@ void TrimScreen::function(int f)
 		{
 			return;
 		}
-		auto editSoundGui = mpc.getUis().lock()->getEditSoundGui();
-		auto newSampleName = sampler.lock()->getSound().lock()->getName();
-		newSampleName = sampler.lock()->addOrIncreaseNumber(StrUtil::trim(newSampleName));
 
-		editSoundGui->setNewName(newSampleName);
-		editSoundGui->setPreviousScreenName("trim");
+		auto editSoundScreen = dynamic_pointer_cast<EditSoundScreen>(Screens::getScreenComponent("edit-sound"));
+		editSoundScreen->setPreviousScreenName("trim");
 		
-		ls.lock()->openScreen("editsound");
+		ls.lock()->openScreen("edit-sound");
 		break;
 	}
 	case 5:

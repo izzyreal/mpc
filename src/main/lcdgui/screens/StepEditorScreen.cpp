@@ -1,15 +1,10 @@
 #include "StepEditorScreen.hpp"
 
-#include <lcdgui/Screens.hpp>
-
 #include <Mpc.hpp>
 #include <audiomidi/EventHandler.hpp>
 
 #include <controls/Controls.hpp>
 
-#include <lcdgui/Field.hpp>
-#include <lcdgui/Label.hpp>
-#include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <lcdgui/SelectedEventBar.hpp>
 
@@ -24,8 +19,6 @@
 #include <sequencer/ProgramChangeEvent.hpp>
 #include <sequencer/Sequencer.hpp>
 #include <sequencer/SystemExclusiveEvent.hpp>
-
-#include <lang/StrUtil.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;

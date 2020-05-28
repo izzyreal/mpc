@@ -11,7 +11,6 @@ namespace mpc::sampler
 namespace mpc::ui::sampler::window
 {
 	class SamplerWindowGui;
-	class EditSoundGui;
 }
 
 namespace mpc::controls::sampler {
@@ -23,7 +22,6 @@ namespace mpc::controls::sampler {
 	protected:
 		std::weak_ptr<mpc::sampler::Sound> sound{};
 		mpc::ui::sampler::window::SamplerWindowGui* swGui{ nullptr };
-		mpc::ui::sampler::window::EditSoundGui* editSoundGui{ nullptr };
 		mpc::sampler::Pad* lastPad{ nullptr };
 		mpc::sampler::NoteParameters* lastNp{ nullptr };
 

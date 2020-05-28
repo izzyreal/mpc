@@ -14,7 +14,6 @@
 #include <controls/sampler/window/AssignmentViewControls.hpp>
 #include <controls/sampler/window/AutoChromaticAssignmentControls.hpp>
 #include <controls/sampler/window/CopyNoteParametersControls.hpp>
-#include <controls/sampler/window/EditSoundControls.hpp>
 #include <controls/sampler/window/KeepOrRetryControls.hpp>
 #include <controls/sampler/window/MuteAssignControls.hpp>
 #include <controls/sampler/window/ProgramControls.hpp>
@@ -73,8 +72,6 @@ Controls::Controls()
 	pressedPadVelos = std::vector<int>(16);
 
 	controls["release"] = new GlobalReleaseControls();
-
-	controls["editsound"] = new sampler::window::EditSoundControls();
 
 	controls["keeporretry"] = new sampler::window::KeepOrRetryControls();
 	controls["assignmentview"] = new sampler::window::AssignmentViewControls();

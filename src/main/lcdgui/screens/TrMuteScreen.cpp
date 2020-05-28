@@ -2,14 +2,8 @@
 
 #include <controls/Controls.hpp>
 
-#include <lcdgui/Label.hpp>
-
-#include <ui/Uis.hpp>
-
 #include <sequencer/Track.hpp>
 #include <sequencer/Sequencer.hpp>
-
-#include <lang/StrUtil.hpp>
 
 using namespace moduru::lang;
 using namespace mpc::lcdgui::screens;

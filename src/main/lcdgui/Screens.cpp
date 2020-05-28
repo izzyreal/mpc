@@ -68,6 +68,7 @@
 #include <lcdgui/screens/window/ZoneStartFineScreen.hpp>
 #include <lcdgui/screens/window/ZoneEndFineScreen.hpp>
 #include <lcdgui/screens/window/ChannelSettingsScreen.hpp>
+#include <lcdgui/screens/window/EditSoundScreen.hpp>
 
 #include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
 #include <lcdgui/screens/dialog/MidiMonitorScreen.hpp>
@@ -562,6 +563,10 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	else if (screenName.compare("channel-settings") == 0)
 	{
 		screen = make_shared<ChannelSettingsScreen>(layerIndex);
+	}
+	else if (screenName.compare("edit-sound") == 0)
+	{
+		screen = make_shared<EditSoundScreen>(layerIndex);
 	}
 
 	if (screen)

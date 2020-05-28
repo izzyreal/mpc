@@ -5,6 +5,7 @@ namespace mpc::lcdgui::screens::window
 {
 	class ZoneStartFineScreen;
 	class ZoneEndFineScreen;
+	class EditSoundScreen;
 }
 
 namespace mpc::sampler
@@ -15,11 +16,6 @@ namespace mpc::sampler
 namespace mpc::lcdgui::screens::window
 {
 	class NumberOfZonesScreen;
-}
-
-namespace mpc::controls::sampler::window
-{
-	class EditSoundControls;
 }
 
 namespace mpc::lcdgui::screens
@@ -64,7 +60,7 @@ namespace mpc::lcdgui::screens
 		friend class mpc::lcdgui::screens::window::NumberOfZonesScreen;
 		friend class mpc::lcdgui::screens::window::ZoneStartFineScreen;
 		friend class mpc::lcdgui::screens::window::ZoneEndFineScreen;
-		friend class mpc::controls::sampler::window::EditSoundControls;
+		friend class mpc::lcdgui::screens::window::EditSoundScreen;
 		friend class mpc::sampler::Sampler;
 
 	};

@@ -32,7 +32,6 @@
 #include <lcdgui/screens/SampleScreen.hpp>
 
 #include <ui/Uis.hpp>
-#include <ui/sampler/window/EditSoundObserver.hpp>
 #include <ui/sampler/window/MuteAssignObserver.hpp>
 #include <ui/sampler/window/SamplerWindowObserver.hpp>
 
@@ -801,11 +800,6 @@ void LayeredScreen::initObserver()
 	else if (csn.compare("name") == 0)
 	{
 		activeObserver = make_unique<ui::NameObserver>();
-	}
-
-	else if (csn.compare("editsound") == 0)
-	{
-		activeObserver = make_unique<EditSoundObserver>();
 	}
 	else if (csn.compare("deleteallfiles") == 0)
 	{

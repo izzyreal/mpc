@@ -2,7 +2,6 @@
 
 #include <lcdgui/screens/DrumScreen.hpp>
 #include <lcdgui/screens/MixerSetupScreen.hpp>
-#include <lcdgui/Screens.hpp>
 
 #include <sampler/Program.hpp>
 #include <sampler/Pad.hpp>

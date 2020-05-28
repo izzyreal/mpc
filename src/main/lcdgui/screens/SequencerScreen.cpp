@@ -9,19 +9,13 @@
 
 #include <sampler/Sampler.hpp>
 
-#include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <lcdgui/screens/EditSequenceScreen.hpp>
 #include <lcdgui/screens/StepEditorScreen.hpp>
-#include <lcdgui/Parameter.hpp>
-#include <lcdgui/Label.hpp>
-#include <lcdgui/Field.hpp>
 
 #include <ui/UserDefaults.hpp>
 
 #include <Util.hpp>
-
-#include <lang/StrUtil.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;

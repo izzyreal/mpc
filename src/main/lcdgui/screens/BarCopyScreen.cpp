@@ -1,7 +1,5 @@
 #include "BarCopyScreen.hpp"
 
-#include <ui/Uis.hpp>
-#include <lcdgui/LayeredScreen.hpp>
 #include <sequencer/Event.hpp>
 #include <sequencer/Sequence.hpp>
 #include <sequencer/Track.hpp>

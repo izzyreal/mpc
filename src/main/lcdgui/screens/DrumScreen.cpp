@@ -2,10 +2,6 @@
 
 #include <mpc/MpcSoundPlayerChannel.hpp>
 
-#include <lcdgui/Label.hpp>
-
-#include <lang/StrUtil.hpp>
-
 using namespace mpc::lcdgui::screens;
 using namespace moduru::lang;
 using namespace std;

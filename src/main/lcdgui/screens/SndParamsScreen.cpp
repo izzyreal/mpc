@@ -4,12 +4,13 @@
 #include <Util.hpp>
 #include <controls/Controls.hpp>
 
-#include <ui/sampler/window/EditSoundGui.hpp>
-
 #include <sampler/Sampler.hpp>
 #include <sampler/Sound.hpp>
 
+#include <lcdgui/screens/window/EditSoundScreen.hpp>
+
 using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui::screens::window;
 using namespace moduru::lang;
 using namespace std;
 
@@ -64,13 +65,9 @@ void SndParamsScreen::function(int f)
 			return;
 		}
 
-		auto newSampleName = sampler.lock()->getSound().lock()->getName();
-		//newSampleName = newSampleName->replaceAll("\\s+$", "");
-		newSampleName = sampler.lock()->addOrIncreaseNumber(newSampleName);
-		auto editSoundGui = mpc.getUis().lock()->getEditSoundGui();
-		editSoundGui->setNewName(newSampleName);
-		editSoundGui->setPreviousScreenName("trim");
-		ls.lock()->openScreen("editsound");
+		auto editSoundScreen = dynamic_pointer_cast<EditSoundScreen>(Screens::getScreenComponent("edit-sound"));
+		editSoundScreen->setPreviousScreenName("trim");
+		ls.lock()->openScreen("edit-sound");
 		break;
 	}
 	case 5:

@@ -1,9 +1,5 @@
 #include "EditSequenceScreen.hpp"
 
-#include <ui/Uis.hpp>
-
-#include <lcdgui/Label.hpp>
-#include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/TrMoveScreen.hpp>
 #include <lcdgui/screens/BarCopyScreen.hpp>
 
@@ -14,8 +10,6 @@
 #include <sequencer/Sequencer.hpp>
 #include <sequencer/TimeSignature.hpp>
 #include <sequencer/SeqUtil.hpp>
-
-#include <lang/StrUtil.hpp>
 
 #include <mpc/MpcSoundPlayerChannel.hpp>
 

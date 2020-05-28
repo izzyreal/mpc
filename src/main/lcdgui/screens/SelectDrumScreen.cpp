@@ -2,7 +2,6 @@
 
 #include <sampler/Program.hpp>
 
-#include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/DrumScreen.hpp>
 
 using namespace mpc::lcdgui;

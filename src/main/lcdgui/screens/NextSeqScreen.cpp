@@ -1,14 +1,11 @@
 #include "NextSeqScreen.hpp"
 
-#include <lcdgui/Label.hpp>
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <lcdgui/screens/SequencerScreen.hpp>
-#include <lcdgui/Screens.hpp>
 
 #include <sequencer/Sequencer.hpp>
 #include <sequencer/TempoChangeEvent.hpp>
 
-#include <lang/StrUtil.hpp>
 #include <Util.hpp>
 
 using namespace mpc::lcdgui;

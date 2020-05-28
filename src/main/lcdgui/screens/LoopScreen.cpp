@@ -2,12 +2,10 @@
 
 #include <Mpc.hpp>
 #include <controls/Controls.hpp>
-#include <lcdgui/Field.hpp>
-#include <lcdgui/Screens.hpp>
+
 #include <lcdgui/screens/LoopScreen.hpp>
 #include <lcdgui/screens/TrimScreen.hpp>
-
-#include <ui/sampler/window/EditSoundGui.hpp>
+#include <lcdgui/screens/window/EditSoundScreen.hpp>
 
 #include <sampler/Sampler.hpp>
 #include <sampler/Sound.hpp>
@@ -101,14 +99,10 @@ void LoopScreen::function(int f)
 		{
 			return;
 		}
-		
-		auto newSoundName = sampler.lock()->getSound().lock()->getName();
-		//newSampleName = newSampleName->replaceAll("\\s+$", "");
-		newSoundName = sampler.lock()->addOrIncreaseNumber(newSoundName);
-		auto editSoundGui = mpc.getUis().lock()->getEditSoundGui();
-		editSoundGui->setNewName(newSoundName);
-		editSoundGui->setPreviousScreenName("loop");
-		ls.lock()->openScreen("editsound");
+
+		auto editSoundScreen = dynamic_pointer_cast<EditSoundScreen>(Screens::getScreenComponent("edit-sound"));
+		editSoundScreen->setPreviousScreenName("loop");
+		ls.lock()->openScreen("edit-sound");
 		break;
 	}
 	case 5:

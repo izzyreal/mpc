@@ -6,8 +6,6 @@
 
 #include <Util.hpp>
 
-#include <lang/StrUtil.hpp>
-
 #include <thirdp/bcmath/bcmath_stl.h>
 
 using namespace mpc::lcdgui::screens;

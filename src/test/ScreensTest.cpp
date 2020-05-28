@@ -122,7 +122,7 @@ vector<string> screenNames = {
 "loop-end-fine",
 "zone-start-fine",
 "zone-end-fine",
-"editsound",
+"edit-sound",
 "edittimestretch",
 "songname",
 "ignoretempochange",

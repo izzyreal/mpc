@@ -7,20 +7,23 @@
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/window/MidiOutputScreen.hpp>
 #include <lcdgui/screens/window/MidiOutputScreen.hpp>
+#include <lcdgui/screens/window/EditSoundScreen.hpp>
 #include <lcdgui/screens/dialog/CopySoundScreen.hpp>
 #include <lcdgui/screens/dialog/ResampleScreen.hpp>
 #include <lcdgui/screens/dialog/StereoToMonoScreen.hpp>
 
 #include <Util.hpp>
+
 #include <disk/AbstractDisk.hpp>
 #include <disk/MpcFile.hpp>
 #include <disk/ApsSaver.hpp>
+
 #include <ui/NameGui.hpp>
 #include <ui/disk/DiskGui.hpp>
 #include <ui/disk/window/DirectoryGui.hpp>
-#include <ui/sampler/window/EditSoundGui.hpp>
 #include <ui/sampler/window/SamplerWindowGui.hpp>
 #include <ui/vmpc/DirectToDiskRecorderGui.hpp>
+
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>
 #include <sampler/Sound.hpp>
@@ -332,12 +335,13 @@ void NameControls::saveName()
 		lLs->openScreen("sequencer");
 		return;
 	}
-	else if (prevScreen.compare("editsound") == 0)
+	else if (prevScreen.compare("edit-sound") == 0)
 	{
-		uis->getEditSoundGui()->setNewName(nameGui->getName());
+		auto editSoundScreen = dynamic_pointer_cast<EditSoundScreen>(Screens::getScreenComponent("edit-sound"));
+		editSoundScreen->setNewName(nameGui->getName());
 		nameGui->setNameBeingEdited(false);
 		lLs->setLastFocus("name", "0");
-		lLs->openScreen("editsound");
+		lLs->openScreen("edit-sound");
 		return;
 	}
 	else if (prevScreen.compare("sound") == 0)
