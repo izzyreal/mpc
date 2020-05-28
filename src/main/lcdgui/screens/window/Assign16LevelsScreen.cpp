@@ -135,7 +135,7 @@ void Assign16LevelsScreen::displayNote()
 
     auto pgmNumber = sampler.lock()->getDrumBusProgramNumber(track.lock()->getBusNumber());
     auto program = sampler.lock()->getProgram(pgmNumber).lock();
-    auto pn = program->getPadNumberFromNote(note);
+    auto pn = program->getPadIndexFromNote(note);
     auto sn = program->getNoteParameters(note)->getSndNumber();
     auto soundName = sn == -1 ? "OFF" : sampler.lock()->getSoundName(sn);
  

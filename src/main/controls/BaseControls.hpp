@@ -36,10 +36,6 @@ namespace mpc::ui {
 	class NameGui;
 }
 
-namespace mpc::ui::sampler {
-	class SamplerGui;
-}
-
 namespace mpc::controls {
 
 	class BaseControls
@@ -66,7 +62,6 @@ namespace mpc::controls {
 
 		std::weak_ptr<mpc::lcdgui::LayeredScreen> ls;
 		mpc::ui::NameGui* nameGui = nullptr;
-		ui::sampler::SamplerGui* samplerGui = nullptr;
 		std::weak_ptr<mpc::lcdgui::Field> activeField;
 
 		std::vector<std::string> typableParams;

@@ -35,7 +35,7 @@ void MixerScreen::open()
 	}
 	displayMixerStrips();
 	displayFunctionKeys();
-	setXPos(samplerGui->getPad());
+	setXPos(mpc.getPad());
 }
 
 void MixerScreen::close()
@@ -173,7 +173,7 @@ void MixerScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 	}
 	else if (s.compare("padandnote") == 0)
 	{
-		setXPos(samplerGui->getPad());
+		setXPos(mpc.getPad());
 	}
 }
 
@@ -326,7 +326,7 @@ void MixerScreen::openWindow()
 	
 	int pad = xPos + (mpc.getBank() * 16);
 	int note = program.lock()->getPad(pad)->getNote();
-	samplerGui->setPadAndNote(pad, note);
+	mpc.setPadAndNote(pad, note);
 	ls.lock()->openScreen("channelsettings");
 }
 

@@ -123,27 +123,26 @@ void AudioMidiServices::start(const int sampleRate, const int inputCount, const 
 	outputProcesses = vector<IOAudioProcess*>(outputCount <= 5 ? outputCount : 5);
 
 	for (auto& p : inputProcesses)
+	{
 		p = nullptr;
+	}
 
 	for (auto& p : outputProcesses)
+	{
 		p = nullptr;
+	}
 
-	for (int i = 0; i < inputProcesses.size(); i++) {
+	for (int i = 0; i < inputProcesses.size(); i++)
+	{
 		inputProcesses[i] = shared_ptr<IOAudioProcess>(server->openAudioInput(getInputNames()[i], "mpc_in" + to_string(i)));
 	}
 
-	for (int i = 0; i < outputProcesses.size(); i++) {
+	for (int i = 0; i < outputProcesses.size(); i++)
+	{
 		outputProcesses[i] = server->openAudioOutput(getOutputNames()[i], "mpc_out" + to_string(i));
 	}
 
-	createSynth();
-
-	if (oldPrograms.size() != 0) {
-		for (int i = 0; i < 4; i++) {
-			Mpc::instance().getDrum(i)->setProgram(oldPrograms[i]);
-		}
-	}
-	
+	createSynth();	
 	connectVoices();
 
 	mpcMidiPorts = make_shared<MpcMidiPorts>();
@@ -358,24 +357,25 @@ void AudioMidiServices::destroyServices()
 	midiSystem->close();
 }
 
-void AudioMidiServices::destroySynth() {
-	oldPrograms = vector<int>(4);
-	for (int i = 0; i < 4; i++) {
-		oldPrograms[i] = Mpc::instance().getDrum(i)->getProgram();
-	}
+void AudioMidiServices::destroySynth()
+{
 	synthRack->close();
 }
 
 void AudioMidiServices::closeIO()
 {
-	for (auto j = 0; j < inputProcesses.size(); j++) {
-		if (inputProcesses[j]) {
+	for (auto j = 0; j < inputProcesses.size(); j++)
+	{
+		if (inputProcesses[j])
+		{
 			server->closeAudioInput(inputProcesses[j].get());
 		}
 	}
 
-	for (auto j = 0; j < outputProcesses.size(); j++) {
-		if (outputProcesses[j] == nullptr) {
+	for (auto j = 0; j < outputProcesses.size(); j++)
+	{
+		if (outputProcesses[j] == nullptr)
+		{
 			continue;
 		}
 		server->closeAudioOutput(outputProcesses[j]);
@@ -386,17 +386,21 @@ void AudioMidiServices::prepareBouncing(DirectToDiskSettings* settings)
 {
 	auto indivFileNames = vector<string>{ "L-R.wav", "1-2.wav", "3-4.wav", "5-6.wav", "7-8.wav" };
 	string sep = moduru::file::FileUtil::getSeparator();
-	for (int i = 0; i < diskRecorders.size(); i++) {
+
+	for (int i = 0; i < diskRecorders.size(); i++)
+	{
 		auto eapa = diskRecorders[i];
 		auto absolutePath = mpc::Paths::home() + sep + "vMPC" + sep + "recordings" + sep + indivFileNames[i];
 		eapa->prepare(absolutePath, settings->lengthInFrames, settings->sampleRate);
 	}
+
 	bouncePrepared = true;
 }
 
 void AudioMidiServices::startBouncing()
 {
-	if (!bouncePrepared) {
+	if (!bouncePrepared)
+	{
 		return;
 	}
 
@@ -406,7 +410,8 @@ void AudioMidiServices::startBouncing()
 
 void AudioMidiServices::stopBouncing()
 {
-	if (!bouncing.load()) {
+	if (!bouncing.load())
+	{
 		return;
 	}
 
@@ -414,11 +419,13 @@ void AudioMidiServices::stopBouncing()
 	bouncing.store(false);
 }
 
-void AudioMidiServices::startRecordingSound() {
+void AudioMidiServices::startRecordingSound()
+{
 	recordingSound.store(true);
 }
 
-void AudioMidiServices::stopSoundRecorder() {
+void AudioMidiServices::stopSoundRecorder()
+{
 	recordingSound.store(false);
 }
 

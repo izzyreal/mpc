@@ -344,7 +344,7 @@ void EventRow::setDrumNoteEventValues()
 		tfArray[0].lock()->setText("--/OFF");
 	}
 	else {
-		tfArray[0].lock()->setText(to_string(ne->getNote()) + "/" + lSampler->getPadName(program.lock()->getPadNumberFromNote(ne->getNote())));
+		tfArray[0].lock()->setText(to_string(ne->getNote()) + "/" + lSampler->getPadName(program.lock()->getPadIndexFromNote(ne->getNote())));
 	}
 	tfArray[1].lock()->setText(noteVarParamNames[ne->getVariationTypeNumber()]);
 	if (ne->getVariationTypeNumber() == 0) {

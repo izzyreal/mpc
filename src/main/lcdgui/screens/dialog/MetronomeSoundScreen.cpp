@@ -68,7 +68,7 @@ void MetronomeSoundScreen::displayAccent()
 {
 	auto lSampler = sampler.lock();
 	auto program = lSampler->getDrumBusProgramNumber(metronomeSound);
-    auto pad = lSampler->getProgram(program).lock()->getPadNumberFromNote(accentNote);
+    auto pad = lSampler->getProgram(program).lock()->getPadIndexFromNote(accentNote);
 	findField("accent").lock()->setText(accentNote + "/" + lSampler->getPadName(pad));
 }
 
@@ -76,7 +76,7 @@ void MetronomeSoundScreen::displayNormal()
 {
 	auto lSampler = sampler.lock();
 	auto program = lSampler->getDrumBusProgramNumber(metronomeSound);
-    auto pad = lSampler->getProgram(program).lock()->getPadNumberFromNote(normalNote);
+    auto pad = lSampler->getProgram(program).lock()->getPadIndexFromNote(normalNote);
 	findField("normal").lock()->setText(to_string(normalNote) + "/" + lSampler->getPadName(pad));
 }
 

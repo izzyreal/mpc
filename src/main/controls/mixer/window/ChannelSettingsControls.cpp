@@ -13,11 +13,14 @@ void ChannelSettingsControls::turnWheel(int i)
     init();
 	auto smc = stereoMixerChannel.lock();
 	auto ifmc = indivFxMixerChannel.lock();
-	if (param.compare("note") == 0) {
-		int note = samplerGui->getNote() + i;
-		if (note >= 35 && note <= 98) {
-			int pad = program.lock()->getPadNumberFromNote(note);
-			samplerGui->setPadAndNote(note, pad);
+	if (param.compare("note") == 0)
+	{
+		int note = mpc.getNote() + i;
+	
+		if (note >= 35 && note <= 98)
+		{
+			int pad = program.lock()->getPadIndexFromNote(note);
+			mpc.setPadAndNote(note, pad);
 		}
 	}
 	else if (param.compare("stereovolume") == 0) {

@@ -34,9 +34,9 @@ void SelectDrumScreen::function(int i)
 		name = previousScreenName;
 	}
 
-	if (samplerGui->getNote() < 35)
+	if (mpc.getNote() < 35)
 	{
-		samplerGui->setPadAndNote(program.lock()->getPadNumberFromNote(35), 35);
+		mpc.setPadAndNote(program.lock()->getPadIndexFromNote(35), 35);
 	}
 
 	ls.lock()->openScreen(name);

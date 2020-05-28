@@ -12,9 +12,6 @@ namespace ctoot {
 }
 
 namespace mpc {
-
-	
-
 	namespace sampler {
 		class Sampler;
 		class Program;
@@ -35,10 +32,6 @@ namespace mpc {
 
 	namespace ui {
 
-		namespace sampler {
-			class SamplerGui;
-		}
-
 		namespace disk {
 
 			class DiskGui;
@@ -52,40 +45,38 @@ namespace mpc {
 			{
 
 			private:
-				
-				std::vector<std::string> views{};
-				std::vector<std::string> types{};
-				std::vector<std::string> pgmSaveNames{};
-				std::vector<std::string> apsSaveNames{};
+				const std::vector<std::string> views{ "All Files", ".SND", ".PGM", ".APS", ".MID", ".ALL", ".WAV", ".SEQ", ".SET" };
+				const std::vector<std::string> types{ "Save All Sequences & Songs", "Save a Sequence", "Save All Program and Sounds", "Save a Program & Sounds", "Save a Sound", "Copy Operating System" };
+				const std::vector<std::string> pgmSaveNames{ "PROGRAM ONLY", "WITH SOUNDS", "WITH .WAV" };
+				const std::vector<std::string> apsSaveNames{ "APS ONLY", "WITH SOUNDS", "WITH .WAV" };
 
 				DiskGui* diskGui{ nullptr };
-				std::weak_ptr<mpc::disk::AbstractDisk> disk{};
-				std::weak_ptr<mpc::sequencer::Sequencer> sequencer{};
-				std::weak_ptr<mpc::sampler::Sampler> sampler{};
+				std::weak_ptr<mpc::disk::AbstractDisk> disk;
+				std::weak_ptr<mpc::sequencer::Sequencer> sequencer;
+				std::weak_ptr<mpc::sampler::Sampler> sampler;
 				ctoot::mpc::MpcSoundPlayerChannel* mpcSoundPlayerChannel{ nullptr };
-				std::weak_ptr<mpc::sampler::Program> program{};
-				mpc::ui::sampler::SamplerGui* samplerGui{ nullptr };
-				std::weak_ptr<mpc::lcdgui::Field> viewField{};
-				std::weak_ptr<mpc::lcdgui::Field> directoryField{};
-				std::weak_ptr<mpc::lcdgui::Field> fileField{};
-				std::weak_ptr<mpc::lcdgui::Field> typeField{};
-				std::weak_ptr<mpc::lcdgui::Field> deviceField{};
-				std::weak_ptr<mpc::lcdgui::Label> loadFileNameLabel{};
-				std::weak_ptr<mpc::lcdgui::Label> sizeLabel{};
-				std::weak_ptr<mpc::lcdgui::Label> freesndLabel{};
-				std::weak_ptr<mpc::lcdgui::Label> freeseqLabel{};
-				std::weak_ptr<mpc::lcdgui::Label> freeLabel{};
-				std::weak_ptr<mpc::lcdgui::Field> loadReplaceSoundField{};
-				std::weak_ptr<mpc::lcdgui::Field> assignToNoteField{};
+				std::weak_ptr<mpc::sampler::Program> program;
+				std::weak_ptr<mpc::lcdgui::Field> viewField;
+				std::weak_ptr<mpc::lcdgui::Field> directoryField;
+				std::weak_ptr<mpc::lcdgui::Field> fileField;
+				std::weak_ptr<mpc::lcdgui::Field> typeField;
+				std::weak_ptr<mpc::lcdgui::Field> deviceField;
+				std::weak_ptr<mpc::lcdgui::Label> loadFileNameLabel;
+				std::weak_ptr<mpc::lcdgui::Label> sizeLabel;
+				std::weak_ptr<mpc::lcdgui::Label> freesndLabel;
+				std::weak_ptr<mpc::lcdgui::Label> freeseqLabel;
+				std::weak_ptr<mpc::lcdgui::Label> freeLabel;
+				std::weak_ptr<mpc::lcdgui::Field> loadReplaceSoundField;
+				std::weak_ptr<mpc::lcdgui::Field> assignToNoteField;
 				std::string csn{ "" };
-				std::weak_ptr<mpc::lcdgui::Field> loadIntoField{};
-				mpc::ui::disk::window::DiskWindowGui* diskWindowGui{};
-				std::weak_ptr<mpc::lcdgui::Label> nameLabel{};
-				std::weak_ptr<mpc::lcdgui::Label> fileLabel{};
-				std::weak_ptr<mpc::lcdgui::Field> saveField{};
-				std::weak_ptr<mpc::lcdgui::Field> replaceSameSoundsField{};
-				std::weak_ptr<mpc::lcdgui::Field> fileTypeField{};
-				std::weak_ptr<mpc::lcdgui::Field> saveAsField{};
+				std::weak_ptr<mpc::lcdgui::Field> loadIntoField;
+				mpc::ui::disk::window::DiskWindowGui* diskWindowGui;
+				std::weak_ptr<mpc::lcdgui::Label> nameLabel;
+				std::weak_ptr<mpc::lcdgui::Label> fileLabel;
+				std::weak_ptr<mpc::lcdgui::Field> saveField;
+				std::weak_ptr<mpc::lcdgui::Field> replaceSameSoundsField;
+				std::weak_ptr<mpc::lcdgui::Field> fileTypeField;
+				std::weak_ptr<mpc::lcdgui::Field> saveAsField;
 
 			private:
 				void displaySaveAs();

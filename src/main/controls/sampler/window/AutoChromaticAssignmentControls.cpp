@@ -21,7 +21,7 @@ void AutoChromaticAssignmentControls::turnWheel(int i)
 	auto lLs = ls.lock();
 	auto lProgram = program.lock();
 	if (param.compare("source") == 0) {
-		samplerGui->setPadAndNote(samplerGui->getPad(), samplerGui->getNote() + i);
+		mpc.setPadAndNote(mpc.getPad(), mpc.getNote() + i);
 		swGui->setAutoChromAssSnd(sampler.lock()->getLastNp(lProgram.get())->getSndNumber(), sampler.lock()->getSoundCount());
 	}
 	else if (param.compare("programname") == 0) {

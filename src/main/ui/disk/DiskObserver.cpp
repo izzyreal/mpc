@@ -11,7 +11,6 @@
 #include <lcdgui/Label.hpp>
 #include <ui/disk/DiskGui.hpp>
 #include <ui/disk/window/DiskWindowGui.hpp>
-#include <ui/sampler/SamplerGui.hpp>
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>
 #include <sampler/Sound.hpp>
@@ -25,22 +24,16 @@
 #include <file/File.hpp>
 
 using namespace mpc::ui::disk;
+using namespace moduru::lang;
 using namespace std;
 
 DiskObserver::DiskObserver()
 {
-	
-	views = vector<string>{ "All Files", ".SND", ".PGM", ".APS", ".MID", ".ALL", ".WAV", ".SEQ", ".SET" };
-
-	types = vector<string>{ "Save All Sequences & Songs", "Save a Sequence", "Save All Program and Sounds", "Save a Program & Sounds", "Save a Sound", "Copy Operating System" };
-	pgmSaveNames = vector<string>{ "PROGRAM ONLY", "WITH SOUNDS", "WITH .WAV" };
-	apsSaveNames = vector<string>{ "APS ONLY", "WITH SOUNDS", "WITH .WAV" };
 	auto uis = Mpc::instance().getUis().lock();
-	samplerGui = uis->getSamplerGui();
 
 	diskWindowGui = uis->getDiskWindowGui();
 	diskWindowGui->addObserver(this);
-	samplerGui->addObserver(this);
+	Mpc::instance().addObserver(this);
 	disk = Mpc::instance().getDisk();
 	sampler = Mpc::instance().getSampler();
 	sequencer = Mpc::instance().getSequencer();
@@ -194,51 +187,53 @@ void DiskObserver::displayFreeSnd()
 
 void DiskObserver::displayAssignToNote()
 {
-	auto nn = samplerGui->getNote();
-	auto pn = program.lock()->getPadNumberFromNote(nn);
-	auto padName = string(pn == -1 ? "OFF" : sampler.lock()->getPadName(pn));
-	auto noteName = string(nn == 34 ? "--" : to_string(nn));
+	auto note = mpc::Mpc::instance().getNote();
+	auto padIndex = program.lock()->getPadIndexFromNote(note);
+	auto padName = string(padIndex == -1 ? "OFF" : sampler.lock()->getPadName(padIndex));
+	auto noteName = string(note == 34 ? "--" : to_string(note));
 	assignToNoteField.lock()->setText(noteName + "/" + padName);
 }
 
 void DiskObserver::displaySize()
-{
-	auto lSizeLabel = sizeLabel.lock();
-	if (csn.compare("load") == 0) {
-		if (disk.lock()->getFileNames().size() == 0) {
-			lSizeLabel->setText("      K");
+{	
+	if (csn.compare("load") == 0)
+	{
+		if (disk.lock()->getFileNames().size() == 0)
+		{
+			sizeLabel.lock()->setText("      K");
 			return;
 		}
-		lSizeLabel->setText(to_string(diskGui->getFileSize(diskGui->getFileLoad())) + "K");
+		sizeLabel.lock()->setText(to_string(diskGui->getFileSize(diskGui->getFileLoad())) + "K");
 	}
 
-	if (csn.compare("save") == 0) {
-		auto lSequencer = sequencer.lock();
-		auto seq = lSequencer->getActiveSequence().lock();
+	if (csn.compare("save") == 0)
+	{
+		auto seq = sequencer.lock()->getActiveSequence().lock();
 		auto size = 0;
-		auto lSampler = sampler.lock();
-		switch (diskGui->getType()) {
+	
+		switch (diskGui->getType())
+		{
 		case 0:
-			size = lSequencer->getUsedSequenceCount() * 25;
+			size = sequencer.lock()->getUsedSequenceCount() * 25;
 			break;
 		case 1:
-			size = seq->isUsed() ? 10 + static_cast<int >(seq->getEventCount() / 1000) : -1;
+			size = seq->isUsed() ? 10 + static_cast<int >(seq->getEventCount() * 0.001) : -1;
 			break;
 		case 2:
-			size = lSampler->getProgramCount() * 4;
+			size = sampler.lock()->getProgramCount() * 4;
 			break;
 		case 3:
 			size = 4;
 			break;
 		case 4:
-			size = lSampler->getSoundCount() == 0 ? -1 : (lSampler->getSound().lock()->getSampleData()->size() * 2 / 1000);
+			size = sampler.lock()->getSoundCount() == 0 ? -1 : (sampler.lock()->getSound().lock()->getSampleData()->size() * 2 * 0.001);
 			break;
 		case 5:
 			size = 512;
 			break;
 		}
 
-		lSizeLabel->setText(moduru::lang::StrUtil::padLeft(to_string(size == -1 ? 0 : size), " ", 6) + "K");
+		sizeLabel.lock()->setText(StrUtil::padLeft(to_string(size == -1 ? 0 : size), " ", 6) + "K");
 	}
 }
 
@@ -416,7 +411,7 @@ DiskObserver::~DiskObserver() {
 	auto lSequencer = sequencer.lock();
 	lSequencer->deleteObserver(this);
 	diskWindowGui->deleteObserver(this);
-	samplerGui->deleteObserver(this);
+	Mpc::instance().deleteObserver(this);
 	diskGui->deleteObserver(this);
 	mpcSoundPlayerChannel->deleteObserver(this);
 }

@@ -179,7 +179,7 @@ void EventHandler::handleNoThru(weak_ptr<mpc::sequencer::Event> e, mpc::sequence
 					{
 						auto note = ne->getNote();
 						auto program = Mpc::instance().getSampler().lock()->getProgram(Mpc::instance().getDrum(drum)->getProgram());
-						int pad = program.lock()->getPadNumberFromNote(note);
+						int pad = program.lock()->getPadIndexFromNote(note);
 						int bank = Mpc::instance().getBank();
 						pad -= bank * 16;
 					

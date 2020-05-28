@@ -876,7 +876,7 @@ void StepEditorScreen::setViewModeNotesText()
 	{
 		if (fromNotePad != 34)
 		{
-			findField("fromnote").lock()->setText(to_string(fromNotePad) + "/" + sampler.lock()->getPadName(program.lock()->getPadNumberFromNote(fromNotePad)));
+			findField("fromnote").lock()->setText(to_string(fromNotePad) + "/" + sampler.lock()->getPadName(program.lock()->getPadIndexFromNote(fromNotePad)));
 		}
 		else
 		{

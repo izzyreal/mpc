@@ -32,15 +32,12 @@ namespace mpc {
 	namespace ui {
 		namespace sampler {
 
-			class SamplerGui;
-
 			class ChannelSettingsObserver
 				: public moduru::observer::Observer
 			{
 
 			private:
 				std::weak_ptr<mpc::sampler::Sampler> sampler{};
-				SamplerGui* samplerGui{ nullptr };
 				ctoot::mpc::MpcSoundPlayerChannel* mpcSoundPlayerChannel{ nullptr };
 				std::weak_ptr<mpc::sampler::Program> program{};
 				std::weak_ptr<mpc::lcdgui::LayeredScreen> ls{};

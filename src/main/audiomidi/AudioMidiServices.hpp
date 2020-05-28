@@ -53,7 +53,8 @@ namespace mpc::audiomidi {
 
 using namespace mpc::audiomidi;
 
-namespace mpc::audiomidi {
+namespace mpc::audiomidi
+{
 
 	class AudioMidiServices final
 		: public moduru::observer::Observable
@@ -91,7 +92,6 @@ namespace mpc::audiomidi {
 		vector<shared_ptr<ctoot::audio::server::IOAudioProcess>> inputProcesses;
 		vector<ctoot::audio::server::IOAudioProcess*> outputProcesses;
 		shared_ptr<mpc::sequencer::FrameSeq> frameSeq;
-		vector<int> oldPrograms;
 		vector<shared_ptr<DiskRecorder>> diskRecorders;
 		shared_ptr<SoundRecorder> soundRecorder;
 		shared_ptr<SoundPlayer> soundPlayer;

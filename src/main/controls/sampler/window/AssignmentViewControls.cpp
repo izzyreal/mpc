@@ -20,12 +20,12 @@ void AssignmentViewControls::up()
 	init();
 	if (param.find("0") != string::npos) return;
 
-	auto nn = program.lock()->getPad(samplerGui->getPad() + 4)->getNote();
-	auto focusPadNr = samplerGui->getPad() + 4;
+	auto nn = program.lock()->getPad(mpc.getPad() + 4)->getNote();
+	auto focusPadNr = mpc.getPad() + 4;
 	while (focusPadNr > 15) focusPadNr -= 16;
 
 	ls.lock()->setFocus(mpc::ui::sampler::window::SamplerWindowGui::padFocusNames[focusPadNr]);
-	samplerGui->setPadAndNote(samplerGui->getPad() + 4, nn);
+	mpc.setPadAndNote(mpc.getPad() + 4, nn);
 }
 
 void AssignmentViewControls::down()
@@ -33,12 +33,12 @@ void AssignmentViewControls::down()
 	init();
 	if (param.find("3") != string::npos) return;
 
-	auto nn = program.lock()->getPad(samplerGui->getPad() - 4)->getNote();
-	auto focusPadNr = samplerGui->getPad() - 4;
+	auto nn = program.lock()->getPad(mpc.getPad() - 4)->getNote();
+	auto focusPadNr = mpc.getPad() - 4;
 	while (focusPadNr > 15) focusPadNr -= 16;
 
 	ls.lock()->setFocus(mpc::ui::sampler::window::SamplerWindowGui::padFocusNames[focusPadNr]);
-	samplerGui->setPadAndNote(samplerGui->getPad() - 4, nn);
+	mpc.setPadAndNote(mpc.getPad() - 4, nn);
 }
 
 void AssignmentViewControls::left()
@@ -46,9 +46,9 @@ void AssignmentViewControls::left()
     init();
     if(param.find("a") != string::npos) return;
     super::left();
-    auto padNr = samplerGui->getPad() - 1;
+    auto padNr = mpc.getPad() - 1;
     auto nn = program.lock()->getPad(padNr)->getNote();
-    samplerGui->setPadAndNote(padNr, nn);
+    mpc.setPadAndNote(padNr, nn);
 }
 
 void AssignmentViewControls::right()
@@ -57,9 +57,9 @@ void AssignmentViewControls::right()
 	if (param.find("d") != string::npos) return;
 
 	super::right();
-	auto padNr = samplerGui->getPad() + 1;
+	auto padNr = mpc.getPad() + 1;
 	auto nn = program.lock()->getPad(padNr)->getNote();
-	samplerGui->setPadAndNote(padNr, nn);
+	mpc.setPadAndNote(padNr, nn);
 }
 
 void AssignmentViewControls::turnWheel(int i)

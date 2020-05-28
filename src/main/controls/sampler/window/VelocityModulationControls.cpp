@@ -24,6 +24,6 @@ void VelocityModulationControls::turnWheel(int i)
 		lastNp->setVeloToLevel(lastNp->getVeloToLevel() + i);
 	}
 	else if (param.compare("note") == 0) {
-		samplerGui->setPadAndNote(samplerGui->getPad(), samplerGui->getNote() + i);
+		mpc.setPadAndNote(mpc.getPad(), mpc.getNote() + i);
 	}
 }

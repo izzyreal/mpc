@@ -1,9 +1,8 @@
-#include <controls/disk/window/LoadASoundControls.hpp>
+#include "LoadASoundControls.hpp"
 
 #include <Mpc.hpp>
 #include <controls/Controls.hpp>
 
-#include <ui/sampler/SamplerGui.hpp>
 #include <ui/Uis.hpp>
 
 #include <sampler/Program.hpp>
@@ -26,9 +25,9 @@ void LoadASoundControls::turnWheel(int i)
 	init();
 	if (param.compare("assigntonote") == 0)
 	{
-		auto nextNn = samplerGui->getNote() + i;
-		auto nextPn = program.lock()->getPadNumberFromNote(nextNn);
-		samplerGui->setPadAndNote(nextPn, nextNn);
+		auto nextNn = mpc.getNote() + i;
+		auto nextPn = program.lock()->getPadIndexFromNote(nextNn);
+		mpc.setPadAndNote(nextPn, nextNn);
 	}
 }
 
@@ -89,9 +88,9 @@ void LoadASoundControls::keepSound()
 	auto program = sampler.lock()->getProgram(programNumber);
 	auto sound = sampler.lock()->getPreviewSound();
 
-	if (samplerGui->getNote() != 34)
+	if (mpc.getNote() != 34)
 	{
-		auto noteParameters = dynamic_cast<mpc::sampler::NoteParameters*>(program.lock()->getNoteParameters(samplerGui->getNote()));
+		auto noteParameters = dynamic_cast<mpc::sampler::NoteParameters*>(program.lock()->getNoteParameters(mpc.getNote()));
 		noteParameters->setSoundNumber(sampler.lock()->getSoundCount() - 1);
 
 		if (sound.lock()->isLoopEnabled())
@@ -99,7 +98,7 @@ void LoadASoundControls::keepSound()
 			noteParameters->setVoiceOverlap(2);
 		}
 
-		auto pn = program.lock()->getPadNumberFromNote(samplerGui->getNote());
+		auto pn = program.lock()->getPadIndexFromNote(mpc.getNote());
 
 		if (pn != -1)
 		{

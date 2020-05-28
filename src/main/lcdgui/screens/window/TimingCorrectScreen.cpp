@@ -60,9 +60,9 @@ void TimingCorrectScreen::function(int i)
 		vector<int> noteRange(2);
 
 		if (track.lock()->getBusNumber() != 0) {
-			if (samplerGui->getNote() != 34) {
-				noteRange[0] = samplerGui->getNote();
-				noteRange[1] = samplerGui->getNote();
+			if (mpc.getNote() != 34) {
+				noteRange[0] = mpc.getNote();
+				noteRange[1] = mpc.getNote();
 			}
 			else {
 				noteRange[0] = 0;
@@ -143,8 +143,8 @@ void TimingCorrectScreen::displayNotes()
 	else {
 		findField("notes0").lock()->setSize(6 * 6 + 2, 9);
 		
-		if (samplerGui->getNote() != 34) {
-			findField("notes0").lock()->setText(to_string(samplerGui->getNote()) + "/" + sampler.lock()->getPadName(samplerGui->getPad()));
+		if (mpc.getNote() != 34) {
+			findField("notes0").lock()->setText(to_string(mpc.getNote()) + "/" + sampler.lock()->getPadName(mpc.getPad()));
 		}
 		else {
 			findField("notes0").lock()->setText("ALL");

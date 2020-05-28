@@ -533,7 +533,7 @@ void EditSequenceScreen::displayDrumNotes()
 	else
 	{
 		auto padNumber = StrUtil::padLeft(to_string(drumNote), " ", 2);
-		auto padName = sampler.lock()->getPadName(program->getPadNumberFromNote(drumNote));
+		auto padName = sampler.lock()->getPadName(program->getPadIndexFromNote(drumNote));
 		findField("drumnote").lock()->setText(padNumber + "/" + padName);
 	}
 }

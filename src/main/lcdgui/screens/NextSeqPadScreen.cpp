@@ -27,14 +27,15 @@ void NextSeqPadScreen::open()
 	displayBank();
 	displaySeqNumbers();
 	displayNextSq();
+
 	sequencer.lock()->addObserver(this);
-	samplerGui->addObserver(this);
+	mpc.addObserver(this);
 }
 
 void NextSeqPadScreen::close()
 {
 	sequencer.lock()->deleteObserver(this);
-	samplerGui->deleteObserver(this);
+	mpc.deleteObserver(this);
 }
 
 void NextSeqPadScreen::right()

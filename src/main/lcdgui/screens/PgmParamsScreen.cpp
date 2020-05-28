@@ -68,7 +68,7 @@ void PgmParamsScreen::function(int i)
 		auto letterNumber = sampler.lock()->getProgramCount() + 21;
 		auto newName = "NewPgm-" + mpc::Mpc::akaiAscii[letterNumber];
 		samplerWindowGui->setNewName(newName);
-		samplerGui->setPrevScreenName(csn);
+		mpc.getUis().lock()->getSamplerGui()->setPrevScreenName(csn);
 		ls.lock()->openScreen("autochromaticassignment");
 		break;
 	}
@@ -146,10 +146,10 @@ void PgmParamsScreen::turnWheel(int i)
 	}
     else if(param.compare("note") == 0)
 	{
-        auto candidate = samplerGui->getNote() + i;
+        auto candidate = mpc.getNote() + i;
 		if (candidate > 34)
 		{
-			samplerGui->setPadAndNote(samplerGui->getPad(), candidate);
+			mpc.setPadAndNote(mpc.getPad(), candidate);
 			displayAttackDecay();
 			displayDecayMode();
 			displayFreq();
@@ -167,21 +167,21 @@ void PgmParamsScreen::openWindow()
 
 	if (param.compare("pgm") == 0)
 	{
-		samplerGui->setPrevScreenName(csn);
+		mpc.getUis().lock()->getSamplerGui()->setPrevScreenName(csn);
 		ls.lock()->openScreen("program");
 	}
 	else if (param.compare("note") == 0)
 	{
 		auto programIndex = mpcSoundPlayerChannel->getProgram();
 		
-		auto note = samplerGui->getNote();
+		auto note = mpc.getNote();
 		auto programCount = sampler.lock()->getProgramCount();
 		auto samplerWindowGui = mpc.getUis().lock()->getSamplerWindowGui();
 		samplerWindowGui->setProg0(programIndex, programCount);
 		samplerWindowGui->setNote0(note);
 		samplerWindowGui->setProg1(programIndex, programCount);
 		samplerWindowGui->setNote1(note);
-		samplerGui->setPrevScreenName(csn);
+		mpc.getUis().lock()->getSamplerGui()->setPrevScreenName(csn);
 		ls.lock()->openScreen("copynoteparameters");
 	}
 	else if (param.compare("attack") == 0 || param.compare("decay") == 0 || param.compare("dcymd") == 0)
@@ -250,7 +250,7 @@ void PgmParamsScreen::displayNote()
 	auto sampleNumber = sampler.lock()->getLastNp(lProgram.get())->getSndNumber();
 	auto note = sampler.lock()->getLastNp(lProgram.get())->getNumber();
 	auto sampleName = sampleNumber != -1 ? sampler.lock()->getSoundName(sampleNumber) : "OFF";
-	auto padNumber = lProgram->getPadNumberFromNote(note);
+	auto padNumber = lProgram->getPadIndexFromNote(note);
 	
 	if (padNumber != -1)
 	{

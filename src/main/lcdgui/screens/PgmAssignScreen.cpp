@@ -69,7 +69,7 @@ void PgmAssignScreen::function(int i)
 		auto newName = "NewPgm-" + mpc::Mpc::akaiAscii[letterNumber];
 		
 		samplerWindowGui->setNewName(newName);
-		samplerGui->setPrevScreenName(csn);
+		mpc.getUis().lock()->getSamplerGui()->setPrevScreenName(csn);
 		ls.lock()->openScreen("autochromaticassignment");
 		break;
 	}
@@ -111,7 +111,7 @@ void PgmAssignScreen::turnWheel(int i)
 	}
 	else if (param.compare("pad") == 0)
 	{
-		auto candidate = samplerGui->getPad() + i;
+		auto candidate = mpc.getPad() + i;
 		
 		if (candidate < 0 || candidate > 63)
 		{
@@ -119,7 +119,7 @@ void PgmAssignScreen::turnWheel(int i)
 		}
 
 		auto nextNote = program.lock()->getPad(candidate)->getNote();
-		samplerGui->setPadAndNote(candidate, nextNote);
+		mpc.setPadAndNote(candidate, nextNote);
 		displayPad();
 		displayNote();
 		displayOptionalNoteA();
@@ -137,7 +137,7 @@ void PgmAssignScreen::turnWheel(int i)
 		
 		if (candidate > 34)
 		{
-			samplerGui->setPadAndNote(samplerGui->getPad(), candidate);
+			mpc.setPadAndNote(mpc.getPad(), candidate);
 		}
 
 		displayPad();
@@ -151,11 +151,11 @@ void PgmAssignScreen::turnWheel(int i)
 	}
 	else if (param.compare("note") == 0)
 	{
-		auto candidate = samplerGui->getNote() + i;
+		auto candidate = mpc.getNote() + i;
 	
 		if (candidate > 34)
 		{
-			samplerGui->setPadAndNote(samplerGui->getPad(), candidate);
+			mpc.setPadAndNote(mpc.getPad(), candidate);
 		}
 		displayNote();
 		displaySoundName();
@@ -215,7 +215,7 @@ void PgmAssignScreen::openWindow()
 	
 	if (param.compare("pgm") == 0)
 	{
-		samplerGui->setPrevScreenName("programassign");
+		mpc.getUis().lock()->getSamplerGui()->setPrevScreenName("programassign");
 		ls.lock()->openScreen("program");
 	}
 	else if (param.compare("pad") == 0 || param.compare("pad-note") == 0)
@@ -229,7 +229,7 @@ void PgmAssignScreen::openWindow()
 	else if (param.compare("note") == 0)
 	{
 		auto pn = mpcSoundPlayerChannel->getProgram();
-		auto nn = samplerGui->getNote();
+		auto nn = mpc.getNote();
 		auto pc = sampler.lock()->getProgramCount();
 		
 		auto samplerWindowGui = mpc.getUis().lock()->getSamplerWindowGui();
@@ -384,7 +384,7 @@ void PgmAssignScreen::displayOptionalNoteA()
 	auto lSampler = sampler.lock();
 	auto lProgram = program.lock();
 	auto noteIntA = sampler.lock()->getLastNp(lProgram.get())->getOptionalNoteA();
-	auto padIntA = lProgram->getPadNumberFromNote(noteIntA);
+	auto padIntA = lProgram->getPadIndexFromNote(noteIntA);
 	auto noteA = noteIntA != 34 ? to_string(noteIntA) : "--";
 	auto padA = padIntA != -1 ? sampler.lock()->getPadName(padIntA) : "OFF";
 	findField("optional-note-a").lock()->setText(noteA + "/" + padA);
@@ -396,7 +396,7 @@ void PgmAssignScreen::displayOptionalNoteB()
 	auto lSampler = sampler.lock();
 	auto lProgram = program.lock();
 	auto noteIntB = sampler.lock()->getLastNp(lProgram.get())->getOptionalNoteB();
-	auto padIntB = lProgram->getPadNumberFromNote(noteIntB);
+	auto padIntB = lProgram->getPadIndexFromNote(noteIntB);
 	auto noteB = noteIntB != 34 ? to_string(noteIntB) : "--";
 	auto padB = padIntB != -1 ? sampler.lock()->getPadName(padIntB) : "OFF";
 	findField("optional-note-b").lock()->setText(noteB + "/" + padB);
@@ -411,7 +411,7 @@ void PgmAssignScreen::displayNote()
 void PgmAssignScreen::displayPad()
 {
 	init();
-	findField("pad").lock()->setText(sampler.lock()->getPadName(samplerGui->getPad()));
+	findField("pad").lock()->setText(sampler.lock()->getPadName(mpc.getPad()));
 }
 
 void PgmAssignScreen::update(moduru::observer::Observable* o, nonstd::any arg)

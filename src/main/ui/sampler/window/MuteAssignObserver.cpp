@@ -47,7 +47,7 @@ void MuteAssignObserver::displayNote()
 	auto lSampler = sampler.lock();
 	auto lProgram = program.lock();
 	auto note = lSampler->getLastNp(lProgram.get())->getNumber();
-	auto pad = lProgram->getPadNumberFromNote(note);
+	auto pad = lProgram->getPadIndexFromNote(note);
 	string soundName = "OFF";
 	auto padName = pad == -1 ? "OFF" : lSampler->getPadName(pad);
 	auto sound = lProgram->getNoteParameters(note)->getSndNumber();
@@ -65,7 +65,7 @@ void MuteAssignObserver::displayNote0()
 		note0Field.lock()->setText("--");
 		return;
 	}
-	auto pad = lProgram->getPadNumberFromNote(note0);
+	auto pad = lProgram->getPadIndexFromNote(note0);
 	string soundName = "OFF";
 	auto sound = lProgram->getNoteParameters(note0)->getSndNumber();
 	if (sound != -1) soundName = lSampler->getSoundName(sound);
@@ -82,7 +82,7 @@ void MuteAssignObserver::displayNote1()
 		note1Field.lock()->setText("--");
 		return;
 	}
-	auto pad = lProgram->getPadNumberFromNote(note1);
+	auto pad = lProgram->getPadIndexFromNote(note1);
 	string soundName = "OFF";
 	auto sound = lProgram->getNoteParameters(note1)->getSndNumber();
 	if (sound != -1) soundName = lSampler->getSoundName(sound);

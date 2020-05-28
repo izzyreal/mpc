@@ -74,14 +74,17 @@ weak_ptr<MpcIndivFxMixerChannel> Program::getIndivFxMixerChannel(int pad)
 	return dynamic_pointer_cast<MpcIndivFxMixerChannel>(pads[pad]->getIndivFxMixerChannel().lock());
 }
 
-int Program::getPadNumberFromNote(int note)
+int Program::getPadIndexFromNote(int note)
 {
-	if (note < 35 || note > 98) {
+	if (note < 35 || note > 98)
+	{
 		return -1;
 	}
 
-	for (int i = 0; i < 64; i++) {
-		if (pads[i]->getNote() == note) {
+	for (int i = 0; i < 64; i++)
+	{
+		if (pads[i]->getNote() == note)
+		{
 			return i;
 		}
 	}

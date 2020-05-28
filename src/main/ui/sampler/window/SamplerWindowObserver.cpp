@@ -101,16 +101,18 @@ SamplerWindowObserver::SamplerWindowObserver()
 		info1Label.lock()->setInverted(true);
 		info1Label.lock()->setSize(13, 9);
 		auto pads = vector <weak_ptr<mpc::lcdgui::Field>> { a3Field, b3Field, c3Field, d3Field, a2Field, b2Field, c2Field, d2Field, a1Field, b1Field, c1Field, d1Field, a0Field, b0Field, c0Field, d0Field };
-		ls->setFocus(swGui->getFocusFromPadNumber(samplerGui->getPad()));
+		ls->setFocus(swGui->getFocusFromPadNumber(Mpc::instance().getPad()));
 		displayAssignmentView();
 	}
-	else if (csn.compare("keeporretry") == 0) {
+	else if (csn.compare("keeporretry") == 0)
+	{
 		nameForNewSoundField = ls->lookupField("namefornewsound");
 		assignToNoteField = ls->lookupField("assigntonote");
 		displayNameForNewSound();
 		displayAssignToPad();
 	}
-	else if (csn.compare("copynoteparameters") == 0) {
+	else if (csn.compare("copynoteparameters") == 0)
+	{
 		prog0Field = ls->lookupField("prog0");
 		note0Field = ls->lookupField("note0");
 		prog1Field = ls->lookupField("prog1");
@@ -194,7 +196,7 @@ void SamplerWindowObserver::displaySource()
 {
 	auto lProgram = program.lock();
 	auto nn = sampler.lock()->getLastNp(lProgram.get())->getNumber();
-	auto pn = lProgram->getPadNumberFromNote(nn);
+	auto pn = lProgram->getPadIndexFromNote(nn);
 	string nnName = to_string(nn);
 	auto padName = pn == -1 ? "OFF" : sampler.lock()->getPadName(pn);
 	sourceField.lock()->setText(nnName + "/" + padName);
@@ -259,7 +261,7 @@ void SamplerWindowObserver::displayNote()
 	auto lProgram = program.lock();
 	auto noteParameters = sampler.lock()->getLastNp(lProgram.get());
 	auto sn = noteParameters->getSndNumber();
-	auto pn = lProgram->getPadNumberFromNote(noteParameters->getNumber());
+	auto pn = lProgram->getPadIndexFromNote(noteParameters->getNumber());
 	auto pad = lProgram->getPad(pn);
 	auto padName = pn != -1 ? sampler.lock()->getPadName(pn) : "OFF";
 	auto sampleName = sn != -1 ? sampler.lock()->getSoundName(sn) : "OFF";
@@ -298,7 +300,7 @@ void SamplerWindowObserver::displayNote0()
 {
 	auto prog = csn.compare("muteassign") == 0 ? program.lock() : dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(swGui->getProg0()).lock());
 	auto nn = csn.compare("muteassign") == 0 ? sampler.lock()->getLastNp(prog.get())->getMuteAssignA() : swGui->getNote0();
-	auto pn = prog->getPadNumberFromNote(nn);
+	auto pn = prog->getPadIndexFromNote(nn);
 	auto sn = nn != 34 ? prog->getNoteParameters(nn)->getSndNumber() : -1;
 	auto nnName = nn == 34 ? "--" : to_string(nn);
 	auto padName = pn != -1 ? sampler.lock()->getPadName(pn) : "OFF";
@@ -316,7 +318,7 @@ void SamplerWindowObserver::displayNote1()
 {
 	auto prog = csn.compare("muteassign") == 0 ? program.lock() : dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(swGui->getProg1()).lock());
 	auto nn = csn.compare("muteassign") == 0 ? sampler.lock()->getLastNp(prog.get())->getMuteAssignB() : swGui->getNote1();
-	auto pn = prog->getPadNumberFromNote(nn);
+	auto pn = prog->getPadIndexFromNote(nn);
 	auto sn = nn != 34 ? prog->getNoteParameters(nn)->getSndNumber() : -1;
 	auto nnName = nn == 34 ? "--" : to_string(nn);
 	auto padName = pn != -1 ? sampler.lock()->getPadName(pn) : "OFF";
@@ -361,12 +363,15 @@ void SamplerWindowObserver::update(moduru::observer::Observable* o, nonstd::any 
 	else if (s.compare("bank") == 0) {
 		displayAssignmentView();
 	}
-	else if (s.compare("padandnote") == 0) {
-		if (csn.compare("keeporretry") == 0) {
+	else if (s.compare("padandnote") == 0)
+	{
+		if (csn.compare("keeporretry") == 0)
+		{
 			displayAssignToPad();
 		}
-		else if (csn.compare("assignmentview") == 0) {
-			Mpc::instance().getLayeredScreen().lock()->setFocus(swGui->getFocusFromPadNumber(samplerGui->getPad()));
+		else if (csn.compare("assignmentview") == 0)
+		{
+			Mpc::instance().getLayeredScreen().lock()->setFocus(swGui->getFocusFromPadNumber(Mpc::instance().getPad()));
 			displayAssignmentView();
 		}
 		else if (csn.compare("velocitymodulation") == 0) {
@@ -463,7 +468,7 @@ void SamplerWindowObserver::displayOriginalKey()
 {
 	auto nn = swGui->getOriginalKey();
 	auto lProgram = program.lock();
-	auto pad = lProgram->getPadNumberFromNote(nn);
+	auto pad = lProgram->getPadIndexFromNote(nn);
 	auto pn = sampler.lock()->getPadName(pad);
 	originalKeyField.lock()->setText(to_string(nn) + "/" + pn);
 }

@@ -1,10 +1,13 @@
 #pragma once
 
+#include <DiskController.hpp>
 #include <lcdgui/LayeredScreen.hpp>
 #include <ui/Uis.hpp>
-#include <Logger.hpp>
 #include <disk/ProgramLoader.hpp>
-#include "DiskController.hpp"
+
+#include <observer/Observable.hpp>
+
+#include <Logger.hpp>
 
 #include <vector>
 #include <string>
@@ -58,6 +61,7 @@ namespace mpc::sampler {
 
 namespace mpc {
 	class Mpc
+		: public moduru::observer::Observable
 	{
 	public:
 		static Mpc& instance()
@@ -88,11 +92,20 @@ namespace mpc {
 	private:
 		std::shared_ptr<hardware::Hardware> hardware;
 		int bank = 0;
+		int pad = 0;
+		int note = 60;
+		int prevNote = 60;
+		int prevPad = -1;
 
 	public:
 		void init(const int sampleRate, const int inputCount, const int outputCount);
 		void setBank(int i);
 		int getBank();
+		void setPadAndNote(int pad, int note);
+		int getNote();
+		int getPad();
+		int getPrevNote();
+		int getPrevPad();
 
 	public:
 		std::weak_ptr<ui::Uis> getUis();

@@ -37,8 +37,7 @@ ChannelSettingsObserver::ChannelSettingsObserver()
 	fxPathNames = { "--", "M1", "M2", "R1", "R2" };
 	stereoNamesSlash = { "-", "1/2", "1/2", "3/4", "3/4", "5/6", "5/6", "7/8", "7/8" };
 	auto uis = Mpc::instance().getUis().lock();
-	samplerGui = uis->getSamplerGui();
-	samplerGui->addObserver(this);
+	Mpc::instance().addObserver(this);
 
 	ls = Mpc::instance().getLayeredScreen();
 
@@ -146,37 +145,37 @@ void ChannelSettingsObserver::displayChannel()
 void ChannelSettingsObserver::displayNoteField()
 {
 	string soundString = "OFF";
-	auto lProgram = program.lock();
-	auto sampleNumber = lProgram->getNoteParameters(samplerGui->getNote())->getSndNumber();
+	auto sampleNumber = program.lock()->getNoteParameters(Mpc::instance().getNote())->getSndNumber();
 
 	if (sampleNumber > 0 && sampleNumber < sampler.lock()->getSoundCount())
 	{
 		soundString = sampler.lock()->getSoundName(sampleNumber);
+
 		if (!sampler.lock()->getSound(sampleNumber).lock()->isMono())
 		{
 			soundString += StrUtil::padLeft("(ST)", " ", 23 - soundString.length());
 		}
 	}
-	noteField.lock()->setText(to_string(samplerGui->getNote()) + "/" + sampler.lock()->getPadName(samplerGui->getPad()) + "-" + soundString);
+	noteField.lock()->setText(to_string(Mpc::instance().getNote()) + "/" + sampler.lock()->getPadName(Mpc::instance().getPad()) + "-" + soundString);
 }
 
 void ChannelSettingsObserver::displayStereoVolume() {
 	auto lProgram = program.lock();
-	auto mixerChannel = lProgram->getPad(samplerGui->getPad())->getStereoMixerChannel();
+	auto mixerChannel = lProgram->getPad(Mpc::instance().getPad())->getStereoMixerChannel();
 	auto lMc = mixerChannel.lock();
 	stereoVolumeField.lock()->setTextPadded(lMc->getLevel(), " ");
 }
 
 void ChannelSettingsObserver::displayIndividualVolume() {
 	auto lProgram = program.lock();
-	auto mixerChannel = lProgram->getPad(samplerGui->getPad())->getIndivFxMixerChannel();
+	auto mixerChannel = lProgram->getPad(Mpc::instance().getPad())->getIndivFxMixerChannel();
 	auto lMc = mixerChannel.lock();
 	individualVolumeField.lock()->setTextPadded(lMc->getVolumeIndividualOut(), " ");
 }
 
 void ChannelSettingsObserver::displayFxSendLevel() {
 	auto lProgram = program.lock();
-	auto mixerChannel = lProgram->getPad(samplerGui->getPad())->getIndivFxMixerChannel();
+	auto mixerChannel = lProgram->getPad(Mpc::instance().getPad())->getIndivFxMixerChannel();
 	auto lMc = mixerChannel.lock();
 	fxSendLevelField.lock()->setTextPadded(lMc->getFxSendLevel(), " ");
 }
@@ -184,7 +183,7 @@ void ChannelSettingsObserver::displayFxSendLevel() {
 void ChannelSettingsObserver::displayPanning()
 {
 	auto lProgram = program.lock();
-	auto mixerChannel = lProgram->getPad(samplerGui->getPad())->getStereoMixerChannel();
+	auto mixerChannel = lProgram->getPad(Mpc::instance().getPad())->getStereoMixerChannel();
 	auto lMc = mixerChannel.lock();
 	
 	if (lMc->getPanning() != 0)
@@ -201,8 +200,8 @@ void ChannelSettingsObserver::displayPanning()
 
 void ChannelSettingsObserver::displayOutput() {
 	auto lProgram = program.lock();
-	auto indivFxMixerChannel = lProgram->getPad(samplerGui->getPad())->getIndivFxMixerChannel().lock();
-	auto stereoMixerChannel = lProgram->getPad(samplerGui->getPad())->getStereoMixerChannel().lock();
+	auto indivFxMixerChannel = lProgram->getPad(Mpc::instance().getPad())->getIndivFxMixerChannel().lock();
+	auto stereoMixerChannel = lProgram->getPad(Mpc::instance().getPad())->getStereoMixerChannel().lock();
 
 	if (stereoMixerChannel->isStereo()) {
 		outputField.lock()->setText(stereoNamesSlash[indivFxMixerChannel->getOutput()]);
@@ -214,7 +213,7 @@ void ChannelSettingsObserver::displayOutput() {
 
 void ChannelSettingsObserver::displayFxPath() {
 	auto lProgram = program.lock();
-	auto mixerChannel = lProgram->getPad(samplerGui->getPad())->getIndivFxMixerChannel();
+	auto mixerChannel = lProgram->getPad(Mpc::instance().getPad())->getIndivFxMixerChannel();
 	auto lMc = mixerChannel.lock();
 	fxPathField.lock()->setText(fxPathNames[lMc->getFxPath()]);
 }
@@ -228,7 +227,7 @@ void ChannelSettingsObserver::displayFollowStereo() {
 }
 
 ChannelSettingsObserver::~ChannelSettingsObserver() {
-	samplerGui->deleteObserver(this);
+	Mpc::instance().deleteObserver(this);
 
 	for (int i = (Mpc::instance().getBank() * 16); i < (Mpc::instance().getBank() * 16) + 16; i++) {
 		auto pad = program.lock()->getPad(i);

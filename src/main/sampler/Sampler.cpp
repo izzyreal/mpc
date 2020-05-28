@@ -767,22 +767,24 @@ string Sampler::addOrIncreaseNumber2(string s)
 
 Pad* Sampler::getLastPad(Program* program)
 {
-	auto sGui = Mpc::instance().getUis().lock()->getSamplerGui();
-	auto lastValidPad = sGui->getPad();
+	auto& mpc = Mpc::instance();
+	auto lastValidPad = mpc.getPad();
+	
 	if (lastValidPad == -1)
 	{
-		lastValidPad = sGui->getPrevPad();
+		lastValidPad = mpc.getPrevPad();
 	}
 	return program->getPad(lastValidPad);
 }
 
 NoteParameters* Sampler::getLastNp(Program* program)
 {
-	auto sGui = Mpc::instance().getUis().lock()->getSamplerGui();
-	auto lastValidNote = sGui->getNote();
+	auto& mpc = Mpc::instance();
+	auto lastValidNote = mpc.getNote();
+	
 	if (lastValidNote == 34)
 	{
-		lastValidNote = sGui->getPrevNote();
+		lastValidNote = mpc.getPrevNote();
 	}
 	return dynamic_cast<mpc::sampler::NoteParameters*>(program->getNoteParameters(lastValidNote));
 }

@@ -19,6 +19,6 @@ void AbstractMixerControls::init()
 {
 	super::init();
 	auto lProgram = program.lock();
-	stereoMixerChannel = lProgram->getPad(samplerGui->getPad())->getStereoMixerChannel();
-	indivFxMixerChannel = lProgram->getPad(samplerGui->getPad())->getIndivFxMixerChannel();
+	stereoMixerChannel = lProgram->getPad(mpc.getPad())->getStereoMixerChannel();
+	indivFxMixerChannel = lProgram->getPad(mpc.getPad())->getIndivFxMixerChannel();
 }

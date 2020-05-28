@@ -15,7 +15,7 @@ void MuteAssignControls::turnWheel(int i)
 {
     init();
     if (param.compare("note") == 0) {
-		samplerGui->setPadAndNote(samplerGui->getPad(), samplerGui->getNote() + i);
+		mpc.setPadAndNote(mpc.getPad(), mpc.getNote() + i);
 	}
 	else if (param.compare("note0") == 0) {
 		lastNp->setMuteAssignA(lastNp->getMuteAssignA() + i);

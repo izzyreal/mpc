@@ -137,8 +137,8 @@ void EditVelocityScreen::displayNotes()
 	}
 	else {
 		findField("notes0").lock()->setSize(6 * 6 + 2, 9);
-		if (samplerGui->getNote() != 34) {
-			findField("notes0").lock()->setText(to_string(samplerGui->getNote()) + "/" + lSampler->getPadName(samplerGui->getPad()));
+		if (mpc.getNote() != 34) {
+			findField("notes0").lock()->setText(to_string(mpc.getNote()) + "/" + lSampler->getPadName(mpc.getPad()));
 		}
 		else {
 			findField("notes0").lock()->setText("ALL");

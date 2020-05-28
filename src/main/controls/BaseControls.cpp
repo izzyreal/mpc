@@ -30,8 +30,8 @@
 #include <ui/disk/DiskGui.hpp>
 #include <ui/disk/window/DirectoryGui.hpp>
 #include <ui/misc/PunchGui.hpp>
-#include <ui/sampler/SamplerGui.hpp>
 #include <ui/sampler/window/EditSoundGui.hpp>
+#include <ui/sampler/SamplerGui.hpp>
 #include <ui/vmpc/DirectToDiskRecorderGui.hpp>
 
 #include <sampler/Pad.hpp>
@@ -62,7 +62,6 @@ BaseControls::BaseControls()
 	sampler = mpc.getSampler();
 	ls = mpc.getLayeredScreen();
 	nameGui = mpc.getUis().lock()->getNameGui();
-	samplerGui = mpc.getUis().lock()->getSamplerGui();
 }
 
 vector<int> BaseControls::splitInc = vector<int>{ 10000000, 1000000, 100000, 10000, 1000, 100, 10, 1 };
@@ -244,11 +243,12 @@ void BaseControls::pad(int i, int velo, bool repeat, int tick)
 		{
 			if (note > 34)
 			{
-				samplerGui->setPadAndNote(pad, note);
+				mpc.setPadAndNote(pad, note);
 			}
 		}
-		else {
-			samplerGui->setPadAndNote(pad, note);
+		else
+		{
+			mpc.setPadAndNote(pad, note);
 		}
 	}
 
@@ -321,7 +321,7 @@ void BaseControls::generateNoteOn(int nn, int padVelo, int tick)
 		{
 			auto type = assign16LevelsScreen->getType();
 			auto key = assign16LevelsScreen->getOriginalKeyPad();
-			auto diff = lProgram->getPadNumberFromNote(nn) - (mpc.getBank() * 16) - key;
+			auto diff = lProgram->getPadIndexFromNote(nn) - (mpc.getBank() * 16) - key;
 			n->setNote(assign16LevelsScreen->getNote());
 			n->setVariationTypeNumber(type);
 			n->setVariationValue(diff * 5);
@@ -348,7 +348,7 @@ void BaseControls::generateNoteOn(int nn, int padVelo, int tick)
 
 		auto type = assign16LevelsScreen->getType();
 		auto key = assign16LevelsScreen->getOriginalKeyPad();
-		auto padnr = program.lock()->getPadNumberFromNote(nn) - (mpc.getBank() * 16);
+		auto padnr = program.lock()->getPadIndexFromNote(nn) - (mpc.getBank() * 16);
 
 		if (type == 0) {
 			auto diff = padnr - key;
@@ -732,10 +732,10 @@ void BaseControls::bank(int i)
 	mpc.setBank(i);
 	
 	auto diff = 16 * (i - oldBank);
-	auto newPadIndex = samplerGui->getPad() + diff;
+	auto newPadIndex = mpc.getPad() + diff;
 	auto newNote = program.lock()->getPad(newPadIndex)->getNote();
 	
-	samplerGui->setPadAndNote(newPadIndex, newNote);
+	mpc.setPadAndNote(newPadIndex, newNote);
 	
 	for (int i = 0; i < 16; i++)
 	{

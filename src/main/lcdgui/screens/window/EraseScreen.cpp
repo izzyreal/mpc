@@ -93,7 +93,7 @@ void EraseScreen::function(int i)
 
 		auto midi = sequencer.lock()->getActiveTrack().lock()->getBusNumber() == 0;
 
-		auto noteA = midi ? midiNote0 : samplerGui->getNote();
+		auto noteA = midi ? midiNote0 : mpc.getNote();
 		auto noteB = midi ? midiNote1 : -1;
 
 		auto seq = sequencer.lock()->getActiveSequence().lock();
@@ -270,9 +270,9 @@ void EraseScreen::displayNotes()
 	{
 		findField("notes0").lock()->setSize(6 * 6 + 2, 8);
 
-		if (samplerGui->getNote() != 34)
+		if (mpc.getNote() != 34)
 		{
-			findField("notes0").lock()->setText(to_string(samplerGui->getNote()) + "/" + sampler.lock()->getPadName(samplerGui->getPad()));
+			findField("notes0").lock()->setText(to_string(mpc.getNote()) + "/" + sampler.lock()->getPadName(mpc.getPad()));
 		}
 		else {
 			findField("notes0").lock()->setText("ALL");

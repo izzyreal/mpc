@@ -21,6 +21,6 @@ void VeloPitchControls::turnWheel(int i)
 		lastNp->setVelocityToPitch(lastNp->getVelocityToPitch() + i);
 	}
 	else if (param.compare("note") == 0) {
-		samplerGui->setPadAndNote(samplerGui->getPad(), samplerGui->getNote() + i);
+		mpc.setPadAndNote(mpc.getPad(), mpc.getNote() + i);
 	}
 }

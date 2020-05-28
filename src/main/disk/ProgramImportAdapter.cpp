@@ -37,7 +37,7 @@ void ProgramImportAdapter::initMixer(int note)
 	auto sound = sampler.lock()->getSound(lResult->getNoteParameters(note)->getSndNumber()).lock();
 	if (!sound) return;
 
-	auto pad = lResult->getPad(lResult->getPadNumberFromNote(note));
+	auto pad = lResult->getPad(lResult->getPadIndexFromNote(note));
 	auto mc = pad->getStereoMixerChannel().lock();
 	if (sound->isMono()) {
 		mc->setStereo(false);

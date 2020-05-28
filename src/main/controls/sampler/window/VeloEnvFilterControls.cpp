@@ -27,6 +27,6 @@ void VeloEnvFilterControls::turnWheel(int i)
 		lastNp->setVelocityToFilterFrequency(lastNp->getVelocityToFilterFrequency() + i);
 	}
 	else if (param.compare("note") == 0) {
-		samplerGui->setPadAndNote(samplerGui->getPad(), samplerGui->getNote() + i);
+		mpc.setPadAndNote(mpc.getPad(), mpc.getNote() + i);
 	}
 }

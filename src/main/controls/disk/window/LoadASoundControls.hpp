@@ -1,7 +1,8 @@
 #pragma once
 #include <controls/disk/AbstractDiskControls.hpp>
 
-namespace mpc::controls::disk::window {
+namespace mpc::controls::disk::window
+{
 
 	class LoadASoundControls
 		: public mpc::controls::disk::AbstractDiskControls

@@ -86,7 +86,7 @@ int SamplerWindowGui::getPadNumberFromFocus(const string& focus, int bank)
 	return pn;
 }
 
-string SamplerWindowGui::getFocusFromPadNumber(const int& padNumber) // feed it samplerGui->getPadNumber()
+string SamplerWindowGui::getFocusFromPadNumber(const int& padNumber) // feed it mpc.getPadNumber()
 {
 	int padNr = padNumber;
 	while (padNr > 15) padNr -= 16;

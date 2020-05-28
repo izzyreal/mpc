@@ -71,7 +71,7 @@ void MpcMidiInput::transport(ctoot::midi::core::MidiMessage* msg, int timeStamp)
 		if (bus != 0) {
 			auto pgm = lSampler->getDrumBusProgramNumber(bus);
 			auto p = lSampler->getProgram(pgm).lock();
-			auto pad = p->getPadNumberFromNote(note);
+			auto pad = p->getPadIndexFromNote(note);
 			if (pad != -1) {
 				switch (status) {
 				case ctoot::midi::core::ShortMessage::POLY_PRESSURE:
@@ -127,17 +127,21 @@ void MpcMidiInput::transport(ctoot::midi::core::MidiMessage* msg, int timeStamp)
 
 		controls->setSliderNoteVar(note.get(), dynamic_pointer_cast<mpc::sampler::Program>(p));
 
-		auto pad = p->getPadNumberFromNote(note->getNote());
-		Mpc::instance().getUis().lock()->getSamplerGui()->setPadAndNote(pad, note->getNote());
+		auto pad = p->getPadIndexFromNote(note->getNote());
+		Mpc::instance().setPadAndNote(pad, note->getNote());
 		Mpc::instance().getEventHandler().lock()->handleNoThru(note, track.get(), timeStamp);
 
-		if (lSequencer->isRecordingOrOverdubbing()) {
+		if (lSequencer->isRecordingOrOverdubbing())
+		{
 			note->setDuration(note->getVelocity() == 0 ? 0 : -1);
 			note->setTick(lSequencer->getTickPosition());
-			if (note->getVelocity() == 0) {
+			
+			if (note->getVelocity() == 0)
+			{
 				track->recordNoteOff(note.get());
 			}
-			else {
+			else
+			{
 				auto recEvent = track->recordNoteOn().lock();
 				note->CopyValuesTo(recEvent);
 			}
@@ -145,7 +149,8 @@ void MpcMidiInput::transport(ctoot::midi::core::MidiMessage* msg, int timeStamp)
 		
 		auto midiOutputScreen = dynamic_pointer_cast<MidiOutputScreen>(Screens::getScreenComponent("midioutput"));
 
-		switch (midiOutputScreen->getSoftThru()) {
+		switch (midiOutputScreen->getSoftThru())
+		{
 		case 0:
 			return;
 		case 1:
@@ -172,7 +177,9 @@ void MpcMidiInput::midiOut(weak_ptr<mpc::sequencer::Event> e, mpc::sequencer::Tr
 	string notify_ = "";
 	auto msg = event->getShortMessage();
 	auto deviceNumber = track->getDevice() - 1;
-	if (deviceNumber != -1 && deviceNumber < 32) {
+
+	if (deviceNumber != -1 && deviceNumber < 32)
+	{
 		auto channel = deviceNumber;
 		if (channel > 15)
 			channel -= 16;
@@ -180,15 +187,19 @@ void MpcMidiInput::midiOut(weak_ptr<mpc::sequencer::Event> e, mpc::sequencer::Tr
 		midiAdapter->process(event, channel, -1);
 		msg = midiAdapter->get().lock().get();
 	}
+
 	auto mpcMidiPorts = Mpc::instance().getMidiPorts().lock();
 
 	notify_ = "a";
-	if (deviceNumber > 15) {
+	
+	if (deviceNumber > 15)
+	{
 		deviceNumber -= 16;
 		notify_ = "b";
 	}
 
-	if (Mpc::instance().getLayeredScreen().lock()->getCurrentScreenName().compare("midioutputmonitor") == 0) {
+	if (Mpc::instance().getLayeredScreen().lock()->getCurrentScreenName().compare("midioutputmonitor") == 0)
+	{
 		setChanged();
 		notifyObservers(notify_ + to_string(deviceNumber));
 	}

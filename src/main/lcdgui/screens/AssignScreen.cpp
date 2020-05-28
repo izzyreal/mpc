@@ -110,7 +110,7 @@ void AssignScreen::displayAssignNote()
 
 	auto lProgram = program.lock();
 	auto lSampler = sampler.lock();
-	string padName = lSampler->getPadName(lProgram->getPadNumberFromNote(nn));
+	string padName = lSampler->getPadName(lProgram->getPadIndexFromNote(nn));
 	auto sn = lProgram->getNoteParameters(nn)->getSndNumber();
 	auto soundName = sn == -1 ? "OFF" : lSampler->getSoundName(sn);
 	findField("assignnote").lock()->setText(to_string(nn) + "/" + padName + "-" + soundName);

@@ -287,7 +287,7 @@ void EditMultipleScreen::updateEditMultiple()
 			{
 				findLabel("value0").lock()->setText(singleLabels[0]);
 				findField("value0").lock()->setSize(6 * 6 + 1, 9);
-				findField("value0").lock()->setText(to_string(stepEditorScreen->getChangeNoteToNumber()) + "/" + sampler.lock()->getPadName(program.lock()->getPadNumberFromNote(stepEditorScreen->getChangeNoteToNumber())));
+				findField("value0").lock()->setText(to_string(stepEditorScreen->getChangeNoteToNumber()) + "/" + sampler.lock()->getPadName(program.lock()->getPadIndexFromNote(stepEditorScreen->getChangeNoteToNumber())));
 			}
 			else if (letter.compare("b") == 0)
 			{
