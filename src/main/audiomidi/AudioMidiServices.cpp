@@ -8,7 +8,6 @@
 #include <audiomidi/SoundRecorder.hpp>
 #include <audiomidi/SoundPlayer.hpp>
 #include <audiomidi/MpcMidiPorts.hpp>
-#include <ui/sampler/SamplerGui.hpp>
 
 #include <ui/vmpc/DirectToDiskRecorderGui.hpp>
 #include <nvram/NvRam.hpp>

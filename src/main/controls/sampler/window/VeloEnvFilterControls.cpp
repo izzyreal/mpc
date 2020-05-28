@@ -1,6 +1,5 @@
 #include <controls/sampler/window/VeloEnvFilterControls.hpp>
 
-#include <ui/sampler/SamplerGui.hpp>
 #include <sampler/NoteParameters.hpp>
 
 using namespace mpc::controls::sampler::window;

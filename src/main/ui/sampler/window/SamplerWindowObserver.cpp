@@ -9,7 +9,6 @@
 #include <lcdgui/screens/DrumScreen.hpp>
 #include <lcdgui/Layer.hpp>
 
-#include <ui/sampler/SamplerGui.hpp>
 #include <ui/sampler/window/SamplerWindowGui.hpp>
 
 #include <sampler/NoteParameters.hpp>
@@ -34,9 +33,9 @@ SamplerWindowObserver::SamplerWindowObserver()
 {
 	letters = vector<string>{ "A" , "B", "C", "D" };
 	
+	Mpc::instance().addObserver(this);
+
 	auto uis = Mpc::instance().getUis().lock();
-	samplerGui = uis->getSamplerGui();
-	samplerGui->addObserver(this);
 	swGui = uis->getSamplerWindowGui();
 	swGui->addObserver(this);
 	sampler = Mpc::instance().getSampler();
@@ -582,10 +581,10 @@ void SamplerWindowObserver::displayMidiProgramChange()
 }
 
 SamplerWindowObserver::~SamplerWindowObserver() {
-	if (Mpc::instance().getLayeredScreen().lock()) {
+	if (Mpc::instance().getLayeredScreen().lock())
+	{
 		Mpc::instance().getLayeredScreen().lock()->getEnvGraph().lock()->Hide(true);
 	}
-	samplerGui->deleteObserver(this);
 	swGui->deleteObserver(this);
 	program.lock()->deleteObserver(this);
 	sampler.lock()->getLastNp(program.lock().get())->deleteObserver(this);

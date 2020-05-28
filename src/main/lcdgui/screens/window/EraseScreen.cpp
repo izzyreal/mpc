@@ -5,7 +5,6 @@
 #include <lcdgui/LayeredScreen.hpp>
 #include <lcdgui/Label.hpp>
 
-#include <ui/sampler/SamplerGui.hpp>
 #include <sequencer/Event.hpp>
 #include <sequencer/Sequence.hpp>
 #include <sequencer/Track.hpp>
@@ -17,9 +16,7 @@
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
-
 using namespace moduru::lang;
-
 using namespace std;
 
 EraseScreen::EraseScreen(const int& layer)
@@ -29,8 +26,7 @@ EraseScreen::EraseScreen(const int& layer)
 
 void EraseScreen::open()
 {
-	auto samplerGui = Mpc::instance().getUis().lock()->getSamplerGui();
-	samplerGui->addObserver(this);
+	mpc.addObserver(this);
 
 	auto seq = sequencer.lock()->getActiveSequence().lock();
 
@@ -46,8 +42,7 @@ void EraseScreen::open()
 
 void EraseScreen::close()
 {
-	auto samplerGui = Mpc::instance().getUis().lock()->getSamplerGui();
-	samplerGui->deleteObserver(this);
+	mpc.deleteObserver(this);
 }
 
 void EraseScreen::turnWheel(int i)

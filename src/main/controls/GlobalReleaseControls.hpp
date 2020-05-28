@@ -11,11 +11,6 @@ namespace mpc {
 		class MpcSoundPlayerChannel;
 	}
 
-	namespace ui {
-		namespace sampler {
-			class SamplerGui;
-		}
-	}
 	namespace sampler {
 		class Sampler;
 		class Program;

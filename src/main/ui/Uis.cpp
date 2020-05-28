@@ -12,8 +12,6 @@
 
 #include <ui/midisync/MidiSyncGui.hpp>
 
-#include <ui/sampler/SamplerGui.hpp>
-
 #include <ui/sampler/window/SamplerWindowGui.hpp>
 #include <ui/sampler/window/EditSoundGui.hpp>
 
@@ -57,7 +55,6 @@ Uis::Uis()
 		}
 	}
 
-	samplerGui = new mpc::ui::sampler::SamplerGui();
 	nameGui = new mpc::ui::NameGui();
 
 	editSoundGui = new mpc::ui::sampler::window::EditSoundGui();
@@ -97,11 +94,6 @@ mpc::ui::disk::window::DirectoryGui* Uis::getDirectoryGui()
 mpc::ui::disk::window::DiskWindowGui* Uis::getDiskWindowGui()
 {
 	return diskWindowGui;
-}
-
-mpc::ui::sampler::SamplerGui* Uis::getSamplerGui()
-{
-	return samplerGui;
 }
 
 mpc::ui::sampler::window::SamplerWindowGui* Uis::getSamplerWindowGui()
@@ -151,7 +143,6 @@ mpc::ui::sampler::window::EditSoundGui* Uis::getEditSoundGui()
 
 Uis::~Uis()
 {
-	if (samplerGui != nullptr) delete samplerGui;
 	if (editSoundGui != nullptr) delete editSoundGui;
 	if (samplerWindowGui != nullptr) delete samplerWindowGui;
 	if (diskGui != nullptr) delete diskGui;

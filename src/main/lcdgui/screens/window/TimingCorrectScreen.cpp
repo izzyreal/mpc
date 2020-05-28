@@ -4,8 +4,6 @@
 #include <lcdgui/FunctionKeys.hpp>
 #include <lcdgui/Label.hpp>
 
-#include <ui/sampler/SamplerGui.hpp>
-
 #include <sequencer/Sequence.hpp>
 #include <sequencer/Track.hpp>
 #include <sequencer/Sequencer.hpp>
@@ -24,8 +22,7 @@ TimingCorrectScreen::TimingCorrectScreen(const int& layer)
 
 void TimingCorrectScreen::open()
 {
-	auto samplerGui = Mpc::instance().getUis().lock()->getSamplerGui();
-	samplerGui->addObserver(this);
+	mpc.addObserver(this);
 
 	auto seq = sequencer.lock()->getActiveSequence().lock();
 
@@ -42,8 +39,7 @@ void TimingCorrectScreen::open()
 
 void TimingCorrectScreen::close()
 {
-	auto samplerGui = Mpc::instance().getUis().lock()->getSamplerGui();
-	samplerGui->deleteObserver(this);
+	mpc.deleteObserver(this);
 }
 
 void TimingCorrectScreen::function(int i)

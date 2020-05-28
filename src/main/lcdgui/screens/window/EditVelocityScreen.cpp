@@ -7,8 +7,6 @@
 #include <sequencer/NoteEvent.hpp>
 #include <sequencer/SeqUtil.hpp>
 
-#include <ui/sampler/SamplerGui.hpp>
-
 #include <lang/StrUtil.hpp>
 
 using namespace mpc::lcdgui::screens::window;
@@ -25,8 +23,7 @@ EditVelocityScreen::EditVelocityScreen(const int& layer)
 
 void EditVelocityScreen::open()
 {
-	auto samplerGui = Mpc::instance().getUis().lock()->getSamplerGui();
-	samplerGui->addObserver(this);
+	mpc.addObserver(this);
 
 	auto seq = sequencer.lock()->getActiveSequence().lock();
 
@@ -41,8 +38,7 @@ void EditVelocityScreen::open()
 
 void EditVelocityScreen::close()
 {
-	auto samplerGui = Mpc::instance().getUis().lock()->getSamplerGui();
-	samplerGui->deleteObserver(this);
+	mpc.deleteObserver(this);
 }
 
 void EditVelocityScreen::update(moduru::observer::Observable* observable, nonstd::any message)
@@ -125,24 +121,28 @@ void EditVelocityScreen::displayTime()
 void EditVelocityScreen::displayNotes()
 {
 	init();
-	auto lSampler = sampler.lock();
-	auto samplerGui = mpc::Mpc::instance().getUis().lock()->getSamplerGui();
-
-	if (track.lock()->getBusNumber() == 0) {
+	
+	if (track.lock()->getBusNumber() == 0)
+	{
 		findField("notes0").lock()->setSize(8 * 6, 9);
 		findLabel("notes1").lock()->Hide(false);
 		findField("notes1").lock()->Hide(false);
 		findField("notes0").lock()->setText(moduru::lang::StrUtil::padLeft(to_string(midiNote0), " ", 3) + "(" + mpc::ui::Uis::noteNames[midiNote0] + u8"\u00D4");
 		findField("notes1").lock()->setText(moduru::lang::StrUtil::padLeft(to_string(midiNote1), " ", 3) + "(" + mpc::ui::Uis::noteNames[midiNote1] + u8"\u00D4");
 	}
-	else {
+	else
+	{
 		findField("notes0").lock()->setSize(6 * 6 + 2, 9);
-		if (mpc.getNote() != 34) {
-			findField("notes0").lock()->setText(to_string(mpc.getNote()) + "/" + lSampler->getPadName(mpc.getPad()));
+		
+		if (mpc.getNote() != 34)
+		{
+			findField("notes0").lock()->setText(to_string(mpc.getNote()) + "/" + sampler.lock()->getPadName(mpc.getPad()));
 		}
-		else {
+		else
+		{
 			findField("notes0").lock()->setText("ALL");
 		}
+		
 		findLabel("notes1").lock()->Hide(true);
 		findField("notes1").lock()->Hide(true);
 	}

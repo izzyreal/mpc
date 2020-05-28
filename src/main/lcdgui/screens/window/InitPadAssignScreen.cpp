@@ -1,6 +1,5 @@
 #include "InitPadAssignScreen.hpp"
 
-#include <ui/sampler/SamplerGui.hpp>
 #include <ui/sampler/window/SamplerWindowGui.hpp>
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>

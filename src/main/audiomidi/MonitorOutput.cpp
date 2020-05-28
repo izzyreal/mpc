@@ -2,18 +2,12 @@
 
 #include <Mpc.hpp>
 #include <sampler/Sampler.hpp>
-#include <ui/sampler/SamplerGui.hpp>
 
 #include <audio/core/ChannelFormat.hpp>
 
 using namespace mpc::audiomidi;
 
 using namespace std;
-
-MonitorOutput::MonitorOutput()
-{
-	
-}
 
 string MonitorOutput::getName()
 {
@@ -61,7 +55,4 @@ void MonitorOutput::close()
 string MonitorOutput::getLocation()
 {
     return "sampler";
-}
-
-MonitorOutput::~MonitorOutput() {
 }

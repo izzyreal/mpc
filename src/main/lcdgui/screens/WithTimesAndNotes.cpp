@@ -4,8 +4,6 @@
 
 #include <lcdgui/LayeredScreen.hpp>
 
-#include <ui/sampler/SamplerGui.hpp>
-
 #include <sequencer/Sequencer.hpp>
 #include <sequencer/Sequence.hpp>
 #include <sequencer/Track.hpp>
@@ -57,7 +55,6 @@ void WithTimesAndNotes::checkAllTimesAndNotes(int notch, Sequence* seq)
 
 		if (track->getBusNumber() != 0)
 		{
-			auto samplerGui = mpc::Mpc::instance().getUis().lock()->getSamplerGui();
 			auto note = mpc.getNote() + notch;
 			auto mpcSoundPlayerChannel = mpc.getSampler().lock()->getDrum(track->getBusNumber() - 1);
 			auto program = dynamic_pointer_cast<mpc::sampler::Program>(mpc.getSampler().lock()->getProgram(mpcSoundPlayerChannel->getProgram()).lock());

@@ -30,11 +30,6 @@ namespace mpc::lcdgui
 	class HorizontalBar;
 }
 
-namespace mpc::ui::sampler
-{
-	class SamplerGui;
-}
-
 namespace mpc::lcdgui
 {
 
@@ -51,7 +46,6 @@ namespace mpc::lcdgui
 		std::weak_ptr<mpc::sampler::Sampler> sampler;
 		ctoot::mpc::MpcSoundPlayerChannel* mpcSoundPlayerChannel = nullptr;
 		std::weak_ptr<mpc::sampler::Program> program;
-		mpc::ui::sampler::SamplerGui* samplerGui = nullptr;
 
 		std::vector<std::string> letters;
 		std::vector<std::string> noteVarParamNames;

@@ -1,7 +1,6 @@
 #include <ui/sampler/window/SamplerWindowGui.hpp>
 
 #include <lcdgui/LayeredScreen.hpp>
-#include <ui/sampler/SamplerGui.hpp>
 
 using namespace mpc::ui::sampler::window;
 using namespace std;
@@ -18,7 +17,10 @@ int SamplerWindowGui::getDeletePgm()
 
 void SamplerWindowGui::setDeletePgm(int i, int programCount)
 {
-	if (i < 0 || i > programCount - 1) return;
+    if (i < 0 || i > programCount - 1)
+    {
+        return;
+    }
 	deletePgm = i;
 	setChanged();
 	notifyObservers(string("deletepgm"));

@@ -32,9 +32,6 @@
 #include <lcdgui/screens/SampleScreen.hpp>
 
 #include <ui/Uis.hpp>
-
-#include <ui/sampler/SamplerGui.hpp>
-
 #include <ui/sampler/window/ChannelSettingsObserver.hpp>
 #include <ui/sampler/window/EditSoundObserver.hpp>
 #include <ui/sampler/window/MuteAssignObserver.hpp>

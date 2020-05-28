@@ -30,8 +30,6 @@ namespace mpc {
 
 		namespace sampler {
 
-			class SamplerGui;
-
 			namespace window {
 
 				class SamplerWindowGui;
@@ -47,7 +45,6 @@ namespace mpc {
 					ctoot::mpc::MpcSoundPlayerChannel* mpcSoundPlayerChannel{ nullptr };
 					std::weak_ptr<mpc::sampler::Program> program{};
 					std::string csn = "";
-					mpc::ui::sampler::SamplerGui* samplerGui{ nullptr };
 					SamplerWindowGui* swGui{ nullptr };
 					std::weak_ptr<mpc::lcdgui::Field> midiProgramChangeField{};
 					std::weak_ptr<mpc::lcdgui::Field> programNameField{};

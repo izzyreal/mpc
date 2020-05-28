@@ -1,7 +1,6 @@
 #include "PgmParamsScreen.hpp"
 
 #include <Mpc.hpp>
-#include <ui/sampler/SamplerGui.hpp>
 #include <ui/sampler/window/SamplerWindowGui.hpp>
 
 #include <sampler/NoteParameters.hpp>
@@ -24,7 +23,7 @@ PgmParamsScreen::PgmParamsScreen(const int layerIndex)
 
 void PgmParamsScreen::open()
 {
-	mpc.getUis().lock()->getSamplerGui()->addObserver(this);
+	mpc.addObserver(this);
 	addChild(make_shared<EnvGraph>());
 	displayPgm();
 	displayNote();
@@ -38,7 +37,7 @@ void PgmParamsScreen::open()
 
 void PgmParamsScreen::close()
 {
-	mpc.getUis().lock()->getSamplerGui()->deleteObserver(this);
+	mpc.deleteObserver(this);
 }
 
 void PgmParamsScreen::function(int i)

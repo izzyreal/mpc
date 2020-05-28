@@ -7,7 +7,6 @@
 #include <ui/Uis.hpp>
 #include <ui/UserDefaults.hpp>
 
-#include <ui/sampler/SamplerGui.hpp>
 #include <sampler/NoteParameters.hpp>
 #include <sampler/Pad.hpp>
 #include <sampler/Program.hpp>

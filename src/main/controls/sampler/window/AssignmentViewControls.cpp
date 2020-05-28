@@ -1,7 +1,6 @@
 #include <controls/sampler/window/AssignmentViewControls.hpp>
 
 #include <lcdgui/Field.hpp>
-#include <ui/sampler/SamplerGui.hpp>
 #include <ui/sampler/window/SamplerWindowGui.hpp>
 #include <sampler/Pad.hpp>
 #include <sampler/Program.hpp>

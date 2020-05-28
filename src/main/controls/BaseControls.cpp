@@ -31,7 +31,6 @@
 #include <ui/disk/window/DirectoryGui.hpp>
 #include <ui/misc/PunchGui.hpp>
 #include <ui/sampler/window/EditSoundGui.hpp>
-#include <ui/sampler/SamplerGui.hpp>
 #include <ui/vmpc/DirectToDiskRecorderGui.hpp>
 
 #include <sampler/Pad.hpp>

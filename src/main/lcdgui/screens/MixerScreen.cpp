@@ -4,8 +4,6 @@
 #include <lcdgui/screens/MixerSetupScreen.hpp>
 #include <lcdgui/Screens.hpp>
 
-#include <ui/sampler/SamplerGui.hpp>
-
 #include <sampler/Program.hpp>
 #include <sampler/Pad.hpp>
 
@@ -26,13 +24,17 @@ MixerScreen::MixerScreen(const int layerIndex)
 
 void MixerScreen::open()
 {
-	mpc.getUis().lock()->getSamplerGui()->addObserver(this);
+	mpc.addObserver(this);
+	
 	initPadNameLabels();
 	initMixerStrips();
-	for (auto& m : mixerStrips) {
+	
+	for (auto& m : mixerStrips)
+	{
 		m->initLabels();
 		m->setColors();
 	}
+	
 	displayMixerStrips();
 	displayFunctionKeys();
 	setXPos(mpc.getPad());
@@ -40,7 +42,7 @@ void MixerScreen::open()
 
 void MixerScreen::close()
 {
-	mpc.getUis().lock()->getSamplerGui()->deleteObserver(this);
+	mpc.deleteObserver(this);
 }
 
 void MixerScreen::initPadNameLabels()

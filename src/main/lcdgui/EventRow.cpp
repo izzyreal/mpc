@@ -7,7 +7,6 @@
 #include <lcdgui/Field.hpp>
 #include <lcdgui/Label.hpp>
 #include <ui/Uis.hpp>
-#include <ui/sampler/SamplerGui.hpp>
 #include <lcdgui/SelectedEventBar.hpp>
 #include <sampler/Pad.hpp>
 #include <sampler/Program.hpp>
@@ -30,6 +29,7 @@
 #include <lang/StrUtil.hpp>
 
 using namespace mpc::lcdgui;
+using namespace moduru::lang;
 using namespace std;
 
 EventRow::EventRow(int bus, weak_ptr<mpc::sequencer::Event> e, int rowNumber)
@@ -66,13 +66,15 @@ EventRow::EventRow(int bus, weak_ptr<mpc::sequencer::Event> e, int rowNumber)
 	mixerEventLabels = vector<string>{ ">", "N:", "L:" };
 	mixerEventSizes = vector<int>{ 12, 6, 3 };
 	mixerEventXPos = vector<int>{ 0, 96, 162 };
-	samplerGui = Mpc::instance().getUis().lock()->getSamplerGui();
 	sampler = Mpc::instance().getSampler();
 	auto lSampler = sampler.lock();
-	if (bus != 0) {
+
+	if (bus != 0)
+	{
 		mpcSoundPlayerChannel = lSampler->getDrum(bus - 1);
 		program = dynamic_pointer_cast<mpc::sampler::Program>(lSampler->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
 	}
+	
 	midi = false;
 	event = e;
 	this->rowNumber = rowNumber;
@@ -173,15 +175,20 @@ void EventRow::setEmptyEventValues()
 
 void EventRow::setSystemExclusiveEventValues()
 {
-    if (!event.lock()) return;
+	if (!event.lock())
+	{
+		return;
+	}
 
     auto see = dynamic_pointer_cast<mpc::sequencer::SystemExclusiveEvent>(event.lock());
-    for (int i = 0; i < 2; i++) {
+    
+	for (int i = 0; i < 2; i++)
+	{
         tfArray[i].lock()->Hide(false);
         labelArray[i].lock()->Hide(false);
     }
-    tfArray[0].lock()->setText(moduru::lang::StrUtil::padLeft(to_string(see->getByteA()), "0", 2));
-	tfArray[1].lock()->setText(moduru::lang::StrUtil::padLeft(to_string(see->getByteB()), "0", 2));
+    tfArray[0].lock()->setText(StrUtil::padLeft(to_string(see->getByteA()), "0", 2));
+	tfArray[1].lock()->setText(StrUtil::padLeft(to_string(see->getByteB()), "0", 2));
     horizontalBar.lock()->Hide(true);
     tfArray[2].lock()->Hide(true);
     tfArray[3].lock()->Hide(true);
@@ -193,14 +200,20 @@ void EventRow::setSystemExclusiveEventValues()
 
 void EventRow::setPolyPressureEventValues()
 {
-    if (!event.lock()) return;
+	if (!event.lock())
+	{
+		return;
+	}
     auto ppe = dynamic_pointer_cast<mpc::sequencer::PolyPressureEvent>(event.lock());
-    for (int i = 0; i < 2; i++) {
+    
+	for (int i = 0; i < 2; i++)
+	{
         tfArray[i].lock()->Hide(false);
         labelArray[i].lock()->Hide(false);
     }
-    tfArray[0].lock()->setText(moduru::lang::StrUtil::padLeft(to_string(ppe->getNote()), " ", 3) + "(" + mpc::ui::Uis::noteNames[ppe->getNote()] + ")");
-    tfArray[1].lock()->setText(moduru::lang::StrUtil::padLeft(to_string(ppe->getAmount()), " ", 3));
+
+    tfArray[0].lock()->setText(StrUtil::padLeft(to_string(ppe->getNote()), " ", 3) + "(" + mpc::ui::Uis::noteNames[ppe->getNote()] + ")");
+    tfArray[1].lock()->setText(StrUtil::padLeft(to_string(ppe->getAmount()), " ", 3));
 	auto lHorizontalBar = horizontalBar.lock();
 	lHorizontalBar->setValue(ppe->getAmount());
     lHorizontalBar->Hide(false);
@@ -219,7 +232,7 @@ void EventRow::setChannelPressureEventValues()
     auto cpe = dynamic_pointer_cast< mpc::sequencer::ChannelPressureEvent>(event.lock());
     tfArray[0].lock()->Hide(false);
     labelArray[0].lock()->Hide(false);
-    tfArray[0].lock()->setText(moduru::lang::StrUtil::padLeft(to_string(cpe->getAmount()), " ", 3));
+    tfArray[0].lock()->setText(StrUtil::padLeft(to_string(cpe->getAmount()), " ", 3));
 	auto lHorizontalBar = horizontalBar.lock();
 	lHorizontalBar->setValue(cpe->getAmount());
     lHorizontalBar->Hide(false);
@@ -244,7 +257,7 @@ void EventRow::setControlChangeEventValues()
         labelArray[i].lock()->Hide(false);
     }
     tfArray[0].lock()->setText(controlNames[cce->getController()]);
-    tfArray[1].lock()->setText(moduru::lang::StrUtil::padLeft(to_string(cce->getAmount()), " ", 3));
+    tfArray[1].lock()->setText(StrUtil::padLeft(to_string(cce->getAmount()), " ", 3));
 	auto lHorizontalBar = horizontalBar.lock();
 	lHorizontalBar->setValue(cce->getAmount());
     lHorizontalBar->Hide(false);
@@ -273,13 +286,13 @@ void EventRow::setMiscEventValues()
         tfArray[i].lock()->Hide(false);
         labelArray[i].lock()->Hide(false);
     }
-    tfArray[0].lock()->setText(moduru::lang::StrUtil::padLeft(to_string(parameterValue), " ", 3));
+    tfArray[0].lock()->setText(StrUtil::padLeft(to_string(parameterValue), " ", 3));
     if(dynamic_pointer_cast< mpc::sequencer::PitchBendEvent>(event.lock()) != nullptr) {
         if(parameterValue > 0) {
-            tfArray[0].lock()->setText("+" + moduru::lang::StrUtil::padLeft(to_string(parameterValue), " ", 4));
+            tfArray[0].lock()->setText("+" + StrUtil::padLeft(to_string(parameterValue), " ", 4));
         }
         if(parameterValue < 0) {
-            tfArray[0].lock()->setText("-" + moduru::lang::StrUtil::padLeft(to_string(abs(parameterValue)), " ", 4));
+            tfArray[0].lock()->setText("-" + StrUtil::padLeft(to_string(abs(parameterValue)), " ", 4));
         }
         if(parameterValue == 0) {
             tfArray[0].lock()->setText("    0");
@@ -297,33 +310,49 @@ void EventRow::setMiscEventValues()
 
 void EventRow::setMixerEventValues()
 {
-	if (!event.lock()) return;
+	if (!event.lock())
+	{
+		return;
+	}
 	auto lSampler = sampler.lock();
 	auto me = dynamic_pointer_cast<mpc::sequencer::MixerEvent>(event.lock());
-	for (int i = 0; i < 3; i++) {
+	
+	for (int i = 0; i < 3; i++)
+	{
 		tfArray[i].lock()->Hide(false);
 		labelArray[i].lock()->Hide(false);
 	}
+	
 	tfArray[0].lock()->setText(mixerParamNames[me->getParameter()]);
 	auto nn = program.lock()->getPad(me->getPad())->getNote();
 	tfArray[1].lock()->setText(string(nn == 34 ? "--" : to_string(nn)) + "/" + lSampler->getPadName(me->getPad()));
-	if (me->getParameter() == 1) {
+	
+	if (me->getParameter() == 1)
+	{
 		labelArray[2].lock()->setText("P:");
 		auto panning = "L";
-		if (me->getValue() > 50) panning = "R";
+		if (me->getValue() > 50)
+		{
+			panning = "R";
+		}
 
-		tfArray[2].lock()->setText(panning + moduru::lang::StrUtil::padLeft(to_string(abs(me->getValue() - 50)), " ", 2));
-		if (me->getValue() == 50) {
+		tfArray[2].lock()->setText(panning + StrUtil::padLeft(to_string(abs(me->getValue() - 50)), " ", 2));
+		
+		if (me->getValue() == 50)
+		{
 			tfArray[2].lock()->setText("0  ");
 		}
 	}
-	else {
+	else
+	{
 		labelArray[2].lock()->setText("L:");
-		tfArray[2].lock()->setText(moduru::lang::StrUtil::padLeft(to_string(me->getValue()), " ", 3));
+		tfArray[2].lock()->setText(StrUtil::padLeft(to_string(me->getValue()), " ", 3));
 	}
+
 	auto lHorizontalBar = horizontalBar.lock();
 	lHorizontalBar->setValue(me->getValue() * 1.27);
 	lHorizontalBar->Hide(false);
+	
 	tfArray[3].lock()->Hide(true);
 	tfArray[4].lock()->Hide(true);
 	labelArray[3].lock()->Hide(true);
@@ -333,34 +362,71 @@ void EventRow::setMixerEventValues()
 void EventRow::setDrumNoteEventValues()
 {
 	if (!event.lock())
+	{
 		return;
+	}
 	auto lSampler = sampler.lock();
 	auto ne = dynamic_pointer_cast<mpc::sequencer::NoteEvent>(event.lock());
-	for (int i = 0; i < 5; i++) {
+	
+	for (int i = 0; i < 5; i++)
+	{
 		tfArray[i].lock()->Hide(false);
 		labelArray[i].lock()->Hide(false);
 	}
-	if (ne->getNote() < 35 || ne->getNote() > 98) {
+	
+	if (ne->getNote() < 35 || ne->getNote() > 98)
+	{
 		tfArray[0].lock()->setText("--/OFF");
 	}
-	else {
+	else
+	{
 		tfArray[0].lock()->setText(to_string(ne->getNote()) + "/" + lSampler->getPadName(program.lock()->getPadIndexFromNote(ne->getNote())));
 	}
+
 	tfArray[1].lock()->setText(noteVarParamNames[ne->getVariationTypeNumber()]);
-	if (ne->getVariationTypeNumber() == 0) {
+	
+	if (ne->getVariationTypeNumber() == 0)
+	{
 		tfArray[2].lock()->setSize(4 * 6 + 1, 9);
 		tfArray[2].lock()->setLocation(90, tfArray[2].lock()->getY());
+	
 		auto noteVarValue = (ne->getVariationValue() * 2) - 128;
-		if (noteVarValue < -120) noteVarValue = -120;
-		if (noteVarValue > 120) noteVarValue = 120;
-		if (noteVarValue == 0) tfArray[2].lock()->setText("   0");
-		if (noteVarValue < 0) tfArray[2].lock()->setText("-" + moduru::lang::StrUtil::padLeft(to_string(abs(noteVarValue)), " ", 3));
-		if (noteVarValue > 0) tfArray[2].lock()->setText("+" + moduru::lang::StrUtil::padLeft(to_string(noteVarValue), " ", 3));
+		
+		if (noteVarValue < -120)
+		{
+			noteVarValue = -120;
+		}
+		
+		if (noteVarValue > 120)
+		{
+			noteVarValue = 120;
+		}
+		
+		if (noteVarValue == 0)
+		{
+			tfArray[2].lock()->setText("   0");
+		}
+
+		if (noteVarValue < 0)
+		{
+			tfArray[2].lock()->setText("-" + StrUtil::padLeft(to_string(abs(noteVarValue)), " ", 3));
+		}
+
+		if (noteVarValue > 0)
+		{
+			tfArray[2].lock()->setText("+" + StrUtil::padLeft(to_string(noteVarValue), " ", 3));
+		}
 	}
-	else if (ne->getVariationTypeNumber() == 1 || ne->getVariationTypeNumber() == 2) {
+	else if (ne->getVariationTypeNumber() == 1 || ne->getVariationTypeNumber() == 2)
+	{
 		auto noteVarValue = ne->getVariationValue();
-		if (noteVarValue > 100) noteVarValue = 100;
-		tfArray[2].lock()->setText(moduru::lang::StrUtil::padLeft(to_string(noteVarValue), " ", 3));
+	
+		if (noteVarValue > 100)
+		{
+			noteVarValue = 100;
+		}
+		
+		tfArray[2].lock()->setText(StrUtil::padLeft(to_string(noteVarValue), " ", 3));
 		tfArray[2].lock()->setSize(3 * 6 + 1, 9);
 		tfArray[2].lock()->setLocation(90 + 6, tfArray[2].lock()->getY());
 	}
@@ -369,12 +435,12 @@ void EventRow::setDrumNoteEventValues()
 		tfArray[2].lock()->setLocation(90, tfArray[2].lock()->getY());
 		auto noteVarValue = ne->getVariationValue() - 50;
 		if (noteVarValue > 50) noteVarValue = 50;
-		if (noteVarValue < 0) tfArray[2].lock()->setText("-" + moduru::lang::StrUtil::padLeft(to_string(abs(noteVarValue)), " ", 2));
-		if (noteVarValue > 0) tfArray[2].lock()->setText("+" + moduru::lang::StrUtil::padLeft(to_string(noteVarValue), " ", 2));
+		if (noteVarValue < 0) tfArray[2].lock()->setText("-" + StrUtil::padLeft(to_string(abs(noteVarValue)), " ", 2));
+		if (noteVarValue > 0) tfArray[2].lock()->setText("+" + StrUtil::padLeft(to_string(noteVarValue), " ", 2));
 		if (noteVarValue == 0) tfArray[2].lock()->setText("  0");
 	}
-	tfArray[3].lock()->setText(moduru::lang::StrUtil::padLeft(to_string(ne->getDuration()), " ", 4));
-	tfArray[4].lock()->setText(moduru::lang::StrUtil::padLeft(to_string(ne->getVelocity()), " ", 3));
+	tfArray[3].lock()->setText(StrUtil::padLeft(to_string(ne->getDuration()), " ", 4));
+	tfArray[4].lock()->setText(StrUtil::padLeft(to_string(ne->getVelocity()), " ", 3));
 	auto lHorizontalBar = horizontalBar.lock(); 
 	lHorizontalBar->setValue(ne->getVelocity());
 	lHorizontalBar->Hide(false);
@@ -388,8 +454,8 @@ void EventRow::setMidiNoteEventValues()
 		tfArray[i].lock()->Hide(false);
 		labelArray[i].lock()->Hide(false);
 	}
-	tfArray[0].lock()->setText(moduru::lang::StrUtil::padLeft(to_string(ne->getNote()), " ", 3) + "(" + mpc::ui::Uis::noteNames[ne->getNote()] + ")");
-	tfArray[1].lock()->setText(moduru::lang::StrUtil::padLeft(to_string(ne->getDuration()), " ", 4));
+	tfArray[0].lock()->setText(StrUtil::padLeft(to_string(ne->getNote()), " ", 3) + "(" + mpc::ui::Uis::noteNames[ne->getNote()] + ")");
+	tfArray[1].lock()->setText(StrUtil::padLeft(to_string(ne->getDuration()), " ", 4));
 	tfArray[2].lock()->setText(to_string(ne->getVelocity()));
 	auto lHorizontalBar = horizontalBar.lock(); 
 	lHorizontalBar->setValue(ne->getVelocity());

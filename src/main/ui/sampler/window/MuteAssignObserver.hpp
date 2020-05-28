@@ -21,8 +21,6 @@ namespace mpc {
 	namespace ui {
 		namespace sampler {
 
-			class SamplerGui;
-
 			namespace window {
 
 				class MuteAssignObserver
@@ -32,7 +30,6 @@ namespace mpc {
 				private:
 					
 					std::weak_ptr<mpc::sampler::Sampler> sampler{};
-					mpc::ui::sampler::SamplerGui* samplerGui{ nullptr };
 					std::weak_ptr<mpc::lcdgui::Field> noteField{};
 					std::weak_ptr<lcdgui::Field> note0Field{};
 					std::weak_ptr<lcdgui::Field> note1Field{};

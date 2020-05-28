@@ -8,7 +8,6 @@
 #include <audiomidi/EventHandler.hpp>
 #include <hardware/Hardware.hpp>
 #include <hardware/Led.hpp>
-#include <ui/sampler/SamplerGui.hpp>
 #include <sampler/Pad.hpp>
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>

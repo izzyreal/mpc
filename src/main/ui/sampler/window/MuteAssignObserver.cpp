@@ -2,10 +2,11 @@
 
 #include <Mpc.hpp>
 #include <lcdgui/Field.hpp>
-#include <ui/sampler/SamplerGui.hpp>
+
 #include <sampler/NoteParameters.hpp>
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>
+
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/DrumScreen.hpp>
 
@@ -16,10 +17,7 @@ using namespace std;
 
 MuteAssignObserver::MuteAssignObserver() 
 {
-	auto uis = Mpc::instance().getUis().lock();
-	samplerGui = uis->getSamplerGui();
-	samplerGui->addObserver(this);
-	
+	Mpc::instance().addObserver(this);
 	sampler = Mpc::instance().getSampler();
 
 	auto drumScreen = dynamic_pointer_cast<DrumScreen>(Screens::getScreenComponent("drum"));
@@ -100,20 +98,23 @@ void MuteAssignObserver::update(moduru::observer::Observable* o, nonstd::any arg
 
 	string s = nonstd::any_cast<string>(arg);
 
-	if (s.compare("padandnote") == 0) {
+	if (s.compare("padandnote") == 0)
+	{
 		displayNote();
 		displayNote0();
 		displayNote1();
 	}
-	else if (s.compare("muteassigna") == 0) {
+	else if (s.compare("muteassigna") == 0)
+	{
 		displayNote0();
 	}
-	else if (s.compare("muteassignb") == 0) {
+	else if (s.compare("muteassignb") == 0)
+	{
 		displayNote1();
 	}
 }
 
 MuteAssignObserver::~MuteAssignObserver() {
-	samplerGui->deleteObserver(this);
+	Mpc::instance().deleteObserver(this);
 	np->deleteObserver(this);
 }

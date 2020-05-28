@@ -1,7 +1,6 @@
 #include <controls/mixer/AbstractMixerControls.hpp>
 
 #include <Mpc.hpp>
-#include <ui/sampler/SamplerGui.hpp>
 #include <mpc/MpcStereoMixerChannel.hpp>
 #include <mpc/MpcIndivFxMixerChannel.hpp>
 #include <sampler/Pad.hpp>

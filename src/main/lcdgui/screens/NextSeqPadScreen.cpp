@@ -2,8 +2,6 @@
 
 #include <sequencer/Sequencer.hpp>
 
-#include <ui/sampler/SamplerGui.hpp>
-
 using namespace mpc::lcdgui::screens;
 using namespace moduru::lang;
 using namespace std;
@@ -15,11 +13,13 @@ NextSeqPadScreen::NextSeqPadScreen(const int& layer)
 
 void NextSeqPadScreen::open()
 {
-	for (int i = 0; i < 16; i++) {
+	for (int i = 0; i < 16; i++)
+	{
 		displaySeq(i);
 		setOpaque(i);
 		setSeqColor(i);
 	}
+	
 	displaySq();
 	displayNow0();
 	displayNow1();

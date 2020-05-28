@@ -1,7 +1,5 @@
 #include "MixerSetupScreen.hpp"
 
-#include <ui/sampler/SamplerGui.hpp>
-
 #include <lcdgui/screens/DrumScreen.hpp>
 #include <lcdgui/Screens.hpp>
 

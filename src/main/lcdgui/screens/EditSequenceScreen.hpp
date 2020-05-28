@@ -40,7 +40,7 @@ namespace mpc::lcdgui::screens
 		std::vector<string> functionNames = { "COPY", "DURATION", "VELOCITY", "TRANSPOSE" };
 		bool modeMerge = false;
 		int editFunctionNumber = 0;
-		int drumNote = 34; // Should come from SamplerGui?
+		int drumNote = 34; // Should come from Mpc.getNote()?
 		int fromSq = 0;
 		int tr0 = 0;
 		int toSq = 0;

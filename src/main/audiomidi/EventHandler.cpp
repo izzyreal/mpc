@@ -14,7 +14,6 @@
 #include <sequencer/TempoChangeEvent.hpp>
 
 #include <ui/Uis.hpp>
-#include <ui/sampler/SamplerGui.hpp>
 #include <ui/midisync/MidiSyncGui.hpp>
 #include <ui/misc/TransGui.hpp>
 #include <ui/vmpc/DirectToDiskRecorderGui.hpp>

@@ -2,7 +2,6 @@
 
 #include <Mpc.hpp>
 #include <ui/Uis.hpp>
-#include <ui/sampler/SamplerGui.hpp>
 #include <ui/vmpc/VmpcSettingsGui.hpp>
 #include <Paths.hpp>
 #include <sampler/Sampler.hpp>

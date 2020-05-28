@@ -18,7 +18,6 @@
 #include <ui/NameGui.hpp>
 #include <ui/disk/DiskGui.hpp>
 #include <ui/disk/window/DirectoryGui.hpp>
-#include <ui/sampler/SamplerGui.hpp>
 #include <ui/sampler/window/EditSoundGui.hpp>
 #include <ui/sampler/window/SamplerWindowGui.hpp>
 #include <ui/vmpc/DirectToDiskRecorderGui.hpp>

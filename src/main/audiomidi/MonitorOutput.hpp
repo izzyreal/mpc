@@ -7,16 +7,6 @@
 
 using namespace ctoot::audio::system;
 
-using namespace std;
-
-namespace mpc {
-	
-}
-
-namespace mpc::sampler {
-	class Sampler;
-}
-
 namespace mpc::audiomidi {
 
 	class MonitorOutput
@@ -32,10 +22,6 @@ namespace mpc::audiomidi {
 		int32_t processAudio(ctoot::audio::core::AudioBuffer* buffer) override;
 		void close() override;
 		std::string getLocation() override;
-
-	public:
-		MonitorOutput();
-		~MonitorOutput();
 
 	};
 }

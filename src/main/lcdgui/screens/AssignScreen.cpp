@@ -1,6 +1,5 @@
 #include "AssignScreen.hpp"
 
-#include <ui/sampler/SamplerGui.hpp>
 #include <sampler/Program.hpp>
 #include <sampler/PgmSlider.hpp>
 

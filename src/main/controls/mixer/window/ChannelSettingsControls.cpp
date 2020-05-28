@@ -1,6 +1,5 @@
 #include <controls/mixer/window/ChannelSettingsControls.hpp>
 
-#include <ui/sampler/SamplerGui.hpp>
 #include <sampler/Program.hpp>
 #include <mpc/MpcStereoMixerChannel.hpp>
 #include <mpc/MpcIndivFxMixerChannel.hpp>

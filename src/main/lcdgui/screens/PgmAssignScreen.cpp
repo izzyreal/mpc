@@ -1,8 +1,8 @@
 #include "PgmAssignScreen.hpp"
 
 #include <Mpc.hpp>
-#include <ui/sampler/SamplerGui.hpp>
 #include <ui/sampler/window/SamplerWindowGui.hpp>
+
 #include <sampler/NoteParameters.hpp>
 #include <sampler/Pad.hpp>
 #include <sampler/Program.hpp>
@@ -23,7 +23,7 @@ PgmAssignScreen::PgmAssignScreen(const int layerIndex)
 
 void PgmAssignScreen::open()
 {
-	mpc.getUis().lock()->getSamplerGui()->addObserver(this);
+	mpc.addObserver(this);
 	displayNote();
 	displayOptionalNoteA();
 	displayOptionalNoteB();
@@ -39,7 +39,7 @@ void PgmAssignScreen::open()
 
 void PgmAssignScreen::close()
 {
-	mpc.getUis().lock()->getSamplerGui()->deleteObserver(this);
+	mpc.deleteObserver(this);
 }
 
 void PgmAssignScreen::function(int i)

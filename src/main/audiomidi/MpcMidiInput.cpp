@@ -13,7 +13,6 @@
 #include <lcdgui/screens/window/MidiOutputScreen.hpp>
 
 #include <ui/midisync/MidiSyncGui.hpp>
-#include <ui/sampler/SamplerGui.hpp>
 
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>

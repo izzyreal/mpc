@@ -5,7 +5,6 @@
 #include <lcdgui/Label.hpp>
 
 #include <ui/Uis.hpp>
-#include <ui/sampler/SamplerGui.hpp>
 
 #include <sequencer/Track.hpp>
 #include <sequencer/Sequencer.hpp>
