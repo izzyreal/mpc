@@ -71,7 +71,7 @@ void ChangeTsigScreen::displayBars()
 
 void ChangeTsigScreen::displayNewTsig()
 {
-	if (csn.compare("deletesequence") == 0) {
+	if (currentScreenName.compare("deletesequence") == 0) {
 		return;
 	}
 	auto result = to_string(timesignature.getNumerator()) + "/" + to_string(timesignature.getDenominator());

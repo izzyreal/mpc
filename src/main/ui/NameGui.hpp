@@ -8,9 +8,9 @@ namespace mpc::ui {
 	{
 
 	private:
-		std::string name{ "" };
+		std::string name = "";
 		bool editing{ false };
-		std::string parameterName{ "" };
+		std::string parameterName = "";
 		int nameLimit{ 0 };
 
 	public:

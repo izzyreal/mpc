@@ -53,8 +53,8 @@ namespace mpc::controls {
 		void splitRight();
 
 	protected:
-		std::string param{ "" };
-		std::string csn{ "" };
+		std::string param = "";
+		std::string currentScreenName = "";
 
 		std::weak_ptr<mpc::sequencer::Track> track;
 		std::weak_ptr<mpc::sampler::Program> program;

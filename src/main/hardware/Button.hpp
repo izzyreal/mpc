@@ -20,7 +20,7 @@ namespace mpc {
 
 		private:
 			
-			std::string label{ "" };
+			std::string label = "";
 			std::weak_ptr<mpc::controls::BaseControls> controls;
 
 		public:

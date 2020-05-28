@@ -23,7 +23,7 @@ namespace mpc::ui::sampler::window {
 		int tune{ 0 };
 		int originalKey{ 60 };
 
-		std::string newName{ "" };
+		std::string newName = "";
 		bool initPadAssignMaster{ false };
 
 	public:

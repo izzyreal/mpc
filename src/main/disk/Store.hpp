@@ -12,9 +12,9 @@ namespace mpc {
 
 		public:
 			bool raw { false };
-			std::string path { "" };
+			std::string path  = "";
 			int totalSpace { 0 };
-			std::string volumeLabel { "" };
+			std::string volumeLabel  = "";
 
 		public:
 			std::string toString();

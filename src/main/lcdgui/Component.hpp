@@ -22,7 +22,7 @@ namespace mpc::lcdgui {
 		std::vector<std::shared_ptr<Component>> children;
 
 	protected:
-		std::string name{ "" };
+		std::string name = "";
 		bool hidden = false;
 		bool dirty = false;
 		unsigned int x{ 0 };

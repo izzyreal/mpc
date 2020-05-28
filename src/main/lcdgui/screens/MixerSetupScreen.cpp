@@ -95,7 +95,7 @@ void MixerSetupScreen::function(int i)
 	{
 		auto drumScreen = dynamic_pointer_cast<DrumScreen>(Screens::getScreenComponent("drum"));
 		drumScreen->setDrum(i);
-		mpc.getUis().lock()->getSamplerGui()->setPrevScreenName(csn);
+		mpc.setPreviousSamplerScreenName(currentScreenName);
 		ls.lock()->openScreen("mixer");
 	}
 }

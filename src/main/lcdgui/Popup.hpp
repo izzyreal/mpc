@@ -15,7 +15,7 @@ namespace mpc {
 
 		private:
 			int pos{ 0 };
-			std::string text{ "" };
+			std::string text = "";
 			std::unique_ptr<Background> bg;
 
 		public:

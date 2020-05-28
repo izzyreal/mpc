@@ -50,7 +50,7 @@ void AbstractSamplerControls::init()
 	program = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
 	auto lProgram = program.lock();
 	
-	if (csn.compare("programassign") == 0)
+	if (currentScreenName.compare("programassign") == 0)
 	{
 		lastPad = sampler.lock()->getLastPad(lProgram.get());
 		auto note = lastPad->getNote();

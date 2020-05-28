@@ -25,11 +25,11 @@ namespace mpc::lcdgui
 
 		bool focusable{ true };
 		bool focus{ false };
-		std::string csn{ "" };
+		std::string csn = "";
 		bool split{ false };
 		int activeSplit{ 0 };
 		bool typeModeEnabled{ false };
-		std::string oldText{ "" };
+		std::string oldText = "";
 		bool scrolling{ false };
 		static const int BLINKING_RATE{ 200 };
 		bool blinking{ false };

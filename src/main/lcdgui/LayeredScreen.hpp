@@ -76,8 +76,8 @@ namespace mpc::lcdgui {
 		std::vector<std::vector<std::string>> lastFocuses{};
 
 		int focusedLayerIndex{ 0 };
-		std::string currentScreenName{ "" };
-		std::string previousScreenName{ "" };
+		std::string currentScreenName = "";
+		std::string previousScreenName = "";
 
 	private:
 		std::vector<std::weak_ptr<mpc::lcdgui::Component>> nonTextComps;
@@ -100,8 +100,8 @@ namespace mpc::lcdgui {
 
 	private:
 		int previousLayer{ 0 };
-		std::string previousViewModeText{ "" };
-		std::string previousFromNoteText{ "" };
+		std::string previousViewModeText = "";
+		std::string previousFromNoteText = "";
 
 	public:
 		void createPopup(std::string text, int textXPos);

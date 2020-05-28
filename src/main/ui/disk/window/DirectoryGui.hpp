@@ -38,7 +38,7 @@ namespace mpc {
 					int yPos0{ 0 };
 					int yOffset0{ 0 };
 					int yOffset1{ 0 };
-					std::string previousScreenName{ "" };
+					std::string previousScreenName = "";
 
 				public:
 					void left();

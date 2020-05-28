@@ -68,7 +68,7 @@ vector<int> BaseControls::splitInc = vector<int>{ 10000000, 1000000, 100000, 100
 
 void BaseControls::init()
 {
-	csn = ls.lock()->getCurrentScreenName();
+	currentScreenName = ls.lock()->getCurrentScreenName();
 	param = ls.lock()->getFocus();
 	activeField = ls.lock()->lookupField(param);
     track = sequencer.lock()->getActiveSequence().lock()->getTrack(sequencer.lock()->getActiveTrackIndex());
@@ -138,36 +138,36 @@ void BaseControls::function(int i)
 	case 3:
 		if (lsLocked->getFocusedLayerIndex() == 1)
 		{
-			if (csn.compare("sequence") == 0)
+			if (currentScreenName.compare("sequence") == 0)
 			{
 				lsLocked->setPreviousScreenName("sequencer");
 			}
-			else if (csn.compare("midiinput") == 0)
+			else if (currentScreenName.compare("midiinput") == 0)
 			{
 				lsLocked->setPreviousScreenName("sequencer");
 			}
-			else if (csn.compare("midioutput") == 0)
+			else if (currentScreenName.compare("midioutput") == 0)
 			{
 				lsLocked->setPreviousScreenName("sequencer");
 			}
-			else if (csn.compare("editsound") == 0)
+			else if (currentScreenName.compare("editsound") == 0)
 			{
 				lsLocked->setPreviousScreenName(mpc.getUis().lock()->getEditSoundGui()->getPreviousScreenName());
 			}
-			else if (csn.compare("sound") == 0)
+			else if (currentScreenName.compare("sound") == 0)
 			{
 				lsLocked->setPreviousScreenName(sampler.lock()->getPreviousScreenName());
 			}
-			else if (csn.compare("program") == 0)
+			else if (currentScreenName.compare("program") == 0)
 			{
-				lsLocked->setPreviousScreenName(mpc.getUis().lock()->getSamplerGui()->getPrevScreenName());
+				lsLocked->setPreviousScreenName(mpc.getPreviousSamplerScreenName());
 			}
-			else if (csn.compare("name") == 0)
+			else if (currentScreenName.compare("name") == 0)
 			{
 				mpc.getUis().lock()->getNameGui()->setNameBeingEdited(false);
 				lsLocked->setLastFocus("name", "0");
 			}
-			else if (csn.compare("directory") == 0)
+			else if (currentScreenName.compare("directory") == 0)
 			{
 				lsLocked->setPreviousScreenName(mpc.getUis().lock()->getDirectoryGui()->getPreviousScreenName());
 			}
@@ -239,7 +239,7 @@ void BaseControls::pad(int i, int velo, bool repeat, int tick)
 	}
 	else
 	{
-		if (csn.compare("programparams") == 0)
+		if (currentScreenName.compare("programparams") == 0)
 		{
 			if (note > 34)
 			{
@@ -252,7 +252,7 @@ void BaseControls::pad(int i, int velo, bool repeat, int tick)
 		}
 	}
 
-	if (csn.compare("assign16levels") == 0 && note != 34)
+	if (currentScreenName.compare("assign16levels") == 0 && note != 34)
 	{
 		assign16LevelsScreen->setNote(note);
 	}
@@ -276,12 +276,12 @@ void BaseControls::generateNoteOn(int nn, int padVelo, int tick)
 	auto lProgram = program.lock();
 	bool slider = lProgram && nn == lProgram->getSlider()->getNote();
 	bool posIsLastTick = sequencer.lock()->getTickPosition() == sequencer.lock()->getActiveSequence().lock()->getLastTick();
-	bool step = csn.compare("step") == 0 && !posIsLastTick;
+	bool step = currentScreenName.compare("step") == 0 && !posIsLastTick;
 	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timingcorrect"));
 	auto noteValue = timingCorrectScreen->getNoteValue();
 	auto swing = timingCorrectScreen->getSwing();
 
-	bool recMainWithoutPlaying = csn.compare("sequencer") == 0 && !sequencer.lock()->isPlaying() && mpc.getControls().lock()->isRecPressed() && timingCorrectScreen->getNoteValue() != 0 && !posIsLastTick;
+	bool recMainWithoutPlaying = currentScreenName.compare("sequencer") == 0 && !sequencer.lock()->isPlaying() && mpc.getControls().lock()->isRecPressed() && timingCorrectScreen->getNoteValue() != 0 && !posIsLastTick;
 
 	shared_ptr<mpc::sequencer::NoteEvent> n;
 
@@ -572,7 +572,7 @@ void BaseControls::play()
 	{
 		if (controls->isRecPressed())
 		{
-			if (csn.compare("sequencer") != 0)
+			if (currentScreenName.compare("sequencer") != 0)
 			{
 				ls.lock()->openScreen("sequencer");
 			}
@@ -580,7 +580,7 @@ void BaseControls::play()
 		}
 		else if (controls->isOverDubPressed())
 		{
-			if (csn.compare("sequencer") != 0)
+			if (currentScreenName.compare("sequencer") != 0)
 			{
 				ls.lock()->openScreen("sequencer");
 			}
@@ -594,11 +594,11 @@ void BaseControls::play()
 			}
 			else
 			{
-				if (csn.compare("song") != 0 && csn.compare("sequencer") != 0 && csn.compare("trackmute") != 0)
+				if (currentScreenName.compare("song") != 0 && currentScreenName.compare("sequencer") != 0 && currentScreenName.compare("trackmute") != 0)
 				{
 					ls.lock()->openScreen("sequencer");
 				}
-				if (csn.compare("song") == 0)
+				if (currentScreenName.compare("song") == 0)
 				{
 					sequencer.lock()->setSongModeEnabled(true);
 				}
@@ -621,7 +621,7 @@ void BaseControls::playStart()
 
 	if (controls->isRecPressed())
 	{
-		if (csn.compare("sequencer") != 0)
+		if (currentScreenName.compare("sequencer") != 0)
 		{
 			ls.lock()->openScreen("sequencer");
 		}
@@ -629,7 +629,7 @@ void BaseControls::playStart()
 	}
 	else if (controls->isOverDubPressed())
 	{
-		if (csn.compare("sequencer") != 0)
+		if (currentScreenName.compare("sequencer") != 0)
 		{
 			ls.lock()->openScreen("sequencer");
 		}
@@ -644,12 +644,12 @@ void BaseControls::playStart()
 		}
 		else
 		{
-			if (csn.compare("song") != 0 && csn.compare("sequencer") != 0 && csn.compare("trackmute") != 0)
+			if (currentScreenName.compare("song") != 0 && currentScreenName.compare("sequencer") != 0 && currentScreenName.compare("trackmute") != 0)
 			{
 				ls.lock()->openScreen("sequencer");
 			}
 			
-			if (csn.compare("song") == 0)
+			if (currentScreenName.compare("song") == 0)
 			{
 				sequencer.lock()->setSongModeEnabled(true);
 			}
@@ -714,7 +714,7 @@ void BaseControls::nextSeq()
 void BaseControls::trackMute()
 {
 	init();
-	if (csn.compare("trackmute") == 0) {
+	if (currentScreenName.compare("trackmute") == 0) {
 		ls.lock()->openScreen("sequencer");
 		return;
 	}

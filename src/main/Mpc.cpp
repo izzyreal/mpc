@@ -330,3 +330,13 @@ int Mpc::getPrevPad()
 {
 	return prevPad;
 }
+
+string Mpc::getPreviousSamplerScreenName()
+{
+	return previousSamplerScreenName;
+}
+
+void Mpc::setPreviousSamplerScreenName(string s)
+{
+	previousSamplerScreenName = s;
+}

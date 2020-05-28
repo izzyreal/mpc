@@ -29,7 +29,7 @@ void AbstractDiskControls::init()
 	super::init();
 	disk = Mpc::instance().getDisk();
 	auto lDisk = disk.lock();
-	if (csn.compare("loadasequencefromall") != 0 && lDisk && lDisk->getFiles().size() > 0 && diskGui->getFileLoad() < lDisk->getFiles().size()) {
+	if (currentScreenName.compare("loadasequencefromall") != 0 && lDisk && lDisk->getFiles().size() > 0 && diskGui->getFileLoad() < lDisk->getFiles().size()) {
 		selectedFile = diskGui->getSelectedFile();
 	}
 }

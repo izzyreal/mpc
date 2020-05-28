@@ -224,7 +224,7 @@ void NameControls::saveName()
 		nameGui->setNameBeingEdited(false);
 		lLs->setLastFocus("name", "0");
 		lLs->openScreen("autochromaticassignment");
-		lLs->setPreviousScreenName(uis->getSamplerGui()->getPrevScreenName());
+		lLs->setPreviousScreenName(mpc.getPreviousSamplerScreenName());
 		return;
 	}
 	else if (paramToRename.compare("rename") == 0)

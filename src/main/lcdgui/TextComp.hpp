@@ -21,7 +21,7 @@ namespace mpc::lcdgui
 		const int FONT_WIDTH = 6;
 
 	protected:
-		std::string text{ "" };
+		std::string text = "";
 		int width = 0; // pixels
 		bool opaque{ false };
 

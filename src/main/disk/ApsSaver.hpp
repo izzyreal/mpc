@@ -11,7 +11,7 @@ namespace mpc::disk {
 	{
 
 	private:
-		std::string apsFileName{ "" };
+		std::string apsFileName = "";
 		std::unique_ptr<mpc::disk::SoundSaver> soundSaver;
 
 	private:

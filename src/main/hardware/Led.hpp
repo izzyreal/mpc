@@ -13,7 +13,7 @@ namespace mpc {
 		{
 
 		private:
-			std::string label{ "" };
+			std::string label = "";
 
 		public:
 			std::string getLabel();

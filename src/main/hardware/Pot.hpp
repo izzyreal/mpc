@@ -8,7 +8,7 @@ namespace mpc::hardware {
 	{
 
 	private:
-		std::string label{ "" };
+		std::string label = "";
 		int value{ 0 };
 
 

@@ -32,7 +32,7 @@ namespace mpc::sampler {
 
 	private:
 		Sampler* sampler{ nullptr };
-		std::string name{ "" };
+		std::string name = "";
 		std::vector<NoteParameters*> noteParameters{ };
 		std::vector<Pad*> pads{ };
 		PgmSlider* slider{ nullptr };

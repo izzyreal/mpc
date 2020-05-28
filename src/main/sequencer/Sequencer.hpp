@@ -51,8 +51,8 @@ namespace mpc::sequencer {
 		BCMath previousTempo{};
 		int recordStartTick{ 0 };
 
-		std::string defaultSongName{ "" };
-		std::string defaultSequenceName{ "" };
+		std::string defaultSongName = "";
+		std::string defaultSequenceName = "";
 		std::vector<std::string> defaultDeviceNames{};
 		int timeDisplayStyle{ 0 };
 		bool recordingModeMulti{ false };

@@ -69,7 +69,7 @@ void NextSeqScreen::function(int i)
 
 void NextSeqScreen::displaySq()
 {
-	string result{ "" };
+	string result = "";
 	auto lSequencer = sequencer.lock();
 	if (lSequencer->isPlaying()) {
 		result.append(StrUtil::padLeft(to_string(lSequencer->getCurrentlyPlayingSequenceIndex() + 1), "0", 2));

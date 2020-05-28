@@ -14,7 +14,7 @@ namespace mpc {
 		{
 
 		private:
-			std::string name{ "" };
+			std::string name = "";
 			std::vector<Step*> steps{};
 			bool loopEnabled{ false };
 			int firstStep{ 0 };

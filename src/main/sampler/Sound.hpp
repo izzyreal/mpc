@@ -12,7 +12,7 @@ namespace mpc {
 		{
 
 		private:
-			std::string name{ "" };
+			std::string name = "";
 			int memoryIndex{ -1 };
 			int numberOfBeats{ 4 };
 			ctoot::mpc::MpcSoundOscillatorControls* oscillatorControls{ nullptr };

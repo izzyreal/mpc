@@ -46,7 +46,7 @@ namespace mpc {
 					std::weak_ptr<mpc::sampler::Sampler> sampler{};
 					ctoot::mpc::MpcSoundPlayerChannel* mpcSoundPlayerChannel{ nullptr };
 					std::weak_ptr<mpc::sampler::Program> program{};
-					std::string csn{ "" };
+					std::string csn = "";
 					mpc::ui::sampler::SamplerGui* samplerGui{ nullptr };
 					SamplerWindowGui* swGui{ nullptr };
 					std::weak_ptr<mpc::lcdgui::Field> midiProgramChangeField{};

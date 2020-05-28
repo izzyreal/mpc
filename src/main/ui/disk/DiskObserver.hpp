@@ -68,7 +68,7 @@ namespace mpc {
 				std::weak_ptr<mpc::lcdgui::Label> freeLabel;
 				std::weak_ptr<mpc::lcdgui::Field> loadReplaceSoundField;
 				std::weak_ptr<mpc::lcdgui::Field> assignToNoteField;
-				std::string csn{ "" };
+				std::string csn = "";
 				std::weak_ptr<mpc::lcdgui::Field> loadIntoField;
 				mpc::ui::disk::window::DiskWindowGui* diskWindowGui;
 				std::weak_ptr<mpc::lcdgui::Label> nameLabel;

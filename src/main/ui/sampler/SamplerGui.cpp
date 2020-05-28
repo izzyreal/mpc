@@ -9,16 +9,6 @@
 using namespace mpc::ui::sampler;
 using namespace std;
 
-string SamplerGui::getPrevScreenName()
-{
-    return prevScreenName;
-}
-
-void SamplerGui::setPrevScreenName(string s)
-{
-    prevScreenName = s;
-}
-
 void SamplerGui::setNewName(string newName)
 {
     this->newName = newName;

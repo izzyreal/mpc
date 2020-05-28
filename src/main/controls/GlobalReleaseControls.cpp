@@ -44,41 +44,41 @@ void GlobalReleaseControls::function(int i) {
 	auto controls = Mpc::instance().getControls().lock();
 	switch (i) {
 	case 0:
-		if (csn.compare("step-timing-correct") == 0) {
+		if (currentScreenName.compare("step-timing-correct") == 0) {
 			ls.lock()->openScreen("step");
 		}
 		break;
 	case 2:
 		controls->setF3Pressed(false);
-		if (csn.compare("loadasound") == 0) {
+		if (currentScreenName.compare("loadasound") == 0) {
 			sampler.lock()->finishBasicVoice();
 		}
 		break;
 	case 3:
 		controls->setF4Pressed(false);
-		if (csn.compare("keeporretry") == 0) {
+		if (currentScreenName.compare("keeporretry") == 0) {
 			sampler.lock()->finishBasicVoice();
 		}
 		break;
 	case 4:
 		controls->setF5Pressed(false);
-		if (csn.compare("load") == 0) {
+		if (currentScreenName.compare("load") == 0) {
 			Mpc::instance().getLayeredScreen().lock()->removePopup();
 			Mpc::instance().getAudioMidiServices().lock()->getSoundPlayer().lock()->enableStopEarly();
 		}
 		break;
 	case 5:
 		controls->setF6Pressed(false);
-		if (!sequencer.lock()->isPlaying() && csn.compare("sequencer") != 0) {
+		if (!sequencer.lock()->isPlaying() && currentScreenName.compare("sequencer") != 0) {
 			sampler.lock()->finishBasicVoice();
 		}
-		if (csn.compare("trackmute") == 0) {
+		if (currentScreenName.compare("trackmute") == 0) {
 			if (!sequencer.lock()->isSoloEnabled()) {
 				ls.lock()->setCurrentBackground("trackmute");
 			}
 			sequencer.lock()->setSoloEnabled(sequencer.lock()->isSoloEnabled());
 		}
-		else if (csn.compare("directory") == 0) {
+		else if (currentScreenName.compare("directory") == 0) {
 			Mpc::instance().getLayeredScreen().lock()->removePopup();
 			Mpc::instance().getAudioMidiServices().lock()->getSoundPlayer().lock()->enableStopEarly();
 		}
@@ -107,8 +107,8 @@ void GlobalReleaseControls::simplePad(int i)
 	generateNoteOff(note);
 	bool posIsLastTick = sequencer.lock()->getTickPosition() == sequencer.lock()->getActiveSequence().lock()->getLastTick();
 
-	bool maybeRecWithoutPlaying = csn.compare("sequencer") == 0 && !posIsLastTick;
-	bool stepRec = csn.compare("step") == 0 && !posIsLastTick;
+	bool maybeRecWithoutPlaying = currentScreenName.compare("sequencer") == 0 && !posIsLastTick;
+	bool stepRec = currentScreenName.compare("step") == 0 && !posIsLastTick;
 	
 	if (stepRec || maybeRecWithoutPlaying)
 	{
@@ -197,7 +197,7 @@ void GlobalReleaseControls::shift()
 	controls->setShiftPressed(false);
 	init();
 
-	if (csn.compare("step") == 0 && param.length() == 2)
+	if (currentScreenName.compare("step") == 0 && param.length() == 2)
 	{
 		auto eventNumber = stoi(param.substr(1, 2));
 		auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(Screens::getScreenComponent("step"));

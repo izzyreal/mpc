@@ -97,6 +97,9 @@ namespace mpc {
 		int prevNote = 60;
 		int prevPad = -1;
 
+		// For returning to a specific screen after for example opening the Name screen
+		std::string previousSamplerScreenName = "";
+
 	public:
 		void init(const int sampleRate, const int inputCount, const int outputCount);
 		void setBank(int i);
@@ -106,6 +109,8 @@ namespace mpc {
 		int getPad();
 		int getPrevNote();
 		int getPrevPad();
+		std::string getPreviousSamplerScreenName();
+		void setPreviousSamplerScreenName(std::string s);
 
 	public:
 		std::weak_ptr<ui::Uis> getUis();

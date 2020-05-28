@@ -171,7 +171,7 @@ void SequencerScreen::displayTempoSource()
 
 void SequencerScreen::displaySq()
 {
-	string result{ "" };
+	string result = "";
 
 	if (sequencer.lock()->isPlaying()) {
 		result.append(moduru::lang::StrUtil::padLeft(to_string(sequencer.lock()->getCurrentlyPlayingSequenceIndex() + 1), "0", 2));

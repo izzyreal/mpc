@@ -69,7 +69,7 @@ void PgmAssignScreen::function(int i)
 		auto newName = "NewPgm-" + mpc::Mpc::akaiAscii[letterNumber];
 		
 		samplerWindowGui->setNewName(newName);
-		mpc.getUis().lock()->getSamplerGui()->setPrevScreenName(csn);
+		mpc.setPreviousSamplerScreenName(currentScreenName);
 		ls.lock()->openScreen("autochromaticassignment");
 		break;
 	}
@@ -215,7 +215,7 @@ void PgmAssignScreen::openWindow()
 	
 	if (param.compare("pgm") == 0)
 	{
-		mpc.getUis().lock()->getSamplerGui()->setPrevScreenName("programassign");
+		mpc.setPreviousSamplerScreenName("programassign");
 		ls.lock()->openScreen("program");
 	}
 	else if (param.compare("pad") == 0 || param.compare("pad-note") == 0)

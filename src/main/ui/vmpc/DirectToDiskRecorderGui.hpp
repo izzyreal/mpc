@@ -21,7 +21,7 @@ namespace mpc {
 				int song{ 0 };
 				int time0{ 0 };
 				int time1{ 0 };
-				std::string outputFolder{ "" };
+				std::string outputFolder = "";
 				bool offline{ false };
 				bool splitLR{ true };
 				int sampleRate{ 0 };

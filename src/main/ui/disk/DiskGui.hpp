@@ -31,7 +31,7 @@ namespace mpc::ui::disk {
 		bool clearProgramWhenLoading{ false };
 		bool waitingForUser{ false };
 		bool skipAll{ false };
-		std::string cannotFindFileName{ "" };
+		std::string cannotFindFileName = "";
 		bool saveReplaceSameSounds{ false };
 		int save{ 0 };
 		int fileTypeSaveSound{ 0 };

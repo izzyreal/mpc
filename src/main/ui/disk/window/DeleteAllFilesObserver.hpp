@@ -25,7 +25,7 @@ namespace mpc {
 
 				private:
 					std::vector<std::string> views{};
-					std::string csn{ "" };
+					std::string csn = "";
 					DiskWindowGui* diskWindowGui{ nullptr };
 	//				mpc::lcdgui::LayeredScreen* ls{ nullptr };
 					std::weak_ptr<mpc::lcdgui::Field> deleteField{};

@@ -68,7 +68,7 @@ void PgmParamsScreen::function(int i)
 		auto letterNumber = sampler.lock()->getProgramCount() + 21;
 		auto newName = "NewPgm-" + mpc::Mpc::akaiAscii[letterNumber];
 		samplerWindowGui->setNewName(newName);
-		mpc.getUis().lock()->getSamplerGui()->setPrevScreenName(csn);
+		mpc.setPreviousSamplerScreenName(currentScreenName);
 		ls.lock()->openScreen("autochromaticassignment");
 		break;
 	}
@@ -167,7 +167,7 @@ void PgmParamsScreen::openWindow()
 
 	if (param.compare("pgm") == 0)
 	{
-		mpc.getUis().lock()->getSamplerGui()->setPrevScreenName(csn);
+		mpc.setPreviousSamplerScreenName(currentScreenName);
 		ls.lock()->openScreen("program");
 	}
 	else if (param.compare("note") == 0)
@@ -181,7 +181,7 @@ void PgmParamsScreen::openWindow()
 		samplerWindowGui->setNote0(note);
 		samplerWindowGui->setProg1(programIndex, programCount);
 		samplerWindowGui->setNote1(note);
-		mpc.getUis().lock()->getSamplerGui()->setPrevScreenName(csn);
+		mpc.setPreviousSamplerScreenName(currentScreenName);
 		ls.lock()->openScreen("copynoteparameters");
 	}
 	else if (param.compare("attack") == 0 || param.compare("decay") == 0 || param.compare("dcymd") == 0)

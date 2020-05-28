@@ -9,7 +9,7 @@ namespace mpc::lcdgui {
 	{
 
 	private:
-		std::string name{ "" };
+		std::string name = "";
 
 	public:
 		void setName(std::string name);
