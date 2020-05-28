@@ -329,7 +329,7 @@ void MixerScreen::openWindow()
 	int pad = xPos + (mpc.getBank() * 16);
 	int note = program.lock()->getPad(pad)->getNote();
 	mpc.setPadAndNote(pad, note);
-	ls.lock()->openScreen("channelsettings");
+	ls.lock()->openScreen("channel-settings");
 }
 
 void MixerScreen::function(int f)

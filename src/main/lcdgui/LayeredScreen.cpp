@@ -32,7 +32,6 @@
 #include <lcdgui/screens/SampleScreen.hpp>
 
 #include <ui/Uis.hpp>
-#include <ui/sampler/window/ChannelSettingsObserver.hpp>
 #include <ui/sampler/window/EditSoundObserver.hpp>
 #include <ui/sampler/window/MuteAssignObserver.hpp>
 #include <ui/sampler/window/SamplerWindowObserver.hpp>
@@ -798,10 +797,6 @@ void LayeredScreen::initObserver()
 	else if (csn.compare("directory") == 0)
 	{
 		activeObserver = make_unique<DirectoryObserver>(Mpc::instance().getDisk());
-	}
-	else if (csn.compare("channelsettings") == 0)
-	{
-		activeObserver = make_unique<ChannelSettingsObserver>();
 	}
 	else if (csn.compare("name") == 0)
 	{

@@ -59,8 +59,6 @@
 #include <controls/misc/TransControls.hpp>
 #include <controls/misc/window/TransposePermanentControls.hpp>
 
-#include <controls/mixer/window/ChannelSettingsControls.hpp>
-
 #include <controls/vmpc/DirectToDiskRecorderControls.hpp>
 #include <controls/vmpc/RecordJamControls.hpp>
 #include <controls/vmpc/RecordingFinishedControls.hpp>
@@ -128,8 +126,6 @@ Controls::Controls()
 	controls["2ndseq"] = new misc::SecondSeqControls();
 
 	controls["transposepermanent"] = new misc::window::TransposePermanentControls();
-
-	controls["channelsettings"] = new mixer::window::ChannelSettingsControls();
 
 	controls["sync"] = new midisync::SyncControls();
 

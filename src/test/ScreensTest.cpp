@@ -94,7 +94,7 @@ vector<string> screenNames = {
 "saveasound",
 "keeporretry",
 "formatdisk",
-"channelsettings",
+"channel-settings",
 "program",
 "sound",
 "velocitymodulation",

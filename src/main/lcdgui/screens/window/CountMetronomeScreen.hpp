@@ -7,7 +7,6 @@
 
 namespace mpc::lcdgui::screens::window
 {
-
 	class CountMetronomeScreen
 		: public mpc::lcdgui::ScreenComponent
 	{
