@@ -1,7 +1,5 @@
 #include "InsertEventScreen.hpp"
 
-#include <Mpc.hpp>
-
 #include <sequencer/ChannelPressureEvent.hpp>
 #include <sequencer/ControlChangeEvent.hpp>
 #include <sequencer/Event.hpp>

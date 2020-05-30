@@ -1,7 +1,6 @@
 #include "PgmParamsScreen.hpp"
 
 #include <Mpc.hpp>
-#include <ui/sampler/window/SamplerWindowGui.hpp>
 
 #include <sampler/NoteParameters.hpp>
 #include <sampler/Pad.hpp>
@@ -49,7 +48,7 @@ void PgmParamsScreen::function(int i)
 	switch (i)
 	{
 	case 0:
-		ls.lock()->openScreen("programassign");
+		ls.lock()->openScreen("program-assign");
 		break;
 	case 1:
 		ls.lock()->openScreen("select-drum");
@@ -62,13 +61,8 @@ void PgmParamsScreen::function(int i)
 		break;
 	case 4:
 	{
-		auto samplerWindowGui = mpc.getUis().lock()->getSamplerWindowGui();
-		samplerWindowGui->setAutoChromAssSnd(sampler.lock()->getLastNp(program.lock().get())->getSndNumber(), sc);
-		auto letterNumber = sampler.lock()->getProgramCount() + 21;
-		auto newName = "NewPgm-" + mpc::Mpc::akaiAscii[letterNumber];
-		samplerWindowGui->setNewName(newName);
 		mpc.setPreviousSamplerScreenName(currentScreenName);
-		ls.lock()->openScreen("autochromaticassignment");
+		ls.lock()->openScreen("auto-chromatic-assignment");
 		break;
 	}
 	case 5:
@@ -171,33 +165,24 @@ void PgmParamsScreen::openWindow()
 	}
 	else if (param.compare("note") == 0)
 	{
-		auto programIndex = mpcSoundPlayerChannel->getProgram();
-		
-		auto note = mpc.getNote();
-		auto programCount = sampler.lock()->getProgramCount();
-		auto samplerWindowGui = mpc.getUis().lock()->getSamplerWindowGui();
-		samplerWindowGui->setProg0(programIndex, programCount);
-		samplerWindowGui->setNote0(note);
-		samplerWindowGui->setProg1(programIndex, programCount);
-		samplerWindowGui->setNote1(note);
 		mpc.setPreviousSamplerScreenName(currentScreenName);
-		ls.lock()->openScreen("copynoteparameters");
+		ls.lock()->openScreen("copy-note-parameters");
 	}
 	else if (param.compare("attack") == 0 || param.compare("decay") == 0 || param.compare("dcymd") == 0)
 	{
-		ls.lock()->openScreen("velocitymodulation");
+		ls.lock()->openScreen("velocity-modulation");
 	}
 	else if (param.compare("freq") == 0 || param.compare("reson") == 0)
 	{
-		ls.lock()->openScreen("veloenvfilter");
+		ls.lock()->openScreen("velo-env-filter");
 	}
 	else if (param.compare("tune") == 0)
 	{
-		ls.lock()->openScreen("velopitch");
+		ls.lock()->openScreen("velo-pitch");
 	}
 	else if (param.compare("voiceoverlap") == 0)
 	{
-		ls.lock()->openScreen("muteassign");
+		ls.lock()->openScreen("mute-assign");
 	}
 }
 

@@ -22,6 +22,7 @@ namespace mpc::lcdgui::screens
 		void pad(int i, int velo, bool repeat, int tick) override;
 
 	private:
+		const std::vector<std::string> letters{ "A", "B", "C", "D" };
 		void displayNextSq();
 		int bankOffset();
 		void displayBank();

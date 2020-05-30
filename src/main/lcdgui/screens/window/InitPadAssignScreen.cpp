@@ -1,9 +1,5 @@
 #include "InitPadAssignScreen.hpp"
 
-#include <ui/sampler/window/SamplerWindowGui.hpp>
-#include <sampler/Program.hpp>
-#include <sampler/Sampler.hpp>
-
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
@@ -42,7 +38,7 @@ void InitPadAssignScreen::function(int i)
 			program.lock()->initPadAssign();
 		}
 		
-		ls.lock()->openScreen("programassign");
+		ls.lock()->openScreen("program-assign");
 		break;
 	}
 }

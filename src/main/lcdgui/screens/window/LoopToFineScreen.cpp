@@ -4,12 +4,7 @@
 #include <lcdgui/screens/LoopScreen.hpp>
 #include <lcdgui/screens/TrimScreen.hpp>
 
-#include <sampler/Sampler.hpp>
-#include <sampler/Sound.hpp>
-
 #include <mpc/MpcSoundOscillatorControls.hpp>
-
-#include <cmath>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;

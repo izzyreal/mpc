@@ -32,7 +32,6 @@
 #include <lcdgui/screens/SampleScreen.hpp>
 
 #include <ui/Uis.hpp>
-#include <ui/sampler/window/MuteAssignObserver.hpp>
 #include <ui/sampler/window/SamplerWindowObserver.hpp>
 
 #include <ui/NameObserver.hpp>
@@ -80,8 +79,8 @@ using namespace rapidjson;
 using namespace std;
 
 static vector<string> samplerWindowNames = vector<string>{ "program", "deleteprogram", "deleteallprograms", "createnewprogram",
-"copyprogram", "assignmentview", "copynoteparameters", "velocitymodulation",
-"veloenvfilter", "velopitch", "autochromaticassignment", "keeporretry" };
+"copyprogram", "assignment-view", "copy-note-parameters", "velocity-modulation",
+"velo-env-filter", "velo-pitch", "auto-chromatic-assignment", "keep-or-retry" };
 
 static vector<string> diskNames = vector<string>{ "load", "save", "format", "setup", "device", "loadaprogram",
 "saveaprogram", "loadasound", "saveasound", "cantfindfile", "filealreadyexists", "loadasequence",
@@ -808,10 +807,6 @@ void LayeredScreen::initObserver()
 	else if (checkActiveScreen(&samplerWindowNames, csn))
 	{
 		activeObserver = make_unique<SamplerWindowObserver>();
-	}
-	else if (csn.compare("muteassign") == 0)
-	{
-		activeObserver = make_unique<MuteAssignObserver>();
 	}
 	else if (csn.compare("settings") == 0)
 	{

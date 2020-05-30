@@ -17,7 +17,7 @@ using namespace moduru::lang;
 using namespace std;
 
 PgmAssignScreen::PgmAssignScreen(const int layerIndex)
-	: ScreenComponent("programassign", layerIndex)
+	: ScreenComponent("program-assign", layerIndex)
 {
 }
 
@@ -62,15 +62,8 @@ void PgmAssignScreen::function(int i)
 		break;
 	case 4:
 	{
-		auto samplerWindowGui = mpc.getUis().lock()->getSamplerWindowGui();
-		samplerWindowGui->setAutoChromAssSnd(sampler.lock()->getLastNp(program.lock().get())->getSndNumber(), sampler.lock()->getSoundCount());
-
-		auto letterNumber = sampler.lock()->getProgramCount() + 21;
-		auto newName = "NewPgm-" + mpc::Mpc::akaiAscii[letterNumber];
-		
-		samplerWindowGui->setNewName(newName);
 		mpc.setPreviousSamplerScreenName(currentScreenName);
-		ls.lock()->openScreen("autochromaticassignment");
+		ls.lock()->openScreen("auto-chromatic-assignment");
 		break;
 	}
 	}
@@ -215,12 +208,12 @@ void PgmAssignScreen::openWindow()
 	
 	if (param.compare("pgm") == 0)
 	{
-		mpc.setPreviousSamplerScreenName("programassign");
+		mpc.setPreviousSamplerScreenName("program-assign");
 		ls.lock()->openScreen("program");
 	}
 	else if (param.compare("pad") == 0 || param.compare("pad-note") == 0)
 	{
-		ls.lock()->openScreen("assignmentview");
+		ls.lock()->openScreen("assignment-view");
 	}
 	else if (param.compare("pad-assign") == 0)
 	{
@@ -228,17 +221,7 @@ void PgmAssignScreen::openWindow()
 	}
 	else if (param.compare("note") == 0)
 	{
-		auto pn = mpcSoundPlayerChannel->getProgram();
-		auto nn = mpc.getNote();
-		auto pc = sampler.lock()->getProgramCount();
-		
-		auto samplerWindowGui = mpc.getUis().lock()->getSamplerWindowGui();
-		samplerWindowGui->setProg0(pn, pc);
-		samplerWindowGui->setNote0(nn);
-		samplerWindowGui->setProg1(pn, pc);
-		samplerWindowGui->setNote1(nn);
-	
-		ls.lock()->openScreen("copynoteparameters");
+		ls.lock()->openScreen("copy-note-parameters");
 	}
 	else if (param.compare("snd") == 0)
 	{
@@ -246,7 +229,7 @@ void PgmAssignScreen::openWindow()
 		if (sn != -1)
 		{
 			sampler.lock()->setSoundIndex(sn);
-			sampler.lock()->setPreviousScreenName("programassign");
+			sampler.lock()->setPreviousScreenName("program-assign");
 			ls.lock()->openScreen("sound");
 		}
 	}

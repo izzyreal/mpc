@@ -15,21 +15,26 @@ EraseAllOffTracksScreen::EraseAllOffTracksScreen(const int& layer)
 void EraseAllOffTracksScreen::function(int i)
 {
 	BaseControls::function(i);
-	auto seq = sequencer.lock()->getActiveSequence().lock();
-	int trackCounter;
 
 	switch (i)
 	{
 	case 4:
-		trackCounter = 0;
-		for (auto& track : seq->getTracks()) {
+	{
+		auto seq = sequencer.lock()->getActiveSequence().lock();
+		int trackCounter = 0;
+
+		for (auto& track : seq->getTracks())
+		{
 			auto t = track.lock();
-			if (!t->isOn()) {
+
+			if (!t->isOn())
+			{
 				seq->purgeTrack(trackCounter);
 			}
 			trackCounter++;
 		}
 		ls.lock()->openScreen("sequencer");
 		break;
+	}
 	}
 }

@@ -55,7 +55,7 @@ void GlobalReleaseControls::function(int i) {
 		break;
 	case 3:
 		controls->setF4Pressed(false);
-		if (currentScreenName.compare("keeporretry") == 0) {
+		if (currentScreenName.compare("keep-or-retry") == 0) {
 			sampler.lock()->finishBasicVoice();
 		}
 		break;

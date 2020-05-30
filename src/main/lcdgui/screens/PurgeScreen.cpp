@@ -20,7 +20,7 @@ void PurgeScreen::function(int f)
 	switch (f)
 	{
 	case 0:
-		ls.lock()->openScreen("programassign");
+		ls.lock()->openScreen("program-assign");
 		break;
 	case 1:
 		ls.lock()->openScreen("programparams");

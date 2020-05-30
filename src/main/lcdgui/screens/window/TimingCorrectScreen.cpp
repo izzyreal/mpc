@@ -1,18 +1,11 @@
 #include "TimingCorrectScreen.hpp"
 
-#include <lcdgui/LayeredScreen.hpp>
-#include <lcdgui/FunctionKeys.hpp>
-#include <lcdgui/Label.hpp>
-
-#include <sequencer/Sequence.hpp>
 #include <sequencer/Track.hpp>
-#include <sequencer/Sequencer.hpp>
 #include <sequencer/SeqUtil.hpp>
-
-#include <lang/StrUtil.hpp>
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
+using namespace moduru::lang;
 using namespace std;
 
 TimingCorrectScreen::TimingCorrectScreen(const int& layer)
@@ -131,8 +124,8 @@ void TimingCorrectScreen::displayNotes()
 	
 	if (track.lock()->getBusNumber() == 0) {
 		findField("notes0").lock()->setSize(8 * 6, 9);
-		findField("notes0").lock()->setText(moduru::lang::StrUtil::padLeft(to_string(midiNote0), " ", 3) + "(" + mpc::ui::Uis::noteNames[midiNote0] + u8"\u00D4");
-		findField("notes1").lock()->setText(moduru::lang::StrUtil::padLeft(to_string(midiNote1), " ", 3) + "(" + mpc::ui::Uis::noteNames[midiNote1] + u8"\u00D4");
+		findField("notes0").lock()->setText(StrUtil::padLeft(to_string(midiNote0), " ", 3) + "(" + mpc::ui::Uis::noteNames[midiNote0] + u8"\u00D4");
+		findField("notes1").lock()->setText(StrUtil::padLeft(to_string(midiNote1), " ", 3) + "(" + mpc::ui::Uis::noteNames[midiNote1] + u8"\u00D4");
 		findLabel("notes1").lock()->Hide(false);
 		findField("notes1").lock()->Hide(false);
 	}

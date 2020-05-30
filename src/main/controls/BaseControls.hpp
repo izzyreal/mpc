@@ -3,7 +3,13 @@
 #include <lcdgui/LayeredScreen.hpp>
 
 #include <sequencer/Sequencer.hpp>
+
 #include <sampler/Sampler.hpp>
+#include <sampler/Pad.hpp>
+#include <sampler/Program.hpp>
+#include <sampler/NoteParameters.hpp>
+
+#include <controls/Controls.hpp>
 
 #include <string>
 #include <memory>

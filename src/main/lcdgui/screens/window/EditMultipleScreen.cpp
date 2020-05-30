@@ -9,10 +9,6 @@
 #include <sequencer/ProgramChangeEvent.hpp>
 
 #include <lcdgui/screens/StepEditorScreen.hpp>
-#include <lcdgui/Screens.hpp>
-#include <lcdgui/Label.hpp>
-
-#include <lang/StrUtil.hpp>
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;

@@ -1,11 +1,6 @@
 #include "TrackScreen.hpp"
 
-#include <lcdgui/LayeredScreen.hpp>
-#include <lcdgui/Label.hpp>
-
-#include <ui/NameGui.hpp>
 #include <sequencer/Track.hpp>
-#include <sequencer/Sequencer.hpp>
 
 using namespace mpc::lcdgui::screens::window;
 using namespace std;

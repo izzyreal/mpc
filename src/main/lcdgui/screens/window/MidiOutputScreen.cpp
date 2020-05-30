@@ -1,11 +1,5 @@
 #include "MidiOutputScreen.hpp"
 
-#include <lcdgui/Label.hpp>
-#include <ui/NameGui.hpp>
-#include <sequencer/Sequence.hpp>
-
-#include <lang/StrUtil.hpp>
-
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 

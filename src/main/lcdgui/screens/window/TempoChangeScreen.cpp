@@ -3,7 +3,6 @@
 #include <sequencer/TempoChangeEvent.hpp>
 #include <sequencer/TimeSignature.hpp>
 
-#include <lcdgui/Label.hpp>
 #include <lcdgui/HorizontalBar.hpp>
 
 #include <Util.hpp>

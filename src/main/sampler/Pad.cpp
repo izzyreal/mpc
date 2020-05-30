@@ -52,7 +52,7 @@ void Pad::setNote(int i)
 		return;
 	}
 
-	auto pgmAssignScreen = dynamic_pointer_cast<PgmAssignScreen>(Screens::getScreenComponent("programassign"));
+	auto pgmAssignScreen = dynamic_pointer_cast<PgmAssignScreen>(Screens::getScreenComponent("program-assign"));
 
 	if (pgmAssignScreen->padAssign)
 	{
@@ -73,7 +73,7 @@ void Pad::setNote(int i)
 
 int Pad::getNote()
 {
-	auto pgmAssignScreen = dynamic_pointer_cast<PgmAssignScreen>(Screens::getScreenComponent("programassign"));
+	auto pgmAssignScreen = dynamic_pointer_cast<PgmAssignScreen>(Screens::getScreenComponent("program-assign"));
 	if (pgmAssignScreen->padAssign)
 	{
 		return (*Mpc::instance().getSampler().lock()->getMasterPadAssign())[number];

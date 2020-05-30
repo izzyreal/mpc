@@ -4,12 +4,15 @@
 #include "Component.hpp"
 #include "Field.hpp"
 #include "Label.hpp"
+#include "FunctionKeys.hpp"
 #include "Background.hpp"
 #include "Wave.hpp"
 #include "TwoDots.hpp"
 #include "EnvGraph.hpp"
 
 #include <controls/BaseControls.hpp>
+
+#include <ui/NameGui.hpp>
 
 #include <observer/Observer.hpp>
 

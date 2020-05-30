@@ -1,4 +1,4 @@
-#include <lcdgui/screens/window/LoopBarsScreen.hpp>
+#include "LoopBarsScreen.hpp"
 
 #include <sequencer/Sequence.hpp>
 

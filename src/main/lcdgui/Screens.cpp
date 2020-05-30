@@ -69,6 +69,16 @@
 #include <lcdgui/screens/window/ZoneEndFineScreen.hpp>
 #include <lcdgui/screens/window/ChannelSettingsScreen.hpp>
 #include <lcdgui/screens/window/EditSoundScreen.hpp>
+#include <lcdgui/screens/window/AssignmentViewScreen.hpp>
+#include <lcdgui/screens/window/AutoChromaticAssignmentScreen.hpp>
+#include <lcdgui/screens/window/CopyNoteParametersScreen.hpp>
+#include <lcdgui/screens/window/KeepOrRetryScreen.hpp>
+#include <lcdgui/screens/window/MuteAssignScreen.hpp>
+#include <lcdgui/screens/window/ProgramScreen.hpp>
+#include <lcdgui/screens/window/VelocityModulationScreen.hpp>
+#include <lcdgui/screens/window/VeloEnvFilterScreen.hpp>
+#include <lcdgui/screens/window/VeloPitchScreen.hpp>
+
 
 #include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
 #include <lcdgui/screens/dialog/MidiMonitorScreen.hpp>
@@ -480,7 +490,7 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	{
 		screen = make_shared<PgmParamsScreen>(layerIndex);
 	}
-	else if (screenName.compare("programassign") == 0)
+	else if (screenName.compare("program-assign") == 0)
 	{
 		screen = make_shared<PgmAssignScreen>(layerIndex);
 	}
@@ -567,6 +577,46 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	else if (screenName.compare("edit-sound") == 0)
 	{
 		screen = make_shared<EditSoundScreen>(layerIndex);
+	}
+	else if (screenName.compare("assignment-view") == 0)
+	{
+		screen = make_shared<AssignmentViewScreen>(layerIndex);
+	}
+	else if (screenName.compare("auto-chromatic-assignment") == 0)
+	{
+		screen = make_shared<AutoChromaticAssignmentScreen>(layerIndex);
+	}
+	else if (screenName.compare("copy-note-parameters") == 0)
+	{
+		screen = make_shared<CopyNoteParametersScreen>(layerIndex);
+	}
+	else if (screenName.compare("keep-or-retry") == 0)
+	{
+		screen = make_shared<KeepOrRetryScreen>(layerIndex);
+	}
+	else if (screenName.compare("mute-assign") == 0)
+	{
+		screen = make_shared<MuteAssignScreen>(layerIndex);
+	}
+	else if (screenName.compare("program") == 0)
+	{
+		screen = make_shared<ProgramScreen>(layerIndex);
+	}
+	else if (screenName.compare("velocity-modulation") == 0)
+	{
+		screen = make_shared<VelocityModulationScreen>(layerIndex);
+	}
+	else if (screenName.compare("velo-env-filter") == 0)
+	{
+		screen = make_shared<VeloEnvFilterScreen>(layerIndex);
+	}
+	else if (screenName.compare("velo-pitch") == 0)
+	{
+		screen = make_shared<VeloPitchScreen>(layerIndex);
+	}
+	else if (screenName.compare("initpadassign") == 0)
+	{
+		screen = make_shared<InitPadAssignScreen>(layerIndex);
 	}
 
 	if (screen)

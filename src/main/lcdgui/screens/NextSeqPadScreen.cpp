@@ -83,7 +83,6 @@ int NextSeqPadScreen::bankOffset()
 
 void NextSeqPadScreen::displayBank()
 {
-	auto letters = vector<string>{ "A", "B", "C", "D" };
 	findLabel("bank").lock()->setText(letters[mpc.getBank()]);
 }
 

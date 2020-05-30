@@ -1,8 +1,7 @@
-#include <lcdgui/screens/window/TimeDisplayScreen.hpp>
-
-#include <lang/StrUtil.hpp>
+#include "TimeDisplayScreen.hpp"
 
 using namespace mpc::lcdgui::screens::window;
+using namespace moduru::lang;
 using namespace std;
 
 TimeDisplayScreen::TimeDisplayScreen(const int& layer)
@@ -58,11 +57,11 @@ void TimeDisplayScreen::displayDisplayStyle()
 
 void TimeDisplayScreen::displayStartTime()
 {
-	findField("starttime").lock()->setText(moduru::lang::StrUtil::padLeft(to_string(startTime), "0", 2));
-	findField("h").lock()->setText(moduru::lang::StrUtil::padLeft(to_string(h), "0", 2));
-	findField("m").lock()->setText(moduru::lang::StrUtil::padLeft(to_string(m), "0", 2));
-	findField("s").lock()->setText(moduru::lang::StrUtil::padLeft(to_string(s), "0", 2));
-	findField("f").lock()->setText(moduru::lang::StrUtil::padLeft(to_string(f), "0", 2));
+	findField("starttime").lock()->setText(StrUtil::padLeft(to_string(startTime), "0", 2));
+	findField("h").lock()->setText(StrUtil::padLeft(to_string(h), "0", 2));
+	findField("m").lock()->setText(StrUtil::padLeft(to_string(m), "0", 2));
+	findField("s").lock()->setText(StrUtil::padLeft(to_string(s), "0", 2));
+	findField("f").lock()->setText(StrUtil::padLeft(to_string(f), "0", 2));
 }
 
 void TimeDisplayScreen::displayFrameRate()

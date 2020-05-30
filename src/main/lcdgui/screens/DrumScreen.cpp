@@ -29,7 +29,7 @@ void DrumScreen::function(int f)
 	switch (f)
 	{
     case int (0):
-        ls.lock()->openScreen("programassign");
+        ls.lock()->openScreen("program-assign");
         break;
     case 1:
         ls.lock()->openScreen("programparams");

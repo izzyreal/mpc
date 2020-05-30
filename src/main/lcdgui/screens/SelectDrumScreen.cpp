@@ -25,7 +25,7 @@ void SelectDrumScreen::function(int i)
 	drumScreen->setDrum(i);
 
 	auto previousScreenName = ls.lock()->getPreviousScreenName();
-	auto name = string("programassign");
+	auto name = string("program-assign");
 
 	if (previousScreenName.compare("programparams") == 0 || previousScreenName.compare("drum") == 0 || previousScreenName.compare("purge") == 0)
 	{

@@ -11,15 +11,6 @@
 #include <controls/sampler/dialog/DeleteAllProgramsControls.hpp>
 #include <controls/sampler/dialog/DeleteAllSoundControls.hpp>
 #include <controls/sampler/dialog/DeleteProgramControls.hpp>
-#include <controls/sampler/window/AssignmentViewControls.hpp>
-#include <controls/sampler/window/AutoChromaticAssignmentControls.hpp>
-#include <controls/sampler/window/CopyNoteParametersControls.hpp>
-#include <controls/sampler/window/KeepOrRetryControls.hpp>
-#include <controls/sampler/window/MuteAssignControls.hpp>
-#include <controls/sampler/window/ProgramControls.hpp>
-#include <controls/sampler/window/VeloEnvFilterControls.hpp>
-#include <controls/sampler/window/VeloPitchControls.hpp>
-#include <controls/sampler/window/VelocityModulationControls.hpp>
 
 #include <controls/disk/FormatControls.hpp>
 #include <controls/disk/LoadControls.hpp>
@@ -72,16 +63,6 @@ Controls::Controls()
 	pressedPadVelos = std::vector<int>(16);
 
 	controls["release"] = new GlobalReleaseControls();
-
-	controls["keeporretry"] = new sampler::window::KeepOrRetryControls();
-	controls["assignmentview"] = new sampler::window::AssignmentViewControls();
-	controls["program"] = new sampler::window::ProgramControls();
-	controls["copynoteparameters"] = new sampler::window::CopyNoteParametersControls();
-	controls["veloenvfilter"] = new sampler::window::VeloEnvFilterControls();
-	controls["muteassign"] = new sampler::window::MuteAssignControls();
-	controls["velopitch"] = new sampler::window::VeloPitchControls();
-	controls["velocitymodulation"] = new sampler::window::VelocityModulationControls();
-	controls["autochromaticassignment"] = new sampler::window::AutoChromaticAssignmentControls();
 
 	controls["createnewprogram"] = new sampler::dialog::CreateNewProgramControls();
 	controls["copyprogram"] = new sampler::dialog::CopyProgramControls();

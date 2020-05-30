@@ -2,8 +2,6 @@
 
 #include <Mpc.hpp>
 
-#include <controls/Controls.hpp>
-
 #include <ui/Uis.hpp>
 
 #include <hardware/Hardware.hpp>
@@ -11,10 +9,6 @@
 #include <hardware/HwSlider.hpp>
 #include <hardware/HwPad.hpp>
 #include <hardware/TopPanel.hpp>
-
-#include <sequencer/Sequencer.hpp>
-#include <sampler/Sampler.hpp>
-#include <sampler/Program.hpp>
 
 #include <Paths.hpp>
 

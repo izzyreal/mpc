@@ -39,7 +39,6 @@ namespace mpc {
 				{
 
 				private:
-					std::vector<std::string> letters{};
 					
 					std::weak_ptr<mpc::sampler::Sampler> sampler{};
 					ctoot::mpc::MpcSoundPlayerChannel* mpcSoundPlayerChannel{ nullptr };
@@ -94,42 +93,15 @@ namespace mpc {
 					std::weak_ptr<mpc::lcdgui::Field> assignToNoteField{};
 
 				private:
-					void displayNameForNewSound();
-					void displayAssignToPad();
-					void displaySource();
-					void displayTune();
-					void displayVeloPitch();
-					void displayAttack();
-					void displayDecay();
-					void displayAmount();
-					void displayVeloFreq();
-					void displayNote();
-					void displayVeloAttack();
-					void displayVeloStart();
-					void displayVeloLevel();
-					void displayVelo();
-					void displayProg0();
-					void displayNote0();
-					void displayProg1();
-					void displayNote1();
+					void displayNewName();
 
 				public:
 					void update(moduru::observer::Observable* o, nonstd::any arg) override;
 
 				private:
-					void displayOriginalKey();
-					void displayAutoChromAssSnd();
-					void displayAssignmentView();
-					void displayInfo0();
-					void displayInfo1();
-					void displayInfo2();
-					void displayPad(int i);
 					void displayPgm0();
 					void displayPgm1();
-					void displayNewName();
 					void displayPgm();
-					void displayProgramName();
-					void displayMidiProgramChange();
 
 				public:
 					SamplerWindowObserver();

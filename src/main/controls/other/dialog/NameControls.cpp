@@ -8,6 +8,7 @@
 #include <lcdgui/screens/window/MidiOutputScreen.hpp>
 #include <lcdgui/screens/window/MidiOutputScreen.hpp>
 #include <lcdgui/screens/window/EditSoundScreen.hpp>
+#include <lcdgui/screens/window/AutoChromaticAssignmentScreen.hpp>
 #include <lcdgui/screens/dialog/CopySoundScreen.hpp>
 #include <lcdgui/screens/dialog/ResampleScreen.hpp>
 #include <lcdgui/screens/dialog/StereoToMonoScreen.hpp>
@@ -222,10 +223,11 @@ void NameControls::saveName()
 	}
 	else if (paramToRename.compare("autochrom") == 0)
 	{
-		uis->getSamplerWindowGui()->setNewName(nameGui->getName());
+		auto autoChromaticAssignmentScreen = dynamic_pointer_cast<AutoChromaticAssignmentScreen>(Screens::getScreenComponent("auto-chromatic-assignment"));
+		autoChromaticAssignmentScreen->newName = nameGui->getName();
 		nameGui->setNameBeingEdited(false);
 		lLs->setLastFocus("name", "0");
-		lLs->openScreen("autochromaticassignment");
+		lLs->openScreen("auto-chromatic-assignment");
 		lLs->setPreviousScreenName(mpc.getPreviousSamplerScreenName());
 		return;
 	}
@@ -297,12 +299,12 @@ void NameControls::saveName()
 		lLs->setLastFocus("name", "0");
 		lLs->openScreen("saveapsfile");
 	}
-	else if (prevScreen.compare("keeporretry") == 0)
+	else if (prevScreen.compare("keep-or-retry") == 0)
 	{
 		dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getPreviewSound().lock())->setName(nameGui->getName());
 		nameGui->setNameBeingEdited(false);
 		lLs->setLastFocus("name", "0");
-		lLs->openScreen("keeporretry");
+		lLs->openScreen("keep-or-retry");
 	}
 	else if (prevScreen.compare("track") == 0
 		) {

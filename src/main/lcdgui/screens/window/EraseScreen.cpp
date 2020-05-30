@@ -1,18 +1,11 @@
 #include "EraseScreen.hpp"
 
-#include <ui/Uis.hpp>
-
-#include <lcdgui/LayeredScreen.hpp>
-#include <lcdgui/Label.hpp>
-
 #include <sequencer/Event.hpp>
 #include <sequencer/Sequence.hpp>
 #include <sequencer/Track.hpp>
 #include <sequencer/NoteEvent.hpp>
 #include <sequencer/Sequencer.hpp>
 #include <sequencer/SeqUtil.hpp>
-
-#include <lang/StrUtil.hpp>
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
@@ -26,8 +19,6 @@ EraseScreen::EraseScreen(const int& layer)
 
 void EraseScreen::open()
 {
-	mpc.addObserver(this);
-
 	auto seq = sequencer.lock()->getActiveSequence().lock();
 
 	setTime0(0);
@@ -38,6 +29,8 @@ void EraseScreen::open()
 	displayTime();
 	displayTrack();
 	displayType();
+
+	mpc.addObserver(this);
 }
 
 void EraseScreen::close()

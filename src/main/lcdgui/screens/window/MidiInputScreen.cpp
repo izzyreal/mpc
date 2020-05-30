@@ -1,7 +1,5 @@
 #include <lcdgui/screens/window/MidiInputScreen.hpp>
 
-#include <lcdgui/LayeredScreen.hpp>
-
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
@@ -23,6 +21,7 @@ void MidiInputScreen::open()
 void MidiInputScreen::function(int i)
 {
 	BaseControls::function(i);
+
 	switch (i)
 	{
 	case 1:
