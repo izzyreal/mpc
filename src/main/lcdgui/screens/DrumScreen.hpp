@@ -3,8 +3,13 @@
 
 #include <controls/BaseSamplerControls.hpp>
 
-namespace mpc::lcdgui::screens {
+namespace mpc::lcdgui::screens
+{
+	class MixerScreen;
+}
 
+namespace mpc::lcdgui::screens
+{
 	class DrumScreen
 		: public mpc::lcdgui::ScreenComponent, public mpc::controls::BaseSamplerControls
 	{
@@ -16,9 +21,6 @@ namespace mpc::lcdgui::screens {
 		DrumScreen(const int layerIndex);
 		void open() override;
 
-		void setDrum(int i);
-		int getDrum();
-
 	private:
 		void displayCurrentVal();
 		void displayDrum();
@@ -27,12 +29,21 @@ namespace mpc::lcdgui::screens {
 		void displayPgmChange();
 		void displayMidiVolume();
 
+		void setDrum(int i);
+
 		bool padToInternalSound = true;
 		int drum = 0;
 
 	public:
 		void setPadToIntSound(bool b);
 		bool isPadToIntSound();
+
+	private:
+		friend class MixerScreen;
+		friend class MixerSetupScreen;
+		friend class SelectDrumScreen;
+		friend class SelectMixerDrumScreen;
+		friend class mpc::controls::BaseSamplerControls;
 
 	};
 }

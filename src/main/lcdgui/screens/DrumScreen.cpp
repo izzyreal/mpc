@@ -129,8 +129,3 @@ void DrumScreen::setDrum(int i)
 	displayMidiVolume();
 	displayCurrentVal();
 }
-
-int DrumScreen::getDrum()
-{
-	return drum;
-}

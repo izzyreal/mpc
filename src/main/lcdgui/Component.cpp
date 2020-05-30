@@ -311,6 +311,10 @@ bool Component::IsDirty()
 }
 
 MRECT Component::getRect() {
+	if (x < 0 || x > 247 || y < 0 || y > 59 || x + w < 0 || x + w > 248 || y + h < 0 || y + h > 60)
+	{
+		printf("");
+	}
 	return MRECT(x, y, x + w, y + h);
 }
 
@@ -366,4 +370,15 @@ weak_ptr<ScreenComponent> Component::findScreenComponent()
 	}
 	
 	return {};
+}
+
+void Component::deleteChildren(const string& name)
+{
+	for (int i = children.size() - 1; i >= 0; i--)
+	{
+		if (children[i]->getName().compare(name) == 0)
+		{
+			children.erase(begin(children) + i);
+		}
+	}
 }

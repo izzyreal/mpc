@@ -47,6 +47,7 @@ namespace mpc::lcdgui {
 		std::weak_ptr<ScreenComponent> findScreenComponent();
 		MRECT getRect();
 		std::vector<std::weak_ptr<Component>> findHiddenChildren();
+		void deleteChildren(const std::string& name);
 
 	public:
 		virtual void Hide(bool b);

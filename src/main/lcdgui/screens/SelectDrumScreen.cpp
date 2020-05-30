@@ -21,8 +21,9 @@ void SelectDrumScreen::function(int i)
 	{
 		return;
 	}
+
 	auto drumScreen = dynamic_pointer_cast<DrumScreen>(Screens::getScreenComponent("drum"));
-	drumScreen->setDrum(i);
+	drumScreen->drum = i;
 
 	auto previousScreenName = ls.lock()->getPreviousScreenName();
 	auto name = string("program-assign");

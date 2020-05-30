@@ -20,10 +20,6 @@ namespace mpc::lcdgui {
 	class TwoDots;
 	class HorizontalBar;
 	class Underline;
-	class VerticalBar;
-	class MixerFaderBackground;
-	class MixerTopBackground;
-	class Knob;
 	class Popup;
 	class Wave;
 	class Effect;
@@ -90,10 +86,6 @@ namespace mpc::lcdgui {
 		std::vector<std::shared_ptr<SelectedEventBar>> selectedEventBarsStepEditor;
 		std::vector<std::shared_ptr<HorizontalBar>> horizontalBarsTempoChangeEditor;
 		std::shared_ptr<Underline> underline;
-		std::vector<std::shared_ptr<VerticalBar>> verticalBarsMixer;
-		std::vector<std::shared_ptr<MixerFaderBackground>> mixerFaderBackgrounds;
-		std::vector<std::shared_ptr<MixerTopBackground>> mixerTopBackgrounds;
-		std::vector<std::shared_ptr<Knob>> knobs;
 		std::shared_ptr<Wave> fineWave;
 		std::shared_ptr<Wave> wave;
 		std::vector<std::shared_ptr<Effect>> effects;
@@ -126,12 +118,8 @@ namespace mpc::lcdgui {
 		std::string getPreviousViewModeText();
 		std::vector<std::weak_ptr<HorizontalBar>> getHorizontalBarsTempoChangeEditor();
 		std::vector<std::weak_ptr<HorizontalBar>>getHorizontalBarsStepEditor();
-		std::vector<std::weak_ptr<VerticalBar>> getVerticalBarsMixer();
 		std::vector<std::weak_ptr<SelectedEventBar>> getSelectedEventBarsStepEditor();
 		FunctionKeys* getFunctionKeys();
-		std::vector<std::weak_ptr<Knob>> getKnobs();
-		std::vector<std::weak_ptr<MixerFaderBackground>> getMixerFaderBackgrounds();
-		std::vector<std::weak_ptr<MixerTopBackground>> getMixerTopBackgrounds();
 		void setFunctionKeysArrangement(int arrangementIndex);
 		std::weak_ptr<Underline> getUnderline();
 		std::weak_ptr<TwoDots> getTwoDots();

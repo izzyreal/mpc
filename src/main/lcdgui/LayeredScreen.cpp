@@ -19,10 +19,6 @@
 #include <lcdgui/Label.hpp>
 #include <lcdgui/Underline.hpp>
 #include <lcdgui/HorizontalBar.hpp>
-#include <lcdgui/VerticalBar.hpp>
-#include <lcdgui/MixerFaderBackground.hpp>
-#include <lcdgui/MixerTopBackground.hpp>
-#include <lcdgui/Knob.hpp>
 #include <lcdgui/TwoDots.hpp>
 #include <lcdgui/Wave.hpp>
 #include <lcdgui/Popup.hpp>
@@ -92,12 +88,6 @@ LayeredScreen::LayeredScreen()
 	horizontalBarsStepEditor = vector<shared_ptr<HorizontalBar>>(4);
 	selectedEventBarsStepEditor = vector<shared_ptr<SelectedEventBar>>(4);
 
-	verticalBarsMixer = vector<shared_ptr<VerticalBar>>(16);
-	mixerFaderBackgrounds = vector<shared_ptr<MixerFaderBackground>>(16);
-	mixerTopBackgrounds = vector<shared_ptr<MixerTopBackground>>(16);
-	knobs = vector<shared_ptr<Knob>>(16);
-
-
 	underline = make_shared<Underline>();
 	envGraph = make_shared<EnvGraph>();
 
@@ -127,43 +117,6 @@ LayeredScreen::LayeredScreen()
 		horizontalBarsStepEditor[i] = make_shared<HorizontalBar>(rect, 0);
 		horizontalBarsStepEditor[i]->Hide(true);
 		nonTextComps.push_back(horizontalBarsStepEditor[i]);
-	}
-
-	for (int i = 0; i < 16; i++) {
-		w = 13;
-		h = 34;
-		x = 4 + (i * 15);
-		y = 15;
-		rect = MRECT(x, y, x + w, y + h);
-		mixerFaderBackgrounds[i] = make_shared<MixerFaderBackground>(rect);
-		mixerFaderBackgrounds[i]->Hide(true);
-		nonTextComps.push_back(mixerFaderBackgrounds[i]);
-
-		w = 13;
-		h = 12;
-		x = 4 + (i * 15);
-		y = 0;
-		rect = MRECT(x, y, x + w, y + h);
-		mixerTopBackgrounds[i] = make_shared<MixerTopBackground>(rect);
-		mixerTopBackgrounds[i]->Hide(true);
-		nonTextComps.push_back(mixerTopBackgrounds[i]);
-
-		w = 5;
-		h = 37;
-		x = 12 + (i * 15);
-		y = 16;
-		rect = MRECT(x, y, x + w, y + h);
-		verticalBarsMixer[i] = make_shared<VerticalBar>(rect);
-		verticalBarsMixer[i]->Hide(true);
-		nonTextComps.push_back(verticalBarsMixer[i]);
-
-		w = 13;
-		h = 13;
-		x = 5 + (i * 15);
-		y = 1;
-		rect = MRECT(x, y, x + w, y + h);
-		knobs[i] = make_shared<Knob>(rect);
-		knobs[i]->Hide(true);
 	}
 
 	fineWave = make_shared <Wave>();
@@ -522,14 +475,6 @@ vector<weak_ptr<HorizontalBar>> LayeredScreen::getHorizontalBarsStepEditor()
 	return res;
 }
 
-vector<weak_ptr<VerticalBar>> LayeredScreen::getVerticalBarsMixer()
-{
-	auto res = vector<weak_ptr<VerticalBar>>();
-	for (auto& b : verticalBarsMixer)
-		res.push_back(b);
-	return res;
-}
-
 vector<weak_ptr<SelectedEventBar>> LayeredScreen::getSelectedEventBarsStepEditor()
 {
 	auto res = vector<weak_ptr<SelectedEventBar>>();
@@ -541,30 +486,6 @@ vector<weak_ptr<SelectedEventBar>> LayeredScreen::getSelectedEventBarsStepEditor
 FunctionKeys* LayeredScreen::getFunctionKeys()
 {
 	return getFocusedLayer().lock()->getFunctionKeys();
-}
-
-vector<weak_ptr<Knob>> LayeredScreen::getKnobs()
-{
-	auto res = vector<weak_ptr<Knob>>();
-	for (auto& b : knobs)
-		res.push_back(b);
-	return res;
-}
-
-vector<weak_ptr<MixerFaderBackground>> LayeredScreen::getMixerFaderBackgrounds()
-{
-	auto res = vector<weak_ptr<MixerFaderBackground>>();
-	for (auto& b : mixerFaderBackgrounds)
-		res.push_back(b);
-	return res;
-}
-
-vector<weak_ptr<MixerTopBackground>> LayeredScreen::getMixerTopBackgrounds()
-{
-	auto res = vector<weak_ptr<MixerTopBackground>>();
-	for (auto& b : mixerTopBackgrounds)
-		res.push_back(b);
-	return res;
 }
 
 void LayeredScreen::setFunctionKeysArrangement(int arrangementIndex)
