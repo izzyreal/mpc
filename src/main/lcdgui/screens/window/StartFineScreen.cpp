@@ -1,6 +1,5 @@
 #include "StartFineScreen.hpp"
 
-#include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/TrimScreen.hpp>
 
 using namespace mpc::lcdgui;

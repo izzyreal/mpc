@@ -1,15 +1,6 @@
 #include "TrimScreen.hpp"
 
-#include <Mpc.hpp>
-#include <controls/Controls.hpp>
-
 #include <lcdgui/screens/window/EditSoundScreen.hpp>
-
-#include <sampler/Sampler.hpp>
-#include <sampler/Sound.hpp>
-
-#include <stdint.h>
-#include <limits.h>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;

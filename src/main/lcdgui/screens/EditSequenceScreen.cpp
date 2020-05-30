@@ -4,10 +4,8 @@
 #include <lcdgui/screens/BarCopyScreen.hpp>
 
 #include <sequencer/Event.hpp>
-#include <sequencer/Sequence.hpp>
 #include <sequencer/Track.hpp>
 #include <sequencer/NoteEvent.hpp>
-#include <sequencer/Sequencer.hpp>
 #include <sequencer/TimeSignature.hpp>
 #include <sequencer/SeqUtil.hpp>
 

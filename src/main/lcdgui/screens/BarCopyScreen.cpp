@@ -1,9 +1,7 @@
 #include "BarCopyScreen.hpp"
 
 #include <sequencer/Event.hpp>
-#include <sequencer/Sequence.hpp>
 #include <sequencer/Track.hpp>
-#include <sequencer/Sequencer.hpp>
 
 using namespace mpc::lcdgui::screens;
 using namespace std;

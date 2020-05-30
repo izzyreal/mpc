@@ -1,14 +1,8 @@
 #include "LoopScreen.hpp"
 
-#include <Mpc.hpp>
-#include <controls/Controls.hpp>
-
 #include <lcdgui/screens/LoopScreen.hpp>
 #include <lcdgui/screens/TrimScreen.hpp>
 #include <lcdgui/screens/window/EditSoundScreen.hpp>
-
-#include <sampler/Sampler.hpp>
-#include <sampler/Sound.hpp>
 
 #include <stdint.h>
 #include <limits.h>

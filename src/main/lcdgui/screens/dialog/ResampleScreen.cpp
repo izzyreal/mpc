@@ -1,13 +1,6 @@
 #include "ResampleScreen.hpp"
 
-#include <ui/NameGui.hpp>
-#include <lcdgui/Field.hpp>
-#include <sampler/Sampler.hpp>
-#include <sampler/Sound.hpp>
-
 #include <thirdp/libsamplerate/samplerate.h>
-
-#include <cmath>
 
 using namespace mpc::lcdgui::screens::dialog;
 using namespace std;

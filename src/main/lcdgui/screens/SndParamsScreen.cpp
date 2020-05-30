@@ -1,11 +1,6 @@
-#include <lcdgui/screens/SndParamsScreen.hpp>
+#include "SndParamsScreen.hpp"
 
-#include <Mpc.hpp>
 #include <Util.hpp>
-#include <controls/Controls.hpp>
-
-#include <sampler/Sampler.hpp>
-#include <sampler/Sound.hpp>
 
 #include <lcdgui/screens/window/EditSoundScreen.hpp>
 

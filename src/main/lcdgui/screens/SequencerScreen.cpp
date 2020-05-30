@@ -1,13 +1,8 @@
 #include "SequencerScreen.hpp"
 
-#include <Mpc.hpp>
-#include <sequencer/Sequencer.hpp>
-#include <sequencer/Sequence.hpp>
 #include <sequencer/Track.hpp>
 #include <sequencer/TempoChangeEvent.hpp>
 #include <sequencer/NoteEvent.hpp>
-
-#include <sampler/Sampler.hpp>
 
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <lcdgui/screens/EditSequenceScreen.hpp>

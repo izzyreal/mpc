@@ -1,6 +1,8 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
+#include <controls/BaseSamplerControls.hpp>
+
 namespace mpc::controls::other::dialog
 {
 	class NameControls;
@@ -9,7 +11,7 @@ namespace mpc::controls::other::dialog
 namespace mpc::lcdgui::screens::window
 {
 	class AutoChromaticAssignmentScreen
-		: public mpc::lcdgui::ScreenComponent
+		: public mpc::lcdgui::ScreenComponent, public mpc::controls::BaseSamplerControls
 	{
 
 	public:

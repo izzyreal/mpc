@@ -1,11 +1,7 @@
 #include "PgmParamsScreen.hpp"
 
-#include <Mpc.hpp>
-
 #include <sampler/NoteParameters.hpp>
 #include <sampler/Pad.hpp>
-#include <sampler/Sampler.hpp>
-#include <sampler/Sound.hpp>
 
 #include <mpc/MpcSoundPlayerChannel.hpp>
 
@@ -73,10 +69,9 @@ void PgmParamsScreen::function(int i)
 void PgmParamsScreen::turnWheel(int i)
 {
     init();
-    
-	auto lastPad = sampler.lock()->getLastPad(program.lock().get());
-	auto lastNoteParameters = dynamic_cast<mpc::sampler::NoteParameters*>(program.lock()->getNoteParameters(lastPad->getNote()));
-	
+
+	auto lastNoteParameters = sampler.lock()->getLastNp(program.lock().get());
+
 	if (param.compare("tune") == 0)
 	{
 		lastNoteParameters->setTune(lastNoteParameters->getTune() + i);

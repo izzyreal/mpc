@@ -1,10 +1,12 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
+#include <controls/BaseSamplerControls.hpp>
+
 namespace mpc::lcdgui::screens {
 
 	class SelectDrumScreen
-		: public mpc::lcdgui::ScreenComponent
+		: public mpc::lcdgui::ScreenComponent, public mpc::controls::BaseSamplerControls
 	{
 
 	public:

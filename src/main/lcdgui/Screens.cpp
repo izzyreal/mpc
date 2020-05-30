@@ -79,7 +79,6 @@
 #include <lcdgui/screens/window/VeloEnvFilterScreen.hpp>
 #include <lcdgui/screens/window/VeloPitchScreen.hpp>
 
-
 #include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
 #include <lcdgui/screens/dialog/MidiMonitorScreen.hpp>
 #include <lcdgui/screens/dialog/CopySequenceScreen.hpp>
@@ -94,6 +93,12 @@
 #include <lcdgui/screens/dialog/MonoToStereoScreen.hpp>
 #include <lcdgui/screens/dialog/ResampleScreen.hpp>
 #include <lcdgui/screens/dialog/StereoToMonoScreen.hpp>
+#include <lcdgui/screens/dialog/CreateNewProgramScreen.hpp>
+#include <lcdgui/screens/dialog/CopyProgramScreen.hpp>
+#include <lcdgui/screens/dialog/DeleteAllProgramsScreen.hpp>
+#include <lcdgui/screens/dialog/DeleteAllSoundScreen.hpp>
+#include <lcdgui/screens/dialog/DeleteProgramScreen.hpp>
+
 
 #include <file/FileUtil.hpp>
 
@@ -614,9 +619,29 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	{
 		screen = make_shared<VeloPitchScreen>(layerIndex);
 	}
-	else if (screenName.compare("initpadassign") == 0)
+	else if (screenName.compare("init-pad-assign") == 0)
 	{
 		screen = make_shared<InitPadAssignScreen>(layerIndex);
+	}
+	else if (screenName.compare("create-new-program") == 0)
+	{
+		screen = make_shared<CreateNewProgramScreen>(layerIndex);
+	}
+	else if (screenName.compare("copy-program") == 0)
+	{
+		screen = make_shared<CopyProgramScreen>(layerIndex);
+	}
+	else if (screenName.compare("delete-all-programs") == 0)
+	{
+		screen = make_shared<DeleteAllProgramsScreen>(layerIndex);
+	}
+	else if (screenName.compare("delete-all-sound") == 0)
+	{
+		screen = make_shared<DeleteAllSoundScreen>(layerIndex);
+	}
+	else if (screenName.compare("delete-program") == 0)
+	{
+		screen = make_shared<DeleteProgramScreen>(layerIndex);
 	}
 
 	if (screen)

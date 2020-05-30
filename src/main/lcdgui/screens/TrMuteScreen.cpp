@@ -1,9 +1,6 @@
 #include "TrMuteScreen.hpp"
 
-#include <controls/Controls.hpp>
-
 #include <sequencer/Track.hpp>
-#include <sequencer/Sequencer.hpp>
 
 using namespace moduru::lang;
 using namespace mpc::lcdgui::screens;

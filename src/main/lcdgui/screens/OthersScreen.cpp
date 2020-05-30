@@ -1,8 +1,5 @@
 #include "OthersScreen.hpp"
 
-#include <Mpc.hpp>
-#include <controls/Controls.hpp>
-
 using namespace mpc::lcdgui;
 using namespace std;
 

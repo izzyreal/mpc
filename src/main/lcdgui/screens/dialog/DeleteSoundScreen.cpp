@@ -1,7 +1,5 @@
 #include "DeleteSoundScreen.hpp"
 
-#include <sampler/Sampler.hpp>
-
 using namespace mpc::lcdgui::screens::dialog;
 using namespace std;
 
@@ -22,7 +20,7 @@ void DeleteSoundScreen::function(int i)
 	switch (i)
 	{
     case 2:
-        ls.lock()->openScreen("deleteallsound");
+        ls.lock()->openScreen("delete-all-sound");
         break;
     case int (3):
         ls.lock()->openScreen("sound");

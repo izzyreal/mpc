@@ -1,7 +1,5 @@
 #include "NextSeqPadScreen.hpp"
 
-#include <sequencer/Sequencer.hpp>
-
 using namespace mpc::lcdgui::screens;
 using namespace moduru::lang;
 using namespace std;

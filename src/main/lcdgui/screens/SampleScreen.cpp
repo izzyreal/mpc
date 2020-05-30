@@ -1,12 +1,7 @@
 #include "SampleScreen.hpp"
 
-#include <Mpc.hpp>
-#include <controls/Controls.hpp>
-
 #include <audiomidi/AudioMidiServices.hpp>
 #include <audiomidi/SoundRecorder.hpp>
-
-#include <sampler/Sampler.hpp>
 
 using namespace mpc::lcdgui::screens;
 using namespace std;

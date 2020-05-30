@@ -1,13 +1,8 @@
 #include "PgmAssignScreen.hpp"
 
-#include <Mpc.hpp>
-#include <ui/sampler/window/SamplerWindowGui.hpp>
-
 #include <sampler/NoteParameters.hpp>
 #include <sampler/Pad.hpp>
 #include <sampler/Program.hpp>
-#include <sampler/Sampler.hpp>
-#include <sampler/Sound.hpp>
 
 #include <mpc/MpcSoundPlayerChannel.hpp>
 #include <mpc/MpcStereoMixerChannel.hpp>
@@ -217,7 +212,7 @@ void PgmAssignScreen::openWindow()
 	}
 	else if (param.compare("pad-assign") == 0)
 	{
-		ls.lock()->openScreen("initpadassign");
+		ls.lock()->openScreen("init-pad-assign");
 	}
 	else if (param.compare("note") == 0)
 	{

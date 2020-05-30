@@ -1,4 +1,4 @@
-#include <lcdgui/screens/PurgeScreen.hpp>
+#include "PurgeScreen.hpp"
 
 using namespace mpc::lcdgui::screens;
 using namespace std;

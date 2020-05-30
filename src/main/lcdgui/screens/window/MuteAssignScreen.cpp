@@ -28,20 +28,19 @@ void MuteAssignScreen::close()
 void MuteAssignScreen::turnWheel(int i)
 {
     init();
-    
+	auto lastNoteParameters = sampler.lock()->getLastNp(program.lock().get());
+
 	if (param.compare("note") == 0)
 	{
 		mpc.setPadAndNote(mpc.getPad(), mpc.getNote() + i);
 	}
 	else if (param.compare("note0") == 0)
 	{
-		auto lastNoteParameters = sampler.lock()->getLastNp(program.lock().get());
 		lastNoteParameters->setMuteAssignA(lastNoteParameters->getMuteAssignA() + i);
 		displayNote0();
 	}
 	else if (param.compare("note1") == 0)
 	{
-		auto lastNoteParameters = sampler.lock()->getLastNp(program.lock().get());
 		lastNoteParameters->setMuteAssignB(lastNoteParameters->getMuteAssignB() + i);
 		displayNote1();
 	}

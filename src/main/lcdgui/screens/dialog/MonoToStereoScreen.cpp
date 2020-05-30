@@ -1,8 +1,5 @@
 #include "MonoToStereoScreen.hpp"
 
-#include <sampler/Sampler.hpp>
-#include <sampler/Sound.hpp>
-
 using namespace mpc::lcdgui::screens::dialog;
 using namespace moduru::lang;
 using namespace std;

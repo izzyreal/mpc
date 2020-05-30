@@ -1,8 +1,5 @@
 #include "ZoneScreen.hpp"
 
-#include <Mpc.hpp>
-#include <controls/Controls.hpp>
-
 #include <lcdgui/screens/TrimScreen.hpp>
 #include <lcdgui/screens/window/NumberOfZonesScreen.hpp>
 #include <lcdgui/screens/window/EditSoundScreen.hpp>

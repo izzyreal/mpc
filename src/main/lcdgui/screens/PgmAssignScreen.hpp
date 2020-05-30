@@ -1,6 +1,8 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
+#include <controls/BaseSamplerControls.hpp>
+
 namespace mpc::sampler
 {
 	class Pad;
@@ -14,7 +16,7 @@ namespace mpc::file::aps
 namespace mpc::lcdgui::screens {
 
 	class PgmAssignScreen
-		: public mpc::lcdgui::ScreenComponent
+		: public mpc::lcdgui::ScreenComponent, public mpc::controls::BaseSamplerControls
 	{
 
 	public:

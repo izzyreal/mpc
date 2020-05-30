@@ -4,7 +4,7 @@ using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
 InitPadAssignScreen::InitPadAssignScreen(const int layerIndex) 
-	: ScreenComponent("initpadassign", layerIndex)
+	: ScreenComponent("init-pad-assign", layerIndex)
 {
 }
 
@@ -16,7 +16,7 @@ void InitPadAssignScreen::open()
 void InitPadAssignScreen::turnWheel(int i)
 {
     init();
-	if (param.compare("initpadassign") == 0)
+	if (param.compare("init-pad-assign") == 0)
 	{
 		initPadAssignIsMaster = i > 0;
 		displayInitPadAssign();
@@ -45,5 +45,5 @@ void InitPadAssignScreen::function(int i)
 
 void InitPadAssignScreen::displayInitPadAssign()
 {
-	findField("initpadassign").lock()->setText(initPadAssignIsMaster ? "MASTER" : "PROGRAM");
+	findField("init-pad-assign").lock()->setText(initPadAssignIsMaster ? "MASTER" : "PROGRAM");
 }

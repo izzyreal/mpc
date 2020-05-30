@@ -5,8 +5,6 @@
 
 #include <sequencer/Track.hpp>
 
-#include <ui/NameGui.hpp>
-
 #include <lcdgui/screens/ZoneScreen.hpp>
 
 #include <mpc/MpcSoundPlayerChannel.hpp>

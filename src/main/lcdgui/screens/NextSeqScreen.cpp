@@ -3,7 +3,6 @@
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <lcdgui/screens/SequencerScreen.hpp>
 
-#include <sequencer/Sequencer.hpp>
 #include <sequencer/TempoChangeEvent.hpp>
 
 #include <Util.hpp>

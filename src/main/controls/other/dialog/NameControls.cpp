@@ -12,6 +12,7 @@
 #include <lcdgui/screens/dialog/CopySoundScreen.hpp>
 #include <lcdgui/screens/dialog/ResampleScreen.hpp>
 #include <lcdgui/screens/dialog/StereoToMonoScreen.hpp>
+#include <lcdgui/screens/dialog/CreateNewProgramScreen.hpp>
 
 #include <Util.hpp>
 
@@ -22,7 +23,6 @@
 #include <ui/NameGui.hpp>
 #include <ui/disk/DiskGui.hpp>
 #include <ui/disk/window/DirectoryGui.hpp>
-#include <ui/sampler/window/SamplerWindowGui.hpp>
 #include <ui/vmpc/DirectToDiskRecorderGui.hpp>
 
 #include <sampler/Program.hpp>
@@ -213,9 +213,10 @@ void NameControls::saveName()
 		lLs->openScreen("program");
 		return;
 	}
-	else if (paramToRename.compare("createnewprogram") == 0)
+	else if (paramToRename.compare("create-new-program") == 0)
 	{
-		uis->getSamplerWindowGui()->setNewName(nameGui->getName());
+		auto createNewProgramScreen = dynamic_pointer_cast<CreateNewProgramScreen>(Screens::getScreenComponent("create-new-program"));
+		createNewProgramScreen->newName = nameGui->getName();
 		nameGui->setNameBeingEdited(false);
 		lLs->setLastFocus("name", "0");
 		lLs->openScreen("program");

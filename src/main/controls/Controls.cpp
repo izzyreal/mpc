@@ -6,12 +6,6 @@
 
 #include <controls/GlobalReleaseControls.hpp>
 
-#include <controls/sampler/dialog/CopyProgramControls.hpp>
-#include <controls/sampler/dialog/CreateNewProgramControls.hpp>
-#include <controls/sampler/dialog/DeleteAllProgramsControls.hpp>
-#include <controls/sampler/dialog/DeleteAllSoundControls.hpp>
-#include <controls/sampler/dialog/DeleteProgramControls.hpp>
-
 #include <controls/disk/FormatControls.hpp>
 #include <controls/disk/LoadControls.hpp>
 #include <controls/disk/SaveControls.hpp>
@@ -63,12 +57,6 @@ Controls::Controls()
 	pressedPadVelos = std::vector<int>(16);
 
 	controls["release"] = new GlobalReleaseControls();
-
-	controls["createnewprogram"] = new sampler::dialog::CreateNewProgramControls();
-	controls["copyprogram"] = new sampler::dialog::CopyProgramControls();
-	controls["deleteallprograms"] = new sampler::dialog::DeleteAllProgramsControls();
-	controls["deleteprogram"] = new sampler::dialog::DeleteProgramControls();
-	controls["deleteallsound"] = new sampler::dialog::DeleteAllSoundControls();
 
 	controls["load"] = new disk::LoadControls();
 	controls["save"] = new disk::SaveControls();

@@ -32,7 +32,6 @@
 #include <lcdgui/screens/SampleScreen.hpp>
 
 #include <ui/Uis.hpp>
-#include <ui/sampler/window/SamplerWindowObserver.hpp>
 
 #include <ui/NameObserver.hpp>
 
@@ -54,8 +53,6 @@
 
 #include <file/FileUtil.hpp>
 
-#include <rapidjson/filereadstream.h>
-
 #include <cmath>
 #include <set>
 
@@ -64,8 +61,6 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 
 using namespace mpc::ui::vmpc;
-using namespace mpc::ui::sampler;
-using namespace mpc::ui::sampler::window;
 using namespace mpc::ui::midisync;
 using namespace mpc::ui::misc;
 using namespace mpc::ui::other;
@@ -77,10 +72,6 @@ using namespace moduru::file;
 using namespace rapidjson;
 
 using namespace std;
-
-static vector<string> samplerWindowNames = vector<string>{ "program", "deleteprogram", "deleteallprograms", "createnewprogram",
-"copyprogram", "assignment-view", "copy-note-parameters", "velocity-modulation",
-"velo-env-filter", "velo-pitch", "auto-chromatic-assignment", "keep-or-retry" };
 
 static vector<string> diskNames = vector<string>{ "load", "save", "format", "setup", "device", "loadaprogram",
 "saveaprogram", "loadasound", "saveasound", "cantfindfile", "filealreadyexists", "loadasequence",
@@ -94,8 +85,6 @@ moduru::gui::bmfont LayeredScreen::font = _bmfParser.getLoadedFont();
 LayeredScreen::LayeredScreen() 
 {	
 	root = make_unique<Component>("root");
-
-	pixels = vector<vector<bool>>(248, vector<bool>(60));
 	popup = make_unique<Popup>();
 	popup->Hide(true);
 
@@ -803,10 +792,6 @@ void LayeredScreen::initObserver()
 	else if (csn.compare("deleteallfiles") == 0)
 	{
 		activeObserver = make_unique<DeleteAllFilesObserver>();
-	}
-	else if (checkActiveScreen(&samplerWindowNames, csn))
-	{
-		activeObserver = make_unique<SamplerWindowObserver>();
 	}
 	else if (csn.compare("settings") == 0)
 	{

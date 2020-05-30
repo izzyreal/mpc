@@ -38,15 +38,15 @@ void ProgramScreen::function(int i)
 	switch (i)
 	{
 	case 1:
-		ls.lock()->openScreen("deleteprogram");
+		ls.lock()->openScreen("delete-program");
 		break;
 	case 2:
 	{
-		ls.lock()->openScreen("createnewprogram");
+		ls.lock()->openScreen("create-new-program");
 		break;
 	}
 	case 4:
-		ls.lock()->openScreen("copyprogram");
+		ls.lock()->openScreen("copy-program");
 		break;
 	}
 }

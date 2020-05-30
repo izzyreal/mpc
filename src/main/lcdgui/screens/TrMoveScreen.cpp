@@ -3,9 +3,7 @@
 #include "BarCopyScreen.hpp"
 #include "EditSequenceScreen.hpp"
 
-#include <sequencer/Sequence.hpp>
 #include <sequencer/Track.hpp>
-#include <sequencer/Sequencer.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;

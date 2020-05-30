@@ -1,10 +1,7 @@
 #include "LoopToFineScreen.hpp"
 
-#include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/LoopScreen.hpp>
 #include <lcdgui/screens/TrimScreen.hpp>
-
-#include <mpc/MpcSoundOscillatorControls.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;

@@ -25,7 +25,7 @@ namespace mpc::lcdgui
 {
 
 	class ScreenComponent
-		: public Component, public moduru::observer::Observer, public mpc::controls::BaseControls
+		: public Component, public moduru::observer::Observer, virtual public mpc::controls::BaseControls
 	{
 
 	private:

@@ -1,6 +1,5 @@
 #include "SongScreen.hpp"
 
-#include <sequencer/Sequencer.hpp>
 #include <sequencer/Step.hpp>
 #include <sequencer/Song.hpp>
 

@@ -31,10 +31,6 @@ namespace mpc::ui::disk::window {
 	class DirectoryGui;
 }
 
-namespace mpc::ui::sampler::window {
-	class SamplerWindowGui;
-}
-
 namespace mpc::ui::midisync {
 	class MidiSyncGui;
 }
@@ -46,8 +42,6 @@ namespace mpc::ui {
 
 	private:
 		mpc::ui::NameGui* nameGui = nullptr;
-
-		mpc::ui::sampler::window::SamplerWindowGui* samplerWindowGui = nullptr;
 
 		mpc::ui::disk::DiskGui* diskGui = nullptr;
 		mpc::ui::disk::window::DirectoryGui* directoryGui = nullptr;
@@ -69,7 +63,6 @@ namespace mpc::ui {
 		mpc::ui::disk::DiskGui* getDiskGui();
 		mpc::ui::disk::window::DirectoryGui* getDirectoryGui();
 		mpc::ui::disk::window::DiskWindowGui* getDiskWindowGui();
-		mpc::ui::sampler::window::SamplerWindowGui* getSamplerWindowGui();
 		mpc::ui::NameGui* getNameGui();
 
 		mpc::ui::other::OthersGui* getOthersGui();

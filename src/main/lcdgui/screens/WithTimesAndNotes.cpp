@@ -1,9 +1,5 @@
 #include "WithTimesAndNotes.hpp"
 
-#include <Mpc.hpp>
-
-#include <lcdgui/LayeredScreen.hpp>
-
 #include <sequencer/Sequencer.hpp>
 #include <sequencer/Sequence.hpp>
 #include <sequencer/Track.hpp>

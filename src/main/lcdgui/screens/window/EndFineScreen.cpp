@@ -2,8 +2,6 @@
 
 #include <lcdgui/screens/TrimScreen.hpp>
 
-#include <cmath>
-
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;

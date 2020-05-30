@@ -1,9 +1,6 @@
 #include "StepEditorScreen.hpp"
 
-#include <Mpc.hpp>
 #include <audiomidi/EventHandler.hpp>
-
-#include <controls/Controls.hpp>
 
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <lcdgui/SelectedEventBar.hpp>
@@ -11,13 +8,11 @@
 #include <sequencer/ChannelPressureEvent.hpp>
 #include <sequencer/ControlChangeEvent.hpp>
 #include <sequencer/MixerEvent.hpp>
-#include <sequencer/Sequence.hpp>
 #include <sequencer/Track.hpp>
 #include <sequencer/NoteEvent.hpp>
 #include <sequencer/PitchBendEvent.hpp>
 #include <sequencer/PolyPressureEvent.hpp>
 #include <sequencer/ProgramChangeEvent.hpp>
-#include <sequencer/Sequencer.hpp>
 #include <sequencer/SystemExclusiveEvent.hpp>
 
 using namespace mpc::lcdgui;
