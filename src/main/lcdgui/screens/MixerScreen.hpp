@@ -33,7 +33,6 @@ namespace mpc::lcdgui::screens {
 		const std::vector<std::string> fxPathNames = { "--", "M1", "M2", "R1", "R2" };
 		const std::vector<std::string> stereoNames = { "-", "12", "12", "34", "34", "56", "56", "78", "78" };
 		const std::vector<std::string> monoNames = { "-", "1", "2", "3", "4", "5", "6", "7", "8" };
-		const std::vector<std::string> letters{ "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p" };
 
 	private:
 		int tab = 0;
@@ -41,7 +40,6 @@ namespace mpc::lcdgui::screens {
 		int xPos = 0;
 		int yPos = 0;
 		std::vector<std::weak_ptr<mpc::lcdgui::MixerStrip>> mixerStrips;
-		void initPadNameLabels();
 		void initMixerStrips();
 		void displayMixerStrips();
 		void displayFunctionKeys();

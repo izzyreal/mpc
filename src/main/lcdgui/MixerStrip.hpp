@@ -41,6 +41,7 @@ namespace mpc::lcdgui
 		std::weak_ptr<Knob> findKnob();
 		std::weak_ptr<MixerTopBackground> findMixerTopBackground();
 		std::weak_ptr<MixerFaderBackground> findMixerFaderBackground();
+		const std::vector<std::string> letters{ "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p" };
 
 	public:
 		void setValueA(int i);
@@ -51,7 +52,7 @@ namespace mpc::lcdgui
 		void setValueAString(std::string str);
 
 	public:
-		MixerStrip(int columnIndex, int bank, std::vector<std::weak_ptr<Label>> fields);
+		MixerStrip(int columnIndex, int bank);
 
 	};
 }

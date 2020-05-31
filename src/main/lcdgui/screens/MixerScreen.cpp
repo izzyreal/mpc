@@ -16,7 +16,7 @@ using namespace moduru::lang;
 using namespace std;
 
 MixerScreen::MixerScreen(const int layerIndex) 
-	: ScreenComponent("select-drum", layerIndex)
+	: ScreenComponent("mixer", layerIndex)
 {
 }
 
@@ -24,7 +24,6 @@ void MixerScreen::open()
 {
 	mpc.addObserver(this);
 	
-	initPadNameLabels();
 	initMixerStrips();
 	
 	for (auto& m : mixerStrips)
@@ -43,50 +42,6 @@ void MixerScreen::close()
 	mpc.deleteObserver(this);
 }
 
-void MixerScreen::initPadNameLabels()
-{
-	int lCounter3 = 0;
-	int lCounter4 = 0;
-
-	for (auto label : findLabels())
-	{
-		auto l = label.lock();
-
-		if (l)
-		{
-			if (l->getName().compare("e3") == 0 || l->getName().compare("e4") == 0)
-			{
-				l->setSize(6, 9);
-			}
-
-			if (l->getName().length() == 2)
-			{
-				if (l->getName()[1] == '3')
-				{
-					l->setText("0");
-
-					if (lCounter3 > 8)
-					{
-						l->setText("1");
-					}
-
-					lCounter3++;
-				}
-				else if (l->getName()[1] == '4')
-				{
-					l->setText(to_string(lCounter4 + 1));
-					lCounter4++;
-
-					if (lCounter4 == 9)
-					{
-						lCounter4 = -1;
-					}
-				}
-			}
-		}
-	}
-}
-
 void MixerScreen::initMixerStrips()
 {
 	deleteChildren("mixer-strip");
@@ -97,14 +52,7 @@ void MixerScreen::initMixerStrips()
 
 	for (int i = 0; i < 16; i++)
 	{
-		vector<weak_ptr<Label>> labels;
-
-		for (int j = 0; j < 5; j++)
-		{
-			labels.push_back(findLabel(letters[i] + "0"));
-		}
-
-		mixerStrips.push_back(move(dynamic_pointer_cast<MixerStrip>(addChild(make_shared<MixerStrip>(i, mpc.getBank(), labels)).lock())));
+		mixerStrips.push_back(move(dynamic_pointer_cast<MixerStrip>(addChild(make_shared<MixerStrip>(i, mpc.getBank())).lock())));
 	}
 	
 	displayMixerStrips();
@@ -168,7 +116,6 @@ void MixerScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 
 	if (s.compare("bank") == 0)
 	{
-		initPadNameLabels();
 		initMixerStrips();
 
 		for (auto& m : mixerStrips)
@@ -244,7 +191,6 @@ void MixerScreen::setTab(int i)
 {
 	tab = i;
 
-	initPadNameLabels();
 	initMixerStrips();
 
 	for (auto& m : mixerStrips)

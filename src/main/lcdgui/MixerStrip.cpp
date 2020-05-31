@@ -8,11 +8,13 @@
 #include <lcdgui/screens/MixerScreen.hpp>
 #include <lcdgui/Screens.hpp>
 
-using namespace std;
+#include <lang/StrUtil.hpp>
+
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui;
+using namespace moduru::lang;
 
-MixerStrip::MixerStrip(int columnIndex, int bank, vector<weak_ptr<Label>> labels)
+MixerStrip::MixerStrip(int columnIndex, int bank)
 	: Component("mixer-strip")
 {
 	this->columnIndex = columnIndex;
@@ -24,19 +26,45 @@ MixerStrip::MixerStrip(int columnIndex, int bank, vector<weak_ptr<Label>> labels
 	yPos1fx = 2;
 	selection = -1;
 
-	auto x = 12 + (columnIndex * 15);
-	addChild(move(make_shared<VerticalBar>(MRECT(x, 16, x + 5, 53))));
+	auto x4 = 4 + (columnIndex * 15);
+	addChild(move(make_shared<MixerTopBackground>(MRECT(x4, 0, x4 + w, 12))));
 
-	x = 4 + (columnIndex * 15);
-	addChild(move(make_shared<MixerFaderBackground>(MRECT(x, 15, x + 13, 49))));
-	addChild(move(make_shared<MixerTopBackground>(MRECT(x, 0, x + w, 12))));
+	auto x2 = 4 + (columnIndex * 15);
+	addChild(move(make_shared<MixerFaderBackground>(MRECT(x2, 15, x2 + 13, 49))));
 
-	x = 5 + (columnIndex * 15);
-	addChild(move(make_shared<Knob>(MRECT(x, 1, x + 13, 14))));
+	auto x3 = 5 + (columnIndex * 15);
+	addChild(move(make_shared<Knob>(MRECT(x3, 1, x3 + 13, 14))));
+
+	auto x1 = 12 + (columnIndex * 15);
+	addChild(move(make_shared<VerticalBar>(MRECT(x1, 16, x1 + 5, 53))));
+
+
+	for (int i = 0; i < 5; i++)
+	{
+		auto xPos = 5 + (columnIndex * 15);
+
+		if (i == 1)
+		{
+			xPos += 6;
+		}
+
+		auto yPos = 2 + (i * 13);
+		if (i >= 1)
+		{
+			yPos -= 13;
+		}
+
+		auto label = dynamic_pointer_cast<Label>(addChild(move(make_shared<Label>(letters[columnIndex] + to_string(i), "", xPos, yPos, 6))).lock());
+		labels.push_back(label);
+	}
 
 	labels[1].lock()->setOpaque(false);
 	labels[2].lock()->setOpaque(true);
 	labels[2].lock()->setText(abcd[bank]);
+
+	auto padName = StrUtil::padLeft(to_string(columnIndex + 1), "0", 2);
+	labels[3].lock()->setText(padName.substr(0, 1));
+	labels[4].lock()->setText(padName.substr(1, 2));
 
 	initLabels();
 	setColors();
