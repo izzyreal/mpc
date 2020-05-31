@@ -24,9 +24,9 @@ Field::Field(const string& name, int x, int y, int width)
 	: TextComp(name)
 {
 	this->name = name;
-	this->width = width;
-	setLocation(x - 1, y - 1);
+	//this->width = width;
 	setSize(width + 2, 9);
+	setLocation(x - 1, y - 1);
 }
 
 const int Field::BLINKING_RATE;

@@ -12,6 +12,10 @@ namespace mpc::lcdgui
 
 	public:
 		MixerTopBackground(MRECT rect);
+		void setColor(bool);
+
+	private:
+		bool color;
 
 	};
 }

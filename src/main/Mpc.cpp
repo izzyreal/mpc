@@ -261,6 +261,9 @@ void Mpc::setBank(int i)
 
 	bank = i;
 
+	setChanged();
+	notifyObservers(string("bank"));
+
 	hardware->getLed("padbanka").lock()->light(i == 0);
 	hardware->getLed("padbankb").lock()->light(i == 1);
 	hardware->getLed("padbankc").lock()->light(i == 2);

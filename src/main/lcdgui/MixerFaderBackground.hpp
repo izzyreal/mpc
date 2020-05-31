@@ -1,21 +1,22 @@
 #pragma once
 #include "Component.hpp"
 
-namespace mpc {
-	namespace lcdgui {
+namespace mpc::lcdgui
+{
 
-		class MixerFaderBackground
-			: public Component
-		{
+	class MixerFaderBackground
+		: public Component
+	{
 
-		public:
-			void Draw(std::vector<std::vector<bool>>* pixels) override;
+	public:
+		void Draw(std::vector<std::vector<bool>>* pixels) override;
 
-		public:
-			MixerFaderBackground(MRECT rect);
-			~MixerFaderBackground();
+	public:
+		MixerFaderBackground(MRECT rect);
+		void setColor(bool);
 
-		};
+	private:
+		bool color = true;
 
-	}
+	};
 }

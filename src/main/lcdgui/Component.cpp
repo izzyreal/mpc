@@ -158,6 +158,7 @@ vector<weak_ptr<Parameter>> Component::findParameters()
 weak_ptr<Component> Component::addChild(shared_ptr<Component> child)
 {
 	children.push_back(move(child));
+	SetDirtyRecursive();
 	return children.back();
 }
 
@@ -267,12 +268,16 @@ void Component::SetDirty()
 		return;
 	}
 
+	for (auto& c : children)
+	{
+		c->SetDirty();
+	}
+	
 	dirty = true;
 }
 
 void Component::SetDirtyRecursive()
 {
-	
 	for (auto& c : children)
 	{
 		c->SetDirtyRecursive();

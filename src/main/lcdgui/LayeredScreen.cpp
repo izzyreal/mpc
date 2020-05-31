@@ -302,7 +302,7 @@ int LayeredScreen::openScreen(string screenName) {
 
 	getFocusedLayer().lock()->addChild(screenComponent);
 	
-	screenComponent->SetDirtyRecursive();
+	//screenComponent->SetDirtyRecursive();
 
 	screenComponent->open();
 

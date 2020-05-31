@@ -17,14 +17,23 @@ void MixerFaderBackground::Draw(std::vector<std::vector<bool>>* pixels) {
 
 	auto rect = getRect();
 
-	for (int i = rect.L; i < rect.R; i++) {
-		for (int j = rect.T; j < rect.B; j++) {
-			(*pixels)[i][j] = true;
+	for (int i = rect.L; i < rect.R; i++)
+	{
+		for (int j = rect.T; j < rect.B; j++)
+		{
+			(*pixels)[i][j] = color;
 		}
 	}
 
-	dirty = false;
+	Component::Draw(pixels);
 }
 
-MixerFaderBackground::~MixerFaderBackground() {
+void MixerFaderBackground::setColor(bool on)
+{
+	if (color == on)
+	{
+		return;
+	}
+	color = on;
+	SetDirty();
 }

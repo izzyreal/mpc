@@ -41,6 +41,7 @@ namespace mpc::lcdgui::screens {
 		int yPos = 0;
 		std::vector<std::weak_ptr<mpc::lcdgui::MixerStrip>> mixerStrips;
 		void initMixerStrips();
+		void displayMixerStrip(int i);
 		void displayMixerStrips();
 		void displayFunctionKeys();
 		void displayStereoFaders();

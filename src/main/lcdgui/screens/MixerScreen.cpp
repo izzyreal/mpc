@@ -46,22 +46,19 @@ void MixerScreen::close()
 
 void MixerScreen::initMixerStrips()
 {
-	deleteChildren("mixer-strip");
-
-	mixerStrips.clear();
-
 	init();
 
 	for (int i = 0; i < 16; i++)
 	{
-		mixerStrips.push_back(move(dynamic_pointer_cast<MixerStrip>(addChild(make_shared<MixerStrip>(i, mpc.getBank())).lock())));
+		mixerStrips.push_back(move(dynamic_pointer_cast<MixerStrip>(addChild(make_shared<MixerStrip>(i)).lock())));
+		mixerStrips.back().lock()->setBank(mpc.getBank());
 	}
 	
 	displayMixerStrips();
 	mixerStrips[xPos].lock()->setSelection(yPos);
 }
 
-void MixerScreen::displayMixerStrips()
+void MixerScreen::displayMixerStrip(int i)
 {
 	init();
 
@@ -70,43 +67,48 @@ void MixerScreen::displayMixerStrips()
 	bool sSrcDrum = mixerSetupScreen->isStereoMixSourceDrum();
 	bool iSrcDrum = mixerSetupScreen->isIndivFxSourceDrum();
 
+	auto smc = program.lock()->getPad(i + (mpc.getBank() * 16))->getStereoMixerChannel().lock();
+	auto ifmc = program.lock()->getPad(i + (mpc.getBank() * 16))->getIndivFxMixerChannel().lock();
+
+	if (sSrcDrum)
+	{
+		smc = mpcSoundPlayerChannel->getStereoMixerChannels()[i + (mpc.getBank() * 16)].lock();
+	}
+
+	if (iSrcDrum)
+	{
+		ifmc = mpcSoundPlayerChannel->getIndivFxMixerChannels()[i + (mpc.getBank() * 16)].lock();
+	}
+
+	if (tab == 0)
+	{
+		mixerStrips[i].lock()->setValueA(smc->getPanning());
+		mixerStrips[i].lock()->setValueB(smc->getLevel());
+	}
+	else if (tab == 1)
+	{
+		if (smc->isStereo())
+		{
+			mixerStrips[i].lock()->setValueAString(stereoNames[ifmc->getOutput()]);
+		}
+		else
+		{
+			mixerStrips[i].lock()->setValueAString(monoNames[ifmc->getOutput()]);
+		}
+		mixerStrips[i].lock()->setValueB(ifmc->getVolumeIndividualOut());
+	}
+	else if (tab == 2)
+	{
+		mixerStrips[i].lock()->setValueAString(fxPathNames[ifmc->getFxPath()]);
+		mixerStrips[i].lock()->setValueB(ifmc->getFxSendLevel());
+	}
+}
+
+void MixerScreen::displayMixerStrips()
+{
 	for (int i = 0; i < 16; i++)
 	{
-		auto smc = program.lock()->getPad(i + (mpc.getBank()* 16))->getStereoMixerChannel().lock();
-		auto ifmc = program.lock()->getPad(i + (mpc.getBank()* 16))->getIndivFxMixerChannel().lock();
-
-		if (sSrcDrum)
-		{
-			smc = mpcSoundPlayerChannel->getStereoMixerChannels()[i + (mpc.getBank() * 16)].lock();
-		}
-
-		if (iSrcDrum)
-		{
-			ifmc = mpcSoundPlayerChannel->getIndivFxMixerChannels()[i + (mpc.getBank() * 16)].lock();
-		}
-
-		if (tab == 0)
-		{
-			mixerStrips[i].lock()->setValueA(smc->getPanning());
-			mixerStrips[i].lock()->setValueB(smc->getLevel());
-		}
-		else if (tab == 1)
-		{
-			if (smc->isStereo())
-			{
-				mixerStrips[i].lock()->setValueAString(stereoNames[ifmc->getOutput()]);
-			}
-			else
-			{
-				mixerStrips[i].lock()->setValueAString(monoNames[ifmc->getOutput()]);
-			}
-			mixerStrips[i].lock()->setValueB(ifmc->getVolumeIndividualOut());
-		}
-		else if (tab == 2)
-		{
-			mixerStrips[i].lock()->setValueAString(fxPathNames[ifmc->getFxPath()]);
-			mixerStrips[i].lock()->setValueB(ifmc->getFxSendLevel());
-		}
+		displayMixerStrip(i);
 	}
 }
 
@@ -118,16 +120,13 @@ void MixerScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 
 	if (s.compare("bank") == 0)
 	{
-		initMixerStrips();
-
 		for (auto& m : mixerStrips)
 		{
-			m.lock()->initLabels();
-			m.lock()->setColors();
+			m.lock()->setBank(mpc.getBank());
+			//m.lock()->initLabels();
+			//m.lock()->setColors();
 		}
-		
 		displayMixerStrips();
-		displayFunctionKeys();
 	}
 	else if (s.compare("padandnote") == 0)
 	{
@@ -192,8 +191,6 @@ void MixerScreen::setLink(bool b)
 void MixerScreen::setTab(int i)
 {
 	tab = i;
-
-	initMixerStrips();
 
 	for (auto& m : mixerStrips)
 	{
@@ -324,9 +321,7 @@ void MixerScreen::turnWheel(int i)
 
 	auto drum = mpc.getDrum(drumScreen->drum);
 
-	auto smc = sSrcDrum ? drum->getStereoMixerChannels()[pad].lock() : program.lock()->getPad(pad)->getStereoMixerChannel().lock();
 	auto smcs = sSrcDrum ? drum->getStereoMixerChannels() : vector<weak_ptr<ctoot::mpc::MpcStereoMixerChannel>>(16);
-	auto ifmc = iSrcDrum ? drum->getIndivFxMixerChannels()[pad].lock() : program.lock()->getPad(pad)->getIndivFxMixerChannel().lock();
 	auto ifmcs = iSrcDrum ? drum->getIndivFxMixerChannels() : vector<weak_ptr<ctoot::mpc::MpcIndivFxMixerChannel>>(16);
 
 	for (int i = 0; i < 16; i++)
@@ -345,35 +340,35 @@ void MixerScreen::turnWheel(int i)
 	if (tab == 0)
 	{
 		bool record = sequencer.lock()->isRecordingOrOverdubbing() && mixerSetupScreen->isRecordMixChangesEnabled();
+		auto smc = sSrcDrum ? drum->getStereoMixerChannels()[pad].lock() : program.lock()->getPad(pad)->getStereoMixerChannel().lock();
+
 		if (yPos == 0)
 		{
-			if (!link)
-			{
-				smc->setPanning(smc->getPanning() + i);
-				
-				if (record)
-				{
-					recordMixerEvent(pad, 1, smc->getPanning());
-				}
-			}
-			else
+			if (link)
 			{
 				int padCounter = 0;
-				
+
 				for (auto mcTemp : smcs)
 				{
 					auto lMcTemp = mcTemp.lock();
 					lMcTemp->setPanning(lMcTemp->getPanning() + i);
-					
+
 					if (record)
 					{
 						recordMixerEvent(padCounter++, 1, lMcTemp->getPanning());
 					}
 				}
 			}
+			else
+			{
+				smc->setPanning(smc->getPanning() + i);
 
+				if (record)
+				{
+					recordMixerEvent(pad, 1, smc->getPanning());
+				}
+			}
 			displayPanning();
-
 		}
 		else if (yPos == 1)
 		{
@@ -407,6 +402,8 @@ void MixerScreen::turnWheel(int i)
 	}
 	else if (tab == 1)
 	{
+		auto ifmc = iSrcDrum ? drum->getIndivFxMixerChannels()[pad].lock() : program.lock()->getPad(pad)->getIndivFxMixerChannel().lock();
+
 		if (yPos == 0)
 		{
 			if (!link)
@@ -446,6 +443,8 @@ void MixerScreen::turnWheel(int i)
 	}
 	else if (tab == 2)
 	{
+		auto ifmc = iSrcDrum ? drum->getIndivFxMixerChannels()[pad].lock() : program.lock()->getPad(pad)->getIndivFxMixerChannel().lock();
+
 		if (yPos == 0)
 		{
 			if (!link)

@@ -35,13 +35,10 @@ namespace mpc::lcdgui
 		int selection;
 
 	private:
-		//Don't move to "addChild", these are convenience references
-		std::vector<std::weak_ptr<Label>> labels;
 		std::weak_ptr<MixerFader> findMixerFader();
 		std::weak_ptr<Knob> findKnob();
 		std::weak_ptr<MixerTopBackground> findMixerTopBackground();
 		std::weak_ptr<MixerFaderBackground> findMixerFaderBackground();
-		const std::vector<std::string> letters{ "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p" };
 
 	public:
 		void setValueA(int i);
@@ -50,9 +47,10 @@ namespace mpc::lcdgui
 		void setColors();
 		void setSelection(int i);
 		void setValueAString(std::string str);
+		void setBank(int i);
 
 	public:
-		MixerStrip(int columnIndex, int bank);
+		MixerStrip(int columnIndex);
 
 	};
 }

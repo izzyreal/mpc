@@ -84,13 +84,19 @@ int TextComp::getH() {
 }
 
 void TextComp::setOpaque(bool b) {
-	opaque = b;
-	SetDirty();
+	if (opaque != b)
+	{
+		opaque = b;
+		SetDirty();
+	}
 }
 
 void TextComp::setInverted(bool b) {
-	inverted = b;
-	SetDirty();
+	if (inverted != b)
+	{
+		inverted = b;
+		SetDirty();
+	}
 }
 
 string TextComp::getName() {
@@ -107,12 +113,15 @@ unsigned int TextComp::GetTextEntryLength() {
 
 void TextComp::setText(const string& s)
 {
-	text = s;
-	SetDirty();
+	if (text.compare(s) != 0)
+	{
+		text = s;
+		SetDirty();
+	}
 }
 
 void TextComp::setTextPadded(string s, string padding) {
-	string padded = StrUtil::padLeft(s, padding, ceil(float(width) / float(6)));
+	string padded = StrUtil::padLeft(s, padding, ceil(float(w - 2) / float(6)));
 	setText(padded);
 }
 

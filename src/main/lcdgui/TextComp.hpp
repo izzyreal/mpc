@@ -22,7 +22,7 @@ namespace mpc::lcdgui
 
 	protected:
 		std::string text = "";
-		int width = 0; // pixels
+		//int width = 0; // pixels
 		bool opaque{ false };
 
 	public:
