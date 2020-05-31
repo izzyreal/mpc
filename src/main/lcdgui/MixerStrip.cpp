@@ -18,7 +18,6 @@ MixerStrip::MixerStrip(int columnIndex, int bank)
 	: Component("mixer-strip")
 {
 	this->columnIndex = columnIndex;
-	this->labels = labels;
 
 	yPos0indiv = 0;
 	yPos1indiv = 4;
@@ -26,17 +25,15 @@ MixerStrip::MixerStrip(int columnIndex, int bank)
 	yPos1fx = 2;
 	selection = -1;
 
-	auto x4 = 4 + (columnIndex * 15);
-	addChild(move(make_shared<MixerTopBackground>(MRECT(x4, 0, x4 + w, 12))));
+	auto x1 = 4 + (columnIndex * 15);
+	addChild(move(make_shared<MixerTopBackground>(MRECT(x1, 0, x1 + 14, 13))));
+	addChild(move(make_shared<MixerFaderBackground>(MRECT(x1, 14, x1 + 14, 50))));
 
-	auto x2 = 4 + (columnIndex * 15);
-	addChild(move(make_shared<MixerFaderBackground>(MRECT(x2, 15, x2 + 13, 49))));
+	auto x2 = 5 + (columnIndex * 15);
+	addChild(move(make_shared<Knob>(MRECT(x2, 1, x2 + 12, 12))));
 
-	auto x3 = 5 + (columnIndex * 15);
-	addChild(move(make_shared<Knob>(MRECT(x3, 1, x3 + 13, 14))));
-
-	auto x1 = 12 + (columnIndex * 15);
-	addChild(move(make_shared<VerticalBar>(MRECT(x1, 16, x1 + 5, 53))));
+	auto x3 = 12 + (columnIndex * 15);
+	addChild(move(make_shared<VerticalBar>(MRECT(x3, 15, x3 + 4, 49))));
 
 
 	for (int i = 0; i < 5; i++)
@@ -48,7 +45,7 @@ MixerStrip::MixerStrip(int columnIndex, int bank)
 			xPos += 6;
 		}
 
-		auto yPos = 2 + (i * 13);
+		auto yPos = 3 + (i * 13);
 		if (i >= 1)
 		{
 			yPos -= 13;
@@ -184,7 +181,6 @@ void MixerStrip::setValueAString(string str)
 		labels[0].lock()->setText(str.substr(0, 1));
 		labels[1].lock()->setText(str.substr(1, 2));
 	}
-	findMixerTopBackground().lock()->SetDirty();
 }
 
 weak_ptr<VerticalBar> MixerStrip::findVerticalBar()

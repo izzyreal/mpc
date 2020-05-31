@@ -23,7 +23,9 @@ MixerScreen::MixerScreen(const int layerIndex)
 void MixerScreen::open()
 {
 	mpc.addObserver(this);
-	
+
+	findField("dummy").lock()->Hide(true);
+
 	initMixerStrips();
 	
 	for (auto& m : mixerStrips)

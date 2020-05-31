@@ -17,8 +17,8 @@ void MixerFaderBackground::Draw(std::vector<std::vector<bool>>* pixels) {
 
 	auto rect = getRect();
 
-	for (int i = rect.L; i < rect.R + 1; i++) {
-		for (int j = rect.T; j < rect.B + 1; j++) {
+	for (int i = rect.L; i < rect.R; i++) {
+		for (int j = rect.T; j < rect.B; j++) {
 			(*pixels)[i][j] = true;
 		}
 	}

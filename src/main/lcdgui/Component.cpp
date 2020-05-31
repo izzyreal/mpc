@@ -229,7 +229,7 @@ void Component::Hide(bool b)
 	if (hidden != b)
 	{
 		hidden = b;
-		SetDirty();
+		dirty = true;
 	} 
 }
 
@@ -262,6 +262,11 @@ MRECT Component::getDirtyArea() {
 
 void Component::SetDirty() 
 { 
+	if (hidden)
+	{
+		return;
+	}
+
 	dirty = true;
 }
 
@@ -312,11 +317,12 @@ MRECT Component::getRect() {
 
 void Component::Clear(vector<vector<bool>>* pixels) {
 	auto r = getRect();
-	for (int i = r.L; i < r.R - 1; i++) {
+	for (int i = r.L; i < r.R; i++) {
 		if (i < 0)
 		{
 			continue;
 		}
+
 		for (int j = r.T; j < r.B; j++) {
 			(*pixels)[i][j] = false;
 		}
