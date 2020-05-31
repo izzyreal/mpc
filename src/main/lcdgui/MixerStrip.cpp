@@ -4,7 +4,7 @@
 #include <lcdgui/Label.hpp>
 #include <lcdgui/MixerFaderBackground.hpp>
 #include <lcdgui/MixerTopBackground.hpp>
-#include <lcdgui/VerticalBar.hpp>
+#include <lcdgui/MixerFader.hpp>
 #include <lcdgui/screens/MixerScreen.hpp>
 #include <lcdgui/Screens.hpp>
 
@@ -33,7 +33,7 @@ MixerStrip::MixerStrip(int columnIndex, int bank)
 	addChild(move(make_shared<Knob>(MRECT(x2, 1, x2 + 12, 12))));
 
 	auto x3 = 12 + (columnIndex * 15);
-	addChild(move(make_shared<VerticalBar>(MRECT(x3, 15, x3 + 4, 49))));
+	addChild(move(make_shared<MixerFader>(MRECT(x3, 15, x3 + 4, 49))));
 
 
 	for (int i = 0; i < 5; i++)
@@ -74,7 +74,7 @@ void MixerStrip::setValueA(int i)
 
 void MixerStrip::setValueB(int i)
 {
-    findVerticalBar().lock()->setValue(i);
+    findMixerFader().lock()->setValue(i);
 }
 
 void MixerStrip::initLabels()
@@ -120,8 +120,8 @@ void MixerStrip::setColors()
 		findMixerTopBackground().lock()->Hide(true);
 		findMixerFaderBackground().lock()->Hide(true);
 		findKnob().lock()->setColor(true);
-		findVerticalBar().lock()->Hide(false);
-		findVerticalBar().lock()->setColor(true);
+		findMixerFader().lock()->Hide(false);
+		findMixerFader().lock()->setColor(true);
 	}
 	else if (selection == 0)
 	{
@@ -133,8 +133,8 @@ void MixerStrip::setColors()
 		findMixerTopBackground().lock()->Hide(false);
 		findMixerFaderBackground().lock()->Hide(true);
 		findKnob().lock()->setColor(false);
-		findVerticalBar().lock()->Hide(false);
-		findVerticalBar().lock()->setColor(true);
+		findMixerFader().lock()->Hide(false);
+		findMixerFader().lock()->setColor(true);
 	}
     else if (selection == 1)
 	{
@@ -146,8 +146,8 @@ void MixerStrip::setColors()
 		findMixerTopBackground().lock()->Hide(true); 
 		findMixerFaderBackground().lock()->Hide(false);
         findKnob().lock()->setColor(true);
-		findVerticalBar().lock()->Hide(false);
-		findVerticalBar().lock()->setColor(false);
+		findMixerFader().lock()->Hide(false);
+		findMixerFader().lock()->setColor(false);
     }
 }
 
@@ -183,13 +183,13 @@ void MixerStrip::setValueAString(string str)
 	}
 }
 
-weak_ptr<VerticalBar> MixerStrip::findVerticalBar()
+weak_ptr<MixerFader> MixerStrip::findMixerFader()
 {
 	for (auto& c : children)
 	{
-		if (c->getName().compare("vertical-bar") == 0)
+		if (c->getName().compare("mixer-fader") == 0)
 		{
-			return dynamic_pointer_cast<VerticalBar>(c);
+			return dynamic_pointer_cast<MixerFader>(c);
 		}
 	}
 	return {};

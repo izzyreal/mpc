@@ -8,7 +8,7 @@
 namespace mpc::lcdgui
 {
 	class Label;
-	class VerticalBar;
+	class MixerFader;
 	class MixerTopBackground;
 	class MixerFaderBackground;
 	class Knob;
@@ -37,7 +37,7 @@ namespace mpc::lcdgui
 	private:
 		//Don't move to "addChild", these are convenience references
 		std::vector<std::weak_ptr<Label>> labels;
-		std::weak_ptr<VerticalBar> findVerticalBar();
+		std::weak_ptr<MixerFader> findMixerFader();
 		std::weak_ptr<Knob> findKnob();
 		std::weak_ptr<MixerTopBackground> findMixerTopBackground();
 		std::weak_ptr<MixerFaderBackground> findMixerFaderBackground();

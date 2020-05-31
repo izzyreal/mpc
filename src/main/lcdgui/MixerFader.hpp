@@ -3,7 +3,7 @@
 
 namespace mpc::lcdgui
 {
-	class VerticalBar
+	class MixerFader
 		: public Component
 	{
 
@@ -19,7 +19,7 @@ namespace mpc::lcdgui
 		void Draw(std::vector<std::vector<bool>>* pixels) override;
 
 	public:
-		VerticalBar(MRECT rect);
+		MixerFader(MRECT rect);
 
 	};
 }
