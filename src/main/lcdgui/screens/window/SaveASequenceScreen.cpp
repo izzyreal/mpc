@@ -70,6 +70,12 @@ void SaveASequenceScreen::displaySaveAs()
 void SaveASequenceScreen::displayFile()
 {
 	auto name = nameGui->getName();
+
+	if (name.length() < 2)
+	{
+		return;
+	}
+
 	findField("file").lock()->setText(name.substr(0, 1));
 	findLabel("file1").lock()->setText(name.substr(1));
 }

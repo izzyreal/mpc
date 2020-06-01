@@ -24,6 +24,7 @@ namespace mpc::lcdgui::screens::window
 	class LoadASequenceFromAllScreen;
 	class Mpc2000XlAllFileScreen;
 	class LoadASoundScreen;
+	class LoadASequenceScreen;
 }
 
 namespace mpc::lcdgui::screens
@@ -66,6 +67,7 @@ namespace mpc::lcdgui::screens
 		friend class mpc::lcdgui::screens::window::LoadASequenceFromAllScreen;
 		friend class mpc::lcdgui::screens::window::Mpc2000XlAllFileScreen;
 		friend class mpc::lcdgui::screens::window::LoadASoundScreen;
+		friend class mpc::lcdgui::screens::window::LoadASequenceScreen;
 		friend class mpc::controls::BaseControls;
 		friend class mpc::controls::other::dialog::NameControls;
 		friend class mpc::disk::AbstractDisk;

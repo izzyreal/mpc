@@ -50,29 +50,32 @@ void Background::Draw(std::vector< std::vector<bool>>* pixels)
 	fclose(f);
 	int colorCount = (imageDataOffset - infosize) / 4;
 
-	if (colorCount > 2)
-	{
-		printf("");
-	}
-
 	int charcounter = 0;
-	for (int y = 0; y < height; y++) {
-		for (int x = 0; x < width; x++) {
+	
+	for (int y = 0; y < height; y++)
+	{
+		for (int x = 0; x < width; x++)
+		{
 			auto value = data[charcounter++];
 
-			if ((colorCount <= 2 && value == 1) || (colorCount > 2 && value == 2)) {
+			if ((colorCount <= 2 && value == 1) || (colorCount > 2 && value == 2))
+			{
 				(*pixels)[x][y] = true;
 			}
-			else if (value == 0) {
+			else if (value == 0)
+			{
 				(*pixels)[x][y] = false;
 			}
 		}
 	}
 
 	// clear bottom in case height != full LCD height
-	if (name.compare("popup") != 0) {
-		for (int y = height; y < 60; y++) {
-			for (int x = 0; x < width; x++) {
+	if (name.compare("popup") != 0)
+	{
+		for (int y = height; y < 60; y++)
+		{
+			for (int x = 0; x < width; x++)
+			{
 				(*pixels)[x][y] = false;
 			}
 		}

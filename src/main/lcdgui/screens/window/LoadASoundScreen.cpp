@@ -124,9 +124,9 @@ void LoadASoundScreen::keepSound()
 	}
 }
 
-
 void LoadASoundScreen::displayAssignToNote()
 {
+	init();
 	auto note = mpc::Mpc::instance().getNote();
 	auto padIndex = program.lock()->getPadIndexFromNote(note);
 	auto padName = string(padIndex == -1 ? "OFF" : sampler.lock()->getPadName(padIndex));

@@ -62,6 +62,12 @@ void LoadASequenceFromAllScreen::displayFile()
 	auto loadASequenceFromAllScreen = dynamic_pointer_cast<LoadASequenceFromAllScreen>(Screens::getScreenComponent("load-a-sequence-from-all"));
 	auto loadScreen = dynamic_pointer_cast<LoadScreen>(Screens::getScreenComponent("load"));
 	findField("file").lock()->setTextPadded(loadScreen->fileLoad + 1, "0");
+
+	if (loadScreen->fileLoad >= loadASequenceFromAllScreen->sequencesFromAllFile.size())
+	{
+		return;
+	}
+
 	auto candidate = loadASequenceFromAllScreen->sequencesFromAllFile[loadScreen->fileLoad];
 	auto name = candidate ? candidate->getName() : "(Unused)";
 	findLabel("file0").lock()->setText("-" + name);

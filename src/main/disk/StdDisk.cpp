@@ -108,7 +108,7 @@ void StdDisk::initFiles()
 {
 	for (auto& f : allFiles)
 	{
-		delete f;
+		//delete f;
 	}
 
 	files.clear();

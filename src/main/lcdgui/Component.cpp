@@ -9,6 +9,8 @@
 
 #include <string>
 
+#include <cmath>
+
 using namespace std;
 using namespace mpc::lcdgui;
 
@@ -303,23 +305,29 @@ bool Component::IsDirty()
 	return dirty;
 }
 
-MRECT Component::getRect() {
-	if (x < 0 || x > 247 || y < 0 || y > 59 || x + w < 0 || x + w > 248 || y + h < 0 || y + h > 60)
-	{
-		printf("");
-	}
-	return MRECT(x, y, x + w, y + h);
+MRECT Component::getRect()
+{
+	auto x1 = max(0, x);
+	auto x2 = min(248, x + w);
+	auto y1 = max(0, y);
+	auto y2 = min(60, y + h);
+
+	return MRECT(x1, y1, x2, y2);
 }
 
-void Component::Clear(vector<vector<bool>>* pixels) {
+void Component::Clear(vector<vector<bool>>* pixels)
+{
 	auto r = getRect();
-	for (int i = r.L; i < r.R; i++) {
+
+	for (int i = r.L; i < r.R; i++)
+	{
 		if (i < 0)
 		{
 			continue;
 		}
 
-		for (int j = r.T; j < r.B; j++) {
+		for (int j = r.T; j < r.B; j++)
+		{
 			(*pixels)[i][j] = false;
 		}
 	}
@@ -328,6 +336,7 @@ void Component::Clear(vector<vector<bool>>* pixels) {
 vector<weak_ptr<Component>> Component::findHiddenChildren()
 {
 	vector<weak_ptr<Component>> result;
+
 	for (auto& c : children)
 	{
 		if (c->IsHidden() && c->IsDirty())

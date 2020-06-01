@@ -1,8 +1,16 @@
 #include "LoadASequenceScreen.hpp"
 
 #include <disk/AbstractDisk.hpp>
+#include <disk/MpcFile.hpp>
+
+#include <file/mid/MidiReader.hpp>
+
+#include <lcdgui/screens/LoadScreen.hpp>
+
+#include <file/FileUtil.hpp>
 
 using namespace mpc::lcdgui::screens::window;
+using namespace moduru::file;
 using namespace moduru::lang;
 
 LoadASequenceScreen::LoadASequenceScreen(const int layerIndex) 
@@ -12,6 +20,44 @@ LoadASequenceScreen::LoadASequenceScreen(const int layerIndex)
 
 void LoadASequenceScreen::open()
 {
+	auto newSeq = sequencer.lock()->createSeqInPlaceHolder().lock();
+	newSeq->init(2);
+
+	auto loadScreen = dynamic_pointer_cast<LoadScreen>(Screens::getScreenComponent("load"));
+	auto ext = FileUtil::splitName(loadScreen->getSelectedFileName())[1];
+
+	if (ext.compare("mid") == 0 || ext.compare("MID") == 0)
+	{
+
+		auto midiReader = mpc::file::mid::MidiReader(loadScreen->getSelectedFile(), newSeq);
+
+		midiReader.parseSequence();
+
+		auto usedSeqs = sequencer.lock()->getUsedSequenceIndexes();
+		int index;
+
+		for (index = 0; index < 99; index++)
+		{
+			bool contains = false;
+
+			for (int i : usedSeqs)
+			{
+				if (i == index)
+				{
+					contains = true;
+					break;
+				}
+			}
+
+			if (!contains)
+			{
+				break;
+			}
+		}
+
+		loadInto = index;
+	}
+
 	displayLoadInto();
 	displayFile();
 }
@@ -37,7 +83,6 @@ void LoadASequenceScreen::function(int i)
 		sequencer.lock()->clearPlaceHolder();
 		break;
 	case 4:
-		auto loadASequenceScreen = dynamic_pointer_cast<LoadASequenceScreen>(Screens::getScreenComponent("load-a-sequence"));
 		sequencer.lock()->movePlaceHolderTo(loadInto);
 		sequencer.lock()->setActiveSequenceIndex(loadInto);
 		ls.lock()->openScreen("sequencer");
@@ -57,9 +102,8 @@ void LoadASequenceScreen::setLoadInto(int i)
 
 void LoadASequenceScreen::displayLoadInto()
 {
-	auto loadASequenceScreen = dynamic_pointer_cast<LoadASequenceScreen>(Screens::getScreenComponent("load-a-sequence"));
-	findField("load-into").lock()->setTextPadded(loadASequenceScreen->loadInto + 1, "0");
-	findLabel("load-into0").lock()->setText("-" + Mpc::instance().getSequencer().lock()->getSequence(loadASequenceScreen->loadInto).lock()->getName());
+	findField("load-into").lock()->setTextPadded(loadInto + 1, "0");
+	findLabel("name").lock()->setText("-" + sequencer.lock()->getSequence(loadInto).lock()->getName());
 }
 
 void LoadASequenceScreen::displayFile()

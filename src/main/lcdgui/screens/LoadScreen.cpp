@@ -12,8 +12,6 @@
 #include <disk/AbstractDisk.hpp>
 #include <disk/MpcFile.hpp>
 
-#include <file/mid/MidiReader.hpp>
-
 #include <file/File.hpp>
 #include <file/FileUtil.hpp>
 
@@ -111,37 +109,6 @@ void LoadScreen::function(int i)
 		}
 		else if (StrUtil::eqIgnoreCase(ext, "mid"))
 		{
-			auto newSeq = sequencer.lock()->createSeqInPlaceHolder().lock();
-			newSeq->init(2);
-			auto mr = mpc::file::mid::MidiReader(selectedFile, newSeq);
-
-			mr.parseSequence();
-
-			auto usedSeqs = sequencer.lock()->getUsedSequenceIndexes();
-			int index;
-			
-			for (index = 0; index < 99; index++)
-			{
-				bool contains = false;
-
-				for (int i : usedSeqs)
-				{
-					if (i == index)
-					{
-						contains = true;
-						break;
-					}
-				}
-
-				if (!contains)
-				{
-					break;
-				}
-			}
-
-			auto loadASequenceScreen = dynamic_pointer_cast<LoadASequenceScreen>(Screens::getScreenComponent("load-a-sequence"));
-			loadASequenceScreen->loadInto = index;
-
 			ls.lock()->openScreen("load-a-sequence");
 		}
 		else if (StrUtil::eqIgnoreCase(ext, "all"))
@@ -224,7 +191,7 @@ void LoadScreen::displayDirectory()
 
 void LoadScreen::displayFreeSnd()
 {
-	findLabel("freesnd").lock()->setText(" " + StrUtil::padLeft(to_string(sampler.lock()->getFreeSampleSpace() * 0.001), " ", 5) + "K");
+	findLabel("freesnd").lock()->setText(" " + StrUtil::padLeft(to_string((int)(sampler.lock()->getFreeSampleSpace() * 0.001)), " ", 5) + "K");
 }
 
 void LoadScreen::displayFile()
