@@ -78,7 +78,7 @@ vector<string> screenNames = {
 "init-pad-assign",
 "directory",
 "load-a-program",
-"save-all=file",
+"save-all-file",
 "save-aps-file",
 "save-a-program",
 "load-aps-file",

@@ -3,9 +3,9 @@
 #include <Util.hpp>
 #include <disk/MpcFile.hpp>
 #include <disk/AbstractDisk.hpp>
-#include <ui/NameGui.hpp>
 
 using namespace mpc::lcdgui::screens::window;
+using namespace moduru::lang;
 using namespace std;
 
 SaveAllFileScreen::SaveAllFileScreen(const int layerIndex)
@@ -20,8 +20,15 @@ void SaveAllFileScreen::open()
 
 void SaveAllFileScreen::displayFile()
 {
-	findField("file").lock()->setText(mpc.getUis().lock()->getNameGui()->getName().substr(0, 1));
-	findLabel("file1").lock()->setText(moduru::lang::StrUtil::padRight(mpc.getUis().lock()->getNameGui()->getName().substr(1), " ", 15) + ".ALL");
+	auto nameGui = mpc.getUis().lock()->getNameGui();
+
+	if (nameGui->getName().length() < 2)
+	{
+		return;
+	}
+
+	findField("file").lock()->setText(nameGui->getName().substr(0, 1));
+	findLabel("file1").lock()->setText(StrUtil::padRight(nameGui->getName().substr(1), " ", 15) + ".ALL");
 }
 
 void SaveAllFileScreen::turnWheel(int i)
