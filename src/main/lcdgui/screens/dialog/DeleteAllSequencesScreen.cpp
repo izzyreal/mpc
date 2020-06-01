@@ -5,8 +5,8 @@
 using namespace mpc::lcdgui::screens::dialog;
 using namespace std;
 
-DeleteAllSequencesScreen::DeleteAllSequencesScreen(const int layer)
-	: ScreenComponent("deleteallsequences", layer)
+DeleteAllSequencesScreen::DeleteAllSequencesScreen(const int layerIndex)
+	: ScreenComponent("deleteallsequences", layerIndex)
 {
 }
 

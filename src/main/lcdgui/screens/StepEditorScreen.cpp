@@ -22,8 +22,8 @@ using namespace mpc::sequencer;
 using namespace moduru::lang;
 using namespace std;
 
-StepEditorScreen::StepEditorScreen(const int& layer)
-	: ScreenComponent("stepeditor", layer)
+StepEditorScreen::StepEditorScreen(const int layerIndex)
+	: ScreenComponent("stepeditor", layerIndex)
 {
 }
 

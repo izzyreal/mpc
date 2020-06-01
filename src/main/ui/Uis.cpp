@@ -7,7 +7,6 @@
 #include <ui/misc/TransGui.hpp>
 
 #include <ui/disk/DiskGui.hpp>
-#include <ui/disk/window/DirectoryGui.hpp>
 #include <ui/disk/window/DiskWindowGui.hpp>
 
 #include <ui/midisync/MidiSyncGui.hpp>
@@ -55,7 +54,6 @@ Uis::Uis()
 	nameGui = new mpc::ui::NameGui();
 
 	diskGui = new mpc::ui::disk::DiskGui();
-	directoryGui = new mpc::ui::disk::window::DirectoryGui(diskGui);
 	diskWindowGui = new mpc::ui::disk::window::DiskWindowGui();
 
 	midiSyncGui = new mpc::ui::midisync::MidiSyncGui();
@@ -78,11 +76,6 @@ mpc::ui::midisync::MidiSyncGui* Uis::getMidiSyncGui()
 mpc::ui::disk::DiskGui* Uis::getDiskGui()
 {
 	return diskGui;
-}
-
-mpc::ui::disk::window::DirectoryGui* Uis::getDirectoryGui()
-{
-	return directoryGui;
 }
 
 mpc::ui::disk::window::DiskWindowGui* Uis::getDiskWindowGui()
@@ -128,7 +121,6 @@ mpc::ui::misc::SecondSeqGui* Uis::getSecondSeqGui()
 Uis::~Uis()
 {
 	if (diskGui != nullptr) delete diskGui;
-	if (directoryGui != nullptr) delete directoryGui;
 	if (diskWindowGui != nullptr) delete diskWindowGui;
 	if (midiSyncGui != nullptr) delete midiSyncGui;
 	if (nameGui != nullptr) delete nameGui;

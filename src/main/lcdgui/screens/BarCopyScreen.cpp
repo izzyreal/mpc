@@ -6,8 +6,8 @@
 using namespace mpc::lcdgui::screens;
 using namespace std;
 
-BarCopyScreen::BarCopyScreen(const int& layer)
-	: ScreenComponent("barcopy", layer)
+BarCopyScreen::BarCopyScreen(const int layerIndex)
+	: ScreenComponent("barcopy", layerIndex)
 {
 }
 

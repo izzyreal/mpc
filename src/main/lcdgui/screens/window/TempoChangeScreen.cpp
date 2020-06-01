@@ -10,8 +10,8 @@
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui::screens::window;
 
-TempoChangeScreen::TempoChangeScreen(const int& layer)
-	: ScreenComponent("tempochange", layer)
+TempoChangeScreen::TempoChangeScreen(const int layerIndex)
+	: ScreenComponent("tempochange", layerIndex)
 {
 }
 

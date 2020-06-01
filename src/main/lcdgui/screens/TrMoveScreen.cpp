@@ -10,8 +10,8 @@ using namespace mpc::lcdgui::screens;
 using namespace moduru::lang;
 using namespace std;
 
-TrMoveScreen::TrMoveScreen(const int& layer)
-	: ScreenComponent("trmove", layer)
+TrMoveScreen::TrMoveScreen(const int layerIndex)
+	: ScreenComponent("trmove", layerIndex)
 {
 }
 

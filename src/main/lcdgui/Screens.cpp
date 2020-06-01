@@ -35,6 +35,10 @@
 #include <lcdgui/screens/MixerSetupScreen.hpp>
 #include <lcdgui/screens/FxEditScreen.hpp>
 #include <lcdgui/screens/SelectMixerDrumScreen.hpp>
+#include <lcdgui/screens/LoadScreen.hpp>
+#include <lcdgui/screens/FormatScreen.hpp>
+#include <lcdgui/screens/SetupScreen.hpp>
+#include <lcdgui/screens/SaveScreen.hpp>
 
 #include <lcdgui/screens/window/NumberOfZonesScreen.hpp>
 #include <lcdgui/screens/window/InitPadAssignScreen.hpp>
@@ -78,6 +82,18 @@
 #include <lcdgui/screens/window/VelocityModulationScreen.hpp>
 #include <lcdgui/screens/window/VeloEnvFilterScreen.hpp>
 #include <lcdgui/screens/window/VeloPitchScreen.hpp>
+#include <lcdgui/screens/window/DirectoryScreen.hpp>
+#include <lcdgui/screens/window/LoadAProgramScreen.hpp>
+#include <lcdgui/screens/window/LoadASequenceScreen.hpp>
+#include <lcdgui/screens/window/LoadASequenceFromAllScreen.hpp>
+#include <lcdgui/screens/window/LoadASoundScreen.hpp>
+#include <lcdgui/screens/window/LoadApsFileScreen.hpp>
+#include <lcdgui/screens/window/Mpc2000XlAllFileScreen.hpp>
+#include <lcdgui/screens/window/SaveAProgramScreen.hpp>
+#include <lcdgui/screens/window/SaveASequenceScreen.hpp>
+#include <lcdgui/screens/window/SaveASoundScreen.hpp>
+#include <lcdgui/screens/window/SaveAllFileScreen.hpp>
+#include <lcdgui/screens/window/SaveApsFileScreen.hpp>
 
 #include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
 #include <lcdgui/screens/dialog/MidiMonitorScreen.hpp>
@@ -643,6 +659,70 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	{
 		screen = make_shared<DeleteProgramScreen>(layerIndex);
 	}
+	else if (screenName.compare("load") == 0)
+	{
+		screen = make_shared<LoadScreen>(layerIndex);
+	}
+	else if (screenName.compare("format") == 0)
+	{
+		screen = make_shared<FormatScreen>(layerIndex);
+	}
+	else if (screenName.compare("setup") == 0)
+	{
+		screen = make_shared<SetupScreen>(layerIndex);
+	}
+	else if (screenName.compare("save") == 0)
+	{
+		screen = make_shared<SaveScreen>(layerIndex);
+	}
+	else if (screenName.compare("directory") == 0)
+	{
+		screen = make_shared<DirectoryScreen>(layerIndex);
+	}
+	else if (screenName.compare("load-a-program") == 0)
+	{
+		screen = make_shared<LoadAProgramScreen>(layerIndex);
+	}
+	else if (screenName.compare("load-a-sequence") == 0)
+	{
+		screen = make_shared<LoadASequenceScreen>(layerIndex);
+	}
+	else if (screenName.compare("load-a-sequence-from-all") == 0)
+	{
+		screen = make_shared<LoadASequenceFromAllScreen>(layerIndex);
+	}
+	else if (screenName.compare("load-a-sound") == 0)
+	{
+		screen = make_shared<LoadASoundScreen>(layerIndex);
+	}
+	else if (screenName.compare("load-aps-file") == 0)
+	{
+		screen = make_shared<LoadApsFileScreen>(layerIndex);
+	}
+	else if (screenName.compare("mpc2000xl-all-file") == 0)
+	{
+		screen = make_shared<Mpc2000XlAllFileScreen>(layerIndex);
+	}
+	else if (screenName.compare("save-a-program") == 0)
+	{
+		screen = make_shared<SaveAProgramScreen>(layerIndex);
+	}
+	else if (screenName.compare("save-a-sequence") == 0)
+	{
+		screen = make_shared<SaveASequenceScreen>(layerIndex);
+	}
+	else if (screenName.compare("save-a-sound") == 0)
+	{
+		screen = make_shared<SaveASoundScreen>(layerIndex);
+	}
+	else if (screenName.compare("save-all-file") == 0)
+	{
+		screen = make_shared<SaveAllFileScreen>(layerIndex);
+	}
+	else if (screenName.compare("save-aps-file") == 0)
+	{
+		screen = make_shared<SaveApsFileScreen>(layerIndex);
+	}	
 
 	if (screen)
 	{

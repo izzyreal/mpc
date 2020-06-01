@@ -61,7 +61,7 @@ namespace mpc::lcdgui::screens::dialog {
 		void setNormalVelo(int i);
 
 	public:
-		MetronomeSoundScreen(const int layer);
+		MetronomeSoundScreen(const int layerIndex);
 
 	public:
 		void turnWheel(int notch) override;

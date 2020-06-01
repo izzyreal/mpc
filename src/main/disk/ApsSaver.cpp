@@ -7,8 +7,13 @@
 #include <ui/disk/DiskGui.hpp>
 #include <sampler/Sampler.hpp>
 
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/window/SaveAProgramScreen.hpp>
+
 using namespace mpc::disk;
 using namespace mpc::file::aps; 
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
 ApsSaver::ApsSaver(string apsFileName)
@@ -28,18 +33,22 @@ ApsSaver::ApsSaver(string apsFileName)
 
 void ApsSaver::saveAps()
 {
-	auto lDisk = Mpc::instance().getDisk().lock();
-	lDisk->setBusy(true);
-    auto file = lDisk->newFile(apsFileName);
+	auto disk = Mpc::instance().getDisk().lock();
+	disk->setBusy(true);
+    auto file = disk->newFile(apsFileName);
 	ApsParser apsParser(apsFileName.substr(0, apsFileName.find(".")));
     auto bytes = apsParser.getBytes();
     file->setFileData(&bytes);
-	auto const saveWith = Mpc::instance().getUis().lock()->getDiskGui()->getPgmSave();
-	if (saveWith != 0) {
-		soundSaver = make_unique<mpc::disk::SoundSaver>(Mpc::instance().getSampler().lock()->getSounds(), saveWith == 1 ? false : true);
+
+	auto saveAProgramScreen = dynamic_pointer_cast<SaveAProgramScreen>(Screens::getScreenComponent("save-a-program"));
+	
+	if (saveAProgramScreen->save != 0)
+	{
+		soundSaver = make_unique<mpc::disk::SoundSaver>(Mpc::instance().getSampler().lock()->getSounds(), saveAProgramScreen->save == 1 ? false : true);
 	}
-	else {
-		lDisk->setBusy(false);
+	else
+	{
+		disk->setBusy(false);
 		Mpc::instance().getLayeredScreen().lock()->openScreen("save");
 	}
 }

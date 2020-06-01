@@ -3,8 +3,8 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
-TransmitProgramChangesScreen::TransmitProgramChangesScreen(const int& layer)
-	: ScreenComponent("transmitprogramchanges", layer)
+TransmitProgramChangesScreen::TransmitProgramChangesScreen(const int layerIndex)
+	: ScreenComponent("transmitprogramchanges", layerIndex)
 {
 }
 

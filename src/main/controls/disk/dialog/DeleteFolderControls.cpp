@@ -2,7 +2,6 @@
 
 #include <disk/AbstractDisk.hpp>
 #include <disk/MpcFile.hpp>
-#include <ui/disk/window/DirectoryGui.hpp>
 
 #include <Logger.hpp>
 
@@ -26,12 +25,12 @@ void DeleteFolderControls::static_deleteFolder(void* this_p)
 void DeleteFolderControls::deleteFolder()
 {
 	disk.lock()->setBusy(true);
-	ls.lock()->createPopup("Delete:" + directoryGui->getSelectedFile()->getName(), 85);
-	if (disk.lock()->deleteDir(directoryGui->getSelectedFile())) {
+	//ls.lock()->createPopup("Delete:" + directoryGui->getSelectedFile()->getName(), 85);
+	//if (disk.lock()->deleteDir(directoryGui->getSelectedFile())) {
 		//MLOG("About to flush.");
-		disk.lock()->flush();
-		disk.lock()->initFiles();
-	}
+		//disk.lock()->flush();
+		//disk.lock()->initFiles();
+	//}
 	this_thread::sleep_for(chrono::milliseconds(1000));
 	ls.lock()->removePopup();
 	ls.lock()->openScreen("directory");

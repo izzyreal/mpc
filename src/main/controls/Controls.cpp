@@ -6,24 +6,6 @@
 
 #include <controls/GlobalReleaseControls.hpp>
 
-#include <controls/disk/FormatControls.hpp>
-#include <controls/disk/LoadControls.hpp>
-#include <controls/disk/SaveControls.hpp>
-#include <controls/disk/SetupControls.hpp>
-
-#include <controls/disk/window/DirectoryControls.hpp>
-#include <controls/disk/window/LoadAProgramControls.hpp>
-#include <controls/disk/window/LoadASequenceControls.hpp>
-#include <controls/disk/window/LoadASequenceFromAllControls.hpp>
-#include <controls/disk/window/LoadASoundControls.hpp>
-#include <controls/disk/window/LoadApsFileControls.hpp>
-#include <controls/disk/window/MPC2000XLAllFileControls.hpp>
-#include <controls/disk/window/SaveAProgramControls.hpp>
-#include <controls/disk/window/SaveASequenceControls.hpp>
-#include <controls/disk/window/SaveASoundControls.hpp>
-#include <controls/disk/window/SaveAllFileControls.hpp>
-#include <controls/disk/window/SaveApsFileControls.hpp>
-
 #include <controls/other/InitControls.hpp>
 #include <controls/other/VerControls.hpp>
 
@@ -57,24 +39,6 @@ Controls::Controls()
 	pressedPadVelos = std::vector<int>(16);
 
 	controls["release"] = new GlobalReleaseControls();
-
-	controls["load"] = new disk::LoadControls();
-	controls["save"] = new disk::SaveControls();
-	controls["format"] = new disk::FormatControls();
-	controls["setup"] = new disk::SetupControls();
-
-	controls["loadasequence"] = new disk::window::LoadASequenceControls();
-	controls["saveasound"] = new disk::window::SaveASoundControls();
-	controls["mpc2000xlallfile"] = new disk::window::MPC2000XLAllFileControls();
-	controls["loadasequencefromall"] = new disk::window::LoadASequenceFromAllControls();
-	controls["loadapsfile"] = new disk::window::LoadApsFileControls();
-	controls["saveallfile"] = new disk::window::SaveAllFileControls();
-	controls["loadaprogram"] = new disk::window::LoadAProgramControls();
-	controls["directory"] = new disk::window::DirectoryControls();
-	controls["saveasequence"] = new disk::window::SaveASequenceControls();
-	controls["saveaprogram"] = new disk::window::SaveAProgramControls();
-	controls["saveapsfile"] = new disk::window::SaveApsFileControls();
-	controls["loadasound"] = new disk::window::LoadASoundControls();
 
 	controls["name"] = new other::dialog::NameControls();
 

@@ -8,8 +8,8 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
-NumberOfZonesScreen::NumberOfZonesScreen(const int& layer)
-	: ScreenComponent("number-of-zones", layer)
+NumberOfZonesScreen::NumberOfZonesScreen(const int layerIndex)
+	: ScreenComponent("number-of-zones", layerIndex)
 {
 }
 

@@ -1,13 +1,12 @@
 #include "AssignScreen.hpp"
 
-#include <sampler/Program.hpp>
 #include <sampler/PgmSlider.hpp>
 
 using namespace mpc::lcdgui::screens;
 using namespace std;
 
-AssignScreen::AssignScreen(const int& layer)
-	: ScreenComponent("assign", layer)
+AssignScreen::AssignScreen(const int layerIndex)
+	: ScreenComponent("assign", layerIndex)
 {
 }
 

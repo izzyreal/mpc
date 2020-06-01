@@ -38,9 +38,15 @@
 
 #include <disk/MpcFile.hpp>
 
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/LoadScreen.hpp>
+#include <lcdgui/screens/window/LoadAProgramScreen.hpp>
 #include <string>
 
 using namespace mpc;
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
 Mpc::Mpc()
@@ -171,27 +177,34 @@ vector<string> Mpc::akaiAscii { " ", "!", "#", "$", "%", "&", "'", "(", ")", "-"
 
 void Mpc::loadSound(bool replace)
 {
-	if (loadSoundThread.joinable()) {
+	if (loadSoundThread.joinable())
+	{
 		loadSoundThread.join();
 	}
+	
 	auto lDisk = getDisk().lock();
 	lDisk->setBusy(true);
 	auto soundLoader = mpc::disk::SoundLoader(sampler->getSounds(), replace);
 	soundLoader.setPreview(true);
 	soundLoader.setPartOfProgram(false);
 	bool hasNotBeenLoadedAlready = true;
-	
-	try {
-		hasNotBeenLoadedAlready = soundLoader.loadSound(uis->getDiskGui()->getSelectedFile()) == -1;
+
+	auto loadScreen = dynamic_pointer_cast<LoadScreen>(Screens::getScreenComponent("load"));
+
+	try
+	{
+		hasNotBeenLoadedAlready = soundLoader.loadSound(loadScreen->getSelectedFile()) == -1;
 	}
-	catch (const invalid_argument& exception) {
-		MLOG("A problem occurred when trying to load " + uis->getDiskGui()->getSelectedFile()->getName() + ": " + std::string(exception.what()));
+	catch (const invalid_argument& exception)
+	{
+		MLOG("A problem occurred when trying to load " + loadScreen->getSelectedFileName() + ": " + string(exception.what()));
 		lDisk->setBusy(false);
 		uis->getDiskGui()->removePopup();
 		return;
 	}
 	
-	if (hasNotBeenLoadedAlready) {
+	if (hasNotBeenLoadedAlready)
+	{
 		loadSoundThread = thread(&Mpc::static_loadSound, soundLoader.getSize());
 	}
 	else {
@@ -203,13 +216,20 @@ void Mpc::loadSound(bool replace)
 void Mpc::loadProgram()
 {
 	programLoader.reset();
-	programLoader = make_unique<mpc::disk::ProgramLoader>(uis->getDiskGui()->getSelectedFile(), uis->getDiskGui()->getLoadReplaceSound());
+
+	auto loadScreen = dynamic_pointer_cast<LoadScreen>(Screens::getScreenComponent("load"));
+	auto loadAProgramScreen = dynamic_pointer_cast<LoadAProgramScreen>(Screens::getScreenComponent("load-a-program"));
+
+	programLoader = make_unique<mpc::disk::ProgramLoader>(loadScreen->getSelectedFile(), loadAProgramScreen->loadReplaceSound);
 }
 
 void Mpc::importLoadedProgram()
 {
 	auto t = sequencer->getActiveSequence().lock()->getTrack(sequencer->getActiveTrackIndex()).lock();
-	if (uis->getDiskGui()->getClearProgramWhenLoading()) {
+	auto loadAProgramScreen = dynamic_pointer_cast<LoadAProgramScreen>(Screens::getScreenComponent("load-a-program"));
+
+	if (loadAProgramScreen->clearProgramWhenLoading)
+	{
 		auto pgm = getDrum(t->getBusNumber() - 1)->getProgram();
 		sampler->replaceProgram(programLoader->get(), pgm);
 	}
@@ -233,7 +253,7 @@ void Mpc::runLoadSoundThread(int size) {
 	if (sleepTime < 300) sleepTime = 300;
 	this_thread::sleep_for(chrono::milliseconds((int)(sleepTime * 0.1)));
 	uis->getDiskGui()->removePopup();
-	layeredScreen->openScreen("loadasound");
+	layeredScreen->openScreen("load-a-sound");
 	getDisk().lock()->setBusy(false);
 }
 

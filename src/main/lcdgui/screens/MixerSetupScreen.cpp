@@ -7,8 +7,8 @@ using namespace mpc::lcdgui;
 using namespace moduru::lang;
 using namespace std;
 
-MixerSetupScreen::MixerSetupScreen(const int& layer)
-	: ScreenComponent("mixer-setup", layer)
+MixerSetupScreen::MixerSetupScreen(const int layerIndex)
+	: ScreenComponent("mixer-setup", layerIndex)
 {
 }
 

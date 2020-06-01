@@ -49,7 +49,7 @@ void GlobalReleaseControls::function(int i) {
 		break;
 	case 2:
 		controls->setF3Pressed(false);
-		if (currentScreenName.compare("loadasound") == 0) {
+		if (currentScreenName.compare("load-a-sound") == 0) {
 			sampler.lock()->finishBasicVoice();
 		}
 		break;
@@ -99,7 +99,7 @@ void GlobalReleaseControls::simplePad(int i)
 	
 	controls->getPressedPads()->erase(controls->getPressedPads()->find(i));
 
-	//if (csn.compare("loadasound") == 0) return;
+	//if (csn.compare("load-a-sound") == 0) return;
 
 	auto lTrk = track.lock();
 	auto note = lTrk->getBusNumber() > 0 ? program.lock()->getPad(i + (bank * 16))->getNote() : i + (bank * 16) + 35;

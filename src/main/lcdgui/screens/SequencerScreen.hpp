@@ -17,7 +17,7 @@ namespace mpc::lcdgui::screens
 	{
 
 	public:
-		SequencerScreen(const int& layer);
+		SequencerScreen(const int layerIndex);
 
 	private:
 		std::weak_ptr<mpc::sequencer::Sequence> sequence;

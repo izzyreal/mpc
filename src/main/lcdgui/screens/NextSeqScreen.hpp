@@ -11,7 +11,7 @@ namespace mpc::lcdgui::screens
 		void turnWheel(int i) override;
 		void function(int i) override;
 
-		NextSeqScreen(const int& layer);
+		NextSeqScreen(const int layerIndex);
 		
 		void update(moduru::observer::Observable*, nonstd::any) override;
 		void open() override;

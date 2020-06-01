@@ -5,8 +5,8 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
-TrackScreen::TrackScreen(const int& layer)
-	: ScreenComponent("track", layer)
+TrackScreen::TrackScreen(const int layerIndex)
+	: ScreenComponent("track", layerIndex)
 {
 }
 

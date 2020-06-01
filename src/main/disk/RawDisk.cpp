@@ -8,7 +8,6 @@
 #include <disk/device/RawOsxDevice.hpp>
 #include <disk/device/RawWindowsDevice.hpp>
 #include <ui/disk/DiskGui.hpp>
-#include <ui/disk/window/DirectoryGui.hpp>
 //#include <de/waldheinz/fs/FsDirectory.hpp>
 //#include <de/waldheinz/fs/FsDirectoryEntry.hpp>
 //#include <de/waldheinz/fs/fat/AkaiFatLfnDirectory.hpp>

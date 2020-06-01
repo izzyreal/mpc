@@ -22,9 +22,7 @@ namespace mpc {
 			class DiskGui;
 
 			namespace window {
-				class DirectoryGui;
 				class DiskWindowGui;
-
 			}
 		}
 	}
@@ -40,7 +38,6 @@ namespace mpc {
 				typedef mpc::controls::BaseControls super;
 
 			protected:
-				mpc::ui::disk::window::DirectoryGui* directoryGui{ nullptr };
 				mpc::ui::disk::DiskGui* diskGui{ nullptr };
 				mpc::ui::disk::window::DiskWindowGui* diskWindowGui{ nullptr };
 				mpc::ui::NameGui* nameGui{ nullptr };

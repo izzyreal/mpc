@@ -38,7 +38,7 @@ namespace mpc::lcdgui::screens
 		void turnWheel(int i) override;
 		void function(int i) override;
 
-		SongScreen(const int& layer);
+		SongScreen(const int layerIndex);
 
 		void open() override;
 		void close() override;

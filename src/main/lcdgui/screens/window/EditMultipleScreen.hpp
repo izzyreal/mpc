@@ -19,7 +19,7 @@ namespace mpc::lcdgui::screens::window {
 		void checkNotes();
 
 	public:
-		EditMultipleScreen(const int& layer);
+		EditMultipleScreen(const int layerIndex);
 		void open() override;
 
 	private:

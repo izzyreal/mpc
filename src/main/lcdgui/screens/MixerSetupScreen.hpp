@@ -10,7 +10,7 @@ namespace mpc::lcdgui::screens
 	{
 
 	public:
-		MixerSetupScreen(const int& layer);
+		MixerSetupScreen(const int layerIndex);
 		void turnWheel(int increment) override;
 		void function(int i) override;
 		void open() override;

@@ -7,8 +7,8 @@
 
 #include <memory>
 
-namespace mpc::lcdgui::screens {
-
+namespace mpc::lcdgui::screens
+{
 	class MixerScreen
 		: public mpc::lcdgui::ScreenComponent, public mpc::controls::BaseSamplerControls
 	{
@@ -31,9 +31,9 @@ namespace mpc::lcdgui::screens {
 		void recordMixerEvent(int pad, int param, int value);
 
 	private:
-		const std::vector<std::string> fxPathNames = { "--", "M1", "M2", "R1", "R2" };
-		const std::vector<std::string> stereoNames = { "-", "12", "12", "34", "34", "56", "56", "78", "78" };
-		const std::vector<std::string> monoNames = { "-", "1", "2", "3", "4", "5", "6", "7", "8" };
+		const std::vector<std::string> fxPathNames{ "--", "M1", "M2", "R1", "R2" };
+		const std::vector<std::string> stereoNames{ "-", "12", "12", "34", "34", "56", "56", "78", "78" };
+		const std::vector<std::string> monoNames{ "-", "1", "2", "3", "4", "5", "6", "7", "8" };
 
 	private:
 		int tab = 0;

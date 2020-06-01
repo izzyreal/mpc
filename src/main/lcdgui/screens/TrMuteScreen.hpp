@@ -16,7 +16,7 @@ namespace mpc::lcdgui::screens
 		void pad(int i, int velo, bool repeat, int tick) override;
 
 	public:
-		TrMuteScreen(const int& layer);
+		TrMuteScreen(const int layerIndex);
 		void update(moduru::observer::Observable* o, nonstd::any arg) override;
 		void open() override;
 		void close() override;

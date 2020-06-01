@@ -12,7 +12,7 @@ namespace mpc::lcdgui::screens::dialog
 		void turnWheel(int i) override;
 		void function(int i) override;
 
-		DeleteSequenceScreen(const int layer);
+		DeleteSequenceScreen(const int layerIndex);
 
 		void open() override;
 

@@ -11,7 +11,7 @@ namespace mpc::lcdgui::screens
 		void function(int j) override;
 		void turnWheel(int i) override;
 
-		BarCopyScreen(const int& layer);
+		BarCopyScreen(const int layerIndex);
 		void open() override;
 
 	private:

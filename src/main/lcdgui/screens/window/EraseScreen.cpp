@@ -12,8 +12,8 @@ using namespace mpc::sequencer;
 using namespace moduru::lang;
 using namespace std;
 
-EraseScreen::EraseScreen(const int& layer)
-	: ScreenComponent("erase", layer)
+EraseScreen::EraseScreen(const int layerIndex)
+	: ScreenComponent("erase", layerIndex)
 {
 }
 

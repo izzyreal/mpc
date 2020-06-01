@@ -12,7 +12,7 @@ namespace mpc::lcdgui::screens::window
 		void turnWheel(int i) override;
 
 	public:
-		Assign16LevelsScreen(const int& layer);
+		Assign16LevelsScreen(const int layerIndex);
 
 	private:
 		int note = 35;

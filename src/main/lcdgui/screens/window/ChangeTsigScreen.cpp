@@ -9,8 +9,8 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
-ChangeTsigScreen::ChangeTsigScreen(const int& layer)
-	: ScreenComponent("changetsig", layer)
+ChangeTsigScreen::ChangeTsigScreen(const int layerIndex)
+	: ScreenComponent("changetsig", layerIndex)
 {
 }
 

@@ -7,7 +7,11 @@
 #include <disk/device/Device.hpp>
 #include <disk/device/StdDevice.hpp>
 #include <ui/disk/DiskGui.hpp>
+
 #include <file/AkaiName.hpp>
+
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/LoadScreen.hpp>
 
 #include <raw/fat/ShortName.hpp>
 #include <raw/fat/ShortNameGenerator.hpp>
@@ -25,6 +29,8 @@ using namespace moduru::file;
 using namespace moduru::raw::fat;
 using namespace mpc::disk;
 using namespace mpc::file;
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens;
 using namespace std;
 
 StdDisk::StdDisk(weak_ptr<Store> store)
@@ -100,19 +106,32 @@ void StdDisk::renameFilesToAkai() {
 
 void StdDisk::initFiles()
 {
+	for (auto& f : allFiles)
+	{
+		delete f;
+	}
+
 	files.clear();
 	allFiles.clear();
 
 	renameFilesToAkai();
 
-	auto view = diskGui->getView();
+	auto loadScreen = dynamic_pointer_cast<LoadScreen>(Screens::getScreenComponent("load"));
+
+	auto view = loadScreen->view;
 	auto fileArray = getDir().lock()->listFiles();
-	for (auto& f : fileArray) {
+
+	for (auto& f : fileArray)
+	{
 		MpcFile* mpcFile = new MpcFile(f);
 		allFiles.push_back(mpcFile);
-		if (view != 0) {
+
+		if (view != 0)
+		{
 			string name = f->getName();
-			if (f->isFile() && name.find(".") != string::npos && name.substr(name.length() - 3).compare(extensions[view]) == 0) {
+		
+			if (f->isFile() && name.find(".") != string::npos && name.substr(name.length() - 3).compare(extensions[view]) == 0)
+			{
 				files.push_back(mpcFile);
 			}
 		}

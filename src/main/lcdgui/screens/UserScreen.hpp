@@ -12,7 +12,7 @@ namespace mpc::lcdgui::screens
 		void turnWheel(int i) override;
 
 	public:
-		UserScreen(const int& layer);
+		UserScreen(const int layerIndex);
 		
 		void update(moduru::observer::Observable* o, nonstd::any arg) override;
 		void open() override;

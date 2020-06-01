@@ -3,8 +3,8 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
-MidiOutputScreen::MidiOutputScreen(const int& layer)
-	: ScreenComponent("midioutput", layer)
+MidiOutputScreen::MidiOutputScreen(const int layerIndex)
+	: ScreenComponent("midioutput", layerIndex)
 {
 }
 

@@ -13,7 +13,7 @@ namespace mpc::lcdgui::screens::window
 		void turnWheel(int i) override;
 
 	public:
-		ChangeBars2Screen(const int& layer);
+		ChangeBars2Screen(const int layerIndex);
 
 	public:
 		void open() override;

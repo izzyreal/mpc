@@ -5,8 +5,8 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
-LoopBarsScreen::LoopBarsScreen(const int& layer)
-	: ScreenComponent("loopbarswindow", layer)
+LoopBarsScreen::LoopBarsScreen(const int layerIndex)
+	: ScreenComponent("loopbarswindow", layerIndex)
 {
 }
 

@@ -9,16 +9,23 @@
 #include <file/sndwriter/SndWriter.hpp>
 #include <ui/Uis.hpp>
 #include <ui/disk/DiskGui.hpp>
-#include <ui/disk/window/DirectoryGui.hpp>
 #include <sampler/NoteParameters.hpp>
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>
 #include <sampler/Sound.hpp>
 
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/LoadScreen.hpp>
+#include <lcdgui/screens/window/DirectoryScreen.hpp>
+#include <lcdgui/screens/window/SaveAProgramScreen.hpp>
 #include <file/FileUtil.hpp>
 #include <lang/StrUtil.hpp>
 
 using namespace mpc::disk;
+
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui::screens::window;
 
 using namespace moduru::lang;
 using namespace moduru::file;
@@ -51,15 +58,21 @@ string AbstractDisk::formatFileSize(int size)
 	float m = ((size / 1024.0) / 1024.0);
 	float g = (((size / 1024.0) / 1024.0) / 1024.0);
 	float t = ((((size / 1024.0) / 1024.0) / 1024.0) / 1024.0);
-	if(t > 1) {
+
+	if(t > 1)
+	{
 		hrSize = StrUtil::TrimDecimals(t, 2) + " TB";
-	} else if(g > 1) {
+	} else if(g > 1)
+	{
 		hrSize = StrUtil::TrimDecimals(g, 2) + " GB";
-	} else if(m > 1) {
+	} else if(m > 1)
+	{
 		hrSize = StrUtil::TrimDecimals(m, 2) + " MB";
-	} else if(k > 1) {
+	} else if(k > 1)
+	{
 		hrSize = StrUtil::TrimDecimals(k, 2) + " KB";
-	} else {
+	} else
+	{
 		hrSize = StrUtil::TrimDecimals(b, 2) + " Bytes";
 	}
 	return hrSize;
@@ -103,18 +116,21 @@ vector<string> AbstractDisk::getParentFileNames()
 
 bool AbstractDisk::renameSelectedFile(string s)
 {
-    auto dirGui = Mpc::instance().getUis().lock()->getDirectoryGui();
+	auto directoryScreen = dynamic_pointer_cast<DirectoryScreen>(Screens::getScreenComponent("directory"));
+	auto loadScreen = dynamic_pointer_cast<LoadScreen>(Screens::getScreenComponent("load"));
 	auto diskGui = Mpc::instance().getUis().lock()->getDiskGui();
-    auto left = dirGui->getXPos() == 0;
-    auto fileNumber = left ? dirGui->getYpos0() + dirGui->getYOffsetFirst() : diskGui->getFileLoad();
+  
+	auto left = directoryScreen->xPos == 0;
+	auto fileNumber = left ? directoryScreen->yPos0 + directoryScreen->yOffset0 : loadScreen->fileLoad;
+
     auto file = left ? getParentFile(fileNumber) : getFile(fileNumber);
     return file->setName(s);
 }
 
 bool AbstractDisk::deleteSelectedFile()
 {
-	auto diskGui = Mpc::instance().getUis().lock()->getDiskGui();
-	return files[diskGui->getFileLoad()]->del();
+	auto loadScreen = dynamic_pointer_cast<LoadScreen>(Screens::getScreenComponent("load"));
+	return files[loadScreen->fileLoad]->del();
 }
 
 std::vector<MpcFile*> AbstractDisk::getFiles()
@@ -255,15 +271,20 @@ void AbstractDisk::writeProgram(mpc::sampler::Program* program, string fileName)
     auto bytes = writer.get();
 	pgmFile->setFileData(&bytes);
 	vector<std::weak_ptr<mpc::sampler::Sound>> sounds;
-	for (auto& n : program->getNotesParameters()) {
-		if (n->getSndNumber() != -1) {
+
+	for (auto& n : program->getNotesParameters())
+	{
+		if (n->getSndNumber() != -1)
+		{
 			sounds.push_back(dynamic_pointer_cast<mpc::sampler::Sound>(Mpc::instance().getSampler().lock()->getSound(n->getSndNumber()).lock()));
 		}
 	}
-	auto save = Mpc::instance().getUis().lock()->getDiskGui()->getPgmSave();
+
+	auto saveAProgramScreen = dynamic_pointer_cast<SaveAProgramScreen>(Screens::getScreenComponent("save-a-program"));
 	
-	if (save != 0) {
-		auto isWav = save == 1;
+	if (saveAProgramScreen->save != 0)
+	{
+		auto isWav = saveAProgramScreen->save == 1;
 		soundSaver = make_unique<SoundSaver>(sounds, isWav);
 	}
 	else {

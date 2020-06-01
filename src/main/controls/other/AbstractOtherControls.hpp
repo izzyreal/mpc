@@ -14,11 +14,6 @@ namespace mpc::ui
 	class NameGui;
 }
 
-namespace mpc::ui::disk::window
-{
-	class DirectoryGui;
-}
-
 namespace mpc::controls::other
 {
 
@@ -28,7 +23,6 @@ namespace mpc::controls::other
 
 	protected:
 		mpc::ui::NameGui* nameGui = nullptr;
-		mpc::ui::disk::window::DirectoryGui* directoryGui = nullptr;
 		std::weak_ptr<mpc::sequencer::Sequence> sequence;
 
 	protected:

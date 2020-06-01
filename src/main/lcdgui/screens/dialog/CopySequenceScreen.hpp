@@ -12,7 +12,7 @@ namespace mpc::lcdgui::screens::dialog
 		void function(int i) override;
 		void turnWheel(int i) override;
 
-		CopySequenceScreen(const int layer);
+		CopySequenceScreen(const int layerIndex);
 
 		void open() override;
 

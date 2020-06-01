@@ -2,8 +2,8 @@
 #include <lcdgui/ScreenComponent.hpp>
 #include <lcdgui/screens/WithTimesAndNotes.hpp>
 
-namespace mpc::lcdgui::screens::window {
-
+namespace mpc::lcdgui::screens::window
+{
 	class EraseScreen
 		: public mpc::lcdgui::ScreenComponent, public mpc::lcdgui::screens::WithTimesAndNotes
 	{
@@ -13,7 +13,7 @@ namespace mpc::lcdgui::screens::window {
 		void function(int i) override;
 
 	public:
-		EraseScreen(const int& layer);
+		EraseScreen(const int layerIndex);
 
 	public:
 		void open() override;
@@ -32,9 +32,9 @@ namespace mpc::lcdgui::screens::window {
 		void displayTime() override;
 
 	private:
-		std::vector<std::string> eventClassNames = vector<string>{ "com.mpc.sequencer.NoteEvent", "com.mpc.sequencer.PitchBendEvent", "com.mpc.sequencer.ControlChangeEvent", "com.mpc.sequencer.ProgramChangeEvent", "com.mpc.sequencer.ChannelPressureEvent", "com.mpc.sequencer.PolyPressureEvent", "com.mpc.sequencer.SystemExclusiveEvent" };
-		std::vector<std::string> typeNames = vector<string>{ "NOTES", "PITCH BEND", "CONTROL", "PROG CHANGE", "CH PRESSURE", "POLY PRESS", "EXCLUSIVE" };
-		std::vector<std::string> eraseNames = vector<string>{ "ALL EVENTS", "ALL EXCEPT", "ONLY ERASE" };
+		const std::vector<std::string> eventClassNames{ "com.mpc.sequencer.NoteEvent", "com.mpc.sequencer.PitchBendEvent", "com.mpc.sequencer.ControlChangeEvent", "com.mpc.sequencer.ProgramChangeEvent", "com.mpc.sequencer.ChannelPressureEvent", "com.mpc.sequencer.PolyPressureEvent", "com.mpc.sequencer.SystemExclusiveEvent" };
+		const std::vector<std::string> typeNames{ "NOTES", "PITCH BEND", "CONTROL", "PROG CHANGE", "CH PRESSURE", "POLY PRESS", "EXCLUSIVE" };
+		const std::vector<std::string> eraseNames{ "ALL EVENTS", "ALL EXCEPT", "ONLY ERASE" };
 
 		int track = 0;
 		int erase = 0;

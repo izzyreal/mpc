@@ -11,7 +11,7 @@ namespace mpc::lcdgui::screens::window {
 		void function(int i) override;
 		void turnWheel(int i) override;
 
-		InsertEventScreen(const int& layer);
+		InsertEventScreen(const int layerIndex);
 		void open() override;
 
 	private:

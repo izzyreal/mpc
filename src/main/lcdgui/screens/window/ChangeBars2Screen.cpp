@@ -11,8 +11,8 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
-ChangeBars2Screen::ChangeBars2Screen(const int& layer)
-	: ScreenComponent("changebars2", layer)
+ChangeBars2Screen::ChangeBars2Screen(const int layerIndex)
+	: ScreenComponent("changebars2", layerIndex)
 {
 }
 

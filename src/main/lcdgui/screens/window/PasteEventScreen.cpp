@@ -12,8 +12,8 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui;
 using namespace std;
 
-PasteEventScreen::PasteEventScreen(const int& layer)
-	: ScreenComponent("pasteevent", layer)
+PasteEventScreen::PasteEventScreen(const int layerIndex)
+	: ScreenComponent("pasteevent", layerIndex)
 {
 }
 

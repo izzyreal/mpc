@@ -30,7 +30,7 @@ namespace mpc::lcdgui::screens
 		void down() override;
 		void shift() override;
 
-		StepEditorScreen(const int& layer);
+		StepEditorScreen(const int layerIndex);
 
 		void open() override;
 		void close() override;

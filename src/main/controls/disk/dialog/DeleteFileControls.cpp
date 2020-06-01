@@ -2,7 +2,6 @@
 
 #include <disk/AbstractDisk.hpp>
 #include <disk/MpcFile.hpp>
-#include <ui/disk/window/DirectoryGui.hpp>
 #include <ui/disk/DiskGui.hpp>
 
 #ifdef __linux__
@@ -25,7 +24,7 @@ void DeleteFileControls::function(int i)
 		ls.lock()->openScreen("deleteallfiles");
 		break;
 	case 4:
-		ls.lock()->createPopup("Delete:" + directoryGui->getSelectedFile()->getName(), 85);
+		//ls.lock()->createPopup("Delete:" + directoryGui->getSelectedFile()->getName(), 85);
 		if (deleteThread.joinable()) deleteThread.join();
 		deleteThread = thread(&DeleteFileControls::static_delete, this);
 		break;
@@ -44,10 +43,10 @@ void DeleteFileControls::deleteFile() {
 	if (lDisk->deleteSelectedFile()) {
 		lDisk->flush();
 		lDisk->initFiles();
-		diskGui->setFileLoad(diskGui->getFileLoad() - 1);
-		directoryGui->setYOffset1(directoryGui->getYOffsetSecond() - 1);
+		//diskGui->setFileLoad(diskGui->getFileLoad() - 1);
+		//directoryGui->setYOffset1(directoryGui->getYOffsetSecond() - 1);
 	}
-	if (diskGui->getFileLoad() < 0) diskGui->setFileLoad(0);
+	//if (diskGui->getFileLoad() < 0) diskGui->setFileLoad(0);
 
 	ls.lock()->openScreen("directory");
 }

@@ -11,7 +11,7 @@ namespace mpc::lcdgui::screens::window {
 		void turnWheel(int i) override;
 
 	public:
-		LoopBarsScreen(const int& layer);
+		LoopBarsScreen(const int layerIndex);
 
 	public:
 		void open() override;

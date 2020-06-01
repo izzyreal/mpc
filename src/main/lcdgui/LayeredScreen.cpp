@@ -31,11 +31,7 @@
 
 #include <ui/NameObserver.hpp>
 
-#include <ui/disk/DiskObserver.hpp>
-#include <ui/disk/window/LoadASequenceFromAllObserver.hpp>
 #include <ui/disk/window/DeleteAllFilesObserver.hpp>
-#include <ui/disk/window/DirectoryObserver.hpp>
-#include <ui/disk/window/SaveAllFileObserver.hpp>
 
 #include <ui/midisync/SyncObserver.hpp>
 
@@ -68,10 +64,6 @@ using namespace moduru::file;
 using namespace rapidjson;
 
 using namespace std;
-
-static vector<string> diskNames = vector<string>{ "load", "save", "format", "setup", "device", "loadaprogram",
-"saveaprogram", "loadasound", "saveasound", "cantfindfile", "filealreadyexists", "loadasequence",
-"saveasequence", "saveapsfile" };
 
 static moduru::gui::BMFParser _bmfParser = moduru::gui::BMFParser(string(mpc::Paths::resPath() + moduru::file::FileUtil::getSeparator() + "font.fnt"));
 
@@ -688,20 +680,6 @@ void LayeredScreen::initObserver()
 	}
 	else if (csn.compare("sync") == 0) {
 		activeObserver = make_unique<SyncObserver>();
-	}
-	else if (csn.compare("saveallfile") == 0) {
-		activeObserver = make_unique<SaveAllFileObserver>();
-	}
-	else if (csn.compare("loadasequencefromall") == 0) {
-		activeObserver = make_unique<LoadASequenceFromAllObserver>();
-	}
-	else if (checkActiveScreen(&diskNames, currentScreenName))
-	{
-		activeObserver = make_unique<DiskObserver>();
-	}
-	else if (csn.compare("directory") == 0)
-	{
-		activeObserver = make_unique<DirectoryObserver>(Mpc::instance().getDisk());
 	}
 	else if (csn.compare("name") == 0)
 	{

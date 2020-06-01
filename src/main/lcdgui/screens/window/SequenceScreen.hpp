@@ -8,7 +8,7 @@ namespace mpc::lcdgui::screens::window
 	{
 
 	public:
-		SequenceScreen(const int& layer);
+		SequenceScreen(const int layerIndex);
 	
 	public:
 		void open() override;

@@ -19,8 +19,8 @@ using namespace moduru::lang;
 
 using namespace std;
 
-EditSequenceScreen::EditSequenceScreen(const int& layer)
-	: ScreenComponent("editsequence", layer)
+EditSequenceScreen::EditSequenceScreen(const int layerIndex)
+	: ScreenComponent("editsequence", layerIndex)
 {
 }
 

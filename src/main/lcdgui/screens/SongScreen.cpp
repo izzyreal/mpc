@@ -11,8 +11,8 @@ using namespace mpc::lcdgui::screens;
 using namespace moduru::lang;
 using namespace std;
 
-SongScreen::SongScreen(const int& layer)
-	: ScreenComponent("song", layer)
+SongScreen::SongScreen(const int layerIndex)
+	: ScreenComponent("song", layerIndex)
 {
 }
 

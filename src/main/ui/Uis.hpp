@@ -28,7 +28,6 @@ namespace mpc::ui::disk {
 
 namespace mpc::ui::disk::window {
 	class DiskWindowGui;
-	class DirectoryGui;
 }
 
 namespace mpc::ui::midisync {
@@ -44,7 +43,6 @@ namespace mpc::ui {
 		mpc::ui::NameGui* nameGui = nullptr;
 
 		mpc::ui::disk::DiskGui* diskGui = nullptr;
-		mpc::ui::disk::window::DirectoryGui* directoryGui = nullptr;
 		mpc::ui::disk::window::DiskWindowGui* diskWindowGui = nullptr;
 
 		mpc::ui::midisync::MidiSyncGui* midiSyncGui = nullptr;
@@ -61,7 +59,6 @@ namespace mpc::ui {
 	public:
 		mpc::ui::midisync::MidiSyncGui* getMidiSyncGui();
 		mpc::ui::disk::DiskGui* getDiskGui();
-		mpc::ui::disk::window::DirectoryGui* getDirectoryGui();
 		mpc::ui::disk::window::DiskWindowGui* getDiskWindowGui();
 		mpc::ui::NameGui* getNameGui();
 

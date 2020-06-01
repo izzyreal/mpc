@@ -8,7 +8,7 @@ namespace mpc::lcdgui::screens
 	{
 
 	public:
-		NextSeqPadScreen(const int& layer);
+		NextSeqPadScreen(const int layerIndex);
 
 	public:
 		void right() override;

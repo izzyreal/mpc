@@ -16,8 +16,8 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 using namespace std;
 
-InsertEventScreen::InsertEventScreen(const int& layer)
-	: ScreenComponent("insertevent", layer)
+InsertEventScreen::InsertEventScreen(const int layerIndex)
+	: ScreenComponent("insertevent", layerIndex)
 {
 }
 

@@ -6,8 +6,8 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
-ChangeBarsScreen::ChangeBarsScreen(const int& layer)
-	: ScreenComponent("changebars", layer)
+ChangeBarsScreen::ChangeBarsScreen(const int layerIndex)
+	: ScreenComponent("changebars", layerIndex)
 {
 }
 

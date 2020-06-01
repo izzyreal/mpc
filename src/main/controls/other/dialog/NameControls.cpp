@@ -5,6 +5,8 @@
 #include <lcdgui/Field.hpp>
 #include <lcdgui/Underline.hpp>
 #include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/LoadScreen.hpp>
+#include <lcdgui/screens/window/DirectoryScreen.hpp>
 #include <lcdgui/screens/window/MidiOutputScreen.hpp>
 #include <lcdgui/screens/window/MidiOutputScreen.hpp>
 #include <lcdgui/screens/window/EditSoundScreen.hpp>
@@ -22,7 +24,6 @@
 
 #include <ui/NameGui.hpp>
 #include <ui/disk/DiskGui.hpp>
-#include <ui/disk/window/DirectoryGui.hpp>
 #include <ui/vmpc/DirectToDiskRecorderGui.hpp>
 
 #include <sampler/Program.hpp>
@@ -36,6 +37,7 @@
 
 using namespace mpc::controls::other::dialog;
 using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;
 using namespace std;
@@ -149,18 +151,18 @@ void NameControls::saveName()
 		lLs->setLastFocus("name", "0");
 		lLs->openScreen("directtodiskrecorder");
 	}
-	else if (paramToRename.compare("saveallfile") == 0)
+	else if (paramToRename.compare("save-all-file") == 0)
 	{
 		nameGui->setNameBeingEdited(false);
 		lLs->setLastFocus("name", "0");
-		lLs->openScreen("saveallfile");
+		lLs->openScreen("save-all-file");
 		return;
 	}
-	else if (paramToRename.compare("saveasound") == 0)
+	else if (paramToRename.compare("save-a-sound") == 0)
 	{
 		nameGui->setNameBeingEdited(false);
 		lLs->setLastFocus("name", "0");
-		lLs->openScreen("saveasound");
+		lLs->openScreen("save-a-sound");
 		return;
 	}
 	else if (paramToRename.compare("savingpgm") == 0)
@@ -181,7 +183,7 @@ void NameControls::saveName()
 	}
 	else if (paramToRename.compare("savingmid") == 0)
 	{
-		lLs->openScreen("saveasequence");
+		lLs->openScreen("save-a-sequence");
 		nameGui->setNameBeingEdited(false);
 		lLs->setLastFocus("name", "0");
 		return;
@@ -234,11 +236,16 @@ void NameControls::saveName()
 	}
 	else if (paramToRename.compare("rename") == 0)
 	{
-		bool success;
-		auto ext = mpc::Util::splitName(directoryGui->getSelectedFile()->getName())[1];
-		if (ext.length() > 0) ext = "." + ext;
+		auto directoryScreen = dynamic_pointer_cast<DirectoryScreen>(Screens::getScreenComponent("directory"));
+		auto ext = mpc::Util::splitName(directoryScreen->getSelectedFile()->getName())[1];
+		
+		if (ext.length() > 0)
+		{
+			ext = "." + ext;
+		}
 
-		success = Mpc::instance().getDisk().lock()->renameSelectedFile(StrUtil::trim(StrUtil::toUpper(nameGui->getName())) + ext);
+		bool success = Mpc::instance().getDisk().lock()->renameSelectedFile(StrUtil::trim(StrUtil::toUpper(nameGui->getName())) + ext);
+		
 		if (!success)
 		{
 			lLs->createPopup("File name exists !!", 120);
@@ -265,24 +272,29 @@ void NameControls::saveName()
 			lDisk->flush();
 			lDisk->initFiles();
 			auto counter = 0;
+
 			for (int i = 0; i < lDisk->getFileNames().size(); i++)
 			{
 				if (lDisk->getFileName(i).compare(StrUtil::toUpper(nameGui->getName())) == 0)
 				{
-					uis->getDiskGui()->setFileLoad(counter);
+					auto loadScreen = dynamic_pointer_cast<LoadScreen>(Screens::getScreenComponent("load"));
+					loadScreen->setFileLoad(counter);
+
+					auto directoryScreen = dynamic_pointer_cast<DirectoryScreen>(Screens::getScreenComponent("directory"));
 
 					if (counter > 4)
 					{
-						uis->getDirectoryGui()->setYOffset1(counter - 4);
+						directoryScreen->yOffset1 = counter - 4;
 					}
 					else
 					{
-						uis->getDirectoryGui()->setYOffset1(0);
+						directoryScreen->yOffset1 = 0;
 					}
 					break;
 				}
 				counter++;
 			}
+
 			lLs->openScreen("directory");
 			lLs->setPreviousScreenName("load");
 			nameGui->setNameBeingEdited(false);
@@ -294,11 +306,11 @@ void NameControls::saveName()
 		}
 	}
 
-	if (prevScreen.compare("saveapsfile") == 0)
+	if (prevScreen.compare("save-aps-file") == 0)
 	{
 		nameGui->setNameBeingEdited(false);
 		lLs->setLastFocus("name", "0");
-		lLs->openScreen("saveapsfile");
+		lLs->openScreen("save-aps-file");
 	}
 	else if (prevScreen.compare("keep-or-retry") == 0)
 	{
@@ -315,11 +327,11 @@ void NameControls::saveName()
 		lLs->openScreen("sequencer");
 		return;
 	}
-	else if (prevScreen.compare("saveasequence") == 0)
+	else if (prevScreen.compare("save-a-sequence") == 0)
 	{
 		nameGui->setNameBeingEdited(false);
 		lLs->setLastFocus("name", "0");
-		lLs->openScreen("saveasequence");
+		lLs->openScreen("save-a-sequence");
 	}
 	else if (prevScreen.compare("sequence") == 0)
 	{

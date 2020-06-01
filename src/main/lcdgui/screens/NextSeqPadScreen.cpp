@@ -4,8 +4,8 @@ using namespace mpc::lcdgui::screens;
 using namespace moduru::lang;
 using namespace std;
 
-NextSeqPadScreen::NextSeqPadScreen(const int& layer)
-	: ScreenComponent("nextseqpad", layer)
+NextSeqPadScreen::NextSeqPadScreen(const int layerIndex)
+	: ScreenComponent("nextseqpad", layerIndex)
 {
 }
 

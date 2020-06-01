@@ -17,8 +17,8 @@ using namespace mpc::sequencer;
 using namespace moduru::lang;
 using namespace std;
 
-EditMultipleScreen::EditMultipleScreen(const int& layer)
-	: ScreenComponent("editmultiple", layer)
+EditMultipleScreen::EditMultipleScreen(const int layerIndex)
+	: ScreenComponent("editmultiple", layerIndex)
 {
 }
 

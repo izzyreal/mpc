@@ -22,7 +22,6 @@
 
 #include <ui/NameGui.hpp>
 #include <ui/disk/DiskGui.hpp>
-#include <ui/disk/window/DirectoryGui.hpp>
 #include <ui/misc/PunchGui.hpp>
 #include <ui/vmpc/DirectToDiskRecorderGui.hpp>
 
@@ -38,12 +37,15 @@
 #include <lcdgui/screens/window/Assign16LevelsScreen.hpp>
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <lcdgui/screens/window/EditSoundScreen.hpp>
+#include <lcdgui/screens/window/DirectoryScreen.hpp>
+#include <lcdgui/screens/LoadScreen.hpp>
 #include <lcdgui/Screens.hpp>
 
 #include <mpc/MpcSoundPlayerChannel.hpp>
 #include <audio/server/NonRealTimeAudioServer.hpp>
 
 using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::controls;
 using namespace std;
@@ -163,13 +165,17 @@ void BaseControls::function(int i)
 			}
 			else if (currentScreenName.compare("directory") == 0)
 			{
-				ls.lock()->setPreviousScreenName(mpc.getUis().lock()->getDirectoryGui()->getPreviousScreenName());
+				auto directoryScreen = dynamic_pointer_cast<DirectoryScreen>(Screens::getScreenComponent("directory"));
+				ls.lock()->setPreviousScreenName(directoryScreen->previousScreenName);
 			}
+			
 			if (ls.lock()->getPreviousScreenName().compare("load") == 0)
 			{
-				if (mpc.getUis().lock()->getDiskGui()->getFileLoad() + 1 > mpc.getDisk().lock()->getFiles().size())
+				auto loadScreen = dynamic_pointer_cast<LoadScreen>(Screens::getScreenComponent("load"));
+
+				if (loadScreen->fileLoad + 1 > mpc.getDisk().lock()->getFiles().size())
 				{
-					mpc.getUis().lock()->getDiskGui()->setFileLoad(0);
+					loadScreen->fileLoad = 0; // Can we avoid this? Who's leaving fileLoad in a bad state?
 				}
 			}
 		}
@@ -417,20 +423,24 @@ void BaseControls::numpad(int i)
 			mpc.getUis().lock()->getPunchGui()->setTime1(sequencer.lock()->getActiveSequence().lock()->getLastTick());
 			break;
 		case 3:
+		{
 			if (sequencer.lock()->isPlaying())
 			{
 				break;
 			}
-			
+
 			lDisk->initFiles();
-			
-			if (mpc.getUis().lock()->getDiskGui()->getFileLoad() + 1 > (int) (lDisk->getFiles().size()))
+
+			auto loadScreen = dynamic_pointer_cast<LoadScreen>(Screens::getScreenComponent("load"));
+
+			if (loadScreen->fileLoad + 1 > (int)(lDisk->getFiles().size()))
 			{
-				mpc.getUis().lock()->getDiskGui()->setFileLoad((int)(lDisk->getFiles().size() - 1));
+				loadScreen->fileLoad = (int)(lDisk->getFiles().size() - 1); // Same here, can we avoid this?
 			}
-			
+
 			ls.lock()->openScreen("load");
 			break;
+		}
 		case 4:
 			if (sequencer.lock()->isPlaying())
 			{

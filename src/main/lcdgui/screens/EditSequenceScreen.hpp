@@ -13,7 +13,7 @@ namespace mpc::lcdgui::screens
 		void function(int i) override;
 		void turnWheel(int i) override;
 
-		EditSequenceScreen(const int& layer);
+		EditSequenceScreen(const int layerIndex);
 
 		void open() override;
 

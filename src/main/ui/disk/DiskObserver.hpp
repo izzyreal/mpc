@@ -45,10 +45,6 @@ namespace mpc {
 			{
 
 			private:
-				const std::vector<std::string> views{ "All Files", ".SND", ".PGM", ".APS", ".MID", ".ALL", ".WAV", ".SEQ", ".SET" };
-				const std::vector<std::string> types{ "Save All Sequences & Songs", "Save a Sequence", "Save All Program and Sounds", "Save a Program & Sounds", "Save a Sound", "Copy Operating System" };
-				const std::vector<std::string> pgmSaveNames{ "PROGRAM ONLY", "WITH SOUNDS", "WITH .WAV" };
-				const std::vector<std::string> apsSaveNames{ "APS ONLY", "WITH SOUNDS", "WITH .WAV" };
 
 				DiskGui* diskGui{ nullptr };
 				std::weak_ptr<mpc::disk::AbstractDisk> disk;
@@ -80,14 +76,7 @@ namespace mpc {
 
 			private:
 				void displaySaveAs();
-				void displayFileType();
-				void displaySave();
-				void displayReplaceSameSounds();
-				void displayFree();
-				void displayDevice();
-				void displayFreeSnd();
 				void displayAssignToNote();
-				void displaySize();
 				void displayLoadInto();
 				void displayFile();
 
@@ -95,11 +84,7 @@ namespace mpc {
 				void update(moduru::observer::Observable* o, nonstd::any a) override;
 
 			private:
-				void displayType();
-				void displayLoadReplaceSound();
-				void displayView();
 				void displayDirectory();
-				std::string padExtensionRight(std::string s);
 
 			public:
 				DiskObserver();

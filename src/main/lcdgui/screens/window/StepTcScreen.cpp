@@ -6,8 +6,8 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui;
 using namespace std;
 
-StepTcScreen::StepTcScreen(const int& layer)
-	: ScreenComponent("step-timing-correct", layer)
+StepTcScreen::StepTcScreen(const int layerIndex)
+	: ScreenComponent("step-timing-correct", layerIndex)
 {
 }
 

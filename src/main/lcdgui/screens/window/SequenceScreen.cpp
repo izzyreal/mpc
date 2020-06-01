@@ -6,8 +6,8 @@
 
 using namespace mpc::lcdgui::screens::window;
 
-SequenceScreen::SequenceScreen(const int& layer)
-	: ScreenComponent("sequence", layer)
+SequenceScreen::SequenceScreen(const int layerIndex)
+	: ScreenComponent("sequence", layerIndex)
 {
 }
 

@@ -12,7 +12,7 @@ namespace mpc::lcdgui::screens::window {
 		void turnWheel(int i) override;
 
 	public:
-		MidiInputScreen(const int& layer);
+		MidiInputScreen(const int layerIndex);
 
 	public:
 		void open() override;

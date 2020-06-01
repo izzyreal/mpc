@@ -9,8 +9,8 @@ using namespace mpc::lcdgui::screens;
 using namespace moduru::lang;
 using namespace std;
 
-UserScreen::UserScreen(const int& layer) 
-	: ScreenComponent("user", layer)
+UserScreen::UserScreen(const int layerIndex) 
+	: ScreenComponent("user", layerIndex)
 {
 }
 

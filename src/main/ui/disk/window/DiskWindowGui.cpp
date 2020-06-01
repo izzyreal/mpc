@@ -9,19 +9,6 @@ DiskWindowGui::DiskWindowGui()
 {
 }
 
-void DiskWindowGui::setLoadInto(int i)
-{
-	if (i < 0 || i > 98) return;
-	loadInto = i;
-	setChanged();
-	notifyObservers(string("loadinto"));
-}
-
-int DiskWindowGui::getLoadInto()
-{
-    return loadInto;
-}
-
 void DiskWindowGui::setDelete(int i)
 {
 	if (i < 0 || i > 8) return;
