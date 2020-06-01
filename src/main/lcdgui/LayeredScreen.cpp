@@ -302,15 +302,12 @@ int LayeredScreen::openScreen(string screenName) {
 
 	getFocusedLayer().lock()->addChild(screenComponent);
 	
-	//screenComponent->SetDirtyRecursive();
-
 	screenComponent->open();
 
 	if (screenComponent->findFields().size() > 0)
 	{
 		returnToLastFocus(screenComponent->findFields().front().lock()->getName());
 	}
-	
 	return focusedLayerIndex;
 }
 

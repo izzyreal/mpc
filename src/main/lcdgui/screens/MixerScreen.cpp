@@ -18,6 +18,7 @@ using namespace std;
 MixerScreen::MixerScreen(const int layerIndex) 
 	: ScreenComponent("mixer", layerIndex)
 {
+	addMixerStrips();
 }
 
 void MixerScreen::open()
@@ -25,8 +26,6 @@ void MixerScreen::open()
 	mpc.addObserver(this);
 
 	findField("dummy").lock()->Hide(true);
-
-	initMixerStrips();
 	
 	for (auto& m : mixerStrips)
 	{
@@ -42,12 +41,15 @@ void MixerScreen::open()
 void MixerScreen::close()
 {
 	mpc.deleteObserver(this);
+	findField("dummy").lock()->Hide(false);
+	
+	auto pad = xPos + (mpc.getBank() * 16);
+	auto note = program.lock()->getNoteFromPad(pad);
+	mpc.setPadAndNote(pad, note);
 }
 
-void MixerScreen::initMixerStrips()
+void MixerScreen::addMixerStrips()
 {
-	init();
-
 	for (int i = 0; i < 16; i++)
 	{
 		mixerStrips.push_back(move(dynamic_pointer_cast<MixerStrip>(addChild(make_shared<MixerStrip>(i)).lock())));
@@ -208,18 +210,27 @@ int MixerScreen::getTab()
 
 void MixerScreen::setXPos(int i)
 {
-	if (i < 0 || i > 15) return;
+	if (i < 0 || i > 15)
+	{
+		return;
+	}
+
 	xPos = i;
-	if (!link) {
-		for (auto& m : mixerStrips) {
+	
+	if (link)
+	{
+		for (auto& m : mixerStrips)
+		{
+			m.lock()->setSelection(yPos);
+		}
+	}
+	else
+	{
+		for (auto& m : mixerStrips)
+		{
 			m.lock()->setSelection(-1);
 		}
 		mixerStrips[xPos].lock()->setSelection(yPos);
-	}
-	else {
-		for (auto& m : mixerStrips) {
-			m.lock()->setSelection(yPos);
-		}
 	}
 }
 

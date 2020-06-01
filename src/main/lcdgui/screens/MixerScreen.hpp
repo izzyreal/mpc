@@ -1,6 +1,8 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
+#include <controls/BaseSamplerControls.hpp>
+
 #include <lcdgui/MixerStrip.hpp>
 
 #include <memory>
@@ -8,7 +10,7 @@
 namespace mpc::lcdgui::screens {
 
 	class MixerScreen
-		: public mpc::lcdgui::ScreenComponent
+		: public mpc::lcdgui::ScreenComponent, public mpc::controls::BaseSamplerControls
 	{
 
 	public:
@@ -40,7 +42,7 @@ namespace mpc::lcdgui::screens {
 		int xPos = 0;
 		int yPos = 0;
 		std::vector<std::weak_ptr<mpc::lcdgui::MixerStrip>> mixerStrips;
-		void initMixerStrips();
+		void addMixerStrips();
 		void displayMixerStrip(int i);
 		void displayMixerStrips();
 		void displayFunctionKeys();
