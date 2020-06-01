@@ -51,7 +51,7 @@ MixerStrip::MixerStrip(int columnIndex)
 
 		if (i < 2)
 		{
-			addChild(move(label));
+			findMixerTopBackground().lock()->addChild(move(label));
 		}
 		else
 		{

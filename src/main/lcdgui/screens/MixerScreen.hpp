@@ -16,7 +16,6 @@ namespace mpc::lcdgui::screens {
 	public:
 		void function(int i) override;
 		void turnWheel(int i) override;
-		void pad(int i, int velo, bool repeat, int tick) override;
 		void up() override;
 		void down() override;
 		void left() override;
@@ -39,7 +38,7 @@ namespace mpc::lcdgui::screens {
 	private:
 		int tab = 0;
 		bool link = false;
-		int xPos = 0;
+
 		int yPos = 0;
 		std::vector<std::weak_ptr<mpc::lcdgui::MixerStrip>> mixerStrips;
 		void addMixerStrips();
@@ -55,7 +54,6 @@ namespace mpc::lcdgui::screens {
 
 		void setLink(bool b);
 		void setTab(int i);
-		void setXPos(int i);
 		void setYPos(int i);
 
 	public:

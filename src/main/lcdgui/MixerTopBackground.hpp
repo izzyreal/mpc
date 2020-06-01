@@ -15,7 +15,7 @@ namespace mpc::lcdgui
 		void setColor(bool);
 
 	private:
-		bool color;
+		bool color = true;
 
 	};
 }
