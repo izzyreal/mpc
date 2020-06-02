@@ -15,10 +15,6 @@ namespace mpc::sampler {
 	class Sound;
 }
 
-namespace mpc::ui::disk {
-	class DiskGui;
-}
-
 namespace mpc::disk {
 	class MpcFile;
 	class Store;
@@ -36,11 +32,10 @@ namespace mpc::disk {
 		std::unique_ptr<SoundSaver> soundSaver;
 
 	protected:
-		mpc::ui::disk::DiskGui* diskGui;
 		std::unique_ptr<mpc::disk::device::Device> device{};
 
 	public:
-		std::vector<std::string> extensions{};
+		const std::vector<std::string> extensions{ "", "SND", "PGM", "APS", "MID", "ALL", "WAV", "SEQ", "SET" };
 		std::vector<MpcFile*> files{};
 		std::vector<MpcFile*> allFiles{};
 		std::vector<MpcFile*> parentFiles{};

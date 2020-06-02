@@ -5,7 +5,7 @@ using namespace moduru::lang;
 using namespace std;
 
 ConvertSoundScreen::ConvertSoundScreen(const int layerIndex) 
-	: ScreenComponent("convertsound", layerIndex)
+	: ScreenComponent("convert-sound", layerIndex)
 {
 }
 
@@ -38,7 +38,7 @@ void ConvertSoundScreen::function(int i)
 		{
 			if (sampler.lock()->getSound().lock()->isMono())
 			{
-				ls.lock()->openScreen("monotostereo");
+				ls.lock()->openScreen("mono-to-stereo");
 			}
 			else
 			{

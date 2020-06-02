@@ -38,10 +38,10 @@ void DirectoryScreen::function(int f)
 		if (loadScreen->getSelectedFile() == nullptr) return;
 
 		if (loadScreen->getSelectedFile()->isDirectory()) {
-			ls.lock()->openScreen("deletefolder");
+			ls.lock()->openScreen("delete-folder");
 		}
 		else {
-			ls.lock()->openScreen("deletefile");
+			ls.lock()->openScreen("delete-file");
 		}
 		break;
 	case 2:

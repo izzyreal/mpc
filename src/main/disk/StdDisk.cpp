@@ -6,7 +6,6 @@
 #include <disk/Store.hpp>
 #include <disk/device/Device.hpp>
 #include <disk/device/StdDevice.hpp>
-#include <ui/disk/DiskGui.hpp>
 
 #include <file/AkaiName.hpp>
 

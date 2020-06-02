@@ -10,6 +10,7 @@ namespace mpc::disk
 {
 	class ApsSaver;
 	class AbstractDisk;
+	class SoundSaver;
 }
 
 namespace mpc::lcdgui::screens::window
@@ -40,6 +41,7 @@ namespace mpc::lcdgui::screens::window
 	private:
 		friend class SaveApsFileScreen;
 		friend class mpc::disk::ApsSaver;
+		friend class mpc::disk::SoundSaver;
 		friend class mpc::disk::AbstractDisk;
 
 	};

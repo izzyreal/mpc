@@ -60,7 +60,7 @@ void SaveAllFileScreen::function(int i)
 
 		if (disk->checkExists(existStr))
 		{
-			ls.lock()->openScreen("filealreadyexists");
+			ls.lock()->openScreen("file-already-exists");
 			return;
 		}
 		

@@ -56,7 +56,7 @@ void CountMetronomeScreen::function(int i)
 		ls.lock()->openScreen("sequencer");
 		break;
 	case 4:
-		ls.lock()->openScreen("metronomesound");
+		ls.lock()->openScreen("metronome-sound");
 		break;
 	}
 }

@@ -54,7 +54,6 @@ using namespace mpc::ui::vmpc;
 using namespace mpc::ui::midisync;
 using namespace mpc::ui::misc;
 using namespace mpc::ui::other;
-using namespace mpc::ui::disk;
 
 using namespace moduru::file;
 
@@ -332,6 +331,18 @@ void LayeredScreen::createPopup(string text, int textXPos)
 {
 	popup->Hide(false);
 	popup->setText(text, textXPos);
+}
+
+void LayeredScreen::openFileNamePopup(const string& name, const string& extension)
+{
+	string extUpperCase = "";
+
+	for (auto& c : extension)
+	{
+		extUpperCase.push_back(toupper(c));
+	}
+
+	createPopup("LOADING " + name + "." + extUpperCase, 85);
 }
 
 Background* LayeredScreen::getCurrentBackground()

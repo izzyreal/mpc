@@ -94,6 +94,7 @@
 #include <lcdgui/screens/window/SaveASoundScreen.hpp>
 #include <lcdgui/screens/window/SaveAllFileScreen.hpp>
 #include <lcdgui/screens/window/SaveApsFileScreen.hpp>
+#include <lcdgui/screens/window/CantFindFileScreen.hpp>
 
 #include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
 #include <lcdgui/screens/dialog/MidiMonitorScreen.hpp>
@@ -114,6 +115,9 @@
 #include <lcdgui/screens/dialog/DeleteAllProgramsScreen.hpp>
 #include <lcdgui/screens/dialog/DeleteAllSoundScreen.hpp>
 #include <lcdgui/screens/dialog/DeleteProgramScreen.hpp>
+#include <lcdgui/screens/dialog/DeleteFileScreen.hpp>
+#include <lcdgui/screens/dialog/DeleteFolderScreen.hpp>
+#include <lcdgui/screens/dialog/FileAlreadyExistsScreen.hpp>
 
 #include <lcdgui/screens/dialog2/DeleteAllFilesScreen.hpp>
 
@@ -401,35 +405,35 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	{
 		screen = make_shared<Assign16LevelsScreen>(layerIndex);
 	}
-	else if (screenName.compare("midimonitor") == 0)
+	else if (screenName.compare("midi-monitor") == 0)
 	{
 		screen = make_shared<MidiMonitorScreen>(layerIndex);
 	}
-	else if (screenName.compare("metronomesound") == 0)
+	else if (screenName.compare("metronome-sound") == 0)
 	{
 		screen = make_shared<MetronomeSoundScreen>(layerIndex);
 	}
-	else if (screenName.compare("copysequence") == 0)
+	else if (screenName.compare("copy-sequence") == 0)
 	{
 		screen = make_shared<CopySequenceScreen>(layerIndex);
 	}
-	else if (screenName.compare("copytrack") == 0)
+	else if (screenName.compare("copy-track") == 0)
 	{
 		screen = make_shared<CopyTrackScreen>(layerIndex);
 	}
-	else if (screenName.compare("deletesequence") == 0)
+	else if (screenName.compare("delete-sequence") == 0)
 	{
 		screen = make_shared<DeleteSequenceScreen>(layerIndex);
 	}
-	else if (screenName.compare("deletetrack") == 0)
+	else if (screenName.compare("delete-track") == 0)
 	{
 		screen = make_shared<DeleteTrackScreen>(layerIndex);
 	}
-	else if (screenName.compare("deleteallsequences") == 0)
+	else if (screenName.compare("delete-all-sequences") == 0)
 	{
 		screen = make_shared<DeleteAllSequencesScreen>(layerIndex);
 	}
-	else if (screenName.compare("deletealltracks") == 0)
+	else if (screenName.compare("delete-all-tracks") == 0)
 	{
 		screen = make_shared<DeleteAllTracksScreen>(layerIndex);
 	}
@@ -529,7 +533,7 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	{
 		screen = make_shared<SoundScreen>(layerIndex);
 	}
-	else if (screenName.compare("convertsound") == 0)
+	else if (screenName.compare("convert-sound") == 0)
 	{
 		screen = make_shared<ConvertSoundScreen>(layerIndex);
 	}
@@ -537,11 +541,11 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	{
 		screen = make_shared<CopySoundScreen>(layerIndex);
 	}
-	else if (screenName.compare("deletesound") == 0)
+	else if (screenName.compare("delete-sound") == 0)
 	{
 		screen = make_shared<DeleteSoundScreen>(layerIndex);
 	}
-	else if (screenName.compare("monotostereo") == 0)
+	else if (screenName.compare("mono-to-stereo") == 0)
 	{
 		screen = make_shared<MonoToStereoScreen>(layerIndex);
 	}
@@ -728,6 +732,22 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	else if (screenName.compare("delete-all-files") == 0)
 	{
 		screen = make_shared<DeleteAllFilesScreen>(layerIndex);
+	}	
+	else if (screenName.compare("delete-file") == 0)
+	{
+		screen = make_shared<DeleteFileScreen>(layerIndex);
+	}	
+	else if (screenName.compare("delete-folder") == 0)
+	{
+		screen = make_shared<DeleteFolderScreen>(layerIndex);
+	}	
+	else if (screenName.compare("cant-find-file") == 0)
+	{
+		screen = make_shared<CantFindFileScreen>(layerIndex);
+	}	
+	else if (screenName.compare("file-already-exists") == 0)
+	{
+		screen = make_shared<FileAlreadyExistsScreen>(layerIndex);
 	}	
 
 	if (screen)

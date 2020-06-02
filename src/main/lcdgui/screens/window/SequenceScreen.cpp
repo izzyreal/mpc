@@ -32,10 +32,10 @@ void SequenceScreen::function(int i)
 	BaseControls::function(i);
 	switch (i) {
 	case 1:
-		ls.lock()->openScreen("deletesequence");
+		ls.lock()->openScreen("delete-sequence");
 		break;
 	case 4:
-		ls.lock()->openScreen("copysequence");
+		ls.lock()->openScreen("copy-sequence");
 		break;
 	}
 }

@@ -5,7 +5,6 @@
 #include <file/sndreader/SndReader.hpp>
 #include <file/wav/WavFile.hpp>
 #include <ui/Uis.hpp>
-#include <ui/disk/DiskGui.hpp>
 #include <sampler/Sampler.hpp>
 #include <sampler/Sound.hpp>
 
@@ -20,7 +19,6 @@ using namespace std;
 
 SoundLoader::SoundLoader()
 {
-	
 }
 float SoundLoader::rateToTuneBase = (float)(pow(2, (1.0 / 12.0)));
 
@@ -52,7 +50,9 @@ int SoundLoader::loadSound(MpcFile* f)
 	auto tune = 0;
 	auto loopEnabled = false;
 	auto beats = 4;
-	if (periodIndex != string::npos) {
+	
+	if (periodIndex != string::npos)
+	{
 		extension = soundFileName.substr(periodIndex + 1, soundFileName.length());
 		soundFileName = soundFileName.substr(0, periodIndex);
 		soundName = soundFileName;
@@ -60,58 +60,80 @@ int SoundLoader::loadSound(MpcFile* f)
 	
 	auto sampler = Mpc::instance().getSampler().lock();
 	auto existingSoundIndex = sampler->checkExists(soundName);
-	if (!partOfProgram && existingSoundIndex == -1) {
-		Mpc::instance().getUis().lock()->getDiskGui()->openPopup(soundFileName, extension);
+	
+	if (!partOfProgram && existingSoundIndex == -1)
+	{
+		Mpc::instance().getLayeredScreen().lock()->openFileNamePopup(soundFileName, extension);
 	}
 
 	auto sound = sampler->addSound(sampleRate).lock();
 	std::vector<float>* fa = sound->getSampleData();
 
-	if (StrUtil::eqIgnoreCase(extension, "wav")) {
+	if (StrUtil::eqIgnoreCase(extension, "wav"))
+	{
 
 		auto file = soundFile->getFile().lock();
 		auto wavFile = mpc::file::wav::WavFile::openWavFile(file->getPath());
 		
-		if (wavFile.getValidBits() != 16) {
+		if (wavFile.getValidBits() != 16)
+		{
 			wavFile.close();
 			throw invalid_argument("Only 16 bit supported");
 		}
 		
 		int numChannels = wavFile.getNumChannels();
-		if (numChannels == 1) {
+		
+		if (numChannels == 1)
+		{
 			wavFile.readFrames(fa, wavFile.getNumFrames());
 		}
-		else {
+		else
+		{
 			fa->clear();
 			vector<float> interleaved;
 			wavFile.readFrames(&interleaved, wavFile.getNumFrames());
-			for (int i = 0; i < interleaved.size(); i += 2) {
+		
+			for (int i = 0; i < interleaved.size(); i += 2)
+			{
 				fa->push_back(interleaved[i]);
 			}
-			for (int i = 1; i < interleaved.size(); i += 2) {
+			
+			for (int i = 1; i < interleaved.size(); i += 2)
+			{
 				fa->push_back(interleaved[i]);
 			}
 		}
+
 		size = fa->size();
 		end = size;
-		if (numChannels == 1) {
+		
+		if (numChannels == 1)
+		{
 			mono = true;
 		}
-		else {
+		else
+		{
 			end /= 2;
 		}
+		
 		sampleRate = wavFile.getSampleRate();
 		loopTo = end;
 		float tuneFactor = (float)(sampleRate / 44100.0);
+		
 		tune = (int)(floor(logOfBase(tuneFactor, rateToTuneBase) * 10.0));
+		
 		if (tune < -120)
+		{
 			tune = -120;
-
-		if (tune > 120)
+		}
+		else if (tune > 120)
+		{
 			tune = 120;
+		}
 
 	}
-	else if (StrUtil::eqIgnoreCase(extension, "snd")) {
+	else if (StrUtil::eqIgnoreCase(extension, "snd"))
+	{
 		auto sndReader = mpc::file::sndreader::SndReader(soundFile);
 		sndReader.getSampleData(fa);
 		size = fa->size();
@@ -126,6 +148,7 @@ int SoundLoader::loadSound(MpcFile* f)
 		tune = sndReader.getTune();
 		beats = sndReader.getNumberOfBeats();
 	}
+
 	sound->setName(soundName);
 	sound->setMono(mono);
 	sound->setStart(start);
@@ -137,24 +160,37 @@ int SoundLoader::loadSound(MpcFile* f)
 	sound->setNumberOfBeats(beats);
 
 	bool alreadyLoaded = existingSoundIndex != -1;
-	if (preview) {
+
+	if (preview)
+	{
 		return existingSoundIndex;
 	}
-	else {
-		if (existingSoundIndex == -1) {
-			if (partOfProgram) return (int)(sampler->getSoundCount()) - 1;
+	else
+	{
+		if (existingSoundIndex == -1)
+		{
+			if (partOfProgram)
+			{
+				return (int)(sampler->getSoundCount()) - 1;
+			}
 		}
-		else {
-			if (replace) {
+		else
+		{
+			if (replace)
+			{
 				sound->setMemoryIndex(existingSoundIndex);
 				sampler->deleteSample(existingSoundIndex);
 				sampler->sort();
 			}
-			else {
+			else
+			{
 				sampler->deleteSample((int)(sampler->getSoundCount()) - 1);
 			}
+			
 			if (partOfProgram)
+			{
 				return existingSoundIndex;
+			}
 		}
 	}
 	return -1;

@@ -11,7 +11,7 @@ using namespace mpc::lcdgui::screens::dialog;
 using namespace std;
 
 MetronomeSoundScreen::MetronomeSoundScreen(const int layerIndex)
-	: ScreenComponent("metronomesound", layerIndex)
+	: ScreenComponent("metronome-sound", layerIndex)
 {
 	sampler = Mpc::instance().getSampler();
 }

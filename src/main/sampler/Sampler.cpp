@@ -159,7 +159,7 @@ void Sampler::init()
 
 void Sampler::playMetronome(mpc::sequencer::NoteEvent* event, int framePos)
 {
-	auto metronomeSoundScreen = dynamic_pointer_cast<MetronomeSoundScreen>(Screens::getScreenComponent("metronomesound"));
+	auto metronomeSoundScreen = dynamic_pointer_cast<MetronomeSoundScreen>(Screens::getScreenComponent("metronome-sound"));
 	auto soundNumber = -2;
 
 	if (metronomeSoundScreen->getMetronomeSound() != 0)

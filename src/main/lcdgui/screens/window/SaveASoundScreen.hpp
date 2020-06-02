@@ -1,9 +1,9 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
-namespace mpc::controls::disk::dialog
+namespace mpc::lcdgui::screens::dialog
 {
-	class FileAlreadyExistsControls;
+	class FileAlreadyExistsScreen;
 }
 
 namespace mpc::lcdgui::screens::window
@@ -26,7 +26,7 @@ namespace mpc::lcdgui::screens::window
 		void displayFileType();
 		void displayFile();
 
-		friend class mpc::controls::disk::dialog::FileAlreadyExistsControls;
+		friend class mpc::lcdgui::screens::dialog::FileAlreadyExistsScreen;
 
 	};
 }

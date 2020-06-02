@@ -10,7 +10,7 @@ using namespace mpc::lcdgui::screens::dialog;
 using namespace std;
 
 DeleteTrackScreen::DeleteTrackScreen(const int layerIndex)
-	: ScreenComponent("deletetrack", layerIndex)
+	: ScreenComponent("delete-track", layerIndex)
 {
 }
 
@@ -35,7 +35,7 @@ void DeleteTrackScreen::function(int i)
 	switch (i)
 	{
 	case 2:
-		ls.lock()->openScreen("deletealltracks");
+		ls.lock()->openScreen("delete-all-tracks");
 		break;
 	case 3:
 		ls.lock()->openScreen("sequence");

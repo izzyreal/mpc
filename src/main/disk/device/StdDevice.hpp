@@ -3,19 +3,20 @@
 
 #include <memory>
 
-namespace moduru::file {
+namespace moduru::file
+{
 		class Directory;
 }
 
-namespace mpc::disk::device {
-
+namespace mpc::disk::device
+{
 	class StdDevice
 		: public virtual Device
 	{
 
 	private:
-		bool valid{ false };
-		std::shared_ptr<moduru::file::Directory> root{};
+		bool valid = false;
+		std::shared_ptr<moduru::file::Directory> root;
 
 	public:
 		nonstd::any getRoot() override;
@@ -28,7 +29,6 @@ namespace mpc::disk::device {
 		std::string getVolumeName() override;
 
 		StdDevice(std::string rootPath);
-		~StdDevice();
 
 	};
 }

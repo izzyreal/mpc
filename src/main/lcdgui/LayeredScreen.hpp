@@ -97,6 +97,7 @@ namespace mpc::lcdgui {
 
 	public:
 		void createPopup(std::string text, int textXPos);
+		void openFileNamePopup(const std::string& name, const std::string& ext);
 		lcdgui::Background* getCurrentBackground();
 		void removeCurrentBackground();
 		void setCurrentBackground(std::string s);

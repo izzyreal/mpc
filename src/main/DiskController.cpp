@@ -4,7 +4,6 @@
 
 #include <disk/AbstractDisk.hpp>
 #include <disk/StdDisk.hpp>
-#include <disk/RawDisk.hpp>
 #include <disk/Store.hpp>
 #include <disk/Stores.hpp>
 
@@ -36,34 +35,26 @@ void DiskController::initDisks()
 			continue;
 		}
 		if (deviceGui->getStore(i) == -1)
+		{
 			continue;
+		}
 
 		weak_ptr<mpc::disk::Store> candidate;
 		candidate = deviceGui->isRaw(i) && stores->getRawStores().size() > deviceGui->getStore(i) ? stores->getRawStore(deviceGui->getStore(i)) : stores->getStdStore(deviceGui->getStore(i));
-		if (oldDisk) {
+	
+		if (oldDisk)
+		{
 			auto oldStore = oldDisk->getStore().lock();
 			if (oldStore == candidate.lock())
 				continue;
 
 			oldDisk->close();
 		}
-		if (deviceGui->isRaw(i) && stores->getRawStores().size() > deviceGui->getStore(i)) {
-			try {
-				disks[i] = make_shared<mpc::disk::RawDisk>(stores->getRawStore(deviceGui->getStore(i)));
-			}
-			catch (exception e) {
-				deviceGui->setAccessType(i, mpc::ui::vmpc::DeviceGui::STD);
-				deviceGui->setStore(i, 0);
-				deviceGui->saveSettings();
-				disks[i] = make_shared<mpc::disk::StdDisk>(stores->getStdStore(deviceGui->getStore(i)));
-			}
-		}
-		else {
-			deviceGui->setAccessType(i, mpc::ui::vmpc::DeviceGui::STD);
-			deviceGui->setStore(i, 0);
-			deviceGui->saveSettings();
-			disks[i] = make_shared<mpc::disk::StdDisk>(stores->getStdStore(deviceGui->getStore(i)));
-		}
+
+		deviceGui->setAccessType(i, mpc::ui::vmpc::DeviceGui::STD);
+		deviceGui->setStore(i, 0);
+		deviceGui->saveSettings();
+		disks[i] = make_shared<mpc::disk::StdDisk>(stores->getStdStore(deviceGui->getStore(i)));
 	}
 }
 

@@ -6,7 +6,7 @@ using namespace mpc::lcdgui::screens::dialog;
 using namespace std;
 
 DeleteAllTracksScreen::DeleteAllTracksScreen(const int layerIndex)
-	: ScreenComponent("deletealltracks", layerIndex)
+	: ScreenComponent("delete-all-tracks", layerIndex)
 {
 }
 
@@ -16,7 +16,7 @@ void DeleteAllTracksScreen::function(int i)
 	switch (i)
 	{
 	case 3:
-		ls.lock()->openScreen("deletetrack");
+		ls.lock()->openScreen("delete-track");
 		break;
 	case 4:
 		sequencer.lock()->getActiveSequence().lock()->purgeAllTracks();

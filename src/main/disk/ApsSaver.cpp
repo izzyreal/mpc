@@ -4,7 +4,6 @@
 #include <disk/AbstractDisk.hpp>
 #include <disk/MpcFile.hpp>
 #include <file/aps/ApsParser.hpp>
-#include <ui/disk/DiskGui.hpp>
 #include <sampler/Sampler.hpp>
 
 #include <lcdgui/Screens.hpp>
@@ -23,7 +22,7 @@ ApsSaver::ApsSaver(string apsFileName)
 	auto lDisk = Mpc::instance().getDisk().lock();
 
 	if (lDisk->checkExists(apsFileName)) {
-		Mpc::instance().getLayeredScreen().lock()->openScreen("filealreadyexists");
+		Mpc::instance().getLayeredScreen().lock()->openScreen("file-already-exists");
 	}
 	else {
 		saveAps();

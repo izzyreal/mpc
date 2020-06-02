@@ -32,6 +32,11 @@ namespace mpc::lcdgui::screens::dialog2
 	class DeleteAllFilesScreen;
 }
 
+namespace mpc::lcdgui::screens::dialog
+{
+	class DeleteFileScreen;
+}
+
 namespace mpc::lcdgui::screens
 {
 	class LoadScreen
@@ -66,6 +71,8 @@ namespace mpc::lcdgui::screens
 		void setFileLoadWithMaxCheck(int i);
 		void setFileLoad(int i);
 
+		int getFileSize();
+
 	private:
 		friend class mpc::lcdgui::screens::window::DirectoryScreen;
 		friend class mpc::lcdgui::screens::window::LoadApsFileScreen;
@@ -74,6 +81,7 @@ namespace mpc::lcdgui::screens
 		friend class mpc::lcdgui::screens::window::LoadASoundScreen;
 		friend class mpc::lcdgui::screens::window::LoadASequenceScreen;
 		friend class mpc::lcdgui::screens::dialog2::DeleteAllFilesScreen;
+		friend class mpc::lcdgui::screens::dialog::DeleteFileScreen;
 		friend class mpc::controls::BaseControls;
 		friend class mpc::controls::other::dialog::NameControls;
 		friend class mpc::disk::AbstractDisk;

@@ -15,7 +15,7 @@ void DeleteAllSoundScreen::function(int i)
 	switch (i)
 	{
 	case int(3) :
-		ls.lock()->openScreen("deletesound");
+		ls.lock()->openScreen("delete-sound");
 		break;
 	case 4:
 		sampler.lock()->deleteAllSamples();

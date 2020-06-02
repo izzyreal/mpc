@@ -2,8 +2,6 @@
 
 #include <Util.hpp>
 #include <disk/AbstractDisk.hpp>
-#include <ui/NameGui.hpp>
-#include <ui/disk/DiskGui.hpp>
 
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
@@ -52,7 +50,7 @@ void SaveAProgramScreen::function(int i)
 		if (disk->checkExists(fileName))
 		{
 			nameGui->setName(program.lock()->getName());
-			ls.lock()->openScreen("filealreadyexists");
+			ls.lock()->openScreen("file-already-exists");
 			break;
 		}
 

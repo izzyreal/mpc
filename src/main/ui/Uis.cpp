@@ -6,8 +6,6 @@
 #include <ui/misc/SecondSeqGui.hpp>
 #include <ui/misc/TransGui.hpp>
 
-#include <ui/disk/DiskGui.hpp>
-
 #include <ui/midisync/MidiSyncGui.hpp>
 
 #include <ui/vmpc/DeviceGui.hpp>
@@ -52,8 +50,6 @@ Uis::Uis()
 
 	nameGui = new mpc::ui::NameGui();
 
-	diskGui = new mpc::ui::disk::DiskGui();
-
 	midiSyncGui = new mpc::ui::midisync::MidiSyncGui();
 
 	punchGui = new mpc::ui::misc::PunchGui();
@@ -69,11 +65,6 @@ vector<string> Uis::noteNames;
 mpc::ui::midisync::MidiSyncGui* Uis::getMidiSyncGui()
 {
 	return midiSyncGui;
-}
-
-mpc::ui::disk::DiskGui* Uis::getDiskGui()
-{
-	return diskGui;
 }
 
 mpc::ui::NameGui* Uis::getNameGui()
@@ -113,7 +104,6 @@ mpc::ui::misc::SecondSeqGui* Uis::getSecondSeqGui()
 
 Uis::~Uis()
 {
-	if (diskGui != nullptr) delete diskGui;
 	if (midiSyncGui != nullptr) delete midiSyncGui;
 	if (nameGui != nullptr) delete nameGui;
 	if (punchGui != nullptr) delete punchGui;

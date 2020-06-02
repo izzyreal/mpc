@@ -9,7 +9,7 @@ using namespace mpc::lcdgui::screens::dialog;
 using namespace std;
 
 DeleteSequenceScreen::DeleteSequenceScreen(const int layerIndex)
-	: ScreenComponent("deletesequence", layerIndex)
+	: ScreenComponent("delete-sequence", layerIndex)
 {
 }
 
@@ -35,7 +35,7 @@ void DeleteSequenceScreen::function(int i)
 	
 	switch (i) {
 	case 2:
-		ls.lock()->openScreen("deleteallsequences");
+		ls.lock()->openScreen("delete-all-sequences");
 		break;
 	case 3:
 		ls.lock()->openScreen("sequence");

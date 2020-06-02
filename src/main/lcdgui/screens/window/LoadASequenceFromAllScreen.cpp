@@ -1,7 +1,5 @@
 #include "LoadASequenceFromAllScreen.hpp"
 
-#include <ui/disk/DiskGui.hpp>
-
 #include <sequencer/Sequence.hpp>
 #include <sequencer/Sequencer.hpp>
 

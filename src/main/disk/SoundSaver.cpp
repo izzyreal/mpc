@@ -3,22 +3,24 @@
 #include <Mpc.hpp>
 #include <disk/AbstractDisk.hpp>
 #include <disk/MpcFile.hpp>
-#include <ui/disk/DiskGui.hpp>
 #include <sampler/Sound.hpp>
+
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/window/SaveAProgramScreen.hpp>
 
 #include <lang/StrUtil.hpp>
 
 #include <thread>
 
 using namespace mpc::disk;
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens::window;
 using namespace moduru::lang;
 using namespace std;
 
 SoundSaver::SoundSaver(vector<weak_ptr<mpc::sampler::Sound>> sounds, bool wav) 
-{
-	
+{	
 	disk = Mpc::instance().getDisk();
-	diskGui = Mpc::instance().getUis().lock()->getDiskGui();
 	disk.lock()->setBusy(true);
 	this->sounds = sounds;
 	this->wav = wav;
@@ -43,7 +45,8 @@ void SoundSaver::saveSounds()
 
 		if (lDisk->checkExists(fileName))
 		{
-			if (diskGui->getSaveReplaceSameSounds())
+			auto saveAProgramScreen = dynamic_pointer_cast<SaveAProgramScreen>(Screens::getScreenComponent("save-a-program"));
+			if (saveAProgramScreen->replaceSameSounds)
 			{
                 lDisk->getFile(fileName)->del(); // possibly prepend auto success =
 			}
@@ -75,7 +78,8 @@ void SoundSaver::saveSounds()
 	lDisk->setBusy(false);
 }
 
-SoundSaver::~SoundSaver() {
+SoundSaver::~SoundSaver()
+{
 	if (saveSoundsThread.joinable()) {
 		saveSoundsThread.join();
 	}

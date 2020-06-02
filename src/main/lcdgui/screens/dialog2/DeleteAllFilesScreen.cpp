@@ -46,7 +46,7 @@ void DeleteAllFilesScreen::function(int i)
 	switch (i)
 	{
 	case 3:
-		ls.lock()->openScreen("deletefile");
+		ls.lock()->openScreen("delete-file");
 		ls.lock()->setPreviousScreenName("directory");
 		break;
 	case 4:

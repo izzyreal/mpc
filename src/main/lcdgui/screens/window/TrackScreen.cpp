@@ -30,10 +30,10 @@ void TrackScreen::function(int i)
 	switch (i)
 	{
 	case 1:
-		ls.lock()->openScreen("deletetrack");
+		ls.lock()->openScreen("delete-track");
 		break;
 	case 4:
-		ls.lock()->openScreen("copytrack");
+		ls.lock()->openScreen("copy-track");
 		break;
 	}
 }

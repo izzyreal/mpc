@@ -6,8 +6,6 @@
 #include <lcdgui/screens/window/DirectoryScreen.hpp>
 #include <lcdgui/screens/window/LoadASequenceScreen.hpp>
 
-#include <ui/disk/DiskGui.hpp>
-
 #include <disk/AbstractDisk.hpp>
 #include <disk/MpcFile.hpp>
 
@@ -165,8 +163,6 @@ void LoadScreen::turnWheel(int i)
 {
 	init();
 
-	auto diskGui = mpc.getUis().lock()->getDiskGui();
-
 	if (param.compare("view") == 0)
 	{
 		setView(view + i);
@@ -179,7 +175,6 @@ void LoadScreen::turnWheel(int i)
 
 void LoadScreen::displayView()
 {
-	auto diskGui = mpc.getUis().lock()->getDiskGui();
 	findField("view").lock()->setText(views[view]);
 }
 
@@ -201,9 +196,7 @@ void LoadScreen::displayFile()
 		return;
 	}
 
-	auto diskGui = mpc.getUis().lock()->getDiskGui();
-	string selectedFileName = getSelectedFileName();
-	
+	auto selectedFileName = getSelectedFileName();	
 	auto selectedFile = getSelectedFile();
 	
 	if (selectedFileName.length() != 0 && selectedFile != nullptr && selectedFile->isDirectory())
@@ -225,6 +218,18 @@ void LoadScreen::displayFile()
 	}
 }
 
+int LoadScreen::getFileSize()
+{
+	auto disk = mpc.getDisk().lock();
+	
+	if (disk->getFile(fileLoad) == nullptr || disk->getFile(fileLoad)->isDirectory())
+	{
+		return 0;
+	}
+	
+	return (int)(disk->getFile(fileLoad)->length() / 1024);
+}
+
 void LoadScreen::displaySize()
 {
 	if (mpc.getDisk().lock()->getFileNames().size() == 0)
@@ -233,8 +238,7 @@ void LoadScreen::displaySize()
 		return;
 	}
 	
-	auto diskGui = mpc.getUis().lock()->getDiskGui();
-	findLabel("size").lock()->setText(to_string(diskGui->getFileSize(fileLoad)) + "K");
+	findLabel("size").lock()->setText(to_string(getFileSize()) + "K");
 }
 
 void LoadScreen::setView(int i)

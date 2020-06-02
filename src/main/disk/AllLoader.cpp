@@ -108,7 +108,7 @@ AllLoader::AllLoader(mpc::disk::MpcFile* file, bool sequencesOnly)
 		auto count = allParser.getCount();
 
 		auto countMetronomeScreen = dynamic_pointer_cast<CountMetronomeScreen>(Screens::getScreenComponent("countmetronome"));
-		auto metronomeSoundScreen = dynamic_pointer_cast<MetronomeSoundScreen>(Screens::getScreenComponent("metronomesound"));
+		auto metronomeSoundScreen = dynamic_pointer_cast<MetronomeSoundScreen>(Screens::getScreenComponent("metronome-sound"));
 
 		countMetronomeScreen->setCountIn(count->getCountInMode());
 		metronomeSoundScreen->setAccentVelo(count->getAccentVelo());

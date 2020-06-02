@@ -21,7 +21,6 @@
 #include <lcdgui/Layer.hpp>
 
 #include <ui/NameGui.hpp>
-#include <ui/disk/DiskGui.hpp>
 #include <ui/misc/PunchGui.hpp>
 #include <ui/vmpc/DirectToDiskRecorderGui.hpp>
 

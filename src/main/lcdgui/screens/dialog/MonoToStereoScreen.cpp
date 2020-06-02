@@ -5,7 +5,7 @@ using namespace moduru::lang;
 using namespace std;
 
 MonoToStereoScreen::MonoToStereoScreen(const int layerIndex)
-	: ScreenComponent("monotostereo", layerIndex)
+	: ScreenComponent("mono-to-stereo", layerIndex)
 {
 }
 

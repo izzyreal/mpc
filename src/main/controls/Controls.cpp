@@ -11,11 +11,6 @@
 
 #include <controls/other/dialog/NameControls.hpp>
 
-#include <controls/disk/dialog/CantFindFileControls.hpp>
-#include <controls/disk/dialog/DeleteFileControls.hpp>
-#include <controls/disk/dialog/DeleteFolderControls.hpp>
-#include <controls/disk/dialog/FileAlreadyExistsControls.hpp>
-
 #include <controls/midisync/SyncControls.hpp>
 
 #include <controls/misc/PunchControls.hpp>
@@ -27,14 +22,12 @@
 #include <controls/vmpc/DirectToDiskRecorderControls.hpp>
 #include <controls/vmpc/RecordJamControls.hpp>
 #include <controls/vmpc/RecordingFinishedControls.hpp>
-#include <controls/vmpc/VmpcDiskControls.hpp>
 #include <controls/vmpc/VmpcSettingsControls.hpp>
 
 using namespace mpc::controls;
 
 Controls::Controls()
 {
-	
 	pressedPadVelos = std::vector<int>(16);
 
 	controls["release"] = new GlobalReleaseControls();
@@ -44,11 +37,6 @@ Controls::Controls()
 	controls["init"] = new other::InitControls();
 	controls["ver"] = new other::VerControls();
 
-	controls["deletefile"] = new disk::dialog::DeleteFileControls();
-	controls["deletefolder"] = new disk::dialog::DeleteFolderControls();
-	controls["cantfindfile"] = new disk::dialog::CantFindFileControls();
-	controls["filealreadyexists"] = new disk::dialog::FileAlreadyExistsControls();
-
 	controls["punch"] = new misc::PunchControls();
 	controls["trans"] = new misc::TransControls();
 	controls["2ndseq"] = new misc::SecondSeqControls();
@@ -57,7 +45,6 @@ Controls::Controls()
 
 	controls["sync"] = new midisync::SyncControls();
 
-	controls["disk"] = new vmpc::VmpcDiskControls();
 	controls["directtodiskrecorder"] = new vmpc::DirectToDiskRecorderControls();
 	controls["recordjam"] = new vmpc::RecordJamControls();
 	controls["recordingfinished"] = new vmpc::RecordingFinishedControls();

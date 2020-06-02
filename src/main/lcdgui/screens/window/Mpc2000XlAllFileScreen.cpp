@@ -4,7 +4,6 @@
 #include <lcdgui/screens/window/LoadASequenceFromAllScreen.hpp>
 
 #include <disk/AllLoader.hpp>
-#include <ui/disk/DiskGui.hpp>
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;

@@ -39,10 +39,10 @@ void SoundScreen::function(int i)
 	switch (i)
 	{
 	case 1:
-		ls.lock()->openScreen("deletesound");
+		ls.lock()->openScreen("delete-sound");
 		break;
 	case 2:
-		ls.lock()->openScreen("convertsound");
+		ls.lock()->openScreen("convert-sound");
 		break;
 	case 4:
 		ls.lock()->openScreen("copy-sound");

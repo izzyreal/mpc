@@ -8,7 +8,6 @@
 #include <file/pgmwriter/PgmWriter.hpp>
 #include <file/sndwriter/SndWriter.hpp>
 #include <ui/Uis.hpp>
-#include <ui/disk/DiskGui.hpp>
 #include <sampler/NoteParameters.hpp>
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>
@@ -35,9 +34,6 @@ using namespace std;
 AbstractDisk::AbstractDisk(weak_ptr<mpc::disk::Store> store)
 {
 	this->store = store;
-	
-	this->diskGui = Mpc::instance().getUis().lock()->getDiskGui();
-	extensions = vector<string>{ "", "SND", "PGM", "APS", "MID", "ALL", "WAV", "SEQ", "SET" };
 }
 
 void AbstractDisk::setBusy(bool b)
@@ -118,7 +114,6 @@ bool AbstractDisk::renameSelectedFile(string s)
 {
 	auto directoryScreen = dynamic_pointer_cast<DirectoryScreen>(Screens::getScreenComponent("directory"));
 	auto loadScreen = dynamic_pointer_cast<LoadScreen>(Screens::getScreenComponent("load"));
-	auto diskGui = Mpc::instance().getUis().lock()->getDiskGui();
   
 	auto left = directoryScreen->xPos == 0;
 	auto fileNumber = left ? directoryScreen->yPos0 + directoryScreen->yOffset0 : loadScreen->fileLoad;

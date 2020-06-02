@@ -23,7 +23,6 @@
 #include <disk/ApsSaver.hpp>
 
 #include <ui/NameGui.hpp>
-#include <ui/disk/DiskGui.hpp>
 #include <ui/vmpc/DirectToDiskRecorderGui.hpp>
 
 #include <sampler/Program.hpp>

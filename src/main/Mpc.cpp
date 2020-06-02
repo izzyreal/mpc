@@ -10,7 +10,6 @@
 #include <disk/SoundLoader.hpp>
 
 #include <ui/Uis.hpp>
-#include <ui/disk/DiskGui.hpp>
 
 #include <controls/Controls.hpp>
 
@@ -199,7 +198,7 @@ void Mpc::loadSound(bool replace)
 	{
 		MLOG("A problem occurred when trying to load " + loadScreen->getSelectedFileName() + ": " + string(exception.what()));
 		lDisk->setBusy(false);
-		uis->getDiskGui()->removePopup();
+		layeredScreen->removePopup();
 		return;
 	}
 	
@@ -250,9 +249,14 @@ void Mpc::static_loadSound(int size)
 
 void Mpc::runLoadSoundThread(int size) {
 	int sleepTime = size / 400;
-	if (sleepTime < 300) sleepTime = 300;
+	
+	if (sleepTime < 300)
+	{
+		sleepTime = 300;
+	}
+	
 	this_thread::sleep_for(chrono::milliseconds((int)(sleepTime * 0.1)));
-	uis->getDiskGui()->removePopup();
+	layeredScreen->removePopup();
 	layeredScreen->openScreen("load-a-sound");
 	getDisk().lock()->setBusy(false);
 }

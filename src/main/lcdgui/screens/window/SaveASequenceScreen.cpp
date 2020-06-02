@@ -2,10 +2,6 @@
 
 #include <Util.hpp>
 #include <disk/AbstractDisk.hpp>
-#include <ui/NameGui.hpp>
-#include <ui/disk/DiskGui.hpp>
-#include <sequencer/Sequence.hpp>
-#include <sequencer/Sequencer.hpp>
 
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
@@ -50,7 +46,7 @@ void SaveASequenceScreen::function(int i)
 		
 		if (mpc.getDisk().lock()->checkExists(fileName))
 		{
-			ls.lock()->openScreen("filealreadyexists");
+			ls.lock()->openScreen("file-already-exists");
 			return;
 		}
 		

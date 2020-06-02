@@ -15,7 +15,6 @@
 #include <file/aps/ApsSlider.hpp>
 
 #include <ui/Uis.hpp>
-#include <ui/disk/DiskGui.hpp>
 
 #include <sampler/NoteParameters.hpp>
 #include <sampler/Pad.hpp>
@@ -195,10 +194,10 @@ void ApsLoader::load()
 	drumScreen->setPadToIntSound(apsParser.getGlobalParameters()->isPadToIntSoundEnabled());
 
 	auto uis = Mpc::instance().getUis().lock();
-	uis->getDiskGui()->removePopup();
 	
 	sampler->setSoundIndex(0);
 	
+	Mpc::instance().getLayeredScreen().lock()->removePopup();
 	Mpc::instance().getLayeredScreen().lock()->openScreen("load");
 	lDisk->setBusy(false);
 }
@@ -213,17 +212,21 @@ void ApsLoader::loadSound(string soundFileName, string ext, mpc::disk::MpcFile* 
 
 void ApsLoader::showPopup(string name, string ext, int sampleSize)
 {
-	Mpc::instance().getUis().lock()->getDiskGui()->removePopup();
-	Mpc::instance().getUis().lock()->getDiskGui()->openPopup(StrUtil::padRight(name, " ", 16), ext);
-	if (dynamic_pointer_cast<mpc::disk::StdDisk>(Mpc::instance().getDisk().lock())) {
+	Mpc::instance().getLayeredScreen().lock()->openFileNamePopup(StrUtil::padRight(name, " ", 16), ext);
+
+	if (dynamic_pointer_cast<mpc::disk::StdDisk>(Mpc::instance().getDisk().lock()))
+	{
 		auto sleepTime = sampleSize / 800;
+	
 		if (sleepTime < 300)
+		{
 			sleepTime = 300;
-		//this_thread::sleep_for(chrono::milliseconds((int)(sleepTime*mpc::maingui::Constants::TFACTOR)));
+		}
 		this_thread::sleep_for(chrono::milliseconds((int)(sleepTime * 0.2)));
 	}
 }
 
-ApsLoader::~ApsLoader() {
+ApsLoader::~ApsLoader()
+{
 	if (loadThread.joinable()) loadThread.join();
 }

@@ -16,6 +16,12 @@ namespace mpc::lcdgui::screens::dialog2
 	class DeleteAllFilesScreen;
 }
 
+namespace mpc::lcdgui::screens::dialog
+{
+	class DeleteFileScreen;
+	class DeleteFolderScreen;
+}
+
 namespace mpc::disk
 {
 	class AbstractDisk;
@@ -68,6 +74,8 @@ namespace mpc::lcdgui::screens::window
 		friend class mpc::disk::AbstractDisk;
 		friend class mpc::lcdgui::screens::LoadScreen;
 		friend class mpc::lcdgui::screens::dialog2::DeleteAllFilesScreen;
+		friend class mpc::lcdgui::screens::dialog::DeleteFileScreen;
+		friend class mpc::lcdgui::screens::dialog::DeleteFolderScreen;
 
 	};
 }

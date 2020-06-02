@@ -8,7 +8,7 @@ using namespace mpc::lcdgui::screens::dialog;
 using namespace std;
 
 MidiMonitorScreen::MidiMonitorScreen(const int layerIndex)
-	: ScreenComponent("midimonitor", layerIndex)
+	: ScreenComponent("midi-monitor", layerIndex)
 {	
 }
 
