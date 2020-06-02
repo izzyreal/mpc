@@ -23,6 +23,12 @@ void LoadASoundScreen::open()
 	auto loadScreen = dynamic_pointer_cast<LoadScreen>(Screens::getScreenComponent("load"));
 	findLabel("filename").lock()->setText("File:" + loadScreen->getSelectedFileName());
 	displayAssignToNote();
+	mpc.addObserver(this); // Subscribe to "padandnote" messages
+}
+
+void LoadASoundScreen::close()
+{
+	mpc.deleteObserver(this);
 }
 
 void LoadASoundScreen::turnWheel(int i)
@@ -132,4 +138,14 @@ void LoadASoundScreen::displayAssignToNote()
 	auto padName = string(padIndex == -1 ? "OFF" : sampler.lock()->getPadName(padIndex));
 	auto noteName = string(note == 34 ? "--" : to_string(note));
 	findField("assign-to-note").lock()->setText(noteName + "/" + padName);
+}
+
+void LoadASoundScreen::update(moduru::observer::Observable* observable, nonstd::any message)
+{
+	auto msg = nonstd::any_cast<string>(message);
+	
+	if (param.compare("padandnote") == 0)
+	{
+		displayAssignToNote();
+	}
 }

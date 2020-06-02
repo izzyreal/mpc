@@ -115,6 +115,7 @@
 #include <lcdgui/screens/dialog/DeleteAllSoundScreen.hpp>
 #include <lcdgui/screens/dialog/DeleteProgramScreen.hpp>
 
+#include <lcdgui/screens/dialog2/DeleteAllFilesScreen.hpp>
 
 #include <file/FileUtil.hpp>
 
@@ -124,6 +125,7 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;
+using namespace mpc::lcdgui::screens::dialog2;
 
 using namespace moduru::file;
 
@@ -722,6 +724,10 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	else if (screenName.compare("save-aps-file") == 0)
 	{
 		screen = make_shared<SaveApsFileScreen>(layerIndex);
+	}	
+	else if (screenName.compare("delete-all-files") == 0)
+	{
+		screen = make_shared<DeleteAllFilesScreen>(layerIndex);
 	}	
 
 	if (screen)

@@ -36,10 +36,6 @@ namespace mpc {
 
 			class DiskGui;
 
-			namespace window {
-				class DiskWindowGui;
-			}
-
 			class DiskObserver
 				: public moduru::observer::Observer
 			{
@@ -66,7 +62,6 @@ namespace mpc {
 				std::weak_ptr<mpc::lcdgui::Field> assignToNoteField;
 				std::string csn = "";
 				std::weak_ptr<mpc::lcdgui::Field> loadIntoField;
-				mpc::ui::disk::window::DiskWindowGui* diskWindowGui;
 				std::weak_ptr<mpc::lcdgui::Label> nameLabel;
 				std::weak_ptr<mpc::lcdgui::Label> fileLabel;
 				std::weak_ptr<mpc::lcdgui::Field> saveField;
@@ -74,23 +69,9 @@ namespace mpc {
 				std::weak_ptr<mpc::lcdgui::Field> fileTypeField;
 				std::weak_ptr<mpc::lcdgui::Field> saveAsField;
 
-			private:
-				void displaySaveAs();
-				void displayAssignToNote();
-				void displayLoadInto();
-				void displayFile();
-
-			public:
-				void update(moduru::observer::Observable* o, nonstd::any a) override;
-
-			private:
-				void displayDirectory();
-
 			public:
 				DiskObserver();
-				~DiskObserver();
 			};
-
 		}
 	}
 }

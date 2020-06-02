@@ -21,7 +21,7 @@ void DeleteFileControls::function(int i)
 	super::function(i);
 	switch (i) {
 	case 1:
-		ls.lock()->openScreen("deleteallfiles");
+		ls.lock()->openScreen("delete-all-files");
 		break;
 	case 4:
 		//ls.lock()->createPopup("Delete:" + directoryGui->getSelectedFile()->getName(), 85);

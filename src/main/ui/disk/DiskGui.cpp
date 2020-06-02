@@ -14,19 +14,6 @@ DiskGui::DiskGui()
 	
 }
 
-void DiskGui::setDelete(int i)
-{
-	if (i < 0 || i > 8) return;
-	deleteIndex = i;
-	setChanged();
-	notifyObservers(string("delete"));
-}
-
-int DiskGui::getDelete()
-{
-    return deleteIndex;
-}
-
 int DiskGui::getFileSize(int i)
 {
 	auto lDisk = Mpc::instance().getDisk().lock();

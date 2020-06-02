@@ -31,8 +31,6 @@
 
 #include <ui/NameObserver.hpp>
 
-#include <ui/disk/window/DeleteAllFilesObserver.hpp>
-
 #include <ui/midisync/SyncObserver.hpp>
 
 #include <ui/misc/PunchObserver.hpp>
@@ -57,7 +55,6 @@ using namespace mpc::ui::midisync;
 using namespace mpc::ui::misc;
 using namespace mpc::ui::other;
 using namespace mpc::ui::disk;
-using namespace mpc::ui::disk::window;
 
 using namespace moduru::file;
 
@@ -684,10 +681,6 @@ void LayeredScreen::initObserver()
 	else if (csn.compare("name") == 0)
 	{
 		activeObserver = make_unique<ui::NameObserver>();
-	}
-	else if (csn.compare("deleteallfiles") == 0)
-	{
-		activeObserver = make_unique<DeleteAllFilesObserver>();
 	}
 	else if (csn.compare("settings") == 0)
 	{

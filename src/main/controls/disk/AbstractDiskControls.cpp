@@ -7,7 +7,6 @@
 #include <ui/NameGui.hpp>
 #include <ui/disk/DiskGui.hpp>
 
-#include <ui/disk/window/DiskWindowGui.hpp>
 #include <ui/vmpc/DeviceGui.hpp>
 
 using namespace mpc::controls::disk;
@@ -19,7 +18,6 @@ AbstractDiskControls::AbstractDiskControls()
 	auto uis = Mpc::instance().getUis().lock();
 	nameGui = Mpc::instance().getUis().lock()->getNameGui();
 	diskGui = uis->getDiskGui();
-	diskWindowGui = uis->getDiskWindowGui();
 	deviceGui = uis->getDeviceGui();
 }
 

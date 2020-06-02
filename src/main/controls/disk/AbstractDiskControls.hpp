@@ -20,10 +20,6 @@ namespace mpc {
 
 		namespace disk {
 			class DiskGui;
-
-			namespace window {
-				class DiskWindowGui;
-			}
 		}
 	}
 
@@ -39,7 +35,6 @@ namespace mpc {
 
 			protected:
 				mpc::ui::disk::DiskGui* diskGui{ nullptr };
-				mpc::ui::disk::window::DiskWindowGui* diskWindowGui{ nullptr };
 				mpc::ui::NameGui* nameGui{ nullptr };
 				std::weak_ptr<mpc::disk::AbstractDisk> disk{};
 				mpc::ui::vmpc::DeviceGui* deviceGui{ nullptr };

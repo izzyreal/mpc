@@ -21,7 +21,6 @@ namespace mpc::ui::disk {
 	{
 
 	private:
-		int deleteIndex{ 0 };
 		bool waitingForUser{ false };
 		bool skipAll{ false };
 		std::string cannotFindFileName = "";
@@ -29,8 +28,6 @@ namespace mpc::ui::disk {
 		bool dontAssignSoundWhenLoading_{ false };
 
 	public:
-		void setDelete(int i);
-		int getDelete();
 		int getFileSize(int i);
 		void openPopup(std::string soundFileName, std::string extension);
 		void removePopup();

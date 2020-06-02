@@ -14,6 +14,9 @@ namespace mpc::lcdgui::screens::window
 		LoadASoundScreen(const int layerIndex);
 
 		void open() override;
+		void close() override;
+
+		void update(moduru::observer::Observable* observable, nonstd::any message);
 
 		void turnWheel(int i) override;
 		void function(int i) override;

@@ -7,7 +7,6 @@
 #include <lcdgui/screens/window/LoadASequenceScreen.hpp>
 
 #include <ui/disk/DiskGui.hpp>
-#include <ui/disk/window/DiskWindowGui.hpp>
 
 #include <disk/AbstractDisk.hpp>
 #include <disk/MpcFile.hpp>

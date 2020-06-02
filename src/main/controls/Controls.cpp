@@ -12,7 +12,6 @@
 #include <controls/other/dialog/NameControls.hpp>
 
 #include <controls/disk/dialog/CantFindFileControls.hpp>
-#include <controls/disk/dialog/DeleteAllFilesControls.hpp>
 #include <controls/disk/dialog/DeleteFileControls.hpp>
 #include <controls/disk/dialog/DeleteFolderControls.hpp>
 #include <controls/disk/dialog/FileAlreadyExistsControls.hpp>
@@ -45,7 +44,6 @@ Controls::Controls()
 	controls["init"] = new other::InitControls();
 	controls["ver"] = new other::VerControls();
 
-	controls["deleteallfiles"] = new disk::dialog::DeleteAllFilesControls();
 	controls["deletefile"] = new disk::dialog::DeleteFileControls();
 	controls["deletefolder"] = new disk::dialog::DeleteFolderControls();
 	controls["cantfindfile"] = new disk::dialog::CantFindFileControls();
