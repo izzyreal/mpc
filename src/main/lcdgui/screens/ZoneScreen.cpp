@@ -124,7 +124,7 @@ void ZoneScreen::turnWheel(int i)
 	}
 	
 	auto soundInc = getSoundIncrement(i);
-	auto mtf = ls.lock()->lookupField(param).lock();
+	auto mtf = findField(param).lock();
 	
 	if (mtf->isSplit())
 	{

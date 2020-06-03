@@ -38,10 +38,6 @@ namespace mpc::lcdgui {
 	class LayeredScreen;
 }
 
-namespace mpc::ui {
-	class NameGui;
-}
-
 namespace mpc::controls {
 
 	class BaseControls
@@ -67,7 +63,6 @@ namespace mpc::controls {
 		ctoot::mpc::MpcSoundPlayerChannel* mpcSoundPlayerChannel = nullptr;
 
 		std::weak_ptr<mpc::lcdgui::LayeredScreen> ls;
-		mpc::ui::NameGui* nameGui = nullptr;
 		std::weak_ptr<mpc::lcdgui::Field> activeField;
 
 		std::vector<std::string> typableParams;

@@ -2,6 +2,7 @@
 
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/LoadScreen.hpp>
+#include <lcdgui/screens/window/NameScreen.hpp>
 
 #include <disk/MpcFile.hpp>
 #include <disk/AbstractDisk.hpp>
@@ -31,6 +32,7 @@ void DirectoryScreen::function(int f)
 	BaseControls::function(f);
 	
 	auto loadScreen = dynamic_pointer_cast<LoadScreen>(Screens::getScreenComponent("load"));
+	auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
 
 	switch (f)
 	{
@@ -52,14 +54,14 @@ void DirectoryScreen::function(int f)
 		}
 
 		auto fileNameNoExt = mpc::Util::splitName(loadScreen->getSelectedFile()->getName())[0];
-		nameGui->setName(fileNameNoExt);
+		nameScreen->setName(fileNameNoExt);
 		
 		if (loadScreen->getSelectedFile()->isDirectory())
 		{
-			nameGui->setNameLimit(8);
+			nameScreen->setNameLimit(8);
 		}
 		
-		nameGui->setParameterName("rename");
+		nameScreen->parameterName = "rename";
 		ls.lock()->openScreen("name");
 		break;
 	}
@@ -69,9 +71,9 @@ void DirectoryScreen::function(int f)
 			return;
 		}
 
-		nameGui->setName("NEWFOLDR");
-		nameGui->setNameLimit(8);
-		nameGui->setParameterName("newfolder");
+		nameScreen->setName("NEWFOLDR");
+		nameScreen->setNameLimit(8);
+		nameScreen->parameterName = "newfolder";
 		ls.lock()->openScreen("name");
 		break;
 	case 5:

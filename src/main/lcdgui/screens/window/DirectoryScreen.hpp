@@ -1,9 +1,9 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
-namespace mpc::controls::other::dialog
+namespace mpc::lcdgui::screens::window
 {
-	class NameControls;
+	class NameScreen;
 }
 
 namespace mpc::lcdgui::screens
@@ -70,9 +70,9 @@ namespace mpc::lcdgui::screens::window
 
 	private:
 		friend class mpc::controls::BaseControls;
-		friend class mpc::controls::other::dialog::NameControls;
 		friend class mpc::disk::AbstractDisk;
 		friend class mpc::lcdgui::screens::LoadScreen;
+		friend class mpc::lcdgui::screens::window::NameScreen;
 		friend class mpc::lcdgui::screens::dialog2::DeleteAllFilesScreen;
 		friend class mpc::lcdgui::screens::dialog::DeleteFileScreen;
 		friend class mpc::lcdgui::screens::dialog::DeleteFolderScreen;

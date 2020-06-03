@@ -9,8 +9,6 @@
 #include <controls/other/InitControls.hpp>
 #include <controls/other/VerControls.hpp>
 
-#include <controls/other/dialog/NameControls.hpp>
-
 #include <controls/midisync/SyncControls.hpp>
 
 #include <controls/misc/PunchControls.hpp>
@@ -31,8 +29,6 @@ Controls::Controls()
 	pressedPadVelos = std::vector<int>(16);
 
 	controls["release"] = new GlobalReleaseControls();
-
-	controls["name"] = new other::dialog::NameControls();
 
 	controls["init"] = new other::InitControls();
 	controls["ver"] = new other::VerControls();

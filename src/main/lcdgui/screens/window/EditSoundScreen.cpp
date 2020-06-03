@@ -6,6 +6,7 @@
 #include <sequencer/Track.hpp>
 
 #include <lcdgui/screens/ZoneScreen.hpp>
+#include <lcdgui/screens/window/NameScreen.hpp>
 
 #include <mpc/MpcSoundPlayerChannel.hpp>
 
@@ -344,16 +345,16 @@ void EditSoundScreen::turnWheel(int i)
 {
 	init();
 
-	auto nameGui = mpc.getUis().lock()->getNameGui();
-
 	if (param.compare("edit") == 0)
 	{
 		setEdit(edit + i);
 	}
 	else if (param.compare("new-name") == 0 && (edit == 2 || edit == 7))
 	{
-		nameGui->setName(ls.lock()->lookupField("new-name").lock()->getText());
-		nameGui->setParameterName("newname");
+		auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
+		nameScreen->setName(findField("new-name").lock()->getText());
+		nameScreen->parameterName =  "newname";
+
 		ls.lock()->openScreen("name");
 	}
 	else if (param.compare("new-name") == 0 && edit == 3)

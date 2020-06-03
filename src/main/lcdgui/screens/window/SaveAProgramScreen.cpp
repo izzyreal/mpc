@@ -1,5 +1,7 @@
 #include "SaveAProgramScreen.hpp"
 
+#include <lcdgui/screens/window/NameScreen.hpp>
+
 #include <Util.hpp>
 #include <disk/AbstractDisk.hpp>
 
@@ -37,6 +39,8 @@ void SaveAProgramScreen::function(int i)
 {
 	init();
 
+	auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
+
 	switch (i)
 	{
 	case 3:
@@ -44,12 +48,12 @@ void SaveAProgramScreen::function(int i)
 		break;
 	case 4:
 	{
-		auto fileName = mpc::Util::getFileName(nameGui->getName()) + ".PGM";
+		auto fileName = mpc::Util::getFileName(nameScreen->getName()) + ".PGM";
 		auto disk = mpc.getDisk().lock();
 
 		if (disk->checkExists(fileName))
 		{
-			nameGui->setName(program.lock()->getName());
+			nameScreen->setName(program.lock()->getName());
 			ls.lock()->openScreen("file-already-exists");
 			break;
 		}
@@ -83,6 +87,6 @@ void SaveAProgramScreen::displayReplaceSameSounds()
 
 void SaveAProgramScreen::displayFile()
 {
-	auto nameGui = Mpc::instance().getUis().lock()->getNameGui();
-	findLabel("file").lock()->setText(nameGui->getName() + ".PGM");
+	auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
+	findLabel("file").lock()->setText(nameScreen->getName() + ".PGM");
 }

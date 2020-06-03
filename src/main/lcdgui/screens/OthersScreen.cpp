@@ -1,6 +1,6 @@
 #include "OthersScreen.hpp"
 
-using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens;
 using namespace std;
 
 OthersScreen::OthersScreen(const int layerIndex) 

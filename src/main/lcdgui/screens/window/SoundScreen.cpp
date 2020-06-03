@@ -1,6 +1,6 @@
 #include "SoundScreen.hpp"
 
-#include <ui/NameGui.hpp>
+#include <lcdgui/screens/window/NameScreen.hpp>
 
 using namespace mpc::lcdgui::screens::window;
 using namespace moduru::lang;
@@ -25,9 +25,9 @@ void SoundScreen::turnWheel(int i)
 	
 	if (param.compare("soundname") == 0)
 	{
-		auto nameGui = mpc.getUis().lock()->getNameGui();
-		nameGui->setName(ls.lock()->lookupField("soundname").lock()->getText());
-		nameGui->setParameterName("soundname");
+		auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
+		nameScreen->setName(findField("soundname").lock()->getText());
+		nameScreen->parameterName = "soundname";
 		ls.lock()->openScreen("name");
 	}
 }

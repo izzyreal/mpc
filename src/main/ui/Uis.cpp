@@ -1,7 +1,5 @@
 #include <ui/Uis.hpp>
 
-#include <ui/NameGui.hpp>
-
 #include <ui/misc/PunchGui.hpp>
 #include <ui/misc/SecondSeqGui.hpp>
 #include <ui/misc/TransGui.hpp>
@@ -48,8 +46,6 @@ Uis::Uis()
 		}
 	}
 
-	nameGui = new mpc::ui::NameGui();
-
 	midiSyncGui = new mpc::ui::midisync::MidiSyncGui();
 
 	punchGui = new mpc::ui::misc::PunchGui();
@@ -65,11 +61,6 @@ vector<string> Uis::noteNames;
 mpc::ui::midisync::MidiSyncGui* Uis::getMidiSyncGui()
 {
 	return midiSyncGui;
-}
-
-mpc::ui::NameGui* Uis::getNameGui()
-{
-	return nameGui;
 }
 
 mpc::ui::vmpc::DeviceGui* Uis::getDeviceGui()
@@ -105,7 +96,6 @@ mpc::ui::misc::SecondSeqGui* Uis::getSecondSeqGui()
 Uis::~Uis()
 {
 	if (midiSyncGui != nullptr) delete midiSyncGui;
-	if (nameGui != nullptr) delete nameGui;
 	if (punchGui != nullptr) delete punchGui;
 	if (d2dRecorderGui != nullptr) delete d2dRecorderGui;
 	if (transGui != nullptr) delete transGui;

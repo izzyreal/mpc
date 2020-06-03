@@ -2,6 +2,8 @@
 
 #include <sequencer/Track.hpp>
 
+#include <lcdgui/screens/window/NameScreen.hpp>
+
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
@@ -41,13 +43,16 @@ void TrackScreen::function(int i)
 void TrackScreen::turnWheel(int i)
 {
 	init();
-	
-	if (param.find("default") != string::npos) {
-		nameGui->setName(sequencer.lock()->getDefaultTrackName(sequencer.lock()->getActiveTrackIndex()));
+	auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
+
+	if (param.find("default") != string::npos)
+	{
+		nameScreen->setName(sequencer.lock()->getDefaultTrackName(sequencer.lock()->getActiveTrackIndex()));
 	}
-	else {
-		nameGui->setName(track.lock()->getName());
+	else
+	{
+		nameScreen->setName(track.lock()->getName());
 	}
-	nameGui->setParameterName(param);
+	nameScreen->parameterName = param;
 	ls.lock()->openScreen("name");
 }

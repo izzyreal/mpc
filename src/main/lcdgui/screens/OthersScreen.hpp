@@ -1,10 +1,10 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
-namespace mpc::lcdgui {
+namespace mpc::lcdgui::screens {
 
 	class OthersScreen
-		: public ScreenComponent
+		: public mpc::lcdgui::ScreenComponent
 	{
 
 	private:

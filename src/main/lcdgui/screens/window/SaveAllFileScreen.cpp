@@ -1,5 +1,7 @@
 #include "SaveAllFileScreen.hpp"
 
+#include <lcdgui/screens/window/NameScreen.hpp>
+
 #include <Util.hpp>
 #include <disk/MpcFile.hpp>
 #include <disk/AbstractDisk.hpp>
@@ -20,24 +22,26 @@ void SaveAllFileScreen::open()
 
 void SaveAllFileScreen::displayFile()
 {
-	auto nameGui = mpc.getUis().lock()->getNameGui();
+	auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
 
-	if (nameGui->getName().length() < 2)
+	if (nameScreen->getName().length() < 2)
 	{
 		return;
 	}
 
-	findField("file").lock()->setText(nameGui->getName().substr(0, 1));
-	findLabel("file1").lock()->setText(StrUtil::padRight(nameGui->getName().substr(1), " ", 15) + ".ALL");
+	findField("file").lock()->setText(nameScreen->getName().substr(0, 1));
+	findLabel("file1").lock()->setText(StrUtil::padRight(nameScreen->getName().substr(1), " ", 15) + ".ALL");
 }
 
 void SaveAllFileScreen::turnWheel(int i)
 {
 	init();
 
+	auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
+
 	if (param.compare("file") == 0)
 	{
-		nameGui->setParameterName("save-all-file");
+		nameScreen->parameterName = "save-all-file";
 		ls.lock()->openScreen("name");
 	}
 }
@@ -45,7 +49,9 @@ void SaveAllFileScreen::turnWheel(int i)
 void SaveAllFileScreen::function(int i)
 {
 	init();
-	
+
+	auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
+
 	switch (i)
 	{
 	case 3:
@@ -53,7 +59,7 @@ void SaveAllFileScreen::function(int i)
 		break;
 	case 4:
 	{
-		auto allName = mpc::Util::getFileName(nameGui->getName());
+		auto allName = mpc::Util::getFileName(nameScreen->getName());
 		auto existStr = allName + ".ALL";
 		
 		auto disk = mpc.getDisk().lock();
@@ -64,7 +70,7 @@ void SaveAllFileScreen::function(int i)
 			return;
 		}
 		
-		allParser = make_unique<mpc::file::all::AllParser>(mpc::Util::getFileName(nameGui->getName()));
+		allParser = make_unique<mpc::file::all::AllParser>(mpc::Util::getFileName(nameScreen->getName()));
 		auto f = disk->newFile(allName + ".ALL");
 		auto bytes = allParser->getBytes();
 		f->setFileData(&bytes);

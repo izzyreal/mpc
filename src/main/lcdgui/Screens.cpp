@@ -95,6 +95,7 @@
 #include <lcdgui/screens/window/SaveAllFileScreen.hpp>
 #include <lcdgui/screens/window/SaveApsFileScreen.hpp>
 #include <lcdgui/screens/window/CantFindFileScreen.hpp>
+#include <lcdgui/screens/window/NameScreen.hpp>
 
 #include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
 #include <lcdgui/screens/dialog/MidiMonitorScreen.hpp>
@@ -748,6 +749,10 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	else if (screenName.compare("file-already-exists") == 0)
 	{
 		screen = make_shared<FileAlreadyExistsScreen>(layerIndex);
+	}	
+	else if (screenName.compare("name") == 0)
+	{
+		screen = make_shared<NameScreen>(layerIndex);
 	}	
 
 	if (screen)

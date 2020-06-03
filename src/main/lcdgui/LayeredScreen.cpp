@@ -29,8 +29,6 @@
 
 #include <ui/Uis.hpp>
 
-#include <ui/NameObserver.hpp>
-
 #include <ui/midisync/SyncObserver.hpp>
 
 #include <ui/misc/PunchObserver.hpp>
@@ -688,10 +686,6 @@ void LayeredScreen::initObserver()
 	}
 	else if (csn.compare("sync") == 0) {
 		activeObserver = make_unique<SyncObserver>();
-	}
-	else if (csn.compare("name") == 0)
-	{
-		activeObserver = make_unique<ui::NameObserver>();
 	}
 	else if (csn.compare("settings") == 0)
 	{

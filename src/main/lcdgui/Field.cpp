@@ -4,7 +4,6 @@
 
 #include <Mpc.hpp>
 #include <lcdgui/LayeredScreen.hpp>
-#include <ui/NameGui.hpp>
 #include <lcdgui/TwoDots.hpp>
 
 #include <lang/StrUtil.hpp>

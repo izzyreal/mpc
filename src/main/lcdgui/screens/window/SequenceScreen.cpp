@@ -1,8 +1,6 @@
 #include "SequenceScreen.hpp"
 
-#include <ui/NameGui.hpp>
-
-#include <lcdgui/Label.hpp>
+#include <lcdgui/screens/window/NameScreen.hpp>
 
 using namespace mpc::lcdgui::screens::window;
 
@@ -30,7 +28,9 @@ void SequenceScreen::open()
 void SequenceScreen::function(int i)
 {
 	BaseControls::function(i);
-	switch (i) {
+
+	switch (i)
+	{
 	case 1:
 		ls.lock()->openScreen("delete-sequence");
 		break;
@@ -43,14 +43,19 @@ void SequenceScreen::function(int i)
 void SequenceScreen::turnWheel(int i)
 {
 	init();
-	auto nameGui = mpc.getUis().lock()->getNameGui();
-	if (param.find("default") != string::npos) {
-		nameGui->setName(sequencer.lock()->getDefaultSequenceName());
+
+	auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
+
+	if (param.find("default") != string::npos)
+	{
+		nameScreen->setName(sequencer.lock()->getDefaultSequenceName());
 	}
-	else {
+	else
+	{
 		auto seq = sequencer.lock()->getActiveSequence().lock();
-		nameGui->setName(seq->getName());
+		nameScreen->setName(seq->getName());
 	}
-	nameGui->setParameterName(param);
+
+	nameScreen->parameterName = param;
 	ls.lock()->openScreen("name");
 }

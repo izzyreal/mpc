@@ -1,10 +1,12 @@
 #include "SaveScreen.hpp"
 
 #include <sequencer/Track.hpp>
+#include <lcdgui/screens/window/NameScreen.hpp>
 
 #include <Util.hpp>
 
 using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui::screens::window;
 using namespace moduru::lang;
 using namespace std;
 
@@ -43,26 +45,29 @@ void SaveScreen::function(int i)
 		shared_ptr<mpc::sequencer::Sequence> seq;
 
 		auto lProgram = program.lock();
+		auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
 
 		switch (type)
 		{
 		case 0:
-			nameGui->setName("ALL_SEQ_SONG1");
+		{
+			nameScreen->setName("ALL_SEQ_SONG1");
 			ls.lock()->openScreen("save-all-file");
 			break;
+		}
 		case 1:
 			seq = sequencer.lock()->getActiveSequence().lock();
 			if (!seq->isUsed()) return;
 
-			nameGui->setName(seq->getName());
+			nameScreen->setName(seq->getName());
 			ls.lock()->openScreen("save-a-sequence");
 			break;
 		case 2:
-			nameGui->setName("ALL_PGMS");
+			nameScreen->setName("ALL_PGMS");
 			ls.lock()->openScreen("save-aps-file");
 			break;
 		case 3:
-			nameGui->setName(mpc::Util::getFileName(lProgram->getName()));
+			nameScreen->setName(mpc::Util::getFileName(lProgram->getName()));
 			ls.lock()->openScreen("saveaprogram");
 			break;
 		case 4:
@@ -70,7 +75,7 @@ void SaveScreen::function(int i)
 			{
 				break;
 			}
-			nameGui->setName(sampler.lock()->getSoundName(sampler.lock()->getSoundIndex()));
+			nameScreen->setName(sampler.lock()->getSoundName(sampler.lock()->getSoundIndex()));
 			ls.lock()->openScreen("save-a-sound");
 			break;
 		}

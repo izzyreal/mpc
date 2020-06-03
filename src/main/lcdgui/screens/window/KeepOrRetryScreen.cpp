@@ -1,10 +1,8 @@
 #include "KeepOrRetryScreen.hpp"
 
-#include <Mpc.hpp>
-#include <ui/NameGui.hpp>
+#include <lcdgui/screens/window/NameScreen.hpp>
+
 #include <sampler/NoteParameters.hpp>
-#include <sampler/Sampler.hpp>
-#include <sampler/Sound.hpp>
 
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
@@ -61,8 +59,9 @@ void KeepOrRetryScreen::function(int i)
 void KeepOrRetryScreen::turnWheel(int i)
 {
     init();
-    nameGui->setName(dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getPreviewSound().lock())->getName());
-    nameGui->setParameterName(param);
+	auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
+	nameScreen->setName(dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getPreviewSound().lock())->getName());
+	nameScreen->parameterName = param;
     ls.lock()->openScreen("name");
 }
 

@@ -20,7 +20,6 @@
 #include <lcdgui/Field.hpp>
 #include <lcdgui/Layer.hpp>
 
-#include <ui/NameGui.hpp>
 #include <ui/misc/PunchGui.hpp>
 #include <ui/vmpc/DirectToDiskRecorderGui.hpp>
 
@@ -37,6 +36,7 @@
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <lcdgui/screens/window/EditSoundScreen.hpp>
 #include <lcdgui/screens/window/DirectoryScreen.hpp>
+#include <lcdgui/screens/window/NameScreen.hpp>
 #include <lcdgui/screens/LoadScreen.hpp>
 #include <lcdgui/Screens.hpp>
 
@@ -55,7 +55,6 @@ BaseControls::BaseControls()
 	sequencer = mpc.getSequencer();
 	sampler = mpc.getSampler();
 	ls = mpc.getLayeredScreen();
-	nameGui = mpc.getUis().lock()->getNameGui();
 }
 
 vector<int> BaseControls::splitInc = vector<int>{ 10000000, 1000000, 100000, 10000, 1000, 100, 10, 1 };
@@ -159,7 +158,8 @@ void BaseControls::function(int i)
 			}
 			else if (currentScreenName.compare("name") == 0)
 			{
-				mpc.getUis().lock()->getNameGui()->setNameBeingEdited(false);
+				auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
+				nameScreen->editing = false;
 				ls.lock()->setLastFocus("name", "0");
 			}
 			else if (currentScreenName.compare("directory") == 0)

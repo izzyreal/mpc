@@ -113,7 +113,7 @@ void TrimScreen::turnWheel(int i)
 	
 	//auto notch = getNotch(increment);
 	auto soundInc = getSoundIncrement(i);
-	auto mtf = ls.lock()->lookupField(param).lock();
+	auto mtf = findField(param).lock();
 	
 	if (mtf->isSplit())
 	{
@@ -257,7 +257,7 @@ void TrimScreen::pressEnter()
 	}
 	
 	auto lLs = ls.lock();
-	auto mtf = ls.lock()->lookupField(param).lock();
+	auto mtf = findField(param).lock();
 	
 	if (!mtf->isTypeModeEnabled())
 	{

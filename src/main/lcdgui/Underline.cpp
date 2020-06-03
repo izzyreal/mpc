@@ -1,7 +1,5 @@
 #include <lcdgui/Underline.hpp>
 
-#include <Logger.hpp>
-
 using namespace mpc::lcdgui;
 using namespace std;
 
@@ -20,8 +18,10 @@ void Underline::Draw(vector<vector<bool>>* pixels)
 		return;
 	}
 
-	for (int i = 0; i < 16; i++) {
-		for (int j = 0; j < 6; j++) {
+	for (int i = 0; i < 16; i++)
+	{
+		for (int j = 0; j < 6; j++)
+		{
 			(*pixels)[j + (i * 6) + 106][27] = states[i];
 		}
 	}
@@ -32,7 +32,4 @@ void Underline::setState(int i, bool b)
 {
     states[i] = b;
 	SetDirty();
-}
-
-Underline::~Underline() {
 }

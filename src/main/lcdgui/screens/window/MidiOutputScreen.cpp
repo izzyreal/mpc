@@ -1,5 +1,7 @@
 #include "MidiOutputScreen.hpp"
 
+#include <lcdgui/screens/window/NameScreen.hpp>
+
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
@@ -22,9 +24,10 @@ void MidiOutputScreen::turnWheel(int i)
 	
 	if (param.compare("firstletter") == 0)
 	{
-		nameGui->setName(seq->getDeviceName(deviceNumber + i));
-		nameGui->setParameterName("devicename");
-		nameGui->setNameLimit(8);
+		auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
+		nameScreen->setName(seq->getDeviceName(deviceNumber + i));
+		nameScreen->parameterName = "devicename";
+		nameScreen->setNameLimit(8);
 		ls.lock()->openScreen("name");
 	}
 	else if (param.compare("softthru") == 0)

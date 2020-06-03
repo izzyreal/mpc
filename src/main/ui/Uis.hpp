@@ -3,10 +3,6 @@
 #include <vector>
 #include <string>
 
-namespace mpc::ui {
-	class NameGui;
-}
-
 namespace mpc::ui::vmpc {
 	class DirectToDiskRecorderGui;
 	class DeviceGui;
@@ -32,8 +28,6 @@ namespace mpc::ui {
 	{
 
 	private:
-		mpc::ui::NameGui* nameGui = nullptr;
-
 		mpc::ui::midisync::MidiSyncGui* midiSyncGui = nullptr;
 
 		mpc::ui::other::OthersGui* othersGui = nullptr;
@@ -47,7 +41,6 @@ namespace mpc::ui {
 
 	public:
 		mpc::ui::midisync::MidiSyncGui* getMidiSyncGui();
-		mpc::ui::NameGui* getNameGui();
 
 		mpc::ui::other::OthersGui* getOthersGui();
 

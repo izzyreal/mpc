@@ -1,5 +1,7 @@
 #include "ProgramScreen.hpp"
 
+#include <lcdgui/screens/window/NameScreen.hpp>
+
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
@@ -21,8 +23,9 @@ void ProgramScreen::turnWheel(int i)
 
 	if (param.compare("programname") == 0)
 	{
-        nameGui->setName(program.lock()->getName());
-        nameGui->setParameterName(param);
+		auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
+		nameScreen->setName(program.lock()->getName());
+		nameScreen->parameterName = param;
         ls.lock()->openScreen("name");
     }
 	else if (param.compare("midiprogramchange") == 0)

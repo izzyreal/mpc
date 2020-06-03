@@ -11,7 +11,6 @@ namespace mpc::sequencer
 namespace mpc::ui
 {
 	class UserDefaults;
-	class NameGui;
 }
 
 namespace mpc::controls::other
@@ -22,7 +21,6 @@ namespace mpc::controls::other
 	{
 
 	protected:
-		mpc::ui::NameGui* nameGui = nullptr;
 		std::weak_ptr<mpc::sequencer::Sequence> sequence;
 
 	protected:

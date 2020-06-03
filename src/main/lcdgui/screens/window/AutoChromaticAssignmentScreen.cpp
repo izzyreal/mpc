@@ -1,5 +1,7 @@
 #include "AutoChromaticAssignmentScreen.hpp"
 
+#include <lcdgui/screens/window/NameScreen.hpp>
+
 using namespace mpc::lcdgui::screens::window;
 using namespace moduru::lang;
 using namespace std;
@@ -36,8 +38,9 @@ void AutoChromaticAssignmentScreen::turnWheel(int i)
 	}
 	else if (param.compare("program-name") == 0)
 	{
-		nameGui->setName(newName);
-		nameGui->setParameterName("autochrom");
+		auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
+		nameScreen->setName(newName);
+		nameScreen->parameterName = "autochrom";
 		ls.lock()->openScreen("name");
 	}
 	else if (param.compare("snd") == 0)

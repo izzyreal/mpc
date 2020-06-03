@@ -1,5 +1,7 @@
 #include "SaveASequenceScreen.hpp"
 
+#include <lcdgui/screens/window/NameScreen.hpp>
+
 #include <Util.hpp>
 #include <disk/AbstractDisk.hpp>
 
@@ -27,7 +29,8 @@ void SaveASequenceScreen::turnWheel(int i)
 	}
 	else if (param.compare("file") == 0)
 	{
-		nameGui->setParameterName("savesequencename");
+		auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
+		nameScreen->parameterName = "savesequencename";
 		ls.lock()->openScreen("name");
 	}
 }
@@ -35,6 +38,7 @@ void SaveASequenceScreen::turnWheel(int i)
 void SaveASequenceScreen::function(int i)
 {
 	init();
+	auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
 
 	switch (i)
 	{
@@ -42,7 +46,7 @@ void SaveASequenceScreen::function(int i)
 		ls.lock()->openScreen("save");
 		break;
 	case 4:
-		auto fileName = mpc::Util::getFileName(nameGui->getName()) + ".MID";
+		auto fileName = mpc::Util::getFileName(nameScreen->getName()) + ".MID";
 		
 		if (mpc.getDisk().lock()->checkExists(fileName))
 		{
@@ -65,7 +69,8 @@ void SaveASequenceScreen::displaySaveAs()
 
 void SaveASequenceScreen::displayFile()
 {
-	auto name = nameGui->getName();
+	auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
+	auto name = nameScreen->getName();
 
 	if (name.length() < 2)
 	{

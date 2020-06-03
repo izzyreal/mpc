@@ -1,9 +1,9 @@
 #include "SaveApsFileScreen.hpp"
 
 #include <Util.hpp>
-#include <ui/NameGui.hpp>
 
 #include <lcdgui/screens/window/SaveAProgramScreen.hpp>
+#include <lcdgui/screens/window/NameScreen.hpp>
 
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
@@ -23,12 +23,12 @@ void SaveApsFileScreen::open()
 void SaveApsFileScreen::turnWheel(int i)
 {
 	init();
-
+	auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
 	auto saveAProgramScreen = dynamic_pointer_cast<SaveAProgramScreen>(Screens::getScreenComponent("save-a-program"));
 
 	if (param.compare("file") == 0)
 	{
-		nameGui->setParameterName("saveapsname");
+		nameScreen->parameterName = "saveapsname";
 		ls.lock()->openScreen("name");
 	}
 	else if (param.compare("save") == 0)
@@ -54,7 +54,8 @@ void SaveApsFileScreen::function(int i)
 		break;
 	case 4:
 	{
-		string apsFileName = mpc::Util::getFileName(nameGui->getName()) + ".APS";
+		auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
+		string apsFileName = mpc::Util::getFileName(nameScreen->getName()) + ".APS";
 		apsSaver = make_unique<mpc::disk::ApsSaver>(apsFileName);
 		break;
 	}
@@ -63,8 +64,8 @@ void SaveApsFileScreen::function(int i)
 
 void SaveApsFileScreen::displayFile()
 {
-	auto nameGui = mpc.getUis().lock()->getNameGui();
-	findField("file").lock()->setText(nameGui->getName());
+	auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
+	findField("file").lock()->setText(nameScreen->getName());
 }
 
 void SaveApsFileScreen::displaySave()

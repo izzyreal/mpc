@@ -1,7 +1,9 @@
 #pragma once
+#include "Component.hpp"
+#include <controls/BaseControls.hpp>
+#include <observer/Observer.hpp>
 
 #include "Screens.hpp"
-#include "Component.hpp"
 #include "Field.hpp"
 #include "Label.hpp"
 #include "FunctionKeys.hpp"
@@ -9,12 +11,6 @@
 #include "Wave.hpp"
 #include "TwoDots.hpp"
 #include "EnvGraph.hpp"
-
-#include <controls/BaseControls.hpp>
-
-#include <ui/NameGui.hpp>
-
-#include <observer/Observer.hpp>
 
 #include <lang/StrUtil.hpp>
 

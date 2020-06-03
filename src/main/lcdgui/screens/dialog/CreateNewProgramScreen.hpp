@@ -3,9 +3,9 @@
 
 #include <controls/BaseSamplerControls.hpp>
 
-namespace mpc::controls::other::dialog
+namespace mpc::lcdgui::screens::window
 {
-	class NameControls;
+	class NameScreen;
 }
 
 namespace mpc::lcdgui::screens::dialog
@@ -28,7 +28,7 @@ namespace mpc::lcdgui::screens::dialog
 		void displayMidiProgramChange();
 
 	private:
-		friend class mpc::controls::other::dialog::NameControls;
+		friend class mpc::lcdgui::screens::window::NameScreen;
 
 	};
 }

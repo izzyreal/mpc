@@ -524,7 +524,7 @@ void StepEditorScreen::down()
 {
 	init();
 
-	if (!ls.lock()->lookupField("a0").lock()->IsHidden() && param.compare("viewmodenumber") == 0)
+	if (!findField("a0").lock()->IsHidden() && param.compare("viewmodenumber") == 0)
 	{
 		ls.lock()->setFocus("a0");
 		return;
@@ -611,7 +611,7 @@ void StepEditorScreen::downOrUp(int increment)
 		{
 			if (!(controls->isShiftPressed() && dynamic_pointer_cast<EmptyEvent>(visibleEvents[(int)(srcNumber + increment)].lock())))
 			{
-				auto tf = ls.lock()->lookupField(destination).lock();
+				auto tf = findField(destination).lock();
 				if (tf && !tf->IsHidden())
 				{
 					ls.lock()->setFocus(tf->getName());

@@ -1,8 +1,9 @@
 #include "StereoToMonoScreen.hpp"
 
-#include <ui/NameGui.hpp>
+#include <lcdgui/screens/window/NameScreen.hpp>
 
 using namespace mpc::lcdgui::screens::dialog;
+using namespace mpc::lcdgui::screens::window;
 using namespace moduru::lang;
 using namespace std;
 
@@ -34,7 +35,9 @@ void StereoToMonoScreen::open()
 void StereoToMonoScreen::turnWheel(int i)
 {
 	init();
-	
+
+	auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
+
 	if (param.compare("stereosource") == 0)
 	{
 		sampler.lock()->setSoundIndex(sampler.lock()->getNextSoundIndex(sampler.lock()->getSoundIndex(), i > 0));
@@ -42,14 +45,14 @@ void StereoToMonoScreen::turnWheel(int i)
 	}
 	else if (param.compare("newlname") == 0)
 	{
-		nameGui->setName(ls.lock()->lookupField("newlname").lock()->getText());
-		nameGui->setParameterName("newlname");
+		nameScreen->setName(findField("newlname").lock()->getText());
+		nameScreen->parameterName = "newlname";
 		ls.lock()->openScreen("name");
 	}
 	else if (param.compare("newrname") == 0)
 	{
-		nameGui->setName(ls.lock()->lookupField("newrname").lock()->getText());
-		nameGui->setParameterName("newrname");
+		nameScreen->setName(findField("newrname").lock()->getText());
+		nameScreen->parameterName = "newrname";
 		ls.lock()->openScreen("name");
 	}
 }

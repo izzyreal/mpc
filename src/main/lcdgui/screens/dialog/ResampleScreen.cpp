@@ -1,8 +1,11 @@
 #include "ResampleScreen.hpp"
 
+#include <lcdgui/screens/window/NameScreen.hpp>
+
 #include <thirdp/libsamplerate/samplerate.h>
 
 using namespace mpc::lcdgui::screens::dialog;
+using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
 ResampleScreen::ResampleScreen(const int layerIndex)
@@ -46,8 +49,9 @@ void ResampleScreen::turnWheel(int i)
 	}
 	else if (param.compare("newname") == 0)
 	{
-		nameGui->setName(ls.lock()->lookupField("newname").lock()->getText());
-		nameGui->setParameterName("newname");
+		auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
+		nameScreen->setName(findField("newname").lock()->getText());
+		nameScreen->parameterName = "newname";
 		ls.lock()->openScreen("name");
 	}
 }

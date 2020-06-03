@@ -6,11 +6,6 @@ namespace mpc
 	class Mpc;
 }
 
-namespace mpc::controls::other::dialog
-{
-	class NameControls;
-}
-
 namespace mpc::disk
 {
 	class AbstractDisk;
@@ -25,6 +20,7 @@ namespace mpc::lcdgui::screens::window
 	class Mpc2000XlAllFileScreen;
 	class LoadASoundScreen;
 	class LoadASequenceScreen;
+	class NameScreen;
 }
 
 namespace mpc::lcdgui::screens::dialog2
@@ -80,10 +76,10 @@ namespace mpc::lcdgui::screens
 		friend class mpc::lcdgui::screens::window::Mpc2000XlAllFileScreen;
 		friend class mpc::lcdgui::screens::window::LoadASoundScreen;
 		friend class mpc::lcdgui::screens::window::LoadASequenceScreen;
+		friend class mpc::lcdgui::screens::window::NameScreen;
 		friend class mpc::lcdgui::screens::dialog2::DeleteAllFilesScreen;
 		friend class mpc::lcdgui::screens::dialog::DeleteFileScreen;
 		friend class mpc::controls::BaseControls;
-		friend class mpc::controls::other::dialog::NameControls;
 		friend class mpc::disk::AbstractDisk;
 		friend class mpc::disk::StdDisk;
 		friend class mpc::Mpc;

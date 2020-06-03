@@ -128,7 +128,7 @@ void LoopScreen::turnWheel(int i)
 	auto loopScreen = dynamic_pointer_cast<LoopScreen>(Screens::getScreenComponent("loop"));
 	auto const loopFix = loopScreen->loopLngthFix;
 	
-	auto mtf = ls.lock()->lookupField(param).lock();
+	auto mtf = findField(param).lock();
 	
 	if (mtf->isSplit())
 	{
@@ -293,7 +293,7 @@ void LoopScreen::pressEnter()
 	}
 	
 	auto lLs = ls.lock();
-	auto mtf = ls.lock()->lookupField(param).lock();
+	auto mtf = findField(param).lock();
 
 	if (!mtf->isTypeModeEnabled())
 	{

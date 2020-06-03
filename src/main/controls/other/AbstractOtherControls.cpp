@@ -2,7 +2,6 @@
 
 #include <Mpc.hpp>
 #include <Paths.hpp>
-#include <ui/NameGui.hpp>
 #include <ui/UserDefaults.hpp>
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>
@@ -17,7 +16,6 @@ AbstractOtherControls::AbstractOtherControls()
 	: BaseControls()
 {
 	akaiAsciiChar = mpc::Mpc::akaiAsciiChar;
-	nameGui = Mpc::instance().getUis().lock()->getNameGui();
 }
 
 void AbstractOtherControls::init()
