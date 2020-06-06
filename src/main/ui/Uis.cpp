@@ -6,8 +6,6 @@
 
 #include <ui/midisync/MidiSyncGui.hpp>
 
-#include <ui/vmpc/DirectToDiskRecorderGui.hpp>
-
 using namespace mpc::ui;
 using namespace std;
 
@@ -50,8 +48,6 @@ Uis::Uis()
 	punchGui = new mpc::ui::misc::PunchGui();
 	transGui = new mpc::ui::misc::TransGui();
 	secondSeqGui = new mpc::ui::misc::SecondSeqGui();
-
-	d2dRecorderGui = new mpc::ui::vmpc::DirectToDiskRecorderGui();
 }
 
 vector<string> Uis::noteNames;
@@ -71,11 +67,6 @@ mpc::ui::other::OthersGui* Uis::getOthersGui()
 	return othersGui;
 }
 
-mpc::ui::vmpc::DirectToDiskRecorderGui* Uis::getD2DRecorderGui()
-{
-	return d2dRecorderGui;
-}
-
 mpc::ui::misc::TransGui* Uis::getTransGui()
 {
 	return transGui;
@@ -90,7 +81,6 @@ Uis::~Uis()
 {
 	if (midiSyncGui != nullptr) delete midiSyncGui;
 	if (punchGui != nullptr) delete punchGui;
-	if (d2dRecorderGui != nullptr) delete d2dRecorderGui;
 	if (transGui != nullptr) delete transGui;
 	if (secondSeqGui != nullptr) delete secondSeqGui;
 	if (othersGui != nullptr) delete othersGui;

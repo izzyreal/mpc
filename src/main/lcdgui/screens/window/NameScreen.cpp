@@ -6,6 +6,7 @@
 #include <lcdgui/screens/window/MidiOutputScreen.hpp>
 #include <lcdgui/screens/window/EditSoundScreen.hpp>
 #include <lcdgui/screens/window/AutoChromaticAssignmentScreen.hpp>
+#include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
 #include <lcdgui/screens/dialog/CopySoundScreen.hpp>
 #include <lcdgui/screens/dialog/ResampleScreen.hpp>
 #include <lcdgui/screens/dialog/StereoToMonoScreen.hpp>
@@ -18,8 +19,6 @@
 #include <disk/AbstractDisk.hpp>
 #include <disk/MpcFile.hpp>
 #include <disk/ApsSaver.hpp>
-
-#include <ui/vmpc/DirectToDiskRecorderGui.hpp>
 
 #include <sequencer/Track.hpp>
 
@@ -152,12 +151,13 @@ void NameScreen::saveName()
 {	
 	auto prevScreen = ls.lock()->getPreviousScreenName();
 
-	if (parameterName.compare("outputfolder") == 0)
+	if (parameterName.compare("output-folder") == 0)
 	{
-		mpc.getUis().lock()->getD2DRecorderGui()->setOutputFolder(getName());
+		auto directToDiskRecorderScreen = dynamic_pointer_cast<VmpcDirectToDiskRecorderScreen>(Screens::getScreenComponent("vmpc-direct-to-disk-recorder"));
+		directToDiskRecorderScreen->outputFolder = getName();
 		editing = false;
 		ls.lock()->setLastFocus("name", "0");
-		ls.lock()->openScreen("directtodiskrecorder");
+		ls.lock()->openScreen("vmpc-direct-to-disk-recorder");
 	}
 	else if (parameterName.compare("save-all-file") == 0)
 	{

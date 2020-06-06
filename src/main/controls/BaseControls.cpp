@@ -21,7 +21,6 @@
 #include <lcdgui/Layer.hpp>
 
 #include <ui/misc/PunchGui.hpp>
-#include <ui/vmpc/DirectToDiskRecorderGui.hpp>
 
 #include <sampler/Pad.hpp>
 #include <sampler/Program.hpp>
@@ -592,8 +591,7 @@ void BaseControls::play()
 		else {
 			if (controls->isShiftPressed() && !mpc.getAudioMidiServices().lock()->isBouncing())
 			{
-				mpc.getUis().lock()->getD2DRecorderGui()->setSq(sequencer.lock()->getActiveSequenceIndex());
-				ls.lock()->openScreen("directtodiskrecorder");
+				ls.lock()->openScreen("vmpc-direct-to-disk-recorder");
 			}
 			else
 			{
@@ -642,8 +640,7 @@ void BaseControls::playStart()
 	{
 		if (controls->isShiftPressed())
 		{
-			mpc.getUis().lock()->getD2DRecorderGui()->setSq(sequencer.lock()->getActiveSequenceIndex());
-			ls.lock()->openScreen("directtodiskrecorder");
+			ls.lock()->openScreen("vmpc-direct-to-disk-recorder");
 		}
 		else
 		{

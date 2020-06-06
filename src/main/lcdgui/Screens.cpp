@@ -40,6 +40,7 @@
 #include <lcdgui/screens/SetupScreen.hpp>
 #include <lcdgui/screens/SaveScreen.hpp>
 #include <lcdgui/screens/VmpcDiskScreen.hpp>
+#include <lcdgui/screens/VmpcSettingsScreen.hpp>
 
 #include <lcdgui/screens/window/NumberOfZonesScreen.hpp>
 #include <lcdgui/screens/window/InitPadAssignScreen.hpp>
@@ -97,6 +98,9 @@
 #include <lcdgui/screens/window/SaveApsFileScreen.hpp>
 #include <lcdgui/screens/window/CantFindFileScreen.hpp>
 #include <lcdgui/screens/window/NameScreen.hpp>
+#include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
+#include <lcdgui/screens/window/VmpcRecordingFinishedScreen.hpp>
+#include <lcdgui/screens/window/VmpcRecordJamScreen.hpp>
 
 #include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
 #include <lcdgui/screens/dialog/MidiMonitorScreen.hpp>
@@ -758,6 +762,22 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	else if (screenName.compare("vmpc-disk") == 0)
 	{
 		screen = make_shared<VmpcDiskScreen>(layerIndex);
+	}	
+	else if (screenName.compare("vmpc-settings") == 0)
+	{
+		screen = make_shared<VmpcSettingsScreen>(layerIndex);
+	}	
+	else if (screenName.compare("vmpc-direct-to-disk-recorder") == 0)
+	{
+		screen = make_shared<VmpcDirectToDiskRecorderScreen>(layerIndex);
+	}	
+	else if (screenName.compare("vmpc-record-jam") == 0)
+	{
+		screen = make_shared<VmpcRecordJamScreen>(layerIndex);
+	}	
+	else if (screenName.compare("vmpc-recording-finished") == 0)
+	{
+		screen = make_shared<VmpcRecordingFinishedScreen>(layerIndex);
 	}	
 
 	if (screen)

@@ -9,11 +9,11 @@
 #include <audiomidi/SoundPlayer.hpp>
 #include <audiomidi/MpcMidiPorts.hpp>
 
-#include <ui/vmpc/DirectToDiskRecorderGui.hpp>
 #include <nvram/NvRam.hpp>
 #include <nvram/AudioMidiConfig.hpp>
 #include <sampler/Sampler.hpp>
 #include <sequencer/Sequencer.hpp>
+
 #include <mpc/MpcVoice.hpp>
 #include <mpc/MpcBasicSoundPlayerChannel.hpp>
 #include <mpc/MpcBasicSoundPlayerControls.hpp>
@@ -141,7 +141,7 @@ void AudioMidiServices::start(const int sampleRate, const int inputCount, const 
 		outputProcesses[i] = server->openAudioOutput(getOutputNames()[i], "mpc_out" + to_string(i));
 	}
 
-	createSynth();	
+	createSynth();
 	connectVoices();
 
 	mpcMidiPorts = make_shared<MpcMidiPorts>();
@@ -153,13 +153,13 @@ void AudioMidiServices::start(const int sampleRate, const int inputCount, const 
 	auto sc = mixer->getMixerControls().lock()->getStripControls("67").lock();
 	auto mmc = dynamic_pointer_cast<MainMixControls>(sc->find("Main").lock());
 	dynamic_pointer_cast<ctoot::audio::fader::FaderControl>(mmc->find("Level").lock())->setValue(static_cast<float>(100));
-	
+
 	cac = make_shared<CompoundAudioClient>();
 	cac->add(frameSeq.get());
 	cac->add(mixer.get());
 
 	mixer->getStrip("66").lock()->setInputProcess(inputProcesses[0]);
-	
+
 	offlineServer->setWeakPtr(offlineServer);
 	offlineServer->setClient(cac);
 
@@ -207,20 +207,20 @@ NonRealTimeAudioServer* AudioMidiServices::getAudioServer() {
 void AudioMidiServices::setupMixer()
 {
 	mixerControls = make_shared<ctoot::mpc::MpcMixerControls>("MpcMixerControls", 1.f);
-	
+
 	// AUX#1 - #4 represent ASSIGNABLE MIX OUT 1/2, 3/4, 5/6 and 7/8
 	mixerControls->createAuxBusControls("AUX#1", ChannelFormat::STEREO());
 	mixerControls->createAuxBusControls("AUX#2", ChannelFormat::STEREO());
 	mixerControls->createAuxBusControls("AUX#3", ChannelFormat::STEREO());
 	mixerControls->createAuxBusControls("AUX#4", ChannelFormat::STEREO());
-	
+
 	// FX#1 Represents the MPC2000XL's only FX send bus
 	mixerControls->createFxBusControls("FX#1", ChannelFormat::STEREO());
 	int nReturns = 1;
-	
+
 	// L/R represents STEREO OUT L/R
 	ctoot::audio::mixer::MixerControlsFactory::createBusStrips(dynamic_pointer_cast<ctoot::audio::mixer::MixerControls>(mixerControls), "L-R", ChannelFormat::STEREO(), nReturns);
-	
+
 	/*
 	* There are 32 voices. Each voice has one channel for mixing to STEREO OUT L/R, and one channel for mixing to an ASSIGNABLE MIX OUT. These are strips 1-64.
 	* There's one channel for the MpcBasicSoundPlayerChannel, which plays the metronome, preview and playX sounds. This is strip 65.
@@ -306,7 +306,7 @@ void AudioMidiServices::createSynth()
 	mms = dynamic_pointer_cast<ctoot::mpc::MpcMultiMidiSynth>(synthRack->getMidiSynth(0).lock());
 
 	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(Screens::getScreenComponent("mixer-setup"));
-	
+
 	for (int i = 0; i < 4; i++)
 	{
 		auto m = make_shared<ctoot::mpc::MpcSoundPlayerControls>(mms, dynamic_pointer_cast<ctoot::mpc::MpcSampler>(Mpc::instance().getSampler().lock()), i, mixer, server, mixerSetupScreen.get());
@@ -414,7 +414,7 @@ void AudioMidiServices::stopBouncing()
 		return;
 	}
 
-	Mpc::instance().getLayeredScreen().lock()->openScreen("recordingfinished");	
+	Mpc::instance().getLayeredScreen().lock()->openScreen("vmpc-recording-finished");
 	bouncing.store(false);
 }
 

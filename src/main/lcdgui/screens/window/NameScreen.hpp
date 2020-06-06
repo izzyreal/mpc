@@ -6,11 +6,6 @@ namespace mpc::controls
 	class BaseControls;
 }
 
-namespace mpc::controls::vmpc
-{
-	class DirectToDiskRecorderControls;
-}
-
 namespace mpc::lcdgui
 {
 	class Underline;
@@ -36,6 +31,7 @@ namespace mpc::lcdgui::screens::window
 	class TrackScreen;
 	class SaveASequenceScreen;
 	class ProgramScreen;
+	class VmpcDirectToDiskRecorderScreen;
 }
 
 namespace mpc::lcdgui::screens::dialog
@@ -91,7 +87,7 @@ namespace mpc::lcdgui::screens::window
 		friend class SaveAProgramScreen;
 		friend class SaveApsFileScreen;
 		friend class mpc::controls::BaseControls;
-		friend class mpc::controls::vmpc::DirectToDiskRecorderControls;
+		friend class mpc::lcdgui::screens::window::VmpcDirectToDiskRecorderScreen;
 		friend class mpc::lcdgui::screens::dialog::CopySoundScreen;
 		friend class mpc::lcdgui::screens::dialog::StereoToMonoScreen;
 		friend class mpc::lcdgui::screens::dialog::FileAlreadyExistsScreen;

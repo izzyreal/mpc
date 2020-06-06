@@ -35,9 +35,6 @@
 #include <ui/misc/SecondSeqObserver.hpp>
 #include <ui/misc/TransObserver.hpp>
 
-#include <ui/vmpc/DirectToDiskRecorderObserver.hpp>
-#include <ui/vmpc/VmpcSettingsObserver.hpp>
-
 #include <file/FileUtil.hpp>
 
 #include <cmath>
@@ -47,7 +44,6 @@ using namespace mpc::ui;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 
-using namespace mpc::ui::vmpc;
 using namespace mpc::ui::midisync;
 using namespace mpc::ui::misc;
 using namespace mpc::ui::other;
@@ -668,10 +664,7 @@ void LayeredScreen::initObserver()
 		activeObserver.reset();
 	}
 
-	if (csn.compare("directtodiskrecorder") == 0) {
-		activeObserver = make_unique<DirectToDiskRecorderObserver>();
-	}
-	else if (csn.compare("punch") == 0) {
+	if (csn.compare("punch") == 0) {
 		activeObserver = make_unique<PunchObserver>();
 	}
 	else if (csn.compare("trans") == 0) {
@@ -682,10 +675,6 @@ void LayeredScreen::initObserver()
 	}
 	else if (csn.compare("sync") == 0) {
 		activeObserver = make_unique<SyncObserver>();
-	}
-	else if (csn.compare("vmpc-settings") == 0)
-	{
-		activeObserver = make_unique<VmpcSettingsObserver>();
 	}
 }
 

@@ -9,7 +9,6 @@
 #include <hardware/HwPad.hpp>
 
 #include <ui/Uis.hpp>
-#include <ui/vmpc/DirectToDiskRecorderGui.hpp>
 #include <ui/UserDefaults.hpp>
 
 #include <lcdgui/LayeredScreen.hpp>
@@ -459,24 +458,16 @@ void Sequencer::play(bool fromStart)
 	}
 
 	hw->getLed("play").lock()->light(true);
+
 	auto ams = Mpc::instance().getAudioMidiServices().lock();
-	auto directToDiskRecordGui = Mpc::instance().getUis().lock()->getD2DRecorderGui();
-	bool offline = directToDiskRecordGui->isOffline();
-	
-	int rate = ams->getAudioServer()->getSampleRate();
 
 	if (ams->isBouncePrepared())
 	{
-		if (offline)
-		{
-			vector<int> rates{ 44100, 48000, 88200 };
-			rate = rates[directToDiskRecordGui->getSampleRate()];
-		}
-
 		ams->startBouncing();
 	}
 	else
 	{
+		int rate = ams->getAudioServer()->getSampleRate();
 		ams->getFrameSequencer().lock()->start(rate);
 	}
 

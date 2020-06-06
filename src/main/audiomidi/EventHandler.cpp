@@ -16,7 +16,6 @@
 #include <ui/Uis.hpp>
 #include <ui/midisync/MidiSyncGui.hpp>
 #include <ui/misc/TransGui.hpp>
-#include <ui/vmpc/DirectToDiskRecorderGui.hpp>
 
 #include <hardware/Hardware.hpp>
 #include <hardware/HwPad.hpp>
@@ -27,6 +26,7 @@
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/MixerSetupScreen.hpp>
 #include <lcdgui/screens/window/CountMetronomeScreen.hpp>
+#include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
 
 #include <midi/core/MidiMessage.hpp>
 #include <midi/core/ShortMessage.hpp>
@@ -278,8 +278,10 @@ void EventHandler::midiOut(weak_ptr<mpc::sequencer::Event> e, mpc::sequencer::Tr
 			notifyLetter = "b";
 		}
 
+		auto directToDiskRecorderScreen = dynamic_pointer_cast<VmpcDirectToDiskRecorderScreen>(Screens::getScreenComponent("vmpc-direct-to-disk-recorder"));
+
 		if (!(Mpc::instance().getAudioMidiServices().lock()->isBouncing() &&
-			Mpc::instance().getUis().lock()->getD2DRecorderGui()->isOffline()) && 
+			directToDiskRecorderScreen->offline) &&
 			r != nullptr && track->getDevice() != 0)
 		{
 			if (r != nullptr)
@@ -287,6 +289,7 @@ void EventHandler::midiOut(weak_ptr<mpc::sequencer::Event> e, mpc::sequencer::Tr
 				auto fs = Mpc::instance().getAudioMidiServices().lock()->getFrameSequencer().lock();
 				auto eventFrame = fs->getEventFrameOffset(event->getTick());
 				msg.bufferPos = eventFrame;
+
 				if (r->size() < 100)
 				{
 					r->push_back(msg);

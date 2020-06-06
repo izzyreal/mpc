@@ -17,11 +17,6 @@
 #include <controls/misc/TransControls.hpp>
 #include <controls/misc/window/TransposePermanentControls.hpp>
 
-#include <controls/vmpc/DirectToDiskRecorderControls.hpp>
-#include <controls/vmpc/RecordJamControls.hpp>
-#include <controls/vmpc/RecordingFinishedControls.hpp>
-#include <controls/vmpc/VmpcSettingsControls.hpp>
-
 using namespace mpc::controls;
 
 Controls::Controls()
@@ -40,11 +35,6 @@ Controls::Controls()
 	controls["transposepermanent"] = new misc::window::TransposePermanentControls();
 
 	controls["sync"] = new midisync::SyncControls();
-
-	controls["directtodiskrecorder"] = new vmpc::DirectToDiskRecorderControls();
-	controls["recordjam"] = new vmpc::RecordJamControls();
-	controls["recordingfinished"] = new vmpc::RecordingFinishedControls();
-	controls["vmpc-settings"] = new vmpc::VmpcSettingsControls();
 }
 
 void Controls::setCtrlPressed(bool b) {

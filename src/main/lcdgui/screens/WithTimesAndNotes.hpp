@@ -7,7 +7,6 @@ namespace mpc::sequencer
 
 namespace mpc::lcdgui::screens
 {
-
 	class WithTimesAndNotes
 	{
 
@@ -31,6 +30,7 @@ namespace mpc::lcdgui::screens
 		virtual void displayTime() = 0;
 
 	public:
+		void checkAllTimes(int notch, mpc::sequencer::Sequence* sequence = nullptr);
 		void checkAllTimesAndNotes(int notch, mpc::sequencer::Sequence* sequence = nullptr);
 
 	};

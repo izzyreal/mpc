@@ -2,12 +2,13 @@
 
 #include <Mpc.hpp>
 #include <ui/Uis.hpp>
-#include <ui/vmpc/VmpcSettingsGui.hpp>
+
 #include <Paths.hpp>
 #include <sampler/Sampler.hpp>
 
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/PgmAssignScreen.hpp>
+#include <lcdgui/screens/VmpcSettingsScreen.hpp>
 
 using namespace mpc::sampler;
 using namespace mpc::lcdgui;
@@ -21,7 +22,9 @@ std::vector<int> Pad::originalPadNotes = {	37, 36, 42, 82, 40, 38, 46, 44, 48, 4
 
 std::vector<int>& Pad::getPadNotes()
 {
-	if (mpc::ui::vmpc::VmpcSettingsGui::instance().getInitialPadMapping() == 0)
+	auto directToDiskRecorderScreen = dynamic_pointer_cast<VmpcSettingsScreen>(Screens::getScreenComponent("vmpc-settings"));
+	
+	if (directToDiskRecorderScreen->initialPadMapping == 0)
 	{
 		static vector<int> vmpcPadNotes;
 		if (vmpcPadNotes.size() == 0)
