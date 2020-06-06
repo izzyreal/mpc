@@ -36,7 +36,9 @@ StdDisk::StdDisk(weak_ptr<Store> store)
 	: AbstractDisk(store)
 {
 	device = make_unique<mpc::disk::device::StdDevice>(store.lock()->path);
-	if (device) {
+	
+	if (device)
+	{
 		root = nonstd::any_cast<weak_ptr<Directory>>(device->getRoot());
 		initFiles();
 	}

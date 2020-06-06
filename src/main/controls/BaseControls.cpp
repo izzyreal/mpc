@@ -403,7 +403,7 @@ void BaseControls::numpad(int i)
 		switch (i)
 		{
 		case 0:
-			ls.lock()->openScreen("settings");
+			ls.lock()->openScreen("vmpc-settings");
 			break;
 		case 1:
 			if (sequencer.lock()->isPlaying())

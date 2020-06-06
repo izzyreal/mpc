@@ -39,6 +39,7 @@
 #include <lcdgui/screens/FormatScreen.hpp>
 #include <lcdgui/screens/SetupScreen.hpp>
 #include <lcdgui/screens/SaveScreen.hpp>
+#include <lcdgui/screens/VmpcDiskScreen.hpp>
 
 #include <lcdgui/screens/window/NumberOfZonesScreen.hpp>
 #include <lcdgui/screens/window/InitPadAssignScreen.hpp>
@@ -753,6 +754,10 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	else if (screenName.compare("name") == 0)
 	{
 		screen = make_shared<NameScreen>(layerIndex);
+	}	
+	else if (screenName.compare("vmpc-disk") == 0)
+	{
+		screen = make_shared<VmpcDiskScreen>(layerIndex);
 	}	
 
 	if (screen)

@@ -5,7 +5,6 @@
 
 namespace mpc::ui::vmpc {
 	class DirectToDiskRecorderGui;
-	class DeviceGui;
 }
 
 namespace mpc::ui::misc {
@@ -36,7 +35,6 @@ namespace mpc::ui {
 		mpc::ui::misc::SecondSeqGui* secondSeqGui = nullptr;
 		mpc::ui::misc::TransGui* transGui = nullptr;
 
-		mpc::ui::vmpc::DeviceGui* deviceGui = nullptr;
 		mpc::ui::vmpc::DirectToDiskRecorderGui* d2dRecorderGui = nullptr;
 
 	public:
@@ -44,7 +42,6 @@ namespace mpc::ui {
 
 		mpc::ui::other::OthersGui* getOthersGui();
 
-		mpc::ui::vmpc::DeviceGui* getDeviceGui();
 		mpc::ui::vmpc::DirectToDiskRecorderGui* getD2DRecorderGui();
 
 		mpc::ui::misc::TransGui* getTransGui();

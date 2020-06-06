@@ -6,6 +6,15 @@
 #include <vector>
 #include <string>
 
+/*
+* Children of AbstractDisk provide a direct interface to the rest of the application to perform
+* file operations. These operations are mostly domain-specific implementations of create, read,
+* write and rename.
+*
+* Lower level functionality like opening file handles and reading from and writing to file streams
+* is delegated to the moduru::file library by the MpcFiles that AbstractDisk uses.
+*/
+
 namespace mpc::sequencer {
 	class Sequence;
 }

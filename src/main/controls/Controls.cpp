@@ -44,7 +44,7 @@ Controls::Controls()
 	controls["directtodiskrecorder"] = new vmpc::DirectToDiskRecorderControls();
 	controls["recordjam"] = new vmpc::RecordJamControls();
 	controls["recordingfinished"] = new vmpc::RecordingFinishedControls();
-	controls["settings"] = new vmpc::VmpcSettingsControls();
+	controls["vmpc-settings"] = new vmpc::VmpcSettingsControls();
 }
 
 void Controls::setCtrlPressed(bool b) {

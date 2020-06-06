@@ -37,7 +37,6 @@
 
 #include <ui/vmpc/DirectToDiskRecorderObserver.hpp>
 #include <ui/vmpc/VmpcSettingsObserver.hpp>
-#include <ui/vmpc/VmpcDiskObserver.hpp>
 
 #include <file/FileUtil.hpp>
 
@@ -672,9 +671,6 @@ void LayeredScreen::initObserver()
 	if (csn.compare("directtodiskrecorder") == 0) {
 		activeObserver = make_unique<DirectToDiskRecorderObserver>();
 	}
-	else if (csn.compare("disk") == 0) {
-		activeObserver = make_unique<VmpcDiskObserver>();
-	}
 	else if (csn.compare("punch") == 0) {
 		activeObserver = make_unique<PunchObserver>();
 	}
@@ -687,7 +683,7 @@ void LayeredScreen::initObserver()
 	else if (csn.compare("sync") == 0) {
 		activeObserver = make_unique<SyncObserver>();
 	}
-	else if (csn.compare("settings") == 0)
+	else if (csn.compare("vmpc-settings") == 0)
 	{
 		activeObserver = make_unique<VmpcSettingsObserver>();
 	}

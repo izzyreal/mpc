@@ -1,8 +1,9 @@
 #pragma once
 
-#include <DiskController.hpp>
 #include <lcdgui/LayeredScreen.hpp>
 #include <ui/Uis.hpp>
+
+#include <disk/DiskController.hpp>
 #include <disk/ProgramLoader.hpp>
 
 #include <observer/Observable.hpp>
@@ -14,48 +15,57 @@
 #include <thread>
 #include <memory>
 
-namespace ctoot::mpc {
+namespace ctoot::mpc
+{
 	class MpcSoundPlayerChannel;
 	class MpcBasicSoundPlayerChannel;
 	class MpcMultiMidiSynth;
 }
 
-namespace mpc::ui {
+namespace mpc::ui
+{
 	class UserDefaults;
 	class Uis;
 }
 
-namespace mpc::hardware {
+namespace mpc::hardware
+{
 	class Hardware;
 }
 
-namespace mpc::disk {
+namespace mpc::disk
+{
 	class Stores;
 	class AbstractDisk;
 }
 
-namespace mpc::controls {
+namespace mpc::controls
+{
 	class Controls;
 	class BaseControls;
 	class GlobalReleaseControls;
 }
 
-namespace mpc::lcdgui {
+namespace mpc::lcdgui
+{
 	class LayeredScreen;
 }
 
-namespace mpc::audiomidi {
+namespace mpc::audiomidi
+{
 	class EventHandler;
 	class AudioMidiServices;
 	class MpcMidiInput;
 	class MpcMidiPorts;
 }
 
-namespace mpc::sequencer {
+namespace mpc::sequencer
+{
 	class Sequencer;
 }
 
-namespace mpc::sampler {
+namespace mpc::sampler
+{
 	class Sampler;
 }
 
@@ -87,7 +97,7 @@ namespace mpc {
 		std::vector<audiomidi::MpcMidiInput*> mpcMidiInputs;
 
 	private:
-		std::unique_ptr<DiskController> diskController{};
+		std::unique_ptr<mpc::disk::DiskController> diskController;
 
 	private:
 		std::shared_ptr<hardware::Hardware> hardware;

@@ -6,6 +6,15 @@
 #include <string>
 #include <memory>
 
+/*
+* An MpcFile contains either an AkaiFatLongFileNameDirectoryEntry or a moduru::file::FileSystemNode.
+* Check each implementation for how low-level file IO is handled.
+*
+* The MpcFile sits at the same level as the AbstractDisk -- it lives in the world of the virtual MPC2000XL
+* and is directly consumable by the application for loading and saving songs, sounds, sequences, creating
+* and deleting directories, etc.
+*/
+
 namespace moduru::file
 {
 	class FsNode;

@@ -88,7 +88,7 @@ void Mpc::init(const int sampleRate, const int inputCount, const int outputCount
 
 	controls = make_shared<controls::Controls>();
 
-	diskController = make_unique<DiskController>();
+	diskController = make_unique<mpc::disk::DiskController>();
 	diskController->initDisks();
 
 	hardware->getSlider().lock()->setValue(mpc::nvram::NvRam::getSlider());
