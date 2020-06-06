@@ -38,14 +38,10 @@ namespace mpc::lcdgui {
 	private:
 		std::unique_ptr<Component> root;
 		std::vector<std::vector<bool>> pixels = std::vector<std::vector<bool>>(248, std::vector<bool>(60));
-		std::unique_ptr<moduru::observer::Observer> activeObserver;
 
 	public:
 		static std::vector<std::vector<bool>> atlas;
 		static moduru::gui::bmfont font;
-
-	private:
-		void initObserver();
 
 	private:
 		const int LAYER_COUNT = 4;

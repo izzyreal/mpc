@@ -15,7 +15,6 @@
 #include <file/all/Tracks.hpp>
 
 #include <ui/UserDefaults.hpp>
-#include <ui/midisync/MidiSyncGui.hpp>
 
 #include <sequencer/Event.hpp>
 #include <sequencer/Sequence.hpp>
@@ -34,6 +33,7 @@
 #include <lcdgui/screens/StepEditorScreen.hpp>
 #include <lcdgui/screens/SongScreen.hpp>
 #include <lcdgui/screens/OthersScreen.hpp>
+#include <lcdgui/screens/SyncScreen.hpp>
 
 #include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
 
@@ -158,15 +158,16 @@ AllLoader::AllLoader(mpc::disk::MpcFile* file, bool sequencesOnly)
 
 		othersScreen->setTapAveraging(misc->getTapAvg());
 
-		auto msGui = Mpc::instance().getUis().lock()->getMidiSyncGui();
-		msGui->setReceiveMMCEnabled(misc->isInReceiveMMCEnabled());
-		msGui->setSendMMCEnabled(midiSyncMisc->isSendMMCEnabled());
-		msGui->setModeIn(midiSyncMisc->getInMode());
-		msGui->setModeOut(midiSyncMisc->getOutMode());
-		msGui->setShiftEarly(midiSyncMisc->getShiftEarly());
-		msGui->setFrameRate(midiSyncMisc->getFrameRate());
-		msGui->setIn(midiSyncMisc->getInput());
-		msGui->setOut(midiSyncMisc->getOutput());
+		auto syncScreen = dynamic_pointer_cast<SyncScreen>(Screens::getScreenComponent("sync"));
+
+		syncScreen->receiveMMCEnabled = misc->isInReceiveMMCEnabled();
+		syncScreen->sendMMCEnabled = midiSyncMisc->isSendMMCEnabled();
+		syncScreen->in = midiSyncMisc->getInput();
+		syncScreen->out = midiSyncMisc->getOutput();
+		syncScreen->setModeIn(midiSyncMisc->getInMode());
+		syncScreen->setModeOut(midiSyncMisc->getOutMode());
+		syncScreen->shiftEarly = midiSyncMisc->getShiftEarly();
+		syncScreen->frameRate = midiSyncMisc->getFrameRate();
 		
 		lSequencer->setSecondSequenceEnabled(sequencer->secondSeqEnabled);
 		lSequencer->setSecondSequenceIndex(sequencer->secondSeqIndex);

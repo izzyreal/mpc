@@ -29,8 +29,6 @@
 
 #include <ui/Uis.hpp>
 
-#include <ui/midisync/SyncObserver.hpp>
-
 #include <file/FileUtil.hpp>
 
 #include <cmath>
@@ -39,8 +37,6 @@
 using namespace mpc::ui;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
-
-using namespace mpc::ui::midisync;
 
 using namespace moduru::file;
 
@@ -646,21 +642,6 @@ static inline bool checkActiveScreen(vector<string>* sa, string csn)
 			return true;
 	}
 	return false;
-}
-
-void LayeredScreen::initObserver()
-{
-
-	auto csn = currentScreenName;
-
-	if (activeObserver)
-	{
-		activeObserver.reset();
-	}
-
-	if (csn.compare("sync") == 0) {
-		activeObserver = make_unique<SyncObserver>();
-	}
 }
 
 string LayeredScreen::getFocus()

@@ -2,11 +2,11 @@
 
 #include <Mpc.hpp>
 #include <ui/Uis.hpp>
-#include <ui/midisync/MidiSyncGui.hpp>
 
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/StepEditorScreen.hpp>
 #include <lcdgui/screens/OthersScreen.hpp>
+#include <lcdgui/screens/SyncScreen.hpp>
 
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui;
@@ -29,7 +29,10 @@ Misc::Misc()
 	auto othersScreen = dynamic_pointer_cast<OthersScreen>(Screens::getScreenComponent("others"));
 	saveBytes = vector<char>(LENGTH);
 	saveBytes[TAP_AVG_OFFSET] = (char)(othersScreen->getTapAveraging());
-	saveBytes[MIDI_SYNC_IN_RECEIVE_MMC_OFFSET] = (char)(Mpc::instance().getUis().lock()->getMidiSyncGui()->isReceiveMMCEnabled() ? 1 : 0);
+
+	auto syncScreen = dynamic_pointer_cast<SyncScreen>(Screens::getScreenComponent("sync"));
+
+	saveBytes[MIDI_SYNC_IN_RECEIVE_MMC_OFFSET] = (char)(syncScreen->receiveMMCEnabled ? 1 : 0);
 	saveBytes[AUTO_STEP_INCREMENT_OFFSET] = (char)(stepEditorScreen->isAutoStepIncrementEnabled() ? 1 : 0);
 	saveBytes[DURATION_OF_REC_NOTES_OFFSET] = (char)(stepEditorScreen->isDurationTcPercentageEnabled() ? 1 : 0);
 	saveBytes[DURATION_TC_PERCENTAGE_OFFSET] = (char)(stepEditorScreen->getTcValueRecordedNotes());

@@ -1,7 +1,5 @@
 #include <ui/Uis.hpp>
 
-#include <ui/midisync/MidiSyncGui.hpp>
-
 using namespace mpc::ui;
 using namespace std;
 
@@ -38,18 +36,6 @@ Uis::Uis()
 
 		}
 	}
-
-	midiSyncGui = new mpc::ui::midisync::MidiSyncGui();
 }
 
 vector<string> Uis::noteNames;
-
-mpc::ui::midisync::MidiSyncGui* Uis::getMidiSyncGui()
-{
-	return midiSyncGui;
-}
-
-Uis::~Uis()
-{
-	if (midiSyncGui != nullptr) delete midiSyncGui;
-}

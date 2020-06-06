@@ -10,9 +10,8 @@
 
 #include <lcdgui/LayeredScreen.hpp>
 #include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/SyncScreen.hpp>
 #include <lcdgui/screens/window/MidiOutputScreen.hpp>
-
-#include <ui/midisync/MidiSyncGui.hpp>
 
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>
@@ -29,18 +28,17 @@
 
 using namespace mpc::audiomidi;
 using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
 MpcMidiInput::MpcMidiInput(int index)
 {
-	
 	sequencer = Mpc::instance().getSequencer();
 	sampler = Mpc::instance().getSampler();
 	this->index = index;
 	midiAdapter = make_unique<mpc::sequencer::MidiAdapter>();
 	eventAdapter = make_unique<mpc::sequencer::EventAdapter>(sequencer);
-	msGui = Mpc::instance().getUis().lock()->getMidiSyncGui();
 }
 
 string MpcMidiInput::getName()
@@ -58,29 +56,43 @@ void MpcMidiInput::transport(ctoot::midi::core::MidiMessage* msg, int timeStamp)
 	notify_ += to_string(channel);
 	setChanged();
 	notifyObservers(notify_);
-	if (status == ctoot::midi::core::ShortMessage::CONTROL_CHANGE) {
+
+	if (status == ctoot::midi::core::ShortMessage::CONTROL_CHANGE)
+	{
 		Mpc::instance().getHardware().lock()->getSlider().lock()->setValue(msg->getMessage()->at(2));
 	}
+	
 	auto lSequencer = sequencer.lock();
-	if (status == ctoot::midi::core::ShortMessage::POLY_PRESSURE || status == ctoot::midi::core::ShortMessage::NOTE_ON || status == ctoot::midi::core::ShortMessage::NOTE_OFF) {
+	
+	if (status == ctoot::midi::core::ShortMessage::POLY_PRESSURE ||
+		status == ctoot::midi::core::ShortMessage::NOTE_ON ||
+		status == ctoot::midi::core::ShortMessage::NOTE_OFF)
+	{
 		int note = (*msg->getMessage())[1];
 		int velo = (*msg->getMessage())[2];
 		auto s = lSequencer->getActiveSequence().lock();
 		auto bus = s->getTrack(lSequencer->getActiveTrackIndex()).lock()->getBusNumber();
-		if (bus != 0) {
+
+		if (bus != 0)
+		{
 			auto pgm = lSampler->getDrumBusProgramNumber(bus);
 			auto p = lSampler->getProgram(pgm).lock();
 			auto pad = p->getPadIndexFromNote(note);
-			if (pad != -1) {
-				switch (status) {
+		
+			if (pad != -1)
+			{
+				switch (status)
+				{
 				case ctoot::midi::core::ShortMessage::POLY_PRESSURE:
 					Mpc::instance().getControls().lock()->getPressedPadVelos()->at(pad) = velo;
 					break;
 				case ctoot::midi::core::ShortMessage::NOTE_ON:
-					if (velo > 0) {
+					if (velo > 0)
+					{
 						Mpc::instance().getControls().lock()->getPressedPads()->emplace(pad);
 					}
-					else {
+					else
+					{
 						Mpc::instance().getControls().lock()->getPressedPads()->erase(pad);
 					}
 					break;
@@ -95,16 +107,22 @@ void MpcMidiInput::transport(ctoot::midi::core::MidiMessage* msg, int timeStamp)
 
 	auto event = eventAdapter->get().lock();
 
-	if (!event) {
+	if (!event)
+	{
 		return;
 	}
 
 	auto mce = dynamic_pointer_cast<mpc::sequencer::MidiClockEvent>(event);
 	auto note = dynamic_pointer_cast<mpc::sequencer::NoteEvent>(event);
 
-	if (mce && msGui->getIn() == index) {
-		if (msGui->getModeIn() != 0) {
-			switch (mce->getStatus()) {
+	auto syncScreen = dynamic_pointer_cast<SyncScreen>(Screens::getScreenComponent("sync"));
+
+	if (mce && syncScreen->in == index)
+	{
+		if (syncScreen->getModeIn() != 0)
+		{
+			switch (mce->getStatus())
+			{
 			case ctoot::midi::core::ShortMessage::START:
 				lSequencer->playFromStart();
 				break;
@@ -117,7 +135,8 @@ void MpcMidiInput::transport(ctoot::midi::core::MidiMessage* msg, int timeStamp)
 
 		}
 	}
-	else if (note) {
+	else if (note)
+	{
 		note->setTick(-1);
 		auto s = lSequencer->isPlaying() ? lSequencer->getCurrentlyPlayingSequence().lock() : lSequencer->getActiveSequence().lock();
 		auto track = dynamic_pointer_cast<mpc::sequencer::Track>(s->getTrack(note->getTrack()).lock());

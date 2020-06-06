@@ -14,7 +14,6 @@
 #include <sequencer/TempoChangeEvent.hpp>
 
 #include <ui/Uis.hpp>
-#include <ui/midisync/MidiSyncGui.hpp>
 
 #include <hardware/Hardware.hpp>
 #include <hardware/HwPad.hpp>
@@ -25,6 +24,7 @@
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/MixerSetupScreen.hpp>
 #include <lcdgui/screens/TransScreen.hpp>
+#include <lcdgui/screens/SyncScreen.hpp>
 #include <lcdgui/screens/window/CountMetronomeScreen.hpp>
 #include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
 
@@ -54,13 +54,17 @@ EventHandler::EventHandler()
 {
 	sequencer = Mpc::instance().getSequencer();
 	sampler = Mpc::instance().getSampler();
-	msGui = Mpc::instance().getUis().lock()->getMidiSyncGui();
 }
 
 void EventHandler::handle(weak_ptr<mpc::sequencer::Event> event, mpc::sequencer::Track* track)
 {
+	if (!track->isOn() && event.lock()->getTick() != -1)
+	{
+		return;
+	}
+
 	auto ne = dynamic_pointer_cast<mpc::sequencer::NoteEvent>(event.lock());
-	if (!track->isOn() && event.lock()->getTick() != -1) return;
+	
 	handleNoThru(event, track, -1);
 	midiOut(event, track);
 }
@@ -138,7 +142,9 @@ void EventHandler::handleNoThru(weak_ptr<mpc::sequencer::Event> e, mpc::sequence
 		auto midiOutputStreamA = &mpcMidiPorts->getReceivers()[0];
 		auto midiOutputStreamB = &mpcMidiPorts->getReceivers()[1];
 
-		switch (msGui->getOut())
+		auto syncScreen = dynamic_pointer_cast<SyncScreen>(Screens::getScreenComponent("sync"));
+
+		switch (syncScreen->out)
 		{
 		case 0:
 			midiOutputStreamA->push_back(*clockMsg);

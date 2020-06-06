@@ -46,6 +46,7 @@
 #include <lcdgui/screens/SecondSeqScreen.hpp>
 #include <lcdgui/screens/TransScreen.hpp>
 #include <lcdgui/screens/PunchScreen.hpp>
+#include <lcdgui/screens/SyncScreen.hpp>
 
 #include <lcdgui/screens/window/NumberOfZonesScreen.hpp>
 #include <lcdgui/screens/window/InitPadAssignScreen.hpp>
@@ -808,6 +809,10 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	else if (screenName.compare("punch") == 0)
 	{
 		screen = make_shared<PunchScreen>(layerIndex);
+	}
+	else if (screenName.compare("sync") == 0)
+	{
+		screen = make_shared<SyncScreen>(layerIndex);
 	}
 
 	if (screen)

@@ -7,15 +7,6 @@
 
 #include <memory>
 
-namespace mpc::ui::midisync {
-	class MidiSyncGui;
-}
-
-namespace mpc::ui::vmpc {
-	class MidiGui;
-}
-
-
 namespace mpc::audiomidi {
 
 	class EventHandler final
@@ -25,8 +16,6 @@ namespace mpc::audiomidi {
 	private:
 		std::weak_ptr<mpc::sequencer::Sequencer> sequencer;
 		std::weak_ptr<mpc::sampler::Sampler> sampler;
-		mpc::ui::midisync::MidiSyncGui* msGui = nullptr;
-		ui::vmpc::MidiGui* midiGui = nullptr;
 		
 	public:
 		void handle(std::weak_ptr<mpc::sequencer::Event> event, mpc::sequencer::Track* track);

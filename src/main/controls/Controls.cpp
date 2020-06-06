@@ -6,17 +6,12 @@
 
 #include <controls/GlobalReleaseControls.hpp>
 
-#include <controls/midisync/SyncControls.hpp>
-
 using namespace mpc::controls;
 
 Controls::Controls()
 {
 	pressedPadVelos = std::vector<int>(16);
-
 	controls["release"] = new GlobalReleaseControls();
-
-	controls["sync"] = new midisync::SyncControls();
 }
 
 void Controls::setCtrlPressed(bool b) {
