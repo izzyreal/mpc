@@ -206,7 +206,7 @@ void EraseScreen::displayTrack()
 		trackName = sequence->getTrack(track).lock()->getActualName();
 	}
 	findField("track").lock()->setTextPadded(track + 1, " ");
-	findLabel("trackname").lock()->setText("-" + trackName);
+	findLabel("track-name").lock()->setText("-" + trackName);
 }
 
 void EraseScreen::displayTime()

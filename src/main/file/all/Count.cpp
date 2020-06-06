@@ -33,7 +33,7 @@ Count::Count(vector<char> b)
 
 Count::Count() 
 {
-	auto countMetronomeScreen = dynamic_pointer_cast<CountMetronomeScreen>(Screens::getScreenComponent("countmetronome"));
+	auto countMetronomeScreen = dynamic_pointer_cast<CountMetronomeScreen>(Screens::getScreenComponent("count-metronome"));
 	auto metronomeSoundScreen = dynamic_pointer_cast<MetronomeSoundScreen>(Screens::getScreenComponent("metronome-sound"));
 
 	auto lSequencer = Mpc::instance().getSequencer().lock();

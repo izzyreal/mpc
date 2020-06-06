@@ -3,14 +3,14 @@
 
 namespace mpc::lcdgui::screens::window
 {
-	class VmpcRecordJamScreen
+	class TransposePermanentScreen
 		: public mpc::lcdgui::ScreenComponent
 	{
-
 	public:
 		void function(int i) override;
 
-		VmpcRecordJamScreen(int layerIndex);
+	public:
+		TransposePermanentScreen(const int layerIndex);
 
 	};
 }

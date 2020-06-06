@@ -1,9 +1,5 @@
 #include <ui/Uis.hpp>
 
-#include <ui/misc/PunchGui.hpp>
-#include <ui/misc/SecondSeqGui.hpp>
-#include <ui/misc/TransGui.hpp>
-
 #include <ui/midisync/MidiSyncGui.hpp>
 
 using namespace mpc::ui;
@@ -44,10 +40,6 @@ Uis::Uis()
 	}
 
 	midiSyncGui = new mpc::ui::midisync::MidiSyncGui();
-
-	punchGui = new mpc::ui::misc::PunchGui();
-	transGui = new mpc::ui::misc::TransGui();
-	secondSeqGui = new mpc::ui::misc::SecondSeqGui();
 }
 
 vector<string> Uis::noteNames;
@@ -57,31 +49,7 @@ mpc::ui::midisync::MidiSyncGui* Uis::getMidiSyncGui()
 	return midiSyncGui;
 }
 
-mpc::ui::misc::PunchGui* Uis::getPunchGui()
-{
-	return punchGui;
-}
-
-mpc::ui::other::OthersGui* Uis::getOthersGui()
-{
-	return othersGui;
-}
-
-mpc::ui::misc::TransGui* Uis::getTransGui()
-{
-	return transGui;
-}
-
-mpc::ui::misc::SecondSeqGui* Uis::getSecondSeqGui()
-{
-	return secondSeqGui;
-}
-
 Uis::~Uis()
 {
 	if (midiSyncGui != nullptr) delete midiSyncGui;
-	if (punchGui != nullptr) delete punchGui;
-	if (transGui != nullptr) delete transGui;
-	if (secondSeqGui != nullptr) delete secondSeqGui;
-	if (othersGui != nullptr) delete othersGui;
 }

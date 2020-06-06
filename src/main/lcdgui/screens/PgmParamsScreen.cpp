@@ -12,7 +12,7 @@ using namespace mpc::lcdgui::screens;
 using namespace std;
 
 PgmParamsScreen::PgmParamsScreen(const int layerIndex) 
-	: ScreenComponent("programparams", layerIndex)
+	: ScreenComponent("program-params", layerIndex)
 {
 }
 

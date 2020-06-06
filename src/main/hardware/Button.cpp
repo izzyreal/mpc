@@ -83,10 +83,10 @@ void Button::push() {
 	else if (label.compare("tap") == 0) {
 		controls->tap();
 	}
-	else if (label.compare("nextseq") == 0) {
+	else if (label.compare("next-seq") == 0) {
 		controls->nextSeq();
 	}
-	else if (label.compare("trackmute") == 0) {
+	else if (label.compare("track-mute") == 0) {
 		controls->trackMute();
 	}
 	else if (label.compare("fulllevel") == 0) {

@@ -7,7 +7,7 @@ using namespace mpc::lcdgui::screens;
 using namespace std;
 
 BarCopyScreen::BarCopyScreen(const int layerIndex)
-	: ScreenComponent("barcopy", layerIndex)
+	: ScreenComponent("bar-copy", layerIndex)
 {
 }
 
@@ -36,7 +36,7 @@ void BarCopyScreen::function(int j)
 		ls.lock()->openScreen("edit");
 		break;
 	case 2:
-		ls.lock()->openScreen("trmove");
+		ls.lock()->openScreen("tr-move");
 		break;
 	case 3:
 		ls.lock()->openScreen("user");

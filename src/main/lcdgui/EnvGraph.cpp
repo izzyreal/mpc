@@ -40,21 +40,21 @@ void EnvGraph::Draw(std::vector<std::vector<bool>>* pixels)
 	}
 
 	auto csn = Mpc::instance().getLayeredScreen().lock()->getCurrentScreenName();
-	int xoff = (csn.compare("programparams") == 0) ? 76 : 92;
-	int yoff = (csn.compare("programparams") == 0) ? 16 : 22;
+	int xoff = (csn.compare("program-params") == 0) ? 76 : 92;
+	int yoff = (csn.compare("program-params") == 0) ? 16 : 22;
 	int width = 44;
 	int height = 28;
 	for (int x = 0; x < width - 1; x++) {
 		for (int y = 0; y < height - 1; y++) {
 			int x1 = xoff + x;
 			int y1 = yoff + y;
-			if (csn.compare("programparams") == 0 && y1 == 24 && x1 >= 93 && x1 <= 101) continue;
+			if (csn.compare("program-params") == 0 && y1 == 24 && x1 >= 93 && x1 <= 101) continue;
 			(*pixels)[x1][y1] = false;
 		}
 	}
 	
-	xoff = (csn.compare("programparams") == 0) ? 0 : 16;
-	yoff = (csn.compare("programparams") == 0) ? 0 : 6;
+	xoff = (csn.compare("program-params") == 0) ? 0 : 16;
+	yoff = (csn.compare("program-params") == 0) ? 0 : 6;
 
 	for (auto& c : coordinates) {
 		auto linePixels = moduru::gui::Bressenham::Line(c[0] + xoff, c[1] + yoff, c[2] + xoff, c[3] + yoff);

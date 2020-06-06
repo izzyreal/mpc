@@ -11,7 +11,7 @@ using namespace mpc::sequencer;
 using namespace mpc::lcdgui::screens::window;
 
 TempoChangeScreen::TempoChangeScreen(const int layerIndex)
-	: ScreenComponent("tempochange", layerIndex)
+	: ScreenComponent("tempo-change", layerIndex)
 {
 }
 
@@ -116,13 +116,13 @@ void TempoChangeScreen::displayInitialTempo()
 	auto seq = sequencer.lock()->getActiveSequence().lock();
 	string tempoStr = seq->getInitialTempo().toString();
 	tempoStr = mpc::Util::replaceDotWithSmallSpaceDot(tempoStr);
-	findField("initialtempo").lock()->setText(tempoStr);
+	findField("initial-tempo").lock()->setText(tempoStr);
 }
 
 void TempoChangeScreen::displayTempoChangeOn()
 {
 	auto sequence = sequencer.lock()->getActiveSequence().lock();
-	findField("tempochange").lock()->setText(sequence->isTempoChangeOn() ? "YES" : "NO");
+	findField("tempo-change").lock()->setText(sequence->isTempoChangeOn() ? "YES" : "NO");
 }
 
 void TempoChangeScreen::displayTempoChange0()
@@ -311,7 +311,7 @@ void TempoChangeScreen::left()
 	{
 		if (param[0] == 'a')
 		{
-			ls.lock()->setFocus("tempochange");
+			ls.lock()->setFocus("tempo-change");
 			return;
 		}
 	}
@@ -323,7 +323,7 @@ void TempoChangeScreen::right()
 	init();
 	if (param.length() == 2) {
 		if (param[0] == 'f') {
-			ls.lock()->setFocus("initialtempo");
+			ls.lock()->setFocus("initial-tempo");
 			return;
 		}
 	}
@@ -367,7 +367,7 @@ void TempoChangeScreen::function(int j)
 			setTempoChangeOffset(offset - 1);
 		}
 
-		ls.lock()->openScreen("tempochange");
+		ls.lock()->openScreen("tempo-change");
 		ls.lock()->setFocus(string("a" + to_string(yPos)));
 		break;
 	case 2:
@@ -437,7 +437,7 @@ void TempoChangeScreen::function(int j)
 			}
 		}
 		seq->sortTempoChangeEvents();
-		ls.lock()->openScreen("tempochange");
+		ls.lock()->openScreen("tempo-change");
 		break;
 	}
 	initVisibleEvents();
@@ -491,11 +491,11 @@ void TempoChangeScreen::turnWheel(int j)
 	auto seq = sequencer.lock()->getActiveSequence().lock();
 	auto tceList = seq->getTempoChangeEvents();
 
-	if (param.compare("tempochange") == 0)
+	if (param.compare("tempo-change") == 0)
 	{
 		seq->setTempoChangeOn(j > 0);
 	}
-	else if (param.compare("initialtempo") == 0)
+	else if (param.compare("initial-tempo") == 0)
 	{
 		auto tce = tceList[0].lock();
 		seq->setInitialTempo(BCMath(seq->getInitialTempo().toDouble() + (j / 10.0)));
@@ -568,11 +568,11 @@ void TempoChangeScreen::down()
 	auto tce1 = visibleTempoChanges[1].lock();
 	auto tce2 = visibleTempoChanges[2].lock();
 
-	if (param.compare("tempochange") == 0)
+	if (param.compare("tempo-change") == 0)
 	{
 		ls.lock()->setFocus("e0");
 	}
-	else if (param.compare("initialtempo") == 0)
+	else if (param.compare("initial-tempo") == 0)
 	{
 		ls.lock()->setFocus("f0");
 	}
@@ -633,11 +633,11 @@ void TempoChangeScreen::up()
 		{
 			if (param.compare("e0") == 0)
 			{
-				ls.lock()->setFocus("tempochange");
+				ls.lock()->setFocus("tempo-change");
 			}
 			else if (param.compare("f0") == 0)
 			{
-				ls.lock()->setFocus("initialtempo");
+				ls.lock()->setFocus("initial-tempo");
 			}
 			return;
 		}

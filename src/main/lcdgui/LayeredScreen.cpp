@@ -31,10 +31,6 @@
 
 #include <ui/midisync/SyncObserver.hpp>
 
-#include <ui/misc/PunchObserver.hpp>
-#include <ui/misc/SecondSeqObserver.hpp>
-#include <ui/misc/TransObserver.hpp>
-
 #include <file/FileUtil.hpp>
 
 #include <cmath>
@@ -45,8 +41,6 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 
 using namespace mpc::ui::midisync;
-using namespace mpc::ui::misc;
-using namespace mpc::ui::other;
 
 using namespace moduru::file;
 
@@ -248,7 +242,7 @@ int LayeredScreen::openScreen(string screenName) {
 		ams->getSoundRecorder().lock()->setVuMeterActive(true);
 	}
 
-	if (currentScreenName.compare("erase") == 0 || currentScreenName.compare("timingcorrect") == 0)
+	if (currentScreenName.compare("erase") == 0 || currentScreenName.compare("timing-correct") == 0)
 	{
 		// This field may not be visible the next time we visit this screen.
 		// Like the real 2KXL we always set focus to the first Notes: field
@@ -664,16 +658,7 @@ void LayeredScreen::initObserver()
 		activeObserver.reset();
 	}
 
-	if (csn.compare("punch") == 0) {
-		activeObserver = make_unique<PunchObserver>();
-	}
-	else if (csn.compare("trans") == 0) {
-		activeObserver = make_unique<TransObserver>();
-	}
-	else if (csn.compare("2ndseq") == 0) {
-		activeObserver = make_unique<SecondSeqObserver>();
-	}
-	else if (csn.compare("sync") == 0) {
+	if (csn.compare("sync") == 0) {
 		activeObserver = make_unique<SyncObserver>();
 	}
 }

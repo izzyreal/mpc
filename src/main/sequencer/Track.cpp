@@ -200,7 +200,7 @@ void Track::addEventRealTime(shared_ptr<Event> event)
 			}
 		}
 	}
-	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timingcorrect"));
+	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timing-correct"));
 	tcValue = timingCorrectScreen->getNoteValue();
 	
 	auto lSequencer = sequencer.lock();
@@ -252,7 +252,7 @@ weak_ptr<Event> Track::addEvent(int tick, string type) {
 		res = make_shared<NoteEvent>();
 		lastAdded = dynamic_pointer_cast<NoteEvent>(res);
 	}
-	else if (type.compare("tempochange") == 0) {
+	else if (type.compare("tempo-change") == 0) {
 		res = make_shared<TempoChangeEvent>(parent);
 	}
 	else if (type.compare("pitchbend") == 0) {

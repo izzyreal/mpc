@@ -14,7 +14,7 @@ using namespace moduru::lang;
 using namespace std;
 
 NextSeqScreen::NextSeqScreen(const int layerIndex)
-	: ScreenComponent("nextseq", layerIndex)
+	: ScreenComponent("next-seq", layerIndex)
 {
 }
 
@@ -58,7 +58,7 @@ void NextSeqScreen::function(int i)
 	init();
 	switch (i) {
 	case 5:
-		ls.lock()->openScreen("nextseqpad");
+		ls.lock()->openScreen("next-seq-pad");
 		break;
 	}
 }
@@ -148,7 +148,7 @@ void NextSeqScreen::displayTempoSource()
 
 void NextSeqScreen::displayTiming()
 {
-	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timingcorrect"));
+	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timing-correct"));
 	auto noteValue = timingCorrectScreen->getNoteValue();
 	findField("timing").lock()->setText(SequencerScreen::timingCorrectNames[noteValue]);
 }

@@ -168,7 +168,7 @@ void Sequence::createClickTrack()
 	auto den = 0;
 	auto denTicks = 0;
 
-	auto countMetronomeScreen = dynamic_pointer_cast<CountMetronomeScreen>(Screens::getScreenComponent("countmetronome"));
+	auto countMetronomeScreen = dynamic_pointer_cast<CountMetronomeScreen>(Screens::getScreenComponent("count-metronome"));
 	auto metronomeSoundScreen = dynamic_pointer_cast<MetronomeSoundScreen>(Screens::getScreenComponent("metronome-sound"));
 
 	for (int i = 0; i < bars; i++)
@@ -242,7 +242,7 @@ void Sequence::createMidiClockTrack()
 void Sequence::createTempoChangeTrack()
 {
 	metaTracks[2]->removeEvents();
-	auto tce = metaTracks[2]->addEvent(0, "tempochange").lock();
+	auto tce = metaTracks[2]->addEvent(0, "tempo-change").lock();
 	dynamic_pointer_cast<mpc::sequencer::TempoChangeEvent>(tce)->setStepNumber(0);
 }
 
@@ -363,7 +363,7 @@ vector<weak_ptr<TempoChangeEvent>> Sequence::getTempoChangeEvents()
 }
 
 weak_ptr<TempoChangeEvent> Sequence::addTempoChangeEvent() {
-	auto res = metaTracks[2]->addEvent(0, "tempochange");
+	auto res = metaTracks[2]->addEvent(0, "tempo-change");
 	return dynamic_pointer_cast<TempoChangeEvent>(res.lock());
 }
 
@@ -396,7 +396,7 @@ void Sequence::setInitialTempo(BCMath bd)
 
 	initialTempo = tempo;
 	setChanged();
-	notifyObservers(string("initialtempo"));
+	notifyObservers(string("initial-tempo"));
 }
 
 

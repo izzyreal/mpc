@@ -30,7 +30,7 @@ mpc::file::all::Sequencer::Sequencer()
 	saveBytes[SEQ_OFFSET] = seq->getActiveSequenceIndex();
 	saveBytes[TR_OFFSET] = seq->getActiveTrackIndex();
 
-	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timingcorrect"));
+	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timing-correct"));
 	auto noteValue = timingCorrectScreen->getNoteValue();
 
 	saveBytes[TC_OFFSET] = noteValue;

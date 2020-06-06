@@ -112,7 +112,7 @@ void SongScreen::openWindow()
 	init();
 	if (param.compare("loop") == 0)
 	{
-		ls.lock()->openScreen("loopsongwindow");
+		ls.lock()->openScreen("loop-song-window");
 	}
 }
 
@@ -320,7 +320,7 @@ void SongScreen::update(moduru::observer::Observable* observable, nonstd::any me
 {
 	auto msg = nonstd::any_cast<string>(message);
 
-	if (msg.compare("used") == 0 || msg.compare("songname") == 0) {
+	if (msg.compare("used") == 0 || msg.compare("song-name") == 0) {
 		displaySongName();
 	}
 	else if (msg.compare("bar") == 0)

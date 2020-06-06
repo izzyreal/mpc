@@ -17,7 +17,7 @@ using namespace moduru::lang;
 using namespace std;
 
 EditVelocityScreen::EditVelocityScreen(const int layerIndex)
-	: ScreenComponent("editvelocity", layerIndex)
+	: ScreenComponent("edit-velocity", layerIndex)
 {
 }
 

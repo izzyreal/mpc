@@ -207,7 +207,7 @@ void MetronomeSoundScreen::function(int i)
     init();
     switch (i) {
     case 3:
-        ls.lock()->openScreen("countmetronome");
+        ls.lock()->openScreen("count-metronome");
         break;
     }
 }

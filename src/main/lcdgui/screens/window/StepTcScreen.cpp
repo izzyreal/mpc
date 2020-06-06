@@ -18,7 +18,7 @@ void StepTcScreen::open()
 
 void StepTcScreen::displayTcValue()
 {
-	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timingcorrect"));
+	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timing-correct"));
 	auto noteValue = timingCorrectScreen->getNoteValue();
 	findField("tcvalue").lock()->setText(timingCorrectNames[noteValue]);
 }

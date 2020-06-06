@@ -20,8 +20,6 @@
 #include <lcdgui/Field.hpp>
 #include <lcdgui/Layer.hpp>
 
-#include <ui/misc/PunchGui.hpp>
-
 #include <sampler/Pad.hpp>
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>
@@ -134,11 +132,11 @@ void BaseControls::function(int i)
 			{
 				ls.lock()->setPreviousScreenName("sequencer");
 			}
-			else if (currentScreenName.compare("midiinput") == 0)
+			else if (currentScreenName.compare("midi-input") == 0)
 			{
 				ls.lock()->setPreviousScreenName("sequencer");
 			}
-			else if (currentScreenName.compare("midioutput") == 0)
+			else if (currentScreenName.compare("midi-output") == 0)
 			{
 				ls.lock()->setPreviousScreenName("sequencer");
 			}
@@ -220,7 +218,7 @@ void BaseControls::pad(int i, int velo, bool repeat, int tick)
 	auto velocity = velo;
 	auto pad = i + (mpc.getBank() * 16);
 
-	auto assign16LevelsScreen = dynamic_pointer_cast<Assign16LevelsScreen>(Screens::getScreenComponent("assign16levels"));
+	auto assign16LevelsScreen = dynamic_pointer_cast<Assign16LevelsScreen>(Screens::getScreenComponent("assign-16-levels"));
 
 	if (mpc.getHardware().lock()->getTopPanel().lock()->isSixteenLevelsEnabled())
 	{
@@ -237,7 +235,7 @@ void BaseControls::pad(int i, int velo, bool repeat, int tick)
 	}
 	else
 	{
-		if (currentScreenName.compare("programparams") == 0)
+		if (currentScreenName.compare("program-params") == 0)
 		{
 			if (note > 34)
 			{
@@ -250,7 +248,7 @@ void BaseControls::pad(int i, int velo, bool repeat, int tick)
 		}
 	}
 
-	if (currentScreenName.compare("assign16levels") == 0 && note != 34)
+	if (currentScreenName.compare("assign-16-levels") == 0 && note != 34)
 	{
 		assign16LevelsScreen->setNote(note);
 	}
@@ -275,7 +273,7 @@ void BaseControls::generateNoteOn(int nn, int padVelo, int tick)
 	bool slider = lProgram && nn == lProgram->getSlider()->getNote();
 	bool posIsLastTick = sequencer.lock()->getTickPosition() == sequencer.lock()->getActiveSequence().lock()->getLastTick();
 	bool step = currentScreenName.compare("step") == 0 && !posIsLastTick;
-	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timingcorrect"));
+	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timing-correct"));
 	auto noteValue = timingCorrectScreen->getNoteValue();
 	auto swing = timingCorrectScreen->getSwing();
 
@@ -283,7 +281,7 @@ void BaseControls::generateNoteOn(int nn, int padVelo, int tick)
 
 	shared_ptr<mpc::sequencer::NoteEvent> n;
 
-	auto assign16LevelsScreen = dynamic_pointer_cast<Assign16LevelsScreen>(Screens::getScreenComponent("assign16levels"));
+	auto assign16LevelsScreen = dynamic_pointer_cast<Assign16LevelsScreen>(Screens::getScreenComponent("assign-16-levels"));
 
 	if (sequencer.lock()->isRecordingOrOverdubbing() || step || recMainWithoutPlaying)
 	{
@@ -417,8 +415,6 @@ void BaseControls::numpad(int i)
 				break;
 			}
 			ls.lock()->openScreen("punch");
-			mpc.getUis().lock()->getPunchGui()->setTime0(0);
-			mpc.getUis().lock()->getPunchGui()->setTime1(sequencer.lock()->getActiveSequence().lock()->getLastTick());
 			break;
 		case 3:
 		{
@@ -595,7 +591,7 @@ void BaseControls::play()
 			}
 			else
 			{
-				if (currentScreenName.compare("song") != 0 && currentScreenName.compare("sequencer") != 0 && currentScreenName.compare("trackmute") != 0)
+				if (currentScreenName.compare("song") != 0 && currentScreenName.compare("sequencer") != 0 && currentScreenName.compare("track-mute") != 0)
 				{
 					ls.lock()->openScreen("sequencer");
 				}
@@ -644,7 +640,7 @@ void BaseControls::playStart()
 		}
 		else
 		{
-			if (currentScreenName.compare("song") != 0 && currentScreenName.compare("sequencer") != 0 && currentScreenName.compare("trackmute") != 0)
+			if (currentScreenName.compare("song") != 0 && currentScreenName.compare("sequencer") != 0 && currentScreenName.compare("track-mute") != 0)
 			{
 				ls.lock()->openScreen("sequencer");
 			}
@@ -708,19 +704,19 @@ void BaseControls::nextBarEnd()
 void BaseControls::nextSeq()
 {
 	init();
-	ls.lock()->openScreen("nextseq");
+	ls.lock()->openScreen("next-seq");
 }
 
 void BaseControls::trackMute()
 {
 	init();
-	if (currentScreenName.compare("trackmute") == 0) {
+	if (currentScreenName.compare("track-mute") == 0) {
 		ls.lock()->openScreen("sequencer");
 		return;
 	}
 	sequencer.lock()->setSoloEnabled(false);
-	ls.lock()->openScreen("trackmute");
-	mpc.getHardware().lock()->getLed("trackmute").lock()->light(true);
+	ls.lock()->openScreen("track-mute");
+	mpc.getHardware().lock()->getLed("track-mute").lock()->light(true);
 }
 
 void BaseControls::bank(int i)
@@ -764,7 +760,7 @@ void BaseControls::sixteenLevels()
 		hardware->getLed("sixteenlevels").lock()->light(false);
 	}
 	else {
-		ls.lock()->openScreen("assign16levels");
+		ls.lock()->openScreen("assign-16-levels");
 	}
 }
 

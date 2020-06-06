@@ -18,7 +18,7 @@ using namespace moduru::lang;
 using namespace std;
 
 EditMultipleScreen::EditMultipleScreen(const int layerIndex)
-	: ScreenComponent("editmultiple", layerIndex)
+	: ScreenComponent("edit-multiple", layerIndex)
 {
 }
 

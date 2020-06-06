@@ -5,7 +5,7 @@ using namespace moduru::lang;
 using namespace std;
 
 NextSeqPadScreen::NextSeqPadScreen(const int layerIndex)
-	: ScreenComponent("nextseqpad", layerIndex)
+	: ScreenComponent("next-seq-pad", layerIndex)
 {
 }
 
@@ -62,7 +62,7 @@ void NextSeqPadScreen::function(int i)
 	switch (i)
 	{
 	case 5:
-		ls.lock()->openScreen("nextseq");
+		ls.lock()->openScreen("next-seq");
 		break;
 	}
 }

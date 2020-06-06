@@ -43,6 +43,9 @@
 #include <lcdgui/screens/VmpcSettingsScreen.hpp>
 #include <lcdgui/screens/VerScreen.hpp>
 #include <lcdgui/screens/InitScreen.hpp>
+#include <lcdgui/screens/SecondSeqScreen.hpp>
+#include <lcdgui/screens/TransScreen.hpp>
+#include <lcdgui/screens/PunchScreen.hpp>
 
 #include <lcdgui/screens/window/NumberOfZonesScreen.hpp>
 #include <lcdgui/screens/window/InitPadAssignScreen.hpp>
@@ -102,7 +105,7 @@
 #include <lcdgui/screens/window/NameScreen.hpp>
 #include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
 #include <lcdgui/screens/window/VmpcRecordingFinishedScreen.hpp>
-#include <lcdgui/screens/window/VmpcRecordJamScreen.hpp>
+#include <lcdgui/screens/window/TransposePermanentScreen.hpp>
 
 #include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
 #include <lcdgui/screens/dialog/MidiMonitorScreen.hpp>
@@ -126,6 +129,7 @@
 #include <lcdgui/screens/dialog/DeleteFileScreen.hpp>
 #include <lcdgui/screens/dialog/DeleteFolderScreen.hpp>
 #include <lcdgui/screens/dialog/FileAlreadyExistsScreen.hpp>
+#include <lcdgui/screens/dialog/VmpcRecordJamScreen.hpp>
 
 #include <lcdgui/screens/dialog2/DeleteAllFilesScreen.hpp>
 
@@ -333,63 +337,63 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	{
 		screen = make_shared<SequenceScreen>(layerIndex);
 	}
-	else if (screenName.compare("tempochange") == 0)
+	else if (screenName.compare("tempo-change") == 0)
 	{
 		screen = make_shared<TempoChangeScreen>(layerIndex);
 	}
-	else if (screenName.compare("countmetronome") == 0)
+	else if (screenName.compare("count-metronome") == 0)
 	{
 		screen = make_shared<CountMetronomeScreen>(layerIndex);
 	}
-	else if (screenName.compare("editmultiple") == 0)
+	else if (screenName.compare("edit-multiple") == 0)
 	{
 		screen = make_shared<EditMultipleScreen>(layerIndex);
 	}
-	else if (screenName.compare("transmitprogramchanges") == 0)
+	else if (screenName.compare("transmit-program-changes") == 0)
 	{
 		screen = make_shared<TransmitProgramChangesScreen>(layerIndex);
 	}
-	else if (screenName.compare("timingcorrect") == 0)
+	else if (screenName.compare("timing-correct") == 0)
 	{
 		screen = make_shared<TimingCorrectScreen>(layerIndex);
 	}
-	else if (screenName.compare("timedisplay") == 0)
+	else if (screenName.compare("time-display") == 0)
 	{
 		screen = make_shared<TimeDisplayScreen>(layerIndex);
 	}
-	else if (screenName.compare("pasteevent") == 0)
+	else if (screenName.compare("paste-event") == 0)
 	{
 		screen = make_shared<PasteEventScreen>(layerIndex);
 	}
-	else if (screenName.compare("multirecordingsetup") == 0)
+	else if (screenName.compare("multi-recording-setup") == 0)
 	{
 		screen = make_shared<MultiRecordingSetupScreen>(layerIndex);
 	}
-	else if (screenName.compare("midioutput") == 0)
+	else if (screenName.compare("midi-output") == 0)
 	{
 		screen = make_shared<MidiOutputScreen>(layerIndex);
 	}
-	else if (screenName.compare("midiinput") == 0)
+	else if (screenName.compare("midi-input") == 0)
 	{
 		screen = make_shared<MidiInputScreen>(layerIndex);
 	}
-	else if (screenName.compare("loopbarswindow") == 0)
+	else if (screenName.compare("loop-bars-window") == 0)
 	{
 		screen = make_shared<LoopBarsScreen>(layerIndex);
 	}
-	else if (screenName.compare("insertevent") == 0)
+	else if (screenName.compare("insert-event") == 0)
 	{
 		screen = make_shared<InsertEventScreen>(layerIndex);
 	}
-	else if (screenName.compare("eraseallofftracks") == 0)
+	else if (screenName.compare("erase-all-off-tracks") == 0)
 	{
 		screen = make_shared<EraseAllOffTracksScreen>(layerIndex);
 	}
-	else if (screenName.compare("changetsig") == 0)
+	else if (screenName.compare("change-tsig") == 0)
 	{
 		screen = make_shared<ChangeTsigScreen>(layerIndex);
 	}
-	else if (screenName.compare("editvelocity") == 0)
+	else if (screenName.compare("edit-velocity") == 0)
 	{
 		screen = make_shared<EditVelocityScreen>(layerIndex);
 	}
@@ -397,11 +401,11 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	{
 		screen = make_shared<EraseScreen>(layerIndex);
 	}
-	else if (screenName.compare("changebars") == 0)
+	else if (screenName.compare("change-bars") == 0)
 	{
 		screen = make_shared<ChangeBarsScreen>(layerIndex);
 	}
-	else if (screenName.compare("changebars2") == 0)
+	else if (screenName.compare("change-bars-2") == 0)
 	{
 		screen = make_shared<ChangeBars2Screen>(layerIndex);
 	}
@@ -409,7 +413,7 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	{
 		screen = make_shared<TrackScreen>(layerIndex);
 	}
-	else if (screenName.compare("assign16levels") == 0)
+	else if (screenName.compare("assign-16-levels") == 0)
 	{
 		screen = make_shared<Assign16LevelsScreen>(layerIndex);
 	}
@@ -445,11 +449,11 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	{
 		screen = make_shared<DeleteAllTracksScreen>(layerIndex);
 	}
-	else if (screenName.compare("nextseqpad") == 0)
+	else if (screenName.compare("next-seq-pad") == 0)
 	{
 		screen = make_shared<NextSeqPadScreen>(layerIndex);
 	}
-	else if (screenName.compare("nextseq") == 0)
+	else if (screenName.compare("next-seq") == 0)
 	{
 		screen = make_shared<NextSeqScreen>(layerIndex);
 	}
@@ -457,7 +461,7 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	{
 		screen = make_shared<SongScreen>(layerIndex);
 	}
-	else if (screenName.compare("trackmute") == 0)
+	else if (screenName.compare("track-mute") == 0)
 	{
 		screen = make_shared<TrMuteScreen>(layerIndex);
 	}
@@ -469,11 +473,11 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	{
 		screen = make_shared<EditSequenceScreen>(layerIndex);
 	}
-	else if (screenName.compare("barcopy") == 0)
+	else if (screenName.compare("bar-copy") == 0)
 	{
 		screen = make_shared<BarCopyScreen>(layerIndex);
 	}
-	else if (screenName.compare("trmove") == 0)
+	else if (screenName.compare("tr-move") == 0)
 	{
 		screen = make_shared<TrMoveScreen>(layerIndex);
 	}
@@ -521,7 +525,7 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	{
 		screen = make_shared<SndParamsScreen>(layerIndex);
 	}
-	else if (screenName.compare("programparams") == 0)
+	else if (screenName.compare("program-params") == 0)
 	{
 		screen = make_shared<PgmParamsScreen>(layerIndex);
 	}
@@ -789,6 +793,22 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	{
 		screen = make_shared<InitScreen>(layerIndex);
 	}	
+	else if (screenName.compare("second-seq") == 0)
+	{
+		screen = make_shared<SecondSeqScreen>(layerIndex);
+	}	
+	else if (screenName.compare("trans") == 0)
+	{
+		screen = make_shared<TransScreen>(layerIndex);
+	}	
+	else if (screenName.compare("transpose-permanent") == 0)
+	{
+		screen = make_shared<TransposePermanentScreen>(layerIndex);
+	}	
+	else if (screenName.compare("punch") == 0)
+	{
+		screen = make_shared<PunchScreen>(layerIndex);
+	}
 
 	if (screen)
 	{

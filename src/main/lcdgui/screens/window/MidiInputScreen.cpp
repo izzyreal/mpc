@@ -4,7 +4,7 @@ using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
 MidiInputScreen::MidiInputScreen(const int layerIndex)
-	: ScreenComponent("midiinput", layerIndex)
+	: ScreenComponent("midi-input", layerIndex)
 {
 }
 
@@ -25,7 +25,7 @@ void MidiInputScreen::function(int i)
 	switch (i)
 	{
 	case 1:
-		ls.lock()->openScreen("midiinputmonitor");
+		ls.lock()->openScreen("midi-input-monitor");
 		break;
 	}
 }

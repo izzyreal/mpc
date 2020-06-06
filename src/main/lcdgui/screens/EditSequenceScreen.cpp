@@ -51,16 +51,16 @@ void EditSequenceScreen::function(int i)
 	{
 	case 1:
 	{
-		auto barCopyScreen = dynamic_pointer_cast<BarCopyScreen>(Screens::getScreenComponent("barcopy"));
+		auto barCopyScreen = dynamic_pointer_cast<BarCopyScreen>(Screens::getScreenComponent("bar-copy"));
 		barCopyScreen->setFromSq(fromSq);
-		ls.lock()->openScreen("barcopy");
+		ls.lock()->openScreen("bar-copy");
 		break;
 	}
 	case 2:
 	{
-		auto trMoveScreen = dynamic_pointer_cast<TrMoveScreen>(Screens::getScreenComponent("trmove"));
+		auto trMoveScreen = dynamic_pointer_cast<TrMoveScreen>(Screens::getScreenComponent("tr-move"));
 		trMoveScreen->setSq(fromSq);
-		ls.lock()->openScreen("trmove");
+		ls.lock()->openScreen("tr-move");
 		break;
 	}
 	case 3:

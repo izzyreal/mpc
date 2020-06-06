@@ -40,7 +40,7 @@ weak_ptr<Event> EventAdapter::convert(ctoot::midi::core::ShortMessage* msg)
 		return midiClockEvent;
 	}
 
-	auto midiInputScreen = dynamic_pointer_cast<MidiInputScreen>(Screens::getScreenComponent("midiinput"));
+	auto midiInputScreen = dynamic_pointer_cast<MidiInputScreen>(Screens::getScreenComponent("midi-input"));
 
 	if (midiInputScreen->getReceiveCh() != -1 && !(msg->getChannel() == midiInputScreen->getReceiveCh()))
 	{
@@ -63,7 +63,7 @@ weak_ptr<Event> EventAdapter::convert(ctoot::midi::core::ShortMessage* msg)
 
 		auto track = sequencer.lock()->getActiveTrackIndex();
 		
-		auto screen = dynamic_pointer_cast<MultiRecordingSetupScreen>(Screens::getScreenComponent("multirecordingsetup"));
+		auto screen = dynamic_pointer_cast<MultiRecordingSetupScreen>(Screens::getScreenComponent("multi-recording-setup"));
 		auto mrs = screen->getMrsLines();
 
 		if (sequencer.lock()->isRecordingModeMulti())

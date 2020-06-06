@@ -47,7 +47,7 @@ void PgmAssignScreen::function(int i)
 		ls.lock()->openScreen("select-drum");
 		break;
 	case 1:
-		ls.lock()->openScreen("programparams");
+		ls.lock()->openScreen("program-params");
 		break;
 	case 2:
 		ls.lock()->openScreen("drum");

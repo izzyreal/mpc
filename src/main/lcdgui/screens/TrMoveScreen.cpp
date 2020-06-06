@@ -11,21 +11,21 @@ using namespace moduru::lang;
 using namespace std;
 
 TrMoveScreen::TrMoveScreen(const int layerIndex)
-	: ScreenComponent("trmove", layerIndex)
+	: ScreenComponent("tr-move", layerIndex)
 {
 }
 
 void TrMoveScreen::open()
 {
 	//May need to happen more often
-	ls.lock()->setCurrentBackground("trmove");
+	ls.lock()->setCurrentBackground("tr-move");
 	findLabel("selecttrack").lock()->setText("Select track");
 	findLabel("tomove").lock()->setText("to move.");
 
 	displaySq();
 	displayTrFields();
 	displayTrLabels();
-	auto barCopyScreen = dynamic_pointer_cast<BarCopyScreen>(Screens::getScreenComponent("barcopy"));
+	auto barCopyScreen = dynamic_pointer_cast<BarCopyScreen>(Screens::getScreenComponent("bar-copy"));
 	setSq(barCopyScreen->getFromSq());
 }
 
@@ -119,9 +119,9 @@ void TrMoveScreen::function(int i)
 		break;
 	}
 	case 1:
-	{		auto barCopyScreen = dynamic_pointer_cast<BarCopyScreen>(Screens::getScreenComponent("barcopy"));
+	{		auto barCopyScreen = dynamic_pointer_cast<BarCopyScreen>(Screens::getScreenComponent("bar-copy"));
 	barCopyScreen->setFromSq(sq);
-	ls.lock()->openScreen("barcopy");
+	ls.lock()->openScreen("bar-copy");
 	break;
 	}
 	case 3:

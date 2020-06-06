@@ -101,13 +101,13 @@ AllLoader::AllLoader(mpc::disk::MpcFile* file, bool sequencesOnly)
 		lSequencer->setActiveSequenceIndex(sequencer->sequence);
 		lSequencer->setSelectedTrackIndex(sequencer->track);
 		
-		auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timingcorrect"));
+		auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timing-correct"));
 		
 		timingCorrectScreen->setNoteValue(sequencer->tc);
 		
 		auto count = allParser.getCount();
 
-		auto countMetronomeScreen = dynamic_pointer_cast<CountMetronomeScreen>(Screens::getScreenComponent("countmetronome"));
+		auto countMetronomeScreen = dynamic_pointer_cast<CountMetronomeScreen>(Screens::getScreenComponent("count-metronome"));
 		auto metronomeSoundScreen = dynamic_pointer_cast<MetronomeSoundScreen>(Screens::getScreenComponent("metronome-sound"));
 
 		countMetronomeScreen->setCountIn(count->getCountInMode());
@@ -123,7 +123,7 @@ AllLoader::AllLoader(mpc::disk::MpcFile* file, bool sequencesOnly)
 		lSequencer->setCountEnabled(count->isEnabled());
 
 		auto midiInput = allParser.getMidiInput();
-		auto midiInputScreen = dynamic_pointer_cast<MidiInputScreen>(Screens::getScreenComponent("midiinput"));
+		auto midiInputScreen = dynamic_pointer_cast<MidiInputScreen>(Screens::getScreenComponent("midi-input"));
 
 		midiInputScreen->setReceiveCh(midiInput->getReceiveCh());
 		midiInputScreen->setType(midiInput->getFilterType());
@@ -132,7 +132,7 @@ AllLoader::AllLoader(mpc::disk::MpcFile* file, bool sequencesOnly)
 
 		auto trackDests = midiInput->getMultiRecTrackDests();
 		
-		auto multiRecordingSetupScreen = dynamic_pointer_cast<MultiRecordingSetupScreen>(Screens::getScreenComponent("multirecordingsetup"));
+		auto multiRecordingSetupScreen = dynamic_pointer_cast<MultiRecordingSetupScreen>(Screens::getScreenComponent("multi-recording-setup"));
 
 		for (int i = 0; i < trackDests.size(); i++) {
 			multiRecordingSetupScreen->getMrsLines()[i]->setTrack(trackDests[i]);

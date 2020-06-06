@@ -9,7 +9,7 @@ using namespace moduru::lang;
 using namespace std;
 
 TimingCorrectScreen::TimingCorrectScreen(const int layerIndex)
-	: ScreenComponent("timingcorrect", layerIndex)
+	: ScreenComponent("timing-correct", layerIndex)
 {
 }
 

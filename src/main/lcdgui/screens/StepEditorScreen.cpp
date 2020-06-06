@@ -150,7 +150,7 @@ void StepEditorScreen::function(int i)
 		{
 			if (!posIsLastTick)
 			{
-				ls.lock()->openScreen("insertevent");
+				ls.lock()->openScreen("insert-event");
 			}
 		}
 		else
@@ -234,13 +234,13 @@ void StepEditorScreen::function(int i)
 			setSelectedEvent(visibleEvents[eventNumber]);
 			setSelectedEvents();
 			setSelectedParameterLetter(eventLetter);
-			ls.lock()->openScreen("editmultiple");
+			ls.lock()->openScreen("edit-multiple");
 			break;
 		}
 	}
 	case 4:
 		if (placeHolder.size() != 0)
-			ls.lock()->openScreen("pasteevent");
+			ls.lock()->openScreen("paste-event");
 		break;
 	case 5:
 		if (selectionStartIndex == -1)
@@ -290,7 +290,7 @@ void StepEditorScreen::turnWheel(int i)
 	}
 	else if (param.compare("tcvalue") == 0)
 	{
-		auto screen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timingcorrect"));
+		auto screen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timing-correct"));
 		auto noteValue = screen->getNoteValue();
 		screen->setNoteValue(noteValue + i);
 	}

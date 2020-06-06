@@ -29,8 +29,8 @@ KbMapping::KbMapping()
 	labelKeyMap["prevbarstart"] = kh->code("r");
 	labelKeyMap["nextbarend"] = kh->code("t");
 	labelKeyMap["tap"] = kh->code("y");
-	labelKeyMap["nextseq"] = kh->code("[");
-	labelKeyMap["trackmute"] = kh->code("]");
+	labelKeyMap["next-seq"] = kh->code("[");
+	labelKeyMap["track-mute"] = kh->code("]");
 	labelKeyMap["fulllevel"] = kh->code("o");
 	labelKeyMap["sixteenlevels"] = kh->code("p");
 	labelKeyMap["f1"] = kh->code("f1");

@@ -414,7 +414,7 @@ void Sequencer::play(bool fromStart)
     
 	currentlyPlayingSequenceIndex = activeSequenceIndex;
 
-	auto countMetronomeScreen = dynamic_pointer_cast<CountMetronomeScreen>(Screens::getScreenComponent("countmetronome"));
+	auto countMetronomeScreen = dynamic_pointer_cast<CountMetronomeScreen>(Screens::getScreenComponent("count-metronome"));
 	auto countInMode = countMetronomeScreen->getCountInMode();
 
     if (!countEnabled || countInMode == 0 || (countInMode == 1 && recording == false))
@@ -609,7 +609,7 @@ void Sequencer::stop(int tick)
 	int frameOffset = tick == -1 ? 0 : ams->getFrameSequencer().lock()->getEventFrameOffset(tick);
 	ams->getFrameSequencer().lock()->stop();
 	if (recording || overdubbing) {
-		auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timingcorrect"));
+		auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timing-correct"));
 		auto noteValue = timingCorrectScreen->getNoteValue();
 		s2->getTrack(activeTrackIndex).lock()->correctTimeRange(0, s2->getLastTick(), TICK_VALUES[noteValue]);
 	}
@@ -1163,7 +1163,7 @@ void Sequencer::notifyTimeDisplayRealtime()
 
 void Sequencer::goToPreviousStep()
 {
-	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timingcorrect"));
+	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timing-correct"));
 	auto noteValue = timingCorrectScreen->getNoteValue();
 
 	auto stepSize = TICK_VALUES[noteValue];
@@ -1192,7 +1192,7 @@ void Sequencer::goToPreviousStep()
 
 void Sequencer::goToNextStep()
 {
-	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timingcorrect"));
+	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timing-correct"));
 	auto noteValue = timingCorrectScreen->getNoteValue();
 
 	auto stepSize = TICK_VALUES[noteValue];

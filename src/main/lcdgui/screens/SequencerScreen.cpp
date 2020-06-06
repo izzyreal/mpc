@@ -233,7 +233,7 @@ vector<string> SequencerScreen::timingCorrectNames = vector<string>{ "OFF", "1/8
 
 void SequencerScreen::displayTiming()
 {
-	auto noteValue = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timingcorrect"))->getNoteValue();
+	auto noteValue = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timing-correct"))->getNoteValue();
 	findField("timing").lock()->setText(timingCorrectNames[noteValue]);
 }
 
@@ -512,10 +512,10 @@ void SequencerScreen::turnWheel(int i)
 		track.lock()->setVelocityRatio(track.lock()->getVelocityRatio() + i);
 	}
 	else if (focus.compare("timing") == 0) {
-		auto screen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timingcorrect"));
+		auto screen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timing-correct"));
 		auto noteValue = screen->getNoteValue();
 		screen->setNoteValue(noteValue + i);
-		setLastFocus("timingcorrect", "notevalue");
+		setLastFocus("timing-correct", "notevalue");
 		displayTiming();
 	}
 	else if (focus.compare("sq") == 0) {
@@ -530,7 +530,7 @@ void SequencerScreen::turnWheel(int i)
 		sequencer.lock()->setNextSq(sequencer.lock()->getNextSq() + i);
 	}
 	else if (focus.compare("bars") == 0) {
-		openScreen("changebars2");
+		openScreen("change-bars-2");
 	}
 	else if (focus.compare("tempo") == 0) {
 		double oldTempo = sequencer.lock()->getTempo().toDouble();
@@ -538,7 +538,7 @@ void SequencerScreen::turnWheel(int i)
 		sequencer.lock()->setTempo(BCMath(newTempo));
 	}
 	else if (focus.compare("tsig") == 0) {
-		openScreen("changetsig");
+		openScreen("change-tsig");
 	}
 	else if (focus.compare("temposource") == 0) {
 		sequencer.lock()->setTempoSourceSequence(i > 0);
@@ -574,27 +574,27 @@ void SequencerScreen::openWindow()
 	}
 	else if (focus.find("now") != string::npos)
 	{
-		openScreen("timedisplay");
+		openScreen("time-display");
 	}
 	else if (focus.find("tempo") != string::npos)
 	{
-		openScreen("tempochange");
+		openScreen("tempo-change");
 	}
 	else if (focus.compare("timing") == 0)
 	{
-		openScreen("timingcorrect");
+		openScreen("timing-correct");
 	}
 	else if (focus.compare("tsig") == 0)
 	{
-		openScreen("changetsig");
+		openScreen("change-tsig");
 	}
 	else if (focus.compare("count") == 0)
 	{
-		openScreen("countmetronome");
+		openScreen("count-metronome");
 	}
 	else if (focus.compare("loop") == 0)
 	{
-		openScreen("loopbarswindow");
+		openScreen("loop-bars-window");
 	}
 	else if (focus.compare("tr") == 0)
 	{
@@ -602,30 +602,30 @@ void SequencerScreen::openWindow()
 	}
 	else if (focus.compare("on") == 0)
 	{
-		openScreen("eraseallofftracks");
+		openScreen("erase-all-off-tracks");
 	}
 	else if (focus.compare("pgm") == 0)
 	{
-		openScreen("transmitprogramchanges");
+		openScreen("transmit-program-changes");
 	}
 	else if (focus.compare("recordingmode") == 0)
 	{
-		openScreen("multirecordingsetup");
+		openScreen("multi-recording-setup");
 	}
 	else if (focus.compare("tracktype") == 0)
 	{
-		openScreen("midiinput");
+		openScreen("midi-input");
 	}
 	else if (focus.compare("devicenumber") == 0)
 	{
-		openScreen("midioutput");
+		openScreen("midi-output");
 	}
 	else if (focus.compare("bars") == 0)
 	{
-		openScreen("changebars");
+		openScreen("change-bars");
 	}
 	else if (focus.compare("velo") == 0) {
-		openScreen("editvelocity");
+		openScreen("edit-velocity");
 	}
 }
 

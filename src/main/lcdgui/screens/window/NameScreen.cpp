@@ -347,9 +347,9 @@ void NameScreen::saveName()
 		ls.lock()->setLastFocus("name", "0");
 		ls.lock()->openScreen("sequencer");
 	}
-	else if (prevScreen.compare("midioutput") == 0)
+	else if (prevScreen.compare("midi-output") == 0)
 	{
-		auto midiOutputScreen = dynamic_pointer_cast<MidiOutputScreen>(Screens::getScreenComponent("midioutput"));
+		auto midiOutputScreen = dynamic_pointer_cast<MidiOutputScreen>(Screens::getScreenComponent("midi-output"));
 		sequencer.lock()->getActiveSequence().lock()->setDeviceName(midiOutputScreen->getDeviceNumber() + 1, getName().substr(0, 8));
 		editing = false;
 		ls.lock()->setLastFocus("name", "0");

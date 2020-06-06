@@ -15,7 +15,7 @@ using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
 Assign16LevelsScreen::Assign16LevelsScreen(const int layerIndex)
-	: ScreenComponent("assign16levels", layerIndex)
+	: ScreenComponent("assign-16-levels", layerIndex)
 {
 }
 

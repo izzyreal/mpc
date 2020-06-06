@@ -40,7 +40,7 @@ void TempoChangeEvent::plusOneBar(int numerator, int denominator, TempoChangeEve
         }
     }
     setChanged();
-    notifyObservers(string("tempochange"));
+    notifyObservers(string("tempo-change"));
 }
 
 void TempoChangeEvent::minusOneBar(int numerator, int denominator, TempoChangeEvent* previous)
@@ -56,7 +56,7 @@ void TempoChangeEvent::minusOneBar(int numerator, int denominator, TempoChangeEv
 		}
 	}
 	setChanged();
-	notifyObservers(string("tempochange"));
+	notifyObservers(string("tempo-change"));
 }
 
 void TempoChangeEvent::plusOneBeat(int denominator, TempoChangeEvent* next)
@@ -71,7 +71,7 @@ void TempoChangeEvent::plusOneBeat(int denominator, TempoChangeEvent* next)
 		}
 	}
 	setChanged();
-	notifyObservers(string("tempochange"));
+	notifyObservers(string("tempo-change"));
 }
 
 void TempoChangeEvent::minusOneBeat(int denominator, TempoChangeEvent* previous)
@@ -87,7 +87,7 @@ void TempoChangeEvent::minusOneBeat(int denominator, TempoChangeEvent* previous)
 		}
 	}
 	setChanged();
-	notifyObservers(string("tempochange"));
+	notifyObservers(string("tempo-change"));
 }
 
 void TempoChangeEvent::plusOneClock(TempoChangeEvent* next)
@@ -101,7 +101,7 @@ void TempoChangeEvent::plusOneClock(TempoChangeEvent* next)
 		tick = parent->getLastTick();
 
 	setChanged();
-	notifyObservers(string("tempochange"));
+	notifyObservers(string("tempo-change"));
 }
 
 void TempoChangeEvent::minusOneClock(TempoChangeEvent* previous)
@@ -114,7 +114,7 @@ void TempoChangeEvent::minusOneClock(TempoChangeEvent* previous)
 	tick--;
 
 	setChanged();
-	notifyObservers(string("tempochange"));
+	notifyObservers(string("tempo-change"));
 }
 
 void TempoChangeEvent::setRatio(int i)
@@ -122,7 +122,7 @@ void TempoChangeEvent::setRatio(int i)
 	if (i < 100 || i > 9998) return;
 	ratio = i;
 	setChanged();
-	notifyObservers(string("tempochange"));
+	notifyObservers(string("tempo-change"));
 }
 
 int TempoChangeEvent::getRatio()
@@ -135,7 +135,7 @@ void TempoChangeEvent::setStepNumber(int i)
 	if (i < 0) return;
 	stepNumber = i;
 	setChanged();
-	notifyObservers(string("tempochange"));
+	notifyObservers(string("tempo-change"));
 }
 
 int TempoChangeEvent::getStepNumber()

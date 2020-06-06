@@ -15,7 +15,6 @@
 
 #include <ui/Uis.hpp>
 #include <ui/midisync/MidiSyncGui.hpp>
-#include <ui/misc/TransGui.hpp>
 
 #include <hardware/Hardware.hpp>
 #include <hardware/HwPad.hpp>
@@ -25,6 +24,7 @@
 
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/MixerSetupScreen.hpp>
+#include <lcdgui/screens/TransScreen.hpp>
 #include <lcdgui/screens/window/CountMetronomeScreen.hpp>
 #include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
 
@@ -41,6 +41,7 @@
 #include <mpc/MpcIndivFxMixerChannel.hpp>
 
 #include <file/File.hpp>
+
 #include <thirdp/bcmath/bcmath_stl.h>
 
 using namespace mpc::lcdgui;
@@ -70,7 +71,7 @@ void EventHandler::handleNoThru(weak_ptr<mpc::sequencer::Event> e, mpc::sequence
 
 	auto lSequencer = sequencer.lock();
 
-	auto countMetronomeScreen = dynamic_pointer_cast<CountMetronomeScreen>(Screens::getScreenComponent("countmetronome"));
+	auto countMetronomeScreen = dynamic_pointer_cast<CountMetronomeScreen>(Screens::getScreenComponent("count-metronome"));
 
 	if (track->getName().compare("click") == 0)
 	{
@@ -239,11 +240,11 @@ void EventHandler::midiOut(weak_ptr<mpc::sequencer::Event> e, mpc::sequencer::Tr
 
 	if (ne)
 	{
-		auto transGui = Mpc::instance().getUis().lock()->getTransGui();
-	
-		if (transGui->getTr() == -1 || transGui->getTr() == ne->getTrack())
+		auto transScreen = dynamic_pointer_cast<TransScreen>(Screens::getScreenComponent("trans"));
+
+		if (transScreen->tr == -1 || transScreen->tr == ne->getTrack())
 		{
-			ne->setNote(ne->getNote() + transGui->getAmount());
+			ne->setNote(ne->getNote() + transScreen->transposeAmount);
 		}
 				
 		auto deviceNumber = track->getDevice() - 1;
@@ -301,7 +302,7 @@ void EventHandler::midiOut(weak_ptr<mpc::sequencer::Event> e, mpc::sequencer::Tr
 			}
 		}
 
-		if (Mpc::instance().getLayeredScreen().lock()->getCurrentScreenName().compare("midioutputmonitor") == 0)
+		if (Mpc::instance().getLayeredScreen().lock()->getCurrentScreenName().compare("midi-output-monitor") == 0)
 		{
 			setChanged();
 			notifyObservers(string(notifyLetter + to_string(deviceNumber)));

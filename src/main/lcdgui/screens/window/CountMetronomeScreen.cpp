@@ -5,7 +5,7 @@
 using namespace mpc::lcdgui::screens::window;
 
 CountMetronomeScreen::CountMetronomeScreen(const int layerIndex)
-	: ScreenComponent("countmetronome", layerIndex)
+	: ScreenComponent("count-metronome", layerIndex)
 {
 }
 

@@ -71,9 +71,9 @@ void GlobalReleaseControls::function(int i) {
 		if (!sequencer.lock()->isPlaying() && currentScreenName.compare("sequencer") != 0) {
 			sampler.lock()->finishBasicVoice();
 		}
-		if (currentScreenName.compare("trackmute") == 0) {
+		if (currentScreenName.compare("track-mute") == 0) {
 			if (!sequencer.lock()->isSoloEnabled()) {
-				ls.lock()->setCurrentBackground("trackmute");
+				ls.lock()->setCurrentBackground("track-mute");
 			}
 			sequencer.lock()->setSoloEnabled(sequencer.lock()->isSoloEnabled());
 		}
@@ -117,7 +117,7 @@ void GlobalReleaseControls::simplePad(int i)
 		
 		if (adjustedRecordedNote && maybeRecWithoutPlaying)
 		{
-			auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timingcorrect"));
+			auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timing-correct"));
 			auto noteValue = timingCorrectScreen->getNoteValue();
 
 			int noteVal = timingCorrectScreen->getNoteValue();

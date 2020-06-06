@@ -17,7 +17,7 @@ using namespace mpc::sequencer;
 using namespace std;
 
 InsertEventScreen::InsertEventScreen(const int layerIndex)
-	: ScreenComponent("insertevent", layerIndex)
+	: ScreenComponent("insert-event", layerIndex)
 {
 }
 

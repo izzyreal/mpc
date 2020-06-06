@@ -62,7 +62,7 @@ void Song::setName(string str)
 {
     name = str;
     setChanged();
-	notifyObservers(string("songname"));
+	notifyObservers(string("song-name"));
 }
 
 string Song::getName()
@@ -85,7 +85,7 @@ void Song::insertStep(int stepIndex, Step* s)
 	if (!used) {
 		used = true;
 		setChanged();
-		notifyObservers(string("songname"));
+		notifyObservers(string("song-name"));
 	}
 	notifySong();
 }

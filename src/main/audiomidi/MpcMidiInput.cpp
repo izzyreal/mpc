@@ -146,7 +146,7 @@ void MpcMidiInput::transport(ctoot::midi::core::MidiMessage* msg, int timeStamp)
 			}
 		}
 		
-		auto midiOutputScreen = dynamic_pointer_cast<MidiOutputScreen>(Screens::getScreenComponent("midioutput"));
+		auto midiOutputScreen = dynamic_pointer_cast<MidiOutputScreen>(Screens::getScreenComponent("midi-output"));
 
 		switch (midiOutputScreen->getSoftThru())
 		{
@@ -197,7 +197,7 @@ void MpcMidiInput::midiOut(weak_ptr<mpc::sequencer::Event> e, mpc::sequencer::Tr
 		notify_ = "b";
 	}
 
-	if (Mpc::instance().getLayeredScreen().lock()->getCurrentScreenName().compare("midioutputmonitor") == 0)
+	if (Mpc::instance().getLayeredScreen().lock()->getCurrentScreenName().compare("midi-output-monitor") == 0)
 	{
 		setChanged();
 		notifyObservers(notify_ + to_string(deviceNumber));
@@ -210,7 +210,7 @@ void MpcMidiInput::transportOmni(ctoot::midi::core::MidiMessage* msg, string out
 
 	if (dynamic_cast<ctoot::midi::core::ShortMessage*>(msg) != nullptr)
 	{
-		if (Mpc::instance().getLayeredScreen().lock()->getCurrentScreenName().compare("midioutputmonitor") == 0)
+		if (Mpc::instance().getLayeredScreen().lock()->getCurrentScreenName().compare("midi-output-monitor") == 0)
 		{
 			setChanged();
 			notifyObservers(string(outputLetter + to_string(dynamic_cast<ctoot::midi::core::ShortMessage*>(msg)->getChannel())));

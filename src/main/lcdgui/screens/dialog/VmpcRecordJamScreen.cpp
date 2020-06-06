@@ -1,6 +1,6 @@
 #include "VmpcRecordJamScreen.hpp"
 
-using namespace mpc::lcdgui::screens::window;
+using namespace mpc::lcdgui::screens::dialog;
 using namespace std;
 
 VmpcRecordJamScreen::VmpcRecordJamScreen(const int layerIndex)

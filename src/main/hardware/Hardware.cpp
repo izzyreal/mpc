@@ -19,7 +19,7 @@ Hardware::Hardware()
 
 	topPanel = make_shared<TopPanel>();
 
-	vector<string> buttonLabels{ "left", "right", "up", "down",	"rec", "overdub", "stop", "play", "playstart", "mainscreen", "prevstepevent", "nextstepevent",	"goto",	"prevbarstart",	"nextbarend", "tap", "nextseq",	"trackmute", "openwindow", "fulllevel", "sixteenlevels", "f1", "f2", "f3", "f4", "f5", "f6", "shift", "enter", "undoseq", "erase", "after", "banka", "bankb", "bankc", "bankd" };
+	vector<string> buttonLabels{ "left", "right", "up", "down",	"rec", "overdub", "stop", "play", "playstart", "mainscreen", "prevstepevent", "nextstepevent",	"goto",	"prevbarstart",	"nextbarend", "tap", "next-seq",	"track-mute", "openwindow", "fulllevel", "sixteenlevels", "f1", "f2", "f3", "f4", "f5", "f6", "shift", "enter", "undoseq", "erase", "after", "banka", "bankb", "bankc", "bankd" };
 
 	for (auto& l : buttonLabels)
 	{
@@ -38,7 +38,7 @@ Hardware::Hardware()
 
 	dataWheel = make_shared<DataWheel>();
 
-	vector<string> ledLabels{ "fulllevel", "sixteenlevels", "nextseq", "trackmute", "padbanka", "padbankb", "padbankc", "padbankd", "after", "undoseq", "rec", "overdub", "play" };
+	vector<string> ledLabels{ "fulllevel", "sixteenlevels", "next-seq", "track-mute", "padbanka", "padbankb", "padbankc", "padbankd", "after", "undoseq", "rec", "overdub", "play" };
 
 	for (auto& l : ledLabels)
 	{

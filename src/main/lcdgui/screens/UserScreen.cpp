@@ -43,10 +43,10 @@ void UserScreen::function(int i)
         ls.lock()->openScreen("edit");
         break;
     case 1:
-        ls.lock()->openScreen("barcopy");
+        ls.lock()->openScreen("bar-copy");
         break;
     case 2:
-        ls.lock()->openScreen("trmove");
+        ls.lock()->openScreen("tr-move");
         break;
     }
 

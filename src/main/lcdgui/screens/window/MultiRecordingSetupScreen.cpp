@@ -6,7 +6,7 @@ using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
 MultiRecordingSetupScreen::MultiRecordingSetupScreen(const int layerIndex)
-	: ScreenComponent("multirecordingsetup", layerIndex)
+	: ScreenComponent("multi-recording-setup", layerIndex)
 {
 	for (int i = 0; i < 34; i++)
 	{

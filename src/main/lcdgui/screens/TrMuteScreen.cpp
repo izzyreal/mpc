@@ -63,7 +63,7 @@ void TrMuteScreen::pad(int i, int velo, bool repeat, int tick)
 
 		sequencer.lock()->setSelectedTrackIndex(i + (mpc.getBank() * 16));
 		ls.lock()->removeCurrentBackground();
-		ls.lock()->setCurrentBackground("trackmutesolo2");
+		ls.lock()->setCurrentBackground("track-mute-solo-2");
 	}
 	else
 	{
@@ -106,12 +106,12 @@ void TrMuteScreen::function(int i)
 	case 5:
 		if (sequencer.lock()->isSoloEnabled())
 		{
-			ls.lock()->setCurrentBackground("trackmute");
+			ls.lock()->setCurrentBackground("track-mute");
 			sequencer.lock()->setSoloEnabled(false);
 		}
 		else
 		{
-			ls.lock()->setCurrentBackground("trackmutesolo1");
+			ls.lock()->setCurrentBackground("track-mute-solo-1");
 			sequencer.lock()->setSoloEnabled(sequencer.lock()->isSoloEnabled());
 		}
 		break;

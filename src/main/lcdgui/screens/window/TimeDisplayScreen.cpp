@@ -5,7 +5,7 @@ using namespace moduru::lang;
 using namespace std;
 
 TimeDisplayScreen::TimeDisplayScreen(const int layerIndex)
-	: ScreenComponent("timedisplay", layerIndex)
+	: ScreenComponent("time-display", layerIndex)
 {
 }
 

@@ -8,12 +8,6 @@
 
 #include <controls/midisync/SyncControls.hpp>
 
-#include <controls/misc/PunchControls.hpp>
-
-#include <controls/misc/SecondSeqControls.hpp>
-#include <controls/misc/TransControls.hpp>
-#include <controls/misc/window/TransposePermanentControls.hpp>
-
 using namespace mpc::controls;
 
 Controls::Controls()
@@ -21,12 +15,6 @@ Controls::Controls()
 	pressedPadVelos = std::vector<int>(16);
 
 	controls["release"] = new GlobalReleaseControls();
-
-	controls["punch"] = new misc::PunchControls();
-	controls["trans"] = new misc::TransControls();
-	controls["2ndseq"] = new misc::SecondSeqControls();
-
-	controls["transposepermanent"] = new misc::window::TransposePermanentControls();
 
 	controls["sync"] = new midisync::SyncControls();
 }
