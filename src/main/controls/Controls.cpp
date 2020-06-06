@@ -6,9 +6,6 @@
 
 #include <controls/GlobalReleaseControls.hpp>
 
-#include <controls/other/InitControls.hpp>
-#include <controls/other/VerControls.hpp>
-
 #include <controls/midisync/SyncControls.hpp>
 
 #include <controls/misc/PunchControls.hpp>
@@ -24,9 +21,6 @@ Controls::Controls()
 	pressedPadVelos = std::vector<int>(16);
 
 	controls["release"] = new GlobalReleaseControls();
-
-	controls["init"] = new other::InitControls();
-	controls["ver"] = new other::VerControls();
 
 	controls["punch"] = new misc::PunchControls();
 	controls["trans"] = new misc::TransControls();

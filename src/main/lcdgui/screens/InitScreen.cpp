@@ -1,19 +1,21 @@
-#include <controls/other/InitControls.hpp>
+#include "InitScreen.hpp"
 
 #include <ui/UserDefaults.hpp>
 
-using namespace mpc::controls::other;
+using namespace mpc::lcdgui::screens;
 using namespace std;
 
-InitControls::InitControls() 
-	: AbstractOtherControls()
+InitScreen::InitScreen(const int layerIndex) 
+	: ScreenComponent("init", layerIndex)
 {
 }
 
-void InitControls::function(int i)
+void InitScreen::function(int i)
 {
 	init();
-	switch (i) {
+	
+	switch (i)
+	{
 	case 0:
 		ls.lock()->openScreen("others");
 		break;

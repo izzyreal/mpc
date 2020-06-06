@@ -41,6 +41,8 @@
 #include <lcdgui/screens/SaveScreen.hpp>
 #include <lcdgui/screens/VmpcDiskScreen.hpp>
 #include <lcdgui/screens/VmpcSettingsScreen.hpp>
+#include <lcdgui/screens/VerScreen.hpp>
+#include <lcdgui/screens/InitScreen.hpp>
 
 #include <lcdgui/screens/window/NumberOfZonesScreen.hpp>
 #include <lcdgui/screens/window/InitPadAssignScreen.hpp>
@@ -778,6 +780,14 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	else if (screenName.compare("vmpc-recording-finished") == 0)
 	{
 		screen = make_shared<VmpcRecordingFinishedScreen>(layerIndex);
+	}	
+	else if (screenName.compare("ver") == 0)
+	{
+		screen = make_shared<VerScreen>(layerIndex);
+	}	
+	else if (screenName.compare("init") == 0)
+	{
+		screen = make_shared<InitScreen>(layerIndex);
 	}	
 
 	if (screen)
