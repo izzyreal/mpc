@@ -4,8 +4,6 @@
 #include <audiomidi/AudioMidiServices.hpp>
 #include <disk/SoundLoader.hpp>
 #include <Paths.hpp>
-#include <ui/Uis.hpp>
-#include <ui/UserDefaults.hpp>
 
 #include <sampler/NoteParameters.hpp>
 #include <sampler/Pad.hpp>

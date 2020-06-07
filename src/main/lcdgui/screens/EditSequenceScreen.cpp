@@ -44,8 +44,6 @@ void EditSequenceScreen::function(int i)
 	
 	auto fromSequence = sequencer.lock()->getSequence(fromSq).lock();
 	auto toSequence = sequencer.lock()->getSequence(toSq).lock();
-
-	auto uis = Mpc::instance().getUis().lock();
 	
 	switch (i)
 	{
@@ -508,8 +506,8 @@ void EditSequenceScreen::displayNotes()
 
 void EditSequenceScreen::displayMidiNotes()
 {
-	//findField("midinote0").lock()->setText(StrUtil::padLeft(to_string(getMidiNote0()), " ", 3) + "(" + mpc::ui::Uis::noteNames[getMidiNote0()] + u8"\u00D4");
-	//findField("midinote1").lock()->setText(StrUtil::padLeft(to_string(getMidiNote1()), " ", 3) + "(" + mpc::ui::Uis::noteNames[getMidiNote1()] + u8"\u00D4");
+	//findField("midinote0").lock()->setText(StrUtil::padLeft(to_string(getMidiNote0()), " ", 3) + "(" + mpc::Util::noteNames()[getMidiNote0()] + u8"\u00D4");
+	//findField("midinote1").lock()->setText(StrUtil::padLeft(to_string(getMidiNote1()), " ", 3) + "(" + mpc::Util::noteNames()[getMidiNote1()] + u8"\u00D4");
 }
 
 void EditSequenceScreen::displayDrumNotes()

@@ -2,8 +2,6 @@
 
 #include <Mpc.hpp>
 
-#include <ui/Uis.hpp>
-
 #include <hardware/Hardware.hpp>
 #include <hardware/Led.hpp>
 #include <hardware/HwSlider.hpp>

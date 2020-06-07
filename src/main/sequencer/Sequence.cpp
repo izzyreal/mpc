@@ -2,8 +2,6 @@
 
 #include <Mpc.hpp>
 
-#include <ui/UserDefaults.hpp>
-
 #include <sequencer/Event.hpp>
 #include <sequencer/Track.hpp>
 #include <sequencer/NoteEvent.hpp>
@@ -13,10 +11,12 @@
 #include <sequencer/TimeSignature.hpp>
 
 #include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/UserScreen.hpp>
 #include <lcdgui/screens/window/CountMetronomeScreen.hpp>
 #include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
 
 using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::sequencer;
@@ -50,10 +50,11 @@ Sequence::Sequence(vector<string> defaultTrackNames)
 	metaTracks[2]->setName("tempo");
 	deviceNames = vector<string>(33);
 
-	auto& userDefaults = mpc::ui::UserDefaults::instance();
+	auto userScreen = dynamic_pointer_cast<UserScreen>(Screens::getScreenComponent("user"));
 
-	for (int i = 0; i < 33; i++) {
-		deviceNames[i] = userDefaults.getDeviceName(i);
+	for (int i = 0; i < 33; i++)
+	{
+		deviceNames[i] = userScreen->getDeviceName(i);
 	}
 }
 
@@ -310,20 +311,24 @@ bool Sequence::isUsed()
 void Sequence::init(int lastBarIndex)
 {
 	used = true;
-	auto& userDefaults = mpc::ui::UserDefaults::instance();
-	initialTempo = userDefaults.getTempo();
-	loopEnabled = userDefaults.isLoopEnabled();
-	for (auto& track : getTracks()) {
+
+	auto userScreen = dynamic_pointer_cast<UserScreen>(Screens::getScreenComponent("user"));
+	initialTempo = userScreen->tempo;
+	loopEnabled = userScreen->loop;
+
+	for (auto& track : getTracks())
+	{
 		auto lTrack = track.lock();
-		lTrack->setDeviceNumber(userDefaults.getDeviceNumber());
-		lTrack->setProgramChange(userDefaults.getPgm());
-		lTrack->setBusNumber(userDefaults.getBus());
-		lTrack->setVelocityRatio(userDefaults.getVeloRatio());
+		lTrack->setDeviceNumber(userScreen->device);
+		lTrack->setProgramChange(userScreen->pgm);
+		lTrack->setBusNumber(userScreen->bus);
+		lTrack->setVelocityRatio(userScreen->velo);
 	}
+	
 	setLastBar(lastBarIndex);
 	initMetaTracks();
 	initLoop();
-	setTimeSignature(0, getLastBar(), userDefaults.getTimeSig().getNumerator(), userDefaults.getTimeSig().getDenominator());
+	setTimeSignature(0, getLastBar(), userScreen->timeSig.getNumerator(), userScreen->timeSig.getDenominator());
 }
 
 void Sequence::setTimeSignature(int firstBar, int tsLastBar, int num, int den)

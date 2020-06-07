@@ -2,8 +2,6 @@
 
 #include <Mpc.hpp>
 
-#include <ui/UserDefaults.hpp>
-
 #include <Util.hpp>
 #include <disk/MpcFile.hpp>
 #include <file/all/Count.hpp>
@@ -16,10 +14,13 @@
 #include <file/all/SequenceNames.hpp>
 #include <file/all/AllSequencer.hpp>
 #include <file/all/AllSong.hpp>
+
 #include <sequencer/Sequence.hpp>
 #include <sequencer/Sequencer.hpp>
 
+
 #include <file/ByteUtil.hpp>
+
 #include <VecUtil.hpp>
 
 using namespace mpc::file::all;
@@ -51,7 +52,9 @@ AllParser::AllParser(string allName)
 	vector<vector<char>> chunks;
 	auto header = Header();
 	chunks.push_back(header.getBytes());
-	auto defaults = Defaults(mpc::ui::UserDefaults::instance());
+	
+	Defaults defaults;
+	
 	chunks.push_back(defaults.getBytes());
 	chunks.push_back(UNKNOWN_CHUNK);
 	sequencer = new Sequencer();

@@ -6,11 +6,12 @@
 #include <lcdgui/HorizontalBar.hpp>
 #include <lcdgui/Field.hpp>
 #include <lcdgui/Label.hpp>
-#include <ui/Uis.hpp>
+
 #include <lcdgui/SelectedEventBar.hpp>
 #include <sampler/Pad.hpp>
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>
+
 #include <sequencer/ChannelPressureEvent.hpp>
 #include <sequencer/ControlChangeEvent.hpp>
 #include <sequencer/EmptyEvent.hpp>
@@ -212,7 +213,7 @@ void EventRow::setPolyPressureEventValues()
         labelArray[i].lock()->Hide(false);
     }
 
-    tfArray[0].lock()->setText(StrUtil::padLeft(to_string(ppe->getNote()), " ", 3) + "(" + mpc::ui::Uis::noteNames[ppe->getNote()] + ")");
+    tfArray[0].lock()->setText(StrUtil::padLeft(to_string(ppe->getNote()), " ", 3) + "(" + mpc::Util::noteNames()[ppe->getNote()] + ")");
     tfArray[1].lock()->setText(StrUtil::padLeft(to_string(ppe->getAmount()), " ", 3));
 	auto lHorizontalBar = horizontalBar.lock();
 	lHorizontalBar->setValue(ppe->getAmount());
@@ -454,7 +455,7 @@ void EventRow::setMidiNoteEventValues()
 		tfArray[i].lock()->Hide(false);
 		labelArray[i].lock()->Hide(false);
 	}
-	tfArray[0].lock()->setText(StrUtil::padLeft(to_string(ne->getNote()), " ", 3) + "(" + mpc::ui::Uis::noteNames[ne->getNote()] + ")");
+	tfArray[0].lock()->setText(StrUtil::padLeft(to_string(ne->getNote()), " ", 3) + "(" + mpc::Util::noteNames()[ne->getNote()] + ")");
 	tfArray[1].lock()->setText(StrUtil::padLeft(to_string(ne->getDuration()), " ", 4));
 	tfArray[2].lock()->setText(to_string(ne->getVelocity()));
 	auto lHorizontalBar = horizontalBar.lock(); 

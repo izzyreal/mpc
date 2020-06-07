@@ -3,12 +3,12 @@
 #include <sequencer/Track.hpp>
 #include <sequencer/TempoChangeEvent.hpp>
 #include <sequencer/NoteEvent.hpp>
+#include <sequencer/TimeSignature.hpp>
 
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <lcdgui/screens/EditSequenceScreen.hpp>
 #include <lcdgui/screens/StepEditorScreen.hpp>
-
-#include <ui/UserDefaults.hpp>
+#include <lcdgui/screens/UserScreen.hpp>
 
 #include <Util.hpp>
 
@@ -644,17 +644,21 @@ void SequencerScreen::right()
 {
 	init();
 
-	if (sequencer.lock()->getNextSq() != -1) {
+	if (sequencer.lock()->getNextSq() != -1)
+	{
 		return;
 	}
 
-	if (!sequence.lock()->isUsed()) {
-		sequence.lock()->init(mpc::ui::UserDefaults::instance().getLastBarIndex());
+	if (!sequence.lock()->isUsed())
+	{
+		auto userScreen = dynamic_pointer_cast<UserScreen>(Screens::getScreenComponent("user"));
+		sequence.lock()->init(userScreen->lastBar);
 		int index = sequencer.lock()->getActiveSequenceIndex();
 		string name = moduru::lang::StrUtil::trim(sequencer.lock()->getDefaultSequenceName()) + moduru::lang::StrUtil::padLeft(to_string(index + 1), "0", 2);
 		sequence.lock()->setName(name);
 		sequencer.lock()->setActiveSequenceIndex(sequencer.lock()->getActiveSequenceIndex());
 	}
+
 	BaseControls::right();
 }
 
@@ -673,12 +677,15 @@ void SequencerScreen::down()
 {
 	init();
 
-	if (sequencer.lock()->getNextSq() != -1) {
+	if (sequencer.lock()->getNextSq() != -1)
+	{
 		return;
 	}
 
-	if (!sequence.lock()->isUsed()) {
-		sequence.lock()->init(mpc::ui::UserDefaults::instance().getLastBarIndex());
+	if (!sequence.lock()->isUsed())
+	{
+		auto userScreen = dynamic_pointer_cast<UserScreen>(Screens::getScreenComponent("user"));
+		sequence.lock()->init(userScreen->lastBar);
 		int index = sequencer.lock()->getActiveSequenceIndex();
 		string name = moduru::lang::StrUtil::trim(sequencer.lock()->getDefaultSequenceName()) + moduru::lang::StrUtil::padLeft(to_string(index + 1), "0", 2);
 		sequence.lock()->setName(name);

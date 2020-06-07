@@ -1,11 +1,11 @@
 #include "EditVelocityScreen.hpp"
 
-#include <lcdgui/Label.hpp>
-
 #include <sequencer/Event.hpp>
 #include <sequencer/Track.hpp>
 #include <sequencer/NoteEvent.hpp>
 #include <sequencer/SeqUtil.hpp>
+
+#include <Util.hpp>
 
 #include <lang/StrUtil.hpp>
 
@@ -127,8 +127,8 @@ void EditVelocityScreen::displayNotes()
 		findField("notes0").lock()->setSize(8 * 6, 9);
 		findLabel("notes1").lock()->Hide(false);
 		findField("notes1").lock()->Hide(false);
-		findField("notes0").lock()->setText(moduru::lang::StrUtil::padLeft(to_string(midiNote0), " ", 3) + "(" + mpc::ui::Uis::noteNames[midiNote0] + u8"\u00D4");
-		findField("notes1").lock()->setText(moduru::lang::StrUtil::padLeft(to_string(midiNote1), " ", 3) + "(" + mpc::ui::Uis::noteNames[midiNote1] + u8"\u00D4");
+		findField("notes0").lock()->setText(moduru::lang::StrUtil::padLeft(to_string(midiNote0), " ", 3) + "(" + mpc::Util::noteNames()[midiNote0] + u8"\u00D4");
+		findField("notes1").lock()->setText(moduru::lang::StrUtil::padLeft(to_string(midiNote1), " ", 3) + "(" + mpc::Util::noteNames()[midiNote1] + u8"\u00D4");
 	}
 	else
 	{

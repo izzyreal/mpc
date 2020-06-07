@@ -3,10 +3,6 @@
 #include <vector>
 #include <string>
 
-namespace mpc::ui {
-	class UserDefaults;
-}
-
 namespace mpc::file::all {
 
 	class Defaults
@@ -47,10 +43,10 @@ namespace mpc::file::all {
 		static const int TR_STATUS_OFFSET{ 1664 };
 		static const int TR_STATUS_LENGTH{ 64 };
 		std::string defaultSeqName = "";
-		int tempo{};
-		int timeSigNum{};
-		int timeSigDen{};
-		int barCount{};
+		int tempo;
+		int timeSigNum;
+		int timeSigDen;
+		int barCount;
 
 		std::vector<std::string> devNames = std::vector<std::string>(33);
 		std::vector<std::string> trackNames = std::vector<std::string>(64);
@@ -59,7 +55,7 @@ namespace mpc::file::all {
 		std::vector<int> pgms = std::vector<int>(64);
 		std::vector<int> trVelos = std::vector<int>(64);
 		std::vector<int> status = std::vector<int>(64);
-		std::vector<char> saveBytes{};
+		std::vector<char> saveBytes;
 
 	private:
 		void parseNames(std::vector<char> loadBytes);
@@ -78,19 +74,19 @@ namespace mpc::file::all {
 		std::vector<int> getTrVelos();
 
 	private:
-		void setTrackSettings(mpc::ui::UserDefaults& ud);
-		void setLastTick(mpc::ui::UserDefaults& ud);
-		void setBarCount(mpc::ui::UserDefaults& ud);
-		void setTimeSig(mpc::ui::UserDefaults& ud);
+		void setTrackSettings();
+		void setLastTick();
+		void setBarCount();
+		void setTimeSig();
 
 	public:
-		void setNames(mpc::ui::UserDefaults& ud);
-		void setTempo(mpc::ui::UserDefaults& ud);
+		void setNames();
+		void setTempo();
 
 	public:
 		std::vector<char> getBytes();
 
 		Defaults(std::vector<char> loadBytes);
-		Defaults(mpc::ui::UserDefaults& ud);
+		Defaults();
 	};
 }

@@ -4,7 +4,6 @@
 #include <disk/MpcFile.hpp>
 #include <file/sndreader/SndReader.hpp>
 #include <file/wav/WavFile.hpp>
-#include <ui/Uis.hpp>
 #include <sampler/Sampler.hpp>
 #include <sampler/Sound.hpp>
 

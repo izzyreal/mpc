@@ -13,8 +13,6 @@
 #include <sequencer/Sequencer.hpp>
 #include <sequencer/TempoChangeEvent.hpp>
 
-#include <ui/Uis.hpp>
-
 #include <hardware/Hardware.hpp>
 #include <hardware/HwPad.hpp>
 

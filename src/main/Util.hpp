@@ -17,6 +17,7 @@ namespace mpc
 		static void drawLine(std::vector<std::vector<bool>>& pixels, const std::vector<std::vector<int>>& line, const bool color, const std::vector<int>& offsetxy);
 		static void drawLines(std::vector<std::vector<bool>>& pixels, const std::vector<std::vector<std::vector<int>>>& lines, const std::vector<bool>& colors);
 		static void drawLines(std::vector<std::vector<bool>>& pixels, const std::vector<std::vector<std::vector<int>>>& lines, const std::vector<bool>& colors, const std::vector<int>& offsetxy);
+		static std::vector<std::string>& noteNames();
 
 	};
 }

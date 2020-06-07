@@ -1,7 +1,8 @@
 #include "UserScreen.hpp"
 
-#include <ui/UserDefaults.hpp>
 #include <sequencer/TimeSignature.hpp>
+
+#include <nvram/NvRam.hpp>
 
 #include <Util.hpp>
 
@@ -12,12 +13,11 @@ using namespace std;
 UserScreen::UserScreen(const int layerIndex) 
 	: ScreenComponent("user", layerIndex)
 {
+	resetPreferences();
 }
 
 void UserScreen::open()
 {
-	mpc::ui::UserDefaults::instance().addObserver(this);
-	mpc::ui::UserDefaults::instance().getTimeSig().addObserver(this);
 	displayTempo();
 	displayLoop();
 	displayTsig();
@@ -29,16 +29,12 @@ void UserScreen::open()
 	displayVelo();
 }
 
-void UserScreen::close()
-{
-	mpc::ui::UserDefaults::instance().deleteObserver(this);
-	mpc::ui::UserDefaults::instance().getTimeSig().deleteObserver(this);
-}
-
 void UserScreen::function(int i)
 {
     init();
-	switch (i) {
+	
+	switch (i)
+	{
     case 0:
         ls.lock()->openScreen("edit");
         break;
@@ -56,185 +52,320 @@ void UserScreen::turnWheel(int i)
 {
 	init();
 	
-	auto ud = mpc::ui::UserDefaults::instance();
-
-	if (param.compare("tempo") == 0) {
-		double oldTempo = ud.getTempo().toDouble();
-		double newTempo = oldTempo + (i / 10.0);
-		ud.setTempo(BCMath(newTempo));
+	if (param.compare("tempo") == 0)
+	{
+		double oldTempo = tempo.toDouble();
+		double newTempo = oldTempo + (i * 0.1);
+		setTempo(BCMath(newTempo));
 	}
-	else if (param.compare("loop") == 0) {
-		ud.setLoop(i > 0);
+	else if (param.compare("loop") == 0)
+	{
+		setLoop(i > 0);
 	}
-	else if (param.compare("tsig") == 0) {
-		if (i > 0) {
-			ud.getTimeSig().increase();
+	else if (param.compare("tsig") == 0)
+	{
+		if (i > 0)
+		{
+			timeSig.increase();
 		}
-		else {
-			ud.getTimeSig().decrease();
+		else
+		{
+			timeSig.decrease();
 		}
 	}
-	else if (param.compare("bars") == 0) {
-		ud.setLastBar(ud.getLastBarIndex() + i);
+	else if (param.compare("bars") == 0)
+	{
+		setLastBar(lastBar + i);
 	}
-	else if (param.compare("pgm") == 0) {
-		ud.setPgm(ud.getPgm() + i);
+	else if (param.compare("pgm") == 0)
+	{
+		setPgm(pgm + i);
 	}
-	else if (param.compare("recordingmode") == 0) {
-		ud.setRecordingModeMulti(i > 0);
+	else if (param.compare("recordingmode") == 0)
+	{
+		setRecordingModeMulti(i > 0);
 	}
-	else if (param.compare("tracktype") == 0) {
-		ud.setBus(ud.getBus() + i);
+	else if (param.compare("tracktype") == 0)
+	{
+		setBus(bus + i);
 	}
-	else if (param.compare("devicenumber") == 0) {
-		ud.setDeviceNumber(ud.getDeviceNumber() + i);
+	else if (param.compare("device") == 0)
+	{
+		setDeviceNumber(device + i);
 	}
-	else if (param.compare("velo") == 0) {
-		ud.setVelo(ud.getVeloRatio() + i);
+	else if (param.compare("velo") == 0)
+	{
+		setVelo(velo + i);
 	}
 }
 
-
 void UserScreen::displayTempo()
 {
-	auto tempo = mpc::ui::UserDefaults::instance().getTempo().toString();
-	tempo = StrUtil::padLeft(tempo, " ", 5);
-	tempo = mpc::Util::replaceDotWithSmallSpaceDot(tempo);
-	findField("tempo").lock()->setText(tempo);
+	auto tempoStr = StrUtil::padLeft(tempo.toString(), " ", 5);
+	tempoStr = mpc::Util::replaceDotWithSmallSpaceDot(tempoStr);
+	findField("tempo").lock()->setText(tempoStr);
 }
 
 void UserScreen::displayLoop()
 {
-	findField("loop").lock()->setText(mpc::ui::UserDefaults::instance().isLoopEnabled() ? "ON" : "OFF");
+	findField("loop").lock()->setText(loop ? "ON" : "OFF");
 }
 
 void UserScreen::displayTsig()
 {
-	auto numerator = to_string(mpc::ui::UserDefaults::instance().getTimeSig().getNumerator());
-	auto denominator = to_string(mpc::ui::UserDefaults::instance().getTimeSig().getDenominator());
+	auto numerator = to_string(timeSig.getNumerator());
+	auto denominator = to_string(timeSig.getDenominator());
 	findField("tsig").lock()->setText(numerator + "/" + denominator);
 }
 
 void UserScreen::displayBars()
 {
-	findField("bars").lock()->setText(to_string(mpc::ui::UserDefaults::instance().getLastBarIndex() + 1));
+	findField("bars").lock()->setText(to_string(lastBar + 1));
 }
 
 void UserScreen::displayPgm()
 {
-	if (mpc::ui::UserDefaults::instance().getPgm() == 0)
+	if (pgm == 0)
 	{
 		findField("pgm").lock()->setText("OFF");
 	}
 	else
 	{
-		findField("pgm").lock()->setText(to_string(mpc::ui::UserDefaults::instance().getPgm()));
+		findField("pgm").lock()->setText(to_string(pgm));
 	}
 }
 
 void UserScreen::displayRecordingMode()
 {
-	findField("recordingmode").lock()->setText(mpc::ui::UserDefaults::instance().isRecordingModeMulti() ? "M" : "S");
+	findField("recordingmode").lock()->setText(recordingModeMulti ? "M" : "S");
 }
 
 void UserScreen::displayTrackType()
 {
-	findField("tracktype").lock()->setText(busNames[mpc::ui::UserDefaults::instance().getBus()]);
+	findField("tracktype").lock()->setText(busNames[bus]);
 	displayDeviceName();
 }
 
 void UserScreen::displayDeviceNumber()
 {
-	if (mpc::ui::UserDefaults::instance().getDeviceNumber() == 0)
+	if (device == 0)
 	{
-		findField("devicenumber").lock()->setText("OFF");
+		findField("device").lock()->setText("OFF");
+		return;
+	}
+
+	if (device >= 17)
+	{
+		findField("device").lock()->setTextPadded(to_string(device - 16) + "B", " ");
 	}
 	else
 	{
-		if (mpc::ui::UserDefaults::instance().getDeviceNumber() >= 17)
-		{
-			findField("devicenumber").lock()->setTextPadded(to_string(mpc::ui::UserDefaults::instance().getDeviceNumber() - 16) + "B", " ");
-		}
-		else
-		{
-			findField("devicenumber").lock()->setTextPadded(to_string(mpc::ui::UserDefaults::instance().getDeviceNumber()) + "A", " ");
-		}
+		findField("device").lock()->setTextPadded(to_string(device) + "A", " ");
 	}
 }
 
 void UserScreen::displayVelo()
 {
-	findField("velo").lock()->setText(to_string(mpc::ui::UserDefaults::instance().getVeloRatio()));
+	findField("velo").lock()->setText(to_string(velo));
 }
 
 void UserScreen::displayDeviceName()
 {
-	auto sampler = Mpc::instance().getSampler().lock();
+	init();
 
-	if (mpc::ui::UserDefaults::instance().getBus() != 0)
+	if (bus == 0)
 	{
-		if (mpc::ui::UserDefaults::instance().getDeviceNumber() == 0)
+		if (device != 0)
 		{
-			auto p = dynamic_pointer_cast<mpc::sampler::Program>(sampler->getProgram(sampler->getDrumBusProgramNumber(mpc::ui::UserDefaults::instance().getBus())).lock());
-			findLabel("devicename").lock()->setText(p->getName());
-		}
-		else
-		{
-			findLabel("devicename").lock()->setText(mpc::ui::UserDefaults::instance().getDeviceName(mpc::ui::UserDefaults::instance().getDeviceNumber()));
-		}
-	}
-
-	if (mpc::ui::UserDefaults::instance().getBus() == 0)
-	{
-		if (mpc::ui::UserDefaults::instance().getDeviceNumber() != 0)
-		{
-			findLabel("devicename").lock()->setText(mpc::ui::UserDefaults::instance().getDeviceName(mpc::ui::UserDefaults::instance().getDeviceNumber()));
+			findLabel("devicename").lock()->setText(getDeviceName(device));
 		}
 		else
 		{
 			findLabel("devicename").lock()->setText("");
 		}
 	}
+	else
+	{
+		if (device == 0)
+		{
+			findLabel("devicename").lock()->setText(program.lock()->getName());
+		}
+		else
+		{
+			findLabel("devicename").lock()->setText(getDeviceName(device));
+		}
+	}
 }
 
-void UserScreen::update(moduru::observer::Observable* o, nonstd::any arg)
+void UserScreen::resetPreferences()
 {
-	string s = nonstd::any_cast<string>(arg);
-	if (s.compare("tempo") == 0)
+	sequenceName = string("Sequence");
+	bus = 1;
+	tempo = BCMath("120.0");
+	velo = 100;
+	pgm = 0;
+	recordingModeMulti = false;
+	loop = true;
+	device = 0;
+
+	trackNames.clear();
+
+	for (int i = 0; i < 64; i++)
 	{
-		displayTempo();
+		trackNames.push_back(string("Track-" + moduru::lang::StrUtil::padLeft(to_string((int)(i + 1)), "0", 2)));
 	}
-	else if (s.compare("loop") == 0)
+
+	lastBar = 1;
+	timeSig.setNumerator(4);
+	timeSig.setDenominator(4);
+
+	deviceNames.clear();
+
+	deviceNames.push_back(string("        "));
+
+	for (int i = 1; i < 33; i++)
 	{
-		displayLoop();
+		deviceNames.push_back("Device" + moduru::lang::StrUtil::padLeft(to_string(i), "0", 2));
 	}
-	else if (s.compare("timesignature") == 0)
+}
+
+string UserScreen::getDeviceName(int i)
+{
+	return deviceNames[i];
+}
+
+void UserScreen::setTempo(BCMath bd)
+{
+	auto str = to_string(bd.toDouble());
+
+	if (str.find(".") == string::npos)
 	{
-		displayTsig();
+		str += ".0";
 	}
-	else if (s.compare("bars") == 0)
+
+	auto length = (int)(str.find(".")) + 2;
+	tempo = BCMath(str.substr(0, length));
+
+	if (tempo.toDouble() < 30.0) {
+		tempo = BCMath("30.0");
+	}
+	else if (tempo.toDouble() > 300.0) {
+		tempo = BCMath("300.0");
+	}
+
+	displayTempo();
+}
+
+void UserScreen::setLoop(bool b)
+{
+	if (loop == b)
 	{
-		displayBars();
+		return;
 	}
-	else if (s.compare("pgm") == 0)
+
+	loop = b;
+	displayLoop();
+}
+
+void UserScreen::setBus(int i)
+{
+	if (i < 0 || i > 4)
 	{
-		displayPgm();
+		return;
 	}
-	else if (s.compare("recordingmode") == 0)
+
+	bus = i;
+	displayTrackType();
+}
+
+void UserScreen::setDeviceNumber(int i)
+{
+	if (i < 0 || i > 33)
 	{
-		displayRecordingMode();
+		return;
 	}
-	else if (s.compare("tracktype") == 0)
+
+	device = i;
+	displayDeviceNumber();
+	displayDeviceName();
+}
+
+void UserScreen::setRecordingModeMulti(bool b)
+{
+	if (recordingModeMulti == b)
 	{
-		displayTrackType();
+		return;
 	}
-	else if (s.compare("devicenumber") == 0)
+
+	recordingModeMulti = b;
+	displayRecordingMode();
+}
+
+void UserScreen::setLastBar(int i)
+{
+	if (i < 0 || i > 998)
 	{
-		displayDeviceNumber();
-		displayDeviceName();
+		return;
 	}
-	else if (s.compare("velo") == 0)
+
+	lastBar = i;
+	displayBars();
+}
+
+void UserScreen::setPgm(int i)
+{
+	if (i < 0 || i > 128)
 	{
-		displayVelo();
+		return;
 	}
+
+	pgm = i;
+	displayPgm();
+}
+
+void UserScreen::setVelo(int i)
+{
+	if (i < 1)
+	{
+		i = 1;
+	}
+	else if (i > 200)
+	{
+		i = 200;
+	}
+
+	velo = i;
+	displayVelo();
+}
+
+string UserScreen::getTrackName(int i)
+{
+	return trackNames[i];
+}
+
+int8_t UserScreen::getTrackStatus()
+{
+	// This number is so magic that I forgot what it's for.
+	return 6;
+}
+
+void UserScreen::setDeviceName(int i, string s)
+{
+	deviceNames[i] = s;
+}
+
+void UserScreen::setSequenceName(string name)
+{
+	sequenceName = name;
+}
+
+void UserScreen::setTimeSig(int num, int den)
+{
+	timeSig.setNumerator(num);
+	timeSig.setDenominator(den);
+}
+
+void UserScreen::setTrackName(int i, string s)
+{
+	trackNames[i] = s;
 }

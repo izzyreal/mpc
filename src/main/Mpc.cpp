@@ -9,8 +9,6 @@
 #include <disk/AbstractDisk.hpp>
 #include <disk/SoundLoader.hpp>
 
-#include <ui/Uis.hpp>
-
 #include <controls/Controls.hpp>
 
 #include <audiomidi/AudioMidiServices.hpp>
@@ -54,7 +52,6 @@ Mpc::Mpc()
 
 	hardware = make_shared<hardware::Hardware>();
 
-	uis = make_shared<ui::Uis>();
 	layeredScreen = make_shared<lcdgui::LayeredScreen>();
 }
 
@@ -93,10 +90,6 @@ void Mpc::init(const int sampleRate, const int inputCount, const int outputCount
 
 	hardware->getSlider().lock()->setValue(mpc::nvram::NvRam::getSlider());
 	MLOG("Mpc is ready")
-}
-
-weak_ptr<ui::Uis> Mpc::getUis() {
-	return uis;
 }
 
 weak_ptr<controls::Controls> Mpc::getControls() {
@@ -302,11 +295,14 @@ int Mpc::getBank()
 Mpc::~Mpc() {
 	MLOG("Mpc destructor.");
 
+	mpc::nvram::NvRam::saveUserDefaults();
+
 	for (auto& m : mpcMidiInputs) {
 		if (m != nullptr) {
 			delete m;
 		}
 	}
+
     if (layeredScreen) layeredScreen.reset();
 	if (audioMidiServices) audioMidiServices->destroyServices();
 	MLOG("audio midi services destroyed.");

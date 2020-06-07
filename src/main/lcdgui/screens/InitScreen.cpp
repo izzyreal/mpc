@@ -1,6 +1,7 @@
 #include "InitScreen.hpp"
 
-#include <ui/UserDefaults.hpp>
+#include <lcdgui/screens/UserScreen.hpp>
+#include <lcdgui/screens/SetupScreen.hpp>
 
 using namespace mpc::lcdgui::screens;
 using namespace std;
@@ -23,8 +24,15 @@ void InitScreen::function(int i)
 		ls.lock()->openScreen("ver");
 		break;
 	case 5:
-		mpc::ui::UserDefaults::instance().initialize();
+	{
+		auto userScreen = dynamic_pointer_cast<UserScreen>(Screens::getScreenComponent("user"));
+		userScreen->resetPreferences();
+
+		auto setupScreen = dynamic_pointer_cast<SetupScreen>(Screens::getScreenComponent("setup"));
+		setupScreen->resetPreferences();
+
 		ls.lock()->openScreen("sequencer");
 		break;
+	}
 	}
 }

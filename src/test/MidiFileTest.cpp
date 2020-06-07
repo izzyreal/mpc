@@ -7,8 +7,6 @@
 #include <sequencer/Sequence.hpp>
 #include <sequencer/Track.hpp>
 
-#include <ui/UserDefaults.hpp>
-
 #include <disk/AbstractDisk.hpp>
 #include <disk/MpcFile.hpp>
 

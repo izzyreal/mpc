@@ -3,6 +3,8 @@
 #include <sequencer/Track.hpp>
 #include <sequencer/SeqUtil.hpp>
 
+#include <Util.hpp>
+
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 using namespace moduru::lang;
@@ -122,20 +124,24 @@ void TimingCorrectScreen::displayNotes()
 {
 	init();
 	
-	if (track.lock()->getBusNumber() == 0) {
+	if (track.lock()->getBusNumber() == 0)
+	{
 		findField("notes0").lock()->setSize(8 * 6, 9);
-		findField("notes0").lock()->setText(StrUtil::padLeft(to_string(midiNote0), " ", 3) + "(" + mpc::ui::Uis::noteNames[midiNote0] + u8"\u00D4");
-		findField("notes1").lock()->setText(StrUtil::padLeft(to_string(midiNote1), " ", 3) + "(" + mpc::ui::Uis::noteNames[midiNote1] + u8"\u00D4");
+		findField("notes0").lock()->setText(StrUtil::padLeft(to_string(midiNote0), " ", 3) + "(" + mpc::Util::noteNames()[midiNote0] + u8"\u00D4");
+		findField("notes1").lock()->setText(StrUtil::padLeft(to_string(midiNote1), " ", 3) + "(" + mpc::Util::noteNames()[midiNote1] + u8"\u00D4");
 		findLabel("notes1").lock()->Hide(false);
 		findField("notes1").lock()->Hide(false);
 	}
-	else {
+	else
+	{
 		findField("notes0").lock()->setSize(6 * 6 + 2, 9);
 		
-		if (mpc.getNote() != 34) {
+		if (mpc.getNote() != 34)
+		{
 			findField("notes0").lock()->setText(to_string(mpc.getNote()) + "/" + sampler.lock()->getPadName(mpc.getPad()));
 		}
-		else {
+		else
+		{
 			findField("notes0").lock()->setText("ALL");
 		}
 		findLabel("notes1").lock()->Hide(true);

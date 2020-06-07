@@ -3,8 +3,6 @@
 #include <Mpc.hpp>
 #include <file/aps/ApsParser.hpp>
 
-#include <ui/Uis.hpp>
-
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/MixerSetupScreen.hpp>
 #include <lcdgui/screens/DrumScreen.hpp>
@@ -35,7 +33,6 @@ ApsGlobalParameters::ApsGlobalParameters()
 	saveBytes = vector<char>(ApsParser::PARAMETERS_LENGTH);
 	for (int i = 0; i < saveBytes.size(); i++)
 	saveBytes[i] = TEMPLATE[i];
-	auto uis = Mpc::instance().getUis().lock();
 	
 	auto drumScreen = dynamic_pointer_cast<DrumScreen>(Screens::getScreenComponent("drum"));
 

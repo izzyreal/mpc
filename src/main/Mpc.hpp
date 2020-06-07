@@ -1,7 +1,6 @@
 #pragma once
 
 #include <lcdgui/LayeredScreen.hpp>
-#include <ui/Uis.hpp>
 
 #include <disk/DiskController.hpp>
 #include <disk/ProgramLoader.hpp>
@@ -20,12 +19,6 @@ namespace ctoot::mpc
 	class MpcSoundPlayerChannel;
 	class MpcBasicSoundPlayerChannel;
 	class MpcMultiMidiSynth;
-}
-
-namespace mpc::ui
-{
-	class UserDefaults;
-	class Uis;
 }
 
 namespace mpc::hardware
@@ -69,7 +62,8 @@ namespace mpc::sampler
 	class Sampler;
 }
 
-namespace mpc {
+namespace mpc
+{
 	class Mpc
 		: public moduru::observer::Observable
 	{
@@ -85,7 +79,6 @@ namespace mpc {
 		std::unique_ptr<mpc::disk::ProgramLoader> programLoader{};
 
 	private:
-		std::shared_ptr<mpc::ui::Uis> uis;
 		std::shared_ptr<lcdgui::LayeredScreen> layeredScreen;
 		std::shared_ptr<controls::Controls> controls;
 
@@ -123,7 +116,6 @@ namespace mpc {
 		void setPreviousSamplerScreenName(std::string s);
 
 	public:
-		std::weak_ptr<ui::Uis> getUis();
 		std::weak_ptr<lcdgui::LayeredScreen> getLayeredScreen();
 		std::weak_ptr<controls::Controls> getControls();
 		controls::BaseControls* getActiveControls();

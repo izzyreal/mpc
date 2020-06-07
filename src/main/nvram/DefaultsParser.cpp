@@ -16,9 +16,9 @@ mpc::file::all::Defaults DefaultsParser::AllDefaultsFromFile(moduru::file::File&
 	return mpc::file::all::Defaults(moduru::VecUtil::CopyOfRange(&data, 0, mpc::file::all::AllParser::DEFAULTS_LENGTH));
 }
 
-DefaultsParser::DefaultsParser(mpc::ui::UserDefaults& ud)
+DefaultsParser::DefaultsParser()
 {
-	saveBytes = mpc::file::all::Defaults(ud).getBytes();
+	saveBytes = mpc::file::all::Defaults().getBytes();
 }
 
 vector<char> DefaultsParser::getBytes()

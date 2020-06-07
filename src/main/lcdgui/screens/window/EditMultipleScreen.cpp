@@ -10,6 +10,8 @@
 
 #include <lcdgui/screens/StepEditorScreen.hpp>
 
+#include <Util.hpp>
+
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui;
@@ -381,7 +383,7 @@ void EditMultipleScreen::updateEditMultiple()
 			findLabel("value0").lock()->setLocation(xPosSingle, yPosSingle);
 			findLabel("value0").lock()->setText(singleLabels[0]);
 			findField("value0").lock()->setSize(8 * 6 + 1, 9);
-			findField("value0").lock()->setText((StrUtil::padLeft(to_string(stepEditorScreen->getChangeNoteToNumber()), " ", 3) + "(" + mpc::ui::Uis::noteNames[stepEditorScreen->getChangeNoteToNumber()]) + ")");
+			findField("value0").lock()->setText((StrUtil::padLeft(to_string(stepEditorScreen->getChangeNoteToNumber()), " ", 3) + "(" + mpc::Util::noteNames()[stepEditorScreen->getChangeNoteToNumber()]) + ")");
 			findLabel("value0").lock()->setSize(findLabel("value0").lock()->GetTextEntryLength() * 6 + 1, 9);
 			findField("value0").lock()->Hide(false);
 			findField("value0").lock()->setLocation((xPosSingle)+(findLabel("value0").lock()->getW()), yPosSingle);

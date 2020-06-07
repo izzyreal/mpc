@@ -8,10 +8,12 @@
 #include <hardware/Led.hpp>
 #include <hardware/HwPad.hpp>
 
-#include <ui/Uis.hpp>
-#include <ui/UserDefaults.hpp>
-
 #include <lcdgui/LayeredScreen.hpp>
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/SongScreen.hpp>
+#include <lcdgui/screens/window/TimingCorrectScreen.hpp>
+#include <lcdgui/screens/window/CountMetronomeScreen.hpp>
+#include <lcdgui/screens/UserScreen.hpp>
 
 #include <sequencer/Event.hpp>
 #include <sequencer/TempoChangeEvent.hpp>
@@ -30,11 +32,6 @@
 #include <System.hpp>
 #include <lang/StrUtil.hpp>
 
-#include <lcdgui/Screens.hpp>
-#include <lcdgui/screens/SongScreen.hpp>
-#include <lcdgui/screens/window/TimingCorrectScreen.hpp>
-#include <lcdgui/screens/window/CountMetronomeScreen.hpp>
-
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
@@ -51,10 +48,10 @@ void Sequencer::init()
 	reposition = -1;
 	nextsq = -1;
 	previousTempo = BCMath("0.0");
-
-	auto& userDefaults = mpc::ui::UserDefaults::instance();
-
-	defaultSequenceName = moduru::lang::StrUtil::trim(userDefaults.getSequenceName());
+	
+	auto userScreen = dynamic_pointer_cast<UserScreen>(Screens::getScreenComponent("user"));
+	defaultSequenceName = moduru::lang::StrUtil::trim(userScreen->sequenceName);
+	
 	for (int i = 0; i < 64; i++)
 	{
 		string name = "Track-";
@@ -68,16 +65,17 @@ void Sequencer::init()
 	
 	for (int i = 0; i < 33; i++)
 	{
-		defaultDeviceNames[i] = userDefaults.getDeviceName(i);
+		defaultDeviceNames[i] = userScreen->getDeviceName(i);
 	}
 
-	recordingModeMulti = userDefaults.isRecordingModeMulti();
+	recordingModeMulti = userScreen->recordingModeMulti;
 
 	soloEnabled = false;
 	tempoSourceSequenceEnabled = true;
 	countEnabled = true;
 	recording = false;
-	tempo = userDefaults.getTempo();
+	
+	tempo = userScreen->tempo;
 	tempo = BCMath("120.0");
 
 	metronomeOnly = false;

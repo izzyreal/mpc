@@ -1,14 +1,19 @@
 #include "NvRam.hpp"
 
-#include <file/all/Defaults.hpp>
-#include <hardware/Hardware.hpp>
-#include <hardware/HwSlider.hpp>
-#include <Paths.hpp>
-#include <Mpc.hpp>
-#include <audiomidi/AudioMidiServices.hpp>
-#include <ui/UserDefaults.hpp>
 #include <nvram/DefaultsParser.hpp>
 #include <nvram/KnobPositions.hpp>
+
+#include <Mpc.hpp>
+#include <Paths.hpp>
+
+#include <lcdgui/screens/UserScreen.hpp>
+
+#include <audiomidi/AudioMidiServices.hpp>
+
+#include <hardware/Hardware.hpp>
+#include <hardware/HwSlider.hpp>
+
+#include <file/all/Defaults.hpp>
 
 #include <thirdp/bcmath/bcmath_stl.h>
 
@@ -16,60 +21,57 @@
 #include <file/FileUtil.hpp>
 
 using namespace mpc::nvram;
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens;
 using namespace moduru::file;
 using namespace std;
 
-NvRam::NvRam()
-{
-}
-
-mpc::ui::UserDefaults NvRam::load()
+void NvRam::load()
 {
 	string path = mpc::Paths::resPath() + "nvram.vmp";
 	auto file = File(path, nullptr);
 
-	auto ud = mpc::ui::UserDefaults();
+	if (!file.exists())
+	{
+		return;
+	}
+
+	auto defaults = DefaultsParser::AllDefaultsFromFile(file);
+	auto userScreen = dynamic_pointer_cast<UserScreen>(Screens::getScreenComponent("user"));
+
+	userScreen->lastBar = defaults.getBarCount() - 1;
+	userScreen->bus = defaults.getBusses()[0];
+
+	for (int i = 0; i < 33; i++)
+	{
+		userScreen->setDeviceName(i, defaults.getDefaultDevNames()[i]);
+	}
 	
-	if (!file.exists()) {
-		file.create();
-		auto stream = FileUtil::ofstreamw(path, ios::binary | ios::out);
-		auto dp = DefaultsParser(ud);
-		auto bytes = dp.getBytes();
-		stream.write(&bytes[0], bytes.size());
-		stream.close();
+	userScreen->setSequenceName(defaults.getDefaultSeqName());
+	auto defTrackNames = defaults.getDefaultTrackNames();
+
+	for (int i = 0; i < 64; i++)
+	{
+		userScreen->setTrackName(i, defTrackNames[i]);
 	}
-	else {
-		auto defaults = DefaultsParser::AllDefaultsFromFile(file);
-		
-		ud.setLastBar(defaults.getBarCount() - 1);
-		ud.setBus((defaults.getBusses())[0]);
-		
-		for (int i = 0; i < 33; i++) {
-			ud.setDeviceName(i, defaults.getDefaultDevNames()[i]);
-		}
-		ud.setSequenceName(defaults.getDefaultSeqName());
-		auto defTrackNames = defaults.getDefaultTrackNames();
-		for (int i = 0; i < 64; i++) {
-			ud.setTrackName(i, defTrackNames[i]);
-		}
-		ud.setDeviceNumber(defaults.getDevices()[0]);
-		ud.setTimeSig(defaults.getTimeSigNum(), defaults.getTimeSigDen());
-		ud.setPgm(defaults.getPgms()[0]);
-		ud.setTempo(defaults.getTempo() / 10.0);
-		ud.setVelo(defaults.getTrVelos()[0]);
-	}
-    return ud;
+
+	userScreen->setDeviceNumber(defaults.getDevices()[0]);
+	userScreen->setTimeSig(defaults.getTimeSigNum(), defaults.getTimeSigDen());
+	userScreen->setPgm(defaults.getPgms()[0]);
+	userScreen->setTempo(defaults.getTempo() / 10.0);
+	userScreen->setVelo(defaults.getTrVelos()[0]);
 }
 
 void NvRam::saveUserDefaults()
 {
-	auto dp = DefaultsParser(mpc::ui::UserDefaults::instance());
+	DefaultsParser dp;
 	
 	string fileName = mpc::Paths::resPath() + "nvram.vmp";
 	
 	auto file = moduru::file::File(fileName, nullptr);
 	
-	if (!file.exists()) {
+	if (!file.exists())
+	{
 		file.create();
 	}
 

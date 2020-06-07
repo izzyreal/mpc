@@ -15,6 +15,8 @@
 #include <sequencer/ProgramChangeEvent.hpp>
 #include <sequencer/SystemExclusiveEvent.hpp>
 
+#include <Util.hpp>
+
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;
@@ -873,8 +875,8 @@ void StepEditorScreen::setViewModeNotesText()
 	}
 	else if (viewModeNumber == 1 && track.lock()->getBusNumber() == 0)
 	{
-		findField("fromnote").lock()->setText(StrUtil::padLeft(to_string(noteA), " ", 3) + "(" + mpc::ui::Uis::noteNames[noteA] + u8"\u00D4");
-		findField("tonote").lock()->setText(StrUtil::padLeft(to_string(noteB), " ", 3) + "(" + mpc::ui::Uis::noteNames[noteB] + u8"\u00D4");
+		findField("fromnote").lock()->setText(StrUtil::padLeft(to_string(noteA), " ", 3) + "(" + mpc::Util::noteNames()[noteA] + u8"\u00D4");
+		findField("tonote").lock()->setText(StrUtil::padLeft(to_string(noteB), " ", 3) + "(" + mpc::Util::noteNames()[noteB] + u8"\u00D4");
 	}
 	else if (viewModeNumber == 3)
 	{

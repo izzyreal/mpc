@@ -1,11 +1,11 @@
 #include "EraseScreen.hpp"
 
 #include <sequencer/Event.hpp>
-#include <sequencer/Sequence.hpp>
 #include <sequencer/Track.hpp>
 #include <sequencer/NoteEvent.hpp>
-#include <sequencer/Sequencer.hpp>
 #include <sequencer/SeqUtil.hpp>
+
+#include <Util.hpp>
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
@@ -100,23 +100,32 @@ void EraseScreen::function(int i)
 				{
 					string excludeClass;
 					string includeClass;
-					switch (erase) {
+					
+					switch (erase)
+					{
 					case 0:
-						if (ne) {
+						if (ne)
+						{
 							auto nn = ne->getNote();
-							if (midi && nn >= noteA && nn <= noteB) {
+							
+							if (midi && nn >= noteA && nn <= noteB)
+							{
 								removalIndices.push_back(k);
 							}
-							if (!midi && (noteA <= 34 || noteA == nn)) {
+							
+							if (!midi && (noteA <= 34 || noteA == nn))
+							{
 								removalIndices.push_back(k);
 							}
 						}
-						else {
+						else
+						{
 							removalIndices.push_back(k);
 						}
 						break;
 					case 1:
 						excludeClass = eventClassNames[type];
+
 						if (string(typeid(e).name()).compare(excludeClass) != 0)
 						{
 							if (ne)
@@ -270,8 +279,8 @@ void EraseScreen::displayNotes()
 	else
 	{
 		findField("notes0").lock()->setSize(8 * 6, 8);
-		findField("notes0").lock()->setText((StrUtil::padLeft(to_string(midiNote0), " ", 3) + "(" + mpc::ui::Uis::noteNames[midiNote0]) + ")");
-		findField("notes1").lock()->setText((StrUtil::padLeft(to_string(midiNote1), " ", 3) + "(" + mpc::ui::Uis::noteNames[midiNote1]) + ")");
+		findField("notes0").lock()->setText((StrUtil::padLeft(to_string(midiNote0), " ", 3) + "(" + mpc::Util::noteNames()[midiNote0]) + ")");
+		findField("notes1").lock()->setText((StrUtil::padLeft(to_string(midiNote1), " ", 3) + "(" + mpc::Util::noteNames()[midiNote1]) + ")");
 	}
 }
 

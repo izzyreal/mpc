@@ -14,8 +14,6 @@
 #include <file/all/AllSong.hpp>
 #include <file/all/Tracks.hpp>
 
-#include <ui/UserDefaults.hpp>
-
 #include <sequencer/Event.hpp>
 #include <sequencer/Sequence.hpp>
 #include <sequencer/Track.hpp>
@@ -34,6 +32,7 @@
 #include <lcdgui/screens/SongScreen.hpp>
 #include <lcdgui/screens/OthersScreen.hpp>
 #include <lcdgui/screens/SyncScreen.hpp>
+#include <lcdgui/screens/UserScreen.hpp>
 
 #include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
 
@@ -69,33 +68,38 @@ AllLoader::AllLoader(mpc::disk::MpcFile* file, bool sequencesOnly)
 		allSequences = temp;
 		convertSequences(true);
 	}
-	else {
+	else
+	{
 		auto lSequencer = Mpc::instance().getSequencer().lock();
 		allSequences = allParser.getAllSequences();
 		auto defaults = allParser.getDefaults();
 		
-		auto& ud = mpc::ui::UserDefaults::instance();
+		auto userScreen = dynamic_pointer_cast<UserScreen>(Screens::getScreenComponent("user"));
+
+		userScreen->setLastBar(defaults->getBarCount() - 1);
+		userScreen->setBus(defaults->getBusses()[0]);
 		
-		ud.setLastBar(defaults->getBarCount() - 1);
-		ud.setBus(defaults->getBusses()[0]);
-		
-		for (int i = 0; i < 33; i++) {
-			ud.setDeviceName(i, defaults->getDefaultDevNames()[i]);
+		for (int i = 0; i < 33; i++)
+		{
+			userScreen->setDeviceName(i, defaults->getDefaultDevNames()[i]);
 		}
 
-		ud.setSequenceName(defaults->getDefaultSeqName());
+		userScreen->setSequenceName(defaults->getDefaultSeqName());
 		auto defTrackNames = defaults->getDefaultTrackNames();
 		
-		for (int i = 0; i < 64; i++) {
-			ud.setTrackName(i, defTrackNames[i]);
+		for (int i = 0; i < 64; i++)
+		{
+			userScreen->setTrackName(i, defTrackNames[i]);
 		}
 
-		ud.setDeviceNumber(defaults->getDevices()[0]);
-		ud.setTimeSig(defaults->getTimeSigNum(), defaults->getTimeSigDen());
-		ud.setPgm(defaults->getPgms()[0]);
-		ud.setTempo(BCMath(defaults->getTempo() / 10.0));
-		ud.setVelo(defaults->getTrVelos()[0]);
+		userScreen->setDeviceNumber(defaults->getDevices()[0]);
+		userScreen->setTimeSig(defaults->getTimeSigNum(), defaults->getTimeSigDen());
+		userScreen->setPgm(defaults->getPgms()[0]);
+		userScreen->setTempo(BCMath(defaults->getTempo() * 0.1));
+		userScreen->setVelo(defaults->getTrVelos()[0]);
+
 		convertSequences(false);
+		
 		auto allSeqNames = allParser.getSeqNames()->getNames();
 		auto sequencer = allParser.getSequencer();
 		lSequencer->setActiveSequenceIndex(sequencer->sequence);

@@ -14,8 +14,6 @@
 #include <file/aps/ApsProgram.hpp>
 #include <file/aps/ApsSlider.hpp>
 
-#include <ui/Uis.hpp>
-
 #include <sampler/NoteParameters.hpp>
 #include <sampler/Pad.hpp>
 #include <sampler/Program.hpp>
@@ -192,8 +190,6 @@ void ApsLoader::load()
 	auto drumScreen = dynamic_pointer_cast<DrumScreen>(Screens::getScreenComponent("drum"));
 
 	drumScreen->setPadToIntSound(apsParser.getGlobalParameters()->isPadToIntSoundEnabled());
-
-	auto uis = Mpc::instance().getUis().lock();
 	
 	sampler->setSoundIndex(0);
 	

@@ -27,14 +27,11 @@
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/SampleScreen.hpp>
 
-#include <ui/Uis.hpp>
-
 #include <file/FileUtil.hpp>
 
 #include <cmath>
 #include <set>
 
-using namespace mpc::ui;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 
