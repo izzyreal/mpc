@@ -31,6 +31,8 @@
 
 #include <lang/StrUtil.hpp>
 
+#include <stdexcept>
+
 using namespace mpc::disk;
 using namespace mpc::file::aps;
 using namespace moduru::lang;

@@ -15,6 +15,8 @@
 
 #include <file/File.hpp>
 
+#include <stdexcept>
+
 #ifdef __linux__
 #include <climits>
 #endif // __linux__
