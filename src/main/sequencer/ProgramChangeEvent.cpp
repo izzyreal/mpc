@@ -12,7 +12,7 @@ void ProgramChangeEvent::setProgram(int i)
 	if (i < 1 || i > 128) return;
 	programChangeValue = i;
 	setChanged();
-	notifyObservers(string("stepeditor"));
+	notifyObservers(string("step-editor"));
 }
 
 int ProgramChangeEvent::getProgram()

@@ -466,7 +466,7 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	{
 		screen = make_shared<TrMuteScreen>(layerIndex);
 	}
-	else if (screenName.compare("step") == 0)
+	else if (screenName.compare("step-editor") == 0)
 	{
 		screen = make_shared<StepEditorScreen>(layerIndex);
 	}

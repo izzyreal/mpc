@@ -24,7 +24,7 @@ using namespace moduru::lang;
 using namespace std;
 
 StepEditorScreen::StepEditorScreen(const int layerIndex)
-	: ScreenComponent("stepeditor", layerIndex)
+	: ScreenComponent("step-editor", layerIndex)
 {
 	int x, y, w, h;
 	MRECT rect;
@@ -136,7 +136,7 @@ void StepEditorScreen::function(int i)
 		if (selectionStartIndex != -1)
 		{
 			removeEvents();
-			ls.lock()->openScreen("step");
+			ls.lock()->openScreen("step-editor");
 			ls.lock()->setFocus("a0");
 		}
 		else if (param.length() == 2)
@@ -153,7 +153,7 @@ void StepEditorScreen::function(int i)
 						break;
 					}
 				}
-				ls.lock()->openScreen("step");
+				ls.lock()->openScreen("step-editor");
 			}
 		}
 		break;
@@ -1238,7 +1238,7 @@ void StepEditorScreen::update(moduru::observer::Observable*, nonstd::any message
 {
 	auto msg = nonstd::any_cast<string>(message);
 
-	if (msg.compare("stepeditor") == 0)
+	if (msg.compare("step-editor") == 0)
 	{
 		if (Mpc::instance().getControls().lock()->getPressedPads()->size() != 0)
 		{

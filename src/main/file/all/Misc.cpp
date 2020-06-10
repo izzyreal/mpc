@@ -24,7 +24,7 @@ Misc::Misc(vector<char> b)
 
 Misc::Misc()
 {
-	auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(Screens::getScreenComponent("step"));
+	auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(Screens::getScreenComponent("step-editor"));
 	auto othersScreen = dynamic_pointer_cast<OthersScreen>(Screens::getScreenComponent("others"));
 	saveBytes = vector<char>(LENGTH);
 	saveBytes[TAP_AVG_OFFSET] = (char)(othersScreen->getTapAveraging());

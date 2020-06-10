@@ -44,7 +44,7 @@ void GlobalReleaseControls::function(int i) {
 	switch (i) {
 	case 0:
 		if (currentScreenName.compare("step-timing-correct") == 0) {
-			ls.lock()->openScreen("step");
+			ls.lock()->openScreen("step-editor");
 		}
 		break;
 	case 2:
@@ -107,7 +107,7 @@ void GlobalReleaseControls::simplePad(int i)
 	bool posIsLastTick = sequencer.lock()->getTickPosition() == sequencer.lock()->getActiveSequence().lock()->getLastTick();
 
 	bool maybeRecWithoutPlaying = currentScreenName.compare("sequencer") == 0 && !posIsLastTick;
-	bool stepRec = currentScreenName.compare("step") == 0 && !posIsLastTick;
+	bool stepRec = currentScreenName.compare("step-editor") == 0 && !posIsLastTick;
 	
 	if (stepRec || maybeRecWithoutPlaying)
 	{
@@ -196,10 +196,10 @@ void GlobalReleaseControls::shift()
 	controls->setShiftPressed(false);
 	init();
 
-	if (currentScreenName.compare("step") == 0 && param.length() == 2)
+	if (currentScreenName.compare("step-editor") == 0 && param.length() == 2)
 	{
 		auto eventNumber = stoi(param.substr(1, 2));
-		auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(Screens::getScreenComponent("step"));
+		auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(Screens::getScreenComponent("step-editor"));
 		auto res = eventNumber + stepEditorScreen->getYOffset();
 		stepEditorScreen->setSelectionEndIndex(res);
 	}

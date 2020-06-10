@@ -273,7 +273,7 @@ void BaseControls::generateNoteOn(int nn, int padVelo, int tick)
 	auto lProgram = program.lock();
 	bool slider = lProgram && nn == lProgram->getSlider()->getNote();
 	bool posIsLastTick = sequencer.lock()->getTickPosition() == sequencer.lock()->getActiveSequence().lock()->getLastTick();
-	bool step = currentScreenName.compare("step") == 0 && !posIsLastTick;
+	bool step = currentScreenName.compare("step-editor") == 0 && !posIsLastTick;
 	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timing-correct"));
 	auto noteValue = timingCorrectScreen->getNoteValue();
 	auto swing = timingCorrectScreen->getSwing();

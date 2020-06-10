@@ -13,7 +13,7 @@ void PitchBendEvent::setAmount(int i)
 
     pitchBendAmount = i;
     setChanged();
-    notifyObservers(string("stepeditor"));
+    notifyObservers(string("step-editor"));
 }
 
 int PitchBendEvent::getAmount()

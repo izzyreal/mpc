@@ -377,17 +377,17 @@ void SequencerScreen::pressEnter()
 		if (focus.compare("now0") == 0)
 		{
 			sequencer.lock()->setBar(candidate - 1);
-			setLastFocus("step", "viewmodenumber");
+			setLastFocus("step-editor", "viewmodenumber");
 		}
 		else if (focus.compare("now1") == 0)
 		{
 			sequencer.lock()->setBeat(candidate - 1);
-			setLastFocus("step", "viewmodenumber");
+			setLastFocus("step-editor", "viewmodenumber");
 		}
 		else if (focus.compare("now2") == 0)
 		{
 			sequencer.lock()->setClock(candidate);
-			setLastFocus("step", "viewmodenumber");
+			setLastFocus("step-editor", "viewmodenumber");
 		}
 		else if (focus.compare("tempo") == 0)
 		{
@@ -409,7 +409,7 @@ void SequencerScreen::function(int i)
 
 	switch (i) {
 	case 0:
-		openScreen("step");
+		openScreen("step-editor");
 		break;
 	case 1:
 		editSequenceScreen->setTime1(sequence.lock()->getLastTick());
@@ -437,7 +437,7 @@ void SequencerScreen::turnWheel(int i)
 	auto focus = findFocus().lock()->getName();
 
 	if (focus.size() >= 3 && focus.substr(0, 3).compare("now") == 0) {
-		setLastFocus("step", "viewmodenumber");
+		setLastFocus("step-editor", "viewmodenumber");
 	}
 
 	if (focus.compare("now0") == 0) {
@@ -467,13 +467,13 @@ void SequencerScreen::turnWheel(int i)
 	{
 		track.lock()->setBusNumber(track.lock()->getBusNumber() + i);
 		
-		auto lastFocus = getLastFocus("step");
+		auto lastFocus = getLastFocus("step-editor");
 
 		if (lastFocus.length() == 2)
 		{
 			auto eventNumber = stoi(lastFocus.substr(1, 2));
 
-			auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(Screens::getScreenComponent("step"));
+			auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(Screens::getScreenComponent("step-editor"));
 
 			if (dynamic_pointer_cast<mpc::sequencer::NoteEvent>(stepEditorScreen->getVisibleEvents()[eventNumber].lock()))
 			{
@@ -481,7 +481,7 @@ void SequencerScreen::turnWheel(int i)
 				{
 					if (lastFocus[0] == 'd' || lastFocus[0] == 'e')
 					{
-						setLastFocus("step", "a" + to_string(eventNumber));
+						setLastFocus("step-editor", "a" + to_string(eventNumber));
 					}
 				}
 			}

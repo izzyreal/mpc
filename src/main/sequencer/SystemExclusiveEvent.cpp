@@ -14,7 +14,7 @@ void SystemExclusiveEvent::setByteA(int i)
 
     bytes[0] = i;
     setChanged();
-    notifyObservers(string("stepeditor"));
+    notifyObservers(string("step-editor"));
 }
 
 int SystemExclusiveEvent::getByteA()
@@ -28,7 +28,7 @@ void SystemExclusiveEvent::setByteB(int i)
 
 	bytes[1] = i;
     setChanged();
-    notifyObservers(string("stepeditor"));
+    notifyObservers(string("step-editor"));
 }
 
 int SystemExclusiveEvent::getByteB()

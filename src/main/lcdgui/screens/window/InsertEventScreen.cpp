@@ -40,7 +40,7 @@ void InsertEventScreen::function(int i)
 	case 4:
 	{
 		insertEvent();
-		ls.lock()->openScreen("step");
+		ls.lock()->openScreen("step-editor");
 		break;
 	}
 	}

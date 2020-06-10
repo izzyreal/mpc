@@ -10,7 +10,7 @@ Parameter::Parameter(string labelStr, string name, int x, int y, int fieldWidth)
 	: Component(name)
 {
 
-	addChild(make_shared<Label>(name, labelStr, x, y, labelStr.size() * 6));
+	addChild(make_shared<Label>(name, labelStr, x, y - 1, labelStr.size() * 6));
 
 	const char* p = labelStr.c_str();
 	

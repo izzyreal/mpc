@@ -116,7 +116,7 @@ void FunctionKeys::Draw(std::vector<std::vector<bool>>* pixels) {
 			}
 		}
 
-		lcdgui::Label labelComponent("fk" + to_string(i), texts[activeArrangement][i], xPos[i] + offsetx, 52, stringSize);
+		lcdgui::Label labelComponent("fk" + to_string(i), texts[activeArrangement][i], xPos[i] + offsetx, 51, stringSize);
 		labelComponent.setInverted(!label);
 		labelComponent.setOpaque(false);
 		labelComponent.Draw(pixels);

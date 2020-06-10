@@ -338,7 +338,7 @@ void SongScreen::update(moduru::observer::Observable* observable, nonstd::any me
 	else if (msg.compare("tempo") == 0) {
 		displayTempo();
 	}
-	else if (msg.compare("step") == 0) {
+	else if (msg.compare("step-editor") == 0) {
 		displaySteps();
 	}
 	else if (msg.compare("play") == 0) {
