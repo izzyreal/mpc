@@ -1,6 +1,7 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 #include <lcdgui/EventRow.hpp>
+#include <lcdgui/SelectedEventBar.hpp>
 
 #include <sequencer/Event.hpp>
 #include <sequencer/EmptyEvent.hpp>
@@ -38,6 +39,7 @@ namespace mpc::lcdgui::screens
 		void update(moduru::observer::Observable*, nonstd::any message);
 
 	private:
+		std::vector<std::weak_ptr<mpc::lcdgui::SelectedEventBar>> findSelectedEventBars();
 		void refreshSelection();
 		void initVisibleEvents();
 
@@ -55,6 +57,7 @@ namespace mpc::lcdgui::screens
 		std::vector<std::weak_ptr<mpc::sequencer::Event>> placeHolder;
 		std::weak_ptr<mpc::sequencer::Event> selectedEvent;
 		std::vector<std::weak_ptr<mpc::sequencer::Event>> selectedEvents;
+		
 		int viewModeNumber = 0;
 		int noteA = 0;
 		int noteB = 0;

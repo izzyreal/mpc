@@ -1,6 +1,11 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
+namespace mpc::lcdgui
+{
+	class Effect;
+}
+
 namespace mpc::lcdgui::screens
 {
 	class FxEditScreen
@@ -17,6 +22,7 @@ namespace mpc::lcdgui::screens
 
 	private:
 		void checkEffects();
+		std::vector<std::weak_ptr<Effect>> findEffects();
 
 	public:
 		FxEditScreen(const int layerIndex);

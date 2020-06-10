@@ -27,6 +27,15 @@ DirectoryScreen::DirectoryScreen(const int layerIndex)
 {
 }
 
+void DirectoryScreen::open()
+{
+	displayLeftFields();
+	displayRightFields();
+	drawGraphicsLeft();
+	drawGraphicsRight();
+	refreshFocus();
+}
+
 void DirectoryScreen::function(int f)
 {
 	BaseControls::function(f);
@@ -435,16 +444,20 @@ mpc::disk::MpcFile* DirectoryScreen::getFileFromGrid(int x, int y)
 void DirectoryScreen::displayLeftFields()
 {
 	auto disk = mpc.getDisk().lock();
-	int size = disk->getParentFileNames().size();
+
+	auto names = disk->getParentFileNames();
+
+	int size = names.size();
 
 	for (int i = 0; i < 5; i++)
 	{
 		if (i + yOffset0 > size - 1)
 		{
-			findField("a" + i).lock()->setText("");
+			findField("a" + to_string(i)).lock()->setText("");
 		}
-		else {
-			findField("a" + i).lock()->setText(disk->getParentFileNames()[i + yOffset0]);
+		else
+		{
+			findField("a" + to_string(i)).lock()->setText(names[i + yOffset0]);
 		}
 	}
 
@@ -463,7 +476,7 @@ void DirectoryScreen::displayRightFields()
 	{
 		if (i + yOffset1 > size - 1)
 		{
-			findField("b" + i).lock()->setText("");
+			findField("b" + to_string(i)).lock()->setText("");
 		}
 		else
 		{
@@ -476,7 +489,7 @@ void DirectoryScreen::displayRightFields()
 				ext = "." + ext;
 			}
 
-			findField("b" + i).lock()->setText(name + ext);
+			findField("b" + to_string(i)).lock()->setText(name + ext);
 		}
 	}
 }
@@ -490,7 +503,7 @@ void DirectoryScreen::refreshFocus()
 	else if (xPos == 1)
 	{
 		auto loadScreen = dynamic_pointer_cast<LoadScreen>(Screens::getScreenComponent("load"));
-		ls.lock()->setFocus("b" + (loadScreen->fileLoad - yOffset1));
+		ls.lock()->setFocus("b" + to_string(loadScreen->fileLoad - yOffset1));
 	}
 }
 

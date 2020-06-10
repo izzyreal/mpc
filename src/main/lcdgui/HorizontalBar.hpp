@@ -18,7 +18,7 @@ namespace mpc {
 			void Draw(std::vector<std::vector<bool>>* pixels) override;
 
 		public:
-			HorizontalBar(MRECT rect, int value);
+			HorizontalBar(MRECT rect, int value = 0);
 			~HorizontalBar();
 
 		};

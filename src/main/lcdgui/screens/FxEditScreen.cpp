@@ -10,6 +10,20 @@ using namespace std;
 FxEditScreen::FxEditScreen(const int layerIndex) 
 	: ScreenComponent("fx-edit", layerIndex)
 {
+	int effectWidth = 30;
+	int effectHeight = 14;
+	int effectDistance = 5;
+	int effectOffset = 42;
+	//int effectY = 36; // when effect is off
+	int effectY = 23; // when effect is on
+
+	for (int i = 0; i < 6; i++)
+	{
+		int x = (i * (effectWidth + effectDistance)) + effectOffset;
+		MRECT r(x, effectY, x + effectWidth - 1, effectY + effectHeight - 1);
+		addChild(make_shared<Effect>(r));
+	}
+
 }
 
 void FxEditScreen::open()
@@ -25,7 +39,8 @@ void FxEditScreen::function(int f) {
 	}
 }
 
-void FxEditScreen::turnWheel(int i) {
+void FxEditScreen::turnWheel(int i)
+{
 	init();
 	if (param.compare("drum") == 0)
 	{
@@ -40,20 +55,40 @@ void FxEditScreen::left()
 	checkEffects();
 }
 
-void FxEditScreen::right() {
+void FxEditScreen::right()
+{
 	BaseControls::right();
 	checkEffects();
 }
 
-void FxEditScreen::up() {
+void FxEditScreen::up()
+{
 	BaseControls::up();
 	checkEffects();
 }
 
-void FxEditScreen::down() {
+void FxEditScreen::down()
+{
 	BaseControls::down();
 	checkEffects();
 }
+
+vector<weak_ptr<Effect>> FxEditScreen::findEffects()
+{
+	vector<weak_ptr<Effect>> result;
+
+	for (auto& c : children)
+	{
+		auto candidate = dynamic_pointer_cast<Effect>(c);
+		if (candidate)
+		{
+			result.push_back(candidate);
+		}
+	}
+
+	return result;
+}
+
 
 void FxEditScreen::checkEffects() {
 	string prevParam = param;
@@ -63,8 +98,10 @@ void FxEditScreen::checkEffects() {
 	if (prevParam.compare(param) != 0)
 	{
 		vector<string> effects{ "dist", "filt", "mod", "echo", "rev", "mix" };
-		for (int i = 0; i < 6; i++) {
-			auto effect = ls.lock()->getEffects()[i].lock();
+		for (int i = 0; i < 6; i++)
+		{
+			auto effect = findEffects()[i].lock();
+		
 			if (effects[i].compare(param) == 0)
 			{
 				effect->setFilled(true);

@@ -42,6 +42,8 @@ namespace mpc::lcdgui::screens::window
 
 		DirectoryScreen(const int layerIndex);
 
+		void open() override;
+
 	private:
 		int xPos = 0;
 		int yPos0 = 0;

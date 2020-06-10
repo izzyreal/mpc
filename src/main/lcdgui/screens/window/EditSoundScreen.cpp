@@ -49,8 +49,6 @@ void EditSoundScreen::open()
 void EditSoundScreen::displayEdit()
 {
     findField("edit").lock()->setText(editNames[edit]);
-	auto editLabel = Mpc::instance().getLayeredScreen().lock()->lookupLabel("edit").lock();
-	editLabel->SetDirty();
     
     if (edit == 0)
     {

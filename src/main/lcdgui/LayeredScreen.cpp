@@ -15,15 +15,7 @@
 
 #include <lcdgui/Layer.hpp>
 #include <lcdgui/ScreenComponent.hpp>
-#include <lcdgui/EnvGraph.hpp>
-#include <lcdgui/Label.hpp>
-#include <lcdgui/Underline.hpp>
-#include <lcdgui/HorizontalBar.hpp>
-#include <lcdgui/TwoDots.hpp>
-#include <lcdgui/Wave.hpp>
 #include <lcdgui/Popup.hpp>
-#include <lcdgui/SelectedEventBar.hpp>
-#include <lcdgui/Effect.hpp>
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/SampleScreen.hpp>
 
@@ -52,68 +44,6 @@ LayeredScreen::LayeredScreen()
 	popup = make_unique<Popup>();
 	popup->Hide(true);
 
-	horizontalBarsTempoChangeEditor = vector<shared_ptr<HorizontalBar>>(4);
-	horizontalBarsStepEditor = vector<shared_ptr<HorizontalBar>>(4);
-	selectedEventBarsStepEditor = vector<shared_ptr<SelectedEventBar>>(4);
-
-	underline = make_shared<Underline>();
-	envGraph = make_shared<EnvGraph>();
-
-	int x, y, w, h;
-	MRECT rect;
-	for (int i = 0; i < 4; i++) {
-		w = 193;
-		h = 9;
-		x = 0;
-		y = 11 + (i * 9);
-		rect = MRECT(x, y, x + w, y + h);
-		selectedEventBarsStepEditor[i] = make_shared<SelectedEventBar>(rect);
-		selectedEventBarsStepEditor[i]->Hide(true);
-		nonTextComps.push_back(selectedEventBarsStepEditor[i]);
-
-		w = 33;
-		h = 5;
-		x = 191;
-		y = 13 + (i * 9);
-		rect = MRECT(x, y, x + w, y + h);
-		horizontalBarsTempoChangeEditor[i] = make_shared<HorizontalBar>(rect, 0);
-		horizontalBarsTempoChangeEditor[i]->Hide(true);
-
-		w = 50;
-		x = 198;
-		rect = MRECT(x, y, x + w, y + h);
-		horizontalBarsStepEditor[i] = make_shared<HorizontalBar>(rect, 0);
-		horizontalBarsStepEditor[i]->Hide(true);
-		nonTextComps.push_back(horizontalBarsStepEditor[i]);
-	}
-
-	fineWave = make_shared <Wave>();
-	fineWave->setFine(true);
-	//fineWave->Hide(true);
-
-	wave = make_shared<Wave>();
-	wave->Hide(true);
-	wave->setFine(false);
-	nonTextComps.push_back(wave);
-
-	twoDots = make_shared<TwoDots>();
-	//twoDots->Hide(true);
-
-	int effectWidth = 30;
-	int effectHeight = 14;
-	int effectDistance = 5;
-	int effectOffset = 42;
-	//int effectY = 36; // when effect is off
-	int effectY = 23; // when effect is on
-	for (int i = 0; i < 6; i++) {
-		int x = (i * (effectWidth + effectDistance)) + effectOffset;
-		MRECT r(x, effectY, x + effectWidth - 1, effectY + effectHeight - 1);
-		auto effect = make_shared<Effect>(r);
-		effect->Hide(true);
-		nonTextComps.push_back(effect);
-		effects.push_back(move(effect));
-	}
-
 	shared_ptr<Layer> previousLayer;
 
 	for (int i = 0; i < LAYER_COUNT; i++)
@@ -137,37 +67,35 @@ weak_ptr<ScreenComponent> LayeredScreen::findScreenComponent()
 	return getFocusedLayer().lock()->findScreenComponent();
 }
 
-weak_ptr<EnvGraph> LayeredScreen::getEnvGraph() {
-	return envGraph;
-}
-
-vector<weak_ptr<Effect>> LayeredScreen::getEffects() {
-	vector<weak_ptr<Effect>> res;
-	for (auto& e : effects)
-		res.push_back(e);
-	return res;
-}
-
-int LayeredScreen::getCurrentFieldIndex() {
+int LayeredScreen::getCurrentFieldIndex()
+{
 	int currentIndex;
 	auto layer = layers[focusedLayerIndex].lock();
 	auto fields = layer->findFields();
 	int size = fields.size();
 	
-	for (currentIndex = 0; currentIndex <= size; currentIndex++) {
-		if (currentIndex == size) break;
-		if (fields[currentIndex].lock()->getName().compare(layer->getFocus()) == 0) {
+	for (currentIndex = 0; currentIndex <= size; currentIndex++)
+	{
+		if (currentIndex == size)
+		{
+			break;
+		}
+
+		if (fields[currentIndex].lock()->getName().compare(layer->getFocus()) == 0)
+		{
 			break;
 		}
 	}
 	
-	if (currentIndex == size) {
+	if (currentIndex == size)
+	{
 		return -1;
 	}
 	return currentIndex;
 }
 
-void LayeredScreen::transferFocus(bool backwards) {
+void LayeredScreen::transferFocus(bool backwards)
+{
 	int currentIndex, candidateIndex;
 	auto layer = layers[focusedLayerIndex].lock();
 	auto fields = layer->findFields();
@@ -196,12 +124,15 @@ void LayeredScreen::transferFocus(bool backwards) {
 	{
 		candidateIndex = backwards ? currentIndex-- - 1 : currentIndex++ + 1;
 		
-		if (candidateIndex >= 0 && candidateIndex < size) {
-			if (!fields[candidateIndex].lock()->IsHidden()) {
+		if (candidateIndex >= 0 && candidateIndex < size)
+		{
+			if (!fields[candidateIndex].lock()->IsHidden())
+			{
 				success = true;
 			}
 		}
-		else {
+		else
+		{
 			break;
 		}
 	}
@@ -436,55 +367,6 @@ string LayeredScreen::getPreviousViewModeText()
 	return previousViewModeText;
 }
 
-vector<weak_ptr<HorizontalBar>> LayeredScreen::getHorizontalBarsTempoChangeEditor()
-{
-	auto res = vector<weak_ptr<HorizontalBar>>();
-	for (auto& b : horizontalBarsTempoChangeEditor)
-		res.push_back(b);
-	return res;
-}
-
-vector<weak_ptr<HorizontalBar>> LayeredScreen::getHorizontalBarsStepEditor()
-{
-	auto res = vector<weak_ptr<HorizontalBar>>();
-	for (auto& b : horizontalBarsStepEditor)
-		res.push_back(b);
-	return res;
-}
-
-vector<weak_ptr<SelectedEventBar>> LayeredScreen::getSelectedEventBarsStepEditor()
-{
-	auto res = vector<weak_ptr<SelectedEventBar>>();
-	for (auto& b : selectedEventBarsStepEditor)
-		res.push_back(b);
-	return res;
-}
-
-FunctionKeys* LayeredScreen::getFunctionKeys()
-{
-	return getFocusedLayer().lock()->getFunctionKeys();
-}
-
-void LayeredScreen::setFunctionKeysArrangement(int arrangementIndex)
-{
-	getFunctionKeys()->setActiveArrangement(arrangementIndex);
-}
-
-weak_ptr<TwoDots> LayeredScreen::getTwoDots()
-{
-	return twoDots;
-}
-
-weak_ptr<Wave> LayeredScreen::getWave()
-{
-	return wave;
-}
-
-weak_ptr<Wave> LayeredScreen::getFineWave()
-{
-	return fineWave;
-}
-
 int LayeredScreen::getFocusedLayerIndex()
 {
 	return focusedLayerIndex;
@@ -494,7 +376,6 @@ std::weak_ptr<Layer> LayeredScreen::getFocusedLayer()
 {
 	return layers[focusedLayerIndex];
 }
-
 
 weak_ptr<Field> LayeredScreen::findBelow(weak_ptr<Field> tf0) {
 	int marginChars = 8;
@@ -618,29 +499,6 @@ string LayeredScreen::findAbove(string tf0) {
 	return result;
 }
 
-weak_ptr<Underline> LayeredScreen::getUnderline() {
-	return underline;
-}
-
-weak_ptr<Field> LayeredScreen::lookupField(string s)
-{
-	return root->findField(s);
-}
-
-weak_ptr<Label> LayeredScreen::lookupLabel(string s)
-{
-	return root->findLabel(s);
-}
-
-static inline bool checkActiveScreen(vector<string>* sa, string csn)
-{
-	for (auto s : *sa) {
-		if (csn.compare(s) == 0)
-			return true;
-	}
-	return false;
-}
-
 string LayeredScreen::getFocus()
 {
 	return getFocusedLayer().lock()->getFocus();
@@ -649,4 +507,14 @@ string LayeredScreen::getFocus()
 void LayeredScreen::setFocus(const string& focus)
 {
 	getFocusedLayer().lock()->setFocus(focus);
+}
+
+void LayeredScreen::setFunctionKeysArrangement(int arrangementIndex)
+{
+	getFunctionKeys()->setActiveArrangement(arrangementIndex);
+}
+
+FunctionKeys* LayeredScreen::getFunctionKeys()
+{
+	return getFocusedLayer().lock()->getFunctionKeys();
 }

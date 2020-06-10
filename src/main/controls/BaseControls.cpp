@@ -47,26 +47,29 @@ using namespace std;
 BaseControls::BaseControls()
 	: mpc(mpc::Mpc::instance())
 {
-	sequencer = mpc.getSequencer();
-	sampler = mpc.getSampler();
 	ls = mpc.getLayeredScreen();
+	sampler = mpc.getSampler();
+	sequencer = mpc.getSequencer();
 }
 
 vector<int> BaseControls::splitInc = vector<int>{ 10000000, 1000000, 100000, 10000, 1000, 100, 10, 1 };
 
 void BaseControls::init()
 {
+	sampler = mpc.getSampler();
+	sequencer = mpc.getSequencer();
+
 	currentScreenName = ls.lock()->getCurrentScreenName();
 	param = ls.lock()->getFocus();
-	activeField = ls.lock()->lookupField(param);
-    track = sequencer.lock()->getActiveSequence().lock()->getTrack(sequencer.lock()->getActiveTrackIndex());
-	
+	activeField = ls.lock()->getFocusedLayer().lock()->findField(param);
+	track = sequencer.lock()->getActiveSequence().lock()->getTrack(sequencer.lock()->getActiveTrackIndex());
+
 	if (track.lock()->getBusNumber() != 0)
 	{
-        mpcSoundPlayerChannel = sampler.lock()->getDrum(track.lock()->getBusNumber() - 1);
+		mpcSoundPlayerChannel = sampler.lock()->getDrum(track.lock()->getBusNumber() - 1);
 		program = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
-    }
-    }
+	}
+}
 
 void BaseControls::left()
 {
@@ -362,7 +365,8 @@ void BaseControls::generateNoteOn(int nn, int padVelo, int tick)
 		noteEvent->setVariationTypeNumber(type);
 	}
 
-	if (slider) {
+	if (slider)
+	{
 		setSliderNoteVar(noteEvent.get(), program);
 	}
 
@@ -377,21 +381,20 @@ void BaseControls::numpad(int i)
 	
 	if (!controls->isShiftPressed())
 	{
-		auto mtf = ls.lock()->lookupField(param);
+		auto mtf = ls.lock()->getFocusedLayer().lock()->findField(param).lock();
 
 		if (isTypable())
 		{
-			auto lMtf = mtf.lock();
-			if (!lMtf->isTypeModeEnabled())
+			if (!mtf->isTypeModeEnabled())
 			{
-				lMtf->enableTypeMode();
+				mtf->enableTypeMode();
 			}
 
-			lMtf->type(i);
+			mtf->type(i);
 		}
 	}
 
-	auto lDisk = mpc.getDisk().lock();
+	auto disk = mpc.getDisk().lock();
 
 	if (controls->isShiftPressed())
 	{
@@ -421,13 +424,13 @@ void BaseControls::numpad(int i)
 				break;
 			}
 
-			lDisk->initFiles();
+			disk->initFiles();
 
 			auto loadScreen = dynamic_pointer_cast<LoadScreen>(Screens::getScreenComponent("load"));
 
-			if (loadScreen->fileLoad + 1 > (int)(lDisk->getFiles().size()))
+			if (loadScreen->fileLoad + 1 > (int)(disk->getFiles().size()))
 			{
-				loadScreen->fileLoad = (int)(lDisk->getFiles().size() - 1); // Same here, can we avoid this?
+				loadScreen->fileLoad = (int)(disk->getFiles().size() - 1); // Same here, can we avoid this?
 			}
 
 			ls.lock()->openScreen("load");
@@ -920,7 +923,7 @@ void BaseControls::splitLeft()
 void BaseControls::splitRight()
 {
 	init();
-	auto mtf = ls.lock()->lookupField(param).lock();
+	auto mtf = ls.lock()->getFocusedLayer().lock()->findField(param).lock();
 	auto controls = Mpc::instance().getControls().lock();
 	
 	if (controls->isShiftPressed())

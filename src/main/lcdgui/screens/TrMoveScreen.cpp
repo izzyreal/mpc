@@ -141,7 +141,7 @@ void TrMoveScreen::function(int i)
 
 		if (isSelected())
 		{
-			auto sequence = sequencer.lock()->getSequence(sq).lock();
+			auto sequence = mpc.getSequencer().lock()->getSequence(sq).lock();
 			insert(sequence.get());
 			ls.lock()->setFocus("tr1");
 			ls.lock()->setFunctionKeysArrangement(1);
@@ -187,7 +187,7 @@ void TrMoveScreen::displayTrLabels()
 		}
 	}
 
-	auto sequence = sequencer.lock()->getSequence(sq).lock();
+	auto sequence = mpc.getSequencer().lock()->getSequence(sq).lock();
 
 	if (tr0Index >= 0)
 	{
@@ -223,7 +223,7 @@ void TrMoveScreen::displayTrLabels()
 
 void TrMoveScreen::displayTrFields()
 {
-	auto sequence = sequencer.lock()->getSequence(sq).lock();
+	auto sequence = mpc.getSequencer().lock()->getSequence(sq).lock();
 	
 	if (isSelected())
 	{
@@ -265,7 +265,7 @@ void TrMoveScreen::displayTrFields()
 void TrMoveScreen::displaySq()
 {
 	findLabel("sq").lock()->SetDirty();
-	findField("sq").lock()->setText(StrUtil::padLeft(to_string(sq + 1), "0", 2) + "-" + sequencer.lock()->getSequence(sq).lock()->getName());
+	findField("sq").lock()->setText(StrUtil::padLeft(to_string(sq + 1), "0", 2) + "-" + mpc.getSequencer().lock()->getSequence(sq).lock()->getName());
 }
 
 bool TrMoveScreen::isSelected()

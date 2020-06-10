@@ -3,7 +3,6 @@
 #include <audiomidi/EventHandler.hpp>
 
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
-#include <lcdgui/SelectedEventBar.hpp>
 
 #include <sequencer/ChannelPressureEvent.hpp>
 #include <sequencer/ControlChangeEvent.hpp>
@@ -27,6 +26,19 @@ using namespace std;
 StepEditorScreen::StepEditorScreen(const int layerIndex)
 	: ScreenComponent("stepeditor", layerIndex)
 {
+	int x, y, w, h;
+	MRECT rect;
+
+	for (int i = 0; i < 4; i++)
+	{
+		w = 193;
+		h = 9;
+		x = 0;
+		y = 11 + (i * 9);
+		rect = MRECT(x, y, x + w, y + h);
+		auto bar = addChild(make_shared<SelectedEventBar>(rect));
+		bar.lock()->Hide(true);
+	}
 }
 
 void StepEditorScreen::open()
@@ -534,23 +546,23 @@ void StepEditorScreen::down()
 
 	else if (param.find("now") != string::npos)
 	{
-		if (!ls.lock()->lookupLabel("e0").lock()->IsHidden())
+		if (!findLabel("e0").lock()->IsHidden())
 		{
 			ls.lock()->setFocus("e0");
 		}
-		else if (!ls.lock()->lookupLabel("d0").lock()->IsHidden())
+		else if (!findLabel("d0").lock()->IsHidden())
 		{
 			ls.lock()->setFocus("d0");
 		}
-		else if (!ls.lock()->lookupLabel("c0").lock()->IsHidden())
+		else if (!findLabel("c0").lock()->IsHidden())
 		{
 			ls.lock()->setFocus("c0");
 		}
-		else if (!ls.lock()->lookupLabel("b0").lock()->IsHidden())
+		else if (!findLabel("b0").lock()->IsHidden())
 		{
 			ls.lock()->setFocus("b0");
 		}
-		else if (!ls.lock()->lookupLabel("a0").lock()->IsHidden())
+		else if (!findLabel("a0").lock()->IsHidden())
 		{
 			ls.lock()->setFocus("a0");
 		}
@@ -880,8 +892,14 @@ void StepEditorScreen::setViewModeNotesText()
 	}
 	else if (viewModeNumber == 3)
 	{
-		if (controlNumber == -1) findField("controlnumber").lock()->setText("   -    ALL");
-		if (controlNumber != -1) findField("controlnumber").lock()->setText(EventRow::controlNames[controlNumber]);
+		if (controlNumber == -1)
+		{
+			findField("controlnumber").lock()->setText("   -    ALL");
+		}
+		else
+		{
+			findField("controlnumber").lock()->setText(EventRow::controlNames[controlNumber]);
+		}
 	}
 	findField("view").lock()->setText(viewNames[viewModeNumber]);
 	findField("view").lock()->setSize(findField("view").lock()->getText().length() * 6 + 1, 9);
@@ -1086,7 +1104,7 @@ void StepEditorScreen::checkSelection()
 		int firstSelectedVisibleEventIndex = -1;
 		auto selectedEventCounter = 0;
 	
-		for (auto& seb : ls->getSelectedEventBarsStepEditor())
+		for (auto& seb : findSelectedEventBars())
 		{
 			if (!seb.lock()->IsHidden())
 			{
@@ -1375,4 +1393,20 @@ bool StepEditorScreen::isDurationTcPercentageEnabled()
 int StepEditorScreen::getTcValueRecordedNotes()
 {
 	return tcValueRecordedNotes;
+}
+
+vector<weak_ptr<mpc::lcdgui::SelectedEventBar>> StepEditorScreen::findSelectedEventBars()
+{
+	vector<weak_ptr<SelectedEventBar>> result;
+
+	for (auto& c : children)
+	{
+		auto candidate = dynamic_pointer_cast<SelectedEventBar>(c);
+		if (candidate)
+		{
+			result.push_back(candidate);
+		}
+	}
+
+	return result;
 }

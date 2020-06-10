@@ -115,7 +115,7 @@ void NameScreen::turnWheel(int j)
 				{
 					changeNameCharacter(i, j > 0);
 					editing = true;
-					ls.lock()->getUnderline().lock()->Hide(false);
+					findUnderline().lock()->Hide(false);
 					initEditColors();
 					drawUnderline();
 					break;
@@ -414,7 +414,7 @@ void NameScreen::drawUnderline()
 			return;
 		}
 		
-		auto u = ls.lock()->getUnderline().lock();
+		auto u = findUnderline().lock();
 		
 		for (int i = 0; i < 16; i++)
 		{

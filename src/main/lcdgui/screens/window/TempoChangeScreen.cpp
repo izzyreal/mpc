@@ -13,13 +13,22 @@ using namespace mpc::lcdgui::screens::window;
 TempoChangeScreen::TempoChangeScreen(const int layerIndex)
 	: ScreenComponent("tempo-change", layerIndex)
 {
+	for (int i = 0; i < 4; i++)
+	{
+		int w = 33;
+		int h = 5;
+		int x = 191;
+		int y = 13 + (i * 9);
+		
+		auto rect = MRECT(x, y, x + w, y + h);
+		bars.push_back(dynamic_pointer_cast<HorizontalBar>(addChild(make_shared<HorizontalBar>(rect, 0)).lock()));
+	}
 }
 
 void TempoChangeScreen::open()
 {
-	bars = ls.lock()->getHorizontalBarsTempoChangeEditor();
-	
-	for (auto& bar :bars) {
+	for (auto& bar :bars)
+	{
 		bar.lock()->Hide(true);
 	}
 

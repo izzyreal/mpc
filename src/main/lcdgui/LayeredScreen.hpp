@@ -8,21 +8,11 @@
 
 #include <gui/BasicStructs.hpp>
 
-namespace moduru::observer {
-	class Observer;
-}
-
-namespace mpc::lcdgui {
+namespace mpc::lcdgui
+{
 	class FunctionKeys;
-	class SelectedEventBar;
 	class Background;
-	class EnvGraph;
-	class TwoDots;
-	class HorizontalBar;
-	class Underline;
 	class Popup;
-	class Wave;
-	class Effect;
 	class Field;
 	class Label;
 	class Layer;
@@ -60,36 +50,20 @@ namespace mpc::lcdgui {
 		int getFocusedLayerIndex();
 		std::weak_ptr<Layer> getFocusedLayer();
 		int openScreen(std::string name); // returns layer number
-		std::weak_ptr<Field> lookupField(std::string s);
-		std::weak_ptr<Label> lookupLabel(std::string s);
 		std::weak_ptr<ScreenComponent> findScreenComponent();
 
 	private:
 		std::vector<std::vector<std::string>> lastFocuses{};
-
 		int focusedLayerIndex{ 0 };
 		std::string currentScreenName = "";
 		std::string previousScreenName = "";
-
-	private:
-		std::vector<std::weak_ptr<mpc::lcdgui::Component>> nonTextComps;
-
-	private:
 		std::shared_ptr<Popup> popup;
-		std::shared_ptr<EnvGraph> envGraph;
-		std::shared_ptr<TwoDots> twoDots;
-		std::vector<std::shared_ptr<HorizontalBar>> horizontalBarsStepEditor;
-		std::vector<std::shared_ptr<SelectedEventBar>> selectedEventBarsStepEditor;
-		std::vector<std::shared_ptr<HorizontalBar>> horizontalBarsTempoChangeEditor;
-		std::shared_ptr<Underline> underline;
-		std::shared_ptr<Wave> fineWave;
-		std::shared_ptr<Wave> wave;
-		std::vector<std::shared_ptr<Effect>> effects;
-
-	private:
 		int previousLayer{ 0 };
 		std::string previousViewModeText = "";
 		std::string previousFromNoteText = "";
+
+	private:
+		FunctionKeys* getFunctionKeys();
 
 	public:
 		void createPopup(std::string text, int textXPos);
@@ -113,17 +87,7 @@ namespace mpc::lcdgui {
 		void setPreviousFromNoteText(std::string text);
 		void setPreviousViewModeText(std::string text);
 		std::string getPreviousViewModeText();
-		std::vector<std::weak_ptr<HorizontalBar>> getHorizontalBarsTempoChangeEditor();
-		std::vector<std::weak_ptr<HorizontalBar>>getHorizontalBarsStepEditor();
-		std::vector<std::weak_ptr<SelectedEventBar>> getSelectedEventBarsStepEditor();
-		FunctionKeys* getFunctionKeys();
 		void setFunctionKeysArrangement(int arrangementIndex);
-		std::weak_ptr<Underline> getUnderline();
-		std::weak_ptr<TwoDots> getTwoDots();
-		std::weak_ptr<Wave> getFineWave();
-		std::weak_ptr<Wave> getWave();
-		std::weak_ptr<EnvGraph> getEnvGraph();
-		std::vector<std::weak_ptr<Effect>> getEffects();
 
 	public:
 		std::vector<std::vector<bool>>* getPixels();

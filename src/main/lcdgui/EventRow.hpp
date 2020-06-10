@@ -32,10 +32,9 @@ namespace mpc::lcdgui
 
 namespace mpc::lcdgui
 {
-
 	class EventRow
+		: Component
 	{
-
 	private:
 		std::vector<std::weak_ptr<mpc::lcdgui::Component>> eventRow;
 		std::weak_ptr<mpc::sequencer::Event> event;
@@ -47,42 +46,42 @@ namespace mpc::lcdgui
 		ctoot::mpc::MpcSoundPlayerChannel* mpcSoundPlayerChannel = nullptr;
 		std::weak_ptr<mpc::sampler::Program> program;
 
-		std::vector<std::string> letters;
-		std::vector<std::string> noteVarParamNames;
-		std::vector<std::string> drumNoteEventLabels;
-		std::vector<int> drumNoteEventSizes;
-		std::vector<int> drumNoteEventXPos;
-		std::vector<std::string> midiNoteEventLabels;
-		std::vector<int> midiNoteEventSizes;
-		std::vector<int> midiNoteEventXPos;
-		std::vector<std::string> miscEventLabels;
-		std::vector<int> miscEventSizes;
-		std::vector<int> miscEventXPos;
-		std::vector<std::string> polyPressureEventLabels;
-		std::vector<int> polyPressureEventSizes;
-		std::vector<int> polyPressureEventXPos;
-		std::vector<std::string> sysexEventLabels;
-		std::vector<int> sysexEventSizes;
-		std::vector<int> sysexEventXPos;
-		std::vector<std::string> emptyEventLabels;
-		std::vector<int> emptyEventSizes;
-		std::vector<int> emptyEventXPos;
-		std::vector<std::string> channelPressureEventLabels;
-		std::vector<int> channelPressureEventSizes;
-		std::vector<int> channelPressureEventXPos;
+		const std::vector<std::string> letters{ "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m" };
+		const std::vector<std::string> noteVarParamNames{ "Tun", "Dcy", "Atk", "Flt" };
+		const std::vector<std::string> drumNoteEventLabels{ ">N: ", "", ":", "D:", "V:" };
+		const std::vector<int> drumNoteEventSizes{ 6, 3, 4, 4, 3 };
+		const std::vector<int> drumNoteEventXPos{ 0, 66, 85, 120, 162 };
+		const std::vector<std::string> midiNoteEventLabels{ ">Note:", "D:", "V:" };
+		const std::vector<int> midiNoteEventSizes{ 8, 4, 3 };
+		const std::vector<int> midiNoteEventXPos{ 0, 98, 144 };
+		const std::vector<std::string> miscEventLabels{ ">BEND          :", ":" };
+		const std::vector<int> miscEventSizes{ 5, 0 };
+		const std::vector<int> miscEventXPos{ 0, 168 };
+		const std::vector<std::string> polyPressureEventLabels{ ">POLY PRESSURE :", ":" };
+		const std::vector<int> polyPressureEventSizes{ 8, 3 };
+		const std::vector<int> polyPressureEventXPos{ 0, 168 };
+		const std::vector<std::string> sysexEventLabels{ ">Exclusive:", "" };
+		const std::vector<int> sysexEventSizes{ 2, 2 };
+		const std::vector<int> sysexEventXPos{ 0, 81 };
+		const std::vector<std::string> emptyEventLabels{ "" };
+		const std::vector<int> emptyEventSizes{ 1 };
+		const std::vector<int> emptyEventXPos{ 6 };
+		const std::vector<std::string> channelPressureEventLabels{ ">CH PRESSURE   :            :" };
+		const std::vector<int> channelPressureEventSizes{ 3 };
+		const std::vector<int> channelPressureEventXPos{ 0 };
+		std::vector<std::string> controlChangeEventLabels{ ">CONTROL CHANGE:", ":" };
+		std::vector<int> controlChangeEventSizes{ 12, 3 };
+		std::vector<int> controlChangeEventXPos{ 0, 168 };
+		std::vector<std::string> mixerParamNames{ "STEREO LEVEL", "STEREO PAN  ", "FXsend LEVEL", "INDIV LEVEL" };
+		std::vector<std::string> mixerEventLabels{ ">", "N:", "L:" };
+		std::vector<int> mixerEventSizes{ 12, 6, 3 };
+		std::vector<int> mixerEventXPos{ 0, 96, 162 };
+
 		bool selected;
-		std::vector<std::string> controlChangeEventLabels;
-		std::vector<int> controlChangeEventSizes;
-		std::vector<int> controlChangeEventXPos;
-		std::vector<std::string> mixerParamNames;
-		std::vector<std::string> mixerEventLabels;
-		std::vector<int> mixerEventSizes;
-		std::vector<int> mixerEventXPos;
 		bool midi;
-		int rowNumber;
+		int rowIndex;
 
 	public:
-		static std::vector<std::string> controlNames;
 		void setMidi(bool b);
 		void init();
 		void setEmptyEventValues();
@@ -109,6 +108,8 @@ namespace mpc::lcdgui
 
 	public:
 		EventRow(int bus, std::weak_ptr<mpc::sequencer::Event> e, int rowNumber);
+
+		static std::vector<std::string> controlNames;
 
 	};
 }
