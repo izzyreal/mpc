@@ -239,7 +239,13 @@ void Component::Hide(bool b)
 	{
 		hidden = b;
 		dirty = true;
-	} 
+	}
+
+	for (auto& c : children)
+	{
+		c->Hide(b);
+	}
+
 }
 
 void Component::setSize(int w, int h)

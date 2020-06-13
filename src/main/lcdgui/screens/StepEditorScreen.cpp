@@ -26,19 +26,6 @@ using namespace std;
 StepEditorScreen::StepEditorScreen(const int layerIndex)
 	: ScreenComponent("step-editor", layerIndex)
 {
-	int x, y, w, h;
-	MRECT rect;
-
-	for (int i = 0; i < 4; i++)
-	{
-		w = 193;
-		h = 9;
-		x = 0;
-		y = 11 + (i * 9);
-		rect = MRECT(x, y, x + w, y + h);
-		auto bar = addChild(make_shared<SelectedEventBar>(rect));
-		bar.lock()->Hide(true);
-	}
 }
 
 void StepEditorScreen::open()
@@ -65,30 +52,24 @@ void StepEditorScreen::open()
 	findField("now0").lock()->setTextPadded(sequencer.lock()->getCurrentBarNumber() + 1, "0");
 	findField("now1").lock()->setTextPadded(sequencer.lock()->getCurrentBeatNumber() + 1, "0");
 	findField("now2").lock()->setTextPadded(sequencer.lock()->getCurrentClockNumber(), "0");
+
 	initVisibleEvents();
-	
-	eventRows.clear();
 
 	for (int i = 0; i < 4; i++)
 	{
-		auto eventRow = make_unique<EventRow>(track.lock()->getBusNumber(), visibleEvents[i], i);
+		deleteChildren("event-row-" + to_string(i));
+		auto eventRow = dynamic_pointer_cast<EventRow>(addChild(make_shared<EventRow>(track.lock()->getBusNumber(), visibleEvents[i], i)).lock());
 		auto event = visibleEvents[i].lock();
-	
+
 		if (event)
 		{
 			event->addObserver(this);
 		}
-		
+
 		eventRow->setMidi(track.lock()->getBusNumber() == 0);
 		eventRow->init();
-
-		for (auto& ic : eventRow->getEventRow())
-		{
-			ic.lock()->Hide(true);
-		}
-		
-		eventRows.push_back(move(eventRow));
 	}
+	
 	refreshEventRows();
 	refreshSelection();
 }
@@ -269,7 +250,7 @@ void StepEditorScreen::function(int i)
 				{
 					auto tick = event->getTick();
 					event->setTick(-1);
-					Mpc::instance().getEventHandler().lock()->handle(event, track.lock().get());
+					mpc.getEventHandler().lock()->handle(event, track.lock().get());
 					event->setTick(tick);
 				}
 			}
@@ -474,7 +455,7 @@ void StepEditorScreen::prevStepEvent()
 {
 	init();
 	
-	auto controls = Mpc::instance().getControls().lock();
+	auto controls = mpc.getControls().lock();
 
 	if (controls->isGoToPressed())
 	{
@@ -489,7 +470,7 @@ void StepEditorScreen::nextStepEvent()
 {
 	init();
 	
-	auto controls = Mpc::instance().getControls().lock();
+	auto controls = mpc.getControls().lock();
 	
 	if (controls->isGoToPressed())
 	{
@@ -503,7 +484,7 @@ void StepEditorScreen::nextStepEvent()
 void StepEditorScreen::prevBarStart()
 {
 	init();
-	auto controls = Mpc::instance().getControls().lock();
+	auto controls = mpc.getControls().lock();
 	
 	if (controls->isGoToPressed())
 	{
@@ -518,7 +499,7 @@ void StepEditorScreen::nextBarEnd()
 {
 	init();
 	
-	auto controls = Mpc::instance().getControls().lock();
+	auto controls = mpc.getControls().lock();
 	
 	if (controls->isGoToPressed())
 	{
@@ -553,7 +534,7 @@ void StepEditorScreen::up()
 		auto srcLetter = src.substr(0, 1);
 		int srcNumber = stoi(src.substr(1, 2));
 		auto increment = 0;
-		auto controls = Mpc::instance().getControls().lock();
+		auto controls = mpc.getControls().lock();
 		
 		if (!controls->isShiftPressed() && srcNumber == 0 && yOffset == 0)
 		{
@@ -617,7 +598,7 @@ void StepEditorScreen::down()
 		auto srcLetter = src.substr(0, 1);
 		int srcNumber = stoi(src.substr(1, 2));
 		auto increment = 0;
-		auto controls = Mpc::instance().getControls().lock();
+		auto controls = mpc.getControls().lock();
 		
 		if (srcNumber == 3)
 		{
@@ -660,7 +641,7 @@ void StepEditorScreen::downOrUp(int increment)
 		auto src = param;
 		auto srcLetter = src.substr(0, 1);
 		int srcNumber = stoi(src.substr(1, 2));
-		auto controls = Mpc::instance().getControls().lock();
+		auto controls = mpc.getControls().lock();
 		auto destination = srcLetter + to_string(srcNumber + increment);
 		
 		if (srcNumber + increment != -1)
@@ -703,28 +684,31 @@ void StepEditorScreen::refreshSelection()
 		for (int i = 0; i < 4; i++)
 		{
 			int absoluteEventNumber = i + yOffset;
-		
+			auto eventRow = findEventRows()[i].lock();
+
 			if (absoluteEventNumber >= firstEventIndex && absoluteEventNumber < lastEventIndex + 1)
 			{
-				eventRows[i]->setSelected(true);
+				eventRow->setSelected(true);
 				somethingSelected = true;
 			}
 			else
 			{
-				eventRows[i]->setSelected(false);
+				eventRow->setSelected(false);
 			}
 		}
 	}
-	else {
+	else
+	{
 		for (int i = 0; i < 4; i++)
 		{
-			eventRows[i]->setSelected(false);
+			auto eventRow = findEventRows()[i].lock();
+			eventRow->setSelected(false);
 		}
 	}
 
 	if (somethingSelected)
 	{
-		Mpc::instance().getLayeredScreen().lock()->setFunctionKeysArrangement(1);
+		ls.lock()->setFunctionKeysArrangement(1);
 	}
 }
 
@@ -850,21 +834,21 @@ void StepEditorScreen::initVisibleEvents()
 
 void StepEditorScreen::refreshEventRows()
 {
+	return;
 	for (int i = 0; i < 4; i++)
 	{
-		eventRows[i]->setEvent(visibleEvents[i]);
+		auto eventRow = findEventRows()[i].lock();
+		eventRow->setEvent(visibleEvents[i]);
 		auto event = visibleEvents[i].lock();
-		eventRows[i]->init();
+		eventRow->init();
 	
 		if (!event)
 		{
-			for (auto& e : eventRows[i]->getEventRow())
-			{
-				e.lock()->Hide(true);
-			}
+			eventRow->Hide(true);
 		}
 		else
 		{
+			eventRow->Hide(false);
 			event->addObserver(this);
 		}
 	}
@@ -1138,8 +1122,7 @@ void StepEditorScreen::setSelectedEvents()
 
 void StepEditorScreen::checkSelection()
 {
-	auto ls = Mpc::instance().getLayeredScreen().lock();
-	string focus = ls->getFocus();
+	string focus = ls.lock()->getFocus();
 	
 	if (focus.length() == 2)
 	{
@@ -1284,7 +1267,7 @@ void StepEditorScreen::update(moduru::observer::Observable*, nonstd::any message
 
 	if (msg.compare("step-editor") == 0)
 	{
-		if (Mpc::instance().getControls().lock()->getPressedPads()->size() != 0)
+		if (mpc.getControls().lock()->getPressedPads()->size() != 0)
 		{
 			// a note is currently being recorded by the user pressing a pad
 			initVisibleEvents();
@@ -1304,45 +1287,47 @@ void StepEditorScreen::update(moduru::observer::Observable*, nonstd::any message
 			return;
 		}
 
+		auto eventRow = findEventRows()[eventNumber].lock();
+
 		if (dynamic_pointer_cast<NoteEvent>(visibleEvents[eventNumber].lock()))
 		{
 			if (track.lock()->getBusNumber() != 0)
 			{
-				eventRows[eventNumber]->setDrumNoteEventValues();
+				eventRow->setDrumNoteEventValues();
 			}
 			else
 			{
-				eventRows[eventNumber]->setMidiNoteEventValues();
+				eventRow->setMidiNoteEventValues();
 			}
 		}
 		else if (dynamic_pointer_cast<MixerEvent>(visibleEvents[eventNumber].lock()))
 		{
-			eventRows[eventNumber]->setMixerEventValues();
+			eventRow->setMixerEventValues();
 		}
 		else if (dynamic_pointer_cast<PitchBendEvent>(visibleEvents[eventNumber].lock())
 			|| dynamic_pointer_cast<ProgramChangeEvent>(visibleEvents[eventNumber].lock()))
 		{
-			eventRows[eventNumber]->setMiscEventValues();
+			eventRow->setMiscEventValues();
 		}
 		else if (dynamic_pointer_cast<ControlChangeEvent>(visibleEvents[eventNumber].lock()))
 		{
-			eventRows[eventNumber]->setControlChangeEventValues();
+			eventRow->setControlChangeEventValues();
 		}
 		else if (dynamic_pointer_cast<ChannelPressureEvent>(visibleEvents[eventNumber].lock()))
 		{
-			eventRows[eventNumber]->setChannelPressureEventValues();
+			eventRow->setChannelPressureEventValues();
 		}
 		else if (dynamic_pointer_cast<PolyPressureEvent>(visibleEvents[eventNumber].lock()))
 		{
-			eventRows[eventNumber]->setPolyPressureEventValues();
+			eventRow->setPolyPressureEventValues();
 		}
 		else if (dynamic_pointer_cast<SystemExclusiveEvent>(visibleEvents[eventNumber].lock()))
 		{
-			eventRows[eventNumber]->setSystemExclusiveEventValues();
+			eventRow->setSystemExclusiveEventValues();
 		}
 		else if (dynamic_pointer_cast<EmptyEvent>(visibleEvents[eventNumber].lock()))
 		{
-			eventRows[eventNumber]->setEmptyEventValues();
+			eventRow->setEmptyEventValues();
 		}
 	}
 	else if (msg.compare("bar") == 0)
@@ -1439,13 +1424,33 @@ int StepEditorScreen::getTcValueRecordedNotes()
 	return tcValueRecordedNotes;
 }
 
-vector<weak_ptr<mpc::lcdgui::SelectedEventBar>> StepEditorScreen::findSelectedEventBars()
+vector<weak_ptr<SelectedEventBar>> StepEditorScreen::findSelectedEventBars()
 {
 	vector<weak_ptr<SelectedEventBar>> result;
 
+	for (auto& eventRow : findEventRows())
+	{
+		auto child = eventRow.lock()->findChild("selected-event-bar").lock();
+		{
+			auto candidate = dynamic_pointer_cast<SelectedEventBar>(child);
+			
+			if (candidate)
+			{
+				result.push_back(candidate);
+			}
+		}
+	}
+
+	return result;
+}
+
+vector<weak_ptr<EventRow>> StepEditorScreen::findEventRows()
+{
+	vector<weak_ptr<EventRow>> result;
+
 	for (auto& c : children)
 	{
-		auto candidate = dynamic_pointer_cast<SelectedEventBar>(c);
+		auto candidate = dynamic_pointer_cast<EventRow>(c);
 		if (candidate)
 		{
 			result.push_back(candidate);

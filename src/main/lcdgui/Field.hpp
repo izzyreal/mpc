@@ -21,7 +21,7 @@ namespace mpc::lcdgui
 	{
 
 	private:
-		std::vector<Label*> letters{};
+		std::vector<Label*> letters;
 
 		bool focusable{ true };
 		bool focus{ false };

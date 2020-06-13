@@ -56,7 +56,7 @@ void FunctionKeys::Draw(std::vector<std::vector<bool>>* pixels) {
 		return;
 	}
 
-	Clear(pixels);
+	//Clear(pixels);
 
 	vector<int> xPos = vector<int>{ 2, 43, 84, 125, 166, 207 };
 

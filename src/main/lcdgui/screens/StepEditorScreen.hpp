@@ -40,6 +40,7 @@ namespace mpc::lcdgui::screens
 
 	private:
 		std::vector<std::weak_ptr<mpc::lcdgui::SelectedEventBar>> findSelectedEventBars();
+		std::vector<std::weak_ptr<mpc::lcdgui::EventRow>> findEventRows();
 		void refreshSelection();
 		void initVisibleEvents();
 
@@ -51,7 +52,6 @@ namespace mpc::lcdgui::screens
 	private:
 		std::vector<std::string> viewNames = { "ALL EVENTS", "NOTES", "PITCH BEND", "CTRL:", "PROG CHANGE", "CH PRESSURE", "POLY PRESS", "EXCLUSIVE" };
 		std::shared_ptr<mpc::sequencer::EmptyEvent> emptyEvent = std::make_shared<mpc::sequencer::EmptyEvent>();
-		std::vector<std::unique_ptr<EventRow>> eventRows;
 		std::vector<std::weak_ptr<mpc::sequencer::Event>> visibleEvents;
 		std::vector <std::weak_ptr<mpc::sequencer::Event>> eventsAtCurrentTick;
 		std::vector<std::weak_ptr<mpc::sequencer::Event>> placeHolder;

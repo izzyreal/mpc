@@ -124,7 +124,7 @@ void EditVelocityScreen::displayNotes()
 	
 	if (track.lock()->getBusNumber() == 0)
 	{
-		findField("notes0").lock()->setSize(8 * 6, 9);
+		findField("notes0").lock()->setSize(8 * 6 + 1, 9);
 		findLabel("notes1").lock()->Hide(false);
 		findField("notes1").lock()->Hide(false);
 		findField("notes0").lock()->setText(moduru::lang::StrUtil::padLeft(to_string(midiNote0), " ", 3) + "(" + mpc::Util::noteNames()[midiNote0] + u8"\u00D4");
@@ -132,7 +132,7 @@ void EditVelocityScreen::displayNotes()
 	}
 	else
 	{
-		findField("notes0").lock()->setSize(6 * 6 + 2, 9);
+		findField("notes0").lock()->setSize(6 * 6 + 1, 9);
 		
 		if (mpc.getNote() != 34)
 		{

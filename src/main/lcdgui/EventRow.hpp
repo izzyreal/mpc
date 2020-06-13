@@ -33,10 +33,9 @@ namespace mpc::lcdgui
 namespace mpc::lcdgui
 {
 	class EventRow
-		: Component
+		: public Component
 	{
 	private:
-		std::vector<std::weak_ptr<mpc::lcdgui::Component>> eventRow;
 		std::weak_ptr<mpc::sequencer::Event> event;
 		std::weak_ptr<mpc::lcdgui::HorizontalBar> horizontalBar;
 		std::weak_ptr<mpc::lcdgui::SelectedEventBar> selectedEventBar;
@@ -46,7 +45,7 @@ namespace mpc::lcdgui
 		ctoot::mpc::MpcSoundPlayerChannel* mpcSoundPlayerChannel = nullptr;
 		std::weak_ptr<mpc::sampler::Program> program;
 
-		const std::vector<std::string> letters{ "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m" };
+		const std::vector<std::string> letters{ "a", "b", "c", "d", "e" };
 		const std::vector<std::string> noteVarParamNames{ "Tun", "Dcy", "Atk", "Flt" };
 		const std::vector<std::string> drumNoteEventLabels{ ">N: ", "", ":", "D:", "V:" };
 		const std::vector<int> drumNoteEventSizes{ 6, 3, 4, 4, 3 };
@@ -101,7 +100,6 @@ namespace mpc::lcdgui
 		void setSizeAndLocation(std::vector<int> xPosArray, std::vector<int> sizeArray);
 
 	public:
-		std::vector<std::weak_ptr<mpc::lcdgui::Component>> getEventRow();
 		void setEvent(std::weak_ptr<mpc::sequencer::Event> event);
 		void setSelected(bool b);
 		bool isSelected();

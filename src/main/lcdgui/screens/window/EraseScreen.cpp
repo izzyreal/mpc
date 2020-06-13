@@ -265,7 +265,7 @@ void EraseScreen::displayNotes()
 
 	if (bus > 0)
 	{
-		findField("notes0").lock()->setSize(6 * 6 + 2, 8);
+		findField("notes0").lock()->setSize(6 * 6 + 1, 8);
 
 		if (mpc.getNote() != 34)
 		{

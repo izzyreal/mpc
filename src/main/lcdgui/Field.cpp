@@ -23,8 +23,7 @@ Field::Field(const string& name, int x, int y, int width)
 	: TextComp(name)
 {
 	this->name = name;
-	//this->width = width;
-	setSize(width + 2, 9);
+	setSize(width, 9);
 	setLocation(x - 1, y - 1);
 }
 
@@ -32,6 +31,10 @@ const int Field::BLINKING_RATE;
 
 void Field::Draw(std::vector<std::vector<bool>>* pixels)
 {
+	if (name.compare("a0") == 0)
+	{
+		printf("");
+	}
 	if (shouldNotDraw(pixels))
 	{
 		return;

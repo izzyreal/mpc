@@ -23,7 +23,10 @@ Parameter::Parameter(string labelStr, string name, int x, int y, int fieldWidth)
 
 	int tfOffset = (count * 6);
 
-	auto field = make_shared<Field>(name, x + tfOffset, y, fieldWidth - 1);
+	// We add + 1 to the field width, because currently the json resources provide
+	// n_characters * font_width for their width, and it should be + 1 to acommodate
+	// for the rectangle of a field.
+	auto field = make_shared<Field>(name, x + tfOffset, y, fieldWidth + 1);
 	auto rect = field->getRect();
 	rect.L -= 1;
 	rect.T -= 1;
