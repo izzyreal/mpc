@@ -39,12 +39,18 @@ void Field::Draw(std::vector<std::vector<bool>>* pixels)
 
 	auto r = getRect();
 
-	for (int i = r.L; i < r.R - 1; i++)
+	if (name.compare("view") == 0)
+	{
+		MLOG("Drawing view with rect" + r.getInfo());
+	}
+
+	for (int i = r.L; i < r.R; i++)
 	{
 		if (i < 0)
 		{
 			continue;
 		}
+
 		for (int j = r.T; j < r.B; j++)
 		{
 			if (j < 0)

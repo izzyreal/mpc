@@ -286,7 +286,7 @@ void StepEditorScreen::turnWheel(int i)
 {
 	init();
 	
-	if (param.compare("viewmodenumber") == 0)
+	if (param.compare("view") == 0)
 	{
 		setViewModeNumber(viewModeNumber + i);
 	}
@@ -335,102 +335,134 @@ void StepEditorScreen::turnWheel(int i)
 		auto mixer = dynamic_pointer_cast<MixerEvent>(visibleEvents[eventNumber].lock());
 		auto note = dynamic_pointer_cast<NoteEvent>(visibleEvents[eventNumber].lock());
 
-		if (sysEx) {
-			if (param.find("a") != string::npos) {
+		if (sysEx)
+		{
+			if (param.find("a") != string::npos)
+			{
 				sysEx->setByteA(sysEx->getByteA() + i);
 			}
-			else if (param.find("b") != string::npos) {
+			else if (param.find("b") != string::npos)
+			{
 				sysEx->setByteB(sysEx->getByteB() + i);
 			}
 		}
-		else if (channelPressure) {
-			if (param.find("a") != string::npos) {
+		else if (channelPressure)
+		{
+			if (param.find("a") != string::npos)
+			{
 				channelPressure->setAmount(channelPressure->getAmount() + i);
 			}
 		}
-		else if (polyPressure) {
-			if (param.find("a") != string::npos) {
+		else if (polyPressure)
+		{
+			if (param.find("a") != string::npos)
+			{
 				polyPressure->setNote(polyPressure->getNote() + i);
 			}
-			else if (param.find("b") != string::npos) {
+			else if (param.find("b") != string::npos)
+			{
 				polyPressure->setAmount(polyPressure->getAmount() + i);
 			}
 		}
-		else if (controlChange) {
-			if (param.find("a") != string::npos) {
+		else if (controlChange)
+		{
+			if (param.find("a") != string::npos)
+			{
 				controlChange->setController(controlChange->getController() + i);
 			}
-			else if (param.find("b") != string::npos) {
+			else if (param.find("b") != string::npos)
+			{
 				controlChange->setAmount(controlChange->getAmount() + i);
 			}
 
 		}
-		else if (programChange) {
-			if (param.find("a") != string::npos) {
+		else if (programChange)
+		{
+			if (param.find("a") != string::npos)
+			{
 				programChange->setProgram(programChange->getProgram() + i);
 			}
 
 		}
-		else if (pitchBend) {
-			if (param.find("a") != string::npos) {
+		else if (pitchBend)
+		{
+			if (param.find("a") != string::npos)
+			{
 				pitchBend->setAmount(pitchBend->getAmount() + i);
 			}
 
 		}
-		else if (mixer) {
-			if (param.find("a") != string::npos) {
+		else if (mixer)
+		{
+			if (param.find("a") != string::npos)
+			{
 				mixer->setParameter(mixer->getParameter() + i);
 			}
-			else if (param.find("b") != string::npos) {
+			else if (param.find("b") != string::npos)
+			{
 				mixer->setPadNumber(mixer->getPad() + i);
 			}
-			else if (param.find("c") != string::npos) {
+			else if (param.find("c") != string::npos)
+			{
 				mixer->setValue(mixer->getValue() + i);
 			}
 		}
-		else if (note && track.lock()->getBusNumber() == 0) {
-			if (param.find("a") != string::npos) {
+		else if (note && track.lock()->getBusNumber() == 0)
+		{
+			if (param.find("a") != string::npos)
+			{
 				note->setNote(note->getNote() + i);
 			}
-			else if (param.find("b") != string::npos) {
+			else if (param.find("b") != string::npos)
+			{
 				note->setDuration(note->getDuration() + i);
 			}
-			else if (param.find("c") != string::npos) {
+			else if (param.find("c") != string::npos)
+			{
 				note->setVelocity(note->getVelocity() + i);
 			}
 		}
-		else if (note && track.lock()->getBusNumber() != 0) {
-			if (param.find("a") != string::npos) {
-				if (note->getNote() + i > 98) {
+		else if (note && track.lock()->getBusNumber() != 0)
+		{
+			if (param.find("a") != string::npos)
+			{
+				if (note->getNote() + i > 98)
+				{
 					if (note->getNote() != 98) note->setNote(98);
 					return;
 				}
-				if (note->getNote() + i < 35) {
+				else if (note->getNote() + i < 35)
+				{
 					if (note->getNote() != 35) note->setNote(35);
 					return;
 				}
-
-				if (note->getNote() < 35) {
+				else if (note->getNote() < 35)
+				{
 					note->setNote(35);
 					return;
 				}
-				if (note->getNote() > 98) {
+				else if (note->getNote() > 98)
+				{
 					note->setNote(98);
 					return;
 				}
 				
 				note->setNote(note->getNote() + i);
 			}
-			else if (param.find("b") != string::npos) {
+			else if (param.find("b") != string::npos)
+			{
 				note->setVariationTypeNumber(note->getVariationTypeNumber() + i);
 			}
-			else if (param.find("c") != string::npos) {
+			else if (param.find("c") != string::npos)
+			{
 				note->setVariationValue(note->getVariationValue() + i);
 			}
-			else if (param.find("d") != string::npos) {
+			else if (param.find("d") != string::npos)
+			{
 				note->setDuration(note->getDuration() + i);
 			}
-			else if (param.find("e") != string::npos) {
+			else if (param.find("e") != string::npos)
+			{
 				note->setVelocity(note->getVelocity() + i);
 			}
 		}
@@ -443,7 +475,9 @@ void StepEditorScreen::prevStepEvent()
 	init();
 	
 	auto controls = Mpc::instance().getControls().lock();
-	if (controls->isGoToPressed()) {
+
+	if (controls->isGoToPressed())
+	{
 		sequencer.lock()->goToPreviousEvent();
 	}
 	else {
@@ -456,7 +490,9 @@ void StepEditorScreen::nextStepEvent()
 	init();
 	
 	auto controls = Mpc::instance().getControls().lock();
-	if (controls->isGoToPressed()) {
+	
+	if (controls->isGoToPressed())
+	{
 		sequencer.lock()->goToNextEvent();
 	}
 	else {
@@ -469,7 +505,8 @@ void StepEditorScreen::prevBarStart()
 	init();
 	auto controls = Mpc::instance().getControls().lock();
 	
-	if (controls->isGoToPressed()) {
+	if (controls->isGoToPressed())
+	{
 		sequencer.lock()->setBar(0);
 	}
 	else {
@@ -482,7 +519,9 @@ void StepEditorScreen::nextBarEnd()
 	init();
 	
 	auto controls = Mpc::instance().getControls().lock();
-	if (controls->isGoToPressed()) {
+	
+	if (controls->isGoToPressed())
+	{
 		sequencer.lock()->setBar(sequencer.lock()->getActiveSequence().lock()->getLastBar() + 1);
 	}
 	else {
@@ -490,19 +529,22 @@ void StepEditorScreen::nextBarEnd()
 	}
 }
 
-void StepEditorScreen::left() {
+void StepEditorScreen::left()
+{
 	BaseControls::left();
 	checkSelection();
 	refreshSelection();
 }
 
-void StepEditorScreen::right() {
+void StepEditorScreen::right()
+{
 	BaseControls::right();
 	checkSelection();
 	refreshSelection();
 }
 
-void StepEditorScreen::up() {
+void StepEditorScreen::up()
+{
 	init();
 	
 	if (param.length() == 2)
@@ -516,7 +558,7 @@ void StepEditorScreen::up() {
 		if (!controls->isShiftPressed() && srcNumber == 0 && yOffset == 0)
 		{
 			clearSelection();
-			ls.lock()->setFocus("viewmodenumber");
+			ls.lock()->setFocus("view");
 			refreshSelection();
 			return;
 		}
@@ -538,7 +580,7 @@ void StepEditorScreen::down()
 {
 	init();
 
-	if (!findField("a0").lock()->IsHidden() && param.compare("viewmodenumber") == 0)
+	if (!findField("a0").lock()->IsHidden() && param.compare("view") == 0)
 	{
 		ls.lock()->setFocus("a0");
 		return;
@@ -901,8 +943,10 @@ void StepEditorScreen::setViewModeNotesText()
 			findField("controlnumber").lock()->setText(EventRow::controlNames[controlNumber]);
 		}
 	}
+
 	findField("view").lock()->setText(viewNames[viewModeNumber]);
-	findField("view").lock()->setSize(findField("view").lock()->getText().length() * 6 + 1, 9);
+	auto newWidth = findField("view").lock()->getText().length() * 6 + 1;
+	findField("view").lock()->setSize(newWidth, 9);
 }
 
 void StepEditorScreen::setViewModeNumber(int i)

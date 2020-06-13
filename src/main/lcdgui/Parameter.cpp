@@ -10,7 +10,7 @@ Parameter::Parameter(string labelStr, string name, int x, int y, int fieldWidth)
 	: Component(name)
 {
 
-	addChild(make_shared<Label>(name, labelStr, x, y - 1, labelStr.size() * 6));
+	addChild(make_shared<Label>(name, labelStr, x, y - 1, labelStr.size() * 6 - 1));
 
 	const char* p = labelStr.c_str();
 	
@@ -23,7 +23,7 @@ Parameter::Parameter(string labelStr, string name, int x, int y, int fieldWidth)
 
 	int tfOffset = (count * 6);
 
-	auto field = make_shared<Field>(name, x + tfOffset, y, fieldWidth);
+	auto field = make_shared<Field>(name, x + tfOffset, y, fieldWidth - 1);
 	auto rect = field->getRect();
 	rect.L -= 1;
 	rect.T -= 1;

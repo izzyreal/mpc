@@ -18,26 +18,34 @@ mpc::lcdgui::FunctionKeys* Layer::getFunctionKeys() {
 	return dynamic_cast<FunctionKeys*>(findChild("function-keys").lock().get());
 }
 
-void Layer::setFocus(string textFieldName) {
+void Layer::setFocus(string textFieldName)
+{
 
 	// First make sure the desired focus field exists and is focusable
 	bool exists = false;
-	for (auto& a : findFields()) {
+
+	for (auto& a : findFields())
+	{
 		auto tf = dynamic_pointer_cast<Field>(a.lock());
 		//if (!tf->IsHidden() && tf->getName().compare(textFieldName) == 0 && tf->isFocusable()) {
-		if (tf->getName().compare(textFieldName) == 0 && tf->isFocusable()) {
+		if (tf->getName().compare(textFieldName) == 0 && tf->isFocusable())
+		{
 			exists = true;
 			break;
 		}
 	}
 
-	if (!exists) {
+	if (!exists)
+	{
 		return;
 	}
 
-	for (auto& a : findFields()) {
+	for (auto& a : findFields())
+	{
 		auto tf = dynamic_pointer_cast<Field>(a.lock());
-		if (tf->getName().compare(focus) == 0 && tf->isFocusable()) {
+	
+		if (tf->getName().compare(focus) == 0 && tf->isFocusable())
+		{
 			tf->loseFocus(textFieldName);
 			break;
 		}
@@ -46,15 +54,19 @@ void Layer::setFocus(string textFieldName) {
 	string oldFocus = focus;
 	focus = textFieldName;
 
-	for (auto& a : findFields()) {
+	for (auto& a : findFields())
+	{
 		auto tf = dynamic_pointer_cast<Field>(a.lock());
-		if (tf->getName().compare(textFieldName) == 0 && tf->isFocusable()) {
+
+		if (tf->getName().compare(textFieldName) == 0 && tf->isFocusable())
+		{
 			tf->takeFocus(oldFocus);
 			break;
 		}
 	}
 }
 
-string Layer::getFocus() {
+string Layer::getFocus()
+{
 	return focus;
 }

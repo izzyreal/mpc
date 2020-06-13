@@ -21,7 +21,8 @@ Component::Component(const string& name)
 
 bool Component::shouldNotDraw(vector<vector<bool>>* pixels)
 {
-	if (!IsDirty()) {
+	if (!IsDirty())
+	{
 		return true;
 	}
 
@@ -30,6 +31,11 @@ bool Component::shouldNotDraw(vector<vector<bool>>* pixels)
 		Clear(pixels);
 		dirty = false;
 		return true;
+	}
+
+	if (!dirtyRect.Empty())
+	{
+		Clear(pixels);
 	}
 
 	return false;
@@ -236,28 +242,39 @@ void Component::Hide(bool b)
 	} 
 }
 
-void Component::setSize(int w, int h) {
+void Component::setSize(int w, int h)
+{
+	if (name.compare("view") == 0)
+	{
+		printf("");
+	}
+
+	dirtyRect = dirtyRect.Union(&getRect());
 	this->w = w;
 	this->h = h;
 	SetDirty();
 }
 
-void Component::setLocation(int x, int y) {
+void Component::setLocation(int x, int y)
+{
 	this->x = x;
 	this->y = y;
 	SetDirty();
 }
 
-MRECT Component::getDirtyArea() {
+MRECT Component::getDirtyArea()
+{
 	MRECT res;
 	for (auto c : children)
 	{
 		res = res.Union(&c->getDirtyArea());
 	}
 
-	if (dirty) {
+	if (dirty)
+	{
 		auto rect = getRect();
 		res = res.Union(&rect);
+		res = res.Union(&dirtyRect);
 	}
 
 	return res;
@@ -318,6 +335,19 @@ MRECT Component::getRect()
 void Component::Clear(vector<vector<bool>>* pixels)
 {
 	auto r = getRect();
+
+	if (!dirtyRect.Empty())
+	{
+		r = r.Union(&dirtyRect);
+		dirtyRect.Clear();
+	}
+
+	if (name.compare("view") == 0)
+	{
+		MLOG("Clearing view with rect " + r.getInfo());
+		MLOG("r.L: " + to_string(r.L) + ", r.R: " + to_string(r.R));
+		MLOG("r.T: " + to_string(r.T) + ", r.B: " + to_string(r.B));
+	}
 
 	for (int i = r.L; i < r.R; i++)
 	{

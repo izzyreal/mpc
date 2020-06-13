@@ -7,16 +7,21 @@
 #include <string>
 #include <memory>
 
-namespace mpc::lcdgui {
+namespace mpc::lcdgui
+{
 	class Label;
 	class Field;
 	class Parameter;
 	class ScreenComponent;
 }
 
-namespace mpc::lcdgui {
+namespace mpc::lcdgui
+{
+	class Component
+	{
 
-	class Component {
+	private:
+		MRECT dirtyRect;
 
 	protected:
 		std::vector<std::shared_ptr<Component>> children;
