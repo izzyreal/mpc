@@ -30,10 +30,10 @@ namespace mpc::lcdgui
 		std::string name = "";
 		bool hidden = false;
 		bool dirty = false;
-		int x = 0;
-		int y = 0;
-		int w = 0;
-		int h = 0;
+		int x = -1;
+		int y = -1;
+		int w = -1;
+		int h = -1;
 
 	protected:
 		bool shouldNotDraw(std::vector<std::vector<bool>>* pixels);

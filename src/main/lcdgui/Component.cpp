@@ -244,12 +244,11 @@ void Component::Hide(bool b)
 
 void Component::setSize(int w, int h)
 {
-	if (name.compare("view") == 0)
+	if (!(this->w == -1 && this->h == -1))
 	{
-		printf("");
+		dirtyRect = dirtyRect.Union(&getRect());
 	}
 
-	dirtyRect = dirtyRect.Union(&getRect());
 	this->w = w;
 	this->h = h;
 	SetDirty();
@@ -257,6 +256,11 @@ void Component::setSize(int w, int h)
 
 void Component::setLocation(int x, int y)
 {
+	if (!(this->x == -1 && this->y == -1))
+	{
+		dirtyRect = dirtyRect.Union(&getRect());
+	}
+
 	this->x = x;
 	this->y = y;
 	SetDirty();
