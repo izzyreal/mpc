@@ -337,7 +337,7 @@ void LayeredScreen::transferLeft()
 
 	for (auto& f : getFocusedLayer().lock()->findFields())
 	{
-		if (f.lock() == source)
+		if (f.lock() == source || !f.lock()->isFocusable() || f.lock()->IsHidden())
 		{
 			continue;
 		}
@@ -383,7 +383,7 @@ void LayeredScreen::transferRight()
 
 	for (auto& f : getFocusedLayer().lock()->findFields())
 	{
-		if (f.lock() == source)
+		if (f.lock() == source || !f.lock()->isFocusable() || f.lock()->IsHidden())
 		{
 			continue;
 		}
@@ -451,18 +451,25 @@ weak_ptr<Field> LayeredScreen::findBelow(weak_ptr<Field> tf0)
 		}
 	}
 
-	if (result.lock() == lTf0) {
+	if (result.lock() == lTf0)
+	{
 		marginChars = 16;
 		maxDistH = 6 * marginChars;
-		for (auto& a : getFocusedLayer().lock()->findFields()) {
+
+		for (auto& a : getFocusedLayer().lock()->findFields())
+		{
 			auto tf1 = a.lock();
 			auto B1 = tf1->getY() + tf1->getH();
 			auto B0 = lTf0->getY() + lTf0->getH();
 			auto MW1 = 0.5f * (float)(tf1->getX() * 2 + tf1->getW());
 			auto MW0 = 0.5f * (float)(lTf0->getX() * 2 + lTf0->getW());
-			if (B1 - B0 >= minDistV) {
-				if (abs((int)(MW1 - MW0)) <= maxDistH) {
-					if (!tf1->IsHidden() && tf1->isFocusable()) {
+
+			if (B1 - B0 >= minDistV)
+			{
+				if (abs((int)(MW1 - MW0)) <= maxDistH)
+				{
+					if (!tf1->IsHidden() && tf1->isFocusable())
+					{
 						result = tf1;
 						break;
 					}
@@ -473,7 +480,8 @@ weak_ptr<Field> LayeredScreen::findBelow(weak_ptr<Field> tf0)
 	return result;
 }
 
-weak_ptr<Field> LayeredScreen::findAbove(weak_ptr<Field> tf0) {
+weak_ptr<Field> LayeredScreen::findAbove(weak_ptr<Field> tf0)
+{
 	int marginChars = 8;
 	int minDistV = - 7;
 	int maxDistH = 6 * marginChars;
@@ -483,33 +491,47 @@ weak_ptr<Field> LayeredScreen::findAbove(weak_ptr<Field> tf0) {
 	auto revComponents = getFocusedLayer().lock()->findFields();
 
 	reverse(revComponents.begin(), revComponents.end());
-	for (auto& a : revComponents) {
+
+	for (auto& a : revComponents)
+	{
 		auto tf1 = a.lock();
 		auto B1 = tf1->getY() + tf1->getH();
 		auto B0 = lTf0->getY() + lTf0->getH();
 		auto MW1 = 0.5f * (float)(tf1->getX() * 2 + tf1->getW());
 		auto MW0 = 0.5f * (float)(lTf0->getX() * 2 + lTf0->getW());
-		if (B1 - B0 <= minDistV) {
-			if (abs((int)(MW1 - MW0)) <= maxDistH) {
-				if (!tf1->IsHidden() && tf1->isFocusable()) {
+
+		if (B1 - B0 <= minDistV)
+		{
+			if (abs((int)(MW1 - MW0)) <= maxDistH)
+			{
+				if (!tf1->IsHidden() && tf1->isFocusable())
+				{
 					result = tf1;
 					break;
 				}
 			}
 		}
 	}
-	if (result.lock() == lTf0) {
+
+	if (result.lock() == lTf0)
+	{
 		marginChars = 16;
 		maxDistH = 6 * marginChars;
-		for (auto& a : revComponents) {
+	
+		for (auto& a : revComponents)
+		{
 			auto tf1 = a.lock();
 			auto B1 = tf1->getY() + tf1->getH();
 			auto B0 = lTf0->getY() + lTf0->getH();
 			auto MW1 = 0.5f * (float)(tf1->getX() * 2 + tf1->getW());
 			auto MW0 = 0.5f * (float)(lTf0->getX() * 2 + lTf0->getW());
-			if (B1 - B0 <= minDistV) {
-				if (abs((int)(MW1 - MW0)) <= maxDistH) {
-					if (!tf1->IsHidden() && tf1->isFocusable()) {
+
+			if (B1 - B0 <= minDistV)
+			{
+				if (abs((int)(MW1 - MW0)) <= maxDistH)
+				{
+					if (!tf1->IsHidden() && tf1->isFocusable())
+					{
 						result = tf1;
 						break;
 					}
@@ -522,13 +544,16 @@ weak_ptr<Field> LayeredScreen::findAbove(weak_ptr<Field> tf0) {
 
 string LayeredScreen::findBelow(string tf0) {
 	string result = tf0;
-	for (auto& a : getFocusedLayer().lock()->findFields()) {
+
+	for (auto& a : getFocusedLayer().lock()->findFields())
+	{
 		auto candidate = a.lock();
 		if (candidate->getName().compare(tf0) == 0) {
 			result = findBelow(candidate).lock()->getName();
 			break;
 		}
 	}
+	
 	return result;
 }
 

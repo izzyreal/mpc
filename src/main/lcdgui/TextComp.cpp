@@ -3,6 +3,7 @@
 #include <Mpc.hpp>
 #include <Paths.hpp>
 
+#include <lcdgui/Label.hpp>
 
 #include <lang/StrUtil.hpp>
 #include <lang/utf8_decode.h>
@@ -23,6 +24,18 @@ void TextComp::Draw(std::vector<std::vector<bool>>* pixels)
 	if (shouldNotDraw(pixels))
 	{
 		return;
+	}
+
+	if (dynamic_cast<Label*>(this) != nullptr)
+	{
+		auto rect = getRect();
+		for (int x1 = rect.L + 1; x1 < rect.R; x1++)
+		{
+			for (int y1 = rect.T + 1; y1 < rect.B - 1; y1++)
+			{
+				(*pixels)[x1][y1] = inverted ? true : false;
+			}
+		}
 	}
 
 	auto font = &LayeredScreen::font;

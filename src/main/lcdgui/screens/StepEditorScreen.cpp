@@ -544,7 +544,6 @@ void StepEditorScreen::up()
 		auto src = param;
 		auto srcLetter = src.substr(0, 1);
 		int srcNumber = stoi(src.substr(1, 2));
-		auto increment = 0;
 		auto controls = mpc.getControls().lock();
 		
 		if (!controls->isShiftPressed() && srcNumber == 0 && yOffset == 0)
@@ -565,8 +564,7 @@ void StepEditorScreen::up()
 			}
 		}
 
-		increment = -1;
-		downOrUp(increment);
+		downOrUp(-1);
 	}
 }
 
@@ -610,7 +608,6 @@ void StepEditorScreen::down()
 		auto src = param;
 		auto srcLetter = src.substr(0, 1);
 		int srcNumber = stoi(src.substr(1, 2));
-		auto increment = 0;
 		auto controls = mpc.getControls().lock();
 		
 		if (srcNumber == 3)
@@ -622,7 +619,15 @@ void StepEditorScreen::down()
 			}
 			
 			setyOffset(yOffset + 1);
-			
+
+			auto focus = ls.lock()->getFocus();
+			auto comp = findField(focus).lock();
+
+			if (comp->IsHidden())
+			{
+				ls.lock()->setFocus("a3");
+			}
+
 			if (controls->isShiftPressed() && dynamic_pointer_cast<EmptyEvent>(visibleEvents[3].lock()))
 			{
 				setSelectionEndIndex(srcNumber + yOffset);
@@ -631,8 +636,8 @@ void StepEditorScreen::down()
 			refreshSelection();
 			return;
 		}
-		increment = 1;
-		downOrUp(increment);
+
+		downOrUp(1);
 	}
 }
 
@@ -1049,6 +1054,7 @@ void StepEditorScreen::setyOffset(int i)
 	{
 		return;
 	}
+
 	yOffset = i;
 
 	initVisibleEvents();

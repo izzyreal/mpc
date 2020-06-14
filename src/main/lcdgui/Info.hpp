@@ -15,7 +15,5 @@ namespace mpc::lcdgui {
 	public:
 		Info(const std::string& name, int x, int y, int size);
 
-		void Draw(std::vector<std::vector<bool>>* pixels) override;
-
 	};
 }
