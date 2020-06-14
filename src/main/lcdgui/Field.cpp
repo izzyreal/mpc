@@ -25,7 +25,7 @@ Field::Field(const string& name, int x, int y, int width)
 	this->name = name;
 	setSize(width, 9);
 	setLocation(x - 1, y - 1);
-	dirtyRect.Clear();
+	preDrawClearRect.Clear();
 }
 
 const int Field::BLINKING_RATE;

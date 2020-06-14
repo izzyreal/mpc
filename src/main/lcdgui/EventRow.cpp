@@ -55,13 +55,13 @@ EventRow::EventRow(int bus, weak_ptr<Event> e, int rowIndex)
 	MRECT parametersRect = MRECT(x1, y1, x1 + w1, y1 + h1);
 	parameters = dynamic_pointer_cast<EventRowParameters>(addChild(make_shared<EventRowParameters>(parametersRect)).lock());
 
-	for (int i = 0; i < 5; i++)
+	for (int i = 4; i >= 0; i--)
 	{
 		auto label = parameters.lock()->addChild(make_shared<Label>(letters[i] + to_string(rowIndex), drumNoteEventLabels[i], drumNoteEventXPos[i] + 1, rowIndex * 9 + 12, drumNoteEventLabels[i].length() * 6 + 1)).lock();
-		labels.push_back(dynamic_pointer_cast<Label>(label));
+		labels.insert(begin(labels), dynamic_pointer_cast<Label>(label));
 
 		auto tf = parameters.lock()->addChild(make_shared<Field>(letters[i] + to_string(rowIndex), drumNoteEventXPos[i] + 1 + drumNoteEventLabels[i].length() * 6 + 1, rowIndex * 9 + 12, drumNoteEventSizes[i])).lock();
-		fields.push_back(dynamic_pointer_cast<Field>(tf));
+		fields.insert(begin(fields), dynamic_pointer_cast<Field>(tf));
 	}
 
 	h1 = 5;
@@ -159,8 +159,8 @@ void EventRow::setEmptyEventValues()
 
 	for (int i = 1; i < 5; i++)
 	{
-		parameters.lock()->sendToBack(fields[i]);
-		parameters.lock()->sendToBack(labels[i]);
+		//parameters.lock()->sendToBack(fields[i]);
+		//parameters.lock()->sendToBack(labels[i]);
 		fields[i].lock()->Hide(true);
 		labels[i].lock()->Hide(true);
 	}
@@ -188,8 +188,8 @@ void EventRow::setSystemExclusiveEventValues()
 
 	for (int i = 2; i < 5; i++)
 	{
-		parameters.lock()->sendToBack(fields[i]);
-		parameters.lock()->sendToBack(labels[i]);
+		//parameters.lock()->sendToBack(fields[i]);
+		//parameters.lock()->sendToBack(labels[i]);
 		fields[i].lock()->Hide(true);
 		labels[i].lock()->Hide(true);
 	}
@@ -217,8 +217,8 @@ void EventRow::setPolyPressureEventValues()
 	
 	for (int i = 2; i < 5; i++)
 	{
-		parameters.lock()->sendToBack(fields[i]);
-		parameters.lock()->sendToBack(labels[i]);
+		//parameters.lock()->sendToBack(fields[i]);
+		//parameters.lock()->sendToBack(labels[i]);
 		fields[i].lock()->Hide(true);
 		labels[i].lock()->Hide(true);
 	}
@@ -241,8 +241,8 @@ void EventRow::setChannelPressureEventValues()
 
 	for (int i = 1; i < 5; i++)
 	{
-		parameters.lock()->sendToBack(fields[i]);
-		parameters.lock()->sendToBack(labels[i]);
+		//parameters.lock()->sendToBack(fields[i]);
+		//parameters.lock()->sendToBack(labels[i]);
 		fields[i].lock()->Hide(true);
 		labels[i].lock()->Hide(true);
 	}
@@ -272,8 +272,8 @@ void EventRow::setControlChangeEventValues()
     
 	for (int i = 2; i < 5; i++)
 	{
-		parameters.lock()->sendToBack(fields[i]);
-		parameters.lock()->sendToBack(labels[i]);
+		//parameters.lock()->sendToBack(fields[i]);
+		//parameters.lock()->sendToBack(labels[i]);
 		fields[i].lock()->Hide(true);
 		labels[i].lock()->Hide(true);
 	}
@@ -331,8 +331,8 @@ void EventRow::setMiscEventValues()
 
 	for (int i = 1; i < 5; i++)
 	{
-		parameters.lock()->sendToBack(fields[i]);
-		parameters.lock()->sendToBack(labels[i]);
+		//parameters.lock()->sendToBack(fields[i]);
+		//parameters.lock()->sendToBack(labels[i]);
 		fields[i].lock()->Hide(true);
 		labels[i].lock()->Hide(true);
 	}
@@ -387,8 +387,8 @@ void EventRow::setMixerEventValues()
 	
 	for (int i = 3; i < 5; i++)
 	{
-		parameters.lock()->sendToBack(fields[i]);
-		parameters.lock()->sendToBack(labels[i]);
+		//parameters.lock()->sendToBack(fields[i]);
+		//parameters.lock()->sendToBack(labels[i]);
 		fields[i].lock()->Hide(true);
 		labels[i].lock()->Hide(true);
 	}
@@ -520,8 +520,8 @@ void EventRow::setMidiNoteEventValues()
 
 	for (int i = 3; i < 5; i++)
 	{
-		parameters.lock()->sendToBack(fields[i]);
-		parameters.lock()->sendToBack(labels[i]);
+		//parameters.lock()->sendToBack(fields[i]);
+		//parameters.lock()->sendToBack(labels[i]);
 		fields[i].lock()->Hide(true);
 		labels[i].lock()->Hide(true);
 	}

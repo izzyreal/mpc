@@ -69,11 +69,6 @@ bool Component::bringToFront(Component* childToBringToFront)
 
 bool Component::shouldNotDraw(vector<vector<bool>>* pixels)
 {
-	if (name.compare("event-row-1") == 0)
-	{
-		printf("");
-	}
-
 	if (!IsDirty())
 	{
 		return true;
@@ -84,11 +79,6 @@ bool Component::shouldNotDraw(vector<vector<bool>>* pixels)
 		Clear(pixels);
 		dirty = false;
 		return true;
-	}
-
-	if (!dirtyRect.Empty())
-	{
-		Clear(pixels);
 	}
 
 	return false;
@@ -309,9 +299,14 @@ void Component::Hide(bool b)
 
 void Component::setSize(int w, int h)
 {
+	if (w == this->w && h == this->h)
+	{
+		return;
+	}
+
 	if (!(this->w == -1 && this->h == -1))
 	{
-		dirtyRect = dirtyRect.Union(&getRect());
+		preDrawClearRect = preDrawClearRect.Union(&getRect());
 	}
 
 	this->w = w;
@@ -321,9 +316,14 @@ void Component::setSize(int w, int h)
 
 void Component::setLocation(int x, int y)
 {
+	if (x == this->x && y == this->y)
+	{
+		return;
+	}
+
 	if (!(this->x == -1 && this->y == -1))
 	{
-		dirtyRect = dirtyRect.Union(&getRect());
+		preDrawClearRect = preDrawClearRect.Union(&getRect());
 	}
 
 	this->x = x;
@@ -334,6 +334,7 @@ void Component::setLocation(int x, int y)
 MRECT Component::getDirtyArea()
 {
 	MRECT res;
+
 	for (auto c : children)
 	{
 		res = res.Union(&c->getDirtyArea());
@@ -343,7 +344,6 @@ MRECT Component::getDirtyArea()
 	{
 		auto rect = getRect();
 		res = res.Union(&rect);
-		res = res.Union(&dirtyRect);
 	}
 
 	return res;
@@ -405,10 +405,32 @@ void Component::Clear(vector<vector<bool>>* pixels)
 {
 	auto r = getRect();
 
-	if (!dirtyRect.Empty())
+	for (int i = r.L; i < r.R; i++)
 	{
-		r = r.Union(&dirtyRect);
-		dirtyRect.Clear();
+		if (i < 0)
+		{
+			continue;
+		}
+
+		for (int j = r.T; j < r.B; j++)
+		{
+			(*pixels)[i][j] = false;
+		}
+	}
+}
+
+void Component::preDrawClear(vector<vector<bool>>* pixels)
+{
+	auto r = preDrawClearRect;
+
+	for (auto& c : children)
+	{
+		c->preDrawClear(pixels);
+	}
+
+	if (r.Empty())
+	{
+		return;
 	}
 
 	for (int i = r.L; i < r.R; i++)
@@ -423,6 +445,8 @@ void Component::Clear(vector<vector<bool>>* pixels)
 			(*pixels)[i][j] = false;
 		}
 	}
+
+	preDrawClearRect.Clear();
 }
 
 vector<weak_ptr<Component>> Component::findHiddenChildren()

@@ -8,3 +8,8 @@ Info::Info(const string& name, int x, int y, int size)
 {
 	addChild(make_shared<Label>(name, "", x, y + 2, 0));
 }
+
+void Info::Draw(std::vector<std::vector<bool>>* pixels)
+{
+	Component::Draw(pixels);
+}

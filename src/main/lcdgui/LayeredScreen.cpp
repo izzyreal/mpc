@@ -169,6 +169,8 @@ void LayeredScreen::Draw() {
 	{
 		c.lock()->Draw(&pixels);
 	}
+
+	root->preDrawClear(&pixels);
 	root->Draw(&pixels);
 	return;
 }

@@ -558,11 +558,13 @@ void StepEditorScreen::up()
 		if (srcNumber == 0 && yOffset != 0)
 		{
 			setyOffset(yOffset - 1);
+
 			if (controls->isShiftPressed())
 			{
 				setSelectionEndIndex(srcNumber + yOffset);
 			}
 		}
+
 		increment = -1;
 		downOrUp(increment);
 	}
