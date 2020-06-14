@@ -95,7 +95,6 @@ void Field::takeFocus(string prev)
 
 void Field::loseFocus(string next)
 {
-	MLOG("field " + name + " loses focus to " + next);
 	focus = false;
 	inverted = false;
 	/*

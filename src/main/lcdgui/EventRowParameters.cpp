@@ -24,8 +24,6 @@ void EventRowParameters::Draw(std::vector<std::vector<bool>>* pixels)
 		return;
 	}
 
-	MLOG("Actually drawing EventRowParameters");
-
 	SetDirty(); // Whenever we draw this component, we mark the children as dirty as well
 
 	auto rect = getRect();

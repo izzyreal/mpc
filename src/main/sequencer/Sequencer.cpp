@@ -780,11 +780,8 @@ void Sequencer::copyTrack(weak_ptr<Track> src, weak_ptr<Track> dest)
 	
 	lDest->setTrackIndex(lSrc->getTrackIndex());
 	
-	MLOG("Copying track " + src.lock()->getActualName() + " to " + dest.lock()->getActualName());
-	MLOG("Setting lDest index to " + to_string(lDest->getTrackIndex()));
-
-	for (auto& e : lSrc->getEvents()) {
-		MLOG("Cloning event " + to_string(e.lock()->getTick()));
+	for (auto& e : lSrc->getEvents())
+	{
 		lDest->cloneEvent(e);
 	}
 
@@ -809,7 +806,8 @@ string Sequencer::getDefaultTrackName(int i)
 	return defaultTrackNames[i];
 }
 
-vector<string> Sequencer::getDefaultTrackNames() {
+vector<string> Sequencer::getDefaultTrackNames()
+{
 	return defaultTrackNames;
 }
 

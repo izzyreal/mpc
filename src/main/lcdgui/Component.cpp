@@ -69,6 +69,11 @@ bool Component::bringToFront(Component* childToBringToFront)
 
 bool Component::shouldNotDraw(vector<vector<bool>>* pixels)
 {
+	if (name.compare("event-row-1") == 0)
+	{
+		printf("");
+	}
+
 	if (!IsDirty())
 	{
 		return true;
@@ -264,6 +269,11 @@ weak_ptr<Component> Component::findChild(const string& name)
 
 void Component::Draw(vector<vector<bool>>* pixels)
 {
+	if (shouldNotDraw(pixels))
+	{
+		return;
+	}
+
 	if (hidden || !IsDirty())
 	{
 		return;
@@ -271,7 +281,6 @@ void Component::Draw(vector<vector<bool>>* pixels)
 
 	for (auto& c : children)
 	{
-		//MLOG("Drawing child of " + name + ": " + c->getName());
 		c->Draw(pixels);
 	}
 
@@ -332,10 +341,7 @@ MRECT Component::getDirtyArea()
 
 	if (dirty)
 	{
-		MLOG(name + " is dirty");
 		auto rect = getRect();
-		MLOG("rect1: " + rect.getInfo());
-		MLOG("rect2: " + dirtyRect.getInfo());
 		res = res.Union(&rect);
 		res = res.Union(&dirtyRect);
 	}
@@ -398,8 +404,6 @@ MRECT Component::getRect()
 void Component::Clear(vector<vector<bool>>* pixels)
 {
 	auto r = getRect();
-
-	MLOG("Clearing " + name);
 
 	if (!dirtyRect.Empty())
 	{

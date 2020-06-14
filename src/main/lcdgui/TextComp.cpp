@@ -25,11 +25,6 @@ void TextComp::Draw(std::vector<std::vector<bool>>* pixels)
 		return;
 	}
 
-	if (mpc::Mpc::instance().getLayeredScreen().lock()->getCurrentScreenName().compare("step-editor") == 0)
-	{
-		MLOG("Drawing " + name + " with width " + to_string(w));
-	}
-
 	auto font = &LayeredScreen::font;
 	auto atlas = &LayeredScreen::atlas;
 
