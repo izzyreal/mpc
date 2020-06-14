@@ -63,6 +63,7 @@ namespace mpc::lcdgui
 		void setSize(int width, int height);
 		void setLocation(int x, int y);
 		const std::string& getName();
+		void sendToBack(std::weak_ptr<Component> childToSendBack);
 
 	public:
 		virtual void Draw(std::vector<std::vector<bool>>* pixels);

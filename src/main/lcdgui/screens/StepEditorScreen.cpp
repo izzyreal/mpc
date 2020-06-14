@@ -23,6 +23,8 @@ using namespace mpc::sequencer;
 using namespace moduru::lang;
 using namespace std;
 
+const int EVENT_ROW_COUNT = 4;
+
 StepEditorScreen::StepEditorScreen(const int layerIndex)
 	: ScreenComponent("step-editor", layerIndex)
 {
@@ -55,7 +57,7 @@ void StepEditorScreen::open()
 
 	initVisibleEvents();
 
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < EVENT_ROW_COUNT; i++)
 	{
 		deleteChildren("event-row-" + to_string(i));
 		auto eventRow = dynamic_pointer_cast<EventRow>(addChild(make_shared<EventRow>(track.lock()->getBusNumber(), visibleEvents[i], i)).lock());
@@ -69,7 +71,7 @@ void StepEditorScreen::open()
 		eventRow->setMidi(track.lock()->getBusNumber() == 0);
 		eventRow->init();
 	}
-	
+
 	refreshEventRows();
 	refreshSelection();
 }
@@ -203,29 +205,38 @@ void StepEditorScreen::function(int i)
 				}
 			}
 
-			if (ne && track.lock()->getBusNumber() == 0) {
-				if (isA) {
+			if (ne && track.lock()->getBusNumber() == 0)
+			{
+				if (isA)
+				{
 					setChangeNoteToNumber(ne->getNote());
 				}
-				else if (isB) {
+				else if (isB)
+				{
 					setEditValue(ne->getDuration());
 				}
-				else if (isC) {
+				else if (isC)
+				{
 					setEditValue(ne->getVelocity());
 				}
 			}
-			else if (pce) {
+			else if (pce)
+			{
 				setEditValue(pce->getProgram());
 			}
-			else if (cpe) {
+			else if (cpe)
+			{
 				setEditValue(cpe->getAmount());
 			}
-			else if (ppe) {
+			else if (ppe)
+			{
 				setEditValue(ppe->getAmount());
 			}
-			else if (cce) {
+			else if (cce)
+			{
 				setEditValue(cce->getAmount());
 			}
+
 			setSelectedEvent(visibleEvents[eventNumber]);
 			setSelectedEvents();
 			setSelectedParameterLetter(eventLetter);
@@ -681,7 +692,7 @@ void StepEditorScreen::refreshSelection()
 			lastEventIndex = selectionStartIndex;
 		}
 
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < EVENT_ROW_COUNT; i++)
 		{
 			int absoluteEventNumber = i + yOffset;
 			auto eventRow = findEventRows()[i].lock();
@@ -699,7 +710,7 @@ void StepEditorScreen::refreshSelection()
 	}
 	else
 	{
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < EVENT_ROW_COUNT; i++)
 		{
 			auto eventRow = findEventRows()[i].lock();
 			eventRow->setSelected(false);
@@ -820,7 +831,7 @@ void StepEditorScreen::initVisibleEvents()
 	int firstVisibleEventIndex = yOffset;
 	int visibleEventCounter = 0;
 	
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < EVENT_ROW_COUNT; i++)
 	{
 		visibleEvents[visibleEventCounter] = eventsAtCurrentTick[i + firstVisibleEventIndex];
 		visibleEventCounter++;
@@ -834,23 +845,23 @@ void StepEditorScreen::initVisibleEvents()
 
 void StepEditorScreen::refreshEventRows()
 {
-	return;
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < EVENT_ROW_COUNT; i++)
 	{
 		auto eventRow = findEventRows()[i].lock();
-		eventRow->setEvent(visibleEvents[i]);
 		auto event = visibleEvents[i].lock();
-		eventRow->init();
 	
-		if (!event)
-		{
-			eventRow->Hide(true);
-		}
-		else
+		if (event)
 		{
 			eventRow->Hide(false);
 			event->addObserver(this);
 		}
+		else
+		{
+			eventRow->Hide(true);
+		}
+
+		eventRow->setEvent(event);
+		eventRow->init();
 	}
 }
 
@@ -1123,43 +1134,42 @@ void StepEditorScreen::setSelectedEvents()
 void StepEditorScreen::checkSelection()
 {
 	string focus = ls.lock()->getFocus();
-	
-	if (focus.length() == 2)
-	{
-		int eventNumber = stoi(focus.substr(1, 2));
-		int  visibleEventCounter = 0;
-		int firstSelectedVisibleEventIndex = -1;
-		auto selectedEventCounter = 0;
-	
-		for (auto& seb : findSelectedEventBars())
-		{
-			if (!seb.lock()->IsHidden())
-			{
-				if (firstSelectedVisibleEventIndex == -1)
-				{
-					firstSelectedVisibleEventIndex = visibleEventCounter;
-				}
-				selectedEventCounter++;
-			}
-			visibleEventCounter++;
-		}
 
-		if (firstSelectedVisibleEventIndex != -1)
-		{
-			int lastSelectedVisibleEventIndex = firstSelectedVisibleEventIndex + selectedEventCounter - 1;
-		
-			if (!dynamic_pointer_cast<EmptyEvent>(visibleEvents[eventNumber].lock()))
-			{
-				if (eventNumber < firstSelectedVisibleEventIndex || eventNumber > lastSelectedVisibleEventIndex)
-				{
-					clearSelection();
-				}
-			}
-		}
-	}
-	else
+	if (focus.length() != 2)
 	{
 		clearSelection();
+		return;
+	}
+
+	int eventNumber = stoi(focus.substr(1, 2));
+	int  visibleEventCounter = 0;
+	int firstSelectedVisibleEventIndex = -1;
+	auto selectedEventCounter = 0;
+
+	for (auto& EventRowParameters : findEventRowParameterss())
+	{
+		if (!EventRowParameters.lock()->IsHidden())
+		{
+			if (firstSelectedVisibleEventIndex == -1)
+			{
+				firstSelectedVisibleEventIndex = visibleEventCounter;
+			}
+			selectedEventCounter++;
+		}
+		visibleEventCounter++;
+	}
+
+	if (firstSelectedVisibleEventIndex != -1)
+	{
+		int lastSelectedVisibleEventIndex = firstSelectedVisibleEventIndex + selectedEventCounter - 1;
+
+		if (!dynamic_pointer_cast<EmptyEvent>(visibleEvents[eventNumber].lock()))
+		{
+			if (eventNumber < firstSelectedVisibleEventIndex || eventNumber > lastSelectedVisibleEventIndex)
+			{
+				clearSelection();
+			}
+		}
 	}
 }
 
@@ -1424,15 +1434,15 @@ int StepEditorScreen::getTcValueRecordedNotes()
 	return tcValueRecordedNotes;
 }
 
-vector<weak_ptr<SelectedEventBar>> StepEditorScreen::findSelectedEventBars()
+vector<weak_ptr<EventRowParameters>> StepEditorScreen::findEventRowParameterss()
 {
-	vector<weak_ptr<SelectedEventBar>> result;
+	vector<weak_ptr<EventRowParameters>> result;
 
 	for (auto& eventRow : findEventRows())
 	{
-		auto child = eventRow.lock()->findChild("selected-event-bar").lock();
+		auto child = eventRow.lock()->findChild("event-row-parameters").lock();
 		{
-			auto candidate = dynamic_pointer_cast<SelectedEventBar>(child);
+			auto candidate = dynamic_pointer_cast<EventRowParameters>(child);
 			
 			if (candidate)
 			{

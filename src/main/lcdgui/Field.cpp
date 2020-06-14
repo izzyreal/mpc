@@ -31,21 +31,12 @@ const int Field::BLINKING_RATE;
 
 void Field::Draw(std::vector<std::vector<bool>>* pixels)
 {
-	if (name.compare("a0") == 0)
-	{
-		printf("");
-	}
 	if (shouldNotDraw(pixels))
 	{
 		return;
 	}
 
 	auto r = getRect();
-
-	if (name.compare("view") == 0)
-	{
-		MLOG("Drawing view with rect" + r.getInfo());
-	}
 
 	for (int i = r.L; i < r.R; i++)
 	{
@@ -104,6 +95,7 @@ void Field::takeFocus(string prev)
 
 void Field::loseFocus(string next)
 {
+	MLOG("field " + name + " loses focus to " + next);
 	focus = false;
 	inverted = false;
 	/*

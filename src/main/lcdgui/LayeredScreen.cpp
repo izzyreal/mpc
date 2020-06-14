@@ -227,6 +227,7 @@ void LayeredScreen::Draw() {
 MRECT LayeredScreen::getDirtyArea() {
 	MLOG("LayeredScreen::getDirtyArea()");
 	auto dirtyArea = root->getDirtyArea();
+	MLOG("dirtyArea: " + dirtyArea.getInfo());
 	return dirtyArea;
 }
 

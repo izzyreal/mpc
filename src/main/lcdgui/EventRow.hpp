@@ -24,7 +24,7 @@ namespace mpc::sampler
 
 namespace mpc::lcdgui
 {
-	class SelectedEventBar;
+	class EventRowParameters;
 	class Field;
 	class Label;
 	class HorizontalBar;
@@ -38,9 +38,9 @@ namespace mpc::lcdgui
 	private:
 		std::weak_ptr<mpc::sequencer::Event> event;
 		std::weak_ptr<mpc::lcdgui::HorizontalBar> horizontalBar;
-		std::weak_ptr<mpc::lcdgui::SelectedEventBar> selectedEventBar;
-		std::vector<std::weak_ptr<mpc::lcdgui::Field>> tfArray;
-		std::vector<std::weak_ptr<mpc::lcdgui::Label>> labelArray;
+		std::weak_ptr<mpc::lcdgui::EventRowParameters> parameters;
+		std::vector<std::weak_ptr<mpc::lcdgui::Field>> fields;
+		std::vector<std::weak_ptr<mpc::lcdgui::Label>> labels;
 		std::weak_ptr<mpc::sampler::Sampler> sampler;
 		ctoot::mpc::MpcSoundPlayerChannel* mpcSoundPlayerChannel = nullptr;
 		std::weak_ptr<mpc::sampler::Program> program;
@@ -76,9 +76,9 @@ namespace mpc::lcdgui
 		std::vector<int> mixerEventSizes{ 12, 6, 3 };
 		std::vector<int> mixerEventXPos{ 0, 96, 162 };
 
-		bool selected;
-		bool midi;
-		int rowIndex;
+		bool selected = false;
+		bool midi = false;
+		int rowIndex = 0;
 
 	public:
 		void setMidi(bool b);
@@ -94,10 +94,9 @@ namespace mpc::lcdgui
 		void setMidiNoteEventValues();
 
 	private:
-		void initLabelsAndFields();
 		void setColors();
-		void setLabelTexts(std::vector<std::string> labels);
-		void setSizeAndLocation(std::vector<int> xPosArray, std::vector<int> sizeArray);
+		void setLabelTexts(const std::vector<std::string>& labels);
+		void setSizesAndLocations(const std::vector<int>& xPosArray, const std::vector<int>& sizeArray);
 
 	public:
 		void setEvent(std::weak_ptr<mpc::sequencer::Event> event);

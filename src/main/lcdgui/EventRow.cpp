@@ -7,7 +7,7 @@
 #include <lcdgui/Field.hpp>
 #include <lcdgui/Label.hpp>
 
-#include <lcdgui/SelectedEventBar.hpp>
+#include <lcdgui/EventRowParameters.hpp>
 #include <sampler/Pad.hpp>
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>
@@ -39,41 +39,41 @@ vector<string> EventRow::controlNames = vector<string>{ "BANK SEL MSB", "MOD WHE
 EventRow::EventRow(int bus, weak_ptr<Event> e, int rowIndex)
 	: Component("event-row-" + to_string(rowIndex)), sampler(Mpc::instance().getSampler()), rowIndex(rowIndex)
 {
-	for (int i = 0; i < 5; i++)
-	{
-		auto tf = addChild(make_shared<Field>(letters[i] + to_string(rowIndex), 0, rowIndex * 9 + 11, 0)).lock();
-		tfArray.push_back(dynamic_pointer_cast<Field>(tf));
-		tf->Hide(true);
-		
-		auto label = addChild(make_shared<Label>(letters[i] + to_string(rowIndex), "", 0, rowIndex * 9 + 11, -1)).lock();
-		labelArray.push_back(dynamic_pointer_cast<Label>(label));
-		label->Hide(true);
-	}
-
 	if (bus != 0)
 	{
 		mpcSoundPlayerChannel = sampler.lock()->getDrum(bus - 1);
 		program = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
 	}
 	
-	midi = false;
 	event = e;
-	auto ls = Mpc::instance().getLayeredScreen().lock();
-	w = 193;
-	h = 9;
-	x = 0;
-	y = 11 + (rowIndex * 9);
 	
-	MRECT selectedEventBarRect = MRECT(x, y, x + w, y + h);
-	//selectedEventBar = dynamic_pointer_cast<SelectedEventBar>(addChild(make_shared<SelectedEventBar>(selectedEventBarRect)).lock());
+	int w1 = 193;
+	int h1 = 9;
+	int x1 = 0;
+	int y1 = 11 + (rowIndex * 9);
+	
+	MRECT parametersRect = MRECT(x1, y1, x1 + w1, y1 + h1);
+	parameters = dynamic_pointer_cast<EventRowParameters>(addChild(make_shared<EventRowParameters>(parametersRect)).lock());
 
-	h = 5;
-	y = 13 + (rowIndex * 9);
-	x = 198;
-	w = 50;
-	MRECT horizontalBarRect = MRECT(x, y, x + w, y + h);
+	for (int i = 0; i < 5; i++)
+	{
+		auto label = parameters.lock()->addChild(make_shared<Label>(letters[i] + to_string(rowIndex), drumNoteEventLabels[i], drumNoteEventXPos[i], rowIndex * 9 + 11, drumNoteEventLabels[i].length() * 6 + 1)).lock();
+		labels.push_back(dynamic_pointer_cast<Label>(label));
+
+		auto tf = parameters.lock()->addChild(make_shared<Field>(letters[i] + to_string(rowIndex), drumNoteEventXPos[i] + drumNoteEventLabels[i].length() * 6 + 1, rowIndex * 9 + 11, drumNoteEventSizes[i])).lock();
+		fields.push_back(dynamic_pointer_cast<Field>(tf));
+	}
+
+	h1 = 5;
+	y1 = 13 + (rowIndex * 9);
+	x1 = 198;
+	w1 = 50;
+
+	MRECT horizontalBarRect = MRECT(x1, y1, x1 + w1, y1 + h1);
 	horizontalBar = dynamic_pointer_cast<HorizontalBar>(addChild(make_shared<HorizontalBar>(horizontalBarRect)).lock());
-	initLabelsAndFields();
+	horizontalBar.lock()->Hide(true);
+
+	setColors();
 }
 
 void EventRow::setMidi(bool b)
@@ -88,81 +88,82 @@ void EventRow::init()
 		if (midi)
 		{
 			setLabelTexts(midiNoteEventLabels);
-			setSizeAndLocation(midiNoteEventXPos, midiNoteEventSizes);
+			setSizesAndLocations(midiNoteEventXPos, midiNoteEventSizes);
 			setMidiNoteEventValues();
 		}
 		else
 		{
 			setLabelTexts(drumNoteEventLabels);
-			setSizeAndLocation(drumNoteEventXPos, drumNoteEventSizes);
+			setSizesAndLocations(drumNoteEventXPos, drumNoteEventSizes);
 			setDrumNoteEventValues();
 		}
 	}
 	else if (dynamic_pointer_cast<EmptyEvent>(event.lock()))
 	{
 		setLabelTexts(emptyEventLabels);
-		setSizeAndLocation(emptyEventXPos, emptyEventSizes);
+		setSizesAndLocations(emptyEventXPos, emptyEventSizes);
 		setEmptyEventValues();
 	}
 	else if (dynamic_pointer_cast<PitchBendEvent>(event.lock()))
 	{
 		setLabelTexts(miscEventLabels);
-		setSizeAndLocation(miscEventXPos, miscEventSizes);
+		setSizesAndLocations(miscEventXPos, miscEventSizes);
 		setMiscEventValues();
 	}
 	else if (dynamic_pointer_cast<ProgramChangeEvent>(event.lock()))
 	{
 		setLabelTexts(miscEventLabels);
-		setSizeAndLocation(miscEventXPos, miscEventSizes);
+		setSizesAndLocations(miscEventXPos, miscEventSizes);
 		setMiscEventValues();
 	}
 	else if (dynamic_pointer_cast<ControlChangeEvent>(event.lock()))
 	{
 		setLabelTexts(controlChangeEventLabels);
-		setSizeAndLocation(controlChangeEventXPos, controlChangeEventSizes);
+		setSizesAndLocations(controlChangeEventXPos, controlChangeEventSizes);
 		setControlChangeEventValues();
 	}
 	else if (dynamic_pointer_cast<ChannelPressureEvent>(event.lock()))
 	{
 		setLabelTexts(channelPressureEventLabels);
-		setSizeAndLocation(channelPressureEventXPos, channelPressureEventSizes);
+		setSizesAndLocations(channelPressureEventXPos, channelPressureEventSizes);
 		setChannelPressureEventValues();
 	}
 	else if (dynamic_pointer_cast<PolyPressureEvent>(event.lock()))
 	{
 		setLabelTexts(polyPressureEventLabels);
-		setSizeAndLocation(polyPressureEventXPos, polyPressureEventSizes);
+		setSizesAndLocations(polyPressureEventXPos, polyPressureEventSizes);
 		setPolyPressureEventValues();
 	}
 	else if (dynamic_pointer_cast<SystemExclusiveEvent>(event.lock()))
 	{
 		setLabelTexts(sysexEventLabels);
-		setSizeAndLocation(sysexEventXPos, sysexEventSizes);
+		setSizesAndLocations(sysexEventXPos, sysexEventSizes);
 		setSystemExclusiveEventValues();
 	}
 	else if (dynamic_pointer_cast<MixerEvent>(event.lock()))
 	{
 		setLabelTexts(mixerEventLabels);
-		setSizeAndLocation(mixerEventXPos, mixerEventSizes);
+		setSizesAndLocations(mixerEventXPos, mixerEventSizes);
 		setMixerEventValues();
 	}
 }
 
 void EventRow::setEmptyEventValues()
 {
-	tfArray[0].lock()->Hide(false);
-	labelArray[0].lock()->Hide(false);
-	labelArray[0].lock()->setText("");
-	tfArray[0].lock()->setText(" ");
+	fields[0].lock()->Hide(false);
+	labels[0].lock()->Hide(false);
+	labels[0].lock()->setText("");
+	fields[0].lock()->setText(" ");
+	
 	horizontalBar.lock()->Hide(true);
-	tfArray[1].lock()->Hide(true);
-	tfArray[2].lock()->Hide(true);
-	tfArray[3].lock()->Hide(true);
-	tfArray[4].lock()->Hide(true);
-	labelArray[1].lock()->Hide(true);
-	labelArray[2].lock()->Hide(true);
-	labelArray[3].lock()->Hide(true);
-	labelArray[4].lock()->Hide(true);
+
+	for (int i = 1; i < 5; i++)
+	{
+		parameters.lock()->sendToBack(fields[i]);
+		parameters.lock()->sendToBack(labels[i]);
+		fields[i].lock()->Hide(true);
+		labels[i].lock()->Hide(true);
+	}
 }
 
 void EventRow::setSystemExclusiveEventValues()
@@ -176,18 +177,22 @@ void EventRow::setSystemExclusiveEventValues()
     
 	for (int i = 0; i < 2; i++)
 	{
-        tfArray[i].lock()->Hide(false);
-        labelArray[i].lock()->Hide(false);
+        fields[i].lock()->Hide(false);
+        labels[i].lock()->Hide(false);
     }
-    tfArray[0].lock()->setText(StrUtil::padLeft(to_string(see->getByteA()), "0", 2));
-	tfArray[1].lock()->setText(StrUtil::padLeft(to_string(see->getByteB()), "0", 2));
-    horizontalBar.lock()->Hide(true);
-    tfArray[2].lock()->Hide(true);
-    tfArray[3].lock()->Hide(true);
-    tfArray[4].lock()->Hide(true);
-    labelArray[2].lock()->Hide(true);
-    labelArray[3].lock()->Hide(true);
-    labelArray[4].lock()->Hide(true);
+    
+	fields[0].lock()->setText(StrUtil::padLeft(to_string(see->getByteA()), "0", 2));
+	fields[1].lock()->setText(StrUtil::padLeft(to_string(see->getByteB()), "0", 2));
+    
+	horizontalBar.lock()->Hide(true);
+
+	for (int i = 2; i < 5; i++)
+	{
+		parameters.lock()->sendToBack(fields[i]);
+		parameters.lock()->sendToBack(labels[i]);
+		fields[i].lock()->Hide(true);
+		labels[i].lock()->Hide(true);
+	}
 }
 
 void EventRow::setPolyPressureEventValues()
@@ -200,65 +205,78 @@ void EventRow::setPolyPressureEventValues()
     
 	for (int i = 0; i < 2; i++)
 	{
-        tfArray[i].lock()->Hide(false);
-        labelArray[i].lock()->Hide(false);
+        fields[i].lock()->Hide(false);
+        labels[i].lock()->Hide(false);
     }
 
-    tfArray[0].lock()->setText(StrUtil::padLeft(to_string(ppe->getNote()), " ", 3) + "(" + mpc::Util::noteNames()[ppe->getNote()] + ")");
-    tfArray[1].lock()->setText(StrUtil::padLeft(to_string(ppe->getAmount()), " ", 3));
-	auto lHorizontalBar = horizontalBar.lock();
-	lHorizontalBar->setValue(ppe->getAmount());
-    lHorizontalBar->Hide(false);
-    tfArray[2].lock()->Hide(true);
-    tfArray[3].lock()->Hide(true);
-    tfArray[4].lock()->Hide(true);
-    labelArray[2].lock()->Hide(true);
-    labelArray[3].lock()->Hide(true);
-    labelArray[4].lock()->Hide(true);
+    fields[0].lock()->setText(StrUtil::padLeft(to_string(ppe->getNote()), " ", 3) + "(" + mpc::Util::noteNames()[ppe->getNote()] + ")");
+    fields[1].lock()->setText(StrUtil::padLeft(to_string(ppe->getAmount()), " ", 3));
+	
+	horizontalBar.lock()->setValue(ppe->getAmount());
+    horizontalBar.lock()->Hide(false);
+	
+	for (int i = 2; i < 5; i++)
+	{
+		parameters.lock()->sendToBack(fields[i]);
+		parameters.lock()->sendToBack(labels[i]);
+		fields[i].lock()->Hide(true);
+		labels[i].lock()->Hide(true);
+	}
 }
 
 void EventRow::setChannelPressureEventValues()
 {
-    if (!event.lock()) return;
+	if (!event.lock())
+	{
+		return;
+	}
 
     auto cpe = dynamic_pointer_cast< ChannelPressureEvent>(event.lock());
-    tfArray[0].lock()->Hide(false);
-    labelArray[0].lock()->Hide(false);
-    tfArray[0].lock()->setText(StrUtil::padLeft(to_string(cpe->getAmount()), " ", 3));
-	auto lHorizontalBar = horizontalBar.lock();
-	lHorizontalBar->setValue(cpe->getAmount());
-    lHorizontalBar->Hide(false);
-    tfArray[1].lock()->Hide(true);
-    tfArray[2].lock()->Hide(true);
-    tfArray[3].lock()->Hide(true);
-    tfArray[4].lock()->Hide(true);
-    labelArray[1].lock()->Hide(true);
-    labelArray[2].lock()->Hide(true);
-    labelArray[3].lock()->Hide(true);
-    labelArray[4].lock()->Hide(true);
+    fields[0].lock()->Hide(false);
+    labels[0].lock()->Hide(false);
+    fields[0].lock()->setText(StrUtil::padLeft(to_string(cpe->getAmount()), " ", 3));
+
+	horizontalBar.lock()->setValue(cpe->getAmount());
+    horizontalBar.lock()->Hide(false);
+
+	for (int i = 1; i < 5; i++)
+	{
+		parameters.lock()->sendToBack(fields[i]);
+		parameters.lock()->sendToBack(labels[i]);
+		fields[i].lock()->Hide(true);
+		labels[i].lock()->Hide(true);
+	}
 }
 
 void EventRow::setControlChangeEventValues()
 {
-    if (!event.lock())
-        return;
+	if (!event.lock())
+	{
+		return;
+	}
 
     auto cce = dynamic_pointer_cast< ControlChangeEvent>(event.lock());
-    for (int i = 0; i < 2; i++) {
-        tfArray[i].lock()->Hide(false);
-        labelArray[i].lock()->Hide(false);
+    
+	for (int i = 0; i < 2; i++)
+	{
+        fields[i].lock()->Hide(false);
+        labels[i].lock()->Hide(false);
     }
-    tfArray[0].lock()->setText(controlNames[cce->getController()]);
-    tfArray[1].lock()->setText(StrUtil::padLeft(to_string(cce->getAmount()), " ", 3));
+
+    fields[0].lock()->setText(controlNames[cce->getController()]);
+    fields[1].lock()->setText(StrUtil::padLeft(to_string(cce->getAmount()), " ", 3));
+	
 	auto lHorizontalBar = horizontalBar.lock();
 	lHorizontalBar->setValue(cce->getAmount());
     lHorizontalBar->Hide(false);
-    tfArray[2].lock()->Hide(true);
-    tfArray[3].lock()->Hide(true);
-    tfArray[4].lock()->Hide(true);
-    labelArray[2].lock()->Hide(true);
-    labelArray[3].lock()->Hide(true);
-    labelArray[4].lock()->Hide(true);
+    
+	for (int i = 2; i < 5; i++)
+	{
+		parameters.lock()->sendToBack(fields[i]);
+		parameters.lock()->sendToBack(labels[i]);
+		fields[i].lock()->Hide(true);
+		labels[i].lock()->Hide(true);
+	}
 }
 
 void EventRow::setMiscEventValues()
@@ -278,45 +296,46 @@ void EventRow::setMiscEventValues()
         parameterValue = pitchBendEvent->getAmount();
     }
     
-	if (programChangeEvent != nullptr)
+	if (programChangeEvent)
 	{
-        parameterValue = dynamic_pointer_cast< ProgramChangeEvent>(event.lock())->getProgram();
-        labelArray[0].lock()->setText(">PROGRAM CHANGE:");
-        tfArray[0].lock()->setSize(3 * 6 + 1, 9);
+        parameterValue = programChangeEvent->getProgram();
+        labels[0].lock()->setText(">PROGRAM CHANGE:");
+        fields[0].lock()->setSize(3 * 6 + 1, 9);
     }
     
 	for (int i = 0; i < 2; i++)
 	{
-        tfArray[i].lock()->Hide(false);
-        labelArray[i].lock()->Hide(false);
+        fields[i].lock()->Hide(false);
+        labels[i].lock()->Hide(false);
     }
     
-	tfArray[0].lock()->setText(StrUtil::padLeft(to_string(parameterValue), " ", 3));
+	fields[0].lock()->setText(StrUtil::padLeft(to_string(parameterValue), " ", 3));
     
-	if(dynamic_pointer_cast< PitchBendEvent>(event.lock()) != nullptr)
+	if (pitchBendEvent)
 	{
         if(parameterValue > 0)
 		{
-            tfArray[0].lock()->setText("+" + StrUtil::padLeft(to_string(parameterValue), " ", 4));
+            fields[0].lock()->setText("+" + StrUtil::padLeft(to_string(parameterValue), " ", 4));
         }
         else if(parameterValue < 0)
 		{
-            tfArray[0].lock()->setText("-" + StrUtil::padLeft(to_string(abs(parameterValue)), " ", 4));
+            fields[0].lock()->setText("-" + StrUtil::padLeft(to_string(abs(parameterValue)), " ", 4));
         }
         else if(parameterValue == 0)
 		{
-            tfArray[0].lock()->setText("    0");
+            fields[0].lock()->setText("    0");
         }
     }
 
     horizontalBar.lock()->Hide(true);
-    tfArray[1].lock()->Hide(true);
-    tfArray[2].lock()->Hide(true);
-    tfArray[3].lock()->Hide(true);
-    tfArray[4].lock()->Hide(true);
-    labelArray[2].lock()->Hide(true);
-    labelArray[3].lock()->Hide(true);
-    labelArray[4].lock()->Hide(true);
+
+	for (int i = 1; i < 5; i++)
+	{
+		parameters.lock()->sendToBack(fields[i]);
+		parameters.lock()->sendToBack(labels[i]);
+		fields[i].lock()->Hide(true);
+		labels[i].lock()->Hide(true);
+	}
 }
 
 void EventRow::setMixerEventValues()
@@ -325,49 +344,54 @@ void EventRow::setMixerEventValues()
 	{
 		return;
 	}
+
 	auto lSampler = sampler.lock();
-	auto me = dynamic_pointer_cast<MixerEvent>(event.lock());
+	auto mixerEvent = dynamic_pointer_cast<MixerEvent>(event.lock());
 	
 	for (int i = 0; i < 3; i++)
 	{
-		tfArray[i].lock()->Hide(false);
-		labelArray[i].lock()->Hide(false);
+		fields[i].lock()->Hide(false);
+		labels[i].lock()->Hide(false);
 	}
 	
-	tfArray[0].lock()->setText(mixerParamNames[me->getParameter()]);
-	auto nn = program.lock()->getPad(me->getPad())->getNote();
-	tfArray[1].lock()->setText(string(nn == 34 ? "--" : to_string(nn)) + "/" + lSampler->getPadName(me->getPad()));
+	fields[0].lock()->setText(mixerParamNames[mixerEvent->getParameter()]);
+	auto nn = program.lock()->getPad(mixerEvent->getPad())->getNote();
+	fields[1].lock()->setText(string(nn == 34 ? "--" : to_string(nn)) + "/" + lSampler->getPadName(mixerEvent->getPad()));
 	
-	if (me->getParameter() == 1)
+	if (mixerEvent->getParameter() == 1)
 	{
-		labelArray[2].lock()->setText("P:");
+		labels[2].lock()->setText("P:");
 		auto panning = "L";
-		if (me->getValue() > 50)
+
+		if (mixerEvent->getValue() > 50)
 		{
 			panning = "R";
 		}
 
-		tfArray[2].lock()->setText(panning + StrUtil::padLeft(to_string(abs(me->getValue() - 50)), " ", 2));
+		fields[2].lock()->setText(panning + StrUtil::padLeft(to_string(abs(mixerEvent->getValue() - 50)), " ", 2));
 		
-		if (me->getValue() == 50)
+		if (mixerEvent->getValue() == 50)
 		{
-			tfArray[2].lock()->setText("0  ");
+			fields[2].lock()->setText("0  ");
 		}
 	}
 	else
 	{
-		labelArray[2].lock()->setText("L:");
-		tfArray[2].lock()->setText(StrUtil::padLeft(to_string(me->getValue()), " ", 3));
+		labels[2].lock()->setText("L:");
+		fields[2].lock()->setText(StrUtil::padLeft(to_string(mixerEvent->getValue()), " ", 3));
 	}
 
 	auto lHorizontalBar = horizontalBar.lock();
-	lHorizontalBar->setValue(me->getValue() * 1.27);
+	lHorizontalBar->setValue(mixerEvent->getValue() * 1.27);
 	lHorizontalBar->Hide(false);
 	
-	tfArray[3].lock()->Hide(true);
-	tfArray[4].lock()->Hide(true);
-	labelArray[3].lock()->Hide(true);
-	labelArray[4].lock()->Hide(true);
+	for (int i = 3; i < 5; i++)
+	{
+		parameters.lock()->sendToBack(fields[i]);
+		parameters.lock()->sendToBack(labels[i]);
+		fields[i].lock()->Hide(true);
+		labels[i].lock()->Hide(true);
+	}
 }
 
 void EventRow::setDrumNoteEventValues()
@@ -376,30 +400,31 @@ void EventRow::setDrumNoteEventValues()
 	{
 		return;
 	}
+
 	auto lSampler = sampler.lock();
 	auto ne = dynamic_pointer_cast<NoteEvent>(event.lock());
 	
 	for (int i = 0; i < 5; i++)
 	{
-		tfArray[i].lock()->Hide(false);
-		labelArray[i].lock()->Hide(false);
+		fields[i].lock()->Hide(false);
+		labels[i].lock()->Hide(false);
 	}
 	
 	if (ne->getNote() < 35 || ne->getNote() > 98)
 	{
-		tfArray[0].lock()->setText("--/OFF");
+		fields[0].lock()->setText("--/OFF");
 	}
 	else
 	{
-		tfArray[0].lock()->setText(to_string(ne->getNote()) + "/" + lSampler->getPadName(program.lock()->getPadIndexFromNote(ne->getNote())));
+		fields[0].lock()->setText(to_string(ne->getNote()) + "/" + lSampler->getPadName(program.lock()->getPadIndexFromNote(ne->getNote())));
 	}
 
-	tfArray[1].lock()->setText(noteVarParamNames[ne->getVariationTypeNumber()]);
+	fields[1].lock()->setText(noteVarParamNames[ne->getVariationTypeNumber()]);
 	
 	if (ne->getVariationTypeNumber() == 0)
 	{
-		tfArray[2].lock()->setSize(4 * 6 + 1, 9);
-		tfArray[2].lock()->setLocation(90, tfArray[2].lock()->getY());
+		fields[2].lock()->setSize(4 * 6 + 1, 9);
+		fields[2].lock()->setLocation(90, fields[2].lock()->getY());
 	
 		auto noteVarValue = (ne->getVariationValue() * 2) - 128;
 		
@@ -415,17 +440,15 @@ void EventRow::setDrumNoteEventValues()
 		
 		if (noteVarValue == 0)
 		{
-			tfArray[2].lock()->setText("   0");
+			fields[2].lock()->setText("   0");
 		}
-
-		if (noteVarValue < 0)
+		else if (noteVarValue < 0)
 		{
-			tfArray[2].lock()->setText("-" + StrUtil::padLeft(to_string(abs(noteVarValue)), " ", 3));
+			fields[2].lock()->setText("-" + StrUtil::padLeft(to_string(abs(noteVarValue)), " ", 3));
 		}
-
-		if (noteVarValue > 0)
+		else if (noteVarValue > 0)
 		{
-			tfArray[2].lock()->setText("+" + StrUtil::padLeft(to_string(noteVarValue), " ", 3));
+			fields[2].lock()->setText("+" + StrUtil::padLeft(to_string(noteVarValue), " ", 3));
 		}
 	}
 	else if (ne->getVariationTypeNumber() == 1 || ne->getVariationTypeNumber() == 2)
@@ -437,14 +460,14 @@ void EventRow::setDrumNoteEventValues()
 			noteVarValue = 100;
 		}
 		
-		tfArray[2].lock()->setText(StrUtil::padLeft(to_string(noteVarValue), " ", 3));
-		tfArray[2].lock()->setSize(3 * 6 + 1, 9);
-		tfArray[2].lock()->setLocation(90 + 6, tfArray[2].lock()->getY());
+		fields[2].lock()->setText(StrUtil::padLeft(to_string(noteVarValue), " ", 3));
+		fields[2].lock()->setSize(3 * 6 + 1, 9);
+		fields[2].lock()->setLocation(90 + 6, fields[2].lock()->getY());
 	}
 	else if (ne->getVariationTypeNumber() == 3)
 	{
-		tfArray[2].lock()->setSize(4 * 6 + 1, 9);
-		tfArray[2].lock()->setLocation(90, tfArray[2].lock()->getY());
+		fields[2].lock()->setSize(4 * 6 + 1, 9);
+		fields[2].lock()->setLocation(90, fields[2].lock()->getY());
 		auto noteVarValue = ne->getVariationValue() - 50;
 		
 		if (noteVarValue > 50)
@@ -454,24 +477,23 @@ void EventRow::setDrumNoteEventValues()
 		
 		if (noteVarValue < 0)
 		{
-			tfArray[2].lock()->setText("-" + StrUtil::padLeft(to_string(abs(noteVarValue)), " ", 2));
+			fields[2].lock()->setText("-" + StrUtil::padLeft(to_string(abs(noteVarValue)), " ", 2));
 		}
 		else if (noteVarValue > 0)
 		{
-			tfArray[2].lock()->setText("+" + StrUtil::padLeft(to_string(noteVarValue), " ", 2));
+			fields[2].lock()->setText("+" + StrUtil::padLeft(to_string(noteVarValue), " ", 2));
 		}
 		else
 		{
-			tfArray[2].lock()->setText("  0");
+			fields[2].lock()->setText("  0");
 		}
 	}
 
-	tfArray[3].lock()->setText(StrUtil::padLeft(to_string(ne->getDuration()), " ", 4));
-	tfArray[4].lock()->setText(StrUtil::padLeft(to_string(ne->getVelocity()), " ", 3));
+	fields[3].lock()->setText(StrUtil::padLeft(to_string(ne->getDuration()), " ", 4));
+	fields[4].lock()->setText(StrUtil::padLeft(to_string(ne->getVelocity()), " ", 3));
 	
-	auto lHorizontalBar = horizontalBar.lock(); 
-	lHorizontalBar->setValue(ne->getVelocity());
-	lHorizontalBar->Hide(false);
+	horizontalBar.lock()->setValue(ne->getVelocity());
+	horizontalBar.lock()->Hide(false);
 }
 
 void EventRow::setMidiNoteEventValues()
@@ -485,27 +507,24 @@ void EventRow::setMidiNoteEventValues()
 	
 	for (int i = 0; i < 3; i++)
 	{
-		tfArray[i].lock()->Hide(false);
-		labelArray[i].lock()->Hide(false);
+		fields[i].lock()->Hide(false);
+		labels[i].lock()->Hide(false);
 	}
 	
-	tfArray[0].lock()->setText(StrUtil::padLeft(to_string(ne->getNote()), " ", 3) + "(" + mpc::Util::noteNames()[ne->getNote()] + ")");
-	tfArray[1].lock()->setText(StrUtil::padLeft(to_string(ne->getDuration()), " ", 4));
-	tfArray[2].lock()->setText(to_string(ne->getVelocity()));
+	fields[0].lock()->setText(StrUtil::padLeft(to_string(ne->getNote()), " ", 3) + "(" + mpc::Util::noteNames()[ne->getNote()] + ")");
+	fields[1].lock()->setText(StrUtil::padLeft(to_string(ne->getDuration()), " ", 4));
+	fields[2].lock()->setText(to_string(ne->getVelocity()));
 	
-	auto lHorizontalBar = horizontalBar.lock(); 
-	lHorizontalBar->setValue(ne->getVelocity());
-	lHorizontalBar->Hide(false);
-	tfArray[3].lock()->Hide(true);
-	tfArray[4].lock()->Hide(true);
-	labelArray[3].lock()->Hide(true);
-	labelArray[4].lock()->Hide(true);
-}
+	horizontalBar.lock()->setValue(ne->getVelocity());
+	horizontalBar.lock()->Hide(false);
 
-void EventRow::initLabelsAndFields()
-{
-	horizontalBar.lock()->Hide(true);
-	setColors();
+	for (int i = 3; i < 5; i++)
+	{
+		parameters.lock()->sendToBack(fields[i]);
+		parameters.lock()->sendToBack(labels[i]);
+		fields[i].lock()->Hide(true);
+		labels[i].lock()->Hide(true);
+	}
 }
 
 void EventRow::setColors()
@@ -516,54 +535,58 @@ void EventRow::setColors()
 	{
 		if (selected)
 		{
-			//selectedEventBar.lock()->Hide(false);
-			//selectedEventBar.lock()->SetDirty();
-			labelArray[i].lock()->setInverted(true);
-			labelArray[i].lock()->setOpaque(true);
+			parameters.lock()->setColor(true);
+			labels[i].lock()->setInverted(true);
+			labels[i].lock()->setOpaque(true);
 		
-			if (ls->getFocus().compare(tfArray[i].lock()->getName()) == 0)
+			if (ls->getFocus().compare(fields[i].lock()->getName()) == 0)
 			{
-				tfArray[i].lock()->setInverted(false);
-				//tfArray[i].lock()->setOpaque(false);
+				fields[i].lock()->setInverted(false);
 			}
 			else
 			{
-				tfArray[i].lock()->setInverted(true);
+				fields[i].lock()->setInverted(true);
 			}
 		}
 		else
 		{
-			//selectedEventBar.lock()->Hide(true);
-			labelArray[i].lock()->setInverted(false);
-			//labelArray[i].lock()->setOpaque(false);
-			if (tfArray[i].lock()->hasFocus())
+			parameters.lock()->setColor(false);
+			labels[i].lock()->setInverted(false);
+			
+			if (fields[i].lock()->hasFocus())
 			{
-				tfArray[i].lock()->setInverted(true);
+				fields[i].lock()->setInverted(true);
 			}
 			else
 			{
-				tfArray[i].lock()->setInverted(false);
+				fields[i].lock()->setInverted(false);
 			}
 		}
 	}
 }
 
-void EventRow::setLabelTexts(vector<string> labels)
+void EventRow::setLabelTexts(const vector<string>& labelTexts)
 {
-	for (int i = 0; i < labels.size(); i++)
+	for (int i = 0; i < labelTexts.size(); i++)
 	{
-		labelArray[i].lock()->setText(labels[i]);
+		labels[i].lock()->setText(labelTexts[i]);
 	}
 }
 
-void EventRow::setSizeAndLocation(vector<int> xPosArray, vector<int> sizeArray)
+void EventRow::setSizesAndLocations(const vector<int>& xPositions, const vector<int>& fieldWidths)
 {
-	for (int i = 0; i < xPosArray.size(); i++)
+	for (int i = 0; i < xPositions.size(); i++)
 	{
-		tfArray[i].lock()->setSize((sizeArray[i] * 6) + 1, 9);
-		labelArray[i].lock()->setSize(labelArray[i].lock()->getText().length() * 6, 9);
-		labelArray[i].lock()->setLocation(xPosArray[i] - 1, 11 + (rowIndex * 9));
-		tfArray[i].lock()->setLocation(xPosArray[i] + (labelArray[i].lock()->getText().length() * 6) - 1, 11 + (rowIndex * 9));
+		auto tf = fields[i].lock();
+		auto label = labels[i].lock();
+
+		auto labelTextLength = label->getText().length();
+
+		tf->setSize((fieldWidths[i] * 6) + 1, 9);
+		tf->setLocation(xPositions[i] + (labelTextLength * 6) - 1, 11 + (rowIndex * 9));
+
+		label->setSize(labelTextLength * 6, 9);
+		label->setLocation(xPositions[i] - 1, 11 + (rowIndex * 9));
 	}
 }
 

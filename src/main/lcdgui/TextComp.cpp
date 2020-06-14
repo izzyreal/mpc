@@ -18,10 +18,16 @@ TextComp::TextComp(const std::string& name)
 {
 }
 
-void TextComp::Draw(std::vector<std::vector<bool>>* pixels) {
+void TextComp::Draw(std::vector<std::vector<bool>>* pixels)
+{
 	if (shouldNotDraw(pixels))
 	{
 		return;
+	}
+
+	if (mpc::Mpc::instance().getLayeredScreen().lock()->getCurrentScreenName().compare("step-editor") == 0)
+	{
+		MLOG("Drawing " + name + " with width " + to_string(w));
 	}
 
 	auto font = &LayeredScreen::font;

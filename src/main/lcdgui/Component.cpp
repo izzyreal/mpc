@@ -19,6 +19,20 @@ Component::Component(const string& name)
 	this->name = name;
 }
 
+void Component::sendToBack(std::weak_ptr<Component> childToSendBack)
+{
+	for (int i = 0; i < children.size(); i++)
+	{
+		if (children[i] == childToSendBack.lock())
+		{
+			auto placeHolder = children[i];
+			children.erase(begin(children) + i);
+			children.insert(children.begin(), move(placeHolder));
+			break;
+		}
+	}
+}
+
 bool Component::shouldNotDraw(vector<vector<bool>>* pixels)
 {
 	if (!IsDirty())
@@ -222,6 +236,7 @@ void Component::Draw(vector<vector<bool>>* pixels)
 
 	for (auto& c : children)
 	{
+		//MLOG("Drawing child of " + name + ": " + c->getName());
 		c->Draw(pixels);
 	}
 
@@ -282,7 +297,10 @@ MRECT Component::getDirtyArea()
 
 	if (dirty)
 	{
+		MLOG(name + " is dirty");
 		auto rect = getRect();
+		MLOG("rect1: " + rect.getInfo());
+		MLOG("rect2: " + dirtyRect.getInfo());
 		res = res.Union(&rect);
 		res = res.Union(&dirtyRect);
 	}
@@ -346,17 +364,12 @@ void Component::Clear(vector<vector<bool>>* pixels)
 {
 	auto r = getRect();
 
+	MLOG("Clearing " + name);
+
 	if (!dirtyRect.Empty())
 	{
 		r = r.Union(&dirtyRect);
 		dirtyRect.Clear();
-	}
-
-	if (name.compare("view") == 0)
-	{
-		MLOG("Clearing view with rect " + r.getInfo());
-		MLOG("r.L: " + to_string(r.L) + ", r.R: " + to_string(r.R));
-		MLOG("r.T: " + to_string(r.T) + ", r.B: " + to_string(r.B));
 	}
 
 	for (int i = r.L; i < r.R; i++)

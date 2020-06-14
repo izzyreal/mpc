@@ -1,7 +1,7 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 #include <lcdgui/EventRow.hpp>
-#include <lcdgui/SelectedEventBar.hpp>
+#include <lcdgui/EventRowParameters.hpp>
 
 #include <sequencer/Event.hpp>
 #include <sequencer/EmptyEvent.hpp>
@@ -39,7 +39,7 @@ namespace mpc::lcdgui::screens
 		void update(moduru::observer::Observable*, nonstd::any message);
 
 	private:
-		std::vector<std::weak_ptr<mpc::lcdgui::SelectedEventBar>> findSelectedEventBars();
+		std::vector<std::weak_ptr<mpc::lcdgui::EventRowParameters>> findEventRowParameterss();
 		std::vector<std::weak_ptr<mpc::lcdgui::EventRow>> findEventRows();
 		void refreshSelection();
 		void initVisibleEvents();
