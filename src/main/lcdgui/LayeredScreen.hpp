@@ -43,9 +43,11 @@ namespace mpc::lcdgui {
 		std::weak_ptr<mpc::lcdgui::Field> findAbove(std::weak_ptr<mpc::lcdgui::Field> tf);
 
 	public:
+		void transferLeft();
+		void transferRight();
 		std::string findBelow(std::string tf);
 		std::string findAbove(std::string tf);
-		void transferFocus(bool backwards);
+		//void transferFocus(bool backwards);
 		Layer* getLayer(int i);
 		int getFocusedLayerIndex();
 		std::weak_ptr<Layer> getFocusedLayer();

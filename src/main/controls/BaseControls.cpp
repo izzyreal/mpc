@@ -84,7 +84,7 @@ void BaseControls::left()
 		return;
 	}
 	
-	ls.lock()->transferFocus(true);
+	ls.lock()->transferLeft();
 }
 
 void BaseControls::right()
@@ -99,7 +99,7 @@ void BaseControls::right()
 		return;
 	}
 	
-	ls.lock()->transferFocus(false);
+	ls.lock()->transferRight();
 }
 
 void BaseControls::up()

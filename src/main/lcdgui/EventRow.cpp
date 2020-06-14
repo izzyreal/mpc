@@ -57,10 +57,10 @@ EventRow::EventRow(int bus, weak_ptr<Event> e, int rowIndex)
 
 	for (int i = 0; i < 5; i++)
 	{
-		auto label = parameters.lock()->addChild(make_shared<Label>(letters[i] + to_string(rowIndex), drumNoteEventLabels[i], drumNoteEventXPos[i], rowIndex * 9 + 11, drumNoteEventLabels[i].length() * 6 + 1)).lock();
+		auto label = parameters.lock()->addChild(make_shared<Label>(letters[i] + to_string(rowIndex), drumNoteEventLabels[i], drumNoteEventXPos[i] + 1, rowIndex * 9 + 12, drumNoteEventLabels[i].length() * 6 + 1)).lock();
 		labels.push_back(dynamic_pointer_cast<Label>(label));
 
-		auto tf = parameters.lock()->addChild(make_shared<Field>(letters[i] + to_string(rowIndex), drumNoteEventXPos[i] + drumNoteEventLabels[i].length() * 6 + 1, rowIndex * 9 + 11, drumNoteEventSizes[i])).lock();
+		auto tf = parameters.lock()->addChild(make_shared<Field>(letters[i] + to_string(rowIndex), drumNoteEventXPos[i] + 1 + drumNoteEventLabels[i].length() * 6 + 1, rowIndex * 9 + 12, drumNoteEventSizes[i])).lock();
 		fields.push_back(dynamic_pointer_cast<Field>(tf));
 	}
 

@@ -25,6 +25,7 @@ Field::Field(const string& name, int x, int y, int width)
 	this->name = name;
 	setSize(width, 9);
 	setLocation(x - 1, y - 1);
+	dirtyRect.Clear();
 }
 
 const int Field::BLINKING_RATE;
@@ -54,7 +55,6 @@ void Field::Draw(std::vector<std::vector<bool>>* pixels)
 			(*pixels)[i][j] = inverted;
 		}
 	}
-
 	TextComp::Draw(pixels);
 }
 

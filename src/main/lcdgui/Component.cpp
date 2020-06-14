@@ -19,7 +19,7 @@ Component::Component(const string& name)
 	this->name = name;
 }
 
-void Component::sendToBack(std::weak_ptr<Component> childToSendBack)
+void Component::sendToBack(weak_ptr<Component> childToSendBack)
 {
 	for (int i = 0; i < children.size(); i++)
 	{
@@ -31,6 +31,40 @@ void Component::sendToBack(std::weak_ptr<Component> childToSendBack)
 			break;
 		}
 	}
+}
+
+bool Component::bringToFront(Component* childToBringToFront)
+{	
+
+	if (childToBringToFront == nullptr)
+	{
+		return false;
+	}
+
+	for (int i = 0; i < children.size(); i++)
+	{
+		if (children[i].get() == childToBringToFront)
+		{
+			auto placeHolder = children[i];
+			children.erase(begin(children) + i);
+			children.push_back(move(placeHolder));
+			return true;
+		}
+	}
+
+	for (auto& c : children)
+	{
+		if (c->bringToFront(childToBringToFront))
+		{
+			if (parent != nullptr)
+			{
+				parent->bringToFront(this);
+			}
+			return true;
+		}
+	}
+
+	return false;
 }
 
 bool Component::shouldNotDraw(vector<vector<bool>>* pixels)
@@ -179,6 +213,7 @@ vector<weak_ptr<Parameter>> Component::findParameters()
 
 weak_ptr<Component> Component::addChild(shared_ptr<Component> child)
 {
+	child->parent = this;
 	children.push_back(move(child));
 	SetDirty();
 	return children.back();
@@ -437,4 +472,9 @@ void Component::deleteChildren(const string& name)
 			children.erase(begin(children) + i);
 		}
 	}
+}
+
+Component* Component::getParent()
+{
+	return parent;
 }

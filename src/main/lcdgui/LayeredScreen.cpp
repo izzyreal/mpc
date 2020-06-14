@@ -94,57 +94,6 @@ int LayeredScreen::getCurrentFieldIndex()
 	return currentIndex;
 }
 
-void LayeredScreen::transferFocus(bool backwards)
-{
-	int currentIndex, candidateIndex;
-	auto layer = layers[focusedLayerIndex].lock();
-	auto fields = layer->findFields();
-	int size = fields.size();
-	
-	currentIndex = getCurrentFieldIndex();
-	
-	if (currentIndex == -1)
-	{
-		return;
-	}
-	
-	if (backwards && currentIndex == 0)
-	{
-		return;
-	}
-
-	if (!backwards && currentIndex == size - 1)
-	{
-		return;
-	}
-
-	bool success = false;
-	
-	while (!success)
-	{
-		candidateIndex = backwards ? currentIndex-- - 1 : currentIndex++ + 1;
-		
-		if (candidateIndex >= 0 && candidateIndex < size)
-		{
-			if (!fields[candidateIndex].lock()->IsHidden())
-			{
-				success = true;
-			}
-		}
-		else
-		{
-			break;
-		}
-	}
-
-	if (!success)
-	{
-		return;
-	}
-
-	layer->setFocus(fields[candidateIndex].lock()->getName());
-}
-
 int LayeredScreen::openScreen(string screenName) {
 
 	if (currentScreenName.compare(screenName) == 0) {
@@ -378,7 +327,100 @@ std::weak_ptr<Layer> LayeredScreen::getFocusedLayer()
 	return layers[focusedLayerIndex];
 }
 
-weak_ptr<Field> LayeredScreen::findBelow(weak_ptr<Field> tf0) {
+void LayeredScreen::transferLeft()
+{
+	shared_ptr<Field> candidate;
+
+	auto source = getFocusedLayer().lock()->findField(getFocus()).lock();
+
+	for (auto& f : getFocusedLayer().lock()->findFields())
+	{
+		if (f.lock() == source)
+		{
+			continue;
+		}
+
+		int verticalOffset = abs(source->getY() - f.lock()->getY());
+
+		if (verticalOffset > 2)
+		{
+			continue;
+		}
+
+		int candidateVerticalOffset = candidate ? abs(source->getY() - candidate->getY()) : INT_MAX;
+
+		if (verticalOffset <= candidateVerticalOffset)
+		{
+
+			if (f.lock()->getX() > source->getX())
+			{
+				continue;
+			}
+
+			int horizontalOffset = source->getX() - f.lock()->getX();
+			int candidateHorizontalOffset = candidate ? source->getX() - candidate->getX() : INT_MAX;
+
+			if (horizontalOffset <= candidateHorizontalOffset)
+			{
+				candidate = f.lock();
+			}
+		}
+	}
+
+	if (candidate)
+	{
+		setFocus(candidate->getName());
+	}
+}
+
+void LayeredScreen::transferRight()
+{
+	shared_ptr<Field> candidate;
+
+	auto source = getFocusedLayer().lock()->findField(getFocus()).lock();
+
+	for (auto& f : getFocusedLayer().lock()->findFields())
+	{
+		if (f.lock() == source)
+		{
+			continue;
+		}
+		
+		int verticalOffset = abs(source->getY() - f.lock()->getY());
+
+		if (verticalOffset > 2)
+		{
+			continue;
+		}
+
+		int candidateVerticalOffset = candidate ? abs(source->getY() - candidate->getY()) : INT_MAX;
+
+		if (verticalOffset <= candidateVerticalOffset)
+		{
+
+			if (f.lock()->getX() < source->getX())
+			{
+				continue;
+			}
+
+			int horizontalOffset = f.lock()->getX() - source->getX();
+			int candidateHorizontalOffset = candidate ? candidate->getX() - source->getX() : INT_MAX;
+
+			if (horizontalOffset <= candidateHorizontalOffset)
+			{
+				candidate = f.lock();
+			}
+		}
+	}
+
+	if (candidate)
+	{
+		setFocus(candidate->getName());
+	}
+}
+
+weak_ptr<Field> LayeredScreen::findBelow(weak_ptr<Field> tf0)
+{
 	int marginChars = 8;
 	int minDistV = 7;
 	int maxDistH = 6 * marginChars;

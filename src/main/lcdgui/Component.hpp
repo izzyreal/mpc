@@ -20,10 +20,9 @@ namespace mpc::lcdgui
 	class Component
 	{
 
-	private:
-		MRECT dirtyRect;
-
 	protected:
+		MRECT dirtyRect;
+		Component* parent = nullptr;
 		std::vector<std::shared_ptr<Component>> children;
 
 	protected:
@@ -64,6 +63,8 @@ namespace mpc::lcdgui
 		void setLocation(int x, int y);
 		const std::string& getName();
 		void sendToBack(std::weak_ptr<Component> childToSendBack);
+		bool bringToFront(Component* childToBringToFront);
+		Component* getParent();
 
 	public:
 		virtual void Draw(std::vector<std::vector<bool>>* pixels);
