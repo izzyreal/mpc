@@ -119,26 +119,42 @@ void StepEditorScreen::function(int i)
 		if (selectionStartIndex != -1)
 		{
 			removeEvents();
-			ls.lock()->openScreen("step-editor");
+
 			ls.lock()->setFocus("a0");
 		}
 		else if (param.length() == 2)
 		{
-			auto eventNumber = stoi(param.substr(1, 2));
+			auto rowIndex = stoi(param.substr(1, 2));
 		
-			if (!dynamic_pointer_cast<EmptyEvent>(visibleEvents[eventNumber].lock()))
+			if (!dynamic_pointer_cast<EmptyEvent>(visibleEvents[rowIndex].lock()))
 			{
 				for (int i = 0; i < track.lock()->getEvents().size(); i++)
 				{
-					if (track.lock()->getEvents()[i].lock() == visibleEvents[eventNumber].lock())
+					if (track.lock()->getEvents()[i].lock() == visibleEvents[rowIndex].lock())
 					{
 						track.lock()->removeEvent(i);
 						break;
 					}
 				}
-				ls.lock()->openScreen("step-editor");
+
+				// Here we check whether the removed event was the last (non-empty) visible event.
+				// If yes, we make sure the empty event's field has focus.
+				if (dynamic_pointer_cast<EmptyEvent>(visibleEvents[rowIndex + 1].lock()))
+				{
+					ls.lock()->setFocus("a" + to_string(rowIndex));
+				}
+
+				if (rowIndex == 2 && yOffset > 0)
+				{
+					yOffset--;
+				}
 			}
 		}
+
+		initVisibleEvents();
+		refreshEventRows();
+		refreshSelection();
+
 		break;
 	case 3:
 	{
