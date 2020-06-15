@@ -23,6 +23,13 @@ Field::Field(const string& name, int x, int y, int width)
 	: TextComp(name)
 {
 	this->name = name;
+	
+	if (width == 1)
+	{
+		// We use width 0 as an indicator of wanting to be completely invisible, like dummy fields
+		width = 0;
+	}
+
 	setSize(width, 9);
 	setLocation(x - 1, y - 1);
 	preDrawClearRect.Clear();
