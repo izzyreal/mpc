@@ -31,7 +31,7 @@ void Song::setFirstStep(int i)
     if(firstStep > lastStep)
         setLastStep(firstStep);
 
-    setChanged();
+    
 	notifyObservers(string("firststep"));
 }
 
@@ -49,7 +49,7 @@ void Song::setLastStep(int i)
 	if (lastStep < firstStep)
 		setFirstStep(lastStep);
 
-	setChanged();
+	
 	notifyObservers(string("laststep"));
 }
 
@@ -61,7 +61,7 @@ int Song::getLastStep()
 void Song::setName(string str)
 {
     name = str;
-    setChanged();
+    
 	notifyObservers(string("song-name"));
 }
 
@@ -84,7 +84,7 @@ void Song::insertStep(int stepIndex, Step* s)
 	steps.insert(steps.begin() + stepIndex, s);
 	if (!used) {
 		used = true;
-		setChanged();
+		
 		notifyObservers(string("song-name"));
 	}
 	notifySong();
@@ -92,7 +92,7 @@ void Song::insertStep(int stepIndex, Step* s)
 
 void Song::notifySong()
 {
-    setChanged();
+    
 	notifyObservers(string("song"));
 }
 
@@ -131,7 +131,7 @@ bool Song::isUsed()
 void Song::setUsed(bool b)
 {
     used = true;
-    setChanged();
+    
 	notifyObservers(string("used"));
 }
 

@@ -11,7 +11,7 @@ void PolyPressureEvent::setNote(int i)
 {
     if(i < 0 || i > 127) return;
     note = i;
-    setChanged();
+    
     notifyObservers(string("step-editor"));
 }
 
@@ -26,7 +26,7 @@ void PolyPressureEvent::setAmount(int i)
         return;
 
     polyPressureValue = i;
-    setChanged();
+    
     notifyObservers(string("step-editor"));
 }
 

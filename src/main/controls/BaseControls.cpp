@@ -296,7 +296,7 @@ void BaseControls::generateNoteOn(int nn, int padVelo, int tick)
 			int noteVal = timingCorrectScreen->getNoteValue();
 			int stepLength = sequencer.lock()->getTickValues()[noteVal];
 			if (stepLength != 0) {
-				int bar = sequencer.lock()->getCurrentBarNumber() + 1;
+				int bar = sequencer.lock()->getCurrentBarIndex() + 1;
 				track.lock()->timingCorrect(0, bar, n.get(), stepLength);
 				vector<weak_ptr<mpc::sequencer::Event>> events{ n };
 				track.lock()->swing(events, noteVal, timingCorrectScreen->getSwing(), vector<int>{0, 127});

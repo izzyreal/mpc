@@ -278,7 +278,7 @@ void Mpc::setBank(int i)
 
 	bank = i;
 
-	setChanged();
+	
 	notifyObservers(string("bank"));
 
 	hardware->getLed("padbanka").lock()->light(i == 0);
@@ -330,7 +330,7 @@ void Mpc::setPadAndNote(int pad, int note)
 
 	this->note = note;
 
-	setChanged();
+	
 	notifyObservers(string("padandnote"));
 }
 

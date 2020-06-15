@@ -33,7 +33,7 @@ void NoteEvent::setNote(int i)
     if(number == i) return;
 
     number = i;
-    setChanged();
+    
     notifyObservers(string("step-editor"));
 }
 
@@ -46,7 +46,7 @@ void NoteEvent::setDuration(int i)
 {
 	if (i < 0 || i > 9999) return;
 	duration = i;
-	setChanged();
+	
 	notifyObservers(string("step-editor"));
 }
 
@@ -65,7 +65,7 @@ void NoteEvent::setVariationTypeNumber(int i)
     if(i < 0 || i > 3) return;
 
     variationTypeNumber = i;
-    setChanged();
+    
     notifyObservers(string("step-editor"));
 }
 
@@ -76,7 +76,7 @@ void NoteEvent::setVariationValue(int i)
     if(variationTypeNumber != 0 && i > 100) i = 100;
 
     variationValue = i;
-    setChanged();
+    
     notifyObservers(string("step-editor"));
 }
 
@@ -90,7 +90,7 @@ void NoteEvent::setVelocity(int i)
     if(i < 1 || i > 127) return;
 
     velocity = i;
-    setChanged();
+    
     notifyObservers(string("step-editor"));
 }
 

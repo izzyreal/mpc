@@ -169,7 +169,7 @@ void Track::setUsed(bool b)
     used = b;
     if (used)
 	{
-        setChanged();
+        
         notifyObservers(string("tracknumbername"));
     }
 }
@@ -177,7 +177,7 @@ void Track::setUsed(bool b)
 void Track::setOn(bool b)
 {
     on = b;
-    setChanged();
+    
     notifyObservers(string("trackon"));
 }
 
@@ -219,7 +219,7 @@ void Track::removeEvent(weak_ptr<Event> event) {
 			events.erase(events.begin() + i);
 		}
 	}
-	setChanged();
+	
 	notifyObservers(string("resetstepeditor"));
 }
 
@@ -229,7 +229,7 @@ bool Track::adjustDurLastEvent(int newDur)
 	if (!lLastAdded) return false;
 	lLastAdded->setDuration(newDur);
 	lastAdded.reset();
-	setChanged();
+	
 	notifyObservers(string("resetstepeditor"));
 	return true;
 }
@@ -280,9 +280,9 @@ weak_ptr<Event> Track::addEvent(int tick, string type) {
 	res->setTick(tick);
 	events.push_back(res);
 	sortEvents();
-	setChanged();
+	
 	notifyObservers(string("resetstepeditor"));
-	setChanged();
+	
 	notifyObservers(string(type) + "added");
 	return res;
 }
@@ -320,7 +320,7 @@ weak_ptr<Event> Track::cloneEvent(weak_ptr<Event> src) {
 	events.push_back(res);
 
 	sortEvents();
-	setChanged();
+	
 	notifyObservers(string("resetstepeditor"));
 	return events.back();
 }
@@ -328,7 +328,7 @@ weak_ptr<Event> Track::cloneEvent(weak_ptr<Event> src) {
 void Track::removeEvent(int i)
 {
     events.erase(events.begin() + i);
-	setChanged();
+	
 	notifyObservers(string("resetstepeditor"));
 }
 
@@ -345,7 +345,7 @@ void Track::setVelocityRatio(int i)
 		i = 200;
 	}
     velocityRatio = i;
-    setChanged();
+    
     notifyObservers(string("velocityratio"));
 }
 
@@ -358,7 +358,7 @@ void Track::setProgramChange(int i)
 {
     if (i < 0 || i > 128) return;
     programChange = i;
-    setChanged();
+    
     notifyObservers(string("programchange"));
 }
 
@@ -371,7 +371,7 @@ void Track::setBusNumber(int i)
 {
     if (i < 0 || i > 4) return;
     busNumber = i;
-    setChanged();
+    
     notifyObservers(string("tracktype"));
 }
 
@@ -384,9 +384,9 @@ void Track::setDeviceNumber(int i)
 {
     if (i < 0 || i > 32) return;
     device = i;
-    setChanged();
+    
     notifyObservers(string("device"));
-    setChanged();
+    
     notifyObservers(string("devicename"));
 }
 
@@ -403,7 +403,7 @@ weak_ptr<Event> Track::getEvent(int i)
 void Track::setName(string s)
 {
     name = s;
-    setChanged();
+    
     notifyObservers(string("tracknumbername"));
 }
 

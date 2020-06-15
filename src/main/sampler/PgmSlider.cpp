@@ -12,7 +12,7 @@ void PgmSlider::setAssignNote(int i)
     if(i < 34 || i > 98) return;
 
     assignNote = i;
-    setChanged();
+    
     notifyObservers(string("assignnote"));
 }
 
@@ -27,7 +27,7 @@ void PgmSlider::setTuneLowRange(int i)
         return;
 
     tuneLowRange = i;
-    setChanged();
+    
     notifyObservers(string("lowrange"));
     if(tuneLowRange > tuneHighRange)
         setTuneHighRange(tuneLowRange);
@@ -45,7 +45,7 @@ void PgmSlider::setTuneHighRange(int i)
         return;
 
     tuneHighRange = i;
-    setChanged();
+    
     notifyObservers(string("highrange"));
     if(tuneHighRange < tuneLowRange)
         setTuneLowRange(tuneHighRange);
@@ -63,7 +63,7 @@ void PgmSlider::setDecayLowRange(int i)
         return;
 
     decayLowRange = i;
-    setChanged();
+    
     notifyObservers(string("lowrange"));
     if(decayLowRange > decayHighRange)
         setDecayHighRange(decayLowRange);
@@ -81,7 +81,7 @@ void PgmSlider::setDecayHighRange(int i)
         return;
 
     decayHighRange = i;
-    setChanged();
+    
     notifyObservers(string("highrange"));
     if(decayHighRange < decayLowRange)
         setDecayLowRange(decayHighRange);
@@ -99,7 +99,7 @@ void PgmSlider::setAttackLowRange(int i)
         return;
 
     attackLowRange = i;
-    setChanged();
+    
     notifyObservers(string("lowrange"));
     if(attackLowRange > attackHighRange)
         setAttackHighRange(attackLowRange);
@@ -117,7 +117,7 @@ void PgmSlider::setAttackHighRange(int i)
         return;
 
     attackHighRange = i;
-    setChanged();
+    
     notifyObservers(string("highrange"));
     if(attackHighRange < attackLowRange)
         setAttackLowRange(attackHighRange);
@@ -135,7 +135,7 @@ void PgmSlider::setFilterLowRange(int i)
         return;
 
     filterLowRange = i;
-    setChanged();
+    
     notifyObservers(string("lowrange"));
     if(filterLowRange > filterHighRange)
         setFilterHighRange(filterLowRange);
@@ -153,7 +153,7 @@ void PgmSlider::setFilterHighRange(int i)
         return;
 
     filterHighRange = i;
-    setChanged();
+    
     notifyObservers(string("highrange"));
     if(filterHighRange < filterLowRange)
         setFilterLowRange(filterHighRange);
@@ -171,7 +171,7 @@ void PgmSlider::setControlChange(int i)
         return;
 
     controlChange = i;
-    setChanged();
+    
     notifyObservers(string("controlchange"));
 }
 
@@ -191,7 +191,7 @@ void PgmSlider::setParameter(int i)
         return;
 
     parameter = i;
-    setChanged();
+    
     notifyObservers(string("parameter"));
 }
 

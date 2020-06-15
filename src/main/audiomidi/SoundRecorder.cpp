@@ -106,7 +106,7 @@ int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf)
 	applyGain(inputGain * 0.01, right);
 
 	if (vuMeterActive.load()) {
-		setChanged();
+		
 		notifyObservers(buf->square());
 	}
 

@@ -123,7 +123,7 @@ void GlobalReleaseControls::simplePad(int i)
 			int noteVal = timingCorrectScreen->getNoteValue();
 			int stepLength = sequencer.lock()->getTickValues()[noteVal];
 			int nextPos = sequencer.lock()->getTickPosition() + stepLength;
-			auto bar = sequencer.lock()->getCurrentBarNumber() + 1;
+			auto bar = sequencer.lock()->getCurrentBarIndex() + 1;
 			nextPos = lTrk->timingCorrectTick(0, bar, nextPos, stepLength);
 			auto lastTick = sequencer.lock()->getActiveSequence().lock()->getLastTick();
 			

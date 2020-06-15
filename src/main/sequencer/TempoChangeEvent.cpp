@@ -39,7 +39,7 @@ void TempoChangeEvent::plusOneBar(int numerator, int denominator, TempoChangeEve
             tick = next->getTick() - 1;
         }
     }
-    setChanged();
+    
     notifyObservers(string("tempo-change"));
 }
 
@@ -55,7 +55,7 @@ void TempoChangeEvent::minusOneBar(int numerator, int denominator, TempoChangeEv
 			tick = previous->getTick() + 1;
 		}
 	}
-	setChanged();
+	
 	notifyObservers(string("tempo-change"));
 }
 
@@ -70,7 +70,7 @@ void TempoChangeEvent::plusOneBeat(int denominator, TempoChangeEvent* next)
 			tick = next->getTick() - 1;
 		}
 	}
-	setChanged();
+	
 	notifyObservers(string("tempo-change"));
 }
 
@@ -86,7 +86,7 @@ void TempoChangeEvent::minusOneBeat(int denominator, TempoChangeEvent* previous)
 			tick = previous->getTick() + 1;
 		}
 	}
-	setChanged();
+	
 	notifyObservers(string("tempo-change"));
 }
 
@@ -100,7 +100,7 @@ void TempoChangeEvent::plusOneClock(TempoChangeEvent* next)
 	if (tick > parent->getLastTick())
 		tick = parent->getLastTick();
 
-	setChanged();
+	
 	notifyObservers(string("tempo-change"));
 }
 
@@ -113,7 +113,7 @@ void TempoChangeEvent::minusOneClock(TempoChangeEvent* previous)
 	}
 	tick--;
 
-	setChanged();
+	
 	notifyObservers(string("tempo-change"));
 }
 
@@ -121,7 +121,7 @@ void TempoChangeEvent::setRatio(int i)
 {
 	if (i < 100 || i > 9998) return;
 	ratio = i;
-	setChanged();
+	
 	notifyObservers(string("tempo-change"));
 }
 
@@ -134,7 +134,7 @@ void TempoChangeEvent::setStepNumber(int i)
 {
 	if (i < 0) return;
 	stepNumber = i;
-	setChanged();
+	
 	notifyObservers(string("tempo-change"));
 }
 

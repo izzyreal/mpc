@@ -125,13 +125,13 @@ void NextSeqPadScreen::setSeqColor(int i)
 void NextSeqPadScreen::displayNow0()
 {
 	auto lSequencer = sequencer.lock();
-	findField("now0").lock()->setTextPadded(lSequencer->getCurrentBarNumber() + 1, "0");
+	findField("now0").lock()->setTextPadded(lSequencer->getCurrentBarIndex() + 1, "0");
 }
 
 void NextSeqPadScreen::displayNow1()
 {
 	auto lSequencer = sequencer.lock();
-	findField("now1").lock()->setTextPadded(lSequencer->getCurrentBeatNumber() + 1, "0");
+	findField("now1").lock()->setTextPadded(lSequencer->getCurrentBeatIndex() + 1, "0");
 }
 
 void NextSeqPadScreen::displayNow2()

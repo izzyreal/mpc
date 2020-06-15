@@ -54,7 +54,7 @@ void MpcMidiInput::transport(ctoot::midi::core::MidiMessage* msg, int timeStamp)
 	string notify_ = string(index == 0 ? "a" : "b");
 	auto channel = dynamic_cast<ctoot::midi::core::ShortMessage*>(msg)->getChannel();
 	notify_ += to_string(channel);
-	setChanged();
+	
 	notifyObservers(notify_);
 
 	if (status == ctoot::midi::core::ShortMessage::CONTROL_CHANGE)
@@ -218,7 +218,7 @@ void MpcMidiInput::midiOut(weak_ptr<mpc::sequencer::Event> e, mpc::sequencer::Tr
 
 	if (Mpc::instance().getLayeredScreen().lock()->getCurrentScreenName().compare("midi-output-monitor") == 0)
 	{
-		setChanged();
+		
 		notifyObservers(notify_ + to_string(deviceNumber));
 	}
 }
@@ -231,7 +231,7 @@ void MpcMidiInput::transportOmni(ctoot::midi::core::MidiMessage* msg, string out
 	{
 		if (Mpc::instance().getLayeredScreen().lock()->getCurrentScreenName().compare("midi-output-monitor") == 0)
 		{
-			setChanged();
+			
 			notifyObservers(string(outputLetter + to_string(dynamic_cast<ctoot::midi::core::ShortMessage*>(msg)->getChannel())));
 		}
 	}

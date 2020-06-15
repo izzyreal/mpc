@@ -45,14 +45,14 @@ void StepEditorScreen::open()
 		program = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(pgm).lock());
 	}
 
-	refreshViewModeNotes();
-	setViewModeNotesText();
+	refreshViewNotes();
+	setViewNotesText();
 	displayView();
 	sequencer.lock()->addObserver(this);
 	track.lock()->addObserver(this);
 	
-	findField("now0").lock()->setTextPadded(sequencer.lock()->getCurrentBarNumber() + 1, "0");
-	findField("now1").lock()->setTextPadded(sequencer.lock()->getCurrentBeatNumber() + 1, "0");
+	findField("now0").lock()->setTextPadded(sequencer.lock()->getCurrentBarIndex() + 1, "0");
+	findField("now1").lock()->setTextPadded(sequencer.lock()->getCurrentBeatIndex() + 1, "0");
 	findField("now2").lock()->setTextPadded(sequencer.lock()->getCurrentClockNumber(), "0");
 
 	initVisibleEvents();
@@ -184,7 +184,7 @@ void StepEditorScreen::function(int i)
 			{
 				if (isA)
 				{
-					setChangeNoteToNumber(ne->getNote());
+					setChangeNoteToIndex(ne->getNote());
 				}
 				else if (isB)
 				{
@@ -209,7 +209,7 @@ void StepEditorScreen::function(int i)
 			{
 				if (isA)
 				{
-					setChangeNoteToNumber(ne->getNote());
+					setChangeNoteToIndex(ne->getNote());
 				}
 				else if (isB)
 				{
@@ -280,15 +280,15 @@ void StepEditorScreen::turnWheel(int i)
 	
 	if (param.compare("view") == 0)
 	{
-		setViewModeNumber(viewModeNumber + i);
+		setView(view + i);
 	}
 	else if (param.compare("now0") == 0)
 	{
-		sequencer.lock()->setBar(sequencer.lock()->getCurrentBarNumber() + i);
+		sequencer.lock()->setBar(sequencer.lock()->getCurrentBarIndex() + i);
 	}
 	else if (param.compare("now1") == 0)
 	{
-		sequencer.lock()->setBeat(sequencer.lock()->getCurrentBeatNumber() + i);
+		sequencer.lock()->setBeat(sequencer.lock()->getCurrentBeatIndex() + i);
 	}
 	else if (param.compare("now2") == 0)
 	{
@@ -311,7 +311,7 @@ void StepEditorScreen::turnWheel(int i)
 	}
 	else if (param.compare("controlnumber") == 0)
 	{
-		setControlNumber(controlNumber + i);
+		setControl(control + i);
 	}
 	else if (param.length() == 2)
 	{
@@ -502,7 +502,7 @@ void StepEditorScreen::prevBarStart()
 		sequencer.lock()->setBar(0);
 	}
 	else {
-		sequencer.lock()->setBar(sequencer.lock()->getCurrentBarNumber() - 1);
+		sequencer.lock()->setBar(sequencer.lock()->getCurrentBarIndex() - 1);
 	}
 }
 
@@ -517,7 +517,7 @@ void StepEditorScreen::nextBarEnd()
 		sequencer.lock()->setBar(sequencer.lock()->getActiveSequence().lock()->getLastBar() + 1);
 	}
 	else {
-		sequencer.lock()->setBar(sequencer.lock()->getCurrentBarNumber() + 1);
+		sequencer.lock()->setBar(sequencer.lock()->getCurrentBarIndex() + 1);
 	}
 }
 
@@ -749,10 +749,12 @@ void StepEditorScreen::initVisibleEvents()
 
 		if (lEvent->getTick() == sequencer.lock()->getTickPosition())
 		{
-			if ((viewModeNumber == 0
-				|| viewModeNumber == 1)
-				&& dynamic_pointer_cast<NoteEvent>(lEvent)) {
+			if ((view == 0
+				|| view == 1)
+				&& dynamic_pointer_cast<NoteEvent>(lEvent))
+			{
 				auto ne = dynamic_pointer_cast<NoteEvent>(lEvent);
+			
 				if (track.lock()->getBusNumber() != 0)
 				{
 					if (fromNotePad == 34)
@@ -766,55 +768,56 @@ void StepEditorScreen::initVisibleEvents()
 					}
 				}
 				else {
-					if (ne->getNote() >= noteA
+					if ( (ne->getNote() >= noteA
 						&& ne->getNote() <= noteB)
+						|| view == 0)
 					{
 						eventsAtCurrentTick.push_back(ne);
 					}
 				}
 			}
 
-			if ((viewModeNumber == 0
-				|| viewModeNumber == 2)
+			if ((view == 0
+				|| view == 2)
 				&& dynamic_pointer_cast<PitchBendEvent>(lEvent))
 			{
 				eventsAtCurrentTick.push_back(event);
 			}
 
-			if ((viewModeNumber == 0 || viewModeNumber == 3)
+			if ((view == 0 || view == 3)
 				&& dynamic_pointer_cast<ControlChangeEvent>(lEvent))
 			{
-				if (controlNumber == -1) {
+				if (control == -1) {
 					eventsAtCurrentTick.push_back(event);
 				}
-				if (controlNumber == dynamic_pointer_cast<ControlChangeEvent>(lEvent)->getController())
+				if (control == dynamic_pointer_cast<ControlChangeEvent>(lEvent)->getController())
 				{
 					eventsAtCurrentTick.push_back(event);
 				}
 			}
-			if ((viewModeNumber == 0
-				|| viewModeNumber == 4)
+			if ((view == 0
+				|| view == 4)
 				&& dynamic_pointer_cast<ProgramChangeEvent>(lEvent))
 			{
 				eventsAtCurrentTick.push_back(event);
 			}
 
-			if ((viewModeNumber == 0
-				|| viewModeNumber == 5)
+			if ((view == 0
+				|| view == 5)
 				&& dynamic_pointer_cast<ChannelPressureEvent>(lEvent))
 			{
 				eventsAtCurrentTick.push_back(event);
 			}
 
-			if ((viewModeNumber == 0
-				|| viewModeNumber == 6)
+			if ((view == 0
+				|| view == 6)
 				&& dynamic_pointer_cast<PolyPressureEvent>(lEvent))
 			{
 				eventsAtCurrentTick.push_back(event);
 			}
 
-			if ((viewModeNumber == 0
-				|| viewModeNumber == 7)
+			if ((view == 0
+				|| view == 7)
 				&& (dynamic_pointer_cast<SystemExclusiveEvent>(lEvent)
 					|| dynamic_pointer_cast<MixerEvent>(lEvent)))
 			{
@@ -872,11 +875,11 @@ void StepEditorScreen::refreshEventRows()
 	}
 }
 
-void StepEditorScreen::refreshViewModeNotes()
+void StepEditorScreen::refreshViewNotes()
 {
 	init();
 	
-	if (viewModeNumber == 1 && track.lock()->getBusNumber() != 0)
+	if (view == 1 && track.lock()->getBusNumber() != 0)
 	{
 		findLabel("fromnote").lock()->Hide(false);
 		findField("fromnote").lock()->Hide(false);
@@ -884,7 +887,7 @@ void StepEditorScreen::refreshViewModeNotes()
 		findLabel("tonote").lock()->Hide(true);
 		findField("tonote").lock()->Hide(true);
 	}
-	else if (viewModeNumber == 1 && track.lock()->getBusNumber() == 0)
+	else if (view == 1 && track.lock()->getBusNumber() == 0)
 	{
 		findLabel("fromnote").lock()->Hide(false);
 		findField("fromnote").lock()->Hide(false);
@@ -896,7 +899,7 @@ void StepEditorScreen::refreshViewModeNotes()
 		findField("tonote").lock()->Hide(false);
 		findField("controlnumber").lock()->Hide(true);
 	}
-	else if (viewModeNumber == 3)
+	else if (view == 3)
 	{
 		findLabel("fromnote").lock()->Hide(true);
 		findField("fromnote").lock()->Hide(true);
@@ -904,7 +907,7 @@ void StepEditorScreen::refreshViewModeNotes()
 		findField("tonote").lock()->Hide(true);
 		findField("controlnumber").lock()->Hide(false);
 	}
-	else if (viewModeNumber != 1 && viewModeNumber != 3)
+	else if (view != 1 && view != 3)
 	{
 		findLabel("fromnote").lock()->Hide(true);
 		findField("fromnote").lock()->Hide(true);
@@ -914,11 +917,11 @@ void StepEditorScreen::refreshViewModeNotes()
 	}
 }
 
-void StepEditorScreen::setViewModeNotesText()
+void StepEditorScreen::setViewNotesText()
 {
 	init();
 	
-	if (viewModeNumber == 1 && track.lock()->getBusNumber() != 0)
+	if (view == 1 && track.lock()->getBusNumber() != 0)
 	{
 		if (fromNotePad != 34)
 		{
@@ -929,38 +932,38 @@ void StepEditorScreen::setViewModeNotesText()
 			findField("fromnote").lock()->setText("ALL");
 		}
 	}
-	else if (viewModeNumber == 1 && track.lock()->getBusNumber() == 0)
+	else if (view == 1 && track.lock()->getBusNumber() == 0)
 	{
 		findField("fromnote").lock()->setText(StrUtil::padLeft(to_string(noteA), " ", 3) + "(" + mpc::Util::noteNames()[noteA] + u8"\u00D4");
 		findField("tonote").lock()->setText(StrUtil::padLeft(to_string(noteB), " ", 3) + "(" + mpc::Util::noteNames()[noteB] + u8"\u00D4");
 	}
-	else if (viewModeNumber == 3)
+	else if (view == 3)
 	{
-		if (controlNumber == -1)
+		if (control == -1)
 		{
 			findField("controlnumber").lock()->setText("   -    ALL");
 		}
 		else
 		{
-			findField("controlnumber").lock()->setText(EventRow::controlNames[controlNumber]);
+			findField("controlnumber").lock()->setText(EventRow::controlNames[control]);
 		}
 	}
 
-	findField("view").lock()->setText(viewNames[viewModeNumber]);
+	findField("view").lock()->setText(viewNames[view]);
 	auto newWidth = findField("view").lock()->getText().length() * 6 + 1;
 	findField("view").lock()->setSize(newWidth, 9);
 }
 
-void StepEditorScreen::setViewModeNumber(int i)
+void StepEditorScreen::setView(int i)
 {
 	if (i < 0 || i > 7)
 	{
 		return;
 	}
 
-	viewModeNumber = i;
-	refreshViewModeNotes();
-	setViewModeNotesText();
+	view = i;
+	refreshViewNotes();
+	setViewNotesText();
 	setyOffset(0);
 }
 
@@ -973,15 +976,15 @@ void StepEditorScreen::setNoteA(int i)
 
 	noteA = i;
 	
-	if (i > noteB)
+	if (noteA > noteB)
 	{
-		setNoteB(i);
+		noteB = noteA;
 	}
 
-	setViewModeNotesText();
+	setViewNotesText();
 	displayView();
-	refreshViewModeNotes();
-	setViewModeNotesText();
+	refreshViewNotes();
+	setViewNotesText();
 	initVisibleEvents();
 	refreshEventRows();
 	refreshSelection();
@@ -996,33 +999,33 @@ void StepEditorScreen::setNoteB(int i)
 	
 	noteB = i;
 	
-	if (i < noteA)
+	if (noteB < noteA)
 	{
-		setNoteA(i);
+		noteA = noteB;
 	}
 
-	setViewModeNotesText();
+	setViewNotesText();
 	displayView();
-	refreshViewModeNotes();
-	setViewModeNotesText();
+	refreshViewNotes();
+	setViewNotesText();
 	initVisibleEvents();
 	refreshEventRows();
 	refreshSelection();
 }
 
-void StepEditorScreen::setControlNumber(int i)
+void StepEditorScreen::setControl(int i)
 {
 	if (i < -1 || i > 127)
 	{
 		return;
 	}
 
-	controlNumber = i;
+	control = i;
 	
-	setViewModeNotesText();
+	setViewNotesText();
 	displayView();
-	refreshViewModeNotes();
-	setViewModeNotesText();
+	refreshViewNotes();
+	setViewNotesText();
 	initVisibleEvents();
 	refreshEventRows();
 	refreshSelection();
@@ -1062,7 +1065,7 @@ void StepEditorScreen::setyOffset(int i)
 	refreshSelection();
 }
 
-void StepEditorScreen::setSelectedEventNumber(int i)
+void StepEditorScreen::setSelectedEventIndex(int i)
 {
 	selectedEventNumber = i;
 }
@@ -1075,10 +1078,10 @@ void StepEditorScreen::setFromNotePad(int i)
 	}
 	fromNotePad = i;
 
-	setViewModeNotesText();
+	setViewNotesText();
 	displayView();
-	refreshViewModeNotes();
-	setViewModeNotesText();
+	refreshViewNotes();
+	setViewNotesText();
 	initVisibleEvents();
 	refreshEventRows();
 	refreshSelection();
@@ -1191,7 +1194,7 @@ void StepEditorScreen::setSelectedParameterLetter(string str)
 	selectedParameterLetter = str;
 }
 
-void StepEditorScreen::setChangeNoteToNumber(int i)
+void StepEditorScreen::setChangeNoteToIndex(int i)
 {
 	if (i < 0 || i > 127)
 	{
@@ -1276,7 +1279,7 @@ void StepEditorScreen::removeEvents()
 
 void StepEditorScreen::displayView()
 {
-	findField("view").lock()->setText(viewNames[viewModeNumber]);
+	findField("view").lock()->setText(viewNames[view]);
 }
 
 void StepEditorScreen::update(moduru::observer::Observable*, nonstd::any message)
@@ -1354,7 +1357,7 @@ void StepEditorScreen::update(moduru::observer::Observable*, nonstd::any message
 		{
 			return;
 		}
-		findField("now0").lock()->setTextPadded(sequencer.lock()->getCurrentBarNumber() + 1, "0");
+		findField("now0").lock()->setTextPadded(sequencer.lock()->getCurrentBarIndex() + 1, "0");
 		setyOffset(0);
 	}
 	else if (msg.compare("beat") == 0)
@@ -1363,7 +1366,7 @@ void StepEditorScreen::update(moduru::observer::Observable*, nonstd::any message
 		{
 			return;
 		}
-		findField("now1").lock()->setTextPadded(sequencer.lock()->getCurrentBeatNumber() + 1, "0");
+		findField("now1").lock()->setTextPadded(sequencer.lock()->getCurrentBeatIndex() + 1, "0");
 		setyOffset(0);
 	}
 	else if (msg.compare("clock") == 0)

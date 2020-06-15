@@ -46,8 +46,8 @@ namespace mpc::lcdgui::screens
 
 	private:
 		void refreshEventRows();
-		void refreshViewModeNotes();
-		void setViewModeNotesText();
+		void refreshViewNotes();
+		void setViewNotesText();
 
 	private:
 		std::vector<std::string> viewNames = { "ALL EVENTS", "NOTES", "PITCH BEND", "CTRL:", "PROG CHANGE", "CH PRESSURE", "POLY PRESS", "EXCLUSIVE" };
@@ -58,10 +58,10 @@ namespace mpc::lcdgui::screens
 		std::weak_ptr<mpc::sequencer::Event> selectedEvent;
 		std::vector<std::weak_ptr<mpc::sequencer::Event>> selectedEvents;
 		
-		int viewModeNumber = 0;
+		int view = 0;
 		int noteA = 0;
-		int noteB = 0;
-		int controlNumber = -1;
+		int noteB = 127;
+		int control = -1;
 		bool autoStepIncrementEnabled = false;
 		bool durationOfRecordedNotes = false;
 		int tcValueRecordedNotes = 100;
@@ -78,12 +78,12 @@ namespace mpc::lcdgui::screens
 		bool durationTcPercentageEnabled = false;
 
 	private:
-		void setViewModeNumber(int i);
+		void setView(int i);
 		void setNoteA(int i);
 		void setNoteB(int i);
-		void setControlNumber(int i);
+		void setControl(int i);
 		void setyOffset(int i);
-		void setSelectedEventNumber(int i);
+		void setSelectedEventIndex(int i);
 		void setFromNotePad(int i);
 		void setSelectionStartIndex(int i);
 		void setSelectedEvents();
@@ -99,7 +99,7 @@ namespace mpc::lcdgui::screens
 
 	public:
 		void setAutoStepIncrementEnabled(bool b);
-		void setChangeNoteToNumber(int i);
+		void setChangeNoteToIndex(int i);
 		void setChangeVariationTypeNumber(int i);
 		void setChangeVariationValue(int i);
 		void setEditValue(int i);

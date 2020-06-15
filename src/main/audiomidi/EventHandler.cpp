@@ -308,7 +308,6 @@ void EventHandler::midiOut(weak_ptr<mpc::sequencer::Event> e, mpc::sequencer::Tr
 
 		if (Mpc::instance().getLayeredScreen().lock()->getCurrentScreenName().compare("midi-output-monitor") == 0)
 		{
-			setChanged();
 			notifyObservers(string(notifyLetter + to_string(deviceNumber)));
 		}
 	}

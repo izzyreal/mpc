@@ -11,7 +11,7 @@ void ControlChangeEvent::setController(int i)
 {
 	if (i < 0 || i > 127) return;
 	controllerNumber = i;
-	setChanged();
+	
 	notifyObservers(string("step-editor"));
 }
 
@@ -25,7 +25,7 @@ void ControlChangeEvent::setAmount(int i)
     if(i < 0 || i > 127) return;
 
     controllerValue = i;
-    setChanged();
+    
     notifyObservers(string("step-editor"));
 }
 

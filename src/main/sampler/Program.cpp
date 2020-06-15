@@ -118,7 +118,7 @@ void Program::setMidiProgramChange(int i)
 	}
 
 	this->midiProgramChange = i;
-	setChanged();
+	
 	notifyObservers(string("midiprogramchange"));
 }
 

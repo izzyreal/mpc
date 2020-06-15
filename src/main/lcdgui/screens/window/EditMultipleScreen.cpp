@@ -147,7 +147,7 @@ void EditMultipleScreen::turnWheel(int i)
 				{
 					return;
 				}
-				stepEditorScreen->setChangeNoteToNumber(stepEditorScreen->getChangeNoteToNumber() + i);
+				stepEditorScreen->setChangeNoteToIndex(stepEditorScreen->getChangeNoteToNumber() + i);
 			}
 			else if (paramLetter.compare("b") == 0)
 			{
@@ -166,7 +166,7 @@ void EditMultipleScreen::turnWheel(int i)
 		{
 			if (paramLetter.compare("a") == 0)
 			{
-				stepEditorScreen->setChangeNoteToNumber(stepEditorScreen->getChangeNoteToNumber() + i);
+				stepEditorScreen->setChangeNoteToIndex(stepEditorScreen->getChangeNoteToNumber() + i);
 			}
 			else if (paramLetter.compare("b") == 0 || paramLetter.compare("c") == 0)
 			{

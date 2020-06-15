@@ -35,7 +35,7 @@ void NoteParameters::setSoundNumber(int i)
     //if(i < -1 || (i != -1 && i > (sampler->getSoundCount() - 1))) return;
 
     soundNumber = i;
-    setChanged();
+    
     notifyObservers(string("samplenumber"));
 }
 
@@ -46,7 +46,7 @@ void NoteParameters::setSoundGenMode(int i)
     if(i < 0 || i > 3) return;
 
     soundGenerationMode = i;
-    setChanged();
+    
     notifyObservers(string("soundgenerationmode"));
 }
 
@@ -64,7 +64,7 @@ void NoteParameters::setVeloRangeLower(int i)
     if(i > velocityRangeUpper - 2) setVeloRangeUpper(i - 1);
 
     velocityRangeLower = i;
-    setChanged();
+    
     notifyObservers(string("ifover1"));
 }
 
@@ -80,7 +80,7 @@ void NoteParameters::setOptNoteA(int i)
 	if (i < 34 || i > 98) return;
 
 	optionalNoteA = i;
-	setChanged();
+	
 	notifyObservers(string("use1"));
 }
 
@@ -98,7 +98,7 @@ void NoteParameters::setVeloRangeUpper(int i)
 		return;
 
 	velocityRangeUpper = i;
-	setChanged();
+	
 	notifyObservers(string("ifover2"));
 }
 
@@ -116,7 +116,7 @@ void NoteParameters::setOptionalNoteB(int i)
 		return;
 
 	optionalNoteB = i;
-	setChanged();
+	
 	notifyObservers(string("use2"));
 }
 
@@ -136,7 +136,7 @@ void NoteParameters::setVoiceOverlap(int i)
         return;
 
     voiceOverlap = i;
-    setChanged();
+    
     notifyObservers(string("voiceoverlap"));
 }
 
@@ -146,7 +146,7 @@ void NoteParameters::setMuteAssignA(int i)
         return;
 
     muteAssignA = i;
-    setChanged();
+    
     notifyObservers(string("muteassigna"));
 }
 
@@ -161,7 +161,7 @@ void NoteParameters::setMuteAssignB(int i)
         return;
 
     muteAssignB = i;
-    setChanged();
+    
     notifyObservers(string("muteassignb"));
 }
 
@@ -179,7 +179,7 @@ void NoteParameters::setTune(int i)
         return;
 
     tune = i;
-    setChanged();
+    
     notifyObservers(string("tune"));
 }
 
@@ -197,7 +197,7 @@ void NoteParameters::setAttack(int i)
         return;
 
     attack = i;
-    setChanged();
+    
     notifyObservers(string("attack"));
 }
 
@@ -215,7 +215,7 @@ void NoteParameters::setDecay(int i)
         return;
 
     decay = i;
-    setChanged();
+    
     notifyObservers(string("decay"));
 }
 
@@ -233,7 +233,7 @@ void NoteParameters::setDecayMode(int i)
         return;
 
     decayMode = i;
-    setChanged();
+    
     notifyObservers(string("dcymd"));
 }
 
@@ -251,7 +251,7 @@ void NoteParameters::setFilterFrequency(int i)
         return;
 
     filterFrequency = i;
-    setChanged();
+    
     notifyObservers(string("freq"));
 }
 
@@ -269,7 +269,7 @@ void NoteParameters::setFilterResonance(int i)
         return;
 
     filterResonance = i;
-    setChanged();
+    
     notifyObservers(string("reson"));
 }
 
@@ -287,7 +287,7 @@ void NoteParameters::setFilterAttack(int i)
         return;
 
     filterAttack = i;
-    setChanged();
+    
     notifyObservers(string("filterattack"));
 }
 
@@ -305,7 +305,7 @@ void NoteParameters::setFilterDecay(int i)
         return;
 
     filterDecay = i;
-    setChanged();
+    
     notifyObservers(string("filterdecay"));
 }
 
@@ -323,7 +323,7 @@ void NoteParameters::setFilterEnvelopeAmount(int i)
         return;
 
     filterEnvelopeAmount = i;
-    setChanged();
+    
     notifyObservers(string("filterenvelopeamount"));
 }
 
@@ -341,7 +341,7 @@ void NoteParameters::setVeloToLevel(int i)
         return;
 
     velocityToLevel = i;
-    setChanged();
+    
     notifyObservers(string("velocitytolevel"));
 }
 
@@ -359,7 +359,7 @@ void NoteParameters::setVelocityToAttack(int i)
         return;
 
     velocityToAttack = i;
-    setChanged();
+    
     notifyObservers(string("velocitytoattack"));
 }
 
@@ -377,7 +377,7 @@ void NoteParameters::setVelocityToStart(int i)
         return;
 
     velocityToStart = i;
-    setChanged();
+    
     notifyObservers(string("velocitytostart"));
 }
 
@@ -395,7 +395,7 @@ void NoteParameters::setVelocityToFilterFrequency(int i)
         return;
 
     velocityToFilterFrequency = i;
-    setChanged();
+    
     notifyObservers(string("velocitytofilterfrequency"));
 }
 
@@ -413,7 +413,7 @@ void NoteParameters::setSliderParameterNumber(int i)
         return;
 
     sliderParameterNumber = i;
-    setChanged();
+    
     notifyObservers(string("sliderparameternumber"));
 }
 
@@ -431,7 +431,7 @@ void NoteParameters::setVelocityToPitch(int i)
         return;
 
     velocityToPitch = i;
-    setChanged();
+    
     notifyObservers(string("velocitytopitch"));
 }
 

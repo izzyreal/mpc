@@ -152,8 +152,8 @@ namespace mpc::sequencer {
 		std::vector<std::string> getDefaultTrackNames();
 		std::string getDefaultTrackName(int i);
 		void setDefaultTrackName(std::string s, int i);
-		int getCurrentBarNumber();
-		int getCurrentBeatNumber();
+		int getCurrentBarIndex();
+		int getCurrentBeatIndex();
 		int getCurrentClockNumber();
 		void setBar(int i);
 		void setBeat(int i);

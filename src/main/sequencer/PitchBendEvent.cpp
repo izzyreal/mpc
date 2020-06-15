@@ -12,7 +12,7 @@ void PitchBendEvent::setAmount(int i)
     if(i < -8192 || i > 8191) return;
 
     pitchBendAmount = i;
-    setChanged();
+    
     notifyObservers(string("step-editor"));
 }
 

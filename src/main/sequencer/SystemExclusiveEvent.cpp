@@ -13,7 +13,7 @@ void SystemExclusiveEvent::setByteA(int i)
     if(i < 0 || i > 255) return;
 
     bytes[0] = i;
-    setChanged();
+    
     notifyObservers(string("step-editor"));
 }
 
@@ -27,7 +27,7 @@ void SystemExclusiveEvent::setByteB(int i)
     if(i < 0 || i > 255) return;
 
 	bytes[1] = i;
-    setChanged();
+    
     notifyObservers(string("step-editor"));
 }
 

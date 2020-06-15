@@ -65,11 +65,11 @@ void Pad::setNote(int i)
 		note = i;
 	}
 	
-	setChanged();
+	
 	notifyObservers(string("padnotenumber"));
-	setChanged();
+	
 	notifyObservers(string("note"));
-	setChanged();
+	
 	notifyObservers(string("samplenumber"));
 }
 

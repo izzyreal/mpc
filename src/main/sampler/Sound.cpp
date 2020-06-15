@@ -22,7 +22,7 @@ Sound::Sound()
 void Sound::setName(string s)
 {
     name = s;
-    setChanged();
+    
     notifyObservers(string("samplename"));
 }
 
@@ -42,7 +42,7 @@ void Sound::setNumberOfBeats(int i)
         return;
 
     numberOfBeats = i;
-    setChanged();
+    
     notifyObservers(string("beat"));
 }
 

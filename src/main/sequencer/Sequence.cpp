@@ -85,11 +85,11 @@ void Sequence::setFirstLoopBar(int i)
 	}
 
 	firstLoopBar = i;
-	setChanged();
+	
 	notifyObservers(string("firstloopbar"));
 	if (i > lastLoopBar) {
 		lastLoopBar = i;
-		setChanged();
+		
 		notifyObservers(string("lastloopbar"));
 	}
 }
@@ -109,7 +109,7 @@ void Sequence::setLastLoopBar(int i)
 		if (i < lastBar) {
 			lastLoopBarEnd = false;
 			lastLoopBar = lastBar;
-			setChanged();
+			
 			notifyObservers(string("lastloopbar"));
 			return;
 		}
@@ -120,22 +120,22 @@ void Sequence::setLastLoopBar(int i)
 	else {
 		if (i > lastBar) {
 			lastLoopBarEnd = true;
-			setChanged();
+			
 			notifyObservers(string("lastloopbar"));
 		}
 		else {
 			lastLoopBar = i;
-			setChanged();
+			
 			notifyObservers(string("lastloopbar"));
 			if (i < firstLoopBar) {
 				firstLoopBar = i;
-				setChanged();
+				
 				notifyObservers(string("firstloopbar"));
 			}
 		}
 	}
 	lastLoopBar = i;
-	setChanged();
+	
 	notifyObservers(string("lastloopbar"));
 }
 
@@ -289,7 +289,7 @@ int Sequence::getLastBar()
 void Sequence::setLoopEnabled(bool b)
 {
 	loopEnabled = b;
-	setChanged();
+	
 	notifyObservers(string("loop"));
 }
 
@@ -400,7 +400,7 @@ void Sequence::setInitialTempo(BCMath bd)
 	}
 
 	initialTempo = tempo;
-	setChanged();
+	
 	notifyObservers(string("initial-tempo"));
 }
 
@@ -421,7 +421,7 @@ bool Sequence::isTempoChangeOn()
 void Sequence::setTempoChangeOn(bool b)
 {
 	tempoChangeOn = b;
-	setChanged();
+	
 	notifyObservers(string("tempochangeon"));
 }
 
@@ -437,7 +437,7 @@ int Sequence::getLastTick()
 TimeSignature Sequence::getTimeSignature()
 {
 	auto ts = TimeSignature();
-	int bar = Mpc::instance().getSequencer().lock()->getCurrentBarNumber();
+	int bar = Mpc::instance().getSequencer().lock()->getCurrentBarIndex();
 	ts.setNumerator(numerators[bar]);
 	ts.setDenominator(denominators[bar]);
 	return ts;

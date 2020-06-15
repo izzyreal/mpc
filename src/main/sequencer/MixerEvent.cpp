@@ -11,7 +11,7 @@ void MixerEvent::setParameter(int i)
 {
 	if (i < 0 || i > 3) return;
 	mixerParameter = i;
-	setChanged();
+	
 	notifyObservers(string("step-editor"));
 }
 
@@ -25,7 +25,7 @@ void MixerEvent::setPadNumber(int i)
     if(i < 0 || i > 63) return;
 
     padNumber = i;
-    setChanged();
+    
     notifyObservers(string("step-editor"));
 }
 
@@ -39,7 +39,7 @@ void MixerEvent::setValue(int i)
     if(i < 0 || i > 100) return;
 
     mixerParameterValue = i;
-    setChanged();
+    
     notifyObservers(string("step-editor"));
 }
 

@@ -179,12 +179,12 @@ void SequencerScreen::displaySq()
 
 void SequencerScreen::displayNow0()
 {
-	findField("now0").lock()->setTextPadded(sequencer.lock()->getCurrentBarNumber() + 1, "0");
+	findField("now0").lock()->setTextPadded(sequencer.lock()->getCurrentBarIndex() + 1, "0");
 }
 
 void SequencerScreen::displayNow1()
 {
-	findField("now1").lock()->setTextPadded(sequencer.lock()->getCurrentBeatNumber() + 1, "0");
+	findField("now1").lock()->setTextPadded(sequencer.lock()->getCurrentBeatIndex() + 1, "0");
 }
 
 void SequencerScreen::displayNow2()
@@ -441,10 +441,10 @@ void SequencerScreen::turnWheel(int i)
 	}
 
 	if (focus.compare("now0") == 0) {
-		sequencer.lock()->setBar(sequencer.lock()->getCurrentBarNumber() + i);
+		sequencer.lock()->setBar(sequencer.lock()->getCurrentBarIndex() + i);
 	}
 	else if (focus.compare("now1") == 0) {
-		sequencer.lock()->setBeat(sequencer.lock()->getCurrentBeatNumber() + i);
+		sequencer.lock()->setBeat(sequencer.lock()->getCurrentBeatIndex() + i);
 	}
 	else if (focus.compare("now2") == 0) {
 		sequencer.lock()->setClock(sequencer.lock()->getCurrentClockNumber() + i);
