@@ -29,6 +29,8 @@
 #include <cmath>
 #include <lang/StrUtil.hpp>
 
+#include <sstream>
+
 using namespace mpc::lcdgui;
 using namespace mpc::sequencer;
 using namespace moduru::lang;
@@ -159,8 +161,6 @@ void EventRow::setEmptyEventValues()
 
 	for (int i = 1; i < 5; i++)
 	{
-		//parameters.lock()->sendToBack(fields[i]);
-		//parameters.lock()->sendToBack(labels[i]);
 		fields[i].lock()->Hide(true);
 		labels[i].lock()->Hide(true);
 	}
@@ -181,15 +181,18 @@ void EventRow::setSystemExclusiveEventValues()
         labels[i].lock()->Hide(false);
     }
     
-	fields[0].lock()->setText(StrUtil::padLeft(to_string(see->getByteA()), "0", 2));
-	fields[1].lock()->setText(StrUtil::padLeft(to_string(see->getByteB()), "0", 2));
+	char byteA[3];
+	sprintf(byteA, "%X", see->getByteA()); //convert number to hex
+	fields[0].lock()->setText(StrUtil::padLeft(string(byteA), "0", 2));
+
+	char byteB[3];
+	sprintf(byteB, "%X", see->getByteB()); //convert number to hex
+	fields[1].lock()->setText(StrUtil::padLeft(string(byteB), "0", 2));
     
 	horizontalBar.lock()->Hide(true);
 
 	for (int i = 2; i < 5; i++)
 	{
-		//parameters.lock()->sendToBack(fields[i]);
-		//parameters.lock()->sendToBack(labels[i]);
 		fields[i].lock()->Hide(true);
 		labels[i].lock()->Hide(true);
 	}
@@ -217,8 +220,6 @@ void EventRow::setPolyPressureEventValues()
 	
 	for (int i = 2; i < 5; i++)
 	{
-		//parameters.lock()->sendToBack(fields[i]);
-		//parameters.lock()->sendToBack(labels[i]);
 		fields[i].lock()->Hide(true);
 		labels[i].lock()->Hide(true);
 	}
@@ -241,8 +242,6 @@ void EventRow::setChannelPressureEventValues()
 
 	for (int i = 1; i < 5; i++)
 	{
-		//parameters.lock()->sendToBack(fields[i]);
-		//parameters.lock()->sendToBack(labels[i]);
 		fields[i].lock()->Hide(true);
 		labels[i].lock()->Hide(true);
 	}
@@ -272,8 +271,6 @@ void EventRow::setControlChangeEventValues()
     
 	for (int i = 2; i < 5; i++)
 	{
-		//parameters.lock()->sendToBack(fields[i]);
-		//parameters.lock()->sendToBack(labels[i]);
 		fields[i].lock()->Hide(true);
 		labels[i].lock()->Hide(true);
 	}
@@ -331,8 +328,6 @@ void EventRow::setMiscEventValues()
 
 	for (int i = 1; i < 5; i++)
 	{
-		//parameters.lock()->sendToBack(fields[i]);
-		//parameters.lock()->sendToBack(labels[i]);
 		fields[i].lock()->Hide(true);
 		labels[i].lock()->Hide(true);
 	}
@@ -387,8 +382,6 @@ void EventRow::setMixerEventValues()
 	
 	for (int i = 3; i < 5; i++)
 	{
-		//parameters.lock()->sendToBack(fields[i]);
-		//parameters.lock()->sendToBack(labels[i]);
 		fields[i].lock()->Hide(true);
 		labels[i].lock()->Hide(true);
 	}
@@ -520,8 +513,6 @@ void EventRow::setMidiNoteEventValues()
 
 	for (int i = 3; i < 5; i++)
 	{
-		//parameters.lock()->sendToBack(fields[i]);
-		//parameters.lock()->sendToBack(labels[i]);
 		fields[i].lock()->Hide(true);
 		labels[i].lock()->Hide(true);
 	}

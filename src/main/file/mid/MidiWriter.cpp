@@ -141,36 +141,47 @@ MidiWriter::MidiWriter(mpc::sequencer::Sequence* sequence)
 					variations.push_back(varNoteOff);
 
 			}
-			else if (mpcSysExEvent) {
-				auto sysExData = vector<char>((int)(mpcSysExEvent->getBytes()->size()) - 1);
+			else if (mpcSysExEvent)
+			{
+				auto sysExData = vector<char>((int)(mpcSysExEvent->getBytes().size()) - 1);
+			
 				for (int j = 0; j < sysExData.size(); j++)
-					sysExData[j] = (*mpcSysExEvent->getBytes())[j + 1];
+				{
+					sysExData[j] = mpcSysExEvent->getBytes()[j + 1];
+				}
+
 				auto see = make_shared<SystemExclusiveEvent>(240, mpcSysExEvent->getTick(), sysExData);
 				miscEvents.push_back(see);
 			}
-			else if (pitchBendEvent) {
+			else if (pitchBendEvent)
+			{
 				auto amountBytes = moduru::file::ByteUtil::ushort2bytes(pitchBendEvent->getAmount() + 8192);
 				auto pb = make_shared<PitchBend>(pitchBendEvent->getTick(), 1, (int)(amountBytes[0] & 255), (int)(amountBytes[1] & 255));
 				pb->setBendAmount(pitchBendEvent->getAmount() + 8192);
 				miscEvents.push_back(pb);
 			}
-			else if (channelPressureEvent) {
+			else if (channelPressureEvent)
+			{
 				auto ca = make_shared<ChannelAftertouch>(channelPressureEvent->getTick(), 1, channelPressureEvent->getAmount());
 				miscEvents.push_back(ca);
 			}
-			else if (polyPressureEvent) {
+			else if (polyPressureEvent)
+			{
 				auto na = make_shared<NoteAftertouch>(polyPressureEvent->getTick(), 1, polyPressureEvent->getNote(), polyPressureEvent->getAmount());
 				miscEvents.push_back(na);
 			}
-			else if (controlChangeEvent) {
+			else if (controlChangeEvent)
+			{
 				auto c = make_shared<Controller>(controlChangeEvent->getTick(), 1, controlChangeEvent->getController(), controlChangeEvent->getAmount());
 				miscEvents.push_back(c);
 			}
-			else if (programChangeEvent) {
-			auto pc = make_shared<ProgramChange>(programChangeEvent->getTick(), 1, programChangeEvent->getProgram());
+			else if (programChangeEvent)
+			{
+				auto pc = make_shared<ProgramChange>(programChangeEvent->getTick(), 1, programChangeEvent->getProgram());
 				miscEvents.push_back(pc);
 			}
-			else if (mixerEvent) {
+			else if (mixerEvent)
+			{
 				auto sysExData = vector<char>(8);
 				sysExData[0] = 71;
 				sysExData[1] = 0;
@@ -184,24 +195,37 @@ MidiWriter::MidiWriter(mpc::sequencer::Sequence* sequence)
 				miscEvents.push_back(see);
 			}
 		}
-		for (auto i = 0; i < sequence->getLastTick(); i++) {
-			for (auto& no : noteOffs) {
-				if (no->getTick() == i) {
+
+		for (auto i = 0; i < sequence->getLastTick(); i++)
+		{
+			for (auto& no : noteOffs)
+			{
+				if (no->getTick() == i)
+				{
 					mt->insertEvent(no);
 				}
 			}
-			for (auto& var : variations) {
-				if (var->getTick() == i) {
+
+			for (auto& var : variations)
+			{
+				if (var->getTick() == i)
+				{
 					mt->insertEvent(var);
 				}
 			}
-			for (auto& no : noteOns) {
-				if (no->getTick() == i) {
+			
+			for (auto& no : noteOns)
+			{
+				if (no->getTick() == i)
+				{
 					mt->insertEvent(no);
 				}
 			}
-			for (auto& e : miscEvents) {
-				if (e->getTick() == i) {
+
+			for (auto& e : miscEvents)
+			{
+				if (e->getTick() == i)
+				{
 					mt->insertEvent(e);
 				}
 			}
@@ -215,8 +239,10 @@ MidiWriter::MidiWriter(mpc::sequencer::Sequence* sequence)
 
 void MidiWriter::addNoteOn(shared_ptr<NoteOn> noteOn)
 {
-	for (auto& no : noteOffs) {
-		if (no->getNoteValue() == noteOn->getNoteValue() && no->getTick() > noteOn->getTick()) {
+	for (auto& no : noteOffs)
+	{
+		if (no->getNoteValue() == noteOn->getNoteValue() && no->getTick() > noteOn->getTick())
+		{
 			no = make_shared<NoteOn>(noteOn->getTick(), no->getChannel(), no->getNoteValue(), 0);
 		}
 	}
@@ -227,14 +253,20 @@ void MidiWriter::createDeltas(weak_ptr<mpc::midi::MidiTrack> midiTrack)
 {
 	auto mt = midiTrack.lock();
 	shared_ptr<mpc::midi::event::MidiEvent> previousEvent;
-	for (auto& me : mt->getEvents()) {
+
+	for (auto& me : mt->getEvents())
+	{
 		auto event = dynamic_pointer_cast<mpc::midi::event::NoteOn>(me.lock());
-		if (event) {
-			if (previousEvent) {
-				if (event->getTick() != previousEvent->getTick()) {
+		if (event)
+		{
+			if (previousEvent)
+			{
+				if (event->getTick() != previousEvent->getTick())
+				{
 					event->setDelta(event->getTick() - previousEvent->getTick());
 				}
-				else {
+				else
+				{
 					event->setDelta(0);
 				}
 			}

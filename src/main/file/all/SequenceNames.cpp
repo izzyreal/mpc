@@ -112,7 +112,7 @@ int SequenceNames::getSegmentCount(mpc::sequencer::Sequence* seq)
 		
 			if (sysEx)
 			{
-				auto dataSegments = (int)(ceil(sysEx->getBytes()->size() / 8.0));
+				auto dataSegments = (int)(ceil(sysEx->getBytes().size() / 8.0));
 				segmentCount += dataSegments + 1;
 			}
 			else if (dynamic_pointer_cast<mpc::sequencer::MixerEvent>(e.lock()))

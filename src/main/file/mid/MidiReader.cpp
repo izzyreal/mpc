@@ -251,35 +251,44 @@ void MidiReader::parseSequence()
 						sysExData[j + 1] = sysEx->getData()[j];
 
 					auto see = dynamic_pointer_cast<mpc::sequencer::SystemExclusiveEvent>(track->addEvent(sysEx->getTick(), "systemexclusive").lock());
-					vector<char> tmp;
-					for (char c : sysExData) {
-						tmp.push_back(c);
+					vector<unsigned char> tmp;
+
+					for (char c : sysExData)
+					{
+						tmp.push_back(static_cast<unsigned char>(c));
 					}
-					see->setBytes(&tmp);
+					
+					see->setBytes(tmp);
 				}
 			}
-			else if (noteAfterTouch) {
+			else if (noteAfterTouch)
+			{
 				auto ppe = dynamic_pointer_cast<PolyPressureEvent>(track->addEvent(noteAfterTouch->getTick(), "polypressure").lock());
 				ppe->setNote(noteAfterTouch->getNoteValue());
 				ppe->setAmount(noteAfterTouch->getAmount());
 			}
-			else if (channelAfterTouch) {
+			else if (channelAfterTouch)
+			{
 				auto cpe = dynamic_pointer_cast<ChannelPressureEvent>(track->addEvent(channelAfterTouch->getTick(), "channelpressure").lock());
 				cpe->setAmount(channelAfterTouch->getAmount());
 			}
-			else if (programChange) {
+			else if (programChange)
+			{
 				auto pce = dynamic_pointer_cast<ProgramChangeEvent>(track->addEvent(programChange->getTick(), "programchange").lock());
 				pce->setProgram(programChange->getProgramNumber() + 1);
 			}
-			else if (trackName) {
+			else if (trackName)
+			{
 				track->setName(trackName->getTrackName());
 			}
-			else if (controller) {
+			else if (controller)
+			{
 				auto cce = dynamic_pointer_cast<ControlChangeEvent>(track->addEvent(controller->getTick(), "controlchange").lock());
 				cce->setController(controller->getControllerType());
 				cce->setAmount(controller->getValue());
 			}
-			else if (pitchBend) {
+			else if (pitchBend)
+			{
 				auto pbe = dynamic_pointer_cast<PitchBendEvent>(track->addEvent(pitchBend->getTick(), "pitchbend").lock());
 				pbe->setAmount(pitchBend->getBendAmount() - 8192);
 			}

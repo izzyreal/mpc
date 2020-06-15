@@ -221,22 +221,32 @@ int Sequence::getEventAmount()
 int Sequence::getSegmentCount(mpc::sequencer::Sequence* seq)
 {
 	int segmentCount = 0;
-	for (auto& track : seq->getTracks()) {
+	
+	for (auto& track : seq->getTracks())
+	{
 		auto t = track.lock();
+		
 		if (t->getTrackIndex() > 63)
+		{
 			break;
+		}
 
-		for (auto& e : t->getEvents()) {
+		for (auto& e : t->getEvents())
+		{
 			auto sysExEvent = dynamic_pointer_cast<mpc::sequencer::SystemExclusiveEvent>(e.lock());
 			auto mixerEvent = dynamic_pointer_cast<mpc::sequencer::MixerEvent>(e.lock());
-			if (sysExEvent) {
-				int dataSegments = (int)(ceil((int)(sysExEvent->getBytes()->size()) / 8.0));
+			
+			if (sysExEvent)
+			{
+				int dataSegments = (int)(ceil((int)(sysExEvent->getBytes().size()) / 8.0));
 				segmentCount += dataSegments + 2;
 			}
-			else if (mixerEvent) {
+			else if (mixerEvent)
+			{
 				segmentCount += 4;
 			}
-			else {
+			else
+			{
 				segmentCount++;
 			}
 		}
@@ -248,13 +258,19 @@ void Sequence::setUnknown32BitInt(mpc::sequencer::Sequence* seq)
 {
 	auto unknownNumberBytes1 = moduru::file::ByteUtil::uint2bytes(10000000);
 	auto unknownNumberBytes2 = moduru::file::ByteUtil::uint2bytes(seq->getLastTick() * 5208.333333333333);
-	for (int i = 0; i < 2; i++) {
-		for (int j = 0; j < 4; j++) {
+	
+	for (int i = 0; i < 2; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
 			saveBytes[UNKNOWN32_BIT_INT_OFFSET + j + (i * 4)] = unknownNumberBytes1[j];
 		}
 	}
-	for (int i = 2; i < 4; i++) {
-		for (int j = 0; j < 4; j++) {
+
+	for (int i = 2; i < 4; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
 			saveBytes[UNKNOWN32_BIT_INT_OFFSET + j + (i * 4)] = unknownNumberBytes2[j];
 		}
 	}
@@ -270,14 +286,24 @@ void Sequence::setBarCount(int i)
 vector<char> Sequence::createEventSegmentsChunk(mpc::sequencer::Sequence* seq)
 {
 	vector<vector<char>> ea;
-	for (int i = 0; i < seq->getLastTick(); i++) {
-		for (auto& track : seq->getTracks()) {
-			auto t = track.lock();
-			if (t->getTrackIndex() > 63) break;
 
-			for (auto& event : t->getEvents()) {
+	for (int i = 0; i < seq->getLastTick(); i++)
+	{
+		for (auto& track : seq->getTracks())
+		{
+			auto t = track.lock();
+
+			if (t->getTrackIndex() > 63)
+			{
+				break;
+			}
+
+			for (auto& event : t->getEvents())
+			{
 				auto e = event.lock();
-				if (e->getTick() == i) {
+
+				if (e->getTick() == i)
+				{
 					e->setTrack(t->getTrackIndex());
 					auto ae = AllEvent(e.get());
 					ea.push_back(ae.getBytes());
