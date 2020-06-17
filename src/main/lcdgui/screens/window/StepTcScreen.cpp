@@ -16,6 +16,13 @@ void StepTcScreen::open()
 	displayTcValue();
 }
 
+void StepTcScreen::turnWheel(int i)
+{
+	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timing-correct"));
+	timingCorrectScreen->setNoteValue(timingCorrectScreen->getNoteValue() + i);
+	displayTcValue();
+}
+
 void StepTcScreen::displayTcValue()
 {
 	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timing-correct"));
