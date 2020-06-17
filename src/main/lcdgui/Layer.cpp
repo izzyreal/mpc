@@ -61,7 +61,7 @@ void Layer::setFocus(string textFieldName)
 		if (tf->getName().compare(textFieldName) == 0 && tf->isFocusable())
 		{
 			tf->takeFocus(oldFocus);
-			//bringToFront(tf.get());
+			bringToFront(tf.get());
 			break;
 		}
 	}

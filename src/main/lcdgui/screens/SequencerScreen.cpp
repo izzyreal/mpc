@@ -96,31 +96,39 @@ void SequencerScreen::displayBars()
 
 void SequencerScreen::displayPgm()
 {
-	if (track.lock()->getProgramChange() == 0) {
+	if (track.lock()->getProgramChange() == 0)
+	{
 		findField("pgm").lock()->setText("OFF");
 	}
-	else {
+	else
+	{
 		findField("pgm").lock()->setText(to_string(track.lock()->getProgramChange()));
 	}
 }
 
 void SequencerScreen::displayDeviceName()
 {
-	if (track.lock()->getBusNumber() != 0) {
-		if (track.lock()->getDevice() == 0) {
+	if (track.lock()->getBusNumber() != 0)
+	{
+		if (track.lock()->getDevice() == 0)
+		{
 			int pgm = sampler.lock()->getDrumBusProgramNumber(track.lock()->getBusNumber());
 			auto p = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(pgm).lock());
 			findLabel("devicename").lock()->setText(p->getName());
 		}
-		else {
+		else
+		{
 			findLabel("devicename").lock()->setText(sequencer.lock()->getActiveSequence().lock()->getDeviceName(track.lock()->getDevice()));
 		}
 	}
-	else if (track.lock()->getBusNumber() == 0) {
-		if (track.lock()->getDevice() == 0) {
+	else if (track.lock()->getBusNumber() == 0)
+	{
+		if (track.lock()->getDevice() == 0)
+		{
 			findLabel("devicename").lock()->setText("NewPgm-A");
 		}
-		else {
+		else
+		{
 			findLabel("devicename").lock()->setText(sequencer.lock()->getActiveSequence().lock()->getDeviceName(track.lock()->getDevice()));
 		}
 	}

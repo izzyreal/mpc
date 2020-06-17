@@ -35,7 +35,6 @@ void Component::sendToBack(weak_ptr<Component> childToSendBack)
 
 bool Component::bringToFront(Component* childToBringToFront)
 {	
-
 	if (childToBringToFront == nullptr)
 	{
 		return false;
@@ -45,9 +44,15 @@ bool Component::bringToFront(Component* childToBringToFront)
 	{
 		if (children[i].get() == childToBringToFront)
 		{
+			MLOG(name + " brings " + childToBringToFront->getName() + " to front");
 			auto placeHolder = children[i];
 			children.erase(begin(children) + i);
 			children.push_back(move(placeHolder));
+
+			if (parent != nullptr)
+			{
+				parent->bringToFront(this);
+			}
 			return true;
 		}
 	}
@@ -56,10 +61,6 @@ bool Component::bringToFront(Component* childToBringToFront)
 	{
 		if (c->bringToFront(childToBringToFront))
 		{
-			if (parent != nullptr)
-			{
-				parent->bringToFront(this);
-			}
 			return true;
 		}
 	}
@@ -208,6 +209,11 @@ vector<weak_ptr<Parameter>> Component::findParameters()
 
 weak_ptr<Component> Component::addChild(shared_ptr<Component> child)
 {
+	if (name.compare("tempo-change") == 0 && child->getName().find("a") != string::npos)
+	{
+		printf("");
+	}
+
 	child->parent = this;
 	children.push_back(move(child));
 	SetDirty();
@@ -233,9 +239,15 @@ void Component::removeChild(weak_ptr<Component> child)
 
 void Component::addChildren(vector<shared_ptr<Component>> children)
 {
+
+	if (name.compare("tempo-change") == 0)
+	{
+		printf("");
+	}
+
 	for (auto& c : children)
 	{
-		this->children.push_back(move(c));
+		addChild(c);
 	}
 }
 

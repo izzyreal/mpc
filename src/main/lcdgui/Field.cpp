@@ -44,6 +44,11 @@ void Field::Draw(std::vector<std::vector<bool>>* pixels)
 		return;
 	}
 
+	if (name.compare("a0") == 0 || name.compare("a1") == 0)
+	{
+		MLOG("drawing " + name);
+	}
+
 	auto r = getRect();
 
 	for (int i = r.L; i < r.R; i++)
