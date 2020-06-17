@@ -137,17 +137,21 @@ void SequencerScreen::displayTempo()
 void SequencerScreen::displayTempoLabel()
 {
 	auto currentRatio = -1;
-	for (auto& tce : sequencer.lock()->getActiveSequence().lock()->getTempoChangeEvents()) {
+	for (auto& tce : sequencer.lock()->getActiveSequence().lock()->getTempoChangeEvents())
+	{
 		auto lTce = tce.lock();
-		if (lTce->getTick() > sequencer.lock()->getTickPosition()) {
+		if (lTce->getTick() > sequencer.lock()->getTickPosition())
+		{
 			break;
 		}
 		currentRatio = lTce->getRatio();
 	}
-	if (currentRatio != 1000) {
+	if (currentRatio != 1000)
+	{
 		findLabel("tempo").lock()->setText(u8"c\u00C0:");
 	}
-	else {
+	else
+	{
 		findLabel("tempo").lock()->setText(u8" \u00C0:");
 	}
 }
@@ -436,20 +440,25 @@ void SequencerScreen::turnWheel(int i)
 
 	auto focus = findFocus().lock()->getName();
 
-	if (focus.size() >= 3 && focus.substr(0, 3).compare("now") == 0) {
-		setLastFocus("step-editor", "viewmodenumber");
+	if (focus.size() >= 3 && focus.substr(0, 3).compare("now") == 0)
+	{
+		setLastFocus("step-editor", "view");
 	}
 
-	if (focus.compare("now0") == 0) {
+	if (focus.compare("now0") == 0)
+	{
 		sequencer.lock()->setBar(sequencer.lock()->getCurrentBarIndex() + i);
 	}
-	else if (focus.compare("now1") == 0) {
+	else if (focus.compare("now1") == 0)
+	{
 		sequencer.lock()->setBeat(sequencer.lock()->getCurrentBeatIndex() + i);
 	}
-	else if (focus.compare("now2") == 0) {
+	else if (focus.compare("now2") == 0)
+	{
 		sequencer.lock()->setClock(sequencer.lock()->getCurrentClockNumber() + i);
 	}
-	else if (focus.compare("devicenumber") == 0) {
+	else if (focus.compare("devicenumber") == 0)
+	{
 		track.lock()->setDeviceNumber(track.lock()->getDevice() + i);
 	}
 	else if (focus.compare("tr") == 0)
@@ -493,66 +502,85 @@ void SequencerScreen::turnWheel(int i)
 		string drumnote = "drumnote";
 
 		if (lastFocus.compare("") != 0) {
-			if (std::mismatch(midinote.begin(), midinote.end(), lastFocus.begin()).first == midinote.end()) {
-				if (track.lock()->getBusNumber() != 0) {
+			if (std::mismatch(midinote.begin(), midinote.end(), lastFocus.begin()).first == midinote.end())
+			{
+				if (track.lock()->getBusNumber() != 0)
+				{
 					setLastFocus("edit", "drumnote");
 				}
 			}
-			else if (std::mismatch(drumnote.begin(), drumnote.end(), lastFocus.begin()).first == drumnote.end()) {
-				if (track.lock()->getBusNumber() == 0) {
+			else if (std::mismatch(drumnote.begin(), drumnote.end(), lastFocus.begin()).first == drumnote.end())
+			{
+				if (track.lock()->getBusNumber() == 0)
+				{
 					setLastFocus("edit", "midinote0");
 				}
 			}
 		}
 	}
-	else if (focus.compare("pgm") == 0) {
+	else if (focus.compare("pgm") == 0)
+	{
 		track.lock()->setProgramChange(track.lock()->getProgramChange() + i);
 	}
-	else if (focus.compare("velo") == 0) {
+	else if (focus.compare("velo") == 0)
+	{
 		track.lock()->setVelocityRatio(track.lock()->getVelocityRatio() + i);
 	}
-	else if (focus.compare("timing") == 0) {
+	else if (focus.compare("timing") == 0)
+	{
 		auto screen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timing-correct"));
 		auto noteValue = screen->getNoteValue();
 		screen->setNoteValue(noteValue + i);
 		setLastFocus("timing-correct", "notevalue");
 		displayTiming();
 	}
-	else if (focus.compare("sq") == 0) {
-		if (sequencer.lock()->isPlaying()) {
+	else if (focus.compare("sq") == 0)
+	{
+		if (sequencer.lock()->isPlaying())
+		{
 			sequencer.lock()->setNextSq(sequencer.lock()->getCurrentlyPlayingSequenceIndex() + i);
 		}
-		else {
+		else
+		{
 			sequencer.lock()->setActiveSequenceIndex(sequencer.lock()->getActiveSequenceIndex() + i);
 		}
 	}
-	else if (focus.compare("nextsq") == 0) {
+	else if (focus.compare("nextsq") == 0)
+	{
 		sequencer.lock()->setNextSq(sequencer.lock()->getNextSq() + i);
 	}
-	else if (focus.compare("bars") == 0) {
+	else if (focus.compare("bars") == 0)
+	{
 		openScreen("change-bars-2");
 	}
-	else if (focus.compare("tempo") == 0) {
+	else if (focus.compare("tempo") == 0)
+	{
 		double oldTempo = sequencer.lock()->getTempo().toDouble();
 		double newTempo = oldTempo + (i / 10.0);
 		sequencer.lock()->setTempo(BCMath(newTempo));
 	}
-	else if (focus.compare("tsig") == 0) {
+	else if (focus.compare("tsig") == 0)
+	{
 		openScreen("change-tsig");
 	}
-	else if (focus.compare("temposource") == 0) {
+	else if (focus.compare("temposource") == 0)
+	{
 		sequencer.lock()->setTempoSourceSequence(i > 0);
 	}
-	else if (focus.compare("count") == 0) {
+	else if (focus.compare("count") == 0)
+	{
 		sequencer.lock()->setCountEnabled(i > 0);
 	}
-	else if (focus.compare("loop") == 0) {
+	else if (focus.compare("loop") == 0)
+	{
 		sequence.lock()->setLoopEnabled(i > 0);
 	}
-	else if (focus.compare("recordingmode") == 0) {
+	else if (focus.compare("recordingmode") == 0)
+	{
 		sequencer.lock()->setRecordingModeMulti(i > 0);
 	}
-	else if (focus.compare("on") == 0) {
+	else if (focus.compare("on") == 0)
+	{
 		track.lock()->setOn(i > 0);
 	}
 }
