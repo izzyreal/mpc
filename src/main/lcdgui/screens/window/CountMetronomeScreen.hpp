@@ -15,12 +15,6 @@ namespace mpc::lcdgui::screens::window
 		std::vector<std::string> countInNames = { "OFF", "REC ONLY", "REC+PLAY" };
 		std::vector<std::string> rateNames = { "1/4", "1/4(3)", "1/8", "1/8(3)", "1/16", "1/16(3)", "1/32", "1/32(3)" };
 
-		std::weak_ptr<mpc::lcdgui::Field> countInField;
-		std::weak_ptr<mpc::lcdgui::Field> inPlayField;
-		std::weak_ptr<mpc::lcdgui::Field> rateField;
-		std::weak_ptr<mpc::lcdgui::Field> inRecField;
-		std::weak_ptr<mpc::lcdgui::Field> waitForKeyField;
-
 		int countIn = 0;
 		bool inPlay = true;
 		int rate = 0;

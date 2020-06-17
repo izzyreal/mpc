@@ -11,12 +11,6 @@ CountMetronomeScreen::CountMetronomeScreen(const int layerIndex)
 
 void CountMetronomeScreen::open()
 {
-	countInField = findField("countin");
-	inPlayField = findField("inplay");
-	rateField = findField("rate");
-	inRecField = findField("inrec");
-	waitForKeyField = findField("waitforkey");
-
 	displayCountIn();
 	displayInPlay();
 	displayRate();
@@ -26,32 +20,33 @@ void CountMetronomeScreen::open()
 
 void CountMetronomeScreen::displayWaitForKey()
 {
-	waitForKeyField.lock()->setText(waitForKey ? "ON" : "OFF");
+	findField("wait-for-key").lock()->setText(waitForKey ? "ON" : "OFF");
 }
 
 void CountMetronomeScreen::displayInRec()
 {
-	inRecField.lock()->setText(inRec ? "YES" : "NO");
+	findField("in-rec").lock()->setText(inRec ? "YES" : "NO");
 }
 
 void CountMetronomeScreen::displayRate()
 {
-	rateField.lock()->setText(rateNames[rate]);
+	findField("rate").lock()->setText(rateNames[rate]);
 }
 
 void CountMetronomeScreen::displayInPlay()
 {
-	inPlayField.lock()->setText(inPlay ? "YES" : "NO");
+	findField("in-play").lock()->setText(inPlay ? "YES" : "NO");
 }
 
 void CountMetronomeScreen::displayCountIn()
 {
-	countInField.lock()->setText(countInNames[countIn]);
+	findField("count-in").lock()->setText(countInNames[countIn]);
 }
 
 void CountMetronomeScreen::function(int i)
 {
-	switch (i) {
+	switch (i)
+	{
 	case 3:
 		ls.lock()->openScreen("sequencer");
 		break;
@@ -65,11 +60,11 @@ void CountMetronomeScreen::turnWheel(int i)
 {
 	init();
 
-	if (param.compare("countin") == 0)
+	if (param.compare("count-in") == 0)
 	{
 		setCountIn(countIn + i);
 	}
-	else if (param.compare("inplay") == 0)
+	else if (param.compare("in-play") == 0)
 	{
 		setInPlay(i > 0);
 	}
@@ -78,11 +73,11 @@ void CountMetronomeScreen::turnWheel(int i)
 		setRate(rate + i);
 		sequencer.lock()->getActiveSequence().lock()->initMetaTracks();
 	}
-	else if (param.compare("inrec") == 0)
+	else if (param.compare("in-rec") == 0)
 	{
 		setInRec(i > 0);
 	}
-	else if (param.compare("waitforkey") == 0)
+	else if (param.compare("wait-for-key") == 0)
 	{
 		setWaitForKey(i > 0);
 	}
@@ -99,6 +94,7 @@ void CountMetronomeScreen::setCountIn(int i)
 	{
 		return;
 	}
+
 	countIn = i;
 	displayCountIn();
 }
@@ -109,6 +105,7 @@ void CountMetronomeScreen::setInPlay(bool b)
 	{
 		return;
 	}
+
 	inPlay = b;
 	displayInPlay();
 }
@@ -153,7 +150,9 @@ bool CountMetronomeScreen::isWaitForKeyEnabled()
 void CountMetronomeScreen::setInRec(bool b)
 {
 	if (inRec == b)
+	{
 		return;
+	}
 
 	inRec = b;
 	displayInRec();
