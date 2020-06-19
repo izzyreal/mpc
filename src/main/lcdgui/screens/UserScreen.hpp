@@ -59,7 +59,7 @@ namespace mpc::lcdgui::screens
 		void displayVelo();
 		void displayDeviceName();
 
-		BCMath tempo = 0;
+		double tempo = 0.0;
 		bool loop = false;
 		int bus = 0;
 		int device = 0;
@@ -72,7 +72,7 @@ namespace mpc::lcdgui::screens
 		mpc::sequencer::TimeSignature timeSig;
 		std::vector<std::string> deviceNames;
 
-		void setTempo(BCMath i);
+		void setTempo(const double newTempo);
 		void setLoop(bool b);
 		void setBus(int i);
 		void setDeviceNumber(int i);

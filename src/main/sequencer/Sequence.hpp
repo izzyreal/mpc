@@ -2,8 +2,6 @@
 #include <observer/Observable.hpp>
 #include <Mpc.hpp>
 
-#include <thirdp/bcmath/bcmath_stl.h>
-
 #include <memory>
 
 namespace mpc::sequencer {
@@ -19,7 +17,7 @@ namespace mpc::sequencer {
 	{
 
 	private:
-		BCMath initialTempo = BCMath("120.0");
+		double initialTempo = 120.0;
 
 		std::vector<std::shared_ptr<Track>> tracks;
 		std::vector<std::shared_ptr<Track>> metaTracks;
@@ -43,8 +41,8 @@ namespace mpc::sequencer {
 		bool lastLoopBarEnd = false;
 
 	public:
-		BCMath getInitialTempo();
-		void setInitialTempo(BCMath bd);
+		double getInitialTempo();
+		void setInitialTempo(const double initialTempo);
 
 		void setLoopStart(int l);
 		int getLoopStart();

@@ -54,19 +54,24 @@ MidiWriter::MidiWriter(mpc::sequencer::Sequence* sequence)
 	meta->insertEvent(seqName);
 	vector<shared_ptr<mpc::midi::event::meta::Tempo>> tempos;
 	int previousTick = 0;
-	auto tempo = sequence->getInitialTempo().toFloat();
+	auto tempo = sequence->getInitialTempo();
 	auto mpqn = (int)(6.0E7 / tempo);
 	tempos.push_back(make_shared<mpc::midi::event::meta::Tempo>(0, 0, mpqn));
-	for (auto& e : sequence->getTempoChangeEvents()) {
+
+	for (auto& e : sequence->getTempoChangeEvents())
+	{
 		auto tce = e.lock();
-		tempo = tce->getTempo().toFloat();
+		tempo = tce->getTempo();
 		mpqn = (int)(6.0E7 / tempo);
 		tempos.push_back(make_shared<mpc::midi::event::meta::Tempo>(tce->getTick(), tce->getTick() - previousTick, mpqn));
 		previousTick = tce->getTick();
 	}
-	for (auto& t : tempos) {
+
+	for (auto& t : tempos)
+	{
 		meta->insertEvent(t);
 	}
+	
 	meta->insertEvent(make_shared<meta::SmpteOffset>(0, 0, mpc::midi::event::meta::FrameRate::FRAME_RATE_25, 0, 0, 0, 0, 0));
 	std::set<vector<int>> tSigs;
 	auto tSigTick = 0;

@@ -18,8 +18,6 @@
 #include <file/File.hpp>
 #include <file/FileUtil.hpp>
 
-#include <thirdp/bcmath/bcmath_stl.h>
-
 #include <string>
 #include <vector>
 

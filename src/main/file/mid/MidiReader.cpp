@@ -109,44 +109,56 @@ void MidiReader::parseSequence()
 		}
 	}
 
-	auto initialTempoString = to_string(tempoChanges[0].lock()->getBpm());
-	auto length = initialTempoString.find(".") + 2;
-	auto initialTempoBd = BCMath(initialTempoString.substr(0, length));
-	sequence->setInitialTempo(initialTempoBd);
-	if (!lSequencer->isTempoSourceSequenceEnabled()) {
-		lSequencer->setTempo(initialTempoBd);
+	auto initialTempo = tempoChanges[0].lock()->getBpm();
+
+	sequence->setInitialTempo(initialTempo);
+
+	if (!lSequencer->isTempoSourceSequenceEnabled())
+	{
+		lSequencer->setTempo(initialTempo);
 	}
-	for (int i = 1; i < tempoChanges.size(); i++) {
+	
+	for (int i = 1; i < tempoChanges.size(); i++)
+	{
 		auto tce = sequence->addTempoChangeEvent().lock();
 		auto lTcMidi = tempoChanges[i].lock();
-		auto ratio = (float)(lTcMidi->getBpm()) / initialTempoBd.toFloat();
+		auto ratio = (float)(lTcMidi->getBpm()) / initialTempo;
 		tce->setRatio((int)(ratio * 1000.0));
 		tce->setStepNumber(i);
 		tce->setTick(lTcMidi->getTick());
 	}
 
 	if (timeSignatures.size() == 1)
+	{
 		lengthInTicks = midiTracks[0].lock()->getEndOfTrackDelta();
+	}
 
 	int accumLength = 0;
 	int barCounter = 0;
-	for (int i = 0; i < timeSignatures.size(); i++) {
+
+	for (int i = 0; i < timeSignatures.size(); i++)
+	{
 		auto current = timeSignatures[i].lock();
 		shared_ptr<meta::TimeSignature> next;
 
-		if (timeSignatures.size() > i + 1) {
+		if (timeSignatures.size() > i + 1)
+		{
 			next = timeSignatures[i + 1].lock();
 		}
 
-		if (next) {
-			while (accumLength < next->getTick()) {
+		if (next)
+		{
+			while (accumLength < next->getTick())
+			{
 				sequence->setTimeSignature(barCounter, current->getNumerator(), current->getRealDenominator());
 				int barLength = (*sequence->getBarLengths())[barCounter++];
 				accumLength += barLength;
 			}
 		}
-		else {
-			while (accumLength < lengthInTicks) {
+		else
+		{
+			while (accumLength < lengthInTicks)
+			{
 				sequence->setTimeSignature(barCounter, current->getNumerator(), current->getRealDenominator());
 				int barLength = (*sequence->getBarLengths())[barCounter++];
 				accumLength += barLength;
@@ -155,78 +167,108 @@ void MidiReader::parseSequence()
 	}
 	sequence->setLastBar(barCounter - 1);
 	sequence->setFirstLoopBar(firstLoopBar);
-	if (lastLoopBar == -1) {
+
+	if (lastLoopBar == -1)
+	{
 		sequence->setLastLoopBar(sequence->getLastBar());
 		sequence->setLastLoopBar(sequence->getLastLoopBar() + 1);
 	}
-	else {
+	else
+	{
 		sequence->setLastLoopBar(lastLoopBar);
 	}
+	
 	unique_ptr<NoteEvent> nVariation;
-	for (int i = 1; i < midiTracks.size(); i++) {
+	
+	for (int i = 1; i < midiTracks.size(); i++)
+	{
 		auto mt = midiTracks[i].lock();
 		vector<shared_ptr<NoteOn>> noteOffs;
 		vector<shared_ptr<NoteEvent>> noteOns;
 		auto track = sequence->purgeTrack(i - 1).lock();
 		track->setUsed(true);
 
-		for (auto& me : mt->getEvents()) {
+		for (auto& me : mt->getEvents())
+		{
 			auto noteOff = dynamic_pointer_cast<NoteOff>(me.lock());
 			auto noteOn = dynamic_pointer_cast<NoteOn>(me.lock());
-			if (noteOff) {
+
+			if (noteOff)
+			{
 				nVariation = make_unique<NoteEvent>();
 				nVariation->setVariationTypeNumber(noteOff->getNoteValue());
 				nVariation->setVariationValue(noteOff->getVelocity());
 			}
-			else if (noteOn) {
-				if (noteOn->getVelocity() == 0) {
-					if (getNumberOfNotes(noteOn->getNoteValue(), noteOns) > getNumberOfNoteOns(noteOn->getNoteValue(), noteOffs)) {
+			else if (noteOn)
+			{
+				if (noteOn->getVelocity() == 0)
+				{
+					if (getNumberOfNotes(noteOn->getNoteValue(), noteOns) > getNumberOfNoteOns(noteOn->getNoteValue(), noteOffs))
+					{
 						noteOffs.push_back(noteOn);
 					}
 				}
-				else {
-					if (getNumberOfNotes(noteOn->getNoteValue(), noteOns) > getNumberOfNoteOns(noteOn->getNoteValue(), noteOffs)) {
+				else
+				{
+					if (getNumberOfNotes(noteOn->getNoteValue(), noteOns) > getNumberOfNoteOns(noteOn->getNoteValue(), noteOffs))
+					{
 						auto noteOff = make_shared<NoteOn>(noteOn->getTick(), 0, (noteOn->getNoteValue()), 0);
 						noteOffs.push_back(noteOff);
 					}
+
 					auto ne = make_shared<NoteEvent>(noteOn->getNoteValue());
 					ne->setTick(noteOn->getTick());
 					ne->setVelocity(noteOn->getVelocity());
-					if (nVariation) {
+					
+					if (nVariation)
+					{
 						ne->setVariationTypeNumber(nVariation->getVariationTypeNumber());
 						ne->setVariationValue(nVariation->getVariationValue());
 					}
-					else {
+					else
+					{
 						ne->setVariationValue(64);
 					}
 					noteOns.push_back(ne);
 				}
 			}
 		}
-		for (auto& n: noteOns) {
+
+		for (auto& n: noteOns)
+		{
 			auto noteOn = dynamic_pointer_cast<mpc::sequencer::NoteEvent>(track->addEvent(n->getTick(), "note").lock());
 			n->CopyValuesTo(noteOn);
 			int indexCandidate = -1;
 			int tickCandidate = 999999999;
-			for (int k = 0; k < noteOffs.size(); k++) {
+
+			for (int k = 0; k < noteOffs.size(); k++)
+			{
 				auto noteOff = noteOffs[k];
-				if (noteOff->getNoteValue() == noteOn->getNote() && noteOff->getTick() >= noteOn->getTick()) {
-					if (noteOff->getTick() < tickCandidate) {
+
+				if (noteOff->getNoteValue() == noteOn->getNote() && noteOff->getTick() >= noteOn->getTick())
+				{
+					if (noteOff->getTick() < tickCandidate)
+					{
 						tickCandidate = noteOff->getTick();
 						indexCandidate = k;
 						break;
 					}
 				}
 			}
-			if (indexCandidate != -1) {
+
+			if (indexCandidate != -1)
+			{
 				noteOn->setDuration((int)(noteOffs[indexCandidate]->getTick() - noteOn->getTick()));
 				noteOffs.erase(noteOffs.begin() + indexCandidate);
 			}
-			else {
+			else
+			{
 				noteOn->setDuration(24);
 			}
 		}
-		for (auto& me : mt->getEvents()) {
+
+		for (auto& me : mt->getEvents())
+		{
 
 			auto sysEx = dynamic_pointer_cast<mpc::midi::event::SystemExclusiveEvent>(me.lock());
 			auto noteAfterTouch = dynamic_pointer_cast<NoteAftertouch>(me.lock());
@@ -236,19 +278,26 @@ void MidiReader::parseSequence()
 			auto controller = dynamic_pointer_cast<Controller>(me.lock());
 			auto pitchBend = dynamic_pointer_cast<PitchBend>(me.lock());
 
-			if (sysEx) {
+			if (sysEx)
+			{
 				auto sysExData = sysEx->getData();
-				if (sysExData.size() == 8 && sysExData[0] == 71 && sysExData[1] == 0 && sysExData[2] == 68 && sysExData[3] == 69 && sysExData[7] == 247) {
+			
+				if (sysExData.size() == 8 && sysExData[0] == 71 && sysExData[1] == 0 && sysExData[2] == 68 && sysExData[3] == 69 && sysExData[7] == 247)
+				{
 					auto mixerEvent = dynamic_pointer_cast<MixerEvent>(track->addEvent(sysEx->getTick(), "mixer").lock());
 					mixerEvent->setParameter(sysExData[4] - 1);
 					mixerEvent->setPadNumber(sysExData[5]);
 					mixerEvent->setValue(sysExData[6]);
 				}
-				else {
+				else
+				{
 					sysExData = vector<char>(sysEx->getData().size() + 1);
 					sysExData[0] = 240;
+				
 					for (int j = 0; j < sysEx->getData().size(); j++)
+					{
 						sysExData[j + 1] = sysEx->getData()[j];
+					}
 
 					auto see = dynamic_pointer_cast<mpc::sequencer::SystemExclusiveEvent>(track->addEvent(sysEx->getTick(), "systemexclusive").lock());
 					vector<unsigned char> tmp;

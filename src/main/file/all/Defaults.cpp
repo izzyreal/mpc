@@ -288,7 +288,7 @@ void Defaults::setNames()
 void Defaults::setTempo()
 {
 	auto userScreen = dynamic_pointer_cast<UserScreen>(Screens::getScreenComponent("user"));
-	auto tempo = static_cast<int>(userScreen->tempo.toDouble() * 10.0);
+	auto tempo = static_cast<int>(userScreen->tempo * 10.0);
 	auto tempoBytes = moduru::file::ByteUtil::ushort2bytes(tempo);
 	saveBytes[TEMPO_BYTE1_OFFSET] = tempoBytes[0];
 	saveBytes[TEMPO_BYTE2_OFFSET] = tempoBytes[1];

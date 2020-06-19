@@ -13,14 +13,13 @@
 
 #include <io/CircularIntBuffer.hpp>
 
-#include <thirdp/bcmath/bcmath_stl.h>
-
-namespace mpc::sequencer {
+namespace mpc::sequencer
+{
 	class Song;
 }
 
-namespace mpc::sequencer {
-
+namespace mpc::sequencer
+{
 	class Sequencer final
 		: public moduru::observer::Observable
 	{
@@ -48,7 +47,7 @@ namespace mpc::sequencer {
 		int secondSequenceIndex{ 0 };
 		bool lastRecordingActive{ false };
 		int playStartTick{ 0 };
-		BCMath previousTempo{};
+		double previousTempo = 0.0;
 		int recordStartTick{ 0 };
 
 		std::string defaultSongName = "";
@@ -83,7 +82,7 @@ namespace mpc::sequencer {
 		bool recording{ false };
 
 		int activeTrackIndex{ 0 };
-		BCMath tempo{};
+		double tempo = 120.0;
 		int nextsq{ 0 };
 
 	private:
@@ -99,8 +98,8 @@ namespace mpc::sequencer {
 		void notifyTimeDisplay();
 		void notifyTimeDisplayRealtime();
 		void init();
-		void setTempo(BCMath t);
-		BCMath getTempo();
+		void setTempo(const double newTempo);
+		double getTempo();
 		bool isTempoSourceSequenceEnabled();
 		void setTempoSourceSequence(bool b);
 		bool isRecordingOrOverdubbing();

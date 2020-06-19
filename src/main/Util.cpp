@@ -198,3 +198,18 @@ vector<string>& Util::noteNames()
 	
 	return noteNames;
 }
+
+string Util::tempoString(const double tempo)
+{
+	string result = to_string(tempo);
+	
+	if (result.find(".") == string::npos)
+	{
+		result += ".0";
+	}
+	else {
+		result = result.substr(0, result.find(".") + 2);
+	}
+
+	return replaceDotWithSmallSpaceDot(result);
+}

@@ -44,7 +44,6 @@ bool Component::bringToFront(Component* childToBringToFront)
 	{
 		if (children[i].get() == childToBringToFront)
 		{
-			MLOG(name + " brings " + childToBringToFront->getName() + " to front");
 			auto placeHolder = children[i];
 			children.erase(begin(children) + i);
 			children.push_back(move(placeHolder));

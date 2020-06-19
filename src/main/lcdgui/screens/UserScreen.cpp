@@ -54,9 +54,8 @@ void UserScreen::turnWheel(int i)
 	
 	if (param.compare("tempo") == 0)
 	{
-		double oldTempo = tempo.toDouble();
-		double newTempo = oldTempo + (i * 0.1);
-		setTempo(BCMath(newTempo));
+		double newTempo = tempo + (i * 0.1);
+		setTempo(newTempo);
 	}
 	else if (param.compare("loop") == 0)
 	{
@@ -101,9 +100,7 @@ void UserScreen::turnWheel(int i)
 
 void UserScreen::displayTempo()
 {
-	auto tempoStr = StrUtil::padLeft(tempo.toString(), " ", 5);
-	tempoStr = mpc::Util::replaceDotWithSmallSpaceDot(tempoStr);
-	findField("tempo").lock()->setText(tempoStr);
+	findField("tempo").lock()->setText(Util::tempoString(tempo));
 }
 
 void UserScreen::displayLoop()
@@ -201,7 +198,7 @@ void UserScreen::resetPreferences()
 {
 	sequenceName = string("Sequence");
 	bus = 1;
-	tempo = BCMath("120.0");
+	tempo = 120.0;
 	velo = 100;
 	pgm = 0;
 	recordingModeMulti = false;
@@ -234,23 +231,20 @@ string UserScreen::getDeviceName(int i)
 	return deviceNames[i];
 }
 
-void UserScreen::setTempo(BCMath bd)
+void UserScreen::setTempo(const double newTempo)
 {
-	auto str = to_string(bd.toDouble());
+	auto str = to_string(newTempo);
 
-	if (str.find(".") == string::npos)
+	if (newTempo < 30.0)
 	{
-		str += ".0";
+		tempo = 30.0;
 	}
-
-	auto length = (int)(str.find(".")) + 2;
-	tempo = BCMath(str.substr(0, length));
-
-	if (tempo.toDouble() < 30.0) {
-		tempo = BCMath("30.0");
+	else if (newTempo > 300.0) {
+		tempo = 300.0;
 	}
-	else if (tempo.toDouble() > 300.0) {
-		tempo = BCMath("300.0");
+	else
+	{
+		tempo = newTempo;
 	}
 
 	displayTempo();

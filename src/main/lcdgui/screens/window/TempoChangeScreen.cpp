@@ -9,6 +9,7 @@
 
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui::screens::window;
+using namespace moduru::lang;
 
 TempoChangeScreen::TempoChangeScreen(const int layerIndex)
 	: ScreenComponent("tempo-change", layerIndex)
@@ -123,9 +124,7 @@ void TempoChangeScreen::initVisibleEvents()
 void TempoChangeScreen::displayInitialTempo()
 {
 	auto seq = sequencer.lock()->getActiveSequence().lock();
-	string tempoStr = seq->getInitialTempo().toString();
-	tempoStr = mpc::Util::replaceDotWithSmallSpaceDot(tempoStr);
-	findField("initial-tempo").lock()->setText(tempoStr);
+	findField("initial-tempo").lock()->setText(Util::tempoString(seq->getInitialTempo()));
 }
 
 void TempoChangeScreen::displayTempoChangeOn()
@@ -150,26 +149,17 @@ void TempoChangeScreen::displayTempoChange0()
 	value = tce->getClock(timeSig.getNumerator(), timeSig.getDenominator());
 	d0Field.lock()->setTextPadded(value, "0");
 
-	string ratioStr = moduru::lang::StrUtil::TrimDecimals(tce->getRatio() / 10.0, 1);
-	ratioStr = moduru::lang::StrUtil::padLeft(ratioStr, " ", 5);
+	string ratioStr = StrUtil::TrimDecimals(tce->getRatio() * 0.1, 1);
+	ratioStr = StrUtil::padLeft(ratioStr, " ", 5);
 	ratioStr = Util::replaceDotWithSmallSpaceDot(ratioStr);
 	e0Field.lock()->setText(ratioStr);
 
-	auto tempo = sequence->getInitialTempo().toDouble() * (tce->getRatio() / 1000.0);
-	
-	if (tempo < 30)
-	{
-		tempo = 30.0;
-	}
-	else if (tempo > 300)
-	{
-		tempo = 300.0;
-	}
+	double initialTempo = sequence->getInitialTempo();
+	int ratio = tce->getRatio();
 
-	string tempoStr = moduru::lang::StrUtil::TrimDecimals((tempo * 10) / 10.0, 1);
-	tempoStr = moduru::lang::StrUtil::padLeft(tempoStr, " ", 5);
-	tempoStr = Util::replaceDotWithSmallSpaceDot(tempoStr);
-	f0Field.lock()->setText(tempoStr);
+	double tempo = initialTempo * double(ratio) * 0.001;
+	
+	f0Field.lock()->setText(Util::tempoString(tempo));
 	bars[1].lock()->setValue((tempo - 15) * (290 / 975.0));
 }
 
@@ -216,26 +206,13 @@ void TempoChangeScreen::displayTempoChange1()
 	c1Field.lock()->setTextPadded(tce->getBeat(timeSig.getNumerator(), timeSig.getDenominator()) + 1, "0");
 	d1Field.lock()->setTextPadded(tce->getClock(timeSig.getNumerator(), timeSig.getDenominator()), "0");
 
-	string ratioStr = moduru::lang::StrUtil::TrimDecimals(tce->getRatio() / 10.0, 1);
-	ratioStr = moduru::lang::StrUtil::padLeft(ratioStr, " ", 5);
+	string ratioStr = StrUtil::TrimDecimals(tce->getRatio() * 0.1, 1);
+	ratioStr = StrUtil::padLeft(ratioStr, " ", 5);
 	ratioStr = Util::replaceDotWithSmallSpaceDot(ratioStr);
 	e1Field.lock()->setText(ratioStr);
 
-	auto tempo = sequence->getInitialTempo().toDouble() * (tce->getRatio() / 1000.0);
-	
-	if (tempo < 30)
-	{
-		tempo = 30.0;
-	}
-	else if (tempo > 300) {
-		tempo = 300.0;
-	}
-	
-	string tempoStr = moduru::lang::StrUtil::TrimDecimals((tempo * 10) / 10.0, 1);
-	
-	tempoStr = moduru::lang::StrUtil::padLeft(tempoStr, " ", 5);
-	tempoStr = Util::replaceDotWithSmallSpaceDot(tempoStr);
-	f1Field.lock()->setText(tempoStr);
+	auto tempo = sequence->getInitialTempo() * (tce->getRatio() * 0.001);
+	f1Field.lock()->setText(Util::tempoString(tempo));
 
 	bars[2].lock()->setValue((tempo - 15) * (290 / 975.0));
 }
@@ -289,26 +266,14 @@ void TempoChangeScreen::displayTempoChange2()
 	c2Field.lock()->setTextPadded(tce->getBeat(timeSig.getNumerator(), timeSig.getDenominator()) + 1, "0");
 	d2Field.lock()->setTextPadded(tce->getClock(timeSig.getNumerator(), timeSig.getDenominator()), "0");
 
-	string ratioStr = moduru::lang::StrUtil::TrimDecimals(tce->getRatio() / 10.0, 1);
-	ratioStr = moduru::lang::StrUtil::padLeft(ratioStr, " ", 5);
+	string ratioStr = StrUtil::TrimDecimals(tce->getRatio() * 0.1, 1);
+	ratioStr = StrUtil::padLeft(ratioStr, " ", 5);
 	ratioStr = Util::replaceDotWithSmallSpaceDot(ratioStr);
 	e2Field.lock()->setText(ratioStr);
 
-	auto tempo = sequence->getInitialTempo().toDouble() * (tce->getRatio() / 1000.0);
+	auto tempo = sequence->getInitialTempo() * tce->getRatio() * 0.001;
 	
-	if (tempo < 30)
-	{
-		tempo = 30.0;
-	}
-	else if (tempo > 300)
-	{
-		tempo = 300.0;
-	}
-
-	string tempoStr = moduru::lang::StrUtil::TrimDecimals((tempo * 10) / 10.0, 1);
-	tempoStr = moduru::lang::StrUtil::padLeft(tempoStr, " ", 5);
-	tempoStr = Util::replaceDotWithSmallSpaceDot(tempoStr);
-	f2Field.lock()->setText(tempoStr);
+	f2Field.lock()->setText(Util::tempoString(tempo));
 
 	bars[3].lock()->setValue((tempo - 15) * (290 / 975.0));
 }
@@ -345,12 +310,11 @@ void TempoChangeScreen::function(int j)
 	
 	auto yPos = -1;
 
-	if (param.length() == 2) {
+	if (param.length() == 2)
+	{
 		yPos = stoi(param.substr(1, 2));
 	}
 
-	int nowDetected;
-	std::shared_ptr<TempoChangeEvent> tce;
 	auto seq = sequencer.lock()->getActiveSequence().lock();
 
 	auto tceList = seq->getTempoChangeEvents();
@@ -380,7 +344,8 @@ void TempoChangeScreen::function(int j)
 		ls.lock()->setFocus(string("a" + to_string(yPos)));
 		break;
 	case 2:
-		nowDetected = -1;
+	{
+		auto nowDetected = -1;
 		for (int i = 0; i < tceList.size(); i++)
 		{
 			if (tceList[i].lock()->getTick() == sequencer.lock()->getTickPosition())
@@ -389,7 +354,7 @@ void TempoChangeScreen::function(int j)
 				break;
 			}
 		}
-		
+
 		if (nowDetected == -1)
 		{
 			auto tce = seq->addTempoChangeEvent().lock();
@@ -402,19 +367,21 @@ void TempoChangeScreen::function(int j)
 			{
 				setTempoChangeOffset(nowDetected);
 			}
-			
+
 			ls.lock()->setFocus(param.substr(0, 1) + to_string(nowDetected - offset));
 		}
+	}
 		break;
 	case 3:
 		ls.lock()->openScreen("sequencer");
 		break;
 	case 4:
+	{
 		tceList = seq->getTempoChangeEvents();
-		
+
 		if (tceList.size() == 1)
 		{
-			tce = seq->addTempoChangeEvent().lock();
+			auto tce = seq->addTempoChangeEvent().lock();
 			tce->setTick(seq->getLastTick());
 			tce->setStepNumber(1);
 		}
@@ -424,24 +391,29 @@ void TempoChangeScreen::function(int j)
 			{
 				return;
 			}
-			
+
 			auto lCurrent = current.lock();
 			auto lNext = next.lock();
 			auto lPrevious = previous.lock();
-			
+
 			if (yPos + offset == 0)
 			{
 				if (lCurrent->getTick() == 1)
 				{
 					return;
 				}
-				tce = seq->addTempoChangeEvent().lock();
+				
+				auto tce = seq->addTempoChangeEvent().lock();
 				tce->setTick(lNext->getTick() - 1);
 			}
-			else if (yPos + offset > 0) {
+			else if (yPos + offset > 0)
+			{
 				if (lCurrent->getTick() - 1 == lPrevious->getTick())
+				{
 					return;
-				tce = seq->addTempoChangeEvent().lock();
+				}
+
+				auto tce = seq->addTempoChangeEvent().lock();
 				tce->setTick(lCurrent->getTick() - 1);
 			}
 		}
@@ -449,6 +421,8 @@ void TempoChangeScreen::function(int j)
 		ls.lock()->openScreen("tempo-change");
 		break;
 	}
+	}
+
 	initVisibleEvents();
 	displayInitialTempo();
 	displayTempoChange0();
@@ -503,11 +477,17 @@ void TempoChangeScreen::turnWheel(int j)
 	if (param.compare("tempo-change") == 0)
 	{
 		seq->setTempoChangeOn(j > 0);
+		return;
 	}
 	else if (param.compare("initial-tempo") == 0)
 	{
 		auto tce = tceList[0].lock();
-		seq->setInitialTempo(BCMath(seq->getInitialTempo().toDouble() + (j / 10.0)));
+		seq->setInitialTempo(seq->getInitialTempo()+ (j * 0.1));
+		displayInitialTempo();
+		displayTempoChange0();
+		displayTempoChange1();
+		displayTempoChange2();
+		return;
 	}
 	
 	auto ts = seq->getTimeSignature();

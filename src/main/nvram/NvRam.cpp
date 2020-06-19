@@ -15,8 +15,6 @@
 
 #include <file/all/Defaults.hpp>
 
-#include <thirdp/bcmath/bcmath_stl.h>
-
 #include <file/File.hpp>
 #include <file/FileUtil.hpp>
 

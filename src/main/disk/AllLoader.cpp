@@ -95,7 +95,7 @@ AllLoader::AllLoader(mpc::disk::MpcFile* file, bool sequencesOnly)
 		userScreen->setDeviceNumber(defaults->getDevices()[0]);
 		userScreen->setTimeSig(defaults->getTimeSigNum(), defaults->getTimeSigDen());
 		userScreen->setPgm(defaults->getPgms()[0]);
-		userScreen->setTempo(BCMath(defaults->getTempo() * 0.1));
+		userScreen->setTempo(defaults->getTempo() * 0.1);
 		userScreen->setVelo(defaults->getTrVelos()[0]);
 
 		convertSequences(false);

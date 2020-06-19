@@ -72,7 +72,7 @@ void FrameSeq::work(int nFrames)
 	}
 
 	auto seq = lSequencer->getCurrentlyPlayingSequence().lock();
-	double tempo = lSequencer->getTempo().toDouble();
+	double tempo = lSequencer->getTempo();
 
 	if (tempo != clock.getBpm())
 	{

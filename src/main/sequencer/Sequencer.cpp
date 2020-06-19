@@ -47,7 +47,7 @@ void Sequencer::init()
 	taps = make_unique<moduru::io::CircularIntBuffer>(4, true, true);
 	reposition = -1;
 	nextsq = -1;
-	previousTempo = BCMath("0.0");
+	previousTempo = 0.0;
 	
 	auto userScreen = dynamic_pointer_cast<UserScreen>(Screens::getScreenComponent("user"));
 	defaultSequenceName = moduru::lang::StrUtil::trim(userScreen->sequenceName);
@@ -76,7 +76,7 @@ void Sequencer::init()
 	recording = false;
 	
 	tempo = userScreen->tempo;
-	tempo = BCMath("120.0");
+	tempo = 120.0;
 
 	metronomeOnly = false;
 	metronomeSeq = nullptr;
@@ -128,9 +128,9 @@ vector<int> Sequencer::getTickValues() {
 int Sequencer::repeats;
 bool Sequencer::endOfSong = false;
 
-void Sequencer::setTempo(BCMath i)
+void Sequencer::setTempo(const double newTempo)
 {
-	if (i.toDouble() < 30.0 || i.toDouble() > 300.0)
+	if (newTempo < 30.0 || newTempo > 300.0)
 	{
 		return;
 	}
@@ -143,27 +143,27 @@ void Sequencer::setTempo(BCMath i)
 	
 		if (tce->getTick() == 0)
 		{
-			s->setInitialTempo(i);
+			s->setInitialTempo(newTempo);
 		}
 		else
 		{
 			auto initialTempo = s->getInitialTempo();
-			auto ratio = i.toDouble() / initialTempo.toDouble();
+			auto ratio = newTempo / initialTempo;
 			tce->setRatio((int)(ratio * 1000.0));
 		}
 	}
-	else {
-		auto tempoStr = to_string(i.toDouble());
-		auto length = (int)(tempoStr.find(".")) + 2;
-		tempo = BCMath(tempoStr.substr(0, length));
+	else
+	{
+		tempo = newTempo;
 	}
 	
 	notifyObservers(string("tempo"));
 }
 
-BCMath Sequencer::getTempo()
+double Sequencer::getTempo()
 {
-	if (!isPlaying() && !getActiveSequence().lock()->isUsed()) {
+	if (!isPlaying() && !getActiveSequence().lock()->isUsed())
+	{
 		return tempo;
 	}
 
@@ -1315,10 +1315,15 @@ void Sequencer::goToNextStep()
 
 void Sequencer::tap()
 {
-	if (isPlaying()) return;
+	if (isPlaying())
+	{
+		return;
+	}
+
 	auto nanoLong = moduru::System::nanoTime();
 
-	if (nanoLong - lastTap > (2000 * 1000000)) {
+	if (nanoLong - lastTap > (2000 * 1000000))
+	{
 		taps = make_unique<moduru::io::CircularIntBuffer>(4, true, true);
 	}
 
@@ -1326,10 +1331,14 @@ void Sequencer::tap()
 	taps->write(vector<int>{ (int)nanoLong });
 	int accum = 0;
 	vector<long> tapsLong;
-	while (taps->availableRead() > 0) {
+	
+	while (taps->availableRead() > 0)
+	{
 		tapsLong.push_back(taps->read());
 	}
-	for (int i = 0; i < (int)(tapsLong.size()) - 1; i++) {
+	
+	for (int i = 0; i < (int)(tapsLong.size()) - 1; i++)
+	{
 		int l0 = tapsLong[i];
 		int l1 = tapsLong[i + 1];
 		accum += l1 - l0;
@@ -1339,7 +1348,7 @@ void Sequencer::tap()
 
 	auto tempo = (60000.0 * 1000000.0) / (accum / ((int)(tapsLong.size()) - 1));
 	tempo = floor(tempo * 10) / 10;
-	setTempo(BCMath(tempo));
+	setTempo(tempo);
 }
 
 int Sequencer::getResolution()
@@ -1353,9 +1362,11 @@ void Sequencer::move(int tick)
 	reposition = tick;
 	position = tick;
 	playStartTick = tick;
+	
 	auto s = isPlaying() ? getCurrentlyPlayingSequence().lock() : getActiveSequence().lock();
 
-	if (!isPlaying() && songMode) {
+	if (!isPlaying() && songMode)
+	{
 		s = sequences[getSongSequenceIndex()];
 	}
 
@@ -1363,9 +1374,9 @@ void Sequencer::move(int tick)
 
 	notifyTimeDisplay();
 
-	if (getTempo().toDouble() != previousTempo.toDouble()) {
-		previousTempo = getTempo();
-		
+	if (getTempo() != previousTempo)
+	{
+		previousTempo = getTempo();	
 		notifyObservers(string("tempo"));
 	}
 }

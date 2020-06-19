@@ -113,10 +113,8 @@ void NextSeqScreen::displayNow2()
 
 void NextSeqScreen::displayTempo()
 {
-	auto tempo = sequencer.lock()->getTempo().toString();
-	tempo = mpc::Util::replaceDotWithSmallSpaceDot(tempo);
-	findField("tempo").lock()->setText(tempo);
 	displayTempoLabel();
+	findField("tempo").lock()->setText(Util::tempoString(sequencer.lock()->getTempo()));
 }
 
 void NextSeqScreen::displayTempoLabel()

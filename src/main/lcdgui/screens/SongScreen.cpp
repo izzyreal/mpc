@@ -5,8 +5,6 @@
 
 #include <Util.hpp>
 
-#include <thirdp/bcmath/bcmath_stl.h>
-
 using namespace mpc::lcdgui::screens;
 using namespace moduru::lang;
 using namespace std;
@@ -173,7 +171,7 @@ void SongScreen::turnWheel(int i)
 	}
 	else if (param.compare("tempo") == 0 && !sequencer.lock()->isTempoSourceSequenceEnabled())
 	{
-		sequencer.lock()->setTempo(BCMath(sequencer.lock()->getTempo().toDouble() + (i / 10.0)));
+		sequencer.lock()->setTempo(sequencer.lock()->getTempo() + (i * 0.1));
 	}
 	else if (param.compare("temposource") == 0)
 	{
@@ -207,10 +205,7 @@ void SongScreen::function(int i)
 
 void SongScreen::displayTempo()
 {
-	string tempo = sequencer.lock()->getTempo().toString();
-	tempo = StrUtil::padLeft(tempo, " ", 5);
-	tempo = mpc::Util::replaceDotWithSmallSpaceDot(tempo);
-	findField("tempo").lock()->setText(tempo);
+	findField("tempo").lock()->setText(Util::tempoString(sequencer.lock()->getTempo()));
 }
 
 void SongScreen::displayLoop()

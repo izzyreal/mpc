@@ -1,5 +1,4 @@
 #pragma once
-#include <thirdp/bcmath/bcmath_stl.h>
 
 namespace mpc::sequencer
 {
@@ -26,14 +25,14 @@ namespace mpc::sequencer
 		static int setClock(int i, Sequence* s, int position);
 
 	private:
-		static double secondsPerTick(BCMath tempo);
-		static double ticksPerSecond(BCMath tempo);
+		static double secondsPerTick(const double tempo);
+		static double ticksPerSecond(const double tempo);
 
 	public:
-		static double ticksToFrames(double ticks, BCMath tempo, float sr);
+		static double ticksToFrames(double ticks, const double tempo, float sr);
 
 	public:
-		static double framesToTicks(double d, BCMath tempo, float sr);
+		static double framesToTicks(double d, const double tempo, float sr);
 
 	public:
 		static double sequenceFrameLength(Sequence* seq, int firstTick, int lastTick, float sr);

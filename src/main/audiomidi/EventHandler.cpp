@@ -40,8 +40,6 @@
 
 #include <file/File.hpp>
 
-#include <thirdp/bcmath/bcmath_stl.h>
-
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
@@ -118,7 +116,7 @@ void EventHandler::handleNoThru(weak_ptr<mpc::sequencer::Event> e, mpc::sequence
 	auto ne = dynamic_pointer_cast<mpc::sequencer::NoteEvent>(event);
 	auto me = dynamic_pointer_cast<mpc::sequencer::MixerEvent>(event);
 
-	if (tce && tce->getTempo().toDouble() != lSequencer->getTempo().toDouble())
+	if (tce && tce->getTempo() != lSequencer->getTempo())
 	{
 		// Currently unsure whether MASTER tempo mode supports tempo changes.
 		// I suspect it does. This would mean Sequencer would need to house a

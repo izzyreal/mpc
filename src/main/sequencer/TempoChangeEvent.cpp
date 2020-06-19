@@ -164,18 +164,25 @@ int TempoChangeEvent::getClock(int n, int d)
 	return clock;
 }
 
-BCMath TempoChangeEvent::getTempo()
+double TempoChangeEvent::getTempo()
 {
-	auto tempoDouble = parent->getInitialTempo().toDouble() * (ratio / 1000.0);
-	auto str = to_string(tempoDouble);
-	auto length = (int)(str.find(".")) + 2;
-	auto tempo = BCMath(str.substr(0, length));
-	if (tempo.toDouble() < 30.0) tempo = BCMath("30.0");
-	if (tempo.toDouble() > 300.0) tempo = BCMath("300.0");
+	auto tempo = parent->getInitialTempo() * ratio * 0.001;
+	
+	if (tempo < 30.0)
+	{
+		return 30.0;
+	}
+	
+	if (tempo > 300.0)
+	{
+		return 300.0;
+	}
+	
 	return tempo;
 }
 
-void TempoChangeEvent::CopyValuesTo(std::weak_ptr<Event> dest) {
+void TempoChangeEvent::CopyValuesTo(std::weak_ptr<Event> dest)
+{
 	Event::CopyValuesTo(dest);
 	auto lDest = dynamic_pointer_cast<TempoChangeEvent>(dest.lock());
 	lDest->setRatio(getRatio());

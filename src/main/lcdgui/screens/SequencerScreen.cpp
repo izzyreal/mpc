@@ -137,9 +137,7 @@ void SequencerScreen::displayDeviceName()
 void SequencerScreen::displayTempo()
 {
 	displayTempoLabel();
-	auto tempo = sequencer.lock()->getTempo().toString();
-	tempo = Util::replaceDotWithSmallSpaceDot(tempo);
-	findField("tempo").lock()->setText(tempo);
+	findField("tempo").lock()->setText(Util::tempoString(sequencer.lock()->getTempo()));
 }
 
 void SequencerScreen::displayTempoLabel()
@@ -403,7 +401,7 @@ void SequencerScreen::pressEnter()
 		}
 		else if (focus.compare("tempo") == 0)
 		{
-			sequencer.lock()->setTempo(BCMath(candidate / 10.0));
+			sequencer.lock()->setTempo(candidate * 0.1);
 		}
 		else if (focus.compare("velo") == 0)
 		{
@@ -563,9 +561,9 @@ void SequencerScreen::turnWheel(int i)
 	}
 	else if (focus.compare("tempo") == 0)
 	{
-		double oldTempo = sequencer.lock()->getTempo().toDouble();
-		double newTempo = oldTempo + (i / 10.0);
-		sequencer.lock()->setTempo(BCMath(newTempo));
+		double oldTempo = sequencer.lock()->getTempo();
+		double newTempo = oldTempo + (i * 0.1);
+		sequencer.lock()->setTempo(newTempo);
 	}
 	else if (focus.compare("tsig") == 0)
 	{

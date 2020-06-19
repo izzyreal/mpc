@@ -35,10 +35,13 @@ Sequence::Sequence(vector<string> defaultTrackNames)
 
 	loopEnabled = true;
 	lastBar = -1;
-	for (int i = 0; i < 64; i++) {
+
+	for (int i = 0; i < 64; i++)
+	{
 		tracks.push_back(make_shared<Track>(this, i));
 		tracks[i]->setName(defaultTrackNames[i]);
 	}
+
 	metaTracks.push_back(make_shared<Track>(this, 64));
 	metaTracks.push_back(make_shared<Track>(this, 65));
 	metaTracks.push_back(make_shared<Track>(this, 66));
@@ -344,8 +347,11 @@ void Sequence::setTimeSignature(int bar, int num, int den)
 vector<weak_ptr<Track>> Sequence::getTracks()
 {
 	auto res = vector<weak_ptr<Track>>();
+
 	for (auto& t : tracks)
+	{
 		res.push_back(t);
+	}
 	return res;
 }
 
@@ -362,44 +368,39 @@ void Sequence::setDeviceNames(vector<string> sa)
 vector<weak_ptr<TempoChangeEvent>> Sequence::getTempoChangeEvents()
 {
 	auto res = vector<weak_ptr<TempoChangeEvent>>();
+	
 	for (auto& t : metaTracks[2]->getEvents())
+	{
 		res.push_back(dynamic_pointer_cast<TempoChangeEvent>(t.lock()));
+	}
 	return res;
 }
 
-weak_ptr<TempoChangeEvent> Sequence::addTempoChangeEvent() {
+weak_ptr<TempoChangeEvent> Sequence::addTempoChangeEvent()
+{
 	auto res = metaTracks[2]->addEvent(0, "tempo-change");
 	return dynamic_pointer_cast<TempoChangeEvent>(res.lock());
 }
 
-BCMath Sequence::getInitialTempo()
+double Sequence::getInitialTempo()
 {
 	return initialTempo;
 }
 
-void Sequence::setInitialTempo(BCMath bd)
+void Sequence::setInitialTempo(const double initialTempo)
 {
-	auto str = to_string(bd.toDouble());
+	auto str = to_string(initialTempo);
 	
-	if (str.find(".") == string::npos)
-	{
-		str += ".0";
-	}
-	
-	auto length = (int)(str.find(".")) + 2;
-	auto tempo = BCMath(str.substr(0, length));
-	
-	if (tempo.toDouble() < 30.0)
-	{
-		tempo = BCMath("30.0");
-	}
-	
-	if (tempo.toDouble() > 300.0)
-	{
-		tempo = BCMath("300.0");
-	}
+	this->initialTempo = initialTempo;
 
-	initialTempo = tempo;
+	if (initialTempo < 30.0)
+	{
+		this->initialTempo = 30.0;
+	}
+	else if (initialTempo > 300.0)
+	{
+		this->initialTempo = 300.0;
+	}
 	
 	notifyObservers(string("initial-tempo"));
 }
