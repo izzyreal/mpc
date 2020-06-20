@@ -36,10 +36,6 @@ namespace mpc::lcdgui::screens::window
 		int swing = 50;
 		int amount = 0;
 		int noteValue = 3;
-		int midiNote0 = 0;
-		int midiNote1 = 127;
-		int time0 = 0;
-		int time1 = 0;
 
 	public:
 		int getNoteValue();

@@ -55,7 +55,6 @@ void WithTimesAndNotes::checkAllTimesAndNotes(int notch, Sequence* seq)
 
 	if (param.compare("notes0") == 0)
 	{
-
 		auto track = mpc.getSequencer().lock()->getActiveTrack().lock();
 
 		if (track->getBusNumber() != 0)
@@ -64,22 +63,17 @@ void WithTimesAndNotes::checkAllTimesAndNotes(int notch, Sequence* seq)
 			auto mpcSoundPlayerChannel = mpc.getSampler().lock()->getDrum(track->getBusNumber() - 1);
 			auto program = dynamic_pointer_cast<mpc::sampler::Program>(mpc.getSampler().lock()->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
 			auto pad = program->getPadIndexFromNote(note);
-			mpc.setPadAndNote(pad, mpc.getNote());
+			mpc.setPadAndNote(pad, note);
 		}
 		else
 		{
-			setMidiNote0(getMidiNote0() + notch);
+			setMidiNote0(note0 + notch);
 		}
 	}
 	else if (param.compare("notes1") == 0)
 	{
-		setMidiNote1(getMidiNote1() + notch);
+		setMidiNote1(note1 + notch);
 	}
-}
-
-int WithTimesAndNotes::getMidiNote0()
-{
-	return note0;
 }
 
 void WithTimesAndNotes::setMidiNote0(int i)
@@ -90,12 +84,13 @@ void WithTimesAndNotes::setMidiNote0(int i)
 	}
 
 	note0 = i;
-	displayNotes();
-}
 
-int WithTimesAndNotes::getMidiNote1()
-{
-	return note1;
+	if (note0 > note1)
+	{
+		note1 = note0;
+	}
+
+	displayNotes();
 }
 
 void WithTimesAndNotes::setMidiNote1(int i)
@@ -106,6 +101,12 @@ void WithTimesAndNotes::setMidiNote1(int i)
 	}
 
 	note1 = i;
+
+	if (note1 < note0)
+	{
+		note0 = note1;
+	}
+
 	displayNotes();
 }
 

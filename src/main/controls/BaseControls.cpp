@@ -725,11 +725,12 @@ void BaseControls::bank(int i)
 	init();
 	
 	auto oldBank = mpc.getBank();
-	
-	mpc.setBank(i);
-	
+		
 	auto diff = 16 * (i - oldBank);
 	auto newPadIndex = mpc.getPad() + diff;
+	
+	mpc.setBank(i);
+
 	auto newNote = program.lock()->getPad(newPadIndex)->getNote();
 	
 	mpc.setPadAndNote(newPadIndex, newNote);

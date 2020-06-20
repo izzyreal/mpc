@@ -20,8 +20,6 @@ namespace mpc::lcdgui::screens
 		void setTime0(int time0);
 		void setTime1(int time1);
 		
-		int getMidiNote0();
-		int getMidiNote1();
 		void setMidiNote0(int note);
 		void setMidiNote1(int note);
 

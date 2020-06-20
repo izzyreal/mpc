@@ -105,9 +105,7 @@ void EditSequenceScreen::function(int i)
 				{
 					if (sourceTrack->getBusNumber() == 0)
 					{
-						auto mn0 = getMidiNote0();
-						auto mn1 = getMidiNote1();
-						if (ne->getNote() < mn0 || ne->getNote() > mn1)
+						if (ne->getNote() < note0 || ne->getNote() > note1)
 						{
 							continue;
 						}
@@ -251,11 +249,11 @@ void EditSequenceScreen::turnWheel(int i)
 	}
 	else if (param.compare("midinote0") == 0)
 	{
-		setMidiNote0(getMidiNote0() + i);
+		setMidiNote0(note0 + i);
 	}
-	else if (param.compare("midinote1") == 0
-		) {
-		setMidiNote1(getMidiNote1() + i);
+	else if (param.compare("midinote1") == 0)
+	{
+		setMidiNote1(note0 + i);
 	}
 	else if (param.compare("fromsq") == 0)
 	{

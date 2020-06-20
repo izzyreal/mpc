@@ -50,20 +50,25 @@ void TimingCorrectScreen::function(int i)
 
 		vector<int> noteRange(2);
 
-		if (track.lock()->getBusNumber() != 0) {
-			if (mpc.getNote() != 34) {
+		if (track.lock()->getBusNumber() != 0)
+		{
+			if (mpc.getNote() != 34)
+			{
 				noteRange[0] = mpc.getNote();
 				noteRange[1] = mpc.getNote();
 			}
-			else {
+			else
+			{
 				noteRange[0] = 0;
 				noteRange[1] = 127;
 			}
 		}
-		else {
-			noteRange[0] = midiNote0;
-			noteRange[1] = midiNote1;
+		else
+		{
+			noteRange[0] = note0;
+			noteRange[1] = note1;
 		}
+
 		track.lock()->swing(track.lock()->getEventRange(time0, time1), noteValue, swing, noteRange);
 
 		auto sequence = sequencer.lock()->getActiveSequence().lock();
@@ -96,6 +101,7 @@ void TimingCorrectScreen::turnWheel(int i)
 	}
 	
 	checkAllTimesAndNotes(i);
+	displayTime();
 }
 
 void TimingCorrectScreen::displayNoteValue()
@@ -127,8 +133,8 @@ void TimingCorrectScreen::displayNotes()
 	if (track.lock()->getBusNumber() == 0)
 	{
 		findField("notes0").lock()->setSize(8 * 6 + 1, 9);
-		findField("notes0").lock()->setText(StrUtil::padLeft(to_string(midiNote0), " ", 3) + "(" + mpc::Util::noteNames()[midiNote0] + u8"\u00D4");
-		findField("notes1").lock()->setText(StrUtil::padLeft(to_string(midiNote1), " ", 3) + "(" + mpc::Util::noteNames()[midiNote1] + u8"\u00D4");
+		findField("notes0").lock()->setText(StrUtil::padLeft(to_string(note0), " ", 3) + "(" + mpc::Util::noteNames()[note0] + u8"\u00D4");
+		findField("notes1").lock()->setText(StrUtil::padLeft(to_string(note1), " ", 3) + "(" + mpc::Util::noteNames()[note1] + u8"\u00D4");
 		findLabel("notes1").lock()->Hide(false);
 		findField("notes1").lock()->Hide(false);
 	}
