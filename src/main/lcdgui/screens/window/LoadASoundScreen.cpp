@@ -143,8 +143,7 @@ void LoadASoundScreen::displayAssignToNote()
 void LoadASoundScreen::update(moduru::observer::Observable* observable, nonstd::any message)
 {
 	auto msg = nonstd::any_cast<string>(message);
-	
-	if (param.compare("padandnote") == 0)
+	if (msg.compare("padandnote") == 0)
 	{
 		displayAssignToNote();
 	}
