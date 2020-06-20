@@ -339,8 +339,13 @@ void TempoChangeScreen::function(int j)
 		{
 			setTempoChangeOffset(offset - 1);
 		}
+		
+		initVisibleEvents();
 
-		ls.lock()->openScreen("tempo-change");
+		displayTempoChange0();
+		displayTempoChange1();
+		displayTempoChange2();
+		
 		ls.lock()->setFocus(string("a" + to_string(yPos)));
 		break;
 	case 2:
@@ -360,6 +365,12 @@ void TempoChangeScreen::function(int j)
 			auto tce = seq->addTempoChangeEvent().lock();
 			tce->setTick(sequencer.lock()->getTickPosition());
 			seq->sortTempoChangeEvents();
+			initVisibleEvents();
+			displayTempoChange0();
+			displayTempoChange1();
+			displayTempoChange2();
+
+			ls.lock()->setFocus(string("a" + to_string(yPos)));
 		}
 		else
 		{
@@ -418,16 +429,15 @@ void TempoChangeScreen::function(int j)
 			}
 		}
 		seq->sortTempoChangeEvents();
-		ls.lock()->openScreen("tempo-change");
+		initVisibleEvents();
+		displayTempoChange0();
+		displayTempoChange1();
+		displayTempoChange2();
+
+		ls.lock()->setFocus(param);
 		break;
 	}
 	}
-
-	initVisibleEvents();
-	displayInitialTempo();
-	displayTempoChange0();
-	displayTempoChange1();
-	displayTempoChange2();
 }
 
 void TempoChangeScreen::init()
