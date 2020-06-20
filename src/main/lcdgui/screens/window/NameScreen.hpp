@@ -52,6 +52,7 @@ namespace mpc::lcdgui::screens::window
 		NameScreen(const int layerIndex);
 
 		void open() override;
+		void close() override;
 
 		void left() override;
 		void right() override;

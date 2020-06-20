@@ -50,6 +50,11 @@ void NameScreen::open()
 	displayName();
 }
 
+void NameScreen::close()
+{
+	ls.lock()->setFocus("0");
+}
+
 void NameScreen::left()
 {
 	init();
@@ -438,6 +443,7 @@ void NameScreen::initEditColors()
 		field->setOpaque(true);
 		field->setInverted(false);
     }
+
 	auto focus = ls.lock()->getFocus();
 	findField(focus).lock()->setInverted(false);
 	findField(focus).lock()->setOpaque(true);

@@ -15,7 +15,8 @@
 #include <memory>
 #include <vector>
 
-namespace ctoot::mpc {
+namespace ctoot::mpc
+{
 	class MpcSoundPlayerChannel;
 }
 
@@ -24,22 +25,25 @@ namespace mpc
 	class Mpc;
 }
 
-namespace mpc::sequencer {
+namespace mpc::sequencer
+{
 	class Track;
 	class NoteEvent;
 }
 
-namespace mpc::sampler {
+namespace mpc::sampler
+{
 	class Program;
 }
 
-namespace mpc::lcdgui {
+namespace mpc::lcdgui
+{
 	class Field;
 	class LayeredScreen;
 }
 
-namespace mpc::controls {
-
+namespace mpc::controls
+{
 	class BaseControls
 	{
 
