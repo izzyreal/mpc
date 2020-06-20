@@ -21,12 +21,8 @@ namespace mpc::lcdgui::screens::window {
 		void close() override;
 
 	private:
-		int time0 = 0;
-		int time1 = 0;
 		int editType = 0;
 		int value = 0;
-		int midiNote0 = 0;
-		int midiNote1 = 0;
 		std::vector<std::string> editTypeNames = { "ADD VALUE", "SUB VALUE", "MULT VAL%", "SET TO VAL" };
 
 	private:

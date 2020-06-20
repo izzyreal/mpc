@@ -14,7 +14,7 @@ namespace mpc::lcdgui::screens
 		int time0 = 0;
 		int time1 = 0;
 		int note0 = 0;
-		int note1 = 0;
+		int note1 = 127;
 
 	public:
 		void setTime0(int time0);
