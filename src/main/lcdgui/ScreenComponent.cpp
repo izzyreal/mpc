@@ -1,11 +1,10 @@
 #include "ScreenComponent.hpp"
 
 #include "Background.hpp"
-#
+
 #include <Mpc.hpp>
 
 using namespace mpc::lcdgui;
-
 using namespace std;
 
 ScreenComponent::ScreenComponent(const string& name, const int layer)
@@ -13,6 +12,16 @@ ScreenComponent::ScreenComponent(const string& name, const int layer)
 {
 	auto background = dynamic_pointer_cast<Background>(addChild(make_shared<Background>()).lock());
 	background->setName(name);
+}
+
+void ScreenComponent::setTransferMap(const map<string, vector<string>>& transferMap)
+{
+	this->transferMap = transferMap;
+}
+
+const map<string, vector<string>>& ScreenComponent::getTransferMap()
+{
+	return transferMap;
 }
 
 weak_ptr<Wave> ScreenComponent::findWave()

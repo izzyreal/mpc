@@ -143,11 +143,8 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::dialog2;
-
 using namespace moduru::file;
-
 using namespace rapidjson;
-
 using namespace std;
 
 vector<unique_ptr<Document>> Screens::layerDocuments;
@@ -187,7 +184,7 @@ vector<string> getFunctionKeyLabels(Value& functionKeyLabels)
 	return labels;
 }
 
-vector<shared_ptr<Component>> Screens::get(const string& screenName, int& foundInLayer)
+pair<vector<shared_ptr<Component>>, map<string, vector<string>>> Screens::get(const string& screenName, int& foundInLayer)
 {
 	
 	if (Screens::layerDocuments.empty())
@@ -244,22 +241,48 @@ vector<shared_ptr<Component>> Screens::get(const string& screenName, int& foundI
 		components.push_back(move(functionKeysComponent));
 	}
 
-	if (arrangement.HasMember("labels"))
+	map<string, vector<string>> transferMap;
+
+	if (arrangement.HasMember("parameters"))
 	{
+		Value& parameters = arrangement["parameters"];
+		Value& labels = arrangement["labels"];
 		Value& x = arrangement["x"];
 		Value& y = arrangement["y"];
-		Value& parameters = arrangement["parameters"];
 		Value& tfsize = arrangement["tfsize"];
-		Value& labels = arrangement["labels"];
 
-		for (int i = 0; i < labels.Size(); i++)
+		vector<string> row;
+
+		int skipCounter = 0;
+
+		string previous = "";
+		for (int i = 0; i < parameters.Size(); i++)
 		{
-			components.push_back(make_unique<Parameter>(labels[i].GetString()
-				, parameters[i].GetString()
-				, x[i].GetInt()
-				, y[i].GetInt()
-				, tfsize[i].GetInt()
+			if (parameters[i].IsArray())
+			{
+				vector<string> parameterTransferMap;
+				for (int j = 0; j < parameters[i].Size(); j++)
+				{
+					parameterTransferMap.push_back(parameters[i][j].GetString());
+				}
+				transferMap[previous] = parameterTransferMap;
+				skipCounter++;
+				continue;
+			}
+
+			auto parameterName = parameters[i].GetString();
+			
+			row.push_back(parameterName);
+
+			components.push_back(
+				make_unique<Parameter>(labels[i - skipCounter].GetString(),
+				parameterName,
+				x[i - skipCounter].GetInt(),
+				y[i - skipCounter].GetInt(),
+				tfsize[i - skipCounter].GetInt()
 				));
+
+			previous = parameterName;
 		}
 	}
 
@@ -280,7 +303,7 @@ vector<shared_ptr<Component>> Screens::get(const string& screenName, int& foundI
 		}
 	}
 
-	return components;
+	return { components, transferMap };
 }
 
 void Screens::init()
@@ -328,7 +351,9 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	shared_ptr<ScreenComponent> screen;
 
 	int layerIndex = -1;
-	auto children = get(screenName, layerIndex);
+	auto arrangement = get(screenName, layerIndex);
+	auto children = arrangement.first;
+	auto transferMap = arrangement.second;
 
 	if (screenName.compare("sequencer") == 0)
 	{
@@ -818,6 +843,7 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	if (screen)
 	{
 		screen->addChildren(children);
+		screen->setTransferMap(transferMap);
 		screens[screenName] = screen;
 	}
 

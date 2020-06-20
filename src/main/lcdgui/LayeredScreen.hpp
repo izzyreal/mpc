@@ -42,6 +42,9 @@ namespace mpc::lcdgui {
 		std::weak_ptr<mpc::lcdgui::Field> findBelow(std::weak_ptr<mpc::lcdgui::Field> tf);
 		std::weak_ptr<mpc::lcdgui::Field> findAbove(std::weak_ptr<mpc::lcdgui::Field> tf);
 
+		// 0 = left, 1 = right, 2 = up, 3 = down
+		bool transfer(int direction, bool setFocusEnabled, std::shared_ptr<mpc::lcdgui::Field>& nextFocus);
+
 	public:
 		void transferLeft();
 		void transferRight();
