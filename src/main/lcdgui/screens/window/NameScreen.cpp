@@ -32,6 +32,7 @@ using namespace moduru::lang;
 NameScreen::NameScreen(const int layerIndex)
 	: ScreenComponent("name", layerIndex)
 {
+	addChild(make_shared<Underline>());
 }
 
 weak_ptr<Underline> NameScreen::findUnderline()
@@ -41,8 +42,6 @@ weak_ptr<Underline> NameScreen::findUnderline()
 
 void NameScreen::open()
 {
-	addChild(make_shared<Underline>()).lock()->Hide(true);
-
 	for (int i = 0; i < 16; i++)
 	{
 		findUnderline().lock()->setState(i, false);
@@ -115,7 +114,6 @@ void NameScreen::turnWheel(int j)
 				{
 					changeNameCharacter(i, j > 0);
 					editing = true;
-					findUnderline().lock()->Hide(false);
 					initEditColors();
 					drawUnderline();
 					break;
@@ -427,6 +425,8 @@ void NameScreen::drawUnderline()
 				u->setState(i, false);
 			}
 		}
+
+		bringToFront(u.get());
 	}
 }
 

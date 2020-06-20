@@ -7,8 +7,8 @@ Underline::Underline()
 	: Component("underline")
 {
 	states = vector<bool>(16);
-	setSize(248, 50);
-	setLocation(0, 0);
+	setSize(95, 1);
+	setLocation(106, 27);
 }
 
 void Underline::Draw(vector<vector<bool>>* pixels)
@@ -22,7 +22,7 @@ void Underline::Draw(vector<vector<bool>>* pixels)
 	{
 		for (int j = 0; j < 6; j++)
 		{
-			(*pixels)[j + (i * 6) + 106][27] = states[i];
+			(*pixels)[j + (i * 6) + x][y] = states[i];
 		}
 	}
 	dirty = false;

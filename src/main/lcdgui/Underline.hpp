@@ -10,7 +10,7 @@ namespace mpc::lcdgui
 	{
 
 	private:
-		std::vector<bool> states{};
+		std::vector<bool> states;
 
 	public:
 		void Draw(std::vector<std::vector<bool>>* pixels) override;

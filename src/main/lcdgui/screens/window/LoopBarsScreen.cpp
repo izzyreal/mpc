@@ -26,12 +26,14 @@ void LoopBarsScreen::turnWheel(int i)
 	{
 		seq->setFirstLoopBar(seq->getFirstLoopBar() + i);
 		displayFirstBar();
+		displayLastBar();
 		displayNumberOfBars();
 	}
 	else if (param.compare("lastbar") == 0)
 	{
 		seq->setLastLoopBar(seq->getLastLoopBar() + i);
 		displayLastBar();
+		displayFirstBar();
 		displayNumberOfBars();
 	}
 	else if (param.compare("numberofbars") == 0 && i < 0)
@@ -49,7 +51,8 @@ void LoopBarsScreen::turnWheel(int i)
 			displayNumberOfBars();
 		}
 	}
-	else if (param.compare("numberofbars") == 0) {
+	else if (param.compare("numberofbars") == 0)
+	{
 		seq->setLastLoopBar(seq->getLastLoopBar() + i);
 		displayLastBar();
 		displayNumberOfBars();

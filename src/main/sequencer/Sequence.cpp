@@ -83,16 +83,18 @@ int Sequence::getLoopEnd()
 
 void Sequence::setFirstLoopBar(int i)
 {
-	if (i < 0 || i > lastBar) {
+	if (i < 0 || i > lastBar)
+	{
 		return;
 	}
 
 	firstLoopBar = i;
 	
 	notifyObservers(string("firstloopbar"));
-	if (i > lastLoopBar) {
+	
+	if (i > lastLoopBar)
+	{
 		lastLoopBar = i;
-		
 		notifyObservers(string("lastloopbar"));
 	}
 }
@@ -104,35 +106,42 @@ int Sequence::getFirstLoopBar()
 
 void Sequence::setLastLoopBar(int i)
 {
-	if (i < 0) {
+	if (i < 0)
+	{
 		return;
 	}
 
-	if (lastLoopBarEnd) {
-		if (i < lastBar) {
+	if (lastLoopBarEnd)
+	{
+		if (i < lastBar)
+		{
 			lastLoopBarEnd = false;
 			lastLoopBar = lastBar;
 			
 			notifyObservers(string("lastloopbar"));
 			return;
 		}
-		else {
+		else
+		{
 			return;
 		}
 	}
-	else {
-		if (i > lastBar) {
-			lastLoopBarEnd = true;
-			
+	else
+	{
+		if (i > lastBar)
+		{
+			lastLoopBarEnd = true;	
 			notifyObservers(string("lastloopbar"));
 		}
-		else {
+		else
+		{
 			lastLoopBar = i;
 			
 			notifyObservers(string("lastloopbar"));
-			if (i < firstLoopBar) {
+		
+			if (i < firstLoopBar)
+			{
 				firstLoopBar = i;
-				
 				notifyObservers(string("firstloopbar"));
 			}
 		}
@@ -144,15 +153,18 @@ void Sequence::setLastLoopBar(int i)
 
 int Sequence::getLastLoopBar()
 {
-	if (lastLoopBarEnd) {
+	if (lastLoopBarEnd)
+	{
 		return lastBar;
 	}
 	return lastLoopBar;
 }
 
-vector<weak_ptr<Track>> Sequence::getMetaTracks() {
+vector<weak_ptr<Track>> Sequence::getMetaTracks()
+{
 	auto res = vector<weak_ptr<Track>>();
-	for (auto& t : metaTracks) {
+	for (auto& t : metaTracks)
+	{
 		res.push_back(t);
 	}
 	return res;
@@ -498,16 +510,27 @@ void Sequence::deleteBars(int firstBar, int lBar)
 	lBar++;
 
 	int deleteFirstTick = 0;
-	for (int i = 0; i < firstBar; i++)
-		deleteFirstTick += barLengths[i];
-	int deleteLastTick = deleteFirstTick;
-	for (int i = firstBar; i < lBar; i++)
-		deleteLastTick += barLengths[i];
 
-	for (auto& t : tracks) {
-		for (auto& e : t->getEvents()) {
+	for (int i = 0; i < firstBar; i++)
+	{
+		deleteFirstTick += barLengths[i];
+	}
+
+	int deleteLastTick = deleteFirstTick;
+	
+	for (int i = firstBar; i < lBar; i++)
+	{
+		deleteLastTick += barLengths[i];
+	}
+
+	for (auto& t : tracks)
+	{
+		for (auto& e : t->getEvents())
+		{
 			if (e.lock()->getTick() >= deleteFirstTick && e.lock()->getTick() < deleteLastTick)
+			{
 				t->removeEvent(e);
+			}
 		}
 	}
 
@@ -515,81 +538,136 @@ void Sequence::deleteBars(int firstBar, int lBar)
 	lastBar -= difference;
 	int oldBarStartPos = 0;
 	auto barCounter = 0;
-	for (auto l : barLengths) {
-		if (barCounter == lBar)	break;
+
+	for (auto l : barLengths)
+	{
+		if (barCounter == lBar)
+		{
+			break;
+		}
 		oldBarStartPos += l;
 		barCounter++;
 	}
+
 	int newBarStartPos = 0;
 	barCounter = 0;
-	for (auto l : barLengths) {
-		if (barCounter == firstBar)	break;
+	
+	for (auto l : barLengths)
+	{
+		if (barCounter == firstBar)
+		{
+			break;
+		}
 		newBarStartPos += l;
 		barCounter++;
 	}
+
 	auto tickDifference = oldBarStartPos - newBarStartPos;
-	for (int i = firstBar; i < 999; i++) {
-		if (i + difference > 998) break;
+	
+	for (int i = firstBar; i < 999; i++)
+	{
+		if (i + difference > 998)
+		{
+			break;
+		}
 
 		barLengths[i] = barLengths[i + difference];
 		numerators[i] = numerators[i + difference];
 		denominators[i] = denominators[i + difference];
 	}
-	for (auto& t : tracks) {
-		if (t->getTrackIndex() >= 64 || t->getTrackIndex() == 65) continue;
 
-		for (auto& event : t->getEvents()) {
+	for (auto& t : tracks)
+	{
+		if (t->getTrackIndex() >= 64 || t->getTrackIndex() == 65)
+		{
+			continue;
+		}
+
+		for (auto& event : t->getEvents())
+		{
 			auto e = event.lock();
-			if (e->getTick() >= oldBarStartPos) {
+			
+			if (e->getTick() >= oldBarStartPos)
+			{
 				e->setTick(e->getTick() - tickDifference);
 			}
 		}
 	}
 
-	if (firstLoopBar > lastBar) firstLoopBar = lastBar;
-	if (lastLoopBar > lastBar) lastLoopBar = lastBar;
+	if (firstLoopBar > lastBar)
+	{
+		firstLoopBar = lastBar;
+	}
+
+	if (lastLoopBar > lastBar)
+	{
+		lastLoopBar = lastBar;
+	}
 }
 
 void Sequence::insertBars(int numberOfBars, int afterBar)
 {
 	lastBar += numberOfBars;
-	for (int i = afterBar; i < 999; i++) {
+
+	for (int i = afterBar; i < 999; i++)
+	{
 		if (i + numberOfBars > 998)
+		{
 			break;
+		}
 
 		barLengths[i + numberOfBars] = barLengths[i];
 		numerators[i + numberOfBars] = numerators[i];
 		denominators[i + numberOfBars] = denominators[i];
 	}
-	for (int i = afterBar; i < afterBar + numberOfBars; i++) {
+
+	for (int i = afterBar; i < afterBar + numberOfBars; i++)
+	{
 		barLengths[i] = 384;
 		numerators[i] = 4;
 		denominators[i] = 4;
 	}
+	
 	int barStart = 0;
 	auto barCounter = 0;
-	for (auto l : barLengths) {
+	
+	for (auto l : barLengths)
+	{
 		if (barCounter == afterBar)
+		{
 			break;
+		}
 
 		barStart += l;
 		barCounter++;
 	}
+
 	barCounter = 0;
 	int newBarStart = 0;
-	for (auto l : barLengths) {
-		if (barCounter == afterBar + numberOfBars) {
+	
+	for (auto l : barLengths)
+	{
+		if (barCounter == afterBar + numberOfBars)
+		{
 			break;
 		}
 
 		newBarStart += l;
 		barCounter++;
 	}
-	for (auto& t : tracks) {
-		if (t->getTrackIndex() == 64 || t->getTrackIndex() == 65) continue;
-		for (auto& event : t->getEvents()) {
+	for (auto& t : tracks)
+	{
+		if (t->getTrackIndex() == 64 || t->getTrackIndex() == 65)
+		{
+			continue;
+		}
+		
+		for (auto& event : t->getEvents())
+		{
 			auto e = event.lock();
-			if (e->getTick() >= barStart) {
+			
+			if (e->getTick() >= barStart)
+			{
 				e->setTick(e->getTick() + (newBarStart - barStart));
 			}
 		}
@@ -599,17 +677,28 @@ void Sequence::insertBars(int numberOfBars, int afterBar)
 
 void Sequence::moveTrack(int source, int destination)
 {
-	if (source == destination) return;
-	if (source > destination) {
+	if (source == destination)
+	{
+		return;
+	}
+
+	if (source > destination)
+	{
 		tracks[source]->setTrackIndex(destination);
-		for (int i = destination; i < source; i++) {
+	
+		for (int i = destination; i < source; i++)
+		{
 			auto t = tracks[i];
 			t->setTrackIndex(t->getTrackIndex() + 1);
 		}
 	}
-	if (destination > source) {
+
+	if (destination > source)
+	{
 		tracks[source]->setTrackIndex(destination);
-		for (int i = source + 1; i <= destination; i++) {
+		
+		for (int i = source + 1; i <= destination; i++)
+		{
 			auto t = tracks[i];
 			t->setTrackIndex(t->getTrackIndex() - 1);
 		}
@@ -625,8 +714,12 @@ bool Sequence::isLastLoopBarEnd()
 int Sequence::getEventCount()
 {
 	auto counter = 0;
-	for (auto& t : tracks) {
-		if (t->getTrackIndex() > 63) break;
+	for (auto& t : tracks)
+	{
+		if (t->getTrackIndex() > 63)
+		{
+			break;
+		}
 		counter += t->getEvents().size();
 	}
 	return counter;
@@ -638,8 +731,11 @@ void Sequence::initLoop()
 	auto lastBar = getLastLoopBar() + 1;
 	int loopStart = 0;
 	int loopEnd = 0;
-	for (int i = 0; i < lastBar; i++) {
-		if (i < firstBar) {
+
+	for (int i = 0; i < lastBar; i++)
+	{
+		if (i < firstBar)
+		{
 			loopStart += barLengths[i];
 		}
 		loopEnd += barLengths[i];
@@ -672,9 +768,12 @@ void Sequence::removeFirstMetronomeClick()
 int Sequence::getNoteEventCount()
 {
 	auto eventCounter = 0;
-	for (int i = 0; i < 64; i++) {
+	
+	for (int i = 0; i < 64; i++)
+	{
 		eventCounter += tracks[i]->getNoteEvents().size();
 	}
+	
 	return eventCounter;
 }
 
@@ -686,7 +785,8 @@ bool Sequence::trackIndexComparator(weak_ptr<Track> t0, weak_ptr<Track> t1)
 int Sequence::getFirstTickOfBar(int index)
 {
 	int res = 0;
-	for (int i = 0; i < index; i++) {
+	for (int i = 0; i < index; i++)
+	{
 		res += barLengths[i];
 	}
 	return res;
