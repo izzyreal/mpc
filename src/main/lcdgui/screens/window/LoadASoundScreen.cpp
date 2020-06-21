@@ -20,6 +20,19 @@ LoadASoundScreen::LoadASoundScreen(const int layerIndex)
 
 void LoadASoundScreen::open()
 {
+	if (mpc.getNote() < 34)
+	{
+		init();
+		mpc.setPadAndNote(-1, 34);
+	}
+	else if (mpc.getNote() > 98)
+	{
+		init();
+		auto pad = program.lock()->getPadIndexFromNote(98);
+		mpc.setPadAndNote(pad, 98);
+	}
+
+
 	auto loadScreen = dynamic_pointer_cast<LoadScreen>(Screens::getScreenComponent("load"));
 	findLabel("filename").lock()->setText("File:" + loadScreen->getSelectedFileName());
 	displayAssignToNote();
