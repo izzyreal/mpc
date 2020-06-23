@@ -1485,13 +1485,9 @@ vector<weak_ptr<EventRow>> StepEditorScreen::findEventRows()
 {
 	vector<weak_ptr<EventRow>> result;
 
-	for (auto& c : children)
+	for (int i = 0; i < 4; i++)
 	{
-		auto candidate = dynamic_pointer_cast<EventRow>(c);
-		if (candidate)
-		{
-			result.push_back(candidate);
-		}
+		result.push_back(dynamic_pointer_cast<EventRow>(findChild("event-row-" + to_string(i)).lock()));
 	}
 
 	return result;
