@@ -1,3 +1,6 @@
+## v0.1.5 (23-6-2020)
+* Fix no audio input (sampling) issue in standalone
+
 ## v0.1.4 (9-5-2020)
 * [Plugin compatibility matrix](https://github.com/izzyreal/vmpc-juce/blob/master/plugin-compatibility-matrix.md)
 * Logic Pro X support (experimental)
