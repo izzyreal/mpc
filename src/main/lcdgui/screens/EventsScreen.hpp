@@ -5,7 +5,13 @@
 
 namespace mpc::lcdgui::screens
 {
-	class EditSequenceScreen
+	class BarCopyScreen;
+	class TrMoveScreen;
+}
+
+namespace mpc::lcdgui::screens
+{
+	class EventsScreen
 		: public mpc::lcdgui::ScreenComponent, public WithTimesAndNotes
 	{
 
@@ -13,7 +19,7 @@ namespace mpc::lcdgui::screens
 		void function(int i) override;
 		void turnWheel(int i) override;
 
-		EditSequenceScreen(const int layerIndex);
+		EventsScreen(const int layerIndex);
 
 		void open() override;
 
@@ -68,6 +74,10 @@ namespace mpc::lcdgui::screens
 		void setDuration(int i);
 		void setVelocityValue(int i);
 		void setStart(int startTicks);
+
+	private:
+		friend class mpc::lcdgui::screens::BarCopyScreen;
+		friend class mpc::lcdgui::screens::TrMoveScreen;
 
 	};
 }

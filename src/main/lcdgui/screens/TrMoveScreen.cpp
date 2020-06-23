@@ -1,7 +1,6 @@
 #include "TrMoveScreen.hpp"
 
-#include "BarCopyScreen.hpp"
-#include "EditSequenceScreen.hpp"
+#include "EventsScreen.hpp"
 
 #include <sequencer/Track.hpp>
 
@@ -25,13 +24,12 @@ void TrMoveScreen::open()
 	displaySq();
 	displayTrFields();
 	displayTrLabels();
-	auto barCopyScreen = dynamic_pointer_cast<BarCopyScreen>(Screens::getScreenComponent("bar-copy"));
-	setSq(barCopyScreen->getFromSq());
 }
 
 void TrMoveScreen::turnWheel(int i)
 {
 	init();
+
 	if (param.find("tr") != string::npos && i > 0)
 	{
 		goUp();
@@ -42,7 +40,11 @@ void TrMoveScreen::turnWheel(int i)
 	}
 	else if (param.compare("sq") == 0)
 	{
-		setSq(sq + i);
+		auto eventsScreen = dynamic_pointer_cast<EventsScreen>(Screens::getScreenComponent("events"));
+		eventsScreen->fromSq += i;
+		displaySq();
+		displayTrFields();
+		displayTrLabels();
 	}
 }
 
@@ -113,22 +115,20 @@ void TrMoveScreen::function(int i)
 	{
 	case 0:
 	{
-		auto editSequenceScreen = dynamic_pointer_cast<EditSequenceScreen>(Screens::getScreenComponent("editsequence"));
-		editSequenceScreen->setFromSq(sq);
-		ls.lock()->openScreen("edit");
+		ls.lock()->openScreen("events");
 		break;
 	}
 	case 1:
-	{		auto barCopyScreen = dynamic_pointer_cast<BarCopyScreen>(Screens::getScreenComponent("bar-copy"));
-	barCopyScreen->setFromSq(sq);
-	ls.lock()->openScreen("bar-copy");
-	break;
+	{
+		ls.lock()->openScreen("bar-copy");
+		break;
 	}
 	case 3:
 		ls.lock()->openScreen("user");
 		break;
 	case 4:
-		if (isSelected()) {
+		if (isSelected())
+		{
 			cancel();
 		}
 		ls.lock()->setFocus("tr1");
@@ -141,7 +141,8 @@ void TrMoveScreen::function(int i)
 
 		if (isSelected())
 		{
-			auto sequence = mpc.getSequencer().lock()->getSequence(sq).lock();
+			auto eventsScreen = dynamic_pointer_cast<EventsScreen>(Screens::getScreenComponent("events"));
+			auto sequence = mpc.getSequencer().lock()->getSequence(eventsScreen->fromSq).lock();
 			insert(sequence.get());
 			ls.lock()->setFocus("tr1");
 			ls.lock()->setFunctionKeysArrangement(1);
@@ -187,7 +188,8 @@ void TrMoveScreen::displayTrLabels()
 		}
 	}
 
-	auto sequence = mpc.getSequencer().lock()->getSequence(sq).lock();
+	auto eventsScreen = dynamic_pointer_cast<EventsScreen>(Screens::getScreenComponent("events"));
+	auto sequence = mpc.getSequencer().lock()->getSequence(eventsScreen->fromSq).lock();
 
 	if (tr0Index >= 0)
 	{
@@ -198,24 +200,31 @@ void TrMoveScreen::displayTrLabels()
 	{
 		tr0 = "";
 	}
-	if (tr1Index < 64) {
+	if (tr1Index < 64)
+	{
 		tr1Name = sequence->getTrack(tr1Index).lock()->getName();
 		tr1 += "Tr:" + StrUtil::padLeft(to_string(tr1Index + 1), "0", 2) + "-" + tr1Name;
 	}
-	else {
+	else
+	{
 		tr1 = "";
 	}
-	if (tr0.compare("") == 0) {
+	
+	if (tr0.compare("") == 0)
+	{
 		findLabel("tr0").lock()->Hide(true);
 	}
-	else {
+	else
+	{
 		findLabel("tr0").lock()->Hide(false);
 		findLabel("tr0").lock()->setText(tr0);
 	}
-	if (tr1.compare("") == 0) {
+	if (tr1.compare("") == 0)
+	{
 		findLabel("tr1").lock()->Hide(true);
 	}
-	else {
+	else
+	{
 		findLabel("tr1").lock()->Hide(false);
 		findLabel("tr1").lock()->setText(tr1);
 	}
@@ -223,7 +232,8 @@ void TrMoveScreen::displayTrLabels()
 
 void TrMoveScreen::displayTrFields()
 {
-	auto sequence = mpc.getSequencer().lock()->getSequence(sq).lock();
+	auto eventsScreen = dynamic_pointer_cast<EventsScreen>(Screens::getScreenComponent("events"));
+	auto sequence = mpc.getSequencer().lock()->getSequence(eventsScreen->fromSq).lock();
 	
 	if (isSelected())
 	{
@@ -264,8 +274,9 @@ void TrMoveScreen::displayTrFields()
 
 void TrMoveScreen::displaySq()
 {
-	findLabel("sq").lock()->SetDirty();
-	findField("sq").lock()->setText(StrUtil::padLeft(to_string(sq + 1), "0", 2) + "-" + mpc.getSequencer().lock()->getSequence(sq).lock()->getName());
+	auto eventsScreen = dynamic_pointer_cast<EventsScreen>(Screens::getScreenComponent("events"));
+	auto sequence = mpc.getSequencer().lock()->getSequence(eventsScreen->fromSq).lock();
+	findField("sq").lock()->setText(StrUtil::padLeft(to_string(eventsScreen->fromSq + 1), "0", 2) + "-" + sequence->getName());
 }
 
 bool TrMoveScreen::isSelected()
@@ -299,16 +310,6 @@ void TrMoveScreen::goDown()
 	currentTrackIndex++;
 	displayTrLabels();
 	displayTrFields();
-}
-
-void TrMoveScreen::setSq(int i)
-{
-	if (i < 0 || i > 98)
-	{
-		return;
-	}
-	sq = i;
-	displaySq();
 }
 
 void TrMoveScreen::select()

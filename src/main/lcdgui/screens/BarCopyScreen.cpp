@@ -3,6 +3,8 @@
 #include <sequencer/Event.hpp>
 #include <sequencer/Track.hpp>
 
+#include <lcdgui/screens/EventsScreen.hpp>
+
 using namespace mpc::lcdgui::screens;
 using namespace std;
 
@@ -25,16 +27,13 @@ void BarCopyScreen::function(int j)
 {
 	init();
 
-	auto toSequence = sequencer.lock()->getSequence(toSq).lock();
-	auto fromSequence = sequencer.lock()->getSequence(fromSq).lock();
-	
 	switch (j)
 	{
 	case 0:
-		setFromSq(fromSq);
-		setToSq(toSq);
-		ls.lock()->openScreen("edit");
+	{
+		ls.lock()->openScreen("events");
 		break;
+	}
 	case 2:
 		ls.lock()->openScreen("tr-move");
 		break;
@@ -44,8 +43,13 @@ void BarCopyScreen::function(int j)
 	case 4:
 		break;
 	case 5:
+	{
 		auto numberOfBars = (lastBar - firstBar + 1) * copies;
-	
+
+		auto eventsScreen = dynamic_pointer_cast<EventsScreen>(Screens::getScreenComponent("events"));
+		auto fromSequence = sequencer.lock()->getSequence(eventsScreen->fromSq).lock();
+		auto toSequence = sequencer.lock()->getSequence(eventsScreen->toSq).lock();
+
 		if (!toSequence->isUsed())
 		{
 			toSequence->init(numberOfBars - 1);
@@ -55,19 +59,24 @@ void BarCopyScreen::function(int j)
 		}
 
 		int copyCounter = 0;
+
 		for (int i = 0; i < numberOfBars; i++)
 		{
 			toSequence->setTimeSignature(i + afterBar, fromSequence->getNumerator(copyCounter + firstBar), fromSequence->getDenominator(copyCounter + firstBar));
 			copyCounter++;
-			if (copyCounter >= copies) copyCounter = 0;
+			
+			if (copyCounter >= copies)
+			{
+				copyCounter = 0;
+			}
 		}
-		
+
 		auto firstTick = 0;
 		auto lastTick = 0;
 		auto firstTickOfToSeq = 0;
 		auto offset = 0;
 		auto segmentLengthTicks = 0;
-		
+
 		for (int i = 0; i < 999; i++)
 		{
 			if (i == firstBar)
@@ -80,7 +89,9 @@ void BarCopyScreen::function(int j)
 		for (int i = 0; i < 999; i++)
 		{
 			lastTick += (*fromSequence->getBarLengths())[i];
-			if (i == lastBar) {
+			
+			if (i == lastBar)
+			{
 				break;
 			}
 		}
@@ -93,16 +104,17 @@ void BarCopyScreen::function(int j)
 			{
 				break;
 			}
+
 			firstTickOfToSeq += (*toSequence->getBarLengths())[i];
 		}
 
 		offset = firstTickOfToSeq - firstTick;
-		
+
 		for (int i = 0; i < 64; i++)
 		{
 			auto t1 = fromSequence->getTrack(i).lock();
 			auto t2 = toSequence->getTrack(i).lock();
-		
+
 			for (auto& e : t1->getEvents())
 			{
 				auto event = e.lock();
@@ -113,7 +125,7 @@ void BarCopyScreen::function(int j)
 					{
 						t2->setUsed(true);
 					}
-					
+
 					for (auto k = 0; k < copies; k++)
 					{
 						auto clone = t2->cloneEvent(event).lock();
@@ -125,17 +137,23 @@ void BarCopyScreen::function(int j)
 		ls.lock()->openScreen("sequencer");
 		break;
 	}
+	}
 }
 
 void BarCopyScreen::turnWheel(int i)
 {
 	init();
-	auto fromSequence = sequencer.lock()->getSequence(fromSq).lock();
-	auto toSequence = sequencer.lock()->getSequence(toSq).lock();
-	
-	if (param.compare("fromsq") == 0) {
 
-		setFromSq(fromSq + i);
+	auto eventsScreen = dynamic_pointer_cast<EventsScreen>(Screens::getScreenComponent("events"));
+	auto fromSequence = sequencer.lock()->getSequence(eventsScreen->fromSq).lock();
+	auto toSequence = sequencer.lock()->getSequence(eventsScreen->toSq).lock();
+
+	if (param.compare("fromsq") == 0)
+	{
+
+		eventsScreen->fromSq += i;
+
+		displayFromSq();
 
 		if (lastBar > fromSequence->getLastBar())
 		{
@@ -145,7 +163,9 @@ void BarCopyScreen::turnWheel(int i)
 	}
 	else if (param.compare("tosq") == 0)
 	{
-		setToSq(toSq + i);
+		eventsScreen->toSq += i;
+
+		displayToSq();
 
 		if (afterBar > toSequence->getLastBar())
 		{
@@ -178,12 +198,14 @@ void BarCopyScreen::displayCopies()
 
 void BarCopyScreen::displayToSq()
 {
-	findField("tosq").lock()->setText(to_string(toSq + 1));
+	auto eventsScreen = dynamic_pointer_cast<EventsScreen>(Screens::getScreenComponent("events"));
+	findField("tosq").lock()->setText(to_string(eventsScreen->toSq + 1));
 }
 
 void BarCopyScreen::displayFromSq()
 {
-	findField("fromsq").lock()->setText(to_string(fromSq + 1));
+	auto eventsScreen = dynamic_pointer_cast<EventsScreen>(Screens::getScreenComponent("events"));
+	findField("fromsq").lock()->setText(to_string(eventsScreen->fromSq + 1));
 }
 
 void BarCopyScreen::displayAfterBar()
@@ -214,28 +236,6 @@ void BarCopyScreen::setLastBar(int i, int max)
 		setFirstBar(lastBar, max);
 	}
 	displayLastBar();
-}
-
-void BarCopyScreen::setFromSq(int i)
-{
-	if (i < 0 || i > 98)
-	{
-		return;
-	}
-
-	fromSq = i;
-	displayFromSq();
-}
-
-void BarCopyScreen::setToSq(int i)
-{
-	if (i < 0 || i > 98)
-	{
-		return;
-	}
-
-	toSq = i;
-	displayToSq();
 }
 
 void BarCopyScreen::setFirstBar(int i, int max)
@@ -274,9 +274,4 @@ void BarCopyScreen::setCopies(int i)
 
 	copies = i;
 	displayCopies();
-}
-
-int BarCopyScreen::getFromSq()
-{
-	return fromSq;
 }

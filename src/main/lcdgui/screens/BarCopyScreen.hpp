@@ -23,21 +23,14 @@ namespace mpc::lcdgui::screens
 		void displayFirstBar();
 
 	private:
-		int fromSq = 0;
-		int toSq = 0;
 		int lastBar = 0;
 		int firstBar = 0;
 		int afterBar = 0;
 		int copies = 1;
 		void setLastBar(int i, int max);
-		void setToSq(int i);
 		void setFirstBar(int i, int max);
 		void setAfterBar(int i, int max);
 		void setCopies(int i);
-
-	public:
-		void setFromSq(int i);
-		int getFromSq();
 
 	};
 }

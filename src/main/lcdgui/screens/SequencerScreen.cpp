@@ -6,7 +6,7 @@
 #include <sequencer/TimeSignature.hpp>
 
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
-#include <lcdgui/screens/EditSequenceScreen.hpp>
+#include <lcdgui/screens/EventsScreen.hpp>
 #include <lcdgui/screens/StepEditorScreen.hpp>
 #include <lcdgui/screens/UserScreen.hpp>
 
@@ -415,16 +415,19 @@ void SequencerScreen::function(int i)
 	init();
 	BaseControls::function(i);
 
-	auto editSequenceScreen = dynamic_pointer_cast<EditSequenceScreen>(Screens::getScreenComponent("editsequence"));
-
-	switch (i) {
+	switch (i)
+	{
 	case 0:
 		openScreen("step-editor");
 		break;
 	case 1:
-		editSequenceScreen->setTime1(sequence.lock()->getLastTick());
-		openScreen("edit");
+	{
+		auto eventsScreen = dynamic_pointer_cast<EventsScreen>(Screens::getScreenComponent("events"));
+		eventsScreen->setTime0(0);
+		eventsScreen->setTime1(sequence.lock()->getLastTick());
+		openScreen("events");
 		break;
+	}
 	case 2:
 		track.lock()->setOn(!track.lock()->isOn());
 		break;
@@ -502,7 +505,7 @@ void SequencerScreen::turnWheel(int i)
 			}
 		}
 
-		lastFocus = getLastFocus("edit");
+		lastFocus = getLastFocus("events");
 
 		string midinote = "midinote";
 		string drumnote = "drumnote";
@@ -512,14 +515,14 @@ void SequencerScreen::turnWheel(int i)
 			{
 				if (track.lock()->getBusNumber() != 0)
 				{
-					setLastFocus("edit", "drumnote");
+					setLastFocus("events", "drumnote");
 				}
 			}
 			else if (std::mismatch(drumnote.begin(), drumnote.end(), lastFocus.begin()).first == drumnote.end())
 			{
 				if (track.lock()->getBusNumber() == 0)
 				{
-					setLastFocus("edit", "midinote0");
+					setLastFocus("events", "midinote0");
 				}
 			}
 		}

@@ -11,7 +11,7 @@
 #include <lcdgui/screens/SequencerScreen.hpp>
 #include <lcdgui/screens/AssignScreen.hpp>
 #include <lcdgui/screens/BarCopyScreen.hpp>
-#include <lcdgui/screens/EditSequenceScreen.hpp>
+#include <lcdgui/screens/EventsScreen.hpp>
 #include <lcdgui/screens/NextSeqPadScreen.hpp>
 #include <lcdgui/screens/NextSeqScreen.hpp>
 #include <lcdgui/screens/SequencerScreen.hpp>
@@ -495,9 +495,9 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	{
 		screen = make_shared<StepEditorScreen>(layerIndex);
 	}
-	else if (screenName.compare("edit") == 0)
+	else if (screenName.compare("events") == 0)
 	{
-		screen = make_shared<EditSequenceScreen>(layerIndex);
+		screen = make_shared<EventsScreen>(layerIndex);
 	}
 	else if (screenName.compare("bar-copy") == 0)
 	{

@@ -1,7 +1,4 @@
-#include "EditSequenceScreen.hpp"
-
-#include <lcdgui/screens/TrMoveScreen.hpp>
-#include <lcdgui/screens/BarCopyScreen.hpp>
+#include "EventsScreen.hpp"
 
 #include <sequencer/Event.hpp>
 #include <sequencer/Track.hpp>
@@ -9,22 +6,22 @@
 #include <sequencer/TimeSignature.hpp>
 #include <sequencer/SeqUtil.hpp>
 
+#include <Util.hpp>
+
 #include <mpc/MpcSoundPlayerChannel.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::sequencer;
-
 using namespace moduru::lang;
-
 using namespace std;
 
-EditSequenceScreen::EditSequenceScreen(const int layerIndex)
-	: ScreenComponent("editsequence", layerIndex)
+EventsScreen::EventsScreen(const int layerIndex)
+	: ScreenComponent("events", layerIndex)
 {
 }
 
-void EditSequenceScreen::open()
+void EventsScreen::open()
 {
 	displayEdit();
 	displayTime();
@@ -38,7 +35,7 @@ void EditSequenceScreen::open()
 	displayCopies();
 }
 
-void EditSequenceScreen::function(int i)
+void EventsScreen::function(int i)
 {
 	init();
 	
@@ -49,15 +46,11 @@ void EditSequenceScreen::function(int i)
 	{
 	case 1:
 	{
-		auto barCopyScreen = dynamic_pointer_cast<BarCopyScreen>(Screens::getScreenComponent("bar-copy"));
-		barCopyScreen->setFromSq(fromSq);
 		ls.lock()->openScreen("bar-copy");
 		break;
 	}
 	case 2:
 	{
-		auto trMoveScreen = dynamic_pointer_cast<TrMoveScreen>(Screens::getScreenComponent("tr-move"));
-		trMoveScreen->setSq(fromSq);
 		ls.lock()->openScreen("tr-move");
 		break;
 	}
@@ -219,7 +212,7 @@ void EditSequenceScreen::function(int i)
 	}
 }
 
-void EditSequenceScreen::turnWheel(int i)
+void EventsScreen::turnWheel(int i)
 {
 	init();
 	auto fromSequence = sequencer.lock()->getSequence(fromSq).lock();
@@ -317,7 +310,7 @@ void EditSequenceScreen::turnWheel(int i)
 	}
 }
 
-void EditSequenceScreen::displayStart()
+void EventsScreen::displayStart()
 {
 	auto seq = sequencer.lock()->getSequence(toSq).lock();
 	findField("start0").lock()->setText(StrUtil::padLeft(to_string(SeqUtil::getBar(seq.get(), start) + 1), "0", 3));
@@ -325,7 +318,7 @@ void EditSequenceScreen::displayStart()
 	findField("start2").lock()->setText(StrUtil::padLeft(to_string(SeqUtil::getClock(seq.get(), start)), "0", 2));
 }
 
-void EditSequenceScreen::displayTime()
+void EventsScreen::displayTime()
 {
 	auto seq = sequencer.lock()->getSequence(fromSq).lock();
 	findField("time0").lock()->setText(StrUtil::padLeft(to_string(SeqUtil::getBar(seq.get(), time0) + 1), "0", 3));
@@ -336,7 +329,7 @@ void EditSequenceScreen::displayTime()
 	findField("time5").lock()->setText(StrUtil::padLeft(to_string(SeqUtil::getClock(seq.get(), time1)), "0", 2));
 }
 
-void EditSequenceScreen::displayCopies()
+void EventsScreen::displayCopies()
 {
 	if (editFunctionNumber == 0)
 	{
@@ -352,7 +345,7 @@ void EditSequenceScreen::displayCopies()
 	}
 }
 
-void EditSequenceScreen::displayMode()
+void EventsScreen::displayMode()
 {
 	if (editFunctionNumber == 0)
 	{
@@ -383,7 +376,7 @@ void EditSequenceScreen::displayMode()
 	}
 }
 
-void EditSequenceScreen::displayEdit()
+void EventsScreen::displayEdit()
 {
 	findField("editfunction").lock()->setText(functionNames[editFunctionNumber]);
 
@@ -476,7 +469,7 @@ void EditSequenceScreen::displayEdit()
 	}
 }
 
-void EditSequenceScreen::displayNotes()
+void EventsScreen::displayNotes()
 {
 	init();
 
@@ -502,13 +495,13 @@ void EditSequenceScreen::displayNotes()
 	}
 }
 
-void EditSequenceScreen::displayMidiNotes()
+void EventsScreen::displayMidiNotes()
 {
-	//findField("midinote0").lock()->setText(StrUtil::padLeft(to_string(getMidiNote0()), " ", 3) + "(" + mpc::Util::noteNames()[getMidiNote0()] + u8"\u00D4");
-	//findField("midinote1").lock()->setText(StrUtil::padLeft(to_string(getMidiNote1()), " ", 3) + "(" + mpc::Util::noteNames()[getMidiNote1()] + u8"\u00D4");
+	findField("midinote0").lock()->setText(StrUtil::padLeft(to_string(note0), " ", 3) + "(" + mpc::Util::noteNames()[note0] + u8"\u00D4");
+	findField("midinote1").lock()->setText(StrUtil::padLeft(to_string(note1), " ", 3) + "(" + mpc::Util::noteNames()[note1] + u8"\u00D4");
 }
 
-void EditSequenceScreen::displayDrumNotes()
+void EventsScreen::displayDrumNotes()
 {
 	auto sequence = sequencer.lock()->getSequence(fromSq).lock();
 	auto track = sequence->getTrack(tr0).lock();
@@ -526,7 +519,7 @@ void EditSequenceScreen::displayDrumNotes()
 	}
 }
 
-void EditSequenceScreen::setEdit(int i)
+void EventsScreen::setEdit(int i)
 {
 	if (i < 0 || i > 3)
 	{
@@ -536,7 +529,7 @@ void EditSequenceScreen::setEdit(int i)
 	displayEdit();
 }
 
-void EditSequenceScreen::setDrumNote(int i)
+void EventsScreen::setDrumNote(int i)
 {
 	if (i < 34 || i > 98)
 	{
@@ -546,7 +539,7 @@ void EditSequenceScreen::setDrumNote(int i)
 	displayDrumNotes();
 }
 
-void EditSequenceScreen::setFromSq(int i)
+void EventsScreen::setFromSq(int i)
 {
 	if (i < 0 || i > 98)
 	{
@@ -556,7 +549,7 @@ void EditSequenceScreen::setFromSq(int i)
 	displayFromSq();
 }
 
-void EditSequenceScreen::setTr0(int i)
+void EventsScreen::setTr0(int i)
 {
 	if (i < 0 || i > 63)
 	{
@@ -566,7 +559,7 @@ void EditSequenceScreen::setTr0(int i)
 	displayTr0();
 }
 
-void EditSequenceScreen::setToSq(int i)
+void EventsScreen::setToSq(int i)
 {
 	if (i < 0 || i > 98)
 	{
@@ -577,7 +570,7 @@ void EditSequenceScreen::setToSq(int i)
 	displayToSq();
 }
 
-void EditSequenceScreen::setTr1(int i)
+void EventsScreen::setTr1(int i)
 {
 	if (i < 0 || i > 63)
 	{
@@ -587,13 +580,13 @@ void EditSequenceScreen::setTr1(int i)
 	displayTr1();
 }
 
-void EditSequenceScreen::setModeMerge(bool b)
+void EventsScreen::setModeMerge(bool b)
 {
 	modeMerge = b;
 	displayMode();
 }
 
-void EditSequenceScreen::setCopies(int i)
+void EventsScreen::setCopies(int i)
 {
 	if (i < 1 || i > 999)
 	{
@@ -603,7 +596,7 @@ void EditSequenceScreen::setCopies(int i)
 	displayCopies();
 }
 
-void EditSequenceScreen::setDurationMode(int i)
+void EventsScreen::setDurationMode(int i)
 {
 	if (i < 0 || i > 3)
 	{
@@ -618,7 +611,7 @@ void EditSequenceScreen::setDurationMode(int i)
 	displayDurationMode();
 }
 
-void EditSequenceScreen::setVelocityMode(int i)
+void EventsScreen::setVelocityMode(int i)
 {
 	if (i < 0 || i > 3)
 	{
@@ -634,7 +627,7 @@ void EditSequenceScreen::setVelocityMode(int i)
 	displayVelocityMode();
 }
 
-void EditSequenceScreen::setTransposeAmount(int i)
+void EventsScreen::setTransposeAmount(int i)
 {
 	if (i < -12 || i > 12)
 	{
@@ -644,7 +637,7 @@ void EditSequenceScreen::setTransposeAmount(int i)
 	displayTransposeAmount();
 }
 
-void EditSequenceScreen::setDuration(int i)
+void EventsScreen::setDuration(int i)
 {
 	if (i < 1 || i > 9999)
 	{
@@ -659,7 +652,7 @@ void EditSequenceScreen::setDuration(int i)
 	displayCopies();
 }
 
-void EditSequenceScreen::setVelocityValue(int i)
+void EventsScreen::setVelocityValue(int i)
 {
 	if (i < 1 || i > 200)
 	{
@@ -674,48 +667,48 @@ void EditSequenceScreen::setVelocityValue(int i)
 	displayVelocityValue();
 }
 
-void EditSequenceScreen::setStart(int i)
+void EventsScreen::setStart(int i)
 {
 	start = i;
 	displayStart();
 }
 
-void EditSequenceScreen::displayTr1()
+void EventsScreen::displayTr1()
 {
 	findField("tr1").lock()->setText(to_string(tr1 + 1));
 }
 
-void EditSequenceScreen::displayToSq()
+void EventsScreen::displayToSq()
 {
 	findField("tosq").lock()->setText(to_string(toSq + 1));
 }
 
-void EditSequenceScreen::displayTr0()
+void EventsScreen::displayTr0()
 {
 	findField("tr0").lock()->setText(to_string(tr0 + 1));
 }
 
-void EditSequenceScreen::displayFromSq()
+void EventsScreen::displayFromSq()
 {
 	findField("fromsq").lock()->setText(to_string(fromSq + 1));
 }
 
-void EditSequenceScreen::displayDurationMode()
+void EventsScreen::displayDurationMode()
 {
 
 }
 
-void EditSequenceScreen::displayVelocityMode()
+void EventsScreen::displayVelocityMode()
 {
 
 }
 
-void EditSequenceScreen::displayTransposeAmount()
+void EventsScreen::displayTransposeAmount()
 {
 
 }
 
-void EditSequenceScreen::displayVelocityValue()
+void EventsScreen::displayVelocityValue()
 {
 
 }

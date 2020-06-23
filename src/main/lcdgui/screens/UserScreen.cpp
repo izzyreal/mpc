@@ -36,7 +36,7 @@ void UserScreen::function(int i)
 	switch (i)
 	{
     case 0:
-        ls.lock()->openScreen("edit");
+        ls.lock()->openScreen("events");
         break;
     case 1:
         ls.lock()->openScreen("bar-copy");

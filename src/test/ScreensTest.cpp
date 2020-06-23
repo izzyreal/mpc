@@ -38,7 +38,7 @@ vector<string> screenNames = {
 "program-params",
 "format",
 "setup",
-"edit",
+"events",
 "bar-copy",
 "tr-move",
 "user",
