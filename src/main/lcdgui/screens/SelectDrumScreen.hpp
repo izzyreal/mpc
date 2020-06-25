@@ -3,8 +3,8 @@
 
 #include <controls/BaseSamplerControls.hpp>
 
-namespace mpc::lcdgui::screens {
-
+namespace mpc::lcdgui::screens
+{
 	class SelectDrumScreen
 		: public mpc::lcdgui::ScreenComponent, public mpc::controls::BaseSamplerControls
 	{
@@ -13,6 +13,8 @@ namespace mpc::lcdgui::screens {
 		void function(int i) override;
 
 		SelectDrumScreen(const int layerIndex);
+
+		void open() override;
 
 	};
 }
