@@ -68,14 +68,18 @@ void SequencerScreen::displayVelo()
 
 void SequencerScreen::displayDeviceNumber()
 {
-	if (track.lock()->getDevice() == 0) {
+	if (track.lock()->getDevice() == 0)
+	{
 		findField("devicenumber").lock()->setText("OFF");
 	}
-	else {
-		if (track.lock()->getDevice() >= 17) {
+	else
+	{
+		if (track.lock()->getDevice() >= 17)
+		{
 			findField("devicenumber").lock()->setText(to_string(track.lock()->getDevice() - 16) + "B");
 		}
-		else {
+		else
+		{
 			findField("devicenumber").lock()->setText(to_string(track.lock()->getDevice()) + "A");
 		}
 	}
@@ -443,6 +447,15 @@ void SequencerScreen::function(int i)
 	}
 }
 
+void SequencerScreen::checkTrackUsed()
+{
+	if (!track.lock()->isUsed())
+	{
+		track.lock()->setUsed(true);
+		displayTr();
+	}
+}
+
 void SequencerScreen::turnWheel(int i)
 {
 	init();
@@ -468,6 +481,7 @@ void SequencerScreen::turnWheel(int i)
 	}
 	else if (focus.compare("devicenumber") == 0)
 	{
+		checkTrackUsed();
 		track.lock()->setDeviceNumber(track.lock()->getDevice() + i);
 	}
 	else if (focus.compare("tr") == 0)
@@ -483,6 +497,8 @@ void SequencerScreen::turnWheel(int i)
 	}
 	else if (focus.compare("tracktype") == 0)
 	{
+		checkTrackUsed();
+
 		track.lock()->setBusNumber(track.lock()->getBusNumber() + i);
 		
 		auto lastFocus = getLastFocus("step-editor");
@@ -529,10 +545,12 @@ void SequencerScreen::turnWheel(int i)
 	}
 	else if (focus.compare("pgm") == 0)
 	{
+		checkTrackUsed();
 		track.lock()->setProgramChange(track.lock()->getProgramChange() + i);
 	}
 	else if (focus.compare("velo") == 0)
 	{
+		checkTrackUsed();
 		track.lock()->setVelocityRatio(track.lock()->getVelocityRatio() + i);
 	}
 	else if (focus.compare("timing") == 0)
@@ -590,6 +608,7 @@ void SequencerScreen::turnWheel(int i)
 	}
 	else if (focus.compare("on") == 0)
 	{
+		checkTrackUsed();
 		track.lock()->setOn(i > 0);
 	}
 }
