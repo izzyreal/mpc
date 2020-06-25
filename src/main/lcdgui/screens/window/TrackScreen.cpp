@@ -14,8 +14,9 @@ TrackScreen::TrackScreen(const int layerIndex)
 
 void TrackScreen::open()
 {
-	init();
+	ls.lock()->setPreviousScreenName("sequencer");
 
+	init();
 	auto activeTrackIndex = sequencer.lock()->getActiveTrackIndex();
 	auto defaultTrackName = sequencer.lock()->getDefaultTrackName(activeTrackIndex);
 
@@ -51,6 +52,11 @@ void TrackScreen::turnWheel(int i)
 	}
 	else
 	{
+		if (!track.lock()->isUsed())
+		{
+			track.lock()->setUsed(true);
+		}
+
 		nameScreen->setName(track.lock()->getName());
 	}
 	nameScreen->parameterName = param;

@@ -274,7 +274,10 @@ void Sequence::setName(string s)
 
 string Sequence::getName()
 {
-	if (!used) return string("(Unused)");
+	if (!used)
+	{
+		return string("(Unused)");
+	}
 	return name;
 }
 
@@ -290,9 +293,11 @@ string Sequence::getDeviceName(int i)
 
 void Sequence::setLastBar(int i)
 {
-	if (i < 0 || i > 998) {
+	if (i < 0 || i > 998)
+	{
 		return;
 	}
+	
 	lastBar = i;
 }
 
@@ -505,9 +510,9 @@ void Sequence::setBarLengths(vector<int>& newBarLengths) {
 	barLengths = newBarLengths;
 }
 
-void Sequence::deleteBars(int firstBar, int lBar)
+void Sequence::deleteBars(int firstBar, int _lastBar)
 {
-	lBar++;
+	_lastBar++;
 
 	int deleteFirstTick = 0;
 
@@ -518,7 +523,7 @@ void Sequence::deleteBars(int firstBar, int lBar)
 
 	int deleteLastTick = deleteFirstTick;
 	
-	for (int i = firstBar; i < lBar; i++)
+	for (int i = firstBar; i < _lastBar; i++)
 	{
 		deleteLastTick += barLengths[i];
 	}
@@ -534,14 +539,14 @@ void Sequence::deleteBars(int firstBar, int lBar)
 		}
 	}
 
-	auto difference = lBar - firstBar;
+	auto difference = _lastBar - firstBar;
 	lastBar -= difference;
 	int oldBarStartPos = 0;
 	auto barCounter = 0;
 
 	for (auto l : barLengths)
 	{
-		if (barCounter == lBar)
+		if (barCounter == _lastBar)
 		{
 			break;
 		}
@@ -602,6 +607,11 @@ void Sequence::deleteBars(int firstBar, int lBar)
 	if (lastLoopBar > lastBar)
 	{
 		lastLoopBar = lastBar;
+	}
+
+	if (lastBar == 0)
+	{
+		setUsed(false);
 	}
 }
 

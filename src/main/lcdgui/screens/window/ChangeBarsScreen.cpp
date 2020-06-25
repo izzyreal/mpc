@@ -13,27 +13,10 @@ ChangeBarsScreen::ChangeBarsScreen(const int layerIndex)
 
 void ChangeBarsScreen::open()
 {
-	auto sequence = sequencer.lock()->getActiveSequence().lock();
-
-	if (getAfterBar() > sequence->getLastBar() + 1)
-	{
-		setAfterBar(sequence->getLastBar() + 1, sequence->getLastBar());
-	}
-
-	if (getFirstBar() > sequence->getLastBar())
-	{
-		setFirstBar(sequence->getLastBar(), sequence->getLastBar());
-	}
-
-	if (getLastBar() > sequence->getLastBar())
-	{
-		setLastBar(sequence->getLastBar(), sequence->getLastBar());
-	}
-
-	displayAfterBar();
-	displayNumberOfBars();
-	displayFirstBar();
-	displayLastBar();
+	setAfterBar(0);
+	setNumberOfBars(0);
+	setFirstBar(0);
+	setLastBar(0);
 }
 
 void ChangeBarsScreen::function(int i)
@@ -44,11 +27,11 @@ void ChangeBarsScreen::function(int i)
 	switch (i)
 	{
 	case 1:
-		seq->insertBars(getNumberOfBars(), getAfterBar());
+		seq->insertBars(numberOfBars, afterBar);
 		ls.lock()->openScreen("sequencer");
 		break;
 	case 4:
-		seq->deleteBars(getFirstBar(), getLastBar());
+		seq->deleteBars(firstBar, lastBar);
 		ls.lock()->openScreen("sequencer");
 		break;
 	}
@@ -57,55 +40,50 @@ void ChangeBarsScreen::function(int i)
 void ChangeBarsScreen::turnWheel(int i)
 {
 	init();
-	auto seq = sequencer.lock()->getActiveSequence().lock();
 
 	if (param.compare("afterbar") == 0)
 	{
-		setAfterBar(getAfterBar() + i, seq->getLastBar());
+		setAfterBar(afterBar + i);
 	}
 	else if (param.compare("numberofbars") == 0)
 	{
-		setNumberOfBars(getNumberOfBars() + i, seq->getLastBar());
+		setNumberOfBars(numberOfBars + i);
 	}
 	else if (param.compare("firstbar") == 0)
 	{
-		setFirstBar(getFirstBar() + i, seq->getLastBar());
+		setFirstBar(firstBar + i);
 	}
 	else if (param.compare("lastbar") == 0)
 	{
-		setLastBar(getLastBar() + i, seq->getLastBar());
+		setLastBar(lastBar + i);
 	}
 }
 
-
 void ChangeBarsScreen::displayFirstBar()
 {
-	findField("firstbar").lock()->setText(to_string(getFirstBar() + 1));
+	findField("firstbar").lock()->setText(to_string(firstBar + 1));
 }
 
 void ChangeBarsScreen::displayLastBar()
 {
-	findField("lastbar").lock()->setText(to_string(getLastBar() + 1));
+	findField("lastbar").lock()->setText(to_string(lastBar + 1));
 }
 
 void ChangeBarsScreen::displayNumberOfBars()
 {
-	findField("numberofbars").lock()->setText(to_string(getNumberOfBars()));
+	findField("numberofbars").lock()->setText(to_string(numberOfBars));
 }
 
 void ChangeBarsScreen::displayAfterBar()
 {
-	findField("afterbar").lock()->setText(to_string(getAfterBar()));
+	findField("afterbar").lock()->setText(to_string(afterBar));
 }
 
-int ChangeBarsScreen::getLastBar()
+void ChangeBarsScreen::setLastBar(int i)
 {
-	return lastBar;
-}
+	auto seq = sequencer.lock()->getActiveSequence().lock();
 
-void ChangeBarsScreen::setLastBar(int i, int max)
-{
-	if (i < 0 || i > max)
+	if (i < 0 || i > seq->getLastBar())
 	{
 		return;
 	}
@@ -114,20 +92,17 @@ void ChangeBarsScreen::setLastBar(int i, int max)
 
 	if (lastBar < firstBar)
 	{
-		setFirstBar(lastBar, max);
+		setFirstBar(lastBar);
 	}
 
 	displayLastBar();
 }
 
-int ChangeBarsScreen::getFirstBar()
+void ChangeBarsScreen::setFirstBar(int i)
 {
-	return firstBar;
-}
+	auto seq = sequencer.lock()->getActiveSequence().lock();
 
-void ChangeBarsScreen::setFirstBar(int i, int max)
-{
-	if (i < 0 || i > max)
+	if (i < 0 || i > seq->getLastBar())
 	{
 		return;
 	}
@@ -138,18 +113,15 @@ void ChangeBarsScreen::setFirstBar(int i, int max)
 
 	if (firstBar > lastBar)
 	{
-		setLastBar(firstBar, max);
+		setLastBar(firstBar);
 	}
 }
 
-int ChangeBarsScreen::getNumberOfBars()
+void ChangeBarsScreen::setNumberOfBars(int i)
 {
-	return numberOfBars;
-}
+	auto seq = sequencer.lock()->getActiveSequence().lock();
 
-void ChangeBarsScreen::setNumberOfBars(int i, int max)
-{
-	if (i < 0 || i >(999 - (max + 1)))
+	if (i < 0 || i > (998 - seq->getLastBar()))
 	{
 		return;
 	}
@@ -158,14 +130,11 @@ void ChangeBarsScreen::setNumberOfBars(int i, int max)
 	displayNumberOfBars();
 }
 
-int ChangeBarsScreen::getAfterBar()
+void ChangeBarsScreen::setAfterBar(int i)
 {
-	return afterBar;
-}
+	auto seq = sequencer.lock()->getActiveSequence().lock();
 
-void ChangeBarsScreen::setAfterBar(int i, int max)
-{
-	if (i < 0 || i > max + 1)
+	if (i < 0 || i >= seq->getLastBar())
 	{
 		return;
 	}
