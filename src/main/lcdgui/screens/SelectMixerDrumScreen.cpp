@@ -11,6 +11,12 @@ SelectMixerDrumScreen::SelectMixerDrumScreen(const int layerIndex)
 {
 }
 
+void SelectMixerDrumScreen::open()
+{
+	auto drumScreen = dynamic_pointer_cast<DrumScreen>(Screens::getScreenComponent("drum"));
+	ls.lock()->setFunctionKeysArrangement(drumScreen->drum);
+}
+
 void SelectMixerDrumScreen::function(int i)
 {
 	init();
