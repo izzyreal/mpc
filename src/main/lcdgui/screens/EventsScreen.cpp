@@ -27,8 +27,8 @@ void EventsScreen::open()
 {
 	setFromSq(sequencer.lock()->getActiveSequenceIndex());
 	setToSq(sequencer.lock()->getActiveSequenceIndex());
-	setTr0(sequencer.lock()->getActiveTrackIndex());
-	setTr1(sequencer.lock()->getActiveTrackIndex());
+	setFromTr(sequencer.lock()->getActiveTrackIndex());
+	setToTr(sequencer.lock()->getActiveTrackIndex());
 
 	auto seq = sequencer.lock()->getActiveSequence().lock();
 	if (!seq->isUsed())
@@ -53,7 +53,7 @@ void EventsScreen::function(int i)
 {
 	init();
 	
-	auto fromSequence = sequencer.lock()->getSequence(fromSq).lock();
+	auto fromSequence = sequencer.lock()->getActiveSequence().lock();
 	auto toSequence = sequencer.lock()->getSequence(toSq).lock();
 	
 	switch (i)
@@ -76,7 +76,7 @@ void EventsScreen::function(int i)
 		auto sourceStart = time0;
 		auto sourceEnd = time1;
 		auto segLength = sourceEnd - sourceStart;
-		auto sourceTrack = fromSequence->getTrack(tr0).lock();
+		auto sourceTrack = fromSequence->getTrack(fromTr).lock();
 
 		if (editFunctionNumber == 0)
 		{
@@ -88,7 +88,7 @@ void EventsScreen::function(int i)
 				toSequence->init(fromSequence->getLastBar());
 			}
 
-			auto destTrack = toSequence->getTrack(tr1).lock();
+			auto destTrack = toSequence->getTrack(toTr).lock();
 
 			if (!modeMerge)
 			{
@@ -229,7 +229,7 @@ void EventsScreen::function(int i)
 void EventsScreen::turnWheel(int i)
 {
 	init();
-	auto fromSequence = sequencer.lock()->getSequence(fromSq).lock();
+	auto fromSequence = sequencer.lock()->getActiveSequence().lock();
 	auto toSequence = sequencer.lock()->getSequence(toSq).lock();
 
 	checkAllTimesAndNotes(i, fromSequence.get());
@@ -262,22 +262,22 @@ void EventsScreen::turnWheel(int i)
 	{
 		setMidiNote1(note0 + i);
 	}
-	else if (param.compare("fromsq") == 0)
+	else if (param.compare("from-sq") == 0)
 	{
-		setFromSq(fromSq + i);
+		setFromSq(sequencer.lock()->getActiveSequenceIndex() + i);
 		
-		auto fromSeq = sequencer.lock()->getSequence(fromSq).lock();
+		auto fromSeq = sequencer.lock()->getActiveSequence().lock();
 		
 		if (time1 > fromSeq->getLastTick())
 		{
 			setTime1(fromSeq->getLastTick());
 		}
 	}
-	else if (param.compare("tr0") == 0)
+	else if (param.compare("from-tr") == 0)
 	{
-		setTr0(tr0 + i);
+		setFromTr(fromTr + i);
 	}
-	else if (param.compare("tosq") == 0)
+	else if (param.compare("to-sq") == 0)
 	{
 		setToSq(toSq + i);
 		auto toSeq = sequencer.lock()->getSequence(toSq).lock();
@@ -287,9 +287,9 @@ void EventsScreen::turnWheel(int i)
 			setStart(toSeq->getLastTick());
 		}
 	}
-	else if (param.compare("tr1") == 0)
+	else if (param.compare("to-tr") == 0)
 	{
-		setTr1(tr1 + i);
+		setToTr(toTr + i);
 	}
 	else if (param.compare("mode") == 0)
 	{
@@ -334,7 +334,7 @@ void EventsScreen::displayStart()
 
 void EventsScreen::displayTime()
 {
-	auto seq = sequencer.lock()->getSequence(fromSq).lock();
+	auto seq = sequencer.lock()->getActiveSequence().lock();
 	findField("time0").lock()->setText(StrUtil::padLeft(to_string(SeqUtil::getBar(seq.get(), time0) + 1), "0", 3));
 	findField("time1").lock()->setText(StrUtil::padLeft(to_string(SeqUtil::getBeat(seq.get(), time0) + 1), "0", 2));
 	findField("time2").lock()->setText(StrUtil::padLeft(to_string(SeqUtil::getClock(seq.get(), time0)), "0", 2));
@@ -396,20 +396,20 @@ void EventsScreen::displayEdit()
 
 	if (editFunctionNumber == 0)
 	{
-		findLabel("fromsq").lock()->setLocation(132, 1);
-		findField("fromsq").lock()->setLocation(findField("fromsq").lock()->getX(), 1);
-		findLabel("tr0").lock()->setLocation(findLabel("tr0").lock()->getX(), 1);
-		findField("tr0").lock()->setLocation(findField("tr0").lock()->getX(), 1);
+		findLabel("from-sq").lock()->setLocation(132, 1);
+		findField("from-sq").lock()->setLocation(findField("from-sq").lock()->getX(), 1);
+		findLabel("from-tr").lock()->setLocation(findLabel("from-tr").lock()->getX(), 1);
+		findField("from-tr").lock()->setLocation(findField("from-tr").lock()->getX(), 1);
 		findLabel("mode").lock()->setText("Mode:");
-		findLabel("fromsq").lock()->setText("From sq:");
-		findField("tosq").lock()->Hide(false);
-		findField("tr1").lock()->Hide(false);
+		findLabel("from-sq").lock()->setText("From sq:");
+		findField("to-sq").lock()->Hide(false);
+		findField("to-tr").lock()->Hide(false);
 		findField("start0").lock()->Hide(false);
 		findField("start1").lock()->Hide(false);
 		findField("start2").lock()->Hide(false);
 		findField("copies").lock()->Hide(false);
-		findLabel("tosq").lock()->Hide(false);
-		findLabel("tr1").lock()->Hide(false);
+		findLabel("to-sq").lock()->Hide(false);
+		findLabel("to-tr").lock()->Hide(false);
 		findLabel("start0").lock()->Hide(false);
 		findLabel("start1").lock()->Hide(false);
 		findLabel("start2").lock()->Hide(false);
@@ -423,20 +423,20 @@ void EventsScreen::displayEdit()
 	}
 	else if (editFunctionNumber == 1 || editFunctionNumber == 2)
 	{
-		findLabel("fromsq").lock()->setLocation(132, 3);
-		findField("fromsq").lock()->setLocation(findField("fromsq").lock()->getX(), 3);
-		findLabel("tr0").lock()->setLocation(findLabel("tr0").lock()->getX(), 3);
-		findField("tr0").lock()->setLocation(findField("tr0").lock()->getX(), 3);
+		findLabel("from-sq").lock()->setLocation(132, 3);
+		findField("from-sq").lock()->setLocation(findField("from-sq").lock()->getX(), 3);
+		findLabel("from-tr").lock()->setLocation(findLabel("from-tr").lock()->getX(), 3);
+		findField("from-tr").lock()->setLocation(findField("from-tr").lock()->getX(), 3);
 		findLabel("mode").lock()->setText("Mode:");
-		findLabel("fromsq").lock()->setText("Edit sq:");
-		findField("tosq").lock()->Hide(true);
-		findField("tr1").lock()->Hide(true);
+		findLabel("from-sq").lock()->setText("Edit sq:");
+		findField("to-sq").lock()->Hide(true);
+		findField("to-tr").lock()->Hide(true);
 		findField("start0").lock()->Hide(true);
 		findField("start1").lock()->Hide(true);
 		findField("start2").lock()->Hide(true);
 		findField("copies").lock()->Hide(false);
-		findLabel("tosq").lock()->Hide(true);
-		findLabel("tr1").lock()->Hide(true);
+		findLabel("to-sq").lock()->Hide(true);
+		findLabel("to-tr").lock()->Hide(true);
 		findLabel("start0").lock()->Hide(true);
 		findLabel("start1").lock()->Hide(true);
 		findLabel("start2").lock()->Hide(true);
@@ -458,20 +458,20 @@ void EventsScreen::displayEdit()
 	}
 	else if (editFunctionNumber == 3)
 	{
-		findLabel("fromsq").lock()->setLocation(132, 3);
-		findField("fromsq").lock()->setLocation(findField("fromsq").lock()->getX(), 3);
-		findLabel("tr0").lock()->setLocation(findLabel("tr0").lock()->getX(), 3);
-		findField("tr0").lock()->setLocation(findField("tr0").lock()->getX(), 3);
+		findLabel("from-sq").lock()->setLocation(132, 3);
+		findField("from-sq").lock()->setLocation(findField("from-sq").lock()->getX(), 3);
+		findLabel("from-tr").lock()->setLocation(findLabel("from-tr").lock()->getX(), 3);
+		findField("from-tr").lock()->setLocation(findField("from-tr").lock()->getX(), 3);
 		findLabel("mode").lock()->setText("Amount:");
-		findLabel("fromsq").lock()->setText("Edit sq:");
-		findField("tosq").lock()->Hide(true);
-		findField("tr1").lock()->Hide(true);
+		findLabel("from-sq").lock()->setText("Edit sq:");
+		findField("to-sq").lock()->Hide(true);
+		findField("to-tr").lock()->Hide(true);
 		findField("start0").lock()->Hide(true);
 		findField("start1").lock()->Hide(true);
 		findField("start2").lock()->Hide(true);
 		findField("copies").lock()->Hide(true);
-		findLabel("tosq").lock()->Hide(true);
-		findLabel("tr1").lock()->Hide(true);
+		findLabel("to-sq").lock()->Hide(true);
+		findLabel("to-tr").lock()->Hide(true);
 		findLabel("start0").lock()->Hide(true);
 		findLabel("start1").lock()->Hide(true);
 		findLabel("start2").lock()->Hide(true);
@@ -517,8 +517,8 @@ void EventsScreen::displayMidiNotes()
 
 void EventsScreen::displayDrumNotes()
 {
-	auto sequence = sequencer.lock()->getSequence(fromSq).lock();
-	auto track = sequence->getTrack(tr0).lock();
+	auto sequence = sequencer.lock()->getActiveSequence().lock();
+	auto track = sequence->getTrack(fromTr).lock();
 	auto program = sampler.lock()->getProgram(sampler.lock()->getDrum(track->getBusNumber() - 1)->getProgram()).lock();
 	
 	if (drumNote == 34)
@@ -559,18 +559,29 @@ void EventsScreen::setFromSq(int i)
 	{
 		return;
 	}
-	fromSq = i;
+
+	sequencer.lock()->setActiveSequenceIndex(i);
+
+	// The below check can be removed if we're only supposed to jump to used sequences.
+	// For now we initialize any sequence that we come across.
+	auto seq = sequencer.lock()->getActiveSequence().lock();
+	if (!seq->isUsed())
+	{
+		auto userScreen = dynamic_pointer_cast<UserScreen>(Screens::getScreenComponent("user"));
+		seq->init(userScreen->lastBar);
+	}
+
 	displayFromSq();
 }
 
-void EventsScreen::setTr0(int i)
+void EventsScreen::setFromTr(int i)
 {
 	if (i < 0 || i > 63)
 	{
 		return;
 	}
-	tr0 = i;
-	displayTr0();
+	fromTr = i;
+	displayFromTr();
 }
 
 void EventsScreen::setToSq(int i)
@@ -584,14 +595,14 @@ void EventsScreen::setToSq(int i)
 	displayToSq();
 }
 
-void EventsScreen::setTr1(int i)
+void EventsScreen::setToTr(int i)
 {
 	if (i < 0 || i > 63)
 	{
 		return;
 	}
-	tr1 = i;
-	displayTr1();
+	toTr = i;
+	displayToTr();
 }
 
 void EventsScreen::setModeMerge(bool b)
@@ -687,24 +698,24 @@ void EventsScreen::setStart(int i)
 	displayStart();
 }
 
-void EventsScreen::displayTr1()
+void EventsScreen::displayFromSq()
 {
-	findField("tr1").lock()->setText(to_string(tr1 + 1));
+	findField("from-sq").lock()->setText(to_string(sequencer.lock()->getActiveSequenceIndex() + 1));
+}
+
+void EventsScreen::displayFromTr()
+{
+	findField("from-tr").lock()->setText(to_string(fromTr + 1));
 }
 
 void EventsScreen::displayToSq()
 {
-	findField("tosq").lock()->setText(to_string(toSq + 1));
+	findField("to-sq").lock()->setText(to_string(toSq + 1));
 }
 
-void EventsScreen::displayTr0()
+void EventsScreen::displayToTr()
 {
-	findField("tr0").lock()->setText(to_string(tr0 + 1));
-}
-
-void EventsScreen::displayFromSq()
-{
-	findField("fromsq").lock()->setText(to_string(fromSq + 1));
+	findField("to-tr").lock()->setText(to_string(toTr + 1));
 }
 
 void EventsScreen::displayDurationMode()

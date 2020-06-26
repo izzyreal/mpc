@@ -47,7 +47,7 @@ void BarsScreen::function(int j)
 		auto eventsScreen = dynamic_pointer_cast<EventsScreen>(Screens::getScreenComponent("events"));
 		auto numberOfBars = (lastBar - firstBar + 1) * eventsScreen->copies;
 
-		auto fromSequence = sequencer.lock()->getSequence(eventsScreen->fromSq).lock();
+		auto fromSequence = sequencer.lock()->getActiveSequence().lock();
 		auto toSequence = sequencer.lock()->getSequence(eventsScreen->toSq).lock();
 
 		if (!toSequence->isUsed())
@@ -145,13 +145,13 @@ void BarsScreen::turnWheel(int i)
 	init();
 
 	auto eventsScreen = dynamic_pointer_cast<EventsScreen>(Screens::getScreenComponent("events"));
-	auto fromSequence = sequencer.lock()->getSequence(eventsScreen->fromSq).lock();
+	auto fromSequence = sequencer.lock()->getActiveSequence().lock();
 	auto toSequence = sequencer.lock()->getSequence(eventsScreen->toSq).lock();
 
 	if (param.compare("fromsq") == 0)
 	{
 
-		eventsScreen->fromSq += i;
+		eventsScreen->setFromSq(sequencer.lock()->getActiveSequenceIndex() + i);
 
 		displayFromSq();
 
@@ -163,7 +163,7 @@ void BarsScreen::turnWheel(int i)
 	}
 	else if (param.compare("tosq") == 0)
 	{
-		eventsScreen->toSq += i;
+		eventsScreen->setToSq(eventsScreen->toSq + i);
 
 		displayToSq();
 
@@ -205,8 +205,7 @@ void BarsScreen::displayToSq()
 
 void BarsScreen::displayFromSq()
 {
-	auto eventsScreen = dynamic_pointer_cast<EventsScreen>(Screens::getScreenComponent("events"));
-	findField("fromsq").lock()->setText(to_string(eventsScreen->fromSq + 1));
+	findField("fromsq").lock()->setText(to_string(sequencer.lock()->getActiveSequenceIndex() + 1));
 }
 
 void BarsScreen::displayAfterBar()
@@ -232,6 +231,7 @@ void BarsScreen::setLastBar(int i, int max)
 	}
 
 	lastBar = i;
+
 	if (lastBar < firstBar)
 	{
 		setFirstBar(lastBar, max);

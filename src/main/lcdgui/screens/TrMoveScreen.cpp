@@ -41,7 +41,7 @@ void TrMoveScreen::turnWheel(int i)
 	else if (param.compare("sq") == 0)
 	{
 		auto eventsScreen = dynamic_pointer_cast<EventsScreen>(Screens::getScreenComponent("events"));
-		eventsScreen->fromSq += i;
+		eventsScreen->setFromSq(sequencer.lock()->getActiveSequenceIndex() + i);
 		displaySq();
 		displayTrFields();
 		displayTrLabels();
@@ -141,8 +141,7 @@ void TrMoveScreen::function(int i)
 
 		if (isSelected())
 		{
-			auto eventsScreen = dynamic_pointer_cast<EventsScreen>(Screens::getScreenComponent("events"));
-			auto sequence = mpc.getSequencer().lock()->getSequence(eventsScreen->fromSq).lock();
+			auto sequence = mpc.getSequencer().lock()->getActiveSequence().lock();
 			insert(sequence.get());
 			ls.lock()->setFocus("tr1");
 			ls.lock()->setFunctionKeysArrangement(1);
@@ -189,7 +188,7 @@ void TrMoveScreen::displayTrLabels()
 	}
 
 	auto eventsScreen = dynamic_pointer_cast<EventsScreen>(Screens::getScreenComponent("events"));
-	auto sequence = mpc.getSequencer().lock()->getSequence(eventsScreen->fromSq).lock();
+	auto sequence = mpc.getSequencer().lock()->getActiveSequence().lock();
 
 	if (tr0Index >= 0)
 	{
@@ -233,7 +232,7 @@ void TrMoveScreen::displayTrLabels()
 void TrMoveScreen::displayTrFields()
 {
 	auto eventsScreen = dynamic_pointer_cast<EventsScreen>(Screens::getScreenComponent("events"));
-	auto sequence = mpc.getSequencer().lock()->getSequence(eventsScreen->fromSq).lock();
+	auto sequence = mpc.getSequencer().lock()->getActiveSequence().lock();
 	
 	if (isSelected())
 	{
@@ -274,9 +273,8 @@ void TrMoveScreen::displayTrFields()
 
 void TrMoveScreen::displaySq()
 {
-	auto eventsScreen = dynamic_pointer_cast<EventsScreen>(Screens::getScreenComponent("events"));
-	auto sequence = mpc.getSequencer().lock()->getSequence(eventsScreen->fromSq).lock();
-	findField("sq").lock()->setText(StrUtil::padLeft(to_string(eventsScreen->fromSq + 1), "0", 2) + "-" + sequence->getName());
+	auto sequence = mpc.getSequencer().lock()->getActiveSequence().lock();
+	findField("sq").lock()->setText(StrUtil::padLeft(to_string(sequencer.lock()->getActiveSequenceIndex() + 1), "0", 2) + "-" + sequence->getName());
 }
 
 bool TrMoveScreen::isSelected()

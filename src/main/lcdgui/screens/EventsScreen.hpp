@@ -32,9 +32,9 @@ namespace mpc::lcdgui::screens
 		void displayNotes();
 		void displayMidiNotes();
 		void displayDrumNotes();
-		void displayTr1();
+		void displayToTr();
 		void displayToSq();
-		void displayTr0();
+		void displayFromTr();
 		void displayFromSq();
 		void displayDurationMode();
 		void displayVelocityMode();
@@ -47,10 +47,9 @@ namespace mpc::lcdgui::screens
 		bool modeMerge = false;
 		int editFunctionNumber = 0;
 		int drumNote = 34; // Should come from Mpc.getNote()?
-		int fromSq = 0;
-		int tr0 = 0;
+		int fromTr = 0;
 		int toSq = 0;
-		int tr1 = 0;
+		int toTr = 0;
 		int start = 0;
 		int copies = 1;
 		int durationMode = 0;
@@ -63,9 +62,9 @@ namespace mpc::lcdgui::screens
 		void setEdit(int i);
 		void setDrumNote(int i);
 		void setFromSq(int i);
-		void setTr0(int i);
+		void setFromTr(int i);
 		void setToSq(int i);
-		void setTr1(int i);
+		void setToTr(int i);
 		void setModeMerge(bool b);
 		void setCopies(int i);
 		void setDurationMode(int i);
