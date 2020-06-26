@@ -39,7 +39,7 @@ void UserScreen::function(int i)
         ls.lock()->openScreen("events");
         break;
     case 1:
-        ls.lock()->openScreen("bar-copy");
+        ls.lock()->openScreen("bars");
         break;
     case 2:
         ls.lock()->openScreen("tr-move");

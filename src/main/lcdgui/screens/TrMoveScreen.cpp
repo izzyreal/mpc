@@ -120,7 +120,7 @@ void TrMoveScreen::function(int i)
 	}
 	case 1:
 	{
-		ls.lock()->openScreen("bar-copy");
+		ls.lock()->openScreen("bars");
 		break;
 	}
 	case 3:

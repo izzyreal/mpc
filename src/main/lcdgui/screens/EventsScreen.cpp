@@ -6,6 +6,8 @@
 #include <sequencer/TimeSignature.hpp>
 #include <sequencer/SeqUtil.hpp>
 
+#include <lcdgui/screens/UserScreen.hpp>
+
 #include <Util.hpp>
 
 #include <mpc/MpcSoundPlayerChannel.hpp>
@@ -23,13 +25,25 @@ EventsScreen::EventsScreen(const int layerIndex)
 
 void EventsScreen::open()
 {
-	displayEdit();
+	setFromSq(sequencer.lock()->getActiveSequenceIndex());
+	setToSq(sequencer.lock()->getActiveSequenceIndex());
+	setTr0(sequencer.lock()->getActiveTrackIndex());
+	setTr1(sequencer.lock()->getActiveTrackIndex());
+
+	auto seq = sequencer.lock()->getActiveSequence().lock();
+	if (!seq->isUsed())
+	{
+		auto userScreen = dynamic_pointer_cast<UserScreen>(Screens::getScreenComponent("user"));
+		seq->init(userScreen->lastBar);
+	}
+
+	time0 = 0;
+	time1 = seq->getLastTick();
 	displayTime();
+
+	displayEdit();
 	displayNotes();
-	findField("fromsq").lock()->setText(to_string(fromSq + 1));
-	findField("tr0").lock()->setText(to_string(tr0 + 1));
-	findField("tosq").lock()->setText(to_string(toSq + 1));
-	findField("tr1").lock()->setText(to_string(tr1 + 1));
+
 	displayMode();
 	displayStart();
 	displayCopies();
@@ -46,7 +60,7 @@ void EventsScreen::function(int i)
 	{
 	case 1:
 	{
-		ls.lock()->openScreen("bar-copy");
+		ls.lock()->openScreen("bars");
 		break;
 	}
 	case 2:

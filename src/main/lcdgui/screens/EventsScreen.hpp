@@ -5,7 +5,7 @@
 
 namespace mpc::lcdgui::screens
 {
-	class BarCopyScreen;
+	class BarsScreen;
 	class TrMoveScreen;
 }
 
@@ -76,7 +76,7 @@ namespace mpc::lcdgui::screens
 		void setStart(int startTicks);
 
 	private:
-		friend class mpc::lcdgui::screens::BarCopyScreen;
+		friend class mpc::lcdgui::screens::BarsScreen;
 		friend class mpc::lcdgui::screens::TrMoveScreen;
 
 	};

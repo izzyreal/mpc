@@ -3,7 +3,7 @@
 
 namespace mpc::lcdgui::screens
 {
-	class BarCopyScreen
+	class BarsScreen
 		: public mpc::lcdgui::ScreenComponent
 	{
 
@@ -11,7 +11,7 @@ namespace mpc::lcdgui::screens
 		void function(int j) override;
 		void turnWheel(int i) override;
 
-		BarCopyScreen(const int layerIndex);
+		BarsScreen(const int layerIndex);
 		void open() override;
 
 	private:
@@ -26,7 +26,6 @@ namespace mpc::lcdgui::screens
 		int lastBar = 0;
 		int firstBar = 0;
 		int afterBar = 0;
-		int copies = 1;
 		void setLastBar(int i, int max);
 		void setFirstBar(int i, int max);
 		void setAfterBar(int i, int max);

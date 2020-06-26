@@ -39,7 +39,7 @@ vector<string> screenNames = {
 "format",
 "setup",
 "events",
-"bar-copy",
+"bars",
 "tr-move",
 "user",
 "drum",
