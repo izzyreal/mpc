@@ -35,7 +35,22 @@ Field::Field(const string& name, int x, int y, int width)
 	preDrawClearRect.Clear();
 }
 
+void Field::setNextFocus(const std::string& nextFocus)
+{
+	this->nextFocus = nextFocus;
+}
+
 const int Field::BLINKING_RATE;
+
+void Field::Hide(bool b)
+{
+	if (b && focus)
+	{
+		mpc::Mpc::instance().getLayeredScreen().lock()->setFocus(nextFocus);
+	}
+
+	Component::Hide(b);
+}
 
 void Field::Draw(std::vector<std::vector<bool>>* pixels)
 {
@@ -43,7 +58,7 @@ void Field::Draw(std::vector<std::vector<bool>>* pixels)
 	{
 		return;
 	}
-
+	
 	auto r = getRect();
 
 	for (int i = r.L; i < r.R; i++)

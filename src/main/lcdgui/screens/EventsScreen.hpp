@@ -7,6 +7,7 @@ namespace mpc::lcdgui::screens
 {
 	class BarsScreen;
 	class TrMoveScreen;
+	class UserScreen;
 }
 
 namespace mpc::lcdgui::screens
@@ -31,7 +32,7 @@ namespace mpc::lcdgui::screens
 		void displayEdit();
 		void displayNotes();
 		void displayMidiNotes();
-		void displayDrumNotes();
+		void displayDrumNotes() override;
 		void displayToTr();
 		void displayToSq();
 		void displayFromTr();
@@ -42,11 +43,12 @@ namespace mpc::lcdgui::screens
 		void displayVelocityValue();
 
 	private:
-		std::vector<string> modeNames = { "ADD VALUE", "SUB VALUE", "MULTI VAL%", "SET TO VAL" };
-		std::vector<string> functionNames = { "COPY", "DURATION", "VELOCITY", "TRANSPOSE" };
+		int tab = 0;
+		const std::vector<string> tabNames{ "events", "bars", "tr-move", "user" };
+		const std::vector<string> modeNames{ "ADD VALUE", "SUB VALUE", "MULTI VAL%", "SET TO VAL" };
+		const std::vector<string> functionNames{ "COPY", "DURATION", "VELOCITY", "TRANSPOSE" };
 		bool modeMerge = false;
 		int editFunctionNumber = 0;
-		int drumNote = 34; // Should come from Mpc.getNote()?
 		int fromTr = 0;
 		int toSq = 0;
 		int toTr = 0;
@@ -77,6 +79,7 @@ namespace mpc::lcdgui::screens
 	private:
 		friend class mpc::lcdgui::screens::BarsScreen;
 		friend class mpc::lcdgui::screens::TrMoveScreen;
+		friend class mpc::lcdgui::screens::UserScreen;
 
 	};
 }

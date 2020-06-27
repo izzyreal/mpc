@@ -135,6 +135,7 @@
 #include <lcdgui/screens/dialog2/DeleteAllFilesScreen.hpp>
 
 #include <file/FileUtil.hpp>
+#include <lang/StrUtil.hpp>
 
 #include <rapidjson/filereadstream.h>
 
@@ -144,6 +145,7 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace moduru::file;
+using namespace moduru::lang;
 using namespace rapidjson;
 using namespace std;
 
@@ -270,8 +272,16 @@ pair<vector<shared_ptr<Component>>, map<string, vector<string>>> Screens::get(co
 				continue;
 			}
 
-			auto parameterName = parameters[i].GetString();
-			
+			auto parameterName = string(parameters[i].GetString());
+			auto parameterNames = StrUtil::split(parameterName, ',');
+			string nextFocus = "_";
+
+			if (parameterNames.size() > 1)
+			{
+				parameterName = parameterNames[0];
+				nextFocus = parameterNames[1];
+			}
+
 			row.push_back(parameterName);
 
 			components.push_back(
@@ -281,6 +291,10 @@ pair<vector<shared_ptr<Component>>, map<string, vector<string>>> Screens::get(co
 				y[i - skipCounter].GetInt(),
 				tfsize[i - skipCounter].GetInt()
 				));
+
+			auto parameter = components.back();
+			auto field = parameter->findField(parameterName).lock();
+			field->setNextFocus(nextFocus);
 
 			previous = parameterName;
 		}

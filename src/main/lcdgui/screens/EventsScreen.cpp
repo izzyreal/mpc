@@ -25,12 +25,19 @@ EventsScreen::EventsScreen(const int layerIndex)
 
 void EventsScreen::open()
 {
+	if (tab != 0)
+	{
+		ls.lock()->openScreen(tabNames[tab]);
+		return;
+	}
+
 	setFromSq(sequencer.lock()->getActiveSequenceIndex());
 	setToSq(sequencer.lock()->getActiveSequenceIndex());
 	setFromTr(sequencer.lock()->getActiveTrackIndex());
 	setToTr(sequencer.lock()->getActiveTrackIndex());
 
 	auto seq = sequencer.lock()->getActiveSequence().lock();
+
 	if (!seq->isUsed())
 	{
 		auto userScreen = dynamic_pointer_cast<UserScreen>(Screens::getScreenComponent("user"));
@@ -58,18 +65,12 @@ void EventsScreen::function(int i)
 	
 	switch (i)
 	{
+	// Intentional fall-through
 	case 1:
-	{
-		ls.lock()->openScreen("bars");
-		break;
-	}
 	case 2:
-	{
-		ls.lock()->openScreen("tr-move");
-		break;
-	}
 	case 3:
-		ls.lock()->openScreen("user");
+		tab = i;
+		ls.lock()->openScreen(tabNames[tab]);
 		break;
 	case 5:
 	{
@@ -119,7 +120,7 @@ void EventsScreen::function(int i)
 					}
 					else
 					{
-						if (drumNote != 34 && drumNote != ne->getNote())
+						if (mpc.getNote() != 34 && mpc.getNote() != ne->getNote())
 						{
 							continue;
 						}
@@ -231,8 +232,12 @@ void EventsScreen::turnWheel(int i)
 	init();
 	auto fromSequence = sequencer.lock()->getActiveSequence().lock();
 	auto toSequence = sequencer.lock()->getSequence(toSq).lock();
+	auto track = fromSequence->getTrack(fromTr).lock().get();
 
-	checkAllTimesAndNotes(i, fromSequence.get());
+	if (checkAllTimesAndNotes(i, fromSequence.get(), track))
+	{
+		return;
+	}
 
 	if (param.compare("start0") == 0)
 	{
@@ -246,21 +251,9 @@ void EventsScreen::turnWheel(int i)
 	{
 		setStart(SeqUtil::setClock(SeqUtil::getClock(toSequence.get(), start) + i, toSequence.get(), start));
 	}
-	else if (param.compare("editfunction") == 0)
+	else if (param.compare("edit") == 0)
 	{
 		setEdit(editFunctionNumber + i);
-	}
-	else if (param.compare("drumnote") == 0)
-	{
-		setDrumNote(drumNote + i);
-	}
-	else if (param.compare("midinote0") == 0)
-	{
-		setMidiNote0(note0 + i);
-	}
-	else if (param.compare("midinote1") == 0)
-	{
-		setMidiNote1(note0 + i);
 	}
 	else if (param.compare("from-sq") == 0)
 	{
@@ -310,15 +303,18 @@ void EventsScreen::turnWheel(int i)
 			setTransposeAmount(transposeAmount + i);
 		}
 	}
-	else if (param.compare("copies") == 0) {
+	else if (param.compare("copies") == 0)
+	{
 		if (editFunctionNumber == 0)
 		{
 			setCopies(copies + i);
 		}
-		else if (editFunctionNumber == 1) {
+		else if (editFunctionNumber == 1)
+		{
 			setDuration(durationValue + i);
 		}
-		else if (editFunctionNumber == 2) {
+		else if (editFunctionNumber == 2)
+		{
 			setVelocityValue(velocityValue + i);
 		}
 	}
@@ -392,7 +388,7 @@ void EventsScreen::displayMode()
 
 void EventsScreen::displayEdit()
 {
-	findField("editfunction").lock()->setText(functionNames[editFunctionNumber]);
+	findField("edit").lock()->setText(functionNames[editFunctionNumber]);
 
 	if (editFunctionNumber == 0)
 	{
@@ -487,49 +483,49 @@ void EventsScreen::displayNotes()
 {
 	init();
 
-	findField("midinote0").lock()->setSize(8 * 6, 9);
-	findField("midinote1").lock()->setSize(8 * 6, 9);
-	findField("midinote1").lock()->setLocation(62, 39);
+	auto sequence = sequencer.lock()->getActiveSequence().lock();
+	auto track = sequence->getTrack(fromTr).lock();
 
-	if (track.lock()->getBusNumber() == 0)
+	if (track->getBusNumber() == 0)
 	{
-		findField("drumnote").lock()->Hide(true);
-		findField("midinote0").lock()->Hide(false);
-		findField("midinote1").lock()->Hide(false);
-		findLabel("midinote1").lock()->Hide(false);
+		findField("note0").lock()->setSize(48, 9);
+		findField("note1").lock()->Hide(false);
+		findLabel("note1").lock()->Hide(false);
 		displayMidiNotes();
 	}
 	else
 	{
-		findField("drumnote").lock()->Hide(false);
-		findField("midinote0").lock()->Hide(true);
-		findField("midinote1").lock()->Hide(true);
-		findLabel("midinote1").lock()->Hide(true);
+		findField("note0").lock()->setSize(37, 9);
+		findField("note1").lock()->Hide(true);
+		findLabel("note1").lock()->Hide(true);
 		displayDrumNotes();
 	}
 }
 
 void EventsScreen::displayMidiNotes()
 {
-	findField("midinote0").lock()->setText(StrUtil::padLeft(to_string(note0), " ", 3) + "(" + mpc::Util::noteNames()[note0] + u8"\u00D4");
-	findField("midinote1").lock()->setText(StrUtil::padLeft(to_string(note1), " ", 3) + "(" + mpc::Util::noteNames()[note1] + u8"\u00D4");
+	findField("note0").lock()->setText(StrUtil::padLeft(to_string(note0), " ", 3) + "(" + mpc::Util::noteNames()[note0] + u8"\u00D4");
+	findField("note1").lock()->setText(StrUtil::padLeft(to_string(note1), " ", 3) + "(" + mpc::Util::noteNames()[note1] + u8"\u00D4");
 }
 
 void EventsScreen::displayDrumNotes()
 {
-	auto sequence = sequencer.lock()->getActiveSequence().lock();
-	auto track = sequence->getTrack(fromTr).lock();
-	auto program = sampler.lock()->getProgram(sampler.lock()->getDrum(track->getBusNumber() - 1)->getProgram()).lock();
-	
+	auto drumNote = mpc.getNote();
+
 	if (drumNote == 34)
 	{
-		findField("drumnote").lock()->setText("ALL");
+		findField("note0").lock()->setText("ALL");
 	}
 	else
 	{
-		auto padNumber = StrUtil::padLeft(to_string(drumNote), " ", 2);
-		auto padName = sampler.lock()->getPadName(program->getPadIndexFromNote(drumNote));
-		findField("drumnote").lock()->setText(padNumber + "/" + padName);
+		auto sequence = sequencer.lock()->getActiveSequence().lock();
+		auto track = sequence->getTrack(fromTr).lock();
+		auto program = sampler.lock()->getProgram(sampler.lock()->getDrum(track->getBusNumber() - 1)->getProgram()).lock();
+		
+		auto noteText = StrUtil::padLeft(to_string(drumNote), " ", 2);
+		auto padText = sampler.lock()->getPadName(program->getPadIndexFromNote(drumNote));
+		
+		findField("note0").lock()->setText(noteText + "/" + padText);
 	}
 }
 
@@ -539,18 +535,9 @@ void EventsScreen::setEdit(int i)
 	{
 		return;
 	}
+
 	editFunctionNumber = i;
 	displayEdit();
-}
-
-void EventsScreen::setDrumNote(int i)
-{
-	if (i < 34 || i > 98)
-	{
-		return;
-	}
-	drumNote = i;
-	displayDrumNotes();
 }
 
 void EventsScreen::setFromSq(int i)

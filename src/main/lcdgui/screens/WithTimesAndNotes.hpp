@@ -3,6 +3,7 @@
 namespace mpc::sequencer
 {
 	class Sequence;
+	class Track;
 }
 
 namespace mpc::lcdgui::screens
@@ -20,16 +21,17 @@ namespace mpc::lcdgui::screens
 		void setTime0(int time0);
 		void setTime1(int time1);
 		
-		void setMidiNote0(int note);
-		void setMidiNote1(int note);
+		void setNote0(int note);
+		void setNote1(int note);
 
 	protected:
 		virtual void displayNotes() = 0;
+		virtual void displayDrumNotes() {}
 		virtual void displayTime() = 0;
 
 	public:
-		void checkAllTimes(int notch, mpc::sequencer::Sequence* sequence = nullptr);
-		void checkAllTimesAndNotes(int notch, mpc::sequencer::Sequence* sequence = nullptr);
+		bool checkAllTimes(int notch, mpc::sequencer::Sequence* sequence = nullptr);
+		bool checkAllTimesAndNotes(int notch, mpc::sequencer::Sequence* sequence = nullptr, mpc::sequencer::Track* track = nullptr);
 
 	};
 }

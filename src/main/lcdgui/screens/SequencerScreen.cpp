@@ -89,7 +89,7 @@ vector<string> SequencerScreen::busNames = vector<string>{ "MIDI", "DRUM1", "DRU
 
 void SequencerScreen::displayBus()
 {
-	findField("tracktype").lock()->setText(busNames[sequencer.lock()->getActiveTrack().lock()->getBusNumber()]);
+	findField("bus").lock()->setText(busNames[sequencer.lock()->getActiveTrack().lock()->getBusNumber()]);
 	displayDeviceName();
 }
 
@@ -349,7 +349,7 @@ void SequencerScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 	{
 		displayVelo();
 	}
-	else if (s.compare("tracktype") == 0)
+	else if (s.compare("bus") == 0)
 	{
 		displayBus();
 	}
@@ -391,17 +391,17 @@ void SequencerScreen::pressEnter()
 		if (focus.compare("now0") == 0)
 		{
 			sequencer.lock()->setBar(candidate - 1);
-			setLastFocus("step-editor", "viewmodenumber");
+			setLastFocus("step-editor", "view");
 		}
 		else if (focus.compare("now1") == 0)
 		{
 			sequencer.lock()->setBeat(candidate - 1);
-			setLastFocus("step-editor", "viewmodenumber");
+			setLastFocus("step-editor", "view");
 		}
 		else if (focus.compare("now2") == 0)
 		{
 			sequencer.lock()->setClock(candidate);
-			setLastFocus("step-editor", "viewmodenumber");
+			setLastFocus("step-editor", "view");
 		}
 		else if (focus.compare("tempo") == 0)
 		{
@@ -495,7 +495,7 @@ void SequencerScreen::turnWheel(int i)
 			sequencer.lock()->trackDown();
 		}
 	}
-	else if (focus.compare("tracktype") == 0)
+	else if (focus.compare("bus") == 0)
 	{
 		checkTrackUsed();
 
@@ -517,28 +517,6 @@ void SequencerScreen::turnWheel(int i)
 					{
 						setLastFocus("step-editor", "a" + to_string(eventNumber));
 					}
-				}
-			}
-		}
-
-		lastFocus = getLastFocus("events");
-
-		string midinote = "midinote";
-		string drumnote = "drumnote";
-
-		if (lastFocus.compare("") != 0) {
-			if (std::mismatch(midinote.begin(), midinote.end(), lastFocus.begin()).first == midinote.end())
-			{
-				if (track.lock()->getBusNumber() != 0)
-				{
-					setLastFocus("events", "drumnote");
-				}
-			}
-			else if (std::mismatch(drumnote.begin(), drumnote.end(), lastFocus.begin()).first == drumnote.end())
-			{
-				if (track.lock()->getBusNumber() == 0)
-				{
-					setLastFocus("events", "midinote0");
 				}
 			}
 		}
@@ -668,7 +646,7 @@ void SequencerScreen::openWindow()
 	{
 		openScreen("multi-recording-setup");
 	}
-	else if (focus.compare("tracktype") == 0)
+	else if (focus.compare("bus") == 0)
 	{
 		openScreen("midi-input");
 	}

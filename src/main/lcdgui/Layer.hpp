@@ -21,7 +21,7 @@ namespace mpc::lcdgui
 	public:
 		mpc::lcdgui::Background* getBackground();
 		mpc::lcdgui::FunctionKeys* getFunctionKeys();
-		void setFocus(std::string textFieldName);
+		bool setFocus(std::string textFieldName);
 		std::string getFocus();
 
 	public:

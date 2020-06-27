@@ -124,27 +124,27 @@ void EditVelocityScreen::displayNotes()
 	
 	if (track.lock()->getBusNumber() == 0)
 	{
-		findField("notes0").lock()->setSize(8 * 6 + 1, 9);
-		findLabel("notes1").lock()->Hide(false);
-		findField("notes1").lock()->Hide(false);
-		findField("notes0").lock()->setText(moduru::lang::StrUtil::padLeft(to_string(note0), " ", 3) + "(" + mpc::Util::noteNames()[note0] + u8"\u00D4");
-		findField("notes1").lock()->setText(moduru::lang::StrUtil::padLeft(to_string(note1), " ", 3) + "(" + mpc::Util::noteNames()[note1] + u8"\u00D4");
+		findField("note0").lock()->setSize(8 * 6 + 1, 9);
+		findLabel("note1").lock()->Hide(false);
+		findField("note1").lock()->Hide(false);
+		findField("note0").lock()->setText(moduru::lang::StrUtil::padLeft(to_string(note0), " ", 3) + "(" + mpc::Util::noteNames()[note0] + u8"\u00D4");
+		findField("note1").lock()->setText(moduru::lang::StrUtil::padLeft(to_string(note1), " ", 3) + "(" + mpc::Util::noteNames()[note1] + u8"\u00D4");
 	}
 	else
 	{
-		findField("notes0").lock()->setSize(6 * 6 + 1, 9);
+		findField("note0").lock()->setSize(6 * 6 + 1, 9);
 		
 		if (mpc.getNote() != 34)
 		{
-			findField("notes0").lock()->setText(to_string(mpc.getNote()) + "/" + sampler.lock()->getPadName(mpc.getPad()));
+			findField("note0").lock()->setText(to_string(mpc.getNote()) + "/" + sampler.lock()->getPadName(mpc.getPad()));
 		}
 		else
 		{
-			findField("notes0").lock()->setText("ALL");
+			findField("note0").lock()->setText("ALL");
 		}
 		
-		findLabel("notes1").lock()->Hide(true);
-		findField("notes1").lock()->Hide(true);
+		findLabel("note1").lock()->Hide(true);
+		findField("note1").lock()->Hide(true);
 	}
 }
 

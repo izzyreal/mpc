@@ -208,11 +208,6 @@ vector<weak_ptr<Parameter>> Component::findParameters()
 
 weak_ptr<Component> Component::addChild(shared_ptr<Component> child)
 {
-	if (name.compare("tempo-change") == 0 && child->getName().find("a") != string::npos)
-	{
-		printf("");
-	}
-
 	child->parent = this;
 	children.push_back(move(child));
 	SetDirty();
@@ -238,12 +233,6 @@ void Component::removeChild(weak_ptr<Component> child)
 
 void Component::addChildren(vector<shared_ptr<Component>> children)
 {
-
-	if (name.compare("tempo-change") == 0)
-	{
-		printf("");
-	}
-
 	for (auto& c : children)
 	{
 		addChild(c);

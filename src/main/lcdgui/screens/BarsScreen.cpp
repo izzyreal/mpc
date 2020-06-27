@@ -26,25 +26,21 @@ void BarsScreen::open()
 void BarsScreen::function(int j)
 {
 	init();
+	auto eventsScreen = dynamic_pointer_cast<EventsScreen>(Screens::getScreenComponent("events"));
 
 	switch (j)
 	{
+		// Intentional fall-through
 	case 0:
-	{
-		ls.lock()->openScreen("events");
-		break;
-	}
 	case 2:
-		ls.lock()->openScreen("tr-move");
-		break;
 	case 3:
-		ls.lock()->openScreen("user");
-		break;
+		eventsScreen->tab = j;
+		ls.lock()->openScreen(eventsScreen->tabNames[eventsScreen->tab]);
+	break;
 	case 4:
 		break;
 	case 5:
 	{
-		auto eventsScreen = dynamic_pointer_cast<EventsScreen>(Screens::getScreenComponent("events"));
 		auto numberOfBars = (lastBar - firstBar + 1) * eventsScreen->copies;
 
 		auto fromSequence = sequencer.lock()->getActiveSequence().lock();

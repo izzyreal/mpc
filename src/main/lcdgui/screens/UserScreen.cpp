@@ -2,6 +2,8 @@
 
 #include <sequencer/TimeSignature.hpp>
 
+#include <lcdgui/screens/EventsScreen.hpp>
+
 #include <nvram/NvRam.hpp>
 
 #include <Util.hpp>
@@ -24,7 +26,7 @@ void UserScreen::open()
 	displayBars();
 	displayPgm();
 	displayRecordingMode();
-	displayTrackType();
+	displayBus();
 	displayDeviceNumber();
 	displayVelo();
 }
@@ -35,15 +37,16 @@ void UserScreen::function(int i)
 	
 	switch (i)
 	{
-    case 0:
-        ls.lock()->openScreen("events");
-        break;
-    case 1:
-        ls.lock()->openScreen("bars");
-        break;
-    case 2:
-        ls.lock()->openScreen("tr-move");
-        break;
+		// Intentional fall-through
+		case 0:
+		case 1:
+		case 2:
+		{
+			auto eventsScreen = dynamic_pointer_cast<EventsScreen>(Screens::getScreenComponent("events"));
+			eventsScreen->tab = i;
+			ls.lock()->openScreen(eventsScreen->tabNames[eventsScreen->tab]);
+			break;
+		}
     }
 
 }
@@ -84,7 +87,7 @@ void UserScreen::turnWheel(int i)
 	{
 		setRecordingModeMulti(i > 0);
 	}
-	else if (param.compare("tracktype") == 0)
+	else if (param.compare("bus") == 0)
 	{
 		setBus(bus + i);
 	}
@@ -137,9 +140,9 @@ void UserScreen::displayRecordingMode()
 	findField("recordingmode").lock()->setText(recordingModeMulti ? "M" : "S");
 }
 
-void UserScreen::displayTrackType()
+void UserScreen::displayBus()
 {
-	findField("tracktype").lock()->setText(busNames[bus]);
+	findField("bus").lock()->setText(busNames[bus]);
 	displayDeviceName();
 }
 
@@ -269,7 +272,7 @@ void UserScreen::setBus(int i)
 	}
 
 	bus = i;
-	displayTrackType();
+	displayBus();
 }
 
 void UserScreen::setDeviceNumber(int i)

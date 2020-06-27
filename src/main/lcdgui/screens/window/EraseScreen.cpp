@@ -249,38 +249,38 @@ void EraseScreen::displayNotes()
 
 	if (erase != 0 && ((erase == 1 && type != 0) || (erase == 2 && type != 0)))
 	{
-		findField("notes0").lock()->Hide(true);
-		findLabel("notes0").lock()->Hide(true);
-		findField("notes1").lock()->Hide(true);
-		findLabel("notes1").lock()->Hide(true);
+		findField("note0").lock()->Hide(true);
+		findLabel("note0").lock()->Hide(true);
+		findField("note1").lock()->Hide(true);
+		findLabel("note1").lock()->Hide(true);
 		return;
 	}
 
 	auto bus = sequencer.lock()->getActiveTrack().lock()->getBusNumber();
 
-	findField("notes0").lock()->Hide(false);
-	findLabel("notes0").lock()->Hide(false);
-	findField("notes1").lock()->Hide(bus != 0);
-	findLabel("notes1").lock()->Hide(bus != 0);
+	findField("note0").lock()->Hide(false);
+	findLabel("note0").lock()->Hide(false);
+	findField("note1").lock()->Hide(bus != 0);
+	findLabel("note1").lock()->Hide(bus != 0);
 
 	if (bus > 0)
 	{
-		findField("notes0").lock()->setSize(6 * 6 + 1, 8);
+		findField("note0").lock()->setSize(6 * 6 + 1, 8);
 
 		if (mpc.getNote() != 34)
 		{
-			findField("notes0").lock()->setText(to_string(mpc.getNote()) + "/" + sampler.lock()->getPadName(mpc.getPad()));
+			findField("note0").lock()->setText(to_string(mpc.getNote()) + "/" + sampler.lock()->getPadName(mpc.getPad()));
 		}
 		else {
-			findField("notes0").lock()->setText("ALL");
+			findField("note0").lock()->setText("ALL");
 		}
 
 	}
 	else
 	{
-		findField("notes0").lock()->setSize(8 * 6, 8);
-		findField("notes0").lock()->setText((StrUtil::padLeft(to_string(midiNote0), " ", 3) + "(" + mpc::Util::noteNames()[midiNote0]) + ")");
-		findField("notes1").lock()->setText((StrUtil::padLeft(to_string(midiNote1), " ", 3) + "(" + mpc::Util::noteNames()[midiNote1]) + ")");
+		findField("note0").lock()->setSize(8 * 6, 8);
+		findField("note0").lock()->setText((StrUtil::padLeft(to_string(midiNote0), " ", 3) + "(" + mpc::Util::noteNames()[midiNote0]) + ")");
+		findField("note1").lock()->setText((StrUtil::padLeft(to_string(midiNote1), " ", 3) + "(" + mpc::Util::noteNames()[midiNote1]) + ")");
 	}
 }
 

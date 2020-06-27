@@ -683,7 +683,7 @@ void Sequencer::notifyTrack()
     
     notifyObservers(string("velocityratio"));
     
-    notifyObservers(string("tracktype"));
+    notifyObservers(string("bus"));
     
     notifyObservers(string("device"));
     

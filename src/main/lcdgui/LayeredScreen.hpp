@@ -38,18 +38,14 @@ namespace mpc::lcdgui {
 
 		std::vector<std::weak_ptr<Layer>> layers;
 
-		int getCurrentFieldIndex();
-		std::weak_ptr<mpc::lcdgui::Field> findBelow(std::weak_ptr<mpc::lcdgui::Field> tf);
-		std::weak_ptr<mpc::lcdgui::Field> findAbove(std::weak_ptr<mpc::lcdgui::Field> tf);
-
 		// 0 = left, 1 = right, 2 = up, 3 = down
-		bool transfer(int direction, bool setFocusEnabled, std::shared_ptr<mpc::lcdgui::Field>& nextFocus);
+		bool transfer(int direction);
 
 	public:
 		void transferLeft();
 		void transferRight();
-		std::string findBelow(std::string tf);
-		std::string findAbove(std::string tf);
+		void transferUp();
+		void transferDown();
 		//void transferFocus(bool backwards);
 		Layer* getLayer(int i);
 		int getFocusedLayerIndex();
@@ -102,7 +98,7 @@ namespace mpc::lcdgui {
 
 	public:
 		std::string getFocus();
-		void setFocus(const std::string& focus);
+		bool setFocus(const std::string& focus);
 
 	public:
 		LayeredScreen();

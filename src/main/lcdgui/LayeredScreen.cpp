@@ -20,17 +20,16 @@
 #include <lcdgui/screens/SampleScreen.hpp>
 
 #include <file/FileUtil.hpp>
+#include <lang/StrUtil.hpp>
 
 #include <cmath>
 #include <set>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
-
 using namespace moduru::file;
-
+using namespace moduru::lang;
 using namespace rapidjson;
-
 using namespace std;
 
 static moduru::gui::BMFParser _bmfParser = moduru::gui::BMFParser(string(mpc::Paths::resPath() + moduru::file::FileUtil::getSeparator() + "font.fnt"));
@@ -67,33 +66,6 @@ weak_ptr<ScreenComponent> LayeredScreen::findScreenComponent()
 	return getFocusedLayer().lock()->findScreenComponent();
 }
 
-int LayeredScreen::getCurrentFieldIndex()
-{
-	int currentIndex;
-	auto layer = layers[focusedLayerIndex].lock();
-	auto fields = layer->findFields();
-	int size = fields.size();
-	
-	for (currentIndex = 0; currentIndex <= size; currentIndex++)
-	{
-		if (currentIndex == size)
-		{
-			break;
-		}
-
-		if (fields[currentIndex].lock()->getName().compare(layer->getFocus()) == 0)
-		{
-			break;
-		}
-	}
-	
-	if (currentIndex == size)
-	{
-		return -1;
-	}
-	return currentIndex;
-}
-
 int LayeredScreen::openScreen(string screenName)
 {
 	if (currentScreenName.compare(screenName) == 0)
@@ -121,9 +93,9 @@ int LayeredScreen::openScreen(string screenName)
 		// This field may not be visible the next time we visit this screen.
 		// Like the real 2KXL we always set focus to the first Notes: field
 		// if the current focus is hte second Notes: field.
-		if (getFocus().compare("notes1") == 0)
+		if (getFocus().compare("note1") == 0)
 		{
-			setFocus("notes0");
+			setFocus("note0");
 		}
 	}
 
@@ -151,12 +123,13 @@ int LayeredScreen::openScreen(string screenName)
 
 	getFocusedLayer().lock()->addChild(screenComponent);
 	
-	screenComponent->open();
-
 	if (screenComponent->findFields().size() > 0)
 	{
 		returnToLastFocus(screenComponent->findFields().front().lock()->getName());
 	}
+
+	screenComponent->open();
+
 	return focusedLayerIndex;
 }
 
@@ -341,7 +314,7 @@ std::weak_ptr<Layer> LayeredScreen::getFocusedLayer()
 	return layers[focusedLayerIndex];
 }
 
-bool LayeredScreen::transfer(int direction, bool setFocusEnabled, shared_ptr<Field>& nextFocus)
+bool LayeredScreen::transfer(int direction)
 {
 	auto screen = findScreenComponent().lock();
 	auto currentFocus = getFocusedLayer().lock()->findField(getFocus()).lock();
@@ -354,37 +327,27 @@ bool LayeredScreen::transfer(int direction, bool setFocusEnabled, shared_ptr<Fie
 	}
 
 	auto mapping = (*mapCandidate).second;
-	auto nextFocusName = mapping[direction];
+	auto nextFocusNames = StrUtil::split(mapping[direction], ',');
 
-	if (nextFocusName.compare("_") == 0)
+	for (auto& nextFocusName : nextFocusNames)
 	{
-		return false;
-	}
-
-	if (setFocusEnabled)
-	{
-		setFocus(nextFocusName);
-	}
-	else
-	{
-		auto candidate = getFocusedLayer().lock()->findField(nextFocusName).lock();
-		if (!candidate->IsHidden() && candidate->isFocusable())
-		{
-			nextFocus = candidate;
-		}
-		else
+		if (nextFocusName.compare("_") == 0)
 		{
 			return false;
 		}
+
+		if (setFocus(nextFocusName))
+		{
+			return true;
+		}
 	}
 
-	return true;
+	return false;
 }
 
 void LayeredScreen::transferLeft()
 {
-	shared_ptr<Field> dummyCandidate;
-	if (transfer(0, true, dummyCandidate))
+	if (transfer(0))
 	{
 		return;
 	}
@@ -435,8 +398,7 @@ void LayeredScreen::transferLeft()
 
 void LayeredScreen::transferRight()
 {
-	shared_ptr<Field> dummyCandidate;
-	if (transfer(1, true, dummyCandidate))
+	if (transfer(1))
 	{
 		return;
 	}
@@ -485,171 +447,140 @@ void LayeredScreen::transferRight()
 	}
 }
 
-weak_ptr<Field> LayeredScreen::findBelow(weak_ptr<Field> tf0)
+void LayeredScreen::transferDown()
 {
-	shared_ptr<Field> newCandidate;
-	if (transfer(3, false, newCandidate))
+	if (transfer(3))
 	{
-		return newCandidate;
+		return;
 	}
 
 	int marginChars = 8;
 	int minDistV = 7;
 	int maxDistH = 6 * marginChars;
-	weak_ptr<Field> result = tf0;
-	
-	auto lTf0 = tf0.lock();
-	
-	for (auto& a : getFocusedLayer().lock()->findFields())
+	auto current = getFocusedLayer().lock()->findField(getFocus()).lock();
+	shared_ptr<Field> next;
+
+	for (auto& field : getFocusedLayer().lock()->findFields())
 	{
-		auto tf1 = a.lock();
-		auto B1 = tf1->getY() + tf1->getH();
-		auto B0 = lTf0->getY() + lTf0->getH();
-		auto MW1 = 0.5f * (float)(tf1->getX()*2 + tf1->getW());
-		auto MW0 = 0.5f * (float)(lTf0->getX() * 2 + lTf0->getW());
+		auto B1 = field.lock()->getRect().B;
+		auto B0 = current->getRect().B;
+		auto MW1 = 0.5f * (float)(field.lock()->getX() * 2 + field.lock()->getW());
+		auto MW0 = 0.5f * (float)(current->getX() * 2 + current->getW());
 
 		if (B1 - B0 >= minDistV)
 		{
 			if (abs((int)(MW1 - MW0)) <= maxDistH)
 			{
-				if (!tf1->IsHidden() && tf1->isFocusable())
+				if (!field.lock()->IsHidden() && field.lock()->isFocusable())
 				{
-					result = tf1;
+					next = field.lock();
 					break;
 				}
 			}
 		}
 	}
 
-	if (result.lock() == lTf0)
+	if (next == current)
 	{
 		marginChars = 16;
 		maxDistH = 6 * marginChars;
 
-		for (auto& a : getFocusedLayer().lock()->findFields())
+		for (auto& field : getFocusedLayer().lock()->findFields())
 		{
-			auto tf1 = a.lock();
-			auto B1 = tf1->getY() + tf1->getH();
-			auto B0 = lTf0->getY() + lTf0->getH();
-			auto MW1 = 0.5f * (float)(tf1->getX() * 2 + tf1->getW());
-			auto MW0 = 0.5f * (float)(lTf0->getX() * 2 + lTf0->getW());
+			auto B0 = current->getY() + current->getH();
+			auto B1 = field.lock()->getY() + field.lock()->getH();
+			auto MW0 = 0.5f * (float)(current->getX() * 2 + current->getW());
+			auto MW1 = 0.5f * (float)(field.lock()->getX() * 2 + field.lock()->getW());
 
 			if (B1 - B0 >= minDistV)
 			{
 				if (abs((int)(MW1 - MW0)) <= maxDistH)
 				{
-					if (!tf1->IsHidden() && tf1->isFocusable())
+					if (!field.lock()->IsHidden() && field.lock()->isFocusable())
 					{
-						result = tf1;
+						next = field.lock();
 						break;
 					}
 				}
 			}
 		}
 	}
-	return result;
+
+	if (next)
+	{
+		setFocus(next->getName());
+	}
 }
 
-weak_ptr<Field> LayeredScreen::findAbove(weak_ptr<Field> tf0)
+void LayeredScreen::transferUp()
 {
 	shared_ptr<Field> newCandidate;
-	if (transfer(2, false, newCandidate))
+
+	if (transfer(2))
 	{
-		return newCandidate;
+		return;
 	}
 
 	int marginChars = 8;
 	int minDistV = -7;
 	int maxDistH = 6 * marginChars;
-	weak_ptr<Field> result = tf0;
-	auto lTf0 = tf0.lock();
+	auto result = getFocusedLayer().lock()->findField(getFocus()).lock();
+	shared_ptr<Field> next;
 	
 	auto revComponents = getFocusedLayer().lock()->findFields();
 
 	reverse(revComponents.begin(), revComponents.end());
 
-	for (auto& a : revComponents)
+	for (auto& field : revComponents)
 	{
-		auto tf1 = a.lock();
-		auto B1 = tf1->getY() + tf1->getH();
-		auto B0 = lTf0->getY() + lTf0->getH();
-		auto MW1 = 0.5f * (float)(tf1->getX() * 2 + tf1->getW());
-		auto MW0 = 0.5f * (float)(lTf0->getX() * 2 + lTf0->getW());
+		auto B1 = field.lock()->getY() + field.lock()->getH();
+		auto B0 = result->getY() + result->getH();
+		auto MW1 = 0.5f * (float)(field.lock()->getX() * 2 + field.lock()->getW());
+		auto MW0 = 0.5f * (float)(result->getX() * 2 + result->getW());
 
 		if (B1 - B0 <= minDistV)
 		{
 			if (abs((int)(MW1 - MW0)) <= maxDistH)
 			{
-				if (!tf1->IsHidden() && tf1->isFocusable())
+				if (!field.lock()->IsHidden() && field.lock()->isFocusable())
 				{
-					result = tf1;
+					next = field.lock();
 					break;
 				}
 			}
 		}
 	}
 
-	if (result.lock() == lTf0)
+	if (next == result)
 	{
 		marginChars = 16;
 		maxDistH = 6 * marginChars;
 	
-		for (auto& a : revComponents)
+		for (auto& field : revComponents)
 		{
-			auto tf1 = a.lock();
-			auto B1 = tf1->getY() + tf1->getH();
-			auto B0 = lTf0->getY() + lTf0->getH();
-			auto MW1 = 0.5f * (float)(tf1->getX() * 2 + tf1->getW());
-			auto MW0 = 0.5f * (float)(lTf0->getX() * 2 + lTf0->getW());
+			auto B1 = field.lock()->getY() + field.lock()->getH();
+			auto B0 = result->getY() + result->getH();
+			auto MW1 = 0.5f * (float)(field.lock()->getX() * 2 + field.lock()->getW());
+			auto MW0 = 0.5f * (float)(field.lock()->getX() * 2 + field.lock()->getW());
 
 			if (B1 - B0 <= minDistV)
 			{
 				if (abs((int)(MW1 - MW0)) <= maxDistH)
 				{
-					if (!tf1->IsHidden() && tf1->isFocusable())
+					if (!field.lock()->IsHidden() && field.lock()->isFocusable())
 					{
-						result = tf1;
+						next = field.lock();
 						break;
 					}
 				}
 			}
 		}
 	}
-	return result;
-}
 
-string LayeredScreen::findBelow(string tf0)
-{
-	string result = tf0;
-
-	for (auto& a : getFocusedLayer().lock()->findFields())
+	if (next)
 	{
-		auto candidate = a.lock();
-
-		if (candidate->getName().compare(tf0) == 0)
-		{
-			result = findBelow(candidate).lock()->getName();
-			break;
-		}
+		setFocus(next->getName());
 	}
-	
-	return result;
-}
-
-string LayeredScreen::findAbove(string tf0)
-{
-	string result = tf0;
-	for (auto& a : getFocusedLayer().lock()->findFields())
-	{
-		auto candidate = a.lock();
-		
-		if (candidate->getName().compare(tf0) == 0)
-		{
-			result = findAbove(candidate).lock()->getName();
-			break;
-		}
-	}
-	return result;
 }
 
 string LayeredScreen::getFocus()
@@ -657,9 +588,9 @@ string LayeredScreen::getFocus()
 	return getFocusedLayer().lock()->getFocus();
 }
 
-void LayeredScreen::setFocus(const string& focus)
+bool LayeredScreen::setFocus(const string& focus)
 {
-	getFocusedLayer().lock()->setFocus(focus);
+	return getFocusedLayer().lock()->setFocus(focus);
 }
 
 void LayeredScreen::setFunctionKeysArrangement(int arrangementIndex)

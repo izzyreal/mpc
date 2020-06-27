@@ -20,13 +20,13 @@ mpc::lcdgui::FunctionKeys* Layer::getFunctionKeys()
 	return dynamic_cast<FunctionKeys*>(findChild("function-keys").lock().get());
 }
 
-void Layer::setFocus(string textFieldName)
+bool Layer::setFocus(string textFieldName)
 {
 	auto newFocus = findField(textFieldName).lock();
 
 	if (!newFocus || newFocus->IsHidden() || !newFocus->isFocusable())
 	{
-		return;
+		return false;
 	}
 
 	auto oldFocus = findField(focus).lock();
@@ -42,6 +42,7 @@ void Layer::setFocus(string textFieldName)
 
 	newFocus->takeFocus(oldFocusName);
 	bringToFront(newFocus.get());
+	return true;
 }
 
 string Layer::getFocus()

@@ -75,7 +75,8 @@ void BaseControls::left()
 {
 	init();
 	
-	if (!activeField.lock()) {
+	if (!activeField.lock())
+	{
 		return;
 	}
 	
@@ -91,11 +92,13 @@ void BaseControls::right()
 {
 	init();
 	
-	if (!activeField.lock()) {
+	if (!activeField.lock())
+	{
 		return;
 	}
 	
-	if (param.compare("dummy") == 0) {
+	if (param.compare("dummy") == 0)
+	{
 		return;
 	}
 	
@@ -105,19 +108,35 @@ void BaseControls::right()
 void BaseControls::up()
 {
     init();
-	auto aboveCandidate = ls.lock()->findAbove(param);
-	if (param.compare(aboveCandidate) != 0) {
-		ls.lock()->setFocus(aboveCandidate);
+
+	if (!activeField.lock())
+	{
+		return;
 	}
+
+	if (param.compare("dummy") == 0)
+	{
+		return;
+	}
+
+	ls.lock()->transferUp();
 }
 
 void BaseControls::down()
 {
-    init();
-	auto belowCandidate = ls.lock()->findBelow(param);
-	if (param.compare(belowCandidate) != 0) {
-		ls.lock()->setFocus(belowCandidate);
+	init();
+
+	if (!activeField.lock())
+	{
+		return;
 	}
+
+	if (param.compare("dummy") == 0)
+	{
+		return;
+	}
+
+	ls.lock()->transferDown();
 }
 
 void BaseControls::function(int i)

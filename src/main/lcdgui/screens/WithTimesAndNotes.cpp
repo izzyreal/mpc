@@ -13,7 +13,7 @@
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui::screens;
 
-void WithTimesAndNotes::checkAllTimes(int notch, Sequence* seq)
+bool WithTimesAndNotes::checkAllTimes(int notch, Sequence* seq)
 {
 	auto& mpc = mpc::Mpc::instance();
 
@@ -23,39 +23,53 @@ void WithTimesAndNotes::checkAllTimes(int notch, Sequence* seq)
 	if (param.compare("time0") == 0)
 	{
 		setTime0(SeqUtil::getTickFromBar((SeqUtil::getBarFromTick(sequence, time0)) + notch, sequence, time0));
+		return true;
 	}
 	else if (param.compare("time1") == 0)
 	{
 		setTime0(SeqUtil::setBeat((SeqUtil::getBeat(sequence, time0)) + notch, sequence, time0));
+		return true;
 	}
 	else if (param.compare("time2") == 0)
 	{
 		setTime0(SeqUtil::setClock((SeqUtil::getClock(sequence, time0)) + notch, sequence, time0));
+		return true;
 	}
 	else if (param.compare("time3") == 0)
 	{
 		setTime1(SeqUtil::getTickFromBar((SeqUtil::getBarFromTick(sequence, time1)) + notch, sequence, time1));
+		return true;
 	}
 	else if (param.compare("time4") == 0)
 	{
 		setTime1(SeqUtil::setBeat((SeqUtil::getBeat(sequence, time1)) + notch, sequence, time1));
+		return true;
 	}
 	else if (param.compare("time5") == 0)
 	{
 		setTime1(SeqUtil::setClock((SeqUtil::getClock(sequence, time1)) + notch, sequence, time1));
+		return true;
 	}
+
+	return false;
 }
 
-void WithTimesAndNotes::checkAllTimesAndNotes(int notch, Sequence* seq)
+bool WithTimesAndNotes::checkAllTimesAndNotes(int notch, Sequence* seq, Track* _track)
 {
 	auto& mpc = mpc::Mpc::instance();
 	auto param = mpc.getLayeredScreen().lock()->getFocus();
 
-	checkAllTimes(notch, seq);
+	auto timesHaveChanged = checkAllTimes(notch, seq);
+	auto notesHaveChanged = false;
 
-	if (param.compare("notes0") == 0)
+	if (param.compare("note0") == 0)
 	{
-		auto track = mpc.getSequencer().lock()->getActiveTrack().lock();
+		auto track = mpc.getSequencer().lock()->getActiveTrack().lock().get();
+
+		if (_track != nullptr)
+		{
+			track = _track;
+		}
 
 		if (track->getBusNumber() != 0)
 		{
@@ -64,19 +78,25 @@ void WithTimesAndNotes::checkAllTimesAndNotes(int notch, Sequence* seq)
 			auto program = dynamic_pointer_cast<mpc::sampler::Program>(mpc.getSampler().lock()->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
 			auto pad = program->getPadIndexFromNote(note);
 			mpc.setPadAndNote(pad, note);
+			displayDrumNotes();
 		}
 		else
 		{
-			setMidiNote0(note0 + notch);
+			setNote0(note0 + notch);
 		}
+
+		notesHaveChanged = true;
 	}
-	else if (param.compare("notes1") == 0)
+	else if (param.compare("note1") == 0)
 	{
-		setMidiNote1(note1 + notch);
+		setNote1(note1 + notch);
+		notesHaveChanged = true;
 	}
+
+	return timesHaveChanged || notesHaveChanged;
 }
 
-void WithTimesAndNotes::setMidiNote0(int i)
+void WithTimesAndNotes::setNote0(int i)
 {
 	if (i < 0 || i > 127)
 	{
@@ -93,7 +113,7 @@ void WithTimesAndNotes::setMidiNote0(int i)
 	displayNotes();
 }
 
-void WithTimesAndNotes::setMidiNote1(int i)
+void WithTimesAndNotes::setNote1(int i)
 {
 	if (i < 0 || i > 127)
 	{

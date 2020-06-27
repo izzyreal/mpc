@@ -113,19 +113,16 @@ void TrMoveScreen::function(int i)
 	init();
 	switch (i)
 	{
+		// Intentional fall-through
 	case 0:
-	{
-		ls.lock()->openScreen("events");
-		break;
-	}
 	case 1:
+	case 3:
 	{
-		ls.lock()->openScreen("bars");
+		auto eventsScreen = dynamic_pointer_cast<EventsScreen>(Screens::getScreenComponent("events"));
+		eventsScreen->tab = i;
+		ls.lock()->openScreen(eventsScreen->tabNames[eventsScreen->tab]);
 		break;
 	}
-	case 3:
-		ls.lock()->openScreen("user");
-		break;
 	case 4:
 		if (isSelected())
 		{

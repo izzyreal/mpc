@@ -21,6 +21,8 @@ namespace mpc::lcdgui
 	{
 
 	private:
+		// When hiding a field that is focused, we pass focus to nextFocus
+		std::string nextFocus = "_";
 		std::vector<Label*> letters;
 
 		bool focusable{ true };
@@ -53,9 +55,11 @@ namespace mpc::lcdgui
 		void startBlinking();
 		void stopBlinking();
 		bool getBlinking();
+		void setNextFocus(const std::string& nextFocus);
 
 	public:
 		void Draw(std::vector<std::vector<bool>>* pixels) override;
+		void Hide(bool b) override;
 
 	public:
 		Field(const std::string& name, int x, int y, int columns);
