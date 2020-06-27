@@ -54,6 +54,23 @@ void EventsScreen::open()
 	displayMode();
 	displayStart();
 	displayCopies();
+
+	mpc.addObserver(this); // Subscribe to "padandnote" events
+}
+
+void EventsScreen::close()
+{
+	mpc.deleteObserver(this);
+}
+
+void EventsScreen::update(moduru::observer::Observable* observable, nonstd::any message)
+{
+	string msg = nonstd::any_cast<string>(message);
+
+	if (msg.compare("padandnote") == 0)
+	{
+		displayNotes();
+	}
 }
 
 void EventsScreen::function(int i)

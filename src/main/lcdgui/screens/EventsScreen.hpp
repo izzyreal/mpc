@@ -23,6 +23,8 @@ namespace mpc::lcdgui::screens
 		EventsScreen(const int layerIndex);
 
 		void open() override;
+		void close() override;
+		void update(moduru::observer::Observable* o, nonstd::any arg) override;
 
 	private:
 		void displayStart();
