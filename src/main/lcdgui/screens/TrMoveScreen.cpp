@@ -16,8 +16,7 @@ TrMoveScreen::TrMoveScreen(const int layerIndex)
 
 void TrMoveScreen::open()
 {
-	//May need to happen more often
-	ls.lock()->setCurrentBackground("tr-move");
+	findBackground().lock()->SetDirty();
 	findLabel("selecttrack").lock()->setText("Select track");
 	findLabel("tomove").lock()->setText("to move.");
 
@@ -51,7 +50,7 @@ void TrMoveScreen::turnWheel(int i)
 void TrMoveScreen::up()
 {
 	init();
-	if (param.find("tr") != string::npos)
+	if (param.compare("tr") == 0)
 	{
 		goUp();
 	}
@@ -60,52 +59,46 @@ void TrMoveScreen::up()
 void TrMoveScreen::down()
 {
 	init();
-	if (param.find("tr") != string::npos)
+	if (param.compare("tr") == 0)
 	{
 		goDown();
+	}
+	else
+	{
+		BaseControls::down();
+		ls.lock()->setFunctionKeysArrangement(1);
 	}
 }
 
 void TrMoveScreen::left()
 {
 	init();
-	if (isSelected() && param.compare("tr0") == 0)
-	{
-		return;
-	}
-	else if (!isSelected() && param.compare("sq") == 0)
-	{
-		return;
-	}
-	BaseControls::left();
-	init();
 
 	if (param.compare("sq") == 0)
 	{
-		ls.lock()->setFunctionKeysArrangement(0);
+		return;
 	}
+
+	if (isSelected())
+	{
+		return;
+	}
+
+	BaseControls::left();
+	ls.lock()->setFunctionKeysArrangement(0);
 }
 
 void TrMoveScreen::right()
 {
 	init();
-	if (isSelected() && param.compare("tr0") == 0)
+
+	if (param.compare("tr") == 0)
 	{
 		return;
 	}
-	
-	if (!isSelected() && param.compare("tr1") == 0)
-	{
-		return;
-	}
-	
+
 	BaseControls::right();
-	init();
-	
-	if (param.compare("sq") != 0 && !isSelected())
-	{
-		ls.lock()->setFunctionKeysArrangement(1);
-	}
+	ls.lock()->setFunctionKeysArrangement(1);
 }
 
 void TrMoveScreen::function(int i)
@@ -128,7 +121,6 @@ void TrMoveScreen::function(int i)
 		{
 			cancel();
 		}
-		ls.lock()->setFocus("tr1");
 		break;
 	case 5:
 		if (param.compare("sq") == 0)
@@ -140,13 +132,10 @@ void TrMoveScreen::function(int i)
 		{
 			auto sequence = mpc.getSequencer().lock()->getActiveSequence().lock();
 			insert(sequence.get());
-			ls.lock()->setFocus("tr1");
-			ls.lock()->setFunctionKeysArrangement(1);
 		}
 		else
 		{
 			select();
-			ls.lock()->setFocus("tr0");
 		}
 		break;
 	}
@@ -215,6 +204,7 @@ void TrMoveScreen::displayTrLabels()
 		findLabel("tr0").lock()->Hide(false);
 		findLabel("tr0").lock()->setText(tr0);
 	}
+
 	if (tr1.compare("") == 0)
 	{
 		findLabel("tr1").lock()->Hide(true);
@@ -235,8 +225,7 @@ void TrMoveScreen::displayTrFields()
 	{
 		findLabel("selecttrack").lock()->Hide(true);
 		findLabel("tomove").lock()->Hide(true);
-		findField("tr1").lock()->Hide(true);
-		findField("tr0").lock()->Hide(false);
+		findField("tr").lock()->setLocation(9, 26);
 
 		auto tr0Name = sequence->getTrack(selectedTrackIndex).lock()->getName();
 		
@@ -245,33 +234,24 @@ void TrMoveScreen::displayTrFields()
 			tr0Name = StrUtil::padRight(tr0Name, " ", 9) + u8"\u00CD";
 		}
 		
-		findField("tr0").lock()->setText("Tr:" + StrUtil::padLeft(to_string(selectedTrackIndex + 1), "0", 2) + "-" + tr0Name);
-		ls.lock()->setFunctionKeysArrangement(2);
+		findField("tr").lock()->setText("Tr:" + StrUtil::padLeft(to_string(selectedTrackIndex + 1), "0", 2) + "-" + tr0Name);
 	}
 	else
 	{
 		findLabel("selecttrack").lock()->Hide(false);
 		findLabel("tomove").lock()->Hide(false);
-		findField("tr0").lock()->Hide(true);
-		findField("tr1").lock()->Hide(false);
+		findField("tr").lock()->setLocation(108, 26);
 
-		findField("tr1").lock()->setText("Tr:" + StrUtil::padLeft(to_string(currentTrackIndex + 1), "0", 2) + "-" + sequence->getTrack(currentTrackIndex).lock()->getName());
-		
-		if (ls.lock()->getFocus().compare(findField("tr1").lock()->getName()) == 0)
-		{
-			ls.lock()->setFunctionKeysArrangement(1);
-		}
-		else
-		{
-			ls.lock()->setFunctionKeysArrangement(0);
-		}
+		findField("tr").lock()->setText("Tr:" + StrUtil::padLeft(to_string(currentTrackIndex + 1), "0", 2) + "-" + sequence->getTrack(currentTrackIndex).lock()->getName());
 	}
 }
 
 void TrMoveScreen::displaySq()
 {
 	auto sequence = mpc.getSequencer().lock()->getActiveSequence().lock();
-	findField("sq").lock()->setText(StrUtil::padLeft(to_string(sequencer.lock()->getActiveSequenceIndex() + 1), "0", 2) + "-" + sequence->getName());
+	findField("sq").lock()->setText(StrUtil::padLeft(to_string(sequencer.lock()->getActiveSequenceIndex() + 1), "0", 2));
+	auto sequenceName = "-" + sequence->getName();
+	findLabel("sq-name").lock()->setText(sequenceName);
 }
 
 bool TrMoveScreen::isSelected()
@@ -312,6 +292,8 @@ void TrMoveScreen::select()
 	selectedTrackIndex = currentTrackIndex;
 	displayTrLabels();
 	displayTrFields();
+	ls.lock()->setFunctionKeysArrangement(2);
+	SetDirty();
 }
 
 void TrMoveScreen::cancel()
@@ -319,6 +301,8 @@ void TrMoveScreen::cancel()
 	selectedTrackIndex = -1;
 	displayTrLabels();
 	displayTrFields();
+	ls.lock()->setFunctionKeysArrangement(1);
+	SetDirty();
 }
 
 void TrMoveScreen::insert(mpc::sequencer::Sequence* s)
@@ -327,4 +311,6 @@ void TrMoveScreen::insert(mpc::sequencer::Sequence* s)
 	selectedTrackIndex = -1;
 	displayTrLabels();
 	displayTrFields();
+	ls.lock()->setFunctionKeysArrangement(1);
+	SetDirty();
 }
