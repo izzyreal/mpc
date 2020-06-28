@@ -15,8 +15,8 @@ namespace mpc::controls {
 	class Controls
 	{
 	private:
-		bool ctrlPressed{ false };
-		bool altPressed{ false };
+		bool ctrlPressed = false;
+		bool altPressed = false;
 
 	public:
 		void setCtrlPressed(bool b);
@@ -25,16 +25,16 @@ namespace mpc::controls {
 		bool isAltPressed();
 
 	private:
-		bool shiftPressed{ false };
-		bool recPressed{ false };
-		bool overDubPressed{ false };
-		bool tapPressed{ false };
-		bool goToPressed{ false };
-		bool erasePressed{ false };
-		bool f3Pressed{ false };
-		bool f4Pressed{ false };
-		bool f5Pressed{ false };
-		bool f6Pressed{ false };
+		bool shiftPressed = false;
+		bool recPressed = false;
+		bool overDubPressed = false;
+		bool tapPressed = false;
+		bool goToPressed = false;
+		bool erasePressed = false;
+		bool f3Pressed = false;
+		bool f4Pressed = false;
+		bool f5Pressed = false;
+		bool f6Pressed = false;
 		std::set<int> pressedPads;
 		std::vector<int> pressedPadVelos;
 
@@ -63,6 +63,8 @@ namespace mpc::controls {
 
 		std::set<int>* getPressedPads();
 		std::vector<int>* getPressedPadVelos();
+
+		void releaseAll();
 
 	private:
 		std::unordered_map<std::string, controls::BaseControls*> controls{};

@@ -89,6 +89,7 @@ void Mpc::init(const int sampleRate, const int inputCount, const int outputCount
 	diskController->initDisks();
 
 	hardware->getSlider().lock()->setValue(mpc::nvram::NvRam::getSlider());
+	mpc::nvram::NvRam::loadUserScreenValues();
 	MLOG("Mpc is ready")
 }
 
@@ -295,7 +296,7 @@ int Mpc::getBank()
 Mpc::~Mpc() {
 	MLOG("Mpc destructor.");
 
-	mpc::nvram::NvRam::saveUserDefaults();
+	mpc::nvram::NvRam::saveUserScreenValues();
 
 	for (auto& m : mpcMidiInputs) {
 		if (m != nullptr) {

@@ -24,7 +24,7 @@ using namespace mpc::lcdgui::screens;
 using namespace moduru::file;
 using namespace std;
 
-void NvRam::load()
+void NvRam::loadUserScreenValues()
 {
 	string path = mpc::Paths::resPath() + "nvram.vmp";
 	auto file = File(path, nullptr);
@@ -60,7 +60,7 @@ void NvRam::load()
 	userScreen->setVelo(defaults.getTrVelos()[0]);
 }
 
-void NvRam::saveUserDefaults()
+void NvRam::saveUserScreenValues()
 {
 	DefaultsParser dp;
 	

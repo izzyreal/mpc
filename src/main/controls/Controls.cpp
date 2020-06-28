@@ -7,118 +7,163 @@
 #include <controls/GlobalReleaseControls.hpp>
 
 using namespace mpc::controls;
+using namespace std;
 
 Controls::Controls()
 {
-	pressedPadVelos = std::vector<int>(16);
+	pressedPadVelos = vector<int>(16);
 	controls["release"] = new GlobalReleaseControls();
 }
 
-void Controls::setCtrlPressed(bool b) {
+void Controls::releaseAll()
+{
+	ctrlPressed = false;
+	altPressed = false;
+	shiftPressed = false;
+	recPressed = false;
+	overDubPressed = false;
+	tapPressed = false;
+	goToPressed = false;
+	erasePressed = false;
+	f3Pressed = false;
+	f4Pressed = false;
+	f5Pressed = false;
+	f6Pressed = false;
+	pressedPads.clear();
+	pressedPadVelos = vector<int>(16);
+}
+
+void Controls::setCtrlPressed(bool b)
+{
 	ctrlPressed = b;
 }
 
-void Controls::setAltPressed(bool b) {
+void Controls::setAltPressed(bool b)
+{
 	altPressed = b;
 }
 
-bool Controls::isCtrlPressed() {
+bool Controls::isCtrlPressed()
+{
 	return ctrlPressed;
 }
 
-bool Controls::isAltPressed() {
+bool Controls::isAltPressed()
+{
 	return altPressed;
 }
 
-bool Controls::isErasePressed() {
+bool Controls::isErasePressed()
+{
 	return erasePressed;
 }
 
-bool Controls::isRecPressed() {
+bool Controls::isRecPressed()
+{
 	return recPressed;
 }
 
-bool Controls::isOverDubPressed() {
+bool Controls::isOverDubPressed()
+{
 	return overDubPressed;
 }
 
-bool Controls::isTapPressed() {
+bool Controls::isTapPressed()
+{
 	return tapPressed;
 }
 
-bool Controls::isGoToPressed() {
+bool Controls::isGoToPressed()
+{
 	return goToPressed;
 }
 
-bool Controls::isShiftPressed() {
+bool Controls::isShiftPressed()
+{
 	return shiftPressed;
 }
 
-bool Controls::isF3Pressed() {
+bool Controls::isF3Pressed()
+{
 	return f3Pressed;
 }
 
-bool Controls::isF4Pressed() {
+bool Controls::isF4Pressed()
+{
 	return f4Pressed;
 }
 
-bool Controls::isF5Pressed() {
+bool Controls::isF5Pressed()
+{
 	return f5Pressed;
 }
 
-bool Controls::isF6Pressed() {
+bool Controls::isF6Pressed()
+{
 	return f6Pressed;
 }
 
-std::set<int>* Controls::getPressedPads() {
+set<int>* Controls::getPressedPads()
+{
 	return &pressedPads;
 }
 
-std::vector<int>* Controls::getPressedPadVelos() {
+vector<int>* Controls::getPressedPadVelos()
+{
 	return &pressedPadVelos;
 }
 
-void Controls::setErasePressed(bool b) {
+void Controls::setErasePressed(bool b)
+{
 	erasePressed = b;
 }
 
-void Controls::setRecPressed(bool b) {
+void Controls::setRecPressed(bool b)
+{
 	recPressed = b;
 }
 
-void Controls::setOverDubPressed(bool b) {
+void Controls::setOverDubPressed(bool b)
+{
 	overDubPressed = b;
 }
 
-void Controls::setTapPressed(bool b) {
+void Controls::setTapPressed(bool b)
+{
 	tapPressed = b;
 }
 
-void Controls::setGoToPressed(bool b) {
+void Controls::setGoToPressed(bool b)
+{
 	goToPressed = b;
 }
 
-void Controls::setShiftPressed(bool b) {
+void Controls::setShiftPressed(bool b)
+{
 	shiftPressed = b;
 }
 
-void Controls::setF3Pressed(bool b) {
+void Controls::setF3Pressed(bool b)
+{
 	f3Pressed = b;
 }
 
-void Controls::setF4Pressed(bool b) {
+void Controls::setF4Pressed(bool b)
+{
 	f4Pressed = b;
 }
 
-void Controls::setF5Pressed(bool b) {
+void Controls::setF5Pressed(bool b)
+{
 	f5Pressed = b;
 }
 
-void Controls::setF6Pressed(bool b) {
+void Controls::setF6Pressed(bool b)
+{
 	f6Pressed = b;
 }
 
-BaseControls* Controls::getControls(std::string s)
+BaseControls* Controls::getControls(string s)
 {
 	return controls[s];
 }

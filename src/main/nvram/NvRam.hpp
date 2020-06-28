@@ -6,8 +6,8 @@ namespace mpc::nvram
 	{
 
 	public:
-		static void load();
-		static void saveUserDefaults();
+		static void loadUserScreenValues();
+		static void saveUserScreenValues();
 		static void saveKnobPositions();
 		static int getMasterLevel();
 		static int getRecordLevel();

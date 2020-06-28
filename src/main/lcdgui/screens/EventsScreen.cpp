@@ -566,15 +566,6 @@ void EventsScreen::setFromSq(int i)
 
 	sequencer.lock()->setActiveSequenceIndex(i);
 
-	// The below check can be removed if we're only supposed to jump to used sequences.
-	// For now we initialize any sequence that we come across.
-	auto seq = sequencer.lock()->getActiveSequence().lock();
-	if (!seq->isUsed())
-	{
-		auto userScreen = dynamic_pointer_cast<UserScreen>(Screens::getScreenComponent("user"));
-		seq->init(userScreen->lastBar);
-	}
-
 	displayFromSq();
 }
 
