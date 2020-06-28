@@ -360,10 +360,6 @@ void SequencerScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 	{
 		displayDeviceName();
 	}
-	else if (s.compare("soloenabled") == 0)
-	{
-		//soloLabel.lock()->setBlinking(sequencer.lock()->isSoloEnabled());
-	}
 }
 
 void SequencerScreen::pressEnter()
@@ -432,8 +428,13 @@ void SequencerScreen::function(int i)
 		track.lock()->setOn(!track.lock()->isOn());
 		break;
 	case 3:
+	{
 		sequencer.lock()->setSoloEnabled(!sequencer.lock()->isSoloEnabled());
+
+		findLabel("fk3").lock()->setBlinking(sequencer.lock()->isSoloEnabled());
+
 		break;
+	}
 	case 4:
 		sequencer.lock()->trackDown();
 		break;

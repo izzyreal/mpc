@@ -40,8 +40,6 @@ void Field::setNextFocus(const std::string& nextFocus)
 	this->nextFocus = nextFocus;
 }
 
-const int Field::BLINKING_RATE;
-
 void Field::Hide(bool b)
 {
 	if (b && focus)
@@ -154,14 +152,25 @@ void Field::loseFocus(string next)
 
 void Field::setSplit(bool b)
 {
-	if (split == b) return;
+	if (split == b)
+	{
+		return;
+	}
+	
 	split = b;
-	if (split) {
-		this->setOpaque(false);
-		if (letters.size() != 0) {
+	
+	if (split)
+	{
+		setOpaque(false);
+
+		if (letters.size() != 0)
+		{
 			for (auto& l : letters)
+			{
 				delete l;
+			}
 		}
+
 		letters.clear();
 		letters = vector<Label*>(getText().length());
 		activeSplit = letters.size() - 1;
@@ -212,7 +221,10 @@ int Field::getActiveSplit()
 
 bool Field::setActiveSplit(int i)
 {
-	if (i < 1 || i + 1 > letters.size()) return false;
+	if (i < 1 || i + 1 > letters.size())
+	{
+		return false;
+	}
 	activeSplit = i;
 	redrawSplit();
 	return true;
@@ -220,8 +232,10 @@ bool Field::setActiveSplit(int i)
 
 bool Field::enableTypeMode()
 {
-    if(typeModeEnabled)
-        return false;
+	if (typeModeEnabled)
+	{
+		return false;
+	}
 
     typeModeEnabled = true;
 	//oldText = this->getText();
@@ -235,18 +249,24 @@ bool Field::enableTypeMode()
 int Field::enter()
 {
 	auto value = INT_MAX;
-    if(!typeModeEnabled)
-        return value;
+
+	if (!typeModeEnabled)
+	{
+		return value;
+	}
 
     //setFont(mpc2000font);
     //setFontColor(Constants::LCD_OFF);
 	//setTransparency(false);
     typeModeEnabled = false;
-    try {
+    
+	try
+	{
 	//	string valueString = getText();
 	//	value = stoi(valueString);
 	}
-	catch (std::invalid_argument& e) {
+	catch (std::invalid_argument& e)
+	{
 		printf("Field.enter ERROR: %s", e.what());
         return value;
     }
@@ -265,8 +285,10 @@ bool Field::isTypeModeEnabled()
 
 void Field::disableTypeMode()
 {
-    if(!typeModeEnabled)
-        return;
+	if (!typeModeEnabled)
+	{
+		return;
+	}
 
     typeModeEnabled = false;
     //setFontColor(Constants::LCD_OFF);
@@ -274,36 +296,25 @@ void Field::disableTypeMode()
     //setText(oldText.c_str());
 }
 
-void Field::startBlinking()
+void Field::setFocusable(bool b)
 {
-    blinking = true;
-}
-
-void Field::stopBlinking()
-{
-    blinking = false;
-}
-
-bool Field::getBlinking()
-{
-    return this->blinking;
-}
-
-void Field::setFocusable(bool b) {
 	focusable = b;
 }
 
-bool Field::isFocusable() {
+bool Field::isFocusable()
+{
 	return focusable;
 }
 
-bool Field::hasFocus() {
+bool Field::hasFocus()
+{
 	return focus;
 }
 
 Field::~Field()
 {
-	for (auto& l : letters) {
+	for (auto& l : letters)
+	{
 		delete l;
 	}
 }

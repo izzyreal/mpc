@@ -398,6 +398,11 @@ MRECT Component::getRect()
 	auto y1 = max(0, y);
 	auto y2 = min(60, y + h);
 
+	if (name.compare("fk3") == 0)
+	{
+		printf("");
+	}
+
 	return MRECT(x1, y1, x2, y2);
 }
 

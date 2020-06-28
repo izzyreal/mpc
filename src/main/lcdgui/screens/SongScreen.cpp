@@ -330,19 +330,23 @@ void SongScreen::update(moduru::observer::Observable* observable, nonstd::any me
 	{
 		displayNow2();
 	}
-	else if (msg.compare("tempo") == 0) {
+	else if (msg.compare("tempo") == 0)
+	{
 		displayTempo();
 	}
-	else if (msg.compare("step-editor") == 0) {
+	else if (msg.compare("step-editor") == 0)
+	{
 		displaySteps();
 	}
-	else if (msg.compare("play") == 0) {
-		findField("sequence1").lock()->startBlinking();
-		findField("reps1").lock()->startBlinking();
+	else if (msg.compare("play") == 0)
+	{
+		findField("sequence1").lock()->setBlinking(true);
+		findField("reps1").lock()->setBlinking(true);
 	}
-	else if (msg.compare("stop") == 0) {
-		findField("sequence1").lock()->stopBlinking();
-		findField("reps1").lock()->stopBlinking();
+	else if (msg.compare("stop") == 0)
+	{
+		findField("sequence1").lock()->setBlinking(false);
+		findField("reps1").lock()->setBlinking(false);
 	}
 }
 

@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <thread>
 
 namespace mpc::lcdgui
 {
@@ -12,9 +13,15 @@ namespace mpc::lcdgui
 	class TextComp
 		: public Component
 	{
+	private:
+		static const int BLINK_INTERVAL = 400;
+		bool blinking = false;
+		std::thread blinkThread;
+		static void static_blink(void* args);
+		void runBlinkThread();
 
 	protected:
-		bool inverted{ false };
+		bool inverted = false;
 
 	protected:
 		const int FONT_HEIGHT = 7;
@@ -23,12 +30,13 @@ namespace mpc::lcdgui
 	protected:
 		std::string text = "";
 		//int width = 0; // pixels
-		bool opaque{ false };
+		bool opaque = false;
 
 	public:
 		virtual void setText(const std::string& s);
 
 	public:
+		void setBlinking(bool b);
 		void setOpaque(bool b);
 		void setInverted(bool b);
 		int getX();
@@ -46,6 +54,7 @@ namespace mpc::lcdgui
 
 	public:
 		TextComp(const std::string& name);
+		~TextComp();
 
 	};
 }

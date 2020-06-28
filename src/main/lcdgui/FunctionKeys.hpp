@@ -33,7 +33,6 @@ namespace mpc::lcdgui
 
 	public:
 		FunctionKeys(const std::string& name, std::vector<std::vector<std::string>> texts, std::vector<std::vector<int>> types);
-		~FunctionKeys();
 
 	};
 }

@@ -8,9 +8,7 @@
 #include <lang/StrUtil.hpp>
 #include <lang/utf8_decode.h>
 
-
 using namespace mpc::lcdgui;
-
 using namespace moduru::lang;
 using namespace std;
 
@@ -70,6 +68,12 @@ void TextComp::Draw(std::vector<std::vector<bool>>* pixels)
 				{
 					int xpos = textx + x1 + current_char.xoffset;
 					int ypos = texty + y1 + current_char.yoffset;
+
+					if (h <= 7)
+					{
+						ypos--;
+					}
+
 					(*pixels)[xpos][ypos] = inverted ? false : true;
 				}
 			}
@@ -81,23 +85,28 @@ void TextComp::Draw(std::vector<std::vector<bool>>* pixels)
 	dirty = false;
 }
 
-int TextComp::getX() {
+int TextComp::getX()
+{
 	return x;
 }
 
-int TextComp::getY() {
+int TextComp::getY()
+{
 	return y;
 }
 
-int TextComp::getW() {
+int TextComp::getW()
+{
 	return w;
 }
 
-int TextComp::getH() {
+int TextComp::getH()
+{
 	return h;
 }
 
-void TextComp::setOpaque(bool b) {
+void TextComp::setOpaque(bool b)
+{
 	if (opaque != b)
 	{
 		opaque = b;
@@ -105,7 +114,8 @@ void TextComp::setOpaque(bool b) {
 	}
 }
 
-void TextComp::setInverted(bool b) {
+void TextComp::setInverted(bool b)
+{
 	if (inverted != b)
 	{
 		inverted = b;
@@ -113,15 +123,18 @@ void TextComp::setInverted(bool b) {
 	}
 }
 
-string TextComp::getName() {
+string TextComp::getName()
+{
 	return name;
 }
 
-string TextComp::getText() {
+string TextComp::getText()
+{
 	return text;
 }
 
-unsigned int TextComp::GetTextEntryLength() {
+unsigned int TextComp::GetTextEntryLength()
+{
 	return text.length();
 }
 
@@ -134,11 +147,63 @@ void TextComp::setText(const string& s)
 	}
 }
 
-void TextComp::setTextPadded(string s, string padding) {
+void TextComp::setTextPadded(string s, string padding)
+{
 	string padded = StrUtil::padLeft(s, padding, ceil(float(w - 2) / float(6)));
 	setText(padded);
 }
 
-void TextComp::setTextPadded(int i, string padding) {
+void TextComp::setTextPadded(int i, string padding)
+{
 	setTextPadded(to_string(i), padding);
+}
+
+void TextComp::static_blink(void* args)
+{
+	static_cast<TextComp*>(args)->runBlinkThread();
+}
+
+void TextComp::runBlinkThread()
+{
+	while (blinking)
+	{
+		int counter = 0;
+		
+		while (blinking && counter++ != BLINK_INTERVAL)
+		{
+			this_thread::sleep_for(chrono::milliseconds(1));
+		}
+
+		Hide(!IsHidden());
+	}
+	Hide(false);
+}
+
+void TextComp::setBlinking(bool b)
+{
+	if (blinking == b)
+	{
+		return;
+	}
+
+	blinking = b;
+
+	if (blinkThread.joinable())
+	{
+		blinkThread.join();
+	}
+
+	if (blinking)
+	{
+		blinkThread = thread(&TextComp::static_blink, this);
+	}
+}
+
+TextComp::~TextComp()
+{
+	if (blinking)
+	{
+		blinking = false;
+		blinkThread.join();
+	}
 }

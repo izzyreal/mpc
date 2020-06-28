@@ -33,8 +33,6 @@ namespace mpc::lcdgui
 		bool typeModeEnabled{ false };
 		std::string oldText = "";
 		bool scrolling{ false };
-		static const int BLINKING_RATE{ 200 };
-		bool blinking{ false };
 
 	public:
 		bool hasFocus();
@@ -52,9 +50,6 @@ namespace mpc::lcdgui
 		void type(int i);
 		bool isTypeModeEnabled();
 		void disableTypeMode();
-		void startBlinking();
-		void stopBlinking();
-		bool getBlinking();
 		void setNextFocus(const std::string& nextFocus);
 
 	public:
