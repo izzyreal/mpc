@@ -528,7 +528,6 @@ void EventRow::setColors()
 		{
 			parameters.lock()->setColor(true);
 			labels[i].lock()->setInverted(true);
-			labels[i].lock()->setOpaque(true);
 		
 			if (ls->getFocus().compare(fields[i].lock()->getName()) == 0)
 			{

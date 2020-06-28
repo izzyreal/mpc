@@ -14,7 +14,6 @@ void NextSeqPadScreen::open()
 	for (int i = 0; i < 16; i++)
 	{
 		displaySeq(i);
-		setOpaque(i);
 		setSeqColor(i);
 	}
 	
@@ -94,11 +93,6 @@ void NextSeqPadScreen::displaySq()
 {
 	auto lSequencer = sequencer.lock();
 	findField("sq").lock()->setText(StrUtil::padLeft(to_string(lSequencer->getActiveSequenceIndex() + 1), "0", 2) + "-" + lSequencer->getActiveSequence().lock()->getName());
-}
-
-void NextSeqPadScreen::setOpaque(int i)
-{
-	findLabel(to_string(i + 1)).lock()->setOpaque(true);
 }
 
 void NextSeqPadScreen::displaySeq(int i)

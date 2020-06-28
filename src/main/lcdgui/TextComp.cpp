@@ -105,15 +105,6 @@ int TextComp::getH()
 	return h;
 }
 
-void TextComp::setOpaque(bool b)
-{
-	if (opaque != b)
-	{
-		opaque = b;
-		SetDirty();
-	}
-}
-
 void TextComp::setInverted(bool b)
 {
 	if (inverted != b)

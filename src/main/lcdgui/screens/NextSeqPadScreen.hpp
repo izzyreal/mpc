@@ -28,7 +28,6 @@ namespace mpc::lcdgui::screens
 		void displayBank();
 		void displaySeqNumbers();
 		void displaySq();
-		void setOpaque(int i);
 		void displaySeq(int i);
 		void setSeqColor(int i);
 		void displayNow0();

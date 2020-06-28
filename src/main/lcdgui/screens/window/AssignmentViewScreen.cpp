@@ -10,8 +10,6 @@ AssignmentViewScreen::AssignmentViewScreen(const int layerIndex)
 
 void AssignmentViewScreen::open()
 {
-	findLabel("info0").lock()->setOpaque(false);
-	findLabel("info1").lock()->setOpaque(true);
 	findLabel("info1").lock()->setInverted(true);
 	findLabel("info1").lock()->setSize(13, 9);
 	

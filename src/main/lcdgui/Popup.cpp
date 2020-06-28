@@ -33,7 +33,6 @@ void Popup::Draw(std::vector<std::vector<bool>>* pixels)
 
 	bg->Draw(pixels);
 	lcdgui::Label l("popup", text, 43, 23, text.size() * 6);
-	l.setOpaque(true);
 	l.setInverted(true);
 	l.Draw(pixels);
 	dirty = false;

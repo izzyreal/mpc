@@ -161,8 +161,6 @@ void Field::setSplit(bool b)
 	
 	if (split)
 	{
-		setOpaque(false);
-
 		if (letters.size() != 0)
 		{
 			for (auto& l : letters)
@@ -190,7 +188,6 @@ void Field::setSplit(bool b)
 		if (letters.size() == 0)
 			return;
 
-		setOpaque(true);
 		//for (int i = 0; i < letters.size(); i++)
 			//GetGUI()->DetachControl(letters[i]);
 		activeSplit = 0;
@@ -204,7 +201,6 @@ void Field::redrawSplit()
 	for (int i = 0; i < letters.size(); i++) {
 		//letters[i]->setForeground(i < activeSplit);
 		//letters[i]->setBackground(i < activeSplit ? mpc::maingui::Constants::LCD_ON() : mpc::maingui::Constants::LCD_OFF());
-		//letters[i]->setOpaque(i < activeSplit);
 	}
 	//SetDirty(true);
 }

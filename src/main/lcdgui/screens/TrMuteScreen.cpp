@@ -19,15 +19,18 @@ void TrMuteScreen::open()
 	sequencer.lock()->addObserver(this);
 
 	auto sequence = sequencer.lock()->getActiveSequence().lock();
-	for (int i = 0; i < 64; i++) {
+	
+	for (int i = 0; i < 64; i++)
+	{
 		sequence->getTrack(i).lock()->addObserver(this);
 	}
 
-	for (int i = 0; i < 16; i++) {
+	for (int i = 0; i < 16; i++)
+	{
 		displayTrack(i);
-		setOpaque(i);
 		setTrackColor(i);
 	}
+
 	displaySq();
 	displayNow0();
 	displayNow1();
@@ -38,13 +41,16 @@ void TrMuteScreen::close()
 {
 	sequencer.lock()->deleteObserver(this);
 	auto sequence = sequencer.lock()->getActiveSequence().lock();
-	for (int i = 0; i < 64; i++) {
+	
+	for (int i = 0; i < 64; i++)
+	{
 		sequence->getTrack(i).lock()->deleteObserver(this);
 	}
 }
 
 void TrMuteScreen::right()
 {
+	// Stop right from propgating to BaseController
 }
 
 void TrMuteScreen::pad(int i, int velo, bool repeat, int tick)
@@ -141,11 +147,6 @@ void TrMuteScreen::displaySq()
 	auto sequenceNumber = StrUtil::padLeft(to_string(sequencer.lock()->getActiveSequenceIndex() + 1), "0", 2);
 	auto sequenceName = sequencer.lock()->getActiveSequence().lock()->getName();
 	findField("sq").lock()->setText(sequenceNumber + "-" + sequenceName);
-}
-
-void TrMuteScreen::setOpaque(int i)
-{
-	findLabel(to_string(i + 1)).lock()->setOpaque(true);
 }
 
 void TrMuteScreen::displayTrack(int i)

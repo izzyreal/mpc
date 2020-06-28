@@ -26,7 +26,6 @@ namespace mpc::lcdgui::screens
 		void displayBank();
 		void displayTrackNumbers();
 		void displaySq();
-		void setOpaque(int i);
 		void displayTrack(int i);
 		void setTrackColor(int i);
 		void displayNow0();

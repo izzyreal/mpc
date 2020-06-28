@@ -316,8 +316,6 @@ void PgmAssignScreen::displaySoundGenerationMode()
 		{
 			findLabel("optional-note-a").lock()->setText("over:   , use:");
 			findLabel("optional-note-b").lock()->setText("over:   , use:");
-			findLabel("optional-note-a").lock()->setOpaque(false);
-			findLabel("optional-note-b").lock()->setOpaque(false);
 			
 			findLabel("velocity-range-lower").lock()->Hide(false);
 			findField("velocity-range-lower").lock()->Hide(false);

@@ -14,7 +14,7 @@ namespace mpc::lcdgui
 		: public Component
 	{
 	private:
-		static const int BLINK_INTERVAL = 400;
+		static const int BLINK_INTERVAL = 300;
 		bool blinking = false;
 		std::thread blinkThread;
 		static void static_blink(void* args);
@@ -22,22 +22,17 @@ namespace mpc::lcdgui
 
 	protected:
 		bool inverted = false;
-
-	protected:
 		const int FONT_HEIGHT = 7;
 		const int FONT_WIDTH = 6;
 
 	protected:
 		std::string text = "";
-		//int width = 0; // pixels
-		bool opaque = false;
 
 	public:
 		virtual void setText(const std::string& s);
 
 	public:
 		void setBlinking(bool b);
-		void setOpaque(bool b);
 		void setInverted(bool b);
 		int getX();
 		int getY();

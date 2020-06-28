@@ -440,13 +440,11 @@ void NameScreen::initEditColors()
     for (int i = 0; i < 16; i++)
 	{
 		auto field = findField(to_string(i)).lock();
-		field->setOpaque(true);
 		field->setInverted(false);
     }
 
 	auto focus = ls.lock()->getFocus();
 	findField(focus).lock()->setInverted(false);
-	findField(focus).lock()->setOpaque(true);
 }
 
 void NameScreen::resetNameScreen()
