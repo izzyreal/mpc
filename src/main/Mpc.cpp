@@ -293,23 +293,6 @@ int Mpc::getBank()
 	return bank;
 }
 
-Mpc::~Mpc() {
-	MLOG("Mpc destructor.");
-
-	mpc::nvram::NvRam::saveUserScreenValues();
-
-	for (auto& m : mpcMidiInputs) {
-		if (m != nullptr) {
-			delete m;
-		}
-	}
-
-    if (layeredScreen) layeredScreen.reset();
-	if (audioMidiServices) audioMidiServices->destroyServices();
-	MLOG("audio midi services destroyed.");
-	if (loadSoundThread.joinable()) loadSoundThread.join();
-}
-
 void Mpc::setPadAndNote(int pad, int note)
 {
 	if (pad < -1 || pad > 63 || note < 34 || note > 98)
@@ -363,4 +346,34 @@ string Mpc::getPreviousSamplerScreenName()
 void Mpc::setPreviousSamplerScreenName(string s)
 {
 	previousSamplerScreenName = s;
+}
+
+Mpc::~Mpc() {
+	MLOG("Entering Mpc destructor");
+
+	mpc::nvram::NvRam::saveUserScreenValues();
+	mpc::nvram::NvRam::saveKnobPositions();
+
+	for (auto& m : mpcMidiInputs)
+	{
+		if (m != nullptr) {
+			delete m;
+		}
+	}
+
+	if (layeredScreen)
+	{
+		layeredScreen.reset();
+	}
+
+	if (audioMidiServices)
+	{
+		audioMidiServices->destroyServices();
+		MLOG("AudioMidiServices destroyed.");
+	}
+
+	if (loadSoundThread.joinable())
+	{
+		loadSoundThread.join();
+	}
 }

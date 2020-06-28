@@ -47,7 +47,6 @@ namespace mpc::hardware
 
 	public:
 		Hardware();
-		~Hardware();
 
 	};
 }

@@ -92,7 +92,3 @@ weak_ptr<DataWheel> Hardware::getDataWheel() {
 weak_ptr<Slider> Hardware::getSlider() {
 	return slider;
 }
-
-Hardware::~Hardware() {
-	mpc::nvram::NvRam::saveKnobPositions();
-}
