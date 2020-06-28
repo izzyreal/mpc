@@ -6,7 +6,6 @@
 #include <sequencer/TimeSignature.hpp>
 
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
-#include <lcdgui/screens/EventsScreen.hpp>
 #include <lcdgui/screens/StepEditorScreen.hpp>
 #include <lcdgui/screens/UserScreen.hpp>
 
@@ -426,9 +425,6 @@ void SequencerScreen::function(int i)
 		break;
 	case 1:
 	{
-		auto eventsScreen = dynamic_pointer_cast<EventsScreen>(Screens::getScreenComponent("events"));
-		eventsScreen->setTime0(0);
-		eventsScreen->setTime1(sequence.lock()->getLastTick());
 		openScreen("events");
 		break;
 	}
