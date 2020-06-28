@@ -27,6 +27,16 @@ void FunctionKeys::setActiveArrangement(int i)
 	}
 	activeArrangement = i;
 	SetDirty();
+
+	auto arrangement = enabled[activeArrangement];
+	for (int j = 0; j < 6; j++)
+	{
+		if (arrangement[j])
+		{
+			MRECT clearRect{ xPos[j], 51, xPos[j] + 39, 60 };
+			preDrawClearRect = preDrawClearRect.Union(&clearRect);
+		}
+	}
 }
 
 void FunctionKeys::disable(int i)
@@ -35,6 +45,7 @@ void FunctionKeys::disable(int i)
 	{
 		return;
 	}
+
 	enabled[activeArrangement][i] = false;
 	SetDirty();
 }
@@ -49,16 +60,12 @@ void FunctionKeys::enable(int i)
 	SetDirty();
 }
 
-void FunctionKeys::Draw(std::vector<std::vector<bool>>* pixels) {
-
+void FunctionKeys::Draw(std::vector<std::vector<bool>>* pixels)
+{
 	if (shouldNotDraw(pixels))
 	{
 		return;
 	}
-
-	Clear(pixels);
-
-	vector<int> xPos = vector<int>{ 2, 43, 84, 125, 166, 207 };
 
 	bool border = false;
 	bool bg = false;

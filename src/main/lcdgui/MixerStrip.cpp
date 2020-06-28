@@ -42,6 +42,7 @@ MixerStrip::MixerStrip(int columnIndex)
 		}
 
 		auto yPos = 2 + (i * 13);
+
 		if (i >= 1)
 		{
 			yPos -= 13;

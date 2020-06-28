@@ -17,6 +17,7 @@ namespace mpc::lcdgui
 	{
 
 	private:
+		const std::vector<int> xPos { 2, 43, 84, 125, 166, 207 };
 		int activeArrangement = 0;
 		std::vector<std::vector<std::string>> texts;
 		std::vector<std::vector<int>> types;
