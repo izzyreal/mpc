@@ -11,12 +11,15 @@ MonoToStereoScreen::MonoToStereoScreen(const int layerIndex)
 
 void MonoToStereoScreen::open()
 {
-	string name = sampler.lock()->getSound().lock()->getName();
-	name = StrUtil::trim(name);
-	name = StrUtil::padRight(name, "_", 16);
-	name = name.substr(0, 14);
-	setNewStName(name + "-S");
-	setNewStName(name + "-S");
+	if (sampler.lock()->getSound().lock())
+	{
+		string name = sampler.lock()->getSound().lock()->getName();
+		name = StrUtil::trim(name);
+		name = StrUtil::padRight(name, "_", 16);
+		name = name.substr(0, 14);
+		setNewStName(name + "-S");
+		setNewStName(name + "-S");
+	}
 
 	setRSource(sampler.lock()->getSoundIndex());
 	displayLSource();
@@ -91,6 +94,11 @@ void MonoToStereoScreen::function(int j)
 
 void MonoToStereoScreen::displayLSource()
 {
+	if (!sampler.lock()->getSound().lock())
+	{
+		return;
+	}
+
 	findField("lsource").lock()->setText(sampler.lock()->getSound().lock()->getName());
 
 	if (sampler.lock()->getSound().lock()->isMono() && sampler.lock()->getSound().lock()->isMono())
@@ -105,6 +113,11 @@ void MonoToStereoScreen::displayLSource()
 
 void MonoToStereoScreen::displayRSource()
 {
+	if (!sampler.lock()->getSound(rSource).lock())
+	{
+		return;
+	}
+
 	findField("rsource").lock()->setText(sampler.lock()->getSoundName(rSource));
 
 	if (sampler.lock()->getSound().lock()->isMono() && sampler.lock()->getSound(rSource).lock()->isMono())

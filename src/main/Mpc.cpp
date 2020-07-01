@@ -90,6 +90,12 @@ void Mpc::init(const int sampleRate, const int inputCount, const int outputCount
 
 	hardware->getSlider().lock()->setValue(mpc::nvram::NvRam::getSlider());
 	mpc::nvram::NvRam::loadUserScreenValues();
+
+	for (auto& screenName : screenNames)
+	{
+		//layeredScreen->openScreen(screenName);
+	}
+
 	MLOG("Mpc is ready")
 }
 

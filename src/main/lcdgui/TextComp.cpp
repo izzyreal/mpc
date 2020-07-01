@@ -24,6 +24,12 @@ void TextComp::Draw(std::vector<std::vector<bool>>* pixels)
 		return;
 	}
 
+	if (text.length() == 0)
+	{
+		dirty = false;
+		return;
+	}
+
 	if (dynamic_cast<Label*>(this) != nullptr)
 	{
 		auto rect = getRect();

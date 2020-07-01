@@ -18,12 +18,13 @@ FunctionKeys::FunctionKeys(const string& name, vector<vector<string>> texts, vec
 
 	for (int i = 0; i < 6; i++)
 	{
-		MRECT clearRect{ xPos[i], 51, xPos[i] + 39, 60 };
-		addChild(make_shared<Label>("fk" + to_string(i), "", xPos[i], 51, 0));
+		auto child = addChild(make_shared<TextComp>("fk" + to_string(i)));
 	}
 
 	setSize(248, 10);
 	setLocation(0, 50);
+	//preDrawClearRect.Clear();
+	//dirty = false;
 }
 
 void FunctionKeys::setActiveArrangement(int i)
@@ -50,7 +51,7 @@ void FunctionKeys::setActiveArrangement(int i)
 
 	for (int j = 0; j < 6; j++)
 	{
-		auto label = findLabel("fk" + to_string(j)).lock();
+		auto label = findChild("fk" + to_string(j)).lock();
 		auto hideLabel = !enabled[activeArrangement][j] || texts[activeArrangement][j].compare("") == 0 || types[activeArrangement][j] == -1;
 		label->Hide(hideLabel);
 	}
@@ -67,7 +68,7 @@ void FunctionKeys::disable(int i)
 
 	enabled[activeArrangement][i] = false;
 
-	findLabel("fk" + to_string(i)).lock()->Hide(true);
+	findChild("fk" + to_string(i)).lock()->Hide(true);
 
 	SetDirty();
 }
@@ -81,7 +82,7 @@ void FunctionKeys::enable(int i)
 
 	enabled[activeArrangement][i] = true;
 
-	findLabel("fk" + to_string(i)).lock()->Hide(false);
+	findChild("fk" + to_string(i)).lock()->Hide(false);
 
 	SetDirty();
 }
@@ -150,10 +151,9 @@ void FunctionKeys::Draw(std::vector<std::vector<bool>>* pixels)
 			}
 		}
 
-		auto label = findLabel("fk" + to_string(i)).lock();
+		auto label = dynamic_pointer_cast<TextComp>(findChild("fk" + to_string(i)).lock());
 		label->setText(texts[activeArrangement][i]);
 		label->setLocation(xPos[i] + offsetx, 52);
-		label->setSize(lengthInPixels, 7);
 		label->setInverted(!isLabel);
 	}
 

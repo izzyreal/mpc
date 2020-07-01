@@ -36,6 +36,12 @@ void EndFineScreen::displayFineWaveform()
 	auto trimScreen = dynamic_pointer_cast<TrimScreen>(Screens::getScreenComponent("trim"));
 
 	auto sound = sampler.lock()->getSound().lock();
+
+	if (!sound)
+	{
+		return;
+	}
+
 	findWave().lock()->setSampleData(sound->getSampleData(), sound->isMono(), trimScreen->view);
 	findWave().lock()->setCenterSamplePos(sound->getEnd());
 }
@@ -44,12 +50,24 @@ void EndFineScreen::displayFineWaveform()
 void EndFineScreen::displayEnd()
 {
 	auto sound = sampler.lock()->getSound().lock();
+
+	if (!sound)
+	{
+		return;
+	}
+
 	findField("end").lock()->setTextPadded(sound->getEnd(), " ");
 }
 
 void EndFineScreen::displayLngthLabel()
 {
 	auto sound = sampler.lock()->getSound().lock();
+
+	if (!sound)
+	{
+		return;
+	}
+
 	findLabel("lngth").lock()->setTextPadded(sound->getEnd() - sound->getStart(), " ");
 }
 
@@ -86,6 +104,7 @@ void EndFineScreen::turnWheel(int i)
 {
 	init();
 	auto sound = sampler.lock()->getSound().lock();
+
 	auto startEndLength = static_cast<int>(sound->getEnd() - sound->getStart());
 	auto trimScreen = dynamic_pointer_cast<TrimScreen>(Screens::getScreenComponent("trim"));
 	auto sampleLength = sound->getFrameCount();

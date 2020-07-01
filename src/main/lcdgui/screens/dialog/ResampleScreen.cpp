@@ -17,14 +17,18 @@ void ResampleScreen::open()
 {
 	auto previousScreenName = ls.lock()->getPreviousScreenName();
 
-	if (previousScreenName.compare("name") != 0)
+	if (previousScreenName.compare("name") != 0 && sampler.lock()->getSound().lock())
 	{
 		newName = sampler.lock()->getSound().lock()->getName();
 		//newSampleName = newSampleName->replaceAll("\\s+$", "");
 		newName = sampler.lock()->addOrIncreaseNumber(newName);
 	}
 
-	setNewFs(sampler.lock()->getSound().lock()->getSampleRate());
+	if (sampler.lock()->getSound().lock())
+	{
+		setNewFs(sampler.lock()->getSound().lock()->getSampleRate());
+	}
+
 	displayNewBit();
 	displayNewFs();
 	displayNewName();

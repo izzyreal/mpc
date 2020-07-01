@@ -67,6 +67,10 @@ void KeepOrRetryScreen::turnWheel(int i)
 
 void KeepOrRetryScreen::displayNameForNewSound()
 {
+	if (!sampler.lock()->getSound().lock())
+	{
+		return;
+	}
 	findField("name-for-new-sound").lock()->setText(dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getPreviewSound().lock())->getName());
 }
 

@@ -15,7 +15,10 @@ void SaveASoundScreen::open()
 {
 	if (ls.lock()->getPreviousScreenName().compare("name") != 0)
 	{
-		saveName = sampler.lock()->getSound().lock()->getName();
+		if (sampler.lock()->getSound().lock())
+		{
+			saveName = sampler.lock()->getSound().lock()->getName();
+		}
 	}
 
 	displayFile();

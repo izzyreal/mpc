@@ -41,6 +41,12 @@ void LoopToFineScreen::displayLoopLngth()
 void LoopToFineScreen::displayLngthField()
 {
 	auto sound = sampler.lock()->getSound().lock();
+	
+	if (!sound)
+	{
+		return;
+	}
+
 	findField("lngth").lock()->setTextPadded(sound->getEnd() - sound->getLoopTo(), " ");
 }
 
@@ -48,6 +54,12 @@ void LoopToFineScreen::displayFineWaveform()
 {
 	auto trimScreen = dynamic_pointer_cast<TrimScreen>(Screens::getScreenComponent("trim"));
 	auto sound = sampler.lock()->getSound().lock();
+	
+	if (!sound)
+	{
+		return;
+	}
+
 	findWave().lock()->setSampleData(sound->getSampleData(), sound->isMono(), trimScreen->view);
 	findWave().lock()->setCenterSamplePos(sound->getLoopTo());
 }
@@ -60,6 +72,12 @@ void LoopToFineScreen::displayPlayX()
 void LoopToFineScreen::displayTo()
 {
 	auto sound = sampler.lock()->getSound().lock();
+
+	if (!sound)
+	{
+		return;
+	}
+
 	findField("to").lock()->setTextPadded(sound->getLoopTo(), " ");
 }
 

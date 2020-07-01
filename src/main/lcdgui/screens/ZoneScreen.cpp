@@ -303,6 +303,11 @@ void ZoneScreen::setZoneStart(int zoneIndex, int start)
 
 int ZoneScreen::getZoneStart(int zoneIndex)
 {
+	if (zoneIndex >= zones.size())
+	{
+		return 0;
+	}
+
 	return zones[zoneIndex][0];
 }
 
@@ -327,6 +332,11 @@ void ZoneScreen::setZoneEnd(int zoneIndex, int end)
 
 int ZoneScreen::getZoneEnd(int zoneIndex)
 {
+	if (zoneIndex >= zones.size())
+	{
+		return 0;
+	}
+
 	return zones[zoneIndex][1];
 }
 

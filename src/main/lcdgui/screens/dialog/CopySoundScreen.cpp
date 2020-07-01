@@ -15,7 +15,7 @@ void CopySoundScreen::open()
 {
 	auto previousScreenName = ls.lock()->getPreviousScreenName();
 
-	if (previousScreenName.compare("name") != 0)
+	if (previousScreenName.compare("name") != 0 && sampler.lock()->getSound().lock())
 	{
 		newName = sampler.lock()->getSound().lock()->getName();
 		//newSampleName = newSampleName->replaceAll("\\s+$", "");
@@ -74,6 +74,11 @@ void CopySoundScreen::displayNewName()
 
 void CopySoundScreen::displaySnd()
 {
+	if (!sampler.lock()->getSound().lock())
+	{
+		return;
+	}
+
 	findField("snd").lock()->setText(sampler.lock()->getSound().lock()->getName());
 }
 

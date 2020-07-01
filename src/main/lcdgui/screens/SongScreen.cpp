@@ -16,6 +16,7 @@ SongScreen::SongScreen(const int layerIndex)
 
 void SongScreen::open()
 {
+	init();
 	displaySongName();
 	displayNow0();
 	displayNow1();

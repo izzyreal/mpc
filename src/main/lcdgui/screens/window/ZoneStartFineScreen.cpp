@@ -37,6 +37,12 @@ void ZoneStartFineScreen::displayFineWaveform()
 	auto trimScreen = dynamic_pointer_cast<TrimScreen>(Screens::getScreenComponent("trim"));
 
 	auto sound = sampler.lock()->getSound().lock();
+
+	if (!sound)
+	{
+		return;
+	}
+
 	findWave().lock()->setSampleData(sound->getSampleData(), sound->isMono(), trimScreen->view);
 	findWave().lock()->setCenterSamplePos(zoneScreen->getZoneStart(zoneScreen->zone));
 }

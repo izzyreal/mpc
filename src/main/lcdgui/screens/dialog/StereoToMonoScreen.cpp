@@ -16,7 +16,7 @@ void StereoToMonoScreen::open()
 {
 	auto previousScreenName = ls.lock()->getPreviousScreenName();
 
-	if (previousScreenName.compare("name") != 0)
+	if (previousScreenName.compare("name") != 0 && sampler.lock()->getSound().lock())
 	{
 		string name = sampler.lock()->getSound().lock()->getName();
 		name = StrUtil::trim(name);
@@ -105,6 +105,12 @@ void StereoToMonoScreen::function(int i)
 void StereoToMonoScreen::displayStereoSource()
 {
 	auto sound = sampler.lock()->getSound().lock();
+
+	if (!sound)
+	{
+		return;
+	}
+
 	findField("stereosource").lock()->setText(sound->getName());
 
 	if (sound->isMono())

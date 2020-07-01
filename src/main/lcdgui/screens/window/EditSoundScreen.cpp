@@ -36,7 +36,7 @@ EditSoundScreen::EditSoundScreen(const int layerIndex)
 
 void EditSoundScreen::open()
 {
-	if (ls.lock()->getPreviousScreenName().compare("name") != 0)
+	if (ls.lock()->getPreviousScreenName().compare("name") != 0 && sampler.lock()->getSound().lock())
 	{
 		auto newSoundName = sampler.lock()->getSound().lock()->getName();
 		//newSampleName = newSampleName->replaceAll("\\s+$", "");
