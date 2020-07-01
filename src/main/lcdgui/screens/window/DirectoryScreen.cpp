@@ -453,7 +453,7 @@ void DirectoryScreen::displayLeftFields()
 	{
 		if (i + yOffset0 > size - 1)
 		{
-			findField("a" + to_string(i)).lock()->setText("");
+			findField("a" + to_string(i)).lock()->setText(" ");
 		}
 		else
 		{
@@ -476,7 +476,7 @@ void DirectoryScreen::displayRightFields()
 	{
 		if (i + yOffset1 > size - 1)
 		{
-			findField("b" + to_string(i)).lock()->setText("");
+			findField("b" + to_string(i)).lock()->setText(" ");
 		}
 		else
 		{
@@ -572,12 +572,12 @@ void DirectoryScreen::drawGraphicsLeft()
 	auto a2 = findLabel("a2i").lock();
 	auto a3 = findLabel("a3i").lock();
 	auto a4 = findLabel("a4i").lock();
-	topLeft->setText("");
-	a0->setText("");
-	a1->setText("");
-	a2->setText("");
-	a3->setText("");
-	a4->setText("");
+	topLeft->setText(" ");
+	a0->setText(" ");
+	a1->setText(" ");
+	a2->setText(" ");
+	a3->setText(" ");
+	a4->setText(" ");
 
 	auto fc = getFirstColumn();
 	auto currentDirIcons = vector<string>{ u8"\u00EF", u8"\u00F1", u8"\u00F0" };
@@ -760,11 +760,11 @@ void DirectoryScreen::drawGraphicsRight()
 	auto b3 = findLabel("b3i").lock();
 	auto b4 = findLabel("b4i").lock();
 
-	b0->setText("");
-	b1->setText("");
-	b2->setText("");
-	b3->setText("");
-	b4->setText("");
+	b0->setText(" ");
+	b1->setText(" ");
+	b2->setText(" ");
+	b3->setText(" ");
+	b4->setText(" ");
 
 	auto firstColumn = getFirstColumn();
 	auto secondColumn = getSecondColumn();

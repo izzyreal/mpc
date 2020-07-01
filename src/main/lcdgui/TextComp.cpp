@@ -35,7 +35,7 @@ void TextComp::Draw(std::vector<std::vector<bool>>* pixels)
 		auto rect = getRect();
 		for (int x1 = rect.L + 1; x1 < rect.R; x1++)
 		{
-			for (int y1 = rect.T + 1; y1 < rect.B - 1; y1++)
+			for (int y1 = rect.T; y1 < rect.B - 1; y1++)
 			{
 				(*pixels)[x1][y1] = inverted ? true : false;
 			}
@@ -137,11 +137,8 @@ unsigned int TextComp::GetTextEntryLength()
 
 void TextComp::setText(const string& s)
 {
-	if (text.compare(s) != 0)
-	{
-		text = s;
-		SetDirty();
-	}
+	text = s;
+	SetDirty();
 }
 
 void TextComp::setTextPadded(string s, string padding)
