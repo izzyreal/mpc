@@ -69,6 +69,10 @@ bool Component::bringToFront(Component* childToBringToFront)
 
 bool Component::shouldNotDraw(vector<vector<bool>>* pixels)
 {
+	if (name.compare("fk3") == 0 && hidden)
+	{
+		printf("");
+	}
 	if (!IsDirty())
 	{
 		return true;
@@ -105,6 +109,8 @@ weak_ptr<Parameter> Component::findParameter(const string& name)
 
 	return {};
 }
+
+
 
 weak_ptr<Label> Component::findLabel(const string& name)
 {

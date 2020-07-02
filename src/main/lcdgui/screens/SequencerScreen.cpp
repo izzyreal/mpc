@@ -431,7 +431,7 @@ void SequencerScreen::function(int i)
 	{
 		sequencer.lock()->setSoloEnabled(!sequencer.lock()->isSoloEnabled());
 
-		findLabel("fk3").lock()->setBlinking(sequencer.lock()->isSoloEnabled());
+		findChild<TextComp>("fk3").lock()->setBlinking(sequencer.lock()->isSoloEnabled());
 
 		break;
 	}

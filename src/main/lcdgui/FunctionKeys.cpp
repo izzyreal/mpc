@@ -18,13 +18,12 @@ FunctionKeys::FunctionKeys(const string& name, vector<vector<string>> texts, vec
 
 	for (int i = 0; i < 6; i++)
 	{
-		auto child = addChild(make_shared<TextComp>("fk" + to_string(i)));
+		auto child = addChild(make_shared<TextComp>("fk" + to_string(i))).lock();
+		child->setSize(29, 7);
 	}
 
 	setSize(248, 10);
 	setLocation(0, 50);
-	//preDrawClearRect.Clear();
-	//dirty = false;
 }
 
 void FunctionKeys::setActiveArrangement(int i)

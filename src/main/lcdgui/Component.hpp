@@ -38,6 +38,27 @@ namespace mpc::lcdgui
 		bool shouldNotDraw(std::vector<std::vector<bool>>* pixels);
 
 	public:
+		template<class T>
+		std::weak_ptr<T> findChild(const std::string& name)
+		{
+			for (auto& c : children)
+			{
+				if (c->getName().compare(name) == 0 && dynamic_pointer_cast<T>(c))
+				{
+					return dynamic_pointer_cast<T>(c);
+				}
+
+				auto candidate = c->findChild<T>(name).lock();
+
+				if (candidate)
+				{
+					return candidate;
+				}
+			}
+
+			return {};
+		}
+
 		std::weak_ptr<Component> addChild(std::shared_ptr<Component> child);
 		void removeChild(std::weak_ptr<Component> child);
 		void addChildren(std::vector<std::shared_ptr<Component>> children);
