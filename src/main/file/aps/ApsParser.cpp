@@ -79,22 +79,37 @@ ApsParser::ApsParser(string apsNameString)
 	}
 	//chunks.push_back(vector<char>{ 1, 127, 0, 0, 7, 4, 30, 0 }); // [2] of this chunk is pgm index
 	chunks.push_back(vector<char>{ 1, 127 });
-	for (int i = 0; i < 24; i++) {
+	
+	for (int i = 0; i < 24; i++)
+	{
 		auto p = sampler->getProgram(i).lock();
-		if (!p) continue;
+		
+		if (!p)
+		{
+			continue;
+		}
+
 		auto program = ApsProgram(dynamic_cast<mpc::sampler::Program*>(p.get()), i);
 		chunks.push_back(program.getBytes());
 	}
+	
 	chunks.push_back(vector<char>{ (char)255, (char)255 });
 	auto totalSize = 0;
-	for (auto& ba : chunks) {
+	
+	for (auto& ba : chunks)
+	{
 		totalSize += ba.size();
 	}
+	
 	saveBytes = vector<char>(totalSize);
 	auto counter = 0;
-	for (auto& ba : chunks) {
+	
+	for (auto& ba : chunks)
+	{
 		for (auto& b : ba)
+		{
 			saveBytes[counter++] = b;
+		}
 	}
 }
 

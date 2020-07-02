@@ -6,7 +6,7 @@ using namespace std;
 ApsHeader::ApsHeader(vector<char> loadBytes) 
 {
 	valid = loadBytes[0] == 10 && loadBytes[1] == 5 && loadBytes[3] == 0;
-	soundAmount = loadBytes[2];
+	soundCount = loadBytes[2];
 }
 
 ApsHeader::ApsHeader(int soundCount)
@@ -25,7 +25,7 @@ bool ApsHeader::isValid()
 
 int ApsHeader::getSoundAmount()
 {
-    return soundAmount;
+    return soundCount;
 }
 
 vector<char> ApsHeader::getBytes()

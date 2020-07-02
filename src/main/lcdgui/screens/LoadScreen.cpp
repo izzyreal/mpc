@@ -115,7 +115,7 @@ void LoadScreen::function(int i)
 		}
 		else if (StrUtil::eqIgnoreCase(ext, "aps"))
 		{
-			ls.lock()->openScreen("loadapsfile");
+			ls.lock()->openScreen("load-aps-file");
 			return;
 		}
 

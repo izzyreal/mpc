@@ -50,63 +50,74 @@ ApsLoader::ApsLoader(mpc::disk::MpcFile* file)
 	loadThread = thread(&ApsLoader::static_load, this);
 }
 
-void ApsLoader::static_load(void* this_p) {
+void ApsLoader::static_load(void* this_p)
+{
 	static_cast<ApsLoader*>(this_p)->load();
 }
 
 void ApsLoader::load()
 {
-	auto lDisk = Mpc::instance().getDisk().lock();
-	lDisk->setBusy(true);
+	auto disk = Mpc::instance().getDisk().lock();
+	disk->setBusy(true);
 	ApsParser apsParser(file);
+
+	if (!apsParser.isHeaderValid())
+	{
+		MLOG("The APS file you're trying to load does not have a valid ID. The first 2 bytes of an MPC2000XL APS file should be 0A 05. MPC2000 APS files start with 0A 04 and are not supported (yet?).");
+		disk->setBusy(false);
+		return;
+	}
+
 	auto sampler = Mpc::instance().getSampler().lock();
 	sampler->deleteAllSamples();
 	const bool initPgms = false;
-	for (int i = 0; i < apsParser.getSoundNames().size(); i++) {
+
+	for (int i = 0; i < apsParser.getSoundNames().size(); i++)
+	{
 		auto ext = "snd";
 		mpc::disk::MpcFile* soundFile = nullptr;
 		string soundFileName = StrUtil::replaceAll(apsParser.getSoundNames()[i], ' ', "");
-		for (auto& f : lDisk->getAllFiles()) {
+
+		for (auto& f : disk->getAllFiles())
+		{
 			if (StrUtil::eqIgnoreCase(StrUtil::replaceAll(f->getName(), ' ', ""), soundFileName + ".SND"))
+			{
 				soundFile = f;
-		}
-		if (soundFile == nullptr) {
-			for (auto& f : lDisk->getAllFiles()) {
-				if (StrUtil::eqIgnoreCase(StrUtil::replaceAll(f->getName(), ' ', ""), soundFileName + ".WAV"))
-					soundFile = f;
 			}
+		}
+
+		if (soundFile == nullptr)
+		{
+			for (auto& f : disk->getAllFiles())
+			{
+				if (StrUtil::eqIgnoreCase(StrUtil::replaceAll(f->getName(), ' ', ""), soundFileName + ".WAV"))
+				{
+					soundFile = f;
+				}
+			}
+
 			ext = "wav";
 		}
-		if (soundFile != nullptr) {
-			loadSound(soundFileName, ext, soundFile, false, i);
+
+		if (soundFile == nullptr)
+		{
+			MLOG("Error loading sound " + soundFileName + ". Check if such a file with SND or WAV extension exists next to your APS or PGM file.");
+			continue;
 		}
-		else {
-			if (dynamic_pointer_cast<mpc::disk::StdDisk>(lDisk)) {
-				ext = "snd";
-				soundFileName = soundFileName.substr(0, 8);
-				for (auto& f : lDisk->getAllFiles()) {
-					if (StrUtil::eqIgnoreCase(StrUtil::replaceAll(f->getName(), ' ', ""), soundFileName + ".SND"))
-						soundFile = f;
-				}
-				if (soundFile == nullptr) {
-					for (auto& f : lDisk->getAllFiles()) {
-						if (StrUtil::eqIgnoreCase(StrUtil::replaceAll(f->getName(), ' ', ""), soundFileName + ".WAV"))
-							soundFile = f;
-					}
-					ext = "wav";
-				}
-			}
-			if (soundFile == nullptr) {
-				throw std::invalid_argument("error loading soundfile");
-			}
-		}
+
+		loadSound(soundFileName, ext, soundFile, false, i);
 	}
+
 	sampler->deleteAllPrograms(initPgms);
-	for (auto& p : apsParser.getPrograms()) {
+	
+	for (auto& p : apsParser.getPrograms())
+	{
 		auto newProgram = sampler->addProgram(p->index).lock();
 		auto assignTable = p->getAssignTable()->get();
 		newProgram->setName(p->getName());
-		for (int i = 0; i < 64; i++) {
+
+		for (int i = 0; i < 64; i++)
+		{
 			int padnn = assignTable[i];
 			newProgram->getPad(i)->setNote(padnn);
 			auto apssmc = p->getStereoMixerChannel(i + 35);
@@ -146,6 +157,7 @@ void ApsLoader::load()
 			np->setVeloRangeUpper(anp->getVelocityRangeUpper());
 			np->setVelocityToPitch(anp->getVelocityToPitch());
 		}
+
 		auto slider = dynamic_cast<mpc::sampler::PgmSlider*>(newProgram->getSlider());
 		slider->setAttackHighRange(p->getSlider()->getAttackHigh());
 		slider->setAttackLowRange(p->getSlider()->getAttackLow());
@@ -159,10 +171,13 @@ void ApsLoader::load()
 		slider->setTuneLowRange(p->getSlider()->getTuneLow());
 	}
 
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < 4; i++)
+	{
 		auto m = apsParser.getDrumMixers()[i];
 		auto drum = Mpc::instance().getDrum(i);
-		for (int note = 35; note <= 98; note++) {
+
+		for (int note = 35; note <= 98; note++)
+		{
 			auto apssmc = m->getStereoMixerChannel(note);
 			auto apsifmc = m->getIndivFxMixerChannel(note);
 			auto drumsmc = drum->getStereoMixerChannels()[note - 35].lock();
@@ -174,11 +189,13 @@ void ApsLoader::load()
 			drumifmc->setOutput(apsifmc->getOutput());
 			drumifmc->setFxSendLevel(apsifmc->getFxSendLevel());
 		}
+
 		auto pgm = apsParser.getDrumConfiguration(i)->getProgram();
 		drum->setProgram(pgm);
 		drum->setReceivePgmChange(apsParser.getDrumConfiguration(i)->getReceivePgmChange());
 		drum->setReceiveMidiVolume(apsParser.getDrumConfiguration(i)->getReceiveMidiVolume());
 	}
+
 	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(Screens::getScreenComponent("mixer-setup"));
 
 	mixerSetupScreen->setRecordMixChangesEnabled(apsParser.getGlobalParameters()->isRecordMixChangesEnabled());
@@ -195,7 +212,7 @@ void ApsLoader::load()
 	
 	Mpc::instance().getLayeredScreen().lock()->removePopup();
 	Mpc::instance().getLayeredScreen().lock()->openScreen("load");
-	lDisk->setBusy(false);
+	disk->setBusy(false);
 }
 
 void ApsLoader::loadSound(string soundFileName, string ext, mpc::disk::MpcFile* soundFile, bool replace, int loadSoundIndex)
@@ -224,5 +241,8 @@ void ApsLoader::showPopup(string name, string ext, int sampleSize)
 
 ApsLoader::~ApsLoader()
 {
-	if (loadThread.joinable()) loadThread.join();
+	if (loadThread.joinable())
+	{
+		loadThread.join();
+	}
 }
