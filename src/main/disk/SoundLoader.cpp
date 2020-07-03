@@ -62,6 +62,7 @@ int SoundLoader::loadSound(MpcFile* f)
 	
 	if (!partOfProgram && existingSoundIndex == -1)
 	{
+		Mpc::instance().getLayeredScreen().lock()->removePopup();
 		Mpc::instance().getLayeredScreen().lock()->openFileNamePopup(soundFileName, extension);
 	}
 

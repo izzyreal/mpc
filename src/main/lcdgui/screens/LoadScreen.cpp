@@ -51,7 +51,7 @@ void LoadScreen::function(int i)
 		ls.lock()->openScreen("format");
 		break;
 	case 3:
-		ls.lock()->openScreen("setup");
+		//ls.lock()->openScreen("setup");
 		break;
 	case 4:
 	{

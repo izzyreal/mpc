@@ -204,7 +204,8 @@ void Mpc::loadSound(bool replace)
 	
 	if (hasNotBeenLoadedAlready)
 	{
-		loadSoundThread = thread(&Mpc::static_loadSound, soundLoader.getSize());
+		//loadSoundThread = thread(&Mpc::static_loadSound, soundLoader.getSize());
+		runLoadSoundThread(soundLoader.getSize());
 	}
 	else {
 		sampler->deleteSample(sampler->getSoundCount() - 1);
@@ -247,7 +248,8 @@ void Mpc::static_loadSound(int size)
 	Mpc::instance().runLoadSoundThread(size);
 }
 
-void Mpc::runLoadSoundThread(int size) {
+void Mpc::runLoadSoundThread(int size)
+{
 	int sleepTime = size / 400;
 	
 	if (sleepTime < 300)
@@ -255,8 +257,7 @@ void Mpc::runLoadSoundThread(int size) {
 		sleepTime = 300;
 	}
 	
-	this_thread::sleep_for(chrono::milliseconds((int)(sleepTime * 0.1)));
-	layeredScreen->removePopup();
+	//this_thread::sleep_for(chrono::milliseconds((int)(sleepTime)));
 	layeredScreen->openScreen("load-a-sound");
 	getDisk().lock()->setBusy(false);
 }

@@ -225,6 +225,7 @@ void ApsLoader::loadSound(string soundFileName, string ext, mpc::disk::MpcFile* 
 
 void ApsLoader::showPopup(string name, string ext, int sampleSize)
 {
+	Mpc::instance().getLayeredScreen().lock()->removePopup();
 	Mpc::instance().getLayeredScreen().lock()->openFileNamePopup(StrUtil::padRight(name, " ", 16), ext);
 
 	if (dynamic_pointer_cast<mpc::disk::StdDisk>(Mpc::instance().getDisk().lock()))

@@ -107,11 +107,6 @@ void StdDisk::renameFilesToAkai() {
 
 void StdDisk::initFiles()
 {
-	for (auto& f : allFiles)
-	{
-		delete f;
-	}
-
 	files.clear();
 	allFiles.clear();
 
@@ -120,14 +115,14 @@ void StdDisk::initFiles()
 	auto loadScreen = dynamic_pointer_cast<LoadScreen>(Screens::getScreenComponent("load"));
 
 	auto view = loadScreen->view;
-	auto fileArray = getDir().lock()->listFiles();
+	auto dirList = getDir().lock()->listFiles();
 
-	for (auto& f : fileArray)
+	for (auto& f : dirList)
 	{
 		MpcFile* mpcFile = new MpcFile(f);
 		allFiles.push_back(mpcFile);
 
-		if (view != 0)
+		if (view != 0 && f->isFile())
 		{
 			string name = f->getName();
 		

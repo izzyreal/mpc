@@ -45,9 +45,9 @@ namespace mpc::disk {
 
 	public:
 		const std::vector<std::string> extensions{ "", "SND", "PGM", "APS", "MID", "ALL", "WAV", "SEQ", "SET" };
-		std::vector<MpcFile*> files{};
-		std::vector<MpcFile*> allFiles{};
-		std::vector<MpcFile*> parentFiles{};
+		std::vector<MpcFile*> files;
+		std::vector<MpcFile*> allFiles;
+		std::vector<MpcFile*> parentFiles;
 
 	public:
 		static std::string formatFileSize(int size);
