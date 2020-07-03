@@ -67,7 +67,7 @@ namespace mpc::lcdgui {
 		FunctionKeys* getFunctionKeys();
 
 	public:
-		void createPopup(std::string text, int textXPos);
+		void createPopup(std::string text);
 		void openFileNamePopup(const std::string& name, const std::string& ext);
 		lcdgui::Background* getCurrentBackground();
 		void removeCurrentBackground();

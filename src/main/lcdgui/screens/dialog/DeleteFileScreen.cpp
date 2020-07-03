@@ -32,7 +32,7 @@ void DeleteFileScreen::function(int i)
 		break;
 	case 4:
 		auto directoryScreen = dynamic_pointer_cast<DirectoryScreen>(Screens::getScreenComponent("directory"));
-		ls.lock()->createPopup("Delete:" + directoryScreen->getSelectedFile()->getName(), 85);
+		ls.lock()->createPopup("Delete:" + directoryScreen->getSelectedFile()->getName());
 		
 		if (deleteThread.joinable())
 		{

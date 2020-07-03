@@ -8,11 +8,8 @@ namespace mpc::lcdgui {
 		: public Component
 	{
 
-	private:
-		std::string name = "";
-
 	public:
-		void setName(std::string name);
+		void setName(const std::string& name);
 
 	public:
 		void Draw(std::vector< std::vector<bool>>* pixels) override;

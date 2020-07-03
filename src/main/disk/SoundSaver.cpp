@@ -41,7 +41,7 @@ void SoundSaver::saveSounds()
 		string fileName = StrUtil::replaceAll(s.lock()->getName(), ' ', "");
 
 		Mpc::instance().getLayeredScreen().lock()->removePopup();
-		Mpc::instance().getLayeredScreen().lock()->createPopup("SAVING " + (StrUtil::padRight(fileName, " ", 16) + ext), 85);
+		Mpc::instance().getLayeredScreen().lock()->createPopup("SAVING " + (StrUtil::padRight(fileName, " ", 16) + ext));
 
 		if (lDisk->checkExists(fileName))
 		{

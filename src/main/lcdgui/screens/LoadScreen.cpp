@@ -75,11 +75,11 @@ void LoadScreen::function(int i)
 
 			if (started)
 			{
-				mpc.getLayeredScreen().lock()->createPopup("Playing " + name, 45);
+				mpc.getLayeredScreen().lock()->createPopup("Playing " + name);
 			}
 			else
 			{
-				mpc.getLayeredScreen().lock()->createPopup("Can't play " + name, 35);
+				mpc.getLayeredScreen().lock()->createPopup("Can't play " + name);
 			}
 		}
 		break;

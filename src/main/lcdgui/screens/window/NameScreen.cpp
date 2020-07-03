@@ -259,7 +259,7 @@ void NameScreen::saveName()
 		
 		if (!success)
 		{
-			ls.lock()->createPopup("File name exists !!", 120);
+			ls.lock()->createPopup("File name exists !!");
 			ls.lock()->setPreviousScreenName("directory");
 			return;
 		}
@@ -313,7 +313,7 @@ void NameScreen::saveName()
 
 		if (!success)
 		{
-			ls.lock()->createPopup("Folder name exists !!", 120);
+			ls.lock()->createPopup("Folder name exists !!");
 		}
 	}
 

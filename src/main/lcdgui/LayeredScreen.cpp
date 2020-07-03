@@ -37,10 +37,11 @@ static moduru::gui::BMFParser _bmfParser = moduru::gui::BMFParser(string(mpc::Pa
 std::vector<std::vector<bool>> LayeredScreen::atlas = _bmfParser.getAtlas();
 moduru::gui::bmfont LayeredScreen::font = _bmfParser.getLoadedFont();
 
-LayeredScreen::LayeredScreen() 
+LayeredScreen::LayeredScreen()
 {	
 	root = make_unique<Component>("root");
-	popup = make_unique<Popup>();
+	
+	popup = make_shared<Popup>();
 	popup->Hide(true);
 
 	shared_ptr<Layer> previousLayer;
@@ -117,12 +118,14 @@ int LayeredScreen::openScreen(string screenName)
 	{
 		oldScreenComponent->close();
 		getFocusedLayer().lock()->removeChild(oldScreenComponent);
+		getFocusedLayer().lock()->removeChild(popup);
 	}
 
 	focusedLayerIndex = screenComponent->getLayerIndex();
 
 	getFocusedLayer().lock()->addChild(screenComponent);
-	
+	getFocusedLayer().lock()->addChild(popup);
+
 	if (screenComponent->findFields().size() > 0)
 	{
 		returnToLastFocus(screenComponent->findFields().front().lock()->getName());
@@ -169,10 +172,10 @@ Layer* LayeredScreen::getLayer(int i)
 	return layers[i].lock().get();
 }
 
-void LayeredScreen::createPopup(string text, int textXPos)
+void LayeredScreen::createPopup(string text)
 {
 	popup->Hide(false);
-	popup->setText(text, textXPos);
+	popup->setText(text);
 }
 
 void LayeredScreen::openFileNamePopup(const string& name, const string& extension)
@@ -184,7 +187,7 @@ void LayeredScreen::openFileNamePopup(const string& name, const string& extensio
 		extUpperCase.push_back(toupper(c));
 	}
 
-	createPopup("LOADING " + name + "." + extUpperCase, 85);
+	createPopup("LOADING " + name + "." + extUpperCase);
 }
 
 Background* LayeredScreen::getCurrentBackground()
@@ -209,7 +212,7 @@ void LayeredScreen::removePopup()
 
 void LayeredScreen::setPopupText(string text)
 {
-	popup->setText(text, 0);
+	popup->setText(text);
 }
 
 void LayeredScreen::returnToLastFocus(string firstFieldOfThisScreen)

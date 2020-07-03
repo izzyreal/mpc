@@ -104,10 +104,10 @@ void DirectoryScreen::function(int f)
 			auto name = file->getFsNode().lock()->getNameWithoutExtension();
 
 			if (started) {
-				Mpc::instance().getLayeredScreen().lock()->createPopup("Playing " + name, 45);
+				Mpc::instance().getLayeredScreen().lock()->createPopup("Playing " + name);
 			}
 			else {
-				Mpc::instance().getLayeredScreen().lock()->createPopup("Can't play " + name, 35);
+				Mpc::instance().getLayeredScreen().lock()->createPopup("Can't play " + name);
 			}
 		}
 

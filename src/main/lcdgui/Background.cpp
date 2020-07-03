@@ -15,13 +15,13 @@ Background::Background()
 	h = 60;
 }
 
-void Background::setName(std::string name)
+void Background::setName(const string& name)
 { 
 	this->name = name;
 	SetDirty();
 }
 
-void Background::Draw(std::vector< std::vector<bool>>* pixels)
+void Background::Draw(vector<vector<bool>>* pixels)
 {
 	if (shouldNotDraw(pixels))
 	{

@@ -11,17 +11,19 @@ using namespace std;
 Popup::Popup()
 	: Component("popup")
 {
-	bg = make_unique<Background>();
-	bg->setName("popup");
+	addChild(make_unique<Background>());
+	findChild<Background>("background").lock()->setName("popup");
+
+	addChild(make_shared<Label>("popup", "", 43, 23, 0));
+	findChild<Label>("popup").lock()->setInverted(true);
+
 	setSize(184, 17);
 	setLocation(34, 18);
 }
 
-void Popup::setText(string text, int pos)
+void Popup::setText(string text)
 {
-	this->text = text;
-	this->pos = pos;
-	SetDirty();
+	findChild<Label>("popup").lock()->setText(text);
 }
 
 void Popup::Draw(std::vector<std::vector<bool>>* pixels)
@@ -31,12 +33,5 @@ void Popup::Draw(std::vector<std::vector<bool>>* pixels)
 		return;
 	}
 
-	bg->Draw(pixels);
-	lcdgui::Label l("popup", text, 43, 23, text.size() * 6);
-	l.setInverted(true);
-	l.Draw(pixels);
-	dirty = false;
-}
-
-Popup::~Popup() {
+	Component::Draw(pixels);
 }

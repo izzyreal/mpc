@@ -4,31 +4,25 @@
 #include <string>
 #include <memory>
 
-namespace mpc {
-	namespace lcdgui {
+namespace mpc::lcdgui
+{
+	class Background;
 
-		class Background;
+	class Popup
+		: public Component
+	{
 
-		class Popup
-			: public Component			
-		{
+	private:
+		std::string text = "";
 
-		private:
-			int pos{ 0 };
-			std::string text = "";
-			std::unique_ptr<Background> bg;
+	public:
+		void setText(std::string text);
 
-		public:
-			void setText(std::string text, int pos);
+	public:
+		void Draw(std::vector<std::vector<bool>>* pixels) override;
 
-		public:
-			void Draw(std::vector<std::vector<bool>>* pixels) override;
+	public:
+		Popup();
 
-		public:
-			Popup();
-			~Popup();
-
-		};
-
-	}
+	};
 }
