@@ -41,7 +41,6 @@ using namespace std;
 
 ApsLoader::ApsLoader(mpc::disk::MpcFile* file) 
 {
-	
 	this->file = file;
 	
 	if (loadThread.joinable())
@@ -228,7 +227,7 @@ void ApsLoader::showPopup(string name, string ext, int sampleSize)
 {
 	Mpc::instance().getLayeredScreen().lock()->openScreen("popup");
 	auto popupScreen = dynamic_pointer_cast<PopupScreen>(Screens::getScreenComponent("popup"));
-	popupScreen->setText("LOADING " + StrUtil::padRight(name, " ", 16) + "." + ext);
+	popupScreen->setText("LOADING " + StrUtil::padRight(name, " ", 16) + "." + StrUtil::toUpper(ext));
 
 	if (dynamic_pointer_cast<mpc::disk::StdDisk>(Mpc::instance().getDisk().lock()))
 	{

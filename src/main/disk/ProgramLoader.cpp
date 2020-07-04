@@ -127,15 +127,21 @@ void ProgramLoader::loadSound(string soundFileName, string ext, MpcFile* soundFi
 	int addedSoundIndex = -1;
 	auto sl = SoundLoader(Mpc::instance().getSampler().lock()->getSounds(), replace);
 	sl.setPartOfProgram(true);
-	try {
+
+	try
+	{
 		showPopup(soundFileName, ext, soundFile->length());
 		addedSoundIndex = sl.loadSound(soundFile);
-		if (addedSoundIndex != -1) {
+		
+		if (addedSoundIndex != -1)
+		{
 			(*soundsDestIndex)[loadSoundIndex] = addedSoundIndex;
 		}
 	}
-	catch (exception e) {
-		e.what();
+	catch (const exception& e)
+	{
+		auto msg = string(e.what());
+		MLOG("Exception occurred in ProgramLoader::loadSound(...) -- " + msg);
 	}
 }
 
@@ -143,21 +149,16 @@ void ProgramLoader::showPopup(string name, string ext, int sampleSize)
 {
 	Mpc::instance().getLayeredScreen().lock()->openScreen("popup");
 	auto popupScreen = dynamic_pointer_cast<PopupScreen>(Screens::getScreenComponent("popup"));
-	popupScreen->setText("LOADING " + StrUtil::padRight(name, " ", 16) + "." + ext);
+	popupScreen->setText("LOADING " + StrUtil::padRight(name, " ", 16) + "." + StrUtil::toUpper(ext));
 
-	if (dynamic_pointer_cast<StdDisk>(Mpc::instance().getDisk().lock()) != nullptr)
+	auto sleepTime = sampleSize / 800;
+	
+	if (sleepTime < 300)
 	{
-		try
-		{
-			auto sleepTime = sampleSize / 400;
-			if (sleepTime < 300) sleepTime = 300;
-			this_thread::sleep_for(chrono::milliseconds((int)(sleepTime * 0.5)));
-		}
-		catch (exception e)
-		{
-			e.what();
-		}
+		sleepTime = 300;
 	}
+
+	this_thread::sleep_for(chrono::milliseconds((int)(sleepTime * 0.2)));
 }
 
 void ProgramLoader::notfound(string soundFileName, string ext)

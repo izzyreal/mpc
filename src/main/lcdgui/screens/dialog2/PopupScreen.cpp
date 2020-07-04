@@ -18,4 +18,5 @@ PopupScreen::PopupScreen()
 void PopupScreen::setText(string text)
 {
 	findChild<Label>("popup").lock()->setText(text);
+	SetDirty();
 }
