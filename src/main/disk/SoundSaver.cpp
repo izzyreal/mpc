@@ -7,6 +7,7 @@
 
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/window/SaveAProgramScreen.hpp>
+#include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
 #include <lang/StrUtil.hpp>
 
@@ -15,6 +16,7 @@
 using namespace mpc::disk;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::lcdgui::screens::dialog2;
 using namespace moduru::lang;
 using namespace std;
 
@@ -37,11 +39,13 @@ void SoundSaver::saveSounds()
 	string const ext = string(wav ? ".WAV" : ".SND");
 	auto lDisk = disk.lock();
 	
-	for (auto s : sounds) {
+	for (auto s : sounds)
+	{
 		string fileName = StrUtil::replaceAll(s.lock()->getName(), ' ', "");
-
-		Mpc::instance().getLayeredScreen().lock()->removePopup();
-		Mpc::instance().getLayeredScreen().lock()->createPopup("SAVING " + (StrUtil::padRight(fileName, " ", 16) + ext));
+		
+		Mpc::instance().getLayeredScreen().lock()->openScreen("popup");
+		auto popupScreen = dynamic_pointer_cast<PopupScreen>(Screens::getScreenComponent("popup"));
+		popupScreen->setText("SAVING " + StrUtil::padRight(fileName, " ", 16) + ext);
 
 		if (lDisk->checkExists(fileName))
 		{
@@ -68,19 +72,20 @@ void SoundSaver::saveSounds()
 		{
 			this_thread::sleep_for(chrono::milliseconds(300));
 		}
-		catch (exception e) {
+		catch (exception e)
+		{
 			e.what();
 		}
 	}
 
-    Mpc::instance().getLayeredScreen().lock()->removePopup();
 	Mpc::instance().getLayeredScreen().lock()->openScreen("save");
 	lDisk->setBusy(false);
 }
 
 SoundSaver::~SoundSaver()
 {
-	if (saveSoundsThread.joinable()) {
+	if (saveSoundsThread.joinable())
+	{
 		saveSoundsThread.join();
 	}
 }

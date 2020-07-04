@@ -5,6 +5,7 @@
 
 #include <lcdgui/screens/window/DirectoryScreen.hpp>
 #include <lcdgui/screens/window/LoadASequenceScreen.hpp>
+#include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
 #include <disk/AbstractDisk.hpp>
 #include <disk/MpcFile.hpp>
@@ -14,6 +15,7 @@
 
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::sampler;
 using namespace moduru::lang;
 using namespace moduru::file;
@@ -73,13 +75,16 @@ void LoadScreen::function(int i)
 			
 			auto name = file->getFsNode().lock()->getNameWithoutExtension();
 
+			ls.lock()->openScreen("popup");
+			auto popupScreen = dynamic_pointer_cast<PopupScreen>(Screens::getScreenComponent("popup"));
+
 			if (started)
 			{
-				mpc.getLayeredScreen().lock()->createPopup("Playing " + name);
+				popupScreen->setText("Playing " + name);
 			}
 			else
 			{
-				mpc.getLayeredScreen().lock()->createPopup("Can't play " + name);
+				popupScreen->setText("Can't play " + name);
 			}
 		}
 		break;

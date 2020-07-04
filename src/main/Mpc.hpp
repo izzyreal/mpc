@@ -141,8 +141,7 @@ namespace mpc
 		void importLoadedProgram();
 
 	private:
-		void runLoadSoundThread(int size);
-		static void static_loadSound(int size);
+		static void runLoadSoundThread(int size);
 
 	public:
 		std::weak_ptr<mpc::disk::AbstractDisk> getDisk();

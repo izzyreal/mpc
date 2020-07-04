@@ -1,6 +1,7 @@
 #include "DeleteFolderScreen.hpp"
 
 #include <lcdgui/screens/window/DirectoryScreen.hpp>
+#include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
 #include <disk/AbstractDisk.hpp>
 #include <disk/MpcFile.hpp>
@@ -9,8 +10,10 @@
 #include <pthread.h>
 #endif // __linux__
 
-using namespace mpc::lcdgui::screens::dialog;
+using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::lcdgui::screens::dialog;
+using namespace mpc::lcdgui::screens::dialog2;
 using namespace std;
 
 DeleteFolderScreen::DeleteFolderScreen(const int layerIndex) 
@@ -29,7 +32,9 @@ void DeleteFolderScreen::deleteFolder()
 	disk->setBusy(true);
 
 	auto directoryScreen = dynamic_pointer_cast<DirectoryScreen>(Screens::getScreenComponent("directory"));
-	ls.lock()->createPopup("Delete:" + directoryScreen->getSelectedFile()->getName());
+	ls.lock()->openScreen("popup");
+	auto popupScreen = dynamic_pointer_cast<PopupScreen>(Screens::getScreenComponent("popup"));
+	popupScreen->setText("Delete:" + directoryScreen->getSelectedFile()->getName());
 
 	if (disk->deleteDir(directoryScreen->getSelectedFile()))
 	{
@@ -38,7 +43,6 @@ void DeleteFolderScreen::deleteFolder()
 	}
 
 	this_thread::sleep_for(chrono::milliseconds(1000));
-	ls.lock()->removePopup();
 	ls.lock()->openScreen("directory");
 	disk->setBusy(false);
 }

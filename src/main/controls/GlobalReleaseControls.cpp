@@ -61,24 +61,30 @@ void GlobalReleaseControls::function(int i) {
 		break;
 	case 4:
 		controls->setF5Pressed(false);
-		if (currentScreenName.compare("load") == 0) {
-			Mpc::instance().getLayeredScreen().lock()->removePopup();
+		if (ls.lock()->getPreviousScreenName().compare("load") == 0 && currentScreenName.compare("popup") == 0)
+		{
+			ls.lock()->openScreen("load");
 			Mpc::instance().getAudioMidiServices().lock()->getSoundPlayer().lock()->enableStopEarly();
 		}
 		break;
 	case 5:
 		controls->setF6Pressed(false);
-		if (!sequencer.lock()->isPlaying() && currentScreenName.compare("sequencer") != 0) {
+		if (!sequencer.lock()->isPlaying() && currentScreenName.compare("sequencer") != 0)
+		{
 			sampler.lock()->finishBasicVoice();
 		}
-		if (currentScreenName.compare("track-mute") == 0) {
-			if (!sequencer.lock()->isSoloEnabled()) {
+		
+		if (currentScreenName.compare("track-mute") == 0)
+		{
+			if (!sequencer.lock()->isSoloEnabled())
+			{
 				ls.lock()->setCurrentBackground("track-mute");
 			}
 			sequencer.lock()->setSoloEnabled(sequencer.lock()->isSoloEnabled());
 		}
-		else if (currentScreenName.compare("directory") == 0) {
-			Mpc::instance().getLayeredScreen().lock()->removePopup();
+		else if (ls.lock()->getPreviousScreenName().compare("directory") == 0 && currentScreenName.compare("popup") == 0)
+		{
+			ls.lock()->openScreen("directory");
 			Mpc::instance().getAudioMidiServices().lock()->getSoundPlayer().lock()->enableStopEarly();
 		}
 		break;

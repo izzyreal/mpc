@@ -3,6 +3,7 @@
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/LoadScreen.hpp>
 #include <lcdgui/screens/window/NameScreen.hpp>
+#include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
 #include <disk/MpcFile.hpp>
 #include <disk/AbstractDisk.hpp>
@@ -15,9 +16,10 @@
 #include <file/File.hpp>
 #include <file/FileUtil.hpp>
 
-using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui::screens::window;
+using namespace mpc::lcdgui::screens::dialog2;
 using namespace moduru::lang;
 using namespace moduru::file;
 using namespace std;
@@ -89,7 +91,8 @@ void DirectoryScreen::function(int f)
 	{
 		auto controls = Mpc::instance().getControls().lock();
 
-		if (controls->isF6Pressed()) {
+		if (controls->isF6Pressed())
+		{
 			return;
 		}
 
@@ -97,17 +100,23 @@ void DirectoryScreen::function(int f)
 
 		auto file = loadScreen->getSelectedFile();
 
-		if (!file->isDirectory()) {
+		if (!file->isDirectory())
+		{
 
 			bool started = mpc.getAudioMidiServices().lock()->getSoundPlayer().lock()->start(file->getFile().lock()->getPath());
 
 			auto name = file->getFsNode().lock()->getNameWithoutExtension();
 
-			if (started) {
-				Mpc::instance().getLayeredScreen().lock()->createPopup("Playing " + name);
+			ls.lock()->openScreen("popup");
+			auto popupScreen = dynamic_pointer_cast<PopupScreen>(Screens::getScreenComponent("popup"));
+
+			if (started)
+			{
+				popupScreen->setText("Playing " + name);
 			}
-			else {
-				Mpc::instance().getLayeredScreen().lock()->createPopup("Can't play " + name);
+			else
+			{
+				popupScreen->setText("Can't play " + name);
 			}
 		}
 

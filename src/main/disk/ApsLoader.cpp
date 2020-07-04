@@ -27,11 +27,13 @@
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/DrumScreen.hpp>
 #include <lcdgui/screens/MixerSetupScreen.hpp>
+#include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
 #include <lang/StrUtil.hpp>
 
 using namespace mpc::lcdgui;
-using namespace mpc::lcdgui::screens; 
+using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::disk;
 using namespace mpc::file::aps;
 using namespace moduru::lang;
@@ -210,7 +212,6 @@ void ApsLoader::load()
 	
 	sampler->setSoundIndex(0);
 	
-	Mpc::instance().getLayeredScreen().lock()->removePopup();
 	Mpc::instance().getLayeredScreen().lock()->openScreen("load");
 	disk->setBusy(false);
 }
@@ -225,8 +226,9 @@ void ApsLoader::loadSound(string soundFileName, string ext, mpc::disk::MpcFile* 
 
 void ApsLoader::showPopup(string name, string ext, int sampleSize)
 {
-	Mpc::instance().getLayeredScreen().lock()->removePopup();
-	Mpc::instance().getLayeredScreen().lock()->openFileNamePopup(StrUtil::padRight(name, " ", 16), ext);
+	Mpc::instance().getLayeredScreen().lock()->openScreen("popup");
+	auto popupScreen = dynamic_pointer_cast<PopupScreen>(Screens::getScreenComponent("popup"));
+	popupScreen->setText("LOADING " + StrUtil::padRight(name, " ", 16) + "." + ext);
 
 	if (dynamic_pointer_cast<mpc::disk::StdDisk>(Mpc::instance().getDisk().lock()))
 	{

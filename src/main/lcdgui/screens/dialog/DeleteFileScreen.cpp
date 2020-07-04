@@ -4,15 +4,17 @@
 #include <disk/MpcFile.hpp>
 
 #include <lcdgui/screens/window/DirectoryScreen.hpp>
+#include <lcdgui/screens/dialog2/PopupScreen.hpp>
 #include <lcdgui/screens/LoadScreen.hpp>
 
 #ifdef __linux__
 #include <pthread.h>
 #endif // __linux__
 
-using namespace mpc::lcdgui::screens::dialog;
-using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui::screens::window;
+using namespace mpc::lcdgui::screens::dialog;
+using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::lcdgui;
 using namespace std;
 
@@ -32,7 +34,9 @@ void DeleteFileScreen::function(int i)
 		break;
 	case 4:
 		auto directoryScreen = dynamic_pointer_cast<DirectoryScreen>(Screens::getScreenComponent("directory"));
-		ls.lock()->createPopup("Delete:" + directoryScreen->getSelectedFile()->getName());
+		ls.lock()->openScreen("popup");
+		auto popupScreen = dynamic_pointer_cast<PopupScreen>(Screens::getScreenComponent("popup"));
+		popupScreen->setText("Delete:" + directoryScreen->getSelectedFile()->getName());
 		
 		if (deleteThread.joinable())
 		{
@@ -49,9 +53,9 @@ void DeleteFileScreen::static_delete(void * args)
 	static_cast<DeleteFileScreen*>(args)->deleteFile();
 }
 
-void DeleteFileScreen::deleteFile() {
+void DeleteFileScreen::deleteFile()
+{
 	this_thread::sleep_for(chrono::milliseconds(1000));
-	ls.lock()->removePopup();
 
 	auto disk = mpc.getDisk().lock();
 

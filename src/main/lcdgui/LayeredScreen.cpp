@@ -15,9 +15,9 @@
 
 #include <lcdgui/Layer.hpp>
 #include <lcdgui/ScreenComponent.hpp>
-#include <lcdgui/Popup.hpp>
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/SampleScreen.hpp>
+#include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
 #include <file/FileUtil.hpp>
 #include <lang/StrUtil.hpp>
@@ -27,6 +27,7 @@
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui::screens::dialog2;
 using namespace moduru::file;
 using namespace moduru::lang;
 using namespace rapidjson;
@@ -41,9 +42,6 @@ LayeredScreen::LayeredScreen()
 {	
 	root = make_unique<Component>("root");
 	
-	popup = make_shared<Popup>();
-	popup->Hide(true);
-
 	shared_ptr<Layer> previousLayer;
 
 	for (int i = 0; i < LAYER_COUNT; i++)
@@ -118,13 +116,11 @@ int LayeredScreen::openScreen(string screenName)
 	{
 		oldScreenComponent->close();
 		getFocusedLayer().lock()->removeChild(oldScreenComponent);
-		getFocusedLayer().lock()->removeChild(popup);
 	}
 
 	focusedLayerIndex = screenComponent->getLayerIndex();
 
 	getFocusedLayer().lock()->addChild(screenComponent);
-	getFocusedLayer().lock()->addChild(popup);
 
 	if (screenComponent->findFields().size() > 0)
 	{
@@ -167,52 +163,14 @@ bool LayeredScreen::IsDirty()
 	return root->IsDirty();
 }
 
-Layer* LayeredScreen::getLayer(int i)
-{
-	return layers[i].lock().get();
-}
-
-void LayeredScreen::createPopup(string text)
-{
-	popup->Hide(false);
-	popup->setText(text);
-}
-
-void LayeredScreen::openFileNamePopup(const string& name, const string& extension)
-{
-	string extUpperCase = "";
-
-	for (auto& c : extension)
-	{
-		extUpperCase.push_back(toupper(c));
-	}
-
-	createPopup("LOADING " + name + "." + extUpperCase);
-}
-
 Background* LayeredScreen::getCurrentBackground()
 {
 	return getFocusedLayer().lock()->getBackground();
 }
 
-void LayeredScreen::removeCurrentBackground()
-{
-	getFocusedLayer().lock()->getBackground()->setName("");
-}
-
 void LayeredScreen::setCurrentBackground(string s)
 {
 	getCurrentBackground()->setName(s);
-}
-
-void LayeredScreen::removePopup()
-{
-	popup->Hide(true);
-}
-
-void LayeredScreen::setPopupText(string text)
-{
-	popup->setText(text);
 }
 
 void LayeredScreen::returnToLastFocus(string firstFieldOfThisScreen)
@@ -280,31 +238,6 @@ void LayeredScreen::setPreviousScreenName(string screenName)
 string LayeredScreen::getPreviousScreenName()
 {
 	return previousScreenName;
-}
-
-Popup* LayeredScreen::getPopup()
-{
-	return popup.get();
-}
-
-string LayeredScreen::getPreviousFromNoteText()
-{
-	return previousFromNoteText;
-}
-
-void LayeredScreen::setPreviousFromNoteText(string text)
-{
-	previousFromNoteText = text;
-}
-
-void LayeredScreen::setPreviousViewModeText(string text)
-{
-	previousViewModeText = text;
-}
-
-string LayeredScreen::getPreviousViewModeText()
-{
-	return previousViewModeText;
 }
 
 int LayeredScreen::getFocusedLayerIndex()

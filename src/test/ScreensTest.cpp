@@ -178,7 +178,8 @@ vector<string> screenNames = {
 "copy-sequence",
 "delete-sequence",
 "midi-monitor",
-"delete-all-files"
+"delete-all-files",
+"popup"
 };
 
 SCENARIO("All screens can be opened", "[gui]") {

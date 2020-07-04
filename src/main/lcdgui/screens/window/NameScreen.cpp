@@ -11,6 +11,7 @@
 #include <lcdgui/screens/dialog/ResampleScreen.hpp>
 #include <lcdgui/screens/dialog/StereoToMonoScreen.hpp>
 #include <lcdgui/screens/dialog/CreateNewProgramScreen.hpp>
+#include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
 #include <lcdgui/Underline.hpp>
 
@@ -26,6 +27,7 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;
+using namespace mpc::lcdgui::screens::dialog2;
 using namespace std;
 using namespace moduru::lang;
 
@@ -259,7 +261,9 @@ void NameScreen::saveName()
 		
 		if (!success)
 		{
-			ls.lock()->createPopup("File name exists !!");
+			ls.lock()->openScreen("popup");
+			auto popupScreen = dynamic_pointer_cast<PopupScreen>(Screens::getScreenComponent("popup"));
+			popupScreen->setText("File name exists !!");
 			ls.lock()->setPreviousScreenName("directory");
 			return;
 		}
@@ -313,7 +317,9 @@ void NameScreen::saveName()
 
 		if (!success)
 		{
-			ls.lock()->createPopup("Folder name exists !!");
+			ls.lock()->openScreen("popup");
+			auto popupScreen = dynamic_pointer_cast<PopupScreen>(Screens::getScreenComponent("popup"));
+			popupScreen->setText("Folder name exists !!");
 		}
 	}
 

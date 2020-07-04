@@ -12,6 +12,7 @@
 #include <sampler/Sampler.hpp>
 
 #include <lcdgui/screens/window/CantFindFileScreen.hpp>
+#include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
 #include <lang/StrUtil.hpp>
 
@@ -22,6 +23,7 @@
 using namespace mpc::disk;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::lcdgui::screens::dialog2;
 using namespace moduru::lang;
 using namespace std;
 
@@ -116,7 +118,6 @@ void ProgramLoader::loadProgram()
 	auto adapter = ProgramImportAdapter(Mpc::instance().getSampler(), p, soundsDestIndex);
 	result = adapter.get();
 	Mpc::instance().importLoadedProgram();
-	Mpc::instance().getLayeredScreen().lock()->removePopup();
 	disk->setBusy(false);
 	Mpc::instance().getLayeredScreen().lock()->openScreen("load");
 }
@@ -140,8 +141,9 @@ void ProgramLoader::loadSound(string soundFileName, string ext, MpcFile* soundFi
 
 void ProgramLoader::showPopup(string name, string ext, int sampleSize)
 {
-	Mpc::instance().getLayeredScreen().lock()->removePopup();
-	Mpc::instance().getLayeredScreen().lock()->openFileNamePopup(StrUtil::padRight(name, " ", 16), ext);
+	Mpc::instance().getLayeredScreen().lock()->openScreen("popup");
+	auto popupScreen = dynamic_pointer_cast<PopupScreen>(Screens::getScreenComponent("popup"));
+	popupScreen->setText("LOADING " + StrUtil::padRight(name, " ", 16) + "." + ext);
 
 	if (dynamic_pointer_cast<StdDisk>(Mpc::instance().getDisk().lock()) != nullptr)
 	{
@@ -149,8 +151,7 @@ void ProgramLoader::showPopup(string name, string ext, int sampleSize)
 		{
 			auto sleepTime = sampleSize / 400;
 			if (sleepTime < 300) sleepTime = 300;
-			//this_thread::sleep_for(chrono::milliseconds((int)(sleepTime * mpc::maingui::Constants::TFACTOR)));
-			this_thread::sleep_for(chrono::milliseconds((int)(sleepTime * 0.2)));
+			this_thread::sleep_for(chrono::milliseconds((int)(sleepTime * 0.5)));
 		}
 		catch (exception e)
 		{
@@ -166,19 +167,8 @@ void ProgramLoader::notfound(string soundFileName, string ext)
 
 	if (!skipAll)
 	{
-		Mpc::instance().getLayeredScreen().lock()->openFileNamePopup(soundFileName, ext);
-		
-		try
-		{
-			this_thread::sleep_for(chrono::milliseconds(500));
-		}
-		catch (exception e)
-		{
-			e.what();
-		}
+		showPopup(soundFileName, ext, 10000); // 10000kb is a dummy value
 	
-		Mpc::instance().getLayeredScreen().lock()->removePopup();
-
 		cantFindFileScreen->waitingForUser = true;
 		
 		cantFindFileScreen->fileName = soundFileName;

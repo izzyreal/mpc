@@ -198,14 +198,13 @@ void Mpc::loadSound(bool replace)
 	{
 		MLOG("A problem occurred when trying to load " + loadScreen->getSelectedFileName() + ": " + string(exception.what()));
 		lDisk->setBusy(false);
-		layeredScreen->removePopup();
+		layeredScreen->openScreen("load");
 		return;
 	}
 	
 	if (hasNotBeenLoadedAlready)
 	{
-		//loadSoundThread = thread(&Mpc::static_loadSound, soundLoader.getSize());
-		runLoadSoundThread(soundLoader.getSize());
+		loadSoundThread = thread(&Mpc::runLoadSoundThread, soundLoader.getSize());
 	}
 	else {
 		sampler->deleteSample(sampler->getSoundCount() - 1);
@@ -243,11 +242,6 @@ ctoot::mpc::MpcMultiMidiSynth* Mpc::getMms()
 	return audioMidiServices->getMms().lock().get();
 }
 
-void Mpc::static_loadSound(int size)
-{
-	Mpc::instance().runLoadSoundThread(size);
-}
-
 void Mpc::runLoadSoundThread(int size)
 {
 	int sleepTime = size / 400;
@@ -257,9 +251,9 @@ void Mpc::runLoadSoundThread(int size)
 		sleepTime = 300;
 	}
 	
-	//this_thread::sleep_for(chrono::milliseconds((int)(sleepTime)));
-	layeredScreen->openScreen("load-a-sound");
-	getDisk().lock()->setBusy(false);
+	this_thread::sleep_for(chrono::milliseconds((int)(sleepTime)));
+	Mpc::instance().getLayeredScreen().lock()->openScreen("load-a-sound");
+	Mpc::instance().getDisk().lock()->setBusy(false);
 }
 
 weak_ptr<audiomidi::MpcMidiPorts> Mpc::getMidiPorts()

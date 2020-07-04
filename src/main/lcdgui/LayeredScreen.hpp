@@ -12,7 +12,6 @@ namespace mpc::lcdgui
 {
 	class FunctionKeys;
 	class Background;
-	class Popup;
 	class Field;
 	class Label;
 	class Layer;
@@ -46,8 +45,6 @@ namespace mpc::lcdgui {
 		void transferRight();
 		void transferUp();
 		void transferDown();
-		//void transferFocus(bool backwards);
-		Layer* getLayer(int i);
 		int getFocusedLayerIndex();
 		std::weak_ptr<Layer> getFocusedLayer();
 		int openScreen(std::string name); // returns layer number
@@ -58,22 +55,14 @@ namespace mpc::lcdgui {
 		int focusedLayerIndex{ 0 };
 		std::string currentScreenName = "";
 		std::string previousScreenName = "";
-		std::shared_ptr<Popup> popup;
 		int previousLayer{ 0 };
-		std::string previousViewModeText = "";
-		std::string previousFromNoteText = "";
 
 	private:
 		FunctionKeys* getFunctionKeys();
 
 	public:
-		void createPopup(std::string text);
-		void openFileNamePopup(const std::string& name, const std::string& ext);
 		lcdgui::Background* getCurrentBackground();
-		void removeCurrentBackground();
 		void setCurrentBackground(std::string s);
-		void removePopup();
-		void setPopupText(std::string text);
 
 	public:
 		void returnToLastFocus(std::string firstFieldOfThisScreen);
@@ -83,11 +72,6 @@ namespace mpc::lcdgui {
 		std::string getCurrentScreenName();
 		void setPreviousScreenName(std::string screenName);
 		std::string getPreviousScreenName();
-		mpc::lcdgui::Popup* getPopup();
-		std::string getPreviousFromNoteText();
-		void setPreviousFromNoteText(std::string text);
-		void setPreviousViewModeText(std::string text);
-		std::string getPreviousViewModeText();
 		void setFunctionKeysArrangement(int arrangementIndex);
 
 	public:

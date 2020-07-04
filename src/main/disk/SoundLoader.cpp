@@ -7,13 +7,17 @@
 #include <sampler/Sampler.hpp>
 #include <sampler/Sound.hpp>
 
+#include <lcdgui/screens/dialog2/PopupScreen.hpp>
+
 #include <lang/StrUtil.hpp>
 #include <file/File.hpp>
 
 #include <cmath>
 
-using namespace moduru::lang;
 using namespace mpc::disk;
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens::dialog2;
+using namespace moduru::lang;
 using namespace std;
 
 SoundLoader::SoundLoader()
@@ -62,8 +66,9 @@ int SoundLoader::loadSound(MpcFile* f)
 	
 	if (!partOfProgram && existingSoundIndex == -1)
 	{
-		Mpc::instance().getLayeredScreen().lock()->removePopup();
-		Mpc::instance().getLayeredScreen().lock()->openFileNamePopup(soundFileName, extension);
+		Mpc::instance().getLayeredScreen().lock()->openScreen("popup");
+		auto popupScreen = dynamic_pointer_cast<PopupScreen>(Screens::getScreenComponent("popup"));
+		popupScreen->setText("LOADING " + StrUtil::padRight(soundFileName, " ", 16) + "." + extension);
 	}
 
 	auto sound = sampler->addSound(sampleRate).lock();

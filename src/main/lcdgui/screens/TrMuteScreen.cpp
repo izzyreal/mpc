@@ -68,7 +68,6 @@ void TrMuteScreen::pad(int i, int velo, bool repeat, int tick)
 		}
 
 		sequencer.lock()->setSelectedTrackIndex(i + (mpc.getBank() * 16));
-		ls.lock()->removeCurrentBackground();
 		ls.lock()->setCurrentBackground("track-mute-solo-2");
 	}
 	else

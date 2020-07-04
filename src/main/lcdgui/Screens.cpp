@@ -133,6 +133,7 @@
 #include <lcdgui/screens/dialog/VmpcRecordJamScreen.hpp>
 
 #include <lcdgui/screens/dialog2/DeleteAllFilesScreen.hpp>
+#include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
 #include <file/FileUtil.hpp>
 #include <lang/StrUtil.hpp>
@@ -852,6 +853,10 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	else if (screenName.compare("sync") == 0)
 	{
 		screen = make_shared<SyncScreen>(layerIndex);
+	}
+	else if (screenName.compare("popup") == 0)
+	{
+		screen = make_shared<PopupScreen>();
 	}
 
 	if (screen)
