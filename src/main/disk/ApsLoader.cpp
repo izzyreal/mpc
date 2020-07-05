@@ -28,11 +28,13 @@
 #include <lcdgui/screens/DrumScreen.hpp>
 #include <lcdgui/screens/MixerSetupScreen.hpp>
 #include <lcdgui/screens/dialog2/PopupScreen.hpp>
+#include <lcdgui/screens/window/CantFindFileScreen.hpp>
 
 #include <lang/StrUtil.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::disk;
 using namespace mpc::file::aps;
@@ -42,11 +44,9 @@ using namespace std;
 ApsLoader::ApsLoader(mpc::disk::MpcFile* file) 
 {
 	this->file = file;
-	
-	if (loadThread.joinable())
-	{
-		loadThread.join();
-	}
+
+	auto cantFindFileScreen = dynamic_pointer_cast<CantFindFileScreen>(Screens::getScreenComponent("cant-find-file"));
+	cantFindFileScreen->skipAll = false;
 
 	loadThread = thread(&ApsLoader::static_load, this);
 }
@@ -54,6 +54,26 @@ ApsLoader::ApsLoader(mpc::disk::MpcFile* file)
 void ApsLoader::static_load(void* this_p)
 {
 	static_cast<ApsLoader*>(this_p)->load();
+}
+
+void ApsLoader::notFound(string soundFileName, string ext)
+{
+	auto cantFindFileScreen = dynamic_pointer_cast<CantFindFileScreen>(Screens::getScreenComponent("cant-find-file"));
+	auto skipAll = cantFindFileScreen->skipAll;
+
+	if (!skipAll)
+	{
+		cantFindFileScreen->waitingForUser = true;
+
+		cantFindFileScreen->fileName = soundFileName;
+
+		Mpc::instance().getLayeredScreen().lock()->openScreen("cant-find-file");
+
+		while (cantFindFileScreen->waitingForUser)
+		{
+			this_thread::sleep_for(chrono::milliseconds(25));
+		}
+	}
 }
 
 void ApsLoader::load()
@@ -102,7 +122,7 @@ void ApsLoader::load()
 
 		if (soundFile == nullptr)
 		{
-			MLOG("Error loading sound " + soundFileName + ". Check if such a file with SND or WAV extension exists next to your APS or PGM file.");
+			notFound(soundFileName, ext);
 			continue;
 		}
 

@@ -4,6 +4,7 @@
 namespace mpc::disk
 {
 	class ProgramLoader;
+	class ApsLoader;
 }
 
 namespace mpc::lcdgui::screens::window
@@ -23,6 +24,7 @@ namespace mpc::lcdgui::screens::window
 		bool waitingForUser = false;
 
 		friend class mpc::disk::ProgramLoader;
+		friend class mpc::disk::ApsLoader;
 
 	};
 }

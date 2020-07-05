@@ -29,6 +29,7 @@ namespace mpc::disk {
 
 	private:
 		void load();
+		void notFound(std::string soundFileName, std::string ext);
 
 	private:
 		static void static_load(void* this_p);

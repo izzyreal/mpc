@@ -29,10 +29,12 @@ using namespace std;
 
 ProgramLoader::ProgramLoader(MpcFile* file, bool replace)
 {
-	
 	this->file = file;
 	this->replace = replace;
-	if (loadProgramThread.joinable()) loadProgramThread.join();
+
+	auto cantFindFileScreen = dynamic_pointer_cast<CantFindFileScreen>(Screens::getScreenComponent("cant-find-file"));
+	cantFindFileScreen->skipAll = false;
+
 	loadProgramThread = thread(&ProgramLoader::static_loadProgram, this);
 }
 
@@ -168,8 +170,6 @@ void ProgramLoader::notfound(string soundFileName, string ext)
 
 	if (!skipAll)
 	{
-		showPopup(soundFileName, ext, 10000); // 10000kb is a dummy value
-	
 		cantFindFileScreen->waitingForUser = true;
 		
 		cantFindFileScreen->fileName = soundFileName;
@@ -178,14 +178,7 @@ void ProgramLoader::notfound(string soundFileName, string ext)
 
 		while (cantFindFileScreen->waitingForUser)
 		{
-			try
-			{
-				this_thread::sleep_for(chrono::milliseconds(25));
-			}
-			catch (exception e)
-			{
-				e.what();
-			}
+			this_thread::sleep_for(chrono::milliseconds(25));
 		}
 	}
 }
@@ -195,6 +188,10 @@ weak_ptr<mpc::sampler::Program> ProgramLoader::get()
     return result;
 }
 
-ProgramLoader::~ProgramLoader() {
-	if (loadProgramThread.joinable()) loadProgramThread.join();
+ProgramLoader::~ProgramLoader()
+{
+	if (loadProgramThread.joinable())
+	{
+		loadProgramThread.join();
+	}
 }
