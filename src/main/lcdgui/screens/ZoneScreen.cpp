@@ -15,14 +15,14 @@ using namespace std;
 ZoneScreen::ZoneScreen(const int layerIndex) 
 	: ScreenComponent("zone", layerIndex)
 {
+	addChild(move(make_shared<TwoDots>()));
+	addChild(move(make_shared<Wave>()));
+	findWave().lock()->setFine(false);
 }
 
 void ZoneScreen::open()
 {
 	typableParams = vector<string>{ "st", "end" };
-
-	addChild(move(make_shared<Wave>()));
-	addChild(move(make_shared<TwoDots>()));
 
 	findTwoDots().lock()->setVisible(0, true);
 	findTwoDots().lock()->setVisible(1, true);

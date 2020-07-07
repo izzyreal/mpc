@@ -65,7 +65,14 @@ weak_ptr<Sound> Sampler::getSound()
 {
 	if (soundIndex < 0)
 	{
-		return {};
+		if (sounds.size() == 0)
+		{
+			return {};
+		}
+
+		// This is a bit of a hack, depending on what the real 2KXL does.
+		// For now this will work fine to get some kind of sane index here after loading an APS, PGM, SND or WAV into an empty sampler.
+		soundIndex = 0;
 	}
 
 	return sounds[soundIndex];

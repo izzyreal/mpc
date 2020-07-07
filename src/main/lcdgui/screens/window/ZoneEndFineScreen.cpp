@@ -11,25 +11,24 @@ using namespace std;
 ZoneEndFineScreen::ZoneEndFineScreen(const int layerIndex)
 	: ScreenComponent("zone-end-fine", layerIndex)
 {
-}
-
-void ZoneEndFineScreen::open()
-{
 	addChild(move(make_shared<Wave>()));
 	addChild(move(make_shared<TwoDots>()));
-
-	displayEnd();
-	displayLngthLabel();
-
-	displayPlayX();
-	displayFineWaveform();
+	findWave().lock()->setFine(true);
 
 	findTwoDots().lock()->setVisible(0, false);
 	findTwoDots().lock()->setVisible(1, false);
 	findTwoDots().lock()->setVisible(2, true);
 	findTwoDots().lock()->setVisible(3, true);
 	findTwoDots().lock()->setSelected(3, false);
+}
 
+void ZoneEndFineScreen::open()
+{
+	displayEnd();
+	displayLngthLabel();
+
+	displayPlayX();
+	displayFineWaveform();
 }
 
 void ZoneEndFineScreen::displayFineWaveform()

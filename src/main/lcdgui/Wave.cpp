@@ -19,38 +19,59 @@ Wave::Wave()
 	setLocation(0, 0);
 }
 
-void Wave::setFine(bool fine) {
+void Wave::setFine(bool fine)
+{
 	this->fine = fine;
-	if (fine) {
+
+	if (fine)
+	{
 		width = 109;
 	}
-	else {
+	else
+	{
 		width = 245;
 	}
 }
 
-void Wave::zoomPlus() {
-	if (zoomFactor == 7) return;
+void Wave::zoomPlus()
+{
+	if (zoomFactor == 7)
+	{
+		return;
+	}
+
 	zoomFactor++;
+	
 	initSamplesPerPixel();
 	SetDirty();
 }
 
-void Wave::zoomMinus() {
-	if (zoomFactor == 1) return;
+void Wave::zoomMinus()
+{
+	if (zoomFactor == 1)
+	{
+		return;
+	}
+
 	zoomFactor--;
+	
 	initSamplesPerPixel();
 	SetDirty();
 }
 
-void Wave::initSamplesPerPixel() {
-	if (fine) {
+void Wave::initSamplesPerPixel()
+{
+	if (fine)
+	{
 		samplesPerPixel = 1;
-		for (int i = 1; i < zoomFactor; i++) {
+		
+		for (int i = 1; i < zoomFactor; i++)
+		{
 			samplesPerPixel *= 2;
 		}
 	}
-	else {
+	else
+	{
 		samplesPerPixel = (float)frames / (float)width;
 	}
 }
@@ -96,7 +117,7 @@ void Wave::setSelection(unsigned int start, unsigned int end)
 	SetDirty();
 }
 
-void Wave::makeLine(std::vector<std::vector<std::vector<int>> >* lines, std::vector<bool>* colors, unsigned int x)
+void Wave::makeLine(std::vector<std::vector<std::vector<int>>>* lines, std::vector<bool>* colors, unsigned int x)
 {
 	int offset = 0;
 	float peakPos = 0;
@@ -108,19 +129,38 @@ void Wave::makeLine(std::vector<std::vector<std::vector<int>> >* lines, std::vec
 		//offset += centerSamplePos;
 		centerSamplePixel = centerSamplePos / samplesPerPixel;
 	}
+	
 	int samplePos = (int)(floor((float) (x - (fine ? (54 - centerSamplePixel) : 0)) * samplesPerPixel));
 	offset += samplePos;
 	
-	if (!mono && view == 1) offset += frames;
+	if (!mono && view == 1)
+	{
+		offset += frames;
+	}
 
-	if (offset < 0 || offset >= sampleData->size() && !fine) return;
-	if (!mono && view == 0 && offset > frames && !fine) return;
-	if (!mono && view == 1 && offset < frames && !fine) return;
+	if (offset < 0 || offset >= sampleData->size() && !fine)
+	{
+		return;
+	}
+	
+	if (!mono && view == 0 && offset > frames && !fine)
+	{
+		return;
+	}
+
+	if (!mono && view == 1 && offset < frames && !fine)
+	{
+		return;
+	}
 
 	float sample;
-	for (int i = 0; i < (floor)(samplesPerPixel); i++) {
-		sample = sampleData->at(offset++);
-		if (sample > 0) {
+	
+	for (int i = 0; i < (floor)(samplesPerPixel); i++)
+	{
+		sample = (*sampleData)[offset++];
+	
+		if (sample > 0)
+		{
 			peakPos = moduru::math::Math::maxf(peakPos, sample);
 		}
 		else if (sample < 0) {
@@ -135,99 +175,137 @@ void Wave::makeLine(std::vector<std::vector<std::vector<int>> >* lines, std::vec
 	const unsigned int posLineLength = (unsigned int) (floor(13.0 * ((peakPos - invisible) * ratio)));
 	const unsigned int negLineLength = (unsigned int)(floor(13.0 * ((abs(peakNeg) - invisible) * ratio)));
 
-	if (posLineLength != 13) {
+	if (posLineLength != 13)
+	{
 		lines->push_back(Bressenham::Line(x, 0, x, 13 - (posLineLength + 1)));
 	}
 
-	if (peakPos > invisible) {
+	if (peakPos > invisible)
+	{
 		lines->push_back(Bressenham::Line(x, (13 - posLineLength) - 1, x, 12));
 	}
 
-	if (abs(peakNeg) > invisible) {
+	if (abs(peakNeg) > invisible)
+	{
 		lines->push_back(Bressenham::Line(x, 13, x, 13 + negLineLength));
 	}
 
-	if (negLineLength != 13) {
+	if (negLineLength != 13)
+	{
 		lines->push_back(Bressenham::Line(x, 13 + (negLineLength + 1), x, 26));
 	}
 
 	colors->clear();
 
-	if (samplePos >= selectionStart && samplePos < selectionEnd && !fine) {
-		if (posLineLength != 13) {
+	if (samplePos >= selectionStart && samplePos < selectionEnd && !fine)
+	{
+		if (posLineLength != 13)
+		{
 			colors->push_back(true);
 		}
-		if (peakPos > invisible) {
+		
+		if (peakPos > invisible)
+		{
 			colors->push_back(false);
 		}
-		if (abs(peakNeg) > invisible) {
+		
+		if (abs(peakNeg) > invisible)
+		{
 			colors->push_back(false);
 		}
-		if (negLineLength != 13) {
+	
+		if (negLineLength != 13)
+		{
 			colors->push_back(true);
 		}
 	}
-	else {
-		if (posLineLength != 13) {
+	else
+	{
+		if (posLineLength != 13)
+		{
 			colors->push_back(false);
 		}
-		if (peakPos > invisible) {
-			if (fine) {
-				if (samplePos + samplesPerPixel >= frames) {
+		
+		if (peakPos > invisible)
+		{
+			if (fine)
+			{
+				if (samplePos + samplesPerPixel >= frames)
+				{
 					colors->push_back(false);
 				}
-				else {
+				else
+				{
 					colors->push_back(true);
 				}
 			}
-			else {
+			else
+			{
 				colors->push_back(true);
 			}
 		}
-		if (abs(peakNeg) > invisible) {
-			if (fine) {
-				if (samplePos + samplesPerPixel >= frames) {
+
+		if (abs(peakNeg) > invisible)
+		{
+			if (fine)
+			{
+				if (samplePos + samplesPerPixel >= frames)
+				{
 					colors->push_back(false);
 				}
-				else {
+				else
+				{
 					colors->push_back(true);
 				}
 			}
-			else {
+			else
+			{
 				colors->push_back(true);
 			}
 		}
-		if (negLineLength != 13) {
+
+		if (negLineLength != 13)
+		{
 			colors->push_back(false);
 		}
 	}
 }
 
-void Wave::Draw(std::vector<std::vector<bool>>* pixels) {
+void Wave::Draw(std::vector<std::vector<bool>>* pixels)
+{
 	if (shouldNotDraw(pixels))
 	{
 		return;
 	}
 
-	if (sampleData == nullptr) {
+	if (sampleData == nullptr)
+	{
 		return;
 	}
 
 	vector<vector<vector<int>>> lines;
 	vector<bool> colors;
 	vector<int> offsetxy{ fine ? 23 : 1 , fine ? 16 : 21 };
-	for (int i = 0; i < width; i++) {
-		if (i == 55 && fine) {
-			for (int j = 0; j < 27; j++) {
+
+	for (int i = 0; i < width; i++)
+	{
+		if (i == 55 && fine)
+		{
+			for (int j = 0; j < 27; j++)
+			{
 				(*pixels)[i + offsetxy[0]][j + offsetxy[1]] = true;
 			}
 			continue;
 		}
+
 		makeLine(&lines, &colors, i);
 		int counter = 0;
-		for (auto& l : lines) {
+		
+		for (auto& l : lines)
+		{
 			mpc::Util::drawLine(*pixels, l, colors[counter++], offsetxy);
 		}
 	}
+
 	dirty = false;
 }

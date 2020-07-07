@@ -10,25 +10,25 @@ using namespace std;
 EndFineScreen::EndFineScreen(const int layerIndex)
 	: ScreenComponent("end-fine", layerIndex)
 {
-}
-
-void EndFineScreen::open()
-{
 	addChild(move(make_shared<Wave>()));
 	addChild(move(make_shared<TwoDots>()));
-
-	displayEnd();
-	displayLngthLabel();
-	displaySmplLngth();
-
-	displayPlayX();
-	displayFineWaveform();
+	findWave().lock()->setFine(true);
 
 	findTwoDots().lock()->setVisible(0, false);
 	findTwoDots().lock()->setVisible(1, false);
 	findTwoDots().lock()->setVisible(2, true);
 	findTwoDots().lock()->setVisible(3, true);
 	findTwoDots().lock()->setSelected(3, false);
+}
+
+void EndFineScreen::open()
+{
+	displayEnd();
+	displayLngthLabel();
+	displaySmplLngth();
+
+	displayPlayX();
+	displayFineWaveform();
 }
 
 void EndFineScreen::displayFineWaveform()

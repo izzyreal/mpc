@@ -11,25 +11,26 @@ using namespace std;
 LoopEndFineScreen::LoopEndFineScreen(const int layerIndex)
 	: ScreenComponent("loop-end-fine", layerIndex)
 {
-}
-
-void LoopEndFineScreen::open()
-{
 	addChild(move(make_shared<Wave>()));
 	addChild(move(make_shared<TwoDots>()));
 
-	displayEnd();
-	displayLngthField();
-	displayLoopLngth();
-
-	displayPlayX();
-	displayFineWaveform();
+	findWave().lock()->setFine(true);
 
 	findTwoDots().lock()->setVisible(0, false);
 	findTwoDots().lock()->setVisible(1, false);
 	findTwoDots().lock()->setVisible(2, true);
 	findTwoDots().lock()->setVisible(3, true);
 	findTwoDots().lock()->setSelected(3, false);
+}
+
+void LoopEndFineScreen::open()
+{
+	displayEnd();
+	displayLngthField();
+	displayLoopLngth();
+
+	displayPlayX();
+	displayFineWaveform();
 }
 
 void LoopEndFineScreen::displayLoopLngth()

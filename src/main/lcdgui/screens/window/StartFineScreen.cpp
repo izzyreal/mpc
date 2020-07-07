@@ -10,15 +10,13 @@ using namespace std;
 StartFineScreen::StartFineScreen(const int layerIndex)
 	: ScreenComponent("start-fine", layerIndex)
 {
+	addChild(move(make_shared<Wave>()));
+	addChild(move(make_shared<TwoDots>()));
+	findWave().lock()->setFine(true);
 }
 
 void StartFineScreen::open()
 {
-	addChild(move(make_shared<Wave>()));
-	addChild(move(make_shared<TwoDots>()));
-
-	findWave().lock()->setFine(true);
-
 	displayStart();
 	displayLngthLabel();
 	displaySmplLngth();

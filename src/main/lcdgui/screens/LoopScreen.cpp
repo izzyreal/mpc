@@ -16,14 +16,14 @@ using namespace std;
 LoopScreen::LoopScreen(const int layerIndex)
 	: ScreenComponent("loop", layerIndex)
 {
+	addChild(move(make_shared<TwoDots>()));
+	addChild(move(make_shared<Wave>()));
+	findWave().lock()->setFine(false);
 }
 
 void LoopScreen::open()
 {
 	typableParams = vector<string>{ "to", "endlengthvalue" };
-
-	addChild(move(make_shared<TwoDots>()));
-	addChild(move(make_shared<Wave>()));
 
 	auto twoDots = findTwoDots().lock();
 	twoDots->setVisible(0, true);
