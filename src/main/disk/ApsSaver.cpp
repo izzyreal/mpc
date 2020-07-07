@@ -19,16 +19,17 @@ ApsSaver::ApsSaver(string apsFileName)
 {
 	
 	this->apsFileName = apsFileName;
-	auto lDisk = Mpc::instance().getDisk().lock();
+	auto disk = Mpc::instance().getDisk().lock();
 
-	if (lDisk->checkExists(apsFileName)) {
+	if (disk->checkExists(apsFileName))
+	{
 		Mpc::instance().getLayeredScreen().lock()->openScreen("file-already-exists");
 	}
-	else {
+	else
+	{
 		saveAps();
 	}
 }
-
 
 void ApsSaver::saveAps()
 {

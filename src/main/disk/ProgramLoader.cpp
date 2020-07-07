@@ -151,7 +151,7 @@ void ProgramLoader::showPopup(string name, string ext, int sampleSize)
 {
 	Mpc::instance().getLayeredScreen().lock()->openScreen("popup");
 	auto popupScreen = dynamic_pointer_cast<PopupScreen>(Screens::getScreenComponent("popup"));
-	popupScreen->setText("LOADING " + StrUtil::padRight(name, " ", 16) + "." + StrUtil::toUpper(ext));
+	popupScreen->setText("LOADING " + StrUtil::toUpper(StrUtil::padRight(name, " ", 16) + "." + ext));
 
 	auto sleepTime = sampleSize / 800;
 	
