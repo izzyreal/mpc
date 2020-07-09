@@ -95,7 +95,7 @@ void Field::takeFocus(string prev)
 			layeredScreen->getTwoDots().lock()->setSelected(1, true);
 		}
 	}
-	if (csn.compare("startfine") == 0 || csn.compare("endfine") == 0 || csn.compare("looptofine") == 0 || csn.compare("loopendfine") == 0) {
+	if (csn.compare("start-fine") == 0 || csn.compare("end-fine") == 0 || csn.compare("loop-to-fine") == 0 || csn.compare("loop-end-fine") == 0) {
 		if (focusEvent.compare("start") == 0) {
 			layeredScreen->getTwoDots().lock()->setSelected(2, true);
 		}
@@ -131,7 +131,7 @@ void Field::loseFocus(string next)
 			layeredScreen->getTwoDots().lock()->setSelected(1, false);
 		}
 	}
-	else if (csn.compare("startfine") == 0 || csn.compare("endfine") == 0 || csn.compare("looptofine") == 0 || csn.compare("loopendfine") == 0) {
+	else if (csn.compare("start-fine") == 0 || csn.compare("end-fine") == 0 || csn.compare("loop-to-fine") == 0 || csn.compare("loop-end-fine") == 0) {
 		if (focusEvent.compare("start") == 0) {
 			layeredScreen->getTwoDots().lock()->setSelected(2, false);
 		}

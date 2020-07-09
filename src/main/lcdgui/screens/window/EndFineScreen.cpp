@@ -18,7 +18,6 @@ EndFineScreen::EndFineScreen(const int layerIndex)
 	findTwoDots().lock()->setVisible(1, false);
 	findTwoDots().lock()->setVisible(2, true);
 	findTwoDots().lock()->setVisible(3, true);
-	findTwoDots().lock()->setSelected(3, false);
 }
 
 void EndFineScreen::open()
@@ -29,6 +28,7 @@ void EndFineScreen::open()
 
 	displayPlayX();
 	displayFineWaveform();
+	findTwoDots().lock()->setSelected(3, false);
 }
 
 void EndFineScreen::displayFineWaveform()

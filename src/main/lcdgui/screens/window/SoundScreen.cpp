@@ -7,7 +7,7 @@ using namespace moduru::lang;
 using namespace std;
 
 SoundScreen::SoundScreen(const int layerIndex) 
-	: ScreenComponent("soundscreen", layerIndex)
+	: ScreenComponent("sound", layerIndex)
 {
 }
 

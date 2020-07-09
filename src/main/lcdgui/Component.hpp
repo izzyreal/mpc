@@ -43,6 +43,12 @@ namespace mpc::lcdgui
 		{
 			for (auto& c : children)
 			{
+
+				if (name.compare("") == 0 && dynamic_pointer_cast<T>(c))
+				{
+					return dynamic_pointer_cast<T>(c);
+				}
+
 				if (c->getName().compare(name) == 0 && dynamic_pointer_cast<T>(c))
 				{
 					return dynamic_pointer_cast<T>(c);

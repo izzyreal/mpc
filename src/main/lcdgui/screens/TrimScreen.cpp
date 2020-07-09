@@ -52,11 +52,13 @@ void TrimScreen::openWindow()
 		sampler.lock()->setPreviousScreenName("trim");
 		ls.lock()->openScreen("sound");
 	}
-	else if (param.compare("st") == 0) {
-		ls.lock()->openScreen("startfine");
+	else if (param.compare("st") == 0)
+	{
+		ls.lock()->openScreen("start-fine");
 	}
-	else if (param.compare("end") == 0) {
-		ls.lock()->openScreen("endfine");
+	else if (param.compare("end") == 0)
+	{
+		ls.lock()->openScreen("end-fine");
 	}
 }
 

@@ -61,11 +61,11 @@ void LoopScreen::openWindow()
 	}
 	else if (param.compare("to") == 0)
 	{
-		ls.lock()->openScreen("looptofine");
+		ls.lock()->openScreen("loop-to-fine");
 	}
 	else if (param.compare("endlengthvalue") == 0)
 	{
-		ls.lock()->openScreen("loopendfine");
+		ls.lock()->openScreen("loop-end-fine");
 	}
 }
 

@@ -62,11 +62,11 @@ void ZoneScreen::openWindow()
 	}
 	else if (param.compare("st") == 0)
 	{
-		ls.lock()->openScreen("zonestartfine");
+		ls.lock()->openScreen("zone-start-fine");
 	}
 	else if (param.compare("end") == 0)
 	{
-		ls.lock()->openScreen("zoneendfine");
+		ls.lock()->openScreen("zone-end-fine");
 	}
 }
 

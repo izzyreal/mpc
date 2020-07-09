@@ -100,6 +100,11 @@ int Sequencer::getActiveSequenceIndex()
 
 weak_ptr<Track> Sequencer::getActiveTrack()
 {
+	if (!getActiveSequence().lock())
+	{
+		return {};
+	}
+
 	return getActiveSequence().lock()->getTrack(activeTrackIndex);
 }
 
@@ -1054,7 +1059,6 @@ int Sequencer::getLoopEnd()
 {
     return getActiveSequence().lock()->getLoopEnd();
 }
-
 
 weak_ptr<Sequence> Sequencer::getActiveSequence()
 {

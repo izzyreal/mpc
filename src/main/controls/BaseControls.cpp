@@ -62,12 +62,17 @@ void BaseControls::init()
 	currentScreenName = ls.lock()->getCurrentScreenName();
 	param = ls.lock()->getFocus();
 	activeField = ls.lock()->getFocusedLayer().lock()->findField(param);
-	track = sequencer.lock()->getActiveSequence().lock()->getTrack(sequencer.lock()->getActiveTrackIndex());
-
-	if (track.lock()->getBusNumber() != 0)
+	
+	
+	if (sequencer.lock()->getActiveTrack().lock())
 	{
-		mpcSoundPlayerChannel = sampler.lock()->getDrum(track.lock()->getBusNumber() - 1);
-		program = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
+		track = sequencer.lock()->getActiveTrack();
+
+		if (track.lock()->getBusNumber() != 0)
+		{
+			mpcSoundPlayerChannel = sampler.lock()->getDrum(track.lock()->getBusNumber() - 1);
+			program = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
+		}
 	}
 }
 

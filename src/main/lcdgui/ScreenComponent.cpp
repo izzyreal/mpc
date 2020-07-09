@@ -73,5 +73,5 @@ const string ScreenComponent::getLastFocus(const string& screenName)
 
 weak_ptr<Background> ScreenComponent::findBackground()
 {
-	return dynamic_pointer_cast<Background>(findChild("background").lock());
+	return findChild<Background>("");
 }
