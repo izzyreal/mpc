@@ -35,7 +35,7 @@ void LoopToFineScreen::open()
 void LoopToFineScreen::displayLoopLngth()
 {
 	auto loopScreen = dynamic_pointer_cast<LoopScreen>(Screens::getScreenComponent("loop"));
-	findField("looplngth").lock()->setText(loopScreen->loopLngthFix ? "FIX" : "VARI");
+	findField("loop-lngth").lock()->setText(loopScreen->loopLngthFix ? "FIX" : "VARI");
 }
 
 void LoopToFineScreen::displayLngthField()
@@ -110,7 +110,7 @@ void LoopToFineScreen::turnWheel(int i)
 
 	auto sampleLength = sound->getFrameCount();
 	
-	if (param.compare("looplngth") == 0)
+	if (param.compare("loop-lngth") == 0)
 	{
 		loopScreen->loopLngthFix = i > 0;
 		displayLoopLngth();

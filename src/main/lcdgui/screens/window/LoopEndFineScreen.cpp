@@ -36,7 +36,7 @@ void LoopEndFineScreen::open()
 void LoopEndFineScreen::displayLoopLngth()
 {
 	auto loopScreen = dynamic_pointer_cast<LoopScreen>(Screens::getScreenComponent("loop"));
-	findField("looplngth").lock()->setText(loopScreen->loopLngthFix ? "FIX" : "VARI");
+	findField("loop-lngth").lock()->setText(loopScreen->loopLngthFix ? "FIX" : "VARI");
 }
 
 void LoopEndFineScreen::displayLngthField()
@@ -111,10 +111,10 @@ void LoopEndFineScreen::turnWheel(int i)
 
 	auto sampleLength = sound->getFrameCount();
 
-	if (param.compare("looplngth") == 0)
+	if (param.compare("loop-lngth") == 0)
 	{
 		loopScreen->loopLngthFix = i > 0;
-		displayLngthField();
+		displayLoopLngth();
 	}
 	else if (param.compare("lngth") == 0)
 	{
@@ -126,21 +126,21 @@ void LoopEndFineScreen::turnWheel(int i)
 		sound->setEnd(sound->getEnd() + i);
 
 		displayEnd();
-		displayLoopLngth();
+		displayLngthField();
 		displayFineWaveform();
 	}
 	else if (param.compare("end") == 0)
 	{
 		sound->setEnd(sound->getEnd() + i);
 
-		displayEnd();
-		displayLngthField();
-		displayFineWaveform();
-
 		if (loopScreen->loopLngthFix)
 		{
 			sound->setLoopTo(sound->getEnd() - loopLength);
 		}
+
+		displayEnd();
+		displayLngthField();
+		displayFineWaveform();
 	}
 	else if (param.compare("playx") == 0)
 	{
