@@ -926,7 +926,7 @@ void BaseControls::splitLeft()
 
 	if (!controls->isShiftPressed())
 	{
-		left();
+		BaseControls::left();
 		return;
 	}
 
@@ -962,6 +962,6 @@ void BaseControls::splitRight()
 		}
 	}
 	else {
-		right();
+		BaseControls::right();
 	}
 }
