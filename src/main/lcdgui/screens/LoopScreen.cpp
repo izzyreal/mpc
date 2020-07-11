@@ -19,11 +19,6 @@ LoopScreen::LoopScreen(const int layerIndex)
 	addChild(move(make_shared<TwoDots>()));
 	addChild(move(make_shared<Wave>()));
 	findWave().lock()->setFine(false);
-}
-
-void LoopScreen::open()
-{
-	typableParams = vector<string>{ "to", "endlengthvalue" };
 
 	auto twoDots = findTwoDots().lock();
 	twoDots->setVisible(0, true);
@@ -31,14 +26,32 @@ void LoopScreen::open()
 	twoDots->setVisible(2, false);
 	twoDots->setVisible(3, false);
 
-	if (!sampler.lock()->getSound().lock())
+	typableParams = vector<string>{ "to", "endlengthvalue" };
+}
+
+void LoopScreen::open()
+{
+	bool sound = sampler.lock()->getSound().lock() ? true : false;
+
+	findField("snd").lock()->setFocusable(sound);
+	findField("playx").lock()->setFocusable(sound);
+	findField("to").lock()->setFocusable(sound);
+	findField("endlength").lock()->setFocusable(sound);
+	findField("endlengthvalue").lock()->setFocusable(sound);
+	findField("loop").lock()->setFocusable(sound);
+	findField("dummy").lock()->setFocusable(!sound);
+
+	if (sound)
 	{
-		findField("snd").lock()->setFocusable(false);
-		findField("playx").lock()->setFocusable(false);
-		findField("to").lock()->setFocusable(false);
-		findField("endlength").lock()->setFocusable(false);
-		findField("endlengthvalue").lock()->setFocusable(false);
-		findField("loop").lock()->setFocusable(false);
+		init();
+		if (param.compare("dummy") == 0)
+		{
+			ls.lock()->setFocus("snd");
+		}
+	}
+	else
+	{
+		ls.lock()->setFocus("dummy");
 	}
 
 	displaySnd();

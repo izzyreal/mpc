@@ -20,19 +20,32 @@ TrimScreen::TrimScreen(const int layerIndex)
 	twoDots->setVisible(1, true);
 	twoDots->setVisible(2, false);
 	twoDots->setVisible(3, false);
+
+	typableParams = vector<string>{ "st", "end" };
 }
 
 void TrimScreen::open()
 {
-	typableParams = vector<string>{ "st", "end" };
+	bool sound = sampler.lock()->getSound().lock() ? true : false;
 
-	if (!sampler.lock()->getSound().lock())
+	findField("snd").lock()->setFocusable(sound);
+	findField("playx").lock()->setFocusable(sound);
+	findField("end").lock()->setFocusable(sound);
+	findField("view").lock()->setFocusable(sound);
+	findField("st").lock()->setFocusable(sound);
+	findField("dummy").lock()->setFocusable(!sound);
+
+	if (sound)
 	{
-		findField("snd").lock()->setFocusable(false);
-		findField("playx").lock()->setFocusable(false);
-		findField("end").lock()->setFocusable(false);
-		findField("view").lock()->setFocusable(false);
-		findField("st").lock()->setFocusable(false);
+		init();
+		if (param.compare("dummy") == 0)
+		{
+			ls.lock()->setFocus("snd");
+		}
+	}
+	else
+	{
+		ls.lock()->setFocus("dummy");
 	}
 
 	displaySnd();

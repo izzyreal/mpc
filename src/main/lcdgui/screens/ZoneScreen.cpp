@@ -18,24 +18,35 @@ ZoneScreen::ZoneScreen(const int layerIndex)
 	addChild(move(make_shared<TwoDots>()));
 	addChild(move(make_shared<Wave>()));
 	findWave().lock()->setFine(false);
-}
-
-void ZoneScreen::open()
-{
-	typableParams = vector<string>{ "st", "end" };
 
 	findTwoDots().lock()->setVisible(0, true);
 	findTwoDots().lock()->setVisible(1, true);
 	findTwoDots().lock()->setVisible(2, false);
 	findTwoDots().lock()->setVisible(3, false);
 
-	if (!sampler.lock()->getSound().lock())
+	typableParams = vector<string>{ "st", "end" };
+}
+
+void ZoneScreen::open()
+{
+	bool sound = sampler.lock()->getSound().lock() ? true : false;
+	findField("snd").lock()->setFocusable(sound);
+	findField("playx").lock()->setFocusable(sound);
+	findField("st").lock()->setFocusable(sound);
+	findField("end").lock()->setFocusable(sound);
+	findField("zone").lock()->setFocusable(sound);
+	findField("dummy").lock()->setFocusable(!sound);
+
+	if (sound)
 	{
-		findField("snd").lock()->setFocusable(false);
-		findField("playx").lock()->setFocusable(false);
-		findField("st").lock()->setFocusable(false);
-		findField("end").lock()->setFocusable(false);
-		findField("zone").lock()->setFocusable(false);
+		init();
+		if (param.compare("dummy") == 0)
+		{
+			ls.lock()->setFocus("snd");
+		}
+	}
+	else 
+	{
 		ls.lock()->setFocus("dummy");
 	}
 
