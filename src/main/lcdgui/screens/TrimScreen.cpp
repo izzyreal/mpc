@@ -14,17 +14,17 @@ TrimScreen::TrimScreen(const int layerIndex)
 	addChild(move(make_shared<TwoDots>()));
 	addChild(move(make_shared<Wave>()));
 	findWave().lock()->setFine(false);
-}
-
-void TrimScreen::open()
-{
-	typableParams = vector<string>{ "st", "end" };
 
 	auto twoDots = findTwoDots().lock();
 	twoDots->setVisible(0, true);
 	twoDots->setVisible(1, true);
 	twoDots->setVisible(2, false);
 	twoDots->setVisible(3, false);
+}
+
+void TrimScreen::open()
+{
+	typableParams = vector<string>{ "st", "end" };
 
 	if (!sampler.lock()->getSound().lock())
 	{
