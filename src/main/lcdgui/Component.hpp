@@ -21,7 +21,6 @@ namespace mpc::lcdgui
 	{
 
 	protected:
-		MRECT preDrawClearRect;
 		Component* parent = nullptr;
 		std::vector<std::shared_ptr<Component>> children;
 
@@ -99,6 +98,7 @@ namespace mpc::lcdgui
 		void preDrawClear(std::vector<std::vector<bool>>* pixels);
 
 	public:
+		MRECT preDrawClearRect;
 		Component(const std::string& name);
 
 	};

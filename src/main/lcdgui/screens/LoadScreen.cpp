@@ -104,21 +104,26 @@ void LoadScreen::function(int i)
 			mpc.loadSound(false);
 			return;
 		}
-		else if (StrUtil::eqIgnoreCase(ext, "pgm"))
+		
+		if (StrUtil::eqIgnoreCase(ext, "pgm"))
 		{
 			ls.lock()->openScreen("load-a-program");
 			return;
 		}
-		else if (StrUtil::eqIgnoreCase(ext, "mid"))
+		
+		if (StrUtil::eqIgnoreCase(ext, "mid"))
 		{
 			ls.lock()->openScreen("load-a-sequence");
+			return;
 		}
-		else if (StrUtil::eqIgnoreCase(ext, "all"))
+		
+		if (StrUtil::eqIgnoreCase(ext, "all"))
 		{
 			ls.lock()->openScreen("mpc2000xl-all-file");
 			return;
 		}
-		else if (StrUtil::eqIgnoreCase(ext, "aps"))
+		
+		if (StrUtil::eqIgnoreCase(ext, "aps"))
 		{
 			ls.lock()->openScreen("load-aps-file");
 			return;
@@ -136,6 +141,10 @@ void LoadScreen::function(int i)
 				displayDirectory();
 				displayFile();
 				displaySize();
+
+				auto splitFileName = StrUtil::split(getSelectedFileName(), '.');
+				auto playable = splitFileName.size() > 1 && (StrUtil::eqIgnoreCase(splitFileName[1], "snd") || StrUtil::eqIgnoreCase(splitFileName[1], "wav"));
+				ls.lock()->setFunctionKeysArrangement(playable ? 1 : 0);
 			}
 		}
 		break;
@@ -176,6 +185,10 @@ void LoadScreen::turnWheel(int i)
 	{
 		setFileLoadWithMaxCheck(fileLoad + i);
 	}
+
+	auto splitFileName = StrUtil::split(getSelectedFileName(), '.');
+	auto playable = splitFileName.size() > 1 && (StrUtil::eqIgnoreCase(splitFileName[1], "snd") || StrUtil::eqIgnoreCase(splitFileName[1], "wav"));
+	ls.lock()->setFunctionKeysArrangement(playable ? 1 : 0);
 }
 
 void LoadScreen::displayView()

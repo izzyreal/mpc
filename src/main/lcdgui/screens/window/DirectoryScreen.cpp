@@ -131,7 +131,8 @@ void DirectoryScreen::turnWheel(int i)
 	{
 		down();
 	}
-	else {
+	else
+	{
 		up();
 	}
 }
@@ -146,9 +147,9 @@ void DirectoryScreen::left()
 	{
 		xPos--;
 		refreshFocus();
-		return;
 	}
-	else {
+	else
+	{
 		if (disk->moveBack())
 		{
 			auto loadScreen = dynamic_pointer_cast<LoadScreen>(Screens::getScreenComponent("load"));
@@ -193,6 +194,17 @@ void DirectoryScreen::left()
 
 			refreshFocus();
 		}
+	}
+
+	if (getSelectedFile() != nullptr)
+	{
+		auto splitFileName = StrUtil::split(getSelectedFile()->getName(), '.');
+		auto playable = splitFileName.size() > 1 && (StrUtil::eqIgnoreCase(splitFileName[1], "snd") || StrUtil::eqIgnoreCase(splitFileName[1], "wav"));
+		ls.lock()->setFunctionKeysArrangement(playable ? 1 : 0);
+	}
+	else
+	{
+		ls.lock()->setFunctionKeysArrangement(0);
 	}
 }
 
@@ -248,6 +260,10 @@ void DirectoryScreen::right()
 
 		refreshFocus();
 	}
+
+	auto splitFileName = StrUtil::split(getSelectedFile()->getName(), '.');
+	auto playable = splitFileName.size() > 1 && (StrUtil::eqIgnoreCase(splitFileName[1], "snd") || StrUtil::eqIgnoreCase(splitFileName[1], "wav"));
+	ls.lock()->setFunctionKeysArrangement(playable ? 1 : 0);
 }
 
 void DirectoryScreen::up()
@@ -328,6 +344,10 @@ void DirectoryScreen::up()
 			loadScreen->fileLoad -= 1;
 			refreshFocus();
 		}
+
+		auto splitFileName = StrUtil::split(getSelectedFile()->getName(), '.');
+		auto playable = splitFileName.size() > 1 && (StrUtil::eqIgnoreCase(splitFileName[1], "snd") || StrUtil::eqIgnoreCase(splitFileName[1], "wav"));
+		ls.lock()->setFunctionKeysArrangement(playable ? 1 : 0);
 	}
 }
 
@@ -388,7 +408,6 @@ void DirectoryScreen::down()
 
 			refreshFocus();
 		}
-		return;
 	}
 	else
 	{
@@ -416,6 +435,10 @@ void DirectoryScreen::down()
 			loadScreen->fileLoad += 1;
 			refreshFocus();
 		}
+
+		auto splitFileName = StrUtil::split(getSelectedFile()->getName(), '.');
+		auto playable = splitFileName.size() > 1 && (StrUtil::eqIgnoreCase(splitFileName[1], "snd") || StrUtil::eqIgnoreCase(splitFileName[1], "wav"));
+		ls.lock()->setFunctionKeysArrangement(playable ? 1 : 0);
 	}
 }
 

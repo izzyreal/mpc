@@ -1,6 +1,7 @@
 #include "FunctionKeys.hpp"
 
 #include <lcdgui/Label.hpp>
+#include <lcdgui/Background.hpp>
 
 #include <Paths.hpp>
 
@@ -9,21 +10,115 @@
 using namespace mpc::lcdgui;
 using namespace std;
 
+FunctionKey::FunctionKey(const std::string& name, const int xPos)
+	: Component(name)
+{
+	setSize(39, 9);
+	setLocation(xPos, 51);
+	preDrawClearRect.Clear();
+
+	auto label = addChild(make_shared<TextComp>(name)).lock();
+	label->setSize(0, 0);
+	label->setLocation(xPos + 1, 52);
+	label->preDrawClearRect.Clear();
+}
+
+void FunctionKey::Draw(std::vector<std::vector<bool>>* pixels)
+{
+	if (shouldNotDraw(pixels))
+	{
+		return;
+	}
+
+	auto label = findChild<TextComp>(name).lock();
+
+	if (label->getText().compare("") == 0 || type == -1)
+	{
+		return;
+	}
+	
+	bool border = false;
+	bool bg = false;
+
+	if (type == 0)
+	{
+		border = true;
+		bg = true;
+	}
+	else if (type == 1)
+	{
+		border = true;
+		bg = false;
+	}
+	else
+	{
+		border = false;
+		bg = false;
+	}
+
+	for (int j = 0; j < 39; j++)
+	{
+		(*pixels)[x + j][51] = border;
+		(*pixels)[x + j][59] = border;
+	}
+
+	for (int j = 52; j < 59; j++)
+	{
+		(*pixels)[x][j] = border;
+		(*pixels)[x + 38][j] = border;
+	}
+
+	for (int j = 1; j < 38; j++)
+	{
+		for (int k = 52; k < 59; k++)
+		{
+			(*pixels)[x + j][k] = bg;
+		}
+	}
+
+	Component::Draw(pixels);
+}
+
+void FunctionKey::setText(const string& text)
+{
+	auto label = findChild<TextComp>(name).lock();
+	label->setText(text);
+
+	auto stringSize = label->GetTextEntryLength();
+	auto lengthInPixels = stringSize * 6;
+	int offsetx = (39 - lengthInPixels) * 0.5;
+
+	label->setLocation(x + offsetx, 52);
+	label->setSize((stringSize * 6) - 1, 7);
+}
+
+void FunctionKey::setType(const int type)
+{
+	if (this->type != -1 && type == -1)
+	{
+		parent->getParent()->findChild<Background>("").lock()->repaintUnobtrusive(getRect());
+	}
+
+	this->type = type;
+	Hide(type == -1);
+	SetDirty();
+}
+
 FunctionKeys::FunctionKeys(const string& name, vector<vector<string>> texts, vector<vector<int>> types)
 	: Component(name)
 {
 	this->texts = texts;
 	this->types = types;
-	enabled = vector<vector<bool>>(types.size(), vector<bool>{ true, true, true, true, true, true });
 
 	for (int i = 0; i < 6; i++)
 	{
-		auto child = addChild(make_shared<TextComp>("fk" + to_string(i))).lock();
-		child->setSize(29, 7);
+		addChild(make_shared<FunctionKey>("fk" + to_string(i), xPoses[i]));
 	}
 
 	setSize(248, 10);
 	setLocation(0, 50);
+	preDrawClearRect.Clear();
+	setActiveArrangement(0);
 }
 
 void FunctionKeys::setActiveArrangement(int i)
@@ -33,128 +128,16 @@ void FunctionKeys::setActiveArrangement(int i)
 		return;
 	}
 
-	for (int j = 0; j < 6; j++)
-	{
-		if (texts[activeArrangement][j].compare("") == 0 ||
-			!enabled[activeArrangement][j] ||
-			types[activeArrangement][j] == -1)
-		{
-			continue;
-		}
-
-		MRECT clearRect{ xPos[j], 51, xPos[j] + 39, 60 };
-		preDrawClearRect = preDrawClearRect.Union(&clearRect);
-	}
-
 	activeArrangement = i;
 
 	for (int j = 0; j < 6; j++)
 	{
-		auto label = findChild("fk" + to_string(j)).lock();
-		auto hideLabel = !enabled[activeArrangement][j] || texts[activeArrangement][j].compare("") == 0 || types[activeArrangement][j] == -1;
-		label->Hide(hideLabel);
+		auto fk = findChild<FunctionKey>("fk" + to_string(j)).lock();
+
+		fk->setText(texts[activeArrangement][j]);
+		fk->setType(types[activeArrangement][j]);
+		auto type = types[activeArrangement][j];
+		auto label = fk->findChild<TextComp>(fk->getName()).lock();
+		label->setInverted(type == 0);
 	}
-
-	SetDirty();
-}
-
-void FunctionKeys::disable(int i)
-{
-	if (!enabled[activeArrangement][i])
-	{
-		return;
-	}
-
-	enabled[activeArrangement][i] = false;
-
-	findChild("fk" + to_string(i)).lock()->Hide(true);
-
-	SetDirty();
-}
-
-void FunctionKeys::enable(int i)
-{
-	if (enabled[activeArrangement][i])
-	{
-		return;
-	}
-
-	enabled[activeArrangement][i] = true;
-
-	findChild("fk" + to_string(i)).lock()->Hide(false);
-
-	SetDirty();
-}
-
-void FunctionKeys::Draw(std::vector<std::vector<bool>>* pixels)
-{
-	if (shouldNotDraw(pixels))
-	{
-		return;
-	}
-
-	bool border = false;
-	bool bg = false;
-	bool isLabel = false;
-
-	for (int i = 0; i < xPos.size(); i++)
-	{
-		if (texts[activeArrangement][i].compare("") == 0 || 
-			!enabled[activeArrangement][i] || 
-			types[activeArrangement][i] == -1)
-		{
-			continue;
-		}
-
-		auto stringSize = texts[activeArrangement][i].size();
-		auto lengthInPixels = stringSize * 6;
-		
-		int offsetx = (39 - lengthInPixels) * 0.5;
-		
-		if (types[activeArrangement][i] == 0)
-		{
-			border = true;
-			bg = true;
-			isLabel = false;
-		}
-		else if (types[activeArrangement][i] == 1)
-		{
-			border = true;
-			bg = false;
-			isLabel = true;
-		}
-		else if (types[activeArrangement][i] == 2)
-		{
-			border = false;
-			bg = false;
-			isLabel = true;
-		}
-
-		for (int j = 0; j < 39; j++)
-		{
-			int x1 = j + xPos[i];
-			(*pixels)[x1][51] = border;
-			(*pixels)[x1][59] = border;
-		}
-		
-		for (int j = 52; j < 59; j++)
-		{
-			(*pixels)[xPos[i]][j] = border;
-			(*pixels)[xPos[i] + 38][j] = border;
-		}
-
-		for (int j = 1; j < 38; j++)
-		{
-			for (int k = 52; k < 59; k++) {
-				(*pixels)[xPos[i] + j][k] = bg;
-			}
-		}
-
-		auto label = dynamic_pointer_cast<TextComp>(findChild("fk" + to_string(i)).lock());
-		label->setText(texts[activeArrangement][i]);
-		label->setLocation(xPos[i] + offsetx, 52);
-		label->setInverted(!isLabel);
-	}
-
-	Component::Draw(pixels);
 }

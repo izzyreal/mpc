@@ -8,13 +8,13 @@ namespace mpc::lcdgui {
 		: public Component
 	{
 
+	private:
+		MRECT unobtrusiveRect;
+
 	public:
+		void repaintUnobtrusive(MRECT rect); // This is used for disappearing function keys
 		void setName(const std::string& name);
-
-	public:
 		void Draw(std::vector< std::vector<bool>>* pixels) override;
-
-	public:
 		Background();
 
 	};

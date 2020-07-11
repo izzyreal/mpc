@@ -110,10 +110,10 @@ void TimingCorrectScreen::displayNoteValue()
 
 	if (noteValue != 0)
 	{
-		fb->enable(4);
+		//fb->enable(4);
 	}
 	else {
-		fb->disable(4);
+		//fb->disable(4);
 	}
 
 	findField("notevalue").lock()->setText(noteValueNames[noteValue]);

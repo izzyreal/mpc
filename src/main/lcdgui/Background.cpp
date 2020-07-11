@@ -15,6 +15,12 @@ Background::Background()
 	h = 60;
 }
 
+void Background::repaintUnobtrusive(MRECT rect)
+{
+	unobtrusiveRect = unobtrusiveRect.Union(&rect);
+	SetDirty();
+}
+
 void Background::setName(const string& name)
 { 
 	this->name = name;
@@ -50,13 +56,24 @@ void Background::Draw(vector<vector<bool>>* pixels)
 	fclose(f);
 	int colorCount = (imageDataOffset - infosize) / 4;
 
-	int charcounter = 0;
+	int byteCounter = 0;
 	
+	const auto unobtrusive = !unobtrusiveRect.Empty();
+
 	for (int y = 0; y < height; y++)
 	{
 		for (int x = 0; x < width; x++)
 		{
-			auto value = data[charcounter++];
+			if (unobtrusive)
+			{
+				if (x < unobtrusiveRect.L || x > unobtrusiveRect.R || y < unobtrusiveRect.T || y > unobtrusiveRect.B)
+				{
+					byteCounter++;
+					continue;
+				}
+			}
+
+			auto value = data[byteCounter++];
 
 			if ((colorCount <= 2 && value == 1) || (colorCount > 2 && value == 2))
 			{
@@ -81,4 +98,5 @@ void Background::Draw(vector<vector<bool>>* pixels)
 		}
 	}
 	dirty = false;
+	unobtrusiveRect.Clear();
 }
