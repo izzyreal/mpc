@@ -416,7 +416,7 @@ void Component::Clear(vector<vector<bool>>* pixels)
 
 	if (dynamic_cast<FunctionKey*>(this) != nullptr)
 	{
-		//return;
+		return;
 	}
 
 	for (int i = r.L; i < r.R; i++)

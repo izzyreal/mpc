@@ -15,13 +15,14 @@ FunctionKey::FunctionKey(const std::string& name, const int xPos)
 {
 	setSize(39, 9);
 	setLocation(xPos, 51);
-	preDrawClearRect.Clear();
 
 	auto label = addChild(make_shared<TextComp>(name)).lock();
 	label->setSize(0, 0);
 	label->setLocation(xPos + 1, 52);
 	label->preDrawClearRect.Clear();
 	Hide(true);
+	preDrawClearRect.Clear();
+	SetDirty(false);
 }
 
 void FunctionKey::Draw(std::vector<std::vector<bool>>* pixels)
