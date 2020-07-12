@@ -249,7 +249,7 @@ int LoadScreen::getFileSize()
 		return 0;
 	}
 	
-	return (int)(disk->getFile(fileLoad)->length() / 1024);
+	return (int) ceil(disk->getFile(fileLoad)->length() / 1024.0);
 }
 
 void LoadScreen::displaySize()
@@ -260,7 +260,7 @@ void LoadScreen::displaySize()
 		return;
 	}
 	
-	findLabel("size").lock()->setText(to_string(getFileSize()) + "K");
+	findLabel("size").lock()->setText(StrUtil::padLeft(to_string(getFileSize()), " ", 6) + "K");
 }
 
 void LoadScreen::setView(int i)
