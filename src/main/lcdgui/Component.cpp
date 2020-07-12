@@ -70,10 +70,6 @@ bool Component::bringToFront(Component* childToBringToFront)
 
 bool Component::shouldNotDraw(vector<vector<bool>>* pixels)
 {
-	if (name.compare("fk3") == 0 && hidden)
-	{
-		printf("");
-	}
 	if (!IsDirty())
 	{
 		return true;
@@ -271,6 +267,8 @@ void Component::Draw(vector<vector<bool>>* pixels)
 		return;
 	}
 
+	//MLOG("Drawing " + name);
+
 	if (hidden || !IsDirty())
 	{
 		return;
@@ -356,7 +354,7 @@ MRECT Component::getDirtyArea()
 	return res;
 }
 
-void Component::SetDirty() 
+void Component::SetDirty(bool b) 
 { 
 	if (hidden)
 	{
@@ -365,10 +363,10 @@ void Component::SetDirty()
 
 	for (auto& c : children)
 	{
-		c->SetDirty();
+		c->SetDirty(b);
 	}
 	
-	dirty = true;
+	dirty = b;
 }
 
 bool Component::IsHidden()
@@ -395,6 +393,11 @@ bool Component::IsDirty()
 		return true;
 	}
 
+	if (dirty)
+	{
+		//MLOG(name + " is dirty");
+	}
+
 	return dirty;
 }
 
@@ -404,12 +407,6 @@ MRECT Component::getRect()
 	auto x2 = min(248, x + w);
 	auto y1 = max(0, y);
 	auto y2 = min(60, y + h);
-
-	if (name.compare("fk3") == 0)
-	{
-		printf("");
-	}
-
 	return MRECT(x1, y1, x2, y2);
 }
 

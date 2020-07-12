@@ -21,6 +21,7 @@ FunctionKey::FunctionKey(const std::string& name, const int xPos)
 	label->setSize(0, 0);
 	label->setLocation(xPos + 1, 52);
 	label->preDrawClearRect.Clear();
+	Hide(true);
 }
 
 void FunctionKey::Draw(std::vector<std::vector<bool>>* pixels)
@@ -32,11 +33,6 @@ void FunctionKey::Draw(std::vector<std::vector<bool>>* pixels)
 
 	auto label = findChild<TextComp>(name).lock();
 
-	if (label->getText().compare("") == 0 || type == -1)
-	{
-		return;
-	}
-	
 	bool border = false;
 	bool bg = false;
 
@@ -135,10 +131,14 @@ void FunctionKeys::setActiveArrangement(int i)
 	{
 		auto fk = findChild<FunctionKey>("fk" + to_string(j)).lock();
 
-		fk->setText(texts[activeArrangement][j]);
-		fk->setType(types[activeArrangement][j]);
 		auto type = types[activeArrangement][j];
-		auto label = fk->findChild<TextComp>(fk->getName()).lock();
-		label->setInverted(type == 0);
+		fk->setType(type);
+
+		if (type != -1)
+		{
+			auto label = fk->findChild<TextComp>(fk->getName()).lock();
+			fk->setText(texts[activeArrangement][j]);
+			label->setInverted(type == 0);
+		}
 	}
 }

@@ -81,7 +81,7 @@ namespace mpc::lcdgui
 
 	public:
 		virtual void Hide(bool b);
-		virtual void SetDirty();
+		virtual void SetDirty(bool b = true);
 		bool IsHidden();
 		bool IsDirty();
 		MRECT getDirtyArea();
