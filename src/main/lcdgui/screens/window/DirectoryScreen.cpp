@@ -48,12 +48,17 @@ void DirectoryScreen::function(int f)
 	switch (f)
 	{
 	case 1:
-		if (loadScreen->getSelectedFile() == nullptr) return;
+		if (loadScreen->getSelectedFile() == nullptr)
+		{
+			return;
+		}
 
-		if (loadScreen->getSelectedFile()->isDirectory()) {
+		if (loadScreen->getSelectedFile()->isDirectory())
+		{
 			ls.lock()->openScreen("delete-folder");
 		}
-		else {
+		else
+		{
 			ls.lock()->openScreen("delete-file");
 		}
 		break;
@@ -261,9 +266,12 @@ void DirectoryScreen::right()
 		refreshFocus();
 	}
 
-	auto splitFileName = StrUtil::split(getSelectedFile()->getName(), '.');
-	auto playable = splitFileName.size() > 1 && (StrUtil::eqIgnoreCase(splitFileName[1], "snd") || StrUtil::eqIgnoreCase(splitFileName[1], "wav"));
-	ls.lock()->setFunctionKeysArrangement(playable ? 1 : 0);
+	if (getSelectedFile() != nullptr)
+	{
+		auto splitFileName = StrUtil::split(getSelectedFile()->getName(), '.');
+		auto playable = splitFileName.size() > 1 && (StrUtil::eqIgnoreCase(splitFileName[1], "snd") || StrUtil::eqIgnoreCase(splitFileName[1], "wav"));
+		ls.lock()->setFunctionKeysArrangement(playable ? 1 : 0);
+	}
 }
 
 void DirectoryScreen::up()
@@ -431,14 +439,18 @@ void DirectoryScreen::down()
 			displayRightFields();
 			drawGraphicsRight();
 		}
-		else {
+		else
+		{
 			loadScreen->fileLoad += 1;
 			refreshFocus();
 		}
 
-		auto splitFileName = StrUtil::split(getSelectedFile()->getName(), '.');
-		auto playable = splitFileName.size() > 1 && (StrUtil::eqIgnoreCase(splitFileName[1], "snd") || StrUtil::eqIgnoreCase(splitFileName[1], "wav"));
-		ls.lock()->setFunctionKeysArrangement(playable ? 1 : 0);
+		if (getSelectedFile() != nullptr)
+		{
+			auto splitFileName = StrUtil::split(getSelectedFile()->getName(), '.');
+			auto playable = splitFileName.size() > 1 && (StrUtil::eqIgnoreCase(splitFileName[1], "snd") || StrUtil::eqIgnoreCase(splitFileName[1], "wav"));
+			ls.lock()->setFunctionKeysArrangement(playable ? 1 : 0);
+		}
 	}
 }
 
@@ -464,8 +476,7 @@ mpc::disk::MpcFile* DirectoryScreen::getFileFromGrid(int x, int y)
 	{
 		f = disk->getParentFile(y + yOffset0);
 	}
-
-	if (x == 1 && disk->getFileNames().size() > y + yOffset1)
+	else if (x == 1 && disk->getFileNames().size() > y + yOffset1)
 	{
 		f = disk->getFile(y + yOffset1);
 	}

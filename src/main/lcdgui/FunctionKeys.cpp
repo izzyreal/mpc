@@ -22,7 +22,6 @@ FunctionKey::FunctionKey(const std::string& name, const int xPos)
 	label->preDrawClearRect.Clear();
 	Hide(true);
 	preDrawClearRect.Clear();
-	SetDirty(false);
 }
 
 void FunctionKey::Draw(std::vector<std::vector<bool>>* pixels)
