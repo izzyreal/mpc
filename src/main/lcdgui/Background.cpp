@@ -11,8 +11,8 @@ Background::Background()
 {
 	x = 0;
 	y = 0;
-	w = 0;
-	h = 0;
+	w = 248;
+	h = 60;
 }
 
 void Background::repaintUnobtrusive(MRECT rect)
