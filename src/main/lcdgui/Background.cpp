@@ -11,8 +11,8 @@ Background::Background()
 {
 	x = 0;
 	y = 0;
-	w = 248;
-	h = 60;
+	w = 0;
+	h = 0;
 }
 
 void Background::repaintUnobtrusive(MRECT rect)
@@ -39,7 +39,8 @@ void Background::Draw(vector<vector<bool>>* pixels)
 
 	FILE* f = moduru::file::FileUtil::fopenw(backgroundPath, "rb");
 	
-	if (f == NULL) {
+	if (f == NULL)
+	{
 		return;
 	}
 

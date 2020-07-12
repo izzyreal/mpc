@@ -1,6 +1,7 @@
 #include "Component.hpp"
 
 #include "Label.hpp"
+#include "Background.hpp"
 #include "Field.hpp"
 #include "Parameter.hpp"
 #include "ScreenComponent.hpp"
@@ -415,6 +416,11 @@ MRECT Component::getRect()
 void Component::Clear(vector<vector<bool>>* pixels)
 {
 	auto r = getRect();
+
+	if (dynamic_cast<FunctionKey*>(this) != nullptr)
+	{
+		//return;
+	}
 
 	for (int i = r.L; i < r.R; i++)
 	{

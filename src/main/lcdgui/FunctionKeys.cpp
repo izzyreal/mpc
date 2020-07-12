@@ -94,6 +94,11 @@ void FunctionKey::setText(const string& text)
 
 void FunctionKey::setType(const int type)
 {
+	if (this->type == type)
+	{
+		return;
+	}
+
 	if (this->type != -1 && type == -1)
 	{
 		parent->getParent()->findChild<Background>("").lock()->repaintUnobtrusive(getRect());
@@ -114,10 +119,6 @@ FunctionKeys::FunctionKeys(const string& name, vector<vector<string>> texts, vec
 	{
 		addChild(make_shared<FunctionKey>("fk" + to_string(i), xPoses[i]));
 	}
-
-	setSize(248, 10);
-	setLocation(0, 50);
-	preDrawClearRect.Clear();
 	setActiveArrangement(0);
 }
 
