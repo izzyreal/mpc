@@ -36,6 +36,10 @@ void LoadScreen::open()
 
 	displayFreeSnd();
 	findLabel("freeseq").lock()->setText("  2640K");
+
+	auto splitFileName = StrUtil::split(getSelectedFileName(), '.');
+	auto playable = splitFileName.size() > 1 && (StrUtil::eqIgnoreCase(splitFileName[1], "snd") || StrUtil::eqIgnoreCase(splitFileName[1], "wav"));
+	ls.lock()->setFunctionKeysArrangement(playable ? 1 : 0);
 }
 
 void LoadScreen::function(int i)
