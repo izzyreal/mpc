@@ -38,6 +38,22 @@ void DirectoryScreen::open()
 	refreshFocus();
 }
 
+void DirectoryScreen::setFunctionKeys()
+{
+	if (getSelectedFile() != nullptr)
+	{
+		auto splitFileName = StrUtil::split(getSelectedFile()->getName(), '.');
+		auto playable = splitFileName.size() > 1 && (StrUtil::eqIgnoreCase(splitFileName[1], "snd") || StrUtil::eqIgnoreCase(splitFileName[1], "wav"));
+		ls.lock()->setFunctionKeysArrangement(playable ? 1 : 0);
+	}
+	else
+	{
+		ls.lock()->setFunctionKeysArrangement(0);
+	}
+
+	findChild<Background>("").lock()->repaintUnobtrusive(findChild<FunctionKey>("fk5").lock()->getRect());
+}
+
 void DirectoryScreen::function(int f)
 {
 	BaseControls::function(f);
@@ -201,16 +217,7 @@ void DirectoryScreen::left()
 		}
 	}
 
-	if (getSelectedFile() != nullptr)
-	{
-		auto splitFileName = StrUtil::split(getSelectedFile()->getName(), '.');
-		auto playable = splitFileName.size() > 1 && (StrUtil::eqIgnoreCase(splitFileName[1], "snd") || StrUtil::eqIgnoreCase(splitFileName[1], "wav"));
-		ls.lock()->setFunctionKeysArrangement(playable ? 1 : 0);
-	}
-	else
-	{
-		ls.lock()->setFunctionKeysArrangement(0);
-	}
+	setFunctionKeys();
 }
 
 void DirectoryScreen::right()
@@ -266,12 +273,7 @@ void DirectoryScreen::right()
 		refreshFocus();
 	}
 
-	if (getSelectedFile() != nullptr)
-	{
-		auto splitFileName = StrUtil::split(getSelectedFile()->getName(), '.');
-		auto playable = splitFileName.size() > 1 && (StrUtil::eqIgnoreCase(splitFileName[1], "snd") || StrUtil::eqIgnoreCase(splitFileName[1], "wav"));
-		ls.lock()->setFunctionKeysArrangement(playable ? 1 : 0);
-	}
+	setFunctionKeys();
 }
 
 void DirectoryScreen::up()
@@ -353,9 +355,7 @@ void DirectoryScreen::up()
 			refreshFocus();
 		}
 
-		auto splitFileName = StrUtil::split(getSelectedFile()->getName(), '.');
-		auto playable = splitFileName.size() > 1 && (StrUtil::eqIgnoreCase(splitFileName[1], "snd") || StrUtil::eqIgnoreCase(splitFileName[1], "wav"));
-		ls.lock()->setFunctionKeysArrangement(playable ? 1 : 0);
+		setFunctionKeys();
 	}
 }
 
@@ -445,12 +445,7 @@ void DirectoryScreen::down()
 			refreshFocus();
 		}
 
-		if (getSelectedFile() != nullptr)
-		{
-			auto splitFileName = StrUtil::split(getSelectedFile()->getName(), '.');
-			auto playable = splitFileName.size() > 1 && (StrUtil::eqIgnoreCase(splitFileName[1], "snd") || StrUtil::eqIgnoreCase(splitFileName[1], "wav"));
-			ls.lock()->setFunctionKeysArrangement(playable ? 1 : 0);
-		}
+		setFunctionKeys();
 	}
 }
 

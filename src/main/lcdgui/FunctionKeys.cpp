@@ -95,11 +95,6 @@ void FunctionKey::setType(const int type)
 		return;
 	}
 
-	if (this->type != -1 && type == -1)
-	{
-		parent->getParent()->findChild<Background>("").lock()->repaintUnobtrusive(getRect());
-	}
-
 	this->type = type;
 	Hide(type == -1);
 	SetDirty();

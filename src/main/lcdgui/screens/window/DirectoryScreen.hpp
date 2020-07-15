@@ -52,6 +52,7 @@ namespace mpc::lcdgui::screens::window
 		std::string previousScreenName = "";
 
 	private:
+		void setFunctionKeys();
 		mpc::disk::MpcFile* getSelectedFile();
 		mpc::disk::MpcFile* getFileFromGrid(int x, int y);
 		void displayLeftFields();
