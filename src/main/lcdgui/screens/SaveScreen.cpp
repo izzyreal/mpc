@@ -108,9 +108,9 @@ void SaveScreen::turnWheel(int i)
 			sampler.lock()->setSoundIndex(sampler.lock()->getSoundIndex() + i);
 			break;
 		}
+		displayFile();
+		displaySize();
 	}
-	displayFile();
-	displaySize();
 }
 
 void SaveScreen::setType(int i)
