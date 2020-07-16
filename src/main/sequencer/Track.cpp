@@ -375,7 +375,7 @@ void Track::setBusNumber(int i)
     notifyObservers(string("bus"));
 }
 
-int Track::getBusNumber()
+int Track::getBus()
 {
     return busNumber;
 }

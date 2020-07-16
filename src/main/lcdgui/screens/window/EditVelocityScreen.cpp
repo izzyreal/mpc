@@ -122,7 +122,7 @@ void EditVelocityScreen::displayNotes()
 {
 	init();
 	
-	if (track.lock()->getBusNumber() == 0)
+	if (track.lock()->getBus() == 0)
 	{
 		findField("note0").lock()->setSize(8 * 6 + 1, 9);
 		findLabel("note1").lock()->Hide(false);

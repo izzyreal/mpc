@@ -100,7 +100,7 @@ void SaveScreen::turnWheel(int i)
 			break;
 		case 3:
 		{
-			auto nr = sequencer.lock()->getActiveSequence().lock()->getTrack(sequencer.lock()->getActiveTrackIndex()).lock()->getBusNumber();
+			auto nr = sequencer.lock()->getActiveSequence().lock()->getTrack(sequencer.lock()->getActiveTrackIndex()).lock()->getBus();
 			sampler.lock()->setDrumBusProgramNumber(nr, sampler.lock()->getDrumBusProgramNumber(nr) + i);
 			break;
 		}

@@ -28,6 +28,10 @@ const int EVENT_ROW_COUNT = 4;
 StepEditorScreen::StepEditorScreen(const int layerIndex)
 	: ScreenComponent("step-editor", layerIndex)
 {
+	for (int i = 0; i < EVENT_ROW_COUNT; i++)
+	{
+		addChild(make_shared<EventRow>(i)).lock();
+	}
 }
 
 void StepEditorScreen::open()
@@ -39,9 +43,9 @@ void StepEditorScreen::open()
 
 	init();
 
-	if (track.lock()->getBusNumber() != 0)
+	if (track.lock()->getBus() != 0)
 	{
-		int pgm = sampler.lock()->getDrumBusProgramNumber(track.lock()->getBusNumber());
+		int pgm = sampler.lock()->getDrumBusProgramNumber(track.lock()->getBus());
 		program = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(pgm).lock());
 	}
 
@@ -56,21 +60,6 @@ void StepEditorScreen::open()
 	findField("now2").lock()->setTextPadded(sequencer.lock()->getCurrentClockNumber(), "0");
 
 	initVisibleEvents();
-
-	for (int i = 0; i < EVENT_ROW_COUNT; i++)
-	{
-		deleteChildren("event-row-" + to_string(i));
-		auto eventRow = dynamic_pointer_cast<EventRow>(addChild(make_shared<EventRow>(track.lock()->getBusNumber(), visibleEvents[i], i)).lock());
-		auto event = visibleEvents[i].lock();
-
-		if (event)
-		{
-			event->addObserver(this);
-		}
-
-		eventRow->setMidi(track.lock()->getBusNumber() == 0);
-		eventRow->init();
-	}
 
 	refreshEventRows();
 	refreshSelection();
@@ -196,7 +185,7 @@ void StepEditorScreen::function(int i)
 				return;
 			}
 
-			if (ne && track.lock()->getBusNumber() != 0)
+			if (ne && track.lock()->getBus() != 0)
 			{
 				if (isA)
 				{
@@ -221,7 +210,7 @@ void StepEditorScreen::function(int i)
 				}
 			}
 
-			if (ne && track.lock()->getBusNumber() == 0)
+			if (ne && track.lock()->getBus() == 0)
 			{
 				if (isA)
 				{
@@ -318,8 +307,8 @@ void StepEditorScreen::turnWheel(int i)
 	}
 	else if (param.compare("fromnote") == 0)
 	{
-		if (track.lock()->getBusNumber() != 0) setFromNotePad(fromNotePad + i);
-		if (track.lock()->getBusNumber() == 0) setNoteA(noteA + i);
+		if (track.lock()->getBus() != 0) setFromNotePad(fromNotePad + i);
+		if (track.lock()->getBus() == 0) setNoteA(noteA + i);
 	}
 	else if (param.compare("tonote") == 0)
 	{
@@ -415,7 +404,7 @@ void StepEditorScreen::turnWheel(int i)
 				mixer->setValue(mixer->getValue() + i);
 			}
 		}
-		else if (note && track.lock()->getBusNumber() == 0)
+		else if (note && track.lock()->getBus() == 0)
 		{
 			if (param.find("a") != string::npos)
 			{
@@ -430,7 +419,7 @@ void StepEditorScreen::turnWheel(int i)
 				note->setVelocity(note->getVelocity() + i);
 			}
 		}
-		else if (note && track.lock()->getBusNumber() != 0)
+		else if (note && track.lock()->getBus() != 0)
 		{
 			if (param.find("a") != string::npos)
 			{
@@ -771,7 +760,7 @@ void StepEditorScreen::initVisibleEvents()
 			{
 				auto ne = dynamic_pointer_cast<NoteEvent>(lEvent);
 			
-				if (track.lock()->getBusNumber() != 0)
+				if (track.lock()->getBus() != 0)
 				{
 					if (fromNotePad == 34)
 					{
@@ -880,6 +869,7 @@ void StepEditorScreen::refreshEventRows()
 		{
 			eventRow->Hide(false);
 			event->addObserver(this);
+			eventRow->setBus(sequencer.lock()->getActiveTrack().lock()->getBus());
 		}
 		else
 		{
@@ -895,7 +885,7 @@ void StepEditorScreen::refreshViewNotes()
 {
 	init();
 	
-	if (view == 1 && track.lock()->getBusNumber() != 0)
+	if (view == 1 && track.lock()->getBus() != 0)
 	{
 		findLabel("fromnote").lock()->Hide(false);
 		findField("fromnote").lock()->Hide(false);
@@ -903,7 +893,7 @@ void StepEditorScreen::refreshViewNotes()
 		findLabel("tonote").lock()->Hide(true);
 		findField("tonote").lock()->Hide(true);
 	}
-	else if (view == 1 && track.lock()->getBusNumber() == 0)
+	else if (view == 1 && track.lock()->getBus() == 0)
 	{
 		findLabel("fromnote").lock()->Hide(false);
 		findField("fromnote").lock()->Hide(false);
@@ -937,7 +927,7 @@ void StepEditorScreen::setViewNotesText()
 {
 	init();
 	
-	if (view == 1 && track.lock()->getBusNumber() != 0)
+	if (view == 1 && track.lock()->getBus() != 0)
 	{
 		if (fromNotePad != 34)
 		{
@@ -948,7 +938,7 @@ void StepEditorScreen::setViewNotesText()
 			findField("fromnote").lock()->setText("ALL");
 		}
 	}
-	else if (view == 1 && track.lock()->getBusNumber() == 0)
+	else if (view == 1 && track.lock()->getBus() == 0)
 	{
 		findField("fromnote").lock()->setText(StrUtil::padLeft(to_string(noteA), " ", 3) + "(" + mpc::Util::noteNames()[noteA] + u8"\u00D4");
 		findField("tonote").lock()->setText(StrUtil::padLeft(to_string(noteB), " ", 3) + "(" + mpc::Util::noteNames()[noteB] + u8"\u00D4");
@@ -1328,7 +1318,7 @@ void StepEditorScreen::update(moduru::observer::Observable*, nonstd::any message
 
 		if (dynamic_pointer_cast<NoteEvent>(visibleEvents[eventNumber].lock()))
 		{
-			if (track.lock()->getBusNumber() != 0)
+			if (track.lock()->getBus() != 0)
 			{
 				eventRow->setDrumNoteEventValues();
 			}

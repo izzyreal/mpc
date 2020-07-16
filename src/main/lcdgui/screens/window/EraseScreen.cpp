@@ -79,7 +79,7 @@ void EraseScreen::function(int i)
 			lastIndex = 63;
 		}
 
-		auto midi = sequencer.lock()->getActiveTrack().lock()->getBusNumber() == 0;
+		auto midi = sequencer.lock()->getActiveTrack().lock()->getBus() == 0;
 
 		auto noteA = midi ? midiNote0 : mpc.getNote();
 		auto noteB = midi ? midiNote1 : -1;
@@ -256,7 +256,7 @@ void EraseScreen::displayNotes()
 		return;
 	}
 
-	auto bus = sequencer.lock()->getActiveTrack().lock()->getBusNumber();
+	auto bus = sequencer.lock()->getActiveTrack().lock()->getBus();
 
 	findField("note0").lock()->Hide(false);
 	findLabel("note0").lock()->Hide(false);

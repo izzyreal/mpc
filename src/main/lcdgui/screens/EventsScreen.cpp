@@ -128,7 +128,7 @@ void EventsScreen::function(int i)
 			
 				if (ne)
 				{
-					if (sourceTrack->getBusNumber() == 0)
+					if (sourceTrack->getBus() == 0)
 					{
 						if (ne->getNote() < note0 || ne->getNote() > note1)
 						{
@@ -503,7 +503,7 @@ void EventsScreen::displayNotes()
 	auto sequence = sequencer.lock()->getActiveSequence().lock();
 	auto track = sequence->getTrack(fromTr).lock();
 
-	if (track->getBusNumber() == 0)
+	if (track->getBus() == 0)
 	{
 		findField("note0").lock()->setSize(48, 9);
 		findField("note1").lock()->Hide(false);
@@ -537,7 +537,7 @@ void EventsScreen::displayDrumNotes()
 	{
 		auto sequence = sequencer.lock()->getActiveSequence().lock();
 		auto track = sequence->getTrack(fromTr).lock();
-		auto program = sampler.lock()->getProgram(sampler.lock()->getDrum(track->getBusNumber() - 1)->getProgram()).lock();
+		auto program = sampler.lock()->getProgram(sampler.lock()->getDrum(track->getBus() - 1)->getProgram()).lock();
 		
 		auto noteText = StrUtil::padLeft(to_string(drumNote), " ", 2);
 		auto padText = sampler.lock()->getPadName(program->getPadIndexFromNote(drumNote));

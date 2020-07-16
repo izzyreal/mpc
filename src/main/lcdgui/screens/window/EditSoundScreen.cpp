@@ -657,9 +657,9 @@ void EditSoundScreen::function(int j)
 				auto s = sequencer.lock()->getSequence(sequencer.lock()->getActiveSequenceIndex()).lock();
 				auto t = s->getTrack(sequencer.lock()->getActiveTrackIndex()).lock();
 
-				if (t->getBusNumber() != 0)
+				if (t->getBus() != 0)
 				{
-					mpc.getDrum(t->getBusNumber() - 1)->setProgram(sampler.lock()->getProgramCount() - 1);
+					mpc.getDrum(t->getBus() - 1)->setProgram(sampler.lock()->getProgramCount() - 1);
 				}
 			}
 		}

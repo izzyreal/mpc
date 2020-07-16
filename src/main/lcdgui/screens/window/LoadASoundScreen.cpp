@@ -97,7 +97,7 @@ void LoadASoundScreen::keepSound()
 	auto sampler = Mpc::instance().getSampler();
 	auto track = sequence->getTrack(sequencer->getActiveTrackIndex()).lock();
 
-	auto bus = track->getBusNumber();
+	auto bus = track->getBus();
 	auto programNumber = sampler.lock()->getDrumBusProgramNumber(bus);
 	auto program = sampler.lock()->getProgram(programNumber);
 	auto sound = sampler.lock()->getPreviewSound();

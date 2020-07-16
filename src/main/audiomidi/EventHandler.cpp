@@ -156,7 +156,7 @@ void EventHandler::handleNoThru(weak_ptr<mpc::sequencer::Event> e, mpc::sequence
 	}
 	else if (ne)
 	{
-		auto busNumber = track->getBusNumber();
+		auto busNumber = track->getBus();
 	
 		if (busNumber != 0)
 		{
@@ -203,14 +203,14 @@ void EventHandler::handleNoThru(weak_ptr<mpc::sequencer::Event> e, mpc::sequence
 	{
 		auto pad = me->getPad();
 		auto lSampler = sampler.lock();
-		auto p = lSampler->getProgram(lSampler->getDrumBusProgramNumber(track->getBusNumber())).lock();
+		auto p = lSampler->getProgram(lSampler->getDrumBusProgramNumber(track->getBus())).lock();
 		auto mixer = p->getStereoMixerChannel(pad).lock();
 	
 		auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(Screens::getScreenComponent("mixer-setup"));
 
 		if (mixerSetupScreen->isStereoMixSourceDrum())
 		{
-			auto busNumber = track->getBusNumber();
+			auto busNumber = track->getBus();
 		
 			if (busNumber != 0)
 			{

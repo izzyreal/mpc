@@ -229,11 +229,11 @@ void Mpc::importLoadedProgram()
 
 	if (loadAProgramScreen->clearProgramWhenLoading)
 	{
-		auto pgm = getDrum(t->getBusNumber() - 1)->getProgram();
+		auto pgm = getDrum(t->getBus() - 1)->getProgram();
 		sampler->replaceProgram(programLoader->get(), pgm);
 	}
 	else {
-		getDrum(t->getBusNumber() - 1)->setProgram(sampler->getProgramCount() - 1);
+		getDrum(t->getBus() - 1)->setProgram(sampler->getProgramCount() - 1);
 	}
 }
 

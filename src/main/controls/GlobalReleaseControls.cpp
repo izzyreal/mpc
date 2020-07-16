@@ -108,7 +108,7 @@ void GlobalReleaseControls::simplePad(int i)
 	//if (csn.compare("load-a-sound") == 0) return;
 
 	auto lTrk = track.lock();
-	auto note = lTrk->getBusNumber() > 0 ? program.lock()->getPad(i + (bank * 16))->getNote() : i + (bank * 16) + 35;
+	auto note = lTrk->getBus() > 0 ? program.lock()->getPad(i + (bank * 16))->getNote() : i + (bank * 16) + 35;
 	generateNoteOff(note);
 	bool posIsLastTick = sequencer.lock()->getTickPosition() == sequencer.lock()->getActiveSequence().lock()->getLastTick();
 

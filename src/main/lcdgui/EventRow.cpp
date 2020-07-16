@@ -38,17 +38,9 @@ using namespace std;
 
 vector<string> EventRow::controlNames = vector<string>{ "BANK SEL MSB", "MOD WHEEL", "BREATH CONT", "03", "FOOT CONTROL", "PORTA TIME", "DATA ENTRY", "MAIN VOLUME", "BALANCE", "09", "PAN", "EXPRESSION", "EFFECT 1", "EFFECT 2", "14", "15", "GEN.PUR. 1", "GEN.PUR. 2", "GEN.PUR. 3", "GEN.PUR. 4", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "BANK SEL LSB", "MOD WHEL LSB", "BREATH LSB", "35", "FOOT CNT LSB", "PORT TIME LS", "DATA ENT LSB", "MAIN VOL LSB", "BALANCE LSB", "41", "PAN LSB", "EXPRESS LSB", "EFFECT 1 LSB", "EFFECT 2 MSB", "46", "47", "GEN.PUR.1 LS", "GEN.PUR.2 LS", "GEN.PUR.3 LS", "GEN.PUR.4 LS", "52", "53", "54", "55", "56", "57", "58", "59", "60", "61", "62", "63", "SUSTAIN PDL", "PORTA PEDAL", "SOSTENUTO", "SOFT PEDAL", "LEGATO FT SW", "HOLD 2", "SOUND VARI", "TIMBER/HARMO", "RELEASE TIME", "ATTACK TIME", "BRIGHTNESS", "SOUND CONT 6", "SOUND CONT 7", "SOUND CONT 8", "SOUND CONT 9", "SOUND CONT10", "GEN.PUR. 5", "GEN.PUR. 6", "GEN.PUR. 7", "GEN.PUR. 8", "PORTA CNTRL", "85", "86", "87", "88", "89", "90", "EXT EFF DPTH", "TREMOLO DPTH", "CHORUS DEPTH", " DETUNE DEPTH", "PHASER DEPTH", "DATA INCRE", "DATA DECRE", "NRPN LSB", "NRPN MSB", "RPN LSB", "RPN MSB", "102", "103", "104", "105", "106", "107", "108", "109", "110", "111", "112", "113", "114", "115", "116", "117", "118", "119", "ALL SND OFF", "RESET CONTRL", "LOCAL ON/OFF", "ALL NOTE OFF", "OMNI OFF", "OMNI ON", "MONO MODE ON", "POLY MODE ON" };
 
-EventRow::EventRow(int bus, weak_ptr<Event> e, int rowIndex)
-	: Component("event-row-" + to_string(rowIndex)), sampler(Mpc::instance().getSampler()), rowIndex(rowIndex)
-{
-	if (bus != 0)
-	{
-		mpcSoundPlayerChannel = sampler.lock()->getDrum(bus - 1);
-		program = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
-	}
-	
-	event = e;
-	
+EventRow::EventRow(int rowIndex)
+	: Component("event-row-" + to_string(rowIndex)), rowIndex(rowIndex)
+{	
 	int w1 = 193;
 	int h1 = 9;
 	int x1 = 0;
@@ -78,16 +70,16 @@ EventRow::EventRow(int bus, weak_ptr<Event> e, int rowIndex)
 	setColors();
 }
 
-void EventRow::setMidi(bool b)
+void EventRow::setBus(const int bus)
 {
-    midi = b;
+	this->bus = bus;
 }
 
 void EventRow::init()
 {
 	if (dynamic_pointer_cast<NoteEvent>(event.lock()))
 	{
-		if (midi)
+		if (bus == 0)
 		{
 			setLabelTexts(midiNoteEventLabels);
 			setSizesAndLocations(midiNoteEventXPos, midiNoteEventSizes);
@@ -340,7 +332,6 @@ void EventRow::setMixerEventValues()
 		return;
 	}
 
-	auto lSampler = sampler.lock();
 	auto mixerEvent = dynamic_pointer_cast<MixerEvent>(event.lock());
 	
 	for (int i = 0; i < 3; i++)
@@ -350,8 +341,18 @@ void EventRow::setMixerEventValues()
 	}
 	
 	fields[0].lock()->setText(mixerParamNames[mixerEvent->getParameter()]);
-	auto nn = program.lock()->getPad(mixerEvent->getPad())->getNote();
-	fields[1].lock()->setText(string(nn == 34 ? "--" : to_string(nn)) + "/" + lSampler->getPadName(mixerEvent->getPad()));
+
+	auto sampler = mpc::Mpc::instance().getSampler().lock();
+	
+	if (bus == 0)
+	{
+		return;
+	}
+
+	auto program = dynamic_pointer_cast<mpc::sampler::Program>(sampler->getProgram(sampler->getDrumBusProgramNumber(bus)).lock());
+	auto nn = program->getPad(mixerEvent->getPad())->getNote();
+
+	fields[1].lock()->setText(string(nn == 34 ? "--" : to_string(nn)) + "/" + sampler->getPadName(mixerEvent->getPad()));
 	
 	if (mixerEvent->getParameter() == 1)
 	{
@@ -394,7 +395,6 @@ void EventRow::setDrumNoteEventValues()
 		return;
 	}
 
-	auto lSampler = sampler.lock();
 	auto ne = dynamic_pointer_cast<NoteEvent>(event.lock());
 	
 	for (int i = 0; i < 5; i++)
@@ -409,7 +409,12 @@ void EventRow::setDrumNoteEventValues()
 	}
 	else
 	{
-		fields[0].lock()->setText(to_string(ne->getNote()) + "/" + lSampler->getPadName(program.lock()->getPadIndexFromNote(ne->getNote())));
+		if (bus != 0)
+		{
+			auto sampler = mpc::Mpc::instance().getSampler().lock();
+			auto program = dynamic_pointer_cast<mpc::sampler::Program>(sampler->getProgram(sampler->getDrumBusProgramNumber(bus)).lock());
+			fields[0].lock()->setText(to_string(ne->getNote()) + "/" + sampler->getPadName(program->getPadIndexFromNote(ne->getNote())));
+		}
 	}
 
 	fields[1].lock()->setText(noteVarParamNames[ne->getVariationTypeNumber()]);

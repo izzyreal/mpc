@@ -71,7 +71,7 @@ void MpcMidiInput::transport(ctoot::midi::core::MidiMessage* msg, int timeStamp)
 		int note = (*msg->getMessage())[1];
 		int velo = (*msg->getMessage())[2];
 		auto s = lSequencer->getActiveSequence().lock();
-		auto bus = s->getTrack(lSequencer->getActiveTrackIndex()).lock()->getBusNumber();
+		auto bus = s->getTrack(lSequencer->getActiveTrackIndex()).lock()->getBus();
 
 		if (bus != 0)
 		{
@@ -140,7 +140,7 @@ void MpcMidiInput::transport(ctoot::midi::core::MidiMessage* msg, int timeStamp)
 		note->setTick(-1);
 		auto s = lSequencer->isPlaying() ? lSequencer->getCurrentlyPlayingSequence().lock() : lSequencer->getActiveSequence().lock();
 		auto track = dynamic_pointer_cast<mpc::sequencer::Track>(s->getTrack(note->getTrack()).lock());
-		auto p = lSampler->getProgram(lSampler->getDrumBusProgramNumber(track->getBusNumber())).lock();
+		auto p = lSampler->getProgram(lSampler->getDrumBusProgramNumber(track->getBus())).lock();
 		auto controls = Mpc::instance().getActiveControls();
 
 		controls->setSliderNoteVar(note.get(), dynamic_pointer_cast<mpc::sampler::Program>(p));

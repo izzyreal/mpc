@@ -16,12 +16,6 @@ namespace mpc::sequencer
 		class Event;
 }
 
-namespace mpc::sampler
-{
-	class Sampler;
-	class Program;
-}
-
 namespace mpc::lcdgui
 {
 	class EventRowParameters;
@@ -41,9 +35,6 @@ namespace mpc::lcdgui
 		std::weak_ptr<mpc::lcdgui::EventRowParameters> parameters;
 		std::vector<std::weak_ptr<mpc::lcdgui::Field>> fields;
 		std::vector<std::weak_ptr<mpc::lcdgui::Label>> labels;
-		std::weak_ptr<mpc::sampler::Sampler> sampler;
-		ctoot::mpc::MpcSoundPlayerChannel* mpcSoundPlayerChannel = nullptr;
-		std::weak_ptr<mpc::sampler::Program> program;
 
 		const std::vector<std::string> letters{ "a", "b", "c", "d", "e" };
 		const std::vector<std::string> noteVarParamNames{ "Tun", "Dcy", "Atk", "Flt" };
@@ -77,11 +68,11 @@ namespace mpc::lcdgui
 		std::vector<int> mixerEventXPos{ 0, 96, 162 };
 
 		bool selected = false;
-		bool midi = false;
+		int bus = -1;
 		int rowIndex = 0;
 
 	public:
-		void setMidi(bool b);
+		void setBus(const int bus);
 		void init();
 		void setEmptyEventValues();
 		void setSystemExclusiveEventValues();
@@ -103,8 +94,7 @@ namespace mpc::lcdgui
 		void setSelected(bool b);
 		bool isSelected();
 
-	public:
-		EventRow(int bus, std::weak_ptr<mpc::sequencer::Event> e, int rowNumber);
+		EventRow(int rowNumber);
 
 		static std::vector<std::string> controlNames;
 

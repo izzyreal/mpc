@@ -68,9 +68,9 @@ void BaseControls::init()
 	{
 		track = sequencer.lock()->getActiveTrack();
 
-		if (track.lock()->getBusNumber() != 0)
+		if (track.lock()->getBus() != 0)
 		{
-			mpcSoundPlayerChannel = sampler.lock()->getDrum(track.lock()->getBusNumber() - 1);
+			mpcSoundPlayerChannel = sampler.lock()->getDrum(track.lock()->getBus() - 1);
 			program = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
 		}
 	}
@@ -239,7 +239,7 @@ void BaseControls::pad(int i, int velo, bool repeat, int tick)
 			return;
 		}
 	}
-	auto note = track.lock()->getBusNumber() > 0 ? program.lock()->getPad(i + (mpc.getBank() * 16))->getNote() : i + (mpc.getBank() * 16) + 35;
+	auto note = track.lock()->getBus() > 0 ? program.lock()->getPad(i + (mpc.getBank() * 16))->getNote() : i + (mpc.getBank() * 16) + 35;
 	auto velocity = velo;
 	auto pad = i + (mpc.getBank() * 16);
 

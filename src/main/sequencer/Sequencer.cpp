@@ -800,7 +800,7 @@ void Sequencer::copyTrackParameters(weak_ptr<Track> source, weak_ptr<Track> dest
 	lDest->setUsed(lSrc->isUsed());
     lDest->setOn(lSrc->isOn());
     lDest->setDeviceNumber(lSrc->getDevice());
-    lDest->setBusNumber(lSrc->getBusNumber());
+    lDest->setBusNumber(lSrc->getBus());
     lDest->setVelocityRatio(lSrc->getVelocityRatio());
     lDest->setProgramChange(lSrc->getProgramChange());
     lDest->setName(lSrc->getName());

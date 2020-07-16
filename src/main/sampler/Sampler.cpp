@@ -332,7 +332,7 @@ void Sampler::checkProgramReferences()
 {
 	auto lSequencer = Mpc::instance().getSequencer().lock();
 	auto t = lSequencer->getActiveSequence().lock()->getTrack(lSequencer->getActiveTrackIndex()).lock();
-	auto bus = t->getBusNumber();
+	auto bus = t->getBus();
 
 	for (int i = 0; i < 4; i++)
 	{

@@ -50,7 +50,7 @@ void TimingCorrectScreen::function(int i)
 
 		vector<int> noteRange(2);
 
-		if (track.lock()->getBusNumber() != 0)
+		if (track.lock()->getBus() != 0)
 		{
 			if (mpc.getNote() != 34)
 			{
@@ -130,7 +130,7 @@ void TimingCorrectScreen::displayNotes()
 {
 	init();
 	
-	if (track.lock()->getBusNumber() == 0)
+	if (track.lock()->getBus() == 0)
 	{
 		findField("note0").lock()->setSize(8 * 6 + 1, 9);
 		findField("note0").lock()->setText(StrUtil::padLeft(to_string(note0), " ", 3) + "(" + mpc::Util::noteNames()[note0] + u8"\u00D4");

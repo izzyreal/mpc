@@ -41,7 +41,7 @@ void EditMultipleScreen::function(int i)
 	switch (i)
 	{
 	case 4:
-		if (dynamic_pointer_cast<NoteEvent>(selectedEvent.lock()) && track.lock()->getBusNumber() != 0)
+		if (dynamic_pointer_cast<NoteEvent>(selectedEvent.lock()) && track.lock()->getBus() != 0)
 		{
 			if (paramLetter.compare("a") == 0)
 			{
@@ -77,7 +77,7 @@ void EditMultipleScreen::function(int i)
 			}
 		}
 
-		if (dynamic_pointer_cast<NoteEvent>(selectedEvent.lock()) && track.lock()->getBusNumber() == 0)
+		if (dynamic_pointer_cast<NoteEvent>(selectedEvent.lock()) && track.lock()->getBus() == 0)
 		{
 			if (paramLetter.compare("a") == 0)
 			{
@@ -139,7 +139,7 @@ void EditMultipleScreen::turnWheel(int i)
 
 	if (param.compare("value0") == 0)
 	{
-		if (dynamic_pointer_cast<NoteEvent>(event.lock()) && track.lock()->getBusNumber() != 0)
+		if (dynamic_pointer_cast<NoteEvent>(event.lock()) && track.lock()->getBus() != 0)
 		{
 			if (paramLetter.compare("a") == 0)
 			{
@@ -162,7 +162,7 @@ void EditMultipleScreen::turnWheel(int i)
 				setEditTypeNumber(editTypeNumber + i);
 			}
 		}
-		else if (dynamic_pointer_cast<NoteEvent>(event.lock()) && track.lock()->getBusNumber() == 0)
+		else if (dynamic_pointer_cast<NoteEvent>(event.lock()) && track.lock()->getBus() == 0)
 		{
 			if (paramLetter.compare("a") == 0)
 			{
@@ -272,7 +272,7 @@ void EditMultipleScreen::updateEditMultiple()
 	auto event = stepEditorScreen->getSelectedEvent().lock();
 	auto letter = stepEditorScreen->getSelectedParameterLetter();
 
-	if (dynamic_pointer_cast<NoteEvent>(event) && track.lock()->getBusNumber() != 0)
+	if (dynamic_pointer_cast<NoteEvent>(event) && track.lock()->getBus() != 0)
 	{
 		if (letter.compare("a") == 0 || letter.compare("b") == 0 || letter.compare("c") == 0)
 		{
@@ -373,7 +373,7 @@ void EditMultipleScreen::updateEditMultiple()
 		}
 	}
 
-	if (dynamic_pointer_cast<NoteEvent>(event) && track.lock()->getBusNumber() == 0)
+	if (dynamic_pointer_cast<NoteEvent>(event) && track.lock()->getBus() == 0)
 	{
 		if (letter.compare("a") == 0)
 		{

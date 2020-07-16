@@ -88,7 +88,7 @@ vector<string> SequencerScreen::busNames = vector<string>{ "MIDI", "DRUM1", "DRU
 
 void SequencerScreen::displayBus()
 {
-	findField("bus").lock()->setText(busNames[sequencer.lock()->getActiveTrack().lock()->getBusNumber()]);
+	findField("bus").lock()->setText(busNames[sequencer.lock()->getActiveTrack().lock()->getBus()]);
 	displayDeviceName();
 }
 
@@ -111,11 +111,11 @@ void SequencerScreen::displayPgm()
 
 void SequencerScreen::displayDeviceName()
 {
-	if (track.lock()->getBusNumber() != 0)
+	if (track.lock()->getBus() != 0)
 	{
 		if (track.lock()->getDevice() == 0)
 		{
-			int pgm = sampler.lock()->getDrumBusProgramNumber(track.lock()->getBusNumber());
+			int pgm = sampler.lock()->getDrumBusProgramNumber(track.lock()->getBus());
 			auto p = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(pgm).lock());
 			findLabel("devicename").lock()->setText(p->getName());
 		}
@@ -124,7 +124,7 @@ void SequencerScreen::displayDeviceName()
 			findLabel("devicename").lock()->setText(sequencer.lock()->getActiveSequence().lock()->getDeviceName(track.lock()->getDevice()));
 		}
 	}
-	else if (track.lock()->getBusNumber() == 0)
+	else if (track.lock()->getBus() == 0)
 	{
 		if (track.lock()->getDevice() == 0)
 		{
@@ -496,7 +496,7 @@ void SequencerScreen::turnWheel(int i)
 	{
 		checkTrackUsed();
 
-		track.lock()->setBusNumber(track.lock()->getBusNumber() + i);
+		track.lock()->setBusNumber(track.lock()->getBus() + i);
 		
 		auto lastFocus = getLastFocus("step-editor");
 
@@ -508,7 +508,7 @@ void SequencerScreen::turnWheel(int i)
 
 			if (dynamic_pointer_cast<mpc::sequencer::NoteEvent>(stepEditorScreen->getVisibleEvents()[eventNumber].lock()))
 			{
-				if (track.lock()->getBusNumber() == 0)
+				if (track.lock()->getBus() == 0)
 				{
 					if (lastFocus[0] == 'd' || lastFocus[0] == 'e')
 					{

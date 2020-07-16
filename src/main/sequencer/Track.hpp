@@ -74,7 +74,7 @@ namespace mpc::sequencer {
 		void setProgramChange(int i);
 		int getProgramChange();
 		void setBusNumber(int i);
-		int getBusNumber();
+		int getBus();
 		void setDeviceNumber(int i);
 		int getDevice();
 		std::weak_ptr<Event> getEvent(int i);
