@@ -27,6 +27,7 @@ namespace mpc::lcdgui
 	private:
 		const int layer;
 		std::map<std::string, std::vector<std::string>> transferMap;
+		string firstField = "";
 
 	public:
 		const int& getLayerIndex();
@@ -48,6 +49,8 @@ namespace mpc::lcdgui
 	public:
 		ScreenComponent(const std::string& name, const int layer);
 		void setTransferMap(const std::map<std::string, std::vector<std::string>>& transferMap);
+		void setFirstField(const std::string& firstField);
+		std::string getFirstField();
 		const std::map<std::string, std::vector<std::string>>& getTransferMap();
 
 	};

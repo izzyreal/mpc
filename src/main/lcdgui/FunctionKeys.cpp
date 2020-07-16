@@ -85,7 +85,7 @@ void FunctionKey::setText(const string& text)
 	int offsetx = (39 - lengthInPixels) * 0.5;
 
 	label->setLocation(x + offsetx, 52);
-	label->setSize((stringSize * 6) - 1, 7);
+	label->setSize(39 - offsetx - 1, 7);
 }
 
 void FunctionKey::setType(const int type)
@@ -100,13 +100,35 @@ void FunctionKey::setType(const int type)
 	SetDirty();
 }
 
-FunctionKeys::FunctionKeys(const string& name, vector<vector<string>> texts, vector<vector<int>> types)
+FunctionKeys::FunctionKeys(const string& name, vector<vector<string>> allTexts, vector<vector<int>> allTypes)
 	: Component(name)
 {
-	this->texts = texts;
-	this->types = types;
+	this->texts = allTexts;
+	this->types = allTypes;
 
-	for (int i = 0; i < 6; i++)
+	int firstFunctionKey = -1;
+	int lastFunctionKey = -1;
+	
+	for (auto& texts : allTexts)
+	{
+		for (int i = 0; i < texts.size(); i++)
+		{
+			if (texts[i].compare("") != 0 && (firstFunctionKey == -1 || i < firstFunctionKey))
+			{
+				firstFunctionKey = i;
+				continue;
+			}
+
+
+			if (firstFunctionKey != -1 && texts[i].compare("") != 0 && i > lastFunctionKey)
+			{
+				lastFunctionKey = i;
+				continue;
+			}
+		}
+	}
+
+	for (int i = firstFunctionKey; i <= lastFunctionKey; i++)
 	{
 		addChild(make_shared<FunctionKey>("fk" + to_string(i), xPoses[i]));
 	}
@@ -125,6 +147,11 @@ void FunctionKeys::setActiveArrangement(int i)
 	for (int j = 0; j < 6; j++)
 	{
 		auto fk = findChild<FunctionKey>("fk" + to_string(j)).lock();
+
+		if (!fk)
+		{
+			continue;
+		}
 
 		auto type = types[activeArrangement][j];
 		fk->setType(type);

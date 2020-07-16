@@ -24,6 +24,16 @@ const map<string, vector<string>>& ScreenComponent::getTransferMap()
 	return transferMap;
 }
 
+void ScreenComponent::setFirstField(const std::string& firstField)
+{
+	this->firstField = firstField;
+}
+
+std::string ScreenComponent::getFirstField()
+{
+	return firstField;
+}
+
 weak_ptr<Wave> ScreenComponent::findWave()
 {
 	return dynamic_pointer_cast<Wave>(findChild("wave").lock());

@@ -27,7 +27,11 @@ namespace mpc::lcdgui
 		static std::vector<std::string> zoomScreenNames;
 
 	private:
-		static std::pair<std::vector<std::shared_ptr<Component>>, std::map<std::string, std::vector<std::string>>> get(const std::string& screenName, int& foundInLayer);
+		static std::pair<std::vector<std::shared_ptr<Component>>, std::map<std::string, std::vector<std::string>>> get(
+			const std::string& screenName,
+			int& foundInLayer,
+			std::string& firstField
+		);
 
 	public:	
 		static std::shared_ptr<ScreenComponent> getScreenComponent(const std::string& screenName);

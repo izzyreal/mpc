@@ -187,7 +187,7 @@ vector<string> getFunctionKeyLabels(Value& functionKeyLabels)
 	return labels;
 }
 
-pair<vector<shared_ptr<Component>>, map<string, vector<string>>> Screens::get(const string& screenName, int& foundInLayer)
+pair<vector<shared_ptr<Component>>, map<string, vector<string>>> Screens::get(const string& screenName, int& foundInLayer, string& firstField)
 {
 	
 	if (Screens::layerDocuments.empty())
@@ -217,7 +217,6 @@ pair<vector<shared_ptr<Component>>, map<string, vector<string>>> Screens::get(co
 	{
 		Value& functionLabels = arrangement["fblabels"];
 		Value& functionTypes = arrangement["fbtypes"];
-
 
 		vector<vector<string>> allLabels;
 		vector<vector<int>> allTypes;
@@ -295,6 +294,12 @@ pair<vector<shared_ptr<Component>>, map<string, vector<string>>> Screens::get(co
 
 			auto parameter = components.back();
 			auto field = parameter->findField(parameterName).lock();
+
+			if (i == 0)
+			{
+				firstField = parameterName;
+			}
+
 			field->setNextFocus(nextFocus);
 
 			previous = parameterName;
@@ -366,7 +371,8 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	shared_ptr<ScreenComponent> screen;
 
 	int layerIndex = -1;
-	auto arrangement = get(screenName, layerIndex);
+	string firstField = "";
+	auto arrangement = get(screenName, layerIndex, firstField);
 	auto children = arrangement.first;
 	auto transferMap = arrangement.second;
 
@@ -863,6 +869,7 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	{
 		screen->addChildren(children);
 		screen->setTransferMap(transferMap);
+		screen->setFirstField(firstField);
 		screens[screenName] = screen;
 	}
 

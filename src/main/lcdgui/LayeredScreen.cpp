@@ -124,7 +124,7 @@ int LayeredScreen::openScreen(string screenName)
 
 	if (screenComponent->findFields().size() > 0)
 	{
-		returnToLastFocus(screenComponent->findFields().front().lock()->getName());
+		returnToLastFocus(screenComponent->getFirstField());
 	}
 
 	screenComponent->open();
@@ -173,7 +173,7 @@ void LayeredScreen::setCurrentBackground(string s)
 	getCurrentBackground()->setName(s);
 }
 
-void LayeredScreen::returnToLastFocus(string firstFieldOfThisScreen)
+void LayeredScreen::returnToLastFocus(string firstFieldOfCurrentScreen)
 {
 	auto focusCounter = 0;
 	
@@ -190,9 +190,9 @@ void LayeredScreen::returnToLastFocus(string firstFieldOfThisScreen)
 	{
 		vector<string> sa(2);
 		sa[0] = currentScreenName;
-		sa[1] = firstFieldOfThisScreen;
+		sa[1] = firstFieldOfCurrentScreen;
 		lastFocuses.push_back(sa);
-		setFocus(firstFieldOfThisScreen);
+		setFocus(firstFieldOfCurrentScreen);
 	}
 }
 

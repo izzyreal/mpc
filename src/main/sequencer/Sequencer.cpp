@@ -621,6 +621,9 @@ void Sequencer::stop(int tick)
 	if (nextsq != -1) {
 		notifynextsq = true;
 		nextsq = -1;
+
+		// This is called from the audio thread, should be called from the UI thread instead.
+		// stop() is called by FrameSeq.
 		Mpc::instance().getLayeredScreen().lock()->setFocus("sq");
 	}
     recording = false;
