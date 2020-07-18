@@ -116,14 +116,12 @@ FunctionKeys::FunctionKeys(const string& name, vector<vector<string>> allTexts, 
 			if (texts[i].compare("") != 0 && (firstFunctionKey == -1 || i < firstFunctionKey))
 			{
 				firstFunctionKey = i;
-				continue;
 			}
 
 
 			if (firstFunctionKey != -1 && texts[i].compare("") != 0 && i > lastFunctionKey)
 			{
 				lastFunctionKey = i;
-				continue;
 			}
 		}
 	}

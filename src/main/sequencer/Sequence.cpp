@@ -151,7 +151,7 @@ void Sequence::setLastLoopBarIndex(int i)
 	notifyObservers(string("lastloopbar"));
 }
 
-int Sequence::getLastLoopBar()
+int Sequence::getLastLoopBarIndex()
 {
 	if (lastLoopBarEnd)
 	{
@@ -748,7 +748,7 @@ void Sequence::initLoop()
 	}
 
 	auto firstBar = getFirstLoopBarIndex();
-	auto lastBar = getLastLoopBar() + 1;
+	auto lastBar = getLastLoopBarIndex() + 1;
 	int loopStart = 0;
 	int loopEnd = 0;
 

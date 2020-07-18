@@ -111,7 +111,7 @@ Sequence::Sequence(mpc::sequencer::Sequence* seq, int number)
 	saveBytes[SEQUENCE_INDEX_OFFSET] = (number);
 	setUnknown32BitInt(seq);
 	auto loopStartBytes = moduru::file::ByteUtil::ushort2bytes(seq->getFirstLoopBarIndex());
-	auto loopEndBytes = moduru::file::ByteUtil::ushort2bytes(seq->getLastLoopBar());
+	auto loopEndBytes = moduru::file::ByteUtil::ushort2bytes(seq->getLastLoopBarIndex());
 	
 	if (seq->isLastLoopBarEnd())
 	{

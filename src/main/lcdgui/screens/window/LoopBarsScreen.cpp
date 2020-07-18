@@ -31,7 +31,7 @@ void LoopBarsScreen::turnWheel(int i)
 	}
 	else if (param.compare("lastbar") == 0)
 	{
-		seq->setLastLoopBarIndex(seq->getLastLoopBar() + i);
+		seq->setLastLoopBarIndex(seq->getLastLoopBarIndex() + i);
 		displayLastBar();
 		displayFirstBar();
 		displayNumberOfBars();
@@ -40,20 +40,20 @@ void LoopBarsScreen::turnWheel(int i)
 	{
 		if (seq->isLastLoopBarEnd())
 		{
-			seq->setLastLoopBarIndex(seq->getLastLoopBar() - 2);
+			seq->setLastLoopBarIndex(seq->getLastLoopBarIndex() - 2);
 			displayLastBar();
 			displayNumberOfBars();
 		}
-		else if (seq->getLastLoopBar() > seq->getFirstLoopBarIndex())
+		else if (seq->getLastLoopBarIndex() >= seq->getFirstLoopBarIndex())
 		{
-			seq->setLastLoopBarIndex(seq->getLastLoopBar() - 1);
+			seq->setLastLoopBarIndex(seq->getLastLoopBarIndex() - 1);
 			displayLastBar();
 			displayNumberOfBars();
 		}
 	}
 	else if (param.compare("numberofbars") == 0)
 	{
-		seq->setLastLoopBarIndex(seq->getLastLoopBar() + i);
+		seq->setLastLoopBarIndex(seq->getLastLoopBarIndex() + i);
 		displayLastBar();
 		displayNumberOfBars();
 	}
@@ -68,14 +68,14 @@ void LoopBarsScreen::displayLastBar()
 		findField("lastbar").lock()->setText("END");
 	}
 	else {
-		findField("lastbar").lock()->setText(to_string(seq->getLastLoopBar() + 1));
+		findField("lastbar").lock()->setText(to_string(seq->getLastLoopBarIndex() + 1));
 	}
 }
 
 void LoopBarsScreen::displayNumberOfBars()
 {
 	auto seq = sequencer.lock()->getActiveSequence().lock();
-	findField("numberofbars").lock()->setText(to_string(seq->getLastLoopBar() - seq->getFirstLoopBarIndex() + 1));
+	findField("numberofbars").lock()->setText(to_string(seq->getLastLoopBarIndex() - seq->getFirstLoopBarIndex() + 1));
 }
 
 void LoopBarsScreen::displayFirstBar()

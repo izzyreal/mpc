@@ -171,7 +171,7 @@ void MidiReader::parseSequence()
 	if (lastLoopBar == -1)
 	{
 		sequence->setLastLoopBarIndex(sequence->getLastBarIndex());
-		sequence->setLastLoopBarIndex(sequence->getLastLoopBar() + 1);
+		sequence->setLastLoopBarIndex(sequence->getLastLoopBarIndex() + 1);
 	}
 	else
 	{

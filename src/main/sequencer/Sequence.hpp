@@ -51,7 +51,7 @@ namespace mpc::sequencer {
 		void setFirstLoopBarIndex(int i);
 		int getFirstLoopBarIndex();
 		void setLastLoopBarIndex(int i);
-		int getLastLoopBar();
+		int getLastLoopBarIndex();
 		void initMetaTracks();
 
 	private:
