@@ -18,7 +18,7 @@ ChangeBars2Screen::ChangeBars2Screen(const int layerIndex)
 
 void ChangeBars2Screen::open()
 {
-	setNewBars(sequencer.lock()->getActiveSequence().lock()->getLastBar());
+	setNewBars(sequencer.lock()->getActiveSequence().lock()->getLastBarIndex());
 	displayCurrent();
 	displayNewBars();
 }
@@ -26,7 +26,7 @@ void ChangeBars2Screen::open()
 void ChangeBars2Screen::displayCurrent()
 {
 	auto seq = sequencer.lock()->getActiveSequence().lock();
-	findLabel("current").lock()->setText(to_string(seq->getLastBar() + 1));
+	findLabel("current").lock()->setText(to_string(seq->getLastBarIndex() + 1));
 }
 
 void ChangeBars2Screen::function(int i)
@@ -41,14 +41,14 @@ void ChangeBars2Screen::function(int i)
 		ls.lock()->openScreen("change-bars");
 		break;
 	case 4:
-		if (newBars < seq->getLastBar())
+		if (newBars < seq->getLastBarIndex())
 		{
-			seq->deleteBars(newBars + 1, seq->getLastBar());
+			seq->deleteBars(newBars + 1, seq->getLastBarIndex());
 		}
 
-		if (newBars > seq->getLastBar())
+		if (newBars > seq->getLastBarIndex())
 		{
-			seq->insertBars(newBars - seq->getLastBar(), seq->getLastBar() + 1);
+			seq->insertBars(newBars - seq->getLastBarIndex(), seq->getLastBarIndex() + 1);
 		}
 		ls.lock()->openScreen("sequencer");
 		sequencer.lock()->setBar(0);
@@ -66,17 +66,17 @@ void ChangeBars2Screen::displayNewBars()
 	findField("newbars").lock()->setText(moduru::lang::StrUtil::padLeft(to_string(newBars + 1), " ", 3));
 
 
-	if (newBars == seq->getLastBar())
+	if (newBars == seq->getLastBarIndex())
 	{
 		message0->setText("");
 		message1->setText("");
 	}
-	else if (newBars > seq->getLastBar())
+	else if (newBars > seq->getLastBarIndex())
 	{
 		message0->setText("Pressing DO IT will add");
 		message1->setText("blank bars after last bar.");
 	}
-	else if (newBars < seq->getLastBar())
+	else if (newBars < seq->getLastBarIndex())
 	{
 		message0->setText("Pressing DO IT will truncate");
 		message1->setText("bars after last bar.");

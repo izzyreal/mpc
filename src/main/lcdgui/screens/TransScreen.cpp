@@ -13,7 +13,7 @@ TransScreen::TransScreen(const int layerIndex)
 void TransScreen::open()
 {
 	setBar0(0);
-	setBar1(sequencer.lock()->getActiveSequence().lock()->getLastBar());
+	setBar1(sequencer.lock()->getActiveSequence().lock()->getLastBarIndex());
 
 	displayTransposeAmount();
 	displayTr();
@@ -53,7 +53,7 @@ void TransScreen::turnWheel(int i)
 	{
 		auto candidate = bar0 + i;
 		
-		if (candidate < 0 || candidate > sequencer.lock()->getActiveSequence().lock()->getLastBar())
+		if (candidate < 0 || candidate > sequencer.lock()->getActiveSequence().lock()->getLastBarIndex())
 		{
 			return;
 		}
@@ -64,7 +64,7 @@ void TransScreen::turnWheel(int i)
 	{
 		auto candidate = bar1 + i;
 	
-		if (candidate < 0 || candidate > sequencer.lock()->getActiveSequence().lock()->getLastBar())
+		if (candidate < 0 || candidate > sequencer.lock()->getActiveSequence().lock()->getLastBarIndex())
 		{
 			return;
 		}

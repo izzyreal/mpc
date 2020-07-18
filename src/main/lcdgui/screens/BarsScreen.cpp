@@ -151,9 +151,9 @@ void BarsScreen::turnWheel(int i)
 
 		displayFromSq();
 
-		if (lastBar > fromSequence->getLastBar())
+		if (lastBar > fromSequence->getLastBarIndex())
 		{
-			setLastBar(fromSequence->getLastBar(), fromSequence->getLastBar());
+			setLastBar(fromSequence->getLastBarIndex(), fromSequence->getLastBarIndex());
 		}
 
 	}
@@ -163,23 +163,23 @@ void BarsScreen::turnWheel(int i)
 
 		displayToSq();
 
-		if (afterBar > toSequence->getLastBar())
+		if (afterBar > toSequence->getLastBarIndex())
 		{
-			setAfterBar(toSequence->getLastBar(), toSequence->getLastBar());
+			setAfterBar(toSequence->getLastBarIndex(), toSequence->getLastBarIndex());
 		}
 
 	}
 	else if (param.compare("afterbar") == 0)
 	{
-		setAfterBar(afterBar + i, toSequence->getLastBar());
+		setAfterBar(afterBar + i, toSequence->getLastBarIndex());
 	}
 	else if (param.compare("firstbar") == 0)
 	{
-		setFirstBar(firstBar + i, fromSequence->getLastBar());
+		setFirstBar(firstBar + i, fromSequence->getLastBarIndex());
 	}
 	else if (param.compare("lastbar") == 0)
 	{
-		setLastBar(lastBar + i, fromSequence->getLastBar());
+		setLastBar(lastBar + i, fromSequence->getLastBarIndex());
 	}
 	else if (param.compare("copies") == 0)
 	{

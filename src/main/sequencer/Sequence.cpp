@@ -34,7 +34,7 @@ Sequence::Sequence(vector<string> defaultTrackNames)
 	used = false;
 
 	loopEnabled = true;
-	lastBar = -1;
+	lastBarIndex = -1;
 
 	for (int i = 0; i < 64; i++)
 	{
@@ -81,30 +81,30 @@ int Sequence::getLoopEnd()
 	return loopEnd;
 }
 
-void Sequence::setFirstLoopBar(int i)
+void Sequence::setFirstLoopBarIndex(int i)
 {
-	if (i < 0 || i > lastBar)
+	if (i < 0 || i > lastBarIndex)
 	{
 		return;
 	}
 
-	firstLoopBar = i;
+	firstLoopBarIndex = i;
 	
 	notifyObservers(string("firstloopbar"));
 	
-	if (i > lastLoopBar)
+	if (i > lastLoopBarIndex)
 	{
-		lastLoopBar = i;
+		lastLoopBarIndex = i;
 		notifyObservers(string("lastloopbar"));
 	}
 }
 
-int Sequence::getFirstLoopBar()
+int Sequence::getFirstLoopBarIndex()
 {
-	return firstLoopBar;
+	return firstLoopBarIndex;
 }
 
-void Sequence::setLastLoopBar(int i)
+void Sequence::setLastLoopBarIndex(int i)
 {
 	if (i < 0)
 	{
@@ -113,10 +113,10 @@ void Sequence::setLastLoopBar(int i)
 
 	if (lastLoopBarEnd)
 	{
-		if (i < lastBar)
+		if (i < lastBarIndex)
 		{
 			lastLoopBarEnd = false;
-			lastLoopBar = lastBar;
+			lastLoopBarIndex = lastBarIndex;
 			
 			notifyObservers(string("lastloopbar"));
 			return;
@@ -128,25 +128,25 @@ void Sequence::setLastLoopBar(int i)
 	}
 	else
 	{
-		if (i > lastBar)
+		if (i > lastBarIndex)
 		{
 			lastLoopBarEnd = true;	
 			notifyObservers(string("lastloopbar"));
 		}
 		else
 		{
-			lastLoopBar = i;
+			lastLoopBarIndex = i;
 			
 			notifyObservers(string("lastloopbar"));
 		
-			if (i < firstLoopBar)
+			if (i < firstLoopBarIndex)
 			{
-				firstLoopBar = i;
+				firstLoopBarIndex = i;
 				notifyObservers(string("firstloopbar"));
 			}
 		}
 	}
-	lastLoopBar = i;
+	lastLoopBarIndex = i;
 	
 	notifyObservers(string("lastloopbar"));
 }
@@ -155,9 +155,9 @@ int Sequence::getLastLoopBar()
 {
 	if (lastLoopBarEnd)
 	{
-		return lastBar;
+		return lastBarIndex;
 	}
-	return lastLoopBar;
+	return lastLoopBarIndex;
 }
 
 vector<weak_ptr<Track>> Sequence::getMetaTracks()
@@ -180,7 +180,7 @@ void Sequence::initMetaTracks()
 void Sequence::createClickTrack()
 {
 	metaTracks[0]->removeEvents();
-	auto bars = getLastBar() + 1;
+	auto bars = getLastBarIndex() + 1;
 	auto den = 0;
 	auto denTicks = 0;
 
@@ -298,12 +298,12 @@ void Sequence::setLastBar(int i)
 		return;
 	}
 	
-	lastBar = i;
+	lastBarIndex = i;
 }
 
-int Sequence::getLastBar()
+int Sequence::getLastBarIndex()
 {
-	return lastBar;
+	return lastBarIndex;
 }
 
 void Sequence::setLoopEnabled(bool b)
@@ -348,7 +348,7 @@ void Sequence::init(int lastBarIndex)
 	setLastBar(lastBarIndex);
 	initMetaTracks();
 	initLoop();
-	setTimeSignature(0, getLastBar(), userScreen->timeSig.getNumerator(), userScreen->timeSig.getDenominator());
+	setTimeSignature(0, getLastBarIndex(), userScreen->timeSig.getNumerator(), userScreen->timeSig.getDenominator());
 }
 
 void Sequence::setTimeSignature(int firstBar, int tsLastBar, int num, int den)
@@ -446,7 +446,7 @@ void Sequence::setTempoChangeOn(bool b)
 int Sequence::getLastTick()
 {
 	int lastTick = 0;
-	for (int i = 0; i < getLastBar() + 1; i++) {
+	for (int i = 0; i < getLastBarIndex() + 1; i++) {
 		lastTick += barLengths[i];
 	}
 	return lastTick;
@@ -540,7 +540,7 @@ void Sequence::deleteBars(int firstBar, int _lastBar)
 	}
 
 	auto difference = _lastBar - firstBar;
-	lastBar -= difference;
+	lastBarIndex -= difference;
 	int oldBarStartPos = 0;
 	auto barCounter = 0;
 
@@ -599,17 +599,17 @@ void Sequence::deleteBars(int firstBar, int _lastBar)
 		}
 	}
 
-	if (firstLoopBar > lastBar)
+	if (firstLoopBarIndex > lastBarIndex)
 	{
-		firstLoopBar = lastBar;
+		firstLoopBarIndex = lastBarIndex;
 	}
 
-	if (lastLoopBar > lastBar)
+	if (lastLoopBarIndex > lastBarIndex)
 	{
-		lastLoopBar = lastBar;
+		lastLoopBarIndex = lastBarIndex;
 	}
 
-	if (lastBar == 0)
+	if (lastBarIndex  == -1)
 	{
 		setUsed(false);
 	}
@@ -617,7 +617,7 @@ void Sequence::deleteBars(int firstBar, int _lastBar)
 
 void Sequence::insertBars(int numberOfBars, int afterBar)
 {
-	lastBar += numberOfBars;
+	lastBarIndex += numberOfBars;
 
 	for (int i = afterBar; i < 999; i++)
 	{
@@ -737,7 +737,17 @@ int Sequence::getEventCount()
 
 void Sequence::initLoop()
 {
-	auto firstBar = getFirstLoopBar();
+	if (firstLoopBarIndex == -1 && lastBarIndex >= 0)
+	{
+		firstLoopBarIndex = 0;
+	}
+
+	if (lastLoopBarIndex == -1 && lastBarIndex >= 0)
+	{
+		lastLoopBarIndex = lastBarIndex;
+	}
+
+	auto firstBar = getFirstLoopBarIndex();
 	auto lastBar = getLastLoopBar() + 1;
 	int loopStart = 0;
 	int loopEnd = 0;

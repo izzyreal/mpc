@@ -84,7 +84,7 @@ void FrameSeq::work(int nFrames)
 	int tcValue = lSequencer->getTickValues()[timingCorrectScreen->getNoteValue()];
 	int swingPercentage = timingCorrectScreen->getSwing();
 	int swingOffset = (int)((swingPercentage - 50) * (4.0 * 0.01) * (tcValue * 0.5));
-	int start = (*seq->getBarLengths())[seq->getFirstLoopBar()];
+	int start = (*seq->getBarLengths())[seq->getFirstLoopBarIndex()];
 
 	for (int i = 0; i < nFrames; i++)
 	{

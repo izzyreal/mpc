@@ -31,13 +31,13 @@ namespace mpc::sequencer {
 
 		string name = "";
 		bool loopEnabled = false;
-		int lastBar = -1;
+		int lastBarIndex = -1;
 		bool used = false;
 		bool tempoChangeOn = false;
 		int loopStart = 0;
 		int loopEnd = 0;
-		int firstLoopBar = 0;
-		int lastLoopBar = 0;
+		int firstLoopBarIndex = 0;
+		int lastLoopBarIndex = 0;
 		bool lastLoopBarEnd = false;
 
 	public:
@@ -48,9 +48,9 @@ namespace mpc::sequencer {
 		int getLoopStart();
 		void setLoopEnd(int l);
 		int getLoopEnd();
-		void setFirstLoopBar(int i);
-		int getFirstLoopBar();
-		void setLastLoopBar(int i);
+		void setFirstLoopBarIndex(int i);
+		int getFirstLoopBarIndex();
+		void setLastLoopBarIndex(int i);
 		int getLastLoopBar();
 		void initMetaTracks();
 
@@ -68,7 +68,7 @@ namespace mpc::sequencer {
 		void setDeviceName(int i, string s);
 		string getDeviceName(int i);
 		void setLastBar(int i);
-		int getLastBar();
+		int getLastBarIndex();
 		void setLoopEnabled(bool b);
 		weak_ptr<Track> getTrack(int i);
 		void setUsed(bool b);

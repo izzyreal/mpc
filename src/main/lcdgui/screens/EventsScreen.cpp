@@ -103,7 +103,7 @@ void EventsScreen::function(int i)
 			
 			if (!toSequence->isUsed())
 			{
-				toSequence->init(fromSequence->getLastBar());
+				toSequence->init(fromSequence->getLastBarIndex());
 			}
 
 			auto destTrack = toSequence->getTrack(toTr).lock();

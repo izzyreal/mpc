@@ -519,7 +519,7 @@ void StepEditorScreen::nextBarEnd()
 	
 	if (controls->isGoToPressed())
 	{
-		sequencer.lock()->setBar(sequencer.lock()->getActiveSequence().lock()->getLastBar() + 1);
+		sequencer.lock()->setBar(sequencer.lock()->getActiveSequence().lock()->getLastBarIndex() + 1);
 	}
 	else {
 		sequencer.lock()->setBar(sequencer.lock()->getCurrentBarIndex() + 1);

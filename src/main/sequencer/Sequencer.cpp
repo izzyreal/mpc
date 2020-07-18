@@ -734,7 +734,7 @@ shared_ptr<Sequence> Sequencer::copySequence(weak_ptr<Sequence> src)
 {
 	auto source = src.lock();
 	auto copy = make_shared<Sequence>(defaultTrackNames);
-	copy->init(source->getLastBar());
+	copy->init(source->getLastBarIndex());
 	copySequenceParameters(source, copy);
 	
 	for (int i = 0; i < 64; i++) {
@@ -828,7 +828,7 @@ int Sequencer::getCurrentBarIndex()
 {
 	auto s = isPlaying() ? getCurrentlyPlayingSequence().lock() : getActiveSequence().lock();
 	auto pos = getTickPosition();
-	if (pos == s->getLastTick()) return s->getLastBar() + 1;
+	if (pos == s->getLastTick()) return s->getLastBarIndex() + 1;
 	auto index = pos;
 	if (isPlaying() && !countingIn) index = getTickPosition();
 	if (index == 0) return 0;
@@ -838,7 +838,7 @@ int Sequencer::getCurrentBarIndex()
 
 	int tickCounter = 0;
 	for (int i = 0; i < 999; i++) {
-		if (i > s->getLastBar()) i = 0;
+		if (i > s->getLastBarIndex()) i = 0;
 		tickCounter += (*barLengths)[i];
 		if (tickCounter > index) {
 			barCounter = i;
@@ -944,12 +944,12 @@ void Sequencer::setBar(int i)
 
 	auto s = getActiveSequence().lock();
 	
-	if (i > s->getLastBar() + 1)
+	if (i > s->getLastBarIndex() + 1)
 	{
 		return;
 	}
 
-	if (s->getLastBar() == 998 && i > 998)
+	if (s->getLastBarIndex() == 998 && i > 998)
 	{
 		return;
 	}
@@ -957,7 +957,7 @@ void Sequencer::setBar(int i)
 	auto den = ts.getDenominator();
 	auto denTicks = (int)(96 * (4.0 / den));
 	
-	if (i != s->getLastBar() + 1)
+	if (i != s->getLastBarIndex() + 1)
 	{
 		ts.setNumerator(s->getNumerator(i));
 		ts.setDenominator(s->getDenominator(i));

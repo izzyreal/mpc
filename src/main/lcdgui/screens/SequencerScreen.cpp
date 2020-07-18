@@ -94,7 +94,7 @@ void SequencerScreen::displayBus()
 
 void SequencerScreen::displayBars()
 {
-	findField("bars").lock()->setText(to_string(sequencer.lock()->getActiveSequence().lock()->getLastBar() + 1));
+	findField("bars").lock()->setText(to_string(sequencer.lock()->getActiveSequence().lock()->getLastBarIndex() + 1));
 }
 
 void SequencerScreen::displayPgm()
@@ -417,10 +417,20 @@ void SequencerScreen::function(int i)
 	switch (i)
 	{
 	case 0:
+		if (sequencer.lock()->isPlaying())
+		{
+			return;
+		}
+
 		openScreen("step-editor");
 		break;
 	case 1:
 	{
+		if (sequencer.lock()->isPlaying())
+		{
+			return;
+		}
+
 		openScreen("events");
 		break;
 	}
@@ -430,9 +440,7 @@ void SequencerScreen::function(int i)
 	case 3:
 	{
 		sequencer.lock()->setSoloEnabled(!sequencer.lock()->isSoloEnabled());
-
 		findChild<TextComp>("fk3").lock()->setBlinking(sequencer.lock()->isSoloEnabled());
-
 		break;
 	}
 	case 4:

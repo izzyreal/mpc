@@ -120,7 +120,7 @@ int Song::getStepBarAmount(int step)
 {
     auto seq = sequencer->getSequence(steps[step]->getSequence()).lock();
     if(!seq->isUsed()) return 0;
-    return seq->getLastBar();
+    return seq->getLastBarIndex();
 }
 
 bool Song::isUsed()

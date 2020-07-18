@@ -43,12 +43,12 @@ void ChangeTsigScreen::turnWheel(int i)
 
 	if (param.compare("bar0") == 0)
 	{
-		setBar0(bar0 + i, seq->getLastBar());
+		setBar0(bar0 + i, seq->getLastBarIndex());
 		displayBars();
 	}
 	else if (param.compare("bar1") == 0)
 	{
-		setBar1(bar1 + i, seq->getLastBar());
+		setBar1(bar1 + i, seq->getLastBarIndex());
 		displayBars();
 	}
 	else if (param.compare("newtsig") == 0 && i > 0)

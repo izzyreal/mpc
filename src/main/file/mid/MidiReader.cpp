@@ -166,16 +166,16 @@ void MidiReader::parseSequence()
 		}
 	}
 	sequence->setLastBar(barCounter - 1);
-	sequence->setFirstLoopBar(firstLoopBar);
+	sequence->setFirstLoopBarIndex(firstLoopBar);
 
 	if (lastLoopBar == -1)
 	{
-		sequence->setLastLoopBar(sequence->getLastBar());
-		sequence->setLastLoopBar(sequence->getLastLoopBar() + 1);
+		sequence->setLastLoopBarIndex(sequence->getLastBarIndex());
+		sequence->setLastLoopBarIndex(sequence->getLastLoopBar() + 1);
 	}
 	else
 	{
-		sequence->setLastLoopBar(lastLoopBar);
+		sequence->setLastLoopBarIndex(lastLoopBar);
 	}
 	
 	unique_ptr<NoteEvent> nVariation;

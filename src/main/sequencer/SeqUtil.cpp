@@ -158,7 +158,7 @@ void SeqUtil::setTimeSignature(Sequence* sequence, int bar, int num, int den)
 {
 	auto newDenTicks = 96 * (4.0 / den);
 	auto newBarLengths = vector<int>(999);
-	auto lastBar = sequence->getLastBar();
+	auto lastBar = sequence->getLastBarIndex();
 
 	for (int i = 0; i < 999; i++)
 	{
@@ -170,10 +170,10 @@ void SeqUtil::setTimeSignature(Sequence* sequence, int bar, int num, int den)
 	(*sequence->getNumerators())[bar] = num;
 	(*sequence->getDenominators())[bar] = den;
 	
-	if (bar == sequence->getLastBar())
+	if (bar == sequence->getLastBarIndex())
 	{
-		(*sequence->getNumerators())[sequence->getLastBar() + 1] = num;
-		(*sequence->getDenominators())[sequence->getLastBar() + 1] = den;
+		(*sequence->getNumerators())[sequence->getLastBarIndex() + 1] = num;
+		(*sequence->getDenominators())[sequence->getLastBarIndex() + 1] = den;
 	}
 	else
 	{

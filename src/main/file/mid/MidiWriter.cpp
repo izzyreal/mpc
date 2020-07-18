@@ -76,7 +76,7 @@ MidiWriter::MidiWriter(mpc::sequencer::Sequence* sequence)
 	std::set<vector<int>> tSigs;
 	auto tSigTick = 0;
 	auto lastAdded = vector<int>(3);
-	for (int i = 0; i < sequence->getLastBar() + 1; i++) {
+	for (int i = 0; i < sequence->getLastBarIndex() + 1; i++) {
 		auto actualTick = tSigTick;
 		if (lastAdded[0] == sequence->getNumerator(i) && lastAdded[1] == sequence->getDenominator(i))
 			actualTick = lastAdded[2];

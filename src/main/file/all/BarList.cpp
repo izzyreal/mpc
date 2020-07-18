@@ -25,7 +25,7 @@ BarList::BarList(mpc::sequencer::Sequence* seq)
 	auto barLengths = seq->getBarLengths();
 	auto ticksPerBeat = 0;
 	auto lastTick = 0;
-	for (int i = 0; i < seq->getLastBar() + 1; i++) {
+	for (int i = 0; i < seq->getLastBarIndex() + 1; i++) {
 		lastTick += (*barLengths)[i];
 		ticksPerBeat = static_cast<int>((*barLengths)[i] / seq->getNumerator(i));
 		auto bar = new Bar(ticksPerBeat, lastTick);
@@ -35,7 +35,7 @@ BarList::BarList(mpc::sequencer::Sequence* seq)
 	}
 	auto bar = new Bar(ticksPerBeat, 0);
 	for (int i = 0; i < 4; i++)
-		saveBytes[(seq->getLastBar() + 1) * 4 + i] = bar->getBytes()[i];
+		saveBytes[(seq->getLastBarIndex() + 1) * 4 + i] = bar->getBytes()[i];
 
 }
 

@@ -259,13 +259,13 @@ void AllLoader::convertSequences(const bool indiv)
 		}
 
 		mpcSeq->initMetaTracks();
-		mpcSeq->setFirstLoopBar(as->loopFirst);
-		mpcSeq->setLastLoopBar(as->loopLast);
-		mpcSeq->setLastLoopBar(as->loopLast);
+		mpcSeq->setFirstLoopBarIndex(as->loopFirst);
+		mpcSeq->setLastLoopBarIndex(as->loopLast);
+		mpcSeq->setLastLoopBarIndex(as->loopLast);
 		
 		if (as->loopLastEnd)
 		{
-			mpcSeq->setLastLoopBar(INT_MAX);
+			mpcSeq->setLastLoopBarIndex(INT_MAX);
 		}
 
 		mpcSeq->setLoopEnabled(as->loop);

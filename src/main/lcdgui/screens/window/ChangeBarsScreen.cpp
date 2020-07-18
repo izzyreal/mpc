@@ -32,6 +32,12 @@ void ChangeBarsScreen::function(int i)
 		break;
 	case 4:
 		seq->deleteBars(firstBar, lastBar);
+		
+		if (sequencer.lock()->getTickPosition() > seq->getLastTick())
+		{
+			sequencer.lock()->move(seq->getLastTick());
+		}
+
 		ls.lock()->openScreen("sequencer");
 		break;
 	}
@@ -83,7 +89,7 @@ void ChangeBarsScreen::setLastBar(int i)
 {
 	auto seq = sequencer.lock()->getActiveSequence().lock();
 
-	if (i < 0 || i > seq->getLastBar())
+	if (i < 0 || i > seq->getLastBarIndex())
 	{
 		return;
 	}
@@ -102,7 +108,7 @@ void ChangeBarsScreen::setFirstBar(int i)
 {
 	auto seq = sequencer.lock()->getActiveSequence().lock();
 
-	if (i < 0 || i > seq->getLastBar())
+	if (i < 0 || i > seq->getLastBarIndex())
 	{
 		return;
 	}
@@ -121,7 +127,7 @@ void ChangeBarsScreen::setNumberOfBars(int i)
 {
 	auto seq = sequencer.lock()->getActiveSequence().lock();
 
-	if (i < 0 || i > (998 - seq->getLastBar()))
+	if (i < 0 || i > (998 - seq->getLastBarIndex()))
 	{
 		return;
 	}
@@ -134,7 +140,7 @@ void ChangeBarsScreen::setAfterBar(int i)
 {
 	auto seq = sequencer.lock()->getActiveSequence().lock();
 
-	if (i < 0 || i >= seq->getLastBar())
+	if (i < 0 || i >= seq->getLastBarIndex())
 	{
 		return;
 	}

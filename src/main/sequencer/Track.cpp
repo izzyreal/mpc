@@ -207,7 +207,7 @@ void Track::addEventRealTime(shared_ptr<Event> event)
 	
 	if (tcValue > 0 && dynamic_pointer_cast<NoteEvent>(event))
 	{
-		timingCorrect(0, parent->getLastBar(), dynamic_cast<NoteEvent*>(event.get()), lSequencer->getTickValues()[tcValue]);
+		timingCorrect(0, parent->getLastBarIndex(), dynamic_cast<NoteEvent*>(event.get()), lSequencer->getTickValues()[tcValue]);
 	}
 	events.push_back(std::move(event));
     sortEvents();

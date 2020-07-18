@@ -106,11 +106,11 @@ Sequence::Sequence(mpc::sequencer::Sequence* seq, int number)
 		saveBytes[i] = PADDING2[i - PADDING2_OFFSET];
 	}
 
-	setBarCount(seq->getLastBar() + 1);
+	setBarCount(seq->getLastBarIndex() + 1);
 	setLastTick(seq);
 	saveBytes[SEQUENCE_INDEX_OFFSET] = (number);
 	setUnknown32BitInt(seq);
-	auto loopStartBytes = moduru::file::ByteUtil::ushort2bytes(seq->getFirstLoopBar());
+	auto loopStartBytes = moduru::file::ByteUtil::ushort2bytes(seq->getFirstLoopBarIndex());
 	auto loopEndBytes = moduru::file::ByteUtil::ushort2bytes(seq->getLastLoopBar());
 	
 	if (seq->isLastLoopBarEnd())
