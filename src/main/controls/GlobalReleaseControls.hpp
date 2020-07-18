@@ -29,7 +29,7 @@ namespace mpc {
 			void simplePad(int i);
 
 		private:
-			void generateNoteOff(int nn);
+			void generateNoteOff(int note);
 
 		public:
 			void overDub() override;

@@ -53,7 +53,7 @@ namespace mpc::sequencer {
 		int getTrackIndex();
 		std::weak_ptr<mpc::sequencer::NoteEvent> recordNoteOn();
 		void flushNoteCache();
-		void recordNoteOff(NoteEvent* n);
+		void recordNoteOff(NoteEvent&);
 		void setUsed(bool b);
 		void setOn(bool b);
 
@@ -84,7 +84,6 @@ namespace mpc::sequencer {
 
 		int getNextTick();
 		void playNext();
-		void off(bool stop);
 		bool isOn();
 		bool isUsed();
 

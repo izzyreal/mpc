@@ -38,29 +38,38 @@ void GlobalReleaseControls::goTo() {
 	controls->setGoToPressed(false);
 }
 
-void GlobalReleaseControls::function(int i) {
+void GlobalReleaseControls::function(int i)
+{
 	init();
 	auto controls = Mpc::instance().getControls().lock();
-	switch (i) {
+	
+	switch (i)
+	{
 	case 0:
-		if (currentScreenName.compare("step-timing-correct") == 0) {
+		if (currentScreenName.compare("step-timing-correct") == 0)
+		{
 			ls.lock()->openScreen("step-editor");
 		}
 		break;
 	case 2:
 		controls->setF3Pressed(false);
-		if (currentScreenName.compare("load-a-sound") == 0) {
+		
+		if (currentScreenName.compare("load-a-sound") == 0)
+		{
 			sampler.lock()->finishBasicVoice();
 		}
 		break;
 	case 3:
 		controls->setF4Pressed(false);
-		if (currentScreenName.compare("keep-or-retry") == 0) {
+		
+		if (currentScreenName.compare("keep-or-retry") == 0)
+		{
 			sampler.lock()->finishBasicVoice();
 		}
 		break;
 	case 4:
 		controls->setF5Pressed(false);
+
 		if (ls.lock()->getPreviousScreenName().compare("load") == 0 && currentScreenName.compare("popup") == 0)
 		{
 			ls.lock()->openScreen("load");
@@ -69,6 +78,7 @@ void GlobalReleaseControls::function(int i) {
 		break;
 	case 5:
 		controls->setF6Pressed(false);
+
 		if (!sequencer.lock()->isPlaying() && currentScreenName.compare("sequencer") != 0)
 		{
 			sampler.lock()->finishBasicVoice();
@@ -105,8 +115,6 @@ void GlobalReleaseControls::simplePad(int i)
 	
 	controls->getPressedPads()->erase(controls->getPressedPads()->find(i));
 
-	//if (csn.compare("load-a-sound") == 0) return;
-
 	auto lTrk = track.lock();
 	auto note = lTrk->getBus() > 0 ? program.lock()->getPad(i + (bank * 16))->getNote() : i + (bank * 16) + 35;
 	generateNoteOff(note);
@@ -119,9 +127,9 @@ void GlobalReleaseControls::simplePad(int i)
 	{
 		auto newDur = static_cast<int>(Mpc::instance().getAudioMidiServices().lock()->getFrameSequencer().lock()->getTickPosition());
 		sequencer.lock()->stopMetronomeTrack();
-		bool adjustedRecordedNote = lTrk->adjustDurLastEvent(newDur);
+		bool durationHasBeenAdjusted = lTrk->adjustDurLastEvent(newDur);
 		
-		if (adjustedRecordedNote && maybeRecWithoutPlaying)
+		if (durationHasBeenAdjusted && maybeRecWithoutPlaying)
 		{
 			auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timing-correct"));
 			auto noteValue = timingCorrectScreen->getNoteValue();
@@ -138,29 +146,29 @@ void GlobalReleaseControls::simplePad(int i)
 				nextPos = lTrk->swingTick(nextPos, noteVal, timingCorrectScreen->getSwing());
 				sequencer.lock()->move(nextPos);
 			}
-			else {
+			else
+			{
 				sequencer.lock()->move(lastTick);
 			}
 		}
 	}
 }
 
-void GlobalReleaseControls::generateNoteOff(int nn)
+void GlobalReleaseControls::generateNoteOff(int note)
 {
     init();
 	auto lTrk = track.lock();
     
 	if (sequencer.lock()->isRecordingOrOverdubbing())
 	{
-        auto n = new mpc::sequencer::NoteEvent();
-        n->setNote(nn);
-        n->setVelocity(0);
-        n->setTick(sequencer.lock()->getTickPosition());
-        lTrk->recordNoteOff(n);
-		delete n;
+		mpc::sequencer::NoteEvent noteOff;
+        noteOff.setNote(note);
+        noteOff.setVelocity(0);
+        noteOff.setTick(sequencer.lock()->getTickPosition());
+        lTrk->recordNoteOff(noteOff);
     }
 
-    auto noteEvent = make_shared<mpc::sequencer::NoteEvent>(nn);
+    auto noteEvent = make_shared<mpc::sequencer::NoteEvent>(note);
     noteEvent->setVelocity(0);
     noteEvent->setDuration(0);
     noteEvent->setTick(-1);

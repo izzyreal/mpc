@@ -233,7 +233,8 @@ void BaseControls::pad(int i, int velo, bool repeat, int tick)
 		controls->getPressedPads()->emplace(i);
 		controls->getPressedPadVelos()->at(i) = velo;
 	}
-	else {
+	else
+	{
 		if (!(controls->isTapPressed() && sequencer.lock()->isPlaying()))
 		{
 			return;
@@ -319,12 +320,16 @@ void BaseControls::generateNoteOn(int nn, int padVelo, int tick)
 			n = track.lock()->addNoteEvent(sequencer.lock()->getTickPosition(), nn).lock();
 			int noteVal = timingCorrectScreen->getNoteValue();
 			int stepLength = sequencer.lock()->getTickValues()[noteVal];
-			if (stepLength != 0) {
+			
+			if (stepLength != 0)
+			{
 				int bar = sequencer.lock()->getCurrentBarIndex() + 1;
 				track.lock()->timingCorrect(0, bar, n.get(), stepLength);
 				vector<weak_ptr<mpc::sequencer::Event>> events{ n };
 				track.lock()->swing(events, noteVal, timingCorrectScreen->getSwing(), vector<int>{0, 127});
-				if (n->getTick() != sequencer.lock()->getTickPosition()) {
+
+				if (n->getTick() != sequencer.lock()->getTickPosition())
+				{
 					sequencer.lock()->move(n->getTick());
 				}
 			}

@@ -1357,6 +1357,11 @@ void StepEditorScreen::update(moduru::observer::Observable*, nonstd::any message
 			eventRow->setEmptyEventValues();
 		}
 	}
+	else if (msg.compare("adjust-duration") == 0)
+	{
+		initVisibleEvents();
+		refreshEventRows();
+	}
 	else if (msg.compare("bar") == 0)
 	{
 		if (sequencer.lock()->isPlaying())

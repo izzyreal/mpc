@@ -156,7 +156,8 @@ void MpcMidiInput::transport(ctoot::midi::core::MidiMessage* msg, int timeStamp)
 			
 			if (note->getVelocity() == 0)
 			{
-				track->recordNoteOff(note.get());
+				mpc::sequencer::NoteEvent& noteOff = *note.get();
+				track->recordNoteOff(noteOff);
 			}
 			else
 			{

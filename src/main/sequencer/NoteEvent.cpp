@@ -44,7 +44,10 @@ int NoteEvent::getNote()
 
 void NoteEvent::setDuration(int i)
 {
-	if (i < 0 || i > 9999) return;
+    if (i < 0 || i > 9999)
+    {
+        return;
+    }
 	duration = i;
 	
 	notifyObservers(string("step-editor"));
