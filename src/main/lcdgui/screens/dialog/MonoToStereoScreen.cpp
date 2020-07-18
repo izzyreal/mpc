@@ -26,6 +26,28 @@ void MonoToStereoScreen::open()
 	displayRSource();
 }
 
+void MonoToStereoScreen::updateNewStName()
+{
+	if ( ! sampler.lock()->getSound().lock()->isMono() || ! sampler.lock()->getSound(rSource).lock()->isMono())
+	{
+		setNewStName("");
+		return;
+	}
+
+	auto lSourceName = sampler.lock()->getSound().lock()->getName();
+
+	if (lSourceName.length() > 14)
+	{
+		lSourceName = lSourceName.substr(0, 14);
+	}
+	else if (lSourceName.length() < 14)
+	{
+		lSourceName = StrUtil::padRight(lSourceName, "_", 14);
+	}
+
+	setNewStName(lSourceName + "_S");
+}
+
 void MonoToStereoScreen::turnWheel(int i)
 {
 	init();
@@ -34,16 +56,20 @@ void MonoToStereoScreen::turnWheel(int i)
 	{
 		sampler.lock()->selectPreviousSound();
 		displayLSource();
+		updateNewStName();
+
 	}
 	else if (param.compare("lsource") == 0 && i > 0)
 	{
 		sampler.lock()->selectNextSound();
 		displayLSource();
+		updateNewStName();
 	}
 	else if (param.compare("rsource") == 0)
 	{
 		setRSource(sampler.lock()->getNextSoundIndex(rSource, i > 0));
 		displayRSource();
+		updateNewStName();
 	}
 }
 
@@ -58,7 +84,7 @@ void MonoToStereoScreen::function(int j)
 		break;
 	case 4:
 	{
-		if (!sampler.lock()->getSound().lock()->isMono() || !sampler.lock()->getSound(rSource).lock()->isMono())
+		if ( ! sampler.lock()->getSound().lock()->isMono() || ! sampler.lock()->getSound(rSource).lock()->isMono())
 		{
 			return;
 		}
@@ -108,6 +134,7 @@ void MonoToStereoScreen::displayLSource()
 	else
 	{
 		ls.lock()->setFunctionKeysArrangement(1);
+		findChild<Background>("").lock()->repaintUnobtrusive(findChild<FunctionKey>("fk4").lock()->getRect());
 	}
 }
 
@@ -127,6 +154,7 @@ void MonoToStereoScreen::displayRSource()
 	else
 	{
 		ls.lock()->setFunctionKeysArrangement(1);
+		findChild<Background>("").lock()->repaintUnobtrusive(findChild<FunctionKey>("fk4").lock()->getRect());
 	}
 }
 
@@ -149,5 +177,6 @@ void MonoToStereoScreen::setRSource(int i)
 void MonoToStereoScreen::setNewStName(string s)
 {
 	newStName = s;
+	displayNewStName();
 }
 

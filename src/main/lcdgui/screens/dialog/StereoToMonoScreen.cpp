@@ -16,15 +16,9 @@ void StereoToMonoScreen::open()
 {
 	auto previousScreenName = ls.lock()->getPreviousScreenName();
 
-	if (previousScreenName.compare("name") != 0 && sampler.lock()->getSound().lock())
+	if (previousScreenName.compare("name") != 0)
 	{
-		string name = sampler.lock()->getSound().lock()->getName();
-		name = StrUtil::trim(name);
-		name = StrUtil::padRight(name, "_", 16);
-		name = name.substr(0, 14);
-
-		setNewLName(name + "-L");
-		setNewRName(name + "-R");
+		updateNewNames();
 	}
 
 	displayNewLName();
@@ -42,6 +36,7 @@ void StereoToMonoScreen::turnWheel(int i)
 	{
 		sampler.lock()->setSoundIndex(sampler.lock()->getNextSoundIndex(sampler.lock()->getSoundIndex(), i > 0));
 		displayStereoSource();
+		updateNewNames();
 	}
 	else if (param.compare("newlname") == 0)
 	{
@@ -102,6 +97,24 @@ void StereoToMonoScreen::function(int i)
 	}
 }
 
+void StereoToMonoScreen::updateNewNames()
+{
+	if ( ! sampler.lock()->getSound().lock() || sampler.lock()->getSound().lock()->isMono())
+	{
+		setNewLName("");
+		setNewRName("");
+		return;
+	}
+
+	string name = sampler.lock()->getSound().lock()->getName();
+	name = StrUtil::trim(name);
+	name = StrUtil::padRight(name, "_", 16);
+	name = name.substr(0, 14);
+
+	setNewLName(name + "-L");
+	setNewRName(name + "-R");
+}
+
 void StereoToMonoScreen::displayStereoSource()
 {
 	auto sound = sampler.lock()->getSound().lock();
@@ -116,8 +129,10 @@ void StereoToMonoScreen::displayStereoSource()
 	if (sound->isMono())
 	{
 		ls.lock()->setFunctionKeysArrangement(1);
+		findChild<Background>("").lock()->repaintUnobtrusive(findChild<FunctionKey>("fk4").lock()->getRect());
 	}
-	else {
+	else
+	{
 		ls.lock()->setFunctionKeysArrangement(0);
 	}
 }

@@ -24,6 +24,7 @@ namespace mpc::lcdgui::screens::dialog
 		void displayStereoSource();
 		void displayNewLName();
 		void displayNewRName();
+		void updateNewNames();
 
 		std::string newLName = "";
 		std::string newRName = "";
