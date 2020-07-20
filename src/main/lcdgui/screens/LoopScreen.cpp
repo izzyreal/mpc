@@ -253,7 +253,7 @@ void LoopScreen::setSlider(int i)
 		}
 		
 		sound->setLoopTo(candidatePos);
-		
+
 		if (lengthFix)
 		{
 			sound->setEnd(sound->getLoopTo() + oldLength);
@@ -279,6 +279,7 @@ void LoopScreen::setSlider(int i)
 		{
 			sound->setLoopTo(sound->getEnd() - oldLength);
 		}
+
 		displayEndLength();
 		displayEndLengthValue();
 		displayTo();

@@ -21,11 +21,11 @@ namespace mpc {
 		{
 
 		private:
-			std::thread loadProgramThread{};
-			std::weak_ptr<mpc::sampler::Program> result{};
+			std::thread loadProgramThread;
+			std::weak_ptr<mpc::sampler::Program> result;
 			
-			MpcFile* file{ nullptr };
-			bool replace{ false };
+			MpcFile* file = nullptr;
+			bool replace = false;
 
 		public:
 			void loadProgram();

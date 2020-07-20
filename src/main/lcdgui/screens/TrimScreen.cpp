@@ -210,7 +210,7 @@ void TrimScreen::turnWheel(int i)
 
 void TrimScreen::setSlider(int i)
 {
-	if (!Mpc::instance().getControls().lock()->isShiftPressed())
+	if (!mpc.getControls().lock()->isShiftPressed())
 	{
 		return;
 	}
@@ -232,11 +232,14 @@ void TrimScreen::setSlider(int i)
 		}
 		
 		sound->setStart(candidatePos);
-		
+		displaySt();
+
 		if (smplLngthFix)
 		{
 			sound->setEnd(sound->getStart() + oldLength);
+			displayEnd();
 		}
+
 		displayWave();
 	}
 	else if (param.compare("end") == 0)
@@ -249,11 +252,14 @@ void TrimScreen::setSlider(int i)
 		}
 		
 		sound->setEnd(candidatePos);
-		
+		displayEnd();
+
 		if (smplLngthFix)
 		{
 			sound->setStart(sound->getEnd() - oldLength);
+			displaySt();
 		}
+
 		displayWave();
 	}
 }

@@ -31,15 +31,20 @@ void LoadAProgramScreen::function(int i)
 	switch (i)
 	{
 	case 2:
+	{
 		clearProgramWhenLoading = true;
-		Mpc::instance().loadProgram();
+		auto oldLoadReplaceSound = loadReplaceSound;
+		loadReplaceSound = true;
+		mpc.loadProgram();
+		loadReplaceSound = oldLoadReplaceSound;
 		break;
+	}
 	case 3:
 		ls.lock()->openScreen("load");
 		break;
 	case 4:
 		clearProgramWhenLoading = false;
-		Mpc::instance().loadProgram();
+		mpc.loadProgram();
 		break;
 	}
 }

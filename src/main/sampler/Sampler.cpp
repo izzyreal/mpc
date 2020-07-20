@@ -53,7 +53,7 @@ void Sampler::setSoundIndex(int i)
 	soundIndex = i;
 
 	auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(Screens::getScreenComponent("zone"));
-	zoneScreen->initZones(getSound().lock()->getLastFrameIndex());
+	zoneScreen->initZones(getSound().lock()->getFrameCount());
 }
 
 int Sampler::getSoundIndex()
@@ -417,38 +417,39 @@ void Sampler::trimSample(weak_ptr<Sound> sound, int start, int end)
 {
 	auto s = sound.lock();
 	auto data = s->getSampleData();
-	auto lf = s->getLastFrameIndex();
+	auto frameCount = s->getFrameCount();
 
-	if (!s->isMono())
-	{
-		int startRight = start + lf;
-		int endRight = end + lf;
-	
-		data->erase(data->begin() + endRight, data->end());
-		data->erase(data->begin() + lf, data->begin() + startRight);
-		data->erase(data->begin() + end, data->begin() + lf);
-		data->erase(data->begin(), data->begin() + start);
-	}
-	else
+	if (s->isMono())
 	{
 		data->erase(data->begin() + end, data->end());
 		data->erase(data->begin(), data->begin() + start);
 	}
+	else
+	{
+		int startRight = start + frameCount;
+		int endRight = end + frameCount;
+
+		data->erase(data->begin() + endRight, data->end());
+		data->erase(data->begin() + frameCount, data->begin() + startRight);
+		data->erase(data->begin() + end, data->begin() + frameCount);
+		data->erase(data->begin(), data->begin() + start);
+	}
+
 	s->setStart(0);
-	s->setEnd(s->getLastFrameIndex() + 1);
-	s->setLoopTo(s->getLastFrameIndex() + 1);
+	s->setEnd(s->getFrameCount());
+	s->setLoopTo(s->getFrameCount());
 }
 
 void Sampler::deleteSection(const unsigned int sampleNumber, const unsigned int start, const unsigned int end)
 {
 	auto s = sounds[sampleNumber];
 	auto data = s->getSampleData();
-	auto lf = s->getLastFrameIndex();
+	auto frameCount = s->getFrameCount();
 
 	if (!s->isMono())
 	{
-		const unsigned int startRight = start + lf;
-		const unsigned int endRight = end + lf;
+		const unsigned int startRight = start + frameCount;
+		const unsigned int endRight = end + frameCount;
 		data->erase(data->begin() + startRight, data->begin() + endRight);
 	}
 	data->erase(data->begin() + start, data->begin() + end);
@@ -1057,28 +1058,35 @@ bool Sampler::compareName(weak_ptr<Sound> a, weak_ptr<Sound> b) {
 }
 
 bool Sampler::compareSize(weak_ptr<Sound> a, weak_ptr<Sound> b) {
-	return a.lock()->getLastFrameIndex() < b.lock()->getLastFrameIndex();
+	return a.lock()->getFrameCount() < b.lock()->getFrameCount();
 }
 
 int Sampler::getUsedProgram(int startIndex, bool up) {
 	auto res = startIndex;
 
-	if (up) {
-		for (int i = startIndex + 1; i < programs.size(); i++) {
-			if (programs[i]) {
+	if (up)
+	{
+		for (int i = startIndex + 1; i < programs.size(); i++)
+		{
+			if (programs[i])
+			{
 				res = i;
 				break;
 			}
 		}
 	}
-	else {
-		for (int i = startIndex - 1; i >= 0; i--) {
-			if (programs[i]) {
+	else
+	{
+		for (int i = startIndex - 1; i >= 0; i--)
+		{
+			if (programs[i])
+			{
 				res = i;
 				break;
 			}
 		}
 	}
+
 	return res;
 }
 

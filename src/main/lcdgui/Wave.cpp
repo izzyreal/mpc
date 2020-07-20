@@ -84,7 +84,11 @@ void Wave::setCenterSamplePos(unsigned int centerSamplePos)
 
 void Wave::setSampleData(vector<float>* sampleData, bool mono, unsigned int view)
 {
-	if (this->sampleData == sampleData)
+	auto newFrames = mono ? sampleData->size() : (sampleData->size() * 0.5);
+
+	if (this->sampleData == sampleData &&
+		newFrames == frames &&
+		this->mono == mono && this->view == view)
 	{
 		return;
 	}
@@ -99,7 +103,7 @@ void Wave::setSampleData(vector<float>* sampleData, bool mono, unsigned int view
 	this->mono = mono;
 	this->view = view;
 	
-	frames = mono ? sampleData->size() : (sampleData->size() * 0.5);
+	frames = newFrames;
 	
 	initSamplesPerPixel();
 	SetDirty();

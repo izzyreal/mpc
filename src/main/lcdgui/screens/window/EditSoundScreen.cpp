@@ -663,7 +663,7 @@ void EditSoundScreen::function(int j)
 				}
 			}
 		}
-		sampler.lock()->setSoundIndex(sampler.lock()->getSoundCount() - 1);
+
 		ls.lock()->openScreen(previousScreenName);
 		break;
 	}
