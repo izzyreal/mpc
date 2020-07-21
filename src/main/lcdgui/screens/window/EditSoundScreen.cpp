@@ -68,7 +68,7 @@ void EditSoundScreen::displayEdit()
     }
     else if (edit == 1)
     {
-        findBackground().lock()->setName("editloopfromsttoend");
+        findBackground().lock()->setName("edit-loop-from-st-to-end");
 		findField("new-name").lock()->Hide(true);
         findLabel("new-name").lock()->Hide(true);
         findField("ratio").lock()->Hide(true);
@@ -84,7 +84,7 @@ void EditSoundScreen::displayEdit()
     }
     else if (edit == 2)
     {
-        findBackground().lock()->setName("editempty");
+        findBackground().lock()->setName("edit-empty");
 		findField("new-name").lock()->Hide(false);
         findLabel("new-name").lock()->Hide(false);
         findField("ratio").lock()->Hide(true);
@@ -101,7 +101,7 @@ void EditSoundScreen::displayEdit()
     }
     else if (edit == 3)
     {
-        findBackground().lock()->setName("editempty");
+        findBackground().lock()->setName("edit-empty");
 		findField("new-name").lock()->Hide(false);
         findLabel("new-name").lock()->Hide(false);
         findField("ratio").lock()->Hide(true);
@@ -118,7 +118,7 @@ void EditSoundScreen::displayEdit()
     }
     else if (edit == 4)
     {
-        findBackground().lock()->setName("editexecute");
+        findBackground().lock()->setName("edit-execute");
 		findField("new-name").lock()->Hide(true);
         findLabel("new-name").lock()->Hide(true);
         findField("ratio").lock()->Hide(true);
@@ -134,7 +134,7 @@ void EditSoundScreen::displayEdit()
     }
     else if (edit == 5)
     {
-        findBackground().lock()->setName("editexecute");
+        findBackground().lock()->setName("edit-execute");
 		findField("new-name").lock()->Hide(true);
         findLabel("new-name").lock()->Hide(true);
         findField("ratio").lock()->Hide(true);
@@ -150,7 +150,7 @@ void EditSoundScreen::displayEdit()
     }
     else if (edit == 6)
     {
-        findBackground().lock()->setName("editexecute");
+        findBackground().lock()->setName("edit-execute");
         findField("new-name").lock()->Hide(true);
         findLabel("new-name").lock()->Hide(true);
         findField("ratio").lock()->Hide(true);
@@ -166,7 +166,7 @@ void EditSoundScreen::displayEdit()
     }
     else if (edit == 7)
     {
-        findBackground().lock()->setName("editempty");
+        findBackground().lock()->setName("edit-empty");
 		findField("new-name").lock()->Hide(false);
         findLabel("new-name").lock()->Hide(false);
         findField("ratio").lock()->Hide(false);
@@ -183,7 +183,7 @@ void EditSoundScreen::displayEdit()
     }
     else if(edit == 8)
     {
-        findBackground().lock()->setName("editempty");
+        findBackground().lock()->setName("edit-empty");
 		findField("new-name").lock()->Hide(true);
         findLabel("new-name").lock()->Hide(true);
         findField("ratio").lock()->Hide(true);
@@ -192,14 +192,17 @@ void EditSoundScreen::displayEdit()
         findLabel("preset").lock()->Hide(true);
         findField("adjust").lock()->Hide(true);
         findLabel("adjust").lock()->Hide(true);
-        findLabel("end-margin").lock()->Hide(false);
         findField("end-margin").lock()->Hide(false);
-        findLabel("create-new-program").lock()->Hide(false);
-        findField("create-new-program").lock()->Hide(false);
-        displayEndMargin();
+		findLabel("end-margin").lock()->Hide(false);
+		findField("create-new-program").lock()->Hide(false);
+		findLabel("create-new-program").lock()->Hide(false);
+		displayEndMargin();
         displayCreateNewProgram();
     }
-	//ls.lock()->setFunctionKeysArrangement(0); What happens if we draw a background? Will the function keys get drawn again?
+	// What happens if we draw a background? Will the function keys get drawn again?
+	// Unfortunately they are not. We should think about making things children of background.
+	// For now we'll do this hacky thing.
+	ls.lock()->setFunctionKeysArrangement(0);
 }
 
 void EditSoundScreen::displayCreateNewProgram()
