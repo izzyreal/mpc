@@ -867,7 +867,7 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 
 	if (screen)
 	{
-		screen->addChildren(children);
+		screen->findChild<Background>("").lock()->addChildren(children);
 		screen->setTransferMap(transferMap);
 		screen->setFirstField(firstField);
 		screens[screenName] = screen;

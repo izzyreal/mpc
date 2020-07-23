@@ -43,13 +43,23 @@ void EditSoundScreen::open()
 		newSoundName = sampler.lock()->addOrIncreaseNumber(newSoundName);
 		setNewName(newSoundName);
 	}
+
 	displayEdit();
+	displayVariable();
+
+	if (edit == 8)
+	{
+		displayEndMargin();
+		displayCreateNewProgram();
+	}
 }
 
 void EditSoundScreen::displayEdit()
 {
-    findField("edit").lock()->setText(editNames[edit]);
-    
+	findLabel("edit").lock()->setText("Edit:");
+	findField("edit").lock()->setText(editNames[edit]);
+	displayVariable(); // This can also be avoided by making textfields and labels children of Background.
+
     if (edit == 0)
     {
         findBackground().lock()->setName("edit-sound");
@@ -97,7 +107,7 @@ void EditSoundScreen::displayEdit()
         findField("end-margin").lock()->Hide(true);
         findLabel("create-new-program").lock()->Hide(true);
         findField("create-new-program").lock()->Hide(true);
-        displayVariable();
+
     }
     else if (edit == 3)
     {
@@ -114,7 +124,6 @@ void EditSoundScreen::displayEdit()
         findField("end-margin").lock()->Hide(true);
         findLabel("create-new-program").lock()->Hide(true);
         findField("create-new-program").lock()->Hide(true);
-        displayVariable();
     }
     else if (edit == 4)
     {
@@ -231,10 +240,16 @@ void EditSoundScreen::displayVariable()
 		findLabel("new-name").lock()->setText("Insert Snd:");
 		findField("new-name").lock()->setLocation((findLabel("new-name").lock()->getW() * 0.5) + 19 * 2, 21 - 2);
 		string stereo = "";
-		if (!sampler.lock()->getSound(insertSoundNumber).lock()->isMono()) stereo = "(ST)";
+		
+		if (!sampler.lock()->getSound(insertSoundNumber).lock()->isMono())
+		{
+			stereo = "(ST)";
+		}
+
 		findField("new-name").lock()->setText(StrUtil::padRight(sampleName, " ", 16) + stereo);
 	}
-	else if (edit == 7) {
+	else if (edit == 7)
+	{
 		findLabel("new-name").lock()->setSize(9 * 6 * 2, 18);
 		findLabel("new-name").lock()->setText("New name:");
 		findField("new-name").lock()->setLocation((findLabel("new-name").lock()->getW() * 0.5) + (19 * 2), 21 - 2);
@@ -274,7 +289,7 @@ void EditSoundScreen::setInsertSndNr(int i, int soundCount)
     }
 
     insertSoundNumber = i;
-    displayEdit();
+	displayVariable();
 }
 
 void EditSoundScreen::setTimeStretchRatio(int i)
@@ -286,7 +301,7 @@ void EditSoundScreen::setTimeStretchRatio(int i)
 
     timeStretchRatio = i;
     
-    displayEdit();
+	displayVariable();
 }
 
 void EditSoundScreen::setTimeStretchPresetNumber(int i)
@@ -297,7 +312,7 @@ void EditSoundScreen::setTimeStretchPresetNumber(int i)
     }
 
     timeStretchPresetNumber = i;
-    displayEdit();
+	displayVariable();
 }
 
 void EditSoundScreen::setTimeStretchAdjust(int i)
@@ -308,7 +323,7 @@ void EditSoundScreen::setTimeStretchAdjust(int i)
     }
 
     timeStretchAdjust = i;
-    displayEdit();
+	displayVariable();
 }
 
 void EditSoundScreen::setPreviousScreenName(string s)
