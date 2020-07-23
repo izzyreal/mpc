@@ -64,7 +64,7 @@ namespace mpc::lcdgui
 			return {};
 		}
 
-		std::weak_ptr<Component> addChild(std::shared_ptr<Component> child);
+		virtual std::weak_ptr<Component> addChild(std::shared_ptr<Component> child);
 		void removeChild(std::weak_ptr<Component> child);
 		void addChildren(std::vector<std::shared_ptr<Component>> children);
 		std::weak_ptr<Component> findChild(const std::string& name);

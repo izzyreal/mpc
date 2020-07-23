@@ -56,9 +56,9 @@ void EditSoundScreen::open()
 
 void EditSoundScreen::displayEdit()
 {
-	findLabel("edit").lock()->setText("Edit:");
+	//findLabel("edit").lock()->setText("Edit:");
 	findField("edit").lock()->setText(editNames[edit]);
-	displayVariable(); // This can also be avoided by making textfields and labels children of Background.
+	//displayVariable(); // This can also be avoided by making textfields and labels children of Background.
 
     if (edit == 0)
     {
@@ -211,7 +211,7 @@ void EditSoundScreen::displayEdit()
 	// What happens if we draw a background? Will the function keys get drawn again?
 	// Unfortunately they are not. We should think about making things children of background.
 	// For now we'll do this hacky thing.
-	ls.lock()->setFunctionKeysArrangement(0);
+	//ls.lock()->setFunctionKeysArrangement(0);
 }
 
 void EditSoundScreen::displayCreateNewProgram()
@@ -228,17 +228,17 @@ void EditSoundScreen::displayVariable()
 {	
     if (edit == 2)
     {
-		findLabel("new-name").lock()->setSize(9 * 6 * 2, 18);
+		findLabel("new-name").lock()->setSize(9 * 6, 9);
 		findLabel("new-name").lock()->setText("New name:");
-		findField("new-name").lock()->setLocation((findLabel("new-name").lock()->getW() * 0.5) + 19, 21 - 2);
+		findField("new-name").lock()->setLocation(findLabel("new-name").lock()->getW() + 19, 20);
 		findField("new-name").lock()->setText(newName);
 	}
 	else if (edit == 3)
     {
 		auto sampleName = sampler.lock()->getSoundName(insertSoundNumber);
-		findLabel("new-name").lock()->setSize(11 * 6 * 2, 18);
+		findLabel("new-name").lock()->setSize(11 * 6, 9);
 		findLabel("new-name").lock()->setText("Insert Snd:");
-		findField("new-name").lock()->setLocation((findLabel("new-name").lock()->getW() * 0.5) + 19 * 2, 21 - 2);
+		findField("new-name").lock()->setLocation(findLabel("new-name").lock()->getW() + 19, 20);
 		string stereo = "";
 		
 		if (!sampler.lock()->getSound(insertSoundNumber).lock()->isMono())
@@ -250,9 +250,9 @@ void EditSoundScreen::displayVariable()
 	}
 	else if (edit == 7)
 	{
-		findLabel("new-name").lock()->setSize(9 * 6 * 2, 18);
+		findLabel("new-name").lock()->setSize(9 * 6, 9);
 		findLabel("new-name").lock()->setText("New name:");
-		findField("new-name").lock()->setLocation((findLabel("new-name").lock()->getW() * 0.5) + (19 * 2), 21 - 2);
+		findField("new-name").lock()->setLocation(findLabel("new-name").lock()->getW() + 19, 20); // , 20 is that still from the old days?
 		findField("new-name").lock()->setText(newName);
 		findField("ratio").lock()->setText(to_string(timeStretchRatio * 0.01) + "%");
 		findField("preset").lock()->setText(timeStretchPresetNames[timeStretchPresetNumber]);

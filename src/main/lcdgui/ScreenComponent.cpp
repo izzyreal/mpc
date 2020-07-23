@@ -14,6 +14,18 @@ ScreenComponent::ScreenComponent(const string& name, const int layer)
 	background->setName(name);
 }
 
+weak_ptr<Component> ScreenComponent::addChild(shared_ptr<Component> child)
+{
+	auto background = findBackground().lock();
+	
+	if (background)
+	{
+		return background->addChild(child);
+	}
+
+	return Component::addChild(child);
+}
+
 void ScreenComponent::setTransferMap(const map<string, vector<string>>& transferMap)
 {
 	this->transferMap = transferMap;

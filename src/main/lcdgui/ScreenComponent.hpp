@@ -41,6 +41,7 @@ namespace mpc::lcdgui
 		std::weak_ptr<Wave> findWave();
 		std::weak_ptr<TwoDots> findTwoDots();
 		std::weak_ptr<EnvGraph> findEnvGraph();
+		std::weak_ptr<Component> addChild(std::shared_ptr<Component> child) override;
 
 	public:
 		virtual void open() {}
