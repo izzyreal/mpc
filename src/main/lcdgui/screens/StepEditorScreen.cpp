@@ -63,6 +63,8 @@ void StepEditorScreen::open()
 
 	refreshEventRows();
 	refreshSelection();
+
+	ls.lock()->setFocus("a0");
 }
 
 void StepEditorScreen::close()
@@ -70,6 +72,8 @@ void StepEditorScreen::close()
 	init();
 	sequencer.lock()->deleteObserver(this);
 	track.lock()->deleteObserver(this);
+
+	track.lock()->removeDoubles();
 
 	for (auto& e : visibleEvents)
 	{
