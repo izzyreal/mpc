@@ -269,7 +269,7 @@ bool LayeredScreen::transfer(int direction)
 	{
 		if (nextFocusName.compare("_") == 0)
 		{
-			return false;
+			return true;
 		}
 
 		if (setFocus(nextFocusName))

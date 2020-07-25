@@ -5,44 +5,41 @@
 #include <vector>
 #include <string>
 
-namespace mpc {
+namespace mpc::sampler
+{
+	class Program;
+}
 
-	
+namespace mpc::disk
+{
+	class MpcFile;
+}
 
-	namespace sampler {
-		class Program;
-	}
+namespace mpc::disk
+{
+	class ProgramLoader
+	{
+	private:
+		std::thread loadProgramThread;
+		std::weak_ptr<mpc::sampler::Program> result;
 
-	namespace disk {
+		MpcFile* file = nullptr;
+		bool replace = false;
 
-		class MpcFile;
+	public:
+		void loadProgram();
 
-		class ProgramLoader
-		{
+	private:
+		static void static_loadProgram(void* this_p);
 
-		private:
-			std::thread loadProgramThread;
-			std::weak_ptr<mpc::sampler::Program> result;
-			
-			MpcFile* file = nullptr;
-			bool replace = false;
+		void loadSound(std::string soundFileName, std::string ext, MpcFile* soundFile, std::vector<int>* soundsDestIndex, bool replace, int loadSoundIndex);
+		void showPopup(std::string name, std::string ext, int sampleSize);
+		void notfound(std::string soundFileName, std::string ext);
 
-		public:
-			void loadProgram();
+	public:
+		std::weak_ptr<mpc::sampler::Program> get();
 
-		private:
-			static void static_loadProgram(void* this_p);
-			
-			void loadSound(std::string soundFileName, std::string ext, MpcFile* soundFile, std::vector<int>* soundsDestIndex, bool replace, int loadSoundIndex);
-			void showPopup(std::string name, std::string ext, int sampleSize);
-			void notfound(std::string soundFileName, std::string ext);
-
-		public:
-			std::weak_ptr<mpc::sampler::Program> get();
-
-			ProgramLoader(MpcFile* file, bool replace);
-			~ProgramLoader();
-		};
-
-	}
+		ProgramLoader(MpcFile* file, bool replace);
+		~ProgramLoader();
+	};
 }
