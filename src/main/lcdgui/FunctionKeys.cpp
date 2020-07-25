@@ -108,7 +108,7 @@ FunctionKeys::FunctionKeys(const string& name, vector<vector<string>> allTexts, 
 
 	int firstFunctionKey = -1;
 	int lastFunctionKey = -1;
-	
+
 	for (auto& texts : allTexts)
 	{
 		for (int i = 0; i < texts.size(); i++)
@@ -126,10 +126,14 @@ FunctionKeys::FunctionKeys(const string& name, vector<vector<string>> allTexts, 
 		}
 	}
 
-	for (int i = firstFunctionKey; i <= lastFunctionKey; i++)
+	if (firstFunctionKey >= 0)
 	{
-		addChild(make_shared<FunctionKey>("fk" + to_string(i), xPoses[i]));
+		for (int i = firstFunctionKey; i <= lastFunctionKey; i++)
+		{
+			addChild(make_shared<FunctionKey>("fk" + to_string(i), xPoses[i]));
+		}
 	}
+
 	setActiveArrangement(0);
 }
 
