@@ -194,7 +194,7 @@ void Mpc::loadSound(bool replace)
 	{
 		hasNotBeenLoadedAlready = soundLoader.loadSound(loadScreen->getSelectedFile()) == -1;
 	}
-	catch (const invalid_argument& exception)
+	catch (const exception& exception)
 	{
 		MLOG("A problem occurred when trying to load " + loadScreen->getSelectedFileName() + ": " + string(exception.what()));
 		lDisk->setBusy(false);

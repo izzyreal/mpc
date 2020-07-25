@@ -277,7 +277,7 @@ void MixerScreen::right()
 {
 	init();
 
-	if (getXPos() >= 16)
+	if (getXPos() >= 15)
 	{
 		return;
 	}
