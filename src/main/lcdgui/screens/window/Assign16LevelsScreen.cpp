@@ -19,6 +19,14 @@ Assign16LevelsScreen::Assign16LevelsScreen(const int layerIndex)
 {
 }
 
+void Assign16LevelsScreen::open()
+{
+    displayNote();
+    displayParameter();
+    displayType();
+    displayOriginalKeyPad();
+}
+
 void Assign16LevelsScreen::function(int i)
 {
     BaseControls::function(i);
@@ -44,7 +52,7 @@ void Assign16LevelsScreen::turnWheel(int i)
     }
     else if (param.compare("param") == 0)
     {
-        setParameter(parameter + i);
+        setParam(parameter + i);
     }
     else if (param.compare("type") == 0)
     {
@@ -67,7 +75,7 @@ void Assign16LevelsScreen::setNote(int newNote)
     displayNote();
 }
 
-void Assign16LevelsScreen::setParameter(int i)
+void Assign16LevelsScreen::setParam(int i)
 {
     if (i < 0 || i > 1)
     {
@@ -75,12 +83,9 @@ void Assign16LevelsScreen::setParameter(int i)
     }
 
     parameter = i;
+    
     displayParameter();
-
-    if (parameter == 1) {
-        displayType();
-        displayOriginalKeyPad();
-    }
+    displayType();
 }
 
 void Assign16LevelsScreen::setType(int i)
@@ -91,12 +96,14 @@ void Assign16LevelsScreen::setType(int i)
     }
 
     type = i;
+
     displayType();
+    displayOriginalKeyPad();
 }
 
 void Assign16LevelsScreen::setOriginalKeyPad(int i)
 {
-    if (i < 0 || i > 15)
+    if (i < 3 || i > 12)
     {
         return;
     }
@@ -125,10 +132,6 @@ int Assign16LevelsScreen::getParameter()
     return parameter;
 }
 
-
-vector<string> Assign16LevelsScreen::PARAM_NAMES{ "VELOCITY", "NOTE VAR" };
-vector<string> Assign16LevelsScreen::TYPE_NAMES{ "TUNING", "DECAY", "ATTACK", "FILTER" };
-
 void Assign16LevelsScreen::displayNote()
 {
     init();
@@ -144,21 +147,33 @@ void Assign16LevelsScreen::displayNote()
 
 void Assign16LevelsScreen::displayParameter()
 {
-    findField("param").lock()->setText(PARAM_NAMES[parameter]);
-    findField("type").lock()->Hide(parameter != 1);
-    findLabel("type").lock()->Hide(parameter != 1);
-    findField("originalkeypad").lock()->Hide(!(parameter == 1 && type == 0));
-    findLabel("originalkeypad").lock()->Hide(!(parameter == 1 && type == 0));
+    findField("param").lock()->setText(paramNames[parameter]);
 }
 
 void Assign16LevelsScreen::displayType()
 {
-    findField("type").lock()->setText(TYPE_NAMES[type]);
-    findField("originalkeypad").lock()->Hide(type != 0);
-    findLabel("originalkeypad").lock()->Hide(type != 0);
+    displayOriginalKeyPad();
+
+    findField("type").lock()->Hide(parameter != 1);
+    findLabel("type").lock()->Hide(parameter != 1);
+
+    if (parameter != 1)
+    {
+        return;
+    }
+
+    findField("type").lock()->setText(typeNames[type]);
 }
 
 void Assign16LevelsScreen::displayOriginalKeyPad()
 {
+    findField("originalkeypad").lock()->Hide(!(parameter == 1 && type == 0));
+    findLabel("originalkeypad").lock()->Hide(!(parameter == 1 && type == 0));
+
+    if (type != 0)
+    {
+        return;
+    }
+
     findField("originalkeypad").lock()->setTextPadded(originalKeyPad + 1, " ");
 }
