@@ -20,6 +20,8 @@ void MixerSetupScreen::open()
 	displayIndivFxSource();
 	displayCopyPgmMixToDrum();
 	displayRecordMixChanges();
+	auto drumScreen = dynamic_pointer_cast<DrumScreen>(Screens::getScreenComponent("drum"));
+	ls.lock()->setFunctionKeysArrangement(drumScreen->drum);
 }
 
 void MixerSetupScreen::displayMasterLevel() {

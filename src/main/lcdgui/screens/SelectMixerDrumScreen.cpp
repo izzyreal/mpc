@@ -28,4 +28,8 @@ void SelectMixerDrumScreen::function(int i)
 		mpc.setPreviousSamplerScreenName(currentScreenName);
 		ls.lock()->openScreen("mixer");
 	}
+	else if (i == 4)
+	{
+		ls.lock()->openScreen("mixer-setup");
+	}
 }
