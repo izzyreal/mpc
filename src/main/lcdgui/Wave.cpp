@@ -72,7 +72,7 @@ void Wave::initSamplesPerPixel()
 	}
 	else
 	{
-		samplesPerPixel = (float)frames / (float)width;
+		samplesPerPixel = (float)frameCount / (float)width;
 	}
 }
 
@@ -84,10 +84,10 @@ void Wave::setCenterSamplePos(unsigned int centerSamplePos)
 
 void Wave::setSampleData(vector<float>* sampleData, bool mono, unsigned int view)
 {
-	auto newFrames = mono ? sampleData->size() : (sampleData->size() * 0.5);
+	auto newFrameCount = sampleData != nullptr ? (mono ? sampleData->size() : (sampleData->size() * 0.5)) : 0;
 
 	if (this->sampleData == sampleData &&
-		newFrames == frames &&
+		newFrameCount == frameCount &&
 		this->mono == mono && this->view == view)
 	{
 		return;
@@ -97,13 +97,14 @@ void Wave::setSampleData(vector<float>* sampleData, bool mono, unsigned int view
 
 	if (sampleData == nullptr)
 	{
+		frameCount = 0;
 		return;
 	}
 
 	this->mono = mono;
 	this->view = view;
 	
-	frames = newFrames;
+	frameCount = newFrameCount;
 	
 	initSamplesPerPixel();
 	SetDirty();
@@ -139,7 +140,7 @@ void Wave::makeLine(std::vector<std::vector<std::vector<int>>>* lines, std::vect
 	
 	if (!mono && view == 1)
 	{
-		offset += frames;
+		offset += frameCount;
 	}
 
 	if (offset < 0 || offset >= sampleData->size() && !fine)
@@ -147,12 +148,12 @@ void Wave::makeLine(std::vector<std::vector<std::vector<int>>>* lines, std::vect
 		return;
 	}
 	
-	if (!mono && view == 0 && offset > frames && !fine)
+	if (!mono && view == 0 && offset > frameCount && !fine)
 	{
 		return;
 	}
 
-	if (!mono && view == 1 && offset < frames && !fine)
+	if (!mono && view == 1 && offset < frameCount && !fine)
 	{
 		return;
 	}
@@ -234,7 +235,7 @@ void Wave::makeLine(std::vector<std::vector<std::vector<int>>>* lines, std::vect
 		{
 			if (fine)
 			{
-				if (samplePos + samplesPerPixel >= frames)
+				if (samplePos + samplesPerPixel >= frameCount)
 				{
 					colors->push_back(false);
 				}
@@ -253,7 +254,7 @@ void Wave::makeLine(std::vector<std::vector<std::vector<int>>>* lines, std::vect
 		{
 			if (fine)
 			{
-				if (samplePos + samplesPerPixel >= frames)
+				if (samplePos + samplesPerPixel >= frameCount)
 				{
 					colors->push_back(false);
 				}

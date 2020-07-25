@@ -15,7 +15,7 @@ namespace mpc::lcdgui
 		bool mono{ true };
 		unsigned int view{ 0 };
 		float samplesPerPixel{ 1.0f };
-		unsigned int frames{ 0 };
+		unsigned int frameCount{ 0 };
 		float exp{ 1.0f };
 		unsigned int selectionStart{ 0 };	// normal view only
 		unsigned int selectionEnd{ 0 };		// normal view only
