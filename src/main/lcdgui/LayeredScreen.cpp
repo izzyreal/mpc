@@ -33,7 +33,7 @@ using namespace moduru::lang;
 using namespace rapidjson;
 using namespace std;
 
-static moduru::gui::BMFParser _bmfParser = moduru::gui::BMFParser(string(mpc::Paths::resPath() + moduru::file::FileUtil::getSeparator() + "font.fnt"));
+static moduru::gui::BMFParser _bmfParser = moduru::gui::BMFParser(string(mpc::Paths::resPath() + moduru::file::FileUtil::getSeparator() + "mpc2000xl-font.fnt"));
 
 std::vector<std::vector<bool>> LayeredScreen::atlas = _bmfParser.getAtlas();
 moduru::gui::bmfont LayeredScreen::font = _bmfParser.getLoadedFont();

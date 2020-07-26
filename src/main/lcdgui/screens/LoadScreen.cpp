@@ -202,7 +202,7 @@ void LoadScreen::displayView()
 
 void LoadScreen::displayDirectory()
 {
-	findLabel("directory").lock()->setText(u8"\u00C2:" + mpc.getDisk().lock()->getDirectoryName());
+	findLabel("directory").lock()->setText(u8"\u00C2" + mpc.getDisk().lock()->getDirectoryName());
 }
 
 void LoadScreen::displayFreeSnd()
