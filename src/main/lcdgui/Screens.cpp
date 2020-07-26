@@ -8,6 +8,8 @@
 #include <lcdgui/FunctionKeys.hpp>
 #include <lcdgui/ScreenComponent.hpp>
 
+#include <lcdgui/screens/StaticScreen.hpp>
+
 #include <lcdgui/screens/SequencerScreen.hpp>
 #include <lcdgui/screens/AssignScreen.hpp>
 #include <lcdgui/screens/BarsScreen.hpp>
@@ -787,71 +789,71 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	else if (screenName.compare("save-aps-file") == 0)
 	{
 		screen = make_shared<SaveApsFileScreen>(layerIndex);
-	}	
+	}
 	else if (screenName.compare("delete-all-files") == 0)
 	{
 		screen = make_shared<DeleteAllFilesScreen>(layerIndex);
-	}	
+	}
 	else if (screenName.compare("delete-file") == 0)
 	{
 		screen = make_shared<DeleteFileScreen>(layerIndex);
-	}	
+	}
 	else if (screenName.compare("delete-folder") == 0)
 	{
 		screen = make_shared<DeleteFolderScreen>(layerIndex);
-	}	
+	}
 	else if (screenName.compare("cant-find-file") == 0)
 	{
 		screen = make_shared<CantFindFileScreen>(layerIndex);
-	}	
+	}
 	else if (screenName.compare("file-already-exists") == 0)
 	{
 		screen = make_shared<FileAlreadyExistsScreen>(layerIndex);
-	}	
+	}
 	else if (screenName.compare("name") == 0)
 	{
 		screen = make_shared<NameScreen>(layerIndex);
-	}	
+	}
 	else if (screenName.compare("vmpc-disk") == 0)
 	{
 		screen = make_shared<VmpcDiskScreen>(layerIndex);
-	}	
+	}
 	else if (screenName.compare("vmpc-settings") == 0)
 	{
 		screen = make_shared<VmpcSettingsScreen>(layerIndex);
-	}	
+	}
 	else if (screenName.compare("vmpc-direct-to-disk-recorder") == 0)
 	{
 		screen = make_shared<VmpcDirectToDiskRecorderScreen>(layerIndex);
-	}	
+	}
 	else if (screenName.compare("vmpc-record-jam") == 0)
 	{
 		screen = make_shared<VmpcRecordJamScreen>(layerIndex);
-	}	
+	}
 	else if (screenName.compare("vmpc-recording-finished") == 0)
 	{
 		screen = make_shared<VmpcRecordingFinishedScreen>(layerIndex);
-	}	
+	}
 	else if (screenName.compare("ver") == 0)
 	{
 		screen = make_shared<VerScreen>(layerIndex);
-	}	
+	}
 	else if (screenName.compare("init") == 0)
 	{
 		screen = make_shared<InitScreen>(layerIndex);
-	}	
+	}
 	else if (screenName.compare("second-seq") == 0)
 	{
 		screen = make_shared<SecondSeqScreen>(layerIndex);
-	}	
+	}
 	else if (screenName.compare("trans") == 0)
 	{
 		screen = make_shared<TransScreen>(layerIndex);
-	}	
+	}
 	else if (screenName.compare("transpose-permanent") == 0)
 	{
 		screen = make_shared<TransposePermanentScreen>(layerIndex);
-	}	
+	}
 	else if (screenName.compare("punch") == 0)
 	{
 		screen = make_shared<PunchScreen>(layerIndex);
@@ -863,6 +865,17 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	else if (screenName.compare("popup") == 0)
 	{
 		screen = make_shared<PopupScreen>();
+	}
+	
+	// We break up the else-if chain due to "C1061 Compiler limit: blocks nested too deeply" on Visual Studio
+	
+	if (screenName.compare("mpc2000xl") == 0 ||
+		screenName.compare("black") == 0 ||
+		screenName.compare("half-black") == 0 ||
+		screenName.compare("empty") == 0)
+	{
+		screen = make_shared<StaticScreen>();
+		screen->findChild<Background>("").lock()->setName(screenName);
 	}
 
 	if (screen)
