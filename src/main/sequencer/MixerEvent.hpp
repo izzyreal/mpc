@@ -1,31 +1,29 @@
 #pragma once
 #include <sequencer/Event.hpp>
 
-namespace mpc {
-	namespace sequencer {
+namespace mpc::sequencer
+{
+	class MixerEvent
+		: public Event
+	{
 
-		class MixerEvent
-			: public Event
-		{
+	private:
+		int mixerParameter{ 0 };
+		int padNumber{ 0 };
+		int mixerParameterValue{ 0 };
 
-		private:
-			int mixerParameter{ 0 };
-			int padNumber{ 0 };
-			int mixerParameterValue{ 0 };
+	public:
+		void setParameter(int i);
+		int getParameter();
+		void setPadNumber(int i);
+		int getPad();
+		void setValue(int i);
+		int getValue();
 
-		public:
-			void setParameter(int i);
-			int getParameter();
-			void setPadNumber(int i);
-			int getPad();
-			void setValue(int i);
-			int getValue();
+		void CopyValuesTo(std::weak_ptr<Event> dest) override;
 
-			void CopyValuesTo(std::weak_ptr<Event> dest) override;
+		MixerEvent();
+		std::string getTypeName() override { return "mixer"; }
 
-			MixerEvent();
-
-		};
-
-	}
+	};
 }

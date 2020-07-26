@@ -19,6 +19,7 @@ namespace mpc::sequencer
 		std::vector<unsigned char>& getBytes();
 
 		void CopyValuesTo(std::weak_ptr<Event> dest) override;
+		std::string getTypeName() override { return "system-exclusive"; }
 
 	};
 }

@@ -51,15 +51,14 @@ namespace mpc::lcdgui::screens
 		void setViewNotesText();
 
 	private:
-		const std::vector<std::string> viewNames = { "ALL EVENTS", "NOTES", "PITCH BEND", "CTRL:", "PROG CHANGE", "CH PRESSURE", "POLY PRESS", "EXCLUSIVE" };
+		const std::vector<std::string> viewNames { "ALL EVENTS", "NOTES", "PITCH BEND", "CTRL:", "PROG CHANGE", "CH PRESSURE", "POLY PRESS", "EXCLUSIVE" };
 		std::shared_ptr<mpc::sequencer::EmptyEvent> emptyEvent = std::make_shared<mpc::sequencer::EmptyEvent>();
 		std::vector<std::weak_ptr<mpc::sequencer::Event>> visibleEvents;
 		std::vector <std::weak_ptr<mpc::sequencer::Event>> eventsAtCurrentTick;
 		std::vector<std::weak_ptr<mpc::sequencer::Event>> placeHolder;
 		std::weak_ptr<mpc::sequencer::Event> selectedEvent;
 		std::vector<std::weak_ptr<mpc::sequencer::Event>> selectedEvents;
-		std::string lastColumn = "a";
-		std::map<std::string, std::string> lastColumn_;
+		std::map<std::string, std::string> lastColumn;
 
 		int view = 0;
 		int noteA = 0;

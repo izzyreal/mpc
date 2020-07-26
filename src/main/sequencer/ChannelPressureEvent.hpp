@@ -3,25 +3,23 @@
 
 #include <memory>
 
-namespace mpc {
-	namespace sequencer {
+namespace mpc::sequencer
+{
+	class ChannelPressureEvent
+		: public Event
+	{
 
-		class ChannelPressureEvent
-			: public Event
-		{
+	private:
+		int channelPressureValue{ 0 };
 
-		private:
-			int channelPressureValue{ 0 };
+	public:
+		void setAmount(int i);
+		int getAmount();
 
-		public:
-			void setAmount(int i);
-			int getAmount();
+		void CopyValuesTo(std::weak_ptr<Event> dest) override;
 
-			void CopyValuesTo(std::weak_ptr<Event> dest) override;
+		ChannelPressureEvent();
+		std::string getTypeName() override { return "channel-pressure"; }
 
-			ChannelPressureEvent();
-
-		};
-
-	}
+	};
 }

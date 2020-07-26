@@ -28,6 +28,18 @@ const int EVENT_ROW_COUNT = 4;
 StepEditorScreen::StepEditorScreen(const int layerIndex)
 	: ScreenComponent("step-editor", layerIndex)
 {
+	lastColumn["empty"] = "a";
+	lastColumn["channel-pressure"] = "a";
+	lastColumn["control-change"] = "a";
+	lastColumn["midi-clock"] = "a";
+	lastColumn["mixer"] = "a";
+	lastColumn["note"] = "a";
+	lastColumn["pitch-bend"] = "a";
+	lastColumn["poly-pressure"] = "a";
+	lastColumn["program-change"] = "a";
+	lastColumn["system-exclusive"] = "a";
+	lastColumn["tempo-change"] = "a";
+
 	for (int i = 0; i < EVENT_ROW_COUNT; i++)
 	{
 		addChild(make_shared<EventRow>(i)).lock();
@@ -64,7 +76,14 @@ void StepEditorScreen::open()
 	refreshEventRows();
 	refreshSelection();
 
-	ls.lock()->setFocus("a0");
+	auto previousScreen = ls.lock()->getPreviousScreenName();
+
+	if (previousScreen.compare("step-timing-correct") != 0 &&
+		previousScreen.compare("insert-event") != 0 &&
+		previousScreen.compare("paste-event") != 0)
+	{
+		ls.lock()->setFocus("a0");
+	}
 }
 
 void StepEditorScreen::close()
@@ -109,6 +128,8 @@ void StepEditorScreen::function(int i)
 		}
 		break;
 	case 2:
+	{
+		auto rowIndex = stoi(param.substr(1, 2));
 		if (selectionStartIndex != -1)
 		{
 			removeEvents();
@@ -117,8 +138,6 @@ void StepEditorScreen::function(int i)
 		}
 		else if (param.length() == 2)
 		{
-			auto rowIndex = stoi(param.substr(1, 2));
-		
 			if (!dynamic_pointer_cast<EmptyEvent>(visibleEvents[rowIndex].lock()))
 			{
 				for (int i = 0; i < track.lock()->getEvents().size(); i++)
@@ -128,13 +147,6 @@ void StepEditorScreen::function(int i)
 						track.lock()->removeEvent(i);
 						break;
 					}
-				}
-
-				// Here we check whether the removed event was the last (non-empty) visible event.
-				// If yes, we make sure the empty event's field has focus.
-				if (dynamic_pointer_cast<EmptyEvent>(visibleEvents[rowIndex + 1].lock()))
-				{
-					ls.lock()->setFocus("a" + to_string(rowIndex));
 				}
 
 				if (rowIndex == 2 && yOffset > 0)
@@ -148,7 +160,11 @@ void StepEditorScreen::function(int i)
 		refreshEventRows();
 		refreshSelection();
 
+		auto eventType = visibleEvents[rowIndex].lock()->getTypeName();
+
+		ls.lock()->setFocus(lastColumn[eventType] + to_string(rowIndex));
 		break;
+	}
 	case 3:
 	{
 		bool posIsLastTick = sequencer.lock()->getTickPosition() == sequencer.lock()->getActiveSequence().lock()->getLastTick();
@@ -558,7 +574,8 @@ void StepEditorScreen::up()
 		if (!controls->isShiftPressed() && srcNumber == 0 && yOffset == 0)
 		{
 			clearSelection();
-			lastColumn = srcLetter;
+			auto eventType = visibleEvents[srcNumber].lock()->getTypeName();
+			lastColumn[eventType] = srcLetter;
 			ls.lock()->setFocus("view");
 			refreshSelection();
 			return;
@@ -566,12 +583,19 @@ void StepEditorScreen::up()
 		
 		if (srcNumber == 0 && yOffset != 0)
 		{
+			auto oldEventType = visibleEvents[srcNumber].lock()->getTypeName();
+			lastColumn[oldEventType] = srcLetter;
+
 			setyOffset(yOffset - 1);
+
+			auto newEventType = visibleEvents[srcNumber].lock()->getTypeName();
+			ls.lock()->setFocus(lastColumn[newEventType] + to_string(srcNumber));
 
 			if (controls->isShiftPressed())
 			{
 				setSelectionEndIndex(srcNumber + yOffset);
 			}
+			return;
 		}
 
 		downOrUp(-1);
@@ -584,12 +608,14 @@ void StepEditorScreen::down()
 
 	if (param.compare("view") == 0 || param.find("now") != string::npos)
 	{
+		auto eventType = visibleEvents[0].lock()->getTypeName();
+		
 		if (dynamic_pointer_cast<EmptyEvent>(visibleEvents[0].lock()))
 		{
-			lastColumn = "a";
+			lastColumn[eventType] = "a";
 		}
 
-		ls.lock()->setFocus(lastColumn + "0");
+		ls.lock()->setFocus(lastColumn[eventType] + "0");
 		return;
 	}
 	
@@ -607,15 +633,15 @@ void StepEditorScreen::down()
 				return;
 			}
 			
+			auto oldEventType = visibleEvents[srcNumber].lock()->getTypeName();
+			lastColumn[oldEventType] = srcLetter;
+
 			setyOffset(yOffset + 1);
 
-			auto focus = ls.lock()->getFocus();
-			auto comp = findField(focus).lock();
+			auto newEventType = visibleEvents[srcNumber].lock()->getTypeName();
+			auto newColumn = lastColumn[newEventType];
 
-			if (comp->IsHidden())
-			{
-				ls.lock()->setFocus("a3");
-			}
+			ls.lock()->setFocus(newColumn + "3");
 
 			if (controls->isShiftPressed() && dynamic_pointer_cast<EmptyEvent>(visibleEvents[3].lock()))
 			{
@@ -653,20 +679,13 @@ void StepEditorScreen::downOrUp(int increment)
 		
 		if (srcNumber + increment != -1)
 		{
-			if (!(controls->isShiftPressed() && dynamic_pointer_cast<EmptyEvent>(visibleEvents[(int)(srcNumber + increment)].lock())))
+			if (!controls->isShiftPressed() && visibleEvents[srcNumber + increment].lock())
 			{
-				auto tf = findField(destination).lock();
-				if (tf)
-				{
-					if (!tf->IsHidden())
-					{
-						ls.lock()->setFocus(tf->getName());
-					}
-					else
-					{
-						ls.lock()->setFocus("a" + to_string(srcNumber + increment));
-					}
-				}
+				auto oldEventType = visibleEvents[srcNumber].lock()->getTypeName();
+				lastColumn[oldEventType] = srcLetter;
+
+				auto newEventType = visibleEvents[srcNumber + increment].lock()->getTypeName();
+				ls.lock()->setFocus(lastColumn[newEventType] + to_string(srcNumber + increment));
 			}
 		}
 
@@ -674,7 +693,8 @@ void StepEditorScreen::downOrUp(int increment)
 		{
 			setSelectionEndIndex(srcNumber + increment + yOffset);
 		}
-		else {
+		else
+		{
 			checkSelection();
 			refreshSelection();
 		}
@@ -959,6 +979,7 @@ void StepEditorScreen::setView(int i)
 	}
 
 	view = i;
+
 	refreshViewNotes();
 	setViewNotesText();
 	setyOffset(0);
