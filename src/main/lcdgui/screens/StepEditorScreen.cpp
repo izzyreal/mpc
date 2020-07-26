@@ -92,7 +92,14 @@ void StepEditorScreen::close()
 	sequencer.lock()->deleteObserver(this);
 	track.lock()->deleteObserver(this);
 
-	track.lock()->removeDoubles();
+	auto nextScreen = ls.lock()->getCurrentScreenName();
+
+	if (nextScreen.compare("step-timing-correct") != 0 &&
+		nextScreen.compare("insert-event") != 0 &&
+		nextScreen.compare("paste-event") != 0)
+	{
+		track.lock()->removeDoubles();
+	}
 
 	for (auto& e : visibleEvents)
 	{
