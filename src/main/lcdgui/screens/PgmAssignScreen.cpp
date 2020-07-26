@@ -69,7 +69,7 @@ void PgmAssignScreen::turnWheel(int i)
 	init();
 
 	auto lastPad = sampler.lock()->getLastPad(program.lock().get());
-	auto lastNoteParameters = dynamic_cast<mpc::sampler::NoteParameters*>(program.lock()->getNoteParameters(lastPad->getNote()));
+	auto lastNoteParameters = sampler.lock()->getLastNp(program.lock().get());
 
 	if (param.compare("pad-assign") == 0)
 	{
@@ -314,13 +314,15 @@ void PgmAssignScreen::displaySoundGenerationMode()
 		
 		if (sgm == 2 || sgm == 3)
 		{
-			findLabel("optional-note-a").lock()->setText("over:   , use:");
-			findLabel("optional-note-b").lock()->setText("over:   , use:");
+			findLabel("optional-note-a").lock()->setText("over:    , use:");
+			findLabel("optional-note-b").lock()->setText("over:    , use:");
 			
 			findLabel("velocity-range-lower").lock()->Hide(false);
 			findField("velocity-range-lower").lock()->Hide(false);
 			findLabel("velocity-range-upper").lock()->Hide(false);
 			findField("velocity-range-upper").lock()->Hide(false);
+			bringToFront(findField("velocity-range-lower").lock().get());
+			bringToFront(findField("velocity-range-upper").lock().get());
 			
 			displayVeloRangeLower();
 			displayVeloRangeUpper();

@@ -14,12 +14,12 @@ using namespace std;
 PgmParamsScreen::PgmParamsScreen(const int layerIndex) 
 	: ScreenComponent("program-params", layerIndex)
 {
+	addChild(make_shared<EnvGraph>());
 }
 
 void PgmParamsScreen::open()
 {
 	mpc.addObserver(this);
-	addChild(make_shared<EnvGraph>());
 	displayPgm();
 	displayNote();
 	displayDecayMode();
