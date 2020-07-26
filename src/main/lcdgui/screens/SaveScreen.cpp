@@ -3,6 +3,7 @@
 #include <Paths.hpp>
 #include <sequencer/Track.hpp>
 #include <lcdgui/screens/window/NameScreen.hpp>
+#include <disk/AbstractDisk.hpp>
 
 #include <Util.hpp>
 
@@ -25,6 +26,7 @@ void SaveScreen::open()
 	displayType();
 	displayFile();
 	displayFree();
+	displayDirectory();
 
 	findField("device").lock()->setText("SCSI-1");
 }
@@ -160,7 +162,7 @@ void SaveScreen::displayFile()
 		file = program.lock()->getName();
 		break;
 	case 4:
-		file = string(sampler.lock()->getSoundCount() == 0 ? "" : sampler.lock()->getSound().lock()->getName());
+		file = string(sampler.lock()->getSoundCount() == 0 ? " (No sound)" : sampler.lock()->getSound().lock()->getName());
 		break;
 	case 5:
 		file = "MPC2KXL         .BIN";
@@ -203,4 +205,9 @@ void SaveScreen::displayFree()
 {
 	auto freeFormatted = FileUtil::getFreeDiskSpaceFormatted(mpc::Paths::home());
 	findLabel("free").lock()->setText(freeFormatted);
+}
+
+void SaveScreen::displayDirectory()
+{
+	findLabel("directory").lock()->setText(u8"\u00C2" + mpc.getDisk().lock()->getDirectoryName());
 }

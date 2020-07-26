@@ -25,6 +25,7 @@ namespace mpc::lcdgui::screens
 		void displayFile();
 		void displaySize();
 		void displayFree();
+		void displayDirectory();
 
 	};
 }
