@@ -1,13 +1,17 @@
 #include "SaveScreen.hpp"
 
+#include <Paths.hpp>
 #include <sequencer/Track.hpp>
 #include <lcdgui/screens/window/NameScreen.hpp>
 
 #include <Util.hpp>
 
+#include <file/FileUtil.hpp>
+
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace moduru::lang;
+using namespace moduru::file;
 using namespace std;
 
 SaveScreen::SaveScreen(const int layerIndex) 
@@ -68,7 +72,7 @@ void SaveScreen::function(int i)
 			break;
 		case 3:
 			nameScreen->setName(mpc::Util::getFileName(lProgram->getName()));
-			ls.lock()->openScreen("saveaprogram");
+			ls.lock()->openScreen("save-a-program");
 			break;
 		case 4:
 			if (sampler.lock()->getSoundCount() == 0)
@@ -158,6 +162,8 @@ void SaveScreen::displayFile()
 	case 4:
 		file = string(sampler.lock()->getSoundCount() == 0 ? "" : sampler.lock()->getSound().lock()->getName());
 		break;
+	case 5:
+		file = "MPC2KXL         .BIN";
 	}
 
 	findField("file").lock()->setText(file);
@@ -195,6 +201,6 @@ void SaveScreen::displaySize()
 
 void SaveScreen::displayFree()
 {
-	//auto freeFormatted = moduru::file::FileUtil::getFreeDiskSpaceFormatted(mpc::StartUp::storesPath);
-	findLabel("free").lock()->setText("0GB");
+	auto freeFormatted = FileUtil::getFreeDiskSpaceFormatted(mpc::Paths::home());
+	findLabel("free").lock()->setText(freeFormatted);
 }

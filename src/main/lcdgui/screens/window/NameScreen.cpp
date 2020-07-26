@@ -182,7 +182,7 @@ void NameScreen::saveName()
 	{
 		editing = false;
 		ls.lock()->setLastFocus("name", "0");
-		ls.lock()->openScreen("saveaprogram");
+		ls.lock()->openScreen("save-a-program");
 		return;
 	}
 	else if (parameterName.compare("savingaps") == 0)

@@ -32,7 +32,7 @@ void FileAlreadyExistsScreen::function(int i)
 		auto disk = mpc.getDisk().lock();
 		auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
 
-		if (ls.lock()->getPreviousScreenName().compare("saveaprogram") == 0)
+		if (ls.lock()->getPreviousScreenName().compare("save-a-program") == 0)
 		{
 			auto pfileName = mpc::Util::getFileName(nameScreen->getName()) + ".PGM";
 			auto success = disk->getFile(pfileName)->del();
@@ -125,7 +125,7 @@ void FileAlreadyExistsScreen::function(int i)
 	{
 		auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
 
-		if (ls.lock()->getPreviousScreenName().compare("saveaprogram") == 0)
+		if (ls.lock()->getPreviousScreenName().compare("save-a-program") == 0)
 		{
 			nameScreen->parameterName ="savingpgm";
 			ls.lock()->openScreen("name");

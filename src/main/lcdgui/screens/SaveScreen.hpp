@@ -16,7 +16,7 @@ namespace mpc::lcdgui::screens
 		void open() override;
 
 	private:
-		const std::vector<std::string> types{ "Save All Sequences & Songs", "Save a Sequence", "Save All Program and Sounds", "Save a Program & Sounds", "Save a Sound", "Copy Operating System" };
+		const std::vector<std::string> types{ u8"Save All Sequences\u00CE&\u00CESongs", "Save a Sequence", u8"Save All Programs\u00CE&\u00CESounds", "Save a Program & Sounds", "Save a Sound", "Copy Operating System" };
 
 		int type = 0;
 		void setType(int i);
