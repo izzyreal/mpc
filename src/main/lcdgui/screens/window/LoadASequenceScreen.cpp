@@ -12,6 +12,7 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace moduru::file;
 using namespace moduru::lang;
+using namespace std;
 
 LoadASequenceScreen::LoadASequenceScreen(const int layerIndex) 
 	: ScreenComponent("load-a-sequence", layerIndex)

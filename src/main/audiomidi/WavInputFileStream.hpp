@@ -15,12 +15,12 @@ static const int EXPECTED_FMT_DATA_SIZE = 16;
 std::ifstream wav_init_ifstream(const std::string& path)
 {
 #ifdef _WIN32
-    auto result = moduru::file::FileUtil::ifstreamw(path, ios::in | ios::binary);
-    result.unsetf(ios_base::skipws);
+    auto result = moduru::file::FileUtil::ifstreamw(path, std::ios::in | std::ios::binary);
+    result.unsetf(std::ios_base::skipws);
     return result;
 #else
-    std::ifstream result(path.c_str(), ios::in | ios::binary);
-    result.unsetf(ios_base::skipws);
+    std::ifstream result(path.c_str(), std::ios::in | std::ios::binary);
+    result.unsetf(std::ios_base::skipws);
 	return result;
 #endif
 }

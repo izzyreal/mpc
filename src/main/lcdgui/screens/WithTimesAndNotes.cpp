@@ -12,6 +12,7 @@
 
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui::screens;
+using namespace std;
 
 bool WithTimesAndNotes::checkAllTimes(int notch, Sequence* seq)
 {

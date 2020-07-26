@@ -10,6 +10,7 @@
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui::screens::window;
 using namespace moduru::lang;
+using namespace std;
 
 TempoChangeScreen::TempoChangeScreen(const int layerIndex)
 	: ScreenComponent("tempo-change", layerIndex)

@@ -311,7 +311,8 @@ void Component::setSize(int w, int h)
 
 	if (!(this->w == -1 && this->h == -1))
 	{
-		preDrawClearRect = preDrawClearRect.Union(&getRect());
+		auto rect = getRect();
+		preDrawClearRect = preDrawClearRect.Union(&rect);
 	}
 
 	this->w = w;
@@ -328,7 +329,8 @@ void Component::setLocation(int x, int y)
 
 	if (!(this->x == -1 && this->y == -1))
 	{
-		preDrawClearRect = preDrawClearRect.Union(&getRect());
+		auto rect = getRect();
+		preDrawClearRect = preDrawClearRect.Union(&rect);
 	}
 
 	this->x = x;
@@ -342,7 +344,8 @@ MRECT Component::getDirtyArea()
 
 	for (auto c : children)
 	{
-		res = res.Union(&c->getDirtyArea());
+		auto rect = c->getDirtyArea();
+		res = res.Union(&rect);
 	}
 
 	if (dirty)

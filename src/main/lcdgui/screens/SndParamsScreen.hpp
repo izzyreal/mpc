@@ -17,7 +17,7 @@ namespace mpc::lcdgui::screens
 		void open() override;
 
 	private:
-		const std::vector<std::string> playXNames = vector<string>{ "ALL", "ZONE", "BEFOR ST", "BEFOR TO", "AFTR END" };
+		const std::vector<std::string> playXNames = std::vector<std::string>{ "ALL", "ZONE", "BEFOR ST", "BEFOR TO", "AFTR END" };
 		void displayLevel();
 		void displayTune();
 		void displayBeat();

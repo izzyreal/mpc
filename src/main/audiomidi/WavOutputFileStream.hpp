@@ -10,7 +10,7 @@ static const int DATA_CHUNK_ID{ 1635017060 };
 
 std::ofstream wav_init_ofstream(const std::string& path)
 {
-    std::ofstream result(path.c_str(), ios::out | ios::binary);
+    std::ofstream result(path.c_str(), std::ios::out | std::ios::binary);
 	return result;
 }
 

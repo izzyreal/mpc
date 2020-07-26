@@ -14,6 +14,7 @@
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
+using namespace std;
 
 SequencerScreen::SequencerScreen(const int layerIndex)
 	: ScreenComponent("sequencer", layerIndex)

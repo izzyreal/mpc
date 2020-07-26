@@ -13,6 +13,7 @@
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui;
 using namespace moduru::lang;
+using namespace std;
 
 MixerStrip::MixerStrip(int columnIndex)
 	: Component("mixer-strip")

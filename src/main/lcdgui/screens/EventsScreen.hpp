@@ -46,9 +46,9 @@ namespace mpc::lcdgui::screens
 
 	private:
 		int tab = 0;
-		const std::vector<string> tabNames{ "events", "bars", "tr-move", "user" };
-		const std::vector<string> modeNames{ "ADD VALUE", "SUB VALUE", "MULTI VAL%", "SET TO VAL" };
-		const std::vector<string> functionNames{ "COPY", "DURATION", "VELOCITY", "TRANSPOSE" };
+		const std::vector<std::string> tabNames{ "events", "bars", "tr-move", "user" };
+		const std::vector<std::string> modeNames{ "ADD VALUE", "SUB VALUE", "MULTI VAL%", "SET TO VAL" };
+		const std::vector<std::string> functionNames{ "COPY", "DURATION", "VELOCITY", "TRANSPOSE" };
 		bool modeMerge = false;
 		int editFunctionNumber = 0;
 		int fromTr = 0;

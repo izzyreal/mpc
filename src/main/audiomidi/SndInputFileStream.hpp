@@ -22,14 +22,14 @@ const int SAMPLE_RATE_INDEX = 40; // 2 byte unsigned short
 
 std::ifstream snd_init_ifstream(const std::string& path)
 {
-    auto result = moduru::file::FileUtil::ifstreamw(path.c_str(), ios::in | ios::binary);
-    result.unsetf(ios_base::skipws);
-	return result;
+    auto result = moduru::file::FileUtil::ifstreamw(path.c_str(), std::ios::in | std::ios::binary);
+    result.unsetf(std::ios_base::skipws);
+    return result;
 }
 
 void snd_read_bytes(std::ifstream& stream, const std::vector<char>& bytes, const int maxLength)
 {
-    auto byteCountToRead = min((int)bytes.size(), maxLength);
+    auto byteCountToRead = std::min((int)bytes.size(), maxLength);
     stream.read((char*)(&bytes[0]), byteCountToRead);
 }
 

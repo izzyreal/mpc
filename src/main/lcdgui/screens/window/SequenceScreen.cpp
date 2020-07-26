@@ -3,6 +3,7 @@
 #include <lcdgui/screens/window/NameScreen.hpp>
 
 using namespace mpc::lcdgui::screens::window;
+using namespace std;
 
 SequenceScreen::SequenceScreen(const int layerIndex)
 	: ScreenComponent("sequence", layerIndex)

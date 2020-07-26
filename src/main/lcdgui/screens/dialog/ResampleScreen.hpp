@@ -21,8 +21,8 @@ namespace mpc::lcdgui::screens::dialog
 		void open() override;
 
 	private:
-		const std::vector<std::string> qualityNames = vector<string>{ "LOW", "MED", "HIGH" };
-		const std::vector<std::string> bitNames = vector<string>{ "16", "12", "8" };
+		const std::vector<std::string> qualityNames = std::vector<std::string>{ "LOW", "MED", "HIGH" };
+		const std::vector<std::string> bitNames = std::vector<std::string>{ "16", "12", "8" };
 		
 		void displayNewFs();
 		void displayQuality();

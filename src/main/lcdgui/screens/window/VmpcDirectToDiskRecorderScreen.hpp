@@ -61,7 +61,7 @@ namespace mpc::lcdgui::screens::window
 		void displayNotes() override {} // We don't have notes in this screen
 
 		friend class NameScreen;
-		friend class EventHandler;
+		friend class mpc::audiomidi::EventHandler;
 
 	};
 }

@@ -8,6 +8,8 @@
 #include <lang/StrUtil.hpp>
 #include <lang/utf8_decode.h>
 
+#include <cmath>
+
 using namespace mpc::lcdgui;
 using namespace moduru::lang;
 using namespace std;
