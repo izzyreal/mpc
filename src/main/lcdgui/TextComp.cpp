@@ -68,7 +68,7 @@ void TextComp::Draw(std::vector<std::vector<bool>>* pixels)
 		{
 			for (int y1 = 0; y1 < current_char.height; y1++)
 			{
-				bool on = (*atlas)[atlasx + x1][atlasy + y1 + 1];
+				bool on = (*atlas)[atlasy + y1][atlasx + x1];
 			
 				if (on)
 				{

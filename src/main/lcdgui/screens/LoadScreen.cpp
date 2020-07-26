@@ -202,7 +202,7 @@ void LoadScreen::displayView()
 
 void LoadScreen::displayDirectory()
 {
-	findField("directory").lock()->setText(mpc.getDisk().lock()->getDirectoryName());
+	findLabel("directory").lock()->setText(u8"\u00C2:" + mpc.getDisk().lock()->getDirectoryName());
 }
 
 void LoadScreen::displayFreeSnd()
@@ -290,7 +290,14 @@ mpc::disk::MpcFile* LoadScreen::getSelectedFile()
 
 string LoadScreen::getSelectedFileName()
 {
-	return mpc.getDisk().lock()->getFileNames()[fileLoad];
+	auto fileNames = mpc.getDisk().lock()->getFileNames();
+	
+	if (fileNames.size() <= fileLoad)
+	{
+		return "";
+	}
+
+	return fileNames[fileLoad];
 }
 
 bool LoadScreen::isSelectedFileDirectory()
