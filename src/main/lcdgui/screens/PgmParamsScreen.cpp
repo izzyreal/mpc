@@ -217,9 +217,10 @@ void PgmParamsScreen::displayAttackDecay()
 	auto lProgram = program.lock();
 	auto attack = sampler.lock()->getLastNp(lProgram.get())->getAttack();
 	auto decay = sampler.lock()->getLastNp(lProgram.get())->getDecay();
+	auto decayModeStart = sampler.lock()->getLastNp(lProgram.get())->getDecayMode() == 1;
 	findField("attack").lock()->setTextPadded(attack, " ");
 	findField("decay").lock()->setTextPadded(decay, " ");
-	findEnvGraph().lock()->setCoordinates(attack, decay);
+	findEnvGraph().lock()->setCoordinates(attack, decay, decayModeStart);
 }
 
 void PgmParamsScreen::displayNote()
@@ -261,6 +262,7 @@ void PgmParamsScreen::displayDecayMode()
 	init();
 	auto lProgram = program.lock();
 	findField("dcymd").lock()->setText(decayModes[sampler.lock()->getLastNp(lProgram.get())->getDecayMode()]);
+	displayAttackDecay();
 }
 
 void PgmParamsScreen::displayVoiceOverlap()

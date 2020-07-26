@@ -96,7 +96,7 @@ void VeloEnvFilterScreen::displayAttack()
 	auto attack = sampler.lock()->getLastNp(program.lock().get())->getFilterAttack();
 	auto decay = sampler.lock()->getLastNp(program.lock().get())->getFilterDecay();
 	findField("attack").lock()->setTextPadded(attack, " ");
-	findEnvGraph().lock()->setCoordinates(attack, decay);
+	findEnvGraph().lock()->setCoordinates(attack, decay, true);
 }
 
 void VeloEnvFilterScreen::displayDecay()
@@ -104,7 +104,7 @@ void VeloEnvFilterScreen::displayDecay()
 	auto attack = sampler.lock()->getLastNp(program.lock().get())->getFilterAttack();
 	auto decay = sampler.lock()->getLastNp(program.lock().get())->getFilterDecay();
 	findField("decay").lock()->setTextPadded(decay, " ");
-	findEnvGraph().lock()->setCoordinates(attack, decay);
+	findEnvGraph().lock()->setCoordinates(attack, decay, true);
 }
 
 void VeloEnvFilterScreen::displayAmount()

@@ -621,10 +621,15 @@ void BaseControls::play()
 			}
 			else
 			{
-				if (currentScreenName.compare("song") != 0 && currentScreenName.compare("sequencer") != 0 && currentScreenName.compare("track-mute") != 0)
+				if (currentScreenName.compare("song") != 0 &&
+					currentScreenName.compare("sequencer") != 0 &&
+					currentScreenName.compare("track-mute") != 0 &&
+					currentScreenName.compare("program-assign") != 0 &&
+					currentScreenName.compare("program-params") != 0)
 				{
 					ls.lock()->openScreen("sequencer");
 				}
+
 				if (currentScreenName.compare("song") == 0)
 				{
 					sequencer.lock()->setSongModeEnabled(true);

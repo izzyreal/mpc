@@ -15,7 +15,7 @@ namespace mpc::lcdgui
 
 	public:
 		void setCoordinates(std::vector<std::vector<int>> ia);
-		void setCoordinates(int attack, int decay);
+		void setCoordinates(int attack, int decay, bool decayModeStart);
 
 	public:
 		void Draw(std::vector<std::vector<bool>>* pixels) override;
