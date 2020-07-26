@@ -1,28 +1,30 @@
 #pragma once
 #include <fstream>
 #include <vector>
-
-using namespace std;
+#include <string>
 
 static const int RIFF_CHUNK_ID{ 1179011410 };
 static const int RIFF_TYPE_ID{ 1163280727 };
 static const int FMT_CHUNK_ID{ 544501094 };
 static const int DATA_CHUNK_ID{ 1635017060 };
 
-ofstream wav_init_ofstream(const string& path) {
-    ofstream result(path.c_str(), ios::out | ios::binary);
+std::ofstream wav_init_ofstream(const std::string& path)
+{
+    std::ofstream result(path.c_str(), ios::out | ios::binary);
 	return result;
 }
 
-void wav_putLE(ofstream& stream, int val, int numBytes)
+void wav_putLE(std::ofstream& stream, int val, int numBytes)
 {
-    for (auto b = 0; b < numBytes; b++) {
+    for (auto b = 0; b < numBytes; b++)
+    {
         stream <<static_cast<char>(val & 255);
         val >>= 8;
     }
 }
 
-void wav_writeHeader(ofstream& stream, const int sampleRate) {
+void wav_writeHeader(std::ofstream& stream, const int sampleRate)
+{
 	const int numChannels = 2;
 	const int validBits = 16;
 
@@ -46,11 +48,13 @@ void wav_writeHeader(ofstream& stream, const int sampleRate) {
     wav_putLE(stream, 0, 4); // Offset 40. For now we set data chunk size 0 
 }
 
-void wav_write_bytes(ofstream& stream, const vector<char>& bytes) {
+void wav_write_bytes(std::ofstream& stream, const std::vector<char>& bytes)
+{
     stream.write((char*)(&bytes[0]), bytes.size());
 }
 
-void wav_close(ofstream& stream, const int sampleRate, const int frameCount) {
+void wav_close(std::ofstream& stream, const int sampleRate, const int frameCount)
+{
     const int numChannels = 2;
     const int validBits = 16;
 
@@ -64,12 +68,14 @@ void wav_close(ofstream& stream, const int sampleRate, const int frameCount) {
     
     bool wordAlignAdjust = false;
  
-    if (dataChunkSize % 2 == 1) {
+    if (dataChunkSize % 2 == 1)
+    {
         mainChunkSize += 1;
         wordAlignAdjust = true;
     }
     
-    if (wordAlignAdjust) {
+    if (wordAlignAdjust)
+    {
         stream << 0;
     }
 

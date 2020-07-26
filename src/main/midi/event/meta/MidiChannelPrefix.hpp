@@ -1,16 +1,19 @@
 #pragma once
 #include <midi/event/meta/MetaEvent.hpp>
 
-namespace mpc::midi::event::meta {
-
+namespace mpc::midi::event::meta
+{
 	class MetaEventData;
+}
 
+namespace mpc::midi::event::meta
+{
 	class MidiChannelPrefix
 		: public MetaEvent
 	{
 
 	private:
-		int mChannel{};
+		int mChannel;
 
 	public:
 		virtual void setChannel(int c);
@@ -20,7 +23,7 @@ namespace mpc::midi::event::meta {
 		int getEventSize() override;
 
 	public:
-		void writeToOutputStream(ostream& out)  override;
+		void writeToOutputStream(std::ostream& out)  override;
 		static std::shared_ptr<MetaEvent> parseMidiChannelPrefix(int tick, int delta, MetaEventData* info);
 		virtual int compareTo(mpc::midi::event::MidiEvent* other);
 

@@ -7,15 +7,12 @@
 #include <fstream>
 #include <sstream>
 
-using namespace std;
-
-namespace mpc::midi::event {
-
+namespace mpc::midi::event
+{
 	class MidiEvent
 	{
-
 	public:
-		int mTick{ 0 };
+		int mTick = 0;
 		mpc::midi::util::VariableLengthInt mDelta;
 
 	public:
@@ -29,7 +26,7 @@ namespace mpc::midi::event {
 	public:
 		virtual int getSize();
 		virtual bool requiresStatusByte(MidiEvent* prevEvent);
-		virtual void writeToOutputStream(ostream& out, bool writeType);
+		virtual void writeToOutputStream(std::ostream& out, bool writeType);
 
 	private:
 		static int sId;
@@ -37,13 +34,13 @@ namespace mpc::midi::event {
 		static int sChannel;
 
 	public:
-		static shared_ptr<MidiEvent> parseEvent(int tick, int delta, stringstream& in);
+		static std::shared_ptr<MidiEvent> parseEvent(int tick, int delta, std::stringstream& in);
 
 	private:
 		static bool verifyIdentifier(int id);
 
 	public:
-		virtual string toString();
+		virtual std::string toString();
 
 		MidiEvent(int tick, int delta);
 	};

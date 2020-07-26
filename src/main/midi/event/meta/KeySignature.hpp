@@ -1,8 +1,8 @@
 #pragma once
 #include <midi/event/meta/MetaEvent.hpp>
 
-namespace mpc::midi::event::meta {
-
+namespace mpc::midi::event::meta
+{
 	class MetaEventData;
 
 	class KeySignature
@@ -14,8 +14,8 @@ namespace mpc::midi::event::meta {
 		static const int SCALE_MINOR{ 1 };
 
 	private:
-		int mKey{};
-		int mScale{};
+		int mKey;
+		int mScale;
 
 	public:
 		void setKey(int key);
@@ -25,8 +25,8 @@ namespace mpc::midi::event::meta {
 
 	public:
 		int getEventSize() override;
-		void writeToOutputStream(ostream& out)  override;
-		void writeToOutputStream(ostream& out, bool writeType) override;
+		void writeToOutputStream(std::ostream& out)  override;
+		void writeToOutputStream(std::ostream& out, bool writeType) override;
 
 	public:
 		static std::shared_ptr<MetaEvent> parseKeySignature(int tick, int delta, MetaEventData* info);

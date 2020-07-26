@@ -3,16 +3,16 @@
 
 #include <ostream>
 
-namespace mpc::midi::event::meta {
-
+namespace mpc::midi::event::meta
+{
 	class EndOfTrack
 		: public MetaEvent
 	{
 
 	public:
 		int getEventSize() override;
-		void writeToOutputStream(ostream& out) override;
-		void writeToOutputStream(ostream& out, bool writeType) override;
+		void writeToOutputStream(std::ostream& out) override;
+		void writeToOutputStream(std::ostream& out, bool writeType) override;
 
 	public:
 		int compareTo(mpc::midi::event::MidiEvent* other);

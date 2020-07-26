@@ -14,10 +14,9 @@
 
 using namespace mpc::sampler;
 using namespace ctoot::audio::core;
-using namespace std;
 
-namespace mpc::audiomidi {
-
+namespace mpc::audiomidi
+{
 	class SoundPlayer
 		: public AudioProcess
 	{
@@ -25,16 +24,16 @@ namespace mpc::audiomidi {
 	private:
 		int ingestedSourceFrameCount = 0;
 		int sourceFrameCount = 0;
-		shared_ptr<AudioFormat> sourceFormat;
+		std::shared_ptr<AudioFormat> sourceFormat;
 		bool isWav = false;
 		bool isSnd = false;
 		float fadeFactor = -1.0f;
 		bool stopEarly = false;
 
 	private:
-		mutex _playing;
+		std::mutex _playing;
 		bool playing = false;
-		string filePath = "";
+		std::string filePath = "";
 		circular_buffer<float> resampleInputBufferLeft = circular_buffer<float>(20000);
 		circular_buffer<float> resampleInputBufferRight = circular_buffer<float>(20000);
 		circular_buffer<float> resampleOutputBufferLeft = circular_buffer<float>(20000);
@@ -43,10 +42,10 @@ namespace mpc::audiomidi {
 		SRC_STATE* srcRight = nullptr;
 		int srcLeftError = 0;
 		int srcRightError = 0;
-		ifstream stream;
+		std::ifstream stream;
 
 	public:
-		bool start(const string& filePath);
+		bool start(const std::string& filePath);
 		int processAudio(ctoot::audio::core::AudioBuffer* buf) override;
 		void open() {};
 		void close() {};
@@ -56,7 +55,7 @@ namespace mpc::audiomidi {
 
 	private:
 		void stop();
-		void resampleChannel(bool left, vector<float>* input, int sourceSampleRate, int destinationSampleRate, bool endOfInput);
+		void resampleChannel(bool left, std::vector<float>* input, int sourceSampleRate, int destinationSampleRate, bool endOfInput);
 
 	public:
 		SoundPlayer();

@@ -51,13 +51,13 @@ namespace mpc::sampler {
 		std::vector<int> autoChromaticAssign;
 
 		std::vector<std::shared_ptr<Sound>> sounds;
-		std::vector<std::shared_ptr<Program>> programs = vector<shared_ptr<Program>>(24);
+		std::vector<std::shared_ptr<Program>> programs = std::vector<std::shared_ptr<Program>>(24);
 		int soundSortingType = 0;
 		std::vector<std::string> padNames;
-		std::vector<std::string> abcd = vector<string>{ "A", "B", "C", "D" };
+		std::vector<std::string> abcd = std::vector<std::string>{ "A", "B", "C", "D" };
 		std::vector<float> clickSample;
 		std::shared_ptr<Sound> clickSound;
-		std::vector<std::string> sortNames = vector<string>{ "MEMORY", "NAME", "SIZE" };
+		std::vector<std::string> sortNames = std::vector<std::string>{ "MEMORY", "NAME", "SIZE" };
 		
 
 	public:

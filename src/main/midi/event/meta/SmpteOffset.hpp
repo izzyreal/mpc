@@ -41,8 +41,8 @@ namespace mpc::midi::event::meta {
 
 	public:
 		int getEventSize() override;
-		void writeToOutputStream(ostream& out) override;
-		void writeToOutputStream(ostream& out, bool writeType) override;
+		void writeToOutputStream(std::ostream& out) override;
+		void writeToOutputStream(std::ostream& out, bool writeType) override;
 	
 	public:
 		static std::shared_ptr<MetaEvent> parseSmpteOffset(int tick, int delta, MetaEventData* info);

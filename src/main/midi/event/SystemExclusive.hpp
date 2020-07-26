@@ -10,15 +10,15 @@ namespace mpc::midi::event {
 	{
 
 	private:
-		int mType{};
-		mpc::midi::util::VariableLengthInt* mLength{};
-		std::vector<char> mData{};
+		int mType;
+		mpc::midi::util::VariableLengthInt* mLength;
+		std::vector<char> mData;
 
 	public:
 		virtual std::vector<char> getData();
 		virtual void setData(std::vector<char> data);
 		bool requiresStatusByte(MidiEvent* prevEvent) override;
-		void writeToOutputStream(ostream& out, bool writeType) override;
+		void writeToOutputStream(std::ostream& out, bool writeType) override;
 		virtual int compareTo(MidiEvent* other);
 
 	public:

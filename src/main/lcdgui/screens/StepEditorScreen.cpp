@@ -558,6 +558,7 @@ void StepEditorScreen::up()
 		if (!controls->isShiftPressed() && srcNumber == 0 && yOffset == 0)
 		{
 			clearSelection();
+			lastColumn = srcLetter;
 			ls.lock()->setFocus("view");
 			refreshSelection();
 			return;
@@ -581,37 +582,17 @@ void StepEditorScreen::down()
 {
 	init();
 
-	if (!findField("a0").lock()->IsHidden() && param.compare("view") == 0)
+	if (param.compare("view") == 0 || param.find("now") != string::npos)
 	{
-		ls.lock()->setFocus("a0");
+		if (dynamic_pointer_cast<EmptyEvent>(visibleEvents[0].lock()))
+		{
+			lastColumn = "a";
+		}
+
+		ls.lock()->setFocus(lastColumn + "0");
 		return;
 	}
-
-	else if (param.find("now") != string::npos)
-	{
-		if (!findLabel("e0").lock()->IsHidden())
-		{
-			ls.lock()->setFocus("e0");
-		}
-		else if (!findLabel("d0").lock()->IsHidden())
-		{
-			ls.lock()->setFocus("d0");
-		}
-		else if (!findLabel("c0").lock()->IsHidden())
-		{
-			ls.lock()->setFocus("c0");
-		}
-		else if (!findLabel("b0").lock()->IsHidden())
-		{
-			ls.lock()->setFocus("b0");
-		}
-		else if (!findLabel("a0").lock()->IsHidden())
-		{
-			ls.lock()->setFocus("a0");
-		}
-		return;
-	}
-
+	
 	if (param.length() == 2)
 	{
 		auto src = param;
@@ -621,7 +602,6 @@ void StepEditorScreen::down()
 		
 		if (srcNumber == 3)
 		{
-			
 			if (yOffset + 4 == eventsAtCurrentTick.size())
 			{
 				return;
@@ -676,9 +656,16 @@ void StepEditorScreen::downOrUp(int increment)
 			if (!(controls->isShiftPressed() && dynamic_pointer_cast<EmptyEvent>(visibleEvents[(int)(srcNumber + increment)].lock())))
 			{
 				auto tf = findField(destination).lock();
-				if (tf && !tf->IsHidden())
+				if (tf)
 				{
-					ls.lock()->setFocus(tf->getName());
+					if (!tf->IsHidden())
+					{
+						ls.lock()->setFocus(tf->getName());
+					}
+					else
+					{
+						ls.lock()->setFocus("a" + to_string(srcNumber + increment));
+					}
 				}
 			}
 		}

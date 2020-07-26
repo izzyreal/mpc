@@ -17,11 +17,11 @@ namespace mpc::midi::event::meta {
 		mpc::midi::util::VariableLengthInt mLength;
 
 	public:
-		virtual void writeToOutputStream(ostream& output);
-		void writeToOutputStream(ostream& out, bool writeType) override;
+		virtual void writeToOutputStream(std::ostream& output);
+		void writeToOutputStream(std::ostream& out, bool writeType) override;
 
 	public:
-		static std::shared_ptr<MetaEvent> parseMetaEvent(int tick, int delta, stringstream& in);
+		static std::shared_ptr<MetaEvent> parseMetaEvent(int tick, int delta, std::stringstream& in);
 		static const int SEQUENCE_NUMBER{ 0 };
 		static const int TEXT_EVENT{ 1 };
 		static const int COPYRIGHT_NOTICE{ 2 };

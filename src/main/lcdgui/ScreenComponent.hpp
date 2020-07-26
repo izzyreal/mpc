@@ -27,7 +27,7 @@ namespace mpc::lcdgui
 	private:
 		const int layer;
 		std::map<std::string, std::vector<std::string>> transferMap;
-		string firstField = "";
+		std::string firstField = "";
 
 	public:
 		const int& getLayerIndex();

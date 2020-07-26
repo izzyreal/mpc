@@ -4,7 +4,6 @@
 
 #include <file/FileUtil.hpp>
 
-using namespace std;
 const char ID[2] = { 0x01, 0x04 };
 
 const int ID_INDEX = 0; // 2 byte ANSI string of a number greater than '10' and equal to or smaller than '15'
@@ -21,41 +20,42 @@ const int LOOP_ENABLED_INDEX = 38; // 1 byte, 1 if true
 const int BEAT_COUNT_INDEX = 39; // 1 byte
 const int SAMPLE_RATE_INDEX = 40; // 2 byte unsigned short
 
-using namespace std;
-
-ifstream snd_init_ifstream(const string& path)
+std::ifstream snd_init_ifstream(const std::string& path)
 {
     auto result = moduru::file::FileUtil::ifstreamw(path.c_str(), ios::in | ios::binary);
     result.unsetf(ios_base::skipws);
 	return result;
 }
 
-void snd_read_bytes(ifstream& stream, const vector<char>& bytes, const int maxLength)
+void snd_read_bytes(std::ifstream& stream, const std::vector<char>& bytes, const int maxLength)
 {
     auto byteCountToRead = min((int)bytes.size(), maxLength);
     stream.read((char*)(&bytes[0]), byteCountToRead);
 }
 
-string snd_get_string(ifstream& stream, const int maxLength)
+std::string snd_get_string(std::ifstream& stream, const int maxLength)
 {
-    vector<char> buffer(17);
+    std::vector<char> buffer(17);
     snd_read_bytes(stream, buffer, maxLength);
 
-    if (buffer.size() > maxLength) {
-        buffer = vector<char>(buffer.begin(), buffer.begin() + maxLength);
+    if (buffer.size() > maxLength)
+    {
+        buffer = std::vector<char>(buffer.begin(), buffer.begin() + maxLength);
     }
 
-    for (int i = 0; i < buffer.size(); i++) {
-        if (buffer[i] == 0x20 || buffer[i] == 0x00) {
-            buffer = vector<char>(buffer.begin(), buffer.begin() + i);
+    for (int i = 0; i < buffer.size(); i++)
+    {
+        if (buffer[i] == 0x20 || buffer[i] == 0x00)
+        {
+            buffer = std::vector<char>(buffer.begin(), buffer.begin() + i);
             break;
         }
     }
 
-    return string(buffer.begin(), buffer.end());
+    return std::string(buffer.begin(), buffer.end());
 }
 
-uint16_t snd_get_unsigned_short_LE(ifstream& stream)
+uint16_t snd_get_unsigned_short_LE(std::ifstream& stream)
 {
     unsigned char buffer[2];
     stream >> buffer[0];
@@ -64,7 +64,7 @@ uint16_t snd_get_unsigned_short_LE(ifstream& stream)
 }
 
 
-int snd_get_LE(ifstream& stream, int numBytes)
+int snd_get_LE(std::ifstream& stream, int numBytes)
 {
 
     if (numBytes < 1 || numBytes > 4) {
@@ -90,14 +90,14 @@ int snd_get_LE(ifstream& stream, int numBytes)
     return val;
 }
 
-char snd_get_char(ifstream& stream)
+char snd_get_char(std::ifstream& stream)
 {
     char result;
     stream >> result;
     return result;
 }
 
-bool snd_read_header(ifstream& stream, int& sampleRate, int& validBits, int& numChannels, int& numFrames)
+bool snd_read_header(std::ifstream& stream, int& sampleRate, int& validBits, int& numChannels, int& numFrames)
 {
     stream.seekg(0, stream.end);
     auto tell = stream.tellg();
@@ -140,7 +140,7 @@ bool snd_read_header(ifstream& stream, int& sampleRate, int& validBits, int& num
     return true;
 }
 
-void snd_close(ifstream& stream)
+void snd_close(std::ifstream& stream)
 {
     stream.close();
 }

@@ -3,23 +3,22 @@
 #include <vector>
 #include <string>
 
-using namespace std;
-
-namespace mpc::file::sndwriter {
+namespace mpc::file::sndwriter
+{
 	class SndWriter;
 }
 
-namespace mpc::file::sndwriter {
-
+namespace mpc::file::sndwriter
+{
 	class SndHeaderWriter
 	{
 	private:
-		vector<char> headerArray = vector<char>(42);
+		std::vector<char> headerArray = std::vector<char>(42);
 
 	public:
-		vector<char>& getHeaderArray();
+		std::vector<char>& getHeaderArray();
 		void setFirstTwoBytes();
-		void setName(const string& name);
+		void setName(const std::string& name);
 		void setLevel(int i);
 		void setTune(int i);
 		void setMono(bool b);
