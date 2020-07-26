@@ -59,6 +59,7 @@ namespace mpc::lcdgui::screens
 		std::weak_ptr<mpc::sequencer::Event> selectedEvent;
 		std::vector<std::weak_ptr<mpc::sequencer::Event>> selectedEvents;
 		std::map<std::string, std::string> lastColumn;
+		int lastRow = 0;
 
 		int view = 0;
 		int noteA = 0;

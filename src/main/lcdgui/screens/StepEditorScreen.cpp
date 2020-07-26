@@ -48,6 +48,8 @@ StepEditorScreen::StepEditorScreen(const int layerIndex)
 
 void StepEditorScreen::open()
 {
+	lastRow = 0;
+
 	findField("controlnumber").lock()->Hide(true);
 	findField("fromnote").lock()->Hide(true);
 	findField("tonote").lock()->Hide(true);
@@ -145,30 +147,34 @@ void StepEditorScreen::function(int i)
 		break;
 	case 2:
 	{
+		if (param.length() != 2)
+		{
+			return;
+		}
+
 		auto rowIndex = stoi(param.substr(1, 2));
+
 		if (selectionStartIndex != -1)
 		{
 			removeEvents();
-
 			ls.lock()->setFocus("a0");
+			return;
 		}
-		else if (param.length() == 2)
+		
+		if (!dynamic_pointer_cast<EmptyEvent>(visibleEvents[rowIndex].lock()))
 		{
-			if (!dynamic_pointer_cast<EmptyEvent>(visibleEvents[rowIndex].lock()))
+			for (int i = 0; i < track.lock()->getEvents().size(); i++)
 			{
-				for (int i = 0; i < track.lock()->getEvents().size(); i++)
+				if (track.lock()->getEvents()[i].lock() == visibleEvents[rowIndex].lock())
 				{
-					if (track.lock()->getEvents()[i].lock() == visibleEvents[rowIndex].lock())
-					{
-						track.lock()->removeEvent(i);
-						break;
-					}
+					track.lock()->removeEvent(i);
+					break;
 				}
+			}
 
-				if (rowIndex == 2 && yOffset > 0)
-				{
-					yOffset--;
-				}
+			if (rowIndex == 2 && yOffset > 0)
+			{
+				yOffset--;
 			}
 		}
 
@@ -564,7 +570,17 @@ void StepEditorScreen::nextBarEnd()
 
 void StepEditorScreen::left()
 {
-	BaseControls::left();
+	init();
+	if (param.length() == 2 && param.substr(0, 1).compare("a") == 0)
+	{
+		lastRow = stoi(param.substr(1, 2));
+		ls.lock()->setFocus("view");
+	}
+	else
+	{
+		BaseControls::left();
+	}
+
 	checkSelection();
 	refreshSelection();
 }
@@ -592,6 +608,7 @@ void StepEditorScreen::up()
 			clearSelection();
 			auto eventType = visibleEvents[srcNumber].lock()->getTypeName();
 			lastColumn[eventType] = srcLetter;
+			lastRow = 0;
 			ls.lock()->setFocus("view");
 			refreshSelection();
 			return;
@@ -624,14 +641,8 @@ void StepEditorScreen::down()
 
 	if (param.compare("view") == 0 || param.find("now") != string::npos)
 	{
-		auto eventType = visibleEvents[0].lock()->getTypeName();
-		
-		if (dynamic_pointer_cast<EmptyEvent>(visibleEvents[0].lock()))
-		{
-			lastColumn[eventType] = "a";
-		}
-
-		ls.lock()->setFocus(lastColumn[eventType] + "0");
+		auto eventType = visibleEvents[lastRow].lock()->getTypeName();
+		ls.lock()->setFocus(lastColumn[eventType] + to_string(lastRow));
 		return;
 	}
 	
