@@ -82,7 +82,8 @@ void StepEditorScreen::open()
 		previousScreen.compare("insert-event") != 0 &&
 		previousScreen.compare("paste-event") != 0)
 	{
-		ls.lock()->setFocus("a0");
+		auto eventType = visibleEvents[0].lock()->getTypeName();
+		ls.lock()->setFocus(lastColumn[eventType] + "0");
 	}
 }
 
@@ -107,6 +108,14 @@ void StepEditorScreen::close()
 		{
 			e.lock()->deleteObserver(this);
 		}
+	}
+
+	if (param.length() == 2)
+	{
+		int srcNumber = stoi(param.substr(1, 2));
+		auto srcLetter = param.substr(0, 1);
+		auto eventType = visibleEvents[srcNumber].lock()->getTypeName();
+		lastColumn[eventType] = srcLetter;
 	}
 }
 
