@@ -10,6 +10,10 @@
 namespace mpc::lcdgui
 {
 
+	enum Alignment {
+		None, Centered
+	};
+
 	class TextComp
 		: public Component
 	{
@@ -19,6 +23,9 @@ namespace mpc::lcdgui
 		std::thread blinkThread;
 		static void static_blink(void* args);
 		void runBlinkThread();
+		Alignment alignment = Alignment::None;
+		bool textuallyAligned = false;
+		int alignmentEndX = -1;
 
 	protected:
 		bool inverted = false;
@@ -34,6 +41,7 @@ namespace mpc::lcdgui
 	public:
 		void setBlinking(bool b);
 		void setInverted(bool b);
+		void setAlignment(const Alignment alignment, int endX = -1);
 		int getX();
 		int getY();
 		int getW();
@@ -46,6 +54,7 @@ namespace mpc::lcdgui
 
 	public:
 		virtual void Draw(std::vector<std::vector<bool>>* pixels) override;
+		void setSize(int w, int h) override;
 
 	public:
 		TextComp(const std::string& name);

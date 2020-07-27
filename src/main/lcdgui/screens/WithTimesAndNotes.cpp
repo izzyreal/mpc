@@ -74,7 +74,7 @@ bool WithTimesAndNotes::checkAllTimesAndNotes(int notch, Sequence* seq, Track* _
 
 		if (track->getBus() != 0)
 		{
-			auto note = mpc.getNote() + notch;
+			auto note = note0 + notch;
 			auto mpcSoundPlayerChannel = mpc.getSampler().lock()->getDrum(track->getBus() - 1);
 			auto program = dynamic_pointer_cast<mpc::sampler::Program>(mpc.getSampler().lock()->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
 			auto pad = program->getPadIndexFromNote(note);

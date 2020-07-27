@@ -14,7 +14,7 @@ namespace mpc::lcdgui::screens
 	protected:
 		int time0 = 0;
 		int time1 = 0;
-		int note0 = 0;
+		int note0 = 34;
 		int note1 = 127;
 
 	public:

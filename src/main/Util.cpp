@@ -213,3 +213,29 @@ string Util::tempoString(const double tempo)
 
 	return replaceDotWithSmallSpaceDot(result);
 }
+
+int Util::getTextWidthInPixels(const string& text)
+{
+	const char* p = text.c_str();
+
+	int count = 0;
+
+	for (p; *p != 0; ++p)
+	{
+		count += (*p & 0xc0) != 0x80;
+	}
+
+	int halfSpaceCount = 0;
+
+	const string halfSpace = u8"\u00CE";
+
+	int nPos = text.find(halfSpace, 0);
+
+	while (nPos != string::npos)
+	{
+		halfSpaceCount++;
+		nPos = text.find(halfSpace, nPos + halfSpace.size());
+	}
+
+	return (count * 6) - (halfSpaceCount * 3);
+}

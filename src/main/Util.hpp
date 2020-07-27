@@ -19,6 +19,7 @@ namespace mpc
 		static void drawLines(std::vector<std::vector<bool>>& pixels, const std::vector<std::vector<std::vector<int>>>& lines, const std::vector<bool>& colors, const std::vector<int>& offsetxy);
 		static std::vector<std::string>& noteNames();
 		static std::string tempoString(const double tempo);
+		static int getTextWidthInPixels(const std::string& text);
 
 	};
 }

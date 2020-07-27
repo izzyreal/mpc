@@ -3,36 +3,17 @@
 #include "Field.hpp"
 #include "Label.hpp"
 
+#include <Util.hpp>
+
 using namespace mpc::lcdgui;
 using namespace std;
 
 Parameter::Parameter(string labelStr, string name, int x, int y, int fieldWidth)
 	: Component(name)
 {
-	int count = 0;
-
-	const char* p = labelStr.c_str();
-
-	for (p; *p != 0; ++p)
-	{
-		count += (*p & 0xc0) != 0x80;
-	}
-
-	int halfSpaceCount = 0;
-
-	const string halfSpace = u8"\u00CE";
-
-	int nPos = labelStr.find(halfSpace, 0);
-
-	while (nPos != string::npos)
-	{
-		halfSpaceCount++;
-		nPos = labelStr.find(halfSpace, nPos + halfSpace.size());
-	}
+	const auto labelWidth = mpc::Util::getTextWidthInPixels(labelStr);
 	
-	const auto labelWidth = (count * 6) - (halfSpaceCount * 3);
-	
-	addChild(make_shared<Label>(name, labelStr, x, y - 1, labelWidth - 1));
+	addChild(make_shared<Label>(name, labelStr, x, y - 1, labelWidth));
 	
 	// We add + 1 to the field width, because currently the json resources provide
 	// n_characters * font_width for their width, and it should be + 1 to acommodate

@@ -69,6 +69,7 @@ void EventsScreen::update(moduru::observer::Observable* observable, nonstd::any 
 
 	if (msg.compare("padandnote") == 0)
 	{
+		setNote0(mpc.getNote());
 		displayNotes();
 	}
 }
@@ -505,9 +506,13 @@ void EventsScreen::displayNotes()
 
 	if (track->getBus() == 0)
 	{
-		findField("note0").lock()->setSize(48, 9);
+		findField("note0").lock()->setSize(47, 9);
 		findField("note1").lock()->Hide(false);
 		findLabel("note1").lock()->Hide(false);
+		findField("note0").lock()->setAlignment(Alignment::Centered, 18);
+
+		findField("note1").lock()->setSize(47, 9);
+		findField("note1").lock()->setAlignment(Alignment::Centered, 18);
 		displayMidiNotes();
 	}
 	else
@@ -515,6 +520,7 @@ void EventsScreen::displayNotes()
 		findField("note0").lock()->setSize(37, 9);
 		findField("note1").lock()->Hide(true);
 		findLabel("note1").lock()->Hide(true);
+		findField("note0").lock()->setAlignment(Alignment::None);
 		displayDrumNotes();
 	}
 }
@@ -527,7 +533,7 @@ void EventsScreen::displayMidiNotes()
 
 void EventsScreen::displayDrumNotes()
 {
-	auto drumNote = mpc.getNote();
+	auto drumNote = note0;
 
 	if (drumNote == 34)
 	{

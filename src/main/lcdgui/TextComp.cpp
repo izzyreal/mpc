@@ -5,6 +5,8 @@
 
 #include <lcdgui/Label.hpp>
 
+#include <Util.hpp>
+
 #include <lang/StrUtil.hpp>
 #include <lang/utf8_decode.h>
 
@@ -17,6 +19,15 @@ using namespace std;
 TextComp::TextComp(const std::string& name)
 	: Component(name)
 {
+}
+
+void TextComp::setSize(int w, int h)
+{
+	if (alignmentEndX == -1)
+	{
+		alignmentEndX = w;
+	}
+	Component::setSize(w, h);
 }
 
 void TextComp::Draw(std::vector<std::vector<bool>>* pixels)
@@ -50,11 +61,23 @@ void TextComp::Draw(std::vector<std::vector<bool>>* pixels)
 	int textx = x + 1;
 	int texty = y;
 
+	int alignmentOffset = 0;
+
+	string textToRender = text;
+
+	if (alignment == Alignment::Centered && !textuallyAligned)
+	{
+		auto charsToAlign = StrUtil::replaceAll(text.substr(0, alignmentEndX / FONT_WIDTH), ' ', "");
+		textToRender = charsToAlign + text.substr(alignmentEndX / FONT_WIDTH);
+		auto charsWidthInPixels = mpc::Util::getTextWidthInPixels(charsToAlign);
+		alignmentOffset = (alignmentEndX - charsWidthInPixels) * 0.5;
+	}
+
 	int atlasx, atlasy;
 
-	char* tempText = new char[text.length() + 1];
-	std::strcpy(tempText, text.c_str());
-	utf8_decode_init(tempText, text.length());
+	char* tempText = new char[textToRender.length() + 1];
+	std::strcpy(tempText, textToRender.c_str());
+	utf8_decode_init(tempText, textToRender.length());
 
 	int next = utf8_decode_next();
 	int charCounter = 0;
@@ -76,6 +99,24 @@ void TextComp::Draw(std::vector<std::vector<bool>>* pixels)
 				{
 					int xpos = textx + x1 + current_char.xoffset;
 					int ypos = texty + y1 + current_char.yoffset;
+
+					if (alignment == Alignment::Centered && !textuallyAligned) 
+					{
+						if (xpos - x < alignmentEndX - 4)
+						{
+							xpos += alignmentOffset;
+						}
+						else {
+							xpos += (2 * alignmentOffset);
+						}
+					}
+
+					if (w == 47 && name.find("note") != string::npos)
+					{
+						// Super hacky way to cram as much text in the amount of pixels that
+						// the original leet coders of the Akai MPC2000XL OS did. Respect.
+						xpos -= 1;
+					}
 
 					if (h <= 7)
 					{
@@ -140,6 +181,34 @@ unsigned int TextComp::GetTextEntryLength()
 void TextComp::setText(const string& s)
 {
 	text = s;
+
+	if (alignment == Alignment::Centered && alignmentEndX != w)
+	{
+		auto charsToAlignCount = alignmentEndX / FONT_WIDTH;
+		auto charsToAlign = StrUtil::replaceAll(text.substr(0, charsToAlignCount), ' ', "");
+		
+		if ((charsToAlignCount - charsToAlign.length()) % 2 == 0)
+		{
+			text = s.substr(charsToAlignCount);
+			auto nudge = (charsToAlignCount - charsToAlign.length()) / 2;
+			
+			for (int i = 0; i < nudge; i++)
+				text.insert(text.begin(), ' ');
+
+			for (int i = nudge; i < nudge + charsToAlign.length(); i++)
+				text.insert(text.begin() + i, charsToAlign[i - nudge]);
+
+			for (int i = nudge + charsToAlign.length(); i < charsToAlignCount; i++)
+				text.insert(text.begin() + i, ' ');
+
+			textuallyAligned = true;
+		}
+		else
+		{
+			textuallyAligned = false;
+		}
+	}
+
 	SetDirty();
 }
 
@@ -193,6 +262,19 @@ void TextComp::setBlinking(bool b)
 	{
 		blinkThread = thread(&TextComp::static_blink, this);
 	}
+}
+
+void TextComp::setAlignment(const Alignment alignment, int endX)
+{
+	this->alignment = alignment;
+	alignmentEndX = endX;
+
+	if (alignmentEndX == -1)
+	{
+		alignmentEndX = w;
+	}
+
+	SetDirty();
 }
 
 TextComp::~TextComp()

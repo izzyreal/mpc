@@ -85,7 +85,7 @@ namespace mpc::lcdgui
 		bool IsHidden();
 		bool IsDirty();
 		MRECT getDirtyArea();
-		void setSize(int width, int height);
+		virtual void setSize(int width, int height);
 		void setLocation(int x, int y);
 		const std::string& getName();
 		void sendToBack(std::weak_ptr<Component> childToSendBack);
