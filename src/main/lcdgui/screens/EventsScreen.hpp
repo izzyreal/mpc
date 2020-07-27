@@ -45,6 +45,7 @@ namespace mpc::lcdgui::screens
 		void displayVelocityValue();
 
 	private:
+		bool setNote1X = true;
 		int tab = 0;
 		const std::vector<std::string> tabNames{ "events", "bars", "tr-move", "user" };
 		const std::vector<std::string> modeNames{ "ADD VALUE", "SUB VALUE", "MULTI VAL%", "SET TO VAL" };

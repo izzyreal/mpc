@@ -25,6 +25,17 @@ EventsScreen::EventsScreen(const int layerIndex)
 
 void EventsScreen::open()
 {
+	auto note1Field = findField("note1").lock();
+
+	if (setNote1X)
+	{
+		note1Field->setLocation(note1Field->getX() + 1, note1Field->getY());
+		setNote1X = false;
+	}
+
+	note1Field->setSize(47, 9);
+	note1Field->setAlignment(Alignment::Centered, 18);
+
 	if (tab != 0)
 	{
 		ls.lock()->openScreen(tabNames[tab]);
@@ -510,9 +521,6 @@ void EventsScreen::displayNotes()
 		findField("note1").lock()->Hide(false);
 		findLabel("note1").lock()->Hide(false);
 		findField("note0").lock()->setAlignment(Alignment::Centered, 18);
-
-		findField("note1").lock()->setSize(47, 9);
-		findField("note1").lock()->setAlignment(Alignment::Centered, 18);
 		displayMidiNotes();
 	}
 	else
