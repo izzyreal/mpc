@@ -9,14 +9,13 @@ using namespace std;
 VeloEnvFilterScreen::VeloEnvFilterScreen(const int layerIndex) 
 	: ScreenComponent("velo-env-filter", layerIndex)
 {
+	addChild(make_shared<EnvGraph>());
 }
 
 void VeloEnvFilterScreen::open()
 {
-	addChild(make_shared<EnvGraph>());
-
 	init();
-
+	velo = 127;
 	displayNote();
 	displayAttack();
 	displayDecay();
@@ -41,22 +40,30 @@ void VeloEnvFilterScreen::turnWheel(int i)
     if (param.compare("attack") == 0)
 	{
 		lastNp->setFilterAttack(lastNp->getFilterAttack() + i);
+		displayAttack();
 	}
 	else if (param.compare("decay") == 0)
 	{
 		lastNp->setFilterDecay(lastNp->getFilterDecay() + i);
+		displayDecay();
 	}
 	else if (param.compare("amount") == 0)
 	{
 		lastNp->setFilterEnvelopeAmount(lastNp->getFilterEnvelopeAmount() + i);
+		displayAmount();
 	}
 	else if (param.compare("velofreq") == 0)
 	{
 		lastNp->setVelocityToFilterFrequency(lastNp->getVelocityToFilterFrequency() + i);
+		displayVeloFreq();
 	}
 	else if (param.compare("note") == 0)
 	{
 		mpc.setPadAndNote(mpc.getPad(), mpc.getNote() + i);
+	}
+	else if (param.compare("velo") == 0)
+	{
+		setVelo(velo + i);
 	}
 }
 
@@ -88,7 +95,7 @@ void VeloEnvFilterScreen::displayNote()
 
 void VeloEnvFilterScreen::displayVelo()
 {
-	// Currently unimplemented
+	findField("velo").lock()->setTextPadded(velo, " ");
 }
 
 void VeloEnvFilterScreen::displayAttack()
@@ -115,4 +122,16 @@ void VeloEnvFilterScreen::displayAmount()
 void VeloEnvFilterScreen::displayVeloFreq()
 {
 	findField("velofreq").lock()->setTextPadded(sampler.lock()->getLastNp(program.lock().get())->getVelocityToFilterFrequency(), " ");
+}
+
+void VeloEnvFilterScreen::setVelo(int i)
+{
+	if (i < 1 || i > 127)
+	{
+		return;
+	}
+
+	velo = i;
+
+	displayVelo();
 }

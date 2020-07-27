@@ -69,11 +69,6 @@ void EnvGraph::Draw(std::vector<std::vector<bool>>* pixels)
 			int x1 = xoff + x;
 			int y1 = yoff + y;
 			
-			if (csn.compare("program-params") == 0 && y1 == 24 && x1 >= 93 && x1 <= 101)
-			{
-				//continue;
-			}
-
 			(*pixels)[x1][y1] = false;
 		}
 	}

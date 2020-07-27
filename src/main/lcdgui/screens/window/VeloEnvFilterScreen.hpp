@@ -20,6 +20,8 @@ namespace mpc::lcdgui::screens::window
 		void update(moduru::observer::Observable* observable, nonstd::any message);
 
 	private:
+		unsigned int velo = 127;
+		void setVelo(int i);
 		void displayVelo();
 		void displayNote();
 		void displayAttack();
