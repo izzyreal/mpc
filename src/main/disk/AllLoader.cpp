@@ -103,7 +103,7 @@ AllLoader::AllLoader(mpc::disk::MpcFile* file, bool sequencesOnly)
 		auto allSeqNames = allParser.getSeqNames()->getNames();
 		auto sequencer = allParser.getSequencer();
 		lSequencer->setActiveSequenceIndex(sequencer->sequence);
-		lSequencer->setSelectedTrackIndex(sequencer->track);
+		lSequencer->setActiveTrackIndex(sequencer->track);
 		
 		auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timing-correct"));
 		

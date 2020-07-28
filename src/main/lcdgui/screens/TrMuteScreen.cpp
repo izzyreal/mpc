@@ -67,7 +67,7 @@ void TrMuteScreen::pad(int i, int velo, bool repeat, int tick)
 			sequencer.lock()->setSoloEnabled(true);
 		}
 
-		sequencer.lock()->setSelectedTrackIndex(i + (mpc.getBank() * 16));
+		sequencer.lock()->setActiveTrackIndex(i + (mpc.getBank() * 16));
 		ls.lock()->setCurrentBackground("track-mute-solo-2");
 	}
 	else
@@ -197,7 +197,7 @@ void TrMuteScreen::update(moduru::observer::Observable* o, nonstd::any message)
 	{
 		refreshTracks();
 	}
-	else if (msg.compare("selectedtrackindex") == 0)
+	else if (msg.compare("active-track-index") == 0)
 	{
 		refreshTracks();
 	}

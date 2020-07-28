@@ -171,7 +171,7 @@ namespace mpc::sequencer
 		void move(int tick);
 		int getTickPosition();
 		std::weak_ptr<Sequence> getCurrentlyPlayingSequence();
-		void setSelectedTrackIndex(int i);
+		void setActiveTrackIndex(int i);
 		int getCurrentlyPlayingSequenceIndex();
 		void setCurrentlyPlayingSequenceIndex(int i);
 		int getNextSq();

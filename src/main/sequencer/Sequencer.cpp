@@ -1401,11 +1401,10 @@ weak_ptr<Sequence> Sequencer::getCurrentlyPlayingSequence()
 	return sequences[getCurrentlyPlayingSequenceIndex()];
 }
 
-void Sequencer::setSelectedTrackIndex(int i)
+void Sequencer::setActiveTrackIndex(int i)
 {
     activeTrackIndex = i;
-	
-	notifyObservers(string("selectedtrackindex"));
+	notifyObservers(string("active-track-index"));
 }
 
 int Sequencer::getCurrentlyPlayingSequenceIndex()

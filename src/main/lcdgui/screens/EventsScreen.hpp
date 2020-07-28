@@ -39,10 +39,6 @@ namespace mpc::lcdgui::screens
 		void displayToSq();
 		void displayFromTr();
 		void displayFromSq();
-		void displayDurationMode();
-		void displayVelocityMode();
-		void displayTransposeAmount();
-		void displayVelocityValue();
 
 	private:
 		bool setNote1X = true;
@@ -52,7 +48,6 @@ namespace mpc::lcdgui::screens
 		const std::vector<std::string> functionNames{ "COPY", "DURATION", "VELOCITY", "TRANSPOSE" };
 		bool modeMerge = false;
 		int editFunctionNumber = 0;
-		int fromTr = 0;
 		int toSq = 0;
 		int toTr = 0;
 		int start = 0;

@@ -48,8 +48,8 @@ namespace mpc::lcdgui
 		int getH();
 		std::string getText();
 		std::string getName();
-		void setTextPadded(std::string s, std::string padding);
-		void setTextPadded(int i, std::string padding);
+		void setTextPadded(std::string s, std::string padding = " ");
+		void setTextPadded(int i, std::string padding = " ");
 		unsigned int GetTextEntryLength();
 
 	public:

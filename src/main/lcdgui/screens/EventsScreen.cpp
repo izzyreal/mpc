@@ -106,7 +106,7 @@ void EventsScreen::function(int i)
 		auto sourceStart = time0;
 		auto sourceEnd = time1;
 		auto segLength = sourceEnd - sourceStart;
-		auto sourceTrack = fromSequence->getTrack(fromTr).lock();
+		auto sourceTrack = sequencer.lock()->getActiveTrack().lock();
 
 		if (editFunctionNumber == 0)
 		{
@@ -259,11 +259,9 @@ void EventsScreen::function(int i)
 void EventsScreen::turnWheel(int i)
 {
 	init();
-	auto fromSequence = sequencer.lock()->getActiveSequence().lock();
 	auto toSequence = sequencer.lock()->getSequence(toSq).lock();
-	auto track = fromSequence->getTrack(fromTr).lock().get();
 
-	if (checkAllTimesAndNotes(i, fromSequence.get(), track))
+	if (checkAllTimesAndNotes(i, sequencer.lock()->getActiveSequence().lock().get(), sequencer.lock()->getActiveTrack().lock().get()))
 	{
 		return;
 	}
@@ -297,7 +295,7 @@ void EventsScreen::turnWheel(int i)
 	}
 	else if (param.compare("from-tr") == 0)
 	{
-		setFromTr(fromTr + i);
+		setFromTr(sequencer.lock()->getActiveTrackIndex() +i);
 	}
 	else if (param.compare("to-sq") == 0)
 	{
@@ -352,35 +350,35 @@ void EventsScreen::turnWheel(int i)
 void EventsScreen::displayStart()
 {
 	auto seq = sequencer.lock()->getSequence(toSq).lock();
-	findField("start0").lock()->setText(StrUtil::padLeft(to_string(SeqUtil::getBar(seq.get(), start) + 1), "0", 3));
-	findField("start1").lock()->setText(StrUtil::padLeft(to_string(SeqUtil::getBeat(seq.get(), start) + 1), "0", 2));
-	findField("start2").lock()->setText(StrUtil::padLeft(to_string(SeqUtil::getClock(seq.get(), start)), "0", 2));
+	findField("start0").lock()->setTextPadded(SeqUtil::getBar(seq.get(), start) + 1, "0");
+	findField("start1").lock()->setTextPadded(SeqUtil::getBeat(seq.get(), start) + 1, "0");
+	findField("start2").lock()->setTextPadded(SeqUtil::getClock(seq.get(), start), "0");
 }
 
 void EventsScreen::displayTime()
 {
 	auto seq = sequencer.lock()->getActiveSequence().lock();
-	findField("time0").lock()->setText(StrUtil::padLeft(to_string(SeqUtil::getBar(seq.get(), time0) + 1), "0", 3));
-	findField("time1").lock()->setText(StrUtil::padLeft(to_string(SeqUtil::getBeat(seq.get(), time0) + 1), "0", 2));
-	findField("time2").lock()->setText(StrUtil::padLeft(to_string(SeqUtil::getClock(seq.get(), time0)), "0", 2));
-	findField("time3").lock()->setText(StrUtil::padLeft(to_string(SeqUtil::getBar(seq.get(), time1) + 1), "0", 3));
-	findField("time4").lock()->setText(StrUtil::padLeft(to_string(SeqUtil::getBeat(seq.get(), time1) + 1), "0", 2));
-	findField("time5").lock()->setText(StrUtil::padLeft(to_string(SeqUtil::getClock(seq.get(), time1)), "0", 2));
+	findField("time0").lock()->setTextPadded(SeqUtil::getBar(seq.get(), time0) + 1, "0");
+	findField("time1").lock()->setTextPadded(SeqUtil::getBeat(seq.get(), time0) + 1, "0");
+	findField("time2").lock()->setTextPadded(SeqUtil::getClock(seq.get(), time0), "0");
+	findField("time3").lock()->setTextPadded(SeqUtil::getBar(seq.get(), time1) + 1, "0");
+	findField("time4").lock()->setTextPadded(SeqUtil::getBeat(seq.get(), time1) + 1, "0");
+	findField("time5").lock()->setTextPadded(SeqUtil::getClock(seq.get(), time1), "0");
 }
 
 void EventsScreen::displayCopies()
 {
 	if (editFunctionNumber == 0)
 	{
-		findField("copies").lock()->setText(StrUtil::padLeft(to_string(copies), " ", 3));
+		findField("copies").lock()->setTextPadded(copies);
 	}
 	else if (editFunctionNumber == 1)
 	{
-		findField("copies").lock()->setText(StrUtil::padLeft(to_string(durationValue), " ", 4));
+		findField("copies").lock()->setTextPadded(durationValue);
 	}
 	else if (editFunctionNumber == 2)
 	{
-		findField("copies").lock()->setText(StrUtil::padLeft(to_string(velocityValue), " ", 3));
+		findField("copies").lock()->setTextPadded(velocityValue);
 	}
 }
 
@@ -402,15 +400,15 @@ void EventsScreen::displayMode()
 	{
 		if (transposeAmount == 0)
 		{
-			findField("mode").lock()->setText("  0");
+			findField("mode").lock()->setTextPadded(0);
 		}
 		if (transposeAmount < 0)
 		{
-			findField("mode").lock()->setText(StrUtil::padLeft(to_string(transposeAmount), " ", 3));
+			findField("mode").lock()->setTextPadded(transposeAmount);
 		}
 		if (transposeAmount > 0)
 		{
-			findField("mode").lock()->setText(StrUtil::padLeft("+" + to_string(transposeAmount), " ", 3));
+			findField("mode").lock()->setTextPadded("+" + to_string(transposeAmount));
 		}
 	}
 }
@@ -467,7 +465,7 @@ void EventsScreen::displayEdit()
 		findLabel("start2").lock()->Hide(true);
 		findLabel("copies").lock()->setText("Value:");
 		findLabel("copies").lock()->setSize(6 * 6 + 1, 7);
-		findLabel("copies").lock()->setLocation(138, 35);
+		findLabel("copies").lock()->setLocation(144, 35);
 		findField("copies").lock()->setLocation(findField("copies").lock()->getX(), 34);
 		
 		if (editFunctionNumber == 2)
@@ -502,20 +500,25 @@ void EventsScreen::displayEdit()
 		findLabel("start2").lock()->Hide(true);
 		findLabel("copies").lock()->setText("(Except drum track)");
 		findLabel("copies").lock()->setLocation(132, 38);
-		findLabel("copies").lock()->setSize(112, 7);
+		findLabel("copies").lock()->setSize(113, 7);
 		findLabel("mode").lock()->setLocation(138, 20);
 		findField("mode").lock()->setSize(3 * 6 + 1, 9);
 	}
+	
+	displayCopies();
+	displayFromSq();
+	displayFromTr();
+	displayMode();
+	displayStart();
+	displayToSq();
+	displayToTr();
 }
 
 void EventsScreen::displayNotes()
 {
 	init();
-
-	auto sequence = sequencer.lock()->getActiveSequence().lock();
-	auto track = sequence->getTrack(fromTr).lock();
-
-	if (track->getBus() == 0)
+	
+	if (sequencer.lock()->getActiveTrack().lock()->getBus() == 0)
 	{
 		findField("note0").lock()->setSize(47, 9);
 		findField("note1").lock()->Hide(false);
@@ -549,8 +552,7 @@ void EventsScreen::displayDrumNotes()
 	}
 	else
 	{
-		auto sequence = sequencer.lock()->getActiveSequence().lock();
-		auto track = sequence->getTrack(fromTr).lock();
+		auto track = sequencer.lock()->getActiveTrack().lock();
 		auto program = sampler.lock()->getProgram(sampler.lock()->getDrum(track->getBus() - 1)->getProgram()).lock();
 		
 		auto noteText = StrUtil::padLeft(to_string(drumNote), " ", 2);
@@ -589,7 +591,9 @@ void EventsScreen::setFromTr(int i)
 	{
 		return;
 	}
-	fromTr = i;
+	
+	sequencer.lock()->setActiveTrackIndex(i);
+
 	displayFromTr();
 }
 
@@ -638,11 +642,13 @@ void EventsScreen::setDurationMode(int i)
 	}
 
 	durationMode = i;
+
 	if (durationMode == 2 && durationValue > 200)
 	{
 		setDuration(200);
 	}
-	displayDurationMode();
+	
+	displayMode();
 }
 
 void EventsScreen::setVelocityMode(int i)
@@ -651,6 +657,7 @@ void EventsScreen::setVelocityMode(int i)
 	{
 		return;
 	}
+
 	velocityMode = i;
 
 	if (velocityMode != 2 && velocityValue > 127)
@@ -658,7 +665,7 @@ void EventsScreen::setVelocityMode(int i)
 		setVelocityValue(127);
 	}
 	
-	displayVelocityMode();
+	displayMode();
 }
 
 void EventsScreen::setTransposeAmount(int i)
@@ -667,8 +674,11 @@ void EventsScreen::setTransposeAmount(int i)
 	{
 		return;
 	}
+
 	transposeAmount = i;
-	displayTransposeAmount();
+	// Field otherwise used for displaying mode is
+	// replaced by an "Amount:" field.
+	displayMode();
 }
 
 void EventsScreen::setDuration(int i)
@@ -697,8 +707,12 @@ void EventsScreen::setVelocityValue(int i)
 	{
 		return;
 	}
+
 	velocityValue = i;
-	displayVelocityValue();
+
+	// Field otherwise used for displaying "Copies:" is
+	// replaced by a "Value:" field.
+	displayCopies();
 }
 
 void EventsScreen::setStart(int i)
@@ -709,40 +723,20 @@ void EventsScreen::setStart(int i)
 
 void EventsScreen::displayFromSq()
 {
-	findField("from-sq").lock()->setText(to_string(sequencer.lock()->getActiveSequenceIndex() + 1));
+	findField("from-sq").lock()->setTextPadded(sequencer.lock()->getActiveSequenceIndex() + 1);
 }
 
 void EventsScreen::displayFromTr()
 {
-	findField("from-tr").lock()->setText(to_string(fromTr + 1));
+	findField("from-tr").lock()->setTextPadded(sequencer.lock()->getActiveTrackIndex() + 1);
 }
 
 void EventsScreen::displayToSq()
 {
-	findField("to-sq").lock()->setText(to_string(toSq + 1));
+	findField("to-sq").lock()->setTextPadded(toSq + 1);
 }
 
 void EventsScreen::displayToTr()
 {
-	findField("to-tr").lock()->setText(to_string(toTr + 1));
-}
-
-void EventsScreen::displayDurationMode()
-{
-
-}
-
-void EventsScreen::displayVelocityMode()
-{
-
-}
-
-void EventsScreen::displayTransposeAmount()
-{
-
-}
-
-void EventsScreen::displayVelocityValue()
-{
-
+	findField("to-tr").lock()->setTextPadded(toTr + 1);
 }
