@@ -352,6 +352,11 @@ MRECT Component::getDirtyArea()
 	{
 		auto rect = getRect();
 		res = res.Union(&rect);
+
+		if (!preDrawClearRect.Empty())
+		{
+			res = res.Union(&preDrawClearRect);
+		}
 	}
 
 	return res;
