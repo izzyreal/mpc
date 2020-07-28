@@ -67,8 +67,9 @@ void TextComp::Draw(std::vector<std::vector<bool>>* pixels)
 
 	if (alignment == Alignment::Centered && !textuallyAligned)
 	{
-		auto charsToAlign = StrUtil::replaceAll(text.substr(0, alignmentEndX / FONT_WIDTH), ' ', "");
-		textToRender = charsToAlign + text.substr(alignmentEndX / FONT_WIDTH);
+		auto charsToAlignCount = min(int(ceil(alignmentEndX / float(FONT_WIDTH))), (int)text.length());
+		auto charsToAlign = StrUtil::replaceAll(text.substr(0, charsToAlignCount), ' ', "");
+		textToRender = charsToAlign + text.substr(charsToAlignCount);
 		auto charsWidthInPixels = mpc::Util::getTextWidthInPixels(charsToAlign);
 		alignmentOffset = (alignmentEndX - charsWidthInPixels) * 0.5;
 	}
@@ -184,7 +185,7 @@ void TextComp::setText(const string& s)
 
 	if (alignment == Alignment::Centered && alignmentEndX != w)
 	{
-		auto charsToAlignCount = alignmentEndX / FONT_WIDTH;
+		auto charsToAlignCount = min(int(ceil(alignmentEndX / float(FONT_WIDTH))), (int)text.length());
 		auto charsToAlign = StrUtil::replaceAll(text.substr(0, charsToAlignCount), ' ', "");
 		
 		if ((charsToAlignCount - charsToAlign.length()) % 2 == 0)

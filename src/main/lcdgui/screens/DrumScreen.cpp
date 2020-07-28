@@ -13,6 +13,8 @@ DrumScreen::DrumScreen(const int layerIndex)
 
 void DrumScreen::open()
 {
+	findField("program-change").lock()->setAlignment(Alignment::Centered);
+	findField("midi-volume").lock()->setAlignment(Alignment::Centered);
 	init();
 	displayDrum();
 	displayPadToInternalSound();
@@ -57,15 +59,20 @@ void DrumScreen::turnWheel(int i)
 		mpcSoundPlayerChannel->setProgram(mpcSoundPlayerChannel->getProgram() + i);
 		displayPgm();
 	}
-	else if (param.compare("programchange") == 0)
+	else if (param.compare("program-change") == 0)
 	{
 		mpcSoundPlayerChannel->setReceivePgmChange(i > 0);
 		displayPgmChange();
 	}
-	else if (param.compare("midivolume") == 0)
+	else if (param.compare("midi-volume") == 0)
 	{
 		mpcSoundPlayerChannel->setReceiveMidiVolume(i > 0);
 		displayMidiVolume();
+	}
+	else if (param.compare("current-val") == 0)
+	{
+		mpcSoundPlayerChannel->setLastReceivedMidiVolume(mpcSoundPlayerChannel->getLastReceivedMidiVolume() + i);
+		displayCurrentVal();
 	}
 	else if (param.compare("padtointernalsound") == 0)
 	{
@@ -75,7 +82,8 @@ void DrumScreen::turnWheel(int i)
 
 void DrumScreen::displayCurrentVal()
 {
-	findLabel("currentval").lock()->setTextPadded(sampler.lock()->getUnusedSampleCount(), " ");
+	init();
+	findField("current-val").lock()->setTextPadded(mpcSoundPlayerChannel->getLastReceivedMidiVolume());
 }
 
 void DrumScreen::displayDrum()
@@ -96,12 +104,12 @@ void DrumScreen::displayPgm()
 
 void DrumScreen::displayPgmChange()
 {
-	findField("programchange").lock()->setText(mpcSoundPlayerChannel->receivesPgmChange() ? "RECEIVE" : "IGNORE");
+	findField("program-change").lock()->setText(mpcSoundPlayerChannel->receivesPgmChange() ? "RECEIVE" : "IGNORE");
 }
 
 void DrumScreen::displayMidiVolume()
 {
-	findField("midivolume").lock()->setText(mpcSoundPlayerChannel->receivesMidiVolume() ? "RECEIVE" : "IGNORE");
+	findField("midi-volume").lock()->setText(mpcSoundPlayerChannel->receivesMidiVolume() ? "RECEIVE" : "IGNORE");
 }
 
 bool DrumScreen::isPadToIntSound()
