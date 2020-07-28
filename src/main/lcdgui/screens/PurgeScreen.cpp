@@ -11,6 +11,7 @@ PurgeScreen::PurgeScreen(const int layerIndex)
 void PurgeScreen::open()
 {
 	findLabel("value").lock()->setTextPadded(sampler.lock()->getUnusedSampleCount(), " ");
+	ls.lock()->setFunctionKeysArrangement(sampler.lock()->getUnusedSampleCount() > 0 ? 1 : 0);
 }
 
 void PurgeScreen::function(int f)
@@ -31,9 +32,9 @@ void PurgeScreen::function(int f)
 	case 3:
 		ls.lock()->openScreen("select-drum");
 		break;
-	case 4:
+	case 5:
 		sampler.lock()->purge();
-		ls.lock()->openScreen("purge");
+		open();
 		break;
 	}
 }

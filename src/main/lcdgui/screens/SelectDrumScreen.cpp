@@ -23,7 +23,7 @@ void SelectDrumScreen::function(int i)
 {
 	init();
 
-	if (i >= 4)
+	if (i > 3)
 	{
 		return;
 	}
@@ -31,19 +31,11 @@ void SelectDrumScreen::function(int i)
 	auto drumScreen = dynamic_pointer_cast<DrumScreen>(Screens::getScreenComponent("drum"));
 	drumScreen->drum = i;
 
-	auto previousScreenName = ls.lock()->getPreviousScreenName();
-	auto name = string("program-assign");
-
-	if (previousScreenName.compare("program-params") == 0 || previousScreenName.compare("drum") == 0 || previousScreenName.compare("purge") == 0)
-	{
-		name = previousScreenName;
-	}
-
 	if (mpc.getNote() < 35)
 	{
 		mpc.setPadAndNote(program.lock()->getPadIndexFromNote(35), 35);
 	}
 
-	ls.lock()->openScreen(name);
+	ls.lock()->openScreen("program-assign");
 	return;
 }

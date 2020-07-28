@@ -841,8 +841,6 @@ void Sampler::purge()
 			deleteSound(s);
 		}
 	}
-
-	soundIndex = -1;
 }
 
 void Sampler::deleteSound(weak_ptr<Sound> sound)
@@ -858,9 +856,31 @@ void Sampler::deleteSound(weak_ptr<Sound> sound)
 
 	stable_sort(sounds.begin(), sounds.end(), compareMemoryIndex);
 
+	vector<NoteParameters*> correctedNoteParameters;
+
 	for (int i = 0; i < sounds.size(); i++)
 	{
+		auto oldMemoryIndex = sounds[i]->getMemoryIndex();
+
 		sounds[i]->setMemoryIndex(i);
+
+		auto newMemoryIndex = sounds[i]->getMemoryIndex();
+
+		for (auto& program : programs)
+		{
+			if (program == nullptr)
+				continue;
+
+			for (auto noteParameters : program->getNotesParameters())
+			{
+				if (find(correctedNoteParameters.begin(), correctedNoteParameters.end(), noteParameters) != correctedNoteParameters.end())
+					continue;
+			
+				if (noteParameters->getSndNumber() == oldMemoryIndex)
+					noteParameters->setSoundNumber(newMemoryIndex);
+			}
+		}
+
 	}
 
 	switch (soundSortingType)
