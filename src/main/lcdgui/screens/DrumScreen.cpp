@@ -123,6 +123,9 @@ void DrumScreen::setDrum(int i)
 	}
 
 	drum = i;
+
+	init();
+
 	displayDrum();
 	displayPgm();
 	displayPgmChange();

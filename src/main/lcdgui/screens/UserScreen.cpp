@@ -6,6 +6,8 @@
 
 #include <nvram/NvRam.hpp>
 
+#include <mpc/MpcSoundPlayerChannel.hpp>
+
 #include <Util.hpp>
 
 using namespace mpc::lcdgui::screens;
@@ -188,7 +190,8 @@ void UserScreen::displayDeviceName()
 	{
 		if (device == 0)
 		{
-			findLabel("devicename").lock()->setText(program.lock()->getName());
+			auto programName = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(mpc.getDrum(bus - 1)->getProgram()).lock())->getName();
+			findLabel("devicename").lock()->setText(programName);
 		}
 		else
 		{
@@ -272,7 +275,9 @@ void UserScreen::setBus(int i)
 	}
 
 	bus = i;
+
 	displayBus();
+	displayDeviceName();
 }
 
 void UserScreen::setDeviceNumber(int i)
