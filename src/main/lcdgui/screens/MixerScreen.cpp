@@ -120,8 +120,6 @@ void MixerScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 		for (auto& m : mixerStrips)
 		{
 			m.lock()->setBank(mpc.getBank());
-			//m.lock()->initLabels();
-			//m.lock()->setColors();
 		}
 		displayMixerStrips();
 	}
@@ -303,13 +301,12 @@ void MixerScreen::function(int f)
 	case 1:
 	case 2:
 		setTab(f);
-		//ls.lock()->getCurrentBackground()->SetDirty();
 		break;
 	case 3:
 		ls.lock()->openScreen("mixer-setup");
 		break;
-	case 4:
-		ls.lock()->openScreen("fx-edit");
+//	case 4:
+		//ls.lock()->openScreen("fx-edit");
 	case 5:
 		setLink(!link);
 		break;
