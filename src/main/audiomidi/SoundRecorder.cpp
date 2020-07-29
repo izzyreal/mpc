@@ -114,7 +114,7 @@ int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf)
 		for (auto& f : (*right))
 			if (abs(f) > peakR) peakR = abs(f);
 
-		notifyObservers(peakL);
+		notifyObservers(pair<float, float>(peakL, peakR));
 	}
 
 	if (recording) {

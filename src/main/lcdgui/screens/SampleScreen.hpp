@@ -22,12 +22,14 @@ namespace mpc::lcdgui::screens {
 		void update(moduru::observer::Observable* observable, nonstd::any message);
 
 	private:
-		int input{ 0 };
-		int threshold{ -20 };
-		int mode{ 1 };
-		int time{ 100 };
-		int monitor{ 0 };
-		int preRec{ 100 };
+		int input = 0;
+		int threshold = -20;
+		int mode = 1;
+		int time = 100;
+		int monitor = 0;
+		int preRec = 100;
+		float peakL = 0;
+		float peakR = 0;
 
 		void setInput(int i);
 		void setThreshold(int i);
@@ -42,7 +44,7 @@ namespace mpc::lcdgui::screens {
 		void displayTime();
 		void displayMonitor();
 		void displayPreRec();
-		void updateVU(float value);
+		void updateVU(const float levelL, const float levelR);
 
 	public:
 		int getMode();

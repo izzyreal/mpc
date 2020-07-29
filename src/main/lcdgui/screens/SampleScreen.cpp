@@ -20,20 +20,20 @@ void SampleScreen::open()
 	displayMonitor();
 	displayPreRec();
 
-	auto ams = Mpc::instance().getAudioMidiServices().lock();
+	auto ams = mpc.getAudioMidiServices().lock();
 	ams->getSoundRecorder().lock()->addObserver(this);
 }
 
 void SampleScreen::close()
 {
-	auto ams = Mpc::instance().getAudioMidiServices().lock();
+	auto ams = mpc.getAudioMidiServices().lock();
 	ams->getSoundRecorder().lock()->deleteObserver(this);
 
 }
 
 void SampleScreen::left() {
 	//if (sampler.lock()->isArmed() || sampler.lock()->isRecording()) return;
-	if (Mpc::instance().getAudioMidiServices().lock()->isRecordingSound())
+	if (mpc.getAudioMidiServices().lock()->isRecordingSound())
 	{
 		return;
 	}
@@ -42,7 +42,7 @@ void SampleScreen::left() {
 
 void SampleScreen::right() {
 	//if (sampler.lock()->isArmed() || sampler.lock()->isRecording()) return;
-	if (Mpc::instance().getAudioMidiServices().lock()->isRecordingSound()) {
+	if (mpc.getAudioMidiServices().lock()->isRecordingSound()) {
 		return;
 	}
 	BaseControls::right();
@@ -50,7 +50,7 @@ void SampleScreen::right() {
 
 void SampleScreen::up() {
 	//if (sampler.lock()->isArmed() || sampler.lock()->isRecording()) return;
-	if (Mpc::instance().getAudioMidiServices().lock()->isRecordingSound()) {
+	if (mpc.getAudioMidiServices().lock()->isRecordingSound()) {
 		return;
 	}
 	BaseControls::up();
@@ -58,7 +58,7 @@ void SampleScreen::up() {
 
 void SampleScreen::down() {
 	//if (sampler.lock()->isArmed() || sampler.lock()->isRecording()) return;
-	if (Mpc::instance().getAudioMidiServices().lock()->isRecordingSound()) {
+	if (mpc.getAudioMidiServices().lock()->isRecordingSound()) {
 		return;
 	}
 	BaseControls::down();
@@ -71,16 +71,14 @@ void SampleScreen::function(int i)
 	switch (i)
 	{
 	case 0:
-		if (Mpc::instance().getAudioMidiServices().lock()->isRecordingSound())
-		{
+		if (mpc.getAudioMidiServices().lock()->isRecordingSound()) {
 			return;
 		}
-		//if (!samplerisRecording() && !samplerisArmed())
-			//samplerresetPeak();
+		peakL = 0.f;
+		peakR = 0.f;
 		break;
 	case 4:
-		if (Mpc::instance().getAudioMidiServices().lock()->isRecordingSound())
-		{
+		if (mpc.getAudioMidiServices().lock()->isRecordingSound()) {
 			return;
 		}
 		//if (samplerisRecording()) {
@@ -93,14 +91,14 @@ void SampleScreen::function(int i)
 		//}
 		break;
 	case 5:
-		if (Mpc::instance().getControls().lock()->isF6Pressed())
+		if (mpc.getControls().lock()->isF6Pressed())
 		{
 			return;
 		}
 
-		Mpc::instance().getControls().lock()->setF6Pressed(true);
+		mpc.getControls().lock()->setF6Pressed(true);
 
-		auto ams = Mpc::instance().getAudioMidiServices().lock();
+		auto ams = mpc.getAudioMidiServices().lock();
 
 		if (ams->isRecordingSound())
 		{
@@ -150,7 +148,7 @@ void SampleScreen::turnWheel(int i)
 		{
 			setMonitor(monitor + i);
 			bool muteMonitor = monitor == 0;
-			Mpc::instance().getAudioMidiServices().lock()->muteMonitor(muteMonitor);
+			mpc.getAudioMidiServices().lock()->muteMonitor(muteMonitor);
 		}
 		else if (param.compare("prerec") == 0)
 		{
@@ -233,7 +231,7 @@ void SampleScreen::displayInput()
 
 void SampleScreen::displayThreshold()
 {
-	auto thresholdText = threshold == -64 ? "-\u00D9\u00DA" : to_string(threshold);
+	auto thresholdText = threshold == -64 ? u8"-\u00D9\u00DA" : to_string(threshold);
 	findField("threshold").lock()->setText(thresholdText);
 }
 
@@ -259,23 +257,27 @@ void SampleScreen::displayPreRec()
 	findField("prerec").lock()->setText(to_string(preRec) + "ms");
 }
 
-void SampleScreen::updateVU(float value)
+void SampleScreen::updateVU(const float levelL, const float levelR)
 {
 	string lString = "";
 	string rString = "";
-	auto peaklValue = value;
-	auto peakrValue = value;
+	int peaklValue = peakL * 34;
+	int peakrValue = peakR * 34;
 	int thresholdValue = (threshold + 63) * 0.53125;
-	int levell = value;
-	int levelr = value;
+	
+	int levell = levelL * 34;
+	int levelr = levelR * 34;
+
 	for (int i = 0; i < 34; i++) {
 		string l = " ";
 		string r = " ";
 		bool normall = i <= levell;
 		bool normalr = i <= levelr;
 		bool threshold = i == thresholdValue;
+		
 		bool peakl = i == peaklValue;
 		bool peakr = i == peakrValue;
+	
 		if (threshold && peakl) l = vu_peak_threshold;
 		if (threshold && peakr) r = vu_peak_threshold;
 
@@ -299,7 +301,7 @@ void SampleScreen::updateVU(float value)
 	}
 
 	findLabel("vuleft").lock()->setText(lString);
-	findLabel("vuright").lock()->setText(lString);
+	findLabel("vuright").lock()->setText(rString);
 }
 
 int SampleScreen::getMode()
@@ -318,8 +320,12 @@ void SampleScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 	{
 		try
 		{
-			auto vuValue = nonstd::any_cast<float>(arg);
-			updateVU(vuValue * 100);
+			auto vuValue = nonstd::any_cast<pair<float, float>>(arg);
+			auto left = vuValue.first;
+			auto right = vuValue.second;
+			if (left > peakL) peakL = left;
+			if (right > peakR) peakR = right;
+			updateVU(left, right);
 		}
 		catch (const std::exception& e) {
 			// nothing to do
