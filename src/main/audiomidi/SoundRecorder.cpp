@@ -106,8 +106,15 @@ int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf)
 	applyGain(inputGain * 0.01, right);
 
 	if (vuMeterActive.load()) {
+		float peakL = 0, peakR = 0;
 		
-		notifyObservers(buf->square());
+		for (auto& f : (*left))
+			if (abs(f) > peakL) peakL = abs(f);
+
+		for (auto& f : (*right))
+			if (abs(f) > peakR) peakR = abs(f);
+
+		notifyObservers(peakL);
 	}
 
 	if (recording) {

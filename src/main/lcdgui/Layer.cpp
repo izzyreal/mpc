@@ -12,7 +12,7 @@ Layer::Layer()
 
 mpc::lcdgui::Background* Layer::getBackground()
 {
-	return dynamic_cast<Background*>(findChild("background").lock().get());
+	return dynamic_cast<Background*>(findChild<Background>("").lock().get());
 }
 
 mpc::lcdgui::FunctionKeys* Layer::getFunctionKeys()
