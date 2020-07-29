@@ -40,7 +40,12 @@ void OthersScreen::setContrast(int i)
 		return;
 	}
 	contrast = i;
-	// Currently does not affect anything
+	notifyObservers(string("contrast"));
+}
+
+int OthersScreen::getContrast()
+{
+	return contrast;
 }
 
 void OthersScreen::function(int i)
@@ -64,7 +69,8 @@ void OthersScreen::turnWheel(int i)
 	
 	if (mpc::Mpc::instance().getControls().lock()->isAltPressed())
 	{
-		setContrast(contrast + i);
+		auto increment = i > 0 ? 1 : -1;
+		setContrast(contrast + increment);
 	}
 	else if (param.compare("tapaveraging") == 0)
 	{
