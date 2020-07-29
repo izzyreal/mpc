@@ -16,6 +16,7 @@ void SyncScreen::open()
 	displayModeOut();
 	displayReceiveMMC();
 	displaySendMMC();
+	displayShiftEarly();
 }
 
 void SyncScreen::turnWheel(int i)
@@ -37,6 +38,15 @@ void SyncScreen::turnWheel(int i)
 	else if (param.compare("mode-out") == 0)
 	{
 		setModeOut(getModeOut() + i);
+	}
+	else if (param.compare("shift-early") == 0)
+	{
+		if (modeIns[in] == 1) {
+			setShiftEarly(shiftEarly + i);
+		}
+		else {
+			setFrameRate(frameRate + i);
+		}
 	}
 	else if (param.compare("receive-mmc") == 0)
 	{
@@ -76,9 +86,7 @@ void SyncScreen::setIn(int i)
 void SyncScreen::setOut(int i)
 {
 	if (i < 0 || i > 2)
-	{
 		return;
-	}
 
 	out = i;
 	displayOut();
@@ -86,8 +94,11 @@ void SyncScreen::setOut(int i)
 
 void SyncScreen::setShiftEarly(int i)
 {
+	if (i < 0 || i > 99) // What are the real bounds on a 2KXL?
+		return;
+
 	shiftEarly = i;
-	//displayShiftEarly();
+	displayShiftEarly();
 }
 
 void SyncScreen::setSendMMCEnabled(bool b)
@@ -98,8 +109,11 @@ void SyncScreen::setSendMMCEnabled(bool b)
 
 void SyncScreen::setFrameRate(int i)
 {
+	if (i < 0 || i > 29) // What are the real bounds on a2KXL?
+		return;
+
 	frameRate = i;
-	//displayFrameRate();
+	displayShiftEarly();
 }
 
 void SyncScreen::setModeIn(int i)
@@ -111,6 +125,7 @@ void SyncScreen::setModeIn(int i)
 
 	modeIns[in] = i;
 	displayModeIn();
+	displayShiftEarly();
 }
 
 int SyncScreen::getModeOut()
@@ -145,6 +160,35 @@ void SyncScreen::setReceiveMMCEnabled(bool b)
 {
 	receiveMMCEnabled = b;
 	displayReceiveMMC();
+}
+
+// Also used to display "Frame rate:" field}
+void SyncScreen::displayShiftEarly()
+{
+	if (modeIns[in] == 0) {
+		findLabel("shift-early").lock()->Hide(true);
+		findField("shift-early").lock()->Hide(true);
+	}
+	else if (modeIns[in] == 1)
+	{
+		auto label = findLabel("shift-early").lock();
+		auto field = findField("shift-early").lock();
+		label->Hide(false);
+		field->Hide(false);
+		field->setLocation(100, field->getY());
+		label->setText("Shift early(ms):");
+		field->setTextPadded(shiftEarly);
+	}
+	else if (modeIns[in] == 2)
+	{
+		auto label = findLabel("shift-early").lock();
+		auto field = findField("shift-early").lock();
+		label->Hide(false);
+		field->Hide(false);
+		field->setLocation(70, field->getY());
+		label->setText("Frame rate:");
+		field->setTextPadded(frameRate);
+	}
 }
 
 void SyncScreen::displayIn()

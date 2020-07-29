@@ -62,6 +62,7 @@ namespace mpc::lcdgui::screens
 		void displayModeOut();
 		void displayReceiveMMC();
 		void displaySendMMC();
+		void displayShiftEarly(); // Also used to display "Frame rate:" field
 
 	public:
 		int getModeIn();
