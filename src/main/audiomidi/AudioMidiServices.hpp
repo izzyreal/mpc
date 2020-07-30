@@ -63,7 +63,8 @@ namespace mpc::audiomidi
 	private:
 		std::atomic<bool> bouncing = ATOMIC_VAR_INIT(false);
 		std::atomic<bool> recordingSound = ATOMIC_VAR_INIT(false);
-		
+		std::shared_ptr<ctoot::audio::core::AudioProcess> monitorInputAdapter;
+
 	public:
 		const bool isBouncing();
 		const bool isRecordingSound();
@@ -132,7 +133,6 @@ namespace mpc::audiomidi
 
 	public:
 		AudioMidiServices();
-		~AudioMidiServices();
 
 	};
 }

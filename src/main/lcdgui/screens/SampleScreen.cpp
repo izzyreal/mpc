@@ -3,6 +3,8 @@
 #include <audiomidi/AudioMidiServices.hpp>
 #include <audiomidi/SoundRecorder.hpp>
 
+#include <cmath>
+
 using namespace mpc::lcdgui::screens;
 using namespace std;
 
@@ -109,7 +111,7 @@ void SampleScreen::function(int i)
 		auto sound = sampler.lock()->addSound();
 		sound.lock()->setName(sampler.lock()->addOrIncreaseNumber("sound"));
 		auto lengthInFrames = time * (44100 * 0.1);
-		ams->getSoundRecorder().lock()->prepare(sound, lengthInFrames, mode);
+		ams->getSoundRecorder().lock()->prepare(sound, lengthInFrames);
 		ams->startRecordingSound();
 
 		//if (!samplerisRecording()) {
@@ -232,7 +234,7 @@ void SampleScreen::displayInput()
 void SampleScreen::displayThreshold()
 {
 	auto thresholdText = threshold == -64 ? u8"-\u00D9\u00DA" : to_string(threshold);
-	findField("threshold").lock()->setText(thresholdText);
+	findField("threshold").lock()->setTextPadded(thresholdText);
 }
 
 void SampleScreen::displayMode()
@@ -244,7 +246,7 @@ void SampleScreen::displayTime()
 {
 	string timeText = to_string(time);
 	timeText = timeText.substr(0, timeText.length() - 1) + "." + timeText.substr(timeText.length() - 1);
-	findField("time").lock()->setText(timeText);
+	findField("time").lock()->setTextPadded(timeText);
 }
 
 void SampleScreen::displayMonitor()
@@ -254,19 +256,19 @@ void SampleScreen::displayMonitor()
 
 void SampleScreen::displayPreRec()
 {
-	findField("prerec").lock()->setText(to_string(preRec) + "ms");
+	findField("prerec").lock()->setTextPadded(preRec);
 }
 
 void SampleScreen::updateVU(const float levelL, const float levelR)
 {
 	string lString = "";
 	string rString = "";
-	int peaklValue = peakL * 34;
-	int peakrValue = peakR * 34;
+	int peaklValue = min((int) floor(peakL * 34), 34);
+	int peakrValue = min((int) floor(peakR * 34), 34);
 	int thresholdValue = (threshold + 63) * 0.53125;
 	
-	int levell = levelL * 34;
-	int levelr = levelR * 34;
+	int levell = min((int) floor(levelL * 34), 34);
+	int levelr = min((int) floor(levelR * 34), 34);
 
 	for (int i = 0; i < 34; i++) {
 		string l = " ";

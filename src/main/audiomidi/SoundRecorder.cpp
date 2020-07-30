@@ -1,17 +1,18 @@
 #include <audiomidi/SoundRecorder.hpp>
 
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/SampleScreen.hpp>
+
 #include <audio/core/AudioFormat.hpp>
 #include <audio/core/AudioBuffer.hpp>
 
 #include <cmath>
 
-using namespace std;
 using namespace mpc::sampler;
 using namespace mpc::audiomidi;
-
-SoundRecorder::SoundRecorder()
-{
-}
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens;
+using namespace std;
 
 unsigned int SoundRecorder::getInputGain()
 {
@@ -27,7 +28,7 @@ void SoundRecorder::setInputGain(unsigned int gain)
 }
 
 // modes: 0 = MONO L, 1 = MONO R, 2 = STEREO
-void SoundRecorder::prepare(const weak_ptr<Sound> sound, int lengthInFrames, int mode)
+void SoundRecorder::prepare(const weak_ptr<Sound> sound, int lengthInFrames)
 {
 	if (recording) {
 		return;
@@ -35,7 +36,6 @@ void SoundRecorder::prepare(const weak_ptr<Sound> sound, int lengthInFrames, int
 
 	this->sound = sound;
 	this->lengthInFrames = lengthInFrames;
-	this->mode = mode;
 
 	if (mode != 2) {
 		sound.lock()->setMono(true);
@@ -92,9 +92,9 @@ void applyGain(float gain, vector<float>* data)
 	}
 }
 
-void SoundRecorder::setVuMeterActive(bool active)
+void SoundRecorder::setSampleScreenActive(bool active)
 {
-	vuMeterActive.store(active);
+	sampleScreenActive.store(active);
 }
 
 int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf)
@@ -105,20 +105,41 @@ int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf)
 	applyGain(inputGain * 0.01, left);
 	applyGain(inputGain * 0.01, right);
 
-	if (vuMeterActive.load()) {
+	if (sampleScreenActive.load()) {
+
+		if (!lastSampleScreenActive) {
+			lastSampleScreenActive = true;
+		}
+
+		auto sampleScreen = dynamic_pointer_cast<SampleScreen>(Screens::getScreenComponent("sample"));
+		mode = sampleScreen->getMode();
+
 		float peakL = 0, peakR = 0;
 		
 		for (auto& f : (*left))
-			if (abs(f) > peakL) peakL = abs(f);
+		{
+			if ((mode == 0 || mode == 2) && abs(f) > peakL) peakL = abs(f);
+			if (!recording) preRecBufferLeft.put(f);
+		}
 
 		for (auto& f : (*right))
-			if (abs(f) > peakR) peakR = abs(f);
+		{
+			if ((mode == 1 || mode == 2) && abs(f) > peakR) peakR = abs(f);
+			if (!recording) preRecBufferRight.put(f);
+		}
 
 		notifyObservers(pair<float, float>(peakL, peakR));
 	}
+	else {
+		if (lastSampleScreenActive)
+		{
+			preRecBufferLeft.reset();
+			preRecBufferLeft.reset();
+			lastSampleScreenActive = false;
+		}
+	}
 
 	if (recording) {
-
 		auto s = sound.lock();
 		auto osc = s->getOscillatorControls();
 		auto currentLength = s->getOscillatorControls()->getFrameCount();
@@ -204,7 +225,4 @@ void SoundRecorder::initSrc() {
 	if (mode == 1 || mode == 2) {
 		srcRight = src_new(0, 1, &srcRightError);
 	}
-}
-
-SoundRecorder::~SoundRecorder() {
 }

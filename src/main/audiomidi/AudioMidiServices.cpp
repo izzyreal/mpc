@@ -7,6 +7,7 @@
 #include <audiomidi/DiskRecorder.hpp>
 #include <audiomidi/SoundRecorder.hpp>
 #include <audiomidi/SoundPlayer.hpp>
+#include <audiomidi/MonitorInputAdapter.hpp>
 #include <audiomidi/MpcMidiPorts.hpp>
 
 #include <nvram/NvRam.hpp>
@@ -134,6 +135,9 @@ void AudioMidiServices::start(const int sampleRate, const int inputCount, const 
 	for (int i = 0; i < inputProcesses.size(); i++)
 	{
 		inputProcesses[i] = shared_ptr<IOAudioProcess>(server->openAudioInput(getInputNames()[i], "mpc_in" + to_string(i)));
+		// For now we assume there is only 1 stereo input pair max
+		if (i == 0)
+			monitorInputAdapter = make_shared<MonitorInputAdapter>(inputProcesses[i].get());
 	}
 
 	for (int i = 0; i < outputProcesses.size(); i++)
@@ -158,7 +162,7 @@ void AudioMidiServices::start(const int sampleRate, const int inputCount, const 
 	cac->add(frameSeq.get());
 	cac->add(mixer.get());
 
-	mixer->getStrip("66").lock()->setInputProcess(inputProcesses[0]);
+	mixer->getStrip("66").lock()->setInputProcess(monitorInputAdapter);
 
 	offlineServer->setWeakPtr(offlineServer);
 	offlineServer->setClient(cac);
@@ -445,7 +449,4 @@ const bool AudioMidiServices::isBouncing()
 
 const bool AudioMidiServices::isRecordingSound() {
 	return recordingSound.load();
-}
-
-AudioMidiServices::~AudioMidiServices() {
 }

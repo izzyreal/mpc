@@ -77,14 +77,14 @@ int LayeredScreen::openScreen(string screenName)
 	if (currentScreenName.compare("sample") == 0)
 	{
 		ams->muteMonitor(true);
-		ams->getSoundRecorder().lock()->setVuMeterActive(false);
+		ams->getSoundRecorder().lock()->setSampleScreenActive(false);
 	}
 	else if (screenName.compare("sample") == 0)
 	{
 		auto sampleScreen = dynamic_pointer_cast<SampleScreen>(Screens::getScreenComponent("sample"));
 		bool muteMonitor = sampleScreen->getMonitor() == 0;
 		ams->muteMonitor(muteMonitor);
-		ams->getSoundRecorder().lock()->setVuMeterActive(true);
+		ams->getSoundRecorder().lock()->setSampleScreenActive(true);
 	}
 
 	if (currentScreenName.compare("erase") == 0 || currentScreenName.compare("timing-correct") == 0)
