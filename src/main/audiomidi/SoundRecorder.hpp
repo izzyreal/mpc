@@ -62,6 +62,8 @@ namespace mpc::audiomidi
 		bool isRecording();
 		unsigned int getInputGain();
 		void setInputGain(unsigned int);
+		void setArmed(bool b);
+		bool isArmed();
 
 	};
 }

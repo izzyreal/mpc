@@ -1,5 +1,7 @@
 #include <audiomidi/SoundRecorder.hpp>
 
+#include <audiomidi/AudioMidiServices.hpp>
+
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/SampleScreen.hpp>
 
@@ -27,6 +29,16 @@ void SoundRecorder::setInputGain(unsigned int gain)
 	inputGain = gain;
 }
 
+void SoundRecorder::setArmed(bool b)
+{
+	armed = b;
+}
+
+bool SoundRecorder::isArmed()
+{
+	return armed;
+}
+
 // modes: 0 = MONO L, 1 = MONO R, 2 = STEREO
 void SoundRecorder::prepare(const weak_ptr<Sound> sound, int lengthInFrames)
 {
@@ -44,10 +56,11 @@ void SoundRecorder::prepare(const weak_ptr<Sound> sound, int lengthInFrames)
 
 // Should be called from the audio thread
 void SoundRecorder::start() {
-
 	if (recording) {
 		return;
 	}
+
+	mpc::Mpc::instance().getLayeredScreen().lock()->getCurrentBackground()->setName("recording");
 
 	resampleBufferLeft.reset();
 	resampleBufferRight.reset();
@@ -88,6 +101,8 @@ void SoundRecorder::stop() {
 		src_delete(srcRight);
 		srcRight = NULL;
 	}
+
+	mpc::Mpc::instance().getLayeredScreen().lock()->openScreen("keep-or-retry");
 }
 
 void applyGain(float gain, vector<float>* data)
@@ -132,6 +147,14 @@ int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf)
 		{
 			if ((mode == 1 || mode == 2) && abs(f) > peakR) peakR = abs(f);
 			if (!recording) preRecBufferRight.put(f);
+		}
+
+		// Is this comparison correct or does the real 2KXL take Mode into account?
+		// Also, does the real 2KXL do the below in a frame-accurate manner?
+		if (armed && (log10(peakL) * 20 > sampleScreen->threshold || log10(peakR) * 20 > sampleScreen->threshold))
+		{
+			armed = false;
+			mpc::Mpc::instance().getAudioMidiServices().lock()->startRecordingSound();
 		}
 
 		notifyObservers(pair<float, float>(peakL, peakR));

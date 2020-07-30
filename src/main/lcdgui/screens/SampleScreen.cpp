@@ -15,6 +15,8 @@ SampleScreen::SampleScreen(const int layerIndex)
 
 void SampleScreen::open()
 {
+	ls.lock()->getCurrentBackground()->setName("sample");
+
 	displayInput();
 	displayThreshold();
 	displayMode();
@@ -112,16 +114,16 @@ void SampleScreen::function(int i)
 		sound.lock()->setName(sampler.lock()->addOrIncreaseNumber("sound"));
 		auto lengthInFrames = time * (44100 * 0.1);
 		ams->getSoundRecorder().lock()->prepare(sound, lengthInFrames);
-		ams->startRecordingSound();
 
-		//if (!samplerisRecording()) {
-			//samplerarm();
-			//return;
-		//}
-		//if (samplerisRecording()) {
-			//samplerstopRecordingEarlier();
-			//return;
-		//}
+		if (ams->getSoundRecorder().lock()->isArmed())
+		{
+			ams->startRecordingSound();
+		}
+		else {
+			ams->getSoundRecorder().lock()->setArmed(true);
+			findChild<Background>("").lock()->setName("waiting-for-input-signal");
+		}
+
 		break;
 	}
 }
@@ -263,47 +265,48 @@ void SampleScreen::updateVU(const float levelL, const float levelR)
 {
 	string lString = "";
 	string rString = "";
-	int peaklValue = min((int) floor(peakL * 34), 34);
-	int peakrValue = min((int) floor(peakR * 34), 34);
-	int thresholdValue = (threshold + 63) * 0.53125;
+
+	int peaklValue = (int) floor(log10(peakL) * 20);
+	int peakrValue = (int) floor(log10(peakR) * 20);
 	
-	int levell = min((int) floor(levelL * 34), 34);
-	int levelr = min((int) floor(levelR * 34), 34);
+	int levell = (int) floor(log10(levelL) * 20);
+	int levelr = (int) floor(log10(levelR) * 20);
 
 	for (int i = 0; i < 34; i++) {
 		string l = " ";
 		string r = " ";
-		bool normall = i <= levell;
-		bool normalr = i <= levelr;
-		bool threshold = i == thresholdValue;
+		bool normall = vuPosToDb[i] <= levell;
+		bool normalr = vuPosToDb[i] <= levelr;
 		
-		bool peakl = i == peaklValue;
-		bool peakr = i == peakrValue;
-	
-		if (threshold && peakl) l = vu_peak_threshold;
-		if (threshold && peakr) r = vu_peak_threshold;
+		bool thresholdHit = threshold >= vuPosToDb[i] && (i == 33 || threshold < vuPosToDb[i + 1]);
+		
+		bool peakl = peaklValue >= vuPosToDb[i] && (i == 33 || peaklValue < vuPosToDb[i + 1]);
+		bool peakr = peakrValue >= vuPosToDb[i] && (i == 33 || peakrValue < vuPosToDb[i + 1]);
 
-		if (threshold && normall && !peakl) l = vu_normal_threshold;
-		if (threshold && normalr && !peakr) r = vu_normal_threshold;
+		if (thresholdHit && peakl) l = vu_peak_threshold;
+		if (thresholdHit && peakr) r = vu_peak_threshold;
 
-		if (threshold && !peakl && !normall) l = vu_threshold;
-		if (threshold && !peakr && !normalr) r = vu_threshold;
+		if (thresholdHit && normall && !peakl) l = vu_normal_threshold;
+		if (thresholdHit && normalr && !peakr) r = vu_normal_threshold;
 
-		if (normall && !peakl && !threshold) l = vu_normal;
-		if (normalr && !peakr && !threshold) r = vu_normal;
+		if (thresholdHit && !peakl && !normall) l = vu_threshold;
+		if (thresholdHit && !peakr && !normalr) r = vu_threshold;
 
-		if (peakl && !threshold) l = vu_peak;
-		if (peakr && !threshold) r = vu_peak;
+		if (normall && !peakl && !thresholdHit) l = vu_normal;
+		if (normalr && !peakr && !thresholdHit) r = vu_normal;
 
-		if (peakl && threshold && levell == 33) l = vu_peak_threshold_normal;
-		if (peakr && threshold && levelr == 33) r = vu_peak_threshold_normal;
+		if (peakl && !thresholdHit) l = vu_peak;
+		if (peakr && !thresholdHit) r = vu_peak;
+
+		if (peakl && thresholdHit && levell == 33) l = vu_peak_threshold_normal;
+		if (peakr && thresholdHit && levelr == 33) r = vu_peak_threshold_normal;
 
 		lString += l;
 		rString += r;
 	}
 
-	findLabel("vuleft").lock()->setText(lString);
-	findLabel("vuright").lock()->setText(rString);
+	findLabel("vuleft").lock()->setText( (mode == 0 || mode == 2) ? lString : "                                  ");
+	findLabel("vuright").lock()->setText( (mode == 1 || mode == 2) ? rString : "                                  ");
 }
 
 int SampleScreen::getMode()
