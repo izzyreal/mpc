@@ -62,16 +62,21 @@ void SoundRecorder::stop() {
 	recording = false;
 	auto s = sound.lock();
 
+	auto sampleScreen = dynamic_pointer_cast<SampleScreen>(Screens::getScreenComponent("sample"));
+	auto preRecFrames = (int)(44.1 * sampleScreen->preRec);
+
 	auto frameCount = s->getOscillatorControls()->getFrameCount();
-	auto overflow = frameCount - lengthInFrames;
+
+	auto overflow = frameCount - lengthInFrames - preRecFrames; // Would be fun to check if overflow is ever not 0.
 
 	if (overflow > 0) {
 		s->getSampleData()->erase(s->getSampleData()->end() - overflow, s->getSampleData()->end());
 		if (mode == 2) {
-			s->getSampleData()->erase(s->getSampleData()->begin() + lengthInFrames , s->getSampleData()->begin() + frameCount);
+			s->getSampleData()->erase(s->getSampleData()->begin() + lengthInFrames + preRecFrames, s->getSampleData()->end());
 		}
 	}
 
+	s->setStart(preRecFrames);
 	s->setEnd(s->getOscillatorControls()->getFrameCount());
 
 	if (srcLeft != NULL) {
@@ -155,20 +160,33 @@ int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf)
 
 		if (currentLength == 0 && sampleScreen->preRec != 0)
 		{
-			auto preRecFrames = min((int)(buf->getSampleRate() * 0.001 * sampleScreen->preRec), (int)preRecBufferLeft.available());
+			auto preRecFrames = (int)(buf->getSampleRate() * 0.001 * sampleScreen->preRec);
 			vector<float> preLeft(preRecFrames);
 			vector<float> preRight(preRecFrames);
 
+			int offset = 0;
+			
+			if (preRecFrames > preRecBufferLeft.available())
+				offset = preRecFrames - preRecBufferLeft.available();
+
 			for (int i = 0; i < preRecFrames; i++)
 			{
-				preLeft[i] = preRecBufferLeft.get();
-				preRight[i] = preRecBufferRight.get();
+				if (i < offset)
+				{
+					preLeft[i] = 0;
+					preRight[i] = 0;
+					continue;
+				}
+
+				preLeft[i] = preRecBufferLeft.empty() ? 0 : preRecBufferLeft.get();
+				preRight[i] = preRecBufferRight.empty() ? 0 : preRecBufferRight.get();
 			}
 
 			if (resample)
 			{
 				auto resampledLeft = resampleChannel(true, &preLeft, buf->getSampleRate());
 				auto resampledRight = resampleChannel(false, &preRight, buf->getSampleRate());
+
 				if (mode == 0) {
 					osc->insertFrames(resampledLeft, 0);
 				}
@@ -193,8 +211,6 @@ int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf)
 			
 			preRecBufferLeft.reset();
 			preRecBufferRight.reset();
-
-			MLOG("Added " + to_string(preRecFrames) + " of pre-rec frames");
 		}
 
 		vector<float> resampledLeft;
