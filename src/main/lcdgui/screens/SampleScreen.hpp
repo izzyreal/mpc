@@ -1,6 +1,10 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
+namespace mpc::audiomidi {
+	class SoundRecorder;
+}
+
 namespace mpc::lcdgui::screens {
 
 	class SampleScreen
@@ -61,6 +65,8 @@ namespace mpc::lcdgui::screens {
 		std::vector<std::string> inputNames{ "ANALOG", "DIGITAL" };
 		std::vector<std::string> modeNames{ "MONO L", "MONO R", "STEREO" };
 		std::vector<std::string> monitorNames{ "OFF", "L/R", "1/2", "3/4", "5/6", "7/8" };
+
+		friend class mpc::audiomidi::SoundRecorder;
 
 	};
 }

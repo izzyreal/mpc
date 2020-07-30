@@ -105,13 +105,14 @@ int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf)
 	applyGain(inputGain * 0.01, left);
 	applyGain(inputGain * 0.01, right);
 
+	auto sampleScreen = dynamic_pointer_cast<SampleScreen>(Screens::getScreenComponent("sample"));
+
 	if (sampleScreenActive.load()) {
 
 		if (!lastSampleScreenActive) {
 			lastSampleScreenActive = true;
 		}
 
-		auto sampleScreen = dynamic_pointer_cast<SampleScreen>(Screens::getScreenComponent("sample"));
 		mode = sampleScreen->getMode();
 
 		float peakL = 0, peakR = 0;
@@ -150,6 +151,50 @@ int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf)
 				((mode == 1 || mode == 2) && srcRight == NULL)) {
 				initSrc();
 			}
+		}
+
+		if (currentLength == 0 && sampleScreen->preRec != 0)
+		{
+			auto preRecFrames = min((int)(buf->getSampleRate() * 0.001 * sampleScreen->preRec), (int)preRecBufferLeft.available());
+			vector<float> preLeft(preRecFrames);
+			vector<float> preRight(preRecFrames);
+
+			for (int i = 0; i < preRecFrames; i++)
+			{
+				preLeft[i] = preRecBufferLeft.get();
+				preRight[i] = preRecBufferRight.get();
+			}
+
+			if (resample)
+			{
+				auto resampledLeft = resampleChannel(true, &preLeft, buf->getSampleRate());
+				auto resampledRight = resampleChannel(false, &preRight, buf->getSampleRate());
+				if (mode == 0) {
+					osc->insertFrames(resampledLeft, 0);
+				}
+				else if (mode == 1) {
+					osc->insertFrames(resampledRight, 0);
+				}
+				else if (mode == 2) {
+					osc->insertFrames(resampledLeft, resampledRight, 0);
+				}
+			}
+			else {
+				if (mode == 0) {
+					osc->insertFrames(preLeft, 0);
+				}
+				else if (mode == 1) {
+					osc->insertFrames(preRight, 0);
+				}
+				else if (mode == 2) {
+					osc->insertFrames(preLeft, preRight, 0);
+				}
+			}
+			
+			preRecBufferLeft.reset();
+			preRecBufferRight.reset();
+
+			MLOG("Added " + to_string(preRecFrames) + " of pre-rec frames");
 		}
 
 		vector<float> resampledLeft;

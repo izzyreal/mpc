@@ -37,8 +37,8 @@ namespace mpc::audiomidi
 		circular_buffer<float> resampleBufferRight = circular_buffer<float>(10000);
 		
 		// 100ms at 44.1KHz pre-rec buffer
-		circular_buffer<float> preRecBufferLeft = circular_buffer<float>(4410);
-		circular_buffer<float> preRecBufferRight = circular_buffer<float>(4410);
+		circular_buffer<float> preRecBufferLeft = circular_buffer<float>(10000);
+		circular_buffer<float> preRecBufferRight = circular_buffer<float>(10000);
 		
 		SRC_STATE* srcLeft = NULL;
 		SRC_STATE* srcRight = NULL;
