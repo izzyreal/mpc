@@ -13,7 +13,7 @@ Parameter::Parameter(mpc::Mpc& mpc, string labelStr, string name, int x, int y, 
 {
 	const auto labelWidth = mpc::Util::getTextWidthInPixels(labelStr);
 	
-	addChild(make_shared<Label>(name, labelStr, x, y - 1, labelWidth));
+	addChild(make_shared<Label>(mpc, name, labelStr, x, y - 1, labelWidth));
 	
 	// We add + 1 to the field width, because currently the json resources provide
 	// n_characters * font_width for their width, and it should be + 1 to acommodate

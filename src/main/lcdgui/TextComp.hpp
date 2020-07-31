@@ -7,6 +7,8 @@
 #include <memory>
 #include <thread>
 
+namespace mpc { class Mpc; }
+
 namespace mpc::lcdgui
 {
 
@@ -18,6 +20,7 @@ namespace mpc::lcdgui
 		: public Component
 	{
 	private:
+		mpc::Mpc& mpc;
 		static const int BLINK_INTERVAL = 300;
 		bool blinking = false;
 		std::thread blinkThread;
@@ -57,7 +60,7 @@ namespace mpc::lcdgui
 		void setSize(int w, int h) override;
 
 	public:
-		TextComp(const std::string& name);
+		TextComp(mpc::Mpc& mpc, const std::string& name);
 		~TextComp();
 
 	};

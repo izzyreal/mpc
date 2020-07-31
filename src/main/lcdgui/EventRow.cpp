@@ -51,7 +51,7 @@ EventRow::EventRow(mpc::Mpc& mpc, int rowIndex)
 
 	for (int i = 4; i >= 0; i--)
 	{
-		auto label = parameters.lock()->addChild(make_shared<Label>(letters[i] + to_string(rowIndex), drumNoteEventLabels[i], drumNoteEventXPos[i] + 1, rowIndex * 9 + 12, drumNoteEventLabels[i].length() * 6 + 1)).lock();
+		auto label = parameters.lock()->addChild(make_shared<Label>(mpc, letters[i] + to_string(rowIndex), drumNoteEventLabels[i], drumNoteEventXPos[i] + 1, rowIndex * 9 + 12, drumNoteEventLabels[i].length() * 6 + 1)).lock();
 		labels.insert(begin(labels), dynamic_pointer_cast<Label>(label));
 
 		auto tf = parameters.lock()->addChild(make_shared<Field>(mpc, letters[i] + to_string(rowIndex), drumNoteEventXPos[i] + 1 + drumNoteEventLabels[i].length() * 6 + 1, rowIndex * 9 + 12, drumNoteEventSizes[i])).lock();

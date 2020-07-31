@@ -9,19 +9,21 @@
 #include <string>
 #include <vector>
 
+namespace mpc { class Mpc; }
+
 namespace mpc::lcdgui
 {
 	class FunctionKey
 		: public Component
 	{
+
 	public:
-		FunctionKey(const std::string& name, const int xPos);
+		FunctionKey(mpc::Mpc& mpc, const std::string& name, const int xPos);
 		void Draw(std::vector<std::vector<bool>>* pixels) override;
 		int type = -1;
 		void setText(const std::string& text);
 		void setType(const int type);
 	};
-
 
 	class FunctionKeys
 		: public Component
@@ -35,7 +37,7 @@ namespace mpc::lcdgui
 
 	public:
 		void setActiveArrangement(int i);
-		FunctionKeys(const std::string& name, std::vector<std::vector<std::string>> texts, std::vector<std::vector<int>> types);
+		FunctionKeys(mpc::Mpc& mpc, const std::string& name, std::vector<std::vector<std::string>> texts, std::vector<std::vector<int>> types);
 
 	};
 }

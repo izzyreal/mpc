@@ -49,7 +49,7 @@ MixerStrip::MixerStrip(mpc::Mpc& mpc, int columnIndex)
 			yPos -= 13;
 		}
 
-		auto label = make_shared<Label>(to_string(i), "", xPos, yPos, 5);
+		auto label = make_shared<Label>(mpc, to_string(i), "", xPos, yPos, 5);
 
 		if (i < 2)
 		{

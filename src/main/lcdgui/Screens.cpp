@@ -242,7 +242,7 @@ pair<vector<shared_ptr<Component>>, map<string, vector<string>>> Screens::get(co
 			}
 		}
 
-		auto functionKeysComponent = make_unique<FunctionKeys>("function-keys", allLabels, allTypes);
+		auto functionKeysComponent = make_unique<FunctionKeys>(mpc, "function-keys", allLabels, allTypes);
 		components.push_back(move(functionKeysComponent));
 	}
 
@@ -318,7 +318,7 @@ pair<vector<shared_ptr<Component>>, map<string, vector<string>>> Screens::get(co
 
 		for (int i = 0; i < infoNames.Size(); i++)
 		{
-			components.push_back(make_shared<Label>(infoNames[i].GetString()
+			components.push_back(make_shared<Label>(mpc, infoNames[i].GetString()
 				, ""
 				, infoX[i].GetInt()
 				, infoY[i].GetInt()

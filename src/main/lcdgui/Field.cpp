@@ -20,7 +20,7 @@ using namespace mpc::lcdgui;
 using namespace std;
 
 Field::Field(mpc::Mpc& mpc, const string& name, int x, int y, int width)
-	: TextComp(name), mpc(mpc)
+	: TextComp(mpc, name), mpc(mpc)
 {
 	this->name = name;
 	

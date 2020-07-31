@@ -16,7 +16,6 @@ PgmAllNoteParameters::PgmAllNoteParameters(ProgramFileReader* programFile)
 {
 	this->programFile = programFile;
 }
-vector<char> PgmAllNoteParameters::midiNotesArray;
 
 int PgmAllNoteParameters::getPadNumber(int midiNote)
 {

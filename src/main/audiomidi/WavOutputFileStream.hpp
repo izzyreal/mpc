@@ -18,7 +18,7 @@ void wav_putLE(std::ofstream& stream, int val, int numBytes)
 {
     for (auto b = 0; b < numBytes; b++)
     {
-        stream <<static_cast<char>(val & 255);
+        stream << static_cast<char>(val & 255);
         val >>= 8;
     }
 }

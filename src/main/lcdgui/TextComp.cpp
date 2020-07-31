@@ -16,8 +16,8 @@ using namespace mpc::lcdgui;
 using namespace moduru::lang;
 using namespace std;
 
-TextComp::TextComp(const std::string& name)
-	: Component(name)
+TextComp::TextComp(mpc::Mpc& mpc, const std::string& name)
+	: Component(name), mpc(mpc)
 {
 }
 
@@ -55,8 +55,8 @@ void TextComp::Draw(std::vector<std::vector<bool>>* pixels)
 		}
 	}
 
-	auto font = &LayeredScreen::font;
-	auto atlas = &LayeredScreen::atlas;
+	auto& font = mpc.getLayeredScreen().lock()->font;
+	auto& atlas = mpc.getLayeredScreen().lock()->atlas;
 
 	int textx = x + 1;
 	int texty = y;
@@ -86,7 +86,7 @@ void TextComp::Draw(std::vector<std::vector<bool>>* pixels)
 	while (next != UTF8_END && next >= 0)
 	{
 		moduru::gui::bmfont_char current_char;
-		current_char = font->chars[next];
+		current_char = font.chars[next];
 		atlasx = current_char.x;
 		atlasy = current_char.y;
 		
@@ -94,7 +94,7 @@ void TextComp::Draw(std::vector<std::vector<bool>>* pixels)
 		{
 			for (int y1 = 0; y1 < current_char.height; y1++)
 			{
-				bool on = (*atlas)[atlasy + y1][atlasx + x1];
+				bool on = atlas[atlasy + y1][atlasx + x1];
 			
 				if (on)
 				{

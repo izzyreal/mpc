@@ -32,8 +32,8 @@ namespace mpc::lcdgui {
 		std::vector<std::vector<bool>> pixels = std::vector<std::vector<bool>>(248, std::vector<bool>(60));
 
 	public:
-		static std::vector<std::vector<bool>> atlas;
-		static moduru::gui::bmfont font;
+		std::vector<std::vector<bool>> atlas;
+		moduru::gui::bmfont font;
 
 	private:
 		const int LAYER_COUNT = 4;

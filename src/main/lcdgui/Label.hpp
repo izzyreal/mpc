@@ -4,6 +4,8 @@
 #include "TextComp.hpp"
 #include <gui/BMFParser.hpp>
 
+namespace mpc { class Mpc; }
+
 namespace mpc::lcdgui {
 
 	class Label
@@ -12,7 +14,7 @@ namespace mpc::lcdgui {
 	{
 
 	public:
-		Label(const std::string& name, std::string text, int x, int y, int width);
+		Label(mpc::Mpc& mpc, const std::string& name, std::string text, int x, int y, int width);
 
 	};
 }

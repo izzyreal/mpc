@@ -10,13 +10,13 @@
 using namespace mpc::lcdgui;
 using namespace std;
 
-FunctionKey::FunctionKey(const std::string& name, const int xPos)
+FunctionKey::FunctionKey(mpc::Mpc& mpc, const std::string& name, const int xPos)
 	: Component(name)
 {
 	setSize(39, 9);
 	setLocation(xPos, 51);
 
-	auto label = addChild(make_shared<TextComp>(name)).lock();
+	auto label = addChild(make_shared<TextComp>(mpc, name)).lock();
 	label->setSize(0, 0);
 	label->setLocation(xPos + 1, 52);
 	label->preDrawClearRect.Clear();
@@ -100,7 +100,7 @@ void FunctionKey::setType(const int type)
 	SetDirty();
 }
 
-FunctionKeys::FunctionKeys(const string& name, vector<vector<string>> allTexts, vector<vector<int>> allTypes)
+FunctionKeys::FunctionKeys(mpc::Mpc& mpc, const string& name, vector<vector<string>> allTexts, vector<vector<int>> allTypes)
 	: Component(name)
 {
 	this->texts = allTexts;
@@ -130,7 +130,7 @@ FunctionKeys::FunctionKeys(const string& name, vector<vector<string>> allTexts, 
 	{
 		for (int i = firstFunctionKey; i <= lastFunctionKey; i++)
 		{
-			addChild(make_shared<FunctionKey>("fk" + to_string(i), xPoses[i]));
+			addChild(make_shared<FunctionKey>(mpc, "fk" + to_string(i), xPoses[i]));
 		}
 	}
 

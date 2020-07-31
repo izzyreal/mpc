@@ -11,7 +11,7 @@ using namespace std;
 PopupScreen::PopupScreen(mpc::Mpc& mpc)
 	: ScreenComponent(mpc, "popup", 3)
 {
-	addChild(make_shared<Label>("popup", "", 43, 23, 0));
+	addChild(make_shared<Label>(mpc, "popup", "", 43, 23, 0));
 	findChild<Label>("popup").lock()->setInverted(true);
 }
 

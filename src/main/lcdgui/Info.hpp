@@ -6,6 +6,8 @@
 #include <memory>
 #include <string>
 
+namespace mpc { class Mpc; }
+
 namespace mpc::lcdgui {
 
 	class Info
@@ -13,7 +15,7 @@ namespace mpc::lcdgui {
 	{
 
 	public:
-		Info(const std::string& name, int x, int y, int size);
+		Info(mpc::Mpc& mpc, const std::string& name, int x, int y, int size);
 
 	};
 }
