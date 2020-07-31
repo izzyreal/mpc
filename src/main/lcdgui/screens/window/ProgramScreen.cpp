@@ -1,13 +1,16 @@
 #include "ProgramScreen.hpp"
 
 #include <lcdgui/screens/window/NameScreen.hpp>
+#include <controls/BaseSamplerControls.hpp>
 
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::controls;
 using namespace std;
 
-ProgramScreen::ProgramScreen(mpc::Mpc& mpc, const int layerIndex) 
+ProgramScreen::ProgramScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "program", layerIndex)
 {
+	baseControls = make_shared<BaseSamplerControls>(mpc);
 }
 
 void ProgramScreen::open()

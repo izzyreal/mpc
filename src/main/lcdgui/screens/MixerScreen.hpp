@@ -1,8 +1,5 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
-
-#include <controls/BaseSamplerControls.hpp>
-
 #include <lcdgui/MixerStrip.hpp>
 
 #include <memory>
@@ -11,7 +8,6 @@ namespace mpc::lcdgui::screens
 {
 	class MixerScreen
 		: public mpc::lcdgui::ScreenComponent
-		//public mpc::controls::BaseSamplerControls
 	{
 
 	public:

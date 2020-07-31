@@ -1,13 +1,10 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
-#include <controls/BaseSamplerControls.hpp>
-
 namespace mpc::lcdgui::screens {
 
 	class PgmParamsScreen
 		: public mpc::lcdgui::ScreenComponent
-		//public mpc::controls::BaseSamplerControls
 	{
 
 	public:

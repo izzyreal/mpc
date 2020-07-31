@@ -1,13 +1,10 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
-#include <controls/BaseSamplerControls.hpp>
-
 namespace mpc::lcdgui::screens::window {
 
 	class InitPadAssignScreen
 		: public mpc::lcdgui::ScreenComponent
-		//public mpc::controls::BaseSamplerControls
 	{
 
 	private:

@@ -5,19 +5,23 @@
 
 #include <sequencer/Track.hpp>
 
+#include <controls/BaseSamplerControls.hpp>
+
 #include <lcdgui/screens/ZoneScreen.hpp>
 #include <lcdgui/screens/window/NameScreen.hpp>
 
 #include <mpc/MpcSoundPlayerChannel.hpp>
 
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::controls;
 using namespace moduru::lang;
 using namespace std;
 
 EditSoundScreen::EditSoundScreen(mpc::Mpc& mpc, const int layerIndex)
     : ScreenComponent(mpc, "edit-sound", layerIndex)
 {
-	vector<string> newTimeStretchPresetNames = vector<string>(54);
+	baseControls = make_shared<BaseSamplerControls>(mpc);
+	vector<string> newTimeStretchPresetNames(54);
 	
 	const auto letters = vector<string>{ "A", "B", "C" };
 	

@@ -1,5 +1,7 @@
 #include "PgmAssignScreen.hpp"
 
+#include <controls/BaseSamplerControls.hpp>
+
 #include <sampler/NoteParameters.hpp>
 #include <sampler/Pad.hpp>
 #include <sampler/Program.hpp>
@@ -8,12 +10,14 @@
 #include <mpc/MpcStereoMixerChannel.hpp>
 
 using namespace mpc::lcdgui::screens;
+using namespace mpc::controls;
 using namespace moduru::lang;
 using namespace std;
 
 PgmAssignScreen::PgmAssignScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "program-assign", layerIndex)
 {
+	baseControls = make_shared<BaseSamplerControls>(mpc);
 }
 
 void PgmAssignScreen::open()

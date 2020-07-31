@@ -1,14 +1,17 @@
 #include "AutoChromaticAssignmentScreen.hpp"
 
+#include <controls/BaseSamplerControls.hpp>
 #include <lcdgui/screens/window/NameScreen.hpp>
 
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::controls;
 using namespace moduru::lang;
 using namespace std;
 
 AutoChromaticAssignmentScreen::AutoChromaticAssignmentScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "auto-chromatic-assignment", layerIndex)
 {
+	baseControls = make_shared<BaseSamplerControls>(mpc);
 }
 
 void AutoChromaticAssignmentScreen::open()

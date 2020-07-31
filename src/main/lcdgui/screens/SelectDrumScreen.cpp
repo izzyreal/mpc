@@ -1,16 +1,19 @@
 #include "SelectDrumScreen.hpp"
 
 #include <sampler/Program.hpp>
+#include <controls/BaseSamplerControls.hpp>
 
 #include <lcdgui/screens/DrumScreen.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
+using namespace mpc::controls;
 using namespace std;
 
 SelectDrumScreen::SelectDrumScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "select-drum", layerIndex)
 {
+	baseControls = make_shared<BaseSamplerControls>(mpc);
 }
 
 void SelectDrumScreen::open()

@@ -1,14 +1,18 @@
 #include "CopyNoteParametersScreen.hpp"
 
+#include <controls/BaseSamplerControls.hpp>
+
 #include <mpc/MpcSoundPlayerChannel.hpp>
 
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::controls;
 using namespace moduru::lang;
 using namespace std;
 
 CopyNoteParametersScreen::CopyNoteParametersScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "copy-note-parameters", layerIndex)
 {
+	baseControls = make_shared<BaseSamplerControls>(mpc);
 }
 
 void CopyNoteParametersScreen::open()

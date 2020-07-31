@@ -152,9 +152,6 @@ using namespace moduru::lang;
 using namespace rapidjson;
 using namespace std;
 
-vector<unique_ptr<Document>> Screens::layerDocuments;
-map<string, shared_ptr<ScreenComponent>> Screens::screens;
-
 Screens::Screens(mpc::Mpc& mpc)
 	: mpc(mpc)
 {

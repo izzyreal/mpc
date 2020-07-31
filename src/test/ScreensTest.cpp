@@ -185,15 +185,15 @@ vector<string> screenNames = {
 SCENARIO("All screens can be opened", "[gui]") {
 
 	GIVEN("An initialized Mpc with an initialized Sequence") {
-		mpc::Mpc& mpc = mpc::Mpc::instance();
+		mpc::Mpc mpc;
 		mpc.init(44100, 1, 5);
-		mpc.getSequencer().lock()->getActiveSequence().lock()->init(1);
+		//mpc.getSequencer().lock()->getActiveSequence().lock()->init(1);
 		mpc.getDisk().lock()->moveForward("TEST1");
 		mpc.getDisk().lock()->initFiles();
 
 		auto f = mpc.getDisk().lock()->getFile("ALL_PGMS.APS");
 		
-		auto apsLoader = mpc::disk::ApsLoader(f);
+		auto apsLoader = mpc::disk::ApsLoader(mpc, f);
 
 		this_thread::sleep_for(chrono::milliseconds(500));
 		

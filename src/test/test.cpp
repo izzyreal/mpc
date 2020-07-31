@@ -12,7 +12,7 @@ using namespace std;
 
 TEST_CASE("Mpc is instantiated and booted", "[mpc-boot]")
 {
-	auto& mpc = mpc::Mpc::instance();
+	Mpc mpc;
 	mpc.init(44100, 1, 1);
 	REQUIRE(mpc.getSequencer().lock());
 }
@@ -20,7 +20,7 @@ TEST_CASE("Mpc is instantiated and booted", "[mpc-boot]")
 SCENARIO("A Sequencer initializes correctly", "[sequencer]") {
 
 	GIVEN("A Sequencer") {
-		auto& mpc = mpc::Mpc::instance();
+		Mpc mpc;
 		mpc.init(44100, 1, 1);
 		auto seq = mpc.getSequencer().lock();
 		seq->init();
@@ -32,7 +32,7 @@ SCENARIO("A Sequencer initializes correctly", "[sequencer]") {
 SCENARIO("A Sequence initializes correctly", "[sequence]") {
 
 	GIVEN("An initialized Sequence") {
-		auto& mpc = mpc::Mpc::instance();
+		Mpc mpc;
 		mpc.init(44100, 1, 1);
 		std::vector<string> trackNames;
 				
@@ -41,7 +41,7 @@ SCENARIO("A Sequence initializes correctly", "[sequence]") {
 		       trackNames.push_back("Track-" + to_string(i));
 		}	       
 		
-		mpc::sequencer::Sequence seq(trackNames);
+		mpc::sequencer::Sequence seq(mpc, trackNames);
 		seq.init(1);
 	    REQUIRE( seq.getInitialTempo() == 120.0 );
 	}

@@ -1,13 +1,17 @@
 #include "CreateNewProgramScreen.hpp"
 
+#include <controls/BaseSamplerControls.hpp>
+
 #include <mpc/MpcSoundPlayerChannel.hpp>
 
 using namespace mpc::lcdgui::screens::dialog;
+using namespace mpc::controls;
 using namespace std;
 
 CreateNewProgramScreen::CreateNewProgramScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "create-new-program", layerIndex)
 {
+	baseControls = make_shared<BaseSamplerControls>(mpc);
 }
 
 void CreateNewProgramScreen::open()

@@ -1,14 +1,17 @@
 #include "DrumScreen.hpp"
 
+#include <controls/BaseSamplerControls.hpp>
 #include <mpc/MpcSoundPlayerChannel.hpp>
 
 using namespace mpc::lcdgui::screens;
+using namespace mpc::controls;
 using namespace moduru::lang;
 using namespace std;
 
 DrumScreen::DrumScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "drum", layerIndex)
 {
+	baseControls = make_shared<BaseSamplerControls>(mpc);
 }
 
 void DrumScreen::open()

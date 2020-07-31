@@ -1,5 +1,6 @@
 #include "MixerScreen.hpp"
 
+#include <controls/BaseSamplerControls.hpp>
 #include <lcdgui/screens/DrumScreen.hpp>
 #include <lcdgui/screens/MixerSetupScreen.hpp>
 
@@ -12,12 +13,14 @@
 
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui;
+using namespace mpc::controls;
 using namespace moduru::lang;
 using namespace std;
 
 MixerScreen::MixerScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "mixer", layerIndex)
 {
+	baseControls = make_shared<BaseSamplerControls>(mpc);
 	addMixerStrips();
 }
 

@@ -57,6 +57,8 @@ Mpc::Mpc()
 
 void Mpc::init(const int sampleRate, const int inputCount, const int outputCount)
 {
+	diskController = make_unique<mpc::disk::DiskController>(*this);
+	
 	sequencer = make_shared<mpc::sequencer::Sequencer>(*this);
 	MLOG("Sequencer created");
 
@@ -85,18 +87,19 @@ void Mpc::init(const int sampleRate, const int inputCount, const int outputCount
 
 	controls = make_shared<controls::Controls>(*this);
 
-	diskController = make_unique<mpc::disk::DiskController>(*this);
 	diskController->initDisks();
 
 	hardware->getSlider().lock()->setValue(mpc::nvram::NvRam::getSlider());
 	mpc::nvram::NvRam::loadUserScreenValues(*this);
 
+	/*
 	for (auto& screenName : screenNames)
 	{
 		// Uncomment if you want to try and open all screens before doing anything else.
 		// For debug purposes only.
 		//layeredScreen->openScreen(screenName);
 	}
+	*/
 
 	MLOG("Mpc is ready")
 }

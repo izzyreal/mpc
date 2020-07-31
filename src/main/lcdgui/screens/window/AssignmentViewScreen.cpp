@@ -1,11 +1,15 @@
 #include "AssignmentViewScreen.hpp"
 
+#include <controls/BaseSamplerControls.hpp>
+
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::controls;
 using namespace std;
 
 AssignmentViewScreen::AssignmentViewScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "assignment-view", layerIndex)
 {
+	baseControls = make_shared<BaseSamplerControls>(mpc);
 }
 
 void AssignmentViewScreen::open()

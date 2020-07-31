@@ -1,14 +1,17 @@
 #include "VelocityModulationScreen.hpp"
 
 #include <sampler/NoteParameters.hpp>
+#include <controls/BaseSamplerControls.hpp>
 
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::controls;
 using namespace moduru::lang;
 using namespace std;
 
 VelocityModulationScreen::VelocityModulationScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "velocity-modulation", layerIndex)
 {
+	baseControls = make_shared<BaseSamplerControls>(mpc);
 }
 
 void VelocityModulationScreen::open()

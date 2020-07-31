@@ -1,13 +1,10 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
-#include <controls/BaseSamplerControls.hpp>
-
 namespace mpc::lcdgui::screens::window
 {
 	class CopyNoteParametersScreen
 		: public mpc::lcdgui::ScreenComponent
-		//public mpc::controls::BaseSamplerControls
 	{
 
 	public:

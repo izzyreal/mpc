@@ -1,8 +1,6 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
-#include <controls/BaseSamplerControls.hpp>
-
 namespace mpc::lcdgui::screens::window
 {
 	class NameScreen;
@@ -12,7 +10,6 @@ namespace mpc::lcdgui::screens::dialog
 {
 	class CreateNewProgramScreen
 		: public mpc::lcdgui::ScreenComponent
-		//public mpc::controls::BaseSamplerControls
 	{
 	public:
 		void function(int i) override;

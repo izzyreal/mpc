@@ -1,11 +1,15 @@
 #include "InitPadAssignScreen.hpp"
 
+#include <controls/BaseSamplerControls.hpp>
+
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::controls;
 using namespace std;
 
 InitPadAssignScreen::InitPadAssignScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "init-pad-assign", layerIndex)
 {
+	baseControls = make_shared<BaseSamplerControls>(mpc);
 }
 
 void InitPadAssignScreen::open()

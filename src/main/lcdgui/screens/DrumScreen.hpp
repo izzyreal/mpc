@@ -1,18 +1,20 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
-#include <controls/BaseSamplerControls.hpp>
-
 namespace mpc::lcdgui::screens
 {
 	class MixerScreen;
+}
+
+namespace mpc::controls
+{
+	class BaseSamplerControls;
 }
 
 namespace mpc::lcdgui::screens
 {
 	class DrumScreen
 		: public mpc::lcdgui::ScreenComponent
-		//public mpc::controls::BaseSamplerControls
 	{
 
 	public:

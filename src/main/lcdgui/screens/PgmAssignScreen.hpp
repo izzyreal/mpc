@@ -1,8 +1,6 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
-#include <controls/BaseSamplerControls.hpp>
-
 namespace mpc::sampler
 {
 	class Pad;
@@ -17,11 +15,9 @@ namespace mpc::lcdgui::screens {
 
 	class PgmAssignScreen
 		: public mpc::lcdgui::ScreenComponent
-		//public mpc::controls::BaseSamplerControls
 	{
 
 	public:
-
 		void function(int i) override;
 		void turnWheel(int i) override;
 		void openWindow() override;

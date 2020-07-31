@@ -23,9 +23,9 @@ namespace mpc::lcdgui
 	class Screens
 	{
 	private:
-		static std::vector<std::unique_ptr<rapidjson::Document>> layerDocuments;
-		static std::map<std::string, std::shared_ptr<ScreenComponent>> screens;
-		static void init();
+		std::vector<std::unique_ptr<rapidjson::Document>> layerDocuments;
+		std::map<std::string, std::shared_ptr<ScreenComponent>> screens;
+		void init();
 	
 	private:
 		static std::vector<std::string> zoomScreenNames;
