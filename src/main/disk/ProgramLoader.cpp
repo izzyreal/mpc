@@ -46,11 +46,11 @@ void ProgramLoader::static_loadProgram(void* this_p)
 
 void ProgramLoader::loadProgram()
 {
-	auto converter = PgmToProgramConverter(file, Mpc::instance().getSampler());
+	auto converter = PgmToProgramConverter(file, mpc.getSampler());
 	auto p = converter.get();
 	auto pgmSoundNames = converter.getSoundNames();
 	auto soundsDestIndex = vector<int>(pgmSoundNames.size());
-	auto disk = Mpc::instance().getDisk().lock();
+	auto disk = mpc.getDisk().lock();
 	
 	for (int i = 0; i < pgmSoundNames.size(); i++)
 	{
@@ -118,11 +118,11 @@ void ProgramLoader::loadProgram()
 		}
 	}
 
-	auto adapter = ProgramImportAdapter(Mpc::instance().getSampler(), p, soundsDestIndex);
+	auto adapter = ProgramImportAdapter(mpc.getSampler(), p, soundsDestIndex);
 	result = adapter.get();
-	Mpc::instance().importLoadedProgram();
+	mpc.importLoadedProgram();
 	disk->setBusy(false);
-	Mpc::instance().getLayeredScreen().lock()->openScreen("load");
+	mpc.getLayeredScreen().lock()->openScreen("load");
 }
 
 void ProgramLoader::loadSound(string soundFileName, string ext, MpcFile* soundFile, vector<int>* soundsDestIndex, bool replace, int loadSoundIndex)
@@ -150,7 +150,7 @@ void ProgramLoader::loadSound(string soundFileName, string ext, MpcFile* soundFi
 
 void ProgramLoader::showPopup(string name, string ext, int sampleSize)
 {
-	Mpc::instance().getLayeredScreen().lock()->openScreen("popup");
+	mpc.getLayeredScreen().lock()->openScreen("popup");
 	auto popupScreen = dynamic_pointer_cast<PopupScreen>(mpc.screens->getScreenComponent("popup"));
 	popupScreen->setText("LOADING " + StrUtil::toUpper(StrUtil::padRight(name, " ", 16) + "." + ext));
 
@@ -175,7 +175,7 @@ void ProgramLoader::notfound(string soundFileName, string ext)
 		
 		cantFindFileScreen->fileName = soundFileName;
 		
-		Mpc::instance().getLayeredScreen().lock()->openScreen("cant-find-file");
+		mpc.getLayeredScreen().lock()->openScreen("cant-find-file");
 
 		while (cantFindFileScreen->waitingForUser)
 		{

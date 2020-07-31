@@ -19,8 +19,8 @@
 using namespace mpc::lcdgui;
 using namespace std;
 
-Field::Field(const string& name, int x, int y, int width)
-	: TextComp(name)
+Field::Field(mpc::Mpc& mpc, const string& name, int x, int y, int width)
+	: TextComp(name), mpc(mpc)
 {
 	this->name = name;
 	
@@ -44,7 +44,7 @@ void Field::Hide(bool b)
 {
 	if (b && focus)
 	{
-		mpc::Mpc::instance().getLayeredScreen().lock()->setFocus(nextFocus);
+		mpc.getLayeredScreen().lock()->setFocus(nextFocus);
 	}
 
 	Component::Hide(b);
@@ -80,7 +80,7 @@ void Field::Draw(std::vector<std::vector<bool>>* pixels)
 
 void Field::takeFocus(string prev)
 {
-	auto layeredScreen = mpc::Mpc::instance().getLayeredScreen().lock();
+	auto layeredScreen = mpc.getLayeredScreen().lock();
 	csn = layeredScreen->getCurrentScreenName();
 	focus = true;
 	inverted = true;
@@ -120,7 +120,7 @@ void Field::loseFocus(string next)
 	/*
 	auto focusEvent = getName();
 	
-	auto layeredScreen = mpc::Mpc::instance().getLayeredScreen().lock();
+	auto layeredScreen = mpc.getLayeredScreen().lock();
 
 	csn = layeredScreen->getCurrentScreenName();
 	if (csn.compare("trim") == 0 || csn.compare("loop") == 0) {

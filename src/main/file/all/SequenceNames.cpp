@@ -40,10 +40,10 @@ SequenceNames::SequenceNames(vector<char> b)
 	}
 }
 
-SequenceNames::SequenceNames()
+SequenceNames::SequenceNames(mpc::Mpc& mpc)
 {
 	saveBytes = vector<char>(LENGTH);
-	auto sequencer = Mpc::instance().getSequencer().lock();
+	auto sequencer = mpc.getSequencer().lock();
 
 	for (int i = 0; i < 99; i++)
 	{

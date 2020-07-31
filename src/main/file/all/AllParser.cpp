@@ -75,10 +75,10 @@ AllParser::AllParser(mpc::Mpc& mpc, string allName)
 	chunks.push_back(midiSyncMisc->getBytes());
 	misc = new Misc(mpc);
 	chunks.push_back(misc->getBytes());
-	seqNames = new SequenceNames();
+	seqNames = new SequenceNames(mpc);
 	chunks.push_back(seqNames->getBytes());
 	songs = vector<Song*>(20);
-	auto sequencer = Mpc::instance().getSequencer().lock();
+	auto sequencer = mpc.getSequencer().lock();
 	for (int i = 0; i < 20; i++) {
 		songs[i] = new Song(sequencer->getSong(i).lock().get());
 		chunks.push_back(songs[i]->getBytes());

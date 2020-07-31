@@ -7,7 +7,8 @@
 using namespace mpc::hardware;
 using namespace std;
 
-Pot::Pot(string label)
+Pot::Pot(mpc::Mpc& mpc, string label)
+	: mpc(mpc)
 {
 	this->label = label;
 	
@@ -21,22 +22,22 @@ void Pot::setValue(int i) {
 
 	if (label.compare("vol") == 0)
 	{
-		Mpc::instance().getAudioMidiServices().lock()->setMasterLevel(i);
+		mpc.getAudioMidiServices().lock()->setMasterLevel(i);
 	}
 	else if (label.compare("rec") == 0)
 	{
-		Mpc::instance().getAudioMidiServices().lock()->setRecordLevel(i);
+		mpc.getAudioMidiServices().lock()->setRecordLevel(i);
 	}
 }
 
 int Pot::getValue() {
 	if (label.compare("vol") == 0)
 	{
-		return Mpc::instance().getAudioMidiServices().lock()->getMasterLevel();
+		return mpc.getAudioMidiServices().lock()->getMasterLevel();
 	}
 	else if (label.compare("rec") == 0)
 	{
-		return Mpc::instance().getAudioMidiServices().lock()->getRecordLevel();
+		return mpc.getAudioMidiServices().lock()->getRecordLevel();
 	}
 	return 0;
 }

@@ -367,7 +367,7 @@ void Sequencer::trackDown()
 
 bool Sequencer::isPlaying()
 {
-	auto ams = Mpc::instance().getAudioMidiServices().lock();
+	auto ams = mpc.getAudioMidiServices().lock();
 	auto frameSequencer = ams->getFrameSequencer().lock();
 	auto server = ams->getAudioServer();
 	
@@ -444,7 +444,7 @@ void Sequencer::play(bool fromStart)
 		}
 	}
 
-	auto hw = Mpc::instance().getHardware().lock();
+	auto hw = mpc.getHardware().lock();
 	
 	if (!songMode)
 	{
@@ -467,7 +467,7 @@ void Sequencer::play(bool fromStart)
 
 	hw->getLed("play").lock()->light(true);
 
-	auto ams = Mpc::instance().getAudioMidiServices().lock();
+	auto ams = mpc.getAudioMidiServices().lock();
 
 	if (ams->isBouncePrepared())
 	{
@@ -502,7 +502,7 @@ void Sequencer::undoSeq()
 	sequences[activeSequenceIndex]->resetTrackEventIndices(position);
 
 	lastRecordingActive = !lastRecordingActive;
-	auto hw = Mpc::instance().getHardware().lock();
+	auto hw = mpc.getHardware().lock();
 	hw->getLed("undoseq").lock()->light(lastRecordingActive);
 
 	setActiveSequenceIndex(getActiveSequenceIndex()); // Shortcut to notifying SequencerObserver
@@ -517,7 +517,7 @@ void Sequencer::clearUndoSeq()
 	undoPlaceHolder.reset();
 
     lastRecordingActive = false;
-	auto hw = Mpc::instance().getHardware().lock();
+	auto hw = mpc.getHardware().lock();
 	hw->getLed("undoseq").lock()->light(false);
 }
 
@@ -573,7 +573,7 @@ void Sequencer::switchRecordToOverDub()
 	}
 	recording = false;
 	overdubbing = true;
-	auto hw = Mpc::instance().getHardware().lock();
+	auto hw = mpc.getHardware().lock();
 	hw->getLed("overdub").lock()->light(true);
 	hw->getLed("rec").lock()->light(false);
 }
@@ -593,7 +593,7 @@ void Sequencer::stop(){
 
 void Sequencer::stop(int tick)
 {
-	auto ams = Mpc::instance().getAudioMidiServices().lock();
+	auto ams = mpc.getAudioMidiServices().lock();
 	bool bouncing = ams->isBouncing();
 
 	if (!isPlaying() && !bouncing) {
@@ -605,7 +605,7 @@ void Sequencer::stop(int tick)
 	lastNotifiedBar = -1;
 	lastNotifiedBeat = -1;
 	lastNotifiedClock = -1;
-    //Mpc::instance().getEventHandler()->handle(MidiClockEvent(ctoot::midi::core::ShortMessage::STOP), Track(999));
+    //mpc.getEventHandler()->handle(MidiClockEvent(ctoot::midi::core::ShortMessage::STOP), Track(999));
 	auto s1 = getActiveSequence().lock();
 	auto s2 = getCurrentlyPlayingSequence().lock();
 	auto pos = getTickPosition();
@@ -629,17 +629,17 @@ void Sequencer::stop(int tick)
 
 		// This is called from the audio thread, should be called from the UI thread instead.
 		// stop() is called by FrameSeq.
-		Mpc::instance().getLayeredScreen().lock()->setFocus("sq");
+		mpc.getLayeredScreen().lock()->setFocus("sq");
 	}
     recording = false;
     overdubbing = false;
     
     move(pos);
 	if (!bouncing) {
-		Mpc::instance().getSampler().lock()->stopAllVoices(frameOffset);
+		mpc.getSampler().lock()->stopAllVoices(frameOffset);
 	}
 	for (int i = 0; i < 16; i++) {
-		Mpc::instance().getHardware().lock()->getPad(i).lock()->notifyObservers(255);
+		mpc.getHardware().lock()->getPad(i).lock()->notifyObservers(255);
 	}
     if (notifynextsq) {
         
@@ -660,7 +660,7 @@ void Sequencer::stop(int tick)
 		ams->stopBouncing();
 	}
 	
-	auto hw = Mpc::instance().getHardware().lock();
+	auto hw = mpc.getHardware().lock();
 
 	hw->getLed("overdub").lock()->light(false);
 	hw->getLed("play").lock()->light(false);
@@ -1396,7 +1396,7 @@ void Sequencer::move(int tick)
 int Sequencer::getTickPosition()
 {
     if (isPlaying()) {
-        return Mpc::instance().getAudioMidiServices().lock()->getFrameSequencer().lock()->getTickPosition();
+        return mpc.getAudioMidiServices().lock()->getFrameSequencer().lock()->getTickPosition();
     }
     return position;
 }
@@ -1589,7 +1589,7 @@ void Sequencer::storeActiveSequenceInUndoPlaceHolder()
 	undoPlaceHolder.swap(copy);
 
 	lastRecordingActive = true;
-	auto hw = Mpc::instance().getHardware().lock();
+	auto hw = mpc.getHardware().lock();
 	hw->getLed("undoseq").lock()->light(lastRecordingActive);
 }
 
@@ -1632,7 +1632,7 @@ void Sequencer::playMetronomeTrack()
 	metronomeSeq->setTimeSignature(0, 3, s->getNumerator(getCurrentBarIndex()), s->getDenominator(getCurrentBarIndex()));
 	metronomeSeq->setInitialTempo(getTempo());
 	metronomeSeq->removeFirstMetronomeClick();
-	auto lAms = Mpc::instance().getAudioMidiServices().lock();
+	auto lAms = mpc.getAudioMidiServices().lock();
 	auto fs = lAms->getFrameSequencer().lock();
 	playStartTick = 0;
 	fs->startMetronome(lAms->getAudioServer()->getSampleRate());
@@ -1642,7 +1642,7 @@ void Sequencer::stopMetronomeTrack()
 {
 	if (!metronomeOnly) return;
 	metronomeOnly = false;
-	Mpc::instance().getAudioMidiServices().lock()->getFrameSequencer().lock()->stop();
+	mpc.getAudioMidiServices().lock()->getFrameSequencer().lock()->stop();
 }
 
 weak_ptr<Sequence> Sequencer::createSeqInPlaceHolder() {

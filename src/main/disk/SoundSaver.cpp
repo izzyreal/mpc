@@ -23,7 +23,7 @@ using namespace std;
 SoundSaver::SoundSaver(mpc::Mpc& mpc, vector<weak_ptr<mpc::sampler::Sound>> sounds, bool wav)
 	: mpc(mpc)
 {	
-	disk = Mpc::instance().getDisk();
+	disk = mpc.getDisk();
 	disk.lock()->setBusy(true);
 	this->sounds = sounds;
 	this->wav = wav;
@@ -44,7 +44,7 @@ void SoundSaver::saveSounds()
 	{
 		string fileName = StrUtil::replaceAll(s.lock()->getName(), ' ', "");
 		
-		Mpc::instance().getLayeredScreen().lock()->openScreen("popup");
+		mpc.getLayeredScreen().lock()->openScreen("popup");
 		auto popupScreen = dynamic_pointer_cast<PopupScreen>(mpc.screens->getScreenComponent("popup"));
 		popupScreen->setText("SAVING " + StrUtil::padRight(fileName, " ", 16) + ext);
 
@@ -79,7 +79,7 @@ void SoundSaver::saveSounds()
 		}
 	}
 
-	Mpc::instance().getLayeredScreen().lock()->openScreen("save");
+	mpc.getLayeredScreen().lock()->openScreen("save");
 	lDisk->setBusy(false);
 }
 

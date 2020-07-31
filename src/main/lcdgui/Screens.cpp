@@ -195,8 +195,7 @@ vector<string> getFunctionKeyLabels(Value& functionKeyLabels)
 }
 
 pair<vector<shared_ptr<Component>>, map<string, vector<string>>> Screens::get(const string& screenName, int& foundInLayer, string& firstField)
-{
-	
+{	
 	if (Screens::layerDocuments.empty())
 	{
 		init();
@@ -292,7 +291,7 @@ pair<vector<shared_ptr<Component>>, map<string, vector<string>>> Screens::get(co
 			row.push_back(parameterName);
 
 			components.push_back(
-				make_unique<Parameter>(labels[i - skipCounter].GetString(),
+				make_unique<Parameter>(mpc, labels[i - skipCounter].GetString(),
 				parameterName,
 				x[i - skipCounter].GetInt(),
 				y[i - skipCounter].GetInt(),

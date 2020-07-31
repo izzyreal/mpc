@@ -75,5 +75,5 @@ void LoadASequenceFromAllScreen::displayLoadInto()
 {
 	auto loadASequenceScreen = dynamic_pointer_cast<LoadASequenceScreen>(mpc.screens->getScreenComponent("load-a-sequence"));
 	findField("load-into").lock()->setTextPadded(loadASequenceScreen->loadInto + 1, "0");
-	findLabel("load-into0").lock()->setText("-" + Mpc::instance().getSequencer().lock()->getSequence(loadASequenceScreen->loadInto).lock()->getName());
+	findLabel("load-into0").lock()->setText("-" + mpc.getSequencer().lock()->getSequence(loadASequenceScreen->loadInto).lock()->getName());
 }

@@ -45,7 +45,7 @@ ApsParser::ApsParser(mpc::Mpc& mpc, mpc::disk::MpcFile* file)
 
 ApsParser::ApsParser(mpc::Mpc& mpc, string apsNameString)
 {
-	auto sampler = Mpc::instance().getSampler().lock();
+	auto sampler = mpc.getSampler().lock();
 	vector<vector<char>> chunks;
 	programCount = sampler->getProgramCount();
 	int const soundCount = sampler->getSoundCount();

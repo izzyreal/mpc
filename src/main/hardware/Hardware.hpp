@@ -6,6 +6,8 @@
 #include <memory>
 #include <string>
 
+namespace mpc { class Mpc; }
+
 namespace mpc::hardware
 {
 	class TopPanel;
@@ -46,7 +48,7 @@ namespace mpc::hardware
 		std::weak_ptr<Slider> getSlider();
 
 	public:
-		Hardware();
+		Hardware(mpc::Mpc& mpc);
 
 	};
 }

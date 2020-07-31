@@ -257,7 +257,7 @@ void NameScreen::saveName()
 			ext = "." + ext;
 		}
 
-		bool success = Mpc::instance().getDisk().lock()->renameSelectedFile(StrUtil::trim(StrUtil::toUpper(getName())) + ext);
+		bool success = mpc.getDisk().lock()->renameSelectedFile(StrUtil::trim(StrUtil::toUpper(getName())) + ext);
 		
 		if (!success)
 		{
@@ -269,8 +269,8 @@ void NameScreen::saveName()
 		}
 		else
 		{
-			Mpc::instance().getDisk().lock()->flush();
-			Mpc::instance().getDisk().lock()->initFiles();
+			mpc.getDisk().lock()->flush();
+			mpc.getDisk().lock()->initFiles();
 			editing = false;
 			ls.lock()->setLastFocus("name", "0");
 			ls.lock()->openScreen("directory");

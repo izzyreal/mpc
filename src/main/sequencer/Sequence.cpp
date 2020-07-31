@@ -456,7 +456,7 @@ int Sequence::getLastTick()
 TimeSignature Sequence::getTimeSignature()
 {
 	auto ts = TimeSignature();
-	int bar = Mpc::instance().getSequencer().lock()->getCurrentBarIndex();
+	int bar = mpc.getSequencer().lock()->getCurrentBarIndex();
 	ts.setNumerator(numerators[bar]);
 	ts.setDenominator(denominators[bar]);
 	return ts;

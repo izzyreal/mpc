@@ -19,11 +19,11 @@ ApsSaver::ApsSaver(mpc::Mpc& mpc, string apsFileName)
 	: mpc(mpc)
 {
 	this->apsFileName = apsFileName;
-	auto disk = Mpc::instance().getDisk().lock();
+	auto disk = mpc.getDisk().lock();
 
 	if (disk->checkExists(apsFileName))
 	{
-		Mpc::instance().getLayeredScreen().lock()->openScreen("file-already-exists");
+		mpc.getLayeredScreen().lock()->openScreen("file-already-exists");
 	}
 	else
 	{
@@ -33,7 +33,7 @@ ApsSaver::ApsSaver(mpc::Mpc& mpc, string apsFileName)
 
 void ApsSaver::saveAps()
 {
-	auto disk = Mpc::instance().getDisk().lock();
+	auto disk = mpc.getDisk().lock();
 	disk->setBusy(true);
     auto file = disk->newFile(apsFileName);
 	ApsParser apsParser(mpc, apsFileName.substr(0, apsFileName.find(".")));
@@ -49,6 +49,6 @@ void ApsSaver::saveAps()
 	else
 	{
 		disk->setBusy(false);
-		Mpc::instance().getLayeredScreen().lock()->openScreen("save");
+		mpc.getLayeredScreen().lock()->openScreen("save");
 	}
 }

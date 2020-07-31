@@ -1,5 +1,7 @@
 #pragma once
 
+namespace mpc { class Mpc; }
+
 namespace mpc::sequencer
 {
 	class Sequence;
@@ -30,8 +32,8 @@ namespace mpc::lcdgui::screens
 		virtual void displayTime() = 0;
 
 	public:
-		bool checkAllTimes(int notch, mpc::sequencer::Sequence* sequence = nullptr);
-		bool checkAllTimesAndNotes(int notch, mpc::sequencer::Sequence* sequence = nullptr, mpc::sequencer::Track* track = nullptr);
+		bool checkAllTimes(mpc::Mpc& mpc, int notch, mpc::sequencer::Sequence* sequence = nullptr);
+		bool checkAllTimesAndNotes(mpc::Mpc& mpc, int notch, mpc::sequencer::Sequence* sequence = nullptr, mpc::sequencer::Track* track = nullptr);
 
 	};
 }

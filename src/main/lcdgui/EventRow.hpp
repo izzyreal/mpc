@@ -11,6 +11,8 @@ namespace ctoot::mpc
 	class MpcSoundPlayerChannel;
 }
 
+namespace mpc { class Mpc; }
+
 namespace mpc::sequencer
 {
 		class Event;
@@ -30,6 +32,7 @@ namespace mpc::lcdgui
 		: public Component
 	{
 	private:
+		mpc::Mpc& mpc;
 		std::weak_ptr<mpc::sequencer::Event> event;
 		std::weak_ptr<mpc::lcdgui::HorizontalBar> horizontalBar;
 		std::weak_ptr<mpc::lcdgui::EventRowParameters> parameters;
@@ -94,7 +97,7 @@ namespace mpc::lcdgui
 		void setSelected(bool b);
 		bool isSelected();
 
-		EventRow(int rowNumber);
+		EventRow(mpc::Mpc& mpc, int rowNumber);
 
 		static std::vector<std::string> controlNames;
 

@@ -110,12 +110,12 @@ int Sampler::getInputLevel()
 
 vector<weak_ptr<ctoot::mpc::MpcStereoMixerChannel>> Sampler::getDrumStereoMixerChannels(int i)
 {
-	return Mpc::instance().getDrums()[i]->getStereoMixerChannels();
+	return mpc.getDrums()[i]->getStereoMixerChannels();
 }
 
 vector<weak_ptr<ctoot::mpc::MpcIndivFxMixerChannel>> Sampler::getDrumIndivFxMixerChannels(int i)
 {
-	return Mpc::instance().getDrums()[i]->getIndivFxMixerChannels();
+	return mpc.getDrums()[i]->getIndivFxMixerChannels();
 }
 
 vector<int>* Sampler::getInitMasterPadAssign()
@@ -175,12 +175,12 @@ void Sampler::playMetronome(mpc::sequencer::NoteEvent* event, int framePos)
 
 	if (metronomeSoundScreen->getMetronomeSound() != 0)
 	{
-		auto program = Mpc::instance().getDrum(metronomeSoundScreen->getMetronomeSound() - 1)->getProgram();
+		auto program = mpc.getDrum(metronomeSoundScreen->getMetronomeSound() - 1)->getProgram();
 		auto accent = event->getVelocity() == metronomeSoundScreen->getAccentVelo();
 		soundNumber = programs[program]->getNoteParameters(accent ? metronomeSoundScreen->getAccentNote() : metronomeSoundScreen->getNormalNote())->getSndNumber();
 	}
 	
-	Mpc::instance().getBasicPlayer()->mpcNoteOn(soundNumber, event->getVelocity(), framePos);
+	mpc.getBasicPlayer()->mpcNoteOn(soundNumber, event->getVelocity(), framePos);
 }
 
 void Sampler::playPreviewSample(int start, int end, int loopTo, int overlapMode)
@@ -197,7 +197,7 @@ void Sampler::playPreviewSample(int start, int end, int loopTo, int overlapMode)
 	previewSound->setStart(start);
 	previewSound->setEnd(end);
 	previewSound->setLoopTo(loopTo);
-	Mpc::instance().getBasicPlayer()->noteOn(-3, 127);
+	mpc.getBasicPlayer()->noteOn(-3, 127);
 	previewSound->setStart(oldStart);
 	previewSound->setEnd(oldEnd);
 	previewSound->setLoopTo(oldLoopTo);
@@ -331,7 +331,7 @@ void Sampler::deleteAllPrograms(bool init)
 
 void Sampler::checkProgramReferences()
 {
-	auto lSequencer = Mpc::instance().getSequencer().lock();
+	auto lSequencer = mpc.getSequencer().lock();
 	auto t = lSequencer->getActiveSequence().lock()->getTrack(lSequencer->getActiveTrackIndex()).lock();
 	auto bus = t->getBus();
 
@@ -619,14 +619,14 @@ weak_ptr<Sound> Sampler::createZone(weak_ptr<Sound> source, int start, int end, 
 
 void Sampler::stopAllVoices()
 {
-	if (!Mpc::instance().getAudioMidiServices().lock()->getAudioServer()->isRunning())
+	if (!mpc.getAudioMidiServices().lock()->getAudioServer()->isRunning())
 	{
 		return;
 	}
 
-	Mpc::instance().getBasicPlayer()->allSoundOff();
+	mpc.getBasicPlayer()->allSoundOff();
 	
-	for (auto m : Mpc::instance().getDrums())
+	for (auto m : mpc.getDrums())
 	{
 		m->allSoundOff();
 	}
@@ -634,12 +634,12 @@ void Sampler::stopAllVoices()
 
 void Sampler::stopAllVoices(int frameOffset)
 {
-	dynamic_cast<ctoot::mpc::MpcSoundPlayerChannel*>(Mpc::instance().getDrums()[0])->allSoundOff(frameOffset);
+	dynamic_cast<ctoot::mpc::MpcSoundPlayerChannel*>(mpc.getDrums()[0])->allSoundOff(frameOffset);
 }
 
 void Sampler::finishBasicVoice()
 {
-	Mpc::instance().getBasicPlayer()->finishVoice();
+	mpc.getBasicPlayer()->finishVoice();
 }
 
 void Sampler::playX()
@@ -680,7 +680,7 @@ void Sampler::playX()
 	int oldEnd = sound->getEnd();
 	sound->setStart(start);
 	sound->setEnd(end);
-	Mpc::instance().getBasicPlayer()->noteOn(-4, 127);
+	mpc.getBasicPlayer()->noteOn(-4, 127);
 	sound->setStart(oldStart);
 	sound->setEnd(oldEnd);
 }
@@ -778,7 +778,6 @@ string Sampler::addOrIncreaseNumber2(string s)
 
 Pad* Sampler::getLastPad(Program* program)
 {
-	auto& mpc = Mpc::instance();
 	auto lastValidPad = mpc.getPad();
 	
 	if (lastValidPad == -1)
@@ -790,7 +789,6 @@ Pad* Sampler::getLastPad(Program* program)
 
 NoteParameters* Sampler::getLastNp(Program* program)
 {
-	auto& mpc = Mpc::instance();
 	auto lastValidNote = mpc.getNote();
 	
 	if (lastValidNote == 34)
@@ -966,17 +964,17 @@ void Sampler::mergeToStereo(vector<float>* sourceLeft, vector<float>* sourceRigh
 
 void Sampler::setDrumBusProgramNumber(int busNumber, int programNumber)
 {
-	Mpc::instance().getDrums()[busNumber - 1]->setProgram(programNumber);
+	mpc.getDrums()[busNumber - 1]->setProgram(programNumber);
 }
 
 int Sampler::getDrumBusProgramNumber(int busNumber)
 {
-	return Mpc::instance().getDrums()[busNumber - 1]->getProgram();
+	return mpc.getDrums()[busNumber - 1]->getProgram();
 }
 
 ctoot::mpc::MpcSoundPlayerChannel* Sampler::getDrum(int i)
 {
-	return Mpc::instance().getDrum(i);
+	return mpc.getDrum(i);
 }
 
 weak_ptr<ctoot::mpc::MpcSound> Sampler::getClickSound()

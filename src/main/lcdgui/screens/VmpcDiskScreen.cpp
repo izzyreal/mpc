@@ -154,7 +154,7 @@ void VmpcDiskScreen::displayRoot()
 	string root = "< SCSI-" + to_string(scsi + 1) + " disconnected >";
 
 	int store = getStore(scsi);
-	auto stores = Mpc::instance().getStores().lock();
+	auto stores = mpc.getStores().lock();
 
 	if (store != -1)
 	{

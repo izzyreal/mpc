@@ -68,7 +68,7 @@ void ApsLoader::notFound(string soundFileName, string ext)
 
 		cantFindFileScreen->fileName = soundFileName;
 
-		Mpc::instance().getLayeredScreen().lock()->openScreen("cant-find-file");
+		mpc.getLayeredScreen().lock()->openScreen("cant-find-file");
 
 		while (cantFindFileScreen->waitingForUser)
 		{
@@ -90,7 +90,7 @@ void ApsLoader::load()
 		return;
 	}
 
-	auto sampler = Mpc::instance().getSampler().lock();
+	auto sampler = mpc.getSampler().lock();
 	sampler->deleteAllSamples();
 	const bool initPgms = false;
 
@@ -196,7 +196,7 @@ void ApsLoader::load()
 	for (int i = 0; i < 4; i++)
 	{
 		auto m = apsParser.getDrumMixers()[i];
-		auto drum = Mpc::instance().getDrum(i);
+		auto drum = mpc.getDrum(i);
 
 		for (int note = 35; note <= 98; note++)
 		{
@@ -232,7 +232,7 @@ void ApsLoader::load()
 	
 	sampler->setSoundIndex(0);
 	
-	Mpc::instance().getLayeredScreen().lock()->openScreen("load");
+	mpc.getLayeredScreen().lock()->openScreen("load");
 	disk->setBusy(false);
 }
 
@@ -246,11 +246,11 @@ void ApsLoader::loadSound(string soundFileName, string ext, mpc::disk::MpcFile* 
 
 void ApsLoader::showPopup(string name, string ext, int sampleSize)
 {
-	Mpc::instance().getLayeredScreen().lock()->openScreen("popup");
+	mpc.getLayeredScreen().lock()->openScreen("popup");
 	auto popupScreen = dynamic_pointer_cast<PopupScreen>(mpc.screens->getScreenComponent("popup"));
 	popupScreen->setText("LOADING " + StrUtil::toUpper(StrUtil::padRight(name, " ", 16) + "." + ext));
 
-	if (dynamic_pointer_cast<mpc::disk::StdDisk>(Mpc::instance().getDisk().lock()))
+	if (dynamic_pointer_cast<mpc::disk::StdDisk>(mpc.getDisk().lock()))
 	{
 		auto sleepTime = sampleSize / 800;
 	

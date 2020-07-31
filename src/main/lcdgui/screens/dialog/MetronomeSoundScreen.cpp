@@ -13,7 +13,7 @@ using namespace std;
 MetronomeSoundScreen::MetronomeSoundScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "metronome-sound", layerIndex)
 {
-	sampler = Mpc::instance().getSampler();
+	sampler = mpc.getSampler();
 }
 
 void MetronomeSoundScreen::open()

@@ -63,12 +63,12 @@ int SoundLoader::loadSound(MpcFile* f)
 		soundName = soundFileName;
 	}
 	
-	auto sampler = Mpc::instance().getSampler().lock();
+	auto sampler = mpc.getSampler().lock();
 	auto existingSoundIndex = sampler->checkExists(soundName);
 	
 	if (!partOfProgram && existingSoundIndex == -1)
 	{
-		Mpc::instance().getLayeredScreen().lock()->openScreen("popup");
+		mpc.getLayeredScreen().lock()->openScreen("popup");
 		auto popupScreen = dynamic_pointer_cast<PopupScreen>(mpc.screens->getScreenComponent("popup"));
 		popupScreen->setText("LOADING " + StrUtil::padRight(soundFileName, " ", 16) + "." + extension);
 	}

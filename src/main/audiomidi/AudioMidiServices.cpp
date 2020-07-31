@@ -102,7 +102,7 @@ using namespace std;
 AudioMidiServices::AudioMidiServices(mpc::Mpc& mpc)
 	: mpc(mpc)
 {
-	frameSeq = make_shared<mpc::sequencer::FrameSeq>();
+	frameSeq = make_shared<mpc::sequencer::FrameSeq>(mpc);
 	AudioServices::scan();
 	ctoot::synth::SynthServices::scan();
 	ctoot::synth::SynthChannelServices::scan();
@@ -314,21 +314,21 @@ void AudioMidiServices::createSynth()
 
 	for (int i = 0; i < 4; i++)
 	{
-		auto m = make_shared<ctoot::mpc::MpcSoundPlayerControls>(mms, dynamic_pointer_cast<ctoot::mpc::MpcSampler>(Mpc::instance().getSampler().lock()), i, mixer, server, mixerSetupScreen.get());
+		auto m = make_shared<ctoot::mpc::MpcSoundPlayerControls>(mms, dynamic_pointer_cast<ctoot::mpc::MpcSampler>(mpc.getSampler().lock()), i, mixer, server, mixerSetupScreen.get());
 		msc->setChannelControls(i, m);
 		synthChannelControls.push_back(m);
 	}
 
 	basicVoice = make_shared<ctoot::mpc::MpcVoice>(65, true);
-	auto m = make_shared<ctoot::mpc::MpcBasicSoundPlayerControls>(Mpc::instance().getSampler(), mixer, basicVoice);
+	auto m = make_shared<ctoot::mpc::MpcBasicSoundPlayerControls>(mpc.getSampler(), mixer, basicVoice);
 	msc->setChannelControls(4, m);
 	synthChannelControls.push_back(std::move(m));
 }
 
 void AudioMidiServices::connectVoices()
 {
-	Mpc::instance().getDrums()[0]->connectVoices();
-	Mpc::instance().getBasicPlayer()->connectVoice();
+	mpc.getDrums()[0]->connectVoices();
+	mpc.getBasicPlayer()->connectVoice();
 }
 
 weak_ptr<MpcMidiPorts> AudioMidiServices::getMidiPorts()
@@ -419,7 +419,7 @@ void AudioMidiServices::stopBouncing()
 		return;
 	}
 
-	Mpc::instance().getLayeredScreen().lock()->openScreen("vmpc-recording-finished");
+	mpc.getLayeredScreen().lock()->openScreen("vmpc-recording-finished");
 	bouncing.store(false);
 }
 

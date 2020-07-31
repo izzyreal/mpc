@@ -100,7 +100,7 @@ void TimingCorrectScreen::turnWheel(int i)
 		setAmount(amount + i);
 	}
 	
-	checkAllTimesAndNotes(i);
+	checkAllTimesAndNotes(mpc, i);
 	displayTime();
 }
 

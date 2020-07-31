@@ -68,13 +68,6 @@ namespace mpc
 	class Mpc
 		: public moduru::observer::Observable
 	{
-	public:
-		static Mpc& instance()
-		{
-			static auto mpc = Mpc();
-			return mpc;
-		}
-
 	private:
 		std::thread loadSoundThread;
 		std::unique_ptr<mpc::disk::ProgramLoader> programLoader;
@@ -136,13 +129,13 @@ namespace mpc
 		void importLoadedProgram();
 
 	private:
-		static void runLoadSoundThread(int size);
+		static void runLoadSoundThread(mpc::Mpc* mpc, int size);
 
 	public:
 		std::weak_ptr<mpc::disk::AbstractDisk> getDisk();
 		std::weak_ptr<mpc::disk::Stores> getStores();
 
-	private:
+	public:
 		Mpc();
 		~Mpc();
 

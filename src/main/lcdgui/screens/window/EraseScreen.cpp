@@ -47,7 +47,7 @@ void EraseScreen::turnWheel(int i)
 		setTrack(track + i);
 	}
 
-	checkAllTimesAndNotes(i);
+	checkAllTimesAndNotes(mpc, i);
 
 	if (param.compare("erase") == 0)
 	{

@@ -108,12 +108,12 @@ void TrimScreen::function(int f)
 	}
 	case 5:
 	{
-		if (Mpc::instance().getControls().lock()->isF6Pressed())
+		if (mpc.getControls().lock()->isF6Pressed())
 		{
 			return;
 		}
 
-		Mpc::instance().getControls().lock()->setF6Pressed(true);
+		mpc.getControls().lock()->setF6Pressed(true);
 		sampler.lock()->playX();
 		break;
 	}

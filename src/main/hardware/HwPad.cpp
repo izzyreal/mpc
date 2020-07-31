@@ -8,9 +8,9 @@
 using namespace mpc::hardware;
 using namespace std;
 
-HwPad::HwPad(int index)
+HwPad::HwPad(mpc::Mpc& mpc, int index)
+	: mpc(mpc)
 {
-	
 	this->index = index;
 }
 
@@ -19,17 +19,16 @@ int HwPad::getIndex() {
 }
 
 void HwPad::push(int velo) {
-	auto c = Mpc::instance().getActiveControls();
+	auto c = mpc.getActiveControls();
+	
 	if (!c) return;
+	
 	c->pad(index, velo, false, 0);
 }
 
 void HwPad::release() {
-	auto c = Mpc::instance().getReleaseControls();
-	auto controls = Mpc::instance().getControls();
+	auto c = mpc.getReleaseControls();
+	auto controls = mpc.getControls();
 	if (!c) return;
 	c->simplePad(index);
-}
-
-HwPad::~HwPad() {
 }

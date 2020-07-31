@@ -110,7 +110,7 @@ void DirectoryScreen::function(int f)
 		break;
 	case 5:
 	{
-		auto controls = Mpc::instance().getControls().lock();
+		auto controls = mpc.getControls().lock();
 
 		if (controls->isF6Pressed())
 		{

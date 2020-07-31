@@ -32,7 +32,7 @@ void LoadASequenceScreen::open()
 
 		auto midiReader = mpc::file::mid::MidiReader(loadScreen->getSelectedFile(), newSeq);
 
-		midiReader.parseSequence();
+		midiReader.parseSequence(mpc);
 
 		auto usedSeqs = sequencer.lock()->getUsedSequenceIndexes();
 		int index;

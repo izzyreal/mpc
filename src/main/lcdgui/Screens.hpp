@@ -32,7 +32,7 @@ namespace mpc::lcdgui
 		mpc::Mpc& mpc;
 
 	private:
-		static std::pair<std::vector<std::shared_ptr<Component>>, std::map<std::string, std::vector<std::string>>> get(
+		std::pair<std::vector<std::shared_ptr<Component>>, std::map<std::string, std::vector<std::string>>> get(
 			const std::string& screenName,
 			int& foundInLayer,
 			std::string& firstField

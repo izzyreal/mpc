@@ -53,7 +53,7 @@ void VmpcDirectToDiskRecorderScreen::turnWheel(int i)
 
 	auto seq = mpc.getSequencer().lock()->getSequence(sq).lock().get();
 
-	checkAllTimes(i, seq);
+	checkAllTimes(mpc, i, seq);
 
 	if (param.compare("rate") == 0)
 	{

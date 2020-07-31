@@ -5,6 +5,8 @@
 #include <memory>
 #include <vector>
 
+namespace mpc { class Mpc; }
+
 namespace mpc::lcdgui
 {
 	class Label;
@@ -13,13 +15,12 @@ namespace mpc::lcdgui
 
 namespace mpc::lcdgui
 {
-
 	class Parameter
 		: public Component
 	{
 
 	public:
-		Parameter(std::string labelStr, std::string name, int x, int y, int fieldWidth);
+		Parameter(mpc::Mpc& mpc, std::string labelStr, std::string name, int x, int y, int fieldWidth);
 
 	};
 }

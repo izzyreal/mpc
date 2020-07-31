@@ -100,7 +100,7 @@ void EventHandler::handleNoThru(weak_ptr<mpc::sequencer::Event> e, mpc::sequence
 			return;
 		}
 
-		auto fs = Mpc::instance().getAudioMidiServices().lock()->getFrameSequencer().lock();
+		auto fs = mpc.getAudioMidiServices().lock()->getFrameSequencer().lock();
 		auto eventFrame = fs->getEventFrameOffset(event->getTick());
 		sampler.lock()->playMetronome(ne.get(), eventFrame);
 		return;
@@ -132,7 +132,7 @@ void EventHandler::handleNoThru(weak_ptr<mpc::sequencer::Event> e, mpc::sequence
 	}
 	else if (mce)
 	{
-		auto mpcMidiPorts = Mpc::instance().getMidiPorts().lock();
+		auto mpcMidiPorts = mpc.getMidiPorts().lock();
 		auto clockMsg = dynamic_cast<ctoot::midi::core::ShortMessage*>(mce->getShortMessage());
 		clockMsg->setMessage(mce->getStatus());
 
@@ -169,21 +169,21 @@ void EventHandler::handleNoThru(weak_ptr<mpc::sequencer::Event> e, mpc::sequence
 					auto newVelo = static_cast<int>(ne->getVelocity() * (track->getVelocityRatio() * 0.01));
 					mpc::sequencer::MidiAdapter midiAdapter;
 					midiAdapter.process(ne, drum, newVelo);
-					auto eventFrame = Mpc::instance().getAudioMidiServices().lock()->getFrameSequencer().lock()->getEventFrameOffset(event->getTick());
+					auto eventFrame = mpc.getAudioMidiServices().lock()->getFrameSequencer().lock()->getEventFrameOffset(event->getTick());
 					
 					if (timeStamp != -1)
 					{
 						eventFrame = timeStamp;
 					}
 					
-					Mpc::instance().getMms()->mpcTransport(track->getTrackIndex(), midiAdapter.get().lock().get(), 0, ne->getVariationTypeNumber(), ne->getVariationValue(), eventFrame);
+					mpc.getMms()->mpcTransport(track->getTrackIndex(), midiAdapter.get().lock().get(), 0, ne->getVariationTypeNumber(), ne->getVariationValue(), eventFrame);
 					
-					if (Mpc::instance().getAudioMidiServices().lock()->getAudioServer()->isRealTime())
+					if (mpc.getAudioMidiServices().lock()->getAudioServer()->isRealTime())
 					{
 						auto note = ne->getNote();
-						auto program = Mpc::instance().getSampler().lock()->getProgram(Mpc::instance().getDrum(drum)->getProgram());
+						auto program = mpc.getSampler().lock()->getProgram(mpc.getDrum(drum)->getProgram());
 						int pad = program.lock()->getPadIndexFromNote(note);
-						int bank = Mpc::instance().getBank();
+						int bank = mpc.getBank();
 						pad -= bank * 16;
 					
 						if (pad >= 0 && pad <= 15)
@@ -193,7 +193,7 @@ void EventHandler::handleNoThru(weak_ptr<mpc::sequencer::Event> e, mpc::sequence
 							{
 								notifyVelo = 255;
 							}
-							Mpc::instance().getHardware().lock()->getPad(pad).lock()->notifyObservers(notifyVelo);
+							mpc.getHardware().lock()->getPad(pad).lock()->notifyObservers(notifyVelo);
 						}
 					}
 				}
@@ -216,7 +216,7 @@ void EventHandler::handleNoThru(weak_ptr<mpc::sequencer::Event> e, mpc::sequence
 			if (busNumber != 0)
 			{
 				auto drumIndex = busNumber - 1;
-				auto drum = Mpc::instance().getDrum(drumIndex);
+				auto drum = mpc.getDrum(drumIndex);
 				mixer = drum->getStereoMixerChannels().at(pad).lock();
 			}
 			else
@@ -267,7 +267,7 @@ void EventHandler::midiOut(weak_ptr<mpc::sequencer::Event> e, mpc::sequencer::Tr
 		midiAdapter.process(event, channel, -1);
 		ctoot::midi::core::ShortMessage msg = *midiAdapter.get().lock().get();
 		
-		auto mpcMidiPorts = Mpc::instance().getMidiPorts().lock();
+		auto mpcMidiPorts = mpc.getMidiPorts().lock();
 
 		vector<ctoot::midi::core::ShortMessage>* r;
 
@@ -284,13 +284,13 @@ void EventHandler::midiOut(weak_ptr<mpc::sequencer::Event> e, mpc::sequencer::Tr
 
 		auto directToDiskRecorderScreen = dynamic_pointer_cast<VmpcDirectToDiskRecorderScreen>(mpc.screens->getScreenComponent("vmpc-direct-to-disk-recorder"));
 
-		if (!(Mpc::instance().getAudioMidiServices().lock()->isBouncing() &&
+		if (!(mpc.getAudioMidiServices().lock()->isBouncing() &&
 			directToDiskRecorderScreen->offline) &&
 			r != nullptr && track->getDevice() != 0)
 		{
 			if (r != nullptr)
 			{
-				auto fs = Mpc::instance().getAudioMidiServices().lock()->getFrameSequencer().lock();
+				auto fs = mpc.getAudioMidiServices().lock()->getFrameSequencer().lock();
 				auto eventFrame = fs->getEventFrameOffset(event->getTick());
 				msg.bufferPos = eventFrame;
 
@@ -305,7 +305,7 @@ void EventHandler::midiOut(weak_ptr<mpc::sequencer::Event> e, mpc::sequencer::Tr
 			}
 		}
 
-		if (Mpc::instance().getLayeredScreen().lock()->getCurrentScreenName().compare("midi-output-monitor") == 0)
+		if (mpc.getLayeredScreen().lock()->getCurrentScreenName().compare("midi-output-monitor") == 0)
 		{
 			notifyObservers(string(notifyLetter + to_string(deviceNumber)));
 		}

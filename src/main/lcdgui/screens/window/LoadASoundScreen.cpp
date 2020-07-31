@@ -47,7 +47,7 @@ void LoadASoundScreen::turnWheel(int i)
 void LoadASoundScreen::function(int i)
 {
 	init();
-	auto controls = Mpc::instance().getControls().lock();
+	auto controls = mpc.getControls().lock();
 	
 	switch (i)
 	{
@@ -92,9 +92,9 @@ void LoadASoundScreen::function(int i)
 
 void LoadASoundScreen::keepSound()
 {
-	auto sequencer = Mpc::instance().getSequencer().lock();
+	auto sequencer = mpc.getSequencer().lock();
 	auto sequence = sequencer->getActiveSequence().lock();
-	auto sampler = Mpc::instance().getSampler();
+	auto sampler = mpc.getSampler();
 	auto track = sequence->getTrack(sequencer->getActiveTrackIndex()).lock();
 
 	auto bus = track->getBus();
@@ -134,7 +134,7 @@ void LoadASoundScreen::keepSound()
 void LoadASoundScreen::displayAssignToNote()
 {
 	init();
-	auto note = mpc::Mpc::instance().getNote();
+	auto note = mpc.getNote();
 	auto padIndex = program.lock()->getPadIndexFromNote(note);
 	auto padName = string(padIndex == -1 ? "OFF" : sampler.lock()->getPadName(padIndex));
 	auto noteName = string(note == 34 ? "--" : to_string(note));

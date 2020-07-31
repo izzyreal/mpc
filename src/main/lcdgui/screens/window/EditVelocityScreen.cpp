@@ -104,7 +104,7 @@ void EditVelocityScreen::turnWheel(int i)
 		setValue(value + i);
 	}
 	
-	checkAllTimesAndNotes(i);
+	checkAllTimesAndNotes(mpc, i);
 }
 
 void EditVelocityScreen::displayTime()

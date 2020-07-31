@@ -23,9 +23,10 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 using namespace std;
 
-FrameSeq::FrameSeq() {
-	
-	sequencer = Mpc::instance().getSequencer();
+FrameSeq::FrameSeq(mpc::Mpc& mpc)
+	: mpc(mpc)
+{
+	sequencer = mpc.getSequencer();
 }
 
 void FrameSeq::start(float sampleRate) {
@@ -53,8 +54,6 @@ void FrameSeq::work(int nFrames)
 		return;
 	}
 
-	auto& mpc = mpc::Mpc::instance();
-	
 	auto controls = mpc.getControls().lock();
 	auto songScreen = dynamic_pointer_cast<SongScreen>(mpc.screens->getScreenComponent("song"));
 	auto lSequencer = sequencer.lock();
@@ -245,27 +244,32 @@ int FrameSeq::getTickPosition() {
 	return clock.getTickPosition();
 }
 
-void FrameSeq::move(int newTickPos) {
+void FrameSeq::move(int newTickPos)
+{
 	sequencer.lock()->move(newTickPos);
 	clock.setTick(newTickPos);
 }
 
-void FrameSeq::repeatPad(int tick) {
-	auto controls = Mpc::instance().getControls().lock();
-	if (!controls) return;
+void FrameSeq::repeatPad(int tick)
+{
+	auto controls = mpc.getControls().lock();
+
+	if (!controls)
+		return;
+
 	auto pp = controls->getPressedPads();
-	for (auto& i : *pp) {
-		Mpc::instance().getActiveControls()->pad(i, (*controls->getPressedPadVelos())[i], true, tick);
+
+	for (auto& i : *pp)
+	{
+		mpc.getActiveControls()->pad(i, (*controls->getPressedPadVelos())[i], true, tick);
 	}
 }
 
-void FrameSeq::checkNextSq() {
+void FrameSeq::checkNextSq()
+{
 	auto lSeq = sequencer.lock();
 	lSeq->setCurrentlyPlayingSequenceIndex(lSeq->getNextSq());
 	lSeq->resetNextSq();
 	lSeq->notify("nextsqoff");
 	lSeq->notify("seqnumbername");
-}
-
-FrameSeq::~FrameSeq() {
 }

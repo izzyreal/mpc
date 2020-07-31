@@ -29,7 +29,7 @@ void PunchScreen::turnWheel(int i)
 		setAutoPunch(autoPunch + i);
 	}
 
-    checkAllTimes(i);
+    checkAllTimes(mpc, i);
 }
 
 void PunchScreen::function(int i)
@@ -69,7 +69,7 @@ void PunchScreen::displayAutoPunch()
 
 void PunchScreen::displayTime()
 {
-    auto ls = Mpc::instance().getLayeredScreen().lock();
+    auto ls = mpc.getLayeredScreen().lock();
 
     auto sequence = sequencer.lock()->getActiveSequence().lock().get();
 

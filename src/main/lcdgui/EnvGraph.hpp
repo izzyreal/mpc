@@ -4,6 +4,8 @@
 #include <memory>
 #include <vector>
 
+namespace mpc { class Mpc; }
+
 namespace mpc::lcdgui
 {
 	class EnvGraph
@@ -11,7 +13,8 @@ namespace mpc::lcdgui
 	{
 
 	private:
-		std::vector<std::vector<int>> coordinates{};
+		mpc::Mpc& mpc;
+		std::vector<std::vector<int>> coordinates;
 
 	public:
 		void setCoordinates(std::vector<std::vector<int>> ia);
@@ -21,7 +24,7 @@ namespace mpc::lcdgui
 		void Draw(std::vector<std::vector<bool>>* pixels) override;
 
 	public:
-		EnvGraph();
+		EnvGraph(mpc::Mpc& mpc);
 
 	};
 }

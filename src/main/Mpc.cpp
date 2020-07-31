@@ -50,7 +50,7 @@ Mpc::Mpc()
 {
 	moduru::Logger::l.setPath(mpc::Paths::logFilePath());
 
-	hardware = make_shared<hardware::Hardware>();
+	hardware = make_shared<hardware::Hardware>(*this);
 	screens = make_shared<Screens>(*this);
 	layeredScreen = make_shared<lcdgui::LayeredScreen>(*this);
 }
@@ -206,7 +206,7 @@ void Mpc::loadSound(bool replace)
 	
 	if (hasNotBeenLoadedAlready)
 	{
-		loadSoundThread = thread(&Mpc::runLoadSoundThread, soundLoader.getSize());
+		loadSoundThread = thread(&Mpc::runLoadSoundThread, this, soundLoader.getSize());
 	}
 	else {
 		sampler->deleteSample(sampler->getSoundCount() - 1);
@@ -244,7 +244,7 @@ ctoot::mpc::MpcMultiMidiSynth* Mpc::getMms()
 	return audioMidiServices->getMms().lock().get();
 }
 
-void Mpc::runLoadSoundThread(int size)
+void Mpc::runLoadSoundThread(mpc::Mpc* mpc, int size)
 {
 	int sleepTime = size / 400;
 	
@@ -254,8 +254,8 @@ void Mpc::runLoadSoundThread(int size)
 	}
 	
 	this_thread::sleep_for(chrono::milliseconds((int)(sleepTime)));
-	Mpc::instance().getLayeredScreen().lock()->openScreen("load-a-sound");
-	Mpc::instance().getDisk().lock()->setBusy(false);
+	mpc->getLayeredScreen().lock()->openScreen("load-a-sound");
+	mpc->getDisk().lock()->setBusy(false);
 }
 
 weak_ptr<audiomidi::MpcMidiPorts> Mpc::getMidiPorts()

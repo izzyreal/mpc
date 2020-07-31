@@ -67,12 +67,12 @@ void SndParamsScreen::function(int f)
 	}
 	case 5:
 	{
-		if (Mpc::instance().getControls().lock()->isF6Pressed())
+		if (mpc.getControls().lock()->isF6Pressed())
 		{
 			return;
 		}
 
-		Mpc::instance().getControls().lock()->setF6Pressed(true);
+		mpc.getControls().lock()->setF6Pressed(true);
 		sampler.lock()->playX();
 		break;
 	}
@@ -228,7 +228,7 @@ void SndParamsScreen::displaySnd()
 		return;
 	}
 
-	auto ls = Mpc::instance().getLayeredScreen().lock();
+	auto ls = mpc.getLayeredScreen().lock();
 
 	if (ls->getFocus().compare("dummy") == 0)
 	{

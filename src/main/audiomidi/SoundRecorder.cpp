@@ -65,7 +65,7 @@ void SoundRecorder::start() {
 		return;
 	}
 
-	mpc::Mpc::instance().getLayeredScreen().lock()->getCurrentBackground()->setName("recording");
+	mpc.getLayeredScreen().lock()->getCurrentBackground()->setName("recording");
 
 	resampleBufferLeft.reset();
 	resampleBufferRight.reset();
@@ -107,7 +107,7 @@ void SoundRecorder::stop() {
 		srcRight = NULL;
 	}
 
-	mpc::Mpc::instance().getLayeredScreen().lock()->openScreen("keep-or-retry");
+	mpc.getLayeredScreen().lock()->openScreen("keep-or-retry");
 }
 
 void applyGain(float gain, vector<float>* data)
@@ -159,7 +159,7 @@ int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf)
 		if (armed && (log10(peakL) * 20 > sampleScreen->threshold || log10(peakR) * 20 > sampleScreen->threshold))
 		{
 			armed = false;
-			mpc::Mpc::instance().getAudioMidiServices().lock()->startRecordingSound();
+			mpc.getAudioMidiServices().lock()->startRecordingSound();
 		}
 
 		notifyObservers(pair<float, float>(peakL, peakR));

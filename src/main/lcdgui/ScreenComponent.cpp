@@ -85,17 +85,17 @@ weak_ptr<Field> ScreenComponent::findFocus()
 
 void ScreenComponent::openScreen(const string& screenName)
 {
-	mpc::Mpc::instance().getLayeredScreen().lock()->openScreen(screenName);
+	mpc.getLayeredScreen().lock()->openScreen(screenName);
 }
 
 void ScreenComponent::setLastFocus(const string& screenName, const string& newLastFocus)
 {
-	mpc::Mpc::instance().getLayeredScreen().lock()->setLastFocus(screenName, newLastFocus);
+	mpc.getLayeredScreen().lock()->setLastFocus(screenName, newLastFocus);
 }
 
 const string ScreenComponent::getLastFocus(const string& screenName)
 {
-	return mpc::Mpc::instance().getLayeredScreen().lock()->getLastFocus(screenName);
+	return mpc.getLayeredScreen().lock()->getLastFocus(screenName);
 }
 
 weak_ptr<Background> ScreenComponent::findBackground()

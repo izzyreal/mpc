@@ -5,34 +5,30 @@
 #include <string>
 
 namespace mpc {
+	class Mpc;
+}
+namespace mpc::controls {
+	class BaseControls;
+}
 
-	
+namespace mpc::hardware {
 
-	namespace controls {
-		class BaseControls;
-	}
+	class Button
+		: public moduru::observer::Observable
+	{
 
-	namespace hardware {
+	private:
+		mpc::Mpc& mpc;
+		std::string label = "";
+		std::weak_ptr<mpc::controls::BaseControls> controls;
 
-		class Button
-			: public moduru::observer::Observable
-		{
+	public:
+		std::string getLabel();
+		void push();
+		void release();
 
-		private:
-			
-			std::string label = "";
-			std::weak_ptr<mpc::controls::BaseControls> controls;
+	public:
+		Button(mpc::Mpc& mpc, std::string label);
 
-		public:
-			std::string getLabel();
-			void push();
-			void release();
-
-		public:
-			Button(std::string label);
-			~Button();
-
-		};
-
-	}
+	};
 }

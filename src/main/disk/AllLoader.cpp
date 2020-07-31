@@ -70,7 +70,7 @@ AllLoader::AllLoader(mpc::Mpc& mpc, mpc::disk::MpcFile* file, bool sequencesOnly
 	}
 	else
 	{
-		auto lSequencer = Mpc::instance().getSequencer().lock();
+		auto lSequencer = mpc.getSequencer().lock();
 		allSequences = allParser.getAllSequences();
 		auto defaults = allParser.getDefaults();
 		
@@ -195,7 +195,7 @@ void AllLoader::convertSequences(const bool indiv)
 	
 	if (!indiv)
 	{
-		Mpc::instance().getSequencer().lock()->purgeAllSequences();
+		mpc.getSequencer().lock()->purgeAllSequences();
 	}
 
 	for (auto& as : allSequences)

@@ -2,12 +2,14 @@
 
 #include <string>
 
+namespace mpc { class Mpc; }
+
 namespace mpc::hardware {
 
 	class Pot
 	{
-
 	private:
+		mpc::Mpc& mpc;
 		std::string label = "";
 		int value{ 0 };
 
@@ -18,7 +20,7 @@ namespace mpc::hardware {
 		int getValue();
 
 	public:
-		Pot(std::string label);
+		Pot(mpc::Mpc& mpc, std::string label);
 
 	};
 }

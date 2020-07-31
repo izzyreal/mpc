@@ -42,7 +42,7 @@ StepEditorScreen::StepEditorScreen(mpc::Mpc& mpc, const int layerIndex)
 
 	for (int i = 0; i < EVENT_ROW_COUNT; i++)
 	{
-		addChild(make_shared<EventRow>(i)).lock();
+		addChild(make_shared<EventRow>(mpc, i)).lock();
 	}
 }
 

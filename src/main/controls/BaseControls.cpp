@@ -932,7 +932,7 @@ void BaseControls::splitLeft()
 	init();
 
 	auto mtf = ls.lock()->getFocusedLayer().lock()->findField(param).lock();
-	auto controls = Mpc::instance().getControls().lock();
+	auto controls = mpc.getControls().lock();
 
 	if (!controls->isShiftPressed())
 	{
@@ -959,7 +959,7 @@ void BaseControls::splitRight()
 {
 	init();
 	auto mtf = ls.lock()->getFocusedLayer().lock()->findField(param).lock();
-	auto controls = Mpc::instance().getControls().lock();
+	auto controls = mpc.getControls().lock();
 	
 	if (controls->isShiftPressed())
 	{

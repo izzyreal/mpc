@@ -261,7 +261,7 @@ void EventsScreen::turnWheel(int i)
 	init();
 	auto toSequence = sequencer.lock()->getSequence(toSq).lock();
 
-	if (checkAllTimesAndNotes(i, sequencer.lock()->getActiveSequence().lock().get(), sequencer.lock()->getActiveTrack().lock().get()))
+	if (checkAllTimesAndNotes(mpc, i, sequencer.lock()->getActiveSequence().lock().get(), sequencer.lock()->getActiveTrack().lock().get()))
 	{
 		return;
 	}

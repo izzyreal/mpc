@@ -34,14 +34,14 @@ GlobalReleaseControls::GlobalReleaseControls(mpc::Mpc& mpc)
 }
 
 void GlobalReleaseControls::goTo() {
-	auto controls = Mpc::instance().getControls().lock();
+	auto controls = mpc.getControls().lock();
 	controls->setGoToPressed(false);
 }
 
 void GlobalReleaseControls::function(int i)
 {
 	init();
-	auto controls = Mpc::instance().getControls().lock();
+	auto controls = mpc.getControls().lock();
 	
 	switch (i)
 	{
@@ -73,7 +73,7 @@ void GlobalReleaseControls::function(int i)
 		if (ls.lock()->getPreviousScreenName().compare("load") == 0 && currentScreenName.compare("popup") == 0)
 		{
 			ls.lock()->openScreen("load");
-			Mpc::instance().getAudioMidiServices().lock()->getSoundPlayer().lock()->enableStopEarly();
+			mpc.getAudioMidiServices().lock()->getSoundPlayer().lock()->enableStopEarly();
 		}
 		break;
 	case 5:
@@ -95,7 +95,7 @@ void GlobalReleaseControls::function(int i)
 		else if (ls.lock()->getPreviousScreenName().compare("directory") == 0 && currentScreenName.compare("popup") == 0)
 		{
 			ls.lock()->openScreen("directory");
-			Mpc::instance().getAudioMidiServices().lock()->getSoundPlayer().lock()->enableStopEarly();
+			mpc.getAudioMidiServices().lock()->getSoundPlayer().lock()->enableStopEarly();
 		}
 		break;
 	}
@@ -106,7 +106,7 @@ void GlobalReleaseControls::simplePad(int i)
 	init();
 	auto bank = mpc.getBank();
 	
-	auto controls = Mpc::instance().getControls().lock();
+	auto controls = mpc.getControls().lock();
 	
 	if (controls->getPressedPads()->find(i) == controls->getPressedPads()->end())
 	{
@@ -125,7 +125,7 @@ void GlobalReleaseControls::simplePad(int i)
 	
 	if (stepRec || maybeRecWithoutPlaying)
 	{
-		auto newDur = static_cast<int>(Mpc::instance().getAudioMidiServices().lock()->getFrameSequencer().lock()->getTickPosition());
+		auto newDur = static_cast<int>(mpc.getAudioMidiServices().lock()->getFrameSequencer().lock()->getTickPosition());
 		sequencer.lock()->stopMetronomeTrack();
 		bool durationHasBeenAdjusted = lTrk->adjustDurLastEvent(newDur);
 		
@@ -172,30 +172,30 @@ void GlobalReleaseControls::generateNoteOff(int note)
     noteEvent->setVelocity(0);
     noteEvent->setDuration(0);
     noteEvent->setTick(-1);
-    Mpc::instance().getEventHandler().lock()->handle(noteEvent, lTrk.get());
+    mpc.getEventHandler().lock()->handle(noteEvent, lTrk.get());
 }
 
 void GlobalReleaseControls::overDub()
 {
-	auto controls = Mpc::instance().getControls().lock();
+	auto controls = mpc.getControls().lock();
 	controls->setOverDubPressed(false);
     init();
-	auto hw = Mpc::instance().getHardware().lock();
+	auto hw = mpc.getHardware().lock();
 	hw->getLed("overdub").lock()->light(sequencer.lock()->isOverDubbing());
 }
 
 void GlobalReleaseControls::rec()
 {
-	auto controls = Mpc::instance().getControls().lock();
+	auto controls = mpc.getControls().lock();
 	controls->setRecPressed(false);
     init();
-	auto hw = Mpc::instance().getHardware().lock();
+	auto hw = mpc.getHardware().lock();
 	hw->getLed("rec").lock()->light(sequencer.lock()->isRecording());
 }
 
 void GlobalReleaseControls::tap()
 {
-	auto controls = Mpc::instance().getControls().lock();
+	auto controls = mpc.getControls().lock();
 	controls->setTapPressed(false);
 
 	if (sequencer.lock()->isRecordingOrOverdubbing())
@@ -206,7 +206,7 @@ void GlobalReleaseControls::tap()
 
 void GlobalReleaseControls::shift()
 {
-	auto controls = Mpc::instance().getControls().lock();
+	auto controls = mpc.getControls().lock();
 	controls->setShiftPressed(false);
 	init();
 
@@ -221,6 +221,6 @@ void GlobalReleaseControls::shift()
 
 void GlobalReleaseControls::erase()
 {
-	auto controls = Mpc::instance().getControls().lock();
+	auto controls = mpc.getControls().lock();
 	controls->setErasePressed(false);
 }

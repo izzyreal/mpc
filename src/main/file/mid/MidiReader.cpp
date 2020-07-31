@@ -55,9 +55,9 @@ MidiReader::MidiReader(mpc::disk::MpcFile* file, weak_ptr<Sequence> dest)
 	}
 }
 
-void MidiReader::parseSequence()
+void MidiReader::parseSequence(mpc::Mpc& mpc)
 {
-	auto lSequencer = Mpc::instance().getSequencer().lock();
+	auto lSequencer = mpc.getSequencer().lock();
 	auto sequence = dest.lock();
 	auto midiTracks = midiFile->getTracks();
 	int tmp = midiFile->getLengthInTicks();

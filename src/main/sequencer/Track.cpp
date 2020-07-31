@@ -544,7 +544,7 @@ void Track::playNext()
 	delete_ = lSequencer->isRecording() && (trackIndex == lSequencer->getActiveTrackIndex() || multi) && (trackIndex < 64);
 
 	if (lSequencer->isOverDubbing() &&
-		Mpc::instance().getControls().lock()->isErasePressed() &&
+		mpc.getControls().lock()->isErasePressed() &&
 		(trackIndex == lSequencer->getActiveTrackIndex() || multi) &&
 		trackIndex < 64)
 	{
@@ -560,7 +560,7 @@ void Track::playNext()
 		{
 			if (!delete_)
 			{
-				Mpc::instance().getEventHandler().lock()->handle(no, this);
+				mpc.getEventHandler().lock()->handle(no, this);
 			}
 
 			noteOffs.erase(noteOffs.begin() + counter);
@@ -584,7 +584,7 @@ void Track::playNext()
 		return;
 	}
 
-	Mpc::instance().getEventHandler().lock()->handle(lEvent, this);
+	mpc.getEventHandler().lock()->handle(lEvent, this);
 
 	auto ne = dynamic_pointer_cast<NoteEvent>(lEvent);
 
@@ -658,7 +658,7 @@ vector<weak_ptr<Event>> Track::getEventRange(int startTick, int endTick)
 void Track::correctTimeRange(int startPos, int endPos, int stepLength)
 {
 	if (sequencer.expired())
-		sequencer = Mpc::instance().getSequencer();
+		sequencer = mpc.getSequencer();
 
 	auto lSequencer = sequencer.lock();
 

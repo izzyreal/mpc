@@ -11,9 +11,9 @@
 using namespace mpc::hardware;
 using namespace std;
 
-Button::Button(string label)
+Button::Button(mpc::Mpc& mpc, string label)
+	: mpc(mpc)
 {
-	
 	this->label = label;
 }
 
@@ -22,11 +22,11 @@ string Button::getLabel() {
 }
 
 void Button::push() {
-	if (Mpc::instance().getDisk().lock()->isBusy())
+	if (mpc.getDisk().lock()->isBusy())
 	{
 		return;
 	}
-	auto controls = Mpc::instance().getLayeredScreen().lock()->findScreenComponent().lock();
+	auto controls = mpc.getLayeredScreen().lock()->findScreenComponent().lock();
 	
 	if (!controls) {
 		return;
@@ -173,8 +173,8 @@ void Button::push() {
 }
 
 void Button::release() {
-	if (Mpc::instance().getDisk().lock()->isBusy()) return;
-	auto c = Mpc::instance().getReleaseControls();
+	if (mpc.getDisk().lock()->isBusy()) return;
+	auto c = mpc.getReleaseControls();
 	if (label.compare("shift") == 0) {
 		c->shift();
 	}
@@ -208,7 +208,4 @@ void Button::release() {
 	else if (label.compare("goto") == 0) {
 		c->goTo();
 	}
-}
-
-Button::~Button() {
 }

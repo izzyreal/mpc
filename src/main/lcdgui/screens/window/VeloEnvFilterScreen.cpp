@@ -9,7 +9,7 @@ using namespace std;
 VeloEnvFilterScreen::VeloEnvFilterScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "velo-env-filter", layerIndex)
 {
-	addChild(make_shared<EnvGraph>());
+	addChild(make_shared<EnvGraph>(mpc));
 }
 
 void VeloEnvFilterScreen::open()

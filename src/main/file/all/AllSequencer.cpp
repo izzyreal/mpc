@@ -28,7 +28,7 @@ mpc::file::all::Sequencer::Sequencer(mpc::Mpc& mpc)
 	saveBytes = vector<char>(LENGTH);
 	for (int i = 0; i < LENGTH; i++)
 		saveBytes[i] = TEMPLATE[i];
-	auto seq = Mpc::instance().getSequencer().lock();
+	auto seq = mpc.getSequencer().lock();
 	saveBytes[SEQ_OFFSET] = seq->getActiveSequenceIndex();
 	saveBytes[TR_OFFSET] = seq->getActiveTrackIndex();
 

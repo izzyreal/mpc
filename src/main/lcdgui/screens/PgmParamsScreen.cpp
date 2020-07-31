@@ -14,7 +14,7 @@ using namespace std;
 PgmParamsScreen::PgmParamsScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "program-params", layerIndex)
 {
-	addChild(make_shared<EnvGraph>());
+	addChild(make_shared<EnvGraph>(mpc));
 }
 
 void PgmParamsScreen::open()

@@ -8,6 +8,8 @@
 #include <string>
 #include <vector>
 
+namespace mpc { class Mpc; }
+
 namespace mpc::lcdgui
 {
 	class Label;
@@ -15,12 +17,12 @@ namespace mpc::lcdgui
 
 namespace mpc::lcdgui
 {
-
 	class Field
 		: public TextComp
 	{
 
 	private:
+		mpc::Mpc& mpc;
 		// When hiding a field that is focused, we pass focus to nextFocus
 		std::string nextFocus = "_";
 		std::vector<Label*> letters;
@@ -57,7 +59,7 @@ namespace mpc::lcdgui
 		void Hide(bool b) override;
 
 	public:
-		Field(const std::string& name, int x, int y, int columns);
+		Field(mpc::Mpc& mpc, const std::string& name, int x, int y, int columns);
 		~Field();
 
 	};

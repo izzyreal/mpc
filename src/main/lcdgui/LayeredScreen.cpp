@@ -73,7 +73,7 @@ int LayeredScreen::openScreen(string screenName)
 		return -1;
 	}
 
-	auto ams = Mpc::instance().getAudioMidiServices().lock();
+	auto ams = mpc.getAudioMidiServices().lock();
 
 	if (currentScreenName.compare("sample") == 0)
 	{

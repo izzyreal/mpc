@@ -37,7 +37,7 @@ Count::Count(mpc::Mpc& mpc)
 	auto countMetronomeScreen = dynamic_pointer_cast<CountMetronomeScreen>(mpc.screens->getScreenComponent("count-metronome"));
 	auto metronomeSoundScreen = dynamic_pointer_cast<MetronomeSoundScreen>(mpc.screens->getScreenComponent("metronome-sound"));
 
-	auto lSequencer = Mpc::instance().getSequencer().lock();
+	auto lSequencer = mpc.getSequencer().lock();
 
 	saveBytes = vector<char>(AllParser::COUNT_LENGTH);
 	saveBytes[ENABLED_OFFSET] = static_cast< int8_t >((lSequencer->isCountEnabled() ? 1 : 0));

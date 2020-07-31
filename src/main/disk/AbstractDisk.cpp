@@ -263,7 +263,7 @@ void AbstractDisk::writeProgram(mpc::sampler::Program* program, string fileName)
 		return;
 	}
 
-	auto writer = mpc::file::pgmwriter::PgmWriter(program, Mpc::instance().getSampler());
+	auto writer = mpc::file::pgmwriter::PgmWriter(program, mpc.getSampler());
 	auto pgmFile = newFile(fileName);
     auto bytes = writer.get();
 	pgmFile->setFileData(&bytes);
@@ -273,7 +273,7 @@ void AbstractDisk::writeProgram(mpc::sampler::Program* program, string fileName)
 	{
 		if (n->getSndNumber() != -1)
 		{
-			sounds.push_back(dynamic_pointer_cast<mpc::sampler::Sound>(Mpc::instance().getSampler().lock()->getSound(n->getSndNumber()).lock()));
+			sounds.push_back(dynamic_pointer_cast<mpc::sampler::Sound>(mpc.getSampler().lock()->getSound(n->getSndNumber()).lock()));
 		}
 	}
 
@@ -285,7 +285,7 @@ void AbstractDisk::writeProgram(mpc::sampler::Program* program, string fileName)
 		soundSaver = make_unique<SoundSaver>(mpc, sounds, isWav);
 	}
 	else {
-		mpc::Mpc::instance().getLayeredScreen().lock()->openScreen("save");
+		mpc.getLayeredScreen().lock()->openScreen("save");
 	}
 
 	flush();

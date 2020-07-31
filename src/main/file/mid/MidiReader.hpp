@@ -7,48 +7,40 @@
 #include <vector>
 
 namespace mpc {
+	class Mpc;
+}
 
-	
+namespace mpc::midi::event {
+	class NoteOn;
+}
 
-	namespace midi {
+namespace mpc::sequencer {
+	class Sequence;
+	class NoteEvent;
+}
 
-		namespace event {
-			class NoteOn;
-		}
-	}
+namespace mpc::disk {
+	class MpcFile;
+}
 
-	namespace sequencer {
-		class Sequence;
-		class NoteEvent;
-	}
+namespace mpc::file::mid {
+	class MidiReader
+	{
 
-	namespace disk {
-		class MpcFile;
-	}
+	private:
+		std::unique_ptr<mpc::midi::MidiFile> midiFile;
+		std::weak_ptr<mpc::sequencer::Sequence> dest;
 
-	namespace file {
-		namespace mid {
-			
-			class MidiReader
-			{
 
-			private:
-				std::unique_ptr<mpc::midi::MidiFile> midiFile{};
-				std::weak_ptr<mpc::sequencer::Sequence> dest{};
-				
+	public:
+		void parseSequence(mpc::Mpc& mpc);
 
-			public:
-				void parseSequence();
+	private:
+		static bool isInteger(std::string s);
+		int getNumberOfNoteOns(int noteValue, std::vector<std::shared_ptr<mpc::midi::event::NoteOn>> allNotes);
+		int getNumberOfNotes(int noteValue, std::vector<std::shared_ptr<mpc::sequencer::NoteEvent>> allNotes);
 
-			private:
-				static bool isInteger(std::string s);
-				int getNumberOfNoteOns(int noteValue, std::vector<std::shared_ptr<mpc::midi::event::NoteOn>> allNotes);
-				int getNumberOfNotes(int noteValue, std::vector<std::shared_ptr<mpc::sequencer::NoteEvent>> allNotes);
-
-			public:
-				MidiReader(mpc::disk::MpcFile* file, std::weak_ptr<mpc::sequencer::Sequence> dest);
-			};
-
-		}
-	}
+	public:
+		MidiReader(mpc::disk::MpcFile* file, std::weak_ptr<mpc::sequencer::Sequence> dest);
+	};
 }

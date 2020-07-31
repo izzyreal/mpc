@@ -59,7 +59,7 @@ void Pad::setNote(int i)
 
 	if (pgmAssignScreen->padAssign)
 	{
-		(*Mpc::instance().getSampler().lock()->getMasterPadAssign())[number] = i;
+		(*mpc.getSampler().lock()->getMasterPadAssign())[number] = i;
 	}
 	else
 	{
@@ -79,7 +79,7 @@ int Pad::getNote()
 	auto pgmAssignScreen = dynamic_pointer_cast<PgmAssignScreen>(mpc.screens->getScreenComponent("program-assign"));
 	if (pgmAssignScreen->padAssign)
 	{
-		return (*Mpc::instance().getSampler().lock()->getMasterPadAssign())[number];
+		return (*mpc.getSampler().lock()->getMasterPadAssign())[number];
 	}
 	return note;
 }

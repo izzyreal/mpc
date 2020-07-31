@@ -54,7 +54,7 @@ void SecondSeqScreen::setSq(int i)
 
 void SecondSeqScreen::displaySq()
 {
-    auto sqName = Mpc::instance().getSequencer().lock()->getSequence(sq).lock()->getName();
+    auto sqName = mpc.getSequencer().lock()->getSequence(sq).lock()->getName();
     findField("sq").lock()->setTextPadded(sq + 1, "0");
     findLabel("sequence-name").lock()->setText("-" + sqName);
 }
