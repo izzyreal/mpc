@@ -7,8 +7,8 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
-KeepOrRetryScreen::KeepOrRetryScreen(const int layerIndex) 
-	: ScreenComponent("keep-or-retry", layerIndex)
+KeepOrRetryScreen::KeepOrRetryScreen(mpc::Mpc& mpc, const int layerIndex) 
+	: ScreenComponent(mpc, "keep-or-retry", layerIndex)
 {
 }
 
@@ -28,7 +28,7 @@ void KeepOrRetryScreen::close()
 void KeepOrRetryScreen::mainScreen() {
 	
 	sampler.lock()->deleteSound(dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getPreviewSound().lock()));
-	BaseControls::mainScreen();
+	baseControls->mainScreen();
 }
 
 void KeepOrRetryScreen::function(int i)
@@ -59,7 +59,7 @@ void KeepOrRetryScreen::function(int i)
 void KeepOrRetryScreen::turnWheel(int i)
 {
     init();
-	auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
+	auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
 	nameScreen->setName(dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getPreviewSound().lock())->getName());
 	nameScreen->parameterName = param;
     ls.lock()->openScreen("name");

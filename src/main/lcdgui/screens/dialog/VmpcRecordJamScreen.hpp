@@ -10,7 +10,7 @@ namespace mpc::lcdgui::screens::dialog
 	public:
 		void function(int i) override;
 
-		VmpcRecordJamScreen(int layerIndex);
+		VmpcRecordJamScreen(mpc::Mpc& mpc, int layerIndex);
 
 	};
 }

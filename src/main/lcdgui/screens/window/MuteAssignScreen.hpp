@@ -6,13 +6,14 @@
 namespace mpc::lcdgui::screens::window
 {
 	class MuteAssignScreen
-		: public mpc::lcdgui::ScreenComponent, public mpc::controls::BaseSamplerControls
+		: public mpc::lcdgui::ScreenComponent
+		//public mpc::controls::BaseSamplerControls
 	{
 
 	public:
 		void turnWheel(int i) override;
 
-		MuteAssignScreen(const int layerIndex);
+		MuteAssignScreen(mpc::Mpc& mpc, const int layerIndex);
 		void open() override;
 		void close() override;
 		void update(moduru::observer::Observable* o, nonstd::any arg) override;

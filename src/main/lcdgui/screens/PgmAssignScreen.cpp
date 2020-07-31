@@ -11,8 +11,8 @@ using namespace mpc::lcdgui::screens;
 using namespace moduru::lang;
 using namespace std;
 
-PgmAssignScreen::PgmAssignScreen(const int layerIndex)
-	: ScreenComponent("program-assign", layerIndex)
+PgmAssignScreen::PgmAssignScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "program-assign", layerIndex)
 {
 }
 
@@ -57,7 +57,7 @@ void PgmAssignScreen::function(int i)
 		break;
 	case 4:
 	{
-		mpc.setPreviousSamplerScreenName(currentScreenName);
+		mpc.setPreviousSamplerScreenName("program-assign");
 		ls.lock()->openScreen("auto-chromatic-assignment");
 		break;
 	}

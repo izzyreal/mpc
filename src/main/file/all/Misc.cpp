@@ -22,14 +22,14 @@ Misc::Misc(vector<char> b)
 	pgmChToSeqEnabled = b[MIDI_PGM_CHANGE_TO_SEQ_OFFSET] > 0;
 }
 
-Misc::Misc()
+Misc::Misc(mpc::Mpc& mpc)
 {
-	auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(Screens::getScreenComponent("step-editor"));
-	auto othersScreen = dynamic_pointer_cast<OthersScreen>(Screens::getScreenComponent("others"));
+	auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(mpc.screens->getScreenComponent("step-editor"));
+	auto othersScreen = dynamic_pointer_cast<OthersScreen>(mpc.screens->getScreenComponent("others"));
 	saveBytes = vector<char>(LENGTH);
 	saveBytes[TAP_AVG_OFFSET] = (char)(othersScreen->getTapAveraging());
 
-	auto syncScreen = dynamic_pointer_cast<SyncScreen>(Screens::getScreenComponent("sync"));
+	auto syncScreen = dynamic_pointer_cast<SyncScreen>(mpc.screens->getScreenComponent("sync"));
 
 	saveBytes[MIDI_SYNC_IN_RECEIVE_MMC_OFFSET] = (char)(syncScreen->receiveMMCEnabled ? 1 : 0);
 	saveBytes[AUTO_STEP_INCREMENT_OFFSET] = (char)(stepEditorScreen->isAutoStepIncrementEnabled() ? 1 : 0);

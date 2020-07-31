@@ -21,8 +21,8 @@ using namespace moduru::lang;
 using namespace moduru::file;
 using namespace std;
 
-LoadScreen::LoadScreen(const int layerIndex)
-	: ScreenComponent("load", layerIndex)
+LoadScreen::LoadScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "load", layerIndex)
 {
 }
 
@@ -80,7 +80,7 @@ void LoadScreen::function(int i)
 			auto name = file->getFsNode().lock()->getNameWithoutExtension();
 
 			ls.lock()->openScreen("popup");
-			auto popupScreen = dynamic_pointer_cast<PopupScreen>(Screens::getScreenComponent("popup"));
+			auto popupScreen = dynamic_pointer_cast<PopupScreen>(mpc.screens->getScreenComponent("popup"));
 
 			if (started)
 			{
@@ -168,7 +168,7 @@ void LoadScreen::openWindow()
 			return;
 		}
 
-		auto directoryScreen = dynamic_pointer_cast<DirectoryScreen>(Screens::getScreenComponent("directory"));
+		auto directoryScreen = dynamic_pointer_cast<DirectoryScreen>(mpc.screens->getScreenComponent("directory"));
 		directoryScreen->previousScreenName = "load";
 		directoryScreen->findYOffset0();
 		directoryScreen->setYOffset1(fileLoad);

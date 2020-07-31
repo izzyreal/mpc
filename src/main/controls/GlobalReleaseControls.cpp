@@ -28,8 +28,8 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::controls;
 using namespace std;
 
-GlobalReleaseControls::GlobalReleaseControls()
-	: BaseControls()
+GlobalReleaseControls::GlobalReleaseControls(mpc::Mpc& mpc)
+	: BaseControls(mpc)
 {
 }
 
@@ -131,7 +131,7 @@ void GlobalReleaseControls::simplePad(int i)
 		
 		if (durationHasBeenAdjusted && maybeRecWithoutPlaying)
 		{
-			auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timing-correct"));
+			auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(mpc.screens->getScreenComponent("timing-correct"));
 			auto noteValue = timingCorrectScreen->getNoteValue();
 
 			int noteVal = timingCorrectScreen->getNoteValue();
@@ -213,7 +213,7 @@ void GlobalReleaseControls::shift()
 	if (currentScreenName.compare("step-editor") == 0 && param.length() == 2)
 	{
 		auto eventNumber = stoi(param.substr(1, 2));
-		auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(Screens::getScreenComponent("step-editor"));
+		auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(mpc.screens->getScreenComponent("step-editor"));
 		auto res = eventNumber + stepEditorScreen->getYOffset();
 		stepEditorScreen->setSelectionEndIndex(res);
 	}

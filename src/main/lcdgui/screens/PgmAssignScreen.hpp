@@ -16,7 +16,8 @@ namespace mpc::file::aps
 namespace mpc::lcdgui::screens {
 
 	class PgmAssignScreen
-		: public mpc::lcdgui::ScreenComponent, public mpc::controls::BaseSamplerControls
+		: public mpc::lcdgui::ScreenComponent
+		//public mpc::controls::BaseSamplerControls
 	{
 
 	public:
@@ -25,7 +26,7 @@ namespace mpc::lcdgui::screens {
 		void turnWheel(int i) override;
 		void openWindow() override;
 
-		PgmAssignScreen(const int layerIndex);
+		PgmAssignScreen(mpc::Mpc& mpc, const int layerIndex);
 		void update(moduru::observer::Observable* o, nonstd::any arg);
 		void open() override;
 		void close() override;

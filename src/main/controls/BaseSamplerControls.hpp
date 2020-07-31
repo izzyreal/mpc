@@ -10,5 +10,8 @@ namespace mpc::controls {
 	protected:
 		void init() override;
 
+	public:
+		BaseSamplerControls(mpc::Mpc& mpc);
+
 	};
 }

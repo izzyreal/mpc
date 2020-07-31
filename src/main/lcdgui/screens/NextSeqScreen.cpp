@@ -13,8 +13,8 @@ using namespace mpc::lcdgui::screens::window;
 using namespace moduru::lang;
 using namespace std;
 
-NextSeqScreen::NextSeqScreen(const int layerIndex)
-	: ScreenComponent("next-seq", layerIndex)
+NextSeqScreen::NextSeqScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "next-seq", layerIndex)
 {
 }
 
@@ -146,7 +146,7 @@ void NextSeqScreen::displayTempoSource()
 
 void NextSeqScreen::displayTiming()
 {
-	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timing-correct"));
+	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(mpc.screens->getScreenComponent("timing-correct"));
 	auto noteValue = timingCorrectScreen->getNoteValue();
 	findField("timing").lock()->setText(SequencerScreen::timingCorrectNames[noteValue]);
 }

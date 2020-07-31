@@ -3,8 +3,8 @@
 using namespace mpc::lcdgui::screens::dialog;
 using namespace std;
 
-VmpcRecordJamScreen::VmpcRecordJamScreen(const int layerIndex)
-	: ScreenComponent("vmpc-record-jam", layerIndex)
+VmpcRecordJamScreen::VmpcRecordJamScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "vmpc-record-jam", layerIndex)
 {
 }
 

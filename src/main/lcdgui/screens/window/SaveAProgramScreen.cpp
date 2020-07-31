@@ -8,8 +8,8 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
-SaveAProgramScreen::SaveAProgramScreen(const int layerIndex) 
-	: ScreenComponent("save-a-program", layerIndex)
+SaveAProgramScreen::SaveAProgramScreen(mpc::Mpc& mpc, const int layerIndex) 
+	: ScreenComponent(mpc, "save-a-program", layerIndex)
 {
 }
 
@@ -39,7 +39,7 @@ void SaveAProgramScreen::function(int i)
 {
 	init();
 
-	auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
+	auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
 
 	switch (i)
 	{
@@ -87,6 +87,6 @@ void SaveAProgramScreen::displayReplaceSameSounds()
 
 void SaveAProgramScreen::displayFile()
 {
-	auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
+	auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
 	findLabel("file").lock()->setText(nameScreen->getName() + ".PGM");
 }

@@ -10,8 +10,8 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui;
 using namespace std;
 
-DeleteAllFilesScreen::DeleteAllFilesScreen(const int layerIndex)
-	: ScreenComponent("delete-all-files", layerIndex)
+DeleteAllFilesScreen::DeleteAllFilesScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "delete-all-files", layerIndex)
 {
 }
 
@@ -55,8 +55,8 @@ void DeleteAllFilesScreen::function(int i)
 
 		if (success)
 		{
-			auto loadScreen = dynamic_pointer_cast<LoadScreen>(Screens::getScreenComponent("load"));
-			auto directoryScreen = dynamic_pointer_cast<DirectoryScreen>(Screens::getScreenComponent("directory"));
+			auto loadScreen = dynamic_pointer_cast<LoadScreen>(mpc.screens->getScreenComponent("load"));
+			auto directoryScreen = dynamic_pointer_cast<DirectoryScreen>(mpc.screens->getScreenComponent("directory"));
 			loadScreen->fileLoad = 0;
 			directoryScreen->yOffset1 = 0;
 			mpc.getDisk().lock()->initFiles();

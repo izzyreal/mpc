@@ -51,24 +51,24 @@ Mpc::Mpc()
 	moduru::Logger::l.setPath(mpc::Paths::logFilePath());
 
 	hardware = make_shared<hardware::Hardware>();
-
-	layeredScreen = make_shared<lcdgui::LayeredScreen>();
+	screens = make_shared<Screens>(*this);
+	layeredScreen = make_shared<lcdgui::LayeredScreen>(*this);
 }
 
 void Mpc::init(const int sampleRate, const int inputCount, const int outputCount)
 {
-	sequencer = make_shared<mpc::sequencer::Sequencer>();
+	sequencer = make_shared<mpc::sequencer::Sequencer>(*this);
 	MLOG("Sequencer created");
 
-	sampler = make_shared<mpc::sampler::Sampler>();
+	sampler = make_shared<mpc::sampler::Sampler>(*this);
 	MLOG("Sampler created");
 
-	mpcMidiInputs = vector<mpc::audiomidi::MpcMidiInput*>{ new mpc::audiomidi::MpcMidiInput(0), new mpc::audiomidi::MpcMidiInput(1) };
+	mpcMidiInputs = vector<mpc::audiomidi::MpcMidiInput*>{ new mpc::audiomidi::MpcMidiInput(*this, 0), new mpc::audiomidi::MpcMidiInput(*this, 1) };
 
 	/*
 	* AudioMidiServices requires sampler to exist.
 	*/
-	audioMidiServices = make_shared<mpc::audiomidi::AudioMidiServices>();
+	audioMidiServices = make_shared<mpc::audiomidi::AudioMidiServices>(*this);
 	MLOG("AudioMidiServices created");
 
 	sequencer->init();
@@ -77,22 +77,24 @@ void Mpc::init(const int sampleRate, const int inputCount, const int outputCount
 	sampler->init();
 	MLOG("Sampler initialized");
 
-	eventHandler = make_shared<mpc::audiomidi::EventHandler>();
+	eventHandler = make_shared<mpc::audiomidi::EventHandler>(*this);
 	MLOG("Eeventhandler created");
 
 	audioMidiServices->start(sampleRate, inputCount, outputCount);
 	MLOG("AudioMidiServices started");
 
-	controls = make_shared<controls::Controls>();
+	controls = make_shared<controls::Controls>(*this);
 
-	diskController = make_unique<mpc::disk::DiskController>();
+	diskController = make_unique<mpc::disk::DiskController>(*this);
 	diskController->initDisks();
 
 	hardware->getSlider().lock()->setValue(mpc::nvram::NvRam::getSlider());
-	mpc::nvram::NvRam::loadUserScreenValues();
+	mpc::nvram::NvRam::loadUserScreenValues(*this);
 
 	for (auto& screenName : screenNames)
 	{
+		// Uncomment if you want to try and open all screens before doing anything else.
+		// For debug purposes only.
 		//layeredScreen->openScreen(screenName);
 	}
 
@@ -183,12 +185,12 @@ void Mpc::loadSound(bool replace)
 	
 	auto lDisk = getDisk().lock();
 	lDisk->setBusy(true);
-	auto soundLoader = mpc::disk::SoundLoader(sampler->getSounds(), replace);
+	auto soundLoader = mpc::disk::SoundLoader(*this, sampler->getSounds(), replace);
 	soundLoader.setPreview(true);
 	soundLoader.setPartOfProgram(false);
 	bool hasNotBeenLoadedAlready = true;
 
-	auto loadScreen = dynamic_pointer_cast<LoadScreen>(Screens::getScreenComponent("load"));
+	auto loadScreen = dynamic_pointer_cast<LoadScreen>(screens->getScreenComponent("load"));
 
 	try
 	{
@@ -216,16 +218,16 @@ void Mpc::loadProgram()
 {
 	programLoader.reset();
 
-	auto loadScreen = dynamic_pointer_cast<LoadScreen>(Screens::getScreenComponent("load"));
-	auto loadAProgramScreen = dynamic_pointer_cast<LoadAProgramScreen>(Screens::getScreenComponent("load-a-program"));
+	auto loadScreen = dynamic_pointer_cast<LoadScreen>(screens->getScreenComponent("load"));
+	auto loadAProgramScreen = dynamic_pointer_cast<LoadAProgramScreen>(screens->getScreenComponent("load-a-program"));
 
-	programLoader = make_unique<mpc::disk::ProgramLoader>(loadScreen->getSelectedFile(), loadAProgramScreen->loadReplaceSound);
+	programLoader = make_unique<mpc::disk::ProgramLoader>(*this, loadScreen->getSelectedFile(), loadAProgramScreen->loadReplaceSound);
 }
 
 void Mpc::importLoadedProgram()
 {
 	auto t = sequencer->getActiveSequence().lock()->getTrack(sequencer->getActiveTrackIndex()).lock();
-	auto loadAProgramScreen = dynamic_pointer_cast<LoadAProgramScreen>(Screens::getScreenComponent("load-a-program"));
+	auto loadAProgramScreen = dynamic_pointer_cast<LoadAProgramScreen>(screens->getScreenComponent("load-a-program"));
 
 	if (loadAProgramScreen->clearProgramWhenLoading)
 	{
@@ -352,8 +354,8 @@ void Mpc::setPreviousSamplerScreenName(string s)
 Mpc::~Mpc() {
 	MLOG("Entering Mpc destructor");
 
-	mpc::nvram::NvRam::saveUserScreenValues();
-	mpc::nvram::NvRam::saveKnobPositions();
+	mpc::nvram::NvRam::saveUserScreenValues(*this);
+	mpc::nvram::NvRam::saveKnobPositions(*this);
 
 	for (auto& m : mpcMidiInputs)
 	{

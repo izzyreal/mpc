@@ -5,11 +5,16 @@
 #include <Mpc.hpp>
 
 using namespace mpc::lcdgui;
+using namespace mpc::controls;
 using namespace std;
 
-ScreenComponent::ScreenComponent(const string& name, const int layer)
-	: Component(name), layer(layer)
+ScreenComponent::ScreenComponent(mpc::Mpc& mpc, const string& name, const int layer)
+	: Component(name), layer(layer), mpc(mpc)
 {
+	baseControls = make_shared<BaseControls>(mpc);
+	ls = mpc.getLayeredScreen();
+	sampler = mpc.getSampler();
+	sequencer = mpc.getSequencer();
 	auto background = dynamic_pointer_cast<Background>(addChild(make_shared<Background>()).lock());
 	background->setName(name);
 }

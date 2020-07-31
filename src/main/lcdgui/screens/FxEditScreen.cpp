@@ -7,8 +7,8 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace std;
 
-FxEditScreen::FxEditScreen(const int layerIndex) 
-	: ScreenComponent("fx-edit", layerIndex)
+FxEditScreen::FxEditScreen(mpc::Mpc& mpc, const int layerIndex) 
+	: ScreenComponent(mpc, "fx-edit", layerIndex)
 {
 	int effectWidth = 30;
 	int effectHeight = 14;
@@ -44,32 +44,32 @@ void FxEditScreen::turnWheel(int i)
 	init();
 	if (param.compare("drum") == 0)
 	{
-		auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(Screens::getScreenComponent("mixer-setup"));
+		auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(mpc.screens->getScreenComponent("mixer-setup"));
 		mixerSetupScreen->setFxDrum(mixerSetupScreen->getFxDrum() + i);
 	}
 }
 
 void FxEditScreen::left()
 {
-	BaseControls::left();
+	baseControls->left();
 	checkEffects();
 }
 
 void FxEditScreen::right()
 {
-	BaseControls::right();
+	baseControls->right();
 	checkEffects();
 }
 
 void FxEditScreen::up()
 {
-	BaseControls::up();
+	baseControls->up();
 	checkEffects();
 }
 
 void FxEditScreen::down()
 {
-	BaseControls::down();
+	baseControls->down();
 	checkEffects();
 }
 
@@ -117,7 +117,7 @@ void FxEditScreen::checkEffects() {
 
 void FxEditScreen::displayDrum()
 {
-	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(Screens::getScreenComponent("mixer-setup"));
+	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(mpc.screens->getScreenComponent("mixer-setup"));
 	findField("drum").lock()->setText(to_string(mixerSetupScreen->getFxDrum() + 1));
 }
 

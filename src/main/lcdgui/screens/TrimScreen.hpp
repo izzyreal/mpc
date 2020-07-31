@@ -35,7 +35,7 @@ namespace mpc::lcdgui::screens
 		void setSlider(int i) override;
 
 	public:
-		TrimScreen(const int layerIndex);
+		TrimScreen(mpc::Mpc& mpc, const int layerIndex);
 		void open() override;
 
 	private:

@@ -11,7 +11,7 @@ namespace mpc::lcdgui::screens::window {
 		void turnWheel(int i) override;
 
 	public:
-		TimeDisplayScreen(const int layerIndex);
+		TimeDisplayScreen(mpc::Mpc& mpc, const int layerIndex);
 
 	public:
 		void open() override;

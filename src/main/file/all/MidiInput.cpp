@@ -14,7 +14,7 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::file::all;
 using namespace std;
 
-MidiInput::MidiInput(const vector<char>& b) 
+MidiInput::MidiInput(const vector<char>& b)
 {
 	receiveCh = b[RECEIVE_CH_OFFSET];
 	sustainPedalToDuration = b[SUSTAIN_PEDAL_TO_DURATION_OFFSET] > 0;
@@ -35,7 +35,7 @@ MidiInput::MidiInput(const vector<char>& b)
 	exclusivePassEnabled = b[EXCLUSIVE_PASS_ENABLED_OFFSET] > 0;
 }
 
-MidiInput::MidiInput()
+MidiInput::MidiInput(mpc::Mpc& mpc)
 {
 	saveBytes = vector<char>(LENGTH);
 	
@@ -44,7 +44,7 @@ MidiInput::MidiInput()
 		saveBytes[i] = TEMPLATE[i];
 	}
 
-	auto midiInputScreen = dynamic_pointer_cast<MidiInputScreen>(Screens::getScreenComponent("midi-input"));
+	auto midiInputScreen = dynamic_pointer_cast<MidiInputScreen>(mpc.screens->getScreenComponent("midi-input"));
 
 	saveBytes[RECEIVE_CH_OFFSET] = static_cast<int8_t>(midiInputScreen->getReceiveCh());
 	saveBytes[SUSTAIN_PEDAL_TO_DURATION_OFFSET] = static_cast<int8_t>(midiInputScreen->isSustainPedalToDurationEnabled() ? 1 : 0);
@@ -52,7 +52,7 @@ MidiInput::MidiInput()
 	saveBytes[FILTER_TYPE_OFFSET] = static_cast<int8_t>(midiInputScreen->getType());
 	saveBytes[MULTI_REC_ENABLED_OFFSET] = static_cast<int8_t>(Mpc::instance().getSequencer().lock()->isRecordingModeMulti() ? 1 : 0);
 	
-	auto screen = dynamic_pointer_cast<MultiRecordingSetupScreen>(Screens::getScreenComponent("multi-recording-setup"));
+	auto screen = dynamic_pointer_cast<MultiRecordingSetupScreen>(mpc.screens->getScreenComponent("multi-recording-setup"));
 
 	for (int i = 0; i < MULTI_REC_TRACK_DESTS_LENGTH; i++)
 	{

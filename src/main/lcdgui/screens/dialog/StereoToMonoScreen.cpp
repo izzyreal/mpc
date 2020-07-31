@@ -7,8 +7,8 @@ using namespace mpc::lcdgui::screens::window;
 using namespace moduru::lang;
 using namespace std;
 
-StereoToMonoScreen::StereoToMonoScreen(const int layerIndex)
-	: ScreenComponent("stereo-to-mono", layerIndex)
+StereoToMonoScreen::StereoToMonoScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "stereo-to-mono", layerIndex)
 {
 }
 
@@ -30,7 +30,7 @@ void StereoToMonoScreen::turnWheel(int i)
 {
 	init();
 
-	auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
+	auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
 
 	if (param.compare("stereosource") == 0)
 	{

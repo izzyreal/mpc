@@ -13,7 +13,7 @@ namespace mpc::lcdgui::screens::window
 	{
 
 	public:
-		ZoneEndFineScreen(const int layerIndex);
+		ZoneEndFineScreen(mpc::Mpc& mpc, const int layerIndex);
 
 		void open() override;
 		

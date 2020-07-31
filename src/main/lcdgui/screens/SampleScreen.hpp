@@ -22,7 +22,7 @@ namespace mpc::lcdgui::screens {
 		void down() override;
 
 	public:
-		SampleScreen(const int layerIndex);
+		SampleScreen(mpc::Mpc& mpc, const int layerIndex);
 		void open() override;
 		void close() override;
 		void update(moduru::observer::Observable* observable, nonstd::any message);

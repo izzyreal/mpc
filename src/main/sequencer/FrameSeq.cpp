@@ -56,7 +56,7 @@ void FrameSeq::work(int nFrames)
 	auto& mpc = mpc::Mpc::instance();
 	
 	auto controls = mpc.getControls().lock();
-	auto songScreen = dynamic_pointer_cast<SongScreen>(Screens::getScreenComponent("song"));
+	auto songScreen = dynamic_pointer_cast<SongScreen>(mpc.screens->getScreenComponent("song"));
 	auto lSequencer = sequencer.lock();
 	
 
@@ -79,7 +79,7 @@ void FrameSeq::work(int nFrames)
 		clock.set_bpm(tempo);
 		lSequencer->notify("tempo");
 	}
-	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timing-correct"));
+	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(mpc.screens->getScreenComponent("timing-correct"));
 
 	int tcValue = lSequencer->getTickValues()[timingCorrectScreen->getNoteValue()];
 	int swingPercentage = timingCorrectScreen->getSwing();

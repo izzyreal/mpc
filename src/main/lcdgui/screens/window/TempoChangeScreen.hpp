@@ -69,7 +69,7 @@ namespace mpc::lcdgui::screens::window
 		void displayInitialTempo();
 
 	public:
-		TempoChangeScreen(const int layerIndex);
+		TempoChangeScreen(mpc::Mpc& mpc, const int layerIndex);
 	
 	public:
 		void open() override;

@@ -4,6 +4,8 @@
 #include <vector>
 #include <string>
 
+namespace mpc { class Mpc; }
+
 namespace mpc::disk {
 	class MpcFile;
 }
@@ -23,7 +25,6 @@ namespace mpc::file::all {
 
 namespace mpc::file::all
 {
-
 	class AllParser
 	{
 
@@ -75,15 +76,15 @@ namespace mpc::file::all
 		std::vector<Song*> getSongs();
 
 	private:
+		mpc::Mpc& mpc;
 		std::vector<Sequence*> readSequences(std::vector<char> trimmedSeqsArray);
 
 	public:
 		std::vector<char> getBytes();
 
 	public:
-		AllParser(mpc::disk::MpcFile* file);
-		AllParser(std::string allName);
-		~AllParser();
+		AllParser(mpc::Mpc& mpc, mpc::disk::MpcFile* file);
+		AllParser(mpc::Mpc& mpc, std::string allName);
 
 	};
 }

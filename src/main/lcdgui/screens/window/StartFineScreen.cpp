@@ -7,8 +7,8 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
-StartFineScreen::StartFineScreen(const int layerIndex)
-	: ScreenComponent("start-fine", layerIndex)
+StartFineScreen::StartFineScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "start-fine", layerIndex)
 {
 	addChild(move(make_shared<Wave>()));
 	addChild(move(make_shared<TwoDots>()));
@@ -31,7 +31,7 @@ void StartFineScreen::open()
 
 void StartFineScreen::displayFineWaveform()
 {
-	auto trimScreen = dynamic_pointer_cast<TrimScreen>(Screens::getScreenComponent("trim"));
+	auto trimScreen = dynamic_pointer_cast<TrimScreen>(mpc.screens->getScreenComponent("trim"));
 
 	auto sound = sampler.lock()->getSound().lock();
 
@@ -70,7 +70,7 @@ void StartFineScreen::displayLngthLabel()
 
 void StartFineScreen::displaySmplLngth()
 {
-	auto trimScreen = dynamic_pointer_cast<TrimScreen>(Screens::getScreenComponent("trim"));
+	auto trimScreen = dynamic_pointer_cast<TrimScreen>(mpc.screens->getScreenComponent("trim"));
     findField("smpllngth").lock()->setText(trimScreen->smplLngthFix ? "FIX" : "VARI");
 }
 
@@ -82,7 +82,7 @@ void StartFineScreen::displayPlayX()
 void StartFineScreen::function(int i)
 {
 
-	BaseControls::function(i);
+	baseControls->function(i);
 
 	switch (i)
 	{
@@ -103,7 +103,7 @@ void StartFineScreen::turnWheel(int i)
 	init();
 	auto sound = sampler.lock()->getSound().lock();
 	auto startEndLength = static_cast<int>(sound->getEnd() - sound->getStart());
-	auto trimScreen = dynamic_pointer_cast<TrimScreen>(Screens::getScreenComponent("trim"));
+	auto trimScreen = dynamic_pointer_cast<TrimScreen>(mpc.screens->getScreenComponent("trim"));
 
 	auto sampleLength = sound->getFrameCount();
 

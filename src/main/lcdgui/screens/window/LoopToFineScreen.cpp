@@ -8,8 +8,8 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
-LoopToFineScreen::LoopToFineScreen(const int layerIndex)
-	: ScreenComponent("loop-to-fine", layerIndex)
+LoopToFineScreen::LoopToFineScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "loop-to-fine", layerIndex)
 {
 }
 
@@ -34,7 +34,7 @@ void LoopToFineScreen::open()
 
 void LoopToFineScreen::displayLoopLngth()
 {
-	auto loopScreen = dynamic_pointer_cast<LoopScreen>(Screens::getScreenComponent("loop"));
+	auto loopScreen = dynamic_pointer_cast<LoopScreen>(mpc.screens->getScreenComponent("loop"));
 	findField("loop-lngth").lock()->setText(loopScreen->loopLngthFix ? "FIX" : "VARI");
 }
 
@@ -52,7 +52,7 @@ void LoopToFineScreen::displayLngthField()
 
 void LoopToFineScreen::displayFineWaveform()
 {
-	auto trimScreen = dynamic_pointer_cast<TrimScreen>(Screens::getScreenComponent("trim"));
+	auto trimScreen = dynamic_pointer_cast<TrimScreen>(mpc.screens->getScreenComponent("trim"));
 	auto sound = sampler.lock()->getSound().lock();
 	
 	if (!sound)
@@ -84,7 +84,7 @@ void LoopToFineScreen::displayTo()
 void LoopToFineScreen::function(int i)
 {
 
-	BaseControls::function(i);
+	baseControls->function(i);
 
 	switch (i)
 	{
@@ -106,7 +106,7 @@ void LoopToFineScreen::turnWheel(int i)
 	auto sound = sampler.lock()->getSound().lock();
 	auto startEndLength = static_cast<int>(sound->getEnd() - sound->getStart());
 	auto loopLength = static_cast<int>((sound->getEnd() - sound->getLoopTo()));
-	auto loopScreen = dynamic_pointer_cast<LoopScreen>(Screens::getScreenComponent("loop"));
+	auto loopScreen = dynamic_pointer_cast<LoopScreen>(mpc.screens->getScreenComponent("loop"));
 
 	auto sampleLength = sound->getFrameCount();
 	

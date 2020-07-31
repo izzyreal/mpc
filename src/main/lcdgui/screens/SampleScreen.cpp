@@ -8,8 +8,8 @@
 using namespace mpc::lcdgui::screens;
 using namespace std;
 
-SampleScreen::SampleScreen(const int layerIndex)
-	: ScreenComponent("sample", layerIndex)
+SampleScreen::SampleScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "sample", layerIndex)
 {
 }
 
@@ -41,7 +41,7 @@ void SampleScreen::left() {
 	{
 		return;
 	}
-	BaseControls::left();
+	baseControls->left();
 }
 
 void SampleScreen::right() {
@@ -49,7 +49,7 @@ void SampleScreen::right() {
 	if (mpc.getAudioMidiServices().lock()->isRecordingSound()) {
 		return;
 	}
-	BaseControls::right();
+	baseControls->right();
 }
 
 void SampleScreen::up() {
@@ -57,7 +57,7 @@ void SampleScreen::up() {
 	if (mpc.getAudioMidiServices().lock()->isRecordingSound()) {
 		return;
 	}
-	BaseControls::up();
+	baseControls->up();
 }
 
 void SampleScreen::down() {
@@ -65,7 +65,7 @@ void SampleScreen::down() {
 	if (mpc.getAudioMidiServices().lock()->isRecordingSound()) {
 		return;
 	}
-	BaseControls::down();
+	baseControls->down();
 }
 
 void SampleScreen::function(int i)

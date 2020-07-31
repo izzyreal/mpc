@@ -9,8 +9,8 @@ using namespace mpc::lcdgui::screens;
 using namespace moduru::lang;
 using namespace std;
 
-TrMoveScreen::TrMoveScreen(const int layerIndex)
-	: ScreenComponent("tr-move", layerIndex)
+TrMoveScreen::TrMoveScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "tr-move", layerIndex)
 {
 }
 
@@ -39,7 +39,7 @@ void TrMoveScreen::turnWheel(int i)
 	}
 	else if (param.compare("sq") == 0)
 	{
-		auto eventsScreen = dynamic_pointer_cast<EventsScreen>(Screens::getScreenComponent("events"));
+		auto eventsScreen = dynamic_pointer_cast<EventsScreen>(mpc.screens->getScreenComponent("events"));
 		eventsScreen->setFromSq(sequencer.lock()->getActiveSequenceIndex() + i);
 		displaySq();
 		displayTrFields();
@@ -65,7 +65,7 @@ void TrMoveScreen::down()
 	}
 	else
 	{
-		BaseControls::down();
+		baseControls->down();
 		ls.lock()->setFunctionKeysArrangement(1);
 	}
 }
@@ -84,7 +84,7 @@ void TrMoveScreen::left()
 		return;
 	}
 
-	BaseControls::left();
+	baseControls->left();
 	ls.lock()->setFunctionKeysArrangement(0);
 }
 
@@ -97,7 +97,7 @@ void TrMoveScreen::right()
 		return;
 	}
 
-	BaseControls::right();
+	baseControls->right();
 	ls.lock()->setFunctionKeysArrangement(1);
 }
 
@@ -111,7 +111,7 @@ void TrMoveScreen::function(int i)
 	case 1:
 	case 3:
 	{
-		auto eventsScreen = dynamic_pointer_cast<EventsScreen>(Screens::getScreenComponent("events"));
+		auto eventsScreen = dynamic_pointer_cast<EventsScreen>(mpc.screens->getScreenComponent("events"));
 		eventsScreen->tab = i;
 		ls.lock()->openScreen(eventsScreen->tabNames[eventsScreen->tab]);
 		break;
@@ -173,7 +173,7 @@ void TrMoveScreen::displayTrLabels()
 		}
 	}
 
-	auto eventsScreen = dynamic_pointer_cast<EventsScreen>(Screens::getScreenComponent("events"));
+	auto eventsScreen = dynamic_pointer_cast<EventsScreen>(mpc.screens->getScreenComponent("events"));
 	auto sequence = mpc.getSequencer().lock()->getActiveSequence().lock();
 
 	if (tr0Index >= 0)
@@ -218,7 +218,7 @@ void TrMoveScreen::displayTrLabels()
 
 void TrMoveScreen::displayTrFields()
 {
-	auto eventsScreen = dynamic_pointer_cast<EventsScreen>(Screens::getScreenComponent("events"));
+	auto eventsScreen = dynamic_pointer_cast<EventsScreen>(mpc.screens->getScreenComponent("events"));
 	auto sequence = mpc.getSequencer().lock()->getActiveSequence().lock();
 	
 	if (isSelected())

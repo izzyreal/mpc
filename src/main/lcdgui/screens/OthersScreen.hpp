@@ -20,7 +20,7 @@ namespace mpc::lcdgui::screens {
 		int getTapAveraging();
 		int getContrast();
 
-		OthersScreen(const int layerIndex);
+		OthersScreen(mpc::Mpc& mpc, const int layerIndex);
 		void open() override;
 		void function(int i) override;
 		void turnWheel(int notch) override;

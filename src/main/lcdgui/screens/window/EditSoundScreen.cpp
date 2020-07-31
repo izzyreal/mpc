@@ -14,8 +14,8 @@ using namespace mpc::lcdgui::screens::window;
 using namespace moduru::lang;
 using namespace std;
 
-EditSoundScreen::EditSoundScreen(const int layerIndex)
-    : ScreenComponent("edit-sound", layerIndex)
+EditSoundScreen::EditSoundScreen(mpc::Mpc& mpc, const int layerIndex)
+    : ScreenComponent(mpc, "edit-sound", layerIndex)
 {
 	vector<string> newTimeStretchPresetNames = vector<string>(54);
 	
@@ -367,7 +367,7 @@ void EditSoundScreen::turnWheel(int i)
 	}
 	else if (param.compare("new-name") == 0 && (edit == 2 || edit == 7))
 	{
-		auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
+		auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
 		nameScreen->setName(findField("new-name").lock()->getText());
 		nameScreen->parameterName =  "newname";
 
@@ -401,7 +401,7 @@ void EditSoundScreen::turnWheel(int i)
 
 void EditSoundScreen::function(int j)
 {
-	BaseControls::function(j);
+	baseControls->function(j);
 
 	switch (j)
 	{
@@ -640,7 +640,7 @@ void EditSoundScreen::function(int j)
 		{
 			auto source = sampler.lock()->getSound().lock();
 
-			auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(Screens::getScreenComponent("zone"));
+			auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(mpc.screens->getScreenComponent("zone"));
 			auto zoneCount = zoneScreen->numberOfZones;
 
 			for (int i = 0; i < zoneScreen->numberOfZones; i++)

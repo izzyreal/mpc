@@ -15,7 +15,7 @@ namespace mpc::lcdgui::screens::window
 	public:
 		void function(int i) override;
 
-		LoadApsFileScreen(const int layerIndex);
+		LoadApsFileScreen(mpc::Mpc& mpc, const int layerIndex);
 
 	};
 }

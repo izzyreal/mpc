@@ -21,7 +21,7 @@ namespace mpc::lcdgui::screens::window
 		void turnWheel(int i) override;
 		void function(int i) override;
 
-		LoadASequenceScreen(const int layerIndex);
+		LoadASequenceScreen(mpc::Mpc& mpc, const int layerIndex);
 
 		void open() override;
 

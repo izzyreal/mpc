@@ -20,7 +20,8 @@ using namespace mpc::lcdgui::screens::dialog2;
 using namespace moduru::lang;
 using namespace std;
 
-SoundSaver::SoundSaver(vector<weak_ptr<mpc::sampler::Sound>> sounds, bool wav) 
+SoundSaver::SoundSaver(mpc::Mpc& mpc, vector<weak_ptr<mpc::sampler::Sound>> sounds, bool wav)
+	: mpc(mpc)
 {	
 	disk = Mpc::instance().getDisk();
 	disk.lock()->setBusy(true);
@@ -44,12 +45,12 @@ void SoundSaver::saveSounds()
 		string fileName = StrUtil::replaceAll(s.lock()->getName(), ' ', "");
 		
 		Mpc::instance().getLayeredScreen().lock()->openScreen("popup");
-		auto popupScreen = dynamic_pointer_cast<PopupScreen>(Screens::getScreenComponent("popup"));
+		auto popupScreen = dynamic_pointer_cast<PopupScreen>(mpc.screens->getScreenComponent("popup"));
 		popupScreen->setText("SAVING " + StrUtil::padRight(fileName, " ", 16) + ext);
 
 		if (lDisk->checkExists(fileName))
 		{
-			auto saveAProgramScreen = dynamic_pointer_cast<SaveAProgramScreen>(Screens::getScreenComponent("save-a-program"));
+			auto saveAProgramScreen = dynamic_pointer_cast<SaveAProgramScreen>(mpc.screens->getScreenComponent("save-a-program"));
 			if (saveAProgramScreen->replaceSameSounds)
 			{
                 lDisk->getFile(fileName)->del(); // possibly prepend auto success =

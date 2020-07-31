@@ -16,7 +16,8 @@ using namespace moduru::file;
 using namespace mpc::file::aps;
 using namespace std;
 
-ApsGlobalParameters::ApsGlobalParameters(vector<char> loadBytes)
+ApsGlobalParameters::ApsGlobalParameters(mpc::Mpc& mpc, vector<char> loadBytes)
+	: mpc(mpc)
 {
 	padToInternalSound = BitUtil::getBits(loadBytes[0])[7] == '1';
 	padAssignMaster = BitUtil::getBits(loadBytes[1])[7] == '1';
@@ -28,20 +29,21 @@ ApsGlobalParameters::ApsGlobalParameters(vector<char> loadBytes)
 	masterLevel = loadBytes[6];
 }
 
-ApsGlobalParameters::ApsGlobalParameters() 
+ApsGlobalParameters::ApsGlobalParameters(mpc::Mpc& mpc)
+	: mpc(mpc)
 {
 	saveBytes = vector<char>(ApsParser::PARAMETERS_LENGTH);
 	for (int i = 0; i < saveBytes.size(); i++)
 	saveBytes[i] = TEMPLATE[i];
 	
-	auto drumScreen = dynamic_pointer_cast<DrumScreen>(Screens::getScreenComponent("drum"));
+	auto drumScreen = dynamic_pointer_cast<DrumScreen>(mpc.screens->getScreenComponent("drum"));
 
 	auto const padToInternalSoundVal = drumScreen->isPadToIntSound();
 
-	auto pgmAssignScreen = dynamic_pointer_cast<PgmAssignScreen>(Screens::getScreenComponent("pgmassign"));
+	auto pgmAssignScreen = dynamic_pointer_cast<PgmAssignScreen>(mpc.screens->getScreenComponent("pgmassign"));
 	auto const padAssignMasterVal = pgmAssignScreen->padAssign;
 
-	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(Screens::getScreenComponent("mixer-setup"));
+	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(mpc.screens->getScreenComponent("mixer-setup"));
 	auto const stereoMixSourceDrumVal = mixerSetupScreen->isStereoMixSourceDrum();
 	auto const indivFxSourceDrumVal = mixerSetupScreen->isIndivFxSourceDrum();
 	auto const copyPgmMixToDrumVal = mixerSetupScreen->isCopyPgmMixToDrumEnabled();

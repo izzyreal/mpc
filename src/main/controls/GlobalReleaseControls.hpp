@@ -66,7 +66,7 @@ namespace mpc {
 			void undoSeq() override {};
 
 		public:
-			GlobalReleaseControls();
+			GlobalReleaseControls(mpc::Mpc& mpc);
 
 		};
 

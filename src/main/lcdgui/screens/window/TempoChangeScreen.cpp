@@ -12,8 +12,8 @@ using namespace mpc::lcdgui::screens::window;
 using namespace moduru::lang;
 using namespace std;
 
-TempoChangeScreen::TempoChangeScreen(const int layerIndex)
-	: ScreenComponent("tempo-change", layerIndex)
+TempoChangeScreen::TempoChangeScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "tempo-change", layerIndex)
 {
 	for (int i = 0; i < 4; i++)
 	{
@@ -290,7 +290,7 @@ void TempoChangeScreen::left()
 			return;
 		}
 	}
-	BaseControls::left();
+	baseControls->left();
 }
 
 void TempoChangeScreen::right()
@@ -302,12 +302,12 @@ void TempoChangeScreen::right()
 			return;
 		}
 	}
-	BaseControls::right();
+	baseControls->right();
 }
 
 void TempoChangeScreen::function(int j)
 {
-	BaseControls::function(j);
+	baseControls->function(j);
 	
 	auto yPos = -1;
 
@@ -443,7 +443,7 @@ void TempoChangeScreen::function(int j)
 
 void TempoChangeScreen::init()
 {
-	BaseControls::init();
+	baseControls->init();
 	auto seq = sequencer.lock()->getActiveSequence().lock();
 	auto tceList = seq->getTempoChangeEvents();
 

@@ -10,7 +10,7 @@ namespace moduru::file
 
 namespace mpc
 {
-	
+	class Mpc;
 }
 
 namespace mpc::file::wav
@@ -33,9 +33,8 @@ namespace mpc::disk
 	class SoundLoader
 	{
 	private:
-		
 		static float rateToTuneBase;
-
+		mpc::Mpc& mpc;
 		bool partOfProgram{ false };
 		MpcFile* soundFile{ nullptr };
 		std::vector<std::weak_ptr<mpc::sampler::Sound>> sounds{};
@@ -52,8 +51,8 @@ namespace mpc::disk
 		double logOfBase(float num, float base);
 		int getSize();
 
-		SoundLoader();
-		SoundLoader(std::vector<std::weak_ptr<mpc::sampler::Sound>> sounds, bool replace);
+		SoundLoader(mpc::Mpc& mpc);
+		SoundLoader(mpc::Mpc& mpc, std::vector<std::weak_ptr<mpc::sampler::Sound>> sounds, bool replace);
 
 	};
 }

@@ -18,7 +18,8 @@ using namespace moduru::file;
 using namespace moduru::lang;
 using namespace std;
 
-Defaults::Defaults(vector<char> loadBytes)
+Defaults::Defaults(mpc::Mpc& mpc, vector<char> loadBytes)
+	: mpc(mpc)
 {
 	parseNames(loadBytes);
 
@@ -39,7 +40,8 @@ Defaults::Defaults(vector<char> loadBytes)
 	}
 }
 
-Defaults::Defaults()
+Defaults::Defaults(mpc::Mpc& mpc)
+	: mpc(mpc)
 {
 	saveBytes = vector<char>(AllParser::DEFAULTS_LENGTH);
 	
@@ -55,7 +57,7 @@ Defaults::Defaults()
 	setBarCount();
 	setLastTick();
 
-	auto userScreen = dynamic_pointer_cast<UserScreen>(Screens::getScreenComponent("user"));
+	auto userScreen = dynamic_pointer_cast<UserScreen>(mpc.screens->getScreenComponent("user"));
 	auto lastBar = userScreen->lastBar;
 	
 	if (lastBar == 1)
@@ -211,7 +213,7 @@ vector<int> Defaults::getTrVelos()
 
 void Defaults::setTrackSettings()
 {
-	auto userScreen = dynamic_pointer_cast<UserScreen>(Screens::getScreenComponent("user"));
+	auto userScreen = dynamic_pointer_cast<UserScreen>(mpc.screens->getScreenComponent("user"));
     for (int i = 0; i < 64; i++)
 	{
         saveBytes[DEVICES_OFFSET + i] = (userScreen->device);
@@ -224,7 +226,7 @@ void Defaults::setTrackSettings()
 
 void Defaults::setLastTick()
 {
-	auto userScreen = dynamic_pointer_cast<UserScreen>(Screens::getScreenComponent("user"));
+	auto userScreen = dynamic_pointer_cast<UserScreen>(mpc.screens->getScreenComponent("user"));
 	auto lastTick = (userScreen->lastBar + 1) * 384;
 
 	auto b = moduru::file::ByteUtil::ushort2bytes(lastTick);
@@ -235,7 +237,7 @@ void Defaults::setLastTick()
 
 void Defaults::setBarCount()
 {
-	auto userScreen = dynamic_pointer_cast<UserScreen>(Screens::getScreenComponent("user"));
+	auto userScreen = dynamic_pointer_cast<UserScreen>(mpc.screens->getScreenComponent("user"));
 	auto ba = moduru::file::ByteUtil::ushort2bytes(userScreen->lastBar + 1);
 	saveBytes[BAR_COUNT_BYTE1_OFFSET] = ba[0];
 	saveBytes[BAR_COUNT_BYTE2_OFFSET] = ba[1];
@@ -243,14 +245,14 @@ void Defaults::setBarCount()
 
 void Defaults::setTimeSig()
 {
-	auto userScreen = dynamic_pointer_cast<UserScreen>(Screens::getScreenComponent("user"));
+	auto userScreen = dynamic_pointer_cast<UserScreen>(mpc.screens->getScreenComponent("user"));
 	saveBytes[TIMESIG_NUM_OFFSET] = (userScreen->timeSig.getNumerator());
 	saveBytes[TIMESIG_DEN_OFFSET] = (userScreen->timeSig.getDenominator());
 }
 
 void Defaults::setNames()
 {
-	auto userScreen = dynamic_pointer_cast<UserScreen>(Screens::getScreenComponent("user"));
+	auto userScreen = dynamic_pointer_cast<UserScreen>(mpc.screens->getScreenComponent("user"));
 	auto const defSeqName =StrUtil::padRight(userScreen->sequenceName, " ", AllParser::NAME_LENGTH);
 	
 	for (int i = 0; i < 16; i++)
@@ -287,7 +289,7 @@ void Defaults::setNames()
 
 void Defaults::setTempo()
 {
-	auto userScreen = dynamic_pointer_cast<UserScreen>(Screens::getScreenComponent("user"));
+	auto userScreen = dynamic_pointer_cast<UserScreen>(mpc.screens->getScreenComponent("user"));
 	auto tempo = static_cast<int>(userScreen->tempo * 10.0);
 	auto tempoBytes = moduru::file::ByteUtil::ushort2bytes(tempo);
 	saveBytes[TEMPO_BYTE1_OFFSET] = tempoBytes[0];

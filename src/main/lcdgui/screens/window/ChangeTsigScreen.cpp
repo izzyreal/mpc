@@ -9,8 +9,8 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
-ChangeTsigScreen::ChangeTsigScreen(const int layerIndex)
-	: ScreenComponent("change-tsig", layerIndex)
+ChangeTsigScreen::ChangeTsigScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "change-tsig", layerIndex)
 {
 }
 
@@ -23,7 +23,7 @@ void ChangeTsigScreen::open()
 
 void ChangeTsigScreen::function(int i)
 {
-    BaseControls::function(i);
+    baseControls->function(i);
 
 	switch (i)
 	{
@@ -71,7 +71,7 @@ void ChangeTsigScreen::displayBars()
 
 void ChangeTsigScreen::displayNewTsig()
 {
-	if (currentScreenName.compare("delete-sequence") == 0) {
+	if (ls.lock()->getCurrentScreenName().compare("delete-sequence") == 0) {
 		return;
 	}
 	auto result = to_string(timesignature.getNumerator()) + "/" + to_string(timesignature.getDenominator());

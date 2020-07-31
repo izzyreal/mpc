@@ -8,6 +8,8 @@
 
 #include <gui/BasicStructs.hpp>
 
+namespace mpc { class Mpc; }
+
 namespace mpc::lcdgui
 {
 	class FunctionKeys;
@@ -25,6 +27,7 @@ namespace mpc::lcdgui {
 	{
 
 	private:
+		mpc::Mpc& mpc;
 		std::unique_ptr<Component> root;
 		std::vector<std::vector<bool>> pixels = std::vector<std::vector<bool>>(248, std::vector<bool>(60));
 
@@ -85,7 +88,7 @@ namespace mpc::lcdgui {
 		bool setFocus(const std::string& focus);
 
 	public:
-		LayeredScreen();
+		LayeredScreen(mpc::Mpc& mpc);
 
 	};
 }

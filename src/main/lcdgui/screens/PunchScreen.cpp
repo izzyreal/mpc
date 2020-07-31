@@ -6,8 +6,8 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::sequencer;
 using namespace std;
 
-PunchScreen::PunchScreen(const int layerIndex)
-	: ScreenComponent("punch", layerIndex)
+PunchScreen::PunchScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "punch", layerIndex)
 {
 }
 

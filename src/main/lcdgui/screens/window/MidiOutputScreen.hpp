@@ -12,7 +12,7 @@ namespace mpc::lcdgui::screens::window {
 		void function(int i) override;
 
 	public:
-		MidiOutputScreen(const int layerIndex);
+		MidiOutputScreen(mpc::Mpc& mpc, const int layerIndex);
 
 	public:
 		void open() override;

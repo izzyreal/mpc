@@ -8,8 +8,8 @@
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace std;
 
-PopupScreen::PopupScreen()
-	: ScreenComponent("popup", 3)
+PopupScreen::PopupScreen(mpc::Mpc& mpc)
+	: ScreenComponent(mpc, "popup", 3)
 {
 	addChild(make_shared<Label>("popup", "", 43, 23, 0));
 	findChild<Label>("popup").lock()->setInverted(true);

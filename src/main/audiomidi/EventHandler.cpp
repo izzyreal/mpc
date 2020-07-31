@@ -46,10 +46,11 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::audiomidi;
 using namespace std;
 
-EventHandler::EventHandler()
+EventHandler::EventHandler(mpc::Mpc& mpc)
+	: mpc(mpc)
 {
-	sequencer = Mpc::instance().getSequencer();
-	sampler = Mpc::instance().getSampler();
+	sequencer = mpc.getSequencer();
+	sampler = mpc.getSampler();
 }
 
 void EventHandler::handle(weak_ptr<mpc::sequencer::Event> event, mpc::sequencer::Track* track)
@@ -71,7 +72,7 @@ void EventHandler::handleNoThru(weak_ptr<mpc::sequencer::Event> e, mpc::sequence
 
 	auto lSequencer = sequencer.lock();
 
-	auto countMetronomeScreen = dynamic_pointer_cast<CountMetronomeScreen>(Screens::getScreenComponent("count-metronome"));
+	auto countMetronomeScreen = dynamic_pointer_cast<CountMetronomeScreen>(mpc.screens->getScreenComponent("count-metronome"));
 
 	if (track->getName().compare("click") == 0)
 	{
@@ -138,7 +139,7 @@ void EventHandler::handleNoThru(weak_ptr<mpc::sequencer::Event> e, mpc::sequence
 		auto midiOutputStreamA = &mpcMidiPorts->getReceivers()[0];
 		auto midiOutputStreamB = &mpcMidiPorts->getReceivers()[1];
 
-		auto syncScreen = dynamic_pointer_cast<SyncScreen>(Screens::getScreenComponent("sync"));
+		auto syncScreen = dynamic_pointer_cast<SyncScreen>(mpc.screens->getScreenComponent("sync"));
 
 		switch (syncScreen->out)
 		{
@@ -206,7 +207,7 @@ void EventHandler::handleNoThru(weak_ptr<mpc::sequencer::Event> e, mpc::sequence
 		auto p = lSampler->getProgram(lSampler->getDrumBusProgramNumber(track->getBus())).lock();
 		auto mixer = p->getStereoMixerChannel(pad).lock();
 	
-		auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(Screens::getScreenComponent("mixer-setup"));
+		auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(mpc.screens->getScreenComponent("mixer-setup"));
 
 		if (mixerSetupScreen->isStereoMixSourceDrum())
 		{
@@ -242,7 +243,7 @@ void EventHandler::midiOut(weak_ptr<mpc::sequencer::Event> e, mpc::sequencer::Tr
 
 	if (ne)
 	{
-		auto transScreen = dynamic_pointer_cast<TransScreen>(Screens::getScreenComponent("trans"));
+		auto transScreen = dynamic_pointer_cast<TransScreen>(mpc.screens->getScreenComponent("trans"));
 
 		if (transScreen->tr == -1 || transScreen->tr == ne->getTrack())
 		{
@@ -281,7 +282,7 @@ void EventHandler::midiOut(weak_ptr<mpc::sequencer::Event> e, mpc::sequencer::Tr
 			notifyLetter = "b";
 		}
 
-		auto directToDiskRecorderScreen = dynamic_pointer_cast<VmpcDirectToDiskRecorderScreen>(Screens::getScreenComponent("vmpc-direct-to-disk-recorder"));
+		auto directToDiskRecorderScreen = dynamic_pointer_cast<VmpcDirectToDiskRecorderScreen>(mpc.screens->getScreenComponent("vmpc-direct-to-disk-recorder"));
 
 		if (!(Mpc::instance().getAudioMidiServices().lock()->isBouncing() &&
 			directToDiskRecorderScreen->offline) &&

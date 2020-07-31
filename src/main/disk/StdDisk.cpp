@@ -32,8 +32,8 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace std;
 
-StdDisk::StdDisk(weak_ptr<Store> store)
-	: AbstractDisk(store)
+StdDisk::StdDisk(mpc::Mpc& mpc, weak_ptr<Store> store)
+	: AbstractDisk(mpc, store)
 {
 	device = make_unique<mpc::disk::device::StdDevice>(store.lock()->path);
 	
@@ -112,7 +112,7 @@ void StdDisk::initFiles()
 
 	renameFilesToAkai();
 
-	auto loadScreen = dynamic_pointer_cast<LoadScreen>(Screens::getScreenComponent("load"));
+	auto loadScreen = dynamic_pointer_cast<LoadScreen>(mpc.screens->getScreenComponent("load"));
 
 	auto view = loadScreen->view;
 	auto dirList = getDir().lock()->listFiles();
@@ -292,7 +292,4 @@ string StdDisk::getAbsolutePath()
 
 int StdDisk::getPathDepth() {
 	return path.size();
-}
-
-StdDisk::~StdDisk() {
 }

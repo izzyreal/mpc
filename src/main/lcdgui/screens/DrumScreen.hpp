@@ -11,14 +11,15 @@ namespace mpc::lcdgui::screens
 namespace mpc::lcdgui::screens
 {
 	class DrumScreen
-		: public mpc::lcdgui::ScreenComponent, public mpc::controls::BaseSamplerControls
+		: public mpc::lcdgui::ScreenComponent
+		//public mpc::controls::BaseSamplerControls
 	{
 
 	public:
 		void function(int f) override;
 		void turnWheel(int i) override;
 
-		DrumScreen(const int layerIndex);
+		DrumScreen(mpc::Mpc& mpc, const int layerIndex);
 		void open() override;
 
 	private:

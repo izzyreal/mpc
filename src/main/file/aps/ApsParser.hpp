@@ -13,6 +13,8 @@
 #include <vector>
 #include <string>
 
+namespace mpc { class Mpc; }
+
 namespace mpc::disk
 {
 	class MpcFile;
@@ -63,8 +65,8 @@ namespace mpc::file::aps
 		std::vector<char> getBytes();
 
 	public:
-		ApsParser(mpc::disk::MpcFile* file);
-		ApsParser(std::string apsNameString);
+		ApsParser(mpc::Mpc& mpc, mpc::disk::MpcFile* file);
+		ApsParser(mpc::Mpc& mpc, std::string apsNameString);
 
 		~ApsParser();
 

@@ -11,7 +11,7 @@ namespace mpc::lcdgui::screens {
 
 		void function(int f) override;
 
-		PurgeScreen(const int layerIndex);
+		PurgeScreen(mpc::Mpc& mpc, const int layerIndex);
 
 		void open() override;
 	};

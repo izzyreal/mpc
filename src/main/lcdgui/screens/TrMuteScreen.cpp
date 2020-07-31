@@ -6,8 +6,8 @@ using namespace moduru::lang;
 using namespace mpc::lcdgui::screens;
 using namespace std;
 
-TrMuteScreen::TrMuteScreen(const int layerIndex)
-	: ScreenComponent("trmute", layerIndex)
+TrMuteScreen::TrMuteScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "trmute", layerIndex)
 {
 }
 
@@ -104,7 +104,7 @@ void TrMuteScreen::turnWheel(int i)
 void TrMuteScreen::function(int i)
 {
 	init();
-	BaseControls::function(i);
+	baseControls->function(i);
 	
 	switch (i)
 	{

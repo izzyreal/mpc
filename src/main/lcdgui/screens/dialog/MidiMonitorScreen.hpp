@@ -59,7 +59,7 @@ namespace mpc::lcdgui::screens::dialog
 		void update(moduru::observer::Observable* o, nonstd::any arg) override;
 
 	public:
-		MidiMonitorScreen(const int layerIndex);
+		MidiMonitorScreen(mpc::Mpc& mpc, const int layerIndex);
 
 		void open() override;
 		void close() override;

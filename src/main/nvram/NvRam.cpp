@@ -24,7 +24,7 @@ using namespace mpc::lcdgui::screens;
 using namespace moduru::file;
 using namespace std;
 
-void NvRam::loadUserScreenValues()
+void NvRam::loadUserScreenValues(mpc::Mpc& mpc)
 {
 	string path = mpc::Paths::resPath() + "nvram.vmp";
 	auto file = File(path, nullptr);
@@ -34,8 +34,8 @@ void NvRam::loadUserScreenValues()
 		return;
 	}
 
-	auto defaults = DefaultsParser::AllDefaultsFromFile(file);
-	auto userScreen = dynamic_pointer_cast<UserScreen>(Screens::getScreenComponent("user"));
+	auto defaults = DefaultsParser::AllDefaultsFromFile(mpc, file);
+	auto userScreen = dynamic_pointer_cast<UserScreen>(mpc.screens->getScreenComponent("user"));
 
 	userScreen->lastBar = defaults.getBarCount() - 1;
 	userScreen->bus = defaults.getBusses()[0];
@@ -60,9 +60,9 @@ void NvRam::loadUserScreenValues()
 	userScreen->setVelo(defaults.getTrVelos()[0]);
 }
 
-void NvRam::saveUserScreenValues()
+void NvRam::saveUserScreenValues(mpc::Mpc& mpc)
 {
-	DefaultsParser dp;
+	DefaultsParser dp(mpc);
 	
 	string fileName = mpc::Paths::resPath() + "nvram.vmp";
 	
@@ -79,10 +79,10 @@ void NvRam::saveUserScreenValues()
 	stream.close();
 }
 
-void NvRam::saveKnobPositions()
+void NvRam::saveKnobPositions(mpc::Mpc& mpc)
 {
-    auto ams = Mpc::instance().getAudioMidiServices().lock();
-    auto hw = Mpc::instance().getHardware().lock();
+    auto ams = mpc.getAudioMidiServices().lock();
+    auto hw = mpc.getHardware().lock();
     
 	std::shared_ptr<mpc::hardware::Slider> slider;
     

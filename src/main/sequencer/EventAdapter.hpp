@@ -3,6 +3,8 @@
 #include <vector>
 #include <memory>
 
+namespace mpc { class Mpc; }
+
 namespace ctoot::midi::core
 {
 	class ShortMessage;
@@ -23,6 +25,7 @@ namespace mpc::sequencer
 	{
 
 	private:
+		mpc::Mpc& mpc;
 		std::weak_ptr<Sequencer> sequencer;
 		std::weak_ptr<Event> event;
 		std::shared_ptr<MidiClockEvent> midiClockEvent;
@@ -37,7 +40,7 @@ namespace mpc::sequencer
 	public:
 		std::weak_ptr<Event> get();
 
-		EventAdapter(std::weak_ptr<Sequencer> sequencer);
+		EventAdapter(mpc::Mpc& mpc, std::weak_ptr<Sequencer> sequencer);
 
 	};
 }

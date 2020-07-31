@@ -6,8 +6,8 @@
 using namespace mpc::lcdgui::screens;
 using namespace std;
 
-InitScreen::InitScreen(const int layerIndex) 
-	: ScreenComponent("init", layerIndex)
+InitScreen::InitScreen(mpc::Mpc& mpc, const int layerIndex) 
+	: ScreenComponent(mpc, "init", layerIndex)
 {
 }
 
@@ -25,10 +25,10 @@ void InitScreen::function(int i)
 		break;
 	case 5:
 	{
-		auto userScreen = dynamic_pointer_cast<UserScreen>(Screens::getScreenComponent("user"));
+		auto userScreen = dynamic_pointer_cast<UserScreen>(mpc.screens->getScreenComponent("user"));
 		userScreen->resetPreferences();
 
-		auto setupScreen = dynamic_pointer_cast<SetupScreen>(Screens::getScreenComponent("setup"));
+		auto setupScreen = dynamic_pointer_cast<SetupScreen>(mpc.screens->getScreenComponent("setup"));
 		setupScreen->resetPreferences();
 
 		ls.lock()->openScreen("sequencer");

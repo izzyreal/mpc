@@ -12,8 +12,8 @@ using namespace mpc::lcdgui::screens::window;
 using namespace moduru::lang;
 using namespace std;
 
-ZoneScreen::ZoneScreen(const int layerIndex) 
-	: ScreenComponent("zone", layerIndex)
+ZoneScreen::ZoneScreen(mpc::Mpc& mpc, const int layerIndex) 
+	: ScreenComponent(mpc, "zone", layerIndex)
 {
 	addChild(move(make_shared<TwoDots>()));
 	addChild(move(make_shared<Wave>()));
@@ -24,7 +24,7 @@ ZoneScreen::ZoneScreen(const int layerIndex)
 	findTwoDots().lock()->setVisible(2, false);
 	findTwoDots().lock()->setVisible(3, false);
 
-	typableParams = vector<string>{ "st", "end" };
+	//typableParams = vector<string>{ "st", "end" };
 }
 
 void ZoneScreen::open()
@@ -106,7 +106,7 @@ void ZoneScreen::function(int f)
 			return;
 		}
 
-		auto editSoundScreen = dynamic_pointer_cast<EditSoundScreen>(Screens::getScreenComponent("edit-sound"));
+		auto editSoundScreen = dynamic_pointer_cast<EditSoundScreen>(mpc.screens->getScreenComponent("edit-sound"));
 		editSoundScreen->setPreviousScreenName("zone");
 		ls.lock()->openScreen("edit-sound");
 		break;
@@ -199,7 +199,7 @@ void ZoneScreen::displayWave()
 	}
 
 	auto sampleData = sound->getSampleData();
-	auto trimScreen = dynamic_pointer_cast<TrimScreen>(Screens::getScreenComponent("trim"));
+	auto trimScreen = dynamic_pointer_cast<TrimScreen>(mpc.screens->getScreenComponent("trim"));
 	findWave().lock()->setSampleData(sampleData, sampler.lock()->getSound().lock()->isMono(), trimScreen->view);
 	findWave().lock()->setSelection(getZoneStart(zone), getZoneEnd(zone));
 }

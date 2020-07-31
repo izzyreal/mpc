@@ -31,8 +31,8 @@ using namespace mpc::lcdgui::screens::dialog2;
 using namespace std;
 using namespace moduru::lang;
 
-NameScreen::NameScreen(const int layerIndex)
-	: ScreenComponent("name", layerIndex)
+NameScreen::NameScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "name", layerIndex)
 {
 	addChild(make_shared<Underline>());
 }
@@ -66,7 +66,7 @@ void NameScreen::left()
 		return;
 	}
 
-	BaseControls::left();
+	baseControls->left();
 	
 	if (editing)
 	{
@@ -85,7 +85,7 @@ void NameScreen::right()
 		return;
 	}
 	
-	BaseControls::right();
+	baseControls->right();
 	
 	if (editing)
 	{
@@ -158,7 +158,7 @@ void NameScreen::saveName()
 
 	if (parameterName.compare("output-folder") == 0)
 	{
-		auto directToDiskRecorderScreen = dynamic_pointer_cast<VmpcDirectToDiskRecorderScreen>(Screens::getScreenComponent("vmpc-direct-to-disk-recorder"));
+		auto directToDiskRecorderScreen = dynamic_pointer_cast<VmpcDirectToDiskRecorderScreen>(mpc.screens->getScreenComponent("vmpc-direct-to-disk-recorder"));
 		directToDiskRecorderScreen->outputFolder = getName();
 		editing = false;
 		ls.lock()->setLastFocus("name", "0");
@@ -189,7 +189,7 @@ void NameScreen::saveName()
 	{
 		string apsName = getName();
 		apsName.append(".APS");
-		mpc::disk::ApsSaver apsSaver(mpc::Util::getFileName(apsName));
+		mpc::disk::ApsSaver apsSaver(mpc, mpc::Util::getFileName(apsName));
 		editing = false;
 		ls.lock()->setLastFocus("name", "0");
 		return;
@@ -230,7 +230,7 @@ void NameScreen::saveName()
 	}
 	else if (parameterName.compare("create-new-program") == 0)
 	{
-		auto createNewProgramScreen = dynamic_pointer_cast<CreateNewProgramScreen>(Screens::getScreenComponent("create-new-program"));
+		auto createNewProgramScreen = dynamic_pointer_cast<CreateNewProgramScreen>(mpc.screens->getScreenComponent("create-new-program"));
 		createNewProgramScreen->newName = getName();
 		editing = false;
 		ls.lock()->setLastFocus("name", "0");
@@ -239,7 +239,7 @@ void NameScreen::saveName()
 	}
 	else if (parameterName.compare("autochrom") == 0)
 	{
-		auto autoChromaticAssignmentScreen = dynamic_pointer_cast<AutoChromaticAssignmentScreen>(Screens::getScreenComponent("auto-chromatic-assignment"));
+		auto autoChromaticAssignmentScreen = dynamic_pointer_cast<AutoChromaticAssignmentScreen>(mpc.screens->getScreenComponent("auto-chromatic-assignment"));
 		autoChromaticAssignmentScreen->newName = getName();
 		editing = false;
 		ls.lock()->setLastFocus("name", "0");
@@ -249,7 +249,7 @@ void NameScreen::saveName()
 	}
 	else if (parameterName.compare("rename") == 0)
 	{
-		auto directoryScreen = dynamic_pointer_cast<DirectoryScreen>(Screens::getScreenComponent("directory"));
+		auto directoryScreen = dynamic_pointer_cast<DirectoryScreen>(mpc.screens->getScreenComponent("directory"));
 		auto ext = mpc::Util::splitName(directoryScreen->getSelectedFile()->getName())[1];
 		
 		if (ext.length() > 0)
@@ -262,7 +262,7 @@ void NameScreen::saveName()
 		if (!success)
 		{
 			ls.lock()->openScreen("popup");
-			auto popupScreen = dynamic_pointer_cast<PopupScreen>(Screens::getScreenComponent("popup"));
+			auto popupScreen = dynamic_pointer_cast<PopupScreen>(mpc.screens->getScreenComponent("popup"));
 			popupScreen->setText("File name exists !!");
 			ls.lock()->setPreviousScreenName("directory");
 			return;
@@ -292,10 +292,10 @@ void NameScreen::saveName()
 			{
 				if (disk->getFileName(i).compare(StrUtil::toUpper(getName())) == 0)
 				{
-					auto loadScreen = dynamic_pointer_cast<LoadScreen>(Screens::getScreenComponent("load"));
+					auto loadScreen = dynamic_pointer_cast<LoadScreen>(mpc.screens->getScreenComponent("load"));
 					loadScreen->setFileLoad(counter);
 
-					auto directoryScreen = dynamic_pointer_cast<DirectoryScreen>(Screens::getScreenComponent("directory"));
+					auto directoryScreen = dynamic_pointer_cast<DirectoryScreen>(mpc.screens->getScreenComponent("directory"));
 
 					if (counter > 4)
 					{
@@ -318,7 +318,7 @@ void NameScreen::saveName()
 		if (!success)
 		{
 			ls.lock()->openScreen("popup");
-			auto popupScreen = dynamic_pointer_cast<PopupScreen>(Screens::getScreenComponent("popup"));
+			auto popupScreen = dynamic_pointer_cast<PopupScreen>(mpc.screens->getScreenComponent("popup"));
 			popupScreen->setText("Folder name exists !!");
 		}
 	}
@@ -358,7 +358,7 @@ void NameScreen::saveName()
 	}
 	else if (prevScreen.compare("midi-output") == 0)
 	{
-		auto midiOutputScreen = dynamic_pointer_cast<MidiOutputScreen>(Screens::getScreenComponent("midi-output"));
+		auto midiOutputScreen = dynamic_pointer_cast<MidiOutputScreen>(mpc.screens->getScreenComponent("midi-output"));
 		sequencer.lock()->getActiveSequence().lock()->setDeviceName(midiOutputScreen->getDeviceNumber() + 1, getName().substr(0, 8));
 		editing = false;
 		ls.lock()->setLastFocus("name", "0");
@@ -366,7 +366,7 @@ void NameScreen::saveName()
 	}
 	else if (prevScreen.compare("edit-sound") == 0)
 	{
-		auto editSoundScreen = dynamic_pointer_cast<EditSoundScreen>(Screens::getScreenComponent("edit-sound"));
+		auto editSoundScreen = dynamic_pointer_cast<EditSoundScreen>(mpc.screens->getScreenComponent("edit-sound"));
 		editSoundScreen->setNewName(getName());
 		editing = false;
 		ls.lock()->setLastFocus("name", "0");
@@ -381,7 +381,7 @@ void NameScreen::saveName()
 	}
 	else if (prevScreen.compare("resample") == 0)
 	{
-		auto resampleScreen = dynamic_pointer_cast<ResampleScreen>(Screens::getScreenComponent("resample"));
+		auto resampleScreen = dynamic_pointer_cast<ResampleScreen>(mpc.screens->getScreenComponent("resample"));
 		resampleScreen->setNewName(getName());
 		editing = false;
 		ls.lock()->setLastFocus("name", "0");
@@ -389,7 +389,7 @@ void NameScreen::saveName()
 	}
 	else if (prevScreen.compare("stereo-to-mono") == 0)
 	{
-		auto stereoToMonoScreen = dynamic_pointer_cast<StereoToMonoScreen>(Screens::getScreenComponent("stereo-to-mono"));
+		auto stereoToMonoScreen = dynamic_pointer_cast<StereoToMonoScreen>(mpc.screens->getScreenComponent("stereo-to-mono"));
 		if (parameterName.compare("newlname") == 0)
 		{
 			stereoToMonoScreen->setNewLName(getName());
@@ -404,7 +404,7 @@ void NameScreen::saveName()
 	}
 	else if (prevScreen.compare("copy-sound") == 0)
 	{
-		auto copySoundScreen = dynamic_pointer_cast<CopySoundScreen>(Screens::getScreenComponent("copy-sound"));
+		auto copySoundScreen = dynamic_pointer_cast<CopySoundScreen>(mpc.screens->getScreenComponent("copy-sound"));
 		copySoundScreen->setNewName(getName());
 		editing = false;
 		ls.lock()->setLastFocus("name", "0");

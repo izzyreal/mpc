@@ -5,8 +5,8 @@
 using namespace mpc::lcdgui::screens;
 using namespace std;
 
-TransScreen::TransScreen(const int layerIndex) 
-	: ScreenComponent("trans", layerIndex)
+TransScreen::TransScreen(mpc::Mpc& mpc, const int layerIndex) 
+	: ScreenComponent(mpc, "trans", layerIndex)
 {
 }
 

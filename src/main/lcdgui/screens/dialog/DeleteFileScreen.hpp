@@ -15,7 +15,7 @@ namespace mpc::lcdgui::screens::dialog
 	public:
 		void function(int i) override;
 
-		DeleteFileScreen(const int layerIndex);
+		DeleteFileScreen(mpc::Mpc& mpc, const int layerIndex);
 
 	private:
 		friend class DeleteFileThread;

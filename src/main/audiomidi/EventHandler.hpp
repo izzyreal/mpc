@@ -14,6 +14,7 @@ namespace mpc::audiomidi {
 	{
 
 	private:
+		mpc::Mpc& mpc;
 		std::weak_ptr<mpc::sequencer::Sequencer> sequencer;
 		std::weak_ptr<mpc::sampler::Sampler> sampler;
 		
@@ -25,7 +26,7 @@ namespace mpc::audiomidi {
 		void midiOut(std::weak_ptr<mpc::sequencer::Event> event, mpc::sequencer::Track* track);
 
 	public:
-		EventHandler();
+		EventHandler(mpc::Mpc& mpc);
 
 	};
 }

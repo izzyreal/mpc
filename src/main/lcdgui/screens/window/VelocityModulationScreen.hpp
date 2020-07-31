@@ -6,13 +6,14 @@
 namespace mpc::lcdgui::screens::window
 {
 	class VelocityModulationScreen
-		: public mpc::lcdgui::ScreenComponent, public mpc::controls::BaseSamplerControls
+		: public mpc::lcdgui::ScreenComponent
+		//public mpc::controls::BaseSamplerControls
 	{
 
 	public:
 		void turnWheel(int i) override;
 
-		VelocityModulationScreen(const int layerIndex);
+		VelocityModulationScreen(mpc::Mpc& mpc, const int layerIndex);
 		
 		void open() override;
 		void close() override;

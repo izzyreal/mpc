@@ -10,6 +10,6 @@ namespace mpc::lcdgui::screens
 	public:
 		void function(int i) override;
 
-		InitScreen(const int layerIndex);
+		InitScreen(mpc::Mpc& mpc, const int layerIndex);
 	};
 }

@@ -5,8 +5,8 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
-MidiOutputScreen::MidiOutputScreen(const int layerIndex)
-	: ScreenComponent("midi-output", layerIndex)
+MidiOutputScreen::MidiOutputScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "midi-output", layerIndex)
 {
 }
 
@@ -24,7 +24,7 @@ void MidiOutputScreen::turnWheel(int i)
 	
 	if (param.compare("firstletter") == 0)
 	{
-		auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
+		auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
 		nameScreen->setName(seq->getDeviceName(deviceNumber + i));
 		nameScreen->parameterName = "devicename";
 		nameScreen->setNameLimit(8);
@@ -42,7 +42,7 @@ void MidiOutputScreen::turnWheel(int i)
 
 void MidiOutputScreen::function(int i)
 {
-	BaseControls::function(i);
+	baseControls->function(i);
 	
 	switch (i)
 	{

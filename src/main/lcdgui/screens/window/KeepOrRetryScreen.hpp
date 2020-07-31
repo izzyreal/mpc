@@ -6,7 +6,8 @@
 namespace mpc::lcdgui::screens::window
 {
 	class KeepOrRetryScreen
-		: public mpc::lcdgui::ScreenComponent, public mpc::controls::BaseSamplerControls
+		: public mpc::lcdgui::ScreenComponent
+		//public mpc::controls::BaseSamplerControls
 	{
 
 	public:
@@ -15,7 +16,7 @@ namespace mpc::lcdgui::screens::window
 		void mainScreen() override;
 
 	public:
-		KeepOrRetryScreen(const int layerIndex);
+		KeepOrRetryScreen(mpc::Mpc& mpc, const int layerIndex);
 
 		void update(moduru::observer::Observable* o, nonstd::any arg) override;
 

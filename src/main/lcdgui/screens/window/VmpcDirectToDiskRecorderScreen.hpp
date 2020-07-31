@@ -23,7 +23,7 @@ namespace mpc::lcdgui::screens::window
 		void turnWheel(int i) override;
 		void function(int i) override;
 
-		VmpcDirectToDiskRecorderScreen(const int layerIndex);
+		VmpcDirectToDiskRecorderScreen(mpc::Mpc& mpc, const int layerIndex);
 
 		void open() override;
 

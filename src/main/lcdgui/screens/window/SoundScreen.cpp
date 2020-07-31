@@ -6,8 +6,8 @@ using namespace mpc::lcdgui::screens::window;
 using namespace moduru::lang;
 using namespace std;
 
-SoundScreen::SoundScreen(const int layerIndex) 
-	: ScreenComponent("sound", layerIndex)
+SoundScreen::SoundScreen(mpc::Mpc& mpc, const int layerIndex) 
+	: ScreenComponent(mpc, "sound", layerIndex)
 {
 }
 
@@ -25,7 +25,7 @@ void SoundScreen::turnWheel(int i)
 	
 	if (param.compare("soundname") == 0)
 	{
-		auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
+		auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
 		nameScreen->setName(findField("soundname").lock()->getText());
 		nameScreen->parameterName = "soundname";
 		ls.lock()->openScreen("name");
@@ -34,7 +34,7 @@ void SoundScreen::turnWheel(int i)
 
 void SoundScreen::function(int i)
 {
-	BaseControls::function(i);
+	baseControls->function(i);
 
 	switch (i)
 	{

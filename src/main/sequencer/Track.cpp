@@ -27,11 +27,12 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 using namespace std;
 
-Track::Track(mpc::sequencer::Sequence* parent, int i) 
+Track::Track(mpc::Mpc& mpc, mpc::sequencer::Sequence* parent, int i)
+	: mpc(mpc)
 {
 	this->parent = parent;
 	
-	sequencer = Mpc::instance().getSequencer();
+	sequencer = mpc.getSequencer();
 	trackIndex = i;
 	programChange = 0;
 	velocityRatio = 100;
@@ -213,7 +214,7 @@ void Track::addEventRealTime(shared_ptr<Event> event)
 			}
 		}
 	}
-	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timing-correct"));
+	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(mpc.screens->getScreenComponent("timing-correct"));
 	tcValue = timingCorrectScreen->getNoteValue();
 	
 	auto lSequencer = sequencer.lock();

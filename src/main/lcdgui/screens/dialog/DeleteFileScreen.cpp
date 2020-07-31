@@ -18,14 +18,14 @@ using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::lcdgui;
 using namespace std;
 
-DeleteFileScreen::DeleteFileScreen(const int layerIndex)
-	: ScreenComponent("delete-file", layerIndex)
+DeleteFileScreen::DeleteFileScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "delete-file", layerIndex)
 {
 }
 
 void DeleteFileScreen::function(int i)
 {
-	BaseControls::function(i);
+	baseControls->function(i);
 	
 	switch (i)
 	{
@@ -33,9 +33,9 @@ void DeleteFileScreen::function(int i)
 		ls.lock()->openScreen("delete-all-files");
 		break;
 	case 4:
-		auto directoryScreen = dynamic_pointer_cast<DirectoryScreen>(Screens::getScreenComponent("directory"));
+		auto directoryScreen = dynamic_pointer_cast<DirectoryScreen>(mpc.screens->getScreenComponent("directory"));
 		ls.lock()->openScreen("popup");
-		auto popupScreen = dynamic_pointer_cast<PopupScreen>(Screens::getScreenComponent("popup"));
+		auto popupScreen = dynamic_pointer_cast<PopupScreen>(mpc.screens->getScreenComponent("popup"));
 		popupScreen->setText("Delete:" + directoryScreen->getSelectedFile()->getName());
 		
 		if (deleteThread.joinable())
@@ -64,10 +64,10 @@ void DeleteFileScreen::deleteFile()
 		disk->flush();
 		disk->initFiles();
 
-		auto loadScreen = dynamic_pointer_cast<LoadScreen>(Screens::getScreenComponent("load"));
+		auto loadScreen = dynamic_pointer_cast<LoadScreen>(mpc.screens->getScreenComponent("load"));
 		
 		loadScreen->setFileLoad(loadScreen->fileLoad - 1);
-		auto directoryScreen = dynamic_pointer_cast<DirectoryScreen>(Screens::getScreenComponent("directory"));
+		auto directoryScreen = dynamic_pointer_cast<DirectoryScreen>(mpc.screens->getScreenComponent("directory"));
 		directoryScreen->setYOffset1(directoryScreen->yOffset1 - 1);
 	}
 

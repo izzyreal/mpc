@@ -3,8 +3,8 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
-AssignmentViewScreen::AssignmentViewScreen(const int layerIndex) 
-	: ScreenComponent("assignment-view", layerIndex)
+AssignmentViewScreen::AssignmentViewScreen(mpc::Mpc& mpc, const int layerIndex) 
+	: ScreenComponent(mpc, "assignment-view", layerIndex)
 {
 }
 
@@ -76,7 +76,7 @@ void AssignmentViewScreen::left()
 		return;
 	}
 
-    BaseControls::left();
+    baseControls->left();
     
 	auto padIndex = mpc.getPad() - 1;
     auto note = program.lock()->getPad(padIndex)->getNote();
@@ -92,7 +92,7 @@ void AssignmentViewScreen::right()
 		return;
 	}
 
-	BaseControls::right();
+	baseControls->right();
 	auto padIndex = mpc.getPad() + 1;
 	auto note = program.lock()->getPad(padIndex)->getNote();
 	mpc.setPadAndNote(padIndex, note);

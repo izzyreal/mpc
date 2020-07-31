@@ -6,8 +6,8 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
-SaveASoundScreen::SaveASoundScreen(const int layerIndex) 
-	: ScreenComponent("save-a-sound", layerIndex)
+SaveASoundScreen::SaveASoundScreen(mpc::Mpc& mpc, const int layerIndex) 
+	: ScreenComponent(mpc, "save-a-sound", layerIndex)
 {
 }
 

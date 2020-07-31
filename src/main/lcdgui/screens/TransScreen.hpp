@@ -24,7 +24,7 @@ namespace mpc::lcdgui::screens
 
 		void open() override;
 
-		TransScreen(const int layerIndex);
+		TransScreen(mpc::Mpc& mpc, const int layerIndex);
 
 	private:
 		int tr = -1;

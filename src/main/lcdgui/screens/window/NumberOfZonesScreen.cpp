@@ -8,14 +8,14 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
-NumberOfZonesScreen::NumberOfZonesScreen(const int layerIndex)
-	: ScreenComponent("number-of-zones", layerIndex)
+NumberOfZonesScreen::NumberOfZonesScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "number-of-zones", layerIndex)
 {
 }
 
 void NumberOfZonesScreen::open()
 {
-	auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(Screens::getScreenComponent("zone"));
+	auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(mpc.screens->getScreenComponent("zone"));
 	numberOfZones = zoneScreen->numberOfZones;
 	displayNumberOfZones();
 }
@@ -30,7 +30,7 @@ void NumberOfZonesScreen::function(int i)
 	switch (i)
 	{
 	case 4:
-		auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(Screens::getScreenComponent("zone"));
+		auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(mpc.screens->getScreenComponent("zone"));
 		auto sound = sampler.lock()->getSound().lock();
 		zoneScreen->numberOfZones = numberOfZones;
 		zoneScreen->initZones(sound->getLastFrameIndex());

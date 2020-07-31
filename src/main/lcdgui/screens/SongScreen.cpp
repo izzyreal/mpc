@@ -9,8 +9,8 @@ using namespace mpc::lcdgui::screens;
 using namespace moduru::lang;
 using namespace std;
 
-SongScreen::SongScreen(const int layerIndex)
-	: ScreenComponent("song", layerIndex)
+SongScreen::SongScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "song", layerIndex)
 {
 }
 
@@ -39,7 +39,7 @@ void SongScreen::close()
 
 void SongScreen::init()
 {
-	BaseControls::init();
+	baseControls->init();
 }
 
 void SongScreen::up()
@@ -58,7 +58,7 @@ void SongScreen::up()
 		sequencer.lock()->setBar(0);
 	}
 	else {
-		BaseControls::up();
+		baseControls->up();
 	}
 }
 
@@ -79,7 +79,7 @@ void SongScreen::left()
 	}
 	else
 	{
-		BaseControls::left();
+		baseControls->left();
 	}
 }
 
@@ -102,7 +102,7 @@ void SongScreen::right()
 	}
 	else
 	{
-		BaseControls::right();
+		baseControls->right();
 	}
 }
 
@@ -131,7 +131,7 @@ void SongScreen::down()
 		sequencer.lock()->setBar(0);
 	}
 	else {
-		BaseControls::down();
+		baseControls->down();
 	}
 }
 

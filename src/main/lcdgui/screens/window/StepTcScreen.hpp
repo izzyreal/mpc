@@ -8,7 +8,7 @@ namespace mpc::lcdgui::screens::window {
 	{
 
 	public:
-		StepTcScreen(const int layerIndex);
+		StepTcScreen(mpc::Mpc& mpc, const int layerIndex);
 		
 		void open() override;
 

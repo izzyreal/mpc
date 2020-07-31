@@ -32,7 +32,8 @@ using namespace moduru::file;
 
 using namespace std;
 
-AbstractDisk::AbstractDisk(weak_ptr<mpc::disk::Store> store)
+AbstractDisk::AbstractDisk(mpc::Mpc& mpc, weak_ptr<mpc::disk::Store> store)
+	: mpc(mpc)
 {
 	this->store = store;
 }
@@ -113,8 +114,8 @@ vector<string> AbstractDisk::getParentFileNames()
 
 bool AbstractDisk::renameSelectedFile(string s)
 {
-	auto directoryScreen = dynamic_pointer_cast<DirectoryScreen>(Screens::getScreenComponent("directory"));
-	auto loadScreen = dynamic_pointer_cast<LoadScreen>(Screens::getScreenComponent("load"));
+	auto directoryScreen = dynamic_pointer_cast<DirectoryScreen>(mpc.screens->getScreenComponent("directory"));
+	auto loadScreen = dynamic_pointer_cast<LoadScreen>(mpc.screens->getScreenComponent("load"));
   
 	auto left = directoryScreen->xPos == 0;
 	auto fileNumber = left ? directoryScreen->yPos0 + directoryScreen->yOffset0 : loadScreen->fileLoad;
@@ -125,7 +126,7 @@ bool AbstractDisk::renameSelectedFile(string s)
 
 bool AbstractDisk::deleteSelectedFile()
 {
-	auto loadScreen = dynamic_pointer_cast<LoadScreen>(Screens::getScreenComponent("load"));
+	auto loadScreen = dynamic_pointer_cast<LoadScreen>(mpc.screens->getScreenComponent("load"));
 	return files[loadScreen->fileLoad]->del();
 }
 
@@ -276,12 +277,12 @@ void AbstractDisk::writeProgram(mpc::sampler::Program* program, string fileName)
 		}
 	}
 
-	auto saveAProgramScreen = dynamic_pointer_cast<SaveAProgramScreen>(Screens::getScreenComponent("save-a-program"));
+	auto saveAProgramScreen = dynamic_pointer_cast<SaveAProgramScreen>(mpc.screens->getScreenComponent("save-a-program"));
 	
 	if (saveAProgramScreen->save != 0)
 	{
 		auto isWav = saveAProgramScreen->save == 1;
-		soundSaver = make_unique<SoundSaver>(sounds, isWav);
+		soundSaver = make_unique<SoundSaver>(mpc, sounds, isWav);
 	}
 	else {
 		mpc::Mpc::instance().getLayeredScreen().lock()->openScreen("save");

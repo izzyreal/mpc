@@ -3,8 +3,8 @@
 using namespace mpc::lcdgui::screens;
 using namespace std;
 
-SyncScreen::SyncScreen(const int layerIndex) 
-	: ScreenComponent("sync", layerIndex)
+SyncScreen::SyncScreen(mpc::Mpc& mpc, const int layerIndex) 
+	: ScreenComponent(mpc, "sync", layerIndex)
 {
 }
 

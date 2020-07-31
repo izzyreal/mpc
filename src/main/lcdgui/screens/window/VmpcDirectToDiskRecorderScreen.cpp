@@ -22,8 +22,8 @@ using namespace mpc::sequencer;
 using namespace moduru::lang;
 using namespace std;
 
-VmpcDirectToDiskRecorderScreen::VmpcDirectToDiskRecorderScreen(const int layerIndex)
-	: ScreenComponent("vmpc-direct-to-disk-recorder", layerIndex)
+VmpcDirectToDiskRecorderScreen::VmpcDirectToDiskRecorderScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "vmpc-direct-to-disk-recorder", layerIndex)
 {
 }
 
@@ -81,7 +81,7 @@ void VmpcDirectToDiskRecorderScreen::turnWheel(int i)
 	}
 	else if (param.compare("output-folder") == 0)
 	{
-		auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
+		auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
 		nameScreen->setName(outputFolder);
 		nameScreen->setNameLimit(8);
 		nameScreen->parameterName = "output-folder";
@@ -162,7 +162,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 
 			sequencer.lock()->setSongModeEnabled(true);
 
-			auto songScreen = dynamic_pointer_cast<SongScreen>(Screens::getScreenComponent("song"));
+			auto songScreen = dynamic_pointer_cast<SongScreen>(mpc.screens->getScreenComponent("song"));
 			songScreen->setLoop(false);
 
 			mpc.getAudioMidiServices().lock()->prepareBouncing(settings.get());

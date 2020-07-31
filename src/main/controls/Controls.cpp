@@ -9,10 +9,10 @@
 using namespace mpc::controls;
 using namespace std;
 
-Controls::Controls()
+Controls::Controls(mpc::Mpc& mpc)
 {
 	pressedPadVelos = vector<int>(16);
-	controls["release"] = new GlobalReleaseControls();
+	controls["release"] = new GlobalReleaseControls(mpc);
 }
 
 void Controls::releaseAll()

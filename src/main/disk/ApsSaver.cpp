@@ -15,9 +15,9 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
-ApsSaver::ApsSaver(string apsFileName)
+ApsSaver::ApsSaver(mpc::Mpc& mpc, string apsFileName)
+	: mpc(mpc)
 {
-	
 	this->apsFileName = apsFileName;
 	auto disk = Mpc::instance().getDisk().lock();
 
@@ -36,15 +36,15 @@ void ApsSaver::saveAps()
 	auto disk = Mpc::instance().getDisk().lock();
 	disk->setBusy(true);
     auto file = disk->newFile(apsFileName);
-	ApsParser apsParser(apsFileName.substr(0, apsFileName.find(".")));
+	ApsParser apsParser(mpc, apsFileName.substr(0, apsFileName.find(".")));
     auto bytes = apsParser.getBytes();
     file->setFileData(&bytes);
 
-	auto saveAProgramScreen = dynamic_pointer_cast<SaveAProgramScreen>(Screens::getScreenComponent("save-a-program"));
+	auto saveAProgramScreen = dynamic_pointer_cast<SaveAProgramScreen>(mpc.screens->getScreenComponent("save-a-program"));
 	
 	if (saveAProgramScreen->save != 0)
 	{
-		soundSaver = make_unique<mpc::disk::SoundSaver>(Mpc::instance().getSampler().lock()->getSounds(), saveAProgramScreen->save == 1 ? false : true);
+		soundSaver = make_unique<mpc::disk::SoundSaver>(mpc, mpc.getSampler().lock()->getSounds(), saveAProgramScreen->save == 1 ? false : true);
 	}
 	else
 	{

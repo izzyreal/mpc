@@ -16,6 +16,11 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace std;
 
+SoundRecorder::SoundRecorder(mpc::Mpc& mpc)
+	: mpc(mpc)
+{
+}
+
 unsigned int SoundRecorder::getInputGain()
 {
 	return inputGain;
@@ -75,7 +80,7 @@ void SoundRecorder::stop() {
 	recording = false;
 	auto s = sound.lock();
 
-	auto sampleScreen = dynamic_pointer_cast<SampleScreen>(Screens::getScreenComponent("sample"));
+	auto sampleScreen = dynamic_pointer_cast<SampleScreen>(mpc.screens->getScreenComponent("sample"));
 	auto preRecFrames = (int)(44.1 * sampleScreen->preRec);
 
 	auto frameCount = s->getOscillatorControls()->getFrameCount();
@@ -125,7 +130,7 @@ int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf)
 	applyGain(inputGain * 0.01, left);
 	applyGain(inputGain * 0.01, right);
 
-	auto sampleScreen = dynamic_pointer_cast<SampleScreen>(Screens::getScreenComponent("sample"));
+	auto sampleScreen = dynamic_pointer_cast<SampleScreen>(mpc.screens->getScreenComponent("sample"));
 
 	if (sampleScreenActive.load()) {
 

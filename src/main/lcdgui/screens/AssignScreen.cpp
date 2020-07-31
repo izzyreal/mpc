@@ -5,8 +5,8 @@
 using namespace mpc::lcdgui::screens;
 using namespace std;
 
-AssignScreen::AssignScreen(const int layerIndex)
-	: ScreenComponent("assign", layerIndex)
+AssignScreen::AssignScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "assign", layerIndex)
 {
 }
 
@@ -89,7 +89,7 @@ void AssignScreen::turnWheel(int i)
 
 void AssignScreen::pad(int i, int velo, bool repeat, int tick)
 {
-	BaseControls::pad(i, velo, repeat, 0);
+	baseControls->pad(i, velo, repeat, 0);
 	auto nn = program.lock()->getNoteFromPad(i + (mpc.getBank() * 16));
     program.lock()->getSlider()->setAssignNote(nn);
 }

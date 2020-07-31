@@ -6,8 +6,8 @@ using namespace mpc::lcdgui::screens;
 using namespace moduru::lang;
 using namespace std;
 
-DrumScreen::DrumScreen(const int layerIndex) 
-	: ScreenComponent("drum", layerIndex)
+DrumScreen::DrumScreen(mpc::Mpc& mpc, const int layerIndex) 
+	: ScreenComponent(mpc, "drum", layerIndex)
 {
 }
 

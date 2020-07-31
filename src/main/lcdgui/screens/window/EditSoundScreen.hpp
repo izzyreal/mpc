@@ -6,11 +6,12 @@
 namespace mpc::lcdgui::screens::window {
 
 	class EditSoundScreen
-		: public mpc::lcdgui::ScreenComponent, public mpc::controls::BaseSamplerControls
+		: public mpc::lcdgui::ScreenComponent
+		//public mpc::controls::BaseSamplerControls
 	{
 
 	public:
-		EditSoundScreen(const int layerIndex);
+		EditSoundScreen(mpc::Mpc& mpc, const int layerIndex);
 		void turnWheel(int j) override;
 		void function(int j) override;
 		void open() override;

@@ -4,53 +4,48 @@
 #include <vector>
 #include <string>
 
-namespace mpc {
+namespace mpc { class Mpc; }
 
-	
+namespace mpc::file::aps
+{
+	class ApsGlobalParameters
+	{
+	private:
+		mpc::Mpc& mpc;
+		bool padToInternalSound;
+		bool padAssignMaster;
+		bool stereoMixSourceDrum;
+		bool indivFxSourceDrum;
+		bool copyPgmMixToDrum;
+		bool recordMixChanges;
+		int masterLevel;
+		int fxDrum;
 
-	namespace file {
-		namespace aps {
+	private:
+		static std::vector<char> TEMPLATE;
 
-			class ApsGlobalParameters
-			{
+	public:
+		std::vector<char> saveBytes{};
 
-			private:
-				bool padToInternalSound;
-				bool padAssignMaster;
-				bool stereoMixSourceDrum;
-				bool indivFxSourceDrum;
-				bool copyPgmMixToDrum;
-				bool recordMixChanges;
-				int masterLevel;
-				int fxDrum;
+	private:
+		int readFxDrum(char b);
 
-			private:
-				static std::vector<char> TEMPLATE;
+	public:
+		int getFxDrum();
+		bool isPadToIntSoundEnabled();
+		bool isPadAssignMaster();
+		bool isStereoMixSourceDrum();
+		bool isIndivFxSourceDrum();
+		bool isCopyPgmMixToDrumEnabled();
+		bool isRecordMixChangesEnabled();
+		int getMasterLevel();
 
-			public:
-				std::vector<char> saveBytes{};
+	public:
+		std::vector<char> getBytes();
 
-			private:
-				int readFxDrum(char b);
+	public:
+		ApsGlobalParameters(mpc::Mpc& mpc, std::vector<char> loadBytes);
+		ApsGlobalParameters(mpc::Mpc& mpc);
 
-			public:
-				int getFxDrum();
-				bool isPadToIntSoundEnabled();
-				bool isPadAssignMaster();
-				bool isStereoMixSourceDrum();
-				bool isIndivFxSourceDrum();
-				bool isCopyPgmMixToDrumEnabled();
-				bool isRecordMixChangesEnabled();
-				int getMasterLevel();
-
-			public:
-				std::vector<char> getBytes();
-
-			public:
-				ApsGlobalParameters(std::vector<char> loadBytes);
-				ApsGlobalParameters();
-
-			};
-		}
-	}
+	};
 }

@@ -44,8 +44,8 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::controls;
 using namespace std;
 
-BaseControls::BaseControls()
-	: mpc(mpc::Mpc::instance())
+BaseControls::BaseControls(mpc::Mpc& mpc)
+	: mpc(mpc)
 {
 	ls = mpc.getLayeredScreen();
 	sampler = mpc.getSampler();
@@ -167,7 +167,7 @@ void BaseControls::function(int i)
 			}
 			else if (currentScreenName.compare("edit-sound") == 0)
 			{
-				auto editSoundScreen = dynamic_pointer_cast<EditSoundScreen>(Screens::getScreenComponent("edit-sound"));
+				auto editSoundScreen = dynamic_pointer_cast<EditSoundScreen>(mpc.screens->getScreenComponent("edit-sound"));
 				ls.lock()->setPreviousScreenName(editSoundScreen->getPreviousScreenName());
 			}
 			else if (currentScreenName.compare("sound") == 0)
@@ -180,19 +180,19 @@ void BaseControls::function(int i)
 			}
 			else if (currentScreenName.compare("name") == 0)
 			{
-				auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
+				auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
 				nameScreen->editing = false;
 				ls.lock()->setLastFocus("name", "0");
 			}
 			else if (currentScreenName.compare("directory") == 0)
 			{
-				auto directoryScreen = dynamic_pointer_cast<DirectoryScreen>(Screens::getScreenComponent("directory"));
+				auto directoryScreen = dynamic_pointer_cast<DirectoryScreen>(mpc.screens->getScreenComponent("directory"));
 				ls.lock()->setPreviousScreenName(directoryScreen->previousScreenName);
 			}
 			
 			if (ls.lock()->getPreviousScreenName().compare("load") == 0)
 			{
-				auto loadScreen = dynamic_pointer_cast<LoadScreen>(Screens::getScreenComponent("load"));
+				auto loadScreen = dynamic_pointer_cast<LoadScreen>(mpc.screens->getScreenComponent("load"));
 
 				if (loadScreen->fileLoad + 1 > mpc.getDisk().lock()->getFiles().size())
 				{
@@ -244,7 +244,7 @@ void BaseControls::pad(int i, int velo, bool repeat, int tick)
 	auto velocity = velo;
 	auto pad = i + (mpc.getBank() * 16);
 
-	auto assign16LevelsScreen = dynamic_pointer_cast<Assign16LevelsScreen>(Screens::getScreenComponent("assign-16-levels"));
+	auto assign16LevelsScreen = dynamic_pointer_cast<Assign16LevelsScreen>(mpc.screens->getScreenComponent("assign-16-levels"));
 
 	if (mpc.getHardware().lock()->getTopPanel().lock()->isSixteenLevelsEnabled())
 	{
@@ -299,7 +299,7 @@ void BaseControls::generateNoteOn(int nn, int padVelo, int tick)
 	bool slider = lProgram && nn == lProgram->getSlider()->getNote();
 	bool posIsLastTick = sequencer.lock()->getTickPosition() == sequencer.lock()->getActiveSequence().lock()->getLastTick();
 	bool step = currentScreenName.compare("step-editor") == 0 && !posIsLastTick;
-	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timing-correct"));
+	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(mpc.screens->getScreenComponent("timing-correct"));
 	auto noteValue = timingCorrectScreen->getNoteValue();
 	auto swing = timingCorrectScreen->getSwing();
 
@@ -307,7 +307,7 @@ void BaseControls::generateNoteOn(int nn, int padVelo, int tick)
 
 	shared_ptr<mpc::sequencer::NoteEvent> n;
 
-	auto assign16LevelsScreen = dynamic_pointer_cast<Assign16LevelsScreen>(Screens::getScreenComponent("assign-16-levels"));
+	auto assign16LevelsScreen = dynamic_pointer_cast<Assign16LevelsScreen>(mpc.screens->getScreenComponent("assign-16-levels"));
 
 	if (sequencer.lock()->isRecordingOrOverdubbing() || step || recMainWithoutPlaying)
 	{
@@ -455,7 +455,7 @@ void BaseControls::numpad(int i)
 
 			disk->initFiles();
 
-			auto loadScreen = dynamic_pointer_cast<LoadScreen>(Screens::getScreenComponent("load"));
+			auto loadScreen = dynamic_pointer_cast<LoadScreen>(mpc.screens->getScreenComponent("load"));
 
 			if (loadScreen->fileLoad + 1 > (int)(disk->getFiles().size()))
 			{

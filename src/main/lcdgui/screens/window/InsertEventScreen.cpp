@@ -16,8 +16,8 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 using namespace std;
 
-InsertEventScreen::InsertEventScreen(const int layerIndex)
-	: ScreenComponent("insert-event", layerIndex)
+InsertEventScreen::InsertEventScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "insert-event", layerIndex)
 {
 }
 
@@ -33,7 +33,7 @@ void InsertEventScreen::displayInsertEventType()
 
 void InsertEventScreen::function(int i)
 {
-	BaseControls::function(i);
+	baseControls->function(i);
 	
 	switch (i)
 	{

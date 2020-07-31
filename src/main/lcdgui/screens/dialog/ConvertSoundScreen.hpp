@@ -11,7 +11,7 @@ namespace mpc::lcdgui::screens::dialog
 		void turnWheel(int i) override;
 		void function(int i) override;
 
-		ConvertSoundScreen(const int layerIndex);
+		ConvertSoundScreen(mpc::Mpc& mpc, const int layerIndex);
 
 		void open() override;
 

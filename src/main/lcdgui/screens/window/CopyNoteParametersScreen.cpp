@@ -6,8 +6,8 @@ using namespace mpc::lcdgui::screens::window;
 using namespace moduru::lang;
 using namespace std;
 
-CopyNoteParametersScreen::CopyNoteParametersScreen(const int layerIndex)
-	: ScreenComponent("copy-note-parameters", layerIndex)
+CopyNoteParametersScreen::CopyNoteParametersScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "copy-note-parameters", layerIndex)
 {
 }
 
@@ -48,7 +48,7 @@ void CopyNoteParametersScreen::turnWheel(int i)
 
 void CopyNoteParametersScreen::function(int i)
 {
-	BaseControls::function(i);
+	baseControls->function(i);
 	
 	switch (i)
 	{

@@ -11,7 +11,7 @@ namespace mpc::lcdgui::screens::window {
 		void function(int i) override;
 		void turnWheel(int i) override;
 
-		NumberOfZonesScreen(const int layerIndex);
+		NumberOfZonesScreen(mpc::Mpc& mpc, const int layerIndex);
 
 		void open() override;
 

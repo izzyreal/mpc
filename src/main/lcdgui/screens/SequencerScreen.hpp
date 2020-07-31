@@ -17,7 +17,7 @@ namespace mpc::lcdgui::screens
 	{
 
 	public:
-		SequencerScreen(const int layerIndex);
+		SequencerScreen(mpc::Mpc& mpc, const int layerIndex);
 
 	private:
 		std::weak_ptr<mpc::sequencer::Sequence> sequence;
@@ -65,7 +65,7 @@ namespace mpc::lcdgui::screens
 		void right() override;
 		void up() override;
 		void down() override;
-		void numpad(int i) override { BaseControls::numpad(i); }
+		void numpad(int i) override { baseControls->numpad(i); }
 
 	public:
 		void open() override;

@@ -5,8 +5,8 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
-SequenceScreen::SequenceScreen(const int layerIndex)
-	: ScreenComponent("sequence", layerIndex)
+SequenceScreen::SequenceScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "sequence", layerIndex)
 {
 }
 
@@ -28,7 +28,7 @@ void SequenceScreen::open()
 
 void SequenceScreen::function(int i)
 {
-	BaseControls::function(i);
+	baseControls->function(i);
 
 	switch (i)
 	{
@@ -45,7 +45,7 @@ void SequenceScreen::turnWheel(int i)
 {
 	init();
 
-	auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
+	auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
 
 	if (param.find("default") != string::npos)
 	{

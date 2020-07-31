@@ -10,8 +10,8 @@ using namespace mpc::sequencer;
 using namespace moduru::lang;
 using namespace std;
 
-TimingCorrectScreen::TimingCorrectScreen(const int layerIndex)
-	: ScreenComponent("timing-correct", layerIndex)
+TimingCorrectScreen::TimingCorrectScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "timing-correct", layerIndex)
 {
 }
 
@@ -39,7 +39,7 @@ void TimingCorrectScreen::close()
 
 void TimingCorrectScreen::function(int i)
 {
-	BaseControls::function(i);
+	baseControls->function(i);
 	switch (i)
 	{
 	case 4:

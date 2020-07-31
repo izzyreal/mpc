@@ -4,8 +4,8 @@ using namespace mpc::lcdgui::screens::dialog;
 using namespace moduru::lang;
 using namespace std;
 
-DeleteProgramScreen::DeleteProgramScreen(const int layerIndex)
-	: ScreenComponent("delete-program", layerIndex)
+DeleteProgramScreen::DeleteProgramScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "delete-program", layerIndex)
 {
 }
 

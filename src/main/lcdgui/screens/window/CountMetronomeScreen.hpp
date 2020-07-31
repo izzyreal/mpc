@@ -41,7 +41,7 @@ namespace mpc::lcdgui::screens::window
 		void displayCountIn();
 
 	public:
-		CountMetronomeScreen(const int layerIndex);
+		CountMetronomeScreen(mpc::Mpc& mpc, const int layerIndex);
 
 	public:
 		void open() override;

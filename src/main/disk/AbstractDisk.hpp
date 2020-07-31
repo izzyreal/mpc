@@ -15,6 +15,8 @@
 * is delegated to the moduru::file library by the MpcFiles that AbstractDisk uses.
 */
 
+namespace mpc { class Mpc; }
+
 namespace mpc::sequencer {
 	class Sequence;
 }
@@ -36,12 +38,13 @@ namespace mpc::disk {
 	{
 
 	private:
-		bool busy{ false };
-		std::weak_ptr<Store> store{};
+		bool busy = false;
+		std::weak_ptr<Store> store;
 		std::unique_ptr<SoundSaver> soundSaver;
 
 	protected:
-		std::unique_ptr<mpc::disk::device::Device> device{};
+		mpc::Mpc& mpc;
+		std::unique_ptr<mpc::disk::device::Device> device;
 
 	public:
 		const std::vector<std::string> extensions{ "", "SND", "PGM", "APS", "MID", "ALL", "WAV", "SEQ", "SET" };
@@ -93,7 +96,7 @@ namespace mpc::disk {
 		virtual int getPathDepth() = 0;
 
 	protected:
-		AbstractDisk(std::weak_ptr<Store> store);
+		AbstractDisk(mpc::Mpc& mpc, std::weak_ptr<Store> store);
 		virtual ~AbstractDisk();
 
 	};

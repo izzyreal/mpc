@@ -1,5 +1,4 @@
 #pragma once
-#include <Mpc.hpp>
 #include <sequencer/Sequence.hpp>
 
 #include <cstdint>
@@ -13,6 +12,8 @@
 
 #include <io/CircularIntBuffer.hpp>
 
+namespace mpc { class Mpc; }
+
 namespace mpc::sequencer
 {
 	class Song;
@@ -24,7 +25,11 @@ namespace mpc::sequencer
 		: public moduru::observer::Observable
 	{
 
+	public:
+		Sequencer(mpc::Mpc& mpc);
+
 	private:
+		mpc::Mpc& mpc;
 		int lastNotifiedBar = -1;
 		int lastNotifiedBeat = -1;
 		int lastNotifiedClock = -1;

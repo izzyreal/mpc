@@ -8,8 +8,8 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
-SaveASequenceScreen::SaveASequenceScreen(const int layerIndex)
-	: ScreenComponent("save-a-sequence", layerIndex)
+SaveASequenceScreen::SaveASequenceScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "save-a-sequence", layerIndex)
 {
 }
 
@@ -29,7 +29,7 @@ void SaveASequenceScreen::turnWheel(int i)
 	}
 	else if (param.compare("file") == 0)
 	{
-		auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
+		auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
 		nameScreen->parameterName = "savesequencename";
 		ls.lock()->openScreen("name");
 	}
@@ -38,7 +38,7 @@ void SaveASequenceScreen::turnWheel(int i)
 void SaveASequenceScreen::function(int i)
 {
 	init();
-	auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
+	auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
 
 	switch (i)
 	{
@@ -69,7 +69,7 @@ void SaveASequenceScreen::displaySaveAs()
 
 void SaveASequenceScreen::displayFile()
 {
-	auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
+	auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
 	auto name = nameScreen->getName();
 
 	if (name.length() < 2)

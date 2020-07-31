@@ -10,7 +10,7 @@ namespace mpc::lcdgui::screens::dialog
 		void function(int i) override;
 		void turnWheel(int i) override;
 
-		DeleteProgramScreen(const int layerIndex);
+		DeleteProgramScreen(mpc::Mpc& mpc, const int layerIndex);
 
 	private:
 		int deletePgm = 0;

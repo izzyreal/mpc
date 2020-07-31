@@ -6,8 +6,8 @@ using namespace mpc::lcdgui::screens::window;
 using namespace moduru::lang;
 using namespace std;
 
-VeloPitchScreen::VeloPitchScreen(const int layerIndex)
-	: ScreenComponent("velo-pitch", layerIndex)
+VeloPitchScreen::VeloPitchScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "velo-pitch", layerIndex)
 {
 }
 

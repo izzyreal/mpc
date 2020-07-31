@@ -10,7 +10,8 @@
 namespace mpc::lcdgui::screens
 {
 	class MixerScreen
-		: public mpc::lcdgui::ScreenComponent, public mpc::controls::BaseSamplerControls
+		: public mpc::lcdgui::ScreenComponent
+		//public mpc::controls::BaseSamplerControls
 	{
 
 	public:
@@ -22,7 +23,7 @@ namespace mpc::lcdgui::screens
 		void right() override;
 		void openWindow() override;
 
-		MixerScreen(const int layerIndex);
+		MixerScreen(mpc::Mpc& mpc, const int layerIndex);
 
 		void open() override;
 		void close() override;

@@ -25,6 +25,7 @@ namespace mpc::audiomidi
 		int index = 0;
 
 	private:
+		mpc::Mpc& mpc;
 		std::weak_ptr<mpc::sequencer::Sequencer> sequencer;
 		std::weak_ptr<mpc::sampler::Sampler> sampler;
 
@@ -41,7 +42,7 @@ namespace mpc::audiomidi
 		void transportOmni(ctoot::midi::core::MidiMessage* msg, std::string outputLetter);
 
 	public:
-		MpcMidiInput(int index);
+		MpcMidiInput(mpc::Mpc& mpc, int index);
 
 	};
 }

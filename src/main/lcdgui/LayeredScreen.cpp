@@ -38,7 +38,8 @@ static moduru::gui::BMFParser _bmfParser = moduru::gui::BMFParser(string(mpc::Pa
 std::vector<std::vector<bool>> LayeredScreen::atlas = _bmfParser.getAtlas();
 moduru::gui::bmfont LayeredScreen::font = _bmfParser.getLoadedFont();
 
-LayeredScreen::LayeredScreen()
+LayeredScreen::LayeredScreen(mpc::Mpc& mpc)
+	: mpc(mpc)
 {	
 	root = make_unique<Component>("root");
 	
@@ -81,7 +82,7 @@ int LayeredScreen::openScreen(string screenName)
 	}
 	else if (screenName.compare("sample") == 0)
 	{
-		auto sampleScreen = dynamic_pointer_cast<SampleScreen>(Screens::getScreenComponent("sample"));
+		auto sampleScreen = dynamic_pointer_cast<SampleScreen>(mpc.screens->getScreenComponent("sample"));
 		bool muteMonitor = sampleScreen->getMonitor() == 0;
 		ams->muteMonitor(muteMonitor);
 		ams->getSoundRecorder().lock()->setSampleScreenActive(true);
@@ -103,7 +104,7 @@ int LayeredScreen::openScreen(string screenName)
 	previousScreenName = currentScreenName;
 	currentScreenName = screenName;
 		
-	auto screenComponent = Screens::getScreenComponent(currentScreenName);
+	auto screenComponent = mpc.screens->getScreenComponent(currentScreenName);
 
 	if (!screenComponent)
 	{

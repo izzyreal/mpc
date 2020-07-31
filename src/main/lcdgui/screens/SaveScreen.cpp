@@ -15,8 +15,8 @@ using namespace moduru::lang;
 using namespace moduru::file;
 using namespace std;
 
-SaveScreen::SaveScreen(const int layerIndex) 
-	: ScreenComponent("save", layerIndex)
+SaveScreen::SaveScreen(mpc::Mpc& mpc, const int layerIndex) 
+	: ScreenComponent(mpc, "save", layerIndex)
 {
 }
 
@@ -51,7 +51,7 @@ void SaveScreen::function(int i)
 		shared_ptr<mpc::sequencer::Sequence> seq;
 
 		auto lProgram = program.lock();
-		auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
+		auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
 
 		switch (type)
 		{

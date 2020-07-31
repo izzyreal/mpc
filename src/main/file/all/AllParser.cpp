@@ -26,15 +26,16 @@
 using namespace mpc::file::all;
 using namespace std;
 
-AllParser::AllParser(mpc::disk::MpcFile* file)
+AllParser::AllParser(mpc::Mpc& mpc, mpc::disk::MpcFile* file)
+	: mpc(mpc)
 {
 	songs = vector<Song*>(20);
 	auto loadBytes = file->getBytes();
 	auto header = new Header(moduru::VecUtil::CopyOfRange(&loadBytes, HEADER_OFFSET, HEADER_OFFSET + HEADER_LENGTH));
 	header->verifyFileID();
-	defaults = new Defaults(moduru::VecUtil::CopyOfRange(&loadBytes, DEFAULTS_OFFSET, DEFAULTS_OFFSET + DEFAULTS_LENGTH));
-	sequencer = new Sequencer(moduru::VecUtil::CopyOfRange(&loadBytes, SEQUENCER_OFFSET, SEQUENCER_OFFSET + Sequencer::LENGTH));
-	count = new Count(moduru::VecUtil::CopyOfRange(&loadBytes, COUNT_OFFSET, COUNT_OFFSET + COUNT_LENGTH));
+	defaults = new Defaults(mpc, moduru::VecUtil::CopyOfRange(&loadBytes, DEFAULTS_OFFSET, DEFAULTS_OFFSET + DEFAULTS_LENGTH));
+	sequencer = new Sequencer(mpc, moduru::VecUtil::CopyOfRange(&loadBytes, SEQUENCER_OFFSET, SEQUENCER_OFFSET + Sequencer::LENGTH));
+	count = new Count(mpc, moduru::VecUtil::CopyOfRange(&loadBytes, COUNT_OFFSET, COUNT_OFFSET + COUNT_LENGTH));
 	midiInput = new MidiInput(moduru::VecUtil::CopyOfRange(&loadBytes, MIDI_INPUT_OFFSET, MIDI_INPUT_OFFSET + MidiInput::LENGTH));
 	midiSyncMisc = new MidiSyncMisc(moduru::VecUtil::CopyOfRange(&loadBytes, MIDI_SYNC_OFFSET, MIDI_SYNC_OFFSET + MidiSyncMisc::LENGTH));
 	misc = new Misc(moduru::VecUtil::CopyOfRange(&loadBytes, MISC_OFFSET, MISC_OFFSET + Misc::LENGTH));
@@ -46,22 +47,23 @@ AllParser::AllParser(mpc::disk::MpcFile* file)
 	sequences = readSequences(moduru::VecUtil::CopyOfRange(&loadBytes, SEQUENCES_OFFSET, loadBytes.size()));
 }
 
-AllParser::AllParser(string allName) 
+AllParser::AllParser(mpc::Mpc& mpc, string allName)
+	: mpc(mpc)
 {
 	songs = vector<Song*>(20);
 	vector<vector<char>> chunks;
 	auto header = Header();
 	chunks.push_back(header.getBytes());
 	
-	Defaults defaults;
+	Defaults defaults(mpc);
 	
 	chunks.push_back(defaults.getBytes());
 	chunks.push_back(UNKNOWN_CHUNK);
-	sequencer = new Sequencer();
+	sequencer = new Sequencer(mpc);
 	chunks.push_back(sequencer->getBytes());
-	count = new Count();
+	count = new Count(mpc);
 	chunks.push_back(count->getBytes());
-	midiInput = new MidiInput();
+	midiInput = new MidiInput(mpc);
 	chunks.push_back(midiInput->getBytes());
 	
 	for (int i = 0; i < 16; i++)
@@ -69,9 +71,9 @@ AllParser::AllParser(string allName)
 		chunks.push_back(vector<char>{ (char)0xFF });
 	}
 
-	midiSyncMisc = new MidiSyncMisc();
+	midiSyncMisc = new MidiSyncMisc(mpc);
 	chunks.push_back(midiSyncMisc->getBytes());
-	misc = new Misc();
+	misc = new Misc(mpc);
 	chunks.push_back(misc->getBytes());
 	seqNames = new SequenceNames();
 	chunks.push_back(seqNames->getBytes());
@@ -84,8 +86,8 @@ AllParser::AllParser(string allName)
 	auto usedSeqs = sequencer->getUsedSequences();
 	for (int i = 0; i < usedSeqs.size(); i++) {
 		auto seq = usedSeqs[i];
-		auto allSeq = new Sequence(seq.lock().get(), sequencer->getUsedSequenceIndexes()[i] + 1);
-		chunks.push_back(allSeq->getBytes());
+		Sequence allSeq(seq.lock().get(), sequencer->getUsedSequenceIndexes()[i] + 1);
+		chunks.push_back(allSeq.getBytes());
 	}
 	saveBytes = moduru::file::ByteUtil::stitchByteArrays(chunks);
 }
@@ -181,25 +183,6 @@ vector<Sequence*> AllParser::readSequences(vector<char> trimmedSeqsArray)
 vector<char> AllParser::getBytes()
 {
     return saveBytes;
-}
-
-AllParser::~AllParser() {
-	/*
-	if (header != nullptr) delete header;
-	if (defaults != nullptr) delete defaults;
-	if (sequencer != nullptr) delete sequencer;
-	if (count != nullptr) delete count;
-	if (midiInput != nullptr) delete midiInput;
-	if (midiSyncMisc != nullptr) delete midiSyncMisc;
-	if (misc != nullptr) delete misc;
-	if (seqNames != nullptr) delete seqNames;
-	for (auto s : sequences) {
-		if (s != nullptr) delete s;
-	}
-	for (auto s : songs) {
-		if (s != nullptr) delete s;
-	}
-	*/
 }
 
 vector<char> AllParser::UNKNOWN_CHUNK = vector<char>(64);

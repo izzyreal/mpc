@@ -39,6 +39,11 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 using namespace std;
 
+Sequencer::Sequencer(mpc::Mpc& mpc)
+	: mpc(mpc)
+{
+}
+
 void Sequencer::init()
 {
 	TICK_VALUES = vector<int>{ 1, 48, 32, 24, 16, 12, 8 };
@@ -49,7 +54,7 @@ void Sequencer::init()
 	nextsq = -1;
 	previousTempo = 0.0;
 	
-	auto userScreen = dynamic_pointer_cast<UserScreen>(Screens::getScreenComponent("user"));
+	auto userScreen = dynamic_pointer_cast<UserScreen>(mpc.screens->getScreenComponent("user"));
 	defaultSequenceName = moduru::lang::StrUtil::trim(userScreen->sequenceName);
 	
 	for (int i = 0; i < 64; i++)
@@ -382,7 +387,7 @@ void Sequencer::play(bool fromStart)
 
     endOfSong = false;
     repeats = 0;
-	auto songScreen = dynamic_pointer_cast<SongScreen>(Screens::getScreenComponent("song"));
+	auto songScreen = dynamic_pointer_cast<SongScreen>(mpc.screens->getScreenComponent("song"));
 	auto currentSong = songs[songScreen->getSelectedSongIndex()];
     
 	Step* currentStep = nullptr;
@@ -417,7 +422,7 @@ void Sequencer::play(bool fromStart)
     
 	currentlyPlayingSequenceIndex = activeSequenceIndex;
 
-	auto countMetronomeScreen = dynamic_pointer_cast<CountMetronomeScreen>(Screens::getScreenComponent("count-metronome"));
+	auto countMetronomeScreen = dynamic_pointer_cast<CountMetronomeScreen>(mpc.screens->getScreenComponent("count-metronome"));
 	auto countInMode = countMetronomeScreen->getCountInMode();
 
     if (!countEnabled || countInMode == 0 || (countInMode == 1 && recording == false))
@@ -612,7 +617,7 @@ void Sequencer::stop(int tick)
 	int frameOffset = tick == -1 ? 0 : ams->getFrameSequencer().lock()->getEventFrameOffset(tick);
 	ams->getFrameSequencer().lock()->stop();
 	if (recording || overdubbing) {
-		auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timing-correct"));
+		auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(mpc.screens->getScreenComponent("timing-correct"));
 		auto noteValue = timingCorrectScreen->getNoteValue();
 		s2->getTrack(activeTrackIndex).lock()->correctTimeRange(0, s2->getLastTick(), TICK_VALUES[noteValue]);
 	}
@@ -643,7 +648,7 @@ void Sequencer::stop(int tick)
     
 	notifyTimeDisplay();
 	
-	auto songScreen = dynamic_pointer_cast<SongScreen>(Screens::getScreenComponent("song"));
+	auto songScreen = dynamic_pointer_cast<SongScreen>(mpc.screens->getScreenComponent("song"));
 
     if (endOfSong)
 	{
@@ -714,7 +719,7 @@ void Sequencer::purgeAllSequences()
 
 void Sequencer::purgeSequence(int i) {
 	sequences[i].reset();
-	auto sequence = make_shared<Sequence>(defaultTrackNames);
+	auto sequence = make_shared<Sequence>(mpc, defaultTrackNames);
 	sequences[i].swap(sequence);
 	sequences[i]->resetTrackEventIndices(position);
 	string res = defaultSequenceName;
@@ -733,7 +738,7 @@ void Sequencer::copySequence(int source, int destination)
 shared_ptr<Sequence> Sequencer::copySequence(weak_ptr<Sequence> src)
 {
 	auto source = src.lock();
-	auto copy = make_shared<Sequence>(defaultTrackNames);
+	auto copy = make_shared<Sequence>(mpc, defaultTrackNames);
 	copy->init(source->getLastBarIndex());
 	copySequenceParameters(source, copy);
 	
@@ -1065,7 +1070,7 @@ int Sequencer::getLoopEnd()
 
 weak_ptr<Sequence> Sequencer::getActiveSequence()
 {
-	auto songScreen = dynamic_pointer_cast<SongScreen>(Screens::getScreenComponent("song"));
+	auto songScreen = dynamic_pointer_cast<SongScreen>(mpc.screens->getScreenComponent("song"));
 
 	if (songMode && songs[songScreen->getSelectedSongIndex()]->getStepAmount() != 0)
 	{
@@ -1264,7 +1269,7 @@ void Sequencer::notifyTimeDisplayRealtime()
 
 void Sequencer::goToPreviousStep()
 {
-	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timing-correct"));
+	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(mpc.screens->getScreenComponent("timing-correct"));
 	auto noteValue = timingCorrectScreen->getNoteValue();
 
 	auto stepSize = TICK_VALUES[noteValue];
@@ -1293,7 +1298,7 @@ void Sequencer::goToPreviousStep()
 
 void Sequencer::goToNextStep()
 {
-	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timing-correct"));
+	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(mpc.screens->getScreenComponent("timing-correct"));
 	auto noteValue = timingCorrectScreen->getNoteValue();
 
 	auto stepSize = TICK_VALUES[noteValue];
@@ -1409,7 +1414,7 @@ void Sequencer::setActiveTrackIndex(int i)
 
 int Sequencer::getCurrentlyPlayingSequenceIndex()
 {
-	auto songScreen = dynamic_pointer_cast<SongScreen>(Screens::getScreenComponent("song"));
+	auto songScreen = dynamic_pointer_cast<SongScreen>(mpc.screens->getScreenComponent("song"));
 	auto songSeqIndex = songMode ? songs[songScreen->getSelectedSongIndex()]->getStep(songScreen->getOffset() + 1)->getSequence() : -1;
 	return songMode ? songSeqIndex : currentlyPlayingSequenceIndex;
 }
@@ -1540,7 +1545,7 @@ void Sequencer::setSongModeEnabled(bool b)
 
 int Sequencer::getSongSequenceIndex()
 {
-	auto songScreen = dynamic_pointer_cast<SongScreen>(Screens::getScreenComponent("song"));
+	auto songScreen = dynamic_pointer_cast<SongScreen>(mpc.screens->getScreenComponent("song"));
 	auto song = songs[songScreen->getSelectedSongIndex()];
 	auto step = songScreen->getOffset() + 1;
 
@@ -1621,7 +1626,7 @@ void Sequencer::playMetronomeTrack()
 	}
 
 	metronomeOnly = true;
-	metronomeSeq = make_unique<Sequence>(defaultTrackNames);
+	metronomeSeq = make_unique<Sequence>(mpc, defaultTrackNames);
 	auto s = getActiveSequence().lock();
 	metronomeSeq->init(8);
 	metronomeSeq->setTimeSignature(0, 3, s->getNumerator(getCurrentBarIndex()), s->getDenominator(getCurrentBarIndex()));
@@ -1641,7 +1646,7 @@ void Sequencer::stopMetronomeTrack()
 }
 
 weak_ptr<Sequence> Sequencer::createSeqInPlaceHolder() {
-	placeHolder = make_shared<Sequence>(defaultTrackNames);
+	placeHolder = make_shared<Sequence>(mpc, defaultTrackNames);
 	return placeHolder;
 }
 

@@ -16,7 +16,7 @@ namespace mpc::lcdgui::screens
 		void function(int i) override;
 		void turnWheel(int i) override;
 
-		VmpcDiskScreen(const int layerIndex);
+		VmpcDiskScreen(mpc::Mpc& mpc, const int layerIndex);
 
 		void open() override;
 

@@ -16,8 +16,8 @@ using namespace moduru::lang;
 
 using namespace std;
 
-EditVelocityScreen::EditVelocityScreen(const int layerIndex)
-	: ScreenComponent("edit-velocity", layerIndex)
+EditVelocityScreen::EditVelocityScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "edit-velocity", layerIndex)
 {
 }
 
@@ -54,7 +54,7 @@ void EditVelocityScreen::update(moduru::observer::Observable* observable, nonstd
 
 void EditVelocityScreen::function(int i)
 {
-	BaseControls::function(i);
+	baseControls->function(i);
 	
 	switch (i)
 	{

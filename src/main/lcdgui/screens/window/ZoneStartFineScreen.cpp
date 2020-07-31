@@ -8,8 +8,8 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
-ZoneStartFineScreen::ZoneStartFineScreen(const int layerIndex)
-	: ScreenComponent("zone-start-fine", layerIndex)
+ZoneStartFineScreen::ZoneStartFineScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "zone-start-fine", layerIndex)
 {
 	addChild(move(make_shared<Wave>()));
 	addChild(move(make_shared<TwoDots>()));
@@ -33,8 +33,8 @@ void ZoneStartFineScreen::open()
 
 void ZoneStartFineScreen::displayFineWaveform()
 {
-	auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(Screens::getScreenComponent("zone"));
-	auto trimScreen = dynamic_pointer_cast<TrimScreen>(Screens::getScreenComponent("trim"));
+	auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(mpc.screens->getScreenComponent("zone"));
+	auto trimScreen = dynamic_pointer_cast<TrimScreen>(mpc.screens->getScreenComponent("trim"));
 
 	auto sound = sampler.lock()->getSound().lock();
 
@@ -49,13 +49,13 @@ void ZoneStartFineScreen::displayFineWaveform()
 
 void ZoneStartFineScreen::displayStart()
 {
-	auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(Screens::getScreenComponent("zone"));
+	auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(mpc.screens->getScreenComponent("zone"));
 	findField("start").lock()->setTextPadded(zoneScreen->getZoneStart(zoneScreen->zone), " ");
 }
 
 void ZoneStartFineScreen::displayLngthLabel()
 {
-	auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(Screens::getScreenComponent("zone"));
+	auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(mpc.screens->getScreenComponent("zone"));
 	findLabel("lngth").lock()->setTextPadded(zoneScreen->getZoneEnd(zoneScreen->zone) - zoneScreen->getZoneStart(zoneScreen->zone), " ");
 }
 
@@ -66,7 +66,7 @@ void ZoneStartFineScreen::displayPlayX()
 
 void ZoneStartFineScreen::function(int i)
 {
-	BaseControls::function(i);
+	baseControls->function(i);
 
 	switch (i)
 	{
@@ -88,7 +88,7 @@ void ZoneStartFineScreen::turnWheel(int i)
 	auto sound = sampler.lock()->getSound().lock();
 	auto startEndLength = static_cast<int>(sound->getEnd() - sound->getStart());
 	auto loopLength = static_cast<int>((sound->getEnd() - sound->getLoopTo()));
-	auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(Screens::getScreenComponent("zone"));
+	auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(mpc.screens->getScreenComponent("zone"));
 
 	auto sampleLength = sound->getFrameCount();
 

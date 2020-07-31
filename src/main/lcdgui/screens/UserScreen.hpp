@@ -42,7 +42,7 @@ namespace mpc::lcdgui::screens
 		void turnWheel(int i) override;
 
 	public:
-		UserScreen(const int layerIndex);
+		UserScreen(mpc::Mpc& mpc, const int layerIndex);
 
 		void open() override;
 

@@ -7,8 +7,8 @@ using namespace mpc::lcdgui;
 using namespace moduru::lang;
 using namespace std;
 
-MixerSetupScreen::MixerSetupScreen(const int layerIndex)
-	: ScreenComponent("mixer-setup", layerIndex)
+MixerSetupScreen::MixerSetupScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "mixer-setup", layerIndex)
 {
 }
 
@@ -20,7 +20,7 @@ void MixerSetupScreen::open()
 	displayIndivFxSource();
 	displayCopyPgmMixToDrum();
 	displayRecordMixChanges();
-	auto drumScreen = dynamic_pointer_cast<DrumScreen>(Screens::getScreenComponent("drum"));
+	auto drumScreen = dynamic_pointer_cast<DrumScreen>(mpc.screens->getScreenComponent("drum"));
 	ls.lock()->setFunctionKeysArrangement(drumScreen->drum);
 }
 
@@ -92,9 +92,9 @@ void MixerSetupScreen::function(int i)
 
 	if (i < 4)
 	{
-		auto drumScreen = dynamic_pointer_cast<DrumScreen>(Screens::getScreenComponent("drum"));
+		auto drumScreen = dynamic_pointer_cast<DrumScreen>(mpc.screens->getScreenComponent("drum"));
 		drumScreen->drum = i;
-		mpc.setPreviousSamplerScreenName(currentScreenName);
+		//mpc.setPreviousSamplerScreenName(currentScreenName);
 		ls.lock()->openScreen("mixer");
 	}
 }

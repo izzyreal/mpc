@@ -13,11 +13,11 @@ namespace mpc::lcdgui::screens
 		void function(int f) override;
 		void turnWheel(int i) override;
 
-		SndParamsScreen(const int layerIndex);
+		SndParamsScreen(mpc::Mpc& mpc, const int layerIndex);
 		void open() override;
 
 	private:
-		const std::vector<std::string> playXNames = std::vector<std::string>{ "ALL", "ZONE", "BEFOR ST", "BEFOR TO", "AFTR END" };
+		const std::vector<std::string> playXNames{ "ALL", "ZONE", "BEFOR ST", "BEFOR TO", "AFTR END" };
 		void displayLevel();
 		void displayTune();
 		void displayBeat();

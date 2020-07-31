@@ -4,8 +4,8 @@ using namespace mpc::lcdgui::screens::dialog;
 using namespace moduru::lang;
 using namespace std;
 
-CopyProgramScreen::CopyProgramScreen(const int layerIndex) 
-	: ScreenComponent("copy-program", layerIndex)
+CopyProgramScreen::CopyProgramScreen(mpc::Mpc& mpc, const int layerIndex) 
+	: ScreenComponent(mpc, "copy-program", layerIndex)
 {
 }
 

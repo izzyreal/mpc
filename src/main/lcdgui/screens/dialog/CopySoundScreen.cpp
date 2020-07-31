@@ -6,8 +6,8 @@ using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
-CopySoundScreen::CopySoundScreen(const int layerIndex) 
-	: ScreenComponent("copy-sound", layerIndex)
+CopySoundScreen::CopySoundScreen(mpc::Mpc& mpc, const int layerIndex) 
+	: ScreenComponent(mpc, "copy-sound", layerIndex)
 {
 }
 
@@ -60,7 +60,7 @@ void CopySoundScreen::turnWheel(int i)
 	}
 	else if (param.compare("newname") == 0)
 	{
-		auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
+		auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
 		nameScreen->setName(findField("newname").lock()->getText());
 		nameScreen->parameterName = "newname";
 		ls.lock()->openScreen("name");

@@ -14,8 +14,8 @@ using namespace mpc::lcdgui::screens;
 using namespace ctoot::audio::core;
 using namespace std;
 
-MonitorInputAdapter::MonitorInputAdapter(AudioProcess* process)
-	: AudioProcessAdapter(process)
+MonitorInputAdapter::MonitorInputAdapter(mpc::Mpc& mpc, AudioProcess* process)
+	: AudioProcessAdapter(process), mpc(mpc)
 {
 }
 
@@ -23,7 +23,7 @@ int32_t MonitorInputAdapter::processAudio(ctoot::audio::core::AudioBuffer* buffe
 {
 	auto ret = process->processAudio(buffer);
 
-	auto sampleScreen = dynamic_pointer_cast<SampleScreen>(Screens::getScreenComponent("sample"));
+	auto sampleScreen = dynamic_pointer_cast<SampleScreen>(mpc.screens->getScreenComponent("sample"));
 
 	if (sampleScreen->getMode() == 0)
 	{

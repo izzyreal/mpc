@@ -40,7 +40,7 @@ namespace mpc::lcdgui::screens::window
 		void down() override;
 		void turnWheel(int i) override;
 
-		DirectoryScreen(const int layerIndex);
+		DirectoryScreen(mpc::Mpc& mpc, const int layerIndex);
 
 		void open() override;
 

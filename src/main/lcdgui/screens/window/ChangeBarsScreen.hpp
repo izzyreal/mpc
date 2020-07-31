@@ -21,7 +21,7 @@ namespace mpc::lcdgui::screens::window
 		void displayLastBar();
 
 	public:
-		ChangeBarsScreen(const int layerIndex);
+		ChangeBarsScreen(mpc::Mpc& mpc, const int layerIndex);
 
 	private:
 		int lastBar = 0;

@@ -11,7 +11,7 @@ namespace mpc::lcdgui::screens::dialog
 		void turnWheel(int i) override;
 		void function(int j) override;
 
-		MonoToStereoScreen(const int layerIndex);
+		MonoToStereoScreen(mpc::Mpc& mpc, const int layerIndex);
 
 		void open() override;
 

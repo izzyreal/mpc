@@ -25,8 +25,8 @@ using namespace std;
 
 const int EVENT_ROW_COUNT = 4;
 
-StepEditorScreen::StepEditorScreen(const int layerIndex)
-	: ScreenComponent("step-editor", layerIndex)
+StepEditorScreen::StepEditorScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "step-editor", layerIndex)
 {
 	lastColumn["empty"] = "a";
 	lastColumn["channel-pressure"] = "a";
@@ -343,7 +343,7 @@ void StepEditorScreen::turnWheel(int i)
 	}
 	else if (param.compare("tcvalue") == 0)
 	{
-		auto screen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timing-correct"));
+		auto screen = dynamic_pointer_cast<TimingCorrectScreen>(mpc.screens->getScreenComponent("timing-correct"));
 		auto noteValue = screen->getNoteValue();
 		screen->setNoteValue(noteValue + i);
 	}
@@ -578,7 +578,7 @@ void StepEditorScreen::left()
 	}
 	else
 	{
-		BaseControls::left();
+		baseControls->left();
 	}
 
 	checkSelection();
@@ -587,7 +587,7 @@ void StepEditorScreen::left()
 
 void StepEditorScreen::right()
 {
-	BaseControls::right();
+	baseControls->right();
 	checkSelection();
 	refreshSelection();
 }
@@ -686,7 +686,7 @@ void StepEditorScreen::down()
 void StepEditorScreen::shift()
 {
 	init();
-	BaseControls::shift();
+	baseControls->shift();
 	if (param.length() == 2)
 	{
 		auto eventNumber = stoi(param.substr(1, 2));

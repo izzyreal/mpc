@@ -5,8 +5,8 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
-MultiRecordingSetupScreen::MultiRecordingSetupScreen(const int layerIndex)
-	: ScreenComponent("multi-recording-setup", layerIndex)
+MultiRecordingSetupScreen::MultiRecordingSetupScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "multi-recording-setup", layerIndex)
 {
 	for (int i = 0; i < 34; i++)
 	{
@@ -58,7 +58,7 @@ void MultiRecordingSetupScreen::open()
 
 void MultiRecordingSetupScreen::init()
 {
-	BaseControls::init();
+	baseControls->init();
 	
 	yPos = 0;
 	
@@ -75,7 +75,7 @@ void MultiRecordingSetupScreen::left()
 	{
 		return;
 	}
-	BaseControls::left();
+	baseControls->left();
 }
 
 void MultiRecordingSetupScreen::right()
@@ -85,7 +85,7 @@ void MultiRecordingSetupScreen::right()
 	{
 		return;
 	}
-	BaseControls::right();
+	baseControls->right();
 }
 
 void MultiRecordingSetupScreen::turnWheel(int i)

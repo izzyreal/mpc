@@ -10,7 +10,7 @@ namespace mpc::lcdgui::screens::window {
 	public:
 		void function(int i) override;
 
-		PasteEventScreen(const int layerIndex);
+		PasteEventScreen(mpc::Mpc& mpc, const int layerIndex);
 
 	};
 }

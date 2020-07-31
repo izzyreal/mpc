@@ -15,8 +15,8 @@ using namespace mpc::lcdgui;
 using namespace moduru::lang;
 using namespace std;
 
-MixerStrip::MixerStrip(int columnIndex)
-	: Component("mixer-strip")
+MixerStrip::MixerStrip(mpc::Mpc& mpc, int columnIndex)
+	: Component("mixer-strip"), mpc(mpc)
 {
 	this->columnIndex = columnIndex;
 
@@ -89,7 +89,7 @@ void MixerStrip::setValueB(int i)
 
 void MixerStrip::initLabels()
 {
-	auto mixerScreen = dynamic_pointer_cast<MixerScreen>(Screens::getScreenComponent("mixer"));
+	auto mixerScreen = dynamic_pointer_cast<MixerScreen>(mpc.screens->getScreenComponent("mixer"));
 
 	if (mixerScreen->getTab() == 0)
 	{
@@ -165,7 +165,7 @@ void MixerStrip::setSelection(int i)
 
 void MixerStrip::setValueAString(string str)
 {
-	auto mixerScreen = dynamic_pointer_cast<MixerScreen>(Screens::getScreenComponent("mixer"));
+	auto mixerScreen = dynamic_pointer_cast<MixerScreen>(mpc.screens->getScreenComponent("mixer"));
 
 	if (mixerScreen->getTab() == 1)
 	{

@@ -15,8 +15,8 @@ using namespace mpc::lcdgui;
 using namespace moduru::lang;
 using namespace std;
 
-MixerScreen::MixerScreen(const int layerIndex) 
-	: ScreenComponent("mixer", layerIndex)
+MixerScreen::MixerScreen(mpc::Mpc& mpc, const int layerIndex) 
+	: ScreenComponent(mpc, "mixer", layerIndex)
 {
 	addMixerStrips();
 }
@@ -47,7 +47,7 @@ void MixerScreen::addMixerStrips()
 {
 	for (int i = 0; i < 16; i++)
 	{
-		mixerStrips.push_back(move(dynamic_pointer_cast<MixerStrip>(addChild(make_shared<MixerStrip>(i)).lock())));
+		mixerStrips.push_back(move(dynamic_pointer_cast<MixerStrip>(addChild(make_shared<MixerStrip>(mpc, i)).lock())));
 		mixerStrips.back().lock()->setBank(mpc.getBank());
 	}
 	
@@ -59,7 +59,7 @@ void MixerScreen::displayMixerStrip(int i)
 {
 	init();
 
-	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(Screens::getScreenComponent("mixer-setup"));
+	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(mpc.screens->getScreenComponent("mixer-setup"));
 
 	bool sSrcDrum = mixerSetupScreen->isStereoMixSourceDrum();
 	bool iSrcDrum = mixerSetupScreen->isIndivFxSourceDrum();
@@ -317,14 +317,14 @@ void MixerScreen::turnWheel(int i)
 {
 	init();
 	
-	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(Screens::getScreenComponent("mixer-setup"));
+	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(mpc.screens->getScreenComponent("mixer-setup"));
 
 	int pad = getXPos() + (mpc.getBank() * 16);
 	
 	bool stereoMixSourceIsDrum = mixerSetupScreen->isStereoMixSourceDrum();
 	bool indivAndFxSourceIsDrum = mixerSetupScreen->isIndivFxSourceDrum();
 
-	auto drumScreen = dynamic_pointer_cast<DrumScreen>(Screens::getScreenComponent("drum"));
+	auto drumScreen = dynamic_pointer_cast<DrumScreen>(mpc.screens->getScreenComponent("drum"));
 
 	auto drum = mpc.getDrum(drumScreen->drum);
 
@@ -499,7 +499,7 @@ void MixerScreen::recordMixerEvent(int pad, int param, int value)
 
 void MixerScreen::displayStereoFaders()
 {
-	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(Screens::getScreenComponent("mixer-setup"));
+	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(mpc.screens->getScreenComponent("mixer-setup"));
 
 	bool sourceIsDrum = mixerSetupScreen->isStereoMixSourceDrum();
 
@@ -531,7 +531,7 @@ void MixerScreen::displayStereoFaders()
 
 void MixerScreen::displayPanning()
 {
-	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(Screens::getScreenComponent("mixer-setup"));
+	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(mpc.screens->getScreenComponent("mixer-setup"));
 	bool sourceIsDrum = mixerSetupScreen->isStereoMixSourceDrum();
 
 	if (link)
@@ -567,7 +567,7 @@ void MixerScreen::displayIndividualOutputs()
 
 	init();
 	
-	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(Screens::getScreenComponent("mixer-setup"));
+	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(mpc.screens->getScreenComponent("mixer-setup"));
 	bool sSrcDrum = mixerSetupScreen->isStereoMixSourceDrum();
 	bool iSrcDrum = mixerSetupScreen->isIndivFxSourceDrum();
 
@@ -630,7 +630,7 @@ void MixerScreen::displayIndivFaders()
 {
 	init();
 
-	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(Screens::getScreenComponent("mixer-setup"));
+	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(mpc.screens->getScreenComponent("mixer-setup"));
 	bool iSrcDrum = mixerSetupScreen->isIndivFxSourceDrum();
 
 	if (link)
@@ -665,7 +665,7 @@ void MixerScreen::displayIndivFaders()
 void MixerScreen::displayFxPaths()
 {
 	init();
-	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(Screens::getScreenComponent("mixer-setup"));
+	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(mpc.screens->getScreenComponent("mixer-setup"));
 	bool iSrcDrum = mixerSetupScreen->isIndivFxSourceDrum();
 
 	if (link)
@@ -701,7 +701,7 @@ void MixerScreen::displayFxPaths()
 void MixerScreen::displayFxSendLevels()
 {
 	init();
-	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(Screens::getScreenComponent("mixer-setup"));
+	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(mpc.screens->getScreenComponent("mixer-setup"));
 	bool iSrcDrum = mixerSetupScreen->isIndivFxSourceDrum();
 
 	if (link)

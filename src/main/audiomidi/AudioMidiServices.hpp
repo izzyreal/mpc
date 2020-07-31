@@ -61,6 +61,7 @@ namespace mpc::audiomidi
 	{
 
 	private:
+		mpc::Mpc& mpc;
 		std::atomic<bool> bouncing = ATOMIC_VAR_INIT(false);
 		std::atomic<bool> recordingSound = ATOMIC_VAR_INIT(false);
 		std::shared_ptr<ctoot::audio::core::AudioProcess> monitorInputAdapter;
@@ -132,7 +133,7 @@ namespace mpc::audiomidi
 		void start(const int sampleRate, const int inputCount, const int outputCount);
 
 	public:
-		AudioMidiServices();
+		AudioMidiServices(mpc::Mpc& mpc);
 
 	};
 }

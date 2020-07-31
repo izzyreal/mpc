@@ -9,7 +9,7 @@ namespace mpc::lcdgui::screens::dialog
 	public:
 		void function(int j) override;
 
-		DeleteAllProgramsScreen(const int layerIndex);
+		DeleteAllProgramsScreen(mpc::Mpc& mpc, const int layerIndex);
 
 	};
 }

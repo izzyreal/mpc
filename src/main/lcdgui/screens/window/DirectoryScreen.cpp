@@ -24,8 +24,8 @@ using namespace moduru::lang;
 using namespace moduru::file;
 using namespace std;
 
-DirectoryScreen::DirectoryScreen(const int layerIndex)
-	: ScreenComponent("directory", layerIndex)
+DirectoryScreen::DirectoryScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "directory", layerIndex)
 {
 }
 
@@ -56,10 +56,10 @@ void DirectoryScreen::setFunctionKeys()
 
 void DirectoryScreen::function(int f)
 {
-	BaseControls::function(f);
+	baseControls->function(f);
 	
-	auto loadScreen = dynamic_pointer_cast<LoadScreen>(Screens::getScreenComponent("load"));
-	auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
+	auto loadScreen = dynamic_pointer_cast<LoadScreen>(mpc.screens->getScreenComponent("load"));
+	auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
 
 	switch (f)
 	{
@@ -129,7 +129,7 @@ void DirectoryScreen::function(int f)
 			auto name = file->getFsNode().lock()->getNameWithoutExtension();
 
 			ls.lock()->openScreen("popup");
-			auto popupScreen = dynamic_pointer_cast<PopupScreen>(Screens::getScreenComponent("popup"));
+			auto popupScreen = dynamic_pointer_cast<PopupScreen>(mpc.screens->getScreenComponent("popup"));
 
 			if (started)
 			{
@@ -173,7 +173,7 @@ void DirectoryScreen::left()
 	{
 		if (disk->moveBack())
 		{
-			auto loadScreen = dynamic_pointer_cast<LoadScreen>(Screens::getScreenComponent("load"));
+			auto loadScreen = dynamic_pointer_cast<LoadScreen>(mpc.screens->getScreenComponent("load"));
 			disk->initFiles();
 			
 			loadScreen->fileLoad = 0;
@@ -253,7 +253,7 @@ void DirectoryScreen::right()
 		yPos0 = 0;
 		yOffset1 = 0;
 		
-		auto loadScreen = dynamic_pointer_cast<LoadScreen>(Screens::getScreenComponent("load"));
+		auto loadScreen = dynamic_pointer_cast<LoadScreen>(mpc.screens->getScreenComponent("load"));
 		loadScreen->fileLoad = 0;
 
 		for (int i = 0; i < disk->getParentFileNames().size(); i++)
@@ -279,7 +279,7 @@ void DirectoryScreen::right()
 void DirectoryScreen::up()
 {
 	auto disk = mpc.getDisk().lock();
-	auto loadScreen = dynamic_pointer_cast<LoadScreen>(Screens::getScreenComponent("load"));
+	auto loadScreen = dynamic_pointer_cast<LoadScreen>(mpc.screens->getScreenComponent("load"));
 
 	if (xPos == 0)
 	{
@@ -362,7 +362,7 @@ void DirectoryScreen::up()
 void DirectoryScreen::down()
 {
 	auto disk = mpc.getDisk().lock();
-	auto loadScreen = dynamic_pointer_cast<LoadScreen>(Screens::getScreenComponent("load"));
+	auto loadScreen = dynamic_pointer_cast<LoadScreen>(mpc.screens->getScreenComponent("load"));
 
 	if (xPos == 0)
 	{
@@ -455,7 +455,7 @@ mpc::disk::MpcFile* DirectoryScreen::getSelectedFile()
 
 	if (xPos == 1)
 	{
-		auto loadScreen = dynamic_pointer_cast<LoadScreen>(Screens::getScreenComponent("load"));
+		auto loadScreen = dynamic_pointer_cast<LoadScreen>(mpc.screens->getScreenComponent("load"));
 		yPos = loadScreen->fileLoad - yOffset1;
 	}
 
@@ -540,7 +540,7 @@ void DirectoryScreen::refreshFocus()
 	}
 	else if (xPos == 1)
 	{
-		auto loadScreen = dynamic_pointer_cast<LoadScreen>(Screens::getScreenComponent("load"));
+		auto loadScreen = dynamic_pointer_cast<LoadScreen>(mpc.screens->getScreenComponent("load"));
 		ls.lock()->setFocus("b" + to_string(loadScreen->fileLoad - yOffset1));
 	}
 }

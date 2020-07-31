@@ -29,11 +29,11 @@ MidiSyncMisc::MidiSyncMisc(vector<char> b)
 	defSongName = string(stringBuffer.begin(), stringBuffer.end());
 }
 
-MidiSyncMisc::MidiSyncMisc()
+MidiSyncMisc::MidiSyncMisc(mpc::Mpc& mpc)
 {
 	saveBytes = vector<char>(LENGTH);
 
-	auto syncScreen = dynamic_pointer_cast<SyncScreen>(Screens::getScreenComponent("sync"));
+	auto syncScreen = dynamic_pointer_cast<SyncScreen>(mpc.screens->getScreenComponent("sync"));
 
 	saveBytes[IN_MODE_OFFSET] = static_cast<int8_t>(syncScreen->getModeIn());
 	saveBytes[OUT_MODE_OFFSET] = static_cast<int8_t>(syncScreen->getModeOut());
@@ -43,7 +43,7 @@ MidiSyncMisc::MidiSyncMisc()
 	saveBytes[INPUT_OFFSET] = static_cast<int8_t>(syncScreen->in);
 	saveBytes[OUTPUT_OFFSET] = static_cast<int8_t>(syncScreen->out);
 
-	auto songScreen = dynamic_pointer_cast<SongScreen>(Screens::getScreenComponent("song"));
+	auto songScreen = dynamic_pointer_cast<SongScreen>(mpc.screens->getScreenComponent("song"));
 
 	for (int i = 0; i < AllParser::NAME_LENGTH; i++)
 	{

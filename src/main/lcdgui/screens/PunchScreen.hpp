@@ -14,7 +14,7 @@ namespace mpc::lcdgui::screens {
 		void function(int i) override;
 
 	public:
-		PunchScreen(const int layerIndex);
+		PunchScreen(mpc::Mpc& mpc, const int layerIndex);
 
 		void open() override;
 

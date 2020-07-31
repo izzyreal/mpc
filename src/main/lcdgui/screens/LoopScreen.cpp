@@ -13,8 +13,8 @@ using namespace mpc::lcdgui;
 using namespace moduru::lang;
 using namespace std;
 
-LoopScreen::LoopScreen(const int layerIndex)
-	: ScreenComponent("loop", layerIndex)
+LoopScreen::LoopScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "loop", layerIndex)
 {
 	addChild(move(make_shared<TwoDots>()));
 	addChild(move(make_shared<Wave>()));
@@ -26,7 +26,7 @@ LoopScreen::LoopScreen(const int layerIndex)
 	twoDots->setVisible(2, false);
 	twoDots->setVisible(3, false);
 
-	typableParams = vector<string>{ "to", "endlengthvalue" };
+//	typableParams = vector<string>{ "to", "endlengthvalue" };
 }
 
 void LoopScreen::open()
@@ -107,7 +107,7 @@ void LoopScreen::function(int f)
 			return;
 		}
 
-		auto editSoundScreen = dynamic_pointer_cast<EditSoundScreen>(Screens::getScreenComponent("edit-sound"));
+		auto editSoundScreen = dynamic_pointer_cast<EditSoundScreen>(mpc.screens->getScreenComponent("edit-sound"));
 		editSoundScreen->setPreviousScreenName("loop");
 		ls.lock()->openScreen("edit-sound");
 		break;
@@ -138,7 +138,7 @@ void LoopScreen::turnWheel(int i)
 
 	auto const oldLoopLength = sound->getEnd() - sound->getLoopTo();
     
-	auto loopScreen = dynamic_pointer_cast<LoopScreen>(Screens::getScreenComponent("loop"));
+	auto loopScreen = dynamic_pointer_cast<LoopScreen>(mpc.screens->getScreenComponent("loop"));
 	auto const loopFix = loopScreen->loopLngthFix;
 	
 	auto mtf = findField(param).lock();
@@ -235,7 +235,7 @@ void LoopScreen::setSlider(int i)
 
 	init();
 
-	auto trimScreen = dynamic_pointer_cast<TrimScreen>(Screens::getScreenComponent("trim"));
+	auto trimScreen = dynamic_pointer_cast<TrimScreen>(mpc.screens->getScreenComponent("trim"));
 	auto sound = sampler.lock()->getSound().lock();
 
 	auto const oldLength = sound->getEnd() - sound->getLoopTo();
@@ -316,7 +316,7 @@ void LoopScreen::pressEnter()
 
 	auto candidate = mtf->enter();
 	auto sound = sampler.lock()->getSound().lock();
-	auto loopScreen = dynamic_pointer_cast<LoopScreen>(Screens::getScreenComponent("loop"));
+	auto loopScreen = dynamic_pointer_cast<LoopScreen>(mpc.screens->getScreenComponent("loop"));
 
 	auto const oldLength = sound->getEnd() - sound->getLoopTo();
 	auto const lengthFix = loopScreen->loopLngthFix;
@@ -452,7 +452,7 @@ void LoopScreen::displayWave()
 	}
 
 	auto sampleData = sound->getSampleData();
-	auto trimScreen = dynamic_pointer_cast<TrimScreen>(Screens::getScreenComponent("trim"));
+	auto trimScreen = dynamic_pointer_cast<TrimScreen>(mpc.screens->getScreenComponent("trim"));
 	findWave().lock()->setSampleData(sampleData, sound->isMono(), trimScreen->view);
 	findWave().lock()->setSelection(sound->getLoopTo(), sound->getEnd());
 }

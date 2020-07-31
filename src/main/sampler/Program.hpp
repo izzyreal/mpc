@@ -15,6 +15,8 @@ namespace ctoot::mpc {
 	class MpcNoteParameters;
 }
 
+namespace mpc { class Mpc; }
+
 namespace mpc::sampler {
 
 	class Pad;
@@ -54,7 +56,7 @@ namespace mpc::sampler {
 		int getNoteFromPad(int i);
 
 	public:
-		Program(mpc::sampler::Sampler* sampler);
+		Program(mpc::Mpc& mpc, mpc::sampler::Sampler* sampler);
 		~Program();
 
 	};

@@ -16,8 +16,8 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
-SequencerScreen::SequencerScreen(const int layerIndex)
-	: ScreenComponent("sequencer", layerIndex)
+SequencerScreen::SequencerScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "sequencer", layerIndex)
 {
 }
 
@@ -247,7 +247,7 @@ vector<string> SequencerScreen::timingCorrectNames = vector<string>{ "OFF", "1/8
 
 void SequencerScreen::displayTiming()
 {
-	auto noteValue = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timing-correct"))->getNoteValue();
+	auto noteValue = dynamic_pointer_cast<TimingCorrectScreen>(mpc.screens->getScreenComponent("timing-correct"))->getNoteValue();
 	findField("timing").lock()->setText(timingCorrectNames[noteValue]);
 }
 
@@ -365,7 +365,7 @@ void SequencerScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 
 void SequencerScreen::pressEnter()
 {
-	BaseControls::pressEnter();
+	baseControls->pressEnter();
 
 	if (!isTypable())
 	{
@@ -413,7 +413,7 @@ void SequencerScreen::pressEnter()
 void SequencerScreen::function(int i)
 {
 	init();
-	BaseControls::function(i);
+	baseControls->function(i);
 
 	switch (i)
 	{
@@ -513,7 +513,7 @@ void SequencerScreen::turnWheel(int i)
 		{
 			auto eventNumber = stoi(lastFocus.substr(1, 2));
 
-			auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(Screens::getScreenComponent("step-editor"));
+			auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(mpc.screens->getScreenComponent("step-editor"));
 
 			if (dynamic_pointer_cast<mpc::sequencer::NoteEvent>(stepEditorScreen->getVisibleEvents()[eventNumber].lock()))
 			{
@@ -539,7 +539,7 @@ void SequencerScreen::turnWheel(int i)
 	}
 	else if (focus.compare("timing") == 0)
 	{
-		auto screen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timing-correct"));
+		auto screen = dynamic_pointer_cast<TimingCorrectScreen>(mpc.screens->getScreenComponent("timing-correct"));
 		auto noteValue = screen->getNoteValue();
 		screen->setNoteValue(noteValue + i);
 		setLastFocus("timing-correct", "notevalue");
@@ -677,7 +677,7 @@ void SequencerScreen::left()
 		return;
 	}
 
-	BaseControls::left();
+	baseControls->left();
 }
 
 void SequencerScreen::right()
@@ -691,7 +691,7 @@ void SequencerScreen::right()
 
 	if (!sequence.lock()->isUsed())
 	{
-		auto userScreen = dynamic_pointer_cast<UserScreen>(Screens::getScreenComponent("user"));
+		auto userScreen = dynamic_pointer_cast<UserScreen>(mpc.screens->getScreenComponent("user"));
 		sequence.lock()->init(userScreen->lastBar);
 		int index = sequencer.lock()->getActiveSequenceIndex();
 		string name = moduru::lang::StrUtil::trim(sequencer.lock()->getDefaultSequenceName()) + moduru::lang::StrUtil::padLeft(to_string(index + 1), "0", 2);
@@ -699,7 +699,7 @@ void SequencerScreen::right()
 		sequencer.lock()->setActiveSequenceIndex(sequencer.lock()->getActiveSequenceIndex());
 	}
 
-	BaseControls::right();
+	baseControls->right();
 }
 
 void SequencerScreen::up()
@@ -710,7 +710,7 @@ void SequencerScreen::up()
 		return;
 	}
 
-	BaseControls::up();
+	baseControls->up();
 }
 
 void SequencerScreen::down()
@@ -724,12 +724,12 @@ void SequencerScreen::down()
 
 	if (!sequence.lock()->isUsed())
 	{
-		auto userScreen = dynamic_pointer_cast<UserScreen>(Screens::getScreenComponent("user"));
+		auto userScreen = dynamic_pointer_cast<UserScreen>(mpc.screens->getScreenComponent("user"));
 		sequence.lock()->init(userScreen->lastBar);
 		int index = sequencer.lock()->getActiveSequenceIndex();
 		string name = moduru::lang::StrUtil::trim(sequencer.lock()->getDefaultSequenceName()) + moduru::lang::StrUtil::padLeft(to_string(index + 1), "0", 2);
 		sequence.lock()->setName(name);
 		sequencer.lock()->setActiveSequenceIndex(sequencer.lock()->getActiveSequenceIndex());
 	}
-	BaseControls::down();
+	baseControls->down();
 }

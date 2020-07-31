@@ -16,8 +16,8 @@ using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace std;
 
-DeleteFolderScreen::DeleteFolderScreen(const int layerIndex) 
-	: ScreenComponent("delete-folder", layerIndex)
+DeleteFolderScreen::DeleteFolderScreen(mpc::Mpc& mpc, const int layerIndex) 
+	: ScreenComponent(mpc, "delete-folder", layerIndex)
 {
 }
 
@@ -31,9 +31,9 @@ void DeleteFolderScreen::deleteFolder()
 	auto disk = mpc.getDisk().lock();
 	disk->setBusy(true);
 
-	auto directoryScreen = dynamic_pointer_cast<DirectoryScreen>(Screens::getScreenComponent("directory"));
+	auto directoryScreen = dynamic_pointer_cast<DirectoryScreen>(mpc.screens->getScreenComponent("directory"));
 	ls.lock()->openScreen("popup");
-	auto popupScreen = dynamic_pointer_cast<PopupScreen>(Screens::getScreenComponent("popup"));
+	auto popupScreen = dynamic_pointer_cast<PopupScreen>(mpc.screens->getScreenComponent("popup"));
 	popupScreen->setText("Delete:" + directoryScreen->getSelectedFile()->getName());
 
 	if (disk->deleteDir(directoryScreen->getSelectedFile()))
@@ -49,7 +49,7 @@ void DeleteFolderScreen::deleteFolder()
 
 void DeleteFolderScreen::function(int i)
 {
-	BaseControls::function(i);
+	baseControls->function(i);
 	
 	switch (i)
 	{

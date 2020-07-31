@@ -6,20 +6,23 @@
 
 #include <memory>
 
-namespace mpc::sampler {
+namespace mpc { class Mpc; }
 
+namespace mpc::sampler
+{
 	class Pad
 		: public moduru::observer::Observable
 	{
 
 	private:
 		static std::vector<int> originalPadNotes;
-
+		
 	public:
-		static std::vector<int>& getPadNotes();
+		static std::vector<int>& getPadNotes(mpc::Mpc& mpc);
 		
 
 	private:
+		mpc::Mpc& mpc;
 		int note = 0;
 		int number = 0;
 		std::shared_ptr<ctoot::mpc::MpcStereoMixerChannel> stereoMixerChannel{};
@@ -33,7 +36,7 @@ namespace mpc::sampler {
 		int getNumber();
 
 	public:
-		Pad(int number);
+		Pad(mpc::Mpc& mpc, int number);
 
 	};
 }

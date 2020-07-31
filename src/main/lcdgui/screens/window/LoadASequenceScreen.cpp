@@ -14,8 +14,8 @@ using namespace moduru::file;
 using namespace moduru::lang;
 using namespace std;
 
-LoadASequenceScreen::LoadASequenceScreen(const int layerIndex) 
-	: ScreenComponent("load-a-sequence", layerIndex)
+LoadASequenceScreen::LoadASequenceScreen(mpc::Mpc& mpc, const int layerIndex) 
+	: ScreenComponent(mpc, "load-a-sequence", layerIndex)
 {
 }
 
@@ -24,7 +24,7 @@ void LoadASequenceScreen::open()
 	auto newSeq = sequencer.lock()->createSeqInPlaceHolder().lock();
 	newSeq->init(2);
 
-	auto loadScreen = dynamic_pointer_cast<LoadScreen>(Screens::getScreenComponent("load"));
+	auto loadScreen = dynamic_pointer_cast<LoadScreen>(mpc.screens->getScreenComponent("load"));
 	auto ext = FileUtil::splitName(loadScreen->getSelectedFileName())[1];
 
 	if (ext.compare("mid") == 0 || ext.compare("MID") == 0)

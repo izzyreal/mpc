@@ -8,6 +8,6 @@ namespace mpc::lcdgui::screens
 	{
 
 	public:
-		StaticScreen();
+		StaticScreen(mpc::Mpc& mpc);
 	};
 }

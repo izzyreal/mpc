@@ -8,8 +8,8 @@ using namespace mpc::lcdgui::screens::window;
 using namespace moduru::lang;
 using namespace std;
 
-TrimScreen::TrimScreen(const int layerIndex)
-	: ScreenComponent("trim", layerIndex)
+TrimScreen::TrimScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "trim", layerIndex)
 {
 	addChild(move(make_shared<TwoDots>()));
 	addChild(move(make_shared<Wave>()));
@@ -21,7 +21,7 @@ TrimScreen::TrimScreen(const int layerIndex)
 	twoDots->setVisible(2, false);
 	twoDots->setVisible(3, false);
 
-	typableParams = vector<string>{ "st", "end" };
+	//typableParams = vector<string>{ "st", "end" };
 }
 
 void TrimScreen::open()
@@ -100,7 +100,7 @@ void TrimScreen::function(int f)
 			return;
 		}
 
-		auto editSoundScreen = dynamic_pointer_cast<EditSoundScreen>(Screens::getScreenComponent("edit-sound"));
+		auto editSoundScreen = dynamic_pointer_cast<EditSoundScreen>(mpc.screens->getScreenComponent("edit-sound"));
 		editSoundScreen->setPreviousScreenName("trim");
 		
 		ls.lock()->openScreen("edit-sound");

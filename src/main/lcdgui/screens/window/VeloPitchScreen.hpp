@@ -6,13 +6,14 @@
 namespace mpc::lcdgui::screens::window
 {
 	class VeloPitchScreen
-		: public mpc::lcdgui::ScreenComponent, public mpc::controls::BaseSamplerControls
+		: public mpc::lcdgui::ScreenComponent
+		//public mpc::controls::BaseSamplerControls
 	{
 
 	public:
 		void turnWheel(int i) override;
 
-		VeloPitchScreen(const int layerIndex);
+		VeloPitchScreen(mpc::Mpc& mpc, const int layerIndex);
 
 		void open() override;
 		void close() override;

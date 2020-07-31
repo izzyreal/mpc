@@ -3,8 +3,8 @@
 using namespace mpc::lcdgui::screens;
 using namespace std;
 
-OthersScreen::OthersScreen(const int layerIndex) 
-	: ScreenComponent("others", layerIndex)
+OthersScreen::OthersScreen(mpc::Mpc& mpc, const int layerIndex) 
+	: ScreenComponent(mpc, "others", layerIndex)
 {
 }
 

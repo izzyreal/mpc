@@ -15,7 +15,7 @@ namespace mpc::lcdgui::screens::dialog
 		void function(int i) override;
 
 	public:
-		DeleteFolderScreen(const int layerIndex);
+		DeleteFolderScreen(mpc::Mpc& mpc, const int layerIndex);
 		~DeleteFolderScreen();
 
 	};

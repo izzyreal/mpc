@@ -3,8 +3,8 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
-LoadAProgramScreen::LoadAProgramScreen(const int layerIndex) 
-	: ScreenComponent("load-a-program", layerIndex)
+LoadAProgramScreen::LoadAProgramScreen(mpc::Mpc& mpc, const int layerIndex) 
+	: ScreenComponent(mpc, "load-a-program", layerIndex)
 {
 }
 

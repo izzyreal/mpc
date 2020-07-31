@@ -38,9 +38,10 @@ using namespace mpc::sampler;
 using namespace moduru::lang;
 using namespace std;
 
-Sampler::Sampler()
+Sampler::Sampler(mpc::Mpc& mpc)
+	: mpc(mpc)
 {
-	initMasterPadAssign = Pad::getPadNotes();
+	initMasterPadAssign = Pad::getPadNotes(mpc);
 }
 
 void Sampler::setSoundIndex(int i)
@@ -52,7 +53,7 @@ void Sampler::setSoundIndex(int i)
 
 	soundIndex = i;
 
-	auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(Screens::getScreenComponent("zone"));
+	auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(mpc.screens->getScreenComponent("zone"));
 	zoneScreen->initZones(getSound().lock()->getFrameCount());
 }
 
@@ -169,7 +170,7 @@ void Sampler::init()
 
 void Sampler::playMetronome(mpc::sequencer::NoteEvent* event, int framePos)
 {
-	auto metronomeSoundScreen = dynamic_pointer_cast<MetronomeSoundScreen>(Screens::getScreenComponent("metronome-sound"));
+	auto metronomeSoundScreen = dynamic_pointer_cast<MetronomeSoundScreen>(mpc.screens->getScreenComponent("metronome-sound"));
 	auto soundNumber = -2;
 
 	if (metronomeSoundScreen->getMetronomeSound() != 0)
@@ -226,7 +227,7 @@ weak_ptr<Program> Sampler::addProgram(int i)
 	{
 		return weak_ptr<Program>();
 	}
-	programs[i] = make_shared<Program>(this);
+	programs[i] = make_shared<Program>(mpc, this);
 	return programs[i];
 }
 
@@ -236,7 +237,7 @@ weak_ptr<Program> Sampler::addProgram()
 	{
 		if (!p)
 		{
-			p = make_shared<Program>(this);
+			p = make_shared<Program>(mpc, this);
 			return p;
 		}
 	}
@@ -656,7 +657,7 @@ void Sampler::playX()
 
 	if (playX_ == 1)
 	{
-		auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(Screens::getScreenComponent("zone"));
+		auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(mpc.screens->getScreenComponent("zone"));
 		auto zone = zoneScreen->getZone();
 		start = zone[0];
 		end = zone[1];

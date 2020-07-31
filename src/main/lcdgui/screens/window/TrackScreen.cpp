@@ -7,8 +7,8 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
-TrackScreen::TrackScreen(const int layerIndex)
-	: ScreenComponent("track", layerIndex)
+TrackScreen::TrackScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "track", layerIndex)
 {
 }
 
@@ -29,7 +29,7 @@ void TrackScreen::open()
 
 void TrackScreen::function(int i)
 {
-	BaseControls::function(i);
+	baseControls->function(i);
 	switch (i)
 	{
 	case 1:
@@ -44,7 +44,7 @@ void TrackScreen::function(int i)
 void TrackScreen::turnWheel(int i)
 {
 	init();
-	auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
+	auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
 
 	if (param.find("default") != string::npos)
 	{

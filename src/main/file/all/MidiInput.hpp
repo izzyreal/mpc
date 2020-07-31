@@ -3,6 +3,8 @@
 #include <memory>
 #include <vector>
 
+namespace mpc { class Mpc; }
+
 namespace mpc::file::all {
 
 	class MidiInput
@@ -58,7 +60,7 @@ namespace mpc::file::all {
 		std::vector<char> getBytes();
 
 		MidiInput(const std::vector<char>& b);
-		MidiInput();
+		MidiInput(mpc::Mpc& mpc);
 
 	};
 }

@@ -13,7 +13,7 @@ namespace mpc::lcdgui::screens::dialog2
 		void setText(std::string text);
 
 	public:
-		PopupScreen();
+		PopupScreen(mpc::Mpc& mpc);
 
 	};
 }

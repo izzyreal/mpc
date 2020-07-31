@@ -12,7 +12,8 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::file::all;
 using namespace std;
 
-mpc::file::all::Sequencer::Sequencer(vector<char> loadBytes)
+mpc::file::all::Sequencer::Sequencer(mpc::Mpc& mpc, vector<char> loadBytes)
+	: mpc(mpc)
 {
 	sequence = loadBytes[SEQ_OFFSET];
 	track = loadBytes[TR_OFFSET];
@@ -21,7 +22,8 @@ mpc::file::all::Sequencer::Sequencer(vector<char> loadBytes)
 	secondSeqIndex = loadBytes[SECOND_SEQ_INDEX_OFFSET];
 }
 
-mpc::file::all::Sequencer::Sequencer()
+mpc::file::all::Sequencer::Sequencer(mpc::Mpc& mpc)
+	: mpc(mpc)
 {
 	saveBytes = vector<char>(LENGTH);
 	for (int i = 0; i < LENGTH; i++)
@@ -30,7 +32,7 @@ mpc::file::all::Sequencer::Sequencer()
 	saveBytes[SEQ_OFFSET] = seq->getActiveSequenceIndex();
 	saveBytes[TR_OFFSET] = seq->getActiveTrackIndex();
 
-	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(Screens::getScreenComponent("timing-correct"));
+	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(mpc.screens->getScreenComponent("timing-correct"));
 	auto noteValue = timingCorrectScreen->getNoteValue();
 
 	saveBytes[TC_OFFSET] = noteValue;

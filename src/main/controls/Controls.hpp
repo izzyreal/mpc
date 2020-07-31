@@ -5,6 +5,8 @@
 #include <string>
 #include <set>
 
+namespace mpc { class Mpc; }
+
 namespace mpc::controls {
 	class BaseControls;
 	class GlobalReleaseControls;
@@ -74,7 +76,7 @@ namespace mpc::controls {
 		mpc::controls::GlobalReleaseControls* getReleaseControls();
 
 	public:
-		Controls();
+		Controls(mpc::Mpc& mpc);
 		~Controls();
 	};
 }

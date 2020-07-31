@@ -8,8 +8,8 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
-ZoneEndFineScreen::ZoneEndFineScreen(const int layerIndex)
-	: ScreenComponent("zone-end-fine", layerIndex)
+ZoneEndFineScreen::ZoneEndFineScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "zone-end-fine", layerIndex)
 {
 	addChild(move(make_shared<Wave>()));
 	addChild(move(make_shared<TwoDots>()));
@@ -33,8 +33,8 @@ void ZoneEndFineScreen::open()
 
 void ZoneEndFineScreen::displayFineWaveform()
 {
-	auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(Screens::getScreenComponent("zone"));
-	auto trimScreen = dynamic_pointer_cast<TrimScreen>(Screens::getScreenComponent("trim"));
+	auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(mpc.screens->getScreenComponent("zone"));
+	auto trimScreen = dynamic_pointer_cast<TrimScreen>(mpc.screens->getScreenComponent("trim"));
 
 	auto sound = sampler.lock()->getSound().lock();
 
@@ -49,13 +49,13 @@ void ZoneEndFineScreen::displayFineWaveform()
 
 void ZoneEndFineScreen::displayEnd()
 {
-	auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(Screens::getScreenComponent("zone"));
+	auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(mpc.screens->getScreenComponent("zone"));
 	findField("end").lock()->setTextPadded(zoneScreen->getZoneEnd(zoneScreen->zone), " ");
 }
 
 void ZoneEndFineScreen::displayLngthLabel()
 {
-	auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(Screens::getScreenComponent("zone"));
+	auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(mpc.screens->getScreenComponent("zone"));
 	findLabel("lngth").lock()->setTextPadded(zoneScreen->getZoneEnd(zoneScreen->zone) - zoneScreen->getZoneStart(zoneScreen->zone), " ");
 }
 
@@ -66,7 +66,7 @@ void ZoneEndFineScreen::displayPlayX()
 
 void ZoneEndFineScreen::function(int i)
 {
-	BaseControls::function(i);
+	baseControls->function(i);
 
 	switch (i)
 	{
@@ -86,7 +86,7 @@ void ZoneEndFineScreen::turnWheel(int i)
 {
 	init();
 	auto sound = sampler.lock()->getSound().lock();
-	auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(Screens::getScreenComponent("zone"));
+	auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(mpc.screens->getScreenComponent("zone"));
 
 	if (param.compare("end") == 0)
 	{

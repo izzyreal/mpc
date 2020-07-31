@@ -8,6 +8,10 @@
 #include <memory>
 #include <map>
 
+namespace mpc {
+	class Mpc;
+}
+
 namespace mpc::lcdgui
 {
 	class Component;
@@ -25,6 +29,7 @@ namespace mpc::lcdgui
 	
 	private:
 		static std::vector<std::string> zoomScreenNames;
+		mpc::Mpc& mpc;
 
 	private:
 		static std::pair<std::vector<std::shared_ptr<Component>>, std::map<std::string, std::vector<std::string>>> get(
@@ -34,7 +39,9 @@ namespace mpc::lcdgui
 		);
 
 	public:	
-		static std::shared_ptr<ScreenComponent> getScreenComponent(const std::string& screenName);
+		std::shared_ptr<ScreenComponent> getScreenComponent(const std::string& screenName);
+
+		Screens(mpc::Mpc& mpc);
 
 	};
 }

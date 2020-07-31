@@ -11,6 +11,6 @@ namespace mpc::lcdgui::screens
 		void function(int i) override;
 
 	public:
-		VerScreen(const int layerIndex);
+		VerScreen(mpc::Mpc& mpc, const int layerIndex);
 	};
 }

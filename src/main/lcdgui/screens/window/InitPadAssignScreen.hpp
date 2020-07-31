@@ -6,7 +6,8 @@
 namespace mpc::lcdgui::screens::window {
 
 	class InitPadAssignScreen
-		: public mpc::lcdgui::ScreenComponent, public mpc::controls::BaseSamplerControls
+		: public mpc::lcdgui::ScreenComponent
+		//public mpc::controls::BaseSamplerControls
 	{
 
 	private:
@@ -17,7 +18,7 @@ namespace mpc::lcdgui::screens::window {
 		void turnWheel(int i) override;
 		void function(int i) override;
 
-		InitPadAssignScreen(const int layerIndex);
+		InitPadAssignScreen(mpc::Mpc& mpc, const int layerIndex);
 
 		void open() override;
 

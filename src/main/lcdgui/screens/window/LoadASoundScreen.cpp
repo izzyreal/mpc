@@ -13,15 +13,15 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;
 using namespace std;
 
-LoadASoundScreen::LoadASoundScreen(const int layerIndex)
-	: ScreenComponent("load-a-sound", layerIndex)
+LoadASoundScreen::LoadASoundScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "load-a-sound", layerIndex)
 {
 }
 
 void LoadASoundScreen::open()
 {
 	init();
-	auto loadScreen = dynamic_pointer_cast<LoadScreen>(Screens::getScreenComponent("load"));
+	auto loadScreen = dynamic_pointer_cast<LoadScreen>(mpc.screens->getScreenComponent("load"));
 	findLabel("filename").lock()->setText("File:" + loadScreen->getSelectedFileName());
 	displayAssignToNote();
 	mpc.addObserver(this); // Subscribe to "padandnote" messages

@@ -11,8 +11,8 @@ using namespace mpc::lcdgui::screens::window;
 using namespace moduru::lang;
 using namespace std;
 
-ChannelSettingsScreen::ChannelSettingsScreen(const int layerIndex)
-	: ScreenComponent("channel-settings", layerIndex)
+ChannelSettingsScreen::ChannelSettingsScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "channel-settings", layerIndex)
 {
 }
 
@@ -181,7 +181,7 @@ void ChannelSettingsScreen::displayFxPath() {
 }
 
 void ChannelSettingsScreen::displayFollowStereo() {
-	auto mixerScreen = dynamic_pointer_cast<MixerScreen>(Screens::getScreenComponent("mixer"));
+	auto mixerScreen = dynamic_pointer_cast<MixerScreen>(mpc.screens->getScreenComponent("mixer"));
 	auto mixerChannel = program.lock()->getPad(mixerScreen->getXPos() + (mpc.getBank() * 16))->getIndivFxMixerChannel();
 	findField("followstereo").lock()->setText(mixerChannel.lock()->isFollowingStereo() ? "YES" : "NO");
 }

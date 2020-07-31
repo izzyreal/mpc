@@ -9,8 +9,8 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;
 using namespace std;
 
-Mpc2000XlAllFileScreen::Mpc2000XlAllFileScreen(const int layerIndex) 
-	: ScreenComponent("mpc2000xl-all-file", layerIndex)
+Mpc2000XlAllFileScreen::Mpc2000XlAllFileScreen(mpc::Mpc& mpc, const int layerIndex) 
+	: ScreenComponent(mpc, "mpc2000xl-all-file", layerIndex)
 {
 }
 
@@ -18,7 +18,7 @@ void Mpc2000XlAllFileScreen::function(int i)
 {
 	init();
 
-	auto loadScreen = dynamic_pointer_cast<LoadScreen>(Screens::getScreenComponent("load"));
+	auto loadScreen = dynamic_pointer_cast<LoadScreen>(mpc.screens->getScreenComponent("load"));
 
 	switch (i)
 	
@@ -26,9 +26,9 @@ void Mpc2000XlAllFileScreen::function(int i)
 	case 2:
 	{
 		auto sequencesOnly = true;
-		mpc::disk::AllLoader allLoader(loadScreen->getSelectedFile(), sequencesOnly);
+		mpc::disk::AllLoader allLoader(mpc, loadScreen->getSelectedFile(), sequencesOnly);
 		
-		auto loadASequenceFromAllScreen = dynamic_pointer_cast<LoadASequenceFromAllScreen>(Screens::getScreenComponent("load-a-sequence-from-all"));
+		auto loadASequenceFromAllScreen = dynamic_pointer_cast<LoadASequenceFromAllScreen>(mpc.screens->getScreenComponent("load-a-sequence-from-all"));
 		loadASequenceFromAllScreen->sequencesFromAllFile = allLoader.getSequences();
 
 		loadScreen->fileLoad = 0;
@@ -42,7 +42,7 @@ void Mpc2000XlAllFileScreen::function(int i)
 	case 4:
 	{
 		auto sequencesOnly = false;
-		mpc::disk::AllLoader allLoader(loadScreen->getSelectedFile(), sequencesOnly);
+		mpc::disk::AllLoader allLoader(mpc, loadScreen->getSelectedFile(), sequencesOnly);
 		ls.lock()->openScreen("sequencer");
 		break;
 	}

@@ -8,7 +8,7 @@ namespace mpc::lcdgui::screens
 	{
 
 	public:
-		AssignScreen(const int layerIndex);
+		AssignScreen(mpc::Mpc& mpc, const int layerIndex);
 
 	public:
 		void turnWheel(int i) override;

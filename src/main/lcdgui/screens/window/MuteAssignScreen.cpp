@@ -6,8 +6,8 @@ using namespace mpc::lcdgui::screens::window;
 using namespace moduru::lang;
 using namespace std;
 
-MuteAssignScreen::MuteAssignScreen(const int layerIndex)
-	: ScreenComponent("mute-assign", layerIndex)
+MuteAssignScreen::MuteAssignScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "mute-assign", layerIndex)
 {
 }
 

@@ -17,7 +17,7 @@ namespace mpc::lcdgui::screens::dialog
 		void function(int i) override;
 		void turnWheel(int i) override;
 
-		CopySoundScreen(const int layerIndex);
+		CopySoundScreen(mpc::Mpc& mpc, const int layerIndex);
 
 		void open() override;
 

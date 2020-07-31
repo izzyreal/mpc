@@ -5,6 +5,8 @@
 #include <vector>
 #include <string>
 
+namespace mpc { class Mpc; }
+
 namespace mpc::sampler
 {
 	class Program;
@@ -20,6 +22,7 @@ namespace mpc::disk
 	class ProgramLoader
 	{
 	private:
+		mpc::Mpc& mpc;
 		std::thread loadProgramThread;
 		std::weak_ptr<mpc::sampler::Program> result;
 
@@ -39,7 +42,7 @@ namespace mpc::disk
 	public:
 		std::weak_ptr<mpc::sampler::Program> get();
 
-		ProgramLoader(MpcFile* file, bool replace);
+		ProgramLoader(mpc::Mpc& mpc, MpcFile* file, bool replace);
 		~ProgramLoader();
 	};
 }

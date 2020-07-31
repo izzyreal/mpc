@@ -46,6 +46,7 @@ namespace mpc::sampler {
 
 
 	private:
+		mpc::Mpc& mpc;
 		std::vector<int> initMasterPadAssign;
 		std::vector<int> masterPadAssign;
 		std::vector<int> autoChromaticAssign;
@@ -148,7 +149,7 @@ namespace mpc::sampler {
 		int getPlayX();
 
 	public:
-		Sampler();
+		Sampler(mpc::Mpc& mpc);
 
 	};
 }

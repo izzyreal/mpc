@@ -8,7 +8,7 @@ namespace mpc::lcdgui::screens::window
 	{
 
 	public:
-		ChannelSettingsScreen(const int layerIndex);
+		ChannelSettingsScreen(mpc::Mpc& mpc, const int layerIndex);
 		
 		void turnWheel(int increment) override;
 		

@@ -9,8 +9,8 @@ using namespace mpc::lcdgui::screens::window;
 using namespace moduru::lang;
 using namespace std;
 
-SndParamsScreen::SndParamsScreen(const int layerIndex) 
-	: ScreenComponent("params", layerIndex)
+SndParamsScreen::SndParamsScreen(mpc::Mpc& mpc, const int layerIndex) 
+	: ScreenComponent(mpc, "params", layerIndex)
 {
 }
 
@@ -60,7 +60,7 @@ void SndParamsScreen::function(int f)
 			return;
 		}
 
-		auto editSoundScreen = dynamic_pointer_cast<EditSoundScreen>(Screens::getScreenComponent("edit-sound"));
+		auto editSoundScreen = dynamic_pointer_cast<EditSoundScreen>(mpc.screens->getScreenComponent("edit-sound"));
 		editSoundScreen->setPreviousScreenName("trim");
 		ls.lock()->openScreen("edit-sound");
 		break;

@@ -6,14 +6,15 @@
 namespace mpc::lcdgui::screens::window
 {
 	class CopyNoteParametersScreen
-		: public mpc::lcdgui::ScreenComponent, public mpc::controls::BaseSamplerControls
+		: public mpc::lcdgui::ScreenComponent
+		//public mpc::controls::BaseSamplerControls
 	{
 
 	public:
 		void turnWheel(int i) override;
 		void function(int i) override;
 
-		CopyNoteParametersScreen(const int layerIndex);
+		CopyNoteParametersScreen(mpc::Mpc& mpc, const int layerIndex);
 		void open() override;
 
 	private:

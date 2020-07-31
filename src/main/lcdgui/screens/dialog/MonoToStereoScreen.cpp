@@ -4,8 +4,8 @@ using namespace mpc::lcdgui::screens::dialog;
 using namespace moduru::lang;
 using namespace std;
 
-MonoToStereoScreen::MonoToStereoScreen(const int layerIndex)
-	: ScreenComponent("mono-to-stereo", layerIndex)
+MonoToStereoScreen::MonoToStereoScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "mono-to-stereo", layerIndex)
 {
 }
 

@@ -4,8 +4,8 @@ using namespace mpc::lcdgui::screens::window;
 using namespace moduru::lang;
 using namespace std;
 
-TimeDisplayScreen::TimeDisplayScreen(const int layerIndex)
-	: ScreenComponent("time-display", layerIndex)
+TimeDisplayScreen::TimeDisplayScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "time-display", layerIndex)
 {
 }
 

@@ -12,19 +12,19 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui;
 using namespace std;
 
-PasteEventScreen::PasteEventScreen(const int layerIndex)
-	: ScreenComponent("paste-event", layerIndex)
+PasteEventScreen::PasteEventScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "paste-event", layerIndex)
 {
 }
 
 void PasteEventScreen::function(int i)
 {
-	BaseControls::function(i);
+	baseControls->function(i);
 	
 	switch (i)
 	{
 	case 4:
-		auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(Screens::getScreenComponent("step-editor"));
+		auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(mpc.screens->getScreenComponent("step-editor"));
 		for (auto& event : stepEditorScreen->getPlaceHolder())
 		{
 			auto eventClone = track.lock()->cloneEvent(event).lock();

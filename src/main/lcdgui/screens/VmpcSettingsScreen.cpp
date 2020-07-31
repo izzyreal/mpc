@@ -3,8 +3,8 @@
 using namespace mpc::lcdgui::screens;
 using namespace std;
 
-VmpcSettingsScreen::VmpcSettingsScreen(const int layerIndex)
-	: ScreenComponent("vmpc-settings", layerIndex)
+VmpcSettingsScreen::VmpcSettingsScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "vmpc-settings", layerIndex)
 {
 }
 

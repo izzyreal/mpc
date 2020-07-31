@@ -8,8 +8,8 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
-SaveApsFileScreen::SaveApsFileScreen(const int layerIndex)
-	: ScreenComponent("save-aps-file", layerIndex)
+SaveApsFileScreen::SaveApsFileScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "save-aps-file", layerIndex)
 {
 }
 
@@ -23,8 +23,8 @@ void SaveApsFileScreen::open()
 void SaveApsFileScreen::turnWheel(int i)
 {
 	init();
-	auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
-	auto saveAProgramScreen = dynamic_pointer_cast<SaveAProgramScreen>(Screens::getScreenComponent("save-a-program"));
+	auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
+	auto saveAProgramScreen = dynamic_pointer_cast<SaveAProgramScreen>(mpc.screens->getScreenComponent("save-a-program"));
 
 	if (param.compare("file") == 0)
 	{
@@ -54,9 +54,9 @@ void SaveApsFileScreen::function(int i)
 		break;
 	case 4:
 	{
-		auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
+		auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
 		string apsFileName = mpc::Util::getFileName(nameScreen->getName()) + ".APS";
-		apsSaver = make_unique<mpc::disk::ApsSaver>(apsFileName);
+		apsSaver = make_unique<mpc::disk::ApsSaver>(mpc, apsFileName);
 		break;
 	}
 	}
@@ -64,18 +64,18 @@ void SaveApsFileScreen::function(int i)
 
 void SaveApsFileScreen::displayFile()
 {
-	auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
+	auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
 	findField("file").lock()->setText(nameScreen->getName());
 }
 
 void SaveApsFileScreen::displaySave()
 {
-	auto saveAProgramScreen = dynamic_pointer_cast<SaveAProgramScreen>(Screens::getScreenComponent("save-a-program"));
+	auto saveAProgramScreen = dynamic_pointer_cast<SaveAProgramScreen>(mpc.screens->getScreenComponent("save-a-program"));
 	findField("save").lock()->setText(apsSaveNames[saveAProgramScreen->save]);
 }
 
 void SaveApsFileScreen::displayReplaceSameSounds()
 {
-	auto saveAProgramScreen = dynamic_pointer_cast<SaveAProgramScreen>(Screens::getScreenComponent("save-a-program"));
+	auto saveAProgramScreen = dynamic_pointer_cast<SaveAProgramScreen>(mpc.screens->getScreenComponent("save-a-program"));
 	findField("replace-same-sounds").lock()->setText(string(saveAProgramScreen->replaceSameSounds ? "YES" : "NO"));
 }

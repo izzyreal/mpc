@@ -15,7 +15,7 @@ namespace mpc::lcdgui::screens
 	public:
 		void turnWheel(int i) override;
 
-		VmpcSettingsScreen(const int layerIndex);
+		VmpcSettingsScreen(mpc::Mpc& mpc, const int layerIndex);
 
 		void open() override;
 

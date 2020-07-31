@@ -3,8 +3,8 @@
 using namespace mpc::lcdgui::screens;
 using namespace std;
 
-SecondSeqScreen::SecondSeqScreen(const int layerIndex)
-	: ScreenComponent("second-seq", layerIndex)
+SecondSeqScreen::SecondSeqScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "second-seq", layerIndex)
 {
 }
 

@@ -6,8 +6,8 @@ using namespace mpc::lcdgui::screens::window;
 using namespace moduru::lang;
 using namespace std;
 
-AutoChromaticAssignmentScreen::AutoChromaticAssignmentScreen(const int layerIndex) 
-	: ScreenComponent("auto-chromatic-assignment", layerIndex)
+AutoChromaticAssignmentScreen::AutoChromaticAssignmentScreen(mpc::Mpc& mpc, const int layerIndex) 
+	: ScreenComponent(mpc, "auto-chromatic-assignment", layerIndex)
 {
 }
 
@@ -38,7 +38,7 @@ void AutoChromaticAssignmentScreen::turnWheel(int i)
 	}
 	else if (param.compare("program-name") == 0)
 	{
-		auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
+		auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
 		nameScreen->setName(newName);
 		nameScreen->parameterName = "autochrom";
 		ls.lock()->openScreen("name");

@@ -30,7 +30,7 @@ namespace mpc::lcdgui::screens
 		void function(int f) override;
 		void turnWheel(int i) override;
 
-		ZoneScreen(const int layerIndex);
+		ZoneScreen(mpc::Mpc& mpc, const int layerIndex);
 
 		void open() override;
 		

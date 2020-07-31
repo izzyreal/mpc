@@ -15,7 +15,8 @@ using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::file::all;
 using namespace std;
 
-Count::Count(vector<char> b) 
+Count::Count(mpc::Mpc& mpc, vector<char> b)
+	: mpc(mpc)
 {
 	enabled = b[ENABLED_OFFSET] > 0;
 	countInMode = b[COUNT_IN_MODE_OFFSET];
@@ -30,10 +31,11 @@ Count::Count(vector<char> b)
 	normalVelo = b[NORMAL_VELO_OFFSET];
 }
 
-Count::Count() 
+Count::Count(mpc::Mpc& mpc)
+	: mpc(mpc)
 {
-	auto countMetronomeScreen = dynamic_pointer_cast<CountMetronomeScreen>(Screens::getScreenComponent("count-metronome"));
-	auto metronomeSoundScreen = dynamic_pointer_cast<MetronomeSoundScreen>(Screens::getScreenComponent("metronome-sound"));
+	auto countMetronomeScreen = dynamic_pointer_cast<CountMetronomeScreen>(mpc.screens->getScreenComponent("count-metronome"));
+	auto metronomeSoundScreen = dynamic_pointer_cast<MetronomeSoundScreen>(mpc.screens->getScreenComponent("metronome-sound"));
 
 	auto lSequencer = Mpc::instance().getSequencer().lock();
 

@@ -3,7 +3,7 @@
 using namespace mpc::lcdgui::screens;
 using namespace std;
 
-StaticScreen::StaticScreen() 
-	: ScreenComponent("static", 0)
+StaticScreen::StaticScreen(mpc::Mpc& mpc)
+	: ScreenComponent(mpc, "static", 0)
 {
 }

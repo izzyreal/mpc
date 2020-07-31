@@ -6,8 +6,8 @@
 using namespace mpc::lcdgui::screens;
 using namespace std;
 
-VmpcDiskScreen::VmpcDiskScreen(const int layerIndex)
-	: ScreenComponent("vmpc-disk", layerIndex)
+VmpcDiskScreen::VmpcDiskScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "vmpc-disk", layerIndex)
 {
 }
 

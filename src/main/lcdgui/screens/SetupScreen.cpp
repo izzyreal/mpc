@@ -3,8 +3,8 @@
 using namespace mpc::lcdgui::screens;
 using namespace std;
 
-SetupScreen::SetupScreen(const int layerIndex) 
-	: ScreenComponent("setup", layerIndex)
+SetupScreen::SetupScreen(mpc::Mpc& mpc, const int layerIndex) 
+	: ScreenComponent(mpc, "setup", layerIndex)
 {
 	resetPreferences();
 }

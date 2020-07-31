@@ -15,7 +15,7 @@ namespace mpc::lcdgui::screens
 		void right() override;
 		void function(int i) override;
 
-		TrMoveScreen(const int layerIndex);
+		TrMoveScreen(mpc::Mpc& mpc, const int layerIndex);
 
 		void open() override;
 		

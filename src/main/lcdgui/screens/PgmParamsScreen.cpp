@@ -11,8 +11,8 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace std;
 
-PgmParamsScreen::PgmParamsScreen(const int layerIndex) 
-	: ScreenComponent("program-params", layerIndex)
+PgmParamsScreen::PgmParamsScreen(mpc::Mpc& mpc, const int layerIndex) 
+	: ScreenComponent(mpc, "program-params", layerIndex)
 {
 	addChild(make_shared<EnvGraph>());
 }
@@ -57,7 +57,7 @@ void PgmParamsScreen::function(int i)
 		break;
 	case 4:
 	{
-		mpc.setPreviousSamplerScreenName(currentScreenName);
+		mpc.setPreviousSamplerScreenName("program-params");
 		ls.lock()->openScreen("auto-chromatic-assignment");
 		break;
 	}
@@ -155,12 +155,12 @@ void PgmParamsScreen::openWindow()
 
 	if (param.compare("pgm") == 0)
 	{
-		mpc.setPreviousSamplerScreenName(currentScreenName);
+		mpc.setPreviousSamplerScreenName("program-params");
 		ls.lock()->openScreen("program");
 	}
 	else if (param.compare("note") == 0)
 	{
-		mpc.setPreviousSamplerScreenName(currentScreenName);
+		mpc.setPreviousSamplerScreenName("program-params");
 		ls.lock()->openScreen("copy-note-parameters");
 	}
 	else if (param.compare("attack") == 0 || param.compare("decay") == 0 || param.compare("dcymd") == 0)

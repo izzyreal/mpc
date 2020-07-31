@@ -16,7 +16,7 @@ namespace mpc::lcdgui::screens::window
 		void turnWheel(int i) override;
 		void function(int i) override;
 
-		LoadAProgramScreen(const int layerIndex);
+		LoadAProgramScreen(mpc::Mpc& mpc, const int layerIndex);
 		void open() override;
 
 	private:

@@ -10,7 +10,7 @@ namespace mpc::lcdgui::screens::window
 	public:
 		void function(int i) override;
 
-		Mpc2000XlAllFileScreen(const int layerIndex);
+		Mpc2000XlAllFileScreen(mpc::Mpc& mpc, const int layerIndex);
 
 	};
 }

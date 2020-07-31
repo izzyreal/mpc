@@ -6,14 +6,14 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace std;
 
-SelectMixerDrumScreen::SelectMixerDrumScreen(const int layerIndex)
-	: ScreenComponent("select-mixer-drum", layerIndex)
+SelectMixerDrumScreen::SelectMixerDrumScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "select-mixer-drum", layerIndex)
 {
 }
 
 void SelectMixerDrumScreen::open()
 {
-	auto drumScreen = dynamic_pointer_cast<DrumScreen>(Screens::getScreenComponent("drum"));
+	auto drumScreen = dynamic_pointer_cast<DrumScreen>(mpc.screens->getScreenComponent("drum"));
 	ls.lock()->setFunctionKeysArrangement(drumScreen->drum);
 }
 
@@ -23,9 +23,9 @@ void SelectMixerDrumScreen::function(int i)
 
 	if (i < 4)
 	{
-		auto drumScreen = dynamic_pointer_cast<DrumScreen>(Screens::getScreenComponent("drum"));
+		auto drumScreen = dynamic_pointer_cast<DrumScreen>(mpc.screens->getScreenComponent("drum"));
 		drumScreen->drum = i;
-		mpc.setPreviousSamplerScreenName(currentScreenName);
+		//mpc.setPreviousSamplerScreenName(currentScreenName);
 		ls.lock()->openScreen("mixer");
 	}
 	else if (i == 4)

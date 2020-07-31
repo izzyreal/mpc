@@ -12,7 +12,7 @@ namespace mpc::lcdgui::screens::window
 		void turnWheel(int i) override;
 		void open() override;
 
-		Assign16LevelsScreen(const int layerIndex);
+		Assign16LevelsScreen(mpc::Mpc& mpc, const int layerIndex);
 
 	private:
 		const std::vector<std::string> typeNames{ "TUNING", "DECAY", "ATTACK", "FILTER" };

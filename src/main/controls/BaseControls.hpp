@@ -52,13 +52,13 @@ namespace mpc::controls
 		std::weak_ptr<mpc::sequencer::Sequencer> sequencer;
 		std::weak_ptr<mpc::sampler::Sampler> sampler;
 
-	protected:
+	public:
 		bool splittable = false;
 		static std::vector<int> splitInc;
 		void splitLeft();
 		void splitRight();
 
-	protected:
+	public:
 		std::string param = "";
 		std::string currentScreenName = "";
 
@@ -71,11 +71,9 @@ namespace mpc::controls
 
 		std::vector<std::string> typableParams;
 
-	protected:
+	public:
 		virtual void init();
 		int getSoundIncrement(int notch);
-
-	public:
 		virtual void left();
 		virtual void right();
 		virtual void up();
@@ -116,7 +114,7 @@ namespace mpc::controls
 		void setSliderNoteVar(mpc::sequencer::NoteEvent* n, std::weak_ptr<mpc::sampler::Program> program);
 
 	public:
-		BaseControls();
+		BaseControls(mpc::Mpc& mpc);
 
 	};
 }

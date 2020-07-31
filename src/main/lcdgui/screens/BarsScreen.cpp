@@ -8,8 +8,8 @@
 using namespace mpc::lcdgui::screens;
 using namespace std;
 
-BarsScreen::BarsScreen(const int layerIndex)
-	: ScreenComponent("bars", layerIndex)
+BarsScreen::BarsScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "bars", layerIndex)
 {
 }
 
@@ -26,7 +26,7 @@ void BarsScreen::open()
 void BarsScreen::function(int j)
 {
 	init();
-	auto eventsScreen = dynamic_pointer_cast<EventsScreen>(Screens::getScreenComponent("events"));
+	auto eventsScreen = dynamic_pointer_cast<EventsScreen>(mpc.screens->getScreenComponent("events"));
 
 	switch (j)
 	{
@@ -140,7 +140,7 @@ void BarsScreen::turnWheel(int i)
 {
 	init();
 
-	auto eventsScreen = dynamic_pointer_cast<EventsScreen>(Screens::getScreenComponent("events"));
+	auto eventsScreen = dynamic_pointer_cast<EventsScreen>(mpc.screens->getScreenComponent("events"));
 	auto fromSequence = sequencer.lock()->getActiveSequence().lock();
 	auto toSequence = sequencer.lock()->getSequence(eventsScreen->toSq).lock();
 
@@ -189,13 +189,13 @@ void BarsScreen::turnWheel(int i)
 
 void BarsScreen::displayCopies()
 {
-	auto eventsScreen = dynamic_pointer_cast<EventsScreen>(Screens::getScreenComponent("events"));
+	auto eventsScreen = dynamic_pointer_cast<EventsScreen>(mpc.screens->getScreenComponent("events"));
 	findField("copies").lock()->setTextPadded(eventsScreen->copies, " ");
 }
 
 void BarsScreen::displayToSq()
 {
-	auto eventsScreen = dynamic_pointer_cast<EventsScreen>(Screens::getScreenComponent("events"));
+	auto eventsScreen = dynamic_pointer_cast<EventsScreen>(mpc.screens->getScreenComponent("events"));
 	findField("tosq").lock()->setText(to_string(eventsScreen->toSq + 1));
 }
 
@@ -269,7 +269,7 @@ void BarsScreen::setCopies(int i)
 		return;
 	}
 
-	auto eventsScreen = dynamic_pointer_cast<EventsScreen>(Screens::getScreenComponent("events"));
+	auto eventsScreen = dynamic_pointer_cast<EventsScreen>(mpc.screens->getScreenComponent("events"));
 	eventsScreen->copies = i;
 	displayCopies();
 }

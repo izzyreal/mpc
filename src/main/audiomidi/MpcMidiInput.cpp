@@ -32,13 +32,14 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
-MpcMidiInput::MpcMidiInput(int index)
+MpcMidiInput::MpcMidiInput(mpc::Mpc& mpc, int index)
+	: mpc(mpc)
 {
-	sequencer = Mpc::instance().getSequencer();
-	sampler = Mpc::instance().getSampler();
+	sequencer = mpc.getSequencer();
+	sampler = mpc.getSampler();
 	this->index = index;
 	midiAdapter = make_unique<mpc::sequencer::MidiAdapter>();
-	eventAdapter = make_unique<mpc::sequencer::EventAdapter>(sequencer);
+	eventAdapter = make_unique<mpc::sequencer::EventAdapter>(mpc, sequencer);
 }
 
 string MpcMidiInput::getName()
@@ -115,7 +116,7 @@ void MpcMidiInput::transport(ctoot::midi::core::MidiMessage* msg, int timeStamp)
 	auto mce = dynamic_pointer_cast<mpc::sequencer::MidiClockEvent>(event);
 	auto note = dynamic_pointer_cast<mpc::sequencer::NoteEvent>(event);
 
-	auto syncScreen = dynamic_pointer_cast<SyncScreen>(Screens::getScreenComponent("sync"));
+	auto syncScreen = dynamic_pointer_cast<SyncScreen>(mpc.screens->getScreenComponent("sync"));
 
 	if (mce && syncScreen->in == index)
 	{
@@ -166,7 +167,7 @@ void MpcMidiInput::transport(ctoot::midi::core::MidiMessage* msg, int timeStamp)
 			}
 		}
 		
-		auto midiOutputScreen = dynamic_pointer_cast<MidiOutputScreen>(Screens::getScreenComponent("midi-output"));
+		auto midiOutputScreen = dynamic_pointer_cast<MidiOutputScreen>(mpc.screens->getScreenComponent("midi-output"));
 
 		switch (midiOutputScreen->getSoftThru())
 		{

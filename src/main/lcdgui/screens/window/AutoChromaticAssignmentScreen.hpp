@@ -11,13 +11,14 @@ namespace mpc::lcdgui::screens::window
 namespace mpc::lcdgui::screens::window
 {
 	class AutoChromaticAssignmentScreen
-		: public mpc::lcdgui::ScreenComponent, public mpc::controls::BaseSamplerControls
+		: public mpc::lcdgui::ScreenComponent
+		//public mpc::controls::BaseSamplerControls
 	{
 
 	public:
 		void turnWheel(int i) override;
 
-		AutoChromaticAssignmentScreen(const int layerIndex);
+		AutoChromaticAssignmentScreen(mpc::Mpc& mpc, const int layerIndex);
 		void open() override;
 
 	private:

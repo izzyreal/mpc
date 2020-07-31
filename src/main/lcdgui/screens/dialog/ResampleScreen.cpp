@@ -8,8 +8,8 @@ using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
-ResampleScreen::ResampleScreen(const int layerIndex)
-	: ScreenComponent("resample", layerIndex)
+ResampleScreen::ResampleScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "resample", layerIndex)
 {
 }
 
@@ -53,7 +53,7 @@ void ResampleScreen::turnWheel(int i)
 	}
 	else if (param.compare("newname") == 0)
 	{
-		auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
+		auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
 		nameScreen->setName(findField("newname").lock()->getText());
 		nameScreen->parameterName = "newname";
 		ls.lock()->openScreen("name");

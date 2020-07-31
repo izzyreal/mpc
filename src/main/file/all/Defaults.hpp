@@ -3,6 +3,8 @@
 #include <vector>
 #include <string>
 
+namespace mpc { class Mpc; }
+
 namespace mpc::file::all {
 
 	class Defaults
@@ -59,6 +61,7 @@ namespace mpc::file::all {
 
 	private:
 		void parseNames(std::vector<char> loadBytes);
+		mpc::Mpc& mpc;
 
 	public:
 		std::string getDefaultSeqName();
@@ -86,7 +89,7 @@ namespace mpc::file::all {
 	public:
 		std::vector<char> getBytes();
 
-		Defaults(std::vector<char> loadBytes);
-		Defaults();
+		Defaults(mpc::Mpc& mpc, std::vector<char> loadBytes);
+		Defaults(mpc::Mpc& mpc);
 	};
 }

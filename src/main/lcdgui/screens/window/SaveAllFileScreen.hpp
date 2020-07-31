@@ -10,7 +10,7 @@ namespace mpc::lcdgui::screens::window
 	{
 
 	private:
-		std::unique_ptr<mpc::file::all::AllParser> allParser{};
+		std::unique_ptr<mpc::file::all::AllParser> allParser;
 
 	public:
 		void turnWheel(int i) override;
@@ -18,7 +18,7 @@ namespace mpc::lcdgui::screens::window
 
 		void open() override;
 
-		SaveAllFileScreen(const int layerIndex);
+		SaveAllFileScreen(mpc::Mpc& mpc, const int layerIndex);
 
 	private:
 		void displayFile();

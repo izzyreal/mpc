@@ -3,6 +3,8 @@
 #include <memory>
 #include <vector>
 
+namespace mpc { class Mpc; }
+
 namespace mpc::file::all {
 
 	class Count
@@ -49,7 +51,11 @@ namespace mpc::file::all {
 	public:
 		std::vector<char> getBytes();
 
-		Count(std::vector<char> b);
-		Count();
+		Count(mpc::Mpc& mpc, std::vector<char> b);
+		Count(mpc::Mpc& mpc);
+
+	private:
+		mpc::Mpc& mpc;
+
 	};
 }

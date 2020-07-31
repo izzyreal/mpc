@@ -16,7 +16,7 @@ namespace mpc::lcdgui::screens::dialog
 		void turnWheel(int i) override;
 		void function(int i) override;
 
-		ResampleScreen(const int layerIndex);
+		ResampleScreen(mpc::Mpc& mpc, const int layerIndex);
 
 		void open() override;
 

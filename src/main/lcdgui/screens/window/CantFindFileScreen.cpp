@@ -3,8 +3,8 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
-CantFindFileScreen::CantFindFileScreen(const int layerIndex) 
-	: ScreenComponent("cant-find-file", layerIndex)
+CantFindFileScreen::CantFindFileScreen(mpc::Mpc& mpc, const int layerIndex) 
+	: ScreenComponent(mpc, "cant-find-file", layerIndex)
 {
 }
 

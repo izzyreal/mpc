@@ -3,6 +3,8 @@
 #include <memory>
 #include <vector>
 
+namespace mpc { class Mpc; }
+
 namespace mpc::disk
 {
 	class Stores;
@@ -14,8 +16,8 @@ namespace mpc::disk
 	class DiskController
 	{
 
-
 	private:
+		mpc::Mpc& mpc;
 		static const int MAX_DISKS = 7;
 		std::vector<std::shared_ptr<AbstractDisk>> disks = std::vector<std::shared_ptr<AbstractDisk>>();
 		
@@ -26,7 +28,7 @@ namespace mpc::disk
 		std::shared_ptr<Stores> stores;
 
 	public:
-		DiskController();
+		DiskController(mpc::Mpc& mpc);
 
 		void initDisks();
 		std::weak_ptr<Stores> getStores();

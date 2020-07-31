@@ -6,8 +6,8 @@ using namespace mpc::lcdgui::screens::window;
 using namespace moduru::lang;
 using namespace std;
 
-VeloEnvFilterScreen::VeloEnvFilterScreen(const int layerIndex) 
-	: ScreenComponent("velo-env-filter", layerIndex)
+VeloEnvFilterScreen::VeloEnvFilterScreen(mpc::Mpc& mpc, const int layerIndex) 
+	: ScreenComponent(mpc, "velo-env-filter", layerIndex)
 {
 	addChild(make_shared<EnvGraph>());
 }

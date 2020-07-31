@@ -12,7 +12,7 @@ namespace mpc::lcdgui::screens::dialog
 		void turnWheel(int i) override;
 		void function(int i) override;
 
-		DeleteTrackScreen(const int layerIndex);
+		DeleteTrackScreen(mpc::Mpc& mpc, const int layerIndex);
 
 		void open() override;
 

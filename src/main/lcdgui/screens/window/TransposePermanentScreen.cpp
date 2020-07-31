@@ -9,19 +9,19 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;
 using namespace std;
 
-TransposePermanentScreen::TransposePermanentScreen(const int layerIndex)
-	: ScreenComponent("transpose-permanent", layerIndex)
+TransposePermanentScreen::TransposePermanentScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "transpose-permanent", layerIndex)
 {
 }
 
 void TransposePermanentScreen::function(int i)
 {
-	BaseControls::function(i); // For closing this window
+	baseControls->function(i); // For closing this window
 	
 	switch (i)
 	{
 	case 4:
-		auto transScreen = dynamic_pointer_cast<TransScreen>(Screens::getScreenComponent("trans"));
+		auto transScreen = dynamic_pointer_cast<TransScreen>(mpc.screens->getScreenComponent("trans"));
 		auto all = transScreen->tr == -1;
 
 		vector<int> tracks;

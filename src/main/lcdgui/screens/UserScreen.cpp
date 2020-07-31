@@ -14,8 +14,8 @@ using namespace mpc::lcdgui::screens;
 using namespace moduru::lang;
 using namespace std;
 
-UserScreen::UserScreen(const int layerIndex) 
-	: ScreenComponent("user", layerIndex)
+UserScreen::UserScreen(mpc::Mpc& mpc, const int layerIndex) 
+	: ScreenComponent(mpc, "user", layerIndex)
 {
 	resetPreferences();
 }
@@ -44,7 +44,7 @@ void UserScreen::function(int i)
 		case 1:
 		case 2:
 		{
-			auto eventsScreen = dynamic_pointer_cast<EventsScreen>(Screens::getScreenComponent("events"));
+			auto eventsScreen = dynamic_pointer_cast<EventsScreen>(mpc.screens->getScreenComponent("events"));
 			eventsScreen->tab = i;
 			ls.lock()->openScreen(eventsScreen->tabNames[eventsScreen->tab]);
 			break;

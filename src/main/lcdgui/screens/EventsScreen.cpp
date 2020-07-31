@@ -18,8 +18,8 @@ using namespace mpc::sequencer;
 using namespace moduru::lang;
 using namespace std;
 
-EventsScreen::EventsScreen(const int layerIndex)
-	: ScreenComponent("events", layerIndex)
+EventsScreen::EventsScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "events", layerIndex)
 {
 }
 
@@ -51,7 +51,7 @@ void EventsScreen::open()
 
 	if (!seq->isUsed())
 	{
-		auto userScreen = dynamic_pointer_cast<UserScreen>(Screens::getScreenComponent("user"));
+		auto userScreen = dynamic_pointer_cast<UserScreen>(mpc.screens->getScreenComponent("user"));
 		seq->init(userScreen->lastBar);
 	}
 

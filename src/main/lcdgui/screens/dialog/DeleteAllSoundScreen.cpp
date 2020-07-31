@@ -3,8 +3,8 @@
 using namespace mpc::lcdgui::screens::dialog;
 using namespace std;
 
-DeleteAllSoundScreen::DeleteAllSoundScreen(const int layerIndex)
-	: ScreenComponent("delete-all-sound", layerIndex)
+DeleteAllSoundScreen::DeleteAllSoundScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "delete-all-sound", layerIndex)
 {
 }
 

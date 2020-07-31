@@ -41,11 +41,12 @@ using namespace mpc::file::aps;
 using namespace moduru::lang;
 using namespace std;
 
-ApsLoader::ApsLoader(mpc::disk::MpcFile* file) 
+ApsLoader::ApsLoader(mpc::Mpc& mpc, mpc::disk::MpcFile* file)
+	: mpc(mpc)
 {
 	this->file = file;
 
-	auto cantFindFileScreen = dynamic_pointer_cast<CantFindFileScreen>(Screens::getScreenComponent("cant-find-file"));
+	auto cantFindFileScreen = dynamic_pointer_cast<CantFindFileScreen>(mpc.screens->getScreenComponent("cant-find-file"));
 	cantFindFileScreen->skipAll = false;
 
 	loadThread = thread(&ApsLoader::static_load, this);
@@ -58,7 +59,7 @@ void ApsLoader::static_load(void* this_p)
 
 void ApsLoader::notFound(string soundFileName, string ext)
 {
-	auto cantFindFileScreen = dynamic_pointer_cast<CantFindFileScreen>(Screens::getScreenComponent("cant-find-file"));
+	auto cantFindFileScreen = dynamic_pointer_cast<CantFindFileScreen>(mpc.screens->getScreenComponent("cant-find-file"));
 	auto skipAll = cantFindFileScreen->skipAll;
 
 	if (!skipAll)
@@ -78,9 +79,9 @@ void ApsLoader::notFound(string soundFileName, string ext)
 
 void ApsLoader::load()
 {
-	auto disk = Mpc::instance().getDisk().lock();
+	auto disk = mpc.getDisk().lock();
 	disk->setBusy(true);
-	ApsParser apsParser(file);
+	ApsParser apsParser(mpc, file);
 
 	if (!apsParser.isHeaderValid())
 	{
@@ -217,7 +218,7 @@ void ApsLoader::load()
 		drum->setReceiveMidiVolume(apsParser.getDrumConfiguration(i)->getReceiveMidiVolume());
 	}
 
-	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(Screens::getScreenComponent("mixer-setup"));
+	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(mpc.screens->getScreenComponent("mixer-setup"));
 
 	mixerSetupScreen->setRecordMixChangesEnabled(apsParser.getGlobalParameters()->isRecordMixChangesEnabled());
 	mixerSetupScreen->setCopyPgmMixToDrumEnabled(apsParser.getGlobalParameters()->isCopyPgmMixToDrumEnabled());
@@ -225,7 +226,7 @@ void ApsLoader::load()
 	mixerSetupScreen->setIndivFxSourceDrum(apsParser.getGlobalParameters()->isIndivFxSourceDrum());
 	mixerSetupScreen->setStereoMixSourceDrum(apsParser.getGlobalParameters()->isStereoMixSourceDrum());
 
-	auto drumScreen = dynamic_pointer_cast<DrumScreen>(Screens::getScreenComponent("drum"));
+	auto drumScreen = dynamic_pointer_cast<DrumScreen>(mpc.screens->getScreenComponent("drum"));
 
 	drumScreen->setPadToIntSound(apsParser.getGlobalParameters()->isPadToIntSoundEnabled());
 	
@@ -237,7 +238,7 @@ void ApsLoader::load()
 
 void ApsLoader::loadSound(string soundFileName, string ext, mpc::disk::MpcFile* soundFile, bool replace, int loadSoundIndex)
 {
-	auto sl = mpc::disk::SoundLoader(Mpc::instance().getSampler().lock()->getSounds(), replace);
+	auto sl = mpc::disk::SoundLoader(mpc, mpc.getSampler().lock()->getSounds(), replace);
 	sl.setPartOfProgram(true);
 	showPopup(soundFileName, ext, soundFile->length());
 	sl.loadSound(soundFile);
@@ -246,7 +247,7 @@ void ApsLoader::loadSound(string soundFileName, string ext, mpc::disk::MpcFile* 
 void ApsLoader::showPopup(string name, string ext, int sampleSize)
 {
 	Mpc::instance().getLayeredScreen().lock()->openScreen("popup");
-	auto popupScreen = dynamic_pointer_cast<PopupScreen>(Screens::getScreenComponent("popup"));
+	auto popupScreen = dynamic_pointer_cast<PopupScreen>(mpc.screens->getScreenComponent("popup"));
 	popupScreen->setText("LOADING " + StrUtil::toUpper(StrUtil::padRight(name, " ", 16) + "." + ext));
 
 	if (dynamic_pointer_cast<mpc::disk::StdDisk>(Mpc::instance().getDisk().lock()))

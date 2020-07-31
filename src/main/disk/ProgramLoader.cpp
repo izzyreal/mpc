@@ -27,12 +27,13 @@ using namespace mpc::lcdgui::screens::dialog2;
 using namespace moduru::lang;
 using namespace std;
 
-ProgramLoader::ProgramLoader(MpcFile* file, bool replace)
+ProgramLoader::ProgramLoader(mpc::Mpc& mpc, MpcFile* file, bool replace)
+	: mpc(mpc)
 {
 	this->file = file;
 	this->replace = replace;
 
-	auto cantFindFileScreen = dynamic_pointer_cast<CantFindFileScreen>(Screens::getScreenComponent("cant-find-file"));
+	auto cantFindFileScreen = dynamic_pointer_cast<CantFindFileScreen>(mpc.screens->getScreenComponent("cant-find-file"));
 	cantFindFileScreen->skipAll = false;
 
 	loadProgramThread = thread(&ProgramLoader::static_loadProgram, this);
@@ -127,7 +128,7 @@ void ProgramLoader::loadProgram()
 void ProgramLoader::loadSound(string soundFileName, string ext, MpcFile* soundFile, vector<int>* soundsDestIndex, bool replace, int loadSoundIndex)
 {
 	int addedSoundIndex = -1;
-	auto sl = SoundLoader(Mpc::instance().getSampler().lock()->getSounds(), replace);
+	auto sl = SoundLoader(mpc, mpc.getSampler().lock()->getSounds(), replace);
 	sl.setPartOfProgram(true);
 
 	try
@@ -150,7 +151,7 @@ void ProgramLoader::loadSound(string soundFileName, string ext, MpcFile* soundFi
 void ProgramLoader::showPopup(string name, string ext, int sampleSize)
 {
 	Mpc::instance().getLayeredScreen().lock()->openScreen("popup");
-	auto popupScreen = dynamic_pointer_cast<PopupScreen>(Screens::getScreenComponent("popup"));
+	auto popupScreen = dynamic_pointer_cast<PopupScreen>(mpc.screens->getScreenComponent("popup"));
 	popupScreen->setText("LOADING " + StrUtil::toUpper(StrUtil::padRight(name, " ", 16) + "." + ext));
 
 	auto sleepTime = sampleSize / 800;
@@ -165,7 +166,7 @@ void ProgramLoader::showPopup(string name, string ext, int sampleSize)
 
 void ProgramLoader::notfound(string soundFileName, string ext)
 {
-	auto cantFindFileScreen = dynamic_pointer_cast<CantFindFileScreen>(Screens::getScreenComponent("cant-find-file"));
+	auto cantFindFileScreen = dynamic_pointer_cast<CantFindFileScreen>(mpc.screens->getScreenComponent("cant-find-file"));
 	auto skipAll = cantFindFileScreen->skipAll;
 
 	if (!skipAll)

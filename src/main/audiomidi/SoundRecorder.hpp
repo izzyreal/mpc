@@ -19,6 +19,8 @@ using namespace ctoot::audio::core;
 * A SoundRecorder always records at 44.1KHz, like the real MPC2000XL.
 */
 
+namespace mpc { class Mpc; }
+
 namespace mpc::audiomidi
 {
 	class SoundRecorder
@@ -27,6 +29,7 @@ namespace mpc::audiomidi
 	{
 
 	private:
+		mpc::Mpc& mpc;
 		bool recording = false;
 		bool sampleScreenWasActive = false;
 		int recordedFrameCount = 0;
@@ -64,6 +67,8 @@ namespace mpc::audiomidi
 		void setInputGain(unsigned int);
 		void setArmed(bool b);
 		bool isArmed();
+
+		SoundRecorder(mpc::Mpc& mpc);
 
 	};
 }

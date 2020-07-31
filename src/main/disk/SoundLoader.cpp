@@ -20,12 +20,14 @@ using namespace mpc::lcdgui::screens::dialog2;
 using namespace moduru::lang;
 using namespace std;
 
-SoundLoader::SoundLoader()
+SoundLoader::SoundLoader(mpc::Mpc& mpc)
+	: mpc(mpc)
 {
 }
 float SoundLoader::rateToTuneBase = (float)(pow(2, (1.0 / 12.0)));
 
-SoundLoader::SoundLoader(vector<weak_ptr<mpc::sampler::Sound>> sounds, bool replace)
+SoundLoader::SoundLoader(mpc::Mpc& mpc, vector<weak_ptr<mpc::sampler::Sound>> sounds, bool replace)
+	: mpc(mpc)
 {
 	
 	this->replace = replace;
@@ -67,7 +69,7 @@ int SoundLoader::loadSound(MpcFile* f)
 	if (!partOfProgram && existingSoundIndex == -1)
 	{
 		Mpc::instance().getLayeredScreen().lock()->openScreen("popup");
-		auto popupScreen = dynamic_pointer_cast<PopupScreen>(Screens::getScreenComponent("popup"));
+		auto popupScreen = dynamic_pointer_cast<PopupScreen>(mpc.screens->getScreenComponent("popup"));
 		popupScreen->setText("LOADING " + StrUtil::padRight(soundFileName, " ", 16) + "." + extension);
 	}
 

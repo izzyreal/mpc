@@ -6,8 +6,8 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
-ChangeBarsScreen::ChangeBarsScreen(const int layerIndex)
-	: ScreenComponent("change-bars", layerIndex)
+ChangeBarsScreen::ChangeBarsScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "change-bars", layerIndex)
 {
 }
 
@@ -21,7 +21,7 @@ void ChangeBarsScreen::open()
 
 void ChangeBarsScreen::function(int i)
 {
-    BaseControls::function(i);
+    baseControls->function(i);
 	auto seq = sequencer.lock()->getActiveSequence().lock();
 
 	switch (i)

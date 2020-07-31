@@ -5,8 +5,8 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
-ProgramScreen::ProgramScreen(const int layerIndex) 
-	: ScreenComponent("program", layerIndex)
+ProgramScreen::ProgramScreen(mpc::Mpc& mpc, const int layerIndex) 
+	: ScreenComponent(mpc, "program", layerIndex)
 {
 }
 
@@ -23,7 +23,7 @@ void ProgramScreen::turnWheel(int i)
 
 	if (param.compare("programname") == 0)
 	{
-		auto nameScreen = dynamic_pointer_cast<NameScreen>(Screens::getScreenComponent("name"));
+		auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
 		nameScreen->setName(program.lock()->getName());
 		nameScreen->parameterName = param;
         ls.lock()->openScreen("name");
@@ -36,7 +36,7 @@ void ProgramScreen::turnWheel(int i)
 
 void ProgramScreen::function(int i)
 {
-	BaseControls::function(i);
+	baseControls->function(i);
 
 	switch (i)
 	{

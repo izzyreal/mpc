@@ -99,7 +99,8 @@ using namespace ctoot::audio::mixer;
 
 using namespace std;
 
-AudioMidiServices::AudioMidiServices()
+AudioMidiServices::AudioMidiServices(mpc::Mpc& mpc)
+	: mpc(mpc)
 {
 	frameSeq = make_shared<mpc::sequencer::FrameSeq>();
 	AudioServices::scan();
@@ -114,7 +115,7 @@ void AudioMidiServices::start(const int sampleRate, const int inputCount, const 
 	server = make_shared<ExternalAudioServer>();
 	offlineServer = make_shared<NonRealTimeAudioServer>(server);
 
-	soundRecorder = make_shared<SoundRecorder>();
+	soundRecorder = make_shared<SoundRecorder>(mpc);
 	soundPlayer = make_shared<SoundPlayer>();
 
 	setupMixer();
@@ -137,7 +138,7 @@ void AudioMidiServices::start(const int sampleRate, const int inputCount, const 
 		inputProcesses[i] = shared_ptr<IOAudioProcess>(server->openAudioInput(getInputNames()[i], "mpc_in" + to_string(i)));
 		// For now we assume there is only 1 stereo input pair max
 		if (i == 0)
-			monitorInputAdapter = make_shared<MonitorInputAdapter>(inputProcesses[i].get());
+			monitorInputAdapter = make_shared<MonitorInputAdapter>(mpc, inputProcesses[i].get());
 	}
 
 	for (int i = 0; i < outputProcesses.size(); i++)
@@ -309,7 +310,7 @@ void AudioMidiServices::createSynth()
 	synthRackControls->setSynthControls(0, msc);
 	mms = dynamic_pointer_cast<ctoot::mpc::MpcMultiMidiSynth>(synthRack->getMidiSynth(0).lock());
 
-	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(Screens::getScreenComponent("mixer-setup"));
+	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(mpc.screens->getScreenComponent("mixer-setup"));
 
 	for (int i = 0; i < 4; i++)
 	{

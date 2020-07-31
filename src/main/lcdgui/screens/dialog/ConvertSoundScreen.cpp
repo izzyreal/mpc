@@ -4,8 +4,8 @@ using namespace mpc::lcdgui::screens::dialog;
 using namespace moduru::lang;
 using namespace std;
 
-ConvertSoundScreen::ConvertSoundScreen(const int layerIndex) 
-	: ScreenComponent("convert-sound", layerIndex)
+ConvertSoundScreen::ConvertSoundScreen(mpc::Mpc& mpc, const int layerIndex) 
+	: ScreenComponent(mpc, "convert-sound", layerIndex)
 {
 }
 

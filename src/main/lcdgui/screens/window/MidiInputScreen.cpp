@@ -3,8 +3,8 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
-MidiInputScreen::MidiInputScreen(const int layerIndex)
-	: ScreenComponent("midi-input", layerIndex)
+MidiInputScreen::MidiInputScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "midi-input", layerIndex)
 {
 }
 
@@ -20,7 +20,7 @@ void MidiInputScreen::open()
 
 void MidiInputScreen::function(int i)
 {
-	BaseControls::function(i);
+	baseControls->function(i);
 
 	switch (i)
 	{

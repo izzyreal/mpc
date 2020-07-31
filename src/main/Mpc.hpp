@@ -41,6 +41,7 @@ namespace mpc::controls
 
 namespace mpc::lcdgui
 {
+	class Screens;
 	class LayeredScreen;
 }
 
@@ -75,24 +76,16 @@ namespace mpc
 		}
 
 	private:
-		std::thread loadSoundThread{};
-		std::unique_ptr<mpc::disk::ProgramLoader> programLoader{};
-
-	private:
+		std::thread loadSoundThread;
+		std::unique_ptr<mpc::disk::ProgramLoader> programLoader;
 		std::shared_ptr<lcdgui::LayeredScreen> layeredScreen;
 		std::shared_ptr<controls::Controls> controls;
-
-	private:
 		std::shared_ptr<audiomidi::EventHandler> eventHandler;
 		std::shared_ptr<sequencer::Sequencer> sequencer;
 		std::shared_ptr<sampler::Sampler> sampler;
 		std::shared_ptr<audiomidi::AudioMidiServices> audioMidiServices;
 		std::vector<audiomidi::MpcMidiInput*> mpcMidiInputs;
-
-	private:
 		std::unique_ptr<mpc::disk::DiskController> diskController;
-
-	private:
 		std::shared_ptr<hardware::Hardware> hardware;
 		int bank = 0;
 		int pad = 0;
@@ -104,6 +97,8 @@ namespace mpc
 		std::string previousSamplerScreenName = "";
 
 	public:
+		std::shared_ptr<mpc::lcdgui::Screens> screens;
+
 		void init(const int sampleRate, const int inputCount, const int outputCount);
 		void setBank(int i);
 		int getBank();

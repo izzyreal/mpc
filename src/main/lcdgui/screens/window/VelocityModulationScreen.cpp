@@ -6,8 +6,8 @@ using namespace mpc::lcdgui::screens::window;
 using namespace moduru::lang;
 using namespace std;
 
-VelocityModulationScreen::VelocityModulationScreen(const int layerIndex)
-	: ScreenComponent("velocity-modulation", layerIndex)
+VelocityModulationScreen::VelocityModulationScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "velocity-modulation", layerIndex)
 {
 }
 

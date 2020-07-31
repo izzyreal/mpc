@@ -6,7 +6,8 @@
 namespace mpc::lcdgui::screens {
 
 	class PgmParamsScreen
-		: public mpc::lcdgui::ScreenComponent, public mpc::controls::BaseSamplerControls
+		: public mpc::lcdgui::ScreenComponent
+		//public mpc::controls::BaseSamplerControls
 	{
 
 	public:
@@ -15,7 +16,7 @@ namespace mpc::lcdgui::screens {
 		void turnWheel(int i) override;
 		void openWindow() override;
 
-		PgmParamsScreen(const int layerIndex);
+		PgmParamsScreen(mpc::Mpc& mpc, const int layerIndex);
 		
 		void open() override;
 		void close() override;

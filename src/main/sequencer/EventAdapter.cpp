@@ -18,7 +18,8 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 using namespace std;
 
-EventAdapter::EventAdapter(weak_ptr<Sequencer> sequencer)
+EventAdapter::EventAdapter(mpc::Mpc& mpc, weak_ptr<Sequencer> sequencer)
+	: mpc(mpc)
 {
 	this->sequencer = sequencer;
 	midiClockEvent = make_shared<MidiClockEvent>(0);
@@ -40,7 +41,7 @@ weak_ptr<Event> EventAdapter::convert(ctoot::midi::core::ShortMessage* msg)
 		return midiClockEvent;
 	}
 
-	auto midiInputScreen = dynamic_pointer_cast<MidiInputScreen>(Screens::getScreenComponent("midi-input"));
+	auto midiInputScreen = dynamic_pointer_cast<MidiInputScreen>(mpc.screens->getScreenComponent("midi-input"));
 
 	if (midiInputScreen->getReceiveCh() != -1 && !(msg->getChannel() == midiInputScreen->getReceiveCh()))
 	{
@@ -63,7 +64,7 @@ weak_ptr<Event> EventAdapter::convert(ctoot::midi::core::ShortMessage* msg)
 
 		auto track = sequencer.lock()->getActiveTrackIndex();
 		
-		auto screen = dynamic_pointer_cast<MultiRecordingSetupScreen>(Screens::getScreenComponent("multi-recording-setup"));
+		auto screen = dynamic_pointer_cast<MultiRecordingSetupScreen>(mpc.screens->getScreenComponent("multi-recording-setup"));
 		auto mrs = screen->getMrsLines();
 
 		if (sequencer.lock()->isRecordingModeMulti())

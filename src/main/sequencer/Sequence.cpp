@@ -22,7 +22,8 @@ using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::sequencer;
 using namespace std;
 
-Sequence::Sequence(vector<string> defaultTrackNames)
+Sequence::Sequence(mpc::Mpc& mpc, vector<string> defaultTrackNames)
+	: mpc(mpc)
 {
 	this->defaultTrackNames = defaultTrackNames;
 	barLengths = vector<int>(999);
@@ -38,13 +39,13 @@ Sequence::Sequence(vector<string> defaultTrackNames)
 
 	for (int i = 0; i < 64; i++)
 	{
-		tracks.push_back(make_shared<Track>(this, i));
+		tracks.push_back(make_shared<Track>(mpc, this, i));
 		tracks[i]->setName(defaultTrackNames[i]);
 	}
 
-	metaTracks.push_back(make_shared<Track>(this, 64));
-	metaTracks.push_back(make_shared<Track>(this, 65));
-	metaTracks.push_back(make_shared<Track>(this, 66));
+	metaTracks.push_back(make_shared<Track>(mpc, this, 64));
+	metaTracks.push_back(make_shared<Track>(mpc, this, 65));
+	metaTracks.push_back(make_shared<Track>(mpc, this, 66));
 	metaTracks[0]->setUsed(true);
 	metaTracks[1]->setUsed(true);
 	metaTracks[2]->setUsed(true);
@@ -53,7 +54,7 @@ Sequence::Sequence(vector<string> defaultTrackNames)
 	metaTracks[2]->setName("tempo");
 	deviceNames = vector<string>(33);
 
-	auto userScreen = dynamic_pointer_cast<UserScreen>(Screens::getScreenComponent("user"));
+	auto userScreen = dynamic_pointer_cast<UserScreen>(mpc.screens->getScreenComponent("user"));
 
 	for (int i = 0; i < 33; i++)
 	{
@@ -184,8 +185,8 @@ void Sequence::createClickTrack()
 	auto den = 0;
 	auto denTicks = 0;
 
-	auto countMetronomeScreen = dynamic_pointer_cast<CountMetronomeScreen>(Screens::getScreenComponent("count-metronome"));
-	auto metronomeSoundScreen = dynamic_pointer_cast<MetronomeSoundScreen>(Screens::getScreenComponent("metronome-sound"));
+	auto countMetronomeScreen = dynamic_pointer_cast<CountMetronomeScreen>(mpc.screens->getScreenComponent("count-metronome"));
+	auto metronomeSoundScreen = dynamic_pointer_cast<MetronomeSoundScreen>(mpc.screens->getScreenComponent("metronome-sound"));
 
 	for (int i = 0; i < bars; i++)
 	{
@@ -332,7 +333,7 @@ void Sequence::init(int lastBarIndex)
 {
 	used = true;
 
-	auto userScreen = dynamic_pointer_cast<UserScreen>(Screens::getScreenComponent("user"));
+	auto userScreen = dynamic_pointer_cast<UserScreen>(mpc.screens->getScreenComponent("user"));
 	initialTempo = userScreen->tempo;
 	loopEnabled = userScreen->loop;
 
@@ -486,7 +487,7 @@ void Sequence::purgeAllTracks()
 
 weak_ptr<Track> Sequence::purgeTrack(int i)
 {
-	tracks[i] = make_shared<Track>(this, i);
+	tracks[i] = make_shared<Track>(mpc, this, i);
 	tracks[i]->setName(defaultTrackNames[i]);
 	return tracks[i];
 }

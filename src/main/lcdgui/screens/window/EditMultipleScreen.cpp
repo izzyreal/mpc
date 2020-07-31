@@ -19,8 +19,8 @@ using namespace mpc::sequencer;
 using namespace moduru::lang;
 using namespace std;
 
-EditMultipleScreen::EditMultipleScreen(const int layerIndex)
-	: ScreenComponent("edit-multiple", layerIndex)
+EditMultipleScreen::EditMultipleScreen(mpc::Mpc& mpc, const int layerIndex)
+	: ScreenComponent(mpc, "edit-multiple", layerIndex)
 {
 }
 
@@ -32,8 +32,8 @@ void EditMultipleScreen::open()
 
 void EditMultipleScreen::function(int i)
 {
-	BaseControls::function(i);
-	auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(Screens::getScreenComponent("step-editor"));
+	baseControls->function(i);
+	auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(mpc.screens->getScreenComponent("step-editor"));
 
 	auto selectedEvent = stepEditorScreen->getSelectedEvent();
 	string paramLetter = stepEditorScreen->getSelectedParameterLetter();
@@ -132,7 +132,7 @@ void EditMultipleScreen::turnWheel(int i)
 {
 	init();
 
-	auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(Screens::getScreenComponent("step-editor"));
+	auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(mpc.screens->getScreenComponent("step-editor"));
 	auto event = stepEditorScreen->getSelectedEvent();
 
 	string paramLetter = stepEditorScreen->getSelectedParameterLetter();
@@ -189,7 +189,7 @@ void EditMultipleScreen::turnWheel(int i)
 
 void EditMultipleScreen::checkThreeParameters()
 {
-	auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(Screens::getScreenComponent("step-editor"));
+	auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(mpc.screens->getScreenComponent("step-editor"));
 
 	for (auto& event : stepEditorScreen->getSelectedEvents())
 	{
@@ -215,7 +215,7 @@ void EditMultipleScreen::checkThreeParameters()
 
 void EditMultipleScreen::checkFiveParameters()
 {
-	auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(Screens::getScreenComponent("step-editor"));
+	auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(mpc.screens->getScreenComponent("step-editor"));
 	for (auto& event : stepEditorScreen->getSelectedEvents())
 	{
 
@@ -245,7 +245,7 @@ void EditMultipleScreen::checkFiveParameters()
 
 void EditMultipleScreen::checkNotes()
 {
-	auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(Screens::getScreenComponent("step-editor"));
+	auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(mpc.screens->getScreenComponent("step-editor"));
 	for (auto& event : stepEditorScreen->getSelectedEvents()) {
 		auto note = dynamic_pointer_cast<NoteEvent>(event.lock());
 		if (note) {
@@ -268,7 +268,7 @@ void EditMultipleScreen::updateEditMultiple()
 {
 	init();
 
-	auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(Screens::getScreenComponent("step-editor"));
+	auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(mpc.screens->getScreenComponent("step-editor"));
 	auto event = stepEditorScreen->getSelectedEvent().lock();
 	auto letter = stepEditorScreen->getSelectedParameterLetter();
 
@@ -404,7 +404,7 @@ void EditMultipleScreen::updateEditMultiple()
 
 void EditMultipleScreen::updateDouble()
 {
-	auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(Screens::getScreenComponent("step-editor"));
+	auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(mpc.screens->getScreenComponent("step-editor"));
 
 	findLabel("value0").lock()->Hide(false);
 	findLabel("value1").lock()->Hide(false);

@@ -4,6 +4,8 @@
 
 #include <memory>
 
+namespace mpc { class Mpc; }
+
 namespace mpc::sequencer {
 	class Track;
 	class TimeSignature;
@@ -17,6 +19,7 @@ namespace mpc::sequencer {
 	{
 
 	private:
+		mpc::Mpc& mpc;
 		double initialTempo = 120.0;
 
 		std::vector<std::shared_ptr<Track>> tracks;
@@ -116,7 +119,7 @@ namespace mpc::sequencer {
 		void resetTrackEventIndices(int tick);
 
 	public:
-		Sequence(std::vector<std::string> defaultTrackNames);
+		Sequence(mpc::Mpc& mpc, std::vector<std::string> defaultTrackNames);
 
 	};
 }

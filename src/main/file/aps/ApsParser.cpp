@@ -15,7 +15,7 @@ using namespace moduru;
 using namespace mpc::file::aps;
 using namespace std;
 
-ApsParser::ApsParser(mpc::disk::MpcFile* file)
+ApsParser::ApsParser(mpc::Mpc& mpc, mpc::disk::MpcFile* file)
 {
 	auto loadBytes = file->getBytes();
 	header = make_unique<ApsHeader>(VecUtil::CopyOfRange(&loadBytes, HEADER_OFFSET, HEADER_OFFSET + HEADER_LENGTH));
@@ -26,7 +26,7 @@ ApsParser::ApsParser(mpc::disk::MpcFile* file)
 	auto const nameOffset = soundNamesEnd + PAD_LENGTH1;
 	apsName = make_unique<ApsName>(VecUtil::CopyOfRange(&loadBytes, nameOffset, nameEnd));
 	auto const parametersEnd = nameEnd + PARAMETERS_LENGTH;
-	globalParameters = make_unique<ApsGlobalParameters>(VecUtil::CopyOfRange(&loadBytes, nameEnd, parametersEnd));
+	globalParameters = make_unique<ApsGlobalParameters>(mpc, VecUtil::CopyOfRange(&loadBytes, nameEnd, parametersEnd));
 	auto const maTableEnd = parametersEnd + TABLE_LENGTH;
 	maTable = make_unique<ApsAssignTable>(VecUtil::CopyOfRange(&loadBytes, parametersEnd, maTableEnd));
 	int const drum1MixerOffset = maTableEnd + PAD_LENGTH2;
@@ -43,7 +43,7 @@ ApsParser::ApsParser(mpc::disk::MpcFile* file)
 	}
 }
 
-ApsParser::ApsParser(string apsNameString)
+ApsParser::ApsParser(mpc::Mpc& mpc, string apsNameString)
 {
 	auto sampler = Mpc::instance().getSampler().lock();
 	vector<vector<char>> chunks;
@@ -56,7 +56,7 @@ ApsParser::ApsParser(string apsNameString)
 	chunks.push_back(vector<char>{ 24, 0 });
 	auto apsName = ApsName(apsNameString);
 	chunks.push_back(apsName.getBytes());
-	auto parameters = ApsGlobalParameters();
+	auto parameters = ApsGlobalParameters(mpc);
 	chunks.push_back(parameters.getBytes());
 	auto masterTable = ApsAssignTable(*sampler->getMasterPadAssign());
 	chunks.push_back(masterTable.getBytes());

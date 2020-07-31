@@ -8,6 +8,8 @@
 
 #include <memory>
 
+namespace mpc { class Mpc; }
+
 namespace mpc::sequencer {
 
 	class Track
@@ -15,6 +17,7 @@ namespace mpc::sequencer {
 	{
 
 	private:
+		mpc::Mpc& mpc;
 		static const int MAX_TICK{ 2147483647 };
 
 		std::vector<std::shared_ptr<Event>> events;
@@ -124,7 +127,7 @@ namespace mpc::sequencer {
 		std::string getActualName();
 
 	public:
-		Track(mpc::sequencer::Sequence* parent, int i);
+		Track(mpc::Mpc& mpc, mpc::sequencer::Sequence* parent, int i);
 		~Track();
 
 	private:
