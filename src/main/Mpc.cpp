@@ -158,8 +158,8 @@ weak_ptr<lcdgui::LayeredScreen> Mpc::getLayeredScreen() {
 	return layeredScreen;
 }
 
-controls::BaseControls* Mpc::getActiveControls() {
-	return dynamic_pointer_cast<mpc::controls::BaseControls>(layeredScreen->findScreenComponent().lock()).get();
+weak_ptr<lcdgui::ScreenComponent> Mpc::getActiveControls() {
+	return layeredScreen->findScreenComponent().lock();
 }
 
 controls::GlobalReleaseControls* Mpc::getReleaseControls() {

@@ -2,7 +2,7 @@
 
 #include <Mpc.hpp>
 
-#include <controls/BaseControls.hpp>
+#include <lcdgui/ScreenComponent.hpp>
 #include <controls/GlobalReleaseControls.hpp>
 
 using namespace mpc::hardware;
@@ -19,7 +19,7 @@ int HwPad::getIndex() {
 }
 
 void HwPad::push(int velo) {
-	auto c = mpc.getActiveControls();
+	auto c = mpc.getActiveControls().lock();
 	
 	if (!c) return;
 	

@@ -1,7 +1,7 @@
 #include "HwSlider.hpp"
 
 #include <Mpc.hpp>
-#include <controls/BaseControls.hpp>
+#include <lcdgui/ScreenComponent.hpp>
 
 using namespace mpc::hardware;
 using namespace std;
@@ -18,8 +18,9 @@ void Slider::setValue(int i) {
 	}
 
 	value = i;
-	if (mpc.getActiveControls() != nullptr) {
-		mpc.getActiveControls()->setSlider(value);
+	
+	if (mpc.getActiveControls().lock()) {
+		mpc.getActiveControls().lock()->setSlider(value);
 	}
 }
 

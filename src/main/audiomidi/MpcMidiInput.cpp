@@ -142,7 +142,7 @@ void MpcMidiInput::transport(ctoot::midi::core::MidiMessage* msg, int timeStamp)
 		auto s = lSequencer->isPlaying() ? lSequencer->getCurrentlyPlayingSequence().lock() : lSequencer->getActiveSequence().lock();
 		auto track = dynamic_pointer_cast<mpc::sequencer::Track>(s->getTrack(note->getTrack()).lock());
 		auto p = lSampler->getProgram(lSampler->getDrumBusProgramNumber(track->getBus())).lock();
-		auto controls = mpc.getActiveControls();
+		auto controls = mpc.getActiveControls().lock();
 
 		controls->setSliderNoteVar(note.get(), dynamic_pointer_cast<mpc::sampler::Program>(p));
 

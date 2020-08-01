@@ -43,6 +43,7 @@ namespace mpc::lcdgui
 {
 	class Screens;
 	class LayeredScreen;
+	class ScreenComponent;
 }
 
 namespace mpc::audiomidi
@@ -106,7 +107,7 @@ namespace mpc
 	public:
 		std::weak_ptr<lcdgui::LayeredScreen> getLayeredScreen();
 		std::weak_ptr<controls::Controls> getControls();
-		controls::BaseControls* getActiveControls();
+		std::weak_ptr<mpc::lcdgui::ScreenComponent> getActiveControls();
 		controls::GlobalReleaseControls* getReleaseControls();
 		std::weak_ptr<hardware::Hardware> getHardware();
 

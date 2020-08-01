@@ -261,7 +261,7 @@ void FrameSeq::repeatPad(int tick)
 
 	for (auto& i : *pp)
 	{
-		mpc.getActiveControls()->pad(i, (*controls->getPressedPadVelos())[i], true, tick);
+		mpc.getActiveControls().lock()->pad(i, (*controls->getPressedPadVelos())[i], true, tick);
 	}
 }
 

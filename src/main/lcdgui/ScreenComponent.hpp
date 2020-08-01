@@ -32,7 +32,8 @@ namespace mpc::lcdgui
 
 	public:
 		const int& getLayerIndex();
-
+		mpc::controls::BaseControls* getBaseControls() { if (baseControls) return baseControls.get(); return nullptr; }
+		
 	protected:
 		mpc::Mpc& mpc;
 		std::weak_ptr<mpc::sampler::Sampler> sampler;
@@ -108,6 +109,7 @@ namespace mpc::lcdgui
 		virtual bool isTypable() { return baseControls->isTypable(); }
 
 		int getSoundIncrement(int notch) { return baseControls->getSoundIncrement(notch); }
+		void setSliderNoteVar(mpc::sequencer::NoteEvent* n, std::weak_ptr<mpc::sampler::Program> program) { baseControls->setSliderNoteVar(n, program); }
 
 		virtual void pad(int i, int velo, bool repeat, int tick) { baseControls->pad(i, velo, repeat, tick); }
 
