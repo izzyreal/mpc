@@ -275,9 +275,7 @@ void Component::Draw(vector<vector<bool>>* pixels)
 	}
 
 	for (auto& c : children)
-	{
 		c->Draw(pixels);
-	}
 
 	dirty = false;
 }

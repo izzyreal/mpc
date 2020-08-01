@@ -3,6 +3,7 @@
 #include <lcdgui/screens/LoopScreen.hpp>
 #include <lcdgui/screens/TrimScreen.hpp>
 #include <lcdgui/screens/window/EditSoundScreen.hpp>
+#include <controls/BaseSamplerControls.hpp>
 
 #include <stdint.h>
 #include <limits.h>
@@ -10,12 +11,15 @@
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui;
+using namespace mpc::controls;
 using namespace moduru::lang;
 using namespace std;
 
 LoopScreen::LoopScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "loop", layerIndex)
 {
+	baseControls = make_shared<BaseSamplerControls>(mpc);
+
 	addChild(move(make_shared<TwoDots>()));
 	addChild(move(make_shared<Wave>()));
 	findWave().lock()->setFine(false);
@@ -26,7 +30,7 @@ LoopScreen::LoopScreen(mpc::Mpc& mpc, const int layerIndex)
 	twoDots->setVisible(2, false);
 	twoDots->setVisible(3, false);
 
-//	typableParams = vector<string>{ "to", "endlengthvalue" };
+	baseControls->typableParams = vector<string>{ "to", "endlengthvalue" };
 }
 
 void LoopScreen::open()

@@ -132,6 +132,11 @@ void TextComp::Draw(std::vector<std::vector<bool>>* pixels)
 		next = utf8_decode_next();
 	}
 	delete[] tempText;
+	
+
+	for (auto& c : children)
+		c->Draw(pixels);
+
 	dirty = false;
 }
 

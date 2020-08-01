@@ -17,6 +17,7 @@
 #include <stdexcept>
 
 using namespace mpc::lcdgui;
+using namespace moduru::lang;
 using namespace std;
 
 Field::Field(mpc::Mpc& mpc, const string& name, int x, int y, int width)
@@ -84,32 +85,6 @@ void Field::takeFocus(string prev)
 	csn = layeredScreen->getCurrentScreenName();
 	focus = true;
 	inverted = true;
-	/*
-	auto focusEvent = layeredScreen->getFocus();
-	auto focusField = layeredScreen->lookupField(focusEvent);
-	if (csn.compare("trim") == 0 || csn.compare("loop") == 0) {
-		if (focusEvent.compare("st") == 0 || focusEvent.compare("to") == 0) {
-			layeredScreen->getTwoDots().lock()->setSelected(0, true);
-		}
-		else if (focusEvent.compare("end") == 0 || focusEvent.compare("endlengthvalue") == 0) {
-			layeredScreen->getTwoDots().lock()->setSelected(1, true);
-		}
-	}
-	if (csn.compare("start-fine") == 0 || csn.compare("end-fine") == 0 || csn.compare("loop-to-fine") == 0 || csn.compare("loop-end-fine") == 0) {
-		if (focusEvent.compare("start") == 0) {
-			layeredScreen->getTwoDots().lock()->setSelected(2, true);
-		}
-		else if (focusEvent.compare("end") == 0) {
-			layeredScreen->getTwoDots().lock()->setSelected(2, true);
-		}
-		else if (focusEvent.compare("to") == 0) {
-			layeredScreen->getTwoDots().lock()->setSelected(2, true);
-		}
-		else if (focusEvent.compare("lngth") == 0) {
-			layeredScreen->getTwoDots().lock()->setSelected(3, true);
-		}
-	}
-	*/
 	SetDirty();
 }
 
@@ -117,35 +92,6 @@ void Field::loseFocus(string next)
 {
 	focus = false;
 	inverted = false;
-	/*
-	auto focusEvent = getName();
-	
-	auto layeredScreen = mpc.getLayeredScreen().lock();
-
-	csn = layeredScreen->getCurrentScreenName();
-	if (csn.compare("trim") == 0 || csn.compare("loop") == 0) {
-		if (focusEvent.compare("st") == 0 || focusEvent.compare("to") == 0) {
-			layeredScreen->getTwoDots().lock()->setSelected(0, false);
-		}
-		else if (focusEvent.compare("end") == 0 || focusEvent.compare("endlengthvalue") == 0) {
-			layeredScreen->getTwoDots().lock()->setSelected(1, false);
-		}
-	}
-	else if (csn.compare("start-fine") == 0 || csn.compare("end-fine") == 0 || csn.compare("loop-to-fine") == 0 || csn.compare("loop-end-fine") == 0) {
-		if (focusEvent.compare("start") == 0) {
-			layeredScreen->getTwoDots().lock()->setSelected(2, false);
-		}
-		else if (focusEvent.compare("end") == 0) {
-			layeredScreen->getTwoDots().lock()->setSelected(2, false);
-		}
-		else if (focusEvent.compare("to") == 0) {
-			layeredScreen->getTwoDots().lock()->setSelected(2, false);
-		}
-		else if (focusEvent.compare("lngth") == 0) {
-			layeredScreen->getTwoDots().lock()->setSelected(3, false);
-		}
-	}
-	*/
 	SetDirty();
 }
 
@@ -153,56 +99,38 @@ void Field::loseFocus(string next)
 void Field::setSplit(bool b)
 {
 	if (split == b)
-	{
 		return;
-	}
 	
 	split = b;
 	
 	if (split)
 	{
-		if (letters.size() != 0)
-		{
-			for (auto& l : letters)
-			{
-				delete l;
-			}
+		activeSplit = text.length() - 1;
+
+		for (int i = 0; i < text.length(); i++) {
+			auto field = parent->addChild(make_shared<Field>(mpc, "split" + to_string(i), x + (i * FONT_WIDTH) + 1, y + 1, 7)).lock();
+			dynamic_pointer_cast<Field>(field)->setText(text.substr(i, i + 1));
 		}
 
-		letters.clear();
-		letters = vector<Label*>(getText().length());
-		activeSplit = letters.size() - 1;
-		//auto x = getLocation())->x;
-		//auto y = npc(this->getLocation())->y;
-
-		for (int i = 0; i < letters.size(); i++) {
-			//letters[i] = new Label(GetGUI()->GetPlug());
-			//letters[i]->setFocusable(false);
-			//GetGUI()->AttachControl(letters[i]);
-		}
-		setText(getText());
+		oldText = text;
+		setText("");
 		redrawSplit();
-		//SetDirty(true);
 	}
-	else {
-		if (letters.size() == 0)
-			return;
+	else
+	{
+		for (int i = 0; i < oldText.length(); i++)
+			parent->removeChild(parent->findChild<Field>("split" + to_string(i)));
 
-		//for (int i = 0; i < letters.size(); i++)
-			//GetGUI()->DetachControl(letters[i]);
 		activeSplit = 0;
-		letters.clear();
-		//SetDirty(true);
+		setTextPadded(oldText);
 	}
 }
 
 void Field::redrawSplit()
 {
-	for (int i = 0; i < letters.size(); i++) {
-		//letters[i]->setForeground(i < activeSplit);
-		//letters[i]->setBackground(i < activeSplit ? mpc::maingui::Constants::LCD_ON() : mpc::maingui::Constants::LCD_OFF());
+	for (int i = 0; i < oldText.length(); i++) {
+		parent->findChild<Field>("split" + to_string(i)).lock()->setInverted(i < activeSplit);
 	}
-	//SetDirty(true);
 }
 
 bool Field::isSplit()
@@ -217,10 +145,11 @@ int Field::getActiveSplit()
 
 bool Field::setActiveSplit(int i)
 {
-	if (i < 1 || i + 1 > letters.size())
+	if (i < 1 || i + 1 > oldText.size())
 	{
 		return false;
 	}
+
 	activeSplit = i;
 	redrawSplit();
 	return true;
@@ -234,11 +163,8 @@ bool Field::enableTypeMode()
 	}
 
     typeModeEnabled = true;
-	//oldText = this->getText();
-    //setFont(mpc2000fontunderline);
-    //setFontColor(gui::Constants::LCD_ON);
-	//setTransparency(true);
-    setText("");
+	oldText = text;
+	setText("");
     return true;
 }
 
@@ -251,27 +177,32 @@ int Field::enter()
 		return value;
 	}
 
-    //setFont(mpc2000font);
-    //setFontColor(Constants::LCD_OFF);
-	//setTransparency(false);
     typeModeEnabled = false;
     
 	try
 	{
-	//	string valueString = getText();
-	//	value = stoi(valueString);
+		value = stoi(getText());
 	}
 	catch (std::invalid_argument& e)
 	{
 		printf("Field.enter ERROR: %s", e.what());
         return value;
     }
-    //setText(oldText.c_str());
+    setText(oldText);
     return value;
 }
 
 void Field::type(int i)
 {
+	auto textCopy = StrUtil::replaceAll(getText(), ' ', "");
+	
+	if (textCopy.length() == floor(w / FONT_WIDTH))
+	{
+		textCopy = "";
+	}
+
+	auto newText = textCopy.append(to_string(i));
+	setTextPadded(newText.c_str());
 }
 
 bool Field::isTypeModeEnabled()
@@ -282,14 +213,10 @@ bool Field::isTypeModeEnabled()
 void Field::disableTypeMode()
 {
 	if (!typeModeEnabled)
-	{
 		return;
-	}
 
     typeModeEnabled = false;
-    //setFontColor(Constants::LCD_OFF);
-	//setTransparency(false);
-    //setText(oldText.c_str());
+    setText(oldText.c_str());
 }
 
 void Field::setFocusable(bool b)
@@ -305,12 +232,4 @@ bool Field::isFocusable()
 bool Field::hasFocus()
 {
 	return focus;
-}
-
-Field::~Field()
-{
-	for (auto& l : letters)
-	{
-		delete l;
-	}
 }

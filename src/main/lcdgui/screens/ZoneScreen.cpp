@@ -3,18 +3,22 @@
 #include <lcdgui/screens/TrimScreen.hpp>
 #include <lcdgui/screens/window/NumberOfZonesScreen.hpp>
 #include <lcdgui/screens/window/EditSoundScreen.hpp>
+#include <controls/BaseSamplerControls.hpp>
 
 #include <sampler/Sampler.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::controls;
 using namespace moduru::lang;
 using namespace std;
 
 ZoneScreen::ZoneScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "zone", layerIndex)
 {
+	baseControls = make_shared<BaseSamplerControls>(mpc);
+
 	addChild(move(make_shared<TwoDots>()));
 	addChild(move(make_shared<Wave>()));
 	findWave().lock()->setFine(false);
@@ -24,7 +28,7 @@ ZoneScreen::ZoneScreen(mpc::Mpc& mpc, const int layerIndex)
 	findTwoDots().lock()->setVisible(2, false);
 	findTwoDots().lock()->setVisible(3, false);
 
-	//typableParams = vector<string>{ "st", "end" };
+	baseControls->typableParams = vector<string>{ "st", "end" };
 }
 
 void ZoneScreen::open()

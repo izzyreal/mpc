@@ -1,16 +1,20 @@
 #include "TrimScreen.hpp"
 
 #include <lcdgui/screens/window/EditSoundScreen.hpp>
+#include <controls/BaseSamplerControls.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::controls;
 using namespace moduru::lang;
 using namespace std;
 
 TrimScreen::TrimScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "trim", layerIndex)
 {
+	baseControls = make_shared<BaseSamplerControls>(mpc);
+
 	addChild(move(make_shared<TwoDots>()));
 	addChild(move(make_shared<Wave>()));
 	findWave().lock()->setFine(false);
@@ -21,7 +25,7 @@ TrimScreen::TrimScreen(mpc::Mpc& mpc, const int layerIndex)
 	twoDots->setVisible(2, false);
 	twoDots->setVisible(3, false);
 
-	//typableParams = vector<string>{ "st", "end" };
+	baseControls->typableParams = vector<string>{ "st", "end" };
 }
 
 void TrimScreen::open()
@@ -283,15 +287,14 @@ void TrimScreen::pressEnter()
 		return;
 	}
 	
-	auto lLs = ls.lock();
-	auto mtf = findField(param).lock();
+	auto field = findField(param).lock();
 	
-	if (!mtf->isTypeModeEnabled())
+	if (!field->isTypeModeEnabled())
 	{
 		return;
 	}
 
-	auto candidate = mtf->enter();
+	auto candidate = field->enter();
 	auto sound = sampler.lock()->getSound().lock();
 	auto const oldLength = sound->getEnd() - sound->getStart();
 	
@@ -305,10 +308,12 @@ void TrimScreen::pressEnter()
 			}
 
 			sound->setStart(candidate);
-			
+			displaySt();
+
 			if (smplLngthFix)
 			{
 				sound->setEnd(sound->getStart() + oldLength);
+				displayEnd();
 			}
 			displayWave();
 		}
@@ -320,10 +325,12 @@ void TrimScreen::pressEnter()
 			}
 
 			sound->setEnd(candidate);
+			displayEnd();
 			
 			if (smplLngthFix)
 			{
 				sound->setStart(sound->getEnd() - oldLength);
+				displaySt();
 			}
 			displayWave();
 		}

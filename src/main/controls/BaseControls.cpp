@@ -936,6 +936,7 @@ void BaseControls::splitLeft()
 
 	if (!controls->isShiftPressed())
 	{
+		mtf->setSplit(false);
 		BaseControls::left();
 		return;
 	}
@@ -945,13 +946,13 @@ void BaseControls::splitLeft()
 		return;
 	}
 
-	if (!mtf->isSplit())
+	if (mtf->isSplit())
 	{
-		mtf->setSplit(true);
+		mtf->setActiveSplit(mtf->getActiveSplit() - 1);
 	}
 	else
 	{
-		mtf->setActiveSplit(mtf->getActiveSplit() - 1);
+		mtf->setSplit(true);
 	}
 }
 
@@ -961,17 +962,17 @@ void BaseControls::splitRight()
 	auto mtf = ls.lock()->getFocusedLayer().lock()->findField(param).lock();
 	auto controls = mpc.getControls().lock();
 	
-	if (controls->isShiftPressed())
+	if (!controls->isShiftPressed())
 	{
-		if (splittable && mtf->isSplit())
-		{
-			if (!mtf->setActiveSplit(mtf->getActiveSplit() + 1))
-			{
-				mtf->setSplit(false);
-			}
-		}
-	}
-	else {
 		BaseControls::right();
+		return;
+	}
+	
+	if (splittable && mtf->isSplit())
+	{
+		if (!mtf->setActiveSplit(mtf->getActiveSplit() + 1))
+		{
+			mtf->setSplit(false);
+		}
 	}
 }

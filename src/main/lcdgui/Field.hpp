@@ -25,16 +25,15 @@ namespace mpc::lcdgui
 		mpc::Mpc& mpc;
 		// When hiding a field that is focused, we pass focus to nextFocus
 		std::string nextFocus = "_";
-		std::vector<Label*> letters;
 
-		bool focusable{ true };
-		bool focus{ false };
+		bool focusable = true;
+		bool focus = false;
 		std::string csn = "";
-		bool split{ false };
-		int activeSplit{ 0 };
-		bool typeModeEnabled{ false };
+		bool split = false;
+		int activeSplit = 0;
+		bool typeModeEnabled = false;
 		std::string oldText = "";
-		bool scrolling{ false };
+		bool scrolling = false;
 
 	public:
 		bool hasFocus();
@@ -59,8 +58,7 @@ namespace mpc::lcdgui
 		void Hide(bool b) override;
 
 	public:
-		Field(mpc::Mpc& mpc, const std::string& name, int x, int y, int columns);
-		~Field();
+		Field(mpc::Mpc& mpc, const std::string& name, int x, int y, int width);
 
 	};
 }
