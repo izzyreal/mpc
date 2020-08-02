@@ -100,7 +100,13 @@ void Field::loseFocus(string next)
 {
 	focus = false;
 	inverted = false;
-	setSplit(false);
+
+	if (typeModeEnabled)
+		disableTypeMode();
+
+	if (split)
+		setSplit(false);
+
 	SetDirty();
 }
 
