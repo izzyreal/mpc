@@ -244,12 +244,19 @@ weak_ptr<Program> Sampler::addProgram()
 	return weak_ptr<Program>();
 }
 
-void Sampler::deleteProgram(weak_ptr<Program> program)
+void Sampler::deleteProgram(weak_ptr<Program> _program)
 {
-	auto lProgram = program.lock();
+	auto program = _program.lock();
+	
+	for (auto& bus : mpc.getDrums())
+	{
+		if (programs[bus->getProgram()] == program)
+			bus->setProgram(0);
+	}
+
 	for (auto&& p : programs)
 	{
-		if (p == lProgram)
+		if (p == program)
 		{
 			p.reset();
 			break;

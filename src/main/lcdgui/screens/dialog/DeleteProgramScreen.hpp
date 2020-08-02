@@ -11,12 +11,13 @@ namespace mpc::lcdgui::screens::dialog
 		void turnWheel(int i) override;
 
 		DeleteProgramScreen(mpc::Mpc& mpc, const int layerIndex);
+		void open() override;
 
 	private:
-		int deletePgm = 0;
+		int pgm = 0;
 
 		void setDeletePgm(int i);
-		void displayDeletePgm();
+		void displayPgm();
 
 	};
 }
