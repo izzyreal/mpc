@@ -829,15 +829,17 @@ void Sampler::purge()
 {
 	auto usedSounds = getUsedSounds();
 
-	for (auto& s : sounds)
+	for (int i = 0; i < sounds.size(); i++)
 	{
-		const auto pos = find_if(begin(usedSounds), end(usedSounds), [&s](const weak_ptr<Sound>& sound) {
-			return sound.lock() == s;
+		auto maybeUsedSound = sounds[i];
+		const auto pos = find_if(begin(usedSounds), end(usedSounds), [&maybeUsedSound](const weak_ptr<Sound>& sound) {
+			return sound.lock() == maybeUsedSound;
 		});
 		
 		if (pos == usedSounds.end())
 		{
-			deleteSound(s);
+			deleteSound(maybeUsedSound);
+			i--;
 		}
 	}
 }
