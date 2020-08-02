@@ -64,7 +64,7 @@ void Field::Draw(std::vector<std::vector<bool>>* pixels)
 	{
 		Clear(pixels);
 		auto columns = (int) floor((w - 2) / FONT_WIDTH);
-		auto nonInvertedColumns = columns - (activeSplit - 1);
+		auto nonInvertedColumns = columns - activeSplit;
 		r.R = r.L + (w - (nonInvertedColumns * FONT_WIDTH));
 	}
 
@@ -114,7 +114,8 @@ void Field::setSplit(bool b)
 	
 	if (split)
 	{
-		activeSplit = text.length() - 1;
+		activeSplit = text.length() - 2;
+		MLOG("activeSplit now set to " + to_string(activeSplit));
 	}
 	else
 	{
@@ -135,7 +136,7 @@ int Field::getActiveSplit()
 
 bool Field::setActiveSplit(int i)
 {
-	if (i < 1 || i > text.size())
+	if (i < 0 || i > text.size() - 1)
 		return false;
 
 	activeSplit = i;

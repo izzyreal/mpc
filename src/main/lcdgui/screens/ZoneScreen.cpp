@@ -143,7 +143,7 @@ void ZoneScreen::turnWheel(int i)
 	
 	if (mtf->isSplit())
 	{
-		soundInc = i >= 0 ? splitInc[mtf->getActiveSplit() - 1] : -splitInc[mtf->getActiveSplit() - 1];
+		soundInc = i >= 0 ? splitInc[mtf->getActiveSplit()] : -splitInc[mtf->getActiveSplit()];
 	}
 	
 	if (param.compare("st") == 0)

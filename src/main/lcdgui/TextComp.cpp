@@ -130,7 +130,7 @@ void TextComp::Draw(std::vector<std::vector<bool>>* pixels)
 					(*pixels)[xpos][ypos] = inverted ? false : true;
 
 					if (field != nullptr && field->isSplit())
-						(*pixels)[xpos][ypos] = charCounter >= field->getActiveSplit();
+						(*pixels)[xpos][ypos] = charCounter > field->getActiveSplit();
 
 				}
 			}
@@ -228,7 +228,8 @@ void TextComp::setText(const string& s)
 
 void TextComp::setTextPadded(string s, string padding)
 {
-	string padded = StrUtil::padLeft(s, padding, ceil(float(w - 2) / float(6)));
+	auto columns = (int)floor(w / FONT_WIDTH);
+	string padded = StrUtil::padLeft(s, padding, columns);
 	setText(padded);
 }
 
