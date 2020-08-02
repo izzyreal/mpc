@@ -126,11 +126,11 @@ void ZoneScreen::turnWheel(int i)
 	}
 	
 	auto soundInc = getSoundIncrement(i);
-	auto mtf = findField(param).lock();
+	auto field = findField(param).lock();
 	
-	if (mtf->isSplit())
+	if (field->isSplit())
 	{
-		soundInc = i >= 0 ? splitInc[mtf->getActiveSplit()] : -splitInc[mtf->getActiveSplit()];
+		soundInc = i >= 0 ? splitInc[field->getActiveSplit()] : -splitInc[field->getActiveSplit()];
 	}
 	
 	if (param.compare("st") == 0)

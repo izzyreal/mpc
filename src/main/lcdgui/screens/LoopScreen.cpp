@@ -132,11 +132,11 @@ void LoopScreen::turnWheel(int i)
 	auto loopScreen = dynamic_pointer_cast<LoopScreen>(mpc.screens->getScreenComponent("loop"));
 	auto const loopFix = loopScreen->loopLngthFix;
 	
-	auto mtf = findField(param).lock();
+	auto field = findField(param).lock();
 	
-	if (mtf->isSplit())
+	if (field->isSplit())
 	{
-		soundInc = i >= 0 ? splitInc[mtf->getActiveSplit()] : -splitInc[mtf->getActiveSplit()];
+		soundInc = i >= 0 ? splitInc[field->getActiveSplit()] : -splitInc[field->getActiveSplit()];
 	}
 
 	if (param.compare("to") == 0)
@@ -297,15 +297,14 @@ void LoopScreen::pressEnter()
 		return;
 	}
 	
-	auto lLs = ls.lock();
-	auto mtf = findField(param).lock();
+	auto field = findField(param).lock();
 
-	if (!mtf->isTypeModeEnabled())
+	if (!field->isTypeModeEnabled())
 	{
 		return;
 	}
 
-	auto candidate = mtf->enter();
+	auto candidate = field->enter();
 	auto sound = sampler.lock()->getSound().lock();
 	auto loopScreen = dynamic_pointer_cast<LoopScreen>(mpc.screens->getScreenComponent("loop"));
 

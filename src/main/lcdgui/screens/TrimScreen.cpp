@@ -125,12 +125,12 @@ void TrimScreen::turnWheel(int i)
 	
 	//auto notch = getNotch(increment);
 	auto soundInc = getSoundIncrement(i);
-	auto mtf = findField(param).lock();
+	auto field = findField(param).lock();
 	
-	if (mtf->isSplit())
+	if (field->isSplit())
 	{
-		MLOG("activeSplit: " + to_string(mtf->getActiveSplit()));
-		soundInc = i >= 0 ? splitInc[mtf->getActiveSplit()] : -splitInc[mtf->getActiveSplit()];
+		MLOG("activeSplit: " + to_string(field->getActiveSplit()));
+		soundInc = i >= 0 ? splitInc[field->getActiveSplit()] : -splitInc[field->getActiveSplit()];
 	}
 
 	if (param.compare("st") == 0)

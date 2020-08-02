@@ -410,16 +410,16 @@ void BaseControls::numpad(int i)
 	
 	if (!controls->isShiftPressed())
 	{
-		auto mtf = ls.lock()->getFocusedLayer().lock()->findField(param).lock();
+		auto field = ls.lock()->getFocusedLayer().lock()->findField(param).lock();
 
 		if (isTypable())
 		{
-			if (!mtf->isTypeModeEnabled())
+			if (!field->isTypeModeEnabled())
 			{
-				mtf->enableTypeMode();
+				field->enableTypeMode();
 			}
 
-			mtf->type(i);
+			field->type(i);
 		}
 	}
 
@@ -931,12 +931,12 @@ void BaseControls::splitLeft()
 {
 	init();
 
-	auto mtf = ls.lock()->getFocusedLayer().lock()->findField(param).lock();
+	auto field = ls.lock()->getFocusedLayer().lock()->findField(param).lock();
 	auto controls = mpc.getControls().lock();
 
 	if (!controls->isShiftPressed())
 	{
-		mtf->setSplit(false);
+		field->setSplit(false);
 		BaseControls::left();
 		return;
 	}
@@ -946,20 +946,20 @@ void BaseControls::splitLeft()
 		return;
 	}
 
-	if (mtf->isSplit())
+	if (field->isSplit())
 	{
-		mtf->setActiveSplit(mtf->getActiveSplit() - 1);
+		field->setActiveSplit(field->getActiveSplit() - 1);
 	}
 	else
 	{
-		mtf->setSplit(true);
+		field->setSplit(true);
 	}
 }
 
 void BaseControls::splitRight()
 {
 	init();
-	auto mtf = ls.lock()->getFocusedLayer().lock()->findField(param).lock();
+	auto field = ls.lock()->getFocusedLayer().lock()->findField(param).lock();
 	auto controls = mpc.getControls().lock();
 	
 	if (!controls->isShiftPressed())
@@ -968,11 +968,11 @@ void BaseControls::splitRight()
 		return;
 	}
 	
-	if (splittable && mtf->isSplit())
+	if (splittable && field->isSplit())
 	{
-		if (!mtf->setActiveSplit(mtf->getActiveSplit() + 1))
+		if (!field->setActiveSplit(field->getActiveSplit() + 1))
 		{
-			mtf->setSplit(false);
+			field->setSplit(false);
 		}
 	}
 }
