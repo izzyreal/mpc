@@ -11,22 +11,18 @@ StartFineScreen::StartFineScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "start-fine", layerIndex)
 {
 	addChild(move(make_shared<Wave>()));
-	addChild(move(make_shared<TwoDots>()));
 	findWave().lock()->setFine(true);
-	findTwoDots().lock()->setVisible(0, false);
-	findTwoDots().lock()->setVisible(1, false);
-	findTwoDots().lock()->setVisible(2, true);
-	findTwoDots().lock()->setVisible(3, true);
 }
 
 void StartFineScreen::open()
 {
 	displayStart();
+	findField("start").lock()->enableTwoDots();
 	displayLngthLabel();
+	findLabel("lngth").lock()->enableTwoDots();
 	displaySmplLngth();
 	displayPlayX();
 	displayFineWaveform();
-	findTwoDots().lock()->setSelected(3, false);
 }
 
 void StartFineScreen::displayFineWaveform()

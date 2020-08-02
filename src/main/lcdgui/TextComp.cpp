@@ -22,6 +22,15 @@ TextComp::TextComp(mpc::Mpc& mpc, const std::string& name)
 {
 }
 
+void TextComp::enableTwoDots()
+{
+	if (twoDots)
+		return;
+
+	twoDots = true;
+	SetDirty();
+}
+
 void TextComp::setSize(int w, int h)
 {
 	if (alignmentEndX == -1)
@@ -139,11 +148,17 @@ void TextComp::Draw(std::vector<std::vector<bool>>* pixels)
 		next = utf8_decode_next();
 		charCounter++;
 	}
+
 	delete[] tempText;
 	
-
-	for (auto& c : children)
-		c->Draw(pixels);
+	if (twoDots)
+	{
+		for (auto xPos : vector<int>{ 12, 30 })
+		{
+			if (w > xPos)
+				(*pixels)[xPos + x][y + 8] = inverted ? false : true;
+		}
+	}
 
 	dirty = false;
 }

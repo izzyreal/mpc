@@ -15,15 +15,8 @@ TrimScreen::TrimScreen(mpc::Mpc& mpc, const int layerIndex)
 {
 	baseControls = make_shared<BaseSamplerControls>(mpc);
 
-	addChild(move(make_shared<TwoDots>()));
 	addChild(move(make_shared<Wave>()));
 	findWave().lock()->setFine(false);
-
-	auto twoDots = findTwoDots().lock();
-	twoDots->setVisible(0, true);
-	twoDots->setVisible(1, true);
-	twoDots->setVisible(2, false);
-	twoDots->setVisible(3, false);
 
 	baseControls->typableParams = vector<string>{ "st", "end" };
 }
@@ -34,9 +27,11 @@ void TrimScreen::open()
 
 	findField("snd").lock()->setFocusable(sound);
 	findField("playx").lock()->setFocusable(sound);
-	findField("end").lock()->setFocusable(sound);
-	findField("view").lock()->setFocusable(sound);
 	findField("st").lock()->setFocusable(sound);
+	findField("st").lock()->enableTwoDots();
+	findField("end").lock()->setFocusable(sound);
+	findField("end").lock()->enableTwoDots();
+	findField("view").lock()->setFocusable(sound);
 	findField("dummy").lock()->setFocusable(!sound);
 
 	displaySnd();

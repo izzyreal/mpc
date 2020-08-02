@@ -29,6 +29,7 @@ namespace mpc::lcdgui
 		Alignment alignment = Alignment::None;
 		bool textuallyAligned = false;
 		int alignmentEndX = -1;
+		bool twoDots = false;
 
 	protected:
 		bool inverted = false;
@@ -42,6 +43,7 @@ namespace mpc::lcdgui
 		virtual void setText(const std::string& s);
 
 	public:
+		void enableTwoDots();
 		void setBlinking(bool b);
 		void setInverted(bool b);
 		void setAlignment(const Alignment alignment, int endX = -1);

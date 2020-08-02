@@ -12,20 +12,16 @@ ZoneStartFineScreen::ZoneStartFineScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "zone-start-fine", layerIndex)
 {
 	addChild(move(make_shared<Wave>()));
-	addChild(move(make_shared<TwoDots>()));
 	findWave().lock()->setFine(true);
-
-	findTwoDots().lock()->setVisible(0, false);
-	findTwoDots().lock()->setVisible(1, false);
-	findTwoDots().lock()->setVisible(2, true);
-	findTwoDots().lock()->setVisible(3, true);
-	findTwoDots().lock()->setSelected(3, false);
 }
 
 void ZoneStartFineScreen::open()
 {
+	findField("start").lock()->enableTwoDots();
+	findLabel("lngth").lock()->enableTwoDots();
 	displayStart();
 	displayLngthLabel();
+
 
 	displayPlayX();
 	displayFineWaveform();

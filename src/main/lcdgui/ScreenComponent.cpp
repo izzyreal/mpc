@@ -56,11 +56,6 @@ weak_ptr<Wave> ScreenComponent::findWave()
 	return dynamic_pointer_cast<Wave>(findChild("wave").lock());
 }
 
-weak_ptr<TwoDots> ScreenComponent::findTwoDots()
-{
-	return dynamic_pointer_cast<TwoDots>(findChild("two-dots").lock());
-}
-
 weak_ptr<EnvGraph> ScreenComponent::findEnvGraph()
 {
 	return dynamic_pointer_cast<EnvGraph>(findChild("env-graph").lock());

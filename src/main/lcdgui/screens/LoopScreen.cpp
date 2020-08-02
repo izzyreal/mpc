@@ -20,15 +20,8 @@ LoopScreen::LoopScreen(mpc::Mpc& mpc, const int layerIndex)
 {
 	baseControls = make_shared<BaseSamplerControls>(mpc);
 
-	addChild(move(make_shared<TwoDots>()));
 	addChild(move(make_shared<Wave>()));
 	findWave().lock()->setFine(false);
-
-	auto twoDots = findTwoDots().lock();
-	twoDots->setVisible(0, true);
-	twoDots->setVisible(1, true);
-	twoDots->setVisible(2, false);
-	twoDots->setVisible(3, false);
 
 	baseControls->typableParams = vector<string>{ "to", "endlengthvalue" };
 }
@@ -40,8 +33,10 @@ void LoopScreen::open()
 	findField("snd").lock()->setFocusable(sound);
 	findField("playx").lock()->setFocusable(sound);
 	findField("to").lock()->setFocusable(sound);
+	findField("to").lock()->enableTwoDots();
 	findField("endlength").lock()->setFocusable(sound);
 	findField("endlengthvalue").lock()->setFocusable(sound);
+	findField("endlengthvalue").lock()->enableTwoDots();
 	findField("loop").lock()->setFocusable(sound);
 	findField("dummy").lock()->setFocusable(!sound);
 

@@ -19,15 +19,8 @@ ZoneScreen::ZoneScreen(mpc::Mpc& mpc, const int layerIndex)
 {
 	baseControls = make_shared<BaseSamplerControls>(mpc);
 
-	addChild(move(make_shared<TwoDots>()));
 	addChild(move(make_shared<Wave>()));
 	findWave().lock()->setFine(false);
-
-	findTwoDots().lock()->setVisible(0, true);
-	findTwoDots().lock()->setVisible(1, true);
-	findTwoDots().lock()->setVisible(2, false);
-	findTwoDots().lock()->setVisible(3, false);
-
 	baseControls->typableParams = vector<string>{ "st", "end" };
 }
 
@@ -37,7 +30,9 @@ void ZoneScreen::open()
 	findField("snd").lock()->setFocusable(sound);
 	findField("playx").lock()->setFocusable(sound);
 	findField("st").lock()->setFocusable(sound);
+	findField("st").lock()->enableTwoDots();
 	findField("end").lock()->setFocusable(sound);
+	findField("end").lock()->enableTwoDots();
 	findField("zone").lock()->setFocusable(sound);
 	findField("dummy").lock()->setFocusable(!sound);
 

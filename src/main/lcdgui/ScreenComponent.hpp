@@ -10,7 +10,6 @@
 #include "FunctionKeys.hpp"
 #include "Background.hpp"
 #include "Wave.hpp"
-#include "TwoDots.hpp"
 #include "EnvGraph.hpp"
 
 #include <lang/StrUtil.hpp>
@@ -52,7 +51,6 @@ namespace mpc::lcdgui
 		const std::string getLastFocus(const std::string& screenName);
 		std::weak_ptr<Background> findBackground();
 		std::weak_ptr<Wave> findWave();
-		std::weak_ptr<TwoDots> findTwoDots();
 		std::weak_ptr<EnvGraph> findEnvGraph();
 		std::weak_ptr<Component> addChild(std::shared_ptr<Component> child) override;
 

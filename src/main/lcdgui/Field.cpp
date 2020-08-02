@@ -5,7 +5,6 @@
 #include <Mpc.hpp>
 #include <lcdgui/LayeredScreen.hpp>
 #include <lcdgui/ScreenComponent.hpp>
-#include <lcdgui/TwoDots.hpp>
 
 #include <lang/StrUtil.hpp>
 

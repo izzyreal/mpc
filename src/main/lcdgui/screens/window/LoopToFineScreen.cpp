@@ -11,25 +11,20 @@ using namespace std;
 LoopToFineScreen::LoopToFineScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "loop-to-fine", layerIndex)
 {
+	addChild(move(make_shared<Wave>()));
+	findWave().lock()->setFine(true);
 }
 
 void LoopToFineScreen::open()
 {
-	addChild(move(make_shared<Wave>()));
-	addChild(move(make_shared<TwoDots>()));
-
 	displayTo();
+	findField("to").lock()->enableTwoDots();
 	displayLngthField();
 	displayLoopLngth();
+	findField("lngth").lock()->enableTwoDots();
 
 	displayPlayX();
 	displayFineWaveform();
-
-	findTwoDots().lock()->setVisible(0, false);
-	findTwoDots().lock()->setVisible(1, false);
-	findTwoDots().lock()->setVisible(2, true);
-	findTwoDots().lock()->setVisible(3, true);
-	findTwoDots().lock()->setSelected(3, false);
 }
 
 void LoopToFineScreen::displayLoopLngth()
