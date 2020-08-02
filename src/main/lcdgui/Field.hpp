@@ -31,6 +31,7 @@ namespace mpc::lcdgui
 		std::string csn = "";
 		bool split = false;
 		int activeSplit = 0;
+		MRECT splitRect;
 		bool typeModeEnabled = false;
 		std::string oldText = "";
 		bool scrolling = false;

@@ -92,6 +92,7 @@ void Field::loseFocus(string next)
 {
 	focus = false;
 	inverted = false;
+	setSplit(false);
 	SetDirty();
 }
 
@@ -108,8 +109,9 @@ void Field::setSplit(bool b)
 		activeSplit = text.length() - 1;
 
 		for (int i = 0; i < text.length(); i++) {
-			auto field = parent->addChild(make_shared<Field>(mpc, "split" + to_string(i), x + (i * FONT_WIDTH) + 1, y + 1, 7)).lock();
-			dynamic_pointer_cast<Field>(field)->setText(text.substr(i, i + 1));
+			auto field = dynamic_pointer_cast<Field>(parent->addChild(make_shared<Field>(mpc, "split" + to_string(i), x + (i * FONT_WIDTH) + 1, y + 1, 7)).lock());
+			field->setFocusable(false);
+			field->setText(text.substr(i, i + 1));
 		}
 
 		oldText = text;
@@ -129,7 +131,12 @@ void Field::setSplit(bool b)
 void Field::redrawSplit()
 {
 	for (int i = 0; i < oldText.length(); i++) {
-		parent->findChild<Field>("split" + to_string(i)).lock()->setInverted(i < activeSplit);
+		auto field = parent->findChild<Field>("split" + to_string(i)).lock();
+		field->setInverted(i < activeSplit);
+		if (i < activeSplit)
+		{
+			parent->bringToFront(field.get());
+		}
 	}
 }
 
