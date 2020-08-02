@@ -4,6 +4,7 @@
 
 #include <Mpc.hpp>
 #include <lcdgui/LayeredScreen.hpp>
+#include <lcdgui/ScreenComponent.hpp>
 #include <lcdgui/TwoDots.hpp>
 
 #include <lang/StrUtil.hpp>
@@ -114,8 +115,10 @@ void Field::setSplit(bool b)
 	
 	if (split)
 	{
+		if (typeModeEnabled)
+			mpc.getActiveControls().lock()->pressEnter();
+
 		activeSplit = text.length() - 2;
-		MLOG("activeSplit now set to " + to_string(activeSplit));
 	}
 	else
 	{
@@ -150,6 +153,9 @@ bool Field::enableTypeMode()
 	if (typeModeEnabled)
 		return false;
 
+	if (split)
+		setSplit(false);
+
     typeModeEnabled = true;
 	oldText = text;
 	setText("");
@@ -174,6 +180,7 @@ int Field::enter()
 		printf("Field.enter ERROR: %s", e.what());
         return value;
     }
+
     setText(oldText);
     return value;
 }
