@@ -31,7 +31,6 @@ namespace mpc::lcdgui
 		std::string csn = "";
 		bool split = false;
 		int activeSplit = 0;
-		MRECT splitRect;
 		bool typeModeEnabled = false;
 		std::string oldText = "";
 		bool scrolling = false;
@@ -43,7 +42,6 @@ namespace mpc::lcdgui
 		void loseFocus(std::string next);
 		void takeFocus(std::string prev);
 		void setSplit(bool b);
-		void redrawSplit();
 		bool isSplit();
 		int getActiveSplit();
 		bool setActiveSplit(int i);

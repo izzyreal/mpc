@@ -4,6 +4,7 @@
 #include <Paths.hpp>
 
 #include <lcdgui/Label.hpp>
+#include <lcdgui/Field.hpp>
 
 #include <Util.hpp>
 
@@ -83,6 +84,8 @@ void TextComp::Draw(std::vector<std::vector<bool>>* pixels)
 	int next = utf8_decode_next();
 	int charCounter = 0;
 	
+	auto field = dynamic_cast<Field*>(this);
+
 	while (next != UTF8_END && next >= 0)
 	{
 		moduru::gui::bmfont_char current_char;
@@ -125,11 +128,16 @@ void TextComp::Draw(std::vector<std::vector<bool>>* pixels)
 					}
 
 					(*pixels)[xpos][ypos] = inverted ? false : true;
+
+					if (field != nullptr && field->isSplit())
+						(*pixels)[xpos][ypos] = charCounter >= field->getActiveSplit();
+
 				}
 			}
 		}
 		textx += current_char.xadvance;
 		next = utf8_decode_next();
+		charCounter++;
 	}
 	delete[] tempText;
 	

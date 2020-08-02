@@ -60,6 +60,14 @@ void Field::Draw(std::vector<std::vector<bool>>* pixels)
 	
 	auto r = getRect();
 
+	if (split)
+	{
+		Clear(pixels);
+		auto columns = (int) floor((w - 2) / FONT_WIDTH);
+		auto nonInvertedColumns = columns - (activeSplit - 1);
+		r.R = r.L + (w - (nonInvertedColumns * FONT_WIDTH));
+	}
+
 	for (int i = r.L; i < r.R; i++)
 	{
 		if (i < 0)
@@ -107,37 +115,12 @@ void Field::setSplit(bool b)
 	if (split)
 	{
 		activeSplit = text.length() - 1;
-
-		for (int i = 0; i < text.length(); i++) {
-			auto field = dynamic_pointer_cast<Field>(parent->addChild(make_shared<Field>(mpc, "split" + to_string(i), x + (i * FONT_WIDTH) + 1, y + 1, 7)).lock());
-			field->setFocusable(false);
-			field->setText(text.substr(i, i + 1));
-		}
-
-		oldText = text;
-		setText("");
-		redrawSplit();
 	}
 	else
 	{
-		for (int i = 0; i < oldText.length(); i++)
-			parent->removeChild(parent->findChild<Field>("split" + to_string(i)));
-
 		activeSplit = 0;
-		setTextPadded(oldText);
 	}
-}
-
-void Field::redrawSplit()
-{
-	for (int i = 0; i < oldText.length(); i++) {
-		auto field = parent->findChild<Field>("split" + to_string(i)).lock();
-		field->setInverted(i < activeSplit);
-		if (i < activeSplit)
-		{
-			parent->bringToFront(field.get());
-		}
-	}
+	SetDirty();
 }
 
 bool Field::isSplit()
@@ -152,22 +135,19 @@ int Field::getActiveSplit()
 
 bool Field::setActiveSplit(int i)
 {
-	if (i < 1 || i + 1 > oldText.size())
-	{
+	if (i < 1 || i > text.size())
 		return false;
-	}
 
 	activeSplit = i;
-	redrawSplit();
+
+	SetDirty();
 	return true;
 }
 
 bool Field::enableTypeMode()
 {
 	if (typeModeEnabled)
-	{
 		return false;
-	}
 
     typeModeEnabled = true;
 	oldText = text;
@@ -180,9 +160,7 @@ int Field::enter()
 	auto value = INT_MAX;
 
 	if (!typeModeEnabled)
-	{
 		return value;
-	}
 
     typeModeEnabled = false;
     
