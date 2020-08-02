@@ -82,7 +82,7 @@ void StereoToMonoScreen::function(int i)
 		auto leftData = left->getSampleData();
 		auto rightData = right->getSampleData();
 
-		for (int i = 0; i <= sound->getLastFrameIndex(); i++)
+		for (int i = 0; i < sound->getFrameCount(); i++)
 		{
 			leftData->push_back((*sound->getSampleData())[i]);
 			rightData->push_back((*sound->getSampleData())[i + sound->getFrameCount()]);

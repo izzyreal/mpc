@@ -33,7 +33,7 @@ void NumberOfZonesScreen::function(int i)
 		auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(mpc.screens->getScreenComponent("zone"));
 		auto sound = sampler.lock()->getSound().lock();
 		zoneScreen->numberOfZones = numberOfZones;
-		zoneScreen->initZones(sound->getLastFrameIndex());
+		zoneScreen->initZones();
 		ls.lock()->openScreen("zone");
 		break;
 	}

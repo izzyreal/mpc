@@ -920,10 +920,10 @@ void BaseControls::erase()
 int BaseControls::getSoundIncrement(int notch_inc)
 {
 	auto soundInc = notch_inc;
+
 	if (abs(notch_inc) != 1)
-	{
-		soundInc *= (int)(ceil(sampler.lock()->getSound().lock()->getLastFrameIndex() / 15000.0));
-	}
+		soundInc *= (int)(ceil(sampler.lock()->getSound().lock()->getFrameCount() / 15000.0));
+
 	return soundInc;
 }
 

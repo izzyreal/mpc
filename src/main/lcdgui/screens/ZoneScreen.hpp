@@ -43,13 +43,12 @@ namespace mpc::lcdgui::screens
 		void displayZone();
 
 	private:
-		const std::vector<std::string> playXNames = { "ALL", "ZONE", "BEFOR ST", "BEFOR TO", "AFTR END" };
+		const std::vector<std::string> playXNames{ "ALL", "ZONE", "BEFOR ST", "BEFOR TO", "AFTR END" };
 		int numberOfZones = 16;
 		std::vector<std::vector<int>> zones;
 		int zone = 0;
-		int zonedSampleFrameCount = 0;
 
-		void initZones(int length);
+		void initZones();
 		void setZoneStart(int zoneIndex, int start);
 		int getZoneStart(int zoneIndex);
 		void setZoneEnd(int zoneIndex, int end);

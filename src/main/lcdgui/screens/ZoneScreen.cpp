@@ -26,6 +26,9 @@ ZoneScreen::ZoneScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void ZoneScreen::open()
 {
+	if (zones.empty())
+		initZones();
+
 	bool sound = sampler.lock()->getSound().lock() ? true : false;
 	findField("snd").lock()->setFocusable(sound);
 	findField("playx").lock()->setFocusable(sound);
@@ -254,18 +257,21 @@ void ZoneScreen::displayZone()
 	findField("zone").lock()->setText(to_string(zone + 1));
 }
 
-void ZoneScreen::initZones(int length)
+void ZoneScreen::initZones()
 {
-	if (zone > numberOfZones - 1)
-	{
-		zone = 0;
-	}
-
-	this->zonedSampleFrameCount = length;
-	int zoneLength = (int)floor(length / numberOfZones);
-	int zoneStart = 0;
 	zones.clear();
 	
+	auto sound = sampler.lock()->getSound().lock();
+
+	if (!sound)
+	{
+		zone = 0;
+		return;
+	}
+
+	int zoneLength = (int)floor(sound->getFrameCount() / numberOfZones);
+	int zoneStart = 0;
+
 	for (int i = 0; i < numberOfZones - 1; i++)
 	{
 		zones.push_back(vector<int>(2));
@@ -273,9 +279,11 @@ void ZoneScreen::initZones(int length)
 		zones[i][1] = zoneStart + zoneLength - 1;
 		zoneStart += zoneLength;
 	}
+
 	zones.push_back(vector<int>(2));
 	zones[numberOfZones - 1][0] = zoneStart;
-	zones[numberOfZones - 1][1] = length;
+	zones[numberOfZones - 1][1] = sound->getFrameCount();
+	zone = 0;
 }
 
 void ZoneScreen::setZoneStart(int zoneIndex, int start)
@@ -283,17 +291,22 @@ void ZoneScreen::setZoneStart(int zoneIndex, int start)
 	if (start > zones[zoneIndex][1]) {
 		start = zones[zoneIndex][1];
 	}
+	
 	if (zoneIndex == 0 && start < 0) {
 		start = 0;
 	}
+	
 	if (zoneIndex > 0 && start < zones[zoneIndex - 1][0]) {
 		start = zones[zoneIndex - 1][0];
 	}
+	
 	zones[zoneIndex][0] = start;
+	
 	if (zoneIndex != 0)
 	{
 		zones[zoneIndex - 1][1] = start;
 	}
+	
 	displaySt();
 	displayWave();
 }
@@ -310,14 +323,16 @@ int ZoneScreen::getZoneStart(int zoneIndex)
 
 void ZoneScreen::setZoneEnd(int zoneIndex, int end)
 {
+	auto length = sampler.lock()->getSound().lock()->getFrameCount();
+
 	if (end < zones[zoneIndex][0]) {
 		end = zones[zoneIndex][0];
 	}
 	if (zoneIndex < numberOfZones - 1 && end > zones[zoneIndex + 1][1]) {
 		end = zones[zoneIndex + 1][1];
 	}
-	if (zoneIndex == numberOfZones - 1 && end > zonedSampleFrameCount) {
-		end = zonedSampleFrameCount;
+	if (zoneIndex == numberOfZones - 1 && end > length) {
+		end = length;
 	}
 	zones[zoneIndex][1] = end;
 	if (zoneIndex != numberOfZones - 1) {

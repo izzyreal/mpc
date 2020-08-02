@@ -136,7 +136,7 @@ void LoopScreen::turnWheel(int i)
 
 	if (param.compare("to") == 0)
 	{
-		if (loopFix && sound->getLoopTo() + soundInc + oldLoopLength > sound->getLastFrameIndex())
+		if (loopFix && sound->getLoopTo() + soundInc + oldLoopLength >= sound->getFrameCount())
 		{
 			return;
 		}
@@ -227,7 +227,7 @@ void LoopScreen::setSlider(int i)
 	auto const oldLength = sound->getEnd() - sound->getLoopTo();
 	auto const lengthFix = trimScreen->smplLngthFix;
 
-	auto candidatePos = (int)((i / 124.0) * sound->getLastFrameIndex());
+	auto candidatePos = (int)((i / 124.0) * sound->getFrameCount());
 	auto maxPos = 0;
 
 	if (param.compare("to") == 0)

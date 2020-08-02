@@ -20,7 +20,7 @@ void SndWriter::setValues()
 {
 	setName(sound->getName());
 	setMono(sound->isMono());
-	setFramesCount(sound->getLastFrameIndex() + 1);
+	setFramesCount(sound->getFrameCount());
 	setSampleRate(sound->getSampleRate());
 	setLevel(sound->getSndLevel());
 	setStart(sound->getStart());

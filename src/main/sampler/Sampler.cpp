@@ -54,7 +54,7 @@ void Sampler::setSoundIndex(int i)
 	soundIndex = i;
 
 	auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(mpc.screens->getScreenComponent("zone"));
-	zoneScreen->initZones(getSound().lock()->getFrameCount());
+	zoneScreen->initZones();
 }
 
 int Sampler::getSoundIndex()
