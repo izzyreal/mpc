@@ -407,6 +407,8 @@ void EditSoundScreen::function(int j)
 {
 	baseControls->function(j);
 
+	auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(mpc.screens->getScreenComponent("zone"));
+
 	switch (j)
 	{
 	case 4:
@@ -437,6 +439,7 @@ void EditSoundScreen::function(int j)
 			sound->setStart(0);
 			sound->setEnd(newLength);
 			sound->setMono(sound->isMono());
+			zoneScreen->initZones();
 		}
 		else if (edit == 1)
 		{
@@ -452,7 +455,7 @@ void EditSoundScreen::function(int j)
 
 			for (int i = 0; i < newSampleData->size(); i++)
 			{
-				newSampleData->at(i) = sound->getSampleData()->at(i);
+				(*newSampleData)[i] = (*sound->getSampleData())[i];
 			}
 
 			newSample->setMono(sound->isMono());
@@ -531,6 +534,7 @@ void EditSoundScreen::function(int j)
 			destination->setStart(0);
 			destination->setMono(destination->isMono());
 			destination->setLoopTo(destination->getEnd());
+			zoneScreen->initZones();
 		}
 		else if (edit == 4)
 		{
@@ -538,6 +542,7 @@ void EditSoundScreen::function(int j)
 			sound->setStart(0);
 			sound->setEnd(sound->getFrameCount());
 			sound->setLoopTo(sound->getFrameCount());
+			zoneScreen->initZones();
 		}
 		else if (edit == 5)
 		{
@@ -546,11 +551,11 @@ void EditSoundScreen::function(int j)
 
 			for (int i = start; i < end; i++)
 			{
-				sound->getSampleData()->at(i) = 0.0f;
+				(*sound->getSampleData())[i] = 0.0f;
 
 				if (!sound->isMono())
 				{
-					sound->getSampleData()->at(i + sound->getFrameCount()) = 0.0f;
+					(*sound->getSampleData())[(i + sound->getFrameCount())] = 0.0f;
 				}
 			}
 			ls.lock()->openScreen(previousScreenName);
@@ -563,7 +568,17 @@ void EditSoundScreen::function(int j)
 			auto reverseCounter = end - 1;
 			auto newSampleData = vector<float>(sound->getSampleData()->size());
 
-			if (!sound->isMono())
+			if (sound->isMono())
+			{
+				auto sampleData = sound->getSampleData();
+
+				for (int i = start; i < end; i++)
+				{
+					newSampleData[i] = (*sampleData)[reverseCounter];
+					reverseCounter--;
+				}
+			}
+			else
 			{
 				vector<float> newSampleDataLeft(sound->getSampleData()->size() * 0.5);
 				vector<float> newSampleDataRight(sound->getSampleData()->size() * 0.5);
@@ -589,16 +604,7 @@ void EditSoundScreen::function(int j)
 				}
 				newSampleData = mpc::sampler::Sampler::mergeToStereo(newSampleDataLeft, newSampleDataRight);
 			}
-			else
-			{
-				auto sampleData = sound->getSampleData();
 
-				for (int i = start; i < end; i++)
-				{
-					newSampleData[i] = (*sampleData)[reverseCounter];
-					reverseCounter--;
-				}
-			}
 			sound->getSampleData()->swap(newSampleData);
 			sound->setMono(sound->isMono());
 			ls.lock()->openScreen(previousScreenName);
@@ -611,11 +617,20 @@ void EditSoundScreen::function(int j)
 				return;
 			}
 
-			if (!sound->isMono())
+			if (sound->isMono())
 			{
-				vector<float> sampleDataLeft = (*sound->getSampleData());
+				auto ts = mpc::sampler::TimeStretch(*sound->getSampleData(), (float)(timeStretchRatio * 0.0001), sound->getSampleRate(), timeStretchAdjust);
+				auto newSample = sampler.lock()->addSound(sound->getSampleRate()).lock();
+				auto procData = ts.getProcessedData();
+				newSample->getSampleData()->swap(procData);
+				newSample->setMono(true);
+				newSample->setName(newName);
+			}
+			else
+			{
+				vector<float> sampleDataLeft = *sound->getSampleData();
 				sampleDataLeft.erase(sampleDataLeft.begin() + (sampleDataLeft.size() * 0.5), sampleDataLeft.end());
-				vector<float> sampleDataRight = (*sound->getSampleData());
+				vector<float> sampleDataRight = *sound->getSampleData();
 				sampleDataRight.erase(sampleDataRight.begin(), sampleDataRight.begin() + (sampleDataRight.size() * 0.5));
 
 				auto ts0 = mpc::sampler::TimeStretch(sampleDataLeft, (float)(timeStretchRatio / 10000.0), sound->getSampleRate(), timeStretchAdjust);
@@ -629,22 +644,10 @@ void EditSoundScreen::function(int j)
 				newSample->setMono(false);
 				newSample->setName(newName);
 			}
-
-			if (sound->isMono())
-			{
-				auto ts = mpc::sampler::TimeStretch(*sound->getSampleData(), (float)(timeStretchRatio * 0.0001), sound->getSampleRate(), timeStretchAdjust);
-				auto newSample = sampler.lock()->addSound(sound->getSampleRate()).lock();
-				auto procData = ts.getProcessedData();
-				newSample->getSampleData()->swap(procData);
-				newSample->setMono(true);
-				newSample->setName(newName);
-			}
 		}
 		else if (edit == 8)
 		{
 			auto source = sampler.lock()->getSound().lock();
-
-			auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(mpc.screens->getScreenComponent("zone"));
 			auto zoneCount = zoneScreen->numberOfZones;
 
 			for (int i = 0; i < zoneScreen->numberOfZones; i++)
