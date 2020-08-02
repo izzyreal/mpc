@@ -45,19 +45,6 @@ void LoopScreen::open()
 	findField("loop").lock()->setFocusable(sound);
 	findField("dummy").lock()->setFocusable(!sound);
 
-	if (sound)
-	{
-		init();
-		if (param.compare("dummy") == 0)
-		{
-			ls.lock()->setFocus("snd");
-		}
-	}
-	else
-	{
-		ls.lock()->setFocus("dummy");
-	}
-
 	displaySnd();
 	displayPlayX();
 	displayEndLength();

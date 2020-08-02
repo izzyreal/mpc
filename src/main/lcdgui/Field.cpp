@@ -208,6 +208,9 @@ void Field::disableTypeMode()
 void Field::setFocusable(bool b)
 {
 	focusable = b;
+
+	if (!focusable && focus)
+		mpc.getLayeredScreen().lock()->setFocus(nextFocus);
 }
 
 bool Field::isFocusable()

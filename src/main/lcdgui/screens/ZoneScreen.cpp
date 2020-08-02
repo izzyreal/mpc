@@ -41,19 +41,6 @@ void ZoneScreen::open()
 	findField("zone").lock()->setFocusable(sound);
 	findField("dummy").lock()->setFocusable(!sound);
 
-	if (sound)
-	{
-		init();
-		if (param.compare("dummy") == 0)
-		{
-			ls.lock()->setFocus("snd");
-		}
-	}
-	else 
-	{
-		ls.lock()->setFocus("dummy");
-	}
-
 	displayWave();
 	displaySnd();
 	displayPlayX();
