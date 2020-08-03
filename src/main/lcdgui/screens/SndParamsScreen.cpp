@@ -127,6 +127,7 @@ void SndParamsScreen::turnWheel(int i)
 	{
 		sound->setTune(sound->getTune() + i);
 		displayTune();
+		displaySampleAndNewTempo();
 	}
 	else if (param.compare("beat") == 0)
 	{
@@ -197,7 +198,7 @@ void SndParamsScreen::displaySampleAndNewTempo()
 	auto part1 = bpmString.substr(0, bpmString.length() - 1);
 	auto part2 = bpmString.substr(bpmString.length() - 1);
 
-	if (bpm < 300 || bpm > 3000)
+	if (bpm < 300 || bpm > 9999)
 	{
 		part1 = "---";
 		part2 = "-";
@@ -215,7 +216,7 @@ void SndParamsScreen::displaySampleAndNewTempo()
 	part1 = bpmString.substr(0, bpmString.length() - 1);
 	part2 = bpmString.substr(bpmString.length() - 1);
 	
-	if (newBpm < 300 || newBpm > 3000)
+	if (newBpm < 300 || newBpm > 9999)
 	{
 		part1 = "---";
 		part2 = "-";

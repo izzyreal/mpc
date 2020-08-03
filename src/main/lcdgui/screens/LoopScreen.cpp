@@ -290,16 +290,12 @@ void LoopScreen::pressEnter()
 	init();
 	
 	if (!isTypable())
-	{
 		return;
-	}
 	
 	auto field = findField(param).lock();
 
 	if (!field->isTypeModeEnabled())
-	{
 		return;
-	}
 
 	auto candidate = field->enter();
 	auto sound = sampler.lock()->getSound().lock();
@@ -318,6 +314,7 @@ void LoopScreen::pressEnter()
 			}
 
 			sound->setLoopTo(candidate);
+			displayTo();
 
 			if (lengthFix)
 			{
