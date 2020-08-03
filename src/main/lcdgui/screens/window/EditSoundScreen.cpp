@@ -60,9 +60,7 @@ void EditSoundScreen::open()
 
 void EditSoundScreen::displayEdit()
 {
-	//findLabel("edit").lock()->setText("Edit:");
 	findField("edit").lock()->setText(editNames[edit]);
-	//displayVariable(); // This can also be avoided by making textfields and labels children of Background.
 
     if (edit == 0)
     {
@@ -111,7 +109,6 @@ void EditSoundScreen::displayEdit()
         findField("end-margin").lock()->Hide(true);
         findLabel("create-new-program").lock()->Hide(true);
         findField("create-new-program").lock()->Hide(true);
-
     }
     else if (edit == 3)
     {
@@ -212,10 +209,8 @@ void EditSoundScreen::displayEdit()
 		displayEndMargin();
         displayCreateNewProgram();
     }
-	// What happens if we draw a background? Will the function keys get drawn again?
-	// Unfortunately they are not. We should think about making things children of background.
-	// For now we'll do this hacky thing.
-	//ls.lock()->setFunctionKeysArrangement(0);
+
+	displayVariable();
 }
 
 void EditSoundScreen::displayCreateNewProgram()
@@ -338,11 +333,6 @@ void EditSoundScreen::setPreviousScreenName(string s)
 string EditSoundScreen::getPreviousScreenName()
 {
     return previousScreenName;
-}
-
-void EditSoundScreen::setNewName(int i, string s)
-{
-    newNames.insert(newNames.begin() + i, s);
 }
 
 void EditSoundScreen::setCreateNewProgram(bool b)
