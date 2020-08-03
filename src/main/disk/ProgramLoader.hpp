@@ -35,7 +35,7 @@ namespace mpc::disk
 	private:
 		static void static_loadProgram(void* this_p);
 
-		void loadSound(std::string soundFileName, std::string ext, MpcFile* soundFile, std::vector<int>* soundsDestIndex, bool replace, int loadSoundIndex);
+		void loadSound(const std::string& soundFileName, const std::string& soundName, const std::string& ext, MpcFile* soundFile, std::vector<int>* soundsDestIndex, const bool replace, const int loadSoundIndex);
 		void showPopup(std::string name, std::string ext, int sampleSize);
 		void notfound(std::string soundFileName, std::string ext);
 

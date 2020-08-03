@@ -81,7 +81,7 @@ void ProgramLoader::loadProgram()
 		
 		if (soundFile != nullptr)
 		{
-			loadSound(soundFileName, ext, soundFile, &soundsDestIndex, replace, i);
+			loadSound(soundFileName, pgmSoundNames[i], ext, soundFile, &soundsDestIndex, replace, i);
 		}
 		else
 		{
@@ -125,7 +125,7 @@ void ProgramLoader::loadProgram()
 	mpc.getLayeredScreen().lock()->openScreen("load");
 }
 
-void ProgramLoader::loadSound(string soundFileName, string ext, MpcFile* soundFile, vector<int>* soundsDestIndex, bool replace, int loadSoundIndex)
+void ProgramLoader::loadSound(const string& soundFileName, const string& soundName, const string& ext, MpcFile* soundFile, vector<int>* soundsDestIndex, const bool replace, const int loadSoundIndex)
 {
 	int addedSoundIndex = -1;
 	auto sl = SoundLoader(mpc, mpc.getSampler().lock()->getSounds(), replace);
@@ -133,7 +133,7 @@ void ProgramLoader::loadSound(string soundFileName, string ext, MpcFile* soundFi
 
 	try
 	{
-		showPopup(soundFileName, ext, soundFile->length());
+		showPopup(soundName, ext, soundFile->length());
 		addedSoundIndex = sl.loadSound(soundFile);
 		
 		if (addedSoundIndex != -1)
@@ -152,7 +152,7 @@ void ProgramLoader::showPopup(string name, string ext, int sampleSize)
 {
 	mpc.getLayeredScreen().lock()->openScreen("popup");
 	auto popupScreen = dynamic_pointer_cast<PopupScreen>(mpc.screens->getScreenComponent("popup"));
-	popupScreen->setText("LOADING " + StrUtil::toUpper(StrUtil::padRight(name, " ", 16) + "." + ext));
+	popupScreen->setText("Loading " + StrUtil::padRight(name, " ", 16) + "." + StrUtil::toUpper(ext));
 
 	auto sleepTime = sampleSize / 800;
 	
