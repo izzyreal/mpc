@@ -429,6 +429,9 @@ void Sampler::trimSample(weak_ptr<Sound> sound, int start, int end)
 	auto data = s->getSampleData();
 	auto frameCount = s->getFrameCount();
 
+	if (end > frameCount)
+		end = frameCount;
+
 	if (s->isMono())
 	{
 		data->erase(data->begin() + end, data->end());
@@ -614,15 +617,11 @@ void Sampler::process8Bit(vector<float>* fa)
 weak_ptr<Sound> Sampler::createZone(weak_ptr<Sound> source, int start, int end, int endMargin)
 {
 	auto overlap = (int)(endMargin * source.lock()->getSampleRate() * 0.001);
-	
-	if (overlap > end - start)
-	{
-		overlap = end - start;
-	}
-	
+
 	auto zone = copySound(source);
 	auto zoneLength = end - start + overlap;
-	trimSample(zone, start, start + zoneLength);
+	auto endCandidate = start + zoneLength;
+	trimSample(zone, start, endCandidate);
 	return zone;
 }
 

@@ -33,7 +33,7 @@ namespace mpc::lcdgui::screens::window {
 		int timeStretchPresetNumber = 0;
 		int timeStretchAdjust = 0;
 		int endMargin = 30;
-		bool createNewProgram = false;
+		bool createNewProgram = true;
 		std::string newName = "";
 		std::string previousScreenName = "";
 

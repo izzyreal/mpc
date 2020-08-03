@@ -48,7 +48,14 @@ void EditSoundScreen::open()
 		setNewName(newSoundName);
 	}
 
-	setEdit(0);
+	if (ls.lock()->getPreviousScreenName().compare("zone") == 0)
+	{
+		setEdit(8);
+	}
+	else {
+		setEdit(0);
+	}
+
 	displayVariable();
 
 	if (edit == 8)
@@ -645,16 +652,17 @@ void EditSoundScreen::function(int j)
 				auto start = zoneScreen->getZoneStart(i);
 				auto end = zoneScreen->getZoneEnd(i);
 
-				if (i == zoneScreen->numberOfZones - 1)
-				{
-					endMargin = 0;
-				}
-
 				auto zone = sampler.lock()->createZone(source, start, end, endMargin);
-				zone.lock()->setName(newName + to_string(i + 1));
+				
+				if (i == 0)
+				{
+					zone.lock()->setName(newName);
+				}
+				else
+				{
+					zone.lock()->setName(sampler.lock()->addOrIncreaseNumber(newName));
+				}
 			}
-
-			sampler.lock()->setSoundIndex(sampler.lock()->getSoundCount() - zoneCount);
 
 			if (createNewProgram)
 			{
