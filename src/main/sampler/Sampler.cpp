@@ -276,15 +276,17 @@ vector<weak_ptr<Sound>> Sampler::getSounds()
 
 weak_ptr<Sound> Sampler::addSound()
 {
-	auto res = make_shared<Sound>(44100, sounds.size());
-	sounds.push_back(res);
-	return res;
+	return addSound(44100);
 }
 
 weak_ptr<Sound> Sampler::addSound(int sampleRate)
 {
 	auto res = make_shared<Sound>(sampleRate, sounds.size());
 	sounds.push_back(res);
+
+	if (soundIndex == -1)
+		soundIndex = 0;
+
 	return res;
 }
 
@@ -858,6 +860,10 @@ void Sampler::deleteSound(weak_ptr<Sound> sound)
 		if (sounds[i] == sound.lock())
 		{
 			sounds.erase(sounds.begin() + i);
+			
+			if (soundIndex >= i)
+				soundIndex--;
+			
 			break;
 		}
 	}
@@ -876,7 +882,7 @@ void Sampler::deleteSound(weak_ptr<Sound> sound)
 
 		for (auto& program : programs)
 		{
-			if (program == nullptr)
+			if (!program)
 				continue;
 
 			for (auto noteParameters : program->getNotesParameters())
