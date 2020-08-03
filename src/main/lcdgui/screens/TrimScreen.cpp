@@ -40,6 +40,8 @@ void TrimScreen::open()
 	displayEnd();
 	displayView();
 	displayWave();
+
+	ls.lock()->setFunctionKeysArrangement(sound ? 1 : 0);
 }
 
 void TrimScreen::openWindow()

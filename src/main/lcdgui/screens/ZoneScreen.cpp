@@ -45,6 +45,8 @@ void ZoneScreen::open()
 	displaySt();
 	displayEnd();
 	displayZone();
+
+	ls.lock()->setFunctionKeysArrangement(sound ? 1 : 0);
 }
 
 void ZoneScreen::openWindow()

@@ -47,6 +47,8 @@ void LoopScreen::open()
 	displayLoop();
 	displayTo();
 	displayWave();
+
+	ls.lock()->setFunctionKeysArrangement(sound ? 1 : 0);
 }
 
 void LoopScreen::openWindow()

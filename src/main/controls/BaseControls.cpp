@@ -820,12 +820,16 @@ void BaseControls::after()
 void BaseControls::shift()
 {
 	auto controls = mpc.getControls().lock();
+	
 	if (controls->isShiftPressed())
-	{
 		return;
-	}
-
+	
 	controls->setShiftPressed(true);
+
+	init();
+	auto focus = ls.lock()->getFocusedLayer().lock()->findField(param).lock();
+	if (focus && focus->isTypeModeEnabled())
+		focus->disableTypeMode();
 }
 
 void BaseControls::undoSeq()

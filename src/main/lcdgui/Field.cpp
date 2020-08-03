@@ -71,20 +71,38 @@ void Field::Draw(std::vector<std::vector<bool>>* pixels)
 	for (int i = r.L; i < r.R; i++)
 	{
 		if (i < 0)
-		{
 			continue;
-		}
 
 		for (int j = r.T; j < r.B; j++)
 		{
 			if (j < 0)
-			{
 				continue;
+
+			if (typeModeEnabled && j - r.T <= 7)
+			{
+				(*pixels)[i][j] = !inverted;
 			}
-			(*pixels)[i][j] = inverted;
+			else
+			{
+				(*pixels)[i][j] = inverted;
+			}
 		}
 	}
+
+	auto oldInverted = inverted;
+
+	if (typeModeEnabled)
+		inverted = false;
+
 	TextComp::Draw(pixels);
+
+	if (typeModeEnabled)
+	{
+		inverted = oldInverted;
+		(*pixels)[x][y + FONT_HEIGHT + 1] = false;
+		(*pixels)[x + 12][y + FONT_HEIGHT + 1] = false;
+		(*pixels)[x + 30][y + FONT_HEIGHT + 1] = false;
+	}
 }
 
 void Field::takeFocus(string prev)
@@ -198,6 +216,12 @@ void Field::type(int i)
 	{
 		textCopy = "";
 	}
+
+	if (textCopy.compare("0") == 0 && i == 0)
+		return;
+
+	if (textCopy.compare("0") == 0)
+		textCopy = "";
 
 	auto newText = textCopy.append(to_string(i));
 	setTextPadded(newText.c_str());
