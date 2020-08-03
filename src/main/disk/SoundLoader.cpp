@@ -164,7 +164,7 @@ int SoundLoader::loadSound(MpcFile* f)
 	sound->setLoopEnabled(loopEnabled);
 	sound->setLevel(level);
 	sound->setTune(tune);
-	sound->setNumberOfBeats(beats);
+	sound->setBeatCount(beats);
 
 	bool alreadyLoaded = existingSoundIndex != -1;
 

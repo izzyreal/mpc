@@ -16,6 +16,15 @@ SndParamsScreen::SndParamsScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void SndParamsScreen::open()
 {
+	auto sound = sampler.lock()->getSound().lock() ? true : false;
+
+	findField("snd").lock()->setFocusable(sound);
+	findField("playx").lock()->setFocusable(sound);
+	findField("level").lock()->setFocusable(sound);
+	findField("tune").lock()->setFocusable(sound);
+	findField("beat").lock()->setFocusable(sound);
+	findField("dummy").lock()->setFocusable(!sound);
+
 	displaySnd();
 	displayPlayX();
 	displayLevel();
@@ -119,8 +128,9 @@ void SndParamsScreen::turnWheel(int i)
 	}
 	else if (param.compare("beat") == 0)
 	{
-		sound->setNumberOfBeats(sound->getBeatCount() + i);
+		sound->setBeatCount(sound->getBeatCount() + i);
 		displayBeat();
+		displaySampleAndNewTempo();
 	}
 }
 
@@ -170,7 +180,7 @@ void SndParamsScreen::displaySampleAndNewTempo()
 {
 	auto sound = sampler.lock()->getSound().lock();
 
-	if (!sound)
+	if (!sound || !sound->isLoopEnabled())
 	{
 		findLabel("sample-tempo").lock()->setText("");
 		findLabel("new-tempo").lock()->setText("");

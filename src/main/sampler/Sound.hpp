@@ -25,7 +25,7 @@ namespace mpc {
 
 		public:
 			void setMemoryIndex(int i);
-			void setNumberOfBeats(int i);
+			void setBeatCount(int i);
 			int getBeatCount();
 			std::string getName();
 			std::vector<float>* getSampleData();

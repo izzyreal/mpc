@@ -36,7 +36,7 @@ void Sound::setMemoryIndex(int i)
     memoryIndex = i;
 }
 
-void Sound::setNumberOfBeats(int i)
+void Sound::setBeatCount(int i)
 {
     if(i < 1 || i > 32)
         return;
