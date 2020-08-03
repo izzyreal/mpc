@@ -48,7 +48,7 @@ void EditSoundScreen::open()
 		setNewName(newSoundName);
 	}
 
-	displayEdit();
+	setEdit(0);
 	displayVariable();
 
 	if (edit == 8)

@@ -269,19 +269,19 @@ void ZoneScreen::initZones()
 		return;
 	}
 
-	int zoneLength = (int)floor(sound->getFrameCount() / numberOfZones);
-	int zoneStart = 0;
+	float zoneLength = sound->getFrameCount() / float(numberOfZones);
+	float zoneStart = 0.f;
 
 	for (int i = 0; i < numberOfZones - 1; i++)
 	{
 		zones.push_back(vector<int>(2));
-		zones[i][0] = zoneStart;
-		zones[i][1] = zoneStart + zoneLength - 1;
+		zones[i][0] = (int) floor(zoneStart);
+		zones[i][1] = (int) floor(zoneStart + zoneLength);
 		zoneStart += zoneLength;
 	}
 
 	zones.push_back(vector<int>(2));
-	zones[numberOfZones - 1][0] = zoneStart;
+	zones[numberOfZones - 1][0] = (int)floor(zoneStart);
 	zones[numberOfZones - 1][1] = sound->getFrameCount();
 	zone = 0;
 }
