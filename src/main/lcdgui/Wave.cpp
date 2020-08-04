@@ -202,7 +202,7 @@ void Wave::makeLine(std::vector<std::vector<std::vector<int>>>* lines, std::vect
 
 	colors->clear();
 
-	if (samplePos >= selectionStart && samplePos < selectionEnd && !fine)
+	if (samplePos >= selectionStart && samplePos + samplesPerPixel < selectionEnd && !fine)
 	{
 		if (posLineLength != 13)
 		{
