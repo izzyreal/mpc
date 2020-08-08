@@ -820,10 +820,8 @@ int Sequence::getLastTickOfBar(int index)
 
 void Sequence::resetTrackEventIndices(int tick)
 {
-	if (!isUsed())
-	{
+	if (!isUsed() || tick > getLastTick())
 		return;
-	}
 
 	for (auto& t : tracks)
 	{

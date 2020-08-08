@@ -49,7 +49,9 @@ void Track::move(int tick, int oldTick)
 		eventIndex = 0;
 		return;
 	}
+
 	sort(noteOffs.begin(), noteOffs.end(), tickCmp);
+	
 	for (auto& no : noteOffs) {
 		no->setTick((no->getTick() - oldTick) + tick);
 	}

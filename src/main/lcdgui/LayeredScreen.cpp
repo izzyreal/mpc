@@ -72,9 +72,7 @@ weak_ptr<ScreenComponent> LayeredScreen::findScreenComponent()
 int LayeredScreen::openScreen(string screenName)
 {
 	if (currentScreenName.compare(screenName) == 0)
-	{
 		return -1;
-	}
 
 	auto ams = mpc.getAudioMidiServices().lock();
 
@@ -97,9 +95,7 @@ int LayeredScreen::openScreen(string screenName)
 		// Like the real 2KXL we always set focus to the first Notes: field
 		// if the current focus is hte second Notes: field.
 		if (getFocus().compare("note1") == 0)
-		{
 			setFocus("note0");
-		}
 	}
 
 	auto focus = getFocusedLayer().lock()->findField(getFocus()).lock();
@@ -108,16 +104,14 @@ int LayeredScreen::openScreen(string screenName)
 		focus->setSplit(false);
 
 	setLastFocus(currentScreenName, getFocus());
+		
+	auto screenComponent = mpc.screens->getScreenComponent(screenName);
+
+	if (!screenComponent)
+		return -1;
 
 	previousScreenName = currentScreenName;
 	currentScreenName = screenName;
-		
-	auto screenComponent = mpc.screens->getScreenComponent(currentScreenName);
-
-	if (!screenComponent)
-	{
-		return -1;
-	}
 
 	auto oldScreenComponent = getFocusedLayer().lock()->findScreenComponent().lock();
 
@@ -132,9 +126,7 @@ int LayeredScreen::openScreen(string screenName)
 	getFocusedLayer().lock()->addChild(screenComponent);
 
 	if (screenComponent->findFields().size() > 0)
-	{
 		returnToLastFocus(screenComponent->getFirstField());
-	}
 
 	screenComponent->open();
 

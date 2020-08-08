@@ -70,5 +70,7 @@ namespace mpc::lcdgui::screens
 	public:
 		void open() override;
 		void close() override;
+
+		void initActiveSequence();
 	};
 }

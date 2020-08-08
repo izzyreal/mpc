@@ -15,8 +15,6 @@ void SecondSeqScreen::open()
 
 void SecondSeqScreen::function(int i)
 {
-    init();
-	
     switch (i)
     {
     case 0:
@@ -26,6 +24,8 @@ void SecondSeqScreen::function(int i)
 		ls.lock()->openScreen("trans");
         break;
     case 5:
+        sequencer.lock()->setSecondSequenceEnabled(true);
+        ls.lock()->openScreen("sequencer");
         break;
     }
 }

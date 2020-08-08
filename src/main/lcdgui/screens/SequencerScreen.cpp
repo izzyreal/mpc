@@ -23,6 +23,12 @@ SequencerScreen::SequencerScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void SequencerScreen::open()
 {
+	if (sequencer.lock()->isSecondSequenceEnabled()) {
+		findBackground().lock()->setName("sequencer-2nd");
+	}
+	else {
+		findBackground().lock()->setName("sequencer");
+	}
 
 	sequence = sequencer.lock()->getActiveSequence();
 	track = sequencer.lock()->getActiveTrack();
@@ -673,9 +679,8 @@ void SequencerScreen::left()
 {
 	init();
 
-	if (sequencer.lock()->getNextSq() != -1) {
+	if (sequencer.lock()->getNextSq() != -1)
 		return;
-	}
 
 	baseControls->left();
 }
@@ -685,9 +690,7 @@ void SequencerScreen::right()
 	init();
 
 	if (sequencer.lock()->getNextSq() != -1)
-	{
 		return;
-	}
 
 	if (!sequence.lock()->isUsed())
 	{
@@ -706,9 +709,8 @@ void SequencerScreen::up()
 {
 	init();
 
-	if (sequencer.lock()->getNextSq() != -1) {
+	if (sequencer.lock()->getNextSq() != -1)
 		return;
-	}
 
 	baseControls->up();
 }
@@ -718,9 +720,7 @@ void SequencerScreen::down()
 	init();
 
 	if (sequencer.lock()->getNextSq() != -1)
-	{
 		return;
-	}
 
 	if (!sequence.lock()->isUsed())
 	{
@@ -731,5 +731,6 @@ void SequencerScreen::down()
 		sequence.lock()->setName(name);
 		sequencer.lock()->setActiveSequenceIndex(sequencer.lock()->getActiveSequenceIndex());
 	}
+
 	baseControls->down();
 }

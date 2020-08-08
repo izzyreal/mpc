@@ -516,17 +516,22 @@ void BaseControls::pressEnter()
 void BaseControls::rec()
 {
 	auto controls = mpc.getControls().lock();
+
+	if (controls->isRecPressed())
+		return;
+	
 	controls->setRecPressed(true);
-    init();
+    
+	init();
 
 	auto hw = mpc.getHardware().lock();
-	if(!sequencer.lock()->isPlaying())
+	if (!sequencer.lock()->isPlaying())
 	{
 		hw->getLed("rec").lock()->light(true);
     }
 	else
 	{
-        if(sequencer.lock()->isRecordingOrOverdubbing())
+        if (sequencer.lock()->isRecordingOrOverdubbing())
 		{
             sequencer.lock()->setRecording(false);
             sequencer.lock()->setOverdubbing(false);
@@ -566,10 +571,9 @@ void BaseControls::stop()
 
 	sequencer.lock()->stop();
 	auto controls = mpc.getControls().lock();
+
 	if (controls->isShiftPressed())
-	{
 		mpc.getAudioMidiServices().lock()->stopBouncing();
-	}
 }
 
 void BaseControls::play()
@@ -646,25 +650,27 @@ void BaseControls::playStart()
 	auto controls = mpc.getControls().lock();
 
 	if (sequencer.lock()->isPlaying())
-	{
 		return;
-	}
 
 	if (controls->isRecPressed())
 	{
 		if (currentScreenName.compare("sequencer") != 0)
-		{
 			ls.lock()->openScreen("sequencer");
-		}
+
 		sequencer.lock()->recFromStart();
+
+		if (!sequencer.lock()->isRecording())
+			return;
 	}
 	else if (controls->isOverDubPressed())
 	{
 		if (currentScreenName.compare("sequencer") != 0)
-		{
 			ls.lock()->openScreen("sequencer");
-		}
+
 		sequencer.lock()->overdubFromStart();
+
+		if (!sequencer.lock()->isOverDubbing())
+			return;
 	}
 	else
 	{
@@ -675,14 +681,11 @@ void BaseControls::playStart()
 		else
 		{
 			if (currentScreenName.compare("song") != 0 && currentScreenName.compare("sequencer") != 0 && currentScreenName.compare("track-mute") != 0)
-			{
 				ls.lock()->openScreen("sequencer");
-			}
 			
 			if (currentScreenName.compare("song") == 0)
-			{
 				sequencer.lock()->setSongModeEnabled(true);
-			}
+
 			sequencer.lock()->playFromStart();
 		}
 	}

@@ -114,19 +114,30 @@ weak_ptr<Track> Sequencer::getActiveTrack()
 void Sequencer::playToTick(int targetTick)
 {
 	auto seqIndex = songMode ? getSongSequenceIndex() : currentlyPlayingSequenceIndex;
-	auto tc = metronomeOnly ? metronomeSeq.get() : sequences[seqIndex].get();
-	
-	for (auto& trk : tc->getTracks()) {
-		auto lTrk = trk.lock();
-		while (lTrk->getNextTick() <= targetTick) {
-			lTrk->playNext();
-		}
-	}
+	auto seq = metronomeOnly ? metronomeSeq.get() : sequences[seqIndex].get();
 
-	for (auto& trk : tc->getMetaTracks()) {
-		auto lTrk = trk.lock();
-		while (lTrk->getNextTick() <= targetTick) {
-			lTrk->playNext();
+	for (int i = 0; i < 2; i++)
+	{
+		if (i == 1)
+		{
+			if (!secondSequenceEnabled || metronomeOnly)
+				break;
+
+			seq = sequences[secondSequenceIndex].get();
+		}
+
+		for (auto& track_ : seq->getTracks()) {
+			auto track = track_.lock();
+
+			while (track->getNextTick() <= targetTick)
+				track->playNext();
+		}
+
+		for (auto& track_ : seq->getMetaTracks()) {
+			auto track = track_.lock();
+
+			while (track->getNextTick() <= targetTick)
+				track->playNext();
 		}
 	}
 }
@@ -378,9 +389,7 @@ bool Sequencer::isPlaying()
 void Sequencer::play(bool fromStart)
 {
 	if (isPlaying())
-	{
 		return;
-	}
 
     endOfSong = false;
 	playedStepRepetitions = 0;
@@ -448,6 +457,8 @@ void Sequencer::play(bool fromStart)
 	{
 		if (!s->isUsed())
 		{
+			recording = false;
+			overdubbing = false;
 			return;
 		}
 
@@ -521,25 +532,24 @@ void Sequencer::clearUndoSeq()
 
 void Sequencer::playFromStart()
 {
-	if (isPlaying()) {
+	if (isPlaying())
 		return;
-	}
+
 	play(true);
 }
 
 void Sequencer::play()
 {
-	if (isPlaying()) {
+	if (isPlaying())
 		return;
-	}
+
 	play(false);
 }
 
 void Sequencer::rec()
 {
-	if (isPlaying()) {
+	if (isPlaying())
 		return;
-	}
 
 	recording = true;
 	
@@ -548,9 +558,9 @@ void Sequencer::rec()
 
 void Sequencer::recFromStart()
 {
-	if (isPlaying()) {
+	if (isPlaying())
 		return;
-	}
+
 	recording = true;
 	play(true);
 }
@@ -566,9 +576,9 @@ void Sequencer::overdub()
 
 void Sequencer::switchRecordToOverDub()
 {
-	if (!isRecording()) {
+	if (!isRecording())
 		return;
-	}
+
 	recording = false;
 	overdubbing = true;
 	auto hw = mpc.getHardware().lock();
@@ -578,9 +588,9 @@ void Sequencer::switchRecordToOverDub()
 
 void Sequencer::overdubFromStart()
 {
-	if (isPlaying()) {
+	if (isPlaying())
 		return;
-	}
+
 	overdubbing = true;
 	play(true);
 }
@@ -1377,6 +1387,9 @@ void Sequencer::move(int tick)
 		s = sequences[getSongSequenceIndex()];
 
 	s->resetTrackEventIndices(position);
+
+	if (secondSequenceEnabled)
+		sequences[secondSequenceIndex]->resetTrackEventIndices(position);
 
 	notifyTimeDisplay();
 
