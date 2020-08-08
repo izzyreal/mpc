@@ -7,12 +7,22 @@ using namespace mpc::lcdgui::screens;
 using namespace std;
 
 TrMuteScreen::TrMuteScreen(mpc::Mpc& mpc, const int layerIndex)
-	: ScreenComponent(mpc, "trmute", layerIndex)
+	: ScreenComponent(mpc, "track-mute", layerIndex)
 {
 }
 
 void TrMuteScreen::open()
 {
+	if (sequencer.lock()->isSoloEnabled()) {
+		findBackground().lock()->setName("track-mute-solo-2");
+	}
+	else {
+		findBackground().lock()->setName("track-mute");
+	}
+
+	for (int i = 0; i < 16; i++)
+		findLabel(to_string(i + 1)).lock()->setSize(48, 10);
+
 	displayBank();
 	displayTrackNumbers();
 
@@ -21,9 +31,7 @@ void TrMuteScreen::open()
 	auto sequence = sequencer.lock()->getActiveSequence().lock();
 	
 	for (int i = 0; i < 64; i++)
-	{
 		sequence->getTrack(i).lock()->addObserver(this);
-	}
 
 	for (int i = 0; i < 16; i++)
 	{
@@ -43,9 +51,7 @@ void TrMuteScreen::close()
 	auto sequence = sequencer.lock()->getActiveSequence().lock();
 	
 	for (int i = 0; i < 64; i++)
-	{
 		sequence->getTrack(i).lock()->deleteObserver(this);
-	}
 }
 
 void TrMuteScreen::right()
@@ -62,9 +68,7 @@ void TrMuteScreen::pad(int i, int velo, bool repeat, int tick)
 	if (controls->isF6Pressed() || sequencer.lock()->isSoloEnabled())
 	{
 		if (!sequencer.lock()->isSoloEnabled())
-		{
 			sequencer.lock()->setSoloEnabled(true);
-		}
 
 		sequencer.lock()->setActiveTrackIndex(i + (mpc.getBank() * 16));
 		ls.lock()->setCurrentBackground("track-mute-solo-2");
@@ -84,17 +88,16 @@ void TrMuteScreen::turnWheel(int i)
 	if (param.compare("sq") == 0)
 	{
 		auto oldSequence = sequencer.lock()->getActiveSequence().lock();
+
 		for (int i = 0; i < 64; i++)
-		{
 			oldSequence->getTrack(i).lock()->deleteObserver(this);
-		}
+
 		sequencer.lock()->setActiveSequenceIndex(sequencer.lock()->getActiveSequenceIndex() + i);
 		auto newSequence = sequencer.lock()->getActiveSequence().lock();
 		
 		for (int i = 0; i < 64; i++)
-		{
 			newSequence->getTrack(i).lock()->addObserver(this);
-		}
+
 		displaySq();
 		refreshTracks();
 	}
@@ -108,6 +111,13 @@ void TrMuteScreen::function(int i)
 	switch (i)
 	{
 	case 5:
+		auto controls = mpc.getControls().lock();
+		
+		if (controls->isF6Pressed())
+			return;
+
+		controls->setF6Pressed(true);
+
 		if (sequencer.lock()->isSoloEnabled())
 		{
 			ls.lock()->setCurrentBackground("track-mute");
@@ -116,7 +126,6 @@ void TrMuteScreen::function(int i)
 		else
 		{
 			ls.lock()->setCurrentBackground("track-mute-solo-1");
-			sequencer.lock()->setSoloEnabled(sequencer.lock()->isSoloEnabled());
 		}
 		break;
 	}
@@ -204,10 +213,10 @@ void TrMuteScreen::update(moduru::observer::Observable* o, nonstd::any message)
 	{
 		displayBank();
 		displayTrackNumbers();
+
 		for (int i = 0; i < 16; i++)
-		{
 			setTrackColor(i);
-		}
+
 		refreshTracks();
 	}
 	else if (msg.compare("seqnumbername") == 0)
@@ -218,9 +227,7 @@ void TrMuteScreen::update(moduru::observer::Observable* o, nonstd::any message)
 	else if (msg.compare("trackon") == 0)
 	{
 		for (int i = 0; i < 16; i++)
-		{
 			setTrackColor(i);
-		}
 	}
 	else if (msg.compare("now") == 0 || msg.compare("clock") == 0)
 	{

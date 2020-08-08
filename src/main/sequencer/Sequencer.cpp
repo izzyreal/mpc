@@ -253,8 +253,10 @@ bool Sequencer::isSoloEnabled()
 
 void Sequencer::setSoloEnabled(bool b)
 {
+	if (soloEnabled == b)
+		return;
+
     soloEnabled = b;
-    
     notifyObservers(string("soloenabled"));
 }
 

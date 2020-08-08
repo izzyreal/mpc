@@ -59,6 +59,8 @@ void SequencerScreen::open()
 	sequencer.lock()->addObserver(this);
 	sequence.lock()->addObserver(this);
 	track.lock()->addObserver(this);
+
+	findChild<TextComp>("fk3").lock()->setBlinking(sequencer.lock()->isSoloEnabled());
 }
 
 void SequencerScreen::close()

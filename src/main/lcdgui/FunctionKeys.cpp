@@ -27,9 +27,7 @@ FunctionKey::FunctionKey(mpc::Mpc& mpc, const std::string& name, const int xPos)
 void FunctionKey::Draw(std::vector<std::vector<bool>>* pixels)
 {
 	if (shouldNotDraw(pixels))
-	{
 		return;
-	}
 
 	auto label = findChild<TextComp>(name).lock();
 

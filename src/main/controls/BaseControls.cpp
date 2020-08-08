@@ -747,11 +747,16 @@ void BaseControls::nextSeq()
 void BaseControls::trackMute()
 {
 	init();
-	if (currentScreenName.compare("track-mute") == 0) {
+
+	if (currentScreenName.compare("track-mute") == 0)
+	{
 		ls.lock()->openScreen("sequencer");
 		return;
 	}
-	sequencer.lock()->setSoloEnabled(false);
+	
+	if (!sequencer.lock()->getActiveSequence().lock()->isUsed())
+		return;
+
 	ls.lock()->openScreen("track-mute");
 	mpc.getHardware().lock()->getLed("track-mute").lock()->light(true);
 }

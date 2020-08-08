@@ -267,7 +267,7 @@ void Component::Draw(vector<vector<bool>>* pixels)
 		return;
 	}
 
-	//MLOG("Drawing " + name);
+	MLOG("Drawing " + name);
 
 	if (hidden || !IsDirty())
 	{
@@ -401,7 +401,7 @@ bool Component::IsDirty()
 
 	if (dirty)
 	{
-		//MLOG(name + " is dirty");
+		MLOG(name + " is dirty");
 	}
 
 	return dirty;
