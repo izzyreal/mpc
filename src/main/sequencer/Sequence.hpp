@@ -25,23 +25,23 @@ namespace mpc::sequencer {
 		std::vector<std::shared_ptr<Track>> tracks;
 		std::vector<std::shared_ptr<Track>> metaTracks;
 
-		std::vector<std::string> deviceNames;
+		std::vector<std::string> deviceNames = std::vector<std::string>(33);
 		std::vector<std::string> defaultTrackNames;
 
-		std::vector<int> barLengths;
-		std::vector<int> numerators;
-		std::vector<int> denominators;
+		std::vector<int> barLengths = std::vector<int>(999);
+		std::vector<int> numerators = std::vector<int>(999);
+		std::vector<int> denominators = std::vector<int>(999);
 
 		std::string name = "";
-		bool loopEnabled = false;
+		bool loopEnabled = true;
 		int lastBarIndex = -1;
 		bool used = false;
-		bool tempoChangeOn = false;
+		bool tempoChangeOn = true;
 		int loopStart = 0;
 		int loopEnd = 0;
 		int firstLoopBarIndex = 0;
 		int lastLoopBarIndex = 0;
-		bool lastLoopBarEnd = false;
+		bool lastLoopBarEnd = true;
 
 	public:
 		double getInitialTempo();
