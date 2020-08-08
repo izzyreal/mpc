@@ -48,6 +48,7 @@ void InsertEventScreen::function(int i)
 
 void InsertEventScreen::insertEvent()
 {
+	init();
 	if (insertEventType == 0)
 	{
 		auto event = track.lock()->addEvent(sequencer.lock()->getTickPosition(), "note").lock();

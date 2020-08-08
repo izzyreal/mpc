@@ -60,6 +60,7 @@ void PunchScreen::setAutoPunch(int i)
 
     displayAutoPunch();
     displayTime();
+    displayBackground();
 }
 
 void PunchScreen::displayAutoPunch()
@@ -93,14 +94,14 @@ void PunchScreen::displayTime()
 
 void PunchScreen::displayBackground()
 {
-    string bgName = "punch";
+    string bgName = "punch-in";
     
     if (autoPunch == 1)
     {
-        bgName = "punchout";
+        bgName = "punch-out";
     }
     else if (autoPunch == 2) {
-        bgName = "punchinout";
+        bgName = "punch-in-out";
     }
     
     findBackground().lock()->setName(bgName);
