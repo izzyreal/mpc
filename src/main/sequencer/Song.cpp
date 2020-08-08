@@ -1,16 +1,9 @@
 #include <sequencer/Song.hpp>
 
-#include <sequencer/Sequence.hpp>
-#include <sequencer/Sequencer.hpp>
 #include <sequencer/Step.hpp>
 
 using namespace mpc::sequencer;
 using namespace std;
-
-Song::Song(Sequencer* sequencer) 
-{
-	this->sequencer = sequencer;
-}
 
 void Song::setLoopEnabled(bool b)
 {
@@ -24,15 +17,13 @@ bool Song::isLoopEnabled()
 
 void Song::setFirstStep(int i)
 {
-    if(i < 0 || i > (int) (steps.size()) -1)
+    if (i < 0 || i >= (int) steps.size())
         return;
 
     firstStep = i;
-    if(firstStep > lastStep)
-        setLastStep(firstStep);
 
-    
-	notifyObservers(string("firststep"));
+    if (firstStep > lastStep)
+        setLastStep(firstStep);
 }
 
 int Song::getFirstStep()
@@ -42,15 +33,13 @@ int Song::getFirstStep()
 
 void Song::setLastStep(int i)
 {
-	if (i < 0 || i >(int) (steps.size()) - 1)
+	if (i < 0 || i >= (int) steps.size())
 		return;
 
 	lastStep = i;
-	if (lastStep < firstStep)
-		setFirstStep(lastStep);
 
-	
-	notifyObservers(string("laststep"));
+	if (lastStep < firstStep)
+		setFirstStep(lastStep);	
 }
 
 int Song::getLastStep()
@@ -61,66 +50,38 @@ int Song::getLastStep()
 void Song::setName(string str)
 {
     name = str;
-    
-	notifyObservers(string("song-name"));
 }
 
 string Song::getName()
 {
-	if (!used) return "(Unused)";
-	return name;
+	if (!used)
+        return "(Unused)";
+	
+    return name;
 }
 
 void Song::deleteStep(int stepIndex)
 {
-    if(stepIndex > (int) (steps.size()) - 1) return;
+    if (stepIndex >= (int) steps.size())
+		return;
 
     steps.erase(steps.begin() + stepIndex);
-    notifySong();
 }
 
-void Song::insertStep(int stepIndex, Step* s)
+void Song::insertStep(int stepIndex)
 {
-	steps.insert(steps.begin() + stepIndex, s);
-	if (!used) {
-		used = true;
-		
-		notifyObservers(string("song-name"));
-	}
-	notifySong();
+	steps.insert(steps.begin() + stepIndex, make_shared<Step>());
+	used = true;
 }
 
-void Song::notifySong()
-{
-    
-	notifyObservers(string("song"));
-}
-
-void Song::setStep(int i, Step* s)
-{
-	if (steps[i] != nullptr) {
-		delete steps[i];
-		steps[i] = nullptr;
-	}
-	steps[i] = s;
-	notifySong();
-}
-
-Step* Song::getStep(int i)
+weak_ptr<Step> Song::getStep(int i)
 {
 	return steps[i];
 }
 
-int Song::getStepAmount()
+int Song::getStepCount()
 {
     return steps.size();
-}
-
-int Song::getStepBarAmount(int step)
-{
-    auto seq = sequencer->getSequence(steps[step]->getSequence()).lock();
-    if(!seq->isUsed()) return 0;
-    return seq->getLastBarIndex();
 }
 
 bool Song::isUsed()
@@ -131,11 +92,4 @@ bool Song::isUsed()
 void Song::setUsed(bool b)
 {
     used = true;
-    
-	notifyObservers(string("used"));
-}
-
-Song::~Song() {
-	for (auto& s : steps)
-		delete s;
 }

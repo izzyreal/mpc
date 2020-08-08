@@ -134,13 +134,13 @@ int SeqUtil::loopFrameLength(Sequence* seq, float sr)
 int SeqUtil::songFrameLength(Song* song, mpc::sequencer::Sequencer* sequencer, float sr)
 {
 	double result = 0;
-	auto steps = song->getStepAmount();
+	auto steps = song->getStepCount();
 
 	for (int i = 0; i < steps; i++)
 	{
-		for (int j = 0; j < song->getStep(i)->getRepeats(); j++)
+		for (int j = 0; j < song->getStep(i).lock()->getRepeats(); j++)
 		{
-			auto seq = sequencer->getSequence(song->getStep(i)->getSequence()).lock().get();
+			auto seq = sequencer->getSequence(song->getStep(i).lock()->getSequence()).lock().get();
 			result += sequenceFrameLength(seq, 0, seq->getLastTick(), sr);
 		}
 	}

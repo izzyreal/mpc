@@ -35,8 +35,8 @@
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
-
 using namespace mpc::sequencer;
+using namespace moduru::lang;
 using namespace std;
 
 Sequencer::Sequencer(mpc::Mpc& mpc)
@@ -46,8 +46,6 @@ Sequencer::Sequencer(mpc::Mpc& mpc)
 
 void Sequencer::init()
 {
-	TICK_VALUES = vector<int>{ 1, 48, 32, 24, 16, 12, 8 };
-	repeats = 0;
 	sequences = vector<shared_ptr<Sequence>>(99);
 	taps = make_unique<moduru::io::CircularIntBuffer>(4, true, true);
 	reposition = -1;
@@ -55,12 +53,12 @@ void Sequencer::init()
 	previousTempo = 0.0;
 	
 	auto userScreen = dynamic_pointer_cast<UserScreen>(mpc.screens->getScreenComponent("user"));
-	defaultSequenceName = moduru::lang::StrUtil::trim(userScreen->sequenceName);
+	defaultSequenceName = StrUtil::trim(userScreen->sequenceName);
 	
 	for (int i = 0; i < 64; i++)
 	{
 		string name = "Track-";
-		name = name.append(moduru::lang::StrUtil::padLeft(to_string(i + 1), "0", 2));
+		name = name.append(StrUtil::padLeft(to_string(i + 1), "0", 2));
 		defaultTrackNames.push_back(name);
 	}
 
@@ -93,8 +91,8 @@ void Sequencer::init()
 	
 	for (int i = 0; i < 20; i++)
 	{
-		songs[i] = make_shared<Song>(this);
-		songs[i]->setName("Song" + moduru::lang::StrUtil::padLeft(to_string(i + 1), "0", 2));
+		songs[i] = make_shared<Song>();
+		songs[i]->setName("Song" + StrUtil::padLeft(to_string(i + 1), "0", 2));
 	}
 }
 
@@ -117,12 +115,14 @@ void Sequencer::playToTick(int targetTick)
 {
 	auto seqIndex = songMode ? getSongSequenceIndex() : currentlyPlayingSequenceIndex;
 	auto tc = metronomeOnly ? metronomeSeq.get() : sequences[seqIndex].get();
+	
 	for (auto& trk : tc->getTracks()) {
 		auto lTrk = trk.lock();
 		while (lTrk->getNextTick() <= targetTick) {
 			lTrk->playNext();
 		}
 	}
+
 	for (auto& trk : tc->getMetaTracks()) {
 		auto lTrk = trk.lock();
 		while (lTrk->getNextTick() <= targetTick) {
@@ -134,9 +134,6 @@ void Sequencer::playToTick(int targetTick)
 vector<int> Sequencer::getTickValues() {
 	return TICK_VALUES;
 }
-
-int Sequencer::repeats;
-bool Sequencer::endOfSong = false;
 
 void Sequencer::setTempo(const double newTempo)
 {
@@ -386,11 +383,12 @@ void Sequencer::play(bool fromStart)
 	}
 
     endOfSong = false;
-    repeats = 0;
+	playedStepRepetitions = 0;
 	auto songScreen = dynamic_pointer_cast<SongScreen>(mpc.screens->getScreenComponent("song"));
 	auto currentSong = songs[songScreen->getSelectedSongIndex()];
     
-	Step* currentStep = nullptr;
+	shared_ptr<Step> currentStep;
+
 	if (songMode)
 	{
 		if (!currentSong->isUsed())
@@ -403,19 +401,19 @@ void Sequencer::play(bool fromStart)
 			songScreen->setOffset(-1);
 		}
 		
-		if (songScreen->getOffset() + 1 > currentSong->getStepAmount() - 1)
+		if (songScreen->getOffset() + 1 > currentSong->getStepCount() - 1)
 		{
 			return;
 		}
 		
 		int step = songScreen->getOffset() + 1;
 		
-		if (step > currentSong->getStepAmount())
+		if (step > currentSong->getStepCount())
 		{
-			step = currentSong->getStepAmount() - 1;
+			step = currentSong->getStepCount() - 1;
 		}
 		
-		currentStep = currentSong->getStep(step);
+		currentStep = currentSong->getStep(step).lock();
 	}
 
 	move(position);
@@ -723,7 +721,7 @@ void Sequencer::purgeSequence(int i) {
 	sequences[i].swap(sequence);
 	sequences[i]->resetTrackEventIndices(position);
 	string res = defaultSequenceName;
-	res.append(moduru::lang::StrUtil::padLeft(to_string(i + 1), "0", 2));
+	res.append(StrUtil::padLeft(to_string(i + 1), "0", 2));
 	sequences[i]->setName(res);
 }
 
@@ -1072,7 +1070,7 @@ weak_ptr<Sequence> Sequencer::getActiveSequence()
 {
 	auto songScreen = dynamic_pointer_cast<SongScreen>(mpc.screens->getScreenComponent("song"));
 
-	if (songMode && songs[songScreen->getSelectedSongIndex()]->getStepAmount() != 0)
+	if (songMode && songs[songScreen->getSelectedSongIndex()]->getStepCount() != 0)
 	{
 		return sequences[getSongSequenceIndex() >= 0 ? getSongSequenceIndex() : activeSequenceIndex];
 	}
@@ -1274,23 +1272,24 @@ void Sequencer::goToPreviousStep()
 
 	auto stepSize = TICK_VALUES[noteValue];
 	auto pos = getTickPosition();
-	auto stepAmt = static_cast<int>(ceil(getActiveSequence().lock()->getLastTick() / stepSize)) + 1;
-	auto stepGrid = vector<int>(stepAmt);
+	auto stepCount = static_cast<int>(ceil(getActiveSequence().lock()->getLastTick() / stepSize)) + 1;
+	vector<int> stepGrid(stepCount);
 
-	for (int i = 0; i < stepGrid.size(); i++) {
+	for (int i = 0; i < stepGrid.size(); i++)
 		stepGrid[i] = i * stepSize;
-	}
 
 	auto currentStep = 0;
 
-	for (auto l : stepGrid) {
-		if (pos <= l) break;
+	for (auto l : stepGrid)
+	{
+		if (pos <= l)
+			break;
+		
 		currentStep++;
 	}
 
-	if (currentStep == 0) {
+	if (currentStep == 0)
 		return;
-	}
 
 	currentStep--;
 	move(currentStep * stepSize);
@@ -1304,22 +1303,23 @@ void Sequencer::goToNextStep()
 	auto stepSize = TICK_VALUES[noteValue];
 	auto pos = getTickPosition();
 
-	auto stepGrid = vector<int>(ceil(getActiveSequence().lock()->getLastTick() / stepSize));
+	vector<int> stepGrid(ceil(getActiveSequence().lock()->getLastTick() / stepSize));
 
 	for (int i = 0; i < stepGrid.size(); i++)
 		stepGrid[i] = i * stepSize;
 
 	auto currentStep = -1;
-	for (auto l : stepGrid) {
-		if (pos < l) {
+
+	for (auto l : stepGrid)
+	{
+		if (pos < l)
 			break;
-		}
+
 		currentStep++;
 	}
 
-	if (currentStep == stepGrid.size()) {
+	if (currentStep == stepGrid.size())
 		return;
-	}
 
 	currentStep++;
 	move(currentStep * stepSize);
@@ -1328,16 +1328,12 @@ void Sequencer::goToNextStep()
 void Sequencer::tap()
 {
 	if (isPlaying())
-	{
 		return;
-	}
 
 	auto nanoLong = moduru::System::nanoTime();
 
 	if (nanoLong - lastTap > (2000 * 1000000))
-	{
 		taps = make_unique<moduru::io::CircularIntBuffer>(4, true, true);
-	}
 
 	lastTap = nanoLong;
 	taps->write(vector<int>{ (int)nanoLong });
@@ -1378,9 +1374,7 @@ void Sequencer::move(int tick)
 	auto s = isPlaying() ? getCurrentlyPlayingSequence().lock() : getActiveSequence().lock();
 
 	if (!isPlaying() && songMode)
-	{
 		s = sequences[getSongSequenceIndex()];
-	}
 
 	s->resetTrackEventIndices(position);
 
@@ -1395,9 +1389,9 @@ void Sequencer::move(int tick)
 
 int Sequencer::getTickPosition()
 {
-    if (isPlaying()) {
+    if (isPlaying())
         return mpc.getAudioMidiServices().lock()->getFrameSequencer().lock()->getTickPosition();
-    }
+ 
     return position;
 }
 
@@ -1415,7 +1409,7 @@ void Sequencer::setActiveTrackIndex(int i)
 int Sequencer::getCurrentlyPlayingSequenceIndex()
 {
 	auto songScreen = dynamic_pointer_cast<SongScreen>(mpc.screens->getScreenComponent("song"));
-	auto songSeqIndex = songMode ? songs[songScreen->getSelectedSongIndex()]->getStep(songScreen->getOffset() + 1)->getSequence() : -1;
+	auto songSeqIndex = songMode ? songs[songScreen->getSelectedSongIndex()]->getStep(songScreen->getOffset() + 1).lock()->getSequence() : -1;
 	return songMode ? songSeqIndex : currentlyPlayingSequenceIndex;
 }
 
@@ -1549,11 +1543,11 @@ int Sequencer::getSongSequenceIndex()
 	auto song = songs[songScreen->getSelectedSongIndex()];
 	auto step = songScreen->getOffset() + 1;
 
-	if (step > song->getStepAmount() - 1)
+	if (step > song->getStepCount() - 1)
 	{
-		step = song->getStepAmount() - 1;
+		step = song->getStepCount() - 1;
 	}
-	return song->getStep(step)->getSequence();
+	return song->getStep(step).lock()->getSequence();
 }
 
 bool Sequencer::isSecondSequenceEnabled()
@@ -1662,4 +1656,29 @@ void Sequencer::movePlaceHolderTo(int destIndex) {
 
 weak_ptr<Sequence> Sequencer::getPlaceHolder() {
 	return placeHolder;
+}
+
+int Sequencer::getPlayedStepRepetitions()
+{
+	return playedStepRepetitions;
+}
+
+bool Sequencer::isEndOfSong()
+{
+	return endOfSong;
+}
+
+void Sequencer::setEndOfSong(bool b)
+{
+	endOfSong = b;
+}
+
+void Sequencer::incrementPlayedStepRepetitions()
+{
+	playedStepRepetitions++;
+}
+
+void Sequencer::resetPlayedStepRepetitions()
+{
+	playedStepRepetitions = 0;
 }

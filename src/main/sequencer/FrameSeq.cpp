@@ -145,15 +145,17 @@ void FrameSeq::work(int nFrames)
 				{
 					if (getTickPosition() >= seq->getLastTick() - 1)
 					{
-						Sequencer::repeats++;
+						lSequencer->playToTick(seq->getLastTick() - 1);
+						lSequencer->incrementPlayedStepRepetitions();
 						auto song = lSequencer->getSong(songScreen->getSelectedSongIndex()).lock();
 						auto step = songScreen->getOffset() + 1;
-						if (step == song->getStepAmount() - 1 && Sequencer::repeats == song->getStep(step)->getRepeats())
+
+						if (step == song->getStepCount() - 1 && lSequencer->getPlayedStepRepetitions() >= song->getStep(step).lock()->getRepeats())
 						{
 							if (!songScreen->isLoopEnabled())
 							{
 								lSequencer->playToTick(seq->getLastTick() - 1);
-								Sequencer::endOfSong = true;
+								lSequencer->setEndOfSong(true);
 								lSequencer->stop();
 								lSequencer->move(seq->getLastTick());
 								continue;
@@ -170,14 +172,13 @@ void FrameSeq::work(int nFrames)
 						{
 							lSequencer->playToTick(seq->getLastTick() - 1);
 							
-							if (Sequencer::repeats == song->getStep(step)->getRepeats())
+							if (lSequencer->getPlayedStepRepetitions() == song->getStep(step).lock()->getRepeats())
 							{
-								Sequencer::repeats = 0;
+								lSequencer->resetPlayedStepRepetitions();
 								songScreen->setOffset(songScreen->getOffset() + 1);
 							}
 							
 							move(0);
-							continue;
 						}
 					}
 				}

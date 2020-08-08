@@ -63,7 +63,6 @@ void BaseControls::init()
 	param = ls.lock()->getFocus();
 	activeField = ls.lock()->getFocusedLayer().lock()->findField(param);
 	
-	
 	if (sequencer.lock()->getActiveTrack().lock())
 	{
 		track = sequencer.lock()->getActiveTrack();

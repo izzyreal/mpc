@@ -39,8 +39,10 @@ namespace mpc::sequencer
 		int activeSequenceIndex{ 0 };
 		int currentlyPlayingSequenceIndex{ 0 };
 		bool songMode{ false };
+		int playedStepRepetitions = 0;
+		bool endOfSong = false;
 
-		std::vector<int> TICK_VALUES{};
+		const std::vector<int> TICK_VALUES{ 1, 48, 32, 24, 16, 12, 8 };
 		std::vector<std::shared_ptr<Sequence>> sequences{};
 		std::vector<std::shared_ptr<Song>> songs{};
 		std::unique_ptr<moduru::io::CircularIntBuffer> taps{};
@@ -82,7 +84,6 @@ namespace mpc::sequencer
 
 	public:
 		std::vector<std::string> defaultTrackNames;
-		static bool endOfSong;
 		bool overdubbing{ false };
 		bool recording{ false };
 
@@ -129,6 +130,11 @@ namespace mpc::sequencer
 		void trackUp();
 		void trackDown();
 		bool isPlaying();
+		int getPlayedStepRepetitions();
+		bool isEndOfSong();
+		void setEndOfSong(bool b);
+		void incrementPlayedStepRepetitions();
+		void resetPlayedStepRepetitions();
 
 	public:
 		void undoSeq();
@@ -204,9 +210,6 @@ namespace mpc::sequencer
 		void setOverdubbing(bool b);
 		void playMetronomeTrack();
 		void stopMetronomeTrack();
-
-	public:
-		static int repeats;
 
 	};
 }

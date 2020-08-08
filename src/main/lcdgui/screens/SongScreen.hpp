@@ -27,9 +27,6 @@ namespace mpc::lcdgui::screens
 		bool isLoopEnabled();
 
 	public:
-		void init() override;
-
-	public:
 		void up() override;
 		void down() override;
 		void left() override;

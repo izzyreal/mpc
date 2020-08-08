@@ -26,20 +26,11 @@ void SongScreen::open()
 	displayLoop();
 	displaySteps();
 	sequencer.lock()->addObserver(this);
-	auto song = sequencer.lock()->getSong(selectedSongIndex).lock();
-	song->addObserver(this);
 }
 
 void SongScreen::close()
 {
 	sequencer.lock()->deleteObserver(this);
-	auto song = sequencer.lock()->getSong(selectedSongIndex).lock();
-	song->deleteObserver(this);
-}
-
-void SongScreen::init()
-{
-	baseControls->init();
 }
 
 void SongScreen::up()
@@ -121,7 +112,7 @@ void SongScreen::down()
 	auto song = sequencer.lock()->getSong(selectedSongIndex);
 	if (param.compare("step1") == 0 || param.compare("sequence1") == 0 || param.compare("reps1") == 0)
 	{	
-		if (offset == song.lock()->getStepAmount() - 1)
+		if (offset == song.lock()->getStepCount() - 1)
 		{
 			return;
 		}
@@ -143,32 +134,31 @@ void SongScreen::turnWheel(int i)
 	
 	if (param.find("sequence") != string::npos)
 	{
-		if (offset + 1 > song->getStepAmount() - 1) {
+		if (offset + 1 > song->getStepCount() - 1)
 			return;
-		}
 		
-		auto seq = song->getStep(offset + 1)->getSequence();
+		auto seq = song->getStep(offset + 1).lock()->getSequence();
 		auto up = sequencer.lock()->getFirstUsedSeqUp(seq + 1);
-		song->getStep(offset + 1)->setSequence(i < 0 ? sequencer.lock()->getFirstUsedSeqDown(seq - 1) : up);
+		song->getStep(offset + 1).lock()->setSequence(i < 0 ? sequencer.lock()->getFirstUsedSeqDown(seq - 1) : up);
 		sequencer.lock()->setActiveSequenceIndex(sequencer.lock()->getSongSequenceIndex());
 		sequencer.lock()->setBar(0);
 	}
-	else if (param.find("reps") != string::npos) {
-		if (offset + 1 > song->getStepAmount() - 1)
-		{
+	else if (param.find("reps") != string::npos)
+	{
+		if (offset + 1 > song->getStepCount() - 1)
 			return;
-		}
-		song->getStep(offset + 1)->setRepeats(song->getStep(offset + 1)->getRepeats() + i);
+	
+		song->getStep(offset + 1).lock()->setRepeats(song->getStep(offset + 1).lock()->getRepeats() + i);
+		displaySteps();
 	}
 	else if (param.compare("song") == 0)
 	{
 		setSelectedSongIndex(selectedSongIndex + i);
 		setOffset(-1);
 		init();
-		if (song->isUsed() && song->getStepAmount() != 0)
-		{
-			sequencer.lock()->setActiveSequenceIndex(song->getStep(0)->getSequence());
-		}
+
+		if (song->isUsed() && song->getStepCount() != 0)
+			sequencer.lock()->setActiveSequenceIndex(song->getStep(0).lock()->getSequence());
 	}
 	else if (param.compare("tempo") == 0 && !sequencer.lock()->isTempoSourceSequenceEnabled())
 	{
@@ -195,11 +185,16 @@ void SongScreen::function(int i)
 		song->deleteStep(offset + 1);
 		break;
 	case 5:
-		song->insertStep(offset + 1, new mpc::sequencer::Step(song.get()));
+		song->insertStep(offset + 1);
+		
 		if (!song->isUsed())
 		{
 			song->setUsed(true);
 		}
+
+		displaySongName();
+		displaySteps();
+		displayTempo();
 		break;
 	}
 }
@@ -217,7 +212,7 @@ void SongScreen::displayLoop()
 void SongScreen::displaySteps()
 {
 	auto song = sequencer.lock()->getSong(selectedSongIndex).lock();
-	int steps = song->getStepAmount();
+	int steps = song->getStepCount();
 	auto s = sequencer.lock();
 	
 	auto stepArray = vector<weak_ptr<mpc::lcdgui::Field>>{ findField("step0"), findField("step1"), findField("step2") };
@@ -226,18 +221,19 @@ void SongScreen::displaySteps()
 
 	for (int i = 0; i < 3; i++)
 	{
-		int stepnr = i + offset;
+		int stepIndex = i + offset;
 	
-		if (stepnr >= 0 && stepnr < steps)
+		if (stepIndex >= 0 && stepIndex < steps)
 		{
-			stepArray[i].lock()->setTextPadded(stepnr + 1, " ");
-			auto seqname = s->getSequence(song->getStep(stepnr)->getSequence()).lock()->getName();
-			sequenceArray[i].lock()->setText(StrUtil::padLeft(to_string(song->getStep(stepnr)->getSequence() + 1), "0", 2) + "-" + seqname);
-			repsArray[i].lock()->setText(to_string(song->getStep(stepnr)->getRepeats()));
+			stepArray[i].lock()->setTextPadded(stepIndex + 1, " ");
+			auto seqname = s->getSequence(song->getStep(stepIndex).lock()->getSequence()).lock()->getName();
+			sequenceArray[i].lock()->setText(StrUtil::padLeft(to_string(song->getStep(stepIndex).lock()->getSequence() + 1), "0", 2) + "-" + seqname);
+			repsArray[i].lock()->setText(to_string(song->getStep(stepIndex).lock()->getRepeats()));
 		}
-		else {
+		else
+		{
 			stepArray[i].lock()->setText("");
-			sequenceArray[i].lock()->setText(stepnr == steps ? "   (end of song)" : "");
+			sequenceArray[i].lock()->setText(stepIndex == steps ? "   (end of song)" : "");
 			repsArray[i].lock()->setText("");
 		}
 	}
@@ -272,10 +268,10 @@ void SongScreen::displaySongName()
 void SongScreen::setOffset(int i)
 {
 	if (i < -1)
-	{
 		return;
-	}
+
 	offset = i;
+
 	displaySteps();
 	displayTempo();
 }
@@ -283,17 +279,9 @@ void SongScreen::setOffset(int i)
 void SongScreen::setSelectedSongIndex(int i)
 {
 	if (i < 0 || i > 19)
-	{
 		return;
-	}
-	
-	auto oldSong = sequencer.lock()->getSong(selectedSongIndex).lock();
-	oldSong->deleteObserver(this);
 	
 	selectedSongIndex = i;
-
-	auto newSong = sequencer.lock()->getSong(selectedSongIndex).lock();
-	newSong->deleteObserver(this);
 
 	displaySongName();
 	displaySteps();
@@ -316,10 +304,7 @@ void SongScreen::update(moduru::observer::Observable* observable, nonstd::any me
 {
 	auto msg = nonstd::any_cast<string>(message);
 
-	if (msg.compare("used") == 0 || msg.compare("song-name") == 0) {
-		displaySongName();
-	}
-	else if (msg.compare("bar") == 0)
+	if (msg.compare("bar") == 0)
 	{
 		displayNow0();
 	}
@@ -334,10 +319,6 @@ void SongScreen::update(moduru::observer::Observable* observable, nonstd::any me
 	else if (msg.compare("tempo") == 0)
 	{
 		displayTempo();
-	}
-	else if (msg.compare("step-editor") == 0)
-	{
-		displaySteps();
 	}
 	else if (msg.compare("play") == 0)
 	{
