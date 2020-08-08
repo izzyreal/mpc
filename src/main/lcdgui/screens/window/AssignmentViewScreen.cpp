@@ -171,16 +171,13 @@ void AssignmentViewScreen::displayInfo0()
 
 void AssignmentViewScreen::displayInfo1()
 {
-	auto focus = ls.lock()->getFocus();
 	auto note = program.lock()->getPad(getPadIndexFromFocus())->getNote();
-	auto text = note != 34 ? to_string(note) : "--";
-	
+	auto text = note != 34 ? to_string(note) : "--";	
 	findLabel("info1").lock()->setText(text);
 }
 
 void AssignmentViewScreen::displayInfo2()
 {
-	auto focus = mpc.getLayeredScreen().lock()->getFocus();
 	auto padIndex = getPadIndexFromFocus();
 	int note = program.lock()->getPad(padIndex)->getNote();
 
@@ -207,12 +204,14 @@ void AssignmentViewScreen::displayInfo2()
 
 int AssignmentViewScreen::getPadIndexFromFocus()
 {
-	auto focus = ls.lock()->getFocus();
 	auto padIndex = -1;
+
+	init();
 
 	for (int i = 0; i < padFocusNames.size(); i++)
 	{
-		if (padFocusNames[i].compare(focus) == 0) {
+		if (padFocusNames[i].compare(param) == 0)
+		{
 			padIndex = i;
 			break;
 		}
@@ -227,9 +226,7 @@ string AssignmentViewScreen::getFocusFromPadIndex()
 	auto padIndex = mpc.getPad();
 	
 	while (padIndex > 15)
-	{
 		padIndex -= 16;
-	}
 
 	return padFocusNames[padIndex];
 }

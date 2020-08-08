@@ -449,8 +449,8 @@ void NameScreen::initEditColors()
 		field->setInverted(false);
     }
 
-	auto focus = ls.lock()->getFocus();
-	findField(focus).lock()->setInverted(false);
+	init();
+	findField(param).lock()->setInverted(false);
 }
 
 void NameScreen::resetNameScreen()

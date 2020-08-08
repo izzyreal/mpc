@@ -39,6 +39,7 @@ namespace mpc::lcdgui::screens
 		void displayTr();
 		void displayCount();
 		void displayTiming();
+		void displayAll();
 
 	public:
 		// Shared with NextSeqObserver, find better home

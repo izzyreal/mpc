@@ -17,9 +17,11 @@ namespace mpc::lcdgui::screens
 		void open() override;
 
 	private:
-		int sq{ 0 };
+		int sq = 0;
+		
 		void setSq(int i);
 		void displaySq();
+		void displayFunctionKeys();
 
 	};
 }

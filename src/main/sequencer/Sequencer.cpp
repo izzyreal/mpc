@@ -286,26 +286,19 @@ void Sequencer::setDefaultSequenceName(string s)
 void Sequencer::setActiveSequenceIndex(int i)
 {
 	if (i < 0 || i > 98)
-	{
 		return;
-	}
 
 	activeSequenceIndex = i;
 	
 	if (!isPlaying())
 	{
 		position = 0;
-		
 		notifyObservers(string("now"));
 	}
 	
-	
 	notifyObservers(string("seqnumbername"));
-	
 	notifyObservers(string("timesignature"));
-	
 	notifyObservers(string("numberofbars"));
-	
 	notifyObservers(string("tempo"));
 	notifyTrack();
 }
@@ -1258,16 +1251,19 @@ void Sequencer::notifyTimeDisplayRealtime()
 	int bar = getCurrentBarIndex();
 	int beat = getCurrentBeatIndex();
 	int clock = getCurrentClockNumber();
+	
 	if (lastNotifiedBar != bar) {
 		
 		notifyObservers(string("bar"));
 		lastNotifiedBar = bar;
 	}
+	
 	if (lastNotifiedBeat != beat) {
 		
 		notifyObservers(string("beat"));
 		lastNotifiedBeat = beat;
 	}
+
 	if (lastNotifiedClock != clock) {
 		
 		notifyObservers(string("clock"));
