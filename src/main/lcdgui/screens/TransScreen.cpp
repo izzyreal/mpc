@@ -132,7 +132,7 @@ void TransScreen::setBar1(int i)
 
 void TransScreen::displayTransposeAmount()
 {
-	findField("transpose-amount").lock()->setTextPadded(transposeAmount, " ");
+	findField("transpose-amount").lock()->setTextPadded(transposeAmount);
 }
 
 void TransScreen::displayTr()
@@ -144,6 +144,6 @@ void TransScreen::displayTr()
 
 void TransScreen::displayBars()
 {
-	findField("bar0").lock()->setText(to_string(bar0 + 1));
-	findField("bar1").lock()->setText(to_string(bar1 + 1));
+	findField("bar0").lock()->setTextPadded(to_string(bar0 + 1), "0");
+	findField("bar1").lock()->setTextPadded(to_string(bar1 + 1), "0");
 }
