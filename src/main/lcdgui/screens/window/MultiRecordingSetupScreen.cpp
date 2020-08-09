@@ -3,6 +3,7 @@
 #include <sequencer/Track.hpp>
 
 using namespace mpc::lcdgui::screens::window;
+using namespace moduru::lang;
 using namespace std;
 
 MultiRecordingSetupScreen::MultiRecordingSetupScreen(mpc::Mpc& mpc, const int layerIndex)
@@ -15,29 +16,19 @@ MultiRecordingSetupScreen::MultiRecordingSetupScreen(mpc::Mpc& mpc, const int la
 		mrsLines[i].setOut(0);
 	}
 
-	inNames = vector<string>(34);
-
 	for (int i = 0; i < 34; i++)
 	{
 		if (i < 16)
-		{
-			inNames[i] = "1-" + moduru::lang::StrUtil::padLeft(to_string(i + 1), "0", 2);
-		}
+			inNames[i] = "1-" + StrUtil::padLeft(to_string(i + 1), "0", 2);
 
 		if (i == 16)
-		{
 			inNames[i] = "1-Ex";
-		}
 
 		if (i > 16 && i < 33)
-		{
-			inNames[i] = "2-" + moduru::lang::StrUtil::padLeft(to_string(i - 16), "0", 2);
-		}
+			inNames[i] = "2-" + StrUtil::padLeft(to_string(i - 16), "0", 2);
 
 		if (i == 33)
-		{
 			inNames[i] = "2-Ex";
-		}
 	}
 }
 
@@ -46,9 +37,7 @@ void MultiRecordingSetupScreen::open()
 	auto seq = sequencer.lock()->getActiveSequence().lock();
 	
 	for (auto& mrsLine : mrsLines)
-	{
 		mrsLine.setOut(seq->getTrack(mrsLine.getTrack()).lock()->getDevice());
-	}
 
 	setYOffset(yOffset);
 	displayMrsLine(0);
@@ -58,23 +47,21 @@ void MultiRecordingSetupScreen::open()
 
 void MultiRecordingSetupScreen::init()
 {
-	baseControls->init();
+	ScreenComponent::init();
 	
 	yPos = 0;
 	
 	if (param.length() == 2)
-	{
 		yPos = stoi(param.substr(1, 2));
-	}
 }
 
 void MultiRecordingSetupScreen::left()
 {
 	init();
+
 	if (param[0] == 'a')
-	{
 		return;
-	}
+
 	baseControls->left();
 }
 
@@ -191,7 +178,7 @@ void MultiRecordingSetupScreen::displayMrsLine(int i)
 		}
 		else {
 			string trackNumber = to_string(visibleMrsLines[i]->getTrack() + 1);
-			trackNumber = moduru::lang::StrUtil::padLeft(trackNumber, "0", 2);
+			trackNumber = StrUtil::padLeft(trackNumber, "0", 2);
 			findField("b0").lock()->setText(string(trackNumber + "-" + seq->getTrack(visibleMrsLines[i]->getTrack()).lock()->getName()));
 		}
 		if (visibleMrsLines[i]->getOut() == 0) {
@@ -219,7 +206,7 @@ void MultiRecordingSetupScreen::displayMrsLine(int i)
 		}
 		else
 		{
-			string trStr = moduru::lang::StrUtil::padLeft(to_string(visibleMrsLines[i]->getTrack() + 1), "0", 2);
+			string trStr = StrUtil::padLeft(to_string(visibleMrsLines[i]->getTrack() + 1), "0", 2);
 			findField("b1").lock()->setText(string(trStr + "-" + seq->getTrack(visibleMrsLines[i]->getTrack()).lock()->getName()));
 		}
 		
@@ -249,7 +236,7 @@ void MultiRecordingSetupScreen::displayMrsLine(int i)
 		}
 		else
 		{
-			findField("b2").lock()->setText(moduru::lang::StrUtil::padLeft(to_string(visibleMrsLines[i]->getTrack() + 1), "0", 2) + "-" + seq->getTrack(visibleMrsLines[i]->getTrack()).lock()->getName());
+			findField("b2").lock()->setText(StrUtil::padLeft(to_string(visibleMrsLines[i]->getTrack() + 1), "0", 2) + "-" + seq->getTrack(visibleMrsLines[i]->getTrack()).lock()->getName());
 		}
 
 		if (visibleMrsLines[i]->getOut() == 0)

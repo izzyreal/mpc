@@ -14,7 +14,7 @@ namespace mpc::lcdgui::screens::window {
 		int yOffset = 0;
 		std::vector<MultiRecordingSetupLine> mrsLines = std::vector<MultiRecordingSetupLine>(34);
 		std::vector<MultiRecordingSetupLine*> visibleMrsLines;
-		std::vector<std::string> inNames;
+		std::vector<std::string> inNames = std::vector<std::string>(34);
 
 	public:
 		void init() override;

@@ -443,39 +443,31 @@ void TempoChangeScreen::function(int j)
 
 void TempoChangeScreen::init()
 {
-	baseControls->init();
+	ScreenComponent::init();
 	auto seq = sequencer.lock()->getActiveSequence().lock();
 	auto tceList = seq->getTempoChangeEvents();
 
 	if (param.length() != 2)
-	{
 		return;
-	}
 
 	auto yPos = stoi(param.substr(1, 2));
 
 	int nextPosition = yPos + offset + 1;
 
 	if (tceList.size() > nextPosition)
-	{
 		next = tceList[nextPosition];
-	}
 
 	int currentPosition = yPos + offset;
 
 	if (currentPosition + 1 > tceList.size())
-	{
 		return;
-	}
 
 	current = tceList[currentPosition];
 
 	auto previousPosition = yPos + offset - 1;
 
 	if (previousPosition >= 0)
-	{
 		previous = tceList[previousPosition];
-	}
 }
 
 void TempoChangeScreen::turnWheel(int j)
@@ -621,9 +613,7 @@ void TempoChangeScreen::up()
 	init();
 
 	if (param.length() != 2)
-	{
 		return;
-	}
 
 	auto yPos = stoi(param.substr(1, 2));
 
