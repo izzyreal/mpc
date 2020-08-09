@@ -50,9 +50,8 @@ bool Component::bringToFront(Component* childToBringToFront)
 			children.push_back(move(placeHolder));
 
 			if (parent != nullptr)
-			{
 				parent->bringToFront(this);
-			}
+
 			return true;
 		}
 	}
@@ -60,9 +59,7 @@ bool Component::bringToFront(Component* childToBringToFront)
 	for (auto& c : children)
 	{
 		if (c->bringToFront(childToBringToFront))
-		{
 			return true;
-		}
 	}
 
 	return false;
@@ -116,16 +113,12 @@ weak_ptr<Label> Component::findLabel(const string& name)
 		auto candidate = dynamic_pointer_cast<Label>(c);
 
 		if (candidate && candidate->getName().compare(name) == 0)
-		{
 			return candidate;
-		}
 
 		auto secondCandidate = c->findLabel(name).lock();
 
 		if (secondCandidate)
-		{
 			return secondCandidate;
-		}
 	}
 
 	return {};
@@ -138,16 +131,12 @@ weak_ptr<Field> Component::findField(const string& name)
 		auto candidate = dynamic_pointer_cast<Field>(c);
 
 		if (candidate && candidate->getName().compare(name) == 0)
-		{
 			return candidate;
-		}
 
 		auto secondCandidate = c->findField(name).lock();
 
 		if (secondCandidate)
-		{
 			return secondCandidate;
-		}
 	}
 
 	return {};
@@ -156,56 +145,51 @@ weak_ptr<Field> Component::findField(const string& name)
 vector<weak_ptr<Label>> Component::findLabels()
 {
 	vector<weak_ptr<Label>> result;
+
 	for (auto& c : children)
 	{
 		auto candidate = dynamic_pointer_cast<Label>(c);
 		if (candidate)
-		{
 			result.push_back(candidate);
-		}
 
 		for (auto& Label : c->findLabels())
-		{
 			result.push_back(Label);
-		}
 	}
+
 	return result;
 }
 
 vector<weak_ptr<Field>> Component::findFields()
 {
 	vector<weak_ptr<Field>> result;
+
 	for (auto& c : children)
 	{
 		auto candidate = dynamic_pointer_cast<Field>(c);
+
 		if (candidate)
-		{
 			result.push_back(candidate);
-		}
 
 		for (auto& field : c->findFields())
-		{
 			result.push_back(field);
-		}
 	}
+	
 	return result;
 }
 
 vector<weak_ptr<Parameter>> Component::findParameters()
 {
 	vector<weak_ptr<Parameter>> result;
+	
 	for (auto& c : children)
 	{
 		if (dynamic_pointer_cast<Parameter>(c))
-		{
 			result.push_back(dynamic_pointer_cast<Parameter>(c));
-		}
 		
 		for (auto& parameter : c->findParameters())
-		{
 			result.push_back(parameter);
-		}
 	}
+
 	return result;
 }
 
@@ -252,10 +236,9 @@ weak_ptr<Component> Component::findChild(const string& name)
 		}
 
 		auto candidate = c->findChild(name).lock();
+
 		if (candidate)
-		{
 			return candidate;
-		}
 	}
 	return {};
 }
@@ -263,16 +246,12 @@ weak_ptr<Component> Component::findChild(const string& name)
 void Component::Draw(vector<vector<bool>>* pixels)
 {
 	if (shouldNotDraw(pixels))
-	{
 		return;
-	}
 
-	MLOG("Drawing " + name);
+	//MLOG("Drawing " + name);
 
 	if (hidden || !IsDirty())
-	{
 		return;
-	}
 
 	for (auto& c : children)
 		c->Draw(pixels);
@@ -294,18 +273,13 @@ void Component::Hide(bool b)
 	}
 
 	for (auto& c : children)
-	{
 		c->Hide(b);
-	}
-
 }
 
 void Component::setSize(int w, int h)
 {
 	if (w == this->w && h == this->h)
-	{
 		return;
-	}
 
 	if (!(this->w == -1 && this->h == -1))
 	{
@@ -321,9 +295,7 @@ void Component::setSize(int w, int h)
 void Component::setLocation(int x, int y)
 {
 	if (x == this->x && y == this->y)
-	{
 		return;
-	}
 
 	if (!(this->x == -1 && this->y == -1))
 	{
@@ -352,9 +324,7 @@ MRECT Component::getDirtyArea()
 		res = res.Union(&rect);
 
 		if (!preDrawClearRect.Empty())
-		{
 			res = res.Union(&preDrawClearRect);
-		}
 	}
 
 	return res;
@@ -363,14 +333,10 @@ MRECT Component::getDirtyArea()
 void Component::SetDirty(bool b) 
 { 
 	if (hidden)
-	{
 		return;
-	}
 
 	for (auto& c : children)
-	{
 		c->SetDirty(b);
-	}
 	
 	dirty = b;
 }
@@ -395,14 +361,14 @@ bool Component::IsDirty()
 	}
 
 	if (dirtyChild)
-	{
 		return true;
-	}
 
+	/*
 	if (dirty)
 	{
 		MLOG(name + " is dirty");
 	}
+	*/
 
 	return dirty;
 }
@@ -423,14 +389,10 @@ void Component::Clear(vector<vector<bool>>* pixels)
 	for (int i = r.L; i < r.R; i++)
 	{
 		if (i < 0)
-		{
 			continue;
-		}
 
 		for (int j = r.T; j < r.B; j++)
-		{
 			(*pixels)[i][j] = false;
-		}
 	}
 }
 
@@ -439,26 +401,18 @@ void Component::preDrawClear(vector<vector<bool>>* pixels)
 	auto r = preDrawClearRect;
 
 	for (auto& c : children)
-	{
 		c->preDrawClear(pixels);
-	}
 
 	if (r.Empty())
-	{
 		return;
-	}
 
 	for (int i = r.L; i < r.R; i++)
 	{
 		if (i < 0)
-		{
 			continue;
-		}
 
 		for (int j = r.T; j < r.B; j++)
-		{
 			(*pixels)[i][j] = false;
-		}
 	}
 
 	preDrawClearRect.Clear();
@@ -471,14 +425,10 @@ vector<weak_ptr<Component>> Component::findHiddenChildren()
 	for (auto& c : children)
 	{
 		if (c->IsHidden() && c->IsDirty())
-		{
 			result.push_back(c);
-		}
 
 		for (auto& c1 : c->findHiddenChildren())
-		{
 			result.push_back(c1);
-		}
 	}
 
 	return result;
@@ -491,16 +441,12 @@ weak_ptr<ScreenComponent> Component::findScreenComponent()
 		auto candidate = dynamic_pointer_cast<ScreenComponent>(c);
 		
 		if (candidate)
-		{
 			return candidate;
-		}
 
 		auto childCandidate = c->findScreenComponent().lock();
 
 		if (childCandidate)
-		{
 			return childCandidate;
-		}
 	}
 	
 	return {};
@@ -511,9 +457,7 @@ void Component::deleteChildren(const string& name)
 	for (int i = children.size() - 1; i >= 0; i--)
 	{
 		if (children[i]->getName().compare(name) == 0)
-		{
 			children.erase(begin(children) + i);
-		}
 	}
 }
 
