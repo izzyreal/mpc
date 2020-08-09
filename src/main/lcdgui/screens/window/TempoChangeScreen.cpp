@@ -497,44 +497,45 @@ void TempoChangeScreen::turnWheel(int j)
 
 	for (int i = 0; i < 3; i++)
 	{
-		auto tce = visibleTempoChanges[i].lock();
+		auto event = visibleTempoChanges[i].lock();
 
 		if (param.compare("b" + to_string(i)) == 0)
 		{
 			if (j > 0)
 			{
-				tce->plusOneBar(ts.getNumerator(), ts.getDenominator(), next.lock().get());
+				event->plusOneBar(ts.getNumerator(), ts.getDenominator(), next.lock().get());
 			}
 			else
 			{
-				tce->minusOneBar(ts.getNumerator(), ts.getDenominator(), previous.lock().get());
+				event->minusOneBar(ts.getNumerator(), ts.getDenominator(), previous.lock().get());
 			}
 		}
 		else if (param.compare("c" + to_string(i)) == 0)
 		{
 			if (j > 0)
 			{
-				tce->plusOneBeat(ts.getDenominator(), next.lock().get());
+				event->plusOneBeat(ts.getDenominator(), next.lock().get());
 			}
 			else
 			{
-				tce->minusOneBeat(ts.getDenominator(), previous.lock().get());
+				event->minusOneBeat(ts.getDenominator(), previous.lock().get());
 			}
 		}
 		else if (param.compare("d" + to_string(i)) == 0)
 		{
 			if (j > 0)
 			{
-				tce->plusOneClock(next.lock().get());
+				event->plusOneClock(next.lock().get());
 			}
 			else {
-				tce->minusOneClock(previous.lock().get());
+				event->minusOneClock(previous.lock().get());
 			}
 		}
 		else if (param.compare("e" + to_string(i)) == 0)
 		{
-			tce->setRatio(tce->getRatio() + j);
+			event->setRatio(event->getRatio() + j);
 		}
+
 		if (param.length() == 2 && stoi(param.substr(1)) == i)
 		{
 			if (i == 0)
