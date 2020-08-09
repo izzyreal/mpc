@@ -25,17 +25,13 @@ void SecondSeqScreen::function(int i)
 		ls.lock()->openScreen("trans");
         break;
     case 5:
-        if (sequencer.lock()->isSecondSequenceEnabled() && sq == sequencer.lock()->getSecondSequenceIndex())
+        if (sequencer.lock()->isSecondSequenceEnabled())
         {
             sequencer.lock()->setSecondSequenceEnabled(false);
             ls.lock()->openScreen("sequencer");
             return;
         }
-
-        if (sq == sequencer.lock()->getActiveSequenceIndex() || !sequencer.lock()->getSequence(sq).lock()->isUsed())
-            return;
  
-        sequencer.lock()->setSecondSequenceIndex(sq);
         sequencer.lock()->setSecondSequenceEnabled(true);
         ls.lock()->openScreen("sequencer");
         break;
@@ -70,13 +66,8 @@ void SecondSeqScreen::displaySq()
 
 void SecondSeqScreen::displayFunctionKeys()
 {
-    if (sequencer.lock()->isSecondSequenceEnabled() && sq == sequencer.lock()->getSecondSequenceIndex()) {
+    if (sequencer.lock()->isSecondSequenceEnabled())
         ls.lock()->setFunctionKeysArrangement(2);
-    }
-    else if (sq == sequencer.lock()->getActiveSequenceIndex() || !sequencer.lock()->getSequence(sq).lock()->isUsed()) {
-        ls.lock()->setFunctionKeysArrangement(1);
-    }
-    else {
+    else
         ls.lock()->setFunctionKeysArrangement(0);
-    }
 }

@@ -29,9 +29,7 @@ void TransposePermanentScreen::function(int i)
 		if (all)
 		{
 			for (int i = 0; i < 64; i++)
-			{
 				tracks.push_back(i);
-			}
 		}
 		else
 		{
@@ -51,15 +49,13 @@ void TransposePermanentScreen::function(int i)
 				auto noteEvent = n.lock();
 				
 				if (noteEvent->getTick() < firstTick || noteEvent->getTick() > lastTick)
-				{
 					continue;
-				}
 			
 				noteEvent->setNote(noteEvent->getNote() + transScreen->transposeAmount);
 			}
 		}
 
-		ls.lock()->openScreen("trans");
+		ls.lock()->openScreen("sequencer");
 		break;
 	}
 }

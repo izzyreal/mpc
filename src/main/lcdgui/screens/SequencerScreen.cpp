@@ -556,12 +556,6 @@ void SequencerScreen::turnWheel(int i)
 		}
 		else
 		{
-			if (sequencer.lock()->isSecondSequenceEnabled())
-			{
-				sequencer.lock()->setSecondSequenceEnabled(false);
-				findBackground().lock()->setName("sequencer");
-			}
-
 			sequencer.lock()->setActiveSequenceIndex(sequencer.lock()->getActiveSequenceIndex() + i);
 		}
 	}

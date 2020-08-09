@@ -100,8 +100,14 @@ int LayeredScreen::openScreen(string screenName)
 
 	auto focus = getFocusedLayer().lock()->findField(getFocus()).lock();
 
-	if (focus && focus->isSplit())
-		focus->setSplit(false);
+	if (focus)
+	{
+		if (focus->isSplit())
+			focus->setSplit(false);
+
+		if (focus->isTypeModeEnabled())
+			focus->disableTypeMode();
+	}
 
 	setLastFocus(currentScreenName, getFocus());
 		

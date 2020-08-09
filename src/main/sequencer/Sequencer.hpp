@@ -33,44 +33,43 @@ namespace mpc::sequencer
 		int lastNotifiedBar = -1;
 		int lastNotifiedBeat = -1;
 		int lastNotifiedClock = -1;
-		std::shared_ptr<Sequence> placeHolder{};
-		bool metronomeOnly{ false };
-		std::unique_ptr<mpc::sequencer::Sequence> metronomeSeq{};
-		int activeSequenceIndex{ 0 };
-		int currentlyPlayingSequenceIndex{ 0 };
-		bool songMode{ false };
+		std::shared_ptr<Sequence> placeHolder;
+		bool metronomeOnly = false;
+		std::unique_ptr<mpc::sequencer::Sequence> metronomeSeq;
+		int activeSequenceIndex = 0;
+		int currentlyPlayingSequenceIndex = 0;
+		bool songMode = false;
 		int playedStepRepetitions = 0;
 		bool endOfSong = false;
 
 		const std::vector<int> TICK_VALUES{ 1, 48, 32, 24, 16, 12, 8 };
-		std::vector<std::shared_ptr<Sequence>> sequences{};
-		std::vector<std::shared_ptr<Song>> songs{};
-		std::unique_ptr<moduru::io::CircularIntBuffer> taps{};
+		std::vector<std::shared_ptr<Sequence>> sequences;
+		std::vector<std::shared_ptr<Song>> songs;
+		std::unique_ptr<moduru::io::CircularIntBuffer> taps;
 
-		std::shared_ptr<Sequence> undoPlaceHolder{ nullptr };
+		std::shared_ptr<Sequence> undoPlaceHolder;
 
 
-		bool secondSequenceEnabled{ false };
-		int secondSequenceIndex{ 0 };
-		bool lastRecordingActive{ false };
-		int playStartTick{ 0 };
+		bool secondSequenceEnabled = false;
+		bool lastRecordingActive = false;
+		int playStartTick = 0;
 		double previousTempo = 0.0;
-		int recordStartTick{ 0 };
+		int recordStartTick = 0;
 
 		std::string defaultSongName = "";
 		std::string defaultSequenceName = "";
-		std::vector<std::string> defaultDeviceNames{};
-		int timeDisplayStyle{ 0 };
-		bool recordingModeMulti{ false };
-		int frameRate{ 0 };
-		bool countEnabled{ false };
-		bool soloEnabled{ false };
-		bool tempoSourceSequenceEnabled{ false };
+		std::vector<std::string> defaultDeviceNames;
+		int timeDisplayStyle = 0;
+		bool recordingModeMulti = false;
+		int frameRate = 0;
+		bool countEnabled = false;
+		bool soloEnabled = false;
+		bool tempoSourceSequenceEnabled = false;
 
-		bool countingIn{ false };
-		int reposition{ 0 };
-		int position{ 0 };
-		int lastTap{ 0 };
+		bool countingIn = false;
+		int reposition = 0;
+		int position = 0;
+		int lastTap = 0;
 
 	public:
 		std::vector<int> getTickValues();
@@ -84,12 +83,12 @@ namespace mpc::sequencer
 
 	public:
 		std::vector<std::string> defaultTrackNames;
-		bool overdubbing{ false };
-		bool recording{ false };
+		bool overdubbing = false;
+		bool recording = false;
 
-		int activeTrackIndex{ 0 };
+		int activeTrackIndex = 0;
 		double tempo = 120.0;
-		int nextsq{ 0 };
+		int nextsq = 0;
 
 	private:
 		std::weak_ptr<TempoChangeEvent> getCurrentTempoChangeEvent();
@@ -197,8 +196,6 @@ namespace mpc::sequencer
 		int getSongSequenceIndex();
 		bool isSecondSequenceEnabled();
 		void setSecondSequenceEnabled(bool b);
-		int getSecondSequenceIndex();
-		void setSecondSequenceIndex(int i);
 		void flushTrackNoteCache();
 		void storeActiveSequenceInUndoPlaceHolder();
 		bool isOverDubbing();

@@ -11,6 +11,7 @@
 #include <lcdgui/LayeredScreen.hpp>
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/SongScreen.hpp>
+#include <lcdgui/screens/SecondSeqScreen.hpp>
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <lcdgui/screens/window/CountMetronomeScreen.hpp>
 #include <lcdgui/screens/UserScreen.hpp>
@@ -115,15 +116,19 @@ void Sequencer::playToTick(int targetTick)
 {
 	auto seqIndex = songMode ? getSongSequenceIndex() : currentlyPlayingSequenceIndex;
 	auto seq = metronomeOnly ? metronomeSeq.get() : sequences[seqIndex].get();
+	auto secondSequenceScreen = dynamic_pointer_cast<SecondSeqScreen>(mpc.screens->getScreenComponent("second-seq"));
 
 	for (int i = 0; i < 2; i++)
 	{
 		if (i == 1)
 		{
-			if (!secondSequenceEnabled || metronomeOnly)
+			if (!secondSequenceEnabled || metronomeOnly || secondSequenceScreen->sq == seqIndex) // Real 2KXL would play all events twice for the last clause
 				break;
 
-			seq = sequences[secondSequenceIndex].get();
+			seq = sequences[secondSequenceScreen->sq].get();
+
+			if (!seq->isUsed())
+				break;
 		}
 
 		for (auto& track_ : seq->getTracks()) {
@@ -1378,7 +1383,10 @@ void Sequencer::move(int tick)
 	s->resetTrackEventIndices(position);
 
 	if (secondSequenceEnabled)
-		sequences[secondSequenceIndex]->resetTrackEventIndices(position);
+	{
+		auto secondSequenceScreen = dynamic_pointer_cast<SecondSeqScreen>(mpc.screens->getScreenComponent("second-seq"));
+		sequences[secondSequenceScreen->sq]->resetTrackEventIndices(position);
+	}
 
 	notifyTimeDisplay();
 
@@ -1562,21 +1570,10 @@ void Sequencer::setSecondSequenceEnabled(bool b)
     secondSequenceEnabled = b;
 }
 
-int Sequencer::getSecondSequenceIndex()
-{
-    return secondSequenceIndex;
-}
-
-void Sequencer::setSecondSequenceIndex(int i)
-{
-    secondSequenceIndex = i;
-}
-
 void Sequencer::flushTrackNoteCache()
 {
-	for (auto& t : getCurrentlyPlayingSequence().lock()->getTracks()) {
+	for (auto& t : getCurrentlyPlayingSequence().lock()->getTracks())
 		t.lock()->flushNoteCache();
-	}
 }
 
 void Sequencer::storeActiveSequenceInUndoPlaceHolder()

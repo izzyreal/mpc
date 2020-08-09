@@ -4,12 +4,13 @@
 #include <sequencer/Sequencer.hpp>
 
 #include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/SecondSeqScreen.hpp>
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 
-using namespace mpc::lcdgui;
-using namespace mpc::lcdgui::screens::window;
-
 using namespace mpc::file::all;
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
 mpc::file::all::Sequencer::Sequencer(mpc::Mpc& mpc, vector<char> loadBytes)
@@ -37,7 +38,9 @@ mpc::file::all::Sequencer::Sequencer(mpc::Mpc& mpc)
 
 	saveBytes[TC_OFFSET] = noteValue;
 	saveBytes[SECOND_SEQ_ENABLED_OFFSET] = seq->isSecondSequenceEnabled() ? 1 : 0;
-	saveBytes[SECOND_SEQ_INDEX_OFFSET] = seq->getSecondSequenceIndex();
+	
+	auto secondSequenceScreen = dynamic_pointer_cast<SecondSeqScreen>(mpc.screens->getScreenComponent("second-seq"));
+	saveBytes[SECOND_SEQ_INDEX_OFFSET] = secondSequenceScreen->sq;
 }
 
 const int mpc::file::all::Sequencer::LENGTH;

@@ -29,6 +29,7 @@
 #include <lcdgui/screens/window/MidiInputScreen.hpp>
 #include <lcdgui/screens/window/MultiRecordingSetupLine.hpp>
 #include <lcdgui/screens/StepEditorScreen.hpp>
+#include <lcdgui/screens/SecondSeqScreen.hpp>
 #include <lcdgui/screens/SongScreen.hpp>
 #include <lcdgui/screens/OthersScreen.hpp>
 #include <lcdgui/screens/SyncScreen.hpp>
@@ -174,7 +175,9 @@ AllLoader::AllLoader(mpc::Mpc& mpc, mpc::disk::MpcFile* file, bool sequencesOnly
 		syncScreen->frameRate = midiSyncMisc->getFrameRate();
 		
 		lSequencer->setSecondSequenceEnabled(sequencer->secondSeqEnabled);
-		lSequencer->setSecondSequenceIndex(sequencer->secondSeqIndex);
+
+		auto secondSequenceScreen = dynamic_pointer_cast<SecondSeqScreen>(mpc.screens->getScreenComponent("second-seq"));
+		secondSequenceScreen->sq = sequencer->secondSeqIndex;
 		
 		auto songScreen = dynamic_pointer_cast<SongScreen>(mpc.screens->getScreenComponent("song"));
 		songScreen->setDefaultSongName(midiSyncMisc->getDefSongName());
