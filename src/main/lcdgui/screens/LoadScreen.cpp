@@ -28,6 +28,7 @@ LoadScreen::LoadScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void LoadScreen::open()
 {
+	findField("directory").lock()->setLocation(200, 0);
 	displayView();
 
 	displayDirectory();
@@ -189,6 +190,45 @@ void LoadScreen::turnWheel(int i)
 	{
 		setFileLoadWithMaxCheck(fileLoad + i);
 	}
+	else if (param.compare("directory") == 0)
+	{
+		auto disk = mpc.getDisk().lock();
+		auto currentDir = disk->getDirectoryName();
+		auto parents = disk->getParentFiles();
+	
+		int position = -1;
+
+		for (int j = 0; j < parents.size(); j++)
+		{
+			if (parents[j]->getName().compare(currentDir) == 0)
+			{
+				position = j;
+				break;
+			}
+		}
+
+		const int candidate = position + i;
+
+		if (position != -1 && candidate >= 0 && candidate < parents.size())
+		{
+			if (disk->moveBack())
+			{
+				disk->initFiles();
+
+				if (disk->moveForward(parents[candidate]->getName()))
+				{
+					disk->initFiles();
+					displayDirectory();
+					displayFile();
+					displaySize();
+				}
+				else {
+					// From the user's perspective we stay where we are if the above moveForward call fails.
+					disk->moveForward(currentDir);
+				}
+			}
+		}
+	}
 
 	auto splitFileName = StrUtil::split(getSelectedFileName(), '.');
 	auto playable = splitFileName.size() > 1 && (StrUtil::eqIgnoreCase(splitFileName[1], "snd") || StrUtil::eqIgnoreCase(splitFileName[1], "wav"));
@@ -202,7 +242,7 @@ void LoadScreen::displayView()
 
 void LoadScreen::displayDirectory()
 {
-	findLabel("directory").lock()->setText(u8"\u00C2" + mpc.getDisk().lock()->getDirectoryName());
+	findField("directory").lock()->setText(mpc.getDisk().lock()->getDirectoryName());
 }
 
 void LoadScreen::displayFreeSnd()
@@ -266,9 +306,7 @@ void LoadScreen::displaySize()
 void LoadScreen::setView(int i)
 {
 	if (i < 0 || i > 8)
-	{
 		return;
-	}
 	
 	view = i;
 	
