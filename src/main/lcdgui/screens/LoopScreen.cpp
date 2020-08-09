@@ -91,12 +91,10 @@ void LoopScreen::function(int f)
 	case 4:
 	{
 		if (sampler.lock()->getSoundCount() == 0)
-		{
 			return;
-		}
 
 		auto editSoundScreen = dynamic_pointer_cast<EditSoundScreen>(mpc.screens->getScreenComponent("edit-sound"));
-		editSoundScreen->setPreviousScreenName("loop");
+		editSoundScreen->setReturnToScreenName("loop");
 		ls.lock()->openScreen("edit-sound");
 		break;
 	}

@@ -72,7 +72,7 @@ void SndParamsScreen::function(int f)
 		}
 
 		auto editSoundScreen = dynamic_pointer_cast<EditSoundScreen>(mpc.screens->getScreenComponent("edit-sound"));
-		editSoundScreen->setPreviousScreenName("trim");
+		editSoundScreen->setReturnToScreenName("trim");
 		ls.lock()->openScreen("edit-sound");
 		break;
 	}

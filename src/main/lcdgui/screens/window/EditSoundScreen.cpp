@@ -40,7 +40,9 @@ EditSoundScreen::EditSoundScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void EditSoundScreen::open()
 {
-	if (ls.lock()->getPreviousScreenName().compare("name") != 0 && sampler.lock()->getSound().lock())
+	auto previous = ls.lock()->getPreviousScreenName();
+
+	if (previous.compare("name") != 0 && sampler.lock()->getSound().lock())
 	{
 		auto newSoundName = sampler.lock()->getSound().lock()->getName();
 		//newSampleName = newSampleName->replaceAll("\\s+$", "");
@@ -48,9 +50,12 @@ void EditSoundScreen::open()
 		setNewName(newSoundName);
 	}
 
-	if (ls.lock()->getPreviousScreenName().compare("zone") == 0)
+	if (previous.compare("zone") == 0)
 	{
 		setEdit(8);
+	}
+	else if (previous.compare("loop") == 0) {
+		setEdit(1);
 	}
 	else {
 		setEdit(0);
@@ -278,7 +283,7 @@ void EditSoundScreen::setEdit(int i)
         return;
     }
     
-    if (previousScreenName.compare("zone") != 0 && i > 7)
+    if (returnToScreenName.compare("zone") != 0 && i > 7)
     {
         return;
     }
@@ -324,22 +329,20 @@ void EditSoundScreen::setTimeStretchPresetNumber(int i)
 void EditSoundScreen::setTimeStretchAdjust(int i)
 {
     if (i < -100 || i > 100)
-    {
         return;
-    }
 
     timeStretchAdjust = i;
 	displayVariable();
 }
 
-void EditSoundScreen::setPreviousScreenName(string s)
+void EditSoundScreen::setReturnToScreenName(string s)
 {
-    previousScreenName = s;
+    returnToScreenName = s;
 }
 
-string EditSoundScreen::getPreviousScreenName()
+string EditSoundScreen::getReturnToScreenName()
 {
-    return previousScreenName;
+    return returnToScreenName;
 }
 
 void EditSoundScreen::setCreateNewProgram(bool b)
@@ -413,25 +416,26 @@ void EditSoundScreen::function(int j)
 
 		if (edit == 0)
 		{
+			auto end = sound->getEnd();
+			auto start = sound->getStart();
+
+			if (returnToScreenName.compare("loop") == 0)
+			{
+				start = sound->getLoopTo();
+			}
+			else if (returnToScreenName.compare("zone") == 0)
+			{
+				const auto zone = zoneScreen->zone;
+				start = zoneScreen->getZoneStart(zone);
+				end = zoneScreen->getZoneEnd(zone);
+			}
+
 			auto newLength = sound->getEnd() - sound->getStart();
 
-			if (sound->getStart() > sound->getLoopTo())
-			{
-				if (sound->getLoopTo() > newLength)
-				{
-					sound->setLoopTo(newLength);
-				}
-				else
-				{
-					sound->setLoopTo(0);
-				}
-			}
-			else
-			{
-				sound->setLoopTo(sound->getLoopTo() - sound->getStart());
-			}
-
-			sampler.lock()->trimSample(sampler.lock()->getSoundIndex(), sound->getStart(), sound->getEnd());
+			if (start != 0)
+				sound->setLoopTo(sound->getLoopTo() - start);
+		
+			sampler.lock()->trimSample(sampler.lock()->getSoundIndex(), start, end);
 
 			sound->setStart(0);
 			sound->setEnd(newLength);
@@ -451,9 +455,7 @@ void EditSoundScreen::function(int j)
 			newSampleData->resize(sound->getSampleData()->size());
 
 			for (int i = 0; i < newSampleData->size(); i++)
-			{
 				(*newSampleData)[i] = (*sound->getSampleData())[i];
-			}
 
 			newSample->setMono(sound->isMono());
 			sampler.lock()->trimSample(sampler.lock()->getSoundCount() - 1, sound->getStart(), sound->getEnd());
@@ -465,10 +467,20 @@ void EditSoundScreen::function(int j)
 			auto source = dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getSound(insertSoundNumber).lock());
 			auto destination = sampler.lock()->getSound().lock();
 
-			int destinationStartFrame = sound->getStart();
+			auto destinationStartFrame = sound->getStart();
 
-			int sourceFrameCount = source->getFrameCount();
-			int destinationFrameCount = destination->getFrameCount();
+			if (returnToScreenName.compare("loop") == 0)
+			{
+				destinationStartFrame = sound->getLoopTo();
+			}
+			else if (returnToScreenName.compare("zone") == 0)
+			{
+				const auto zone = zoneScreen->zone;
+				destinationStartFrame = zoneScreen->getZoneStart(zone);
+			}
+
+			auto sourceFrameCount = source->getFrameCount();
+			auto destinationFrameCount = destination->getFrameCount();
 
 			auto newSoundFrameCount = sourceFrameCount + destinationFrameCount;
 			auto newSoundSampleCount = newSoundFrameCount;
@@ -477,9 +489,7 @@ void EditSoundScreen::function(int j)
 			auto destinationData = destination->getSampleData();
 
 			if (!destination->isMono())
-			{
 				newSoundSampleCount *= 2;
-			}
 
 			vector<float> newData(newSoundSampleCount);
 			int sourceFrameCounter = 0;
@@ -492,9 +502,8 @@ void EditSoundScreen::function(int j)
 					newData[i] = (*destinationData)[destinationFrameCounter];
 
 					if (!destination->isMono())
-					{
 						newData[i + newSoundFrameCount] = (*destinationData)[destinationFrameCounter + destinationFrameCount];
-					}
+
 					destinationFrameCounter++;
 				}
 				else if (i < destinationStartFrame + sourceFrameCount)
@@ -518,10 +527,10 @@ void EditSoundScreen::function(int j)
 				else
 				{
 					newData[i] = (*destinationData)[destinationFrameCounter];
+
 					if (!destination->isMono())
-					{
 						newData[i + newSoundFrameCount] = (*destinationData)[destinationFrameCounter + destinationFrameCount];
-					}
+
 					destinationFrameCounter++;
 				}
 			}
@@ -535,7 +544,21 @@ void EditSoundScreen::function(int j)
 		}
 		else if (edit == 4)
 		{
-			sampler.lock()->deleteSection(sampler.lock()->getSoundIndex(), sound->getStart(), sound->getEnd());
+			auto end = sound->getEnd();
+			auto start = sound->getStart();
+
+			if (returnToScreenName.compare("loop") == 0)
+			{
+				start = sound->getLoopTo();
+			}
+			else if (returnToScreenName.compare("zone") == 0)
+			{
+				const auto zone = zoneScreen->zone;
+				start = zoneScreen->getZoneStart(zone);
+				end = zoneScreen->getZoneEnd(zone);
+			}
+
+			sampler.lock()->deleteSection(sampler.lock()->getSoundIndex(), start, end);
 			sound->setStart(0);
 			sound->setEnd(sound->getFrameCount());
 			sound->setLoopTo(sound->getFrameCount());
@@ -545,23 +568,45 @@ void EditSoundScreen::function(int j)
 		{
 			auto start = sound->getStart();
 			auto end = sound->getEnd();
+			
+			if (returnToScreenName.compare("loop") == 0)
+			{
+				start = sound->getLoopTo();
+			}
+			else if (returnToScreenName.compare("zone") == 0)
+			{
+				const auto zone = zoneScreen->zone;
+				start = zoneScreen->getZoneStart(zone);
+				end = zoneScreen->getZoneEnd(zone);
+			}
 
 			for (int i = start; i < end; i++)
 			{
 				(*sound->getSampleData())[i] = 0.0f;
 
 				if (!sound->isMono())
-				{
 					(*sound->getSampleData())[(i + sound->getFrameCount())] = 0.0f;
-				}
 			}
-			ls.lock()->openScreen(previousScreenName);
+
+			ls.lock()->openScreen(returnToScreenName);
 			break;
 		}
 		else if (edit == 6)
 		{
 			auto start = sound->getStart();
 			auto end = sound->getEnd();
+
+			if (returnToScreenName.compare("loop") == 0)
+			{
+				start = sound->getLoopTo();
+			}
+			else if (returnToScreenName.compare("zone") == 0)
+			{
+				const auto zone = zoneScreen->zone;
+				start = zoneScreen->getZoneStart(zone);
+				end = zoneScreen->getZoneEnd(zone);
+			}
+
 			auto reverseCounter = end - 1;
 			auto newSampleData = vector<float>(sound->getSampleData()->size());
 
@@ -603,16 +648,13 @@ void EditSoundScreen::function(int j)
 			}
 
 			sound->getSampleData()->swap(newSampleData);
-			sound->setMono(sound->isMono());
-			ls.lock()->openScreen(previousScreenName);
+			ls.lock()->openScreen(returnToScreenName);
 			break;
 		}
 		else if (edit == 7)
 		{
 			if (timeStretchRatio == 10000)
-			{
 				return;
-			}
 
 			if (sound->isMono())
 			{
@@ -687,7 +729,7 @@ void EditSoundScreen::function(int j)
 			}
 		}
 
-		ls.lock()->openScreen(previousScreenName);
+		ls.lock()->openScreen(returnToScreenName);
 		break;
 	}
 }

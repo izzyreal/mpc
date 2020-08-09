@@ -14,8 +14,9 @@ namespace mpc::lcdgui::screens::window {
 		void open() override;
 
 		void setNewName(std::string s);
-		void setPreviousScreenName(std::string s);
-		std::string getPreviousScreenName();
+
+		void setReturnToScreenName(std::string s);
+		std::string getReturnToScreenName();
 
 	private:
 		const std::vector<std::string> editNames{ "DISCARD", "LOOP FROM ST TO END", u8"SECTION \u00C4 NEW SOUND", u8"INSERT SOUND \u00C4 SECTION START", "DELETE SECTION", "SILENCE SECTION", "REVERSE SECTION", "TIME STRETCH", "SLICE SOUND" };
@@ -35,7 +36,7 @@ namespace mpc::lcdgui::screens::window {
 		int endMargin = 30;
 		bool createNewProgram = true;
 		std::string newName = "";
-		std::string previousScreenName = "";
+		std::string returnToScreenName = "";
 
 		void setEdit(int i);
 		void setInsertSndNr(int i, int soundCount);

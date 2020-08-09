@@ -155,7 +155,7 @@ void BaseControls::function(int i)
 			else if (currentScreenName.compare("edit-sound") == 0)
 			{
 				auto editSoundScreen = dynamic_pointer_cast<EditSoundScreen>(mpc.screens->getScreenComponent("edit-sound"));
-				ls.lock()->setPreviousScreenName(editSoundScreen->getPreviousScreenName());
+				ls.lock()->setPreviousScreenName(editSoundScreen->getReturnToScreenName());
 			}
 			else if (currentScreenName.compare("sound") == 0)
 			{

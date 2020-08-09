@@ -98,7 +98,7 @@ void ZoneScreen::function(int f)
 		}
 
 		auto editSoundScreen = dynamic_pointer_cast<EditSoundScreen>(mpc.screens->getScreenComponent("edit-sound"));
-		editSoundScreen->setPreviousScreenName("zone");
+		editSoundScreen->setReturnToScreenName("zone");
 		ls.lock()->openScreen("edit-sound");
 		break;
 	}
