@@ -25,6 +25,8 @@ EventsScreen::EventsScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void EventsScreen::open()
 {
+	sequencer.lock()->move(0);
+
 	auto note1Field = findField("note1").lock();
 
 	if (setNote1X)
@@ -263,9 +265,7 @@ void EventsScreen::turnWheel(int i)
 	auto toSequence = sequencer.lock()->getSequence(toSq).lock();
 
 	if (checkAllTimesAndNotes(mpc, i, sequencer.lock()->getActiveSequence().lock().get(), sequencer.lock()->getActiveTrack().lock().get()))
-	{
 		return;
-	}
 
 	if (param.compare("start0") == 0)
 	{
@@ -290,9 +290,7 @@ void EventsScreen::turnWheel(int i)
 		auto fromSeq = sequencer.lock()->getActiveSequence().lock();
 		
 		if (time1 > fromSeq->getLastTick())
-		{
 			setTime1(fromSeq->getLastTick());
-		}
 	}
 	else if (param.compare("from-tr") == 0)
 	{
@@ -304,9 +302,7 @@ void EventsScreen::turnWheel(int i)
 		auto toSeq = sequencer.lock()->getSequence(toSq).lock();
 		
 		if (start > toSeq->getLastTick())
-		{
 			setStart(toSeq->getLastTick());
-		}
 	}
 	else if (param.compare("to-tr") == 0)
 	{
@@ -403,11 +399,11 @@ void EventsScreen::displayMode()
 		{
 			findField("mode").lock()->setTextPadded(0);
 		}
-		if (transposeAmount < 0)
+		else if (transposeAmount < 0)
 		{
 			findField("mode").lock()->setTextPadded(transposeAmount);
 		}
-		if (transposeAmount > 0)
+		else
 		{
 			findField("mode").lock()->setTextPadded("+" + to_string(transposeAmount));
 		}
