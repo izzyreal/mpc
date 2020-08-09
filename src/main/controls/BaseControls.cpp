@@ -97,14 +97,10 @@ void BaseControls::right()
 	init();
 	
 	if (!activeField.lock())
-	{
 		return;
-	}
 	
 	if (param.compare("dummy") == 0)
-	{
 		return;
-	}
 	
 	ls.lock()->transferRight();
 }
@@ -114,14 +110,10 @@ void BaseControls::up()
     init();
 
 	if (!activeField.lock())
-	{
 		return;
-	}
 
 	if (param.compare("dummy") == 0)
-	{
 		return;
-	}
 
 	ls.lock()->transferUp();
 }
@@ -131,14 +123,10 @@ void BaseControls::down()
 	init();
 
 	if (!activeField.lock())
-	{
 		return;
-	}
 
 	if (param.compare("dummy") == 0)
-	{
 		return;
-	}
 
 	ls.lock()->transferDown();
 }

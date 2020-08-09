@@ -3,6 +3,8 @@
 
 #include <sequencer/TimeSignature.hpp>
 
+namespace mpc { class Util; }
+
 namespace mpc::disk
 {
 	class AllLoader;
@@ -100,6 +102,7 @@ namespace mpc::lcdgui::screens
 		friend class mpc::nvram::NvRam;
 		friend class mpc::sequencer::Sequence;
 		friend class mpc::sequencer::Sequencer;
+		friend class mpc::Util;
 
 	};
 }

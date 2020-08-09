@@ -2,6 +2,8 @@
 #include <string>
 #include <vector>
 
+namespace mpc { class Mpc; }
+
 namespace mpc
 {
 	class Util
@@ -20,6 +22,7 @@ namespace mpc
 		static std::vector<std::string>& noteNames();
 		static std::string tempoString(const double tempo);
 		static int getTextWidthInPixels(const std::string& text);
+		static void initSequence(mpc::Mpc& mpc);
 
 	};
 }

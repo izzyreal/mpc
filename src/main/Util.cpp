@@ -4,9 +4,12 @@
 #include <cstdlib>
 
 #include <lang/StrUtil.hpp>
+#include <lcdgui/screens/UserScreen.hpp>
 
 using namespace std;
 using namespace mpc;
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens;
 using namespace moduru::lang;
 
 string Util::replaceDotWithSmallSpaceDot(const string& s) {
@@ -238,4 +241,16 @@ int Util::getTextWidthInPixels(const string& text)
 	}
 
 	return (count * 6) - (halfSpaceCount * 3);
+}
+
+void Util::initSequence(mpc::Mpc& mpc)
+{
+	auto userScreen = dynamic_pointer_cast<UserScreen>(mpc.screens->getScreenComponent("user"));
+	auto sequencer = mpc.getSequencer().lock();
+	auto sequence = sequencer->getActiveSequence().lock();
+	sequence->init(userScreen->lastBar);
+	int index = sequencer->getActiveSequenceIndex();
+	string name = StrUtil::trim(sequencer->getDefaultSequenceName()) + StrUtil::padLeft(to_string(index + 1), "0", 2);
+	sequence->setName(name);
+	sequencer->setActiveSequenceIndex(sequencer->getActiveSequenceIndex());
 }

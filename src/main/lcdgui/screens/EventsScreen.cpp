@@ -71,6 +71,7 @@ void EventsScreen::open()
 
 void EventsScreen::close()
 {
+	Util::initSequence(mpc);
 	mpc.deleteObserver(this);
 }
 

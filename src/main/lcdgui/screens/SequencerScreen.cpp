@@ -692,14 +692,7 @@ void SequencerScreen::right()
 		return;
 
 	if (!sequence.lock()->isUsed())
-	{
-		auto userScreen = dynamic_pointer_cast<UserScreen>(mpc.screens->getScreenComponent("user"));
-		sequence.lock()->init(userScreen->lastBar);
-		int index = sequencer.lock()->getActiveSequenceIndex();
-		string name = StrUtil::trim(sequencer.lock()->getDefaultSequenceName()) + StrUtil::padLeft(to_string(index + 1), "0", 2);
-		sequence.lock()->setName(name);
-		sequencer.lock()->setActiveSequenceIndex(sequencer.lock()->getActiveSequenceIndex());
-	}
+		Util::initSequence(mpc);
 
 	baseControls->right();
 }
@@ -722,14 +715,7 @@ void SequencerScreen::down()
 		return;
 
 	if (!sequence.lock()->isUsed())
-	{
-		auto userScreen = dynamic_pointer_cast<UserScreen>(mpc.screens->getScreenComponent("user"));
-		sequence.lock()->init(userScreen->lastBar);
-		int index = sequencer.lock()->getActiveSequenceIndex();
-		string name = StrUtil::trim(sequencer.lock()->getDefaultSequenceName()) + StrUtil::padLeft(to_string(index + 1), "0", 2);
-		sequence.lock()->setName(name);
-		sequencer.lock()->setActiveSequenceIndex(sequencer.lock()->getActiveSequenceIndex());
-	}
+		Util::initSequence(mpc);
 
 	baseControls->down();
 }
