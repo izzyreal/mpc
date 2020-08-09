@@ -302,6 +302,7 @@ void Sequencer::setActiveSequenceIndex(int i)
 	notifyObservers(string("timesignature"));
 	notifyObservers(string("numberofbars"));
 	notifyObservers(string("tempo"));
+	notifyObservers(string("loop"));
 	notifyTrack();
 }
 
