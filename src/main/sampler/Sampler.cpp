@@ -47,9 +47,7 @@ Sampler::Sampler(mpc::Mpc& mpc)
 void Sampler::setSoundIndex(int i)
 {
 	if (i < 0 || i >= sounds.size())
-	{
 		return;
-	}
 
 	soundIndex = i;
 
@@ -67,9 +65,7 @@ weak_ptr<Sound> Sampler::getSound()
 	if (soundIndex < 0)
 	{
 		if (sounds.size() == 0)
-		{
 			return {};
-		}
 
 		// This is a bit of a hack, depending on what the real 2KXL does.
 		// For now this will work fine to get some kind of sane index here after loading an APS, PGM, SND or WAV into an empty sampler.
@@ -77,9 +73,7 @@ weak_ptr<Sound> Sampler::getSound()
 	}
 
 	if (soundIndex >= sounds.size())
-	{
 		return {};
-	}
 
 	return sounds[soundIndex];
 }
@@ -97,9 +91,8 @@ void Sampler::setPreviousScreenName(std::string s)
 void Sampler::setInputLevel(int i)
 {
 	if (i < 0 || i > 100)
-	{
 		return;
-	}
+
 	inputLevel = i;
 }
 
@@ -163,9 +156,7 @@ void Sampler::init()
 	autoChromaticAssign = vector<int>(64);
 
 	for (int i = 0; i < 64; i++)
-	{
 		autoChromaticAssign[i] = i;
-	}
 }
 
 void Sampler::playMetronome(mpc::sequencer::NoteEvent* event, int framePos)
@@ -211,22 +202,21 @@ weak_ptr<ctoot::mpc::MpcProgram> Sampler::getProgram(int programNumber)
 int Sampler::getProgramCount()
 {
 	int res = 0;
+
 	for (auto& p : programs)
 	{
 		if (p)
-		{
 			res++;
-		}
 	}
+
 	return res;
 }
 
 weak_ptr<Program> Sampler::addProgram(int i)
 {
 	if (programs[i])
-	{
 		return weak_ptr<Program>();
-	}
+
 	programs[i] = make_shared<Program>(mpc, this);
 	return programs[i];
 }
@@ -267,10 +257,10 @@ void Sampler::deleteProgram(weak_ptr<Program> _program)
 vector<weak_ptr<Sound>> Sampler::getSounds()
 {
 	auto res = vector<weak_ptr<Sound>>();
+
 	for (auto& s : sounds)
-	{
 		res.push_back(s);
-	}
+
 	return res;
 }
 
@@ -308,10 +298,10 @@ string Sampler::getPadName(int i)
 vector<weak_ptr<Program>> Sampler::getPrograms()
 {
 	auto res = vector<weak_ptr<Program>>();
+
 	for (auto& p : programs)
-	{
 		res.push_back(p);
-	}
+
 	return res;
 }
 
@@ -326,14 +316,11 @@ void Sampler::replaceProgram(weak_ptr<Program> p, int index)
 void Sampler::deleteAllPrograms(bool init)
 {
 	for (auto& p : programs)
-	{
 		p.reset();
-	}
 
 	if (!init)
-	{
 		return;
-	}
+
 	addProgram().lock()->setName("NewPgm-A");
 	checkProgramReferences();
 }
@@ -354,9 +341,7 @@ void Sampler::checkProgramReferences()
 			for (int i = 0; i < 24; i++)
 			{
 				if (programs[i])
-				{
 					setDrumBusProgramNumber(bus, i);
-				}
 			}
 		}
 	}
@@ -370,14 +355,10 @@ vector<float>* Sampler::getClickSample()
 weak_ptr<ctoot::mpc::MpcSound> Sampler::getSound(int sampleNumber)
 {
 	if (sampleNumber == -1)
-	{
 		return weak_ptr<Sound>();
-	}
 
 	if (sampleNumber >= sounds.size())
-	{
 		return weak_ptr<Sound>();
-	}
 
 	return sounds[sampleNumber];
 }
@@ -385,9 +366,8 @@ weak_ptr<ctoot::mpc::MpcSound> Sampler::getSound(int sampleNumber)
 weak_ptr<ctoot::mpc::MpcSound> Sampler::getPreviewSound()
 {
 	if (sounds.size() == 0)
-	{
 		return weak_ptr<Sound>();
-	}
+
 	return sounds[sounds.size() - 1];
 }
 
@@ -396,23 +376,17 @@ void Sampler::setLoopEnabled(int sampleIndex, bool enabled)
 	sounds[sampleIndex]->setLoopEnabled(enabled);
 
 	if (!enabled)
-	{
 		return;
-	}
 
 	for (auto& p : programs)
 	{
 		if (!p)
-		{
 			continue;
-		}
 		
 		for (int i = 0; i < 64; i++)
 		{
 			if (p->getNoteParameters(i + 35)->getSndNumber() == sampleIndex)
-			{
 				dynamic_cast<mpc::sampler::NoteParameters*>(p->getNoteParameters(i + 35))->setVoiceOverlap(2);
-			}
 		}
 	}
 }
@@ -474,9 +448,7 @@ void Sampler::sort()
 	soundSortingType++;
 	
 	if (soundSortingType > 2)
-	{
 		soundSortingType = 0;
-	}
 
 	switch (soundSortingType)
 	{
@@ -503,32 +475,7 @@ void Sampler::sort()
 
 void Sampler::deleteSample(int sampleIndex)
 {
-	sounds.erase(sounds.begin() + sampleIndex);
-
-	for (int i = sampleIndex; i < sounds.size(); i++)
-	{
-		sounds[i]->setMemoryIndex(sounds[i]->getMemoryIndex() - 1);
-	}
-
-	for (auto& p : programs)
-	{
-		if (!p)
-		{
-			continue;
-		}
-		
-		for (auto& n : p->getNotesParameters())
-		{
-			if (n->getSndNumber() == sampleIndex)
-			{
-				n->setSoundNumber(-1);
-			}
-			else if (n->getSndNumber() > sampleIndex)
-			{
-				n->setSoundNumber(n->getSndNumber() - 1);
-			}
-		}
-	}
+	deleteSound(sounds[sampleIndex]);
 }
 
 void Sampler::deleteAllSamples()
@@ -859,10 +806,7 @@ void Sampler::deleteSound(weak_ptr<Sound> sound)
 		if (sounds[i] == sound.lock())
 		{
 			sounds.erase(sounds.begin() + i);
-			
-			if (soundIndex >= i)
-				soundIndex--;
-			
+			soundIndex--;
 			break;
 		}
 	}
@@ -910,9 +854,7 @@ void Sampler::deleteSound(weak_ptr<Sound> sound)
 	}
 
 	if (soundIndex >= sounds.size())
-	{
 		soundIndex--;
-	}
 }
 
 vector<float> Sampler::mergeToStereo(vector<float> fa0, vector<float> fa1)
