@@ -9,6 +9,7 @@
 
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
+using namespace moduru::lang;
 using namespace std;
 
 ChangeBars2Screen::ChangeBars2Screen(mpc::Mpc& mpc, const int layerIndex)
@@ -37,22 +38,33 @@ void ChangeBars2Screen::function(int i)
 	switch (i)
 	{
 	case 2:
-		ls.lock()->openScreen("sequencer");
+		ls.lock()->openScreen("sequencer"); // Required for desired screen transitions
 		ls.lock()->openScreen("change-bars");
 		break;
 	case 4:
-		if (newBars < seq->getLastBarIndex())
+	{
+		auto lastBarIndex = seq->getLastBarIndex();
+		auto changed = false;
+
+		if (newBars < lastBarIndex)
 		{
-			seq->deleteBars(newBars + 1, seq->getLastBarIndex());
+			seq->deleteBars(newBars + 1, lastBarIndex);
+			lastBarIndex = seq->getLastBarIndex();
+			changed = true;
 		}
 
-		if (newBars > seq->getLastBarIndex())
+		if (newBars > lastBarIndex)
 		{
-			seq->insertBars(newBars - seq->getLastBarIndex(), seq->getLastBarIndex() + 1);
+			seq->insertBars(newBars - lastBarIndex, lastBarIndex + 1);
+			changed = true;
 		}
+
+		if (changed)
+			sequencer.lock()->move(0);
+
 		ls.lock()->openScreen("sequencer");
-		sequencer.lock()->setBar(0);
 		break;
+	}
 	}
 }
 
@@ -63,8 +75,7 @@ void ChangeBars2Screen::displayNewBars()
 	auto message0 = findLabel("message0").lock();
 	auto message1 = findLabel("message1").lock();
 
-	findField("newbars").lock()->setText(moduru::lang::StrUtil::padLeft(to_string(newBars + 1), " ", 3));
-
+	findField("newbars").lock()->setText(StrUtil::padLeft(to_string(newBars + 1), " ", 3));
 
 	if (newBars == seq->getLastBarIndex())
 	{
@@ -88,17 +99,14 @@ void ChangeBars2Screen::turnWheel(int i)
 	init();
 
 	if (param.compare("newbars") == 0)
-	{
 		setNewBars(newBars + i);
-	}
 }
 
 void ChangeBars2Screen::setNewBars(int i)
 {
 	if (i < 0 || i > 998)
-	{
 		return;
-	}
+
 	newBars = i;
 	displayNewBars();
 }

@@ -29,7 +29,22 @@ void ChangeTsigScreen::function(int i)
 	{
 	case 4:
 		auto sequence = sequencer.lock()->getActiveSequence().lock();
+
+		auto barLengths = *sequence->getBarLengths();
+
         sequence->setTimeSignature(bar0, bar1, timesignature.getNumerator(), timesignature.getDenominator());
+		
+		auto newBarLengths = sequence->getBarLengths();
+
+		for (int j = 0; j < barLengths.size(); j++)
+		{
+			if (barLengths[j] != (*newBarLengths)[j])
+			{
+				sequencer.lock()->move(0); // Only reset sequencer position when something has changed
+				break;
+			}
+		}
+
         ls.lock()->openScreen("sequencer");
         break;
     }

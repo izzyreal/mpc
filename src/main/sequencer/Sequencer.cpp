@@ -931,9 +931,7 @@ int Sequencer::getCurrentClockNumber()
 	}
 	
 	for (int i = 0; i < getCurrentBeatIndex(); i++)
-	{
 		clock -= denTicks;
-	}
 
 	return clock;
 }
@@ -941,9 +939,7 @@ int Sequencer::getCurrentClockNumber()
 void Sequencer::setBar(int i)
 {
 	if (isPlaying())
-	{
 		return;
-	}
 
 	if (i < 0)
 	{
@@ -954,14 +950,11 @@ void Sequencer::setBar(int i)
 	auto s = getActiveSequence().lock();
 	
 	if (i > s->getLastBarIndex() + 1)
-	{
 		return;
-	}
 
 	if (s->getLastBarIndex() == 998 && i > 998)
-	{
 		return;
-	}
+
 	auto ts = s->getTimeSignature();
 	auto den = ts.getDenominator();
 	auto denTicks = (int)(96 * (4.0 / den));
@@ -981,9 +974,8 @@ void Sequencer::setBar(int i)
 	for (auto l : *barLengths)
 	{
 		if (barCounter == i)
-		{
 			break;
-		}
+
 		pos += l;
 		barCounter++;
 	}
@@ -992,9 +984,7 @@ void Sequencer::setBar(int i)
 	pos += currentClock;
 	
 	if (pos > s->getLastTick())
-	{
 		pos = s->getLastTick();
-	}
 
 	move(pos);
 	
