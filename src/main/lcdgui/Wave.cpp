@@ -113,12 +113,14 @@ void Wave::setSampleData(vector<float>* sampleData, bool mono, unsigned int view
 void Wave::setSelection(unsigned int start, unsigned int end)
 {
 	if (selectionStart == start && selectionEnd == end)
-	{
 		return;
-	}
 
 	selectionStart = start;
 	selectionEnd = end;
+
+	if (selectionEnd - selectionStart < (samplesPerPixel * 2))
+		selectionEnd = selectionStart + (samplesPerPixel * 2);
+
 	SetDirty();
 }
 
@@ -202,34 +204,24 @@ void Wave::makeLine(std::vector<std::vector<std::vector<int>>>* lines, std::vect
 
 	colors->clear();
 
-	if (samplePos >= selectionStart && samplePos + samplesPerPixel < selectionEnd && !fine)
+	if (!fine && samplePos >= selectionStart && samplePos + samplesPerPixel < selectionEnd)
 	{
 		if (posLineLength != 13)
-		{
 			colors->push_back(true);
-		}
 		
 		if (peakPos > invisible)
-		{
 			colors->push_back(false);
-		}
 		
 		if (abs(peakNeg) > invisible)
-		{
 			colors->push_back(false);
-		}
 	
 		if (negLineLength != 13)
-		{
 			colors->push_back(true);
-		}
 	}
 	else
 	{
 		if (posLineLength != 13)
-		{
 			colors->push_back(false);
-		}
 		
 		if (peakPos > invisible)
 		{
@@ -270,23 +262,17 @@ void Wave::makeLine(std::vector<std::vector<std::vector<int>>>* lines, std::vect
 		}
 
 		if (negLineLength != 13)
-		{
 			colors->push_back(false);
-		}
 	}
 }
 
 void Wave::Draw(std::vector<std::vector<bool>>* pixels)
 {
 	if (shouldNotDraw(pixels))
-	{
 		return;
-	}
 
 	if (sampleData == nullptr)
-	{
 		return;
-	}
 
 	vector<vector<vector<int>>> lines;
 	vector<bool> colors;
@@ -297,9 +283,8 @@ void Wave::Draw(std::vector<std::vector<bool>>* pixels)
 		if (i == 55 && fine)
 		{
 			for (int j = 0; j < 27; j++)
-			{
 				(*pixels)[i + offsetxy[0]][j + offsetxy[1]] = true;
-			}
+
 			continue;
 		}
 
@@ -307,9 +292,7 @@ void Wave::Draw(std::vector<std::vector<bool>>* pixels)
 		int counter = 0;
 		
 		for (auto& l : lines)
-		{
 			mpc::Util::drawLine(*pixels, l, colors[counter++], offsetxy);
-		}
 	}
 
 	dirty = false;

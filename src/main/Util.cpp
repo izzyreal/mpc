@@ -105,14 +105,11 @@ string Util::distributeTimeSig(const string& s)
 	auto s1 = s.substr(pos + 1, s.length());
 
 	if (s0.length() == 1)
-	{
         s0 = u8"\u00CE" + s0 + u8"\u00CE";
-    }
     
 	if (s1.length() == 1)
-	{
         s1 = u8"\u00CE" + s1;
-    }
+
 	return s0 + "/" + s1;
 }
 
@@ -121,9 +118,7 @@ void Util::drawLine(vector<vector<bool>>& pixels,
                     const bool color)
 {
 	for (auto& l : line)
-	{
 		pixels[l[0]][l[1]] = color;
-	}
 }
 
 void Util::drawLine(vector<vector<bool>>& pixels,
@@ -132,9 +127,7 @@ void Util::drawLine(vector<vector<bool>>& pixels,
                     const vector<int>& offsetxy)
 {
 	for (auto& l : line)
-	{
 		pixels[l[0] + offsetxy[0]][l[1] + offsetxy[1]] = color;
-	}
 }
 
 void Util::drawLines(vector<vector<bool>>& pixels,
@@ -144,9 +137,7 @@ void Util::drawLines(vector<vector<bool>>& pixels,
 	int colorCounter = 0;
 	
 	for (auto& l : lines)
-	{
 		drawLine(pixels, l, colors[colorCounter++]);
-	}
 }
 
 void Util::drawLines(vector<vector<bool>>& pixels,
@@ -156,9 +147,7 @@ void Util::drawLines(vector<vector<bool>>& pixels,
 {
 	int colorCounter = 0;
 	for (auto& l : lines)
-	{
 		drawLine(pixels, l, colors[colorCounter++], offsetxy);
-	}
 }
 
 vector<string>& Util::noteNames()
@@ -179,14 +168,10 @@ vector<string>& Util::noteNames()
 			string octaveString = to_string(octave);
 
 			if (octave == -2)
-			{
 				octaveString = u8"\u00D2";
-			}
 
 			if (octave == -1)
-			{
 				octaveString = u8"\u00D3";
-			}
 
 			noteNames[j] = someNoteNames[noteCounter] + octaveString;
 			noteCounter++;
@@ -224,9 +209,7 @@ int Util::getTextWidthInPixels(const string& text)
 	int count = 0;
 
 	for (p; *p != 0; ++p)
-	{
 		count += (*p & 0xc0) != 0x80;
-	}
 
 	int halfSpaceCount = 0;
 
