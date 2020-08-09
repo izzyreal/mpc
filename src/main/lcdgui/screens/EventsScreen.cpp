@@ -566,9 +566,7 @@ void EventsScreen::displayDrumNotes()
 void EventsScreen::setEdit(int i)
 {
 	if (i < 0 || i > 3)
-	{
 		return;
-	}
 
 	editFunctionNumber = i;
 	displayEdit();
@@ -577,9 +575,7 @@ void EventsScreen::setEdit(int i)
 void EventsScreen::setFromSq(int i)
 {
 	if (i < 0 || i > 98)
-	{
 		return;
-	}
 
 	sequencer.lock()->setActiveSequenceIndex(i);
 
@@ -589,9 +585,7 @@ void EventsScreen::setFromSq(int i)
 void EventsScreen::setFromTr(int i)
 {
 	if (i < 0 || i > 63)
-	{
 		return;
-	}
 	
 	sequencer.lock()->setActiveTrackIndex(i);
 
@@ -601,9 +595,7 @@ void EventsScreen::setFromTr(int i)
 void EventsScreen::setToSq(int i)
 {
 	if (i < 0 || i > 98)
-	{
 		return;
-	}
 
 	toSq = i;
 	displayToSq();
@@ -612,9 +604,8 @@ void EventsScreen::setToSq(int i)
 void EventsScreen::setToTr(int i)
 {
 	if (i < 0 || i > 63)
-	{
 		return;
-	}
+
 	toTr = i;
 	displayToTr();
 }
@@ -628,9 +619,8 @@ void EventsScreen::setModeMerge(bool b)
 void EventsScreen::setCopies(int i)
 {
 	if (i < 1 || i > 999)
-	{
 		return;
-	}
+
 	copies = i;
 	displayCopies();
 }
@@ -638,16 +628,12 @@ void EventsScreen::setCopies(int i)
 void EventsScreen::setDurationMode(int i)
 {
 	if (i < 0 || i > 3)
-	{
 		return;
-	}
 
 	durationMode = i;
 
 	if (durationMode == 2 && durationValue > 200)
-	{
 		setDuration(200);
-	}
 	
 	displayMode();
 }
@@ -655,16 +641,12 @@ void EventsScreen::setDurationMode(int i)
 void EventsScreen::setVelocityMode(int i)
 {
 	if (i < 0 || i > 3)
-	{
 		return;
-	}
 
 	velocityMode = i;
 
 	if (velocityMode != 2 && velocityValue > 127)
-	{
 		setVelocityValue(127);
-	}
 	
 	displayMode();
 }
@@ -672,9 +654,7 @@ void EventsScreen::setVelocityMode(int i)
 void EventsScreen::setTransposeAmount(int i)
 {
 	if (i < -12 || i > 12)
-	{
 		return;
-	}
 
 	transposeAmount = i;
 	// Field otherwise used for displaying mode is
@@ -685,14 +665,11 @@ void EventsScreen::setTransposeAmount(int i)
 void EventsScreen::setDuration(int i)
 {
 	if (i < 1 || i > 9999)
-	{
 		return;
-	}
 	
 	if (durationMode == 2 && i > 200)
-	{
 		return;
-	}
+
 	durationValue = i;
 	displayCopies();
 }
@@ -700,14 +677,10 @@ void EventsScreen::setDuration(int i)
 void EventsScreen::setVelocityValue(int i)
 {
 	if (i < 1 || i > 200)
-	{
 		return;
-	}
 	
 	if (velocityMode != 2 && i > 127)
-	{
 		return;
-	}
 
 	velocityValue = i;
 

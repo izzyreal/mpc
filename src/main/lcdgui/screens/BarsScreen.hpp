@@ -13,6 +13,7 @@ namespace mpc::lcdgui::screens
 
 		BarsScreen(mpc::Mpc& mpc, const int layerIndex);
 		void open() override;
+		void close() override;
 
 	private:
 		void displayCopies();
