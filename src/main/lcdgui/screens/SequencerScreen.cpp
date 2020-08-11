@@ -769,6 +769,11 @@ void SequencerScreen::down()
 	baseControls->down();
 }
 
+void SequencerScreen::setPunchRectOn(int i, bool b)
+{
+	findChild<PunchRect>("punch-rect-" + to_string(i)).lock()->setOn(b);
+}
+
 void SequencerScreen::displayPunchWhileRecording()
 {
 	auto punchScreen = dynamic_pointer_cast<PunchScreen>(mpc.screens->getScreenComponent("punch"));

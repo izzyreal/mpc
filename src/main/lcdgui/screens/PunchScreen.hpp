@@ -3,6 +3,10 @@
 
 #include <lcdgui/screens/WithTimesAndNotes.hpp>
 
+namespace mpc::sequencer {
+	class FrameSeq;
+}
+
 namespace mpc::lcdgui::screens {
 	class SequencerScreen;
 }
@@ -36,6 +40,7 @@ namespace mpc::lcdgui::screens {
 		void displayNotes() override {}
 
 		friend class SequencerScreen;
+		friend class mpc::sequencer::FrameSeq;
 
 	};
 }

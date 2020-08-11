@@ -15,6 +15,8 @@
 
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <lcdgui/screens/SongScreen.hpp>
+#include <lcdgui/screens/PunchScreen.hpp>
+#include <lcdgui/screens/SequencerScreen.hpp>
 #include <lcdgui/Screens.hpp>
 
 using namespace mpc::lcdgui;
@@ -85,15 +87,38 @@ void FrameSeq::work(int nFrames)
 	int swingOffset = (int)((swingPercentage - 50) * (4.0 * 0.01) * (tcValue * 0.5));
 	int start = (*seq->getBarLengths())[seq->getFirstLoopBarIndex()];
 
+	auto punchScreen = dynamic_pointer_cast<PunchScreen>(mpc.screens->getScreenComponent("punch"));
+
+	auto punch = punchScreen->on && lSequencer->isRecordingOrOverdubbing();
+
+	auto punchInTime = punchScreen->time0;
+	auto punchOutTime = punchScreen->time1;
+	bool punchIn = punchScreen->autoPunch == 0 || punchScreen->autoPunch == 2;
+	bool punchOut = punchScreen->autoPunch == 1 || punchScreen->autoPunch == 2;
+
+	auto sequencerScreen = dynamic_pointer_cast<SequencerScreen>(mpc.screens->getScreenComponent("sequencer"));
+
 	for (int i = 0; i < nFrames; i++)
 	{
 		if (clock.proc())
 		{
 			tickFrameOffset = i;
 
+			if (punch)
+			{
+				if (punchIn && getTickPosition() == punchInTime) {
+					sequencerScreen->setPunchRectOn(0, false);
+					sequencerScreen->setPunchRectOn(1, true);
+				}
+				else if (punchOut && getTickPosition() == punchOutTime)
+				{
+					sequencerScreen->setPunchRectOn(1, false);
+					sequencerScreen->setPunchRectOn(2, true);
+				}
+			}
+
 			if (controls && controls->isTapPressed())
 			{				
-				
 				if (tcValue == 24 || tcValue == 48)
 				{
 					if (getTickPosition() % (tcValue * 2) == swingOffset + tcValue)
@@ -186,6 +211,19 @@ void FrameSeq::work(int nFrames)
 				{
 					if (getTickPosition() >= seq->getLoopEnd() - 1)
 					{
+
+						if (punchIn)
+						{
+							sequencerScreen->setPunchRectOn(0, true);
+							sequencerScreen->setPunchRectOn(1, false);
+						}
+
+						if (punchOut)
+							sequencerScreen->setPunchRectOn(2, false);
+
+						if (punchOut && !punchIn)
+							sequencerScreen->setPunchRectOn(1, true);
+
 						lSequencer->playToTick(getTickPosition());
 						move(seq->getLoopStart());	
 					

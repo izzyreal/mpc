@@ -21,9 +21,7 @@ namespace mpc::lcdgui::screens
 
 	private:
 		std::weak_ptr<mpc::sequencer::Sequence> sequence;
-		std::weak_ptr<mpc::sequencer::Track> track;
 
-	private:
 		void checkTrackUsed();
 		void displaySq();
 		void displayTempoSource();
@@ -75,5 +73,6 @@ namespace mpc::lcdgui::screens
 		void open() override;
 		void close() override;
 
+		void setPunchRectOn(int i, bool b);
 	};
 }
