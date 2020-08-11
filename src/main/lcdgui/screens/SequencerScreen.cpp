@@ -8,31 +8,39 @@
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <lcdgui/screens/StepEditorScreen.hpp>
 #include <lcdgui/screens/UserScreen.hpp>
+#include <lcdgui/screens/PunchScreen.hpp>
+#include <lcdgui/PunchRect.hpp>
 
+#include <sequencer/SeqUtil.hpp>
 #include <Util.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::sequencer;
 using namespace moduru::lang;
 using namespace std;
 
 SequencerScreen::SequencerScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "sequencer", layerIndex)
 {
+	MRECT punch0(0, 52, 30, 59);
+	addChildT<PunchRect>("punch-rect-0", punch0).lock()->Hide(true);
+
+	MRECT punch1(105, 52, 135, 59);
+	addChildT<PunchRect>("punch-rect-1", punch1).lock()->Hide(true);
+
+	MRECT punch2(217, 52, 247, 59);
+	addChildT<PunchRect>("punch-rect-2", punch2).lock()->Hide(true);
 }
 
 void SequencerScreen::open()
 {
-	if (sequencer.lock()->isSecondSequenceEnabled()) {
-		findBackground().lock()->setName("sequencer-2nd");
-	}
-	else {
-		findBackground().lock()->setName("sequencer");
-	}
-
 	sequence = sequencer.lock()->getActiveSequence();
 	track = sequencer.lock()->getActiveTrack();
+
+	findLabel("punch-time-0").lock()->Hide(true);
+	findLabel("punch-time-1").lock()->Hide(true);
 
 	findLabel("nextsq").lock()->Hide(true);
 	findField("nextsq").lock()->Hide(true);
@@ -61,10 +69,35 @@ void SequencerScreen::open()
 	track.lock()->addObserver(this);
 
 	findChild<TextComp>("fk3").lock()->setBlinking(sequencer.lock()->isSoloEnabled());
+
+	auto punchScreen = dynamic_pointer_cast<PunchScreen>(mpc.screens->getScreenComponent("punch"));
+
+	findChild("function-keys").lock()->Hide(punchScreen->on);
+
+	if (sequencer.lock()->isSecondSequenceEnabled())
+	{
+		findBackground().lock()->setName("sequencer-2nd");
+	}
+	else if (punchScreen->on && !sequencer.lock()->isRecordingOrOverdubbing())
+	{
+		findBackground().lock()->setName("sequencer-punch-active");
+	}
+	else {
+		findBackground().lock()->setName("sequencer");
+	}
 }
 
 void SequencerScreen::close()
 {
+	vector<string> screensThatDisablePunch{ "song", "load", "save", "others", "next-seq" };
+	auto nextScreen = ls.lock()->getCurrentScreenName();
+
+	if (find(begin(screensThatDisablePunch), end(screensThatDisablePunch), nextScreen) != end(screensThatDisablePunch))
+	{
+		auto punchScreen = dynamic_pointer_cast<PunchScreen>(mpc.screens->getScreenComponent("punch"));
+		punchScreen->on = false;
+	}
+
 	sequencer.lock()->deleteObserver(this);
 	sequence.lock()->deleteObserver(this);
 	track.lock()->deleteObserver(this);
@@ -419,6 +452,18 @@ void SequencerScreen::function(int i)
 {
 	init();
 	baseControls->function(i);
+	auto punchScreen = dynamic_pointer_cast<PunchScreen>(mpc.screens->getScreenComponent("punch"));
+
+	if (punchScreen->on)
+	{
+		if (!sequencer.lock()->isRecordingOrOverdubbing() && i == 5)
+		{
+			punchScreen->on = false;
+			findBackground().lock()->setName("sequencer");
+			findChild("function-keys").lock()->Hide(false);
+		}
+		return;
+	}
 
 	switch (i)
 	{
@@ -550,12 +595,22 @@ void SequencerScreen::turnWheel(int i)
 	}
 	else if (param.compare("sq") == 0)
 	{
+		auto punchScreen = dynamic_pointer_cast<PunchScreen>(mpc.screens->getScreenComponent("punch"));
+		
 		if (sequencer.lock()->isPlaying())
 		{
-			sequencer.lock()->setNextSq(sequencer.lock()->getCurrentlyPlayingSequenceIndex() + i);
+			if (!punchScreen->on)
+				sequencer.lock()->setNextSq(sequencer.lock()->getCurrentlyPlayingSequenceIndex() + i);
 		}
 		else
 		{
+			if (punchScreen->on)
+			{
+				punchScreen->on = false;
+				findBackground().lock()->setName("sequencer");
+				findChild("function-keys").lock()->Hide(false);
+			}
+
 			sequencer.lock()->setActiveSequenceIndex(sequencer.lock()->getActiveSequenceIndex() + i);
 		}
 	}
@@ -712,4 +767,84 @@ void SequencerScreen::down()
 		Util::initSequence(mpc);
 
 	baseControls->down();
+}
+
+void SequencerScreen::displayPunchWhileRecording()
+{
+	auto punchScreen = dynamic_pointer_cast<PunchScreen>(mpc.screens->getScreenComponent("punch"));
+	auto controls = mpc.getControls().lock();
+
+	if (punchScreen->on && (controls->isRecPressed() || controls->isOverDubPressed()))
+	{
+		findBackground().lock()->setName("sequencer");
+
+		for (int i = 0; i < 3; i++)
+		{
+			auto punchRect = findChild<PunchRect>("punch-rect-" + to_string(i)).lock();
+			punchRect->Hide((i == 0 && punchScreen->autoPunch == 1) || (i == 2 && punchScreen->autoPunch == 0));
+			punchRect->setOn((i == 0 && punchScreen->autoPunch != 1) || (i == 1 && punchScreen->autoPunch == 1));
+		}
+
+		auto time0 = findLabel("punch-time-0").lock();
+		auto time1 = findLabel("punch-time-1").lock();
+
+		time0->Hide(punchScreen->autoPunch == 1);
+		time1->Hide(punchScreen->autoPunch == 0);
+
+		init();
+
+		auto seq = sequence.lock();
+
+		auto text1 = StrUtil::padLeft(to_string(SeqUtil::getBar(seq.get(), punchScreen->time0) + 1), "0", 3);
+		auto text2 = StrUtil::padLeft(to_string(SeqUtil::getBeat(seq.get(), punchScreen->time0) + 1), "0", 2);
+		auto text3 = StrUtil::padLeft(to_string(SeqUtil::getClock(seq.get(), punchScreen->time0)), "0", 2);
+		auto text4 = StrUtil::padLeft(to_string(SeqUtil::getBar(seq.get(), punchScreen->time1) + 1), "0", 3);
+		auto text5 = StrUtil::padLeft(to_string(SeqUtil::getBeat(seq.get(), punchScreen->time1) + 1), "0", 2);
+		auto text6 = StrUtil::padLeft(to_string(SeqUtil::getClock(seq.get(), punchScreen->time1)), "0", 2);
+
+		time0->setText("IN:" + text1 + "." + text2 + "." + text3);
+		time1->setText("OUT:" + text4 + "." + text5 + "." + text6);
+	}
+}
+
+void SequencerScreen::play()
+{
+	if (sequencer.lock()->isPlaying())
+		return;
+
+	displayPunchWhileRecording();
+
+	ScreenComponent::play();
+}
+
+void SequencerScreen::playStart()
+{
+	if (sequencer.lock()->isPlaying())
+		return;
+
+	displayPunchWhileRecording();
+
+	ScreenComponent::playStart();
+}
+
+void SequencerScreen::stop()
+{
+	auto punchScreen = dynamic_pointer_cast<PunchScreen>(mpc.screens->getScreenComponent("punch"));
+
+	if (punchScreen->on)
+	{
+		findBackground().lock()->setName("sequencer-punch-active");
+
+		for (int i = 0; i < 3; i++)
+			findChild<PunchRect>("punch-rect-" + to_string(i)).lock()->Hide(true);
+		
+		auto time0 = findLabel("punch-time-0").lock();
+		auto time1 = findLabel("punch-time-1").lock();
+
+		time0->Hide(true);
+		time1->Hide(true);
+
+	}
+
+	ScreenComponent::stop();
 }

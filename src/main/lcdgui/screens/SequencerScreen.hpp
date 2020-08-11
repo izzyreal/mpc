@@ -52,6 +52,7 @@ namespace mpc::lcdgui::screens
 		void displayRecordingMode();
 		void displayTsig();
 		void displayLoop();
+		void displayPunchWhileRecording();
 
 	public:
 		void update(moduru::observer::Observable* o, nonstd::any arg);
@@ -66,11 +67,13 @@ namespace mpc::lcdgui::screens
 		void up() override;
 		void down() override;
 		void numpad(int i) override { baseControls->numpad(i); }
+		void play() override;
+		void playStart() override;
+		void stop() override;
 
 	public:
 		void open() override;
 		void close() override;
 
-		void initActiveSequence();
 	};
 }

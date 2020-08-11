@@ -54,6 +54,14 @@ namespace mpc::lcdgui
 		std::weak_ptr<EnvGraph> findEnvGraph();
 		std::weak_ptr<Component> addChild(std::shared_ptr<Component> child) override;
 
+		template<typename T, typename... Args>
+		std::weak_ptr<T> addChildT(Args... args)
+		{
+			auto child = std::make_shared<T>(args...);
+			addChild(child);
+			return child;
+		}
+
 	public:
 		virtual void open() {}
 		virtual void close() {}

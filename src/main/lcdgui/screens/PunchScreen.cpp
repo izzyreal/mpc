@@ -18,6 +18,8 @@ void PunchScreen::open()
 
     displayBackground();
     displayAutoPunch();
+
+    ls.lock()->setFunctionKeysArrangement(on);
 }
 
 void PunchScreen::turnWheel(int i)
@@ -25,9 +27,7 @@ void PunchScreen::turnWheel(int i)
     init();
     
 	if (param.compare("auto-punch") == 0)
-    {
 		setAutoPunch(autoPunch + i);
-	}
 
     checkAllTimes(mpc, i);
 }
@@ -45,6 +45,8 @@ void PunchScreen::function(int i)
 		ls.lock()->openScreen("second-seq");
         break;
     case 5:
+        on = !on;
+        ls.lock()->openScreen("sequencer");
         break;
     }
 }
@@ -52,9 +54,7 @@ void PunchScreen::function(int i)
 void PunchScreen::setAutoPunch(int i)
 {
     if (i < 0 || i > 2)
-    {
         return;
-    }
 
     autoPunch = i;
 
