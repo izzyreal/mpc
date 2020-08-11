@@ -212,16 +212,16 @@ void FrameSeq::work(int nFrames)
 					if (getTickPosition() >= seq->getLoopEnd() - 1)
 					{
 
-						if (punchIn)
+						if (punch && punchIn)
 						{
 							sequencerScreen->setPunchRectOn(0, true);
 							sequencerScreen->setPunchRectOn(1, false);
 						}
 
-						if (punchOut)
+						if (punch && punchOut)
 							sequencerScreen->setPunchRectOn(2, false);
 
-						if (punchOut && !punchIn)
+						if (punch && punchOut && !punchIn)
 							sequencerScreen->setPunchRectOn(1, true);
 
 						lSequencer->playToTick(getTickPosition());

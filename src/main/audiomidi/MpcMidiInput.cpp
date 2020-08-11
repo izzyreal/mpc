@@ -163,7 +163,9 @@ void MpcMidiInput::transport(ctoot::midi::core::MidiMessage* msg, int timeStamp)
 			else
 			{
 				auto recEvent = track->recordNoteOn().lock();
-				note->CopyValuesTo(recEvent);
+
+				if (recEvent)
+					note->CopyValuesTo(recEvent);
 			}
 		}
 		

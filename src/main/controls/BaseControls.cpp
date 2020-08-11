@@ -324,31 +324,36 @@ void BaseControls::generateNoteOn(int nn, int padVelo, int tick)
 		else
 		{
 			n = track.lock()->recordNoteOn().lock();
-			n->setNote(nn);
+			
+			// The Track checks if a note should be recorded in case of punch mode. If not,
+			// an empty weak_ptr is returned.
+			// The reason Track performs this check instead of BaseControls, is because the
+			// same logic is required for an event that is coming in from an MpcMidiInput.
+			if (n)
+				n->setNote(nn);
 		}
 		
-		n->setVelocity(padVelo);
-		n->setDuration(step ? 1 : -1);
-		
-		if (mpc.getHardware().lock()->getTopPanel().lock()->isSixteenLevelsEnabled() && assign16LevelsScreen->getParameter() == 1)
+		if (n)
 		{
-			auto type = assign16LevelsScreen->getType();
-			auto key = assign16LevelsScreen->getOriginalKeyPad();
-			auto diff = lProgram->getPadIndexFromNote(nn) - (mpc.getBank() * 16) - key;
-			n->setNote(assign16LevelsScreen->getNote());
-			n->setVariationTypeNumber(type);
-			n->setVariationValue(diff * 5);
-		}
-		
-		if (slider)
-		{
-			setSliderNoteVar(n.get(), program);
+			n->setVelocity(padVelo);
+			n->setDuration(step ? 1 : -1);
+
+			if (mpc.getHardware().lock()->getTopPanel().lock()->isSixteenLevelsEnabled() && assign16LevelsScreen->getParameter() == 1)
+			{
+				auto type = assign16LevelsScreen->getType();
+				auto key = assign16LevelsScreen->getOriginalKeyPad();
+				auto diff = lProgram->getPadIndexFromNote(nn) - (mpc.getBank() * 16) - key;
+				n->setNote(assign16LevelsScreen->getNote());
+				n->setVariationTypeNumber(type);
+				n->setVariationValue(diff * 5);
+			}
+
+			if (slider)
+				setSliderNoteVar(n.get(), program);
 		}
 
 		if (step || recMainWithoutPlaying)
-		{
 			sequencer.lock()->playMetronomeTrack();
-		}
 	}
 
 	auto noteEvent = make_shared<mpc::sequencer::NoteEvent>(nn);
@@ -363,28 +368,30 @@ void BaseControls::generateNoteOn(int nn, int padVelo, int tick)
 		auto key = assign16LevelsScreen->getOriginalKeyPad();
 		auto padnr = program.lock()->getPadIndexFromNote(nn) - (mpc.getBank() * 16);
 
-		if (type == 0) {
+		if (type == 0)
+		{
 			auto diff = padnr - key;
 			auto candidate = 64 + (diff * 5);
+
 			if (candidate > 124) {
 				candidate = 124;
 			}
 			else if (candidate < 4) {
 				candidate = 4;
 			}
+
 			noteEvent->setVariationValue(candidate);
 		}
 		else {
 			noteEvent->setVariationValue((100 / 16) * padnr);
 		}
+
 		noteEvent->setNote(assign16LevelsScreen->getNote());
 		noteEvent->setVariationTypeNumber(type);
 	}
 
 	if (slider)
-	{
 		setSliderNoteVar(noteEvent.get(), program);
-	}
 
 	mpc.getEventHandler().lock()->handle(noteEvent, track.lock().get());
 }

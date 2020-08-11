@@ -5,6 +5,7 @@
 
 namespace mpc::sequencer {
 	class FrameSeq;
+	class Track;
 }
 
 namespace mpc::lcdgui::screens {
@@ -41,6 +42,7 @@ namespace mpc::lcdgui::screens {
 
 		friend class SequencerScreen;
 		friend class mpc::sequencer::FrameSeq;
+		friend class mpc::sequencer::Track;
 
 	};
 }

@@ -19,9 +19,11 @@
 #include <sequencer/MixerEvent.hpp>
 
 #include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/PunchScreen.hpp>
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 
 using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 
 using namespace mpc::sequencer;
@@ -100,10 +102,28 @@ int Track::getTrackIndex()
 
 weak_ptr<NoteEvent> Track::recordNoteOn()
 {
+	auto punchScreen = dynamic_pointer_cast<PunchScreen>(mpc.screens->getScreenComponent("punch"));
 	auto lSequencer = sequencer.lock();
+	
+	auto pos = lSequencer->getTickPosition();
+
+	if (lSequencer->isRecordingOrOverdubbing() && punchScreen->on)
+	{
+		auto mode = punchScreen->autoPunch;
+
+		if (mode == 0 && pos < punchScreen->time0)
+			return {};
+
+		if (mode == 1 && pos >= punchScreen->time1)
+			return {};
+
+		if (mode == 2 && (pos < punchScreen->time0 || pos >= punchScreen-> time1))
+			return {};
+	}
+
 	auto n = make_shared<NoteEvent>();
 	
-	n->setTick(lSequencer->getTickPosition());
+	n->setTick(pos);
 	
 	for (auto& noteOnEvent : queuedNoteOnEvents)
 	{
@@ -112,16 +132,14 @@ weak_ptr<NoteEvent> Track::recordNoteOn()
 			NoteEvent noteOff;
 			noteOff.setNote(n->getNote());
 			noteOff.setVelocity(0);
-			noteOff.setTick(lSequencer->getTickPosition());
+			noteOff.setTick(pos);
 			recordNoteOff(noteOff);
 			break;
 		}
 	}
 
 	if (n->getTick() >= lSequencer->getCurrentlyPlayingSequence().lock()->getLastTick())
-	{
 		n->setTick(0);
-	}
 	
 	queuedNoteOnEvents.push_back(n);
 	
@@ -142,6 +160,7 @@ void Track::recordNoteOff(NoteEvent& n)
 	for (auto& noteEvent : queuedNoteOnEvents)
 	{
 		eraseIndex++;
+
 		if (noteEvent->getNote() == note)
 		{
 			noteOn.swap(noteEvent);
@@ -150,29 +169,25 @@ void Track::recordNoteOff(NoteEvent& n)
 	}
 
 	if (!noteOn)
-	{
 		return;
-	}
 
 	if (eraseIndex != -1 && eraseIndex != queuedNoteOnEvents.size())
-	{
 		queuedNoteOnEvents.erase(queuedNoteOnEvents.begin() + eraseIndex);
-	}
 	
 	if (n.getTick() >= noteOn->getTick())
 	{
 		int candidate = n.getTick() - noteOn->getTick();
 
 		if (candidate < 1)
-		{
 			candidate = 1;
-		}
+
 		noteOn->setDuration(candidate);
 	}
 	else
 	{
 		noteOn->setDuration(sequencer.lock()->getLoopEnd() - 1 - noteOn->getTick());
 	}
+
 	addEventRealTime(noteOn);
 	eventIndex++;
 }
@@ -551,6 +566,24 @@ void Track::playNext()
 		trackIndex < 64)
 	{
 		delete_ = true;
+	}
+	
+	auto punchScreen = dynamic_pointer_cast<PunchScreen>(mpc.screens->getScreenComponent("punch"));
+
+	if (lSequencer->isRecordingOrOverdubbing() && punchScreen->on && trackIndex < 64)
+	{
+		auto pos = lSequencer->getTickPosition();
+		
+		delete_ = false;
+
+		if (punchScreen->autoPunch == 0 && pos >= punchScreen->time0)
+			delete_ = true;
+
+		if (punchScreen->autoPunch == 1 && pos < punchScreen->time1)
+			delete_ = true;
+
+		if (punchScreen->autoPunch == 2 && pos >= punchScreen->time0 && pos < punchScreen->time1)
+			delete_ = true;
 	}
 
 	int counter = 0;
