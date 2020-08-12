@@ -14,6 +14,8 @@ TransScreen::TransScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void TransScreen::open()
 {
+	findChild("function-keys").lock()->Hide(sequencer.lock()->isPlaying());
+
 	setBar0(0);
 	setBar1(sequencer.lock()->getActiveSequence().lock()->getLastBarIndex());
 
@@ -148,4 +150,34 @@ void TransScreen::displayBars()
 {
 	findField("bar0").lock()->setTextPadded(to_string(bar0 + 1), "0");
 	findField("bar1").lock()->setTextPadded(to_string(bar1 + 1), "0");
+}
+
+void TransScreen::play()
+{
+	ScreenComponent::play();
+	findChild("function-keys").lock()->Hide(sequencer.lock()->isPlaying());
+}
+
+void TransScreen::playStart()
+{
+	ScreenComponent::playStart();
+	findChild("function-keys").lock()->Hide(sequencer.lock()->isPlaying());
+}
+
+void TransScreen::rec()
+{
+	ScreenComponent::rec();
+	findChild("function-keys").lock()->Hide(sequencer.lock()->isPlaying());
+}
+
+void TransScreen::overDub()
+{
+	ScreenComponent::overDub();
+	findChild("function-keys").lock()->Hide(sequencer.lock()->isPlaying());
+}
+
+void TransScreen::stop()
+{
+	ScreenComponent::stop();
+	findChild("function-keys").lock()->Hide(sequencer.lock()->isPlaying());
 }

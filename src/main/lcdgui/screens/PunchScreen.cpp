@@ -13,6 +13,12 @@ PunchScreen::PunchScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void PunchScreen::open()
 {
+    if (sequencer.lock()->isPlaying())
+    {
+        ls.lock()->openScreen("trans");
+        return;
+    }
+
     if (tab != 0)
     {
         ls.lock()->openScreen(tabNames[tab]);

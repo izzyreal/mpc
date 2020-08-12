@@ -26,6 +26,12 @@ namespace mpc::lcdgui::screens
 
 		TransScreen(mpc::Mpc& mpc, const int layerIndex);
 
+		void play() override;
+		void playStart() override;
+		void rec() override;
+		void overDub() override;
+		void stop() override;
+
 	private:
 		int tr = -1;
 		int transposeAmount = 0;
