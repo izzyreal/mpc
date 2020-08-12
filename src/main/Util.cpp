@@ -231,6 +231,10 @@ void Util::initSequence(mpc::Mpc& mpc)
 	auto userScreen = dynamic_pointer_cast<UserScreen>(mpc.screens->getScreenComponent("user"));
 	auto sequencer = mpc.getSequencer().lock();
 	auto sequence = sequencer->getActiveSequence().lock();
+
+	if (sequence->isUsed())
+		return;
+
 	sequence->init(userScreen->lastBar);
 	int index = sequencer->getActiveSequenceIndex();
 	string name = StrUtil::trim(sequencer->getDefaultSequenceName()) + StrUtil::padLeft(to_string(index + 1), "0", 2);

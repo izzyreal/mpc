@@ -853,3 +853,15 @@ void SequencerScreen::stop()
 
 	ScreenComponent::stop();
 }
+
+void SequencerScreen::rec()
+{
+	Util::initSequence(mpc);
+	ScreenComponent::rec();
+}
+
+void SequencerScreen::overDub()
+{
+	Util::initSequence(mpc);
+	ScreenComponent::overDub();
+}

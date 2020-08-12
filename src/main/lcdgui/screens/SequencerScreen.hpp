@@ -68,6 +68,8 @@ namespace mpc::lcdgui::screens
 		void play() override;
 		void playStart() override;
 		void stop() override;
+		void rec() override;
+		void overDub() override;
 
 	public:
 		void open() override;
