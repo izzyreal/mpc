@@ -1,5 +1,7 @@
 #include "DeleteProgramScreen.hpp"
 
+#include <mpc/MpcSoundPlayerChannel.hpp>
+
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::sampler;
 using namespace moduru::lang;
@@ -16,14 +18,7 @@ void DeleteProgramScreen::open()
 
     init();
 
-    for (int i = 0; i < allPrograms.size(); i++)
-    {
-        if (allPrograms[i].lock() == program.lock())
-        {
-            pgm = i;
-            break;
-        }
-    }
+    pgm = mpcSoundPlayerChannel->getProgram();
 
     displayPgm();
 }
@@ -44,10 +39,13 @@ void DeleteProgramScreen::function(int i)
         if (sampler.lock()->getProgramCount() > 1)
         {
 			sampler.lock()->deleteProgram(dynamic_pointer_cast<Program>(sampler.lock()->getProgram(pgm).lock()));
-        } else {
+        }
+        else
+        {
 			const bool initPgms = true;
 			sampler.lock()->deleteAllPrograms(initPgms);
 		}
+        
         ls.lock()->openScreen("program");
         break;
     }
@@ -56,10 +54,9 @@ void DeleteProgramScreen::function(int i)
 void DeleteProgramScreen::turnWheel(int i)
 {
     init();
+
     if (param.compare("pgm") == 0)
-    {
-		setDeletePgm(pgm + i);
-	}
+		setPgm(pgm + i);
 }
 
 void DeleteProgramScreen::displayPgm()
@@ -67,12 +64,10 @@ void DeleteProgramScreen::displayPgm()
     findField("pgm").lock()->setText(StrUtil::padLeft(to_string(pgm + 1), " ", 2) + "-" + dynamic_pointer_cast<Program>(sampler.lock()->getProgram(pgm).lock())->getName());
 }
 
-void DeleteProgramScreen::setDeletePgm(int i)
+void DeleteProgramScreen::setPgm(int i)
 {
     if (i < 0 || i >= sampler.lock()->getProgramCount())
-    {
         return;
-    }
 
     pgm = i;
     displayPgm();

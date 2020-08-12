@@ -16,7 +16,7 @@ namespace mpc::lcdgui::screens::dialog
 	private:
 		int pgm = 0;
 
-		void setDeletePgm(int i);
+		void setPgm(int i);
 		void displayPgm();
 
 	};
