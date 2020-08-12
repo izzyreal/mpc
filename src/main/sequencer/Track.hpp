@@ -128,7 +128,6 @@ namespace mpc::sequencer {
 
 	public:
 		Track(mpc::Mpc& mpc, mpc::sequencer::Sequence* parent, int i);
-		~Track();
 
 	private:
 		friend class Sequence;
