@@ -637,6 +637,8 @@ void Sequence::insertBars(int barCount, int afterBar)
 	initMetaTracks();
 
 	notifyObservers(string("numberofbars"));
+	notifyObservers(string("tempo"));
+	notifyObservers(string("timesignature"));
 }
 
 void Sequence::moveTrack(int source, int destination)

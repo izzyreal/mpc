@@ -76,6 +76,8 @@ void UserScreen::turnWheel(int i)
 		{
 			timeSig.decrease();
 		}
+	
+		displayTsig();
 	}
 	else if (param.compare("bars") == 0)
 	{

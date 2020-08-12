@@ -14,6 +14,7 @@ namespace mpc::sequencer
 {
 	class Sequence;
 	class Sequencer;
+	class FrameSeq;
 }
 
 namespace mpc::nvram
@@ -102,6 +103,7 @@ namespace mpc::lcdgui::screens
 		friend class mpc::nvram::NvRam;
 		friend class mpc::sequencer::Sequence;
 		friend class mpc::sequencer::Sequencer;
+		friend class mpc::sequencer::FrameSeq;
 		friend class mpc::Util;
 
 	};

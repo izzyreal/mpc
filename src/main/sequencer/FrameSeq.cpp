@@ -16,6 +16,7 @@
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <lcdgui/screens/SongScreen.hpp>
 #include <lcdgui/screens/PunchScreen.hpp>
+#include <lcdgui/screens/UserScreen.hpp>
 #include <lcdgui/screens/SequencerScreen.hpp>
 #include <lcdgui/Screens.hpp>
 
@@ -96,6 +97,7 @@ void FrameSeq::work(int nFrames)
 	bool punchOut = punchScreen->autoPunch == 1 || punchScreen->autoPunch == 2;
 
 	auto sequencerScreen = dynamic_pointer_cast<SequencerScreen>(mpc.screens->getScreenComponent("sequencer"));
+	auto userScreen = dynamic_pointer_cast<UserScreen>(mpc.screens->getScreenComponent("user"));
 
 	for (int i = 0; i < nFrames; i++)
 	{
@@ -251,6 +253,7 @@ void FrameSeq::work(int nFrames)
 						if (lSequencer->isRecordingOrOverdubbing())
 						{
 							seq->insertBars(1, seq->getLastBarIndex() + 1);
+							seq->setTimeSignature(seq->getLastBarIndex(), seq->getLastBarIndex(), userScreen->timeSig.getNumerator(), userScreen->timeSig.getDenominator());
 						}
 						else
 						{
