@@ -40,10 +40,13 @@ AllParser::AllParser(mpc::Mpc& mpc, mpc::disk::MpcFile* file)
 	midiSyncMisc = new MidiSyncMisc(moduru::VecUtil::CopyOfRange(&loadBytes, MIDI_SYNC_OFFSET, MIDI_SYNC_OFFSET + MidiSyncMisc::LENGTH));
 	misc = new Misc(moduru::VecUtil::CopyOfRange(&loadBytes, MISC_OFFSET, MISC_OFFSET + Misc::LENGTH));
 	seqNames = new SequenceNames(moduru::VecUtil::CopyOfRange(&loadBytes, SEQUENCE_NAMES_OFFSET, SEQUENCE_NAMES_OFFSET + SequenceNames::LENGTH));
-	for (int i = 0; i < 20; i++) {
+	
+	for (int i = 0; i < 20; i++)
+	{
 		int offset = SONGS_OFFSET + (i * Song::LENGTH);
 		songs[i] = new Song(moduru::VecUtil::CopyOfRange(&loadBytes, offset, offset + Song::LENGTH));
 	}
+	
 	sequences = readSequences(moduru::VecUtil::CopyOfRange(&loadBytes, SEQUENCES_OFFSET, loadBytes.size()));
 }
 
@@ -67,9 +70,7 @@ AllParser::AllParser(mpc::Mpc& mpc, string allName)
 	chunks.push_back(midiInput->getBytes());
 	
 	for (int i = 0; i < 16; i++)
-	{
 		chunks.push_back(vector<char>{ (char)0xFF });
-	}
 
 	midiSyncMisc = new MidiSyncMisc(mpc);
 	chunks.push_back(midiSyncMisc->getBytes());
@@ -79,17 +80,40 @@ AllParser::AllParser(mpc::Mpc& mpc, string allName)
 	chunks.push_back(seqNames->getBytes());
 	songs = vector<Song*>(20);
 	auto sequencer = mpc.getSequencer().lock();
+
 	for (int i = 0; i < 20; i++) {
 		songs[i] = new Song(sequencer->getSong(i).lock().get());
 		chunks.push_back(songs[i]->getBytes());
 	}
+	
 	auto usedSeqs = sequencer->getUsedSequences();
-	for (int i = 0; i < usedSeqs.size(); i++) {
+	
+	for (int i = 0; i < usedSeqs.size(); i++)
+	{
 		auto seq = usedSeqs[i];
 		Sequence allSeq(seq.lock().get(), sequencer->getUsedSequenceIndexes()[i] + 1);
 		chunks.push_back(allSeq.getBytes());
 	}
+	
 	saveBytes = moduru::file::ByteUtil::stitchByteArrays(chunks);
+}
+
+AllParser::~AllParser()
+{
+	if (header != nullptr) delete header;
+	if (defaults != nullptr) delete defaults;
+	if (sequencer != nullptr) delete sequencer;
+	if (count != nullptr) delete count;
+	if (midiInput != nullptr) delete midiInput;
+	if (midiSyncMisc != nullptr) delete midiSyncMisc;
+	if (misc != nullptr) delete misc;
+	if (seqNames != nullptr) delete seqNames;
+
+	for (auto& s : sequences)
+		if (s != nullptr) delete s;
+	
+	for (auto& s : songs)
+		if (s != nullptr) delete s;
 }
 
 const int AllParser::NAME_LENGTH;

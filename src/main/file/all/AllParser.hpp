@@ -85,6 +85,7 @@ namespace mpc::file::all
 	public:
 		AllParser(mpc::Mpc& mpc, mpc::disk::MpcFile* file);
 		AllParser(mpc::Mpc& mpc, std::string allName);
+		~AllParser();
 
 	};
 }
