@@ -52,8 +52,6 @@ BaseControls::BaseControls(mpc::Mpc& mpc)
 	sequencer = mpc.getSequencer();
 }
 
-vector<int> BaseControls::splitInc = vector<int>{ 10000000, 1000000, 100000, 10000, 1000, 100, 10, 1 };
-
 void BaseControls::init()
 {
 	sampler = mpc.getSampler();

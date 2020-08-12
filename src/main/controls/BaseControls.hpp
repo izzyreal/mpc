@@ -54,7 +54,6 @@ namespace mpc::controls
 
 	public:
 		bool splittable = false;
-		static std::vector<int> splitInc;
 		void splitLeft();
 		void splitRight();
 
