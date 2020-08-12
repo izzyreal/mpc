@@ -1,5 +1,7 @@
 #include "SecondSeqScreen.hpp"
 
+#include "PunchScreen.hpp"
+
 using namespace mpc::lcdgui::screens;
 using namespace std;
 
@@ -16,13 +18,14 @@ void SecondSeqScreen::open()
 
 void SecondSeqScreen::function(int i)
 {
+    auto punchScreen = dynamic_pointer_cast<PunchScreen>(mpc.screens->getScreenComponent("punch"));
+
     switch (i)
     {
-    case 0:
-        ls.lock()->openScreen("punch");
-        break;
+    case 0: // Intentional fall-through
     case 1:
-		ls.lock()->openScreen("trans");
+        punchScreen->tab = i;
+        ls.lock()->openScreen(punchScreen->tabNames[i]);
         break;
     case 5:
         if (sequencer.lock()->isSecondSequenceEnabled())

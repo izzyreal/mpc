@@ -13,8 +13,17 @@ PunchScreen::PunchScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void PunchScreen::open()
 {
-    setTime0(0);
-    setTime1(sequencer.lock()->getActiveSequence().lock()->getLastTick());
+    if (tab != 0)
+    {
+        ls.lock()->openScreen(tabNames[tab]);
+        return;
+    }
+
+    if (sequencer.lock()->getActiveSequence().lock()->getLastTick() < time0 || (time0 == 0 && time1 == 0))
+    {
+        setTime0(0);
+        setTime1(sequencer.lock()->getActiveSequence().lock()->getLastTick());
+    }
 
     displayBackground();
     displayAutoPunch();
@@ -38,11 +47,10 @@ void PunchScreen::function(int i)
 	
     switch (i)
     {
-    case 1:
-        ls.lock()->openScreen("trans");
-        break;
+    case 1: // Intentional fall-through
     case 2:
-		ls.lock()->openScreen("second-seq");
+        tab = i;
+        ls.lock()->openScreen(tabNames[i]);
         break;
     case 5:
         on = !on;

@@ -10,6 +10,8 @@ namespace mpc::sequencer {
 
 namespace mpc::lcdgui::screens {
 	class SequencerScreen;
+	class TransScreen;
+	class SecondSeqScreen;
 }
 
 namespace mpc::lcdgui::screens {
@@ -28,9 +30,11 @@ namespace mpc::lcdgui::screens {
 		void open() override;
 
 	private:
+		const std::vector<std::string> tabNames{ "punch", "trans", "second-seq" };
 		const std::vector<std::string> autoPunchNames{ "PUNCH IN ONLY", "PUNCH OUT ONLY", "PUNCH IN OUT" };
 		int autoPunch = 0;
 		bool on = false;
+		int tab = 0;
 
 		void setAutoPunch(int i);
 
@@ -41,6 +45,8 @@ namespace mpc::lcdgui::screens {
 		void displayNotes() override {}
 
 		friend class SequencerScreen;
+		friend class TransScreen;
+		friend class SecondSeqScreen;
 		friend class mpc::sequencer::FrameSeq;
 		friend class mpc::sequencer::Track;
 

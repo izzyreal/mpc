@@ -1,5 +1,7 @@
 #include "TransScreen.hpp"
 
+#include "PunchScreen.hpp"
+
 #include <sequencer/Track.hpp>
 
 using namespace mpc::lcdgui::screens;
@@ -22,14 +24,14 @@ void TransScreen::open()
 void TransScreen::function(int i)
 {
 	init();
+	auto punchScreen = dynamic_pointer_cast<PunchScreen>(mpc.screens->getScreenComponent("punch"));
 
 	switch (i)
 	{
-	case 0:
-		ls.lock()->openScreen("punch");
-		break;
+	case 0: // Intentional fall-through
 	case 2:
-		ls.lock()->openScreen("second-seq");
+		punchScreen->tab = i;
+		ls.lock()->openScreen(punchScreen->tabNames[i]);
 		break;
 	case 5:
 		//if (amount == 0) break; // does 2kxl do that?
