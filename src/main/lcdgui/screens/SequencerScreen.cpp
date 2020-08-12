@@ -232,7 +232,6 @@ void SequencerScreen::displaySq()
 	}
 }
 
-
 void SequencerScreen::displayNow0()
 {
 	findField("now0").lock()->setTextPadded(sequencer.lock()->getCurrentBarIndex() + 1, "0");
@@ -515,9 +514,7 @@ void SequencerScreen::turnWheel(int i)
 	init();
 
 	if (param.size() >= 3 && param.substr(0, 3).compare("now") == 0)
-	{
 		setLastFocus("step-editor", "view");
-	}
 
 	if (param.compare("now0") == 0)
 	{

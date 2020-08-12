@@ -100,9 +100,7 @@ void LoopScreen::function(int f)
 	}
 	case 5:
 		if (mpc.getControls().lock()->isF6Pressed())
-		{
 			return;
-		}
 
 		mpc.getControls().lock()->setF6Pressed(true);
 		sampler.lock()->playX();
@@ -115,9 +113,7 @@ void LoopScreen::turnWheel(int i)
     init();
 
 	if (param == "")
-	{
 		return;
-	}
 	
     auto soundInc = getSoundIncrement(i);
 	auto sound = sampler.lock()->getSound().lock();
@@ -130,9 +126,10 @@ void LoopScreen::turnWheel(int i)
 	auto field = findField(param).lock();
 	
 	if (field->isSplit())
-	{
 		soundInc = i >= 0 ? splitInc[field->getActiveSplit()] : -splitInc[field->getActiveSplit()];
-	}
+
+	if (field->isTypeModeEnabled())
+		field->disableTypeMode();
 
 	if (param.compare("to") == 0)
 	{

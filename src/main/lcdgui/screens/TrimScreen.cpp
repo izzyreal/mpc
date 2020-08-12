@@ -113,10 +113,8 @@ void TrimScreen::turnWheel(int i)
 	init();
 
 	if (param == "")
-	{
 		return;
-	}
-	
+
 	auto sound = sampler.lock()->getSound().lock();
 	auto const oldLength = sound->getEnd() - sound->getStart();
 	
@@ -125,10 +123,10 @@ void TrimScreen::turnWheel(int i)
 	auto field = findField(param).lock();
 	
 	if (field->isSplit())
-	{
-		MLOG("activeSplit: " + to_string(field->getActiveSplit()));
 		soundInc = i >= 0 ? splitInc[field->getActiveSplit()] : -splitInc[field->getActiveSplit()];
-	}
+	
+	if (field->isTypeModeEnabled())
+		field->disableTypeMode();
 
 	if (param.compare("st") == 0)
 	{

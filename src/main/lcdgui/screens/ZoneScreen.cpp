@@ -93,9 +93,7 @@ void ZoneScreen::function(int f)
 	case 4:
 	{
 		if (sampler.lock()->getSoundCount() == 0)
-		{
 			return;
-		}
 
 		auto editSoundScreen = dynamic_pointer_cast<EditSoundScreen>(mpc.screens->getScreenComponent("edit-sound"));
 		editSoundScreen->setReturnToScreenName("zone");
@@ -105,9 +103,7 @@ void ZoneScreen::function(int f)
 	case 5:
 	{
 		if (mpc.getControls().lock()->isF6Pressed())
-		{
 			return;
-		}
 
 		mpc.getControls().lock()->setF6Pressed(true);
 		sampler.lock()->playX();
@@ -121,18 +117,17 @@ void ZoneScreen::turnWheel(int i)
 	init();
 
 	if (param == "")
-	{
 		return;
-	}
 	
 	auto soundInc = getSoundIncrement(i);
 	auto field = findField(param).lock();
-	
+
 	if (field->isSplit())
-	{
 		soundInc = i >= 0 ? splitInc[field->getActiveSplit()] : -splitInc[field->getActiveSplit()];
-	}
 	
+	if (field->isTypeModeEnabled())
+		field->disableTypeMode();
+
 	if (param.compare("st") == 0)
 	{
 		setZoneStart(zone, getZoneStart(zone) + soundInc);

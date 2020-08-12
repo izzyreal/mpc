@@ -32,9 +32,7 @@ void StartFineScreen::displayFineWaveform()
 	auto sound = sampler.lock()->getSound().lock();
 
 	if (!sound)
-	{
 		return;
-	}
 
 	findWave().lock()->setSampleData(sound->getSampleData(), sound->isMono(), trimScreen->view);
 	findWave().lock()->setCenterSamplePos(sound->getStart());
@@ -45,9 +43,7 @@ void StartFineScreen::displayStart()
 	auto sound = sampler.lock()->getSound().lock();
 
 	if (!sound)
-	{
 		return;
-	}
 
 	findField("start").lock()->setTextPadded(sound->getStart(), " ");
 }
@@ -57,9 +53,7 @@ void StartFineScreen::displayLngthLabel()
 	auto sound = sampler.lock()->getSound().lock();
 
 	if (!sound)
-	{
 		return;
-	}
 
 	findLabel("lngth").lock()->setTextPadded(sound->getEnd() - sound->getStart(), " ");
 }
