@@ -469,18 +469,16 @@ void SequencerScreen::function(int i)
 	{
 	case 0:
 		if (sequencer.lock()->isPlaying())
-		{
 			return;
-		}
+
+		Util::initSequence(mpc);
 
 		openScreen("step-editor");
 		break;
 	case 1:
 	{
 		if (sequencer.lock()->isPlaying())
-		{
 			return;
-		}
 
 		openScreen("events");
 		break;
