@@ -33,18 +33,19 @@ FrameSeq::FrameSeq(mpc::Mpc& mpc)
 
 void FrameSeq::start(float sampleRate) {
 	MLOG("frameSeq starting with sampleRate " + to_string(sampleRate));
-	if (running) {
+
+	if (running)
 		return;
-	}
+
 	clock.init(sampleRate);
 	clock.setTick(sequencer.lock()->getPlayStartTick());
 	running = true;
 }
 
 void FrameSeq::startMetronome(int sampleRate) {
-	if (running) {
+	if (running)
 		return;
-	}
+
 	metronome = true;
 	start(sampleRate);
 }
@@ -52,9 +53,7 @@ void FrameSeq::startMetronome(int sampleRate) {
 void FrameSeq::work(int nFrames)
 {
 	if (!running)
-	{
 		return;
-	}
 
 	auto controls = mpc.getControls().lock();
 	auto songScreen = dynamic_pointer_cast<SongScreen>(mpc.screens->getScreenComponent("song"));
@@ -66,9 +65,8 @@ void FrameSeq::work(int nFrames)
 	if (frameCounter > 2048)
 	{
 		if (!lSequencer->isCountingIn() && !metronome)
-		{
 			lSequencer->notifyTimeDisplayRealtime();
-		}
+
 		frameCounter = 0;
 	}
 
@@ -80,6 +78,7 @@ void FrameSeq::work(int nFrames)
 		clock.set_bpm(tempo);
 		lSequencer->notify("tempo");
 	}
+
 	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(mpc.screens->getScreenComponent("timing-correct"));
 
 	int tcValue = lSequencer->getTickValues()[timingCorrectScreen->getNoteValue()];
@@ -211,7 +210,6 @@ void FrameSeq::work(int nFrames)
 				{
 					if (getTickPosition() >= seq->getLoopEnd() - 1)
 					{
-
 						if (punch && punchIn)
 						{
 							sequencerScreen->setPunchRectOn(0, true);
@@ -230,21 +228,19 @@ void FrameSeq::work(int nFrames)
 						if (lSequencer->isRecordingOrOverdubbing())
 						{
 							if (lSequencer->isRecording())
-							{
 								lSequencer->switchRecordToOverDub();
-							}
+
 							if (lSequencer->isRecordingModeMulti())
 							{
 								for (auto& t : seq->getTracks())
-								{
 									t.lock()->removeDoubles();
-								}
 							}
 							else
 							{
 								seq->getTrack(lSequencer->getActiveTrackIndex()).lock()->removeDoubles();
 							}
 						}
+
 						continue;
 					}
 				}
@@ -252,11 +248,19 @@ void FrameSeq::work(int nFrames)
 				{
 					if (getTickPosition() >= seq->getLastTick())
 					{
-						lSequencer->stop(seq->getLastTick());
-						lSequencer->move(seq->getLastTick());
+						if (lSequencer->isRecordingOrOverdubbing())
+						{
+							seq->insertBars(1, seq->getLastBarIndex() + 1);
+						}
+						else
+						{
+							lSequencer->stop(seq->getLastTick());
+							lSequencer->move(seq->getLastTick());
+						}
 					}
 				}
 			}
+
 			lSequencer->playToTick(getTickPosition());
 		}
 	}

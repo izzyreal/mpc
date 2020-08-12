@@ -24,10 +24,12 @@ namespace mpc::lcdgui::screens {
 		void turnWheel(int i) override;
 		void function(int i) override;
 
-	public:
 		PunchScreen(mpc::Mpc& mpc, const int layerIndex);
 
 		void open() override;
+
+		void rec() override;
+		void overDub() override;
 
 	private:
 		const std::vector<std::string> tabNames{ "punch", "trans", "second-seq" };

@@ -120,3 +120,15 @@ void PunchScreen::displayBackground()
     
     findBackground().lock()->setName(bgName);
 }
+
+void PunchScreen::rec()
+{
+    ls.lock()->openScreen("sequencer");
+    ScreenComponent::rec();
+}
+
+void PunchScreen::overDub()
+{
+    ls.lock()->openScreen("sequencer");
+    ScreenComponent::rec();
+}

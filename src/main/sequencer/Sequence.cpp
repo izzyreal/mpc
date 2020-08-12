@@ -575,21 +575,21 @@ void Sequence::deleteBars(int firstBar, int _lastBar)
 		setUsed(false);
 }
 
-void Sequence::insertBars(int numberOfBars, int afterBar)
+void Sequence::insertBars(int barCount, int afterBar)
 {
-	lastBarIndex += numberOfBars;
+	lastBarIndex += barCount;
 
 	for (int i = afterBar; i < 999; i++)
 	{
-		if (i + numberOfBars > 998)
+		if (i + barCount > 998)
 			break;
 
-		barLengths[i + numberOfBars] = barLengths[i];
-		numerators[i + numberOfBars] = numerators[i];
-		denominators[i + numberOfBars] = denominators[i];
+		barLengths[i + barCount] = barLengths[i];
+		numerators[i + barCount] = numerators[i];
+		denominators[i + barCount] = denominators[i];
 	}
 
-	for (int i = afterBar; i < afterBar + numberOfBars; i++)
+	for (int i = afterBar; i < afterBar + barCount; i++)
 	{
 		barLengths[i] = 384;
 		numerators[i] = 4;
@@ -613,7 +613,7 @@ void Sequence::insertBars(int numberOfBars, int afterBar)
 	
 	for (auto l : barLengths)
 	{
-		if (barCounter == afterBar + numberOfBars)
+		if (barCounter == afterBar + barCount)
 			break;
 
 		newBarStart += l;
@@ -635,6 +635,8 @@ void Sequence::insertBars(int numberOfBars, int afterBar)
 	}
 
 	initMetaTracks();
+
+	notifyObservers(string("numberofbars"));
 }
 
 void Sequence::moveTrack(int source, int destination)
