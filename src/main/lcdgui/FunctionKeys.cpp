@@ -65,9 +65,7 @@ void FunctionKey::Draw(std::vector<std::vector<bool>>* pixels)
 	for (int j = 1; j < 38; j++)
 	{
 		for (int k = 52; k < 59; k++)
-		{
 			(*pixels)[x + j][k] = bg;
-		}
 	}
 
 	Component::Draw(pixels);

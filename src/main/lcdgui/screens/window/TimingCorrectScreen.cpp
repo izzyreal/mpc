@@ -106,15 +106,8 @@ void TimingCorrectScreen::turnWheel(int i)
 
 void TimingCorrectScreen::displayNoteValue()
 {
-	auto fb = dynamic_pointer_cast<mpc::lcdgui::FunctionKeys>(findChild("function-keys").lock());
-
-	if (noteValue != 0)
-	{
-		//fb->enable(4);
-	}
-	else {
-		//fb->disable(4);
-	}
+	findChild<FunctionKey>("fk4").lock()->Hide(noteValue == 0);
+	SetDirty();
 
 	findField("notevalue").lock()->setText(noteValueNames[noteValue]);
 	findLabel("swing").lock()->Hide(!(noteValue == 1 || noteValue == 3));
