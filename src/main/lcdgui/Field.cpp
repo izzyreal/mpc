@@ -143,10 +143,10 @@ void Field::setSplit(bool b)
 
 		activeSplit = text.length() - 2;
 	}
-	else
-	{
-		activeSplit = 0;
+	else {
+		activeSplit = -1;
 	}
+
 	SetDirty();
 }
 
@@ -177,7 +177,11 @@ bool Field::enableTypeMode()
 		return false;
 
 	if (split)
+	{
+		auto oldActiveSplit = activeSplit;
 		setSplit(false);
+		activeSplit = oldActiveSplit;
+	}
 
     typeModeEnabled = true;
 	oldText = text;
@@ -213,9 +217,7 @@ void Field::type(int i)
 	auto textCopy = StrUtil::replaceAll(getText(), ' ', "");
 	
 	if (textCopy.length() == floor(w / FONT_WIDTH))
-	{
 		textCopy = "";
-	}
 
 	if (textCopy.compare("0") == 0 && i == 0)
 		return;

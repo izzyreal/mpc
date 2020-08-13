@@ -430,16 +430,16 @@ void EditSoundScreen::function(int j)
 				end = zoneScreen->getZoneEnd(zone);
 			}
 
-			auto newLength = sound->getEnd() - sound->getStart();
+			auto newLoopTo = sound->getLoopTo() - start;
 
-			if (start != 0)
-				sound->setLoopTo(sound->getLoopTo() - start);
-		
 			sampler.lock()->trimSample(sampler.lock()->getSoundIndex(), start, end);
 
 			sound->setStart(0);
+
+			auto newLength = sound->getEnd() - sound->getStart();
 			sound->setEnd(newLength);
 			sound->setMono(sound->isMono());
+			sound->setLoopTo(newLoopTo);
 			zoneScreen->initZones();
 		}
 		else if (edit == 1)

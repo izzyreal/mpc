@@ -820,8 +820,18 @@ void BaseControls::shift()
 
 	init();
 	auto focus = ls.lock()->getFocusedLayer().lock()->findField(param).lock();
+
 	if (focus && focus->isTypeModeEnabled())
+	{
 		focus->disableTypeMode();
+		auto split = focus->getActiveSplit();
+
+		if (split != -1)
+		{
+			focus->setSplit(true);
+			focus->setActiveSplit(split);
+		}
+	}
 }
 
 void BaseControls::undoSeq()
@@ -938,9 +948,7 @@ void BaseControls::splitLeft()
 	}
 
 	if (!splittable)
-	{
 		return;
-	}
 
 	if (field->isSplit())
 	{
