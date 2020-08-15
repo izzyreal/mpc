@@ -76,6 +76,9 @@ int LayeredScreen::openScreen(string screenName)
 
 	auto ams = mpc.getAudioMidiServices().lock();
 
+	if (currentScreenName.compare("song") == 0 && mpc.getSequencer().lock()->isPlaying())
+		return -1;
+
 	if (currentScreenName.compare("sample") == 0)
 	{
 		ams->muteMonitor(true);
