@@ -15,7 +15,7 @@ AssignmentViewScreen::AssignmentViewScreen(mpc::Mpc& mpc, const int layerIndex)
 void AssignmentViewScreen::open()
 {
 	findLabel("info1").lock()->setInverted(true);
-	findLabel("info1").lock()->setSize(13, 9);
+	findLabel("info1").lock()->setSize(14, 10);
 	
 	ls.lock()->setFocus(getFocusFromPadIndex());
 

@@ -512,6 +512,7 @@ void BaseControls::rec()
 	init();
 
 	auto hw = mpc.getHardware().lock();
+
 	if (!sequencer.lock()->isPlaying())
 	{
 		hw->getLed("rec").lock()->light(true);
@@ -526,6 +527,9 @@ void BaseControls::rec()
 			hw->getLed("overdub").lock()->light(false);
         }
     }
+
+	if (find(begin(allowTransportScreens), end(allowTransportScreens), currentScreenName) == end(allowTransportScreens))
+		ls.lock()->openScreen("sequencer");
 }
 
 void BaseControls::overDub()
@@ -550,6 +554,9 @@ void BaseControls::overDub()
 			hw->getLed("overdub").lock()->light(false);
 		}
 	}
+
+	if (find(begin(allowTransportScreens), end(allowTransportScreens), currentScreenName) == end(allowTransportScreens))
+		ls.lock()->openScreen("sequencer");
 }
 
 void BaseControls::stop()
@@ -561,6 +568,10 @@ void BaseControls::stop()
 
 	if (controls->isShiftPressed())
 		mpc.getAudioMidiServices().lock()->stopBouncing();
+
+	if (find(begin(allowTransportScreens), end(allowTransportScreens), currentScreenName) == end(allowTransportScreens)
+		&& currentScreenName.compare("song") != 0)
+		ls.lock()->openScreen("sequencer");
 }
 
 void BaseControls::play()
@@ -590,14 +601,14 @@ void BaseControls::play()
 	{
 		if (controls->isRecPressed())
 		{
-			if (currentScreenName.compare("sequencer") != 0 && currentScreenName.compare("trans") != 0)
+			if (find(begin(allowTransportScreens), end(allowTransportScreens), currentScreenName) == end(allowTransportScreens))
 				ls.lock()->openScreen("sequencer");
 
 			sequencer.lock()->rec();
 		}
 		else if (controls->isOverDubPressed())
 		{
-			if (currentScreenName.compare("sequencer") != 0 && currentScreenName.compare("trans") != 0)
+			if (find(begin(allowTransportScreens), end(allowTransportScreens), currentScreenName) == end(allowTransportScreens))
 				ls.lock()->openScreen("sequencer");
 
 			sequencer.lock()->overdub();
@@ -609,19 +620,11 @@ void BaseControls::play()
 			}
 			else
 			{
-				if (currentScreenName.compare("song") != 0 &&
-					currentScreenName.compare("sequencer") != 0 &&
-					currentScreenName.compare("track-mute") != 0 &&
-					currentScreenName.compare("program-assign") != 0 &&
-					currentScreenName.compare("program-params") != 0 &&
-					currentScreenName.compare("trans") != 0)
-				{
+				if (find(begin(allowTransportScreens), end(allowTransportScreens), currentScreenName) == end(allowTransportScreens)
+					&& currentScreenName.compare("song") != 0)
 					ls.lock()->openScreen("sequencer");
-				}
 
-				if (currentScreenName.compare("song") == 0)
-					sequencer.lock()->setSongModeEnabled(true);
-
+				sequencer.lock()->setSongModeEnabled(currentScreenName.compare("song") == 0);
 				sequencer.lock()->play();
 			}
 		}
@@ -639,7 +642,7 @@ void BaseControls::playStart()
 
 	if (controls->isRecPressed())
 	{
-		if (currentScreenName.compare("sequencer") != 0 && currentScreenName.compare("trans") != 0)
+		if (find(begin(allowTransportScreens), end(allowTransportScreens), currentScreenName) == end(allowTransportScreens))
 			ls.lock()->openScreen("sequencer");
 
 		sequencer.lock()->recFromStart();
@@ -649,7 +652,7 @@ void BaseControls::playStart()
 	}
 	else if (controls->isOverDubPressed())
 	{
-		if (currentScreenName.compare("sequencer") != 0 && currentScreenName.compare("trans") != 0)
+		if (find(begin(allowTransportScreens), end(allowTransportScreens), currentScreenName) == end(allowTransportScreens))
 			ls.lock()->openScreen("sequencer");
 
 		sequencer.lock()->overdubFromStart();
@@ -665,12 +668,11 @@ void BaseControls::playStart()
 		}
 		else
 		{
-			if (currentScreenName.compare("song") != 0 && currentScreenName.compare("sequencer") != 0 && currentScreenName.compare("track-mute") != 0 && currentScreenName.compare("trans") != 0)
+			if (find(begin(allowTransportScreens), end(allowTransportScreens), currentScreenName) == end(allowTransportScreens)
+				&& currentScreenName.compare("song") != 0)
 				ls.lock()->openScreen("sequencer");
 			
-			if (currentScreenName.compare("song") == 0)
-				sequencer.lock()->setSongModeEnabled(true);
-
+			sequencer.lock()->setSongModeEnabled(currentScreenName.compare("song") == 0);
 			sequencer.lock()->playFromStart();
 		}
 	}

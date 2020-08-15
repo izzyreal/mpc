@@ -48,6 +48,7 @@ namespace mpc::controls
 	{
 
 	protected:
+		const std::vector<std::string> allowTransportScreens{ "sequencer", "select-drum", "select-mixer-drum", "program-assign", "program-params", "drum", "purge", "program", "create-new-program", "name", "delete-program", "delete-all-programs", "assignment-view", "initialize-pad-assign", "copy-note-parameters", "velocity-modulation", "velo-env-filter", "velo-pitch", "mute-assign", "trans" };
 		mpc::Mpc& mpc;
 		std::weak_ptr<mpc::sequencer::Sequencer> sequencer;
 		std::weak_ptr<mpc::sampler::Sampler> sampler;
