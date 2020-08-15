@@ -6,6 +6,11 @@
 
 namespace mpc::lcdgui::screens
 {
+	class SelectMixerDrumScreen;
+}
+
+namespace mpc::lcdgui::screens
+{
 	class MixerScreen
 		: public mpc::lcdgui::ScreenComponent
 	{
@@ -34,6 +39,7 @@ namespace mpc::lcdgui::screens
 
 	private:
 		int tab = 0;
+		int lastTab = -1;
 		bool link = false;
 
 		int yPos = 0;
@@ -59,6 +65,9 @@ namespace mpc::lcdgui::screens
 
 	public:
 		void update(moduru::observer::Observable* o, nonstd::any arg) override;
+
+	private:
+		friend class SelectMixerDrumScreen;
 
 	};
 }

@@ -1,6 +1,7 @@
 #include "SelectMixerDrumScreen.hpp"
 
 #include <lcdgui/screens/DrumScreen.hpp>
+#include <lcdgui/screens/MixerScreen.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -25,7 +26,6 @@ void SelectMixerDrumScreen::function(int i)
 	{
 		auto drumScreen = dynamic_pointer_cast<DrumScreen>(mpc.screens->getScreenComponent("drum"));
 		drumScreen->drum = i;
-		//mpc.setPreviousSamplerScreenName(currentScreenName);
 		ls.lock()->openScreen("mixer");
 	}
 	else if (i == 4)

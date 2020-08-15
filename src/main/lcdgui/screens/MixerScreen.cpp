@@ -26,6 +26,12 @@ MixerScreen::MixerScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void MixerScreen::open()
 {
+	if (lastTab != -1)
+	{
+		setTab(lastTab);
+		lastTab = -1;
+	}
+
 	mpc.addObserver(this);
 
 	findField("dummy").lock()->Hide(true);
@@ -302,8 +308,15 @@ void MixerScreen::function(int f)
 	{
 	case 0:
 	case 1:
-	case 2:
-		setTab(f);
+	case 2: // Intentional fall-through
+		if (f == tab)
+		{
+			lastTab = tab;
+			ls.lock()->openScreen("select-mixer-drum");
+		}
+		else {
+			setTab(f);
+		}
 		break;
 	case 3:
 		ls.lock()->openScreen("mixer-setup");
