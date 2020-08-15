@@ -31,6 +31,8 @@ void InitPadAssignScreen::function(int i)
 {
 	init();
 	
+	ScreenComponent::function(i);
+
 	switch (i)
 	{
 	case 4:

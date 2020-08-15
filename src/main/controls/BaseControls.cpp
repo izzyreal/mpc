@@ -180,16 +180,12 @@ void BaseControls::function(int i)
 				auto loadScreen = dynamic_pointer_cast<LoadScreen>(mpc.screens->getScreenComponent("load"));
 
 				if (loadScreen->fileLoad + 1 > mpc.getDisk().lock()->getFiles().size())
-				{
 					loadScreen->fileLoad = 0; // Can we avoid this? Who's leaving fileLoad in a bad state?
-				}
 			}
 		}
 		
 		if (ls.lock()->getFocusedLayerIndex() == 1 || ls.lock()->getFocusedLayerIndex() == 2 || ls.lock()->getFocusedLayerIndex() == 3)
-		{
 			ls.lock()->openScreen(ls.lock()->getPreviousScreenName());
-		}
 		break;
 	}
 }
