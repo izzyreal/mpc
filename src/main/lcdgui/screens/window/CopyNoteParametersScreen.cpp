@@ -77,16 +77,14 @@ void CopyNoteParametersScreen::displayProg0()
 void CopyNoteParametersScreen::displayNote0()
 {
 	auto program = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(prog0).lock());
-	auto padIndex = program->getPadIndexFromNote(note0);
-	auto soundIndex = note0 != 34 ? program->getNoteParameters(note0)->getSndNumber() : -1;
-	auto noteText = note0 == 34 ? "--" : to_string(note0);
+	auto padIndex = program->getPadIndexFromNote(note0 + 35);
+	auto soundIndex = note0 != -1 ? program->getNoteParameters(note0 + 35)->getSndNumber() : -1;
+	auto noteText = note0 == -1 ? "--" : to_string(note0 + 35);
 	auto padName = padIndex != -1 ? sampler.lock()->getPadName(padIndex) : "OFF";
 	auto sampleName = soundIndex != -1 ? "-" + sampler.lock()->getSoundName(soundIndex) : "-OFF";
 	
 	if (note0 == -1)
-	{
 		sampleName = "";
-	}
 	
 	findField("note0").lock()->setText(noteText + "/" + padName + sampleName);
 }
@@ -100,16 +98,14 @@ void CopyNoteParametersScreen::displayProg1()
 void CopyNoteParametersScreen::displayNote1()
 {
 	auto program = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(prog1).lock());
-	auto padIndex = program->getPadIndexFromNote(note1);
-	auto soundIndex = note1 != 34 ? program->getNoteParameters(note1)->getSndNumber() : -1;
-	auto noteText = note1 == 34 ? "--" : to_string(note1);
+	auto padIndex = program->getPadIndexFromNote(note1 + 35);
+	auto soundIndex = note1 != -1 ? program->getNoteParameters(note1 + 35)->getSndNumber() : -1;
+	auto noteText = note1 == -1 ? "--" : to_string(note1 + 35);
 	auto padName = padIndex != -1 ? sampler.lock()->getPadName(padIndex) : "OFF";
 	auto sampleName = soundIndex != -1 ? "-" + sampler.lock()->getSoundName(soundIndex) : "-OFF";
 
 	if (note1 == -1)
-	{
 		sampleName = "";
-	}
 
 	findField("note1").lock()->setText(noteText + "/" + padName + sampleName);
 }
@@ -118,9 +114,7 @@ void CopyNoteParametersScreen::displayNote1()
 void CopyNoteParametersScreen::setProg0(int i)
 {
 	if (i < 0 || i >= sampler.lock()->getProgramCount())
-	{
 		return;
-	}
 	
 	prog0 = i;
 	displayProg0();
@@ -129,9 +123,7 @@ void CopyNoteParametersScreen::setProg0(int i)
 void CopyNoteParametersScreen::setProg1(int i)
 {
 	if (i < 0 || i >= sampler.lock()->getProgramCount())
-	{
 		return;
-	}
 
 	prog1 = i;
 	displayProg1();
@@ -140,9 +132,8 @@ void CopyNoteParametersScreen::setProg1(int i)
 void CopyNoteParametersScreen::setNote0(int i)
 {
 	if (i < 0 || i > 63)
-	{
 		return;
-	}
+
 	note0 = i;
 	displayNote0();
 }
@@ -150,9 +141,8 @@ void CopyNoteParametersScreen::setNote0(int i)
 void CopyNoteParametersScreen::setNote1(int i)
 {
 	if (i < 0 || i > 63)
-	{
 		return;
-	}
+
 	note1 = i;
 	displayNote1();
 }
