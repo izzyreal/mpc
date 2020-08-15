@@ -14,9 +14,9 @@ AssignmentViewScreen::AssignmentViewScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void AssignmentViewScreen::open()
 {
-	findLabel("info1").lock()->setInverted(true);
-	findLabel("info1").lock()->setSize(14, 10);
-	
+	findField("info1").lock()->setFocusable(false);
+	findField("info1").lock()->setInverted(true);
+
 	ls.lock()->setFocus(getFocusFromPadIndex());
 
 	init();
@@ -173,7 +173,7 @@ void AssignmentViewScreen::displayInfo1()
 {
 	auto note = program.lock()->getPad(getPadIndexFromFocus())->getNote();
 	auto text = note != 34 ? to_string(note) : "--";	
-	findLabel("info1").lock()->setText(text);
+	findField("info1").lock()->setText(text);
 }
 
 void AssignmentViewScreen::displayInfo2()

@@ -570,7 +570,7 @@ void BaseControls::stop()
 		mpc.getAudioMidiServices().lock()->stopBouncing();
 
 	if (find(begin(allowTransportScreens), end(allowTransportScreens), currentScreenName) == end(allowTransportScreens)
-		&& currentScreenName.compare("song") != 0)
+		&& find(begin(allowPlay), end(allowPlay), currentScreenName) == end(allowPlay))
 		ls.lock()->openScreen("sequencer");
 }
 
@@ -621,7 +621,7 @@ void BaseControls::play()
 			else
 			{
 				if (find(begin(allowTransportScreens), end(allowTransportScreens), currentScreenName) == end(allowTransportScreens)
-					&& currentScreenName.compare("song") != 0)
+					&& find(begin(allowPlay), end(allowPlay), currentScreenName) == end(allowPlay))
 					ls.lock()->openScreen("sequencer");
 
 				sequencer.lock()->setSongModeEnabled(currentScreenName.compare("song") == 0);
@@ -669,7 +669,7 @@ void BaseControls::playStart()
 		else
 		{
 			if (find(begin(allowTransportScreens), end(allowTransportScreens), currentScreenName) == end(allowTransportScreens)
-				&& currentScreenName.compare("song") != 0)
+				&& find(begin(allowPlay), end(allowPlay), currentScreenName) == end(allowPlay))
 				ls.lock()->openScreen("sequencer");
 			
 			sequencer.lock()->setSongModeEnabled(currentScreenName.compare("song") == 0);
