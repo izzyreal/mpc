@@ -3,6 +3,14 @@
 
 namespace mpc::lcdgui::screens
 {
+	class PgmAssignScreen;
+	class PgmParamsScreen;
+	class PurgeScreen;
+	class DrumScreen;
+}
+
+namespace mpc::lcdgui::screens
+{
 	class SelectDrumScreen
 		: public mpc::lcdgui::ScreenComponent
 	{
@@ -13,6 +21,14 @@ namespace mpc::lcdgui::screens
 		SelectDrumScreen(mpc::Mpc& mpc, const int layerIndex);
 
 		void open() override;
+
+	private:
+		std::string redirectScreen = "";
+
+		friend class PgmAssignScreen;
+		friend class PgmParamsScreen;
+		friend class DrumScreen;
+		friend class PurgeScreen;
 
 	};
 }

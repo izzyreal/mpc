@@ -27,18 +27,21 @@ void SelectDrumScreen::function(int i)
 	init();
 
 	if (i > 3)
-	{
 		return;
-	}
 
 	auto drumScreen = dynamic_pointer_cast<DrumScreen>(mpc.screens->getScreenComponent("drum"));
 	drumScreen->drum = i;
 
 	if (mpc.getNote() < 35)
-	{
 		mpc.setPadAndNote(program.lock()->getPadIndexFromNote(35), 35);
-	}
 
-	ls.lock()->openScreen("program-assign");
+	if (redirectScreen.compare("") != 0)
+	{
+		ls.lock()->openScreen(redirectScreen);
+		redirectScreen = "";
+	}
+	else {
+		ls.lock()->openScreen("program-assign");
+	}
 	return;
 }

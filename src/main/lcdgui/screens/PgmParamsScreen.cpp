@@ -1,5 +1,7 @@
 #include "PgmParamsScreen.hpp"
 
+#include "SelectDrumScreen.hpp"
+
 #include <controls/BaseSamplerControls.hpp>
 #include <sampler/NoteParameters.hpp>
 #include <sampler/Pad.hpp>
@@ -50,8 +52,12 @@ void PgmParamsScreen::function(int i)
 		ls.lock()->openScreen("program-assign");
 		break;
 	case 1:
+	{	
+		auto selectDrumScreen = dynamic_pointer_cast<SelectDrumScreen>(mpc.screens->getScreenComponent("select-drum"));
+		selectDrumScreen->redirectScreen = "program-params";
 		ls.lock()->openScreen("select-drum");
 		break;
+	}
 	case 2:
 		ls.lock()->openScreen("drum");
 		break;

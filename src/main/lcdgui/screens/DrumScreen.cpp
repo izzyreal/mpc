@@ -1,5 +1,7 @@
 #include "DrumScreen.hpp"
 
+#include "SelectDrumScreen.hpp"
+
 #include <controls/BaseSamplerControls.hpp>
 #include <mpc/MpcSoundPlayerChannel.hpp>
 
@@ -40,8 +42,12 @@ void DrumScreen::function(int f)
         ls.lock()->openScreen("program-params");
         break;
     case 2:
-        ls.lock()->openScreen("select-drum");
-        break;
+	{
+		auto selectDrumScreen = dynamic_pointer_cast<SelectDrumScreen>(mpc.screens->getScreenComponent("select-drum"));
+		selectDrumScreen->redirectScreen = "drum";
+		ls.lock()->openScreen("select-drum");
+		break;
+	}
     case int (3):
         ls.lock()->openScreen("purge");
         break;

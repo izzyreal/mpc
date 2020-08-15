@@ -1,5 +1,7 @@
 #include "PurgeScreen.hpp"
 
+#include "SelectDrumScreen.hpp"
+
 using namespace mpc::lcdgui::screens;
 using namespace std;
 
@@ -30,8 +32,12 @@ void PurgeScreen::function(int f)
 		ls.lock()->openScreen("drum");
 		break;
 	case 3:
+	{
+		auto selectDrumScreen = dynamic_pointer_cast<SelectDrumScreen>(mpc.screens->getScreenComponent("select-drum"));
+		selectDrumScreen->redirectScreen = "purge";
 		ls.lock()->openScreen("select-drum");
 		break;
+	}
 	case 5:
 		sampler.lock()->purge();
 		open();
