@@ -156,34 +156,9 @@ void StartFineScreen::right()
 
 void StartFineScreen::pressEnter()
 {
-	init();
-
-	auto field = findField(param).lock();
-
-	if (!field->isTypeModeEnabled())
-		return;
-
-	auto candidate = field->enter();
-	auto sound = sampler.lock()->getSound().lock();
-	auto const oldLength = sound->getEnd() - sound->getStart();
 	auto trimScreen = dynamic_pointer_cast<TrimScreen>(mpc.screens->getScreenComponent("trim"));
-	auto smplLngthFix = trimScreen->smplLngthFix;
-
-	if (candidate != INT_MAX)
-	{
-		if (param.compare("start") == 0)
-		{
-			if (smplLngthFix && candidate + oldLength > sound->getFrameCount())
-				return;
-
-			sound->setStart(candidate);
-			displayStart();
-
-			if (smplLngthFix)
-				sound->setEnd(sound->getStart() + oldLength);
-
-			displayLngthLabel();
-			displayFineWave();
-		}
-	}
+	trimScreen->pressEnter();
+	displayStart();
+	displayLngthLabel();
+	displayFineWave();
 }

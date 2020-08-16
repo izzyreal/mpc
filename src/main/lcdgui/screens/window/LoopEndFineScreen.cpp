@@ -132,7 +132,15 @@ void LoopEndFineScreen::turnWheel(int i)
 	}
 	else if (param.compare("end") == 0)
 	{
-		sound->setEnd(sound->getEnd() + soundInc);
+		auto candidate = sound->getEnd() + soundInc;
+
+		if (candidate > sound->getFrameCount())
+			candidate = sound->getFrameCount();
+
+		if (loopScreen->loopLngthFix && candidate - loopLength < 0)
+			candidate = loopLength;
+
+		sound->setEnd(candidate);
 
 		if (loopScreen->loopLngthFix)
 			sound->setLoopTo(sound->getEnd() - loopLength);
@@ -160,39 +168,9 @@ void LoopEndFineScreen::right()
 
 void LoopEndFineScreen::pressEnter()
 {
-	init();
-
-	auto field = findField(param).lock();
-
-	if (!field->isTypeModeEnabled())
-		return;
-
-	auto candidate = field->enter();
-	auto sound = sampler.lock()->getSound().lock();
-	auto const oldLength = sound->getLoopTo() - sound->getStart();
 	auto loopScreen = dynamic_pointer_cast<LoopScreen>(mpc.screens->getScreenComponent("loop"));
-	auto loopLngthFix = loopScreen->loopLngthFix;
-
-	if (candidate != INT_MAX)
-	{
-		if (param.compare("end") == 0)
-		{
-			if (loopLngthFix && candidate - oldLength < 0)
-				return;
-
-			sound->setEnd(candidate);
-			displayEnd();
-
-			if (loopLngthFix)
-				sound->setLoopTo(sound->getEnd() - oldLength);
-			
-			displayLngthField();
-			displayFineWave();
-		}
-		else if (param.compare("lngth") == 0)
-		{
-			sound->setEnd(candidate);
-			displayLngthField();
-		}
-	}
+	loopScreen->pressEnter();
+	displayEnd();
+	displayLngthField();
+	displayFineWave();
 }

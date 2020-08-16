@@ -167,39 +167,9 @@ void LoopToFineScreen::right()
 
 void LoopToFineScreen::pressEnter()
 {
-	init();
-
-	auto field = findField(param).lock();
-
-	if (!field->isTypeModeEnabled())
-		return;
-
-	auto candidate = field->enter();
-	auto sound = sampler.lock()->getSound().lock();
-	auto const oldLength = sound->getLoopTo() - sound->getStart();
 	auto loopScreen = dynamic_pointer_cast<LoopScreen>(mpc.screens->getScreenComponent("loop"));
-	auto loopLngthFix = loopScreen->loopLngthFix;
-
-	if (candidate != INT_MAX)
-	{
-		if (param.compare("to") == 0)
-		{
-			if (loopLngthFix && candidate + oldLength > sound->getFrameCount())
-				candidate = sound->getFrameCount() - oldLength;
-
-			sound->setLoopTo(candidate);
-			displayTo();
-
-			if (loopLngthFix)
-				sound->setEnd(sound->getLoopTo() + oldLength);
-
-			displayLngthField();
-			displayFineWave();
-		}
-		else if (param.compare("lngth") == 0)
-		{
-			sound->setEnd(candidate);
-			displayLngthField();
-		}
-	}
+	loopScreen->pressEnter();
+	displayTo();
+	displayLngthField();
+	displayFineWave();
 }

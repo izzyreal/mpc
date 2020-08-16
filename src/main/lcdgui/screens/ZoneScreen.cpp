@@ -1,5 +1,6 @@
 #include "ZoneScreen.hpp"
 
+#include <lcdgui/Layer.hpp>
 #include <lcdgui/screens/TrimScreen.hpp>
 #include <lcdgui/screens/window/NumberOfZonesScreen.hpp>
 #include <lcdgui/screens/window/EditSoundScreen.hpp>
@@ -353,4 +354,9 @@ void ZoneScreen::setZone(int i)
 vector<int> ZoneScreen::getZone()
 {
 	return vector<int>{ getZoneStart(zone), getZoneEnd(zone) };
+}
+
+void ZoneScreen::pressEnter()
+{
+	// TO-DO
 }

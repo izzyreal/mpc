@@ -1,5 +1,6 @@
 #include "LoopScreen.hpp"
 
+#include <lcdgui/Layer.hpp>
 #include <lcdgui/screens/LoopScreen.hpp>
 #include <lcdgui/screens/TrimScreen.hpp>
 #include <lcdgui/screens/window/EditSoundScreen.hpp>
@@ -64,7 +65,7 @@ void LoopScreen::openWindow()
 	{
 		ls.lock()->openScreen("loop-to-fine");
 	}
-	else if (param.compare("endlengthvalue") == 0)
+	else if (param.compare("endlength") == 0 || param.compare("endlengthvalue") == 0)
 	{
 		ls.lock()->openScreen("loop-end-fine");
 	}
@@ -306,48 +307,49 @@ void LoopScreen::pressEnter()
 {
 	init();
 		
-	auto field = findField(param).lock();
+	auto field = ls.lock()->getFocusedLayer().lock()->findField(param).lock();
 
 	if (!field->isTypeModeEnabled())
 		return;
 
 	auto candidate = field->enter();
 	auto sound = sampler.lock()->getSound().lock();
-	auto loopScreen = dynamic_pointer_cast<LoopScreen>(mpc.screens->getScreenComponent("loop"));
 
 	auto const oldLength = sound->getEnd() - sound->getLoopTo();
-	auto const lengthFix = loopScreen->loopLngthFix;
 
 	if (candidate != INT_MAX)
 	{
 		if (param.compare("to") == 0)
 		{
-			if (lengthFix && candidate + oldLength > sound->getFrameCount())
+			if (loopLngthFix && candidate + oldLength > sound->getFrameCount())
 				candidate = sound->getFrameCount() - oldLength;
 
-			if (candidate > sound->getEnd() && !lengthFix)
+			if (candidate > sound->getEnd() && !loopLngthFix)
 				candidate = sound->getEnd();
 
 			sound->setLoopTo(candidate);
 			displayTo();
 
-			if (lengthFix)
+			if (loopLngthFix)
 				sound->setEnd(sound->getLoopTo() + oldLength);
 
 			displayEndLengthValue();
 			displayEndLength();
 			displayWave();
 		}
-		else if (param.compare("endlengthvalue") == 0)
+		else if (param.compare("endlengthvalue") == 0 || param.compare("end") == 0)
 		{
-			if (endSelected)
+			if ((endSelected && param.compare("endlengthvalue") == 0) || param.compare("end") == 0)
 			{
-				if (lengthFix && candidate - oldLength < 0)
-					return;
+				if (loopLngthFix && candidate - oldLength < 0)
+					candidate = oldLength;
+
+				if (candidate > sound->getFrameCount())
+					candidate = sound->getFrameCount();
 
 				sound->setEnd(candidate);
 
-				if (lengthFix)
+				if (loopLngthFix)
 					sound->setLoopTo(sound->getEnd() - oldLength);
 			}
 			else {

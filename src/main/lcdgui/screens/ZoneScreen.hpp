@@ -29,11 +29,12 @@ namespace mpc::lcdgui::screens
 		void openWindow() override;
 		void function(int f) override;
 		void turnWheel(int i) override;
+		void pressEnter() override;
 
 		ZoneScreen(mpc::Mpc& mpc, const int layerIndex);
 
 		void open() override;
-		
+	
 	private:
 		void displayWave();
 		void displaySnd();

@@ -1,7 +1,9 @@
 #include "TrimScreen.hpp"
 
 #include <lcdgui/screens/window/EditSoundScreen.hpp>
+#include <lcdgui/Layer.hpp>
 #include <controls/BaseSamplerControls.hpp>
+
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -251,11 +253,12 @@ void TrimScreen::right()
 	splitRight();
 }
 
+// Can be called from another layer, i.e. Start Fine and End Fine windows
 void TrimScreen::pressEnter()
 {
 	init();
-	
-	auto field = findField(param).lock();
+
+	auto field = ls.lock()->getFocusedLayer().lock()->findField(param).lock();
 	
 	if (!field->isTypeModeEnabled())
 		return;
@@ -266,7 +269,7 @@ void TrimScreen::pressEnter()
 	
 	if (candidate != INT_MAX)
 	{
-		if (param.compare("st") == 0)
+		if (param.compare("st") == 0 || param.compare("start") == 0)
 		{
 			if (smplLngthFix && candidate + oldLength > sound->getFrameCount())
 				candidate = sound->getFrameCount() - oldLength;
