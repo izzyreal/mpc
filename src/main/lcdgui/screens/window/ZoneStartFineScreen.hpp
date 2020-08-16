@@ -25,9 +25,12 @@ namespace mpc::lcdgui::screens::window
 		
 		void function(int i) override;
 		void turnWheel(int i) override;
+		void left() override;
+		void right() override;
+		void pressEnter() override;
 
 	private:
-		void displayFineWaveform();
+		void displayFineWave();
 		void displayStart();
 		void displayLngthLabel();
 		void displayPlayX();

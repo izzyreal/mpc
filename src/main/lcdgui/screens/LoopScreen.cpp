@@ -23,7 +23,7 @@ LoopScreen::LoopScreen(mpc::Mpc& mpc, const int layerIndex)
 	addChild(move(make_shared<Wave>()));
 	findWave().lock()->setFine(false);
 
-	baseControls->typableParams = vector<string>{ "to", "endlengthvalue" };
+	baseControls->typableParams = { "to", "endlengthvalue" };
 }
 
 void LoopScreen::open()
@@ -283,10 +283,7 @@ void LoopScreen::right()
 void LoopScreen::pressEnter()
 {
 	init();
-	
-	if (!isTypable())
-		return;
-	
+		
 	auto field = findField(param).lock();
 
 	if (!field->isTypeModeEnabled())

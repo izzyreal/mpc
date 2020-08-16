@@ -21,7 +21,7 @@ ZoneScreen::ZoneScreen(mpc::Mpc& mpc, const int layerIndex)
 
 	addChild(move(make_shared<Wave>()));
 	findWave().lock()->setFine(false);
-	baseControls->typableParams = vector<string>{ "st", "end" };
+	baseControls->typableParams = { "st", "end" };
 }
 
 void ZoneScreen::open()
@@ -202,16 +202,12 @@ void ZoneScreen::displaySnd()
 	}
 
 	if (ls.lock()->getFocus().compare("dummy") == 0)
-	{
 		ls.lock()->setFocus(findField("snd").lock()->getName());
-	}
 
 	auto sampleName = sound->getName();
 
 	if (!sound->isMono())
-	{
 		sampleName = StrUtil::padRight(sampleName, " ", 16) + "(ST)";
-	}
 
 	findField("snd").lock()->setText(sampleName);
 }
@@ -285,24 +281,19 @@ void ZoneScreen::initZones()
 
 void ZoneScreen::setZoneStart(int zoneIndex, int start)
 {
-	if (start > zones[zoneIndex][1]) {
+	if (start > zones[zoneIndex][1])
 		start = zones[zoneIndex][1];
-	}
 	
-	if (zoneIndex == 0 && start < 0) {
+	if (zoneIndex == 0 && start < 0)
 		start = 0;
-	}
 	
-	if (zoneIndex > 0 && start < zones[zoneIndex - 1][0]) {
+	if (zoneIndex > 0 && start < zones[zoneIndex - 1][0])
 		start = zones[zoneIndex - 1][0];
-	}
 	
 	zones[zoneIndex][0] = start;
 	
 	if (zoneIndex != 0)
-	{
 		zones[zoneIndex - 1][1] = start;
-	}
 	
 	displaySt();
 	displayWave();
@@ -311,9 +302,7 @@ void ZoneScreen::setZoneStart(int zoneIndex, int start)
 int ZoneScreen::getZoneStart(int zoneIndex)
 {
 	if (zoneIndex >= zones.size())
-	{
 		return 0;
-	}
 
 	return zones[zoneIndex][0];
 }
@@ -322,19 +311,20 @@ void ZoneScreen::setZoneEnd(int zoneIndex, int end)
 {
 	auto length = sampler.lock()->getSound().lock()->getFrameCount();
 
-	if (end < zones[zoneIndex][0]) {
+	if (end < zones[zoneIndex][0])
 		end = zones[zoneIndex][0];
-	}
-	if (zoneIndex < numberOfZones - 1 && end > zones[zoneIndex + 1][1]) {
+
+	if (zoneIndex < numberOfZones - 1 && end > zones[zoneIndex + 1][1])
 		end = zones[zoneIndex + 1][1];
-	}
-	if (zoneIndex == numberOfZones - 1 && end > length) {
+
+	if (zoneIndex == numberOfZones - 1 && end > length)
 		end = length;
-	}
+
 	zones[zoneIndex][1] = end;
-	if (zoneIndex != numberOfZones - 1) {
+
+	if (zoneIndex != numberOfZones - 1)
 		zones[zoneIndex + 1][0] = end;
-	}
+	
 	displayEnd();
 	displayWave();
 }
@@ -342,9 +332,7 @@ void ZoneScreen::setZoneEnd(int zoneIndex, int end)
 int ZoneScreen::getZoneEnd(int zoneIndex)
 {
 	if (zoneIndex >= zones.size())
-	{
 		return 0;
-	}
 
 	return zones[zoneIndex][1];
 }
@@ -352,9 +340,7 @@ int ZoneScreen::getZoneEnd(int zoneIndex)
 void ZoneScreen::setZone(int i)
 {
 	if (i < 0 || i >= numberOfZones)
-	{
 		return;
-	}
 
 	zone = i;
 

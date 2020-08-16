@@ -24,5 +24,5 @@ void BaseSamplerControls::init()
 	mpcSoundPlayerChannel = sampler.lock()->getDrum(drumScreen->drum);
 	program = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
 	
-	splittable = param.compare("st") == 0 || param.compare("end") == 0 || param.compare("to") == 0 || param.compare("endlengthvalue") == 0;
+	splittable = param.compare("st") == 0 || param.compare("end") == 0 || param.compare("to") == 0 || param.compare("endlengthvalue") == 0 || param.compare("start") == 0;
 }

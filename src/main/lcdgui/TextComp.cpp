@@ -43,9 +43,7 @@ void TextComp::setSize(int w, int h)
 void TextComp::Draw(std::vector<std::vector<bool>>* pixels)
 {
 	if (shouldNotDraw(pixels))
-	{
 		return;
-	}
 
 	if (text.length() == 0)
 	{
@@ -155,8 +153,10 @@ void TextComp::Draw(std::vector<std::vector<bool>>* pixels)
 	{
 		for (auto xPos : vector<int>{ 12, 30 })
 		{
+			bool doubleInverted = field != nullptr && field->isSplit() && field->getActiveSplit() + 2 <= xPos / 6;
+
 			if (w > xPos)
-				(*pixels)[xPos + x][y + 8] = inverted ? false : true;
+				(*pixels)[xPos + x][y + 8] = inverted && !doubleInverted ? false : true;
 		}
 	}
 

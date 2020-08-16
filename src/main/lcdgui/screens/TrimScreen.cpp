@@ -18,7 +18,7 @@ TrimScreen::TrimScreen(mpc::Mpc& mpc, const int layerIndex)
 	addChild(move(make_shared<Wave>()));
 	findWave().lock()->setFine(false);
 
-	baseControls->typableParams = vector<string>{ "st", "end" };
+	baseControls->typableParams = { "st", "end" };
 }
 
 void TrimScreen::open()
@@ -118,7 +118,6 @@ void TrimScreen::turnWheel(int i)
 	auto sound = sampler.lock()->getSound().lock();
 	auto const oldLength = sound->getEnd() - sound->getStart();
 	
-	//auto notch = getNotch(increment);
 	auto soundInc = getSoundIncrement(i);
 	auto field = findField(param).lock();
 	
@@ -131,9 +130,7 @@ void TrimScreen::turnWheel(int i)
 	if (param.compare("st") == 0)
 	{
 		if (smplLngthFix && sound->getStart() + soundInc + oldLength > sound->getLastFrameIndex())
-		{
 			return;
-		}
 		
 		sound->setStart(sound->getStart() + soundInc);
 		
@@ -144,14 +141,13 @@ void TrimScreen::turnWheel(int i)
 			sound->setEnd(sound->getStart() + oldLength);
 			displayEnd();
 		}
+
 		displayWave();
 	}
 	else if (param.compare("end") == 0)
 	{
 		if (smplLngthFix && sound->getEnd() + soundInc - oldLength < 0)
-		{
 			return;
-		}
 		
 		sound->setEnd(sound->getEnd() + soundInc);
 		
@@ -198,9 +194,7 @@ void TrimScreen::turnWheel(int i)
 void TrimScreen::setSlider(int i)
 {
 	if (!mpc.getControls().lock()->isShiftPressed())
-	{
 		return;
-	}
     
 	init();
 
@@ -264,18 +258,11 @@ void TrimScreen::right()
 void TrimScreen::pressEnter()
 {
 	init();
-
-	if (!isTypable())
-	{
-		return;
-	}
 	
 	auto field = findField(param).lock();
 	
 	if (!field->isTypeModeEnabled())
-	{
 		return;
-	}
 
 	auto candidate = field->enter();
 	auto sound = sampler.lock()->getSound().lock();
@@ -286,9 +273,7 @@ void TrimScreen::pressEnter()
 		if (param.compare("st") == 0)
 		{
 			if (smplLngthFix && candidate + oldLength > sound->getLastFrameIndex())
-			{
 				return;
-			}
 
 			sound->setStart(candidate);
 			displaySt();
@@ -298,14 +283,13 @@ void TrimScreen::pressEnter()
 				sound->setEnd(sound->getStart() + oldLength);
 				displayEnd();
 			}
+
 			displayWave();
 		}
 		else if (param.compare("end") == 0)
 		{
 			if (smplLngthFix && candidate - oldLength < 0)
-			{
 				return;
-			}
 
 			sound->setEnd(candidate);
 			displayEnd();
@@ -315,6 +299,7 @@ void TrimScreen::pressEnter()
 				sound->setStart(sound->getEnd() - oldLength);
 				displaySt();
 			}
+
 			displayWave();
 		}
 	}

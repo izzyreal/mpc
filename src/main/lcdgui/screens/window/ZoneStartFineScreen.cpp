@@ -24,10 +24,10 @@ void ZoneStartFineScreen::open()
 
 
 	displayPlayX();
-	displayFineWaveform();
+	displayFineWave();
 }
 
-void ZoneStartFineScreen::displayFineWaveform()
+void ZoneStartFineScreen::displayFineWave()
 {
 	auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(mpc.screens->getScreenComponent("zone"));
 	auto trimScreen = dynamic_pointer_cast<TrimScreen>(mpc.screens->getScreenComponent("trim"));
@@ -88,16 +88,61 @@ void ZoneStartFineScreen::turnWheel(int i)
 
 	auto sampleLength = sound->getFrameCount();
 
+	auto soundInc = getSoundIncrement(i);
+	auto field = findField(param).lock();
+
+	if (field->isSplit())
+		soundInc = i >= 0 ? splitInc[field->getActiveSplit()] : -splitInc[field->getActiveSplit()];
+
+	if (field->isTypeModeEnabled())
+		field->disableTypeMode();
+
 	if (param.compare("start") == 0)
 	{
-		zoneScreen->setZoneStart(zoneScreen->zone, zoneScreen->getZoneStart(zoneScreen->zone) + i);
+		zoneScreen->setZoneStart(zoneScreen->zone, zoneScreen->getZoneStart(zoneScreen->zone) + soundInc);
 		displayStart();
 		displayLngthLabel();
-		displayFineWaveform();
+		displayFineWave();
 	}
 	else if (param.compare("playx") == 0)
 	{
 		sampler.lock()->setPlayX(sampler.lock()->getPlayX() + i);
 		displayPlayX();
+	}
+}
+
+void ZoneStartFineScreen::left()
+{
+	splitLeft();
+}
+
+void ZoneStartFineScreen::right()
+{
+	splitRight();
+}
+
+void ZoneStartFineScreen::pressEnter()
+{
+	init();
+
+	auto field = findField(param).lock();
+
+	if (!field->isTypeModeEnabled())
+		return;
+
+	auto candidate = field->enter();
+	auto sound = sampler.lock()->getSound().lock();
+
+	if (candidate != INT_MAX)
+	{
+		if (param.compare("start") == 0)
+		{
+			auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(mpc.screens->getScreenComponent("zone"));
+			zoneScreen->setZoneStart(zoneScreen->zone, candidate);
+			displayStart();
+
+			displayLngthLabel();
+			displayFineWave();
+		}
 	}
 }

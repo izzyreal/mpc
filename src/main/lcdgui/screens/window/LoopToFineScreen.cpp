@@ -24,7 +24,7 @@ void LoopToFineScreen::open()
 	findField("lngth").lock()->enableTwoDots();
 
 	displayPlayX();
-	displayFineWaveform();
+	displayFineWave();
 }
 
 void LoopToFineScreen::displayLoopLngth()
@@ -45,7 +45,7 @@ void LoopToFineScreen::displayLngthField()
 	findField("lngth").lock()->setTextPadded(sound->getEnd() - sound->getLoopTo(), " ");
 }
 
-void LoopToFineScreen::displayFineWaveform()
+void LoopToFineScreen::displayFineWave()
 {
 	auto trimScreen = dynamic_pointer_cast<TrimScreen>(mpc.screens->getScreenComponent("trim"));
 	auto sound = sampler.lock()->getSound().lock();
@@ -105,29 +105,31 @@ void LoopToFineScreen::turnWheel(int i)
 
 	auto sampleLength = sound->getFrameCount();
 	
+	auto soundInc = getSoundIncrement(i);
+	auto field = findField(param).lock();
+
+	if (field->isSplit())
+		soundInc = i >= 0 ? splitInc[field->getActiveSplit()] : -splitInc[field->getActiveSplit()];
+
+	if (field->isTypeModeEnabled())
+		field->disableTypeMode();
+
 	if (param.compare("loop-lngth") == 0)
 	{
 		loopScreen->loopLngthFix = i > 0;
 		displayLoopLngth();
 	}
 	else if (param.compare("lngth") == 0)
-	{
-		if (sound->getEnd() + i > sampleLength)
-		{
-			return;
-		}
-		
-		sound->setEnd(sound->getEnd() + i);
+	{		
+		sound->setEnd(sound->getEnd() + soundInc);
 		
 		displayLngthField();
-		displayFineWaveform();
+		displayFineWave();
 	}
 	else if (param.compare("to") == 0)
 	{
 		if (!loopScreen->loopLngthFix && sound->getEnd() - (sound->getLoopTo() + i) < 0)
-		{
 			return;
-		}
 
 		auto highestLoopTo = sampleLength - 1;
 
@@ -135,26 +137,71 @@ void LoopToFineScreen::turnWheel(int i)
 		{
 			highestLoopTo -= loopLength;
 
-			if (sound->getLoopTo() + i > highestLoopTo)
-			{
+			if (sound->getLoopTo() + soundInc > highestLoopTo)
 				return;
-			}
 		}
 
-		sound->setLoopTo(sound->getLoopTo() + i);
+		sound->setLoopTo(sound->getLoopTo() + soundInc);
 
 		if (loopScreen->loopLngthFix)
-		{
 			sound->setEnd(sound->getLoopTo() + loopLength);
-		}
 
 		displayTo();
 		displayLngthField();
-		displayFineWaveform();
+		displayFineWave();
 	}
 	else if (param.compare("playx") == 0)
 	{
 		sampler.lock()->setPlayX(sampler.lock()->getPlayX() + i);
 		displayPlayX();
+	}
+}
+
+void LoopToFineScreen::left()
+{
+	splitLeft();
+}
+
+void LoopToFineScreen::right()
+{
+	splitRight();
+}
+
+void LoopToFineScreen::pressEnter()
+{
+	init();
+
+	auto field = findField(param).lock();
+
+	if (!field->isTypeModeEnabled())
+		return;
+
+	auto candidate = field->enter();
+	auto sound = sampler.lock()->getSound().lock();
+	auto const oldLength = sound->getLoopTo() - sound->getStart();
+	auto loopScreen = dynamic_pointer_cast<LoopScreen>(mpc.screens->getScreenComponent("loop"));
+	auto loopLngthFix = loopScreen->loopLngthFix;
+
+	if (candidate != INT_MAX)
+	{
+		if (param.compare("to") == 0)
+		{
+			if (loopLngthFix && candidate + oldLength > sound->getFrameCount())
+				return;
+
+			sound->setLoopTo(candidate);
+			displayTo();
+
+			if (loopLngthFix)
+				sound->setEnd(sound->getLoopTo() + oldLength);
+
+			displayLngthField();
+			displayFineWave();
+		}
+		else if (param.compare("lngth") == 0)
+		{
+			sound->setEnd(candidate);
+			displayLngthField();
+		}
 	}
 }

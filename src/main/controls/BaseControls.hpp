@@ -106,7 +106,7 @@ namespace mpc::controls
 		virtual void undoSeq();
 		virtual void erase();
 		virtual void setSlider(int i) {};
-
+		
 		virtual bool isTypable();
 
 		virtual void pad(int i, int velo, bool repeat, int tick);

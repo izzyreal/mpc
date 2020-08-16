@@ -23,10 +23,10 @@ void ZoneEndFineScreen::open()
 	findLabel("lngth").lock()->enableTwoDots();
 
 	displayPlayX();
-	displayFineWaveform();
+	displayFineWave();
 }
 
-void ZoneEndFineScreen::displayFineWaveform()
+void ZoneEndFineScreen::displayFineWave()
 {
 	auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(mpc.screens->getScreenComponent("zone"));
 	auto trimScreen = dynamic_pointer_cast<TrimScreen>(mpc.screens->getScreenComponent("trim"));
@@ -34,9 +34,7 @@ void ZoneEndFineScreen::displayFineWaveform()
 	auto sound = sampler.lock()->getSound().lock();
 
 	if (!sound)
-	{
 		return;
-	}
 
 	findWave().lock()->setSampleData(sound->getSampleData(), sound->isMono(), trimScreen->view);
 	findWave().lock()->setCenterSamplePos(zoneScreen->getZoneEnd(zoneScreen->zone));
@@ -83,16 +81,61 @@ void ZoneEndFineScreen::turnWheel(int i)
 	auto sound = sampler.lock()->getSound().lock();
 	auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(mpc.screens->getScreenComponent("zone"));
 
+	auto soundInc = getSoundIncrement(i);
+	auto field = findField(param).lock();
+
+	if (field->isSplit())
+		soundInc = i >= 0 ? splitInc[field->getActiveSplit()] : -splitInc[field->getActiveSplit()];
+
+	if (field->isTypeModeEnabled())
+		field->disableTypeMode();
+
 	if (param.compare("end") == 0)
 	{
-		zoneScreen->setZoneEnd(zoneScreen->zone, zoneScreen->getZoneEnd(zoneScreen->zone) + i);
+		zoneScreen->setZoneEnd(zoneScreen->zone, zoneScreen->getZoneEnd(zoneScreen->zone) + soundInc);
 		displayLngthLabel();
 		displayEnd();
-		displayFineWaveform();
+		displayFineWave();
 	}
 	else if (param.compare("playx") == 0)
 	{
 		sampler.lock()->setPlayX(sampler.lock()->getPlayX() + i);
 		displayPlayX();
+	}
+}
+
+void ZoneEndFineScreen::left()
+{
+	splitLeft();
+}
+
+void ZoneEndFineScreen::right()
+{
+	splitRight();
+}
+
+void ZoneEndFineScreen::pressEnter()
+{
+	init();
+
+	auto field = findField(param).lock();
+
+	if (!field->isTypeModeEnabled())
+		return;
+
+	auto candidate = field->enter();
+	auto sound = sampler.lock()->getSound().lock();
+
+	if (candidate != INT_MAX)
+	{
+		if (param.compare("end") == 0)
+		{
+			auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(mpc.screens->getScreenComponent("zone"));
+			zoneScreen->setZoneEnd(zoneScreen->zone, candidate);
+			displayEnd();
+
+			displayLngthLabel();
+			displayFineWave();
+		}
 	}
 }

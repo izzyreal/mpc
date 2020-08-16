@@ -13,15 +13,14 @@ namespace mpc::lcdgui
 		std::vector<float>* sampleData{ nullptr };
 		bool fine{ false };
 		bool mono{ true };
-		unsigned int view{ 0 };
+		unsigned int view = 0;
 		float samplesPerPixel{ 1.0f };
-		unsigned int frameCount{ 0 };
+		unsigned int frameCount = 0;
 		float exp{ 1.0f };
-		unsigned int selectionStart{ 0 };	// normal view only
-		unsigned int selectionEnd{ 0 };		// normal view only
-		unsigned int centerSamplePos{ 0 };	// zoomed view only
-		unsigned int zoomFactor{ 7 };		// zoomed view only
-		unsigned int width{ 0 };
+		unsigned int selectionStart = 0;	// normal view only
+		unsigned int selectionEnd = 0;		// normal view only
+		unsigned int centerSamplePos = 0;	// zoomed view only
+		unsigned int zoomFactor{ 3 };		// zoomed view only
 
 	private:
 		void makeLine(std::vector<std::vector<std::vector<int>>>* lines, std::vector<bool>* colors, unsigned int samplePos);

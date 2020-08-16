@@ -409,9 +409,6 @@ void SequencerScreen::pressEnter()
 	init();
 	baseControls->pressEnter();
 
-	if (!isTypable())
-		return;
-
 	auto focusedField = findChild<Field>(param).lock();
 
 	if (!focusedField->isTypeModeEnabled())

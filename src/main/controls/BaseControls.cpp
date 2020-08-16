@@ -392,6 +392,18 @@ void BaseControls::generateNoteOn(int nn, int padVelo, int tick)
 	mpc.getEventHandler().lock()->handle(noteEvent, track.lock().get());
 }
 
+bool BaseControls::isTypable()
+{
+	if (typableParams.size() == 0)
+		return false;
+
+	for (auto str : typableParams)
+		if (str.compare(param) == 0)
+			return true;
+
+	return false;
+}
+
 void BaseControls::numpad(int i)
 {
 	init();
@@ -932,17 +944,6 @@ void BaseControls::setSliderNoteVar(mpc::sequencer::NoteEvent* n, weak_ptr<mpc::
 		n->setVariationValue(filterValue);
 		break;
 	}
-}
-
-bool BaseControls::isTypable()
-{
-	if (typableParams.size() == 0)
-		return false;
-
-	for (auto str : typableParams)
-		if (str.compare(param) == 0)
-			return true;
-	return false;
 }
 
 void BaseControls::erase()

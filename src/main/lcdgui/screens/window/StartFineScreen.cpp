@@ -1,8 +1,10 @@
 #include "StartFineScreen.hpp"
 
 #include <lcdgui/screens/TrimScreen.hpp>
+#include <controls/BaseSamplerControls.hpp>
 
 using namespace mpc::lcdgui;
+using namespace mpc::controls;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
@@ -10,8 +12,12 @@ using namespace std;
 StartFineScreen::StartFineScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "start-fine", layerIndex)
 {
+	baseControls = make_shared<BaseSamplerControls>(mpc);
+
 	addChild(move(make_shared<Wave>()));
 	findWave().lock()->setFine(true);
+
+	baseControls->typableParams = { "start" };
 }
 
 void StartFineScreen::open()
@@ -22,10 +28,10 @@ void StartFineScreen::open()
 	findLabel("lngth").lock()->enableTwoDots();
 	displaySmplLngth();
 	displayPlayX();
-	displayFineWaveform();
+	displayFineWave();
 }
 
-void StartFineScreen::displayFineWaveform()
+void StartFineScreen::displayFineWave()
 {
 	auto trimScreen = dynamic_pointer_cast<TrimScreen>(mpc.screens->getScreenComponent("trim"));
 
@@ -96,6 +102,14 @@ void StartFineScreen::turnWheel(int i)
 	auto trimScreen = dynamic_pointer_cast<TrimScreen>(mpc.screens->getScreenComponent("trim"));
 
 	auto sampleLength = sound->getFrameCount();
+	auto soundInc = getSoundIncrement(i);
+	auto field = findField(param).lock();
+
+	if (field->isSplit())
+		soundInc = i >= 0 ? splitInc[field->getActiveSplit()] : -splitInc[field->getActiveSplit()];
+
+	if (field->isTypeModeEnabled())
+		field->disableTypeMode();
 
 	if (param.compare("start") == 0)
 	{
@@ -106,20 +120,16 @@ void StartFineScreen::turnWheel(int i)
 		{
 			highestStartPos -= startEndLength;
 
-			if (sound->getStart() + i > highestStartPos)
-			{
+			if (sound->getStart() + soundInc > highestStartPos)
 				return;
-			}
 		}
 
-		sound->setStart(sound->getStart() + i);
+		sound->setStart(sound->getStart() + soundInc);
 
 		if (trimScreen->smplLngthFix)
-		{
 			sound->setEnd(sound->getStart() + length);
-		}
 
-		displayFineWaveform();
+		displayFineWave();
 		displayLngthLabel();
 		displayStart();
 	}
@@ -132,5 +142,49 @@ void StartFineScreen::turnWheel(int i)
 	{
 		sampler.lock()->setPlayX(sampler.lock()->getPlayX() + i);
 		displayPlayX();
+	}
+}
+
+void StartFineScreen::left()
+{
+	splitLeft();
+}
+
+void StartFineScreen::right()
+{
+	splitRight();
+}
+
+void StartFineScreen::pressEnter()
+{
+	init();
+
+	auto field = findField(param).lock();
+
+	if (!field->isTypeModeEnabled())
+		return;
+
+	auto candidate = field->enter();
+	auto sound = sampler.lock()->getSound().lock();
+	auto const oldLength = sound->getEnd() - sound->getStart();
+	auto trimScreen = dynamic_pointer_cast<TrimScreen>(mpc.screens->getScreenComponent("trim"));
+	auto smplLngthFix = trimScreen->smplLngthFix;
+
+	if (candidate != INT_MAX)
+	{
+		if (param.compare("start") == 0)
+		{
+			if (smplLngthFix && candidate + oldLength > sound->getFrameCount())
+				return;
+
+			sound->setStart(candidate);
+			displayStart();
+
+			if (smplLngthFix)
+				sound->setEnd(sound->getStart() + oldLength);
+
+			displayLngthLabel();
+			displayFineWave();
+		}
 	}
 }
