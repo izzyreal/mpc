@@ -133,17 +133,26 @@ void LoopScreen::turnWheel(int i)
 
 	if (param.compare("to") == 0)
 	{
-		if (loopFix && sound->getLoopTo() + soundInc + oldLoopLength > sound->getFrameCount())
+		auto candidateLoopTo = sound->getLoopTo() + soundInc;
+		auto candidateEnd = candidateLoopTo + oldLoopLength;
+
+		if (loopFix && candidateEnd > sound->getFrameCount())
 		{
-			return;
+			candidateEnd = sound->getFrameCount();
+			candidateLoopTo = sound->getFrameCount() - oldLoopLength;
 		}
 
-        sound->setLoopTo(sound->getLoopTo() + soundInc);
+		if (!loopFix && candidateLoopTo > sound->getEnd())
+		{
+			sound->setLoopTo(sound->getEnd());
+		}
+		else
+		{
+			sound->setLoopTo(candidateLoopTo);
+		}
 		
 		if (loopFix)
-		{
-			sound->setEnd(sound->getLoopTo() + oldLoopLength);
-		}
+			sound->setEnd(candidateEnd);
 
 		displayEndLength();
 		displayEndLengthValue();
@@ -152,16 +161,38 @@ void LoopScreen::turnWheel(int i)
     }
     else if (param.compare("endlengthvalue") == 0)
 	{
-		if (loopFix && sound->getEnd() + soundInc - oldLoopLength < 0)
+		if (endSelected)
 		{
-			return;
+			auto endCandidate = sound->getEnd() + soundInc;
+
+			if (endCandidate > sound->getFrameCount())
+				endCandidate = sound->getFrameCount();
+
+			sound->setEnd(endCandidate);
+
+			if (loopFix)
+			{
+				auto loopToCandidate = sound->getEnd() - oldLoopLength;
+
+				if (loopToCandidate < 0)
+				{
+					loopToCandidate = 0;
+					sound->setEnd(oldLoopLength);
+				}
+
+				sound->setLoopTo(loopToCandidate);
+			}
 		}
-        
-		sound->setEnd(sound->getEnd() + soundInc);
-		
-		if (loopFix)
-		{
-			sound->setLoopTo(sound->getEnd() - oldLoopLength);
+		else {
+			auto endCandidate = sound->getEnd() + soundInc;
+			
+			if (endCandidate < sound->getLoopTo())
+				endCandidate = sound->getLoopTo();
+
+			if (endCandidate > sound->getFrameCount())
+				endCandidate = sound->getFrameCount();
+
+			sound->setEnd(endCandidate);
 		}
 
 		displayEndLength();
@@ -225,23 +256,19 @@ void LoopScreen::setSlider(int i)
 	auto const lengthFix = trimScreen->smplLngthFix;
 
 	auto candidatePos = (int)((i / 124.0) * sound->getFrameCount());
-	auto maxPos = 0;
-
+	
 	if (param.compare("to") == 0)
 	{
-		maxPos = lengthFix ? sound->getFrameCount() - oldLength : sound->getFrameCount();
+		auto maxPos = lengthFix ? sound->getFrameCount() - oldLength : sound->getFrameCount();
+		
 		if (candidatePos > maxPos)
-		{
 			candidatePos = maxPos;
-		}
 		
 		sound->setLoopTo(candidatePos);
 
 		if (lengthFix)
-		{
 			sound->setEnd(sound->getLoopTo() + oldLength);
-		}
-
+		
 		displayEndLength();
 		displayEndLengthValue();
 		displayTo();
@@ -249,19 +276,15 @@ void LoopScreen::setSlider(int i)
 	}
 	else if (param.compare("endlengthvalue") == 0)
 	{
-		maxPos = lengthFix ? oldLength : 0;
-		
-		if (candidatePos < maxPos)
-		{
-			candidatePos = maxPos;
-		}
+		auto maxEndPos = lengthFix ? oldLength : 0;
+
+		if (candidatePos < maxEndPos)
+			candidatePos = maxEndPos;
 
 		sound->setEnd(candidatePos);
 
 		if (lengthFix)
-		{
 			sound->setLoopTo(sound->getEnd() - oldLength);
-		}
 
 		displayEndLength();
 		displayEndLengthValue();
@@ -318,16 +341,26 @@ void LoopScreen::pressEnter()
 		}
 		else if (param.compare("endlengthvalue") == 0)
 		{
-			if (lengthFix && candidate - oldLength < 0)
+			if (endSelected)
 			{
-				return;
+				if (lengthFix && candidate - oldLength < 0)
+					return;
+
+				sound->setEnd(candidate);
+
+				if (lengthFix)
+					sound->setLoopTo(sound->getEnd() - oldLength);
+			}
+			else {
+				auto endCandidate = sound->getLoopTo() + candidate;
+
+				// No need to check the < case
+				if (endCandidate > sound->getFrameCount())
+					endCandidate = sound->getFrameCount();
+				
+				sound->setEnd(endCandidate);
 			}
 
-			sound->setEnd(candidate);
-			if (lengthFix)
-			{
-				sound->setLoopTo(sound->getEnd() - oldLength);
-			}
 			displayEndLength();
 			displayEndLengthValue();
 			displayTo();
