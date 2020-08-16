@@ -128,26 +128,10 @@ void ZoneStartFineScreen::right()
 
 void ZoneStartFineScreen::pressEnter()
 {
-	init();
+	auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(mpc.screens->getScreenComponent("zone"));
+	zoneScreen->pressEnter();
 
-	auto field = findField(param).lock();
-
-	if (!field->isTypeModeEnabled())
-		return;
-
-	auto candidate = field->enter();
-	auto sound = sampler.lock()->getSound().lock();
-
-	if (candidate != INT_MAX)
-	{
-		if (param.compare("start") == 0)
-		{
-			auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(mpc.screens->getScreenComponent("zone"));
-			zoneScreen->setZoneStart(zoneScreen->zone, candidate);
-			displayStart();
-
-			displayLngthLabel();
-			displayFineWave();
-		}
-	}
+	displayStart();
+	displayLngthLabel();
+	displayFineWave();
 }

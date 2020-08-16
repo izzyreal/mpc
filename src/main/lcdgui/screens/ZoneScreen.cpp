@@ -113,6 +113,16 @@ void ZoneScreen::function(int f)
 	}
 }
 
+void ZoneScreen::left()
+{
+	splitLeft();
+}
+
+void ZoneScreen::right()
+{
+	splitRight();
+}
+
 void ZoneScreen::turnWheel(int i)
 {
 	init();
@@ -358,5 +368,31 @@ vector<int> ZoneScreen::getZone()
 
 void ZoneScreen::pressEnter()
 {
-	// TO-DO
+	init();
+	auto field = ls.lock()->getFocusedLayer().lock()->findField(param).lock();
+
+	if (!field->isTypeModeEnabled())
+		return;
+
+	auto candidate = field->enter();
+	auto sound = sampler.lock()->getSound().lock();
+
+	if (candidate != INT_MAX)
+	{
+		if (param.compare("st") == 0 || param.compare("start") == 0)
+		{
+			auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(mpc.screens->getScreenComponent("zone"));
+			zoneScreen->setZoneStart(zoneScreen->zone, candidate);
+			displaySt();
+			displayWave();
+		}
+		else if (param.compare("end") == 0)
+		{
+			auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(mpc.screens->getScreenComponent("zone"));
+			zoneScreen->setZoneEnd(zoneScreen->zone, candidate);
+			displayEnd();
+			displayWave();
+		}
+	}
+
 }

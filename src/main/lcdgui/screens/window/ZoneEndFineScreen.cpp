@@ -121,26 +121,10 @@ void ZoneEndFineScreen::right()
 
 void ZoneEndFineScreen::pressEnter()
 {
-	init();
+	auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(mpc.screens->getScreenComponent("zone"));
+	zoneScreen->pressEnter();
 
-	auto field = findField(param).lock();
-
-	if (!field->isTypeModeEnabled())
-		return;
-
-	auto candidate = field->enter();
-	auto sound = sampler.lock()->getSound().lock();
-
-	if (candidate != INT_MAX)
-	{
-		if (param.compare("end") == 0)
-		{
-			auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(mpc.screens->getScreenComponent("zone"));
-			zoneScreen->setZoneEnd(zoneScreen->zone, candidate);
-			displayEnd();
-
-			displayLngthLabel();
-			displayFineWave();
-		}
-	}
+	displayEnd();
+	displayLngthLabel();
+	displayFineWave();
 }
