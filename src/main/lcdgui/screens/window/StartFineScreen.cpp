@@ -13,11 +13,10 @@ StartFineScreen::StartFineScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "start-fine", layerIndex)
 {
 	baseControls = make_shared<BaseSamplerControls>(mpc);
+	baseControls->typableParams = { "start" };
 
 	addChild(move(make_shared<Wave>()));
 	findWave().lock()->setFine(true);
-
-	baseControls->typableParams = { "start" };
 }
 
 void StartFineScreen::open()

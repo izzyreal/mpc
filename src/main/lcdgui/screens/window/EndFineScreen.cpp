@@ -1,8 +1,10 @@
 #include "EndFineScreen.hpp"
 
 #include <lcdgui/screens/TrimScreen.hpp>
+#include <controls/BaseSamplerControls.hpp>
 
 using namespace mpc::lcdgui;
+using namespace mpc::controls;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
@@ -10,6 +12,9 @@ using namespace std;
 EndFineScreen::EndFineScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "end-fine", layerIndex)
 {
+	baseControls = make_shared<BaseSamplerControls>(mpc);
+	baseControls->typableParams = { "end" };
+
 	addChild(move(make_shared<Wave>()));
 	findWave().lock()->setFine(true);
 }
@@ -108,8 +113,14 @@ void EndFineScreen::turnWheel(int i)
 	if (field->isTypeModeEnabled())
 		field->disableTypeMode();
 
+
 	if (param.compare("end") == 0)
 	{
+		auto candidate = sound->getEnd() + soundInc;
+
+		if (trimScreen->smplLngthFix && candidate < startEndLength)
+			return;
+
 		sound->setEnd(sound->getEnd() + soundInc);
 
 		if (trimScreen->smplLngthFix)

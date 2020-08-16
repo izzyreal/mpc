@@ -2,7 +2,9 @@
 
 #include <lcdgui/screens/ZoneScreen.hpp>
 #include <lcdgui/screens/TrimScreen.hpp>
+#include <controls/BaseSamplerControls.hpp>
 
+using namespace mpc::controls;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
@@ -11,6 +13,9 @@ using namespace std;
 ZoneStartFineScreen::ZoneStartFineScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "zone-start-fine", layerIndex)
 {
+	baseControls = make_shared<BaseSamplerControls>(mpc);
+	baseControls->typableParams = { "start" };
+
 	addChild(move(make_shared<Wave>()));
 	findWave().lock()->setFine(true);
 }
