@@ -14,7 +14,7 @@ LoopToFineScreen::LoopToFineScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "loop-to-fine", layerIndex)
 {
 	baseControls = make_shared<BaseSamplerControls>(mpc);
-	baseControls->typableParams = { "end", "lngth" };
+	baseControls->typableParams = { "to", "lngth" };
 
 	addChild(move(make_shared<Wave>()));
 	findWave().lock()->setFine(true);
@@ -105,10 +105,8 @@ void LoopToFineScreen::turnWheel(int i)
 	init();
 	auto sound = sampler.lock()->getSound().lock();
 	auto startEndLength = static_cast<int>(sound->getEnd() - sound->getStart());
-	auto loopLength = static_cast<int>((sound->getEnd() - sound->getLoopTo()));
+	auto loopLength = static_cast<int>(sound->getEnd() - sound->getLoopTo());
 	auto loopScreen = dynamic_pointer_cast<LoopScreen>(mpc.screens->getScreenComponent("loop"));
-
-	auto sampleLength = sound->getFrameCount();
 	
 	auto soundInc = getSoundIncrement(i);
 	auto field = findField(param).lock();
@@ -133,17 +131,12 @@ void LoopToFineScreen::turnWheel(int i)
 	}
 	else if (param.compare("to") == 0)
 	{
-		if (!loopScreen->loopLngthFix && sound->getEnd() - (sound->getLoopTo() + i) < 0)
-			return;
-
-		auto highestLoopTo = sampleLength - 1;
-
 		if (loopScreen->loopLngthFix)
 		{
-			highestLoopTo -= loopLength;
+			int highestLoopTo = sound->getFrameCount() - loopLength;
 
 			if (sound->getLoopTo() + soundInc > highestLoopTo)
-				return;
+				soundInc = sound->getLoopTo() - highestLoopTo;
 		}
 
 		sound->setLoopTo(sound->getLoopTo() + soundInc);
@@ -192,7 +185,7 @@ void LoopToFineScreen::pressEnter()
 		if (param.compare("to") == 0)
 		{
 			if (loopLngthFix && candidate + oldLength > sound->getFrameCount())
-				return;
+				candidate = sound->getFrameCount() - oldLength;
 
 			sound->setLoopTo(candidate);
 			displayTo();

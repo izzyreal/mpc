@@ -59,9 +59,7 @@ void EndFineScreen::displayLngthLabel()
 	auto sound = sampler.lock()->getSound().lock();
 
 	if (!sound)
-	{
 		return;
-	}
 
 	findLabel("lngth").lock()->setTextPadded(sound->getEnd() - sound->getStart(), " ");
 }
@@ -119,9 +117,9 @@ void EndFineScreen::turnWheel(int i)
 		auto candidate = sound->getEnd() + soundInc;
 
 		if (trimScreen->smplLngthFix && candidate < startEndLength)
-			return;
+			candidate = startEndLength;
 
-		sound->setEnd(sound->getEnd() + soundInc);
+		sound->setEnd(candidate);
 
 		if (trimScreen->smplLngthFix)
 			sound->setStart(sound->getEnd() - startEndLength);
@@ -171,8 +169,8 @@ void EndFineScreen::pressEnter()
 	{
 		if (param.compare("end") == 0)
 		{
-			if (smplLngthFix && candidate - oldLength < 0)
-				return;
+			if (smplLngthFix && candidate < oldLength)
+				candidate = oldLength;
 
 			sound->setEnd(candidate);
 			displayEnd();

@@ -133,7 +133,7 @@ void LoopScreen::turnWheel(int i)
 
 	if (param.compare("to") == 0)
 	{
-		if (loopFix && sound->getLoopTo() + soundInc + oldLoopLength >= sound->getFrameCount())
+		if (loopFix && sound->getLoopTo() + soundInc + oldLoopLength > sound->getFrameCount())
 		{
 			return;
 		}
@@ -229,7 +229,7 @@ void LoopScreen::setSlider(int i)
 
 	if (param.compare("to") == 0)
 	{
-		maxPos = lengthFix ? sound->getLastFrameIndex() - oldLength : sound->getLastFrameIndex();
+		maxPos = lengthFix ? sound->getFrameCount() - oldLength : sound->getFrameCount();
 		if (candidatePos > maxPos)
 		{
 			candidatePos = maxPos;
@@ -300,18 +300,18 @@ void LoopScreen::pressEnter()
 	{
 		if (param.compare("to") == 0)
 		{
-			if (lengthFix && candidate + oldLength > sound->getLastFrameIndex())
-			{
-				return;
-			}
+			if (lengthFix && candidate + oldLength > sound->getFrameCount())
+				candidate = sound->getFrameCount() - oldLength;
+
+			if (candidate > sound->getEnd() && !lengthFix)
+				candidate = sound->getEnd();
 
 			sound->setLoopTo(candidate);
 			displayTo();
 
 			if (lengthFix)
-			{
 				sound->setEnd(sound->getLoopTo() + oldLength);
-			}
+
 			displayEndLengthValue();
 			displayEndLength();
 			displayWave();

@@ -982,7 +982,6 @@ void BaseControls::splitLeft()
 
 	if (!controls->isShiftPressed())
 	{
-		field->setSplit(false);
 		BaseControls::left();
 		return;
 	}
