@@ -4,12 +4,14 @@
 #include <lcdgui/screens/LoopScreen.hpp>
 #include <lcdgui/screens/TrimScreen.hpp>
 #include <lcdgui/screens/window/EditSoundScreen.hpp>
+#include <lcdgui/screens/dialog2/PopupScreen.hpp>
 #include <controls/BaseSamplerControls.hpp>
 
 #include <stdint.h>
 #include <limits.h>
 
 using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui;
 using namespace mpc::controls;
@@ -81,8 +83,14 @@ void LoopScreen::function(int f)
 		ls.lock()->openScreen("trim");
 		break;
 	case 1:
+	{
 		sampler.lock()->sort();
+		mpc.getLayeredScreen().lock()->openScreen("popup");
+		auto popupScreen = dynamic_pointer_cast<PopupScreen>(mpc.screens->getScreenComponent("popup"));
+		popupScreen->setText("Sorting by " + sampler.lock()->getSoundSortingTypeName());
+		popupScreen->returnToScreenAfterMilliSeconds("loop", 200);
 		break;
+	}
 	case 2:
 		ls.lock()->openScreen("zone");
 		break;

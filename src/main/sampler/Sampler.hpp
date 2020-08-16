@@ -90,6 +90,7 @@ namespace mpc::sampler {
 		void trimSample(int sampleNumber, int start, int end);
 		void deleteSection(const unsigned int sampleNumber, const unsigned int start, const unsigned int end);
 		void sort();
+		std::string getSoundSortingTypeName();
 
 	private:
 		void trimSample(std::weak_ptr<Sound>, int start, int end);

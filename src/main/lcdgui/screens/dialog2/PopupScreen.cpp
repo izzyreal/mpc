@@ -20,3 +20,23 @@ void PopupScreen::setText(string text)
 	findChild<Label>("popup").lock()->setText(text);
 	SetDirty();
 }
+
+void PopupScreen::returnToScreenAfterMilliSeconds(const std::string& screenName, const int delayInMs)
+{
+	if (returnToScreenThread.joinable())
+		returnToScreenThread.join();
+
+	auto screen = screenName;
+	auto layeredScreen = ls.lock();
+
+	returnToScreenThread = thread([screen, delayInMs, layeredScreen]() {
+		this_thread::sleep_for(chrono::milliseconds(delayInMs));
+		layeredScreen->openScreen(screen);
+	});
+}
+
+PopupScreen::~PopupScreen()
+{
+	if (returnToScreenThread.joinable())
+		returnToScreenThread.join();
+}

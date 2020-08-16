@@ -439,6 +439,16 @@ void Sampler::deleteSection(const unsigned int sampleNumber, const unsigned int 
 	data->erase(data->begin() + start, data->begin() + end);
 }
 
+string Sampler::getSoundSortingTypeName()
+{
+	if (soundSortingType == 0)
+		return "MEMORY";
+	else if (soundSortingType == 1)
+		return "NAME";
+	else
+		return "SIZE";
+}
+
 void Sampler::sort()
 {
 	if (sounds.empty())
@@ -448,6 +458,8 @@ void Sampler::sort()
 	
 	if (soundSortingType > 2)
 		soundSortingType = 0;
+
+	auto currentSoundMemIndex = sounds[soundIndex]->getMemoryIndex();
 
 	switch (soundSortingType)
 	{
@@ -461,8 +473,6 @@ void Sampler::sort()
 		stable_sort(sounds.begin(), sounds.end(), compareSize);
 		break;
 	}
-
-	auto currentSoundMemIndex = sounds[soundIndex]->getMemoryIndex();
 
 	for (int i = 0; i < sounds.size(); i++)
 	{

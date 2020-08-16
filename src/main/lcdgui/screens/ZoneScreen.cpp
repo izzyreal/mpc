@@ -5,12 +5,14 @@
 #include <lcdgui/screens/window/NumberOfZonesScreen.hpp>
 #include <lcdgui/screens/window/EditSoundScreen.hpp>
 #include <controls/BaseSamplerControls.hpp>
+#include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
 #include <sampler/Sampler.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::controls;
 using namespace moduru::lang;
 using namespace std;
@@ -86,8 +88,14 @@ void ZoneScreen::function(int f)
 		ls.lock()->openScreen("loop");
 		break;
 	case 2:
+	{
 		sampler.lock()->sort();
+		mpc.getLayeredScreen().lock()->openScreen("popup");
+		auto popupScreen = dynamic_pointer_cast<PopupScreen>(mpc.screens->getScreenComponent("popup"));
+		popupScreen->setText("Sorting by " + sampler.lock()->getSoundSortingTypeName());
+		popupScreen->returnToScreenAfterMilliSeconds("zone", 200);
 		break;
+	}
 	case 3:
 		ls.lock()->openScreen("params");
 		break;

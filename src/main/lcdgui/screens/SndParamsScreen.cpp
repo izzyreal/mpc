@@ -1,11 +1,13 @@
 #include "SndParamsScreen.hpp"
 
-#include <Util.hpp>
-
 #include <lcdgui/screens/window/EditSoundScreen.hpp>
+#include <lcdgui/screens/dialog2/PopupScreen.hpp>
+
+#include <Util.hpp>
 
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::lcdgui::screens::dialog2;
 using namespace moduru::lang;
 using namespace std;
 
@@ -62,8 +64,14 @@ void SndParamsScreen::function(int f)
 		ls.lock()->openScreen("zone");
 		break;
 	case 3:
+	{
 		sampler.lock()->sort();
+		mpc.getLayeredScreen().lock()->openScreen("popup");
+		auto popupScreen = dynamic_pointer_cast<PopupScreen>(mpc.screens->getScreenComponent("popup"));
+		popupScreen->setText("Sorting by " + sampler.lock()->getSoundSortingTypeName());
+		popupScreen->returnToScreenAfterMilliSeconds("params", 200);
 		break;
+	}
 	case 4:
 	{
 		if (sampler.lock()->getSoundCount() == 0)
