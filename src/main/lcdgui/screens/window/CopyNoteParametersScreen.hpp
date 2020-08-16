@@ -15,10 +15,9 @@ namespace mpc::lcdgui::screens::window
 		void open() override;
 
 	private:
-		int prog0{ 0 };
-		int prog1{ 0 };
-		int note0{ 0 };
-		int note1{ 0 };
+		int prog0 = 0;
+		int prog1 = 0;
+		int note1 = 0;
 
 		void setProg0(int i);
 		void setProg1(int i);

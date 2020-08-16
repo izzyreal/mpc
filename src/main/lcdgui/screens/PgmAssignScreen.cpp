@@ -152,9 +152,8 @@ void PgmAssignScreen::turnWheel(int i)
 		auto candidate = mpc.getNote() + i;
 	
 		if (candidate > 34)
-		{
 			mpc.setPadAndNote(mpc.getPad(), candidate);
-		}
+
 		displayNote();
 		displaySoundName();
 

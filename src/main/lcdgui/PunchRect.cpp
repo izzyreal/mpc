@@ -1,50 +1,46 @@
-#include "HorizontalBar.hpp"
+#include "PunchRect.hpp"
+#include <Paths.hpp>
 
-#include <cmath>
-
-#include <Mpc.hpp>
+#include <file/FileUtil.hpp>
 
 using namespace mpc::lcdgui;
+using namespace std;
 
-HorizontalBar::HorizontalBar(MRECT rect, int value)
-	: Component("horizontal-bar")
+PunchRect::PunchRect(const string& name, MRECT rect)
+	: Component(name)
 {
-	setSize(rect.W(), rect.H());
-	setLocation(rect.L, rect.T);
-	this->value = value;
+	w = rect.W();
+	h = rect.H();
+	x = rect.L;
+	y = rect.T;
 }
 
-void HorizontalBar::setValue(int value)
+void PunchRect::Draw(std::vector< std::vector<bool>>* pixels)
 {
-	this->value = value;
-	SetDirty();
-}
-
-void HorizontalBar::Draw(std::vector<std::vector<bool>>* pixels) {
 	if (shouldNotDraw(pixels))
-	{
 		return;
+
+	for (int x1 = x; x1 < x + w; x1++)
+	{
+		for (int y1 = y; y1 < y + h; y1++)
+		{
+			if (x1 == x || x1 == x + w - 1 || y1 == y || y1 == y + h - 1)
+				(*pixels)[x1][y1] = true;
+			else if (on && ((y1 % 2 == 0 && x1 % 2 == 0) || (y1 % 2 == 1 && x1 % 2 == 1)))
+				(*pixels)[x1][y1] = true;
+			else (*pixels)[x1][y1] = false;
+		}
 	}
 
-	auto rect = getRect();
-	int x = rect.L;
-	int y = rect.T;
-	int x2 = x + ((int)(floor((value - 1) / 2.55))) + 1;
-	MRECT r(x, y, x2, y + 6);
-	for (int i = rect.L; i <= rect.R; i++) {
-		if (i > 247) break;
-		for (int j = y; j < y + 5; j++) {
-			(*pixels)[i][j] = false;
-		}
-	}
-	for (int i = x; i < x2; i++) {
-		if (i > rect.R) break;
-		for (int j = y; j < y + 5; j++) {
-			(*pixels)[i][j] = true;
-		}
-	}
 	dirty = false;
 }
 
-HorizontalBar::~HorizontalBar() {
+void PunchRect::setOn(bool on)
+{
+	if (this->on == on)
+		return;
+
+	this->on = on;
+
+	dirty = true;
 }

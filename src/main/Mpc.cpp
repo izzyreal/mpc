@@ -288,10 +288,10 @@ void Mpc::setBank(int i)
 	
 	notifyObservers(string("bank"));
 
-	hardware->getLed("padbanka").lock()->light(i == 0);
-	hardware->getLed("padbankb").lock()->light(i == 1);
-	hardware->getLed("padbankc").lock()->light(i == 2);
-	hardware->getLed("padbankd").lock()->light(i == 3);
+	hardware->getLed("pad-bank-a").lock()->light(i == 0);
+	hardware->getLed("pad-bank-b").lock()->light(i == 1);
+	hardware->getLed("pad-bank-c").lock()->light(i == 2);
+	hardware->getLed("pad-bank-d").lock()->light(i == 3);
 }
 
 int Mpc::getBank()

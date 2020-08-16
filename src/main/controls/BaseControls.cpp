@@ -35,6 +35,8 @@
 #include <lcdgui/screens/LoadScreen.hpp>
 #include <lcdgui/Screens.hpp>
 
+#include <Util.hpp>
+
 #include <mpc/MpcSoundPlayerChannel.hpp>
 #include <audio/server/NonRealTimeAudioServer.hpp>
 
@@ -507,6 +509,9 @@ void BaseControls::rec()
     
 	init();
 
+	if (find(begin(allowPlay), end(allowPlay), currentScreenName) != end(allowPlay))
+		return;
+
 	auto hw = mpc.getHardware().lock();
 
 	if (!sequencer.lock()->isPlaying())
@@ -533,6 +538,9 @@ void BaseControls::overDub()
 	auto controls = mpc.getControls().lock();
 	controls->setOverDubPressed(true);
 	init();
+
+	if (find(begin(allowPlay), end(allowPlay), currentScreenName) != end(allowPlay))
+		return;
 
 	auto hw = mpc.getHardware().lock();
 
@@ -680,14 +688,19 @@ void BaseControls::playStart()
 
 void BaseControls::mainScreen()
 {
-    init();
+	init();
 
 	auto ams = mpc.getAudioMidiServices().lock();
-	if (ams->isRecordingSound()) {
+
+	if (ams->isRecordingSound())
 		ams->stopSoundRecorder();
-	}
+
 	ls.lock()->openScreen("sequencer");
-    sequencer.lock()->setSoloEnabled(sequencer.lock()->isSoloEnabled());
+	sequencer.lock()->setSoloEnabled(sequencer.lock()->isSoloEnabled());
+
+	auto hw = mpc.getHardware().lock();
+	hw->getLed("next-seq").lock()->light(false);
+	hw->getLed("track-mute").lock()->light(false);
 }
 
 void BaseControls::tap()
@@ -724,7 +737,21 @@ void BaseControls::nextBarEnd()
 void BaseControls::nextSeq()
 {
 	init();
-	ls.lock()->openScreen("next-seq");
+
+	if (currentScreenName.compare("next-seq") == 0 ||
+		currentScreenName.compare("next-seq-pad") == 0)
+	{
+		ls.lock()->openScreen("sequencer");
+		mpc.getHardware().lock()->getLed("next-seq").lock()->light(false);
+	}
+	else if (currentScreenName.compare("sequencer") == 0 ||
+		currentScreenName.compare("track-mute") == 0)
+	{
+		Util::initSequence(mpc);
+		ls.lock()->openScreen("next-seq");
+		mpc.getHardware().lock()->getLed("next-seq").lock()->light(true);
+		mpc.getHardware().lock()->getLed("track-mute").lock()->light(false);
+	}
 }
 
 void BaseControls::trackMute()
@@ -733,15 +760,23 @@ void BaseControls::trackMute()
 
 	if (currentScreenName.compare("track-mute") == 0)
 	{
-		ls.lock()->openScreen("sequencer");
-		return;
-	}
-	
-	if (!sequencer.lock()->getActiveSequence().lock()->isUsed())
-		return;
+		auto previous = ls.lock()->getPreviousScreenName();
+		if (previous.compare("next-seq") == 0 || previous.compare("next-seq-pad") == 0)
+			ls.lock()->openScreen("next-seq");
+		else
+			ls.lock()->openScreen("sequencer");
 
-	ls.lock()->openScreen("track-mute");
-	mpc.getHardware().lock()->getLed("track-mute").lock()->light(true);
+		mpc.getHardware().lock()->getLed("track-mute").lock()->light(false);
+	}
+	else if
+		(currentScreenName.compare("next-seq") == 0 ||
+		currentScreenName.compare("next-seq-pad") == 0 ||
+		currentScreenName.compare("sequencer") == 0)
+	{
+		Util::initSequence(mpc);
+		ls.lock()->openScreen("track-mute");
+		mpc.getHardware().lock()->getLed("track-mute").lock()->light(true);
+	}
 }
 
 void BaseControls::bank(int i)
@@ -760,9 +795,7 @@ void BaseControls::bank(int i)
 	mpc.setPadAndNote(newPadIndex, newNote);
 	
 	for (int i = 0; i < 16; i++)
-	{
 		mpc.getHardware().lock()->getPad(i).lock()->notifyObservers(255);
-	}
 }
 
 void BaseControls::fullLevel()
@@ -773,17 +806,25 @@ void BaseControls::fullLevel()
     
 	topPanel->setFullLevelEnabled(!topPanel->isFullLevelEnabled());
 
-	hardware->getLed("fulllevel").lock()->light(topPanel->isFullLevelEnabled());
+	hardware->getLed("full-level").lock()->light(topPanel->isFullLevelEnabled());
 }
 
 void BaseControls::sixteenLevels()
 {
 	init();
+
+	if (currentScreenName.compare("sequencer") != 0 &&
+		currentScreenName.compare("assign-16-levels") != 0)
+	{
+		return;
+	}
+
 	auto hardware = mpc.getHardware().lock();
 	auto topPanel = hardware->getTopPanel().lock();
+
 	if (topPanel->isSixteenLevelsEnabled()) {
 		topPanel->setSixteenLevelsEnabled(false);
-		hardware->getLed("sixteenlevels").lock()->light(false);
+		hardware->getLed("sixteen-levels").lock()->light(false);
 	}
 	else {
 		ls.lock()->openScreen("assign-16-levels");

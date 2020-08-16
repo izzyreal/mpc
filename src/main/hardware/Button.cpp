@@ -23,14 +23,12 @@ string Button::getLabel() {
 
 void Button::push() {
 	if (mpc.getDisk().lock()->isBusy())
-	{
 		return;
-	}
+
 	auto controls = mpc.getLayeredScreen().lock()->findScreenComponent().lock();
 	
-	if (!controls) {
+	if (!controls)
 		return;
-	}
 	
 	if (label.compare("left") == 0) {
 		controls->left();
@@ -56,28 +54,28 @@ void Button::push() {
 	else if (label.compare("play") == 0) {
 		controls->play();
 	}
-	else if (label.compare("playstart") == 0) {
+	else if (label.compare("play-start") == 0) {
 		controls->playStart();
 	}
-	else if (label.compare("mainscreen") == 0) {
+	else if (label.compare("main-screen") == 0) {
 		controls->mainScreen();
 	}
-	else if (label.compare("openwindow") == 0) {
+	else if (label.compare("open-window") == 0) {
 		controls->openWindow();
 	}
-	else if (label.compare("prevstepevent") == 0) {
+	else if (label.compare("prev-step-event") == 0) {
 		controls->prevStepEvent();
 	}
-	else if (label.compare("nextstepevent") == 0) {
+	else if (label.compare("next-step-event") == 0) {
 		controls->nextStepEvent();
 	}
-	else if (label.compare("goto") == 0) {
+	else if (label.compare("go-to") == 0) {
 		controls->goTo();
 	}
-	else if (label.compare("prevbarstart") == 0) {
+	else if (label.compare("prev-bar-start") == 0) {
 		controls->prevBarStart();
 	}
-	else if (label.compare("nextbarend") == 0) {
+	else if (label.compare("next-bar-end") == 0) {
 		controls->nextBarEnd();
 	}
 	else if (label.compare("tap") == 0) {
@@ -89,10 +87,10 @@ void Button::push() {
 	else if (label.compare("track-mute") == 0) {
 		controls->trackMute();
 	}
-	else if (label.compare("fulllevel") == 0) {
+	else if (label.compare("full-level") == 0) {
 		controls->fullLevel();
 	}
-	else if (label.compare("sixteenlevels") == 0) {
+	else if (label.compare("sixteen-levels") == 0) {
 		controls->sixteenLevels();
 	}
 	else if (label.compare("f1") == 0) {
@@ -119,7 +117,7 @@ void Button::push() {
 	else if (label.compare("enter") == 0) {
 		controls->pressEnter();
 	}
-	else if (label.compare("undoseq") == 0) {
+	else if (label.compare("undo-seq") == 0) {
 		controls->undoSeq();
 	}
 	else if (label.compare("erase") == 0) {
@@ -128,16 +126,16 @@ void Button::push() {
 	else if (label.compare("after") == 0) {
 		controls->after();
 	}
-	else if (label.compare("banka") == 0) {
+	else if (label.compare("bank-a") == 0) {
 		controls->bank(0);
 	}
-	else if (label.compare("bankb") == 0) {
+	else if (label.compare("bank-b") == 0) {
 		controls->bank(1);
 	}
-	else if (label.compare("bankc") == 0) {
+	else if (label.compare("bank-c") == 0) {
 		controls->bank(2);
 	}
-	else if (label.compare("bankd") == 0) {
+	else if (label.compare("bank-d") == 0) {
 		controls->bank(3);
 	}
 	else if (label.compare("0") == 0) {
@@ -205,7 +203,7 @@ void Button::release() {
 	else if (label.compare("tap") == 0) {
 		c->tap();
 	}
-	else if (label.compare("goto") == 0) {
+	else if (label.compare("go-to") == 0) {
 		c->goTo();
 	}
 }

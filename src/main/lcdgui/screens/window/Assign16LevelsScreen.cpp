@@ -35,7 +35,7 @@ void Assign16LevelsScreen::function(int i)
     case 4:
 	{
 		mpc.getHardware().lock()->getTopPanel().lock()->setSixteenLevelsEnabled(true);
-		mpc.getHardware().lock()->getLed("sixteenlevels").lock()->light(true);
+		mpc.getHardware().lock()->getLed("sixteen-levels").lock()->light(true);
 		ls.lock()->openScreen(ls.lock()->getPreviousScreenName());
 		break;
 	}
@@ -140,7 +140,7 @@ void Assign16LevelsScreen::displayNote()
     auto program = sampler.lock()->getProgram(pgmNumber).lock();
     auto pn = program->getPadIndexFromNote(note);
     auto sn = program->getNoteParameters(note)->getSndNumber();
-    auto soundName = sn == -1 ? "OFF" : sampler.lock()->getSoundName(sn);
+    auto soundName = sn == -1 ? "(No sound)" : sampler.lock()->getSoundName(sn);
  
     findField("note").lock()->setText(to_string(note) + "/" + sampler.lock()->getPadName(pn) + "-" + soundName);
 }
@@ -176,4 +176,9 @@ void Assign16LevelsScreen::displayOriginalKeyPad()
     }
 
     findField("originalkeypad").lock()->setTextPadded(originalKeyPad + 1, " ");
+}
+
+void Assign16LevelsScreen::openWindow()
+{
+    mainScreen();
 }

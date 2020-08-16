@@ -38,7 +38,7 @@ void CopyNoteParametersScreen::turnWheel(int i)
 	}
 	else if (param.compare("note0") == 0)
 	{
-		setNote0(note0 + i);
+		setNote0(mpc.getNote() + i);
 	}
 	else if (param.compare("prog1") == 0)
 	{
@@ -58,7 +58,7 @@ void CopyNoteParametersScreen::function(int i)
 	{
 	case 4:
 	{
-		auto source = dynamic_cast<mpc::sampler::NoteParameters*>(sampler.lock()->getProgram(prog0).lock()->getNoteParameters(note0));
+		auto source = dynamic_cast<mpc::sampler::NoteParameters*>(sampler.lock()->getProgram(prog0).lock()->getNoteParameters(mpc.getNote()));
 		auto dest = dynamic_cast<mpc::sampler::Program*>(sampler.lock()->getProgram(prog1).lock().get());
 		auto clone = source->clone();
 		dest->setNoteParameters(note1, clone);
@@ -76,10 +76,11 @@ void CopyNoteParametersScreen::displayProg0()
 
 void CopyNoteParametersScreen::displayNote0()
 {
+	auto note0 = mpc.getNote();
 	auto program = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(prog0).lock());
-	auto padIndex = program->getPadIndexFromNote(note0 + 35);
-	auto soundIndex = note0 != -1 ? program->getNoteParameters(note0 + 35)->getSndNumber() : -1;
-	auto noteText = note0 == -1 ? "--" : to_string(note0 + 35);
+	auto padIndex = program->getPadIndexFromNote(note0);
+	auto soundIndex = note0 != -1 ? program->getNoteParameters(note0 )->getSndNumber() : -1;
+	auto noteText = note0 == -1 ? "--" : to_string(note0);
 	auto padName = padIndex != -1 ? sampler.lock()->getPadName(padIndex) : "OFF";
 	auto sampleName = soundIndex != -1 ? "-" + sampler.lock()->getSoundName(soundIndex) : "-OFF";
 	
@@ -131,10 +132,10 @@ void CopyNoteParametersScreen::setProg1(int i)
 
 void CopyNoteParametersScreen::setNote0(int i)
 {
-	if (i < 0 || i > 63)
+	if (i < 35 || i > 98)
 		return;
 
-	note0 = i;
+	mpc.setPadAndNote(mpc.getPad(), i);
 	displayNote0();
 }
 

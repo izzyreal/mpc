@@ -470,7 +470,7 @@ void Sequencer::play(bool fromStart)
 			undoPlaceHolder.swap(copy);
 			lastRecordingActive = true;
 			recordStartTick = getTickPosition();
-			hw->getLed("undoseq").lock()->light(lastRecordingActive);
+			hw->getLed("undo-seq").lock()->light(lastRecordingActive);
 		}
 
 	}
@@ -513,7 +513,7 @@ void Sequencer::undoSeq()
 
 	lastRecordingActive = !lastRecordingActive;
 	auto hw = mpc.getHardware().lock();
-	hw->getLed("undoseq").lock()->light(lastRecordingActive);
+	hw->getLed("undo-seq").lock()->light(lastRecordingActive);
 
 	setActiveSequenceIndex(getActiveSequenceIndex()); // Shortcut to notifying SequencerObserver
 }
@@ -528,7 +528,7 @@ void Sequencer::clearUndoSeq()
 
     lastRecordingActive = false;
 	auto hw = mpc.getHardware().lock();
-	hw->getLed("undoseq").lock()->light(false);
+	hw->getLed("undo-seq").lock()->light(false);
 }
 
 void Sequencer::playFromStart()
@@ -1583,7 +1583,7 @@ void Sequencer::storeActiveSequenceInUndoPlaceHolder()
 
 	lastRecordingActive = true;
 	auto hw = mpc.getHardware().lock();
-	hw->getLed("undoseq").lock()->light(lastRecordingActive);
+	hw->getLed("undo-seq").lock()->light(lastRecordingActive);
 }
 
 bool Sequencer::isOverDubbing()

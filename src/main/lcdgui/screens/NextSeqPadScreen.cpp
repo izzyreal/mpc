@@ -37,6 +37,7 @@ void NextSeqPadScreen::close()
 
 void NextSeqPadScreen::right()
 {
+	// Block ScreenComponent::right() default action. Nothing to do.
 }
 
 void NextSeqPadScreen::pad(int i, int velo, bool repeat, int tick)

@@ -11,6 +11,7 @@ namespace mpc::lcdgui::screens::window
 		void function(int i) override;
 		void turnWheel(int i) override;
 		void open() override;
+		void openWindow() override;
 
 		Assign16LevelsScreen(mpc::Mpc& mpc, const int layerIndex);
 

@@ -41,7 +41,8 @@ void NextSeqScreen::turnWheel(int i)
 {
 	init();
 	
-	if (param.compare("sq") == 0) {
+	if (param.compare("sq") == 0)
+	{
 		if (sequencer.lock()->isPlaying()) {
 			sequencer.lock()->setNextSq(sequencer.lock()->getCurrentlyPlayingSequenceIndex() + i);
 		}
@@ -49,6 +50,7 @@ void NextSeqScreen::turnWheel(int i)
 			sequencer.lock()->setActiveSequenceIndex(sequencer.lock()->getActiveSequenceIndex() + i);
 		}
 	}
+
 	if (param.compare("nextsq") == 0)
 		sequencer.lock()->setNextSq(sequencer.lock()->getNextSq() + i);
 }
@@ -56,24 +58,25 @@ void NextSeqScreen::turnWheel(int i)
 void NextSeqScreen::function(int i)
 {
 	init();
-	switch (i) {
-	case 5:
+	
+	if (i == 5)
 		ls.lock()->openScreen("next-seq-pad");
-		break;
-	}
 }
 
 void NextSeqScreen::displaySq()
 {
 	string result = "";
 	auto lSequencer = sequencer.lock();
-	if (lSequencer->isPlaying()) {
+
+	if (lSequencer->isPlaying())
+	{
 		result.append(StrUtil::padLeft(to_string(lSequencer->getCurrentlyPlayingSequenceIndex() + 1), "0", 2));
 		result.append("-");
 		result.append(lSequencer->getCurrentlyPlayingSequence().lock()->getName());
 		findField("sq").lock()->setText(result);
 	}
-	else {
+	else
+	{
 		result.append(StrUtil::padLeft(to_string(lSequencer->getActiveSequenceIndex() + 1), "0", 2));
 		result.append("-");
 		result.append(lSequencer->getActiveSequence().lock()->getName());
@@ -125,18 +128,17 @@ void NextSeqScreen::displayTempoLabel()
 	for (auto& e : seq->getTempoChangeEvents())
 	{
 		auto tce = e.lock();
+
 		if (tce->getTick() > lSequencer->getTickPosition())
-		{
 			break;
-		}
+
 		currentRatio = tce->getRatio();
 	}
-	if (currentRatio != 1000) {
+
+	if (currentRatio != 1000)
 		findLabel("tempo").lock()->setText(u8"c\u00C0:");
-	}
-	else {
+	else
 		findLabel("tempo").lock()->setText(u8" \u00C0:");
-	}
 }
 
 void NextSeqScreen::displayTempoSource()
