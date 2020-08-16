@@ -226,9 +226,7 @@ void TrimScreen::setSlider(int i)
 		maxPos = smplLngthFix ? oldLength : int(0);
 	
 		if (candidatePos < maxPos)
-		{
 			candidatePos = maxPos;
-		}
 		
 		sound->setEnd(candidatePos);
 		displayEnd();

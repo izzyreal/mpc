@@ -243,9 +243,7 @@ void LoopScreen::turnWheel(int i)
 void LoopScreen::setSlider(int i)
 {
 	if (!mpc.getControls().lock()->isShiftPressed())
-	{
 		return;
-	}
 
 	init();
 
@@ -259,10 +257,11 @@ void LoopScreen::setSlider(int i)
 	
 	if (param.compare("to") == 0)
 	{
-		auto maxPos = lengthFix ? sound->getFrameCount() - oldLength : sound->getFrameCount();
+		if (candidatePos < 0)
+			candidatePos = 0;
 		
-		if (candidatePos > maxPos)
-			candidatePos = maxPos;
+		if (loopLngthFix && candidatePos + oldLength > sound->getFrameCount())
+				candidatePos = sound->getFrameCount() - oldLength;
 		
 		sound->setLoopTo(candidatePos);
 
