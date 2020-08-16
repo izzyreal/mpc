@@ -272,16 +272,14 @@ void AbstractDisk::writeProgram(mpc::sampler::Program* program, string fileName)
 	for (auto& n : program->getNotesParameters())
 	{
 		if (n->getSndNumber() != -1)
-		{
 			sounds.push_back(dynamic_pointer_cast<mpc::sampler::Sound>(mpc.getSampler().lock()->getSound(n->getSndNumber()).lock()));
-		}
 	}
 
 	auto saveAProgramScreen = dynamic_pointer_cast<SaveAProgramScreen>(mpc.screens->getScreenComponent("save-a-program"));
 	
 	if (saveAProgramScreen->save != 0)
 	{
-		auto isWav = saveAProgramScreen->save == 1;
+		auto isWav = saveAProgramScreen->save == 2;
 		soundSaver = make_unique<SoundSaver>(mpc, sounds, isWav);
 	}
 	else {

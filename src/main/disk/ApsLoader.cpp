@@ -103,9 +103,7 @@ void ApsLoader::load()
 		for (auto& f : disk->getAllFiles())
 		{
 			if (StrUtil::eqIgnoreCase(StrUtil::replaceAll(f->getName(), ' ', ""), soundFileName + ".SND"))
-			{
 				soundFile = f;
-			}
 		}
 
 		if (soundFile == nullptr)
@@ -113,9 +111,7 @@ void ApsLoader::load()
 			for (auto& f : disk->getAllFiles())
 			{
 				if (StrUtil::eqIgnoreCase(StrUtil::replaceAll(f->getName(), ' ', ""), soundFileName + ".WAV"))
-				{
 					soundFile = f;
-				}
 			}
 
 			ext = "wav";

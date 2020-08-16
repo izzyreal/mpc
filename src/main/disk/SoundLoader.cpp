@@ -101,27 +101,19 @@ int SoundLoader::loadSound(MpcFile* f)
 			wavFile.readFrames(&interleaved, wavFile.getNumFrames());
 		
 			for (int i = 0; i < interleaved.size(); i += 2)
-			{
 				fa->push_back(interleaved[i]);
-			}
 			
 			for (int i = 1; i < interleaved.size(); i += 2)
-			{
 				fa->push_back(interleaved[i]);
-			}
 		}
 
 		size = fa->size();
 		end = size;
 		
 		if (numChannels == 1)
-		{
 			mono = true;
-		}
 		else
-		{
 			end /= 2;
-		}
 		
 		sampleRate = wavFile.getSampleRate();
 		loopTo = end;
@@ -177,16 +169,14 @@ int SoundLoader::loadSound(MpcFile* f)
 		if (existingSoundIndex == -1)
 		{
 			if (partOfProgram)
-			{
 				return (int)(sampler->getSoundCount()) - 1;
-			}
 		}
 		else
 		{
 			if (replace)
 			{
-				sound->setMemoryIndex(existingSoundIndex);
 				sampler->deleteSample(existingSoundIndex);
+				sound->setMemoryIndex(existingSoundIndex);
 				sampler->sort();
 			}
 			else
@@ -195,9 +185,7 @@ int SoundLoader::loadSound(MpcFile* f)
 			}
 			
 			if (partOfProgram)
-			{
 				return existingSoundIndex;
-			}
 		}
 	}
 	return -1;

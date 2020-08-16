@@ -44,7 +44,7 @@ void ApsSaver::saveAps()
 	
 	if (saveAProgramScreen->save != 0)
 	{
-		soundSaver = make_unique<mpc::disk::SoundSaver>(mpc, mpc.getSampler().lock()->getSounds(), saveAProgramScreen->save == 1 ? false : true);
+		soundSaver = make_unique<mpc::disk::SoundSaver>(mpc, mpc.getSampler().lock()->getSounds(), saveAProgramScreen->save == 2);
 	}
 	else
 	{

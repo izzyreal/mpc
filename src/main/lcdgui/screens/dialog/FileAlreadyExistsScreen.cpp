@@ -23,7 +23,7 @@ FileAlreadyExistsScreen::FileAlreadyExistsScreen(mpc::Mpc& mpc, const int layerI
 
 void FileAlreadyExistsScreen::function(int i)
 {
-	baseControls->function(i);
+	ScreenComponent::function(i);
 		
 	switch (i)
 	{

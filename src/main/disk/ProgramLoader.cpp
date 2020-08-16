@@ -61,9 +61,7 @@ void ProgramLoader::loadProgram()
 		for (auto& f : disk->getAllFiles())
 		{
 			if (StrUtil::eqIgnoreCase(StrUtil::replaceAll(f->getName(), ' ', ""), soundFileName + ".SND"))
-			{
 				soundFile = f;
-			}
 		}
 		
 		if (soundFile == nullptr)
@@ -71,9 +69,7 @@ void ProgramLoader::loadProgram()
 			for (auto& f : disk->getAllFiles())
 			{
 				if (StrUtil::eqIgnoreCase(StrUtil::replaceAll(f->getName(), ' ', ""), soundFileName + ".WAV"))
-				{
 					soundFile = f;
-				}
 			}
 
 			ext = "wav";
@@ -128,7 +124,7 @@ void ProgramLoader::loadProgram()
 void ProgramLoader::loadSound(const string& soundFileName, const string& soundName, const string& ext, MpcFile* soundFile, vector<int>* soundsDestIndex, const bool replace, const int loadSoundIndex)
 {
 	int addedSoundIndex = -1;
-	auto sl = SoundLoader(mpc, mpc.getSampler().lock()->getSounds(), replace);
+	SoundLoader sl(mpc, mpc.getSampler().lock()->getSounds(), replace);
 	sl.setPartOfProgram(true);
 
 	try
@@ -137,9 +133,7 @@ void ProgramLoader::loadSound(const string& soundFileName, const string& soundNa
 		addedSoundIndex = sl.loadSound(soundFile);
 		
 		if (addedSoundIndex != -1)
-		{
 			(*soundsDestIndex)[loadSoundIndex] = addedSoundIndex;
-		}
 	}
 	catch (const exception& e)
 	{

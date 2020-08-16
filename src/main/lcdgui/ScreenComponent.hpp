@@ -84,7 +84,7 @@ namespace mpc::lcdgui
 		virtual void right() { baseControls->right(); }
 		virtual void up() { baseControls->up(); }
 		virtual void down() { baseControls->down(); }
-		virtual void function(int i) { baseControls->function(i); }
+		virtual void function(int i) { init(); baseControls->function(i); }
 		virtual void openWindow() { baseControls->openWindow(); }
 		virtual void turnWheel(int i) { baseControls->turnWheel(i); }
 		virtual void numpad(int i) { baseControls->numpad(i); }
