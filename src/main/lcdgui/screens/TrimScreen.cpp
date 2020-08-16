@@ -129,7 +129,7 @@ void TrimScreen::turnWheel(int i)
 
 	if (param.compare("st") == 0)
 	{
-		if (smplLngthFix && sound->getStart() + soundInc + oldLength > sound->getLastFrameIndex())
+		if (smplLngthFix && sound->getStart() + soundInc + oldLength > sound->getFrameCount())
 			return;
 		
 		sound->setStart(sound->getStart() + soundInc);
@@ -200,17 +200,15 @@ void TrimScreen::setSlider(int i)
 
 	auto sound = sampler.lock()->getSound().lock();
 	auto const oldLength = sound->getEnd() - sound->getStart();
-    auto candidatePos = (int) ((i / 124.0) * sound->getLastFrameIndex());
+    auto candidatePos = (int) ((i / 124.0) * sound->getFrameCount());
     auto maxPos = int (0);
 	
 	if (param.compare("st") == 0)
 	{
-		maxPos = smplLngthFix ? sound->getLastFrameIndex() - oldLength : sound->getLastFrameIndex();
+		maxPos = smplLngthFix ? sound->getFrameCount() - oldLength : sound->getFrameCount();
 
 		if (candidatePos > maxPos)
-		{
 			candidatePos = maxPos;
-		}
 		
 		sound->setStart(candidatePos);
 		displaySt();
@@ -272,8 +270,8 @@ void TrimScreen::pressEnter()
 	{
 		if (param.compare("st") == 0)
 		{
-			if (smplLngthFix && candidate + oldLength > sound->getLastFrameIndex())
-				return;
+			if (smplLngthFix && candidate + oldLength > sound->getFrameCount())
+				candidate = sound->getFrameCount() - oldLength;
 
 			sound->setStart(candidate);
 			displaySt();
@@ -289,7 +287,7 @@ void TrimScreen::pressEnter()
 		else if (param.compare("end") == 0)
 		{
 			if (smplLngthFix && candidate - oldLength < 0)
-				return;
+				candidate = oldLength;
 
 			sound->setEnd(candidate);
 			displayEnd();
