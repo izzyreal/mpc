@@ -48,16 +48,16 @@ ApsGlobalParameters::ApsGlobalParameters(mpc::Mpc& mpc)
 	auto const indivFxSourceDrumVal = mixerSetupScreen->isIndivFxSourceDrum();
 	auto const copyPgmMixToDrumVal = mixerSetupScreen->isCopyPgmMixToDrumEnabled();
 	auto const recordMixChangesVal = mixerSetupScreen->isRecordMixChangesEnabled();
-	//auto const masterLevelVal = mixerSetupScreen->getMasterLevel(); // Why commented?
-	//auto const fxDrumVal = mixerSetupScreen->getFxDrum(); // Why commented?
+	auto const masterLevelVal = mixerSetupScreen->getMasterLevel();
+	auto const fxDrumVal = mixerSetupScreen->getFxDrum();
 	saveBytes[0] = BitUtil::setBits(1, saveBytes[0], padToInternalSoundVal);
 	saveBytes[1] = BitUtil::setBits(1, saveBytes[1], padAssignMasterVal);
 	saveBytes[2] = BitUtil::setBits(1, saveBytes[2], stereoMixSourceDrumVal);
 	saveBytes[2] = BitUtil::setBits(2, saveBytes[2], indivFxSourceDrumVal);
 	saveBytes[3] = BitUtil::setBits(1, saveBytes[3], copyPgmMixToDrumVal);
 	saveBytes[3] = BitUtil::setBits(16, saveBytes[3], recordMixChangesVal);
-	saveBytes[4] = fxDrum;
-	saveBytes[6] = masterLevel;
+	saveBytes[4] = fxDrumVal;
+	saveBytes[6] = masterLevelVal;
 }
 
 vector<char> ApsGlobalParameters::TEMPLATE = vector<char>{ 127, (char) (254 & 0xff), 124, (char) (238 & 0xff), 0, 0, 0, 64 };
