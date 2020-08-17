@@ -282,14 +282,12 @@ void TrimScreen::pressEnter()
 				candidate = sound->getFrameCount() - oldLength;
 
 			sound->setStart(candidate);
-			displaySt();
 
 			if (smplLngthFix)
-			{
 				sound->setEnd(sound->getStart() + oldLength);
-				displayEnd();
-			}
 
+			displaySt();
+			displayEnd();
 			displayWave();
 		}
 		else if (param.compare("end") == 0)
@@ -298,14 +296,14 @@ void TrimScreen::pressEnter()
 				candidate = oldLength;
 
 			sound->setEnd(candidate);
-			displayEnd();
 			
 			if (smplLngthFix)
 			{
 				sound->setStart(sound->getEnd() - oldLength);
-				displaySt();
 			}
 
+			displaySt();
+			displayEnd();
 			displayWave();
 		}
 	}

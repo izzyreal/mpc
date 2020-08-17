@@ -116,7 +116,7 @@ void Wave::makeLine(std::vector<std::vector<std::vector<int>>>* lines, std::vect
 	int offset = 0;
 	float peakPos = 0;
 	float peakNeg = 0;
-	int centerSamplePixel = 0;
+	double centerSamplePixel = 0.f;
 	
 	if (fine)
 		centerSamplePixel = (centerSamplePos / samplesPerPixel) - 1;
