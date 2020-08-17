@@ -73,3 +73,9 @@ void DeleteFileScreen::deleteFile()
 
 	ls.lock()->openScreen("directory");
 }
+
+DeleteFileScreen::~DeleteFileScreen()
+{
+	if (deleteThread.joinable())
+		deleteThread.join();
+}
