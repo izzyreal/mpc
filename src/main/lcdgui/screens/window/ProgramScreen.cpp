@@ -39,7 +39,7 @@ void ProgramScreen::turnWheel(int i)
 
 void ProgramScreen::function(int i)
 {
-	baseControls->function(i);
+	ScreenComponent::function(i);
 
 	switch (i)
 	{

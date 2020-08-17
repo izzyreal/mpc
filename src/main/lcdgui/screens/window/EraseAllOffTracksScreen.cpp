@@ -14,7 +14,7 @@ EraseAllOffTracksScreen::EraseAllOffTracksScreen(mpc::Mpc& mpc, const int layerI
 
 void EraseAllOffTracksScreen::function(int i)
 {
-	baseControls->function(i);
+	ScreenComponent::function(i);
 
 	switch (i)
 	{

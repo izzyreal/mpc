@@ -16,7 +16,7 @@ TransposePermanentScreen::TransposePermanentScreen(mpc::Mpc& mpc, const int laye
 
 void TransposePermanentScreen::function(int i)
 {
-	baseControls->function(i); // For closing this window
+	ScreenComponent::function(i); // For closing this window
 	
 	switch (i)
 	{

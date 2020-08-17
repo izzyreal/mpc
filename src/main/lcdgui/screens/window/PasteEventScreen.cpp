@@ -19,7 +19,7 @@ PasteEventScreen::PasteEventScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void PasteEventScreen::function(int i)
 {
-	baseControls->function(i);
+	ScreenComponent::function(i);
 	
 	switch (i)
 	{

@@ -32,7 +32,7 @@ void ChangeBars2Screen::displayCurrent()
 
 void ChangeBars2Screen::function(int i)
 {
-	baseControls->function(i);
+	ScreenComponent::function(i);
 	auto seq = sequencer.lock()->getActiveSequence().lock();
 
 	switch (i)

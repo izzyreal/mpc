@@ -84,7 +84,7 @@ void LoopToFineScreen::displayTo()
 void LoopToFineScreen::function(int i)
 {
 
-	baseControls->function(i);
+	ScreenComponent::function(i);
 
 	switch (i)
 	{

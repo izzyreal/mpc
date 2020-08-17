@@ -29,7 +29,7 @@ void Assign16LevelsScreen::open()
 
 void Assign16LevelsScreen::function(int i)
 {
-    baseControls->function(i);
+    ScreenComponent::function(i);
 	switch (i)
 	{
     case 4:

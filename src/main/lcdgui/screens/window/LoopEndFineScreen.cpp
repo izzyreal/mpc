@@ -82,7 +82,7 @@ void LoopEndFineScreen::displayPlayX()
 
 void LoopEndFineScreen::function(int i)
 {
-	baseControls->function(i);
+	ScreenComponent::function(i);
 
 	switch (i)
 	{

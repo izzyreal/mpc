@@ -28,7 +28,7 @@ void SequenceScreen::open()
 
 void SequenceScreen::function(int i)
 {
-	baseControls->function(i);
+	ScreenComponent::function(i);
 
 	switch (i)
 	{

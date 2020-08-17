@@ -36,6 +36,7 @@ SequencerScreen::SequencerScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void SequencerScreen::open()
 {
+	init();
 	sequence = sequencer.lock()->getActiveSequence();
 	track = sequencer.lock()->getActiveTrack();
 
@@ -447,7 +448,7 @@ void SequencerScreen::pressEnter()
 void SequencerScreen::function(int i)
 {
 	init();
-	baseControls->function(i);
+	ScreenComponent::function(i);
 	auto punchScreen = dynamic_pointer_cast<PunchScreen>(mpc.screens->getScreenComponent("punch"));
 
 	if (punchScreen->on)

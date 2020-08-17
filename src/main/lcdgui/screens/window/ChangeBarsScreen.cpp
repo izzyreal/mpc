@@ -21,7 +21,7 @@ void ChangeBarsScreen::open()
 
 void ChangeBarsScreen::function(int i)
 {
-    baseControls->function(i);
+    ScreenComponent::function(i);
 	auto seq = sequencer.lock()->getActiveSequence().lock();
 
 	switch (i)

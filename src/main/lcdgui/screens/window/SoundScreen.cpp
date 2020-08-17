@@ -34,7 +34,7 @@ void SoundScreen::turnWheel(int i)
 
 void SoundScreen::function(int i)
 {
-	baseControls->function(i);
+	ScreenComponent::function(i);
 
 	switch (i)
 	{

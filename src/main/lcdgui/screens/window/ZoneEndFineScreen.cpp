@@ -64,7 +64,7 @@ void ZoneEndFineScreen::displayPlayX()
 
 void ZoneEndFineScreen::function(int i)
 {
-	baseControls->function(i);
+	ScreenComponent::function(i);
 
 	switch (i)
 	{

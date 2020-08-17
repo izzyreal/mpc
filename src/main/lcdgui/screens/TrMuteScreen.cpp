@@ -106,7 +106,7 @@ void TrMuteScreen::turnWheel(int i)
 void TrMuteScreen::function(int i)
 {
 	init();
-	baseControls->function(i);
+	ScreenComponent::function(i);
 	
 	switch (i)
 	{

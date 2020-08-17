@@ -32,7 +32,7 @@ void EditMultipleScreen::open()
 
 void EditMultipleScreen::function(int i)
 {
-	baseControls->function(i);
+	ScreenComponent::function(i);
 	auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(mpc.screens->getScreenComponent("step-editor"));
 
 	auto selectedEvent = stepEditorScreen->getSelectedEvent();

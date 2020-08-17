@@ -25,7 +25,7 @@ DeleteFileScreen::DeleteFileScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void DeleteFileScreen::function(int i)
 {
-	baseControls->function(i);
+	ScreenComponent::function(i);
 	
 	switch (i)
 	{

@@ -20,7 +20,7 @@ void MidiInputScreen::open()
 
 void MidiInputScreen::function(int i)
 {
-	baseControls->function(i);
+	ScreenComponent::function(i);
 
 	switch (i)
 	{

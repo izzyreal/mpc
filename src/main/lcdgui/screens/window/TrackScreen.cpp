@@ -29,7 +29,7 @@ void TrackScreen::open()
 
 void TrackScreen::function(int i)
 {
-	baseControls->function(i);
+	ScreenComponent::function(i);
 	switch (i)
 	{
 	case 1:

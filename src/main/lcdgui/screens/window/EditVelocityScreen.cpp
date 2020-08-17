@@ -54,7 +54,7 @@ void EditVelocityScreen::update(moduru::observer::Observable* observable, nonstd
 
 void EditVelocityScreen::function(int i)
 {
-	baseControls->function(i);
+	ScreenComponent::function(i);
 	
 	switch (i)
 	{

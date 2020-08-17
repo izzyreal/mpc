@@ -39,7 +39,7 @@ void TimingCorrectScreen::close()
 
 void TimingCorrectScreen::function(int i)
 {
-	baseControls->function(i);
+	ScreenComponent::function(i);
 	switch (i)
 	{
 	case 4:

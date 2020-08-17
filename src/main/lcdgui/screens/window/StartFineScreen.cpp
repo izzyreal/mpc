@@ -77,7 +77,7 @@ void StartFineScreen::displayPlayX()
 void StartFineScreen::function(int i)
 {
 
-	baseControls->function(i);
+	ScreenComponent::function(i);
 
 	switch (i)
 	{

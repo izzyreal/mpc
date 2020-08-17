@@ -77,7 +77,7 @@ void EndFineScreen::displayPlayX()
 
 void EndFineScreen::function(int i)
 {
-	baseControls->function(i);
+	ScreenComponent::function(i);
 
 	switch (i)
 	{

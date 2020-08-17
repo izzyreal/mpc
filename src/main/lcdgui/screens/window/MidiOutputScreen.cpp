@@ -42,7 +42,7 @@ void MidiOutputScreen::turnWheel(int i)
 
 void MidiOutputScreen::function(int i)
 {
-	baseControls->function(i);
+	ScreenComponent::function(i);
 	
 	switch (i)
 	{

@@ -33,7 +33,7 @@ void InsertEventScreen::displayInsertEventType()
 
 void InsertEventScreen::function(int i)
 {
-	baseControls->function(i);
+	ScreenComponent::function(i);
 	
 	switch (i)
 	{
