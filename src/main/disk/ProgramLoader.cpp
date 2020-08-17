@@ -27,7 +27,8 @@ using namespace mpc::lcdgui::screens::dialog2;
 using namespace moduru::lang;
 using namespace std;
 
-ProgramLoader::ProgramLoader(mpc::Mpc& mpc, MpcFile* file, bool replace)
+// Only used by Mpc
+ProgramLoader::ProgramLoader(mpc::Mpc& mpc, MpcFile* file, const int replaceIndex)
 	: mpc(mpc)
 {
 	this->file = file;
@@ -36,17 +37,17 @@ ProgramLoader::ProgramLoader(mpc::Mpc& mpc, MpcFile* file, bool replace)
 	auto cantFindFileScreen = dynamic_pointer_cast<CantFindFileScreen>(mpc.screens->getScreenComponent("cant-find-file"));
 	cantFindFileScreen->skipAll = false;
 
-	loadProgramThread = thread(&ProgramLoader::static_loadProgram, this);
+	loadProgramThread = thread(&ProgramLoader::static_loadProgram, this, replaceIndex);
 }
 
-void ProgramLoader::static_loadProgram(void* this_p)
+void ProgramLoader::static_loadProgram(void* this_p, const int replaceIndex)
 {
-	static_cast<ProgramLoader*>(this_p)->loadProgram();
+	static_cast<ProgramLoader*>(this_p)->loadProgram(replaceIndex);
 }
 
-void ProgramLoader::loadProgram()
+void ProgramLoader::loadProgram(const int replaceIndex)
 {
-	auto converter = PgmToProgramConverter(file, mpc.getSampler());
+	auto converter = PgmToProgramConverter(file, mpc.getSampler(), replaceIndex);
 	auto p = converter.get();
 	auto pgmSoundNames = converter.getSoundNames();
 	auto soundsDestIndex = vector<int>(pgmSoundNames.size());
@@ -108,9 +109,7 @@ void ProgramLoader::loadProgram()
 			}
 			
 			if (soundFile == nullptr)
-			{
 				notfound(soundFileName, ext);
-			}
 		}
 	}
 

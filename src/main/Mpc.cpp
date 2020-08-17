@@ -224,7 +224,10 @@ void Mpc::loadProgram()
 	auto loadScreen = dynamic_pointer_cast<LoadScreen>(screens->getScreenComponent("load"));
 	auto loadAProgramScreen = dynamic_pointer_cast<LoadAProgramScreen>(screens->getScreenComponent("load-a-program"));
 
-	programLoader = make_unique<mpc::disk::ProgramLoader>(*this, loadScreen->getSelectedFile(), loadAProgramScreen->loadReplaceSound);
+	getActiveControls().lock()->getBaseControls()->init();
+	auto activePgm = getActiveControls().lock()->getBaseControls()->mpcSoundPlayerChannel->getProgram();
+
+	programLoader = make_unique<mpc::disk::ProgramLoader>(*this, loadScreen->getSelectedFile(), loadAProgramScreen->loadReplaceSound ? activePgm : -1);
 }
 
 void Mpc::importLoadedProgram()
@@ -232,14 +235,8 @@ void Mpc::importLoadedProgram()
 	auto t = sequencer->getActiveSequence().lock()->getTrack(sequencer->getActiveTrackIndex()).lock();
 	auto loadAProgramScreen = dynamic_pointer_cast<LoadAProgramScreen>(screens->getScreenComponent("load-a-program"));
 
-	if (loadAProgramScreen->clearProgramWhenLoading)
-	{
-		auto pgm = getDrum(t->getBus() - 1)->getProgram();
-		sampler->replaceProgram(programLoader->get(), pgm);
-	}
-	else {
+	if (!loadAProgramScreen->clearProgramWhenLoading)
 		getDrum(t->getBus() - 1)->setProgram(sampler->getProgramCount() - 1);
-	}
 }
 
 ctoot::mpc::MpcMultiMidiSynth* Mpc::getMms()

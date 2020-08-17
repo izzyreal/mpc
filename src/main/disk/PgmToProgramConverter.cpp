@@ -17,16 +17,23 @@
 #include <mpc/MpcNoteParameters.hpp>
 
 using namespace mpc::disk;
+using namespace mpc::sampler;
 using namespace std;
 
-PgmToProgramConverter::PgmToProgramConverter(MpcFile* file, weak_ptr<mpc::sampler::Sampler> sampler)
+PgmToProgramConverter::PgmToProgramConverter(MpcFile* file, weak_ptr<Sampler> sampler, const int replaceIndex)
 {
-	program = sampler.lock()->addProgram();
+	if (replaceIndex == -1)
+		program = sampler.lock()->addProgram();
+	else
+		program = dynamic_pointer_cast<Program>(sampler.lock()->getProgram(replaceIndex).lock());
+
 	reader = new mpc::file::pgmreader::ProgramFileReader(file);
 
 	auto pgmSoundNames = reader->getSampleNames();
+	
 	for (int i = 0; i < reader->getHeader()->getNumberOfSamples(); i++)
 		soundNames.push_back(pgmSoundNames->getSampleName(i));
+
 	auto const programName = reader->getProgramName();
 	program.lock()->setName(programName->getProgramNameASCII());
 	setNoteParameters();
@@ -37,14 +44,15 @@ PgmToProgramConverter::PgmToProgramConverter(MpcFile* file, weak_ptr<mpc::sample
 
 PgmToProgramConverter::~PgmToProgramConverter()
 {
-	delete reader;
+	if (reader != nullptr)
+		delete reader;
 }
 
 void PgmToProgramConverter::setSlider()
 {
 	auto slider = reader->getSlider();
 	auto nn = slider->getMidiNoteAssign() == 0 ? 34 : slider->getMidiNoteAssign();
-	auto pgmSlider = dynamic_cast<mpc::sampler::PgmSlider*>(program.lock()->getSlider());
+	auto pgmSlider = dynamic_cast<PgmSlider*>(program.lock()->getSlider());
 	pgmSlider->setAssignNote(nn);
 	pgmSlider->setAttackHighRange(slider->getAttackHigh());
 	pgmSlider->setAttackLowRange(slider->getAttackLow());
@@ -63,13 +71,13 @@ void PgmToProgramConverter::setNoteParameters()
 	auto pgmPads = reader->getPads();
 	int pmn = 0;
 	int nn = 0;
-	mpc::sampler::NoteParameters* programNoteParameters = nullptr;
+	NoteParameters* programNoteParameters = nullptr;
 	auto lProgram = program.lock();
 	for (int i = 0; i < 64; i++) {
 		pmn = pgmPads->getNote(i);
 		nn = pmn == -1 ? 34 : pmn;
 		lProgram->getPad(i)->setNote(nn);
-		programNoteParameters = dynamic_cast<mpc::sampler::NoteParameters*>(lProgram->getNoteParameters(i + 35));
+		programNoteParameters = dynamic_cast<NoteParameters*>(lProgram->getNoteParameters(i + 35));
 		programNoteParameters->setAttack(pgmNoteParameters->getAttack(i));
 		programNoteParameters->setDecay(pgmNoteParameters->getDecay(i));
 		programNoteParameters->setDecayMode(pgmNoteParameters->getDecayMode(i));
@@ -128,9 +136,9 @@ void PgmToProgramConverter::setMixer()
 	}
 }
 
-weak_ptr<mpc::sampler::Program> PgmToProgramConverter::get()
+weak_ptr<Program> PgmToProgramConverter::get()
 {
-	if (!done) return weak_ptr<mpc::sampler::Program>();
+	if (!done) return weak_ptr<Program>();
 	return program;
 }
 
