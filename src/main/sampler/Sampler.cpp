@@ -638,12 +638,12 @@ weak_ptr<ctoot::mpc::MpcSound> Sampler::getPlayXSound()
 
 int Sampler::getFreeSampleSpace()
 {
-	int freeSpace = 32 * 1024 * 0.001;
+	double freeSpace = 32620;
 
 	for (auto& s : sounds)
-		freeSpace -= s->getSampleData()->size() * 2;
+		freeSpace -= (s->getSampleData()->size() * 2) / (double) 1024;
 
-	return freeSpace;
+	return (int) floor(freeSpace);
 }
 
 int Sampler::getLastInt(string s)
