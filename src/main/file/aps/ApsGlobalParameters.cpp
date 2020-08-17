@@ -33,8 +33,9 @@ ApsGlobalParameters::ApsGlobalParameters(mpc::Mpc& mpc)
 	: mpc(mpc)
 {
 	saveBytes = vector<char>(ApsParser::PARAMETERS_LENGTH);
+	
 	for (int i = 0; i < saveBytes.size(); i++)
-	saveBytes[i] = TEMPLATE[i];
+		saveBytes[i] = TEMPLATE[i];
 	
 	auto drumScreen = dynamic_pointer_cast<DrumScreen>(mpc.screens->getScreenComponent("drum"));
 
@@ -50,6 +51,7 @@ ApsGlobalParameters::ApsGlobalParameters(mpc::Mpc& mpc)
 	auto const recordMixChangesVal = mixerSetupScreen->isRecordMixChangesEnabled();
 	auto const masterLevelVal = mixerSetupScreen->getMasterLevel();
 	auto const fxDrumVal = mixerSetupScreen->getFxDrum();
+
 	saveBytes[0] = BitUtil::setBits(1, saveBytes[0], padToInternalSoundVal);
 	saveBytes[1] = BitUtil::setBits(1, saveBytes[1], padAssignMasterVal);
 	saveBytes[2] = BitUtil::setBits(1, saveBytes[2], stereoMixSourceDrumVal);
@@ -66,6 +68,7 @@ int ApsGlobalParameters::readFxDrum(char b)
 {
 	for (int i = 2; i < 8; i++)
 		b &= ~(1 << i);
+
 	return b;
 }
 
