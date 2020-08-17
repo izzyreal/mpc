@@ -40,7 +40,7 @@ ApsGlobalParameters::ApsGlobalParameters(mpc::Mpc& mpc)
 
 	auto const padToInternalSoundVal = drumScreen->isPadToIntSound();
 
-	auto pgmAssignScreen = dynamic_pointer_cast<PgmAssignScreen>(mpc.screens->getScreenComponent("pgmassign"));
+	auto pgmAssignScreen = dynamic_pointer_cast<PgmAssignScreen>(mpc.screens->getScreenComponent("program-assign"));
 	auto const padAssignMasterVal = pgmAssignScreen->padAssign;
 
 	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(mpc.screens->getScreenComponent("mixer-setup"));
