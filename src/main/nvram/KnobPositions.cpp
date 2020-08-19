@@ -20,8 +20,8 @@ KnobPositions::KnobPositions()
 {
 	auto file = make_shared<File>(mpc::Paths::resPath() + "knobpositions.vmp", nullptr);
 
-	if (!file->exists()) {
-
+	if (!file->exists())
+	{
 		file->create();
 
 		auto stream = FileUtil::ofstreamw(file->getPath(), ios::binary | ios::out);

@@ -7,6 +7,7 @@
 #include <Paths.hpp>
 
 #include <lcdgui/screens/UserScreen.hpp>
+#include <lcdgui/screens/VmpcSettingsScreen.hpp>
 
 #include <audiomidi/AudioMidiServices.hpp>
 
@@ -30,9 +31,7 @@ void NvRam::loadUserScreenValues(mpc::Mpc& mpc)
 	auto file = File(path, nullptr);
 
 	if (!file.exists())
-	{
 		return;
-	}
 
 	auto defaults = DefaultsParser::AllDefaultsFromFile(mpc, file);
 	auto userScreen = dynamic_pointer_cast<UserScreen>(mpc.screens->getScreenComponent("user"));
@@ -41,17 +40,13 @@ void NvRam::loadUserScreenValues(mpc::Mpc& mpc)
 	userScreen->bus = defaults.getBusses()[0];
 
 	for (int i = 0; i < 33; i++)
-	{
 		userScreen->setDeviceName(i, defaults.getDefaultDevNames()[i]);
-	}
 	
 	userScreen->setSequenceName(defaults.getDefaultSeqName());
 	auto defTrackNames = defaults.getDefaultTrackNames();
 
 	for (int i = 0; i < 64; i++)
-	{
 		userScreen->setTrackName(i, defTrackNames[i]);
-	}
 
 	userScreen->setDeviceNumber(defaults.getDevices()[0]);
 	userScreen->setTimeSig(defaults.getTimeSigNum(), defaults.getTimeSigDen());
@@ -66,12 +61,10 @@ void NvRam::saveUserScreenValues(mpc::Mpc& mpc)
 	
 	string fileName = mpc::Paths::resPath() + "nvram.vmp";
 	
-	auto file = moduru::file::File(fileName, nullptr);
+	File file(fileName, nullptr);
 	
 	if (!file.exists())
-	{
 		file.create();
-	}
 
 	auto stream = FileUtil::ofstreamw(fileName, ios::binary | ios::out);
 	auto bytes = dp.getBytes();
@@ -84,20 +77,18 @@ void NvRam::saveKnobPositions(mpc::Mpc& mpc)
     auto ams = mpc.getAudioMidiServices().lock();
     auto hw = mpc.getHardware().lock();
     
-	std::shared_ptr<mpc::hardware::Slider> slider;
+	shared_ptr<mpc::hardware::Slider> slider;
     
 	// Can we remove this check?
-	if (hw) {
+	if (hw)
 		slider = hw->getSlider().lock();
-	}
 
-    if (ams && hw && slider) {
-        
-		auto file = moduru::file::File(mpc::Paths::resPath() + "knobpositions.vmp", nullptr);
+    if (ams && hw && slider)
+	{    
+		File file(mpc::Paths::resPath() + "knobpositions.vmp", nullptr);
 		
-		if (!file.exists()) {
+		if (!file.exists())
 			file.create();
-		}
 
 		char recordb = ams->getRecordLevel();
         char volumeb = ams->getMasterLevel();
@@ -125,4 +116,36 @@ int NvRam::getSlider()
 {
     
     return KnobPositions().slider;
+}
+
+void NvRam::saveVmpcSettings(mpc::Mpc& mpc)
+{
+	auto vmpcSettingsScreen = dynamic_pointer_cast<VmpcSettingsScreen>(mpc.screens->getScreenComponent("vmpc-settings"));
+	string fileName = mpc::Paths::resPath() + "vmpc-specific.ini";
+
+	File file(fileName, nullptr);
+
+	if (!file.exists())
+		file.create();
+
+	auto stream = FileUtil::ofstreamw(fileName, ios::binary | ios::out);
+	vector<char> bytes{ (char) (vmpcSettingsScreen->initialPadMapping) };
+	stream.write(&bytes[0], bytes.size());
+	stream.close();
+}
+
+void NvRam::loadVmpcSettings(mpc::Mpc& mpc)
+{
+	string path = mpc::Paths::resPath() + "vmpc-specific.ini";
+	File file(path, nullptr);
+
+	if (!file.exists())
+		return;
+
+	auto vmpcSettingsScreen = dynamic_pointer_cast<VmpcSettingsScreen>(mpc.screens->getScreenComponent("vmpc-settings"));
+	
+	vector<char> bytes(1);
+	file.getData(&bytes);
+
+	vmpcSettingsScreen->initialPadMapping = bytes[0];
 }

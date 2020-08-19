@@ -1,10 +1,9 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
-namespace mpc::sampler
-{
-	class Pad;
-}
+namespace mpc::sampler { class Pad; }
+
+namespace mpc::nvram { class NvRam; }
 
 namespace mpc::lcdgui::screens
 {
@@ -26,6 +25,7 @@ namespace mpc::lcdgui::screens
 		void displayInitialPadMapping();
 		
 		friend class mpc::sampler::Pad;
+		friend class mpc::nvram::NvRam;
 
 	};
 }

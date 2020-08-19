@@ -85,6 +85,11 @@ void PgmAssignScreen::turnWheel(int i)
 	{
 		padAssign = i > 0;
 		displayPadAssign();
+		displayPadNote();
+		displayNote();
+		displayPad();
+		displaySoundGenerationMode();
+		displaySoundName();
 	}
 	else if (param.compare("pgm") == 0)
 	{
@@ -112,9 +117,7 @@ void PgmAssignScreen::turnWheel(int i)
 		auto candidate = mpc.getPad() + i;
 		
 		if (candidate < 0 || candidate > 63)
-		{
 			return;
-		}
 
 		auto nextNote = program.lock()->getPad(candidate)->getNote();
 		mpc.setPadAndNote(candidate, nextNote);
@@ -134,9 +137,7 @@ void PgmAssignScreen::turnWheel(int i)
 		auto candidate = lastPad->getNote();
 		
 		if (candidate > 34)
-		{
 			mpc.setPadAndNote(mpc.getPad(), candidate);
-		}
 
 		displayPad();
 		displayNote();
@@ -262,13 +263,9 @@ void PgmAssignScreen::displaySoundName()
 	if (sampler.lock()->getSoundCount() != 0 && sndNumber != -1)
 	{
 		if (sampler.lock()->getSound(sndNumber).lock()->isMono())
-		{
 			findLabel("issoundstereo").lock()->setText("");
-		}
 		else
-		{
 			findLabel("issoundstereo").lock()->setText("(ST)");
-		}
 	}
 }
 
@@ -285,12 +282,9 @@ void PgmAssignScreen::displayPadNote()
 	auto lProgram = program.lock();
 
 	if (sampler.lock()->getLastPad(lProgram.get())->getNote() == 34)
-	{
 		findField("pad-note").lock()->setText("--");
-		return;
-	}
-
-	findField("pad-note").lock()->setText(to_string(sampler.lock()->getLastPad(lProgram.get())->getNote()));
+	else
+		findField("pad-note").lock()->setText(to_string(sampler.lock()->getLastPad(lProgram.get())->getNote()));
 }
 
 void PgmAssignScreen::displaySoundGenerationMode()

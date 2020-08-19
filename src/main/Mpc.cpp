@@ -57,11 +57,13 @@ Mpc::Mpc()
 
 void Mpc::init(const int sampleRate, const int inputCount, const int outputCount)
 {
+
 	diskController = make_unique<mpc::disk::DiskController>(*this);
 	
 	sequencer = make_shared<mpc::sequencer::Sequencer>(*this);
 	MLOG("Sequencer created");
 
+	mpc::nvram::NvRam::loadVmpcSettings(*this); // Needs to be loaded before sampler is instantiated
 	sampler = make_shared<mpc::sampler::Sampler>(*this);
 	MLOG("Sampler created");
 
@@ -356,18 +358,16 @@ Mpc::~Mpc() {
 
 	mpc::nvram::NvRam::saveUserScreenValues(*this);
 	mpc::nvram::NvRam::saveKnobPositions(*this);
+	mpc::nvram::NvRam::saveVmpcSettings(*this);
 
 	for (auto& m : mpcMidiInputs)
 	{
-		if (m != nullptr) {
+		if (m != nullptr)
 			delete m;
-		}
 	}
 
 	if (layeredScreen)
-	{
 		layeredScreen.reset();
-	}
 
 	if (audioMidiServices)
 	{
@@ -376,7 +376,5 @@ Mpc::~Mpc() {
 	}
 
 	if (loadSoundThread.joinable())
-	{
 		loadSoundThread.join();
-	}
 }

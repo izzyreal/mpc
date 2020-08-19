@@ -5,6 +5,7 @@
 
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>
+#include <sampler/Pad.hpp>
 #include <mpc/MpcSoundPlayerChannel.hpp>
 #include <mpc/MpcStereoMixerChannel.hpp>
 #include <mpc/MpcIndivFxMixerChannel.hpp>
@@ -13,6 +14,7 @@
 
 using namespace moduru;
 using namespace mpc::file::aps;
+using namespace mpc::sampler;
 using namespace std;
 
 ApsParser::ApsParser(mpc::Mpc& mpc, mpc::disk::MpcFile* file)
@@ -30,14 +32,17 @@ ApsParser::ApsParser(mpc::Mpc& mpc, mpc::disk::MpcFile* file)
 	auto const maTableEnd = parametersEnd + TABLE_LENGTH;
 	maTable = make_unique<ApsAssignTable>(VecUtil::CopyOfRange(&loadBytes, parametersEnd, maTableEnd));
 	int const drum1MixerOffset = maTableEnd + PAD_LENGTH2;
+
 	for (int i = 0; i < 4; i++) {
 		int offset = drum1MixerOffset + (i * (MIXER_LENGTH + DRUM_CONFIG_LENGTH + DRUM_PAD_LENGTH));
 		drumMixers[i] = make_unique<ApsMixer>(VecUtil::CopyOfRange(&loadBytes, offset, offset + MIXER_LENGTH));
 		drumConfigurations[i] = make_unique<ApsDrumConfiguration>(VecUtil::CopyOfRange(&loadBytes, offset + MIXER_LENGTH, offset + MIXER_LENGTH + DRUM_CONFIG_LENGTH));
 	}
-	//int const firstProgramOffset = drum1MixerOffset + ((MIXER_LENGTH + DRUM_CONFIG_LENGTH) * 4) + PAD_LENGTH3;
+	
 	int const firstProgramOffset = drum1MixerOffset + ((MIXER_LENGTH + DRUM_CONFIG_LENGTH) * 4) + PAD_LENGTH3 - 6;
-	for (int i = 0; i < programCount; i++) {
+	
+	for (int i = 0; i < programCount; i++)
+	{
 		int offset = firstProgramOffset + (i * (PROGRAM_LENGTH + PROGRAM_PAD_LENGTH));
 		programs.push_back(make_unique<ApsProgram>(VecUtil::CopyOfRange(&loadBytes, offset, offset + PROGRAM_LENGTH)));
 	}
@@ -58,19 +63,25 @@ ApsParser::ApsParser(mpc::Mpc& mpc, string apsNameString)
 	chunks.push_back(apsName.getBytes());
 	auto parameters = ApsGlobalParameters(mpc);
 	chunks.push_back(parameters.getBytes());
+
 	auto masterTable = ApsAssignTable(*sampler->getMasterPadAssign());
 	chunks.push_back(masterTable.getBytes());
 	chunks.push_back(vector<char>{ 4, 0, (char) 136, 1, 64, 0, 6 });
-	for (int i = 0; i < 4; i++) {
+
+	for (int i = 0; i < 4; i++)
+	{
 		auto mixer = ApsMixer(sampler->getDrumStereoMixerChannels(i), sampler->getDrumIndivFxMixerChannels(i));
 		auto drumConfig = ApsDrumConfiguration(sampler->getDrumBusProgramNumber(i + 1), sampler->getDrum(i)->receivesPgmChange(), sampler->getDrum(i)->receivesMidiVolume());
+	
 		chunks.push_back(mixer.getBytes());
+		
 		if (i < 3) {
 			chunks.push_back(drumConfig.getBytes());
 		}
 		else {
 			auto ba = drumConfig.getBytes();
 			auto ba1 = vector<char>(7);
+			
 			for (int j = 0; j < 7; j++)
 				ba1[j] = ba[j];
 
@@ -85,9 +96,7 @@ ApsParser::ApsParser(mpc::Mpc& mpc, string apsNameString)
 		auto p = sampler->getProgram(i).lock();
 		
 		if (!p)
-		{
 			continue;
-		}
 
 		auto program = ApsProgram(dynamic_cast<mpc::sampler::Program*>(p.get()), i);
 		chunks.push_back(program.getBytes());
@@ -97,9 +106,7 @@ ApsParser::ApsParser(mpc::Mpc& mpc, string apsNameString)
 	auto totalSize = 0;
 	
 	for (auto& ba : chunks)
-	{
 		totalSize += ba.size();
-	}
 	
 	saveBytes = vector<char>(totalSize);
 	auto counter = 0;
@@ -107,9 +114,7 @@ ApsParser::ApsParser(mpc::Mpc& mpc, string apsNameString)
 	for (auto& ba : chunks)
 	{
 		for (auto& b : ba)
-		{
 			saveBytes[counter++] = b;
-		}
 	}
 }
 

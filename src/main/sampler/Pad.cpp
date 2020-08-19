@@ -21,18 +21,18 @@ std::vector<int> Pad::originalPadNotes = {	37, 36, 42, 82, 40, 38, 46, 44, 48, 4
 
 std::vector<int>& Pad::getPadNotes(mpc::Mpc& mpc)
 {
-	auto directToDiskRecorderScreen = dynamic_pointer_cast<VmpcSettingsScreen>(mpc.screens->getScreenComponent("vmpc-settings"));
+	auto vmpcSettingsScreen = dynamic_pointer_cast<VmpcSettingsScreen>(mpc.screens->getScreenComponent("vmpc-settings"));
 	
-	if (directToDiskRecorderScreen->initialPadMapping == 0)
+	if (vmpcSettingsScreen->initialPadMapping == 0)
 	{
 		static vector<int> vmpcPadNotes;
+
 		if (vmpcPadNotes.size() == 0)
 		{
 			for (int i = 35; i <= 98; i++)
-			{
 				vmpcPadNotes.push_back(i);
-			}
 		}
+		
 		return vmpcPadNotes;
 	}
 	return originalPadNotes;
@@ -41,7 +41,7 @@ std::vector<int>& Pad::getPadNotes(mpc::Mpc& mpc)
 Pad::Pad(mpc::Mpc& mpc, int number)
 	: mpc(mpc)
 {
-	this->number = number;
+	this->index = number;
 
 	note = getPadNotes(mpc)[number];
 	stereoMixerChannel = make_shared<ctoot::mpc::MpcStereoMixerChannel>();
@@ -51,36 +51,27 @@ Pad::Pad(mpc::Mpc& mpc, int number)
 void Pad::setNote(int i)
 {
 	if (i < 34 || i > 98)
-	{
 		return;
-	}
 
 	auto pgmAssignScreen = dynamic_pointer_cast<PgmAssignScreen>(mpc.screens->getScreenComponent("program-assign"));
 
 	if (pgmAssignScreen->padAssign)
-	{
-		(*mpc.getSampler().lock()->getMasterPadAssign())[number] = i;
-	}
+		(*mpc.getSampler().lock()->getMasterPadAssign())[index] = i;
 	else
-	{
 		note = i;
-	}
-	
-	
+
 	notifyObservers(string("padnotenumber"));
-	
 	notifyObservers(string("note"));
-	
 	notifyObservers(string("samplenumber"));
 }
 
 int Pad::getNote()
 {
 	auto pgmAssignScreen = dynamic_pointer_cast<PgmAssignScreen>(mpc.screens->getScreenComponent("program-assign"));
+
 	if (pgmAssignScreen->padAssign)
-	{
-		return (*mpc.getSampler().lock()->getMasterPadAssign())[number];
-	}
+		return (*mpc.getSampler().lock()->getMasterPadAssign())[index];
+
 	return note;
 }
 
@@ -96,5 +87,5 @@ weak_ptr<ctoot::mpc::MpcIndivFxMixerChannel> Pad::getIndivFxMixerChannel()
 
 int Pad::getNumber()
 {
-    return number;
+    return index;
 }

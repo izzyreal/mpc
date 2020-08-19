@@ -6,6 +6,7 @@
 #include <file/pgmwriter/Pads.hpp>
 #include <mpc/MpcStereoMixerChannel.hpp>
 #include <sampler/Program.hpp>
+#include <sampler/Pad.hpp>
 
 #include <lang/StrUtil.hpp>
 #include <VecUtil.hpp>
@@ -54,7 +55,9 @@ ApsProgram::ApsProgram(mpc::sampler::Program* program, int index)
 
 	for (int i = 0; i < 64; i++)
 	{
-		ApsNoteParameters np(dynamic_cast<mpc::sampler::NoteParameters*>(program->getNoteParameters(i + 35)));
+		auto pad = program->getPad(i);
+		auto note = pad->getNote();
+		ApsNoteParameters np(dynamic_cast<mpc::sampler::NoteParameters*>(program->getNoteParameters(note)));
 		byteList.push_back(np.getBytes());
 	}
 	
