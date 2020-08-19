@@ -415,9 +415,7 @@ void AudioMidiServices::startBouncing()
 void AudioMidiServices::stopBouncing()
 {
 	if (!bouncing.load())
-	{
 		return;
-	}
 
 	mpc.getLayeredScreen().lock()->openScreen("vmpc-recording-finished");
 	bouncing.store(false);

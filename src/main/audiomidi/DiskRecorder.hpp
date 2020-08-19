@@ -24,6 +24,7 @@ namespace mpc::audiomidi {
 
 	public:
 		void start();
+		void stop();
 		void prepare(const std::string& absolutePath, int lengthInFrames, int sampleRate);
 		int processAudio(ctoot::audio::core::AudioBuffer* buf) override;
 

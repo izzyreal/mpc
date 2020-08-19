@@ -65,9 +65,7 @@ bool WithTimesAndNotes::checkAllTimesAndNotes(mpc::Mpc& mpc, int notch, Sequence
 		auto track = mpc.getSequencer().lock()->getActiveTrack().lock().get();
 
 		if (_track != nullptr)
-		{
 			track = _track;
-		}
 
 		if (track->getBus() != 0)
 		{
@@ -97,16 +95,12 @@ bool WithTimesAndNotes::checkAllTimesAndNotes(mpc::Mpc& mpc, int notch, Sequence
 void WithTimesAndNotes::setNote0(int i)
 {
 	if (i < 0 || i > 127)
-	{
 		return;
-	}
 
 	note0 = i;
 
 	if (note0 > note1)
-	{
 		note1 = note0;
-	}
 
 	displayNotes();
 }
@@ -114,16 +108,12 @@ void WithTimesAndNotes::setNote0(int i)
 void WithTimesAndNotes::setNote1(int i)
 {
 	if (i < 0 || i > 127)
-	{
 		return;
-	}
 
 	note1 = i;
 
 	if (note1 < note0)
-	{
 		note0 = note1;
-	}
 
 	displayNotes();
 }
@@ -133,9 +123,7 @@ void WithTimesAndNotes::setTime0(int time0)
 	this->time0 = time0;
 
 	if (time0 > time1)
-	{
 		time1 = time0;
-	}
 
 	displayTime();
 }
@@ -145,9 +133,7 @@ void WithTimesAndNotes::setTime1(int time1)
 	this->time1 = time1;
 
 	if (time1 < time0)
-	{
 		time0 = time1;
-	}
 
 	displayTime();
 }

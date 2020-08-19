@@ -29,15 +29,7 @@ VmpcDirectToDiskRecorderScreen::VmpcDirectToDiskRecorderScreen(mpc::Mpc& mpc, co
 
 void VmpcDirectToDiskRecorderScreen::open()
 {
-	if (ls.lock()->getPreviousScreenName().compare("vmpc-settings") != 0)
-	{
-		setSq(sequencer.lock()->getActiveSequenceIndex());
-	}
-	else
-	{
-		displaySq();
-	}
-
+	setSq(sequencer.lock()->getActiveSequenceIndex());
 	displayRecord();
 	displaySong();
 	displayTime();
@@ -151,9 +143,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 			auto mpcSong = sequencer.lock()->getSong(song).lock();
 
 			if (!mpcSong->isUsed())
-			{
 				return;
-			}
 
 			auto lengthInFrames = mpc::sequencer::SeqUtil::songFrameLength(mpcSong.get(), sequencer.lock().get(), rate);
 			auto settings = make_unique<mpc::audiomidi::DirectToDiskSettings>(lengthInFrames, outputFolder, split, rate);
@@ -179,9 +169,8 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 
 void VmpcDirectToDiskRecorderScreen::setSampleRate(int rate) {
 	if (rate < 0 || rate > 2)
-	{
 		return;
-	}
+
 	sampleRate = rate;
 	displayRate();
 }
@@ -189,9 +178,7 @@ void VmpcDirectToDiskRecorderScreen::setSampleRate(int rate) {
 void VmpcDirectToDiskRecorderScreen::setRecord(int i)
 {
 	if (i < 0 || i > 4)
-	{
 		return;
-	}
 
 	record = i;
 
@@ -204,9 +191,7 @@ void VmpcDirectToDiskRecorderScreen::setRecord(int i)
 void VmpcDirectToDiskRecorderScreen::setSq(int i)
 {
 	if (i < 0 || i > 99)
-	{
 		return;
-	}
 
 	sq = i;
 	
@@ -215,21 +200,17 @@ void VmpcDirectToDiskRecorderScreen::setSq(int i)
 	auto s = mpc.getSequencer().lock()->getSequence(sq).lock();
 	
 	if (s->isUsed())
-	{
 		setTime1(s->getLastTick());
-	}
 	else
-	{
 		setTime1(0);
-	}
+
+	displaySq();
 }
 
 void VmpcDirectToDiskRecorderScreen::setSong(int i)
 {
 	if (i < 0 || i > 4)
-	{
 		return;
-	}
 	
 	song = i;
 	displaySong();
@@ -258,9 +239,7 @@ void VmpcDirectToDiskRecorderScreen::displayRate() {
 	findField("rate").lock()->Hide(!offline);
 	
 	if (!offline)
-	{
 		return;
-	}
 
 	vector<string> rates{ "44.1", "48.0", "88.2" };
 	string rate = Util::replaceDotWithSmallSpaceDot(rates[sampleRate]);
@@ -273,9 +252,7 @@ void VmpcDirectToDiskRecorderScreen::displaySong()
 	findLabel("song").lock()->Hide(record != 3);
 
 	if (record != 3)
-	{
 		return;
-	}
 
 	findField("song").lock()->setText(StrUtil::padLeft(to_string(song + 1), "0", 2) + "-" + mpc.getSequencer().lock()->getSong(song).lock()->getName());
 }
@@ -308,9 +285,7 @@ void VmpcDirectToDiskRecorderScreen::displaySq()
 	findLabel("sq").lock()->Hide(!visible);
 
 	if (!visible)
-	{
 		return;
-	}
 
 	findField("sq").lock()->setText(StrUtil::padLeft(to_string(sq + 1), "0", 2) + "-" + mpc.getSequencer().lock()->getSequence(sq).lock()->getName());
 }
@@ -326,9 +301,7 @@ void VmpcDirectToDiskRecorderScreen::displayTime()
 	}
 
 	if (invisible)
-	{
 		return;
-	}
 
 	auto sequence = mpc.getSequencer().lock()->getSequence(sq).lock();
 

@@ -16,6 +16,7 @@ DiskRecorder::DiskRecorder(ctoot::audio::core::AudioProcess* process, string nam
 
 void DiskRecorder::prepare(const std::string& absolutePath, int lengthInFrames, int sampleRate)
 {
+
 	if (writing) {
 		throw std::invalid_argument("Can't prepare when already exporting");
 	}
@@ -23,27 +24,31 @@ void DiskRecorder::prepare(const std::string& absolutePath, int lengthInFrames, 
 	this->lengthInFrames = lengthInFrames;
 	this->sampleRate = sampleRate;
 
-	if (fileStream.is_open()) {
+	if (fileStream.is_open())
 		fileStream.close();
-	}
 
 	fileStream = wav_init_ofstream(absolutePath);
 	wav_writeHeader(fileStream, sampleRate);
 	
 	lengthInBytes = lengthInFrames * 2 * 2; // assume 16 bit stereo for now
 	
+	if (format != nullptr)
+		delete format;
+
 	format = new ctoot::audio::core::AudioFormat(sampleRate, 16, 2, true, false);
 }
 
 int DiskRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf)
 {
 	auto ret = AudioProcessAdapter::processAudio(buf);
-
 	
-	if (writing) {
+	if (writing)
+	{
 		vector<char> audioBufferAsBytes (buf->getByteArrayBufferSize(format, buf->getSampleCount()));
 		buf->convertToByteArray_(0, buf->getSampleCount(), &audioBufferAsBytes, 0, format);
-		if (audioBufferAsBytes.size() + written >= lengthInBytes) {
+		
+		if (audioBufferAsBytes.size() + written >= lengthInBytes)
+		{
 			audioBufferAsBytes.resize(lengthInBytes - written);
 			writing = false;
 		}
@@ -51,12 +56,18 @@ int DiskRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf)
 		wav_write_bytes(fileStream, audioBufferAsBytes);
 		written += audioBufferAsBytes.size();
 		
-		if (!writing) {
+		if (!writing)
+		{
 			wav_close(fileStream, sampleRate, lengthInFrames);
 			lengthInBytes = 0;
 			lengthInFrames = 0;
 			sampleRate = 0;
-			format = nullptr;
+
+			if (format != nullptr)
+			{
+				delete format;
+				format = nullptr;
+			}
 		}
 	}
 
@@ -65,18 +76,26 @@ int DiskRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf)
 
 void DiskRecorder::start()
 {
-	if (!fileStream.is_open()) {
+	if (!fileStream.is_open())
 		throw std::invalid_argument("file stream is not open");
-	}
+
 	written = 0;
 	writing = true;
 }
 
-DiskRecorder::~DiskRecorder() {
-	if (fileStream.is_open()) {
+void DiskRecorder::stop()
+{
+	if (!fileStream.is_open() || !writing)
+		throw std::invalid_argument("file stream is not open or DiskRecorder is currently not writing");
+
+	writing = false;
+}
+
+DiskRecorder::~DiskRecorder()
+{
+	if (fileStream.is_open())
 		fileStream.close();
-	}
-	if (format != nullptr) {
+
+	if (format != nullptr)
 		delete format;
-	}
 }
