@@ -29,7 +29,7 @@ namespace mpc::lcdgui::screens
 		int fxDrum = 0;
 		bool stereoMixSourceDrum = false;
 		bool indivFxSourceDrum = false;
-		bool copyPgmMixToDrumEnabled = false;
+		bool copyPgmMixToDrumEnabled = true;
 		bool recordMixChangesEnabled = false;
 
 	public:
