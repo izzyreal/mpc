@@ -22,7 +22,8 @@ namespace mpc::file::aps
 		int fxDrum;
 
 	private:
-		static std::vector<char> TEMPLATE;
+		static std::vector<char> TEMPLATE_NO_SOUNDS;
+		static std::vector<char> TEMPLATE_SOUNDS;
 
 	public:
 		std::vector<char> saveBytes{};

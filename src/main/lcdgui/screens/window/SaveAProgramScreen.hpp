@@ -31,7 +31,7 @@ namespace mpc::lcdgui::screens::window
 
 		bool replaceSameSounds = false;
 
-		int save = 0;
+		int save = 1;
 		void setSave(int i);
 
 		void displaySave();

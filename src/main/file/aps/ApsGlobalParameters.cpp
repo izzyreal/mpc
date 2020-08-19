@@ -35,7 +35,10 @@ ApsGlobalParameters::ApsGlobalParameters(mpc::Mpc& mpc)
 	saveBytes = vector<char>(ApsParser::PARAMETERS_LENGTH);
 	
 	for (int i = 0; i < saveBytes.size(); i++)
-		saveBytes[i] = TEMPLATE[i];
+		if (mpc.getSampler().lock()->getSoundCount() == 0)
+			saveBytes[i] = TEMPLATE_NO_SOUNDS[i];
+		else
+			saveBytes[i] = TEMPLATE_SOUNDS[i];
 	
 	auto drumScreen = dynamic_pointer_cast<DrumScreen>(mpc.screens->getScreenComponent("drum"));
 
@@ -62,7 +65,8 @@ ApsGlobalParameters::ApsGlobalParameters(mpc::Mpc& mpc)
 	saveBytes[6] = masterLevelVal;
 }
 
-vector<char> ApsGlobalParameters::TEMPLATE = vector<char>{ 127, (char) (254 & 0xff), 124, (char) (238 & 0xff), 0, 0, 0, 64 };
+vector<char> ApsGlobalParameters::TEMPLATE_NO_SOUNDS = vector<char>{ 127, (char) (254 & 0xff), 124, (char) (238 & 0xff), 0, 0, 0, 64 };
+vector<char> ApsGlobalParameters::TEMPLATE_SOUNDS = vector<char>{ '\x03', '\x38', '\x00', '\xa1', 0, 0, 0, 64 };
 
 int ApsGlobalParameters::readFxDrum(char b)
 {

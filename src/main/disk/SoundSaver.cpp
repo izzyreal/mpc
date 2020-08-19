@@ -48,27 +48,21 @@ void SoundSaver::saveSounds()
 		auto popupScreen = dynamic_pointer_cast<PopupScreen>(mpc.screens->getScreenComponent("popup"));
 		popupScreen->setText("SAVING " + StrUtil::padRight(fileName, " ", 16) + ext);
 
-		if (lDisk->checkExists(fileName))
+		if (lDisk->checkExists(fileName + ext))
 		{
 			auto saveAProgramScreen = dynamic_pointer_cast<SaveAProgramScreen>(mpc.screens->getScreenComponent("save-a-program"));
+
 			if (saveAProgramScreen->replaceSameSounds)
-			{
                 lDisk->getFile(fileName)->del(); // possibly prepend auto success =
-			}
 			else
-			{
 				continue;
-			}
 		}
 		
 		if (!wav)
-		{
 			lDisk->writeSound(s);
-		}
 		else
-		{
 			lDisk->writeWav(s);
-		}
+
 		try
 		{
 			this_thread::sleep_for(chrono::milliseconds(300));
@@ -86,7 +80,5 @@ void SoundSaver::saveSounds()
 SoundSaver::~SoundSaver()
 {
 	if (saveSoundsThread.joinable())
-	{
 		saveSoundsThread.join();
-	}
 }

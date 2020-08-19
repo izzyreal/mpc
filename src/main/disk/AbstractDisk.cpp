@@ -217,9 +217,8 @@ void AbstractDisk::writeWav(mpc::sampler::Sound* s, MpcFile* f)
 
 void AbstractDisk::writeSequence(mpc::sequencer::Sequence* s, string fileName)
 {
-	if (checkExists(fileName)) {
+	if (checkExists(fileName))
 		return;
-	}
 	
 	auto newMidFile = newFile(fileName);
 	
@@ -233,11 +232,19 @@ void AbstractDisk::writeSequence(mpc::sequencer::Sequence* s, string fileName)
 bool AbstractDisk::checkExists(string fileName)
 {
 	initFiles();
-	for (auto& str : getFileNames()) {
-		if (StrUtil::eqIgnoreCase(str, fileName)) {
+
+	auto fileNameSplit = FileUtil::splitName(fileName);
+
+	for (auto& file : getAllFiles())
+	{
+		auto name = FileUtil::splitName(file->getName());
+		auto nameIsSame = StrUtil::eqIgnoreCase(name[0], fileNameSplit[0]);
+		auto extIsSame = StrUtil::eqIgnoreCase(name[1], fileNameSplit[1]);
+		
+		if (nameIsSame && extIsSame)
 			return true;
-		}
 	}
+
 	return false;
 }
 
