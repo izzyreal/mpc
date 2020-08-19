@@ -69,8 +69,8 @@ namespace mpc::audiomidi
 	public:
 		const bool isBouncing();
 		const bool isRecordingSound();
-		void startBouncing();
-		void stopBouncing();
+		bool startBouncing();
+		bool stopBouncing();
 		void startRecordingSound();
 		void stopSoundRecorder();
 		
@@ -125,7 +125,7 @@ namespace mpc::audiomidi
 		void connectVoices();
 		std::weak_ptr<MpcMidiPorts> getMidiPorts();
 		void destroyServices();
-		void prepareBouncing(DirectToDiskSettings* settings);
+		bool prepareBouncing(DirectToDiskSettings* settings);
 		std::weak_ptr<mpc::sequencer::FrameSeq> getFrameSequencer();
 		bool isBouncePrepared();
 

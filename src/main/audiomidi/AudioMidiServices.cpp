@@ -340,12 +340,12 @@ void AudioMidiServices::initializeDiskRecorders()
 {
 	for (int i = 0; i < outputProcesses.size(); i++) {
 		auto diskRecorder = make_shared<DiskRecorder>(outputProcesses[i], "diskwriter" + to_string(i));
-		if (i == 0) {
+
+		if (i == 0)
 			mixer->getMainStrip().lock()->setDirectOutputProcess(diskRecorder);
-		}
-		else {
+		else
 			mixer->getStrip(string("AUX#" + to_string(i))).lock()->setDirectOutputProcess(diskRecorder);
-		}
+
 		diskRecorders.push_back(std::move(diskRecorder));
 	}
 }
@@ -371,22 +371,19 @@ void AudioMidiServices::closeIO()
 	for (auto j = 0; j < inputProcesses.size(); j++)
 	{
 		if (inputProcesses[j])
-		{
 			server->closeAudioInput(inputProcesses[j].get());
-		}
 	}
 
 	for (auto j = 0; j < outputProcesses.size(); j++)
 	{
 		if (outputProcesses[j] == nullptr)
-		{
 			continue;
-		}
+
 		server->closeAudioOutput(outputProcesses[j]);
 	}
 }
 
-void AudioMidiServices::prepareBouncing(DirectToDiskSettings* settings)
+bool AudioMidiServices::prepareBouncing(DirectToDiskSettings* settings)
 {
 	auto indivFileNames = vector<string>{ "L-R.wav", "1-2.wav", "3-4.wav", "5-6.wav", "7-8.wav" };
 	string sep = moduru::file::FileUtil::getSeparator();
@@ -395,30 +392,41 @@ void AudioMidiServices::prepareBouncing(DirectToDiskSettings* settings)
 	{
 		auto eapa = diskRecorders[i];
 		auto absolutePath = mpc::Paths::home() + sep + "vMPC" + sep + "recordings" + sep + indivFileNames[i];
-		eapa->prepare(absolutePath, settings->lengthInFrames, settings->sampleRate);
+
+		if (!eapa->prepare(absolutePath, settings->lengthInFrames, settings->sampleRate))
+			return false;
 	}
 
 	bouncePrepared = true;
+	return true;
 }
 
-void AudioMidiServices::startBouncing()
+bool AudioMidiServices::startBouncing()
 {
 	if (!bouncePrepared)
-	{
-		return;
-	}
+		return false;
 
 	bouncePrepared = false;
 	bouncing.store(true);
+	return true;
 }
 
-void AudioMidiServices::stopBouncing()
+bool AudioMidiServices::stopBouncing()
 {
 	if (!bouncing.load())
-		return;
+		return false;
+
+	/*
+	for (auto& recorder : diskRecorders)
+	{
+		if (!recorder->stop())
+			return false;
+	}
+	*/
 
 	mpc.getLayeredScreen().lock()->openScreen("vmpc-recording-finished");
 	bouncing.store(false);
+	return true;
 }
 
 void AudioMidiServices::startRecordingSound()

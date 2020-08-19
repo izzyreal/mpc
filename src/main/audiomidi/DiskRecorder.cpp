@@ -14,12 +14,10 @@ DiskRecorder::DiskRecorder(ctoot::audio::core::AudioProcess* process, string nam
 	this->name = name;
 }
 
-void DiskRecorder::prepare(const std::string& absolutePath, int lengthInFrames, int sampleRate)
+bool DiskRecorder::prepare(const std::string& absolutePath, int lengthInFrames, int sampleRate)
 {
-
-	if (writing) {
-		throw std::invalid_argument("Can't prepare when already exporting");
-	}
+	if (writing)
+		return false;
 
 	this->lengthInFrames = lengthInFrames;
 	this->sampleRate = sampleRate;
@@ -36,6 +34,8 @@ void DiskRecorder::prepare(const std::string& absolutePath, int lengthInFrames, 
 		delete format;
 
 	format = new ctoot::audio::core::AudioFormat(sampleRate, 16, 2, true, false);
+	
+	return true;
 }
 
 int DiskRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf)
@@ -55,8 +55,8 @@ int DiskRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf)
 		
 		wav_write_bytes(fileStream, audioBufferAsBytes);
 		written += audioBufferAsBytes.size();
-		
-		if (!writing)
+
+		if (!writing && fileStream.is_open())
 		{
 			wav_close(fileStream, sampleRate, lengthInFrames);
 			lengthInBytes = 0;
@@ -74,21 +74,34 @@ int DiskRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf)
 	return ret;
 }
 
-void DiskRecorder::start()
+bool DiskRecorder::start()
 {
 	if (!fileStream.is_open())
-		throw std::invalid_argument("file stream is not open");
+		return false;
 
 	written = 0;
 	writing = true;
+
+	return true;
 }
 
-void DiskRecorder::stop()
+bool DiskRecorder::stop()
 {
 	if (!fileStream.is_open() || !writing)
-		throw std::invalid_argument("file stream is not open or DiskRecorder is currently not writing");
+		return false;
 
 	writing = false;
+	lengthInBytes = 0;
+	lengthInFrames = 0;
+	sampleRate = 0;
+
+	if (format != nullptr)
+	{
+		delete format;
+		format = nullptr;
+	}
+
+	return true;
 }
 
 DiskRecorder::~DiskRecorder()
