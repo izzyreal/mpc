@@ -60,9 +60,7 @@ ApsProgram::ApsProgram(mpc::sampler::Program* program, int index)
 
 	for (int i = 0; i < 64; i++)
 	{
-		auto pad = program->getPad(i);
-		auto note = pad->getNote();
-		ApsNoteParameters np(dynamic_cast<mpc::sampler::NoteParameters*>(program->getNoteParameters(note)));
+		ApsNoteParameters np(dynamic_cast<mpc::sampler::NoteParameters*>(program->getNoteParameters(i + 35)));
 		byteList.push_back(np.getBytes());
 	}
 	
