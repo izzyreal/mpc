@@ -21,14 +21,18 @@ ApsProgram::ApsProgram(vector<char> loadBytes)
 	auto nameBytes = VecUtil::CopyOfRange(&loadBytes, NAME_OFFSET, NAME_OFFSET + NAME_LENGTH);
 	name = "";
 	
-	for (char c : nameBytes) {
-		if (c == 0x00) break;
+	for (char c : nameBytes)
+	{
+		if (c == 0x00)
+			break;
+		
 		name.push_back(c);
 	}
 
 	slider = new ApsSlider(VecUtil::CopyOfRange(&loadBytes, SLIDER_OFFSET, SLIDER_OFFSET + SLIDER_LENGTH));
 	
-	for (int i = 0; i < 64; i++) {
+	for (int i = 0; i < 64; i++)
+	{
 		int offset = NOTE_PARAMETERS_OFFSET + (i * NOTE_PARAMETERS_LENGTH);
 		noteParameters[i] = new ApsNoteParameters(VecUtil::CopyOfRange(&loadBytes, offset, offset + NOTE_PARAMETERS_LENGTH));
 	}
@@ -48,7 +52,8 @@ ApsProgram::ApsProgram(mpc::sampler::Program* program, int index)
 	for (char c : name)
 		byteList.push_back(vector<char>{ c });
 	
-	byteList.push_back(vector<char>{ 0 });
+	byteList.push_back(vector<char>{ 0 }); // Name terminator
+
 	ApsSlider slider(program->getSlider());
 	byteList.push_back(slider.getBytes());
 	byteList.push_back(vector<char>{ 35, 64, 0, 26, 0 });
@@ -90,7 +95,8 @@ ApsProgram::ApsProgram(mpc::sampler::Program* program, int index)
 	saveBytes = vector<char>(totalSize);
 	auto counter = 0;
 
-	for (auto& ba : byteList) {
+	for (auto& ba : byteList)
+	{
 		for (auto b : ba)
 			saveBytes[counter++] = b;
 	}
@@ -98,7 +104,7 @@ ApsProgram::ApsProgram(mpc::sampler::Program* program, int index)
 
 const int ApsProgram::NAME_OFFSET;
 const int ApsProgram::NAME_LENGTH;
-const int ApsProgram::PADDING0_LENGTH;
+const int ApsProgram::NAME_TERMINATOR_LENGTH;
 const int ApsProgram::SLIDER_OFFSET;
 const int ApsProgram::SLIDER_LENGTH;
 const int ApsProgram::PADDING1_LENGTH;
@@ -156,4 +162,7 @@ ApsProgram::~ApsProgram()
 	if (slider != nullptr) delete slider;
 	if (mixer != nullptr)delete mixer;
 	if (assignTable != nullptr) delete assignTable;
+	
+	for (auto& np : noteParameters)
+		if (np != nullptr) delete np;
 }

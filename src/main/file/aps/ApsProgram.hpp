@@ -32,7 +32,7 @@ namespace mpc::file::aps
 		const std::vector<char> UNKNOWN{ 0, 7, 4, 30, 0 };
 		static const int NAME_OFFSET{ 6 };
 		static const int NAME_LENGTH{ 16 };
-		static const int PADDING0_LENGTH{ 1 };
+		static const int NAME_TERMINATOR_LENGTH{ 1 };
 		static const int SLIDER_OFFSET{ 23 };
 		static const int SLIDER_LENGTH{ 10 };
 		static const int PADDING1_LENGTH{ 5 };

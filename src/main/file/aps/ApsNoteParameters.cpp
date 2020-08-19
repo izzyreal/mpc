@@ -12,9 +12,9 @@ ApsNoteParameters::ApsNoteParameters(vector<char> loadBytes)
 	soundNumber = static_cast<int>(loadBytes[0]) == 255 ? -1 : (loadBytes[0]);
 	soundGenerationMode = loadBytes[2];
 	velocityRangeLower = loadBytes[3];
-	alsoPlay1 = loadBytes[4];
+	alsoPlay1 = loadBytes[4] == 0 ? 34 : loadBytes[4];
 	velocityRangeUpper = loadBytes[5];
-	alsoPlay2 = loadBytes[6];
+	alsoPlay2 = loadBytes[6] == 0 ? 34 : loadBytes[6];
 	voiceOverlap = loadBytes[7];
 	mute1 = loadBytes[8] == 0 ? 34 : loadBytes[8];
 	mute2 = loadBytes[9] == 0 ? 34 : loadBytes[9];
@@ -42,9 +42,9 @@ ApsNoteParameters::ApsNoteParameters(mpc::sampler::NoteParameters* np)
 	saveBytes[1] = saveBytes[0];
 	saveBytes[2] = np->getSoundGenerationMode();
 	saveBytes[3] = np->getVelocityRangeLower();
-	saveBytes[4] = np->getOptionalNoteA();
+	saveBytes[4] = np->getOptionalNoteA() == 34 ? 0 : np->getOptionalNoteA();
 	saveBytes[5] = np->getVelocityRangeUpper();
-	saveBytes[6] = np->getOptionalNoteB();
+	saveBytes[6] = np->getOptionalNoteB() == 34 ? 0 : np->getOptionalNoteB();
 	saveBytes[7] = np->getVoiceOverlap();
 	saveBytes[8] = np->getMuteAssignA() == 34 ? 0 : np->getMuteAssignA();
 	saveBytes[9] = np->getMuteAssignB() == 34 ? 0 : np->getMuteAssignB();

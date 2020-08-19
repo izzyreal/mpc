@@ -15,14 +15,19 @@ Program::Program(mpc::Mpc& mpc, mpc::sampler::Sampler* sampler)
 {
 	this->sampler = sampler;
 	init();
-	for (int i = 0; i < 64; i++) {
+	
+	for (int i = 0; i < 64; i++)
+	{
 		auto n = new NoteParameters(i);
 		noteParameters.push_back(n);
 	}
-	for (int i = 0; i < 64; i++) {
+	
+	for (int i = 0; i < 64; i++)
+	{
 		auto p = new Pad(mpc, i);
 		pads.push_back(p);
 	}
+	
 	slider = new PgmSlider();
 }
 
@@ -34,11 +39,16 @@ void Program::init()
 int Program::getNumberOfSamples()
 {
     auto counter = 0;
-    for (int i = 0; i < 64; i++) {
+
+    for (int i = 0; i < 64; i++)
+	{
         auto np = getNoteParameters(i + 35);
-        if(np->getSndNumber() != -1) counter++;
+        
+		if(np->getSndNumber() != -1)
+			counter++;
     }
-    return counter;
+    
+	return counter;
 }
 
 void Program::setName(string s)
@@ -77,17 +87,14 @@ weak_ptr<MpcIndivFxMixerChannel> Program::getIndivFxMixerChannel(int pad)
 int Program::getPadIndexFromNote(int note)
 {
 	if (note < 35 || note > 98)
-	{
 		return -1;
-	}
-
+	
 	for (int i = 0; i < 64; i++)
 	{
 		if (pads[i]->getNote() == note)
-		{
 			return i;
-		}
 	}
+
 	return -1;
 }
 
@@ -113,11 +120,10 @@ int Program::getMidiProgramChange()
 
 void Program::setMidiProgramChange(int i)
 {
-	if (i < 1 || i > 128) {
+	if (i < 1 || i > 128)
 		return;
-	}
 
-	this->midiProgramChange = i;
+	midiProgramChange = i;
 	
 	notifyObservers(string("midiprogramchange"));
 }

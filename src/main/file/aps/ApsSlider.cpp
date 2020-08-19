@@ -8,7 +8,7 @@ using namespace std;
 
 ApsSlider::ApsSlider(vector<char> loadBytes) 
 {
-	note = loadBytes[0];
+	note = loadBytes[0] == 0 ? 34 : loadBytes[0];
 	tuneLow = loadBytes[1];
 	tuneHigh = loadBytes[2];
 	decayLow = loadBytes[3];
@@ -23,7 +23,7 @@ ApsSlider::ApsSlider(vector<char> loadBytes)
 ApsSlider::ApsSlider(mpc::sampler::PgmSlider* slider) 
 {
 	saveBytes = vector<char>(ApsProgram::SLIDER_LENGTH);
-	saveBytes[0] = slider->getNote();
+	saveBytes[0] = slider->getNote() == 34 ? 0 : slider->getNote();
 	saveBytes[1] = slider->getTuneLowRange();
 	saveBytes[2] = slider->getTuneHighRange();
 	saveBytes[3] = slider->getDecayLowRange();
