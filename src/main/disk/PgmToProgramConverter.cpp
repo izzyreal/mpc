@@ -69,14 +69,15 @@ void PgmToProgramConverter::setNoteParameters()
 {
 	auto pgmNoteParameters = reader->getAllNoteParameters();
 	auto pgmPads = reader->getPads();
-	int pmn = 0;
-	int nn = 0;
 	NoteParameters* programNoteParameters = nullptr;
 	auto lProgram = program.lock();
-	for (int i = 0; i < 64; i++) {
-		pmn = pgmPads->getNote(i);
-		nn = pmn == -1 ? 34 : pmn;
-		lProgram->getPad(i)->setNote(nn);
+	
+	for (int i = 0; i < 64; i++)
+	{
+		auto padNote = pgmPads->getNote(i);
+		auto note = padNote == -1 ? 34 : padNote;
+		lProgram->getPad(i)->setNote(note);
+
 		programNoteParameters = dynamic_cast<NoteParameters*>(lProgram->getNoteParameters(i + 35));
 		programNoteParameters->setAttack(pgmNoteParameters->getAttack(i));
 		programNoteParameters->setDecay(pgmNoteParameters->getDecay(i));
@@ -90,6 +91,7 @@ void PgmToProgramConverter::setNoteParameters()
 		programNoteParameters->setMuteAssignB(pgmNoteParameters->getMuteAssign2(i));
 		programNoteParameters->setOptNoteA(pgmNoteParameters->getAlsoPlayUse1(i));
 		programNoteParameters->setOptionalNoteB(pgmNoteParameters->getAlsoPlayUse2(i));
+		
 		auto sampleSelect = pgmNoteParameters->getSampleSelect(i);
 		programNoteParameters->setSoundNumberNoLimit(sampleSelect == 255 ? -1 : sampleSelect);
 		programNoteParameters->setSliderParameterNumber(pgmNoteParameters->getSliderParameter(i));
@@ -114,14 +116,7 @@ void PgmToProgramConverter::setMixer()
 
 	for (int i = 0; i < 64; i++)
 	{
-		auto pmn = pgmPads->getNote(i);
-
-		if (pmn == -1)
-			lProgram->getPad(i)->setNote(34);
-		else
-			lProgram->getPad(i)->setNote(pmn);
-
-		auto noteParameters = dynamic_cast<NoteParameters*>(lProgram->getNoteParameters(pmn));
+		auto noteParameters = dynamic_cast<NoteParameters*>(lProgram->getNoteParameters(i + 35));
 		auto smc = noteParameters->getStereoMixerChannel().lock();
 		auto ifmc = noteParameters->getIndivFxMixerChannel().lock();
 		
