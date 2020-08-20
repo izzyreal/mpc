@@ -27,18 +27,18 @@ namespace mpc::sampler {
 	{
 
 	public:
-		std::weak_ptr<ctoot::mpc::MpcStereoMixerChannel> getStereoMixerChannel(int pad) override;
-		std::weak_ptr<ctoot::mpc::MpcIndivFxMixerChannel> getIndivFxMixerChannel(int pad) override;
+		std::weak_ptr<ctoot::mpc::MpcStereoMixerChannel> getStereoMixerChannel(int noteIndex) override;
+		std::weak_ptr<ctoot::mpc::MpcIndivFxMixerChannel> getIndivFxMixerChannel(int noteIndex) override;
 		int getPadIndexFromNote(int note) override;
 		ctoot::mpc::MpcNoteParameters* getNoteParameters(int i) override;
 
 	private:
-		Sampler* sampler{ nullptr };
+		Sampler* sampler = nullptr;
 		std::string name = "";
-		std::vector<NoteParameters*> noteParameters{ };
-		std::vector<Pad*> pads{ };
-		PgmSlider* slider{ nullptr };
-		int midiProgramChange{ 0 };
+		std::vector<NoteParameters*> noteParameters;
+		std::vector<Pad*> pads;
+		PgmSlider* slider = nullptr;
+		int midiProgramChange = 0;
 
 		void init();
 

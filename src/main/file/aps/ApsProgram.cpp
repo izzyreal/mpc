@@ -115,9 +115,9 @@ const int ApsProgram::PADDING3_LENGTH;
 const int ApsProgram::ASSIGN_TABLE_OFFSET;
 const int ApsProgram::ASSIGN_TABLE_LENGTH;
 
-ApsNoteParameters* ApsProgram::getNoteParameters(int note)
+ApsNoteParameters* ApsProgram::getNoteParameters(int noteIndex)
 {
-    return noteParameters[note - 35];
+    return noteParameters[noteIndex];
 }
 
 ApsMixer* ApsProgram::getMixer()
@@ -145,14 +145,14 @@ vector<char> ApsProgram::getBytes()
     return saveBytes;
 }
 
-ctoot::mpc::MpcStereoMixerChannel* ApsProgram::getStereoMixerChannel(int note)
+ctoot::mpc::MpcStereoMixerChannel* ApsProgram::getStereoMixerChannel(int noteIndex)
 {
-	return mixer->getStereoMixerChannel(note);
+	return mixer->getStereoMixerChannel(noteIndex);
 }
 
-ctoot::mpc::MpcIndivFxMixerChannel* ApsProgram::getIndivFxMixerChannel(int note)
+ctoot::mpc::MpcIndivFxMixerChannel* ApsProgram::getIndivFxMixerChannel(int noteIndex)
 {
-	return mixer->getIndivFxMixerChannel(note);
+	return mixer->getIndivFxMixerChannel(noteIndex);
 }
 
 ApsProgram::~ApsProgram()

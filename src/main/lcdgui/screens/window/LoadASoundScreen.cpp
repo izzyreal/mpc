@@ -108,25 +108,14 @@ void LoadASoundScreen::keepSound()
 		noteParameters->setSoundNumber(sampler.lock()->getSoundCount() - 1);
 
 		if (sound.lock()->isLoopEnabled())
-		{
 			noteParameters->setVoiceOverlap(2);
-		}
 
-		auto pn = program.lock()->getPadIndexFromNote(mpc.getNote());
+		auto padIndex = program.lock()->getPadIndexFromNote(mpc.getNote());
 
-		if (pn != -1)
+		if (padIndex != -1)
 		{
-			auto pad = dynamic_pointer_cast<mpc::sampler::Program>(program.lock())->getPad(pn);
-			auto mixerChannel = pad->getStereoMixerChannel().lock();
-			
-			if (sound.lock()->isMono())
-			{
-				mixerChannel->setStereo(false);
-			}
-			else
-			{
-				mixerChannel->setStereo(true);
-			}
+			auto mixerChannel = noteParameters->getStereoMixerChannel().lock();
+			mixerChannel->setStereo(!sound.lock()->isMono());
 		}
 	}
 }

@@ -9,6 +9,7 @@
 #include <sampler/Sound.hpp>
 
 using namespace mpc::disk;
+using namespace mpc::sampler;
 using namespace std;
 
 ProgramImportAdapter::ProgramImportAdapter(weak_ptr<mpc::sampler::Sampler> sampler, weak_ptr<mpc::sampler::Program> inputProgram, vector<int> soundsDestIndex)
@@ -34,17 +35,14 @@ void ProgramImportAdapter::processNoteParameters(mpc::sampler::NoteParameters* n
 void ProgramImportAdapter::initMixer(int note)
 {
 	auto lResult = result.lock();
-	auto sound = sampler.lock()->getSound(lResult->getNoteParameters(note)->getSndNumber()).lock();
-	if (!sound) return;
+	auto noteParameters = dynamic_cast<NoteParameters*>(lResult->getNoteParameters(note));
+	auto sound = sampler.lock()->getSound(noteParameters->getSndNumber()).lock();
 
-	auto pad = lResult->getPad(lResult->getPadIndexFromNote(note));
-	auto mc = pad->getStereoMixerChannel().lock();
-	if (sound->isMono()) {
-		mc->setStereo(false);
-	}
-	else {
-		mc->setStereo(true);
-	}
+	if (!sound)
+		return;
+
+	auto mc = noteParameters->getStereoMixerChannel().lock();
+	mc->setStereo(!sound->isMono());
 }
 
 weak_ptr<mpc::sampler::Program> ProgramImportAdapter::get()

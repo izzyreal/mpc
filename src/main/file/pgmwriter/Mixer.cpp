@@ -6,15 +6,18 @@
 #include <sampler/Program.hpp>
 
 using namespace mpc::file::pgmwriter;
+using namespace mpc::sampler;
 using namespace std;
 
 Mixer::Mixer(mpc::sampler::Program* program)
 {
 	mixerArray = vector<char>(384 + 3);
-	for (int i = 0; i < 64; i++) {
-		auto pad = program->getPad(i);
-		auto smc = pad->getStereoMixerChannel().lock();
-		auto ifmc = pad->getIndivFxMixerChannel().lock();
+
+	for (int i = 0; i < 64; i++)
+	{
+		auto noteParameters = dynamic_cast<NoteParameters*>(program->getNoteParameters(i));
+		auto smc = noteParameters->getStereoMixerChannel().lock();
+		auto ifmc = noteParameters->getIndivFxMixerChannel().lock();
 		setVolume(i, smc->getLevel());
 		setPan(i, smc->getPanning());
 		setVolumeIndividual(i, ifmc->getVolumeIndividualOut());
@@ -22,6 +25,7 @@ Mixer::Mixer(mpc::sampler::Program* program)
 		setEffectsSendLevel(i, ifmc->getFxSendLevel());
 		setEffectsOutput(i, ifmc->getFxPath());
 	}
+
 	mixerArray[384] = 0;
 	mixerArray[385] = 64;
 	mixerArray[386] = 0;

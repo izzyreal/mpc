@@ -37,6 +37,7 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::disk;
+using namespace mpc::sampler;
 using namespace mpc::file::aps;
 using namespace moduru::lang;
 using namespace std;
@@ -71,9 +72,7 @@ void ApsLoader::notFound(string soundFileName, string ext)
 		mpc.getLayeredScreen().lock()->openScreen("cant-find-file");
 
 		while (cantFindFileScreen->waitingForUser)
-		{
 			this_thread::sleep_for(chrono::milliseconds(25));
-		}
 	}
 }
 
@@ -128,65 +127,70 @@ void ApsLoader::load()
 
 	sampler->deleteAllPrograms(initPgms);
 	
-	for (auto& p : apsParser.getPrograms())
+	for (auto& apsProgram : apsParser.getPrograms())
 	{
-		auto newProgram = sampler->addProgram(p->index).lock();
-		auto assignTable = p->getAssignTable()->get();
-		newProgram->setName(p->getName());
+		auto newProgram = sampler->addProgram(apsProgram->index).lock();
+		auto assignTable = apsProgram->getAssignTable()->get();
 
-		for (int i = 0; i < 64; i++)
+		newProgram->setName(apsProgram->getName());
+
+		for (int noteIndex = 0; noteIndex < 64; noteIndex++)
 		{
-			int padnn = assignTable[i];
-			newProgram->getPad(i)->setNote(padnn);
-			auto apssmc = p->getStereoMixerChannel(i + 35);
-			auto apsifmc = p->getIndivFxMixerChannel(i + 35);
-			auto smc = newProgram->getPad(i)->getStereoMixerChannel().lock();
-			auto ifmc = newProgram->getPad(i)->getIndivFxMixerChannel().lock();
-			ifmc->setFxPath(apsifmc->getFxPath());
-			smc->setLevel(apssmc->getLevel());
-			smc->setPanning(apssmc->getPanning());
-			ifmc->setVolumeIndividualOut(apsifmc->getVolumeIndividualOut());
-			ifmc->setFxSendLevel(apsifmc->getFxSendLevel());
-			ifmc->setOutput(apsifmc->getOutput());
-			auto np = dynamic_cast<mpc::sampler::NoteParameters*>(newProgram->getNoteParameters(i + 35));
-			auto anp = p->getNoteParameters(i + 35);
-			np->setSoundNumber(anp->getSoundNumber());
-			np->setTune(anp->getTune());
-			np->setVoiceOverlap(anp->getVoiceOverlap());
-			np->setDecayMode(anp->getDecayMode());
-			np->setAttack(anp->getAttack());
-			np->setDecay(anp->getDecay());
-			np->setFilterAttack(anp->getVelocityToFilterAttack());
-			np->setFilterDecay(anp->getVelocityToFilterDecay());
-			np->setFilterEnvelopeAmount(anp->getVelocityToFilterAmount());
-			np->setFilterFrequency(anp->getCutoffFrequency());
-			np->setFilterResonance(anp->getResonance());
-			np->setMuteAssignA(anp->getMute1());
-			np->setMuteAssignB(anp->getMute2());
-			np->setOptNoteA(anp->getAlsoPlay1());
-			np->setOptionalNoteB(anp->getAlsoPlay2());
-			np->setSliderParameterNumber(anp->getSliderParameter());
-			np->setSoundGenMode(anp->getSoundGenerationMode());
-			np->setVelocityToStart(anp->getVelocityToStart());
-			np->setVelocityToAttack(anp->getVelocityToAttack());
-			np->setVelocityToFilterFrequency(anp->getVelocityToFilterFrequency());
-			np->setVeloToLevel(anp->getVelocityToLevel());
-			np->setVeloRangeLower(anp->getVelocityRangeLower());
-			np->setVeloRangeUpper(anp->getVelocityRangeUpper());
-			np->setVelocityToPitch(anp->getVelocityToPitch());
+			int padnn = assignTable[noteIndex];
+			newProgram->getPad(noteIndex)->setNote(assignTable[noteIndex]);
+
+			auto sourceStereoMixerChannel = apsProgram->getStereoMixerChannel(noteIndex);
+			auto sourceIndivFxMixerChannel = apsProgram->getIndivFxMixerChannel(noteIndex);
+
+			auto destNoteParams = dynamic_cast<NoteParameters*>(newProgram->getNoteParameters(noteIndex + 35));
+			auto destStereoMixerCh = destNoteParams->getStereoMixerChannel().lock();
+			auto destIndivFxCh = destNoteParams->getIndivFxMixerChannel().lock();
+
+			destIndivFxCh->setFxPath(sourceIndivFxMixerChannel->getFxPath());
+			destStereoMixerCh->setLevel(sourceStereoMixerChannel->getLevel());
+			destStereoMixerCh->setPanning(sourceStereoMixerChannel->getPanning());
+			destIndivFxCh->setVolumeIndividualOut(sourceIndivFxMixerChannel->getVolumeIndividualOut());
+			destIndivFxCh->setFxSendLevel(sourceIndivFxMixerChannel->getFxSendLevel());
+			destIndivFxCh->setOutput(sourceIndivFxMixerChannel->getOutput());
+
+			auto srcNoteParams = apsProgram->getNoteParameters(noteIndex);
+			destNoteParams->setSoundNumber(srcNoteParams->getSoundNumber());
+			destNoteParams->setTune(srcNoteParams->getTune());
+			destNoteParams->setVoiceOverlap(srcNoteParams->getVoiceOverlap());
+			destNoteParams->setDecayMode(srcNoteParams->getDecayMode());
+			destNoteParams->setAttack(srcNoteParams->getAttack());
+			destNoteParams->setDecay(srcNoteParams->getDecay());
+			destNoteParams->setFilterAttack(srcNoteParams->getVelocityToFilterAttack());
+			destNoteParams->setFilterDecay(srcNoteParams->getVelocityToFilterDecay());
+			destNoteParams->setFilterEnvelopeAmount(srcNoteParams->getVelocityToFilterAmount());
+			destNoteParams->setFilterFrequency(srcNoteParams->getCutoffFrequency());
+			destNoteParams->setFilterResonance(srcNoteParams->getResonance());
+			destNoteParams->setMuteAssignA(srcNoteParams->getMute1());
+			destNoteParams->setMuteAssignB(srcNoteParams->getMute2());
+			destNoteParams->setOptNoteA(srcNoteParams->getAlsoPlay1());
+			destNoteParams->setOptionalNoteB(srcNoteParams->getAlsoPlay2());
+			destNoteParams->setSliderParameterNumber(srcNoteParams->getSliderParameter());
+			destNoteParams->setSoundGenMode(srcNoteParams->getSoundGenerationMode());
+			destNoteParams->setVelocityToStart(srcNoteParams->getVelocityToStart());
+			destNoteParams->setVelocityToAttack(srcNoteParams->getVelocityToAttack());
+			destNoteParams->setVelocityToFilterFrequency(srcNoteParams->getVelocityToFilterFrequency());
+			destNoteParams->setVeloToLevel(srcNoteParams->getVelocityToLevel());
+			destNoteParams->setVeloRangeLower(srcNoteParams->getVelocityRangeLower());
+			destNoteParams->setVeloRangeUpper(srcNoteParams->getVelocityRangeUpper());
+			destNoteParams->setVelocityToPitch(srcNoteParams->getVelocityToPitch());
 		}
 
 		auto slider = dynamic_cast<mpc::sampler::PgmSlider*>(newProgram->getSlider());
-		slider->setAttackHighRange(p->getSlider()->getAttackHigh());
-		slider->setAttackLowRange(p->getSlider()->getAttackLow());
-		slider->setControlChange(p->getSlider()->getProgramChange());
-		slider->setDecayHighRange(p->getSlider()->getDecayHigh());
-		slider->setDecayLowRange(p->getSlider()->getDecayLow());
-		slider->setFilterHighRange(p->getSlider()->getFilterHigh());
-		slider->setFilterLowRange(p->getSlider()->getFilterLow());
-		slider->setAssignNote(p->getSlider()->getNote());
-		slider->setTuneHighRange(p->getSlider()->getTuneHigh());
-		slider->setTuneLowRange(p->getSlider()->getTuneLow());
+		slider->setAttackHighRange(apsProgram->getSlider()->getAttackHigh());
+		slider->setAttackLowRange(apsProgram->getSlider()->getAttackLow());
+		slider->setControlChange(apsProgram->getSlider()->getProgramChange());
+		slider->setDecayHighRange(apsProgram->getSlider()->getDecayHigh());
+		slider->setDecayLowRange(apsProgram->getSlider()->getDecayLow());
+		slider->setFilterHighRange(apsProgram->getSlider()->getFilterHigh());
+		slider->setFilterLowRange(apsProgram->getSlider()->getFilterLow());
+		slider->setAssignNote(apsProgram->getSlider()->getNote());
+		slider->setTuneHighRange(apsProgram->getSlider()->getTuneHigh());
+		slider->setTuneLowRange(apsProgram->getSlider()->getTuneLow());
 	}
 
 	for (int i = 0; i < 4; i++)
@@ -194,12 +198,12 @@ void ApsLoader::load()
 		auto m = apsParser.getDrumMixers()[i];
 		auto drum = mpc.getDrum(i);
 
-		for (int note = 35; note <= 98; note++)
+		for (int noteIndex = 0; noteIndex < 64; noteIndex++)
 		{
-			auto apssmc = m->getStereoMixerChannel(note);
-			auto apsifmc = m->getIndivFxMixerChannel(note);
-			auto drumsmc = drum->getStereoMixerChannels()[note - 35].lock();
-			auto drumifmc = drum->getIndivFxMixerChannels()[note - 35].lock();
+			auto apssmc = m->getStereoMixerChannel(noteIndex);
+			auto apsifmc = m->getIndivFxMixerChannel(noteIndex);
+			auto drumsmc = drum->getStereoMixerChannels()[noteIndex].lock();
+			auto drumifmc = drum->getIndivFxMixerChannels()[noteIndex].lock();
 			drumifmc->setFxPath(apsifmc->getFxPath());
 			drumsmc->setLevel(apssmc->getLevel());
 			drumsmc->setPanning(apssmc->getPanning());
@@ -251,9 +255,8 @@ void ApsLoader::showPopup(string name, string ext, int sampleSize)
 		auto sleepTime = sampleSize / 800;
 	
 		if (sleepTime < 300)
-		{
 			sleepTime = 300;
-		}
+
 		this_thread::sleep_for(chrono::milliseconds((int)(sleepTime * 0.2)));
 	}
 }
@@ -261,7 +264,5 @@ void ApsLoader::showPopup(string name, string ext, int sampleSize)
 ApsLoader::~ApsLoader()
 {
 	if (loadThread.joinable())
-	{
 		loadThread.join();
-	}
 }

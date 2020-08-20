@@ -110,40 +110,41 @@ void PgmToProgramConverter::setMixer()
 {
 	auto pgmMixer = reader->getMixer();
 	auto pgmPads = reader->getPads();
-	auto skippedMixerChannels = 0;
 	auto lProgram = program.lock();
-	for (int i = 0; i < 64; i++) {
+
+	for (int i = 0; i < 64; i++)
+	{
 		auto pmn = pgmPads->getNote(i);
-		if (pmn == -1) {
+
+		if (pmn == -1)
 			lProgram->getPad(i)->setNote(34);
-		}
-		else {
+		else
 			lProgram->getPad(i)->setNote(pmn);
-		}
-		if (pmn != -1) {
-			auto mixindex = pmn - 35 - skippedMixerChannels;
-			auto smc = lProgram->getPad(i)->getStereoMixerChannel().lock();
-			auto ifmc = lProgram->getPad(i)->getIndivFxMixerChannel().lock();
-			smc->setLevel(pgmMixer->getVolume(mixindex));
-			smc->setPanning(pgmMixer->getPan(mixindex));
-			ifmc->setVolumeIndividualOut(pgmMixer->getVolumeIndividual(mixindex));
-			ifmc->setOutput(pgmMixer->getOutput(mixindex));
-			ifmc->setFxPath(pgmMixer->getEffectsOutput(mixindex));
-		}
-		else {
-			skippedMixerChannels++;
-		}
+
+		auto noteParameters = dynamic_cast<NoteParameters*>(lProgram->getNoteParameters(pmn));
+		auto smc = noteParameters->getStereoMixerChannel().lock();
+		auto ifmc = noteParameters->getIndivFxMixerChannel().lock();
+		
+		smc->setLevel(pgmMixer->getVolume(i));
+		smc->setPanning(pgmMixer->getPan(i));
+		ifmc->setVolumeIndividualOut(pgmMixer->getVolumeIndividual(i));
+		ifmc->setOutput(pgmMixer->getOutput(i));
+		ifmc->setFxPath(pgmMixer->getEffectsOutput(i));
 	}
 }
 
 weak_ptr<Program> PgmToProgramConverter::get()
 {
-	if (!done) return weak_ptr<Program>();
+	if (!done)
+		return weak_ptr<Program>();
+
 	return program;
 }
 
 vector<string> PgmToProgramConverter::getSoundNames()
 {
-	if (!done) return vector<string>(0);
+	if (!done)
+		return vector<string>(0);
+
     return soundNames;
 }

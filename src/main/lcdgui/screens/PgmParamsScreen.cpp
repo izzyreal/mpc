@@ -237,13 +237,14 @@ void PgmParamsScreen::displayNote()
 	init();
 	auto lProgram = program.lock();
 	auto sampleNumber = sampler.lock()->getLastNp(lProgram.get())->getSndNumber();
-	auto note = sampler.lock()->getLastNp(lProgram.get())->getNumber();
+	auto noteParameters = sampler.lock()->getLastNp(lProgram.get());
+	auto note = noteParameters->getNumber();
 	auto sampleName = sampleNumber != -1 ? sampler.lock()->getSoundName(sampleNumber) : "OFF";
 	auto padNumber = lProgram->getPadIndexFromNote(note);
 	
 	if (padNumber != -1)
 	{
-		auto stereo = lProgram->getPad(padNumber)->getStereoMixerChannel().lock()->isStereo() && sampleNumber != -1 ? "(ST)" : "";
+		auto stereo = noteParameters->getStereoMixerChannel().lock()->isStereo() && sampleNumber != -1 ? "(ST)" : "";
 		auto padName = sampler.lock()->getPadName(padNumber);
 		findField("note").lock()->setText(to_string(note) + "/" + padName + "-" + moduru::lang::StrUtil::padRight(sampleName, " ", 16) + stereo);
 	}

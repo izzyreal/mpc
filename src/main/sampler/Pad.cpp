@@ -44,8 +44,6 @@ Pad::Pad(mpc::Mpc& mpc, int number)
 	this->index = number;
 
 	note = getPadNotes(mpc)[number];
-	stereoMixerChannel = make_shared<ctoot::mpc::MpcStereoMixerChannel>();
-	indivFxMixerChannel = make_shared<ctoot::mpc::MpcIndivFxMixerChannel>();
 }
 
 void Pad::setNote(int i)
@@ -73,16 +71,6 @@ int Pad::getNote()
 		return (*mpc.getSampler().lock()->getMasterPadAssign())[index];
 
 	return note;
-}
-
-weak_ptr<ctoot::mpc::MpcStereoMixerChannel> Pad::getStereoMixerChannel()
-{
-    return stereoMixerChannel;
-}
-
-weak_ptr<ctoot::mpc::MpcIndivFxMixerChannel> Pad::getIndivFxMixerChannel()
-{
-	return indivFxMixerChannel;
 }
 
 int Pad::getNumber()

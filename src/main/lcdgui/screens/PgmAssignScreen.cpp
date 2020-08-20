@@ -170,14 +170,10 @@ void PgmAssignScreen::turnWheel(int i)
 		if (sound)
 		{
 			if (sound->isMono())
-			{
-				lastPad->getStereoMixerChannel().lock()->setStereo(false);
-			}
+				lastNoteParameters->getStereoMixerChannel().lock()->setStereo(false);
 			
 			if (sound->isLoopEnabled())
-			{
 				lastNoteParameters->setVoiceOverlap(2);
-			}
 		}
 	}
 	else if (param.compare("mode") == 0)

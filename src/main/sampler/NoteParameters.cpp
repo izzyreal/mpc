@@ -1,9 +1,7 @@
 #include <sampler/NoteParameters.hpp>
 
-//#include <Mpc.hpp>
-//#include <sampler/Sampler.hpp>
-
 using namespace mpc::sampler;
+using namespace ctoot::mpc;
 using namespace std;
 
 NoteParameters::NoteParameters(int number) 
@@ -475,5 +473,12 @@ int NoteParameters::getNumber()
     return number + 35;
 }
 
-NoteParameters::~NoteParameters() {
+weak_ptr<MpcStereoMixerChannel> NoteParameters::getStereoMixerChannel()
+{
+    return stereoMixerChannel;
+}
+
+weak_ptr<MpcIndivFxMixerChannel> NoteParameters::getIndivFxMixerChannel()
+{
+    return indivFxMixerChannel;
 }

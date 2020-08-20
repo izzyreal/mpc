@@ -61,12 +61,12 @@ string Program::getName()
     return name;
 }
 
-MpcNoteParameters* Program::getNoteParameters(int i)
+MpcNoteParameters* Program::getNoteParameters(int note)
 {
-	if (i < 35 || i > 98) {
+	if (note < 35 || note > 98)
 		return nullptr;
-	}
-	return noteParameters[i - 35];
+
+	return noteParameters[note - 35];
 }
 
 Pad* Program::getPad(int i)
@@ -74,14 +74,14 @@ Pad* Program::getPad(int i)
 	return pads[i];
 }
 
-weak_ptr<MpcStereoMixerChannel> Program::getStereoMixerChannel(int pad)
+weak_ptr<MpcStereoMixerChannel> Program::getStereoMixerChannel(int noteIndex)
 {
-	return dynamic_pointer_cast<MpcStereoMixerChannel>(pads[pad]->getStereoMixerChannel().lock());
+	return dynamic_pointer_cast<MpcStereoMixerChannel>(noteParameters[noteIndex]->getStereoMixerChannel().lock());
 }
 
-weak_ptr<MpcIndivFxMixerChannel> Program::getIndivFxMixerChannel(int pad)
+weak_ptr<MpcIndivFxMixerChannel> Program::getIndivFxMixerChannel(int noteIndex)
 {
-	return dynamic_pointer_cast<MpcIndivFxMixerChannel>(pads[pad]->getIndivFxMixerChannel().lock());
+	return dynamic_pointer_cast<MpcIndivFxMixerChannel>(noteParameters[noteIndex]->getIndivFxMixerChannel().lock());
 }
 
 int Program::getPadIndexFromNote(int note)
@@ -142,10 +142,9 @@ int Program::getNoteFromPad(int i)
 	return pads[i]->getNote();
 }
 
-Program::~Program() {
+Program::~Program()
+{
 	delete slider;
-	for (auto& np : noteParameters)
-		delete np;
-	for (auto& p : pads)
-		delete p;
+	for (auto& np : noteParameters) delete np;
+	for (auto& p : pads) delete p;
 }

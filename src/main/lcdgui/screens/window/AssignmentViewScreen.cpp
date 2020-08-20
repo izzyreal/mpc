@@ -191,13 +191,14 @@ void AssignmentViewScreen::displayInfo2()
 
 	string sampleName = sampleNumber != -1 ? sampler.lock()->getSoundName(sampleNumber) : "";
 
-	string stereo = "";
-	auto lastPad = sampler.lock()->getLastPad(program.lock().get());
+	init();
+	auto program_ = program.lock();
+	auto noteParameters = sampler.lock()->getLastNp(program_.get());
 	
-	if (sampleNumber != -1 && lastPad->getStereoMixerChannel().lock()->isStereo())
-	{
+	string stereo = "";
+
+	if (sampleNumber != -1 && noteParameters->getStereoMixerChannel().lock()->isStereo())
 		stereo = "(ST)";
-	}
 
 	findLabel("info2").lock()->setText("=" + sampleName + stereo);
 }

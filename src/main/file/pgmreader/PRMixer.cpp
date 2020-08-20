@@ -39,38 +39,38 @@ vector<char> Mixer::getMixerArray()
     return mixerArray;
 }
 
-int Mixer::getEffectsOutput(int pad)
+int Mixer::getEffectsOutput(int noteIndex)
 {
-    auto effectsOutput = getMixerArray()[(pad * 6) + 0];
+    auto effectsOutput = getMixerArray()[(noteIndex * 6) + 0];
     return effectsOutput;
 }
 
-int Mixer::getVolume(int pad)
+int Mixer::getVolume(int noteIndex)
 {
-    auto volume = getMixerArray()[(pad * 6) + 1];
+    auto volume = getMixerArray()[(noteIndex * 6) + 1];
     return volume;
 }
 
-int Mixer::getPan(int pad)
+int Mixer::getPan(int noteIndex)
 {
-    auto pan = getMixerArray()[(pad * 6) + 2];
+    auto pan = getMixerArray()[(noteIndex * 6) + 2];
     return pan;
 }
 
-int Mixer::getVolumeIndividual(int pad)
+int Mixer::getVolumeIndividual(int noteIndex)
 {
-    auto volumeIndividual = getMixerArray()[(pad * 6) + 3];
+    auto volumeIndividual = getMixerArray()[(noteIndex * 6) + 3];
     return volumeIndividual;
 }
 
-int Mixer::getOutput(int pad)
+int Mixer::getOutput(int noteIndex)
 {
-    auto output = getMixerArray()[(pad * 6) + 4];
+    auto output = getMixerArray()[(noteIndex * 6) + 4];
     return output;
 }
 
-int Mixer::getEffectsSendLevel(int pad)
+int Mixer::getEffectsSendLevel(int noteIndex)
 {
-    auto effectsSendLevel = getMixerArray()[(pad * 6) + 5];
+    auto effectsSendLevel = getMixerArray()[(noteIndex * 6) + 5];
     return effectsSendLevel;
 }
