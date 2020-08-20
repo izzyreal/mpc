@@ -15,42 +15,51 @@ using namespace std;
 PgmWriter::PgmWriter(mpc::sampler::Program* program, weak_ptr<mpc::sampler::Sampler> sampler)
 {
 	this->program = program;
-	auto sn = SampleNames(program, sampler);
-	sampleNames = sn.getSampleNamesArray();
-	auto pwheader = PWHeader(sn.getNumberOfSamples());
-	header = pwheader.getHeaderArray();
-	auto pwpgmname = PgmName(program);
-	pgmName = pwpgmname.getPgmNameArray();
-	auto pwslider = Slider(program);
-	slider = pwslider.getSliderArray();
-	auto pwmidinotes = MidiNotes(program, sn.getSnConvTable());
-	midiNotes = pwmidinotes.midiNotesArray;
-	auto pwmixer = Mixer(program);
-	mixer = pwmixer.getMixerArray();
-	auto pwpads = Pads(program);
-	pads = pwpads.getPadsArray();
+	
+	SampleNames pwSampleNames(program, sampler);
+	sampleNames = pwSampleNames.getSampleNamesArray();
+	
+	PWHeader pwHeader(pwSampleNames.getNumberOfSamples());
+	header = pwHeader.getHeaderArray();
+	
+	PgmName pwPgmName(program);
+	pgmName = pwPgmName.getPgmNameArray();
+
+	Slider pwSlider(program);
+	slider = pwSlider.getSliderArray();
+
+	MidiNotes pwMidiNotes(program, pwSampleNames.getSnConvTable());
+	midiNotes = pwMidiNotes.midiNotesArray;
+	
+	Mixer pwMixer(program);
+	mixer = pwMixer.getMixerArray();
+	
+	Pads pwPads(program);
+	pads = pwPads.getPadsArray();
 }
 
 vector<char> PgmWriter::get()
 {
-	auto caa = vector<vector<char>>(7);
-	caa[0] = header;
-	caa[1] = sampleNames;
-	caa[2] = pgmName;
-	caa[3] = slider;
-	caa[4] = midiNotes;
-	caa[5] = mixer;
-	caa[6] = pads;
+	auto charArrayChunks = vector<vector<char>>(7);
+	charArrayChunks[0] = header;
+	charArrayChunks[1] = sampleNames;
+	charArrayChunks[2] = pgmName;
+	charArrayChunks[3] = slider;
+	charArrayChunks[4] = midiNotes;
+	charArrayChunks[5] = mixer;
+	charArrayChunks[6] = pads;
 	auto programFileSize = 0;
-	for (auto ca : caa)
+
+	for (auto ca : charArrayChunks)
 		programFileSize += ca.size();
 
-	auto bb = vector<char>(programFileSize);
+	vector<char> result(programFileSize);
 	int counter = 0;
-	for (auto ca : caa) {
-		for (auto c : ca) {
-			bb[counter++] = c;
-		}
+
+	for (auto ca : charArrayChunks)
+	{
+		for (auto c : ca)
+			result[counter++] = c;
 	}
-	return bb;
+	return result;
 }
