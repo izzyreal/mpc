@@ -71,6 +71,7 @@ namespace mpc::audiomidi
 		const bool isRecordingSound();
 		bool startBouncing();
 		bool stopBouncing();
+		bool stopBouncingEarly();
 		void startRecordingSound();
 		void stopSoundRecorder();
 		

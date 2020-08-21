@@ -16,7 +16,7 @@ DiskRecorder::DiskRecorder(ctoot::audio::core::AudioProcess* process, string nam
 
 bool DiskRecorder::prepare(const std::string& absolutePath, int lengthInFrames, int sampleRate)
 {
-	if (writing)
+	if (writing.load())
 		return false;
 
 	this->lengthInFrames = lengthInFrames;
@@ -42,7 +42,7 @@ int DiskRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf)
 {
 	auto ret = AudioProcessAdapter::processAudio(buf);
 	
-	if (writing)
+	if (writing.load())
 	{
 		vector<char> audioBufferAsBytes (buf->getByteArrayBufferSize(format, buf->getSampleCount()));
 		buf->convertToByteArray_(0, buf->getSampleCount(), &audioBufferAsBytes, 0, format);
@@ -50,13 +50,13 @@ int DiskRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf)
 		if (audioBufferAsBytes.size() + written >= lengthInBytes)
 		{
 			audioBufferAsBytes.resize(lengthInBytes - written);
-			writing = false;
+			writing.store(false);
 		}
 		
 		wav_write_bytes(fileStream, audioBufferAsBytes);
 		written += audioBufferAsBytes.size();
 
-		if (!writing && fileStream.is_open())
+		if (!writing.load() && fileStream.is_open())
 		{
 			wav_close(fileStream, sampleRate, lengthInFrames);
 			lengthInBytes = 0;
@@ -80,17 +80,20 @@ bool DiskRecorder::start()
 		return false;
 
 	written = 0;
-	writing = true;
+	writing.store(true);
 
 	return true;
 }
 
-bool DiskRecorder::stop()
+bool DiskRecorder::stopEarly()
 {
-	if (!fileStream.is_open() || !writing)
+	if (!fileStream.is_open() || !writing.load())
 		return false;
+	
+	writing.store(false);
+	wav_close(fileStream, sampleRate, written);
 
-	writing = false;
+	written = 0;
 	lengthInBytes = 0;
 	lengthInFrames = 0;
 	sampleRate = 0;

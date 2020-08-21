@@ -415,14 +415,19 @@ bool AudioMidiServices::stopBouncing()
 {
 	if (!bouncing.load())
 		return false;
+	
+	mpc.getLayeredScreen().lock()->openScreen("vmpc-recording-finished");
+	bouncing.store(false);
+	return true;
+}
 
-	/*
+bool AudioMidiServices::stopBouncingEarly()
+{
+	if (!bouncing.load())
+		return false;
+
 	for (auto& recorder : diskRecorders)
-	{
-		if (!recorder->stop())
-			return false;
-	}
-	*/
+		recorder->stopEarly();
 
 	mpc.getLayeredScreen().lock()->openScreen("vmpc-recording-finished");
 	bouncing.store(false);

@@ -112,8 +112,11 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 			sequence->setLoopEnabled(false);
 			auto lengthInFrames = mpc::sequencer::SeqUtil::sequenceFrameLength(sequence.get(), 0, sequence->getLastTick(), rate);
 			auto settings = make_unique<mpc::audiomidi::DirectToDiskSettings>(lengthInFrames, outputFolder, split, rate);
-			mpc.getAudioMidiServices().lock()->prepareBouncing(settings.get());
-			sequencer.lock()->playFromStart();
+			
+			if (!mpc.getAudioMidiServices().lock()->prepareBouncing(settings.get()))
+				ls.lock()->openScreen("vmpc-file-in-use");
+			else			
+				sequencer.lock()->playFromStart();
 			break;
 		}
 		case 1:
@@ -235,8 +238,10 @@ void VmpcDirectToDiskRecorderScreen::setSplitLR(bool b)
 	displaySplitLR();
 }
 
-void VmpcDirectToDiskRecorderScreen::displayRate() {
+void VmpcDirectToDiskRecorderScreen::displayRate()
+{
 	findField("rate").lock()->Hide(!offline);
+	findLabel("rate").lock()->Hide(!offline);
 	
 	if (!offline)
 		return;

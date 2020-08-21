@@ -579,10 +579,12 @@ void BaseControls::stop()
 {
 	init();
 
+	if (mpc.getAudioMidiServices().lock()->isBouncing())
+		mpc.getAudioMidiServices().lock()->stopBouncingEarly();
+
 	sequencer.lock()->stop();
 	auto controls = mpc.getControls().lock();
 
-	mpc.getAudioMidiServices().lock()->stopBouncing();
 
 	if (find(begin(allowTransportScreens), end(allowTransportScreens), currentScreenName) == end(allowTransportScreens)
 		&& find(begin(allowPlay), end(allowPlay), currentScreenName) == end(allowPlay))
