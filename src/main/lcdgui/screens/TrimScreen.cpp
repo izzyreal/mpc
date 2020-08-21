@@ -121,10 +121,11 @@ void TrimScreen::turnWheel(int i)
 {
 	init();
 
-	if (param == "")
+	auto sound = sampler.lock()->getSound().lock();
+
+	if (param == "" || !sound)
 		return;
 
-	auto sound = sampler.lock()->getSound().lock();
 	auto const oldLength = sound->getEnd() - sound->getStart();
 	
 	auto soundInc = getSoundIncrement(i);

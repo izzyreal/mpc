@@ -203,6 +203,7 @@ void Mpc::loadSound(bool replace)
 	}
 	catch (const exception& exception)
 	{
+		sampler->deleteSample(sampler->getSoundCount() - 1);
 		MLOG("A problem occurred when trying to load " + loadScreen->getSelectedFileName() + ": " + string(exception.what()));
 		lDisk->setBusy(false);
 		layeredScreen->openScreen("load");

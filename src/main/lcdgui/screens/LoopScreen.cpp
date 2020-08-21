@@ -121,11 +121,11 @@ void LoopScreen::turnWheel(int i)
 {
     init();
 
-	if (param == "")
-		return;
-	
     auto soundInc = getSoundIncrement(i);
 	auto sound = sampler.lock()->getSound().lock();
+
+	if (param == "" || !sound)
+		return;
 
 	auto const oldLoopLength = sound->getEnd() - sound->getLoopTo();
     

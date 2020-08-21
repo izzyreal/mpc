@@ -41,13 +41,15 @@ void SoundLoader::setPartOfProgram(bool b)
 
 int SoundLoader::loadSound(MpcFile* f)
 {
+	auto sound = mpc.getSampler().lock()->addSound().lock();
+
 	soundFile = f;
 	string soundFileName = soundFile->getName();
 	auto periodIndex = soundFileName.find_last_of('.');
 	string extension = "";
 	string soundName = "";
 	auto mono = false;
-	auto sampleRate = 0;
+	auto sampleRate = 44100;
 	auto start = 0;
 	auto end = 0;
 	auto loopTo = 0;
@@ -73,7 +75,6 @@ int SoundLoader::loadSound(MpcFile* f)
 		popupScreen->setText("LOADING " + StrUtil::padRight(soundFileName, " ", 16) + "." + extension);
 	}
 
-	auto sound = sampler->addSound(sampleRate).lock();
 	std::vector<float>* fa = sound->getSampleData();
 
 	if (StrUtil::eqIgnoreCase(extension, "wav"))
@@ -122,14 +123,9 @@ int SoundLoader::loadSound(MpcFile* f)
 		tune = (int)(floor(logOfBase(tuneFactor, rateToTuneBase) * 10.0));
 		
 		if (tune < -120)
-		{
 			tune = -120;
-		}
 		else if (tune > 120)
-		{
 			tune = 120;
-		}
-
 	}
 	else if (StrUtil::eqIgnoreCase(extension, "snd"))
 	{
@@ -148,6 +144,7 @@ int SoundLoader::loadSound(MpcFile* f)
 		beats = sndReader.getNumberOfBeats();
 	}
 
+	sound->setSampleRate(sampleRate);
 	sound->setName(soundName);
 	sound->setMono(mono);
 	sound->setStart(start);

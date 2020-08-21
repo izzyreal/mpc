@@ -75,9 +75,7 @@ void SndParamsScreen::function(int f)
 	case 4:
 	{
 		if (sampler.lock()->getSoundCount() == 0)
-		{
 			return;
-		}
 
 		auto editSoundScreen = dynamic_pointer_cast<EditSoundScreen>(mpc.screens->getScreenComponent("edit-sound"));
 		editSoundScreen->setReturnToScreenName("trim");
@@ -87,9 +85,7 @@ void SndParamsScreen::function(int f)
 	case 5:
 	{
 		if (mpc.getControls().lock()->isF6Pressed())
-		{
 			return;
-		}
 
 		mpc.getControls().lock()->setF6Pressed(true);
 		sampler.lock()->playX();

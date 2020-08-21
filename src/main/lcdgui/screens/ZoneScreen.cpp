@@ -135,9 +135,11 @@ void ZoneScreen::turnWheel(int i)
 {
 	init();
 
-	if (param == "")
+	auto sound = sampler.lock()->getSound().lock();
+
+	if (param == "" || !sound)
 		return;
-	
+
 	auto soundInc = getSoundIncrement(i);
 	auto field = findField(param).lock();
 
