@@ -596,7 +596,8 @@ void Sequencer::overdubFromStart()
 	play(true);
 }
 
-void Sequencer::stop(){
+void Sequencer::stop()
+{
 	stop(-1);
 }
 
@@ -605,7 +606,8 @@ void Sequencer::stop(int tick)
 	auto ams = mpc.getAudioMidiServices().lock();
 	bool bouncing = ams->isBouncing();
 
-	if (!isPlaying() && !bouncing) {
+	if (!isPlaying() && !bouncing)
+	{
 		if (position != 0)
             setBar(0); // real 2kxl doesn't do this
         return;
@@ -619,20 +621,23 @@ void Sequencer::stop(int tick)
 	auto s2 = getCurrentlyPlayingSequence().lock();
 	auto pos = getTickPosition();
 	
-	if (pos > s1->getLastTick()) {
+	if (pos > s1->getLastTick())
 		pos = s1->getLastTick();
-	}
 
 	int frameOffset = tick == -1 ? 0 : ams->getFrameSequencer().lock()->getEventFrameOffset(tick);
 	ams->getFrameSequencer().lock()->stop();
-	if (recording || overdubbing) {
+	
+	if (recording || overdubbing)
+	{
 		auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(mpc.screens->getScreenComponent("timing-correct"));
 		auto noteValue = timingCorrectScreen->getNoteValue();
 		s2->getTrack(activeTrackIndex).lock()->correctTimeRange(0, s2->getLastTick(), TICK_VALUES[noteValue]);
 	}
 
     auto notifynextsq = false;
-	if (nextsq != -1) {
+	
+	if (nextsq != -1)
+	{
 		notifynextsq = true;
 		nextsq = -1;
 
@@ -640,34 +645,28 @@ void Sequencer::stop(int tick)
 		// stop() is called by FrameSeq.
 		mpc.getLayeredScreen().lock()->setFocus("sq");
 	}
+
     recording = false;
     overdubbing = false;
     
     move(pos);
-	if (!bouncing) {
+
+	if (!bouncing)
 		mpc.getSampler().lock()->stopAllVoices(frameOffset);
-	}
-	for (int i = 0; i < 16; i++) {
+
+	for (int i = 0; i < 16; i++)
 		mpc.getHardware().lock()->getPad(i).lock()->notifyObservers(255);
-	}
-    if (notifynextsq) {
-        
+
+    if (notifynextsq)
         notifyObservers(string("nextsqoff"));
-    }
-    
-	notifyTimeDisplay();
-	
+    	
 	auto songScreen = dynamic_pointer_cast<SongScreen>(mpc.screens->getScreenComponent("song"));
 
     if (endOfSong)
-	{
 		songScreen->setOffset(songScreen->getOffset() + 1);
-    }
 	
 	if (bouncing)
-	{
 		ams->stopBouncing();
-	}
 	
 	auto hw = mpc.getHardware().lock();
 
@@ -675,7 +674,6 @@ void Sequencer::stop(int tick)
 	hw->getLed("play").lock()->light(false);
 	hw->getLed("rec").lock()->light(false);
 
-    
     notifyObservers(string("stop"));
 }
 

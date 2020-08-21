@@ -363,12 +363,8 @@ bool Component::IsDirty()
 	if (dirtyChild)
 		return true;
 
-	/*
 	if (dirty)
-	{
 		MLOG(name + " is dirty");
-	}
-	*/
 
 	return dirty;
 }

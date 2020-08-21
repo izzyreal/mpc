@@ -316,11 +316,14 @@ void SequencerScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 	else if (s.compare("nextsq") == 0)
 	{
 		ls.lock()->setFunctionKeysArrangement(1);
-		if (nextSqField->IsHidden()) {
+		
+		if (nextSqField->IsHidden())
+		{
 			nextSqField->Hide(false);
 			nextSqLabel->Hide(false);
 			ls.lock()->setFocus("nextsq");
 		}
+		
 		nextSqField->setTextPadded(sequencer.lock()->getNextSq() + 1, " ");
 	}
 	else if (s.compare("nextsqoff") == 0)
@@ -418,7 +421,7 @@ void SequencerScreen::pressEnter()
 	auto candidate = focusedField->enter();
 
 	if (candidate != INT_MAX)
-	{	
+	{
 		if (param.compare("now0") == 0)
 		{
 			sequencer.lock()->setBar(candidate - 1);

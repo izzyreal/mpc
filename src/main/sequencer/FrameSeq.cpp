@@ -269,24 +269,28 @@ void FrameSeq::work(int nFrames)
 	}
 }
 
-int FrameSeq::getEventFrameOffset(int tick) {
+int FrameSeq::getEventFrameOffset(int tick)
+{
 	return tickFrameOffset;
 }
 
-void FrameSeq::stop() {
-	if (!running) {
+void FrameSeq::stop()
+{
+	if (!running)
 		return;
-	}
+
 	running = false;
 	metronome = false;
 	tickFrameOffset = 0;
 }
 
-bool FrameSeq::isRunning() {
+bool FrameSeq::isRunning()
+{
 	return running;
 }
 
-int FrameSeq::getTickPosition() {
+int FrameSeq::getTickPosition()
+{
 	return clock.getTickPosition();
 }
 
@@ -306,9 +310,7 @@ void FrameSeq::repeatPad(int tick)
 	auto pp = controls->getPressedPads();
 
 	for (auto& i : *pp)
-	{
 		mpc.getActiveControls().lock()->pad(i, (*controls->getPressedPadVelos())[i], true, tick);
-	}
 }
 
 void FrameSeq::checkNextSq()
