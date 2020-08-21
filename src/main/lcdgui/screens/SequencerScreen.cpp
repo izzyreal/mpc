@@ -16,6 +16,7 @@
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 using namespace moduru::lang;
@@ -190,23 +191,28 @@ void SequencerScreen::displayTempo()
 void SequencerScreen::displayTempoLabel()
 {
 	auto currentRatio = -1;
-	for (auto& tce : sequencer.lock()->getActiveSequence().lock()->getTempoChangeEvents())
-	{
-		auto lTce = tce.lock();
-		if (lTce->getTick() > sequencer.lock()->getTickPosition())
-		{
-			break;
-		}
-		currentRatio = lTce->getRatio();
-	}
-	if (currentRatio != 1000)
-	{
-		findLabel("tempo").lock()->setText(u8"c\u00C0:");
-	}
-	else
+	auto sequence = sequencer.lock()->getActiveSequence().lock();
+
+	if (!sequence->isUsed())
 	{
 		findLabel("tempo").lock()->setText(u8" \u00C0:");
+		return;
 	}
+
+	for (auto& tce : sequence->getTempoChangeEvents())
+	{
+		auto lTce = tce.lock();
+		
+		if (lTce->getTick() > sequencer.lock()->getTickPosition())
+			break;
+	
+		currentRatio = lTce->getRatio();
+	}
+
+	if (currentRatio != 1000)
+		findLabel("tempo").lock()->setText(u8"c\u00C0:");
+	else
+		findLabel("tempo").lock()->setText(u8" \u00C0:");
 }
 
 void SequencerScreen::displayTempoSource()
