@@ -170,7 +170,8 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 	}
 }
 
-void VmpcDirectToDiskRecorderScreen::setSampleRate(int rate) {
+void VmpcDirectToDiskRecorderScreen::setSampleRate(int rate)
+{
 	if (rate < 0 || rate > 2)
 		return;
 
@@ -180,7 +181,7 @@ void VmpcDirectToDiskRecorderScreen::setSampleRate(int rate) {
 
 void VmpcDirectToDiskRecorderScreen::setRecord(int i)
 {
-	if (i < 0 || i > 4)
+	if (i < 0 || i > 3) // Record Jam is disabled. When enabled go up to 4
 		return;
 
 	record = i;
