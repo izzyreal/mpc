@@ -70,8 +70,6 @@ vector<string> screenNames = {
 "vmpc-settings",
 "vmpc-direct-to-disk-recorder",
 "vmpc-recording-finished",
-"buffer-size",
-"audio-midi-disabled",
 "mpc2000xlallfile",
 "copy-note-parameters",
 "assignment-view",

@@ -21,6 +21,8 @@ namespace mpc::lcdgui::screens::window
 		void open() override;
 
 	private:
+		int sourceSeqIndex = 0;
+		void setSourceSeqIndex(int i);
 		void displayFile();
 		void displayLoadInto();
 
