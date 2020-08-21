@@ -385,7 +385,7 @@ void TempoChangeScreen::function(int j)
 	}
 		break;
 	case 3:
-		ls.lock()->openScreen("sequencer");
+		openScreen("sequencer");
 		break;
 	case 4:
 	{

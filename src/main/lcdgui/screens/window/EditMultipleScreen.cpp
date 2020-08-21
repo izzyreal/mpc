@@ -108,7 +108,7 @@ void EditMultipleScreen::function(int i)
 		}
 
 		stepEditorScreen->clearSelection();
-		ls.lock()->openScreen("step-editor");
+		openScreen("step-editor");
 	}
 }
 

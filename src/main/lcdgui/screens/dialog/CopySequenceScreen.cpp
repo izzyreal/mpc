@@ -23,11 +23,11 @@ void CopySequenceScreen::function(int i)
 	switch (i) {
 	case 2:
 		sequencer.lock()->copySequence(sq0, sq1);
-		ls.lock()->openScreen("sequencer");
+		openScreen("sequencer");
 		break;
 	case 4:
 		sequencer.lock()->copySequence(sq0, sq1);
-		ls.lock()->openScreen("sequencer");
+		openScreen("sequencer");
 		break;
 	}
 }

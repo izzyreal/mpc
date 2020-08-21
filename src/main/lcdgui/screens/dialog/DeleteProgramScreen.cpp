@@ -30,10 +30,10 @@ void DeleteProgramScreen::function(int i)
 	switch (i)
     {
     case 2:
-        ls.lock()->openScreen("delete-all-programs");
+        openScreen("delete-all-programs");
         break;
     case 3:
-        ls.lock()->openScreen("program");
+        openScreen("program");
         break;
     case 4:
         if (sampler.lock()->getProgramCount() > 1)
@@ -46,7 +46,7 @@ void DeleteProgramScreen::function(int i)
 			sampler.lock()->deleteAllPrograms(initPgms);
 		}
         
-        ls.lock()->openScreen("program");
+        openScreen("program");
         break;
     }
 }

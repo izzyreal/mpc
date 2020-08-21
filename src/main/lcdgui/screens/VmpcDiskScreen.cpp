@@ -25,7 +25,7 @@ void VmpcDiskScreen::function(int i)
 	switch (i)
 	{
 	case 0:
-		ls.lock()->openScreen("vmpc-settings");
+		openScreen("vmpc-settings");
 		break;
 	}
 }

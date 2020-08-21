@@ -42,7 +42,7 @@ void BarsScreen::function(int j)
 	case 2:
 	case 3:
 		eventsScreen->tab = j;
-		ls.lock()->openScreen(eventsScreen->tabNames[eventsScreen->tab]);
+		openScreen(eventsScreen->tabNames[eventsScreen->tab]);
 	break;
 	case 4:
 		break;
@@ -130,7 +130,7 @@ void BarsScreen::function(int j)
 				}
 			}
 		}
-		ls.lock()->openScreen("sequencer");
+		openScreen("sequencer");
 		break;
 	}
 	}

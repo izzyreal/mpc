@@ -62,7 +62,7 @@ void CopyNoteParametersScreen::function(int i)
 		auto dest = dynamic_cast<mpc::sampler::Program*>(sampler.lock()->getProgram(prog1).lock().get());
 		auto clone = source->clone(note1);
 		dest->setNoteParameters(note1, clone);
-		ls.lock()->openScreen("program-assign");
+		openScreen("program-assign");
 		break;
 	}
 	}

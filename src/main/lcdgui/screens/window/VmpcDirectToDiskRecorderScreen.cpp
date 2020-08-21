@@ -77,7 +77,7 @@ void VmpcDirectToDiskRecorderScreen::turnWheel(int i)
 		nameScreen->setName(outputFolder);
 		nameScreen->setNameLimit(8);
 		nameScreen->parameterName = "output-folder";
-		ls.lock()->openScreen("name");
+		openScreen("name");
 	}
 }
 
@@ -88,7 +88,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 	switch (i)
 	{
 	case 3:
-		ls.lock()->openScreen("sequencer");
+		openScreen("sequencer");
 		break;
 	case 4:
 	{
@@ -108,20 +108,20 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 		{
 		case 0:
 		{
-			ls.lock()->openScreen("sequencer");
+			openScreen("sequencer");
 			sequence->setLoopEnabled(false);
 			auto lengthInFrames = mpc::sequencer::SeqUtil::sequenceFrameLength(sequence.get(), 0, sequence->getLastTick(), rate);
 			auto settings = make_unique<mpc::audiomidi::DirectToDiskSettings>(lengthInFrames, outputFolder, split, rate);
 			
 			if (!mpc.getAudioMidiServices().lock()->prepareBouncing(settings.get()))
-				ls.lock()->openScreen("vmpc-file-in-use");
+				openScreen("vmpc-file-in-use");
 			else			
 				sequencer.lock()->playFromStart();
 			break;
 		}
 		case 1:
 		{
-			ls.lock()->openScreen("sequencer");
+			openScreen("sequencer");
 			auto lengthInFrames = mpc::sequencer::SeqUtil::loopFrameLength(sequence.get(), rate);
 			auto settings = make_unique<mpc::audiomidi::DirectToDiskSettings>(lengthInFrames, outputFolder, split, rate);
 			sequence->setLoopEnabled(false);
@@ -132,7 +132,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 		}
 		case 2:
 		{
-			ls.lock()->openScreen("sequencer");
+			openScreen("sequencer");
 			auto lengthInFrames = mpc::sequencer::SeqUtil::sequenceFrameLength(sequence.get(), time0, time1, rate);
 			auto settings = make_unique<mpc::audiomidi::DirectToDiskSettings>(lengthInFrames, outputFolder, split, rate);
 			sequence->setLoopEnabled(false);
@@ -151,7 +151,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 			auto lengthInFrames = mpc::sequencer::SeqUtil::songFrameLength(mpcSong.get(), sequencer.lock().get(), rate);
 			auto settings = make_unique<mpc::audiomidi::DirectToDiskSettings>(lengthInFrames, outputFolder, split, rate);
 
-			ls.lock()->openScreen("song");
+			openScreen("song");
 
 			sequencer.lock()->setSongModeEnabled(true);
 
@@ -163,7 +163,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 			break;
 		}
 		case 4:
-			ls.lock()->openScreen("vmpc-record-jam");
+			openScreen("vmpc-record-jam");
 			break;
 		}
 	}

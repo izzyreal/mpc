@@ -28,7 +28,7 @@ void SoundScreen::turnWheel(int i)
 		auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
 		nameScreen->setName(findField("soundname").lock()->getText());
 		nameScreen->parameterName = "soundname";
-		ls.lock()->openScreen("name");
+		openScreen("name");
 	}
 }
 
@@ -39,13 +39,13 @@ void SoundScreen::function(int i)
 	switch (i)
 	{
 	case 1:
-		ls.lock()->openScreen("delete-sound");
+		openScreen("delete-sound");
 		break;
 	case 2:
-		ls.lock()->openScreen("convert-sound");
+		openScreen("convert-sound");
 		break;
 	case 4:
-		ls.lock()->openScreen("copy-sound");
+		openScreen("copy-sound");
 		break;
 	}
 }

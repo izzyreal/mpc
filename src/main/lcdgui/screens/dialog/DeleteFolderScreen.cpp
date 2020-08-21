@@ -32,7 +32,7 @@ void DeleteFolderScreen::deleteFolder()
 	disk->setBusy(true);
 
 	auto directoryScreen = dynamic_pointer_cast<DirectoryScreen>(mpc.screens->getScreenComponent("directory"));
-	ls.lock()->openScreen("popup");
+	openScreen("popup");
 	auto popupScreen = dynamic_pointer_cast<PopupScreen>(mpc.screens->getScreenComponent("popup"));
 	popupScreen->setText("Delete:" + directoryScreen->getSelectedFile()->getName());
 
@@ -43,7 +43,7 @@ void DeleteFolderScreen::deleteFolder()
 	}
 
 	this_thread::sleep_for(chrono::milliseconds(1000));
-	ls.lock()->openScreen("directory");
+	openScreen("directory");
 	disk->setBusy(false);
 }
 

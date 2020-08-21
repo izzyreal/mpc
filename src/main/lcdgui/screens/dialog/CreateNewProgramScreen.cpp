@@ -32,14 +32,14 @@ void CreateNewProgramScreen::function(int i)
 	switch (i)
 	{
 	case 3:
-		ls.lock()->openScreen("program");
+		openScreen("program");
 		break;
 	case 4:
 		auto newProgram = sampler.lock()->addProgram().lock();
 		newProgram->setName(newName);
 		newProgram->setMidiProgramChange(newProgramChange);
 		mpcSoundPlayerChannel->setProgram(sampler.lock()->getProgramCount() - 1);
-		ls.lock()->openScreen("program");
+		openScreen("program");
 		break;
 	}
 }

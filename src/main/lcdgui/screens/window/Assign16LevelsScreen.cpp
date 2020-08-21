@@ -36,7 +36,7 @@ void Assign16LevelsScreen::function(int i)
 	{
 		mpc.getHardware().lock()->getTopPanel().lock()->setSixteenLevelsEnabled(true);
 		mpc.getHardware().lock()->getLed("sixteen-levels").lock()->light(true);
-		ls.lock()->openScreen(ls.lock()->getPreviousScreenName());
+		openScreen(ls.lock()->getPreviousScreenName());
 		break;
 	}
     }

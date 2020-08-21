@@ -33,7 +33,7 @@ void EraseAllOffTracksScreen::function(int i)
 			}
 			trackCounter++;
 		}
-		ls.lock()->openScreen("sequencer");
+		openScreen("sequencer");
 		break;
 	}
 	}

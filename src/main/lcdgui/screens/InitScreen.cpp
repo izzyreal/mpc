@@ -18,10 +18,10 @@ void InitScreen::function(int i)
 	switch (i)
 	{
 	case 0:
-		ls.lock()->openScreen("others");
+		openScreen("others");
 		break;
 	case 2:
-		ls.lock()->openScreen("ver");
+		openScreen("ver");
 		break;
 	case 5:
 	{
@@ -31,7 +31,7 @@ void InitScreen::function(int i)
 		auto setupScreen = dynamic_pointer_cast<SetupScreen>(mpc.screens->getScreenComponent("setup"));
 		setupScreen->resetPreferences();
 
-		ls.lock()->openScreen("sequencer");
+		openScreen("sequencer");
 		break;
 	}
 	}

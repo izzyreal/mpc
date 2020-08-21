@@ -15,7 +15,7 @@ void VmpcRecordJamScreen::function(int i)
 	switch (i)
 	{
 	case 3:
-		ls.lock()->openScreen("vmpc-direct-to-disk-recorder");
+		openScreen("vmpc-direct-to-disk-recorder");
 		break;
 	case 4:
 	{
@@ -24,7 +24,7 @@ void VmpcRecordJamScreen::function(int i)
 		//auto lengthInFrames = 44100 * 60 * minutes;
 		//auto split = d2dRecorderGui->isSplitLR();
 		//thread(VmpcRecordJamScreen_function_1(this, lengthInFrames, outputFolder, split, minutes))->start();
-		ls.lock()->openScreen("sequencer");
+		openScreen("sequencer");
 		break;
 	}
 	}

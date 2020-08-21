@@ -42,7 +42,7 @@ void SaveAllFileScreen::turnWheel(int i)
 	if (param.compare("file") == 0)
 	{
 		nameScreen->parameterName = "save-all-file";
-		ls.lock()->openScreen("name");
+		openScreen("name");
 	}
 }
 
@@ -55,7 +55,7 @@ void SaveAllFileScreen::function(int i)
 	switch (i)
 	{
 	case 3:
-		ls.lock()->openScreen("save");
+		openScreen("save");
 		break;
 	case 4:
 	{
@@ -66,7 +66,7 @@ void SaveAllFileScreen::function(int i)
 
 		if (disk->checkExists(existStr))
 		{
-			ls.lock()->openScreen("file-already-exists");
+			openScreen("file-already-exists");
 			return;
 		}
 		
@@ -76,7 +76,7 @@ void SaveAllFileScreen::function(int i)
 		f->setFileData(&bytes);
 		disk->flush();
 		disk->initFiles();
-		ls.lock()->openScreen("save");
+		openScreen("save");
 		break;
 	}
 	}

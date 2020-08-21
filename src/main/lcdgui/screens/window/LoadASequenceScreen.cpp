@@ -80,13 +80,13 @@ void LoadASequenceScreen::function(int i)
 	switch (i)
 	{
 	case 3:
-		ls.lock()->openScreen("load");
+		openScreen("load");
 		sequencer.lock()->clearPlaceHolder();
 		break;
 	case 4:
 		sequencer.lock()->movePlaceHolderTo(loadInto);
 		sequencer.lock()->setActiveSequenceIndex(loadInto);
-		ls.lock()->openScreen("sequencer");
+		openScreen("sequencer");
 		break;
 	}
 }

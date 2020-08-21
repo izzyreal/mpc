@@ -30,7 +30,7 @@ void PasteEventScreen::function(int i)
 			auto eventClone = track.lock()->cloneEvent(event).lock();
 			eventClone->setTick(sequencer.lock()->getTickPosition());
 		}
-		ls.lock()->openScreen("step-editor");
+		openScreen("step-editor");
 		break;
 	}
 }

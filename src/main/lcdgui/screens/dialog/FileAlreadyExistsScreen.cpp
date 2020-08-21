@@ -54,9 +54,9 @@ void FileAlreadyExistsScreen::function(int i)
 				disk->flush();
 				disk->initFiles();
 				disk->writeSequence(sequencer.lock()->getActiveSequence().lock().get(), sfileName);
-				ls.lock()->openScreen("save");
+				openScreen("save");
 			}
-			ls.lock()->openScreen("save");
+			openScreen("save");
 		}
 		else if (ls.lock()->getPreviousScreenName().compare("save-aps-file") == 0)
 		{
@@ -86,7 +86,7 @@ void FileAlreadyExistsScreen::function(int i)
 				f->setFileData(&bytes);
 				disk->flush();
 				disk->initFiles();
-				ls.lock()->openScreen("save");
+				openScreen("save");
 			}
 		}
 		else if (ls.lock()->getPreviousScreenName().compare("save-a-sound") == 0)
@@ -117,7 +117,7 @@ void FileAlreadyExistsScreen::function(int i)
 
 			disk->flush();
 			disk->initFiles();
-			ls.lock()->openScreen("save");
+			openScreen("save");
 		}
 		break;
 	}
@@ -128,27 +128,27 @@ void FileAlreadyExistsScreen::function(int i)
 		if (ls.lock()->getPreviousScreenName().compare("save-a-program") == 0)
 		{
 			nameScreen->parameterName ="savingpgm";
-			ls.lock()->openScreen("name");
+			openScreen("name");
 		}
 		else if (ls.lock()->getPreviousScreenName().compare("save-a-sequence") == 0)
 		{
 			nameScreen->parameterName ="savingmid";
-			ls.lock()->openScreen("name");
+			openScreen("name");
 		}
 		else if (ls.lock()->getPreviousScreenName().compare("save-aps-file") == 0)
 		{
 			nameScreen->parameterName ="savingaps";
-			ls.lock()->openScreen("name");
+			openScreen("name");
 		}
 		else if (ls.lock()->getPreviousScreenName().compare("save-all-file") == 0)
 		{
 			nameScreen->parameterName ="save-all-file";
-			ls.lock()->openScreen("name");
+			openScreen("name");
 		}
 		else if (ls.lock()->getPreviousScreenName().compare("save-a-sound") == 0)
 		{
 			nameScreen->parameterName ="save-a-sound";
-			ls.lock()->openScreen("name");
+			openScreen("name");
 		}
 		break;
 	}

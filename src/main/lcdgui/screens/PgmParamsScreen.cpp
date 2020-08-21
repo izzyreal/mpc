@@ -49,25 +49,25 @@ void PgmParamsScreen::function(int i)
 	switch (i)
 	{
 	case 0:
-		ls.lock()->openScreen("program-assign");
+		openScreen("program-assign");
 		break;
 	case 1:
 	{	
 		auto selectDrumScreen = dynamic_pointer_cast<SelectDrumScreen>(mpc.screens->getScreenComponent("select-drum"));
 		selectDrumScreen->redirectScreen = "program-params";
-		ls.lock()->openScreen("select-drum");
+		openScreen("select-drum");
 		break;
 	}
 	case 2:
-		ls.lock()->openScreen("drum");
+		openScreen("drum");
 		break;
 	case 3:
-		ls.lock()->openScreen("purge");
+		openScreen("purge");
 		break;
 	case 4:
 	{
 		mpc.setPreviousSamplerScreenName("program-params");
-		ls.lock()->openScreen("auto-chromatic-assignment");
+		openScreen("auto-chromatic-assignment");
 		break;
 	}
 	case 5:
@@ -165,28 +165,28 @@ void PgmParamsScreen::openWindow()
 	if (param.compare("pgm") == 0)
 	{
 		mpc.setPreviousSamplerScreenName("program-params");
-		ls.lock()->openScreen("program");
+		openScreen("program");
 	}
 	else if (param.compare("note") == 0)
 	{
 		mpc.setPreviousSamplerScreenName("program-params");
-		ls.lock()->openScreen("copy-note-parameters");
+		openScreen("copy-note-parameters");
 	}
 	else if (param.compare("attack") == 0 || param.compare("decay") == 0 || param.compare("dcymd") == 0)
 	{
-		ls.lock()->openScreen("velocity-modulation");
+		openScreen("velocity-modulation");
 	}
 	else if (param.compare("freq") == 0 || param.compare("reson") == 0)
 	{
-		ls.lock()->openScreen("velo-env-filter");
+		openScreen("velo-env-filter");
 	}
 	else if (param.compare("tune") == 0)
 	{
-		ls.lock()->openScreen("velo-pitch");
+		openScreen("velo-pitch");
 	}
 	else if (param.compare("voiceoverlap") == 0)
 	{
-		ls.lock()->openScreen("mute-assign");
+		openScreen("mute-assign");
 	}
 }
 

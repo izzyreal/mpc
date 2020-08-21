@@ -35,15 +35,15 @@ void DeleteTrackScreen::function(int i)
 	switch (i)
 	{
 	case 2:
-		ls.lock()->openScreen("delete-all-tracks");
+		openScreen("delete-all-tracks");
 		break;
 	case 3:
-		ls.lock()->openScreen("sequence");
+		openScreen("sequence");
 		break;
 	case 4:
 		s = sequencer.lock()->getActiveSequence().lock();
 		s->purgeTrack(trackNumber);
-		ls.lock()->openScreen("sequencer");
+		openScreen("sequencer");
 	}
 }
 

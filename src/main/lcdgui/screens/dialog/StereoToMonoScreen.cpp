@@ -42,13 +42,13 @@ void StereoToMonoScreen::turnWheel(int i)
 	{
 		nameScreen->setName(findField("newlname").lock()->getText());
 		nameScreen->parameterName = "newlname";
-		ls.lock()->openScreen("name");
+		openScreen("name");
 	}
 	else if (param.compare("newrname") == 0)
 	{
 		nameScreen->setName(findField("newrname").lock()->getText());
 		nameScreen->parameterName = "newrname";
-		ls.lock()->openScreen("name");
+		openScreen("name");
 	}
 }
 
@@ -59,7 +59,7 @@ void StereoToMonoScreen::function(int i)
 	switch (i)
 	{
 	case 3:
-		ls.lock()->openScreen("sound");
+		openScreen("sound");
 		break;
 	case 4:
 	{
@@ -90,7 +90,7 @@ void StereoToMonoScreen::function(int i)
 		
 		left->setEnd(left->getSampleData()->size());
 		right->setEnd(right->getSampleData()->size());
-		ls.lock()->openScreen("sound");
+		openScreen("sound");
 		
 		break;
 	}

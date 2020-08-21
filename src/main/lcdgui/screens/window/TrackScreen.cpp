@@ -33,10 +33,10 @@ void TrackScreen::function(int i)
 	switch (i)
 	{
 	case 1:
-		ls.lock()->openScreen("delete-track");
+		openScreen("delete-track");
 		break;
 	case 4:
-		ls.lock()->openScreen("copy-track");
+		openScreen("copy-track");
 		break;
 	}
 }
@@ -60,5 +60,5 @@ void TrackScreen::turnWheel(int i)
 		nameScreen->setName(track.lock()->getName());
 	}
 	nameScreen->parameterName = param;
-	ls.lock()->openScreen("name");
+	openScreen("name");
 }

@@ -61,15 +61,15 @@ void LoopScreen::openWindow()
 	if (param.compare("snd") == 0)
 	{
 		sampler.lock()->setPreviousScreenName("loop");
-		ls.lock()->openScreen("sound");
+		openScreen("sound");
 	}
 	else if (param.compare("to") == 0)
 	{
-		ls.lock()->openScreen("loop-to-fine");
+		openScreen("loop-to-fine");
 	}
 	else if (param.compare("endlength") == 0 || param.compare("endlengthvalue") == 0)
 	{
-		ls.lock()->openScreen("loop-end-fine");
+		openScreen("loop-end-fine");
 	}
 }
 
@@ -80,7 +80,7 @@ void LoopScreen::function(int f)
 	switch (f)
 	{
 	case 0:
-		ls.lock()->openScreen("trim");
+		openScreen("trim");
 		break;
 	case 1:
 	{
@@ -92,10 +92,10 @@ void LoopScreen::function(int f)
 		break;
 	}
 	case 2:
-		ls.lock()->openScreen("zone");
+		openScreen("zone");
 		break;
 	case 3:
-		ls.lock()->openScreen("params");
+		openScreen("params");
 		break;
 	case 4:
 	{
@@ -104,7 +104,7 @@ void LoopScreen::function(int f)
 
 		auto editSoundScreen = dynamic_pointer_cast<EditSoundScreen>(mpc.screens->getScreenComponent("edit-sound"));
 		editSoundScreen->setReturnToScreenName("loop");
-		ls.lock()->openScreen("edit-sound");
+		openScreen("edit-sound");
 		break;
 	}
 	case 5:

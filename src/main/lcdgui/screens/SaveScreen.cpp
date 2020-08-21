@@ -38,13 +38,13 @@ void SaveScreen::function(int i)
 	switch (i)
 	{
 	case 0:
-		ls.lock()->openScreen("load");
+		openScreen("load");
 		break;
 	case 2:
-		ls.lock()->openScreen("format");
+		openScreen("format");
 		break;
 	case 3:
-		//ls.lock()->openScreen("setup");
+		//openScreen("setup");
 		break;
 	case 5:
 	{
@@ -58,7 +58,7 @@ void SaveScreen::function(int i)
 		case 0:
 		{
 			nameScreen->setName("ALL_SEQ_SONG1");
-			ls.lock()->openScreen("save-all-file");
+			openScreen("save-all-file");
 			break;
 		}
 		case 1:
@@ -66,15 +66,15 @@ void SaveScreen::function(int i)
 			if (!seq->isUsed()) return;
 
 			nameScreen->setName(seq->getName());
-			ls.lock()->openScreen("save-a-sequence");
+			openScreen("save-a-sequence");
 			break;
 		case 2:
 			nameScreen->setName("ALL_PGMS");
-			ls.lock()->openScreen("save-aps-file");
+			openScreen("save-aps-file");
 			break;
 		case 3:
 			nameScreen->setName(mpc::Util::getFileName(lProgram->getName()));
-			ls.lock()->openScreen("save-a-program");
+			openScreen("save-a-program");
 			break;
 		case 4:
 			if (sampler.lock()->getSoundCount() == 0)
@@ -82,7 +82,7 @@ void SaveScreen::function(int i)
 				break;
 			}
 			nameScreen->setName(sampler.lock()->getSoundName(sampler.lock()->getSoundIndex()));
-			ls.lock()->openScreen("save-a-sound");
+			openScreen("save-a-sound");
 			break;
 		}
 	}

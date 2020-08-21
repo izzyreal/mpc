@@ -54,15 +54,15 @@ void TrimScreen::openWindow()
 	if (param.compare("snd") == 0)
 	{
 		sampler.lock()->setPreviousScreenName("trim");
-		ls.lock()->openScreen("sound");
+		openScreen("sound");
 	}
 	else if (param.compare("st") == 0)
 	{
-		ls.lock()->openScreen("start-fine");
+		openScreen("start-fine");
 	}
 	else if (param.compare("end") == 0)
 	{
-		ls.lock()->openScreen("end-fine");
+		openScreen("end-fine");
 	}
 }
 
@@ -82,13 +82,13 @@ void TrimScreen::function(int f)
 		break;
 	}
 	case 1:
-		ls.lock()->openScreen("loop");
+		openScreen("loop");
 		break;
 	case 2:
-		ls.lock()->openScreen("zone");
+		openScreen("zone");
 		break;
 	case 3:
-		ls.lock()->openScreen("params");
+		openScreen("params");
 		break;
 	case 4:
 	{
@@ -100,7 +100,7 @@ void TrimScreen::function(int f)
 		auto editSoundScreen = dynamic_pointer_cast<EditSoundScreen>(mpc.screens->getScreenComponent("edit-sound"));
 		editSoundScreen->setReturnToScreenName("trim");
 		
-		ls.lock()->openScreen("edit-sound");
+		openScreen("edit-sound");
 		break;
 	}
 	case 5:

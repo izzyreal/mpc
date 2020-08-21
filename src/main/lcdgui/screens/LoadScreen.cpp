@@ -52,13 +52,13 @@ void LoadScreen::function(int i)
 	switch (i)
 	{
 	case 1:
-		ls.lock()->openScreen("save");
+		openScreen("save");
 		break;
 	case 2:
-		ls.lock()->openScreen("format");
+		openScreen("format");
 		break;
 	case 3:
-		//ls.lock()->openScreen("setup");
+		//openScreen("setup");
 		break;
 	case 4:
 	{
@@ -80,7 +80,7 @@ void LoadScreen::function(int i)
 			
 			auto name = file->getFsNode().lock()->getNameWithoutExtension();
 
-			ls.lock()->openScreen("popup");
+			openScreen("popup");
 			auto popupScreen = dynamic_pointer_cast<PopupScreen>(mpc.screens->getScreenComponent("popup"));
 
 			if (started)
@@ -112,25 +112,25 @@ void LoadScreen::function(int i)
 		
 		if (StrUtil::eqIgnoreCase(ext, "pgm"))
 		{
-			ls.lock()->openScreen("load-a-program");
+			openScreen("load-a-program");
 			return;
 		}
 		
 		if (StrUtil::eqIgnoreCase(ext, "mid"))
 		{
-			ls.lock()->openScreen("load-a-sequence");
+			openScreen("load-a-sequence");
 			return;
 		}
 		
 		if (StrUtil::eqIgnoreCase(ext, "all"))
 		{
-			ls.lock()->openScreen("mpc2000xl-all-file");
+			openScreen("mpc2000xl-all-file");
 			return;
 		}
 		
 		if (StrUtil::eqIgnoreCase(ext, "aps"))
 		{
-			ls.lock()->openScreen("load-aps-file");
+			openScreen("load-aps-file");
 			return;
 		}
 
@@ -173,7 +173,7 @@ void LoadScreen::openWindow()
 		directoryScreen->previousScreenName = "load";
 		directoryScreen->findYOffset0();
 		directoryScreen->setYOffset1(fileLoad);
-		ls.lock()->openScreen("directory");
+		openScreen("directory");
 		return;
 	}
 }

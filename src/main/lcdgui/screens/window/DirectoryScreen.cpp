@@ -71,11 +71,11 @@ void DirectoryScreen::function(int f)
 
 		if (loadScreen->getSelectedFile()->isDirectory())
 		{
-			ls.lock()->openScreen("delete-folder");
+			openScreen("delete-folder");
 		}
 		else
 		{
-			ls.lock()->openScreen("delete-file");
+			openScreen("delete-file");
 		}
 		break;
 	case 2:
@@ -94,7 +94,7 @@ void DirectoryScreen::function(int f)
 		}
 		
 		nameScreen->parameterName = "rename";
-		ls.lock()->openScreen("name");
+		openScreen("name");
 		break;
 	}
 	case 4:
@@ -106,7 +106,7 @@ void DirectoryScreen::function(int f)
 		nameScreen->setName("NEWFOLDR");
 		nameScreen->setNameLimit(8);
 		nameScreen->parameterName = "newfolder";
-		ls.lock()->openScreen("name");
+		openScreen("name");
 		break;
 	case 5:
 	{
@@ -128,7 +128,7 @@ void DirectoryScreen::function(int f)
 
 			auto name = file->getFsNode().lock()->getNameWithoutExtension();
 
-			ls.lock()->openScreen("popup");
+			openScreen("popup");
 			auto popupScreen = dynamic_pointer_cast<PopupScreen>(mpc.screens->getScreenComponent("popup"));
 
 			if (started)

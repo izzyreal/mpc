@@ -73,7 +73,7 @@ void TimingCorrectScreen::function(int i)
 
 		auto sequence = sequencer.lock()->getActiveSequence().lock();
 		track.lock()->shiftTiming(track.lock()->getEventRange(time0, time1), shiftTimingLater, amount, sequence->getLastTick());
-		ls.lock()->openScreen("sequencer");
+		openScreen("sequencer");
 		break;
 	}
 	}

@@ -15,10 +15,10 @@ void VerScreen::function(int i)
 	switch (i)
 	{
 	case 0:
-		ls.lock()->openScreen("others");
+		openScreen("others");
 		break;
 	case 1:
-		ls.lock()->openScreen("init");
+		openScreen("init");
 		break;
 	}
 }

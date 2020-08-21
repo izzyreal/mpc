@@ -38,8 +38,8 @@ void ChangeBars2Screen::function(int i)
 	switch (i)
 	{
 	case 2:
-		ls.lock()->openScreen("sequencer"); // Required for desired screen transitions
-		ls.lock()->openScreen("change-bars");
+		openScreen("sequencer"); // Required for desired screen transitions
+		openScreen("change-bars");
 		break;
 	case 4:
 	{
@@ -62,7 +62,7 @@ void ChangeBars2Screen::function(int i)
 		if (changed)
 			sequencer.lock()->move(0);
 
-		ls.lock()->openScreen("sequencer");
+		openScreen("sequencer");
 		break;
 	}
 	}

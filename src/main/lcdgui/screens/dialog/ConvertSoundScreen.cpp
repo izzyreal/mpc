@@ -31,23 +31,23 @@ void ConvertSoundScreen::function(int i)
 	switch (i)
 	{
 	case 3:
-		ls.lock()->openScreen("sound");
+		openScreen("sound");
 		break;
 	case 4:
 		if (convert == 0)
 		{
 			if (sampler.lock()->getSound().lock()->isMono())
 			{
-				ls.lock()->openScreen("mono-to-stereo");
+				openScreen("mono-to-stereo");
 			}
 			else
 			{
-				ls.lock()->openScreen("stereo-to-mono");
+				openScreen("stereo-to-mono");
 			}
 		}
 		else
 		{
-			ls.lock()->openScreen("resample");
+			openScreen("resample");
 		}
 	}
 }

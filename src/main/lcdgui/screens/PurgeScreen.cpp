@@ -23,19 +23,19 @@ void PurgeScreen::function(int f)
 	switch (f)
 	{
 	case 0:
-		ls.lock()->openScreen("program-assign");
+		openScreen("program-assign");
 		break;
 	case 1:
-		ls.lock()->openScreen("program-params");
+		openScreen("program-params");
 		break;
 	case 2:
-		ls.lock()->openScreen("drum");
+		openScreen("drum");
 		break;
 	case 3:
 	{
 		auto selectDrumScreen = dynamic_pointer_cast<SelectDrumScreen>(mpc.screens->getScreenComponent("select-drum"));
 		selectDrumScreen->redirectScreen = "purge";
-		ls.lock()->openScreen("select-drum");
+		openScreen("select-drum");
 		break;
 	}
 	case 5:

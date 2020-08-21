@@ -59,19 +59,19 @@ void ZoneScreen::openWindow()
 	if (param.compare("snd") == 0)
 	{
 		sampler.lock()->setPreviousScreenName("zone");
-		ls.lock()->openScreen("sound");
+		openScreen("sound");
 	}
 	else if (param.compare("zone") == 0)
 	{
-		ls.lock()->openScreen("number-of-zones");
+		openScreen("number-of-zones");
 	}
 	else if (param.compare("st") == 0)
 	{
-		ls.lock()->openScreen("zone-start-fine");
+		openScreen("zone-start-fine");
 	}
 	else if (param.compare("end") == 0)
 	{
-		ls.lock()->openScreen("zone-end-fine");
+		openScreen("zone-end-fine");
 	}
 }
 
@@ -82,10 +82,10 @@ void ZoneScreen::function(int f)
 	switch (f)
 	{
 	case 0:
-		ls.lock()->openScreen("trim");
+		openScreen("trim");
 		break;
 	case 1:
-		ls.lock()->openScreen("loop");
+		openScreen("loop");
 		break;
 	case 2:
 	{
@@ -97,7 +97,7 @@ void ZoneScreen::function(int f)
 		break;
 	}
 	case 3:
-		ls.lock()->openScreen("params");
+		openScreen("params");
 		break;
 	case 4:
 	{
@@ -106,7 +106,7 @@ void ZoneScreen::function(int f)
 
 		auto editSoundScreen = dynamic_pointer_cast<EditSoundScreen>(mpc.screens->getScreenComponent("edit-sound"));
 		editSoundScreen->setReturnToScreenName("zone");
-		ls.lock()->openScreen("edit-sound");
+		openScreen("edit-sound");
 		break;
 	}
 	case 5:

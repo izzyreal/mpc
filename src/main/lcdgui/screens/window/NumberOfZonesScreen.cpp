@@ -34,7 +34,7 @@ void NumberOfZonesScreen::function(int i)
 		auto sound = sampler.lock()->getSound().lock();
 		zoneScreen->numberOfZones = numberOfZones;
 		zoneScreen->initZones();
-		ls.lock()->openScreen("zone");
+		openScreen("zone");
 		break;
 	}
 }

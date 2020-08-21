@@ -80,7 +80,7 @@ void MonoToStereoScreen::function(int j)
 	switch (j)
 	{
 	case 3:
-		ls.lock()->openScreen("sound");
+		openScreen("sound");
 		break;
 	case 4:
 	{
@@ -113,7 +113,7 @@ void MonoToStereoScreen::function(int j)
 		newSound->setName(newStName);
 		newSound->setMono(false);
 		sampler.lock()->mergeToStereo(left->getSampleData(), &newSampleDataRight, newSound->getSampleData());
-		ls.lock()->openScreen("sound");
+		openScreen("sound");
 	}
 	}
 }

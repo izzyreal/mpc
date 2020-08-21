@@ -289,7 +289,7 @@ void MixerScreen::right()
 void MixerScreen::openWindow()
 {
 	init();
-	ls.lock()->openScreen("channel-settings");
+	openScreen("channel-settings");
 }
 
 void MixerScreen::function(int f)
@@ -304,17 +304,17 @@ void MixerScreen::function(int f)
 		if (f == tab)
 		{
 			lastTab = tab;
-			ls.lock()->openScreen("select-mixer-drum");
+			openScreen("select-mixer-drum");
 		}
 		else {
 			setTab(f);
 		}
 		break;
 	case 3:
-		ls.lock()->openScreen("mixer-setup");
+		openScreen("mixer-setup");
 		break;
 //	case 4:
-		//ls.lock()->openScreen("fx-edit"); // Not implemented
+		//openScreen("fx-edit"); // Not implemented
 	case 5:
 		setLink(!link);
 		break;

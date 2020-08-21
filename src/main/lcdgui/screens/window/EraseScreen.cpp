@@ -66,7 +66,7 @@ void EraseScreen::function(int i)
 	switch (i)
 	{
 	case 3:
-		ls.lock()->openScreen("sequencer");
+		openScreen("sequencer");
 		break;
 	case 4:
 	{
@@ -186,7 +186,7 @@ void EraseScreen::function(int i)
 				t->getEvents().erase(t->getEvents().begin() + integer);
 			}
 		}
-		ls.lock()->openScreen("sequencer");
+		openScreen("sequencer");
 		break;
 	}
 	}

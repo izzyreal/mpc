@@ -44,7 +44,7 @@ void InitPadAssignScreen::function(int i)
 			program.lock()->initPadAssign();
 		}
 		
-		ls.lock()->openScreen("program-assign");
+		openScreen("program-assign");
 		break;
 	}
 }

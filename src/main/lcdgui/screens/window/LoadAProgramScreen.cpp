@@ -40,7 +40,7 @@ void LoadAProgramScreen::function(int i)
 		break;
 	}
 	case 3:
-		ls.lock()->openScreen("load");
+		openScreen("load");
 		break;
 	case 4:
 		clearProgramWhenLoading = false;

@@ -33,7 +33,7 @@ void ChangeBarsScreen::function(int i)
 
 		seq->insertBars(numberOfBars, afterBar);
 
-		ls.lock()->openScreen("sequencer");
+		openScreen("sequencer");
 		break;
 	}
 	case 4:
@@ -42,7 +42,7 @@ void ChangeBarsScreen::function(int i)
 			sequencer.lock()->move(0);
 
 		seq->deleteBars(firstBar, lastBar);
-		ls.lock()->openScreen("sequencer");
+		openScreen("sequencer");
 		break;
 	}
 	}

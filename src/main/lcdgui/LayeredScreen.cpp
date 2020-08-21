@@ -19,6 +19,9 @@
 #include <lcdgui/screens/SampleScreen.hpp>
 #include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
+#include <hardware/Hardware.hpp>
+#include <hardware/Led.hpp>
+
 #include <file/FileUtil.hpp>
 #include <lang/StrUtil.hpp>
 
@@ -139,6 +142,12 @@ int LayeredScreen::openScreen(string screenName)
 
 	screenComponent->open();
 
+
+	vector<string> overdubScreens{ "step-editor", "paste-event", "insert-event", "edit-multiple", "step-timing-correct" };
+
+	auto isOverdubScreen = find(begin(overdubScreens), end(overdubScreens), currentScreenName) != end(overdubScreens);
+	mpc.getHardware().lock()->getLed("overdub").lock()->light(isOverdubScreen || mpc.getControls().lock()->isOverDubPressed());
+	
 	return focusedLayerIndex;
 }
 
@@ -151,9 +160,7 @@ void LayeredScreen::Draw()
 {
 	MLOG("LayeredScreen::Draw()");
 	for (auto& c : root->findHiddenChildren())
-	{
 		c.lock()->Draw(&pixels);
-	}
 
 	root->preDrawClear(&pixels);
 	root->Draw(&pixels);

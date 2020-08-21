@@ -41,7 +41,7 @@ void KeepOrRetryScreen::function(int i)
 	switch (i) {
 	case 1:
 		sampler.lock()->deleteSound(dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getPreviewSound().lock()));
-		ls.lock()->openScreen("sample");
+		openScreen("sample");
 		break;
 	case 3 :
 		if (mpc.getControls().lock()->isF4Pressed())
@@ -54,7 +54,7 @@ void KeepOrRetryScreen::function(int i)
 	case 4:
 		sampler.lock()->getLastNp(program.lock().get())->setSoundNumber(sampler.lock()->getSoundCount() - 1);
 		sampler.lock()->setSoundIndex(sampler.lock()->getSoundCount() - 1);
-		ls.lock()->openScreen("sample");
+		openScreen("sample");
 		break;
 	}
 }
@@ -65,7 +65,7 @@ void KeepOrRetryScreen::turnWheel(int i)
 	auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
 	nameScreen->setName(dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getPreviewSound().lock())->getName());
 	nameScreen->parameterName = param;
-    ls.lock()->openScreen("name");
+    openScreen("name");
 }
 
 void KeepOrRetryScreen::displayNameForNewSound()

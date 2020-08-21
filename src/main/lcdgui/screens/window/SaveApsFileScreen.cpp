@@ -29,7 +29,7 @@ void SaveApsFileScreen::turnWheel(int i)
 	if (param.compare("file") == 0)
 	{
 		nameScreen->parameterName = "saveapsname";
-		ls.lock()->openScreen("name");
+		openScreen("name");
 	}
 	else if (param.compare("save") == 0)
 	{
@@ -50,7 +50,7 @@ void SaveApsFileScreen::function(int i)
 	switch (i)
 	{
 	case 3:
-		ls.lock()->openScreen("save");
+		openScreen("save");
 		break;
 	case 4:
 	{

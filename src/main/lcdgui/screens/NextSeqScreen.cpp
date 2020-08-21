@@ -60,7 +60,7 @@ void NextSeqScreen::function(int i)
 	init();
 	
 	if (i == 5)
-		ls.lock()->openScreen("next-seq-pad");
+		openScreen("next-seq-pad");
 }
 
 void NextSeqScreen::displaySq()

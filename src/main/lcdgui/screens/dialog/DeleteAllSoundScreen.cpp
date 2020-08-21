@@ -15,11 +15,11 @@ void DeleteAllSoundScreen::function(int i)
 	switch (i)
 	{
 	case int(3) :
-		ls.lock()->openScreen("delete-sound");
+		openScreen("delete-sound");
 		break;
 	case 4:
 		sampler.lock()->deleteAllSamples();
-		ls.lock()->openScreen(sampler.lock()->getPreviousScreenName());
+		openScreen(sampler.lock()->getPreviousScreenName());
 		break;
 	}
 }

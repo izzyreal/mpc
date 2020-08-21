@@ -31,7 +31,7 @@ void CopySoundScreen::function(int i)
 
 	switch (i) {
 	case int(3) :
-		ls.lock()->openScreen("sound");
+		openScreen("sound");
 		break;
 	case 4:
 	{
@@ -39,7 +39,7 @@ void CopySoundScreen::function(int i)
 		auto newSound = sampler.lock()->copySound(sound);
 		newSound.lock()->setName(newName);
 		sampler.lock()->setSoundIndex(sampler.lock()->getSoundCount() - 1);
-		ls.lock()->openScreen("sound");
+		openScreen("sound");
 		break;
 	}
 	}
@@ -63,7 +63,7 @@ void CopySoundScreen::turnWheel(int i)
 		auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
 		nameScreen->setName(findField("newname").lock()->getText());
 		nameScreen->parameterName = "newname";
-		ls.lock()->openScreen("name");
+		openScreen("name");
 	}
 }
 

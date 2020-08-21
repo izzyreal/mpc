@@ -44,7 +44,7 @@ void SaveAProgramScreen::function(int i)
 	switch (i)
 	{
 	case 3:
-		ls.lock()->openScreen("save");
+		openScreen("save");
 		break;
 	case 4:
 	{
@@ -54,7 +54,7 @@ void SaveAProgramScreen::function(int i)
 		if (disk->checkExists(fileName))
 		{
 			nameScreen->setName(program.lock()->getName());
-			ls.lock()->openScreen("file-already-exists");
+			openScreen("file-already-exists");
 			break;
 		}
 

@@ -23,14 +23,14 @@ void CopyProgramScreen::function(int i)
 	
 	{
 	case int(3) :
-		ls.lock()->openScreen("program");
+		openScreen("program");
 		break;
 	case 4:
 		if (pgm0 == pgm1) {
 			return;
 		}
 
-		ls.lock()->openScreen("program");
+		openScreen("program");
 		break;
 	}
 }

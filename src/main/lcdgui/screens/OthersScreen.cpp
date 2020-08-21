@@ -54,10 +54,10 @@ void OthersScreen::function(int i)
 	switch (i)
 	{
 	case 1:
-		ls.lock()->openScreen("init");
+		openScreen("init");
 		break;
 	case 2:
-		ls.lock()->openScreen("ver");
+		openScreen("ver");
 		break;
 	}
 }

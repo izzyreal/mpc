@@ -35,14 +35,14 @@ void DeleteSequenceScreen::function(int i)
 	
 	switch (i) {
 	case 2:
-		ls.lock()->openScreen("delete-all-sequences");
+		openScreen("delete-all-sequences");
 		break;
 	case 3:
-		ls.lock()->openScreen("sequence");
+		openScreen("sequence");
 		break;
 	case 4:
 		sequencer.lock()->purgeSequence(sequencer.lock()->getActiveSequenceIndex());
-		ls.lock()->openScreen("sequencer");
+		openScreen("sequencer");
 		break;
 	}
 }

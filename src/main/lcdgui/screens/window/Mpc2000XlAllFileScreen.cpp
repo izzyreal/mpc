@@ -33,17 +33,17 @@ void Mpc2000XlAllFileScreen::function(int i)
 
 		loadScreen->fileLoad = 0;
 		
-		ls.lock()->openScreen("load-a-sequence-from-all");
+		openScreen("load-a-sequence-from-all");
 		break;
 	}
 	case 3:
-		ls.lock()->openScreen("load");
+		openScreen("load");
 		break;
 	case 4:
 	{
 		auto sequencesOnly = false;
 		mpc::disk::AllLoader allLoader(mpc, loadScreen->getSelectedFile(), sequencesOnly);
-		ls.lock()->openScreen("sequencer");
+		openScreen("sequencer");
 		break;
 	}
 	}

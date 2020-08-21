@@ -25,7 +25,7 @@ void MidiInputScreen::function(int i)
 	switch (i)
 	{
 	case 1:
-		ls.lock()->openScreen("midi-input-monitor");
+		openScreen("midi-input-monitor");
 		break;
 	}
 }

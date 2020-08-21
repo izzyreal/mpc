@@ -81,11 +81,11 @@ void LoadASoundScreen::function(int i)
 	case 3:
 		sampler.lock()->finishBasicVoice(); // Here we make sure the sound is not being played, so it can be removed from memory.
 		sampler.lock()->deleteSound(dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getPreviewSound().lock()));
-		ls.lock()->openScreen("load");
+		openScreen("load");
 		break;
 	case 4:
 		keepSound();
-		ls.lock()->openScreen("load");
+		openScreen("load");
 		break;
 	}
 }

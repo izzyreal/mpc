@@ -14,10 +14,10 @@ void FormatScreen::function(int i)
 	switch (i)
 	{
 	case 0:
-		ls.lock()->openScreen("load");
+		openScreen("load");
 		break;
 	case 1:
-		ls.lock()->openScreen("save");
+		openScreen("save");
 		break;
 	}
 }

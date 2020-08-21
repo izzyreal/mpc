@@ -20,10 +20,10 @@ void DeleteSoundScreen::function(int i)
 	switch (i)
 	{
     case 2:
-        ls.lock()->openScreen("delete-all-sound");
+        openScreen("delete-all-sound");
         break;
     case int (3):
-        ls.lock()->openScreen("sound");
+        openScreen("sound");
         break;
     case 4:
         sampler.lock()->deleteSample(sampler.lock()->getSoundIndex());
@@ -35,11 +35,11 @@ void DeleteSoundScreen::function(int i)
 		
 		if (sampler.lock()->getSoundCount() > 0)
 		{
-			ls.lock()->openScreen("sound");
+			openScreen("sound");
 		}
 		else
 		{
-			ls.lock()->openScreen(sampler.lock()->getPreviousScreenName());
+			openScreen(sampler.lock()->getPreviousScreenName());
 		}
         break;
     }

@@ -26,10 +26,10 @@ void SelectMixerDrumScreen::function(int i)
 	{
 		auto drumScreen = dynamic_pointer_cast<DrumScreen>(mpc.screens->getScreenComponent("drum"));
 		drumScreen->drum = i;
-		ls.lock()->openScreen("mixer");
+		openScreen("mixer");
 	}
 	else if (i == 4)
 	{
-		ls.lock()->openScreen("mixer-setup");
+		openScreen("mixer-setup");
 	}
 }

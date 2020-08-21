@@ -15,7 +15,7 @@ void VmpcRecordingFinishedScreen::function(int i)
 	switch (i)
     {
     case 3:
-        ls.lock()->openScreen("sequencer");
+        openScreen("sequencer");
         break;
     }
 }

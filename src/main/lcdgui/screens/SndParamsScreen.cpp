@@ -44,7 +44,7 @@ void SndParamsScreen::openWindow()
 	if (param.compare("snd") == 0)
 	{
 		sampler.lock()->setPreviousScreenName("params");
-		ls.lock()->openScreen("sound");
+		openScreen("sound");
 	}
 }
 
@@ -55,13 +55,13 @@ void SndParamsScreen::function(int f)
 	switch (f)
 	{
 	case 0:
-		ls.lock()->openScreen("trim");
+		openScreen("trim");
 		break;
 	case 1:
-		ls.lock()->openScreen("loop");
+		openScreen("loop");
 		break;
 	case 2:
-		ls.lock()->openScreen("zone");
+		openScreen("zone");
 		break;
 	case 3:
 	{
@@ -81,7 +81,7 @@ void SndParamsScreen::function(int f)
 
 		auto editSoundScreen = dynamic_pointer_cast<EditSoundScreen>(mpc.screens->getScreenComponent("edit-sound"));
 		editSoundScreen->setReturnToScreenName("trim");
-		ls.lock()->openScreen("edit-sound");
+		openScreen("edit-sound");
 		break;
 	}
 	case 5:

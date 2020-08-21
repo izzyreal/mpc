@@ -37,11 +37,11 @@ void SelectDrumScreen::function(int i)
 
 	if (redirectScreen.compare("") != 0)
 	{
-		ls.lock()->openScreen(redirectScreen);
+		openScreen(redirectScreen);
 		redirectScreen = "";
 	}
 	else {
-		ls.lock()->openScreen("program-assign");
+		openScreen("program-assign");
 	}
 	return;
 }

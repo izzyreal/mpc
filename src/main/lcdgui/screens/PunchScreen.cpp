@@ -15,13 +15,13 @@ void PunchScreen::open()
 {
     if (sequencer.lock()->isPlaying())
     {
-        ls.lock()->openScreen("trans");
+        openScreen("trans");
         return;
     }
 
     if (tab != 0)
     {
-        ls.lock()->openScreen(tabNames[tab]);
+        openScreen(tabNames[tab]);
         return;
     }
 
@@ -56,11 +56,11 @@ void PunchScreen::function(int i)
     case 1: // Intentional fall-through
     case 2:
         tab = i;
-        ls.lock()->openScreen(tabNames[i]);
+        openScreen(tabNames[i]);
         break;
     case 5:
         on = !on;
-        ls.lock()->openScreen("sequencer");
+        openScreen("sequencer");
         break;
     }
 }
@@ -123,12 +123,12 @@ void PunchScreen::displayBackground()
 
 void PunchScreen::rec()
 {
-    ls.lock()->openScreen("sequencer");
+    openScreen("sequencer");
     ScreenComponent::rec();
 }
 
 void PunchScreen::overDub()
 {
-    ls.lock()->openScreen("sequencer");
+    openScreen("sequencer");
     ScreenComponent::rec();
 }

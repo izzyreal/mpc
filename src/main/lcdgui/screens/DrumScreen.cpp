@@ -36,20 +36,20 @@ void DrumScreen::function(int f)
 	switch (f)
 	{
     case int (0):
-        ls.lock()->openScreen("program-assign");
+        openScreen("program-assign");
         break;
     case 1:
-        ls.lock()->openScreen("program-params");
+        openScreen("program-params");
         break;
     case 2:
 	{
 		auto selectDrumScreen = dynamic_pointer_cast<SelectDrumScreen>(mpc.screens->getScreenComponent("select-drum"));
 		selectDrumScreen->redirectScreen = "drum";
-		ls.lock()->openScreen("select-drum");
+		openScreen("select-drum");
 		break;
 	}
     case int (3):
-        ls.lock()->openScreen("purge");
+        openScreen("purge");
         break;
     }
 

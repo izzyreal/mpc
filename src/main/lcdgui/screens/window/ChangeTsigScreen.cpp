@@ -45,7 +45,7 @@ void ChangeTsigScreen::function(int i)
 			}
 		}
 
-        ls.lock()->openScreen("sequencer");
+        openScreen("sequencer");
         break;
     }
 }

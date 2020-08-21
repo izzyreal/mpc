@@ -46,7 +46,7 @@ void DeleteAllFilesScreen::function(int i)
 	switch (i)
 	{
 	case 3:
-		ls.lock()->openScreen("delete-file");
+		openScreen("delete-file");
 		ls.lock()->setPreviousScreenName("directory");
 		break;
 	case 4:
@@ -61,7 +61,7 @@ void DeleteAllFilesScreen::function(int i)
 			directoryScreen->yOffset1 = 0;
 			mpc.getDisk().lock()->initFiles();
 		}
-		ls.lock()->openScreen("directory");
+		openScreen("directory");
 		break;
 	}
 	}

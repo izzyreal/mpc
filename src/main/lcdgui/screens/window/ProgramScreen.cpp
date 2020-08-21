@@ -29,7 +29,7 @@ void ProgramScreen::turnWheel(int i)
 		auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
 		nameScreen->setName(program.lock()->getName());
 		nameScreen->parameterName = param;
-        ls.lock()->openScreen("name");
+        openScreen("name");
     }
 	else if (param.compare("midiprogramchange") == 0)
 	{
@@ -44,15 +44,15 @@ void ProgramScreen::function(int i)
 	switch (i)
 	{
 	case 1:
-		ls.lock()->openScreen("delete-program");
+		openScreen("delete-program");
 		break;
 	case 2:
 	{
-		ls.lock()->openScreen("create-new-program");
+		openScreen("create-new-program");
 		break;
 	}
 	case 4:
-		ls.lock()->openScreen("copy-program");
+		openScreen("copy-program");
 		break;
 	}
 }

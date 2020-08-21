@@ -31,7 +31,7 @@ void SaveASequenceScreen::turnWheel(int i)
 	{
 		auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
 		nameScreen->parameterName = "savesequencename";
-		ls.lock()->openScreen("name");
+		openScreen("name");
 	}
 }
 
@@ -43,21 +43,21 @@ void SaveASequenceScreen::function(int i)
 	switch (i)
 	{
 	case 3:
-		ls.lock()->openScreen("save");
+		openScreen("save");
 		break;
 	case 4:
 		auto fileName = mpc::Util::getFileName(nameScreen->getName()) + ".MID";
 		
 		if (mpc.getDisk().lock()->checkExists(fileName))
 		{
-			ls.lock()->openScreen("file-already-exists");
+			openScreen("file-already-exists");
 			return;
 		}
 		
 		auto seq = sequencer.lock()->getActiveSequence().lock();
 		
 		mpc.getDisk().lock()->writeSequence(seq.get(), fileName);
-		ls.lock()->openScreen("save");
+		openScreen("save");
 		break;
 	}
 }

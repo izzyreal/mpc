@@ -33,10 +33,10 @@ void SequenceScreen::function(int i)
 	switch (i)
 	{
 	case 1:
-		ls.lock()->openScreen("delete-sequence");
+		openScreen("delete-sequence");
 		break;
 	case 4:
-		ls.lock()->openScreen("copy-sequence");
+		openScreen("copy-sequence");
 		break;
 	}
 }
@@ -58,5 +58,5 @@ void SequenceScreen::turnWheel(int i)
 	}
 
 	nameScreen->parameterName = param;
-	ls.lock()->openScreen("name");
+	openScreen("name");
 }

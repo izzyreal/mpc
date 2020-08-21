@@ -62,7 +62,7 @@ void NextSeqPadScreen::function(int i)
 	switch (i)
 	{
 	case 5:
-		ls.lock()->openScreen("next-seq");
+		openScreen("next-seq");
 		break;
 	}
 }

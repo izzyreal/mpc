@@ -375,7 +375,7 @@ void EditSoundScreen::turnWheel(int i)
 		nameScreen->setName(findField("new-name").lock()->getText());
 		nameScreen->parameterName =  "newname";
 
-		ls.lock()->openScreen("name");
+		openScreen("name");
 	}
 	else if (param.compare("new-name") == 0 && edit == 3)
 	{
@@ -588,7 +588,7 @@ void EditSoundScreen::function(int j)
 					(*sound->getSampleData())[(i + sound->getFrameCount())] = 0.0f;
 			}
 
-			ls.lock()->openScreen(returnToScreenName);
+			openScreen(returnToScreenName);
 			break;
 		}
 		else if (edit == 6)
@@ -648,7 +648,7 @@ void EditSoundScreen::function(int j)
 			}
 
 			sound->getSampleData()->swap(newSampleData);
-			ls.lock()->openScreen(returnToScreenName);
+			openScreen(returnToScreenName);
 			break;
 		}
 		else if (edit == 7)
@@ -729,7 +729,7 @@ void EditSoundScreen::function(int j)
 			}
 		}
 
-		ls.lock()->openScreen(returnToScreenName);
+		openScreen(returnToScreenName);
 		break;
 	}
 }

@@ -54,7 +54,7 @@ void SaveASoundScreen::function(int i)
 	switch (i)
 	{
 	case 3:
-		ls.lock()->openScreen("save");
+		openScreen("save");
 		break;
 	case 4:
 	{
@@ -65,7 +65,7 @@ void SaveASoundScreen::function(int i)
 
 		if (disk->checkExists(fileName))
 		{
-			ls.lock()->openScreen("file-already-exists");
+			openScreen("file-already-exists");
 			return;
 		}
 		
@@ -85,7 +85,7 @@ void SaveASoundScreen::function(int i)
 
 		disk->flush();
 		disk->initFiles();
-		ls.lock()->openScreen("save");
+		openScreen("save");
 		break;
 	}
 	}

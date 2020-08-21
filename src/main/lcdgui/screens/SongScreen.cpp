@@ -102,7 +102,7 @@ void SongScreen::openWindow()
 	init();
 	if (param.compare("loop") == 0)
 	{
-		ls.lock()->openScreen("loop-song-window");
+		openScreen("loop-song-window");
 	}
 }
 

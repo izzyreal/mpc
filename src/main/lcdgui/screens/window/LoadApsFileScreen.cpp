@@ -16,7 +16,7 @@ void LoadApsFileScreen::function(int i)
 	switch (i)
 	{
 	case 3:
-		ls.lock()->openScreen("load");
+		openScreen("load");
 		break;
 	case 4:
 	{

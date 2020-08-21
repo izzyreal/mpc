@@ -29,7 +29,7 @@ void CopyTrackScreen::function(int i)
 	{
 		auto seqIndex = sequencer.lock()->getActiveSequenceIndex();
 		sequencer.lock()->copyTrack(tr0, tr1, seqIndex, seqIndex);
-		ls.lock()->openScreen("sequencer");
+		openScreen("sequencer");
 		break;
 	}
 	}

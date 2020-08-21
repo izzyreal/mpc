@@ -71,9 +71,7 @@ weak_ptr<Field> ScreenComponent::findFocus()
 	for (auto& field : findFields())
 	{
 		if (field.lock()->hasFocus())
-		{
 			return field;
-		}
 	}
 	return {};
 }

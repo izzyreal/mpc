@@ -44,7 +44,7 @@ void LoadASequenceFromAllScreen::function(int i)
 	switch (i)
 	{
 	case 3:
-		ls.lock()->openScreen("mpc2000xl-all-file");
+		openScreen("mpc2000xl-all-file");
 		break;
 	case 4:
 		auto loadASequenceFromAllScreen = dynamic_pointer_cast<LoadASequenceFromAllScreen>(mpc.screens->getScreenComponent("load-a-sequence-from-all"));
@@ -54,7 +54,7 @@ void LoadASequenceFromAllScreen::function(int i)
 		{
 			auto loadASequenceScreen = dynamic_pointer_cast<LoadASequenceScreen>(mpc.screens->getScreenComponent("load-a-sequence"));
 			sequencer.lock()->setSequence(loadASequenceScreen->loadInto, candidate);
-			ls.lock()->openScreen("sequencer");
+			openScreen("sequencer");
 		}
 		break;
 	}

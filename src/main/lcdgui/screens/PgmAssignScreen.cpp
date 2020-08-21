@@ -53,22 +53,22 @@ void PgmAssignScreen::function(int i)
 	{
 		auto selectDrumScreen = dynamic_pointer_cast<SelectDrumScreen>(mpc.screens->getScreenComponent("select-drum"));
 		selectDrumScreen->redirectScreen = "program-assign";
-		ls.lock()->openScreen("select-drum");
+		openScreen("select-drum");
 		break;
 	}
 	case 1:
-		ls.lock()->openScreen("program-params");
+		openScreen("program-params");
 		break;
 	case 2:
-		ls.lock()->openScreen("drum");
+		openScreen("drum");
 		break;
 	case 3:
-		ls.lock()->openScreen("purge");
+		openScreen("purge");
 		break;
 	case 4:
 	{
 		mpc.setPreviousSamplerScreenName("program-assign");
-		ls.lock()->openScreen("auto-chromatic-assignment");
+		openScreen("auto-chromatic-assignment");
 		break;
 	}
 	}
@@ -210,19 +210,19 @@ void PgmAssignScreen::openWindow()
 	if (param.compare("pgm") == 0)
 	{
 		mpc.setPreviousSamplerScreenName("program-assign");
-		ls.lock()->openScreen("program");
+		openScreen("program");
 	}
 	else if (param.compare("pad") == 0 || param.compare("pad-note") == 0)
 	{
-		ls.lock()->openScreen("assignment-view");
+		openScreen("assignment-view");
 	}
 	else if (param.compare("pad-assign") == 0)
 	{
-		ls.lock()->openScreen("init-pad-assign");
+		openScreen("init-pad-assign");
 	}
 	else if (param.compare("note") == 0)
 	{
-		ls.lock()->openScreen("copy-note-parameters");
+		openScreen("copy-note-parameters");
 	}
 	else if (param.compare("snd") == 0)
 	{
@@ -231,7 +231,7 @@ void PgmAssignScreen::openWindow()
 		{
 			sampler.lock()->setSoundIndex(sn);
 			sampler.lock()->setPreviousScreenName("program-assign");
-			ls.lock()->openScreen("sound");
+			openScreen("sound");
 		}
 	}
 }

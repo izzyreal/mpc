@@ -28,7 +28,7 @@ void MidiOutputScreen::turnWheel(int i)
 		nameScreen->setName(seq->getDeviceName(deviceNumber + i));
 		nameScreen->parameterName = "devicename";
 		nameScreen->setNameLimit(8);
-		ls.lock()->openScreen("name");
+		openScreen("name");
 	}
 	else if (param.compare("softthru") == 0)
 	{
@@ -47,7 +47,7 @@ void MidiOutputScreen::function(int i)
 	switch (i)
 	{
 	case 1:
-		ls.lock()->openScreen("midi-output-monitor");
+		openScreen("midi-output-monitor");
 		break;
 	}
 }

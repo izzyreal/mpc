@@ -56,7 +56,7 @@ void ResampleScreen::turnWheel(int i)
 		auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
 		nameScreen->setName(findField("newname").lock()->getText());
 		nameScreen->parameterName = "newname";
-		ls.lock()->openScreen("name");
+		openScreen("name");
 	}
 }
 
@@ -67,7 +67,7 @@ void ResampleScreen::function(int i)
 	switch (i)
 	{
 	case 3:
-		ls.lock()->openScreen("sound");
+		openScreen("sound");
 		break;
 	case 4:
 	{
@@ -133,7 +133,7 @@ void ResampleScreen::function(int i)
 		}
 
 		sampler.lock()->setSoundIndex(sampler.lock()->getSoundCount() - 1);
-		ls.lock()->openScreen("sound");
+		openScreen("sound");
 		break;
 	}
 	}

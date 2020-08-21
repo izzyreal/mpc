@@ -40,7 +40,7 @@ void EventsScreen::open()
 
 	if (tab != 0)
 	{
-		ls.lock()->openScreen(tabNames[tab]);
+		openScreen(tabNames[tab]);
 		return;
 	}
 
@@ -102,7 +102,7 @@ void EventsScreen::function(int i)
 	case 2:
 	case 3:
 		tab = i;
-		ls.lock()->openScreen(tabNames[tab]);
+		openScreen(tabNames[tab]);
 		break;
 	case 5:
 	{
@@ -253,7 +253,7 @@ void EventsScreen::function(int i)
 				}
 			}
 		}
-		ls.lock()->openScreen("sequencer");
+		openScreen("sequencer");
 	}
 	break;
 	}
