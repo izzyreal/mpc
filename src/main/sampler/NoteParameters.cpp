@@ -438,9 +438,9 @@ int NoteParameters::getVelocityToPitch()
     return velocityToPitch;
 }
 
-NoteParameters* NoteParameters::clone()
+NoteParameters* NoteParameters::clone(const int newNumber)
 {
-	auto res = new NoteParameters(this->number);
+	auto res = new NoteParameters(newNumber);
 	res->setAttack(attack);
 	res->setDecay(decay);
 	res->setDecayMode(decayMode);

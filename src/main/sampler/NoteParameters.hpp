@@ -97,7 +97,7 @@ namespace mpc::sampler
 		int getSliderParameterNumber();
 		void setVelocityToPitch(int i);
 		int getVelocityToPitch();
-		NoteParameters* clone();
+		NoteParameters* clone(const int newNumber);
 		int getNumber();
 
 		NoteParameters(int number);

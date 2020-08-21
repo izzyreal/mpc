@@ -60,7 +60,7 @@ void CopyNoteParametersScreen::function(int i)
 	{
 		auto source = dynamic_cast<mpc::sampler::NoteParameters*>(sampler.lock()->getProgram(prog0).lock()->getNoteParameters(mpc.getNote()));
 		auto dest = dynamic_cast<mpc::sampler::Program*>(sampler.lock()->getProgram(prog1).lock().get());
-		auto clone = source->clone();
+		auto clone = source->clone(note1);
 		dest->setNoteParameters(note1, clone);
 		ls.lock()->openScreen("program-assign");
 		break;

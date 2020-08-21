@@ -110,6 +110,9 @@ mpc::sampler::PgmSlider* Program::getSlider()
 
 void Program::setNoteParameters(int i, NoteParameters* nn)
 {
+	if (noteParameters[i] != nullptr)
+		delete noteParameters[i];
+
 	noteParameters[i] = nn;
 }
 
