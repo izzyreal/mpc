@@ -385,29 +385,25 @@ double Sequence::getInitialTempo()
 }
 
 void Sequence::setInitialTempo(const double initialTempo)
-{
-	auto str = to_string(initialTempo);
-	
+{	
 	this->initialTempo = initialTempo;
 
 	if (initialTempo < 30.0)
-	{
 		this->initialTempo = 30.0;
-	}
 	else if (initialTempo > 300.0)
-	{
 		this->initialTempo = 300.0;
-	}
 	
 	notifyObservers(string("initial-tempo"));
 }
 
 
-void Sequence::removeTempoChangeEvent(int i) {
+void Sequence::removeTempoChangeEvent(int i)
+{
 	metaTracks[2]->removeEvent(i);
 }
 
-void Sequence::removeTempoChangeEvent(weak_ptr<TempoChangeEvent> tce) {
+void Sequence::removeTempoChangeEvent(weak_ptr<TempoChangeEvent> tce)
+{
 	metaTracks[2]->removeEvent(tce);
 }
 
@@ -419,16 +415,16 @@ bool Sequence::isTempoChangeOn()
 void Sequence::setTempoChangeOn(bool b)
 {
 	tempoChangeOn = b;
-	
 	notifyObservers(string("tempochangeon"));
 }
 
 int Sequence::getLastTick()
 {
 	int lastTick = 0;
-	for (int i = 0; i < getLastBarIndex() + 1; i++) {
+	
+	for (int i = 0; i < getLastBarIndex() + 1; i++)
 		lastTick += barLengths[i];
-	}
+	
 	return lastTick;
 }
 
@@ -436,8 +432,13 @@ TimeSignature Sequence::getTimeSignature()
 {
 	auto ts = TimeSignature();
 	int bar = mpc.getSequencer().lock()->getCurrentBarIndex();
+
+	if (bar > lastBarIndex && bar != 0)
+		bar--;
+
 	ts.setNumerator(numerators[bar]);
 	ts.setDenominator(denominators[bar]);
+
 	return ts;
 }
 
@@ -445,7 +446,9 @@ void Sequence::sortTempoChangeEvents()
 {
 	metaTracks[2]->sortEvents();
 	int tceCounter = 0;
-	for (auto& e : metaTracks[2]->getEvents()) {
+
+	for (auto& e : metaTracks[2]->getEvents())
+	{
 		auto tce = dynamic_pointer_cast<TempoChangeEvent>(e.lock());
 		tce->setStepNumber(tceCounter);
 		tceCounter++;
@@ -459,9 +462,8 @@ void Sequence::sortTracks()
 
 void Sequence::purgeAllTracks()
 {
-	for (int i = 0; i < 64; i++) {
+	for (int i = 0; i < 64; i++)
 		purgeTrack(i);
-	}
 }
 
 weak_ptr<Track> Sequence::purgeTrack(int i)
@@ -486,7 +488,8 @@ vector<int>* Sequence::getBarLengths()
 	return &barLengths;
 }
 
-void Sequence::setBarLengths(vector<int>& newBarLengths) {
+void Sequence::setBarLengths(vector<int>& newBarLengths)
+{
 	barLengths = newBarLengths;
 }
 

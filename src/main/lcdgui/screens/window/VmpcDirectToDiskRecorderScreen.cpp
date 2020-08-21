@@ -310,11 +310,11 @@ void VmpcDirectToDiskRecorderScreen::displayTime()
 
 	auto sequence = mpc.getSequencer().lock()->getSequence(sq).lock();
 
-	findField("time0").lock()->setTextPadded(SeqUtil::getBar(sequence.get(), time0 + 1), "0");
-	findField("time1").lock()->setTextPadded(SeqUtil::getBeat(sequence.get(), time0 + 1), "0");
+	findField("time0").lock()->setTextPadded(SeqUtil::getBar(sequence.get(), time0 ) + 1, "0");
+	findField("time1").lock()->setTextPadded(SeqUtil::getBeat(sequence.get(), time0) + 1, "0");
 	findField("time2").lock()->setTextPadded(SeqUtil::getClock(sequence.get(), time0), "0");
-	findField("time3").lock()->setTextPadded(SeqUtil::getBar(sequence.get(), time1 + 1), "0");
-	findField("time4").lock()->setTextPadded(SeqUtil::getBeat(sequence.get(), time1 + 1), "0");
+	findField("time3").lock()->setTextPadded(SeqUtil::getBar(sequence.get(), time1) + 1, "0");
+	findField("time4").lock()->setTextPadded(SeqUtil::getBeat(sequence.get(), time1) + 1, "0");
 	findField("time5").lock()->setTextPadded(SeqUtil::getClock(sequence.get(), time1), "0");
 }
 
