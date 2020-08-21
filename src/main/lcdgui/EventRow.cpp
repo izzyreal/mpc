@@ -41,7 +41,7 @@ vector<string> EventRow::controlNames{ "BANK SEL MSB", "MOD WHEEL", "BREATH CONT
 EventRow::EventRow(mpc::Mpc& mpc, int rowIndex)
 	: Component("event-row-" + to_string(rowIndex)), rowIndex(rowIndex), mpc(mpc)
 {	
-	int w1 = 193;
+	int w1 = 194;
 	int h1 = 9;
 	int x1 = 0;
 	int y1 = 11 + (rowIndex * 9);
