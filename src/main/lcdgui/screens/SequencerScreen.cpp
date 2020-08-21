@@ -77,16 +77,11 @@ void SequencerScreen::open()
 	findChild("function-keys").lock()->Hide(punchScreen->on);
 
 	if (sequencer.lock()->isSecondSequenceEnabled())
-	{
 		findBackground().lock()->setName("sequencer-2nd");
-	}
 	else if (punchScreen->on && !sequencer.lock()->isRecordingOrOverdubbing())
-	{
 		findBackground().lock()->setName("sequencer-punch-active");
-	}
-	else {
+	else
 		findBackground().lock()->setName("sequencer");
-	}
 }
 
 void SequencerScreen::close()
@@ -119,13 +114,9 @@ void SequencerScreen::displayDeviceNumber()
 	else
 	{
 		if (track.lock()->getDevice() >= 17)
-		{
 			findField("devicenumber").lock()->setText(to_string(track.lock()->getDevice() - 16) + "B");
-		}
 		else
-		{
 			findField("devicenumber").lock()->setText(to_string(track.lock()->getDevice()) + "A");
-		}
 	}
 }
 
@@ -145,13 +136,9 @@ void SequencerScreen::displayBars()
 void SequencerScreen::displayPgm()
 {
 	if (track.lock()->getProgramChange() == 0)
-	{
 		findField("pgm").lock()->setText("OFF");
-	}
 	else
-	{
 		findField("pgm").lock()->setText(to_string(track.lock()->getProgramChange()));
-	}
 }
 
 void SequencerScreen::displayDeviceName()
@@ -172,13 +159,9 @@ void SequencerScreen::displayDeviceName()
 	else if (track.lock()->getBus() == 0)
 	{
 		if (track.lock()->getDevice() == 0)
-		{
 			findLabel("devicename").lock()->setText("NewPgm-A");
-		}
 		else
-		{
 			findLabel("devicename").lock()->setText(sequencer.lock()->getActiveSequence().lock()->getDeviceName(track.lock()->getDevice()));
-		}
 	}
 }
 

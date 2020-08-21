@@ -70,10 +70,6 @@ namespace mpc::lcdgui::screens
 		int tcValueRecordedNotes = 100;
 		int yOffset = 0;
 		int selectedEventNumber = 0;
-		int changeNoteToNumber = 35;
-		int changeVariationTypeNumber = 0;
-		int changeVariationValue = 0;
-		int editValue = 0;
 		int fromNotePad = 34;
 		int selectionStartIndex = -1;
 		int selectionEndIndex = -1;
@@ -87,6 +83,7 @@ namespace mpc::lcdgui::screens
 		void setControl(int i);
 		void setyOffset(int i);
 		void setSelectedEventIndex(int i);
+		void setSelectionEndIndex(int i);
 		void setFromNotePad(int i);
 		void setSelectionStartIndex(int i);
 		void setSelectedEvents();
@@ -101,12 +98,8 @@ namespace mpc::lcdgui::screens
 		void displayView();
 
 	public:
+		void finalizeSelection(int i);
 		void setAutoStepIncrementEnabled(bool b);
-		void setChangeNoteToIndex(int i);
-		void setChangeVariationTypeNumber(int i);
-		void setChangeVariationValue(int i);
-		void setEditValue(int i);
-		void setSelectionEndIndex(int i);
 		void setDurationOfRecordedNotes(bool b);
 		void setTcValueRecordedNotes(int i);
 
@@ -118,11 +111,7 @@ namespace mpc::lcdgui::screens
 		std::vector<std::weak_ptr<mpc::sequencer::Event>>& getSelectedEvents();
 		std::weak_ptr<mpc::sequencer::Event> getSelectedEvent();
 		std::string getSelectedParameterLetter();
-		int getChangeVariationTypeNumber();
-		int getChangeVariationValue();
 		void clearSelection();
-		int getChangeNoteToNumber();
-		int getEditValue();
 		int getYOffset();
 		std::vector<std::weak_ptr<mpc::sequencer::Event>>& getPlaceHolder();
 

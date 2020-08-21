@@ -529,7 +529,7 @@ void EventRow::setColors()
 
 	for (int i = 0; i < 5; i++)
 	{
-		if (selected)
+		if (selected && !dynamic_pointer_cast<EmptyEvent>(event.lock()))
 		{
 			parameters.lock()->setColor(true);
 			labels[i].lock()->setInverted(true);

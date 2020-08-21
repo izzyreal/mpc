@@ -199,9 +199,7 @@ void GlobalReleaseControls::tap()
 	controls->setTapPressed(false);
 
 	if (sequencer.lock()->isRecordingOrOverdubbing())
-	{
 		sequencer.lock()->flushTrackNoteCache();
-	}
 }
 
 void GlobalReleaseControls::shift()
@@ -215,7 +213,7 @@ void GlobalReleaseControls::shift()
 		auto eventNumber = stoi(param.substr(1, 2));
 		auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(mpc.screens->getScreenComponent("step-editor"));
 		auto res = eventNumber + stepEditorScreen->getYOffset();
-		stepEditorScreen->setSelectionEndIndex(res);
+		stepEditorScreen->finalizeSelection(res);
 	}
 }
 

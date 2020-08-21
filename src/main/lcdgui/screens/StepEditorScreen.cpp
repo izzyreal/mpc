@@ -3,6 +3,7 @@
 #include <audiomidi/EventHandler.hpp>
 
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
+#include <lcdgui/screens/window/EditMultipleScreen.hpp>
 
 #include <sequencer/ChannelPressureEvent.hpp>
 #include <sequencer/ControlChangeEvent.hpp>
@@ -41,9 +42,7 @@ StepEditorScreen::StepEditorScreen(mpc::Mpc& mpc, const int layerIndex)
 	lastColumn["tempo-change"] = "a";
 
 	for (int i = 0; i < EVENT_ROW_COUNT; i++)
-	{
 		addChild(make_shared<EventRow>(mpc, i)).lock();
-	}
 }
 
 void StepEditorScreen::open()
@@ -95,6 +94,14 @@ void StepEditorScreen::close()
 	sequencer.lock()->deleteObserver(this);
 	track.lock()->deleteObserver(this);
 
+	if (param.length() == 2)
+	{
+		int srcNumber = stoi(param.substr(1, 2));
+		auto srcLetter = param.substr(0, 1);
+		auto eventType = visibleEvents[srcNumber].lock()->getTypeName();
+		lastColumn[eventType] = srcLetter;
+	}
+
 	auto nextScreen = ls.lock()->getCurrentScreenName();
 
 	if (nextScreen.compare("step-timing-correct") != 0 &&
@@ -107,18 +114,10 @@ void StepEditorScreen::close()
 	for (auto& e : visibleEvents)
 	{
 		if (e.lock())
-		{
 			e.lock()->deleteObserver(this);
-		}
 	}
 
-	if (param.length() == 2)
-	{
-		int srcNumber = stoi(param.substr(1, 2));
-		auto srcLetter = param.substr(0, 1);
-		auto eventType = visibleEvents[srcNumber].lock()->getTypeName();
-		lastColumn[eventType] = srcLetter;
-	}
+	clearSelection();
 }
 
 void StepEditorScreen::function(int i)
@@ -148,9 +147,7 @@ void StepEditorScreen::function(int i)
 	case 2:
 	{
 		if (param.length() != 2)
-		{
 			return;
-		}
 
 		auto rowIndex = stoi(param.substr(1, 2));
 
@@ -173,9 +170,7 @@ void StepEditorScreen::function(int i)
 			}
 
 			if (rowIndex == 2 && yOffset > 0)
-			{
 				yOffset--;
-			}
 		}
 
 		initVisibleEvents();
@@ -193,103 +188,95 @@ void StepEditorScreen::function(int i)
 		if (selectionEndIndex == -1)
 		{
 			if (!posIsLastTick)
-			{
 				ls.lock()->openScreen("insert-event");
-			}
 		}
 		else
 		{
-			auto eventNumber = stoi(param.substr(1, 2));
-			auto eventLetter = param.substr(0, 1);
+			auto row = stoi(param.substr(1, 2));
+			auto column = param.substr(0, 1);
 
-			auto ne = dynamic_pointer_cast<NoteEvent>(visibleEvents[eventNumber].lock());
-			auto pbe = dynamic_pointer_cast<PitchBendEvent>(visibleEvents[eventNumber].lock());
-			auto pce = dynamic_pointer_cast<ProgramChangeEvent>(visibleEvents[eventNumber].lock());
-			auto cpe = dynamic_pointer_cast<ChannelPressureEvent>(visibleEvents[eventNumber].lock());
-			auto ppe = dynamic_pointer_cast<PolyPressureEvent>(visibleEvents[eventNumber].lock());
-			auto cce = dynamic_pointer_cast<ControlChangeEvent>(visibleEvents[eventNumber].lock());
-			auto sysex = dynamic_pointer_cast<SystemExclusiveEvent>(visibleEvents[eventNumber].lock());
-			auto me = dynamic_pointer_cast<MixerEvent>(visibleEvents[eventNumber].lock());
+			auto noteEvent = dynamic_pointer_cast<NoteEvent>(visibleEvents[row].lock());
+			auto pitchEvent = dynamic_pointer_cast<PitchBendEvent>(visibleEvents[row].lock());
+			auto pgmChangeEvent = dynamic_pointer_cast<ProgramChangeEvent>(visibleEvents[row].lock());
+			auto chPressEvent = dynamic_pointer_cast<ChannelPressureEvent>(visibleEvents[row].lock());
+			auto polyPressEvent = dynamic_pointer_cast<PolyPressureEvent>(visibleEvents[row].lock());
+			auto controlChangeEvent = dynamic_pointer_cast<ControlChangeEvent>(visibleEvents[row].lock());
+			auto sysexEvent = dynamic_pointer_cast<SystemExclusiveEvent>(visibleEvents[row].lock());
+			auto mixerEvent = dynamic_pointer_cast<MixerEvent>(visibleEvents[row].lock());
+			auto emptyEvent = dynamic_pointer_cast<EmptyEvent>(visibleEvents[row].lock());
 
-			if (pbe || me || sysex)
-			{
+			if (pitchEvent || mixerEvent || sysexEvent || emptyEvent)
 				return;
-			}
 
-			bool isA = eventLetter.compare("a") == 0;
-			bool isB = eventLetter.compare("b") == 0;
-			bool isC = eventLetter.compare("c") == 0;
-			bool isD = eventLetter.compare("d") == 0;
-			bool isE = eventLetter.compare("e") == 0;
+			bool isA = column.compare("a") == 0;
+			bool isB = column.compare("b") == 0;
+			bool isC = column.compare("c") == 0;
+			bool isD = column.compare("d") == 0;
+			bool isE = column.compare("e") == 0;
 
-			if ((ppe || cce) && isA)
-			{
+			if ((polyPressEvent || controlChangeEvent) && isA)
 				return;
-			}
 
-			if (ne && track.lock()->getBus() != 0)
+			auto editMultipleScreen = dynamic_pointer_cast<EditMultipleScreen>(mpc.screens->getScreenComponent("edit-multiple"));
+
+			if (noteEvent && track.lock()->getBus() != 0)
 			{
 				if (isA)
 				{
-					setChangeNoteToIndex(ne->getNote());
+					editMultipleScreen->setChangeNoteToIndex(noteEvent->getNote());
 				}
 				else if (isB)
 				{
-					setChangeVariationTypeNumber(ne->getVariationTypeNumber());
+					editMultipleScreen->setChangeVariationTypeNumber(noteEvent->getVariationTypeNumber());
 				}
 				else if (isC)
 				{
-					setChangeVariationTypeNumber(ne->getVariationTypeNumber());
-					setChangeVariationValue(ne->getVariationValue());
+					editMultipleScreen->setChangeVariationTypeNumber(noteEvent->getVariationTypeNumber());
+					editMultipleScreen->setChangeVariationValue(noteEvent->getVariationValue());
 				}
 				else if (isD)
 				{
-					setEditValue(ne->getDuration());
+					editMultipleScreen->setEditValue(noteEvent->getDuration());
 				}
 				else if (isE)
 				{
-					setEditValue(ne->getVelocity());
+					editMultipleScreen->setEditValue(noteEvent->getVelocity());
 				}
 			}
 
-			if (ne && track.lock()->getBus() == 0)
+			if (noteEvent && track.lock()->getBus() == 0)
 			{
 				if (isA)
-				{
-					setChangeNoteToIndex(ne->getNote());
-				}
+					editMultipleScreen->setChangeNoteToIndex(noteEvent->getNote());
 				else if (isB)
-				{
-					setEditValue(ne->getDuration());
-				}
+					editMultipleScreen->setEditValue(noteEvent->getDuration());
 				else if (isC)
-				{
-					setEditValue(ne->getVelocity());
-				}
+					editMultipleScreen->setEditValue(noteEvent->getVelocity());
 			}
-			else if (pce)
+			else if (pgmChangeEvent)
 			{
-				setEditValue(pce->getProgram());
+				editMultipleScreen->setEditValue(pgmChangeEvent->getProgram());
 			}
-			else if (cpe)
+			else if (chPressEvent)
 			{
-				setEditValue(cpe->getAmount());
+				editMultipleScreen->setEditValue(chPressEvent->getAmount());
 			}
-			else if (ppe)
+			else if (polyPressEvent)
 			{
-				setEditValue(ppe->getAmount());
+				editMultipleScreen->setEditValue(polyPressEvent->getAmount());
 			}
-			else if (cce)
+			else if (controlChangeEvent)
 			{
-				setEditValue(cce->getAmount());
+				editMultipleScreen->setEditValue(controlChangeEvent->getAmount());
 			}
 
-			setSelectedEvent(visibleEvents[eventNumber]);
+			setSelectedEvent(visibleEvents[row]);
 			setSelectedEvents();
-			setSelectedParameterLetter(eventLetter);
+			setSelectedParameterLetter(column);
 			ls.lock()->openScreen("edit-multiple");
-			break;
 		}
+
+		break;
 	}
 	case 4:
 		if (placeHolder.size() != 0)
@@ -603,6 +590,9 @@ void StepEditorScreen::up()
 		int srcNumber = stoi(src.substr(1, 2));
 		auto controls = mpc.getControls().lock();
 		
+		if (controls->isShiftPressed() && selectionStartIndex == -1 && dynamic_pointer_cast<EmptyEvent>(visibleEvents[srcNumber].lock()))
+			return;
+
 		if (!controls->isShiftPressed() && srcNumber == 0 && yOffset == 0)
 		{
 			clearSelection();
@@ -625,9 +615,9 @@ void StepEditorScreen::up()
 			ls.lock()->setFocus(lastColumn[newEventType] + to_string(srcNumber));
 
 			if (controls->isShiftPressed())
-			{
 				setSelectionEndIndex(srcNumber + yOffset);
-			}
+
+			refreshSelection();
 			return;
 		}
 
@@ -671,9 +661,7 @@ void StepEditorScreen::down()
 			ls.lock()->setFocus(newColumn + "3");
 
 			if (controls->isShiftPressed() && dynamic_pointer_cast<EmptyEvent>(visibleEvents[3].lock()))
-			{
 				setSelectionEndIndex(srcNumber + yOffset);
-			}
 			
 			refreshSelection();
 			return;
@@ -687,6 +675,7 @@ void StepEditorScreen::shift()
 {
 	init();
 	baseControls->shift();
+
 	if (param.length() == 2)
 	{
 		auto eventNumber = stoi(param.substr(1, 2));
@@ -706,7 +695,7 @@ void StepEditorScreen::downOrUp(int increment)
 		
 		if (srcNumber + increment != -1)
 		{
-			if (!controls->isShiftPressed() && visibleEvents[srcNumber + increment].lock())
+			if (visibleEvents[srcNumber + increment].lock())
 			{
 				auto oldEventType = visibleEvents[srcNumber].lock()->getTypeName();
 				lastColumn[oldEventType] = srcLetter;
@@ -730,18 +719,13 @@ void StepEditorScreen::downOrUp(int increment)
 
 void StepEditorScreen::refreshSelection()
 {
-	auto firstEventIndex = selectionStartIndex;
-	auto lastEventIndex = selectionEndIndex;
+	auto firstEventIndex = min(selectionStartIndex, selectionEndIndex);
+	auto lastEventIndex = max(selectionStartIndex, selectionEndIndex);
+
 	bool somethingSelected = false;
 	
 	if (firstEventIndex != -1)
 	{
-		if (firstEventIndex > lastEventIndex)
-		{
-			firstEventIndex = selectionEndIndex;
-			lastEventIndex = selectionStartIndex;
-		}
-
 		for (int i = 0; i < EVENT_ROW_COUNT; i++)
 		{
 			int absoluteEventNumber = i + yOffset;
@@ -1118,9 +1102,8 @@ void StepEditorScreen::setSelectedEventIndex(int i)
 void StepEditorScreen::setFromNotePad(int i)
 {
 	if (i < 34 || i > 98)
-	{
 		return;
-	}
+
 	fromNotePad = i;
 
 	setViewNotesText();
@@ -1135,9 +1118,7 @@ void StepEditorScreen::setFromNotePad(int i)
 void StepEditorScreen::setSelectionStartIndex(int i)
 {
 	if (dynamic_pointer_cast<EmptyEvent>(eventsAtCurrentTick[i].lock()))
-	{
 		return;
-	}
 
 	selectionStartIndex = i;
 	selectionEndIndex = i;
@@ -1157,15 +1138,23 @@ void StepEditorScreen::clearSelection()
 void StepEditorScreen::setSelectionEndIndex(int i)
 {
 	if (i == -1)
-	{
 		return;
+
+	selectionEndIndex = i;	
+	refreshSelection();
+}
+
+void StepEditorScreen::finalizeSelection(int i)
+{
+	selectionEndIndex = i;
+	
+	if (selectionEndIndex < selectionStartIndex)
+	{
+		auto oldSelectionStartIndex = selectionStartIndex;
+		selectionStartIndex = selectionEndIndex;
+		selectionEndIndex = oldSelectionStartIndex;
 	}
 
-	if (dynamic_pointer_cast<EmptyEvent>(eventsAtCurrentTick[i].lock()))
-	{
-		return;
-	}
-	selectionEndIndex = i;
 	refreshSelection();
 }
 
@@ -1197,36 +1186,11 @@ void StepEditorScreen::checkSelection()
 		return;
 	}
 
-	int eventNumber = stoi(focus.substr(1, 2));
-	int  visibleEventCounter = 0;
-	int firstSelectedVisibleEventIndex = -1;
-	auto selectedEventCounter = 0;
+	int row = stoi(focus.substr(1, 2));
+	int eventIndex = row + yOffset;
 
-	for (auto& EventRowParameters : findEventRowParameterss())
-	{
-		if (!EventRowParameters.lock()->IsHidden())
-		{
-			if (firstSelectedVisibleEventIndex == -1)
-			{
-				firstSelectedVisibleEventIndex = visibleEventCounter;
-			}
-			selectedEventCounter++;
-		}
-		visibleEventCounter++;
-	}
-
-	if (firstSelectedVisibleEventIndex != -1)
-	{
-		int lastSelectedVisibleEventIndex = firstSelectedVisibleEventIndex + selectedEventCounter - 1;
-
-		if (!dynamic_pointer_cast<EmptyEvent>(visibleEvents[eventNumber].lock()))
-		{
-			if (eventNumber < firstSelectedVisibleEventIndex || eventNumber > lastSelectedVisibleEventIndex)
-			{
-				clearSelection();
-			}
-		}
-	}
+	if (eventIndex < selectionStartIndex || eventIndex > selectionEndIndex)
+		clearSelection();
 }
 
 void StepEditorScreen::setSelectedEvent(weak_ptr<Event> event)
@@ -1239,52 +1203,6 @@ void StepEditorScreen::setSelectedParameterLetter(string str)
 	selectedParameterLetter = str;
 }
 
-void StepEditorScreen::setChangeNoteToIndex(int i)
-{
-	if (i < 0 || i > 127)
-	{
-		return;
-	}
-	changeNoteToNumber = i;
-	// Should call 		updateEditMultiple(); in StepWindowObserver
-}
-
-void StepEditorScreen::setChangeVariationTypeNumber(int i)
-{
-	if (i < 0 || i > 3)
-	{
-		return;
-	}
-	changeVariationTypeNumber = i;
-	// Should call 		updateEditMultiple(); in StepWindowObserver
-}
-
-void StepEditorScreen::setChangeVariationValue(int i)
-{
-	if (i < 0 || i > 128)
-	{
-		return;
-	}
-	
-	if (changeVariationTypeNumber != 0 && i > 100)
-	{
-		i = 100;
-	}
-	
-	changeVariationValue = i;
-	// Should call 		updateEditMultiple(); in StepWindowObserver
-}
-
-void StepEditorScreen::setEditValue(int i)
-{
-	if (i < 0 || i > 127)
-	{
-		return;
-	}
-
-	editValue = i;
-	// Should call 		updateEditMultiple(); in StepWindowObserver
-}
 
 void StepEditorScreen::removeEvents()
 {
@@ -1303,21 +1221,18 @@ void StepEditorScreen::removeEvents()
 	vector<weak_ptr<Event>> tempList;
 	
 	for (auto& e : eventsAtCurrentTick)
-	{
 		tempList.push_back(e);
-	}
 	
 	for (auto& event : tempList)
 	{
 		if (eventCounter >= firstEventIndex && eventCounter <= lastEventIndex)
 		{
 			if (!dynamic_pointer_cast<EmptyEvent>(event.lock()))
-			{
 				track.lock()->removeEvent(event);
-			}
 		}
 		eventCounter++;
 	}
+
 	clearSelection();
 	setyOffset(0);
 }
@@ -1358,13 +1273,9 @@ void StepEditorScreen::update(moduru::observer::Observable*, nonstd::any message
 		if (dynamic_pointer_cast<NoteEvent>(visibleEvents[eventNumber].lock()))
 		{
 			if (track.lock()->getBus() != 0)
-			{
 				eventRow->setDrumNoteEventValues();
-			}
 			else
-			{
 				eventRow->setMidiNoteEventValues();
-			}
 		}
 		else if (dynamic_pointer_cast<MixerEvent>(visibleEvents[eventNumber].lock()))
 		{
@@ -1404,27 +1315,24 @@ void StepEditorScreen::update(moduru::observer::Observable*, nonstd::any message
 	else if (msg.compare("bar") == 0)
 	{
 		if (sequencer.lock()->isPlaying())
-		{
 			return;
-		}
+
 		findField("now0").lock()->setTextPadded(sequencer.lock()->getCurrentBarIndex() + 1, "0");
 		setyOffset(0);
 	}
 	else if (msg.compare("beat") == 0)
 	{
 		if (sequencer.lock()->isPlaying())
-		{
 			return;
-		}
+
 		findField("now1").lock()->setTextPadded(sequencer.lock()->getCurrentBeatIndex() + 1, "0");
 		setyOffset(0);
 	}
 	else if (msg.compare("clock") == 0)
 	{
 		if (sequencer.lock()->isPlaying())
-		{
 			return;
-		}
+
 		findField("now2").lock()->setTextPadded(sequencer.lock()->getCurrentClockNumber(), "0");
 		setyOffset(0);
 	}
@@ -1448,26 +1356,6 @@ string StepEditorScreen::getSelectedParameterLetter()
 weak_ptr<Event> StepEditorScreen::getSelectedEvent()
 {
 	return selectedEvent;
-}
-
-int StepEditorScreen::getChangeVariationTypeNumber()
-{
-	return changeVariationTypeNumber;
-}
-
-int StepEditorScreen::getChangeVariationValue()
-{
-	return changeVariationValue;
-}
-
-int StepEditorScreen::getChangeNoteToNumber()
-{
-	return changeNoteToNumber;
-}
-
-int StepEditorScreen::getEditValue()
-{
-	return editValue;
 }
 
 vector<weak_ptr<Event>>& StepEditorScreen::getPlaceHolder()
@@ -1506,9 +1394,7 @@ vector<weak_ptr<EventRowParameters>> StepEditorScreen::findEventRowParameterss()
 			auto candidate = dynamic_pointer_cast<EventRowParameters>(child);
 			
 			if (candidate)
-			{
 				result.push_back(candidate);
-			}
 		}
 	}
 
@@ -1520,9 +1406,7 @@ vector<weak_ptr<EventRow>> StepEditorScreen::findEventRows()
 	vector<weak_ptr<EventRow>> result;
 
 	for (int i = 0; i < 4; i++)
-	{
 		result.push_back(dynamic_pointer_cast<EventRow>(findChild("event-row-" + to_string(i)).lock()));
-	}
 
 	return result;
 }
