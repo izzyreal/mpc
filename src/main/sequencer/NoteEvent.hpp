@@ -23,7 +23,7 @@ namespace mpc::sequencer
 		int getNote();
 		void setDuration(int i);
 		int getDuration();
-		int getVariationTypeNumber();
+		int getVariationType();
 		void setVariationTypeNumber(int i);
 		void setVariationValue(int i);
 		int getVariationValue();

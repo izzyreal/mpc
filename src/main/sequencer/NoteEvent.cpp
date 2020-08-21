@@ -58,7 +58,7 @@ int NoteEvent::getDuration()
 	return duration;
 }
 
-int NoteEvent::getVariationTypeNumber()
+int NoteEvent::getVariationType()
 {
     return variationTypeNumber;
 }
@@ -110,7 +110,7 @@ int NoteEvent::getVelocity()
 void NoteEvent::CopyValuesTo(weak_ptr<Event> dest) {
 	Event::CopyValuesTo(dest);
 	auto lDest = dynamic_pointer_cast<NoteEvent>(dest.lock());
-	lDest->setVariationTypeNumber(getVariationTypeNumber());
+	lDest->setVariationTypeNumber(getVariationType());
 	lDest->setVariationValue(getVariationValue());
 	lDest->setNote(getNote());
 	lDest->setVelocity(getVelocity());

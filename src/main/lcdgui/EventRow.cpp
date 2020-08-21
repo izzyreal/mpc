@@ -417,9 +417,9 @@ void EventRow::setDrumNoteEventValues()
 		}
 	}
 
-	fields[1].lock()->setText(noteVarParamNames[ne->getVariationTypeNumber()]);
+	fields[1].lock()->setText(noteVarParamNames[ne->getVariationType()]);
 	
-	if (ne->getVariationTypeNumber() == 0)
+	if (ne->getVariationType() == 0)
 	{
 		fields[2].lock()->setSize(4 * 6 + 1, 9);
 		fields[2].lock()->setLocation(90, fields[2].lock()->getY());
@@ -449,7 +449,7 @@ void EventRow::setDrumNoteEventValues()
 			fields[2].lock()->setText("+" + StrUtil::padLeft(to_string(noteVarValue), " ", 3));
 		}
 	}
-	else if (ne->getVariationTypeNumber() == 1 || ne->getVariationTypeNumber() == 2)
+	else if (ne->getVariationType() == 1 || ne->getVariationType() == 2)
 	{
 		auto noteVarValue = ne->getVariationValue();
 	
@@ -462,7 +462,7 @@ void EventRow::setDrumNoteEventValues()
 		fields[2].lock()->setSize(3 * 6 + 1, 9);
 		fields[2].lock()->setLocation(90 + 6, fields[2].lock()->getY());
 	}
-	else if (ne->getVariationTypeNumber() == 3)
+	else if (ne->getVariationType() == 3)
 	{
 		fields[2].lock()->setSize(4 * 6 + 1, 9);
 		fields[2].lock()->setLocation(90, fields[2].lock()->getY());

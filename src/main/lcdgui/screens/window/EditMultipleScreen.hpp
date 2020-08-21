@@ -17,7 +17,7 @@ namespace mpc::lcdgui::screens::window {
 		void turnWheel(int i) override;
 
 	private:
-		int editTypeNumber = 0;
+		int editType = 0;
 
 		void checkThreeParameters();
 		void checkFiveParameters();
@@ -39,18 +39,18 @@ namespace mpc::lcdgui::screens::window {
 		std::vector<int> yPosDouble = { 22, 33 };
 		std::vector<std::string> doubleLabels = { "Edit type:", "Value:" };
 
-		int changeNoteToNumber = 35;
-		int changeVariationTypeNumber = 0;
-		int changeVariationValue = 0;
+		int changeNoteTo = 35;
+		int variationType = 0;
+		int variationValue = 0;
 		int editValue = 0;
 
 		void updateEditMultiple();
 		void updateDouble();
-		void setEditTypeNumber(int i);
+		void setEditType(int i);
 
-		void setChangeNoteToIndex(int i);
-		void setChangeVariationTypeNumber(int i);
-		void setChangeVariationValue(int i);
+		void setChangeNoteTo(int i);
+		void setVariationType(int i);
+		void seVariationValue(int i);
 		void setEditValue(int i);
 
 		friend class mpc::lcdgui::screens::StepEditorScreen;

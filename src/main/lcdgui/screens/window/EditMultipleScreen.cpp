@@ -57,7 +57,7 @@ void EditMultipleScreen::function(int i)
 				for (auto& event : stepEditorScreen->getSelectedEvents())
 				{
 					if (dynamic_pointer_cast<NoteEvent>(event.lock()))
-						dynamic_pointer_cast<NoteEvent>(event.lock())->setVariationTypeNumber(changeVariationTypeNumber);
+						dynamic_pointer_cast<NoteEvent>(event.lock())->setVariationTypeNumber(variationType);
 				}
 			}
 			else if (paramLetter.compare("c") == 0)
@@ -65,7 +65,7 @@ void EditMultipleScreen::function(int i)
 				for (auto& event : stepEditorScreen->getSelectedEvents())
 				{
 					if (dynamic_pointer_cast<NoteEvent>(event.lock()))
-						dynamic_pointer_cast<NoteEvent>(event.lock())->setVariationValue(changeVariationValue);
+						dynamic_pointer_cast<NoteEvent>(event.lock())->setVariationValue(variationValue);
 				}
 			}
 			else if (paramLetter.compare("d") == 0)
@@ -127,42 +127,39 @@ void EditMultipleScreen::turnWheel(int i)
 		{
 			if (paramLetter.compare("a") == 0)
 			{
-				if (changeNoteToNumber == 98)
-					return;
-
-				setChangeNoteToIndex(changeNoteToNumber + i);
+				setChangeNoteTo(changeNoteTo + i);
 			}
 			else if (paramLetter.compare("b") == 0)
 			{
-				setChangeVariationTypeNumber(changeVariationTypeNumber + i);
+				setVariationType(variationType + i);
 			}
 			else if (paramLetter.compare("c") == 0)
 			{
-				setChangeVariationValue(changeVariationValue + i);
+				seVariationValue(variationValue + i);
 			}
 			else if (paramLetter.compare("d") == 0 || paramLetter.compare("e") == 0)
 			{
-				setEditTypeNumber(editTypeNumber + i);
+				setEditType(editType + i);
 			}
 		}
 		else if (dynamic_pointer_cast<NoteEvent>(event.lock()) && track.lock()->getBus() == 0)
 		{
 			if (paramLetter.compare("a") == 0)
-				setChangeNoteToIndex(changeNoteToNumber + i);
+				setChangeNoteTo(changeNoteTo + i);
 			else if (paramLetter.compare("b") == 0 || paramLetter.compare("c") == 0)
-				setEditTypeNumber(editTypeNumber + i);
+				setEditType(editType + i);
 		}
 		else if (dynamic_pointer_cast<ProgramChangeEvent>(event.lock())
 			|| dynamic_pointer_cast<PolyPressureEvent>(event.lock())
 			|| dynamic_pointer_cast<ChannelPressureEvent>(event.lock())
 			|| dynamic_pointer_cast<ControlChangeEvent>(event.lock()))
 		{
-			setEditTypeNumber(editTypeNumber + i);
+			setEditType(editType + i);
 		}
 	}
 	else if (param.compare("value1") == 0)
 	{
-		setEditValue(editValue + 1);
+		setEditValue(editValue + i);
 	}
 
 	updateEditMultiple();
@@ -221,16 +218,20 @@ void EditMultipleScreen::checkNotes()
 		auto note = dynamic_pointer_cast<NoteEvent>(event.lock());
 
 		if (note)
-			note->setNote(changeNoteToNumber);
+			note->setNote(changeNoteTo);
 	}
 }
 
-void EditMultipleScreen::setEditTypeNumber(int i)
+void EditMultipleScreen::setEditType(int i)
 {
 	if (i < 0 || i > 3)
 		return;
 
-	editTypeNumber = i;
+	editType = i;
+
+	if (editType != 2 && editValue > 127)
+		editValue = 127;
+
 	updateEditMultiple();
 }
 
@@ -255,23 +256,23 @@ void EditMultipleScreen::updateEditMultiple()
 			{
 				findLabel("value0").lock()->setText(singleLabels[0]);
 				findField("value0").lock()->setSize(6 * 6 + 1, 9);
-				findField("value0").lock()->setText(to_string(changeNoteToNumber) + "/" + sampler.lock()->getPadName(program.lock()->getPadIndexFromNote(changeNoteToNumber)));
+				findField("value0").lock()->setText(to_string(changeNoteTo) + "/" + sampler.lock()->getPadName(program.lock()->getPadIndexFromNote(changeNoteTo)));
 			}
 			else if (letter.compare("b") == 0)
 			{
 				findLabel("value0").lock()->setText(singleLabels[1]);
 				findField("value0").lock()->setSize(3 * 6 + 1, 9);
-				findField("value0").lock()->setText(noteVariationParameterNames[changeVariationTypeNumber]);
+				findField("value0").lock()->setText(noteVariationParameterNames[variationType]);
 			}
 			else if (letter.compare("c") == 0)
 			{
 				findLabel("value0").lock()->setText(singleLabels[2]);
 			
-				if (changeVariationTypeNumber == 0)
+				if (variationType == 0)
 				{
 					findField("value0").lock()->setSize(4 * 6 + 1, 9);
 					findField("value0").lock()->setLocation(45, findField("value0").lock()->getY());
-					auto noteVarValue = (changeVariationValue * 2) - 128;
+					auto noteVarValue = (variationValue * 2) - 128;
 
 					if (noteVarValue < -120)
 					{
@@ -296,9 +297,9 @@ void EditMultipleScreen::updateEditMultiple()
 					}
 				}
 
-				if (changeVariationTypeNumber == 1 || changeVariationTypeNumber == 2)
+				if (variationType == 1 || variationType == 2)
 				{
-					auto noteVarValue = changeVariationValue;
+					auto noteVarValue = variationValue;
 				
 					if (noteVarValue > 100)
 						noteVarValue = 100;
@@ -307,12 +308,12 @@ void EditMultipleScreen::updateEditMultiple()
 					findField("value0").lock()->setSize(3 * 6 + 1, 9);
 					findField("value0").lock()->setLocation(51, findField("value0").lock()->getY());
 				}
-				else if (changeVariationTypeNumber == 3)
+				else if (variationType == 3)
 				{
 					findField("value0").lock()->setSize(4 * 6 + 1, 9);
 					findField("value0").lock()->setLocation(45, findField("value0").lock()->getY());
 
-					auto noteVarValue = changeVariationValue - 50;
+					auto noteVarValue = variationValue - 50;
 					
 					if (noteVarValue > 50)
 						noteVarValue = 50;
@@ -346,7 +347,7 @@ void EditMultipleScreen::updateEditMultiple()
 			findLabel("value0").lock()->setLocation(xPosSingle, yPosSingle);
 			findLabel("value0").lock()->setText(singleLabels[0]);
 			findField("value0").lock()->setSize(8 * 6 + 1, 9);
-			findField("value0").lock()->setText((StrUtil::padLeft(to_string(changeNoteToNumber), " ", 3) + "(" + mpc::Util::noteNames()[changeNoteToNumber]) + ")");
+			findField("value0").lock()->setText((StrUtil::padLeft(to_string(changeNoteTo), " ", 3) + "(" + mpc::Util::noteNames()[changeNoteTo]) + ")");
 			findLabel("value0").lock()->setSize(findLabel("value0").lock()->GetTextEntryLength() * 6 + 1, 9);
 			findField("value0").lock()->Hide(false);
 			findField("value0").lock()->setLocation(xPosSingle + findLabel("value0").lock()->getW(), yPosSingle);
@@ -381,10 +382,10 @@ void EditMultipleScreen::updateDouble()
 	findLabel("value1").lock()->setLocation(xPosDouble[1], yPosDouble[1]);
 	findField("value0").lock()->setLocation((xPosDouble[0] + findLabel("value0").lock()->getW()), yPosDouble[0]);
 	findField("value1").lock()->setLocation((xPosDouble[1] + findLabel("value1").lock()->getW()), yPosDouble[1]);
-	findField("value0").lock()->setText(editTypeNames[editTypeNumber]);
+	findField("value0").lock()->setText(editTypeNames[editType]);
 	findField("value1").lock()->setText(to_string(editValue));
-	findField("value0").lock()->setSize(findField("value0").lock()->GetTextEntryLength() * 6 + 1, 9);
-	findField("value1").lock()->setSize(findField("value1").lock()->GetTextEntryLength() * 6 + 1, 9);
+	findField("value0").lock()->setSize(10 * 6 + 1, 9);
+	findField("value1").lock()->setSize(3 * 6 + 1, 9);
 }
 
 void EditMultipleScreen::update(moduru::observer::Observable* o, nonstd::any arg)
@@ -395,45 +396,63 @@ void EditMultipleScreen::update(moduru::observer::Observable* o, nonstd::any arg
 	{
 		if (mpc.getNote() != 34)
 		{
-			changeNoteToNumber = mpc.getNote();
+			changeNoteTo = mpc.getNote();
 			updateEditMultiple();
 		}
 	}
 }
 
-void EditMultipleScreen::setChangeNoteToIndex(int i)
+void EditMultipleScreen::setChangeNoteTo(int i)
 {
-	if (i < 0 || i > 127)
-		return;
+	init();
 
-	changeNoteToNumber = i;
+	auto midi = track.lock()->getBus() == 0;
+
+	if (midi)
+	{
+		if (i < 0 || i > 127)
+			return;
+	}
+	else
+	{
+		if (i < 35 || i > 98)
+			return;
+	}
+
+	changeNoteTo = i;
 	updateEditMultiple();
 }
 
-void EditMultipleScreen::setChangeVariationTypeNumber(int i)
+void EditMultipleScreen::setVariationType(int i)
 {
 	if (i < 0 || i > 3)
 		return;
 
-	changeVariationTypeNumber = i;
+	variationType = i;
 	updateEditMultiple();
 }
 
-void EditMultipleScreen::setChangeVariationValue(int i)
+void EditMultipleScreen::seVariationValue(int i)
 {
 	if (i < 0 || i > 128)
 		return;
 
-	if (changeVariationTypeNumber != 0 && i > 100)
+	if (variationType != 0 && i > 100)
 		i = 100;
 
-	changeVariationValue = i;
+	variationValue = i;
 	updateEditMultiple();
 }
 
 void EditMultipleScreen::setEditValue(int i)
 {
-	if (i < 0 || i > 127)
+	if (i < 0)
+		return;
+
+	if (editType != 2 && i > 127)
+		return;
+
+	if (editType == 2 && i > 200)
 		return;
 
 	editValue = i;

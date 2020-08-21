@@ -222,7 +222,7 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
 					
 					if (nVariation)
 					{
-						ne->setVariationTypeNumber(nVariation->getVariationTypeNumber());
+						ne->setVariationTypeNumber(nVariation->getVariationType());
 						ne->setVariationValue(nVariation->getVariationValue());
 					}
 					else

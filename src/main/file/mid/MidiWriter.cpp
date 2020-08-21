@@ -128,7 +128,7 @@ MidiWriter::MidiWriter(mpc::sequencer::Sequence* sequence)
 				noteOffs.push_back(make_shared<NoteOn>(noteEvent->getTick() + noteEvent->getDuration(), track->getTrackIndex(), noteEvent->getNote(), 0));
 				auto variation = false;
 				shared_ptr<NoteOff> varNoteOff;
-				auto varType = noteEvent->getVariationTypeNumber();
+				auto varType = noteEvent->getVariationType();
 				auto varVal = noteEvent->getVariationValue();
 				if (varType == 0 && varVal != 64)
 					variation = true;

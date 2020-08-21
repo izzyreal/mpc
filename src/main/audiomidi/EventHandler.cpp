@@ -176,7 +176,7 @@ void EventHandler::handleNoThru(weak_ptr<mpc::sequencer::Event> e, mpc::sequence
 						eventFrame = timeStamp;
 					}
 					
-					mpc.getMms()->mpcTransport(track->getTrackIndex(), midiAdapter.get().lock().get(), 0, ne->getVariationTypeNumber(), ne->getVariationValue(), eventFrame);
+					mpc.getMms()->mpcTransport(track->getTrackIndex(), midiAdapter.get().lock().get(), 0, ne->getVariationType(), ne->getVariationValue(), eventFrame);
 					
 					if (mpc.getAudioMidiServices().lock()->getAudioServer()->isRealTime())
 					{
