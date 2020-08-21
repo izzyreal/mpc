@@ -3,6 +3,7 @@
 #include <controls/BaseSamplerControls.hpp>
 #include <lcdgui/screens/DrumScreen.hpp>
 #include <lcdgui/screens/MixerSetupScreen.hpp>
+#include <lcdgui/Knob.hpp>
 
 #include <sampler/Pad.hpp>
 
@@ -342,11 +343,13 @@ void MixerScreen::turnWheel(int i)
 
 	for (int i = 0; i < 16; i++)
 	{
+		auto noteParameters_ = dynamic_cast<NoteParameters*>(program.lock()->getNoteParameters(program.lock()->getNoteFromPad(i + (mpc.getBank() * 16))));
+
 		if (!stereoMixSourceIsDrum)
-			stereoMixerChannels[i] = noteParameters->getStereoMixerChannel().lock();
+			stereoMixerChannels[i] = noteParameters_->getStereoMixerChannel();
 
 		if (!indivAndFxSourceIsDrum)
-			indivFxMixerChannels[i] = noteParameters->getIndivFxMixerChannel().lock();
+			indivFxMixerChannels[i] = noteParameters_->getIndivFxMixerChannel();
 	}
 
 	if (tab == 0)
@@ -376,6 +379,7 @@ void MixerScreen::turnWheel(int i)
 				if (record)
 					recordMixerEvent(padIndex, 1, stereoMixerChannel->getPanning());
 			}
+
 			displayPanning();
 		}
 		else if (yPos == 1)
@@ -450,37 +454,37 @@ void MixerScreen::turnWheel(int i)
 
 		if (yPos == 0)
 		{
-			if (link)
+		if (link)
+		{
+			for (auto mixerChannel : indivFxMixerChannels)
 			{
-				for (auto mixerChannel : indivFxMixerChannels)
-				{
-					auto mc = mixerChannel.lock();
-					mc->setFxPath(mc->getFxPath() + i);
-				}
+				auto mc = mixerChannel.lock();
+				mc->setFxPath(mc->getFxPath() + i);
 			}
-			else
-			{
-				ifmc->setFxPath(ifmc->getFxPath() + i);
-			}
+		}
+		else
+		{
+			ifmc->setFxPath(ifmc->getFxPath() + i);
+		}
 
-			displayFxPaths();
+		displayFxPaths();
 		}
 		else if (yPos == 1)
 		{
-			if (link)
+		if (link)
+		{
+			for (auto mixerChannel : indivFxMixerChannels)
 			{
-				for (auto mixerChannel : indivFxMixerChannels)
-				{
-					auto mc = mixerChannel.lock();
-					mc->setFxSendLevel(mc->getFxSendLevel() + i);
-				}
+				auto mc = mixerChannel.lock();
+				mc->setFxSendLevel(mc->getFxSendLevel() + i);
 			}
-			else
-			{
-				ifmc->setFxSendLevel(ifmc->getFxSendLevel() + i);
-			}
+		}
+		else
+		{
+			ifmc->setFxSendLevel(ifmc->getFxSendLevel() + i);
+		}
 
-			displayFxSendLevels();
+		displayFxSendLevels();
 		}
 	}
 }
@@ -509,7 +513,7 @@ void MixerScreen::displayStereoFaders()
 
 			if (note == 34)
 			{
-				// We have no mixer channel
+				mixerStrips[i].lock()->setValueB(0);
 			}
 			else
 			{
@@ -527,10 +531,10 @@ void MixerScreen::displayStereoFaders()
 	{
 		auto padIndex = getXPos() + (mpc.getBank() * 16);
 		auto note = program.lock()->getNoteFromPad(padIndex);
-		
+
 		if (note == 34)
 		{
-			// We have no mixer channel
+			mixerStrips[getXPos()].lock()->setValueB(0);
 		}
 		else
 		{
@@ -541,6 +545,17 @@ void MixerScreen::displayStereoFaders()
 				mixerChannel = mpcSoundPlayerChannel->getStereoMixerChannels()[mpc.getPad()].lock();
 
 			mixerStrips[getXPos()].lock()->setValueB(mixerChannel->getLevel());
+
+			auto padsWithSameNoteParameters = program.lock()->getPadIndicesFromNote(note);
+
+			for (auto& padIndex_ : padsWithSameNoteParameters)
+			{
+				if (padIndex_ != padIndex)
+				{
+					if (padIndex_ >= (mpc.getBank() * 16) && padIndex_ < ((mpc.getBank() + 1) * 16))
+						mixerStrips[padIndex_ - (mpc.getBank() * 16)].lock()->setValueB(mixerChannel->getLevel());
+				}
+			}
 		}
 	}
 }
@@ -557,11 +572,9 @@ void MixerScreen::displayPanning()
 			const auto padIndex = i + (mpc.getBank() * 16);
 			auto note = program.lock()->getNoteFromPad(padIndex);
 
-			if (note == 34)
-			{
-				// We have no mixer channel
-			}
-			else
+			mixerStrips[i].lock()->findChild<Knob>("").lock()->Hide(note == 34);
+
+			if (note != 34)
 			{
 				auto noteParameters = dynamic_cast<NoteParameters*>(program.lock()->getNoteParameters(note));
 				auto mixerChannel = noteParameters->getStereoMixerChannel().lock();
@@ -578,31 +591,39 @@ void MixerScreen::displayPanning()
 		auto padIndex = getXPos() + (mpc.getBank() * 16);
 		auto note = program.lock()->getNoteFromPad(padIndex);
 
-		if (note == 34)
-		{
-			// We have no mixer channel
-		}
-		else
+		mixerStrips[getXPos()].lock()->findChild<Knob>("").lock()->Hide(note == 34);
+
+		if (note != 34)
 		{
 			auto noteParameters = dynamic_cast<NoteParameters*>(program.lock()->getNoteParameters(note));
-			auto mixerChannel = noteParameters->getStereoMixerChannel();
+			auto mixerChannel = noteParameters->getStereoMixerChannel().lock();
 
 			if (sourceIsDrum)
 				mixerChannel = mpcSoundPlayerChannel->getStereoMixerChannels()[mpc.getPad()].lock();
 
-			mixerStrips[getXPos()].lock()->setValueA(mixerChannel.lock()->getPanning());
+			mixerStrips[getXPos()].lock()->setValueA(mixerChannel->getPanning());
+
+			auto padsWithSameNoteParameters = program.lock()->getPadIndicesFromNote(note);
+
+			for (auto& padIndex_ : padsWithSameNoteParameters)
+			{
+				if (padIndex_ != padIndex)
+				{
+					if (padIndex_ >= (mpc.getBank() * 16) && padIndex_ < ((mpc.getBank() + 1) * 16))
+						mixerStrips[padIndex_ - (mpc.getBank() * 16)].lock()->setValueA(mixerChannel->getPanning());
+				}
+			}
 		}
 	}
 }
 
 void MixerScreen::displayIndividualOutputs()
 {
-
 	init();
 	
 	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(mpc.screens->getScreenComponent("mixer-setup"));
-	bool sSrcDrum = mixerSetupScreen->isStereoMixSourceDrum();
-	bool iSrcDrum = mixerSetupScreen->isIndivFxSourceDrum();
+	bool stereoMixSourceIsDrum = mixerSetupScreen->isStereoMixSourceDrum();
+	bool indivFxMixSourceIsDrum = mixerSetupScreen->isIndivFxSourceDrum();
 
 	if (link)
 	{
@@ -613,7 +634,7 @@ void MixerScreen::displayIndividualOutputs()
 
 			if (note == 34)
 			{
-				// We don't have  mixer channel
+				mixerStrips[i].lock()->setValueAString("");
 			}
 			else
 			{
@@ -621,10 +642,10 @@ void MixerScreen::displayIndividualOutputs()
 				auto stereoMixerChannel = noteParameters->getStereoMixerChannel().lock();
 				auto indivFxMixerChannel = noteParameters->getIndivFxMixerChannel().lock();
 
-				if (sSrcDrum)
+				if (stereoMixSourceIsDrum)
 					stereoMixerChannel = mpcSoundPlayerChannel->getStereoMixerChannels()[padIndex].lock();
 
-				if (iSrcDrum)
+				if (indivFxMixSourceIsDrum)
 					indivFxMixerChannel = mpcSoundPlayerChannel->getIndivFxMixerChannels()[padIndex].lock();
 
 				if (stereoMixerChannel->isStereo())
@@ -634,30 +655,47 @@ void MixerScreen::displayIndividualOutputs()
 			}
 		}
 	}
-	else {
+	else
+	{
 		auto padIndex = mpc.getPad();
 		const auto note = program.lock()->getNoteFromPad(padIndex);
 
 		if (note == 34)
 		{
-			// We don't have  mixer channel
+			mixerStrips[getXPos()].lock()->setValueAString("");
 		}
 		else
 		{
 			auto noteParameters = dynamic_cast<NoteParameters*>(program.lock()->getNoteParameters(note));
-			auto smc = noteParameters->getStereoMixerChannel().lock();
-			auto ifmc = noteParameters->getIndivFxMixerChannel().lock();
+			auto stereoMixerChannel = noteParameters->getStereoMixerChannel().lock();
+			auto indivFxMixerChannel = noteParameters->getIndivFxMixerChannel().lock();
 
-			if (sSrcDrum)
-				smc = mpcSoundPlayerChannel->getStereoMixerChannels()[padIndex].lock();
+			if (stereoMixSourceIsDrum)
+				stereoMixerChannel = mpcSoundPlayerChannel->getStereoMixerChannels()[padIndex].lock();
 
-			if (iSrcDrum)
-				ifmc = mpcSoundPlayerChannel->getIndivFxMixerChannels()[padIndex].lock();
+			if (indivFxMixSourceIsDrum)
+				indivFxMixerChannel = mpcSoundPlayerChannel->getIndivFxMixerChannels()[padIndex].lock();
 
-			if (smc->isStereo())
-				mixerStrips[getXPos()].lock()->setValueAString(stereoNames[ifmc->getOutput()]);
+			if (stereoMixerChannel->isStereo())
+				mixerStrips[getXPos()].lock()->setValueAString(stereoNames[indivFxMixerChannel->getOutput()]);
 			else
-				mixerStrips[getXPos()].lock()->setValueAString(monoNames[ifmc->getOutput()]);
+				mixerStrips[getXPos()].lock()->setValueAString(monoNames[indivFxMixerChannel->getOutput()]);
+
+			auto padsWithSameNoteParameters = program.lock()->getPadIndicesFromNote(note);
+
+			for (auto& padIndex_ : padsWithSameNoteParameters)
+			{
+				if (padIndex_ != padIndex)
+				{
+					if (padIndex_ >= (mpc.getBank() * 16) && padIndex_ < ((mpc.getBank() + 1) * 16))
+					{
+						if (stereoMixerChannel->isStereo())
+							mixerStrips[padIndex_ - (mpc.getBank() * 16)].lock()->setValueAString(stereoNames[indivFxMixerChannel->getOutput()]);
+						else
+							mixerStrips[padIndex_ - (mpc.getBank() * 16)].lock()->setValueAString(monoNames[indivFxMixerChannel->getOutput()]);
+					}
+				}
+			}
 		}
 	}
 }
@@ -678,7 +716,7 @@ void MixerScreen::displayIndivFaders()
 
 			if (note == 34)
 			{
-				// We don't have  mixer channel
+				mixerStrips[i].lock()->setValueB(0);
 			}
 			else
 			{
@@ -698,7 +736,7 @@ void MixerScreen::displayIndivFaders()
 
 		if (note == 34)
 		{
-			// We don't have  mixer channel
+			mixerStrips[getXPos()].lock()->setValueB(0);
 		}
 		else
 		{
@@ -710,6 +748,17 @@ void MixerScreen::displayIndivFaders()
 				mixerChannel = mpcSoundPlayerChannel->getIndivFxMixerChannels()[padIndex].lock();
 		
 			mixerStrips[getXPos()].lock()->setValueB(mixerChannel->getVolumeIndividualOut());
+
+			auto padsWithSameNoteParameters = program.lock()->getPadIndicesFromNote(note);
+
+			for (auto& padIndex_ : padsWithSameNoteParameters)
+			{
+				if (padIndex_ != padIndex)
+				{
+					if (padIndex_ >= (mpc.getBank() * 16) && padIndex_ < ((mpc.getBank() + 1) * 16))
+						mixerStrips[padIndex_ - (mpc.getBank() * 16)].lock()->setValueB(mixerChannel->getVolumeIndividualOut());
+				}
+			}
 		}
 	}
 }
@@ -729,7 +778,7 @@ void MixerScreen::displayFxPaths()
 
 			if (note == 34)
 			{
-				// We don't have  mixer channel
+				mixerStrips[i].lock()->setValueAString("");
 			}
 			else
 			{
@@ -750,7 +799,7 @@ void MixerScreen::displayFxPaths()
 
 		if (note == 34)
 		{
-			// We don't have  mixer channel
+			mixerStrips[getXPos()].lock()->setValueAString("");
 		}
 		else
 		{
@@ -761,6 +810,17 @@ void MixerScreen::displayFxPaths()
 				mixerChannel = mpcSoundPlayerChannel->getIndivFxMixerChannels()[padIndex].lock();
 
 			mixerStrips[getXPos()].lock()->setValueAString(fxPathNames[mixerChannel->getFxPath()]);
+
+			auto padsWithSameNoteParameters = program.lock()->getPadIndicesFromNote(note);
+
+			for (auto& padIndex_ : padsWithSameNoteParameters)
+			{
+				if (padIndex_ != padIndex)
+				{
+					if (padIndex_ >= (mpc.getBank() * 16) && padIndex_ < ((mpc.getBank() + 1) * 16))
+						mixerStrips[padIndex_ - (mpc.getBank() * 16)].lock()->setValueAString(fxPathNames[mixerChannel->getFxPath()]);
+				}
+			}
 		}
 	}
 }
@@ -780,7 +840,7 @@ void MixerScreen::displayFxSendLevels()
 
 			if (note == 34)
 			{
-				// We don't have  mixer channel
+				mixerStrips[i].lock()->setValueB(0);
 			}
 			else
 			{
@@ -801,7 +861,7 @@ void MixerScreen::displayFxSendLevels()
 
 		if (note == 34)
 		{
-			// We don't have  mixer channel
+			mixerStrips[getXPos()].lock()->setValueB(0);
 		}
 		else
 		{
@@ -812,6 +872,17 @@ void MixerScreen::displayFxSendLevels()
 				mixerChannel = mpcSoundPlayerChannel->getIndivFxMixerChannels()[padIndex].lock();
 
 			mixerStrips[getXPos()].lock()->setValueB(mixerChannel->getFxSendLevel());
+
+			auto padsWithSameNoteParameters = program.lock()->getPadIndicesFromNote(note);
+
+			for (auto& padIndex_ : padsWithSameNoteParameters)
+			{
+				if (padIndex_ != padIndex)
+				{
+					if (padIndex_ >= (mpc.getBank() * 16) && padIndex_ < ((mpc.getBank() + 1) * 16))
+						mixerStrips[padIndex_ - (mpc.getBank() * 16)].lock()->setValueB(mixerChannel->getFxSendLevel());
+				}
+			}
 		}
 	}
 }

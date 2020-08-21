@@ -145,6 +145,19 @@ int Program::getNoteFromPad(int i)
 	return pads[i]->getNote();
 }
 
+vector<int> Program::getPadIndicesFromNote(int note)
+{
+	vector<int> result;
+	
+	for (int i = 0; i < pads.size(); i++)
+	{
+		if (pads[i]->getNote() == note)
+			result.push_back(i);
+	}
+
+	return result;
+}
+
 Program::~Program()
 {
 	delete slider;

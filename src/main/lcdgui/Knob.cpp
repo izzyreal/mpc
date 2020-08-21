@@ -33,16 +33,14 @@ void Knob::setColor(bool on)
 void Knob::Draw(std::vector<std::vector<bool>>* pixels)
 {
 	if (shouldNotDraw(pixels))
-	{
 		return;
-	}
 
 	auto rect = getRect();
 	
-	for (int i = rect.L; i < rect.R; i++) {
-		for (int j = rect.T; j < rect.B; j++) {
+	for (int i = rect.L; i < rect.R; i++)
+	{
+		for (int j = rect.T; j < rect.B; j++)
 			(*pixels)[i][j] = !color;
-		}
 	}
 
 	vector<vector<vector<int>>> lines;
@@ -66,14 +64,9 @@ void Knob::Draw(std::vector<std::vector<bool>>* pixels)
 	vector<bool> colors;
     
 	for (int i = 0; i < lines.size(); i++)
-	{
 		colors.push_back(color);
-	}
 	
 	vector<int> offsetxy { rect.L, rect.T };
 	mpc::Util::drawLines(*pixels, lines, colors, offsetxy);
 	dirty = false;
-}
-
-Knob::~Knob() {
 }

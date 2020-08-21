@@ -12,9 +12,7 @@ MixerTopBackground::MixerTopBackground(MRECT rect)
 void MixerTopBackground::setColor(bool on)
 {
 	if (color == on)
-	{
 		return;
-	}
 
 	color = on;
 	SetDirty();
@@ -23,18 +21,14 @@ void MixerTopBackground::setColor(bool on)
 void MixerTopBackground::Draw(std::vector<std::vector<bool>>* pixels)
 {
 	if (shouldNotDraw(pixels))
-	{
 		return;
-	}
 
 	auto rect = getRect();
 
 	for (int i = rect.L; i < rect.R; i++)
 	{
 		for (int j = rect.T; j < rect.B; j++)
-		{
 			(*pixels)[i][j] = color;
-		}
 	}
 
 	Component::Draw(pixels);

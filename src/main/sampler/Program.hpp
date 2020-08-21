@@ -49,11 +49,12 @@ namespace mpc::sampler {
 		Pad* getPad(int i);
 		std::vector<NoteParameters*> getNotesParameters();
 		mpc::sampler::PgmSlider* getSlider();
-		void setNoteParameters(int i, NoteParameters* nn);
+		void setNoteParameters(int i, NoteParameters* noteParameters);
 		int getMidiProgramChange();
 		void setMidiProgramChange(int i);
 		void initPadAssign();
 		int getNoteFromPad(int i);
+		std::vector<int> getPadIndicesFromNote(const int note);
 
 	public:
 		Program(mpc::Mpc& mpc, mpc::sampler::Sampler* sampler);
