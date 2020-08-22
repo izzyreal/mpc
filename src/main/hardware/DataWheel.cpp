@@ -12,9 +12,10 @@ DataWheel::DataWheel(mpc::Mpc& mpc)
 {
 }
 
-void DataWheel::turn(int increment) {
-	if (!mpc.getDisk().lock()->isBusy()) {
+void DataWheel::turn(int increment)
+{
+	if (!mpc.getDisk().lock()->isBusy())
 		mpc.getActiveControls().lock()->turnWheel(increment);
-	}
+
 	notifyObservers(increment);
 }

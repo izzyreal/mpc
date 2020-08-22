@@ -30,6 +30,7 @@ using namespace mpc::audiomidi;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
+using namespace ctoot::midi::core;
 using namespace std;
 
 MpcMidiInput::MpcMidiInput(mpc::Mpc& mpc, int index)
@@ -47,25 +48,32 @@ string MpcMidiInput::getName()
 	return "mpcmidiin" + to_string(index);
 }
 
-void MpcMidiInput::transport(ctoot::midi::core::MidiMessage* msg, int timeStamp)
+void MpcMidiInput::transport(MidiMessage* msg, int timeStamp)
 {
 	eventAdapter->process(msg);
+
 	auto status = msg->getStatus();
 	auto lSampler = sampler.lock();
 	string notify_ = string(index == 0 ? "a" : "b");
-	auto channel = dynamic_cast<ctoot::midi::core::ShortMessage*>(msg)->getChannel();
+	auto channel = dynamic_cast<ShortMessage*>(msg)->getChannel();
 	notify_ += to_string(channel);
 	
 	notifyObservers(notify_);
 
-	if (status == ctoot::midi::core::ShortMessage::CONTROL_CHANGE)
+	auto isControl = status >= ShortMessage::CONTROL_CHANGE && status < ShortMessage::CONTROL_CHANGE + 16;
+
+	if (isControl)
 		mpc.getHardware().lock()->getSlider().lock()->setValue((*msg->getMessage())[2]);
 	
 	auto lSequencer = sequencer.lock();
 	
-	if (status == ctoot::midi::core::ShortMessage::POLY_PRESSURE ||
-		status == ctoot::midi::core::ShortMessage::NOTE_ON ||
-		status == ctoot::midi::core::ShortMessage::NOTE_OFF)
+	auto isPolyPressure = status >= ShortMessage::POLY_PRESSURE && status < ShortMessage::POLY_PRESSURE + 16;
+	auto isNoteOn = status >= ShortMessage::NOTE_ON && status < ShortMessage::NOTE_ON + 16;
+	auto isNoteOff = status >= ShortMessage::NOTE_OFF && status < ShortMessage::NOTE_OFF + 16;
+
+	if (isPolyPressure ||
+		isNoteOn ||
+		isNoteOff)
 	{
 		int note = (*msg->getMessage())[1];
 		int velo = (*msg->getMessage())[2];
@@ -80,26 +88,21 @@ void MpcMidiInput::transport(ctoot::midi::core::MidiMessage* msg, int timeStamp)
 		
 			if (pad != -1)
 			{
-				switch (status)
+				if (isPolyPressure)
 				{
-				case ctoot::midi::core::ShortMessage::POLY_PRESSURE:
-					mpc.getControls().lock()->getPressedPadVelos()->at(pad) = velo;
-					break;
-				case ctoot::midi::core::ShortMessage::NOTE_ON:
-					if (velo > 0)
-					{
-						mpc.getControls().lock()->getPressedPads()->emplace(pad);
-					}
-					else
-					{
-						mpc.getControls().lock()->getPressedPads()->erase(pad);
-					}
-					break;
-				case ctoot::midi::core::ShortMessage::NOTE_OFF:
-					mpc.getControls().lock()->getPressedPads()->erase(pad);
-					break;
+					(*mpc.getControls().lock()->getPressedPadVelos())[pad] = velo;
 				}
-
+				else if (isNoteOn)
+				{
+					if (velo > 0)
+						mpc.getControls().lock()->getPressedPads()->emplace(pad);
+					else
+						mpc.getControls().lock()->getPressedPads()->erase(pad);
+				}
+				else if (isNoteOff)
+				{
+					mpc.getControls().lock()->getPressedPads()->erase(pad);
+				}
 			}
 		}
 	}
@@ -120,13 +123,13 @@ void MpcMidiInput::transport(ctoot::midi::core::MidiMessage* msg, int timeStamp)
 		{
 			switch (mce->getStatus())
 			{
-			case ctoot::midi::core::ShortMessage::START:
+			case ShortMessage::START:
 				lSequencer->playFromStart();
 				break;
-			case ctoot::midi::core::ShortMessage::STOP:
+			case ShortMessage::STOP:
 				lSequencer->stop();
 				break;
-			case ctoot::midi::core::ShortMessage::TIMING_CLOCK:
+			case ShortMessage::TIMING_CLOCK:
 				break;
 			}
 
@@ -223,16 +226,16 @@ void MpcMidiInput::midiOut(weak_ptr<mpc::sequencer::Event> e, mpc::sequencer::Tr
 	}
 }
 
-void MpcMidiInput::transportOmni(ctoot::midi::core::MidiMessage* msg, string outputLetter)
+void MpcMidiInput::transportOmni(MidiMessage* msg, string outputLetter)
 {
 	auto mpcMidiPorts = mpc.getMidiPorts().lock();
 
-	if (dynamic_cast<ctoot::midi::core::ShortMessage*>(msg) != nullptr)
+	if (dynamic_cast<ShortMessage*>(msg) != nullptr)
 	{
 		if (mpc.getLayeredScreen().lock()->getCurrentScreenName().compare("midi-output-monitor") == 0)
 		{
 			
-			notifyObservers(string(outputLetter + to_string(dynamic_cast<ctoot::midi::core::ShortMessage*>(msg)->getChannel())));
+			notifyObservers(string(outputLetter + to_string(dynamic_cast<ShortMessage*>(msg)->getChannel())));
 		}
 	}
 }

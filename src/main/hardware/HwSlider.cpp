@@ -11,17 +11,17 @@ Slider::Slider(mpc::Mpc& mpc)
 {
 }
 
-void Slider::setValue(int i) {
+void Slider::setValue(int i)
+{
 	if (i < 0 || i > 127)
-	{
 		return;
-	}
 
 	value = i;
 	
-	if (mpc.getActiveControls().lock()) {
+	if (mpc.getActiveControls().lock())
 		mpc.getActiveControls().lock()->setSlider(value);
-	}
+
+	notifyObservers(value);
 }
 
 int Slider::getValue() {

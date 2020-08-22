@@ -34,6 +34,7 @@ void ProgramScreen::turnWheel(int i)
 	else if (param.compare("midiprogramchange") == 0)
 	{
 		program.lock()->setMidiProgramChange(program.lock()->getMidiProgramChange() + i);
+		displayMidiProgramChange();
 	}
 }
 
