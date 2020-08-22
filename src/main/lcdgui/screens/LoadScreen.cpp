@@ -55,7 +55,7 @@ void LoadScreen::function(int i)
 		openScreen("save");
 		break;
 	case 2:
-		openScreen("format");
+		//openScreen("format");
 		break;
 	case 3:
 		//openScreen("setup");

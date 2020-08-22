@@ -41,7 +41,7 @@ void SaveScreen::function(int i)
 		openScreen("load");
 		break;
 	case 2:
-		openScreen("format");
+		//openScreen("format");
 		break;
 	case 3:
 		//openScreen("setup");
