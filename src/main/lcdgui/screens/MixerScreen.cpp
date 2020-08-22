@@ -79,11 +79,12 @@ void MixerScreen::displayMixerStrip(int i)
 	const auto pad = program.lock()->getPad(padIndex);
 	const auto note = pad->getNote();
 
+	mixerStrips[i].lock()->findChild<Knob>("").lock()->Hide(note == 34);
+
 	if (note == 34)
 	{
-		// We don't have mixer channels.
-		// We should only show the pad names in a strip.
-		// VerticalBar and panning/output/fxpath widget in the top are hidden.
+		mixerStrips[i].lock()->setValueAString("");
+		mixerStrips[i].lock()->setValueB(0);
 	}
 	else
 	{

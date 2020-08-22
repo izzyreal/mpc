@@ -20,8 +20,7 @@ ChannelSettingsScreen::ChannelSettingsScreen(mpc::Mpc& mpc, const int layerIndex
 void ChannelSettingsScreen::open()
 {
 	init();
-	const auto padIndex = mpc.getPad();
-	const auto note_ = program.lock()->getNoteFromPad(padIndex);
+	const auto note_ = program.lock()->getNoteFromPad(mpc.getPad());
 
 	note = note_ == 34 ? 35 : note_;
 	displayChannel();
@@ -43,15 +42,7 @@ void ChannelSettingsScreen::turnWheel(int i)
 
 	if (param.compare("note") == 0)
 	{
-		int note_ = note + i;
-	
-		if (note_ >= 35 && note_ <= 98)
-		{
-			
-			int pad = program.lock()->getPadIndexFromNote(note);
-			mpc.setPadAndNote(note, pad);
-			// update(...) takes care of calling displayChannel
-		}
+		setNote(note + i);
 	}
 	else if (param.compare("stereovolume") == 0)
 	{
@@ -120,17 +111,19 @@ void ChannelSettingsScreen::displayChannel()
 
 void ChannelSettingsScreen::displayNoteField()
 {
-	string soundString = "OFF";
-	auto sampleNumber = program.lock()->getNoteParameters(mpc.getNote())->getSndNumber();
+	string soundName = "OFF";
+	auto soundIndex = program.lock()->getNoteParameters(note)->getSndNumber();
 
-	if (sampleNumber > 0 && sampleNumber < sampler.lock()->getSoundCount())
+	if (soundIndex >= 0 && soundIndex < sampler.lock()->getSoundCount())
 	{
-		soundString = sampler.lock()->getSoundName(sampleNumber);
+		soundName = sampler.lock()->getSoundName(soundIndex);
 
-		if (!sampler.lock()->getSound(sampleNumber).lock()->isMono())
-			soundString += StrUtil::padLeft("(ST)", " ", 23 - soundString.length());
+		if (!sampler.lock()->getSound(soundIndex).lock()->isMono())
+			soundName += StrUtil::padLeft("(ST)", " ", 23 - soundName.length());
 	}
-	findField("note").lock()->setText(to_string(mpc.getNote()) + "/" + sampler.lock()->getPadName(mpc.getPad()) + "-" + soundString);
+
+	auto padIndex = program.lock()->getPadIndexFromNote(note);
+	findField("note").lock()->setText(to_string(note) + "/" + sampler.lock()->getPadName(padIndex) + "-" + soundName);
 }
 
 void ChannelSettingsScreen::displayStereoVolume()
@@ -138,7 +131,7 @@ void ChannelSettingsScreen::displayStereoVolume()
 	auto note = program.lock()->getNoteFromPad(mpc.getPad());
 	if (note == 34)
 	{
-		// We have no mixer channel
+		findField("stereovolume").lock()->setText("");
 	}
 	else {
 		auto noteParameters = dynamic_cast<NoteParameters*>(program.lock()->getNoteParameters(note));
@@ -250,11 +243,11 @@ void ChannelSettingsScreen::displayFollowStereo()
 	}
 }
 
-void ChannelSettingsScreen::setNote(int note_)
+void ChannelSettingsScreen::setNote(int note)
 {
-	if (note_ < 35 || note > 98)
+	if (note < 35 || note > 98)
 		return;
 
-	note = note_;
+	this->note = note;
 	displayChannel();
 }

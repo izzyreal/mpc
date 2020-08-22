@@ -9,6 +9,11 @@ namespace mpc::lcdgui::screens
 	class SelectMixerDrumScreen;
 }
 
+namespace mpc::lcdgui::screens::window
+{
+	class ChannelSettingsScreen;
+}
+
 namespace mpc::lcdgui::screens
 {
 	class MixerScreen
@@ -68,6 +73,7 @@ namespace mpc::lcdgui::screens
 
 	private:
 		friend class SelectMixerDrumScreen;
+		friend class mpc::lcdgui::screens::window::ChannelSettingsScreen;
 
 	};
 }
