@@ -122,8 +122,15 @@ void ChannelSettingsScreen::displayNoteField()
 			soundName += StrUtil::padLeft("(ST)", " ", 23 - soundName.length());
 	}
 
-	auto padIndex = program.lock()->getPadIndexFromNote(note);
-	findField("note").lock()->setText(to_string(note) + "/" + sampler.lock()->getPadName(padIndex) + "-" + soundName);
+	if (note == 34)
+	{
+		findField("note").lock()->setText("");
+	}
+	else
+	{
+		auto padIndex = program.lock()->getPadIndexFromNote(note);
+		findField("note").lock()->setText(to_string(note) + "/" + sampler.lock()->getPadName(padIndex) + "-" + soundName);
+	}
 }
 
 void ChannelSettingsScreen::displayStereoVolume()
@@ -145,7 +152,7 @@ void ChannelSettingsScreen::displayIndividualVolume()
 	auto note = program.lock()->getNoteFromPad(mpc.getPad());
 	if (note == 34)
 	{
-		// We have no mixer channel
+		findField("individualvolume").lock()->setText("");
 	}
 	else {
 		auto noteParameters = dynamic_cast<NoteParameters*>(program.lock()->getNoteParameters(note));
@@ -159,7 +166,7 @@ void ChannelSettingsScreen::displayFxSendLevel()
 	auto note = program.lock()->getNoteFromPad(mpc.getPad());
 	if (note == 34)
 	{
-		// We have no mixer channel
+		findField("fxsendlevel").lock()->setText("");
 	}
 	else {
 		auto noteParameters = dynamic_cast<NoteParameters*>(program.lock()->getNoteParameters(note));
@@ -173,7 +180,7 @@ void ChannelSettingsScreen::displayPanning()
 	auto note = program.lock()->getNoteFromPad(mpc.getPad());
 	if (note == 34)
 	{
-		// We have no mixer channel
+		findField("panning").lock()->setText("");
 	}
 	else {
 		auto noteParameters = dynamic_cast<NoteParameters*>(program.lock()->getNoteParameters(note));
@@ -200,7 +207,7 @@ void ChannelSettingsScreen::displayOutput()
 	auto note = program.lock()->getNoteFromPad(mpc.getPad());
 	if (note == 34)
 	{
-		// We have no mixer channel
+		findField("output").lock()->setText("");
 	}
 	else {
 		auto noteParameters = dynamic_cast<NoteParameters*>(program.lock()->getNoteParameters(note));
@@ -220,7 +227,7 @@ void ChannelSettingsScreen::displayFxPath()
 
 	if (note == 34)
 	{
-		// We have no mixer channel
+		findField("fxpath").lock()->setText("");
 	}
 	else {
 		auto noteParameters = dynamic_cast<NoteParameters*>(program.lock()->getNoteParameters(note));
@@ -234,7 +241,7 @@ void ChannelSettingsScreen::displayFollowStereo()
 	auto note = program.lock()->getNoteFromPad(mpc.getPad());
 	if (note == 34)
 	{
-		// We have no mixer channel
+		findField("followstereo").lock()->setText("");
 	}
 	else {
 		auto noteParameters = dynamic_cast<NoteParameters*>(program.lock()->getNoteParameters(note));
