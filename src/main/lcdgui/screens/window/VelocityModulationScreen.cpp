@@ -72,7 +72,7 @@ void VelocityModulationScreen::displayNote()
 
 void VelocityModulationScreen::displayVelo()
 {
-	// Currently unimplemented
+	findField("velo").lock()->setText("127"); // Unimplemented.
 }
 
 void VelocityModulationScreen::displayVeloAttack()

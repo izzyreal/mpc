@@ -73,17 +73,20 @@ void MidiMonitorScreen::runBlinkThread(weak_ptr<mpc::lcdgui::Label> label) {
 void MidiMonitorScreen::initTimer(std::weak_ptr<mpc::lcdgui::Label> label)
 {
 	if (blinkThread.joinable())
-	{
 		blinkThread.join();
-	}
+
 	blinkThread = thread(&MidiMonitorScreen::static_blink, this, label);
 }
 
 void MidiMonitorScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 {
 	string s = nonstd::any_cast<string>(arg);
+	
 	int deviceNumber = stoi(s.substr(1));
-	if (s[0] == 'b') deviceNumber += 16;
+	
+	if (s[0] == 'b')
+		deviceNumber += 16;
+	
 	auto label = findLabel(to_string(deviceNumber));
 	label.lock()->setText(u8"\u00CC");
 	initTimer(label);

@@ -100,10 +100,8 @@ void MidiInputScreen::displayReceiveCh()
 void MidiInputScreen::setReceiveCh(int i)
 {
 	if (i < -1 || i > 15)
-	{
 		return;
-	}
-
+	
 	receiveCh = i;
 	displayReceiveCh();
 }
@@ -116,9 +114,7 @@ int MidiInputScreen::getReceiveCh()
 void MidiInputScreen::setProgChangeSeq(bool b)
 {
 	if (progChangeSeq == b)
-	{
 		return;
-	}
 
 	progChangeSeq = b;
 	displayProgChangeSeq();
@@ -132,9 +128,7 @@ bool MidiInputScreen::getProgChangeSeq()
 void MidiInputScreen::setSustainPedalToDuration(bool b)
 {
 	if (sustainPedalToDuration == b)
-	{
 		return;
-	}
 
 	sustainPedalToDuration = b;
 	displaySustainPedalToDuration();
@@ -148,9 +142,7 @@ bool MidiInputScreen::isSustainPedalToDurationEnabled()
 void MidiInputScreen::setMidiFilterEnabled(bool b)
 {
 	if (midiFilter == b)
-	{
 		return;
-	}
 
 	midiFilter = b;
 	displayMidiFilter();
@@ -164,9 +156,7 @@ bool MidiInputScreen::isMidiFilterEnabled()
 void MidiInputScreen::setType(int i)
 {
 	if (i < 0 || i > 134)
-	{
 		return;
-	}
 
 	type = i;
 	displayType();
@@ -180,9 +170,7 @@ int MidiInputScreen::getType()
 void MidiInputScreen::setPass(bool b)
 {
 	if (pass == b)
-	{
 		return;
-	}
 
 	pass = b;
 	displayPass();
