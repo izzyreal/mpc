@@ -1017,6 +1017,56 @@ weak_ptr<Sound> Sampler::copySound(weak_ptr<Sound> source)
 	return newSound;
 }
 
+void Sampler::copyProgram(const int sourceIndex, const int destIndex)
+{
+	if (programs[destIndex])
+		programs[destIndex].reset();
+
+	auto src = programs[sourceIndex];
+	auto dest = addProgram(destIndex).lock();
+
+	dest->setMidiProgramChange(dest->getMidiProgramChange());
+	dest->setName(src->getName());
+	
+	for (int i = 0; i < 64; i++)
+	{
+		auto copy = dynamic_cast<NoteParameters*>(src->getNoteParameters(i + 35))->clone(i);
+		dest->setNoteParameters(i, copy);
+		
+		auto mc1 = dest->getIndivFxMixerChannel(i).lock();
+		auto mc2 = src->getIndivFxMixerChannel(i).lock();
+		mc1->setFollowStereo(mc2->isFollowingStereo());
+		mc1->setFxPath(mc2->getFxPath());
+		mc1->setFxSendLevel(mc2->getFxSendLevel());
+		mc1->setOutput(mc2->getOutput());
+		mc1->setVolumeIndividualOut(mc2->getVolumeIndividualOut());
+
+		auto mc3 = dest->getStereoMixerChannel(i).lock();
+		auto mc4 = src->getStereoMixerChannel(i).lock();
+		mc3->setLevel(mc4->getLevel());
+		mc3->setPanning(mc4->getPanning());
+		mc3->setStereo(mc4->isStereo());
+
+		auto srcPad = src->getPad(i);
+		auto destPad = dest->getPad(i);
+		destPad->setNote(srcPad->getNote());
+	}
+
+	auto srcSlider = src->getSlider();
+	auto destSlider = dest->getSlider();
+	destSlider->setAssignNote(srcSlider->getNote());
+	destSlider->setAttackHighRange(srcSlider->getAttackHighRange());
+	destSlider->setAttackLowRange(srcSlider->getAttackLowRange());
+	destSlider->setControlChange(srcSlider->getControlChange());
+	destSlider->setDecayHighRange(srcSlider->getDecayHighRange());
+	destSlider->setDecayLowRange(srcSlider->getDecayLowRange());
+	destSlider->setFilterHighRange(srcSlider->getFilterHighRange());
+	destSlider->setFilterLowRange(srcSlider->getFilterLowRange());
+	destSlider->setParameter(srcSlider->getParameter());
+	destSlider->setTuneHighRange(srcSlider->getTuneHighRange());
+	destSlider->setTuneLowRange(srcSlider->getTuneLowRange());
+}
+
 bool Sampler::compareMemoryIndex(weak_ptr<Sound> a, weak_ptr<Sound> b) {
 	return a.lock()->getMemoryIndex() < b.lock()->getMemoryIndex();
 }

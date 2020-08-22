@@ -4,9 +4,9 @@ using namespace mpc::sampler;
 using namespace ctoot::mpc;
 using namespace std;
 
-NoteParameters::NoteParameters(int number) 
+NoteParameters::NoteParameters(const int index)
+    : index(index)
 {
-	this->number = number;
 	decay = 5;
 	filterFrequency = 100; 
 	velocityRangeLower = 44;
@@ -438,9 +438,9 @@ int NoteParameters::getVelocityToPitch()
     return velocityToPitch;
 }
 
-NoteParameters* NoteParameters::clone(const int newNumber)
+NoteParameters* NoteParameters::clone(const int newIndex)
 {
-	auto res = new NoteParameters(newNumber);
+	auto res = new NoteParameters(newIndex);
 	res->setAttack(attack);
 	res->setDecay(decay);
 	res->setDecayMode(decayMode);
@@ -470,7 +470,7 @@ NoteParameters* NoteParameters::clone(const int newNumber)
 
 int NoteParameters::getNumber()
 {
-    return number + 35;
+    return index + 35;
 }
 
 weak_ptr<MpcStereoMixerChannel> NoteParameters::getStereoMixerChannel()

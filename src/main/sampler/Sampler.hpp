@@ -18,8 +18,8 @@ namespace mpc::sequencer {
 	class NoteEvent;
 }
 
-namespace mpc::sampler {
-
+namespace mpc::sampler
+{
 	class Sampler final
 		: public virtual ctoot::mpc::MpcSampler
 	{
@@ -140,6 +140,7 @@ namespace mpc::sampler {
 		std::vector<std::weak_ptr<ctoot::mpc::MpcStereoMixerChannel>> getDrumStereoMixerChannels(int i);
 		std::vector<std::weak_ptr<ctoot::mpc::MpcIndivFxMixerChannel>> getDrumIndivFxMixerChannels(int i);
 		std::weak_ptr<Sound> copySound(std::weak_ptr<Sound> source);
+		void copyProgram(const int sourceIndex, const int destIndex);
 
 	public:
 		std::vector<int>* getInitMasterPadAssign();

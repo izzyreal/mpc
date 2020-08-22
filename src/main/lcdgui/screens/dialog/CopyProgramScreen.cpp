@@ -26,9 +26,10 @@ void CopyProgramScreen::function(int i)
 		openScreen("program");
 		break;
 	case 4:
-		if (pgm0 == pgm1) {
+		if (pgm0 == pgm1)
 			return;
-		}
+
+		sampler.lock()->copyProgram(pgm0, pgm1);
 
 		openScreen("program");
 		break;
@@ -51,9 +52,7 @@ void CopyProgramScreen::turnWheel(int i)
 void CopyProgramScreen::setPgm0(int i)
 {
 	if (i < 0 || i >= sampler.lock()->getProgramCount())
-	{
 		return;
-	}
 
 	pgm0 = i;
 	displayPgm0();
@@ -61,10 +60,9 @@ void CopyProgramScreen::setPgm0(int i)
 
 void CopyProgramScreen::setPgm1(int i)
 {
-	if (i < 0 || i >= sampler.lock()->getProgramCount())
-	{
+	if (i < 0 || i >= sampler.lock()->getPrograms().size())
 		return;
-	}
+
 	pgm1 = i;
 	displayPgm1();
 }
@@ -77,6 +75,8 @@ void CopyProgramScreen::displayPgm0()
 
 void CopyProgramScreen::displayPgm1()
 {
-	auto programName = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(pgm1).lock())->getName();
+	auto program1 = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(pgm1).lock());
+
+	auto programName = program1 ? program1->getName() : "(no program)";
 	findField("pgm1").lock()->setText(StrUtil::padLeft(to_string(pgm1 + 1), " ", 2) + "-" + programName);
 }

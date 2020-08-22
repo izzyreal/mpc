@@ -108,12 +108,12 @@ mpc::sampler::PgmSlider* Program::getSlider()
     return slider;
 }
 
-void Program::setNoteParameters(int i, NoteParameters* nn)
+void Program::setNoteParameters(int index, NoteParameters* nn)
 {
-	if (noteParameters[i] != nullptr)
-		delete noteParameters[i];
+	if (noteParameters[index] != nullptr)
+		delete noteParameters[index];
 
-	noteParameters[i] = nn;
+	noteParameters[index] = nn;
 }
 
 int Program::getMidiProgramChange()

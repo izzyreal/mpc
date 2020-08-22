@@ -65,7 +65,7 @@ namespace mpc::sampler
 		int velocityToFilterFrequency = 0;
 		int sliderParameterNumber = 0;
 		int velocityToPitch = 0;
-		int number = 0;
+		int index = 0;
 
 	public:
 		void setSoundNumberNoLimit(int i);
@@ -97,9 +97,9 @@ namespace mpc::sampler
 		int getSliderParameterNumber();
 		void setVelocityToPitch(int i);
 		int getVelocityToPitch();
-		NoteParameters* clone(const int newNumber);
+		NoteParameters* clone(const int newIndex);
 		int getNumber();
 
-		NoteParameters(int number);
+		NoteParameters(int index);
 	};
 }
