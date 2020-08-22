@@ -439,8 +439,11 @@ void AudioMidiServices::startRecordingSound()
 	recordingSound.store(true);
 }
 
-void AudioMidiServices::stopSoundRecorder()
+void AudioMidiServices::stopSoundRecorder(bool cancel)
 {
+	if (cancel)
+		soundRecorder->cancel();
+	
 	recordingSound.store(false);
 }
 

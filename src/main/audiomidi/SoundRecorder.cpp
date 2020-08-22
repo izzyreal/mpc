@@ -28,9 +28,9 @@ unsigned int SoundRecorder::getInputGain()
 
 void SoundRecorder::setInputGain(unsigned int gain)
 {
-	if (gain < 0 || gain > 100) {
+	if (gain < 0 || gain > 100)
 		return;
-	}
+
 	inputGain = gain;
 }
 
@@ -47,74 +47,94 @@ bool SoundRecorder::isArmed()
 // modes: 0 = MONO L, 1 = MONO R, 2 = STEREO
 void SoundRecorder::prepare(const weak_ptr<Sound> sound, int lengthInFrames)
 {
-	if (recording) {
+	if (recording)
 		return;
-	}
+
+	cancelled = false;
 
 	this->sound = sound;
 	this->lengthInFrames = lengthInFrames;
 
-	if (mode != 2) {
+	if (mode != 2)
 		sound.lock()->setMono(true);
-	}
 }
 
 // Should be called from the audio thread
-void SoundRecorder::start() {
-	if (recording) {
+void SoundRecorder::start()
+{
+	if (recording)
 		return;
-	}
 
 	mpc.getLayeredScreen().lock()->getCurrentBackground()->setName("recording");
+
+	armed = false;
 
 	resampleBufferLeft.reset();
 	resampleBufferRight.reset();
 	recording = true;
 }
 
-bool SoundRecorder::isRecording() {
+bool SoundRecorder::isRecording()
+{
 	return recording;
 }
 
-void SoundRecorder::stop() {
+void SoundRecorder::stop()
+{
 	recording = false;
-	auto s = sound.lock();
 
-	auto sampleScreen = dynamic_pointer_cast<SampleScreen>(mpc.screens->getScreenComponent("sample"));
-	auto preRecFrames = (int)(44.1 * sampleScreen->preRec);
-
-	auto frameCount = s->getOscillatorControls()->getFrameCount();
-
-	auto overflow = frameCount - lengthInFrames - preRecFrames; // Would be fun to check if overflow is ever not 0.
-
-	if (overflow > 0) {
-		s->getSampleData()->erase(s->getSampleData()->end() - overflow, s->getSampleData()->end());
-		if (mode == 2) {
-			s->getSampleData()->erase(s->getSampleData()->begin() + lengthInFrames + preRecFrames, s->getSampleData()->end());
-		}
-	}
-
-	s->setStart(preRecFrames);
-	s->setEnd(s->getOscillatorControls()->getFrameCount());
-
-	if (srcLeft != NULL) {
+	if (srcLeft != NULL)
+	{
 		src_delete(srcLeft);
 		srcLeft = NULL;
 	}
 
-	if (srcRight != NULL) {
+	if (srcRight != NULL)
+	{
 		src_delete(srcRight);
 		srcRight = NULL;
 	}
 
-	mpc.getLayeredScreen().lock()->openScreen("keep-or-retry");
+	if (cancelled)
+	{
+		mpc.getSampler().lock()->deleteSound(sound);
+		cancelled = false;
+	}
+	else
+	{
+		auto s = sound.lock();
+
+		auto sampleScreen = dynamic_pointer_cast<SampleScreen>(mpc.screens->getScreenComponent("sample"));
+		auto preRecFrames = (int)(44.1 * sampleScreen->preRec);
+
+		auto frameCount = s->getOscillatorControls()->getFrameCount();
+
+		auto overflow = frameCount - lengthInFrames - preRecFrames; // Would be fun to check if overflow is ever not 0.
+
+		if (overflow > 0)
+		{
+			s->getSampleData()->erase(s->getSampleData()->end() - overflow, s->getSampleData()->end());
+
+			if (mode == 2)
+				s->getSampleData()->erase(s->getSampleData()->begin() + lengthInFrames + preRecFrames, s->getSampleData()->end());
+		}
+
+		s->setStart(preRecFrames);
+		s->setEnd(s->getOscillatorControls()->getFrameCount());
+
+		mpc.getLayeredScreen().lock()->openScreen("keep-or-retry");
+	}
+}
+
+void SoundRecorder::cancel()
+{
+	cancelled = true;
 }
 
 void applyGain(float gain, vector<float>* data)
 {
-	for (int i = 0; i < data->size(); i++) {
+	for (int i = 0; i < data->size(); i++)
 		(*data)[i] *= gain;
-	}
 }
 
 void SoundRecorder::setSampleScreenActive(bool active)
@@ -132,11 +152,10 @@ int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf)
 
 	auto sampleScreen = dynamic_pointer_cast<SampleScreen>(mpc.screens->getScreenComponent("sample"));
 
-	if (sampleScreenActive.load()) {
-
-		if (!lastSampleScreenActive) {
+	if (sampleScreenActive.load())
+	{
+		if (!lastSampleScreenActive)
 			lastSampleScreenActive = true;
-		}
 
 		mode = sampleScreen->getMode();
 
@@ -159,12 +178,14 @@ int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf)
 		if (armed && (log10(peakL) * 20 > sampleScreen->threshold || log10(peakR) * 20 > sampleScreen->threshold))
 		{
 			armed = false;
+			mpc.getLayeredScreen().lock()->getCurrentBackground()->setName("recording");
 			mpc.getAudioMidiServices().lock()->startRecordingSound();
 		}
 
 		notifyObservers(pair<float, float>(peakL, peakR));
 	}
-	else {
+	else
+	{
 		if (lastSampleScreenActive)
 		{
 			preRecBufferLeft.reset();
@@ -173,15 +194,18 @@ int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf)
 		}
 	}
 
-	if (recording) {
+	if (recording)
+	{
 		auto s = sound.lock();
 		auto osc = s->getOscillatorControls();
 		auto currentLength = s->getOscillatorControls()->getFrameCount();
 		auto resample = buf->getSampleRate() != 44100;
 
-		if (resample) {
+		if (resample)
+		{
 			if (((mode == 0 || mode == 2) && srcLeft == NULL) ||
-				((mode == 1 || mode == 2) && srcRight == NULL)) {
+				((mode == 1 || mode == 2) && srcRight == NULL))
+			{
 				initSrc();
 			}
 		}
@@ -255,15 +279,12 @@ int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf)
 			right = &resampledRight;
 		}
 
-		if (mode == 0) {
+		if (mode == 0)
 			osc->insertFrames(*left, currentLength);
-		}
-		else if (mode == 1) {
+		else if (mode == 1)
 			osc->insertFrames(*right, currentLength);
-		}
-		else if (mode == 2) {
+		else if (mode == 2)
 			osc->insertFrames(*left, *right, currentLength);
-		}
 
 		if (osc->getFrameCount() >= lengthInFrames) {
 			recording = false;

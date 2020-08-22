@@ -35,70 +35,67 @@ void SampleScreen::close()
 
 }
 
-void SampleScreen::left() {
-	//if (sampler.lock()->isArmed() || sampler.lock()->isRecording()) return;
+void SampleScreen::left()
+{
 	if (mpc.getAudioMidiServices().lock()->isRecordingSound())
-	{
 		return;
-	}
+
 	baseControls->left();
 }
 
-void SampleScreen::right() {
-	//if (sampler.lock()->isArmed() || sampler.lock()->isRecording()) return;
-	if (mpc.getAudioMidiServices().lock()->isRecordingSound()) {
+void SampleScreen::right()
+{
+	if (mpc.getAudioMidiServices().lock()->isRecordingSound())
 		return;
-	}
+
 	baseControls->right();
 }
 
-void SampleScreen::up() {
-	//if (sampler.lock()->isArmed() || sampler.lock()->isRecording()) return;
-	if (mpc.getAudioMidiServices().lock()->isRecordingSound()) {
+void SampleScreen::up()
+{
+	if (mpc.getAudioMidiServices().lock()->isRecordingSound())
 		return;
-	}
+
 	baseControls->up();
 }
 
-void SampleScreen::down() {
-	//if (sampler.lock()->isArmed() || sampler.lock()->isRecording()) return;
-	if (mpc.getAudioMidiServices().lock()->isRecordingSound()) {
+void SampleScreen::down()
+{
+	if (mpc.getAudioMidiServices().lock()->isRecordingSound())
 		return;
-	}
+
 	baseControls->down();
 }
 
 void SampleScreen::function(int i)
 {
 	init();
-	
+
 	switch (i)
 	{
 	case 0:
-		if (mpc.getAudioMidiServices().lock()->isRecordingSound()) {
+		if (mpc.getAudioMidiServices().lock()->isRecordingSound())
 			return;
-		}
+
 		peakL = 0.f;
 		peakR = 0.f;
 		break;
 	case 4:
-		if (mpc.getAudioMidiServices().lock()->isRecordingSound()) {
-			return;
+		if (mpc.getAudioMidiServices().lock()->isRecordingSound())
+		{
+			mpc.getAudioMidiServices().lock()->stopSoundRecorder(true);
+			findBackground().lock()->setName("sample");
 		}
-		//if (samplerisRecording()) {
-		//	samplercancelRecording();
-		//	return;
-		//}
-		//if (samplerisArmed()) {
-		//	samplerunArm();
-		//	return;
-		//}
+		else if (mpc.getAudioMidiServices().lock()->getSoundRecorder().lock()->isArmed())
+		{
+			mpc.getAudioMidiServices().lock()->getSoundRecorder().lock()->setArmed(false);
+			sampler.lock()->deleteSample(sampler.lock()->getSoundCount() - 1);
+			findBackground().lock()->setName("sample");
+		}
 		break;
 	case 5:
 		if (mpc.getControls().lock()->isF6Pressed())
-		{
 			return;
-		}
 
 		mpc.getControls().lock()->setF6Pressed(true);
 
@@ -110,16 +107,17 @@ void SampleScreen::function(int i)
 			return;
 		}
 
-		auto sound = sampler.lock()->addSound();
-		sound.lock()->setName(sampler.lock()->addOrIncreaseNumber("sound"));
-		auto lengthInFrames = time * (44100 * 0.1);
-		ams->getSoundRecorder().lock()->prepare(sound, lengthInFrames);
-
 		if (ams->getSoundRecorder().lock()->isArmed())
 		{
 			ams->startRecordingSound();
+			findBackground().lock()->setName("recording");
 		}
-		else {
+		else
+		{
+			auto sound = sampler.lock()->addSound();
+			sound.lock()->setName(sampler.lock()->addOrIncreaseNumber("sound"));
+			auto lengthInFrames = time * (44100 * 0.1);
+			ams->getSoundRecorder().lock()->prepare(sound, lengthInFrames);
 			ams->getSoundRecorder().lock()->setArmed(true);
 			findChild<Background>("").lock()->setName("waiting-for-input-signal");
 		}
@@ -131,8 +129,11 @@ void SampleScreen::function(int i)
 void SampleScreen::turnWheel(int i)
 {
     init();
-	//if (!samplerisRecording() && !samplerisArmed()) {
-        if (param.compare("input") == 0)
+	auto ams = mpc.getAudioMidiServices().lock();
+
+	if (!ams->isRecordingSound())
+	{
+	    if (param.compare("input") == 0)
 		{
             setInput(input + i);
         }
@@ -158,16 +159,14 @@ void SampleScreen::turnWheel(int i)
 		{
 			setPreRec(preRec + i);
 		}
-    //}
+    }
 }
 
 
 void SampleScreen::setInput(int i)
 {
 	if (i < 0 || i > 1)
-	{
 		return;
-	}
 
 	input = i;
 	displayInput();
@@ -176,9 +175,7 @@ void SampleScreen::setInput(int i)
 void SampleScreen::setThreshold(int i)
 {
 	if (i < -64 || i > 0)
-	{
 		return;
-	}
 
 	threshold = i;
 	displayThreshold();
@@ -187,9 +184,7 @@ void SampleScreen::setThreshold(int i)
 void SampleScreen::setMode(int i)
 {
 	if (i < 0 || i > 2)
-	{
 		return;
-	}
 
 	mode = i;
 	displayMode();
@@ -198,9 +193,7 @@ void SampleScreen::setMode(int i)
 void SampleScreen::setTime(int i)
 {
 	if (i < 0 || i > 3786)
-	{
 		return;
-	}
 
 	time = i;
 	displayTime();
@@ -209,9 +202,7 @@ void SampleScreen::setTime(int i)
 void SampleScreen::setMonitor(int i)
 {
 	if (i < 0 || i > 5)
-	{
 		return;
-	}
 
 	monitor = i;
 	displayMonitor();
@@ -220,9 +211,7 @@ void SampleScreen::setMonitor(int i)
 void SampleScreen::setPreRec(int i)
 {
 	if (i < 0 || i > 100)
-	{
 		return;
-	}
 
 	preRec = i;
 	displayPreRec();
@@ -272,7 +261,8 @@ void SampleScreen::updateVU(const float levelL, const float levelR)
 	int levell = (int) floor(log10(levelL) * 20);
 	int levelr = (int) floor(log10(levelR) * 20);
 
-	for (int i = 0; i < 34; i++) {
+	for (int i = 0; i < 34; i++)
+	{
 		string l = " ";
 		string r = " ";
 		bool normall = vuPosToDb[i] <= levell;

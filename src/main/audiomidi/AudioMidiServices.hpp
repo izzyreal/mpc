@@ -73,7 +73,7 @@ namespace mpc::audiomidi
 		bool stopBouncing();
 		bool stopBouncingEarly();
 		void startRecordingSound();
-		void stopSoundRecorder();
+		void stopSoundRecorder(bool cancel = false);
 		
 	private:
 		bool bouncePrepared = false;

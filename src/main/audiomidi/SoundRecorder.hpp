@@ -31,6 +31,7 @@ namespace mpc::audiomidi
 	private:
 		mpc::Mpc& mpc;
 		bool recording = false;
+		bool cancelled = false;
 		bool sampleScreenWasActive = false;
 		int recordedFrameCount = 0;
 		int lengthInFrames = 0;
@@ -59,9 +60,8 @@ namespace mpc::audiomidi
 		void prepare(const std::weak_ptr<Sound>, int lengthInFrames);
 		void start();
 		void stop();
+		void cancel();
 		int processAudio(ctoot::audio::core::AudioBuffer* buf) override;
-		void open() {};
-		void close() {};
 		bool isRecording();
 		unsigned int getInputGain();
 		void setInputGain(unsigned int);
@@ -70,5 +70,7 @@ namespace mpc::audiomidi
 
 		SoundRecorder(mpc::Mpc& mpc);
 
+		void open() override {}
+		void close() override {}
 	};
 }
