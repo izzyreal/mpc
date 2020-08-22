@@ -289,7 +289,7 @@ int LoadScreen::getFileSize()
 		return 0;
 	}
 	
-	return (int) ceil(disk->getFile(fileLoad)->length() / 1024.0);
+	return (int) floor(disk->getFile(fileLoad)->length() / 1024.0);
 }
 
 void LoadScreen::displaySize()

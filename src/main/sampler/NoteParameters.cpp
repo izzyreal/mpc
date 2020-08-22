@@ -130,7 +130,7 @@ int NoteParameters::getVoiceOverlap()
 
 void NoteParameters::setVoiceOverlap(int i)
 {
-    if(i < 0 || i > 2)
+    if (i < 0 || i > 2)
         return;
 
     voiceOverlap = i;
@@ -155,7 +155,7 @@ int NoteParameters::getMuteAssignA()
 
 void NoteParameters::setMuteAssignB(int i)
 {
-    if(i < 34 || i > 98)
+    if (i < 34 || i > 98)
         return;
 
     muteAssignB = i;
@@ -170,11 +170,13 @@ int NoteParameters::getMuteAssignB()
 
 void NoteParameters::setTune(int i)
 {
-    if(tune == i)
+    if (tune == i)
         return;
 
-    if(i < -240 || i > 240)
-        return;
+    if (i < -240)
+        i = -240;
+    else if (i > 240)
+        i = 240;
 
     tune = i;
     

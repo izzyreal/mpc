@@ -71,7 +71,7 @@ void VeloPitchScreen::displayVeloPitch()
 
 void VeloPitchScreen::displayVelo()
 {
-	// Currently unimplemented
+	findField("velo").lock()->setText("127");
 }
 
 void VeloPitchScreen::update(moduru::observer::Observable* observable, nonstd::any message)
