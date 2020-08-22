@@ -378,7 +378,14 @@ vector<int> ZoneScreen::getZone()
 
 void ZoneScreen::pressEnter()
 {
+	if (mpc.getControls().lock()->isShiftPressed())
+	{
+		openScreen("save");
+		return;
+	}
+
 	init();
+
 	auto field = ls.lock()->getFocusedLayer().lock()->findField(param).lock();
 
 	if (!field->isTypeModeEnabled())

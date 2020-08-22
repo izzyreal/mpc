@@ -264,6 +264,12 @@ void TrimScreen::right()
 // Can be called from another layer, i.e. Start Fine and End Fine windows
 void TrimScreen::pressEnter()
 {
+	if (mpc.getControls().lock()->isShiftPressed())
+	{
+		openScreen("save");
+		return;
+	}
+
 	init();
 
 	auto field = ls.lock()->getFocusedLayer().lock()->findField(param).lock();

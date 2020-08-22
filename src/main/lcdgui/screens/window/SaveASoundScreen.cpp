@@ -16,9 +16,7 @@ void SaveASoundScreen::open()
 	if (ls.lock()->getPreviousScreenName().compare("name") != 0)
 	{
 		if (sampler.lock()->getSound().lock())
-		{
 			saveName = sampler.lock()->getSound().lock()->getName();
-		}
 	}
 
 	displayFile();
@@ -41,7 +39,7 @@ void SaveASoundScreen::turnWheel(int i)
 		saveName = sampler.lock()->getSound().lock()->getName();
 		displayFile();
 	}
-	else if (param.compare("filetype") == 0)
+	else if (param.compare("file-type") == 0)
 	{
 		setFileType(fileType + i);
 	}
@@ -75,13 +73,9 @@ void SaveASoundScreen::function(int i)
 		auto f = disk->newFile(fileName);
 
 		if (fileType == 0)
-		{
 			disk->writeSound(s.get(), f);
-		}
 		else
-		{
 			disk->writeWav(s.get(), f);
-		}
 
 		disk->flush();
 		disk->initFiles();
@@ -94,9 +88,7 @@ void SaveASoundScreen::function(int i)
 void SaveASoundScreen::setFileType(int i)
 {
 	if (i < 0 || i > 1)
-	{
 		return;
-	}
 
 	fileType = i;
 	displayFileType();

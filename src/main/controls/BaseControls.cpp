@@ -503,11 +503,11 @@ void BaseControls::numpad(int i)
 void BaseControls::pressEnter()
 {
 	init();
+
 	auto controls = mpc.getControls().lock();
+
 	if (controls->isShiftPressed())
-	{
 		ls.lock()->openScreen("save");
-	}
 }
 
 void BaseControls::rec()

@@ -146,13 +146,9 @@ void SndParamsScreen::displayLevel()
 	auto sound = sampler.lock()->getSound().lock();
 
 	if (sound)
-	{
 		findField("level").lock()->setText(to_string(sound->getSndLevel()));
-	}
 	else
-	{
 		findField("level").lock()->setText("100");
-	}
 }
 
 void SndParamsScreen::displayTune()
@@ -160,13 +156,9 @@ void SndParamsScreen::displayTune()
 	auto sound = sampler.lock()->getSound().lock();
 
 	if (sound)
-	{
 		findField("tune").lock()->setText(to_string(sound->getTune()));
-	}
 	else
-	{
 		findField("tune").lock()->setText("0");
-	}
 }
 
 void SndParamsScreen::displayBeat()
@@ -174,13 +166,9 @@ void SndParamsScreen::displayBeat()
 	auto sound = sampler.lock()->getSound().lock();
 
 	if (sound)
-	{
 		findField("beat").lock()->setText(to_string(sound->getBeatCount()));
-	}
 	else
-	{
 		findField("beat").lock()->setText("4");
-	}
 }
 
 void SndParamsScreen::displaySampleAndNewTempo()
@@ -241,16 +229,13 @@ void SndParamsScreen::displaySnd()
 	if (sampler.lock()->getSoundCount() == 0)
 	{
 		findField("snd").lock()->setText("(no sound)");
-		//ls.lock()->setFocus("dummy"); // Is this required?
 		return;
 	}
 
 	auto ls = mpc.getLayeredScreen().lock();
 
 	if (ls->getFocus().compare("dummy") == 0)
-	{
 		ls->setFocus(findField("snd").lock()->getName());
-	}
 
 	auto sampleName = sound->getName();
 
