@@ -16,6 +16,7 @@
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
+using namespace ctoot::midi::core;
 using namespace std;
 
 EventAdapter::EventAdapter(mpc::Mpc& mpc, weak_ptr<Sequencer> sequencer)
@@ -26,41 +27,34 @@ EventAdapter::EventAdapter(mpc::Mpc& mpc, weak_ptr<Sequencer> sequencer)
 	noteEvent = make_shared<NoteEvent>(35);
 }
 
-void EventAdapter::process(ctoot::midi::core::MidiMessage* msg)
+void EventAdapter::process(MidiMessage* msg)
 {
-	if (dynamic_cast<ctoot::midi::core::ShortMessage*>(msg) != nullptr) {
-		event = convert(dynamic_cast<ctoot::midi::core::ShortMessage*>(msg));
-	}
-
+	if (dynamic_cast<ShortMessage*>(msg) != nullptr)
+		event = convert(dynamic_cast<ShortMessage*>(msg));
 }
 
-weak_ptr<Event> EventAdapter::convert(ctoot::midi::core::ShortMessage* msg)
+weak_ptr<Event> EventAdapter::convert(ShortMessage* msg)
 {
-	if (msg->getStatus() == ctoot::midi::core::ShortMessage::TIMING_CLOCK || msg->getStatus() == ctoot::midi::core::ShortMessage::START || msg->getStatus() == ctoot::midi::core::ShortMessage::STOP) {
+	if (msg->getStatus() == ShortMessage::TIMING_CLOCK || msg->getStatus() == ShortMessage::START || msg->getStatus() == ShortMessage::STOP)
+	{
 		midiClockEvent->setStatus(msg->getStatus());
 		return midiClockEvent;
 	}
 
 	auto midiInputScreen = dynamic_pointer_cast<MidiInputScreen>(mpc.screens->getScreenComponent("midi-input"));
 
-	if (midiInputScreen->getReceiveCh() != -1 && !(msg->getChannel() == midiInputScreen->getReceiveCh()))
-	{
+	if (midiInputScreen->getReceiveCh() != -1 && msg->getChannel() != midiInputScreen->getReceiveCh())
 		return {};
-	}
 
-	if (msg->getStatus() == ctoot::midi::core::ShortMessage::NOTE_ON || msg->getStatus() == ctoot::midi::core::ShortMessage::NOTE_OFF)
+	if ((msg->getStatus() >= ShortMessage::NOTE_ON && msg->getStatus() < ShortMessage::NOTE_ON + 16) ||
+		(msg->getStatus() >= ShortMessage::NOTE_OFF && msg->getStatus() < ShortMessage::NOTE_OFF + 16))
 	{
-
 		noteEvent->setNote(msg->getData1());
 	
-		if (msg->getStatus() == ctoot::midi::core::ShortMessage::NOTE_ON)
-		{
+		if (msg->getStatus() >= ShortMessage::NOTE_ON)
 			noteEvent->setVelocity(msg->getData2());
-		}
-		else if (msg->getStatus() == ctoot::midi::core::ShortMessage::NOTE_OFF)
-		{
+		else
 			noteEvent->setVelocityZero();
-		}
 
 		auto track = sequencer.lock()->getActiveTrackIndex();
 		
@@ -68,15 +62,14 @@ weak_ptr<Event> EventAdapter::convert(ctoot::midi::core::ShortMessage* msg)
 		auto mrs = screen->getMrsLines();
 
 		if (sequencer.lock()->isRecordingModeMulti())
-		{
 			track = mrs[msg->getChannel()]->getTrack();
-		}
 
 		noteEvent->setTrack(track);
 		noteEvent->setDuration(0);
 		noteEvent->setVariationValue(64);
 		return noteEvent;
 	}
+
 	return {};
 }
 

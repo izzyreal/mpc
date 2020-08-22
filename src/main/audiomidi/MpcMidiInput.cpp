@@ -59,9 +59,7 @@ void MpcMidiInput::transport(ctoot::midi::core::MidiMessage* msg, int timeStamp)
 	notifyObservers(notify_);
 
 	if (status == ctoot::midi::core::ShortMessage::CONTROL_CHANGE)
-	{
-		mpc.getHardware().lock()->getSlider().lock()->setValue(msg->getMessage()->at(2));
-	}
+		mpc.getHardware().lock()->getSlider().lock()->setValue((*msg->getMessage())[2]);
 	
 	auto lSequencer = sequencer.lock();
 	
@@ -109,9 +107,7 @@ void MpcMidiInput::transport(ctoot::midi::core::MidiMessage* msg, int timeStamp)
 	auto event = eventAdapter->get().lock();
 
 	if (!event)
-	{
 		return;
-	}
 
 	auto mce = dynamic_pointer_cast<mpc::sequencer::MidiClockEvent>(event);
 	auto note = dynamic_pointer_cast<mpc::sequencer::NoteEvent>(event);
