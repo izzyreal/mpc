@@ -3,12 +3,15 @@
 #include <sampler/Pad.hpp>
 
 #include <lcdgui/screens/MixerScreen.hpp>
+#include <lcdgui/screens/MixerSetupScreen.hpp>
 
+#include <mpc/MpcSoundPlayerChannel.hpp>
 #include <mpc/MpcStereoMixerChannel.hpp>
 #include <mpc/MpcIndivFxMixerChannel.hpp>
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sampler;
+using namespace ctoot::mpc;
 using namespace moduru::lang;
 using namespace std;
 
@@ -32,13 +35,63 @@ void ChannelSettingsScreen::close()
 	mpc.deleteObserver(this);
 }
 
+weak_ptr<MpcIndivFxMixerChannel> ChannelSettingsScreen::getIndivFxMixerChannel()
+{
+	init();
+	
+	if (note == 34)
+		return {};
+
+	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(mpc.screens->getScreenComponent("mixer-setup"));
+
+	if (mixerSetupScreen->isIndivFxSourceDrum())
+	{
+		auto padIndex = program.lock()->getPadIndexFromNote(note);
+		
+		if (padIndex == -1)
+			return {};
+		
+		return mpcSoundPlayerChannel->getIndivFxMixerChannels()[padIndex];
+	}
+	else
+	{
+		auto noteParameters = dynamic_cast<NoteParameters*>(program.lock()->getNoteParameters(note));
+		return noteParameters->getIndivFxMixerChannel().lock();
+	}
+}
+
+weak_ptr<MpcStereoMixerChannel> ChannelSettingsScreen::getStereoMixerChannel()
+{
+	init();
+	
+	if (note == 34)
+		return {};
+
+	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(mpc.screens->getScreenComponent("mixer-setup"));
+
+	if (mixerSetupScreen->isStereoMixSourceDrum())
+	{
+		auto padIndex = program.lock()->getPadIndexFromNote(note);
+		
+		if (padIndex == -1)
+			return {};
+		
+		return mpcSoundPlayerChannel->getStereoMixerChannels()[padIndex];
+	}
+	else
+	{
+		auto noteParameters = dynamic_cast<NoteParameters*>(program.lock()->getNoteParameters(note));
+		return noteParameters->getStereoMixerChannel().lock();
+	}
+}
+
 void ChannelSettingsScreen::turnWheel(int i)
 {
     init();
 
 	auto noteParameters = dynamic_cast<NoteParameters*>(program.lock()->getNoteParameters(note));
-	auto stereoMixerChannel = noteParameters->getStereoMixerChannel().lock();
-	auto indivFxMixerChannel = noteParameters->getIndivFxMixerChannel().lock();
+	auto stereoMixerChannel = getStereoMixerChannel().lock();
+	auto indivFxMixerChannel = getIndivFxMixerChannel().lock();
 
 	if (param.compare("note") == 0)
 	{
@@ -89,7 +142,8 @@ void ChannelSettingsScreen::update(moduru::observer::Observable* o, nonstd::any 
 
 	if (s.compare("padandnote") == 0)
 	{
-		displayChannel();
+		if (mpc.getNote() != 34)
+			setNote(mpc.getNote());
 	}
 	else if (s.compare("bank") == 0)
 	{

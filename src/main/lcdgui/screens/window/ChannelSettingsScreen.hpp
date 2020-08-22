@@ -1,6 +1,12 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
+namespace ctoot::mpc
+{
+	class MpcIndivFxMixerChannel;
+	class MpcStereoMixerChannel;
+}
+
 namespace mpc::lcdgui::screens::window
 {
 	class ChannelSettingsScreen
@@ -31,6 +37,9 @@ namespace mpc::lcdgui::screens::window
 		void displayFollowStereo();
 		void displayChannel();
 		void setNote(int note_);
+
+		std::weak_ptr<ctoot::mpc::MpcIndivFxMixerChannel> getIndivFxMixerChannel();
+		std::weak_ptr<ctoot::mpc::MpcStereoMixerChannel> getStereoMixerChannel();
 
 	};
 }
