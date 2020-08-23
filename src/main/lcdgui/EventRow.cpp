@@ -55,6 +55,7 @@ EventRow::EventRow(mpc::Mpc& mpc, int rowIndex)
 		labels.insert(begin(labels), dynamic_pointer_cast<Label>(label));
 
 		auto tf = parameters.lock()->addChild(make_shared<Field>(mpc, letters[i] + to_string(rowIndex), drumNoteEventXPos[i] + 1 + drumNoteEventLabels[i].length() * 6 + 1, rowIndex * 9 + 12, drumNoteEventSizes[i])).lock();
+		
 		fields.insert(begin(fields), dynamic_pointer_cast<Field>(tf));
 	}
 
@@ -193,10 +194,9 @@ void EventRow::setSystemExclusiveEventValues()
 void EventRow::setPolyPressureEventValues()
 {
 	if (!event.lock())
-	{
 		return;
-	}
-    auto ppe = dynamic_pointer_cast<PolyPressureEvent>(event.lock());
+
+	auto ppe = dynamic_pointer_cast<PolyPressureEvent>(event.lock());
     
 	for (int i = 0; i < 2; i++)
 	{
@@ -220,9 +220,7 @@ void EventRow::setPolyPressureEventValues()
 void EventRow::setChannelPressureEventValues()
 {
 	if (!event.lock())
-	{
 		return;
-	}
 
     auto cpe = dynamic_pointer_cast< ChannelPressureEvent>(event.lock());
     fields[0].lock()->Hide(false);
@@ -242,9 +240,7 @@ void EventRow::setChannelPressureEventValues()
 void EventRow::setControlChangeEventValues()
 {
 	if (!event.lock())
-	{
 		return;
-	}
 
     auto cce = dynamic_pointer_cast< ControlChangeEvent>(event.lock());
     
@@ -271,9 +267,7 @@ void EventRow::setControlChangeEventValues()
 void EventRow::setMiscEventValues()
 {
 	if (!event.lock())
-	{
 		return;
-	}
 
     auto parameterValue = 0;
     
@@ -281,9 +275,7 @@ void EventRow::setMiscEventValues()
 	auto programChangeEvent = dynamic_pointer_cast<ProgramChangeEvent>(event.lock());
 
 	if (pitchBendEvent != nullptr)
-	{
         parameterValue = pitchBendEvent->getAmount();
-    }
     
 	if (programChangeEvent)
 	{
@@ -328,9 +320,7 @@ void EventRow::setMiscEventValues()
 void EventRow::setMixerEventValues()
 {
 	if (!event.lock())
-	{
 		return;
-	}
 
 	auto mixerEvent = dynamic_pointer_cast<MixerEvent>(event.lock());
 	
@@ -345,9 +335,7 @@ void EventRow::setMixerEventValues()
 	auto sampler = mpc.getSampler().lock();
 	
 	if (bus == 0)
-	{
 		return;
-	}
 
 	auto program = dynamic_pointer_cast<mpc::sampler::Program>(sampler->getProgram(sampler->getDrumBusProgramNumber(bus)).lock());
 	auto nn = program->getPad(mixerEvent->getPad())->getNote();
@@ -360,16 +348,12 @@ void EventRow::setMixerEventValues()
 		auto panning = "L";
 
 		if (mixerEvent->getValue() > 50)
-		{
 			panning = "R";
-		}
 
 		fields[2].lock()->setText(panning + StrUtil::padLeft(to_string(abs(mixerEvent->getValue() - 50)), " ", 2));
 		
 		if (mixerEvent->getValue() == 50)
-		{
 			fields[2].lock()->setText("0  ");
-		}
 	}
 	else
 	{
@@ -391,9 +375,7 @@ void EventRow::setMixerEventValues()
 void EventRow::setDrumNoteEventValues()
 {
 	if (!event.lock())
-	{
 		return;
-	}
 
 	auto ne = dynamic_pointer_cast<NoteEvent>(event.lock());
 	
@@ -427,14 +409,9 @@ void EventRow::setDrumNoteEventValues()
 		auto noteVarValue = (ne->getVariationValue() * 2) - 128;
 		
 		if (noteVarValue < -120)
-		{
 			noteVarValue = -120;
-		}
-		
-		if (noteVarValue > 120)
-		{
+		else if (noteVarValue > 120)
 			noteVarValue = 120;
-		}
 		
 		if (noteVarValue == 0)
 		{
@@ -454,9 +431,7 @@ void EventRow::setDrumNoteEventValues()
 		auto noteVarValue = ne->getVariationValue();
 	
 		if (noteVarValue > 100)
-		{
 			noteVarValue = 100;
-		}
 		
 		fields[2].lock()->setText(StrUtil::padLeft(to_string(noteVarValue), " ", 3));
 		fields[2].lock()->setSize(3 * 6 + 1, 9);
@@ -469,9 +444,7 @@ void EventRow::setDrumNoteEventValues()
 		auto noteVarValue = ne->getVariationValue() - 50;
 		
 		if (noteVarValue > 50)
-		{
 			noteVarValue = 50;
-		}
 		
 		if (noteVarValue < 0)
 		{
@@ -497,9 +470,7 @@ void EventRow::setDrumNoteEventValues()
 void EventRow::setMidiNoteEventValues()
 {
 	if (!event.lock())
-	{
 		return;
-	}
 
 	auto ne = dynamic_pointer_cast<NoteEvent>(event.lock());
 	
@@ -535,13 +506,9 @@ void EventRow::setColors()
 			labels[i].lock()->setInverted(true);
 		
 			if (ls->getFocus().compare(fields[i].lock()->getName()) == 0)
-			{
 				fields[i].lock()->setInverted(false);
-			}
 			else
-			{
 				fields[i].lock()->setInverted(true);
-			}
 		}
 		else
 		{
@@ -549,13 +516,9 @@ void EventRow::setColors()
 			labels[i].lock()->setInverted(false);
 			
 			if (fields[i].lock()->hasFocus())
-			{
 				fields[i].lock()->setInverted(true);
-			}
 			else
-			{
 				fields[i].lock()->setInverted(false);
-			}
 		}
 	}
 }
@@ -563,9 +526,7 @@ void EventRow::setColors()
 void EventRow::setLabelTexts(const vector<string>& labelTexts)
 {
 	for (int i = 0; i < labelTexts.size(); i++)
-	{
 		labels[i].lock()->setText(labelTexts[i]);
-	}
 }
 
 void EventRow::setSizesAndLocations(const vector<int>& xPositions, const vector<int>& fieldWidths)

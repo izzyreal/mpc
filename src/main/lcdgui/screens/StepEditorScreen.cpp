@@ -55,30 +55,8 @@ void StepEditorScreen::open()
 	findField("tonote").lock()->setLocation(115, 0);
 	findLabel("fromnote").lock()->Hide(true);
 	auto rectangle = findChild<Rectangle>("view-background").lock();
-	//rectangle->setOn(true);
-	if (!rectangle->findField("view").lock())
-	{
-		/*
-		auto viewField = findField("view").lock();
-		auto fromNoteField = findField("fromnote").lock();
-		auto toNoteField = findField("tonote").lock();
-
-		removeChild(viewField);
-		removeChild(fromNoteField);
-		removeChild(toNoteField);
-
-		rectangle->addChild(viewField);
-		rectangle->addChild(fromNoteField);
-		rectangle->addChild(toNoteField);
-		*/
-	}
 
 	lastRow = 0;
-
-	//findField("controlnumber").lock()->Hide(true);
-	findField("fromnote").lock()->Hide(true);
-	findField("tonote").lock()->Hide(true);
-	//findLabel("controlnumber").lock()->Hide(true);
 
 	init();
 
@@ -92,9 +70,12 @@ void StepEditorScreen::open()
 	{
 		findField("fromnote").lock()->setAlignment(Alignment::Centered, 18);
 		findField("tonote").lock()->setAlignment(Alignment::Centered, 18);
+
+		if (lastColumn["note"].compare("e") == 0)
+			lastColumn["note"] = "c";
 	}
 
-	refreshViewNotes();
+	updateComponents();
 	setViewNotesText();
 	displayView();
 	sequencer.lock()->addObserver(this);
@@ -374,7 +355,7 @@ void StepEditorScreen::turnWheel(int i)
 		auto noteValue = screen->getNoteValue();
 		screen->setNoteValue(noteValue + i);
 	}
-	else if (param.compare("fromnote") == 0)
+	else if (param.compare("fromnote") == 0 && view == 1)
 	{
 		if (track.lock()->getBus() != 0) setFromNote(fromNote + i);
 		if (track.lock()->getBus() == 0) setNoteA(noteA + i);
@@ -383,7 +364,7 @@ void StepEditorScreen::turnWheel(int i)
 	{
 		setNoteB(noteB + i);
 	}
-	else if (param.compare("controlnumber") == 0)
+	else if (param.compare("fromnote") == 0 && view == 3)
 	{
 		setControl(control + i);
 	}
@@ -637,6 +618,7 @@ void StepEditorScreen::up()
 			setyOffset(yOffset - 1);
 
 			auto newEventType = visibleEvents[srcNumber].lock()->getTypeName();
+
 			ls.lock()->setFocus(lastColumn[newEventType] + to_string(srcNumber));
 
 			if (controls->isShiftPressed())
@@ -654,7 +636,7 @@ void StepEditorScreen::down()
 {
 	init();
 
-	if (param.compare("view") == 0 || param.find("now") != string::npos)
+	if (param.compare("view") == 0 || param.find("now") != string::npos || param.compare("fromnote") == 0 || param.compare("tonote") == 0)
 	{
 		auto eventType = visibleEvents[lastRow].lock()->getTypeName();
 		ls.lock()->setFocus(lastColumn[eventType] + to_string(lastRow));
@@ -787,9 +769,7 @@ void StepEditorScreen::initVisibleEvents()
 	init();
 
 	for (auto& e : eventsAtCurrentTick)
-	{
 		if (e.lock()) e.lock()->deleteObserver(this);
-	}
 	
 	eventsAtCurrentTick.clear();
 	
@@ -809,7 +789,7 @@ void StepEditorScreen::initVisibleEvents()
 			
 				if (track.lock()->getBus() != 0)
 				{
-					if (fromNote == 34)
+					if (fromNote == 34 || view == 0)
 					{
 						eventsAtCurrentTick.push_back(ne);
 					}
@@ -819,7 +799,8 @@ void StepEditorScreen::initVisibleEvents()
 						eventsAtCurrentTick.push_back(ne);
 					}
 				}
-				else {
+				else
+				{
 					if ( (ne->getNote() >= noteA
 						&& ne->getNote() <= noteB)
 						|| view == 0)
@@ -928,7 +909,7 @@ void StepEditorScreen::refreshEventRows()
 	}
 }
 
-void StepEditorScreen::refreshViewNotes()
+void StepEditorScreen::updateComponents()
 {
 	init();
 	
@@ -949,21 +930,22 @@ void StepEditorScreen::refreshViewNotes()
 		findLabel("tonote").lock()->Hide(false);
 		findLabel("tonote").lock()->setText("-");
 		findField("tonote").lock()->Hide(false);
-		//findField("controlnumber").lock()->Hide(true);
 	}
 	else if (view == 3)
 	{
-		findField("fromnote").lock()->Hide(true);
+		auto fromNoteField = findField("fromnote").lock();
+		fromNoteField->Hide(false);
+		fromNoteField->setLocation(60, 0);
+		fromNoteField->setSize(104, 9);
+
 		findLabel("tonote").lock()->Hide(true);
 		findField("tonote").lock()->Hide(true);
-		//findField("controlnumber").lock()->Hide(false);
 	}
 	else if (view != 1 && view != 3)
 	{
 		findField("fromnote").lock()->Hide(true);
 		findLabel("tonote").lock()->Hide(true);
 		findField("tonote").lock()->Hide(true);
-		//findField("controlnumber").lock()->Hide(true);
 	}
 }
 
@@ -985,12 +967,10 @@ void StepEditorScreen::setViewNotesText()
 	}
 	else if (view == 3)
 	{
-		/*
 		if (control == -1)
-			findField("controlnumber").lock()->setText("   -    ALL");
+			findField("fromnote").lock()->setText("   -    ALL");
 		else
-			findField("controlnumber").lock()->setText(EventRow::controlNames[control]);
-		*/
+			findField("fromnote").lock()->setText(StrUtil::padLeft(to_string(control), " ", 3) + "-" + EventRow::controlNames[control]);
 	}
 
 	findField("view").lock()->setText(viewNames[view]);
@@ -1006,7 +986,7 @@ void StepEditorScreen::setView(int i)
 	view = i;
 
 	displayView();
-	refreshViewNotes();
+	updateComponents();
 	setViewNotesText();
 	setyOffset(0);
 	findChild<Rectangle>().lock()->SetDirty();
@@ -1101,7 +1081,7 @@ void StepEditorScreen::setFromNote(int i)
 
 	setViewNotesText();
 	displayView();
-	refreshViewNotes();
+	updateComponents();
 	setViewNotesText();
 	initVisibleEvents();
 	refreshEventRows();

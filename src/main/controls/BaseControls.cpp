@@ -80,14 +80,10 @@ void BaseControls::left()
 	init();
 	
 	if (!activeField.lock())
-	{
 		return;
-	}
 	
 	if (param.compare("dummy") == 0)
-	{
 		return;
-	}
 	
 	ls.lock()->transferLeft();
 }
@@ -207,9 +203,7 @@ void BaseControls::pad(int i, int velo, bool repeat, int tick)
 	auto controls = mpc.getControls().lock();
 
 	if (mpc.getHardware().lock()->getTopPanel().lock()->isFullLevelEnabled())
-	{
 		velo = 127;
-	}
 
 	if (controls->getPressedPads()->find(i) == controls->getPressedPads()->end())
 	{
@@ -219,9 +213,7 @@ void BaseControls::pad(int i, int velo, bool repeat, int tick)
 	else
 	{
 		if (!(controls->isTapPressed() && sequencer.lock()->isPlaying()))
-		{
 			return;
-		}
 	}
 	auto note = track.lock()->getBus() > 0 ? program.lock()->getPad(i + (mpc.getBank() * 16))->getNote() : i + (mpc.getBank() * 16) + 35;
 	auto velocity = velo;
@@ -237,9 +229,7 @@ void BaseControls::pad(int i, int velo, bool repeat, int tick)
 			velocity = (int)(i * (127.0 / 16.0));
 			
 			if (velocity == 0)
-			{
 				velocity = 1;
-			}
 		}
 	}
 	else
@@ -247,9 +237,7 @@ void BaseControls::pad(int i, int velo, bool repeat, int tick)
 		if (currentScreenName.compare("program-params") == 0)
 		{
 			if (note > 34)
-			{
 				mpc.setPadAndNote(pad, note);
-			}
 		}
 		else
 		{
@@ -258,18 +246,15 @@ void BaseControls::pad(int i, int velo, bool repeat, int tick)
 	}
 
 	if (currentScreenName.compare("assign-16-levels") == 0 && note != 34)
-	{
 		assign16LevelsScreen->setNote(note);
-	}
 
 	if (controls->isTapPressed() && sequencer.lock()->isPlaying())
 	{
 		if (repeat)
-		{
 			generateNoteOn(note, velocity, tick);
-		}
 	}
-	else {
+	else
+	{
 		generateNoteOn(note, velocity, -1);
 	}
 }
@@ -312,9 +297,7 @@ void BaseControls::generateNoteOn(int nn, int padVelo, int tick)
 				track.lock()->swing(events, noteVal, timingCorrectScreen->getSwing(), vector<int>{0, 127});
 
 				if (n->getTick() != sequencer.lock()->getTickPosition())
-				{
 					sequencer.lock()->move(n->getTick());
-				}
 			}
 		}
 		else
@@ -369,16 +352,15 @@ void BaseControls::generateNoteOn(int nn, int padVelo, int tick)
 			auto diff = padnr - key;
 			auto candidate = 64 + (diff * 5);
 
-			if (candidate > 124) {
+			if (candidate > 124)
 				candidate = 124;
-			}
-			else if (candidate < 4) {
+			else if (candidate < 4)
 				candidate = 4;
-			}
 
 			noteEvent->setVariationValue(candidate);
 		}
-		else {
+		else
+		{
 			noteEvent->setVariationValue((100 / 16) * padnr);
 		}
 
@@ -398,8 +380,10 @@ bool BaseControls::isTypable()
 		return false;
 
 	for (auto str : typableParams)
+	{
 		if (str.compare(param) == 0)
 			return true;
+	}
 
 	return false;
 }
@@ -417,9 +401,7 @@ void BaseControls::numpad(int i)
 		if (isTypable())
 		{
 			if (!field->isTypeModeEnabled())
-			{
 				field->enableTypeMode();
-			}
 
 			field->type(i);
 		}
@@ -436,9 +418,8 @@ void BaseControls::numpad(int i)
 			break;
 		case 1:
 			if (sequencer.lock()->isPlaying())
-			{
 				return;
-			}
+
 			ls.lock()->openScreen("song");
 			break;
 		case 2:
@@ -454,25 +435,21 @@ void BaseControls::numpad(int i)
 			auto loadScreen = dynamic_pointer_cast<LoadScreen>(mpc.screens->getScreenComponent("load"));
 
 			if (loadScreen->fileLoad + 1 > (int)(disk->getFiles().size()))
-			{
 				loadScreen->fileLoad = (int)(disk->getFiles().size() - 1); // Same here, can we avoid this?
-			}
 
 			ls.lock()->openScreen("load");
 			break;
 		}
 		case 4:
 			if (sequencer.lock()->isPlaying())
-			{
 				break;
-			}
+
 			ls.lock()->openScreen("sample");
 			break;
 		case 5:
 			if (sequencer.lock()->isPlaying())
-			{
 				break;
-			}
+
 			ls.lock()->openScreen("trim");
 			break;
 		case 6:
@@ -483,16 +460,14 @@ void BaseControls::numpad(int i)
 			break;
 		case 8:
 			if (sequencer.lock()->isPlaying())
-			{
 				break;
-			}
+
 			ls.lock()->openScreen("others");
 			break;
 		case 9:
 			if (sequencer.lock()->isPlaying())
-			{
 				break;
-			}
+
 			ls.lock()->openScreen("sync");
 			break;
 		}

@@ -3,8 +3,6 @@
 
 #include <file/FileUtil.hpp>
 
-#include <Logger.hpp>
-
 using namespace mpc::lcdgui;
 using namespace std;
 
@@ -21,8 +19,6 @@ void Rectangle::Draw(std::vector< std::vector<bool>>* pixels)
 {
 	if (shouldNotDraw(pixels))
 		return;
-
-	MLOG("Drawing rect");
 
 	for (int x1 = x; x1 < x + w; x1++)
 	{

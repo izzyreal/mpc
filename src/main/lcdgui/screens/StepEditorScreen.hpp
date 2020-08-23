@@ -47,7 +47,7 @@ namespace mpc::lcdgui::screens
 
 	private:
 		void refreshEventRows();
-		void refreshViewNotes();
+		void updateComponents();
 		void setViewNotesText();
 
 	private:
