@@ -70,7 +70,7 @@ namespace mpc::lcdgui::screens
 		int tcValueRecordedNotes = 100;
 		int yOffset = 0;
 		int selectedEventNumber = 0;
-		int fromNotePad = 34;
+		int fromNote = 34;
 		int selectionStartIndex = -1;
 		int selectionEndIndex = -1;
 		std::string selectedParameterLetter = "";
@@ -84,7 +84,7 @@ namespace mpc::lcdgui::screens
 		void setyOffset(int i);
 		void setSelectedEventIndex(int i);
 		void setSelectionEndIndex(int i);
-		void setFromNotePad(int i);
+		void setFromNote(int i);
 		void setSelectionStartIndex(int i);
 		void setSelectedEvents();
 		void setSelectedEvent(std::weak_ptr<mpc::sequencer::Event> event);

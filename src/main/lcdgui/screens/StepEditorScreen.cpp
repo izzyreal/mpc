@@ -51,6 +51,7 @@ void StepEditorScreen::open()
 
 	findField("controlnumber").lock()->Hide(true);
 	findField("fromnote").lock()->Hide(true);
+	findField("tonote").lock()->setLocation(115, 0);
 	findField("tonote").lock()->Hide(true);
 	findLabel("controlnumber").lock()->Hide(true);
 
@@ -60,6 +61,12 @@ void StepEditorScreen::open()
 	{
 		int pgm = sampler.lock()->getDrumBusProgramNumber(track.lock()->getBus());
 		program = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(pgm).lock());
+		findField("fromnote").lock()->setAlignment(Alignment::None);
+	}
+	else
+	{
+		findField("fromnote").lock()->setAlignment(Alignment::Centered, 18);
+		findField("tonote").lock()->setAlignment(Alignment::Centered, 18);
 	}
 
 	refreshViewNotes();
@@ -86,6 +93,8 @@ void StepEditorScreen::open()
 		auto eventType = visibleEvents[0].lock()->getTypeName();
 		ls.lock()->setFocus(lastColumn[eventType] + "0");
 	}
+
+	mpc.addObserver(this); // Subscribe to "padandnote" messages
 }
 
 void StepEditorScreen::close()
@@ -93,6 +102,7 @@ void StepEditorScreen::close()
 	init();
 	sequencer.lock()->deleteObserver(this);
 	track.lock()->deleteObserver(this);
+	mpc.deleteObserver(this);
 
 	if (param.length() == 2)
 	{
@@ -341,7 +351,7 @@ void StepEditorScreen::turnWheel(int i)
 	}
 	else if (param.compare("fromnote") == 0)
 	{
-		if (track.lock()->getBus() != 0) setFromNotePad(fromNotePad + i);
+		if (track.lock()->getBus() != 0) setFromNote(fromNote + i);
 		if (track.lock()->getBus() == 0) setNoteA(noteA + i);
 	}
 	else if (param.compare("tonote") == 0)
@@ -418,10 +428,7 @@ void StepEditorScreen::turnWheel(int i)
 		else if (pitchBend)
 		{
 			if (param.find("a") != string::npos)
-			{
 				pitchBend->setAmount(pitchBend->getAmount() + i);
-			}
-
 		}
 		else if (mixer)
 		{
@@ -441,17 +448,11 @@ void StepEditorScreen::turnWheel(int i)
 		else if (note && track.lock()->getBus() == 0)
 		{
 			if (param.find("a") != string::npos)
-			{
 				note->setNote(note->getNote() + i);
-			}
 			else if (param.find("b") != string::npos)
-			{
 				note->setDuration(note->getDuration() + i);
-			}
 			else if (param.find("c") != string::npos)
-			{
 				note->setVelocity(note->getVelocity() + i);
-			}
 		}
 		else if (note && track.lock()->getBus() != 0)
 		{
@@ -459,12 +460,16 @@ void StepEditorScreen::turnWheel(int i)
 			{
 				if (note->getNote() + i > 98)
 				{
-					if (note->getNote() != 98) note->setNote(98);
+					if (note->getNote() != 98)
+						note->setNote(98);
+
 					return;
 				}
 				else if (note->getNote() + i < 35)
 				{
-					if (note->getNote() != 35) note->setNote(35);
+					if (note->getNote() != 35)
+						note->setNote(35);
+
 					return;
 				}
 				else if (note->getNote() < 35)
@@ -498,6 +503,7 @@ void StepEditorScreen::turnWheel(int i)
 			}
 		}
 	}
+
 	refreshSelection();
 }
 
@@ -508,12 +514,9 @@ void StepEditorScreen::prevStepEvent()
 	auto controls = mpc.getControls().lock();
 
 	if (controls->isGoToPressed())
-	{
 		sequencer.lock()->goToPreviousEvent();
-	}
-	else {
+	else
 		sequencer.lock()->goToPreviousStep();
-	}
 }
 
 void StepEditorScreen::nextStepEvent()
@@ -523,12 +526,9 @@ void StepEditorScreen::nextStepEvent()
 	auto controls = mpc.getControls().lock();
 	
 	if (controls->isGoToPressed())
-	{
 		sequencer.lock()->goToNextEvent();
-	}
-	else {
+	else
 		sequencer.lock()->goToNextStep();
-	}
 }
 
 void StepEditorScreen::prevBarStart()
@@ -537,12 +537,9 @@ void StepEditorScreen::prevBarStart()
 	auto controls = mpc.getControls().lock();
 	
 	if (controls->isGoToPressed())
-	{
 		sequencer.lock()->setBar(0);
-	}
-	else {
+	else
 		sequencer.lock()->setBar(sequencer.lock()->getCurrentBarIndex() - 1);
-	}
 }
 
 void StepEditorScreen::nextBarEnd()
@@ -552,17 +549,15 @@ void StepEditorScreen::nextBarEnd()
 	auto controls = mpc.getControls().lock();
 	
 	if (controls->isGoToPressed())
-	{
 		sequencer.lock()->setBar(sequencer.lock()->getActiveSequence().lock()->getLastBarIndex() + 1);
-	}
-	else {
+	else
 		sequencer.lock()->setBar(sequencer.lock()->getCurrentBarIndex() + 1);
-	}
 }
 
 void StepEditorScreen::left()
 {
 	init();
+
 	if (param.length() == 2 && param.substr(0, 1).compare("a") == 0)
 	{
 		lastRow = stoi(param.substr(1, 2));
@@ -789,12 +784,12 @@ void StepEditorScreen::initVisibleEvents()
 			
 				if (track.lock()->getBus() != 0)
 				{
-					if (fromNotePad == 34)
+					if (fromNote == 34)
 					{
 						eventsAtCurrentTick.push_back(ne);
 					}
-					else if (fromNotePad != 34
-						&& fromNotePad == ne->getNote())
+					else if (fromNote != 34
+						&& fromNote == ne->getNote())
 					{
 						eventsAtCurrentTick.push_back(ne);
 					}
@@ -916,6 +911,7 @@ void StepEditorScreen::refreshViewNotes()
 	{
 		findLabel("fromnote").lock()->Hide(false);
 		findField("fromnote").lock()->Hide(false);
+		findField("fromnote").lock()->setSize(37, 9);
 		findField("fromnote").lock()->setLocation(67, 0);
 		findLabel("tonote").lock()->Hide(true);
 		findField("tonote").lock()->Hide(true);
@@ -924,9 +920,9 @@ void StepEditorScreen::refreshViewNotes()
 	{
 		findLabel("fromnote").lock()->Hide(false);
 		findField("fromnote").lock()->Hide(false);
-		findField("fromnote").lock()->setLocation(62, 0);
-		findField("fromnote").lock()->setSize(8 * 6, 9);
-		findField("tonote").lock()->setSize(8 * 6, 9);
+		findField("fromnote").lock()->setLocation(61, 0);
+		findField("fromnote").lock()->setSize(47, 9);
+		findField("tonote").lock()->setSize(47, 9);
 		findLabel("tonote").lock()->Hide(false);
 		findLabel("tonote").lock()->setText("-");
 		findField("tonote").lock()->Hide(false);
@@ -956,9 +952,9 @@ void StepEditorScreen::setViewNotesText()
 	
 	if (view == 1 && track.lock()->getBus() != 0)
 	{
-		if (fromNotePad != 34)
+		if (fromNote != 34)
 		{
-			findField("fromnote").lock()->setText(to_string(fromNotePad) + "/" + sampler.lock()->getPadName(program.lock()->getPadIndexFromNote(fromNotePad)));
+			findField("fromnote").lock()->setText(to_string(fromNote) + "/" + sampler.lock()->getPadName(program.lock()->getPadIndexFromNote(fromNote)));
 		}
 		else
 		{
@@ -1104,12 +1100,12 @@ void StepEditorScreen::setSelectedEventIndex(int i)
 	selectedEventNumber = i;
 }
 
-void StepEditorScreen::setFromNotePad(int i)
+void StepEditorScreen::setFromNote(int i)
 {
 	if (i < 34 || i > 98)
 		return;
 
-	fromNotePad = i;
+	fromNote = i;
 
 	setViewNotesText();
 	displayView();
@@ -1251,7 +1247,11 @@ void StepEditorScreen::update(moduru::observer::Observable*, nonstd::any message
 {
 	auto msg = nonstd::any_cast<string>(message);
 
-	if (msg.compare("step-editor") == 0)
+	if (msg.compare("padandnote") == 0)
+	{
+		setFromNote(mpc.getNote());
+	}
+	else if (msg.compare("step-editor") == 0)
 	{
 		if (mpc.getControls().lock()->getPressedPads()->size() != 0)
 		{

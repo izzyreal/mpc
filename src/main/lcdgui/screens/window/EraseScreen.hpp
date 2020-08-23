@@ -39,10 +39,6 @@ namespace mpc::lcdgui::screens::window
 		int track = 0;
 		int erase = 0;
 		int type = 0;
-		int midiNote0 = 0;
-		int midiNote1 = 127;
-		int time0 = 0;
-		int time1 = 0;
 
 		void setTrack(int i);
 		void setErase(int i);

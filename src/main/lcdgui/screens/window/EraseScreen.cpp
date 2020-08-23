@@ -6,10 +6,12 @@
 #include <sequencer/SeqUtil.hpp>
 
 #include <Util.hpp>
+#include <System.hpp>
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 using namespace moduru::lang;
+using namespace moduru;
 using namespace std;
 
 EraseScreen::EraseScreen(mpc::Mpc& mpc, const int layerIndex)
@@ -19,9 +21,26 @@ EraseScreen::EraseScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void EraseScreen::open()
 {
-	auto seq = sequencer.lock()->getActiveSequence().lock();
+	auto bus = sequencer.lock()->getActiveTrack().lock()->getBus();
+
+	if (bus == 0)
+	{
+		findField("note0").lock()->setAlignment(Alignment::Centered, 18);
+		findField("note1").lock()->setAlignment(Alignment::Centered, 18);
+		findField("note0").lock()->setLocation(62, 42);
+	}
+	else
+	{
+		findField("note0").lock()->setAlignment(Alignment::None);
+		findField("note1").lock()->setAlignment(Alignment::None);
+		findField("note0").lock()->setLocation(61, 42);
+	}
+
+	findField("note1").lock()->setLocation(116, 42);
 
 	setTime0(0);
+
+	auto seq = sequencer.lock()->getActiveSequence().lock();
 	setTime1(seq->getLastTick());
 	
 	displayErase();
@@ -42,14 +61,14 @@ void EraseScreen::turnWheel(int i)
 {
 	init();
 
+	if (checkAllTimesAndNotes(mpc, i))
+		return;
+
 	if (param.compare("track") == 0)
 	{
 		setTrack(track + i);
 	}
-
-	checkAllTimesAndNotes(mpc, i);
-
-	if (param.compare("erase") == 0)
+	else if (param.compare("erase") == 0)
 	{
 		setErase(erase + i);
 	}
@@ -81,8 +100,8 @@ void EraseScreen::function(int i)
 
 		auto midi = sequencer.lock()->getActiveTrack().lock()->getBus() == 0;
 
-		auto noteA = midi ? midiNote0 : mpc.getNote();
-		auto noteB = midi ? midiNote1 : -1;
+		auto noteA = midi ? note0 : mpc.getNote();
+		auto noteB = midi ? note1 : -1;
 
 		auto seq = sequencer.lock()->getActiveSequence().lock();
 
@@ -96,10 +115,10 @@ void EraseScreen::function(int i)
 				auto e = t->getEvent(k).lock();
 				auto ne = dynamic_pointer_cast<NoteEvent>(e);
 
-				if (e->getTick() >= time0 && e->getTick() <= time1)
+				if (e->getTick() >= time0 && e->getTick() < time1)
 				{
-					string excludeClass;
-					string includeClass;
+					string excludeClass = "";
+					string includeClass = "";
 					
 					switch (erase)
 					{
@@ -109,14 +128,10 @@ void EraseScreen::function(int i)
 							auto nn = ne->getNote();
 							
 							if (midi && nn >= noteA && nn <= noteB)
-							{
 								removalIndices.push_back(k);
-							}
 							
 							if (!midi && (noteA <= 34 || noteA == nn))
-							{
 								removalIndices.push_back(k);
-							}
 						}
 						else
 						{
@@ -126,21 +141,17 @@ void EraseScreen::function(int i)
 					case 1:
 						excludeClass = eventClassNames[type];
 
-						if (string(typeid(e).name()).compare(excludeClass) != 0)
+						if (System::demangle(typeid(e).name()).compare(excludeClass) != 0)
 						{
 							if (ne)
 							{
 								auto nn = ne->getNote();
 							
 								if (midi && nn >= noteA && nn <= noteB)
-								{
 									removalIndices.push_back(k);
-								}
 								
 								if (!midi && (noteA > 34 && noteA != nn))
-								{
 									removalIndices.push_back(k);
-								}
 							}
 							else
 							{
@@ -151,21 +162,17 @@ void EraseScreen::function(int i)
 					case 2:
 						includeClass = eventClassNames[type];
 						
-						if (string(typeid(e).name()).compare(includeClass) == 0)
+						if (System::demangle(typeid(e).name()).compare(includeClass) == 0)
 						{
 							if (ne)
 							{
 								auto nn = ne->getNote();
 							
 								if (midi && nn >= noteA && nn <= noteB)
-								{
 									removalIndices.push_back(k);
-								}
 								
 								if (!midi && (noteA <= 34 || noteA == nn))
-								{
 									removalIndices.push_back(k);
-								}
 							}
 							else
 							{
@@ -182,9 +189,7 @@ void EraseScreen::function(int i)
 			reverse(begin(removalIndices), end(removalIndices));
 
 			for (int integer : removalIndices)
-			{
 				t->getEvents().erase(t->getEvents().begin() + integer);
-			}
 		}
 		openScreen("sequencer");
 		break;
@@ -197,14 +202,13 @@ void EraseScreen::update(moduru::observer::Observable* observable, nonstd::any m
 	auto msg = nonstd::any_cast<string>(message);
 
 	if (msg.compare("padandnote") == 0)
-	{
 		displayNotes();
-	}
 }
 
 void EraseScreen::displayTrack()
 {
 	string trackName = "";
+
 	if (track == -1)
 	{
 		trackName = "ALL";
@@ -214,6 +218,7 @@ void EraseScreen::displayTrack()
 		auto sequence = sequencer.lock()->getActiveSequence().lock();
 		trackName = sequence->getTrack(track).lock()->getActualName();
 	}
+
 	findField("track").lock()->setTextPadded(track + 1, " ");
 	findLabel("track-name").lock()->setText("-" + trackName);
 }
@@ -237,10 +242,9 @@ void EraseScreen::displayErase()
 void EraseScreen::displayType()
 {
 	findField("type").lock()->Hide(erase == 0);
+
 	if (erase > 0)
-	{
 		findField("type").lock()->setText(typeNames[type]);
-	}
 }
 
 void EraseScreen::displayNotes()
@@ -263,33 +267,27 @@ void EraseScreen::displayNotes()
 	findField("note1").lock()->Hide(bus != 0);
 	findLabel("note1").lock()->Hide(bus != 0);
 
-	if (bus > 0)
+	if (bus == 0)
 	{
-		findField("note0").lock()->setSize(6 * 6 + 1, 8);
-
-		if (mpc.getNote() != 34)
-		{
-			findField("note0").lock()->setText(to_string(mpc.getNote()) + "/" + sampler.lock()->getPadName(mpc.getPad()));
-		}
-		else {
-			findField("note0").lock()->setText("ALL");
-		}
-
+		findField("note0").lock()->setSize(47, 9);
+		findField("note0").lock()->setText((StrUtil::padLeft(to_string(note0), " ", 3) + "(" + mpc::Util::noteNames()[note0]) + ")");
+		findField("note1").lock()->setText((StrUtil::padLeft(to_string(note1), " ", 3) + "(" + mpc::Util::noteNames()[note1]) + ")");
 	}
 	else
 	{
-		findField("note0").lock()->setSize(8 * 6, 8);
-		findField("note0").lock()->setText((StrUtil::padLeft(to_string(midiNote0), " ", 3) + "(" + mpc::Util::noteNames()[midiNote0]) + ")");
-		findField("note1").lock()->setText((StrUtil::padLeft(to_string(midiNote1), " ", 3) + "(" + mpc::Util::noteNames()[midiNote1]) + ")");
+		findField("note0").lock()->setSize(37, 9);
+
+		if (mpc.getNote() == 34)
+			findField("note0").lock()->setText("ALL");
+		else
+			findField("note0").lock()->setText(to_string(mpc.getNote()) + "/" + sampler.lock()->getPadName(mpc.getPad()));
 	}
 }
 
 void EraseScreen::setTrack(int i)
 {
 	if (i < -1 || i > 63)
-	{
 		return;
-	}
 
 	track = i;
 	displayTrack();
@@ -298,21 +296,20 @@ void EraseScreen::setTrack(int i)
 void EraseScreen::setErase(int i)
 {
 	if (i < 0 || i > 2)
-	{
 		return;
-	}
 
 	erase = i;
 	displayErase();
+	displayType();
+	displayNotes();
 }
 
 void EraseScreen::setType(int i)
 {
 	if (i < 0 || i > 6)
-	{
 		return;
-	}
 
 	type = i;
 	displayType();
+	displayNotes();
 }

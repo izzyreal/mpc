@@ -28,7 +28,7 @@ namespace mpc::lcdgui::screens
 
 	protected:
 		virtual void displayNotes() = 0;
-		virtual void displayDrumNotes() {}
+		virtual void displayDrumNotes() { displayNotes(); }
 		virtual void displayTime() = 0;
 
 	public:
