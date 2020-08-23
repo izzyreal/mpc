@@ -1,6 +1,7 @@
 #include "NameScreen.hpp"
 
 #include <lcdgui/screens/LoadScreen.hpp>
+#include <lcdgui/screens/SongScreen.hpp>
 #include <lcdgui/screens/window/DirectoryScreen.hpp>
 #include <lcdgui/screens/window/MidiOutputScreen.hpp>
 #include <lcdgui/screens/window/MidiOutputScreen.hpp>
@@ -22,6 +23,7 @@
 #include <disk/ApsSaver.hpp>
 
 #include <sequencer/Track.hpp>
+#include <sequencer/Song.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -45,9 +47,7 @@ weak_ptr<Underline> NameScreen::findUnderline()
 void NameScreen::open()
 {
 	for (int i = 0; i < 16; i++)
-	{
 		findUnderline().lock()->setState(i, false);
-	}
 
 	displayName();
 }
@@ -62,9 +62,7 @@ void NameScreen::left()
 	init();
 
 	if (stoi(param) == 0)
-	{
 		return;
-	}
 
 	baseControls->left();
 	
@@ -81,9 +79,7 @@ void NameScreen::right()
 	init();
 
 	if (stoi(param) == nameLimit - 1)
-	{
 		return;
-	}
 	
 	baseControls->right();
 	
@@ -217,6 +213,15 @@ void NameScreen::saveName()
 			editing = false;
 			ls.lock()->setLastFocus("name", "0");
 			openScreen("sequencer");
+			return;
+		}
+		else if (prevScreen.compare("song-window") == 0)
+		{
+			auto songScreen = mpc.screens->get<SongScreen>("song");
+			songScreen->defaultSongName = getName();
+			editing = false;
+			ls.lock()->setLastFocus("name", "0");
+			openScreen("song");
 			return;
 		}
 	}
@@ -356,6 +361,14 @@ void NameScreen::saveName()
 		ls.lock()->setLastFocus("name", "0");
 		openScreen("sequencer");
 	}
+	else if (prevScreen.compare("song-window") == 0)
+	{
+		auto songScreen = mpc.screens->get<SongScreen>("song");
+		sequencer.lock()->getSong(songScreen->activeSongIndex).lock()->setName(getName());
+		editing = false;
+		ls.lock()->setLastFocus("name", "0");
+		openScreen("song");
+	}
 	else if (prevScreen.compare("midi-output") == 0)
 	{
 		auto midiOutputScreen = dynamic_pointer_cast<MidiOutputScreen>(mpc.screens->getScreenComponent("midi-output"));
@@ -426,16 +439,7 @@ void NameScreen::drawUnderline()
 		auto u = findUnderline().lock();
 		
 		for (int i = 0; i < 16; i++)
-		{
-			if (i == stoi(focus))
-			{
-				u->setState(i, true);
-			}
-			else
-			{
-				u->setState(i, false);
-			}
-		}
+			u->setState(i, i == stoi(focus));
 
 		bringToFront(u.get());
 	}
@@ -481,14 +485,10 @@ string NameScreen::getName()
 	string s = name;
 
 	while (!s.empty() && isspace(s.back()))
-	{
 		s.pop_back();
-	}
 
 	for (int i = 0; i < s.length(); i++)
-	{
 		if (s[i] == ' ') s[i] = '_';
-	}
 
 	return StrUtil::padRight(s, " ", nameLimit);
 }

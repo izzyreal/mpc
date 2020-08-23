@@ -21,10 +21,10 @@ void TrackScreen::open()
 	auto defaultTrackName = sequencer.lock()->getDefaultTrackName(activeTrackIndex);
 
 	findField("tracknamefirstletter").lock()->setText(track.lock()->getName().substr(0, 1));
-	findLabel("tracknamerest").lock()->setText(track.lock()->getName().substr(1, track.lock()->getName().length()));
+	findLabel("tracknamerest").lock()->setText(track.lock()->getName().substr(1));
 
 	findField("defaultnamefirstletter").lock()->setText(defaultTrackName.substr(0, 1));
-	findLabel("defaultnamerest").lock()->setText(defaultTrackName.substr(1, defaultTrackName.length()));
+	findLabel("defaultnamerest").lock()->setText(defaultTrackName.substr(1));
 }
 
 void TrackScreen::function(int i)

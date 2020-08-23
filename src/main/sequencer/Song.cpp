@@ -71,7 +71,6 @@ void Song::deleteStep(int stepIndex)
 void Song::insertStep(int stepIndex)
 {
 	steps.insert(steps.begin() + stepIndex, make_shared<Step>());
-	used = true;
 }
 
 weak_ptr<Step> Song::getStep(int i)

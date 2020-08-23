@@ -3,6 +3,12 @@
 
 #include <memory>
 
+namespace mpc::lcdgui::screens::window
+{
+	class SongWindow;
+	class NameScreen;
+}
+
 namespace mpc::lcdgui::screens
 {
 	class SongScreen
@@ -11,7 +17,7 @@ namespace mpc::lcdgui::screens
 
 	private:
 		int offset = -1;
-		int selectedSongIndex = 0;
+		int activeSongIndex = 0;
 		std::string defaultSongName = "Song";
 		bool loop = false;
 
@@ -23,7 +29,7 @@ namespace mpc::lcdgui::screens
 		void setLoop(bool b);
 		std::string getDefaultSongName();
 		int getOffset();
-		int getSelectedSongIndex();
+		int getActiveSongIndex();
 		bool isLoopEnabled();
 
 	public:
@@ -50,6 +56,9 @@ namespace mpc::lcdgui::screens
 		void displayNow1();
 		void displayNow2();
 		void displaySongName();
+
+		friend class mpc::lcdgui::screens::window::SongWindow;
+		friend class mpc::lcdgui::screens::window::NameScreen;
 
 	};
 }

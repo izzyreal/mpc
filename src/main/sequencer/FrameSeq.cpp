@@ -173,7 +173,7 @@ void FrameSeq::work(int nFrames)
 					{
 						lSequencer->playToTick(seq->getLastTick() - 1);
 						lSequencer->incrementPlayedStepRepetitions();
-						auto song = lSequencer->getSong(songScreen->getSelectedSongIndex()).lock();
+						auto song = lSequencer->getSong(songScreen->getActiveSongIndex()).lock();
 						auto step = songScreen->getOffset() + 1;
 
 						if (step == song->getStepCount() - 1 && lSequencer->getPlayedStepRepetitions() >= song->getStep(step).lock()->getRepeats())

@@ -24,6 +24,7 @@ namespace mpc::lcdgui::screens::window
 	class SaveAProgramScreen;
 	class SaveApsFileScreen;
 	class SequenceScreen;
+	class SongWindow;
 	class SoundScreen;
 	class AutoChromaticAssignmentScreen;
 	class DirectoryScreen;
@@ -94,6 +95,7 @@ namespace mpc::lcdgui::screens::window
 		friend class mpc::lcdgui::screens::dialog::FileAlreadyExistsScreen;
 		friend class mpc::lcdgui::screens::dialog::ResampleScreen;
 		friend class SequenceScreen;
+		friend class SongWindow;
 		friend class SoundScreen;
 		friend class AutoChromaticAssignmentScreen;
 		friend class DirectoryScreen;

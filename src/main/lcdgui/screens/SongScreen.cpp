@@ -100,28 +100,28 @@ void SongScreen::right()
 void SongScreen::openWindow()
 {
 	init();
+
 	if (param.compare("loop") == 0)
-	{
 		openScreen("loop-song-window");
-	}
+	else if (param.compare("song") == 0)
+		openScreen("song-window");
 }
 
 void SongScreen::down()
 {
 	init();
-	auto song = sequencer.lock()->getSong(selectedSongIndex);
+	auto song = sequencer.lock()->getSong(activeSongIndex);
 	if (param.compare("step1") == 0 || param.compare("sequence1") == 0 || param.compare("reps1") == 0)
 	{	
 		if (offset == song.lock()->getStepCount() - 1)
-		{
 			return;
-		}
 
 		setOffset(offset + 1);
 		sequencer.lock()->setActiveSequenceIndex(sequencer.lock()->getSongSequenceIndex());
 		sequencer.lock()->setBar(0);
 	}
-	else {
+	else
+	{
 		baseControls->down();
 	}
 }
@@ -130,7 +130,7 @@ void SongScreen::turnWheel(int i)
 {
 	init();
 	
-	auto song = sequencer.lock()->getSong(selectedSongIndex).lock();
+	auto song = sequencer.lock()->getSong(activeSongIndex).lock();
 	
 	if (param.find("sequence") != string::npos)
 	{
@@ -153,7 +153,7 @@ void SongScreen::turnWheel(int i)
 	}
 	else if (param.compare("song") == 0)
 	{
-		setSelectedSongIndex(selectedSongIndex + i);
+		setSelectedSongIndex(activeSongIndex + i);
 		setOffset(-1);
 		init();
 
@@ -177,7 +177,7 @@ void SongScreen::turnWheel(int i)
 void SongScreen::function(int i)
 {
 	init();
-	auto song = sequencer.lock()->getSong(selectedSongIndex).lock();
+	auto song = sequencer.lock()->getSong(activeSongIndex).lock();
 	
 	switch (i)
 	{
@@ -190,6 +190,8 @@ void SongScreen::function(int i)
 		if (!song->isUsed())
 		{
 			song->setUsed(true);
+			auto newName = StrUtil::trim(defaultSongName) + StrUtil::padLeft(to_string(activeSongIndex + 1), "0", 2);
+			song->setName(newName);
 		}
 
 		displaySongName();
@@ -211,7 +213,7 @@ void SongScreen::displayLoop()
 
 void SongScreen::displaySteps()
 {
-	auto song = sequencer.lock()->getSong(selectedSongIndex).lock();
+	auto song = sequencer.lock()->getSong(activeSongIndex).lock();
 	int steps = song->getStepCount();
 	auto s = sequencer.lock();
 	
@@ -261,8 +263,8 @@ void SongScreen::displayNow2()
 
 void SongScreen::displaySongName()
 {
-	auto song = sequencer.lock()->getSong(selectedSongIndex).lock();
-	findField("song").lock()->setText(StrUtil::padLeft(to_string(selectedSongIndex + 1), "0", 2) + "-" + song->getName());
+	auto song = sequencer.lock()->getSong(activeSongIndex).lock();
+	findField("song").lock()->setText(StrUtil::padLeft(to_string(activeSongIndex + 1), "0", 2) + "-" + song->getName());
 }
 
 void SongScreen::setOffset(int i)
@@ -281,7 +283,7 @@ void SongScreen::setSelectedSongIndex(int i)
 	if (i < 0 || i > 19)
 		return;
 	
-	selectedSongIndex = i;
+	activeSongIndex = i;
 
 	displaySongName();
 	displaySteps();
@@ -342,9 +344,9 @@ int SongScreen::getOffset()
 	return offset;
 }
 
-int SongScreen::getSelectedSongIndex()
+int SongScreen::getActiveSongIndex()
 {
-	return selectedSongIndex;
+	return activeSongIndex;
 }
 
 bool SongScreen::isLoopEnabled()

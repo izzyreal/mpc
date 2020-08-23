@@ -22,8 +22,8 @@ void SequenceScreen::open()
 
 	sequenceNameFirstLetterField->setText(seq->getName().substr(0, 1));
 	defaultSequenceNameFirstLetterField->setText(sequencer.lock()->getDefaultSequenceName().substr(0, 1));
-	sequenceNameRestLabel->setText(seq->getName().substr(1, seq->getName().length()));
-	defaultSequenceNameRestLabel->setText(sequencer.lock()->getDefaultSequenceName().substr(1, sequencer.lock()->getDefaultSequenceName().length()));
+	sequenceNameRestLabel->setText(seq->getName().substr(1));
+	defaultSequenceNameRestLabel->setText(sequencer.lock()->getDefaultSequenceName().substr(1));
 }
 
 void SequenceScreen::function(int i)
