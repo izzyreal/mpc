@@ -29,9 +29,9 @@ namespace mpc::lcdgui::screens::window {
 
 	private:
 		int edit = 0;
-		int insertSoundNumber = 0;
+		int insertSoundIndex = 0;
 		int timeStretchRatio = 10000;
-		int timeStretchPresetNumber = 0;
+		int timeStretchPresetIndex = 0;
 		int timeStretchAdjust = 0;
 		int endMargin = 30;
 		bool createNewProgram = true;

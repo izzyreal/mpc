@@ -21,7 +21,7 @@ EditSoundScreen::EditSoundScreen(mpc::Mpc& mpc, const int layerIndex)
     : ScreenComponent(mpc, "edit-sound", layerIndex)
 {
 	baseControls = make_shared<BaseSamplerControls>(mpc);
-	vector<string> newTimeStretchPresetNames(54);
+	vector<string> newTimeStretchPresetNames;
 	
 	const auto letters = vector<string>{ "A", "B", "C" };
 	
@@ -29,9 +29,9 @@ EditSoundScreen::EditSoundScreen(mpc::Mpc& mpc, const int layerIndex)
     {
 		for (int i = 0; i < 3; i++)
         {
-			s = StrUtil::padRight(s, " ", 13);
-			s += letters[i];
-			newTimeStretchPresetNames.push_back(s);
+			auto newStr = StrUtil::padRight(s, " ", 13);
+			newStr += letters[i];
+			newTimeStretchPresetNames.push_back(newStr);
 		}
 	}
 
@@ -242,13 +242,13 @@ void EditSoundScreen::displayVariable()
 	}
 	else if (edit == 3)
     {
-		auto sampleName = sampler.lock()->getSoundName(insertSoundNumber);
+		auto sampleName = sampler.lock()->getSoundName(insertSoundIndex);
 		findLabel("new-name").lock()->setSize(11 * 6, 9);
 		findLabel("new-name").lock()->setText("Insert Snd:");
 		findField("new-name").lock()->setLocation(findLabel("new-name").lock()->getW() + 19, 20);
 		string stereo = "";
 		
-		if (!sampler.lock()->getSound(insertSoundNumber).lock()->isMono())
+		if (!sampler.lock()->getSound(insertSoundIndex).lock()->isMono())
 		{
 			stereo = "(ST)";
 		}
@@ -261,8 +261,11 @@ void EditSoundScreen::displayVariable()
 		findLabel("new-name").lock()->setText("New name:");
 		findField("new-name").lock()->setLocation(findLabel("new-name").lock()->getW() + 19, 20); // , 20 is that still from the old days?
 		findField("new-name").lock()->setText(newName);
-		findField("ratio").lock()->setText(to_string(timeStretchRatio * 0.01) + "%");
-		findField("preset").lock()->setText(timeStretchPresetNames[timeStretchPresetNumber]);
+
+		auto trimmedPercentage = StrUtil::TrimDecimals(to_string(timeStretchRatio * 0.01), 2);
+		findField("ratio").lock()->setText(StrUtil::padLeft(trimmedPercentage, " ", 6) + "%");
+
+		findField("preset").lock()->setText(timeStretchPresetNames[timeStretchPresetIndex]);
 		findField("adjust").lock()->setText(to_string(timeStretchAdjust));
 	}
 }
@@ -295,7 +298,7 @@ void EditSoundScreen::setInsertSndNr(int i, int soundCount)
         return;
     }
 
-    insertSoundNumber = i;
+    insertSoundIndex = i;
 	displayVariable();
 }
 
@@ -318,7 +321,7 @@ void EditSoundScreen::setTimeStretchPresetNumber(int i)
         return;
     }
 
-    timeStretchPresetNumber = i;
+    timeStretchPresetIndex = i;
 	displayVariable();
 }
 
@@ -375,7 +378,7 @@ void EditSoundScreen::turnWheel(int i)
 	}
 	else if (param.compare("new-name") == 0 && edit == 3)
 	{
-		setInsertSndNr(insertSoundNumber + i, sampler.lock()->getSoundCount());
+		setInsertSndNr(insertSoundIndex + i, sampler.lock()->getSoundCount());
 	}
 	else if (param.compare("ratio") == 0)
 	{
@@ -383,7 +386,7 @@ void EditSoundScreen::turnWheel(int i)
 	}
 	else if (param.compare("preset") == 0)
 	{
-		setTimeStretchPresetNumber(timeStretchPresetNumber + i);
+		setTimeStretchPresetNumber(timeStretchPresetIndex + i);
 	}
 	else if (param.compare("adjust") == 0)
 	{
@@ -460,7 +463,7 @@ void EditSoundScreen::function(int j)
 		else if (edit == 3)
 		{
 			// Insert sound into section start
-			auto source = dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getSound(insertSoundNumber).lock());
+			auto source = dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getSound(insertSoundIndex).lock());
 			auto destination = sampler.lock()->getSound().lock();
 
 			auto destinationStartFrame = sound->getStart();

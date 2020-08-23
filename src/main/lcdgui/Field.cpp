@@ -44,9 +44,7 @@ void Field::setNextFocus(const std::string& nextFocus)
 void Field::Hide(bool b)
 {
 	if (b && focus)
-	{
 		mpc.getLayeredScreen().lock()->setFocus(nextFocus);
-	}
 
 	Component::Hide(b);
 }
@@ -54,10 +52,8 @@ void Field::Hide(bool b)
 void Field::Draw(std::vector<std::vector<bool>>* pixels)
 {
 	if (shouldNotDraw(pixels))
-	{
 		return;
-	}
-	
+
 	auto r = getRect();
 
 	if (split)
