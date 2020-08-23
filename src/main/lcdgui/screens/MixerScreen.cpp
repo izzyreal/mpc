@@ -35,8 +35,6 @@ void MixerScreen::open()
 	}
 
 	mpc.addObserver(this);
-
-	findField("dummy").lock()->Hide(true);
 	
 	for (auto& m : mixerStrips)
 	{
@@ -51,7 +49,6 @@ void MixerScreen::open()
 void MixerScreen::close()
 {
 	mpc.deleteObserver(this);
-	findField("dummy").lock()->Hide(false);
 }
 
 void MixerScreen::addMixerStrips()

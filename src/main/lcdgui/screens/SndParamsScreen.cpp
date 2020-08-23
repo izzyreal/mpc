@@ -229,21 +229,17 @@ void SndParamsScreen::displaySnd()
 	if (sampler.lock()->getSoundCount() == 0)
 	{
 		findField("snd").lock()->setText("(no sound)");
+		ls.lock()->setFocus("dummy");
 		return;
 	}
 
-	auto ls = mpc.getLayeredScreen().lock();
-
-	if (ls->getFocus().compare("dummy") == 0)
-		ls->setFocus(findField("snd").lock()->getName());
+	if (ls.lock()->getFocus().compare("dummy") == 0)
+		ls.lock()->setFocus("snd");
 
 	auto sampleName = sound->getName();
 
 	if (!sound->isMono())
-	{
-		sampleName = StrUtil::padRight(sampleName, " ", 16);
-		sampleName += "(ST)";
-	}
+		sampleName = StrUtil::padRight(sampleName, " ", 16) + "(ST)";
 
 	findField("snd").lock()->setText(sampleName);
 

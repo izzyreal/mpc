@@ -345,10 +345,7 @@ void TrimScreen::displaySnd()
 	}
 
 	if (ls.lock()->getFocus().compare("dummy") == 0)
-	{
-		ls.lock()->setFocus(findField("snd").lock()->getName());
-	}
-
+		ls.lock()->setFocus("snd");
 
 	auto sampleName = sound->getName();
 

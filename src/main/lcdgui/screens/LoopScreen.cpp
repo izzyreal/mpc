@@ -396,16 +396,12 @@ void LoopScreen::displaySnd()
 	}
 
 	if (ls.lock()->getFocus().compare("dummy") == 0)
-	{
-		ls.lock()->setFocus(findField("snd").lock()->getName());
-	}
+		ls.lock()->setFocus("snd");
 
 	auto sampleName = sound->getName();
 
 	if (!sound->isMono())
-	{
 		sampleName = StrUtil::padRight(sampleName, " ", 16) + "(ST)";
-	}
 
 	findField("snd").lock()->setText(sampleName);
 }
