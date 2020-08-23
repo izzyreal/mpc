@@ -96,19 +96,6 @@ vector<string> screenNames = {
 "velo-pitch",
 "mute-assign",
 "auto-chromatic-assignment",
-"copy-effect-settings",
-"distortion-ring-mod",
-"4bandfilter",
-"effect-mixer",
-"modulation",
-"modulation-rotary",
-"modulation-fmod-auto-pan",
-"modulation-pitch-shift",
-"modulation-pitch-feedback",
-"delay-echo",
-"delay-echo-stereo",
-"reverb",
-"reverb-gated",
 "sound-memory",
 "start-fine",
 "end-fine",
@@ -186,7 +173,7 @@ SCENARIO("All screens can be opened", "[gui]") {
 		mpc.getDisk().lock()->moveForward("TEST1");
 		mpc.getDisk().lock()->initFiles();
 
-		auto f = mpc.getDisk().lock()->getFile("ALL_PGMS.APS");
+		auto f = mpc.getDisk().lock()->getFile("BASIC_KIT.APS");
 		
 		auto apsLoader = mpc::disk::ApsLoader(mpc, f);
 
@@ -205,9 +192,7 @@ SCENARIO("All screens can be opened", "[gui]") {
 			
 			// We do a check for the most important screen
 			if (screenName.compare("sequencer") == 0)
-			{
 				REQUIRE(layerIndex == 0);
-			}
 
 			if (layerIndex == -1)
 			{
@@ -225,40 +210,28 @@ SCENARIO("All screens can be opened", "[gui]") {
 				for (auto b : column)
 				{
 					if (b)
-					{
 						blackPixelCount++;
-					}
 				}
 			}
 
 			// And another check for the most important screen
 			if (screenName.compare("sequencer") == 0)
-			{
 				REQUIRE(blackPixelCount > 0);
-			}
 
 			if (blackPixelCount > 0)
-			{
 				good.push_back(screenName + " has " + to_string(blackPixelCount) + " black pixels");
-			}
 			else
-			{
 				bad.push_back(screenName + " is openable, but has 0 black pixels");
-			}
-
 		}
 
 		MLOG("These screens are fine:");
 		for (auto& msg : good)
-		{
 			MLOG(msg);
-		}
 
 		MLOG("\nThese screens are broken:");
 		for (auto& msg : bad)
-		{
 			MLOG(msg);
-		}
+
 		printf("%i screens are fine and %i screens are broken. Check vmpc.log in ~/vMPC for more details.\n", good.size(), bad.size());
 
 		REQUIRE(good.size() >= 42); // This will be increased as the screens get refactored.

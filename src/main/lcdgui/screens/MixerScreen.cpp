@@ -79,7 +79,7 @@ void MixerScreen::displayMixerStrip(int i)
 	const auto pad = program.lock()->getPad(padIndex);
 	const auto note = pad->getNote();
 
-	mixerStrips[i].lock()->findChild<Knob>("").lock()->Hide(note == 34);
+	mixerStrips[i].lock()->findChild<Knob>("").lock()->Hide(note == 34 || tab != 0);
 
 	if (note == 34)
 	{

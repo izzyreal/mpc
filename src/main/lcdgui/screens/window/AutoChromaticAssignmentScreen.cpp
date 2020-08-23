@@ -78,7 +78,6 @@ void AutoChromaticAssignmentScreen::function(int i)
 		}
 
 		openScreen(ls.lock()->getPreviousScreenName());
-
 		break;
 	}
 	}

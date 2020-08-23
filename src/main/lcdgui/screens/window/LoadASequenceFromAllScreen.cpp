@@ -65,7 +65,7 @@ void LoadASequenceFromAllScreen::displayFile()
 	auto loadASequenceFromAllScreen = dynamic_pointer_cast<LoadASequenceFromAllScreen>(mpc.screens->getScreenComponent("load-a-sequence-from-all"));
 	findField("file").lock()->setTextPadded(sourceSeqIndex + 1, "0");
 
-	auto candidate = loadASequenceFromAllScreen->sequencesFromAllFile[sourceSeqIndex];
+	auto candidate = sourceSeqIndex < sequencesFromAllFile.size() ? loadASequenceFromAllScreen->sequencesFromAllFile[sourceSeqIndex] : shared_ptr<mpc::sequencer::Sequence>();
 	auto name = candidate ? candidate->getName() : "(Unused)";
 	findLabel("file0").lock()->setText("-" + name);
 }
