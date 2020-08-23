@@ -71,7 +71,7 @@ void Wave::setCenterSamplePos(unsigned int centerSamplePos)
 
 void Wave::setSampleData(vector<float>* sampleData, bool mono, unsigned int view)
 {
-	auto newFrameCount = sampleData != nullptr ? (mono ? sampleData->size() : (sampleData->size() * 0.5)) : 0;
+	auto newFrameCount = sampleData != nullptr ? (int) floor(mono ? sampleData->size() : (sampleData->size() * 0.5)) : 0;
 
 	if (this->sampleData == sampleData &&
 		newFrameCount == frameCount &&
@@ -127,7 +127,7 @@ void Wave::makeLine(std::vector<std::vector<std::vector<int>>>* lines, std::vect
 	if (!mono && view == 1)
 		offset += frameCount;
 
-	if (offset < 0 || offset >= sampleData->size() && !fine)
+	if (offset < 0 || offset >= frameCount && !fine)
 		return;
 
 	if (!mono && view == 0 && offset > frameCount && !fine)
@@ -209,7 +209,7 @@ void Wave::makeLine(std::vector<std::vector<std::vector<int>>>* lines, std::vect
 		{
 			if (fine)
 			{
-				if (samplePos + samplesPerPixel >= frameCount || lineX == 55)
+				if ((int) floor(samplePos + samplesPerPixel) >= frameCount || lineX == 55)
 					colors->push_back(false);
 				else
 					colors->push_back(true);
@@ -224,7 +224,7 @@ void Wave::makeLine(std::vector<std::vector<std::vector<int>>>* lines, std::vect
 		{
 			if (fine)
 			{
-				if (samplePos + samplesPerPixel >= frameCount || lineX == 55)
+				if ((int) floor(samplePos + samplesPerPixel) >= frameCount || lineX == 55)
 					colors->push_back(false);
 				else
 					colors->push_back(true);
@@ -248,8 +248,7 @@ void Wave::Draw(std::vector<std::vector<bool>>* pixels)
 	if (sampleData == nullptr)
 		return;
 
-	//if (fine)
-		Clear(pixels);
+	Clear(pixels);
 
 	vector<vector<vector<int>>> lines;
 	vector<bool> colors;

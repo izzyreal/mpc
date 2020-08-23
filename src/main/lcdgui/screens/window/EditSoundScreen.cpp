@@ -51,15 +51,11 @@ void EditSoundScreen::open()
 	}
 
 	if (previous.compare("zone") == 0)
-	{
 		setEdit(8);
-	}
-	else if (previous.compare("loop") == 0) {
+	else if (previous.compare("loop") == 0)
 		setEdit(1);
-	}
-	else {
+	else if (previous.compare("name") != 0)
 		setEdit(0);
-	}
 
 	displayVariable();
 
