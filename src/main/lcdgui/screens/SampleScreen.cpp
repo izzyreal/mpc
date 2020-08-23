@@ -67,6 +67,11 @@ void SampleScreen::down()
 	baseControls->down();
 }
 
+void SampleScreen::openWindow()
+{
+	ls.lock()->openScreen("sound-memory");
+}
+
 void SampleScreen::function(int i)
 {
 	init();

@@ -7,8 +7,8 @@ namespace mpc::audiomidi {
 	class SoundRecorder;
 }
 
-namespace mpc::lcdgui::screens {
-
+namespace mpc::lcdgui::screens 
+{
 	class SampleScreen
 		: public mpc::lcdgui::ScreenComponent
 	{
@@ -16,6 +16,7 @@ namespace mpc::lcdgui::screens {
 	public:
 		void function(int i) override;
 		void turnWheel(int i) override;
+		void openWindow() override;
 		void left() override;
 		void right() override;
 		void up() override;

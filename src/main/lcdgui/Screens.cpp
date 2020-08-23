@@ -109,6 +109,7 @@
 #include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
 #include <lcdgui/screens/window/VmpcRecordingFinishedScreen.hpp>
 #include <lcdgui/screens/window/TransposePermanentScreen.hpp>
+#include <lcdgui/screens/window/SoundMemoryScreen.hpp>
 
 #include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
 #include <lcdgui/screens/dialog/MidiMonitorScreen.hpp>
@@ -877,6 +878,10 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	{
 		screen = make_shared<StaticScreen>(mpc);
 		screen->findChild<Background>("").lock()->setName(screenName);
+	}
+	else if (screenName.compare("sound-memory") == 0)
+	{
+		screen = make_shared<SoundMemoryScreen>(mpc, layerIndex);
 	}
 
 	if (screen)
