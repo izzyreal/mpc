@@ -204,26 +204,25 @@ weak_ptr<Component> Component::addChild(shared_ptr<Component> child)
 void Component::removeChild(weak_ptr<Component> child)
 {
 	if (!child.lock())
-	{
 		return;
-	}
 
 	for (auto& c : children)
 	{
 		if (c == child.lock())
 		{
 			children.erase(find(begin(children), end(children), child.lock()));
-			break;
+			return;
 		}
 	}
+
+	for (auto& c : children)
+		c->removeChild(child);
 }
 
 void Component::addChildren(vector<shared_ptr<Component>> children)
 {
 	for (auto& c : children)
-	{
 		addChild(c);
-	}
 }
 
 weak_ptr<Component> Component::findChild(const string& name)
@@ -231,9 +230,7 @@ weak_ptr<Component> Component::findChild(const string& name)
 	for (auto& c : children)
 	{
 		if (c->getName().compare(name) == 0)
-		{
 			return c;
-		}
 
 		auto candidate = c->findChild(name).lock();
 

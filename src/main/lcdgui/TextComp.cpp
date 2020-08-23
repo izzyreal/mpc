@@ -34,9 +34,8 @@ void TextComp::enableTwoDots()
 void TextComp::setSize(int w, int h)
 {
 	if (alignmentEndX == -1)
-	{
 		alignmentEndX = w;
-	}
+
 	Component::setSize(w, h);
 }
 
@@ -44,6 +43,9 @@ void TextComp::Draw(std::vector<std::vector<bool>>* pixels)
 {
 	if (shouldNotDraw(pixels))
 		return;
+
+	if (name.compare("fromnote") == 0)
+		MLOG("Drawing fromnote");
 
 	if (text.length() == 0)
 	{

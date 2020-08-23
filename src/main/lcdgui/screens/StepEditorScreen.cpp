@@ -5,6 +5,8 @@
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <lcdgui/screens/window/EditMultipleScreen.hpp>
 
+#include <lcdgui/Rectangle.hpp>
+
 #include <sequencer/ChannelPressureEvent.hpp>
 #include <sequencer/ControlChangeEvent.hpp>
 #include <sequencer/MixerEvent.hpp>
@@ -43,17 +45,40 @@ StepEditorScreen::StepEditorScreen(mpc::Mpc& mpc, const int layerIndex)
 
 	for (int i = 0; i < EVENT_ROW_COUNT; i++)
 		addChild(make_shared<EventRow>(mpc, i)).lock();
+
+	MRECT r(31, 0, 164, 9);
+	addChildT<Rectangle>("view-background", r);
 }
 
 void StepEditorScreen::open()
 {
+	findField("tonote").lock()->setLocation(115, 0);
+	findLabel("fromnote").lock()->Hide(true);
+	auto rectangle = findChild<Rectangle>("view-background").lock();
+	//rectangle->setOn(true);
+	if (!rectangle->findField("view").lock())
+	{
+		/*
+		auto viewField = findField("view").lock();
+		auto fromNoteField = findField("fromnote").lock();
+		auto toNoteField = findField("tonote").lock();
+
+		removeChild(viewField);
+		removeChild(fromNoteField);
+		removeChild(toNoteField);
+
+		rectangle->addChild(viewField);
+		rectangle->addChild(fromNoteField);
+		rectangle->addChild(toNoteField);
+		*/
+	}
+
 	lastRow = 0;
 
-	findField("controlnumber").lock()->Hide(true);
+	//findField("controlnumber").lock()->Hide(true);
 	findField("fromnote").lock()->Hide(true);
-	findField("tonote").lock()->setLocation(115, 0);
 	findField("tonote").lock()->Hide(true);
-	findLabel("controlnumber").lock()->Hide(true);
+	//findLabel("controlnumber").lock()->Hide(true);
 
 	init();
 
@@ -909,7 +934,6 @@ void StepEditorScreen::refreshViewNotes()
 	
 	if (view == 1 && track.lock()->getBus() != 0)
 	{
-		findLabel("fromnote").lock()->Hide(false);
 		findField("fromnote").lock()->Hide(false);
 		findField("fromnote").lock()->setSize(37, 9);
 		findField("fromnote").lock()->setLocation(67, 0);
@@ -918,7 +942,6 @@ void StepEditorScreen::refreshViewNotes()
 	}
 	else if (view == 1 && track.lock()->getBus() == 0)
 	{
-		findLabel("fromnote").lock()->Hide(false);
 		findField("fromnote").lock()->Hide(false);
 		findField("fromnote").lock()->setLocation(61, 0);
 		findField("fromnote").lock()->setSize(47, 9);
@@ -926,23 +949,21 @@ void StepEditorScreen::refreshViewNotes()
 		findLabel("tonote").lock()->Hide(false);
 		findLabel("tonote").lock()->setText("-");
 		findField("tonote").lock()->Hide(false);
-		findField("controlnumber").lock()->Hide(true);
+		//findField("controlnumber").lock()->Hide(true);
 	}
 	else if (view == 3)
 	{
-		findLabel("fromnote").lock()->Hide(true);
 		findField("fromnote").lock()->Hide(true);
 		findLabel("tonote").lock()->Hide(true);
 		findField("tonote").lock()->Hide(true);
-		findField("controlnumber").lock()->Hide(false);
+		//findField("controlnumber").lock()->Hide(false);
 	}
 	else if (view != 1 && view != 3)
 	{
-		findLabel("fromnote").lock()->Hide(true);
 		findField("fromnote").lock()->Hide(true);
 		findLabel("tonote").lock()->Hide(true);
 		findField("tonote").lock()->Hide(true);
-		findField("controlnumber").lock()->Hide(true);
+		//findField("controlnumber").lock()->Hide(true);
 	}
 }
 
@@ -952,14 +973,10 @@ void StepEditorScreen::setViewNotesText()
 	
 	if (view == 1 && track.lock()->getBus() != 0)
 	{
-		if (fromNote != 34)
-		{
-			findField("fromnote").lock()->setText(to_string(fromNote) + "/" + sampler.lock()->getPadName(program.lock()->getPadIndexFromNote(fromNote)));
-		}
-		else
-		{
+		if (fromNote == 34)
 			findField("fromnote").lock()->setText("ALL");
-		}
+		else
+			findField("fromnote").lock()->setText(to_string(fromNote) + "/" + sampler.lock()->getPadName(program.lock()->getPadIndexFromNote(fromNote)));
 	}
 	else if (view == 1 && track.lock()->getBus() == 0)
 	{
@@ -968,14 +985,12 @@ void StepEditorScreen::setViewNotesText()
 	}
 	else if (view == 3)
 	{
+		/*
 		if (control == -1)
-		{
 			findField("controlnumber").lock()->setText("   -    ALL");
-		}
 		else
-		{
 			findField("controlnumber").lock()->setText(EventRow::controlNames[control]);
-		}
+		*/
 	}
 
 	findField("view").lock()->setText(viewNames[view]);
@@ -986,34 +1001,27 @@ void StepEditorScreen::setViewNotesText()
 void StepEditorScreen::setView(int i)
 {
 	if (i < 0 || i > 7)
-	{
 		return;
-	}
 
 	view = i;
 
+	displayView();
 	refreshViewNotes();
 	setViewNotesText();
 	setyOffset(0);
+	findChild<Rectangle>().lock()->SetDirty();
 }
 
 void StepEditorScreen::setNoteA(int i)
 {
 	if (i < 0 || i > 127)
-	{
 		return;
-	}
 
 	noteA = i;
 	
 	if (noteA > noteB)
-	{
 		noteB = noteA;
-	}
 
-	setViewNotesText();
-	displayView();
-	refreshViewNotes();
 	setViewNotesText();
 	initVisibleEvents();
 	refreshEventRows();
@@ -1023,20 +1031,13 @@ void StepEditorScreen::setNoteA(int i)
 void StepEditorScreen::setNoteB(int i)
 {
 	if (i < 0 || i > 127)
-	{
 		return;
-	}
 	
 	noteB = i;
 	
 	if (noteB < noteA)
-	{
 		noteA = noteB;
-	}
 
-	setViewNotesText();
-	displayView();
-	refreshViewNotes();
 	setViewNotesText();
 	initVisibleEvents();
 	refreshEventRows();
@@ -1046,15 +1047,10 @@ void StepEditorScreen::setNoteB(int i)
 void StepEditorScreen::setControl(int i)
 {
 	if (i < -1 || i > 127)
-	{
 		return;
-	}
 
 	control = i;
 	
-	setViewNotesText();
-	displayView();
-	refreshViewNotes();
 	setViewNotesText();
 	initVisibleEvents();
 	refreshEventRows();
@@ -1074,9 +1070,7 @@ void StepEditorScreen::setDurationOfRecordedNotes(bool b)
 void StepEditorScreen::setTcValueRecordedNotes(int i)
 {
 	if (i < 0 || i > 100)
-	{
 		return;
-	}
 
 	tcValueRecordedNotes = i;
 }
@@ -1084,9 +1078,7 @@ void StepEditorScreen::setTcValueRecordedNotes(int i)
 void StepEditorScreen::setyOffset(int i)
 {
 	if (i < 0)
-	{
 		return;
-	}
 
 	yOffset = i;
 
@@ -1172,9 +1164,7 @@ void StepEditorScreen::setSelectedEvents()
 	}
 	
 	for (int i = firstEventIndex; i < lastEventIndex + 1; i++)
-	{
 		selectedEvents.push_back(eventsAtCurrentTick[i]);
-	}
 }
 
 void StepEditorScreen::checkSelection()

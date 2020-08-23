@@ -25,16 +25,12 @@ bool Layer::setFocus(string fieldName)
 	auto newFocus = findField(fieldName).lock();
 
 	if (!newFocus || newFocus->IsHidden() || !newFocus->isFocusable())
-	{
 		return false;
-	}
 
 	auto oldFocus = findField(focus).lock();
 
 	if (oldFocus)
-	{
 		oldFocus->loseFocus(fieldName);
-	}
 
 	string oldFocusName = focus;
 

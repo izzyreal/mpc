@@ -38,27 +38,20 @@ namespace mpc::lcdgui
 
 	public:
 		template<class T>
-		std::weak_ptr<T> findChild(const std::string& name)
+		std::weak_ptr<T> findChild(const std::string& name = "")
 		{
 			for (auto& c : children)
 			{
-
 				if (name.compare("") == 0 && std::dynamic_pointer_cast<T>(c))
-				{
 					return std::dynamic_pointer_cast<T>(c);
-				}
 
 				if (c->getName().compare(name) == 0 && std::dynamic_pointer_cast<T>(c))
-				{
 					return std::dynamic_pointer_cast<T>(c);
-				}
 
 				auto candidate = c->findChild<T>(name).lock();
 
 				if (candidate)
-				{
 					return candidate;
-				}
 			}
 
 			return {};

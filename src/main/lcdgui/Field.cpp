@@ -5,6 +5,7 @@
 #include <Mpc.hpp>
 #include <lcdgui/LayeredScreen.hpp>
 #include <lcdgui/ScreenComponent.hpp>
+#include <lcdgui/Rectangle.hpp>
 
 #include <lang/StrUtil.hpp>
 
@@ -75,13 +76,9 @@ void Field::Draw(std::vector<std::vector<bool>>* pixels)
 				continue;
 
 			if (typeModeEnabled && j - r.T <= 7)
-			{
 				(*pixels)[i][j] = !inverted;
-			}
 			else
-			{
 				(*pixels)[i][j] = inverted;
-			}
 		}
 	}
 
@@ -103,8 +100,21 @@ void Field::Draw(std::vector<std::vector<bool>>* pixels)
 
 void Field::takeFocus(string prev)
 {
-	auto layeredScreen = mpc.getLayeredScreen().lock();
-	csn = layeredScreen->getCurrentScreenName();
+	auto ls = mpc.getLayeredScreen().lock();
+	csn = ls->getCurrentScreenName();
+
+	if (csn.compare("step-editor") == 0)
+	{
+		if (name.compare("view") == 0)
+		{
+			auto screen = ls->findScreenComponent().lock();
+			screen->findField("fromnote").lock()->setInverted(true);
+			screen->findField("tonote").lock()->setInverted(true);
+			screen->findLabel("tonote").lock()->setInverted(true);
+			screen->findChild<Rectangle>("").lock()->setOn(true);
+		}
+	}
+
 	focus = true;
 	inverted = true;
 	SetDirty();
@@ -112,8 +122,26 @@ void Field::takeFocus(string prev)
 
 void Field::loseFocus(string next)
 {
+	auto ls = mpc.getLayeredScreen().lock();
+	csn = ls->getCurrentScreenName();
+
 	focus = false;
 	inverted = false;
+
+	if (csn.compare("step-editor") == 0)
+	{
+		if (name.compare("view") == 0)
+		{
+			auto screen = ls->findScreenComponent().lock();
+			screen->findChild<Rectangle>("").lock()->setOn(false);
+
+			if (next.compare("fromnote") != 0)
+				screen->findField("fromnote").lock()->setInverted(false);
+
+			screen->findField("tonote").lock()->setInverted(false);
+			screen->findLabel("tonote").lock()->setInverted(false);
+		}
+	}
 
 	if (typeModeEnabled)
 		disableTypeMode();
