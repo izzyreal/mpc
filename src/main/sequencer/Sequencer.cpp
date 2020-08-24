@@ -162,15 +162,19 @@ void Sequencer::setTempo(const double newTempo)
 	{
 		auto tce = getCurrentTempoChangeEvent().lock();
 	
-		if (tce->getTick() == 0)
+		if (tce->getTick() == 0 && s->isTempoChangeOn())
 		{
 			s->setInitialTempo(newTempo / (tce->getRatio() * 0.001));
 		}
-		else
+		else if (s->isTempoChangeOn())
 		{
 			auto initialTempo = s->getInitialTempo();
 			auto ratio = newTempo / initialTempo;
 			tce->setRatio((int)(ratio * 1000.0));
+		}
+		else
+		{
+			s->setInitialTempo(newTempo);
 		}
 	}
 	else
@@ -188,9 +192,10 @@ double Sequencer::getTempo()
 
 	if (tempoSourceSequenceEnabled)
 	{
+		auto seq = getActiveSequence().lock();
 		auto tce = getCurrentTempoChangeEvent().lock();
 
-		if (tce)
+		if (seq->isTempoChangeOn() && tce)
 			return tce->getTempo();
 
 		return getActiveSequence().lock()->getInitialTempo();

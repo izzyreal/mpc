@@ -176,7 +176,7 @@ void SequencerScreen::displayTempoLabel()
 	auto currentRatio = -1;
 	auto sequence = sequencer.lock()->getActiveSequence().lock();
 
-	if (!sequence->isUsed())
+	if (!sequence->isUsed() || !sequence->isTempoChangeOn())
 	{
 		findLabel("tempo").lock()->setText(u8" \u00C0:");
 		return;

@@ -482,6 +482,7 @@ void TempoChangeScreen::turnWheel(int j)
 	if (param.compare("tempo-change") == 0)
 	{
 		seq->setTempoChangeOn(j > 0);
+		displayTempoChangeOn();
 		return;
 	}
 	else if (param.compare("initial-tempo") == 0)
