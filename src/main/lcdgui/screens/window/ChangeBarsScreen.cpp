@@ -135,7 +135,7 @@ void ChangeBarsScreen::setAfterBar(int i)
 {
 	auto seq = sequencer.lock()->getActiveSequence().lock();
 
-	if (i < 0 || i >= seq->getLastBarIndex())
+	if (i < 0 || i > seq->getLastBarIndex() + 1)
 		return;
 	
 	afterBar = i;
