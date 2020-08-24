@@ -73,7 +73,6 @@ namespace mpc::lcdgui::screens::window
 	
 	public:
 		void open() override;
-		void close() override;
 
 	public:
 		void left() override;

@@ -69,6 +69,24 @@ void TempoChangeScreen::open()
 	f1Label = findLabel("f1");
 	f2Label = findLabel("f2");
 
+	auto events = sequencer.lock()->getActiveSequence().lock()->getTempoChangeEvents();
+
+	if (param.length() == 2)
+	{
+		auto row = stoi(param.substr(1));
+		{
+			if (row + offset >= events.size())
+			{
+				offset = 0;
+				ls.lock()->setFocus("a0");
+			}
+		}
+	}
+	else
+	{
+		offset = 0;
+	}
+
 	initVisibleEvents();
 
 	displayInitialTempo();
@@ -76,10 +94,6 @@ void TempoChangeScreen::open()
 	displayTempoChange1();
 	displayTempoChange2();
 	displayTempoChangeOn();
-}
-
-void TempoChangeScreen::close()
-{
 }
 
 void TempoChangeScreen::initVisibleEvents()
