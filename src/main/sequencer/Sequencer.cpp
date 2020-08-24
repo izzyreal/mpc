@@ -154,9 +154,7 @@ vector<int> Sequencer::getTickValues() {
 void Sequencer::setTempo(const double newTempo)
 {
 	if (newTempo < 30.0 || newTempo > 300.0)
-	{
 		return;
-	}
 
 	auto s = getActiveSequence().lock();
 
@@ -166,7 +164,7 @@ void Sequencer::setTempo(const double newTempo)
 	
 		if (tce->getTick() == 0)
 		{
-			s->setInitialTempo(newTempo);
+			s->setInitialTempo(newTempo / (tce->getRatio() * 0.001));
 		}
 		else
 		{
@@ -186,17 +184,15 @@ void Sequencer::setTempo(const double newTempo)
 double Sequencer::getTempo()
 {
 	if (!isPlaying() && !getActiveSequence().lock()->isUsed())
-	{
 		return tempo;
-	}
 
 	if (tempoSourceSequenceEnabled)
 	{
 		auto tce = getCurrentTempoChangeEvent().lock();
+
 		if (tce)
-		{
 			return tce->getTempo();
-		}
+
 		return getActiveSequence().lock()->getInitialTempo();
 	}
 	return tempo;
@@ -211,19 +207,14 @@ weak_ptr<TempoChangeEvent> Sequencer::getCurrentTempoChangeEvent()
 	{
 		auto lTce = tce.lock();
 		if (getTickPosition() >= lTce->getTick())
-		{
 			index++;
-		}
 		else
-		{
 			break;
-		}
 	}
 	
 	if (index == -1)
-	{
 		index++;
-	}
+
 	return s->getTempoChangeEvents()[index];
 }
 
@@ -237,7 +228,6 @@ void Sequencer::setTempoSourceSequence(bool b)
 	tempoSourceSequenceEnabled = b;
 	
 	notifyObservers(string("temposource"));
-	
 	notifyObservers(string("tempo"));
 }
 
@@ -300,7 +290,7 @@ void Sequencer::setActiveSequenceIndex(int i)
 	if (!isPlaying())
 	{
 		position = 0;
-		notifyObservers(string("now"));
+		notifyTimeDisplay();
 	}
 	
 	notifyObservers(string("seqnumbername"));
@@ -489,7 +479,6 @@ void Sequencer::play(bool fromStart)
 		ams->getFrameSequencer().lock()->start(rate);
 	}
 
-	
     notifyObservers(string("play"));
 }
 
@@ -1388,11 +1377,11 @@ void Sequencer::move(int tick)
 
 	notifyTimeDisplay();
 
-	if (getTempo() != previousTempo)
-	{
-		previousTempo = getTempo();	
-		notifyObservers(string("tempo"));
-	}
+	//if (getTempo() != previousTempo)
+	//{
+		//previousTempo = getTempo();	
+	notifyObservers(string("tempo"));
+	//}
 }
 
 int Sequencer::getTickPosition()

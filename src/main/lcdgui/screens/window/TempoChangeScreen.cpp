@@ -162,7 +162,10 @@ void TempoChangeScreen::displayTempoChange0()
 	int ratio = tce->getRatio();
 
 	double tempo = initialTempo * double(ratio) * 0.001;
-	
+
+	if (tempo < 30.0) tempo = 30.0;
+	else if (tempo > 300.0) tempo = 300.0;
+
 	f0Field.lock()->setText(Util::tempoString(tempo));
 	bars[1].lock()->setValue((tempo - 15) * (290 / 975.0));
 }
@@ -216,8 +219,11 @@ void TempoChangeScreen::displayTempoChange1()
 	e1Field.lock()->setText(ratioStr);
 
 	auto tempo = sequence->getInitialTempo() * (tce->getRatio() * 0.001);
-	f1Field.lock()->setText(Util::tempoString(tempo));
 
+	if (tempo < 30.0) tempo = 30.0;
+	else if (tempo > 300.0) tempo = 300.0;
+
+	f1Field.lock()->setText(Util::tempoString(tempo));
 	bars[2].lock()->setValue((tempo - 15) * (290 / 975.0));
 }
 
@@ -277,8 +283,10 @@ void TempoChangeScreen::displayTempoChange2()
 
 	auto tempo = sequence->getInitialTempo() * tce->getRatio() * 0.001;
 	
-	f2Field.lock()->setText(Util::tempoString(tempo));
+	if (tempo < 30.0) tempo = 30.0;
+	else if (tempo > 300.0) tempo = 300.0;
 
+	f2Field.lock()->setText(Util::tempoString(tempo));
 	bars[3].lock()->setValue((tempo - 15) * (290 / 975.0));
 }
 

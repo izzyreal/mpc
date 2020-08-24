@@ -208,13 +208,15 @@ void SequencerScreen::displaySq()
 {
 	string result = "";
 
-	if (sequencer.lock()->isPlaying()) {
+	if (sequencer.lock()->isPlaying())
+	{
 		result.append(StrUtil::padLeft(to_string(sequencer.lock()->getCurrentlyPlayingSequenceIndex() + 1), "0", 2));
 		result.append("-");
 		result.append(sequencer.lock()->getCurrentlyPlayingSequence().lock()->getName());
 		findField("sq").lock()->setText(result);
 	}
-	else {
+	else
+	{
 		result.append(StrUtil::padLeft(to_string(sequencer.lock()->getActiveSequenceIndex() + 1), "0", 2));
 		result.append("-");
 		result.append(sequencer.lock()->getActiveSequence().lock()->getName());
@@ -354,14 +356,17 @@ void SequencerScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 	else if (s.compare("bar") == 0)
 	{
 		displayNow0();
+		displayTempoLabel();
 	}
 	else if (s.compare("beat") == 0)
 	{
 		displayNow1();
+		displayTempoLabel();
 	}
 	else if (s.compare("clock") == 0)
 	{
 		displayNow2();
+		displayTempoLabel();
 	}
 	else if (s.compare("tempo") == 0)
 	{
