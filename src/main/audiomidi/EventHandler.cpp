@@ -79,26 +79,18 @@ void EventHandler::handleNoThru(weak_ptr<mpc::sequencer::Event> e, mpc::sequence
 		auto lSequencer = sequencer.lock();
 		
 		if (!lSequencer->isCountEnabled())
-		{
 			return;
-		}
 		
 		if (lSequencer->isRecordingOrOverdubbing() && !countMetronomeScreen->getInRec() && !lSequencer->isCountingIn())
-		{
 			return;
-		}
 		
 		if (lSequencer->isPlaying() && !lSequencer->isRecordingOrOverdubbing() && !countMetronomeScreen->getInPlay() && !lSequencer->isCountingIn())
-		{
 			return;
-		}
 
 		auto ne = dynamic_pointer_cast<mpc::sequencer::NoteEvent>(event);
 
 		if (ne->getVelocity() == 0)
-		{
 			return;
-		}
 
 		auto fs = mpc.getAudioMidiServices().lock()->getFrameSequencer().lock();
 		auto eventFrame = fs->getEventFrameOffset(event->getTick());
@@ -108,10 +100,9 @@ void EventHandler::handleNoThru(weak_ptr<mpc::sequencer::Event> e, mpc::sequence
 	else
 	{
 		if (lSequencer->isCountingIn() && event->getTick() != -1)
-		{
 			return;
-		}
 	}
+
 	auto tce = dynamic_pointer_cast<mpc::sequencer::TempoChangeEvent>(event);
 	auto mce = dynamic_pointer_cast<mpc::sequencer::MidiClockEvent>(event);
 	auto ne = dynamic_pointer_cast<mpc::sequencer::NoteEvent>(event);
@@ -125,9 +116,8 @@ void EventHandler::handleNoThru(weak_ptr<mpc::sequencer::Event> e, mpc::sequence
 		// tempo calls probably. Until further notice we only allow
 		// tempo change events if the tempo source is SEQUENCE.
 		if (lSequencer->isTempoSourceSequenceEnabled())
-		{
 			lSequencer->setTempo(tce->getTempo());
-		}
+
 		return;
 	}
 	else if (mce)
@@ -172,9 +162,7 @@ void EventHandler::handleNoThru(weak_ptr<mpc::sequencer::Event> e, mpc::sequence
 					auto eventFrame = mpc.getAudioMidiServices().lock()->getFrameSequencer().lock()->getEventFrameOffset(event->getTick());
 					
 					if (timeStamp != -1)
-					{
 						eventFrame = timeStamp;
-					}
 					
 					mpc.getMms()->mpcTransport(track->getTrackIndex(), midiAdapter.get().lock().get(), 0, ne->getVariationType(), ne->getVariationValue(), eventFrame);
 					
@@ -189,10 +177,10 @@ void EventHandler::handleNoThru(weak_ptr<mpc::sequencer::Event> e, mpc::sequence
 						if (pad >= 0 && pad <= 15)
 						{
 							int notifyVelo = ne->getVelocity();
+
 							if (notifyVelo == 0)
-							{
 								notifyVelo = 255;
-							}
+
 							mpc.getHardware().lock()->getPad(pad).lock()->notifyObservers(notifyVelo);
 						}
 					}
@@ -226,13 +214,9 @@ void EventHandler::handleNoThru(weak_ptr<mpc::sequencer::Event> e, mpc::sequence
 		}
 		
 		if (me->getParameter() == 0)
-		{
 			mixer->setLevel(me->getValue());
-		}
 		else if (me->getParameter() == 1)
-		{
 			mixer->setPanning(me->getValue());
-		}
 	}
 }
 
@@ -246,23 +230,18 @@ void EventHandler::midiOut(weak_ptr<mpc::sequencer::Event> e, mpc::sequencer::Tr
 		auto transScreen = dynamic_pointer_cast<TransScreen>(mpc.screens->getScreenComponent("trans"));
 
 		if (transScreen->tr == -1 || transScreen->tr == ne->getTrack())
-		{
 			ne->setNote(ne->getNote() + transScreen->transposeAmount);
-		}
-				
+
 		auto deviceNumber = track->getDevice() - 1;
 		
 		if (deviceNumber < 0)
-		{
 			return;
-		}
 		
 		auto channel = deviceNumber;
 		
 		if (channel > 15)
-		{
 			channel -= 16;
-		}
+
 		mpc::sequencer::MidiAdapter midiAdapter;
 		midiAdapter.process(event, channel, -1);
 		ctoot::midi::core::ShortMessage msg = *midiAdapter.get().lock().get();
@@ -295,19 +274,12 @@ void EventHandler::midiOut(weak_ptr<mpc::sequencer::Event> e, mpc::sequencer::Tr
 				msg.bufferPos = eventFrame;
 
 				if (r->size() < 100)
-				{
 					r->push_back(msg);
-				}
 				else
-				{
 					r->clear();
-				}
 			}
 		}
 
-		if (mpc.getLayeredScreen().lock()->getCurrentScreenName().compare("midi-output-monitor") == 0)
-		{
-			notifyObservers(string(notifyLetter + to_string(deviceNumber)));
-		}
+		notifyObservers(string(notifyLetter + to_string(deviceNumber)));
 	}
 }

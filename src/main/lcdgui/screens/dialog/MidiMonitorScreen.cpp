@@ -2,13 +2,14 @@
 
 #include <Mpc.hpp>
 #include <audiomidi/EventHandler.hpp>
+#include <audiomidi/MpcMidiInput.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::dialog;
 using namespace std;
 
-MidiMonitorScreen::MidiMonitorScreen(mpc::Mpc& mpc, const int layerIndex)
-	: ScreenComponent(mpc, "midi-monitor", layerIndex)
+MidiMonitorScreen::MidiMonitorScreen(mpc::Mpc& mpc, const std::string& name, const int layerIndex)
+	: ScreenComponent(mpc, name, layerIndex)
 {	
 }
 
@@ -47,17 +48,31 @@ void MidiMonitorScreen::open()
 	b14 = findLabel("30");
 	b15 = findLabel("31");
 
-	mpc.getEventHandler().lock()->addObserver(this);
+	if (name.compare("midi-output-monitor") == 0)
+	{
+		mpc.getEventHandler().lock()->addObserver(this);
+	}
+	else if (name.compare("midi-input-monitor") == 0)
+	{
+		mpc.getMpcMidiInput(0)->addObserver(this);
+		mpc.getMpcMidiInput(1)->addObserver(this);
+	}
 }
 
 void MidiMonitorScreen::close()
 {
-	mpc.getEventHandler().lock()->deleteObserver(this);
-	
-	if (blinkThread.joinable())
+	if (name.compare("midi-output-monitor") == 0)
 	{
-		blinkThread.join();
+		mpc.getEventHandler().lock()->deleteObserver(this);
 	}
+	else if (name.compare("midi-input-monitor") == 0)
+	{
+		mpc.getMpcMidiInput(0)->deleteObserver(this);
+		mpc.getMpcMidiInput(1)->deleteObserver(this);
+	}
+
+	if (blinkThread.joinable())
+		blinkThread.join();
 }
 
 void MidiMonitorScreen::static_blink(void * arg1, weak_ptr<mpc::lcdgui::Label> label)
@@ -65,9 +80,10 @@ void MidiMonitorScreen::static_blink(void * arg1, weak_ptr<mpc::lcdgui::Label> l
 	static_cast<MidiMonitorScreen*>(arg1)->runBlinkThread(label);
 }
 
-void MidiMonitorScreen::runBlinkThread(weak_ptr<mpc::lcdgui::Label> label) {
+void MidiMonitorScreen::runBlinkThread(weak_ptr<mpc::lcdgui::Label> label)
+{
 	this_thread::sleep_for(chrono::milliseconds(50));
-	label.lock()->setText("");
+	label.lock()->setText(" ");
 }
 
 void MidiMonitorScreen::initTimer(std::weak_ptr<mpc::lcdgui::Label> label)
@@ -90,4 +106,10 @@ void MidiMonitorScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 	auto label = findLabel(to_string(deviceNumber));
 	label.lock()->setText(u8"\u00CC");
 	initTimer(label);
+}
+
+MidiMonitorScreen::~MidiMonitorScreen()
+{
+	if (blinkThread.joinable())
+		blinkThread.join();
 }

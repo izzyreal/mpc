@@ -469,9 +469,13 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	{
 		screen = make_shared<Assign16LevelsScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("midi-monitor") == 0)
+	else if (screenName.compare("midi-input-monitor") == 0)
 	{
-		screen = make_shared<MidiMonitorScreen>(mpc, layerIndex);
+		screen = make_shared<MidiMonitorScreen>(mpc, screenName, layerIndex);
+	}
+	else if (screenName.compare("midi-output-monitor") == 0)
+	{
+		screen = make_shared<MidiMonitorScreen>(mpc, screenName, layerIndex);
 	}
 	else if (screenName.compare("metronome-sound") == 0)
 	{
@@ -865,14 +869,14 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	{
 		screen = make_shared<SyncScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("popup") == 0)
-	{
-		screen = make_shared<PopupScreen>(mpc);
-	}
 	
 	// We break up the else-if chain due to "C1061 Compiler limit: blocks nested too deeply" on Visual Studio
 	
-	if (screenName.compare("mpc2000xl") == 0 ||
+	if (screenName.compare("popup") == 0)
+	{
+		screen = make_shared<PopupScreen>(mpc);
+	}
+	else if (screenName.compare("mpc2000xl") == 0 ||
 		screenName.compare("black") == 0 ||
 		screenName.compare("half-black") == 0 ||
 		screenName.compare("empty") == 0)
