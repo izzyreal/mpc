@@ -157,31 +157,44 @@ void Sequencer::setTempo(const double newTempo)
 		return;
 
 	auto s = getActiveSequence().lock();
+	auto tce = getCurrentTempoChangeEvent().lock();
 
-	if (s && s->isUsed() && tempoSourceSequenceEnabled)
+	if (!s || !s->isUsed() || !tempoSourceSequenceEnabled)
 	{
-		auto tce = getCurrentTempoChangeEvent().lock();
-	
-		if (tce->getTick() == 0 && s->isTempoChangeOn())
+		if (tce)
 		{
-			s->setInitialTempo(newTempo / (tce->getRatio() * 0.001));
-		}
-		else if (s->isTempoChangeOn())
-		{
-			auto initialTempo = s->getInitialTempo();
-			auto ratio = newTempo / initialTempo;
-			tce->setRatio((int)(ratio * 1000.0));
+			auto candidate = newTempo / (tce->getRatio() * 0.001);
+
+			if (candidate < 30.0)
+				candidate = 30.0;
+			else if (candidate > 300.0)
+				candidate = 300.0;
+
+			tempo = candidate;
 		}
 		else
 		{
-			s->setInitialTempo(newTempo);
+			tempo = newTempo;
 		}
+		notifyObservers(string("tempo"));
+		return;
+	}
+
+	if (tce && tce->getTick() == 0 && s->isTempoChangeOn())
+	{
+		s->setInitialTempo(newTempo / (tce->getRatio() * 0.001));
+	}
+	else if (s->isTempoChangeOn())
+	{
+		auto initialTempo = s->getInitialTempo();
+		auto ratio = newTempo / initialTempo;
+		tce->setRatio((int)(ratio * 1000.0));
 	}
 	else
 	{
-		tempo = newTempo;
+		s->setInitialTempo(newTempo);
 	}
-	
+
 	notifyObservers(string("tempo"));
 }
 
@@ -190,16 +203,20 @@ double Sequencer::getTempo()
 	if (!isPlaying() && !getActiveSequence().lock()->isUsed())
 		return tempo;
 
+	auto seq = getActiveSequence().lock();
+	auto tce = getCurrentTempoChangeEvent().lock();
+
 	if (tempoSourceSequenceEnabled)
 	{
-		auto seq = getActiveSequence().lock();
-		auto tce = getCurrentTempoChangeEvent().lock();
-
 		if (seq->isTempoChangeOn() && tce)
 			return tce->getTempo();
 
 		return getActiveSequence().lock()->getInitialTempo();
 	}
+
+	if (seq->isTempoChangeOn() && tce)
+		return tempo * tce->getRatio() * 0.001;
+
 	return tempo;
 }
 
@@ -743,18 +760,17 @@ shared_ptr<Sequence> Sequencer::copySequence(weak_ptr<Sequence> src)
 	copy->init(source->getLastBarIndex());
 	copySequenceParameters(source, copy);
 	
-	for (int i = 0; i < 64; i++) {
+	for (int i = 0; i < 64; i++)
 		copyTrack(source->getTrack(i), copy->getTrack(i));
-	}
 
-	for (int i = 0; i < source->getMetaTracks().size(); i++) {
+	for (int i = 0; i < source->getMetaTracks().size(); i++)
+	{
 		copy->getMetaTracks()[i].lock()->removeEvents();
 		copyTrack(source->getMetaTracks()[i], copy->getMetaTracks()[i]);
 	}
 
-	for (auto& tempo : copy->getTempoChangeEvents()) {
+	for (auto& tempo : copy->getTempoChangeEvents())
 		tempo.lock()->setParent(copy.get());
-	}
 
 	return copy;
 }

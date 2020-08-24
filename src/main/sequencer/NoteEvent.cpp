@@ -116,6 +116,3 @@ void NoteEvent::CopyValuesTo(weak_ptr<Event> dest) {
 	lDest->setVelocity(getVelocity());
 	lDest->setDuration(getDuration());
 }
-
-NoteEvent::~NoteEvent() {
-}

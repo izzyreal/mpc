@@ -39,7 +39,5 @@ namespace mpc::sequencer
 		NoteEvent(bool noteOffTrue); // ctor used for noteOffs
 		std::string getTypeName() override { return "note"; }
 
-		~NoteEvent();
-
 	};
 }

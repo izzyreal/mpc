@@ -161,10 +161,8 @@ void SeqUtil::setTimeSignature(Sequence* sequence, int bar, int num, int den)
 	auto lastBar = sequence->getLastBarIndex();
 
 	for (int i = 0; i < 999; i++)
-	{
 		newBarLengths[i] = (*sequence->getBarLengths())[i];
-	}
-	
+
 	newBarLengths[bar] = newDenTicks * num;
 	
 	(*sequence->getNumerators())[bar] = num;
@@ -191,6 +189,7 @@ void SeqUtil::setTimeSignature(Sequence* sequence, int bar, int num, int den)
 			oldBarStartPos[i] = 0;
 			continue;
 		}
+		
 		oldBarStartPos[i] = oldBarStartPos[i - 1] + (*sequence->getBarLengths())[i - 1];
 	}
 
@@ -203,6 +202,7 @@ void SeqUtil::setTimeSignature(Sequence* sequence, int bar, int num, int den)
 			newBarStartPos[i] = 0;
 			continue;
 		}
+
 		newBarStartPos[i] = newBarStartPos[i - 1] + newBarLengths[i - 1];
 	}
 
@@ -210,10 +210,8 @@ void SeqUtil::setTimeSignature(Sequence* sequence, int bar, int num, int den)
 	{
 		auto lTrk = t.lock();
 
-		if (lTrk->getTrackIndex() > 63)
-		{
+		if (lTrk->getTrackIndex() == 64 || lTrk->getTrackIndex() == 65)
 			continue;
-		}
 
 		vector<weak_ptr<Event>> toRemove;
 		bool keep;
@@ -243,107 +241,85 @@ void SeqUtil::setTimeSignature(Sequence* sequence, int bar, int num, int den)
 			}
 
 			if (!keep)
-			{
 				toRemove.push_back(e);
-			}
 		}
 
 		for (auto& e : toRemove)
-		{
 			lTrk->removeEvent(e);
-		}
 	}
 
 	for (int i = 0; i < 999; i++)
-	{
 		(*sequence->getBarLengths())[i] = newBarLengths[i];
-	}
 	
-	sequence->initMetaTracks();
+	sequence->createClickTrack();
+	sequence->createMidiClockTrack();
 }
 
 int SeqUtil::setBar(int i, mpc::sequencer::Sequence* sequence, int position)
 {
 	if (i < 0)
-	{
 		return 0;
-	}
 
 	auto difference = i - SeqUtil::getBar(sequence, position);
 	auto den = sequence->getTimeSignature().getDenominator();
 	auto denTicks = (int)(96 * (4.0 / den));
 
 	if (position + (difference * denTicks * 4) > sequence->getLastTick())
-	{
 		position = sequence->getLastTick();
-	}
-	else {
+	else
 		position = position + (difference * denTicks * 4);
-	}
+
 	return position;
 }
 
 int SeqUtil::setBeat(int i, mpc::sequencer::Sequence* s, int position)
 {
 	if (i < 0)
-	{
 		i = 0;
-	}
+
 	auto difference = i - SeqUtil::getBeat(s, position);
 	auto ts = s->getTimeSignature();
 	auto num = ts.getNumerator();
 
 	if (i >= num)
-	{
 		return position;
-	}
 
 	auto den = ts.getDenominator();
 	auto denTicks = (int)(96 * (4.0 / den));
 
 	if (position + (difference * denTicks) > s->getLastTick())
-	{
 		position = s->getLastTick();
-	}
 	else
-	{
 		position = position + (difference * denTicks);
-	}
+
 	return position;
 }
 
 int SeqUtil::setClock(int i, mpc::sequencer::Sequence* s, int position)
 {
 	if (i < 0)
-	{
 		i = 0;
-	}
 
 	auto difference = i - getClock(s, position);
 	auto den = s->getTimeSignature().getDenominator();
 	auto denTicks = (int)(96 * (4.0 / den));
 
-	if (i > denTicks - 1) {
+	if (i > denTicks - 1)
 		return position;
-	}
 
 	if (position + difference > s->getLastTick())
-	{
 		position = s->getLastTick();
-	}
 	else
-	{
 		position = position + difference;
-	}
+
 	return position;
 }
 
 int SeqUtil::getBar(mpc::sequencer::Sequence* s, int position)
 {
 	if (position == 0)
-	{
 		return 0;
-	}
+
 	auto ts = s->getTimeSignature();
 	auto num = ts.getNumerator();
 	auto den = ts.getDenominator();
@@ -355,9 +331,8 @@ int SeqUtil::getBar(mpc::sequencer::Sequence* s, int position)
 int SeqUtil::getBeat(mpc::sequencer::Sequence* s, int position)
 {
 	if (position == 0)
-	{
 		return 0;
-	}
+
 	auto den = s->getTimeSignature().getDenominator();
 	auto denTicks = (int)(96 * (4.0 / den));
 	auto beat = (int)(floor(position / (denTicks)));
@@ -369,10 +344,10 @@ int SeqUtil::getClock(mpc::sequencer::Sequence* s, int position)
 {
 	auto den = s->getTimeSignature().getDenominator();
 	auto denTicks = (int)(96 * (4.0 / den));
+
 	if (position == 0)
-	{
 		return 0;
-	}
+
 	auto clock = (int)(position % (denTicks));
 	return clock;
 }

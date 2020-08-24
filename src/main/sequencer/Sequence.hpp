@@ -57,7 +57,7 @@ namespace mpc::sequencer {
 		int getLastLoopBarIndex();
 		void initMetaTracks();
 
-	private:
+	public:
 		void createClickTrack();
 		void createMidiClockTrack();
 		void createTempoChangeTrack();
@@ -115,6 +115,7 @@ namespace mpc::sequencer {
 
 		int getFirstTickOfBar(int index);
 		int getLastTickOfBar(int index);
+		int getFirstTickOfBeat(int bar, int beat);
 
 		void resetTrackEventIndices(int tick);
 

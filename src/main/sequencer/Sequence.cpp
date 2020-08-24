@@ -579,6 +579,9 @@ void Sequence::deleteBars(int firstBar, int _lastBar)
 
 	if (lastBarIndex  == -1)
 		setUsed(false);
+
+	createClickTrack();
+	createMidiClockTrack();
 }
 
 void Sequence::insertBars(int barCount, int afterBar)
@@ -640,7 +643,8 @@ void Sequence::insertBars(int barCount, int afterBar)
 		}
 	}
 
-	initMetaTracks();
+	createClickTrack();
+	createMidiClockTrack();
 
 	if (lastBarIndex != -1)
 		setUsed(true);
@@ -758,6 +762,14 @@ int Sequence::getNoteEventCount()
 bool Sequence::trackIndexComparator(weak_ptr<Track> t0, weak_ptr<Track> t1)
 {
 	return t0.lock()->getTrackIndex() < t1.lock()->getTrackIndex();
+}
+
+int Sequence::getFirstTickOfBeat(int bar, int beat)
+{
+	auto barStart = getFirstTickOfBar(bar);
+	auto den = denominators[bar];
+	auto beatTicks = (int)(96 * (4.0 / den));
+	return barStart + (beat * beatTicks);
 }
 
 int Sequence::getFirstTickOfBar(int index)

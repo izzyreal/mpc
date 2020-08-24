@@ -37,6 +37,7 @@ SequencerScreen::SequencerScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void SequencerScreen::open()
 {
+	findLabel("tempo").lock()->setSize(18, 9);
 	init();
 	sequence = sequencer.lock()->getActiveSequence();
 	track = sequencer.lock()->getActiveTrack();

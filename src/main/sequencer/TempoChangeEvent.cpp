@@ -1,5 +1,8 @@
-#include <sequencer/TempoChangeEvent.hpp>
+#include "TempoChangeEvent.hpp"
+
 #include <sequencer/Sequence.hpp>
+#include <sequencer/Sequence.hpp>
+#include <sequencer/SeqUtil.hpp>
 
 using namespace mpc::sequencer;
 using namespace std;
@@ -31,8 +34,8 @@ void TempoChangeEvent::plusOneBar(int numerator, int denominator, TempoChangeEve
     if (stepNumber == 0)
 		return;
 
-    tick = tick + (numerator * (96 * (4.0 / denominator)));
-    
+	tick = parent->getFirstTickOfBar(SeqUtil::getBar(parent, tick) + 1);
+
 	if (tick > parent->getLastTick())
         tick = parent->getLastTick();
 
@@ -50,8 +53,10 @@ void TempoChangeEvent::minusOneBar(int numerator, int denominator, TempoChangeEv
 	if (stepNumber == 0)
 		return;
 
-	tick = tick - (numerator * (96 * (4.0 / denominator)));
-	if (tick < 0) tick = 0;
+	tick = parent->getFirstTickOfBar(SeqUtil::getBar(parent, tick) - 1);
+
+	if (tick < 0)
+		tick = 0;
 
 	if (previous != nullptr)
 	{
@@ -67,10 +72,10 @@ void TempoChangeEvent::plusOneBeat(int denominator, TempoChangeEvent* next)
 	if (stepNumber == 0)
 		return;
 	
-	tick = tick + 96 * (4.0 / denominator);
-	
-	if (tick > parent->getLastTick())
-		tick = parent->getLastTick();
+	tick = parent->getFirstTickOfBeat(SeqUtil::getBar(parent, tick), SeqUtil::getBeat(parent, tick) + 1);
+
+	if (tick >= parent->getLastTick())
+		tick = parent->getLastTick() - 1;
 
 	if (next != nullptr)
 	{
@@ -86,8 +91,8 @@ void TempoChangeEvent::minusOneBeat(int denominator, TempoChangeEvent* previous)
 	if (stepNumber == 0)
 		return;
 
-	tick = tick - 96 * (4.0 / denominator);
-	
+	tick = parent->getFirstTickOfBeat(SeqUtil::getBar(parent, tick), SeqUtil::getBeat(parent, tick) - 1);
+
 	if (tick < 0)
 		tick = 0;
 
