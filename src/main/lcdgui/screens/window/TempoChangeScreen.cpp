@@ -30,9 +30,7 @@ TempoChangeScreen::TempoChangeScreen(mpc::Mpc& mpc, const int layerIndex)
 void TempoChangeScreen::open()
 {
 	for (auto& bar :bars)
-	{
 		bar.lock()->Hide(true);
-	}
 
 	a0Field = findField("a0");
 	a1Field = findField("a1");
@@ -82,10 +80,6 @@ void TempoChangeScreen::open()
 
 void TempoChangeScreen::close()
 {
-	for (auto& h : bars)
-	{
-		h.lock()->Hide(true);
-	}
 }
 
 void TempoChangeScreen::initVisibleEvents()
@@ -95,9 +89,7 @@ void TempoChangeScreen::initVisibleEvents()
 	for (auto& t : visibleTempoChanges)
 	{
 		if (t.lock())
-		{
 			t.lock()->deleteObserver(this);
-		}
 	}
 
 	visibleTempoChanges = vector<weak_ptr<TempoChangeEvent>>(3);
@@ -107,16 +99,13 @@ void TempoChangeScreen::initVisibleEvents()
 	for (int i = 0; i < 3; i++)
 	{
 		if (i + offset < allTce.size())
-		{
 			visibleTempoChanges[i] = allTce[i + offset];
-		}
 		
 		if (allTce.size() <= i + offset + 1)
 		{
 			for (int j = i + 1; j < 2; j++)
-			{
 				visibleTempoChanges[j] = weak_ptr<TempoChangeEvent>();
-			}
+
 			break;
 		}
 	}
@@ -312,9 +301,7 @@ void TempoChangeScreen::function(int j)
 	auto yPos = -1;
 
 	if (param.length() == 2)
-	{
 		yPos = stoi(param.substr(1, 2));
-	}
 
 	auto seq = sequencer.lock()->getActiveSequence().lock();
 
@@ -324,22 +311,16 @@ void TempoChangeScreen::function(int j)
 	{
 	case 1:
 		if (yPos + offset >= tceList.size())
-		{
 			return;
-		}
 		
 		if (tceList[offset + yPos].lock()->getStepNumber() == 0)
-		{
 			return;
-		}
 		
 		seq->removeTempoChangeEvent(offset + yPos);
 		seq->sortTempoChangeEvents();
 
 		if (offset + yPos == tceList.size())
-		{
 			setTempoChangeOffset(offset - 1);
-		}
 		
 		initVisibleEvents();
 
@@ -347,7 +328,7 @@ void TempoChangeScreen::function(int j)
 		displayTempoChange1();
 		displayTempoChange2();
 		
-		ls.lock()->setFocus(string("a" + to_string(yPos)));
+		ls.lock()->setFocus("a" + to_string(yPos));
 		break;
 	case 2:
 	{
@@ -376,9 +357,7 @@ void TempoChangeScreen::function(int j)
 		else
 		{
 			if (nowDetected > offset + 3 || nowDetected < offset)
-			{
 				setTempoChangeOffset(nowDetected);
-			}
 
 			ls.lock()->setFocus(param.substr(0, 1) + to_string(nowDetected - offset));
 		}
@@ -394,15 +373,13 @@ void TempoChangeScreen::function(int j)
 		if (tceList.size() == 1)
 		{
 			auto tce = seq->addTempoChangeEvent().lock();
-			tce->setTick(seq->getLastTick());
+			tce->setTick(seq->getLastTick() - 1);
 			tce->setStepNumber(1);
 		}
 		else if (tceList.size() > 1)
 		{
 			if (param.length() != 2)
-			{
 				return;
-			}
 
 			auto lCurrent = current.lock();
 			auto lNext = next.lock();
@@ -411,9 +388,7 @@ void TempoChangeScreen::function(int j)
 			if (yPos + offset == 0)
 			{
 				if (lCurrent->getTick() == 1)
-				{
 					return;
-				}
 				
 				auto tce = seq->addTempoChangeEvent().lock();
 				tce->setTick(lNext->getTick() - 1);
@@ -421,14 +396,13 @@ void TempoChangeScreen::function(int j)
 			else if (yPos + offset > 0)
 			{
 				if (lCurrent->getTick() - 1 == lPrevious->getTick())
-				{
 					return;
-				}
 
 				auto tce = seq->addTempoChangeEvent().lock();
 				tce->setTick(lCurrent->getTick() - 1);
 			}
 		}
+
 		seq->sortTempoChangeEvents();
 		initVisibleEvents();
 		displayTempoChange0();
@@ -502,34 +476,23 @@ void TempoChangeScreen::turnWheel(int j)
 		if (param.compare("b" + to_string(i)) == 0)
 		{
 			if (j > 0)
-			{
 				event->plusOneBar(ts.getNumerator(), ts.getDenominator(), next.lock().get());
-			}
 			else
-			{
 				event->minusOneBar(ts.getNumerator(), ts.getDenominator(), previous.lock().get());
-			}
 		}
 		else if (param.compare("c" + to_string(i)) == 0)
 		{
 			if (j > 0)
-			{
 				event->plusOneBeat(ts.getDenominator(), next.lock().get());
-			}
 			else
-			{
 				event->minusOneBeat(ts.getDenominator(), previous.lock().get());
-			}
 		}
 		else if (param.compare("d" + to_string(i)) == 0)
 		{
 			if (j > 0)
-			{
 				event->plusOneClock(next.lock().get());
-			}
-			else {
+			else
 				event->minusOneClock(previous.lock().get());
-			}
 		}
 		else if (param.compare("e" + to_string(i)) == 0)
 		{
@@ -539,17 +502,11 @@ void TempoChangeScreen::turnWheel(int j)
 		if (param.length() == 2 && stoi(param.substr(1)) == i)
 		{
 			if (i == 0)
-			{
 				displayTempoChange0();
-			}
 			else if (i == 1)
-			{
 				displayTempoChange1();
-			}
 			else if (i == 2)
-			{
 				displayTempoChange2();
-			}
 		}
 	}
 }
@@ -562,18 +519,12 @@ void TempoChangeScreen::down()
 	auto tce2 = visibleTempoChanges[2].lock();
 
 	if (param.compare("tempo-change") == 0)
-	{
 		ls.lock()->setFocus("e0");
-	}
 	else if (param.compare("initial-tempo") == 0)
-	{
 		ls.lock()->setFocus("f0");
-	}
 	
 	if (param.length() != 2)
-	{
 		return;
-	}
 	
 	auto yPos = stoi(param.substr(1, 2));
 
@@ -593,18 +544,15 @@ void TempoChangeScreen::down()
 		auto sequence = sequencer.lock()->getActiveSequence().lock();
 
 		if (offset + yPos == sequence->getTempoChangeEvents().size() && param[0] != 'a')
-		{
 			ls.lock()->setFocus("a2");
-		}
+
 		return;
 	}
 
 	auto paramToFocus = param.substr(0, 1);
 
 	if ((yPos == 0 && !tce1) || (yPos == 1 && !tce2))
-	{
 		paramToFocus = "a";
-	}
 
 	ls.lock()->setFocus(string(paramToFocus + to_string(yPos + 1)));
 }
@@ -623,13 +571,10 @@ void TempoChangeScreen::up()
 		if (offset == 0)
 		{
 			if (param.compare("e0") == 0)
-			{
 				ls.lock()->setFocus("tempo-change");
-			}
 			else if (param.compare("f0") == 0)
-			{
 				ls.lock()->setFocus("initial-tempo");
-			}
+
 			return;
 		}
 		setTempoChangeOffset(offset - 1);
@@ -643,9 +588,8 @@ void TempoChangeScreen::up()
 void TempoChangeScreen::setTempoChangeOffset(int i)
 {
 	if (i < 0)
-	{
 		return;
-	}
+
 	offset = i;
 
 	initVisibleEvents();

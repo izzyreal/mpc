@@ -76,15 +76,18 @@ void TempoChangeEvent::plusOneBeat(int denominator, TempoChangeEvent* next)
 
 void TempoChangeEvent::minusOneBeat(int denominator, TempoChangeEvent* previous)
 {
-	if (stepNumber == 0) return;
+	if (stepNumber == 0)
+		return;
 
 	tick = tick - 96 * (4.0 / denominator);
-	if (tick < 0) tick = 0;
+	
+	if (tick < 0)
+		tick = 0;
 
-	if (previous != nullptr) {
-		if (tick <= previous->getTick()) {
+	if (previous != nullptr)
+	{
+		if (tick <= previous->getTick())
 			tick = previous->getTick() + 1;
-		}
 	}
 	
 	notifyObservers(string("tempo-change"));
@@ -92,34 +95,43 @@ void TempoChangeEvent::minusOneBeat(int denominator, TempoChangeEvent* previous)
 
 void TempoChangeEvent::plusOneClock(TempoChangeEvent* next)
 {
-	if (stepNumber == 0) return;
-	if (next != nullptr) {
-		if (tick == next->getTick() - 1) return;
-	}
+	if (stepNumber == 0)
+		return;
+	
+	if (next != nullptr && tick == next->getTick() - 1)
+		return;
+	
+	if (tick + 1 >= parent->getLastTick())
+		return;
+
 	tick++;
+	
 	if (tick > parent->getLastTick())
 		tick = parent->getLastTick();
 
-	
 	notifyObservers(string("tempo-change"));
 }
 
 void TempoChangeEvent::minusOneClock(TempoChangeEvent* previous)
 {
-	if (stepNumber == 0 || tick == 0) return;
+	if (stepNumber == 0 || tick == 0)
+		return;
 
 	if (previous != nullptr) {
-		if (tick == previous->getTick() + 1) return;
+		if (tick == previous->getTick() + 1)
+			return;
 	}
+
 	tick--;
 
-	
 	notifyObservers(string("tempo-change"));
 }
 
 void TempoChangeEvent::setRatio(int i)
 {
-	if (i < 100 || i > 9998) return;
+	if (i < 100 || i > 9998)
+		return;
+	
 	ratio = i;
 	
 	notifyObservers(string("tempo-change"));
@@ -132,7 +144,9 @@ int TempoChangeEvent::getRatio()
 
 void TempoChangeEvent::setStepNumber(int i)
 {
-	if (i < 0) return;
+	if (i < 0)
+		return;
+	
 	stepNumber = i;
 	
 	notifyObservers(string("tempo-change"));
@@ -169,14 +183,10 @@ double TempoChangeEvent::getTempo()
 	auto tempo = parent->getInitialTempo() * ratio * 0.001;
 	
 	if (tempo < 30.0)
-	{
 		return 30.0;
-	}
-	
-	if (tempo > 300.0)
-	{
+
+	else if (tempo > 300.0)
 		return 300.0;
-	}
 	
 	return tempo;
 }
