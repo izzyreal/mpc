@@ -68,10 +68,10 @@ void MultiRecordingSetupScreen::left()
 void MultiRecordingSetupScreen::right()
 {
 	init();
+
 	if (param[0] == 'c')
-	{
 		return;
-	}
+
 	ScreenComponent::right();
 }
 
@@ -118,12 +118,19 @@ void MultiRecordingSetupScreen::turnWheel(int i)
 	else if (param[0] == 'b')
 	{
 		setMrsTrack(yPos + yOffset, visibleMrsLines[yPos]->getTrack() + i);
-		setMrsOut(yPos + yOffset, seq->getTrack(visibleMrsLines[yPos]->getTrack()).lock()->getDevice());
+		
+		if (visibleMrsLines[yPos]->getTrack() == -1)
+			setMrsOut(yPos + yOffset, 0);
+		else
+			setMrsOut(yPos + yOffset, seq->getTrack(visibleMrsLines[yPos]->getTrack()).lock()->getDevice());
 	}
 	else if (param[0] == 'c')
 	{
-		setMrsOut(yPos + yOffset, visibleMrsLines[yPos]->getOut() + i);
-		seq->getTrack(visibleMrsLines[yPos]->getTrack()).lock()->setDeviceNumber(visibleMrsLines[yPos]->getOut());
+		if (visibleMrsLines[yPos]->getTrack() != -1)
+		{
+			setMrsOut(yPos + yOffset, visibleMrsLines[yPos]->getOut() + i);
+			seq->getTrack(visibleMrsLines[yPos]->getTrack()).lock()->setDeviceNumber(visibleMrsLines[yPos]->getOut());
+		}
 	}
 }
 
@@ -176,20 +183,26 @@ void MultiRecordingSetupScreen::displayMrsLine(int i)
 		{
 			findField("b0").lock()->setText("---OFF");
 		}
-		else {
+		else
+		{
 			string trackNumber = to_string(visibleMrsLines[i]->getTrack() + 1);
 			trackNumber = StrUtil::padLeft(trackNumber, "0", 2);
 			findField("b0").lock()->setText(string(trackNumber + "-" + seq->getTrack(visibleMrsLines[i]->getTrack()).lock()->getName()));
 		}
-		if (visibleMrsLines[i]->getOut() == 0) {
+		
+		if (visibleMrsLines[i]->getOut() == 0)
+		{
 			findField("c0").lock()->setText("OFF");
 		}
-		else {
-			if (visibleMrsLines[i]->getOut() >= 17) {
+		else
+		{
+			if (visibleMrsLines[i]->getOut() >= 17)
+			{
 				string out = to_string(visibleMrsLines[i]->getOut() - 16);
 				findField("c0").lock()->setTextPadded(string(out + "B"), " ");
 			}
-			else {
+			else
+			{
 				string out = to_string(visibleMrsLines[i]->getOut());
 				findField("c0").lock()->setTextPadded(string(out + "A"), " ");
 			}
@@ -217,13 +230,9 @@ void MultiRecordingSetupScreen::displayMrsLine(int i)
 		else
 		{
 			if (visibleMrsLines[i]->getOut() >= 17)
-			{
 				findField("c1").lock()->setTextPadded(to_string(visibleMrsLines[i]->getOut() - 16) + "B", " ");
-			}
 			else
-			{
 				findField("c1").lock()->setTextPadded(to_string(visibleMrsLines[i]->getOut()) + "A", " ");
-			}
 		}
 	}
 	else if (i == 2)
@@ -231,27 +240,20 @@ void MultiRecordingSetupScreen::displayMrsLine(int i)
 		findField("a2").lock()->setText(inNames[visibleMrsLines[i]->getIn()]);
 
 		if (visibleMrsLines[i]->getTrack() == -1)
-		{
 			findField("b2").lock()->setText("---OFF");
-		}
 		else
-		{
 			findField("b2").lock()->setText(StrUtil::padLeft(to_string(visibleMrsLines[i]->getTrack() + 1), "0", 2) + "-" + seq->getTrack(visibleMrsLines[i]->getTrack()).lock()->getName());
-		}
 
 		if (visibleMrsLines[i]->getOut() == 0)
 		{
 			findField("c2").lock()->setText("OFF");
 		}
-		else {
+		else
+		{
 			if (visibleMrsLines[i]->getOut() >= 17)
-			{
 				findField("c2").lock()->setTextPadded(to_string(visibleMrsLines[i]->getOut() - 16) + "B", " ");
-			}
 			else
-			{
 				findField("c2").lock()->setTextPadded(to_string(visibleMrsLines[i]->getOut()) + "A", " ");
-			}
 		}
 	}
 }
@@ -259,22 +261,16 @@ void MultiRecordingSetupScreen::displayMrsLine(int i)
 void MultiRecordingSetupScreen::setYOffset(int i)
 {
 	if (i < 0)
-	{
 		return;
-	}
 
 	if (i + 3 > mrsLines.size())
-	{
 		return;
-	}
 
 	visibleMrsLines = vector<MultiRecordingSetupLine*>(3);
 	yOffset = i;
 	
 	for (auto j = 0; j < 3; j++)
-	{
 		visibleMrsLines[j] = &mrsLines[yOffset + j];
-	}
 
 	displayMrsLine(0);
 	displayMrsLine(1);
@@ -288,9 +284,7 @@ void MultiRecordingSetupScreen::setMrsTrack(int inputNumber, int newTrackNumber)
 	visibleMrsLines = vector<MultiRecordingSetupLine*>(3);
 	
 	for (auto j = 0; j < 3; j++)
-	{
 		visibleMrsLines[j] = &mrsLines[yOffset + j];
-	}
 	
 	init();
 	auto yPos = stoi(param.substr(1, 2));
@@ -303,9 +297,7 @@ void MultiRecordingSetupScreen::setMrsOut(int inputNumber, int newOutputNumber)
 	visibleMrsLines = vector<MultiRecordingSetupLine*>(3);
 	
 	for (auto j = 0; j < 3; j++)
-	{
 		visibleMrsLines[j] = &mrsLines[yOffset + j];
-	}
 
 	init();
 	auto yPos = stoi(param.substr(1, 2));
@@ -315,9 +307,9 @@ void MultiRecordingSetupScreen::setMrsOut(int inputNumber, int newOutputNumber)
 vector<MultiRecordingSetupLine*> MultiRecordingSetupScreen::getMrsLines()
 {
 	vector<MultiRecordingSetupLine*> result;
+
 	for (auto& mrsLine : mrsLines)
-	{
 		result.push_back(&mrsLine);
-	}
+
 	return result;
 }
