@@ -28,16 +28,18 @@ void TempoChangeEvent::setParent(Sequence* newParent) {
 
 void TempoChangeEvent::plusOneBar(int numerator, int denominator, TempoChangeEvent* next)
 {
-    if (stepNumber == 0) return;
+    if (stepNumber == 0)
+		return;
 
     tick = tick + (numerator * (96 * (4.0 / denominator)));
-    if (tick > parent->getLastTick())
+    
+	if (tick > parent->getLastTick())
         tick = parent->getLastTick();
 
-    if (next != nullptr) {
-        if(tick >= next->getTick()) {
+    if (next != nullptr)
+	{
+        if (tick >= next->getTick())
             tick = next->getTick() - 1;
-        }
     }
     
     notifyObservers(string("tempo-change"));
@@ -45,15 +47,16 @@ void TempoChangeEvent::plusOneBar(int numerator, int denominator, TempoChangeEve
 
 void TempoChangeEvent::minusOneBar(int numerator, int denominator, TempoChangeEvent* previous)
 {
-	if (stepNumber == 0) return;
+	if (stepNumber == 0)
+		return;
 
 	tick = tick - (numerator * (96 * (4.0 / denominator)));
 	if (tick < 0) tick = 0;
 
-	if (previous != nullptr) {
-		if (tick <= previous->getTick()) {
+	if (previous != nullptr)
+	{
+		if (tick <= previous->getTick())
 			tick = previous->getTick() + 1;
-		}
 	}
 	
 	notifyObservers(string("tempo-change"));
@@ -61,14 +64,18 @@ void TempoChangeEvent::minusOneBar(int numerator, int denominator, TempoChangeEv
 
 void TempoChangeEvent::plusOneBeat(int denominator, TempoChangeEvent* next)
 {
-	if (stepNumber == 0) return;
+	if (stepNumber == 0)
+		return;
+	
 	tick = tick + 96 * (4.0 / denominator);
-	if (tick > parent->getLastTick()) tick = parent->getLastTick();
+	
+	if (tick > parent->getLastTick())
+		tick = parent->getLastTick();
 
-	if (next != nullptr) {
-		if (tick >= next->getTick()) {
+	if (next != nullptr)
+	{
+		if (tick >= next->getTick())
 			tick = next->getTick() - 1;
-		}
 	}
 	
 	notifyObservers(string("tempo-change"));

@@ -293,6 +293,7 @@ void TempoChangeScreen::displayTempoChange2()
 void TempoChangeScreen::left()
 {
 	init();
+	
 	if (param.length() == 2)
 	{
 		if (param[0] == 'a')
@@ -301,19 +302,23 @@ void TempoChangeScreen::left()
 			return;
 		}
 	}
+
 	ScreenComponent::left();
 }
 
 void TempoChangeScreen::right()
 {
 	init();
-	if (param.length() == 2) {
-		if (param[0] == 'f') {
+	if (param.length() == 2)
+	{
+		if (param[0] == 'f')
+		{
 			ls.lock()->setFocus("initial-tempo");
 			return;
 		}
 	}
-	baseControls->right();
+
+	ScreenComponent::right();
 }
 
 void TempoChangeScreen::function(int j)
@@ -404,7 +409,6 @@ void TempoChangeScreen::function(int j)
 				return;
 
 			auto lCurrent = current.lock();
-			auto lNext = next.lock();
 			auto lPrevious = previous.lock();
 
 			if (yPos + offset == 0)
@@ -413,7 +417,7 @@ void TempoChangeScreen::function(int j)
 					return;
 				
 				auto tce = seq->addTempoChangeEvent().lock();
-				tce->setTick(lNext->getTick() - 1);
+				tce->setTick(next.lock()->getTick() - 1);
 			}
 			else if (yPos + offset > 0)
 			{
@@ -452,6 +456,8 @@ void TempoChangeScreen::init()
 
 	if (tceList.size() > nextPosition)
 		next = tceList[nextPosition];
+	else
+		next.reset();
 
 	int currentPosition = yPos + offset;
 
