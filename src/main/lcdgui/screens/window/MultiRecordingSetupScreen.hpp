@@ -36,7 +36,6 @@ namespace mpc::lcdgui::screens::window {
 		void displayMrsLine(int i);
 		void setYOffset(int i);
 		void setMrsTrack(int inputNumber, int newTrackNumber);
-		void setMrsOut(int inputNumber, int newOutputNumber);
 
 	public:
 		std::vector<MultiRecordingSetupLine*> getMrsLines();

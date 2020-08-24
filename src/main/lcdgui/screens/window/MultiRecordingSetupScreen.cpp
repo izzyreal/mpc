@@ -13,7 +13,6 @@ MultiRecordingSetupScreen::MultiRecordingSetupScreen(mpc::Mpc& mpc, const int la
 	{
 		mrsLines[i].setTrack(i);
 		mrsLines[i].setIn(i);
-		mrsLines[i].setOut(0);
 	}
 
 	for (int i = 0; i < 34; i++)
@@ -33,12 +32,7 @@ MultiRecordingSetupScreen::MultiRecordingSetupScreen(mpc::Mpc& mpc, const int la
 }
 
 void MultiRecordingSetupScreen::open()
-{
-	auto seq = sequencer.lock()->getActiveSequence().lock();
-	
-	for (auto& mrsLine : mrsLines)
-		mrsLine.setOut(seq->getTrack(mrsLine.getTrack()).lock()->getDevice());
-
+{	
 	setYOffset(yOffset);
 	displayMrsLine(0);
 	displayMrsLine(1);
@@ -102,34 +96,24 @@ void MultiRecordingSetupScreen::turnWheel(int i)
 		else if (i < 0)
 		{
 			if (yPos == 0)
-			{
 				setYOffset(yOffset - 1);
-			}
 			else if (yPos == 1)
-			{
 				ls.lock()->setFocus(param.substr(0, 1).append(to_string(yPos - 1)));
-			}
 			else if (yPos == 2)
-			{
 				ls.lock()->setFocus(param.substr(0, 1).append(to_string(yPos - 1)));
-			}
 		}
 	}
 	else if (param[0] == 'b')
 	{
 		setMrsTrack(yPos + yOffset, visibleMrsLines[yPos]->getTrack() + i);
-		
-		if (visibleMrsLines[yPos]->getTrack() == -1)
-			setMrsOut(yPos + yOffset, 0);
-		else
-			setMrsOut(yPos + yOffset, seq->getTrack(visibleMrsLines[yPos]->getTrack()).lock()->getDevice());
 	}
 	else if (param[0] == 'c')
 	{
 		if (visibleMrsLines[yPos]->getTrack() != -1)
 		{
-			setMrsOut(yPos + yOffset, visibleMrsLines[yPos]->getOut() + i);
-			seq->getTrack(visibleMrsLines[yPos]->getTrack()).lock()->setDeviceNumber(visibleMrsLines[yPos]->getOut());
+			auto track = seq->getTrack(visibleMrsLines[yPos]->getTrack()).lock();
+			track->setDeviceNumber(track->getDevice() + i);
+			displayMrsLine(yPos);
 		}
 	}
 }
@@ -174,86 +158,46 @@ void MultiRecordingSetupScreen::down()
 void MultiRecordingSetupScreen::displayMrsLine(int i)
 {
 	auto seq = sequencer.lock()->getActiveSequence().lock();
+	auto trackIndex = visibleMrsLines[i]->getTrack();
 
-	if (i == 0)
+	auto aField = findField("a" + to_string(i)).lock();
+	auto bField = findField("b" + to_string(i)).lock();
+	auto cField = findField("c" + to_string(i)).lock();
+
+	aField->setText(inNames[visibleMrsLines[i]->getIn()]);
+
+	if (visibleMrsLines[i]->getTrack() == -1)
 	{
-		findField("a0").lock()->setText(inNames[visibleMrsLines[i]->getIn()]);
-	
-		if (visibleMrsLines[i]->getTrack() == -1)
-		{
-			findField("b0").lock()->setText("---OFF");
-		}
-		else
-		{
-			string trackNumber = to_string(visibleMrsLines[i]->getTrack() + 1);
-			trackNumber = StrUtil::padLeft(trackNumber, "0", 2);
-			findField("b0").lock()->setText(string(trackNumber + "-" + seq->getTrack(visibleMrsLines[i]->getTrack()).lock()->getName()));
-		}
-		
-		if (visibleMrsLines[i]->getOut() == 0)
-		{
-			findField("c0").lock()->setText("OFF");
-		}
-		else
-		{
-			if (visibleMrsLines[i]->getOut() >= 17)
-			{
-				string out = to_string(visibleMrsLines[i]->getOut() - 16);
-				findField("c0").lock()->setTextPadded(string(out + "B"), " ");
-			}
-			else
-			{
-				string out = to_string(visibleMrsLines[i]->getOut());
-				findField("c0").lock()->setTextPadded(string(out + "A"), " ");
-			}
-		}
+		bField->setText("---OFF");
 	}
-	else if (i == 1)
+	else
 	{
-		
-		findField("a1").lock()->setText(inNames[visibleMrsLines[i]->getIn()]);
-		
-		if (visibleMrsLines[i]->getTrack() == -1)
-		{
-			findField("b1").lock()->setText("---OFF");
-		}
-		else
-		{
-			string trStr = StrUtil::padLeft(to_string(visibleMrsLines[i]->getTrack() + 1), "0", 2);
-			findField("b1").lock()->setText(string(trStr + "-" + seq->getTrack(visibleMrsLines[i]->getTrack()).lock()->getName()));
-		}
-		
-		if (visibleMrsLines[i]->getOut() == 0)
-		{
-			findField("c1").lock()->setText("OFF");
-		}
-		else
-		{
-			if (visibleMrsLines[i]->getOut() >= 17)
-				findField("c1").lock()->setTextPadded(to_string(visibleMrsLines[i]->getOut() - 16) + "B", " ");
-			else
-				findField("c1").lock()->setTextPadded(to_string(visibleMrsLines[i]->getOut()) + "A", " ");
-		}
+		auto track = seq->getTrack(visibleMrsLines[i]->getTrack()).lock();
+		auto trackNumber = to_string(trackIndex + 1);
+		trackNumber = StrUtil::padLeft(trackNumber, "0", 2);
+		bField->setText(string(trackNumber + "-" + track->getName()));
 	}
-	else if (i == 2)
+
+	if (trackIndex == -1)
 	{
-		findField("a2").lock()->setText(inNames[visibleMrsLines[i]->getIn()]);
+		cField ->setText("");
+	}
+	else
+	{
+		auto track = seq->getTrack(visibleMrsLines[i]->getTrack()).lock();
+		auto dev = track->getDevice();
 
-		if (visibleMrsLines[i]->getTrack() == -1)
-			findField("b2").lock()->setText("---OFF");
-		else
-			findField("b2").lock()->setText(StrUtil::padLeft(to_string(visibleMrsLines[i]->getTrack() + 1), "0", 2) + "-" + seq->getTrack(visibleMrsLines[i]->getTrack()).lock()->getName());
-
-		if (visibleMrsLines[i]->getOut() == 0)
+		if (dev == 0)
 		{
-			findField("c2").lock()->setText("OFF");
+			cField->setText("OFF");
 		}
-		else
+		else if (dev < 17)
 		{
-			if (visibleMrsLines[i]->getOut() >= 17)
-				findField("c2").lock()->setTextPadded(to_string(visibleMrsLines[i]->getOut() - 16) + "B", " ");
-			else
-				findField("c2").lock()->setTextPadded(to_string(visibleMrsLines[i]->getOut()) + "A", " ");
+			cField->setTextPadded(to_string(dev) + "A", " ");
+		}
+		else if (dev <= 32)
+		{
+			cField->setTextPadded(to_string(dev - 16) + "B", " ");
 		}
 	}
 }
@@ -286,19 +230,6 @@ void MultiRecordingSetupScreen::setMrsTrack(int inputNumber, int newTrackNumber)
 	for (auto j = 0; j < 3; j++)
 		visibleMrsLines[j] = &mrsLines[yOffset + j];
 	
-	init();
-	auto yPos = stoi(param.substr(1, 2));
-	displayMrsLine(yPos);
-}
-
-void MultiRecordingSetupScreen::setMrsOut(int inputNumber, int newOutputNumber)
-{
-	mrsLines[inputNumber].setOut(newOutputNumber);
-	visibleMrsLines = vector<MultiRecordingSetupLine*>(3);
-	
-	for (auto j = 0; j < 3; j++)
-		visibleMrsLines[j] = &mrsLines[yOffset + j];
-
 	init();
 	auto yPos = stoi(param.substr(1, 2));
 	displayMrsLine(yPos);

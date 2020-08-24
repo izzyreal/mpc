@@ -114,6 +114,14 @@ void Field::takeFocus(string prev)
 			screen->findChild<Rectangle>("").lock()->setOn(true);
 		}
 	}
+	else if (csn.compare("multi-recording-setup") == 0)
+	{
+		if (name.length() == 2 && name[0] == 'b')
+		{
+			setSplit(true);
+			setActiveSplit(1);
+		}	
+	}
 
 	focus = true;
 	inverted = true;
