@@ -17,6 +17,10 @@ ChangeTsigScreen::ChangeTsigScreen(mpc::Mpc& mpc, const int layerIndex)
 void ChangeTsigScreen::open()
 {
 	timesignature = sequencer.lock()->getActiveSequence().lock()->getTimeSignature();
+
+	bar0 = 0;
+	bar1 = sequencer.lock()->getActiveSequence().lock()->getLastBarIndex();
+
 	displayBars();
 	displayNewTsig();
 }
@@ -110,19 +114,20 @@ void ChangeTsigScreen::setBar0(int i, int max)
 	bar0 = i;
 	
 	if (bar0 > bar1)
-	{
 		bar1 = bar0;
-	}
+
 	displayBars();
 }
 
 void ChangeTsigScreen::setBar1(int i, int max)
 {
 	if (i < 0 || i > max)
-	{
 		return;
-	}
 
 	bar1 = i;
+	
+	if (bar1 < bar0)
+		bar0 = bar1;
+
 	displayBars();
 }

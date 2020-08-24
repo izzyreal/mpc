@@ -495,6 +495,9 @@ void Sequence::setBarLengths(vector<int>& newBarLengths)
 
 void Sequence::deleteBars(int firstBar, int _lastBar)
 {
+	if (lastBarIndex == -1)
+		return;
+
 	_lastBar++;
 
 	int deleteFirstTick = 0;
@@ -638,6 +641,9 @@ void Sequence::insertBars(int barCount, int afterBar)
 	}
 
 	initMetaTracks();
+
+	if (lastBarIndex != -1)
+		setUsed(true);
 
 	notifyObservers(string("numberofbars"));
 	notifyObservers(string("tempo"));
