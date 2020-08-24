@@ -17,6 +17,9 @@ TimingCorrectScreen::TimingCorrectScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void TimingCorrectScreen::open()
 {
+	findField("note1").lock()->setAlignment(Alignment::Centered, 18);
+	findField("note1").lock()->setLocation(116, 40);
+
 	mpc.addObserver(this);
 
 	auto seq = sequencer.lock()->getActiveSequence().lock();
@@ -125,7 +128,9 @@ void TimingCorrectScreen::displayNotes()
 	
 	if (track.lock()->getBus() == 0)
 	{
-		findField("note0").lock()->setSize(8 * 6 + 1, 9);
+		findField("note0").lock()->setAlignment(Alignment::Centered, 18);
+		findField("note0").lock()->setLocation(62, 40);
+		findField("note0").lock()->setSize(47, 9);
 		findField("note0").lock()->setText(StrUtil::padLeft(to_string(note0), " ", 3) + "(" + mpc::Util::noteNames()[note0] + u8"\u00D4");
 		findField("note1").lock()->setText(StrUtil::padLeft(to_string(note1), " ", 3) + "(" + mpc::Util::noteNames()[note1] + u8"\u00D4");
 		findLabel("note1").lock()->Hide(false);
@@ -133,16 +138,15 @@ void TimingCorrectScreen::displayNotes()
 	}
 	else
 	{
-		findField("note0").lock()->setSize(6 * 6 + 1, 9);
+		findField("note0").lock()->setAlignment(Alignment::None);
+		findField("note0").lock()->setLocation(61, 40);
+		findField("note0").lock()->setSize(37, 9);
 		
-		if (mpc.getNote() != 34)
-		{
-			findField("note0").lock()->setText(to_string(mpc.getNote()) + "/" + sampler.lock()->getPadName(mpc.getPad()));
-		}
-		else
-		{
+		if (mpc.getNote() == 34)
 			findField("note0").lock()->setText("ALL");
-		}
+		else
+			findField("note0").lock()->setText(to_string(mpc.getNote()) + "/" + sampler.lock()->getPadName(mpc.getPad()));
+
 		findLabel("note1").lock()->Hide(true);
 		findField("note1").lock()->Hide(true);
 	}
