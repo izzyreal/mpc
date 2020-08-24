@@ -80,7 +80,7 @@ void AssignmentViewScreen::left()
 		return;
 	}
 
-    baseControls->left();
+    ScreenComponent::left();
     
 	auto padIndex = mpc.getPad() - 1;
     auto note = program.lock()->getPad(padIndex)->getNote();
@@ -96,7 +96,7 @@ void AssignmentViewScreen::right()
 		return;
 	}
 
-	baseControls->right();
+	ScreenComponent::right();
 	auto padIndex = mpc.getPad() + 1;
 	auto note = program.lock()->getPad(padIndex)->getNote();
 	mpc.setPadAndNote(padIndex, note);

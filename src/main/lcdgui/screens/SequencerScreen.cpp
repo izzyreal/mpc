@@ -715,7 +715,7 @@ void SequencerScreen::left()
 	if (sequencer.lock()->getNextSq() != -1)
 		return;
 
-	baseControls->left();
+	ScreenComponent::left();
 }
 
 void SequencerScreen::right()
@@ -728,7 +728,7 @@ void SequencerScreen::right()
 	if (!sequence.lock()->isUsed())
 		Util::initSequence(mpc);
 
-	baseControls->right();
+	ScreenComponent::right();
 }
 
 void SequencerScreen::up()
@@ -738,7 +738,7 @@ void SequencerScreen::up()
 	if (sequencer.lock()->getNextSq() != -1)
 		return;
 
-	baseControls->up();
+	ScreenComponent::up();
 }
 
 void SequencerScreen::down()
@@ -751,7 +751,7 @@ void SequencerScreen::down()
 	if (!sequence.lock()->isUsed())
 		Util::initSequence(mpc);
 
-	baseControls->down();
+	ScreenComponent::down();
 }
 
 void SequencerScreen::setPunchRectOn(int i, bool b)

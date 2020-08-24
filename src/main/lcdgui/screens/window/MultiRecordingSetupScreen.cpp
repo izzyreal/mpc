@@ -62,7 +62,7 @@ void MultiRecordingSetupScreen::left()
 	if (param[0] == 'a')
 		return;
 
-	baseControls->left();
+	ScreenComponent::left();
 }
 
 void MultiRecordingSetupScreen::right()
@@ -72,7 +72,7 @@ void MultiRecordingSetupScreen::right()
 	{
 		return;
 	}
-	baseControls->right();
+	ScreenComponent::right();
 }
 
 void MultiRecordingSetupScreen::turnWheel(int i)

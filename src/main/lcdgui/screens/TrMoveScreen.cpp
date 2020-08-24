@@ -65,7 +65,7 @@ void TrMoveScreen::down()
 	}
 	else
 	{
-		baseControls->down();
+		ScreenComponent::down();
 		ls.lock()->setFunctionKeysArrangement(1);
 	}
 }
@@ -84,7 +84,7 @@ void TrMoveScreen::left()
 		return;
 	}
 
-	baseControls->left();
+	ScreenComponent::left();
 	ls.lock()->setFunctionKeysArrangement(0);
 }
 
@@ -97,7 +97,7 @@ void TrMoveScreen::right()
 		return;
 	}
 
-	baseControls->right();
+	ScreenComponent::right();
 	ls.lock()->setFunctionKeysArrangement(1);
 }
 

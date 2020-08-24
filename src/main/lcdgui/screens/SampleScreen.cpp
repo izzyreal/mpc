@@ -40,7 +40,7 @@ void SampleScreen::left()
 	if (mpc.getAudioMidiServices().lock()->isRecordingSound())
 		return;
 
-	baseControls->left();
+	ScreenComponent::left();
 }
 
 void SampleScreen::right()
@@ -48,7 +48,7 @@ void SampleScreen::right()
 	if (mpc.getAudioMidiServices().lock()->isRecordingSound())
 		return;
 
-	baseControls->right();
+	ScreenComponent::right();
 }
 
 void SampleScreen::up()
@@ -56,7 +56,7 @@ void SampleScreen::up()
 	if (mpc.getAudioMidiServices().lock()->isRecordingSound())
 		return;
 
-	baseControls->up();
+	ScreenComponent::up();
 }
 
 void SampleScreen::down()
@@ -64,7 +64,7 @@ void SampleScreen::down()
 	if (mpc.getAudioMidiServices().lock()->isRecordingSound())
 		return;
 
-	baseControls->down();
+	ScreenComponent::down();
 }
 
 void SampleScreen::openWindow()

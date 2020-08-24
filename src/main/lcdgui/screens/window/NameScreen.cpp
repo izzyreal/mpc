@@ -64,7 +64,7 @@ void NameScreen::left()
 	if (stoi(param) == 0)
 		return;
 
-	baseControls->left();
+	ScreenComponent::left();
 	
 	if (editing)
 	{
@@ -81,7 +81,7 @@ void NameScreen::right()
 	if (stoi(param) == nameLimit - 1)
 		return;
 	
-	baseControls->right();
+	ScreenComponent::right();
 	
 	if (editing)
 	{

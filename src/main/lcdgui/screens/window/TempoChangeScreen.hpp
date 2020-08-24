@@ -89,6 +89,6 @@ namespace mpc::lcdgui::screens::window
 		std::weak_ptr<mpc::sequencer::TempoChangeEvent> current;
 		std::weak_ptr<mpc::sequencer::TempoChangeEvent> next;
 		int offset = 0;
-		void setTempoChangeOffset(int i);
+		void setOffset(int i);
 	};
 }

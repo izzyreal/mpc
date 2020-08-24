@@ -49,7 +49,7 @@ void SongScreen::up()
 		sequencer.lock()->setBar(0);
 	}
 	else {
-		baseControls->up();
+		ScreenComponent::up();
 	}
 }
 
@@ -70,7 +70,7 @@ void SongScreen::left()
 	}
 	else
 	{
-		baseControls->left();
+		ScreenComponent::left();
 	}
 }
 
@@ -93,7 +93,7 @@ void SongScreen::right()
 	}
 	else
 	{
-		baseControls->right();
+		ScreenComponent::right();
 	}
 }
 
@@ -122,7 +122,7 @@ void SongScreen::down()
 	}
 	else
 	{
-		baseControls->down();
+		ScreenComponent::down();
 	}
 }
 

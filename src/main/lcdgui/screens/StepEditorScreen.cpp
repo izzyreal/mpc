@@ -571,7 +571,7 @@ void StepEditorScreen::left()
 	}
 	else
 	{
-		baseControls->left();
+		ScreenComponent::left();
 	}
 
 	checkSelection();
@@ -580,7 +580,7 @@ void StepEditorScreen::left()
 
 void StepEditorScreen::right()
 {
-	baseControls->right();
+	ScreenComponent::right();
 	checkSelection();
 	refreshSelection();
 }

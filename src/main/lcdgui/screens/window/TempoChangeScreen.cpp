@@ -279,7 +279,7 @@ void TempoChangeScreen::left()
 			return;
 		}
 	}
-	baseControls->left();
+	ScreenComponent::left();
 }
 
 void TempoChangeScreen::right()
@@ -296,7 +296,7 @@ void TempoChangeScreen::right()
 
 void TempoChangeScreen::function(int j)
 {
-	baseControls->function(j);
+	ScreenComponent::function(j);
 	
 	auto yPos = -1;
 
@@ -319,8 +319,8 @@ void TempoChangeScreen::function(int j)
 		seq->removeTempoChangeEvent(offset + yPos);
 		seq->sortTempoChangeEvents();
 
-		if (offset + yPos == tceList.size())
-			setTempoChangeOffset(offset - 1);
+		if (offset + yPos == tceList.size() - 1)
+			setOffset(offset - 1);
 		
 		initVisibleEvents();
 
@@ -357,7 +357,7 @@ void TempoChangeScreen::function(int j)
 		else
 		{
 			if (nowDetected > offset + 3 || nowDetected < offset)
-				setTempoChangeOffset(nowDetected);
+				setOffset(nowDetected);
 
 			ls.lock()->setFocus(param.substr(0, 1) + to_string(nowDetected - offset));
 		}
@@ -539,7 +539,7 @@ void TempoChangeScreen::down()
 	}
 	else if (yPos == 2)
 	{
-		setTempoChangeOffset(offset + 1);
+		setOffset(offset + 1);
 
 		auto sequence = sequencer.lock()->getActiveSequence().lock();
 
@@ -577,7 +577,7 @@ void TempoChangeScreen::up()
 
 			return;
 		}
-		setTempoChangeOffset(offset - 1);
+		setOffset(offset - 1);
 		return;
 	}
 
@@ -585,7 +585,7 @@ void TempoChangeScreen::up()
 	return;
 }
 
-void TempoChangeScreen::setTempoChangeOffset(int i)
+void TempoChangeScreen::setOffset(int i)
 {
 	if (i < 0)
 		return;

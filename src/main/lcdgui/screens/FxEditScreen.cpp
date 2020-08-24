@@ -51,25 +51,25 @@ void FxEditScreen::turnWheel(int i)
 
 void FxEditScreen::left()
 {
-	baseControls->left();
+	ScreenComponent::left();
 	checkEffects();
 }
 
 void FxEditScreen::right()
 {
-	baseControls->right();
+	ScreenComponent::right();
 	checkEffects();
 }
 
 void FxEditScreen::up()
 {
-	baseControls->up();
+	ScreenComponent::up();
 	checkEffects();
 }
 
 void FxEditScreen::down()
 {
-	baseControls->down();
+	ScreenComponent::down();
 	checkEffects();
 }
 
