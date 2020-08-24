@@ -526,6 +526,12 @@ void TempoChangeScreen::turnWheel(int j)
 		{
 			event->setRatio(event->getRatio() + j);
 		}
+		else if (param.compare("f" + to_string(i)) == 0)
+		{
+			auto seq = sequencer.lock()->getActiveSequence().lock();
+			auto ratio = (event->getTempo() + j * 0.1) / seq->getInitialTempo();
+			event->setRatio((int)round(ratio * 1000.0));
+		}
 
 		if (param.length() == 2 && stoi(param.substr(1)) == i)
 		{
@@ -535,6 +541,8 @@ void TempoChangeScreen::turnWheel(int j)
 				displayTempoChange1();
 			else if (i == 2)
 				displayTempoChange2();
+
+			break;
 		}
 	}
 }
