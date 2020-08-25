@@ -35,7 +35,7 @@ namespace mpc::disk
 
 		void loadSound(const std::string& soundFileName, const std::string& soundName, const std::string& ext, MpcFile* soundFile, std::vector<int>* soundsDestIndex, const bool replace, const int loadSoundIndex);
 		void showPopup(std::string name, std::string ext, int sampleSize);
-		void notfound(std::string soundFileName, std::string ext);
+		void notFound(std::string soundFileName, std::string ext);
 
 	public:
 		std::weak_ptr<mpc::sampler::Program> get();

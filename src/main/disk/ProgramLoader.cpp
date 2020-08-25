@@ -52,68 +52,48 @@ void ProgramLoader::loadProgram(const int replaceIndex)
 	auto pgmSoundNames = converter.getSoundNames();
 	auto soundsDestIndex = vector<int>(pgmSoundNames.size());
 	auto disk = mpc.getDisk().lock();
-	
+
+	vector<int> unavailableSoundIndices;
+
 	for (int i = 0; i < pgmSoundNames.size(); i++)
 	{
 		auto ext = "snd";
-		MpcFile* soundFile = nullptr;
-		auto soundFileName = StrUtil::replaceAll(pgmSoundNames[i], ' ', "");
-		
+		mpc::disk::MpcFile* soundFile = nullptr;
+		string soundFileName = StrUtil::replaceAll(pgmSoundNames[i], ' ', "");
+
 		for (auto& f : disk->getAllFiles())
 		{
 			if (StrUtil::eqIgnoreCase(StrUtil::replaceAll(f->getName(), ' ', ""), soundFileName + ".SND"))
+			{
 				soundFile = f;
+				break;
+			}
 		}
-		
-		if (soundFile == nullptr)
+
+		if (soundFile == nullptr || !soundFile->getFsNode().lock()->exists())
 		{
 			for (auto& f : disk->getAllFiles())
 			{
 				if (StrUtil::eqIgnoreCase(StrUtil::replaceAll(f->getName(), ' ', ""), soundFileName + ".WAV"))
+				{
 					soundFile = f;
-			}
-
-			ext = "wav";
-		}
-		
-		if (soundFile != nullptr)
-		{
-			loadSound(soundFileName, pgmSoundNames[i], ext, soundFile, &soundsDestIndex, replace, i);
-		}
-		else
-		{
-			if (disk != nullptr)
-			{
-				ext = "snd";
-				soundFileName = soundFileName.substr(0, 8);
-				
-				for (auto& f : disk->getAllFiles())
-				{
-					if (StrUtil::eqIgnoreCase(StrUtil::replaceAll(f->getName(), ' ', ""), soundFileName + ".SND"))
-					{
-						soundFile = f;
-					}
-				}
-			
-				if (soundFile == nullptr)
-				{
-					for (auto& f : disk->getAllFiles())
-					{
-						if (StrUtil::eqIgnoreCase(StrUtil::replaceAll(f->getName(), ' ', ""), soundFileName + ".WAV"))
-						{
-							soundFile = f;
-						}
-					}
 					ext = "wav";
+					break;
 				}
 			}
-			
-			if (soundFile == nullptr)
-				notfound(soundFileName, ext);
 		}
+
+		if (soundFile == nullptr || !soundFile->getFsNode().lock()->exists())
+		{
+			unavailableSoundIndices.push_back(i);
+			notFound(soundFileName, ext);
+			continue;
+		}
+
+		loadSound(soundFileName, pgmSoundNames[i], ext, soundFile, &soundsDestIndex, replace, i);
 	}
 
-	auto adapter = ProgramImportAdapter(mpc.getSampler(), p, soundsDestIndex);
+	auto adapter = ProgramImportAdapter(mpc.getSampler(), p, soundsDestIndex, unavailableSoundIndices);
 	result = adapter.get();
 	mpc.importLoadedProgram();
 	disk->setBusy(false);
@@ -150,14 +130,12 @@ void ProgramLoader::showPopup(string name, string ext, int sampleSize)
 	auto sleepTime = sampleSize / 800;
 	
 	if (sleepTime < 300)
-	{
 		sleepTime = 300;
-	}
 
 	this_thread::sleep_for(chrono::milliseconds((int)(sleepTime * 0.2)));
 }
 
-void ProgramLoader::notfound(string soundFileName, string ext)
+void ProgramLoader::notFound(string soundFileName, string ext)
 {
 	auto cantFindFileScreen = dynamic_pointer_cast<CantFindFileScreen>(mpc.screens->getScreenComponent("cant-find-file"));
 	auto skipAll = cantFindFileScreen->skipAll;
@@ -171,9 +149,7 @@ void ProgramLoader::notfound(string soundFileName, string ext)
 		mpc.getLayeredScreen().lock()->openScreen("cant-find-file");
 
 		while (cantFindFileScreen->waitingForUser)
-		{
 			this_thread::sleep_for(chrono::milliseconds(25));
-		}
 	}
 }
 
@@ -185,7 +161,5 @@ weak_ptr<mpc::sampler::Program> ProgramLoader::get()
 ProgramLoader::~ProgramLoader()
 {
 	if (loadProgramThread.joinable())
-	{
 		loadProgramThread.join();
-	}
 }

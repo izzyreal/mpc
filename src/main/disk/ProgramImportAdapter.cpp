@@ -12,24 +12,41 @@ using namespace mpc::disk;
 using namespace mpc::sampler;
 using namespace std;
 
-ProgramImportAdapter::ProgramImportAdapter(weak_ptr<mpc::sampler::Sampler> sampler, weak_ptr<mpc::sampler::Program> inputProgram, vector<int> soundsDestIndex)
+ProgramImportAdapter::ProgramImportAdapter(
+	weak_ptr<Sampler> sampler,
+	weak_ptr<Program> inputProgram,
+	vector<int> soundsDestIndex,
+	vector<int> unavailableSoundIndices
+)
 {
 	this->sampler = sampler;
 	this->soundsDestIndex = soundsDestIndex;
 	result = inputProgram;
 	auto lResult = result.lock();
-	for (int i = 35; i <= 98; i++) {
-		processNoteParameters(dynamic_cast<mpc::sampler::NoteParameters*>(lResult->getNoteParameters(i)));
+
+	for (int i = 35; i <= 98; i++)
+	{
+		auto noteParameters = dynamic_cast<NoteParameters*>(lResult->getNoteParameters(i));
+		
+		if (find(begin(unavailableSoundIndices), end(unavailableSoundIndices), noteParameters->getSndNumber()) != end(unavailableSoundIndices))
+			noteParameters->setSoundNumber(-1);
+
+		processNoteParameters(noteParameters);
 		initMixer(i);
 	}
 }
 
-void ProgramImportAdapter::processNoteParameters(mpc::sampler::NoteParameters* np)
+void ProgramImportAdapter::processNoteParameters(NoteParameters* np)
 {
 	auto const pgmSoundNumber = np->getSndNumber();
+	
 	if (pgmSoundNumber == -1)
 		return;
-	np->setSoundNumber(soundsDestIndex[pgmSoundNumber]);
+
+	if (soundsDestIndex[pgmSoundNumber] >= sampler.lock()->getSoundCount())
+		np->setSoundNumber(-1);
+	else
+		np->setSoundNumber(soundsDestIndex[pgmSoundNumber]);
 }
 
 void ProgramImportAdapter::initMixer(int note)
@@ -45,7 +62,7 @@ void ProgramImportAdapter::initMixer(int note)
 	mc->setStereo(!sound->isMono());
 }
 
-weak_ptr<mpc::sampler::Program> ProgramImportAdapter::get()
+weak_ptr<Program> ProgramImportAdapter::get()
 {
     return result;
 }

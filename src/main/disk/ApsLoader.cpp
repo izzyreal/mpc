@@ -72,7 +72,10 @@ void ApsLoader::notFound(string soundFileName, string ext)
 		mpc.getLayeredScreen().lock()->openScreen("cant-find-file");
 
 		while (cantFindFileScreen->waitingForUser)
+		{
+			MLOG("Screen: " + mpc.getLayeredScreen().lock()->getCurrentScreenName());
 			this_thread::sleep_for(chrono::milliseconds(25));
+		}
 	}
 }
 
@@ -93,6 +96,8 @@ void ApsLoader::load()
 	sampler->deleteAllSamples();
 	const bool initPgms = false;
 
+	vector<int> unavailableSoundIndices;
+
 	for (int i = 0; i < apsParser.getSoundNames().size(); i++)
 	{
 		auto ext = "snd";
@@ -102,22 +107,28 @@ void ApsLoader::load()
 		for (auto& f : disk->getAllFiles())
 		{
 			if (StrUtil::eqIgnoreCase(StrUtil::replaceAll(f->getName(), ' ', ""), soundFileName + ".SND"))
+			{
 				soundFile = f;
+				break;
+			}
 		}
 
-		if (soundFile == nullptr)
+		if (soundFile == nullptr || !soundFile->getFsNode().lock()->exists())
 		{
 			for (auto& f : disk->getAllFiles())
 			{
 				if (StrUtil::eqIgnoreCase(StrUtil::replaceAll(f->getName(), ' ', ""), soundFileName + ".WAV"))
+				{
 					soundFile = f;
+					ext = "wav";
+					break;
+				}
 			}
-
-			ext = "wav";
 		}
 
-		if (soundFile == nullptr)
+		if (soundFile == nullptr || !soundFile->getFsNode().lock()->exists())
 		{
+			unavailableSoundIndices.push_back(i);
 			notFound(soundFileName, ext);
 			continue;
 		}
@@ -154,7 +165,13 @@ void ApsLoader::load()
 			destIndivFxCh->setOutput(sourceIndivFxMixerChannel->getOutput());
 
 			auto srcNoteParams = apsProgram->getNoteParameters(noteIndex);
-			destNoteParams->setSoundNumber(srcNoteParams->getSoundNumber());
+
+			auto soundIndex = srcNoteParams->getSoundNumber();
+
+			if (find(begin(unavailableSoundIndices), end(unavailableSoundIndices), soundIndex) != end(unavailableSoundIndices))
+				soundIndex = -1;
+
+			destNoteParams->setSoundNumber(soundIndex);
 			destNoteParams->setTune(srcNoteParams->getTune());
 			destNoteParams->setVoiceOverlap(srcNoteParams->getVoiceOverlap());
 			destNoteParams->setDecayMode(srcNoteParams->getDecayMode());

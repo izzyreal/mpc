@@ -21,11 +21,14 @@ string Button::getLabel() {
 	return label;
 }
 
-void Button::push() {
-	if (mpc.getDisk().lock()->isBusy())
+void Button::push()
+{
+	auto ls = mpc.getLayeredScreen().lock();
+
+	if (mpc.getDisk().lock()->isBusy() && ls->getCurrentScreenName().compare("cant-find-file") != 0)
 		return;
 
-	auto controls = mpc.getLayeredScreen().lock()->findScreenComponent().lock();
+	auto controls = ls->findScreenComponent().lock();
 	
 	if (!controls)
 		return;
