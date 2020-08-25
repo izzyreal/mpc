@@ -194,12 +194,13 @@ void Track::recordNoteOff(NoteEvent& n)
 
 void Track::setUsed(bool b)
 {
-    used = b;
+	if (!used && b && trackIndex < 64)
+		name = mpc.getSequencer().lock()->getDefaultTrackName(trackIndex);
+	
+	used = b;
     
 	if (used)
-	{    
         notifyObservers(string("tracknumbername"));
-    }
 }
 
 void Track::setOn(bool b)
@@ -212,9 +213,7 @@ void Track::setOn(bool b)
 void Track::addEventRealTime(shared_ptr<Event> event)
 {
 	if (events.size() == 0)
-	{
 		setUsed(true);
-	}
 
 	for (auto& temp : events)
 	{
@@ -249,9 +248,7 @@ void Track::removeEvent(weak_ptr<Event> event)
 	for (int i = 0; i < events.size(); i++)
 	{
 		if (events[i] == event.lock())
-		{
 			events.erase(events.begin() + i);
-		}
 	}
 	
 	notifyObservers(string("step-editor"));
@@ -262,9 +259,7 @@ bool Track::adjustDurLastEvent(int newDur)
 	auto lLastAdded = lastAdded.lock();
 
 	if (!lLastAdded)
-	{
 		return false;
-	}
 
 	lLastAdded->setDuration(newDur);
 	lastAdded.reset();
@@ -382,9 +377,7 @@ weak_ptr<Event> Track::cloneEvent(weak_ptr<Event> src)
 	}
 
 	if (!used)
-	{
 		setUsed(true);
-	}
 
 	events.push_back(res);
 
