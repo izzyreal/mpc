@@ -133,9 +133,20 @@ void NameScreen::function(int i)
     switch (i)
 	{
     case 3:
-        openScreen(ls.lock()->getPreviousScreenName());
-        resetNameScreen();
-        break;
+	{
+		name = originalName;
+
+		vector<string> screens{ "save-a-program", "save-a-sequence", "save-aps-file", "save-all-file", "save-a-sound" };
+
+		if (find(begin(screens), end(screens), parameterName) != end(screens))
+			openScreen(parameterName);
+		else
+			openScreen(ls.lock()->getPreviousScreenName());
+
+		resetNameScreen();
+		parameterName = "";
+		break;
+	}
 	case 4:
 		saveName();
 		break;
@@ -165,6 +176,7 @@ void NameScreen::saveName()
 		editing = false;
 		ls.lock()->setLastFocus("name", "0");
 		openScreen("save-all-file");
+		parameterName = "";
 		return;
 	}
 	else if (parameterName.compare("save-a-sound") == 0)
@@ -172,29 +184,33 @@ void NameScreen::saveName()
 		editing = false;
 		ls.lock()->setLastFocus("name", "0");
 		openScreen("save-a-sound");
+		parameterName = "";
 		return;
 	}
-	else if (parameterName.compare("savingpgm") == 0)
+	else if (parameterName.compare("save-a-program") == 0)
 	{
 		editing = false;
 		ls.lock()->setLastFocus("name", "0");
 		openScreen("save-a-program");
+		parameterName = "";
 		return;
 	}
-	else if (parameterName.compare("savingaps") == 0)
+	else if (parameterName.compare("save-aps-file") == 0)
 	{
 		string apsName = getName();
 		apsName.append(".APS");
 		mpc::disk::ApsSaver apsSaver(mpc, mpc::Util::getFileName(apsName));
 		editing = false;
 		ls.lock()->setLastFocus("name", "0");
+		parameterName = "";
 		return;
 	}
-	else if (parameterName.compare("savingmid") == 0)
+	else if (parameterName.compare("save-a-sequence") == 0)
 	{
 		openScreen("save-a-sequence");
 		editing = false;
 		ls.lock()->setLastFocus("name", "0");
+		parameterName = "";
 		return;
 	}
 	else if (parameterName.find("default") != string::npos)
@@ -398,14 +414,12 @@ void NameScreen::saveName()
 	else if (prevScreen.compare("stereo-to-mono") == 0)
 	{
 		auto stereoToMonoScreen = dynamic_pointer_cast<StereoToMonoScreen>(mpc.screens->getScreenComponent("stereo-to-mono"));
+
 		if (parameterName.compare("newlname") == 0)
-		{
 			stereoToMonoScreen->setNewLName(getName());
-		}
 		else if (parameterName.compare("newrname") == 0)
-		{
 			stereoToMonoScreen->setNewRName(getName());
-		}
+
 		editing = false;
 		ls.lock()->setLastFocus("name", "0");
 		openScreen(prevScreen);
@@ -427,9 +441,7 @@ void NameScreen::drawUnderline()
 		string focus = ls.lock()->getFocus();
 	
 		if (focus.length() != 1 && focus.length() != 2)
-		{
 			return;
-		}
 		
 		auto u = findUnderline().lock();
 		
@@ -462,6 +474,7 @@ void NameScreen::setName(string name)
 {
 	this->name = StrUtil::padRight(name, " ", 16);
 	nameLimit = 16;
+	originalName = name;
 }
 
 void NameScreen::setNameLimit(int i)
@@ -497,37 +510,26 @@ void NameScreen::changeNameCharacter(int i, bool up)
 	for (auto str : mpc::Mpc::akaiAscii)
 	{
 		if (str.compare(s) == 0)
-		{
 			break;
-		}
+
 		stringCounter++;
 	}
 
 	if (stringCounter == 0 && !up)
-	{
 		return;
-	}
 
 	if (stringCounter == 75 && up)
-	{
 		return;
-	}
 
 	auto change = -1;
 	
 	if (up)
-	{
 		change = 1;
-	}
 
 	if (stringCounter > 75)
-	{
 		s = " ";
-	}
 	else
-	{
 		s = mpc::Mpc::akaiAscii[stringCounter + change];
-	}
 	
 	name = name.substr(0, i).append(s).append(name.substr(i + 1, name.length()));
 
@@ -538,9 +540,7 @@ void NameScreen::changeNameCharacter(int i, bool up)
 void NameScreen::displayName()
 {
 	if (nameLimit == 0)
-	{
 		return;
-	}
 
 	findField("0").lock()->setText(getName().substr(0, 1));
 	findField("1").lock()->setText(getName().substr(1, 1));

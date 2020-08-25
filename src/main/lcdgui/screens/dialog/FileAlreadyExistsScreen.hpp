@@ -13,7 +13,7 @@ namespace mpc::lcdgui::screens::dialog
 
 	public:
 		void function(int i) override;
-		
+
 		FileAlreadyExistsScreen(mpc::Mpc& mpc, const int layerIndex);
 
 	};

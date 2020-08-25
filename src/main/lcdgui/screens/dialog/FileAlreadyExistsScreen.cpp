@@ -107,13 +107,9 @@ void FileAlreadyExistsScreen::function(int i)
 			auto f = disk->newFile(fileName);
 
 			if (type == 0)
-			{
 				disk->writeSound(s.get(), f);
-			}
 			else
-			{
 				disk->writeWav(s.get(), f);
-			}
 
 			disk->flush();
 			disk->initFiles();
@@ -125,31 +121,19 @@ void FileAlreadyExistsScreen::function(int i)
 	{
 		auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
 
-		if (ls.lock()->getPreviousScreenName().compare("save-a-program") == 0)
+		vector<string> screens{ "save-a-program", "save-a-sequence", "save-aps-file", "save-all-file", "save-a-sound" };
+
+		auto previousScreen = ls.lock()->getPreviousScreenName();
+
+		if (find(begin(screens), end(screens), nameScreen->parameterName) != end(screens))
+			openScreen("name");
+
+		if (find(begin(screens), end(screens), previousScreen) != end(screens))
 		{
-			nameScreen->parameterName ="savingpgm";
+			nameScreen->parameterName = previousScreen;
 			openScreen("name");
 		}
-		else if (ls.lock()->getPreviousScreenName().compare("save-a-sequence") == 0)
-		{
-			nameScreen->parameterName ="savingmid";
-			openScreen("name");
-		}
-		else if (ls.lock()->getPreviousScreenName().compare("save-aps-file") == 0)
-		{
-			nameScreen->parameterName ="savingaps";
-			openScreen("name");
-		}
-		else if (ls.lock()->getPreviousScreenName().compare("save-all-file") == 0)
-		{
-			nameScreen->parameterName ="save-all-file";
-			openScreen("name");
-		}
-		else if (ls.lock()->getPreviousScreenName().compare("save-a-sound") == 0)
-		{
-			nameScreen->parameterName ="save-a-sound";
-			openScreen("name");
-		}
+
 		break;
 	}
 	}

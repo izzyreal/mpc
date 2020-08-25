@@ -75,6 +75,7 @@ namespace mpc::lcdgui::screens::window
 		bool editing{ false };
 		std::string parameterName = "";
 		int nameLimit{ 0 };
+		std::string originalName = "";
 
 	private:
 		void setName(std::string name);
