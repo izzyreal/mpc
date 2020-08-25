@@ -248,16 +248,14 @@ void EventHandler::midiOut(weak_ptr<mpc::sequencer::Event> e, mpc::sequencer::Tr
 		
 		auto mpcMidiPorts = mpc.getMidiPorts().lock();
 
-		vector<ctoot::midi::core::ShortMessage>* r;
-
-		r = &mpcMidiPorts->getReceivers()[0];
+		vector<ctoot::midi::core::ShortMessage>& r = mpcMidiPorts->getReceivers()[0];
 
 		auto notifyLetter = "a";
 
 		if (deviceNumber > 15)
 		{
 			deviceNumber -= 16;
-			r = &mpcMidiPorts->getReceivers()[1];
+			r = mpcMidiPorts->getReceivers()[1];
 			notifyLetter = "b";
 		}
 
@@ -265,19 +263,16 @@ void EventHandler::midiOut(weak_ptr<mpc::sequencer::Event> e, mpc::sequencer::Tr
 
 		if (!(mpc.getAudioMidiServices().lock()->isBouncing() &&
 			directToDiskRecorderScreen->offline) &&
-			r != nullptr && track->getDevice() != 0)
+			track->getDevice() != 0)
 		{
-			if (r != nullptr)
-			{
-				auto fs = mpc.getAudioMidiServices().lock()->getFrameSequencer().lock();
-				auto eventFrame = fs->getEventFrameOffset(event->getTick());
-				msg.bufferPos = eventFrame;
+			auto fs = mpc.getAudioMidiServices().lock()->getFrameSequencer().lock();
+			auto eventFrame = fs->getEventFrameOffset(event->getTick());
+			msg.bufferPos = eventFrame;
 
-				if (r->size() < 100)
-					r->push_back(msg);
-				else
-					r->clear();
-			}
+			if (r.size() < 100)
+				r.push_back(msg);
+			else
+				r.clear();
 		}
 
 		notifyObservers(string(notifyLetter + to_string(deviceNumber)));

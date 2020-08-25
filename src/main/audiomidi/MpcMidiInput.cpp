@@ -210,7 +210,7 @@ void MpcMidiInput::midiOut(weak_ptr<mpc::sequencer::Event> e, mpc::sequencer::Tr
 	}
 
 	auto mpcMidiPorts = mpc.getMidiPorts().lock();
-
+	
 	notify_ = "a";
 	
 	if (deviceNumber > 15)
@@ -220,10 +220,7 @@ void MpcMidiInput::midiOut(weak_ptr<mpc::sequencer::Event> e, mpc::sequencer::Tr
 	}
 
 	if (mpc.getLayeredScreen().lock()->getCurrentScreenName().compare("midi-output-monitor") == 0)
-	{
-		
 		notifyObservers(notify_ + to_string(deviceNumber));
-	}
 }
 
 void MpcMidiInput::transportOmni(MidiMessage* msg, string outputLetter)
@@ -233,9 +230,6 @@ void MpcMidiInput::transportOmni(MidiMessage* msg, string outputLetter)
 	if (dynamic_cast<ShortMessage*>(msg) != nullptr)
 	{
 		if (mpc.getLayeredScreen().lock()->getCurrentScreenName().compare("midi-output-monitor") == 0)
-		{
-			
 			notifyObservers(string(outputLetter + to_string(dynamic_cast<ShortMessage*>(msg)->getChannel())));
-		}
 	}
 }

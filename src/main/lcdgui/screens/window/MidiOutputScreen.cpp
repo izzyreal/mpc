@@ -1,6 +1,7 @@
 #include "MidiOutputScreen.hpp"
 
 #include <lcdgui/screens/window/NameScreen.hpp>
+#include <audiomidi/MpcMidiPorts.hpp>
 
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
@@ -49,6 +50,9 @@ void MidiOutputScreen::function(int i)
 	case 1:
 		openScreen("midi-output-monitor");
 		break;
+	case 4:
+		mpc.getMidiPorts().lock()->panic();
+		break;
 	}
 }
 
@@ -68,21 +72,17 @@ void MidiOutputScreen::displayDeviceName()
 	string devNumber = "";
 	
 	if (deviceNumber >= 16)
-	{
 		devNumber = moduru::lang::StrUtil::padLeft(to_string(deviceNumber - 15), " ", 2) + "B";
-	}
-	else {
+	else
 		devNumber = moduru::lang::StrUtil::padLeft(to_string(deviceNumber + 1), " ", 2) + "A";
-	}
+
 	findField("devicenumber").lock()->setText(devNumber);
 }
 
 void MidiOutputScreen::setSoftThru(int i)
 {
 	if (i < 0 || i > 4)
-	{
 		return;
-	}
 
 	softThru = i;
 	displaySoftThru();
@@ -96,9 +96,7 @@ int MidiOutputScreen::getSoftThru()
 void MidiOutputScreen::setDeviceNumber(int i)
 {
 	if (i < 0 || i > 31)
-	{
 		return;
-	}
 
 	deviceNumber = i;
 	displayDeviceName();
