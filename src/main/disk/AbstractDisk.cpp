@@ -106,9 +106,10 @@ string AbstractDisk::getFileName(int i)
 vector<string> AbstractDisk::getParentFileNames()
 {
 	vector<string> res;
-	for (auto& f : parentFiles) {
+
+	for (auto& f : parentFiles)
 		res.push_back(f->getName().length() < 8 ? f->getName() : f->getName().substr(0, 8));
-	}
+
 	return res;
 }
 
@@ -118,9 +119,9 @@ bool AbstractDisk::renameSelectedFile(string s)
 	auto loadScreen = dynamic_pointer_cast<LoadScreen>(mpc.screens->getScreenComponent("load"));
   
 	auto left = directoryScreen->xPos == 0;
-	auto fileNumber = left ? directoryScreen->yPos0 + directoryScreen->yOffset0 : loadScreen->fileLoad;
+	auto fileIndex = left ? directoryScreen->yPos0 + directoryScreen->yOffset0 : loadScreen->fileLoad;
 
-    auto file = left ? getParentFile(fileNumber) : getFile(fileNumber);
+    auto file = left ? getParentFile(fileIndex) : getFile(fileIndex);
     return file->setName(s);
 }
 

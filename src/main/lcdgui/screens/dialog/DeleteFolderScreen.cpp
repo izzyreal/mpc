@@ -42,7 +42,7 @@ void DeleteFolderScreen::deleteFolder()
 		disk->initFiles();
 	}
 
-	this_thread::sleep_for(chrono::milliseconds(1000));
+	this_thread::sleep_for(chrono::milliseconds(400));
 	openScreen("directory");
 	disk->setBusy(false);
 }
@@ -55,17 +55,15 @@ void DeleteFolderScreen::function(int i)
 	{
 	case 4:
 		if (deleteFolderThread.joinable())
-		{
 			deleteFolderThread.join();
-		}
+
 		deleteFolderThread = thread(&DeleteFolderScreen::static_deleteFolder, this);
 		break;
 	}
 }
 
-DeleteFolderScreen::~DeleteFolderScreen() {
+DeleteFolderScreen::~DeleteFolderScreen()
+{
 	if (deleteFolderThread.joinable())
-	{
 		deleteFolderThread.join();
-	}
 }

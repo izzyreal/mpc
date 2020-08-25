@@ -127,9 +127,7 @@ void StdDisk::initFiles()
 			string name = f->getName();
 		
 			if (f->isFile() && name.find(".") != string::npos && name.substr(name.length() - 3).compare(extensions[view]) == 0)
-			{
 				files.push_back(mpcFile);
-			}
 		}
 		else {
 			files.push_back(mpcFile);
@@ -144,16 +142,19 @@ void StdDisk::initParentFiles()
 	if (path.size() == 0) return;
 
 	auto temp = getParentDir().lock()->listFiles();
-	for (auto& f : temp) {
-		if (f->isDirectory()) {
+	
+	for (auto& f : temp)
+	{
+		if (f->isDirectory())
 			parentFiles.push_back(new MpcFile(f));
-		}
 	}
 }
 
 string StdDisk::getDirectoryName()
 {
-	if (path.size() == 0) return "ROOT";
+	if (path.size() == 0)
+		return "ROOT";
+	
 	return path[(int)(path.size()) - 1].lock()->getName();
 }
 
@@ -171,10 +172,14 @@ bool StdDisk::moveBack()
 bool StdDisk::moveForward(string directoryName)
 {
 	bool success = false;
-	for (auto& f : files) {
-		if (StrUtil::eqIgnoreCase(StrUtil::trim(f->getName()), StrUtil::trim(directoryName))) {
+	for (auto& f : files)
+	{
+		if (StrUtil::eqIgnoreCase(StrUtil::trim(f->getName()), StrUtil::trim(directoryName)))
+		{
 			auto lFile = f->getFsNode().lock();
-			if (lFile->isDirectory() && lFile->getPath().find("vMPC") != string::npos && lFile->getPath().find("Stores") != string::npos) {
+			
+			if (lFile->isDirectory() && lFile->getPath().find("vMPC") != string::npos && lFile->getPath().find("Stores") != string::npos)
+			{
 				path.push_back(dynamic_pointer_cast<moduru::file::Directory>(f->getFsNode().lock()));
 				success = true;
 				break;
@@ -186,9 +191,8 @@ bool StdDisk::moveForward(string directoryName)
 
 weak_ptr<moduru::file::Directory> StdDisk::getDir()
 {
-	if (path.size() == 0) {
+	if (path.size() == 0)
 		return root;
-	}
 
 	return path[(int) (path.size()) - 1];
 }
@@ -242,11 +246,15 @@ bool StdDisk::deleteRecursive(moduru::file::FsNode* deleteMe)
 {
 	auto deletedSomething = false;
 	auto deletedCurrentFile = false;
-	if (deleteMe->isDirectory()) {
+	
+	if (deleteMe->isDirectory())
+	{
 		for (auto& f : dynamic_cast<moduru::file::Directory*>(deleteMe)->listFiles())
 			deleteRecursive(f.get());
 	}
+	
 	deletedCurrentFile = deleteMe->del();
+	
 	if (deletedCurrentFile)
 		deletedSomething = true;
 

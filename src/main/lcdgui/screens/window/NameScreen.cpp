@@ -271,13 +271,17 @@ void NameScreen::saveName()
 	else if (parameterName.compare("rename") == 0)
 	{
 		auto directoryScreen = dynamic_pointer_cast<DirectoryScreen>(mpc.screens->getScreenComponent("directory"));
-		auto ext = mpc::Util::splitName(directoryScreen->getSelectedFile()->getName())[1];
+		auto file = directoryScreen->getSelectedFile();
+		auto ext = mpc::Util::splitName(file->getName())[1];
 		
 		if (ext.length() > 0)
 			ext = "." + ext;
 
-		bool success = mpc.getDisk().lock()->renameSelectedFile(StrUtil::trim(StrUtil::toUpper(getName())) + ext);
-		
+		auto disk = mpc.getDisk().lock();
+
+		auto newName = StrUtil::trim(StrUtil::toUpper(getName())) + ext;
+		auto success = file->setName(newName);
+
 		if (!success)
 		{
 			openScreen("popup");
@@ -288,8 +292,33 @@ void NameScreen::saveName()
 		}
 		else
 		{
-			mpc.getDisk().lock()->flush();
-			mpc.getDisk().lock()->initFiles();
+			disk->flush();
+
+			if (file->isDirectory() && directoryScreen->getXPos() == 0)
+			{
+				disk->moveBack();
+				disk->initFiles();
+				disk->moveForward(newName);
+				disk->initFiles();
+
+				auto parentFileNames = disk->getParentFileNames();
+				auto it = find(begin(parentFileNames), end(parentFileNames), newName);
+
+				auto index = distance(begin(parentFileNames), it);
+
+				if (index > 4)
+				{
+					directoryScreen->setYOffset0(index - 5);
+					directoryScreen->setYPos0(4);
+				}
+				else
+				{
+					directoryScreen->setYOffset0(0);
+					directoryScreen->setYPos0(index);
+				}
+			}
+
+			disk->initFiles();
 			editing = false;
 			ls.lock()->setLastFocus("name", "0");
 			openScreen("directory");

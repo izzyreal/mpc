@@ -162,20 +162,14 @@ void LoadScreen::openWindow()
 	init();
 	auto disk = mpc.getDisk().lock();
 
-	if (param.compare("directory") == 0 || param.compare("file") == 0)
-	{
-		if (!disk)
-		{
-			return;
-		}
-
-		auto directoryScreen = dynamic_pointer_cast<DirectoryScreen>(mpc.screens->getScreenComponent("directory"));
-		directoryScreen->previousScreenName = "load";
-		directoryScreen->findYOffset0();
-		directoryScreen->setYOffset1(fileLoad);
-		openScreen("directory");
+	if (!disk)
 		return;
-	}
+
+	auto directoryScreen = dynamic_pointer_cast<DirectoryScreen>(mpc.screens->getScreenComponent("directory"));
+	directoryScreen->previousScreenName = "load";
+	directoryScreen->findYOffset0();
+	directoryScreen->setYOffset1(fileLoad);
+	openScreen("directory");
 }
 
 void LoadScreen::turnWheel(int i)
@@ -285,9 +279,7 @@ int LoadScreen::getFileSize()
 	auto disk = mpc.getDisk().lock();
 	
 	if (disk->getFile(fileLoad) == nullptr || disk->getFile(fileLoad)->isDirectory())
-	{
 		return 0;
-	}
 	
 	return (int) floor(disk->getFile(fileLoad)->length() / 1024.0);
 }
@@ -331,9 +323,7 @@ string LoadScreen::getSelectedFileName()
 	auto fileNames = mpc.getDisk().lock()->getFileNames();
 	
 	if (fileNames.size() <= fileLoad)
-	{
 		return "";
-	}
 
 	return fileNames[fileLoad];
 }
@@ -346,9 +336,7 @@ bool LoadScreen::isSelectedFileDirectory()
 void LoadScreen::setFileLoadWithMaxCheck(int i)
 {
 	if (i >= mpc.getDisk().lock()->getFileNames().size())
-	{
 		return;
-	}
 
 	setFileLoad(i);
 }
@@ -356,9 +344,7 @@ void LoadScreen::setFileLoadWithMaxCheck(int i)
 void LoadScreen::setFileLoad(int i)
 {
 	if (i < 0)
-	{
 		return;
-	}
 
 	fileLoad = i;
 	displayFile();

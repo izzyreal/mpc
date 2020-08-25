@@ -53,7 +53,7 @@ void DeleteFileScreen::static_delete(void * args)
 
 void DeleteFileScreen::deleteFile()
 {
-	this_thread::sleep_for(chrono::milliseconds(1000));
+	this_thread::sleep_for(chrono::milliseconds(400));
 
 	auto disk = mpc.getDisk().lock();
 

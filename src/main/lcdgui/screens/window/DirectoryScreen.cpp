@@ -64,10 +64,10 @@ void DirectoryScreen::function(int f)
 	switch (f)
 	{
 	case 1:
-		if (loadScreen->getSelectedFile() == nullptr)
+		if (getSelectedFile() == nullptr)
 			return;
 
-		if (loadScreen->getSelectedFile()->isDirectory())
+		if (getSelectedFile()->isDirectory())
 			openScreen("delete-folder");
 		else
 			openScreen("delete-file");
@@ -75,13 +75,13 @@ void DirectoryScreen::function(int f)
 		break;
 	case 2:
 	{
-		if (loadScreen->getSelectedFile() == nullptr)
+		if (getSelectedFile() == nullptr)
 			return;
 
-		auto fileNameNoExt = mpc::Util::splitName(loadScreen->getSelectedFile()->getName())[0];
+		auto fileNameNoExt = mpc::Util::splitName(getSelectedFile()->getName())[0];
 		nameScreen->setName(fileNameNoExt);
 		
-		if (loadScreen->getSelectedFile()->isDirectory())
+		if (getSelectedFile()->isDirectory())
 			nameScreen->setNameLimit(8);
 		
 		nameScreen->parameterName = "rename";
