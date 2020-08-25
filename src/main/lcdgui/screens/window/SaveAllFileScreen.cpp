@@ -25,9 +25,7 @@ void SaveAllFileScreen::displayFile()
 	auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
 
 	if (nameScreen->getName().length() < 2)
-	{
 		return;
-	}
 
 	findField("file").lock()->setText(nameScreen->getName().substr(0, 1));
 	findLabel("file1").lock()->setText(StrUtil::padRight(nameScreen->getName().substr(1), " ", 15) + ".ALL");
@@ -66,7 +64,7 @@ void SaveAllFileScreen::function(int i)
 
 		if (disk->checkExists(existStr))
 		{
-			openScreen("file-already-exists");
+			openScreen("file-exists");
 			return;
 		}
 		

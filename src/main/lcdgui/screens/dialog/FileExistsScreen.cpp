@@ -1,4 +1,4 @@
-#include "FileAlreadyExistsScreen.hpp"
+#include "FileExistsScreen.hpp"
 
 #include <Util.hpp>
 
@@ -16,12 +16,12 @@ using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
-FileAlreadyExistsScreen::FileAlreadyExistsScreen(mpc::Mpc& mpc, const int layerIndex) 
-	: ScreenComponent(mpc, "file-already-exists", layerIndex)
+FileExistsScreen::FileExistsScreen(mpc::Mpc& mpc, const int layerIndex) 
+	: ScreenComponent(mpc, "file-exists", layerIndex)
 {
 }
 
-void FileAlreadyExistsScreen::function(int i)
+void FileExistsScreen::function(int i)
 {
 	ScreenComponent::function(i);
 		

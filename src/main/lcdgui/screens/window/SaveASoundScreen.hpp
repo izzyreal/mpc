@@ -3,7 +3,7 @@
 
 namespace mpc::lcdgui::screens::dialog
 {
-	class FileAlreadyExistsScreen;
+	class FileExistsScreen;
 }
 
 namespace mpc::lcdgui::screens::window
@@ -26,7 +26,7 @@ namespace mpc::lcdgui::screens::window
 		void displayFileType();
 		void displayFile();
 
-		friend class mpc::lcdgui::screens::dialog::FileAlreadyExistsScreen;
+		friend class mpc::lcdgui::screens::dialog::FileExistsScreen;
 
 	};
 }

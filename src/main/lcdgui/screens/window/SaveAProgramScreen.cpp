@@ -54,7 +54,7 @@ void SaveAProgramScreen::function(int i)
 		if (disk->checkExists(fileName))
 		{
 			nameScreen->setName(program.lock()->getName());
-			openScreen("file-already-exists");
+			openScreen("file-exists");
 			break;
 		}
 

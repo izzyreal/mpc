@@ -50,7 +50,7 @@ void SaveASequenceScreen::function(int i)
 		
 		if (mpc.getDisk().lock()->checkExists(fileName))
 		{
-			openScreen("file-already-exists");
+			openScreen("file-exists");
 			return;
 		}
 		

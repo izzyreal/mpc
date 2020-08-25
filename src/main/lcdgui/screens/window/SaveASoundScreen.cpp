@@ -63,7 +63,7 @@ void SaveASoundScreen::function(int i)
 
 		if (disk->checkExists(fileName))
 		{
-			openScreen("file-already-exists");
+			openScreen("file-exists");
 			return;
 		}
 		

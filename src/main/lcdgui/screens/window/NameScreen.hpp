@@ -39,7 +39,7 @@ namespace mpc::lcdgui::screens::dialog
 {
 	class CopySoundScreen;
 	class StereoToMonoScreen;
-	class FileAlreadyExistsScreen;
+	class FileExistsScreen;
 	class ResampleScreen;
 }
 
@@ -93,7 +93,7 @@ namespace mpc::lcdgui::screens::window
 		friend class mpc::lcdgui::screens::window::VmpcDirectToDiskRecorderScreen;
 		friend class mpc::lcdgui::screens::dialog::CopySoundScreen;
 		friend class mpc::lcdgui::screens::dialog::StereoToMonoScreen;
-		friend class mpc::lcdgui::screens::dialog::FileAlreadyExistsScreen;
+		friend class mpc::lcdgui::screens::dialog::FileExistsScreen;
 		friend class mpc::lcdgui::screens::dialog::ResampleScreen;
 		friend class SequenceScreen;
 		friend class SongWindow;

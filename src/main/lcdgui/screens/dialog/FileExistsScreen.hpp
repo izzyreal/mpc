@@ -5,7 +5,7 @@
 
 namespace mpc::lcdgui::screens::dialog
 {
-	class FileAlreadyExistsScreen
+	class FileExistsScreen
 		: public mpc::lcdgui::ScreenComponent
 	{
 	private:
@@ -14,7 +14,7 @@ namespace mpc::lcdgui::screens::dialog
 	public:
 		void function(int i) override;
 
-		FileAlreadyExistsScreen(mpc::Mpc& mpc, const int layerIndex);
+		FileExistsScreen(mpc::Mpc& mpc, const int layerIndex);
 
 	};
 }

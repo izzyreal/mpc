@@ -133,7 +133,7 @@
 #include <lcdgui/screens/dialog/DeleteProgramScreen.hpp>
 #include <lcdgui/screens/dialog/DeleteFileScreen.hpp>
 #include <lcdgui/screens/dialog/DeleteFolderScreen.hpp>
-#include <lcdgui/screens/dialog/FileAlreadyExistsScreen.hpp>
+#include <lcdgui/screens/dialog/FileExistsScreen.hpp>
 #include <lcdgui/screens/dialog/VmpcRecordJamScreen.hpp>
 
 #include <lcdgui/screens/dialog2/DeleteAllFilesScreen.hpp>
@@ -813,9 +813,9 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	{
 		screen = make_shared<CantFindFileScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("file-already-exists") == 0)
+	else if (screenName.compare("file-exists") == 0)
 	{
-		screen = make_shared<FileAlreadyExistsScreen>(mpc, layerIndex);
+		screen = make_shared<FileExistsScreen>(mpc, layerIndex);
 	}
 	else if (screenName.compare("name") == 0)
 	{
