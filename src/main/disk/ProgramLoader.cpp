@@ -124,7 +124,7 @@ void ProgramLoader::loadSound(const string& soundFileName, const string& soundNa
 void ProgramLoader::showPopup(string name, string ext, int sampleSize)
 {
 	mpc.getLayeredScreen().lock()->openScreen("popup");
-	auto popupScreen = dynamic_pointer_cast<PopupScreen>(mpc.screens->getScreenComponent("popup"));
+	auto popupScreen = mpc.screens->get<PopupScreen>("popup");
 	popupScreen->setText("Loading " + StrUtil::padRight(name, " ", 16) + "." + StrUtil::toUpper(ext));
 
 	auto sleepTime = sampleSize / 800;

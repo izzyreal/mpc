@@ -35,13 +35,11 @@ void DeleteFileScreen::function(int i)
 	case 4:
 		auto directoryScreen = dynamic_pointer_cast<DirectoryScreen>(mpc.screens->getScreenComponent("directory"));
 		openScreen("popup");
-		auto popupScreen = dynamic_pointer_cast<PopupScreen>(mpc.screens->getScreenComponent("popup"));
+		auto popupScreen = mpc.screens->get<PopupScreen>("popup");
 		popupScreen->setText("Delete:" + directoryScreen->getSelectedFile()->getName());
 		
 		if (deleteThread.joinable())
-		{
 			deleteThread.join();
-		}
 		
 		deleteThread = thread(&DeleteFileScreen::static_delete, this);
 		break;

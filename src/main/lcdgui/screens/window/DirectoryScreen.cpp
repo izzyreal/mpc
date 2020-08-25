@@ -114,7 +114,7 @@ void DirectoryScreen::function(int f)
 			auto name = file->getFsNode().lock()->getNameWithoutExtension();
 
 			openScreen("popup");
-			auto popupScreen = dynamic_pointer_cast<PopupScreen>(mpc.screens->getScreenComponent("popup"));
+			auto popupScreen = mpc.screens->get<PopupScreen>("popup");
 
 			if (started)
 				popupScreen->setText("Playing " + name);

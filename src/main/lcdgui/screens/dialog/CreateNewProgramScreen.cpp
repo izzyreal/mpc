@@ -16,8 +16,18 @@ CreateNewProgramScreen::CreateNewProgramScreen(mpc::Mpc& mpc, const int layerInd
 
 void CreateNewProgramScreen::open()
 {
-	auto letterNumber = sampler.lock()->getProgramCount() + 21;
-	newName = "NewPgm-" + mpc::Mpc::akaiAscii[letterNumber];
+	auto letterIndex = 21 + 24;
+
+	for (int i = 0; i < sampler.lock()->getPrograms().size(); i++)
+	{
+		if (!sampler.lock()->getProgram(i).lock())
+		{
+			letterIndex = 21 + i;
+			break;
+		}
+	}
+
+	newName = "NewPgm-" + mpc::Mpc::akaiAscii[letterIndex];
 	
 	init();
 
@@ -38,7 +48,19 @@ void CreateNewProgramScreen::function(int i)
 		auto newProgram = sampler.lock()->addProgram().lock();
 		newProgram->setName(newName);
 		newProgram->setMidiProgramChange(newProgramChange);
-		mpcSoundPlayerChannel->setProgram(sampler.lock()->getProgramCount() - 1);
+		
+		auto index = sampler.lock()->getProgramCount() - 1;
+
+		for (int j = 0; j < sampler.lock()->getPrograms().size(); j++)
+		{
+			if (sampler.lock()->getProgram(j).lock() == newProgram)
+			{
+				index = j;
+				break;
+			}
+		}
+
+		mpcSoundPlayerChannel->setProgram(index);
 		openScreen("program");
 		break;
 	}

@@ -33,7 +33,7 @@ void DeleteFolderScreen::deleteFolder()
 
 	auto directoryScreen = dynamic_pointer_cast<DirectoryScreen>(mpc.screens->getScreenComponent("directory"));
 	openScreen("popup");
-	auto popupScreen = dynamic_pointer_cast<PopupScreen>(mpc.screens->getScreenComponent("popup"));
+	auto popupScreen = mpc.screens->get<PopupScreen>("popup");
 	popupScreen->setText("Delete:" + directoryScreen->getSelectedFile()->getName());
 
 	if (disk->deleteDir(directoryScreen->getSelectedFile()))

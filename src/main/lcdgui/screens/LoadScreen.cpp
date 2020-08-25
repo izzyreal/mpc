@@ -81,7 +81,7 @@ void LoadScreen::function(int i)
 			auto name = file->getFsNode().lock()->getNameWithoutExtension();
 
 			openScreen("popup");
-			auto popupScreen = dynamic_pointer_cast<PopupScreen>(mpc.screens->getScreenComponent("popup"));
+			auto popupScreen = mpc.screens->get<PopupScreen>("popup");
 
 			if (started)
 			{

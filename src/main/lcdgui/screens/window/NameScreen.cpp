@@ -281,7 +281,7 @@ void NameScreen::saveName()
 		if (!success)
 		{
 			openScreen("popup");
-			auto popupScreen = dynamic_pointer_cast<PopupScreen>(mpc.screens->getScreenComponent("popup"));
+			auto popupScreen = mpc.screens->get<PopupScreen>("popup");
 			popupScreen->setText("File name exists !!");
 			ls.lock()->setPreviousScreenName("directory");
 			return;
@@ -334,7 +334,7 @@ void NameScreen::saveName()
 		if (!success)
 		{
 			openScreen("popup");
-			auto popupScreen = dynamic_pointer_cast<PopupScreen>(mpc.screens->getScreenComponent("popup"));
+			auto popupScreen = mpc.screens->get<PopupScreen>("popup");
 			popupScreen->setText("Folder name exists !!");
 		}
 	}

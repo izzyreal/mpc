@@ -1,9 +1,11 @@
 #include "ProgramScreen.hpp"
 
 #include <lcdgui/screens/window/NameScreen.hpp>
+#include <lcdgui/screens/dialog2/PopupScreen.hpp>
 #include <controls/BaseSamplerControls.hpp>
 
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::controls;
 using namespace std;
 
@@ -49,6 +51,15 @@ void ProgramScreen::function(int i)
 		break;
 	case 2:
 	{
+		if (sampler.lock()->getProgramCount() == 24)
+		{
+			auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+			popupScreen->setText("Prog. directory full(24 max)");
+			popupScreen->returnToScreenAfterInteraction("program");
+			ls.lock()->openScreen("popup");
+			return;
+		}
+		
 		openScreen("create-new-program");
 		break;
 	}

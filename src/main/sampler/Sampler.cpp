@@ -241,15 +241,18 @@ void Sampler::deleteProgram(weak_ptr<Program> _program)
 	int firstValidProgram;
 	
 	for (firstValidProgram = 0; firstValidProgram < programs.size(); firstValidProgram++)
+	{
 		if (programs[firstValidProgram] && programs[firstValidProgram] != program)
 		{
 			for (auto& bus : mpc.getDrums())
 			{
 				if (programs[bus->getProgram()] == program)
-					bus->setProgram(0);
+					bus->setProgram(firstValidProgram);
 			}
+	
 			break;
 		}
+	}
 
 	for (auto&& p : programs)
 	{

@@ -71,7 +71,7 @@ int SoundLoader::loadSound(MpcFile* f)
 	if (!partOfProgram && existingSoundIndex == -1)
 	{
 		mpc.getLayeredScreen().lock()->openScreen("popup");
-		auto popupScreen = dynamic_pointer_cast<PopupScreen>(mpc.screens->getScreenComponent("popup"));
+		auto popupScreen = mpc.screens->get<PopupScreen>("popup");
 		popupScreen->setText("LOADING " + StrUtil::padRight(soundFileName, " ", 16) + "." + extension);
 	}
 

@@ -45,7 +45,7 @@ void SoundSaver::saveSounds()
 		string fileName = StrUtil::replaceAll(s.lock()->getName(), ' ', "");
 		
 		mpc.getLayeredScreen().lock()->openScreen("popup");
-		auto popupScreen = dynamic_pointer_cast<PopupScreen>(mpc.screens->getScreenComponent("popup"));
+		auto popupScreen = mpc.screens->get<PopupScreen>("popup");
 		popupScreen->setText("SAVING " + StrUtil::padRight(fileName, " ", 16) + ext);
 
 		if (lDisk->checkExists(fileName + ext))
