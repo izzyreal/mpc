@@ -208,18 +208,19 @@ void BaseControls::pad(int i, int velo, bool repeat, int tick)
 	if (controls->getPressedPads()->find(i) == controls->getPressedPads()->end())
 	{
 		controls->getPressedPads()->emplace(i);
-		controls->getPressedPadVelos()->at(i) = velo;
+		(*controls->getPressedPadVelos())[i] = velo;
 	}
 	else
 	{
 		if (!(controls->isTapPressed() && sequencer.lock()->isPlaying()))
 			return;
 	}
+
 	auto note = track.lock()->getBus() > 0 ? program.lock()->getPad(i + (mpc.getBank() * 16))->getNote() : i + (mpc.getBank() * 16) + 35;
 	auto velocity = velo;
 	auto pad = i + (mpc.getBank() * 16);
 
-	auto assign16LevelsScreen = dynamic_pointer_cast<Assign16LevelsScreen>(mpc.screens->getScreenComponent("assign-16-levels"));
+	auto assign16LevelsScreen = mpc.screens->get<Assign16LevelsScreen>("assign-16-levels");
 
 	if (mpc.getHardware().lock()->getTopPanel().lock()->isSixteenLevelsEnabled())
 	{

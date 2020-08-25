@@ -8,19 +8,24 @@
 #include <audiomidi/EventHandler.hpp>
 #include <hardware/Hardware.hpp>
 #include <hardware/Led.hpp>
+#include <hardware/TopPanel.hpp>
+
 #include <sampler/Pad.hpp>
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>
+
 #include <sequencer/FrameSeq.hpp>
 #include <sequencer/Sequence.hpp>
 #include <sequencer/Track.hpp>
 #include <sequencer/NoteEvent.hpp>
 #include <sequencer/Sequencer.hpp>
-#include <mpc/MpcSoundPlayerChannel.hpp>
 
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <lcdgui/screens/StepEditorScreen.hpp>
+#include <lcdgui/screens/window/Assign16LevelsScreen.hpp>
+
+#include <mpc/MpcSoundPlayerChannel.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
@@ -33,7 +38,8 @@ GlobalReleaseControls::GlobalReleaseControls(mpc::Mpc& mpc)
 {
 }
 
-void GlobalReleaseControls::goTo() {
+void GlobalReleaseControls::goTo()
+{
 	auto controls = mpc.getControls().lock();
 	controls->setGoToPressed(false);
 }
@@ -47,25 +53,22 @@ void GlobalReleaseControls::function(int i)
 	{
 	case 0:
 		if (currentScreenName.compare("step-timing-correct") == 0)
-		{
 			ls.lock()->openScreen("step-editor");
-		}
+
 		break;
 	case 2:
 		controls->setF3Pressed(false);
 		
 		if (currentScreenName.compare("load-a-sound") == 0)
-		{
 			sampler.lock()->finishBasicVoice();
-		}
+
 		break;
 	case 3:
 		controls->setF4Pressed(false);
 		
 		if (currentScreenName.compare("keep-or-retry") == 0)
-		{
 			sampler.lock()->finishBasicVoice();
-		}
+
 		break;
 	case 4:
 		controls->setF5Pressed(false);
@@ -75,21 +78,19 @@ void GlobalReleaseControls::function(int i)
 			ls.lock()->openScreen("load");
 			mpc.getAudioMidiServices().lock()->getSoundPlayer().lock()->enableStopEarly();
 		}
+
 		break;
 	case 5:
 		controls->setF6Pressed(false);
 
 		if (!sequencer.lock()->isPlaying() && currentScreenName.compare("sequencer") != 0)
-		{
 			sampler.lock()->finishBasicVoice();
-		}
 		
 		if (currentScreenName.compare("track-mute") == 0)
 		{
 			if (!sequencer.lock()->isSoloEnabled())
-			{
 				ls.lock()->setCurrentBackground("track-mute");
-			}
+
 			sequencer.lock()->setSoloEnabled(sequencer.lock()->isSoloEnabled());
 		}
 		else if (ls.lock()->getPreviousScreenName().compare("directory") == 0 && currentScreenName.compare("popup") == 0)
@@ -109,14 +110,13 @@ void GlobalReleaseControls::simplePad(int i)
 	auto controls = mpc.getControls().lock();
 	
 	if (controls->getPressedPads()->find(i) == controls->getPressedPads()->end())
-	{
 		return;
-	}
 	
 	controls->getPressedPads()->erase(controls->getPressedPads()->find(i));
 
 	auto lTrk = track.lock();
 	auto note = lTrk->getBus() > 0 ? program.lock()->getPad(i + (bank * 16))->getNote() : i + (bank * 16) + 35;
+
 	generateNoteOff(note);
 	bool posIsLastTick = sequencer.lock()->getTickPosition() == sequencer.lock()->getActiveSequence().lock()->getLastTick();
 
@@ -167,6 +167,11 @@ void GlobalReleaseControls::generateNoteOff(int note)
         noteOff.setTick(sequencer.lock()->getTickPosition());
         lTrk->recordNoteOff(noteOff);
     }
+
+	auto assign16LevelsScreen = mpc.screens->get<Assign16LevelsScreen>("assign-16-levels");
+
+	if (mpc.getHardware().lock()->getTopPanel().lock()->isSixteenLevelsEnabled())
+		note = assign16LevelsScreen->getNote();
 
     auto noteEvent = make_shared<mpc::sequencer::NoteEvent>(note);
     noteEvent->setVelocity(0);

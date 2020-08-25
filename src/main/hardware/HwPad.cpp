@@ -14,21 +14,27 @@ HwPad::HwPad(mpc::Mpc& mpc, int index)
 	this->index = index;
 }
 
-int HwPad::getIndex() {
+int HwPad::getIndex()
+{
 	return index;
 }
 
-void HwPad::push(int velo) {
+void HwPad::push(int velo)
+{
 	auto c = mpc.getActiveControls().lock();
 	
-	if (!c) return;
+	if (!c)
+		return;
 	
 	c->pad(index, velo, false, 0);
 }
 
-void HwPad::release() {
+void HwPad::release()
+{
 	auto c = mpc.getReleaseControls();
-	auto controls = mpc.getControls();
-	if (!c) return;
+
+	if (!c)
+		return;
+
 	c->simplePad(index);
 }
