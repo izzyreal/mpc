@@ -624,13 +624,23 @@ void DirectoryScreen::drawGraphicsLeft()
 	if (size - yOffset0 <= 4)
 	{
 		if (firstVisibleFile->getName().compare(dirName) == 0)
-			a0->setText(currentDirIcons[0]);
+		{
+			if (firstVisibleFile->getName().compare(disk->getParentFileNames()[0]) == 0)
+				a0->setText(currentDirIcons[0]);
+			else
+				a0->setText(currentDirIcons[1]);
+		}
 		else
-			a0->setText(dirIcons[0]);
+		{
+			if (firstVisibleFile->getName().compare(disk->getParentFileNames()[0]) == 0)
+				a0->setText(dirIcons[0]);
+			else
+				a0->setText(dirIcons[1]);
+		}
 		
 		for (int i = 1; i < visibleListLength - 1; i++)
 		{
-			if (fc[i].compare(dirName) == 0)
+			if (getFileFromGrid(0, i)->getName().compare(dirName) == 0)
 				aLabels[i]->setText(currentDirIcons[1]);
 			else
 				aLabels[i]->setText(dirIcons[1]);

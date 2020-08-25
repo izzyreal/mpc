@@ -34,12 +34,52 @@ void DeleteFolderScreen::deleteFolder()
 	auto directoryScreen = dynamic_pointer_cast<DirectoryScreen>(mpc.screens->getScreenComponent("directory"));
 	openScreen("popup");
 	auto popupScreen = mpc.screens->get<PopupScreen>("popup");
-	popupScreen->setText("Delete:" + directoryScreen->getSelectedFile()->getName());
+	auto file = directoryScreen->getSelectedFile();
+	auto fileName = file->getName();
+	popupScreen->setText("Delete:" + fileName);
 
-	if (disk->deleteDir(directoryScreen->getSelectedFile()))
+	auto parentFileNames = disk->getParentFileNames();
+
+	if (disk->deleteDir(file))
 	{
+		auto currentIndex = directoryScreen->yPos0 + directoryScreen->yOffset0;
+	
 		disk->flush();
+		disk->moveBack();
 		disk->initFiles();
+		
+		for (int i = 0; i < parentFileNames.size(); i++)
+		{
+			if (parentFileNames[i].compare(fileName) == 0)
+			{
+				parentFileNames.erase(begin(parentFileNames) + i);
+				break;
+			}
+		}
+
+		if (currentIndex >= parentFileNames.size() && currentIndex != 0)
+		{
+			currentIndex--;
+
+			if (directoryScreen->yPos0 == 0)
+				directoryScreen->yOffset0 -= 1;
+			else
+				directoryScreen->yPos0 -= 1;
+		}
+
+		if (parentFileNames.size() == 0)
+		{
+			directoryScreen->yPos0 = 0;
+			directoryScreen->yOffset0 = 0;
+			disk->moveForward(disk->getParentFileNames()[0]);
+			disk->initFiles();
+		}
+		else
+		{
+			auto nextDir = parentFileNames[currentIndex];
+			disk->moveForward(nextDir);
+			disk->initFiles();
+		}
 	}
 
 	this_thread::sleep_for(chrono::milliseconds(400));
