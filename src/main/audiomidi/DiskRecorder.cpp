@@ -26,6 +26,10 @@ bool DiskRecorder::prepare(const std::string& absolutePath, int lengthInFrames, 
 		fileStream.close();
 
 	fileStream = wav_init_ofstream(absolutePath);
+
+	if (!fileStream.is_open())
+		return false;
+
 	wav_writeHeader(fileStream, sampleRate);
 	
 	lengthInBytes = lengthInFrames * 2 * 2; // assume 16 bit stereo for now
@@ -47,14 +51,14 @@ int DiskRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf)
 		vector<char> audioBufferAsBytes (buf->getByteArrayBufferSize(format, buf->getSampleCount()));
 		buf->convertToByteArray_(0, buf->getSampleCount(), &audioBufferAsBytes, 0, format);
 		
-		if (audioBufferAsBytes.size() + written >= lengthInBytes)
+		if (audioBufferAsBytes.size() + writtenByteCount >= lengthInBytes)
 		{
-			audioBufferAsBytes.resize(lengthInBytes - written);
+			audioBufferAsBytes.resize(lengthInBytes - writtenByteCount);
 			writing.store(false);
 		}
 		
 		wav_write_bytes(fileStream, audioBufferAsBytes);
-		written += audioBufferAsBytes.size();
+		writtenByteCount += audioBufferAsBytes.size();
 
 		if (!writing.load() && fileStream.is_open())
 		{
@@ -79,7 +83,7 @@ bool DiskRecorder::start()
 	if (!fileStream.is_open())
 		return false;
 
-	written = 0;
+	writtenByteCount = 0;
 	writing.store(true);
 
 	return true;
@@ -91,9 +95,12 @@ bool DiskRecorder::stopEarly()
 		return false;
 	
 	writing.store(false);
-	wav_close(fileStream, sampleRate, written);
 
-	written = 0;
+	auto writtenFrames = writtenByteCount / 4;
+
+	wav_close(fileStream, sampleRate, writtenFrames);
+
+	writtenByteCount = 0;
 	lengthInBytes = 0;
 	lengthInFrames = 0;
 	sampleRate = 0;

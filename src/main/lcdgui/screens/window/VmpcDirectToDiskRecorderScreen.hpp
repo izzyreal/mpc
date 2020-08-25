@@ -3,14 +3,20 @@
 
 #include <lcdgui/screens/WithTimesAndNotes.hpp>
 
-namespace mpc::audiomidi
-{
+namespace mpc::audiomidi {
 	class EventHandler;
 }
 
-namespace mpc::lcdgui::screens::window
-{
+namespace mpc::lcdgui::screens::window {
 	class NameScreen;
+}
+
+namespace mpc::lcdgui::screens::dialog {
+	class VmpcRecordJamScreen;
+}
+
+namespace mpc::controls {
+	class BaseControls;
 }
 
 namespace mpc::lcdgui::screens::window
@@ -30,6 +36,7 @@ namespace mpc::lcdgui::screens::window
 	public:
 		bool isOffline();
 		int getSampleRate();
+		int getRecord();
 
 	private:
 		const std::vector<std::string> recordNames{ "SEQUENCE", "LOOP", "CUSTOM RANGE", "SONG", "JAM" };
@@ -62,6 +69,8 @@ namespace mpc::lcdgui::screens::window
 
 		friend class NameScreen;
 		friend class mpc::audiomidi::EventHandler;
+		friend class mpc::lcdgui::screens::dialog::VmpcRecordJamScreen;
+		friend class mpc::controls::BaseControls;
 
 	};
 }

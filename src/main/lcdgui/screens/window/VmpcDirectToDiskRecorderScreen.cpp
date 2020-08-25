@@ -5,7 +5,6 @@
 
 #include <sequencer/Song.hpp>
 #include <sequencer/SeqUtil.hpp>
-#include <audio/server/AudioServer.hpp>
 #include <audio/server/NonRealTimeAudioServer.hpp>
 
 #include <lcdgui/Screens.hpp>
@@ -15,6 +14,7 @@
 #include <Util.hpp>
 
 using namespace mpc;
+using namespace mpc::audiomidi;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui;
@@ -97,9 +97,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 		auto rate = rates[sampleRate];
 
 		if (!offline)
-		{
 			rate = mpc.getAudioMidiServices().lock()->getAudioServer()->getSampleRate();
-		}
 
 		auto split = false;
 		auto sequence = sequencer.lock()->getSequence(seq).lock();
@@ -110,35 +108,44 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 		{
 			openScreen("sequencer");
 			sequence->setLoopEnabled(false);
-			auto lengthInFrames = mpc::sequencer::SeqUtil::sequenceFrameLength(sequence.get(), 0, sequence->getLastTick(), rate);
-			auto settings = make_unique<mpc::audiomidi::DirectToDiskSettings>(lengthInFrames, outputFolder, split, rate);
+			auto lengthInFrames = SeqUtil::sequenceFrameLength(sequence.get(), 0, sequence->getLastTick(), rate);
+			auto settings = make_unique<DirectToDiskSettings>(lengthInFrames, outputFolder, split, rate);
 			
 			if (!mpc.getAudioMidiServices().lock()->prepareBouncing(settings.get()))
 				openScreen("vmpc-file-in-use");
 			else			
 				sequencer.lock()->playFromStart();
+
 			break;
 		}
 		case 1:
 		{
 			openScreen("sequencer");
-			auto lengthInFrames = mpc::sequencer::SeqUtil::loopFrameLength(sequence.get(), rate);
-			auto settings = make_unique<mpc::audiomidi::DirectToDiskSettings>(lengthInFrames, outputFolder, split, rate);
+			auto lengthInFrames = SeqUtil::loopFrameLength(sequence.get(), rate);
+			auto settings = make_unique<DirectToDiskSettings>(lengthInFrames, outputFolder, split, rate);
 			sequence->setLoopEnabled(false);
 			sequencer.lock()->move(sequence->getLoopStart());
-			mpc.getAudioMidiServices().lock()->prepareBouncing(settings.get());
-			sequencer.lock()->play();
+
+			if (!mpc.getAudioMidiServices().lock()->prepareBouncing(settings.get()))
+				openScreen("vmpc-file-in-use");
+			else
+				sequencer.lock()->play();
+
 			break;
 		}
 		case 2:
 		{
 			openScreen("sequencer");
-			auto lengthInFrames = mpc::sequencer::SeqUtil::sequenceFrameLength(sequence.get(), time0, time1, rate);
-			auto settings = make_unique<mpc::audiomidi::DirectToDiskSettings>(lengthInFrames, outputFolder, split, rate);
+			auto lengthInFrames = SeqUtil::sequenceFrameLength(sequence.get(), time0, time1, rate);
+			auto settings = make_unique<DirectToDiskSettings>(lengthInFrames, outputFolder, split, rate);
 			sequence->setLoopEnabled(false);
 			sequencer.lock()->move(time0);
-			mpc.getAudioMidiServices().lock()->prepareBouncing(settings.get());
-			sequencer.lock()->play();
+			
+			if (!mpc.getAudioMidiServices().lock()->prepareBouncing(settings.get()))
+				openScreen("vmpc-file-in-use");
+			else
+				sequencer.lock()->play();
+			
 			break;
 		}
 		case 3:
@@ -148,8 +155,8 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 			if (!mpcSong->isUsed())
 				return;
 
-			auto lengthInFrames = mpc::sequencer::SeqUtil::songFrameLength(mpcSong.get(), sequencer.lock().get(), rate);
-			auto settings = make_unique<mpc::audiomidi::DirectToDiskSettings>(lengthInFrames, outputFolder, split, rate);
+			auto lengthInFrames = SeqUtil::songFrameLength(mpcSong.get(), sequencer.lock().get(), rate);
+			auto settings = make_unique<DirectToDiskSettings>(lengthInFrames, outputFolder, split, rate);
 
 			openScreen("song");
 
@@ -158,8 +165,11 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 			auto songScreen = dynamic_pointer_cast<SongScreen>(mpc.screens->getScreenComponent("song"));
 			songScreen->setLoop(false);
 
-			mpc.getAudioMidiServices().lock()->prepareBouncing(settings.get());
-			sequencer.lock()->playFromStart();
+			if (!mpc.getAudioMidiServices().lock()->prepareBouncing(settings.get()))
+				openScreen("vmpc-file-in-use");
+			else
+				sequencer.lock()->playFromStart();
+
 			break;
 		}
 		case 4:
@@ -181,7 +191,7 @@ void VmpcDirectToDiskRecorderScreen::setSampleRate(int rate)
 
 void VmpcDirectToDiskRecorderScreen::setRecord(int i)
 {
-	if (i < 0 || i > 3) // Record Jam is disabled. When enabled go up to 4
+	if (i < 0 || i > 4)
 		return;
 
 	record = i;
@@ -190,6 +200,7 @@ void VmpcDirectToDiskRecorderScreen::setRecord(int i)
 	displaySq();
 	displaySong();
 	displayTime();
+	displayOffline();
 }
 
 void VmpcDirectToDiskRecorderScreen::setSq(int i)
@@ -265,7 +276,11 @@ void VmpcDirectToDiskRecorderScreen::displaySong()
 
 void VmpcDirectToDiskRecorderScreen::displayOffline()
 {
-	findField("offline").lock()->setText(offline ? "YES" : "NO");
+	findField("offline").lock()->Hide(record == 4);
+	findLabel("offline").lock()->Hide(record == 4);
+	
+	if (record != 4)
+		findField("offline").lock()->setText(offline ? "YES" : "NO");
 }
 
 void VmpcDirectToDiskRecorderScreen::displaySplitLR()
@@ -327,4 +342,9 @@ bool VmpcDirectToDiskRecorderScreen::isOffline()
 int VmpcDirectToDiskRecorderScreen::getSampleRate()
 {
 	return sampleRate;
+}
+
+int VmpcDirectToDiskRecorderScreen::getRecord()
+{
+	return record;
 }

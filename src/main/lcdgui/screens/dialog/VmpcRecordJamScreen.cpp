@@ -1,6 +1,14 @@
 #include "VmpcRecordJamScreen.hpp"
 
+#include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
+#include <audiomidi/AudioMidiServices.hpp>
+#include <audiomidi/DirectToDiskSettings.hpp>
+
+#include <audio/server/NonRealTimeAudioServer.hpp>
+
+using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;
+using namespace mpc::audiomidi;
 using namespace std;
 
 VmpcRecordJamScreen::VmpcRecordJamScreen(mpc::Mpc& mpc, const int layerIndex)
@@ -19,12 +27,23 @@ void VmpcRecordJamScreen::function(int i)
 		break;
 	case 4:
 	{
-		//auto outputFolder = d2dRecorderGui->getOutputfolder();
-		//auto minutes = 10;
-		//auto lengthInFrames = 44100 * 60 * minutes;
-		//auto split = d2dRecorderGui->isSplitLR();
-		//thread(VmpcRecordJamScreen_function_1(this, lengthInFrames, outputFolder, split, minutes))->start();
-		openScreen("sequencer");
+		auto minutes = 60;
+		auto lengthInFrames = 44100 * 60 * minutes;
+		auto vmpcDirectToDiskRecorderScreen = mpc.screens->get<VmpcDirectToDiskRecorderScreen>("vmpc-direct-to-disk-recorder");
+		auto ams = mpc.getAudioMidiServices().lock();
+		auto rate = ams->getAudioServer()->getSampleRate();
+		auto settings = make_unique<DirectToDiskSettings>(lengthInFrames, vmpcDirectToDiskRecorderScreen->outputFolder, false, rate);
+
+		if (ams->prepareBouncing(settings.get()))
+		{
+			openScreen("sequencer");
+			ams->startBouncing();
+		}
+		else
+		{
+			openScreen("vmpc-file-in-use");
+		}
+
 		break;
 	}
 	}

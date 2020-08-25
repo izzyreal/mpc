@@ -15,6 +15,7 @@
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <lcdgui/screens/window/CountMetronomeScreen.hpp>
 #include <lcdgui/screens/UserScreen.hpp>
+#include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
 
 #include <sequencer/Event.hpp>
 #include <sequencer/TempoChangeEvent.hpp>
@@ -676,7 +677,9 @@ void Sequencer::stop(int tick)
     if (endOfSong)
 		songScreen->setOffset(songScreen->getOffset() + 1);
 	
-	if (bouncing)
+	auto vmpcDirectToDiskRecorderScreen = mpc.screens->get<VmpcDirectToDiskRecorderScreen>("vmpc-direct-to-disk-recorder");
+
+	if (bouncing && vmpcDirectToDiskRecorderScreen->getRecord() != 4)
 		ams->stopBouncing();
 	
 	auto hw = mpc.getHardware().lock();

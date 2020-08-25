@@ -75,9 +75,7 @@ void wav_close(std::ofstream& stream, const int sampleRate, const int frameCount
     }
     
     if (wordAlignAdjust)
-    {
         stream << 0;
-    }
 
     stream.seekp(4);
     wav_putLE(stream, mainChunkSize, 4); // We correct the main chunk size to reflect final frame count.

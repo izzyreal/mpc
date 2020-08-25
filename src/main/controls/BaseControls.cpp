@@ -32,6 +32,7 @@
 #include <lcdgui/screens/window/EditSoundScreen.hpp>
 #include <lcdgui/screens/window/DirectoryScreen.hpp>
 #include <lcdgui/screens/window/NameScreen.hpp>
+#include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
 #include <lcdgui/screens/LoadScreen.hpp>
 #include <lcdgui/Screens.hpp>
 
@@ -555,12 +556,14 @@ void BaseControls::stop()
 {
 	init();
 
-	if (mpc.getAudioMidiServices().lock()->isBouncing())
-		mpc.getAudioMidiServices().lock()->stopBouncingEarly();
-
-	sequencer.lock()->stop();
+	auto vmpcDirectToDiskRecorderScreen = mpc.screens->get<VmpcDirectToDiskRecorderScreen>("vmpc-direct-to-disk-recorder");
+	auto ams = mpc.getAudioMidiServices().lock();
 	auto controls = mpc.getControls().lock();
 
+	if (ams->isBouncing() && (vmpcDirectToDiskRecorderScreen->record != 4 || controls->isShiftPressed()))
+		ams->stopBouncingEarly();
+
+	sequencer.lock()->stop();
 
 	if (find(begin(allowTransportScreens), end(allowTransportScreens), currentScreenName) == end(allowTransportScreens)
 		&& find(begin(allowPlay), end(allowPlay), currentScreenName) == end(allowPlay))

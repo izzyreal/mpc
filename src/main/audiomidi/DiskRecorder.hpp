@@ -17,7 +17,7 @@ namespace mpc::audiomidi {
 		ctoot::audio::core::AudioFormat* format = nullptr;
 		std::ofstream fileStream;
 		std::atomic<bool> writing = ATOMIC_VAR_INIT(false);
-		int written = 0;
+		int writtenByteCount = 0;
 		int lengthInFrames = 0;
 		int lengthInBytes = 0;
 		int sampleRate = 0;

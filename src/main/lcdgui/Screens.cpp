@@ -135,6 +135,7 @@
 #include <lcdgui/screens/dialog/DeleteFolderScreen.hpp>
 #include <lcdgui/screens/dialog/FileExistsScreen.hpp>
 #include <lcdgui/screens/dialog/VmpcRecordJamScreen.hpp>
+#include <lcdgui/screens/dialog/VmpcFileInUseScreen.hpp>
 
 #include <lcdgui/screens/dialog2/DeleteAllFilesScreen.hpp>
 #include <lcdgui/screens/dialog2/PopupScreen.hpp>
@@ -891,6 +892,10 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	else if (screenName.compare("song-window") == 0)
 	{
 		screen = make_shared<SongWindow>(mpc, layerIndex);
+	}
+	else if (screenName.compare("vmpc-file-in-use") == 0)
+	{
+		screen = make_shared<VmpcFileInUseScreen>(mpc, layerIndex);
 	}
 
 	if (screen)
