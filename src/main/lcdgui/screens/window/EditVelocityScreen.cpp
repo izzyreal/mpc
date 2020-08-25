@@ -23,7 +23,23 @@ EditVelocityScreen::EditVelocityScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void EditVelocityScreen::open()
 {
-	mpc.addObserver(this);
+
+	auto bus = sequencer.lock()->getActiveTrack().lock()->getBus();
+
+	if (bus == 0)
+	{
+		findField("note0").lock()->setAlignment(Alignment::Centered, 18);
+		findField("note1").lock()->setAlignment(Alignment::Centered, 18);
+		findField("note0").lock()->setLocation(62, 42);
+	}
+	else
+	{
+		findField("note0").lock()->setAlignment(Alignment::None);
+		findField("note1").lock()->setAlignment(Alignment::None);
+		findField("note0").lock()->setLocation(61, 42);
+	}
+
+	findField("note1").lock()->setLocation(116, 42);
 
 	auto seq = sequencer.lock()->getActiveSequence().lock();
 
@@ -34,6 +50,8 @@ void EditVelocityScreen::open()
 	displayValue();
 	displayTime();
 	displayNotes();
+
+	mpc.addObserver(this); // Subscribe to "padandnote" messages
 }
 
 void EditVelocityScreen::close()
@@ -46,9 +64,7 @@ void EditVelocityScreen::update(moduru::observer::Observable* observable, nonstd
 	auto msg = nonstd::any_cast<string>(message);
 
 	if (msg.compare("padandnote") == 0)
-	{
 		displayNotes();
-	}
 }
 
 
@@ -86,6 +102,7 @@ void EditVelocityScreen::function(int i)
 				}
 			}
 		}
+
 		openScreen("sequencer");
 		break;
 	}
@@ -96,13 +113,9 @@ void EditVelocityScreen::turnWheel(int i)
 	init();
 
 	if (param.compare("edittype") == 0)
-	{
 		setEditType(editType + i);
-	}
 	else if (param.compare("value") == 0)
-	{
 		setValue(value + i);
-	}
 	
 	checkAllTimesAndNotes(mpc, i);
 }
@@ -124,7 +137,7 @@ void EditVelocityScreen::displayNotes()
 	
 	if (track.lock()->getBus() == 0)
 	{
-		findField("note0").lock()->setSize(8 * 6 + 1, 9);
+		findField("note0").lock()->setSize(47, 9);
 		findLabel("note1").lock()->Hide(false);
 		findField("note1").lock()->Hide(false);
 		findField("note0").lock()->setText(moduru::lang::StrUtil::padLeft(to_string(note0), " ", 3) + "(" + mpc::Util::noteNames()[note0] + u8"\u00D4");
@@ -132,7 +145,7 @@ void EditVelocityScreen::displayNotes()
 	}
 	else
 	{
-		findField("note0").lock()->setSize(6 * 6 + 1, 9);
+		findField("note0").lock()->setSize(37, 9);
 		
 		if (mpc.getNote() != 34)
 		{
