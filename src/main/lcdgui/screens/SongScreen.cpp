@@ -167,6 +167,8 @@ void SongScreen::turnWheel(int i)
 	else if (param.compare("temposource") == 0)
 	{
 		sequencer.lock()->setTempoSourceSequence(i > 0);
+		displayTempoSource();
+		displayTempo();
 	}
 	else if (param.compare("loop") == 0)
 	{
