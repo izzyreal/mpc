@@ -258,9 +258,7 @@ void NameScreen::saveName()
 		auto ext = mpc::Util::splitName(directoryScreen->getSelectedFile()->getName())[1];
 		
 		if (ext.length() > 0)
-		{
 			ext = "." + ext;
-		}
 
 		bool success = mpc.getDisk().lock()->renameSelectedFile(StrUtil::trim(StrUtil::toUpper(getName())) + ext);
 		
@@ -303,13 +301,10 @@ void NameScreen::saveName()
 					auto directoryScreen = dynamic_pointer_cast<DirectoryScreen>(mpc.screens->getScreenComponent("directory"));
 
 					if (counter > 4)
-					{
 						directoryScreen->yOffset1 = counter - 4;
-					}
 					else
-					{
 						directoryScreen->yOffset1 = 0;
-					}
+
 					break;
 				}
 				counter++;
@@ -332,14 +327,14 @@ void NameScreen::saveName()
 	{
 		editing = false;
 		ls.lock()->setLastFocus("name", "0");
-		openScreen("save-aps-file");
+		openScreen(prevScreen);
 	}
 	else if (prevScreen.compare("keep-or-retry") == 0)
 	{
 		dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getPreviewSound().lock())->setName(getName());
 		editing = false;
 		ls.lock()->setLastFocus("name", "0");
-		openScreen("keep-or-retry");
+		openScreen(prevScreen);
 	}
 	else if (prevScreen.compare("track") == 0)
 	{
@@ -352,14 +347,14 @@ void NameScreen::saveName()
 	{
 		editing = false;
 		ls.lock()->setLastFocus("name", "0");
-		openScreen("save-a-sequence");
+		openScreen(prevScreen);
 	}
 	else if (prevScreen.compare("sequence") == 0)
 	{
 		sequencer.lock()->getActiveSequence().lock()->setName(getName());
 		editing = false;
 		ls.lock()->setLastFocus("name", "0");
-		openScreen("sequencer");
+		openScreen(prevScreen);
 	}
 	else if (prevScreen.compare("song-window") == 0)
 	{
@@ -367,7 +362,7 @@ void NameScreen::saveName()
 		sequencer.lock()->getSong(songScreen->activeSongIndex).lock()->setName(getName());
 		editing = false;
 		ls.lock()->setLastFocus("name", "0");
-		openScreen("song");
+		openScreen(prevScreen);
 	}
 	else if (prevScreen.compare("midi-output") == 0)
 	{
@@ -375,7 +370,7 @@ void NameScreen::saveName()
 		sequencer.lock()->getActiveSequence().lock()->setDeviceName(midiOutputScreen->getDeviceNumber() + 1, getName().substr(0, 8));
 		editing = false;
 		ls.lock()->setLastFocus("name", "0");
-		openScreen("sequencer");
+		openScreen(prevScreen);
 	}
 	else if (prevScreen.compare("edit-sound") == 0)
 	{
@@ -383,14 +378,14 @@ void NameScreen::saveName()
 		editSoundScreen->setNewName(getName());
 		editing = false;
 		ls.lock()->setLastFocus("name", "0");
-		openScreen("edit-sound");
+		openScreen(prevScreen);
 	}
 	else if (prevScreen.compare("sound") == 0)
 	{
 		sampler.lock()->getSound().lock()->setName(getName());
 		editing = false;
 		ls.lock()->setLastFocus("name", "0");
-		openScreen("sound");
+		openScreen(prevScreen);
 	}
 	else if (prevScreen.compare("resample") == 0)
 	{
@@ -398,7 +393,7 @@ void NameScreen::saveName()
 		resampleScreen->setNewName(getName());
 		editing = false;
 		ls.lock()->setLastFocus("name", "0");
-		openScreen("resample");
+		openScreen(prevScreen);
 	}
 	else if (prevScreen.compare("stereo-to-mono") == 0)
 	{
@@ -413,7 +408,7 @@ void NameScreen::saveName()
 		}
 		editing = false;
 		ls.lock()->setLastFocus("name", "0");
-		openScreen("stereo-to-mono");
+		openScreen(prevScreen);
 	}
 	else if (prevScreen.compare("copy-sound") == 0)
 	{
@@ -421,7 +416,7 @@ void NameScreen::saveName()
 		copySoundScreen->setNewName(getName());
 		editing = false;
 		ls.lock()->setLastFocus("name", "0");
-		openScreen("copy-sound");
+		openScreen(prevScreen);
 	}
 }
 

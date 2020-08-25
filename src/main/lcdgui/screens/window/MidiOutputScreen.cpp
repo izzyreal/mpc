@@ -3,6 +3,8 @@
 #include <lcdgui/screens/window/NameScreen.hpp>
 #include <audiomidi/MpcMidiPorts.hpp>
 
+#include <sequencer/Track.hpp>
+
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
@@ -13,6 +15,18 @@ MidiOutputScreen::MidiOutputScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void MidiOutputScreen::open()
 {
+	init();
+	auto prevScreen = ls.lock()->getPreviousScreenName();
+	if (prevScreen.compare("name") != 0 && prevScreen.compare("midi-output-monitor") != 0)
+	{
+		auto dev = track.lock()->getDevice();
+
+		if (dev > 0)
+			deviceIndex = dev - 1;
+		else
+			deviceIndex = 0;
+	}
+
 	displaySoftThru();
 	displayDeviceName();
 }
@@ -26,7 +40,7 @@ void MidiOutputScreen::turnWheel(int i)
 	if (param.compare("firstletter") == 0)
 	{
 		auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
-		nameScreen->setName(seq->getDeviceName(deviceNumber + i));
+		nameScreen->setName(seq->getDeviceName(deviceIndex + i));
 		nameScreen->parameterName = "devicename";
 		nameScreen->setNameLimit(8);
 		openScreen("name");
@@ -37,7 +51,7 @@ void MidiOutputScreen::turnWheel(int i)
 	}
 	else if (param.compare("devicenumber") == 0)
 	{
-		setDeviceNumber(deviceNumber + i);
+		setDeviceIndex(deviceIndex + i);
 	}
 }
 
@@ -64,17 +78,17 @@ void MidiOutputScreen::displaySoftThru()
 void MidiOutputScreen::displayDeviceName()
 {
 	auto sequence = sequencer.lock()->getActiveSequence().lock();
-	auto devName = sequence->getDeviceName(deviceNumber + 1);
+	auto devName = sequence->getDeviceName(deviceIndex + 1);
 	
 	findField("firstletter").lock()->setText(devName.substr(0, 1));
 	findLabel("devicename").lock()->setText(devName.substr(1, devName.length()));
 	
 	string devNumber = "";
 	
-	if (deviceNumber >= 16)
-		devNumber = moduru::lang::StrUtil::padLeft(to_string(deviceNumber - 15), " ", 2) + "B";
+	if (deviceIndex >= 16)
+		devNumber = moduru::lang::StrUtil::padLeft(to_string(deviceIndex - 15), " ", 2) + "B";
 	else
-		devNumber = moduru::lang::StrUtil::padLeft(to_string(deviceNumber + 1), " ", 2) + "A";
+		devNumber = moduru::lang::StrUtil::padLeft(to_string(deviceIndex + 1), " ", 2) + "A";
 
 	findField("devicenumber").lock()->setText(devNumber);
 }
@@ -93,17 +107,17 @@ int MidiOutputScreen::getSoftThru()
 	return softThru;
 }
 
-void MidiOutputScreen::setDeviceNumber(int i)
+void MidiOutputScreen::setDeviceIndex(int i)
 {
 	if (i < 0 || i > 31)
 		return;
 
-	deviceNumber = i;
+	deviceIndex = i;
 	displayDeviceName();
 }
 
 int MidiOutputScreen::getDeviceNumber()
 {
-	return deviceNumber;
+	return deviceIndex;
 }
 
