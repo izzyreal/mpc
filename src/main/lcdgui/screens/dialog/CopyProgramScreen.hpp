@@ -24,5 +24,7 @@ namespace mpc::lcdgui::screens::dialog
 		void displayPgm0();
 		void displayPgm1();
 
+		void displayFunctionKeys();
+
 	};
 }

@@ -87,9 +87,7 @@ void FunctionKey::setText(const string& text)
 void FunctionKey::setType(const int type)
 {
 	if (this->type == type)
-	{
 		return;
-	}
 
 	this->type = type;
 	Hide(type == -1);
@@ -110,24 +108,17 @@ FunctionKeys::FunctionKeys(mpc::Mpc& mpc, const string& name, vector<vector<stri
 		for (int i = 0; i < texts.size(); i++)
 		{
 			if (texts[i].compare("") != 0 && (firstFunctionKey == -1 || i < firstFunctionKey))
-			{
 				firstFunctionKey = i;
-			}
-
 
 			if (firstFunctionKey != -1 && texts[i].compare("") != 0 && i > lastFunctionKey)
-			{
 				lastFunctionKey = i;
-			}
 		}
 	}
 
 	if (firstFunctionKey >= 0)
 	{
 		for (int i = firstFunctionKey; i <= lastFunctionKey; i++)
-		{
 			addChild(make_shared<FunctionKey>(mpc, "fk" + to_string(i), xPoses[i]));
-		}
 	}
 
 	setActiveArrangement(0);
@@ -136,9 +127,7 @@ FunctionKeys::FunctionKeys(mpc::Mpc& mpc, const string& name, vector<vector<stri
 void FunctionKeys::setActiveArrangement(int i)
 {
 	if (i < 0 || i > texts.size())
-	{
 		return;
-	}
 
 	activeArrangement = i;
 
@@ -147,9 +136,7 @@ void FunctionKeys::setActiveArrangement(int i)
 		auto fk = findChild<FunctionKey>("fk" + to_string(j)).lock();
 
 		if (!fk)
-		{
 			continue;
-		}
 
 		auto type = types[activeArrangement][j];
 		fk->setType(type);

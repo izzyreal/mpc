@@ -1,5 +1,7 @@
 #include "CopyProgramScreen.hpp"
 
+#include <mpc/MpcSoundPlayerChannel.hpp>>
+
 using namespace mpc::lcdgui::screens::dialog;
 using namespace moduru::lang;
 using namespace std;
@@ -11,8 +13,13 @@ CopyProgramScreen::CopyProgramScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void CopyProgramScreen::open()
 {
+	init();
+	pgm0 = mpcSoundPlayerChannel->getProgram();
+	pgm1 = pgm0;
+
 	displayPgm0();
 	displayPgm1();
+	displayFunctionKeys();
 }
 
 void CopyProgramScreen::function(int i)
@@ -30,7 +37,7 @@ void CopyProgramScreen::function(int i)
 			return;
 
 		sampler.lock()->copyProgram(pgm0, pgm1);
-
+		mpcSoundPlayerChannel->setProgram(pgm1);
 		openScreen("program");
 		break;
 	}
@@ -41,21 +48,30 @@ void CopyProgramScreen::turnWheel(int i)
 	init();
 		
 	if (param.compare("pgm0") == 0)
-	{
 		setPgm0(pgm0 + i);
-	}
-	else if (param.compare("pgm1") == 0) {
+	else if (param.compare("pgm1") == 0)
 		setPgm1(pgm1 + i);
-	}
 }
 
 void CopyProgramScreen::setPgm0(int i)
-{
-	if (i < 0 || i >= sampler.lock()->getProgramCount())
-		return;
+{	
+	auto candidate = i;
+	auto up = i > pgm0;
 
-	pgm0 = i;
+	candidate = up ? candidate - 1 : candidate + 1;
+
+	do {
+		candidate = up ? candidate + 1 : candidate - 1;
+
+		if (candidate < 0 || candidate >= sampler.lock()->getPrograms().size())
+			return;
+	}
+	while (!sampler.lock()->getProgram(candidate).lock());
+	
+	pgm0 = candidate;
+
 	displayPgm0();
+	displayFunctionKeys();
 }
 
 void CopyProgramScreen::setPgm1(int i)
@@ -65,6 +81,7 @@ void CopyProgramScreen::setPgm1(int i)
 
 	pgm1 = i;
 	displayPgm1();
+	displayFunctionKeys();
 }
 
 void CopyProgramScreen::displayPgm0()
@@ -79,4 +96,10 @@ void CopyProgramScreen::displayPgm1()
 
 	auto programName = program1 ? program1->getName() : "(no program)";
 	findField("pgm1").lock()->setText(StrUtil::padLeft(to_string(pgm1 + 1), " ", 2) + "-" + programName);
+}
+
+void CopyProgramScreen::displayFunctionKeys()
+{
+	ls.lock()->setFunctionKeysArrangement(pgm0 == pgm1 ? 1 : 0);
+	findBackground().lock()->SetDirty();
 }

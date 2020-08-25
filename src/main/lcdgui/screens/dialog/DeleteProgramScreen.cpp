@@ -66,9 +66,18 @@ void DeleteProgramScreen::displayPgm()
 
 void DeleteProgramScreen::setPgm(int i)
 {
-    if (i < 0 || i >= sampler.lock()->getProgramCount())
-        return;
+    auto candidate = i;
+    auto up = i > pgm;
 
-    pgm = i;
+    candidate = up ? candidate - 1 : candidate + 1;
+
+    do {
+        candidate = up ? candidate + 1 : candidate - 1;
+
+        if (candidate < 0 || candidate >= sampler.lock()->getPrograms().size())
+            return;
+    } while (!sampler.lock()->getProgram(candidate).lock());
+
+    pgm = candidate;
     displayPgm();
 }
