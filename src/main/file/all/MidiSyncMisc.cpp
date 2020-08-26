@@ -43,7 +43,7 @@ MidiSyncMisc::MidiSyncMisc(mpc::Mpc& mpc)
 	saveBytes[INPUT_OFFSET] = static_cast<int8_t>(syncScreen->in);
 	saveBytes[OUTPUT_OFFSET] = static_cast<int8_t>(syncScreen->out);
 
-	auto songScreen = dynamic_pointer_cast<SongScreen>(mpc.screens->getScreenComponent("song"));
+	auto songScreen = mpc.screens->get<SongScreen>("song");
 
 	for (int i = 0; i < AllParser::NAME_LENGTH; i++)
 	{

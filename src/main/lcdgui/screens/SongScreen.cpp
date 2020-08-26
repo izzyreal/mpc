@@ -16,6 +16,8 @@ SongScreen::SongScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void SongScreen::open()
 {
+	findField("loop").lock()->setAlignment(Alignment::Centered);
+
 	init();
 	displaySongName();
 	displayNow0();
@@ -39,7 +41,7 @@ void SongScreen::up()
 	
 	if (param.compare("step1") == 0 || param.compare("sequence1") == 0 || param.compare("reps1") == 0)
 	{
-		if (offset == -1)
+		if (offset == -1 || sequencer.lock()->isPlaying())
 			return;
 	
 		setOffset(offset - 1);
@@ -98,6 +100,9 @@ void SongScreen::right()
 
 void SongScreen::openWindow()
 {
+	if (sequencer.lock()->isPlaying())
+		return;
+
 	init();
 
 	auto song = sequencer.lock()->getSong(activeSongIndex).lock();
@@ -106,7 +111,7 @@ void SongScreen::openWindow()
 		song->setUsed(true);
 
 	if (param.compare("loop") == 0)
-		openScreen("loop-song-window");
+		openScreen("loop-song");
 	else if (param.compare("song") == 0)
 		openScreen("song-window");
 	else if (param.compare("tempo") == 0 || param.compare("tempo-source") == 0)
@@ -121,7 +126,7 @@ void SongScreen::down()
 	{	
 		auto song = sequencer.lock()->getSong(activeSongIndex).lock();
 		
-		if (offset == song->getStepCount() - 1)
+		if (offset == song->getStepCount() - 1 || sequencer.lock()->isPlaying())
 			return;
 
 		setOffset(offset + 1);
@@ -187,6 +192,9 @@ void SongScreen::turnWheel(int i)
 
 void SongScreen::function(int i)
 {
+	if (sequencer.lock()->isPlaying())
+		return;
+
 	init();
 	auto song = sequencer.lock()->getSong(activeSongIndex).lock();
 	
@@ -209,8 +217,13 @@ void SongScreen::function(int i)
 
 		song->insertStep(offset + 1);
 		
-		offset++;
+		auto candidate = offset + 1;
 
+		if (candidate + 1 >= song->getStepCount())
+			candidate -= 1;
+
+		setOffset(candidate);
+	
 		if (!song->isUsed())
 		{
 			song->setUsed(true);
@@ -293,7 +306,7 @@ void SongScreen::displayNow0()
 	}
 
 	pastBars += sequencer.lock()->getPlayedStepRepetitions() * (sequencer.lock()->getActiveSequence().lock()->getLastBarIndex() + 1);
-
+	
 	findField("now0").lock()->setTextPadded(sequencer.lock()->getCurrentBarIndex() + 1 + pastBars, "0");
 }
 

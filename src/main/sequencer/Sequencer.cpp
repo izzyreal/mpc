@@ -420,8 +420,7 @@ void Sequencer::play(bool fromStart)
 		return;
 
     endOfSong = false;
-	playedStepRepetitions = 0;
-	auto songScreen = dynamic_pointer_cast<SongScreen>(mpc.screens->getScreenComponent("song"));
+	auto songScreen = mpc.screens->get<SongScreen>("song");
 	auto currentSong = songs[songScreen->getActiveSongIndex()];
     
 	shared_ptr<Step> currentStep;
@@ -631,7 +630,10 @@ void Sequencer::stop(int tick)
             setBar(0); // real 2kxl doesn't do this
         return;
     }
-	
+
+	playedStepRepetitions = 0;
+	songMode = false;
+
 	lastNotifiedBar = -1;
 	lastNotifiedBeat = -1;
 	lastNotifiedClock = -1;
@@ -679,7 +681,7 @@ void Sequencer::stop(int tick)
     if (notifynextsq)
         notifyObservers(string("nextsqoff"));
     	
-	auto songScreen = dynamic_pointer_cast<SongScreen>(mpc.screens->getScreenComponent("song"));
+	auto songScreen = mpc.screens->get<SongScreen>("song");
 
     if (endOfSong)
 		songScreen->setOffset(songScreen->getOffset() + 1);
@@ -1087,12 +1089,10 @@ int Sequencer::getLoopEnd()
 
 weak_ptr<Sequence> Sequencer::getActiveSequence()
 {
-	auto songScreen = dynamic_pointer_cast<SongScreen>(mpc.screens->getScreenComponent("song"));
+	auto songScreen = mpc.screens->get<SongScreen>("song");
 
 	if (songMode && songs[songScreen->getActiveSongIndex()]->getStepCount() != 0)
-	{
 		return sequences[getSongSequenceIndex() >= 0 ? getSongSequenceIndex() : activeSequenceIndex];
-	}
 
 	return sequences[activeSequenceIndex];
 }
@@ -1432,7 +1432,7 @@ void Sequencer::setActiveTrackIndex(int i)
 
 int Sequencer::getCurrentlyPlayingSequenceIndex()
 {
-	auto songScreen = dynamic_pointer_cast<SongScreen>(mpc.screens->getScreenComponent("song"));
+	auto songScreen = mpc.screens->get<SongScreen>("song");
 	auto songSeqIndex = songMode ? songs[songScreen->getActiveSongIndex()]->getStep(songScreen->getOffset() + 1).lock()->getSequence() : -1;
 	return songMode ? songSeqIndex : currentlyPlayingSequenceIndex;
 }
@@ -1563,7 +1563,7 @@ void Sequencer::setSongModeEnabled(bool b)
 
 int Sequencer::getSongSequenceIndex()
 {
-	auto songScreen = dynamic_pointer_cast<SongScreen>(mpc.screens->getScreenComponent("song"));
+	auto songScreen = mpc.screens->get<SongScreen>("song");
 	auto song = songs[songScreen->getActiveSongIndex()];
 	auto step = songScreen->getOffset() + 1;
 

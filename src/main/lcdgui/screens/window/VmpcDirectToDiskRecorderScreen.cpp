@@ -162,7 +162,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 
 			sequencer.lock()->setSongModeEnabled(true);
 
-			auto songScreen = dynamic_pointer_cast<SongScreen>(mpc.screens->getScreenComponent("song"));
+			auto songScreen = mpc.screens->get<SongScreen>("song");
 			songScreen->setLoop(false);
 
 			if (!mpc.getAudioMidiServices().lock()->prepareBouncing(settings.get()))

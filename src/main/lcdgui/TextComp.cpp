@@ -264,9 +264,7 @@ void TextComp::runBlinkThread()
 		int counter = 0;
 		
 		while (blinking && counter++ != BLINK_INTERVAL)
-		{
 			this_thread::sleep_for(chrono::milliseconds(1));
-		}
 
 		Hide(!IsHidden());
 	}
@@ -276,21 +274,15 @@ void TextComp::runBlinkThread()
 void TextComp::setBlinking(bool b)
 {
 	if (blinking == b)
-	{
 		return;
-	}
 
 	blinking = b;
 
 	if (blinkThread.joinable())
-	{
 		blinkThread.join();
-	}
 
 	if (blinking)
-	{
 		blinkThread = thread(&TextComp::static_blink, this);
-	}
 }
 
 void TextComp::setAlignment(const Alignment alignment, int endX)

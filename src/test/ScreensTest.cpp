@@ -108,7 +108,7 @@ vector<string> screenNames = {
 "edit-sound",
 "song-window",
 "ignore-tempo-change",
-"loop-song-window",
+"loop-song",
 "loop-bars-window",
 "convert-song-to-seq",
 "time-display",

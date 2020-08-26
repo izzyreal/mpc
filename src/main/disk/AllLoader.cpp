@@ -179,7 +179,7 @@ AllLoader::AllLoader(mpc::Mpc& mpc, mpc::disk::MpcFile* file, bool sequencesOnly
 		auto secondSequenceScreen = dynamic_pointer_cast<SecondSeqScreen>(mpc.screens->getScreenComponent("second-seq"));
 		secondSequenceScreen->sq = sequencer->secondSeqIndex;
 		
-		auto songScreen = dynamic_pointer_cast<SongScreen>(mpc.screens->getScreenComponent("song"));
+		auto songScreen = mpc.screens->get<SongScreen>("song");
 		songScreen->setDefaultSongName(midiSyncMisc->getDefSongName());
 				
 		auto songs = allParser.getSongs();

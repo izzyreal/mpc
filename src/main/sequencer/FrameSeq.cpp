@@ -57,7 +57,7 @@ void FrameSeq::work(int nFrames)
 		return;
 
 	auto controls = mpc.getControls().lock();
-	auto songScreen = dynamic_pointer_cast<SongScreen>(mpc.screens->getScreenComponent("song"));
+	auto songScreen = mpc.screens->get<SongScreen>("song");
 	auto lSequencer = sequencer.lock();
 	
 
@@ -176,29 +176,34 @@ void FrameSeq::work(int nFrames)
 						auto song = lSequencer->getSong(songScreen->getActiveSongIndex()).lock();
 						auto step = songScreen->getOffset() + 1;
 
-						if (step == song->getStepCount() - 1 && lSequencer->getPlayedStepRepetitions() >= song->getStep(step).lock()->getRepeats())
+						auto doneRepeating = lSequencer->getPlayedStepRepetitions() >= song->getStep(step).lock()->getRepeats();
+						auto reachedLastStep = step == song->getStepCount() - 1;
+
+						if (doneRepeating && songScreen->isLoopEnabled() && step == song->getLastStep())
 						{
-							if (!songScreen->isLoopEnabled())
-							{
-								lSequencer->playToTick(seq->getLastTick() - 1);
-								lSequencer->setEndOfSong(true);
+							lSequencer->playToTick(seq->getLastTick() - 1);
+							lSequencer->resetPlayedStepRepetitions();
+							songScreen->setOffset(song->getFirstStep() - 1);
+							auto newStep = song->getStep(songScreen->getOffset() + 1).lock();
+
+							if (!lSequencer->getSequence(newStep->getSequence()).lock()->isUsed())
 								lSequencer->stop();
-								lSequencer->move(seq->getLastTick());
-								continue;
-							}
-							else
-							{
-								lSequencer->playToTick(seq->getLastTick() - 1);
-								songScreen->setOffset(-1);
-								move(0);
-								continue;
-							}
+							
+							move(0);
+						}
+						else if (doneRepeating && reachedLastStep)
+						{
+							lSequencer->playToTick(seq->getLastTick() - 1);
+							lSequencer->setEndOfSong(true);
+							lSequencer->stop();
+							lSequencer->move(0);
+							continue;
 						}
 						else
 						{
 							lSequencer->playToTick(seq->getLastTick() - 1);
 							
-							if (lSequencer->getPlayedStepRepetitions() == song->getStep(step).lock()->getRepeats())
+							if (doneRepeating)
 							{
 								lSequencer->resetPlayedStepRepetitions();
 								songScreen->setOffset(songScreen->getOffset() + 1);

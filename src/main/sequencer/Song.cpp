@@ -17,7 +17,10 @@ bool Song::isLoopEnabled()
 
 void Song::setFirstStep(int i)
 {
-    if (i < 0 || i >= (int) steps.size())
+    if (i >= steps.size()) i = steps.size() - 1;
+    if (i < 0) i = 0;
+
+    if (firstStep == i)
         return;
 
     firstStep = i;
@@ -33,8 +36,11 @@ int Song::getFirstStep()
 
 void Song::setLastStep(int i)
 {
-	if (i < 0 || i >= (int) steps.size())
-		return;
+    if (i >= steps.size()) i = steps.size() - 1;
+    if (i < 0) i = 0;
+
+    if (lastStep == i)
+        return;
 
 	lastStep = i;
 
@@ -66,6 +72,9 @@ void Song::deleteStep(int stepIndex)
 		return;
 
     steps.erase(steps.begin() + stepIndex);
+
+    if (lastStep >= steps.size())
+        setLastStep(steps.size() - 1);
 }
 
 void Song::insertStep(int stepIndex)
