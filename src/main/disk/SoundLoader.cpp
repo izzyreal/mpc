@@ -172,13 +172,13 @@ int SoundLoader::loadSound(MpcFile* f)
 		{
 			if (replace)
 			{
-				sampler->deleteSample(existingSoundIndex);
+				sampler->deleteSound(existingSoundIndex);
 				sound->setMemoryIndex(existingSoundIndex);
 				sampler->sort();
 			}
 			else
 			{
-				sampler->deleteSample((int)(sampler->getSoundCount()) - 1);
+				sampler->deleteSound((int)(sampler->getSoundCount()) - 1);
 			}
 			
 			if (partOfProgram)

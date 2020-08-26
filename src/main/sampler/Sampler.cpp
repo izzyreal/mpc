@@ -494,11 +494,6 @@ void Sampler::sort()
 	}
 }
 
-void Sampler::deleteSample(int sampleIndex)
-{
-	deleteSound(sounds[sampleIndex]);
-}
-
 void Sampler::deleteAllSamples()
 {
 	sounds.clear();
@@ -793,8 +788,16 @@ void Sampler::purge()
 	}
 }
 
+
+void Sampler::deleteSound(int soundIndex)
+{
+	deleteSound(sounds[soundIndex]);
+}
+
 void Sampler::deleteSound(weak_ptr<Sound> sound)
 {
+	auto index = sound.lock()->getMemoryIndex();
+
 	for (int i = 0; i < sounds.size(); i++)
 	{
 		if (sounds[i] == sound.lock())
@@ -814,8 +817,6 @@ void Sampler::deleteSound(weak_ptr<Sound> sound)
 
 		sounds[i]->setMemoryIndex(i);
 
-		auto newMemoryIndex = sounds[i]->getMemoryIndex();
-
 		for (auto& program : programs)
 		{
 			if (!program)
@@ -827,7 +828,15 @@ void Sampler::deleteSound(weak_ptr<Sound> sound)
 					continue;
 			
 				if (noteParameters->getSndNumber() == oldMemoryIndex)
-					noteParameters->setSoundNumber(newMemoryIndex);
+				{
+					noteParameters->setSoundNumber(i);
+					correctedNoteParameters.push_back(noteParameters);
+				}
+				else if (noteParameters->getSndNumber() == index)
+				{
+					noteParameters->setSoundNumber(-1);
+					correctedNoteParameters.push_back(noteParameters);
+				}
 			}
 		}
 

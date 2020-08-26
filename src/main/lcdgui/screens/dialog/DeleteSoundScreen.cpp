@@ -26,7 +26,7 @@ void DeleteSoundScreen::function(int i)
         openScreen("sound");
         break;
     case 4:
-        sampler.lock()->deleteSample(sampler.lock()->getSoundIndex());
+        sampler.lock()->deleteSound(sampler.lock()->getSoundIndex());
 
 		if (sampler.lock()->getSoundIndex() > sampler.lock()->getSoundCount() - 1)
 		{

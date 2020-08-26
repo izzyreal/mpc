@@ -94,7 +94,7 @@ void SampleScreen::function(int i)
 		else if (mpc.getAudioMidiServices().lock()->getSoundRecorder().lock()->isArmed())
 		{
 			mpc.getAudioMidiServices().lock()->getSoundRecorder().lock()->setArmed(false);
-			sampler.lock()->deleteSample(sampler.lock()->getSoundCount() - 1);
+			sampler.lock()->deleteSound(sampler.lock()->getSoundCount() - 1);
 			findBackground().lock()->setName("sample");
 		}
 		break;

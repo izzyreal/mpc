@@ -85,6 +85,7 @@ namespace mpc::sampler
 		std::string getPadName(int i);
 		std::vector<std::weak_ptr<Program>> getPrograms();
 		std::vector<float>* getClickSample();
+		void deleteSound(int soundIndex);
 		void deleteSound(std::weak_ptr<Sound> sound);
 		void setLoopEnabled(int sampleIndex, bool b);
 		void trimSample(int sampleNumber, int start, int end);
@@ -101,7 +102,6 @@ namespace mpc::sampler
 		static bool compareSize(std::weak_ptr<Sound> a, std::weak_ptr<Sound> b);
 
 	public:
-		void deleteSample(int sampleIndex);
 		void deleteAllSamples();
 		void process12Bit(std::vector<float>* fa);
 		void process8Bit(std::vector<float>* fa);
