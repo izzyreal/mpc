@@ -94,8 +94,8 @@ void NameScreen::right()
 
 void NameScreen::turnWheel(int j)
 {
-    init();
-	
+	init();
+
 	if (editing)
 	{
 		for (int i = 0; i < 16; i++)
@@ -110,18 +110,15 @@ void NameScreen::turnWheel(int j)
 	}
 	else
 	{
-		if (j > 0)
+		for (int i = 0; i < 16; i++)
 		{
-			for (int i = 0; i < 16; i++)
+			if (param.compare(to_string(i)) == 0)
 			{
-				if (param.compare(to_string(i)) == 0)
-				{
-					changeNameCharacter(i, j > 0);
-					editing = true;
-					initEditColors();
-					drawUnderline();
-					break;
-				}
+				changeNameCharacter(i, j > 0);
+				editing = true;
+				initEditColors();
+				drawUnderline();
+				break;
 			}
 		}
 	}
@@ -168,27 +165,27 @@ void NameScreen::saveName()
 	{
 		auto directToDiskRecorderScreen = dynamic_pointer_cast<VmpcDirectToDiskRecorderScreen>(mpc.screens->getScreenComponent("vmpc-direct-to-disk-recorder"));
 		directToDiskRecorderScreen->outputFolder = getName();
-		resetNameScreen();
 		openScreen("vmpc-direct-to-disk-recorder");
+		resetNameScreen();
 	}
 	else if (parameterName.compare("save-all-file") == 0)
 	{
-		resetNameScreen();
 		openScreen("save-all-file");
+		resetNameScreen();
 		parameterName = "";
 		return;
 	}
 	else if (parameterName.compare("save-a-sound") == 0)
 	{
-		resetNameScreen();
 		openScreen("save-a-sound");
+		resetNameScreen();
 		parameterName = "";
 		return;
 	}
 	else if (parameterName.compare("save-a-program") == 0)
 	{
-		resetNameScreen();
 		openScreen("save-a-program");
+		resetNameScreen();
 		parameterName = "";
 		return;
 	}
@@ -213,23 +210,23 @@ void NameScreen::saveName()
 		if (prevScreen.compare("track") == 0)
 		{
 			sequencer.lock()->setDefaultTrackName(getName(), sequencer.lock()->getActiveTrackIndex());
-			resetNameScreen();
 			openScreen("sequencer");
+			resetNameScreen();
 			return;
 		}
 		else if (prevScreen.compare("sequence") == 0)
 		{
 			sequencer.lock()->setDefaultSequenceName(getName());
-			resetNameScreen();
 			openScreen("sequencer");
+			resetNameScreen();
 			return;
 		}
 		else if (prevScreen.compare("song-window") == 0)
 		{
 			auto songScreen = mpc.screens->get<SongScreen>("song");
 			songScreen->defaultSongName = getName();
-			resetNameScreen();
 			openScreen("song");
+			resetNameScreen();
 			return;
 		}
 	}
@@ -237,6 +234,7 @@ void NameScreen::saveName()
 	{
 		program.lock()->setName(getName());
 		openScreen("program");
+		resetNameScreen();
 		return;
 	}
 	else if (parameterName.compare("create-new-program") == 0)
@@ -244,6 +242,7 @@ void NameScreen::saveName()
 		auto createNewProgramScreen = dynamic_pointer_cast<CreateNewProgramScreen>(mpc.screens->getScreenComponent("create-new-program"));
 		createNewProgramScreen->newName = getName();
 		openScreen("program");
+		resetNameScreen();
 		return;
 	}
 	else if (parameterName.compare("autochrom") == 0)
@@ -251,6 +250,7 @@ void NameScreen::saveName()
 		auto autoChromaticAssignmentScreen = dynamic_pointer_cast<AutoChromaticAssignmentScreen>(mpc.screens->getScreenComponent("auto-chromatic-assignment"));
 		autoChromaticAssignmentScreen->newName = getName();
 		openScreen("auto-chromatic-assignment");
+		resetNameScreen();
 		ls.lock()->setPreviousScreenName(mpc.getPreviousSamplerScreenName());
 		return;
 	}
@@ -305,8 +305,8 @@ void NameScreen::saveName()
 			}
 
 			disk->initFiles();
-			resetNameScreen();
 			openScreen("directory");
+			resetNameScreen();
 			return;
 		}
 	}
@@ -340,8 +340,8 @@ void NameScreen::saveName()
 				counter++;
 			}
 
-			resetNameScreen();
 			openScreen("directory");
+			resetNameScreen();
 			ls.lock()->setPreviousScreenName("load");
 		}
 
@@ -355,65 +355,71 @@ void NameScreen::saveName()
 
 	if (prevScreen.compare("save-aps-file") == 0)
 	{
-		resetNameScreen();
 		openScreen(prevScreen);
+		resetNameScreen();
 	}
 	else if (prevScreen.compare("keep-or-retry") == 0)
 	{
 		dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getPreviewSound().lock())->setName(getName());
-		resetNameScreen();
 		openScreen(prevScreen);
+		resetNameScreen();
 	}
 	else if (prevScreen.compare("track") == 0)
 	{
 		track.lock()->setName(getName());
-		resetNameScreen();
 		openScreen("sequencer");
+		resetNameScreen();
 	}
 	else if (prevScreen.compare("save-a-sequence") == 0)
 	{
-		resetNameScreen();
 		openScreen(prevScreen);
+		resetNameScreen();
 	}
 	else if (prevScreen.compare("sequence") == 0)
 	{
 		sequencer.lock()->getActiveSequence().lock()->setName(getName());
-		resetNameScreen();
 		openScreen(prevScreen);
+		resetNameScreen();
 	}
 	else if (prevScreen.compare("song-window") == 0)
 	{
 		auto songScreen = mpc.screens->get<SongScreen>("song");
 		sequencer.lock()->getSong(songScreen->activeSongIndex).lock()->setName(getName());
-		resetNameScreen();
 		openScreen(prevScreen);
+		resetNameScreen();
 	}
 	else if (prevScreen.compare("midi-output") == 0)
 	{
 		auto midiOutputScreen = dynamic_pointer_cast<MidiOutputScreen>(mpc.screens->getScreenComponent("midi-output"));
 		sequencer.lock()->getActiveSequence().lock()->setDeviceName(midiOutputScreen->getDeviceNumber() + 1, getName().substr(0, 8));
-		resetNameScreen();
 		openScreen(prevScreen);
+		resetNameScreen();
 	}
 	else if (prevScreen.compare("edit-sound") == 0)
 	{
 		auto editSoundScreen = dynamic_pointer_cast<EditSoundScreen>(mpc.screens->getScreenComponent("edit-sound"));
 		editSoundScreen->setNewName(getName());
-		resetNameScreen();
 		openScreen(prevScreen);
+		resetNameScreen();
 	}
 	else if (prevScreen.compare("sound") == 0)
 	{
+		if (sampler.lock()->isSoundNameOccupied(getName()))
+			return;
+
 		sampler.lock()->getSound().lock()->setName(getName());
-		resetNameScreen();
 		openScreen(prevScreen);
+		resetNameScreen();
 	}
 	else if (prevScreen.compare("resample") == 0)
 	{
+		if (sampler.lock()->isSoundNameOccupied(getName()))
+			return;
+
 		auto resampleScreen = dynamic_pointer_cast<ResampleScreen>(mpc.screens->getScreenComponent("resample"));
 		resampleScreen->setNewName(getName());
-		resetNameScreen();
 		openScreen(prevScreen);
+		resetNameScreen();
 	}
 	else if (prevScreen.compare("stereo-to-mono") == 0)
 	{
@@ -421,11 +427,12 @@ void NameScreen::saveName()
 
 		if (parameterName.compare("newlname") == 0)
 			stereoToMonoScreen->setNewLName(getName());
+
 		else if (parameterName.compare("newrname") == 0)
 			stereoToMonoScreen->setNewRName(getName());
 
-		resetNameScreen();
 		openScreen(prevScreen);
+		resetNameScreen();
 	}
 	else if (prevScreen.compare("mono-to-stereo") == 0)
 	{
@@ -433,15 +440,15 @@ void NameScreen::saveName()
 
 		monoToStereoScreen->newStName = getName();
 
-		resetNameScreen();
 		openScreen(prevScreen);
+		resetNameScreen();
 	}
 	else if (prevScreen.compare("copy-sound") == 0)
 	{
 		auto copySoundScreen = dynamic_pointer_cast<CopySoundScreen>(mpc.screens->getScreenComponent("copy-sound"));
 		copySoundScreen->setNewName(getName());
-		resetNameScreen();
 		openScreen(prevScreen);
+		resetNameScreen();
 	}
 }
 

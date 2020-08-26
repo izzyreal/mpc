@@ -1134,3 +1134,12 @@ int Sampler::getPlayX()
 {
 	return playX_;
 }
+
+bool Sampler::isSoundNameOccupied(const string& name)
+{
+	for (auto& s : sounds)
+		if (StrUtil::eqIgnoreCase(StrUtil::trim(s->getName()), StrUtil::trim(name)))
+			return true;
+
+	return false;
+}

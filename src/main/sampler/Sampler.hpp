@@ -43,7 +43,7 @@ namespace mpc::sampler
 		std::weak_ptr<Sound> getSound();
 		std::string getPreviousScreenName();
 		void setPreviousScreenName(std::string s);
-
+		bool isSoundNameOccupied(const std::string&);
 
 	private:
 		mpc::Mpc& mpc;
