@@ -57,10 +57,6 @@ void Pad::setNote(int i)
 		(*mpc.getSampler().lock()->getMasterPadAssign())[index] = i;
 	else
 		note = i;
-
-	notifyObservers(string("padnotenumber"));
-	notifyObservers(string("note"));
-	notifyObservers(string("samplenumber"));
 }
 
 int Pad::getNote()

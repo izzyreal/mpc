@@ -370,7 +370,6 @@ void StepEditorScreen::turnWheel(int i)
 	}
 	else if (param.length() == 2)
 	{
-
 		auto eventNumber = stoi(param.substr(1, 2));
 
 		auto sysEx = dynamic_pointer_cast<SystemExclusiveEvent>(visibleEvents[eventNumber].lock());
@@ -385,51 +384,33 @@ void StepEditorScreen::turnWheel(int i)
 		if (sysEx)
 		{
 			if (param.find("a") != string::npos)
-			{
 				sysEx->setByteA(sysEx->getByteA() + i);
-			}
 			else if (param.find("b") != string::npos)
-			{
 				sysEx->setByteB(sysEx->getByteB() + i);
-			}
 		}
 		else if (channelPressure)
 		{
 			if (param.find("a") != string::npos)
-			{
 				channelPressure->setAmount(channelPressure->getAmount() + i);
-			}
 		}
 		else if (polyPressure)
 		{
 			if (param.find("a") != string::npos)
-			{
 				polyPressure->setNote(polyPressure->getNote() + i);
-			}
 			else if (param.find("b") != string::npos)
-			{
 				polyPressure->setAmount(polyPressure->getAmount() + i);
-			}
 		}
 		else if (controlChange)
 		{
 			if (param.find("a") != string::npos)
-			{
 				controlChange->setController(controlChange->getController() + i);
-			}
 			else if (param.find("b") != string::npos)
-			{
 				controlChange->setAmount(controlChange->getAmount() + i);
-			}
-
 		}
 		else if (programChange)
 		{
 			if (param.find("a") != string::npos)
-			{
 				programChange->setProgram(programChange->getProgram() + i);
-			}
-
 		}
 		else if (pitchBend)
 		{
@@ -439,17 +420,11 @@ void StepEditorScreen::turnWheel(int i)
 		else if (mixer)
 		{
 			if (param.find("a") != string::npos)
-			{
 				mixer->setParameter(mixer->getParameter() + i);
-			}
 			else if (param.find("b") != string::npos)
-			{
 				mixer->setPadNumber(mixer->getPad() + i);
-			}
 			else if (param.find("c") != string::npos)
-			{
 				mixer->setValue(mixer->getValue() + i);
-			}
 		}
 		else if (note && track.lock()->getBus() == 0)
 		{

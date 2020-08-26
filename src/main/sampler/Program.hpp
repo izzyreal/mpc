@@ -4,8 +4,6 @@
 #include <sampler/NoteParameters.hpp>
 #include <sampler/PgmSlider.hpp>
 
-#include <observer/Observable.hpp>
-
 #include <memory>
 
 namespace ctoot::mpc {
@@ -23,7 +21,6 @@ namespace mpc::sampler {
 
 	class Program
 		: public virtual ctoot::mpc::MpcProgram
-		, public moduru::observer::Observable
 	{
 
 	public:

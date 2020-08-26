@@ -18,35 +18,26 @@ NoteParameters::NoteParameters(const int index)
 	optionalNoteB = 34;
 }
 
-int NoteParameters::getSndNumber()
+int NoteParameters::getSoundIndex()
 {
-    return soundNumber;
+    return soundIndex;
 }
 
-void NoteParameters::setSoundNumberNoLimit(int i)
+void NoteParameters::setSoundIndex(int i)
 {
-    soundNumber = i;
-}
-
-void NoteParameters::setSoundNumber(int i)
-{
-    //if(i < -1 || (i != -1 && i > (sampler->getSoundCount() - 1))) return;
-
-    soundNumber = i;
-    
-    notifyObservers(string("samplenumber"));
+    soundIndex = i;
 }
 
 void NoteParameters::setSoundGenMode(int i)
 {
-    if(soundGenerationMode == i) return;
+    if (soundGenerationMode == i)
+        return;
 
-    if(i < 0 || i > 3) return;
+    if (i < 0 || i > 3)
+        return;
 
     soundGenerationMode = i;
-    
-    notifyObservers(string("soundgenerationmode"));
-}
+  }
 
 int NoteParameters::getSoundGenerationMode()
 {
@@ -55,16 +46,17 @@ int NoteParameters::getSoundGenerationMode()
 
 void NoteParameters::setVeloRangeLower(int i)
 {
-    if(velocityRangeLower == i) return;
+    if (velocityRangeLower == i)
+        return;
 
-    if(i < 0 || i > 126) return;
+    if (i < 0 || i > 126)
+        return;
 
-    if(i > velocityRangeUpper - 2) setVeloRangeUpper(i - 1);
+    if (i > velocityRangeUpper - 2)
+        setVeloRangeUpper(i - 1);
 
     velocityRangeLower = i;
-    
-    notifyObservers(string("ifover1"));
-}
+ }
 
 int NoteParameters::getVelocityRangeLower()
 {
@@ -73,13 +65,13 @@ int NoteParameters::getVelocityRangeLower()
 
 void NoteParameters::setOptNoteA(int i)
 {
-	if (optionalNoteA == i)  return;
+	if (optionalNoteA == i)
+        return;
 
-	if (i < 34 || i > 98) return;
+	if (i < 34 || i > 98)
+        return;
 
 	optionalNoteA = i;
-	
-	notifyObservers(string("use1"));
 }
 
 int NoteParameters::getOptionalNoteA()
@@ -96,8 +88,6 @@ void NoteParameters::setVeloRangeUpper(int i)
 		return;
 
 	velocityRangeUpper = i;
-	
-	notifyObservers(string("ifover2"));
 }
 
 int NoteParameters::getVelocityRangeUpper()
@@ -114,8 +104,6 @@ void NoteParameters::setOptionalNoteB(int i)
 		return;
 
 	optionalNoteB = i;
-	
-	notifyObservers(string("use2"));
 }
 
 int NoteParameters::getOptionalNoteB()
@@ -134,18 +122,14 @@ void NoteParameters::setVoiceOverlap(int i)
         return;
 
     voiceOverlap = i;
-    
-    notifyObservers(string("voiceoverlap"));
-}
+ }
 
 void NoteParameters::setMuteAssignA(int i)
 {
-    if(i < 34 || i > 98)
+    if (i < 34 || i > 98)
         return;
 
     muteAssignA = i;
-    
-    notifyObservers(string("muteassigna"));
 }
 
 int NoteParameters::getMuteAssignA()
@@ -159,8 +143,6 @@ void NoteParameters::setMuteAssignB(int i)
         return;
 
     muteAssignB = i;
-    
-    notifyObservers(string("muteassignb"));
 }
 
 int NoteParameters::getMuteAssignB()
@@ -179,8 +161,6 @@ void NoteParameters::setTune(int i)
         i = 240;
 
     tune = i;
-    
-    notifyObservers(string("tune"));
 }
 
 int NoteParameters::getTune()
@@ -197,8 +177,6 @@ void NoteParameters::setAttack(int i)
         return;
 
     attack = i;
-    
-    notifyObservers(string("attack"));
 }
 
 int NoteParameters::getAttack()
@@ -208,15 +186,13 @@ int NoteParameters::getAttack()
 
 void NoteParameters::setDecay(int i)
 {
-    if(decay == i)
+    if (decay == i)
         return;
 
-    if(i < 0 || i > 100)
+    if (i < 0 || i > 100)
         return;
 
     decay = i;
-    
-    notifyObservers(string("decay"));
 }
 
 int NoteParameters::getDecay()
@@ -226,15 +202,13 @@ int NoteParameters::getDecay()
 
 void NoteParameters::setDecayMode(int i)
 {
-    if(decayMode == i)
+    if (decayMode == i)
         return;
 
-    if(i < 0 || i > 1)
+    if (i < 0 || i > 1)
         return;
 
     decayMode = i;
-    
-    notifyObservers(string("dcymd"));
 }
 
 int NoteParameters::getDecayMode()
@@ -244,15 +218,13 @@ int NoteParameters::getDecayMode()
 
 void NoteParameters::setFilterFrequency(int i)
 {
-    if(filterFrequency == i)
+    if (filterFrequency == i)
         return;
 
-    if(i < 0 || i > 100)
+    if (i < 0 || i > 100)
         return;
 
     filterFrequency = i;
-    
-    notifyObservers(string("freq"));
 }
 
 int NoteParameters::getFilterFrequency()
@@ -262,15 +234,13 @@ int NoteParameters::getFilterFrequency()
 
 void NoteParameters::setFilterResonance(int i)
 {
-    if(filterResonance == i)
+    if (filterResonance == i)
         return;
 
-    if(i < 0 || i > 15)
+    if (i < 0 || i > 15)
         return;
 
     filterResonance = i;
-    
-    notifyObservers(string("reson"));
 }
 
 int NoteParameters::getFilterResonance()
@@ -280,15 +250,13 @@ int NoteParameters::getFilterResonance()
 
 void NoteParameters::setFilterAttack(int i)
 {
-    if(filterAttack == i)
+    if (filterAttack == i)
         return;
 
-    if(i < 0 || i > 100)
+    if (i < 0 || i > 100)
         return;
 
     filterAttack = i;
-    
-    notifyObservers(string("filterattack"));
 }
 
 int NoteParameters::getFilterAttack()
@@ -298,15 +266,13 @@ int NoteParameters::getFilterAttack()
 
 void NoteParameters::setFilterDecay(int i)
 {
-    if(filterDecay == i)
+    if (filterDecay == i)
         return;
 
-    if(i < 0 || i > 100)
+    if (i < 0 || i > 100)
         return;
 
     filterDecay = i;
-    
-    notifyObservers(string("filterdecay"));
 }
 
 int NoteParameters::getFilterDecay()
@@ -316,15 +282,13 @@ int NoteParameters::getFilterDecay()
 
 void NoteParameters::setFilterEnvelopeAmount(int i)
 {
-    if(filterEnvelopeAmount == i)
+    if (filterEnvelopeAmount == i)
         return;
 
-    if(i < 0 || i > 100)
+    if (i < 0 || i > 100)
         return;
 
     filterEnvelopeAmount = i;
-    
-    notifyObservers(string("filterenvelopeamount"));
 }
 
 int NoteParameters::getFilterEnvelopeAmount()
@@ -334,15 +298,13 @@ int NoteParameters::getFilterEnvelopeAmount()
 
 void NoteParameters::setVeloToLevel(int i)
 {
-    if(velocityToLevel == i)
+    if (velocityToLevel == i)
         return;
 
-    if(i < 0 || i > 100)
+    if (i < 0 || i > 100)
         return;
 
     velocityToLevel = i;
-    
-    notifyObservers(string("velocitytolevel"));
 }
 
 int NoteParameters::getVeloToLevel()
@@ -352,15 +314,13 @@ int NoteParameters::getVeloToLevel()
 
 void NoteParameters::setVelocityToAttack(int i)
 {
-    if(velocityToAttack == i)
+    if (velocityToAttack == i)
         return;
 
-    if(i < 0 || i > 100)
+    if (i < 0 || i > 100)
         return;
 
     velocityToAttack = i;
-    
-    notifyObservers(string("velocitytoattack"));
 }
 
 int NoteParameters::getVelocityToAttack()
@@ -370,15 +330,13 @@ int NoteParameters::getVelocityToAttack()
 
 void NoteParameters::setVelocityToStart(int i)
 {
-    if(velocityToStart == i)
+    if (velocityToStart == i)
         return;
 
-    if(i < 0 || i > 100)
+    if (i < 0 || i > 100)
         return;
 
     velocityToStart = i;
-    
-    notifyObservers(string("velocitytostart"));
 }
 
 int NoteParameters::getVelocityToStart()
@@ -388,15 +346,13 @@ int NoteParameters::getVelocityToStart()
 
 void NoteParameters::setVelocityToFilterFrequency(int i)
 {
-    if(velocityToFilterFrequency == i)
+    if (velocityToFilterFrequency == i)
         return;
 
-    if(i < 0 || i > 100)
+    if (i < 0 || i > 100)
         return;
 
     velocityToFilterFrequency = i;
-    
-    notifyObservers(string("velocitytofilterfrequency"));
 }
 
 int NoteParameters::getVelocityToFilterFrequency()
@@ -406,15 +362,13 @@ int NoteParameters::getVelocityToFilterFrequency()
 
 void NoteParameters::setSliderParameterNumber(int i)
 {
-    if(sliderParameterNumber == i)
+    if (sliderParameterNumber == i)
         return;
 
-    if(i < 0 || i > 3)
+    if (i < 0 || i > 3)
         return;
 
     sliderParameterNumber = i;
-    
-    notifyObservers(string("sliderparameternumber"));
 }
 
 int NoteParameters::getSliderParameterNumber()
@@ -424,15 +378,13 @@ int NoteParameters::getSliderParameterNumber()
 
 void NoteParameters::setVelocityToPitch(int i)
 {
-    if(velocityToPitch == i)
+    if (velocityToPitch == i)
         return;
 
-    if(i < -120 || i > 120)
+    if (i < -120 || i > 120)
         return;
 
     velocityToPitch = i;
-    
-    notifyObservers(string("velocitytopitch"));
 }
 
 int NoteParameters::getVelocityToPitch()
@@ -457,7 +409,7 @@ NoteParameters* NoteParameters::clone(const int newIndex)
 	res->setOptionalNoteB(optionalNoteB);
 	res->setSliderParameterNumber(sliderParameterNumber);
 	res->setSoundGenMode(soundGenerationMode);
-	res->setSoundNumber(soundNumber);
+	res->setSoundIndex(soundIndex);
 	res->setTune(tune);
 	res->setVelocityToAttack(velocityToAttack);
 	res->setVelocityToFilterFrequency(velocityToFilterFrequency);

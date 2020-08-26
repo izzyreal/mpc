@@ -1,6 +1,5 @@
 #pragma once
 #include <mpc/MpcNoteParameters.hpp>
-#include <observer/Observable.hpp>
 
 #include <mpc/MpcStereoMixerChannel.hpp>
 #include <mpc/MpcIndivFxMixerChannel.hpp>
@@ -11,10 +10,9 @@ namespace mpc::sampler
 
 	class NoteParameters
 		: public virtual ctoot::mpc::MpcNoteParameters
-		, public moduru::observer::Observable
 	{
 	public:
-		int getSndNumber() override;
+		int getSoundIndex() override;
 		int getSoundGenerationMode() override;
 		int getOptionalNoteA() override;
 		int getOptionalNoteB() override;
@@ -41,7 +39,7 @@ namespace mpc::sampler
 	private:
 		std::shared_ptr<ctoot::mpc::MpcStereoMixerChannel> stereoMixerChannel = std::make_shared<ctoot::mpc::MpcStereoMixerChannel>();
 		std::shared_ptr<ctoot::mpc::MpcIndivFxMixerChannel> indivFxMixerChannel = std::make_shared<ctoot::mpc::MpcIndivFxMixerChannel>();
-		int soundNumber = -1;
+		int soundIndex = -1;
 		int soundGenerationMode = 0;
 		int velocityRangeLower = 0;
 		int optionalNoteA = 0;
@@ -69,7 +67,7 @@ namespace mpc::sampler
 
 	public:
 		void setSoundNumberNoLimit(int i);
-		void setSoundNumber(int i);
+		void setSoundIndex(int i);
 		void setSoundGenMode(int i);
 		void setVeloRangeLower(int i);
 		int getVelocityRangeLower();

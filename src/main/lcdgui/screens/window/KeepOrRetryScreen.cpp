@@ -52,7 +52,7 @@ void KeepOrRetryScreen::function(int i)
 		sampler.lock()->playPreviewSample(0, sampler.lock()->getPreviewSound().lock()->getLastFrameIndex(), 0, 2);
 		break;
 	case 4:
-		sampler.lock()->getLastNp(program.lock().get())->setSoundNumber(sampler.lock()->getSoundCount() - 1);
+		sampler.lock()->getLastNp(program.lock().get())->setSoundIndex(sampler.lock()->getSoundCount() - 1);
 		sampler.lock()->setSoundIndex(sampler.lock()->getSoundCount() - 1);
 		openScreen("sample");
 		break;

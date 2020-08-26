@@ -87,7 +87,7 @@ void VeloEnvFilterScreen::update(moduru::observer::Observable* observable, nonst
 void VeloEnvFilterScreen::displayNote()
 {
 	auto noteParameters = sampler.lock()->getLastNp(program.lock().get());
-	auto soundIndex = noteParameters->getSndNumber();
+	auto soundIndex = noteParameters->getSoundIndex();
 	auto padIndex = program.lock()->getPadIndexFromNote(noteParameters->getNumber());
 	auto padName = padIndex != -1 ? sampler.lock()->getPadName(padIndex) : "OFF";
 	auto sampleName = soundIndex != -1 ? sampler.lock()->getSoundName(soundIndex) : "OFF";

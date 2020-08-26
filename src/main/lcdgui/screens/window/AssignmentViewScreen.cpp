@@ -147,7 +147,7 @@ void AssignmentViewScreen::displayPad(int i)
 
 	if (note != 34)
 	{
-		auto sampleNumber = program.lock()->getNoteParameters(note)->getSndNumber();
+		auto sampleNumber = program.lock()->getNoteParameters(note)->getSoundIndex();
 		sampleName = sampleNumber != -1 ? sampler.lock()->getSoundName(sampleNumber) : "--";
 	
 		if (sampleName.length() > 8)
@@ -187,7 +187,7 @@ void AssignmentViewScreen::displayInfo2()
 		return;
 	}
 
-	int sampleNumber = program.lock()->getNoteParameters(note)->getSndNumber();
+	int sampleNumber = program.lock()->getNoteParameters(note)->getSoundIndex();
 
 	string sampleName = sampleNumber != -1 ? sampler.lock()->getSoundName(sampleNumber) : "";
 

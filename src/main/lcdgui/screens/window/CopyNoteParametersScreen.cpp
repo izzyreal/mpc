@@ -79,7 +79,7 @@ void CopyNoteParametersScreen::displayNote0()
 	auto note0 = mpc.getNote();
 	auto program = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(prog0).lock());
 	auto padIndex = program->getPadIndexFromNote(note0);
-	auto soundIndex = note0 != -1 ? program->getNoteParameters(note0 )->getSndNumber() : -1;
+	auto soundIndex = note0 != -1 ? program->getNoteParameters(note0 )->getSoundIndex() : -1;
 	auto noteText = note0 == -1 ? "--" : to_string(note0);
 	auto padName = padIndex != -1 ? sampler.lock()->getPadName(padIndex) : "OFF";
 	auto sampleName = soundIndex != -1 ? "-" + sampler.lock()->getSoundName(soundIndex) : "-OFF";
@@ -100,7 +100,7 @@ void CopyNoteParametersScreen::displayNote1()
 {
 	auto program = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(prog1).lock());
 	auto padIndex = program->getPadIndexFromNote(note1 + 35);
-	auto soundIndex = note1 != -1 ? program->getNoteParameters(note1 + 35)->getSndNumber() : -1;
+	auto soundIndex = note1 != -1 ? program->getNoteParameters(note1 + 35)->getSoundIndex() : -1;
 	auto noteText = note1 == -1 ? "--" : to_string(note1 + 35);
 	auto padName = padIndex != -1 ? sampler.lock()->getPadName(padIndex) : "OFF";
 	auto sampleName = soundIndex != -1 ? "-" + sampler.lock()->getSoundName(soundIndex) : "-OFF";

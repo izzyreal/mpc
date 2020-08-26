@@ -29,7 +29,7 @@ void AutoChromaticAssignmentScreen::open()
 
 	init();
 
-	setSourceSoundIndex(sampler.lock()->getLastNp(program.lock().get())->getSndNumber());
+	setSourceSoundIndex(sampler.lock()->getLastNp(program.lock().get())->getSoundIndex());
 	displayOriginalKey();
 	displayTune();
 	displayProgramName();
@@ -62,7 +62,7 @@ void AutoChromaticAssignmentScreen::function(int i)
 			pad->setNote(j);
 			auto noteParameters = new NoteParameters(j - 35);
 			newProgram->setNoteParameters(j - 35, noteParameters);
-			noteParameters->setSoundNumber(sourceSoundIndex);
+			noteParameters->setSoundIndex(sourceSoundIndex);
 			noteParameters->setTune(((j - originalKey) * 10) + tune);
 		}
 
@@ -91,7 +91,7 @@ void AutoChromaticAssignmentScreen::turnWheel(int i)
 	{
 		mpc.setPadAndNote(mpc.getPad(), mpc.getNote() + i);
 		displaySource();
-		setSourceSoundIndex(sampler.lock()->getLastNp(program.lock().get())->getSndNumber());
+		setSourceSoundIndex(sampler.lock()->getLastNp(program.lock().get())->getSoundIndex());
 	}
 	else if (param.compare("program-name") == 0)
 	{
@@ -179,6 +179,6 @@ void AutoChromaticAssignmentScreen::update(moduru::observer::Observable* observa
 	if (msg.compare("padandnote") == 0)
 	{
 		displaySource();
-		setSourceSoundIndex(sampler.lock()->getLastNp(program.lock().get())->getSndNumber());
+		setSourceSoundIndex(sampler.lock()->getLastNp(program.lock().get())->getSoundIndex());
 	}
 }

@@ -105,7 +105,7 @@ void LoadASoundScreen::keepSound()
 	if (mpc.getNote() != 34)
 	{
 		auto noteParameters = dynamic_cast<mpc::sampler::NoteParameters*>(program.lock()->getNoteParameters(mpc.getNote()));
-		noteParameters->setSoundNumber(sampler.lock()->getSoundCount() - 1);
+		noteParameters->setSoundIndex(sampler.lock()->getSoundCount() - 1);
 
 		if (sound.lock()->isLoopEnabled())
 			noteParameters->setVoiceOverlap(2);

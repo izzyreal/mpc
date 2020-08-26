@@ -166,7 +166,7 @@ void ChannelSettingsScreen::displayChannel()
 void ChannelSettingsScreen::displayNoteField()
 {
 	string soundName = "OFF";
-	auto soundIndex = program.lock()->getNoteParameters(note)->getSndNumber();
+	auto soundIndex = program.lock()->getNoteParameters(note)->getSoundIndex();
 
 	if (soundIndex >= 0 && soundIndex < sampler.lock()->getSoundCount())
 	{

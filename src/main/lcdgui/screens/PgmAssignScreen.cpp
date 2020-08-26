@@ -161,11 +161,11 @@ void PgmAssignScreen::turnWheel(int i)
 	}
 	else if (param.compare("snd") == 0)
  {		
-		lastNoteParameters->setSoundNumber(sampler.lock()->getNextSoundIndex(lastNoteParameters->getSndNumber(), i > 0));
+		lastNoteParameters->setSoundIndex(sampler.lock()->getNextSoundIndex(lastNoteParameters->getSoundIndex(), i > 0));
 
 		displaySoundName();
 
-		auto sound = sampler.lock()->getSound(lastNoteParameters->getSndNumber()).lock();
+		auto sound = sampler.lock()->getSound(lastNoteParameters->getSoundIndex()).lock();
 		
 		if (sound)
 		{
@@ -226,7 +226,7 @@ void PgmAssignScreen::openWindow()
 	}
 	else if (param.compare("snd") == 0)
 	{
-		auto sn = sampler.lock()->getLastNp(program.lock().get())->getSndNumber();
+		auto sn = sampler.lock()->getLastNp(program.lock().get())->getSoundIndex();
 		if (sn != -1)
 		{
 			sampler.lock()->setSoundIndex(sn);
@@ -243,7 +243,7 @@ void PgmAssignScreen::displayPgm()
 
 void PgmAssignScreen::displaySoundName()
 {
-	int sndNumber = sampler.lock()->getLastNp(program.lock().get())->getSndNumber();
+	int sndNumber = sampler.lock()->getLastNp(program.lock().get())->getSoundIndex();
 
 	if (sndNumber == -1)
 	{

@@ -28,8 +28,8 @@ ProgramImportAdapter::ProgramImportAdapter(
 	{
 		auto noteParameters = dynamic_cast<NoteParameters*>(lResult->getNoteParameters(i));
 		
-		if (find(begin(unavailableSoundIndices), end(unavailableSoundIndices), noteParameters->getSndNumber()) != end(unavailableSoundIndices))
-			noteParameters->setSoundNumber(-1);
+		if (find(begin(unavailableSoundIndices), end(unavailableSoundIndices), noteParameters->getSoundIndex()) != end(unavailableSoundIndices))
+			noteParameters->setSoundIndex(-1);
 
 		processNoteParameters(noteParameters);
 		initMixer(i);
@@ -38,22 +38,22 @@ ProgramImportAdapter::ProgramImportAdapter(
 
 void ProgramImportAdapter::processNoteParameters(NoteParameters* np)
 {
-	auto const pgmSoundNumber = np->getSndNumber();
+	auto const pgmSoundNumber = np->getSoundIndex();
 	
 	if (pgmSoundNumber == -1)
 		return;
 
 	if (soundsDestIndex[pgmSoundNumber] >= sampler.lock()->getSoundCount())
-		np->setSoundNumber(-1);
+		np->setSoundIndex(-1);
 	else
-		np->setSoundNumber(soundsDestIndex[pgmSoundNumber]);
+		np->setSoundIndex(soundsDestIndex[pgmSoundNumber]);
 }
 
 void ProgramImportAdapter::initMixer(int note)
 {
 	auto lResult = result.lock();
 	auto noteParameters = dynamic_cast<NoteParameters*>(lResult->getNoteParameters(note));
-	auto sound = sampler.lock()->getSound(noteParameters->getSndNumber()).lock();
+	auto sound = sampler.lock()->getSound(noteParameters->getSoundIndex()).lock();
 
 	if (!sound)
 		return;

@@ -168,7 +168,7 @@ void Sampler::playMetronome(mpc::sequencer::NoteEvent* event, int framePos)
 	{
 		auto program = mpc.getDrum(metronomeSoundScreen->getMetronomeSound() - 1)->getProgram();
 		auto accent = event->getVelocity() == metronomeSoundScreen->getAccentVelo();
-		soundNumber = programs[program]->getNoteParameters(accent ? metronomeSoundScreen->getAccentNote() : metronomeSoundScreen->getNormalNote())->getSndNumber();
+		soundNumber = programs[program]->getNoteParameters(accent ? metronomeSoundScreen->getAccentNote() : metronomeSoundScreen->getNormalNote())->getSoundIndex();
 	}
 	
 	mpc.getBasicPlayer()->mpcNoteOn(soundNumber, event->getVelocity(), framePos);
@@ -391,7 +391,7 @@ void Sampler::setLoopEnabled(int sampleIndex, bool enabled)
 		
 		for (int i = 0; i < 64; i++)
 		{
-			if (p->getNoteParameters(i + 35)->getSndNumber() == sampleIndex)
+			if (p->getNoteParameters(i + 35)->getSoundIndex() == sampleIndex)
 				dynamic_cast<mpc::sampler::NoteParameters*>(p->getNoteParameters(i + 35))->setVoiceOverlap(2);
 		}
 	}
@@ -504,7 +504,7 @@ void Sampler::deleteAllSamples()
 			continue;
 
 		for (auto& n : p->getNotesParameters())
-			n->setSoundNumber(-1);
+			n->setSoundIndex(-1);
 	}
 }
 
@@ -757,8 +757,8 @@ vector<weak_ptr<Sound>> Sampler::getUsedSounds()
 	
 		for (auto& nn : p->getNotesParameters())
 		{
-			if (nn->getSndNumber() != -1)
-				usedSounds.emplace(sounds[nn->getSndNumber()]);
+			if (nn->getSoundIndex() != -1)
+				usedSounds.emplace(sounds[nn->getSoundIndex()]);
 		}
 	}
 	return vector<weak_ptr<Sound>>(begin(usedSounds), end(usedSounds));
@@ -827,14 +827,14 @@ void Sampler::deleteSound(weak_ptr<Sound> sound)
 				if (find(correctedNoteParameters.begin(), correctedNoteParameters.end(), noteParameters) != correctedNoteParameters.end())
 					continue;
 			
-				if (noteParameters->getSndNumber() == oldMemoryIndex)
+				if (noteParameters->getSoundIndex() == oldMemoryIndex)
 				{
-					noteParameters->setSoundNumber(i);
+					noteParameters->setSoundIndex(i);
 					correctedNoteParameters.push_back(noteParameters);
 				}
-				else if (noteParameters->getSndNumber() == index)
+				else if (noteParameters->getSoundIndex() == index)
 				{
-					noteParameters->setSoundNumber(-1);
+					noteParameters->setSoundIndex(-1);
 					correctedNoteParameters.push_back(noteParameters);
 				}
 			}

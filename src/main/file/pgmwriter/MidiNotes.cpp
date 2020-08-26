@@ -14,10 +14,10 @@ MidiNotes::MidiNotes(mpc::sampler::Program* program, vector<int> snConvTable)
 	{
 		auto nn = program->getNoteParameters(i + 35);
 
-		if (nn->getSndNumber() == -1)
+		if (nn->getSoundIndex() == -1)
 			setSampleSelect(i, 255);
 		else
-			setSampleSelect(i, snConvTable[nn->getSndNumber()]);
+			setSampleSelect(i, snConvTable[nn->getSoundIndex()]);
 
 		setSoundGenerationMode(i, nn->getSoundGenerationMode());
 		setVelocityRangeLower(i, dynamic_cast<mpc::sampler::NoteParameters*>(nn)->getVelocityRangeLower());

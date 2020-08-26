@@ -93,7 +93,7 @@ void PgmToProgramConverter::setNoteParameters()
 		programNoteParameters->setOptionalNoteB(pgmNoteParameters->getAlsoPlayUse2(i));
 		
 		auto sampleSelect = pgmNoteParameters->getSampleSelect(i);
-		programNoteParameters->setSoundNumberNoLimit(sampleSelect == 255 ? -1 : sampleSelect);
+		programNoteParameters->setSoundIndex(sampleSelect == 255 ? -1 : sampleSelect);
 		programNoteParameters->setSliderParameterNumber(pgmNoteParameters->getSliderParameter(i));
 		programNoteParameters->setSoundGenMode(pgmNoteParameters->getSoundGenerationMode(i));
 		programNoteParameters->setTune(pgmNoteParameters->getTune(i));

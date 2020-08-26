@@ -139,7 +139,7 @@ void Assign16LevelsScreen::displayNote()
     auto pgmNumber = sampler.lock()->getDrumBusProgramNumber(track.lock()->getBus());
     auto program = sampler.lock()->getProgram(pgmNumber).lock();
     auto pn = program->getPadIndexFromNote(note);
-    auto sn = program->getNoteParameters(note)->getSndNumber();
+    auto sn = program->getNoteParameters(note)->getSoundIndex();
     auto soundName = sn == -1 ? "(No sound)" : sampler.lock()->getSoundName(sn);
  
     findField("note").lock()->setText(to_string(note) + "/" + sampler.lock()->getPadName(pn) + "-" + soundName);

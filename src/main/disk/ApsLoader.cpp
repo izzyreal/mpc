@@ -171,7 +171,7 @@ void ApsLoader::load()
 			if (find(begin(unavailableSoundIndices), end(unavailableSoundIndices), soundIndex) != end(unavailableSoundIndices))
 				soundIndex = -1;
 
-			destNoteParams->setSoundNumber(soundIndex);
+			destNoteParams->setSoundIndex(soundIndex);
 			destNoteParams->setTune(srcNoteParams->getTune());
 			destNoteParams->setVoiceOverlap(srcNoteParams->getVoiceOverlap());
 			destNoteParams->setDecayMode(srcNoteParams->getDecayMode());

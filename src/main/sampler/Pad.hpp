@@ -1,15 +1,13 @@
 #pragma once
 
-#include <observer/Observable.hpp>
-
 #include <memory>
+#include <vector>
 
 namespace mpc { class Mpc; }
 
 namespace mpc::sampler
 {
 	class Pad
-		: public moduru::observer::Observable
 	{
 
 	private:
@@ -17,7 +15,6 @@ namespace mpc::sampler
 		
 	public:
 		static std::vector<int>& getPadNotes(mpc::Mpc& mpc);
-		
 
 	private:
 		mpc::Mpc& mpc;

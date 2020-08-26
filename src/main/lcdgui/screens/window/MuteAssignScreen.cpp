@@ -55,7 +55,7 @@ void MuteAssignScreen::displayNote()
 	auto pad = program.lock()->getPadIndexFromNote(note);
 	string soundName = "OFF";
 	auto padName = pad == -1 ? "OFF" : sampler.lock()->getPadName(pad);
-	auto sound = program.lock()->getNoteParameters(note)->getSndNumber();
+	auto sound = program.lock()->getNoteParameters(note)->getSoundIndex();
 	if (sound != -1) soundName = sampler.lock()->getSoundName(sound);
 
 	findField("note").lock()->setText(to_string(note) + "/" + padName + "-" + soundName);
@@ -74,7 +74,7 @@ void MuteAssignScreen::displayNote0()
 
 	auto pad = program.lock()->getPadIndexFromNote(note0);
 	string soundName = "OFF";
-	auto sound = program.lock()->getNoteParameters(note0)->getSndNumber();
+	auto sound = program.lock()->getNoteParameters(note0)->getSoundIndex();
 	
 	if (sound != -1)
 	{
@@ -96,7 +96,7 @@ void MuteAssignScreen::displayNote1()
 	
 	auto pad = program.lock()->getPadIndexFromNote(note1);
 	string soundName = "OFF";
-	auto sound = program.lock()->getNoteParameters(note1)->getSndNumber();
+	auto sound = program.lock()->getNoteParameters(note1)->getSoundIndex();
 
 	if (sound != -1)
 	{

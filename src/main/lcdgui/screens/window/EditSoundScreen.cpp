@@ -715,7 +715,7 @@ void EditSoundScreen::function(int j)
 					auto pad = p->getPad(i);
 					auto note = pad->getNote();
 					auto noteParameters = p->getNoteParameters(note);
-					dynamic_cast<mpc::sampler::NoteParameters*>(noteParameters)->setSoundNumber(sampler.lock()->getSoundCount() - zoneCount + i);
+					dynamic_cast<mpc::sampler::NoteParameters*>(noteParameters)->setSoundIndex(sampler.lock()->getSoundCount() - zoneCount + i);
 				}
 
 				auto s = sequencer.lock()->getSequence(sequencer.lock()->getActiveSequenceIndex()).lock();

@@ -38,8 +38,8 @@ ApsNoteParameters::ApsNoteParameters(vector<char> loadBytes)
 
 ApsNoteParameters::ApsNoteParameters(mpc::sampler::NoteParameters* np)
 {
-	saveBytes[0] = np->getSndNumber() == -1 ? '\xff' : np->getSndNumber();
-	saveBytes[1] = np->getSndNumber() == -1 ? '\xff' : '\x00';
+	saveBytes[0] = np->getSoundIndex() == -1 ? '\xff' : np->getSoundIndex();
+	saveBytes[1] = np->getSoundIndex() == -1 ? '\xff' : '\x00';
 	saveBytes[2] = np->getSoundGenerationMode();
 	saveBytes[3] = np->getVelocityRangeLower();
 	saveBytes[4] = np->getOptionalNoteA() == 34 ? 0 : np->getOptionalNoteA();

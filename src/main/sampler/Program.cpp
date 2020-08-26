@@ -44,7 +44,7 @@ int Program::getNumberOfSamples()
 	{
         auto np = getNoteParameters(i + 35);
         
-		if(np->getSndNumber() != -1)
+		if(np->getSoundIndex() != -1)
 			counter++;
     }
     
@@ -127,15 +127,10 @@ void Program::setMidiProgramChange(int i)
 		return;
 
 	midiProgramChange = i;
-	
-	notifyObservers(string("midiprogramchange"));
 }
 
 void Program::initPadAssign()
 {
-	sampler->getLastNp(this)->deleteObservers();
-	sampler->getLastPad(this)->deleteObservers();
-
 	for (int i = 0; i < 64; i++)
 		pads[i]->setNote((*sampler->getInitMasterPadAssign())[i]);
 }
