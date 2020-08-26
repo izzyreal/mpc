@@ -14,6 +14,7 @@
 #include <lcdgui/screens/SecondSeqScreen.hpp>
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <lcdgui/screens/window/CountMetronomeScreen.hpp>
+#include <lcdgui/screens/window/IgnoreTempoChangeScreen.hpp>
 #include <lcdgui/screens/UserScreen.hpp>
 #include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
 
@@ -54,7 +55,7 @@ void Sequencer::init()
 	nextsq = -1;
 	previousTempo = 0.0;
 	
-	auto userScreen = dynamic_pointer_cast<UserScreen>(mpc.screens->getScreenComponent("user"));
+	auto userScreen = mpc.screens->get<UserScreen>("user");
 	defaultSequenceName = StrUtil::trim(userScreen->sequenceName);
 	
 	for (int i = 0; i < 64; i++)
@@ -207,9 +208,17 @@ double Sequencer::getTempo()
 	auto seq = getActiveSequence().lock();
 	auto tce = getCurrentTempoChangeEvent().lock();
 
+	if (mpc.getLayeredScreen().lock()->getCurrentScreenName().compare("song") == 0)
+	{
+		if (!seq->isUsed())
+			return 120.0;
+	}
+
 	if (tempoSourceSequenceEnabled)
 	{
-		if (seq->isTempoChangeOn() && tce)
+		auto ignoreTempoChangeScreen = mpc.screens->get<IgnoreTempoChangeScreen>("ignore-tempo-change");
+
+		if (seq->isTempoChangeOn() && tce && (!songMode || !ignoreTempoChangeScreen->ignore))
 			return tce->getTempo();
 
 		return getActiveSequence().lock()->getInitialTempo();
@@ -217,7 +226,7 @@ double Sequencer::getTempo()
 
 	if (seq->isTempoChangeOn() && tce)
 		return tempo * tce->getRatio() * 0.001;
-
+	
 	return tempo;
 }
 
@@ -225,7 +234,10 @@ weak_ptr<TempoChangeEvent> Sequencer::getCurrentTempoChangeEvent()
 {
 	auto index = -1;
 	auto s = getActiveSequence().lock();
-	
+
+	if (!s->isUsed())
+		return {};
+
 	for (auto& tce : s->getTempoChangeEvents())
 	{
 		auto lTce = tce.lock();
@@ -250,7 +262,7 @@ void Sequencer::setTempoSourceSequence(bool b)
 {
 	tempoSourceSequenceEnabled = b;
 	
-	notifyObservers(string("temposource"));
+	notifyObservers(string("tempo-source"));
 	notifyObservers(string("tempo"));
 }
 
@@ -415,28 +427,23 @@ void Sequencer::play(bool fromStart)
 	if (songMode)
 	{
 		if (!currentSong->isUsed())
-		{
 			return;
-		}
 
 		if (fromStart)
-		{
 			songScreen->setOffset(-1);
-		}
 		
 		if (songScreen->getOffset() + 1 > currentSong->getStepCount() - 1)
-		{
 			return;
-		}
 		
 		int step = songScreen->getOffset() + 1;
 		
 		if (step > currentSong->getStepCount())
-		{
 			step = currentSong->getStepCount() - 1;
-		}
 		
 		currentStep = currentSong->getStep(step).lock();
+
+		if (!sequences[currentStep->getSequence()]->isUsed())
+			return;
 	}
 
 	move(position);
@@ -449,9 +456,7 @@ void Sequencer::play(bool fromStart)
     if (!countEnabled || countInMode == 0 || (countInMode == 1 && recording == false))
 	{
 		if (fromStart)
-		{
 			move(0);
-		}
     }
 	
 	auto s = getActiveSequence().lock();
@@ -1367,7 +1372,8 @@ void Sequencer::tap()
 		accum += l1 - l0;
 	}
 
-	if (accum == 0) return;
+	if (accum == 0)
+		return;
 
 	auto tempo = (60000.0 * 1000000.0) / (accum / ((int)(tapsLong.size()) - 1));
 	tempo = floor(tempo * 10) / 10;
@@ -1400,12 +1406,7 @@ void Sequencer::move(int tick)
 	}
 
 	notifyTimeDisplay();
-
-	//if (getTempo() != previousTempo)
-	//{
-		//previousTempo = getTempo();	
 	notifyObservers(string("tempo"));
-	//}
 }
 
 int Sequencer::getTickPosition()

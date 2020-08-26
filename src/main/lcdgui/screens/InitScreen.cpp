@@ -25,7 +25,7 @@ void InitScreen::function(int i)
 		break;
 	case 5:
 	{
-		auto userScreen = dynamic_pointer_cast<UserScreen>(mpc.screens->getScreenComponent("user"));
+		auto userScreen = mpc.screens->get<UserScreen>("user");
 		userScreen->resetPreferences();
 
 		auto setupScreen = dynamic_pointer_cast<SetupScreen>(mpc.screens->getScreenComponent("setup"));

@@ -75,7 +75,7 @@ AllLoader::AllLoader(mpc::Mpc& mpc, mpc::disk::MpcFile* file, bool sequencesOnly
 		allSequences = allParser.getAllSequences();
 		auto defaults = allParser.getDefaults();
 		
-		auto userScreen = dynamic_pointer_cast<UserScreen>(mpc.screens->getScreenComponent("user"));
+		auto userScreen = mpc.screens->get<UserScreen>("user");
 
 		userScreen->setLastBar(defaults->getBarCount() - 1);
 		userScreen->setBus(defaults->getBusses()[0]);

@@ -111,6 +111,7 @@
 #include <lcdgui/screens/window/TransposePermanentScreen.hpp>
 #include <lcdgui/screens/window/SoundMemoryScreen.hpp>
 #include <lcdgui/screens/window/SongWindow.hpp>
+#include <lcdgui/screens/window/IgnoreTempoChangeScreen.hpp>
 
 #include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
 #include <lcdgui/screens/dialog/MidiMonitorScreen.hpp>
@@ -896,6 +897,10 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	else if (screenName.compare("vmpc-file-in-use") == 0)
 	{
 		screen = make_shared<VmpcFileInUseScreen>(mpc, layerIndex);
+	}
+	else if (screenName.compare("ignore-tempo-change") == 0)
+	{
+		screen = make_shared<IgnoreTempoChangeScreen>(mpc, layerIndex);
 	}
 
 	if (screen)

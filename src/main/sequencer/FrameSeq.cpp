@@ -97,7 +97,7 @@ void FrameSeq::work(int nFrames)
 	bool punchOut = punchScreen->autoPunch == 1 || punchScreen->autoPunch == 2;
 
 	auto sequencerScreen = dynamic_pointer_cast<SequencerScreen>(mpc.screens->getScreenComponent("sequencer"));
-	auto userScreen = dynamic_pointer_cast<UserScreen>(mpc.screens->getScreenComponent("user"));
+	auto userScreen = mpc.screens->get<UserScreen>("user");
 
 	for (int i = 0; i < nFrames; i++)
 	{
@@ -202,6 +202,11 @@ void FrameSeq::work(int nFrames)
 							{
 								lSequencer->resetPlayedStepRepetitions();
 								songScreen->setOffset(songScreen->getOffset() + 1);
+								
+								auto newStep = song->getStep(songScreen->getOffset() + 1).lock();
+								
+								if (!lSequencer->getSequence(newStep->getSequence()).lock()->isUsed())
+									lSequencer->stop();
 							}
 							
 							move(0);

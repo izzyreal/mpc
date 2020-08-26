@@ -53,7 +53,7 @@ void EventsScreen::open()
 
 	if (!seq->isUsed())
 	{
-		auto userScreen = dynamic_pointer_cast<UserScreen>(mpc.screens->getScreenComponent("user"));
+		auto userScreen = mpc.screens->get<UserScreen>("user");
 		seq->init(userScreen->lastBar);
 	}
 
@@ -73,7 +73,6 @@ void EventsScreen::open()
 
 void EventsScreen::close()
 {
-	Util::initSequence(mpc);
 	mpc.deleteObserver(this);
 }
 

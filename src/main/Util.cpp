@@ -29,15 +29,20 @@ vector<int> Util::getPadAndVelo(const int x, const int y)
 	int padPosY = 343;
 	int xPos = -1;
 	int yPos = -1;
-	for (int j = 0; j < 4; j++) {
-		for (int i = 0; i < 4; i++) {
+
+	for (int j = 0; j < 4; j++)
+	{
+		for (int i = 0; i < 4; i++)
+		{
 			int xborderl = padPosX + (i * padSize) + (i * (emptySize + (i * 2)));
 			int xborderr = xborderl + padSize;
 			int yborderu = padPosY + (j * padSize) + (j * (emptySize + (j * 2)));
 			int yborderd = yborderu + padSize;
 			int centerx = xborderl + (padSize / 2);
 			int centery = yborderu + (padSize / 2);
-			if (x > xborderl && x < xborderr && y > yborderu && y < yborderd) {
+		
+			if (x > xborderl && x < xborderr && y > yborderu && y < yborderd)
+			{
 				xPos = i;
 				yPos = j;
 				int distcx = abs(centerx - x);
@@ -47,9 +52,10 @@ vector<int> Util::getPadAndVelo(const int x, const int y)
 			}
 		}
 	}
-    if (yPos == -1 || yPos == -1) {
+
+    if (yPos == -1 || yPos == -1)
         return vector<int>{ -1, -1 };
-    }
+ 
 	int padNumber = -1;
 	vector<int> column0 = { 12, 8, 4, 0 };
 	vector<int> column1 = { 13, 9, 5, 1 };
@@ -72,9 +78,7 @@ string Util::getFileName(const string& s)
 	{
 		c = toupper(c);
         if (c == ' ')
-		{
             c = '_';
-        }
 	}
 	return copy;
 }
@@ -88,6 +92,7 @@ vector<string> Util::splitName(const string& s)
 		res[1] = "";
 		return res;
 	}
+
 	size_t i = s.find_last_of(".");
 	vector<string> res(2);
 	res[0] = s.substr(0, i);
@@ -98,9 +103,10 @@ vector<string> Util::splitName(const string& s)
 string Util::distributeTimeSig(const string& s)
 {
 	const auto pos = s.find("/");
-    if (pos == string::npos) {
+ 
+	if (pos == string::npos)
         return s;
-    }
+ 
 	auto s0 = s.substr(0, pos);
 	auto s1 = s.substr(pos + 1, s.length());
 
@@ -192,12 +198,9 @@ string Util::tempoString(const double tempo)
 	string result = to_string(tempo);
 	
 	if (result.find(".") == string::npos)
-	{
 		result += ".0";
-	}
-	else {
+	else
 		result = result.substr(0, result.find(".") + 2);
-	}
 
 	return replaceDotWithSmallSpaceDot(result);
 }
@@ -228,13 +231,13 @@ int Util::getTextWidthInPixels(const string& text)
 
 void Util::initSequence(mpc::Mpc& mpc)
 {
-	auto userScreen = dynamic_pointer_cast<UserScreen>(mpc.screens->getScreenComponent("user"));
 	auto sequencer = mpc.getSequencer().lock();
 	auto sequence = sequencer->getActiveSequence().lock();
 
 	if (sequence->isUsed())
 		return;
 
+	auto userScreen = mpc.screens->get<UserScreen>("user");
 	sequence->init(userScreen->lastBar);
 	int index = sequencer->getActiveSequenceIndex();
 	string name = StrUtil::trim(sequencer->getDefaultSequenceName()) + StrUtil::padLeft(to_string(index + 1), "0", 2);

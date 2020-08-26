@@ -21,7 +21,7 @@ namespace mpc::lcdgui::screens
 		std::string defaultSongName = "Song";
 		bool loop = false;
 
-		void setSelectedSongIndex(int i);
+		void setActiveSongIndex(int i);
 
 	public:
 		void setOffset(int i);

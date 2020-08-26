@@ -34,7 +34,7 @@ void NvRam::loadUserScreenValues(mpc::Mpc& mpc)
 		return;
 
 	auto defaults = DefaultsParser::AllDefaultsFromFile(mpc, file);
-	auto userScreen = dynamic_pointer_cast<UserScreen>(mpc.screens->getScreenComponent("user"));
+	auto userScreen = mpc.screens->get<UserScreen>("user");
 
 	userScreen->lastBar = defaults.getBarCount() - 1;
 	userScreen->bus = defaults.getBusses()[0];

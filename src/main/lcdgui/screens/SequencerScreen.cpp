@@ -37,6 +37,12 @@ SequencerScreen::SequencerScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void SequencerScreen::open()
 {
+	findField("loop").lock()->setAlignment(Alignment::Centered);
+	findField("on").lock()->setAlignment(Alignment::Centered);
+	findField("bars").lock()->setAlignment(Alignment::Centered);
+	findField("pgm").lock()->setAlignment(Alignment::Centered);
+	findField("count").lock()->setAlignment(Alignment::Centered);
+
 	findLabel("tempo").lock()->setSize(18, 9);
 	init();
 	sequence = sequencer.lock()->getActiveSequence();
@@ -103,7 +109,7 @@ void SequencerScreen::close()
 
 void SequencerScreen::displayVelo()
 {
-	findField("velo").lock()->setText(to_string(sequencer.lock()->getActiveTrack().lock()->getVelocityRatio()));
+	findField("velo").lock()->setTextPadded(to_string(sequencer.lock()->getActiveTrack().lock()->getVelocityRatio()));
 }
 
 void SequencerScreen::displayDeviceNumber()
@@ -169,7 +175,7 @@ void SequencerScreen::displayDeviceName()
 void SequencerScreen::displayTempo()
 {
 	displayTempoLabel();
-	findField("tempo").lock()->setText(Util::tempoString(sequencer.lock()->getTempo()));
+	findField("tempo").lock()->setText(StrUtil::padLeft(Util::tempoString(sequencer.lock()->getTempo()), " ", 6));
 }
 
 void SequencerScreen::displayTempoLabel()
@@ -201,7 +207,7 @@ void SequencerScreen::displayTempoLabel()
 
 void SequencerScreen::displayTempoSource()
 {
-	findField("temposource").lock()->setText(sequencer.lock()->isTempoSourceSequenceEnabled() ? "(SEQ)" : "(MAS)");
+	findField("tempo-source").lock()->setText(sequencer.lock()->isTempoSourceSequenceEnabled() ? "(SEQ)" : "(MAS)");
 }
 
 
@@ -373,7 +379,7 @@ void SequencerScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 	{
 		displayTempo();
 	}
-	else if (s.compare("temposource") == 0)
+	else if (s.compare("tempo-source") == 0)
 	{
 		displayTempoSource();
 	}
@@ -623,7 +629,7 @@ void SequencerScreen::turnWheel(int i)
 	{
 		openScreen("change-tsig");
 	}
-	else if (param.compare("temposource") == 0)
+	else if (param.compare("tempo-source") == 0)
 	{
 		sequencer.lock()->setTempoSourceSequence(i > 0);
 	}
@@ -655,6 +661,7 @@ void SequencerScreen::openWindow()
 	
 	if (param.compare("sq") == 0)
 	{
+		Util::initSequence(mpc);
 		openScreen("sequence");
 	}
 	else if (param.find("now") != string::npos)
@@ -683,6 +690,9 @@ void SequencerScreen::openWindow()
 	}
 	else if (param.compare("tr") == 0)
 	{
+		if (!track.lock()->isUsed())
+			track.lock()->setUsed(true);
+
 		openScreen("track");
 	}
 	else if (param.compare("on") == 0)
@@ -731,9 +741,6 @@ void SequencerScreen::right()
 	if (sequencer.lock()->getNextSq() != -1)
 		return;
 
-	if (!sequence.lock()->isUsed())
-		Util::initSequence(mpc);
-
 	ScreenComponent::right();
 }
 
@@ -753,9 +760,6 @@ void SequencerScreen::down()
 
 	if (sequencer.lock()->getNextSq() != -1)
 		return;
-
-	if (!sequence.lock()->isUsed())
-		Util::initSequence(mpc);
 
 	ScreenComponent::down();
 }

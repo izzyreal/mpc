@@ -7,6 +7,8 @@
 #include <lcdgui/ScreenComponent.hpp>
 #include <lcdgui/Rectangle.hpp>
 
+#include <Util.hpp>
+
 #include <lang/StrUtil.hpp>
 
 #include <file/File.hpp>
@@ -122,6 +124,11 @@ void Field::takeFocus(string prev)
 			setActiveSplit(1);
 		}	
 	}
+	else if (csn.compare("sequencer") == 0)
+	{
+		if (name.find("now") != string::npos || name.compare("tempo") == 0)
+			Util::initSequence(mpc);
+	}
 
 	focus = true;
 	inverted = true;
@@ -150,7 +157,7 @@ void Field::loseFocus(string next)
 			screen->findLabel("tonote").lock()->setInverted(false);
 		}
 	}
-
+	
 	if (typeModeEnabled)
 		disableTypeMode();
 

@@ -143,7 +143,7 @@ void NextSeqScreen::displayTempoLabel()
 
 void NextSeqScreen::displayTempoSource()
 {
-	findField("temposource").lock()->setText(sequencer.lock()->isTempoSourceSequenceEnabled() ? "(SEQ)" : "(MAS)");
+	findField("tempo-source").lock()->setText(sequencer.lock()->isTempoSourceSequenceEnabled() ? "(SEQ)" : "(MAS)");
 }
 
 void NextSeqScreen::displayTiming()

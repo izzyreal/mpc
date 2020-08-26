@@ -43,7 +43,7 @@ Sequence::Sequence(mpc::Mpc& mpc, vector<string> defaultTrackNames)
 	metaTracks[1]->setName("midiclock");
 	metaTracks[2]->setName("tempo");
 
-	auto userScreen = dynamic_pointer_cast<UserScreen>(mpc.screens->getScreenComponent("user"));
+	auto userScreen = mpc.screens->get<UserScreen>("user");
 
 	for (int i = 0; i < 33; i++)
 		deviceNames[i] = userScreen->getDeviceName(i);
@@ -314,7 +314,7 @@ void Sequence::init(int lastBarIndex)
 {
 	used = true;
 
-	auto userScreen = dynamic_pointer_cast<UserScreen>(mpc.screens->getScreenComponent("user"));
+	auto userScreen = mpc.screens->get<UserScreen>("user");
 	initialTempo = userScreen->tempo;
 	loopEnabled = userScreen->loop;
 
