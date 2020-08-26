@@ -1,8 +1,10 @@
 #include "StereoToMonoScreen.hpp"
 
 #include <lcdgui/screens/window/NameScreen.hpp>
+#include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
 using namespace mpc::lcdgui::screens::dialog;
+using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::lcdgui::screens::window;
 using namespace moduru::lang;
 using namespace std;
@@ -16,11 +18,12 @@ void StereoToMonoScreen::open()
 {
 	auto previousScreenName = ls.lock()->getPreviousScreenName();
 
-	if (previousScreenName.compare("name") != 0)
+	if (previousScreenName.compare("name") != 0 && previousScreenName.compare("popup") != 0)
 	{
 		updateNewNames();
+		ls.lock()->setFocus("stereosource");
 	}
-
+	
 	displayNewLName();
 	displayNewRName();
 	displayStereoSource();
@@ -30,13 +33,12 @@ void StereoToMonoScreen::turnWheel(int i)
 {
 	init();
 
-	auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
+	auto nameScreen = mpc.screens->get<NameScreen>("name");
 
 	if (param.compare("stereosource") == 0)
 	{
 		sampler.lock()->setSoundIndex(sampler.lock()->getNextSoundIndex(sampler.lock()->getSoundIndex(), i > 0));
 		displayStereoSource();
-		updateNewNames();
 	}
 	else if (param.compare("newlname") == 0)
 	{
@@ -66,8 +68,18 @@ void StereoToMonoScreen::function(int i)
 		auto sound = sampler.lock()->getSound().lock();
 
 		if (sound->isMono())
-		{
 			return;
+
+		for (auto& s : sampler.lock()->getSounds())
+		{
+			if (s.lock()->getName().compare(newLName) == 0 || s.lock()->getName().compare(newRName) == 0)
+			{
+				auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+				popupScreen->setText("Name already used");
+				popupScreen->returnToScreenAfterInteraction(name);
+				ls.lock()->openScreen("popup");
+				return;
+			}
 		}
 
 		auto left = sampler.lock()->addSound(sound->getSampleRate()).lock();
@@ -99,12 +111,8 @@ void StereoToMonoScreen::function(int i)
 
 void StereoToMonoScreen::updateNewNames()
 {
-	if ( ! sampler.lock()->getSound().lock() || sampler.lock()->getSound().lock()->isMono())
-	{
-		setNewLName("");
-		setNewRName("");
+	if (! sampler.lock()->getSound().lock() || sampler.lock()->getSound().lock()->isMono())
 		return;
-	}
 
 	string name = sampler.lock()->getSound().lock()->getName();
 	name = StrUtil::trim(name);

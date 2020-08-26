@@ -39,7 +39,7 @@ void MidiOutputScreen::turnWheel(int i)
 	
 	if (param.compare("firstletter") == 0)
 	{
-		auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
+		auto nameScreen = mpc.screens->get<NameScreen>("name");
 		nameScreen->setName(seq->getDeviceName(deviceIndex + i));
 		nameScreen->parameterName = "devicename";
 		nameScreen->setNameLimit(8);

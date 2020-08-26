@@ -62,7 +62,7 @@ void KeepOrRetryScreen::function(int i)
 void KeepOrRetryScreen::turnWheel(int i)
 {
     init();
-	auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
+	auto nameScreen = mpc.screens->get<NameScreen>("name");
 	nameScreen->setName(dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getPreviewSound().lock())->getName());
 	nameScreen->parameterName = param;
     openScreen("name");

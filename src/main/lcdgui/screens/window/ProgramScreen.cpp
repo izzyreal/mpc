@@ -28,7 +28,7 @@ void ProgramScreen::turnWheel(int i)
 
 	if (param.compare("programname") == 0)
 	{
-		auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
+		auto nameScreen = mpc.screens->get<NameScreen>("name");
 		nameScreen->setName(program.lock()->getName());
 		nameScreen->parameterName = param;
         openScreen("name");
@@ -55,7 +55,7 @@ void ProgramScreen::function(int i)
 		{
 			auto popupScreen = mpc.screens->get<PopupScreen>("popup");
 			popupScreen->setText("Prog. directory full(24 max)");
-			popupScreen->returnToScreenAfterInteraction("program");
+			popupScreen->returnToScreenAfterInteraction(name);
 			ls.lock()->openScreen("popup");
 			return;
 		}

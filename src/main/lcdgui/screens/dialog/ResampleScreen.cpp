@@ -53,7 +53,7 @@ void ResampleScreen::turnWheel(int i)
 	}
 	else if (param.compare("newname") == 0)
 	{
-		auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
+		auto nameScreen = mpc.screens->get<NameScreen>("name");
 		nameScreen->setName(findField("newname").lock()->getText());
 		nameScreen->parameterName = "newname";
 		openScreen("name");

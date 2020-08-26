@@ -73,7 +73,7 @@ void VmpcDirectToDiskRecorderScreen::turnWheel(int i)
 	}
 	else if (param.compare("output-folder") == 0)
 	{
-		auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
+		auto nameScreen = mpc.screens->get<NameScreen>("name");
 		nameScreen->setName(outputFolder);
 		nameScreen->setNameLimit(8);
 		nameScreen->parameterName = "output-folder";

@@ -51,7 +51,7 @@ void SaveScreen::function(int i)
 		shared_ptr<mpc::sequencer::Sequence> seq;
 
 		auto lProgram = program.lock();
-		auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
+		auto nameScreen = mpc.screens->get<NameScreen>("name");
 
 		switch (type)
 		{

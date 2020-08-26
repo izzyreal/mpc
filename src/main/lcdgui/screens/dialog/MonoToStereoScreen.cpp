@@ -1,6 +1,11 @@
 #include "MonoToStereoScreen.hpp"
 
+#include <lcdgui/screens/window/NameScreen.hpp>
+#include <lcdgui/screens/dialog2/PopupScreen.hpp>
+
 using namespace mpc::lcdgui::screens::dialog;
+using namespace mpc::lcdgui::screens::dialog2;
+using namespace mpc::lcdgui::screens::window;
 using namespace moduru::lang;
 using namespace std;
 
@@ -11,41 +16,23 @@ MonoToStereoScreen::MonoToStereoScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void MonoToStereoScreen::open()
 {
-	if (sampler.lock()->getSound().lock())
+	auto prevScreen = ls.lock()->getPreviousScreenName();
+
+	if (sampler.lock()->getSound().lock() && prevScreen.compare("name") != 0 && prevScreen.compare("popup") != 0)
 	{
 		string name = sampler.lock()->getSound().lock()->getName();
 		name = StrUtil::trim(name);
 		name = StrUtil::padRight(name, "_", 16);
 		name = name.substr(0, 14);
-		setNewStName(name + "-S");
-		setNewStName(name + "-S");
+		newStName = name + "-S";
 	}
+
+	if (prevScreen.compare("name") != 0 && prevScreen.compare("popup") != 0)
+		ls.lock()->setFocus("lsource");
 
 	setRSource(sampler.lock()->getSoundIndex());
 	displayLSource();
-	displayRSource();
-}
-
-void MonoToStereoScreen::updateNewStName()
-{
-	if ( ! sampler.lock()->getSound().lock()->isMono() || ! sampler.lock()->getSound(rSource).lock()->isMono())
-	{
-		setNewStName("");
-		return;
-	}
-
-	auto lSourceName = sampler.lock()->getSound().lock()->getName();
-
-	if (lSourceName.length() > 14)
-	{
-		lSourceName = lSourceName.substr(0, 14);
-	}
-	else if (lSourceName.length() < 14)
-	{
-		lSourceName = StrUtil::padRight(lSourceName, "_", 14);
-	}
-
-	setNewStName(lSourceName + "_S");
+	displayNewStName();
 }
 
 void MonoToStereoScreen::turnWheel(int i)
@@ -56,20 +43,24 @@ void MonoToStereoScreen::turnWheel(int i)
 	{
 		sampler.lock()->selectPreviousSound();
 		displayLSource();
-		updateNewStName();
 
 	}
 	else if (param.compare("lsource") == 0 && i > 0)
 	{
 		sampler.lock()->selectNextSound();
 		displayLSource();
-		updateNewStName();
 	}
 	else if (param.compare("rsource") == 0)
 	{
 		setRSource(sampler.lock()->getNextSoundIndex(rSource, i > 0));
 		displayRSource();
-		updateNewStName();
+	}
+	else if (param.compare("newstname") == 0)
+	{
+		auto nameScreen = mpc.screens->get<NameScreen>("name");
+		nameScreen->setName(newStName);
+		nameScreen->parameterName = param;
+		openScreen("name");
 	}
 }
 
@@ -84,9 +75,19 @@ void MonoToStereoScreen::function(int j)
 		break;
 	case 4:
 	{
-		if ( ! sampler.lock()->getSound().lock()->isMono() || ! sampler.lock()->getSound(rSource).lock()->isMono())
-		{
+		if (!sampler.lock()->getSound().lock()->isMono() || !sampler.lock()->getSound(rSource).lock()->isMono())
 			return;
+
+		for (auto& s : sampler.lock()->getSounds())
+		{
+			if (s.lock()->getName().compare(newStName) == 0)
+			{
+				auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+				popupScreen->setText("Name already used");
+				popupScreen->returnToScreenAfterInteraction(name);
+				ls.lock()->openScreen("popup");
+				return;
+			}
 		}
 
 		auto left = sampler.lock()->getSound().lock();
@@ -99,14 +100,11 @@ void MonoToStereoScreen::function(int j)
 			newSampleDataRight = vector<float>(left->getSampleData()->size());
 
 			for (int i = 0; i < newSampleDataRight.size(); i++)
-			{
 				newSampleDataRight[i] = (*right->getSampleData())[i];
-			}
 		}
 		else
 		{
 			newSampleDataRight = *right->getSampleData();
-
 		}
 
 		auto newSound = sampler.lock()->addSound(left->getSampleRate()).lock();
@@ -121,9 +119,7 @@ void MonoToStereoScreen::function(int j)
 void MonoToStereoScreen::displayLSource()
 {
 	if (!sampler.lock()->getSound().lock())
-	{
 		return;
-	}
 
 	findField("lsource").lock()->setText(sampler.lock()->getSound().lock()->getName());
 
@@ -141,9 +137,7 @@ void MonoToStereoScreen::displayLSource()
 void MonoToStereoScreen::displayRSource()
 {
 	if (!sampler.lock()->getSound(rSource).lock())
-	{
 		return;
-	}
 
 	findField("rsource").lock()->setText(sampler.lock()->getSoundName(rSource));
 
@@ -166,17 +160,8 @@ void MonoToStereoScreen::displayNewStName()
 void MonoToStereoScreen::setRSource(int i)
 {
 	if (i < 0 || i >= sampler.lock()->getSoundCount())
-	{
 		return;
-	}
 
 	rSource = i;
 	displayRSource();
 }
-
-void MonoToStereoScreen::setNewStName(string s)
-{
-	newStName = s;
-	displayNewStName();
-}
-

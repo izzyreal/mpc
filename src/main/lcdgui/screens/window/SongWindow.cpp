@@ -51,7 +51,7 @@ void SongWindow::turnWheel(int i)
 {
 	init();
 
-	auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
+	auto nameScreen = mpc.screens->get<NameScreen>("name");
 	auto songScreen = mpc.screens->get<SongScreen>("song");
 
 	if (param.find("default") != string::npos)

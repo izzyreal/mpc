@@ -23,7 +23,7 @@ void SaveApsFileScreen::open()
 void SaveApsFileScreen::turnWheel(int i)
 {
 	init();
-	auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
+	auto nameScreen = mpc.screens->get<NameScreen>("name");
 	auto saveAProgramScreen = dynamic_pointer_cast<SaveAProgramScreen>(mpc.screens->getScreenComponent("save-a-program"));
 
 	if (param.compare("file") == 0)
@@ -54,7 +54,7 @@ void SaveApsFileScreen::function(int i)
 		break;
 	case 4:
 	{
-		auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
+		auto nameScreen = mpc.screens->get<NameScreen>("name");
 		string apsFileName = mpc::Util::getFileName(nameScreen->getName()) + ".APS";
 		apsSaver = make_unique<mpc::disk::ApsSaver>(mpc, apsFileName);
 		break;
@@ -64,7 +64,7 @@ void SaveApsFileScreen::function(int i)
 
 void SaveApsFileScreen::displayFile()
 {
-	auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
+	auto nameScreen = mpc.screens->get<NameScreen>("name");
 	findField("file").lock()->setText(nameScreen->getName());
 }
 

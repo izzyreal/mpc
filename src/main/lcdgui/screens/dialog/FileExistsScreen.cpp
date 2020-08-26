@@ -30,7 +30,7 @@ void FileExistsScreen::function(int i)
 	case 2:
 	{
 		auto disk = mpc.getDisk().lock();
-		auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
+		auto nameScreen = mpc.screens->get<NameScreen>("name");
 
 		if (ls.lock()->getPreviousScreenName().compare("save-a-program") == 0)
 		{
@@ -119,7 +119,7 @@ void FileExistsScreen::function(int i)
 	}
 	case 4:
 	{
-		auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
+		auto nameScreen = mpc.screens->get<NameScreen>("name");
 
 		vector<string> screens{ "save-a-program", "save-a-sequence", "save-aps-file", "save-all-file", "save-a-sound" };
 

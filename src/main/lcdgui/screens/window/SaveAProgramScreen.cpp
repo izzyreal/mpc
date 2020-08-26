@@ -39,7 +39,7 @@ void SaveAProgramScreen::function(int i)
 {
 	init();
 
-	auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
+	auto nameScreen = mpc.screens->get<NameScreen>("name");
 
 	switch (i)
 	{
@@ -87,6 +87,6 @@ void SaveAProgramScreen::displayReplaceSameSounds()
 
 void SaveAProgramScreen::displayFile()
 {
-	auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
+	auto nameScreen = mpc.screens->get<NameScreen>("name");
 	findLabel("file").lock()->setText(nameScreen->getName() + ".PGM");
 }

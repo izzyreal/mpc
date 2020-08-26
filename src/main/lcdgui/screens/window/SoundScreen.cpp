@@ -25,7 +25,7 @@ void SoundScreen::turnWheel(int i)
 	
 	if (param.compare("soundname") == 0)
 	{
-		auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
+		auto nameScreen = mpc.screens->get<NameScreen>("name");
 		nameScreen->setName(findField("soundname").lock()->getText());
 		nameScreen->parameterName = "soundname";
 		openScreen("name");

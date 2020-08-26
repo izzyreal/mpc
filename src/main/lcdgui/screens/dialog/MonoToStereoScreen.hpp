@@ -1,6 +1,10 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
+namespace mpc::lcdgui::screens::window {
+	class NameScreen;
+}
+
 namespace mpc::lcdgui::screens::dialog
 {
 	class MonoToStereoScreen
@@ -19,12 +23,12 @@ namespace mpc::lcdgui::screens::dialog
 		void displayLSource();
 		void displayRSource();
 		void displayNewStName();
-		void updateNewStName();
 
 		std::string newStName = "";
 		int rSource = 0;
 		void setRSource(int i);
-		void setNewStName(std::string s);
+
+		friend class mpc::lcdgui::screens::window::NameScreen;
 
 	};
 }

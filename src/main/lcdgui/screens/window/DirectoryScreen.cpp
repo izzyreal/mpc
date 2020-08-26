@@ -59,7 +59,7 @@ void DirectoryScreen::function(int f)
 	ScreenComponent::function(f);
 	
 	auto loadScreen = dynamic_pointer_cast<LoadScreen>(mpc.screens->getScreenComponent("load"));
-	auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
+	auto nameScreen = mpc.screens->get<NameScreen>("name");
 
 	switch (f)
 	{

@@ -22,7 +22,7 @@ void SaveAllFileScreen::open()
 
 void SaveAllFileScreen::displayFile()
 {
-	auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
+	auto nameScreen = mpc.screens->get<NameScreen>("name");
 
 	if (nameScreen->getName().length() < 2)
 		return;
@@ -35,7 +35,7 @@ void SaveAllFileScreen::turnWheel(int i)
 {
 	init();
 
-	auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
+	auto nameScreen = mpc.screens->get<NameScreen>("name");
 
 	if (param.compare("file") == 0)
 	{
@@ -48,7 +48,7 @@ void SaveAllFileScreen::function(int i)
 {
 	init();
 
-	auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
+	auto nameScreen = mpc.screens->get<NameScreen>("name");
 
 	switch (i)
 	{

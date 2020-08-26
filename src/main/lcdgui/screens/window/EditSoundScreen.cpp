@@ -370,7 +370,7 @@ void EditSoundScreen::turnWheel(int i)
 	}
 	else if (param.compare("new-name") == 0 && (edit == 2 || edit == 7))
 	{
-		auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
+		auto nameScreen = mpc.screens->get<NameScreen>("name");
 		nameScreen->setName(findField("new-name").lock()->getText());
 		nameScreen->parameterName =  "newname";
 

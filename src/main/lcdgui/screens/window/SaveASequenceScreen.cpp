@@ -29,7 +29,7 @@ void SaveASequenceScreen::turnWheel(int i)
 	}
 	else if (param.compare("file") == 0)
 	{
-		auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
+		auto nameScreen = mpc.screens->get<NameScreen>("name");
 		nameScreen->parameterName = "savesequencename";
 		openScreen("name");
 	}
@@ -38,7 +38,7 @@ void SaveASequenceScreen::turnWheel(int i)
 void SaveASequenceScreen::function(int i)
 {
 	init();
-	auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
+	auto nameScreen = mpc.screens->get<NameScreen>("name");
 
 	switch (i)
 	{
@@ -69,7 +69,7 @@ void SaveASequenceScreen::displaySaveAs()
 
 void SaveASequenceScreen::displayFile()
 {
-	auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
+	auto nameScreen = mpc.screens->get<NameScreen>("name");
 	auto name = nameScreen->getName();
 
 	if (name.length() < 2)

@@ -95,7 +95,7 @@ void AutoChromaticAssignmentScreen::turnWheel(int i)
 	}
 	else if (param.compare("program-name") == 0)
 	{
-		auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
+		auto nameScreen = mpc.screens->get<NameScreen>("name");
 		nameScreen->setName(newName);
 		nameScreen->parameterName = "autochrom";
 		openScreen("name");

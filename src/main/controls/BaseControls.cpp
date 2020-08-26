@@ -164,7 +164,7 @@ void BaseControls::function(int i)
 			}
 			else if (currentScreenName.compare("name") == 0)
 			{
-				auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
+				auto nameScreen = mpc.screens->get<NameScreen>("name");
 				nameScreen->editing = false;
 				ls.lock()->setLastFocus("name", "0");
 			}

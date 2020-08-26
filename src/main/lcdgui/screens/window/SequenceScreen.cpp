@@ -45,7 +45,7 @@ void SequenceScreen::turnWheel(int i)
 {
 	init();
 
-	auto nameScreen = dynamic_pointer_cast<NameScreen>(mpc.screens->getScreenComponent("name"));
+	auto nameScreen = mpc.screens->get<NameScreen>("name");
 
 	if (param.find("default") != string::npos)
 	{
