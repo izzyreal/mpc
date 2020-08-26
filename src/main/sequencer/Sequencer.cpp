@@ -218,8 +218,11 @@ double Sequencer::getTempo()
 	{
 		auto ignoreTempoChangeScreen = mpc.screens->get<IgnoreTempoChangeScreen>("ignore-tempo-change");
 
-		if (seq->isTempoChangeOn() && tce && (!songMode || !ignoreTempoChangeScreen->ignore))
-			return tce->getTempo();
+		if (seq->isTempoChangeOn() || (songMode && !ignoreTempoChangeScreen->ignore))
+		{
+			if (tce)
+				return tce->getTempo();
+		}
 
 		return getActiveSequence().lock()->getInitialTempo();
 	}
@@ -405,9 +408,8 @@ bool Sequencer::isPlaying()
 	auto frameSequencer = ams->getFrameSequencer().lock();
 	auto server = ams->getAudioServer();
 	
-	if (!server->isRunning() || !frameSequencer) {
+	if (!server->isRunning() || !frameSequencer)
 		return false;
-	}
 
 	return ams->getFrameSequencer().lock()->isRunning();
 }
