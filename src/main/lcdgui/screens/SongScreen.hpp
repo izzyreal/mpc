@@ -2,6 +2,7 @@
 #include <lcdgui/ScreenComponent.hpp>
 
 #include <memory>
+#include <thread>
 
 namespace mpc::lcdgui::screens::window
 {
@@ -16,6 +17,7 @@ namespace mpc::lcdgui::screens
 	{
 
 	private:
+		std::thread blinkThread;
 		int offset = -1;
 		int activeSongIndex = 0;
 		std::string defaultSongName = "Song";
@@ -42,6 +44,7 @@ namespace mpc::lcdgui::screens
 		void function(int i) override;
 
 		SongScreen(mpc::Mpc& mpc, const int layerIndex);
+		~SongScreen();
 
 		void open() override;
 		void close() override;

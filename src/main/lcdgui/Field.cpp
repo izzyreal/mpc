@@ -39,6 +39,12 @@ Field::Field(mpc::Mpc& mpc, const string& name, int x, int y, int width)
 	preDrawClearRect.Clear();
 }
 
+void Field::setRectangleOnly(bool b)
+{
+	rectangleOnly = b;
+	SetDirty();
+}
+
 void Field::setNextFocus(const std::string& nextFocus)
 {
 	this->nextFocus = nextFocus;
@@ -89,7 +95,8 @@ void Field::Draw(std::vector<std::vector<bool>>* pixels)
 	if (typeModeEnabled)
 		inverted = false;
 
-	TextComp::Draw(pixels);
+	if (!rectangleOnly)
+		TextComp::Draw(pixels);
 
 	if (typeModeEnabled)
 	{

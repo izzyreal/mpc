@@ -14,9 +14,20 @@ SongScreen::SongScreen(mpc::Mpc& mpc, const int layerIndex)
 {
 }
 
+SongScreen::~SongScreen()
+{
+	if (blinkThread.joinable())
+		blinkThread.join();
+}
+
 void SongScreen::open()
 {
 	findField("loop").lock()->setAlignment(Alignment::Centered);
+	for (int i = 0; i < 3; i++)
+	{
+		findField("step" + to_string(i)).lock()->setAlignment(Alignment::Centered);
+		findField("reps" + to_string(i)).lock()->setAlignment(Alignment::Centered);
+	}
 
 	init();
 	displaySongName();
@@ -188,6 +199,10 @@ void SongScreen::turnWheel(int i)
 	{
 		setLoop(i > 0);
 	}
+	else if (param.compare("step1") == 0)
+	{
+		setOffset(offset + i);
+	}
 }
 
 void SongScreen::function(int i)
@@ -264,7 +279,7 @@ void SongScreen::displaySteps()
 	
 		if (stepIndex >= 0 && stepIndex < steps)
 		{
-			stepArray[i].lock()->setTextPadded(stepIndex + 1, " ");
+			stepArray[i].lock()->setText(to_string(stepIndex + 1));
 			auto seqname = s->getSequence(song->getStep(stepIndex).lock()->getSequence()).lock()->getName();
 			sequenceArray[i].lock()->setText(StrUtil::padLeft(to_string(song->getStep(stepIndex).lock()->getSequence() + 1), "0", 2) + "-" + seqname);
 			repsArray[i].lock()->setText(to_string(song->getStep(stepIndex).lock()->getRepeats()));
@@ -329,7 +344,12 @@ void SongScreen::displaySongName()
 void SongScreen::setOffset(int i)
 {
 	if (i < -1)
-		return;
+		i = -1;
+
+	auto song = sequencer.lock()->getSong(activeSongIndex).lock();
+
+	if (i >= song->getStepCount() - 1)
+		i = song->getStepCount() - 1;
 
 	offset = i;
 
@@ -386,13 +406,31 @@ void SongScreen::update(moduru::observer::Observable* observable, nonstd::any me
 	}
 	else if (msg.compare("play") == 0)
 	{
-		findField("sequence1").lock()->setBlinking(true);
-		findField("reps1").lock()->setBlinking(true);
-	}
-	else if (msg.compare("stop") == 0)
-	{
-		findField("sequence1").lock()->setBlinking(false);
-		findField("reps1").lock()->setBlinking(false);
+		auto blinkThreadFunction = [&]
+		{
+			const auto blinkInterval = 380;
+			const auto checkInterval = 38;
+			bool on = true;
+			
+			while (sequencer.lock()->isPlaying())
+			{
+				int counter = 0;
+
+				while (counter++ * checkInterval < blinkInterval && sequencer.lock()->isPlaying())
+					this_thread::sleep_for(chrono::milliseconds(checkInterval));
+
+				auto playing = sequencer.lock()->isPlaying();
+
+				findField("sequence1").lock()->setRectangleOnly(on && playing);
+				findField("reps1").lock()->setRectangleOnly(on && playing);
+				on = !on;
+			}
+		};
+
+		if (blinkThread.joinable())
+			blinkThread.join();
+
+		blinkThread = std::thread(blinkThreadFunction);
 	}
 }
 
