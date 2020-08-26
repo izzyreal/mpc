@@ -113,6 +113,7 @@
 #include <lcdgui/screens/window/SongWindow.hpp>
 #include <lcdgui/screens/window/IgnoreTempoChangeScreen.hpp>
 #include <lcdgui/screens/window/LoopSongScreen.hpp>
+#include <lcdgui/screens/window/LoopSongScreen.hpp>
 
 #include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
 #include <lcdgui/screens/dialog/MidiMonitorScreen.hpp>
@@ -136,6 +137,9 @@
 #include <lcdgui/screens/dialog/DeleteFileScreen.hpp>
 #include <lcdgui/screens/dialog/DeleteFolderScreen.hpp>
 #include <lcdgui/screens/dialog/FileExistsScreen.hpp>
+#include <lcdgui/screens/dialog/DeleteAllSongScreen.hpp>
+#include <lcdgui/screens/dialog/DeleteSongScreen.hpp>
+#include <lcdgui/screens/dialog/CopySongScreen.hpp>
 #include <lcdgui/screens/dialog/VmpcRecordJamScreen.hpp>
 #include <lcdgui/screens/dialog/VmpcFileInUseScreen.hpp>
 
@@ -165,43 +169,37 @@ Screens::Screens(mpc::Mpc& mpc)
 vector<int> getFunctionKeyTypes(Value& functionKeyTypes)
 {
 	vector<int> types;
+
 	for (int i = 0; i < 6; i++)
 	{
 		if (functionKeyTypes[i].IsNull())
-		{
 			types.push_back(-1);
-		}
 		else
-		{
 			types.push_back(functionKeyTypes[i].GetInt());
-		}
 	}
+
 	return types;
 }
 
 vector<string> getFunctionKeyLabels(Value& functionKeyLabels)
 {
 	vector<string> labels;
+
 	for (int i = 0; i < 6; i++)
 	{
 		if (functionKeyLabels[i].IsNull())
-		{
 			labels.push_back("");
-		}
 		else
-		{
 			labels.push_back(functionKeyLabels[i].GetString());
-		}
 	}
+
 	return labels;
 }
 
 pair<vector<shared_ptr<Component>>, map<string, vector<string>>> Screens::get(const string& screenName, int& foundInLayer, string& firstField)
 {	
 	if (Screens::layerDocuments.empty())
-	{
 		init();
-	}
 
 	for (int i = 0; i < 4; i++)
 	{
@@ -213,9 +211,7 @@ pair<vector<shared_ptr<Component>>, map<string, vector<string>>> Screens::get(co
 	}
 
 	if (foundInLayer < 0)
-	{
 		return {};
-	}
 
 	Value& arrangement = layerDocuments[foundInLayer]->GetObject()[screenName.c_str()];
 
@@ -266,15 +262,16 @@ pair<vector<shared_ptr<Component>>, map<string, vector<string>>> Screens::get(co
 		int skipCounter = 0;
 
 		string previous = "";
+
 		for (int i = 0; i < parameters.Size(); i++)
 		{
 			if (parameters[i].IsArray())
 			{
 				vector<string> parameterTransferMap;
+				
 				for (int j = 0; j < parameters[i].Size(); j++)
-				{
 					parameterTransferMap.push_back(parameters[i][j].GetString());
-				}
+				
 				transferMap[previous] = parameterTransferMap;
 				skipCounter++;
 				continue;
@@ -304,12 +301,9 @@ pair<vector<shared_ptr<Component>>, map<string, vector<string>>> Screens::get(co
 			auto field = parameter->findField(parameterName).lock();
 
 			if (i == 0)
-			{
 				firstField = parameterName;
-			}
 
 			field->setNextFocus(nextFocus);
-
 			previous = parameterName;
 		}
 	}
@@ -372,9 +366,7 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	auto candidate = screens[screenName];
 
 	if (candidate)
-	{
 		return candidate;
-	}
 
 	shared_ptr<ScreenComponent> screen;
 
@@ -906,6 +898,18 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	else if (screenName.compare("loop-song") == 0)
 	{
 		screen = make_shared<LoopSongScreen>(mpc, layerIndex);
+	}
+	else if (screenName.compare("delete-song") == 0)
+	{
+		screen = make_shared<DeleteSongScreen>(mpc, layerIndex);
+	}
+	else if (screenName.compare("delete-all-song") == 0)
+	{
+		screen = make_shared<DeleteAllSongScreen>(mpc, layerIndex);
+	}
+	else if (screenName.compare("copy-song") == 0)
+	{
+		screen = make_shared<CopySongScreen>(mpc, layerIndex);
 	}
 
 	if (screen)

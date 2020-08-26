@@ -22,26 +22,21 @@ void DeleteSoundScreen::function(int i)
     case 2:
         openScreen("delete-all-sound");
         break;
-    case int (3):
+    case 3:
         openScreen("sound");
         break;
     case 4:
         sampler.lock()->deleteSound(sampler.lock()->getSoundIndex());
 
 		if (sampler.lock()->getSoundIndex() > sampler.lock()->getSoundCount() - 1)
-		{
 			sampler.lock()->setSoundIndex(sampler.lock()->getSoundCount() - 1);
-		}
 		
 		if (sampler.lock()->getSoundCount() > 0)
-		{
 			openScreen("sound");
-		}
 		else
-		{
 			openScreen(sampler.lock()->getPreviousScreenName());
-		}
-        break;
+
+		break;
     }
 }
 

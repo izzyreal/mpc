@@ -20,10 +20,14 @@ void CopySequenceScreen::function(int i)
 {
 	init();
 	
-	switch (i) {
+	switch (i)
+	{
 	case 2:
-		sequencer.lock()->copySequence(sq0, sq1);
+		sequencer.lock()->copySequenceParameters(sq0, sq1);
 		openScreen("sequencer");
+		break;
+	case 3:
+		openScreen("sequence");
 		break;
 	case 4:
 		sequencer.lock()->copySequence(sq0, sq1);

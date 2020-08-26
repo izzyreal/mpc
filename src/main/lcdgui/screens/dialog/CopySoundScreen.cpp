@@ -29,7 +29,8 @@ void CopySoundScreen::function(int i)
 {
 	init();
 
-	switch (i) {
+	switch (i)
+	{
 	case int(3) :
 		openScreen("sound");
 		break;

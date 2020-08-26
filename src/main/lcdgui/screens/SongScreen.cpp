@@ -118,8 +118,12 @@ void SongScreen::openWindow()
 
 	auto song = sequencer.lock()->getSong(activeSongIndex).lock();
 
-	if (!song->isUsed())
+	if (param.find("now") == string::npos && !song->isUsed())
+	{
 		song->setUsed(true);
+		auto songName = StrUtil::trim(defaultSongName) + StrUtil::padLeft(to_string(activeSongIndex + 1), "0", 2);
+		song->setName(songName);
+	}
 
 	if (param.compare("loop") == 0)
 		openScreen("loop-song");
@@ -242,8 +246,8 @@ void SongScreen::function(int i)
 		if (!song->isUsed())
 		{
 			song->setUsed(true);
-			auto newName = StrUtil::trim(defaultSongName) + StrUtil::padLeft(to_string(activeSongIndex + 1), "0", 2);
-			song->setName(newName);
+			auto songName = StrUtil::trim(defaultSongName) + StrUtil::padLeft(to_string(activeSongIndex + 1), "0", 2);
+			song->setName(songName);
 		}
 
 		displaySongName();

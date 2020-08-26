@@ -4,6 +4,11 @@
 #include <memory>
 #include <thread>
 
+namespace mpc::lcdgui::screens::dialog
+{
+	class DeleteSongScreen;
+	class CopySongScreen;
+}
 namespace mpc::lcdgui::screens::window
 {
 	class SongWindow;
@@ -61,6 +66,8 @@ namespace mpc::lcdgui::screens
 		void displaySongName();
 
 		friend class mpc::lcdgui::screens::window::SongWindow;
+		friend class mpc::lcdgui::screens::dialog::DeleteSongScreen;
+		friend class mpc::lcdgui::screens::dialog::CopySongScreen;
 		friend class mpc::lcdgui::screens::window::NameScreen;
 
 	};

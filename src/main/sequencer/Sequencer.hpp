@@ -155,6 +155,8 @@ namespace mpc::sequencer
 		void purgeAllSequences();
 		void purgeSequence(int i);
 		void copySequence(int sq0, int sq1);
+		void copySequenceParameters(const int source, const int dest);
+		void copySong(const int source, const int dest);
 
 	public:
 		void copyTrack(int sourceTrackIndex, int destinationTrackIndex, int sourceSequenceIndex, int destinationSequenceIndex);
@@ -191,6 +193,7 @@ namespace mpc::sequencer
 		void resetNextSq();
 		void setNextSqPad(int i);
 		std::weak_ptr<Song> getSong(int i);
+		void deleteSong(int i);
 		bool isSongModeEnabled();
 		void setSongModeEnabled(bool b);
 		int getSongSequenceIndex();

@@ -1,8 +1,5 @@
 #include "DeleteSequenceScreen.hpp"
 
-#include <sequencer/Sequence.hpp>
-#include <sequencer/Sequencer.hpp>
-
 #include <lang/StrUtil.hpp>
 
 using namespace mpc::lcdgui::screens::dialog;
@@ -33,7 +30,8 @@ void DeleteSequenceScreen::function(int i)
 {
 	init();
 	
-	switch (i) {
+	switch (i)
+	{
 	case 2:
 		openScreen("delete-all-sequences");
 		break;

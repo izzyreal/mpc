@@ -93,10 +93,12 @@ void Sequencer::init()
 	purgeAllSequences();
 	
 	for (int i = 0; i < 20; i++)
-	{
 		songs[i] = make_shared<Song>();
-		songs[i]->setName("Song" + StrUtil::padLeft(to_string(i + 1), "0", 2));
-	}
+}
+
+void Sequencer::deleteSong(int i)
+{
+	songs[i] = make_shared<Song>();
 }
 
 int Sequencer::getActiveSequenceIndex()
@@ -107,9 +109,7 @@ int Sequencer::getActiveSequenceIndex()
 weak_ptr<Track> Sequencer::getActiveTrack()
 {
 	if (!getActiveSequence().lock())
-	{
 		return {};
-	}
 
 	return getActiveSequence().lock()->getTrack(activeTrackIndex);
 }
@@ -765,6 +765,11 @@ void Sequencer::copySequence(int source, int destination)
 	sequences[destination]->initLoop();
 }
 
+void Sequencer::copySequenceParameters(const int source, const int dest)
+{
+	copySequenceParameters(sequences[source], sequences[dest]);
+}
+
 shared_ptr<Sequence> Sequencer::copySequence(weak_ptr<Sequence> src)
 {
 	auto source = src.lock();
@@ -810,9 +815,42 @@ void Sequencer::copyTempoChangeEvents(weak_ptr<Sequence> src, weak_ptr<Sequence>
 
 void Sequencer::copyTrack(int sourceTrackIndex, int destinationTrackIndex, int sourceSequenceIndex, int destinationSequenceIndex)
 {
+	if (sourceSequenceIndex == destinationSequenceIndex && sourceTrackIndex == destinationTrackIndex)
+		return;
+
 	auto src = sequences[sourceSequenceIndex]->getTrack(sourceTrackIndex).lock();
 	auto dest = sequences[destinationSequenceIndex]->purgeTrack(destinationTrackIndex).lock();
 	copyTrack(src, dest);
+}
+
+void Sequencer::copySong(const int source, const int dest)
+{
+	if (source == dest)
+		return;
+
+	auto s0 = songs[source];
+
+	if (!s0->isUsed())
+		return;
+
+	deleteSong(dest);
+
+	auto s1 = songs[dest];
+
+	s1->setUsed(true);
+
+	for (int i = 0; i < s0->getStepCount(); i++)
+	{
+		s1->insertStep(i);
+		auto step = s1->getStep(i).lock();
+		step->setRepeats(s0->getStep(i).lock()->getRepeats());
+		step->setSequence(s0->getStep(i).lock()->getSequence());
+	}
+
+	s1->setFirstStep(s0->getFirstStep());
+	s1->setLastStep(s0->getLastStep());
+	s1->setName(s0->getName());
+	s1->setLoopEnabled(s0->isLoopEnabled());
 }
 
 void Sequencer::copyTrack(weak_ptr<Track> src, weak_ptr<Track> dest)
@@ -1363,9 +1401,7 @@ void Sequencer::tap()
 	vector<long> tapsLong;
 	
 	while (taps->availableRead() > 0)
-	{
 		tapsLong.push_back(taps->read());
-	}
 	
 	for (int i = 0; i < (int)(tapsLong.size()) - 1; i++)
 	{
@@ -1458,6 +1494,7 @@ int Sequencer::getFirstUsedSeqDown(int from)
 			break;
 		}
 	}
+
 	return result;
 }
 
@@ -1473,6 +1510,7 @@ int Sequencer::getFirstUsedSeqUp(int from)
 			break;
 		}
 	}
+
 	return result;
 }
 
@@ -1484,44 +1522,33 @@ void Sequencer::resetNextSq()
 void Sequencer::setNextSq(int i)
 {
 	if (!isPlaying())
-	{
 		return;
-	}
 
 	auto firstNotification = nextsq == -1;
 	
 	auto up = i > nextsq;
 	
 	if (firstNotification)
-	{
 		up = i > currentlyPlayingSequenceIndex;
-	}
 
 	auto candidate = up ? getFirstUsedSeqUp(i) : getFirstUsedSeqDown(i);
 
-	if (candidate == -1) {
+	if (candidate == -1)
 		return;
-	}
 
 	nextsq = candidate;
 	
 
 	if (firstNotification)
-	{
 		notifyObservers(string("nextsq"));
-	}
 	else
-	{
 		notifyObservers(string("nextsqvalue"));
-	}
 }
 
 void Sequencer::setNextSqPad(int i)
 {
 	if (!isPlaying())
-	{
 		return;
-	}
 
 	if (!sequences[i]->isUsed())
 	{
@@ -1536,14 +1563,9 @@ void Sequencer::setNextSqPad(int i)
 	nextsq = i;
 	
 	if (firstNotification)
-	{
-		
 		notifyObservers(string("nextsq"));
-	}
-	else {
-		
+	else
 		notifyObservers(string("nextsqvalue"));
-	}
 }
 
 weak_ptr<Song> Sequencer::getSong(int i)

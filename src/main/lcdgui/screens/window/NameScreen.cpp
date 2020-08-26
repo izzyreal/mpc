@@ -217,7 +217,7 @@ void NameScreen::saveName()
 		else if (prevScreen.compare("sequence") == 0)
 		{
 			sequencer.lock()->setDefaultSequenceName(getName());
-			openScreen("sequencer");
+			openScreen(prevScreen);
 			resetNameScreen();
 			return;
 		}
@@ -225,7 +225,7 @@ void NameScreen::saveName()
 		{
 			auto songScreen = mpc.screens->get<SongScreen>("song");
 			songScreen->defaultSongName = getName();
-			openScreen("song");
+			openScreen(prevScreen);
 			resetNameScreen();
 			return;
 		}

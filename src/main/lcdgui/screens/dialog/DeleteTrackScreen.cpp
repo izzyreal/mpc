@@ -22,16 +22,15 @@ void DeleteTrackScreen::open()
 void DeleteTrackScreen::turnWheel(int i)
 {
 	init();
+
 	if (param.compare("tr") == 0)
-	{
 		setTrackNumber(trackNumber + i);
-	}
 }
 
 void DeleteTrackScreen::function(int i)
 {
 	init();
-	shared_ptr<mpc::sequencer::Sequence> s;
+
 	switch (i)
 	{
 	case 2:
@@ -41,9 +40,11 @@ void DeleteTrackScreen::function(int i)
 		openScreen("sequence");
 		break;
 	case 4:
-		s = sequencer.lock()->getActiveSequence().lock();
+	{
+		auto s = sequencer.lock()->getActiveSequence().lock();
 		s->purgeTrack(trackNumber);
 		openScreen("sequencer");
+	}
 	}
 }
 
