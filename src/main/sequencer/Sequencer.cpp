@@ -1485,35 +1485,30 @@ int Sequencer::getNextSq()
     return nextSq;
 }
 
-int Sequencer::getFirstUsedSeqDown(int from)
+int Sequencer::getFirstUsedSeqDown(int from, bool unused)
 {
-	auto result = -1;
 	for (int i = from; i >= 0; i--)
 	{
-		if (sequences[i]->isUsed())
-		{
-			result = i;
-			break;
-		}
+		auto candidate = unused ? !sequences[i]->isUsed() : sequences[i]->isUsed();
+
+		if (candidate)
+			return i;
 	}
 
-	return result;
+	return -1;
 }
 
-int Sequencer::getFirstUsedSeqUp(int from)
+int Sequencer::getFirstUsedSeqUp(int from, bool unused)
 {
-	auto result = -1;
-
 	for (int i = from; i < 99; i++)
 	{
-		if (sequences[i]->isUsed())
-		{
-			result = i;
-			break;
-		}
+		auto candidate = unused ? !sequences[i]->isUsed() : sequences[i]->isUsed();
+
+		if (candidate)
+			return i;
 	}
 
-	return result;
+	return -1;
 }
 
 void Sequencer::setNextSq(int i)

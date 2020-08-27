@@ -187,8 +187,8 @@ namespace mpc::sequencer
 		int getCurrentlyPlayingSequenceIndex();
 		void setCurrentlyPlayingSequenceIndex(int i);
 		int getNextSq();
-		int getFirstUsedSeqDown(int from);
-		int getFirstUsedSeqUp(int from);
+		int getFirstUsedSeqDown(int from, bool unused = false);
+		int getFirstUsedSeqUp(int from, bool unused = false);
 		void setNextSq(int i);
 		void setNextSqPad(int i);
 		std::weak_ptr<Song> getSong(int i);
