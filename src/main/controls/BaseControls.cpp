@@ -241,7 +241,7 @@ void BaseControls::pad(int i, int velo, bool repeat, int tick)
 			if (note > 34)
 				mpc.setPadAndNote(pad, note);
 		}
-		else
+		else if (currentScreenName.compare("copy-note-parameters") != 0)
 		{
 			mpc.setPadAndNote(pad, note);
 		}
