@@ -22,7 +22,7 @@ void NumberOfZonesScreen::open()
 
 void NumberOfZonesScreen::displayNumberOfZones()
 {
-	findField("number-of-zones").lock()->setText(to_string(numberOfZones));
+	findField("number-of-zones").lock()->setTextPadded(numberOfZones);
 }
 
 void NumberOfZonesScreen::function(int i)

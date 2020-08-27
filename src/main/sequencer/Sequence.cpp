@@ -214,13 +214,13 @@ void Sequence::createClickTrack()
 		
 			if (j == 0)
 			{
-				n->setVelocity(metronomeSoundScreen->getAccentVelo());
-				n->setNote(metronomeSoundScreen->getAccentNote());
+				n->setVelocity(127);
+				n->setNote(1);
 			}
 			else
 			{
-				n->setVelocity(metronomeSoundScreen->getNormalVelo());
-				n->setNote(metronomeSoundScreen->getNormalNote());
+				n->setVelocity(64);
+				n->setNote(1);
 		
 			}
 		}

@@ -2,7 +2,10 @@
 
 #include <sampler/PgmSlider.hpp>
 
+#include <lang/StrUtil.hpp>
+
 using namespace mpc::lcdgui::screens;
+using namespace moduru::lang;
 using namespace std;
 
 AssignScreen::AssignScreen(mpc::Mpc& mpc, const int layerIndex)
@@ -98,20 +101,17 @@ void AssignScreen::displayAssignNote()
 {
 	init();
 	auto slider = program.lock()->getSlider();
-	auto nn = slider->getNote();
+	auto note = slider->getNote();
 
-	if (nn == 34)
-	{
-		findField("assignnote").lock()->setText("OFF");
-		return;
-	}
+	auto padIndex = program.lock()->getPadIndexFromNote(note);
+	auto padName = padIndex == -1 ? "OFF" : sampler.lock()->getPadName(padIndex);
+	
+	auto soundIndex = note == 34 ? -1 : program.lock()->getNoteParameters(note)->getSoundIndex();
+	auto soundName = soundIndex == -1 ? "(No sound)" : sampler.lock()->getSoundName(soundIndex);
+	
+	auto noteName = note == 34 ? "--" : to_string(note);
 
-	auto lProgram = program.lock();
-	auto lSampler = sampler.lock();
-	string padName = lSampler->getPadName(lProgram->getPadIndexFromNote(nn));
-	auto sn = lProgram->getNoteParameters(nn)->getSoundIndex();
-	auto soundName = sn == -1 ? "OFF" : lSampler->getSoundName(sn);
-	findField("assignnote").lock()->setText(to_string(nn) + "/" + padName + "-" + soundName);
+	findField("assignnote").lock()->setText(noteName + "/" + padName + "-" + soundName);
 }
 
 void AssignScreen::displayParameter()
@@ -123,52 +123,66 @@ void AssignScreen::displayParameter()
 
 void AssignScreen::displayHighRange()
 {
-	int hr = 0;
+	int value = 0;
 	init();
 	auto slider = program.lock()->getSlider();
+	auto sign = "";
+
+	findField("highrange").lock()->setSize(19, 9);
 
 	switch (slider->getParameter())
 	{
 	case 0:
-		hr = slider->getTuneHighRange();
+		value = slider->getTuneHighRange();
+		sign = value < 0 ? "-" : " ";
+		findField("highrange").lock()->setSize(25, 9);
 		break;
 	case 1:
-		hr = slider->getDecayHighRange();
+		value = slider->getDecayHighRange();
 		break;
 	case 2:
-		hr = slider->getAttackHighRange();
+		value = slider->getAttackHighRange();
 		break;
 	case 3:
-		hr = slider->getFilterHighRange();
+		value = slider->getFilterHighRange();
+		findField("highrange").lock()->setSize(25, 9);
+		sign = value < 0 ? "-" : " ";
 		break;
 	}
-	findField("highrange").lock()->setTextPadded(hr, " ");
+
+	findField("highrange").lock()->setText(sign + StrUtil::padLeft(to_string(abs(value)), " ", 3));
 }
 
 void AssignScreen::displayLowRange()
 {
-	auto lr = 0;
+	auto value = 0;
 
 	init();
 	auto slider = program.lock()->getSlider();
+	auto sign = "";
+	findField("lowrange").lock()->setSize(19, 9);
 
 	switch (slider->getParameter())
 	{
 	case 0:
-		lr = slider->getTuneLowRange();
+		value = slider->getTuneLowRange();
+		sign = value < 0 ? "-" : " ";
+		findField("lowrange").lock()->setSize(25, 9);
 		break;
 	case 1:
-		lr = slider->getDecayLowRange();
+		value = slider->getDecayLowRange();
 		break;
 	case 2:
-		lr = slider->getAttackLowRange();
+		value = slider->getAttackLowRange();
 		break;
 	case 3:
-		lr = slider->getFilterLowRange();
+		value = slider->getFilterLowRange();
+		sign = value < 0 ? "-" : " ";
+		findField("lowrange").lock()->setSize(25, 9);
 		break;
 	}
 
-	findField("lowrange").lock()->setTextPadded(lr, " ");
+	findField("lowrange").lock()->setText(sign + StrUtil::padLeft(to_string(abs(value)), " ", 3));
 }
 
 void AssignScreen::displayAssignNv()

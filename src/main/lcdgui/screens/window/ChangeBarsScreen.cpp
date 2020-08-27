@@ -70,24 +70,24 @@ void ChangeBarsScreen::turnWheel(int i)
 	}
 }
 
-void ChangeBarsScreen::displayFirstBar()
+void ChangeBarsScreen::displayAfterBar()
 {
-	findField("firstbar").lock()->setText(to_string(firstBar + 1));
-}
-
-void ChangeBarsScreen::displayLastBar()
-{
-	findField("lastbar").lock()->setText(to_string(lastBar + 1));
+	findField("afterbar").lock()->setTextPadded(afterBar);
 }
 
 void ChangeBarsScreen::displayNumberOfBars()
 {
-	findField("numberofbars").lock()->setText(to_string(numberOfBars));
+	findField("numberofbars").lock()->setTextPadded(numberOfBars);
 }
 
-void ChangeBarsScreen::displayAfterBar()
+void ChangeBarsScreen::displayFirstBar()
 {
-	findField("afterbar").lock()->setText(to_string(afterBar));
+	findField("firstbar").lock()->setTextPadded(firstBar + 1);
+}
+
+void ChangeBarsScreen::displayLastBar()
+{
+	findField("lastbar").lock()->setTextPadded(lastBar + 1);
 }
 
 void ChangeBarsScreen::setLastBar(int i)

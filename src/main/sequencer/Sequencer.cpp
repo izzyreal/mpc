@@ -52,7 +52,7 @@ void Sequencer::init()
 	sequences = vector<shared_ptr<Sequence>>(99);
 	taps = make_unique<moduru::io::CircularIntBuffer>(4, true, true);
 	reposition = -1;
-	nextsq = -1;
+	nextSq = -1;
 	previousTempo = 0.0;
 	
 	auto userScreen = mpc.screens->get<UserScreen>("user");
@@ -153,10 +153,12 @@ vector<int> Sequencer::getTickValues() {
 	return TICK_VALUES;
 }
 
-void Sequencer::setTempo(const double newTempo)
+void Sequencer::setTempo(double newTempo)
 {
-	if (newTempo < 30.0 || newTempo > 300.0)
-		return;
+	if (newTempo < 30.0)
+		newTempo = 30.0;
+	else if (newTempo > 300.0)
+		newTempo = 300.0;
 
 	auto s = getActiveSequence().lock();
 	auto tce = getCurrentTempoChangeEvent().lock();
@@ -190,7 +192,7 @@ void Sequencer::setTempo(const double newTempo)
 	{
 		auto initialTempo = s->getInitialTempo();
 		auto ratio = newTempo / initialTempo;
-		tce->setRatio((int)(ratio * 1000.0));
+		tce->setRatio((int) round(ratio * 1000.0));
 	}
 	else
 	{
@@ -657,10 +659,10 @@ void Sequencer::stop(int tick)
 
     auto notifynextsq = false;
 	
-	if (nextsq != -1)
+	if (nextSq != -1)
 	{
 		notifynextsq = true;
-		nextsq = -1;
+		nextSq = -1;
 
 		// This is called from the audio thread, should be called from the UI thread instead.
 		// stop() is called by FrameSeq.
@@ -1480,7 +1482,7 @@ void Sequencer::setCurrentlyPlayingSequenceIndex(int i) {
 
 int Sequencer::getNextSq()
 {
-    return nextsq;
+    return nextSq;
 }
 
 int Sequencer::getFirstUsedSeqDown(int from)
@@ -1514,32 +1516,28 @@ int Sequencer::getFirstUsedSeqUp(int from)
 	return result;
 }
 
-void Sequencer::resetNextSq()
-{
-	nextsq = -1;
-}
-
 void Sequencer::setNextSq(int i)
 {
-	if (!isPlaying())
-		return;
+	if (i < -1) i = -1;
+	if (i > 98) i = 98;
 
-	auto firstNotification = nextsq == -1;
+	auto firstNotification = nextSq == -1;
 	
-	auto up = i > nextsq;
+	auto up = i > nextSq;
 	
 	if (firstNotification)
 		up = i > currentlyPlayingSequenceIndex;
 
 	auto candidate = up ? getFirstUsedSeqUp(i) : getFirstUsedSeqDown(i);
 
-	if (candidate == -1)
+	if (up && candidate == -1)
 		return;
 
-	nextsq = candidate;
-	
+	nextSq = candidate;
 
-	if (firstNotification)
+	if (nextSq == -1)
+		notifyObservers(string("nextoff"));
+	else if (firstNotification)
 		notifyObservers(string("nextsq"));
 	else
 		notifyObservers(string("nextsqvalue"));
@@ -1547,20 +1545,16 @@ void Sequencer::setNextSq(int i)
 
 void Sequencer::setNextSqPad(int i)
 {
-	if (!isPlaying())
-		return;
-
 	if (!sequences[i]->isUsed())
 	{
-		nextsq = -1;
-		
+		nextSq = -1;
 		notifyObservers(string("nextsqoff"));
 		return;
 	}
 
-	auto firstNotification = nextsq == -1;
+	auto firstNotification = nextSq == -1;
 	
-	nextsq = i;
+	nextSq = i;
 	
 	if (firstNotification)
 		notifyObservers(string("nextsq"));

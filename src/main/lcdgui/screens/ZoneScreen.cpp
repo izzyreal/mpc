@@ -264,11 +264,11 @@ void ZoneScreen::displayZone()
 {
 	if (sampler.lock()->getSoundCount() == 0)
 	{
-		findField("zone").lock()->setText("1");
+		findField("zone").lock()->setTextPadded(1);
 		return;
 	}
 
-	findField("zone").lock()->setText(to_string(zone + 1));
+	findField("zone").lock()->setTextPadded(zone + 1);
 }
 
 void ZoneScreen::initZones()

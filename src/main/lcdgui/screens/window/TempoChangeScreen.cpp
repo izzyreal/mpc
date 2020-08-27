@@ -3,7 +3,7 @@
 #include <sequencer/TempoChangeEvent.hpp>
 #include <sequencer/TimeSignature.hpp>
 
-#include <lcdgui/HorizontalBar.hpp>
+#include <lcdgui/HorizontalBar2.hpp>
 
 #include <Util.hpp>
 
@@ -15,20 +15,22 @@ using namespace std;
 TempoChangeScreen::TempoChangeScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "tempo-change", layerIndex)
 {
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 3; i++)
 	{
-		int w = 33;
+		int w = 35;
 		int h = 5;
 		int x = 191;
-		int y = 13 + (i * 9);
+		int y = 22 + (i * 9);
 		
 		auto rect = MRECT(x, y, x + w, y + h);
-		bars.push_back(dynamic_pointer_cast<HorizontalBar>(addChild(make_shared<HorizontalBar>(rect, 0)).lock()));
+		bars.push_back(addChildT<HorizontalBar2>(rect).lock());
 	}
 }
 
 void TempoChangeScreen::open()
 {
+	findLabel("initial-tempo").lock()->setLocation(140, 10);
+
 	for (auto& bar :bars)
 		bar.lock()->Hide(true);
 
@@ -68,6 +70,10 @@ void TempoChangeScreen::open()
 	f0Label = findLabel("f0");
 	f1Label = findLabel("f1");
 	f2Label = findLabel("f2");
+
+	a0Field.lock()->setAlignment(Alignment::Centered);
+	a1Field.lock()->setAlignment(Alignment::Centered);
+	a2Field.lock()->setAlignment(Alignment::Centered);
 
 	auto events = sequencer.lock()->getActiveSequence().lock()->getTempoChangeEvents();
 
@@ -140,13 +146,13 @@ void TempoChangeScreen::displayTempoChangeOn()
 void TempoChangeScreen::displayTempoChange0()
 {
 	auto sequence = sequencer.lock()->getActiveSequence().lock();
-	bars[1].lock()->Hide(false);
+	bars[0].lock()->Hide(false);
 	
 	auto tce = visibleTempoChanges[0].lock();
-	a0Field.lock()->setText(" " + to_string(tce->getStepNumber() + 1));
+	a0Field.lock()->setText(to_string(tce->getStepNumber() + 1));
 	auto timeSig = sequence->getTimeSignature();
-	int value = tce->getBar(timeSig.getNumerator(), timeSig.getDenominator()) + 1;
 	
+	int value = tce->getBar(timeSig.getNumerator(), timeSig.getDenominator()) + 1;
 	b0Field.lock()->setTextPadded(value, "0");
 	value = tce->getBeat(timeSig.getNumerator(), timeSig.getDenominator()) + 1;
 	c0Field.lock()->setTextPadded(value, "0");
@@ -167,7 +173,7 @@ void TempoChangeScreen::displayTempoChange0()
 	else if (tempo > 300.0) tempo = 300.0;
 
 	f0Field.lock()->setText(Util::tempoString(tempo));
-	bars[1].lock()->setValue((tempo - 15) * (290 / 975.0));
+	bars[0].lock()->setValue((tempo - 30) / 270.0);
 }
 
 void TempoChangeScreen::displayTempoChange1()
@@ -188,7 +194,7 @@ void TempoChangeScreen::displayTempoChange1()
 		d1Label.lock()->Hide(true);
 		e1Label.lock()->Hide(true);
 		f1Label.lock()->Hide(true);
-		bars[2].lock()->Hide(true);
+		bars[1].lock()->Hide(true);
 		return;
 	}
 	
@@ -202,9 +208,9 @@ void TempoChangeScreen::displayTempoChange1()
 	d1Label.lock()->Hide(false);
 	e1Label.lock()->Hide(false);
 	f1Label.lock()->Hide(false);
-	bars[2].lock()->Hide(false);
+	bars[1].lock()->Hide(false);
 
-	a1Field.lock()->setText(" " + to_string(tce->getStepNumber() + 1));
+	a1Field.lock()->setText(to_string(tce->getStepNumber() + 1));
 	
 	auto sequence = sequencer.lock()->getActiveSequence().lock();
 	auto timeSig = sequence->getTimeSignature();
@@ -224,7 +230,7 @@ void TempoChangeScreen::displayTempoChange1()
 	else if (tempo > 300.0) tempo = 300.0;
 
 	f1Field.lock()->setText(Util::tempoString(tempo));
-	bars[2].lock()->setValue((tempo - 15) * (290 / 975.0));
+	bars[1].lock()->setValue((tempo - 30) / 270.0);
 }
 
 void TempoChangeScreen::displayTempoChange2()
@@ -253,7 +259,7 @@ void TempoChangeScreen::displayTempoChange2()
 		d2Label.lock()->Hide(true);
 		e2Label.lock()->Hide(true);
 		f2Label.lock()->Hide(true);
-		bars[3].lock()->Hide(true);
+		bars[2].lock()->Hide(true);
 		return;
 	}
 
@@ -267,8 +273,8 @@ void TempoChangeScreen::displayTempoChange2()
 	d2Label.lock()->Hide(false);
 	e2Label.lock()->Hide(false);
 	f2Label.lock()->Hide(false);
-	bars[3].lock()->Hide(false);
-	a2Field.lock()->setText(" " + to_string(tce->getStepNumber() + 1));
+	bars[2].lock()->Hide(false);
+	a2Field.lock()->setText(to_string(tce->getStepNumber() + 1));
 
 	auto sequence = sequencer.lock()->getActiveSequence().lock();
 	auto timeSig = sequence->getTimeSignature();
@@ -287,7 +293,7 @@ void TempoChangeScreen::displayTempoChange2()
 	else if (tempo > 300.0) tempo = 300.0;
 
 	f2Field.lock()->setText(Util::tempoString(tempo));
-	bars[3].lock()->setValue((tempo - 15) * (290 / 975.0));
+	bars[2].lock()->setValue((tempo - 30) / 270.0);
 }
 
 void TempoChangeScreen::left()

@@ -88,7 +88,7 @@ namespace mpc::sequencer
 
 		int activeTrackIndex = 0;
 		double tempo = 120.0;
-		int nextsq = 0;
+		int nextSq = -1;
 
 	private:
 		std::weak_ptr<TempoChangeEvent> getCurrentTempoChangeEvent();
@@ -103,7 +103,7 @@ namespace mpc::sequencer
 		void notifyTimeDisplay();
 		void notifyTimeDisplayRealtime();
 		void init();
-		void setTempo(const double newTempo);
+		void setTempo(double newTempo);
 		double getTempo();
 		bool isTempoSourceSequenceEnabled();
 		void setTempoSourceSequence(bool b);
@@ -190,7 +190,6 @@ namespace mpc::sequencer
 		int getFirstUsedSeqDown(int from);
 		int getFirstUsedSeqUp(int from);
 		void setNextSq(int i);
-		void resetNextSq();
 		void setNextSqPad(int i);
 		std::weak_ptr<Song> getSong(int i);
 		void deleteSong(int i);

@@ -4,10 +4,7 @@
 #include <memory>
 #include <vector>
 
-namespace mpc::sampler
-{
-	class Sampler;
-}
+namespace mpc::sampler { class Sampler; }
 
 namespace mpc::lcdgui
 {
@@ -16,11 +13,21 @@ namespace mpc::lcdgui
 	class Background;
 }
 
-namespace mpc::lcdgui::screens::dialog {
-
+namespace mpc::lcdgui::screens::dialog
+{
 	class MetronomeSoundScreen
 		: public mpc::lcdgui::ScreenComponent
 	{
+
+	public:
+		MetronomeSoundScreen(mpc::Mpc& mpc, const int layerIndex);
+
+		void turnWheel(int notch) override;
+		void function(int i) override;
+		void open() override;
+		void close() override;
+
+		void update(moduru::observer::Observable* o, nonstd::any msg) override;
 
 	private:
 		std::weak_ptr<mpc::sampler::Sampler> sampler;
@@ -36,39 +43,29 @@ namespace mpc::lcdgui::screens::dialog {
 		void displayNormalVelo();
 
 	private:
-		int clickVolume = 100;
-		int clickOutput = 0;
-		int metronomeSound = 0;
+		int volume = 100;
+		int output = 0;
+		int sound = 0;
 		int accentVelo = 127;
-		int accentNote = 35;
+		int accentPad = 35;
 		int normalVelo = 64;
-		int normalNote = 35;
+		int normalPad = 35;
 
 	public:
-		int getClickVolume();
-		void setClickVolume(int i);
-		int getClickOutput();
-		void setClickOutput(int i);
-		int getMetronomeSound();
-		void setMetronomeSound(int i);
-		int getAccentNote();
-		void setAccentNote(int i);
+		int getVolume();
+		void setVolume(int i);
+		int getOutput();
+		void setOutput(int i);
+		int getSound();
+		void setSound(int i);
+		int getAccentPad();
+		void setAccentPad(int i);
 		int getAccentVelo();
 		void setAccentVelo(int i);
-		int getNormalNote();
-		void setNormalNote(int i);
+		int getNormalPad();
+		void setNormalPad(int i);
 		int getNormalVelo();
 		void setNormalVelo(int i);
-
-	public:
-		MetronomeSoundScreen(mpc::Mpc& mpc, const int layerIndex);
-
-	public:
-		void turnWheel(int notch) override;
-		void function(int i) override;
-
-	public:
-		void open() override;
 
 	};
 }

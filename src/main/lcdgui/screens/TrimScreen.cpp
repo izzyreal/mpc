@@ -26,6 +26,7 @@ TrimScreen::TrimScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void TrimScreen::open()
 {
+	findField("view").lock()->setAlignment(Alignment::Centered);
 	bool sound = sampler.lock()->getSound().lock() ? true : false;
 
 	findField("snd").lock()->setFocusable(sound);

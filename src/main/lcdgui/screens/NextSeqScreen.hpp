@@ -18,6 +18,8 @@ namespace mpc::lcdgui::screens
 		void close() override;
 
 	private:
+		bool selectNextSqFromScratch = true;
+
 		void displaySq();
 		void displayNextSq();
 		void displayNow0();

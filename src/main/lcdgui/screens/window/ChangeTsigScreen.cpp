@@ -4,9 +4,10 @@
 #include <sequencer/Sequence.hpp>
 #include <sequencer/TimeSignature.hpp>
 
-#include <Util.hpp>
+#include <lang/StrUtil.hpp>
 
 using namespace mpc::lcdgui::screens::window;
+using namespace moduru::lang;
 using namespace std;
 
 ChangeTsigScreen::ChangeTsigScreen(mpc::Mpc& mpc, const int layerIndex)
@@ -84,32 +85,24 @@ void ChangeTsigScreen::turnWheel(int i)
 
 void ChangeTsigScreen::displayBars()
 {
-	findField("bar0").lock()->setText(to_string(bar0 + 1));
-	findField("bar1").lock()->setText(to_string(bar1 + 1));
+	findField("bar0").lock()->setTextPadded(bar0 + 1);
+	findField("bar1").lock()->setTextPadded(bar1 + 1);
 }
 
 void ChangeTsigScreen::displayNewTsig()
 {
-	if (ls.lock()->getCurrentScreenName().compare("delete-sequence") == 0) {
+	if (ls.lock()->getCurrentScreenName().compare("delete-sequence") == 0)
 		return;
-	}
-	auto result = to_string(timesignature.getNumerator()) + "/" + to_string(timesignature.getDenominator());
-	findField("newtsig").lock()->setText(mpc::Util::distributeTimeSig(result));
-}
 
-/*
-mpc::sequencer::TimeSignature& ChangeTsigScreen::getNewTimeSignature()
-{
-	return newTimeSignature;
+	auto result = StrUtil::padLeft(to_string(timesignature.getNumerator()), " ", 2) + 
+		"/" + StrUtil::padLeft(to_string(timesignature.getDenominator()), " ", 2);
+	findField("newtsig").lock()->setText(result);
 }
-*/
 
 void ChangeTsigScreen::setBar0(int i, int max)
 {
 	if (i < 0 || i > max)
-	{
 		return;
-	}
 
 	bar0 = i;
 	

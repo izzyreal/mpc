@@ -25,11 +25,18 @@ void Assign16LevelsScreen::open()
     displayParameter();
     displayType();
     displayOriginalKeyPad();
+    mpc.addObserver(this); // Subscribe to "padandnote" messages
+}
+
+void Assign16LevelsScreen::close()
+{
+    mpc.deleteObserver(this);
 }
 
 void Assign16LevelsScreen::function(int i)
 {
     ScreenComponent::function(i);
+
 	switch (i)
 	{
     case 4:
@@ -66,10 +73,13 @@ void Assign16LevelsScreen::turnWheel(int i)
 
 void Assign16LevelsScreen::setNote(int newNote)
 {
-    if (newNote < 35 || newNote > 98)
-    {
+    if (newNote < 35)
+        newNote = 35;
+    else if (newNote > 98)
+        newNote = 98;
+
+    if (note == newNote)
         return;
-    }
 
     note = newNote;
     displayNote();
@@ -78,9 +88,7 @@ void Assign16LevelsScreen::setNote(int newNote)
 void Assign16LevelsScreen::setParam(int i)
 {
     if (i < 0 || i > 1)
-    {
         return;
-    }
 
     parameter = i;
     
@@ -91,9 +99,7 @@ void Assign16LevelsScreen::setParam(int i)
 void Assign16LevelsScreen::setType(int i)
 {
     if (i < 0 || i > 3)
-    {
         return;
-    }
 
     type = i;
 
@@ -104,9 +110,7 @@ void Assign16LevelsScreen::setType(int i)
 void Assign16LevelsScreen::setOriginalKeyPad(int i)
 {
     if (i < 3 || i > 12)
-    {
         return;
-    }
 
     originalKeyPad = i;
     displayOriginalKeyPad();
@@ -138,11 +142,16 @@ void Assign16LevelsScreen::displayNote()
 
     auto pgmNumber = sampler.lock()->getDrumBusProgramNumber(track.lock()->getBus());
     auto program = sampler.lock()->getProgram(pgmNumber).lock();
-    auto pn = program->getPadIndexFromNote(note);
-    auto sn = program->getNoteParameters(note)->getSoundIndex();
-    auto soundName = sn == -1 ? "(No sound)" : sampler.lock()->getSoundName(sn);
- 
-    findField("note").lock()->setText(to_string(note) + "/" + sampler.lock()->getPadName(pn) + "-" + soundName);
+    auto padIndex = program->getPadIndexFromNote(note);
+
+    auto padName = padIndex == -1 ? "OFF" : sampler.lock()->getPadName(padIndex);
+
+    auto soundIndex = note == 34 ? -1 : program->getNoteParameters(note)->getSoundIndex();
+    auto soundName = soundIndex == -1 ? "(No sound)" : sampler.lock()->getSoundName(soundIndex);
+
+    auto noteName = note == 34 ? "--" : to_string(note);
+
+    findField("note").lock()->setText(noteName + "/" + padName + "-" + soundName);
 }
 
 void Assign16LevelsScreen::displayParameter()
@@ -158,9 +167,7 @@ void Assign16LevelsScreen::displayType()
     findLabel("type").lock()->Hide(parameter != 1);
 
     if (parameter != 1)
-    {
         return;
-    }
 
     findField("type").lock()->setText(typeNames[type]);
 }
@@ -171,9 +178,7 @@ void Assign16LevelsScreen::displayOriginalKeyPad()
     findLabel("originalkeypad").lock()->Hide(!(parameter == 1 && type == 0));
 
     if (type != 0)
-    {
         return;
-    }
 
     findField("originalkeypad").lock()->setTextPadded(originalKeyPad + 1, " ");
 }
@@ -181,4 +186,15 @@ void Assign16LevelsScreen::displayOriginalKeyPad()
 void Assign16LevelsScreen::openWindow()
 {
     mainScreen();
+}
+
+void Assign16LevelsScreen::update(moduru::observer::Observable* o, nonstd::any msg)
+{
+    auto s = nonstd::any_cast<string>(msg);
+
+    if (s.compare("padandnote") == 0)
+    {
+        note = mpc.getNote();
+        displayNote();
+    }
 }

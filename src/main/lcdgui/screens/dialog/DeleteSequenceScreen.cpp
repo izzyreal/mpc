@@ -3,6 +3,7 @@
 #include <lang/StrUtil.hpp>
 
 using namespace mpc::lcdgui::screens::dialog;
+using namespace moduru::lang;
 using namespace std;
 
 DeleteSequenceScreen::DeleteSequenceScreen(mpc::Mpc& mpc, const int layerIndex)
@@ -48,5 +49,5 @@ void DeleteSequenceScreen::function(int i)
 void DeleteSequenceScreen::displaySequenceNumberName()
 {
 	auto sequenceName = sequencer.lock()->getActiveSequence().lock()->getName();
-	findField("sq").lock()->setText(moduru::lang::StrUtil::padLeft(to_string(sequencer.lock()->getActiveSequenceIndex() + 1), " ", 2) + "-" + sequenceName);
+	findField("sq").lock()->setText(StrUtil::padLeft(to_string(sequencer.lock()->getActiveSequenceIndex() + 1), "0", 2) + "-" + sequenceName);
 }

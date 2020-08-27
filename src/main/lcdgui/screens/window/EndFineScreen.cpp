@@ -21,6 +21,7 @@ EndFineScreen::EndFineScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void EndFineScreen::open()
 {
+	findField("smpllngth").lock()->setAlignment(Alignment::Centered);
 	findField("end").lock()->enableTwoDots();
 	displayEnd();
 	displaySmplLngth();

@@ -51,9 +51,6 @@ void SequencerScreen::open()
 	findLabel("punch-time-0").lock()->Hide(true);
 	findLabel("punch-time-1").lock()->Hide(true);
 
-	findLabel("nextsq").lock()->Hide(true);
-	findField("nextsq").lock()->Hide(true);
-
 	displaySq();
 	displayTr();
 	displayOn();
@@ -72,6 +69,7 @@ void SequencerScreen::open()
 	displayVelo();
 	displayBus();
 	displayDeviceNumber();
+	displayNextSq();
 
 	sequencer.lock()->addObserver(this);
 	sequence.lock()->addObserver(this);
@@ -89,6 +87,9 @@ void SequencerScreen::open()
 		findBackground().lock()->setName("sequencer-punch-active");
 	else
 		findBackground().lock()->setName("sequencer");
+
+	if (sequencer.lock()->getNextSq() != -1)
+		ls.lock()->setFocus("nextsq");
 }
 
 void SequencerScreen::close()
@@ -304,32 +305,19 @@ void SequencerScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 
 	string s = nonstd::any_cast<string>(arg);
 
-	auto nextSqField = findField("nextsq").lock();
-	auto nextSqLabel = findLabel("nextsq").lock();
-
 	if (s.compare("nextsqvalue") == 0)
 	{
-		nextSqField->setTextPadded(sequencer.lock()->getNextSq() + 1, " ");
+		displayNextSq();
 	}
 	else if (s.compare("nextsq") == 0)
 	{
-		ls.lock()->setFunctionKeysArrangement(1);
-		
-		if (nextSqField->IsHidden())
-		{
-			nextSqField->Hide(false);
-			nextSqLabel->Hide(false);
-			ls.lock()->setFocus("nextsq");
-		}
-		
-		nextSqField->setTextPadded(sequencer.lock()->getNextSq() + 1, " ");
+		displayNextSq();
+		ls.lock()->setFocus("nextsq");
 	}
 	else if (s.compare("nextsqoff") == 0)
 	{
-		nextSqField->Hide(true);
-		nextSqLabel->Hide(true);
-		ls.lock()->setFunctionKeysArrangement(0);
 		ls.lock()->setFocus("sq");
+		displayNextSq();
 	}
 	else if (s.compare("count") == 0)
 	{
@@ -584,7 +572,7 @@ void SequencerScreen::turnWheel(int i)
 	}
 	else if (param.compare("timing") == 0)
 	{
-		auto screen = dynamic_pointer_cast<TimingCorrectScreen>(mpc.screens->getScreenComponent("timing-correct"));
+		auto screen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
 		auto noteValue = screen->getNoteValue();
 		screen->setNoteValue(noteValue + i);
 		setLastFocus("timing-correct", "notevalue");
@@ -805,6 +793,20 @@ void SequencerScreen::displayPunchWhileRecording()
 		time0->setText("IN:" + text1 + "." + text2 + "." + text3);
 		time1->setText("OUT:" + text4 + "." + text5 + "." + text6);
 	}
+}
+
+void SequencerScreen::displayNextSq()
+{
+	ls.lock()->setFunctionKeysArrangement(sequencer.lock()->getNextSq() == -1 ? 0 : 1);
+
+	auto noNextSq = sequencer.lock()->getNextSq() == -1;
+	findLabel("nextsq").lock()->Hide(noNextSq);
+	findField("nextsq").lock()->Hide(noNextSq);
+
+	if (noNextSq)
+		return;
+
+	findField("nextsq").lock()->setTextPadded(sequencer.lock()->getNextSq() + 1);
 }
 
 void SequencerScreen::play()

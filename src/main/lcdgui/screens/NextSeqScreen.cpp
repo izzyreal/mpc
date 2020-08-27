@@ -20,6 +20,8 @@ NextSeqScreen::NextSeqScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void NextSeqScreen::open()
 {
+	selectNextSqFromScratch = true;
+
 	displaySq();
 	displayNow0();
 	displayNow1();
@@ -30,6 +32,11 @@ void NextSeqScreen::open()
 	displayNextSq();
 	
 	sequencer.lock()->addObserver(this);
+
+	if (sequencer.lock()->getNextSq() == -1)
+		ls.lock()->setFocus("sq");
+	else
+		ls.lock()->setFocus("nextsq");
 }
 
 void NextSeqScreen::close()
@@ -43,24 +50,68 @@ void NextSeqScreen::turnWheel(int i)
 	
 	if (param.compare("sq") == 0)
 	{
-		if (sequencer.lock()->isPlaying()) {
+		if (sequencer.lock()->isPlaying())
+		{
 			sequencer.lock()->setNextSq(sequencer.lock()->getCurrentlyPlayingSequenceIndex() + i);
+			ls.lock()->setFocus("nextsq");
 		}
-		else {
+		else
 			sequencer.lock()->setActiveSequenceIndex(sequencer.lock()->getActiveSequenceIndex() + i);
-		}
 	}
+	else if (param.compare("nextsq") == 0)
+	{
+		auto nextSq = sequencer.lock()->getNextSq();
+		
+		if (nextSq == -1 && i < 0)
+			return;
 
-	if (param.compare("nextsq") == 0)
-		sequencer.lock()->setNextSq(sequencer.lock()->getNextSq() + i);
+		if (nextSq == -1 && selectNextSqFromScratch)
+		{
+			nextSq = sequencer.lock()->getActiveSequenceIndex();
+			selectNextSqFromScratch = false;
+		}
+		else
+			nextSq += i;
+
+		sequencer.lock()->setNextSq(nextSq);
+
+		displayNextSq();
+	}
+	else if (param.compare("timing") == 0)
+	{
+		auto screen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
+		auto noteValue = screen->getNoteValue();
+		screen->setNoteValue(noteValue + i);
+		setLastFocus("timing-correct", "notevalue");
+		displayTiming();
+	}
+	else if (param.compare("tempo") == 0)
+	{
+		double oldTempo = sequencer.lock()->getTempo();
+		double newTempo = oldTempo + (i * 0.1);
+		sequencer.lock()->setTempo(newTempo);
+		displayTempo();
+	}
 }
 
 void NextSeqScreen::function(int i)
 {
 	init();
 	
-	if (i == 5)
+	if (i == 3)
+	{
+		// SUDDEN unimplemented
+	}
+	else if (i == 4)
+	{
+		sequencer.lock()->setNextSq(-1);
+		selectNextSqFromScratch = true;
+		displayNextSq();
+	}
+	else if (i == 5)
+	{
 		openScreen("next-seq-pad");
+	}
 }
 
 void NextSeqScreen::displaySq()
@@ -185,13 +236,19 @@ void NextSeqScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 	}
 	else if (s.compare("nextsq") == 0)
 	{
-		findField("nextsq").lock()->Hide(false);
 		displayNextSq();
 	}
-	else if (s.compare("nextsqoff") == 0) {
-		findField("nextsq").lock()->Hide(true);
+	else if (s.compare("nextsqoff") == 0)
+	{
+		selectNextSqFromScratch = true;
+		displayNextSq();
 	}
-	else if (s.compare("timing") == 0) {
+	else if (s.compare("timing") == 0)
+	{
 		displayTiming();
+	}
+	else if (s.compare("tempo") == 0)
+	{
+		displayTempo();
 	}
 }

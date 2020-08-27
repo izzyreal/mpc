@@ -5,7 +5,7 @@
 
 namespace mpc::lcdgui
 {
-	class HorizontalBar;
+	class HorizontalBar2;
 }
 
 namespace mpc::sequence
@@ -21,7 +21,7 @@ namespace mpc::lcdgui::screens::window
 	{
 
 	private:
-		std::vector<std::weak_ptr<mpc::lcdgui::HorizontalBar>> bars;
+		std::vector<std::weak_ptr<mpc::lcdgui::HorizontalBar2>> bars;
 		std::vector<std::weak_ptr<mpc::sequencer::TempoChangeEvent>> visibleTempoChanges;
 		std::weak_ptr<mpc::lcdgui::Field> a0Field;
 		std::weak_ptr<mpc::lcdgui::Field> a1Field;

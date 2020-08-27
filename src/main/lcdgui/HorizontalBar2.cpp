@@ -1,4 +1,4 @@
-#include "HorizontalBar.hpp"
+#include "HorizontalBar2.hpp"
 
 #include <cmath>
 
@@ -6,21 +6,20 @@
 
 using namespace mpc::lcdgui;
 
-HorizontalBar::HorizontalBar(MRECT rect, int value)
+HorizontalBar2::HorizontalBar2(MRECT rect)
 	: Component("horizontal-bar")
 {
 	setSize(rect.W(), rect.H());
 	setLocation(rect.L, rect.T);
-	this->value = value;
 }
 
-void HorizontalBar::setValue(int value)
+void HorizontalBar2::setValue(float value)
 {
 	this->value = value;
 	SetDirty();
 }
 
-void HorizontalBar::Draw(std::vector<std::vector<bool>>* pixels)
+void HorizontalBar2::Draw(std::vector<std::vector<bool>>* pixels)
 {
 	if (shouldNotDraw(pixels))
 		return;
@@ -28,7 +27,7 @@ void HorizontalBar::Draw(std::vector<std::vector<bool>>* pixels)
 	auto rect = getRect();
 	int x = rect.L;
 	int y = rect.T;
-	int x2 = x + ((int)(floor((value - 1) / 2.55))) + 1;
+	int x2 = x + floor(1 + value * w);
 	MRECT r(x, y, x2, y + 6);
 	
 	for (int i = rect.L; i <= rect.R; i++)

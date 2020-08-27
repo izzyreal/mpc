@@ -15,6 +15,7 @@ SaveApsFileScreen::SaveApsFileScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void SaveApsFileScreen::open()
 {
+	findField("replace-same-sounds").lock()->setAlignment(Alignment::Centered); 
 	displayFile();
 	displayReplaceSameSounds();
 	displaySave();

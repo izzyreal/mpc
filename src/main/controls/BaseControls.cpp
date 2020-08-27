@@ -247,9 +247,6 @@ void BaseControls::pad(int i, int velo, bool repeat, int tick)
 		}
 	}
 
-	if (currentScreenName.compare("assign-16-levels") == 0 && note != 34)
-		assign16LevelsScreen->setNote(note);
-
 	if (controls->isTapPressed() && sequencer.lock()->isPlaying())
 	{
 		if (repeat)

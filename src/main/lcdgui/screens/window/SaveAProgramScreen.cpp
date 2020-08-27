@@ -15,6 +15,7 @@ SaveAProgramScreen::SaveAProgramScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void SaveAProgramScreen::open()
 {
+	findField("replace-same-sounds").lock()->setAlignment(Alignment::Centered);
 	displayFile();
 	displaySave();
 	displayReplaceSameSounds();

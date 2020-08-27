@@ -22,6 +22,7 @@ LoopToFineScreen::LoopToFineScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void LoopToFineScreen::open()
 {
+	findField("loop-lngth").lock()->setAlignment(Alignment::Centered);
 	displayTo();
 	findField("to").lock()->enableTwoDots();
 	displayLngthField();

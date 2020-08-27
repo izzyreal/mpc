@@ -327,7 +327,7 @@ void FrameSeq::checkNextSq()
 {
 	auto lSeq = sequencer.lock();
 	lSeq->setCurrentlyPlayingSequenceIndex(lSeq->getNextSq());
-	lSeq->resetNextSq();
+	lSeq->setNextSq(-1);
 	lSeq->notify("nextsqoff");
 	lSeq->notify("seqnumbername");
 }

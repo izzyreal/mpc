@@ -171,7 +171,15 @@ void AudioMidiServices::start(const int sampleRate, const int inputCount, const 
 	offlineServer->start();
 }
 
-void AudioMidiServices::setMonitorLevel(int level) {
+void AudioMidiServices::setPreviewClickVolume(int volume)
+{
+	auto sc = mixer->getMixerControls().lock()->getStripControls("65").lock();
+	auto mmc = dynamic_pointer_cast<MainMixControls>(sc->find("Main").lock());
+	dynamic_pointer_cast<ctoot::audio::fader::FaderControl>(mmc->find("Level").lock())->setValue(static_cast<float>(volume));
+}
+
+void AudioMidiServices::setMonitorLevel(int level)
+{
 	auto sc = mixer->getMixerControls().lock()->getStripControls("66").lock();
 	auto mmc = dynamic_pointer_cast<MainMixControls>(sc->find("Main").lock());
 	dynamic_pointer_cast<ctoot::audio::fader::FaderControl>(mmc->find("Level").lock())->setValue(static_cast<float>(level));

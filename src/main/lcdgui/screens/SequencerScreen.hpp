@@ -51,6 +51,7 @@ namespace mpc::lcdgui::screens
 		void displayTsig();
 		void displayLoop();
 		void displayPunchWhileRecording();
+		void displayNextSq();
 
 	public:
 		void update(moduru::observer::Observable* o, nonstd::any arg);

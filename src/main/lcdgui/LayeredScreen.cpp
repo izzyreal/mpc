@@ -141,7 +141,14 @@ int LayeredScreen::openScreen(string screenName)
 
 	auto isOverdubScreen = find(begin(overdubScreens), end(overdubScreens), currentScreenName) != end(overdubScreens);
 	mpc.getHardware().lock()->getLed("overdub").lock()->light(isOverdubScreen || mpc.getControls().lock()->isOverDubPressed());
+
+	vector<string> nextSeqScreens{ "sequencer", "next-seq", "next-seq-pad", "track-mute", "time-display", "assign" };
+
+	auto isNextSeqScreen = find(begin(nextSeqScreens), end(nextSeqScreens), currentScreenName) != end(nextSeqScreens);
 	
+	if (!isNextSeqScreen || (currentScreenName.compare("sequencer") == 0 && !mpc.getSequencer().lock()->isPlaying()))
+		mpc.getSequencer().lock()->setNextSq(-1);
+
 	return focusedLayerIndex;
 }
 
@@ -454,9 +461,7 @@ void LayeredScreen::transferDown()
 	}
 
 	if (next)
-	{
 		setFocus(next->getName());
-	}
 }
 
 void LayeredScreen::transferUp()
@@ -464,9 +469,7 @@ void LayeredScreen::transferUp()
 	shared_ptr<Field> newCandidate;
 
 	if (transfer(2))
-	{
 		return;
-	}
 
 	int marginChars = 8;
 	int minDistV = -7;

@@ -17,9 +17,9 @@ namespace mpc::lcdgui::screens::dialog
 		void open() override;
 
 	private:
-		int trackNumber = 0;
-		void setTrackNumber(int i);
-		void displayTrackNumber();
+		int tr = 0;
+		void setTr(int i);
+		void displayTr();
 
 	};
 }

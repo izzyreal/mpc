@@ -118,10 +118,10 @@ AllLoader::AllLoader(mpc::Mpc& mpc, mpc::disk::MpcFile* file, bool sequencesOnly
 		countMetronomeScreen->setCountIn(count->getCountInMode());
 		metronomeSoundScreen->setAccentVelo(count->getAccentVelo());
 		metronomeSoundScreen->setNormalVelo(count->getNormalVelo());
-		metronomeSoundScreen->setClickOutput(count->getClickOutput());
-		metronomeSoundScreen->setClickVolume(count->getClickVolume());
+		metronomeSoundScreen->setOutput(count->getClickOutput());
+		metronomeSoundScreen->setVolume(count->getClickVolume());
 		countMetronomeScreen->setRate(count->getRate());
-		metronomeSoundScreen->setMetronomeSound(count->getSound());
+		metronomeSoundScreen->setSound(count->getSound());
 		countMetronomeScreen->setInPlay(count->isEnabledInPlay());
 		countMetronomeScreen->setInRec(count->isEnabledInRec());
 		countMetronomeScreen->setWaitForKey(count->isWaitForKeyEnabled());

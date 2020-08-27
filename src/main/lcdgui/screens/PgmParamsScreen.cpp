@@ -13,6 +13,7 @@
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::controls;
+using namespace moduru::lang;
 using namespace std;
 
 PgmParamsScreen::PgmParamsScreen(mpc::Mpc& mpc, const int layerIndex) 
@@ -210,14 +211,14 @@ void PgmParamsScreen::displayReson()
 {
 	init();
 	auto lProgram = program.lock();
-	findField("reson").lock()->setText(to_string(sampler.lock()->getLastNp(lProgram.get())->getFilterResonance()));
+	findField("reson").lock()->setTextPadded(sampler.lock()->getLastNp(lProgram.get())->getFilterResonance());
 }
 
 void PgmParamsScreen::displayFreq()
 {
 	init();
 	auto lProgram = program.lock();
-	findField("freq").lock()->setText(to_string(sampler.lock()->getLastNp(lProgram.get())->getFilterFrequency()));
+	findField("freq").lock()->setTextPadded(sampler.lock()->getLastNp(lProgram.get())->getFilterFrequency());
 }
 
 void PgmParamsScreen::displayAttackDecay()
@@ -227,8 +228,8 @@ void PgmParamsScreen::displayAttackDecay()
 	auto attack = sampler.lock()->getLastNp(lProgram.get())->getAttack();
 	auto decay = sampler.lock()->getLastNp(lProgram.get())->getDecay();
 	auto decayModeStart = sampler.lock()->getLastNp(lProgram.get())->getDecayMode() == 1;
-	findField("attack").lock()->setTextPadded(attack, " ");
-	findField("decay").lock()->setTextPadded(decay, " ");
+	findField("attack").lock()->setTextPadded(attack);
+	findField("decay").lock()->setTextPadded(decay);
 	findEnvGraph().lock()->setCoordinates(attack, decay, decayModeStart);
 }
 
@@ -246,7 +247,7 @@ void PgmParamsScreen::displayNote()
 	{
 		auto stereo = noteParameters->getStereoMixerChannel().lock()->isStereo() && sampleNumber != -1 ? "(ST)" : "";
 		auto padName = sampler.lock()->getPadName(padNumber);
-		findField("note").lock()->setText(to_string(note) + "/" + padName + "-" + moduru::lang::StrUtil::padRight(sampleName, " ", 16) + stereo);
+		findField("note").lock()->setText(to_string(note) + "/" + padName + "-" + StrUtil::padRight(sampleName, " ", 16) + stereo);
 	}
 	else
 	{
@@ -264,7 +265,10 @@ void PgmParamsScreen::displayTune()
 {
 	init();
 	auto lProgram = program.lock();
-	findField("tune").lock()->setText(to_string(sampler.lock()->getLastNp(lProgram.get())->getTune()));
+	auto tune = sampler.lock()->getLastNp(lProgram.get())->getTune();
+	auto sign = tune < 0 ? "-" : " ";
+	auto number = StrUtil::padLeft(to_string(abs(tune)), " ", 3);
+	findField("tune").lock()->setText(sign + number);
 }
 
 void PgmParamsScreen::displayDecayMode()

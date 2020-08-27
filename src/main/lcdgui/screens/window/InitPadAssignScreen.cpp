@@ -14,6 +14,7 @@ InitPadAssignScreen::InitPadAssignScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void InitPadAssignScreen::open()
 {
+	findField("init-pad-assign").lock()->setAlignment(Alignment::Centered);
 	displayInitPadAssign();
 }
 

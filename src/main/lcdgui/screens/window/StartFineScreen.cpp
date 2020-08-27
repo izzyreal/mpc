@@ -21,6 +21,7 @@ StartFineScreen::StartFineScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void StartFineScreen::open()
 {
+	findField("smpllngth").lock()->setAlignment(Alignment::Centered);
 	displayStart();
 	findField("start").lock()->enableTwoDots();
 	displayLngthLabel();

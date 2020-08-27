@@ -41,11 +41,11 @@ EditSoundScreen::EditSoundScreen(mpc::Mpc& mpc, const int layerIndex)
 void EditSoundScreen::open()
 {
 	auto previous = ls.lock()->getPreviousScreenName();
+	findField("create-new-program").lock()->setAlignment(Alignment::Centered);
 
 	if (previous.compare("name") != 0 && sampler.lock()->getSound().lock())
 	{
 		auto newSoundName = sampler.lock()->getSound().lock()->getName();
-		//newSampleName = newSampleName->replaceAll("\\s+$", "");
 		newSoundName = sampler.lock()->addOrIncreaseNumber(newSoundName);
 		setNewName(newSoundName);
 	}
@@ -228,7 +228,7 @@ void EditSoundScreen::displayCreateNewProgram()
 
 void EditSoundScreen::displayEndMargin()
 {
-    findField("end-margin").lock()->setText(to_string(endMargin));
+    findField("end-margin").lock()->setTextPadded(endMargin);
 }
 
 void EditSoundScreen::displayVariable()

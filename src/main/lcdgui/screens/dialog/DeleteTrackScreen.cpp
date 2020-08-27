@@ -7,6 +7,7 @@
 #include <lang/StrUtil.hpp>
 
 using namespace mpc::lcdgui::screens::dialog;
+using namespace moduru::lang;
 using namespace std;
 
 DeleteTrackScreen::DeleteTrackScreen(mpc::Mpc& mpc, const int layerIndex)
@@ -16,7 +17,7 @@ DeleteTrackScreen::DeleteTrackScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void DeleteTrackScreen::open()
 {
-	displayTrackNumber();
+	displayTr();
 }
 
 void DeleteTrackScreen::turnWheel(int i)
@@ -24,7 +25,7 @@ void DeleteTrackScreen::turnWheel(int i)
 	init();
 
 	if (param.compare("tr") == 0)
-		setTrackNumber(trackNumber + i);
+		setTr(tr + i);
 }
 
 void DeleteTrackScreen::function(int i)
@@ -37,30 +38,29 @@ void DeleteTrackScreen::function(int i)
 		openScreen("delete-all-tracks");
 		break;
 	case 3:
-		openScreen("sequence");
+		openScreen("track");
 		break;
 	case 4:
 	{
 		auto s = sequencer.lock()->getActiveSequence().lock();
-		s->purgeTrack(trackNumber);
+		s->purgeTrack(tr);
 		openScreen("sequencer");
 	}
 	}
 }
 
-void DeleteTrackScreen::setTrackNumber(int i)
+void DeleteTrackScreen::setTr(int i)
 {
 	if (i < 0 || i > 63)
-	{
 		return;
-	}
-	trackNumber = i;
-	displayTrackNumber();
+
+	tr = i;
+	displayTr();
 }
 
-void DeleteTrackScreen::displayTrackNumber()
+void DeleteTrackScreen::displayTr()
 {
-	auto trackName = sequencer.lock()->getActiveSequence().lock()->getTrack(trackNumber).lock()->getName();
-	findField("tr").lock()->setText(moduru::lang::StrUtil::padLeft(to_string(trackNumber + 1), " ", 2) + "-" + trackName);
+	auto trackName = sequencer.lock()->getActiveSequence().lock()->getTrack(tr).lock()->getName();
+	findField("tr").lock()->setText(StrUtil::padLeft(to_string(tr + 1), "0", 2) + "-" + trackName);
 }
 

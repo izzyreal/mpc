@@ -159,7 +159,7 @@ void TimingCorrectScreen::displayShiftTiming()
 
 void TimingCorrectScreen::displayAmount()
 {
-	findField("amount").lock()->setText(to_string(amount));
+	findField("amount").lock()->setTextPadded(amount);
 }
 
 void TimingCorrectScreen::displayTime()

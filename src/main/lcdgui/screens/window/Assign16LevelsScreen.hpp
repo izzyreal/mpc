@@ -11,9 +11,11 @@ namespace mpc::lcdgui::screens::window
 		void function(int i) override;
 		void turnWheel(int i) override;
 		void open() override;
+		void close() override;
 		void openWindow() override;
 
 		Assign16LevelsScreen(mpc::Mpc& mpc, const int layerIndex);
+		void update(moduru::observer::Observable* o, nonstd::any msg) override;
 
 	private:
 		const std::vector<std::string> typeNames{ "TUNING", "DECAY", "ATTACK", "FILTER" };

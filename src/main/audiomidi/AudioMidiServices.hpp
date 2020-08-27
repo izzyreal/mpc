@@ -107,6 +107,7 @@ namespace mpc::audiomidi
 		std::vector<std::string> getInputNames();
 		std::vector<std::string> getOutputNames();
 		void setMonitorLevel(int level);
+		void setPreviewClickVolume(int volume);
 
 	public:
 		ctoot::audio::server::NonRealTimeAudioServer* getAudioServer();

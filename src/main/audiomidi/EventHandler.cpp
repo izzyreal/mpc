@@ -56,9 +56,7 @@ EventHandler::EventHandler(mpc::Mpc& mpc)
 void EventHandler::handle(weak_ptr<mpc::sequencer::Event> event, mpc::sequencer::Track* track)
 {
 	if (!track->isOn() && event.lock()->getTick() != -1)
-	{
 		return;
-	}
 
 	auto ne = dynamic_pointer_cast<mpc::sequencer::NoteEvent>(event.lock());
 	

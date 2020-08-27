@@ -11,6 +11,10 @@ CountMetronomeScreen::CountMetronomeScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void CountMetronomeScreen::open()
 {
+	findField("in-play").lock()->setAlignment(Alignment::Centered);
+	findField("in-rec").lock()->setAlignment(Alignment::Centered);
+	findField("wait-for-key").lock()->setAlignment(Alignment::Centered);
+
 	displayCountIn();
 	displayInPlay();
 	displayRate();

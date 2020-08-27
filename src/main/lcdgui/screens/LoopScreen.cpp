@@ -31,6 +31,7 @@ LoopScreen::LoopScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void LoopScreen::open()
 {
+	findField("loop").lock()->setAlignment(Alignment::Centered);
 	bool sound = sampler.lock()->getSound().lock() ? true : false;
 
 	findField("snd").lock()->setFocusable(sound);

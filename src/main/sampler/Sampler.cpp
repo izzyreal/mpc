@@ -164,14 +164,23 @@ void Sampler::playMetronome(mpc::sequencer::NoteEvent* event, int framePos)
 	auto metronomeSoundScreen = dynamic_pointer_cast<MetronomeSoundScreen>(mpc.screens->getScreenComponent("metronome-sound"));
 	auto soundNumber = -2;
 
-	if (metronomeSoundScreen->getMetronomeSound() != 0)
+	auto velocity = event->getVelocity();
+
+	if (metronomeSoundScreen->getSound() != 0)
 	{
-		auto program = mpc.getDrum(metronomeSoundScreen->getMetronomeSound() - 1)->getProgram();
-		auto accent = event->getVelocity() == metronomeSoundScreen->getAccentVelo();
-		soundNumber = programs[program]->getNoteParameters(accent ? metronomeSoundScreen->getAccentNote() : metronomeSoundScreen->getNormalNote())->getSoundIndex();
+		auto program = mpc.getDrum(metronomeSoundScreen->getSound() - 1)->getProgram();
+		auto accent = velocity == 127;
+		velocity = accent ? metronomeSoundScreen->getAccentVelo() : metronomeSoundScreen->getNormalVelo();
+		auto pad = accent ? metronomeSoundScreen->getAccentPad() : metronomeSoundScreen->getNormalPad();
+		auto note = programs[program]->getNoteFromPad(pad);
+		soundNumber = programs[program]->getNoteParameters(note)->getSoundIndex();
+	}
+	else
+	{
+		velocity *= metronomeSoundScreen->getVolume() * 0.01;
 	}
 	
-	mpc.getBasicPlayer()->mpcNoteOn(soundNumber, event->getVelocity(), framePos);
+	mpc.getBasicPlayer()->mpcNoteOn(soundNumber, velocity, framePos);
 }
 
 void Sampler::playPreviewSample(int start, int end, int loopTo, int overlapMode)

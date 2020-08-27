@@ -156,8 +156,11 @@ void StepEditorScreen::function(int i)
 		else if (selectionStartIndex == -1 && param.length() == 2)
 		{
 			// CopySelectedNote
-			auto eventNumber = stoi(param.substr(1, 1));
-			placeHolder = { visibleEvents[eventNumber] };
+			auto eventIndex = stoi(param.substr(1, 1));
+			auto emptyEvent = dynamic_pointer_cast<EmptyEvent>(visibleEvents[eventIndex].lock());
+
+			if (!emptyEvent)
+				placeHolder = { visibleEvents[eventIndex] };
 		}
 		break;
 	case 2:

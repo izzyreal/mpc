@@ -12,6 +12,9 @@ LoopBarsScreen::LoopBarsScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void LoopBarsScreen::open()
 {
+	findField("firstbar").lock()->setAlignment(Alignment::Centered);
+	findField("lastbar").lock()->setAlignment(Alignment::Centered);
+	findField("numberofbars").lock()->setAlignment(Alignment::Centered);
 	displayFirstBar();
 	displayLastBar();
 	displayNumberOfBars();

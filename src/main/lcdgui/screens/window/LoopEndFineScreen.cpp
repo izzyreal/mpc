@@ -22,6 +22,7 @@ LoopEndFineScreen::LoopEndFineScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void LoopEndFineScreen::open()
 {
+	findField("loop-lngth").lock()->setAlignment(Alignment::Centered);
 	findField("end").lock()->enableTwoDots();
 	displayEnd();
 	displayLngthField();
