@@ -208,24 +208,20 @@ weak_ptr<moduru::file::Directory> StdDisk::getParentDir()
 	return path[(int)(path.size()) - 2];
 }
 
-bool StdDisk::deleteAllFiles(int dwGuiDelete)
+bool StdDisk::deleteAllFiles(int extension)
 {
-	weak_ptr<moduru::file::Directory> parentDirectory;
-	try {
-		parentDirectory = getParentDir();
-	}
-	catch (const exception& e1) {
+	if (!getDir().lock())
 		return false;
-	}
-	if (!parentDirectory.lock()) return false;
 
 	auto success = false;
-	auto files = parentDirectory.lock()->listFiles();
-	for (auto& f : files) {
-		if (!f->isDirectory()) {
-			if (dwGuiDelete == 0 || StrUtil::hasEnding(f->getName(), extensions[dwGuiDelete])) {
+	auto files = getDir().lock()->listFiles();
+	
+	for (auto& f : files)
+	{
+		if (!f->isDirectory())
+		{
+			if (extension == 0 || StrUtil::hasEnding(f->getName(), extensions[extension]))
 				success = f->del();
-			}
 		}
 	}
 	return success;
