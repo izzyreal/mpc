@@ -26,8 +26,8 @@ namespace mpc::lcdgui::screens::window
 		void displayAssignmentView();
 		void displayPad(int i);
 		void displayInfo0();
-		void displayInfo1();
-		void displayInfo2();
+		void displayNote();
+		void displaySoundName();
 
 		int getPadIndexFromFocus();
 		std::string getFocusFromPadIndex();

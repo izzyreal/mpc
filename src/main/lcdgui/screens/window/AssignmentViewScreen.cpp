@@ -2,8 +2,11 @@
 
 #include <controls/BaseSamplerControls.hpp>
 
+#include <lang/StrUtil.hpp>
+
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::controls;
+using namespace moduru::lang;
 using namespace std;
 
 AssignmentViewScreen::AssignmentViewScreen(mpc::Mpc& mpc, const int layerIndex) 
@@ -14,8 +17,8 @@ AssignmentViewScreen::AssignmentViewScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void AssignmentViewScreen::open()
 {
-	findField("info1").lock()->setFocusable(false);
-	findField("info1").lock()->setInverted(true);
+	findField("note").lock()->setFocusable(false);
+	findField("note").lock()->setInverted(true);
 
 	ls.lock()->setFocus(getFocusFromPadIndex());
 
@@ -123,8 +126,8 @@ void AssignmentViewScreen::update(moduru::observer::Observable* o, nonstd::any a
 	}
 	else if (s.compare("note") == 0)
 	{
-		displayInfo1();
-		displayInfo2();
+		displayNote();
+		displaySoundName();
 		displayPad(getPadIndexFromFocus());
 	}
 }
@@ -135,8 +138,8 @@ void AssignmentViewScreen::displayAssignmentView()
 		displayPad(i);
 
 	displayInfo0();
-	displayInfo1();
-	displayInfo2();
+	displayNote();
+	displaySoundName();
 }
 
 void AssignmentViewScreen::displayPad(int i)
@@ -151,14 +154,7 @@ void AssignmentViewScreen::displayPad(int i)
 		sampleName = sampleNumber != -1 ? sampler.lock()->getSoundName(sampleNumber) : "--";
 	
 		if (sampleName.length() > 8)
-		{
-			sampleName = sampleName.substr(0, 8);
-		}
-		
-		while (!sampleName.empty() && isspace(sampleName.back()))
-		{
-			sampleName.pop_back();
-		}
+			sampleName = StrUtil::trim(sampleName.substr(0, 8));
 	}
 
 	findField(padFocusNames[i]).lock()->setText(sampleName);
@@ -169,14 +165,14 @@ void AssignmentViewScreen::displayInfo0()
 	findLabel("info0").lock()->setText("Bank:" + letters[mpc.getBank()] + " Note:");
 }
 
-void AssignmentViewScreen::displayInfo1()
+void AssignmentViewScreen::displayNote()
 {
 	auto note = program.lock()->getPad(getPadIndexFromFocus())->getNote();
-	auto text = note != 34 ? to_string(note) : "--";	
-	findField("info1").lock()->setText(text);
+	auto text = note == 34 ? "--" : to_string(note);
+	findField("note").lock()->setText(text);
 }
 
-void AssignmentViewScreen::displayInfo2()
+void AssignmentViewScreen::displaySoundName()
 {
 	auto padIndex = getPadIndexFromFocus();
 	int note = program.lock()->getPad(padIndex)->getNote();
@@ -187,20 +183,20 @@ void AssignmentViewScreen::displayInfo2()
 		return;
 	}
 
-	int sampleNumber = program.lock()->getNoteParameters(note)->getSoundIndex();
+	int soundIndex = program.lock()->getNoteParameters(note)->getSoundIndex();
 
-	string sampleName = sampleNumber != -1 ? sampler.lock()->getSoundName(sampleNumber) : "";
+	string soundName = soundIndex == -1 ? "OFF" : sampler.lock()->getSoundName(soundIndex);
 
 	init();
-	auto program_ = program.lock();
-	auto noteParameters = sampler.lock()->getLastNp(program_.get());
+
+	auto noteParameters = sampler.lock()->getLastNp(program.lock().get());
 	
 	string stereo = "";
 
-	if (sampleNumber != -1 && noteParameters->getStereoMixerChannel().lock()->isStereo())
+	if (soundIndex != -1 && noteParameters->getStereoMixerChannel().lock()->isStereo())
 		stereo = "(ST)";
 
-	findLabel("info2").lock()->setText("=" + sampleName + stereo);
+	findLabel("info2").lock()->setText("=" + StrUtil::padRight(soundName, " ", 16) + stereo);
 }
 
 int AssignmentViewScreen::getPadIndexFromFocus()

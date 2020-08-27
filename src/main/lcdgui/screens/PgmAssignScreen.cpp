@@ -25,6 +25,7 @@ PgmAssignScreen::PgmAssignScreen(mpc::Mpc& mpc, const int layerIndex)
 void PgmAssignScreen::open()
 {
 	findField("pad-assign").lock()->setAlignment(Alignment::Centered);
+	findField("pad-assign").lock()->setLocation(194, 11);
 
 	mpc.addObserver(this);
 	displayNote();
