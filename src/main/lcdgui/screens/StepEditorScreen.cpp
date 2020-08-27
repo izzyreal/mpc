@@ -19,6 +19,8 @@
 
 #include <Util.hpp>
 
+#include <stdexcept>
+
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;
@@ -1216,7 +1218,7 @@ void StepEditorScreen::update(moduru::observer::Observable*, nonstd::any message
 			init();
 			eventNumber = stoi(param.substr(1, 2));
 		}
-		catch (const std::invalid_argument& ia)
+		catch (const invalid_argument& e)
 		{
 			return;
 		}

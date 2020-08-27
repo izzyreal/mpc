@@ -10,8 +10,6 @@
 
 #include <observer/Observable.hpp>
 
-#include <io/CircularIntBuffer.hpp>
-
 namespace mpc { class Mpc; }
 
 namespace mpc::sequencer
@@ -45,7 +43,7 @@ namespace mpc::sequencer
 		const std::vector<int> TICK_VALUES{ 1, 48, 32, 24, 16, 12, 8 };
 		std::vector<std::shared_ptr<Sequence>> sequences;
 		std::vector<std::shared_ptr<Song>> songs;
-		std::unique_ptr<moduru::io::CircularIntBuffer> taps;
+		std::vector<uint64_t> taps{ 0, 0, 0, 0 };
 
 		std::shared_ptr<Sequence> undoPlaceHolder;
 
@@ -69,7 +67,8 @@ namespace mpc::sequencer
 		bool countingIn = false;
 		int reposition = 0;
 		int position = 0;
-		int lastTap = 0;
+		uint64_t lastTap = 0;
+		int tapIndex = 0;
 
 	public:
 		std::vector<int> getTickValues();

@@ -49,8 +49,8 @@ Sequencer::Sequencer(mpc::Mpc& mpc)
 
 void Sequencer::init()
 {
+	lastTap = moduru::System::currentTimeMillis();
 	sequences = vector<shared_ptr<Sequence>>(99);
-	taps = make_unique<moduru::io::CircularIntBuffer>(4, true, true);
 	reposition = -1;
 	nextSq = -1;
 	previousTempo = 0.0;
@@ -1392,30 +1392,51 @@ void Sequencer::tap()
 	if (isPlaying())
 		return;
 
-	auto nanoLong = moduru::System::nanoTime();
+	auto now = moduru::System::currentTimeMillis();
 
-	if (nanoLong - lastTap > (2000 * 1000000))
-		taps = make_unique<moduru::io::CircularIntBuffer>(4, true, true);
-
-	lastTap = nanoLong;
-	taps->write(vector<int>{ (int)nanoLong });
-	int accum = 0;
-	vector<long> tapsLong;
-	
-	while (taps->availableRead() > 0)
-		tapsLong.push_back(taps->read());
-	
-	for (int i = 0; i < (int)(tapsLong.size()) - 1; i++)
+	if (now - lastTap > 2000)
 	{
-		int l0 = tapsLong[i];
-		int l1 = tapsLong[i + 1];
-		accum += l1 - l0;
+		taps = { 0, 0, 0, 0 };
+		tapIndex = 0;
+	}
+
+	lastTap = now;
+
+	taps[tapIndex] = lastTap;
+	
+	uint64_t accum = 0;
+	
+	int index = tapIndex;
+
+	tapIndex++;
+
+	if (tapIndex > 3)
+		tapIndex = 0;
+
+	int usedTapsCounter = 0;
+
+	for (int i = 0; i < 3; i++)
+	{
+		auto l0 = taps[index];
+
+		index--;
+
+		if (index < 0)
+			index = 3;
+
+		auto l1 = taps[index];
+		
+		if (l0 == 0 || l1 == 0)
+			break;
+
+		accum += l0 - l1;
+		usedTapsCounter++;
 	}
 
 	if (accum == 0)
 		return;
 
-	auto tempo = (60000.0 * 1000000.0) / (accum / ((int)(tapsLong.size()) - 1));
+	auto tempo = 60000.0 / (accum / usedTapsCounter);
 	tempo = floor(tempo * 10) / 10;
 	setTempo(tempo);
 }

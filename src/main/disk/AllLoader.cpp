@@ -42,6 +42,8 @@
 
 #include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
 
+#include <stdexcept>
+
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
