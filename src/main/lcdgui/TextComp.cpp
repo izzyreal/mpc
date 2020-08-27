@@ -22,6 +22,12 @@ TextComp::TextComp(mpc::Mpc& mpc, const std::string& name)
 {
 }
 
+void TextComp::setLeftMargin(const int margin)
+{
+	leftMargin = margin;
+	SetDirty();
+}
+
 void TextComp::enableTwoDots()
 {
 	if (twoDots)
@@ -81,6 +87,9 @@ void TextComp::Draw(std::vector<std::vector<bool>>* pixels)
 		alignmentOffset = (alignmentEndX - charsWidthInPixels) * 0.5;
 	}
 
+	if (leftMargin != 0 && alignment == Alignment::None)
+		alignmentOffset = leftMargin;
+
 	int atlasx, atlasy;
 
 	char* tempText = new char[textToRender.length() + 1];
@@ -113,12 +122,13 @@ void TextComp::Draw(std::vector<std::vector<bool>>* pixels)
 					if (alignment == Alignment::Centered && !textuallyAligned) 
 					{
 						if (xpos - x < alignmentEndX - 4)
-						{
 							xpos += alignmentOffset;
-						}
-						else {
+						else
 							xpos += (2 * alignmentOffset);
-						}
+					}
+					else if (leftMargin != 0)
+					{
+						xpos += alignmentOffset;
 					}
 
 					if (w == 47 && name.find("note") != string::npos)
@@ -129,9 +139,7 @@ void TextComp::Draw(std::vector<std::vector<bool>>* pixels)
 					}
 
 					if (h <= 7)
-					{
 						ypos--;
-					}
 
 					(*pixels)[xpos][ypos] = inverted ? false : true;
 

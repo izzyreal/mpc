@@ -17,10 +17,13 @@ namespace mpc::lcdgui::screens::dialog
 		CreateNewProgramScreen(mpc::Mpc& mpc, const int layerIndex);
 
 		void open() override;
+		void turnWheel(int i) override;
 
 	private:
 		std::string newName = "";
-		int newProgramChange = 1;
+		int midiProgramChange = 0;
+
+		void setMidiProgramChange(int i);
 
 		void displayNewName();
 		void displayMidiProgramChange();

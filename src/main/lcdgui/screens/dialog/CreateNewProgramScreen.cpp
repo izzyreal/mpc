@@ -14,6 +14,16 @@ CreateNewProgramScreen::CreateNewProgramScreen(mpc::Mpc& mpc, const int layerInd
 	baseControls = make_shared<BaseSamplerControls>(mpc);
 }
 
+void CreateNewProgramScreen::turnWheel(int i)
+{
+	init();
+
+	if (param.compare("midi-program-change") == 0)
+	{
+		setMidiProgramChange(midiProgramChange + i);
+	}
+}
+
 void CreateNewProgramScreen::open()
 {
 	auto letterIndex = 21 + 24;
@@ -23,6 +33,7 @@ void CreateNewProgramScreen::open()
 		if (!sampler.lock()->getProgram(i).lock())
 		{
 			letterIndex = 21 + i;
+			midiProgramChange = i + 1;
 			break;
 		}
 	}
@@ -47,7 +58,7 @@ void CreateNewProgramScreen::function(int i)
 	case 4:
 		auto newProgram = sampler.lock()->addProgram().lock();
 		newProgram->setName(newName);
-		newProgram->setMidiProgramChange(newProgramChange);
+		newProgram->setMidiProgramChange(midiProgramChange);
 		
 		auto index = sampler.lock()->getProgramCount() - 1;
 
@@ -68,10 +79,25 @@ void CreateNewProgramScreen::function(int i)
 
 void CreateNewProgramScreen::displayMidiProgramChange()
 {
-	findField("midi-program-change").lock()->setTextPadded(program.lock()->getMidiProgramChange(), " ");
+	findField("midi-program-change").lock()->setTextPadded(midiProgramChange);
 }
 
 void CreateNewProgramScreen::displayNewName()
 {
 	findField("new-name").lock()->setText(newName);
+}
+
+void CreateNewProgramScreen::setMidiProgramChange(int i)
+{
+	if (i < 1)
+		i = 1;
+
+	if (i > 128)
+		i = 128;
+
+	if (midiProgramChange == i)
+		return;
+
+	midiProgramChange = i;
+	displayMidiProgramChange();
 }

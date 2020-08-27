@@ -22,6 +22,10 @@ void NextSeqScreen::open()
 {
 	selectNextSqFromScratch = true;
 
+	findLabel("tempo").lock()->setSize(12, 9);
+	findField("tempo").lock()->setLocation(18, 11);
+	findField("tempo").lock()->setLeftMargin(1);
+
 	displaySq();
 	displayNow0();
 	displayNow1();

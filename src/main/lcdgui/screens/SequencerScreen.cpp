@@ -43,7 +43,10 @@ void SequencerScreen::open()
 	findField("pgm").lock()->setAlignment(Alignment::Centered);
 	findField("count").lock()->setAlignment(Alignment::Centered);
 
-	findLabel("tempo").lock()->setSize(18, 9);
+	findLabel("tempo").lock()->setSize(12, 9);
+	findField("tempo").lock()->setLocation(18, 11);
+	findField("tempo").lock()->setLeftMargin(1);
+
 	init();
 	sequence = sequencer.lock()->getActiveSequence();
 	track = sequencer.lock()->getActiveTrack();

@@ -12,9 +12,7 @@ namespace mpc { class Mpc; }
 namespace mpc::lcdgui
 {
 
-	enum Alignment {
-		None, Centered
-	};
+	enum Alignment { None, Centered };
 
 	class TextComp
 		: public Component
@@ -30,6 +28,7 @@ namespace mpc::lcdgui
 		bool textuallyAligned = false;
 		int alignmentEndX = -1;
 		bool twoDots = false;
+		int leftMargin = 0;
 
 	protected:
 		bool inverted = false;
@@ -43,6 +42,7 @@ namespace mpc::lcdgui
 		virtual void setText(const std::string& s);
 
 	public:
+		void setLeftMargin(const int margin);
 		void enableTwoDots();
 		void setBlinking(bool b);
 		void setInverted(bool b);
