@@ -133,6 +133,7 @@ WavFile WavFile::openWavFile(const string& path)
     auto bytesRead = result.iStream.gcount();
 
     if (bytesRead != 12) {
+        result.iStream.close();
         throw std::invalid_argument("Not enough wav file bytes for header");
     }
 	
@@ -141,18 +142,22 @@ WavFile WavFile::openWavFile(const string& path)
 	auto riffTypeID = getLE(result.buffer, 8, 4);
 
     if (riffChunkID != RIFF_CHUNK_ID) {
+        result.iStream.close();
         throw std::invalid_argument("Invalid Wav Header data, incorrect riff chunk ID");
     }
 
     if (riffTypeID != RIFF_TYPE_ID) {
+        result.iStream.close();
         throw std::invalid_argument("Invalid Wav Header data, incorrect riff type ID");
     }
 
     if (chunkSize % 2 != 0) {
+        result.iStream.close();
         chunkSize += 1;
     }
 
     if (fileSize != chunkSize + 8) {
+        result.iStream.close();
         throw std::invalid_argument("Invalid Wav Header data, incorrect chunk size");
     }
 
@@ -164,6 +169,7 @@ WavFile WavFile::openWavFile(const string& path)
         bytesRead = result.iStream.gcount();
         
         if (bytesRead != 8) {
+            result.iStream.close();
             throw std::invalid_argument("Could not read chunk header");
         }
 
@@ -178,6 +184,7 @@ WavFile WavFile::openWavFile(const string& path)
             auto compressionCode = static_cast< int >(getLE(result.buffer, 0, 2));
 			if (compressionCode != 1) {
 				string exc = "Compression Code " + to_string(compressionCode)+ " not supported";
+                result.iStream.close();
 				throw std::invalid_argument(exc.c_str());
 			}
 
@@ -187,39 +194,47 @@ WavFile WavFile::openWavFile(const string& path)
             result.validBits = static_cast< int >(getLE(result.buffer, 14, 2));
 			
             if (result.numChannels == 0) {
+                result.iStream.close();
                 throw std::invalid_argument("Number of channels specified in header is equal to zero");
             }
 
             if (result.blockAlign == 0) {
+                result.iStream.close();
                 throw std::invalid_argument("Block Align specified in header is equal to zero");
             }
 
             if (result.validBits < 2) {
+                result.iStream.close();
                 throw std::invalid_argument("Valid Bits specified in header is less than 2");
             }
 
             if (result.validBits > 64) {
+                result.iStream.close();
                 throw std::invalid_argument("Valid Bits specified in header is greater than 64, this is greater than a long can hold");
             }
 
             result.bytesPerSample = (result.validBits + 7) / 8;
 
             if (result.bytesPerSample * result.numChannels != result.blockAlign) {
+                result.iStream.close();
                 throw std::invalid_argument("Block Align does not agree with bytes required for validBits and number of channels");
             }
 
             numChunkBytes -= 16;
             
             if (numChunkBytes > 0) {
+                result.iStream.close();
                 result.iStream.ignore(numChunkBytes);
             }
 
         } else if(chunkID == DATA_CHUNK_ID) {
             if (foundFormat == false) {
+                result.iStream.close();
                 throw std::invalid_argument("Data chunk found before Format chunk");
             }
 
             if (chunkSize % result.blockAlign != 0) {
+                result.iStream.close();
                 throw std::invalid_argument("Data Chunk size is not multiple of Block Align");
             }
 
@@ -232,6 +247,7 @@ WavFile WavFile::openWavFile(const string& path)
     }
 
     if (foundData == false) {
+        result.iStream.close();
         throw std::invalid_argument("Did not find a data chunk");
     }
 
