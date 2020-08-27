@@ -31,8 +31,11 @@ AllParser::AllParser(mpc::Mpc& mpc, mpc::disk::MpcFile* file)
 {
 	songs = vector<Song*>(20);
 	auto loadBytes = file->getBytes();
-	auto header = new Header(moduru::VecUtil::CopyOfRange(&loadBytes, HEADER_OFFSET, HEADER_OFFSET + HEADER_LENGTH));
-	header->verifyFileID();
+	header = new Header(moduru::VecUtil::CopyOfRange(&loadBytes, HEADER_OFFSET, HEADER_OFFSET + HEADER_LENGTH));
+	
+	if (!header->verifyFileID())
+		throw invalid_argument("Invalid ALL file header ID");
+	
 	defaults = new Defaults(mpc, moduru::VecUtil::CopyOfRange(&loadBytes, DEFAULTS_OFFSET, DEFAULTS_OFFSET + DEFAULTS_LENGTH));
 	sequencer = new Sequencer(mpc, moduru::VecUtil::CopyOfRange(&loadBytes, SEQUENCER_OFFSET, SEQUENCER_OFFSET + Sequencer::LENGTH));
 	count = new Count(mpc, moduru::VecUtil::CopyOfRange(&loadBytes, COUNT_OFFSET, COUNT_OFFSET + COUNT_LENGTH));

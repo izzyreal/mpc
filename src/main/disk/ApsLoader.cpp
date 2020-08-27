@@ -45,6 +45,9 @@ using namespace std;
 ApsLoader::ApsLoader(mpc::Mpc& mpc, mpc::disk::MpcFile* file)
 	: mpc(mpc)
 {
+	if (!file->getFsNode().lock()->exists())
+		throw invalid_argument("File does not exist");
+
 	this->file = file;
 
 	auto cantFindFileScreen = dynamic_pointer_cast<CantFindFileScreen>(mpc.screens->getScreenComponent("cant-find-file"));

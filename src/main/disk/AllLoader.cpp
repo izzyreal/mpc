@@ -1,6 +1,7 @@
 #include "AllLoader.hpp"
 
 #include <Mpc.hpp>
+#include <file/all/AllParser.hpp>
 #include <file/all/Bar.hpp>
 #include <file/all/BarList.hpp>
 #include <file/all/Count.hpp>
@@ -13,6 +14,10 @@
 #include <file/all/AllSequencer.hpp>
 #include <file/all/AllSong.hpp>
 #include <file/all/Tracks.hpp>
+#include <file/all/Header.hpp>
+
+#include <disk/MpcFile.hpp>
+#include <file/FsNode.hpp>
 
 #include <sequencer/Event.hpp>
 #include <sequencer/Sequence.hpp>
@@ -46,8 +51,13 @@ using namespace mpc::file::all;
 using namespace std;
 
 AllLoader::AllLoader(mpc::Mpc& mpc, mpc::disk::MpcFile* file, bool sequencesOnly)
-	: allParser(AllParser(mpc, file)), mpc(mpc)
+	: mpc(mpc)
 {
+	if (!file->getFsNode().lock()->exists())
+		throw invalid_argument("File does not exist");
+
+	AllParser allParser(mpc, file);
+
 	if (sequencesOnly)
 	{
 		allSequences = allParser.getAllSequences();
@@ -185,10 +195,7 @@ AllLoader::AllLoader(mpc::Mpc& mpc, mpc::disk::MpcFile* file, bool sequencesOnly
 		auto songs = allParser.getSongs();
 		
 		for (int i = 0; i < 20; i++)
-		{
 			lSequencer->getSong(i).lock()->setName(songs[i]->name);
-		}
-
 	}
 }
 
@@ -197,9 +204,7 @@ void AllLoader::convertSequences(const bool indiv)
 	int index = -1;
 	
 	if (!indiv)
-	{
 		mpc.getSequencer().lock()->purgeAllSequences();
-	}
 
 	for (auto& as : allSequences)
 	{
@@ -207,7 +212,9 @@ void AllLoader::convertSequences(const bool indiv)
 	
 		if (as == nullptr)
 		{
-			if (indiv) mpcSequences.push_back(nullptr);
+			if (indiv)
+				mpcSequences.push_back(nullptr);
+			
 			continue;
 		}
 

@@ -13,8 +13,12 @@
 #include <sampler/PgmSlider.hpp>
 #include <sampler/Sampler.hpp>
 
+#include <disk/MpcFile.hpp>
+
 #include <mpc/MpcStereoMixerChannel.hpp>
 #include <mpc/MpcNoteParameters.hpp>
+
+#include <stdexcept>
 
 using namespace mpc::disk;
 using namespace mpc::sampler;
@@ -22,12 +26,18 @@ using namespace std;
 
 PgmToProgramConverter::PgmToProgramConverter(MpcFile* file, weak_ptr<Sampler> sampler, const int replaceIndex)
 {
+	if (!file->getFsNode().lock()->exists())
+		throw invalid_argument("File does not exist");
+
+	reader = new mpc::file::pgmreader::ProgramFileReader(file);
+	
+	if (!reader->getHeader()->verifyFirstTwoBytes())
+		throw invalid_argument("PGM first 2 bytes are incorrect");
+	
 	if (replaceIndex == -1)
 		program = sampler.lock()->addProgram();
 	else
 		program = dynamic_pointer_cast<Program>(sampler.lock()->getProgram(replaceIndex).lock());
-
-	reader = new mpc::file::pgmreader::ProgramFileReader(file);
 
 	auto pgmSoundNames = reader->getSampleNames();
 	

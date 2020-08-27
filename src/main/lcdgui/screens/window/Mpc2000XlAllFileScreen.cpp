@@ -2,10 +2,12 @@
 
 #include <lcdgui/screens/LoadScreen.hpp>
 #include <lcdgui/screens/window/LoadASequenceFromAllScreen.hpp>
+#include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
 #include <disk/AllLoader.hpp>
 
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::lcdgui::screens;
 using namespace std;
 
@@ -26,14 +28,24 @@ void Mpc2000XlAllFileScreen::function(int i)
 	case 2:
 	{
 		auto sequencesOnly = true;
-		mpc::disk::AllLoader allLoader(mpc, loadScreen->getSelectedFile(), sequencesOnly);
 		
-		auto loadASequenceFromAllScreen = dynamic_pointer_cast<LoadASequenceFromAllScreen>(mpc.screens->getScreenComponent("load-a-sequence-from-all"));
-		loadASequenceFromAllScreen->sequencesFromAllFile = allLoader.getSequences();
+		try
+		{
+			mpc::disk::AllLoader allLoader(mpc, loadScreen->getSelectedFile(), sequencesOnly);
+			auto loadASequenceFromAllScreen = dynamic_pointer_cast<LoadASequenceFromAllScreen>(mpc.screens->getScreenComponent("load-a-sequence-from-all"));
+			loadASequenceFromAllScreen->sequencesFromAllFile = allLoader.getSequences();
 
-		loadScreen->fileLoad = 0;
-		
-		openScreen("load-a-sequence-from-all");
+			loadScreen->fileLoad = 0;
+
+			openScreen("load-a-sequence-from-all");
+		}
+		catch (const exception& e)
+		{
+			auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+			popupScreen->setText("Wrong file format");
+			popupScreen->returnToScreenAfterInteraction("load");
+			mpc.getLayeredScreen().lock()->openScreen("popup");
+		}
 		break;
 	}
 	case 3:
@@ -42,8 +54,18 @@ void Mpc2000XlAllFileScreen::function(int i)
 	case 4:
 	{
 		auto sequencesOnly = false;
-		mpc::disk::AllLoader allLoader(mpc, loadScreen->getSelectedFile(), sequencesOnly);
-		openScreen("sequencer");
+		try
+		{
+			mpc::disk::AllLoader allLoader(mpc, loadScreen->getSelectedFile(), sequencesOnly);
+			openScreen("sequencer");
+		}
+		catch (const exception& e)
+		{
+			auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+			popupScreen->setText("Wrong file format");
+			popupScreen->returnToScreenAfterInteraction("load");
+			mpc.getLayeredScreen().lock()->openScreen("popup");
+		}
 		break;
 	}
 	}

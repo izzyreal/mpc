@@ -3,8 +3,6 @@
 #include <memory>
 #include <vector>
 
-#include <file/all/AllParser.hpp>
-
 namespace mpc { class Mpc; }
 
 namespace mpc::disk
@@ -29,7 +27,6 @@ namespace mpc::disk
 
 	private:
 		mpc::Mpc& mpc;
-		mpc::file::all::AllParser allParser;
 		std::vector<mpc::file::all::Sequence*> allSequences;
 		std::vector<std::shared_ptr<mpc::sequencer::Sequence>> mpcSequences;
 
