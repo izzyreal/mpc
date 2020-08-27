@@ -152,7 +152,7 @@ void EventHandler::handleNoThru(weak_ptr<mpc::sequencer::Event> e, mpc::sequence
 			auto drum = busNumber - 1;
 			if (ne->getDuration() != -1)
 			{
-				if (!(lSequencer->isSoloEnabled() && track->getTrackIndex() != lSequencer->getActiveTrackIndex()))
+				if (!(lSequencer->isSoloEnabled() && track->getIndex() != lSequencer->getActiveTrackIndex()))
 				{
 					auto newVelo = static_cast<int>(ne->getVelocity() * (track->getVelocityRatio() * 0.01));
 					mpc::sequencer::MidiAdapter midiAdapter;
@@ -162,7 +162,7 @@ void EventHandler::handleNoThru(weak_ptr<mpc::sequencer::Event> e, mpc::sequence
 					if (timeStamp != -1)
 						eventFrame = timeStamp;
 					
-					mpc.getMms()->mpcTransport(track->getTrackIndex(), midiAdapter.get().lock().get(), 0, ne->getVariationType(), ne->getVariationValue(), eventFrame);
+					mpc.getMms()->mpcTransport(track->getIndex(), midiAdapter.get().lock().get(), 0, ne->getVariationType(), ne->getVariationValue(), eventFrame);
 					
 					if (mpc.getAudioMidiServices().lock()->getAudioServer()->isRealTime())
 					{
@@ -220,15 +220,37 @@ void EventHandler::handleNoThru(weak_ptr<mpc::sequencer::Event> e, mpc::sequence
 
 void EventHandler::midiOut(weak_ptr<mpc::sequencer::Event> e, mpc::sequencer::Track* track)
 {
-	auto event = e.lock();
-	auto ne = dynamic_pointer_cast<mpc::sequencer::NoteEvent>(event);
+	auto noteEvent = dynamic_pointer_cast<mpc::sequencer::NoteEvent>(e.lock());
 
-	if (ne)
+	if (noteEvent)
 	{
+		if (noteEvent->getVelocity() == 0 && track->getIndex() < 64)
+		{
+			auto candidate = transposeCache.find({noteEvent->getNote(), track->getIndex() });
+			
+			if (candidate != end(transposeCache))
+			{
+				auto transposeParameters = *candidate;
+				auto copy = make_shared<mpc::sequencer::NoteEvent>(true);
+				noteEvent->CopyValuesTo(copy);
+				noteEvent = copy;
+				noteEvent->setNote(noteEvent->getNote() + transposeParameters.second);
+				transposeCache.erase(candidate);
+			}
+		}
+
 		auto transScreen = dynamic_pointer_cast<TransScreen>(mpc.screens->getScreenComponent("trans"));
 
-		if (transScreen->tr == -1 || transScreen->tr == ne->getTrack())
-			ne->setNote(ne->getNote() + transScreen->transposeAmount);
+		if (track->getIndex() < 64 && transScreen->transposeAmount != 0 &&
+			(transScreen->tr == -1 || transScreen->tr == noteEvent->getTrack()) &&
+			noteEvent->getVelocity() > 0)
+		{
+			auto copy = make_shared<mpc::sequencer::NoteEvent>();
+			noteEvent->CopyValuesTo(copy);
+			noteEvent = copy;
+			transposeCache[{ noteEvent->getNote(), track->getIndex() }] = transScreen->transposeAmount;
+			noteEvent->setNote(noteEvent->getNote() + transScreen->transposeAmount);
+		}
 
 		auto deviceNumber = track->getDevice() - 1;
 		
@@ -241,7 +263,7 @@ void EventHandler::midiOut(weak_ptr<mpc::sequencer::Event> e, mpc::sequencer::Tr
 			channel -= 16;
 
 		mpc::sequencer::MidiAdapter midiAdapter;
-		midiAdapter.process(event, channel, -1);
+		midiAdapter.process(noteEvent, channel, -1);
 		ctoot::midi::core::ShortMessage msg = *midiAdapter.get().lock().get();
 		
 		auto mpcMidiPorts = mpc.getMidiPorts().lock();
@@ -264,7 +286,7 @@ void EventHandler::midiOut(weak_ptr<mpc::sequencer::Event> e, mpc::sequencer::Tr
 			track->getDevice() != 0)
 		{
 			auto fs = mpc.getAudioMidiServices().lock()->getFrameSequencer().lock();
-			auto eventFrame = fs->getEventFrameOffset(event->getTick());
+			auto eventFrame = fs->getEventFrameOffset(noteEvent->getTick());
 			msg.bufferPos = eventFrame;
 
 			if (r.size() < 100)

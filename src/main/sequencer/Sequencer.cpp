@@ -860,7 +860,7 @@ void Sequencer::copyTrack(weak_ptr<Track> src, weak_ptr<Track> dest)
 	auto lSrc = src.lock();
 	auto lDest = dest.lock();
 	
-	lDest->setTrackIndex(lSrc->getTrackIndex());
+	lDest->setTrackIndex(lSrc->getIndex());
 	
 	for (auto& e : lSrc->getEvents())
 	{

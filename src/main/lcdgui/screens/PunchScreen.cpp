@@ -24,8 +24,10 @@ void PunchScreen::open()
         openScreen(tabNames[tab]);
         return;
     }
-
-    if (sequencer.lock()->getActiveSequence().lock()->getLastTick() < time0 || (time0 == 0 && time1 == 0))
+    
+    auto lastTick = sequencer.lock()->getActiveSequence().lock()->getLastTick();
+    
+    if (lastTick < time0 || lastTick < time1 || (time0 == 0 && time1 == 0))
     {
         setTime0(0);
         setTime1(sequencer.lock()->getActiveSequence().lock()->getLastTick());

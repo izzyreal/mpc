@@ -210,7 +210,7 @@ void SeqUtil::setTimeSignature(Sequence* sequence, int bar, int num, int den)
 	{
 		auto lTrk = t.lock();
 
-		if (lTrk->getTrackIndex() == 64 || lTrk->getTrackIndex() == 65)
+		if (lTrk->getIndex() == 64 || lTrk->getIndex() == 65)
 			continue;
 
 		vector<weak_ptr<Event>> toRemove;

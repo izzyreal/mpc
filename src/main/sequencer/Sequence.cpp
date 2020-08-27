@@ -559,7 +559,7 @@ void Sequence::deleteBars(int firstBar, int _lastBar)
 
 	for (auto& t : tracks)
 	{
-		if (t->getTrackIndex() >= 64 || t->getTrackIndex() == 65)
+		if (t->getIndex() >= 64 || t->getIndex() == 65)
 			continue;
 
 		for (auto& event : t->getEvents())
@@ -631,7 +631,7 @@ void Sequence::insertBars(int barCount, int afterBar)
 
 	for (auto& t : tracks)
 	{
-		if (t->getTrackIndex() == 64 || t->getTrackIndex() == 65)
+		if (t->getIndex() == 64 || t->getIndex() == 65)
 			continue;
 		
 		for (auto& event : t->getEvents())
@@ -666,7 +666,7 @@ void Sequence::moveTrack(int source, int destination)
 		for (int i = destination; i < source; i++)
 		{
 			auto t = tracks[i];
-			t->setTrackIndex(t->getTrackIndex() + 1);
+			t->setTrackIndex(t->getIndex() + 1);
 		}
 	}
 
@@ -677,7 +677,7 @@ void Sequence::moveTrack(int source, int destination)
 		for (int i = source + 1; i <= destination; i++)
 		{
 			auto t = tracks[i];
-			t->setTrackIndex(t->getTrackIndex() - 1);
+			t->setTrackIndex(t->getIndex() - 1);
 		}
 	}
 	sortTracks();
@@ -694,7 +694,7 @@ int Sequence::getEventCount()
 	
 	for (auto& t : tracks)
 	{
-		if (t->getTrackIndex() > 63)
+		if (t->getIndex() > 63)
 			break;
 	
 		counter += t->getEvents().size();
@@ -761,7 +761,7 @@ int Sequence::getNoteEventCount()
 
 bool Sequence::trackIndexComparator(weak_ptr<Track> t0, weak_ptr<Track> t1)
 {
-	return t0.lock()->getTrackIndex() < t1.lock()->getTrackIndex();
+	return t0.lock()->getIndex() < t1.lock()->getIndex();
 }
 
 int Sequence::getFirstTickOfBeat(int bar, int beat)

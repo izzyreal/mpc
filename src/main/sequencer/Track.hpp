@@ -53,7 +53,7 @@ namespace mpc::sequencer {
 	public:
 		void move(int tick, int oldTick);
 		void setTrackIndex(int i);
-		int getTrackIndex();
+		int getIndex();
 		std::weak_ptr<mpc::sequencer::NoteEvent> recordNoteOn();
 		void flushNoteCache();
 		void recordNoteOff(NoteEvent&);

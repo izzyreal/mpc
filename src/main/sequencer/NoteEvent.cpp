@@ -14,7 +14,7 @@ NoteEvent::NoteEvent(int i)
 	noteOff = make_shared<NoteEvent>(false);
 }
 
-NoteEvent::NoteEvent(bool noteOffTrue) 
+NoteEvent::NoteEvent(bool dummyParameter) 
 {
 	// noteoff ctor should not create a noteoff
 }
@@ -113,6 +113,6 @@ void NoteEvent::CopyValuesTo(weak_ptr<Event> dest) {
 	lDest->setVariationTypeNumber(getVariationType());
 	lDest->setVariationValue(getVariationValue());
 	lDest->setNote(getNote());
-	lDest->setVelocity(getVelocity());
+    lDest->velocity = velocity;
 	lDest->setDuration(getDuration());
 }

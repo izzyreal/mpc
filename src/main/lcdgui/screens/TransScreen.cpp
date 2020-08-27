@@ -46,7 +46,8 @@ void TransScreen::turnWheel(int i)
 {
 	init();
 	
-	if (param.compare("tr") == 0) {
+	if (param.compare("tr") == 0)
+	{
 		setTr(tr + i);
 	}
 	else if (param.compare("transpose-amount") == 0)
@@ -58,9 +59,7 @@ void TransScreen::turnWheel(int i)
 		auto candidate = bar0 + i;
 		
 		if (candidate < 0 || candidate > sequencer.lock()->getActiveSequence().lock()->getLastBarIndex())
-		{
 			return;
-		}
 
 		setBar0(candidate);
 	}
@@ -69,9 +68,7 @@ void TransScreen::turnWheel(int i)
 		auto candidate = bar1 + i;
 	
 		if (candidate < 0 || candidate > sequencer.lock()->getActiveSequence().lock()->getLastBarIndex())
-		{
 			return;
-		}
 
 		setBar1(candidate);
 	}
@@ -80,9 +77,7 @@ void TransScreen::turnWheel(int i)
 void TransScreen::setTransposeAmount(int i)
 {
 	if (i < -12 || i > 12)
-	{
 		return;
-	}
 	
 	transposeAmount = i;
 	
@@ -92,9 +87,7 @@ void TransScreen::setTransposeAmount(int i)
 void TransScreen::setTr(int i)
 {
 	if (i < -1 || i > 63)
-	{
 		return;
-	}
 	
 	tr = i;
 	displayTr();
@@ -103,16 +96,12 @@ void TransScreen::setTr(int i)
 void TransScreen::setBar0(int i)
 {
 	if (i < 0)
-	{
 		return;
-	}
 	
 	bar0 = i;
 	
 	if (bar0 > bar1)
-	{
 		bar1 = bar0;
-	}
 
 	displayBars();
 }
@@ -120,16 +109,12 @@ void TransScreen::setBar0(int i)
 void TransScreen::setBar1(int i)
 {
 	if (i < 0)
-	{
 		return;
-	}
 
 	bar1 = i;
 	
 	if (bar1 < bar0)
-	{
 		bar0 = bar1;
-	}
 	
 	displayBars();
 }

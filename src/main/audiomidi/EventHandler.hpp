@@ -6,6 +6,7 @@
 #include <sequencer/MidiAdapter.hpp>
 
 #include <memory>
+#include <map>
 
 namespace mpc::audiomidi {
 
@@ -17,7 +18,8 @@ namespace mpc::audiomidi {
 		mpc::Mpc& mpc;
 		std::weak_ptr<mpc::sequencer::Sequencer> sequencer;
 		std::weak_ptr<mpc::sampler::Sampler> sampler;
-		
+		std::map<std::pair<int, int>, int> transposeCache;
+
 	public:
 		void handle(std::weak_ptr<mpc::sequencer::Event> event, mpc::sequencer::Track* track);
 		void handleNoThru(std::weak_ptr<mpc::sequencer::Event> event, mpc::sequencer::Track* track, int timeStamp);

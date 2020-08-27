@@ -95,7 +95,7 @@ void Track::setTrackIndex(int i)
     trackIndex = i;
 }
 
-int Track::getTrackIndex()
+int Track::getIndex()
 {
     return trackIndex;
 }

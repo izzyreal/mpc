@@ -103,13 +103,13 @@ MidiWriter::MidiWriter(mpc::sequencer::Sequence* sequence)
 		variations.clear();
 		noteOns.clear();
 		miscEvents.clear();
-		if (track->getTrackIndex() > 63 || !track->isUsed())
+		if (track->getIndex() > 63 || !track->isUsed())
 			break;
 
 		auto mt = make_shared<mpc::midi::MidiTrack>();
 		auto in = make_shared<meta::InstrumentName>(0, 0, "        ");
 		mt->insertEvent(in);
-		string trackNumber = moduru::lang::StrUtil::padLeft(to_string(track->getTrackIndex()), "0", 2);
+		string trackNumber = moduru::lang::StrUtil::padLeft(to_string(track->getIndex()), "0", 2);
 		auto text = make_shared<meta::Text>(0, 0, "TRACK DATA:" + trackNumber + "C0006403  000107   ");
 		mt->insertEvent(text);
 		auto tn = make_shared<meta::TrackName>(0, 0, moduru::lang::StrUtil::padRight(track->getName(), " ", 16));
@@ -124,8 +124,8 @@ MidiWriter::MidiWriter(mpc::sequencer::Sequence* sequence)
 			auto programChangeEvent = dynamic_pointer_cast<mpc::sequencer::ProgramChangeEvent>(event.lock());
 			auto mixerEvent = dynamic_pointer_cast<mpc::sequencer::MixerEvent>(event.lock());
 			if (noteEvent) {
-				addNoteOn(make_shared<NoteOn>(noteEvent->getTick(), track->getTrackIndex(), noteEvent->getNote(), noteEvent->getVelocity()));
-				noteOffs.push_back(make_shared<NoteOn>(noteEvent->getTick() + noteEvent->getDuration(), track->getTrackIndex(), noteEvent->getNote(), 0));
+				addNoteOn(make_shared<NoteOn>(noteEvent->getTick(), track->getIndex(), noteEvent->getNote(), noteEvent->getVelocity()));
+				noteOffs.push_back(make_shared<NoteOn>(noteEvent->getTick() + noteEvent->getDuration(), track->getIndex(), noteEvent->getNote(), 0));
 				auto variation = false;
 				shared_ptr<NoteOff> varNoteOff;
 				auto varType = noteEvent->getVariationType();
@@ -140,7 +140,7 @@ MidiWriter::MidiWriter(mpc::sequencer::Sequence* sequence)
 					variation = true;
 
 				if (variation)
-					varNoteOff = make_shared<NoteOff>(noteEvent->getTick(), track->getTrackIndex(), varType, varVal);
+					varNoteOff = make_shared<NoteOff>(noteEvent->getTick(), track->getIndex(), varType, varVal);
 
 				if (varNoteOff != nullptr)
 					variations.push_back(varNoteOff);

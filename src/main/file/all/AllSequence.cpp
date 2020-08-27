@@ -268,7 +268,7 @@ int Sequence::getSegmentCount(mpc::sequencer::Sequence* seq)
 	{
 		auto t = track.lock();
 		
-		if (t->getTrackIndex() > 63)
+		if (t->getIndex() > 63)
 		{
 			break;
 		}
@@ -335,7 +335,7 @@ vector<char> Sequence::createEventSegmentsChunk(mpc::sequencer::Sequence* seq)
 		{
 			auto t = track.lock();
 
-			if (t->getTrackIndex() > 63)
+			if (t->getIndex() > 63)
 			{
 				break;
 			}
@@ -346,7 +346,7 @@ vector<char> Sequence::createEventSegmentsChunk(mpc::sequencer::Sequence* seq)
 
 				if (e->getTick() == i)
 				{
-					e->setTrack(t->getTrackIndex());
+					e->setTrack(t->getIndex());
 					auto ae = AllEvent(e.get());
 					ea.push_back(ae.getBytes());
 				}
