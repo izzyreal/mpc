@@ -135,6 +135,10 @@ void StepEditorScreen::close()
 			e.lock()->deleteObserver(this);
 	}
 
+	for (auto& e : eventsAtCurrentTick)
+		if (e.lock())
+			e.lock()->deleteObserver(this);
+
 	clearSelection();
 }
 

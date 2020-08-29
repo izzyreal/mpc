@@ -379,12 +379,14 @@ weak_ptr<Event> Track::cloneEvent(weak_ptr<Event> src)
 	if (!used)
 		setUsed(true);
 
+	weak_ptr result = res;
+
 	events.push_back(res);
 
 	sortEvents();
-	
+
 	notifyObservers(string("step-editor"));
-	return events.back();
+	return result;
 }
 
 void Track::removeEvent(int i)
@@ -401,13 +403,9 @@ void Track::removeEvents() {
 void Track::setVelocityRatio(int i)
 {
 	if (i < 1)
-	{
 		i = 1;
-	}
 	else if (i > 200)
-	{
 		i = 200;
-	}
 
     velocityRatio = i;
     
@@ -422,9 +420,7 @@ int Track::getVelocityRatio()
 void Track::setProgramChange(int i)
 {
 	if (i < 0 || i > 128)
-	{
 		return;
-	}
 
     programChange = i;
     
@@ -439,9 +435,7 @@ int Track::getProgramChange()
 void Track::setBusNumber(int i)
 {
 	if (i < 0 || i > 4)
-	{
 		return;
-	}
 
     busNumber = i;
     
@@ -456,9 +450,7 @@ int Track::getBus()
 void Track::setDeviceNumber(int i)
 {
 	if (i < 0 || i > 32)
-	{
 		return;
-	}
 
     device = i;
     
@@ -487,9 +479,7 @@ void Track::setName(string s)
 string Track::getName()
 {
 	if (!used)
-	{
 		return "(Unused)";
-	}
 
     return name;
 }
@@ -499,9 +489,7 @@ vector<weak_ptr<Event>> Track::getEvents()
 	auto res = vector<weak_ptr<Event>>();
 	
 	for (auto& e : events)
-	{
 		res.push_back(e);
-	}
 
     return res;
 }
