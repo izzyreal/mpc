@@ -588,9 +588,9 @@ void Sequencer::recFromStart()
 
 void Sequencer::overdub()
 {
-	if (isPlaying()) {
+	if (isPlaying())
 		return;
-	}
+
 	overdubbing = true;
 	play(false);
 }
@@ -902,24 +902,26 @@ int Sequencer::getCurrentBarIndex()
 {
 	auto s = isPlaying() ? getCurrentlyPlayingSequence().lock() : getActiveSequence().lock();
 	auto pos = getTickPosition();
-	if (pos == s->getLastTick()) return s->getLastBarIndex() + 1;
-	auto index = pos;
-	if (isPlaying() && !countingIn) index = getTickPosition();
-	if (index == 0) return 0;
 
+	if (pos == s->getLastTick())
+		return s->getLastBarIndex() + 1;
+		
 	auto barLengths = s->getBarLengths();
-	auto barCounter = 0;
-
+	
 	int tickCounter = 0;
-	for (int i = 0; i < 999; i++) {
-		if (i > s->getLastBarIndex()) i = 0;
+	
+	for (int i = 0; i < 999; i++)
+	{
+		if (i > s->getLastBarIndex())
+			return 0; // Should not happen
+	
 		tickCounter += (*barLengths)[i];
-		if (tickCounter > index) {
-			barCounter = i;
-			break;
-		}
+		
+		if (tickCounter > pos)
+			return i;
 	}
-	return barCounter;
+
+	return 0;
 }
 
 int Sequencer::getCurrentBeatIndex()
@@ -943,59 +945,59 @@ int Sequencer::getCurrentBeatIndex()
 
 	int barStartPos = 0;
 	auto barCounter = 0;
-	for (auto l : *s->getBarLengths()) {
-		if (barCounter == getCurrentBarIndex()) break;
+
+	const auto currentBarIndex = getCurrentBarIndex();
+
+	for (auto l : *s->getBarLengths())
+	{
+		if (barCounter == currentBarIndex)
+			break;
+	
 		barStartPos += l;
 		barCounter++;
 	}
-	auto beatCounter = (int)(floor((index - barStartPos) / denTicks));
-	return beatCounter;
+
+	auto beatIndex = (int) floor((index - barStartPos) / denTicks);
+	return beatIndex;
 }
 
 int Sequencer::getCurrentClockNumber()
 {
 	auto s = isPlaying() ? getCurrentlyPlayingSequence().lock() : getActiveSequence().lock();
 
-	int pos = getTickPosition();
+	auto clock = getTickPosition();
 	
-	if (pos == s->getLastTick())
-	{
+	if (clock == s->getLastTick())
 		return 0;
-	}
-	
-	int index = pos;
-	
+		
 	if (isPlaying() && !countingIn)
 	{
-		if (index > s->getLastTick())
-		{
-			index %= s->getLastTick();
-		}
+		if (clock > s->getLastTick())
+			clock %= s->getLastTick();
 	}
 
 	auto ts = s->getTimeSignature();
 	auto den = ts.getDenominator();
 	auto denTicks = 96 * (4.0 / den);
 
-	if (index == 0)
-	{
-		return index;
-	}
+	if (clock == 0)
+		return 0;
 
 	auto barCounter = 0;
-	int clock = index;
+	auto currentBarIndex = getCurrentBarIndex();
 
 	for (auto l : *s->getBarLengths())
 	{
-		if (barCounter == getCurrentBarIndex())
-		{
+		if (barCounter == currentBarIndex)
 			break;
-		}
+
 		clock -= l;
 		barCounter++;
 	}
 	
-	for (int i = 0; i < getCurrentBeatIndex(); i++)
+	auto currentBeatIndex = getCurrentBeatIndex();
+
+	for (int i = 0; i < currentBeatIndex; i++)
 		clock -= denTicks;
 
 	return clock;
@@ -1061,26 +1063,20 @@ void Sequencer::setBar(int i)
 void Sequencer::setBeat(int i)
 {
 	if (i < 0 || isPlaying())
-	{
 		return;
-	}
 
 	auto s = getActiveSequence().lock();
 	auto pos = getTickPosition();
 	
 	if (pos == s->getLastTick())
-	{
 		return;
-	}
 	
 	auto ts = s->getTimeSignature();
 	auto difference = i - getCurrentBeatIndex();
 	auto num = ts.getNumerator();
 	
 	if (i >= num)
-	{
 		return;
-	}
 
 	auto den = ts.getDenominator();
 	auto denTicks = 96 * (4.0 / den);
@@ -1091,17 +1087,13 @@ void Sequencer::setBeat(int i)
 void Sequencer::setClock(int i)
 {
 	if (i < 0 || isPlaying())
-	{
 		return;
-	}
 
 	auto s = getActiveSequence().lock();
 	int pos = getTickPosition();
 	
 	if (pos == s->getLastTick())
-	{
 		return;
-	}
 	
 	getCurrentClockNumber();
 	int difference = i - getCurrentClockNumber();
@@ -1109,14 +1101,10 @@ void Sequencer::setClock(int i)
 	auto denTicks = 96 * (4.0 / den);
 
 	if (i > denTicks - 1)
-	{
 		return;
-	}
 
 	if (pos + difference > s->getLastTick())
-	{
 		return;
-	}
 
 	pos += difference;
 	move(pos);
@@ -1149,9 +1137,7 @@ vector<weak_ptr<Sequence>> Sequencer::getUsedSequences()
 	for (auto s : sequences)
 	{
 		if (s->isUsed())
-		{
 			usedSeqs.push_back(s);
-		}
 	}
 
     return usedSeqs;
@@ -1166,9 +1152,7 @@ vector<int> Sequencer::getUsedSequenceIndexes()
         auto s = sequences[i];
 	
 		if (s->isUsed())
-		{
 			usedSeqs.push_back(i);
-		}
     }
 	return usedSeqs;
 }
@@ -1199,12 +1183,9 @@ void Sequencer::goToPreviousEvent()
 		prev = t->getEvent(t->getEventIndex() - 1).lock();
 	
 		if (prev->getTick() == event->getTick())
-		{
 			t->setEventIndex(t->getEventIndex() - 1);
-		} else
-		{
+		else
 			break;
-		}
 	}
 
 	t->setEventIndex(t->getEventIndex() - 1);
@@ -1215,9 +1196,7 @@ void Sequencer::goToPreviousEvent()
 		prev = t->getEvent(t->getEventIndex() - 1).lock();
 	
 		if (prev->getTick() != event->getTick())
-		{
 			break;
-		}
 
 		t->setEventIndex(t->getEventIndex() - 1);
 	}
@@ -1233,18 +1212,15 @@ void Sequencer::goToNextEvent()
 	if (t->getEvents().size() == 0)
 	{
 		if (position != s->getLastTick())
-		{
 			move(s->getLastTick());
-		}
+
 		return;
 	}
 
 	const int eventCount = t->getEvents().size();
 	
 	if (position == s->getLastTick())
-	{
 		return;
-	}
 
 	if (t->getEventIndex() >= eventCount - 1 && position >= t->getEvent(eventCount - 1).lock()->getTick())
 	{
@@ -1269,9 +1245,7 @@ void Sequencer::goToNextEvent()
 			next = t->getEvent(t->getEventIndex() + 1).lock();
 		
 			if (next->getTick() != event->getTick())
-			{
 				break;
-			}
 
 			t->setEventIndex(t->getEventIndex() + 1);
 		}
@@ -1284,9 +1258,8 @@ void Sequencer::goToNextEvent()
 		event = t->getEvent(t->getEventIndex()).lock();
 		next = t->getEvent(t->getEventIndex() + 1).lock();
 
-		if (next->getTick() != event->getTick()) {
+		if (next->getTick() != event->getTick())
 			break;
-		}
 
 		t->setEventIndex(t->getEventIndex() + 1);
 	}
@@ -1296,7 +1269,6 @@ void Sequencer::goToNextEvent()
 
 void Sequencer::notifyTimeDisplay()
 {
-    
 	notifyObservers(string("bar"));
 	notifyObservers(string("beat"));
 	notifyObservers(string("clock"));
@@ -1496,7 +1468,8 @@ int Sequencer::getCurrentlyPlayingSequenceIndex()
 	return songMode ? songSeqIndex : currentlyPlayingSequenceIndex;
 }
 
-void Sequencer::setCurrentlyPlayingSequenceIndex(int i) {
+void Sequencer::setCurrentlyPlayingSequenceIndex(int i)
+{
 	currentlyPlayingSequenceIndex = i;
 	activeSequenceIndex = i;
 }

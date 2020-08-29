@@ -116,9 +116,7 @@ void EventsScreen::function(int i)
 			auto destOffset = destStart - sourceStart;
 			
 			if (!toSequence->isUsed())
-			{
 				toSequence->init(fromSequence->getLastBarIndex());
-			}
 
 			auto destTrack = toSequence->getTrack(toTr).lock();
 
@@ -129,9 +127,7 @@ void EventsScreen::function(int i)
 					auto tick = e.lock()->getTick();
 					
 					if (tick >= destOffset && tick < destOffset + (segLength * copies))
-					{
 						destTrack->removeEvent(e);
-					}
 				}
 			}
 
@@ -145,23 +141,17 @@ void EventsScreen::function(int i)
 					if (sourceTrack->getBus() == 0)
 					{
 						if (ne->getNote() < note0 || ne->getNote() > note1)
-						{
 							continue;
-						}
 					}
 					else
 					{
 						if (mpc.getNote() != 34 && mpc.getNote() != ne->getNote())
-						{
 							continue;
-						}
 					}
 				}
 
 				if (event->getTick() >= sourceEnd)
-				{
 					break;
-				}
 
 				if (event->getTick() >= sourceStart)
 				{
@@ -252,6 +242,7 @@ void EventsScreen::function(int i)
 				}
 			}
 		}
+
 		openScreen("sequencer");
 	}
 	break;
