@@ -379,7 +379,7 @@ weak_ptr<Event> Track::cloneEvent(weak_ptr<Event> src)
 	if (!used)
 		setUsed(true);
 
-	weak_ptr result = weak_ptr(res);
+	auto result = weak_ptr<Event>(res);
 
 	events.push_back(res);
 
