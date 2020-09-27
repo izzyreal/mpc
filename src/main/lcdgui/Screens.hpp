@@ -44,7 +44,7 @@ namespace mpc::lcdgui
 		template <typename T>
 		std::shared_ptr<T> get(const std::string& screenName)
 		{
-			return dynamic_pointer_cast<T>(getScreenComponent(screenName));
+			return std::dynamic_pointer_cast<T>(getScreenComponent(screenName));
 		}
 
 		Screens(mpc::Mpc& mpc);
