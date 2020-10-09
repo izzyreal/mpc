@@ -17,6 +17,7 @@ DeleteTrackScreen::DeleteTrackScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void DeleteTrackScreen::open()
 {
+	setTr(sequencer.lock()->getActiveTrackIndex());
 	displayTr();
 }
 
