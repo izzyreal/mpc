@@ -31,6 +31,8 @@
 
 #include <thirdp/libsamplerate/samplerate.h>
 
+#include <functional>
+
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::dialog;
@@ -478,7 +480,10 @@ void Sampler::sort()
 	if (soundSortingType > 2)
 		soundSortingType = 0;
 
-	auto currentSoundMemIndex = sounds[soundIndex]->getMemoryIndex();
+	auto currentSoundMemoryIndex = soundIndex == -1 ? -1 : sounds[soundIndex]->getMemoryIndex();
+
+	vector<string> oldSoundNames;
+	std::transform(begin(sounds), end(sounds), std::back_inserter(oldSoundNames), [](shared_ptr<Sound> sound) { return sound->getName(); });
 
 	switch (soundSortingType)
 	{
@@ -493,10 +498,35 @@ void Sampler::sort()
 		break;
 	}
 
+	vector<string> newSoundNames;
+	std::transform(begin(sounds), end(sounds), std::back_inserter(newSoundNames), [](shared_ptr<Sound> sound) { return sound->getName(); });
+
+	vector<NoteParameters*> correctedNoteParameters;
+
+	for (auto& program : programs)
+	{
+		if (!program)
+			continue;
+
+		for (auto noteParameters : program->getNotesParameters())
+		{
+			if (find(correctedNoteParameters.begin(), correctedNoteParameters.end(), noteParameters) != correctedNoteParameters.end())
+				continue;
+
+			if (noteParameters->getSoundIndex() != -1)
+			{
+				auto name = *find(begin(oldSoundNames), end(oldSoundNames), oldSoundNames[noteParameters->getSoundIndex()]);
+				auto newNameItr = find(begin(newSoundNames), end(newSoundNames), name);
+				auto newIndex = std::distance(begin(newSoundNames), newNameItr);
+				noteParameters->setSoundIndex(newIndex);
+				correctedNoteParameters.push_back(noteParameters);
+			}
+		}
+	}
+
 	for (int i = 0; i < sounds.size(); i++)
 	{
-		if (sounds[i]->getMemoryIndex() == currentSoundMemIndex)
-		{
+		if (sounds[i]->getMemoryIndex() == currentSoundMemoryIndex) {
 			setSoundIndex(i);
 			break;
 		}
@@ -848,7 +878,6 @@ void Sampler::deleteSound(weak_ptr<Sound> sound)
 				}
 			}
 		}
-
 	}
 
 	switch (soundSortingType)
