@@ -1,3 +1,11 @@
+## v0.2.0 (11-10-2020)
+* Drag-and-drop single SND/WAV files onto pads
+* Large refactoring, mostly GUI related
+* Punch mode
+* Tap-to-set-tempo
+* Fix loading and saving of most file formats
+* Fixes too many bugs and crashes to mention here
+
 ## v0.1.5 (23-6-2020)
 * Fix no audio input (sampling) issue in standalone
 
