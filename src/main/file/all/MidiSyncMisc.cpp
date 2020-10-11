@@ -2,13 +2,16 @@
 
 #include <Mpc.hpp>
 #include <file/all/AllParser.hpp>
-#include <ui/Uis.hpp>
-#include <ui/midisync/MidiSyncGui.hpp>
-#include <ui/sequencer/SongGui.hpp>
 
 #include <lang/StrUtil.hpp>
 #include <VecUtil.hpp>
 
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/SongScreen.hpp>
+#include <lcdgui/screens/SyncScreen.hpp>
+
+using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui;
 using namespace mpc::file::all;
 using namespace std;
 
@@ -21,23 +24,31 @@ MidiSyncMisc::MidiSyncMisc(vector<char> b)
 	frameRate = b[FRAME_RATE_OFFSET];
 	input = b[INPUT_OFFSET];
 	output = b[OUTPUT_OFFSET];
-	defSongName = "";
+
 	auto stringBuffer = moduru::VecUtil::CopyOfRange(&b, DEF_SONG_NAME_OFFSET, DEF_SONG_NAME_OFFSET + AllParser::NAME_LENGTH);
+	defSongName = string(stringBuffer.begin(), stringBuffer.end());
 }
 
-MidiSyncMisc::MidiSyncMisc()
+MidiSyncMisc::MidiSyncMisc(mpc::Mpc& mpc)
 {
 	saveBytes = vector<char>(LENGTH);
-	auto ms = Mpc::instance().getUis().lock()->getMidiSyncGui();
-	saveBytes[IN_MODE_OFFSET] = static_cast<int8_t>(ms->getModeIn());
-	saveBytes[OUT_MODE_OFFSET] = static_cast<int8_t>(ms->getModeOut());
-	saveBytes[SHIFT_EARLY_OFFSET] = static_cast<int8_t>(ms->getShiftEarly());
-	saveBytes[SEND_MMC_OFFSET] = static_cast<int8_t>((ms->isSendMMCEnabled() ? 1 : 0));
-	saveBytes[FRAME_RATE_OFFSET] = static_cast<int8_t>(ms->getFrameRate());
-	saveBytes[INPUT_OFFSET] = static_cast<int8_t>(ms->getIn());
-	saveBytes[OUTPUT_OFFSET] = static_cast<int8_t>(ms->getOut());
+
+	auto syncScreen = dynamic_pointer_cast<SyncScreen>(mpc.screens->getScreenComponent("sync"));
+
+	saveBytes[IN_MODE_OFFSET] = static_cast<int8_t>(syncScreen->getModeIn());
+	saveBytes[OUT_MODE_OFFSET] = static_cast<int8_t>(syncScreen->getModeOut());
+	saveBytes[SHIFT_EARLY_OFFSET] = static_cast<int8_t>(syncScreen->shiftEarly);
+	saveBytes[SEND_MMC_OFFSET] = static_cast<int8_t>((syncScreen->sendMMCEnabled ? 1 : 0));
+	saveBytes[FRAME_RATE_OFFSET] = static_cast<int8_t>(syncScreen->frameRate);
+	saveBytes[INPUT_OFFSET] = static_cast<int8_t>(syncScreen->in);
+	saveBytes[OUTPUT_OFFSET] = static_cast<int8_t>(syncScreen->out);
+
+	auto songScreen = mpc.screens->get<SongScreen>("song");
+
 	for (int i = 0; i < AllParser::NAME_LENGTH; i++)
-		saveBytes[DEF_SONG_NAME_OFFSET + i] = moduru::lang::StrUtil::padRight(Mpc::instance().getUis().lock()->getSongGui()->getDefaultSongName(), " ", 16)[i];
+	{
+		saveBytes[DEF_SONG_NAME_OFFSET + i] = moduru::lang::StrUtil::padRight(songScreen->getDefaultSongName(), " ", 16)[i];
+	}
 
 	saveBytes[DEF_SONG_NAME_OFFSET + 16] = 1;
 }

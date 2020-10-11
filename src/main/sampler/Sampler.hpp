@@ -5,6 +5,7 @@
 #include <sampler/Program.hpp>
 #include <sampler/Sound.hpp>
 
+#include <set>
 #include <memory>
 
 namespace ctoot::mpc {
@@ -13,47 +14,51 @@ namespace ctoot::mpc {
 	class MpcSoundPlayerChannel;
 }
 
-namespace mpc {
-	
-}
-
 namespace mpc::sequencer {
 	class NoteEvent;
 }
 
-using namespace ctoot::mpc;
-
-using namespace std;
-
-namespace mpc::sampler {
-
+namespace mpc::sampler
+{
 	class Sampler final
-		: public virtual MpcSampler
+		: public virtual ctoot::mpc::MpcSampler
 	{
 
 	public:
-		weak_ptr<MpcSound> getPreviewSound() override;
-		weak_ptr<MpcSound> getPlayXSound() override;
-		weak_ptr<MpcSound> getClickSound() override;
-		weak_ptr<MpcSound> getSound(int sampleNumber) override;
-		weak_ptr<MpcProgram> getProgram(int programNumber) override;
+		std::weak_ptr<ctoot::mpc::MpcSound> getPreviewSound() override;
+		std::weak_ptr<ctoot::mpc::MpcSound> getPlayXSound() override;
+		std::weak_ptr<ctoot::mpc::MpcSound> getClickSound() override;
+		std::weak_ptr<ctoot::mpc::MpcSound> getSound(int sampleNumber) override;
+		std::weak_ptr<ctoot::mpc::MpcProgram> getProgram(int programNumber) override;
 
 	private:
 		int inputLevel = 0;
+		int soundIndex = 0;
+		int playX_ = 0;
+		std::string previousScreenName = "";
+
+	public:
+		void setSoundIndex(int i);
+		int getSoundIndex();
+		std::weak_ptr<Sound> getSound();
+		std::string getPreviousScreenName();
+		void setPreviousScreenName(std::string s);
+		bool isSoundNameOccupied(const std::string&);
 
 	private:
-		vector<int> initMasterPadAssign{};
-		vector<int> masterPadAssign{};
-		vector<int> autoChromaticAssign{};
+		mpc::Mpc& mpc;
+		std::vector<int> initMasterPadAssign;
+		std::vector<int> masterPadAssign;
+		std::vector<int> autoChromaticAssign;
 
-		vector<shared_ptr<Sound>> sounds{};
-		vector<shared_ptr<Program>> programs{};
-		int soundSortingType{};
-		vector<string> padNames{};
-		vector<string> abcd{};
-		vector<float> clickSample{};
-		shared_ptr<Sound> clickSound{};
-		vector<string> sortNames{};
+		std::vector<std::shared_ptr<Sound>> sounds;
+		std::vector<std::shared_ptr<Program>> programs = std::vector<std::shared_ptr<Program>>(24);
+		int soundSortingType = 0;
+		std::vector<std::string> padNames;
+		std::vector<std::string> abcd = std::vector<std::string>{ "A", "B", "C", "D" };
+		std::vector<float> clickSample;
+		std::shared_ptr<Sound> clickSound;
+		std::vector<std::string> sortNames = std::vector<std::string>{ "MEMORY", "NAME", "SIZE" };
 		
 
 	public:
@@ -66,58 +71,60 @@ namespace mpc::sampler {
 		void playMetronome(mpc::sequencer::NoteEvent* event, int framePos);
 		void playPreviewSample(int start, int end, int loopTo, int overlapMode);
 		int getProgramCount();
-		weak_ptr<Program> addProgram();
-		weak_ptr<Program> addProgram(int i);
-		void replaceProgram(weak_ptr<Program> p, int index);
-		void deleteProgram(weak_ptr<Program> program);
+		std::weak_ptr<Program> addProgram();
+		std::weak_ptr<Program> addProgram(int i);
+		void replaceProgram(std::weak_ptr<Program> p, int index);
+		void deleteProgram(std::weak_ptr<Program> program);
 		void deleteAllPrograms(bool init);
 		void checkProgramReferences();
-		vector<weak_ptr<Sound>> getSounds();
-		weak_ptr<Sound> addSound();
-		weak_ptr<Sound> addSound(int sampleRate);
+		std::vector<std::weak_ptr<Sound>> getSounds();
+		std::weak_ptr<Sound> addSound();
+		std::weak_ptr<Sound> addSound(int sampleRate);
 		int getSoundCount();
-		string getSoundName(int i);
-		string getPadName(int i);
-		vector<weak_ptr<Program>> getPrograms();
-		vector<float>* getClickSample();
-		void deleteSound(weak_ptr<Sound> sound);
+		std::string getSoundName(int i);
+		std::string getPadName(int i);
+		std::vector<std::weak_ptr<Program>> getPrograms();
+		std::vector<float>* getClickSample();
+		void deleteSound(int soundIndex);
+		void deleteSound(std::weak_ptr<Sound> sound);
 		void setLoopEnabled(int sampleIndex, bool b);
 		void trimSample(int sampleNumber, int start, int end);
 		void deleteSection(const unsigned int sampleNumber, const unsigned int start, const unsigned int end);
 		void sort();
+		std::string getSoundSortingTypeName();
 
 	private:
-		void trimSample(weak_ptr<Sound>, int start, int end);
+		void trimSample(std::weak_ptr<Sound>, int start, int end);
 
 	private:
-		static bool compareMemoryIndex(weak_ptr<Sound> a, weak_ptr<Sound> b);
-		static bool compareName(weak_ptr<Sound> a, weak_ptr<Sound> b);
-		static bool compareSize(weak_ptr<Sound> a, weak_ptr<Sound> b);
+		static bool compareMemoryIndex(std::weak_ptr<Sound> a, std::weak_ptr<Sound> b);
+		static bool compareName(std::weak_ptr<Sound> a, std::weak_ptr<Sound> b);
+		static bool compareSize(std::weak_ptr<Sound> a, std::weak_ptr<Sound> b);
 
 	public:
-		void deleteSample(int sampleIndex);
 		void deleteAllSamples();
-		void process12Bit(vector<float>* fa);
-		void process8Bit(vector<float>* fa);
-		void resample(vector<float>*, int srcRate, vector<float>* dest, int destRate);
-		weak_ptr<Sound> createZone(weak_ptr<Sound> source, int start, int end, int endMargin);
+		void process12Bit(std::vector<float>* fa);
+		void process8Bit(std::vector<float>* fa);
+		void resample(std::vector<float>*, int srcRate, std::vector<float>* dest, int destRate);
+		std::weak_ptr<Sound> createZone(std::weak_ptr<Sound> source, int start, int end, int endMargin);
 		void stopAllVoices();
 		void stopAllVoices(int frameOffset);
-		void playX(int playXMode, vector<int>* zone);
+		void playX();
 		int getFreeSampleSpace();
 
 	private:
-		int getLastInt(string s);
-		string addOrIncreaseNumber2(string s);
+		std::vector<std::weak_ptr<Sound>> getUsedSounds();
+		int getLastInt(std::string s);
+		std::string addOrIncreaseNumber2(std::string s);
 
 	public:
-		string addOrIncreaseNumber(string s);
+		std::string addOrIncreaseNumber(std::string s);
 		Pad* getLastPad(Program* program);
 		NoteParameters* getLastNp(Program* program);
-		int getUnusedSampleAmount();
+		int getUnusedSampleCount();
 		void purge();
-		static vector<float> mergeToStereo(vector<float> fa0, vector<float> fa1);
-		void mergeToStereo(vector<float>* sourceLeft, vector<float>* sourceRight, vector<float>* dest);
+		static std::vector<float> mergeToStereo(std::vector<float> fa0, std::vector<float> fa1);
+		void mergeToStereo(std::vector<float>* sourceLeft, std::vector<float>* sourceRight, std::vector<float>* dest);
 		void setDrumBusProgramNumber(int busNumber, int programNumber);
 		int getDrumBusProgramNumber(int busNumber);
 		ctoot::mpc::MpcSoundPlayerChannel* getDrum(int i);
@@ -125,28 +132,26 @@ namespace mpc::sampler {
 	public:
 		int getUsedProgram(int startIndex, bool up);
 
-	private:
-		void setSampleBackground();
-
 	public:
-		int checkExists(string soundName);
+		int checkExists(std::string soundName);
 		int getNextSoundIndex(int j, bool up);
-		void setSoundGuiPrevSound();
-		void setSoundGuiNextSound();
-		vector<weak_ptr<ctoot::mpc::MpcStereoMixerChannel>> getDrumStereoMixerChannels(int i);
-		vector<weak_ptr<ctoot::mpc::MpcIndivFxMixerChannel>> getDrumIndivFxMixerChannels(int i);
-		weak_ptr<Sound> copySound(weak_ptr<Sound> source);
+		void selectPreviousSound();
+		void selectNextSound();
+		std::vector<std::weak_ptr<ctoot::mpc::MpcStereoMixerChannel>> getDrumStereoMixerChannels(int i);
+		std::vector<std::weak_ptr<ctoot::mpc::MpcIndivFxMixerChannel>> getDrumIndivFxMixerChannels(int i);
+		std::weak_ptr<Sound> copySound(std::weak_ptr<Sound> source);
+		void copyProgram(const int sourceIndex, const int destIndex);
 
 	public:
-		vector<int>* getInitMasterPadAssign();
-		vector<int>* getMasterPadAssign();
-		void setMasterPadAssign(vector<int> v);
-		vector<int>* getAutoChromaticAssign();
-
+		std::vector<int>* getInitMasterPadAssign();
+		std::vector<int>* getMasterPadAssign();
+		void setMasterPadAssign(std::vector<int> v);
+		std::vector<int>* getAutoChromaticAssign();
+		void setPlayX(int i);
+		int getPlayX();
 
 	public:
-		Sampler();
-		~Sampler();
+		Sampler(mpc::Mpc& mpc);
 
 	};
 }

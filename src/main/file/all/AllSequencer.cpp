@@ -1,13 +1,20 @@
 #include <file/all/AllSequencer.hpp>
 
 #include <Mpc.hpp>
-#include <ui/sequencer/window/SequencerWindowGui.hpp>
 #include <sequencer/Sequencer.hpp>
 
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/SecondSeqScreen.hpp>
+#include <lcdgui/screens/window/TimingCorrectScreen.hpp>
+
 using namespace mpc::file::all;
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
-mpc::file::all::Sequencer::Sequencer(vector<char> loadBytes)
+mpc::file::all::Sequencer::Sequencer(mpc::Mpc& mpc, vector<char> loadBytes)
+	: mpc(mpc)
 {
 	sequence = loadBytes[SEQ_OFFSET];
 	track = loadBytes[TR_OFFSET];
@@ -16,17 +23,24 @@ mpc::file::all::Sequencer::Sequencer(vector<char> loadBytes)
 	secondSeqIndex = loadBytes[SECOND_SEQ_INDEX_OFFSET];
 }
 
-mpc::file::all::Sequencer::Sequencer()
+mpc::file::all::Sequencer::Sequencer(mpc::Mpc& mpc)
+	: mpc(mpc)
 {
 	saveBytes = vector<char>(LENGTH);
 	for (int i = 0; i < LENGTH; i++)
 		saveBytes[i] = TEMPLATE[i];
-	auto seq = Mpc::instance().getSequencer().lock();
+	auto seq = mpc.getSequencer().lock();
 	saveBytes[SEQ_OFFSET] = seq->getActiveSequenceIndex();
 	saveBytes[TR_OFFSET] = seq->getActiveTrackIndex();
-	saveBytes[TC_OFFSET] = Mpc::instance().getUis().lock()->getSequencerWindowGui()->getNoteValue();
+
+	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(mpc.screens->getScreenComponent("timing-correct"));
+	auto noteValue = timingCorrectScreen->getNoteValue();
+
+	saveBytes[TC_OFFSET] = noteValue;
 	saveBytes[SECOND_SEQ_ENABLED_OFFSET] = seq->isSecondSequenceEnabled() ? 1 : 0;
-	saveBytes[SECOND_SEQ_INDEX_OFFSET] = seq->getSecondSequenceIndex();
+	
+	auto secondSequenceScreen = dynamic_pointer_cast<SecondSeqScreen>(mpc.screens->getScreenComponent("second-seq"));
+	saveBytes[SECOND_SEQ_INDEX_OFFSET] = secondSequenceScreen->sq;
 }
 
 const int mpc::file::all::Sequencer::LENGTH;

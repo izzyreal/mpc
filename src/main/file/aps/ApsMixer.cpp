@@ -32,52 +32,52 @@ ApsMixer::ApsMixer(vector<weak_ptr<ctoot::mpc::MpcStereoMixerChannel>> smcs, vec
 	}
 }
 
-ctoot::mpc::MpcStereoMixerChannel* ApsMixer::getStereoMixerChannel(int noteNumber)
+ctoot::mpc::MpcStereoMixerChannel* ApsMixer::getStereoMixerChannel(int noteIndex)
 {
 	auto params = new ctoot::mpc::MpcStereoMixerChannel();
-	params->setLevel(getLevel(noteNumber));
-	params->setPanning(getPanning(noteNumber));
+	params->setLevel(getLevel(noteIndex));
+	params->setPanning(getPanning(noteIndex));
 	return params;
 }
 
-ctoot::mpc::MpcIndivFxMixerChannel* ApsMixer::getIndivFxMixerChannel(int noteNumber)
+ctoot::mpc::MpcIndivFxMixerChannel* ApsMixer::getIndivFxMixerChannel(int noteIndex)
 {
 	auto params = new ctoot::mpc::MpcIndivFxMixerChannel();
-	params->setVolumeIndividualOut(getIndividualLevel(noteNumber));
-	params->setOutput(getIndividualOutput(noteNumber));
-	params->setFxSendLevel(getSendLevel(noteNumber));
-	params->setFxPath(getFxPath(noteNumber));
+	params->setVolumeIndividualOut(getIndividualLevel(noteIndex));
+	params->setOutput(getIndividualOutput(noteIndex));
+	params->setFxSendLevel(getSendLevel(noteIndex));
+	params->setFxPath(getFxPath(noteIndex));
 	return params;
 }
 
-int ApsMixer::getFxPath(int note)
+int ApsMixer::getFxPath(int noteIndex)
 {
-    return fxPaths[note - 35];
+    return fxPaths[noteIndex];
 }
 
-int ApsMixer::getLevel(int note)
+int ApsMixer::getLevel(int noteIndex)
 {
-	return levels[note - 35];
+	return levels[noteIndex];
 }
 
-int ApsMixer::getPanning(int note)
+int ApsMixer::getPanning(int noteIndex)
 {
-    return pannings[note - 35];
+    return pannings[noteIndex];
 }
 
-int ApsMixer::getIndividualLevel(int note)
+int ApsMixer::getIndividualLevel(int noteIndex)
 {
-    return iLevels[note - 35];
+    return iLevels[noteIndex];
 }
 
-int ApsMixer::getIndividualOutput(int note)
+int ApsMixer::getIndividualOutput(int noteIndex)
 {
-    return iOutputs[note - 35];
+    return iOutputs[noteIndex];
 }
 
-int ApsMixer::getSendLevel(int note)
+int ApsMixer::getSendLevel(int noteIndex)
 {
-    return sendLevels[note - 35];
+    return sendLevels[noteIndex];
 }
 
 vector<char> ApsMixer::getBytes()

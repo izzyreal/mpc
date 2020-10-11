@@ -1,28 +1,22 @@
 #pragma once
-
 #include <observer/Observable.hpp>
 
-namespace mpc {
-	
-	namespace hardware {
+namespace mpc { class Mpc; }
 
-		class Slider
-			: public moduru::observer::Observable
-		{
+namespace mpc::hardware {
 
-		private:
-			
-			int value = 0;
+	class Slider
+		: public moduru::observer::Observable
+	{
 
-		public:
-			void setValue(int i);
-			int getValue();
+	private:
+		mpc::Mpc& mpc;
+		int value = 0;
 
-		public:
-			Slider();
-			~Slider();
+	public:
+		Slider(mpc::Mpc& mpc);
+		void setValue(int i);
+		int getValue();
 
-		};
-
-	}
+	};
 }

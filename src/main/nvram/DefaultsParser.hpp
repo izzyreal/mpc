@@ -1,32 +1,27 @@
 #pragma once
 
-#include <vector>
-#include <memory>
-
 #include <file/File.hpp>
 
-namespace mpc::ui {
-	class UserDefaults;
-}
+#include <vector>
 
-namespace mpc::file::all {
+namespace mpc { class Mpc; }
+
+namespace mpc::file::all
+{
 	class Defaults;
 }
 
-namespace mpc::nvram {
+namespace mpc::nvram
+{
 
 	class DefaultsParser
 	{
 
 	public:
-		static mpc::file::all::Defaults AllDefaultsFromFile(moduru::file::File& file);
-
-	public:
+		static mpc::file::all::Defaults AllDefaultsFromFile(mpc::Mpc& mpc, moduru::file::File& file);
 		std::vector<char> saveBytes{};
-
-	public:
 		std::vector<char> getBytes();
 
-		DefaultsParser(std::weak_ptr<mpc::ui::UserDefaults> ud);
+		DefaultsParser(mpc::Mpc& mpc);
 	};
 }

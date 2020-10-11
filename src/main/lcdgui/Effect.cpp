@@ -5,8 +5,10 @@
 using namespace mpc::lcdgui;
 
 Effect::Effect(MRECT rect)
+	: Component("effect")
 {
-	this->rect = rect;
+	setSize(rect.W(), rect.H());
+	setLocation(rect.L, rect.T);
 }
 
 void Effect::setFilled(bool b)
@@ -16,7 +18,12 @@ void Effect::setFilled(bool b)
 }
 
 void Effect::Draw(std::vector<std::vector<bool>>* pixels) {
-	if (IsHidden()) return;
+	if (shouldNotDraw(pixels))
+	{
+		return;
+	}
+
+	auto rect = getRect();
 	int x = rect.L;
 	int y = rect.T;
 

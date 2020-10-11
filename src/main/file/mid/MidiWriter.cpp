@@ -54,24 +54,29 @@ MidiWriter::MidiWriter(mpc::sequencer::Sequence* sequence)
 	meta->insertEvent(seqName);
 	vector<shared_ptr<mpc::midi::event::meta::Tempo>> tempos;
 	int previousTick = 0;
-	auto tempo = sequence->getInitialTempo().toFloat();
+	auto tempo = sequence->getInitialTempo();
 	auto mpqn = (int)(6.0E7 / tempo);
 	tempos.push_back(make_shared<mpc::midi::event::meta::Tempo>(0, 0, mpqn));
-	for (auto& e : sequence->getTempoChangeEvents()) {
+
+	for (auto& e : sequence->getTempoChangeEvents())
+	{
 		auto tce = e.lock();
-		tempo = tce->getTempo().toFloat();
+		tempo = tce->getTempo();
 		mpqn = (int)(6.0E7 / tempo);
 		tempos.push_back(make_shared<mpc::midi::event::meta::Tempo>(tce->getTick(), tce->getTick() - previousTick, mpqn));
 		previousTick = tce->getTick();
 	}
-	for (auto& t : tempos) {
+
+	for (auto& t : tempos)
+	{
 		meta->insertEvent(t);
 	}
+	
 	meta->insertEvent(make_shared<meta::SmpteOffset>(0, 0, mpc::midi::event::meta::FrameRate::FRAME_RATE_25, 0, 0, 0, 0, 0));
 	std::set<vector<int>> tSigs;
 	auto tSigTick = 0;
 	auto lastAdded = vector<int>(3);
-	for (int i = 0; i < sequence->getLastBar() + 1; i++) {
+	for (int i = 0; i < sequence->getLastBarIndex() + 1; i++) {
 		auto actualTick = tSigTick;
 		if (lastAdded[0] == sequence->getNumerator(i) && lastAdded[1] == sequence->getDenominator(i))
 			actualTick = lastAdded[2];
@@ -98,13 +103,13 @@ MidiWriter::MidiWriter(mpc::sequencer::Sequence* sequence)
 		variations.clear();
 		noteOns.clear();
 		miscEvents.clear();
-		if (track->getTrackIndex() > 63 || !track->isUsed())
+		if (track->getIndex() > 63 || !track->isUsed())
 			break;
 
 		auto mt = make_shared<mpc::midi::MidiTrack>();
 		auto in = make_shared<meta::InstrumentName>(0, 0, "        ");
 		mt->insertEvent(in);
-		string trackNumber = moduru::lang::StrUtil::padLeft(to_string(track->getTrackIndex()), "0", 2);
+		string trackNumber = moduru::lang::StrUtil::padLeft(to_string(track->getIndex()), "0", 2);
 		auto text = make_shared<meta::Text>(0, 0, "TRACK DATA:" + trackNumber + "C0006403  000107   ");
 		mt->insertEvent(text);
 		auto tn = make_shared<meta::TrackName>(0, 0, moduru::lang::StrUtil::padRight(track->getName(), " ", 16));
@@ -119,11 +124,11 @@ MidiWriter::MidiWriter(mpc::sequencer::Sequence* sequence)
 			auto programChangeEvent = dynamic_pointer_cast<mpc::sequencer::ProgramChangeEvent>(event.lock());
 			auto mixerEvent = dynamic_pointer_cast<mpc::sequencer::MixerEvent>(event.lock());
 			if (noteEvent) {
-				addNoteOn(make_shared<NoteOn>(noteEvent->getTick(), track->getTrackIndex(), noteEvent->getNote(), noteEvent->getVelocity()));
-				noteOffs.push_back(make_shared<NoteOn>(noteEvent->getTick() + noteEvent->getDuration(), track->getTrackIndex(), noteEvent->getNote(), 0));
+				addNoteOn(make_shared<NoteOn>(noteEvent->getTick(), track->getIndex(), noteEvent->getNote(), noteEvent->getVelocity()));
+				noteOffs.push_back(make_shared<NoteOn>(noteEvent->getTick() + noteEvent->getDuration(), track->getIndex(), noteEvent->getNote(), 0));
 				auto variation = false;
 				shared_ptr<NoteOff> varNoteOff;
-				auto varType = noteEvent->getVariationTypeNumber();
+				auto varType = noteEvent->getVariationType();
 				auto varVal = noteEvent->getVariationValue();
 				if (varType == 0 && varVal != 64)
 					variation = true;
@@ -135,42 +140,53 @@ MidiWriter::MidiWriter(mpc::sequencer::Sequence* sequence)
 					variation = true;
 
 				if (variation)
-					varNoteOff = make_shared<NoteOff>(noteEvent->getTick(), track->getTrackIndex(), varType, varVal);
+					varNoteOff = make_shared<NoteOff>(noteEvent->getTick(), track->getIndex(), varType, varVal);
 
 				if (varNoteOff != nullptr)
 					variations.push_back(varNoteOff);
 
 			}
-			else if (mpcSysExEvent) {
-				auto sysExData = vector<char>((int)(mpcSysExEvent->getBytes()->size()) - 1);
+			else if (mpcSysExEvent)
+			{
+				auto sysExData = vector<char>((int)(mpcSysExEvent->getBytes().size()) - 1);
+			
 				for (int j = 0; j < sysExData.size(); j++)
-					sysExData[j] = (*mpcSysExEvent->getBytes())[j + 1];
+				{
+					sysExData[j] = mpcSysExEvent->getBytes()[j + 1];
+				}
+
 				auto see = make_shared<SystemExclusiveEvent>(240, mpcSysExEvent->getTick(), sysExData);
 				miscEvents.push_back(see);
 			}
-			else if (pitchBendEvent) {
+			else if (pitchBendEvent)
+			{
 				auto amountBytes = moduru::file::ByteUtil::ushort2bytes(pitchBendEvent->getAmount() + 8192);
 				auto pb = make_shared<PitchBend>(pitchBendEvent->getTick(), 1, (int)(amountBytes[0] & 255), (int)(amountBytes[1] & 255));
 				pb->setBendAmount(pitchBendEvent->getAmount() + 8192);
 				miscEvents.push_back(pb);
 			}
-			else if (channelPressureEvent) {
+			else if (channelPressureEvent)
+			{
 				auto ca = make_shared<ChannelAftertouch>(channelPressureEvent->getTick(), 1, channelPressureEvent->getAmount());
 				miscEvents.push_back(ca);
 			}
-			else if (polyPressureEvent) {
+			else if (polyPressureEvent)
+			{
 				auto na = make_shared<NoteAftertouch>(polyPressureEvent->getTick(), 1, polyPressureEvent->getNote(), polyPressureEvent->getAmount());
 				miscEvents.push_back(na);
 			}
-			else if (controlChangeEvent) {
+			else if (controlChangeEvent)
+			{
 				auto c = make_shared<Controller>(controlChangeEvent->getTick(), 1, controlChangeEvent->getController(), controlChangeEvent->getAmount());
 				miscEvents.push_back(c);
 			}
-			else if (programChangeEvent) {
-			auto pc = make_shared<ProgramChange>(programChangeEvent->getTick(), 1, programChangeEvent->getProgram());
+			else if (programChangeEvent)
+			{
+				auto pc = make_shared<ProgramChange>(programChangeEvent->getTick(), 1, programChangeEvent->getProgram());
 				miscEvents.push_back(pc);
 			}
-			else if (mixerEvent) {
+			else if (mixerEvent)
+			{
 				auto sysExData = vector<char>(8);
 				sysExData[0] = 71;
 				sysExData[1] = 0;
@@ -184,24 +200,37 @@ MidiWriter::MidiWriter(mpc::sequencer::Sequence* sequence)
 				miscEvents.push_back(see);
 			}
 		}
-		for (auto i = 0; i < sequence->getLastTick(); i++) {
-			for (auto& no : noteOffs) {
-				if (no->getTick() == i) {
+
+		for (auto i = 0; i < sequence->getLastTick(); i++)
+		{
+			for (auto& no : noteOffs)
+			{
+				if (no->getTick() == i)
+				{
 					mt->insertEvent(no);
 				}
 			}
-			for (auto& var : variations) {
-				if (var->getTick() == i) {
+
+			for (auto& var : variations)
+			{
+				if (var->getTick() == i)
+				{
 					mt->insertEvent(var);
 				}
 			}
-			for (auto& no : noteOns) {
-				if (no->getTick() == i) {
+			
+			for (auto& no : noteOns)
+			{
+				if (no->getTick() == i)
+				{
 					mt->insertEvent(no);
 				}
 			}
-			for (auto& e : miscEvents) {
-				if (e->getTick() == i) {
+
+			for (auto& e : miscEvents)
+			{
+				if (e->getTick() == i)
+				{
 					mt->insertEvent(e);
 				}
 			}
@@ -215,8 +244,10 @@ MidiWriter::MidiWriter(mpc::sequencer::Sequence* sequence)
 
 void MidiWriter::addNoteOn(shared_ptr<NoteOn> noteOn)
 {
-	for (auto& no : noteOffs) {
-		if (no->getNoteValue() == noteOn->getNoteValue() && no->getTick() > noteOn->getTick()) {
+	for (auto& no : noteOffs)
+	{
+		if (no->getNoteValue() == noteOn->getNoteValue() && no->getTick() > noteOn->getTick())
+		{
 			no = make_shared<NoteOn>(noteOn->getTick(), no->getChannel(), no->getNoteValue(), 0);
 		}
 	}
@@ -227,14 +258,20 @@ void MidiWriter::createDeltas(weak_ptr<mpc::midi::MidiTrack> midiTrack)
 {
 	auto mt = midiTrack.lock();
 	shared_ptr<mpc::midi::event::MidiEvent> previousEvent;
-	for (auto& me : mt->getEvents()) {
+
+	for (auto& me : mt->getEvents())
+	{
 		auto event = dynamic_pointer_cast<mpc::midi::event::NoteOn>(me.lock());
-		if (event) {
-			if (previousEvent) {
-				if (event->getTick() != previousEvent->getTick()) {
+		if (event)
+		{
+			if (previousEvent)
+			{
+				if (event->getTick() != previousEvent->getTick())
+				{
 					event->setDelta(event->getTick() - previousEvent->getTick());
 				}
-				else {
+				else
+				{
 					event->setDelta(0);
 				}
 			}

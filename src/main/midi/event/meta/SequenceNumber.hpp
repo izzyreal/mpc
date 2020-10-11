@@ -10,7 +10,7 @@ namespace mpc::midi::event::meta {
 	{
 
 	private:
-		int mNumber{};
+		int mNumber;
 
 	public:
 		int getMostSignificantBits();
@@ -21,8 +21,8 @@ namespace mpc::midi::event::meta {
 		static std::shared_ptr<MetaEvent> parseSequenceNumber(int tick, int delta, MetaEventData* info);
 
 	public:
-		void writeToOutputStream(ostream& out)  override;
-		void writeToOutputStream(ostream& out, bool writeType) override;
+		void writeToOutputStream(std::ostream& out)  override;
+		void writeToOutputStream(std::ostream& out, bool writeType) override;
 		int getEventSize() override;
 
 	public:

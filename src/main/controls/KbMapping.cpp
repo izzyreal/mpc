@@ -2,7 +2,7 @@
 #include <thirdp/wrpkey/key.hxx>
 
 #include <file/File.hpp>
-#include <StartUp.hpp>
+#include <Paths.hpp>
 
 #include <Logger.hpp>
 
@@ -20,19 +20,19 @@ KbMapping::KbMapping()
 	labelKeyMap["overdub"] = kh->code("semicolon");
 	labelKeyMap["stop"] = kh->code("quote");
 	labelKeyMap["play"] = kh->code("space");
-	labelKeyMap["playstart"] = kh->code("backslash");
-	labelKeyMap["mainscreen"] = kh->code("escape");
-	labelKeyMap["openwindow"] = kh->code("i");
-	labelKeyMap["prevstepevent"] = kh->code("q");
-	labelKeyMap["nextstepevent"] = kh->code("w");
-	labelKeyMap["goto"] = kh->code("e");
-	labelKeyMap["prevbarstart"] = kh->code("r");
-	labelKeyMap["nextbarend"] = kh->code("t");
+	labelKeyMap["play-start"] = kh->code("backslash");
+	labelKeyMap["main-screen"] = kh->code("escape");
+	labelKeyMap["open-window"] = kh->code("i");
+	labelKeyMap["prev-step-event"] = kh->code("q");
+	labelKeyMap["next-step-event"] = kh->code("w");
+	labelKeyMap["go-to"] = kh->code("e");
+	labelKeyMap["prev-bar-start"] = kh->code("r");
+	labelKeyMap["next-bar-end"] = kh->code("t");
 	labelKeyMap["tap"] = kh->code("y");
-	labelKeyMap["nextseq"] = kh->code("[");
-	labelKeyMap["trackmute"] = kh->code("]");
-	labelKeyMap["fulllevel"] = kh->code("o");
-	labelKeyMap["sixteenlevels"] = kh->code("p");
+	labelKeyMap["next-seq"] = kh->code("[");
+	labelKeyMap["track-mute"] = kh->code("]");
+	labelKeyMap["full-level"] = kh->code("o");
+	labelKeyMap["sixteen-levels"] = kh->code("p");
 	labelKeyMap["f1"] = kh->code("f1");
 	labelKeyMap["f2"] = kh->code("f2");
 	labelKeyMap["f3"] = kh->code("f3");
@@ -41,13 +41,13 @@ KbMapping::KbMapping()
 	labelKeyMap["f6"] = kh->code("f6");
 	labelKeyMap["shift"] = kh->code("left shift");
 	labelKeyMap["enter"] = kh->code("enter");
-	labelKeyMap["undoseq"] = kh->code("f10");
+	labelKeyMap["undo-seq"] = kh->code("f10");
 	labelKeyMap["erase"] = kh->code("f11");
 	labelKeyMap["after"] = kh->code("f12");
-	labelKeyMap["banka"] = kh->code("home");
-	labelKeyMap["bankb"] = kh->code("end");
-	labelKeyMap["bankc"] = kh->code("insert");
-	labelKeyMap["bankd"] = kh->code("delete");
+	labelKeyMap["bank-a"] = kh->code("home");
+	labelKeyMap["bank-b"] = kh->code("end");
+	labelKeyMap["bank-c"] = kh->code("insert");
+	labelKeyMap["bank-d"] = kh->code("delete");
 	labelKeyMap["0"] = kh->code("0");
 	labelKeyMap["1"] = kh->code("1");
 	labelKeyMap["2"] = kh->code("2");
@@ -63,7 +63,7 @@ KbMapping::KbMapping()
 const key_helper_t* mpc::controls::KbMapping::kh = &key_helper_t::instance();
 
 void KbMapping::exportMapping() {
-	auto path = mpc::StartUp::resPath + "/keys.txt";
+	auto path = mpc::Paths::resPath() + "/keys.txt";
 	moduru::file::File f(path, nullptr);
 	if (f.exists()) {
 		f.del();

@@ -6,8 +6,11 @@
 #include <disk/Store.hpp>
 #include <disk/device/Device.hpp>
 #include <disk/device/StdDevice.hpp>
-#include <ui/disk/DiskGui.hpp>
+
 #include <file/AkaiName.hpp>
+
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/LoadScreen.hpp>
 
 #include <raw/fat/ShortName.hpp>
 #include <raw/fat/ShortNameGenerator.hpp>
@@ -25,13 +28,17 @@ using namespace moduru::file;
 using namespace moduru::raw::fat;
 using namespace mpc::disk;
 using namespace mpc::file;
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens;
 using namespace std;
 
-StdDisk::StdDisk(weak_ptr<Store> store)
-	: AbstractDisk(store)
+StdDisk::StdDisk(mpc::Mpc& mpc, weak_ptr<Store> store)
+	: AbstractDisk(mpc, store)
 {
 	device = make_unique<mpc::disk::device::StdDevice>(store.lock()->path);
-	if (device) {
+	
+	if (device)
+	{
 		root = nonstd::any_cast<weak_ptr<Directory>>(device->getRoot());
 		initFiles();
 	}
@@ -105,16 +112,22 @@ void StdDisk::initFiles()
 
 	renameFilesToAkai();
 
-	auto view = diskGui->getView();
-	auto fileArray = getDir().lock()->listFiles();
-	for (auto& f : fileArray) {
+	auto loadScreen = dynamic_pointer_cast<LoadScreen>(mpc.screens->getScreenComponent("load"));
+
+	auto view = loadScreen->view;
+	auto dirList = getDir().lock()->listFiles();
+
+	for (auto& f : dirList)
+	{
 		MpcFile* mpcFile = new MpcFile(f);
 		allFiles.push_back(mpcFile);
-		if (view != 0) {
+
+		if (view != 0 && f->isFile())
+		{
 			string name = f->getName();
-			if (f->isFile() && name.find(".") != string::npos && name.substr(name.length() - 3).compare(extensions[view]) == 0) {
+		
+			if (f->isFile() && name.find(".") != string::npos && name.substr(name.length() - 3).compare(extensions[view]) == 0)
 				files.push_back(mpcFile);
-			}
 		}
 		else {
 			files.push_back(mpcFile);
@@ -129,16 +142,19 @@ void StdDisk::initParentFiles()
 	if (path.size() == 0) return;
 
 	auto temp = getParentDir().lock()->listFiles();
-	for (auto& f : temp) {
-		if (f->isDirectory()) {
+	
+	for (auto& f : temp)
+	{
+		if (f->isDirectory())
 			parentFiles.push_back(new MpcFile(f));
-		}
 	}
 }
 
 string StdDisk::getDirectoryName()
 {
-	if (path.size() == 0) return "ROOT";
+	if (path.size() == 0)
+		return "ROOT";
+	
 	return path[(int)(path.size()) - 1].lock()->getName();
 }
 
@@ -156,10 +172,14 @@ bool StdDisk::moveBack()
 bool StdDisk::moveForward(string directoryName)
 {
 	bool success = false;
-	for (auto& f : files) {
-		if (StrUtil::eqIgnoreCase(StrUtil::trim(f->getName()), StrUtil::trim(directoryName))) {
+	for (auto& f : files)
+	{
+		if (StrUtil::eqIgnoreCase(StrUtil::trim(f->getName()), StrUtil::trim(directoryName)))
+		{
 			auto lFile = f->getFsNode().lock();
-			if (lFile->isDirectory() && lFile->getPath().find("vMPC") != string::npos && lFile->getPath().find("Stores") != string::npos) {
+			
+			if (lFile->isDirectory() && lFile->getPath().find("vMPC") != string::npos && lFile->getPath().find("Stores") != string::npos)
+			{
 				path.push_back(dynamic_pointer_cast<moduru::file::Directory>(f->getFsNode().lock()));
 				success = true;
 				break;
@@ -171,9 +191,8 @@ bool StdDisk::moveForward(string directoryName)
 
 weak_ptr<moduru::file::Directory> StdDisk::getDir()
 {
-	if (path.size() == 0) {
+	if (path.size() == 0)
 		return root;
-	}
 
 	return path[(int) (path.size()) - 1];
 }
@@ -189,24 +208,20 @@ weak_ptr<moduru::file::Directory> StdDisk::getParentDir()
 	return path[(int)(path.size()) - 2];
 }
 
-bool StdDisk::deleteAllFiles(int dwGuiDelete)
+bool StdDisk::deleteAllFiles(int extension)
 {
-	weak_ptr<moduru::file::Directory> parentDirectory;
-	try {
-		parentDirectory = getParentDir();
-	}
-	catch (const exception& e1) {
+	if (!getDir().lock())
 		return false;
-	}
-	if (!parentDirectory.lock()) return false;
 
 	auto success = false;
-	auto files = parentDirectory.lock()->listFiles();
-	for (auto& f : files) {
-		if (!f->isDirectory()) {
-			if (dwGuiDelete == 0 || StrUtil::hasEnding(f->getName(), extensions[dwGuiDelete])) {
+	auto files = getDir().lock()->listFiles();
+	
+	for (auto& f : files)
+	{
+		if (!f->isDirectory())
+		{
+			if (extension == 0 || StrUtil::hasEnding(f->getName(), extensions[extension]))
 				success = f->del();
-			}
 		}
 	}
 	return success;
@@ -227,11 +242,15 @@ bool StdDisk::deleteRecursive(moduru::file::FsNode* deleteMe)
 {
 	auto deletedSomething = false;
 	auto deletedCurrentFile = false;
-	if (deleteMe->isDirectory()) {
+	
+	if (deleteMe->isDirectory())
+	{
 		for (auto& f : dynamic_cast<moduru::file::Directory*>(deleteMe)->listFiles())
 			deleteRecursive(f.get());
 	}
+	
 	deletedCurrentFile = deleteMe->del();
+	
 	if (deletedCurrentFile)
 		deletedSomething = true;
 
@@ -277,7 +296,4 @@ string StdDisk::getAbsolutePath()
 
 int StdDisk::getPathDepth() {
 	return path.size();
-}
-
-StdDisk::~StdDisk() {
 }

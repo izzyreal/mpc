@@ -28,7 +28,7 @@ AllNoteEvent::AllNoteEvent(mpc::sequencer::Event* event)
 	try {
 		saveBytes = setVelocity(saveBytes, ne->getVelocity());
 		saveBytes = setTrackNumber(saveBytes, ne->getTrack());
-		saveBytes = setVariationType(saveBytes, ne->getVariationTypeNumber());
+		saveBytes = setVariationType(saveBytes, ne->getVariationType());
 		saveBytes = setVariationValue(saveBytes, ne->getVariationValue());
 		saveBytes = AllEvent::writeTick(saveBytes, static_cast<int>(ne->getTick()));
 		saveBytes = setDuration(saveBytes, static_cast<int>(ne->getDuration()));

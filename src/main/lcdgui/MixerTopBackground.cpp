@@ -2,21 +2,34 @@
 
 using namespace mpc::lcdgui;
 
-MixerTopBackground::MixerTopBackground(MRECT rect) 
+MixerTopBackground::MixerTopBackground(MRECT rect)
+	: Component("mixer-top-background")
 {
-	this->rect = rect;
+	setSize(rect.W(), rect.H());
+	setLocation(rect.L, rect.T);
 }
 
+void MixerTopBackground::setColor(bool on)
+{
+	if (color == on)
+		return;
+
+	color = on;
+	SetDirty();
+}
 
 void MixerTopBackground::Draw(std::vector<std::vector<bool>>* pixels)
 {
-	for (int i = rect.L; i < rect.R + 1; i++) {
-		for (int j = rect.T; j < rect.B + 1; j++) {
-			(*pixels)[i][j] = true;
-		}
-	}
-	dirty = false;
-}
+	if (shouldNotDraw(pixels))
+		return;
 
-MixerTopBackground::~MixerTopBackground() {
+	auto rect = getRect();
+
+	for (int i = rect.L; i < rect.R; i++)
+	{
+		for (int j = rect.T; j < rect.B; j++)
+			(*pixels)[i][j] = color;
+	}
+
+	Component::Draw(pixels);
 }

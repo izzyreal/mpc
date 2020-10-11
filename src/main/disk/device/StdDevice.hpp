@@ -3,19 +3,27 @@
 
 #include <memory>
 
-namespace moduru::file {
+/*
+* A StdDevice, as opposed to a RawDevice (see older commits), is a disk device which root is bound to a directory on the user's
+* drive where some APS, SND, WAV, ALL, etc. files are that the user wants to access from within vMPC2000XL.
+* 
+* Maybe later I'll add RawDevice, an implementation that has only worked in the abandoned Java rendition of vMPC2000XL.
+*/
+
+namespace moduru::file
+{
 		class Directory;
 }
 
-namespace mpc::disk::device {
-
+namespace mpc::disk::device
+{
 	class StdDevice
 		: public virtual Device
 	{
 
 	private:
-		bool valid{ false };
-		std::shared_ptr<moduru::file::Directory> root{};
+		bool valid = false;
+		std::shared_ptr<moduru::file::Directory> root;
 
 	public:
 		nonstd::any getRoot() override;
@@ -28,7 +36,6 @@ namespace mpc::disk::device {
 		std::string getVolumeName() override;
 
 		StdDevice(std::string rootPath);
-		~StdDevice();
 
 	};
 }

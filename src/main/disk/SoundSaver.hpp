@@ -4,9 +4,7 @@
 #include <vector>
 #include <thread>
 
-namespace mpc::ui::disk {
-	class DiskGui;
-}
+namespace mpc { class Mpc; }
 
 namespace mpc::sampler {
 	class Sound;
@@ -21,22 +19,17 @@ namespace mpc::disk {
 	class SoundSaver
 	{
 
-	public:
-
-		std::weak_ptr<AbstractDisk> disk{};
-		mpc::ui::disk::DiskGui* diskGui{};
-
 	private:
-		std::vector<std::weak_ptr<mpc::sampler::Sound>> sounds{};
-		bool wav{ false };
-
-	private:
-		std::thread saveSoundsThread{};
+		mpc::Mpc& mpc;
+		std::weak_ptr<AbstractDisk> disk;
+		std::vector<std::weak_ptr<mpc::sampler::Sound>> sounds;
+		bool wav = false;
+		std::thread saveSoundsThread;
 		static void static_saveSounds(void* this_p);
 		void saveSounds();
 
 	public:
-		SoundSaver(std::vector<std::weak_ptr<mpc::sampler::Sound>> sounds, bool wav);
+		SoundSaver(mpc::Mpc& mpc, std::vector<std::weak_ptr<mpc::sampler::Sound>> sounds, bool wav);
 		~SoundSaver();
 
 	};

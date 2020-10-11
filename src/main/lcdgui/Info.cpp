@@ -3,15 +3,8 @@
 using namespace mpc::lcdgui;
 using namespace std;
 
-Info::Info(weak_ptr<Label> label, string name, int x, int y, int size) {
-	this->label = label;
-	label.lock()->initialize(name, " ", x, y, size);
-	label.lock()->enableRigorousClearing();
-}
-
-weak_ptr<Label> Info::getLabel() {
-	return label;
-}
-
-Info::~Info() {
+Info::Info(mpc::Mpc& mpc, const string& name, int x, int y, int size)
+	: Component("info-for-" + name)
+{
+	addChild(make_shared<Label>(mpc, name, "", x, y + 2, size));
 }

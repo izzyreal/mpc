@@ -1,10 +1,7 @@
 #pragma once
 
+#include <midi/core/ShortMessage.hpp>
 #include <vector>
-
-namespace ctoot::midi::core {
-	class ShortMessage;
-}
 
 namespace mpc::audiomidi {
 
@@ -12,13 +9,12 @@ namespace mpc::audiomidi {
 	{
 
 	private:
-		std::vector<std::vector<ctoot::midi::core::ShortMessage>> receivers;
+		std::vector<std::vector<ctoot::midi::core::ShortMessage>> receivers =
+			std::vector<std::vector<ctoot::midi::core::ShortMessage>>(2);
 
 	public:
 		std::vector<std::vector<ctoot::midi::core::ShortMessage>>& getReceivers();
+		void panic();
 
-	public:
-		MpcMidiPorts();
-		~MpcMidiPorts();
 	};
 }

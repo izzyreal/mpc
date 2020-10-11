@@ -18,7 +18,7 @@ namespace mpc {
 			private:
 				//static ::de::waldheinz::fs::util::RawWindowsVolume* rawVolume_;
 				//static ::de::waldheinz::fs::FileSystem* fs_;
-				std::string driveLetter{ "" };
+				std::string driveLetter = "";
 				//int totalSpace{ 0 };
 
 			public:

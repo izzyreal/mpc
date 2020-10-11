@@ -1,29 +1,25 @@
 #pragma once
 #include <sequencer/Event.hpp>
 
-namespace mpc {
-	namespace sequencer {
+namespace mpc::sequencer
+{
+	class SystemExclusiveEvent
+		: public Event
+	{
 
-		class SystemExclusiveEvent
-			: public Event
-		{
+	private:
+		std::vector<unsigned char> bytes = std::vector<unsigned char>(2);
 
-		private:
-			std::vector<char> bytes{};
+	public:
+		void setByteA(unsigned char i);
+		unsigned char getByteA();
+		void setByteB(unsigned char i);
+		unsigned char getByteB();
+		void setBytes(const std::vector<unsigned char>& ba);
+		std::vector<unsigned char>& getBytes();
 
-		public:
-			void setByteA(int i);
-			int getByteA();
-			void setByteB(int i);
-			int getByteB();
-			void setBytes(std::vector<char>* ba);
-			std::vector<char>* getBytes();
+		void CopyValuesTo(std::weak_ptr<Event> dest) override;
+		std::string getTypeName() override { return "system-exclusive"; }
 
-			void CopyValuesTo(std::weak_ptr<Event> dest) override;
-
-			SystemExclusiveEvent();
-
-		};
-
-	}
+	};
 }

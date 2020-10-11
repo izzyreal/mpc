@@ -4,29 +4,30 @@
 #include <string>
 #include <memory>
 
-namespace mpc::sampler {
+namespace mpc::sampler
+{
 	class Sound;
 }
 
-namespace mpc::file::sndwriter {
+namespace mpc::file::sndwriter
+{
 	class SndHeaderWriter;
 }
 
-using namespace std;
-
-namespace mpc::file::sndwriter {
+namespace mpc::file::sndwriter
+{
 	class SndWriter
 	{
 
 	private:
 		static const int HEADER_SIZE = 42;
-		shared_ptr<SndHeaderWriter> sndHeaderWriter;
+		std::shared_ptr<SndHeaderWriter> sndHeaderWriter;
 		mpc::sampler::Sound* sound;
-		vector<char> sndFileArray;
+		std::vector<char> sndFileArray;
 
 	private:
 		void setValues();
-		void setName(string s);
+		void setName(std::string s);
 		void setMono(bool b);
 		void setFramesCount(int i);
 		void setSampleRate(int i);
@@ -37,10 +38,10 @@ namespace mpc::file::sndwriter {
 		void setLoopEnabled(bool b);
 		void setTune(int i);
 		void setBeatCount(int i);
-		void setSampleData(const vector<float>& fa, bool b);
+		void setSampleData(const std::vector<float>& fa, bool b);
 
 	public:
-		vector<char> getSndFileArray();
+		std::vector<char> getSndFileArray();
 
 		SndWriter(mpc::sampler::Sound* sound);
 	};

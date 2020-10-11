@@ -1,25 +1,23 @@
 #pragma once
 #include <sequencer/Event.hpp>
 
-namespace mpc {
-	namespace sequencer {
+namespace mpc::sequencer
+{
+	class ProgramChangeEvent
+		: public Event
+	{
 
-		class ProgramChangeEvent
-			: public Event
-		{
+	private:
+		int programChangeValue = 0;
 
-		private:
-			int programChangeValue{ 0 };
+	public:
+		void setProgram(int i);
+		int getProgram();
 
-		public:
-			void setProgram(int i);
-			int getProgram();
+		void CopyValuesTo(std::weak_ptr<Event> dest) override;
 
-			void CopyValuesTo(std::weak_ptr<Event> dest) override;
+		ProgramChangeEvent();
+		std::string getTypeName() override { return "program-change"; }
 
-			ProgramChangeEvent();
-
-		};
-
-	}
+	};
 }

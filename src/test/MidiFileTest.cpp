@@ -1,16 +1,14 @@
 #include <catch2/catch.hpp>
 
 #include <Mpc.hpp>
+#include <Paths.hpp>
+
 #include <sequencer/Sequencer.hpp>
 #include <sequencer/Sequence.hpp>
 #include <sequencer/Track.hpp>
 
-#include <ui/UserDefaults.hpp>
-
 #include <disk/AbstractDisk.hpp>
 #include <disk/MpcFile.hpp>
-
-#include <StartUp.hpp>
 
 #include <midi/MidiFile.hpp>
 #include <file/mid/MidiReader.hpp>
@@ -19,8 +17,6 @@
 
 #include <file/File.hpp>
 #include <file/FileUtil.hpp>
-
-#include <thirdp/bcmath/bcmath_stl.h>
 
 #include <string>
 #include <vector>
@@ -36,7 +32,7 @@ SCENARIO("A MidiFile can be written", "[file]") {
 
 	GIVEN("An Mpc with a Sequence") {
 
-		mpc::Mpc& mpc = mpc::Mpc::instance();
+		mpc::Mpc mpc;
 		mpc.init(44100, 1, 1);
 		auto sequencer = mpc.getSequencer().lock();
 		auto sequence = sequencer->getSequence(0).lock();
@@ -50,7 +46,7 @@ SCENARIO("A MidiFile can be written", "[file]") {
 		noteEvent->setVelocity(127);
 
 		auto name = string("foo.mid");
-		auto path = mpc::StartUp::storesPath + "MPC2000XL/" + name;
+		auto path = mpc::Paths::storesPath() + "MPC2000XL/" + name;
 		auto fileToDelete = File(path, nullptr);
 		fileToDelete.del();
 		fileToDelete.close();
@@ -58,6 +54,8 @@ SCENARIO("A MidiFile can be written", "[file]") {
 		auto midiWriter = MidiWriter(sequence.get());
 
 		midiWriter.writeToFile(path);
+
+		disk->initFiles();
 
 		auto files = disk->getFiles();
 		auto fileIterator = find_if(begin(files), end(files), [](MpcFile* f) { return f->getName().compare("FOO.MID") == 0; });

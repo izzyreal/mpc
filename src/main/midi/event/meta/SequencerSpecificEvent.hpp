@@ -8,7 +8,7 @@ namespace mpc::midi::event::meta {
 		: public MetaEvent
 	{
 	private:
-		std::vector<char> mData{};
+		std::vector<char> mData;
 
 	public:
 		virtual void setData(std::vector<char> data);
@@ -16,8 +16,8 @@ namespace mpc::midi::event::meta {
 
 	public:
 		int getEventSize() override;
-		void writeToOutputStream(ostream& out)  override;
-		void writeToOutputStream(ostream& out, bool writeType) override;
+		void writeToOutputStream(std::ostream& out)  override;
+		void writeToOutputStream(std::ostream& out, bool writeType) override;
 		
 	public:
 		virtual int compareTo(mpc::midi::event::MidiEvent* other);

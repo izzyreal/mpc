@@ -11,8 +11,6 @@ namespace mpc::midi {
 	class MidiTrack;
 }
 
-using namespace std;
-
 namespace mpc::midi {
 
 	class MidiFile
@@ -44,7 +42,7 @@ namespace mpc::midi {
 		void addTrack(std::shared_ptr<MidiTrack> T);
 		void addTrack(std::shared_ptr<MidiTrack> T, int pos);
 		void removeTrack(int pos);
-		void writeToOutputStream(ostream& stream);
+		void writeToOutputStream(std::ostream& stream);
 
 	private:
 		void initFromBuffer(std::vector<char>& buffer);
@@ -53,7 +51,7 @@ namespace mpc::midi {
 		MidiFile();
 		MidiFile(int resolution);
 		MidiFile(int resolution, std::vector<MidiTrack*> tracks);
-		MidiFile(istream& stream);
+		MidiFile(std::istream& stream);
 		~MidiFile();
 
 	};

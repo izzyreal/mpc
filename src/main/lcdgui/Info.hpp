@@ -1,26 +1,21 @@
 #pragma once
 #include "Label.hpp"
 
+#include "Component.hpp"
+
 #include <memory>
 #include <string>
 
-namespace mpc {
-	namespace lcdgui {
+namespace mpc { class Mpc; }
 
-		class Info
-		{
+namespace mpc::lcdgui {
 
-		private:
-			std::weak_ptr<Label> label{};
+	class Info
+		: public Component
+	{
 
-		public:
-			std::weak_ptr<Label> getLabel();
+	public:
+		Info(mpc::Mpc& mpc, const std::string& name, int x, int y, int size);
 
-			Info(std::weak_ptr<Label> label, std::string name, int x, int y, int size);
-			~Info();
-
-		};
-
-	}
-
+	};
 }

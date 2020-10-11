@@ -3,23 +3,19 @@
 using namespace mpc::hardware;
 using namespace std;
 
-Led::Led(string label)
+Led::Led(string label) : label(label)
 {
-	this->label = label;
 }
 
-string Led::getLabel() {
+string Led::getLabel()
+{
 	return label;
 }
 
-void Led::light(bool b) {
-	if (b) {
-		notifyObservers(string(label + "on"));
-	}
-	else {
-		notifyObservers(string(label + "off"));
-	}
-}
-
-Led::~Led() {
+void Led::light(bool b)
+{
+	if (b)
+		notifyObservers(string(label + "-on"));
+	else
+		notifyObservers(string(label + "-off"));
 }

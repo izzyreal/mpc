@@ -1,27 +1,20 @@
 #pragma once
 #include "Component.hpp"
 
-namespace mpc {
-	namespace lcdgui {
+namespace mpc::lcdgui
+{
+	class HorizontalBar
+		: public Component
+	{
 
-		class HorizontalBar
-			: public Component
-		{
+	private:
+		int value;
 
-		private:
-			int value;
+	public:
+		void setValue(int value);
+		void Draw(std::vector<std::vector<bool>>* pixels) override;
 
-		public:
-			void setValue(int value);
+		HorizontalBar(MRECT rect, int value = 0);
 
-		public:
-			void Draw(std::vector<std::vector<bool>>* pixels) override;
-
-		public:
-			HorizontalBar(MRECT rect, int value);
-			~HorizontalBar();
-
-		};
-
-	}
+	};
 }

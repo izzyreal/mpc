@@ -7,36 +7,42 @@
 using namespace mpc::hardware;
 using namespace std;
 
-Pot::Pot(string label)
+Pot::Pot(mpc::Mpc& mpc, string label)
+	: mpc(mpc)
 {
 	this->label = label;
 	
 }
 
 void Pot::setValue(int i) {
-	if (i < 0 || i > 100) return;
-	if (label.compare("vol") == 0) {
-		Mpc::instance().getAudioMidiServices().lock()->setMasterLevel(i);
+	if (i < 0 || i > 100)
+	{
+		return;
 	}
-	else if (label.compare("rec") == 0) {
-		Mpc::instance().getAudioMidiServices().lock()->setRecordLevel(i);
+
+	if (label.compare("vol") == 0)
+	{
+		mpc.getAudioMidiServices().lock()->setMasterLevel(i);
 	}
-//	notifyObservers(i);
+	else if (label.compare("rec") == 0)
+	{
+		mpc.getAudioMidiServices().lock()->setRecordLevel(i);
+	}
 }
 
 int Pot::getValue() {
-	if (label.compare("vol") == 0) {
-		return Mpc::instance().getAudioMidiServices().lock()->getMasterLevel();
+	if (label.compare("vol") == 0)
+	{
+		return mpc.getAudioMidiServices().lock()->getMasterLevel();
 	}
-	else if (label.compare("rec") == 0) {
-		return Mpc::instance().getAudioMidiServices().lock()->getRecordLevel();
+	else if (label.compare("rec") == 0)
+	{
+		return mpc.getAudioMidiServices().lock()->getRecordLevel();
 	}
 	return 0;
 }
 
-string Pot::getLabel() {
+string Pot::getLabel()
+{
 	return label;
-}
-
-Pot::~Pot() {
 }

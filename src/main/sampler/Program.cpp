@@ -11,18 +11,23 @@ using namespace mpc::sampler;
 using namespace ctoot::mpc;
 using namespace std;
 
-Program::Program(mpc::sampler::Sampler* sampler) 
+Program::Program(mpc::Mpc& mpc, mpc::sampler::Sampler* sampler)
 {
 	this->sampler = sampler;
 	init();
-	for (int i = 0; i < 64; i++) {
+	
+	for (int i = 0; i < 64; i++)
+	{
 		auto n = new NoteParameters(i);
 		noteParameters.push_back(n);
 	}
-	for (int i = 0; i < 64; i++) {
-		auto p = new Pad(i);
+	
+	for (int i = 0; i < 64; i++)
+	{
+		auto p = new Pad(mpc, i);
 		pads.push_back(p);
 	}
+	
 	slider = new PgmSlider();
 }
 
@@ -34,11 +39,16 @@ void Program::init()
 int Program::getNumberOfSamples()
 {
     auto counter = 0;
-    for (int i = 0; i < 64; i++) {
+
+    for (int i = 0; i < 64; i++)
+	{
         auto np = getNoteParameters(i + 35);
-        if(np->getSndNumber() != -1) counter++;
+        
+		if(np->getSoundIndex() != -1)
+			counter++;
     }
-    return counter;
+    
+	return counter;
 }
 
 void Program::setName(string s)
@@ -51,12 +61,12 @@ string Program::getName()
     return name;
 }
 
-MpcNoteParameters* Program::getNoteParameters(int i)
+MpcNoteParameters* Program::getNoteParameters(int note)
 {
-	if (i < 35 || i > 98) {
+	if (note < 35 || note > 98)
 		return nullptr;
-	}
-	return noteParameters[i - 35];
+
+	return noteParameters[note - 35];
 }
 
 Pad* Program::getPad(int i)
@@ -64,27 +74,27 @@ Pad* Program::getPad(int i)
 	return pads[i];
 }
 
-weak_ptr<MpcStereoMixerChannel> Program::getStereoMixerChannel(int pad)
+weak_ptr<MpcStereoMixerChannel> Program::getStereoMixerChannel(int noteIndex)
 {
-	return dynamic_pointer_cast<MpcStereoMixerChannel>(pads[pad]->getStereoMixerChannel().lock());
+	return dynamic_pointer_cast<MpcStereoMixerChannel>(noteParameters[noteIndex]->getStereoMixerChannel().lock());
 }
 
-weak_ptr<MpcIndivFxMixerChannel> Program::getIndivFxMixerChannel(int pad)
+weak_ptr<MpcIndivFxMixerChannel> Program::getIndivFxMixerChannel(int noteIndex)
 {
-	return dynamic_pointer_cast<MpcIndivFxMixerChannel>(pads[pad]->getIndivFxMixerChannel().lock());
+	return dynamic_pointer_cast<MpcIndivFxMixerChannel>(noteParameters[noteIndex]->getIndivFxMixerChannel().lock());
 }
 
-int Program::getPadNumberFromNote(int note)
+int Program::getPadIndexFromNote(int note)
 {
-	if (note < 35 || note > 98) {
+	if (note < 35 || note > 98)
 		return -1;
+	
+	for (int i = 0; i < 64; i++)
+	{
+		if (pads[i]->getNote() == note)
+			return i;
 	}
 
-	for (int i = 0; i < 64; i++) {
-		if (pads[i]->getNote() == note) {
-			return i;
-		}
-	}
 	return -1;
 }
 
@@ -98,9 +108,12 @@ mpc::sampler::PgmSlider* Program::getSlider()
     return slider;
 }
 
-void Program::setNoteParameters(int i, NoteParameters* nn)
+void Program::setNoteParameters(int index, NoteParameters* nn)
 {
-	noteParameters[i] = nn;
+	if (noteParameters[index] != nullptr)
+		delete noteParameters[index];
+
+	noteParameters[index] = nn;
 }
 
 int Program::getMidiProgramChange()
@@ -110,20 +123,14 @@ int Program::getMidiProgramChange()
 
 void Program::setMidiProgramChange(int i)
 {
-	if (i < 1 || i > 128) {
+	if (i < 1 || i > 128)
 		return;
-	}
 
-	this->midiProgramChange = i;
-	setChanged();
-	notifyObservers(string("midiprogramchange"));
+	midiProgramChange = i;
 }
 
 void Program::initPadAssign()
 {
-	sampler->getLastNp(this)->deleteObservers();
-	sampler->getLastPad(this)->deleteObservers();
-
 	for (int i = 0; i < 64; i++)
 		pads[i]->setNote((*sampler->getInitMasterPadAssign())[i]);
 }
@@ -133,10 +140,22 @@ int Program::getNoteFromPad(int i)
 	return pads[i]->getNote();
 }
 
-Program::~Program() {
+vector<int> Program::getPadIndicesFromNote(int note)
+{
+	vector<int> result;
+	
+	for (int i = 0; i < pads.size(); i++)
+	{
+		if (pads[i]->getNote() == note)
+			result.push_back(i);
+	}
+
+	return result;
+}
+
+Program::~Program()
+{
 	delete slider;
-	for (auto& np : noteParameters)
-		delete np;
-	for (auto& p : pads)
-		delete p;
+	for (auto& np : noteParameters) delete np;
+	for (auto& p : pads) delete p;
 }

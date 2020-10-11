@@ -9,14 +9,16 @@ using namespace std;
 MidiNotes::MidiNotes(mpc::sampler::Program* program, vector<int> snConvTable)
 {
 	midiNotesArray = vector<char>(1601);
-	for (int i = 0; i < 64; i++) {
+	
+	for (int i = 0; i < 64; i++)
+	{
 		auto nn = program->getNoteParameters(i + 35);
-		if (nn->getSndNumber() == -1) {
+
+		if (nn->getSoundIndex() == -1)
 			setSampleSelect(i, 255);
-		}
-		else {
-			setSampleSelect(i, snConvTable[nn->getSndNumber()]);
-		}
+		else
+			setSampleSelect(i, snConvTable[nn->getSoundIndex()]);
+
 		setSoundGenerationMode(i, nn->getSoundGenerationMode());
 		setVelocityRangeLower(i, dynamic_cast<mpc::sampler::NoteParameters*>(nn)->getVelocityRangeLower());
 		setAlsoPlayUse1(i, nn->getOptionalNoteA());
@@ -25,7 +27,7 @@ MidiNotes::MidiNotes(mpc::sampler::Program* program, vector<int> snConvTable)
 		setVoiceOverlap(i, nn->getVoiceOverlap());
 		setMuteAssign1(i, nn->getMuteAssignA() == 34 ? 0 : nn->getMuteAssignA());
 		setMuteAssign2(i, nn->getMuteAssignB() == 34 ? 0 : nn->getMuteAssignB());
-		setTune(i, nn->getTune());
+		setTune(i, static_cast<int16_t>(nn->getTune()));
 		setAttack(i, nn->getAttack());
 		setDecay(i, nn->getDecay());
 		setDecayMode(i, nn->getDecayMode());
@@ -41,6 +43,7 @@ MidiNotes::MidiNotes(mpc::sampler::Program* program, vector<int> snConvTable)
 		setSliderParameter(i, dynamic_cast<mpc::sampler::NoteParameters*>(nn)->getSliderParameterNumber());
 		setVelocityToPitch(i, dynamic_cast<mpc::sampler::NoteParameters*>(nn)->getVelocityToPitch());
 	}
+
 	midiNotesArray[1600] = 6;
 }
 
@@ -166,9 +169,8 @@ void MidiNotes::setVelocityToPitch(int midiNote, int velocityToPitch)
     midiNotesArray[(midiNote * 25) + 24] = velocityToPitch;
 }
 
-vector<char> MidiNotes::setShort(::vector<char> ca, int offset, short s)
+void MidiNotes::setShort(vector<char>& ca, int offset, int16_t s)
 {
 	ca[offset] = s;
 	ca[offset + 1] = s >> 8;
-	return ca;
 }

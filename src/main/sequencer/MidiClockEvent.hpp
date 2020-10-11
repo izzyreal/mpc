@@ -2,28 +2,26 @@
 #include <sequencer/Event.hpp>
 #include <midi/core/ShortMessage.hpp>
 
-namespace mpc {
-	namespace sequencer {
+namespace mpc::sequencer
+{
+	class MidiClockEvent
+		: public Event
+	{
 
-		class MidiClockEvent
-			: public Event
-		{
+	public:
+		typedef Event super;
 
-		public:
-			typedef Event super;
+	private:
+		int status{ 0 };
 
-		private:
-			int status{ 0 };
+	public:
+		virtual int getStatus();
+		virtual void setStatus(int i);
 
-		public:
-			virtual int getStatus();
-			virtual void setStatus(int i);
+		void CopyValuesTo(std::weak_ptr<Event> dest) override;
 
-			void CopyValuesTo(std::weak_ptr<Event> dest) override;
+		MidiClockEvent(int status);
+		std::string getTypeName() override { return "midi-clock"; }
 
-			MidiClockEvent(int status);
-
-		};
-
-	}
+	};
 }

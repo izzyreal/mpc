@@ -10,9 +10,9 @@ TimeSignature::TimeSignature()
 void TimeSignature::setNumerator(int i)
 {
     numerator = i;
-    setChanged();
+    
     notifyObservers(string("timesignature"));
-    setChanged();
+    
     notifyObservers(string("beat"));
 }
 
@@ -24,9 +24,9 @@ int TimeSignature::getNumerator()
 void TimeSignature::setDenominator(int i)
 {
     denominator = i;
-    setChanged();
+    
     notifyObservers(string("timesignature"));
-    setChanged();
+    
     notifyObservers(string("beat"));
 }
 

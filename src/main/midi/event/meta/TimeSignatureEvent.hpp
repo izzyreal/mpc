@@ -1,10 +1,13 @@
 #pragma once
 #include <midi/event/meta/MetaEvent.hpp>
 
-namespace mpc::midi::event::meta {
-
+namespace mpc::midi::event::meta
+{
 	class MetaEventData;
+}
 
+namespace mpc::midi::event::meta
+{
 	class TimeSignature
 		: public MetaEvent
 	{
@@ -18,10 +21,10 @@ namespace mpc::midi::event::meta {
 		static const int DEFAULT_DIVISION{ 8 };
 
 	private:
-		int mNumerator{};
-		int mDenominator{};
-		int mMeter{};
-		int mDivision{};
+		int mNumerator;
+		int mDenominator;
+		int mMeter;
+		int mDivision;
 
 	public:
 		virtual void setTimeSignature(int num, int den, int meter, int div);
@@ -33,8 +36,8 @@ namespace mpc::midi::event::meta {
 
 	public:
 		int getEventSize() override;
-		void writeToOutputStream(ostream& out)  override;
-		void writeToOutputStream(ostream& out, bool writeType) override;
+		void writeToOutputStream(std::ostream& out)  override;
+		void writeToOutputStream(std::ostream& out, bool writeType) override;
 
 	public:
 		static std::shared_ptr<MetaEvent> parseTimeSignature(int tick, int delta, MetaEventData* info);

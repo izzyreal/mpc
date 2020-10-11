@@ -28,7 +28,11 @@ namespace mpc {
 		public:
 			std::weak_ptr<mpc::sampler::Program> get();
 
-			ProgramImportAdapter(std::weak_ptr<mpc::sampler::Sampler> sampler, std::weak_ptr<mpc::sampler::Program> inputProgram, std::vector<int> soundsDestIndex);
+			ProgramImportAdapter(std::weak_ptr<mpc::sampler::Sampler> sampler,
+				std::weak_ptr<mpc::sampler::Program> inputProgram,
+				std::vector<int> soundsDestIndex,
+				std::vector<int> unavailableSoundIndices
+			);
 		};
 
 	}

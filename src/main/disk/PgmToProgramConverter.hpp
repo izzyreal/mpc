@@ -23,9 +23,9 @@ namespace mpc::disk {
 
 	private:
 		mpc::file::pgmreader::ProgramFileReader* reader{ nullptr };
-		std::weak_ptr<mpc::sampler::Program> program{};
+		std::weak_ptr<mpc::sampler::Program> program;
 		bool done{ false };
-		std::vector<std::string> soundNames{};
+		std::vector<std::string> soundNames;
 
 	public:
 		void setSlider();
@@ -36,7 +36,7 @@ namespace mpc::disk {
 		std::weak_ptr<mpc::sampler::Program> get();
 		std::vector<std::string> getSoundNames();
 
-		PgmToProgramConverter(MpcFile* file, std::weak_ptr<mpc::sampler::Sampler> sampler);
+		PgmToProgramConverter(MpcFile* file, std::weak_ptr<mpc::sampler::Sampler> sampler, const int replaceIndex);
 		~PgmToProgramConverter();
 	};
 }

@@ -1,15 +1,10 @@
-#include <sampler/Sampler.hpp>
-#include <lang/StrUtil.hpp>
+#include "Sampler.hpp"
+
 #include <Mpc.hpp>
 #include <audiomidi/AudioMidiServices.hpp>
 #include <disk/SoundLoader.hpp>
-#include <StartUp.hpp>
-#include <ui/Uis.hpp>
-#include <ui/UserDefaults.hpp>
-#include <lcdgui/Background.hpp>
-#include <ui/sampler/SamplerGui.hpp>
-#include <ui/sampler/SoundGui.hpp>
-#include <ui/sequencer/window/SequencerWindowGui.hpp>
+#include <Paths.hpp>
+
 #include <sampler/NoteParameters.hpp>
 #include <sampler/Pad.hpp>
 #include <sampler/Program.hpp>
@@ -18,6 +13,10 @@
 #include <sequencer/Sequencer.hpp>
 #include <sequencer/Track.hpp>
 #include <sequencer/Sequence.hpp>
+
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/ZoneScreen.hpp>
+#include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
 
 #include <synth/SynthChannel.hpp>
 #include <audio/server/NonRealTimeAudioServer.hpp>
@@ -28,40 +27,90 @@
 #include <mpc/MpcIndivFxMixerChannel.hpp>
 
 #include <file/File.hpp>
+#include <lang/StrUtil.hpp>
+
 #include <thirdp/libsamplerate/samplerate.h>
 
+#include <functional>
 
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::sampler;
+using namespace moduru::lang;
 using namespace std;
 
-Sampler::Sampler()
+Sampler::Sampler(mpc::Mpc& mpc)
+	: mpc(mpc)
 {
-	
-	soundSortingType = 0;
-	abcd = vector<string>{ "A", "B", "C", "D" };
-	sortNames = vector<string>{ "MEMORY", "NAME", "SIZE" };
-	initMasterPadAssign = Pad::getPadNotes();
-
-	programs = vector<shared_ptr<Program>>(24);
+	initMasterPadAssign = Pad::getPadNotes(mpc);
 }
 
-void Sampler::setInputLevel(int i) {
-	if (i < 0 || i > 100) return;
+void Sampler::setSoundIndex(int i)
+{
+	if (i < 0 || i >= sounds.size())
+		return;
+
+	soundIndex = i;
+
+	auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(mpc.screens->getScreenComponent("zone"));
+	zoneScreen->initZones();
+}
+
+int Sampler::getSoundIndex()
+{
+	return soundIndex;
+}
+
+weak_ptr<Sound> Sampler::getSound()
+{
+	if (soundIndex < 0)
+	{
+		if (sounds.size() == 0)
+			return {};
+
+		// This is a bit of a hack, depending on what the real 2KXL does.
+		// For now this will work fine to get some kind of sane index here after loading an APS, PGM, SND or WAV into an empty sampler.
+		soundIndex = 0;
+	}
+
+	if (soundIndex >= sounds.size())
+		return {};
+
+	return sounds[soundIndex];
+}
+
+std::string Sampler::getPreviousScreenName()
+{
+	return previousScreenName;
+}
+
+void Sampler::setPreviousScreenName(std::string s)
+{
+	previousScreenName = s;
+}
+
+void Sampler::setInputLevel(int i)
+{
+	if (i < 0 || i > 100)
+		return;
+
 	inputLevel = i;
 }
 
-int Sampler::getInputLevel() {
+int Sampler::getInputLevel()
+{
 	return inputLevel;
 }
 
 vector<weak_ptr<ctoot::mpc::MpcStereoMixerChannel>> Sampler::getDrumStereoMixerChannels(int i)
 {
-	return Mpc::instance().getDrums()[i]->getStereoMixerChannels();
+	return mpc.getDrums()[i]->getStereoMixerChannels();
 }
 
 vector<weak_ptr<ctoot::mpc::MpcIndivFxMixerChannel>> Sampler::getDrumIndivFxMixerChannels(int i)
 {
-	return Mpc::instance().getDrums()[i]->getIndivFxMixerChannels();
+	return mpc.getDrums()[i]->getIndivFxMixerChannels();
 }
 
 vector<int>* Sampler::getInitMasterPadAssign()
@@ -74,7 +123,8 @@ vector<int>* Sampler::getMasterPadAssign()
 	return &masterPadAssign;
 }
 
-void Sampler::setMasterPadAssign(vector<int> v) {
+void Sampler::setMasterPadAssign(vector<int> v)
+{
 	masterPadAssign = v;
 }
 
@@ -87,41 +137,58 @@ void Sampler::init()
 {
 	auto program = addProgram().lock();;
 	program->setName("NewPgm-A");
-	for (int i = 0; i < 4; i++) {
-		for (auto j = 0; j < 16; j++) {
+	
+	for (int i = 0; i < 4; i++)
+	{
+		for (auto j = 0; j < 16; j++)
+		{
 			string result = "";
 			result.append(abcd[i]);
-			result.append(moduru::lang::StrUtil::padLeft(to_string(j + 1), "0", 2));
+			result.append(StrUtil::padLeft(to_string(j + 1), "0", 2));
 			padNames.push_back(result);
 		}
 	}
 
-	auto f = make_shared<moduru::file::File>(mpc::StartUp::resPath + "click.wav", nullptr);
+	auto file = make_shared<moduru::file::File>(mpc::Paths::resPath() + "click.wav", nullptr);
 	clickSound = make_shared<Sound>();
-	mpc::disk::SoundLoader::getSampleDataFromWav(f, clickSound->getSampleData());
+	mpc::disk::SoundLoader::getSampleDataFromWav(file, clickSound->getSampleData());
 	clickSound->setMono(true);
 	clickSound->setLevel(100);
 	masterPadAssign = initMasterPadAssign;
 	autoChromaticAssign = vector<int>(64);
+
 	for (int i = 0; i < 64; i++)
 		autoChromaticAssign[i] = i;
 }
 
 void Sampler::playMetronome(mpc::sequencer::NoteEvent* event, int framePos)
 {
-	auto swGui = Mpc::instance().getUis().lock()->getSequencerWindowGui();
+	auto metronomeSoundScreen = dynamic_pointer_cast<MetronomeSoundScreen>(mpc.screens->getScreenComponent("metronome-sound"));
 	auto soundNumber = -2;
-	if (swGui->getMetronomeSound() != 0) {
-		auto program = Mpc::instance().getDrum(swGui->getMetronomeSound() - 1)->getProgram();
-		auto accent = event->getVelocity() == swGui->getAccentVelo();
-		soundNumber = programs[program]->getNoteParameters(accent ? swGui->getAccentNote() : swGui->getNormalNote())->getSndNumber();
+
+	auto velocity = event->getVelocity();
+
+	if (metronomeSoundScreen->getSound() != 0)
+	{
+		auto program = mpc.getDrum(metronomeSoundScreen->getSound() - 1)->getProgram();
+		auto accent = velocity == 127;
+		velocity = accent ? metronomeSoundScreen->getAccentVelo() : metronomeSoundScreen->getNormalVelo();
+		auto pad = accent ? metronomeSoundScreen->getAccentPad() : metronomeSoundScreen->getNormalPad();
+		auto note = programs[program]->getNoteFromPad(pad);
+		soundNumber = programs[program]->getNoteParameters(note)->getSoundIndex();
 	}
-	Mpc::instance().getBasicPlayer()->mpcNoteOn(soundNumber, event->getVelocity(), framePos);
+	else
+	{
+		velocity *= metronomeSoundScreen->getVolume() * 0.01;
+	}
+	
+	mpc.getBasicPlayer()->mpcNoteOn(soundNumber, velocity, framePos);
 }
 
 void Sampler::playPreviewSample(int start, int end, int loopTo, int overlapMode)
 {
-	if (sounds.size() == 0) {
+	if (sounds.size() == 0)
+	{
 		return;
 	}
 
@@ -132,7 +199,7 @@ void Sampler::playPreviewSample(int start, int end, int loopTo, int overlapMode)
 	previewSound->setStart(start);
 	previewSound->setEnd(end);
 	previewSound->setLoopTo(loopTo);
-	Mpc::instance().getBasicPlayer()->noteOn(-3, 127);
+	mpc.getBasicPlayer()->noteOn(-3, 127);
 	previewSound->setStart(oldStart);
 	previewSound->setEnd(oldEnd);
 	previewSound->setLoopTo(oldLoopTo);
@@ -146,34 +213,62 @@ weak_ptr<ctoot::mpc::MpcProgram> Sampler::getProgram(int programNumber)
 int Sampler::getProgramCount()
 {
 	int res = 0;
+
 	for (auto& p : programs)
-		if (p) res++;
+	{
+		if (p)
+			res++;
+	}
+
 	return res;
 }
 
-weak_ptr<Program> Sampler::addProgram(int i) {
-	if (programs[i]) {
+weak_ptr<Program> Sampler::addProgram(int i)
+{
+	if (programs[i])
 		return weak_ptr<Program>();
-	}
-	programs[i] = make_shared<Program>(this);
+
+	programs[i] = make_shared<Program>(mpc, this);
 	return programs[i];
 }
 
 weak_ptr<Program> Sampler::addProgram()
 {
-	for (auto& p : programs) {
-		if (!p) {
-			p = make_shared<Program>(this);
+	for (auto& p : programs)
+	{
+		if (!p)
+		{
+			p = make_shared<Program>(mpc, this);
 			return p;
 		}
 	}
 	return weak_ptr<Program>();
 }
 
-void Sampler::deleteProgram(weak_ptr<Program> program) {
-	auto lProgram = program.lock();
-	for (auto&& p : programs) {
-		if (p == lProgram) {
+void Sampler::deleteProgram(weak_ptr<Program> _program)
+{
+	auto program = _program.lock();
+	
+	int firstValidProgram;
+	
+	for (firstValidProgram = 0; firstValidProgram < programs.size(); firstValidProgram++)
+	{
+		if (programs[firstValidProgram] && programs[firstValidProgram] != program)
+		{
+			for (auto& bus : mpc.getDrums())
+			{
+				if (programs[bus->getProgram()] == program)
+					bus->setProgram(firstValidProgram);
+			}
+	
+			break;
+		}
+	}
+
+	for (auto&& p : programs)
+	{
+		if (p == program)
+		{
 			p.reset();
 			break;
 		}
@@ -183,18 +278,20 @@ void Sampler::deleteProgram(weak_ptr<Program> program) {
 vector<weak_ptr<Sound>> Sampler::getSounds()
 {
 	auto res = vector<weak_ptr<Sound>>();
+
 	for (auto& s : sounds)
 		res.push_back(s);
+
 	return res;
 }
 
-weak_ptr<Sound> Sampler::addSound() {
-	auto res = make_shared<Sound>(44100, sounds.size());
-	sounds.push_back(res);
-	return res;
+weak_ptr<Sound> Sampler::addSound()
+{
+	return addSound(44100);
 }
 
-weak_ptr<Sound> Sampler::addSound(int sampleRate) {
+weak_ptr<Sound> Sampler::addSound(int sampleRate)
+{
 	auto res = make_shared<Sound>(sampleRate, sounds.size());
 	sounds.push_back(res);
 	return res;
@@ -218,38 +315,50 @@ string Sampler::getPadName(int i)
 vector<weak_ptr<Program>> Sampler::getPrograms()
 {
 	auto res = vector<weak_ptr<Program>>();
+
 	for (auto& p : programs)
 		res.push_back(p);
+
 	return res;
 }
 
-void Sampler::replaceProgram(weak_ptr<Program> p, int index) {
+void Sampler::replaceProgram(weak_ptr<Program> p, int index)
+{
 	auto sourceProgram = p.lock();
 	auto destProgram = programs[index];
 	destProgram.swap(sourceProgram);
 	deleteProgram(sourceProgram);
 }
 
-void Sampler::deleteAllPrograms(bool init) {
+void Sampler::deleteAllPrograms(bool init)
+{
 	for (auto& p : programs)
 		p.reset();
-	if (!init) return;
+
+	if (!init)
+		return;
+
 	addProgram().lock()->setName("NewPgm-A");
 	checkProgramReferences();
 }
 
-void Sampler::checkProgramReferences() {
-	auto lSequencer = Mpc::instance().getSequencer().lock();
+void Sampler::checkProgramReferences()
+{
+	auto lSequencer = mpc.getSequencer().lock();
 	auto t = lSequencer->getActiveSequence().lock()->getTrack(lSequencer->getActiveTrackIndex()).lock();
-	auto bus = t->getBusNumber();
-	for (int i = 0; i < 4; i++) {
+	auto bus = t->getBus();
+
+	for (int i = 0; i < 4; i++)
+	{
 		auto pgm = getDrumBusProgramNumber(bus);
-		if (!programs[pgm]) {
+		
+		if (!programs[pgm])
+		{
 			// check what real MPC does in this condition
-			for (int i = 0; i < 24; i++) {
-				if (programs[i]) {
+			for (int i = 0; i < 24; i++)
+			{
+				if (programs[i])
 					setDrumBusProgramNumber(bus, i);
-				}
 			}
 		}
 	}
@@ -273,7 +382,9 @@ weak_ptr<ctoot::mpc::MpcSound> Sampler::getSound(int sampleNumber)
 
 weak_ptr<ctoot::mpc::MpcSound> Sampler::getPreviewSound()
 {
-	if (sounds.size() == 0) return weak_ptr<Sound>();
+	if (sounds.size() == 0)
+		return weak_ptr<Sound>();
+
 	return sounds[sounds.size() - 1];
 }
 
@@ -281,14 +392,18 @@ void Sampler::setLoopEnabled(int sampleIndex, bool enabled)
 {
 	sounds[sampleIndex]->setLoopEnabled(enabled);
 
-	if (!enabled) return;
+	if (!enabled)
+		return;
 
-	for (auto& p : programs) {
-		if (!p) continue;
-		for (int i = 0; i < 64; i++) {
-			if (p->getNoteParameters(i + 35)->getSndNumber() == sampleIndex) {
+	for (auto& p : programs)
+	{
+		if (!p)
+			continue;
+		
+		for (int i = 0; i < 64; i++)
+		{
+			if (p->getNoteParameters(i + 35)->getSoundIndex() == sampleIndex)
 				dynamic_cast<mpc::sampler::NoteParameters*>(p->getNoteParameters(i + 35))->setVoiceOverlap(2);
-			}
 		}
 	}
 }
@@ -299,49 +414,79 @@ void Sampler::trimSample(int sampleNumber, int start, int end)
 	trimSample(s, start, end);
 }
 
-void Sampler::trimSample(weak_ptr<Sound> sound, int start, int end) {
+void Sampler::trimSample(weak_ptr<Sound> sound, int start, int end)
+{
 	auto s = sound.lock();
 	auto data = s->getSampleData();
-	auto lf = s->getLastFrameIndex();
+	auto frameCount = s->getFrameCount();
 
-	if (!s->isMono()) {
-		int startRight = start + lf;
-		int endRight = end + lf;
-		data->erase(data->begin() + endRight, data->end());
-		data->erase(data->begin() + lf, data->begin() + startRight);
-		data->erase(data->begin() + end, data->begin() + lf);
-		data->erase(data->begin(), data->begin() + start);
-	}
-	else {
+	if (end > frameCount)
+		end = frameCount;
+
+	if (s->isMono())
+	{
 		data->erase(data->begin() + end, data->end());
 		data->erase(data->begin(), data->begin() + start);
 	}
+	else
+	{
+		int startRight = start + frameCount;
+		int endRight = end + frameCount;
+
+		data->erase(data->begin() + endRight, data->end());
+		data->erase(data->begin() + frameCount, data->begin() + startRight);
+		data->erase(data->begin() + end, data->begin() + frameCount);
+		data->erase(data->begin(), data->begin() + start);
+	}
+
 	s->setStart(0);
-	s->setEnd(s->getLastFrameIndex() + 1);
-	s->setLoopTo(s->getLastFrameIndex() + 1);
+	s->setEnd(s->getFrameCount());
+	s->setLoopTo(s->getFrameCount());
 }
 
-void Sampler::deleteSection(const unsigned int sampleNumber, const unsigned int start, const unsigned int end) {
+void Sampler::deleteSection(const unsigned int sampleNumber, const unsigned int start, const unsigned int end)
+{
 	auto s = sounds[sampleNumber];
 	auto data = s->getSampleData();
-	auto lf = s->getLastFrameIndex();
+	auto frameCount = s->getFrameCount();
 
-	if (!s->isMono()) {
-		const unsigned int startRight = start + lf;
-		const unsigned int endRight = end + lf;
+	if (!s->isMono())
+	{
+		const unsigned int startRight = start + frameCount;
+		const unsigned int endRight = end + frameCount;
 		data->erase(data->begin() + startRight, data->begin() + endRight);
 	}
+
 	data->erase(data->begin() + start, data->begin() + end);
+}
+
+string Sampler::getSoundSortingTypeName()
+{
+	if (soundSortingType == 0)
+		return "MEMORY";
+	else if (soundSortingType == 1)
+		return "NAME";
+	else
+		return "SIZE";
 }
 
 void Sampler::sort()
 {
-	auto soundGui = Mpc::instance().getUis().lock()->getSoundGui();
-	auto currentSound = soundGui->getSoundIndex();
-	auto currentSoundMemIndex = sounds[currentSound]->getMemoryIndex();
-	soundSortingType++;
-	if (soundSortingType > 2) soundSortingType = 0;
-	switch (soundSortingType) {
+	if (sounds.empty())
+		return;
+
+	soundSortingType++; // This should be optional. Only when called by F1/F2/F3/F4 it should do this.
+	
+	if (soundSortingType > 2)
+		soundSortingType = 0;
+
+	auto currentSoundMemoryIndex = soundIndex == -1 ? -1 : sounds[soundIndex]->getMemoryIndex();
+
+	vector<string> oldSoundNames;
+	std::transform(begin(sounds), end(sounds), std::back_inserter(oldSoundNames), [](shared_ptr<Sound> sound) { return sound->getName(); });
+
+	switch (soundSortingType)
+	{
 	case 0:
 		stable_sort(sounds.begin(), sounds.end(), compareMemoryIndex);
 		break;
@@ -352,30 +497,38 @@ void Sampler::sort()
 		stable_sort(sounds.begin(), sounds.end(), compareSize);
 		break;
 	}
-	for (int i = 0; i < sounds.size(); i++) {
-		if (sounds[i]->getMemoryIndex() == currentSoundMemIndex) {
-			soundGui->setSoundIndex(i, sounds.size());
-			break;
+
+	vector<string> newSoundNames;
+	std::transform(begin(sounds), end(sounds), std::back_inserter(newSoundNames), [](shared_ptr<Sound> sound) { return sound->getName(); });
+
+	vector<NoteParameters*> correctedNoteParameters;
+
+	for (auto& program : programs)
+	{
+		if (!program)
+			continue;
+
+		for (auto noteParameters : program->getNotesParameters())
+		{
+			if (find(correctedNoteParameters.begin(), correctedNoteParameters.end(), noteParameters) != correctedNoteParameters.end())
+				continue;
+
+			if (noteParameters->getSoundIndex() != -1)
+			{
+				auto name = *find(begin(oldSoundNames), end(oldSoundNames), oldSoundNames[noteParameters->getSoundIndex()]);
+				auto newNameItr = find(begin(newSoundNames), end(newSoundNames), name);
+				auto newIndex = std::distance(begin(newSoundNames), newNameItr);
+				noteParameters->setSoundIndex(newIndex);
+				correctedNoteParameters.push_back(noteParameters);
+			}
 		}
 	}
-}
 
-void Sampler::deleteSample(int sampleIndex)
-{
-	sounds.erase(sounds.begin() + sampleIndex);
-	for (int i = sampleIndex; i < sounds.size(); i++) {
-		sounds[i]->setMemoryIndex(sounds[i]->getMemoryIndex() - 1);
-	}
-
-	for (auto& p : programs) {
-		if (!p) continue;
-		for (auto& n : p->getNotesParameters()) {
-			if (n->getSndNumber() == sampleIndex) {
-				n->setSoundNumber(-1);
-			}
-			else if (n->getSndNumber() > sampleIndex) {
-				n->setSoundNumber(n->getSndNumber() - 1);
-			}
+	for (int i = 0; i < sounds.size(); i++)
+	{
+		if (sounds[i]->getMemoryIndex() == currentSoundMemoryIndex) {
+			setSoundIndex(i);
+			break;
 		}
 	}
 }
@@ -383,57 +536,67 @@ void Sampler::deleteSample(int sampleIndex)
 void Sampler::deleteAllSamples()
 {
 	sounds.clear();
-	for (auto& p : programs) {
-		if (!p) continue;
-		for (auto& n : p->getNotesParameters()) {
-			n->setSoundNumber(-1);
-		}
+	
+	for (auto& p : programs)
+	{
+		if (!p)
+			continue;
+
+		for (auto& n : p->getNotesParameters())
+			n->setSoundIndex(-1);
 	}
 }
 
 void Sampler::process12Bit(vector<float>* fa)
 {
-	for (auto j = 0; j < fa->size(); j++) {
+	for (auto j = 0; j < fa->size(); j++)
+	{
+		if ((*fa)[j] != 0.0f)
+		{
+			auto fShort = static_cast< int16_t >((*fa)[j] * 32767.4999999);
 
-		if (fa->at(j) != 0.0f) {
-			auto fShort = static_cast< int16_t >(fa->at(j) * 32767.4999999);
-
-			if (fa->at(j) > 0.9999999f)
+			if ((*fa)[j] > 0.9999999f)
 				fShort = 32767;
+
 			int16_t newShort = fShort;
 			newShort &= ~(1 << 0);
 			newShort &= ~(1 << 1);
 			newShort &= ~(1 << 2);
 			newShort &= ~(1 << 3);
-			fa->at(j) = static_cast< float >(newShort / 32767.4999999);
+
+			(*fa)[j] = static_cast< float >(newShort / 32767.4999999);
 		}
-		else {
-			fa->at(j) = 0;
+		else
+		{
+			(*fa)[j] = 0;
 		}
 	}
 }
 
 void Sampler::process8Bit(vector<float>* fa)
 {
-	for (auto j = 0; j < fa->size(); j++) {
-		if ((*fa)[j] != 0.0f) {
+	for (auto j = 0; j < fa->size(); j++)
+	{
+		if ((*fa)[j] != 0.0f)
+		{
 			float f = (*fa)[j];
-			if (f < -1) {
+		
+			if (f < -1)
 				f = -1;
-			}
-			else if (f > 1) {
+			else if (f > 1)
 				f = 1;
-			}
+
 			unsigned short ushort = (signed short)((f + 1)  * 32767.4999999);
 			unsigned char eightBit = ushort >> 8;
 			signed sshort = (eightBit - 128) << 8;
+			
 			f = (float)(sshort / 32767.49999999);
-			if (f < -1) {
+			
+			if (f < -1)
 				f = -1;
-			}
-			else if (f > 1) {
+			else if (f > 1)
 				f = 1;
-			}
+			
 			(*fa)[j] = f;
 		}
 	}
@@ -441,94 +604,109 @@ void Sampler::process8Bit(vector<float>* fa)
 
 weak_ptr<Sound> Sampler::createZone(weak_ptr<Sound> source, int start, int end, int endMargin)
 {
-	auto lSource = source.lock();
-	auto overlap = (int)(endMargin * (lSource->getSampleRate() / 1000.0));
-	if (overlap > end - start) {
-		overlap = end - start;
-	}
+	auto overlap = (int)(endMargin * source.lock()->getSampleRate() * 0.001);
+
 	auto zone = copySound(source);
 	auto zoneLength = end - start + overlap;
-	trimSample(zone, start, start + zoneLength);
+	auto endCandidate = start + zoneLength;
+	trimSample(zone, start, endCandidate);
 	return zone;
 }
 
 void Sampler::stopAllVoices()
 {
-	if (!Mpc::instance().getAudioMidiServices().lock()->getAudioServer()->isRunning()) {
+	if (!mpc.getAudioMidiServices().lock()->getAudioServer()->isRunning())
 		return;
-	}
-	Mpc::instance().getBasicPlayer()->allSoundOff();
-	for (auto m : Mpc::instance().getDrums())
+	
+	mpc.getBasicPlayer()->allSoundOff();
+	
+	for (auto m : mpc.getDrums())
 		m->allSoundOff();
 }
 
-void Sampler::stopAllVoices(int frameOffset) {
-	dynamic_cast<ctoot::mpc::MpcSoundPlayerChannel*>(Mpc::instance().getDrums()[0])->allSoundOff(frameOffset);
-}
-
-void Sampler::finishBasicVoice() {
-	Mpc::instance().getBasicPlayer()->finishVoice();
-}
-
-void Sampler::playX(int playXMode, vector<int>* zone)
+void Sampler::stopAllVoices(int frameOffset)
 {
-	int index = Mpc::instance().getUis().lock()->getSoundGui()->getSoundIndex();
-	auto sound = sounds[index];
+	dynamic_cast<ctoot::mpc::MpcSoundPlayerChannel*>(mpc.getDrums()[0])->allSoundOff(frameOffset);
+}
+
+void Sampler::finishBasicVoice()
+{
+	mpc.getBasicPlayer()->finishVoice();
+}
+
+void Sampler::playX()
+{
+	auto sound = sounds[soundIndex];
 	auto start = 0;
 	auto end = sound->getSampleData()->size() - 1;
 
-	if (!sound->isMono()) end /= 2;
+	if (!sound->isMono())
+		end *= 0.5;
 
 	auto fullEnd = end;
-	if (playXMode == 1) {
-		start = (*zone)[0];
-		end = (*zone)[1];
+
+	if (playX_ == 1)
+	{
+		auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(mpc.screens->getScreenComponent("zone"));
+		auto zone = zoneScreen->getZone();
+		start = zone[0];
+		end = zone[1];
 	}
-	if (playXMode == 2) {
+	else if (playX_ == 2)
+	{
 		end = sound->getStart();
 	}
-	if (playXMode == 3) {
+	else if (playX_ == 3)
+	{
 		end = sound->getLoopTo();
 	}
-
-	if (playXMode == 4) {
+	else if (playX_ == 4)
+	{
 		start = sound->getEnd();
 		end = fullEnd;
 	}
+
 	int oldStart = sound->getStart();
 	int oldEnd = sound->getEnd();
 	sound->setStart(start);
 	sound->setEnd(end);
-	Mpc::instance().getBasicPlayer()->noteOn(-4, 127);
+	mpc.getBasicPlayer()->noteOn(-4, 127);
 	sound->setStart(oldStart);
 	sound->setEnd(oldEnd);
 }
 
-weak_ptr<ctoot::mpc::MpcSound> Sampler::getPlayXSound() {
-	return sounds[Mpc::instance().getUis().lock()->getSoundGui()->getSoundIndex()];
+weak_ptr<ctoot::mpc::MpcSound> Sampler::getPlayXSound()
+{
+	return sounds[soundIndex];
 }
 
 int Sampler::getFreeSampleSpace()
 {
-	int freeSpace = 32 * 1024 * 1000;
-	for (auto& s : sounds) {
-		freeSpace -= s->getSampleData()->size() * 2;
-	}
-	return freeSpace;
+	double freeSpace = 32620;
+
+	for (auto& s : sounds)
+		freeSpace -= (s->getSampleData()->size() * 2) / (double) 1024;
+
+	return (int) floor(freeSpace);
 }
 
 int Sampler::getLastInt(string s)
 {
 	auto offset = s.length();
-	for (int i = s.length() - 1; i >= 0; i--) {
-		auto c = s.at(i);
-		if (isdigit(c)) {
+
+	for (int i = s.length() - 1; i >= 0; i--)
+	{
+		auto c = s[i];
+
+		if (isdigit(c))
+		{
 			offset--;
 		}
-		else {
-			if (offset == s.length()) {
+		else
+		{
+			if (offset == s.length())
 				return INT_MIN;
-			}
+
 			break;
 		}
 	}
@@ -539,23 +717,32 @@ string Sampler::addOrIncreaseNumber(string s)
 {
 	auto res = addOrIncreaseNumber2(s);
 	bool exists = true;
-	while (exists) {
+	
+	while (exists)
+	{
 		exists = false;
-		for (int i = 0; i < getSoundCount(); i++) {
-			if (getSoundName(i).compare(res) == 0) {
+
+		for (int i = 0; i < getSoundCount(); i++)
+		{
+			if (getSoundName(i).compare(res) == 0)
+			{
 				exists = true;
 				res = addOrIncreaseNumber2(res);
 				break;
 			}
 		}
 	}
+
 	return res;
 }
 
-string Sampler::addOrIncreaseNumber2(string s) {
+string Sampler::addOrIncreaseNumber2(string s)
+{
 	int candidate = getLastInt(s);
 	string res = s;
-	if (candidate != INT_MIN) {
+	
+	if (candidate != INT_MIN)
+	{
 		auto candidateStr = to_string(candidate);
 		int candidateLength = candidateStr.length();
 
@@ -571,7 +758,8 @@ string Sampler::addOrIncreaseNumber2(string s) {
 
 		res += candidateStr;
 	}
-	else {
+	else
+	{
 		res = s + to_string(1);
 	}
 	return res;
@@ -579,81 +767,80 @@ string Sampler::addOrIncreaseNumber2(string s) {
 
 Pad* Sampler::getLastPad(Program* program)
 {
-	auto sGui = Mpc::instance().getUis().lock()->getSamplerGui();
-	auto lastValidPad = sGui->getPad();
-	if (lastValidPad == -1) lastValidPad = sGui->getPrevPad();
+	auto lastValidPad = mpc.getPad();
+	
+	if (lastValidPad == -1)
+		lastValidPad = mpc.getPrevPad();
+
 	return program->getPad(lastValidPad);
 }
 
 NoteParameters* Sampler::getLastNp(Program* program)
 {
-	auto sGui = Mpc::instance().getUis().lock()->getSamplerGui();
-	auto lastValidNote = sGui->getNote();
-	if (lastValidNote == 34) lastValidNote = sGui->getPrevNote();
+	auto lastValidNote = mpc.getNote();
+	
+	if (lastValidNote == 34)
+		lastValidNote = mpc.getPrevNote();
+
 	return dynamic_cast<mpc::sampler::NoteParameters*>(program->getNoteParameters(lastValidNote));
 }
 
-int Sampler::getUnusedSampleAmount()
+vector<weak_ptr<Sound>> Sampler::getUsedSounds()
 {
-	vector<weak_ptr<Sound>> soundSet;
-	for (auto& p : programs) {
-		if (!p) continue;
-		for (auto& nn : p->getNotesParameters()) {
-			if (nn->getSndNumber() != -1) {
-				auto candidate = sounds[nn->getSndNumber()];
-				bool contains = false;
-				for (auto& s : soundSet) {
-					if (s.lock() == candidate) {
-						contains = true;
-						break;
-					}
-				}
-				if (!contains) soundSet.push_back(sounds[nn->getSndNumber()]);
-			}
+	set<weak_ptr<Sound>, owner_less<weak_ptr<Sound>>> usedSounds;
+
+	for (auto& p : programs)
+	{
+		if (!p)
+			continue;
+	
+		for (auto& nn : p->getNotesParameters())
+		{
+			if (nn->getSoundIndex() != -1)
+				usedSounds.emplace(sounds[nn->getSoundIndex()]);
 		}
 	}
-	return (int)(sounds.size() - soundSet.size());
+	return vector<weak_ptr<Sound>>(begin(usedSounds), end(usedSounds));
+}
+
+int Sampler::getUnusedSampleCount()
+{
+	return (int)(sounds.size() - getUsedSounds().size());
 }
 
 void Sampler::purge()
 {
-	vector<weak_ptr<Sound>> soundSet;
-	for (auto& p : programs) {
-		for (auto& nn : p->getNotesParameters()) {
-			if (nn->getSndNumber() != -1) {
-				auto candidate = sounds[nn->getSndNumber()];
-				bool contains = false;
-				for (auto& s : soundSet) {
-					if (s.lock() == candidate) {
-						contains = true;
-						break;
-					}
-				}
-				if (!contains) soundSet.push_back(sounds[nn->getSndNumber()]);
-			}
-		}
-	}
+	auto usedSounds = getUsedSounds();
 
-	vector<weak_ptr<Sound>> toRemove;
-	for (auto& s : sounds) {
-		bool contains = false;
-		for (auto& s2 : soundSet) {
-			if (s2.lock() == s) {
-				contains = true;
-				break;
-			}
+	for (int i = 0; i < sounds.size(); i++)
+	{
+		auto maybeUsedSound = sounds[i];
+		const auto pos = find_if(begin(usedSounds), end(usedSounds), [&maybeUsedSound](const weak_ptr<Sound>& sound) {
+			return sound.lock() == maybeUsedSound;
+		});
+		
+		if (pos == usedSounds.end())
+		{
+			deleteSound(maybeUsedSound);
+			i--;
 		}
-		if (!contains) toRemove.push_back(s);
-	}
-	for (auto& s : toRemove) {
-		deleteSound(s);
 	}
 }
 
-void Sampler::deleteSound(weak_ptr<Sound> sound) {
-	auto lSound = sound.lock();
-	for (int i = 0; i < sounds.size(); i++) {
-		if (sounds[i] == lSound) {
+
+void Sampler::deleteSound(int soundIndex)
+{
+	deleteSound(sounds[soundIndex]);
+}
+
+void Sampler::deleteSound(weak_ptr<Sound> sound)
+{
+	auto index = sound.lock()->getMemoryIndex();
+
+	for (int i = 0; i < sounds.size(); i++)
+	{
+		if (sounds[i] == sound.lock())
+		{
 			sounds.erase(sounds.begin() + i);
 			break;
 		}
@@ -661,11 +848,40 @@ void Sampler::deleteSound(weak_ptr<Sound> sound) {
 
 	stable_sort(sounds.begin(), sounds.end(), compareMemoryIndex);
 
-	for (int i = 0; i < sounds.size(); i++) {
+	vector<NoteParameters*> correctedNoteParameters;
+
+	for (int i = 0; i < sounds.size(); i++)
+	{
+		auto oldMemoryIndex = sounds[i]->getMemoryIndex();
+
 		sounds[i]->setMemoryIndex(i);
+
+		for (auto& program : programs)
+		{
+			if (!program)
+				continue;
+
+			for (auto noteParameters : program->getNotesParameters())
+			{
+				if (find(correctedNoteParameters.begin(), correctedNoteParameters.end(), noteParameters) != correctedNoteParameters.end())
+					continue;
+			
+				if (noteParameters->getSoundIndex() == oldMemoryIndex)
+				{
+					noteParameters->setSoundIndex(i);
+					correctedNoteParameters.push_back(noteParameters);
+				}
+				else if (noteParameters->getSoundIndex() == index)
+				{
+					noteParameters->setSoundIndex(-1);
+					correctedNoteParameters.push_back(noteParameters);
+				}
+			}
+		}
 	}
 
-	switch (soundSortingType) {
+	switch (soundSortingType)
+	{
 	case 0:
 		stable_sort(sounds.begin(), sounds.end(), compareMemoryIndex);
 		break;
@@ -676,20 +892,32 @@ void Sampler::deleteSound(weak_ptr<Sound> sound) {
 		stable_sort(sounds.begin(), sounds.end(), compareSize);
 		break;
 	}
+
+	if (soundIndex >= sounds.size())
+		soundIndex--;
+	
+	if (soundIndex < 0)
+		soundIndex = 0;
 }
 
 vector<float> Sampler::mergeToStereo(vector<float> fa0, vector<float> fa1)
 {
 	const int newLengthFrames = fa0.size() > fa1.size() ? fa0.size() : fa1.size();
 	vector<float> newSampleData = vector<float>(newLengthFrames * 2);
-	for (int i = 0; i < newLengthFrames; i++) {
-		if (i < fa0.size()) {
+
+	for (int i = 0; i < newLengthFrames; i++)
+	{
+		if (i < fa0.size())
+		{
 			newSampleData[i] = fa0[i];
 		}
-		else {
+		else
+		{
 			newSampleData[i] = 0;
 		}
-		if (i < fa1.size()) {
+		
+		if (i < fa1.size())
+		{
 			newSampleData[i + newLengthFrames] = fa1[i];
 		}
 		else {
@@ -699,37 +927,53 @@ vector<float> Sampler::mergeToStereo(vector<float> fa0, vector<float> fa1)
 	return newSampleData;
 }
 
-void Sampler::mergeToStereo(vector<float>* sourceLeft, vector<float>* sourceRight, vector<float>* dest) {
+void Sampler::mergeToStereo(vector<float>* sourceLeft, vector<float>* sourceRight, vector<float>* dest)
+{
 	dest->clear();
+
 	for (auto& f : *sourceLeft)
+	{
 		dest->push_back(f);
-	if (sourceLeft->size() < sourceRight->size()) {
-		auto diff = sourceRight->size() - sourceLeft->size();
-		for (int i = 0; i < diff; i++)
-			dest->push_back(0);
 	}
+	
+	if (sourceLeft->size() < sourceRight->size())
+	{
+		auto diff = sourceRight->size() - sourceLeft->size();
+	
+		for (int i = 0; i < diff; i++)
+		{
+			dest->push_back(0);
+		}
+	}
+	
 	for (auto& f : *sourceRight)
+	{
 		dest->push_back(f);
-	if (sourceRight->size() < sourceLeft->size()) {
+	}
+	
+	if (sourceRight->size() < sourceLeft->size())
+	{
 		auto diff = sourceLeft->size() - sourceRight->size();
 		for (int i = 0; i < diff; i++)
+		{
 			dest->push_back(0);
+		}
 	}
 }
 
 void Sampler::setDrumBusProgramNumber(int busNumber, int programNumber)
 {
-	Mpc::instance().getDrums()[busNumber - 1]->setProgram(programNumber);
+	mpc.getDrums()[busNumber - 1]->setProgram(programNumber);
 }
 
 int Sampler::getDrumBusProgramNumber(int busNumber)
 {
-	return Mpc::instance().getDrums()[busNumber - 1]->getProgram();
+	return mpc.getDrums()[busNumber - 1]->getProgram();
 }
 
 ctoot::mpc::MpcSoundPlayerChannel* Sampler::getDrum(int i)
 {
-	return Mpc::instance().getDrum(i);
+	return mpc.getDrum(i);
 }
 
 weak_ptr<ctoot::mpc::MpcSound> Sampler::getClickSound()
@@ -737,7 +981,8 @@ weak_ptr<ctoot::mpc::MpcSound> Sampler::getClickSound()
 	return clickSound;
 }
 
-void Sampler::resample(std::vector<float>* src, int srcRate, std::vector<float>* dest, int destRate) {
+void Sampler::resample(std::vector<float>* src, int srcRate, std::vector<float>* dest, int destRate)
+{
 
 	float* srcArray = &(*src)[0];
 
@@ -753,36 +998,32 @@ void Sampler::resample(std::vector<float>* src, int srcRate, std::vector<float>*
 	srcData.data_out = destArray;
 
 	auto error = src_simple(&srcData, 0, 1);
-	if (error != 0) {
+	
+	if (error != 0)
+	{
 		const char* errormsg = src_strerror(error);
 		string errorStr(errormsg);
 		MLOG("libsamplerate error: " + errorStr);
 	}
+
 	for (auto& f : *dest) {
-		if (f > 1) {
+		if (f > 1)
+		{
 			f = 1;
 		}
-		else if (f < -1) {
+		else if (f < -1)
+		{
 			f = -1;
 		}
 	}
 }
 
-
-void Sampler::setSampleBackground()
-{
-	Mpc::instance().getLayeredScreen().lock()->getCurrentBackground()->setName("sample");
-	auto components = Mpc::instance().getLayeredScreen().lock()->getLayer(0)->getAllLabelsAndFields();
-	for (auto& c : components) {
-		c.lock()->SetDirty();
-	}
-	Mpc::instance().getLayeredScreen().lock()->getFunctionKeys()->SetDirty();
-}
-
 int Sampler::checkExists(string soundName)
 {
-	for (int i = 0; i < getSoundCount(); i++) {
-		if (moduru::lang::StrUtil::eqIgnoreCase(moduru::lang::StrUtil::replaceAll(soundName, ' ', ""), getSoundName(i))) {
+	for (int i = 0; i < getSoundCount(); i++)
+	{
+		if (StrUtil::eqIgnoreCase(StrUtil::replaceAll(soundName, ' ', ""), getSoundName(i)))
+		{
 			return i;
 		}
 	}
@@ -792,20 +1033,21 @@ int Sampler::checkExists(string soundName)
 int Sampler::getNextSoundIndex(int j, bool up)
 {
 	auto inc = up ? 1 : -1;
-	if (j + inc < -1 || j + inc > getSoundCount() - 1) return j;
+	if (j + inc < -1 || j + inc > getSoundCount() - 1)
+	{
+		return j;
+	}
 	return j + inc;
 }
 
-void Sampler::setSoundGuiPrevSound()
+void Sampler::selectPreviousSound()
 {
-	auto soundGui = Mpc::instance().getUis().lock()->getSoundGui();
-	soundGui->setSoundIndex(getNextSoundIndex(soundGui->getSoundIndex(), false), getSoundCount());
+	setSoundIndex(getNextSoundIndex(soundIndex, false));
 }
 
-void Sampler::setSoundGuiNextSound()
+void Sampler::selectNextSound()
 {
-	auto soundGui = Mpc::instance().getUis().lock()->getSoundGui();
-	soundGui->setSoundIndex(getNextSoundIndex(soundGui->getSoundIndex(), true), getSoundCount());
+	setSoundIndex(getNextSoundIndex(soundIndex, true));
 }
 
 weak_ptr<Sound> Sampler::copySound(weak_ptr<Sound> source)
@@ -825,6 +1067,56 @@ weak_ptr<Sound> Sampler::copySound(weak_ptr<Sound> source)
 	return newSound;
 }
 
+void Sampler::copyProgram(const int sourceIndex, const int destIndex)
+{
+	if (programs[destIndex])
+		programs[destIndex].reset();
+
+	auto src = programs[sourceIndex];
+	auto dest = addProgram(destIndex).lock();
+
+	dest->setMidiProgramChange(dest->getMidiProgramChange());
+	dest->setName(src->getName());
+	
+	for (int i = 0; i < 64; i++)
+	{
+		auto copy = dynamic_cast<NoteParameters*>(src->getNoteParameters(i + 35))->clone(i);
+		dest->setNoteParameters(i, copy);
+		
+		auto mc1 = dest->getIndivFxMixerChannel(i).lock();
+		auto mc2 = src->getIndivFxMixerChannel(i).lock();
+		mc1->setFollowStereo(mc2->isFollowingStereo());
+		mc1->setFxPath(mc2->getFxPath());
+		mc1->setFxSendLevel(mc2->getFxSendLevel());
+		mc1->setOutput(mc2->getOutput());
+		mc1->setVolumeIndividualOut(mc2->getVolumeIndividualOut());
+
+		auto mc3 = dest->getStereoMixerChannel(i).lock();
+		auto mc4 = src->getStereoMixerChannel(i).lock();
+		mc3->setLevel(mc4->getLevel());
+		mc3->setPanning(mc4->getPanning());
+		mc3->setStereo(mc4->isStereo());
+
+		auto srcPad = src->getPad(i);
+		auto destPad = dest->getPad(i);
+		destPad->setNote(srcPad->getNote());
+	}
+
+	auto srcSlider = src->getSlider();
+	auto destSlider = dest->getSlider();
+	destSlider->setAssignNote(srcSlider->getNote());
+	destSlider->setAttackHighRange(srcSlider->getAttackHighRange());
+	destSlider->setAttackLowRange(srcSlider->getAttackLowRange());
+	destSlider->setControlChange(srcSlider->getControlChange());
+	destSlider->setDecayHighRange(srcSlider->getDecayHighRange());
+	destSlider->setDecayLowRange(srcSlider->getDecayLowRange());
+	destSlider->setFilterHighRange(srcSlider->getFilterHighRange());
+	destSlider->setFilterLowRange(srcSlider->getFilterLowRange());
+	destSlider->setParameter(srcSlider->getParameter());
+	destSlider->setTuneHighRange(srcSlider->getTuneHighRange());
+	destSlider->setTuneLowRange(srcSlider->getTuneLowRange());
+}
+
 bool Sampler::compareMemoryIndex(weak_ptr<Sound> a, weak_ptr<Sound> b) {
 	return a.lock()->getMemoryIndex() < b.lock()->getMemoryIndex();
 }
@@ -834,30 +1126,58 @@ bool Sampler::compareName(weak_ptr<Sound> a, weak_ptr<Sound> b) {
 }
 
 bool Sampler::compareSize(weak_ptr<Sound> a, weak_ptr<Sound> b) {
-	return a.lock()->getLastFrameIndex() < b.lock()->getLastFrameIndex();
+	return a.lock()->getFrameCount() < b.lock()->getFrameCount();
 }
 
 int Sampler::getUsedProgram(int startIndex, bool up) {
 	auto res = startIndex;
 
-	if (up) {
-		for (int i = startIndex + 1; i < programs.size(); i++) {
-			if (programs[i]) {
+	if (up)
+	{
+		for (int i = startIndex + 1; i < programs.size(); i++)
+		{
+			if (programs[i])
+			{
 				res = i;
 				break;
 			}
 		}
 	}
-	else {
-		for (int i = startIndex - 1; i >= 0; i--) {
-			if (programs[i]) {
+	else
+	{
+		for (int i = startIndex - 1; i >= 0; i--)
+		{
+			if (programs[i])
+			{
 				res = i;
 				break;
 			}
 		}
 	}
+
 	return res;
 }
 
-Sampler::~Sampler() {
+void Sampler::setPlayX(int i)
+{
+	if (i < 0 || i > 4)
+	{
+		return;
+	}
+
+	playX_ = i;
+}
+
+int Sampler::getPlayX()
+{
+	return playX_;
+}
+
+bool Sampler::isSoundNameOccupied(const string& name)
+{
+	for (auto& s : sounds)
+		if (StrUtil::eqIgnoreCase(StrUtil::trim(s->getName()), StrUtil::trim(name)))
+			return true;
+
+	return false;
 }

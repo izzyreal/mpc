@@ -1,134 +1,160 @@
 #include <lcdgui/MixerStrip.hpp>
 
-#include <Mpc.hpp>
-#include <ui/Uis.hpp>
-#include <lcdgui/LayeredScreen.hpp>
 #include <lcdgui/Knob.hpp>
 #include <lcdgui/Label.hpp>
 #include <lcdgui/MixerFaderBackground.hpp>
 #include <lcdgui/MixerTopBackground.hpp>
-#include <lcdgui/VerticalBar.hpp>
-#include <ui/sampler/MixerGui.hpp>
+#include <lcdgui/MixerFader.hpp>
+#include <lcdgui/screens/MixerScreen.hpp>
+#include <lcdgui/Screens.hpp>
 
-using namespace std;
+#include <lang/StrUtil.hpp>
+
+using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui;
+using namespace moduru::lang;
+using namespace std;
 
-MixerStrip::MixerStrip(int columnIndex, int bank)
+MixerStrip::MixerStrip(mpc::Mpc& mpc, int columnIndex)
+	: Component("mixer-strip"), mpc(mpc)
 {
 	this->columnIndex = columnIndex;
-	abcd = vector<string>{ "A", "B", "C", "D" };
-	letters = vector<string>{ "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p" };
-	xPos0indiv = vector<int>{ 5, 20, 35, 50, 65, 80, 95, 110, 125, 140, 155, 170, 185, 200, 215, 230 };
-	xPos1indiv = vector<int>{ 12, 27, 42, 57, 72, 87, 102, 117, 132, 147, 162, 177, 192, 207, 222, 237 };
+
 	yPos0indiv = 0;
 	yPos1indiv = 4;
-	xPos0fx = vector<int>{ 5, 20, 35, 50, 65, 80, 95, 110, 125, 140, 155, 170, 185, 200, 215, 230 };
-	xPos1fx = vector<int>{ 11, 26, 41, 56, 71, 86, 101, 116, 131, 146, 161, 176, 191, 206, 221, 236 };
 	yPos0fx = 2;
 	yPos1fx = 2;
 	selection = -1;
-	mixGui = Mpc::instance().getUis().lock()->getMixerGui();
-	auto lLs = Mpc::instance().getLayeredScreen().lock();
-	verticalBar = lLs->getVerticalBarsMixer()[columnIndex];
-	verticalBar.lock()->Hide(false);
-	knob = lLs->getKnobs()[columnIndex];
-	mixerFaderBackground = lLs->getMixerFaderBackgrounds()[columnIndex];
-	mixerTopBackground = lLs->getMixerTopBackgrounds()[columnIndex];
-	mixerStrip.push_back(verticalBar);
-	mixerStrip.push_back(knob);
-	mixerStrip.push_back(mixerTopBackground);
-	mixerStrip.push_back(mixerFaderBackground);
-	tf0 = lLs->lookupLabel(letters[columnIndex] + "0");
-	tf1 = lLs->lookupLabel(letters[columnIndex] + "1");
-	tf2 = lLs->lookupLabel(letters[columnIndex] + "2");
-	tf3 = lLs->lookupLabel(letters[columnIndex] + "3");
-	tf4 = lLs->lookupLabel(letters[columnIndex] + "4");
-	tf1.lock()->setOpaque(false);
-	tf2.lock()->setOpaque(true);
-	labels = { tf0, tf1, tf2, tf3, tf4 };
-	
-	tf2.lock()->setText(abcd[bank]);
-	initLabels();
-	setColors();
+
+	auto x1 = 4 + (columnIndex * 15);
+	addChild(move(make_shared<MixerTopBackground>(MRECT(x1, 0, x1 + 14, 13))));
+	addChild(move(make_shared<MixerFaderBackground>(MRECT(x1, 14, x1 + 14, 50))));
+
+	auto x2 = 5 + (columnIndex * 15);
+	findChild("mixer-top-background").lock()->addChild(move(make_shared<Knob>(MRECT(x2, 1, x2 + 12, 12))));
+
+	for (int i = 0; i < 5; i++)
+	{
+		auto xPos = 5 + (columnIndex * 15);
+
+		if (i == 1)
+		{
+			xPos += 6;
+		}
+
+		auto yPos = 2 + (i * 13);
+
+		if (i >= 1)
+		{
+			yPos -= 13;
+		}
+
+		auto label = make_shared<Label>(mpc, to_string(i), "", xPos, yPos, 5);
+
+		if (i < 2)
+		{
+			findMixerTopBackground().lock()->addChild(move(label));
+		}
+		else
+		{
+			findMixerFaderBackground().lock()->addChild(move(label));
+		}
+	}
+
+	auto x3 = 12 + (columnIndex * 15);
+	findMixerFaderBackground().lock()->addChild(move(make_shared<MixerFader>(MRECT(x3, 15, x3 + 4, 49))));
+
+	auto padName = StrUtil::padLeft(to_string(columnIndex + 1), "0", 2);
+	findLabel("3").lock()->setText(padName.substr(0, 1));
+	findLabel("4").lock()->setText(padName.substr(1, 2));
 }
 
-vector<weak_ptr<Component>> MixerStrip::getMixerStrip()
+void MixerStrip::setBank(int i)
 {
-    return mixerStrip;
+	findLabel("2").lock()->setText(abcd[i]);
+	findMixerFaderBackground().lock()->SetDirty();
 }
 
 void MixerStrip::setValueA(int i)
 {
-    knob.lock()->setValue(i);
+    findKnob().lock()->setValue(i);
+	findMixerTopBackground().lock()->SetDirty();
 }
 
 void MixerStrip::setValueB(int i)
 {
-    verticalBar.lock()->setValue(i);
+    findMixerFader().lock()->setValue(i);
+	findMixerFaderBackground().lock()->SetDirty();
 }
 
 void MixerStrip::initLabels()
 {
-	if (mixGui->getTab() == 0) {
-		knob.lock()->Hide(false);
-		tf0.lock()->Hide(true);
-		tf1.lock()->Hide(true);
-		tf2.lock()->Hide(false);
-		tf3.lock()->Hide(false);
-		tf4.lock()->Hide(false);
+	auto mixerScreen = dynamic_pointer_cast<MixerScreen>(mpc.screens->getScreenComponent("mixer"));
+
+	if (mixerScreen->getTab() == 0)
+	{
+		findKnob().lock()->Hide(false);
+		findLabel("0").lock()->Hide(true);
+		findLabel("1").lock()->Hide(true);
 	}
-	else if (mixGui->getTab() == 1) {
-		knob.lock()->Hide(true);
-		tf0.lock()->Hide(false);
-		tf1.lock()->Hide(false);
-		tf0.lock()->setLocation(xPos0indiv[columnIndex] - 1, yPos0indiv);
-		tf1.lock()->setLocation(xPos1indiv[columnIndex] - 1, yPos1indiv);
+	else if (mixerScreen->getTab() == 1)
+	{
+		findKnob().lock()->Hide(true);
+		findLabel("0").lock()->Hide(false);
+		findLabel("1").lock()->Hide(false);
+		findLabel("0").lock()->setLocation(xPos0indiv[columnIndex] - 1, yPos0indiv);
+		findLabel("1").lock()->setLocation(xPos1indiv[columnIndex] - 1, yPos1indiv);
 	}
-	else if (mixGui->getTab() == 2) {
-		knob.lock()->Hide(true);
-		tf0.lock()->Hide(false);
-		tf1.lock()->Hide(false);
-		tf0.lock()->setLocation(xPos0fx[columnIndex], yPos0fx);
-		tf1.lock()->setLocation(xPos1fx[columnIndex], yPos1fx);
+	else if (mixerScreen->getTab() == 2)
+	{
+		findKnob().lock()->Hide(true);
+		findLabel("0").lock()->Hide(false);
+		findLabel("1").lock()->Hide(false);
+		findLabel("0").lock()->setLocation(xPos0fx[columnIndex], yPos0fx);
+		findLabel("1").lock()->setLocation(xPos1fx[columnIndex], yPos1fx);
 	}
+	SetDirty();
 }
 
 void MixerStrip::setColors()
 {
-	if (selection == -1) {
-		for (auto& tf : labels) {
-			tf.lock()->setInverted(false);
+	if (selection == -1)
+	{
+		for (int i = 0; i < 5; i++)
+		{
+			findLabel(to_string(i)).lock()->setInverted(false);
 		}
-		mixerTopBackground.lock()->Hide(true);
-		mixerFaderBackground.lock()->Hide(true);
-		knob.lock()->setColor(true);
-		verticalBar.lock()->Hide(false);
-		verticalBar.lock()->setColor(true);
+		
+		findMixerTopBackground().lock()->setColor(false);
+		findMixerFaderBackground().lock()->setColor(false);
+		findKnob().lock()->setColor(true);
+		findMixerFader().lock()->setColor(true);
 	}
-	else if (selection == 0) {
-		labels[0].lock()->setInverted(true);
-		labels[1].lock()->setInverted(true);
-		labels[2].lock()->setInverted(false);
-		labels[3].lock()->setInverted(false);
-		labels[4].lock()->setInverted(false);
-		mixerTopBackground.lock()->Hide(false);
-		mixerFaderBackground.lock()->Hide(true);
-		knob.lock()->setColor(false);
-		verticalBar.lock()->Hide(false);
-		verticalBar.lock()->setColor(true);
+	else if (selection == 0)
+	{
+		findLabel("0").lock()->setInverted(true);
+		findLabel("1").lock()->setInverted(true);
+		findLabel("2").lock()->setInverted(false);
+		findLabel("3").lock()->setInverted(false);
+		findLabel("4").lock()->setInverted(false);
+		findMixerTopBackground().lock()->setColor(true);
+		findMixerFaderBackground().lock()->setColor(false);
+		findKnob().lock()->setColor(false);
+		findMixerFader().lock()->setColor(true);
 	}
-    else if(selection == 1) {
-        labels[0].lock()->setInverted(false);
-        labels[1].lock()->setInverted(false);
-        labels[2].lock()->setInverted(true);
-        labels[3].lock()->setInverted(true);
-        labels[4].lock()->setInverted(true);
-		mixerTopBackground.lock()->Hide(true); 
-		mixerFaderBackground.lock()->Hide(false);
-        knob.lock()->setColor(true);
-		verticalBar.lock()->Hide(false);
-		verticalBar.lock()->setColor(false);
+    else if (selection == 1)
+	{
+        findLabel("0").lock()->setInverted(false);
+        findLabel("1").lock()->setInverted(false);
+        findLabel("2").lock()->setInverted(true);
+        findLabel("3").lock()->setInverted(true);
+        findLabel("4").lock()->setInverted(true);
+		findMixerTopBackground().lock()->setColor(false);
+		findMixerFaderBackground().lock()->setColor(true);
+        findKnob().lock()->setColor(true);
+		findMixerFader().lock()->setColor(false);
     }
+	SetDirty();
 }
 
 void MixerStrip::setSelection(int i)
@@ -139,32 +165,62 @@ void MixerStrip::setSelection(int i)
 
 void MixerStrip::setValueAString(string str)
 {
-	if (mixGui->getTab() == 1) {
-		if (str.length() == 1) {
-			labels[0].lock()->setText(str);
-			labels[0].lock()->setLocation(xPos0indiv[columnIndex] + 2, yPos0indiv + 2);
-			labels[1].lock()->setText("");
+	auto mixerScreen = dynamic_pointer_cast<MixerScreen>(mpc.screens->getScreenComponent("mixer"));
+
+	if (mixerScreen->getTab() == 1)
+	{
+		if (str.length() == 1)
+		{
+			findLabel("0").lock()->setText(str);
+			findLabel("0").lock()->setLocation(xPos0indiv[columnIndex] + 2, yPos0indiv + 2);
+			findLabel("1").lock()->Hide(true);
 		}
-		else if (str.length() == 2) {
-			labels[0].lock()->setLocation(xPos0indiv[columnIndex], yPos0indiv);
-			labels[0].lock()->setText(str.substr(0, 1));
-			labels[1].lock()->setText(str.substr(1, 2));
+		else if (str.length() == 2)
+		{
+			findLabel("0").lock()->setLocation(xPos0indiv[columnIndex], yPos0indiv);
+			findLabel("0").lock()->setText(str.substr(0, 1));
+			findLabel("1").lock()->Hide(false);
+			findLabel("1").lock()->setText(str.substr(1, 2));
 		}
 	}
-	else if (mixGui->getTab() == 2) {
-		labels[0].lock()->setText(str.substr(0, 1));
-		labels[1].lock()->setText(str.substr(1, 2));
+	else if (mixerScreen->getTab() == 2)
+	{
+		findLabel("0").lock()->setText(str.substr(0, 1));
+		findLabel("1").lock()->setText(str.substr(1, 2));
 	}
-	mixerTopBackground.lock()->SetDirty();
+	SetDirty();
 }
 
-MixerStrip::~MixerStrip() {
-	if (!verticalBar.expired()) 
-		verticalBar.lock()->Hide(true);
-	if (!mixerFaderBackground.expired())
-		mixerFaderBackground.lock()->Hide(true);
-	if (!mixerTopBackground.expired())
-		mixerTopBackground.lock()->Hide(true);
-	if (!knob.expired())
-		knob.lock()->Hide(true);
+weak_ptr<MixerFader> MixerStrip::findMixerFader()
+{
+	return dynamic_pointer_cast<MixerFader>(findChild("mixer-fader-background").lock()->findChild("mixer-fader").lock());
+}
+
+weak_ptr<Knob> MixerStrip::findKnob()
+{
+	return dynamic_pointer_cast<Knob>(findChild("mixer-top-background").lock()->findChild("knob").lock());
+}
+
+weak_ptr<MixerTopBackground> MixerStrip::findMixerTopBackground()
+{
+	for (auto& c : children)
+	{
+		if (c->getName().compare("mixer-top-background") == 0)
+		{
+			return dynamic_pointer_cast<MixerTopBackground>(c);
+		}
+	}
+	return {};
+}
+
+weak_ptr<MixerFaderBackground> MixerStrip::findMixerFaderBackground()
+{
+	for (auto& c : children)
+	{
+		if (c->getName().compare("mixer-fader-background") == 0)
+		{
+			return dynamic_pointer_cast<MixerFaderBackground>(c);
+		}
+	}
+	return {};
 }

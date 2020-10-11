@@ -4,30 +4,17 @@
 #include "TextComp.hpp"
 #include <gui/BMFParser.hpp>
 
-namespace mpc {
-	namespace lcdgui {
+namespace mpc { class Mpc; }
 
-		class Label
-			: public TextComp
+namespace mpc::lcdgui {
 
-		{
-		private:
-			bool rigorousClearing = false;
+	class Label
+		: public TextComp
 
-		public:
-			virtual void initialize(std::string name, std::string text, int x, int y, int columns);
-			
-		public:
-			void enableRigorousClearing();
+	{
 
-		public:
-			void Draw(std::vector<std::vector<bool>>* pixels) override;
+	public:
+		Label(mpc::Mpc& mpc, const std::string& name, std::string text, int x, int y, int width);
 
-		public:
-			Label(std::vector<std::vector<bool>>* atlas, moduru::gui::bmfont* font);
-			~Label() override;
-
-		};
-
-	}
+	};
 }

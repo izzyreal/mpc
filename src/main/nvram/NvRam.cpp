@@ -1,77 +1,70 @@
-#include <nvram/NvRam.hpp>
+#include "NvRam.hpp"
 
-#include <file/all/Defaults.hpp>
-#include <hardware/Hardware.hpp>
-#include <hardware/HwSlider.hpp>
-#include <StartUp.hpp>
-#include <Mpc.hpp>
-#include <audiomidi/AudioMidiServices.hpp>
-#include <ui/UserDefaults.hpp>
 #include <nvram/DefaultsParser.hpp>
 #include <nvram/KnobPositions.hpp>
 
-#include <thirdp/bcmath/bcmath_stl.h>
+#include <Mpc.hpp>
+#include <Paths.hpp>
+
+#include <lcdgui/screens/UserScreen.hpp>
+#include <lcdgui/screens/VmpcSettingsScreen.hpp>
+
+#include <audiomidi/AudioMidiServices.hpp>
+
+#include <hardware/Hardware.hpp>
+#include <hardware/HwSlider.hpp>
+
+#include <file/all/Defaults.hpp>
 
 #include <file/File.hpp>
 #include <file/FileUtil.hpp>
 
 using namespace mpc::nvram;
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens;
 using namespace moduru::file;
 using namespace std;
 
-NvRam::NvRam()
+void NvRam::loadUserScreenValues(mpc::Mpc& mpc)
 {
-}
-
-shared_ptr<mpc::ui::UserDefaults> NvRam::load()
-{
-	string path = mpc::StartUp::resPath + "nvram.vmp";
+	string path = mpc::Paths::resPath() + "nvram.vmp";
 	auto file = File(path, nullptr);
 
-	auto ud = make_shared<mpc::ui::UserDefaults>();
+	if (!file.exists())
+		return;
+
+	auto defaults = DefaultsParser::AllDefaultsFromFile(mpc, file);
+	auto userScreen = mpc.screens->get<UserScreen>("user");
+
+	userScreen->lastBar = defaults.getBarCount() - 1;
+	userScreen->bus = defaults.getBusses()[0];
+
+	for (int i = 0; i < 33; i++)
+		userScreen->setDeviceName(i, defaults.getDefaultDevNames()[i]);
 	
-	if (!file.exists()) {
-		file.create();
-		auto stream = FileUtil::ofstreamw(path, ios::binary | ios::out);
-		auto dp = DefaultsParser(ud);
-		auto bytes = dp.getBytes();
-		stream.write(&bytes[0], bytes.size());
-		stream.close();
-	}
-	else {
-		auto defaults = DefaultsParser::AllDefaultsFromFile(file);
-		
-		ud->setLastBar(defaults.getBarCount() - 1);
-		ud->setBus((defaults.getBusses())[0]);
-		
-		for (int i = 0; i < 33; i++) {
-			ud->setDeviceName(i, defaults.getDefaultDevNames()[i]);
-		}
-		ud->setSequenceName(defaults.getDefaultSeqName());
-		auto defTrackNames = defaults.getDefaultTrackNames();
-		for (int i = 0; i < 64; i++) {
-			ud->setTrackName(i, defTrackNames[i]);
-		}
-		ud->setDeviceNumber(defaults.getDevices()[0]);
-		ud->setTimeSig(defaults.getTimeSigNum(), defaults.getTimeSigDen());
-		ud->setPgm(defaults.getPgms()[0]);
-		ud->setTempo(defaults.getTempo() / 10.0);
-		ud->setVelo(defaults.getTrVelos()[0]);
-	}
-    return ud;
+	userScreen->setSequenceName(defaults.getDefaultSeqName());
+	auto defTrackNames = defaults.getDefaultTrackNames();
+
+	for (int i = 0; i < 64; i++)
+		userScreen->setTrackName(i, defTrackNames[i]);
+
+	userScreen->setDeviceNumber(defaults.getDevices()[0]);
+	userScreen->setTimeSig(defaults.getTimeSigNum(), defaults.getTimeSigDen());
+	userScreen->setPgm(defaults.getPgms()[0]);
+	userScreen->setTempo(defaults.getTempo() / 10.0);
+	userScreen->setVelo(defaults.getTrVelos()[0]);
 }
 
-void NvRam::saveUserDefaults()
+void NvRam::saveUserScreenValues(mpc::Mpc& mpc)
 {
-	auto dp = DefaultsParser(mpc::StartUp::getUserDefaults());
+	DefaultsParser dp(mpc);
 	
-	string fileName = mpc::StartUp::resPath + "nvram.vmp";
+	string fileName = mpc::Paths::resPath() + "nvram.vmp";
 	
-	auto file = moduru::file::File(fileName, nullptr);
+	File file(fileName, nullptr);
 	
-	if (!file.exists()) {
+	if (!file.exists())
 		file.create();
-	}
 
 	auto stream = FileUtil::ofstreamw(fileName, ios::binary | ios::out);
 	auto bytes = dp.getBytes();
@@ -79,25 +72,23 @@ void NvRam::saveUserDefaults()
 	stream.close();
 }
 
-void NvRam::saveKnobPositions()
+void NvRam::saveKnobPositions(mpc::Mpc& mpc)
 {
-    auto ams = Mpc::instance().getAudioMidiServices().lock();
-    auto hw = Mpc::instance().getHardware().lock();
+    auto ams = mpc.getAudioMidiServices().lock();
+    auto hw = mpc.getHardware().lock();
     
-	std::shared_ptr<mpc::hardware::Slider> slider;
+	shared_ptr<mpc::hardware::Slider> slider;
     
 	// Can we remove this check?
-	if (hw) {
+	if (hw)
 		slider = hw->getSlider().lock();
-	}
 
-    if (ams && hw && slider) {
-        
-		auto file = moduru::file::File(mpc::StartUp::resPath + "knobpositions.vmp", nullptr);
+    if (ams && hw && slider)
+	{    
+		File file(mpc::Paths::resPath() + "knobpositions.vmp", nullptr);
 		
-		if (!file.exists()) {
+		if (!file.exists())
 			file.create();
-		}
 
 		char recordb = ams->getRecordLevel();
         char volumeb = ams->getMasterLevel();
@@ -125,4 +116,36 @@ int NvRam::getSlider()
 {
     
     return KnobPositions().slider;
+}
+
+void NvRam::saveVmpcSettings(mpc::Mpc& mpc)
+{
+	auto vmpcSettingsScreen = dynamic_pointer_cast<VmpcSettingsScreen>(mpc.screens->getScreenComponent("vmpc-settings"));
+	string fileName = mpc::Paths::resPath() + "vmpc-specific.ini";
+
+	File file(fileName, nullptr);
+
+	if (!file.exists())
+		file.create();
+
+	auto stream = FileUtil::ofstreamw(fileName, ios::binary | ios::out);
+	vector<char> bytes{ (char) (vmpcSettingsScreen->initialPadMapping) };
+	stream.write(&bytes[0], bytes.size());
+	stream.close();
+}
+
+void NvRam::loadVmpcSettings(mpc::Mpc& mpc)
+{
+	string path = mpc::Paths::resPath() + "vmpc-specific.ini";
+	File file(path, nullptr);
+
+	if (!file.exists())
+		return;
+
+	auto vmpcSettingsScreen = dynamic_pointer_cast<VmpcSettingsScreen>(mpc.screens->getScreenComponent("vmpc-settings"));
+	
+	vector<char> bytes(1);
+	file.getData(&bytes);
+
+	vmpcSettingsScreen->initialPadMapping = bytes[0];
 }

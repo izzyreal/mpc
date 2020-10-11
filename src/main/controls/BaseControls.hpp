@@ -2,73 +2,79 @@
 
 #include <lcdgui/LayeredScreen.hpp>
 
+#include <sequencer/Sequencer.hpp>
+
+#include <sampler/Sampler.hpp>
+#include <sampler/Pad.hpp>
+#include <sampler/Program.hpp>
+#include <sampler/NoteParameters.hpp>
+
+#include <controls/Controls.hpp>
+
 #include <string>
 #include <memory>
 #include <vector>
 
-namespace ctoot::mpc {
+namespace ctoot::mpc
+{
 	class MpcSoundPlayerChannel;
 }
 
-namespace mpc {
-	
+namespace mpc
+{
+	class Mpc;
 }
 
-namespace mpc::sequencer {
-	class Sequencer;
+namespace mpc::sequencer
+{
 	class Track;
 	class NoteEvent;
 }
 
-namespace mpc::sampler {
-	class Sampler;
+namespace mpc::sampler
+{
 	class Program;
 }
 
-namespace mpc::lcdgui {
+namespace mpc::lcdgui
+{
 	class Field;
 	class LayeredScreen;
 }
 
-namespace mpc::ui {
-	class NameGui;
-}
-
-namespace mpc::ui::sequencer {
-	class SequencerGui;
-}
-
-namespace mpc::ui::sampler {
-	class SamplerGui;
-}
-
-namespace mpc::controls {
+namespace mpc::controls
+{
 	class BaseControls
 	{
-	protected:
-		std::string param{ "" };
-		std::string csn{ "" };
-
-		
-		std::weak_ptr<mpc::sequencer::Sequencer> sequencer{};
-		std::weak_ptr<mpc::sampler::Sampler> sampler{};
-		std::weak_ptr<mpc::sequencer::Track> track{};
-		std::weak_ptr<mpc::sampler::Program> program{};
-		ctoot::mpc::MpcSoundPlayerChannel* mpcSoundPlayerChannel{ nullptr };
-
-		std::weak_ptr<mpc::lcdgui::LayeredScreen> ls{};
-		mpc::ui::NameGui* nameGui{ nullptr };
-		ui::sequencer::SequencerGui* sequencerGui{ nullptr };
-		ui::sampler::SamplerGui* samplerGui{ nullptr };
-		std::weak_ptr<mpc::lcdgui::Field> activeField{};
-
-		int bank_{ 0 };
-		std::vector<std::string> typableParams{};
 
 	protected:
-		virtual void init();
+		const std::vector<std::string> allowTransportScreens{ "sequencer", "select-drum", "select-mixer-drum", "program-assign", "program-params", "drum", "purge", "program", "create-new-program", "name", "delete-program", "delete-all-programs", "assignment-view", "initialize-pad-assign", "copy-note-parameters", "velocity-modulation", "velo-env-filter", "velo-pitch", "mute-assign", "trans" };
+		const std::vector<std::string> allowPlay{ "song", "track-mute", "next-seq", "next-seq-pad" };
+		mpc::Mpc& mpc;
+		std::weak_ptr<mpc::sequencer::Sequencer> sequencer;
+		std::weak_ptr<mpc::sampler::Sampler> sampler;
 
 	public:
+		bool splittable = false;
+		void splitLeft();
+		void splitRight();
+
+	public:
+		std::string param = "";
+		std::string currentScreenName = "";
+
+		std::weak_ptr<mpc::sequencer::Track> track;
+		std::weak_ptr<mpc::sampler::Program> program;
+		ctoot::mpc::MpcSoundPlayerChannel* mpcSoundPlayerChannel = nullptr;
+
+		std::weak_ptr<mpc::lcdgui::LayeredScreen> ls;
+		std::weak_ptr<mpc::lcdgui::Field> activeField;
+
+		std::vector<std::string> typableParams;
+
+	public:
+		virtual void init();
+		int getSoundIncrement(int notch);
 		virtual void left();
 		virtual void right();
 		virtual void up();
@@ -76,7 +82,6 @@ namespace mpc::controls {
 		virtual void function(int i);
 		virtual void openWindow();
 		virtual void turnWheel(int i);
-		//virtual void keyEvent(unsigned char c) {};
 		virtual void numpad(int i);
 		virtual void pressEnter();
 		virtual void rec();
@@ -100,8 +105,8 @@ namespace mpc::controls {
 		virtual void shift();
 		virtual void undoSeq();
 		virtual void erase();
-
 		virtual void setSlider(int i) {};
+		
 		virtual bool isTypable();
 
 		virtual void pad(int i, int velo, bool repeat, int tick);
@@ -110,8 +115,7 @@ namespace mpc::controls {
 		void setSliderNoteVar(mpc::sequencer::NoteEvent* n, std::weak_ptr<mpc::sampler::Program> program);
 
 	public:
-		BaseControls();
-		virtual ~BaseControls();
+		BaseControls(mpc::Mpc& mpc);
 
 	};
 }

@@ -16,15 +16,16 @@ namespace mpc::audiomidi {
 		std::string name;
 		ctoot::audio::core::AudioFormat* format = nullptr;
 		std::ofstream fileStream;
-		bool writing = false;
-		int written = 0;
+		std::atomic<bool> writing = ATOMIC_VAR_INIT(false);
+		int writtenByteCount = 0;
 		int lengthInFrames = 0;
 		int lengthInBytes = 0;
 		int sampleRate = 0;
 
 	public:
-		void start();
-		void prepare(const std::string& absolutePath, int lengthInFrames, int sampleRate);
+		bool start();
+		bool stopEarly();
+		bool prepare(const std::string& absolutePath, int lengthInFrames, int sampleRate);
 		int processAudio(ctoot::audio::core::AudioBuffer* buf) override;
 
 	public:

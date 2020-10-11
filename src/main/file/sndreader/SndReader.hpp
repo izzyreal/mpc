@@ -6,28 +6,28 @@
 #include <vector>
 #include <memory>
 
-namespace mpc::disk {
+namespace mpc::disk
+{
 	class MpcFile;
 }
 
-namespace mpc::file::sndreader {
+namespace mpc::file::sndreader
+{
 	class SndHeaderReader;
 }
 
-using namespace std;
-
-namespace mpc::file::sndreader {
-
+namespace mpc::file::sndreader
+{
 	class SndReader
 	{
 
 	private:
-		vector<char> sndFileArray;
-		shared_ptr<SndHeaderReader> sndHeaderReader;
+		std::vector<char> sndFileArray;
+		std::shared_ptr<SndHeaderReader> sndHeaderReader;
 		mpc::disk::MpcFile* sndFile;
 
 	public:
-		string getName();
+		std::string getName();
 		bool isMono();
 		int getNumberOfFrames();
 		int getSampleRate();
@@ -38,10 +38,10 @@ namespace mpc::file::sndreader {
 		bool isLoopEnabled();
 		int getTune();
 		int getNumberOfBeats();
-		void getSampleData(vector<float>* dest);
+		void getSampleData(std::vector<float>* dest);
 
 	public:
-		vector<char>& getSndFileArray();
+		std::vector<char>& getSndFileArray();
 
 	public:
 		SndReader(mpc::disk::MpcFile* soundFile);

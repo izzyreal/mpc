@@ -1,20 +1,20 @@
 #include "AudioMidiServices.hpp"
 
 // mpc
-#include <StartUp.hpp>
+#include <Paths.hpp>
 #include <Mpc.hpp>
 #include <audiomidi/DirectToDiskSettings.hpp>
 #include <audiomidi/DiskRecorder.hpp>
 #include <audiomidi/SoundRecorder.hpp>
 #include <audiomidi/SoundPlayer.hpp>
+#include <audiomidi/MonitorInputAdapter.hpp>
 #include <audiomidi/MpcMidiPorts.hpp>
-#include <ui/sampler/SamplerGui.hpp>
-#include <ui/sampler/MixerSetupGui.hpp>
-#include <ui/vmpc/DirectToDiskRecorderGui.hpp>
+
 #include <nvram/NvRam.hpp>
 #include <nvram/AudioMidiConfig.hpp>
 #include <sampler/Sampler.hpp>
 #include <sequencer/Sequencer.hpp>
+
 #include <mpc/MpcVoice.hpp>
 #include <mpc/MpcBasicSoundPlayerChannel.hpp>
 #include <mpc/MpcBasicSoundPlayerControls.hpp>
@@ -24,6 +24,9 @@
 #include <mpc/MpcMultiSynthControls.hpp>
 #include <mpc/MpcSoundPlayerChannel.hpp>
 #include <mpc/MpcSoundPlayerControls.hpp>
+
+#include <lcdgui/screens/MixerSetupScreen.hpp>
+#include <lcdgui/Screens.hpp>
 
 // ctoot
 #include <audio/core/AudioFormat.hpp>
@@ -87,6 +90,8 @@
 
 using namespace mpc;
 using namespace mpc::audiomidi;
+using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui;
 
 using namespace ctoot::audio::server;
 using namespace ctoot::audio::core;
@@ -94,9 +99,10 @@ using namespace ctoot::audio::mixer;
 
 using namespace std;
 
-AudioMidiServices::AudioMidiServices()
+AudioMidiServices::AudioMidiServices(mpc::Mpc& mpc)
+	: mpc(mpc)
 {
-	frameSeq = make_shared<mpc::sequencer::FrameSeq>();
+	frameSeq = make_shared<mpc::sequencer::FrameSeq>(mpc);
 	AudioServices::scan();
 	ctoot::synth::SynthServices::scan();
 	ctoot::synth::SynthChannelServices::scan();
@@ -109,7 +115,7 @@ void AudioMidiServices::start(const int sampleRate, const int inputCount, const 
 	server = make_shared<ExternalAudioServer>();
 	offlineServer = make_shared<NonRealTimeAudioServer>(server);
 
-	soundRecorder = make_shared<SoundRecorder>();
+	soundRecorder = make_shared<SoundRecorder>(mpc);
 	soundPlayer = make_shared<SoundPlayer>();
 
 	setupMixer();
@@ -118,27 +124,29 @@ void AudioMidiServices::start(const int sampleRate, const int inputCount, const 
 	outputProcesses = vector<IOAudioProcess*>(outputCount <= 5 ? outputCount : 5);
 
 	for (auto& p : inputProcesses)
+	{
 		p = nullptr;
-
-	for (auto& p : outputProcesses)
-		p = nullptr;
-
-	for (int i = 0; i < inputProcesses.size(); i++) {
-		inputProcesses[i] = shared_ptr<IOAudioProcess>(server->openAudioInput(getInputNames()[i], "mpc_in" + to_string(i)));
 	}
 
-	for (int i = 0; i < outputProcesses.size(); i++) {
+	for (auto& p : outputProcesses)
+	{
+		p = nullptr;
+	}
+
+	for (int i = 0; i < inputProcesses.size(); i++)
+	{
+		inputProcesses[i] = shared_ptr<IOAudioProcess>(server->openAudioInput(getInputNames()[i], "mpc_in" + to_string(i)));
+		// For now we assume there is only 1 stereo input pair max
+		if (i == 0)
+			monitorInputAdapter = make_shared<MonitorInputAdapter>(mpc, inputProcesses[i].get());
+	}
+
+	for (int i = 0; i < outputProcesses.size(); i++)
+	{
 		outputProcesses[i] = server->openAudioOutput(getOutputNames()[i], "mpc_out" + to_string(i));
 	}
 
 	createSynth();
-
-	if (oldPrograms.size() != 0) {
-		for (int i = 0; i < 4; i++) {
-			Mpc::instance().getDrum(i)->setProgram(oldPrograms[i]);
-		}
-	}
-	
 	connectVoices();
 
 	mpcMidiPorts = make_shared<MpcMidiPorts>();
@@ -150,20 +158,28 @@ void AudioMidiServices::start(const int sampleRate, const int inputCount, const 
 	auto sc = mixer->getMixerControls().lock()->getStripControls("67").lock();
 	auto mmc = dynamic_pointer_cast<MainMixControls>(sc->find("Main").lock());
 	dynamic_pointer_cast<ctoot::audio::fader::FaderControl>(mmc->find("Level").lock())->setValue(static_cast<float>(100));
-	
+
 	cac = make_shared<CompoundAudioClient>();
 	cac->add(frameSeq.get());
 	cac->add(mixer.get());
 
-	mixer->getStrip("66").lock()->setInputProcess(inputProcesses[0]);
-	
+	mixer->getStrip("66").lock()->setInputProcess(monitorInputAdapter);
+
 	offlineServer->setWeakPtr(offlineServer);
 	offlineServer->setClient(cac);
 
 	offlineServer->start();
 }
 
-void AudioMidiServices::setMonitorLevel(int level) {
+void AudioMidiServices::setPreviewClickVolume(int volume)
+{
+	auto sc = mixer->getMixerControls().lock()->getStripControls("65").lock();
+	auto mmc = dynamic_pointer_cast<MainMixControls>(sc->find("Main").lock());
+	dynamic_pointer_cast<ctoot::audio::fader::FaderControl>(mmc->find("Level").lock())->setValue(static_cast<float>(volume));
+}
+
+void AudioMidiServices::setMonitorLevel(int level)
+{
 	auto sc = mixer->getMixerControls().lock()->getStripControls("66").lock();
 	auto mmc = dynamic_pointer_cast<MainMixControls>(sc->find("Main").lock());
 	dynamic_pointer_cast<ctoot::audio::fader::FaderControl>(mmc->find("Level").lock())->setValue(static_cast<float>(level));
@@ -204,20 +220,20 @@ NonRealTimeAudioServer* AudioMidiServices::getAudioServer() {
 void AudioMidiServices::setupMixer()
 {
 	mixerControls = make_shared<ctoot::mpc::MpcMixerControls>("MpcMixerControls", 1.f);
-	
+
 	// AUX#1 - #4 represent ASSIGNABLE MIX OUT 1/2, 3/4, 5/6 and 7/8
 	mixerControls->createAuxBusControls("AUX#1", ChannelFormat::STEREO());
 	mixerControls->createAuxBusControls("AUX#2", ChannelFormat::STEREO());
 	mixerControls->createAuxBusControls("AUX#3", ChannelFormat::STEREO());
 	mixerControls->createAuxBusControls("AUX#4", ChannelFormat::STEREO());
-	
+
 	// FX#1 Represents the MPC2000XL's only FX send bus
 	mixerControls->createFxBusControls("FX#1", ChannelFormat::STEREO());
 	int nReturns = 1;
-	
+
 	// L/R represents STEREO OUT L/R
 	ctoot::audio::mixer::MixerControlsFactory::createBusStrips(dynamic_pointer_cast<ctoot::audio::mixer::MixerControls>(mixerControls), "L-R", ChannelFormat::STEREO(), nReturns);
-	
+
 	/*
 	* There are 32 voices. Each voice has one channel for mixing to STEREO OUT L/R, and one channel for mixing to an ASSIGNABLE MIX OUT. These are strips 1-64.
 	* There's one channel for the MpcBasicSoundPlayerChannel, which plays the metronome, preview and playX sounds. This is strip 65.
@@ -301,22 +317,26 @@ void AudioMidiServices::createSynth()
 	msc = make_shared<ctoot::mpc::MpcMultiSynthControls>();
 	synthRackControls->setSynthControls(0, msc);
 	mms = dynamic_pointer_cast<ctoot::mpc::MpcMultiMidiSynth>(synthRack->getMidiSynth(0).lock());
-	auto msGui = Mpc::instance().getUis().lock()->getMixerSetupGui();
-	for (int i = 0; i < 4; i++) {
-		auto m = make_shared<ctoot::mpc::MpcSoundPlayerControls>(mms, dynamic_pointer_cast<ctoot::mpc::MpcSampler>(Mpc::instance().getSampler().lock()), i, mixer, server, dynamic_cast<ctoot::mpc::MpcMixerSetupGui*>(msGui));
+
+	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(mpc.screens->getScreenComponent("mixer-setup"));
+
+	for (int i = 0; i < 4; i++)
+	{
+		auto m = make_shared<ctoot::mpc::MpcSoundPlayerControls>(mms, dynamic_pointer_cast<ctoot::mpc::MpcSampler>(mpc.getSampler().lock()), i, mixer, server, mixerSetupScreen.get());
 		msc->setChannelControls(i, m);
 		synthChannelControls.push_back(m);
 	}
+
 	basicVoice = make_shared<ctoot::mpc::MpcVoice>(65, true);
-	auto m = make_shared<ctoot::mpc::MpcBasicSoundPlayerControls>(Mpc::instance().getSampler(), mixer, basicVoice);
+	auto m = make_shared<ctoot::mpc::MpcBasicSoundPlayerControls>(mpc.getSampler(), mixer, basicVoice);
 	msc->setChannelControls(4, m);
 	synthChannelControls.push_back(std::move(m));
 }
 
 void AudioMidiServices::connectVoices()
 {
-	Mpc::instance().getDrums()[0]->connectVoices();
-	Mpc::instance().getBasicPlayer()->connectVoice();
+	mpc.getDrums()[0]->connectVoices();
+	mpc.getBasicPlayer()->connectVoice();
 }
 
 weak_ptr<MpcMidiPorts> AudioMidiServices::getMidiPorts()
@@ -328,12 +348,12 @@ void AudioMidiServices::initializeDiskRecorders()
 {
 	for (int i = 0; i < outputProcesses.size(); i++) {
 		auto diskRecorder = make_shared<DiskRecorder>(outputProcesses[i], "diskwriter" + to_string(i));
-		if (i == 0) {
+
+		if (i == 0)
 			mixer->getMainStrip().lock()->setDirectOutputProcess(diskRecorder);
-		}
-		else {
+		else
 			mixer->getStrip(string("AUX#" + to_string(i))).lock()->setDirectOutputProcess(diskRecorder);
-		}
+
 		diskRecorders.push_back(std::move(diskRecorder));
 	}
 }
@@ -349,67 +369,89 @@ void AudioMidiServices::destroyServices()
 	midiSystem->close();
 }
 
-void AudioMidiServices::destroySynth() {
-	oldPrograms = vector<int>(4);
-	for (int i = 0; i < 4; i++) {
-		oldPrograms[i] = Mpc::instance().getDrum(i)->getProgram();
-	}
+void AudioMidiServices::destroySynth()
+{
 	synthRack->close();
 }
 
 void AudioMidiServices::closeIO()
 {
-	for (auto j = 0; j < inputProcesses.size(); j++) {
-		if (inputProcesses[j]) {
+	for (auto j = 0; j < inputProcesses.size(); j++)
+	{
+		if (inputProcesses[j])
 			server->closeAudioInput(inputProcesses[j].get());
-		}
 	}
 
-	for (auto j = 0; j < outputProcesses.size(); j++) {
-		if (outputProcesses[j] == nullptr) {
+	for (auto j = 0; j < outputProcesses.size(); j++)
+	{
+		if (outputProcesses[j] == nullptr)
 			continue;
-		}
+
 		server->closeAudioOutput(outputProcesses[j]);
 	}
 }
 
-void AudioMidiServices::prepareBouncing(DirectToDiskSettings* settings)
+bool AudioMidiServices::prepareBouncing(DirectToDiskSettings* settings)
 {
 	auto indivFileNames = vector<string>{ "L-R.wav", "1-2.wav", "3-4.wav", "5-6.wav", "7-8.wav" };
 	string sep = moduru::file::FileUtil::getSeparator();
-	for (int i = 0; i < diskRecorders.size(); i++) {
+
+	for (int i = 0; i < diskRecorders.size(); i++)
+	{
 		auto eapa = diskRecorders[i];
-		auto absolutePath = mpc::StartUp::home + sep + "vMPC" + sep + "recordings" + sep + indivFileNames[i];
-		eapa->prepare(absolutePath, settings->lengthInFrames, settings->sampleRate);
+		auto absolutePath = mpc::Paths::home() + sep + "vMPC" + sep + "recordings" + sep + indivFileNames[i];
+
+		if (!eapa->prepare(absolutePath, settings->lengthInFrames, settings->sampleRate))
+			return false;
 	}
+
 	bouncePrepared = true;
+	return true;
 }
 
-void AudioMidiServices::startBouncing()
+bool AudioMidiServices::startBouncing()
 {
-	if (!bouncePrepared) {
-		return;
-	}
+	if (!bouncePrepared)
+		return false;
 
 	bouncePrepared = false;
 	bouncing.store(true);
+	return true;
 }
 
-void AudioMidiServices::stopBouncing()
+bool AudioMidiServices::stopBouncing()
 {
-	if (!bouncing.load()) {
-		return;
-	}
-
-	Mpc::instance().getLayeredScreen().lock()->openScreen("recordingfinished");	
+	if (!bouncing.load())
+		return false;
+	
+	mpc.getLayeredScreen().lock()->openScreen("vmpc-recording-finished");
 	bouncing.store(false);
+	return true;
 }
 
-void AudioMidiServices::startRecordingSound() {
+bool AudioMidiServices::stopBouncingEarly()
+{
+	if (!bouncing.load())
+		return false;
+
+	for (auto& recorder : diskRecorders)
+		recorder->stopEarly();
+
+	mpc.getLayeredScreen().lock()->openScreen("vmpc-recording-finished");
+	bouncing.store(false);
+	return true;
+}
+
+void AudioMidiServices::startRecordingSound()
+{
 	recordingSound.store(true);
 }
 
-void AudioMidiServices::stopSoundRecorder() {
+void AudioMidiServices::stopSoundRecorder(bool cancel)
+{
+	if (cancel)
+		soundRecorder->cancel();
+	
 	recordingSound.store(false);
 }
 
@@ -430,7 +472,4 @@ const bool AudioMidiServices::isBouncing()
 
 const bool AudioMidiServices::isRecordingSound() {
 	return recordingSound.load();
-}
-
-AudioMidiServices::~AudioMidiServices() {
 }

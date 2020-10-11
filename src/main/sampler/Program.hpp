@@ -4,8 +4,6 @@
 #include <sampler/NoteParameters.hpp>
 #include <sampler/PgmSlider.hpp>
 
-#include <observer/Observable.hpp>
-
 #include <memory>
 
 namespace ctoot::mpc {
@@ -15,28 +13,29 @@ namespace ctoot::mpc {
 	class MpcNoteParameters;
 }
 
+namespace mpc { class Mpc; }
+
 namespace mpc::sampler {
 
 	class Pad;
 
 	class Program
 		: public virtual ctoot::mpc::MpcProgram
-		, public moduru::observer::Observable
 	{
 
 	public:
-		std::weak_ptr<ctoot::mpc::MpcStereoMixerChannel> getStereoMixerChannel(int pad) override;
-		std::weak_ptr<ctoot::mpc::MpcIndivFxMixerChannel> getIndivFxMixerChannel(int pad) override;
-		int getPadNumberFromNote(int note) override;
+		std::weak_ptr<ctoot::mpc::MpcStereoMixerChannel> getStereoMixerChannel(int noteIndex) override;
+		std::weak_ptr<ctoot::mpc::MpcIndivFxMixerChannel> getIndivFxMixerChannel(int noteIndex) override;
+		int getPadIndexFromNote(int note) override;
 		ctoot::mpc::MpcNoteParameters* getNoteParameters(int i) override;
 
 	private:
-		Sampler* sampler{ nullptr };
-		std::string name{ "" };
-		std::vector<NoteParameters*> noteParameters{ };
-		std::vector<Pad*> pads{ };
-		PgmSlider* slider{ nullptr };
-		int midiProgramChange{ 0 };
+		Sampler* sampler = nullptr;
+		std::string name = "";
+		std::vector<NoteParameters*> noteParameters;
+		std::vector<Pad*> pads;
+		PgmSlider* slider = nullptr;
+		int midiProgramChange = 0;
 
 		void init();
 
@@ -47,14 +46,15 @@ namespace mpc::sampler {
 		Pad* getPad(int i);
 		std::vector<NoteParameters*> getNotesParameters();
 		mpc::sampler::PgmSlider* getSlider();
-		void setNoteParameters(int i, NoteParameters* nn);
+		void setNoteParameters(int i, NoteParameters* noteParameters);
 		int getMidiProgramChange();
 		void setMidiProgramChange(int i);
 		void initPadAssign();
 		int getNoteFromPad(int i);
+		std::vector<int> getPadIndicesFromNote(const int note);
 
 	public:
-		Program(mpc::sampler::Sampler* sampler);
+		Program(mpc::Mpc& mpc, mpc::sampler::Sampler* sampler);
 		~Program();
 
 	};

@@ -4,28 +4,22 @@
 
 #include <string>
 
-namespace mpc {
+namespace mpc::hardware
+{
+	class Led
+		: public moduru::observer::Observable
+	{
 
-	namespace hardware {
+	private:
+		std::string label = "";
 
-		class Led
-			: public moduru::observer::Observable
-		{
+	public:
+		std::string getLabel();
 
-		private:
-			std::string label{ "" };
+	public:
+		void light(bool b);
 
-		public:
-			std::string getLabel();
-
-		public:
-			void light(bool b);
-
-		public:
-			Led(std::string label);
-			~Led();
-
-		};
-
-	}
+	public:
+		Led(std::string label);
+	};
 }

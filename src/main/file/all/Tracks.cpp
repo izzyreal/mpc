@@ -43,7 +43,7 @@ Tracks::Tracks(mpc::sequencer::Sequence* seq)
 			string name = moduru::lang::StrUtil::padRight(t->getActualName(), " ", AllParser::NAME_LENGTH);
 			saveBytes[offset + j] = name[j];
 		}
-		saveBytes[BUSSES_OFFSET + i] = (t->getBusNumber());
+		saveBytes[BUSSES_OFFSET + i] = (t->getBus());
 		saveBytes[PGMS_OFFSET + i] = (t->getProgramChange());
 		saveBytes[VELO_RATIOS_OFFSET + i] = (t->getVelocityRatio());
 		auto status = t->isUsed() ? 7 : 6;

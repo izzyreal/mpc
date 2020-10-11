@@ -9,9 +9,11 @@ using namespace std;
 
 StdDevice::StdDevice(string rootPath)
 {
-	if (!FileUtil::Exists(rootPath)) {
+	if (!FileUtil::Exists(rootPath))
+	{
 		return;
 	}
+	
 	root = make_shared<moduru::file::Directory>(rootPath, nullptr);
 	valid = true;
 }
@@ -52,7 +54,4 @@ int StdDevice::getSize()
 string StdDevice::getVolumeName()
 {
     return "stddevvolume";
-}
-
-StdDevice::~StdDevice() {
 }

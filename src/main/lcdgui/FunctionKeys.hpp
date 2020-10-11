@@ -9,41 +9,35 @@
 #include <string>
 #include <vector>
 
-namespace mpc {
-	namespace lcdgui {
+namespace mpc { class Mpc; }
 
-		class FunctionKeys
-			: public Component
-		{
-		private:
-			std::vector<std::vector<bool>>* atlas;
-			moduru::gui::bmfont* font;
+namespace mpc::lcdgui
+{
+	class FunctionKey
+		: public Component
+	{
 
-		public:
-			std::string name0{ "" };
-			std::string name1{ "" };
-			std::string name2{ "" };
-			std::string name3{ "" };
-			std::string name4{ "" };
-			std::string name5{ "" };
-			int box0{ 0 }, box1{ 0 }, box2{ 0 }, box3{ 0 }, box4{ 0 }, box5{ 0 };
-			std::vector<bool> enabled;
-			std::vector<std::string> names{};
+	public:
+		FunctionKey(mpc::Mpc& mpc, const std::string& name, const int xPos);
+		void Draw(std::vector<std::vector<bool>>* pixels) override;
+		int type = -1;
+		void setText(const std::string& text);
+		void setType(const int type);
+	};
 
-		public:
-			void initialize(rapidjson::Value& fbLabels, rapidjson::Value& fbTypes);
-			void disable(int i);
-			void enable(int i);
-			void clearAll(std::vector<std::vector<bool>>* pixels);
+	class FunctionKeys
+		: public Component
+	{
 
-		public:
-			void Draw(std::vector<std::vector<bool>>* pixels) override;
+	private:
+		const std::vector<int> xPoses { 2, 43, 84, 125, 166, 207 };
+		int activeArrangement = -1;
+		std::vector<std::vector<std::string>> texts;
+		std::vector<std::vector<int>> types;
 
-		public:
-			FunctionKeys(std::vector<std::vector<bool>>* atlas, moduru::gui::bmfont* font);
-			~FunctionKeys();
+	public:
+		void setActiveArrangement(int i);
+		FunctionKeys(mpc::Mpc& mpc, const std::string& name, std::vector<std::vector<std::string>> texts, std::vector<std::vector<int>> types);
 
-		};
-
-	}
+	};
 }

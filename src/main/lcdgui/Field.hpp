@@ -8,64 +8,58 @@
 #include <string>
 #include <vector>
 
-namespace mpc {
+namespace mpc { class Mpc; }
 
-	namespace lcdgui {
+namespace mpc::lcdgui
+{
+	class Label;
+}
 
-		class LayeredScreen;
+namespace mpc::lcdgui
+{
+	class Field
+		: public TextComp
+	{
 
-		class Label;
-		class Field
-			: public TextComp
-		{
+	private:
+		mpc::Mpc& mpc;
+		// When hiding a field that is focused, we pass focus to nextFocus
+		std::string nextFocus = "_";
 
-		private:
-			mpc::lcdgui::LayeredScreen* layeredScreen{};
-			std::vector<Label*> letters{};
+		bool focusable = true;
+		bool focus = false;
+		std::string csn = "";
+		bool split = false;
+		int activeSplit = 0;
+		bool typeModeEnabled = false;
+		std::string oldText = "";
+		bool scrolling = false;
+		bool rectangleOnly = false;
 
-			bool focusable{ true };
-			bool focus{ false };
-			std::string csn{ "" };
-			bool split{ false };
-			int activeSplit{ 0 };
-			bool typeModeEnabled{ false };
-			std::string oldText{ "" };
-			bool scrolling{ false };
-			//Field_Scroller* scroller{};
-			static const int BLINKING_RATE{ 200 };
-			bool blinking{ false };
+	public:
+		bool hasFocus();
+		void setFocusable(bool b);
+		bool isFocusable();
+		void loseFocus(std::string next);
+		void takeFocus(std::string prev);
+		void setSplit(bool b);
+		bool isSplit();
+		int getActiveSplit();
+		bool setActiveSplit(int i);
+		bool enableTypeMode();
+		int enter();
+		void type(int i);
+		bool isTypeModeEnabled();
+		void disableTypeMode();
+		void setNextFocus(const std::string& nextFocus);
+		void setRectangleOnly(bool b);
 
-		public:
-			void setSize(int x, int y, bool clear = true) override;
-			void Draw(std::vector<std::vector<bool>>* pixels) override;
+	public:
+		void Draw(std::vector<std::vector<bool>>* pixels) override;
+		void Hide(bool b) override;
 
-		public:
-			bool hasFocus();
-			void setFocusable(bool b);
-			bool isFocusable();
-			void loseFocus(std::string next);
-			void takeFocus(std::string prev);
-			void setSplit(bool b);
-			void redrawSplit();
-			bool isSplit();
-			int getActiveSplit();
-			bool setActiveSplit(int i);
-			bool enableTypeMode();
-			int enter();
-			void type(int i);
-			bool isTypeModeEnabled();
-			void disableTypeMode();
-			//void enableScrolling(std::vector<CLabel> enablers);
-			void startBlinking();
-			void stopBlinking();
-			bool getBlinking();
+	public:
+		Field(mpc::Mpc& mpc, const std::string& name, int x, int y, int width);
 
-			void initialize(std::string name, int x, int y, int columns);
-
-		public:
-			Field(mpc::lcdgui::LayeredScreen* layeredScreen, std::vector<std::vector<bool>>* atlas, moduru::gui::bmfont* font);
-			~Field();
-
-		};
-	}
+	};
 }

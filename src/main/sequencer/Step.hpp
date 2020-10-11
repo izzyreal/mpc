@@ -1,28 +1,18 @@
 #pragma once
 
-namespace mpc {
-	namespace sequencer {
+namespace mpc::sequencer
+{
+	class Step
+	{
 
-		class Song;
+	private:
+		int sequence = 0;
+		int repeatCount = 1;
 
-		class Step
-		{
-
-		private:
-			Song* song{ nullptr };
-			int sequence{ 0 };
-			int repeats{ 1 };
-
-		public:
-			virtual void setSequence(int i);
-			virtual int getSequence();
-			virtual void setRepeats(int i);
-			virtual int getRepeats();
-
-			Step(Song* song );
-			~Step();
-
-		};
-
-	}
+	public:
+		void setSequence(int i);
+		int getSequence();
+		void setRepeats(int i);
+		int getRepeats();
+	};
 }

@@ -4,8 +4,6 @@
 
 #include <file/FileUtil.hpp>
 
-using namespace std;
-
 static const int RIFF_CHUNK_ID{ 1179011410 };
 static const int RIFF_TYPE_ID{ 1163280727 };
 static const int FMT_CHUNK_ID{ 544501094 };
@@ -14,29 +12,31 @@ static const int DATA_CHUNK_ID{ 1635017060 };
 static const int EXPECTED_HEADER_SIZE = 44;
 static const int EXPECTED_FMT_DATA_SIZE = 16;
 
-ifstream wav_init_ifstream(const string& path) {
+std::ifstream wav_init_ifstream(const std::string& path)
+{
 #ifdef _WIN32
-    auto result = moduru::file::FileUtil::ifstreamw(path, ios::in | ios::binary);
-    result.unsetf(ios_base::skipws);
+    auto result = moduru::file::FileUtil::ifstreamw(path, std::ios::in | std::ios::binary);
+    result.unsetf(std::ios_base::skipws);
     return result;
 #else
-    ifstream result(path.c_str(), ios::in | ios::binary);
-    result.unsetf(ios_base::skipws);
+    std::ifstream result(path.c_str(), std::ios::in | std::ios::binary);
+    result.unsetf(std::ios_base::skipws);
 	return result;
 #endif
 }
 
-int wav_get_LE(ifstream& stream, int numBytes)
+int wav_get_LE(std::ifstream& stream, int numBytes)
 {
-
-    if (numBytes < 1 || numBytes > 4) {
+    if (numBytes < 1 || numBytes > 4)
+    {
         return 0;
     }
 
     int pos = 0;
     char buffer[4];
 
-    for (int i = 0; i < numBytes; i++) {
+    for (int i = 0; i < numBytes; i++)
+    {
         char c;
         stream >> buffer[i];
     }
@@ -46,15 +46,16 @@ int wav_get_LE(ifstream& stream, int numBytes)
 
     int val = buffer[pos] & 255;
 
-    for (auto b = 0; b < numBytes; b++) {
+    for (auto b = 0; b < numBytes; b++)
+    {
         val = (val << 8) + (buffer[--pos] & 255);
     }
 
     return val;
 }
 
-bool wav_read_header(ifstream& stream, int& sampleRate, int& validBits, int& numChannels, int& numFrames) {
-    
+bool wav_read_header(std::ifstream& stream, int& sampleRate, int& validBits, int& numChannels, int& numFrames)
+{    
     stream.seekg(0, stream.end);
 
     auto tell = stream.tellg();
@@ -84,7 +85,9 @@ bool wav_read_header(ifstream& stream, int& sampleRate, int& validBits, int& num
     // Skip fact and smpl chunks
     const int maxRetries = 10;
     int retryCounter = 0;
-    while (dataChunkId != DATA_CHUNK_ID && retryCounter++ != maxRetries) {
+
+    while (dataChunkId != DATA_CHUNK_ID && retryCounter++ != maxRetries)
+    {
         auto factOrOtherChunkSize = wav_get_LE(stream, 4);
         stream.ignore(factOrOtherChunkSize);
         dataChunkId = wav_get_LE(stream, 4);
@@ -92,11 +95,13 @@ bool wav_read_header(ifstream& stream, int& sampleRate, int& validBits, int& num
 
     auto dataChunkSize = wav_get_LE(stream, 4);       // Offset 40
 
-    if (riffChunkId != RIFF_CHUNK_ID) {
+    if (riffChunkId != RIFF_CHUNK_ID)
+    {
         return false;
     }
 
-    if (fmtChunkId != FMT_CHUNK_ID) {
+    if (fmtChunkId != FMT_CHUNK_ID)
+    {
         return false;
     }
 
@@ -104,28 +109,34 @@ bool wav_read_header(ifstream& stream, int& sampleRate, int& validBits, int& num
         //return false;
     //}
 
-    if (!isPCM) {
+    if (!isPCM)
+    {
         return false;
     }
 
-    if (numChannels != 1 && numChannels != 2) {
+    if (numChannels != 1 && numChannels != 2)
+    {
         return false;
     }
 
-    if (sampleRate < 11025 || sampleRate > 48000) {
+    if (sampleRate < 11025 || sampleRate > 48000)
+    {
         return false;
     }
 
-    if (validBits != 16) {
+    if (validBits != 16)
+    {
         return false;
     }
 
     // Some wav writers don't word align properly...
-    if (mainChunkSize % 2 == 1) {
+    if (mainChunkSize % 2 == 1)
+    {
         mainChunkSize += 1;
     }
 
-    if (mainChunkSize + 8 != tell) {
+    if (mainChunkSize + 8 != tell)
+    {
         return false;
     }
 
@@ -134,10 +145,12 @@ bool wav_read_header(ifstream& stream, int& sampleRate, int& validBits, int& num
     return true;
 }
 
-void wav_read_bytes(ifstream& stream, const vector<char>& bytes) {
+void wav_read_bytes(std::ifstream& stream, const std::vector<char>& bytes)
+{
    stream.read((char*)(&bytes[0]), bytes.size());
 }
 
-void wav_close(ifstream& stream) {
+void wav_close(std::ifstream& stream)
+{
     stream.close();
 }

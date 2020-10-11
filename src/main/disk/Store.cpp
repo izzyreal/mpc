@@ -1,7 +1,7 @@
 #include <disk/Store.hpp>
 
-#include <disk/RawDisk.hpp>
 #include <disk/Stores.hpp>
+#include <disk/AbstractDisk.hpp>
 
 #include <Logger.hpp>
 
@@ -15,14 +15,16 @@ Store::Store(Stores* stores, string path, int totalSpace, string volumeLabel, bo
 	this->volumeLabel = volumeLabel;
 	this->raw = raw;
 
-	string msg = "initializing store " + path + " with total space " + to_string(totalSpace);
+	const string msg = "initializing store " + path + " with total space " + to_string(totalSpace);
 	MLOG(msg);
 }
 
 string Store::toString()
 {
 	if (!raw)
+	{
 		return volumeLabel + " / " + AbstractDisk::formatFileSize(totalSpace);
+	}
 
 	return path + " / " + volumeLabel + " / " + AbstractDisk::formatFileSize(totalSpace);
 }

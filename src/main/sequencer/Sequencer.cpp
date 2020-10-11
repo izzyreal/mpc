@@ -1,18 +1,22 @@
 #include "Sequencer.hpp"
 
 #include <Mpc.hpp>
+
+#include <audiomidi/AudioMidiServices.hpp>
+
 #include <hardware/Hardware.hpp>
 #include <hardware/Led.hpp>
 #include <hardware/HwPad.hpp>
-#include <ui/Uis.hpp>
-#include <ui/sequencer/window/SequencerWindowGui.hpp>
-#include <ui/vmpc/DirectToDiskRecorderGui.hpp>
-#include <ui/sequencer/SongGui.hpp>
-#include <StartUp.hpp>
-#include <ui/UserDefaults.hpp>
-#include <lcdgui/LayeredScreen.hpp>
 
-#include <audiomidi/AudioMidiServices.hpp>
+#include <lcdgui/LayeredScreen.hpp>
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/SongScreen.hpp>
+#include <lcdgui/screens/SecondSeqScreen.hpp>
+#include <lcdgui/screens/window/TimingCorrectScreen.hpp>
+#include <lcdgui/screens/window/CountMetronomeScreen.hpp>
+#include <lcdgui/screens/window/IgnoreTempoChangeScreen.hpp>
+#include <lcdgui/screens/UserScreen.hpp>
+#include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
 
 #include <sequencer/Event.hpp>
 #include <sequencer/TempoChangeEvent.hpp>
@@ -31,44 +35,54 @@
 #include <System.hpp>
 #include <lang/StrUtil.hpp>
 
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
+using namespace moduru::lang;
 using namespace std;
 
-Sequencer::Sequencer() 
+Sequencer::Sequencer(mpc::Mpc& mpc)
+	: mpc(mpc)
 {
-	
 }
 
 void Sequencer::init()
 {
-	TICK_VALUES = vector<int>{ 1, 48, 32, 24, 16, 12, 8 };
-	repeats = 0;
+	lastTap = moduru::System::currentTimeMillis();
 	sequences = vector<shared_ptr<Sequence>>(99);
-	taps = make_unique<moduru::io::CircularIntBuffer>(4, true, true);
 	reposition = -1;
-	nextsq = -1;
-	previousTempo = BCMath("0.0");
-	auto userDefaults = mpc::StartUp::getUserDefaults().lock();
-	defaultSequenceName = moduru::lang::StrUtil::trim(userDefaults->getSequenceName());
-	for (int i = 0; i < 64; i++) {
+	nextSq = -1;
+	previousTempo = 0.0;
+	
+	auto userScreen = mpc.screens->get<UserScreen>("user");
+	defaultSequenceName = StrUtil::trim(userScreen->sequenceName);
+	
+	for (int i = 0; i < 64; i++)
+	{
 		string name = "Track-";
-		name = name.append(moduru::lang::StrUtil::padLeft(to_string(i + 1), "0", 2));
+		name = name.append(StrUtil::padLeft(to_string(i + 1), "0", 2));
 		defaultTrackNames.push_back(name);
 	}
 
 	activeTrackIndex = 0;
 	songs = vector<shared_ptr<Song>>(20);
 	defaultDeviceNames = vector<string>(33);
+	
 	for (int i = 0; i < 33; i++)
-		defaultDeviceNames[i] = userDefaults->getDeviceName(i);
+	{
+		defaultDeviceNames[i] = userScreen->getDeviceName(i);
+	}
 
-	recordingModeMulti = userDefaults->isRecordingModeMulti();
+	recordingModeMulti = userScreen->recordingModeMulti;
+
 	soloEnabled = false;
 	tempoSourceSequenceEnabled = true;
 	countEnabled = true;
 	recording = false;
-	tempo = userDefaults->getTempo();
-	tempo = BCMath("120.0");
+	
+	tempo = userScreen->tempo;
+	tempo = 120.0;
 
 	metronomeOnly = false;
 	metronomeSeq = nullptr;
@@ -77,10 +91,14 @@ void Sequencer::init()
 	songMode = false;
 
 	purgeAllSequences();
-	for (int i = 0; i < 20; i++) {
-		songs[i] = make_shared<Song>(this);
-		songs[i]->setName("Song" + moduru::lang::StrUtil::padLeft(to_string(i + 1), "0", 2));
-	}
+	
+	for (int i = 0; i < 20; i++)
+		songs[i] = make_shared<Song>();
+}
+
+void Sequencer::deleteSong(int i)
+{
+	songs[i] = make_shared<Song>();
 }
 
 int Sequencer::getActiveSequenceIndex()
@@ -88,20 +106,45 @@ int Sequencer::getActiveSequenceIndex()
 	return activeSequenceIndex;
 }
 
+weak_ptr<Track> Sequencer::getActiveTrack()
+{
+	if (!getActiveSequence().lock())
+		return {};
+
+	return getActiveSequence().lock()->getTrack(activeTrackIndex);
+}
+
 void Sequencer::playToTick(int targetTick)
 {
 	auto seqIndex = songMode ? getSongSequenceIndex() : currentlyPlayingSequenceIndex;
-	auto tc = metronomeOnly ? metronomeSeq.get() : sequences[seqIndex].get();
-	for (auto& trk : tc->getTracks()) {
-		auto lTrk = trk.lock();
-		while (lTrk->getNextTick() <= targetTick) {
-			lTrk->playNext();
+	auto seq = metronomeOnly ? metronomeSeq.get() : sequences[seqIndex].get();
+	auto secondSequenceScreen = dynamic_pointer_cast<SecondSeqScreen>(mpc.screens->getScreenComponent("second-seq"));
+
+	for (int i = 0; i < 2; i++)
+	{
+		if (i == 1)
+		{
+			if (!secondSequenceEnabled || metronomeOnly || secondSequenceScreen->sq == seqIndex) // Real 2KXL would play all events twice for the last clause
+				break;
+
+			seq = sequences[secondSequenceScreen->sq].get();
+
+			if (!seq->isUsed())
+				break;
 		}
-	}
-	for (auto& trk : tc->getMetaTracks()) {
-		auto lTrk = trk.lock();
-		while (lTrk->getNextTick() <= targetTick) {
-			lTrk->playNext();
+
+		for (auto& track_ : seq->getTracks()) {
+			auto track = track_.lock();
+
+			while (track->getNextTick() <= targetTick)
+				track->playNext();
+		}
+
+		for (auto& track_ : seq->getMetaTracks()) {
+			auto track = track_.lock();
+
+			while (track->getNextTick() <= targetTick)
+				track->playNext();
 		}
 	}
 }
@@ -110,52 +153,85 @@ vector<int> Sequencer::getTickValues() {
 	return TICK_VALUES;
 }
 
-int Sequencer::repeats;
-bool Sequencer::endOfSong = false;
-
-void Sequencer::setTempo(BCMath i)
+void Sequencer::setTempo(double newTempo)
 {
-	if (i.toDouble() < 30.0 || i.toDouble() > 300.0)
+	if (newTempo < 30.0)
+		newTempo = 30.0;
+	else if (newTempo > 300.0)
+		newTempo = 300.0;
+
+	auto s = getActiveSequence().lock();
+	auto tce = getCurrentTempoChangeEvent().lock();
+
+	if (!s || !s->isUsed() || !tempoSourceSequenceEnabled)
 	{
+		if (tce)
+		{
+			auto candidate = newTempo / (tce->getRatio() * 0.001);
+
+			if (candidate < 30.0)
+				candidate = 30.0;
+			else if (candidate > 300.0)
+				candidate = 300.0;
+
+			tempo = candidate;
+		}
+		else
+		{
+			tempo = newTempo;
+		}
+		notifyObservers(string("tempo"));
 		return;
 	}
 
-	auto s = getActiveSequence().lock();
-	if (s && s->isUsed() && tempoSourceSequenceEnabled) {
-		auto tce = getCurrentTempoChangeEvent().lock();
-		if (tce->getTick() == 0) {
-			s->setInitialTempo(i);
-		}
-		else {
-			auto initialTempo = s->getInitialTempo();
-			auto ratio = i.toDouble() / initialTempo.toDouble();
-			tce->setRatio((int)(ratio * 1000.0));
-		}
+	if (tce && tce->getTick() == 0 && s->isTempoChangeOn())
+	{
+		s->setInitialTempo(newTempo / (tce->getRatio() * 0.001));
 	}
-	else {
-		auto tempoStr = to_string(i.toDouble());
-		auto length = (int)(tempoStr.find(".")) + 2;
-		tempo = BCMath(tempoStr.substr(0, length));
+	else if (s->isTempoChangeOn())
+	{
+		auto initialTempo = s->getInitialTempo();
+		auto ratio = newTempo / initialTempo;
+		tce->setRatio((int) round(ratio * 1000.0));
 	}
-	setChanged();
+	else
+	{
+		s->setInitialTempo(newTempo);
+	}
+
 	notifyObservers(string("tempo"));
 }
 
-BCMath Sequencer::getTempo()
+double Sequencer::getTempo()
 {
-	if (!isPlaying() && !getActiveSequence().lock()->isUsed()) {
+	if (!isPlaying() && !getActiveSequence().lock()->isUsed())
 		return tempo;
+
+	auto seq = getActiveSequence().lock();
+	auto tce = getCurrentTempoChangeEvent().lock();
+
+	if (mpc.getLayeredScreen().lock()->getCurrentScreenName().compare("song") == 0)
+	{
+		if (!seq->isUsed())
+			return 120.0;
 	}
 
 	if (tempoSourceSequenceEnabled)
 	{
-		auto tce = getCurrentTempoChangeEvent().lock();
-		if (tce)
+		auto ignoreTempoChangeScreen = mpc.screens->get<IgnoreTempoChangeScreen>("ignore-tempo-change");
+
+		if (seq->isTempoChangeOn() || (songMode && !ignoreTempoChangeScreen->ignore))
 		{
-			return tce->getTempo();
+			if (tce)
+				return tce->getTempo();
 		}
+
 		return getActiveSequence().lock()->getInitialTempo();
 	}
+
+	if (seq->isTempoChangeOn() && tce)
+		return tempo * tce->getRatio() * 0.001;
+	
 	return tempo;
 }
 
@@ -163,24 +239,22 @@ weak_ptr<TempoChangeEvent> Sequencer::getCurrentTempoChangeEvent()
 {
 	auto index = -1;
 	auto s = getActiveSequence().lock();
-	
+
+	if (!s->isUsed())
+		return {};
+
 	for (auto& tce : s->getTempoChangeEvents())
 	{
 		auto lTce = tce.lock();
 		if (getTickPosition() >= lTce->getTick())
-		{
 			index++;
-		}
 		else
-		{
 			break;
-		}
 	}
 	
 	if (index == -1)
-	{
 		index++;
-	}
+
 	return s->getTempoChangeEvents()[index];
 }
 
@@ -192,9 +266,8 @@ bool Sequencer::isTempoSourceSequenceEnabled()
 void Sequencer::setTempoSourceSequence(bool b)
 {
 	tempoSourceSequenceEnabled = b;
-	setChanged();
-	notifyObservers(string("temposource"));
-	setChanged();
+	
+	notifyObservers(string("tempo-source"));
 	notifyObservers(string("tempo"));
 }
 
@@ -215,8 +288,10 @@ bool Sequencer::isSoloEnabled()
 
 void Sequencer::setSoloEnabled(bool b)
 {
+	if (soloEnabled == b)
+		return;
+
     soloEnabled = b;
-    setChanged();
     notifyObservers(string("soloenabled"));
 }
 
@@ -248,27 +323,21 @@ void Sequencer::setDefaultSequenceName(string s)
 void Sequencer::setActiveSequenceIndex(int i)
 {
 	if (i < 0 || i > 98)
-	{
 		return;
-	}
 
 	activeSequenceIndex = i;
 	
 	if (!isPlaying())
 	{
 		position = 0;
-		setChanged();
-		notifyObservers(string("now"));
+		notifyTimeDisplay();
 	}
 	
-	setChanged();
 	notifyObservers(string("seqnumbername"));
-	setChanged();
 	notifyObservers(string("timesignature"));
-	setChanged();
 	notifyObservers(string("numberofbars"));
-	setChanged();
 	notifyObservers(string("tempo"));
+	notifyObservers(string("loop"));
 	notifyTrack();
 }
 
@@ -290,7 +359,7 @@ bool Sequencer::isCountEnabled()
 void Sequencer::setCountEnabled(bool b)
 {
     countEnabled = b;
-    setChanged();
+    
     notifyObservers(string("count"));
 }
 
@@ -307,7 +376,7 @@ int Sequencer::getTimeDisplayStyle()
 void Sequencer::setRecordingModeMulti(bool b)
 {
     recordingModeMulti = b;
-    setChanged();
+    
     notifyObservers(string("recordingmode"));
 }
 
@@ -337,13 +406,12 @@ void Sequencer::trackDown()
 
 bool Sequencer::isPlaying()
 {
-	auto ams = Mpc::instance().getAudioMidiServices().lock();
+	auto ams = mpc.getAudioMidiServices().lock();
 	auto frameSequencer = ams->getFrameSequencer().lock();
 	auto server = ams->getAudioServer();
 	
-	if (!server->isRunning() || !frameSequencer) {
+	if (!server->isRunning() || !frameSequencer)
 		return false;
-	}
 
 	return ams->getFrameSequencer().lock()->isRunning();
 }
@@ -351,69 +419,68 @@ bool Sequencer::isPlaying()
 void Sequencer::play(bool fromStart)
 {
 	if (isPlaying())
-	{
 		return;
-	}
 
     endOfSong = false;
-    repeats = 0;
-	auto songGui = Mpc::instance().getUis().lock()->getSongGui();
-	auto currentSong = songs[songGui->getSelectedSongIndex()];
-    Step* currentStep = nullptr;
+	auto songScreen = mpc.screens->get<SongScreen>("song");
+	auto currentSong = songs[songScreen->getActiveSongIndex()];
+    
+	shared_ptr<Step> currentStep;
+
 	if (songMode)
 	{
 		if (!currentSong->isUsed())
-		{
 			return;
-		}
 
 		if (fromStart)
-		{
-			songGui->setOffset(-1);
-		}
+			songScreen->setOffset(-1);
 		
-		if (songGui->getOffset() + 1 > currentSong->getStepAmount() - 1)
-		{
+		if (songScreen->getOffset() + 1 > currentSong->getStepCount() - 1)
 			return;
-		}
 		
-		int step = songGui->getOffset() + 1;
+		int step = songScreen->getOffset() + 1;
 		
-		if (step > currentSong->getStepAmount())
-		{
-			step = currentSong->getStepAmount() - 1;
-		}
+		if (step > currentSong->getStepCount())
+			step = currentSong->getStepCount() - 1;
 		
-		currentStep = currentSong->getStep(step);
+		currentStep = currentSong->getStep(step).lock();
+
+		if (!sequences[currentStep->getSequence()]->isUsed())
+			return;
 	}
+
 	move(position);
-    currentlyPlayingSequenceIndex = activeSequenceIndex;
+    
+	currentlyPlayingSequenceIndex = activeSequenceIndex;
 
-	auto swGui = Mpc::instance().getUis().lock()->getSequencerWindowGui();
+	auto countMetronomeScreen = dynamic_pointer_cast<CountMetronomeScreen>(mpc.screens->getScreenComponent("count-metronome"));
+	auto countInMode = countMetronomeScreen->getCountInMode();
 
-
-    if (!countEnabled || swGui->getCountInMode() == 0 || (swGui->getCountInMode() == 1 && recording == false))
+    if (!countEnabled || countInMode == 0 || (countInMode == 1 && recording == false))
 	{
 		if (fromStart)
-		{
 			move(0);
-		}
     }
+	
 	auto s = getActiveSequence().lock();
+	
 	if (countEnabled && !songMode)
 	{
-		if (swGui->getCountInMode() == 2 || (swGui->getCountInMode() == 1 && recording == true))
+		if (countInMode == 2 || (countInMode == 1 && recording == true))
 		{
 			move(s->getLoopStart());
 			startCountingIn();
 		}
 	}
 
-	auto hw = Mpc::instance().getHardware().lock();
+	auto hw = mpc.getHardware().lock();
+	
 	if (!songMode)
 	{
 		if (!s->isUsed())
 		{
+			recording = false;
+			overdubbing = false;
 			return;
 		}
 
@@ -424,32 +491,25 @@ void Sequencer::play(bool fromStart)
 			undoPlaceHolder.swap(copy);
 			lastRecordingActive = true;
 			recordStartTick = getTickPosition();
-			hw->getLed("undoseq").lock()->light(lastRecordingActive);
+			hw->getLed("undo-seq").lock()->light(lastRecordingActive);
 		}
 
 	}
 
 	hw->getLed("play").lock()->light(true);
-	auto ams = Mpc::instance().getAudioMidiServices().lock();
-	auto directToDiskRecordGui = Mpc::instance().getUis().lock()->getD2DRecorderGui();
-	bool offline = directToDiskRecordGui->isOffline();
-	
-	int rate = ams->getAudioServer()->getSampleRate();
+
+	auto ams = mpc.getAudioMidiServices().lock();
+
 	if (ams->isBouncePrepared())
 	{
-		if (offline)
-		{
-			vector<int> rates{ 44100, 48000, 88200 };
-			rate = rates[directToDiskRecordGui->getSampleRate()];
-		}
-
 		ams->startBouncing();
 	}
-	else {
+	else
+	{
+		int rate = ams->getAudioServer()->getSampleRate();
 		ams->getFrameSequencer().lock()->start(rate);
 	}
 
-	setChanged();
     notifyObservers(string("play"));
 }
 
@@ -472,8 +532,8 @@ void Sequencer::undoSeq()
 	sequences[activeSequenceIndex]->resetTrackEventIndices(position);
 
 	lastRecordingActive = !lastRecordingActive;
-	auto hw = Mpc::instance().getHardware().lock();
-	hw->getLed("undoseq").lock()->light(lastRecordingActive);
+	auto hw = mpc.getHardware().lock();
+	hw->getLed("undo-seq").lock()->light(lastRecordingActive);
 
 	setActiveSequenceIndex(getActiveSequenceIndex()); // Shortcut to notifying SequencerObserver
 }
@@ -487,31 +547,30 @@ void Sequencer::clearUndoSeq()
 	undoPlaceHolder.reset();
 
     lastRecordingActive = false;
-	auto hw = Mpc::instance().getHardware().lock();
-	hw->getLed("undoseq").lock()->light(false);
+	auto hw = mpc.getHardware().lock();
+	hw->getLed("undo-seq").lock()->light(false);
 }
 
 void Sequencer::playFromStart()
 {
-	if (isPlaying()) {
+	if (isPlaying())
 		return;
-	}
+
 	play(true);
 }
 
 void Sequencer::play()
 {
-	if (isPlaying()) {
+	if (isPlaying())
 		return;
-	}
+
 	play(false);
 }
 
 void Sequencer::rec()
 {
-	if (isPlaying()) {
+	if (isPlaying())
 		return;
-	}
 
 	recording = true;
 	
@@ -520,114 +579,126 @@ void Sequencer::rec()
 
 void Sequencer::recFromStart()
 {
-	if (isPlaying()) {
+	if (isPlaying())
 		return;
-	}
+
 	recording = true;
 	play(true);
 }
 
 void Sequencer::overdub()
 {
-	if (isPlaying()) {
+	if (isPlaying())
 		return;
-	}
+
 	overdubbing = true;
 	play(false);
 }
 
 void Sequencer::switchRecordToOverDub()
 {
-	if (!isRecording()) {
+	if (!isRecording())
 		return;
-	}
+
 	recording = false;
 	overdubbing = true;
-	auto hw = Mpc::instance().getHardware().lock();
+	auto hw = mpc.getHardware().lock();
 	hw->getLed("overdub").lock()->light(true);
 	hw->getLed("rec").lock()->light(false);
 }
 
 void Sequencer::overdubFromStart()
 {
-	if (isPlaying()) {
+	if (isPlaying())
 		return;
-	}
+
 	overdubbing = true;
 	play(true);
 }
 
-void Sequencer::stop(){
+void Sequencer::stop()
+{
 	stop(-1);
 }
 
 void Sequencer::stop(int tick)
 {
-	auto ams = Mpc::instance().getAudioMidiServices().lock();
+	auto ams = mpc.getAudioMidiServices().lock();
 	bool bouncing = ams->isBouncing();
 
-	if (!isPlaying() && !bouncing) {
+	if (!isPlaying() && !bouncing)
+	{
 		if (position != 0)
             setBar(0); // real 2kxl doesn't do this
         return;
     }
-	
+
+	playedStepRepetitions = 0;
+	songMode = false;
+
 	lastNotifiedBar = -1;
 	lastNotifiedBeat = -1;
 	lastNotifiedClock = -1;
-    //Mpc::instance().getEventHandler()->handle(MidiClockEvent(ctoot::midi::core::ShortMessage::STOP), Track(999));
+    //mpc.getEventHandler()->handle(MidiClockEvent(ctoot::midi::core::ShortMessage::STOP), Track(999));
 	auto s1 = getActiveSequence().lock();
 	auto s2 = getCurrentlyPlayingSequence().lock();
 	auto pos = getTickPosition();
 	
-	if (pos > s1->getLastTick()) {
+	if (pos > s1->getLastTick())
 		pos = s1->getLastTick();
-	}
 
 	int frameOffset = tick == -1 ? 0 : ams->getFrameSequencer().lock()->getEventFrameOffset(tick);
 	ams->getFrameSequencer().lock()->stop();
-    if (recording || overdubbing)
-        s2->getTrack(activeTrackIndex).lock()->correctTimeRange(0, s2->getLastTick(), TICK_VALUES[Mpc::instance().getUis().lock()->getSequencerWindowGui()->getNoteValue()]);
+	
+	if (recording || overdubbing)
+	{
+		auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(mpc.screens->getScreenComponent("timing-correct"));
+		auto noteValue = timingCorrectScreen->getNoteValue();
+		s2->getTrack(activeTrackIndex).lock()->correctTimeRange(0, s2->getLastTick(), TICK_VALUES[noteValue]);
+	}
 
     auto notifynextsq = false;
-	if (nextsq != -1) {
+	
+	if (nextSq != -1)
+	{
 		notifynextsq = true;
-		nextsq = -1;
-		Mpc::instance().getLayeredScreen().lock()->setFocus("sq");
+		nextSq = -1;
+
+		// This is called from the audio thread, should be called from the UI thread instead.
+		// stop() is called by FrameSeq.
+		mpc.getLayeredScreen().lock()->setFocus("sq");
 	}
+
     recording = false;
     overdubbing = false;
     
     move(pos);
-	if (!bouncing) {
-		Mpc::instance().getSampler().lock()->stopAllVoices(frameOffset);
-	}
-	for (int i = 0; i < 16; i++) {
-		Mpc::instance().getHardware().lock()->getPad(i).lock()->notifyObservers(255);
-	}
-    if (notifynextsq) {
-        setChanged();
+
+	if (!bouncing)
+		mpc.getSampler().lock()->stopAllVoices(frameOffset);
+
+	for (int i = 0; i < 16; i++)
+		mpc.getHardware().lock()->getPad(i).lock()->notifyObservers(255);
+
+    if (notifynextsq)
         notifyObservers(string("nextsqoff"));
-    }
-    
-	notifyTimeDisplay();
+    	
+	auto songScreen = mpc.screens->get<SongScreen>("song");
+
+    if (endOfSong)
+		songScreen->setOffset(songScreen->getOffset() + 1);
 	
-	auto songGui = Mpc::instance().getUis().lock()->getSongGui();
-    if (endOfSong) {
-		auto songGui = Mpc::instance().getUis().lock()->getSongGui();
-		songGui->setOffset(songGui->getOffset() + 1);
-    }
-	
-	if (bouncing) {
+	auto vmpcDirectToDiskRecorderScreen = mpc.screens->get<VmpcDirectToDiskRecorderScreen>("vmpc-direct-to-disk-recorder");
+
+	if (bouncing && vmpcDirectToDiskRecorderScreen->getRecord() != 4)
 		ams->stopBouncing();
-	}
 	
-	auto hw = Mpc::instance().getHardware().lock();
+	auto hw = mpc.getHardware().lock();
+
 	hw->getLed("overdub").lock()->light(false);
 	hw->getLed("play").lock()->light(false);
 	hw->getLed("rec").lock()->light(false);
 
-    setChanged();
     notifyObservers(string("stop"));
 }
 
@@ -648,19 +719,19 @@ void Sequencer::startCountingIn()
 
 void Sequencer::notifyTrack()
 {
-    setChanged();
+    
     notifyObservers(string("tracknumbername"));
-    setChanged();
+    
     notifyObservers(string("trackon"));
-    setChanged();
+    
     notifyObservers(string("programchange"));
-    setChanged();
+    
     notifyObservers(string("velocityratio"));
-    setChanged();
-    notifyObservers(string("tracktype"));
-    setChanged();
+    
+    notifyObservers(string("bus"));
+    
     notifyObservers(string("device"));
-    setChanged();
+    
     notifyObservers(string("devicename"));
 }
 
@@ -680,11 +751,11 @@ void Sequencer::purgeAllSequences()
 
 void Sequencer::purgeSequence(int i) {
 	sequences[i].reset();
-	auto sequence = make_shared<Sequence>(defaultTrackNames);
+	auto sequence = make_shared<Sequence>(mpc, defaultTrackNames);
 	sequences[i].swap(sequence);
 	sequences[i]->resetTrackEventIndices(position);
 	string res = defaultSequenceName;
-	res.append(moduru::lang::StrUtil::padLeft(to_string(i + 1), "0", 2));
+	res.append(StrUtil::padLeft(to_string(i + 1), "0", 2));
 	sequences[i]->setName(res);
 }
 
@@ -696,25 +767,29 @@ void Sequencer::copySequence(int source, int destination)
 	sequences[destination]->initLoop();
 }
 
+void Sequencer::copySequenceParameters(const int source, const int dest)
+{
+	copySequenceParameters(sequences[source], sequences[dest]);
+}
+
 shared_ptr<Sequence> Sequencer::copySequence(weak_ptr<Sequence> src)
 {
 	auto source = src.lock();
-	auto copy = make_shared<Sequence>(defaultTrackNames);
-	copy->init(source->getLastBar());
+	auto copy = make_shared<Sequence>(mpc, defaultTrackNames);
+	copy->init(source->getLastBarIndex());
 	copySequenceParameters(source, copy);
 	
-	for (int i = 0; i < 64; i++) {
+	for (int i = 0; i < 64; i++)
 		copyTrack(source->getTrack(i), copy->getTrack(i));
-	}
 
-	for (int i = 0; i < source->getMetaTracks().size(); i++) {
+	for (int i = 0; i < source->getMetaTracks().size(); i++)
+	{
 		copy->getMetaTracks()[i].lock()->removeEvents();
 		copyTrack(source->getMetaTracks()[i], copy->getMetaTracks()[i]);
 	}
 
-	for (auto& tempo : copy->getTempoChangeEvents()) {
+	for (auto& tempo : copy->getTempoChangeEvents())
 		tempo.lock()->setParent(copy.get());
-	}
 
 	return copy;
 }
@@ -742,9 +817,42 @@ void Sequencer::copyTempoChangeEvents(weak_ptr<Sequence> src, weak_ptr<Sequence>
 
 void Sequencer::copyTrack(int sourceTrackIndex, int destinationTrackIndex, int sourceSequenceIndex, int destinationSequenceIndex)
 {
+	if (sourceSequenceIndex == destinationSequenceIndex && sourceTrackIndex == destinationTrackIndex)
+		return;
+
 	auto src = sequences[sourceSequenceIndex]->getTrack(sourceTrackIndex).lock();
 	auto dest = sequences[destinationSequenceIndex]->purgeTrack(destinationTrackIndex).lock();
 	copyTrack(src, dest);
+}
+
+void Sequencer::copySong(const int source, const int dest)
+{
+	if (source == dest)
+		return;
+
+	auto s0 = songs[source];
+
+	if (!s0->isUsed())
+		return;
+
+	deleteSong(dest);
+
+	auto s1 = songs[dest];
+
+	s1->setUsed(true);
+
+	for (int i = 0; i < s0->getStepCount(); i++)
+	{
+		s1->insertStep(i);
+		auto step = s1->getStep(i).lock();
+		step->setRepeats(s0->getStep(i).lock()->getRepeats());
+		step->setSequence(s0->getStep(i).lock()->getSequence());
+	}
+
+	s1->setFirstStep(s0->getFirstStep());
+	s1->setLastStep(s0->getLastStep());
+	s1->setName(s0->getName());
+	s1->setLoopEnabled(s0->isLoopEnabled());
 }
 
 void Sequencer::copyTrack(weak_ptr<Track> src, weak_ptr<Track> dest)
@@ -752,13 +860,10 @@ void Sequencer::copyTrack(weak_ptr<Track> src, weak_ptr<Track> dest)
 	auto lSrc = src.lock();
 	auto lDest = dest.lock();
 	
-	lDest->setTrackIndex(lSrc->getTrackIndex());
+	lDest->setTrackIndex(lSrc->getIndex());
 	
-	MLOG("Copying track " + src.lock()->getActualName() + " to " + dest.lock()->getActualName());
-	MLOG("Setting lDest index to " + to_string(lDest->getTrackIndex()));
-
-	for (auto& e : lSrc->getEvents()) {
-		MLOG("Cloning event " + to_string(e.lock()->getTick()));
+	for (auto& e : lSrc->getEvents())
+	{
 		lDest->cloneEvent(e);
 	}
 
@@ -772,7 +877,7 @@ void Sequencer::copyTrackParameters(weak_ptr<Track> source, weak_ptr<Track> dest
 	lDest->setUsed(lSrc->isUsed());
     lDest->setOn(lSrc->isOn());
     lDest->setDeviceNumber(lSrc->getDevice());
-    lDest->setBusNumber(lSrc->getBusNumber());
+    lDest->setBusNumber(lSrc->getBus());
     lDest->setVelocityRatio(lSrc->getVelocityRatio());
     lDest->setProgramChange(lSrc->getProgramChange());
     lDest->setName(lSrc->getName());
@@ -783,7 +888,8 @@ string Sequencer::getDefaultTrackName(int i)
 	return defaultTrackNames[i];
 }
 
-vector<string> Sequencer::getDefaultTrackNames() {
+vector<string> Sequencer::getDefaultTrackNames()
+{
 	return defaultTrackNames;
 }
 
@@ -792,31 +898,33 @@ void Sequencer::setDefaultTrackName(string s, int i)
 	defaultTrackNames[i] = s;
 }
 
-int Sequencer::getCurrentBarNumber()
+int Sequencer::getCurrentBarIndex()
 {
 	auto s = isPlaying() ? getCurrentlyPlayingSequence().lock() : getActiveSequence().lock();
 	auto pos = getTickPosition();
-	if (pos == s->getLastTick()) return s->getLastBar() + 1;
-	auto index = pos;
-	if (isPlaying() && !countingIn) index = getTickPosition();
-	if (index == 0) return 0;
 
+	if (pos == s->getLastTick())
+		return s->getLastBarIndex() + 1;
+		
 	auto barLengths = s->getBarLengths();
-	auto barCounter = 0;
-
+	
 	int tickCounter = 0;
-	for (int i = 0; i < 999; i++) {
-		if (i > s->getLastBar()) i = 0;
+	
+	for (int i = 0; i < 999; i++)
+	{
+		if (i > s->getLastBarIndex())
+			return 0; // Should not happen
+	
 		tickCounter += (*barLengths)[i];
-		if (tickCounter > index) {
-			barCounter = i;
-			break;
-		}
+		
+		if (tickCounter > pos)
+			return i;
 	}
-	return barCounter;
+
+	return 0;
 }
 
-int Sequencer::getCurrentBeatNumber()
+int Sequencer::getCurrentBeatIndex()
 {
 	auto s = isPlaying() ? getCurrentlyPlayingSequence().lock() : getActiveSequence().lock();
 	auto pos = getTickPosition();
@@ -837,87 +945,116 @@ int Sequencer::getCurrentBeatNumber()
 
 	int barStartPos = 0;
 	auto barCounter = 0;
-	for (auto l : *s->getBarLengths()) {
-		if (barCounter == getCurrentBarNumber()) break;
+
+	const auto currentBarIndex = getCurrentBarIndex();
+
+	for (auto l : *s->getBarLengths())
+	{
+		if (barCounter == currentBarIndex)
+			break;
+	
 		barStartPos += l;
 		barCounter++;
 	}
-	auto beatCounter = (int)(floor((index - barStartPos) / denTicks));
-	return beatCounter;
+
+	auto beatIndex = (int) floor((index - barStartPos) / denTicks);
+	return beatIndex;
 }
 
 int Sequencer::getCurrentClockNumber()
 {
 	auto s = isPlaying() ? getCurrentlyPlayingSequence().lock() : getActiveSequence().lock();
 
-	int pos = getTickPosition();
-	if (pos == s->getLastTick()) {
+	auto clock = getTickPosition();
+	
+	if (clock == s->getLastTick())
 		return 0;
+		
+	if (isPlaying() && !countingIn)
+	{
+		if (clock > s->getLastTick())
+			clock %= s->getLastTick();
 	}
-	int index = pos;
-	if (isPlaying() && !countingIn) {
-		if (index > s->getLastTick()) {
-			index %= s->getLastTick();
-		}
-	}
+
 	auto ts = s->getTimeSignature();
 	auto den = ts.getDenominator();
 	auto denTicks = 96 * (4.0 / den);
 
-	if (index == 0) {
-		return index;
-	}
+	if (clock == 0)
+		return 0;
 
 	auto barCounter = 0;
-	int clock = index;
+	auto currentBarIndex = getCurrentBarIndex();
 
-	for (auto l : *s->getBarLengths()) {
-		if (barCounter == getCurrentBarNumber()) break;
+	for (auto l : *s->getBarLengths())
+	{
+		if (barCounter == currentBarIndex)
+			break;
+
 		clock -= l;
 		barCounter++;
 	}
-	for (int i = 0; i < getCurrentBeatNumber(); i++) {
+	
+	auto currentBeatIndex = getCurrentBeatIndex();
+
+	for (int i = 0; i < currentBeatIndex; i++)
 		clock -= denTicks;
-	}
+
 	return clock;
 }
 
 void Sequencer::setBar(int i)
 {
-	if (isPlaying()) return;
+	if (isPlaying())
+		return;
 
-	if (i < 0) {
+	if (i < 0)
+	{
 		move(0);
 		return;
 	}
 
 	auto s = getActiveSequence().lock();
-	if (i > s->getLastBar() + 1) return;
+	
+	if (i > s->getLastBarIndex() + 1)
+		return;
 
-	if (s->getLastBar() == 998 && i > 998) return;
+	if (s->getLastBarIndex() == 998 && i > 998)
+		return;
+
 	auto ts = s->getTimeSignature();
 	auto den = ts.getDenominator();
 	auto denTicks = (int)(96 * (4.0 / den));
-	if (i != s->getLastBar() + 1) {
+	
+	if (i != s->getLastBarIndex() + 1)
+	{
 		ts.setNumerator(s->getNumerator(i));
 		ts.setDenominator(s->getDenominator(i));
 	}
+
 	auto barLengths = s->getBarLengths();
 	auto currentClock = getCurrentClockNumber();
-	auto currentBeat = getCurrentBeatNumber();
+	auto currentBeat = getCurrentBeatIndex();
 	int pos = 0;
 	auto barCounter = 0;
-	for (auto l : *barLengths) {
-		if (barCounter == i) break;
+	
+	for (auto l : *barLengths)
+	{
+		if (barCounter == i)
+			break;
+
 		pos += l;
 		barCounter++;
 	}
+
 	pos += currentBeat * denTicks;
 	pos += currentClock;
-	if (pos > s->getLastTick()) pos = s->getLastTick();
+	
+	if (pos > s->getLastTick())
+		pos = s->getLastTick();
 
 	move(pos);
-	setChanged();
+	
 	notifyObservers(string("timesignature"));
 	setBeat(0);
 	setClock(0);
@@ -925,21 +1062,21 @@ void Sequencer::setBar(int i)
 
 void Sequencer::setBeat(int i)
 {
-	if (i < 0 || isPlaying()) {
+	if (i < 0 || isPlaying())
 		return;
-	}
 
 	auto s = getActiveSequence().lock();
 	auto pos = getTickPosition();
-	if (pos == s->getLastTick()) {
+	
+	if (pos == s->getLastTick())
 		return;
-	}
+	
 	auto ts = s->getTimeSignature();
-	auto difference = i - getCurrentBeatNumber();
+	auto difference = i - getCurrentBeatIndex();
 	auto num = ts.getNumerator();
-	if (i >= num) {
+	
+	if (i >= num)
 		return;
-	}
 
 	auto den = ts.getDenominator();
 	auto denTicks = 96 * (4.0 / den);
@@ -949,26 +1086,25 @@ void Sequencer::setBeat(int i)
 
 void Sequencer::setClock(int i)
 {
-	if (i < 0 || isPlaying()) {
+	if (i < 0 || isPlaying())
 		return;
-	}
 
 	auto s = getActiveSequence().lock();
 	int pos = getTickPosition();
-	if (pos == s->getLastTick()) {
+	
+	if (pos == s->getLastTick())
 		return;
-	}
+	
 	getCurrentClockNumber();
 	int difference = i - getCurrentClockNumber();
 	auto den = s->getTimeSignature().getDenominator();
 	auto denTicks = 96 * (4.0 / den);
-	if (i > denTicks - 1) {
-		return;
-	}
 
-	if (pos + difference > s->getLastTick()) {
+	if (i > denTicks - 1)
 		return;
-	}
+
+	if (pos + difference > s->getLastTick())
+		return;
 
 	pos += difference;
 	move(pos);
@@ -979,13 +1115,13 @@ int Sequencer::getLoopEnd()
     return getActiveSequence().lock()->getLoopEnd();
 }
 
-
 weak_ptr<Sequence> Sequencer::getActiveSequence()
 {
-	auto songGui = Mpc::instance().getUis().lock()->getSongGui();
-	if (songMode && songs[songGui->getSelectedSongIndex()]->getStepAmount() != 0) {
+	auto songScreen = mpc.screens->get<SongScreen>("song");
+
+	if (songMode && songs[songScreen->getActiveSongIndex()]->getStepCount() != 0)
 		return sequences[getSongSequenceIndex() >= 0 ? getSongSequenceIndex() : activeSequenceIndex];
-	}
+
 	return sequences[activeSequenceIndex];
 }
 
@@ -997,17 +1133,24 @@ int Sequencer::getUsedSequenceCount()
 vector<weak_ptr<Sequence>> Sequencer::getUsedSequences()
 {
 	vector<weak_ptr<Sequence>> usedSeqs;
+
 	for (auto s : sequences)
+	{
 		if (s->isUsed())
 			usedSeqs.push_back(s);
+	}
+
     return usedSeqs;
 }
 
 vector<int> Sequencer::getUsedSequenceIndexes()
 {
 	vector<int> usedSeqs;
-	for (int i = 0; i < 99; i++) {
+
+	for (int i = 0; i < 99; i++)
+	{
         auto s = sequences[i];
+	
 		if (s->isUsed())
 			usedSeqs.push_back(i);
     }
@@ -1017,36 +1160,47 @@ vector<int> Sequencer::getUsedSequenceIndexes()
 void Sequencer::goToPreviousEvent()
 {
 	auto t = getActiveSequence().lock()->getTrack(getActiveTrackIndex()).lock();
-	if(t->getEventIndex() == 0) {
+
+	if (t->getEventIndex() == 0)
+	{
 		setBar(0);
 		return;
 	}
-	if(t->getEventIndex() + 1 >= t->getEvents().size() && t->getEvent((int)(t->getEvents().size()) - 1).lock()->getTick() < position) {
+
+	if (t->getEventIndex() + 1 >= t->getEvents().size() && t->getEvent((int)(t->getEvents().size()) - 1).lock()->getTick() < position)
+	{
 		t->setEventIndex((int)(t->getEvents().size()) - 1);
 		move(t->getEvent(t->getEventIndex()).lock()->getTick());
 		return;
 	}
+
 	shared_ptr<Event> event;
 	shared_ptr<Event> prev;
-	while (t->getEventIndex() > 0) {
+	
+	while (t->getEventIndex() > 0)
+	{
 		event = t->getEvent(t->getEventIndex()).lock();
 		prev = t->getEvent(t->getEventIndex() - 1).lock();
-		if(prev->getTick() == event->getTick()) {
+	
+		if (prev->getTick() == event->getTick())
 			t->setEventIndex(t->getEventIndex() - 1);
-		} else {
+		else
 			break;
-		}
 	}
+
 	t->setEventIndex(t->getEventIndex() - 1);
-	while (t->getEventIndex() > 0) {
+	
+	while (t->getEventIndex() > 0)
+	{
 		event = t->getEvent(t->getEventIndex()).lock();
 		prev = t->getEvent(t->getEventIndex() - 1).lock();
-		if(prev->getTick() == event->getTick()) {
-			t->setEventIndex(t->getEventIndex() - 1);
-		} else {
+	
+		if (prev->getTick() != event->getTick())
 			break;
-		}
+
+		t->setEventIndex(t->getEventIndex() - 1);
 	}
+
 	move(t->getEvents()[t->getEventIndex()].lock()->getTick());
 }
 
@@ -1054,79 +1208,92 @@ void Sequencer::goToNextEvent()
 {
 	auto s = getActiveSequence().lock();
 	auto t = s->getTrack(getActiveTrackIndex()).lock();
-	if (t->getEvents().size() == 0) {
-		if (position != s->getLastTick()) {
+
+	if (t->getEvents().size() == 0)
+	{
+		if (position != s->getLastTick())
 			move(s->getLastTick());
-		}
+
 		return;
 	}
+
 	const int eventCount = t->getEvents().size();
+	
 	if (position == s->getLastTick())
 		return;
 
-	if (t->getEventIndex() >= eventCount - 1 && position >= t->getEvent(eventCount - 1).lock()->getTick()) {
+	if (t->getEventIndex() >= eventCount - 1 && position >= t->getEvent(eventCount - 1).lock()->getTick())
+	{
 		move(s->getLastTick());
 		return;
 	}
-	if (t->getEvent(t->getEventIndex()).lock()->getTick() > position) {
+	
+	if (t->getEvent(t->getEventIndex()).lock()->getTick() > position)
+	{
 		move(t->getEvent(t->getEventIndex()).lock()->getTick());
 		return;
 	}
+	
 	shared_ptr<Event> event;
 	shared_ptr<Event> next;
-	if (t->getEvent(t->getEventIndex()).lock()->getTick() == position) {
-		while (t->getEventIndex() < eventCount - 2) {
+	
+	if (t->getEvent(t->getEventIndex()).lock()->getTick() == position)
+	{
+		while (t->getEventIndex() < eventCount - 2)
+		{
 			event = t->getEvent(t->getEventIndex()).lock();
 			next = t->getEvent(t->getEventIndex() + 1).lock();
-			if (next->getTick() == event->getTick()) {
-				t->setEventIndex(t->getEventIndex() + 1);
-			}
-			else {
+		
+			if (next->getTick() != event->getTick())
 				break;
-			}
-		}
-	}
-	t->setEventIndex(t->getEventIndex() + 1);
-	while (t->getEventIndex() < eventCount - 2) {
-		event = t->getEvent(t->getEventIndex()).lock();
-		next = t->getEvent(t->getEventIndex() + 1).lock();
-		if (next->getTick() == event->getTick()) {
+
 			t->setEventIndex(t->getEventIndex() + 1);
 		}
-		else {
-			break;
-		}
 	}
+
+	t->setEventIndex(t->getEventIndex() + 1);
+	
+	while (t->getEventIndex() < eventCount - 2)
+	{
+		event = t->getEvent(t->getEventIndex()).lock();
+		next = t->getEvent(t->getEventIndex() + 1).lock();
+
+		if (next->getTick() != event->getTick())
+			break;
+
+		t->setEventIndex(t->getEventIndex() + 1);
+	}
+
 	move(t->getEvent(t->getEventIndex()).lock()->getTick());
 }
 
 void Sequencer::notifyTimeDisplay()
 {
-    setChanged();
 	notifyObservers(string("bar"));
-	setChanged();
 	notifyObservers(string("beat"));
-	setChanged();
 	notifyObservers(string("clock"));
 }
 
 void Sequencer::notifyTimeDisplayRealtime()
 {
-	int bar = getCurrentBarNumber();
-	int beat = getCurrentBeatNumber();
+	int bar = getCurrentBarIndex();
+	int beat = getCurrentBeatIndex();
 	int clock = getCurrentClockNumber();
+	
 	if (lastNotifiedBar != bar) {
-		setChanged();
+		
 		notifyObservers(string("bar"));
 		lastNotifiedBar = bar;
 	}
+	
 	if (lastNotifiedBeat != beat) {
-		setChanged();
+		
 		notifyObservers(string("beat"));
 		lastNotifiedBeat = beat;
 	}
+
 	if (lastNotifiedClock != clock) {
-		setChanged();
+		
 		notifyObservers(string("clock"));
 		lastNotifiedClock = clock;
 	}
@@ -1134,26 +1301,29 @@ void Sequencer::notifyTimeDisplayRealtime()
 
 void Sequencer::goToPreviousStep()
 {
-	auto swGui = Mpc::instance().getUis().lock()->getSequencerWindowGui();
-	auto stepSize = TICK_VALUES[swGui->getNoteValue()];
-	auto pos = getTickPosition();
-	auto stepAmt = static_cast<int>(ceil(getActiveSequence().lock()->getLastTick() / stepSize)) + 1;
-	auto stepGrid = vector<int>(stepAmt);
+	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(mpc.screens->getScreenComponent("timing-correct"));
+	auto noteValue = timingCorrectScreen->getNoteValue();
 
-	for (int i = 0; i < stepGrid.size(); i++) {
+	auto stepSize = TICK_VALUES[noteValue];
+	auto pos = getTickPosition();
+	auto stepCount = static_cast<int>(ceil(getActiveSequence().lock()->getLastTick() / stepSize)) + 1;
+	vector<int> stepGrid(stepCount);
+
+	for (int i = 0; i < stepGrid.size(); i++)
 		stepGrid[i] = i * stepSize;
-	}
 
 	auto currentStep = 0;
 
-	for (auto l : stepGrid) {
-		if (pos <= l) break;
+	for (auto l : stepGrid)
+	{
+		if (pos <= l)
+			break;
+		
 		currentStep++;
 	}
 
-	if (currentStep == 0) {
+	if (currentStep == 0)
 		return;
-	}
 
 	currentStep--;
 	move(currentStep * stepSize);
@@ -1161,26 +1331,29 @@ void Sequencer::goToPreviousStep()
 
 void Sequencer::goToNextStep()
 {
-	auto swGui = Mpc::instance().getUis().lock()->getSequencerWindowGui();
-	auto stepSize = TICK_VALUES[swGui->getNoteValue()];
+	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(mpc.screens->getScreenComponent("timing-correct"));
+	auto noteValue = timingCorrectScreen->getNoteValue();
+
+	auto stepSize = TICK_VALUES[noteValue];
 	auto pos = getTickPosition();
 
-	auto stepGrid = vector<int>(ceil(getActiveSequence().lock()->getLastTick() / stepSize));
+	vector<int> stepGrid(ceil(getActiveSequence().lock()->getLastTick() / stepSize));
 
 	for (int i = 0; i < stepGrid.size(); i++)
 		stepGrid[i] = i * stepSize;
 
 	auto currentStep = -1;
-	for (auto l : stepGrid) {
-		if (pos < l) {
+
+	for (auto l : stepGrid)
+	{
+		if (pos < l)
 			break;
-		}
+
 		currentStep++;
 	}
 
-	if (currentStep == stepGrid.size()) {
+	if (currentStep == stepGrid.size())
 		return;
-	}
 
 	currentStep++;
 	move(currentStep * stepSize);
@@ -1188,31 +1361,56 @@ void Sequencer::goToNextStep()
 
 void Sequencer::tap()
 {
-	if (isPlaying()) return;
-	auto nanoLong = moduru::System::nanoTime();
+	if (isPlaying())
+		return;
 
-	if (nanoLong - lastTap > (2000 * 1000000)) {
-		taps = make_unique<moduru::io::CircularIntBuffer>(4, true, true);
+	auto now = moduru::System::currentTimeMillis();
+
+	if (now - lastTap > 2000)
+	{
+		taps = { 0, 0, 0, 0 };
+		tapIndex = 0;
 	}
 
-	lastTap = nanoLong;
-	taps->write(vector<int>{ (int)nanoLong });
-	int accum = 0;
-	vector<long> tapsLong;
-	while (taps->availableRead() > 0) {
-		tapsLong.push_back(taps->read());
-	}
-	for (int i = 0; i < (int)(tapsLong.size()) - 1; i++) {
-		int l0 = tapsLong[i];
-		int l1 = tapsLong[i + 1];
-		accum += l1 - l0;
+	lastTap = now;
+
+	taps[tapIndex] = lastTap;
+	
+	uint64_t accum = 0;
+	
+	int index = tapIndex;
+
+	tapIndex++;
+
+	if (tapIndex > 3)
+		tapIndex = 0;
+
+	int usedTapsCounter = 0;
+
+	for (int i = 0; i < 3; i++)
+	{
+		auto l0 = taps[index];
+
+		index--;
+
+		if (index < 0)
+			index = 3;
+
+		auto l1 = taps[index];
+		
+		if (l0 == 0 || l1 == 0)
+			break;
+
+		accum += l0 - l1;
+		usedTapsCounter++;
 	}
 
-	if (accum == 0) return;
+	if (accum == 0)
+		return;
 
-	auto tempo = (60000.0 * 1000000.0) / (accum / ((int)(tapsLong.size()) - 1));
+	auto tempo = 60000.0 / (accum / usedTapsCounter);
 	tempo = floor(tempo * 10) / 10;
-	setTempo(BCMath(tempo));
+	setTempo(tempo);
 }
 
 int Sequencer::getResolution()
@@ -1226,28 +1424,29 @@ void Sequencer::move(int tick)
 	reposition = tick;
 	position = tick;
 	playStartTick = tick;
+	
 	auto s = isPlaying() ? getCurrentlyPlayingSequence().lock() : getActiveSequence().lock();
 
-	if (!isPlaying() && songMode) {
+	if (!isPlaying() && songMode)
 		s = sequences[getSongSequenceIndex()];
-	}
 
 	s->resetTrackEventIndices(position);
 
-	notifyTimeDisplay();
-
-	if (getTempo().toDouble() != previousTempo.toDouble()) {
-		previousTempo = getTempo();
-		setChanged();
-		notifyObservers(string("tempo"));
+	if (secondSequenceEnabled)
+	{
+		auto secondSequenceScreen = dynamic_pointer_cast<SecondSeqScreen>(mpc.screens->getScreenComponent("second-seq"));
+		sequences[secondSequenceScreen->sq]->resetTrackEventIndices(position);
 	}
+
+	notifyTimeDisplay();
+	notifyObservers(string("tempo"));
 }
 
 int Sequencer::getTickPosition()
 {
-    if (isPlaying()) {
-        return Mpc::instance().getAudioMidiServices().lock()->getFrameSequencer().lock()->getTickPosition();
-    }
+    if (isPlaying())
+        return mpc.getAudioMidiServices().lock()->getFrameSequencer().lock()->getTickPosition();
+ 
     return position;
 }
 
@@ -1256,114 +1455,100 @@ weak_ptr<Sequence> Sequencer::getCurrentlyPlayingSequence()
 	return sequences[getCurrentlyPlayingSequenceIndex()];
 }
 
-void Sequencer::setSelectedTrackIndex(int i)
+void Sequencer::setActiveTrackIndex(int i)
 {
     activeTrackIndex = i;
-	setChanged();
-	notifyObservers(string("selectedtrackindex"));
+	notifyObservers(string("active-track-index"));
 }
 
 int Sequencer::getCurrentlyPlayingSequenceIndex()
 {
-	auto songGui = Mpc::instance().getUis().lock()->getSongGui();
-	auto songSeqIndex = songMode ? songs[songGui->getSelectedSongIndex()]->getStep(songGui->getOffset() + 1)->getSequence() : -1;
+	auto songScreen = mpc.screens->get<SongScreen>("song");
+	auto songSeqIndex = songMode ? songs[songScreen->getActiveSongIndex()]->getStep(songScreen->getOffset() + 1).lock()->getSequence() : -1;
 	return songMode ? songSeqIndex : currentlyPlayingSequenceIndex;
 }
 
-void Sequencer::setCurrentlyPlayingSequenceIndex(int i) {
+void Sequencer::setCurrentlyPlayingSequenceIndex(int i)
+{
 	currentlyPlayingSequenceIndex = i;
 	activeSequenceIndex = i;
 }
 
 int Sequencer::getNextSq()
 {
-    return nextsq;
+    return nextSq;
 }
 
-int Sequencer::getFirstUsedSeqDown(int from)
+int Sequencer::getFirstUsedSeqDown(int from, bool unused)
 {
-	auto result = -1;
-	for (int i = from; i >= 0; i--) {
-		if (sequences[i]->isUsed()) {
-			result = i;
-			break;
-		}
+	for (int i = from; i >= 0; i--)
+	{
+		auto candidate = unused ? !sequences[i]->isUsed() : sequences[i]->isUsed();
+
+		if (candidate)
+			return i;
 	}
-	return result;
+
+	return -1;
 }
 
-int Sequencer::getFirstUsedSeqUp(int from)
+int Sequencer::getFirstUsedSeqUp(int from, bool unused)
 {
-	auto result = -1;
-	for (int i = from; i < 99; i++) {
-		if (sequences[i]->isUsed()) {
-			result = i;
-			break;
-		}
-	}
-	return result;
-}
+	for (int i = from; i < 99; i++)
+	{
+		auto candidate = unused ? !sequences[i]->isUsed() : sequences[i]->isUsed();
 
-void Sequencer::resetNextSq() {
-	nextsq = -1;
+		if (candidate)
+			return i;
+	}
+
+	return -1;
 }
 
 void Sequencer::setNextSq(int i)
 {
-	if (!isPlaying()) {
-		return;
-	}
+	if (i < -1) i = -1;
+	if (i > 98) i = 98;
 
-	auto firstNotification = nextsq == -1;
+	auto firstNotification = nextSq == -1;
 	
-	auto up = i > nextsq;
+	auto up = i > nextSq;
 	
-	if (firstNotification) {
+	if (firstNotification)
 		up = i > currentlyPlayingSequenceIndex;
-	}
 
 	auto candidate = up ? getFirstUsedSeqUp(i) : getFirstUsedSeqDown(i);
 
-	if (candidate == -1) {
+	if (up && candidate == -1)
 		return;
-	}
 
-	nextsq = candidate;
-	setChanged();
+	nextSq = candidate;
 
-	if (firstNotification) {
+	if (nextSq == -1)
+		notifyObservers(string("nextoff"));
+	else if (firstNotification)
 		notifyObservers(string("nextsq"));
-	}
-	else {
+	else
 		notifyObservers(string("nextsqvalue"));
-	}
 }
 
 void Sequencer::setNextSqPad(int i)
 {
-	if (!isPlaying()) {
-		return;
-	}
-
-	if (!sequences[i]->isUsed()) {
-		nextsq = -1;
-		setChanged();
+	if (!sequences[i]->isUsed())
+	{
+		nextSq = -1;
 		notifyObservers(string("nextsqoff"));
 		return;
 	}
 
-	auto firstnotify = nextsq == -1;
+	auto firstNotification = nextSq == -1;
 	
-	nextsq = i;
+	nextSq = i;
 	
-	if (firstnotify) {
-		setChanged();
+	if (firstNotification)
 		notifyObservers(string("nextsq"));
-	}
-	else {
-		setChanged();
+	else
 		notifyObservers(string("nextsqvalue"));
-	}
 }
 
 weak_ptr<Song> Sequencer::getSong(int i)
@@ -1383,13 +1568,15 @@ void Sequencer::setSongModeEnabled(bool b)
 
 int Sequencer::getSongSequenceIndex()
 {
-	auto songGui = Mpc::instance().getUis().lock()->getSongGui();
-	auto song = songs[songGui->getSelectedSongIndex()];
-	auto step = songGui->getOffset() + 1;
-	if (step > song->getStepAmount() - 1) {
-		step = song->getStepAmount() - 1;
+	auto songScreen = mpc.screens->get<SongScreen>("song");
+	auto song = songs[songScreen->getActiveSongIndex()];
+	auto step = songScreen->getOffset() + 1;
+
+	if (step > song->getStepCount() - 1)
+	{
+		step = song->getStepCount() - 1;
 	}
-	return song->getStep(step)->getSequence();
+	return song->getStep(step).lock()->getSequence();
 }
 
 bool Sequencer::isSecondSequenceEnabled()
@@ -1402,21 +1589,10 @@ void Sequencer::setSecondSequenceEnabled(bool b)
     secondSequenceEnabled = b;
 }
 
-int Sequencer::getSecondSequenceIndex()
-{
-    return secondSequenceIndex;
-}
-
-void Sequencer::setSecondSequenceIndex(int i)
-{
-    secondSequenceIndex = i;
-}
-
 void Sequencer::flushTrackNoteCache()
 {
-	for (auto& t : getCurrentlyPlayingSequence().lock()->getTracks()) {
+	for (auto& t : getCurrentlyPlayingSequence().lock()->getTracks())
 		t.lock()->flushNoteCache();
-	}
 }
 
 void Sequencer::storeActiveSequenceInUndoPlaceHolder()
@@ -1425,8 +1601,8 @@ void Sequencer::storeActiveSequenceInUndoPlaceHolder()
 	undoPlaceHolder.swap(copy);
 
 	lastRecordingActive = true;
-	auto hw = Mpc::instance().getHardware().lock();
-	hw->getLed("undoseq").lock()->light(lastRecordingActive);
+	auto hw = mpc.getHardware().lock();
+	hw->getLed("undo-seq").lock()->light(lastRecordingActive);
 }
 
 bool Sequencer::isOverDubbing()
@@ -1441,7 +1617,7 @@ int Sequencer::getPlayStartTick()
 
 void Sequencer::notify(string s)
 {
-	setChanged();
+	
 	notifyObservers(s);
 }
 
@@ -1462,13 +1638,13 @@ void Sequencer::playMetronomeTrack()
 	}
 
 	metronomeOnly = true;
-	metronomeSeq = make_unique<Sequence>(defaultTrackNames);
+	metronomeSeq = make_unique<Sequence>(mpc, defaultTrackNames);
 	auto s = getActiveSequence().lock();
 	metronomeSeq->init(8);
-	metronomeSeq->setTimeSignature(0, 3, s->getNumerator(getCurrentBarNumber()), s->getDenominator(getCurrentBarNumber()));
+	metronomeSeq->setTimeSignature(0, 3, s->getNumerator(getCurrentBarIndex()), s->getDenominator(getCurrentBarIndex()));
 	metronomeSeq->setInitialTempo(getTempo());
 	metronomeSeq->removeFirstMetronomeClick();
-	auto lAms = Mpc::instance().getAudioMidiServices().lock();
+	auto lAms = mpc.getAudioMidiServices().lock();
 	auto fs = lAms->getFrameSequencer().lock();
 	playStartTick = 0;
 	fs->startMetronome(lAms->getAudioServer()->getSampleRate());
@@ -1478,11 +1654,11 @@ void Sequencer::stopMetronomeTrack()
 {
 	if (!metronomeOnly) return;
 	metronomeOnly = false;
-	Mpc::instance().getAudioMidiServices().lock()->getFrameSequencer().lock()->stop();
+	mpc.getAudioMidiServices().lock()->getFrameSequencer().lock()->stop();
 }
 
 weak_ptr<Sequence> Sequencer::createSeqInPlaceHolder() {
-	placeHolder = make_shared<Sequence>(defaultTrackNames);
+	placeHolder = make_shared<Sequence>(mpc, defaultTrackNames);
 	return placeHolder;
 }
 
@@ -1500,5 +1676,27 @@ weak_ptr<Sequence> Sequencer::getPlaceHolder() {
 	return placeHolder;
 }
 
-Sequencer::~Sequencer() {
+int Sequencer::getPlayedStepRepetitions()
+{
+	return playedStepRepetitions;
+}
+
+bool Sequencer::isEndOfSong()
+{
+	return endOfSong;
+}
+
+void Sequencer::setEndOfSong(bool b)
+{
+	endOfSong = b;
+}
+
+void Sequencer::incrementPlayedStepRepetitions()
+{
+	playedStepRepetitions++;
+}
+
+void Sequencer::resetPlayedStepRepetitions()
+{
+	playedStepRepetitions = 0;
 }

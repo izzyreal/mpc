@@ -1,13 +1,13 @@
 #include "Mpc.hpp"
 
-#include "StartUp.hpp"
+#include <lcdgui/Component.hpp>
+#include <lcdgui/ScreenComponent.hpp>
+
+#include "Paths.hpp"
 #include <nvram/NvRam.hpp>
 
 #include <disk/AbstractDisk.hpp>
 #include <disk/SoundLoader.hpp>
-
-#include <ui/Uis.hpp>
-#include <ui/disk/DiskGui.hpp>
 
 #include <controls/Controls.hpp>
 
@@ -28,42 +28,51 @@
 
 #include <hardware/Hardware.hpp>
 #include <hardware/HwSlider.hpp>
+#include <hardware/Led.hpp>
 
 #include <disk/AllLoader.hpp>
 #include <disk/ApsLoader.hpp>
 
 #include <disk/MpcFile.hpp>
 
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/LoadScreen.hpp>
+#include <lcdgui/screens/window/LoadAProgramScreen.hpp>
 #include <string>
 
 using namespace mpc;
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
 Mpc::Mpc()
 {
-	moduru::Logger::l.setPath(mpc::StartUp::logFilePath);
+	moduru::Logger::l.setPath(mpc::Paths::logFilePath());
 
-	hardware = make_shared<hardware::Hardware>();
-
-	uis = make_shared<ui::Uis>();
-	layeredScreen = make_shared<lcdgui::LayeredScreen>();
-
+	hardware = make_shared<hardware::Hardware>(*this);
+	screens = make_shared<Screens>(*this);
+	layeredScreen = make_shared<lcdgui::LayeredScreen>(*this);
 }
 
 void Mpc::init(const int sampleRate, const int inputCount, const int outputCount)
 {
-	sequencer = make_shared<mpc::sequencer::Sequencer>();
+
+	diskController = make_unique<mpc::disk::DiskController>(*this);
+	
+	sequencer = make_shared<mpc::sequencer::Sequencer>(*this);
 	MLOG("Sequencer created");
 
-	sampler = make_shared<mpc::sampler::Sampler>();
+	mpc::nvram::NvRam::loadVmpcSettings(*this); // Needs to be loaded before sampler is instantiated
+	sampler = make_shared<mpc::sampler::Sampler>(*this);
 	MLOG("Sampler created");
 
-	mpcMidiInputs = vector<mpc::audiomidi::MpcMidiInput*>{ new mpc::audiomidi::MpcMidiInput(0), new mpc::audiomidi::MpcMidiInput(1) };
+	mpcMidiInputs = vector<mpc::audiomidi::MpcMidiInput*>{ new mpc::audiomidi::MpcMidiInput(*this, 0), new mpc::audiomidi::MpcMidiInput(*this, 1) };
 
 	/*
 	* AudioMidiServices requires sampler to exist.
 	*/
-	audioMidiServices = make_shared<mpc::audiomidi::AudioMidiServices>();
+	audioMidiServices = make_shared<mpc::audiomidi::AudioMidiServices>(*this);
 	MLOG("AudioMidiServices created");
 
 	sequencer->init();
@@ -72,27 +81,29 @@ void Mpc::init(const int sampleRate, const int inputCount, const int outputCount
 	sampler->init();
 	MLOG("Sampler initialized");
 
-	eventHandler = make_shared<mpc::audiomidi::EventHandler>();
+	eventHandler = make_shared<mpc::audiomidi::EventHandler>(*this);
 	MLOG("Eeventhandler created");
 
 	audioMidiServices->start(sampleRate, inputCount, outputCount);
 	MLOG("AudioMidiServices started");
 
-	controls = make_shared<controls::Controls>();
+	controls = make_shared<controls::Controls>(*this);
 
-	diskController = make_unique<DiskController>();
 	diskController->initDisks();
 
 	hardware->getSlider().lock()->setValue(mpc::nvram::NvRam::getSlider());
+	mpc::nvram::NvRam::loadUserScreenValues(*this);
+
+	/*
+	for (auto& screenName : screenNames)
+	{
+		// Uncomment if you want to try and open all screens before doing anything else.
+		// For debug purposes only.
+		//layeredScreen->openScreen(screenName);
+	}
+	*/
+
 	MLOG("Mpc is ready")
-}
-
-void Mpc::powerOn() {
-	mpc::StartUp().runStartUpRoutine();
-}
-
-weak_ptr<ui::Uis> Mpc::getUis() {
-	return uis;
 }
 
 weak_ptr<controls::Controls> Mpc::getControls() {
@@ -149,8 +160,8 @@ weak_ptr<lcdgui::LayeredScreen> Mpc::getLayeredScreen() {
 	return layeredScreen;
 }
 
-controls::BaseControls* Mpc::getActiveControls() {
-	return controls->getControls(layeredScreen->getCurrentScreenName());
+weak_ptr<lcdgui::ScreenComponent> Mpc::getActiveControls() {
+	return layeredScreen->findScreenComponent().lock();
 }
 
 controls::GlobalReleaseControls* Mpc::getReleaseControls() {
@@ -172,32 +183,39 @@ vector<string> Mpc::akaiAscii { " ", "!", "#", "$", "%", "&", "'", "(", ")", "-"
 
 void Mpc::loadSound(bool replace)
 {
-	if (loadSoundThread.joinable()) {
+	if (loadSoundThread.joinable())
+	{
 		loadSoundThread.join();
 	}
+	
 	auto lDisk = getDisk().lock();
 	lDisk->setBusy(true);
-	auto soundLoader = mpc::disk::SoundLoader(sampler->getSounds(), replace);
+	auto soundLoader = mpc::disk::SoundLoader(*this, sampler->getSounds(), replace);
 	soundLoader.setPreview(true);
 	soundLoader.setPartOfProgram(false);
 	bool hasNotBeenLoadedAlready = true;
-	
-	try {
-		hasNotBeenLoadedAlready = soundLoader.loadSound(uis->getDiskGui()->getSelectedFile()) == -1;
+
+	auto loadScreen = dynamic_pointer_cast<LoadScreen>(screens->getScreenComponent("load"));
+
+	try
+	{
+		hasNotBeenLoadedAlready = soundLoader.loadSound(loadScreen->getSelectedFile()) == -1;
 	}
-	catch (const invalid_argument& exception) {
-		MLOG("A problem occurred when trying to load " + uis->getDiskGui()->getSelectedFile()->getName() + ": " + std::string(exception.what()));
+	catch (const exception& exception)
+	{
+		sampler->deleteSound(sampler->getSoundCount() - 1);
+		MLOG("A problem occurred when trying to load " + loadScreen->getSelectedFileName() + ": " + string(exception.what()));
 		lDisk->setBusy(false);
-		uis->getDiskGui()->removePopup();
-		layeredScreen->getLayer(0)->setDirty();
+		layeredScreen->openScreen("load");
 		return;
 	}
 	
-	if (hasNotBeenLoadedAlready) {
-		loadSoundThread = thread(&Mpc::static_loadSound, soundLoader.getSize());
+	if (hasNotBeenLoadedAlready)
+	{
+		loadSoundThread = thread(&Mpc::runLoadSoundThread, this, soundLoader.getSize());
 	}
 	else {
-		sampler->deleteSample(sampler->getSoundCount() - 1);
+		sampler->deleteSound(sampler->getSoundCount() - 1);
 		lDisk->setBusy(false);
 	}
 }
@@ -205,19 +223,23 @@ void Mpc::loadSound(bool replace)
 void Mpc::loadProgram()
 {
 	programLoader.reset();
-	programLoader = make_unique<mpc::disk::ProgramLoader>(uis->getDiskGui()->getSelectedFile(), uis->getDiskGui()->getLoadReplaceSound());
+
+	auto loadScreen = dynamic_pointer_cast<LoadScreen>(screens->getScreenComponent("load"));
+	auto loadAProgramScreen = dynamic_pointer_cast<LoadAProgramScreen>(screens->getScreenComponent("load-a-program"));
+
+	getActiveControls().lock()->getBaseControls()->init();
+	auto activePgm = getActiveControls().lock()->getBaseControls()->mpcSoundPlayerChannel->getProgram();
+
+	programLoader = make_unique<mpc::disk::ProgramLoader>(*this, loadScreen->getSelectedFile(), loadAProgramScreen->loadReplaceSound ? activePgm : -1);
 }
 
 void Mpc::importLoadedProgram()
 {
 	auto t = sequencer->getActiveSequence().lock()->getTrack(sequencer->getActiveTrackIndex()).lock();
-	if (uis->getDiskGui()->getClearProgramWhenLoading()) {
-		auto pgm = getDrum(t->getBusNumber() - 1)->getProgram();
-		sampler->replaceProgram(programLoader->get(), pgm);
-	}
-	else {
-		getDrum(t->getBusNumber() - 1)->setProgram(sampler->getProgramCount() - 1);
-	}
+	auto loadAProgramScreen = dynamic_pointer_cast<LoadAProgramScreen>(screens->getScreenComponent("load-a-program"));
+
+	if (!loadAProgramScreen->clearProgramWhenLoading)
+		getDrum(t->getBus() - 1)->setProgram(sampler->getProgramCount() - 1);
 }
 
 ctoot::mpc::MpcMultiMidiSynth* Mpc::getMms()
@@ -225,18 +247,18 @@ ctoot::mpc::MpcMultiMidiSynth* Mpc::getMms()
 	return audioMidiServices->getMms().lock().get();
 }
 
-void Mpc::static_loadSound(int size)
+void Mpc::runLoadSoundThread(mpc::Mpc* mpc, int size)
 {
-	Mpc::instance().runLoadSoundThread(size);
-}
-
-void Mpc::runLoadSoundThread(int size) {
 	int sleepTime = size / 400;
-	if (sleepTime < 300) sleepTime = 300;
-	this_thread::sleep_for(chrono::milliseconds((int)(sleepTime * 0.1)));
-	uis->getDiskGui()->removePopup();
-	layeredScreen->openScreen("loadasound");
-	getDisk().lock()->setBusy(false);
+	
+	if (sleepTime < 300)
+	{
+		sleepTime = 300;
+	}
+	
+	this_thread::sleep_for(chrono::milliseconds((int)(sleepTime)));
+	mpc->getLayeredScreen().lock()->openScreen("load-a-sound");
+	mpc->getDisk().lock()->setBusy(false);
 }
 
 weak_ptr<audiomidi::MpcMidiPorts> Mpc::getMidiPorts()
@@ -249,17 +271,111 @@ audiomidi::MpcMidiInput* Mpc::getMpcMidiInput(int i)
 	return mpcMidiInputs[i];
 }
 
-Mpc::~Mpc() {
-	MLOG("Mpc destructor.");
-	mpc::nvram::NvRam::saveUserDefaults();
-	mpc::nvram::NvRam::saveKnobPositions();
-	for (auto& m : mpcMidiInputs) {
-		if (m != nullptr) {
-			delete m;
-		}
+void Mpc::setBank(int i)
+{
+	if (i == bank)
+	{
+		return;
 	}
-    if (layeredScreen) layeredScreen.reset();
-	if (audioMidiServices) audioMidiServices->destroyServices();
-	MLOG("audio midi services destroyed.");
-	if (loadSoundThread.joinable()) loadSoundThread.join();
+	
+	if (i < 0 || i > 3)
+	{
+		return;
+	}
+
+	bank = i;
+
+	
+	notifyObservers(string("bank"));
+
+	hardware->getLed("pad-bank-a").lock()->light(i == 0);
+	hardware->getLed("pad-bank-b").lock()->light(i == 1);
+	hardware->getLed("pad-bank-c").lock()->light(i == 2);
+	hardware->getLed("pad-bank-d").lock()->light(i == 3);
+}
+
+int Mpc::getBank()
+{
+	return bank;
+}
+
+void Mpc::setPadAndNote(int pad, int note)
+{
+	if (pad < -1 || pad > 63 || note < 34 || note > 98)
+	{
+		return;
+	}
+
+	if (prevPad != pad && pad != -1)
+	{
+		prevPad = pad;
+	}
+
+	this->pad = pad;
+
+	if (note != 34)
+	{
+		prevNote = note;
+	}
+
+	this->note = note;
+
+	
+	notifyObservers(string("padandnote"));
+}
+
+int Mpc::getNote()
+{
+	return note;
+}
+
+int Mpc::getPad()
+{
+	return pad;
+}
+
+int Mpc::getPrevNote()
+{
+	return prevNote;
+}
+
+int Mpc::getPrevPad()
+{
+	return prevPad;
+}
+
+string Mpc::getPreviousSamplerScreenName()
+{
+	return previousSamplerScreenName;
+}
+
+void Mpc::setPreviousSamplerScreenName(string s)
+{
+	previousSamplerScreenName = s;
+}
+
+Mpc::~Mpc() {
+	MLOG("Entering Mpc destructor");
+
+	mpc::nvram::NvRam::saveUserScreenValues(*this);
+	mpc::nvram::NvRam::saveKnobPositions(*this);
+	mpc::nvram::NvRam::saveVmpcSettings(*this);
+
+	for (auto& m : mpcMidiInputs)
+	{
+		if (m != nullptr)
+			delete m;
+	}
+
+	if (layeredScreen)
+		layeredScreen.reset();
+
+	if (audioMidiServices)
+	{
+		audioMidiServices->destroyServices();
+		MLOG("AudioMidiServices destroyed.");
+	}
+
+	if (loadSoundThread.joinable())
+		loadSoundThread.join();
 }

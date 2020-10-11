@@ -14,13 +14,11 @@
 #include <file/all/AllSequencer.hpp>
 #include <file/all/AllSong.hpp>
 #include <file/all/Tracks.hpp>
-#include <StartUp.hpp>
-#include <ui/UserDefaults.hpp>
-#include <ui/midisync/MidiSyncGui.hpp>
-#include <ui/sequencer/SongGui.hpp>
-#include <ui/sequencer/StepEditorGui.hpp>
-#include <ui/sequencer/window/MultiRecordingSetupLine.hpp>
-#include <ui/sequencer/window/SequencerWindowGui.hpp>
+#include <file/all/Header.hpp>
+
+#include <disk/MpcFile.hpp>
+#include <file/FsNode.hpp>
+
 #include <sequencer/Event.hpp>
 #include <sequencer/Sequence.hpp>
 #include <sequencer/Track.hpp>
@@ -28,125 +26,178 @@
 #include <sequencer/Song.hpp>
 #include <sequencer/TempoChangeEvent.hpp>
 
-#include <thirdp/bcmath/bcmath_stl.h>
+#include <lcdgui/Screens.hpp>
 
+#include <lcdgui/screens/window/CountMetronomeScreen.hpp>
+#include <lcdgui/screens/window/TimingCorrectScreen.hpp>
+#include <lcdgui/screens/window/MultiRecordingSetupScreen.hpp>
+#include <lcdgui/screens/window/MidiInputScreen.hpp>
+#include <lcdgui/screens/window/MultiRecordingSetupLine.hpp>
+#include <lcdgui/screens/StepEditorScreen.hpp>
+#include <lcdgui/screens/SecondSeqScreen.hpp>
+#include <lcdgui/screens/SongScreen.hpp>
+#include <lcdgui/screens/OthersScreen.hpp>
+#include <lcdgui/screens/SyncScreen.hpp>
+#include <lcdgui/screens/UserScreen.hpp>
+
+#include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
+
+#include <stdexcept>
+
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui::screens::window;
+using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::disk;
 using namespace mpc::file::all;
 using namespace std;
 
-AllLoader::AllLoader(mpc::disk::MpcFile* file, bool sequencesOnly) 
+AllLoader::AllLoader(mpc::Mpc& mpc, mpc::disk::MpcFile* file, bool sequencesOnly)
+	: mpc(mpc)
 {
-	if (sequencesOnly) {
-		allParser = new AllParser(file);
-		allSequences = allParser->getAllSequences();
-		auto allSeqNames = allParser->getSeqNames()->getNames();
+	if (!file->getFsNode().lock()->exists())
+		throw invalid_argument("File does not exist");
+
+	AllParser allParser(mpc, file);
+
+	if (sequencesOnly)
+	{
+		allSequences = allParser.getAllSequences();
+		auto allSeqNames = allParser.getSeqNames()->getNames();
 		vector<Sequence*> temp;
 		int counter = 0;
-		for (int i = 0; i < 99; i++) {
-			if (allSeqNames.at(i).find("(Unused)") != string::npos) {
+		
+		for (int i = 0; i < 99; i++)
+		{
+			if (allSeqNames.at(i).find("(Unused)") != string::npos)
+			{
 				temp.push_back(nullptr);
 			}
-			else {
+			else
+			{
 				temp.push_back(allSequences[counter++]);
 			}
 		}
 		allSequences = temp;
 		convertSequences(true);
 	}
-	else {
-		auto lSequencer = Mpc::instance().getSequencer().lock();
-		allParser = new AllParser(file);
-		allSequences = allParser->getAllSequences();
-		auto defaults = allParser->getDefaults();
-		auto ud = mpc::StartUp::getUserDefaults().lock();
-		ud->setLastBar(defaults->getBarCount() - 1);
-		ud->setBus(defaults->getBusses()[0]);
+	else
+	{
+		auto lSequencer = mpc.getSequencer().lock();
+		allSequences = allParser.getAllSequences();
+		auto defaults = allParser.getDefaults();
 		
-		for (int i = 0; i < 33; i++) {
-			ud->setDeviceName(i, defaults->getDefaultDevNames()[i]);
+		auto userScreen = mpc.screens->get<UserScreen>("user");
+
+		userScreen->setLastBar(defaults->getBarCount() - 1);
+		userScreen->setBus(defaults->getBusses()[0]);
+		
+		for (int i = 0; i < 33; i++)
+		{
+			userScreen->setDeviceName(i, defaults->getDefaultDevNames()[i]);
 		}
 
-		ud->setSequenceName(defaults->getDefaultSeqName());
+		userScreen->setSequenceName(defaults->getDefaultSeqName());
 		auto defTrackNames = defaults->getDefaultTrackNames();
 		
-		for (int i = 0; i < 64; i++) {
-			ud->setTrackName(i, defTrackNames[i]);
+		for (int i = 0; i < 64; i++)
+		{
+			userScreen->setTrackName(i, defTrackNames[i]);
 		}
 
-		ud->setDeviceNumber(defaults->getDevices()[0]);
-		ud->setTimeSig(defaults->getTimeSigNum(), defaults->getTimeSigDen());
-		ud->setPgm(defaults->getPgms()[0]);
-		ud->setTempo(BCMath(defaults->getTempo() / 10.0));
-		ud->setVelo(defaults->getTrVelos()[0]);
+		userScreen->setDeviceNumber(defaults->getDevices()[0]);
+		userScreen->setTimeSig(defaults->getTimeSigNum(), defaults->getTimeSigDen());
+		userScreen->setPgm(defaults->getPgms()[0]);
+		userScreen->setTempo(defaults->getTempo() * 0.1);
+		userScreen->setVelo(defaults->getTrVelos()[0]);
+
 		convertSequences(false);
-		auto allSeqNames = allParser->getSeqNames()->getNames();
-		auto sequencer = allParser->getSequencer();
+		
+		auto allSeqNames = allParser.getSeqNames()->getNames();
+		auto sequencer = allParser.getSequencer();
 		lSequencer->setActiveSequenceIndex(sequencer->sequence);
-		lSequencer->setSelectedTrackIndex(sequencer->track);
-		auto swGui = Mpc::instance().getUis().lock()->getSequencerWindowGui();
-		swGui->setNoteValue(sequencer->tc);
-		auto count = allParser->getCount();
-		swGui->setCountIn(count->getCountInMode());
-		swGui->setAccentVelo(count->getAccentVelo());
-		swGui->setNormalVelo(count->getNormalVelo());
-		swGui->setClickOutput(count->getClickOutput());
-		swGui->setClickVolume(count->getClickVolume());
-		swGui->setRate(count->getRate());
-		swGui->setMetronomeSound(count->getSound());
-		swGui->setInPlay(count->isEnabledInPlay());
-		swGui->setInRec(count->isEnabledInRec());
-		swGui->setWaitForKey(count->isWaitForKeyEnabled());
+		lSequencer->setActiveTrackIndex(sequencer->track);
+		
+		auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(mpc.screens->getScreenComponent("timing-correct"));
+		
+		timingCorrectScreen->setNoteValue(sequencer->tc);
+		
+		auto count = allParser.getCount();
+
+		auto countMetronomeScreen = dynamic_pointer_cast<CountMetronomeScreen>(mpc.screens->getScreenComponent("count-metronome"));
+		auto metronomeSoundScreen = dynamic_pointer_cast<MetronomeSoundScreen>(mpc.screens->getScreenComponent("metronome-sound"));
+
+		countMetronomeScreen->setCountIn(count->getCountInMode());
+		metronomeSoundScreen->setAccentVelo(count->getAccentVelo());
+		metronomeSoundScreen->setNormalVelo(count->getNormalVelo());
+		metronomeSoundScreen->setOutput(count->getClickOutput());
+		metronomeSoundScreen->setVolume(count->getClickVolume());
+		countMetronomeScreen->setRate(count->getRate());
+		metronomeSoundScreen->setSound(count->getSound());
+		countMetronomeScreen->setInPlay(count->isEnabledInPlay());
+		countMetronomeScreen->setInRec(count->isEnabledInRec());
+		countMetronomeScreen->setWaitForKey(count->isWaitForKeyEnabled());
 		lSequencer->setCountEnabled(count->isEnabled());
-		auto midiInput = allParser->getMidiInput();
-		swGui->setReceiveCh(midiInput->getReceiveCh());
-		swGui->setFilterType(midiInput->getFilterType());
+
+		auto midiInput = allParser.getMidiInput();
+		auto midiInputScreen = dynamic_pointer_cast<MidiInputScreen>(mpc.screens->getScreenComponent("midi-input"));
+
+		midiInputScreen->setReceiveCh(midiInput->getReceiveCh());
+		midiInputScreen->setType(midiInput->getFilterType());
+		midiInputScreen->setMidiFilterEnabled(midiInput->isFilterEnabled());
+		midiInputScreen->setSustainPedalToDuration(midiInput->isSustainPedalToDurationEnabled());
+
 		auto trackDests = midiInput->getMultiRecTrackDests();
 		
+		auto multiRecordingSetupScreen = dynamic_pointer_cast<MultiRecordingSetupScreen>(mpc.screens->getScreenComponent("multi-recording-setup"));
+
 		for (int i = 0; i < trackDests.size(); i++) {
-			swGui->getMrsLines()[i]->setTrack(trackDests[i]);
+			multiRecordingSetupScreen->getMrsLines()[i]->setTrack(trackDests[i]);
 		}
 
-		swGui->setChPressurePassEnabled(midiInput->isChPressurePassEnabled());
-		swGui->setExclusivePassEnabled(midiInput->isExclusivePassEnabled());
-		swGui->setMidiFilterEnabled(midiInput->isFilterEnabled());
+		midiInputScreen->setChPressurePassEnabled(midiInput->isChPressurePassEnabled());
+		midiInputScreen->setExclusivePassEnabled(midiInput->isExclusivePassEnabled());
 		lSequencer->setRecordingModeMulti(midiInput->isMultiRecEnabled());
-		swGui->setNotePassEnabled(midiInput->isNotePassEnabled());
-		swGui->setPgmChangePassEnabled(midiInput->isPgmChangePassEnabled());
-		swGui->setPitchBendPassEnabled(midiInput->isPitchBendPassEnabled());
-		swGui->setPolyPressurePassEnabled(midiInput->isPolyPressurePassEnabled());
-		swGui->setSustainPedalToDuration(midiInput->isSustainPedalToDurationEnabled());
-		auto misc = allParser->getMisc();
-		auto midiSyncMisc = allParser->getMidiSync();
-		auto seGui = Mpc::instance().getUis().lock()->getStepEditorGui();
-		seGui->setAutoStepIncrementEnabled(misc->isAutoStepIncEnabled());
-		seGui->setTcValueRecordedNotes(misc->getDurationTcPercentage());
-		seGui->setDurationOfRecordedNotes(misc->isDurationOfRecNotesTc());
-		auto msGui = Mpc::instance().getUis().lock()->getMidiSyncGui();
-		msGui->setReceiveMMCEnabled(misc->isInReceiveMMCEnabled());
-		msGui->setSendMMCEnabled(midiSyncMisc->isSendMMCEnabled());
-		msGui->setModeIn(midiSyncMisc->getInMode());
-		msGui->setModeOut(midiSyncMisc->getOutMode());
-		msGui->setShiftEarly(midiSyncMisc->getShiftEarly());
-		msGui->setFrameRate(midiSyncMisc->getFrameRate());
-		msGui->setIn(midiSyncMisc->getInput());
-		msGui->setOut(midiSyncMisc->getOutput());
-		lSequencer->setSecondSequenceEnabled(sequencer->secondSeqEnabled);
-		lSequencer->setSecondSequenceIndex(sequencer->secondSeqIndex);
-		Mpc::instance().getUis().lock()->getSongGui()->setDefaultSongName(midiSyncMisc->getDefSongName());
-		swGui->setTapAvg(misc->getTapAvg());
-		auto songs = allParser->getSongs();
+		midiInputScreen->setNotePassEnabled(midiInput->isNotePassEnabled());
+		midiInputScreen->setPgmChangePassEnabled(midiInput->isPgmChangePassEnabled());
+		midiInputScreen->setPitchBendPassEnabled(midiInput->isPitchBendPassEnabled());
+		midiInputScreen->setPolyPressurePassEnabled(midiInput->isPolyPressurePassEnabled());
 		
-		for (int i = 0; i < 20; i++) {
+		auto midiSyncMisc = allParser.getMidiSync();
+				
+		auto misc = allParser.getMisc();
+		auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(mpc.screens->getScreenComponent("step-editor"));
+		stepEditorScreen->setAutoStepIncrementEnabled(misc->isAutoStepIncEnabled());
+		stepEditorScreen->setTcValueRecordedNotes(misc->getDurationTcPercentage());
+		stepEditorScreen->setDurationOfRecordedNotes(misc->isDurationOfRecNotesTc());
+
+		auto othersScreen = dynamic_pointer_cast<OthersScreen>(mpc.screens->getScreenComponent("others"));
+
+		othersScreen->setTapAveraging(misc->getTapAvg());
+
+		auto syncScreen = dynamic_pointer_cast<SyncScreen>(mpc.screens->getScreenComponent("sync"));
+
+		syncScreen->receiveMMCEnabled = misc->isInReceiveMMCEnabled();
+		syncScreen->sendMMCEnabled = midiSyncMisc->isSendMMCEnabled();
+		syncScreen->in = midiSyncMisc->getInput();
+		syncScreen->out = midiSyncMisc->getOutput();
+		syncScreen->setModeIn(midiSyncMisc->getInMode());
+		syncScreen->setModeOut(midiSyncMisc->getOutMode());
+		syncScreen->shiftEarly = midiSyncMisc->getShiftEarly();
+		syncScreen->frameRate = midiSyncMisc->getFrameRate();
+		
+		lSequencer->setSecondSequenceEnabled(sequencer->secondSeqEnabled);
+
+		auto secondSequenceScreen = dynamic_pointer_cast<SecondSeqScreen>(mpc.screens->getScreenComponent("second-seq"));
+		secondSequenceScreen->sq = sequencer->secondSeqIndex;
+		
+		auto songScreen = mpc.screens->get<SongScreen>("song");
+		songScreen->setDefaultSongName(midiSyncMisc->getDefSongName());
+				
+		auto songs = allParser.getSongs();
+		
+		for (int i = 0; i < 20; i++)
 			lSequencer->getSong(i).lock()->setName(songs[i]->name);
-		}
-
-	}
-}
-
-AllLoader::~AllLoader()
-{
-	if (allParser != nullptr) {
-		delete allParser;
 	}
 }
 
@@ -154,33 +205,46 @@ void AllLoader::convertSequences(const bool indiv)
 {
 	int index = -1;
 	
-	if (!indiv) {
-		Mpc::instance().getSequencer().lock()->purgeAllSequences();
-	}
+	if (!indiv)
+		mpc.getSequencer().lock()->purgeAllSequences();
 
-	for (auto& as : allSequences) {
+	for (auto& as : allSequences)
+	{
 		index++;
-		if (as == nullptr) {
-			if (indiv) mpcSequences.push_back(nullptr);
+	
+		if (as == nullptr)
+		{
+			if (indiv)
+				mpcSequences.push_back(nullptr);
+			
 			continue;
 		}
+
 		shared_ptr<mpc::sequencer::Sequence> mpcSeq;
-		if (indiv) {
-			mpcSeq = make_shared<mpc::sequencer::Sequence>(Mpc::instance().getSequencer().lock()->getDefaultTrackNames());
+		
+		if (indiv)
+		{
+			mpcSeq = make_shared<mpc::sequencer::Sequence>(mpc, mpc.getSequencer().lock()->getDefaultTrackNames());
 		}
 		else {
-			mpcSeq = Mpc::instance().getSequencer().lock()->getSequence(index).lock();
+			mpcSeq = mpc.getSequencer().lock()->getSequence(index).lock();
 		}
+		
 		mpcSeq->init(as->barCount - 1);
-		for (int i = 0; i < as->barCount; i++) {
+		
+		for (int i = 0; i < as->barCount; i++)
+		{
 			auto num = dynamic_cast<Bar*>(as->barList->getBars()[i])->getNumerator();
 			auto den = dynamic_cast<Bar*>(as->barList->getBars()[i])->getDenominator();
 			mpcSeq->setTimeSignature(i, num, den);
 		}
+
 		mpcSeq->setName(as->name);
 		mpcSeq->setInitialTempo(as->tempo);
 		auto at = as->tracks;
-		for (int i = 0; i < 64; i++) {
+		
+		for (int i = 0; i < 64; i++)
+		{
 			auto t = mpcSeq->getTrack(i).lock();
 			t->setUsed(at->getStatus(i) != 6);
 			t->setName(at->getName(i));
@@ -189,7 +253,9 @@ void AllLoader::convertSequences(const bool indiv)
 			t->setOn(at->getStatus(i) != 5);
 			t->setVelocityRatio(at->getVelo(i));
 		}
-		for (int j = 0; j < as->getEventAmount(); j++) {
+
+		for (int j = 0; j < as->getEventAmount(); j++)
+		{
 			auto e = as->allEvents[j];
 			if (e == nullptr) continue;
 			int track = e->getTrack();
@@ -198,24 +264,32 @@ void AllLoader::convertSequences(const bool indiv)
 			if (track > 63) track -= 64;
 			mpcSeq->getTrack(track).lock()->cloneEvent(shared_ptr<mpc::sequencer::Event>(e));
 		}
+
 		for (int i = 0; i < 32; i++)
+		{
 			mpcSeq->setDeviceName(i, as->devNames[i]);
+		}
 
 		mpcSeq->initMetaTracks();
-		mpcSeq->setFirstLoopBar(as->loopFirst);
-		mpcSeq->setLastLoopBar(as->loopLast);
-		mpcSeq->setLastLoopBar(as->loopLast);
+		mpcSeq->setFirstLoopBarIndex(as->loopFirst);
+		mpcSeq->setLastLoopBarIndex(as->loopLast);
+		mpcSeq->setLastLoopBarIndex(as->loopLast);
+		
 		if (as->loopLastEnd)
-			mpcSeq->setLastLoopBar(INT_MAX);
+		{
+			mpcSeq->setLastLoopBarIndex(INT_MAX);
+		}
 
 		mpcSeq->setLoopEnabled(as->loop);
-		if (indiv) {
+		
+		if (indiv)
+		{
 			mpcSequences.push_back(mpcSeq);
 		}
 	}
 }
 
-vector<shared_ptr<mpc::sequencer::Sequence>>* AllLoader::getSequences()
+vector<shared_ptr<mpc::sequencer::Sequence>>& AllLoader::getSequences()
 {
-    return &mpcSequences;
+    return mpcSequences;
 }

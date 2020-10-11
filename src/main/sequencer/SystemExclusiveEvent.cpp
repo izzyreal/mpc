@@ -3,53 +3,53 @@
 using namespace mpc::sequencer;
 using namespace std;
 
-SystemExclusiveEvent::SystemExclusiveEvent()
+void SystemExclusiveEvent::setByteA(unsigned char i)
 {
-	bytes = vector<char>(2);
-}
-
-void SystemExclusiveEvent::setByteA(int i)
-{
-    if(i < 0 || i > 255) return;
+    if (i < 0 || i > 255)
+    {
+        return;
+    }
 
     bytes[0] = i;
-    setChanged();
-    notifyObservers(string("stepeditor"));
+    
+    notifyObservers(string("step-editor"));
 }
 
-int SystemExclusiveEvent::getByteA()
+unsigned char SystemExclusiveEvent::getByteA()
 {
     return bytes[0];
 }
 
-void SystemExclusiveEvent::setByteB(int i)
+void SystemExclusiveEvent::setByteB(unsigned char i)
 {
-    if(i < 0 || i > 255) return;
+    if (i < 0 || i > 255)
+    {
+        return;
+    }
 
-	bytes[1] = i;
-    setChanged();
-    notifyObservers(string("stepeditor"));
+    bytes[1] = i;
+    
+    notifyObservers(string("step-editor"));
 }
 
-int SystemExclusiveEvent::getByteB()
+unsigned char SystemExclusiveEvent::getByteB()
 {
     return bytes[1];
 }
 
-void SystemExclusiveEvent::setBytes(vector<char>* ba)
+void SystemExclusiveEvent::setBytes(const vector<unsigned char>& ba)
 {
-    bytes = *ba;
+    bytes = ba;
 }
 
-vector<char>* SystemExclusiveEvent::getBytes()
+vector<unsigned char>& SystemExclusiveEvent::getBytes()
 {
-    return &bytes;
+    return bytes;
 }
 
-void SystemExclusiveEvent::CopyValuesTo(std::weak_ptr<Event> dest) {
+void SystemExclusiveEvent::CopyValuesTo(std::weak_ptr<Event> dest)
+{
 	Event::CopyValuesTo(dest);
 	auto lDest = dynamic_pointer_cast<SystemExclusiveEvent>(dest.lock());
 	lDest->setBytes(getBytes());
-	lDest->setByteA(getByteA());
-	lDest->setByteB(getByteB());
 }

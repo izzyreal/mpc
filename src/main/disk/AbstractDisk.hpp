@@ -6,6 +6,17 @@
 #include <vector>
 #include <string>
 
+/*
+* Children of AbstractDisk provide a direct interface to the rest of the application to perform
+* file operations. These operations are mostly domain-specific implementations of create, read,
+* write and rename.
+*
+* Lower level functionality like opening file handles and reading from and writing to file streams
+* is delegated to the moduru::file library by the MpcFiles that AbstractDisk uses.
+*/
+
+namespace mpc { class Mpc; }
+
 namespace mpc::sequencer {
 	class Sequence;
 }
@@ -13,10 +24,6 @@ namespace mpc::sequencer {
 namespace mpc::sampler {
 	class Program;
 	class Sound;
-}
-
-namespace mpc::ui::disk {
-	class DiskGui;
 }
 
 namespace mpc::disk {
@@ -31,19 +38,19 @@ namespace mpc::disk {
 	{
 
 	private:
-		bool busy{ false };
-		std::weak_ptr<Store> store{};
+		bool busy = false;
+		std::weak_ptr<Store> store;
 		std::unique_ptr<SoundSaver> soundSaver;
 
 	protected:
-		mpc::ui::disk::DiskGui* diskGui;
-		std::unique_ptr<mpc::disk::device::Device> device{};
+		mpc::Mpc& mpc;
+		std::unique_ptr<mpc::disk::device::Device> device;
 
 	public:
-		std::vector<std::string> extensions{};
-		std::vector<MpcFile*> files{};
-		std::vector<MpcFile*> allFiles{};
-		std::vector<MpcFile*> parentFiles{};
+		const std::vector<std::string> extensions{ "", "SND", "PGM", "APS", "MID", "ALL", "WAV", "SEQ", "SET" };
+		std::vector<MpcFile*> files;
+		std::vector<MpcFile*> allFiles;
+		std::vector<MpcFile*> parentFiles;
 
 	public:
 		static std::string formatFileSize(int size);
@@ -89,7 +96,7 @@ namespace mpc::disk {
 		virtual int getPathDepth() = 0;
 
 	protected:
-		AbstractDisk(std::weak_ptr<Store> store);
+		AbstractDisk(mpc::Mpc& mpc, std::weak_ptr<Store> store);
 		virtual ~AbstractDisk();
 
 	};

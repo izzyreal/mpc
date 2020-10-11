@@ -1,4 +1,4 @@
-#include <nvram/DefaultsParser.hpp>
+#include "DefaultsParser.hpp"
 
 #include <file/all/AllParser.hpp>
 #include <file/all/Defaults.hpp>
@@ -6,19 +6,19 @@
 #include <VecUtil.hpp>
 
 using namespace mpc::nvram;
+
 using namespace std;
 
-mpc::file::all::Defaults DefaultsParser::AllDefaultsFromFile(moduru::file::File& file)
+mpc::file::all::Defaults DefaultsParser::AllDefaultsFromFile(mpc::Mpc& mpc, moduru::file::File& file)
 {
 	vector<char> data;
 	file.getData(&data);
-	return mpc::file::all::Defaults(moduru::VecUtil::CopyOfRange(&data, 0, mpc::file::all::AllParser::DEFAULTS_LENGTH));
+	return mpc::file::all::Defaults(mpc, moduru::VecUtil::CopyOfRange(&data, 0, mpc::file::all::AllParser::DEFAULTS_LENGTH));
 }
 
-DefaultsParser::DefaultsParser(weak_ptr<mpc::ui::UserDefaults> ud)
+DefaultsParser::DefaultsParser(mpc::Mpc& mpc)
 {
-	auto defaults = mpc::file::all::Defaults(ud.lock().get());
-	saveBytes = defaults.getBytes();
+	saveBytes = mpc::file::all::Defaults(mpc).getBytes();
 }
 
 vector<char> DefaultsParser::getBytes()

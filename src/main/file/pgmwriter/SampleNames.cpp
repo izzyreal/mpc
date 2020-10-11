@@ -13,8 +13,8 @@ SampleNames::SampleNames(mpc::sampler::Program* program, weak_ptr<mpc::sampler::
 {
 	vector<int> list;
 	for (auto& nn : program->getNotesParameters()) {
-		if (nn->getSndNumber() != -1)
-			list.push_back(nn->getSndNumber());
+		if (nn->getSoundIndex() != -1)
+			list.push_back(nn->getSoundIndex());
 	}
 	//Collections::sort(list);
 	set<string> sampleNamesSet;

@@ -1,18 +1,25 @@
 #include "MpcMidiPorts.hpp"
 
-#include <midi/core/ShortMessage.hpp>
-
 using namespace mpc::audiomidi;
+using namespace ctoot::midi::core;
 using namespace std;
 
-MpcMidiPorts::MpcMidiPorts()
-{
-	receivers = vector<vector<ctoot::midi::core::ShortMessage>>(2);
-}
-
-vector<vector<ctoot::midi::core::ShortMessage>>& MpcMidiPorts::getReceivers() {
+vector<vector<ShortMessage>>& MpcMidiPorts::getReceivers() {
 	return receivers;
 }
 
-MpcMidiPorts::~MpcMidiPorts() {
+void MpcMidiPorts::panic()
+{	
+	ShortMessage tootMsg;
+	for (auto& r : receivers)
+	{
+		for (int ch = 0; ch < 16; ch++)
+		{
+			for (int note = 0; note < 128; note++)
+			{
+				tootMsg.setMessage(ShortMessage::NOTE_OFF, ch, note, 0);
+				r.push_back(tootMsg);
+			}
+		}
+	}
 }

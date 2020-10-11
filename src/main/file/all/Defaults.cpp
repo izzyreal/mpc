@@ -2,26 +2,36 @@
 
 #include <Util.hpp>
 #include <file/all/AllParser.hpp>
-#include <ui/UserDefaults.hpp>
 #include <sequencer/TimeSignature.hpp>
 
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/UserScreen.hpp>
+
 #include <file/ByteUtil.hpp>
+#include <lang/StrUtil.hpp>
 #include <VecUtil.hpp>
 
 using namespace mpc::file::all;
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens;
 using namespace moduru::file;
+using namespace moduru::lang;
 using namespace std;
 
-Defaults::Defaults(vector<char> loadBytes)
+Defaults::Defaults(mpc::Mpc& mpc, vector<char> loadBytes)
+	: mpc(mpc)
 {
 	parseNames(loadBytes);
+
 	auto tempoBytes = vector<char>{ loadBytes[TEMPO_BYTE1_OFFSET], loadBytes[TEMPO_BYTE2_OFFSET] };
 	tempo = ByteUtil::bytes2ushort(tempoBytes);
 	timeSigNum = loadBytes[TIMESIG_NUM_OFFSET];
 	timeSigDen = loadBytes[TIMESIG_DEN_OFFSET];
 	auto barCountBytes = vector<char>{ loadBytes[BAR_COUNT_BYTE1_OFFSET], loadBytes[BAR_COUNT_BYTE2_OFFSET] };
 	barCount = ByteUtil::bytes2ushort(barCountBytes);
-	for (int i = 0; i < 64; i++) {
+
+	for (int i = 0; i < 64; i++)
+	{
 		devices[i] = loadBytes[DEVICES_OFFSET + i];
 		busses[i] = loadBytes[BUSSES_OFFSET + i];
 		pgms[i] = loadBytes[PGMS_OFFSET + i];
@@ -30,34 +40,53 @@ Defaults::Defaults(vector<char> loadBytes)
 	}
 }
 
-Defaults::Defaults(mpc::ui::UserDefaults* ud)
+Defaults::Defaults(mpc::Mpc& mpc)
+	: mpc(mpc)
 {
 	saveBytes = vector<char>(AllParser::DEFAULTS_LENGTH);
-	setNames(ud);
+	
+	setNames();
+	
 	for (int i = 0; i < UNKNOWN1.size(); i++)
+	{
 		saveBytes[UNKNOWN1_OFFSET + i] = UNKNOWN1[i];
-	setTempo(ud);
-	setTimeSig(ud);
-	setBarCount(ud);
-	setLastTick(ud);
-	auto lastBar = ud->getLastBarIndex();
-	if (lastBar == 1) {
+	}
+
+	setTempo();
+	setTimeSig();
+	setBarCount();
+	setLastTick();
+
+	auto userScreen = mpc.screens->get<UserScreen>("user");
+	auto lastBar = userScreen->lastBar;
+	
+	if (lastBar == 1)
+	{
 		saveBytes[LAST_TICK_BYTE1_OFFSET] = 0;
 		saveBytes[LAST_TICK_BYTE2_OFFSET] = 0;
 	}
+
 	if (lastBar == 1)
+	{
 		lastBar = 0;
+	}
 
 	auto unknownNumberBytes = moduru::file::ByteUtil::uint2bytes((lastBar + 1) * 2000000);
-	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 4; j++) {
+
+	for (int i = 0; i < 4; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
 			saveBytes[UNKNOWN32_BIT_INT_OFFSET + j + (i * 4)] = unknownNumberBytes[j];
 		}
 	}
-	for (int i = 0; i < UNKNOWN2.size(); i++)
-		saveBytes[UNKNOWN2_OFFSET + i] = UNKNOWN2[i];
 
-	setTrackSettings(ud);
+	for (int i = 0; i < UNKNOWN2.size(); i++)
+	{
+		saveBytes[UNKNOWN2_OFFSET + i] = UNKNOWN2[i];
+	}
+
+	setTrackSettings();
 }
 
 const int Defaults::DEF_SEQ_NAME_OFFSET;
@@ -182,66 +211,86 @@ vector<int> Defaults::getTrVelos()
     return trVelos;
 }
 
-void Defaults::setTrackSettings(mpc::ui::UserDefaults* ud)
+void Defaults::setTrackSettings()
 {
-    for (int i = 0; i < 64; i++) {
-        saveBytes[DEVICES_OFFSET + i] = (ud->getDeviceNumber());
-        saveBytes[BUSSES_OFFSET + i] = (ud->getBus());
-        saveBytes[PGMS_OFFSET + i] = (ud->getPgm());
-        saveBytes[TR_VELOS_OFFSET + i] = (ud->getVeloRatio());
-        saveBytes[TR_STATUS_OFFSET + i] = (ud->getTrackStatus());
+	auto userScreen = mpc.screens->get<UserScreen>("user");
+    for (int i = 0; i < 64; i++)
+	{
+        saveBytes[DEVICES_OFFSET + i] = (userScreen->device);
+        saveBytes[BUSSES_OFFSET + i] = (userScreen->bus);
+        saveBytes[PGMS_OFFSET + i] = (userScreen->pgm);
+        saveBytes[TR_VELOS_OFFSET + i] = (userScreen->velo);
+        saveBytes[TR_STATUS_OFFSET + i] = (userScreen->getTrackStatus());
     }
 }
 
-void Defaults::setLastTick(mpc::ui::UserDefaults* ud)
+void Defaults::setLastTick()
 {
-	auto lastTick = (ud->getLastBarIndex() + 1) * 384;
+	auto userScreen = mpc.screens->get<UserScreen>("user");
+	auto lastTick = (userScreen->lastBar + 1) * 384;
+
 	auto b = moduru::file::ByteUtil::ushort2bytes(lastTick);
+	
 	saveBytes[LAST_TICK_BYTE1_OFFSET] = b[0];
 	saveBytes[LAST_TICK_BYTE2_OFFSET] = b[1];
 }
 
-void Defaults::setBarCount(mpc::ui::UserDefaults* ud)
+void Defaults::setBarCount()
 {
-	auto ba = moduru::file::ByteUtil::ushort2bytes(ud->getLastBarIndex() + 1);
+	auto userScreen = mpc.screens->get<UserScreen>("user");
+	auto ba = moduru::file::ByteUtil::ushort2bytes(userScreen->lastBar + 1);
 	saveBytes[BAR_COUNT_BYTE1_OFFSET] = ba[0];
 	saveBytes[BAR_COUNT_BYTE2_OFFSET] = ba[1];
 }
 
-void Defaults::setTimeSig(mpc::ui::UserDefaults* ud)
+void Defaults::setTimeSig()
 {
-	saveBytes[TIMESIG_NUM_OFFSET] = (ud->getTimeSig().getNumerator());
-	saveBytes[TIMESIG_DEN_OFFSET] = (ud->getTimeSig().getDenominator());
+	auto userScreen = mpc.screens->get<UserScreen>("user");
+	saveBytes[TIMESIG_NUM_OFFSET] = (userScreen->timeSig.getNumerator());
+	saveBytes[TIMESIG_DEN_OFFSET] = (userScreen->timeSig.getDenominator());
 }
 
-void Defaults::setNames(mpc::ui::UserDefaults* ud)
+void Defaults::setNames()
 {
-	auto const defSeqName = moduru::lang::StrUtil::padRight(ud->getSequenceName(), " ", AllParser::NAME_LENGTH);
+	auto userScreen = mpc.screens->get<UserScreen>("user");
+	auto const defSeqName =StrUtil::padRight(userScreen->sequenceName, " ", AllParser::NAME_LENGTH);
+	
 	for (int i = 0; i < 16; i++)
+	{
 		saveBytes[DEF_SEQ_NAME_OFFSET + i] = defSeqName[i];
+	}
 
 	string stringBuffer;
-	for (int i = 0; i < 33; i++) {
-		auto const defDevName = ud->getDeviceName(i);
-		stringBuffer = moduru::lang::StrUtil::padRight(defDevName, " ", AllParser::DEV_NAME_LENGTH);
+
+	for (int i = 0; i < 33; i++)
+	{
+		auto const defDevName = userScreen->getDeviceName(i);
+		stringBuffer =StrUtil::padRight(defDevName, " ", AllParser::DEV_NAME_LENGTH);
 		auto offset = DEV_NAMES_OFFSET + (i * AllParser::DEV_NAME_LENGTH);
+	
 		for (int j = offset; j < offset + AllParser::DEV_NAME_LENGTH; j++)
+		{
 			saveBytes[j] = stringBuffer[j - offset];
+		}
 
 	}
-	for (int i = 0; i < 64; i++) {
-		auto const defTrackName = ud->getTrackName(i);
-		stringBuffer = moduru::lang::StrUtil::padRight(defTrackName, " ", AllParser::NAME_LENGTH);
+	for (int i = 0; i < 64; i++)
+	{
+		auto const defTrackName = userScreen->getTrackName(i);
+		stringBuffer = StrUtil::padRight(defTrackName, " ", AllParser::NAME_LENGTH);
 		auto offset = TR_NAMES_OFFSET + (i * AllParser::NAME_LENGTH);
+	
 		for (int j = offset; j < offset + AllParser::NAME_LENGTH; j++)
+		{
 			saveBytes[j] = stringBuffer[j - offset];
-
+		}
 	}
 }
 
-void Defaults::setTempo(mpc::ui::UserDefaults* ud)
+void Defaults::setTempo()
 {
-	auto tempo = static_cast<int>(ud->getTempo().toDouble() * 10.0);
+	auto userScreen = mpc.screens->get<UserScreen>("user");
+	auto tempo = static_cast<int>(userScreen->tempo * 10.0);
 	auto tempoBytes = moduru::file::ByteUtil::ushort2bytes(tempo);
 	saveBytes[TEMPO_BYTE1_OFFSET] = tempoBytes[0];
 	saveBytes[TEMPO_BYTE2_OFFSET] = tempoBytes[1];

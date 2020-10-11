@@ -1,23 +1,22 @@
 #include "DataWheel.hpp"
 
 #include <Mpc.hpp>
-#include <controls/BaseControls.hpp>
+#include <lcdgui/ScreenComponent.hpp>
 #include <disk/AbstractDisk.hpp>
 
 using namespace mpc::hardware;
 using namespace std;
 
-DataWheel::DataWheel()
+DataWheel::DataWheel(mpc::Mpc& mpc)
+	: mpc(mpc)
 {
-	
 }
 
-void DataWheel::turn(int increment) {
-	if (!Mpc::instance().getDisk().lock()->isBusy()) {
-		Mpc::instance().getActiveControls()->turnWheel(increment);
-	}
+void DataWheel::turn(int increment)
+{
+	auto controls = mpc.getActiveControls().lock();
+	if (!mpc.getDisk().lock()->isBusy() && controls)
+		controls->turnWheel(increment);
+
 	notifyObservers(increment);
-}
-
-DataWheel::~DataWheel() {
 }

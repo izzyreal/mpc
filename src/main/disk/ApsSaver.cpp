@@ -4,42 +4,47 @@
 #include <disk/AbstractDisk.hpp>
 #include <disk/MpcFile.hpp>
 #include <file/aps/ApsParser.hpp>
-#include <ui/disk/DiskGui.hpp>
 #include <sampler/Sampler.hpp>
+
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/window/SaveAProgramScreen.hpp>
 
 using namespace mpc::disk;
 using namespace mpc::file::aps; 
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
-ApsSaver::ApsSaver(string apsFileName)
+ApsSaver::ApsSaver(mpc::Mpc& mpc, string apsFileName)
+	: mpc(mpc)
 {
-	
 	this->apsFileName = apsFileName;
-	auto lDisk = Mpc::instance().getDisk().lock();
+	auto disk = mpc.getDisk().lock();
 
-	if (lDisk->checkExists(apsFileName)) {
-		Mpc::instance().getLayeredScreen().lock()->openScreen("filealreadyexists");
-	}
-	else {
+	if (disk->checkExists(apsFileName))
+		mpc.getLayeredScreen().lock()->openScreen("file-exists");
+	else
 		saveAps();
-	}
 }
-
 
 void ApsSaver::saveAps()
 {
-	auto lDisk = Mpc::instance().getDisk().lock();
-	lDisk->setBusy(true);
-    auto file = lDisk->newFile(apsFileName);
-	ApsParser apsParser(apsFileName.substr(0, apsFileName.find(".")));
+	auto disk = mpc.getDisk().lock();
+	disk->setBusy(true);
+    auto file = disk->newFile(apsFileName);
+	ApsParser apsParser(mpc, apsFileName.substr(0, apsFileName.find(".")));
     auto bytes = apsParser.getBytes();
     file->setFileData(&bytes);
-	auto const saveWith = Mpc::instance().getUis().lock()->getDiskGui()->getPgmSave();
-	if (saveWith != 0) {
-		soundSaver = make_unique<mpc::disk::SoundSaver>(Mpc::instance().getSampler().lock()->getSounds(), saveWith == 1 ? false : true);
+
+	auto saveAProgramScreen = dynamic_pointer_cast<SaveAProgramScreen>(mpc.screens->getScreenComponent("save-a-program"));
+	
+	if (saveAProgramScreen->save != 0)
+	{
+		soundSaver = make_unique<mpc::disk::SoundSaver>(mpc, mpc.getSampler().lock()->getSounds(), saveAProgramScreen->save == 2);
 	}
-	else {
-		lDisk->setBusy(false);
-		Mpc::instance().getLayeredScreen().lock()->openScreen("save");
+	else
+	{
+		disk->setBusy(false);
+		mpc.getLayeredScreen().lock()->openScreen("save");
 	}
 }

@@ -1,7 +1,7 @@
 #include <disk/Stores.hpp>
 
 #include <disk/Store.hpp>
-#include <StartUp.hpp>
+#include <Paths.hpp>
 
 #include <file/FileSystem.hpp>
 
@@ -33,24 +33,13 @@ Stores::Stores()
 	}
 	*/
 
+	// The idea is to allow the user to map multiple directories to an MPC2000XL ATAPI or SCSI device -- an accessible disk volume, a store.
+	// At the moment we only implement a single default store.
 	string defaultStdStoreLabel = "MPC2000XL";
-	string defaultStdStorePath = mpc::StartUp::storesPath + defaultStdStoreLabel;
+	string defaultStdStorePath = mpc::Paths::storesPath() + defaultStdStoreLabel;
 	int size = 0;
 	size = 512 * 1024 * 1024;
 	stores.push_back(make_shared<Store>(this, defaultStdStorePath, size, defaultStdStoreLabel, false));
-}
-
-void Stores::printStore(Store* s)
-{
-	/*
-    npc(::java::lang::System::out())->println((u"path: "_j)->append(npc(s)->path)
-        ->append(u"   size: "_j)
-        ->append(npc(s)->totalSpace)
-        ->append(u"   label: "_j)
-        ->append(npc(s)->volumeLabel)
-        ->append(u"   raw: "_j)
-        ->append(npc(s)->raw)->toString());
-		*/
 }
 
 weak_ptr<Store> Stores::getStdStore(int store)
@@ -81,7 +70,4 @@ vector<weak_ptr<Store>> Stores::getStdStores()
 			res.push_back(s);
 	}
 	return res;
-}
-
-Stores::~Stores() {
 }

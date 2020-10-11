@@ -1,10 +1,5 @@
 #include <disk/MpcFile.hpp>
 
-//#include <disk/RawDisk.hpp>
-//#include <de/waldheinz/fs/FsDirectory.hpp>
-//#include <de/waldheinz/fs/fat/AkaiFatLfnDirectoryEntry.hpp>
-//#include <de/waldheinz/fs/fat/FatFile.hpp>
-
 #include <file/Directory.hpp>
 #include <lang/StrUtil.hpp>
 #include <file/FsNode.hpp>
@@ -209,7 +204,4 @@ vector<char> MpcFile::getBytes()
 
 bool MpcFile::isStd() {
 	return std;
-}
-
-MpcFile::~MpcFile() {
 }

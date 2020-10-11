@@ -11,11 +11,6 @@ namespace mpc {
 		class MpcSoundPlayerChannel;
 	}
 
-	namespace ui {
-		namespace sampler {
-			class SamplerGui;
-		}
-	}
 	namespace sampler {
 		class Sampler;
 		class Program;
@@ -34,7 +29,7 @@ namespace mpc {
 			void simplePad(int i);
 
 		private:
-			void generateNoteOff(int nn);
+			void generateNoteOff(int note);
 
 		public:
 			void overDub() override;
@@ -71,8 +66,7 @@ namespace mpc {
 			void undoSeq() override {};
 
 		public:
-			GlobalReleaseControls();
-			virtual ~GlobalReleaseControls();
+			GlobalReleaseControls(mpc::Mpc& mpc);
 
 		};
 

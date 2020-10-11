@@ -3,34 +3,30 @@
 #include <observer/Observable.hpp>
 
 namespace mpc {
+	class Mpc;
+}
 
-	
+namespace mpc::controls {
+	class BaseControls;
+}
 
-	namespace controls {
-		class BaseControls;
-	}
+namespace mpc::hardware {
+	class HwPad
+		: public moduru::observer::Observable
+	{
 
-	namespace hardware {
+	private:
+		mpc::Mpc& mpc;
+		int index;
+		std::weak_ptr<mpc::controls::BaseControls> controls;
 
-		class HwPad
-			: public moduru::observer::Observable
-		{
+	public:
+		int getIndex();
+		void push(int velo);
+		void release();
 
-		private:
-			
-			int index;
-			std::weak_ptr<mpc::controls::BaseControls> controls;
+	public:
+		HwPad(mpc::Mpc& mpc, int index);
 
-		public:
-			int getIndex();
-			void push(int velo);
-			void release();
-
-		public:
-			HwPad(int index);
-			~HwPad();
-
-		};
-
-	}
+	};
 }

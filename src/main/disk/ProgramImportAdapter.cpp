@@ -9,45 +9,60 @@
 #include <sampler/Sound.hpp>
 
 using namespace mpc::disk;
+using namespace mpc::sampler;
 using namespace std;
 
-ProgramImportAdapter::ProgramImportAdapter(weak_ptr<mpc::sampler::Sampler> sampler, weak_ptr<mpc::sampler::Program> inputProgram, vector<int> soundsDestIndex)
+ProgramImportAdapter::ProgramImportAdapter(
+	weak_ptr<Sampler> sampler,
+	weak_ptr<Program> inputProgram,
+	vector<int> soundsDestIndex,
+	vector<int> unavailableSoundIndices
+)
 {
 	this->sampler = sampler;
 	this->soundsDestIndex = soundsDestIndex;
 	result = inputProgram;
 	auto lResult = result.lock();
-	for (int i = 35; i <= 98; i++) {
-		processNoteParameters(dynamic_cast<mpc::sampler::NoteParameters*>(lResult->getNoteParameters(i)));
+
+	for (int i = 35; i <= 98; i++)
+	{
+		auto noteParameters = dynamic_cast<NoteParameters*>(lResult->getNoteParameters(i));
+		
+		if (find(begin(unavailableSoundIndices), end(unavailableSoundIndices), noteParameters->getSoundIndex()) != end(unavailableSoundIndices))
+			noteParameters->setSoundIndex(-1);
+
+		processNoteParameters(noteParameters);
 		initMixer(i);
 	}
 }
 
-void ProgramImportAdapter::processNoteParameters(mpc::sampler::NoteParameters* np)
+void ProgramImportAdapter::processNoteParameters(NoteParameters* np)
 {
-	auto const pgmSoundNumber = np->getSndNumber();
+	auto const pgmSoundNumber = np->getSoundIndex();
+	
 	if (pgmSoundNumber == -1)
 		return;
-	np->setSoundNumber(soundsDestIndex[pgmSoundNumber]);
+
+	if (soundsDestIndex[pgmSoundNumber] >= sampler.lock()->getSoundCount())
+		np->setSoundIndex(-1);
+	else
+		np->setSoundIndex(soundsDestIndex[pgmSoundNumber]);
 }
 
 void ProgramImportAdapter::initMixer(int note)
 {
 	auto lResult = result.lock();
-	auto sound = sampler.lock()->getSound(lResult->getNoteParameters(note)->getSndNumber()).lock();
-	if (!sound) return;
+	auto noteParameters = dynamic_cast<NoteParameters*>(lResult->getNoteParameters(note));
+	auto sound = sampler.lock()->getSound(noteParameters->getSoundIndex()).lock();
 
-	auto pad = lResult->getPad(lResult->getPadNumberFromNote(note));
-	auto mc = pad->getStereoMixerChannel().lock();
-	if (sound->isMono()) {
-		mc->setStereo(false);
-	}
-	else {
-		mc->setStereo(true);
-	}
+	if (!sound)
+		return;
+
+	auto mc = noteParameters->getStereoMixerChannel().lock();
+	mc->setStereo(!sound->isMono());
 }
 
-weak_ptr<mpc::sampler::Program> ProgramImportAdapter::get()
+weak_ptr<Program> ProgramImportAdapter::get()
 {
     return result;
 }

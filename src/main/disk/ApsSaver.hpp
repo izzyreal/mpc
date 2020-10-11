@@ -5,20 +5,23 @@
 #include <memory>
 #include <string>
 
+namespace mpc { class Mpc; }
+
 namespace mpc::disk {
 
 	class ApsSaver
 	{
 
 	private:
-		std::string apsFileName{ "" };
+		mpc::Mpc& mpc;
+		std::string apsFileName = "";
 		std::unique_ptr<mpc::disk::SoundSaver> soundSaver;
 
 	private:
 		void saveAps();
 
 	public:
-		ApsSaver(std::string apsFileName);
+		ApsSaver(mpc::Mpc& mpc, std::string apsFileName);
 
 	};
 }

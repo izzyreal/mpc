@@ -77,18 +77,22 @@ AllSysExEvent::AllSysExEvent(mpc::sequencer::Event* e)
 		saveBytes[DATA_OFFSET + MIXER_VALUE_OFFSET + 1] = DATA_TERMINATOR_ID;
 		saveBytes[MIX_TERMINATOR_ID_OFFSET] = CHUNK_TERMINATOR_ID;
 	}
-	else if (dynamic_cast< mpc::sequencer::SystemExclusiveEvent* >(e) != nullptr) {
+	else if (dynamic_cast< mpc::sequencer::SystemExclusiveEvent* >(e) != nullptr)
+	{
 		auto see = dynamic_cast< mpc::sequencer::SystemExclusiveEvent* >(e);
 		AllEvent::writeTick(saveBytes, see->getTick());
-		int dataSize = see->getBytes()->size();
+		int dataSize = see->getBytes().size();
 		int dataSegments = static_cast< int >(dataSize / 8.0);
 		saveBytes = vector<char>((dataSegments + 2) * Sequence::EVENT_SEG_LENGTH);
 		saveBytes[AllEvent::TRACK_OFFSET] = (char) (e->getTrack());
 		saveBytes[AllEvent::TRACK_OFFSET + ((dataSegments + 1) * Sequence::EVENT_SEG_LENGTH)] = (char) (e->getTrack());
 		saveBytes[CHUNK_HEADER_ID_OFFSET] = HEADER_ID;
 		saveBytes[BYTE_COUNT_OFFSET] = (char) (dataSize);
+		
 		for (int i = 0; i < dataSize; i++)
-			saveBytes[DATA_OFFSET + i] = (*see->getBytes())[i];
+		{
+			saveBytes[DATA_OFFSET + i] = see->getBytes()[i];
+		}
 
 		saveBytes[(int)(saveBytes.size()) - 4] = CHUNK_TERMINATOR_ID;
 	}

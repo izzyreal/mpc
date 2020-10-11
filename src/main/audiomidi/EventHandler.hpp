@@ -6,19 +6,7 @@
 #include <sequencer/MidiAdapter.hpp>
 
 #include <memory>
-
-namespace mpc::ui::sequencer::window {
-	class SequencerWindowGui;
-}
-
-namespace mpc::ui::midisync {
-	class MidiSyncGui;
-}
-
-namespace mpc::ui::vmpc {
-	class MidiGui;
-}
-
+#include <map>
 
 namespace mpc::audiomidi {
 
@@ -27,13 +15,10 @@ namespace mpc::audiomidi {
 	{
 
 	private:
-		std::weak_ptr<mpc::sequencer::Sequencer> sequencer{ };
-		std::weak_ptr<mpc::sampler::Sampler> sampler{};
-		ui::sequencer::window::SequencerWindowGui* swGui{ nullptr };
-		mpc::ui::midisync::MidiSyncGui* msGui{ nullptr };
-		ui::vmpc::MidiGui* midiGui{ nullptr };
-		
-		//mpc::sequencer::MidiAdapter midiAdapter;
+		mpc::Mpc& mpc;
+		std::weak_ptr<mpc::sequencer::Sequencer> sequencer;
+		std::weak_ptr<mpc::sampler::Sampler> sampler;
+		std::map<std::pair<int, int>, int> transposeCache;
 
 	public:
 		void handle(std::weak_ptr<mpc::sequencer::Event> event, mpc::sequencer::Track* track);
@@ -43,7 +28,7 @@ namespace mpc::audiomidi {
 		void midiOut(std::weak_ptr<mpc::sequencer::Event> event, mpc::sequencer::Track* track);
 
 	public:
-		EventHandler();
+		EventHandler(mpc::Mpc& mpc);
 
 	};
 }

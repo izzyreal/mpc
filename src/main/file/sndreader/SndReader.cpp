@@ -14,6 +14,11 @@ SndReader::SndReader(mpc::disk::MpcFile* soundFile)
 	sndFile = soundFile;
 	sndFileArray = sndFile->getBytes();
 	sndHeaderReader = make_shared<SndHeaderReader>(this);
+
+	if (!sndHeaderReader->hasValidId())
+	{
+		throw invalid_argument(soundFile->getName() + " does not have a valid SND ID.");
+	}
 }
 
 string SndReader::getName()

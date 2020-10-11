@@ -11,7 +11,7 @@ namespace mpc {
 				class FrameRate
 				{
 				private:
-					std::string name{ "" };
+					std::string name = "";
 					int ordinal{ -1 };
 
 				public:

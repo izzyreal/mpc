@@ -1,6 +1,6 @@
 #include <nvram/KnobPositions.hpp>
 
-#include <StartUp.hpp>
+#include <Paths.hpp>
 
 #include <file/File.hpp>
 #include <file/FileUtil.hpp>
@@ -18,10 +18,10 @@ using namespace std;
 
 KnobPositions::KnobPositions()
 {
-	auto file = make_shared<File>(mpc::StartUp::resPath + "knobpositions.vmp", nullptr);
+	auto file = make_shared<File>(mpc::Paths::resPath() + "knobpositions.vmp", nullptr);
 
-	if (!file->exists()) {
-
+	if (!file->exists())
+	{
 		file->create();
 
 		auto stream = FileUtil::ofstreamw(file->getPath(), ios::binary | ios::out);

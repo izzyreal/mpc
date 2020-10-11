@@ -2,7 +2,6 @@
 
 #include <Mpc.hpp>
 #include <controls/Controls.hpp>
-#include <ui/sequencer/window/SequencerWindowGui.hpp>
 #include <audiomidi/EventHandler.hpp>
 #include <sequencer/Event.hpp>
 #include <sequencer/Sequence.hpp>
@@ -19,14 +18,23 @@
 #include <sequencer/ChannelPressureEvent.hpp>
 #include <sequencer/MixerEvent.hpp>
 
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/PunchScreen.hpp>
+#include <lcdgui/screens/window/TimingCorrectScreen.hpp>
+
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui::screens::window;
+
 using namespace mpc::sequencer;
 using namespace std;
 
-Track::Track(mpc::sequencer::Sequence* parent, int i) 
+Track::Track(mpc::Mpc& mpc, mpc::sequencer::Sequence* parent, int i)
+	: mpc(mpc)
 {
 	this->parent = parent;
 	
-	sequencer = Mpc::instance().getSequencer();
+	sequencer = mpc.getSequencer();
 	trackIndex = i;
 	programChange = 0;
 	velocityRatio = 100;
@@ -43,7 +51,9 @@ void Track::move(int tick, int oldTick)
 		eventIndex = 0;
 		return;
 	}
+
 	sort(noteOffs.begin(), noteOffs.end(), tickCmp);
+	
 	for (auto& no : noteOffs) {
 		no->setTick((no->getTick() - oldTick) + tick);
 	}
@@ -85,32 +95,51 @@ void Track::setTrackIndex(int i)
     trackIndex = i;
 }
 
-int Track::getTrackIndex()
+int Track::getIndex()
 {
     return trackIndex;
 }
 
 weak_ptr<NoteEvent> Track::recordNoteOn()
 {
+	auto punchScreen = dynamic_pointer_cast<PunchScreen>(mpc.screens->getScreenComponent("punch"));
 	auto lSequencer = sequencer.lock();
+	
+	auto pos = lSequencer->getTickPosition();
+
+	if (lSequencer->isRecordingOrOverdubbing() && punchScreen->on)
+	{
+		auto mode = punchScreen->autoPunch;
+
+		if (mode == 0 && pos < punchScreen->time0)
+			return {};
+
+		if (mode == 1 && pos >= punchScreen->time1)
+			return {};
+
+		if (mode == 2 && (pos < punchScreen->time0 || pos >= punchScreen-> time1))
+			return {};
+	}
+
 	auto n = make_shared<NoteEvent>();
 	
-	n->setTick(lSequencer->getTickPosition());
+	n->setTick(pos);
 	
-	for (auto& noteOnEvent : queuedNoteOnEvents) {
-		if (noteOnEvent->getNote() == n->getNote()) {
-			auto noteOffEvent = new NoteEvent();
-			noteOffEvent->setNote(n->getNote());
-			noteOffEvent->setVelocity(0);
-			noteOffEvent->setTick(lSequencer->getTickPosition());
-			recordNoteOff(noteOffEvent);
+	for (auto& noteOnEvent : queuedNoteOnEvents)
+	{
+		if (noteOnEvent->getNote() == n->getNote())
+		{
+			NoteEvent noteOff;
+			noteOff.setNote(n->getNote());
+			noteOff.setVelocity(0);
+			noteOff.setTick(pos);
+			recordNoteOff(noteOff);
 			break;
 		}
 	}
 
-	if (n->getTick() >= lSequencer->getCurrentlyPlayingSequence().lock()->getLastTick()) {
+	if (n->getTick() >= lSequencer->getCurrentlyPlayingSequence().lock()->getLastTick())
 		n->setTick(0);
-	}
 	
 	queuedNoteOnEvents.push_back(n);
 	
@@ -122,61 +151,78 @@ void Track::flushNoteCache()
 	queuedNoteOnEvents.clear();
 }
 
-void Track::recordNoteOff(NoteEvent* n)
+void Track::recordNoteOff(NoteEvent& n)
 {
-	auto note = n->getNote();
+	auto note = n.getNote();
 	shared_ptr<NoteEvent> noteOn;
 	int eraseIndex = -1;
-	for (auto& noteEvent : queuedNoteOnEvents) {
+
+	for (auto& noteEvent : queuedNoteOnEvents)
+	{
 		eraseIndex++;
-		if (noteEvent->getNote() == note) {
+
+		if (noteEvent->getNote() == note)
+		{
 			noteOn.swap(noteEvent);
 			break;
 		}
 	}
 
-	if (!noteOn) {
+	if (!noteOn)
 		return;
-	}
 
-	if (eraseIndex != -1 && eraseIndex != queuedNoteOnEvents.size()) queuedNoteOnEvents.erase(queuedNoteOnEvents.begin() + eraseIndex);
+	if (eraseIndex != -1 && eraseIndex != queuedNoteOnEvents.size())
+		queuedNoteOnEvents.erase(queuedNoteOnEvents.begin() + eraseIndex);
 	
-	if (n->getTick() >= noteOn->getTick()) {
-		int candidate = n->getTick() - noteOn->getTick();
-		if (candidate < 1) candidate = 1;
+	if (n.getTick() >= noteOn->getTick())
+	{
+		int candidate = n.getTick() - noteOn->getTick();
+
+		if (candidate < 1)
+			candidate = 1;
+
 		noteOn->setDuration(candidate);
 	}
-	else {
+	else
+	{
 		noteOn->setDuration(sequencer.lock()->getLoopEnd() - 1 - noteOn->getTick());
 	}
+
 	addEventRealTime(noteOn);
 	eventIndex++;
 }
 
 void Track::setUsed(bool b)
 {
-    used = b;
-    if (used) {
-        setChanged();
+	if (!used && b && trackIndex < 64)
+		name = mpc.getSequencer().lock()->getDefaultTrackName(trackIndex);
+	
+	used = b;
+    
+	if (used)
         notifyObservers(string("tracknumbername"));
-    }
 }
 
 void Track::setOn(bool b)
 {
     on = b;
-    setChanged();
+    
     notifyObservers(string("trackon"));
 }
 
 void Track::addEventRealTime(shared_ptr<Event> event)
 {
-    if (events.size() == 0) setUsed(true);
+	if (events.size() == 0)
+		setUsed(true);
 
-	for (auto& temp : events) {
-		if (temp->getTick() == event->getTick()) {
-			if (typeid(temp) == typeid(event)) {
-				if (dynamic_pointer_cast<NoteEvent>(temp)->getNote() == dynamic_pointer_cast<NoteEvent>(event)->getNote()) {
+	for (auto& temp : events)
+	{
+		if (temp->getTick() == event->getTick())
+		{
+			if (typeid(temp) == typeid(event))
+			{
+				if (dynamic_pointer_cast<NoteEvent>(temp)->getNote() == dynamic_pointer_cast<NoteEvent>(event)->getNote())
+				{
 					dynamic_pointer_cast<NoteEvent>(temp)->setDuration(dynamic_pointer_cast<NoteEvent>(event)->getDuration());
 					dynamic_pointer_cast<NoteEvent>(temp)->setVelocity(dynamic_pointer_cast<NoteEvent>(event)->getVelocity());
 					return;
@@ -184,90 +230,122 @@ void Track::addEventRealTime(shared_ptr<Event> event)
 			}
 		}
 	}
-    tcValue = Mpc::instance().getUis().lock()->getSequencerWindowGui()->getNoteValue();
+	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(mpc.screens->getScreenComponent("timing-correct"));
+	tcValue = timingCorrectScreen->getNoteValue();
+	
 	auto lSequencer = sequencer.lock();
-	if (tcValue > 0 && dynamic_pointer_cast<NoteEvent>(event)) {
-		timingCorrect(0, parent->getLastBar(), dynamic_cast<NoteEvent*>(event.get()), lSequencer->getTickValues()[tcValue]);
+	
+	if (tcValue > 0 && dynamic_pointer_cast<NoteEvent>(event))
+	{
+		timingCorrect(0, parent->getLastBarIndex(), dynamic_cast<NoteEvent*>(event.get()), lSequencer->getTickValues()[tcValue]);
 	}
 	events.push_back(std::move(event));
     sortEvents();
 }
 
-void Track::removeEvent(weak_ptr<Event> event) {
-	for (int i = 0; i < events.size(); i++) {
-		if (events[i] == event.lock()) {
+void Track::removeEvent(weak_ptr<Event> event)
+{
+	for (int i = 0; i < events.size(); i++)
+	{
+		if (events[i] == event.lock())
 			events.erase(events.begin() + i);
-		}
 	}
-	setChanged();
-	notifyObservers(string("resetstepeditor"));
+	
+	notifyObservers(string("step-editor"));
 }
 
 bool Track::adjustDurLastEvent(int newDur)
 {
 	auto lLastAdded = lastAdded.lock();
-	if (!lLastAdded) return false;
+
+	if (!lLastAdded)
+		return false;
+
 	lLastAdded->setDuration(newDur);
 	lastAdded.reset();
-	setChanged();
-	notifyObservers(string("resetstepeditor"));
+	
+	notifyObservers(string("adjust-duration"));
 	return true;
 }
 
-weak_ptr<NoteEvent> Track::addNoteEvent(int tick, int note) {
+weak_ptr<NoteEvent> Track::addNoteEvent(int tick, int note)
+{
 	auto candidate = getNoteEvent(tick, note);
-	if (candidate.lock()) {
+
+	if (candidate.lock())
+	{
 		candidate.lock()->setDuration(1);
 		lastAdded = candidate;
 		return candidate;
 	}
+	
 	auto res = dynamic_pointer_cast<NoteEvent>(addEvent(tick, "note").lock());
 	res->setNote(note);
+
+	notifyObservers(string("step-editor"));
+
 	return res;
 }
 
-weak_ptr<Event> Track::addEvent(int tick, string type) {
+weak_ptr<Event> Track::addEvent(int tick, string type)
+{
 	shared_ptr<Event> res;
-	if (type.compare("note") == 0) {
+
+	if (type.compare("note") == 0)
+	{
 		res = make_shared<NoteEvent>();
 		lastAdded = dynamic_pointer_cast<NoteEvent>(res);
 	}
-	else if (type.compare("tempochange") == 0) {
+	else if (type.compare("tempo-change") == 0)
+	{
 		res = make_shared<TempoChangeEvent>(parent);
 	}
-	else if (type.compare("pitchbend") == 0) {
+	else if (type.compare("pitchbend") == 0)
+	{
 		res = make_shared<PitchBendEvent>();
 	}
-	else if (type.compare("controlchange") == 0) {
+	else if (type.compare("controlchange") == 0)
+	{
 		res = make_shared<ControlChangeEvent>();
 	}
-	else if (type.compare("programchange") == 0) {
+	else if (type.compare("programchange") == 0)
+	{
 		res = make_shared<ProgramChangeEvent>();
 	}
-	else if (type.compare("channelpressure") == 0) {
+	else if (type.compare("channelpressure") == 0)
+	{
 		res = make_shared<ChannelPressureEvent>();
 	}
-	else if (type.compare("polypressure") == 0) {
+	else if (type.compare("polypressure") == 0)
+	{
 		res = make_shared<PolyPressureEvent>();
 	}
-	else if (type.compare("systemexclusive") == 0) {
+	else if (type.compare("systemexclusive") == 0)
+	{
 		res = make_shared<SystemExclusiveEvent>();
 	}
-	else if (type.compare("mixer") == 0) {
+	else if (type.compare("mixer") == 0)
+	{
 		res = make_shared<MixerEvent>();
 	}
-	if (events.size() == 0) setUsed(true);
+	
+	if (events.size() == 0)
+	{
+		setUsed(true);
+	}
+
 	res->setTick(tick);
 	events.push_back(res);
 	sortEvents();
-	setChanged();
-	notifyObservers(string("resetstepeditor"));
-	setChanged();
+	
+	notifyObservers(string("step-editor"));
+	
 	notifyObservers(string(type) + "added");
 	return res;
 }
 
-weak_ptr<Event> Track::cloneEvent(weak_ptr<Event> src) {
+weak_ptr<Event> Track::cloneEvent(weak_ptr<Event> src)
+{
 
 	auto seq = sequencer.lock()->getActiveSequence().lock().get();
 
@@ -277,39 +355,45 @@ weak_ptr<Event> Track::cloneEvent(weak_ptr<Event> src) {
 	auto ne = dynamic_pointer_cast<NoteEvent>(src.lock());
 	auto me = dynamic_pointer_cast<MixerEvent>(src.lock());
 
-	if (ne) {
+	if (ne)
+	{
 		res = make_shared<NoteEvent>();
 		ne->CopyValuesTo(res);
-		//lastAdded = dynamic_pointer_cast<NoteEvent>(res);
 	}
-	else if (tce) {
+	else if (tce)
+	{
 		res = make_shared<TempoChangeEvent>(seq);
 		tce->CopyValuesTo(res);
 	}
-	else if (mce) {
+	else if (mce)
+	{
 		res = make_shared<MidiClockEvent>(0);
 		mce->CopyValuesTo(res);
 	}
-	else if (me) {
+	else if (me)
+	{
 		res = make_shared<MixerEvent>();
 		me->CopyValuesTo(res);
 	}
 
-	if (!used) setUsed(true);
+	if (!used)
+		setUsed(true);
+
+	auto result = weak_ptr<Event>(res);
 
 	events.push_back(res);
 
 	sortEvents();
-	setChanged();
-	notifyObservers(string("resetstepeditor"));
-	return events.back();
+
+	notifyObservers(string("step-editor"));
+	return result;
 }
 
 void Track::removeEvent(int i)
 {
     events.erase(events.begin() + i);
-	setChanged();
-	notifyObservers(string("resetstepeditor"));
+	
+	notifyObservers(string("step-editor"));
 }
 
 void Track::removeEvents() {
@@ -318,14 +402,13 @@ void Track::removeEvents() {
 
 void Track::setVelocityRatio(int i)
 {
-	if (i < 1) {
+	if (i < 1)
 		i = 1;
-	}
-	else if (i > 200) {
+	else if (i > 200)
 		i = 200;
-	}
+
     velocityRatio = i;
-    setChanged();
+    
     notifyObservers(string("velocityratio"));
 }
 
@@ -336,9 +419,11 @@ int Track::getVelocityRatio()
 
 void Track::setProgramChange(int i)
 {
-    if (i < 0 || i > 128) return;
+	if (i < 0 || i > 128)
+		return;
+
     programChange = i;
-    setChanged();
+    
     notifyObservers(string("programchange"));
 }
 
@@ -349,24 +434,28 @@ int Track::getProgramChange()
 
 void Track::setBusNumber(int i)
 {
-    if (i < 0 || i > 4) return;
+	if (i < 0 || i > 4)
+		return;
+
     busNumber = i;
-    setChanged();
-    notifyObservers(string("tracktype"));
+    
+    notifyObservers(string("bus"));
 }
 
-int Track::getBusNumber()
+int Track::getBus()
 {
     return busNumber;
 }
 
 void Track::setDeviceNumber(int i)
 {
-    if (i < 0 || i > 32) return;
+	if (i < 0 || i > 32)
+		return;
+
     device = i;
-    setChanged();
+    
     notifyObservers(string("device"));
-    setChanged();
+    
     notifyObservers(string("devicename"));
 }
 
@@ -383,75 +472,103 @@ weak_ptr<Event> Track::getEvent(int i)
 void Track::setName(string s)
 {
     name = s;
-    setChanged();
+    
     notifyObservers(string("tracknumbername"));
 }
 
 string Track::getName()
 {
-	if (!used) return "(Unused)";
+	if (!used)
+		return "(Unused)";
+
     return name;
 }
 
 vector<weak_ptr<Event>> Track::getEvents()
 {
 	auto res = vector<weak_ptr<Event>>();
+	
 	for (auto& e : events)
 		res.push_back(e);
+
     return res;
 }
 
 int Track::getNextTick()
 {
-	if (eventIndex + 1 > events.size() && noteOffs.size() == 0) {
+	if (eventIndex + 1 > events.size() && noteOffs.size() == 0)
 		return MAX_TICK;
-	}
 	
 	eventAvailable = eventIndex < events.size();
 	sort(noteOffs.begin(), noteOffs.end(), tickCmp);
 	
-	if (noteOffs.size() != 0) {
-		for (auto& no : noteOffs) {
-			if (eventAvailable) {
-				if (no->getTick() < events[eventIndex]->getTick()) {
+	if (noteOffs.size() != 0)
+	{
+		for (auto& no : noteOffs)
+		{
+			if (eventAvailable)
+			{
+				if (no->getTick() < events[eventIndex]->getTick())
 					return no->getTick();
-				}
 			}
-			else {
+			else
+			{
 				return no->getTick();
 			}
 		}
 	}
 
-	if (eventAvailable) {
+	if (eventAvailable)
 		return events[eventIndex]->getTick();
-	}
 	
 	return MAX_TICK;
 }
 
 void Track::playNext()
 {
-	if (eventIndex + 1 > events.size() && noteOffs.size() == 0) {
+	if (eventIndex + 1 > events.size() && noteOffs.size() == 0)
 		return;
-	}
 	
 	auto lSequencer = sequencer.lock();
 	multi = lSequencer->isRecordingModeMulti();
 	delete_ = lSequencer->isRecording() && (trackIndex == lSequencer->getActiveTrackIndex() || multi) && (trackIndex < 64);
 
-	if (lSequencer->isOverDubbing() && Mpc::instance().getControls().lock()->isErasePressed() && (trackIndex == lSequencer->getActiveTrackIndex() || multi) && trackIndex < 64) {
+	if (lSequencer->isOverDubbing() &&
+		mpc.getControls().lock()->isErasePressed() &&
+		(trackIndex == lSequencer->getActiveTrackIndex() || multi) &&
+		trackIndex < 64)
+	{
 		delete_ = true;
+	}
+	
+	auto punchScreen = dynamic_pointer_cast<PunchScreen>(mpc.screens->getScreenComponent("punch"));
+
+	if (lSequencer->isRecording() && punchScreen->on && trackIndex < 64)
+	{
+		auto pos = lSequencer->getTickPosition();
+		
+		delete_ = false;
+
+		if (punchScreen->autoPunch == 0 && pos >= punchScreen->time0)
+			delete_ = true;
+
+		if (punchScreen->autoPunch == 1 && pos < punchScreen->time1)
+			delete_ = true;
+
+		if (punchScreen->autoPunch == 2 && pos >= punchScreen->time0 && pos < punchScreen->time1)
+			delete_ = true;
 	}
 
 	int counter = 0;
 	sort(noteOffs.begin(), noteOffs.end(), tickCmp);
 	
-	for (auto& no : noteOffs) {	
-		if (eventIndex + 1 > events.size() || no->getTick() < events[eventIndex]->getTick()) {
-			if (!delete_) {
-				Mpc::instance().getEventHandler().lock()->handle(no, this);
-			}
+	for (auto& no : noteOffs)
+	{	
+		if (eventIndex + 1 > events.size() || no->getTick() < events[eventIndex]->getTick())
+		{
+			if (!delete_)
+				mpc.getEventHandler().lock()->handle(no, this);
+
 			noteOffs.erase(noteOffs.begin() + counter);
 			return;
 		}
@@ -461,25 +578,32 @@ void Track::playNext()
 	event = events[eventIndex];
 	auto lEvent = event.lock();
 	auto note = dynamic_pointer_cast<NoteEvent>(lEvent);
-	if (note) {
+
+	if (note)
 		note->setTrack(trackIndex);
-	}
-	if (delete_) {
+	
+	if (delete_)
+	{
 		events.erase(events.begin() + eventIndex);
 		return;
 	}
 
-	Mpc::instance().getEventHandler().lock()->handle(lEvent, this);
+	mpc.getEventHandler().lock()->handle(lEvent, this);
 
 	auto ne = dynamic_pointer_cast<NoteEvent>(lEvent);
-	if (ne) {
-		if (ne->getVelocity() > 0 && ne->getDuration() >= 0) {
+
+	if (ne)
+	{
+		if (ne->getVelocity() > 0 && ne->getDuration() >= 0)
+		{
 			auto noteOff = ne->getNoteOff().lock();
 			noteOff->setDuration(0);
 			noteOff->setNote(ne->getNote());
 			noteOff->setTrack(ne->getTrack());
 			auto dur = ne->getDuration();
-			if (dur < 1) dur = 1;
+
+			if (dur < 1)
+				dur = 1;
 
 			noteOff->setTick(ne->getTick() + dur);
 			noteOff->setVelocity(0);
@@ -487,21 +611,18 @@ void Track::playNext()
 		}
 	}
 	
-	if (!(ne && ne->getVelocity() == 0)) {
+	if (!(ne && ne->getVelocity() == 0))
 		eventIndex++;
-	}
 }
 
-bool Track::tickCmp(weak_ptr<Event> a, weak_ptr<Event> b) {
+bool Track::tickCmp(weak_ptr<Event> a, weak_ptr<Event> b)
+{
 	return a.lock()->getTick() < b.lock()->getTick();
 }
 
-bool Track::noteCmp(weak_ptr<NoteEvent> a, weak_ptr<NoteEvent> b) {
-	return a.lock()->getNote() < b.lock()->getNote();
-}
-
-void Track::off(bool stop)
+bool Track::noteCmp(weak_ptr<NoteEvent> a, weak_ptr<NoteEvent> b)
 {
+	return a.lock()->getNote() < b.lock()->getNote();
 }
 
 bool Track::isOn()
@@ -516,24 +637,30 @@ bool Track::isUsed()
 
 void Track::setEventIndex(int i)
 {
-    if(i < 0 || i + 1 > events.size()) return;
+	if (i < 0 || i + 1 > events.size())
+		return;
+
     eventIndex = i;
 }
 
 vector<weak_ptr<Event>> Track::getEventRange(int startTick, int endTick)
 {
-	if (tempEvents.size() > 0) tempEvents.clear();
-	for (auto& e : events) {
+	if (tempEvents.size() > 0)
+		tempEvents.clear();
+
+	for (auto& e : events)
+	{
 		if (e->getTick() >= startTick && e->getTick() <= endTick)
 			tempEvents.push_back(e);
 	}
+	
 	return tempEvents;
 }
 
 void Track::correctTimeRange(int startPos, int endPos, int stepLength)
 {
 	if (sequencer.expired())
-		sequencer = Mpc::instance().getSequencer();
+		sequencer = mpc.getSequencer();
 
 	auto lSequencer = sequencer.lock();
 
@@ -541,30 +668,40 @@ void Track::correctTimeRange(int startPos, int endPos, int stepLength)
 	int accumBarLengths = 0;
 	auto fromBar = 0;
 	auto toBar = 0;
-	for (int i = 0; i < 999; i++) {
+	
+	for (int i = 0; i < 999; i++)
+	{
 		accumBarLengths += (*s->getBarLengths())[i];
-		if (accumBarLengths >= startPos) {
+	
+		if (accumBarLengths >= startPos)
+		{
 			fromBar = i;
 			break;
 		}
 	}
-	for (int i = 0; i < 999; i++) {
+	
+	for (int i = 0; i < 999; i++)
+	{
 		accumBarLengths += (*s->getBarLengths())[i];
-		if (accumBarLengths > endPos) {
+	
+		if (accumBarLengths > endPos)
+		{
 			toBar = i;
 			break;
 		}
 	}
 
-	for (auto& event : events) {
+	for (auto& event : events)
+	{
 		auto ne = dynamic_pointer_cast<NoteEvent>(event);
-		if (ne) {
+		
+		if (ne)
+		{
 			if (event->getTick() >= endPos)
 				break;
 
 			if (event->getTick() >= startPos && event->getTick() < endPos)
 				timingCorrect(fromBar, toBar, ne.get(), stepLength);
-
 		}
 	}
 
@@ -575,6 +712,7 @@ void Track::correctTimeRange(int startPos, int endPos, int stepLength)
 void Track::timingCorrect(int fromBar, int toBar, NoteEvent* noteEvent, int stepLength)
 {
 	auto newTick = timingCorrectTick(fromBar, toBar, noteEvent->getTick(), stepLength);
+
 	if (newTick != noteEvent->getTick())
 		noteEvent->setTick(newTick);
 }
@@ -588,7 +726,9 @@ int Track::timingCorrectTick(int fromBar, int toBar, int tick, int stepLength)
 	auto s = sequencer.lock()->getActiveSequence().lock();
 	int segmentStart = 0;
 	int segmentEnd = 0;
-	for (int i = 0; i < 999; i++) {
+
+	for (int i = 0; i < 999; i++)
+	{
 		if (i < fromBar)
 			segmentStart += (*s->getBarLengths())[i];
 
@@ -599,35 +739,50 @@ int Track::timingCorrectTick(int fromBar, int toBar, int tick, int stepLength)
 			break;
 		}
 	}
-	for (int i = 0; i < 999; i++) {
+
+	for (int i = 0; i < 999; i++)
+	{
 		accumBarLengths += (*s->getBarLengths())[i];
-		if (tick < accumBarLengths && tick >= previousAccumBarLengths) {
+	
+		if (tick < accumBarLengths && tick >= previousAccumBarLengths)
+		{
 			barNumber = i;
 			break;
 		}
+		
 		previousAccumBarLengths = accumBarLengths;
 	}
-	for (int i = 1; i < 1000; i++) {
-		if ((*s->getBarLengths())[barNumber] - (i * stepLength) < 0) {
+	
+	for (int i = 1; i < 1000; i++)
+	{
+		if ((*s->getBarLengths())[barNumber] - (i * stepLength) < 0)
+		{
 			numberOfSteps = i - 1;
 			break;
 		}
 	}
-	int currentBarStart = 0;
-	for (int i = 0; i < barNumber; i++) {
-		currentBarStart += (*s->getBarLengths())[i];
-	}
 
-	for (int i = 0; i <= numberOfSteps; i++) {
+	int currentBarStart = 0;
+	
+	for (int i = 0; i < barNumber; i++)
+		currentBarStart += (*s->getBarLengths())[i];
+
+	for (int i = 0; i <= numberOfSteps; i++)
+	{
 		int stepStart = ((i - 1) * stepLength) + (stepLength / 2);
 		int stepEnd = (i * stepLength) + (stepLength / 2);
-		if (tick - currentBarStart >= stepStart && tick - currentBarStart <= stepEnd) {
+
+		if (tick - currentBarStart >= stepStart && tick - currentBarStart <= stepEnd)
+		{
 			tick = (i * stepLength) + currentBarStart;
+		
 			if (tick >= segmentEnd)
 				tick = segmentStart;
+			
 			break;
 		}
 	}
+
 	return tick;
 }
 
@@ -637,16 +792,22 @@ void Track::removeDoubles()
 	vector<int> deleteIndexList;
 	vector<int> notesAtTick;
 	int lastTick = -100;
-	for (auto& e : events) {
+
+	for (auto& e : events)
+	{
 		auto ne = dynamic_pointer_cast<NoteEvent>(e);
-		if (ne) {
-			if (lastTick != e->getTick()) {
+	
+		if (ne)
+		{
+			if (lastTick != e->getTick())
 				notesAtTick.clear();
-			}
 
 			bool contains = false;
-			for (auto& n : notesAtTick) {
-				if (n == ne->getNote()) {
+
+			for (auto& n : notesAtTick)
+			{
+				if (n == ne->getNote())
+				{
 					contains = true;
 					break;
 				}
@@ -658,14 +819,16 @@ void Track::removeDoubles()
 			else {
 				deleteIndexList.push_back(eventCounter);
 			}
+
 			lastTick = e->getTick();
 		}
 		eventCounter++;
 	}
+
 	std::reverse(deleteIndexList.begin(), deleteIndexList.end());
-	for (auto& i : deleteIndexList) {
+	
+	for (auto& i : deleteIndexList)
 		events.erase(events.begin() + i);
-	}
 }
 
 void Track::sortEvents()
@@ -676,29 +839,35 @@ void Track::sortEvents()
 vector<weak_ptr<NoteEvent>> Track::getNoteEvents()
 {
 	vector<weak_ptr<NoteEvent>> noteEvents;
-	for (auto& e : events) {
+
+	for (auto& e : events)
+	{
 		auto ne = dynamic_pointer_cast<NoteEvent>(e);
-		if (ne) noteEvents.push_back(ne);
+		
+		if (ne)
+			noteEvents.push_back(ne);
 	}
+	
 	return noteEvents;
 }
 
 vector<weak_ptr<NoteEvent>> Track::getNoteEventsAtTick(int tick)
 {
 	vector<weak_ptr<NoteEvent>> noteEvents;
-	for (auto& ne : getNoteEvents()) {
-		if (ne.lock()->getTick() == tick) {
+
+	for (auto& ne : getNoteEvents())
+	{
+		if (ne.lock()->getTick() == tick)
 			noteEvents.push_back(ne);
-		}
 	}
+
 	return noteEvents;
 }
 
 void Track::sortEventsByNotePerTick()
 {
-	for (auto& ne : getNoteEvents()) {
+	for (auto& ne : getNoteEvents())
 		sortEventsOfTickByNote(getNoteEventsAtTick(ne.lock()->getTick()));
-	}
 }
 
 void Track::sortEventsOfTickByNote(vector<weak_ptr<NoteEvent>> noteEvents)
@@ -713,25 +882,34 @@ void Track::swing(int noteValue, int percentage, vector<int> noteRange)
 
 void Track::swing(vector<weak_ptr<Event>> eventsToSwing, int noteValue, int percentage, vector<int> noteRange)
 {
-	if (noteValue != 1 && noteValue != 3) return;
+	if (noteValue != 1 && noteValue != 3)
+		return;
 
-	for (auto& e : eventsToSwing) {
+	for (auto& e : eventsToSwing)
+	{
 		auto ne = dynamic_pointer_cast<NoteEvent>(e.lock());
-		if (ne) {
-			if (ne->getNote() >= noteRange[0] && ne->getNote() <= noteRange[1]) {
+	
+		if (ne)
+		{
+			if (ne->getNote() >= noteRange[0] && ne->getNote() <= noteRange[1])
 				ne->setTick(swingTick(ne->getTick(), noteValue, percentage));
-			}
 		}
 	}
 }
 
-int Track::swingTick(int tick, int noteValue, int percentage) {
-	if (noteValue != 1 && noteValue != 3) return tick;
+int Track::swingTick(int tick, int noteValue, int percentage)
+{
+	if (noteValue != 1 && noteValue != 3)
+		return tick;
+	
 	auto base = 48;
-	if (noteValue == 3) base = 24;
-	if ((tick + base) % (base * 2) == 0) {
+	
+	if (noteValue == 3)
+		base = 24;
+	
+	if ((tick + base) % (base * 2) == 0)
 		tick += ((percentage - 50) * (4.0 / 100.0) * (base / 2.0));
-	}
+
 	return tick;
 }
 
@@ -742,16 +920,20 @@ void Track::shiftTiming(bool later, int amount, int lastTick)
 
 void Track::shiftTiming(vector<weak_ptr<Event>> eventsToShift, bool later, int amount, int lastTick)
 {
-	if (!later) amount *= -1;
-	for (auto& event : eventsToShift) {
+	if (!later)
+		amount *= -1;
+	
+	for (auto& event : eventsToShift)
+	{
 		auto e = event.lock();
+	
 		e->setTick(e->getTick() + amount);
-		if (e->getTick() < 0) {
+
+		if (e->getTick() < 0)
 			e->setTick(0);
-		}
-		if (e->getTick() > lastTick) {
+
+		if (e->getTick() > lastTick)
 			e->setTick(lastTick);
-		}
 	}
 }
 
@@ -763,7 +945,4 @@ int Track::getEventIndex()
 string Track::getActualName()
 {
     return name;
-}
-
-Track::~Track() {
 }

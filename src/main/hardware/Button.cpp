@@ -2,6 +2,8 @@
 
 #include <Mpc.hpp>
 
+#include <lcdgui/ScreenComponent.hpp>
+
 #include <controls/BaseControls.hpp>
 #include <controls/GlobalReleaseControls.hpp>
 #include <disk/AbstractDisk.hpp>
@@ -9,9 +11,9 @@
 using namespace mpc::hardware;
 using namespace std;
 
-Button::Button(string label)
+Button::Button(mpc::Mpc& mpc, string label)
+	: mpc(mpc)
 {
-	
 	this->label = label;
 }
 
@@ -19,153 +21,161 @@ string Button::getLabel() {
 	return label;
 }
 
-void Button::push() {
-	if (Mpc::instance().getDisk().lock()->isBusy()) return;
-	auto c = Mpc::instance().getActiveControls();
-	if (!c) return;
+void Button::push()
+{
+	auto ls = mpc.getLayeredScreen().lock();
+
+	if (mpc.getDisk().lock()->isBusy() && ls->getCurrentScreenName().compare("cant-find-file") != 0)
+		return;
+
+	auto controls = ls->findScreenComponent().lock();
+	
+	if (!controls)
+		return;
+	
 	if (label.compare("left") == 0) {
-		c->left();
+		controls->left();
 	}
 	else if (label.compare("right") == 0) {
-		c->right();
+		controls->right();
 	}
 	else if (label.compare("up") == 0) {
-		c->up();
+		controls->up();
 	}
 	else if (label.compare("down") == 0) {
-		c->down();
+		controls->down();
 	}
 	else if (label.compare("rec") == 0) {
-		c->rec();
+		controls->rec();
 	}
 	else if (label.compare("overdub") == 0) {
-		c->overDub();
+		controls->overDub();
 	}
 	else if (label.compare("stop") == 0) {
-		c->stop();
+		controls->stop();
 	}
 	else if (label.compare("play") == 0) {
-		c->play();
+		controls->play();
 	}
-	else if (label.compare("playstart") == 0) {
-		c->playStart();
+	else if (label.compare("play-start") == 0) {
+		controls->playStart();
 	}
-	else if (label.compare("mainscreen") == 0) {
-		c->mainScreen();
+	else if (label.compare("main-screen") == 0) {
+		controls->mainScreen();
 	}
-	else if (label.compare("openwindow") == 0) {
-		c->openWindow();
+	else if (label.compare("open-window") == 0) {
+		controls->openWindow();
 	}
-	else if (label.compare("prevstepevent") == 0) {
-		c->prevStepEvent();
+	else if (label.compare("prev-step-event") == 0) {
+		controls->prevStepEvent();
 	}
-	else if (label.compare("nextstepevent") == 0) {
-		c->nextStepEvent();
+	else if (label.compare("next-step-event") == 0) {
+		controls->nextStepEvent();
 	}
-	else if (label.compare("goto") == 0) {
-		c->goTo();
+	else if (label.compare("go-to") == 0) {
+		controls->goTo();
 	}
-	else if (label.compare("prevbarstart") == 0) {
-		c->prevBarStart();
+	else if (label.compare("prev-bar-start") == 0) {
+		controls->prevBarStart();
 	}
-	else if (label.compare("nextbarend") == 0) {
-		c->nextBarEnd();
+	else if (label.compare("next-bar-end") == 0) {
+		controls->nextBarEnd();
 	}
 	else if (label.compare("tap") == 0) {
-		c->tap();
+		controls->tap();
 	}
-	else if (label.compare("nextseq") == 0) {
-		c->nextSeq();
+	else if (label.compare("next-seq") == 0) {
+		controls->nextSeq();
 	}
-	else if (label.compare("trackmute") == 0) {
-		c->trackMute();
+	else if (label.compare("track-mute") == 0) {
+		controls->trackMute();
 	}
-	else if (label.compare("fulllevel") == 0) {
-		c->fullLevel();
+	else if (label.compare("full-level") == 0) {
+		controls->fullLevel();
 	}
-	else if (label.compare("sixteenlevels") == 0) {
-		c->sixteenLevels();
+	else if (label.compare("sixteen-levels") == 0) {
+		controls->sixteenLevels();
 	}
 	else if (label.compare("f1") == 0) {
-		c->function(0);
+		controls->function(0);
 	}
 	else if (label.compare("f2") == 0) {
-		c->function(1);
+		controls->function(1);
 	}
 	else if (label.compare("f3") == 0) {
-		c->function(2);
+		controls->function(2);
 	}
 	else if (label.compare("f4") == 0) {
-		c->function(3);
+		controls->function(3);
 	}
 	else if (label.compare("f5") == 0) {
-		c->function(4);
+		controls->function(4);
 	}
 	else if (label.compare("f6") == 0) {
-		c->function(5);
+		controls->function(5);
 	}
 	else if (label.compare("shift") == 0) {
-		c->shift();
+		controls->shift();
 	}
 	else if (label.compare("enter") == 0) {
-		c->pressEnter();
+		controls->pressEnter();
 	}
-	else if (label.compare("undoseq") == 0) {
-		c->undoSeq();
+	else if (label.compare("undo-seq") == 0) {
+		controls->undoSeq();
 	}
 	else if (label.compare("erase") == 0) {
-		c->erase();
+		controls->erase();
 	}
 	else if (label.compare("after") == 0) {
-		c->after();
+		controls->after();
 	}
-	else if (label.compare("banka") == 0) {
-		c->bank(0);
+	else if (label.compare("bank-a") == 0) {
+		controls->bank(0);
 	}
-	else if (label.compare("bankb") == 0) {
-		c->bank(1);
+	else if (label.compare("bank-b") == 0) {
+		controls->bank(1);
 	}
-	else if (label.compare("bankc") == 0) {
-		c->bank(2);
+	else if (label.compare("bank-c") == 0) {
+		controls->bank(2);
 	}
-	else if (label.compare("bankd") == 0) {
-		c->bank(3);
+	else if (label.compare("bank-d") == 0) {
+		controls->bank(3);
 	}
 	else if (label.compare("0") == 0) {
-		c->numpad(0);
+		controls->numpad(0);
 	}
 	else if (label.compare("1") == 0) {
-		c->numpad(1);
+		controls->numpad(1);
 	}
 	else if (label.compare("2") == 0) {
-		c->numpad(2);
+		controls->numpad(2);
 	}
 	else if (label.compare("3") == 0) {
-		c->numpad(3);
+		controls->numpad(3);
 	}
 	else if (label.compare("4") == 0) {
-		c->numpad(4);
+		controls->numpad(4);
 	}
 	else if (label.compare("5") == 0) {
-		c->numpad(5);
+		controls->numpad(5);
 	}
 	else if (label.compare("6") == 0) {
-		c->numpad(6);
+		controls->numpad(6);
 	}
 	else if (label.compare("7") == 0) {
-		c->numpad(7);
+		controls->numpad(7);
 	}
 	else if (label.compare("8") == 0) {
-		c->numpad(8);
+		controls->numpad(8);
 	}
 	else if (label.compare("9") == 0) {
-		c->numpad(9);
+		controls->numpad(9);
 	}
 }
 
 void Button::release() {
-	if (Mpc::instance().getDisk().lock()->isBusy()) return;
-	auto c = Mpc::instance().getReleaseControls();
+	if (mpc.getDisk().lock()->isBusy()) return;
+	auto c = mpc.getReleaseControls();
 	if (label.compare("shift") == 0) {
 		c->shift();
 	}
@@ -196,10 +206,7 @@ void Button::release() {
 	else if (label.compare("tap") == 0) {
 		c->tap();
 	}
-	else if (label.compare("goto") == 0) {
+	else if (label.compare("go-to") == 0) {
 		c->goTo();
 	}
-}
-
-Button::~Button() {
 }

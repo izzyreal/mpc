@@ -1,32 +1,26 @@
 #pragma once
 
-#include <observer/Observable.hpp>
-
 #include <string>
 
-namespace mpc {
-	
-	namespace hardware {
+namespace mpc { class Mpc; }
 
-		class Pot
-			//: public moduru::observer::Observable
-		{
+namespace mpc::hardware {
 
-		private:
-			std::string label{ "" };
-			int value{ 0 };
-			
+	class Pot
+	{
+	private:
+		mpc::Mpc& mpc;
+		std::string label = "";
+		int value{ 0 };
 
-		public:
-			std::string getLabel();
-			void setValue(int i);
-			int getValue();
 
-		public:
-			Pot(std::string label);
-			~Pot();
+	public:
+		std::string getLabel();
+		void setValue(int i);
+		int getValue();
 
-		};
+	public:
+		Pot(mpc::Mpc& mpc, std::string label);
 
-	}
+	};
 }

@@ -14,11 +14,13 @@
 #include <sequencer/TempoChangeEvent.hpp>
 
 #include <file/ByteUtil.hpp>
+#include <lang/StrUtil.hpp>
 #include <VecUtil.hpp>
 
 #include <cmath>
 
 using namespace std;
+using namespace moduru::lang;
 using namespace mpc::file::all;
 
 Sequence::Sequence(vector<char> b) 
@@ -26,26 +28,42 @@ Sequence::Sequence(vector<char> b)
 	barList = new BarList(moduru::VecUtil::CopyOfRange(&b, BAR_LIST_OFFSET, BAR_LIST_OFFSET + BAR_LIST_LENGTH));
 	auto nameBytes = moduru::VecUtil::CopyOfRange(&b, NAME_OFFSET, NAME_OFFSET + AllParser::NAME_LENGTH);
 	name = "";
-	for (char c : nameBytes) {
-		if (c == 0x00) break;
+	
+	for (char c : nameBytes)
+	{
+		if (c == 0x00)
+		{
+			break;
+		}
 		name.push_back(c);
 	}
-	tempo = BCMath(getTempoDouble(vector<char>{ b[TEMPO_BYTE1_OFFSET] , b[TEMPO_BYTE2_OFFSET] }));
+
+	tempo = getTempoDouble(vector<char>{ b[TEMPO_BYTE1_OFFSET] , b[TEMPO_BYTE2_OFFSET] });
 	auto barCountBytes = vector<char>{ b[BAR_COUNT_BYTE1_OFFSET], b[BAR_COUNT_BYTE2_OFFSET] };
 	barCount = moduru::file::ByteUtil::bytes2ushort(barCountBytes);
 	loopFirst = moduru::file::ByteUtil::bytes2ushort(vector<char>{ b[LOOP_FIRST_OFFSET], b[LOOP_FIRST_OFFSET + 1] });
 	loopLast = moduru::file::ByteUtil::bytes2ushort(vector<char>{ b[LOOP_LAST_OFFSET], b[LOOP_LAST_OFFSET + 1] });
-	if (loopLast > 998) {
+
+	if (loopLast > 998)
+	{
 		loopLast = barCount;
 		loopLastEnd = true;
 	}
+	
 	loop = (b[LOOP_ENABLED_OFFSET] > 0);
-	for (int i = 0; i < 33; i++) {
+	
+	for (int i = 0; i < 33; i++)
+	{
 		auto offset = DEVICE_NAMES_OFFSET + (i * AllParser::DEV_NAME_LENGTH);
 		string stringBuffer = "";
 		auto stringBytes = moduru::VecUtil::CopyOfRange(&b, offset, offset + AllParser::DEV_NAME_LENGTH);
-		for (char c : stringBytes) {
-			if (c == 0x00) break;
+
+		for (char c : stringBytes)
+		{
+			if (c == 0x00)
+			{
+				break;
+			}
 			stringBuffer.push_back(c);
 		}
 		devNames[i] = stringBuffer;
@@ -60,63 +78,89 @@ Sequence::Sequence(mpc::sequencer::Sequence* seq, int number)
 	auto segmentCount = getSegmentCount(seq);
 	auto terminatorCount = (segmentCount & 1) == 0 ? 2 : 1;
 	saveBytes = vector<char>(10240 + (segmentCount * Sequence::EVENT_SEG_LENGTH) + (terminatorCount * Sequence::EVENT_SEG_LENGTH));
+
 	for (int i = 0; i < AllParser::NAME_LENGTH; i++)
-		saveBytes[i] = moduru::lang::StrUtil::padRight(seq->getName(), " ", AllParser::NAME_LENGTH)[i];
+	{
+		saveBytes[i] = StrUtil::padRight(seq->getName(), " ", AllParser::NAME_LENGTH)[i];
+	}
 
 	if ((segmentCountLastEventIndex & 1) != 0)
+	{
 		segmentCountLastEventIndex--;
+	}
 
 	segmentCountLastEventIndex /= 2;
 	auto lastEventIndexBytes = moduru::file::ByteUtil::ushort2bytes(1 + (segmentCountLastEventIndex < 0 ? 0 : segmentCountLastEventIndex));
 	saveBytes[LAST_EVENT_INDEX_OFFSET] = lastEventIndexBytes[0];
 	saveBytes[LAST_EVENT_INDEX_OFFSET + 1] = lastEventIndexBytes[1];
+	
 	for (int i = Sequence::PADDING1_OFFSET; i < PADDING1_OFFSET + PADDING1.size(); i++)
+	{
 		saveBytes[i] = PADDING1[i - PADDING1_OFFSET];
+	}
 
-	setTempoDouble(seq->getInitialTempo().toDouble());
+	setTempoDouble(seq->getInitialTempo());
+	
 	for (int i = Sequence::PADDING2_OFFSET; i < PADDING2_OFFSET + PADDING2.size(); i++)
+	{
 		saveBytes[i] = PADDING2[i - PADDING2_OFFSET];
+	}
 
-	setBarCount(seq->getLastBar() + 1);
+	setBarCount(seq->getLastBarIndex() + 1);
 	setLastTick(seq);
 	saveBytes[SEQUENCE_INDEX_OFFSET] = (number);
 	setUnknown32BitInt(seq);
-	auto loopStartBytes = moduru::file::ByteUtil::ushort2bytes(seq->getFirstLoopBar());
-	auto loopEndBytes = moduru::file::ByteUtil::ushort2bytes(seq->getLastLoopBar());
+	auto loopStartBytes = moduru::file::ByteUtil::ushort2bytes(seq->getFirstLoopBarIndex());
+	auto loopEndBytes = moduru::file::ByteUtil::ushort2bytes(seq->getLastLoopBarIndex());
+	
 	if (seq->isLastLoopBarEnd())
-		loopEndBytes = vector<char>{ (char) 255, (char) 255 };
+	{
+		loopEndBytes = vector<char>{ (char)255, (char)255 };
+	}
 
 	saveBytes[LOOP_FIRST_OFFSET] = loopStartBytes[0];
 	saveBytes[LOOP_FIRST_OFFSET + 1] = loopStartBytes[1];
 	saveBytes[LOOP_LAST_OFFSET] = loopEndBytes[0];
 	saveBytes[LOOP_LAST_OFFSET + 1] = loopEndBytes[1];
 	saveBytes[LOOP_ENABLED_OFFSET] = seq->isLoopEnabled() ? 1 : 0;
-	for (int i = 0; i < PADDING4.size(); i++) {
+	
+	for (int i = 0; i < PADDING4.size(); i++)
+	{
 		saveBytes[PADDING4_OFFSET + i] = PADDING4[i];
 	}
 
-	for (int i = 0; i < 33; i++) {
+	for (int i = 0; i < 33; i++)
+	{
 		auto offset = DEVICE_NAMES_OFFSET + (i * AllParser::DEV_NAME_LENGTH);
-		for (int j = 0; j < AllParser::DEV_NAME_LENGTH; j++) {
-			saveBytes[offset + j] = moduru::lang::StrUtil::padRight(seq->getDeviceName(i), " ", AllParser::DEV_NAME_LENGTH)[j];
+
+		for (int j = 0; j < AllParser::DEV_NAME_LENGTH; j++)
+		{
+			saveBytes[offset + j] = StrUtil::padRight(seq->getDeviceName(i), " ", AllParser::DEV_NAME_LENGTH)[j];
 		}
 	}
 	auto tracks = Tracks(seq);
-	for (int i = 0; i < TRACKS_LENGTH; i++) {
+
+	for (int i = 0; i < TRACKS_LENGTH; i++)
+	{
 		saveBytes[i + TRACKS_OFFSET] = tracks.getBytes()[i];
 	}
 
 	auto barList = BarList(seq);
-	for (int i = Sequence::BAR_LIST_OFFSET; i < BAR_LIST_OFFSET + BAR_LIST_LENGTH; i++) {
+
+	for (int i = Sequence::BAR_LIST_OFFSET; i < BAR_LIST_OFFSET + BAR_LIST_LENGTH; i++)
+	{
 		saveBytes[i] = barList.getBytes()[i - BAR_LIST_OFFSET];
 	}
 
 	auto eventArraysChunk = createEventSegmentsChunk(seq);
-	for (int i = Sequence::EVENTS_OFFSET; i < EVENTS_OFFSET + eventArraysChunk.size(); i++) {
+
+	for (int i = Sequence::EVENTS_OFFSET; i < EVENTS_OFFSET + eventArraysChunk.size(); i++)
+	{
 		saveBytes[i] = eventArraysChunk[i - EVENTS_OFFSET];
 	}
 
-	for (int i = (int)(saveBytes.size()) - 8; i < saveBytes.size(); i++) {
+	for (int i = (int)(saveBytes.size()) - 8; i < saveBytes.size(); i++)
+	{
 		saveBytes[i] = (255);
 	}
 }
@@ -219,22 +263,32 @@ int Sequence::getEventAmount()
 int Sequence::getSegmentCount(mpc::sequencer::Sequence* seq)
 {
 	int segmentCount = 0;
-	for (auto& track : seq->getTracks()) {
+	
+	for (auto& track : seq->getTracks())
+	{
 		auto t = track.lock();
-		if (t->getTrackIndex() > 63)
+		
+		if (t->getIndex() > 63)
+		{
 			break;
+		}
 
-		for (auto& e : t->getEvents()) {
+		for (auto& e : t->getEvents())
+		{
 			auto sysExEvent = dynamic_pointer_cast<mpc::sequencer::SystemExclusiveEvent>(e.lock());
 			auto mixerEvent = dynamic_pointer_cast<mpc::sequencer::MixerEvent>(e.lock());
-			if (sysExEvent) {
-				int dataSegments = (int)(ceil((int)(sysExEvent->getBytes()->size()) / 8.0));
+			
+			if (sysExEvent)
+			{
+				int dataSegments = (int)(ceil((int)(sysExEvent->getBytes().size()) / 8.0));
 				segmentCount += dataSegments + 2;
 			}
-			else if (mixerEvent) {
+			else if (mixerEvent)
+			{
 				segmentCount += 4;
 			}
-			else {
+			else
+			{
 				segmentCount++;
 			}
 		}
@@ -246,13 +300,19 @@ void Sequence::setUnknown32BitInt(mpc::sequencer::Sequence* seq)
 {
 	auto unknownNumberBytes1 = moduru::file::ByteUtil::uint2bytes(10000000);
 	auto unknownNumberBytes2 = moduru::file::ByteUtil::uint2bytes(seq->getLastTick() * 5208.333333333333);
-	for (int i = 0; i < 2; i++) {
-		for (int j = 0; j < 4; j++) {
+	
+	for (int i = 0; i < 2; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
 			saveBytes[UNKNOWN32_BIT_INT_OFFSET + j + (i * 4)] = unknownNumberBytes1[j];
 		}
 	}
-	for (int i = 2; i < 4; i++) {
-		for (int j = 0; j < 4; j++) {
+
+	for (int i = 2; i < 4; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
 			saveBytes[UNKNOWN32_BIT_INT_OFFSET + j + (i * 4)] = unknownNumberBytes2[j];
 		}
 	}
@@ -268,15 +328,25 @@ void Sequence::setBarCount(int i)
 vector<char> Sequence::createEventSegmentsChunk(mpc::sequencer::Sequence* seq)
 {
 	vector<vector<char>> ea;
-	for (int i = 0; i < seq->getLastTick(); i++) {
-		for (auto& track : seq->getTracks()) {
-			auto t = track.lock();
-			if (t->getTrackIndex() > 63) break;
 
-			for (auto& event : t->getEvents()) {
+	for (int i = 0; i < seq->getLastTick(); i++)
+	{
+		for (auto& track : seq->getTracks())
+		{
+			auto t = track.lock();
+
+			if (t->getIndex() > 63)
+			{
+				break;
+			}
+
+			for (auto& event : t->getEvents())
+			{
 				auto e = event.lock();
-				if (e->getTick() == i) {
-					e->setTrack(t->getTrackIndex());
+
+				if (e->getTick() == i)
+				{
+					e->setTrack(t->getIndex());
 					auto ae = AllEvent(e.get());
 					ea.push_back(ae.getBytes());
 				}

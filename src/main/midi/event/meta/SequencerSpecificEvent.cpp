@@ -6,6 +6,7 @@
 #include <midi/util/VariableLengthInt.hpp>
 
 using namespace mpc::midi::event::meta;
+using namespace std;
 
 SequencerSpecificEvent::SequencerSpecificEvent(int tick, int delta, std::vector<char> data)
 	: MetaEvent(tick, delta, MetaEvent::SEQUENCER_SPECIFIC)

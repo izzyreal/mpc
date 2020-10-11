@@ -2,20 +2,38 @@
 
 using namespace mpc::lcdgui;
 
-MixerFaderBackground::MixerFaderBackground(MRECT rect) 
+MixerFaderBackground::MixerFaderBackground(MRECT rect)
+	: Component("mixer-fader-background")
 {
-	this->rect = rect;
+	setSize(rect.W(), rect.H());
+	setLocation(rect.L, rect.T);
 }
 
 void MixerFaderBackground::Draw(std::vector<std::vector<bool>>* pixels) {
-	if (IsHidden()) return;
-	for (int i = rect.L; i < rect.R + 1; i++) {
-		for (int j = rect.T; j < rect.B + 1; j++) {
-			(*pixels)[i][j] = true;
+	if (shouldNotDraw(pixels))
+	{
+		return;
+	}
+
+	auto rect = getRect();
+
+	for (int i = rect.L; i < rect.R; i++)
+	{
+		for (int j = rect.T; j < rect.B; j++)
+		{
+			(*pixels)[i][j] = color;
 		}
 	}
-	dirty = false;
+
+	Component::Draw(pixels);
 }
 
-MixerFaderBackground::~MixerFaderBackground() {
+void MixerFaderBackground::setColor(bool on)
+{
+	if (color == on)
+	{
+		return;
+	}
+	color = on;
+	SetDirty();
 }

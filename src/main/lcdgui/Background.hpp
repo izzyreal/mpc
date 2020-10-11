@@ -2,28 +2,20 @@
 #include "Component.hpp"
 #include <string>
 
-namespace mpc {
-	namespace lcdgui {
+namespace mpc::lcdgui {
 
-		class Background
-			: public Component
-		{
+	class Background
+		: public Component
+	{
 
-		private:
-			std::string name{ "" };
+	private:
+		MRECT unobtrusiveRect;
 
-		public:
-			void setName(std::string name);
+	public:
+		void repaintUnobtrusive(MRECT rect); // This is used for hiding function keys of windows and dialogs
+		void setName(const std::string& name);
+		void Draw(std::vector< std::vector<bool>>* pixels) override;
+		Background();
 
-		public:
-			void Draw(std::vector< std::vector<bool>>* pixels) override;
-
-		public:
-			Background();
-			~Background();
-
-		};
-
-	}
-
+	};
 }

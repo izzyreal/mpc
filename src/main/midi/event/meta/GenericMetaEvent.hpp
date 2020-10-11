@@ -10,12 +10,12 @@ namespace mpc::midi::event::meta {
 	{
 
 	private:
-		std::vector<char> mData{};
+		std::vector<char> mData;
 
 	public:
 		int getEventSize() override;
-		void writeToOutputStream(ostream& out)  override;
-		void writeToOutputStream(ostream& out, bool writeType)  override;
+		void writeToOutputStream(std::ostream& out)  override;
+		void writeToOutputStream(std::ostream& out, bool writeType)  override;
 
 
 	public:

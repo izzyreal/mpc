@@ -2,27 +2,20 @@
 
 #include <observer/Observable.hpp>
 
-namespace mpc {
+namespace mpc { class Mpc; }
 
-	
+namespace mpc::hardware
+{
+	class DataWheel
+		: public moduru::observer::Observable
+	{
 
-	namespace hardware {
+	private:
+		mpc::Mpc& mpc;
 
-		class DataWheel
-			: public moduru::observer::Observable
-		{
+	public:
+		DataWheel(mpc::Mpc& mpc);
+		void turn(int increment);
 
-		private:
-			
-
-		public:
-			void turn(int increment);
-
-		public:
-			DataWheel();
-			~DataWheel();
-
-		};
-
-	}
+	};
 }

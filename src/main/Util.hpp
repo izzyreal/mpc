@@ -2,28 +2,27 @@
 #include <string>
 #include <vector>
 
-#include <lang/StrUtil.hpp>
+namespace mpc { class Mpc; }
 
-using namespace std;
-
-namespace mpc {
-
-	class Util {
+namespace mpc
+{
+	class Util
+	{
 
 	public:
+		static std::vector<int> getPadAndVelo(const int x, const int y);
+		static std::string getFileName(const std::string& s);
+		static std::vector<std::string> splitName(const std::string& s);
+		static std::string distributeTimeSig(const std::string& s);
+		static std::string replaceDotWithSmallSpaceDot(const std::string& s);
+		static void drawLine(std::vector<std::vector<bool>>& pixels, const std::vector<std::vector<int>>& line, const bool color);
+		static void drawLine(std::vector<std::vector<bool>>& pixels, const std::vector<std::vector<int>>& line, const bool color, const std::vector<int>& offsetxy);
+		static void drawLines(std::vector<std::vector<bool>>& pixels, const std::vector<std::vector<std::vector<int>>>& lines, const std::vector<bool>& colors);
+		static void drawLines(std::vector<std::vector<bool>>& pixels, const std::vector<std::vector<std::vector<int>>>& lines, const std::vector<bool>& colors, const std::vector<int>& offsetxy);
+		static std::vector<std::string>& noteNames();
+		static std::string tempoString(const double tempo);
+		static int getTextWidthInPixels(const std::string& text);
+		static void initSequence(mpc::Mpc& mpc);
 
-		static vector<int> getPadAndVelo(const int x, const int y);
-		static string getFileName(const string& s);
-		static vector<string> splitName(const string& s);
-		static string distributeTimeSig(const string& s);
-		static string replaceDotWithSmallSpaceDot(const string& s);
-		static void drawLine(vector<vector<bool>>& pixels, const vector<vector<int>>& line, const bool color);
-		static void drawLine(vector<vector<bool>>& pixels, const vector<vector<int>>& line, const bool color, const vector<int>& offsetxy);
-		static void drawLines(vector<vector<bool>>& pixels, const vector<vector<vector<int>>>& lines, const vector<bool>& colors);
-		static void drawLines(vector<vector<bool>>& pixels, const vector<vector<vector<int>>>& lines, const vector<bool>& colors, const vector<int>& offsetxy);
-		//static void drawScaled(IGraphics* g, vector<vector<int>> line, unsigned int scale, IColor* color, vector<int> offsetxy);
-		//static void drawScaled(IGraphics* g, vector<vector<vector<int>>> lines, unsigned int scale, IColor* color, vector<int> offsetxy);
-		//static void drawScaled(IGraphics* g, vector<vector<vector<int>>> lines, unsigned int scale, vector<IColor*> colors, vector<int> offsetxy);
-		
 	};
 }

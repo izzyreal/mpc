@@ -11,9 +11,11 @@ using namespace mpc::lcdgui;
 using namespace moduru::gui;
 using namespace std;
 
-Knob::Knob(MRECT rect) 
+Knob::Knob(MRECT rect)
+	: Component("knob")
 {
-	this->rect = rect;
+	setSize(rect.W(), rect.H());
+	setLocation(rect.L, rect.T);
 }
 
 void Knob::setValue(int value)
@@ -30,12 +32,17 @@ void Knob::setColor(bool on)
 
 void Knob::Draw(std::vector<std::vector<bool>>* pixels)
 {
-	if (IsHidden()) return;
-	for (int i = rect.L-1; i < rect.R; i++) {
-		for (int j = rect.T-1; j < rect.B; j++) {
+	if (shouldNotDraw(pixels))
+		return;
+
+	auto rect = getRect();
+	
+	for (int i = rect.L; i < rect.R; i++)
+	{
+		for (int j = rect.T; j < rect.B; j++)
 			(*pixels)[i][j] = !color;
-		}
 	}
+
 	vector<vector<vector<int>>> lines;
 	lines.push_back(Bressenham::Line(0, 3, 0, 7));
 	lines.push_back(Bressenham::Line(0, 7, 3, 10));
@@ -55,13 +62,11 @@ void Knob::Draw(std::vector<std::vector<bool>>* pixels)
 	lines.push_back(Bressenham::Line(5, 5, x0 + radiusInt + 1, y0 + radiusInt + 1));
 	
 	vector<bool> colors;
-    for (int i = 0; i < lines.size(); i++) {
+    
+	for (int i = 0; i < lines.size(); i++)
 		colors.push_back(color);
-	}
+	
 	vector<int> offsetxy { rect.L, rect.T };
 	mpc::Util::drawLines(*pixels, lines, colors, offsetxy);
 	dirty = false;
-}
-
-Knob::~Knob() {
 }

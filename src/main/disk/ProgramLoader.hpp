@@ -5,44 +5,42 @@
 #include <vector>
 #include <string>
 
-namespace mpc {
+namespace mpc { class Mpc; }
 
-	
+namespace mpc::sampler
+{
+	class Program;
+}
 
-	namespace sampler {
-		class Program;
-	}
+namespace mpc::disk
+{
+	class MpcFile;
+}
 
-	namespace disk {
+namespace mpc::disk
+{
+	class ProgramLoader
+	{
+	private:
+		mpc::Mpc& mpc;
+		std::thread loadProgramThread;
+		std::weak_ptr<mpc::sampler::Program> result;
 
-		class MpcFile;
+		MpcFile* file = nullptr;
+		bool replace = false;
 
-		class ProgramLoader
-		{
+	private:
+		void loadProgram(const int replaceIndex);
+		static void static_loadProgram(void* this_p, const int replaceIndex);
 
-		private:
-			std::thread loadProgramThread{};
-			std::weak_ptr<mpc::sampler::Program> result{};
-			
-			MpcFile* file{ nullptr };
-			bool replace{ false };
+		void loadSound(const std::string& soundFileName, const std::string& soundName, const std::string& ext, MpcFile* soundFile, std::vector<int>* soundsDestIndex, const bool replace, const int loadSoundIndex);
+		void showPopup(std::string name, std::string ext, int sampleSize);
+		void notFound(std::string soundFileName, std::string ext);
 
-		public:
-			void loadProgram();
+	public:
+		std::weak_ptr<mpc::sampler::Program> get();
 
-		private:
-			static void static_loadProgram(void* this_p);
-			
-			void loadSound(std::string soundFileName, std::string ext, MpcFile* soundFile, std::vector<int>* soundsDestIndex, bool replace, int loadSoundIndex);
-			void showPopup(std::string name, std::string ext, int sampleSize);
-			void notfound(std::string soundFileName, std::string ext);
-
-		public:
-			std::weak_ptr<mpc::sampler::Program> get();
-
-			ProgramLoader(MpcFile* file, bool replace);
-			~ProgramLoader();
-		};
-
-	}
+		ProgramLoader(mpc::Mpc& mpc, MpcFile* file, const int replaceIndex);
+		~ProgramLoader();
+	};
 }
