@@ -14,6 +14,10 @@
 #include <sequencer/SeqUtil.hpp>
 #include <Util.hpp>
 
+#ifdef __linux__
+#include <climits>
+#endif
+
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens;

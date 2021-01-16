@@ -13,6 +13,10 @@
 
 #include <cmath>
 
+#ifdef __linux
+#include <cstring>
+#endif
+
 using namespace mpc::lcdgui;
 using namespace moduru::lang;
 using namespace std;

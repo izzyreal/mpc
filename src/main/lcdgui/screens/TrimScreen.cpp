@@ -5,6 +5,10 @@
 #include <lcdgui/Layer.hpp>
 #include <controls/BaseSamplerControls.hpp>
 
+#ifdef __linux__
+#include <climits>
+#endif
+
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;

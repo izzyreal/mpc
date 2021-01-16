@@ -5,6 +5,10 @@
 #include <fstream>
 #include <string>
 
+#ifdef __linux__
+#include <atomic>
+#endif
+
 namespace mpc::audiomidi {
 
 	class DiskRecorder
