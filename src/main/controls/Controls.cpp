@@ -1,5 +1,7 @@
 #include "Controls.hpp"
 
+#include "KeyEventHandler.hpp"
+
 #include <Mpc.hpp>
 
 #include <controls/BaseControls.hpp>
@@ -13,6 +15,12 @@ Controls::Controls(mpc::Mpc& mpc)
 {
 	pressedPadVelos = vector<int>(16);
 	controls["release"] = new GlobalReleaseControls(mpc);
+    keyEventHandler = make_shared<KeyEventHandler>(mpc.getHardware());
+}
+
+weak_ptr<KeyEventHandler> Controls::getKeyEventHandler()
+{
+    return keyEventHandler;
 }
 
 void Controls::releaseAll()

@@ -8,6 +8,7 @@
 namespace mpc { class Mpc; }
 
 namespace mpc::controls {
+    class KeyEventHandler;
 	class BaseControls;
 	class GlobalReleaseControls;
 }
@@ -39,6 +40,7 @@ namespace mpc::controls {
 		bool f6Pressed = false;
 		std::set<int> pressedPads;
 		std::vector<int> pressedPadVelos;
+        std::shared_ptr<KeyEventHandler> keyEventHandler;
 
 	public:
 		void setErasePressed(bool b);
@@ -67,9 +69,10 @@ namespace mpc::controls {
 		std::vector<int>* getPressedPadVelos();
 
 		void releaseAll();
-
+        std::weak_ptr<KeyEventHandler> getKeyEventHandler();
+        
 	private:
-		std::unordered_map<std::string, controls::BaseControls*> controls{};
+		std::unordered_map<std::string, controls::BaseControls*> controls;
 
 	public:
 		mpc::controls::BaseControls* getControls(std::string s);

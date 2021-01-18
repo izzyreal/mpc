@@ -2,6 +2,7 @@
 
 #include <lcdgui/Component.hpp>
 #include <lcdgui/ScreenComponent.hpp>
+#include <lcdgui/kbeditor/KbEditor.hpp>
 
 #include "Paths.hpp"
 #include <nvram/NvRam.hpp>
@@ -53,6 +54,7 @@ Mpc::Mpc()
 	hardware = make_shared<hardware::Hardware>(*this);
 	screens = make_shared<Screens>(*this);
 	layeredScreen = make_shared<lcdgui::LayeredScreen>(*this);
+    kbEditor = make_shared<mpc::lcdgui::kbeditor::KbEditor>(*this);
 }
 
 void Mpc::init(const int sampleRate, const int inputCount, const int outputCount)
@@ -269,6 +271,11 @@ weak_ptr<audiomidi::MpcMidiPorts> Mpc::getMidiPorts()
 audiomidi::MpcMidiInput* Mpc::getMpcMidiInput(int i)
 {
 	return mpcMidiInputs[i];
+}
+
+weak_ptr<mpc::lcdgui::kbeditor::KbEditor> Mpc::getKbEditor()
+{
+    return kbEditor;
 }
 
 void Mpc::setBank(int i)
