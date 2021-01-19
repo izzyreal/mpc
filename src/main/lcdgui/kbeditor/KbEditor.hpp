@@ -16,5 +16,10 @@ namespace mpc::lcdgui::kbeditor {
     private:
         mpc::Mpc& mpc;
         
+        int row = 0;
+        int rowOffset = 0;
+        
+        void updateRows();
+        
 	};
 }

@@ -18,11 +18,5 @@ Parameter::Parameter(mpc::Mpc& mpc, string labelStr, string name, int x, int y, 
 	// We add + 1 to the field width, because currently the json resources provide
 	// n_characters * font_width for their width, and it should be + 1 to acommodate
 	// for the rectangle of a field.
-	auto field = make_shared<Field>(mpc, name, x + labelWidth, y, fieldWidth + 1);
-	auto rect = field->getRect();
-	rect.L -= 1;
-	rect.T -= 1;
-	rect.B += 1;
-
-	addChild(field);
+	addChild(make_shared<Field>(mpc, name, x + labelWidth, y, fieldWidth + 1));
 }

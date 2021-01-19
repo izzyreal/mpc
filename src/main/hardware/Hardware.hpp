@@ -42,6 +42,8 @@ private:
 public:
     std::weak_ptr<TopPanel> getTopPanel();
     std::weak_ptr<HwPad> getPad(int index);
+    std::vector<std::weak_ptr<HwComponent>> getPads();
+    std::vector<std::weak_ptr<HwComponent>> getButtons();
     std::weak_ptr<Button> getButton(std::string label);
     std::weak_ptr<Led> getLed(std::string label);
     std::vector<std::shared_ptr<Led>> getLeds();

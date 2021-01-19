@@ -17,7 +17,7 @@ mpc::lcdgui::Background* Layer::getBackground()
 
 mpc::lcdgui::FunctionKeys* Layer::getFunctionKeys()
 {
-	return dynamic_cast<FunctionKeys*>(findChild("function-keys").lock().get());
+	return findChild<FunctionKeys>("function-keys").lock().get();
 }
 
 bool Layer::setFocus(string fieldName)
