@@ -9,7 +9,7 @@ using namespace mpc::hardware;
 using namespace std;
 
 HwPad::HwPad(mpc::Mpc& mpc, int index)
-	: mpc(mpc)
+	: HwComponent(mpc, "pad-" + to_string(index + 1))
 {
 	this->index = index;
 }

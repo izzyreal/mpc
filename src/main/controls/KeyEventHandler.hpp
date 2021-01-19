@@ -1,6 +1,8 @@
 #ifndef KeyEventHandler_h
 #define KeyEventHandler_h
 
+#include <controls/KbMapping.hpp>
+
 #include <memory>
 #include <vector>
 
@@ -23,6 +25,7 @@ public:
 private:
     std::weak_ptr<mpc::hardware::Hardware> hardware;
     std::vector<int> pressed;
+    std::shared_ptr<KbMapping> kbMapping;
     
 };
 

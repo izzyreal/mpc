@@ -1,5 +1,6 @@
 #include "Hardware.hpp"
 
+#include "HwComponent.hpp"
 #include "TopPanel.hpp"
 #include "Button.hpp"
 #include "DataWheel.hpp"
@@ -23,16 +24,19 @@ Hardware::Hardware(mpc::Mpc& mpc)
 	for (auto& l : buttonLabels)
 	{
 		buttons.push_back(std::make_shared<Button>(mpc, l));
+        components.push_back(buttons.back());
 	}
 
 	for (int i = 0; i <= 9; i++)
 	{
 		buttons.push_back(std::make_shared<Button>(mpc, std::to_string(i)));
+        components.push_back(buttons.back());
 	}
 	
 	for (int i = 0; i <= 15; i++)
 	{
 		pads.push_back(std::make_shared<HwPad>(mpc, i));
+        components.push_back(pads.back());
 	}
 
 	dataWheel = make_shared<DataWheel>(mpc);
@@ -90,4 +94,20 @@ weak_ptr<DataWheel> Hardware::getDataWheel() {
 
 weak_ptr<Slider> Hardware::getSlider() {
 	return slider;
+}
+
+weak_ptr<HwComponent> Hardware::getComponentByLabel(const string& label)
+{
+    weak_ptr<HwComponent> result;
+    
+    for (auto& c : components)
+    {
+        if (c.lock()->getLabel().compare(label) == 0)
+        {
+            result = c;
+            break;
+        }
+    }
+    
+    return result;
 }

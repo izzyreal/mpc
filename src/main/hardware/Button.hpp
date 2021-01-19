@@ -2,33 +2,33 @@
 
 #include <observer/Observable.hpp>
 
+#include <hardware/HwComponent.hpp>
+
 #include <string>
 
 namespace mpc {
-	class Mpc;
+class Mpc;
 }
+
 namespace mpc::controls {
-	class BaseControls;
+class BaseControls;
 }
 
 namespace mpc::hardware {
 
-	class Button
-		: public moduru::observer::Observable
-	{
-
-	private:
-		mpc::Mpc& mpc;
-		std::string label = "";
-		std::weak_ptr<mpc::controls::BaseControls> controls;
-
-	public:
-		std::string getLabel();
-		void push();
-		void release();
-
-	public:
-		Button(mpc::Mpc& mpc, std::string label);
-
-	};
+class Button
+: public mpc::hardware::HwComponent
+, public moduru::observer::Observable
+{
+    
+private:
+    std::weak_ptr<mpc::controls::BaseControls> controls;
+    
+public:
+    void push() override;
+    void release() override;
+    
+    Button(mpc::Mpc& mpc, const std::string& label);
+    
+};
 }

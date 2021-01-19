@@ -1,5 +1,6 @@
 #pragma once
 
+#include <hardware/HwComponent.hpp>
 #include <observer/Observable.hpp>
 
 namespace mpc {
@@ -12,18 +13,18 @@ namespace mpc::controls {
 
 namespace mpc::hardware {
 	class HwPad
-		: public moduru::observer::Observable
+		: public HwComponent
+        , public moduru::observer::Observable
 	{
 
 	private:
-		mpc::Mpc& mpc;
 		int index;
 		std::weak_ptr<mpc::controls::BaseControls> controls;
 
 	public:
 		int getIndex();
-		void push(int velo);
-		void release();
+		void push(int velo) override;
+		void release() override;
 
 	public:
 		HwPad(mpc::Mpc& mpc, int index);

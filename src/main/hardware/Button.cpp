@@ -11,14 +11,9 @@
 using namespace mpc::hardware;
 using namespace std;
 
-Button::Button(mpc::Mpc& mpc, string label)
-	: mpc(mpc)
+Button::Button(mpc::Mpc& mpc, const string& label)
+	: HwComponent(mpc, label)
 {
-	this->label = label;
-}
-
-string Button::getLabel() {
-	return label;
 }
 
 void Button::push()

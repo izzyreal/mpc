@@ -3,6 +3,7 @@
 #include "KeyEvent.hpp"
 
 #include <hardware/Hardware.hpp>
+#include <hardware/HwComponent.hpp>
 
 #include <sys/OsxKeyCodes.hpp>
 #include <Logger.hpp>
@@ -17,6 +18,7 @@ using namespace std;
 KeyEventHandler::KeyEventHandler(weak_ptr<Hardware> hardware)
     : hardware (hardware)
 {
+    kbMapping = make_shared<KbMapping>();
 }
 
 void KeyEventHandler::handle(const KeyEvent& keyEvent)
@@ -62,5 +64,23 @@ void KeyEventHandler::handle(const KeyEvent& keyEvent)
     rawKeyCodeHex << std::hex << keyEvent.rawKeyCode;
     auto rawKeyCodeHexString = string(rawKeyCodeHex.str());
     MLOG("KeyEventHandler::handle key " + string(keyEvent.keyDown ? "press" : "release") + " event with rawKeyCode " + to_string(keyEvent.rawKeyCode) + ", " + rawKeyCodeHexString);
+    
+    auto hardwareLabel = kbMapping->getLabelFromKeyCode(keyEvent.rawKeyCode);
 
+    MLOG("This event should " + string(keyEvent.keyDown ? "press" : "release") + " hardware label " + hardwareLabel);
+    
+    auto hardwareComponent = hardware.lock()->getComponentByLabel(hardwareLabel).lock();
+    
+    if (hardwareComponent)
+    {
+        if (keyEvent.keyDown)
+        {
+            hardwareComponent->push();
+            hardwareComponent->push(127);
+        }
+        else
+        {
+            hardwareComponent->release();
+        }
+    }
 }

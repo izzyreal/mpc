@@ -58,6 +58,22 @@ KbMapping::KbMapping()
 	labelKeyMap["7"] = kh->code("7");
 	labelKeyMap["8"] = kh->code("8");
 	labelKeyMap["9"] = kh->code("9");
+    labelKeyMap["pad-1"] = kh->code("z");
+    labelKeyMap["pad-2"] = kh->code("x");
+    labelKeyMap["pad-3"] = kh->code("c");
+    labelKeyMap["pad-4"] = kh->code("v");
+    labelKeyMap["pad-5"] = kh->code("a");
+    labelKeyMap["pad-6"] = kh->code("s");
+    labelKeyMap["pad-7"] = kh->code("d");
+    labelKeyMap["pad-8"] = kh->code("f");
+    labelKeyMap["pad-9"] = kh->code("b");
+    labelKeyMap["pad-10"] = kh->code("n");
+    labelKeyMap["pad-11"] = kh->code("m");
+    labelKeyMap["pad-12"] = kh->code("comma");
+    labelKeyMap["pad-13"] = kh->code("g");
+    labelKeyMap["pad-14"] = kh->code("h");
+    labelKeyMap["pad-15"] = kh->code("j");
+    labelKeyMap["pad-16"] = kh->code("k");
 	exportMapping();
 }
 const key_helper_t* mpc::controls::KbMapping::kh = &key_helper_t::instance();
