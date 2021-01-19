@@ -4,8 +4,7 @@
 
 #include <hardware/Hardware.hpp>
 
-#include <thirdp/wrpkey/key.hxx>
-
+#include <sys/OsxKeyCodes.hpp>
 #include <Logger.hpp>
 
 #include <sstream>
@@ -25,26 +24,43 @@ void KeyEventHandler::handle(const KeyEvent& keyEvent)
 
     auto it = find(begin(pressed), end(pressed), keyEvent.rawKeyCode);
 
-    if (keyEvent.keyDown) {
-        if (it != end(pressed))
+    bool isCapsLock = false;
+#ifdef __APPLE__
+    isCapsLock = moduru::sys::OsxKeyCodes::keyCodeNames[keyEvent.rawKeyCode].compare("caps lock") == 0;
+#endif
+
+    // Special case as caps lock only sends key releases on OSX
+    if (isCapsLock) {
+        if (it == end(pressed))
         {
-            // For now we don't accept any kind of auto-repeat.
-            // Maybe in the future when we allow users to type things like sound
-            // and sequence names with the keyboard we will.
-            return;
+            // We must fire a "push" to whatever control caps lock is bound to.
+            pressed.push_back(keyEvent.rawKeyCode);
+        } else {
+            // We must fire a "release" to whatever control caps lock is bound to.
+            pressed.erase(it);
         }
-        
-        pressed.push_back(keyEvent.rawKeyCode);
-    } else {
-        pressed.erase(it);
+    }
+    else {
+        if (keyEvent.keyDown) {
+            
+            if (it != end(pressed))
+            {
+                // For now we don't accept any kind of auto-repeat.
+                // Maybe in the future when we allow users to type things like sound
+                // and sequence names with the keyboard we will.
+                return;
+            }
+            
+            pressed.push_back(keyEvent.rawKeyCode);
+            
+        } else {
+            pressed.erase(it);
+        }
     }
     
     stringstream rawKeyCodeHex;
     rawKeyCodeHex << std::hex << keyEvent.rawKeyCode;
     auto rawKeyCodeHexString = string(rawKeyCodeHex.str());
-    MLOG("KeyEventHandler::handle keyEvent with rawKeyCode " + to_string(keyEvent.rawKeyCode) + ", " + rawKeyCodeHexString);
-    
-    auto* helper = &WonderRabbitProject::key::key_helper_t::instance();
-//    auto name = helper->name(keyEvent.rawKeyCode);
-//    MLOG("WRP key name: " + name);
+    MLOG("KeyEventHandler::handle key " + string(keyEvent.keyDown ? "press" : "release") + " event with rawKeyCode " + to_string(keyEvent.rawKeyCode) + ", " + rawKeyCodeHexString);
+
 }
