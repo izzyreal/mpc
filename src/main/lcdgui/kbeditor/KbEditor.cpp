@@ -1,6 +1,7 @@
 #include "KbEditor.hpp"
 
 #include <lcdgui/Label.hpp>
+#include <controls/KbMapping.hpp>
 
 #include <Logger.hpp>
 #include <sys/OsxKeyCodes.hpp>
@@ -23,14 +24,16 @@ KbEditor::KbEditor(mpc::Mpc& mpc)
 
 void KbEditor::Draw(vector<vector<bool>>* pixels)
 {
-//    if (shouldNotDraw(pixels))
-//    {
-//        return;
-//    }
+    if (shouldNotDraw(pixels))
+    {
+        return;
+    }
 
     auto& codes = moduru::sys::OsxKeyCodes::keyCodeNames;
-
+    auto kbMapping = mpc::controls::KbMapping();
+    
     mpc::lcdgui::Label* label = nullptr;
+    
     
     int counter = 0;
     for (auto const& [keyCode, name] : codes)
@@ -45,8 +48,14 @@ void KbEditor::Draw(vector<vector<bool>>* pixels)
         label->SetDirty(true);
         label->Draw(pixels);
         delete label;
+        
+        label = new mpc::lcdgui::Label(mpc, string(name), string(kbMapping.getLabelFromKeyCode(keyCode)), 200, counter * 10, 200);
+        label->SetDirty(true);
+        label->Draw(pixels);
+        delete label;
+        
         counter++;
     }
 
-//    Component::Draw(pixels);
+    Component::Draw(pixels);
 }
