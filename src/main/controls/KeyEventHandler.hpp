@@ -2,6 +2,7 @@
 #define KeyEventHandler_h
 
 #include <memory>
+#include <vector>
 
 namespace mpc::controls {
 class KeyEvent;
@@ -21,6 +22,7 @@ public:
     
 private:
     std::weak_ptr<mpc::hardware::Hardware> hardware;
+    std::vector<int> pressed;
     
 };
 

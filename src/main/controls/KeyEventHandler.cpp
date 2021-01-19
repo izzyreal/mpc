@@ -22,6 +22,23 @@ KeyEventHandler::KeyEventHandler(weak_ptr<Hardware> hardware)
 
 void KeyEventHandler::handle(const KeyEvent& keyEvent)
 {
+
+    auto it = find(begin(pressed), end(pressed), keyEvent.rawKeyCode);
+
+    if (keyEvent.keyDown) {
+        if (it != end(pressed))
+        {
+            // For now we don't accept any kind of auto-repeat.
+            // Maybe in the future when we allow users to type things like sound
+            // and sequence names with the keyboard we will.
+            return;
+        }
+        
+        pressed.push_back(keyEvent.rawKeyCode);
+    } else {
+        pressed.erase(it);
+    }
+    
     stringstream rawKeyCodeHex;
     rawKeyCodeHex << std::hex << keyEvent.rawKeyCode;
     auto rawKeyCodeHexString = string(rawKeyCodeHex.str());
