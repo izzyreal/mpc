@@ -77,6 +77,11 @@ int LayeredScreen::openScreen(string screenName)
 	if (currentScreenName.compare(screenName) == 0)
 		return -1;
 
+    auto screenComponent = mpc.screens->getScreenComponent(screenName);
+
+    if (!screenComponent)
+        return -1;
+    
 	auto ams = mpc.getAudioMidiServices().lock();
 
 	if (currentScreenName.compare("song") == 0 && mpc.getSequencer().lock()->isPlaying())
@@ -104,17 +109,12 @@ int LayeredScreen::openScreen(string screenName)
 			setFocus("note0");
 	}
 
-	auto focus = getFocusedLayer().lock()->findField(getFocus()).lock();
+    auto focus = getFocusedLayer().lock()->findField(getFocus()).lock();
 
-	setLastFocus(currentScreenName, getFocus());
+    setLastFocus(currentScreenName, getFocus());
 
-	if (focus)
-		focus->loseFocus("");
-
-	auto screenComponent = mpc.screens->getScreenComponent(screenName);
-
-	if (!screenComponent)
-		return -1;
+    if (focus)
+        focus->loseFocus("");
 
 	previousScreenName = currentScreenName;
 	currentScreenName = screenName;
