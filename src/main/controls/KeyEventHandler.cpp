@@ -1,7 +1,10 @@
 #include "KeyEventHandler.hpp"
 
+#include <Mpc.hpp>
+
 #include "KeyEvent.hpp"
 
+#include <lcdgui/LayeredScreen.hpp>
 #include <hardware/Hardware.hpp>
 #include <hardware/HwComponent.hpp>
 
@@ -11,19 +14,24 @@
 #include <sstream>
 #include <iomanip>
 
+using namespace mpc::lcdgui;
 using namespace mpc::controls;
 using namespace mpc::hardware;
 using namespace std;
 
-KeyEventHandler::KeyEventHandler(weak_ptr<Hardware> hardware)
-    : hardware (hardware)
+KeyEventHandler::KeyEventHandler(mpc::Mpc& mpc)
+    : mpc (mpc)
 {
     kbMapping = make_shared<KbMapping>();
 }
 
 void KeyEventHandler::handle(const KeyEvent& keyEvent)
 {
-
+    if (mpc.getLayeredScreen().lock()->getCurrentScreenName().compare("vmpc-keyboard") == 0)
+    {
+        return;
+    }
+    
     auto it = find(begin(pressed), end(pressed), keyEvent.rawKeyCode);
 
     bool isCapsLock = false;
@@ -69,7 +77,7 @@ void KeyEventHandler::handle(const KeyEvent& keyEvent)
 
     MLOG("This event should " + string(keyEvent.keyDown ? "press" : "release") + " hardware label " + hardwareLabel);
     
-    auto hardwareComponent = hardware.lock()->getComponentByLabel(hardwareLabel).lock();
+    auto hardwareComponent = mpc.getHardware().lock()->getComponentByLabel(hardwareLabel).lock();
     
     if (hardwareComponent)
     {

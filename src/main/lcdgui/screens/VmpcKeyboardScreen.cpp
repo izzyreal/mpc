@@ -1,4 +1,4 @@
-#include "KbEditor.hpp"
+#include "VmpcKeyboardScreen.hpp"
 
 #include <Mpc.hpp>
 
@@ -16,30 +16,51 @@
 
 #include <string>
 
-using namespace mpc::lcdgui::kbeditor;
+using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui;
 using namespace moduru::lang;
 using namespace std;
 
-KbEditor::KbEditor(mpc::Mpc& mpc)
-: Component("keyboard-editor"), mpc (mpc)
+VmpcKeyboardScreen::VmpcKeyboardScreen(mpc::Mpc& mpc, int layerIndex)
+: ScreenComponent(mpc, "vmpc-keyboard", layerIndex)
 {
-    x = 0;
-    y = 0;
-    w = 400;
-    h = 400;
-        
-    for (int i = 0; i < 16; i++)
+    for (int i = 0; i < 5; i++)
     {
-        auto param = make_shared<Parameter>(mpc, "       ", "row" + to_string(i), 20, 20 + (i * 10), 40 * 6);
+        auto param = make_shared<Parameter>(mpc, "       ", "row" + to_string(i), 2, 3 + (i * 9), 20 * 6);
         
         addChild(param);
     }
-    
+}
+
+void VmpcKeyboardScreen::open()
+{
     updateRows();
 }
 
-void KbEditor::updateRows()
+void VmpcKeyboardScreen::up()
+{
+    MLOG("up");
+}
+
+void VmpcKeyboardScreen::down()
+{
+    
+}
+
+void VmpcKeyboardScreen::function(int i)
+{
+    switch(i)
+    {
+        case 0:
+            ls.lock()->openScreen("vmpc-settings");
+            break;
+        case 4:
+            // kbMapping.resetToDefault()
+            break;
+    }
+}
+
+void VmpcKeyboardScreen::updateRows()
 {
     
     auto& keyCodeNames = moduru::sys::OsxKeyCodes::keyCodeNames;
@@ -56,7 +77,7 @@ void KbEditor::updateRows()
         padLabelsToKeyCodeNames.push_back({label, keyCodeNames[kbMapping.getKeyCodeFromLabel(label)]});
     }
     
-    for (int i = 0; i < 16; i++)
+    for (int i = 0; i < 5; i++)
     {
         auto l = findChild<Label>("row" + to_string(i)).lock();
         auto f = findChild<Field>("row" + to_string(i)).lock();
@@ -67,14 +88,4 @@ void KbEditor::updateRows()
         f->setText(padLabelsToKeyCodeNames[i].second);
         f->setInverted(row == i);
     }
-}
-
-void KbEditor::Draw(vector<vector<bool>>* pixels)
-{
-    if (shouldNotDraw(pixels))
-    {
-        return;
-    }
-    
-    Component::Draw(pixels);
 }

@@ -17,6 +17,7 @@ namespace mpc::lcdgui::screens
 		VmpcSettingsScreen(mpc::Mpc& mpc, const int layerIndex);
 
 		void open() override;
+        void function(int) override;
 
 	private:
 		const std::vector<std::string> initialPadMappingNames{ "VMPC", "ORIGINAL" };

@@ -46,11 +46,6 @@ namespace mpc::lcdgui
 	class ScreenComponent;
 }
 
-namespace mpc::lcdgui::kbeditor
-{
-    class KbEditor;
-}
-
 namespace mpc::audiomidi
 {
 	class EventHandler;
@@ -75,7 +70,6 @@ namespace mpc
 		: public moduru::observer::Observable
 	{
 	private:
-        std::shared_ptr<mpc::lcdgui::kbeditor::KbEditor> kbEditor;
 		std::thread loadSoundThread;
 		std::unique_ptr<mpc::disk::ProgramLoader> programLoader;
 		std::shared_ptr<lcdgui::LayeredScreen> layeredScreen;
@@ -127,9 +121,6 @@ namespace mpc
 		ctoot::mpc::MpcMultiMidiSynth* getMms();
 		std::weak_ptr<mpc::audiomidi::MpcMidiPorts> getMidiPorts();
 		mpc::audiomidi::MpcMidiInput* getMpcMidiInput(int i);
-
-    public:
-        std::weak_ptr<mpc::lcdgui::kbeditor::KbEditor> getKbEditor();
 
 	public:
 		void loadSound(bool replace);

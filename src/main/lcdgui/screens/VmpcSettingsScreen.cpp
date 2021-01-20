@@ -13,6 +13,16 @@ void VmpcSettingsScreen::open()
 	displayInitialPadMapping();
 }
 
+void VmpcSettingsScreen::function(int i)
+{
+    switch (i)
+    {
+        case 1:
+            ls.lock()->openScreen("vmpc-keyboard");
+            break;
+    }
+}
+
 void VmpcSettingsScreen::turnWheel(int i)
 {
     init();

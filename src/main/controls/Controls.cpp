@@ -15,7 +15,7 @@ Controls::Controls(mpc::Mpc& mpc)
 {
 	pressedPadVelos = vector<int>(16);
 	controls["release"] = new GlobalReleaseControls(mpc);
-    keyEventHandler = make_shared<KeyEventHandler>(mpc.getHardware());
+    keyEventHandler = make_shared<KeyEventHandler>(mpc);
 }
 
 weak_ptr<KeyEventHandler> Controls::getKeyEventHandler()

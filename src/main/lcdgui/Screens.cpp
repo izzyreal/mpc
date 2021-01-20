@@ -41,14 +41,16 @@
 #include <lcdgui/screens/FormatScreen.hpp>
 #include <lcdgui/screens/SetupScreen.hpp>
 #include <lcdgui/screens/SaveScreen.hpp>
-#include <lcdgui/screens/VmpcDiskScreen.hpp>
-#include <lcdgui/screens/VmpcSettingsScreen.hpp>
 #include <lcdgui/screens/VerScreen.hpp>
 #include <lcdgui/screens/InitScreen.hpp>
 #include <lcdgui/screens/SecondSeqScreen.hpp>
 #include <lcdgui/screens/TransScreen.hpp>
 #include <lcdgui/screens/PunchScreen.hpp>
 #include <lcdgui/screens/SyncScreen.hpp>
+
+#include <lcdgui/screens/VmpcDiskScreen.hpp>
+#include <lcdgui/screens/VmpcSettingsScreen.hpp>
+#include <lcdgui/screens/VmpcKeyboardScreen.hpp>
 
 #include <lcdgui/screens/window/NumberOfZonesScreen.hpp>
 #include <lcdgui/screens/window/InitPadAssignScreen.hpp>
@@ -920,6 +922,10 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	{
 		screen = make_shared<CopySongScreen>(mpc, layerIndex);
 	}
+    else if (screenName.compare("vmpc-keyboard") == 0)
+    {
+        screen = make_shared<VmpcKeyboardScreen>(mpc, layerIndex);
+    }
 
 	if (screen)
 	{
