@@ -14,8 +14,6 @@
 #include <Logger.hpp>
 #include <sys/OsxKeyCodes.hpp>
 
-#include <string>
-
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui;
 using namespace moduru::lang;
@@ -26,10 +24,12 @@ VmpcKeyboardScreen::VmpcKeyboardScreen(mpc::Mpc& mpc, int layerIndex)
 {
     for (int i = 0; i < 5; i++)
     {
-        auto param = make_shared<Parameter>(mpc, "       ", "row" + to_string(i), 2, 3 + (i * 9), 20 * 6);
+        auto param = make_shared<Parameter>(mpc, "                 ", "row" + to_string(i), 2, 3 + (i * 9), 20 * 6);
         
         addChild(param);
     }
+    
+    updateKeyCodeNames();
 }
 
 void VmpcKeyboardScreen::open()
@@ -39,12 +39,34 @@ void VmpcKeyboardScreen::open()
 
 void VmpcKeyboardScreen::up()
 {
-    MLOG("up");
+    if (row == 0)
+    {
+        if (rowOffset == 0)
+            return;
+        
+        rowOffset--;
+        updateRows();
+        return;
+    }
+    
+    row--;
+    updateRows();
 }
 
 void VmpcKeyboardScreen::down()
 {
+    if (row == 4)
+    {
+        if (rowOffset + 5 >= labelsToKeyCodeNames.size())
+            return;
+        
+        rowOffset++;
+        updateRows();
+        return;
+    }
     
+    row++;
+    updateRows();
 }
 
 void VmpcKeyboardScreen::function(int i)
@@ -62,30 +84,41 @@ void VmpcKeyboardScreen::function(int i)
 
 void VmpcKeyboardScreen::updateRows()
 {
-    
-    auto& keyCodeNames = moduru::sys::OsxKeyCodes::keyCodeNames;
-    
-    auto kbMapping = mpc::controls::KbMapping();
-    
-    vector<pair<string, string>> padLabelsToKeyCodeNames;
-    
-    auto hw = mpc.getHardware().lock();
-    
-    for (auto p : hw->getPads())
-    {
-        auto label = p.lock()->getLabel();
-        padLabelsToKeyCodeNames.push_back({label, keyCodeNames[kbMapping.getKeyCodeFromLabel(label)]});
-    }
-    
     for (int i = 0; i < 5; i++)
     {
         auto l = findChild<Label>("row" + to_string(i)).lock();
         auto f = findChild<Field>("row" + to_string(i)).lock();
         
-        auto labelText = StrUtil::padRight(padLabelsToKeyCodeNames[i].first, " ", 6) + ": ";
+        int length = 16;
+        
+        auto labelText = StrUtil::padRight(labelsToKeyCodeNames[i + rowOffset].first, " ", length) + ": ";
         
         l->setText(labelText);
-        f->setText(padLabelsToKeyCodeNames[i].second);
+        f->setText(labelsToKeyCodeNames[i + rowOffset].second);
         f->setInverted(row == i);
+    }
+}
+
+void VmpcKeyboardScreen::updateKeyCodeNames()
+{
+    labelsToKeyCodeNames.clear();
+    
+    auto& keyCodeNames = moduru::sys::OsxKeyCodes::keyCodeNames;
+    auto kbMapping = mpc::controls::KbMapping();
+    auto hw = mpc.getHardware().lock();
+    
+    auto pads = hw->getPads();
+    auto buttons = hw->getButtons();
+    
+    vector<weak_ptr<mpc::hardware::HwComponent>> components;
+    
+    for (auto& p : pads) components.push_back(p);
+    for (auto& b : buttons) components.push_back(b);
+    
+    
+    for (auto c : components)
+    {
+        auto label = c.lock()->getLabel();
+        labelsToKeyCodeNames.push_back({label, keyCodeNames[kbMapping.getKeyCodeFromLabel(label)]});
     }
 }

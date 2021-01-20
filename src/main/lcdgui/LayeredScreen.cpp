@@ -159,7 +159,7 @@ vector<vector<bool>>* LayeredScreen::getPixels()
 
 void LayeredScreen::Draw()
 {
-	MLOG("LayeredScreen::Draw()");
+//	MLOG("LayeredScreen::Draw()");
 	for (auto& c : root->findHiddenChildren())
 		c.lock()->Draw(&pixels);
 
@@ -170,7 +170,7 @@ void LayeredScreen::Draw()
 
 MRECT LayeredScreen::getDirtyArea()
 {
-	MLOG("LayeredScreen::getDirtyArea()");
+//	MLOG("LayeredScreen::getDirtyArea()");
 	auto dirtyArea = root->getDirtyArea();
 	//MLOG("dirtyArea: " + dirtyArea.getInfo());
 	return dirtyArea;

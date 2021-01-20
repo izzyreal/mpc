@@ -27,11 +27,6 @@ KeyEventHandler::KeyEventHandler(mpc::Mpc& mpc)
 
 void KeyEventHandler::handle(const KeyEvent& keyEvent)
 {
-    if (mpc.getLayeredScreen().lock()->getCurrentScreenName().compare("vmpc-keyboard") == 0)
-    {
-        return;
-    }
-    
     auto it = find(begin(pressed), end(pressed), keyEvent.rawKeyCode);
 
     bool isCapsLock = false;
@@ -68,15 +63,12 @@ void KeyEventHandler::handle(const KeyEvent& keyEvent)
         }
     }
     
-    stringstream rawKeyCodeHex;
-    rawKeyCodeHex << std::hex << keyEvent.rawKeyCode;
-    auto rawKeyCodeHexString = string(rawKeyCodeHex.str());
-    MLOG("KeyEventHandler::handle key " + string(keyEvent.keyDown ? "press" : "release") + " event with rawKeyCode " + to_string(keyEvent.rawKeyCode) + ", " + rawKeyCodeHexString);
+    if (mpc.getLayeredScreen().lock()->getCurrentScreenName().compare("vmpc-keyboard") == 0)
+    {
+        return;
+    }
     
     auto hardwareLabel = kbMapping->getLabelFromKeyCode(keyEvent.rawKeyCode);
-
-    MLOG("This event should " + string(keyEvent.keyDown ? "press" : "release") + " hardware label " + hardwareLabel);
-    
     auto hardwareComponent = mpc.getHardware().lock()->getComponentByLabel(hardwareLabel).lock();
     
     if (hardwareComponent)

@@ -1,6 +1,8 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
+#include <string>
+
 namespace mpc { class Mpc; }
 
 namespace mpc::lcdgui::screens{
@@ -21,6 +23,9 @@ public:
 private:
     int row = 0;
     int rowOffset = 0;
+    
+    std::vector<std::pair<std::string, std::string>> labelsToKeyCodeNames;
+    void updateKeyCodeNames();
     
     void updateRows();
     
