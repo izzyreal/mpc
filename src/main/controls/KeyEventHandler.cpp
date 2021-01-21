@@ -34,6 +34,8 @@ void KeyEventHandler::handle(const KeyEvent& keyEvent)
         return;
     }
     
+    MLOG("Handling, and not ignoring, key code " + to_string(keyEvent.rawKeyCode) + (keyEvent.keyDown ? " down" : " up"));
+    
     auto it = find(begin(pressed), end(pressed), keyEvent.rawKeyCode);
 
     bool isCapsLock = false;
@@ -66,7 +68,12 @@ void KeyEventHandler::handle(const KeyEvent& keyEvent)
             pressed.push_back(keyEvent.rawKeyCode);
             
         } else {
-            pressed.erase(it);
+            
+            // There are some odd cases where a key down event actually comes in as a key up.
+            // Concrete example on OSX: [fn + left shift] produces a key up event when pressed,
+            // and another key up event when released.
+            if (it != end(pressed))
+                pressed.erase(it);
         }
     }
     

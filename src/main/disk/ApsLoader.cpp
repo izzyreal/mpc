@@ -78,7 +78,6 @@ void ApsLoader::notFound(string soundFileName, string ext)
 
 		while (cantFindFileScreen->waitingForUser)
 		{
-			MLOG("Screen: " + mpc.getLayeredScreen().lock()->getCurrentScreenName());
 			this_thread::sleep_for(chrono::milliseconds(25));
 		}
 	}

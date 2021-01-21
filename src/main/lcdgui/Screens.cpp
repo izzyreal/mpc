@@ -244,15 +244,6 @@ pair<vector<shared_ptr<Component>>, map<string, vector<string>>> Screens::get(co
 				allTypes.push_back(types);
 			}
 		}
-
-        MLOG("Screenname: " + screenName);
-        
-        if (screenName.compare("settings") == 0) {
-            MLOG("Foo!");
-            for (auto& texts : allLabels)
-                for (auto& text : texts)
-                    MLOG("text: " + text);
-        }
         
 		auto functionKeysComponent = make_unique<FunctionKeys>(mpc, "function-keys", allLabels, allTypes);
 		components.push_back(move(functionKeysComponent));
