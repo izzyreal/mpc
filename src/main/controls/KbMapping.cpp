@@ -42,8 +42,8 @@ KbMapping::KbMapping()
 	labelKeyMap["shift"] = kh->code("left shift");
 	labelKeyMap["enter"] = kh->code("enter");
 	labelKeyMap["undo-seq"] = kh->code("f10");
-//	labelKeyMap["erase"] = kh->code("f11"); // These are reserved on OSX.
-//	labelKeyMap["after"] = kh->code("f12"); // Find alternatives.
+	labelKeyMap["erase"] = kh->code("f8");
+	labelKeyMap["after"] = kh->code("f9");
 	labelKeyMap["bank-a"] = kh->code("home");
 	labelKeyMap["bank-b"] = kh->code("end");
 	labelKeyMap["bank-c"] = kh->code("insert");
@@ -74,6 +74,10 @@ KbMapping::KbMapping()
     labelKeyMap["pad-14"] = kh->code("h");
     labelKeyMap["pad-15"] = kh->code("j");
     labelKeyMap["pad-16"] = kh->code("k");
+    labelKeyMap["datawheel-down"] = kh->code("minus");
+    labelKeyMap["datawheel-up"] = kh->code("equals");
+    labelKeyMap["ctrl"] = kh->code("left control");
+    labelKeyMap["alt"] = kh->code("left option");
 	exportMapping();
 }
 const key_helper_t* mpc::controls::KbMapping::kh = &key_helper_t::instance();
@@ -126,39 +130,4 @@ std::string KbMapping::getKeyCodeString(int keyCode) {
 		}
 	}
 	return kh->name(keyCode);
-}
-
-int KbMapping::dataWheelBack()
-{
-    return kh->code("minus");
-}
-
-int KbMapping::dataWheelForward()
-{
-    
-	return kh->code("equals");
-}
-
-vector<int> KbMapping::padKeys()
-{
-    return vector<int>{ kh->code("z"), kh->code("x"), kh->code("c"), kh->code("v"), kh->code("a"), kh->code("s"), kh->code("d"), kh->code("f"), kh->code("b"), kh->code("n"), kh->code("m"), kh->code("comma"), kh->code("g"), kh->code("h"), kh->code("j"), kh->code("k") };
-}
-
-vector<int> KbMapping::numPad()
-{
-    return vector<int>{ kh->code("0"), kh->code("1"), kh->code("2"), kh->code("3"), kh->code("4"), kh->code("5"), kh->code("6"), kh->code("7"), kh->code("8"), kh->code("9") };
-}
-
-vector<int> KbMapping::altNumPad()
-{
-	return vector<int>{ 96, 97, 98, 99, 100, 101, 102, 103, 104, 105 };
-}
-
-
-int KbMapping::ctrl() {
-	return kh->code("left control");
-}
-
-int KbMapping::alt() {
-	return kh->code("left alternate");
 }

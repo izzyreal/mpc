@@ -19,16 +19,6 @@ namespace mpc {
 			std::unordered_map<std::string, int> labelKeyMap;
 
 		public:
-			static int dataWheelBack();
-			static int dataWheelForward();
-			static std::vector<int> padKeys();
-			static std::vector<int> numPad();
-			static std::vector<int> altNumPad();
-
-			static int ctrl();
-			static int alt();
-
-		public:
 			int getKeyCodeFromLabel(std::string label);
 			std::string getLabelFromKeyCode(int keyCode);
 			std::string getKeyCodeString(int keyCode);

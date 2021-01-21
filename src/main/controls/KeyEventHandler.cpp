@@ -4,6 +4,8 @@
 
 #include "KeyEvent.hpp"
 
+#include <controls/Controls.hpp>
+#include <lcdgui/ScreenComponent.hpp>
 #include <lcdgui/LayeredScreen.hpp>
 #include <hardware/Hardware.hpp>
 #include <hardware/HwComponent.hpp>
@@ -20,7 +22,7 @@ using namespace mpc::hardware;
 using namespace std;
 
 KeyEventHandler::KeyEventHandler(mpc::Mpc& mpc)
-    : mpc (mpc)
+: mpc (mpc)
 {
     kbMapping = make_shared<KbMapping>();
 }
@@ -35,14 +37,14 @@ void KeyEventHandler::handle(const KeyEvent& keyEvent)
     }
     
     MLOG("Handling, and not ignoring, key code " + to_string(keyEvent.rawKeyCode) + (keyEvent.keyDown ? " down" : " up"));
-    
+    MLOG("");
     auto it = find(begin(pressed), end(pressed), keyEvent.rawKeyCode);
-
+    
     bool isCapsLock = false;
 #ifdef __APPLE__
     isCapsLock = moduru::sys::OsxKeyCodes::keyCodeNames[keyEvent.rawKeyCode].compare("caps lock") == 0;
 #endif
-
+    
     // Special case as caps lock only sends key releases on OSX
     if (isCapsLock) {
         if (it == end(pressed))
@@ -82,8 +84,11 @@ void KeyEventHandler::handle(const KeyEvent& keyEvent)
         return;
     }
     
-    auto hardwareLabel = kbMapping->getLabelFromKeyCode(keyEvent.rawKeyCode);
-    auto hardwareComponent = mpc.getHardware().lock()->getComponentByLabel(hardwareLabel).lock();
+    auto label = kbMapping->getLabelFromKeyCode(keyEvent.rawKeyCode);
+    
+//    MLOG("Label associated with key code: " + label);
+    
+    auto hardwareComponent = mpc.getHardware().lock()->getComponentByLabel(label).lock();
     
     if (hardwareComponent)
     {
@@ -95,6 +100,45 @@ void KeyEventHandler::handle(const KeyEvent& keyEvent)
         else
         {
             hardwareComponent->release();
+        }
+    }
+    else
+    {
+        // We have some key codes that map to themselves, not to a hardware component.
+        if (label.compare("ctrl") == 0)
+        {
+            mpc.getControls().lock()->setCtrlPressed(keyEvent.keyDown);
+        }
+        else if (label.compare("alt") == 0)
+        {
+            mpc.getControls().lock()->setAltPressed(keyEvent.keyDown);
+        }
+        
+        // And we have some things that are not buttons. Probably pads should be handled here
+        // as well, so we can do some velocity calculation based on the current state of Mpc.
+        else if (label.find("datawheel-") != string::npos && keyEvent.keyDown)
+        {
+            int increment = 1;
+            
+            if (mpc.getControls().lock()->isCtrlPressed())
+            {
+                increment *= 10;
+            }
+            
+            if (mpc.getControls().lock()->isAltPressed())
+            {
+                increment *= 10;
+            }
+            
+            if (mpc.getControls().lock()->isShiftPressed())
+            {
+                increment *= 10;
+            }
+            
+            if (label.find("down") != string::npos)
+                increment = -increment;
+            
+            mpc.getActiveControls().lock()->turnWheel(increment);
         }
     }
 }
