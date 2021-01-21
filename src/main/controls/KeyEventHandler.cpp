@@ -27,6 +27,13 @@ KeyEventHandler::KeyEventHandler(mpc::Mpc& mpc)
 
 void KeyEventHandler::handle(const KeyEvent& keyEvent)
 {
+    // If no action is associated with some keypress,
+    // don't do anything at all, so we avoid unexpected and undefined behaviour.
+    if (kbMapping->getLabelFromKeyCode(keyEvent.rawKeyCode).compare("") == 0)
+    {
+        return;
+    }
+    
     auto it = find(begin(pressed), end(pressed), keyEvent.rawKeyCode);
 
     bool isCapsLock = false;

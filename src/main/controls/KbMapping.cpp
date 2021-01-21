@@ -42,8 +42,8 @@ KbMapping::KbMapping()
 	labelKeyMap["shift"] = kh->code("left shift");
 	labelKeyMap["enter"] = kh->code("enter");
 	labelKeyMap["undo-seq"] = kh->code("f10");
-	labelKeyMap["erase"] = kh->code("f11");
-	labelKeyMap["after"] = kh->code("f12");
+//	labelKeyMap["erase"] = kh->code("f11"); // These are reserved on OSX.
+//	labelKeyMap["after"] = kh->code("f12"); // Find alternatives.
 	labelKeyMap["bank-a"] = kh->code("home");
 	labelKeyMap["bank-b"] = kh->code("end");
 	labelKeyMap["bank-c"] = kh->code("insert");
