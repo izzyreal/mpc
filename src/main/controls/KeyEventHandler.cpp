@@ -5,8 +5,12 @@
 #include "KeyEvent.hpp"
 
 #include <controls/Controls.hpp>
+#include <controls/KbMapping.hpp>
+
 #include <lcdgui/ScreenComponent.hpp>
 #include <lcdgui/LayeredScreen.hpp>
+#include <lcdgui/screens/VmpcKeyboardScreen.hpp>
+
 #include <hardware/Hardware.hpp>
 #include <hardware/HwComponent.hpp>
 
@@ -17,6 +21,7 @@
 #include <iomanip>
 
 using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens;
 using namespace mpc::controls;
 using namespace mpc::hardware;
 using namespace std;
@@ -24,20 +29,22 @@ using namespace std;
 KeyEventHandler::KeyEventHandler(mpc::Mpc& mpc)
 : mpc (mpc)
 {
-    kbMapping = make_shared<KbMapping>();
 }
 
 void KeyEventHandler::handle(const KeyEvent& keyEvent)
 {
+    auto screen = mpc.screens->get<VmpcKeyboardScreen>("vmpc-keyboard");
+    auto kbMapping = mpc.getControls().lock()->getKbMapping().lock();
     // If no action is associated with some keypress,
     // don't do anything at all, so we avoid unexpected and undefined behaviour.
-    if (kbMapping->getLabelFromKeyCode(keyEvent.rawKeyCode).compare("") == 0)
+    if (kbMapping->getLabelFromKeyCode(keyEvent.rawKeyCode).compare("") == 0 &&
+        !screen->isLearning())
     {
         return;
     }
     
-    MLOG("Handling, and not ignoring, key code " + to_string(keyEvent.rawKeyCode) + (keyEvent.keyDown ? " down" : " up"));
-    MLOG("");
+//    MLOG("Handling, and not ignoring, key code " + to_string(keyEvent.rawKeyCode) + (keyEvent.keyDown ? " down" : " up"));
+//    MLOG("");
     auto it = find(begin(pressed), end(pressed), keyEvent.rawKeyCode);
     
     bool isCapsLock = false;
@@ -81,6 +88,14 @@ void KeyEventHandler::handle(const KeyEvent& keyEvent)
     
     if (mpc.getLayeredScreen().lock()->getCurrentScreenName().compare("vmpc-keyboard") == 0)
     {
+        if (!keyEvent.keyDown)
+            return;
+        
+        auto screen = mpc.screens->get<VmpcKeyboardScreen>("vmpc-keyboard");
+        
+        if (screen->isLearning())
+            screen->setLearnCandidate(keyEvent.rawKeyCode);
+        
         return;
     }
     

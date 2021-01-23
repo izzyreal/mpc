@@ -1,8 +1,6 @@
 #ifndef KeyEventHandler_h
 #define KeyEventHandler_h
 
-#include <controls/KbMapping.hpp>
-
 #include <memory>
 #include <vector>
 
@@ -25,7 +23,6 @@ public:
 private:
     mpc::Mpc& mpc;
     std::vector<int> pressed;
-    std::shared_ptr<KbMapping> kbMapping;
     
 };
 

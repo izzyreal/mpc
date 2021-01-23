@@ -2,6 +2,8 @@
 
 #include "KeyEventHandler.hpp"
 
+#include "KbMapping.hpp"
+
 #include <Mpc.hpp>
 
 #include <controls/BaseControls.hpp>
@@ -16,6 +18,7 @@ Controls::Controls(mpc::Mpc& mpc)
 	pressedPadVelos = vector<int>(16);
 	controls["release"] = new GlobalReleaseControls(mpc);
     keyEventHandler = make_shared<KeyEventHandler>(mpc);
+    kbMapping = make_shared<KbMapping>();
 }
 
 weak_ptr<KeyEventHandler> Controls::getKeyEventHandler()
@@ -187,4 +190,9 @@ Controls::~Controls()
 	{
 		delete c.second;
 	}
+}
+
+weak_ptr<KbMapping> Controls::getKbMapping()
+{
+    return kbMapping;
 }

@@ -18,16 +18,21 @@ public:
     void up() override;
     void down() override;
     void function(int i) override;
-    
-    
+
+    bool isLearning();
+    void setLearnCandidate(const int rawKeyCode);
+
 private:
     int row = 0;
     int rowOffset = 0;
+    int learnCandidate = -1;
+    
+    bool learning = false;
     
     std::vector<std::pair<std::string, std::string>> labelsToKeyCodeNames;
     void updateKeyCodeNames();
     
     void updateRows();
-    
+        
 };
 }

@@ -332,12 +332,12 @@ pair<vector<shared_ptr<Component>>, map<string, vector<string>>> Screens::get(co
 
 void Screens::init()
 {
-	auto path0 = string(mpc::Paths::resPath() + "mainpanel-mod.json");
-	auto path1 = string(mpc::Paths::resPath() + "windowpanel-mod.json");
-	auto path2 = string(mpc::Paths::resPath() + "dialogpanel-mod.json");
-	auto path3 = string(mpc::Paths::resPath() + "dialog2panel-mod.json");
+	auto layer1ScreensPath = string(mpc::Paths::resPath() + "layer_1_screens.json");
+	auto layer2ScreensPath = string(mpc::Paths::resPath() + "layer_2_screens.json");
+	auto layer3ScreensPath = string(mpc::Paths::resPath() + "layer_3_screens.json");
+	auto layer4ScreensPath = string(mpc::Paths::resPath() + "layer_4_screens.json");
 
-	vector<string> paths = { path0, path1, path2, path3 };
+	vector<string> paths = { layer1ScreensPath, layer2ScreensPath, layer3ScreensPath, layer4ScreensPath };
 
 	for (int i = 0; i < 4; i++)
 	{

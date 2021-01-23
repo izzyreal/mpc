@@ -22,10 +22,11 @@ namespace mpc {
 			int getKeyCodeFromLabel(std::string label);
 			std::string getLabelFromKeyCode(int keyCode);
 			std::string getKeyCodeString(int keyCode);
-
+            void setKeyCodeForLabel(const int keyCode, std::string label);
+            
 		public:
 			void exportMapping();
-
+            
 		public:
 			KbMapping();
 

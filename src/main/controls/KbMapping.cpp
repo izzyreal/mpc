@@ -78,6 +78,7 @@ KbMapping::KbMapping()
     labelKeyMap["datawheel-up"] = kh->code("equals");
     labelKeyMap["ctrl"] = kh->code("left control");
     labelKeyMap["alt"] = kh->code("left option");
+    
 	exportMapping();
 }
 const key_helper_t* mpc::controls::KbMapping::kh = &key_helper_t::instance();
@@ -130,4 +131,9 @@ std::string KbMapping::getKeyCodeString(int keyCode) {
 		}
 	}
 	return kh->name(keyCode);
+}
+
+void KbMapping::setKeyCodeForLabel(const int keyCode, std::string label)
+{
+    labelKeyMap[label] = keyCode;
 }

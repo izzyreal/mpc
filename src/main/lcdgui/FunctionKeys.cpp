@@ -29,8 +29,6 @@ void FunctionKey::Draw(std::vector<std::vector<bool>>* pixels)
 	if (shouldNotDraw(pixels))
 		return;
 
-	auto label = findChild<TextComp>(name).lock();
-
 	bool border = false;
 	bool bg = false;
 
