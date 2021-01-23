@@ -88,13 +88,18 @@ void VmpcKeyboardScreen::function(int i)
             ls.lock()->openScreen("vmpc-settings");
             break;
         case 2:
-            if (!learning)
+            if (learning)
+            {
+                learning = false;
+                findChild<TextComp>("fk2").lock()->setBlinking(false);
+                findChild<TextComp>("fk3").lock()->setBlinking(false);
+                setLearnCandidate(-1);
+                updateRows();
                 return;
+            }
             
-            learning = false;
-            findChild<TextComp>("fk2").lock()->setBlinking(false);
-            findChild<TextComp>("fk3").lock()->setBlinking(false);
-            setLearnCandidate(-1);
+            mpc.getControls().lock()->getKbMapping().lock()->initializeDefaults();
+            updateKeyCodeNames();
             updateRows();
             break;
         case 3:
@@ -105,7 +110,9 @@ void VmpcKeyboardScreen::function(int i)
             
             if (!learning)
             {
-                mpc.getControls().lock()->getKbMapping().lock()->setKeyCodeForLabel(learnCandidate, labelsToKeyCodeNames[row + rowOffset].first);
+                mpc.getControls().lock()->getKbMapping()
+                .lock()->setKeyCodeForLabel(learnCandidate,
+                                            labelsToKeyCodeNames[row + rowOffset].first);
                 updateKeyCodeNames();
             }
             
@@ -116,7 +123,15 @@ void VmpcKeyboardScreen::function(int i)
             if (learning)
                 return;
             
-            // kbMapping.resetToDefault()
+            mpc.getControls().lock()->getKbMapping().lock()->importMapping();
+            updateKeyCodeNames();
+            updateRows();
+            break;
+        case 5:
+            if (learning)
+                return;
+            
+            mpc.getControls().lock()->getKbMapping().lock()->exportMapping();
             break;
     }
 }
