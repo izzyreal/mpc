@@ -14,7 +14,12 @@
 #include <hardware/Hardware.hpp>
 #include <hardware/HwComponent.hpp>
 
+#ifdef __APPLE__
 #include <sys/OsxKeyCodes.hpp>
+#elif defined _WIN32
+#include <sys/WindowsKeyCodes.hpp>
+#endif
+
 #include <Logger.hpp>
 
 #include <sstream>
@@ -24,6 +29,7 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::controls;
 using namespace mpc::hardware;
+using namespace moduru::sys;
 using namespace std;
 
 KeyEventHandler::KeyEventHandler(mpc::Mpc& mpc)
@@ -51,7 +57,9 @@ void KeyEventHandler::handle(const KeyEvent& keyEvent)
     
     bool isCapsLock = false;
 #ifdef __APPLE__
-    isCapsLock = moduru::sys::OsxKeyCodes::keyCodeNames[keyEvent.rawKeyCode].compare("caps lock") == 0;
+    isCapsLock = OsxKeyCodes::keyCodeNames[keyEvent.rawKeyCode].compare("caps lock") == 0;
+#elif defined _WIN32
+    isCapsLock = WindowsKeyCodes::keyCodeNames[keyEvent.rawKeyCode].compare("caps lock") == 0;
 #endif
     
     // Special case as caps lock only sends key releases on OSX
