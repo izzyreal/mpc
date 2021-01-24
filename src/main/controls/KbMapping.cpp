@@ -140,7 +140,7 @@ void KbMapping::initializeDefaults()
     labelKeyMap["f4"] = kh->code("f4");
     labelKeyMap["f5"] = kh->code("f5");
     labelKeyMap["f6"] = kh->code("f6");
-    labelKeyMap["shift"] = kh->code("left shift");
+    labelKeyMap["shift"] = kh->code("shift");
     labelKeyMap["enter"] = kh->code("enter");
     labelKeyMap["undo-seq"] = kh->code("f10");
     labelKeyMap["erase"] = kh->code("f8");
@@ -177,8 +177,12 @@ void KbMapping::initializeDefaults()
     labelKeyMap["pad-16"] = kh->code("k");
     labelKeyMap["datawheel-down"] = kh->code("minus");
     labelKeyMap["datawheel-up"] = kh->code("equals");
-    labelKeyMap["ctrl"] = kh->code("left control");
-    labelKeyMap["alt"] = kh->code("left option");
+    labelKeyMap["ctrl"] = kh->code("control");
+#ifdef __APPLE__
+    labelKeyMap["alt"] = kh->code("option");
+#elif defined _WIN32
+    labelKeyMap["alt"] = kh->code("alternate");
+#endif
 }
 
 int KbMapping::getKeyCodeFromLabel(std::string label) {

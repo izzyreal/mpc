@@ -33,6 +33,8 @@ KeyEventHandler::KeyEventHandler(mpc::Mpc& mpc)
 
 void KeyEventHandler::handle(const KeyEvent& keyEvent)
 {
+    MLOG("KeyEventHandler::handle keyEvent.rawKeyCode " + to_string(keyEvent.rawKeyCode) + string(keyEvent.keyDown ? " down" : " up"));
+
     auto screen = mpc.screens->get<VmpcKeyboardScreen>("vmpc-keyboard");
     auto kbMapping = mpc.getControls().lock()->getKbMapping().lock();
     // If no action is associated with some keypress,
@@ -101,7 +103,7 @@ void KeyEventHandler::handle(const KeyEvent& keyEvent)
     
     auto label = kbMapping->getLabelFromKeyCode(keyEvent.rawKeyCode);
     
-//    MLOG("Label associated with key code: " + label);
+    MLOG("Label associated with key code: " + label);
     
     auto hardwareComponent = mpc.getHardware().lock()->getComponentByLabel(label).lock();
     
