@@ -17,6 +17,8 @@
 #include <sys/OsxKeyCodes.hpp>
 #elif defined _WIN32
 #include <sys/WindowsKeyCodes.hpp>
+#elif defined __linux__
+#include <sys/OsxKeyCodes.hpp>
 #endif
 
 using namespace mpc::lcdgui::screens;
@@ -171,9 +173,10 @@ void VmpcKeyboardScreen::updateRows()
         {
 #ifdef __APPLE__
             f->setText(OsxKeyCodes::keyCodeNames[learnCandidate]);
-#include <sys/OsxKeyCodes.hpp>
 #elif defined _WIN32
             f->setText(WindowsKeyCodes::keyCodeNames[learnCandidate]);
+#elif defined __linux__
+            f->setText(OsxKeyCodes::keyCodeNames[learnCandidate]);
 #endif
             f->setBlinking(true);
         }
@@ -193,6 +196,8 @@ void VmpcKeyboardScreen::updateKeyCodeNames()
 #include <sys/OsxKeyCodes.hpp>
 #elif defined _WIN32
     auto& keyCodeNames = WindowsKeyCodes::keyCodeNames;
+#elif defined __linux__
+    auto& keyCodeNames = OsxKeyCodes::keyCodeNames;
 #endif
     auto kbMapping = mpc.getControls().lock()->getKbMapping().lock();
     auto hw = mpc.getHardware().lock();

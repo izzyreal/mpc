@@ -18,6 +18,8 @@
 #include <sys/OsxKeyCodes.hpp>
 #elif defined _WIN32
 #include <sys/WindowsKeyCodes.hpp>
+#elif defined __linux__
+#include <sys/OsxKeyCodes.hpp>
 #endif
 
 #include <Logger.hpp>
