@@ -55,6 +55,7 @@ void KbMapping::importMapping()
     {
         MLOG("No keys.txt mapping found in vMPC/resources. Initializing default mapping...");
         initializeDefaults();
+        MLOG("Default z keySym " + to_string(kh->code("z"))); 
         return;
     }
     
@@ -119,7 +120,7 @@ void KbMapping::initializeDefaults()
     labelKeyMap["down"] = kh->code("down");
     labelKeyMap["rec"] = kh->code("l");
     labelKeyMap["overdub"] = kh->code("semicolon");
-    //labelKeyMap["stop"] = kh->code("quote");
+    labelKeyMap["stop"] = kh->code("quote");
     labelKeyMap["play"] = kh->code("space");
     labelKeyMap["play-start"] = kh->code("backslash");
     labelKeyMap["main-screen"] = kh->code("escape");
@@ -176,7 +177,7 @@ void KbMapping::initializeDefaults()
     labelKeyMap["pad-15"] = kh->code("j");
     labelKeyMap["pad-16"] = kh->code("k");
     labelKeyMap["datawheel-down"] = kh->code("minus");
-    //labelKeyMap["datawheel-up"] = kh->code("equals");
+    labelKeyMap["datawheel-up"] = kh->code("equals");
     labelKeyMap["ctrl"] = kh->code("control");
 #ifdef __APPLE__
     labelKeyMap["alt"] = kh->code("option");
