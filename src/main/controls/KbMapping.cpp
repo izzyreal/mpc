@@ -181,7 +181,7 @@ void KbMapping::initializeDefaults()
     labelKeyMap["ctrl"] = kh->code("control");
 #ifdef __APPLE__
     labelKeyMap["alt"] = kh->code("option");
-#elif defined _WIN32
+#elif defined _WIN32 || defined __linux__
     labelKeyMap["alt"] = kh->code("alternate");
 #endif
 }
