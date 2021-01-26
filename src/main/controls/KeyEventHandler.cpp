@@ -19,7 +19,7 @@
 #elif defined _WIN32
 #include <sys/WindowsKeyCodes.hpp>
 #elif defined __linux__
-#include <sys/OsxKeyCodes.hpp>
+#include <sys/LinuxKeyCodes.hpp>
 #endif
 
 #include <Logger.hpp>
@@ -62,6 +62,8 @@ void KeyEventHandler::handle(const KeyEvent& keyEvent)
     isCapsLock = OsxKeyCodes::keyCodeNames[keyEvent.rawKeyCode].compare("caps lock") == 0;
 #elif defined _WIN32
     isCapsLock = WindowsKeyCodes::keyCodeNames[keyEvent.rawKeyCode].compare("caps lock") == 0;
+#elif defined __linux__
+    isCapsLock = LinuxKeyCodes::keyCodeNames[keyEvent.rawKeyCode].compare("caps lock") == 0;
 #endif
     
     // Special case as caps lock only sends key releases on OSX

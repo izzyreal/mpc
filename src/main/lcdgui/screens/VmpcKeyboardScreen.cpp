@@ -18,7 +18,7 @@
 #elif defined _WIN32
 #include <sys/WindowsKeyCodes.hpp>
 #elif defined __linux__
-#include <sys/OsxKeyCodes.hpp>
+#include <sys/LinuxKeyCodes.hpp>
 #endif
 
 using namespace mpc::lcdgui::screens;
@@ -176,7 +176,7 @@ void VmpcKeyboardScreen::updateRows()
 #elif defined _WIN32
             f->setText(WindowsKeyCodes::keyCodeNames[learnCandidate]);
 #elif defined __linux__
-            f->setText(OsxKeyCodes::keyCodeNames[learnCandidate]);
+            f->setText(LinuxKeyCodes::keyCodeNames[learnCandidate]);
 #endif
             f->setBlinking(true);
         }
@@ -197,7 +197,7 @@ void VmpcKeyboardScreen::updateKeyCodeNames()
 #elif defined _WIN32
     auto& keyCodeNames = WindowsKeyCodes::keyCodeNames;
 #elif defined __linux__
-    auto& keyCodeNames = OsxKeyCodes::keyCodeNames;
+    auto& keyCodeNames = LinuxKeyCodes::keyCodeNames;
 #endif
     auto kbMapping = mpc.getControls().lock()->getKbMapping().lock();
     auto hw = mpc.getHardware().lock();
