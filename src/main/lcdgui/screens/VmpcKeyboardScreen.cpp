@@ -13,13 +13,7 @@
 #include <lang/StrUtil.hpp>
 #include <Logger.hpp>
 
-#ifdef __APPLE__
-#include <sys/OsxKeyCodes.hpp>
-#elif defined _WIN32
-#include <sys/WindowsKeyCodes.hpp>
-#elif defined __linux__
-#include <sys/LinuxKeyCodes.hpp>
-#endif
+#include <sys/KeyCodes.hpp>
 
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui;
@@ -171,13 +165,7 @@ void VmpcKeyboardScreen::updateRows()
         
         if (learning && i == row)
         {
-#ifdef __APPLE__
-            f->setText(OsxKeyCodes::keyCodeNames[learnCandidate]);
-#elif defined _WIN32
-            f->setText(WindowsKeyCodes::keyCodeNames[learnCandidate]);
-#elif defined __linux__
-            f->setText(LinuxKeyCodes::keyCodeNames[learnCandidate]);
-#endif
+            f->setText(KeyCodes::keyCodeNames[learnCandidate]);
             f->setBlinking(true);
         }
         else
@@ -191,14 +179,8 @@ void VmpcKeyboardScreen::updateKeyCodeNames()
 {
     labelsToKeyCodeNames.clear();
     
-#ifdef __APPLE__
-    auto& keyCodeNames = OsxKeyCodes::keyCodeNames;
-#include <sys/OsxKeyCodes.hpp>
-#elif defined _WIN32
-    auto& keyCodeNames = WindowsKeyCodes::keyCodeNames;
-#elif defined __linux__
-    auto& keyCodeNames = LinuxKeyCodes::keyCodeNames;
-#endif
+    auto& keyCodeNames = KeyCodes::keyCodeNames;
+
     auto kbMapping = mpc.getControls().lock()->getKbMapping().lock();
     auto hw = mpc.getHardware().lock();
     

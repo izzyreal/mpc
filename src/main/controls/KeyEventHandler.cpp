@@ -14,13 +14,7 @@
 #include <hardware/Hardware.hpp>
 #include <hardware/HwComponent.hpp>
 
-#ifdef __APPLE__
-#include <sys/OsxKeyCodes.hpp>
-#elif defined _WIN32
-#include <sys/WindowsKeyCodes.hpp>
-#elif defined __linux__
-#include <sys/LinuxKeyCodes.hpp>
-#endif
+#include <sys/KeyCodes.hpp>
 
 #include <Logger.hpp>
 
@@ -58,13 +52,7 @@ void KeyEventHandler::handle(const KeyEvent& keyEvent)
     auto it = find(begin(pressed), end(pressed), keyEvent.rawKeyCode);
     
     bool isCapsLock = false;
-#ifdef __APPLE__
-    isCapsLock = OsxKeyCodes::keyCodeNames[keyEvent.rawKeyCode].compare("caps lock") == 0;
-#elif defined _WIN32
-    isCapsLock = WindowsKeyCodes::keyCodeNames[keyEvent.rawKeyCode].compare("caps lock") == 0;
-#elif defined __linux__
-    isCapsLock = LinuxKeyCodes::keyCodeNames[keyEvent.rawKeyCode].compare("caps lock") == 0;
-#endif
+    isCapsLock = KeyCodes::keyCodeNames[keyEvent.rawKeyCode].compare("caps lock") == 0;
     
     // Special case as caps lock only sends key releases on OSX
     if (isCapsLock) {
