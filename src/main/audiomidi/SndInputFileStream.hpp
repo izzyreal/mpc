@@ -4,7 +4,7 @@
 
 #include <file/FileUtil.hpp>
 
-const char ID[2] = { 0x01, 0x04 };
+const char ID[] = { 0x01, 0x04, '\0' };
 
 const int ID_INDEX = 0; // 2 byte ANSI string of a number greater than '10' and equal to or smaller than '15'
 const int NAME_INDEX = 2; // 16 byte ISO-8859 string
@@ -105,7 +105,7 @@ bool snd_read_header(std::ifstream& stream, int& sampleRate, int& validBits, int
     
     auto sndId = snd_get_string(stream, 2);
     
-    if (sndId.compare(ID) != 0) {
+    if (strcmp(sndId.c_str(), ID) != 0) {
         return false;
     }
 
