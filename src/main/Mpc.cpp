@@ -103,6 +103,8 @@ void Mpc::init(const int sampleRate, const int inputCount, const int outputCount
 	}
 	*/
 
+	layeredScreen->openScreen("sequencer");
+
 	MLOG("Mpc is ready")
 }
 

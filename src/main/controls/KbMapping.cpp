@@ -55,7 +55,6 @@ void KbMapping::importMapping()
     {
         MLOG("No keys.txt mapping found in vMPC/resources. Initializing default mapping...");
         initializeDefaults();
-        MLOG("Default z keySym " + to_string(kh->code("z"))); 
         return;
     }
     
