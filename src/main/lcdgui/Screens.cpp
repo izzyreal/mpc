@@ -48,10 +48,6 @@
 #include <lcdgui/screens/PunchScreen.hpp>
 #include <lcdgui/screens/SyncScreen.hpp>
 
-#include <lcdgui/screens/VmpcDiskScreen.hpp>
-#include <lcdgui/screens/VmpcSettingsScreen.hpp>
-#include <lcdgui/screens/VmpcKeyboardScreen.hpp>
-
 #include <lcdgui/screens/window/NumberOfZonesScreen.hpp>
 #include <lcdgui/screens/window/InitPadAssignScreen.hpp>
 #include <lcdgui/screens/window/SequenceScreen.hpp>
@@ -108,8 +104,6 @@
 #include <lcdgui/screens/window/SaveApsFileScreen.hpp>
 #include <lcdgui/screens/window/CantFindFileScreen.hpp>
 #include <lcdgui/screens/window/NameScreen.hpp>
-#include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
-#include <lcdgui/screens/window/VmpcRecordingFinishedScreen.hpp>
 #include <lcdgui/screens/window/TransposePermanentScreen.hpp>
 #include <lcdgui/screens/window/SoundMemoryScreen.hpp>
 #include <lcdgui/screens/window/SongWindow.hpp>
@@ -147,6 +141,15 @@
 
 #include <lcdgui/screens/dialog2/DeleteAllFilesScreen.hpp>
 #include <lcdgui/screens/dialog2/PopupScreen.hpp>
+
+
+#include <lcdgui/screens/VmpcDiskScreen.hpp>
+#include <lcdgui/screens/VmpcSettingsScreen.hpp>
+#include <lcdgui/screens/VmpcKeyboardScreen.hpp>
+
+#include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
+#include <lcdgui/screens/window/VmpcRecordingFinishedScreen.hpp>
+#include <lcdgui/screens/window/VmpcResetKeyboardScreen.hpp>
 
 #include <file/FileUtil.hpp>
 #include <lang/StrUtil.hpp>
@@ -917,7 +920,11 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
     {
         screen = make_shared<VmpcKeyboardScreen>(mpc, layerIndex);
     }
-
+    else if (screenName.compare("vmpc-reset-keyboard") == 0)
+    {
+        screen = make_shared<VmpcResetKeyboardScreen>(mpc, layerIndex);
+    }
+    
 	if (screen)
 	{
 		screen->findChild<Background>("").lock()->addChildren(children);

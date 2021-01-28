@@ -36,7 +36,9 @@ VmpcKeyboardScreen::VmpcKeyboardScreen(mpc::Mpc& mpc, int layerIndex)
 
 void VmpcKeyboardScreen::open()
 {
+    mappingHasChanged = false;
     setLearnCandidate(-1);
+    updateKeyCodeNames();
     updateRows();
 }
 
@@ -104,18 +106,24 @@ void VmpcKeyboardScreen::function(int i)
             updateRows();
             break;
         case 3:
+            if (learning)
+            {
+                auto label = labelsToKeyCodeNames[row + rowOffset].first;
+                auto kbMapping = mpc.getControls().lock()->getKbMapping().lock();
+                auto oldKeyCode = kbMapping->getKeyCodeFromLabel(label);
+                
+                if (learnCandidate != oldKeyCode)
+                {
+                    mappingHasChanged = true;
+                    kbMapping->setKeyCodeForLabel(learnCandidate, label);
+                    updateKeyCodeNames();
+                }
+            }
+            
             learning = !learning;
             ls.lock()->setFunctionKeysArrangement(learning ? 1 : 0);
             findChild<TextComp>("fk2").lock()->setBlinking(learning);
             findChild<TextComp>("fk3").lock()->setBlinking(learning);
-            
-            if (!learning)
-            {
-                mpc.getControls().lock()->getKbMapping()
-                .lock()->setKeyCodeForLabel(learnCandidate,
-                                            labelsToKeyCodeNames[row + rowOffset].first);
-                updateKeyCodeNames();
-            }
             
             setLearnCandidate(-1);
             updateRows();
@@ -124,9 +132,7 @@ void VmpcKeyboardScreen::function(int i)
             if (learning)
                 return;
             
-            mpc.getControls().lock()->getKbMapping().lock()->importMapping();
-            updateKeyCodeNames();
-            updateRows();
+            ls.lock()->openScreen("vmpc-reset-keyboard");
             break;
         case 5:
             if (learning)
@@ -135,6 +141,17 @@ void VmpcKeyboardScreen::function(int i)
             mpc.getControls().lock()->getKbMapping().lock()->exportMapping();
             break;
     }
+}
+
+void VmpcKeyboardScreen::mainScreen()
+{
+//    if (mappingHasChanged)
+//    {
+//        ls.lock()->openScreen("vmpc-discard-mapping-changes");
+//        return;
+//    }
+    
+    ScreenComponent::mainScreen();
 }
 
 void VmpcKeyboardScreen::setLearnCandidate(const int rawKeyCode)
