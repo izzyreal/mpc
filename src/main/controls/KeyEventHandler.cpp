@@ -92,11 +92,55 @@ void KeyEventHandler::handle(const KeyEvent& keyEvent)
     {
         if (!keyEvent.keyDown)
             return;
-        
-        auto screen = mpc.screens->get<VmpcKeyboardScreen>("vmpc-keyboard");
-        
+                
         if (screen->isLearning())
+        {
             screen->setLearnCandidate(keyEvent.rawKeyCode);
+        }
+        else
+        {
+            if (screen->isLearning())
+                return;
+
+            auto desc = KeyCodes::keyCodeNames[keyEvent.rawKeyCode];
+            
+            if (desc.compare(KeyCodes::names[KeyCodes::MVK_UpArrow]) == 0)
+            {
+                screen->up();
+            }
+            else if (desc.compare(KeyCodes::names[KeyCodes::MVK_DownArrow]) == 0)
+            {
+                screen->down();
+            }
+            else if (desc.compare(KeyCodes::names[KeyCodes::MVK_F1]) == 0)
+            {
+                screen->function(0);
+            }
+            else if (desc.compare(KeyCodes::names[KeyCodes::MVK_F2]) == 0)
+            {
+                screen->function(1);
+            }
+            else if (desc.compare(KeyCodes::names[KeyCodes::MVK_F3]) == 0)
+            {
+                screen->function(2);
+            }
+            else if (desc.compare(KeyCodes::names[KeyCodes::MVK_F4]) == 0)
+            {
+                screen->function(3);
+            }
+            else if (desc.compare(KeyCodes::names[KeyCodes::MVK_F5]) == 0)
+            {
+                screen->function(4);
+            }
+            else if (desc.compare(KeyCodes::names[KeyCodes::MVK_F6]) == 0)
+            {
+                screen->function(5);
+            }
+            else if (desc.compare(KeyCodes::names[KeyCodes::MVK_Escape]) == 0)
+            {
+                screen->mainScreen();
+            }
+        }
         
         return;
     }

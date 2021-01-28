@@ -18,7 +18,8 @@ public:
     void up() override;
     void down() override;
     void function(int i) override;
-
+    void mainScreen() override;
+    
     bool isLearning();
     void setLearnCandidate(const int rawKeyCode);
 
@@ -28,6 +29,7 @@ private:
     int learnCandidate = -1;
     
     bool learning = false;
+    bool mappingHasChanged = false;
     
     std::vector<std::pair<std::string, std::string>> labelsToKeyCodeNames;
     void updateKeyCodeNames();
