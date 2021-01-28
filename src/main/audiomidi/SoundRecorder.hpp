@@ -61,7 +61,7 @@ namespace mpc::audiomidi
 		void start();
 		void stop();
 		void cancel();
-		int processAudio(ctoot::audio::core::AudioBuffer* buf) override;
+		int processAudio(ctoot::audio::core::AudioBuffer* buf, int nFrames) override;
 		bool isRecording();
 		unsigned int getInputGain();
 		void setInputGain(unsigned int);

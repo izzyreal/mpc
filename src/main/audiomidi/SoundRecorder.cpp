@@ -142,7 +142,7 @@ void SoundRecorder::setSampleScreenActive(bool active)
 	sampleScreenActive.store(active);
 }
 
-int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf)
+int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf, int nFrames)
 {
 	auto left = buf->getChannel(0);
 	auto right = buf->getChannel(1);
@@ -161,16 +161,23 @@ int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf)
 
 		float peakL = 0, peakR = 0;
 		
+		int frameCounter = 0;
+
 		for (auto& f : (*left))
 		{
 			if ((mode == 0 || mode == 2) && abs(f) > peakL) peakL = abs(f);
 			if (!recording) preRecBufferLeft.put(f);
+			frameCounter++;
+			if (frameCounter >= nFrames) break;
 		}
 
+		frameCounter = 0;
 		for (auto& f : (*right))
 		{
 			if ((mode == 1 || mode == 2) && abs(f) > peakR) peakR = abs(f);
 			if (!recording) preRecBufferRight.put(f);
+			frameCounter++;
+			if (frameCounter >= nFrames) break;
 		}
 
 		// Is this comparison correct or does the real 2KXL take Mode into account?

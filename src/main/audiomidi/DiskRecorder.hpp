@@ -30,7 +30,7 @@ namespace mpc::audiomidi {
 		bool start();
 		bool stopEarly();
 		bool prepare(const std::string& absolutePath, int lengthInFrames, int sampleRate);
-		int processAudio(ctoot::audio::core::AudioBuffer* buf) override;
+		int processAudio(ctoot::audio::core::AudioBuffer* buf, int nFrames) override;
 
 	public:
 		DiskRecorder(ctoot::audio::core::AudioProcess* process, std::string name);

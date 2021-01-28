@@ -42,14 +42,14 @@ bool DiskRecorder::prepare(const std::string& absolutePath, int lengthInFrames, 
 	return true;
 }
 
-int DiskRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf)
+int DiskRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf, int nFrames)
 {
 	auto ret = AudioProcessAdapter::processAudio(buf);
 	
 	if (writing.load())
 	{
-		vector<char> audioBufferAsBytes (buf->getByteArrayBufferSize(format, buf->getSampleCount()));
-		buf->convertToByteArray_(0, buf->getSampleCount(), &audioBufferAsBytes, 0, format);
+		vector<char> audioBufferAsBytes (buf->getByteArrayBufferSize(format, nFrames));
+		buf->convertToByteArray_(0, nFrames, &audioBufferAsBytes, 0, format);
 		
 		if (audioBufferAsBytes.size() + writtenByteCount >= lengthInBytes)
 		{

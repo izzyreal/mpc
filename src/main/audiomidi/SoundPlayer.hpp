@@ -46,7 +46,7 @@ namespace mpc::audiomidi
 
 	public:
 		bool start(const std::string& filePath);
-		int processAudio(ctoot::audio::core::AudioBuffer* buf) override;
+		int processAudio(ctoot::audio::core::AudioBuffer* buf, int nFrames) override;
 		void open() {};
 		void close() {};
 		
