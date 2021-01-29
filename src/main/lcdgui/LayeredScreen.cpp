@@ -181,6 +181,11 @@ bool LayeredScreen::IsDirty()
 	return root->IsDirty();
 }
 
+void LayeredScreen::setDirty()
+{
+	root->SetDirty();
+}
+
 Background* LayeredScreen::getCurrentBackground()
 {
 	return getFocusedLayer().lock()->getBackground();

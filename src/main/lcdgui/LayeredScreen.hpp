@@ -80,6 +80,7 @@ namespace mpc::lcdgui {
 	public:
 		std::vector<std::vector<bool>>* getPixels();
 		bool IsDirty();
+		void setDirty();
 		MRECT getDirtyArea();
 		void Draw();
 
