@@ -56,7 +56,7 @@ void ProgramScreen::function(int i)
 			auto popupScreen = mpc.screens->get<PopupScreen>("popup");
 			popupScreen->setText("Prog. directory full(24 max)");
 			popupScreen->returnToScreenAfterInteraction(name);
-			ls.lock()->openScreen("popup");
+			openScreen("popup");
 			return;
 		}
 		

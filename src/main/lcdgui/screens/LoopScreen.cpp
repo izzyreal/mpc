@@ -86,7 +86,7 @@ void LoopScreen::function(int f)
 	case 1:
 	{
 		sampler.lock()->sort();
-		ls.lock()->openScreen("popup");
+		openScreen("popup");
 		auto popupScreen = mpc.screens->get<PopupScreen>("popup");
 		popupScreen->setText("Sorting by " + sampler.lock()->getSoundSortingTypeName());
 		popupScreen->returnToScreenAfterMilliSeconds("loop", 200);

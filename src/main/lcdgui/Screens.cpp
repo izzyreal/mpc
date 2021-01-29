@@ -150,6 +150,7 @@
 #include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
 #include <lcdgui/screens/window/VmpcRecordingFinishedScreen.hpp>
 #include <lcdgui/screens/window/VmpcResetKeyboardScreen.hpp>
+#include <lcdgui/screens/window/VmpcDiscardMappingChangesScreen.hpp>
 
 #include <file/FileUtil.hpp>
 #include <lang/StrUtil.hpp>
@@ -923,6 +924,10 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
     else if (screenName.compare("vmpc-reset-keyboard") == 0)
     {
         screen = make_shared<VmpcResetKeyboardScreen>(mpc, layerIndex);
+    }
+    else if (screenName.compare("vmpc-discard-mapping-changes") == 0)
+    {
+        screen = make_shared<VmpcDiscardMappingChangesScreen>(mpc, layerIndex);
     }
     
 	if (screen)

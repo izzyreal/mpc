@@ -18,7 +18,7 @@ void VmpcSettingsScreen::function(int i)
     switch (i)
     {
         case 1:
-            ls.lock()->openScreen("vmpc-keyboard");
+            openScreen("vmpc-keyboard");
             break;
     }
 }

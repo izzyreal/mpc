@@ -4,6 +4,7 @@
 #include <thirdp/wrpkey/key.hxx>
 
 #include <unordered_map>
+#include <vector>
 #include <string>
 
 namespace mpc::controls
@@ -17,6 +18,7 @@ public:
     std::string getLabelFromKeyCode(int keyCode);
     std::string getKeyCodeString(int keyCode);
     void setKeyCodeForLabel(const int keyCode, std::string label);
+    std::vector<std::string> getMappedLabels();
     
     void exportMapping();
     void importMapping();

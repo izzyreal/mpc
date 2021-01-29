@@ -5,9 +5,11 @@
 #include <hardware/Hardware.hpp>
 #include <hardware/HwPad.hpp>
 
+#include <lcdgui/screens/dialog2/PopupScreen.hpp>
 #include <lcdgui/Parameter.hpp>
 #include <lcdgui/Label.hpp>
 #include <lcdgui/Field.hpp>
+
 #include <controls/KbMapping.hpp>
 
 #include <lang/StrUtil.hpp>
@@ -16,7 +18,9 @@
 #include <sys/KeyCodes.hpp>
 
 using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::lcdgui;
+using namespace mpc::controls;
 using namespace moduru::lang;
 using namespace moduru::sys;
 using namespace std;
@@ -36,7 +40,7 @@ VmpcKeyboardScreen::VmpcKeyboardScreen(mpc::Mpc& mpc, int layerIndex)
 
 void VmpcKeyboardScreen::open()
 {
-    mappingHasChanged = false;
+    setLearning(false);
     setLearnCandidate(-1);
     updateKeyCodeNames();
     updateRows();
@@ -80,6 +84,32 @@ void VmpcKeyboardScreen::down()
     updateRows();
 }
 
+void VmpcKeyboardScreen::setLearning(bool b)
+{
+    learning = b;
+    findChild<TextComp>("fk2").lock()->setBlinking(learning);
+    findChild<TextComp>("fk3").lock()->setBlinking(learning);
+    ls.lock()->setFunctionKeysArrangement(learning ? 1 : 0);
+}
+
+bool VmpcKeyboardScreen::hasMappingChanged()
+{
+    auto persisted = KbMapping();
+    auto inMem = mpc.getControls().lock()->getKbMapping().lock();
+
+    for (auto& label : inMem->getMappedLabels())
+    {
+        if (inMem->getKeyCodeFromLabel(label) != persisted.getKeyCodeFromLabel(label))
+            return true;
+    }
+    for (auto& label : persisted.getMappedLabels())
+    {
+        if (inMem->getKeyCodeFromLabel(label) != persisted.getKeyCodeFromLabel(label))
+            return true;
+    }
+    return false;
+}
+
 void VmpcKeyboardScreen::function(int i)
 {
     switch(i)
@@ -88,14 +118,12 @@ void VmpcKeyboardScreen::function(int i)
             if (learning)
                 return;
             
-            ls.lock()->openScreen("vmpc-settings");
+            openScreen("vmpc-settings");
             break;
         case 2:
             if (learning)
             {
-                learning = false;
-                findChild<TextComp>("fk2").lock()->setBlinking(false);
-                findChild<TextComp>("fk3").lock()->setBlinking(false);
+                setLearning(false);
                 setLearnCandidate(-1);
                 updateRows();
                 return;
@@ -114,16 +142,12 @@ void VmpcKeyboardScreen::function(int i)
                 
                 if (learnCandidate != oldKeyCode)
                 {
-                    mappingHasChanged = true;
                     kbMapping->setKeyCodeForLabel(learnCandidate, label);
                     updateKeyCodeNames();
                 }
             }
             
-            learning = !learning;
-            ls.lock()->setFunctionKeysArrangement(learning ? 1 : 0);
-            findChild<TextComp>("fk2").lock()->setBlinking(learning);
-            findChild<TextComp>("fk3").lock()->setBlinking(learning);
+            setLearning(!learning);
             
             setLearnCandidate(-1);
             updateRows();
@@ -132,24 +156,38 @@ void VmpcKeyboardScreen::function(int i)
             if (learning)
                 return;
             
-            ls.lock()->openScreen("vmpc-reset-keyboard");
+            openScreen("vmpc-reset-keyboard");
             break;
         case 5:
             if (learning)
                 return;
-            
-            mpc.getControls().lock()->getKbMapping().lock()->exportMapping();
+
+            auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+            mpc.getLayeredScreen().lock()->openScreen("popup");
+
+            if (hasMappingChanged())
+            {
+                mpc.getControls().lock()->getKbMapping().lock()->exportMapping();
+                popupScreen->setText("Keyboard mapping saved");
+            }
+            else
+            {
+                popupScreen->setText("Keyboard mapping unchanged");
+            }
+
+            popupScreen->returnToScreenAfterMilliSeconds("vmpc-keyboard", 1000);
+
             break;
     }
 }
 
 void VmpcKeyboardScreen::mainScreen()
 {
-//    if (mappingHasChanged)
-//    {
-//        ls.lock()->openScreen("vmpc-discard-mapping-changes");
-//        return;
-//    }
+    if (hasMappingChanged())
+    {
+        openScreen("vmpc-discard-mapping-changes");
+        return;
+    }
     
     ScreenComponent::mainScreen();
 }

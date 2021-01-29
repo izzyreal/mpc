@@ -16,6 +16,14 @@ KbMapping::KbMapping()
 }
 const key_helper_t* mpc::controls::KbMapping::kh = &key_helper_t::instance();
 
+vector<string> KbMapping::getMappedLabels()
+{
+    vector<string> result;
+    for (auto kv : labelKeyMap)
+        result.push_back(kv.first);
+    return result;
+}
+
 void KbMapping::exportMapping() {
 	auto path = mpc::Paths::resPath() + "/keys.txt";
 	moduru::file::File f(path, nullptr);

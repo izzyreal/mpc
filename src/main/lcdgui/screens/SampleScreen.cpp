@@ -69,7 +69,7 @@ void SampleScreen::down()
 
 void SampleScreen::openWindow()
 {
-	ls.lock()->openScreen("sound-memory");
+	openScreen("sound-memory");
 }
 
 void SampleScreen::function(int i)

@@ -29,11 +29,11 @@ private:
     int learnCandidate = -1;
     
     bool learning = false;
-    bool mappingHasChanged = false;
+    bool hasMappingChanged();
     
     std::vector<std::pair<std::string, std::string>> labelsToKeyCodeNames;
     void updateKeyCodeNames();
-    
+    void setLearning(bool b);
     void updateRows();
         
 };
