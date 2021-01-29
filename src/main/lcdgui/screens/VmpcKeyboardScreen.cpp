@@ -253,4 +253,7 @@ void VmpcKeyboardScreen::updateKeyCodeNames()
         auto label = c.lock()->getLabel();
         labelsToKeyCodeNames.push_back({label, keyCodeNames[kbMapping->getKeyCodeFromLabel(label)]});
     }
+
+    labelsToKeyCodeNames.push_back({ "datawheel-up", keyCodeNames[kbMapping->getKeyCodeFromLabel("datawheel-up")] });
+    labelsToKeyCodeNames.push_back({ "datawheel-down", keyCodeNames[kbMapping->getKeyCodeFromLabel("datawheel-down")] });
 }

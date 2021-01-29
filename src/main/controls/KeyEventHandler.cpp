@@ -13,6 +13,7 @@
 
 #include <hardware/Hardware.hpp>
 #include <hardware/HwComponent.hpp>
+#include <hardware/DataWheel.hpp>
 
 #include <sys/KeyCodes.hpp>
 
@@ -199,7 +200,7 @@ void KeyEventHandler::handle(const KeyEvent& keyEvent)
             if (label.find("down") != string::npos)
                 increment = -increment;
             
-            mpc.getActiveControls().lock()->turnWheel(increment);
+            mpc.getHardware().lock()->getDataWheel().lock()->turn(increment);
         }
     }
 }
