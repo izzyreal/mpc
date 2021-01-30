@@ -63,6 +63,12 @@ void AutoChromaticAssignmentScreen::function(int i)
 			auto noteParameters = new NoteParameters(j - 35);
 			newProgram->setNoteParameters(j - 35, noteParameters);
 			noteParameters->setSoundIndex(sourceSoundIndex);
+
+			if (sourceSoundIndex != -1 && sampler.lock()->getSound(sourceSoundIndex).lock()->isLoopEnabled())
+			{
+				noteParameters->setVoiceOverlap(2);
+			}
+
 			noteParameters->setTune(((j - originalKey) * 10) + tune);
 		}
 

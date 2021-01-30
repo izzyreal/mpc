@@ -44,9 +44,18 @@ void ProgramImportAdapter::processNoteParameters(NoteParameters* np)
 		return;
 
 	if (soundsDestIndex[pgmSoundNumber] >= sampler.lock()->getSoundCount())
+	{
 		np->setSoundIndex(-1);
+	}
 	else
+	{
 		np->setSoundIndex(soundsDestIndex[pgmSoundNumber]);
+		if (sampler.lock()->getSound(soundsDestIndex[pgmSoundNumber]).lock()->isLoopEnabled())
+		{
+			// Set overlap mode to NOTE OFF, the only sane one for when loop is enabled.
+			np->setVoiceOverlap(2);
+		}
+	}
 }
 
 void ProgramImportAdapter::initMixer(int note)

@@ -175,9 +175,17 @@ void ApsLoader::load()
 			if (find(begin(unavailableSoundIndices), end(unavailableSoundIndices), soundIndex) != end(unavailableSoundIndices))
 				soundIndex = -1;
 
+			auto voiceOverlap = srcNoteParams->getVoiceOverlap();
+
+			if (soundIndex != -1 && sampler->getSound().lock()->isLoopEnabled())
+			{
+				// Set overlap mode to NOTE OFF, the only sane one for when loop is enabled.
+				voiceOverlap = 2;
+			}
+
 			destNoteParams->setSoundIndex(soundIndex);
 			destNoteParams->setTune(srcNoteParams->getTune());
-			destNoteParams->setVoiceOverlap(srcNoteParams->getVoiceOverlap());
+			destNoteParams->setVoiceOverlap(voiceOverlap);
 			destNoteParams->setDecayMode(srcNoteParams->getDecayMode());
 			destNoteParams->setAttack(srcNoteParams->getAttack());
 			destNoteParams->setDecay(srcNoteParams->getDecay());
