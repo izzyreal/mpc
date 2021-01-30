@@ -2,6 +2,8 @@
 
 #include <file/FileUtil.hpp>
 
+#include <Logger.hpp>
+
 using namespace mpc::file::wav;
 using namespace std;
 
@@ -21,6 +23,16 @@ const int WavFile::RIFF_TYPE_ID;
 int WavFile::getNumChannels()
 {
     return numChannels;
+}
+
+int WavFile::getNumSampleLoops()
+{
+    return numSampleLoops;
+}
+
+SampleLoop& WavFile::getSampleLoop()
+{
+    return sampleLoop;
 }
 
 int WavFile::getNumFrames()
@@ -132,6 +144,8 @@ WavFile WavFile::openWavFile(const string& path)
     
     auto bytesRead = result.iStream.gcount();
 
+    auto totalBytesRead = bytesRead;
+
     if (bytesRead != 12) {
         result.iStream.close();
         throw std::invalid_argument("Not enough wav file bytes for header");
@@ -163,13 +177,19 @@ WavFile WavFile::openWavFile(const string& path)
 
     auto foundFormat = false;
     auto foundData = false;
+    std::ios::pos_type dataPos;
 
-    while (true) {
+    while (totalBytesRead + 1 < fileSize) {
+
+        //MLOG("totalBytesRead " + to_string(totalBytesRead) + ", fileSize " + to_string(fileSize) + ", diff " + to_string(fileSize - totalBytesRead));
         result.iStream.read(&result.buffer[0], 8);
         bytesRead = result.iStream.gcount();
         
+        totalBytesRead += bytesRead;
+
         if (bytesRead != 8) {
             result.iStream.close();
+            //MLOG("bytesRead instead of 8: " + to_string(bytesRead));
             throw std::invalid_argument("Could not read chunk header");
         }
 
@@ -177,10 +197,16 @@ WavFile WavFile::openWavFile(const string& path)
         chunkSize = getLE(result.buffer, 4, 4);
         auto numChunkBytes = (chunkSize % 2 == 1) ? chunkSize + 1 : chunkSize;
 
+        //MLOG("chunkID " + to_string(chunkID));
+        //MLOG("chunkSize " + to_string(chunkSize));
+
 		if (chunkID == FMT_CHUNK_ID) {
             foundFormat = true;
             result.iStream.read(&result.buffer[0], 16);
             bytesRead = result.iStream.gcount();
+
+            totalBytesRead += chunkSize;
+
             auto compressionCode = static_cast< int >(getLE(result.buffer, 0, 2));
 			if (compressionCode != 1) {
 				string exc = "Compression Code " + to_string(compressionCode)+ " not supported";
@@ -192,7 +218,7 @@ WavFile WavFile::openWavFile(const string& path)
             result.sampleRate = getLE(result.buffer, 4, 4);
             result.blockAlign = static_cast< int >(getLE(result.buffer, 12, 2));
             result.validBits = static_cast< int >(getLE(result.buffer, 14, 2));
-			
+
             if (result.numChannels == 0) {
                 result.iStream.close();
                 throw std::invalid_argument("Number of channels specified in header is equal to zero");
@@ -227,7 +253,8 @@ WavFile WavFile::openWavFile(const string& path)
                 result.iStream.ignore(numChunkBytes);
             }
 
-        } else if(chunkID == DATA_CHUNK_ID) {
+        }
+        else if (chunkID == DATA_CHUNK_ID) {
             if (foundFormat == false) {
                 result.iStream.close();
                 throw std::invalid_argument("Data chunk found before Format chunk");
@@ -240,9 +267,32 @@ WavFile WavFile::openWavFile(const string& path)
 
             result.numFrames = chunkSize / result.blockAlign;
             foundData = true;
-            break;
+            totalBytesRead += chunkSize;
+            dataPos = result.iStream.tellg();
+            result.iStream.ignore(chunkSize);
+        }
+        else if (chunkID == SMPL_CHUNK_ID)
+        {
+            result.iStream.read(&result.buffer[0], chunkSize);
+            bytesRead = result.iStream.gcount();
+
+            totalBytesRead += chunkSize;
+
+            result.numSampleLoops = static_cast<int>(getLE(result.buffer, NUM_SAMPLE_LOOPS, 4));
+
+            if (result.numSampleLoops > 0)
+            {
+                // For now we just take the first sample loop
+                result.sampleLoop.cuePointId = static_cast<int>(getLE(result.buffer, LIST_OF_SAMPLE_LOOPS_OFFSET, 4));
+                result.sampleLoop.type = static_cast<int>(getLE(result.buffer, LIST_OF_SAMPLE_LOOPS_OFFSET + 4, 4));
+                result.sampleLoop.start = static_cast<int>(getLE(result.buffer, LIST_OF_SAMPLE_LOOPS_OFFSET + 8, 4));
+                result.sampleLoop.end = static_cast<int>(getLE(result.buffer, LIST_OF_SAMPLE_LOOPS_OFFSET + 12, 4));
+                result.sampleLoop.fraction = static_cast<int>(getLE(result.buffer, LIST_OF_SAMPLE_LOOPS_OFFSET + 16, 4));
+                result.sampleLoop.playCount = static_cast<int>(getLE(result.buffer, LIST_OF_SAMPLE_LOOPS_OFFSET + 20, 4));
+            }
         } else {
             result.iStream.ignore(numChunkBytes);
+            totalBytesRead += chunkSize;
         }
     }
 
@@ -262,6 +312,7 @@ WavFile WavFile::openWavFile(const string& path)
     result.bufferPointer = 0;
     result.bytesRead = 0;
     result.frameCounter = 0;
+    result.iStream.seekg(dataPos);
     return result;
 }
 
@@ -309,7 +360,7 @@ int WavFile::readSample()
 			if (read == 0)
 				throw std::invalid_argument("Not enough data available");
 
-			bytesRead = read;
+            bytesRead = read;
 			bufferPointer = 0;
 		}
 		int v = buffer[bufferPointer];

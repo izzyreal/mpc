@@ -117,7 +117,17 @@ int SoundLoader::loadSound(MpcFile* f)
 			end /= 2;
 		
 		sampleRate = wavFile.getSampleRate();
+		
 		loopTo = end;
+
+		if (wavFile.getNumSampleLoops() > 0)
+		{
+			auto& sampleLoop = wavFile.getSampleLoop();
+			loopTo = sampleLoop.start;
+			end = sampleLoop.end;
+			loopEnabled = true;
+		}
+
 		float tuneFactor = (float)(sampleRate / 44100.0);
 		
 		tune = (int)(floor(logOfBase(tuneFactor, rateToTuneBase) * 10.0));
