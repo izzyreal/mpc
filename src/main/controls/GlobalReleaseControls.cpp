@@ -102,11 +102,16 @@ void GlobalReleaseControls::function(int i)
 		else if (ls.lock()->getCurrentScreenName().compare("step-editor") == 0)
 		{
 			// Temporary solution until we know what the real 2kxl does.
+
 			sampler.lock()->stopAllVoices();
+
 			controls->getPressedPads()->clear();
-			controls->getPressedPadVelos()->clear();
+			
 			for (int j = 0; j < 16; j++)
+			{
+				controls->getPressedPadVelos()->at(j) = 0;
 				mpc.getHardware().lock()->getPad(j).lock()->notifyObservers(255);
+			}
 		}
 		break;
 	}
