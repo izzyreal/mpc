@@ -188,8 +188,10 @@ void EraseScreen::function(int i)
 			sort(begin(removalIndices), end(removalIndices));
 			reverse(begin(removalIndices), end(removalIndices));
 
-			for (int integer : removalIndices)
-				t->getEvents().erase(t->getEvents().begin() + integer);
+			for (int index : removalIndices)
+            {
+                t->removeEvent(index);
+            }
 		}
 		openScreen("sequencer");
 		break;
