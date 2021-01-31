@@ -230,7 +230,7 @@ void Track::addEventRealTime(shared_ptr<Event> event)
 			}
 		}
 	}
-	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(mpc.screens->getScreenComponent("timing-correct"));
+	auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
 	tcValue = timingCorrectScreen->getNoteValue();
 	
 	auto lSequencer = sequencer.lock();

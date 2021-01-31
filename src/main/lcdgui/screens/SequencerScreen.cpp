@@ -295,7 +295,7 @@ vector<string> SequencerScreen::timingCorrectNames = vector<string>{ "OFF", "1/8
 
 void SequencerScreen::displayTiming()
 {
-	auto noteValue = dynamic_pointer_cast<TimingCorrectScreen>(mpc.screens->getScreenComponent("timing-correct"))->getNoteValue();
+	auto noteValue = mpc.screens->get<TimingCorrectScreen>("timing-correct")->getNoteValue();
 	findField("timing").lock()->setText(timingCorrectNames[noteValue]);
 }
 

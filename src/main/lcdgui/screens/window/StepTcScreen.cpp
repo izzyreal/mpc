@@ -18,14 +18,14 @@ void StepTcScreen::open()
 
 void StepTcScreen::turnWheel(int i)
 {
-	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(mpc.screens->getScreenComponent("timing-correct"));
+	auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
 	timingCorrectScreen->setNoteValue(timingCorrectScreen->getNoteValue() + i);
 	displayTcValue();
 }
 
 void StepTcScreen::displayTcValue()
 {
-	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(mpc.screens->getScreenComponent("timing-correct"));
+	auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
 	auto noteValue = timingCorrectScreen->getNoteValue();
 	findField("tcvalue").lock()->setText(timingCorrectNames[noteValue]);
 }

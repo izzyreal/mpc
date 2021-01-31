@@ -122,7 +122,7 @@ AllLoader::AllLoader(mpc::Mpc& mpc, mpc::disk::MpcFile* file, bool sequencesOnly
 		lSequencer->setActiveSequenceIndex(sequencer->sequence);
 		lSequencer->setActiveTrackIndex(sequencer->track);
 		
-		auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(mpc.screens->getScreenComponent("timing-correct"));
+		auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
 		
 		timingCorrectScreen->setNoteValue(sequencer->tc);
 		

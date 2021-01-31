@@ -360,7 +360,7 @@ void StepEditorScreen::turnWheel(int i)
 	}
 	else if (param.compare("tcvalue") == 0)
 	{
-		auto screen = dynamic_pointer_cast<TimingCorrectScreen>(mpc.screens->getScreenComponent("timing-correct"));
+		auto screen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
 		auto noteValue = screen->getNoteValue();
 		screen->setNoteValue(noteValue + i);
 	}

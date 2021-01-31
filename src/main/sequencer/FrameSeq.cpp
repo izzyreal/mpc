@@ -80,7 +80,7 @@ void FrameSeq::work(int nFrames)
 		lSequencer->notify("tempo");
 	}
 
-	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(mpc.screens->getScreenComponent("timing-correct"));
+	auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
 
 	int tcValue = lSequencer->getTickValues()[timingCorrectScreen->getNoteValue()];
 	int swingPercentage = timingCorrectScreen->getSwing();

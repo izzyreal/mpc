@@ -131,7 +131,7 @@ void GlobalReleaseControls::simplePad(int i)
 		
 		if (durationHasBeenAdjusted && maybeRecWithoutPlaying)
 		{
-			auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(mpc.screens->getScreenComponent("timing-correct"));
+			auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
 			auto noteValue = timingCorrectScreen->getNoteValue();
 
 			int noteVal = timingCorrectScreen->getNoteValue();

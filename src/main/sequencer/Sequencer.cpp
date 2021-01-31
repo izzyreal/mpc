@@ -652,7 +652,7 @@ void Sequencer::stop(int tick)
 	
 	if (recording || overdubbing)
 	{
-		auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(mpc.screens->getScreenComponent("timing-correct"));
+		auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
 		auto noteValue = timingCorrectScreen->getNoteValue();
 		s2->getTrack(activeTrackIndex).lock()->correctTimeRange(0, s2->getLastTick(), TICK_VALUES[noteValue]);
 	}
@@ -1301,7 +1301,7 @@ void Sequencer::notifyTimeDisplayRealtime()
 
 void Sequencer::goToPreviousStep()
 {
-	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(mpc.screens->getScreenComponent("timing-correct"));
+	auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
 	auto noteValue = timingCorrectScreen->getNoteValue();
 
 	auto stepSize = TICK_VALUES[noteValue];
@@ -1331,7 +1331,7 @@ void Sequencer::goToPreviousStep()
 
 void Sequencer::goToNextStep()
 {
-	auto timingCorrectScreen = dynamic_pointer_cast<TimingCorrectScreen>(mpc.screens->getScreenComponent("timing-correct"));
+	auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
 	auto noteValue = timingCorrectScreen->getNoteValue();
 
 	auto stepSize = TICK_VALUES[noteValue];
