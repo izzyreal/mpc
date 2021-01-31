@@ -9,6 +9,7 @@
 #include <hardware/Hardware.hpp>
 #include <hardware/Led.hpp>
 #include <hardware/TopPanel.hpp>
+#include <hardware/HwPad.hpp>
 
 #include <sampler/Pad.hpp>
 #include <sampler/Program.hpp>
@@ -97,6 +98,15 @@ void GlobalReleaseControls::function(int i)
 		{
 			ls.lock()->openScreen("directory");
 			mpc.getAudioMidiServices().lock()->getSoundPlayer().lock()->enableStopEarly();
+		}
+		else if (ls.lock()->getCurrentScreenName().compare("step-editor") == 0)
+		{
+			// Temporary solution until we know what the real 2kxl does.
+			sampler.lock()->stopAllVoices();
+			controls->getPressedPads()->clear();
+			controls->getPressedPadVelos()->clear();
+			for (int j = 0; j < 16; j++)
+				mpc.getHardware().lock()->getPad(j).lock()->notifyObservers(255);
 		}
 		break;
 	}
