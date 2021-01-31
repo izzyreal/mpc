@@ -159,19 +159,19 @@ void GlobalReleaseControls::generateNoteOff(int note)
     init();
 	auto lTrk = track.lock();
     
-	if (sequencer.lock()->isRecordingOrOverdubbing())
-	{
-		mpc::sequencer::NoteEvent noteOff;
-        noteOff.setNote(note);
-        noteOff.setVelocity(0);
-        noteOff.setTick(sequencer.lock()->getTickPosition());
-        lTrk->recordNoteOff(noteOff);
-    }
-
 	auto assign16LevelsScreen = mpc.screens->get<Assign16LevelsScreen>("assign-16-levels");
 
 	if (mpc.getHardware().lock()->getTopPanel().lock()->isSixteenLevelsEnabled())
 		note = assign16LevelsScreen->getNote();
+
+	if (sequencer.lock()->isRecordingOrOverdubbing())
+	{
+		mpc::sequencer::NoteEvent noteOff;
+		noteOff.setNote(note);
+		noteOff.setVelocity(0);
+		noteOff.setTick(sequencer.lock()->getTickPosition());
+		lTrk->recordNoteOff(noteOff);
+	}
 
     auto noteEvent = make_shared<mpc::sequencer::NoteEvent>(note);
     noteEvent->setVelocity(0);

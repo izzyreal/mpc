@@ -316,14 +316,33 @@ void BaseControls::generateNoteOn(int nn, int padVelo, int tick)
 			n->setVelocity(padVelo);
 			n->setDuration(step ? 1 : -1);
 
-			if (mpc.getHardware().lock()->getTopPanel().lock()->isSixteenLevelsEnabled() && assign16LevelsScreen->getParameter() == 1)
-			{
-				auto type = assign16LevelsScreen->getType();
-				auto key = assign16LevelsScreen->getOriginalKeyPad();
-				auto diff = lProgram->getPadIndexFromNote(nn) - (mpc.getBank() * 16) - key;
+			if (mpc.getHardware().lock()->getTopPanel().lock()->isSixteenLevelsEnabled()) {
+				if (assign16LevelsScreen->getParameter() == 1)
+				{
+					auto type = assign16LevelsScreen->getType();
+					auto key = assign16LevelsScreen->getOriginalKeyPad();
+					auto padnr = program.lock()->getPadIndexFromNote(nn) - (mpc.getBank() * 16);
+
+					if (type == 0)
+					{
+						auto diff = padnr - key;
+						auto candidate = 64 + (diff * 5);
+
+						if (candidate > 124)
+							candidate = 124;
+						else if (candidate < 4)
+							candidate = 4;
+
+						n->setVariationValue(candidate);
+					}
+					else
+					{
+						n->setVariationValue((100 / 16) * padnr);
+					}
+				}
+
 				n->setNote(assign16LevelsScreen->getNote());
-				n->setVariationTypeNumber(type);
-				n->setVariationValue(diff * 5);
+				n->setVariationTypeNumber(assign16LevelsScreen->getType());
 			}
 
 			if (slider)
