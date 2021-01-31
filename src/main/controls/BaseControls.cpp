@@ -217,6 +217,11 @@ void BaseControls::pad(int i, int velo, bool repeat, int tick)
 		if (!(controls->isTapPressed() && sequencer.lock()->isPlaying()))
 			return;
 	}
+    
+    if (sequencer.lock()->isRecordingOrOverdubbing() && mpc.getControls().lock()->isErasePressed())
+    {
+        return;
+    }
 
 	auto note = track.lock()->getBus() > 0 ? program.lock()->getPad(i + (mpc.getBank() * 16))->getNote() : i + (mpc.getBank() * 16) + 35;
 	auto velocity = velo;
@@ -933,10 +938,7 @@ void BaseControls::erase()
 	if (!sequencer.lock()->getActiveSequence().lock()->isUsed())
 		return;
 
-	if (sequencer.lock()->isOverDubbing()) {
-		// TODO
-	}
-	else {
+	if (!sequencer.lock()->isRecordingOrOverdubbing()) {
 		ls.lock()->openScreen("erase");
 	}
 }

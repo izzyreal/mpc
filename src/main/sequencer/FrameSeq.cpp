@@ -96,7 +96,7 @@ void FrameSeq::work(int nFrames)
 	bool punchIn = punchScreen->autoPunch == 0 || punchScreen->autoPunch == 2;
 	bool punchOut = punchScreen->autoPunch == 1 || punchScreen->autoPunch == 2;
 
-	auto sequencerScreen = dynamic_pointer_cast<SequencerScreen>(mpc.screens->getScreenComponent("sequencer"));
+	auto sequencerScreen = mpc.screens->get<SequencerScreen>("sequencer");
 	auto userScreen = mpc.screens->get<UserScreen>("user");
 
 	for (int i = 0; i < nFrames; i++)

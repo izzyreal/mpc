@@ -37,6 +37,13 @@ SequencerScreen::SequencerScreen(mpc::Mpc& mpc, const int layerIndex)
 
 	MRECT punch2(217, 52, 247, 59);
 	addChildT<PunchRect>("punch-rect-2", punch2).lock()->Hide(true);
+    
+    addChild(make_shared<TextComp>(mpc, "erase-label"));
+    auto eraseLabel = findChild<TextComp>("erase-label").lock();
+    eraseLabel->setText("(Hold pads or keys to erase)");
+    eraseLabel->setLocation(36, 51);
+    eraseLabel->setSize(eraseLabel->GetTextEntryLength() * 6, 8);
+    eraseLabel->Hide(true);
 }
 
 void SequencerScreen::open()
@@ -86,7 +93,7 @@ void SequencerScreen::open()
 
 	auto punchScreen = dynamic_pointer_cast<PunchScreen>(mpc.screens->getScreenComponent("punch"));
 
-	findChild("function-keys").lock()->Hide(punchScreen->on);
+	findChild("function-keys").lock()->Hide(punchScreen->on || mpc.getControls().lock()->isErasePressed());
 
 	if (sequencer.lock()->isSecondSequenceEnabled())
 		findBackground().lock()->setName("sequencer-2nd");
@@ -97,6 +104,19 @@ void SequencerScreen::open()
 
 	if (sequencer.lock()->getNextSq() != -1)
 		ls.lock()->setFocus("nextsq");
+}
+
+void SequencerScreen::erase()
+{
+    findChild("function-keys").lock()->Hide(true);
+    findChild("erase-label").lock()->Hide(false);
+    ScreenComponent::erase();
+}
+
+void SequencerScreen::releaseErase()
+{
+    findChild("function-keys").lock()->Hide(false);
+    findChild("erase-label").lock()->Hide(true);
 }
 
 void SequencerScreen::close()

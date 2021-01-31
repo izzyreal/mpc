@@ -22,8 +22,9 @@
 #include <sequencer/Sequencer.hpp>
 
 #include <lcdgui/Screens.hpp>
-#include <lcdgui/screens/window/TimingCorrectScreen.hpp>
+#include <lcdgui/screens/SequencerScreen.hpp>
 #include <lcdgui/screens/StepEditorScreen.hpp>
+#include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <lcdgui/screens/window/Assign16LevelsScreen.hpp>
 
 #include <mpc/MpcSoundPlayerChannel.hpp>
@@ -129,6 +130,11 @@ void GlobalReleaseControls::simplePad(int i)
 	
 	controls->getPressedPads()->erase(controls->getPressedPads()->find(i));
 
+    if (sequencer.lock()->isRecordingOrOverdubbing() && mpc.getControls().lock()->isErasePressed())
+    {
+        return;
+    }
+    
 	auto lTrk = track.lock();
 	auto note = lTrk->getBus() > 0 ? program.lock()->getPad(i + (bank * 16))->getNote() : i + (bank * 16) + 35;
 
@@ -241,4 +247,6 @@ void GlobalReleaseControls::erase()
 {
 	auto controls = mpc.getControls().lock();
 	controls->setErasePressed(false);
+    auto sequencerScreen = mpc.screens->get<SequencerScreen>("sequencer");
+    sequencerScreen->releaseErase();
 }

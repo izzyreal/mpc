@@ -54,9 +54,8 @@ namespace mpc::lcdgui::screens
 		void displayNextSq();
 
 	public:
-		void update(moduru::observer::Observable* o, nonstd::any arg);
+		void update(moduru::observer::Observable* o, nonstd::any arg) override;
 
-	public:
 		void pressEnter() override;
 		void function(int i) override;
 		void turnWheel(int i) override;
@@ -71,11 +70,12 @@ namespace mpc::lcdgui::screens
 		void stop() override;
 		void rec() override;
 		void overDub() override;
+        void erase() override;
 
-	public:
 		void open() override;
 		void close() override;
 
-		void setPunchRectOn(int i, bool b);
+        void setPunchRectOn(int i, bool b);
+        void releaseErase();
 	};
 }

@@ -18,6 +18,8 @@
 #include <sequencer/ChannelPressureEvent.hpp>
 #include <sequencer/MixerEvent.hpp>
 
+#include <sampler/Program.hpp>
+
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/PunchScreen.hpp>
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
@@ -101,7 +103,7 @@ int Track::getIndex()
 }
 
 weak_ptr<NoteEvent> Track::recordNoteOn()
-{
+{    
 	auto punchScreen = dynamic_pointer_cast<PunchScreen>(mpc.screens->getScreenComponent("punch"));
 	auto lSequencer = sequencer.lock();
 	
@@ -532,14 +534,6 @@ void Track::playNext()
 	auto lSequencer = sequencer.lock();
 	multi = lSequencer->isRecordingModeMulti();
 	delete_ = lSequencer->isRecording() && (trackIndex == lSequencer->getActiveTrackIndex() || multi) && (trackIndex < 64);
-
-	if (lSequencer->isOverDubbing() &&
-		mpc.getControls().lock()->isErasePressed() &&
-		(trackIndex == lSequencer->getActiveTrackIndex() || multi) &&
-		trackIndex < 64)
-	{
-		delete_ = true;
-	}
 	
 	auto punchScreen = dynamic_pointer_cast<PunchScreen>(mpc.screens->getScreenComponent("punch"));
 
@@ -580,8 +574,28 @@ void Track::playNext()
 	auto note = dynamic_pointer_cast<NoteEvent>(lEvent);
 
 	if (note)
-		note->setTrack(trackIndex);
-	
+    {
+        note->setTrack(trackIndex);
+    
+        if (lSequencer->isOverDubbing() &&
+            mpc.getControls().lock()->isErasePressed() &&
+            (trackIndex == lSequencer->getActiveTrackIndex() || multi) &&
+            trackIndex < 64 &&
+            busNumber > 0)
+        {
+            auto pgmIndex = mpc.getSampler().lock()->getDrumBusProgramNumber(busNumber);
+            auto pgm = dynamic_pointer_cast<mpc::sampler::Program>(mpc.getSampler().lock()->getProgram(pgmIndex).lock());
+            
+            for (int padIndex : *mpc.getControls().lock()->getPressedPads())
+            {
+                auto padNote = pgm->getNoteFromPad(padIndex);
+             
+                if (note->getNote() == padNote)
+                    delete_ = true;
+            }
+        }
+    }
+	    
 	if (delete_)
 	{
 		events.erase(events.begin() + eventIndex);
