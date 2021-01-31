@@ -93,7 +93,7 @@ void SequencerScreen::open()
 
 	auto punchScreen = dynamic_pointer_cast<PunchScreen>(mpc.screens->getScreenComponent("punch"));
 
-	findChild("function-keys").lock()->Hide(punchScreen->on || mpc.getControls().lock()->isErasePressed());
+	findChild("function-keys").lock()->Hide(punchScreen->on || (mpc.getControls().lock()->isErasePressed() && sequencer.lock()->isRecordingOrOverdubbing()));
 
 	if (sequencer.lock()->isSecondSequenceEnabled())
 		findBackground().lock()->setName("sequencer-2nd");
