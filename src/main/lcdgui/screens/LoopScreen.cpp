@@ -217,8 +217,8 @@ void LoopScreen::turnWheel(int i)
 	}
 	else if (param.compare("loop") == 0)
 	{
-		sampler.lock()->setLoopEnabled(sound->getMemoryIndex(), i > 0);
-		displayLoop();
+        sampler.lock()->getSound().lock()->setLoopEnabled(i > 0);
+        displayLoop();
 	}
 	else if (param.compare("endlength") == 0)
 	{

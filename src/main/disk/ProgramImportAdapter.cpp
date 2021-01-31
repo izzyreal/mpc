@@ -50,11 +50,6 @@ void ProgramImportAdapter::processNoteParameters(NoteParameters* np)
 	else
 	{
 		np->setSoundIndex(soundsDestIndex[pgmSoundNumber]);
-		if (sampler.lock()->getSound(soundsDestIndex[pgmSoundNumber]).lock()->isLoopEnabled())
-		{
-			// Set overlap mode to NOTE OFF, the only sane one for when loop is enabled.
-			np->setVoiceOverlap(2);
-		}
 	}
 }
 

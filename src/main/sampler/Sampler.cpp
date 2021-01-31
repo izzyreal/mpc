@@ -388,26 +388,6 @@ weak_ptr<ctoot::mpc::MpcSound> Sampler::getPreviewSound()
 	return sounds[sounds.size() - 1];
 }
 
-void Sampler::setLoopEnabled(int sampleIndex, bool enabled)
-{
-	sounds[sampleIndex]->setLoopEnabled(enabled);
-
-	if (!enabled)
-		return;
-
-	for (auto& p : programs)
-	{
-		if (!p)
-			continue;
-		
-		for (int i = 0; i < 64; i++)
-		{
-			if (p->getNoteParameters(i + 35)->getSoundIndex() == sampleIndex)
-				dynamic_cast<mpc::sampler::NoteParameters*>(p->getNoteParameters(i + 35))->setVoiceOverlap(2);
-		}
-	}
-}
-
 void Sampler::trimSample(int sampleNumber, int start, int end)
 {
 	auto s = sounds[sampleNumber];

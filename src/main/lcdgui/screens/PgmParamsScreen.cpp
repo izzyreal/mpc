@@ -282,6 +282,15 @@ void PgmParamsScreen::displayDecayMode()
 void PgmParamsScreen::displayVoiceOverlap()
 {
 	init();
-	auto lProgram = program.lock();
-	findField("voiceoverlap").lock()->setText(voiceOverlapModes[sampler.lock()->getLastNp(lProgram.get())->getVoiceOverlap()]);
+	
+    auto lProgram = program.lock();
+    auto lastNoteParameters = sampler.lock()->getLastNp(lProgram.get());
+    auto mode = lastNoteParameters->getVoiceOverlap();
+    
+    auto sound = sampler.lock()->getSound(lastNoteParameters->getSoundIndex()).lock();
+    
+    if (sound && sound->isLoopEnabled())
+        mode = 2;
+    
+	findField("voiceoverlap").lock()->setText(voiceOverlapModes[mode]);
 }

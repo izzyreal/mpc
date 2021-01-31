@@ -87,7 +87,6 @@ namespace mpc::sampler
 		std::vector<float>* getClickSample();
 		void deleteSound(int soundIndex);
 		void deleteSound(std::weak_ptr<Sound> sound);
-		void setLoopEnabled(int sampleIndex, bool b);
 		void trimSample(int sampleNumber, int start, int end);
 		void deleteSection(const unsigned int sampleNumber, const unsigned int start, const unsigned int end);
 		void sort();

@@ -55,14 +55,6 @@ void KeepOrRetryScreen::function(int i)
 		auto index = sampler.lock()->getSoundCount() - 1;
 		sampler.lock()->getLastNp(program.lock().get())->setSoundIndex(index);
 
-		if (index != -1)
-		{
-			auto sound = sampler.lock()->getSound(index).lock();
-
-			if (sound->isLoopEnabled())
-				sampler.lock()->getLastNp(program.lock().get())->setVoiceOverlap(2);
-		}
-
 		sampler.lock()->setSoundIndex(index);
 		openScreen("sample");
 		break;
