@@ -38,12 +38,12 @@ SequencerScreen::SequencerScreen(mpc::Mpc& mpc, const int layerIndex)
 	MRECT punch2(217, 52, 247, 59);
 	addChildT<PunchRect>("punch-rect-2", punch2).lock()->Hide(true);
     
-    addChild(make_shared<TextComp>(mpc, "erase-label"));
-    auto eraseLabel = findChild<TextComp>("erase-label").lock();
-    eraseLabel->setText("(Hold pads or keys to erase)");
-    eraseLabel->setLocation(36, 51);
-    eraseLabel->setSize(eraseLabel->GetTextEntryLength() * 6, 8);
-    eraseLabel->Hide(true);
+    addChild(make_shared<TextComp>(mpc, "footer-label"));
+    auto footerLabel = findChild<TextComp>("footer-label").lock();
+    footerLabel->setLocation(36, 51);
+    footerLabel->setText("(Hold pads or keys to repeat)");
+    footerLabel->setSize(footerLabel->GetTextEntryLength() * 6, 8);
+    footerLabel->Hide(true);
 }
 
 void SequencerScreen::open()
@@ -109,14 +109,48 @@ void SequencerScreen::open()
 void SequencerScreen::erase()
 {
     findChild("function-keys").lock()->Hide(true);
-    findChild("erase-label").lock()->Hide(false);
+    findChild("footer-label").lock()->Hide(false);
+    findChild<TextComp>("footer-label").lock()->setText("(Hold pads or keys to erase)");
     ScreenComponent::erase();
+}
+
+void SequencerScreen::tap()
+{
+    if (mpc.getControls().lock()->isNoteRepeatLocked())
+    {
+        mpc.getControls().lock()->setNoteRepeatLocked(false);
+        findChild("function-keys").lock()->Hide(false);
+        findChild("footer-label").lock()->Hide(true);
+        findChild<TextComp>("footer-label").lock()->setText("(Hold pads or keys to repeat)");
+    }
+    else
+    {
+        findChild("function-keys").lock()->Hide(true);
+        findChild("footer-label").lock()->Hide(false);
+        findChild<TextComp>("footer-label").lock()->setText("(Hold pads or keys to repeat)");
+    }
+    
+    ScreenComponent::tap();
+}
+
+void SequencerScreen::shift()
+{
+    if (mpc.getControls().lock()->isTapPressed())
+    {
+        mpc.getControls().lock()->setNoteRepeatLocked(true);
+    }
 }
 
 void SequencerScreen::releaseErase()
 {
+    findChild("footer-label").lock()->Hide(true);
     findChild("function-keys").lock()->Hide(false);
-    findChild("erase-label").lock()->Hide(true);
+}
+
+void SequencerScreen::releaseTap()
+{
+    findChild("footer-label").lock()->Hide(true);
+    findChild("function-keys").lock()->Hide(false);
 }
 
 void SequencerScreen::close()

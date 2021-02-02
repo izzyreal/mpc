@@ -226,6 +226,12 @@ void GlobalReleaseControls::tap()
 
 	if (sequencer.lock()->isRecordingOrOverdubbing())
 		sequencer.lock()->flushTrackNoteCache();
+    
+    if (!controls->isNoteRepeatLocked())
+    {
+        auto sequencerScreen = mpc.screens->get<SequencerScreen>("sequencer");
+        sequencerScreen->releaseTap();
+    }
 }
 
 void GlobalReleaseControls::shift()

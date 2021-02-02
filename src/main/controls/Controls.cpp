@@ -84,6 +84,11 @@ bool Controls::isTapPressed()
 	return tapPressed;
 }
 
+bool Controls::isNoteRepeatLocked()
+{
+    return noteRepeatLocked;
+}
+
 bool Controls::isGoToPressed()
 {
 	return goToPressed;
@@ -142,6 +147,11 @@ void Controls::setOverDubPressed(bool b)
 void Controls::setTapPressed(bool b)
 {
 	tapPressed = b;
+}
+
+void Controls::setNoteRepeatLocked(bool b)
+{
+    noteRepeatLocked = b;
 }
 
 void Controls::setGoToPressed(bool b)

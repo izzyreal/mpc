@@ -23,21 +23,23 @@ namespace mpc::controls {
         Controls(mpc::Mpc& mpc);
         ~Controls();
 
-        void setErasePressed(bool b);
-        void setRecPressed(bool b);
-        void setOverDubPressed(bool b);
-        void setTapPressed(bool b);
-        void setGoToPressed(bool b);
-        void setShiftPressed(bool b);
-        void setF3Pressed(bool b);
-        void setF4Pressed(bool b);
-        void setF5Pressed(bool b);
-        void setF6Pressed(bool b);
+        void setErasePressed(bool);
+        void setRecPressed(bool);
+        void setOverDubPressed(bool);
+        void setTapPressed(bool);
+        void setGoToPressed(bool);
+        void setShiftPressed(bool);
+        void setF3Pressed(bool);
+        void setF4Pressed(bool);
+        void setF5Pressed(bool);
+        void setF6Pressed(bool);
+        void setNoteRepeatLocked(bool);
 
         bool isErasePressed();
         bool isRecPressed();
         bool isOverDubPressed();
         bool isTapPressed();
+        bool isNoteRepeatLocked();
         bool isGoToPressed();
         bool isShiftPressed();
         bool isF3Pressed();
@@ -53,8 +55,8 @@ namespace mpc::controls {
         mpc::controls::BaseControls* getControls(std::string s);
         mpc::controls::GlobalReleaseControls* getReleaseControls();
 
-		void setCtrlPressed(bool b);
-		void setAltPressed(bool b);
+		void setCtrlPressed(bool);
+		void setAltPressed(bool);
 		bool isCtrlPressed();
 		bool isAltPressed();
         std::weak_ptr<KbMapping> getKbMapping();
@@ -67,6 +69,7 @@ namespace mpc::controls {
 		bool recPressed = false;
 		bool overDubPressed = false;
 		bool tapPressed = false;
+        bool noteRepeatLocked = false;
 		bool goToPressed = false;
 		bool erasePressed = false;
 		bool f3Pressed = false;

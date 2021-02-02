@@ -71,11 +71,15 @@ namespace mpc::lcdgui::screens
 		void rec() override;
 		void overDub() override;
         void erase() override;
-
+        void tap() override;
+        void shift() override;
+        
 		void open() override;
 		void close() override;
 
         void setPunchRectOn(int i, bool b);
+        
         void releaseErase();
+        void releaseTap();
 	};
 }

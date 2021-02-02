@@ -119,7 +119,7 @@ void FrameSeq::work(int nFrames)
 				}
 			}
 
-			if (controls && controls->isTapPressed())
+			if (controls && (controls->isTapPressed() || controls->isNoteRepeatLocked()))
 			{				
 				if (tcValue == 24 || tcValue == 48)
 				{
