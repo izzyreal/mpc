@@ -3,6 +3,8 @@
 
 namespace mpc::sampler { class Pad; }
 
+namespace mpc::sequencer { class Track; }
+
 namespace mpc::nvram { class NvRam; }
 
 namespace mpc::lcdgui::screens
@@ -18,15 +20,23 @@ namespace mpc::lcdgui::screens
 
 		void open() override;
         void function(int) override;
-
+        
 	private:
 		const std::vector<std::string> initialPadMappingNames{ "VMPC", "ORIGINAL" };
+        const std::vector<std::string> _16LevelsEraseModeNames{ "Any pressed pad", "Only source pad" };
+        
 		int initialPadMapping = 0;
-		void setInitialPadMapping(int i);
-		void displayInitialPadMapping();
+        int _16LevelsEraseMode = 0;
+		
+        void setInitialPadMapping(int i);
+        void set16LevelsEraseMode(int i);
+		
+        void displayInitialPadMapping();
+        void display16LevelsEraseMode();
 		
 		friend class mpc::sampler::Pad;
 		friend class mpc::nvram::NvRam;
+        friend class mpc::sequencer::Track;
 
 	};
 }

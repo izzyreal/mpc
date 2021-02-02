@@ -3,6 +3,7 @@
 #include <Mpc.hpp>
 #include <controls/Controls.hpp>
 #include <audiomidi/EventHandler.hpp>
+
 #include <sequencer/Event.hpp>
 #include <sequencer/Sequence.hpp>
 #include <sequencer/NoteEvent.hpp>
@@ -23,6 +24,11 @@
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/PunchScreen.hpp>
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
+
+#include <lcdgui/screens/VmpcSettingsScreen.hpp>
+
+#include <hardware/Hardware.hpp>
+#include <hardware/TopPanel.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -533,7 +539,7 @@ void Track::playNext()
 	
 	auto lSequencer = sequencer.lock();
 	multi = lSequencer->isRecordingModeMulti();
-	delete_ = lSequencer->isRecording() && (trackIndex == lSequencer->getActiveTrackIndex() || multi) && (trackIndex < 64);
+	_delete = lSequencer->isRecording() && (trackIndex == lSequencer->getActiveTrackIndex() || multi) && (trackIndex < 64);
 	
 	auto punchScreen = dynamic_pointer_cast<PunchScreen>(mpc.screens->getScreenComponent("punch"));
 
@@ -541,16 +547,16 @@ void Track::playNext()
 	{
 		auto pos = lSequencer->getTickPosition();
 		
-		delete_ = false;
+		_delete = false;
 
 		if (punchScreen->autoPunch == 0 && pos >= punchScreen->time0)
-			delete_ = true;
+			_delete = true;
 
 		if (punchScreen->autoPunch == 1 && pos < punchScreen->time1)
-			delete_ = true;
+			_delete = true;
 
 		if (punchScreen->autoPunch == 2 && pos >= punchScreen->time0 && pos < punchScreen->time1)
-			delete_ = true;
+			_delete = true;
 	}
 
 	int counter = 0;
@@ -560,7 +566,7 @@ void Track::playNext()
 	{	
 		if (eventIndex + 1 > events.size() || no->getTick() < events[eventIndex]->getTick())
 		{
-			if (!delete_)
+			if (!_delete)
 				mpc.getEventHandler().lock()->handle(no, this);
 
 			noteOffs.erase(noteOffs.begin() + counter);
@@ -591,12 +597,22 @@ void Track::playNext()
                 auto padNote = pgm->getNoteFromPad(padIndex);
              
                 if (note->getNote() == padNote)
-                    delete_ = true;
+                    _delete = true;
+            }
+            
+            if (!_delete &&
+                mpc.getControls().lock()->getPressedPads()->size() != 0 &&
+                mpc.getHardware().lock()->getTopPanel().lock()->isSixteenLevelsEnabled())
+            {
+                auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
+                
+                if (vmpcSettingsScreen->_16LevelsEraseMode == 0)
+                    _delete = true;
             }
         }
     }
 	    
-	if (delete_)
+	if (_delete)
 	{
 		events.erase(events.begin() + eventIndex);
 		return;

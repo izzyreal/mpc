@@ -108,13 +108,11 @@ int NvRam::getMasterLevel()
 
 int NvRam::getRecordLevel()
 {
-    
     return KnobPositions().recordLevel;
 }
 
 int NvRam::getSlider()
 {
-    
     return KnobPositions().slider;
 }
 
@@ -129,7 +127,12 @@ void NvRam::saveVmpcSettings(mpc::Mpc& mpc)
 		file.create();
 
 	auto stream = FileUtil::ofstreamw(fileName, ios::binary | ios::out);
-	vector<char> bytes{ (char) (vmpcSettingsScreen->initialPadMapping) };
+	
+    vector<char> bytes{
+        (char) (vmpcSettingsScreen->initialPadMapping),
+        (char) (vmpcSettingsScreen->_16LevelsEraseMode)
+    };
+    
 	stream.write(&bytes[0], bytes.size());
 	stream.close();
 }
@@ -139,13 +142,14 @@ void NvRam::loadVmpcSettings(mpc::Mpc& mpc)
 	string path = mpc::Paths::resPath() + "vmpc-specific.ini";
 	File file(path, nullptr);
 
-	if (!file.exists())
+	if (!file.exists() || file.getLength() != 2)
 		return;
 
 	auto vmpcSettingsScreen = dynamic_pointer_cast<VmpcSettingsScreen>(mpc.screens->getScreenComponent("vmpc-settings"));
 	
-	vector<char> bytes(1);
+	vector<char> bytes(2);
 	file.getData(&bytes);
 
 	vmpcSettingsScreen->initialPadMapping = bytes[0];
+    vmpcSettingsScreen->_16LevelsEraseMode = bytes[1];
 }

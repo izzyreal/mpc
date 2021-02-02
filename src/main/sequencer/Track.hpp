@@ -42,7 +42,7 @@ namespace mpc::sequencer {
 		bool eventAvailable{ false };
 		std::weak_ptr<Event> event;
 		bool multi{ false };
-		bool delete_{ false };
+		bool _delete{ false };
 		int tcValue = 0;
 		std::vector<std::weak_ptr<Event>> tempEvents;
 

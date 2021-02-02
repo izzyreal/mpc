@@ -11,6 +11,7 @@ VmpcSettingsScreen::VmpcSettingsScreen(mpc::Mpc& mpc, const int layerIndex)
 void VmpcSettingsScreen::open()
 {
 	displayInitialPadMapping();
+    display16LevelsEraseMode();
 }
 
 void VmpcSettingsScreen::function(int i)
@@ -31,14 +32,16 @@ void VmpcSettingsScreen::turnWheel(int i)
 	{
 		setInitialPadMapping(initialPadMapping + i);
 	}
+    else if (param.compare("16-levels-erase-mode") == 0)
+    {
+        set16LevelsEraseMode(_16LevelsEraseMode + i);
+    }
 }
 
 void VmpcSettingsScreen::setInitialPadMapping(int i)
 {
 	if (i < 0 || i > 1)
-	{
 		return;
-	}
 
 	initialPadMapping = i;
 
@@ -48,4 +51,18 @@ void VmpcSettingsScreen::setInitialPadMapping(int i)
 void VmpcSettingsScreen::displayInitialPadMapping()
 {
 	findField("initial-pad-mapping").lock()->setText(initialPadMappingNames[initialPadMapping]);
+}
+
+void VmpcSettingsScreen::display16LevelsEraseMode()
+{
+    findField("16-levels-erase-mode").lock()->setText(_16LevelsEraseModeNames[_16LevelsEraseMode]);
+}
+
+void VmpcSettingsScreen::set16LevelsEraseMode(int i)
+{
+    if (i < 0 || i > 1)
+        return;
+
+    _16LevelsEraseMode = i;
+    display16LevelsEraseMode();
 }
