@@ -139,6 +139,7 @@ void SequencerScreen::shift()
     {
         mpc.getControls().lock()->setNoteRepeatLocked(true);
     }
+    ScreenComponent::shift();
 }
 
 void SequencerScreen::releaseErase()
