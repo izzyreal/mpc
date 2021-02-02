@@ -104,6 +104,12 @@ void SequencerScreen::open()
 
 	if (sequencer.lock()->getNextSq() != -1)
 		ls.lock()->setFocus("nextsq");
+    
+    
+    const auto footerIsInvisible = !mpc.getControls().lock()->isNoteRepeatLocked() && !(mpc.getControls().lock()->isErasePressed() && sequencer.lock()->isRecordingOrOverdubbing());
+    
+    findChild("footer-label").lock()->Hide(footerIsInvisible);
+    findChild("function-keys").lock()->Hide(!footerIsInvisible);
 }
 
 void SequencerScreen::erase()
@@ -164,7 +170,7 @@ void SequencerScreen::close()
 		auto punchScreen = dynamic_pointer_cast<PunchScreen>(mpc.screens->getScreenComponent("punch"));
 		punchScreen->on = false;
 	}
-
+    
 	sequencer.lock()->deleteObserver(this);
 	sequence.lock()->deleteObserver(this);
 	track.lock()->deleteObserver(this);
@@ -910,6 +916,11 @@ void SequencerScreen::stop()
 
 	}
 
+    if (mpc.getControls().lock()->isNoteRepeatLocked())
+    {
+        releaseTap();
+    }
+    
 	ScreenComponent::stop();
 }
 

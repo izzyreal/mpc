@@ -198,12 +198,12 @@ void BaseControls::turnWheel(int i)
 {
 }
 
-void BaseControls::pad(int i, int velo, bool repeat, int tick)
+void BaseControls::pad(int i, int velo, bool triggeredByRepeat, int tick)
 {
 	init();
 
 	auto controls = mpc.getControls().lock();
-
+    
 	if (mpc.getHardware().lock()->getTopPanel().lock()->isFullLevelEnabled())
 		velo = 127;
 
@@ -223,6 +223,11 @@ void BaseControls::pad(int i, int velo, bool repeat, int tick)
         return;
     }
 
+    if (controls->isNoteRepeatLocked() && !triggeredByRepeat)
+    {
+        return;
+    }
+    
 	auto note = track.lock()->getBus() > 0 ? program.lock()->getPad(i + (mpc.getBank() * 16))->getNote() : i + (mpc.getBank() * 16) + 35;
 	auto velocity = velo;
 	auto pad = i + (mpc.getBank() * 16);
@@ -255,7 +260,7 @@ void BaseControls::pad(int i, int velo, bool repeat, int tick)
 
 	if (controls->isTapPressed() && sequencer.lock()->isPlaying())
 	{
-		if (repeat)
+		if (triggeredByRepeat)
 			generateNoteOn(note, velocity, tick);
 	}
 	else
@@ -558,10 +563,13 @@ void BaseControls::overDub()
 void BaseControls::stop()
 {
 	init();
-
+    
 	auto vmpcDirectToDiskRecorderScreen = mpc.screens->get<VmpcDirectToDiskRecorderScreen>("vmpc-direct-to-disk-recorder");
 	auto ams = mpc.getAudioMidiServices().lock();
 	auto controls = mpc.getControls().lock();
+    
+    if (controls->isNoteRepeatLocked())
+        controls->setNoteRepeatLocked(false);
 
 	if (ams->isBouncing() && (vmpcDirectToDiskRecorderScreen->record != 4 || controls->isShiftPressed()))
 		ams->stopBouncingEarly();
