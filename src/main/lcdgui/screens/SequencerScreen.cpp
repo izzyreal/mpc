@@ -122,18 +122,20 @@ void SequencerScreen::erase()
 
 void SequencerScreen::tap()
 {
-    if (mpc.getControls().lock()->isNoteRepeatLocked())
+    if (sequencer.lock()->isPlaying())
     {
-        mpc.getControls().lock()->setNoteRepeatLocked(false);
-        findChild("function-keys").lock()->Hide(false);
-        findChild("footer-label").lock()->Hide(true);
-        findChild<TextComp>("footer-label").lock()->setText("(Hold pads or keys to repeat)");
-    }
-    else
-    {
-        findChild("function-keys").lock()->Hide(true);
-        findChild("footer-label").lock()->Hide(false);
-        findChild<TextComp>("footer-label").lock()->setText("(Hold pads or keys to repeat)");
+        if (mpc.getControls().lock()->isNoteRepeatLocked())
+        {
+            mpc.getControls().lock()->setNoteRepeatLocked(false);
+            findChild("function-keys").lock()->Hide(false);
+            findChild("footer-label").lock()->Hide(true);
+        }
+        else
+        {
+            findChild("function-keys").lock()->Hide(true);
+            findChild("footer-label").lock()->Hide(false);
+            findChild<TextComp>("footer-label").lock()->setText("(Hold pads or keys to repeat)");
+        }
     }
     
     ScreenComponent::tap();
