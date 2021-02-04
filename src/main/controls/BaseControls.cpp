@@ -349,7 +349,7 @@ void BaseControls::generateNoteOn(int note, int padVelo, int tick)
 			recordedEvent = trk->addNoteEvent(seq->getTickPosition(), note).lock();
 			int stepLength = seq->getTickValues()[tc_note];
 
-			if (stepLength != 0)
+			if (stepLength != 1)
 			{
 				int bar = seq->getCurrentBarIndex() + 1;
 				trk->timingCorrect(0, bar, recordedEvent.get(), stepLength);

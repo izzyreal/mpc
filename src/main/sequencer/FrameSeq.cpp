@@ -134,7 +134,7 @@ void FrameSeq::work(int nFrames)
 				}
 				else
 				{
-					if (getTickPosition() % tcValue == 0)
+					if (tcValue != 1 && getTickPosition() % tcValue == 0)
 					{
 						repeatPad(getTickPosition());
 					}
