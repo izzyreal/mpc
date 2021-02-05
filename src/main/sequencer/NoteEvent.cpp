@@ -116,3 +116,13 @@ void NoteEvent::CopyValuesTo(weak_ptr<Event> dest) {
     lDest->velocity = velocity;
 	lDest->setDuration(getDuration());
 }
+
+bool NoteEvent::getShouldBePlayed()
+{
+    return shouldBePlayed;
+}
+
+void NoteEvent::setShouldBePlayed(bool b)
+{
+    shouldBePlayed = b;
+}

@@ -40,7 +40,7 @@ namespace mpc::sequencer {
 		int eventIndex = 0;
 		std::weak_ptr<NoteEvent> lastAdded;
 		bool eventAvailable{ false };
-		std::weak_ptr<Event> event;
+//		std::weak_ptr<Event> event;
 		bool multi{ false };
 		bool _delete{ false };
 		int tcValue = 0;
@@ -61,7 +61,7 @@ namespace mpc::sequencer {
 		void setOn(bool b);
 
 	private:
-		void addEventRealTime(std::shared_ptr<mpc::sequencer::Event> event);
+		void addEventRealTime(std::shared_ptr<NoteEvent> event);
 		std::weak_ptr<NoteEvent> getNoteEvent(int tick, int note);
 
 	public:
