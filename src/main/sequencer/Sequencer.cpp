@@ -597,14 +597,11 @@ void Sequencer::overdub()
 
 void Sequencer::switchRecordToOverDub()
 {
-	if (!isRecording())
+	if (!recording)
 		return;
 
 	recording = false;
 	overdubbing = true;
-	auto hw = mpc.getHardware().lock();
-	hw->getLed("overdub").lock()->light(true);
-	hw->getLed("rec").lock()->light(false);
 }
 
 void Sequencer::overdubFromStart()

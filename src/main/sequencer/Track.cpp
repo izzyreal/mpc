@@ -563,7 +563,7 @@ void Track::playNext()
 	int counter = 0;
 	sort(noteOffs.begin(), noteOffs.end(), tickCmp);
 
-    auto event = events[eventIndex];
+    auto event = eventIndex >= events.size() ? shared_ptr<Event>() : events[eventIndex];
     
 	for (auto& no : noteOffs)
 	{	
