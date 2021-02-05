@@ -8,7 +8,6 @@ class NoteEvent
 {
     
 private:
-    bool shouldBePlayed = true;
     int number = 60;
     int duration = -1;
     int variationTypeNumber = 0;
@@ -31,8 +30,6 @@ public:
     void setVelocity(int i);
     void setVelocityZero();
     int getVelocity();
-    bool getShouldBePlayed();
-    void setShouldBePlayed(bool);
     
     void CopyValuesTo(std::weak_ptr<Event> dest) override;
     
