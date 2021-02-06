@@ -147,7 +147,7 @@ weak_ptr<NoteEvent> Track::recordNoteOn()
 	}
 
 	if (n->getTick() >= lSequencer->getCurrentlyPlayingSequence().lock()->getLastTick())
-		n->setTick(0);
+        n->setTick(0);
 	
 	queuedNoteOnEvents.push_back(n);
 	
@@ -196,8 +196,14 @@ void Track::recordNoteOff(NoteEvent& n)
         noteOn->setDuration(sequencer.lock()->getLoopEnd() - 1 - noteOn->getTick());
     }
     
+    auto eventsSize = events.size();
+    
     addEventRealTime(noteOn);
-    eventIndex++;
+    
+    if (eventsSize != events.size())
+    {
+        eventIndex++;
+    }
 }
 
 void Track::setUsed(bool b)
@@ -220,6 +226,14 @@ void Track::setOn(bool b)
 
 void Track::addEventRealTime(shared_ptr<NoteEvent> e1)
 {
+	auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
+	tcValue = timingCorrectScreen->getNoteValue();
+	
+	auto lSequencer = sequencer.lock();
+	
+	if (tcValue > 0 && e1)
+        timingCorrect(0, parent->getLastBarIndex(), e1.get(), lSequencer->getTickValues()[tcValue]);
+ 
     for (auto& _e2 : events)
     {
         if (_e2->getTick() == e1->getTick())
@@ -239,14 +253,6 @@ void Track::addEventRealTime(shared_ptr<NoteEvent> e1)
 
     if (events.size() == 0)
         setUsed(true);
-    
-	auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
-	tcValue = timingCorrectScreen->getNoteValue();
-	
-	auto lSequencer = sequencer.lock();
-	
-	if (tcValue > 0 && e1)
-		timingCorrect(0, parent->getLastBarIndex(), e1.get(), lSequencer->getTickValues()[tcValue]);
     
 	events.push_back(std::move(e1));
     sortEvents();
