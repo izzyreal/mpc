@@ -161,43 +161,43 @@ void Track::flushNoteCache()
 
 void Track::recordNoteOff(NoteEvent& n)
 {
-	auto note = n.getNote();
-	shared_ptr<NoteEvent> noteOn;
-	int eraseIndex = -1;
-
-	for (auto& noteEvent : queuedNoteOnEvents)
-	{
-		eraseIndex++;
-
-		if (noteEvent->getNote() == note)
-		{
-			noteOn.swap(noteEvent);
-			break;
-		}
-	}
-
-	if (!noteOn)
-		return;
-
-	if (eraseIndex != -1 && eraseIndex != queuedNoteOnEvents.size())
-		queuedNoteOnEvents.erase(queuedNoteOnEvents.begin() + eraseIndex);
-	
-	if (n.getTick() >= noteOn->getTick())
-	{
-		int candidate = n.getTick() - noteOn->getTick();
-
-		if (candidate < 1)
-			candidate = 1;
-
-		noteOn->setDuration(candidate);
-	}
-	else
-	{
-		noteOn->setDuration(sequencer.lock()->getLoopEnd() - 1 - noteOn->getTick());
-	}
-
-	addEventRealTime(noteOn);
-	eventIndex++;
+    auto note = n.getNote();
+    shared_ptr<NoteEvent> noteOn;
+    int eraseIndex = -1;
+    
+    for (auto& noteEvent : queuedNoteOnEvents)
+    {
+        eraseIndex++;
+        
+        if (noteEvent->getNote() == note)
+        {
+            noteOn.swap(noteEvent);
+            break;
+        }
+    }
+    
+    if (!noteOn)
+        return;
+    
+    if (eraseIndex != -1 && eraseIndex != queuedNoteOnEvents.size())
+        queuedNoteOnEvents.erase(queuedNoteOnEvents.begin() + eraseIndex);
+    
+    if (n.getTick() >= noteOn->getTick())
+    {
+        int candidate = n.getTick() - noteOn->getTick();
+        
+        if (candidate < 1)
+            candidate = 1;
+        
+        noteOn->setDuration(candidate);
+    }
+    else
+    {
+        noteOn->setDuration(sequencer.lock()->getLoopEnd() - 1 - noteOn->getTick());
+    }
+    
+    addEventRealTime(noteOn);
+    eventIndex++;
 }
 
 void Track::setUsed(bool b)
@@ -561,7 +561,7 @@ void Track::playNext()
 	}
 
 	int counter = 0;
-	sort(noteOffs.begin(), noteOffs.end(), tickCmp);
+    sortEvents();
 
     auto event = eventIndex >= events.size() ? shared_ptr<Event>() : events[eventIndex];
     
@@ -648,9 +648,14 @@ bool Track::tickCmp(weak_ptr<Event> a, weak_ptr<Event> b)
 	return a.lock()->getTick() < b.lock()->getTick();
 }
 
-bool Track::noteCmp(weak_ptr<NoteEvent> a, weak_ptr<NoteEvent> b)
+bool Track::noteCmp(weak_ptr<Event> _a, weak_ptr<Event> _b)
 {
-	return a.lock()->getNote() < b.lock()->getNote();
+    auto a = dynamic_pointer_cast<NoteEvent>(_a.lock());
+    auto b = dynamic_pointer_cast<NoteEvent>(_b.lock());
+    
+    if (!a || !b) return true;
+    
+	return a->getNote() < b->getNote();
 }
 
 bool Track::isOn()

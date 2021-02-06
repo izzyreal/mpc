@@ -48,7 +48,7 @@ namespace mpc::sequencer {
 
 	protected:
 		static bool tickCmp(std::weak_ptr<Event> a, std::weak_ptr<Event> b);
-		static bool noteCmp(std::weak_ptr<NoteEvent> a, std::weak_ptr<NoteEvent> b);
+		static bool noteCmp(std::weak_ptr<Event> a, std::weak_ptr<Event> b);
 
 	public:
 		void move(int tick, int oldTick);
