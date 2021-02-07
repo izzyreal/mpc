@@ -65,7 +65,7 @@ void StepEditorScreen::open()
 	if (track.lock()->getBus() != 0)
 	{
 		int pgm = sampler.lock()->getDrumBusProgramNumber(track.lock()->getBus());
-		program = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(pgm).lock());
+		program = sampler.lock()->getProgram(pgm);
 		findField("fromnote").lock()->setAlignment(Alignment::None);
 	}
 	else

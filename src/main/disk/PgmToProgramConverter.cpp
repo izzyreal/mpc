@@ -39,7 +39,7 @@ PgmToProgramConverter::PgmToProgramConverter(weak_ptr<MpcFile> _file, weak_ptr<S
 	if (replaceIndex == -1)
 		program = sampler.lock()->addProgram();
 	else
-		program = dynamic_pointer_cast<Program>(sampler.lock()->getProgram(replaceIndex).lock());
+		program = sampler.lock()->getProgram(replaceIndex);
 
 	auto pgmSoundNames = reader->getSampleNames();
 	

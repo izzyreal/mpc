@@ -192,7 +192,7 @@ void UserScreen::displayDeviceName()
 	{
 		if (device == 0)
 		{
-			auto programName = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(mpc.getDrum(bus - 1)->getProgram()).lock())->getName();
+			auto programName = sampler.lock()->getProgram(mpc.getDrum(bus - 1)->getProgram()).lock()->getName();
 			findLabel("devicename").lock()->setText(programName);
 		}
 		else

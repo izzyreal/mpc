@@ -597,7 +597,7 @@ void Track::playNext()
             busNumber > 0)
         {
             auto pgmIndex = mpc.getSampler().lock()->getDrumBusProgramNumber(busNumber);
-            auto pgm = dynamic_pointer_cast<mpc::sampler::Program>(mpc.getSampler().lock()->getProgram(pgmIndex).lock());
+            auto pgm = mpc.getSampler().lock()->getProgram(pgmIndex).lock();
             
             for (int padIndex : *mpc.getControls().lock()->getPressedPads())
             {

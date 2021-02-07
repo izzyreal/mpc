@@ -38,7 +38,7 @@ void DeleteProgramScreen::function(int i)
     case 4:
         if (sampler.lock()->getProgramCount() > 1)
         {
-			sampler.lock()->deleteProgram(dynamic_pointer_cast<Program>(sampler.lock()->getProgram(pgm).lock()));
+			sampler.lock()->deleteProgram(sampler.lock()->getProgram(pgm));
         }
         else
         {
@@ -61,7 +61,7 @@ void DeleteProgramScreen::turnWheel(int i)
 
 void DeleteProgramScreen::displayPgm()
 {
-    findField("pgm").lock()->setText(StrUtil::padLeft(to_string(pgm + 1), " ", 2) + "-" + dynamic_pointer_cast<Program>(sampler.lock()->getProgram(pgm).lock())->getName());
+    findField("pgm").lock()->setText(StrUtil::padLeft(to_string(pgm + 1), " ", 2) + "-" + sampler.lock()->getProgram(pgm).lock()->getName());
 }
 
 void DeleteProgramScreen::setPgm(int i)

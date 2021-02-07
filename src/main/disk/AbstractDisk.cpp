@@ -287,9 +287,7 @@ void AbstractDisk::writeProgram(weak_ptr<Program> program, const string& fileNam
 	for (auto& n : program.lock()->getNotesParameters())
 	{
 		if (n->getSoundIndex() != -1)
-        {
-            sounds.push_back(dynamic_pointer_cast<Sound>(mpc.getSampler().lock()->getSound(n->getSoundIndex()).lock()));
-        }
+            sounds.push_back(mpc.getSampler().lock()->getSound(n->getSoundIndex()).lock());
 	}
 
 	auto saveAProgramScreen = dynamic_pointer_cast<SaveAProgramScreen>(mpc.screens->getScreenComponent("save-a-program"));

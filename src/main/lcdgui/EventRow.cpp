@@ -337,7 +337,7 @@ void EventRow::setMixerEventValues()
 	if (bus == 0)
 		return;
 
-	auto program = dynamic_pointer_cast<mpc::sampler::Program>(sampler->getProgram(sampler->getDrumBusProgramNumber(bus)).lock());
+	auto program = sampler->getProgram(sampler->getDrumBusProgramNumber(bus)).lock();
 	auto nn = program->getPad(mixerEvent->getPad())->getNote();
 
 	fields[1].lock()->setText(string(nn == 34 ? "--" : to_string(nn)) + "/" + sampler->getPadName(mixerEvent->getPad()));
@@ -394,7 +394,7 @@ void EventRow::setDrumNoteEventValues()
 		if (bus != 0)
 		{
 			auto sampler = mpc.getSampler().lock();
-			auto program = dynamic_pointer_cast<mpc::sampler::Program>(sampler->getProgram(sampler->getDrumBusProgramNumber(bus)).lock());
+			auto program = sampler->getProgram(sampler->getDrumBusProgramNumber(bus)).lock();
 			fields[0].lock()->setText(to_string(ne->getNote()) + "/" + sampler->getPadName(program->getPadIndexFromNote(ne->getNote())));
 		}
 	}

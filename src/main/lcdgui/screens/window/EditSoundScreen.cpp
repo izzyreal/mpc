@@ -463,7 +463,7 @@ void EditSoundScreen::function(int j)
 		else if (edit == 3)
 		{
 			// Insert sound into section start
-			auto source = dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getSound(insertSoundIndex).lock());
+			auto source = sampler.lock()->getSound(insertSoundIndex).lock();
 			auto destination = sampler.lock()->getSound().lock();
 
 			auto destinationStartFrame = sound->getStart();

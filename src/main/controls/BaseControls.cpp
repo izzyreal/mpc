@@ -72,7 +72,7 @@ void BaseControls::init()
 		if (track.lock()->getBus() != 0)
 		{
 			mpcSoundPlayerChannel = sampler.lock()->getDrum(track.lock()->getBus() - 1);
-			program = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(mpcSoundPlayerChannel->getProgram()).lock());
+			program = sampler.lock()->getProgram(mpcSoundPlayerChannel->getProgram());
 		}
 	}
 }

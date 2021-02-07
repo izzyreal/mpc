@@ -53,13 +53,11 @@ void LoadASoundScreen::function(int i)
 	{
 	case 2:
 	{
-		if (controls->isF3Pressed()) {
+		if (controls->isF3Pressed())
 			return;
-		}
 
 		controls->setF3Pressed(true);
-		//samplerstopAllVoices();
-		auto s = dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getPreviewSound().lock());
+		auto s = sampler.lock()->getPreviewSound().lock();
 		auto start = s->getStart();
 		auto end = s->getSampleData()->size();
 		auto loopTo = -1;
@@ -72,15 +70,14 @@ void LoadASoundScreen::function(int i)
 		}
 		
 		if (!s->isMono())
-		{
 			end *= 0.5;
-		}
-		sampler.lock()->playPreviewSample(start, end, loopTo, overlapMode);
+
+        sampler.lock()->playPreviewSample(start, end, loopTo, overlapMode);
 		break;
 	}
 	case 3:
 		sampler.lock()->finishBasicVoice(); // Here we make sure the sound is not being played, so it can be removed from memory.
-		sampler.lock()->deleteSound(dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getPreviewSound().lock()));
+		sampler.lock()->deleteSound(sampler.lock()->getPreviewSound());
 		openScreen("load");
 		break;
 	case 4:

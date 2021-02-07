@@ -226,7 +226,7 @@ void SequencerScreen::displayDeviceName()
 		if (track.lock()->getDevice() == 0)
 		{
 			int pgm = sampler.lock()->getDrumBusProgramNumber(track.lock()->getBus());
-			auto p = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(pgm).lock());
+			auto p = sampler.lock()->getProgram(pgm).lock();
 			findLabel("devicename").lock()->setText(p->getName());
 		}
 		else

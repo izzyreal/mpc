@@ -30,7 +30,7 @@ void KeepOrRetryScreen::close()
 
 void KeepOrRetryScreen::mainScreen() {
 	
-	sampler.lock()->deleteSound(dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getPreviewSound().lock()));
+	sampler.lock()->deleteSound(sampler.lock()->getPreviewSound());
 	baseControls->mainScreen();
 }
 
@@ -38,9 +38,10 @@ void KeepOrRetryScreen::function(int i)
 {
 	init();
 	
-	switch (i) {
+	switch (i)
+    {
 	case 1:
-		sampler.lock()->deleteSound(dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getPreviewSound().lock()));
+		sampler.lock()->deleteSound(sampler.lock()->getPreviewSound());
 		openScreen("sample");
 		break;
 	case 3 :
@@ -65,7 +66,7 @@ void KeepOrRetryScreen::turnWheel(int i)
 {
     init();
 	auto nameScreen = mpc.screens->get<NameScreen>("name");
-	nameScreen->setName(dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getPreviewSound().lock())->getName());
+	nameScreen->setName(sampler.lock()->getPreviewSound().lock()->getName());
 	nameScreen->parameterName = param;
     openScreen("name");
 }
@@ -73,10 +74,9 @@ void KeepOrRetryScreen::turnWheel(int i)
 void KeepOrRetryScreen::displayNameForNewSound()
 {
 	if (!sampler.lock()->getSound().lock())
-	{
 		return;
-	}
-	findField("name-for-new-sound").lock()->setText(dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getPreviewSound().lock())->getName());
+
+    findField("name-for-new-sound").lock()->setText(sampler.lock()->getPreviewSound().lock()->getName());
 }
 
 void KeepOrRetryScreen::displayAssignToNote()
@@ -91,7 +91,5 @@ void KeepOrRetryScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 	string s = nonstd::any_cast<string>(arg);
 
 	if (s.compare("padandnote") == 0)
-	{
 		displayAssignToNote();
-	}
 }

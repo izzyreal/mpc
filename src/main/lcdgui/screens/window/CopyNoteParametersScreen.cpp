@@ -70,7 +70,7 @@ void CopyNoteParametersScreen::function(int i)
 
 void CopyNoteParametersScreen::displayProg0()
 {
-	auto program = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(prog0).lock());
+	auto program = sampler.lock()->getProgram(prog0).lock();
 	findField("prog0").lock()->setText(StrUtil::padLeft(to_string(prog0 + 1), " ", 2) + "-" + program->getName());
 }
 
@@ -78,7 +78,7 @@ void CopyNoteParametersScreen::displayNote0()
 {
 	auto noteParameters = sampler.lock()->getLastNp(program.lock().get());
 	auto note0 = noteParameters->getNumber();
-	auto program = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(prog0).lock());
+	auto program = sampler.lock()->getProgram(prog0).lock();
 	auto padIndex = program->getPadIndexFromNote(note0);
 	auto soundIndex = note0 != -1 ? noteParameters->getSoundIndex() : -1;
 	auto noteText = note0 == -1 ? "--" : to_string(note0);
@@ -93,13 +93,13 @@ void CopyNoteParametersScreen::displayNote0()
 
 void CopyNoteParametersScreen::displayProg1()
 {
-	auto program = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(prog1).lock());
+	auto program = sampler.lock()->getProgram(prog1).lock();
 	findField("prog1").lock()->setText(StrUtil::padLeft(to_string(prog1 + 1), " ", 2) + "-" + program->getName());
 }
 
 void CopyNoteParametersScreen::displayNote1()
 {
-	auto program = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(prog1).lock());
+	auto program = sampler.lock()->getProgram(prog1).lock();
 	auto padIndex = program->getPadIndexFromNote(note1 + 35);
 	auto soundIndex = note1 != -1 ? program->getNoteParameters(note1 + 35)->getSoundIndex() : -1;
 	auto noteText = note1 == -1 ? "--" : to_string(note1 + 35);

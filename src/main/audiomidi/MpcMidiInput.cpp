@@ -143,7 +143,7 @@ void MpcMidiInput::transport(MidiMessage* msg, int timeStamp)
 		auto p = lSampler->getProgram(lSampler->getDrumBusProgramNumber(track->getBus())).lock();
 		auto controls = mpc.getActiveControls().lock();
 
-		controls->setSliderNoteVar(note.get(), dynamic_pointer_cast<mpc::sampler::Program>(p));
+		controls->setSliderNoteVar(note.get(), p);
 
 		auto pad = p->getPadIndexFromNote(note->getNote());
 		mpc.setPadAndNote(pad, note->getNote());

@@ -76,14 +76,14 @@ void ResampleScreen::function(int i)
 
 		auto source = snd->getSampleData();
 
-		if (newFs != dynamic_pointer_cast<mpc::sampler::Sound>(snd)->getSampleRate())
+		if (newFs != snd->getSampleRate())
 		{
 			float* srcArray = &(*source)[0];
 
 			SRC_DATA srcData;
 			srcData.data_in = srcArray;
 			srcData.input_frames = source->size();
-			srcData.src_ratio = (double)(newFs) / (double)(dynamic_pointer_cast<mpc::sampler::Sound>(snd)->getSampleRate());
+			srcData.src_ratio = (double)(newFs) / (double)(snd->getSampleRate());
             
 			srcData.output_frames = (floor)(source->size() * srcData.src_ratio);
 

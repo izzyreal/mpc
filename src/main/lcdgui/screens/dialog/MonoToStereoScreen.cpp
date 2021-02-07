@@ -91,7 +91,7 @@ void MonoToStereoScreen::function(int j)
 		}
 
 		auto left = sampler.lock()->getSound().lock();
-		auto right = dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getSound(rSource).lock());
+		auto right = sampler.lock()->getSound(rSource).lock();
 
 		vector<float> newSampleDataRight;
 

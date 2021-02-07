@@ -360,7 +360,7 @@ void NameScreen::saveName()
 	}
 	else if (prevScreen.compare("keep-or-retry") == 0)
 	{
-		dynamic_pointer_cast<mpc::sampler::Sound>(sampler.lock()->getPreviewSound().lock())->setName(getName());
+		sampler.lock()->getPreviewSound().lock()->setName(getName());
 		openScreen(prevScreen);
 		resetNameScreen();
 	}

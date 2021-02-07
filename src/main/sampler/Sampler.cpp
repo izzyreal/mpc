@@ -37,6 +37,7 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::sampler;
+using namespace ctoot::mpc;
 using namespace moduru::lang;
 using namespace std;
 
@@ -44,6 +45,24 @@ Sampler::Sampler(mpc::Mpc& mpc)
 	: mpc(mpc)
 {
 	initMasterPadAssign = Pad::getPadNotes(mpc);
+}
+
+weak_ptr<Sound> Sampler::getPreviewSound()
+{
+    return sounds[sounds.size() - 1];
+}
+
+weak_ptr<Sound> Sampler::getSound(int index)
+{
+    if (index < 0 || index >= sounds.size())
+        return {};
+
+    return sounds[index];
+}
+
+weak_ptr<Program> Sampler::getProgram(int index)
+{
+    return programs[index];
 }
 
 void Sampler::setSoundIndex(int i)
@@ -103,12 +122,12 @@ int Sampler::getInputLevel()
 	return inputLevel;
 }
 
-vector<weak_ptr<ctoot::mpc::MpcStereoMixerChannel>> Sampler::getDrumStereoMixerChannels(int i)
+vector<weak_ptr<MpcStereoMixerChannel>> Sampler::getDrumStereoMixerChannels(int i)
 {
 	return mpc.getDrums()[i]->getStereoMixerChannels();
 }
 
-vector<weak_ptr<ctoot::mpc::MpcIndivFxMixerChannel>> Sampler::getDrumIndivFxMixerChannels(int i)
+vector<weak_ptr<MpcIndivFxMixerChannel>> Sampler::getDrumIndivFxMixerChannels(int i)
 {
 	return mpc.getDrums()[i]->getIndivFxMixerChannels();
 }
@@ -205,9 +224,9 @@ void Sampler::playPreviewSample(int start, int end, int loopTo, int overlapMode)
 	previewSound->setLoopTo(oldLoopTo);
 }
 
-weak_ptr<ctoot::mpc::MpcProgram> Sampler::getProgram(int programNumber)
+weak_ptr<MpcProgram> Sampler::getMpcProgram(int index)
 {
-	return programs[programNumber];
+	return programs[index];
 }
 
 int Sampler::getProgramCount()
@@ -369,18 +388,15 @@ vector<float>* Sampler::getClickSample()
 	return &clickSample;
 }
 
-weak_ptr<ctoot::mpc::MpcSound> Sampler::getSound(int sampleNumber)
+weak_ptr<MpcSound> Sampler::getMpcSound(int index)
 {
-	if (sampleNumber == -1)
-		return weak_ptr<Sound>();
+    if (index < 0 || index >= sounds.size())
+        return {};
 
-	if (sampleNumber >= sounds.size())
-		return weak_ptr<Sound>();
-
-	return sounds[sampleNumber];
+	return sounds[index];
 }
 
-weak_ptr<ctoot::mpc::MpcSound> Sampler::getPreviewSound()
+weak_ptr<MpcSound> Sampler::getMpcPreviewSound()
 {
 	if (sounds.size() == 0)
 		return weak_ptr<Sound>();
@@ -606,7 +622,7 @@ void Sampler::stopAllVoices()
 
 void Sampler::stopAllVoices(int frameOffset)
 {
-	dynamic_cast<ctoot::mpc::MpcSoundPlayerChannel*>(mpc.getDrums()[0])->allSoundOff(frameOffset);
+	dynamic_cast<MpcSoundPlayerChannel*>(mpc.getDrums()[0])->allSoundOff(frameOffset);
 }
 
 void Sampler::finishBasicVoice()
@@ -655,7 +671,7 @@ void Sampler::playX()
 	sound->setEnd(oldEnd);
 }
 
-weak_ptr<ctoot::mpc::MpcSound> Sampler::getPlayXSound()
+weak_ptr<MpcSound> Sampler::getPlayXSound()
 {
 	return sounds[soundIndex];
 }
@@ -951,12 +967,12 @@ int Sampler::getDrumBusProgramNumber(int busNumber)
 	return mpc.getDrums()[busNumber - 1]->getProgram();
 }
 
-ctoot::mpc::MpcSoundPlayerChannel* Sampler::getDrum(int i)
+MpcSoundPlayerChannel* Sampler::getDrum(int i)
 {
 	return mpc.getDrum(i);
 }
 
-weak_ptr<ctoot::mpc::MpcSound> Sampler::getClickSound()
+weak_ptr<MpcSound> Sampler::getClickSound()
 {
 	return clickSound;
 }

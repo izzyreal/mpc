@@ -86,13 +86,13 @@ void CopyProgramScreen::setPgm1(int i)
 
 void CopyProgramScreen::displayPgm0()
 {
-	auto programName = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(pgm0).lock())->getName();
+	auto programName = sampler.lock()->getProgram(pgm0).lock()->getName();
 	findField("pgm0").lock()->setText(StrUtil::padLeft(to_string(pgm0 + 1), " ", 2) + "-" + programName);
 }
 
 void CopyProgramScreen::displayPgm1()
 {
-	auto program1 = dynamic_pointer_cast<mpc::sampler::Program>(sampler.lock()->getProgram(pgm1).lock());
+	auto program1 = sampler.lock()->getProgram(pgm1).lock();
 
 	auto programName = program1 ? program1->getName() : "(no program)";
 	findField("pgm1").lock()->setText(StrUtil::padLeft(to_string(pgm1 + 1), " ", 2) + "-" + programName);

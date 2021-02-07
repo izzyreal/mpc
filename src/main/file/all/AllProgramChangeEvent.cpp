@@ -23,7 +23,7 @@ AllProgramChangeEvent::AllProgramChangeEvent(mpc::sequencer::Event* e)
 	saveBytes[AllEvent::EVENT_ID_OFFSET] = AllEvent::PGM_CHANGE_ID;
 	AllEvent::writeTick(saveBytes, static_cast< int >(e->getTick()));
 	saveBytes[AllEvent::TRACK_OFFSET] = static_cast< int8_t >(e->getTrack());
-	saveBytes[PROGRAM_OFFSET] = static_cast< int8_t >((pce->getProgram() - 1));
+	saveBytes[PROGRAM_OFFSET] = static_cast< int8_t >(pce->getProgram() - 1);
 }
 
 int AllProgramChangeEvent::PROGRAM_OFFSET = 5;
