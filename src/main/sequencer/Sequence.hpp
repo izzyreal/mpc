@@ -23,8 +23,10 @@ namespace mpc::sequencer {
 		double initialTempo = 120.0;
 
 		std::vector<std::shared_ptr<Track>> tracks;
+        std::vector<std::weak_ptr<Track>> weakTracks;
 		std::vector<std::shared_ptr<Track>> metaTracks;
-
+        std::vector<std::weak_ptr<Track>> weakMetaTracks;
+        
 		std::vector<std::string> deviceNames = std::vector<std::string>(33);
 		std::vector<std::string> defaultTrackNames;
 
@@ -93,7 +95,6 @@ namespace mpc::sequencer {
 		int getLastTick();
 		TimeSignature getTimeSignature();
 		void sortTempoChangeEvents();
-		void sortTracks();
 		void purgeAllTracks();
 		std::weak_ptr<Track> purgeTrack(int i);
 		int getDenominator(int i);

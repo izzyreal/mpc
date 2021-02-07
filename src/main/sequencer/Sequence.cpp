@@ -30,12 +30,17 @@ Sequence::Sequence(mpc::Mpc& mpc, vector<string> defaultTrackNames)
 	for (int i = 0; i < 64; i++)
 	{
 		tracks.push_back(make_shared<Track>(mpc, this, i));
+        weakTracks.push_back(tracks.back());
 		tracks[i]->setName(defaultTrackNames[i]);
 	}
 
 	metaTracks.push_back(make_shared<Track>(mpc, this, 64));
 	metaTracks.push_back(make_shared<Track>(mpc, this, 65));
 	metaTracks.push_back(make_shared<Track>(mpc, this, 66));
+    
+    for (auto& mt : metaTracks)
+        weakMetaTracks.push_back(mt);
+    
 	metaTracks[0]->setUsed(true);
 	metaTracks[1]->setUsed(true);
 	metaTracks[2]->setUsed(true);
@@ -146,12 +151,7 @@ int Sequence::getLastLoopBarIndex()
 
 vector<weak_ptr<Track>> Sequence::getMetaTracks()
 {
-	auto res = vector<weak_ptr<Track>>();
-	
-	for (auto& t : metaTracks)
-		res.push_back(t);
-	
-	return res;
+    return weakMetaTracks;
 }
 
 void Sequence::initMetaTracks()
@@ -318,18 +318,18 @@ void Sequence::init(int lastBarIndex)
 	initialTempo = userScreen->tempo;
 	loopEnabled = userScreen->loop;
 
-	for (auto& track : getTracks())
+	for (auto& t : tracks)
 	{
-		auto lTrack = track.lock();
-		lTrack->setDeviceNumber(userScreen->device);
-		lTrack->setProgramChange(userScreen->pgm);
-		lTrack->setBusNumber(userScreen->bus);
-		lTrack->setVelocityRatio(userScreen->velo);
+		t->setDeviceNumber(userScreen->device);
+		t->setProgramChange(userScreen->pgm);
+		t->setBusNumber(userScreen->bus);
+		t->setVelocityRatio(userScreen->velo);
 	}
 	
 	setLastBar(lastBarIndex);
 	initMetaTracks();
 	initLoop();
+    
 	setTimeSignature(0, getLastBarIndex(), userScreen->timeSig.getNumerator(), userScreen->timeSig.getDenominator());
 }
 
@@ -345,12 +345,7 @@ void Sequence::setTimeSignature(int bar, int num, int den)
 
 vector<weak_ptr<Track>> Sequence::getTracks()
 {
-	auto res = vector<weak_ptr<Track>>();
-
-	for (auto& t : tracks)
-		res.push_back(t);
-
-	return res;
+    return weakTracks;
 }
 
 vector<string> Sequence::getDeviceNames()
@@ -455,11 +450,6 @@ void Sequence::sortTempoChangeEvents()
 	}
 }
 
-void Sequence::sortTracks()
-{
-	sort(tracks.begin(), tracks.end(), trackIndexComparator);
-}
-
 void Sequence::purgeAllTracks()
 {
 	for (int i = 0; i < 64; i++)
@@ -470,6 +460,7 @@ weak_ptr<Track> Sequence::purgeTrack(int i)
 {
 	tracks[i] = make_shared<Track>(mpc, this, i);
 	tracks[i]->setName(defaultTrackNames[i]);
+    weakTracks[i] = tracks[i];
 	return tracks[i];
 }
 
@@ -680,7 +671,9 @@ void Sequence::moveTrack(int source, int destination)
 			t->setTrackIndex(t->getIndex() - 1);
 		}
 	}
-	sortTracks();
+    
+    sort(begin(tracks), end(tracks), trackIndexComparator);
+    sort(begin(weakTracks), end(weakTracks), trackIndexComparator);
 }
 
 bool Sequence::isLastLoopBarEnd()
