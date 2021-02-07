@@ -24,12 +24,14 @@ using namespace mpc::disk;
 using namespace mpc::sampler;
 using namespace std;
 
-PgmToProgramConverter::PgmToProgramConverter(MpcFile* file, weak_ptr<Sampler> sampler, const int replaceIndex)
+PgmToProgramConverter::PgmToProgramConverter(weak_ptr<MpcFile> _file, weak_ptr<Sampler> sampler, const int replaceIndex)
 {
+    auto file = _file.lock();
+    
 	if (!file->getFsNode().lock()->exists())
 		throw invalid_argument("File does not exist");
 
-	reader = new mpc::file::pgmreader::ProgramFileReader(file);
+	reader = new mpc::file::pgmreader::ProgramFileReader(file.get());
 	
 	if (!reader->getHeader()->verifyFirstTwoBytes())
 		throw invalid_argument("PGM first 2 bytes are incorrect");

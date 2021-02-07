@@ -36,7 +36,7 @@ namespace mpc::disk {
 		std::weak_ptr<mpc::sampler::Program> get();
 		std::vector<std::string> getSoundNames();
 
-		PgmToProgramConverter(MpcFile* file, std::weak_ptr<mpc::sampler::Sampler> sampler, const int replaceIndex);
+		PgmToProgramConverter(std::weak_ptr<MpcFile>, std::weak_ptr<mpc::sampler::Sampler> sampler, const int replaceIndex);
 		~PgmToProgramConverter();
 	};
 }

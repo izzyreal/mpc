@@ -16,12 +16,18 @@ MpcFile::MpcFile(nonstd::any fileObject)
 {
 	//raw = dynamic_cast< ::de::waldheinz::fs::fat::AkaiFatLfnDirectoryEntry* >(fileObject) != nullptr;
 	try {
-		stdEntry = nonstd::any_cast<shared_ptr<FsNode>>(fileObject);
-		std = true;
-	}
-	catch (std::exception e) {
-		e.what();
-		std = false;
+        if (fileObject.has_value() && fileObject.type() == typeid(shared_ptr<File>))
+        {
+            stdEntry = nonstd::any_cast<shared_ptr<File>>(fileObject);
+        }
+        else if (fileObject.has_value() && fileObject.type() == typeid(shared_ptr<FsNode>))
+        {
+            stdEntry = nonstd::any_cast<shared_ptr<FsNode>>(fileObject);
+        }
+    }
+	catch (const exception& e) {
+		string msg = e.what();
+        MLOG("Failed to cast fileObject to shared_ptr<FsNode>: " + msg);
 	}
 	//rawEntry = raw ? java_cast< ::de::waldheinz::fs::fat::AkaiFatLfnDirectoryEntry* >(fileObject) : static_cast< ::de::waldheinz::fs::fat::AkaiFatLfnDirectoryEntry* >(nullptr);
 }
@@ -203,5 +209,5 @@ vector<char> MpcFile::getBytes()
 }
 
 bool MpcFile::isStd() {
-	return std;
+	return stdEntry != nullptr;
 }

@@ -46,7 +46,7 @@ StdDisk::StdDisk(mpc::Mpc& mpc, weak_ptr<Store> store)
 
 void StdDisk::renameFilesToAkai() {
 
-	auto dirContent = getDir().lock()->listFiles();
+	auto dirContent = getDir()->listFiles();
 	
 	vector<shared_ptr<FsNode>> files;
 	vector<shared_ptr<FsNode>> directories;
@@ -115,11 +115,11 @@ void StdDisk::initFiles()
 	auto loadScreen = dynamic_pointer_cast<LoadScreen>(mpc.screens->getScreenComponent("load"));
 
 	auto view = loadScreen->view;
-	auto dirList = getDir().lock()->listFiles();
+	auto dirList = getDir()->listFiles();
 
 	for (auto& f : dirList)
 	{
-		MpcFile* mpcFile = new MpcFile(f);
+		auto mpcFile = make_shared<MpcFile>(f);
 		allFiles.push_back(mpcFile);
 
 		if (view != 0 && f->isFile())
@@ -133,6 +133,7 @@ void StdDisk::initFiles()
 			files.push_back(mpcFile);
 		}
 	}
+    
 	initParentFiles();
 }
 
@@ -141,12 +142,12 @@ void StdDisk::initParentFiles()
 	parentFiles.clear();
 	if (path.size() == 0) return;
 
-	auto temp = getParentDir().lock()->listFiles();
+	auto temp = getParentDir()->listFiles();
 	
 	for (auto& f : temp)
 	{
 		if (f->isDirectory())
-			parentFiles.push_back(new MpcFile(f));
+			parentFiles.push_back(make_shared<MpcFile>(f));
 	}
 }
 
@@ -155,7 +156,7 @@ string StdDisk::getDirectoryName()
 	if (path.size() == 0)
 		return "ROOT";
 	
-	return path[(int)(path.size()) - 1].lock()->getName();
+	return path[ (int) (path.size()) - 1];
 }
 
 bool StdDisk::moveBack()
@@ -169,7 +170,7 @@ bool StdDisk::moveBack()
 	return true;
 }
 
-bool StdDisk::moveForward(string directoryName)
+bool StdDisk::moveForward(const string& directoryName)
 {
 	bool success = false;
 	for (auto& f : files)
@@ -180,7 +181,7 @@ bool StdDisk::moveForward(string directoryName)
 			
 			if (lFile->isDirectory() && lFile->getPath().find("vMPC") != string::npos && lFile->getPath().find("Stores") != string::npos)
 			{
-				path.push_back(dynamic_pointer_cast<moduru::file::Directory>(f->getFsNode().lock()));
+				path.push_back(f->getName());
 				success = true;
 				break;
 			}
@@ -189,32 +190,49 @@ bool StdDisk::moveForward(string directoryName)
 	return success;
 }
 
-weak_ptr<moduru::file::Directory> StdDisk::getDir()
+shared_ptr<Directory> StdDisk::getDir()
 {
+    auto rootDir = make_shared<Directory>(root.lock()->getPath(), nullptr);
+    
 	if (path.size() == 0)
-		return root;
+		return rootDir;
 
-	return path[(int) (path.size()) - 1];
+    string dirPath = root.lock()->getPath();
+    
+    for (int i = 0; i < path.size(); i++)
+    {
+        dirPath = dirPath + FileUtil::getSeparator() + path[i];
+    }
+    
+	return make_shared<Directory>(dirPath, nullptr);
 }
 
-weak_ptr<moduru::file::Directory> StdDisk::getParentDir()
+shared_ptr<Directory> StdDisk::getParentDir()
 {
 	if (path.size() == 0)
-		return weak_ptr<Directory>();
+        return {};
 
 	if (path.size() == 1)
-		return root;
+		return make_shared<Directory>(root.lock()->getPath(), nullptr);
 
-	return path[(int)(path.size()) - 2];
-}
+    string dirPath = root.lock()->getPath();
+    
+    for (int i = 0; i < path.size() - 1; i++)
+    {
+        dirPath = dirPath + FileUtil::getSeparator() + path[i];
+    }
+    
+    return make_shared<Directory>(dirPath, nullptr);}
 
 bool StdDisk::deleteAllFiles(int extension)
 {
-	if (!getDir().lock())
+    auto dir = getDir();
+    
+	if (!dir)
 		return false;
 
 	auto success = false;
-	auto files = getDir().lock()->listFiles();
+	auto files = dir->listFiles();
 	
 	for (auto& f : files)
 	{
@@ -227,25 +245,26 @@ bool StdDisk::deleteAllFiles(int extension)
 	return success;
 }
 
-bool StdDisk::newFolder(string newDirName)
+bool StdDisk::newFolder(const string& newDirName)
 {
-	auto f = moduru::file::Directory(getDir().lock()->getPath() + FileUtil::getSeparator() + StrUtil::toUpper(newDirName), getDir().lock().get());
+    auto dir = getDir();
+	auto f = Directory(dir->getPath() + FileUtil::getSeparator() + StrUtil::toUpper(newDirName), dir.get());
 	return f.create();
 }
 
-bool StdDisk::deleteDir(MpcFile* f)
+bool StdDisk::deleteDir(weak_ptr<MpcFile> f)
 {
-    return deleteRecursive(f->getFsNode().lock().get());
+    return deleteRecursive(f.lock()->getFsNode().lock().get());
 }
 
-bool StdDisk::deleteRecursive(moduru::file::FsNode* deleteMe)
+bool StdDisk::deleteRecursive(FsNode* deleteMe)
 {
 	auto deletedSomething = false;
 	auto deletedCurrentFile = false;
 	
 	if (deleteMe->isDirectory())
 	{
-		for (auto& f : dynamic_cast<moduru::file::Directory*>(deleteMe)->listFiles())
+		for (auto& f : dynamic_cast<Directory*>(deleteMe)->listFiles())
 			deleteRecursive(f.get());
 	}
 	
@@ -260,38 +279,42 @@ bool StdDisk::deleteRecursive(moduru::file::FsNode* deleteMe)
 	return deletedSomething;
 }
 
-MpcFile* StdDisk::newFile(string newFileName)
+shared_ptr<MpcFile> StdDisk::newFile(const string& _newFileName)
 {
-	moduru::file::File* f = nullptr;
-	try {
-		auto split = FileUtil::splitName(newFileName);
+    shared_ptr<File> f;
+    
+    auto fileName = _newFileName;
+    
+	try
+    {
+		auto split = FileUtil::splitName(fileName);
 		split[0] = moduru::lang::StrUtil::trim(split[0]);
-		newFileName = split[0] + "." + split[1];
+		fileName = split[0] + "." + split[1];
 
-		string newFilePath = getDir().lock()->getPath() + FileUtil::getSeparator() + StrUtil::toUpper(StrUtil::replaceAll(newFileName, ' ', "_"));
-		f = new moduru::file::File(newFilePath, getDir().lock().get());
+        auto dir = getDir();
+        
+		string filePath = dir->getPath() + FileUtil::getSeparator() + StrUtil::toUpper(StrUtil::replaceAll(fileName, ' ', "_"));
+        
+		f = make_shared<File>(filePath, dir.get());
 		auto success = f->create();
-		if (success) {
-			return new MpcFile(shared_ptr<FsNode>(f));
+		
+        if (success)
+        {
+			return make_shared<MpcFile>(f);
 		}
-		else {
-			delete f;
-		}
-		return nullptr;
 	}
-	catch (exception e) {
-		e.what();
-		if (f != nullptr) {
-			delete f;
-		}
-		return nullptr;
+	catch (const exception& e) {
+        MLOG("Failed to create file " + _newFileName + ":");
+        string msg = e.what();
+        MLOG(msg);
 	}
-	return nullptr;
+    
+	return {};
 }
 
 string StdDisk::getAbsolutePath()
 {
-    return getDir().lock()->getPath();
+    return getDir()->getPath();
 }
 
 int StdDisk::getPathDepth() {

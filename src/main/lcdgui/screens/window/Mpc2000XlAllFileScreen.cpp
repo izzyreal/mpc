@@ -31,7 +31,7 @@ void Mpc2000XlAllFileScreen::function(int i)
 		
 		try
 		{
-			mpc::disk::AllLoader allLoader(mpc, loadScreen->getSelectedFile(), sequencesOnly);
+			mpc::disk::AllLoader allLoader(mpc, loadScreen->getSelectedFile().get(), sequencesOnly);
 			auto loadASequenceFromAllScreen = dynamic_pointer_cast<LoadASequenceFromAllScreen>(mpc.screens->getScreenComponent("load-a-sequence-from-all"));
 			loadASequenceFromAllScreen->sequencesFromAllFile = allLoader.getSequences();
 
@@ -56,7 +56,7 @@ void Mpc2000XlAllFileScreen::function(int i)
 		auto sequencesOnly = false;
 		try
 		{
-			mpc::disk::AllLoader allLoader(mpc, loadScreen->getSelectedFile(), sequencesOnly);
+			mpc::disk::AllLoader allLoader(mpc, loadScreen->getSelectedFile().get(), sequencesOnly);
 			openScreen("sequencer");
 		}
 		catch (const exception& e)

@@ -28,16 +28,13 @@ using namespace moduru::lang;
 using namespace std;
 
 // Only used by Mpc
-ProgramLoader::ProgramLoader(mpc::Mpc& mpc, MpcFile* file, const int replaceIndex)
-	: mpc(mpc)
+ProgramLoader::ProgramLoader(mpc::Mpc& _mpc, weak_ptr<MpcFile> _file, const int replaceIndex)
+: mpc(_mpc), file(_file), replace (replaceIndex != -1)
 {
-	this->file = file;
-	this->replace = replace;
-
-	auto cantFindFileScreen = dynamic_pointer_cast<CantFindFileScreen>(mpc.screens->getScreenComponent("cant-find-file"));
-	cantFindFileScreen->skipAll = false;
-
-	loadProgramThread = thread(&ProgramLoader::static_loadProgram, this, replaceIndex);
+    auto cantFindFileScreen = dynamic_pointer_cast<CantFindFileScreen>(mpc.screens->getScreenComponent("cant-find-file"));
+    cantFindFileScreen->skipAll = false;
+    
+    loadProgramThread = thread(&ProgramLoader::static_loadProgram, this, replaceIndex);
 }
 
 void ProgramLoader::static_loadProgram(void* this_p, const int replaceIndex)
@@ -61,7 +58,7 @@ void ProgramLoader::loadProgram(const int replaceIndex)
 		for (int i = 0; i < pgmSoundNames.size(); i++)
 		{
 			auto ext = "snd";
-			mpc::disk::MpcFile* soundFile = nullptr;
+			shared_ptr<MpcFile> soundFile;
 			string soundFileName = StrUtil::replaceAll(pgmSoundNames[i], ' ', "");
 
 			for (auto& f : disk->getAllFiles())
@@ -73,7 +70,7 @@ void ProgramLoader::loadProgram(const int replaceIndex)
 				}
 			}
 
-			if (soundFile == nullptr || !soundFile->getFsNode().lock()->exists())
+			if (!soundFile || !soundFile->getFsNode().lock()->exists())
 			{
 				for (auto& f : disk->getAllFiles())
 				{
@@ -86,15 +83,23 @@ void ProgramLoader::loadProgram(const int replaceIndex)
 				}
 			}
 
-			if (soundFile == nullptr || !soundFile->getFsNode().lock()->exists())
+			if (!soundFile || !soundFile->getFsNode().lock()->exists())
 			{
 				unavailableSoundIndices.push_back(i);
 				notFound(soundFileName, ext);
 				continue;
 			}
 
-			loadSound(soundFileName, pgmSoundNames[i], ext, soundFile, &soundsDestIndex, replace, i);
-		}
+            loadSound(
+                      soundFileName,
+                      pgmSoundNames[i],
+                      ext,
+                      soundFile,
+                      &soundsDestIndex,
+                      replace,
+                      i
+                      );
+        }
 
 		auto adapter = ProgramImportAdapter(mpc.getSampler(), p, soundsDestIndex, unavailableSoundIndices);
 		result = adapter.get();
@@ -112,25 +117,34 @@ void ProgramLoader::loadProgram(const int replaceIndex)
 	}
 }
 
-void ProgramLoader::loadSound(const string& soundFileName, const string& soundName, const string& ext, MpcFile* soundFile, vector<int>* soundsDestIndex, const bool replace, const int loadSoundIndex)
+void ProgramLoader::loadSound
+(
+ const string& soundFileName,
+ const string& soundName,
+ const string& ext,
+ weak_ptr<MpcFile> soundFile,
+ vector<int>* soundsDestIndex,
+ const bool replace,
+ const int loadSoundIndex
+ )
 {
-	int addedSoundIndex = -1;
-	SoundLoader sl(mpc, mpc.getSampler().lock()->getSounds(), replace);
-	sl.setPartOfProgram(true);
-
-	try
-	{
-		showPopup(soundName, ext, soundFile->length());
-		addedSoundIndex = sl.loadSound(soundFile);
-		
-		if (addedSoundIndex != -1)
-			(*soundsDestIndex)[loadSoundIndex] = addedSoundIndex;
-	}
-	catch (const exception& e)
-	{
-		auto msg = string(e.what());
-		MLOG("Exception occurred in ProgramLoader::loadSound(...) -- " + msg);
-	}
+    int addedSoundIndex = -1;
+    SoundLoader sl(mpc, mpc.getSampler().lock()->getSounds(), replace);
+    sl.setPartOfProgram(true);
+    
+    try
+    {
+        showPopup(soundName, ext, soundFile.lock()->length());
+        addedSoundIndex = sl.loadSound(soundFile);
+        
+        if (addedSoundIndex != -1)
+            (*soundsDestIndex)[loadSoundIndex] = addedSoundIndex;
+    }
+    catch (const exception& e)
+    {
+        auto msg = string(e.what());
+        MLOG("Exception occurred in ProgramLoader::loadSound(...) -- " + msg);
+    }
 }
 
 void ProgramLoader::showPopup(string name, string ext, int sampleSize)

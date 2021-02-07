@@ -35,19 +35,18 @@ namespace mpc::disk
 	private:
 		static float rateToTuneBase;
 		mpc::Mpc& mpc;
-		bool partOfProgram{ false };
-		MpcFile* soundFile{ nullptr };
-		std::vector<std::weak_ptr<mpc::sampler::Sound>> sounds{};
-		bool preview{ false };
-		bool replace{ false };
-		int size{ 0 };
+        bool partOfProgram = false;
+		std::vector<std::weak_ptr<mpc::sampler::Sound>> sounds;
+		bool preview = false;
+		bool replace = false;
+        int size = 0;
 
 	public:
 		static void getSampleDataFromWav(std::weak_ptr<moduru::file::File> wavFile, std::vector<float>* dest);
 
-		void setPartOfProgram(bool b);
-		int loadSound(MpcFile* f);
-		void setPreview(bool b);
+		void setPartOfProgram(bool);
+		int loadSound(std::weak_ptr<MpcFile>);
+		void setPreview(bool);
 		double logOfBase(float num, float base);
 		int getSize();
 

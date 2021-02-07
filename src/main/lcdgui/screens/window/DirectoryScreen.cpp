@@ -16,6 +16,7 @@
 #include <file/File.hpp>
 #include <file/FileUtil.hpp>
 
+using namespace mpc::disk;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
@@ -40,7 +41,7 @@ void DirectoryScreen::open()
 
 void DirectoryScreen::setFunctionKeys()
 {
-	if (getSelectedFile() != nullptr)
+	if (getSelectedFile())
 	{
 		auto splitFileName = StrUtil::split(getSelectedFile()->getName(), '.');
 		auto playable = splitFileName.size() > 1 && (StrUtil::eqIgnoreCase(splitFileName[1], "snd") || StrUtil::eqIgnoreCase(splitFileName[1], "wav"));
@@ -64,7 +65,7 @@ void DirectoryScreen::function(int f)
 	switch (f)
 	{
 	case 1:
-		if (getSelectedFile() == nullptr)
+		if (!getSelectedFile())
 			return;
 
 		if (getSelectedFile()->isDirectory())
@@ -75,7 +76,7 @@ void DirectoryScreen::function(int f)
 		break;
 	case 2:
 	{
-		if (getSelectedFile() == nullptr)
+		if (!getSelectedFile())
 			return;
 
 		auto fileNameNoExt = mpc::Util::splitName(getSelectedFile()->getName())[0];
@@ -203,14 +204,11 @@ void DirectoryScreen::right()
 	{
 		auto disk = mpc.getDisk().lock();
 		
-		if (getSelectedFile() == nullptr || disk->getFileNames().size() == 0 || !getSelectedFile()->isDirectory())
+		if (!getSelectedFile() || disk->getFileNames().size() == 0 || !getSelectedFile()->isDirectory())
 			return;
 
 		auto f = getSelectedFile();
 		
-		if (f == nullptr)
-			return;
-
 		if (!disk->moveForward(f->getName()))
 			return;
 
@@ -404,7 +402,7 @@ void DirectoryScreen::down()
 	}
 }
 
-mpc::disk::MpcFile* DirectoryScreen::getSelectedFile()
+shared_ptr<MpcFile> DirectoryScreen::getSelectedFile()
 {
 	auto yPos = yPos0;
 
@@ -417,17 +415,16 @@ mpc::disk::MpcFile* DirectoryScreen::getSelectedFile()
 	return getFileFromGrid(xPos, yPos);
 }
 
-mpc::disk::MpcFile* DirectoryScreen::getFileFromGrid(int x, int y)
+shared_ptr<MpcFile> DirectoryScreen::getFileFromGrid(int x, int y)
 {
 	auto disk = mpc.getDisk().lock();
-	mpc::disk::MpcFile* f = nullptr;
 	
 	if (x == 0 && disk->getParentFileNames().size() > y + yOffset0)
-		f = disk->getParentFile(y + yOffset0);
+		return disk->getParentFile(y + yOffset0);
 	else if (x == 1 && disk->getFileNames().size() > y + yOffset1)
-		f = disk->getFile(y + yOffset1);
+		return disk->getFile(y + yOffset1);
 
-	return f;
+    return {};
 }
 
 void DirectoryScreen::displayLeftFields()
@@ -588,21 +585,21 @@ void DirectoryScreen::drawGraphicsLeft()
 		return;
 	}
 	
-	int lastVisibleFileNumber = size - yOffset0 - 1;
+	int bottomVisibleFileIndex = size - yOffset0 - 1;
 	auto firstVisibleFile = getFileFromGrid(0, 0);
-	mpc::disk::MpcFile* lastVisibleFile = nullptr;
+    shared_ptr<MpcFile> lastVisibleFile;
 	
-	if (lastVisibleFileNumber > 0)
+	if (bottomVisibleFileIndex > 0)
 	{
-		if (lastVisibleFileNumber > 4)
-			lastVisibleFileNumber = 4;
+		if (bottomVisibleFileIndex > 4)
+			bottomVisibleFileIndex = 4;
 
-		lastVisibleFile = getFileFromGrid(0, lastVisibleFileNumber);
+		lastVisibleFile = getFileFromGrid(0, bottomVisibleFileIndex);
 	}
 
 	auto disk = mpc.getDisk().lock();
 	auto dirName = disk->getDirectoryName();
-	int visibleListLength = lastVisibleFileNumber + 1;
+	int visibleListLength = bottomVisibleFileIndex + 1;
 
 	if ( (size - yOffset0) == 2)
 	{
@@ -779,7 +776,7 @@ void DirectoryScreen::drawGraphicsRight()
 
 	auto file10 = getFileFromGrid(1, 0);
 
-	if (file10 != nullptr && file10->isDirectory())
+	if (file10 && file10->isDirectory())
 	{
 		if (yOffset1 == 0)
 		{
@@ -807,28 +804,28 @@ void DirectoryScreen::drawGraphicsRight()
 
 	auto file11 = getFileFromGrid(1, 1);
 
-	if (file11 != nullptr && file11->isDirectory())
+	if (file11 && file11->isDirectory())
 		c1->setText(u8"\u00E6");
 	else
 		c1->setText(u8"\u00E3");
 
 	auto file12 = getFileFromGrid(1, 2);
 
-	if (file12 != nullptr && file12->isDirectory())
+	if (file12 && file12->isDirectory())
 		c2->setText(u8"\u00E6");
 	else
 		c2->setText(u8"\u00E3");
 
 	auto file13 = getFileFromGrid(1, 3);
 
-	if (file13 != nullptr && file13->isDirectory())
+	if (file13 && file13->isDirectory())
 		c3->setText(u8"\u00E6");
 	else
 		c3->setText(u8"\u00E3");
 
 	auto file14 = getFileFromGrid(1, 4);
 
-	if (file14 != nullptr && file14->isDirectory())
+	if (file14 && file14->isDirectory())
 	{
 		if (yOffset1 + 5 == secondColumn.size())
 			c4->setText(u8"\u00E2");

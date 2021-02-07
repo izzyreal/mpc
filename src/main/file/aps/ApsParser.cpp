@@ -14,13 +14,21 @@
 
 using namespace moduru;
 using namespace mpc::file::aps;
+using namespace mpc::disk;
 using namespace mpc::sampler;
 using namespace std;
 
-ApsParser::ApsParser(mpc::Mpc& mpc, mpc::disk::MpcFile* file)
+ApsParser::ApsParser(mpc::Mpc& mpc, weak_ptr<MpcFile> file)
 {
-	auto loadBytes = file->getBytes();
+	auto loadBytes = file.lock()->getBytes();
+    
+    if (loadBytes.size() == 0)
+    {
+        throw invalid_argument(file.lock()->getName() + " is an empty file");
+    }
+    
 	header = make_unique<ApsHeader>(VecUtil::CopyOfRange(&loadBytes, HEADER_OFFSET, HEADER_OFFSET + HEADER_LENGTH));
+    
 	auto const soundNamesEnd = HEADER_LENGTH + (header->getSoundAmount() * SOUND_NAME_LENGTH);
 	soundNames = make_unique<ApsSoundNames>(VecUtil::CopyOfRange(&loadBytes, HEADER_OFFSET + HEADER_LENGTH, soundNamesEnd));
 	programCount = (loadBytes.size() - 1689 - (soundNames->get().size() * 17)) / PROGRAM_LENGTH;
@@ -93,8 +101,8 @@ ApsParser::ApsParser(mpc::Mpc& mpc, string apsNameString)
 			chunks.push_back(ba1);
 		}
 	}
-	//chunks.push_back(vector<char>{ 1, 127, 0, 0, 7, 4, 30, 0 }); // [2] of this chunk is pgm index
-	chunks.push_back(vector<char>{ 1, 127 });
+
+    chunks.push_back(vector<char>{ 1, 127 });
 	
 	for (int i = 0; i < 24; i++)
 	{

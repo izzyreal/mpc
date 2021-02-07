@@ -30,7 +30,7 @@ void LoadASequenceScreen::open()
 	if (ext.compare("mid") == 0 || ext.compare("MID") == 0)
 	{
 
-		auto midiReader = mpc::file::mid::MidiReader(loadScreen->getSelectedFile(), newSeq);
+		auto midiReader = mpc::file::mid::MidiReader(loadScreen->getSelectedFile().get(), newSeq);
 
 		midiReader.parseSequence(mpc);
 

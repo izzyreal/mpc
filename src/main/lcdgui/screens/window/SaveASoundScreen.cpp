@@ -73,9 +73,9 @@ void SaveASoundScreen::function(int i)
 		auto f = disk->newFile(fileName);
 
 		if (fileType == 0)
-			disk->writeSound(s.get(), f);
+			disk->writeSound(s, f);
 		else
-			disk->writeWav(s.get(), f);
+			disk->writeWav(s, f);
 
 		disk->flush();
 		disk->initFiles();

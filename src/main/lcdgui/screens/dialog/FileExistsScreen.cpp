@@ -41,7 +41,7 @@ void FileExistsScreen::function(int i)
 			{
 				disk->flush();
 				disk->initFiles();
-				disk->writeProgram(program.lock().get(), pfileName);
+				disk->writeProgram(program, pfileName);
 			}
 		}
 		else if (ls.lock()->getPreviousScreenName().compare("save-a-sequence") == 0)
@@ -53,7 +53,7 @@ void FileExistsScreen::function(int i)
 			{
 				disk->flush();
 				disk->initFiles();
-				disk->writeSequence(sequencer.lock()->getActiveSequence().lock().get(), sfileName);
+				disk->writeSequence(sequencer.lock()->getActiveSequence(), sfileName);
 				openScreen("save");
 			}
 			openScreen("save");
@@ -107,9 +107,9 @@ void FileExistsScreen::function(int i)
 			auto f = disk->newFile(fileName);
 
 			if (type == 0)
-				disk->writeSound(s.get(), f);
+				disk->writeSound(s, f);
 			else
-				disk->writeWav(s.get(), f);
+				disk->writeWav(s, f);
 
 			disk->flush();
 			disk->initFiles();

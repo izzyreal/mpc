@@ -53,8 +53,8 @@ namespace mpc::lcdgui::screens::window
 
 	private:
 		void setFunctionKeys();
-		mpc::disk::MpcFile* getSelectedFile();
-		mpc::disk::MpcFile* getFileFromGrid(int x, int y);
+		std::shared_ptr<mpc::disk::MpcFile> getSelectedFile();
+        std::shared_ptr<mpc::disk::MpcFile> getFileFromGrid(int x, int y);
 		void displayLeftFields();
 		void displayRightFields();
 		void refreshFocus();

@@ -39,11 +39,11 @@ void SoundLoader::setPartOfProgram(bool b)
 	partOfProgram = b;
 }
 
-int SoundLoader::loadSound(MpcFile* f)
+int SoundLoader::loadSound(weak_ptr<MpcFile> f)
 {
 	auto sound = mpc.getSampler().lock()->addSound().lock();
 
-	soundFile = f;
+	auto soundFile = f.lock();
 	string soundFileName = soundFile->getName();
 	auto periodIndex = soundFileName.find_last_of('.');
 	string extension = "";
@@ -139,7 +139,7 @@ int SoundLoader::loadSound(MpcFile* f)
 	}
 	else if (StrUtil::eqIgnoreCase(extension, "snd"))
 	{
-		auto sndReader = mpc::file::sndreader::SndReader(soundFile);
+		auto sndReader = mpc::file::sndreader::SndReader(soundFile.get());
 		sndReader.getSampleData(fa);
 		size = fa->size();
 		mono = sndReader.isMono();

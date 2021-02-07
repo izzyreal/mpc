@@ -13,6 +13,7 @@
 #include <file/File.hpp>
 #include <file/FileUtil.hpp>
 
+using namespace mpc::disk;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
@@ -255,7 +256,7 @@ void LoadScreen::displayFile()
 	auto selectedFileName = getSelectedFileName();	
 	auto selectedFile = getSelectedFile();
 	
-	if (selectedFileName.length() != 0 && selectedFile != nullptr && selectedFile->isDirectory())
+	if (selectedFileName.length() != 0 && selectedFile && selectedFile->isDirectory())
 	{
 		findField("file").lock()->setText(u8"\u00C3" + StrUtil::padRight(FileUtil::splitName(selectedFileName)[0], " ", 16));
 	}
@@ -278,7 +279,7 @@ int LoadScreen::getFileSize()
 {
 	auto disk = mpc.getDisk().lock();
 	
-	if (disk->getFile(fileLoad) == nullptr || disk->getFile(fileLoad)->isDirectory())
+	if (!disk->getFile(fileLoad) || disk->getFile(fileLoad)->isDirectory())
 		return 0;
 	
 	return (int) floor(disk->getFile(fileLoad)->length() / 1024.0);
@@ -313,7 +314,7 @@ void LoadScreen::setView(int i)
 }
 
 
-mpc::disk::MpcFile* LoadScreen::getSelectedFile()
+shared_ptr<MpcFile> LoadScreen::getSelectedFile()
 {
 	return mpc.getDisk().lock()->getFile(fileLoad);
 }

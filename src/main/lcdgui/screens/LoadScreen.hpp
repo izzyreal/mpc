@@ -61,7 +61,7 @@ namespace mpc::lcdgui::screens
 		void displaySize();
 
 		void setView(int i);
-		mpc::disk::MpcFile* getSelectedFile();
+		std::shared_ptr<mpc::disk::MpcFile> getSelectedFile();
 		std::string getSelectedFileName();
 		bool isSelectedFileDirectory();
 		void setFileLoadWithMaxCheck(int i);
