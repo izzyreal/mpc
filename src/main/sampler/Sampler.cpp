@@ -961,51 +961,12 @@ weak_ptr<ctoot::mpc::MpcSound> Sampler::getClickSound()
 	return clickSound;
 }
 
-void Sampler::resample(std::vector<float>* src, int srcRate, std::vector<float>* dest, int destRate)
-{
-
-	float* srcArray = &(*src)[0];
-
-	SRC_DATA srcData;
-	srcData.data_in = srcArray;
-	srcData.input_frames = src->size();
-	srcData.src_ratio = (double)(destRate) / (double)(srcRate);
-	srcData.output_frames = (floor)(src->size() * srcData.src_ratio);
-
-	dest->resize(srcData.output_frames);
-
-	float* destArray = &(*dest)[0];
-	srcData.data_out = destArray;
-
-	auto error = src_simple(&srcData, 0, 1);
-	
-	if (error != 0)
-	{
-		const char* errormsg = src_strerror(error);
-		string errorStr(errormsg);
-		MLOG("libsamplerate error: " + errorStr);
-	}
-
-	for (auto& f : *dest) {
-		if (f > 1)
-		{
-			f = 1;
-		}
-		else if (f < -1)
-		{
-			f = -1;
-		}
-	}
-}
-
 int Sampler::checkExists(string soundName)
 {
 	for (int i = 0; i < getSoundCount(); i++)
 	{
 		if (StrUtil::eqIgnoreCase(StrUtil::replaceAll(soundName, ' ', ""), getSoundName(i)))
-		{
 			return i;
-		}
 	}
 	return -1;
 }

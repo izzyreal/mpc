@@ -20,7 +20,6 @@ void ResampleScreen::open()
 	if (previousScreenName.compare("name") != 0 && sampler.lock()->getSound().lock())
 	{
 		newName = sampler.lock()->getSound().lock()->getName();
-		//newSampleName = newSampleName->replaceAll("\\s+$", "");
 		newName = sampler.lock()->addOrIncreaseNumber(newName);
 	}
 
@@ -85,6 +84,7 @@ void ResampleScreen::function(int i)
 			srcData.data_in = srcArray;
 			srcData.input_frames = source->size();
 			srcData.src_ratio = (double)(newFs) / (double)(dynamic_pointer_cast<mpc::sampler::Sound>(snd)->getSampleRate());
+            
 			srcData.output_frames = (floor)(source->size() * srcData.src_ratio);
 
 			auto dest = destSnd->getSampleData();
