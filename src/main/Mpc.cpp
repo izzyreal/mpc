@@ -94,25 +94,23 @@ void Mpc::init(const int sampleRate, const int inputCount, const int outputCount
 	hardware->getSlider().lock()->setValue(mpc::nvram::NvRam::getSlider());
 	mpc::nvram::NvRam::loadUserScreenValues(*this);
 
-	/*
+    // We fetch all screens once so they're all cached in Screens,
+    // avoiding memory allocations on the audio thread.
 	for (auto& screenName : screenNames)
-	{
-		// Uncomment if you want to try and open all screens before doing anything else.
-		// For debug purposes only.
-		//layeredScreen->openScreen(screenName);
-	}
-	*/
+        screens->get<ScreenComponent>(screenName);
 
 	layeredScreen->openScreen("sequencer");
 
 	MLOG("Mpc is ready")
 }
 
-weak_ptr<controls::Controls> Mpc::getControls() {
+weak_ptr<controls::Controls> Mpc::getControls()
+{
 	return controls;
 }
 
-weak_ptr<hardware::Hardware> Mpc::getHardware() {
+weak_ptr<hardware::Hardware> Mpc::getHardware()
+{
 	return hardware;
 }
 
@@ -186,9 +184,7 @@ vector<string> Mpc::akaiAscii { " ", "!", "#", "$", "%", "&", "'", "(", ")", "-"
 void Mpc::loadSound(bool replace)
 {
 	if (loadSoundThread.joinable())
-	{
 		loadSoundThread.join();
-	}
 	
 	auto lDisk = getDisk().lock();
 	lDisk->setBusy(true);
@@ -216,7 +212,8 @@ void Mpc::loadSound(bool replace)
 	{
 		loadSoundThread = thread(&Mpc::runLoadSoundThread, this, soundLoader.getSize());
 	}
-	else {
+	else
+    {
 		sampler->deleteSound(sampler->getSoundCount() - 1);
 		lDisk->setBusy(false);
 	}
