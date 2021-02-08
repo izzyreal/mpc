@@ -9,9 +9,9 @@
 using namespace mpc::file::all;
 using namespace std;
 
-Song::Song(vector<char> b) 
+Song::Song(const vector<char>& b) 
 {
-	auto nameBytes = moduru::VecUtil::CopyOfRange(&b, NAME_OFFSET, NAME_OFFSET + AllParser::NAME_LENGTH);
+	auto nameBytes = moduru::VecUtil::CopyOfRange(b, NAME_OFFSET, NAME_OFFSET + AllParser::NAME_LENGTH);
 	name = "";
 	for (char c : nameBytes) {
 		if (c == 0x00) break;

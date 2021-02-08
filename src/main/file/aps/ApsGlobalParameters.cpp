@@ -16,7 +16,7 @@ using namespace moduru::file;
 using namespace mpc::file::aps;
 using namespace std;
 
-ApsGlobalParameters::ApsGlobalParameters(mpc::Mpc& mpc, vector<char> loadBytes)
+ApsGlobalParameters::ApsGlobalParameters(mpc::Mpc& mpc, const vector<char>& loadBytes)
 	: mpc(mpc)
 {
 	padToInternalSound = BitUtil::getBits(loadBytes[0])[7] == '1';

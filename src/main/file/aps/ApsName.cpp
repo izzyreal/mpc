@@ -8,9 +8,9 @@ using namespace mpc::file::aps;
 using namespace moduru;
 using namespace std;
 
-ApsName::ApsName(vector<char> loadBytes)
+ApsName::ApsName(const vector<char>& loadBytes)
 {
-	auto nameBytes = VecUtil::CopyOfRange(&loadBytes, 0, NAME_STRING_LENGTH);
+	auto nameBytes = VecUtil::CopyOfRange(loadBytes, 0, NAME_STRING_LENGTH);
 	name = "";
 	for (char c : nameBytes) {
 		if (c == 0x00) break;

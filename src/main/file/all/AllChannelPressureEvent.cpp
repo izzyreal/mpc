@@ -7,7 +7,7 @@
 using namespace mpc::file::all;
 using namespace std;
 
-AllChannelPressureEvent::AllChannelPressureEvent(vector<char> ba) 
+AllChannelPressureEvent::AllChannelPressureEvent(const vector<char>& ba) 
 {
 	auto cpe = new mpc::sequencer::ChannelPressureEvent();
 	cpe->setTick(AllEvent::readTick(ba));

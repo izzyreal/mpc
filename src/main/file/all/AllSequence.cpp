@@ -23,10 +23,10 @@ using namespace std;
 using namespace moduru::lang;
 using namespace mpc::file::all;
 
-Sequence::Sequence(vector<char> b) 
+Sequence::Sequence(const vector<char>& b) 
 {
-	barList = new BarList(moduru::VecUtil::CopyOfRange(&b, BAR_LIST_OFFSET, BAR_LIST_OFFSET + BAR_LIST_LENGTH));
-	auto nameBytes = moduru::VecUtil::CopyOfRange(&b, NAME_OFFSET, NAME_OFFSET + AllParser::NAME_LENGTH);
+	barList = new BarList(moduru::VecUtil::CopyOfRange(b, BAR_LIST_OFFSET, BAR_LIST_OFFSET + BAR_LIST_LENGTH));
+	auto nameBytes = moduru::VecUtil::CopyOfRange(b, NAME_OFFSET, NAME_OFFSET + AllParser::NAME_LENGTH);
 	name = "";
 	
 	for (char c : nameBytes)
@@ -56,7 +56,7 @@ Sequence::Sequence(vector<char> b)
 	{
 		auto offset = DEVICE_NAMES_OFFSET + (i * AllParser::DEV_NAME_LENGTH);
 		string stringBuffer = "";
-		auto stringBytes = moduru::VecUtil::CopyOfRange(&b, offset, offset + AllParser::DEV_NAME_LENGTH);
+		auto stringBytes = moduru::VecUtil::CopyOfRange(b, offset, offset + AllParser::DEV_NAME_LENGTH);
 
 		for (char c : stringBytes)
 		{
@@ -68,7 +68,7 @@ Sequence::Sequence(vector<char> b)
 		}
 		devNames[i] = stringBuffer;
 	}
-	tracks = new Tracks(moduru::VecUtil::CopyOfRange(&b, TRACKS_OFFSET, TRACKS_LENGTH));
+	tracks = new Tracks(moduru::VecUtil::CopyOfRange(b, TRACKS_OFFSET, TRACKS_LENGTH));
 	allEvents = readEvents(b);
 }
 
@@ -205,7 +205,7 @@ const int Sequence::BAR_LIST_OFFSET;
 const int Sequence::BAR_LIST_LENGTH;
 const int Sequence::EVENTS_OFFSET;
 
-vector<mpc::sequencer::Event*> Sequence::readEvents(vector<char> seqBytes)
+vector<mpc::sequencer::Event*> Sequence::readEvents(const vector<char>& seqBytes)
 {
 	vector<mpc::sequencer::Event*> aeList;
 	for (auto& ba : readEventSegments(seqBytes)) {
@@ -215,22 +215,30 @@ vector<mpc::sequencer::Event*> Sequence::readEvents(vector<char> seqBytes)
 	return aeList;
 }
 
-vector<vector<char>> Sequence::readEventSegments(vector<char> seqBytes)
+vector<vector<char>> Sequence::readEventSegments(const vector<char>& seqBytes)
 {
 	vector<vector<char>> eventArrays;
 	int candidateOffset = Sequence::EVENTS_OFFSET;
-	for (int i = 0; i < MAX_EVENT_SEG_COUNT; i++) {
+    
+	for (int i = 0; i < MAX_EVENT_SEG_COUNT; i++)
+    {
 		int sysexSegs = 0;
-		auto ea = moduru::VecUtil::CopyOfRange(&seqBytes, candidateOffset, candidateOffset + EVENT_SEG_LENGTH);
-		if (moduru::VecUtil::Equals(ea, TERMINATOR)) break;
+		auto ea = moduru::VecUtil::CopyOfRange(seqBytes, candidateOffset, candidateOffset + EVENT_SEG_LENGTH);
+	
+        if (moduru::VecUtil::Equals(ea, TERMINATOR))
+            break;
 
 		if (ea[EVENT_ID_OFFSET] == SYS_EX_ID) {
-			for (sysexSegs = 0; sysexSegs < MAX_SYSEX_SIZE; sysexSegs++) {
-				auto potentialTerminator = moduru::VecUtil::CopyOfRange(&seqBytes, candidateOffset + (sysexSegs * EVENT_SEG_LENGTH), candidateOffset + (sysexSegs * EVENT_SEG_LENGTH) + EVENT_SEG_LENGTH);
-				if (potentialTerminator[EVENT_ID_OFFSET] == SYS_EX_TERMINATOR_ID) break;
+			for (sysexSegs = 0; sysexSegs < MAX_SYSEX_SIZE; sysexSegs++)
+            {
+				auto potentialTerminator = moduru::VecUtil::CopyOfRange(seqBytes, candidateOffset + (sysexSegs * EVENT_SEG_LENGTH), candidateOffset + (sysexSegs * EVENT_SEG_LENGTH) + EVENT_SEG_LENGTH);
+			
+                if (potentialTerminator[EVENT_ID_OFFSET] == SYS_EX_TERMINATOR_ID)
+                    break;
 			}
-			sysexSegs++;
-			ea = moduru::VecUtil::CopyOfRange(&seqBytes, candidateOffset, candidateOffset + (sysexSegs * EVENT_SEG_LENGTH));
+			
+            sysexSegs++;
+			ea = moduru::VecUtil::CopyOfRange(seqBytes, candidateOffset, candidateOffset + (sysexSegs * EVENT_SEG_LENGTH));
 		}
 		eventArrays.push_back(ea);
 		candidateOffset += (int)(ea.size());
@@ -238,7 +246,7 @@ vector<vector<char>> Sequence::readEventSegments(vector<char> seqBytes)
 	return eventArrays;
 }
 
-double Sequence::getTempoDouble(vector<char> bytePair)
+double Sequence::getTempoDouble(const vector<char>& bytePair)
 {
 	double k = 0;
 	auto s = moduru::file::ByteUtil::bytes2ushort(bytePair);
@@ -246,12 +254,13 @@ double Sequence::getTempoDouble(vector<char> bytePair)
 	return k / 10.0;
 }
 
-int Sequence::getNumberOfEventSegmentsForThisSeq(vector<char> seqBytes)
+int Sequence::getNumberOfEventSegmentsForThisSeq(const vector<char>& seqBytes)
 {
 	auto accum = 0;
-	for (auto& ba : readEventSegments(seqBytes)) {
+    
+	for (auto& ba : readEventSegments(seqBytes))
 		accum += (int) (ba.size()) / 8;
-	}
+
 	return accum;
 }
 

@@ -28,7 +28,7 @@ vector<char> Header::getHeaderArray()
 bool Header::verifyFileID()
 {
 	auto verifyFileID = false;
-	auto checkFileID = moduru::VecUtil::CopyOfRange(&loadBytes, 0, 16);
+	auto checkFileID = moduru::VecUtil::CopyOfRange(loadBytes, 0, 16);
 	string fileIDString = "";
 	for (char c : checkFileID) {
 		if (c == 0x00) break;

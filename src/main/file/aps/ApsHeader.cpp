@@ -3,7 +3,7 @@
 using namespace mpc::file::aps;
 using namespace std;
 
-ApsHeader::ApsHeader(vector<char> loadBytes) 
+ApsHeader::ApsHeader(const vector<char>& loadBytes) 
 {
 	valid = loadBytes[0] == 10 && loadBytes[1] == 5 && loadBytes[3] == 0;
 	soundCount = loadBytes[2];

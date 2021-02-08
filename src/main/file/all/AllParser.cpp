@@ -31,26 +31,26 @@ AllParser::AllParser(mpc::Mpc& mpc, mpc::disk::MpcFile* file)
 {
 	songs = vector<Song*>(20);
 	auto loadBytes = file->getBytes();
-	header = new Header(moduru::VecUtil::CopyOfRange(&loadBytes, HEADER_OFFSET, HEADER_OFFSET + HEADER_LENGTH));
+	header = new Header(moduru::VecUtil::CopyOfRange(loadBytes, HEADER_OFFSET, HEADER_OFFSET + HEADER_LENGTH));
 	
 	if (!header->verifyFileID())
 		throw invalid_argument("Invalid ALL file header ID");
 	
-	defaults = new Defaults(mpc, moduru::VecUtil::CopyOfRange(&loadBytes, DEFAULTS_OFFSET, DEFAULTS_OFFSET + DEFAULTS_LENGTH));
-	sequencer = new Sequencer(mpc, moduru::VecUtil::CopyOfRange(&loadBytes, SEQUENCER_OFFSET, SEQUENCER_OFFSET + Sequencer::LENGTH));
-	count = new Count(mpc, moduru::VecUtil::CopyOfRange(&loadBytes, COUNT_OFFSET, COUNT_OFFSET + COUNT_LENGTH));
-	midiInput = new MidiInput(moduru::VecUtil::CopyOfRange(&loadBytes, MIDI_INPUT_OFFSET, MIDI_INPUT_OFFSET + MidiInput::LENGTH));
-	midiSyncMisc = new MidiSyncMisc(moduru::VecUtil::CopyOfRange(&loadBytes, MIDI_SYNC_OFFSET, MIDI_SYNC_OFFSET + MidiSyncMisc::LENGTH));
-	misc = new Misc(moduru::VecUtil::CopyOfRange(&loadBytes, MISC_OFFSET, MISC_OFFSET + Misc::LENGTH));
-	seqNames = new SequenceNames(moduru::VecUtil::CopyOfRange(&loadBytes, SEQUENCE_NAMES_OFFSET, SEQUENCE_NAMES_OFFSET + SequenceNames::LENGTH));
+	defaults = new Defaults(mpc, moduru::VecUtil::CopyOfRange(loadBytes, DEFAULTS_OFFSET, DEFAULTS_OFFSET + DEFAULTS_LENGTH));
+	sequencer = new Sequencer(mpc, moduru::VecUtil::CopyOfRange(loadBytes, SEQUENCER_OFFSET, SEQUENCER_OFFSET + Sequencer::LENGTH));
+	count = new Count(mpc, moduru::VecUtil::CopyOfRange(loadBytes, COUNT_OFFSET, COUNT_OFFSET + COUNT_LENGTH));
+	midiInput = new MidiInput(moduru::VecUtil::CopyOfRange(loadBytes, MIDI_INPUT_OFFSET, MIDI_INPUT_OFFSET + MidiInput::LENGTH));
+	midiSyncMisc = new MidiSyncMisc(moduru::VecUtil::CopyOfRange(loadBytes, MIDI_SYNC_OFFSET, MIDI_SYNC_OFFSET + MidiSyncMisc::LENGTH));
+	misc = new Misc(moduru::VecUtil::CopyOfRange(loadBytes, MISC_OFFSET, MISC_OFFSET + Misc::LENGTH));
+	seqNames = new SequenceNames(moduru::VecUtil::CopyOfRange(loadBytes, SEQUENCE_NAMES_OFFSET, SEQUENCE_NAMES_OFFSET + SequenceNames::LENGTH));
 	
 	for (int i = 0; i < 20; i++)
 	{
 		int offset = SONGS_OFFSET + (i * Song::LENGTH);
-		songs[i] = new Song(moduru::VecUtil::CopyOfRange(&loadBytes, offset, offset + Song::LENGTH));
+		songs[i] = new Song(moduru::VecUtil::CopyOfRange(loadBytes, offset, offset + Song::LENGTH));
 	}
 	
-	sequences = readSequences(moduru::VecUtil::CopyOfRange(&loadBytes, SEQUENCES_OFFSET, loadBytes.size()));
+	sequences = readSequences(moduru::VecUtil::CopyOfRange(loadBytes, SEQUENCES_OFFSET, loadBytes.size()));
 }
 
 AllParser::AllParser(mpc::Mpc& mpc, string allName)
@@ -192,18 +192,22 @@ vector<Sequence*> AllParser::readSequences(vector<char> trimmedSeqsArray)
 		eventSegments = Sequence::getNumberOfEventSegmentsForThisSeq(trimmedSeqsArray);
 		currentSeqEnd = EMPTY_SEQ_LENGTH + (eventSegments * EVENT_LENGTH);
 		if (currentSeqEnd > trimmedSeqsArray.size()) currentSeqEnd -= 8;
-		auto currentSeqArray = moduru::VecUtil::CopyOfRange(&trimmedSeqsArray, 0, currentSeqEnd);
+		auto currentSeqArray = moduru::VecUtil::CopyOfRange(trimmedSeqsArray, 0, currentSeqEnd);
 		auto as = new Sequence(currentSeqArray);
 		seqs.push_back(as);
 		read += currentSeqEnd;
 		int multiplier = (eventSegments & 1) == 0 ? 0 : 1;
-		if (totalSeqChunkLength - read >= EMPTY_SEQ_LENGTH - 16) {
-			trimmedSeqsArray = moduru::VecUtil::CopyOfRange(&trimmedSeqsArray, currentSeqEnd - (multiplier * EVENT_LENGTH), trimmedSeqsArray.size());
+		
+        if (totalSeqChunkLength - read >= EMPTY_SEQ_LENGTH - 16)
+        {
+			trimmedSeqsArray = moduru::VecUtil::CopyOfRange(trimmedSeqsArray, currentSeqEnd - (multiplier * EVENT_LENGTH), trimmedSeqsArray.size());
 		}
-		else {
+		else
+        {
 			break;
 		}
 	}
+    
 	return seqs;
 }
 

@@ -23,7 +23,7 @@ Tracks::Tracks(vector<char> loadBytes)
 		veloRatios[i] = loadBytes[VELO_RATIOS_OFFSET + i];
 		auto offset = TRACK_NAMES_OFFSET + (i * AllParser::NAME_LENGTH);
 		string name = "";
-		for (char c : moduru::VecUtil::CopyOfRange(&loadBytes, offset, offset + AllParser::NAME_LENGTH)) {
+		for (char c : moduru::VecUtil::CopyOfRange(loadBytes, offset, offset + AllParser::NAME_LENGTH)) {
 			if (c == 0x00) break;
 			name.push_back(c);
 		}

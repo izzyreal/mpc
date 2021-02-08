@@ -26,7 +26,7 @@ SequenceNames::SequenceNames(vector<char> b)
 	{	
 		int offset = i * ENTRY_LENGTH;
 		string stringBuffer = "";
-		auto nameBytes = moduru::VecUtil::CopyOfRange(&b, offset, offset + AllParser::NAME_LENGTH);
+		auto nameBytes = moduru::VecUtil::CopyOfRange(b, offset, offset + AllParser::NAME_LENGTH);
 
 		for (char c : nameBytes)
 		{

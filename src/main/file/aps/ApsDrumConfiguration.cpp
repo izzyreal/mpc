@@ -7,7 +7,7 @@ using namespace moduru::file;
 using namespace mpc::file::aps;
 using namespace std;
 
-ApsDrumConfiguration::ApsDrumConfiguration(vector<char> loadBytes)
+ApsDrumConfiguration::ApsDrumConfiguration(const vector<char>& loadBytes)
 {
 	program = loadBytes[5];
 	receivePgmChange = BitUtil::getBits(loadBytes[2])[7] == '1';

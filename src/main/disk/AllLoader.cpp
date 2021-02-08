@@ -238,8 +238,8 @@ void AllLoader::convertSequences(const bool indiv)
 		
 		for (int i = 0; i < as->barCount; i++)
 		{
-			auto num = dynamic_cast<Bar*>(as->barList->getBars()[i])->getNumerator();
-			auto den = dynamic_cast<Bar*>(as->barList->getBars()[i])->getDenominator();
+			auto num = as->barList->getBars()[i]->getNumerator();
+			auto den = as->barList->getBars()[i]->getDenominator();
 			mpcSeq->setTimeSignature(i, num, den);
 		}
 

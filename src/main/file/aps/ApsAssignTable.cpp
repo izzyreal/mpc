@@ -3,7 +3,7 @@
 using namespace mpc::file::aps;
 using namespace std;
 
-ApsAssignTable::ApsAssignTable(vector<char> loadBytes) 
+ApsAssignTable::ApsAssignTable(const vector<char>& loadBytes) 
 {
 	assignTable = vector<int>(64);
 	for (int i = 0; i < 64; i++)

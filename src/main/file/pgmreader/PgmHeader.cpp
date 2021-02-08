@@ -11,7 +11,7 @@ using namespace mpc::file::pgmreader;
 PgmHeader::PgmHeader(ProgramFileReader* programFile)
 {
     auto pgmFileArray = programFile->readProgramFileArray();
-	headerArray = VecUtil::CopyOfRange(&pgmFileArray, 0, 4);
+	headerArray = VecUtil::CopyOfRange(pgmFileArray, 0, 4);
 }
 
 vector<char> PgmHeader::getHeaderArray()

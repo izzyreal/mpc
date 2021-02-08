@@ -8,15 +8,27 @@
 using namespace mpc::file::all;
 using namespace std;
 
-BarList::BarList(vector<char> loadBytes)
+BarList::BarList(const vector<char>& loadBytes)
 {
 	Bar* previousBar = nullptr;
-	for (int i = 0; i < 999; i++) {
-		auto bar = new Bar(moduru::VecUtil::CopyOfRange(&loadBytes, i * 4, (i * 4) + 4), previousBar);
-		if (bar->lastTick == 0) break;
-		bars.push_back(bar);
+	
+    for (int i = 0; i < 999; i++)
+    {
+		auto bar = new Bar(moduru::VecUtil::CopyOfRange(loadBytes, i * 4, (i * 4) + 4), previousBar);
+		
+        if (bar->lastTick == 0)
+            break;
+	
+        bars.push_back(bar);
 		previousBar = bar;
 	}
+}
+
+BarList::~BarList()
+{
+    for (auto& b : bars)
+        if (b != nullptr)
+            delete b;
 }
 
 BarList::BarList(mpc::sequencer::Sequence* seq)
@@ -25,17 +37,23 @@ BarList::BarList(mpc::sequencer::Sequence* seq)
 	auto barLengths = seq->getBarLengths();
 	auto ticksPerBeat = 0;
 	auto lastTick = 0;
-	for (int i = 0; i < seq->getLastBarIndex() + 1; i++) {
+	
+    for (int i = 0; i < seq->getLastBarIndex() + 1; i++)
+    {
 		lastTick += (*barLengths)[i];
 		ticksPerBeat = static_cast<int>((*barLengths)[i] / seq->getNumerator(i));
-		auto bar = new Bar(ticksPerBeat, lastTick);
+		
+        Bar bar(ticksPerBeat, lastTick);
+        
 		for (auto j = 0; j < 4; j++)
-			saveBytes[(i * 4) + j] = bar->getBytes()[j];
+			saveBytes[(i * 4) + j] = bar.getBytes()[j];
 
 	}
-	auto bar = new Bar(ticksPerBeat, 0);
+	
+    Bar bar(ticksPerBeat, 0);
+    
 	for (int i = 0; i < 4; i++)
-		saveBytes[(seq->getLastBarIndex() + 1) * 4 + i] = bar->getBytes()[i];
+		saveBytes[(seq->getLastBarIndex() + 1) * 4 + i] = bar.getBytes()[i];
 
 }
 

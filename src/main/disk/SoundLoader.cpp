@@ -45,6 +45,9 @@ int SoundLoader::loadSound(weak_ptr<MpcFile> f)
 
 	auto soundFile = f.lock();
 	string soundFileName = soundFile->getName();
+    
+    MLOG("Loading sound file " + soundFileName);
+    
 	auto periodIndex = soundFileName.find_last_of('.');
 	string extension = "";
 	string soundName = "";
@@ -167,6 +170,8 @@ int SoundLoader::loadSound(weak_ptr<MpcFile> f)
 
 	bool alreadyLoaded = existingSoundIndex != -1;
 
+    MLOG("Loaded sound " + soundFileName);
+    
 	if (preview)
 	{
 		return existingSoundIndex;

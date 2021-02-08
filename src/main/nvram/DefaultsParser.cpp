@@ -13,7 +13,7 @@ mpc::file::all::Defaults DefaultsParser::AllDefaultsFromFile(mpc::Mpc& mpc, modu
 {
 	vector<char> data;
 	file.getData(&data);
-	return mpc::file::all::Defaults(mpc, moduru::VecUtil::CopyOfRange(&data, 0, mpc::file::all::AllParser::DEFAULTS_LENGTH));
+	return mpc::file::all::Defaults(mpc, moduru::VecUtil::CopyOfRange(data, 0, mpc::file::all::AllParser::DEFAULTS_LENGTH));
 }
 
 DefaultsParser::DefaultsParser(mpc::Mpc& mpc)

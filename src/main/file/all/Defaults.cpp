@@ -127,7 +127,7 @@ const int Defaults::TR_STATUS_LENGTH;
 void Defaults::parseNames(vector<char> loadBytes)
 {
 	vector<char> stringBuffer;
-	stringBuffer = moduru::VecUtil::CopyOfRange(&loadBytes, DEF_SEQ_NAME_OFFSET, DEF_SEQ_NAME_OFFSET + AllParser::NAME_LENGTH);
+	stringBuffer = moduru::VecUtil::CopyOfRange(loadBytes, DEF_SEQ_NAME_OFFSET, DEF_SEQ_NAME_OFFSET + AllParser::NAME_LENGTH);
 	defaultSeqName = "";
 	for (char c : stringBuffer) {
 		if (c == 0x00) break;
@@ -136,7 +136,7 @@ void Defaults::parseNames(vector<char> loadBytes)
 	auto offset = 0;
 	for (int i = 0; i < 33; i++) {
 		offset = DEV_NAMES_OFFSET + (i * AllParser::DEV_NAME_LENGTH);
-		stringBuffer = moduru::VecUtil::CopyOfRange(&loadBytes, offset, offset + AllParser::DEV_NAME_LENGTH);
+		stringBuffer = moduru::VecUtil::CopyOfRange(loadBytes, offset, offset + AllParser::DEV_NAME_LENGTH);
 		string s = "";
 		for (char c : stringBuffer) {
 			if (c == 0x00) break;
@@ -146,7 +146,7 @@ void Defaults::parseNames(vector<char> loadBytes)
 	}
 	for (int i = 0; i < 64; i++) {
 		offset = TR_NAMES_OFFSET + (i * AllParser::NAME_LENGTH);
-		stringBuffer = moduru::VecUtil::CopyOfRange(&loadBytes, offset, offset + AllParser::NAME_LENGTH);
+		stringBuffer = moduru::VecUtil::CopyOfRange(loadBytes, offset, offset + AllParser::NAME_LENGTH);
 		string s = "";
 		for (char c : stringBuffer) {
 			if (c == 0x00) break;

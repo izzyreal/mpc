@@ -2,7 +2,6 @@
 
 #include <Util.hpp>
 #include <file/BitUtil.hpp>
-//#include <file/Definitions.hpp>
 #include <file/all/AllChannelPressureEvent.hpp>
 #include <file/all/AllControlChangeEvent.hpp>
 #include <file/all/AllNoteEvent.hpp>
@@ -27,11 +26,14 @@
 using namespace mpc::file::all;
 using namespace std;
 
-AllEvent::AllEvent(vector<char> ba) 
+AllEvent::AllEvent(const vector<char>& ba)
 {
 	auto eventID = ba[EVENT_ID_OFFSET];
-	if (eventID < 0) {
-		switch (ba[EVENT_ID_OFFSET]) {
+	
+    if (eventID < 0)
+    {
+		switch (ba[EVENT_ID_OFFSET])
+        {
 		case POLY_PRESSURE_ID:
 			event = (new AllPolyPressureEvent(ba))->event;
 			break;
@@ -53,7 +55,8 @@ AllEvent::AllEvent(vector<char> ba)
 		}
 
 	}
-	else {
+	else
+    {
 		auto ane = new AllNoteEvent(ba);
 		auto ne = new mpc::sequencer::NoteEvent(ane->getNote());
 		ne->setDuration(ane->getDuration());
@@ -117,7 +120,7 @@ vector<char> AllEvent::getBytes()
     return bytes;
 }
 
-int AllEvent::readTick(vector<char> b)
+int AllEvent::readTick(const vector<char>& b)
 {
 	unsigned short s3 = moduru::file::BitUtil::removeUnusedBits(b[TICK_BYTE3_OFFSET], TICK_BYTE3_BIT_RANGE);
 	int result = moduru::file::ByteUtil::bytes2ushort(vector<char>{ b[TICK_BYTE1_OFFSET], b[TICK_BYTE2_OFFSET] }) + (s3 * 65536);

@@ -13,14 +13,15 @@
 using namespace mpc::file::all;
 using namespace std;
 
-AllSysExEvent::AllSysExEvent(vector<char> ba)
+AllSysExEvent::AllSysExEvent(const vector<char>& ba)
 {
 	int byteCount = ba[BYTE_COUNT_OFFSET];
 	sysexLoadData = vector<char>(byteCount);
 	for (int i = 0; i < byteCount; i++)
 		sysexLoadData[i] = ba[DATA_OFFSET + i];
 
-	if (moduru::VecUtil::Equals(moduru::VecUtil::CopyOfRange(&sysexLoadData, MIXER_SIGNATURE_OFFSET, MIXER_SIGNATURE_OFFSET + MIXER_SIGNATURE.size()), MIXER_SIGNATURE)) {
+	if (moduru::VecUtil::Equals(moduru::VecUtil::CopyOfRange(sysexLoadData, MIXER_SIGNATURE_OFFSET, MIXER_SIGNATURE_OFFSET + MIXER_SIGNATURE.size()), MIXER_SIGNATURE))
+    {
 		auto me = new mpc::sequencer::MixerEvent();
 		auto paramCandidate = sysexLoadData[MIXER_PARAMETER_OFFSET] - 1;
 		if (paramCandidate == 4) paramCandidate = 3;
@@ -30,7 +31,8 @@ AllSysExEvent::AllSysExEvent(vector<char> ba)
 		me->setTick(AllEvent::readTick(ba));
 		event = me;
 	}
-	else {
+	else
+    {
 		auto see = new mpc::sequencer::SystemExclusiveEvent();
 		//see->setBytes(sysexLoadData);
 		see->setTick(AllEvent::readTick(ba));

@@ -66,7 +66,7 @@ namespace mpc::file::aps
 		ctoot::mpc::MpcIndivFxMixerChannel* getIndivFxMixerChannel(int noteIndex);
 
 	public:
-		ApsProgram(std::vector<char> loadBytes);
+		ApsProgram(const std::vector<char>& loadBytes);
 		ApsProgram(mpc::sampler::Program* program, int index);
 		~ApsProgram();
 	};

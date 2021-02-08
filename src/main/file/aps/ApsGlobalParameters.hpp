@@ -45,7 +45,7 @@ namespace mpc::file::aps
 		std::vector<char> getBytes();
 
 	public:
-		ApsGlobalParameters(mpc::Mpc& mpc, std::vector<char> loadBytes);
+		ApsGlobalParameters(mpc::Mpc& mpc, const std::vector<char>& loadBytes);
 		ApsGlobalParameters(mpc::Mpc& mpc);
 
 	};

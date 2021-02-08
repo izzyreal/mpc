@@ -3,30 +3,24 @@
 #include <vector>
 #include <string>
 
-namespace mpc {
+namespace mpc::sampler {
+class Sampler;
+}
 
-	namespace sampler {
-		class Sampler;
-	}
-
-	namespace file {
-		namespace aps {
-
-			class ApsSoundNames
-			{
-
-			public:
-				static const int NAME_STRING_LENGTH{ 16 };
-				std::vector<std::string> names{};
-				std::vector<char> saveBytes{};
-
-			public:
-				std::vector<std::string> get();
-				std::vector<char> getBytes();
-
-				ApsSoundNames(std::vector<char> loadBytes);
-				ApsSoundNames(mpc::sampler::Sampler* sampler);
-			};
-		}
-	}
+namespace mpc::file::aps {
+class ApsSoundNames
+{
+public:
+    ApsSoundNames(const std::vector<char>& loadBytes);
+    ApsSoundNames(mpc::sampler::Sampler* sampler);
+    
+    static const int NAME_STRING_LENGTH = 16;
+    
+    std::vector<std::string> names;
+    std::vector<char> saveBytes;
+    
+    std::vector<std::string> get();
+    std::vector<char> getBytes();
+    
+};
 }

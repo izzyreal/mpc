@@ -6,7 +6,7 @@
 using namespace mpc::file::aps;
 using namespace std;
 
-ApsMixer::ApsMixer(vector<char> loadBytes) 
+ApsMixer::ApsMixer(const vector<char>& loadBytes) 
 {
 	for (int i = 0; i < 64; i++) {
 		fxPaths[i] = loadBytes[(i * 6) + 0];

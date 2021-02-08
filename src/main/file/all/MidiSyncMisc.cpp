@@ -25,7 +25,7 @@ MidiSyncMisc::MidiSyncMisc(vector<char> b)
 	input = b[INPUT_OFFSET];
 	output = b[OUTPUT_OFFSET];
 
-	auto stringBuffer = moduru::VecUtil::CopyOfRange(&b, DEF_SONG_NAME_OFFSET, DEF_SONG_NAME_OFFSET + AllParser::NAME_LENGTH);
+	auto stringBuffer = moduru::VecUtil::CopyOfRange(b, DEF_SONG_NAME_OFFSET, DEF_SONG_NAME_OFFSET + AllParser::NAME_LENGTH);
 	defSongName = string(stringBuffer.begin(), stringBuffer.end());
 }
 

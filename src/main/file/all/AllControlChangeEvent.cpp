@@ -7,7 +7,7 @@
 using namespace mpc::file::all;
 using namespace std;
 
-AllControlChangeEvent::AllControlChangeEvent(vector<char> ba) 
+AllControlChangeEvent::AllControlChangeEvent(const vector<char>& ba) 
 {
 	auto cce = new mpc::sequencer::ControlChangeEvent();
 	cce->setTick(AllEvent::readTick(ba));

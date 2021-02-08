@@ -24,7 +24,7 @@ vector<char> SoundNames::getSampleNamesArray()
 {
 	auto sampleNamesSize = getSampleNamesSize();
     auto pgmFileArray = programFile->readProgramFileArray();
-	sampleNamesArray = VecUtil::CopyOfRange(&pgmFileArray, 4, (4 + sampleNamesSize + 2));
+	sampleNamesArray = VecUtil::CopyOfRange(pgmFileArray, 4, (4 + sampleNamesSize + 2));
 	return sampleNamesArray;
 }
 
@@ -34,7 +34,7 @@ string SoundNames::getSampleName(int sampleNumber)
 	auto h = programFile->getHeader();
 	if (sampleNumber < h->getNumberOfSamples()) {
 		sampleNamesArray = getSampleNamesArray();
-		auto sampleName = VecUtil::CopyOfRange(&sampleNamesArray, (sampleNumber * 17), ((sampleNumber * 17) + 16));
+		auto sampleName = VecUtil::CopyOfRange(sampleNamesArray, (sampleNumber * 17), ((sampleNumber * 17) + 16));
 		for (char c : sampleName) {
 			if (c == 0x00) break;
 			sampleNameString.push_back(c);

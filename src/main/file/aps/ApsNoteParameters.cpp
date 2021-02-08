@@ -7,7 +7,7 @@
 using namespace mpc::file::aps;
 using namespace std;
 
-ApsNoteParameters::ApsNoteParameters(vector<char> loadBytes)
+ApsNoteParameters::ApsNoteParameters(const vector<char>& loadBytes)
 {
 	soundNumber = loadBytes[0] == '\xff' ? -1 : loadBytes[0];
 	soundGenerationMode = loadBytes[2];

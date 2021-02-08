@@ -61,7 +61,7 @@ void ApsLoader::static_load(void* this_p)
 	static_cast<ApsLoader*>(this_p)->load();
 }
 
-void ApsLoader::notFound(string soundFileName, string ext)
+void ApsLoader::notFound(mpc::Mpc& mpc, string soundFileName, string ext)
 {
 	auto cantFindFileScreen = dynamic_pointer_cast<CantFindFileScreen>(mpc.screens->getScreenComponent("cant-find-file"));
 	auto skipAll = cantFindFileScreen->skipAll;
@@ -79,6 +79,187 @@ void ApsLoader::notFound(string soundFileName, string ext)
 			this_thread::sleep_for(chrono::milliseconds(25));
 		}
 	}
+}
+
+void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool headless)
+{
+    int c = 0;
+    MLOG("loadFromParsedAps " + to_string(c++));
+    auto sampler = mpc.getSampler().lock();
+    auto disk = mpc.getDisk().lock();
+    sampler->deleteAllSamples();
+    const bool initPgms = false;
+
+    vector<int> unavailableSoundIndices;
+    MLOG("loadFromParsedAps " + to_string(c++));
+
+    for (int i = 0; i < apsParser.getSoundNames().size(); i++)
+    {
+        auto ext = "snd";
+        shared_ptr<MpcFile> soundFile;
+        string soundFileName = StrUtil::replaceAll(apsParser.getSoundNames()[i], ' ', "");
+
+        for (auto& f : disk->getAllFiles())
+        {
+            if (StrUtil::eqIgnoreCase(StrUtil::replaceAll(f->getName(), ' ', ""), soundFileName + ".SND"))
+            {
+                soundFile = f;
+                break;
+            }
+        }
+
+        if (!soundFile || !soundFile->getFsNode().lock()->exists())
+        {
+            for (auto& f : disk->getAllFiles())
+            {
+                if (StrUtil::eqIgnoreCase(StrUtil::replaceAll(f->getName(), ' ', ""), soundFileName + ".WAV"))
+                {
+                    soundFile = f;
+                    ext = "wav";
+                    break;
+                }
+            }
+        }
+
+        if (!soundFile || !soundFile->getFsNode().lock()->exists())
+        {
+            unavailableSoundIndices.push_back(i);
+            
+            if (!headless)
+                ApsLoader::notFound(mpc, soundFileName, ext);
+            
+            continue;
+        }
+
+        ApsLoader::loadSound(mpc, soundFileName, ext, soundFile, false, i, headless);
+    }
+    MLOG("loadFromParsedAps " + to_string(c++));
+
+    sampler->deleteAllPrograms(initPgms);
+    
+    for (auto& apsProgram : apsParser.getPrograms())
+    {
+        auto newProgram = sampler->addProgram(apsProgram->index).lock();
+        auto assignTable = apsProgram->getAssignTable()->get();
+
+        newProgram->setName(apsProgram->getName());
+
+        for (int noteIndex = 0; noteIndex < 64; noteIndex++)
+        {
+            int padnn = assignTable[noteIndex];
+            newProgram->getPad(noteIndex)->setNote(assignTable[noteIndex]);
+
+            auto sourceStereoMixerChannel = apsProgram->getStereoMixerChannel(noteIndex);
+            auto sourceIndivFxMixerChannel = apsProgram->getIndivFxMixerChannel(noteIndex);
+
+            auto destNoteParams = dynamic_cast<NoteParameters*>(newProgram->getNoteParameters(noteIndex + 35));
+            auto destStereoMixerCh = destNoteParams->getStereoMixerChannel().lock();
+            auto destIndivFxCh = destNoteParams->getIndivFxMixerChannel().lock();
+
+            destIndivFxCh->setFxPath(sourceIndivFxMixerChannel->getFxPath());
+            destStereoMixerCh->setLevel(sourceStereoMixerChannel->getLevel());
+            destStereoMixerCh->setPanning(sourceStereoMixerChannel->getPanning());
+            destIndivFxCh->setVolumeIndividualOut(sourceIndivFxMixerChannel->getVolumeIndividualOut());
+            destIndivFxCh->setFxSendLevel(sourceIndivFxMixerChannel->getFxSendLevel());
+            destIndivFxCh->setOutput(sourceIndivFxMixerChannel->getOutput());
+
+            auto srcNoteParams = apsProgram->getNoteParameters(noteIndex);
+
+            auto soundIndex = srcNoteParams->getSoundNumber();
+
+            if (find(begin(unavailableSoundIndices), end(unavailableSoundIndices), soundIndex) != end(unavailableSoundIndices))
+                soundIndex = -1;
+
+            auto voiceOverlap = srcNoteParams->getVoiceOverlap();
+
+            if (soundIndex != -1 && sampler->getSound().lock()->isLoopEnabled())
+            {
+                // Set overlap mode to NOTE OFF, the only sane one for when loop is enabled.
+                voiceOverlap = 2;
+            }
+
+            destNoteParams->setSoundIndex(soundIndex);
+            destNoteParams->setTune(srcNoteParams->getTune());
+            destNoteParams->setVoiceOverlap(voiceOverlap);
+            destNoteParams->setDecayMode(srcNoteParams->getDecayMode());
+            destNoteParams->setAttack(srcNoteParams->getAttack());
+            destNoteParams->setDecay(srcNoteParams->getDecay());
+            destNoteParams->setFilterAttack(srcNoteParams->getVelocityToFilterAttack());
+            destNoteParams->setFilterDecay(srcNoteParams->getVelocityToFilterDecay());
+            destNoteParams->setFilterEnvelopeAmount(srcNoteParams->getVelocityToFilterAmount());
+            destNoteParams->setFilterFrequency(srcNoteParams->getCutoffFrequency());
+            destNoteParams->setFilterResonance(srcNoteParams->getResonance());
+            destNoteParams->setMuteAssignA(srcNoteParams->getMute1());
+            destNoteParams->setMuteAssignB(srcNoteParams->getMute2());
+            destNoteParams->setOptNoteA(srcNoteParams->getAlsoPlay1());
+            destNoteParams->setOptionalNoteB(srcNoteParams->getAlsoPlay2());
+            destNoteParams->setSliderParameterNumber(srcNoteParams->getSliderParameter());
+            destNoteParams->setSoundGenMode(srcNoteParams->getSoundGenerationMode());
+            destNoteParams->setVelocityToStart(srcNoteParams->getVelocityToStart());
+            destNoteParams->setVelocityToAttack(srcNoteParams->getVelocityToAttack());
+            destNoteParams->setVelocityToFilterFrequency(srcNoteParams->getVelocityToFilterFrequency());
+            destNoteParams->setVeloToLevel(srcNoteParams->getVelocityToLevel());
+            destNoteParams->setVeloRangeLower(srcNoteParams->getVelocityRangeLower());
+            destNoteParams->setVeloRangeUpper(srcNoteParams->getVelocityRangeUpper());
+            destNoteParams->setVelocityToPitch(srcNoteParams->getVelocityToPitch());
+        }
+
+        auto slider = dynamic_cast<mpc::sampler::PgmSlider*>(newProgram->getSlider());
+        slider->setAttackHighRange(apsProgram->getSlider()->getAttackHigh());
+        slider->setAttackLowRange(apsProgram->getSlider()->getAttackLow());
+        slider->setControlChange(apsProgram->getSlider()->getProgramChange());
+        slider->setDecayHighRange(apsProgram->getSlider()->getDecayHigh());
+        slider->setDecayLowRange(apsProgram->getSlider()->getDecayLow());
+        slider->setFilterHighRange(apsProgram->getSlider()->getFilterHigh());
+        slider->setFilterLowRange(apsProgram->getSlider()->getFilterLow());
+        slider->setAssignNote(apsProgram->getSlider()->getNote());
+        slider->setTuneHighRange(apsProgram->getSlider()->getTuneHigh());
+        slider->setTuneLowRange(apsProgram->getSlider()->getTuneLow());
+    }
+    MLOG("loadFromParsedAps " + to_string(c++));
+    MLOG("apsParser drumMixers size");
+    MLOG(to_string(apsParser.getDrumMixers().size()));
+    
+    for (int i = 0; i < 4; i++)
+    {
+        auto m = apsParser.getDrumMixers()[i];
+        auto drum = mpc.getDrum(i);
+
+        for (int noteIndex = 0; noteIndex < 64; noteIndex++)
+        {
+            auto apssmc = m->getStereoMixerChannel(noteIndex);
+            auto apsifmc = m->getIndivFxMixerChannel(noteIndex);
+            auto drumsmc = drum->getStereoMixerChannels()[noteIndex].lock();
+            auto drumifmc = drum->getIndivFxMixerChannels()[noteIndex].lock();
+            drumifmc->setFxPath(apsifmc->getFxPath());
+            drumsmc->setLevel(apssmc->getLevel());
+            drumsmc->setPanning(apssmc->getPanning());
+            drumifmc->setVolumeIndividualOut(apsifmc->getVolumeIndividualOut());
+            drumifmc->setOutput(apsifmc->getOutput());
+            drumifmc->setFxSendLevel(apsifmc->getFxSendLevel());
+        }
+
+        auto pgm = apsParser.getDrumConfiguration(i)->getProgram();
+        drum->setProgram(pgm);
+        drum->setReceivePgmChange(apsParser.getDrumConfiguration(i)->getReceivePgmChange());
+        drum->setReceiveMidiVolume(apsParser.getDrumConfiguration(i)->getReceiveMidiVolume());
+    }
+    MLOG("loadFromParsedAps " + to_string(c++));
+
+    auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(mpc.screens->getScreenComponent("mixer-setup"));
+
+    auto globals = apsParser.getGlobalParameters();
+    
+    mixerSetupScreen->setRecordMixChangesEnabled(globals->isRecordMixChangesEnabled());
+    mixerSetupScreen->setCopyPgmMixToDrumEnabled(globals->isCopyPgmMixToDrumEnabled());
+    mixerSetupScreen->setFxDrum(globals->getFxDrum());
+    mixerSetupScreen->setIndivFxSourceDrum(globals->isIndivFxSourceDrum());
+    mixerSetupScreen->setStereoMixSourceDrum(globals->isStereoMixSourceDrum());
+    MLOG("loadFromParsedAps " + to_string(c++));
+
+    auto drumScreen = dynamic_pointer_cast<DrumScreen>(mpc.screens->getScreenComponent("drum"));
+
+    drumScreen->setPadToIntSound(globals->isPadToIntSoundEnabled());
 }
 
 void ApsLoader::load()
@@ -107,187 +288,27 @@ void ApsLoader::load()
 		return;
 	}
 
-	auto sampler = mpc.getSampler().lock();
-	sampler->deleteAllSamples();
-	const bool initPgms = false;
-
-	vector<int> unavailableSoundIndices;
-
-	for (int i = 0; i < apsParser->getSoundNames().size(); i++)
-	{
-		auto ext = "snd";
-		shared_ptr<MpcFile> soundFile;
-		string soundFileName = StrUtil::replaceAll(apsParser->getSoundNames()[i], ' ', "");
-
-		for (auto& f : disk->getAllFiles())
-		{
-			if (StrUtil::eqIgnoreCase(StrUtil::replaceAll(f->getName(), ' ', ""), soundFileName + ".SND"))
-			{
-				soundFile = f;
-				break;
-			}
-		}
-
-		if (!soundFile || !soundFile->getFsNode().lock()->exists())
-		{
-			for (auto& f : disk->getAllFiles())
-			{
-				if (StrUtil::eqIgnoreCase(StrUtil::replaceAll(f->getName(), ' ', ""), soundFileName + ".WAV"))
-				{
-					soundFile = f;
-					ext = "wav";
-					break;
-				}
-			}
-		}
-
-		if (!soundFile || !soundFile->getFsNode().lock()->exists())
-		{
-			unavailableSoundIndices.push_back(i);
-			notFound(soundFileName, ext);
-			continue;
-		}
-
-		loadSound(soundFileName, ext, soundFile, false, i);
-	}
-
-	sampler->deleteAllPrograms(initPgms);
-	
-	for (auto& apsProgram : apsParser->getPrograms())
-	{
-		auto newProgram = sampler->addProgram(apsProgram->index).lock();
-		auto assignTable = apsProgram->getAssignTable()->get();
-
-		newProgram->setName(apsProgram->getName());
-
-		for (int noteIndex = 0; noteIndex < 64; noteIndex++)
-		{
-			int padnn = assignTable[noteIndex];
-			newProgram->getPad(noteIndex)->setNote(assignTable[noteIndex]);
-
-			auto sourceStereoMixerChannel = apsProgram->getStereoMixerChannel(noteIndex);
-			auto sourceIndivFxMixerChannel = apsProgram->getIndivFxMixerChannel(noteIndex);
-
-			auto destNoteParams = dynamic_cast<NoteParameters*>(newProgram->getNoteParameters(noteIndex + 35));
-			auto destStereoMixerCh = destNoteParams->getStereoMixerChannel().lock();
-			auto destIndivFxCh = destNoteParams->getIndivFxMixerChannel().lock();
-
-			destIndivFxCh->setFxPath(sourceIndivFxMixerChannel->getFxPath());
-			destStereoMixerCh->setLevel(sourceStereoMixerChannel->getLevel());
-			destStereoMixerCh->setPanning(sourceStereoMixerChannel->getPanning());
-			destIndivFxCh->setVolumeIndividualOut(sourceIndivFxMixerChannel->getVolumeIndividualOut());
-			destIndivFxCh->setFxSendLevel(sourceIndivFxMixerChannel->getFxSendLevel());
-			destIndivFxCh->setOutput(sourceIndivFxMixerChannel->getOutput());
-
-			auto srcNoteParams = apsProgram->getNoteParameters(noteIndex);
-
-			auto soundIndex = srcNoteParams->getSoundNumber();
-
-			if (find(begin(unavailableSoundIndices), end(unavailableSoundIndices), soundIndex) != end(unavailableSoundIndices))
-				soundIndex = -1;
-
-			auto voiceOverlap = srcNoteParams->getVoiceOverlap();
-
-			if (soundIndex != -1 && sampler->getSound().lock()->isLoopEnabled())
-			{
-				// Set overlap mode to NOTE OFF, the only sane one for when loop is enabled.
-				voiceOverlap = 2;
-			}
-
-			destNoteParams->setSoundIndex(soundIndex);
-			destNoteParams->setTune(srcNoteParams->getTune());
-			destNoteParams->setVoiceOverlap(voiceOverlap);
-			destNoteParams->setDecayMode(srcNoteParams->getDecayMode());
-			destNoteParams->setAttack(srcNoteParams->getAttack());
-			destNoteParams->setDecay(srcNoteParams->getDecay());
-			destNoteParams->setFilterAttack(srcNoteParams->getVelocityToFilterAttack());
-			destNoteParams->setFilterDecay(srcNoteParams->getVelocityToFilterDecay());
-			destNoteParams->setFilterEnvelopeAmount(srcNoteParams->getVelocityToFilterAmount());
-			destNoteParams->setFilterFrequency(srcNoteParams->getCutoffFrequency());
-			destNoteParams->setFilterResonance(srcNoteParams->getResonance());
-			destNoteParams->setMuteAssignA(srcNoteParams->getMute1());
-			destNoteParams->setMuteAssignB(srcNoteParams->getMute2());
-			destNoteParams->setOptNoteA(srcNoteParams->getAlsoPlay1());
-			destNoteParams->setOptionalNoteB(srcNoteParams->getAlsoPlay2());
-			destNoteParams->setSliderParameterNumber(srcNoteParams->getSliderParameter());
-			destNoteParams->setSoundGenMode(srcNoteParams->getSoundGenerationMode());
-			destNoteParams->setVelocityToStart(srcNoteParams->getVelocityToStart());
-			destNoteParams->setVelocityToAttack(srcNoteParams->getVelocityToAttack());
-			destNoteParams->setVelocityToFilterFrequency(srcNoteParams->getVelocityToFilterFrequency());
-			destNoteParams->setVeloToLevel(srcNoteParams->getVelocityToLevel());
-			destNoteParams->setVeloRangeLower(srcNoteParams->getVelocityRangeLower());
-			destNoteParams->setVeloRangeUpper(srcNoteParams->getVelocityRangeUpper());
-			destNoteParams->setVelocityToPitch(srcNoteParams->getVelocityToPitch());
-		}
-
-		auto slider = dynamic_cast<mpc::sampler::PgmSlider*>(newProgram->getSlider());
-		slider->setAttackHighRange(apsProgram->getSlider()->getAttackHigh());
-		slider->setAttackLowRange(apsProgram->getSlider()->getAttackLow());
-		slider->setControlChange(apsProgram->getSlider()->getProgramChange());
-		slider->setDecayHighRange(apsProgram->getSlider()->getDecayHigh());
-		slider->setDecayLowRange(apsProgram->getSlider()->getDecayLow());
-		slider->setFilterHighRange(apsProgram->getSlider()->getFilterHigh());
-		slider->setFilterLowRange(apsProgram->getSlider()->getFilterLow());
-		slider->setAssignNote(apsProgram->getSlider()->getNote());
-		slider->setTuneHighRange(apsProgram->getSlider()->getTuneHigh());
-		slider->setTuneLowRange(apsProgram->getSlider()->getTuneLow());
-	}
-
-	for (int i = 0; i < 4; i++)
-	{
-		auto m = apsParser->getDrumMixers()[i];
-		auto drum = mpc.getDrum(i);
-
-		for (int noteIndex = 0; noteIndex < 64; noteIndex++)
-		{
-			auto apssmc = m->getStereoMixerChannel(noteIndex);
-			auto apsifmc = m->getIndivFxMixerChannel(noteIndex);
-			auto drumsmc = drum->getStereoMixerChannels()[noteIndex].lock();
-			auto drumifmc = drum->getIndivFxMixerChannels()[noteIndex].lock();
-			drumifmc->setFxPath(apsifmc->getFxPath());
-			drumsmc->setLevel(apssmc->getLevel());
-			drumsmc->setPanning(apssmc->getPanning());
-			drumifmc->setVolumeIndividualOut(apsifmc->getVolumeIndividualOut());
-			drumifmc->setOutput(apsifmc->getOutput());
-			drumifmc->setFxSendLevel(apsifmc->getFxSendLevel());
-		}
-
-		auto pgm = apsParser->getDrumConfiguration(i)->getProgram();
-		drum->setProgram(pgm);
-		drum->setReceivePgmChange(apsParser->getDrumConfiguration(i)->getReceivePgmChange());
-		drum->setReceiveMidiVolume(apsParser->getDrumConfiguration(i)->getReceiveMidiVolume());
-	}
-
-	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(mpc.screens->getScreenComponent("mixer-setup"));
-
-    auto globals = apsParser->getGlobalParameters();
+    ApsLoader::loadFromParsedAps(*apsParser.get(), mpc);
     
-	mixerSetupScreen->setRecordMixChangesEnabled(globals->isRecordMixChangesEnabled());
-	mixerSetupScreen->setCopyPgmMixToDrumEnabled(globals->isCopyPgmMixToDrumEnabled());
-	mixerSetupScreen->setFxDrum(globals->getFxDrum());
-	mixerSetupScreen->setIndivFxSourceDrum(globals->isIndivFxSourceDrum());
-	mixerSetupScreen->setStereoMixSourceDrum(globals->isStereoMixSourceDrum());
-
-	auto drumScreen = dynamic_pointer_cast<DrumScreen>(mpc.screens->getScreenComponent("drum"));
-
-	drumScreen->setPadToIntSound(globals->isPadToIntSoundEnabled());
-	
-	sampler->setSoundIndex(0);
-	
-	mpc.getLayeredScreen().lock()->openScreen("load");
-	disk->setBusy(false);
+    mpc.getSampler().lock()->setSoundIndex(0);
+    
+    mpc.getLayeredScreen().lock()->openScreen("load");
+    disk->setBusy(false);
 }
 
-void ApsLoader::loadSound(string soundFileName, string ext, weak_ptr<MpcFile> _soundFile, bool replace, int loadSoundIndex)
+void ApsLoader::loadSound(mpc::Mpc& mpc, string soundFileName, string ext, weak_ptr<MpcFile> _soundFile, bool replace, int loadSoundIndex, bool headless)
 {
     auto soundFile = _soundFile.lock();
 	auto sl = SoundLoader(mpc, mpc.getSampler().lock()->getSounds(), replace);
 	sl.setPartOfProgram(true);
-	showPopup(soundFileName, ext, soundFile->length());
-	sl.loadSound(soundFile);
+
+    if (!headless)
+        ApsLoader::showPopup(mpc, soundFileName, ext, soundFile->length());
+
+    sl.loadSound(soundFile);
 }
 
-void ApsLoader::showPopup(string name, string ext, int sampleSize)
+void ApsLoader::showPopup(mpc::Mpc& mpc, string name, string ext, int sampleSize)
 {
 	mpc.getLayeredScreen().lock()->openScreen("popup");
 	auto popupScreen = mpc.screens->get<PopupScreen>("popup");

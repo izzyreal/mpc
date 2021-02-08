@@ -9,7 +9,7 @@
 using namespace std;
 using namespace mpc::file::all;
 
-AllNoteEvent::AllNoteEvent(vector<char> b) 
+AllNoteEvent::AllNoteEvent(const vector<char>& b) 
 {
 	note = b[NOTE_NUMBER_OFFSET];
 	tick = AllEvent::readTick(b);

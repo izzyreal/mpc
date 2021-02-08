@@ -38,7 +38,7 @@ namespace mpc::file::aps
 		int getProgramChange();
 		std::vector<char> getBytes();
 
-		ApsSlider(std::vector<char> loadBytes);
+		ApsSlider(const std::vector<char>& loadBytes);
 		ApsSlider(mpc::sampler::PgmSlider* slider);
 	};
 }

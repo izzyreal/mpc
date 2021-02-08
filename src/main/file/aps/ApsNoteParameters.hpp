@@ -66,7 +66,7 @@ namespace mpc::file::aps
 		int getVelocityToPitch();
 		std::vector<char> getBytes();
 
-		ApsNoteParameters(std::vector<char> loadBytes);
+		ApsNoteParameters(const std::vector<char>& loadBytes);
 		ApsNoteParameters(mpc::sampler::NoteParameters* np);
 	};
 }

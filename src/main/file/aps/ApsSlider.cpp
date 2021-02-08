@@ -6,7 +6,7 @@
 using namespace mpc::file::aps;
 using namespace std;
 
-ApsSlider::ApsSlider(vector<char> loadBytes) 
+ApsSlider::ApsSlider(const vector<char>& loadBytes) 
 {
 	note = loadBytes[0] == 0 ? 34 : loadBytes[0];
 	tuneLow = loadBytes[1];

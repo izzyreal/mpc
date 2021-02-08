@@ -36,7 +36,7 @@ int Pads::getPadsEnd()
 vector<char> Pads::getPadsArray()
 {
     auto pgmFileArray = programFile->readProgramFileArray();
-	padsArray = VecUtil::CopyOfRange(&pgmFileArray, getPadsStart(), getPadsEnd());
+	padsArray = VecUtil::CopyOfRange(pgmFileArray, getPadsStart(), getPadsEnd());
 	return padsArray;
 }
 
