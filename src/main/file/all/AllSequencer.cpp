@@ -13,7 +13,7 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
-mpc::file::all::Sequencer::Sequencer(mpc::Mpc& mpc, vector<char> loadBytes)
+mpc::file::all::Sequencer::Sequencer(mpc::Mpc& mpc, const vector<char>& loadBytes)
 	: mpc(mpc)
 {
 	sequence = loadBytes[SEQ_OFFSET];

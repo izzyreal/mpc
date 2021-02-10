@@ -26,7 +26,7 @@ namespace mpc {
 			public:
 				std::vector<char> getBytes();
 
-				Bar(std::vector<char> bytes, Bar* previousBar);
+				Bar(const std::vector<char>& bytes, Bar* previousBar);
 				Bar(int ticksPerBeat, int lastTick);
 			};
 

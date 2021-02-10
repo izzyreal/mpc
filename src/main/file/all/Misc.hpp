@@ -41,7 +41,7 @@ namespace mpc::file::all
 		std::vector<char> getBytes();
 
 	public:
-		Misc(std::vector<char> b);
+		Misc(const std::vector<char>& b);
 		Misc(mpc::Mpc& mpc);
 	};
 }

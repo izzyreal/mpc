@@ -20,7 +20,7 @@ using namespace mpc::file::all;
 using namespace moduru::lang;
 using namespace std; 
 
-SequenceNames::SequenceNames(vector<char> b)
+SequenceNames::SequenceNames(const vector<char>& b)
 {
 	for (int i = 0; i < names.size(); i++)
 	{	

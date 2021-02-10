@@ -10,13 +10,15 @@
 using namespace mpc::file::all;
 using namespace std;
 
-AllPitchBendEvent::AllPitchBendEvent(vector<char> ba)
+AllPitchBendEvent::AllPitchBendEvent(const vector<char>& ba)
 {
 	auto pbe = new mpc::sequencer::PitchBendEvent();
 	pbe->setTick(AllEvent::readTick(ba));
 	pbe->setTrack(ba[AllEvent::TRACK_OFFSET]);
-	auto candidate = moduru::file::ByteUtil::bytes2ushort(vector<char>{ ba[AMOUNT_OFFSET], ba[AMOUNT_OFFSET + 1] }) - 16384;
-	if (candidate < -8192)
+
+    auto candidate = moduru::file::ByteUtil::bytes2ushort(vector<char>{ ba[AMOUNT_OFFSET], ba[AMOUNT_OFFSET + 1] }) - 16384;
+
+    if (candidate < -8192)
 		candidate += 8192;
 
 	pbe->setAmount(candidate);

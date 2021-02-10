@@ -24,8 +24,10 @@ AllNoteEvent::AllNoteEvent(mpc::sequencer::Event* event)
 {
 	saveBytes = vector<char>(Sequence::EVENT_SEG_LENGTH);
 	auto ne = dynamic_cast<sequencer::NoteEvent*>(event);
+    
 	saveBytes[NOTE_NUMBER_OFFSET] = static_cast<int8_t>(ne->getNote());
-	try {
+	
+    try {
 		saveBytes = setVelocity(saveBytes, ne->getVelocity());
 		saveBytes = setTrackNumber(saveBytes, ne->getTrack());
 		saveBytes = setVariationType(saveBytes, ne->getVariationType());

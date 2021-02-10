@@ -19,7 +19,7 @@ AllControlChangeEvent::AllControlChangeEvent(const vector<char>& ba)
 
 AllControlChangeEvent::AllControlChangeEvent(mpc::sequencer::Event* e) 
 {
-	auto cce = dynamic_cast< mpc::sequencer::ControlChangeEvent* >(e);
+	auto cce = dynamic_cast<mpc::sequencer::ControlChangeEvent*>(e);
 	saveBytes = vector<char>(8);
 	saveBytes[AllEvent::EVENT_ID_OFFSET] = AllEvent::CONTROL_CHANGE_ID;
 	AllEvent::writeTick(saveBytes, static_cast< int >(e->getTick()));

@@ -7,7 +7,7 @@
 using namespace mpc::file::all;
 using namespace std;
 
-Header::Header(vector<char> b) 
+Header::Header(const vector<char>& b) 
 {
 	loadBytes = b;
 }

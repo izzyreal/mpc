@@ -15,7 +15,7 @@
 using namespace mpc::file::all;
 using namespace std;
 
-Tracks::Tracks(vector<char> loadBytes)
+Tracks::Tracks(const vector<char>& loadBytes)
 {
 	for (int i = 0; i < 64; i++) {
 		busses[i] = loadBytes[BUSSES_OFFSET + i];

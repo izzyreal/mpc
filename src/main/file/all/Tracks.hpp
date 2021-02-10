@@ -46,7 +46,7 @@ namespace mpc {
 			public:
 				std::vector<char> getBytes();
 
-				Tracks(std::vector<char> loadBytes);
+				Tracks(const std::vector<char>& loadBytes);
 				Tracks(mpc::sequencer::Sequence* seq);
 			};
 

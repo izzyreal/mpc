@@ -89,7 +89,7 @@ namespace mpc::file::all {
 	public:
 		std::vector<char> getBytes();
 
-		Defaults(mpc::Mpc& mpc, std::vector<char> loadBytes);
+		Defaults(mpc::Mpc& mpc, const std::vector<char>& loadBytes);
 		Defaults(mpc::Mpc& mpc);
 	};
 }

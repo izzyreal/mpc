@@ -15,7 +15,7 @@ using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::file::all;
 using namespace std;
 
-Count::Count(mpc::Mpc& mpc, vector<char> b)
+Count::Count(mpc::Mpc& mpc, const vector<char>& b)
 	: mpc(mpc)
 {
 	enabled = b[ENABLED_OFFSET] > 0;

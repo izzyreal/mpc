@@ -32,7 +32,7 @@ namespace mpc::file::all
 	public:
 		std::vector<char> getBytes();
 
-		Sequencer(mpc::Mpc& mpc, std::vector<char> loadBytes);
+		Sequencer(mpc::Mpc& mpc, const std::vector<char>& loadBytes);
 		Sequencer(mpc::Mpc& mpc);
 
 	};

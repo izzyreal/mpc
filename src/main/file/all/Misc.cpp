@@ -12,7 +12,7 @@ using namespace mpc::lcdgui;
 using namespace mpc::file::all;
 using namespace std;
 
-Misc::Misc(vector<char> b) 
+Misc::Misc(const vector<char>& b)
 {
 	tapAvg = b[TAP_AVG_OFFSET];
 	inReceiveMMCEnabled = b[MIDI_SYNC_IN_RECEIVE_MMC_OFFSET] > 0;

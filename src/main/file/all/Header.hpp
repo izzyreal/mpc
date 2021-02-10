@@ -20,7 +20,7 @@ namespace mpc {
 			public:
 				std::vector<char> getBytes();
 
-				Header(std::vector<char> b);
+				Header(const std::vector<char>& b);
 				Header();
 			};
 

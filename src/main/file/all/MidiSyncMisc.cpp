@@ -15,7 +15,7 @@ using namespace mpc::lcdgui;
 using namespace mpc::file::all;
 using namespace std;
 
-MidiSyncMisc::MidiSyncMisc(vector<char> b) 
+MidiSyncMisc::MidiSyncMisc(const vector<char>& b) 
 {
 	inMode = b[IN_MODE_OFFSET];
 	outMode = b[OUT_MODE_OFFSET];

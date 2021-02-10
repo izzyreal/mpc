@@ -51,7 +51,7 @@ namespace mpc::file::all {
 	public:
 		std::vector<char> getBytes();
 
-		Count(mpc::Mpc& mpc, std::vector<char> b);
+		Count(mpc::Mpc& mpc, const std::vector<char>& b);
 		Count(mpc::Mpc& mpc);
 
 	private:

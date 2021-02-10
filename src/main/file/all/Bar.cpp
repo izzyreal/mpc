@@ -5,7 +5,7 @@
 using namespace mpc::file::all;
 using namespace std;
 
-Bar::Bar(vector<char> bytes, Bar* previousBar)
+Bar::Bar(const vector<char>& bytes, Bar* previousBar)
 {
 	ticksPerBeat = bytes[0] & 255;
 	auto intVal = moduru::file::ByteUtil::bytes2ushort(vector<char>{ bytes[1] , bytes[2] });

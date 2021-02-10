@@ -30,7 +30,7 @@ namespace mpc::file::all {
 		std::vector<char> getBytes();
 		static int getSegmentCount(mpc::sequencer::Sequence* seq);
 
-		SequenceNames(std::vector<char> b);
+		SequenceNames(const std::vector<char>& b);
 		SequenceNames(mpc::Mpc& mpc);
 	};
 }

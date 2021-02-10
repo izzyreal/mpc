@@ -48,7 +48,7 @@ namespace mpc::file::all
 	public:
 		std::vector<char> getBytes();
 
-		MidiSyncMisc(std::vector<char> b);
+		MidiSyncMisc(const std::vector<char>& b);
 		MidiSyncMisc(mpc::Mpc& mpc);
 
 	};

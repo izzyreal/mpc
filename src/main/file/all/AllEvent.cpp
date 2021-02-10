@@ -35,37 +35,39 @@ AllEvent::AllEvent(const vector<char>& ba)
 		switch (ba[EVENT_ID_OFFSET])
         {
 		case POLY_PRESSURE_ID:
-			event = (new AllPolyPressureEvent(ba))->event;
+			event = AllPolyPressureEvent(ba).event;
 			break;
 		case CONTROL_CHANGE_ID:
-			event = (new AllControlChangeEvent(ba))->event;
+			event = AllControlChangeEvent(ba).event;
 			break;
 		case PGM_CHANGE_ID:
-			event = (new AllProgramChangeEvent(ba))->event;
+			event = AllProgramChangeEvent(ba).event;
 			break;
 		case CH_PRESSURE_ID:
-			event = (new AllChannelPressureEvent(ba))->event;
+			event = AllChannelPressureEvent(ba).event;
 			break;
 		case PITCH_BEND_ID:
-			event = (new AllPitchBendEvent(ba))->event;
+			event = AllPitchBendEvent(ba).event;
 			break;
 		case SYS_EX_ID:
-			event = (new AllSysExEvent(ba))->event;
+			event = AllSysExEvent(ba).event;
 			break;
 		}
 
 	}
 	else
     {
-		auto ane = new AllNoteEvent(ba);
-		auto ne = new mpc::sequencer::NoteEvent(ane->getNote());
-		ne->setDuration(ane->getDuration());
-		ne->setTick(ane->getTick());
-		ne->setVelocity(ane->getVelocity());
-		ne->setVariationValue(ane->getVariationValue());
-		ne->setVariationTypeNumber(ane->getVariationType());
-		ne->setTrack(ba[TRACK_OFFSET]);
-		event = ne;
+		AllNoteEvent allNoteEvent(ba);
+		
+        auto noteEvent = new mpc::sequencer::NoteEvent(allNoteEvent.getNote());
+        noteEvent->setDuration(allNoteEvent.getDuration());
+        noteEvent->setTick(allNoteEvent.getTick());
+        noteEvent->setVelocity(allNoteEvent.getVelocity());
+        noteEvent->setVariationValue(allNoteEvent.getVariationValue());
+        noteEvent->setVariationTypeNumber(allNoteEvent.getVariationType());
+        noteEvent->setTrack(ba[TRACK_OFFSET]);
+        
+		event = noteEvent;
 	}
 }
 
@@ -123,8 +125,10 @@ vector<char> AllEvent::getBytes()
 int AllEvent::readTick(const vector<char>& b)
 {
 	unsigned short s3 = moduru::file::BitUtil::removeUnusedBits(b[TICK_BYTE3_OFFSET], TICK_BYTE3_BIT_RANGE);
-	int result = moduru::file::ByteUtil::bytes2ushort(vector<char>{ b[TICK_BYTE1_OFFSET], b[TICK_BYTE2_OFFSET] }) + (s3 * 65536);
-	return result;
+	
+    int result = moduru::file::ByteUtil::bytes2ushort(vector<char>{ b[TICK_BYTE1_OFFSET], b[TICK_BYTE2_OFFSET] }) + (s3 * 65536);
+
+    return result;
 }
 
 vector<char> AllEvent::writeTick(vector<char> event, int tick)
@@ -134,6 +138,8 @@ vector<char> AllEvent::writeTick(vector<char> event, int tick)
 	event[TICK_BYTE1_OFFSET] = ba[0];
 	event[TICK_BYTE2_OFFSET] = ba[1];
 	auto s3 = static_cast<int16_t>(floor(tick / 65536.0));
+    
 	event[TICK_BYTE3_OFFSET] = moduru::file::BitUtil::stitchBytes(event[TICK_BYTE3_OFFSET], AllNoteEvent::DURATION_BYTE1_BIT_RANGE, static_cast<int8_t>(s3), TICK_BYTE3_BIT_RANGE);
-	return event;
+	
+    return event;
 }

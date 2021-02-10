@@ -7,7 +7,7 @@
 using namespace mpc::file::all;
 using namespace std;
 
-AllPolyPressureEvent::AllPolyPressureEvent(vector<char> ba) 
+AllPolyPressureEvent::AllPolyPressureEvent(const vector<char>& ba) 
 {
 	auto ppe = new mpc::sequencer::PolyPressureEvent();
 	ppe->setTick(AllEvent::readTick(ba));

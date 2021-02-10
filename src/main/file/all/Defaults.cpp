@@ -18,7 +18,7 @@ using namespace moduru::file;
 using namespace moduru::lang;
 using namespace std;
 
-Defaults::Defaults(mpc::Mpc& mpc, vector<char> loadBytes)
+Defaults::Defaults(mpc::Mpc& mpc, const vector<char>& loadBytes)
 	: mpc(mpc)
 {
 	parseNames(loadBytes);

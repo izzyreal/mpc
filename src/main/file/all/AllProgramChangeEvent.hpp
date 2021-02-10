@@ -22,7 +22,7 @@ namespace mpc {
 				std::vector<char> saveBytes{};
 
 			public:
-				AllProgramChangeEvent(std::vector<char> ba);
+				AllProgramChangeEvent(const std::vector<char>& ba);
 				AllProgramChangeEvent(mpc::sequencer::Event* e);
 			};
 
