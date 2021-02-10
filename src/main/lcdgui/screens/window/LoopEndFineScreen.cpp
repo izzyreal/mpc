@@ -35,7 +35,7 @@ void LoopEndFineScreen::open()
 
 void LoopEndFineScreen::displayLoopLngth()
 {
-	auto loopScreen = dynamic_pointer_cast<LoopScreen>(mpc.screens->getScreenComponent("loop"));
+	auto loopScreen = mpc.screens->get<LoopScreen>("loop");
 	findField("loop-lngth").lock()->setText(loopScreen->loopLngthFix ? "FIX" : "VARI");
 }
 
@@ -51,7 +51,7 @@ void LoopEndFineScreen::displayLngthField()
 
 void LoopEndFineScreen::displayFineWave()
 {
-	auto trimScreen = dynamic_pointer_cast<TrimScreen>(mpc.screens->getScreenComponent("trim"));
+	auto trimScreen = mpc.screens->get<TrimScreen>("trim");
 
 	auto sound = sampler.lock()->getSound().lock();
 
@@ -105,7 +105,7 @@ void LoopEndFineScreen::turnWheel(int i)
 	auto sound = sampler.lock()->getSound().lock();
 	auto startEndLength = static_cast<int>(sound->getEnd() - sound->getStart());
 	auto loopLength = static_cast<int>((sound->getEnd() - sound->getLoopTo()));
-	auto loopScreen = dynamic_pointer_cast<LoopScreen>(mpc.screens->getScreenComponent("loop"));
+	auto loopScreen = mpc.screens->get<LoopScreen>("loop");
 
 	auto sampleLength = sound->getFrameCount();
 
@@ -169,7 +169,7 @@ void LoopEndFineScreen::right()
 
 void LoopEndFineScreen::pressEnter()
 {
-	auto loopScreen = dynamic_pointer_cast<LoopScreen>(mpc.screens->getScreenComponent("loop"));
+	auto loopScreen = mpc.screens->get<LoopScreen>("loop");
 	loopScreen->pressEnter();
 	displayEnd();
 	displayLngthField();

@@ -33,7 +33,7 @@ MidiSyncMisc::MidiSyncMisc(mpc::Mpc& mpc)
 {
 	saveBytes = vector<char>(LENGTH);
 
-	auto syncScreen = dynamic_pointer_cast<SyncScreen>(mpc.screens->getScreenComponent("sync"));
+	auto syncScreen = mpc.screens->get<SyncScreen>("sync");
 
 	saveBytes[IN_MODE_OFFSET] = static_cast<int8_t>(syncScreen->getModeIn());
 	saveBytes[OUT_MODE_OFFSET] = static_cast<int8_t>(syncScreen->getModeOut());

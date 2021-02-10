@@ -42,7 +42,7 @@ weak_ptr<MpcIndivFxMixerChannel> ChannelSettingsScreen::getIndivFxMixerChannel()
 	if (note == 34)
 		return {};
 
-	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(mpc.screens->getScreenComponent("mixer-setup"));
+	auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>("mixer-setup");
 
 	if (mixerSetupScreen->isIndivFxSourceDrum())
 	{
@@ -67,7 +67,7 @@ weak_ptr<MpcStereoMixerChannel> ChannelSettingsScreen::getStereoMixerChannel()
 	if (note == 34)
 		return {};
 
-	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(mpc.screens->getScreenComponent("mixer-setup"));
+	auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>("mixer-setup");
 
 	if (mixerSetupScreen->isStereoMixSourceDrum())
 	{

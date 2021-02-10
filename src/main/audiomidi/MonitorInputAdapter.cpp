@@ -23,7 +23,7 @@ int32_t MonitorInputAdapter::processAudio(ctoot::audio::core::AudioBuffer* buffe
 {
 	auto ret = process->processAudio(buffer);
 
-	auto sampleScreen = dynamic_pointer_cast<SampleScreen>(mpc.screens->getScreenComponent("sample"));
+	auto sampleScreen = mpc.screens->get<SampleScreen>("sample");
 
 	if (sampleScreen->getMode() == 0)
 	{

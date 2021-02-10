@@ -33,7 +33,7 @@ void BarsScreen::close()
 void BarsScreen::function(int j)
 {
 	init();
-	auto eventsScreen = dynamic_pointer_cast<EventsScreen>(mpc.screens->getScreenComponent("events"));
+	auto eventsScreen = mpc.screens->get<EventsScreen>("events");
 
 	switch (j)
 	{
@@ -140,7 +140,7 @@ void BarsScreen::turnWheel(int i)
 {
 	init();
 
-	auto eventsScreen = dynamic_pointer_cast<EventsScreen>(mpc.screens->getScreenComponent("events"));
+	auto eventsScreen = mpc.screens->get<EventsScreen>("events");
 	auto fromSequence = sequencer.lock()->getActiveSequence().lock();
 	auto toSequence = sequencer.lock()->getSequence(eventsScreen->toSq).lock();
 
@@ -184,13 +184,13 @@ void BarsScreen::turnWheel(int i)
 
 void BarsScreen::displayCopies()
 {
-	auto eventsScreen = dynamic_pointer_cast<EventsScreen>(mpc.screens->getScreenComponent("events"));
+	auto eventsScreen = mpc.screens->get<EventsScreen>("events");
 	findField("copies").lock()->setTextPadded(eventsScreen->copies, " ");
 }
 
 void BarsScreen::displayToSq()
 {
-	auto eventsScreen = dynamic_pointer_cast<EventsScreen>(mpc.screens->getScreenComponent("events"));
+	auto eventsScreen = mpc.screens->get<EventsScreen>("events");
 	findField("tosq").lock()->setText(to_string(eventsScreen->toSq + 1));
 }
 
@@ -254,7 +254,7 @@ void BarsScreen::setCopies(int i)
 	if (i < 1 || i > 999)
 		return;
 
-	auto eventsScreen = dynamic_pointer_cast<EventsScreen>(mpc.screens->getScreenComponent("events"));
+	auto eventsScreen = mpc.screens->get<EventsScreen>("events");
 	eventsScreen->copies = i;
 	displayCopies();
 }

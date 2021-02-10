@@ -50,7 +50,7 @@ ApsLoader::ApsLoader(mpc::Mpc& _mpc, weak_ptr<MpcFile> _file)
 	if (!file.lock()->getFsNode().lock()->exists())
 		throw invalid_argument("File does not exist");
 
-	auto cantFindFileScreen = dynamic_pointer_cast<CantFindFileScreen>(mpc.screens->getScreenComponent("cant-find-file"));
+	auto cantFindFileScreen = mpc.screens->get<CantFindFileScreen>("cant-find-file");
 	cantFindFileScreen->skipAll = false;
 
 	loadThread = thread(&ApsLoader::static_load, this);
@@ -63,7 +63,7 @@ void ApsLoader::static_load(void* this_p)
 
 void ApsLoader::notFound(mpc::Mpc& mpc, string soundFileName, string ext)
 {
-	auto cantFindFileScreen = dynamic_pointer_cast<CantFindFileScreen>(mpc.screens->getScreenComponent("cant-find-file"));
+	auto cantFindFileScreen = mpc.screens->get<CantFindFileScreen>("cant-find-file");
 	auto skipAll = cantFindFileScreen->skipAll;
 
 	if (!skipAll)
@@ -170,17 +170,9 @@ void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool head
             if (find(begin(unavailableSoundIndices), end(unavailableSoundIndices), soundIndex) != end(unavailableSoundIndices))
                 soundIndex = -1;
 
-            auto voiceOverlap = srcNoteParams->getVoiceOverlap();
-
-            if (soundIndex != -1 && sampler->getSound().lock()->isLoopEnabled())
-            {
-                // Set overlap mode to NOTE OFF, the only sane one for when loop is enabled.
-                voiceOverlap = 2;
-            }
-
             destNoteParams->setSoundIndex(soundIndex);
             destNoteParams->setTune(srcNoteParams->getTune());
-            destNoteParams->setVoiceOverlap(voiceOverlap);
+            destNoteParams->setVoiceOverlap(srcNoteParams->getVoiceOverlap());
             destNoteParams->setDecayMode(srcNoteParams->getDecayMode());
             destNoteParams->setAttack(srcNoteParams->getAttack());
             destNoteParams->setDecay(srcNoteParams->getDecay());
@@ -246,7 +238,7 @@ void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool head
     }
     MLOG("loadFromParsedAps " + to_string(c++));
 
-    auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(mpc.screens->getScreenComponent("mixer-setup"));
+    auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>("mixer-setup");
 
     auto globals = apsParser.getGlobalParameters();
     
@@ -257,7 +249,7 @@ void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool head
     mixerSetupScreen->setStereoMixSourceDrum(globals->isStereoMixSourceDrum());
     MLOG("loadFromParsedAps " + to_string(c++));
 
-    auto drumScreen = dynamic_pointer_cast<DrumScreen>(mpc.screens->getScreenComponent("drum"));
+    auto drumScreen = mpc.screens->get<DrumScreen>("drum");
 
     drumScreen->setPadToIntSound(globals->isPadToIntSoundEnabled());
 }
@@ -304,7 +296,7 @@ void ApsLoader::loadSound(mpc::Mpc& mpc, string soundFileName, string ext, weak_
 
     if (!headless)
         ApsLoader::showPopup(mpc, soundFileName, ext, soundFile->length());
-
+    MLOG("Loading sound: " + soundFileName);
     sl.loadSound(soundFile);
 }
 

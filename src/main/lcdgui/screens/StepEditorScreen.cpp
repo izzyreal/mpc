@@ -247,7 +247,7 @@ void StepEditorScreen::function(int i)
 			if ((polyPressEvent || controlChangeEvent) && isA)
 				return;
 
-			auto editMultipleScreen = dynamic_pointer_cast<EditMultipleScreen>(mpc.screens->getScreenComponent("edit-multiple"));
+			auto editMultipleScreen = mpc.screens->get<EditMultipleScreen>("edit-multiple");
 
 			if (noteEvent && track.lock()->getBus() != 0)
 			{

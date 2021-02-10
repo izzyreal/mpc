@@ -15,7 +15,7 @@ NumberOfZonesScreen::NumberOfZonesScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void NumberOfZonesScreen::open()
 {
-	auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(mpc.screens->getScreenComponent("zone"));
+	auto zoneScreen = mpc.screens->get<ZoneScreen>("zone");
 	numberOfZones = zoneScreen->numberOfZones;
 	displayNumberOfZones();
 }
@@ -30,7 +30,7 @@ void NumberOfZonesScreen::function(int i)
 	switch (i)
 	{
 	case 4:
-		auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(mpc.screens->getScreenComponent("zone"));
+		auto zoneScreen = mpc.screens->get<ZoneScreen>("zone");
 		auto sound = sampler.lock()->getSound().lock();
 		zoneScreen->numberOfZones = numberOfZones;
 		zoneScreen->initZones();

@@ -59,7 +59,7 @@ void DirectoryScreen::function(int f)
 {
 	ScreenComponent::function(f);
 	
-	auto loadScreen = dynamic_pointer_cast<LoadScreen>(mpc.screens->getScreenComponent("load"));
+	auto loadScreen = mpc.screens->get<LoadScreen>("load");
 	auto nameScreen = mpc.screens->get<NameScreen>("name");
 
 	switch (f)
@@ -150,7 +150,7 @@ void DirectoryScreen::left()
 	{
 		if (disk->moveBack())
 		{
-			auto loadScreen = dynamic_pointer_cast<LoadScreen>(mpc.screens->getScreenComponent("load"));
+			auto loadScreen = mpc.screens->get<LoadScreen>("load");
 			disk->initFiles();
 			
 			loadScreen->fileLoad = 0;
@@ -217,7 +217,7 @@ void DirectoryScreen::right()
 		yPos0 = 0;
 		yOffset1 = 0;
 		
-		auto loadScreen = dynamic_pointer_cast<LoadScreen>(mpc.screens->getScreenComponent("load"));
+		auto loadScreen = mpc.screens->get<LoadScreen>("load");
 		loadScreen->fileLoad = 0;
 
 		for (int i = 0; i < disk->getParentFileNames().size(); i++)
@@ -243,7 +243,7 @@ void DirectoryScreen::right()
 void DirectoryScreen::up()
 {
 	auto disk = mpc.getDisk().lock();
-	auto loadScreen = dynamic_pointer_cast<LoadScreen>(mpc.screens->getScreenComponent("load"));
+	auto loadScreen = mpc.screens->get<LoadScreen>("load");
 
 	if (xPos == 0)
 	{
@@ -323,7 +323,7 @@ void DirectoryScreen::up()
 void DirectoryScreen::down()
 {
 	auto disk = mpc.getDisk().lock();
-	auto loadScreen = dynamic_pointer_cast<LoadScreen>(mpc.screens->getScreenComponent("load"));
+	auto loadScreen = mpc.screens->get<LoadScreen>("load");
 
 	if (xPos == 0)
 	{
@@ -408,7 +408,7 @@ shared_ptr<MpcFile> DirectoryScreen::getSelectedFile()
 
 	if (xPos == 1)
 	{
-		auto loadScreen = dynamic_pointer_cast<LoadScreen>(mpc.screens->getScreenComponent("load"));
+		auto loadScreen = mpc.screens->get<LoadScreen>("load");
 		yPos = loadScreen->fileLoad - yOffset1;
 	}
 
@@ -481,7 +481,7 @@ void DirectoryScreen::refreshFocus()
 	}
 	else if (xPos == 1)
 	{
-		auto loadScreen = dynamic_pointer_cast<LoadScreen>(mpc.screens->getScreenComponent("load"));
+		auto loadScreen = mpc.screens->get<LoadScreen>("load");
 		ls.lock()->setFocus("b" + to_string(loadScreen->fileLoad - yOffset1));
 	}
 }

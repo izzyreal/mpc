@@ -152,7 +152,7 @@ void BaseControls::function(int i)
 			}
 			else if (currentScreenName.compare("edit-sound") == 0)
 			{
-				auto editSoundScreen = dynamic_pointer_cast<EditSoundScreen>(mpc.screens->getScreenComponent("edit-sound"));
+				auto editSoundScreen = mpc.screens->get<EditSoundScreen>("edit-sound");
 				ls.lock()->setPreviousScreenName(editSoundScreen->getReturnToScreenName());
 			}
 			else if (currentScreenName.compare("sound") == 0)
@@ -171,13 +171,13 @@ void BaseControls::function(int i)
 			}
 			else if (currentScreenName.compare("directory") == 0)
 			{
-				auto directoryScreen = dynamic_pointer_cast<DirectoryScreen>(mpc.screens->getScreenComponent("directory"));
+				auto directoryScreen = mpc.screens->get<DirectoryScreen>("directory");
 				ls.lock()->setPreviousScreenName(directoryScreen->previousScreenName);
 			}
 			
 			if (ls.lock()->getPreviousScreenName().compare("load") == 0)
 			{
-				auto loadScreen = dynamic_pointer_cast<LoadScreen>(mpc.screens->getScreenComponent("load"));
+				auto loadScreen = mpc.screens->get<LoadScreen>("load");
 
 				if (loadScreen->fileLoad + 1 > mpc.getDisk().lock()->getFiles().size())
 					loadScreen->fileLoad = 0; // Can we avoid this? Who's leaving fileLoad in a bad state?
@@ -442,7 +442,7 @@ void BaseControls::numpad(int i)
 
 			disk->initFiles();
 
-			auto loadScreen = dynamic_pointer_cast<LoadScreen>(mpc.screens->getScreenComponent("load"));
+			auto loadScreen = mpc.screens->get<LoadScreen>("load");
 
 			if (loadScreen->fileLoad + 1 > (int)(disk->getFiles().size()))
 				loadScreen->fileLoad = (int)(disk->getFiles().size() - 1); // Same here, can we avoid this?

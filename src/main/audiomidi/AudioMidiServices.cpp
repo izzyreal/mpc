@@ -318,7 +318,7 @@ void AudioMidiServices::createSynth()
 	synthRackControls->setSynthControls(0, msc);
 	mms = dynamic_pointer_cast<ctoot::mpc::MpcMultiMidiSynth>(synthRack->getMidiSynth(0).lock());
 
-	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(mpc.screens->getScreenComponent("mixer-setup"));
+	auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>("mixer-setup");
 
 	for (int i = 0; i < 4; i++)
 	{

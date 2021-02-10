@@ -117,8 +117,8 @@ vector<string> AbstractDisk::getParentFileNames()
 
 bool AbstractDisk::renameSelectedFile(string s)
 {
-	auto directoryScreen = dynamic_pointer_cast<DirectoryScreen>(mpc.screens->getScreenComponent("directory"));
-	auto loadScreen = dynamic_pointer_cast<LoadScreen>(mpc.screens->getScreenComponent("load"));
+	auto directoryScreen = mpc.screens->get<DirectoryScreen>("directory");
+	auto loadScreen = mpc.screens->get<LoadScreen>("load");
   
 	auto left = directoryScreen->xPos == 0;
 	auto fileIndex = left ? directoryScreen->yPos0 + directoryScreen->yOffset0 : loadScreen->fileLoad;
@@ -129,7 +129,7 @@ bool AbstractDisk::renameSelectedFile(string s)
 
 bool AbstractDisk::deleteSelectedFile()
 {
-	auto loadScreen = dynamic_pointer_cast<LoadScreen>(mpc.screens->getScreenComponent("load"));
+	auto loadScreen = mpc.screens->get<LoadScreen>("load");
 	return files[loadScreen->fileLoad]->del();
 }
 
@@ -290,7 +290,7 @@ void AbstractDisk::writeProgram(weak_ptr<Program> program, const string& fileNam
             sounds.push_back(mpc.getSampler().lock()->getSound(n->getSoundIndex()).lock());
 	}
 
-	auto saveAProgramScreen = dynamic_pointer_cast<SaveAProgramScreen>(mpc.screens->getScreenComponent("save-a-program"));
+	auto saveAProgramScreen = mpc.screens->get<SaveAProgramScreen>("save-a-program");
 	
 	if (saveAProgramScreen->save != 0)
 	{

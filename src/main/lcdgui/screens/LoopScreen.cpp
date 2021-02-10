@@ -103,7 +103,7 @@ void LoopScreen::function(int f)
 		if (sampler.lock()->getSoundCount() == 0)
 			return;
 
-		auto editSoundScreen = dynamic_pointer_cast<EditSoundScreen>(mpc.screens->getScreenComponent("edit-sound"));
+		auto editSoundScreen = mpc.screens->get<EditSoundScreen>("edit-sound");
 		editSoundScreen->setReturnToScreenName("loop");
 		openScreen("edit-sound");
 		break;
@@ -130,7 +130,7 @@ void LoopScreen::turnWheel(int i)
 
 	auto const oldLoopLength = sound->getEnd() - sound->getLoopTo();
     
-	auto loopScreen = dynamic_pointer_cast<LoopScreen>(mpc.screens->getScreenComponent("loop"));
+	auto loopScreen = mpc.screens->get<LoopScreen>("loop");
 	auto const loopFix = loopScreen->loopLngthFix;
 	
 	auto field = findField(param).lock();
@@ -257,7 +257,7 @@ void LoopScreen::setSlider(int i)
 
 	init();
 
-	auto trimScreen = dynamic_pointer_cast<TrimScreen>(mpc.screens->getScreenComponent("trim"));
+	auto trimScreen = mpc.screens->get<TrimScreen>("trim");
 	auto sound = sampler.lock()->getSound().lock();
 
 	auto const oldLength = sound->getEnd() - sound->getLoopTo();
@@ -473,7 +473,7 @@ void LoopScreen::displayWave()
 	}
 
 	auto sampleData = sound->getSampleData();
-	auto trimScreen = dynamic_pointer_cast<TrimScreen>(mpc.screens->getScreenComponent("trim"));
+	auto trimScreen = mpc.screens->get<TrimScreen>("trim");
 	findWave().lock()->setSampleData(sampleData, sound->isMono(), trimScreen->view);
 	findWave().lock()->setSelection(sound->getLoopTo(), sound->getEnd());
 }

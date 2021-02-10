@@ -27,7 +27,7 @@ void DiskController::initDisks()
 {
 	disks.clear();
 	disks = vector<shared_ptr<mpc::disk::AbstractDisk>>(MAX_DISKS);
-	auto vmpcDiskScreen = dynamic_pointer_cast<VmpcDiskScreen>(mpc.screens->getScreenComponent("vmpc-disk"));
+	auto vmpcDiskScreen = mpc.screens->get<VmpcDiskScreen>("vmpc-disk");
 
 	for (int i = 0; i < MAX_DISKS; i++)
 	{
@@ -80,7 +80,7 @@ weak_ptr<mpc::disk::AbstractDisk> DiskController::getDisk()
 		return {};
 	}
 
-	auto vmpcDiskScreen = dynamic_pointer_cast<VmpcDiskScreen>(mpc.screens->getScreenComponent("vmpc-disk"));
+	auto vmpcDiskScreen = mpc.screens->get<VmpcDiskScreen>("vmpc-disk");
 	return disks[vmpcDiskScreen->scsi];
 }
 

@@ -193,7 +193,7 @@ void Mpc::loadSound(bool replace)
 	soundLoader.setPartOfProgram(false);
 	bool hasNotBeenLoadedAlready = true;
 
-	auto loadScreen = dynamic_pointer_cast<LoadScreen>(screens->getScreenComponent("load"));
+	auto loadScreen = screens->get<LoadScreen>("load");
 
 	try
 	{
@@ -223,8 +223,8 @@ void Mpc::loadProgram()
 {
 	programLoader.reset();
 
-	auto loadScreen = dynamic_pointer_cast<LoadScreen>(screens->getScreenComponent("load"));
-	auto loadAProgramScreen = dynamic_pointer_cast<LoadAProgramScreen>(screens->getScreenComponent("load-a-program"));
+	auto loadScreen = screens->get<LoadScreen>("load");
+	auto loadAProgramScreen = screens->get<LoadAProgramScreen>("load-a-program");
 
 	getActiveControls().lock()->getBaseControls()->init();
 	auto activePgm = getActiveControls().lock()->getBaseControls()->mpcSoundPlayerChannel->getProgram();
@@ -235,7 +235,7 @@ void Mpc::loadProgram()
 void Mpc::importLoadedProgram()
 {
 	auto t = sequencer->getActiveSequence().lock()->getTrack(sequencer->getActiveTrackIndex()).lock();
-	auto loadAProgramScreen = dynamic_pointer_cast<LoadAProgramScreen>(screens->getScreenComponent("load-a-program"));
+	auto loadAProgramScreen = screens->get<LoadAProgramScreen>("load-a-program");
 
 	if (!loadAProgramScreen->clearProgramWhenLoading)
 		getDrum(t->getBus() - 1)->setProgram(sampler->getProgramCount() - 1);

@@ -118,7 +118,7 @@ void Sequencer::playToTick(int targetTick)
 {
 	auto seqIndex = songMode ? getSongSequenceIndex() : currentlyPlayingSequenceIndex;
 	auto seq = metronomeOnly ? metronomeSeq.get() : sequences[seqIndex].get();
-	auto secondSequenceScreen = dynamic_pointer_cast<SecondSeqScreen>(mpc.screens->getScreenComponent("second-seq"));
+	auto secondSequenceScreen = mpc.screens->get<SecondSeqScreen>("second-seq");
 
 	for (int i = 0; i < 2; i++)
 	{
@@ -453,7 +453,7 @@ void Sequencer::play(bool fromStart)
     
 	currentlyPlayingSequenceIndex = activeSequenceIndex;
 
-	auto countMetronomeScreen = dynamic_pointer_cast<CountMetronomeScreen>(mpc.screens->getScreenComponent("count-metronome"));
+	auto countMetronomeScreen = mpc.screens->get<CountMetronomeScreen>("count-metronome");
 	auto countInMode = countMetronomeScreen->getCountInMode();
 
     if (!countEnabled || countInMode == 0 || (countInMode == 1 && recording == false))
@@ -1431,7 +1431,7 @@ void Sequencer::move(int tick)
 
 	if (secondSequenceEnabled)
 	{
-		auto secondSequenceScreen = dynamic_pointer_cast<SecondSeqScreen>(mpc.screens->getScreenComponent("second-seq"));
+		auto secondSequenceScreen = mpc.screens->get<SecondSeqScreen>("second-seq");
 		sequences[secondSequenceScreen->sq]->resetTrackEventIndices(position);
 	}
 

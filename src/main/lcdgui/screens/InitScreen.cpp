@@ -28,7 +28,7 @@ void InitScreen::function(int i)
 		auto userScreen = mpc.screens->get<UserScreen>("user");
 		userScreen->resetPreferences();
 
-		auto setupScreen = dynamic_pointer_cast<SetupScreen>(mpc.screens->getScreenComponent("setup"));
+		auto setupScreen = mpc.screens->get<SetupScreen>("setup");
 		setupScreen->resetPreferences();
 
 		openScreen("sequencer");

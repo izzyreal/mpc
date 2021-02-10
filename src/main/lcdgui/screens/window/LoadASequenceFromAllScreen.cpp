@@ -31,7 +31,7 @@ void LoadASequenceFromAllScreen::turnWheel(int i)
 	}
 	else if (param.compare("load-into") == 0)
 	{
-		auto loadASequenceScreen = dynamic_pointer_cast<LoadASequenceScreen>(mpc.screens->getScreenComponent("load-a-sequence"));
+		auto loadASequenceScreen = mpc.screens->get<LoadASequenceScreen>("load-a-sequence");
 		loadASequenceScreen->setLoadInto(loadASequenceScreen->loadInto + i);
 		displayLoadInto();
 	}
@@ -47,12 +47,12 @@ void LoadASequenceFromAllScreen::function(int i)
 		openScreen("mpc2000xl-all-file");
 		break;
 	case 4:
-		auto loadASequenceFromAllScreen = dynamic_pointer_cast<LoadASequenceFromAllScreen>(mpc.screens->getScreenComponent("load-a-sequence-from-all"));
+		auto loadASequenceFromAllScreen = mpc.screens->get<LoadASequenceFromAllScreen>("load-a-sequence-from-all");
 		auto candidate = loadASequenceFromAllScreen->sequencesFromAllFile[sourceSeqIndex];
 
 		if (candidate)
 		{
-			auto loadASequenceScreen = dynamic_pointer_cast<LoadASequenceScreen>(mpc.screens->getScreenComponent("load-a-sequence"));
+			auto loadASequenceScreen = mpc.screens->get<LoadASequenceScreen>("load-a-sequence");
 			sequencer.lock()->setSequence(loadASequenceScreen->loadInto, candidate);
 			openScreen("sequencer");
 		}
@@ -62,7 +62,7 @@ void LoadASequenceFromAllScreen::function(int i)
 
 void LoadASequenceFromAllScreen::displayFile()
 {
-	auto loadASequenceFromAllScreen = dynamic_pointer_cast<LoadASequenceFromAllScreen>(mpc.screens->getScreenComponent("load-a-sequence-from-all"));
+	auto loadASequenceFromAllScreen = mpc.screens->get<LoadASequenceFromAllScreen>("load-a-sequence-from-all");
 	findField("file").lock()->setTextPadded(sourceSeqIndex + 1, "0");
 
 	auto candidate = sourceSeqIndex < sequencesFromAllFile.size() ? loadASequenceFromAllScreen->sequencesFromAllFile[sourceSeqIndex] : shared_ptr<mpc::sequencer::Sequence>();
@@ -72,14 +72,14 @@ void LoadASequenceFromAllScreen::displayFile()
 
 void LoadASequenceFromAllScreen::displayLoadInto()
 {
-	auto loadASequenceScreen = dynamic_pointer_cast<LoadASequenceScreen>(mpc.screens->getScreenComponent("load-a-sequence"));
+	auto loadASequenceScreen = mpc.screens->get<LoadASequenceScreen>("load-a-sequence");
 	findField("load-into").lock()->setTextPadded(loadASequenceScreen->loadInto + 1, "0");
 	findLabel("load-into0").lock()->setText("-" + mpc.getSequencer().lock()->getSequence(loadASequenceScreen->loadInto).lock()->getName());
 }
 
 void LoadASequenceFromAllScreen::setSourceSeqIndex(int i)
 {
-	auto loadASequenceFromAllScreen = dynamic_pointer_cast<LoadASequenceFromAllScreen>(mpc.screens->getScreenComponent("load-a-sequence-from-all"));
+	auto loadASequenceFromAllScreen = mpc.screens->get<LoadASequenceFromAllScreen>("load-a-sequence-from-all");
 	const auto max = loadASequenceFromAllScreen->sequencesFromAllFile.size();
 
 	if (i < 0 || i >= max)

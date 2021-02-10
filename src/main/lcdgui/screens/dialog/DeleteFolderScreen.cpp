@@ -31,7 +31,7 @@ void DeleteFolderScreen::deleteFolder()
 	auto disk = mpc.getDisk().lock();
 	disk->setBusy(true);
 
-	auto directoryScreen = dynamic_pointer_cast<DirectoryScreen>(mpc.screens->getScreenComponent("directory"));
+	auto directoryScreen = mpc.screens->get<DirectoryScreen>("directory");
 	openScreen("popup");
 	auto popupScreen = mpc.screens->get<PopupScreen>("popup");
 	auto file = directoryScreen->getSelectedFile();

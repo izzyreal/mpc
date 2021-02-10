@@ -44,7 +44,7 @@ MidiInput::MidiInput(mpc::Mpc& mpc)
 		saveBytes[i] = TEMPLATE[i];
 	}
 
-	auto midiInputScreen = dynamic_pointer_cast<MidiInputScreen>(mpc.screens->getScreenComponent("midi-input"));
+	auto midiInputScreen = mpc.screens->get<MidiInputScreen>("midi-input");
 
 	saveBytes[RECEIVE_CH_OFFSET] = static_cast<int8_t>(midiInputScreen->getReceiveCh());
 	saveBytes[SUSTAIN_PEDAL_TO_DURATION_OFFSET] = static_cast<int8_t>(midiInputScreen->isSustainPedalToDurationEnabled() ? 1 : 0);
@@ -52,7 +52,7 @@ MidiInput::MidiInput(mpc::Mpc& mpc)
 	saveBytes[FILTER_TYPE_OFFSET] = static_cast<int8_t>(midiInputScreen->getType());
 	saveBytes[MULTI_REC_ENABLED_OFFSET] = static_cast<int8_t>(mpc.getSequencer().lock()->isRecordingModeMulti() ? 1 : 0);
 	
-	auto screen = dynamic_pointer_cast<MultiRecordingSetupScreen>(mpc.screens->getScreenComponent("multi-recording-setup"));
+	auto screen = mpc.screens->get<MultiRecordingSetupScreen>("multi-recording-setup");
 
 	for (int i = 0; i < MULTI_REC_TRACK_DESTS_LENGTH; i++)
 	{

@@ -77,7 +77,7 @@ void SndParamsScreen::function(int f)
 		if (sampler.lock()->getSoundCount() == 0)
 			return;
 
-		auto editSoundScreen = dynamic_pointer_cast<EditSoundScreen>(mpc.screens->getScreenComponent("edit-sound"));
+		auto editSoundScreen = mpc.screens->get<EditSoundScreen>("edit-sound");
 		editSoundScreen->setReturnToScreenName("trim");
 		openScreen("edit-sound");
 		break;

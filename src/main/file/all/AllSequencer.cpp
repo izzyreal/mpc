@@ -39,7 +39,7 @@ mpc::file::all::Sequencer::Sequencer(mpc::Mpc& mpc)
 	saveBytes[TC_OFFSET] = noteValue;
 	saveBytes[SECOND_SEQ_ENABLED_OFFSET] = seq->isSecondSequenceEnabled() ? 1 : 0;
 	
-	auto secondSequenceScreen = dynamic_pointer_cast<SecondSeqScreen>(mpc.screens->getScreenComponent("second-seq"));
+	auto secondSequenceScreen = mpc.screens->get<SecondSeqScreen>("second-seq");
 	saveBytes[SECOND_SEQ_INDEX_OFFSET] = secondSequenceScreen->sq;
 }
 

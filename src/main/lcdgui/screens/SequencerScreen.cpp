@@ -91,7 +91,7 @@ void SequencerScreen::open()
 
 	findChild<TextComp>("fk3").lock()->setBlinking(sequencer.lock()->isSoloEnabled());
 
-	auto punchScreen = dynamic_pointer_cast<PunchScreen>(mpc.screens->getScreenComponent("punch"));
+	auto punchScreen = mpc.screens->get<PunchScreen>("punch");
 
 	findChild("function-keys").lock()->Hide(punchScreen->on || (mpc.getControls().lock()->isErasePressed() && sequencer.lock()->isRecordingOrOverdubbing()));
 
@@ -169,7 +169,7 @@ void SequencerScreen::close()
 
 	if (find(begin(screensThatDisablePunch), end(screensThatDisablePunch), nextScreen) != end(screensThatDisablePunch))
 	{
-		auto punchScreen = dynamic_pointer_cast<PunchScreen>(mpc.screens->getScreenComponent("punch"));
+		auto punchScreen = mpc.screens->get<PunchScreen>("punch");
 		punchScreen->on = false;
 	}
     
@@ -511,7 +511,7 @@ void SequencerScreen::function(int i)
 {
 	init();
 	ScreenComponent::function(i);
-	auto punchScreen = dynamic_pointer_cast<PunchScreen>(mpc.screens->getScreenComponent("punch"));
+	auto punchScreen = mpc.screens->get<PunchScreen>("punch");
 
 	if (punchScreen->on)
 	{
@@ -616,7 +616,7 @@ void SequencerScreen::turnWheel(int i)
 		{
 			auto eventNumber = stoi(lastFocus.substr(1, 2));
 
-			auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(mpc.screens->getScreenComponent("step-editor"));
+			auto stepEditorScreen = mpc.screens->get<StepEditorScreen>("step-editor");
 
 			if (dynamic_pointer_cast<mpc::sequencer::NoteEvent>(stepEditorScreen->getVisibleEvents()[eventNumber].lock()))
 			{
@@ -650,7 +650,7 @@ void SequencerScreen::turnWheel(int i)
 	}
 	else if (param.compare("sq") == 0)
 	{
-		auto punchScreen = dynamic_pointer_cast<PunchScreen>(mpc.screens->getScreenComponent("punch"));
+		auto punchScreen = mpc.screens->get<PunchScreen>("punch");
 		
 		if (sequencer.lock()->isPlaying())
 		{
@@ -829,7 +829,7 @@ void SequencerScreen::setPunchRectOn(int i, bool b)
 
 void SequencerScreen::displayPunchWhileRecording()
 {
-	auto punchScreen = dynamic_pointer_cast<PunchScreen>(mpc.screens->getScreenComponent("punch"));
+	auto punchScreen = mpc.screens->get<PunchScreen>("punch");
 	auto controls = mpc.getControls().lock();
 
 	if (punchScreen->on && (controls->isRecPressed() || controls->isOverDubPressed()))
@@ -901,7 +901,7 @@ void SequencerScreen::playStart()
 
 void SequencerScreen::stop()
 {
-	auto punchScreen = dynamic_pointer_cast<PunchScreen>(mpc.screens->getScreenComponent("punch"));
+	auto punchScreen = mpc.screens->get<PunchScreen>("punch");
 
 	if (punchScreen->on)
 	{

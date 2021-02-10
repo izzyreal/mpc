@@ -33,7 +33,7 @@ void StartFineScreen::open()
 
 void StartFineScreen::displayFineWave()
 {
-	auto trimScreen = dynamic_pointer_cast<TrimScreen>(mpc.screens->getScreenComponent("trim"));
+	auto trimScreen = mpc.screens->get<TrimScreen>("trim");
 
 	auto sound = sampler.lock()->getSound().lock();
 
@@ -66,7 +66,7 @@ void StartFineScreen::displayLngthLabel()
 
 void StartFineScreen::displaySmplLngth()
 {
-	auto trimScreen = dynamic_pointer_cast<TrimScreen>(mpc.screens->getScreenComponent("trim"));
+	auto trimScreen = mpc.screens->get<TrimScreen>("trim");
     findField("smpllngth").lock()->setText(trimScreen->smplLngthFix ? "FIX" : "VARI");
 }
 
@@ -99,7 +99,7 @@ void StartFineScreen::turnWheel(int i)
 	init();
 	auto sound = sampler.lock()->getSound().lock();
 	auto startEndLength = static_cast<int>(sound->getEnd() - sound->getStart());
-	auto trimScreen = dynamic_pointer_cast<TrimScreen>(mpc.screens->getScreenComponent("trim"));
+	auto trimScreen = mpc.screens->get<TrimScreen>("trim");
 
 	auto sampleLength = sound->getFrameCount();
 	auto soundInc = getSoundIncrement(i);
@@ -157,7 +157,7 @@ void StartFineScreen::right()
 
 void StartFineScreen::pressEnter()
 {
-	auto trimScreen = dynamic_pointer_cast<TrimScreen>(mpc.screens->getScreenComponent("trim"));
+	auto trimScreen = mpc.screens->get<TrimScreen>("trim");
 	trimScreen->pressEnter();
 	displayStart();
 	displayLngthLabel();

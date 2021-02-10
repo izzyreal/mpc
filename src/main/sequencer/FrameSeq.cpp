@@ -88,7 +88,7 @@ void FrameSeq::work(int nFrames)
 	int swingOffset = (int)((swingPercentage - 50) * (4.0 * 0.01) * (tcValue * 0.5));
 	int start = (*seq->getBarLengths())[seq->getFirstLoopBarIndex()];
 
-	auto punchScreen = dynamic_pointer_cast<PunchScreen>(mpc.screens->getScreenComponent("punch"));
+	auto punchScreen = mpc.screens->get<PunchScreen>("punch");
 
 	auto punch = punchScreen->on && lSequencer->isRecordingOrOverdubbing();
 

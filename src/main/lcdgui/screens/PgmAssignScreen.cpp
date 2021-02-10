@@ -54,7 +54,7 @@ void PgmAssignScreen::function(int i)
 	{
 	case 0:	
 	{
-		auto selectDrumScreen = dynamic_pointer_cast<SelectDrumScreen>(mpc.screens->getScreenComponent("select-drum"));
+		auto selectDrumScreen = mpc.screens->get<SelectDrumScreen>("select-drum");
 		selectDrumScreen->redirectScreen = "program-assign";
 		openScreen("select-drum");
 		break;

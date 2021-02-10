@@ -102,7 +102,7 @@ void TrimScreen::function(int f)
 			return;
 		}
 
-		auto editSoundScreen = dynamic_pointer_cast<EditSoundScreen>(mpc.screens->getScreenComponent("edit-sound"));
+		auto editSoundScreen = mpc.screens->get<EditSoundScreen>("edit-sound");
 		editSoundScreen->setReturnToScreenName("trim");
 		
 		openScreen("edit-sound");

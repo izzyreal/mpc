@@ -406,7 +406,7 @@ void EditSoundScreen::function(int j)
 {
 	baseControls->function(j);
 
-	auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(mpc.screens->getScreenComponent("zone"));
+	auto zoneScreen = mpc.screens->get<ZoneScreen>("zone");
 
 	switch (j)
 	{

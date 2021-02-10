@@ -110,7 +110,7 @@ int Track::getIndex()
 
 weak_ptr<NoteEvent> Track::recordNoteOn()
 {    
-	auto punchScreen = dynamic_pointer_cast<PunchScreen>(mpc.screens->getScreenComponent("punch"));
+	auto punchScreen = mpc.screens->get<PunchScreen>("punch");
 	auto lSequencer = sequencer.lock();
 	
 	auto pos = lSequencer->getTickPosition();
@@ -548,7 +548,7 @@ void Track::playNext()
 	multi = lSequencer->isRecordingModeMulti();
 	_delete = lSequencer->isRecording() && (trackIndex == lSequencer->getActiveTrackIndex() || multi) && (trackIndex < 64);
 	
-	auto punchScreen = dynamic_pointer_cast<PunchScreen>(mpc.screens->getScreenComponent("punch"));
+	auto punchScreen = mpc.screens->get<PunchScreen>("punch");
 
 	if (lSequencer->isRecording() && punchScreen->on && trackIndex < 64)
 	{

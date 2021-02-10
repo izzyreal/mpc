@@ -128,8 +128,8 @@ AllLoader::AllLoader(mpc::Mpc& mpc, mpc::disk::MpcFile* file, bool sequencesOnly
 		
 		auto count = allParser.getCount();
 
-		auto countMetronomeScreen = dynamic_pointer_cast<CountMetronomeScreen>(mpc.screens->getScreenComponent("count-metronome"));
-		auto metronomeSoundScreen = dynamic_pointer_cast<MetronomeSoundScreen>(mpc.screens->getScreenComponent("metronome-sound"));
+		auto countMetronomeScreen = mpc.screens->get<CountMetronomeScreen>("count-metronome");
+		auto metronomeSoundScreen = mpc.screens->get<MetronomeSoundScreen>("metronome-sound");
 
 		countMetronomeScreen->setCountIn(count->getCountInMode());
 		metronomeSoundScreen->setAccentVelo(count->getAccentVelo());
@@ -144,7 +144,7 @@ AllLoader::AllLoader(mpc::Mpc& mpc, mpc::disk::MpcFile* file, bool sequencesOnly
 		lSequencer->setCountEnabled(count->isEnabled());
 
 		auto midiInput = allParser.getMidiInput();
-		auto midiInputScreen = dynamic_pointer_cast<MidiInputScreen>(mpc.screens->getScreenComponent("midi-input"));
+		auto midiInputScreen = mpc.screens->get<MidiInputScreen>("midi-input");
 
 		midiInputScreen->setReceiveCh(midiInput->getReceiveCh());
 		midiInputScreen->setType(midiInput->getFilterType());
@@ -153,7 +153,7 @@ AllLoader::AllLoader(mpc::Mpc& mpc, mpc::disk::MpcFile* file, bool sequencesOnly
 
 		auto trackDests = midiInput->getMultiRecTrackDests();
 		
-		auto multiRecordingSetupScreen = dynamic_pointer_cast<MultiRecordingSetupScreen>(mpc.screens->getScreenComponent("multi-recording-setup"));
+		auto multiRecordingSetupScreen = mpc.screens->get<MultiRecordingSetupScreen>("multi-recording-setup");
 
 		for (int i = 0; i < trackDests.size(); i++) {
 			multiRecordingSetupScreen->getMrsLines()[i]->setTrack(trackDests[i]);
@@ -170,16 +170,16 @@ AllLoader::AllLoader(mpc::Mpc& mpc, mpc::disk::MpcFile* file, bool sequencesOnly
 		auto midiSyncMisc = allParser.getMidiSync();
 				
 		auto misc = allParser.getMisc();
-		auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(mpc.screens->getScreenComponent("step-editor"));
+		auto stepEditorScreen = mpc.screens->get<StepEditorScreen>("step-editor");
 		stepEditorScreen->setAutoStepIncrementEnabled(misc->isAutoStepIncEnabled());
 		stepEditorScreen->setTcValueRecordedNotes(misc->getDurationTcPercentage());
 		stepEditorScreen->setDurationOfRecordedNotes(misc->isDurationOfRecNotesTc());
 
-		auto othersScreen = dynamic_pointer_cast<OthersScreen>(mpc.screens->getScreenComponent("others"));
+		auto othersScreen = mpc.screens->get<OthersScreen>("others");
 
 		othersScreen->setTapAveraging(misc->getTapAvg());
 
-		auto syncScreen = dynamic_pointer_cast<SyncScreen>(mpc.screens->getScreenComponent("sync"));
+		auto syncScreen = mpc.screens->get<SyncScreen>("sync");
 
 		syncScreen->receiveMMCEnabled = misc->isInReceiveMMCEnabled();
 		syncScreen->sendMMCEnabled = midiSyncMisc->isSendMMCEnabled();
@@ -192,7 +192,7 @@ AllLoader::AllLoader(mpc::Mpc& mpc, mpc::disk::MpcFile* file, bool sequencesOnly
 		
 		lSequencer->setSecondSequenceEnabled(sequencer->secondSeqEnabled);
 
-		auto secondSequenceScreen = dynamic_pointer_cast<SecondSeqScreen>(mpc.screens->getScreenComponent("second-seq"));
+		auto secondSequenceScreen = mpc.screens->get<SecondSeqScreen>("second-seq");
 		secondSequenceScreen->sq = sequencer->secondSeqIndex;
 		
 		auto songScreen = mpc.screens->get<SongScreen>("song");

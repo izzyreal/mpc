@@ -34,8 +34,8 @@ void ZoneStartFineScreen::open()
 
 void ZoneStartFineScreen::displayFineWave()
 {
-	auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(mpc.screens->getScreenComponent("zone"));
-	auto trimScreen = dynamic_pointer_cast<TrimScreen>(mpc.screens->getScreenComponent("trim"));
+	auto zoneScreen = mpc.screens->get<ZoneScreen>("zone");
+	auto trimScreen = mpc.screens->get<TrimScreen>("trim");
 
 	auto sound = sampler.lock()->getSound().lock();
 
@@ -50,13 +50,13 @@ void ZoneStartFineScreen::displayFineWave()
 
 void ZoneStartFineScreen::displayStart()
 {
-	auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(mpc.screens->getScreenComponent("zone"));
+	auto zoneScreen = mpc.screens->get<ZoneScreen>("zone");
 	findField("start").lock()->setTextPadded(zoneScreen->getZoneStart(zoneScreen->zone), " ");
 }
 
 void ZoneStartFineScreen::displayLngthLabel()
 {
-	auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(mpc.screens->getScreenComponent("zone"));
+	auto zoneScreen = mpc.screens->get<ZoneScreen>("zone");
 	findLabel("lngth").lock()->setTextPadded(zoneScreen->getZoneEnd(zoneScreen->zone) - zoneScreen->getZoneStart(zoneScreen->zone), " ");
 }
 
@@ -89,7 +89,7 @@ void ZoneStartFineScreen::turnWheel(int i)
 	auto sound = sampler.lock()->getSound().lock();
 	auto startEndLength = static_cast<int>(sound->getEnd() - sound->getStart());
 	auto loopLength = static_cast<int>((sound->getEnd() - sound->getLoopTo()));
-	auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(mpc.screens->getScreenComponent("zone"));
+	auto zoneScreen = mpc.screens->get<ZoneScreen>("zone");
 
 	auto sampleLength = sound->getFrameCount();
 
@@ -128,7 +128,7 @@ void ZoneStartFineScreen::right()
 
 void ZoneStartFineScreen::pressEnter()
 {
-	auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(mpc.screens->getScreenComponent("zone"));
+	auto zoneScreen = mpc.screens->get<ZoneScreen>("zone");
 	zoneScreen->pressEnter();
 
 	displayStart();

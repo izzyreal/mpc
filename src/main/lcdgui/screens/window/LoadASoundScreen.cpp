@@ -21,7 +21,7 @@ LoadASoundScreen::LoadASoundScreen(mpc::Mpc& mpc, const int layerIndex)
 void LoadASoundScreen::open()
 {
 	init();
-	auto loadScreen = dynamic_pointer_cast<LoadScreen>(mpc.screens->getScreenComponent("load"));
+	auto loadScreen = mpc.screens->get<LoadScreen>("load");
 	findLabel("filename").lock()->setText("File:" + loadScreen->getSelectedFileName());
 	displayAssignToNote();
 	mpc.addObserver(this); // Subscribe to "padandnote" messages

@@ -25,7 +25,7 @@ void SaveApsFileScreen::turnWheel(int i)
 {
 	init();
 	auto nameScreen = mpc.screens->get<NameScreen>("name");
-	auto saveAProgramScreen = dynamic_pointer_cast<SaveAProgramScreen>(mpc.screens->getScreenComponent("save-a-program"));
+	auto saveAProgramScreen = mpc.screens->get<SaveAProgramScreen>("save-a-program");
 
 	if (param.compare("file") == 0)
 	{
@@ -71,12 +71,12 @@ void SaveApsFileScreen::displayFile()
 
 void SaveApsFileScreen::displaySave()
 {
-	auto saveAProgramScreen = dynamic_pointer_cast<SaveAProgramScreen>(mpc.screens->getScreenComponent("save-a-program"));
+	auto saveAProgramScreen = mpc.screens->get<SaveAProgramScreen>("save-a-program");
 	findField("save").lock()->setText(apsSaveNames[saveAProgramScreen->save]);
 }
 
 void SaveApsFileScreen::displayReplaceSameSounds()
 {
-	auto saveAProgramScreen = dynamic_pointer_cast<SaveAProgramScreen>(mpc.screens->getScreenComponent("save-a-program"));
+	auto saveAProgramScreen = mpc.screens->get<SaveAProgramScreen>("save-a-program");
 	findField("replace-same-sounds").lock()->setText(string(saveAProgramScreen->replaceSameSounds ? "YES" : "NO"));
 }

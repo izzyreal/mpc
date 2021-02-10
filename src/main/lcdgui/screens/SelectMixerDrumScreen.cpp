@@ -14,7 +14,7 @@ SelectMixerDrumScreen::SelectMixerDrumScreen(mpc::Mpc& mpc, const int layerIndex
 
 void SelectMixerDrumScreen::open()
 {
-	auto drumScreen = dynamic_pointer_cast<DrumScreen>(mpc.screens->getScreenComponent("drum"));
+	auto drumScreen = mpc.screens->get<DrumScreen>("drum");
 	ls.lock()->setFunctionKeysArrangement(drumScreen->drum);
 }
 
@@ -24,7 +24,7 @@ void SelectMixerDrumScreen::function(int i)
 
 	if (i < 4)
 	{
-		auto drumScreen = dynamic_pointer_cast<DrumScreen>(mpc.screens->getScreenComponent("drum"));
+		auto drumScreen = mpc.screens->get<DrumScreen>("drum");
 		drumScreen->drum = i;
 		openScreen("mixer");
 	}

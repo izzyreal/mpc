@@ -115,7 +115,7 @@ void MpcMidiInput::transport(MidiMessage* msg, int timeStamp)
 	auto mce = dynamic_pointer_cast<mpc::sequencer::MidiClockEvent>(event);
 	auto note = dynamic_pointer_cast<mpc::sequencer::NoteEvent>(event);
 
-	auto syncScreen = dynamic_pointer_cast<SyncScreen>(mpc.screens->getScreenComponent("sync"));
+	auto syncScreen = mpc.screens->get<SyncScreen>("sync");
 
 	if (mce && syncScreen->in == index)
 	{
@@ -168,7 +168,7 @@ void MpcMidiInput::transport(MidiMessage* msg, int timeStamp)
 			}
 		}
 		
-		auto midiOutputScreen = dynamic_pointer_cast<MidiOutputScreen>(mpc.screens->getScreenComponent("midi-output"));
+		auto midiOutputScreen = mpc.screens->get<MidiOutputScreen>("midi-output");
 
 		switch (midiOutputScreen->getSoftThru())
 		{

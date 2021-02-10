@@ -94,7 +94,7 @@ int LayeredScreen::openScreen(string screenName)
 	}
 	else if (screenName.compare("sample") == 0)
 	{
-		auto sampleScreen = dynamic_pointer_cast<SampleScreen>(mpc.screens->getScreenComponent("sample"));
+		auto sampleScreen = mpc.screens->get<SampleScreen>("sample");
 		bool muteMonitor = sampleScreen->getMonitor() == 0;
 		ams->muteMonitor(muteMonitor);
 		ams->getSoundRecorder().lock()->setSampleScreenActive(true);

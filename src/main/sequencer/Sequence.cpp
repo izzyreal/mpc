@@ -168,8 +168,8 @@ void Sequence::createClickTrack()
 	auto den = 0;
 	auto denTicks = 0;
 
-	auto countMetronomeScreen = dynamic_pointer_cast<CountMetronomeScreen>(mpc.screens->getScreenComponent("count-metronome"));
-	auto metronomeSoundScreen = dynamic_pointer_cast<MetronomeSoundScreen>(mpc.screens->getScreenComponent("metronome-sound"));
+	auto countMetronomeScreen = mpc.screens->get<CountMetronomeScreen>("count-metronome");
+	auto metronomeSoundScreen = mpc.screens->get<MetronomeSoundScreen>("metronome-sound");
 
 	for (int i = 0; i < bars; i++)
 	{

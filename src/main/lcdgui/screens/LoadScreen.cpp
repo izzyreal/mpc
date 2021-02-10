@@ -166,7 +166,7 @@ void LoadScreen::openWindow()
 	if (!disk)
 		return;
 
-	auto directoryScreen = dynamic_pointer_cast<DirectoryScreen>(mpc.screens->getScreenComponent("directory"));
+	auto directoryScreen = mpc.screens->get<DirectoryScreen>("directory");
 	directoryScreen->previousScreenName = "load";
 	directoryScreen->findYOffset0();
 	directoryScreen->setYOffset1(fileLoad);

@@ -22,7 +22,7 @@ void LoadApsFileScreen::function(int i)
 		break;
 	case 4:
 	{
-		auto loadScreen = dynamic_pointer_cast<LoadScreen>(mpc.screens->getScreenComponent("load"));
+		auto loadScreen = mpc.screens->get<LoadScreen>("load");
 		try
 		{
 			apsLoader = make_unique<mpc::disk::ApsLoader>(mpc, loadScreen->getSelectedFile());

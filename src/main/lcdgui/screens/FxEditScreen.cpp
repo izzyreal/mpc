@@ -44,7 +44,7 @@ void FxEditScreen::turnWheel(int i)
 	init();
 	if (param.compare("drum") == 0)
 	{
-		auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(mpc.screens->getScreenComponent("mixer-setup"));
+		auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>("mixer-setup");
 		mixerSetupScreen->setFxDrum(mixerSetupScreen->getFxDrum() + i);
 	}
 }
@@ -117,7 +117,7 @@ void FxEditScreen::checkEffects() {
 
 void FxEditScreen::displayDrum()
 {
-	auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(mpc.screens->getScreenComponent("mixer-setup"));
+	auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>("mixer-setup");
 	findField("drum").lock()->setText(to_string(mixerSetupScreen->getFxDrum() + 1));
 }
 

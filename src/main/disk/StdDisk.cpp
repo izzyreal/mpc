@@ -112,7 +112,7 @@ void StdDisk::initFiles()
 
 	renameFilesToAkai();
 
-	auto loadScreen = dynamic_pointer_cast<LoadScreen>(mpc.screens->getScreenComponent("load"));
+	auto loadScreen = mpc.screens->get<LoadScreen>("load");
 
 	auto view = loadScreen->view;
 	auto dirList = getDir()->listFiles();

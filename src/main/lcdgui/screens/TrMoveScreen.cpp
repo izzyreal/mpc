@@ -39,7 +39,7 @@ void TrMoveScreen::turnWheel(int i)
 	}
 	else if (param.compare("sq") == 0)
 	{
-		auto eventsScreen = dynamic_pointer_cast<EventsScreen>(mpc.screens->getScreenComponent("events"));
+		auto eventsScreen = mpc.screens->get<EventsScreen>("events");
 		eventsScreen->setFromSq(sequencer.lock()->getActiveSequenceIndex() + i);
 		displaySq();
 		displayTrFields();
@@ -111,7 +111,7 @@ void TrMoveScreen::function(int i)
 	case 1:
 	case 3:
 	{
-		auto eventsScreen = dynamic_pointer_cast<EventsScreen>(mpc.screens->getScreenComponent("events"));
+		auto eventsScreen = mpc.screens->get<EventsScreen>("events");
 		eventsScreen->tab = i;
 		openScreen(eventsScreen->tabNames[eventsScreen->tab]);
 		break;
@@ -173,7 +173,7 @@ void TrMoveScreen::displayTrLabels()
 		}
 	}
 
-	auto eventsScreen = dynamic_pointer_cast<EventsScreen>(mpc.screens->getScreenComponent("events"));
+	auto eventsScreen = mpc.screens->get<EventsScreen>("events");
 	auto sequence = mpc.getSequencer().lock()->getActiveSequence().lock();
 
 	if (tr0Index >= 0)
@@ -218,7 +218,7 @@ void TrMoveScreen::displayTrLabels()
 
 void TrMoveScreen::displayTrFields()
 {
-	auto eventsScreen = dynamic_pointer_cast<EventsScreen>(mpc.screens->getScreenComponent("events"));
+	auto eventsScreen = mpc.screens->get<EventsScreen>("events");
 	auto sequence = mpc.getSequencer().lock()->getActiveSequence().lock();
 	
 	if (isSelected())

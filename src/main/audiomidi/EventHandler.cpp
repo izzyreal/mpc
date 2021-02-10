@@ -70,7 +70,7 @@ void EventHandler::handleNoThru(weak_ptr<mpc::sequencer::Event> e, mpc::sequence
 
 	auto lSequencer = sequencer.lock();
 
-	auto countMetronomeScreen = dynamic_pointer_cast<CountMetronomeScreen>(mpc.screens->getScreenComponent("count-metronome"));
+	auto countMetronomeScreen = mpc.screens->get<CountMetronomeScreen>("count-metronome");
 
 	if (track->getName().compare("click") == 0)
 	{
@@ -127,7 +127,7 @@ void EventHandler::handleNoThru(weak_ptr<mpc::sequencer::Event> e, mpc::sequence
 		auto midiOutputStreamA = &mpcMidiPorts->getReceivers()[0];
 		auto midiOutputStreamB = &mpcMidiPorts->getReceivers()[1];
 
-		auto syncScreen = dynamic_pointer_cast<SyncScreen>(mpc.screens->getScreenComponent("sync"));
+		auto syncScreen = mpc.screens->get<SyncScreen>("sync");
 
 		switch (syncScreen->out)
 		{
@@ -193,7 +193,7 @@ void EventHandler::handleNoThru(weak_ptr<mpc::sequencer::Event> e, mpc::sequence
 		auto p = lSampler->getProgram(lSampler->getDrumBusProgramNumber(track->getBus())).lock();
 		auto mixer = p->getStereoMixerChannel(pad).lock();
 	
-		auto mixerSetupScreen = dynamic_pointer_cast<MixerSetupScreen>(mpc.screens->getScreenComponent("mixer-setup"));
+		auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>("mixer-setup");
 
 		if (mixerSetupScreen->isStereoMixSourceDrum())
 		{
@@ -239,7 +239,7 @@ void EventHandler::midiOut(weak_ptr<mpc::sequencer::Event> e, mpc::sequencer::Tr
 			}
 		}
 
-		auto transScreen = dynamic_pointer_cast<TransScreen>(mpc.screens->getScreenComponent("trans"));
+		auto transScreen = mpc.screens->get<TransScreen>("trans");
 
 		if (track->getIndex() < 64 && transScreen->transposeAmount != 0 &&
 			(transScreen->tr == -1 || transScreen->tr == noteEvent->getTrack()) &&
@@ -279,7 +279,7 @@ void EventHandler::midiOut(weak_ptr<mpc::sequencer::Event> e, mpc::sequencer::Tr
 			notifyLetter = "b";
 		}
 
-		auto directToDiskRecorderScreen = dynamic_pointer_cast<VmpcDirectToDiskRecorderScreen>(mpc.screens->getScreenComponent("vmpc-direct-to-disk-recorder"));
+		auto directToDiskRecorderScreen = mpc.screens->get<VmpcDirectToDiskRecorderScreen>("vmpc-direct-to-disk-recorder");
 
 		if (!(mpc.getAudioMidiServices().lock()->isBouncing() &&
 			directToDiskRecorderScreen->offline) &&

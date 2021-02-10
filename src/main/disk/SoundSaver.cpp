@@ -50,7 +50,7 @@ void SoundSaver::saveSounds()
 
 		if (lDisk->checkExists(fileName + ext))
 		{
-			auto saveAProgramScreen = dynamic_pointer_cast<SaveAProgramScreen>(mpc.screens->getScreenComponent("save-a-program"));
+			auto saveAProgramScreen = mpc.screens->get<SaveAProgramScreen>("save-a-program");
 
 			if (saveAProgramScreen->replaceSameSounds)
                 lDisk->getFile(fileName + ext)->del(); // possibly prepend auto success =

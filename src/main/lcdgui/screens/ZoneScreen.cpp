@@ -108,7 +108,7 @@ void ZoneScreen::function(int f)
 		if (sampler.lock()->getSoundCount() == 0)
 			return;
 
-		auto editSoundScreen = dynamic_pointer_cast<EditSoundScreen>(mpc.screens->getScreenComponent("edit-sound"));
+		auto editSoundScreen = mpc.screens->get<EditSoundScreen>("edit-sound");
 		editSoundScreen->setReturnToScreenName("zone");
 		openScreen("edit-sound");
 		break;
@@ -210,7 +210,7 @@ void ZoneScreen::displayWave()
 	}
 
 	auto sampleData = sound->getSampleData();
-	auto trimScreen = dynamic_pointer_cast<TrimScreen>(mpc.screens->getScreenComponent("trim"));
+	auto trimScreen = mpc.screens->get<TrimScreen>("trim");
 	findWave().lock()->setSampleData(sampleData, sampler.lock()->getSound().lock()->isMono(), trimScreen->view);
 	findWave().lock()->setSelection(getZoneStart(zone), getZoneEnd(zone));
 }
@@ -402,14 +402,14 @@ void ZoneScreen::pressEnter()
 	{
 		if (param.compare("st") == 0 || param.compare("start") == 0)
 		{
-			auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(mpc.screens->getScreenComponent("zone"));
+			auto zoneScreen = mpc.screens->get<ZoneScreen>("zone");
 			zoneScreen->setZoneStart(zoneScreen->zone, candidate);
 			displaySt();
 			displayWave();
 		}
 		else if (param.compare("end") == 0)
 		{
-			auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(mpc.screens->getScreenComponent("zone"));
+			auto zoneScreen = mpc.screens->get<ZoneScreen>("zone");
 			zoneScreen->setZoneEnd(zoneScreen->zone, candidate);
 			displayEnd();
 			displayWave();

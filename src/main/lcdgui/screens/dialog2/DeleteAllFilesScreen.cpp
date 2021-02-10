@@ -55,8 +55,8 @@ void DeleteAllFilesScreen::function(int i)
 
 		if (success)
 		{
-			auto loadScreen = dynamic_pointer_cast<LoadScreen>(mpc.screens->getScreenComponent("load"));
-			auto directoryScreen = dynamic_pointer_cast<DirectoryScreen>(mpc.screens->getScreenComponent("directory"));
+			auto loadScreen = mpc.screens->get<LoadScreen>("load");
+			auto directoryScreen = mpc.screens->get<DirectoryScreen>("directory");
 			loadScreen->fileLoad = 0;
 			directoryScreen->yOffset1 = 0;
 			mpc.getDisk().lock()->initFiles();

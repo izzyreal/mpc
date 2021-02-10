@@ -43,7 +43,7 @@ void DrumScreen::function(int f)
         break;
     case 2:
 	{
-		auto selectDrumScreen = dynamic_pointer_cast<SelectDrumScreen>(mpc.screens->getScreenComponent("select-drum"));
+		auto selectDrumScreen = mpc.screens->get<SelectDrumScreen>("select-drum");
 		selectDrumScreen->redirectScreen = "drum";
 		openScreen("select-drum");
 		break;

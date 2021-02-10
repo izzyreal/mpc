@@ -72,7 +72,7 @@ void Sampler::setSoundIndex(int i)
 
 	soundIndex = i;
 
-	auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(mpc.screens->getScreenComponent("zone"));
+	auto zoneScreen = mpc.screens->get<ZoneScreen>("zone");
 	zoneScreen->initZones();
 }
 
@@ -182,7 +182,7 @@ void Sampler::init()
 
 void Sampler::playMetronome(mpc::sequencer::NoteEvent* event, int framePos)
 {
-	auto metronomeSoundScreen = dynamic_pointer_cast<MetronomeSoundScreen>(mpc.screens->getScreenComponent("metronome-sound"));
+	auto metronomeSoundScreen = mpc.screens->get<MetronomeSoundScreen>("metronome-sound");
 	auto soundNumber = -2;
 
 	auto velocity = event->getVelocity();
@@ -643,7 +643,7 @@ void Sampler::playX()
 
 	if (playX_ == 1)
 	{
-		auto zoneScreen = dynamic_pointer_cast<ZoneScreen>(mpc.screens->getScreenComponent("zone"));
+		auto zoneScreen = mpc.screens->get<ZoneScreen>("zone");
 		auto zone = zoneScreen->getZone();
 		start = zone[0];
 		end = zone[1];

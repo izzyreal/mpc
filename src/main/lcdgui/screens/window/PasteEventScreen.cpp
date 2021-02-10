@@ -24,7 +24,7 @@ void PasteEventScreen::function(int i)
 	switch (i)
 	{
 	case 4:
-		auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(mpc.screens->getScreenComponent("step-editor"));
+		auto stepEditorScreen = mpc.screens->get<StepEditorScreen>("step-editor");
 		for (auto& event : stepEditorScreen->getPlaceHolder())
 		{
 			auto eventClone = track.lock()->cloneEvent(event).lock();

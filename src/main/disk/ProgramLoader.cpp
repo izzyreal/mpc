@@ -31,7 +31,7 @@ using namespace std;
 ProgramLoader::ProgramLoader(mpc::Mpc& _mpc, weak_ptr<MpcFile> _file, const int replaceIndex)
 : mpc(_mpc), file(_file), replace (replaceIndex != -1)
 {
-    auto cantFindFileScreen = dynamic_pointer_cast<CantFindFileScreen>(mpc.screens->getScreenComponent("cant-find-file"));
+    auto cantFindFileScreen = mpc.screens->get<CantFindFileScreen>("cant-find-file");
     cantFindFileScreen->skipAll = false;
     
     loadProgramThread = thread(&ProgramLoader::static_loadProgram, this, replaceIndex);
@@ -163,7 +163,7 @@ void ProgramLoader::showPopup(string name, string ext, int sampleSize)
 
 void ProgramLoader::notFound(string soundFileName, string ext)
 {
-	auto cantFindFileScreen = dynamic_pointer_cast<CantFindFileScreen>(mpc.screens->getScreenComponent("cant-find-file"));
+	auto cantFindFileScreen = mpc.screens->get<CantFindFileScreen>("cant-find-file");
 	auto skipAll = cantFindFileScreen->skipAll;
 
 	if (!skipAll)

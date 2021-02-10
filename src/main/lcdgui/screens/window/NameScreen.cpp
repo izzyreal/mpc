@@ -163,7 +163,7 @@ void NameScreen::saveName()
 
 	if (parameterName.compare("output-folder") == 0)
 	{
-		auto directToDiskRecorderScreen = dynamic_pointer_cast<VmpcDirectToDiskRecorderScreen>(mpc.screens->getScreenComponent("vmpc-direct-to-disk-recorder"));
+		auto directToDiskRecorderScreen = mpc.screens->get<VmpcDirectToDiskRecorderScreen>("vmpc-direct-to-disk-recorder");
 		directToDiskRecorderScreen->outputFolder = getName();
 		openScreen("vmpc-direct-to-disk-recorder");
 		resetNameScreen();
@@ -239,7 +239,7 @@ void NameScreen::saveName()
 	}
 	else if (parameterName.compare("create-new-program") == 0)
 	{
-		auto createNewProgramScreen = dynamic_pointer_cast<CreateNewProgramScreen>(mpc.screens->getScreenComponent("create-new-program"));
+		auto createNewProgramScreen = mpc.screens->get<CreateNewProgramScreen>("create-new-program");
 		createNewProgramScreen->newName = getName();
 		openScreen("program");
 		resetNameScreen();
@@ -247,7 +247,7 @@ void NameScreen::saveName()
 	}
 	else if (parameterName.compare("autochrom") == 0)
 	{
-		auto autoChromaticAssignmentScreen = dynamic_pointer_cast<AutoChromaticAssignmentScreen>(mpc.screens->getScreenComponent("auto-chromatic-assignment"));
+		auto autoChromaticAssignmentScreen = mpc.screens->get<AutoChromaticAssignmentScreen>("auto-chromatic-assignment");
 		autoChromaticAssignmentScreen->newName = getName();
 		openScreen("auto-chromatic-assignment");
 		resetNameScreen();
@@ -256,7 +256,7 @@ void NameScreen::saveName()
 	}
 	else if (parameterName.compare("rename") == 0)
 	{
-		auto directoryScreen = dynamic_pointer_cast<DirectoryScreen>(mpc.screens->getScreenComponent("directory"));
+		auto directoryScreen = mpc.screens->get<DirectoryScreen>("directory");
 		auto file = directoryScreen->getSelectedFile();
 		auto ext = mpc::Util::splitName(file->getName())[1];
 		
@@ -325,10 +325,10 @@ void NameScreen::saveName()
 			{
 				if (disk->getFileName(i).compare(StrUtil::toUpper(getName())) == 0)
 				{
-					auto loadScreen = dynamic_pointer_cast<LoadScreen>(mpc.screens->getScreenComponent("load"));
+					auto loadScreen = mpc.screens->get<LoadScreen>("load");
 					loadScreen->setFileLoad(counter);
 
-					auto directoryScreen = dynamic_pointer_cast<DirectoryScreen>(mpc.screens->getScreenComponent("directory"));
+					auto directoryScreen = mpc.screens->get<DirectoryScreen>("directory");
 
 					if (counter > 4)
 						directoryScreen->yOffset1 = counter - 4;
@@ -390,14 +390,14 @@ void NameScreen::saveName()
 	}
 	else if (prevScreen.compare("midi-output") == 0)
 	{
-		auto midiOutputScreen = dynamic_pointer_cast<MidiOutputScreen>(mpc.screens->getScreenComponent("midi-output"));
+		auto midiOutputScreen = mpc.screens->get<MidiOutputScreen>("midi-output");
 		sequencer.lock()->getActiveSequence().lock()->setDeviceName(midiOutputScreen->getDeviceNumber() + 1, getName().substr(0, 8));
 		openScreen(prevScreen);
 		resetNameScreen();
 	}
 	else if (prevScreen.compare("edit-sound") == 0)
 	{
-		auto editSoundScreen = dynamic_pointer_cast<EditSoundScreen>(mpc.screens->getScreenComponent("edit-sound"));
+		auto editSoundScreen = mpc.screens->get<EditSoundScreen>("edit-sound");
 		editSoundScreen->setNewName(getName());
 		openScreen(prevScreen);
 		resetNameScreen();
@@ -416,7 +416,7 @@ void NameScreen::saveName()
 		if (sampler.lock()->isSoundNameOccupied(getName()))
 			return;
 
-		auto resampleScreen = dynamic_pointer_cast<ResampleScreen>(mpc.screens->getScreenComponent("resample"));
+		auto resampleScreen = mpc.screens->get<ResampleScreen>("resample");
 		resampleScreen->setNewName(getName());
 		openScreen(prevScreen);
 		resetNameScreen();
@@ -445,7 +445,7 @@ void NameScreen::saveName()
 	}
 	else if (prevScreen.compare("copy-sound") == 0)
 	{
-		auto copySoundScreen = dynamic_pointer_cast<CopySoundScreen>(mpc.screens->getScreenComponent("copy-sound"));
+		auto copySoundScreen = mpc.screens->get<CopySoundScreen>("copy-sound");
 		copySoundScreen->setNewName(getName());
 		openScreen(prevScreen);
 		resetNameScreen();

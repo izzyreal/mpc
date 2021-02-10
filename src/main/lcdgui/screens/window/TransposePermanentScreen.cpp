@@ -21,7 +21,7 @@ void TransposePermanentScreen::function(int i)
 	switch (i)
 	{
 	case 4:
-		auto transScreen = dynamic_pointer_cast<TransScreen>(mpc.screens->getScreenComponent("trans"));
+		auto transScreen = mpc.screens->get<TransScreen>("trans");
 		auto all = transScreen->tr == -1;
 
 		vector<int> tracks;

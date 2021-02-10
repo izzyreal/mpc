@@ -21,7 +21,7 @@ std::vector<int> Pad::originalPadNotes = {	37, 36, 42, 82, 40, 38, 46, 44, 48, 4
 
 std::vector<int>& Pad::getPadNotes(mpc::Mpc& mpc)
 {
-	auto vmpcSettingsScreen = dynamic_pointer_cast<VmpcSettingsScreen>(mpc.screens->getScreenComponent("vmpc-settings"));
+	auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
 	
 	if (vmpcSettingsScreen->initialPadMapping == 0)
 	{
@@ -51,7 +51,7 @@ void Pad::setNote(int i)
 	if (i < 34 || i > 98)
 		return;
 
-	auto pgmAssignScreen = dynamic_pointer_cast<PgmAssignScreen>(mpc.screens->getScreenComponent("program-assign"));
+	auto pgmAssignScreen = mpc.screens->get<PgmAssignScreen>("program-assign");
 
 	if (pgmAssignScreen->padAssign)
 		(*mpc.getSampler().lock()->getMasterPadAssign())[index] = i;
@@ -61,7 +61,7 @@ void Pad::setNote(int i)
 
 int Pad::getNote()
 {
-	auto pgmAssignScreen = dynamic_pointer_cast<PgmAssignScreen>(mpc.screens->getScreenComponent("program-assign"));
+	auto pgmAssignScreen = mpc.screens->get<PgmAssignScreen>("program-assign");
 
 	if (pgmAssignScreen->padAssign)
 		return (*mpc.getSampler().lock()->getMasterPadAssign())[index];

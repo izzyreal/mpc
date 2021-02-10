@@ -18,7 +18,7 @@ void SecondSeqScreen::open()
 
 void SecondSeqScreen::function(int i)
 {
-    auto punchScreen = dynamic_pointer_cast<PunchScreen>(mpc.screens->getScreenComponent("punch"));
+    auto punchScreen = mpc.screens->get<PunchScreen>("punch");
 
     switch (i)
     {

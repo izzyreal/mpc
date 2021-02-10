@@ -41,7 +41,7 @@ weak_ptr<Event> EventAdapter::convert(ShortMessage* msg)
 		return midiClockEvent;
 	}
 
-	auto midiInputScreen = dynamic_pointer_cast<MidiInputScreen>(mpc.screens->getScreenComponent("midi-input"));
+	auto midiInputScreen = mpc.screens->get<MidiInputScreen>("midi-input");
 
 	if (midiInputScreen->getReceiveCh() != -1 && msg->getChannel() != midiInputScreen->getReceiveCh())
 		return {};
@@ -58,7 +58,7 @@ weak_ptr<Event> EventAdapter::convert(ShortMessage* msg)
 
 		auto track = sequencer.lock()->getActiveTrackIndex();
 		
-		auto screen = dynamic_pointer_cast<MultiRecordingSetupScreen>(mpc.screens->getScreenComponent("multi-recording-setup"));
+		auto screen = mpc.screens->get<MultiRecordingSetupScreen>("multi-recording-setup");
 		auto mrs = screen->getMrsLines();
 
 		if (sequencer.lock()->isRecordingModeMulti())

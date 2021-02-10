@@ -24,7 +24,7 @@ void LoadASequenceScreen::open()
 	auto newSeq = sequencer.lock()->createSeqInPlaceHolder().lock();
 	newSeq->init(2);
 
-	auto loadScreen = dynamic_pointer_cast<LoadScreen>(mpc.screens->getScreenComponent("load"));
+	auto loadScreen = mpc.screens->get<LoadScreen>("load");
 	auto ext = FileUtil::splitName(loadScreen->getSelectedFileName())[1];
 
 	if (ext.compare("mid") == 0 || ext.compare("MID") == 0)

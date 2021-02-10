@@ -93,7 +93,7 @@ void FileExistsScreen::function(int i)
 		{
 			auto s = sampler.lock()->getSound().lock();
 
-			auto saveASoundScreen = dynamic_pointer_cast<SaveASoundScreen>(mpc.screens->getScreenComponent("save-a-sound"));
+			auto saveASoundScreen = mpc.screens->get<SaveASoundScreen>("save-a-sound");
 
 			auto type = saveASoundScreen->fileType;
 

@@ -24,12 +24,12 @@ Misc::Misc(vector<char> b)
 
 Misc::Misc(mpc::Mpc& mpc)
 {
-	auto stepEditorScreen = dynamic_pointer_cast<StepEditorScreen>(mpc.screens->getScreenComponent("step-editor"));
-	auto othersScreen = dynamic_pointer_cast<OthersScreen>(mpc.screens->getScreenComponent("others"));
+	auto stepEditorScreen = mpc.screens->get<StepEditorScreen>("step-editor");
+	auto othersScreen = mpc.screens->get<OthersScreen>("others");
 	saveBytes = vector<char>(LENGTH);
 	saveBytes[TAP_AVG_OFFSET] = (char)(othersScreen->getTapAveraging());
 
-	auto syncScreen = dynamic_pointer_cast<SyncScreen>(mpc.screens->getScreenComponent("sync"));
+	auto syncScreen = mpc.screens->get<SyncScreen>("sync");
 
 	saveBytes[MIDI_SYNC_IN_RECEIVE_MMC_OFFSET] = (char)(syncScreen->receiveMMCEnabled ? 1 : 0);
 	saveBytes[AUTO_STEP_INCREMENT_OFFSET] = (char)(stepEditorScreen->isAutoStepIncrementEnabled() ? 1 : 0);

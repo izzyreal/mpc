@@ -89,7 +89,7 @@ void MixerStrip::setValueB(int i)
 
 void MixerStrip::initLabels()
 {
-	auto mixerScreen = dynamic_pointer_cast<MixerScreen>(mpc.screens->getScreenComponent("mixer"));
+	auto mixerScreen = mpc.screens->get<MixerScreen>("mixer");
 
 	if (mixerScreen->getTab() == 0)
 	{
@@ -165,7 +165,7 @@ void MixerStrip::setSelection(int i)
 
 void MixerStrip::setValueAString(string str)
 {
-	auto mixerScreen = dynamic_pointer_cast<MixerScreen>(mpc.screens->getScreenComponent("mixer"));
+	auto mixerScreen = mpc.screens->get<MixerScreen>("mixer");
 
 	if (mixerScreen->getTab() == 1)
 	{

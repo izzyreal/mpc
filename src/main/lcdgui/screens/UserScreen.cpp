@@ -44,7 +44,7 @@ void UserScreen::function(int i)
 		case 1:
 		case 2:
 		{
-			auto eventsScreen = dynamic_pointer_cast<EventsScreen>(mpc.screens->getScreenComponent("events"));
+			auto eventsScreen = mpc.screens->get<EventsScreen>("events");
 			eventsScreen->tab = i;
 			openScreen(eventsScreen->tabNames[eventsScreen->tab]);
 			break;

@@ -104,7 +104,7 @@ void SoundRecorder::stop()
 	{
 		auto s = sound.lock();
 
-		auto sampleScreen = dynamic_pointer_cast<SampleScreen>(mpc.screens->getScreenComponent("sample"));
+		auto sampleScreen = mpc.screens->get<SampleScreen>("sample");
 		auto preRecFrames = (int)(44.1 * sampleScreen->preRec);
 
 		auto frameCount = s->getOscillatorControls()->getFrameCount();
@@ -150,7 +150,7 @@ int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf, int nFrame
 	applyGain(inputGain * 0.01, left);
 	applyGain(inputGain * 0.01, right);
 
-	auto sampleScreen = dynamic_pointer_cast<SampleScreen>(mpc.screens->getScreenComponent("sample"));
+	auto sampleScreen = mpc.screens->get<SampleScreen>("sample");
 
 	if (sampleScreenActive.load())
 	{

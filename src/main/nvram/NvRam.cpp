@@ -118,7 +118,7 @@ int NvRam::getSlider()
 
 void NvRam::saveVmpcSettings(mpc::Mpc& mpc)
 {
-	auto vmpcSettingsScreen = dynamic_pointer_cast<VmpcSettingsScreen>(mpc.screens->getScreenComponent("vmpc-settings"));
+	auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
 	string fileName = mpc::Paths::resPath() + "vmpc-specific.ini";
 
 	File file(fileName, nullptr);
@@ -145,7 +145,7 @@ void NvRam::loadVmpcSettings(mpc::Mpc& mpc)
 	if (!file.exists() || file.getLength() != 2)
 		return;
 
-	auto vmpcSettingsScreen = dynamic_pointer_cast<VmpcSettingsScreen>(mpc.screens->getScreenComponent("vmpc-settings"));
+	auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
 	
 	vector<char> bytes(2);
 	file.getData(&bytes);

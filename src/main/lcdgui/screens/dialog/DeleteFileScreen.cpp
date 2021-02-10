@@ -33,7 +33,7 @@ void DeleteFileScreen::function(int i)
 		openScreen("delete-all-files");
 		break;
 	case 4:
-		auto directoryScreen = dynamic_pointer_cast<DirectoryScreen>(mpc.screens->getScreenComponent("directory"));
+		auto directoryScreen = mpc.screens->get<DirectoryScreen>("directory");
 		openScreen("popup");
 		auto popupScreen = mpc.screens->get<PopupScreen>("popup");
 		popupScreen->setText("Delete:" + directoryScreen->getSelectedFile()->getName());
@@ -62,10 +62,10 @@ void DeleteFileScreen::deleteFile()
 		disk->flush();
 		disk->initFiles();
 
-		auto loadScreen = dynamic_pointer_cast<LoadScreen>(mpc.screens->getScreenComponent("load"));
+		auto loadScreen = mpc.screens->get<LoadScreen>("load");
 		
 		loadScreen->setFileLoad(loadScreen->fileLoad - 1);
-		auto directoryScreen = dynamic_pointer_cast<DirectoryScreen>(mpc.screens->getScreenComponent("directory"));
+		auto directoryScreen = mpc.screens->get<DirectoryScreen>("directory");
 		directoryScreen->setYOffset1(directoryScreen->yOffset1 - 1);
 	}
 
