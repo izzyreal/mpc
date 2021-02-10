@@ -30,14 +30,10 @@
 #include <hardware/HwSlider.hpp>
 #include <hardware/Led.hpp>
 
-#include <disk/AllLoader.hpp>
-#include <disk/ApsLoader.hpp>
-
-#include <disk/MpcFile.hpp>
-
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/LoadScreen.hpp>
 #include <lcdgui/screens/window/LoadAProgramScreen.hpp>
+
 #include <string>
 
 using namespace mpc;

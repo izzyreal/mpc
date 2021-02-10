@@ -26,11 +26,14 @@
 using namespace mpc::file::all;
 using namespace std;
 
-AllParser::AllParser(mpc::Mpc& mpc, mpc::disk::MpcFile* file)
-	: mpc(mpc)
+AllParser::AllParser(mpc::Mpc& _mpc, mpc::disk::MpcFile* file)
+    : AllParser(_mpc, file->getBytes())
 {
-	songs = vector<Song*>(20);
-	auto loadBytes = file->getBytes();
+}
+
+AllParser::AllParser(mpc::Mpc& _mpc, const vector<char>& loadBytes)
+	: mpc (_mpc)
+{
 	header = new Header(moduru::VecUtil::CopyOfRange(loadBytes, HEADER_OFFSET, HEADER_OFFSET + HEADER_LENGTH));
 	
 	if (!header->verifyFileID())
@@ -53,10 +56,9 @@ AllParser::AllParser(mpc::Mpc& mpc, mpc::disk::MpcFile* file)
 	sequences = readSequences(moduru::VecUtil::CopyOfRange(loadBytes, SEQUENCES_OFFSET, loadBytes.size()));
 }
 
-AllParser::AllParser(mpc::Mpc& mpc, string allName)
-	: mpc(mpc)
+AllParser::AllParser(mpc::Mpc& _mpc, const string& allName)
+	: mpc (_mpc)
 {
-	songs = vector<Song*>(20);
 	vector<vector<char>> chunks;
 	auto header = Header();
 	chunks.push_back(header.getBytes());
@@ -81,7 +83,7 @@ AllParser::AllParser(mpc::Mpc& mpc, string allName)
 	chunks.push_back(misc->getBytes());
 	seqNames = new SequenceNames(mpc);
 	chunks.push_back(seqNames->getBytes());
-	songs = vector<Song*>(20);
+    
 	auto sequencer = mpc.getSequencer().lock();
 
 	for (int i = 0; i < 20; i++) {

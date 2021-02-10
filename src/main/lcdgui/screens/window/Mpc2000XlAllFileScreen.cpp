@@ -32,7 +32,9 @@ void Mpc2000XlAllFileScreen::function(int i)
 		try
 		{
 			mpc::disk::AllLoader allLoader(mpc, loadScreen->getSelectedFile().get(), sequencesOnly);
-			auto loadASequenceFromAllScreen = mpc.screens->get<LoadASequenceFromAllScreen>("load-a-sequence-from-all");
+			
+            auto loadASequenceFromAllScreen = mpc.screens->get<LoadASequenceFromAllScreen>("load-a-sequence-from-all");
+            
 			loadASequenceFromAllScreen->sequencesFromAllFile = allLoader.getSequences();
 
 			loadScreen->fileLoad = 0;

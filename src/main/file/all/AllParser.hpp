@@ -61,7 +61,7 @@ namespace mpc::file::all
 		Misc* misc = nullptr;
 		SequenceNames* seqNames = nullptr;
 		std::vector<Sequence*> sequences;
-		std::vector<Song*> songs;
+        std::vector<Song*> songs = std::vector<Song*>(20);
 		std::vector<char> saveBytes;
 
 	public:
@@ -83,8 +83,9 @@ namespace mpc::file::all
 		std::vector<char> getBytes();
 
 	public:
-		AllParser(mpc::Mpc& mpc, mpc::disk::MpcFile* file);
-		AllParser(mpc::Mpc& mpc, std::string allName);
+		AllParser(mpc::Mpc&, mpc::disk::MpcFile*);
+        AllParser(mpc::Mpc&, const std::vector<char>& loadBytes);
+		AllParser(mpc::Mpc&, const std::string& allName);
 		~AllParser();
 
 	};

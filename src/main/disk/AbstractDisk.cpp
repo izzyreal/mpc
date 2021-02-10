@@ -154,16 +154,14 @@ vector<shared_ptr<MpcFile>>& AbstractDisk::getParentFiles()
 
 void AbstractDisk::writeSound(weak_ptr<Sound> s)
 {
-	string name = mpc::Util::getFileName(s.lock()->getName() + ".SND");
-    auto nf = newFile(name);
-    writeSound(s, nf);
+	auto name = mpc::Util::getFileName(s.lock()->getName() + ".SND");
+    writeSound(s, newFile(name));
 }
 
 void AbstractDisk::writeWav(weak_ptr<Sound> s)
 {
-	string name = mpc::Util::getFileName(s.lock()->getName() + ".WAV");
-	auto nf = newFile(name);
-	writeWav(s, nf);
+	auto name = mpc::Util::getFileName(s.lock()->getName() + ".WAV");
+	writeWav(s, newFile(name));
 }
 
 void AbstractDisk::writeSound(weak_ptr<Sound> s, weak_ptr<MpcFile> f)

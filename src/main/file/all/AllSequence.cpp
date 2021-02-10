@@ -208,10 +208,13 @@ const int Sequence::EVENTS_OFFSET;
 vector<mpc::sequencer::Event*> Sequence::readEvents(const vector<char>& seqBytes)
 {
 	vector<mpc::sequencer::Event*> aeList;
-	for (auto& ba : readEventSegments(seqBytes)) {
+	
+    for (auto& ba : readEventSegments(seqBytes))
+    {
 		auto ae = AllEvent(ba);
 		aeList.push_back(ae.getEvent());
 	}
+    
 	return aeList;
 }
 

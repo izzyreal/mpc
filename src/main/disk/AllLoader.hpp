@@ -18,6 +18,7 @@ namespace mpc::sequencer
 namespace mpc::file::all
 {
 	class Sequence;
+    class AllParser;
 }
 
 namespace mpc::disk
@@ -34,7 +35,8 @@ namespace mpc::disk
 
 	public:
 		std::vector<std::shared_ptr<mpc::sequencer::Sequence>>& getSequences();
-		AllLoader(mpc::Mpc& mpc, mpc::disk::MpcFile* file, bool sequencesOnly);
+		AllLoader(mpc::Mpc&, mpc::disk::MpcFile*, bool sequencesOnly);
+        AllLoader(mpc::Mpc&, mpc::file::all::AllParser&, bool sequencesOnly);
 
 	};
 }

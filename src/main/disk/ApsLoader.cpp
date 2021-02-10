@@ -75,9 +75,7 @@ void ApsLoader::notFound(mpc::Mpc& mpc, string soundFileName, string ext)
 		mpc.getLayeredScreen().lock()->openScreen("cant-find-file");
 
 		while (cantFindFileScreen->waitingForUser)
-		{
-			this_thread::sleep_for(chrono::milliseconds(25));
-		}
+            this_thread::sleep_for(chrono::milliseconds(25));
 	}
 }
 
