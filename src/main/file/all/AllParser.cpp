@@ -188,13 +188,22 @@ vector<mpc::file::all::Song*> AllParser::getSongs()
 vector<Sequence*> AllParser::readSequences(vector<char> trimmedSeqsArray)
 {
 	const int totalSeqChunkLength = trimmedSeqsArray.size();
+    
+    if (totalSeqChunkLength == 0)
+        return {};
+    
 	vector<Sequence*> seqs;
 	int eventSegments, currentSeqEnd, read = 0;
-	for (int i = 0; i < 99; i++) {
+    
+	for (int i = 0; i < 99; i++)
+    {
 		eventSegments = Sequence::getNumberOfEventSegmentsForThisSeq(trimmedSeqsArray);
 		currentSeqEnd = EMPTY_SEQ_LENGTH + (eventSegments * EVENT_LENGTH);
-		if (currentSeqEnd > trimmedSeqsArray.size()) currentSeqEnd -= 8;
-		auto currentSeqArray = moduru::VecUtil::CopyOfRange(trimmedSeqsArray, 0, currentSeqEnd);
+	
+        if (currentSeqEnd > trimmedSeqsArray.size())
+            currentSeqEnd -= 8;
+		
+        auto currentSeqArray = moduru::VecUtil::CopyOfRange(trimmedSeqsArray, 0, currentSeqEnd);
 		auto as = new Sequence(currentSeqArray);
 		seqs.push_back(as);
 		read += currentSeqEnd;

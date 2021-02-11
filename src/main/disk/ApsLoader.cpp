@@ -81,15 +81,12 @@ void ApsLoader::notFound(mpc::Mpc& mpc, string soundFileName, string ext)
 
 void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool headless)
 {
-    int c = 0;
-    MLOG("loadFromParsedAps " + to_string(c++));
     auto sampler = mpc.getSampler().lock();
     auto disk = mpc.getDisk().lock();
     sampler->deleteAllSamples();
     const bool initPgms = false;
 
     vector<int> unavailableSoundIndices;
-    MLOG("loadFromParsedAps " + to_string(c++));
 
     for (int i = 0; i < apsParser.getSoundNames().size(); i++)
     {
@@ -131,7 +128,6 @@ void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool head
 
         ApsLoader::loadSound(mpc, soundFileName, ext, soundFile, false, i, headless);
     }
-    MLOG("loadFromParsedAps " + to_string(c++));
 
     sampler->deleteAllPrograms(initPgms);
     
@@ -206,9 +202,6 @@ void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool head
         slider->setTuneHighRange(apsProgram->getSlider()->getTuneHigh());
         slider->setTuneLowRange(apsProgram->getSlider()->getTuneLow());
     }
-    MLOG("loadFromParsedAps " + to_string(c++));
-    MLOG("apsParser drumMixers size");
-    MLOG(to_string(apsParser.getDrumMixers().size()));
     
     for (int i = 0; i < 4; i++)
     {
@@ -234,7 +227,6 @@ void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool head
         drum->setReceivePgmChange(apsParser.getDrumConfiguration(i)->getReceivePgmChange());
         drum->setReceiveMidiVolume(apsParser.getDrumConfiguration(i)->getReceiveMidiVolume());
     }
-    MLOG("loadFromParsedAps " + to_string(c++));
 
     auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>("mixer-setup");
 
@@ -245,10 +237,8 @@ void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool head
     mixerSetupScreen->setFxDrum(globals->getFxDrum());
     mixerSetupScreen->setIndivFxSourceDrum(globals->isIndivFxSourceDrum());
     mixerSetupScreen->setStereoMixSourceDrum(globals->isStereoMixSourceDrum());
-    MLOG("loadFromParsedAps " + to_string(c++));
 
     auto drumScreen = mpc.screens->get<DrumScreen>("drum");
-
     drumScreen->setPadToIntSound(globals->isPadToIntSoundEnabled());
 }
 
@@ -294,7 +284,7 @@ void ApsLoader::loadSound(mpc::Mpc& mpc, string soundFileName, string ext, weak_
 
     if (!headless)
         ApsLoader::showPopup(mpc, soundFileName, ext, soundFile->length());
-    MLOG("Loading sound: " + soundFileName);
+    
     sl.loadSound(soundFile);
 }
 
