@@ -8,7 +8,7 @@ namespace mpc::lcdgui::screens
 class VmpcAutoSaveScreen
 : public mpc::lcdgui::ScreenComponent
 {
-    
+
 public:
     void turnWheel(int i) override;
     
@@ -21,7 +21,7 @@ private:
     const std::vector<std::string> autoSaveOnExitNames{ "Disabled", "Ask", "Enabled" };
     const std::vector<std::string> autoLoadOnStartNames{ "Disabled", "Ask", "Enabled" };
     
-    int autoSaveOnExit = 0;
+    int autoSaveOnExit = 2;
     int autoLoadOnStart = 1;
     
     void displayAutoSaveOnExit();
