@@ -690,13 +690,7 @@ void Sequencer::stop(int tick)
 	if (bouncing && vmpcDirectToDiskRecorderScreen->getRecord() != 4)
 		ams->stopBouncing();
 	
-	auto hw = mpc.getHardware().lock();
-
-	hw->getLed("overdub").lock()->light(false);
-	hw->getLed("play").lock()->light(false);
-	hw->getLed("rec").lock()->light(false);
-
-    notifyObservers(string("stop"));
+	notifyObservers(string("stop"));
 }
 
 bool Sequencer::isCountingIn()
