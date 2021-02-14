@@ -326,7 +326,7 @@ void BaseControls::generateNoteOn(int note, int padVelo, int tick)
 				}
 				else
 				{
-					event->setVariationValue((100 / 16) * padIndex);
+					event->setVariationValue(static_cast<int>(floor(100 / 16.0) * padIndex));
 				}
 			}
 

@@ -22,8 +22,8 @@ namespace mpc::lcdgui::screens
         void function(int) override;
         
 	private:
-		const std::vector<std::string> initialPadMappingNames{ "VMPC", "ORIGINAL" };
-        const std::vector<std::string> _16LevelsEraseModeNames{ "Any pressed pad", "Only source pad" };
+		const std::vector<std::string> initialPadMappingNames{ "VMPC2000XL", "ORIGINAL" };
+        const std::vector<std::string> _16LevelsEraseModeNames{ "All levels", "Only pressed level" };
         
 		int initialPadMapping = 0;
         int _16LevelsEraseMode = 0;

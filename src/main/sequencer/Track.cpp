@@ -24,6 +24,7 @@
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/PunchScreen.hpp>
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
+#include <lcdgui/screens/window/Assign16LevelsScreen.hpp>
 
 #include <lcdgui/screens/VmpcSettingsScreen.hpp>
 
@@ -607,14 +608,58 @@ void Track::playNext()
                     _delete = true;
             }
             
+            auto pressedPads = *mpc.getControls().lock()->getPressedPads();
+            auto pressedPadVelos = *mpc.getControls().lock()->getPressedPadVelos();
+            
             if (!_delete &&
-                mpc.getControls().lock()->getPressedPads()->size() != 0 &&
+                pressedPads.size() != 0 &&
                 mpc.getHardware().lock()->getTopPanel().lock()->isSixteenLevelsEnabled())
             {
                 auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
-                
+                auto assign16LevelsScreen = mpc.screens->get<Assign16LevelsScreen>("assign-16-levels");
+
                 if (vmpcSettingsScreen->_16LevelsEraseMode == 0)
+                {
                     _delete = true;
+                }
+                else if (vmpcSettingsScreen->_16LevelsEraseMode == 1)
+                {
+                    const auto& varValue = note->getVariationValue();
+                    vector<int> pressedNotes;
+                    auto _16l_key = assign16LevelsScreen->getOriginalKeyPad();
+                    auto _16l_type = assign16LevelsScreen->getType();
+
+                    for (int i = 0 ; i < 16; i++)
+                    {
+                        const auto isPressed = pressedPads.find(i) != end(pressedPads);
+                        if (isPressed)
+                        {
+                            const auto& velo = pressedPadVelos[i];
+                            int wouldBeVarValue = 0;
+                            
+                            if (_16l_type == 0)
+                            {
+                                auto diff = i - _16l_key;
+                                auto candidate = 64 + (diff * 5);
+
+                                if (candidate > 124)
+                                    candidate = 124;
+                                else if (candidate < 4)
+                                    candidate = 4;
+
+                                wouldBeVarValue = static_cast<int>(candidate);
+                            }
+                            else
+                            {
+                                wouldBeVarValue = static_cast<int>(floor(100 / 16.0) * i);
+                            }
+                            
+                            if (varValue == wouldBeVarValue)
+                                _delete = true;
+                        }
+                    }
+                    
+                }
             }
         }
     }
