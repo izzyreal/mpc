@@ -146,6 +146,7 @@
 #include <lcdgui/screens/VmpcDiskScreen.hpp>
 #include <lcdgui/screens/VmpcSettingsScreen.hpp>
 #include <lcdgui/screens/VmpcKeyboardScreen.hpp>
+#include <lcdgui/screens/VmpcAutoSaveScreen.hpp>
 
 #include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
 #include <lcdgui/screens/window/VmpcRecordingFinishedScreen.hpp>
@@ -928,6 +929,10 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
     else if (screenName.compare("vmpc-discard-mapping-changes") == 0)
     {
         screen = make_shared<VmpcDiscardMappingChangesScreen>(mpc, layerIndex);
+    }
+    else if (screenName.compare("vmpc-auto-save") == 0)
+    {
+        screen = make_shared<VmpcAutoSaveScreen>(mpc, layerIndex);
     }
     
 	if (screen)

@@ -21,6 +21,9 @@ void VmpcSettingsScreen::function(int i)
         case 1:
             openScreen("vmpc-keyboard");
             break;
+        case 2:
+            openScreen("vmpc-auto-save");
+            break;
     }
 }
 

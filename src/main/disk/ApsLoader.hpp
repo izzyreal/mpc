@@ -42,7 +42,7 @@ public:
     ApsLoader(mpc::Mpc&, std::weak_ptr<MpcFile>);
     ~ApsLoader();
     
-    static void loadFromParsedAps(mpc::file::aps::ApsParser& parsedAps, mpc::Mpc& mpc, bool headless = false);
+    static void loadFromParsedAps(mpc::file::aps::ApsParser&, mpc::Mpc&, bool withoutSounds, bool headless = false);
     
 };
 }

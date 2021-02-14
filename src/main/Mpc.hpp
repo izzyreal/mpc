@@ -292,7 +292,8 @@ private:
         "vmpc-file-in-use",
         "vmpc-keyboard",
         "vmpc-reset-keyboard",
-        "vmpc-discard-mapping-changes"
+        "vmpc-discard-mapping-changes",
+        "vmpc-auto-save"
     };
 };
 }

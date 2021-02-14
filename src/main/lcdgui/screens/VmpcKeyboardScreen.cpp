@@ -129,9 +129,7 @@ void VmpcKeyboardScreen::function(int i)
                 return;
             }
             
-            mpc.getControls().lock()->getKbMapping().lock()->initializeDefaults();
-            updateKeyCodeNames();
-            updateRows();
+            openScreen("vmpc-auto-save");
             break;
         case 3:
             if (learning)

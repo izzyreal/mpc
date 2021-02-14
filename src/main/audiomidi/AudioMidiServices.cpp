@@ -11,7 +11,6 @@
 #include <audiomidi/MpcMidiPorts.hpp>
 
 #include <nvram/NvRam.hpp>
-#include <nvram/AudioMidiConfig.hpp>
 #include <sampler/Sampler.hpp>
 #include <sequencer/Sequencer.hpp>
 

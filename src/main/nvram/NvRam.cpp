@@ -8,6 +8,7 @@
 
 #include <lcdgui/screens/UserScreen.hpp>
 #include <lcdgui/screens/VmpcSettingsScreen.hpp>
+#include <lcdgui/screens/VmpcAutoSaveScreen.hpp>
 
 #include <audiomidi/AudioMidiServices.hpp>
 
@@ -119,6 +120,8 @@ int NvRam::getSlider()
 void NvRam::saveVmpcSettings(mpc::Mpc& mpc)
 {
 	auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
+    auto vmpcAutoSaveScreen = mpc.screens->get<VmpcAutoSaveScreen>("vmpc-auto-save");
+    
 	string fileName = mpc::Paths::resPath() + "vmpc-specific.ini";
 
 	File file(fileName, nullptr);
@@ -130,7 +133,9 @@ void NvRam::saveVmpcSettings(mpc::Mpc& mpc)
 	
     vector<char> bytes{
         (char) (vmpcSettingsScreen->initialPadMapping),
-        (char) (vmpcSettingsScreen->_16LevelsEraseMode)
+        (char) (vmpcSettingsScreen->_16LevelsEraseMode),
+        (char) (vmpcAutoSaveScreen->autoSaveOnExit),
+        (char) (vmpcAutoSaveScreen->autoLoadOnStart)
     };
     
 	stream.write(&bytes[0], bytes.size());
@@ -142,14 +147,18 @@ void NvRam::loadVmpcSettings(mpc::Mpc& mpc)
 	string path = mpc::Paths::resPath() + "vmpc-specific.ini";
 	File file(path, nullptr);
 
-	if (!file.exists() || file.getLength() != 2)
+	if (!file.exists() || file.getLength() != 4)
 		return;
 
 	auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
-	
-	vector<char> bytes(2);
+    auto vmpcAutoSaveScreen = mpc.screens->get<VmpcAutoSaveScreen>("vmpc-auto-save");
+
+	vector<char> bytes(4);
 	file.getData(&bytes);
 
 	vmpcSettingsScreen->initialPadMapping = bytes[0];
     vmpcSettingsScreen->_16LevelsEraseMode = bytes[1];
+    vmpcAutoSaveScreen->autoSaveOnExit = bytes[2];
+    vmpcAutoSaveScreen->autoLoadOnStart = bytes[3];
+    
 }
