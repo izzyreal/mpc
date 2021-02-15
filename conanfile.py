@@ -3,6 +3,7 @@ from conans import ConanFile, CMake
 class Pkg(ConanFile):
     name = "mpc"
     description = "static library for emulating the Akai MPC2000XL sequencer sampler"
+    license = "GPL-3.0"
     version = "0.1"
     settings = "os", "compiler", "arch", "build_type"
     generators = "cmake"
