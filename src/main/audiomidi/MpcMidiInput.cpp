@@ -55,15 +55,24 @@ void MpcMidiInput::transport(MidiMessage* msg, int timeStamp)
 	auto status = msg->getStatus();
 	auto lSampler = sampler.lock();
 	string notify_ = string(index == 0 ? "a" : "b");
-	auto channel = dynamic_cast<ShortMessage*>(msg)->getChannel();
-	notify_ += to_string(channel);
+    auto shortMsg = dynamic_cast<ShortMessage*>(msg);
+    auto channel = shortMsg->getChannel();
+    
+    notify_ += to_string(channel);
 	
 	notifyObservers(notify_);
 
 	auto isControl = status >= ShortMessage::CONTROL_CHANGE && status < ShortMessage::CONTROL_CHANGE + 16;
 
 	if (isControl)
-		mpc.getHardware().lock()->getSlider().lock()->setValue((*msg->getMessage())[2]);
+    {
+        const auto controller = shortMsg->getData1();
+        const auto value = shortMsg->getData2();
+
+        // As per the MPC2000XL's MIDI implementation chart
+        if (controller == 7)
+            mpc.getHardware().lock()->getSlider().lock()->setValue(value);
+    }
 	
 	auto lSequencer = sequencer.lock();
 	
