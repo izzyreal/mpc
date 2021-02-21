@@ -29,7 +29,7 @@ namespace mpc::lcdgui::screens
 		void function(int i) override;
 
 	public:
-		SyncScreen(mpc::Mpc& mpc, const int layerIndex);
+		SyncScreen(mpc::Mpc&, const int layerIndex);
 
 		void open() override;
 

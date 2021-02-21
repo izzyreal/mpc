@@ -47,6 +47,7 @@
 #include <lcdgui/screens/TransScreen.hpp>
 #include <lcdgui/screens/PunchScreen.hpp>
 #include <lcdgui/screens/SyncScreen.hpp>
+#include <lcdgui/screens/MidiSwScreen.hpp>
 
 #include <lcdgui/screens/window/NumberOfZonesScreen.hpp>
 #include <lcdgui/screens/window/InitPadAssignScreen.hpp>
@@ -933,6 +934,10 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
     else if (screenName.compare("vmpc-auto-save") == 0)
     {
         screen = make_shared<VmpcAutoSaveScreen>(mpc, layerIndex);
+    }
+    else if (screenName.compare("midi-sw") == 0)
+    {
+        screen = make_shared<MidiSwScreen>(mpc, layerIndex);
     }
     
 	if (screen)
