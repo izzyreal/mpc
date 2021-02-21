@@ -10,6 +10,15 @@ SyncScreen::SyncScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void SyncScreen::open()
 {
+    if (tab == 2 && ls.lock()->getPreviousScreenName().compare("midi-sw") == 0)
+        tab = 0;
+    
+    if (tab == 2)
+    {
+        openScreen("midi-sw");
+        return;
+    }
+    
     displayIn();
     displayOut();
     displayModeIn();
@@ -65,6 +74,7 @@ void SyncScreen::function(int i)
     switch (i)
     {
         case 2:
+            tab = 2;
             openScreen("midi-sw");
             break;
     }
@@ -73,9 +83,8 @@ void SyncScreen::function(int i)
 void SyncScreen::setIn(int i)
 {
     if (i < 0 || i > 1)
-    {
         return;
-    }
+
     in = i;
     displayIn();
 }
@@ -91,7 +100,7 @@ void SyncScreen::setOut(int i)
 
 void SyncScreen::setShiftEarly(int i)
 {
-    if (i < 0 || i > 99) // What are the real bounds on a 2KXL?
+    if (i < 0 || i > 20)
         return;
     
     shiftEarly = i;

@@ -39,6 +39,8 @@ namespace mpc::lcdgui::screens
 	private:
 		const std::vector<std::string> modeNames{ "OFF", "MIDI CLOCK", "TIME CODE" };
 
+        int tab = 0;
+        
 		int shiftEarly = 0;
 		bool sendMMCEnabled = false;
 		int frameRate = 0;
