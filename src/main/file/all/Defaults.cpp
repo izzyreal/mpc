@@ -27,8 +27,10 @@ Defaults::Defaults(mpc::Mpc& mpc, const vector<char>& loadBytes)
 	tempo = ByteUtil::bytes2ushort(tempoBytes);
 	timeSigNum = loadBytes[TIMESIG_NUM_OFFSET];
 	timeSigDen = loadBytes[TIMESIG_DEN_OFFSET];
+    
 	auto barCountBytes = vector<char>{ loadBytes[BAR_COUNT_BYTE1_OFFSET], loadBytes[BAR_COUNT_BYTE2_OFFSET] };
-	barCount = ByteUtil::bytes2ushort(barCountBytes);
+
+    barCount = ByteUtil::bytes2ushort(barCountBytes);
 
 	for (int i = 0; i < 64; i++)
 	{
@@ -48,9 +50,7 @@ Defaults::Defaults(mpc::Mpc& mpc)
 	setNames();
 	
 	for (int i = 0; i < UNKNOWN1.size(); i++)
-	{
 		saveBytes[UNKNOWN1_OFFSET + i] = UNKNOWN1[i];
-	}
 
 	setTempo();
 	setTimeSig();
@@ -64,10 +64,6 @@ Defaults::Defaults(mpc::Mpc& mpc)
 	{
 		saveBytes[LAST_TICK_BYTE1_OFFSET] = 0;
 		saveBytes[LAST_TICK_BYTE2_OFFSET] = 0;
-	}
-
-	if (lastBar == 1)
-	{
 		lastBar = 0;
 	}
 
@@ -76,15 +72,11 @@ Defaults::Defaults(mpc::Mpc& mpc)
 	for (int i = 0; i < 4; i++)
 	{
 		for (int j = 0; j < 4; j++)
-		{
 			saveBytes[UNKNOWN32_BIT_INT_OFFSET + j + (i * 4)] = unknownNumberBytes[j];
-		}
 	}
 
 	for (int i = 0; i < UNKNOWN2.size(); i++)
-	{
 		saveBytes[UNKNOWN2_OFFSET + i] = UNKNOWN2[i];
-	}
 
 	setTrackSettings();
 }

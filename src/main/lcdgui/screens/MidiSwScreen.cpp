@@ -12,7 +12,12 @@ MidiSwScreen::MidiSwScreen(mpc::Mpc& mpc, const int layerIndex)
 void MidiSwScreen::initializeDefaultMapping()
 {
     for (int i = 0; i < SWITCH_COUNT; i++)
-        controllerToFunctionMapping.push_back(pair(-1, 0));
+        controllerToFunctionMapping.push_back(pair(0, 0));
+}
+
+pair<int, int> MidiSwScreen::getSwitch(int index)
+{
+    return controllerToFunctionMapping[index];
 }
 
 void MidiSwScreen::open()
@@ -37,7 +42,7 @@ void MidiSwScreen::displayCtrlsAndFunctions()
         auto functionField = findChild<Field>("function" + to_string(i)).lock();
         
         auto ctrl = association.first;
-        ctrlField->setText(ctrl == -1 ? "OFF" : to_string(ctrl));
+        ctrlField->setText(ctrl == 0 ? "OFF" : to_string(ctrl - 1));
         
         auto fn = association.second;
         functionField->setText(functionNames[fn]);
@@ -46,13 +51,18 @@ void MidiSwScreen::displayCtrlsAndFunctions()
 
 void MidiSwScreen::setSwitch(const int index, const std::pair<int, int> _switch)
 {
-    if (_switch.first < -1 || _switch.first > 128
+    if (_switch.first < 0 || _switch.first > 128
         || _switch.second < 0 || _switch.second >= functionNames.size())
         return;
     
     controllerToFunctionMapping[index] = _switch;
     
     displayCtrlsAndFunctions();
+}
+
+void MidiSwScreen::setSwitches(const std::vector<std::pair<int, int>>& _switches)
+{
+    controllerToFunctionMapping = _switches;
 }
 
 void MidiSwScreen::turnWheel(int i)

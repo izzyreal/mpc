@@ -39,6 +39,7 @@
 #include <lcdgui/screens/OthersScreen.hpp>
 #include <lcdgui/screens/SyncScreen.hpp>
 #include <lcdgui/screens/UserScreen.hpp>
+#include <lcdgui/screens/MidiSwScreen.hpp>
 
 #include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
 
@@ -177,6 +178,9 @@ AllLoader::AllLoader(mpc::Mpc& _mpc, AllParser& allParser, bool sequencesOnly)
         stepEditorScreen->setTcValueRecordedNotes(misc->getDurationTcPercentage());
         stepEditorScreen->setDurationOfRecordedNotes(misc->isDurationOfRecNotesTc());
 
+        auto midiSwScreen = mpc.screens->get<MidiSwScreen>("midi-sw");
+        midiSwScreen->setSwitches(misc->getSwitches());
+        
         auto othersScreen = mpc.screens->get<OthersScreen>("others");
 
         othersScreen->setTapAveraging(misc->getTapAvg());
