@@ -40,6 +40,7 @@ void DeleteSequenceScreen::function(int i)
 		openScreen("sequence");
 		break;
 	case 4:
+		sequencer.lock()->move(0);
 		sequencer.lock()->purgeSequence(sequencer.lock()->getActiveSequenceIndex());
 		openScreen("sequencer");
 		break;

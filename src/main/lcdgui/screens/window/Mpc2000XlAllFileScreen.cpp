@@ -54,10 +54,9 @@ void Mpc2000XlAllFileScreen::function(int i)
 		break;
 	case 4:
 	{
-		auto sequencesOnly = false;
 		try
 		{
-			mpc::disk::AllLoader allLoader(mpc, loadScreen->getSelectedFile().get(), sequencesOnly);
+			AllLoader::loadEverythingFromFile(mpc, loadScreen->getSelectedFile().get());
 			openScreen("sequencer");
 		}
 		catch (const exception& e)
