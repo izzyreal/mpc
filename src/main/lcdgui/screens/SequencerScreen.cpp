@@ -364,13 +364,16 @@ void SequencerScreen::displayTiming()
 
 void SequencerScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 {
-	track.lock()->deleteObserver(this);
-	sequence.lock()->deleteObserver(this);
+	if (sequence.lock())
+		sequence.lock()->deleteObserver(this);
 	
 	sequence = sequencer.lock()->getActiveSequence();
-	track = sequencer.lock()->getActiveTrack();
-
 	sequence.lock()->addObserver(this);
+
+	if (track.lock())
+		track.lock()->deleteObserver(this);
+
+	track = sequencer.lock()->getActiveTrack();
 	track.lock()->addObserver(this);
 
 	string s = nonstd::any_cast<string>(arg);
