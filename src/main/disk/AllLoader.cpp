@@ -96,8 +96,8 @@ vector<shared_ptr<mpc::sequencer::Sequence>> AllLoader::loadOnlySequencesFromFil
 
 void AllLoader::loadEverythingFromFile(mpc::Mpc& mpc, mpc::disk::MpcFile* f)
 {
-
-    AllLoader::loadEverythingFromAllParser(mpc, AllParser(mpc, f));
+    AllParser allParser(mpc, f);
+    AllLoader::loadEverythingFromAllParser(mpc, allParser);
 }
 
 void AllLoader::convertAllSeqToMpcSeq(mpc::file::all::Sequence* as, shared_ptr<mpc::sequencer::Sequence> mpcSeq)
