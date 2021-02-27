@@ -5,7 +5,6 @@
 #include <audiomidi/AudioMidiServices.hpp>
 
 #include <hardware/Hardware.hpp>
-#include <hardware/Led.hpp>
 #include <hardware/HwPad.hpp>
 
 #include <lcdgui/LayeredScreen.hpp>
@@ -489,14 +488,11 @@ void Sequencer::play(bool fromStart)
 		if (recording || overdubbing) {
 			auto copy = copySequence(s);
 			undoPlaceHolder.swap(copy);
-			lastRecordingActive = true;
+			undoSeqAvailable = true;
 			recordStartTick = getTickPosition();
-			hw->getLed("undo-seq").lock()->light(lastRecordingActive);
 		}
 
 	}
-
-	hw->getLed("play").lock()->light(true);
 
 	auto ams = mpc.getAudioMidiServices().lock();
 
@@ -515,13 +511,11 @@ void Sequencer::play(bool fromStart)
 
 void Sequencer::undoSeq()
 {
-	if (isPlaying()) {
+	if (isPlaying())
 		return;
-	}
 	
-	if (!undoPlaceHolder) {
+	if (!undoPlaceHolder)
 		return;
-	}
 
 	auto s = copySequence(undoPlaceHolder);
 	auto copy = copySequence(sequences[activeSequenceIndex]);	
@@ -531,11 +525,15 @@ void Sequencer::undoSeq()
 	
 	sequences[activeSequenceIndex]->resetTrackEventIndices(position);
 
-	lastRecordingActive = !lastRecordingActive;
+	undoSeqAvailable = !undoSeqAvailable;
 	auto hw = mpc.getHardware().lock();
-	hw->getLed("undo-seq").lock()->light(lastRecordingActive);
 
 	setActiveSequenceIndex(getActiveSequenceIndex()); // Shortcut to notifying SequencerObserver
+}
+
+bool Sequencer::isUndoSeqAvailable()
+{
+    return undoSeqAvailable;
 }
 
 void Sequencer::clearUndoSeq()
@@ -546,9 +544,8 @@ void Sequencer::clearUndoSeq()
 	
 	undoPlaceHolder.reset();
 
-    lastRecordingActive = false;
+    undoSeqAvailable = false;
 	auto hw = mpc.getHardware().lock();
-	hw->getLed("undo-seq").lock()->light(false);
 }
 
 void Sequencer::playFromStart()
@@ -1591,9 +1588,7 @@ void Sequencer::storeActiveSequenceInUndoPlaceHolder()
 	auto copy = copySequence(sequences[activeSequenceIndex]);
 	undoPlaceHolder.swap(copy);
 
-	lastRecordingActive = true;
-	auto hw = mpc.getHardware().lock();
-	hw->getLed("undo-seq").lock()->light(lastRecordingActive);
+	undoSeqAvailable = true;
 }
 
 bool Sequencer::isOverDubbing()

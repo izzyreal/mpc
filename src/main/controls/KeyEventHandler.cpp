@@ -68,14 +68,10 @@ void KeyEventHandler::handle(const KeyEvent& keyEvent)
     }
     else {
         if (keyEvent.keyDown) {
-            
-            if (it != end(pressed))
-            {
-                // For now we don't accept any kind of auto-repeat.
-                // Maybe in the future when we allow users to type things like sound
-                // and sequence names with the keyboard we will.
-                return;
-            }
+
+//            Uncomment to disable key repeats
+//            if (it != end(pressed))
+//                return;
             
             pressed.push_back(keyEvent.rawKeyCode);
             

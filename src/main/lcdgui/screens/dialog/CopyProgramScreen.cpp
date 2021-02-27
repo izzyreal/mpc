@@ -1,6 +1,6 @@
 #include "CopyProgramScreen.hpp"
 
-#include <mpc/MpcSoundPlayerChannel.hpp>>
+#include <mpc/MpcSoundPlayerChannel.hpp>
 
 using namespace mpc::lcdgui::screens::dialog;
 using namespace moduru::lang;

@@ -26,8 +26,20 @@ namespace mpc::sequencer
 	public:
 		Sequencer(mpc::Mpc& mpc);
 
+        std::vector<int> getTickValues();
+        void playToTick(int targetTick);
+        int getActiveSequenceIndex();
+        std::weak_ptr<Track> getActiveTrack();
+        std::weak_ptr<Sequence> createSeqInPlaceHolder();
+        void clearPlaceHolder();
+        void movePlaceHolderTo(int destIndex);
+        std::weak_ptr<Sequence> getPlaceHolder();
+        bool isUndoSeqAvailable();
+
 	private:
-		mpc::Mpc& mpc;
+        const std::vector<int> TICK_VALUES{ 1, 48, 32, 24, 16, 12, 8 };
+
+        mpc::Mpc& mpc;
 		int lastNotifiedBar = -1;
 		int lastNotifiedBeat = -1;
 		int lastNotifiedClock = -1;
@@ -40,16 +52,14 @@ namespace mpc::sequencer
 		int playedStepRepetitions = 0;
 		bool endOfSong = false;
 
-		const std::vector<int> TICK_VALUES{ 1, 48, 32, 24, 16, 12, 8 };
 		std::vector<std::shared_ptr<Sequence>> sequences;
 		std::vector<std::shared_ptr<Song>> songs;
 		std::vector<uint64_t> taps{ 0, 0, 0, 0 };
 
 		std::shared_ptr<Sequence> undoPlaceHolder;
 
-
 		bool secondSequenceEnabled = false;
-		bool lastRecordingActive = false;
+		bool undoSeqAvailable = false;
 		int playStartTick = 0;
 		double previousTempo = 0.0;
 		int recordStartTick = 0;
@@ -70,26 +80,13 @@ namespace mpc::sequencer
 		uint64_t lastTap = 0;
 		int tapIndex = 0;
 
-	public:
-		std::vector<int> getTickValues();
-		void playToTick(int targetTick);
-		int getActiveSequenceIndex();
-		std::weak_ptr<Track> getActiveTrack();
-		std::weak_ptr<Sequence> createSeqInPlaceHolder();
-		void clearPlaceHolder();
-		void movePlaceHolderTo(int destIndex);
-		std::weak_ptr<Sequence> getPlaceHolder();
-
-	public:
 		std::vector<std::string> defaultTrackNames;
 		bool overdubbing = false;
 		bool recording = false;
-
 		int activeTrackIndex = 0;
 		double tempo = 120.0;
 		int nextSq = -1;
 
-	private:
 		std::weak_ptr<TempoChangeEvent> getCurrentTempoChangeEvent();
 		void play(bool fromStart);
 		std::shared_ptr<Sequence> copySequence(std::weak_ptr<Sequence> source);
