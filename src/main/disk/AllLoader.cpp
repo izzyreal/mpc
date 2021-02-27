@@ -64,29 +64,105 @@ AllLoader::AllLoader(mpc::Mpc& _mpc, mpc::disk::MpcFile* file, bool sequencesOnl
     mpcSequences = AllLoader(_mpc, allParser, sequencesOnly).mpcSequences;
 }
 
+vector<shared_ptr<mpc::sequencer::Sequence>> AllLoader::loadOnlySequencesFromFile(mpc::Mpc& mpc, mpc::disk::MpcFile* f)
+{
+	vector<shared_ptr<mpc::sequencer::Sequence>> mpcSequences;
+
+    auto allParser = AllParser(mpc, f);
+    auto allSequences = allParser.getAllSequences();
+    auto allSeqNames = allParser.getSeqNames()->getNames();
+    vector<Sequence*> temp;
+    int counter = 0;
+
+    for (int i = 0; i < 99; i++)
+    {
+        if (allSeqNames[i].find("(Unused)") != string::npos)
+            temp.push_back(nullptr);
+        else
+            temp.push_back(allSequences[counter++]);
+    }
+
+    allSequences = temp;
+
+	int index = -1;
+
+    for (auto& as : allSequences)
+    {
+        index++;
+
+        if (as == nullptr)
+        {
+            mpcSequences.push_back(nullptr);
+            continue;
+        }
+
+        shared_ptr<mpc::sequencer::Sequence> mpcSeq;
+
+        mpcSeq = make_shared<mpc::sequencer::Sequence>(mpc, mpc.getSequencer().lock()->getDefaultTrackNames());
+
+        mpcSeq->init(as->barCount - 1);
+
+        for (int i = 0; i < as->barCount; i++)
+        {
+            auto num = as->barList->getBars()[i]->getNumerator();
+            auto den = as->barList->getBars()[i]->getDenominator();
+            mpcSeq->setTimeSignature(i, num, den);
+        }
+
+        mpcSeq->setName(as->name);
+        mpcSeq->setInitialTempo(as->tempo);
+        auto at = as->tracks;
+
+        for (int i = 0; i < 64; i++)
+        {
+            auto t = mpcSeq->getTrack(i).lock();
+            t->setUsed(at->getStatus(i) != 6);
+            t->setName(at->getName(i));
+            t->setBusNumber(at->getBus(i));
+            t->setProgramChange(at->getPgm(i));
+            t->setOn(at->getStatus(i) != 5);
+            t->setVelocityRatio(at->getVelo(i));
+        }
+
+        for (int j = 0; j < as->getEventAmount(); j++)
+        {
+            auto e = as->allEvents[j];
+
+            if (e == nullptr)
+                continue;
+
+            int track = e->getTrack();
+
+            if (track > 128) track -= 128;
+            if (track < 0) track += 128;
+            if (track > 63) track -= 64;
+
+            mpcSeq->getTrack(track).lock()->cloneEvent(shared_ptr<mpc::sequencer::Event>(e));
+        }
+
+        for (int i = 0; i < 32; i++)
+            mpcSeq->setDeviceName(i, as->devNames[i]);
+
+        mpcSeq->initMetaTracks();
+        mpcSeq->setFirstLoopBarIndex(as->loopFirst);
+        mpcSeq->setLastLoopBarIndex(as->loopLast);
+        mpcSeq->setLastLoopBarIndex(as->loopLast);
+
+        if (as->loopLastEnd)
+            mpcSeq->setLastLoopBarIndex(INT_MAX);
+
+        mpcSeq->setLoopEnabled(as->loop);
+        mpcSequences.push_back(mpcSeq);
+    }
+
+    return mpcSequences;
+}
+
 AllLoader::AllLoader(mpc::Mpc& _mpc, AllParser& allParser, bool sequencesOnly)
 : mpc (_mpc)
 {
     if (sequencesOnly)
     {
-        allSequences = allParser.getAllSequences();
-        auto allSeqNames = allParser.getSeqNames()->getNames();
-        vector<Sequence*> temp;
-        int counter = 0;
-        
-        for (int i = 0; i < 99; i++)
-        {
-            if (allSeqNames.at(i).find("(Unused)") != string::npos)
-            {
-                temp.push_back(nullptr);
-            }
-            else
-            {
-                temp.push_back(allSequences[counter++]);
-            }
-        }
-        allSequences = temp;
-        convertSequences(true);
     }
     else
     {

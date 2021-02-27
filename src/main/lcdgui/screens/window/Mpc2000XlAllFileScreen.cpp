@@ -9,6 +9,7 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::lcdgui::screens;
+using namespace mpc::disk;
 using namespace std;
 
 Mpc2000XlAllFileScreen::Mpc2000XlAllFileScreen(mpc::Mpc& mpc, const int layerIndex) 
@@ -31,11 +32,9 @@ void Mpc2000XlAllFileScreen::function(int i)
 		
 		try
 		{
-			mpc::disk::AllLoader allLoader(mpc, loadScreen->getSelectedFile().get(), sequencesOnly);
-			
             auto loadASequenceFromAllScreen = mpc.screens->get<LoadASequenceFromAllScreen>("load-a-sequence-from-all");
             
-			loadASequenceFromAllScreen->sequencesFromAllFile = allLoader.getSequences();
+			loadASequenceFromAllScreen->sequencesFromAllFile = AllLoader::loadOnlySequencesFromFile(mpc, loadScreen->getSelectedFile().get());
 
 			loadScreen->fileLoad = 0;
 

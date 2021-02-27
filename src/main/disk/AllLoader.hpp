@@ -38,5 +38,6 @@ namespace mpc::disk
 		AllLoader(mpc::Mpc&, mpc::disk::MpcFile*, bool sequencesOnly);
         AllLoader(mpc::Mpc&, mpc::file::all::AllParser&, bool sequencesOnly);
 
+		static std::vector<std::shared_ptr<mpc::sequencer::Sequence>> loadOnlySequencesFromFile(mpc::Mpc&, mpc::disk::MpcFile*);
 	};
 }
