@@ -10,13 +10,13 @@ public:
     std::vector<char> saveBytes;
     
 public:
-    std::vector<char> getHeaderArray();
+    std::vector<char>& getHeaderArray();
     bool verifyFileID();
     
 public:
-    std::vector<char> getBytes();
+    std::vector<char>& getBytes();
     
-    Header(const std::vector<char>& b);
+    Header(const std::vector<char>& loadBytes);
     Header();
 };
 }

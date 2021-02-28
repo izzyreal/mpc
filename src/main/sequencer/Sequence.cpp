@@ -1,4 +1,4 @@
-#include <sequencer/Sequence.hpp>
+#include "Sequence.hpp"
 
 #include <Mpc.hpp>
 
@@ -22,11 +22,9 @@ using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::sequencer;
 using namespace std;
 
-Sequence::Sequence(mpc::Mpc& mpc, vector<string> defaultTrackNames)
-	: mpc(mpc)
+Sequence::Sequence(mpc::Mpc& _mpc)
+	: mpc (_mpc), defaultTrackNames (_mpc.getSequencer().lock()->getDefaultTrackNames())
 {
-	this->defaultTrackNames = defaultTrackNames;
-
 	for (int i = 0; i < 64; i++)
 	{
 		tracks.push_back(make_shared<Track>(mpc, this, i));

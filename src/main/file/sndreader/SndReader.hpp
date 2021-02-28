@@ -37,7 +37,7 @@ public:
     bool isLoopEnabled();
     int getTune();
     int getNumberOfBeats();
-    void getSampleData(std::vector<float>* dest);
+    void writeSampleData(std::vector<float>* dest);
     
 public:
     std::vector<char>& getSndFileArray();

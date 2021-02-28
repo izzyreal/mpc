@@ -79,16 +79,12 @@ SequenceNames::SequenceNames(mpc::Mpc& mpc)
 	}
 }
 
-const int SequenceNames::LENGTH;
-const int SequenceNames::ENTRY_LENGTH;
-const int SequenceNames::LAST_EVENT_INDEX_OFFSET;
-
-vector<string> SequenceNames::getNames()
+vector<string>& SequenceNames::getNames()
 {
     return names;
 }
 
-vector<char> SequenceNames::getBytes()
+vector<char>& SequenceNames::getBytes()
 {
     return saveBytes;
 }
@@ -102,9 +98,7 @@ int SequenceNames::getSegmentCount(mpc::sequencer::Sequence* seq)
 		auto t = track.lock();
 
 		if (t->getIndex() > 63)
-		{
 			break;
-		}
 
 		for (auto& e : t->getEvents())
 		{
@@ -125,5 +119,6 @@ int SequenceNames::getSegmentCount(mpc::sequencer::Sequence* seq)
 			}
 		}
 	}
+    
 	return segmentCount;
 }

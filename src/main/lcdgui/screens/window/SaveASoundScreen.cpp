@@ -1,5 +1,7 @@
 #include "SaveASoundScreen.hpp"
 
+#include <lcdgui/screens/window/NameScreen.hpp>
+
 #include <disk/AbstractDisk.hpp>
 #include <Util.hpp>
 
@@ -13,12 +15,6 @@ SaveASoundScreen::SaveASoundScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void SaveASoundScreen::open()
 {
-	if (ls.lock()->getPreviousScreenName().compare("name") != 0)
-	{
-		if (sampler.lock()->getSound().lock())
-			saveName = sampler.lock()->getSound().lock()->getName();
-	}
-
 	displayFile();
 	displayFileType();
 }
@@ -30,19 +26,22 @@ void SaveASoundScreen::turnWheel(int i)
 	if (param.compare("file") == 0 && i > 0)
 	{
 		sampler.lock()->selectPreviousSound();
-		saveName = sampler.lock()->getSound().lock()->getName();
-		displayFile();
 	}
 	else if (param.compare("file") == 0 && i < 0)
 	{
 		sampler.lock()->selectNextSound();
-		saveName = sampler.lock()->getSound().lock()->getName();
-		displayFile();
 	}
 	else if (param.compare("file-type") == 0)
 	{
 		setFileType(fileType + i);
 	}
+    
+    if (param.compare("file") == 0)
+    {
+        auto saveName = sampler.lock()->getSound().lock()->getName();
+        mpc.screens->get<NameScreen>("name")->setName(saveName);
+        displayFile();
+    }
 }
 
 void SaveASoundScreen::function(int i)
@@ -59,7 +58,7 @@ void SaveASoundScreen::function(int i)
 		auto disk = mpc.getDisk().lock();
 		auto s = sampler.lock()->getSound().lock();
 		auto ext = string(fileType == 0 ? ".SND" : ".WAV");
-		auto fileName = mpc::Util::getFileName(saveName) + ext;
+		auto fileName = mpc::Util::getFileName(mpc.screens->get<NameScreen>("name")->getName()) + ext;
 
 		if (disk->checkExists(fileName))
 		{
@@ -101,5 +100,5 @@ void SaveASoundScreen::displayFileType()
 
 void SaveASoundScreen::displayFile()
 {
-	findField("file").lock()->setText(saveName);
+	findField("file").lock()->setText(mpc.screens->get<NameScreen>("name")->getName());
 }

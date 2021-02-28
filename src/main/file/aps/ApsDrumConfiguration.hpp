@@ -7,10 +7,10 @@ class ApsDrumConfiguration
 {
     
 public:
-    int program{};
-    bool receivePgmChange{};
-    bool receiveMidiVolume{};
-    std::vector<char> saveBytes{};
+    int program;
+    bool receivePgmChange;
+    bool receiveMidiVolume;
+    std::vector<char> saveBytes;
     
 private:
     static std::vector<char> TEMPLATE;

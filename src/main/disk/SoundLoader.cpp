@@ -45,9 +45,7 @@ int SoundLoader::loadSound(weak_ptr<MpcFile> f)
 
 	auto soundFile = f.lock();
 	string soundFileName = soundFile->getName();
-    
-    MLOG("Loading sound file " + soundFileName);
-    
+        
 	auto periodIndex = soundFileName.find_last_of('.');
 	string extension = "";
 	string soundName = "";
@@ -143,7 +141,7 @@ int SoundLoader::loadSound(weak_ptr<MpcFile> f)
 	else if (StrUtil::eqIgnoreCase(extension, "snd"))
 	{
 		auto sndReader = mpc::file::sndreader::SndReader(soundFile.get());
-		sndReader.getSampleData(fa);
+		sndReader.writeSampleData(fa);
 		size = fa->size();
 		mono = sndReader.isMono();
 		start = sndReader.getStart();
@@ -169,38 +167,35 @@ int SoundLoader::loadSound(weak_ptr<MpcFile> f)
 	sound->setBeatCount(beats);
 
 	bool alreadyLoaded = existingSoundIndex != -1;
-
-    MLOG("Loaded sound " + soundFileName);
     
 	if (preview)
 	{
 		return existingSoundIndex;
 	}
-	else
-	{
-		if (existingSoundIndex == -1)
-		{
-			if (partOfProgram)
-				return (int)(sampler->getSoundCount()) - 1;
-		}
-		else
-		{
-			if (replace)
-			{
-				sampler->deleteSound(existingSoundIndex);
-				sound->setMemoryIndex(existingSoundIndex);
-				sampler->sort();
-			}
-			else
-			{
-				sampler->deleteSound((int)(sampler->getSoundCount()) - 1);
-			}
-			
-			if (partOfProgram)
-				return existingSoundIndex;
-		}
-	}
-	return -1;
+
+    if (existingSoundIndex == -1)
+    {
+        if (partOfProgram)
+            return (int)(sampler->getSoundCount()) - 1;
+    }
+    else
+    {
+        if (replace)
+        {
+            sampler->deleteSound(existingSoundIndex);
+            sound->setMemoryIndex(existingSoundIndex);
+            sampler->sort();
+        }
+        else
+        {
+            sampler->deleteSound((int)(sampler->getSoundCount()) - 1);
+        }
+        
+        if (partOfProgram)
+            return existingSoundIndex;
+    }
+
+    return -1;
 }
 
 void SoundLoader::getSampleDataFromWav(weak_ptr<moduru::file::File> soundFile, vector<float>* dest)

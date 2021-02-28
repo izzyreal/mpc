@@ -53,16 +53,6 @@ MidiSyncMisc::MidiSyncMisc(mpc::Mpc& mpc)
 	saveBytes[DEF_SONG_NAME_OFFSET + 16] = 1;
 }
 
-const int MidiSyncMisc::LENGTH;
-const int MidiSyncMisc::IN_MODE_OFFSET;
-const int MidiSyncMisc::OUT_MODE_OFFSET;
-const int MidiSyncMisc::SHIFT_EARLY_OFFSET;
-const int MidiSyncMisc::SEND_MMC_OFFSET;
-const int MidiSyncMisc::FRAME_RATE_OFFSET;
-const int MidiSyncMisc::INPUT_OFFSET;
-const int MidiSyncMisc::OUTPUT_OFFSET;
-const int MidiSyncMisc::DEF_SONG_NAME_OFFSET;
-
 int MidiSyncMisc::getInMode()
 {
     return inMode;
@@ -103,7 +93,7 @@ string MidiSyncMisc::getDefSongName()
     return defSongName;
 }
 
-vector<char> MidiSyncMisc::getBytes()
+vector<char>& MidiSyncMisc::getBytes()
 {
     return saveBytes;
 }

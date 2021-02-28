@@ -43,7 +43,7 @@ string Song::getName()
     return name;
 }
 
-vector<char> Song::getBytes()
+vector<char>& Song::getBytes()
 {
     return saveBytes;
 }

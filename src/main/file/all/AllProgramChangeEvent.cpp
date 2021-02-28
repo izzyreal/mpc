@@ -1,29 +1,31 @@
-#include <file/all/AllProgramChangeEvent.hpp>
+#include "AllProgramChangeEvent.hpp"
 
 #include <file/all/AllEvent.hpp>
-#include <sequencer/Event.hpp>
 #include <sequencer/ProgramChangeEvent.hpp>
 
 using namespace mpc::file::all;
+using namespace mpc::sequencer;
 using namespace std;
 
-AllProgramChangeEvent::AllProgramChangeEvent(const vector<char>& ba) 
+shared_ptr<ProgramChangeEvent> AllProgramChangeEvent::bytesToMpcEvent(const vector<char>& bytes)
 {
-	auto pce = new mpc::sequencer::ProgramChangeEvent();
-	pce->setTick(AllEvent::readTick(ba));
-	pce->setTrack(ba[AllEvent::TRACK_OFFSET]);
-	pce->setProgram(ba[PROGRAM_OFFSET] + 1);
-	event = pce;
+	auto event = make_shared<ProgramChangeEvent>();
+	
+    event->setTick(AllEvent::readTick(bytes));
+	event->setTrack(bytes[AllEvent::TRACK_OFFSET]);
+	event->setProgram(bytes[PROGRAM_OFFSET] + 1);
+	
+    return event;
 }
 
-AllProgramChangeEvent::AllProgramChangeEvent(mpc::sequencer::Event* e) 
+vector<char> AllProgramChangeEvent::mpcEventToBytes(shared_ptr<ProgramChangeEvent> event)
 {
-	auto pce = dynamic_cast< mpc::sequencer::ProgramChangeEvent* >(e);
-	saveBytes = vector<char>(8);
-	saveBytes[AllEvent::EVENT_ID_OFFSET] = AllEvent::PGM_CHANGE_ID;
-	AllEvent::writeTick(saveBytes, static_cast< int >(e->getTick()));
-	saveBytes[AllEvent::TRACK_OFFSET] = static_cast< int8_t >(e->getTrack());
-	saveBytes[PROGRAM_OFFSET] = static_cast< int8_t >(pce->getProgram() - 1);
+	vector<char> bytes(8);
+    
+    bytes[AllEvent::EVENT_ID_OFFSET] = AllEvent::PGM_CHANGE_ID;
+	AllEvent::writeTick(bytes, static_cast<int>(event->getTick()));
+    bytes[AllEvent::TRACK_OFFSET] = static_cast<int8_t>(event->getTrack());
+    bytes[PROGRAM_OFFSET] = static_cast<int8_t>(event->getProgram() - 1);
+    
+    return bytes;
 }
-
-int AllProgramChangeEvent::PROGRAM_OFFSET = 5;

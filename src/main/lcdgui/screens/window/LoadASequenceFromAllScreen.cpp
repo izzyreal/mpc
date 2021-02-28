@@ -47,8 +47,7 @@ void LoadASequenceFromAllScreen::function(int i)
 		openScreen("mpc2000xl-all-file");
 		break;
 	case 4:
-		auto loadASequenceFromAllScreen = mpc.screens->get<LoadASequenceFromAllScreen>("load-a-sequence-from-all");
-		auto candidate = loadASequenceFromAllScreen->sequencesFromAllFile[sourceSeqIndex];
+		auto candidate = sequencesFromAllFile[sourceSeqIndex];
 
 		if (candidate)
 		{
@@ -62,12 +61,13 @@ void LoadASequenceFromAllScreen::function(int i)
 
 void LoadASequenceFromAllScreen::displayFile()
 {
-	auto loadASequenceFromAllScreen = mpc.screens->get<LoadASequenceFromAllScreen>("load-a-sequence-from-all");
 	findField("file").lock()->setTextPadded(sourceSeqIndex + 1, "0");
 
-	auto candidate = sourceSeqIndex < sequencesFromAllFile.size() ? loadASequenceFromAllScreen->sequencesFromAllFile[sourceSeqIndex] : shared_ptr<mpc::sequencer::Sequence>();
-	auto name = candidate ? candidate->getName() : "(Unused)";
-	findLabel("file0").lock()->setText("-" + name);
+    auto candidate = sequencesFromAllFile[sourceSeqIndex];
+	
+    auto name = candidate ? candidate->getName() : "(Unused)";
+	
+    findLabel("file0").lock()->setText("-" + name);
 }
 
 void LoadASequenceFromAllScreen::displayLoadInto()
@@ -79,10 +79,7 @@ void LoadASequenceFromAllScreen::displayLoadInto()
 
 void LoadASequenceFromAllScreen::setSourceSeqIndex(int i)
 {
-	auto loadASequenceFromAllScreen = mpc.screens->get<LoadASequenceFromAllScreen>("load-a-sequence-from-all");
-	const auto max = loadASequenceFromAllScreen->sequencesFromAllFile.size();
-
-	if (i < 0 || i >= max)
+	if (i < 0 || i >= sequencesFromAllFile.size())
 		return;
 
 	sourceSeqIndex = i;

@@ -21,7 +21,7 @@ public:
     std::vector<Bar*> getBars();
     
 public:
-    std::vector<char> getBytes();
+    std::vector<char>& getBytes();
     BarList(const std::vector<char>& loadBytes);
     
 public:

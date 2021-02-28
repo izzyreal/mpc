@@ -60,7 +60,7 @@ int Bar::getLastTick()
     return lastTick;
 }
 
-vector<char> Bar::getBytes()
+vector<char>& Bar::getBytes()
 {
     return saveBytes;
 }

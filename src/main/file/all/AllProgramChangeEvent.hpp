@@ -2,30 +2,19 @@
 
 #include <vector>
 
-namespace mpc {
+namespace mpc::sequencer {
+class ProgramChangeEvent;
+}
 
-	namespace sequencer {
-		class Event;
-	}
-
-	namespace file {
-		namespace all {
-
-			class AllProgramChangeEvent
-			{
-
-			private:
-				static int PROGRAM_OFFSET;
-
-			public:
-				mpc::sequencer::Event* event {  };
-				std::vector<char> saveBytes{};
-
-			public:
-				AllProgramChangeEvent(const std::vector<char>& ba);
-				AllProgramChangeEvent(mpc::sequencer::Event* e);
-			};
-
-		}
-	}
+namespace mpc::file::all {
+class AllProgramChangeEvent
+{
+    
+private:
+    const static int PROGRAM_OFFSET = 5;
+    
+public:
+    static std::shared_ptr<mpc::sequencer::ProgramChangeEvent> bytesToMpcEvent(const std::vector<char>&);
+    static std::vector<char> mpcEventToBytes(std::shared_ptr<mpc::sequencer::ProgramChangeEvent>);
+};
 }

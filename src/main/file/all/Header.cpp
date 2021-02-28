@@ -7,9 +7,9 @@
 using namespace mpc::file::all;
 using namespace std;
 
-Header::Header(const vector<char>& b) 
+Header::Header(const vector<char>& _loadBytes)
+: loadBytes (_loadBytes)
 {
-	loadBytes = b;
 }
 
 Header::Header()
@@ -20,7 +20,7 @@ Header::Header()
 		saveBytes[i] = s[i];
 }
 
-vector<char> Header::getHeaderArray()
+vector<char>& Header::getHeaderArray()
 {
     return loadBytes;
 }
@@ -41,7 +41,7 @@ bool Header::verifyFileID()
 	return verifyFileID;
 }
 
-vector<char> Header::getBytes()
+vector<char>& Header::getBytes()
 {
     return saveBytes;
 }

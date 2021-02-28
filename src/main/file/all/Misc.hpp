@@ -20,7 +20,7 @@ public:
     int getDurationTcPercentage();
     bool isPgmChToSeqEnabled();
     
-    std::vector<char> getBytes();
+    std::vector<char>& getBytes();
     
     Misc(const std::vector<char>& b);
     Misc(mpc::Mpc&);

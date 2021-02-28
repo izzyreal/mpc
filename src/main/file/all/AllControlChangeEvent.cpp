@@ -5,28 +5,30 @@
 #include <sequencer/Event.hpp>
 
 using namespace mpc::file::all;
+using namespace mpc::sequencer;
 using namespace std;
 
-AllControlChangeEvent::AllControlChangeEvent(const vector<char>& ba) 
+shared_ptr<ControlChangeEvent> AllControlChangeEvent::bytesToMpcEvent(const vector<char>& bytes)
 {
-	auto cce = new mpc::sequencer::ControlChangeEvent();
-	cce->setTick(AllEvent::readTick(ba));
-	cce->setTrack(ba[AllEvent::TRACK_OFFSET]);
-	cce->setController(ba[CONTROLLER_OFFSET]);
-	cce->setAmount(ba[AMOUNT_OFFSET]);
-	event = cce;
+	auto event = make_shared<ControlChangeEvent>();
+	
+    event->setTick(AllEvent::readTick(bytes));
+	event->setTrack(bytes[AllEvent::TRACK_OFFSET]);
+	event->setController(bytes[CONTROLLER_OFFSET]);
+	event->setAmount(bytes[AMOUNT_OFFSET]);
+    
+    return event;
 }
 
-AllControlChangeEvent::AllControlChangeEvent(mpc::sequencer::Event* e) 
+vector<char> AllControlChangeEvent::mpcEventToBytes(shared_ptr<ControlChangeEvent> event)
 {
-	auto cce = dynamic_cast<mpc::sequencer::ControlChangeEvent*>(e);
-	saveBytes = vector<char>(8);
-	saveBytes[AllEvent::EVENT_ID_OFFSET] = AllEvent::CONTROL_CHANGE_ID;
-	AllEvent::writeTick(saveBytes, static_cast< int >(e->getTick()));
-	saveBytes[AllEvent::TRACK_OFFSET] = static_cast< int8_t >(e->getTrack());
-	saveBytes[CONTROLLER_OFFSET] = static_cast< int8_t >(cce->getController());
-	saveBytes[AMOUNT_OFFSET] = static_cast< int8_t >(cce->getAmount());
+	vector<char> bytes(8);
+    
+    bytes[AllEvent::EVENT_ID_OFFSET] = AllEvent::CONTROL_CHANGE_ID;
+	AllEvent::writeTick(bytes, static_cast<int>(event->getTick()));
+	bytes[AllEvent::TRACK_OFFSET] = static_cast<int8_t>(event->getTrack());
+	bytes[CONTROLLER_OFFSET] = static_cast<int8_t>(event->getController());
+	bytes[AMOUNT_OFFSET] = static_cast<int8_t>(event->getAmount());
+    
+    return bytes;
 }
-
-int AllControlChangeEvent::CONTROLLER_OFFSET = 5;
-int AllControlChangeEvent::AMOUNT_OFFSET = 6;
