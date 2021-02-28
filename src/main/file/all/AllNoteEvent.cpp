@@ -19,8 +19,9 @@ shared_ptr<NoteEvent> AllNoteEvent::bytesToMpcEvent(const vector<char>& bytes)
     
     event->setNote(bytes[NOTE_NUMBER_OFFSET]);
     event->setTick(AllEvent::readTick(bytes));
-    event->setTrack(readTrackNumber(bytes));
-    event->setDuration(readDuration(bytes));
+    auto track = readTrackNumber(bytes);
+    event->setTrack(track);
+    event->setDuration(readDuration(bytes)- (track * 4));
     event->setVelocity(readVelocity(bytes));
     event->setVariationTypeNumber(readVariationType(bytes));
     event->setVariationValue(readVariationValue(bytes));

@@ -78,7 +78,7 @@ int SndReader::getNumberOfBeats()
     return sndHeaderReader->getNumberOfBeats();
 }
 
-void SndReader::getSampleData(vector<float>* dest)
+void SndReader::writeSampleData(vector<float>* dest)
 {
 	int length = sndHeaderReader->getNumberOfFrames();
 
