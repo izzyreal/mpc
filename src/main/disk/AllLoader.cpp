@@ -61,7 +61,8 @@ vector<shared_ptr<mpc::sequencer::Sequence>> AllLoader::loadOnlySequencesFromFil
 {
 	vector<shared_ptr<mpc::sequencer::Sequence>> mpcSequences;
 
-    auto allParser = AllParser(mpc, f);
+    AllParser allParser(mpc, f);
+    
     auto allSequences = allParser.getAllSequences();
     
     auto allSeqNames = allParser.getSeqNames()->getNames();
@@ -71,26 +72,18 @@ vector<shared_ptr<mpc::sequencer::Sequence>> AllLoader::loadOnlySequencesFromFil
     for (int i = 0; i < 99; i++)
     {
         if (allSeqNames[i].find("(Unused)") != string::npos)
-            temp.push_back(nullptr);
-        else
-            temp.push_back(allSequences[counter++]);
-    }
-
-    allSequences = temp;
-
-    for (auto& as : allSequences)
-    {
-        if (as == nullptr)
         {
-            mpcSequences.push_back(nullptr);
+            mpcSequences.push_back({});
             continue;
         }
-
+        
         auto mpcSeq = make_shared<mpc::sequencer::Sequence>(mpc, mpc.getSequencer().lock()->getDefaultTrackNames());
-        convertAllSeqToMpcSeq(as, mpcSeq);
+        
+        convertAllSeqToMpcSeq(allSequences[counter++], mpcSeq);
+        
         mpcSequences.push_back(mpcSeq);
     }
-
+    
     return mpcSequences;
 }
 
