@@ -31,7 +31,7 @@ public:
     std::vector<char> saveBytes;
     
 public:
-    std::vector<char> getBytes();
+    std::vector<char>& getBytes();
     
     AllSequencer(mpc::Mpc& mpc, const std::vector<char>& loadBytes);
     AllSequencer(mpc::Mpc& mpc);

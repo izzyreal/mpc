@@ -49,7 +49,7 @@ public:
     int getNormalVelo();
     
 public:
-    std::vector<char> getBytes();
+    std::vector<char>& getBytes();
     
     Count(mpc::Mpc& mpc, const std::vector<char>& b);
     Count(mpc::Mpc& mpc);

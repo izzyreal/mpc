@@ -430,7 +430,7 @@ void AllSequence::setLastTick(mpc::sequencer::Sequence* seq)
     saveBytes[LAST_TICK_BYTE4_OFFSET + 1] = (large);
 }
 
-vector<char> AllSequence::getBytes()
+vector<char>& AllSequence::getBytes()
 {
     return saveBytes;
 }

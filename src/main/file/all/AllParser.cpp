@@ -205,7 +205,7 @@ vector<AllSequence*> AllParser::readSequences(vector<char> trimmedSeqsArray)
 	return seqs;
 }
 
-vector<char> AllParser::getBytes()
+vector<char>& AllParser::getBytes()
 {
     return saveBytes;
 }

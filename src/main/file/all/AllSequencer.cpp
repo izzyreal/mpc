@@ -44,15 +44,9 @@ AllSequencer::AllSequencer(mpc::Mpc& mpc)
 	saveBytes[SECOND_SEQ_INDEX_OFFSET] = secondSequenceScreen->sq;
 }
 
-const int AllSequencer::LENGTH;
 vector<char> AllSequencer::TEMPLATE = vector<char>{ 0, 0, 0, 0 , (char) 176, 4, 1, 3, 0, 0, 0, 0, 12, 0, 0, 0 };
-const int AllSequencer::SEQ_OFFSET;
-const int AllSequencer::TR_OFFSET;
-const int AllSequencer::TC_OFFSET;
-const int AllSequencer::SECOND_SEQ_ENABLED_OFFSET;
-const int AllSequencer::SECOND_SEQ_INDEX_OFFSET;
 
-vector<char> AllSequencer::getBytes()
+vector<char>& AllSequencer::getBytes()
 {
     return saveBytes;
 }

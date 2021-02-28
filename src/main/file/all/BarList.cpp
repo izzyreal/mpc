@@ -62,8 +62,7 @@ vector<Bar*> BarList::getBars()
     return bars;
 }
 
-
-vector<char> BarList::getBytes()
+vector<char>& BarList::getBytes()
 {
     return saveBytes;
 }

@@ -109,7 +109,7 @@ private:
     void setLastTick(mpc::sequencer::Sequence* seq);
     
 public:
-    std::vector<char> getBytes();
+    std::vector<char>& getBytes();
     
     void applyToMpcSeq(std::shared_ptr<mpc::sequencer::Sequence> mpcSeq);
     

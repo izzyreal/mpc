@@ -58,13 +58,6 @@ Misc::Misc(mpc::Mpc& mpc)
 	saveBytes[MIDI_PGM_CHANGE_TO_SEQ_OFFSET] = 0; // Unimplemented
 }
 
-const int Misc::TAP_AVG_OFFSET;
-const int Misc::MIDI_SYNC_IN_RECEIVE_MMC_OFFSET;
-const int Misc::AUTO_STEP_INCREMENT_OFFSET;
-const int Misc::DURATION_OF_REC_NOTES_OFFSET;
-const int Misc::DURATION_TC_PERCENTAGE_OFFSET;
-const int Misc::MIDI_PGM_CHANGE_TO_SEQ_OFFSET;
-
 int Misc::getTapAvg()
 {
     return tapAvg;
@@ -100,7 +93,7 @@ vector<pair<int, int>> Misc::getSwitches()
     return switches;
 }
 
-vector<char> Misc::getBytes()
+vector<char>& Misc::getBytes()
 {
     return saveBytes;
 }

@@ -57,7 +57,7 @@ public:
     bool isExclusivePassEnabled();
     
 public:
-    std::vector<char> getBytes();
+    std::vector<char>& getBytes();
     
     MidiInput(const std::vector<char>& b);
     MidiInput(mpc::Mpc& mpc);

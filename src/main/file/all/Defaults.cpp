@@ -18,6 +18,10 @@ using namespace moduru::file;
 using namespace moduru::lang;
 using namespace std;
 
+vector<char> Defaults::UNKNOWN1 = vector<char>{ 1, 0, 0, 1, 1, 0 };
+vector<char> Defaults::UNKNOWN2 = vector<char>{ 0, 0, (char) 0xFF, (char) 0xFF, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 32, 32, 32, 32, 32, 32, 32 };
+
 Defaults::Defaults(mpc::Mpc& mpc, const vector<char>& loadBytes)
 	: mpc(mpc)
 {
@@ -81,68 +85,53 @@ Defaults::Defaults(mpc::Mpc& mpc)
 	setTrackSettings();
 }
 
-const int Defaults::DEF_SEQ_NAME_OFFSET;
-const int Defaults::UNKNOWN1_OFFSET;
-
-vector<char> Defaults::UNKNOWN1 = vector<char>{ 1, 0, 0, 1, 1, 0 };
-
-const int Defaults::TEMPO_BYTE1_OFFSET;
-const int Defaults::TEMPO_BYTE2_OFFSET;
-const int Defaults::TIMESIG_NUM_OFFSET;
-const int Defaults::TIMESIG_DEN_OFFSET;
-const int Defaults::BAR_COUNT_BYTE1_OFFSET;
-const int Defaults::BAR_COUNT_BYTE2_OFFSET;
-const int Defaults::LAST_TICK_BYTE1_OFFSET;
-const int Defaults::LAST_TICK_BYTE2_OFFSET;
-const int Defaults::LAST_TICK_BYTE3_OFFSET;
-const int Defaults::UNKNOWN32_BIT_INT_OFFSET;
-const int Defaults::UNKNOWN2_OFFSET;
-
-vector<char> Defaults::UNKNOWN2 = vector<char>{ 0, 0, (char) 0xFF, (char) 0xFF, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-	, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 32, 32, 32, 32, 32, 32, 32 };
-
-const int Defaults::DEV_NAMES_OFFSET;
-const int Defaults::DEV_NAMES_LENGTH;
-const int Defaults::TR_NAMES_OFFSET;
-const int Defaults::TR_NAMES_LENGTH;
-const int Defaults::DEVICES_OFFSET;
-const int Defaults::DEVICES_LENGTH;
-const int Defaults::BUSSES_OFFSET;
-const int Defaults::BUSSES_LENGTH;
-const int Defaults::PGMS_OFFSET;
-const int Defaults::PGMS_LENGTH;
-const int Defaults::TR_VELOS_OFFSET;
-const int Defaults::TR_VELOS_LENGTH;
-const int Defaults::TR_STATUS_OFFSET;
-const int Defaults::TR_STATUS_LENGTH;
-
 void Defaults::parseNames(vector<char> loadBytes)
 {
 	vector<char> stringBuffer;
-	stringBuffer = moduru::VecUtil::CopyOfRange(loadBytes, DEF_SEQ_NAME_OFFSET, DEF_SEQ_NAME_OFFSET + AllParser::NAME_LENGTH);
-	defaultSeqName = "";
-	for (char c : stringBuffer) {
-		if (c == 0x00) break;
+	
+    stringBuffer = moduru::VecUtil::CopyOfRange(loadBytes, DEF_SEQ_NAME_OFFSET, DEF_SEQ_NAME_OFFSET + AllParser::NAME_LENGTH);
+	
+    defaultSeqName = "";
+	
+    for (char c : stringBuffer)
+    {
+		if (c == 0x00)
+            break;
+        
 		defaultSeqName.push_back(c);
 	}
-	auto offset = 0;
-	for (int i = 0; i < 33; i++) {
+	
+    auto offset = 0;
+    
+	for (int i = 0; i < 33; i++)
+    {
 		offset = DEV_NAMES_OFFSET + (i * AllParser::DEV_NAME_LENGTH);
 		stringBuffer = moduru::VecUtil::CopyOfRange(loadBytes, offset, offset + AllParser::DEV_NAME_LENGTH);
 		string s = "";
-		for (char c : stringBuffer) {
-			if (c == 0x00) break;
-			s.push_back(c);
+		
+        for (char c : stringBuffer)
+        {
+			if (c == 0x00)
+                break;
+			
+            s.push_back(c);
 		}
+        
 		devNames[i] = s;
 	}
-	for (int i = 0; i < 64; i++) {
+    
+	for (int i = 0; i < 64; i++)
+    {
 		offset = TR_NAMES_OFFSET + (i * AllParser::NAME_LENGTH);
 		stringBuffer = moduru::VecUtil::CopyOfRange(loadBytes, offset, offset + AllParser::NAME_LENGTH);
 		string s = "";
-		for (char c : stringBuffer) {
-			if (c == 0x00) break;
-			s.push_back(c);
+	
+        for (char c : stringBuffer)
+        {
+			if (c == 0x00)
+                break;
+			
+            s.push_back(c);
 		}
 		trackNames[i] = s;
 	}
@@ -288,7 +277,7 @@ void Defaults::setTempo()
 	saveBytes[TEMPO_BYTE2_OFFSET] = tempoBytes[1];
 }
 
-vector<char> Defaults::getBytes()
+vector<char>& Defaults::getBytes()
 {
 	return saveBytes;
 }

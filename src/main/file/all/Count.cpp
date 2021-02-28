@@ -53,18 +53,6 @@ Count::Count(mpc::Mpc& mpc)
 	saveBytes[NORMAL_VELO_OFFSET] = static_cast< int8_t >(metronomeSoundScreen->getNormalVelo());
 }
 
-const int Count::ENABLED_OFFSET;
-const int Count::COUNT_IN_MODE_OFFSET;
-const int Count::CLICK_VOLUME_OFFSET;
-const int Count::RATE_OFFSET;
-const int Count::ENABLED_IN_PLAY_OFFSET;
-const int Count::ENABLED_IN_REC_OFFSET;
-const int Count::CLICK_OUTPUT_OFFSET;
-const int Count::WAIT_FOR_KEY_ENABLED_OFFSET;
-const int Count::SOUND_OFFSET;
-const int Count::ACCENT_VELO_OFFSET;
-const int Count::NORMAL_VELO_OFFSET;
-
 bool Count::isEnabled()
 {
     return enabled;
@@ -120,7 +108,7 @@ int Count::getNormalVelo()
     return normalVelo;
 }
 
-vector<char> Count::getBytes()
+vector<char>& Count::getBytes()
 {
     return saveBytes;
 }

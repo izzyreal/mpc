@@ -18,14 +18,14 @@ private:
     static const int NAME_OFFSET{ 0 };
     
 public:
-    std::string name{};
-    std::vector<char> saveBytes{};
+    std::string name;
+    std::vector<char> saveBytes;
     
 public:
     std::string getName();
     
 public:
-    std::vector<char> getBytes();
+    std::vector<char>& getBytes();
     
     Song(const std::vector<char>& b);
     Song(mpc::sequencer::Song* mpcSong);

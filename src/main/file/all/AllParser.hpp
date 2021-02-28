@@ -82,7 +82,7 @@ namespace mpc::file::all
 		std::vector<AllSequence*> readSequences(std::vector<char> trimmedSeqsArray);
 
 	public:
-		std::vector<char> getBytes();
+		std::vector<char>& getBytes();
 
 	public:
 		AllParser(mpc::Mpc&, mpc::disk::MpcFile*);
