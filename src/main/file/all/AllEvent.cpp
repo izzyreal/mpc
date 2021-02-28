@@ -107,6 +107,4 @@ void AllEvent::writeTick(vector<char>& event, int tick)
     auto s3 = static_cast<int16_t>(floor(tick / 65536.0));
     
     event[TICK_BYTE3_OFFSET] = BitUtil::stitchBytes(event[TICK_BYTE3_OFFSET], AllNoteEvent::DURATION_BYTE1_BIT_RANGE, static_cast<int8_t>(s3), TICK_BYTE3_BIT_RANGE);
-    
-    return event;
 }

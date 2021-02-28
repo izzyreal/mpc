@@ -122,21 +122,18 @@ void AllNoteEvent::writeVelocity(vector<char>& event, int v)
 {
     auto value = static_cast< int8_t >(v);
     event[VELOCITY_OFFSET] = BitUtil::stitchBytes(event[VELOCITY_OFFSET], vector<int>{ VAR_TYPE_BYTE1_BIT, VAR_TYPE_BYTE1_BIT }, value, VELOCITY_BIT_RANGE);
-    return event;
 }
 
 void AllNoteEvent::writeTrackNumber(vector<char>& event, int t)
 {
     auto value = static_cast< int8_t >(t);
     event[TRACK_NUMBER_OFFSET] = BitUtil::stitchBytes(event[TRACK_NUMBER_OFFSET], DURATION_BYTE2_BIT_RANGE, value, TRACK_NUMBER_BIT_RANGE);
-    return event;
 }
 
 void AllNoteEvent::writeVariationValue(vector<char>& event, int v)
 {
     auto value = static_cast< int8_t >(v);
     event[VAR_VALUE_OFFSET] = BitUtil::stitchBytes(event[VAR_VALUE_OFFSET], vector<int>{ VAR_TYPE_BYTE2_BIT, VAR_TYPE_BYTE2_BIT }, value, VAR_VALUE_BIT_RANGE);
-    return event;
 }
 
 void AllNoteEvent::writeDuration(vector<char>& event, int duration)
@@ -150,8 +147,6 @@ void AllNoteEvent::writeDuration(vector<char>& event, int duration)
     event[DURATION_BYTE2_OFFSET] = BitUtil::stitchBytes(event[DURATION_BYTE2_OFFSET], TRACK_NUMBER_BIT_RANGE, static_cast< int8_t >(s2), DURATION_BYTE2_BIT_RANGE);
 
     event[DURATION_BYTE3_OFFSET] = static_cast< int8_t >(s3);
-
-    return event;
 }
 
 void AllNoteEvent::writeVariationType(vector<char>& event, int type)
@@ -179,5 +174,4 @@ void AllNoteEvent::writeVariationType(vector<char>& event, int type)
 
     event[VAR_TYPE_BYTE1_OFFSET] = byte1;
     event[VAR_TYPE_BYTE2_OFFSET] = byte2;
-    return event;
 }
