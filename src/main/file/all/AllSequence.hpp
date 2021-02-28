@@ -111,6 +111,8 @@ private:
 public:
     std::vector<char> getBytes();
     
+    void applyToMpcSeq(std::shared_ptr<mpc::sequencer::Sequence> mpcSeq);
+    
     AllSequence(const std::vector<char>& b);
     AllSequence(mpc::sequencer::Sequence* seq, int number);
     

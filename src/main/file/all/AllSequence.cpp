@@ -1,5 +1,6 @@
 #include "AllSequence.hpp"
 
+#include "Bar.hpp"
 #include "AllEvent.hpp"
 #include "AllParser.hpp"
 #include "BarList.hpp"
@@ -77,6 +78,58 @@ AllSequence::AllSequence(const vector<char>& bytes)
     allEvents = readEvents(bytes);
 }
 
+void AllSequence::applyToMpcSeq(shared_ptr<mpc::sequencer::Sequence> mpcSeq)
+{
+    mpcSeq->init(barCount - 1);
+
+    for (int i = 0; i < barCount; i++)
+    {
+        auto num = barList->getBars()[i]->getNumerator();
+        auto den = barList->getBars()[i]->getDenominator();
+        mpcSeq->setTimeSignature(i, num, den);
+    }
+
+    mpcSeq->setName(name);
+    mpcSeq->setInitialTempo(tempo);
+    auto at = tracks;
+
+    for (int i = 0; i < 64; i++)
+    {
+        auto t = mpcSeq->getTrack(i).lock();
+        t->setUsed(at->getStatus(i) != 6);
+        t->setName(at->getName(i));
+        t->setBusNumber(at->getBus(i));
+        t->setProgramChange(at->getPgm(i));
+        t->setOn(at->getStatus(i) != 5);
+        t->setVelocityRatio(at->getVelo(i));
+    }
+
+    for (int j = 0; j < getEventAmount(); j++)
+    {
+        auto e = allEvents[j];
+        if (e == nullptr) continue;
+        int track = e->getTrack();
+        if (track > 128) track -= 128;
+        if (track < 0) track += 128;
+        if (track > 63) track -= 64;
+        mpcSeq->getTrack(track).lock()->cloneEvent(shared_ptr<mpc::sequencer::Event>(e));
+    }
+
+    for (int i = 0; i < 32; i++)
+        mpcSeq->setDeviceName(i, devNames[i]);
+
+    mpcSeq->initMetaTracks();
+    mpcSeq->setFirstLoopBarIndex(loopFirst);
+    mpcSeq->setLastLoopBarIndex(loopLast);
+    mpcSeq->setLastLoopBarIndex(loopLast);
+
+    if (loopLastEnd)
+        mpcSeq->setLastLoopBarIndex(INT_MAX);
+
+    mpcSeq->setLoopEnabled(loop);
+}
+
+
 AllSequence::AllSequence(mpc::sequencer::Sequence* seq, int number)
 {
     auto segmentCountLastEventIndex = SequenceNames::getSegmentCount(seq);
@@ -85,31 +138,24 @@ AllSequence::AllSequence(mpc::sequencer::Sequence* seq, int number)
     saveBytes = vector<char>(10240 + (segmentCount * AllSequence::EVENT_SEG_LENGTH) + (terminatorCount * AllSequence::EVENT_SEG_LENGTH));
     
     for (int i = 0; i < AllParser::NAME_LENGTH; i++)
-    {
         saveBytes[i] = StrUtil::padRight(seq->getName(), " ", AllParser::NAME_LENGTH)[i];
-    }
     
     if ((segmentCountLastEventIndex & 1) != 0)
-    {
         segmentCountLastEventIndex--;
-    }
     
     segmentCountLastEventIndex /= 2;
     auto lastEventIndexBytes = ByteUtil::ushort2bytes(1 + (segmentCountLastEventIndex < 0 ? 0 : segmentCountLastEventIndex));
+
     saveBytes[LAST_EVENT_INDEX_OFFSET] = lastEventIndexBytes[0];
     saveBytes[LAST_EVENT_INDEX_OFFSET + 1] = lastEventIndexBytes[1];
     
     for (int i = AllSequence::PADDING1_OFFSET; i < PADDING1_OFFSET + PADDING1.size(); i++)
-    {
         saveBytes[i] = PADDING1[i - PADDING1_OFFSET];
-    }
     
     setTempoDouble(seq->getInitialTempo());
     
     for (int i = AllSequence::PADDING2_OFFSET; i < PADDING2_OFFSET + PADDING2.size(); i++)
-    {
         saveBytes[i] = PADDING2[i - PADDING2_OFFSET];
-    }
     
     setBarCount(seq->getLastBarIndex() + 1);
     setLastTick(seq);

@@ -79,7 +79,7 @@ vector<shared_ptr<mpc::sequencer::Sequence>> AllLoader::loadOnlySequencesFromFil
         
         auto mpcSeq = make_shared<mpc::sequencer::Sequence>(mpc, mpc.getSequencer().lock()->getDefaultTrackNames());
         
-        convertAllSeqToMpcSeq(allSequences[counter++], mpcSeq);
+        allSequences[counter++]->applyToMpcSeq(mpcSeq);
         
         mpcSequences.push_back(mpcSeq);
     }
@@ -91,57 +91,6 @@ void AllLoader::loadEverythingFromFile(mpc::Mpc& mpc, mpc::disk::MpcFile* f)
 {
     AllParser allParser(mpc, f);
     AllLoader::loadEverythingFromAllParser(mpc, allParser);
-}
-
-void AllLoader::convertAllSeqToMpcSeq(mpc::file::all::AllSequence* as, shared_ptr<mpc::sequencer::Sequence> mpcSeq)
-{
-    mpcSeq->init(as->barCount - 1);
-
-    for (int i = 0; i < as->barCount; i++)
-    {
-        auto num = as->barList->getBars()[i]->getNumerator();
-        auto den = as->barList->getBars()[i]->getDenominator();
-        mpcSeq->setTimeSignature(i, num, den);
-    }
-
-    mpcSeq->setName(as->name);
-    mpcSeq->setInitialTempo(as->tempo);
-    auto at = as->tracks;
-
-    for (int i = 0; i < 64; i++)
-    {
-        auto t = mpcSeq->getTrack(i).lock();
-        t->setUsed(at->getStatus(i) != 6);
-        t->setName(at->getName(i));
-        t->setBusNumber(at->getBus(i));
-        t->setProgramChange(at->getPgm(i));
-        t->setOn(at->getStatus(i) != 5);
-        t->setVelocityRatio(at->getVelo(i));
-    }
-
-    for (int j = 0; j < as->getEventAmount(); j++)
-    {
-        auto e = as->allEvents[j];
-        if (e == nullptr) continue;
-        int track = e->getTrack();
-        if (track > 128) track -= 128;
-        if (track < 0) track += 128;
-        if (track > 63) track -= 64;
-        mpcSeq->getTrack(track).lock()->cloneEvent(shared_ptr<mpc::sequencer::Event>(e));
-    }
-
-    for (int i = 0; i < 32; i++)
-        mpcSeq->setDeviceName(i, as->devNames[i]);
-
-    mpcSeq->initMetaTracks();
-    mpcSeq->setFirstLoopBarIndex(as->loopFirst);
-    mpcSeq->setLastLoopBarIndex(as->loopLast);
-    mpcSeq->setLastLoopBarIndex(as->loopLast);
-
-    if (as->loopLastEnd)
-        mpcSeq->setLastLoopBarIndex(INT_MAX);
-
-    mpcSeq->setLoopEnabled(as->loop);
 }
 
 void AllLoader::loadEverythingFromAllParser(mpc::Mpc& mpc, AllParser& allParser)
@@ -180,7 +129,7 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc& mpc, AllParser& allParser)
             continue;
 
         auto mpcSeq = mpc.getSequencer().lock()->getSequence(index++).lock();
-        convertAllSeqToMpcSeq(as, mpcSeq);
+        as->applyToMpcSeq(mpcSeq);
     }
 
     auto sequencer = allParser.getSequencer();
