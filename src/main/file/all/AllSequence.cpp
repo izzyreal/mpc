@@ -22,6 +22,10 @@
 
 #include <cmath>
 
+#ifdef __linux__
+#include <climits>
+#endif
+
 using namespace mpc::file::all;
 using namespace mpc::sequencer;
 using namespace moduru::file;
