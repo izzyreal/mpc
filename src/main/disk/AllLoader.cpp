@@ -65,7 +65,7 @@ vector<shared_ptr<mpc::sequencer::Sequence>> AllLoader::loadOnlySequencesFromFil
     auto allSequences = allParser.getAllSequences();
     
     auto allSeqNames = allParser.getSeqNames()->getNames();
-    vector<Sequence*> temp;
+    vector<AllSequence*> temp;
     int counter = 0;
 
     for (int i = 0; i < 99; i++)
@@ -100,7 +100,7 @@ void AllLoader::loadEverythingFromFile(mpc::Mpc& mpc, mpc::disk::MpcFile* f)
     AllLoader::loadEverythingFromAllParser(mpc, allParser);
 }
 
-void AllLoader::convertAllSeqToMpcSeq(mpc::file::all::Sequence* as, shared_ptr<mpc::sequencer::Sequence> mpcSeq)
+void AllLoader::convertAllSeqToMpcSeq(mpc::file::all::AllSequence* as, shared_ptr<mpc::sequencer::Sequence> mpcSeq)
 {
     mpcSeq->init(as->barCount - 1);
 

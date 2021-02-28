@@ -35,7 +35,7 @@ Tracks::Tracks(const vector<char>& loadBytes)
 
 Tracks::Tracks(mpc::sequencer::Sequence* seq)
 {
-	saveBytes = vector<char>(Sequence::TRACKS_LENGTH);
+	saveBytes = vector<char>(AllSequence::TRACKS_LENGTH);
 	for (int i = 0; i < 64; i++) {
 		auto t = seq->getTrack(i).lock();
 		for (auto j = 0; j < AllParser::NAME_LENGTH; j++) {

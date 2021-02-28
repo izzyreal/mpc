@@ -13,13 +13,13 @@ namespace mpc::disk {
 namespace mpc::file::all {
 	class Header;
 	class Defaults;
-	class Sequencer;
+	class AllSequencer;
 	class Count;
 	class MidiInput;
 	class MidiSyncMisc;
 	class Misc;
 	class SequenceNames;
-	class Sequence;
+	class AllSequence;
 	class Song;
 }
 
@@ -54,20 +54,20 @@ namespace mpc::file::all
 		static const int SEQUENCES_OFFSET{ 14406 };
 		Header* header = nullptr;
 		Defaults* defaults = nullptr;
-		Sequencer* sequencer = nullptr;
+		AllSequencer* sequencer = nullptr;
 		Count* count = nullptr;
 		MidiInput* midiInput = nullptr;
 		MidiSyncMisc* midiSyncMisc = nullptr;
 		Misc* misc = nullptr;
-		SequenceNames* seqNames = nullptr;
-		std::vector<Sequence*> sequences;
+        SequenceNames* seqNames = nullptr;
+        std::vector<AllSequence*> sequences;
         std::vector<Song*> songs = std::vector<Song*>(20);
 		std::vector<char> saveBytes;
 
 	public:
-		std::vector<Sequence*> getAllSequences();
+		std::vector<AllSequence*> getAllSequences();
 		Defaults* getDefaults();
-		Sequencer* getSequencer();
+		AllSequencer* getSequencer();
 		Count* getCount();
 		MidiInput* getMidiInput();
 		MidiSyncMisc* getMidiSync();
@@ -77,7 +77,9 @@ namespace mpc::file::all
 
 	private:
 		mpc::Mpc& mpc;
-		std::vector<Sequence*> readSequences(std::vector<char> trimmedSeqsArray);
+        
+        // Dangerous method, as the caller relies on the argument being a copy
+		std::vector<AllSequence*> readSequences(std::vector<char> trimmedSeqsArray);
 
 	public:
 		std::vector<char> getBytes();

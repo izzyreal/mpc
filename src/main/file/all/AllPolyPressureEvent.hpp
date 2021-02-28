@@ -1,9 +1,10 @@
 #pragma once
 
+#include <memory>
 #include <vector>
 
 namespace mpc::sequencer {
-class Event;
+class PolyPressureEvent;
 }
 
 namespace mpc::file::all {
@@ -12,15 +13,11 @@ class AllPolyPressureEvent
 {
     
 private:
-    static int NOTE_OFFSET;
-    static int AMOUNT_OFFSET;
+    const static int NOTE_OFFSET = 5;
+    const static int AMOUNT_OFFSET = 6;
     
 public:
-    mpc::sequencer::Event* event;
-    std::vector<char> saveBytes;
-    
-public:
-    AllPolyPressureEvent(const std::vector<char>& ba);
-    AllPolyPressureEvent(mpc::sequencer::Event* e);
+    static std::shared_ptr<mpc::sequencer::PolyPressureEvent> bytesToMpcEvent(const std::vector<char>&);
+    static std::vector<char> mpcEventToBytes(std::shared_ptr<mpc::sequencer::PolyPressureEvent>);
 };
 }

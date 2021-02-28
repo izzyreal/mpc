@@ -17,7 +17,7 @@ class Tracks;
 
 namespace mpc::file::all
 {
-class Sequence
+class AllSequence
 {
     
 public:
@@ -86,13 +86,13 @@ public:
     std::vector<std::string> devNames = std::vector<std::string>(33);
     Tracks* tracks;
     BarList* barList;
-    std::vector<mpc::sequencer::Event*> allEvents;
+    std::vector<std::shared_ptr<mpc::sequencer::Event>> allEvents;
     
 private:
     std::vector<char> saveBytes;
     
 private:
-    static std::vector<mpc::sequencer::Event*> readEvents(const std::vector<char>& seqBytes);
+    static std::vector<std::shared_ptr<mpc::sequencer::Event>> readEvents(const std::vector<char>& seqBytes);
     static std::vector<std::vector<char>> readEventSegments(const std::vector<char>& seqBytes);
     double getTempoDouble(const std::vector<char>& bytePair);
     
@@ -111,8 +111,8 @@ private:
 public:
     std::vector<char> getBytes();
     
-    Sequence(const std::vector<char>& b);
-    Sequence(mpc::sequencer::Sequence* seq, int number);
+    AllSequence(const std::vector<char>& b);
+    AllSequence(mpc::sequencer::Sequence* seq, int number);
     
 };
 }

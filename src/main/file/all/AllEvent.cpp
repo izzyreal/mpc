@@ -1,14 +1,15 @@
-#include <file/all/AllEvent.hpp>
+#include "AllEvent.hpp"
+
+#include "AllChannelPressureEvent.hpp"
+#include "AllControlChangeEvent.hpp"
+#include "AllNoteEvent.hpp"
+#include "AllPitchBendEvent.hpp"
+#include "AllPolyPressureEvent.hpp"
+#include "AllProgramChangeEvent.hpp"
+#include "AllSysExEvent.hpp"
 
 #include <Util.hpp>
-#include <file/BitUtil.hpp>
-#include <file/all/AllChannelPressureEvent.hpp>
-#include <file/all/AllControlChangeEvent.hpp>
-#include <file/all/AllNoteEvent.hpp>
-#include <file/all/AllPitchBendEvent.hpp>
-#include <file/all/AllPolyPressureEvent.hpp>
-#include <file/all/AllProgramChangeEvent.hpp>
-#include <file/all/AllSysExEvent.hpp>
+
 #include <sequencer/ChannelPressureEvent.hpp>
 #include <sequencer/ControlChangeEvent.hpp>
 #include <sequencer/Event.hpp>
@@ -21,125 +22,91 @@
 
 #include <cmath>
 
+#include <file/BitUtil.hpp>
 #include <file/ByteUtil.hpp>
 
 using namespace mpc::file::all;
+using namespace mpc::sequencer;
+using namespace moduru::file;
 using namespace std;
-
-AllEvent::AllEvent(const vector<char>& ba)
-{
-	auto eventID = ba[EVENT_ID_OFFSET];
-	
-    if (eventID < 0)
-    {
-		switch (ba[EVENT_ID_OFFSET])
-        {
-		case POLY_PRESSURE_ID:
-			event = AllPolyPressureEvent(ba).event;
-			break;
-		case CONTROL_CHANGE_ID:
-			event = AllControlChangeEvent(ba).event;
-			break;
-		case PGM_CHANGE_ID:
-			event = AllProgramChangeEvent(ba).event;
-			break;
-		case CH_PRESSURE_ID:
-			event = AllChannelPressureEvent(ba).event;
-			break;
-		case PITCH_BEND_ID:
-			event = AllPitchBendEvent(ba).event;
-			break;
-		case SYS_EX_ID:
-			event = AllSysExEvent(ba).event;
-			break;
-		}
-
-	}
-	else
-    {
-		AllNoteEvent allNoteEvent(ba);
-		
-        auto noteEvent = new mpc::sequencer::NoteEvent(allNoteEvent.getNote());
-        noteEvent->setDuration(allNoteEvent.getDuration());
-        noteEvent->setTick(allNoteEvent.getTick());
-        noteEvent->setVelocity(allNoteEvent.getVelocity());
-        noteEvent->setVariationValue(allNoteEvent.getVariationValue());
-        noteEvent->setVariationTypeNumber(allNoteEvent.getVariationType());
-        noteEvent->setTrack(ba[TRACK_OFFSET]);
-        
-		event = noteEvent;
-	}
-}
-
-AllEvent::AllEvent(mpc::sequencer::Event* event)
-{
-	if (dynamic_cast<mpc::sequencer::NoteEvent*>(event) != nullptr) {
-		bytes = AllNoteEvent(event).getBytes();
-	}
-	else if (dynamic_cast<mpc::sequencer::PolyPressureEvent*>(event) != nullptr) {
-		bytes = AllPolyPressureEvent(event).saveBytes;
-	}
-	else if (dynamic_cast<mpc::sequencer::ControlChangeEvent*>(event) != nullptr) {
-		bytes = AllControlChangeEvent(event).saveBytes;
-	}
-	else if (dynamic_cast<mpc::sequencer::ProgramChangeEvent*>(event) != nullptr) {
-		bytes = AllProgramChangeEvent(event).saveBytes;
-	}
-	else if (dynamic_cast<mpc::sequencer::ChannelPressureEvent*>(event) != nullptr) {
-		bytes = AllChannelPressureEvent(event).saveBytes;
-	}
-	else if (dynamic_cast<mpc::sequencer::PitchBendEvent*>(event) != nullptr) {
-		bytes = AllPitchBendEvent(event).saveBytes;
-	}
-	else if (dynamic_cast<mpc::sequencer::SystemExclusiveEvent*>(event) != nullptr || dynamic_cast<mpc::sequencer::MixerEvent*>(event) != nullptr) {
-		bytes = AllSysExEvent(event).saveBytes;
-	}
-}
-
-const int AllEvent::TICK_BYTE1_OFFSET;
-const int AllEvent::TICK_BYTE2_OFFSET;
-const int AllEvent::TICK_BYTE3_OFFSET;
 
 vector<int> AllEvent::TICK_BYTE3_BIT_RANGE = vector<int>{ 0, 3 };
 
-const int AllEvent::TRACK_OFFSET;
-const int AllEvent::EVENT_ID_OFFSET;
-
-const char AllEvent::POLY_PRESSURE_ID;
-const char AllEvent::CONTROL_CHANGE_ID;
-const char AllEvent::PGM_CHANGE_ID;
-const char AllEvent::CH_PRESSURE_ID;
-const char AllEvent::PITCH_BEND_ID;
-const char AllEvent::SYS_EX_ID;
-
-mpc::sequencer::Event* AllEvent::getEvent()
+shared_ptr<Event> AllEvent::bytesToMpcEvent(const vector<char>& bytes)
 {
-    return event;
+    auto eventID = bytes[EVENT_ID_OFFSET];
+    
+    if (eventID < 0)
+    {
+        switch (bytes[EVENT_ID_OFFSET])
+        {
+            case POLY_PRESSURE_ID:
+                return AllPolyPressureEvent::bytesToMpcEvent(bytes);
+            case CONTROL_CHANGE_ID:
+                return AllControlChangeEvent::bytesToMpcEvent(bytes);
+            case PGM_CHANGE_ID:
+                return AllPolyPressureEvent::bytesToMpcEvent(bytes);
+            case CH_PRESSURE_ID:
+                return AllChannelPressureEvent::bytesToMpcEvent(bytes);
+            case PITCH_BEND_ID:
+                return AllPitchBendEvent::bytesToMpcEvent(bytes);
+            case SYS_EX_ID:
+                return AllSysExEvent::bytesToMpcEvent(bytes);
+        }
+    }
+    else
+    {
+        return AllNoteEvent::bytesToMpcEvent(bytes);
+    }
 }
 
-vector<char> AllEvent::getBytes()
+vector<char> AllEvent::mpcEventToBytes(std::shared_ptr<mpc::sequencer::Event> event)
 {
-    return bytes;
+    auto note = dynamic_pointer_cast<mpc::sequencer::NoteEvent>(event);
+    auto polyPressure = dynamic_pointer_cast<mpc::sequencer::PolyPressureEvent>(event);
+    auto controlChange = dynamic_pointer_cast<mpc::sequencer::ControlChangeEvent>(event);
+    auto programChange = dynamic_pointer_cast<mpc::sequencer::ProgramChangeEvent>(event);
+    auto channelPressure = dynamic_pointer_cast<mpc::sequencer::ChannelPressureEvent>(event);
+    auto pitchBend = dynamic_pointer_cast<mpc::sequencer::PitchBendEvent>(event);
+    auto sysEx = dynamic_pointer_cast<mpc::sequencer::SystemExclusiveEvent>(event);
+    auto mixer = dynamic_pointer_cast<mpc::sequencer::MixerEvent>(event);
+    
+    if (note)
+        return AllNoteEvent::mpcEventToBytes(note);
+    else if (polyPressure)
+        return AllPolyPressureEvent::mpcEventToBytes(polyPressure);
+    else if (controlChange)
+        return AllControlChangeEvent::mpcEventToBytes(controlChange);
+    else if (programChange)
+        return AllProgramChangeEvent::mpcEventToBytes(programChange);
+    else if (channelPressure)
+        return AllChannelPressureEvent::mpcEventToBytes(channelPressure);
+    else if (pitchBend)
+        return AllPitchBendEvent::mpcEventToBytes(pitchBend);
+    else if (sysEx)
+        return AllSysExEvent::mpcEventToBytes(sysEx);
+    else if (mixer)
+        return AllSysExEvent::mpcEventToBytes(mixer);
 }
 
-int AllEvent::readTick(const vector<char>& b)
+int AllEvent::readTick(const vector<char>& bytes)
 {
-	unsigned short s3 = moduru::file::BitUtil::removeUnusedBits(b[TICK_BYTE3_OFFSET], TICK_BYTE3_BIT_RANGE);
-	
-    int result = moduru::file::ByteUtil::bytes2ushort(vector<char>{ b[TICK_BYTE1_OFFSET], b[TICK_BYTE2_OFFSET] }) + (s3 * 65536);
-
+    unsigned short s3 = BitUtil::removeUnusedBits(bytes[TICK_BYTE3_OFFSET], TICK_BYTE3_BIT_RANGE);
+    
+    int result = ByteUtil::bytes2ushort(vector<char>{ bytes[TICK_BYTE1_OFFSET], bytes[TICK_BYTE2_OFFSET] }) + (s3 * 65536);
+    
     return result;
 }
 
-vector<char> AllEvent::writeTick(vector<char> event, int tick)
+void AllEvent::writeTick(vector<char>& event, int tick)
 {
-	auto remainder = tick % 65536;
-	auto ba = moduru::file::ByteUtil::ushort2bytes(remainder);
-	event[TICK_BYTE1_OFFSET] = ba[0];
-	event[TICK_BYTE2_OFFSET] = ba[1];
-	auto s3 = static_cast<int16_t>(floor(tick / 65536.0));
+    auto remainder = tick % 65536;
+    auto ba = ByteUtil::ushort2bytes(remainder);
+    event[TICK_BYTE1_OFFSET] = ba[0];
+    event[TICK_BYTE2_OFFSET] = ba[1];
+    auto s3 = static_cast<int16_t>(floor(tick / 65536.0));
     
-	event[TICK_BYTE3_OFFSET] = moduru::file::BitUtil::stitchBytes(event[TICK_BYTE3_OFFSET], AllNoteEvent::DURATION_BYTE1_BIT_RANGE, static_cast<int8_t>(s3), TICK_BYTE3_BIT_RANGE);
-	
+    event[TICK_BYTE3_OFFSET] = BitUtil::stitchBytes(event[TICK_BYTE3_OFFSET], AllNoteEvent::DURATION_BYTE1_BIT_RANGE, static_cast<int8_t>(s3), TICK_BYTE3_BIT_RANGE);
+    
     return event;
 }

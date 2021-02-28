@@ -1,31 +1,22 @@
 #pragma once
 
 #include <vector>
+#include <memory>
 
-namespace mpc {
+namespace mpc::sequencer {
+class PitchBendEvent;
+}
 
-	namespace sequencer {
-		class Event;
-	}
+namespace mpc::file::all {
+class AllPitchBendEvent
+{
+    
+private:
+    const static int AMOUNT_OFFSET = 5;
+    
+public:
+    static std::shared_ptr<mpc::sequencer::PitchBendEvent> bytesToMpcEvent(const std::vector<char>&);
+    static std::vector<char> mpcEventToBytes(std::shared_ptr<mpc::sequencer::PitchBendEvent>);
 
-	namespace file {
-		namespace all {
-
-			class AllPitchBendEvent
-			{
-
-			private:
-				static int AMOUNT_OFFSET;
-
-			public:
-				mpc::sequencer::Event* event;
-				std::vector<char> saveBytes;
-
-			public:
-				AllPitchBendEvent(const std::vector<char>& ba);
-				AllPitchBendEvent(mpc::sequencer::Event* e);
-
-			};
-		}
-	}
+};
 }

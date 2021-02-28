@@ -12,7 +12,7 @@ namespace mpc::disk
 
 namespace mpc::file::all {
 	class AllParser;
-	class Sequence;
+	class AllSequence;
 }
 
 namespace mpc::sequencer
@@ -29,6 +29,6 @@ namespace mpc::disk {
 		static void loadEverythingFromAllParser(mpc::Mpc&, mpc::file::all::AllParser&);
 
 	private:
-		static void convertAllSeqToMpcSeq(mpc::file::all::Sequence*, std::shared_ptr<mpc::sequencer::Sequence>);
+		static void convertAllSeqToMpcSeq(mpc::file::all::AllSequence*, std::shared_ptr<mpc::sequencer::Sequence>);
 	};
 }

@@ -1,8 +1,8 @@
-#include <file/all/AllSysExEvent.hpp>
+#include "AllSysExEvent.hpp"
 
-#include <file/all/AllEvent.hpp>
-#include <file/all/AllSequence.hpp>
-#include <sequencer/Event.hpp>
+#include "AllEvent.hpp"
+#include "AllSequence.hpp"
+
 #include <sequencer/MixerEvent.hpp>
 #include <sequencer/SystemExclusiveEvent.hpp>
 
@@ -11,91 +11,97 @@
 #include <cmath>
 
 using namespace mpc::file::all;
+using namespace mpc::sequencer;
+using namespace moduru;
 using namespace std;
 
-AllSysExEvent::AllSysExEvent(const vector<char>& ba)
-{
-	int byteCount = ba[BYTE_COUNT_OFFSET];
-	sysexLoadData = vector<char>(byteCount);
-	for (int i = 0; i < byteCount; i++)
-		sysexLoadData[i] = ba[DATA_OFFSET + i];
+vector<char> AllSysExEvent::MIXER_SIGNATURE = vector<char>{ (char) 240, 71, 0, 68, 69 };
 
-	if (moduru::VecUtil::Equals(moduru::VecUtil::CopyOfRange(sysexLoadData, MIXER_SIGNATURE_OFFSET, MIXER_SIGNATURE_OFFSET + MIXER_SIGNATURE.size()), MIXER_SIGNATURE))
+shared_ptr<Event> AllSysExEvent::bytesToMpcEvent(const vector<char>& bytes)
+{
+	int byteCount = bytes[BYTE_COUNT_OFFSET];
+	
+    vector<char> sysexLoadData(byteCount);
+	
+    shared_ptr<Event> event;
+
+    event->setTrack(bytes[AllEvent::TRACK_OFFSET]);
+
+    for (int i = 0; i < byteCount; i++)
+		sysexLoadData[i] = bytes[DATA_OFFSET + i];
+
+	if (VecUtil::Equals(VecUtil::CopyOfRange(sysexLoadData, MIXER_SIGNATURE_OFFSET, MIXER_SIGNATURE_OFFSET + MIXER_SIGNATURE.size()), MIXER_SIGNATURE))
     {
-		auto me = new mpc::sequencer::MixerEvent();
-		auto paramCandidate = sysexLoadData[MIXER_PARAMETER_OFFSET] - 1;
-		if (paramCandidate == 4) paramCandidate = 3;
-		me->setParameter(paramCandidate);
-		me->setPadNumber(sysexLoadData[MIXER_PAD_OFFSET]);
-		me->setValue(sysexLoadData[MIXER_VALUE_OFFSET]);
-		me->setTick(AllEvent::readTick(ba));
-		event = me;
+		event = make_shared<MixerEvent>();
+        auto mixerEvent = dynamic_pointer_cast<MixerEvent>(event);
+        auto paramCandidate = sysexLoadData[MIXER_PARAMETER_OFFSET] - 1;
+		
+        if (paramCandidate == 4)
+            paramCandidate = 3;
+		
+        mixerEvent->setParameter(paramCandidate);
+        mixerEvent->setPadNumber(sysexLoadData[MIXER_PAD_OFFSET]);
+        mixerEvent->setValue(sysexLoadData[MIXER_VALUE_OFFSET]);
+        mixerEvent->setTick(AllEvent::readTick(bytes));
 	}
 	else
     {
-		auto see = new mpc::sequencer::SystemExclusiveEvent();
-		//see->setBytes(sysexLoadData);
-		see->setTick(AllEvent::readTick(ba));
-		event = see;
+        event = make_shared<SystemExclusiveEvent>();
+		auto sysExEvent = dynamic_pointer_cast<SystemExclusiveEvent>(event);
+		//sysExEvent->setBytes(sysexLoadData);
+        sysExEvent->setTick(AllEvent::readTick(bytes));
 	}
-	event->setTrack(ba[AllEvent::TRACK_OFFSET]);
+        
+    return event;
 }
 
-int AllSysExEvent::CHUNK_HEADER_ID_OFFSET = 4;
-int AllSysExEvent::BYTE_COUNT_OFFSET = 5;
-int AllSysExEvent::DATA_OFFSET = 8;
-int AllSysExEvent::MIX_TERMINATOR_ID_OFFSET = 28;
-int AllSysExEvent::DATA_HEADER_ID_OFFSET = 8;
-char AllSysExEvent::HEADER_ID = 240;
-char AllSysExEvent::DATA_TERMINATOR_ID = 247;
-char AllSysExEvent::CHUNK_TERMINATOR_ID = 248;
-int AllSysExEvent::MIXER_SIGNATURE_OFFSET = 0;
-vector<char> AllSysExEvent::MIXER_SIGNATURE = vector<char>{ (char) 240, 71, 0, 68, 69 };
-int AllSysExEvent::MIXER_PARAMETER_OFFSET = 5;
-int AllSysExEvent::MIXER_PAD_OFFSET = 6;
-int AllSysExEvent::MIXER_VALUE_OFFSET = 7;
-
-AllSysExEvent::AllSysExEvent(mpc::sequencer::Event* e) 
+vector<char> AllSysExEvent::mpcEventToBytes(shared_ptr<Event> event)
 {
-	if (dynamic_cast< mpc::sequencer::MixerEvent* >(e) != nullptr) {
-		auto me = dynamic_cast< mpc::sequencer::MixerEvent* >(e);
-		saveBytes = vector<char>(32);
-		AllEvent::writeTick(saveBytes, me->getTick());
-		saveBytes[AllEvent::TRACK_OFFSET] = (char)(e->getTrack());
-		saveBytes[CHUNK_HEADER_ID_OFFSET] = HEADER_ID;
-		saveBytes[BYTE_COUNT_OFFSET] = 9;
-		saveBytes[DATA_HEADER_ID_OFFSET] = HEADER_ID;
+    vector<char> bytes;
+    
+    auto mixerEvent = dynamic_pointer_cast<MixerEvent>(event);
+    auto sysExEvent = dynamic_pointer_cast<SystemExclusiveEvent>(event);
+    
+    if (mixerEvent)
+    {
+		bytes = vector<char>(32);
+	
+        AllEvent::writeTick(bytes, mixerEvent->getTick());
+		bytes[AllEvent::TRACK_OFFSET] = (char)(event->getTrack());
+		bytes[CHUNK_HEADER_ID_OFFSET] = HEADER_ID;
+		bytes[BYTE_COUNT_OFFSET] = 9;
+		bytes[DATA_HEADER_ID_OFFSET] = HEADER_ID;
 		for (int i = 0; i < MIXER_SIGNATURE.size(); i++)
-			saveBytes[DATA_OFFSET + i] = MIXER_SIGNATURE[i];
+			bytes[DATA_OFFSET + i] = MIXER_SIGNATURE[i];
 
-		saveBytes[DATA_OFFSET + MIXER_PAD_OFFSET] = static_cast< int8_t >(me->getPad());
-		auto paramCandidate = me->getParameter();
+		bytes[DATA_OFFSET + MIXER_PAD_OFFSET] = static_cast<int8_t>(mixerEvent->getPad());
+		auto paramCandidate = mixerEvent->getParameter();
+        
 		if (paramCandidate == 3)
 			paramCandidate = 4;
 
 		paramCandidate++;
-		saveBytes[DATA_OFFSET + MIXER_PARAMETER_OFFSET] = (char) (paramCandidate);
-		saveBytes[DATA_OFFSET + MIXER_VALUE_OFFSET] = (char) (me->getValue());
-		saveBytes[DATA_OFFSET + MIXER_VALUE_OFFSET + 1] = DATA_TERMINATOR_ID;
-		saveBytes[MIX_TERMINATOR_ID_OFFSET] = CHUNK_TERMINATOR_ID;
+		bytes[DATA_OFFSET + MIXER_PARAMETER_OFFSET] = (char) (paramCandidate);
+		bytes[DATA_OFFSET + MIXER_VALUE_OFFSET] = (char) (mixerEvent->getValue());
+		bytes[DATA_OFFSET + MIXER_VALUE_OFFSET + 1] = DATA_TERMINATOR_ID;
+		bytes[MIX_TERMINATOR_ID_OFFSET] = CHUNK_TERMINATOR_ID;
 	}
-	else if (dynamic_cast< mpc::sequencer::SystemExclusiveEvent* >(e) != nullptr)
+	else if (sysExEvent)
 	{
-		auto see = dynamic_cast< mpc::sequencer::SystemExclusiveEvent* >(e);
-		AllEvent::writeTick(saveBytes, see->getTick());
-		int dataSize = see->getBytes().size();
-		int dataSegments = static_cast< int >(dataSize / 8.0);
-		saveBytes = vector<char>((dataSegments + 2) * Sequence::EVENT_SEG_LENGTH);
-		saveBytes[AllEvent::TRACK_OFFSET] = (char) (e->getTrack());
-		saveBytes[AllEvent::TRACK_OFFSET + ((dataSegments + 1) * Sequence::EVENT_SEG_LENGTH)] = (char) (e->getTrack());
-		saveBytes[CHUNK_HEADER_ID_OFFSET] = HEADER_ID;
-		saveBytes[BYTE_COUNT_OFFSET] = (char) (dataSize);
+		AllEvent::writeTick(bytes, sysExEvent->getTick());
+		int dataSize = sysExEvent->getBytes().size();
+		int dataSegments = static_cast<int>(dataSize / 8.0);
+		bytes = vector<char>((dataSegments + 2) * AllSequence::EVENT_SEG_LENGTH);
+		bytes[AllEvent::TRACK_OFFSET] = (char) (event->getTrack());
+		bytes[AllEvent::TRACK_OFFSET + ( (dataSegments + 1) * AllSequence::EVENT_SEG_LENGTH )] = (char) (event->getTrack());
+		bytes[CHUNK_HEADER_ID_OFFSET] = HEADER_ID;
+		bytes[BYTE_COUNT_OFFSET] = (char) (dataSize);
 		
 		for (int i = 0; i < dataSize; i++)
-		{
-			saveBytes[DATA_OFFSET + i] = see->getBytes()[i];
-		}
-
-		saveBytes[(int)(saveBytes.size()) - 4] = CHUNK_TERMINATOR_ID;
+					bytes[DATA_OFFSET + i] = sysExEvent->getBytes()[i];
+		
+		bytes[(int)(bytes.size()) - 4] = CHUNK_TERMINATOR_ID;
 	}
+    
+    return bytes;
 }

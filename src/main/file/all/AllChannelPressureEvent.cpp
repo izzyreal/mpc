@@ -2,28 +2,30 @@
 
 #include <file/all/AllEvent.hpp>
 #include <sequencer/ChannelPressureEvent.hpp>
-#include <sequencer/Event.hpp>
 
 using namespace mpc::file::all;
+using namespace mpc::sequencer;
 using namespace std;
 
-AllChannelPressureEvent::AllChannelPressureEvent(const vector<char>& ba) 
+shared_ptr<ChannelPressureEvent> AllChannelPressureEvent::bytesToMpcEvent(const std::vector<char>& bytes)
 {
-	auto cpe = new mpc::sequencer::ChannelPressureEvent();
-	cpe->setTick(AllEvent::readTick(ba));
-	cpe->setTrack(ba[AllEvent::TRACK_OFFSET]);
-	cpe->setAmount(ba[AMOUNT_OFFSET]);
-	event = cpe;
+    auto event = make_shared<ChannelPressureEvent>();
+    
+    event->setTick(AllEvent::readTick(bytes));
+    event->setTrack(bytes[AllEvent::TRACK_OFFSET]);
+    event->setAmount(bytes[AMOUNT_OFFSET]);
+    
+    return event;
 }
 
-AllChannelPressureEvent::AllChannelPressureEvent(mpc::sequencer::Event* e) 
+vector<char> AllChannelPressureEvent::mpcEventToBytes(shared_ptr<ChannelPressureEvent> event)
 {
-	auto cpe = dynamic_cast< mpc::sequencer::ChannelPressureEvent* >(e);
-	saveBytes = vector<char>(8);
-	saveBytes[AllEvent::EVENT_ID_OFFSET] = AllEvent::CH_PRESSURE_ID;
-	AllEvent::writeTick(saveBytes, static_cast< int >(e->getTick()));
-	saveBytes[AllEvent::TRACK_OFFSET] = static_cast< int8_t >(e->getTrack());
-	saveBytes[AMOUNT_OFFSET] = static_cast< int8_t >(cpe->getAmount());
+    vector<char> bytes(8);
+    
+    bytes[AllEvent::EVENT_ID_OFFSET] = AllEvent::CH_PRESSURE_ID;
+    AllEvent::writeTick(bytes, static_cast<int>(event->getTick()));
+    bytes[AllEvent::TRACK_OFFSET] = static_cast<int8_t>(event->getTrack());
+    bytes[AMOUNT_OFFSET] = static_cast<int8_t>(event->getAmount());
+    
+    return bytes;
 }
-
-int AllChannelPressureEvent::AMOUNT_OFFSET = 5;
