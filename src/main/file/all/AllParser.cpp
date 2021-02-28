@@ -123,25 +123,6 @@ AllParser::~AllParser()
 		if (s != nullptr) delete s;
 }
 
-const int AllParser::NAME_LENGTH;
-const int AllParser::DEV_NAME_LENGTH;
-const int AllParser::EMPTY_SEQ_LENGTH;
-const int AllParser::EVENT_LENGTH;
-const int AllParser::HEADER_OFFSET;
-const int AllParser::HEADER_LENGTH;
-const int AllParser::DEFAULTS_OFFSET;
-const int AllParser::DEFAULTS_LENGTH;
-const int AllParser::UNKNOWN1_OFFSET;
-const int AllParser::SEQUENCER_OFFSET;
-const int AllParser::COUNT_OFFSET;
-const int AllParser::COUNT_LENGTH;
-const int AllParser::MIDI_INPUT_OFFSET;
-const int AllParser::MIDI_SYNC_OFFSET;
-const int AllParser::MISC_OFFSET;
-const int AllParser::SEQUENCE_NAMES_OFFSET;
-const int AllParser::SONGS_OFFSET;
-const int AllParser::SEQUENCES_OFFSET;
-
 vector<AllSequence*> AllParser::getAllSequences()
 {
     return sequences;

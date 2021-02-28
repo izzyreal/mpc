@@ -55,37 +55,8 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::disk;
 using namespace mpc::file::all;
+using namespace mpc::sequencer;
 using namespace std;
-
-vector<shared_ptr<mpc::sequencer::Sequence>> AllLoader::loadOnlySequencesFromFile(mpc::Mpc& mpc, mpc::disk::MpcFile* f)
-{
-	vector<shared_ptr<mpc::sequencer::Sequence>> mpcSequences;
-
-    AllParser allParser(mpc, f);
-    
-    auto allSequences = allParser.getAllSequences();
-    
-    auto allSeqNames = allParser.getSeqNames()->getNames();
-    vector<AllSequence*> temp;
-    int counter = 0;
-
-    for (int i = 0; i < 99; i++)
-    {
-        if (allSeqNames[i].find("(Unused)") != string::npos)
-        {
-            mpcSequences.push_back({});
-            continue;
-        }
-        
-        auto mpcSeq = make_shared<mpc::sequencer::Sequence>(mpc, mpc.getSequencer().lock()->getDefaultTrackNames());
-        
-        allSequences[counter++]->applyToMpcSeq(mpcSeq);
-        
-        mpcSequences.push_back(mpcSeq);
-    }
-    
-    return mpcSequences;
-}
 
 void AllLoader::loadEverythingFromFile(mpc::Mpc& mpc, mpc::disk::MpcFile* f)
 {
@@ -218,4 +189,33 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc& mpc, AllParser& allParser)
 
     for (int i = 0; i < 20; i++)
         lSequencer->getSong(i).lock()->setName(songs[i]->name);
+}
+
+vector<shared_ptr<Sequence>> AllLoader::loadOnlySequencesFromFile(mpc::Mpc& mpc, mpc::disk::MpcFile* f)
+{
+    vector<shared_ptr<Sequence>> mpcSequences;
+
+    AllParser allParser(mpc, f);
+    
+    auto allSequences = allParser.getAllSequences();
+    
+    auto allSeqNames = allParser.getSeqNames()->getNames();
+    int counter = 0;
+
+    for (int i = 0; i < 99; i++)
+    {
+        if (allSeqNames[i].find("(Unused)") != string::npos)
+        {
+            mpcSequences.push_back({});
+            continue;
+        }
+        
+        auto mpcSeq = make_shared<Sequence>(mpc);
+        
+        allSequences[counter++]->applyToMpcSeq(mpcSeq);
+        
+        mpcSequences.push_back(mpcSeq);
+    }
+    
+    return mpcSequences;
 }

@@ -739,7 +739,7 @@ void Sequencer::purgeAllSequences()
 
 void Sequencer::purgeSequence(int i) {
 	sequences[i].reset();
-	auto sequence = make_shared<Sequence>(mpc, defaultTrackNames);
+	auto sequence = make_shared<Sequence>(mpc);
 	sequences[i].swap(sequence);
 	sequences[i]->resetTrackEventIndices(position);
 	string res = defaultSequenceName;
@@ -763,7 +763,7 @@ void Sequencer::copySequenceParameters(const int source, const int dest)
 shared_ptr<Sequence> Sequencer::copySequence(weak_ptr<Sequence> src)
 {
 	auto source = src.lock();
-	auto copy = make_shared<Sequence>(mpc, defaultTrackNames);
+	auto copy = make_shared<Sequence>(mpc);
 	copy->init(source->getLastBarIndex());
 	copySequenceParameters(source, copy);
 	
@@ -1624,7 +1624,7 @@ void Sequencer::playMetronomeTrack()
 	}
 
 	metronomeOnly = true;
-	metronomeSeq = make_unique<Sequence>(mpc, defaultTrackNames);
+	metronomeSeq = make_unique<Sequence>(mpc);
 	auto s = getActiveSequence().lock();
 	metronomeSeq->init(8);
 	metronomeSeq->setTimeSignature(0, 3, s->getNumerator(getCurrentBarIndex()), s->getDenominator(getCurrentBarIndex()));
@@ -1638,27 +1638,33 @@ void Sequencer::playMetronomeTrack()
 
 void Sequencer::stopMetronomeTrack()
 {
-	if (!metronomeOnly) return;
-	metronomeOnly = false;
+	if (!metronomeOnly)
+        return;
+	
+    metronomeOnly = false;
 	mpc.getAudioMidiServices().lock()->getFrameSequencer().lock()->stop();
 }
 
-weak_ptr<Sequence> Sequencer::createSeqInPlaceHolder() {
-	placeHolder = make_shared<Sequence>(mpc, defaultTrackNames);
+weak_ptr<Sequence> Sequencer::createSeqInPlaceHolder()
+{
+	placeHolder = make_shared<Sequence>(mpc);
 	return placeHolder;
 }
 
-void Sequencer::clearPlaceHolder() {
+void Sequencer::clearPlaceHolder()
+{
 	placeHolder.reset();
 }
 
-void Sequencer::movePlaceHolderTo(int destIndex) {
+void Sequencer::movePlaceHolderTo(int destIndex)
+{
 	sequences[destIndex].swap(placeHolder);
 	sequences[destIndex]->resetTrackEventIndices(position);
 	clearPlaceHolder();
 }
 
-weak_ptr<Sequence> Sequencer::getPlaceHolder() {
+weak_ptr<Sequence> Sequencer::getPlaceHolder()
+{
 	return placeHolder;
 }
 
