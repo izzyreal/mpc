@@ -44,8 +44,8 @@ StdDisk::StdDisk(mpc::Mpc& mpc, weak_ptr<Store> store)
 	}
 }
 
-void StdDisk::renameFilesToAkai() {
-
+void StdDisk::renameFilesToAkai()
+{
 	auto dirContent = getDir()->listFiles();
 	
 	vector<shared_ptr<FsNode>> files;
@@ -58,19 +58,20 @@ void StdDisk::renameFilesToAkai() {
 
 	vector<string> allCompatibleNames;
 
-	for (auto& file : files) {
+	for (auto& file : files)
+    {
 		
 		auto namesExcludingItself = allCompatibleNames;
 
 		auto itself = find(namesExcludingItself.begin(), namesExcludingItself.end(), file->getName());
 		
-		if (itself != namesExcludingItself.end()) {
+		if (itself != namesExcludingItself.end())
 			namesExcludingItself.erase(itself);
-		}
 
 		auto akaiName = AkaiName::generate(file->getName(), namesExcludingItself);
 		
-		if (akaiName.compare(file->getName()) == 0) {
+		if (akaiName.compare(file->getName()) == 0)
+        {
 			allCompatibleNames.push_back(akaiName);
 			continue;
 		}
@@ -79,26 +80,26 @@ void StdDisk::renameFilesToAkai() {
 		file->renameTo(akaiName);
 	}
 	
-	for (auto& dir : directories) {
+	for (auto& dir : directories)
+    {
 		set<string> namesAsSet(allCompatibleNames.begin(), allCompatibleNames.end());
 		
 		auto itself = namesAsSet.find(dir->getName());
 		
-		if (itself != namesAsSet.end()) {
+		if (itself != namesAsSet.end())
 			namesAsSet.erase(itself);
-		}
 
 		auto shortNameGenerator = ShortNameGenerator(namesAsSet);
 		auto akaiName = shortNameGenerator.generateShortName(dir->getName()).asSimpleString();
-
-		if (akaiName.compare(dir->getName()) == 0) {
+        
+		if (akaiName.compare(dir->getName()) == 0)
+        {
 			allCompatibleNames.push_back(akaiName);
 			continue;
 		}
 
-		if (akaiName.find(".") != string::npos) {
+		if (akaiName.find(".") != string::npos)
 			akaiName = akaiName.substr(0, akaiName.find_last_of("."));
-		}
 
 		allCompatibleNames.push_back(akaiName);
 		dir->renameTo(akaiName);
@@ -192,17 +193,13 @@ bool StdDisk::moveForward(const string& directoryName)
 
 shared_ptr<Directory> StdDisk::getDir()
 {
-    auto rootDir = make_shared<Directory>(root.lock()->getPath(), nullptr);
-    
 	if (path.size() == 0)
-		return rootDir;
+        return make_shared<Directory>(root.lock()->getPath(), nullptr);
 
     string dirPath = root.lock()->getPath();
     
     for (int i = 0; i < path.size(); i++)
-    {
         dirPath = dirPath + FileUtil::getSeparator() + path[i];
-    }
     
 	return make_shared<Directory>(dirPath, nullptr);
 }
@@ -248,7 +245,7 @@ bool StdDisk::deleteAllFiles(int extension)
 bool StdDisk::newFolder(const string& newDirName)
 {
     auto dir = getDir();
-	auto f = Directory(dir->getPath() + FileUtil::getSeparator() + StrUtil::toUpper(newDirName), dir.get());
+	auto f = Directory(dir->getPath() + FileUtil::getSeparator() + StrUtil::toUpper(newDirName), dir);
 	return f.create();
 }
 
@@ -295,7 +292,7 @@ shared_ptr<MpcFile> StdDisk::newFile(const string& _newFileName)
         
 		string filePath = dir->getPath() + FileUtil::getSeparator() + StrUtil::toUpper(StrUtil::replaceAll(fileName, ' ', "_"));
         
-		f = make_shared<File>(filePath, dir.get());
+		f = make_shared<File>(filePath, dir);
 		auto success = f->create();
 		
         if (success)
