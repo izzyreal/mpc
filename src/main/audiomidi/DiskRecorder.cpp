@@ -5,6 +5,8 @@
 
 #include <audiomidi/WavOutputFileStream.hpp>
 
+#include <Logger.hpp>
+
 using namespace std;
 using namespace mpc::audiomidi;
 
@@ -44,11 +46,11 @@ bool DiskRecorder::prepare(const std::string& absolutePath, int lengthInFrames, 
 
 int DiskRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf, int nFrames)
 {
-	auto ret = AudioProcessAdapter::processAudio(buf);
+	auto ret = AudioProcessAdapter::processAudio(buf, nFrames);
 	
 	if (writing.load())
 	{
-		vector<char> audioBufferAsBytes (buf->getByteArrayBufferSize(format, nFrames));
+        vector<char> audioBufferAsBytes (buf->getByteArrayBufferSize(format, nFrames));
 		buf->convertToByteArray_(0, nFrames, &audioBufferAsBytes, 0, format);
 		
 		if (audioBufferAsBytes.size() + writtenByteCount >= lengthInBytes)

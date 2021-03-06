@@ -34,7 +34,7 @@ namespace mpc::audiomidi {
 
 	public:
 		DiskRecorder(ctoot::audio::core::AudioProcess* process, std::string name);
-		~DiskRecorder();
+        ~DiskRecorder() override;
 
 	};
 }

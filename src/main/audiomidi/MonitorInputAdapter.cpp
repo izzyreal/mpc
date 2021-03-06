@@ -19,19 +19,20 @@ MonitorInputAdapter::MonitorInputAdapter(mpc::Mpc& mpc, AudioProcess* process)
 {
 }
 
-int32_t MonitorInputAdapter::processAudio(ctoot::audio::core::AudioBuffer* buffer)
+int32_t MonitorInputAdapter::processAudio(ctoot::audio::core::AudioBuffer* buffer, int nFrames)
 {
-	auto ret = process->processAudio(buffer);
+	auto ret = process->processAudio(buffer, nFrames);
 
 	auto sampleScreen = mpc.screens->get<SampleScreen>("sample");
-
+    auto mode = sampleScreen->getMode();
+    
 	if (sampleScreen->getMode() == 0)
 	{
-		buffer->copyChannel(0, 1);
+        buffer->copy(0, 1, nFrames);
 	}
 	else if (sampleScreen->getMode() == 1)
 	{
-		buffer->copyChannel(1, 0);
+        buffer->copy(1, 0, nFrames);
 	}
 
 	return ret;

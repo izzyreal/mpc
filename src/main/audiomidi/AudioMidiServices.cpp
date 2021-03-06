@@ -347,13 +347,13 @@ void AudioMidiServices::initializeDiskRecorders()
 {
 	for (int i = 0; i < outputProcesses.size(); i++) {
 		auto diskRecorder = make_shared<DiskRecorder>(outputProcesses[i], "diskwriter" + to_string(i));
-
-		if (i == 0)
-			mixer->getMainStrip().lock()->setDirectOutputProcess(diskRecorder);
+        
+        diskRecorders.push_back(diskRecorder);
+		
+        if (i == 0)
+			mixer->getMainStrip().lock()->setDirectOutputProcess(diskRecorders.back());
 		else
-			mixer->getStrip(string("AUX#" + to_string(i))).lock()->setDirectOutputProcess(diskRecorder);
-
-		diskRecorders.push_back(std::move(diskRecorder));
+			mixer->getStrip(string("AUX#" + to_string(i))).lock()->setDirectOutputProcess(diskRecorders.back());
 	}
 }
 
