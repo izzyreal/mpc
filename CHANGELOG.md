@@ -1,3 +1,33 @@
+## v0.3.1 (7-3-2021)
+* Native M1 included in MacOS universal binary
+* Support for variable sized buffers, i.e. improved FL Studio support
+* Retain plugin state when saving plugin hostproject and when changing buffer size
+* Ubuntu 18.04 standalone binary published
+* Auto-save programs, sounds, sequences and songs
+* MIDISW screen implemented (control some of MPC2000XL's functions with MIDI CCs)
+* Fix vmpc-specific setting 16 levels Erase mode -- options have become All levels (like real MPC2000XL) and Only pressed level
+* Performance improvements
+* Fix note repeat footer appearing during stop
+* Fix a bug where many notes would not be played during note repeat and 
+* Fix Erase operation while 16 levels enabled
+* Add vmpc-specific setting 16 levels Erase mode -- Any pressed pad (like the real MPC2000XL) or Only source pad
+* Add note repeat footer to MAIN screen like real 2000XL
+* Imlement note repeat lock like real 2000XL: press SHIFT while holding TAP/NOTE REPEAT)
+* Fix hanging voices when playing looped sounds in note repeat mode
+* Fix Erase screen erase operation crash
+* Import loop points of drag-and-dropped SND/WAV files
+* Fix erase while recording/overdubbing -- only erase the notes of the pads you press
+* Fixed a loop bug (LOOP TO was ignored)
+* Fixed various 16-levels bugs
+* Fixed step editor F6 (PLAY) stuck pad
+* Datawheel customizable keyboard mapping
+* Datawheel fine mode -- hold Shift while dragging the wheel to move +/- 17x slower
+* Fix LOOP bug (thank you Son Ray Burns for pointing this out)
+* Import WAV loop data -- 1st loop of the "smpl" chunk
+* Improved keyboard handling, notably of Shift, Control, Alt/Option and their combinations
+* Customizable keyboard mapping -- finally a road towards international, non-US keyboard support
+* New screens -- VmpcKeyboard -- to manage mapping, and VmpcDiscardMapping, VmpcResetKeyboard -- to prevent unwanted (loss of) mapping changes
+
 ## v0.2.0 (11-10-2020)
 * Drag-and-drop single SND/WAV files onto pads
 * Large refactoring, mostly GUI related
