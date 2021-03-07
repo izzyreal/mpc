@@ -71,7 +71,7 @@ void DeleteFolderScreen::deleteFolder()
 		{
 			directoryScreen->yPos0 = 0;
 			directoryScreen->yOffset0 = 0;
-			disk->moveForward(disk->getParentFileNames()[0]);
+            disk->moveBack();
 			disk->initFiles();
 		}
 		else
