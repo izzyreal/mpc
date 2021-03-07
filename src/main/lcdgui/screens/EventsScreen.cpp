@@ -82,7 +82,6 @@ void EventsScreen::update(moduru::observer::Observable* observable, nonstd::any 
 
 	if (msg.compare("padandnote") == 0)
 	{
-		setNote0(mpc.getNote());
 		displayNotes();
 	}
 }
@@ -125,7 +124,7 @@ void EventsScreen::function(int i)
 				for (auto& e : destTrack->getEvents())
 				{
 					auto tick = e.lock()->getTick();
-					
+
 					if (tick >= destOffset && tick < destOffset + (segLength * copies))
 						destTrack->removeEvent(e);
 				}
@@ -531,7 +530,7 @@ void EventsScreen::displayMidiNotes()
 
 void EventsScreen::displayDrumNotes()
 {
-	auto drumNote = note0;
+	auto drumNote = mpc.getNote();
 
 	if (drumNote == 34)
 	{

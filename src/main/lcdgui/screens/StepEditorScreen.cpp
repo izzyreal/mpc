@@ -166,7 +166,7 @@ void StepEditorScreen::function(int i)
 			auto emptyEvent = dynamic_pointer_cast<EmptyEvent>(visibleEvents[eventIndex].lock());
 
 			if (!emptyEvent)
-				placeHolder = { visibleEvents[eventIndex] };
+				placeHolder = { visibleEvents[eventIndex].lock() };
 		}
 		break;
 	case 2:
@@ -1128,7 +1128,7 @@ void StepEditorScreen::setSelectedEvents()
 	}
 	
 	for (int i = firstEventIndex; i < lastEventIndex + 1; i++)
-		selectedEvents.push_back(eventsAtCurrentTick[i]);
+		selectedEvents.push_back(eventsAtCurrentTick[i].lock());
 }
 
 void StepEditorScreen::checkSelection()
@@ -1150,7 +1150,7 @@ void StepEditorScreen::checkSelection()
 
 void StepEditorScreen::setSelectedEvent(weak_ptr<Event> event)
 {
-	selectedEvent = event;
+	selectedEvent = event.lock();
 }
 
 void StepEditorScreen::setSelectedParameterLetter(string str)
@@ -1302,7 +1302,7 @@ vector<weak_ptr<Event>>& StepEditorScreen::getVisibleEvents()
 	return visibleEvents;
 }
 
-vector<weak_ptr<Event>>& StepEditorScreen::getSelectedEvents()
+vector<shared_ptr<Event>>& StepEditorScreen::getSelectedEvents()
 {
 	return selectedEvents;
 }
@@ -1312,12 +1312,12 @@ string StepEditorScreen::getSelectedParameterLetter()
 	return selectedParameterLetter;
 }
 
-weak_ptr<Event> StepEditorScreen::getSelectedEvent()
+shared_ptr<Event> StepEditorScreen::getSelectedEvent()
 {
 	return selectedEvent;
 }
 
-vector<weak_ptr<Event>>& StepEditorScreen::getPlaceHolder()
+vector<shared_ptr<Event>>& StepEditorScreen::getPlaceHolder()
 {
 	return placeHolder;
 }

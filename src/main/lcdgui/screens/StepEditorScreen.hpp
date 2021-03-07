@@ -55,9 +55,9 @@ namespace mpc::lcdgui::screens
 		std::shared_ptr<mpc::sequencer::EmptyEvent> emptyEvent = std::make_shared<mpc::sequencer::EmptyEvent>();
 		std::vector<std::weak_ptr<mpc::sequencer::Event>> visibleEvents;
 		std::vector <std::weak_ptr<mpc::sequencer::Event>> eventsAtCurrentTick;
-		std::vector<std::weak_ptr<mpc::sequencer::Event>> placeHolder;
-		std::weak_ptr<mpc::sequencer::Event> selectedEvent;
-		std::vector<std::weak_ptr<mpc::sequencer::Event>> selectedEvents;
+		std::vector<std::shared_ptr<mpc::sequencer::Event>> placeHolder;
+		std::shared_ptr<mpc::sequencer::Event> selectedEvent;
+		std::vector<std::shared_ptr<mpc::sequencer::Event>> selectedEvents;
 		std::map<std::string, std::string> lastColumn;
 		int lastRow = 0;
 
@@ -108,12 +108,12 @@ namespace mpc::lcdgui::screens
 		int getTcValueRecordedNotes();
 
 		std::vector<std::weak_ptr<mpc::sequencer::Event>>& getVisibleEvents();
-		std::vector<std::weak_ptr<mpc::sequencer::Event>>& getSelectedEvents();
-		std::weak_ptr<mpc::sequencer::Event> getSelectedEvent();
+		std::vector<std::shared_ptr<mpc::sequencer::Event>>& getSelectedEvents();
+		std::shared_ptr<mpc::sequencer::Event> getSelectedEvent();
 		std::string getSelectedParameterLetter();
 		void clearSelection();
 		int getYOffset();
-		std::vector<std::weak_ptr<mpc::sequencer::Event>>& getPlaceHolder();
+		std::vector<std::shared_ptr<mpc::sequencer::Event>>& getPlaceHolder();
 
 	};
 }

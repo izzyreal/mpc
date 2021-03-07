@@ -27,14 +27,15 @@ namespace mpc::lcdgui::screens
 		void update(moduru::observer::Observable* o, nonstd::any arg) override;
 
 	private:
-		void displayStart();
-		void displayTime();
+        void displayTime() override;
+        void displayNotes() override;
+        void displayDrumNotes() override;
+
+        void displayStart();
 		void displayCopies();
 		void displayMode();
 		void displayEdit();
-		void displayNotes();
 		void displayMidiNotes();
-		void displayDrumNotes() override;
 		void displayToTr();
 		void displayToSq();
 		void displayFromTr();
