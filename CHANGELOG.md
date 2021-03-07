@@ -6,7 +6,7 @@
 * Auto-save programs, sounds, sequences and songs
 * MIDISW screen implemented (control some of MPC2000XL's functions with MIDI CCs)
 * Fix vmpc-specific setting 16 levels Erase mode -- options have become All levels (like real MPC2000XL) and Only pressed level
-* Performance improvements
+* Performance improvements (don't allocate memory on the audio thread)
 * Fix note repeat footer appearing during stop
 * Fix a bug where many notes would not be played during note repeat and 
 * Fix Erase operation while 16 levels enabled
