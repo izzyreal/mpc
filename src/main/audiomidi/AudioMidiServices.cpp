@@ -244,8 +244,6 @@ void AudioMidiServices::setupMixer()
 	mixer = make_shared<ctoot::audio::mixer::AudioMixer>(mixerControls, offlineServer);
 	audioSystem = make_shared<ctoot::audio::system::MixerConnectedAudioSystem>(mixer);
 	audioSystem->setAutoConnect(false);
-	setMasterLevel(nvram::NvRam::getMasterLevel());
-	setRecordLevel(nvram::NvRam::getRecordLevel());
 	muteMonitor(true);
 	setAssignableMixOutLevels();
 }

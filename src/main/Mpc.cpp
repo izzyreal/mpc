@@ -59,7 +59,6 @@ void Mpc::init(const int sampleRate, const int inputCount, const int outputCount
 	sequencer = make_shared<mpc::sequencer::Sequencer>(*this);
 	MLOG("Sequencer created");
 
-	mpc::nvram::NvRam::loadVmpcSettings(*this); // Needs to be loaded before sampler is instantiated
 	sampler = make_shared<mpc::sampler::Sampler>(*this);
 	MLOG("Sampler created");
 
@@ -74,20 +73,23 @@ void Mpc::init(const int sampleRate, const int inputCount, const int outputCount
 	sequencer->init();
 	MLOG("Sequencer initialized");
 
-	sampler->init();
+    audioMidiServices->start(sampleRate, inputCount, outputCount);
+    MLOG("AudioMidiServices started");
+
+    // This needs to happen before the sampler initializes initMasterPadAssign
+    // which we do in Sampler::init()
+    mpc::nvram::NvRam::loadVmpcSettings(*this);
+
+    sampler->init();
 	MLOG("Sampler initialized");
 
 	eventHandler = make_shared<mpc::audiomidi::EventHandler>(*this);
 	MLOG("Eeventhandler created");
 
-	audioMidiServices->start(sampleRate, inputCount, outputCount);
-	MLOG("AudioMidiServices started");
-
 	controls = make_shared<controls::Controls>(*this);
 
 	diskController->initDisks();
 
-	hardware->getSlider().lock()->setValue(mpc::nvram::NvRam::getSlider());
 	mpc::nvram::NvRam::loadUserScreenValues(*this);
 
     // We fetch all screens once so they're all cached in Screens,
@@ -95,7 +97,7 @@ void Mpc::init(const int sampleRate, const int inputCount, const int outputCount
 	for (auto& screenName : screenNames)
         screens->get<ScreenComponent>(screenName);
 
-	layeredScreen->openScreen("sequencer");
+    layeredScreen->openScreen("sequencer");
 
 	MLOG("Mpc is ready")
 }
@@ -353,7 +355,6 @@ Mpc::~Mpc() {
 	MLOG("Entering Mpc destructor");
 
 	mpc::nvram::NvRam::saveUserScreenValues(*this);
-	mpc::nvram::NvRam::saveKnobPositions(*this);
 	mpc::nvram::NvRam::saveVmpcSettings(*this);
 
 	for (auto& m : mpcMidiInputs)

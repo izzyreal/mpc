@@ -44,7 +44,6 @@ using namespace std;
 Sampler::Sampler(mpc::Mpc& mpc)
 	: mpc(mpc)
 {
-	initMasterPadAssign = Pad::getPadNotes(mpc);
 }
 
 weak_ptr<Sound> Sampler::getPreviewSound()
@@ -154,6 +153,8 @@ vector<int>* Sampler::getAutoChromaticAssign()
 
 void Sampler::init()
 {
+    initMasterPadAssign = Pad::getPadNotes(mpc);
+
 	auto program = addProgram().lock();;
 	program->setName("NewPgm-A");
 	

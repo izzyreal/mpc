@@ -11,7 +11,7 @@ namespace mpc::hardware {
 
 	private:
 		mpc::Mpc& mpc;
-		int value = 0;
+		int value = 50;
 
 	public:
 		Slider(mpc::Mpc& mpc);
