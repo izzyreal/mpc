@@ -5,11 +5,16 @@
 namespace mpc {
 class Paths
 {
-public:
+private:
     static std::string home();
+    static std::string sep;
+    
+public:
     static std::string resPath();
     static std::string tempPath();
     static std::string storesPath();
     static std::string logFilePath();
+    static std::string recordingsPath();
+
 };
 }

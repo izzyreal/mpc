@@ -203,7 +203,7 @@ void SaveScreen::displaySize()
 
 void SaveScreen::displayFree()
 {
-	auto freeFormatted = FileUtil::getFreeDiskSpaceFormatted(mpc::Paths::home());
+	auto freeFormatted = FileUtil::getFreeDiskSpaceFormatted(mpc::Paths::storesPath());
 	findLabel("free").lock()->setText(freeFormatted);
 }
 
