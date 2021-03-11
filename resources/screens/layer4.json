@@ -1,0 +1,12 @@
+{
+"delete-all-files":
+{
+ "labels" : [ "Delete:" ],
+ "x" : [ 57 ],
+ "y" : [ 40 ],
+ "tfsize" : [ 54 ],
+ "parameters" : [ "delete" ],
+ "fblabels" : [ null, null, null, "CANCEL", "DO IT", null],
+ "fbtypes" : [ null, null, null, 0, 1, null ]
+} 
+}

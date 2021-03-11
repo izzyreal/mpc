@@ -1,0 +1,631 @@
+{
+"sequencer":
+{
+ "labels" : [ "Sq:", "Now:", ".", ".", "  :", "", "Timing:", "Tsig:", "Count:", "Loop:", "Bars:", "Tr:", "ON:", "Pgm:", "", ":", ":", "Velo%:", "Next Sq:" ],
+ "x" : [ 2, 168, 210, 228, 3, 48, 96, 185, 8, 108, 185, 2, 137, 190, 8, 14, 50, 178, 4 ],
+ "y" : [ 2, 1, 1, 1, 12, 12, 12, 12, 21, 21, 21, 31, 31, 31, 40, 40, 40, 40, 51 ],
+ "parameters" : [
+ "sq", [ "_", "now0", "_", "tempo" ],
+ "now0", [ "sq", "now1", "_", "tsig" ],
+ "now1", [ "now0", "now2", "_", "tsig" ],
+ "now2", [ "now1", "tempo", "_", "tsig" ],
+ "tempo", [ "now0", "tempo-source", "sq", "count" ],
+ "tempo-source", [ "tempo", "timing", "sq", "count" ],
+ "timing", [ "tempo-source", "tsig", "now0", "loop" ],
+ "tsig", [ "timing", "count", "now0", "bars" ],
+ "count", [ "tsig", "loop", "tempo", "tr" ],
+ "loop", [ "count", "bars", "timing", "on" ],
+ "bars", [ "loop", "tr", "tsig", "pgm" ],
+ "tr", [ "bars", "on", "count", "bus" ],
+ "on", [ "tr", "pgm", "loop", "_" ],
+ "pgm", [ "on", "recordingmode", "bars", "velo" ],
+ "recordingmode", [ "pgm", "bus", "tr", "nextsq" ],
+ "bus", [ "recordingmode", "devicenumber", "tr", "nextsq" ],
+ "devicenumber", [ "bus", "velo", "tr", "nextsq" ],
+ "velo", [ "devicenumber", "_", "pgm", "_" ],
+ "nextsq,sq", [ "_", "_", "bus", "_" ] 
+ ],
+ "tfsize" : [ 114, 18, 12, 12, 28, 30, 41, 30, 18, 18, 18, 114, 18, 18, 6, 30, 18, 18, 12 ],
+ "infowidgets" : [ "devicename", "punch-time-0", "punch-time-1" ],
+ "infosize" : [ 96, 66, 66 ],
+ "infox" : [ 80, 32, 138 ],
+ "infoy" : [ 39, 51, 51 ],
+ "fblabels" : [[ "STEP", "EDIT", "TrMUTE", "SOLO", "Tr -", "Tr +" ], [ null, null, "TrMUTE", "SOLO", "Tr -", "Tr +" ]],
+ "fbtypes" : [[ 0, 0, 1, 1, 1, 1 ], [ null, null, 1, 1, 1, 1 ]]
+},
+"mixer":
+{
+ "fblabels" : [[ "STEREO", "INDIV", "FXsend", "SETUP", "FXedit", "ALL CH" ],
+			   [ "STEREO", "INDIV", "FXsend", "SETUP", "FXedit", "ALL CH" ],
+			   [ "STEREO", "INDIV", "FXsend", "SETUP", "FXedit", "ALL CH" ],
+			   [ "STEREO", "INDIV", "FXsend", "SETUP", "FXedit", "CLEAR" ],
+			   [ "STEREO", "INDIV", "FXsend", "SETUP", "FXedit", "CLEAR" ],
+			   [ "STEREO", "INDIV", "FXsend", "SETUP", "FXedit", "CLEAR" ]],
+ "fbtypes" : [[ 2, 0, 0, 0, 0, 1 ],
+			  [ 0, 2, 0, 0, 0, 1 ],
+			  [ 0, 0, 2, 0, 0, 1 ],
+			  [ 2, 0, 0, 0, 0, 1 ],
+			  [ 0, 2, 0, 0, 0, 1 ],
+			  [ 0, 0, 2, 0, 0, 1 ]]
+},
+"step-editor":
+{
+ "labels" : [ "View:", "", "-", "Now:", ".", "." ],
+ "parameters" : [
+ "view", [ "_", "fromnote", "_", "_" ],
+ "fromnote", [ "view", "tonote,now0", "_", "_" ],
+ "tonote,fromnote", [ "fromnote", "now0", "_", "_" ],
+ "now0", [ "view", "now1", "_", "_" ],
+ "now1", [ "now0", "now2", "_", "_" ],
+ "now2", [ "now1", "_", "_", "_" ]],
+ "x" : [ 1, 67, 109, 168, 210, 228 ],
+ "y" : [ 1, 1, 1, 1, 1, 1 ],
+ "tfsize" : [ 36, 47, 47, 18, 12, 12 ],
+ "fblabels" : [[ "TC", "COPY", "DELETE", "INSERT", "PASTE", "PLAY" ],
+               [ "TC", "COPY", "DELETE", "EDIT", null, "CANCEL" ]],
+ "fbtypes" : [[ 1, 1, 1, 1, 1, 1 ],
+              [ 1, 1, 1, 1, null, 1 ]]
+},
+"load":
+{
+ "labels" : [ "View:", "File:", "\u00C2" ],
+ "x" : [ 0, 0, 186 ],
+ "y" : [ 1, 9, 1  ],
+ "parameters" : [
+ "view", [ "_", "directory", "_", "file" ],
+ "file", [ "view", "directory", "view", "_" ],
+ "directory", [ "view", "file", "_", "file" ]],
+ "tfsize" : [ 54, 120, 58 ],
+ "infowidgets" : [ "size", "freesnd", "freeseq" ],
+ "infosize" : [ 42, 42, 42 ],  
+ "infox" : [ 206, 206, 206 ],
+ "infoy" : [ 8, 29, 38 ],
+ "fblabels" : [[ "LOAD", "SAVE", "FORMAT", "SETUP", null, "DO IT" ],
+               [ "LOAD", "SAVE", "FORMAT", "SETUP", "PLAY", "DO IT" ]],
+ "fbtypes" : [[ 2, 0, 0, 0, null, 1 ],
+              [ 2, 0, 0, 0, 1, 1 ]]
+},
+"save":
+{
+ "labels" : [ "Type:", "File:", "Device:" ],
+ "x" : [ 0, 0, 165 ],
+ "y" : [ 1, 9, 21 ],
+ "parameters" : ["type", "file", "device" ],
+ "tfsize" : [ 150, 120, 36 ],
+ "infowidgets" : ["directory", "size", "free" ],
+ "infosize" : [ 58, 42, 42 ],  
+ "infox" : [ 186, 206, 208 ],
+ "infoy" : [ 0, 8, 38 ],
+ "fblabels" : [ "LOAD", "SAVE", "FORMAT", "SETUP", null, "DO IT" ],
+ "fbtypes" : [ 0, 2, 0, 0, null, 1 ]
+},
+"select-drum":
+{
+ "fblabels" : [[ "DRUM1", "DRUM2", "DRUM3", "DRUM4", null, null ],
+               [ "DRUM1", "DRUM2", "DRUM3", "DRUM4", null, null ],
+			   [ "DRUM1", "DRUM2", "DRUM3", "DRUM4", null, null ],
+			   [ "DRUM1", "DRUM2", "DRUM3", "DRUM4", null, null ]],
+ "fbtypes" : [[ 0, 1, 1, 1, null, null ],
+              [ 1, 0, 1, 1, null, null ],
+			  [ 1, 1, 0, 1, null, null ],
+			  [ 1, 1, 1, 0, null, null ]]
+},
+"select-mixer-drum":
+{
+ "fblabels" : [[ "DRUM1", "DRUM2", "DRUM3", "DRUM4", "SETUP", "FXedit" ],
+               [ "DRUM1", "DRUM2", "DRUM3", "DRUM4", "SETUP", "FXedit" ],
+			   [ "DRUM1", "DRUM2", "DRUM3", "DRUM4", "SETUP", "FXedit" ],
+			   [ "DRUM1", "DRUM2", "DRUM3", "DRUM4", "SETUP", "FXedit" ]],
+ "fbtypes" : [[ 0, 1, 1, 1, 0, 0 ],
+              [ 1, 0, 1, 1, 0, 0 ],
+			  [ 1, 1, 0, 1, 0, 0 ],
+			  [ 1, 1, 1, 0, 0, 0 ]]
+},
+"mixer-setup":
+{
+ "labels" : [ "Stereo mix source:", "INDIV/FX source:", "Copy pgm mix to drum:", "Record mix changes:", "", "Drum:" ],
+ "x" : [ 9, 21, 15, 28, 193, 187 ],
+ "y" : [ 13, 22, 31, 40, 14, 39 ],
+ "parameters" : [
+ "stereomixsource", [ "_", "masterlevel", "_", "indivfxsource" ],
+ "indivfxsource", [ "masterlevel", "copypgmmixtodrum", "stereomixsource", "copypgmmixtodrum" ],
+ "copypgmmixtodrum", [ "indivfxsource", "recordmixchanges", "indivfxsource", "recordmixchanges" ],
+ "recordmixchanges", [ "copypgmmixtodrum", "fxdrum", "copypgmmixtodrum", "_" ],
+ "masterlevel", [ "stereomixsource", "indivfxsource", "_", "fxdrum" ],
+ "fxdrum", [ "recordmixchanges", "_", "masterlevel", "_" ]
+],
+ "tfsize" : [ 42, 42, 18, 18, 30, 24 ],
+ "fblabels" : [[ "DRUM1", "DRUM2", "DRUM3", "DRUM4", "SETUP", "FXedit" ],
+               [ "DRUM1", "DRUM2", "DRUM3", "DRUM4", "SETUP", "FXedit" ],
+			   [ "DRUM1", "DRUM2", "DRUM3", "DRUM4", "SETUP", "FXedit" ],
+			   [ "DRUM1", "DRUM2", "DRUM3", "DRUM4", "SETUP", "FXedit" ]],
+ "fbtypes" : [[ 0, 1, 1, 1, 0, 0 ],
+              [ 1, 0, 1, 1, 0, 0 ],
+			  [ 1, 1, 0, 1, 0, 0 ],
+			  [ 1, 1, 1, 0, 0, 0 ]]
+},
+"program-assign":
+{
+ "labels" : [ "Pgm:", "Pad:", "=Note:", "Pad assign:", "Note:", "=Snd:", "Mode:", "If over:", "If over:", "Also play note:", "Also play note:" ],
+ "x" : [ 3,  8, 50, 130,  8, 50,  8, 96, 96, 108, 108 ],
+ "y" : [ 2, 12, 12,  12, 22, 22, 40, 31, 40,  31,  40 ],
+ "parameters" : [
+ "pgm", [ "_", "pad", "_", "pad"],
+ "pad", [ "pgm", "pad-note", "pgm", "note"],
+ "pad-note", [ "pad", "pad-assign", "pgm", "snd"],
+ "pad-assign", [ "pad-note", "note", "pgm", "optional-note-a"],
+ "note", [ "pad-assign", "snd", "pad", "mode"],
+ "snd", [ "note", "mode", "pad-note", "optional-note-a"],
+ "mode", [ "snd", "velocity-range-lower", "note", "_"],
+ "velocity-range-lower,mode", [ "mode", "optional-note-a", "snd", "velocity-range-upper" ],
+ "velocity-range-upper,mode", [ "mode", "optional-note-b", "velocity-range-lower", "_"],
+ "optional-note-a,velocity-range-lower", [ "velocity-range-lower", "_", "pad-assign", "optional-note-b"],
+ "optional-note-b", [ "velocity-range-upper", "_", "optional-note-a", "_"]],
+ "tfsize" : [ 114, 18, 12, 42, 12, 96, 36, 18, 18, 36, 36 ],
+ "infowidgets" : [ "issoundstereo" ],
+ "infosize" : [ 24 ],
+ "infox" : [ 177 ],
+ "infoy" : [ 21 ],
+ "fblabels" : [ "ASSIGN", "PARAMS", "DRUM", "PURGE", "AUTO", "PLAY" ],
+ "fbtypes" : [ 2, 0, 0, 0, 1, 1 ]
+},
+"program-params":
+{
+ "labels" : [ "Pgm:", "Note:", "Attack:", "Decay:", "Dcy md:", "Freq:", "Reson:", "Tune:", "" ],
+ "x" : [ 3, 45, 3, 9, 3, 134, 134, 190, 190 ],
+ "y" : [ 2, 2, 22, 31, 40, 26, 37, 12, 40 ],
+ "parameters" : [
+ "pgm", [ "_", "note", "_", "attack" ],
+ "note", [ "pgm", "attack", "_", "freq" ],
+ "attack", [ "note", "freq", "pgm", "decay" ],
+ "decay", [ "tune", "reson", "attack", "dcymd" ],
+ "dcymd", [ "voiceoverlap", "reson", "decay", "_" ],
+ "freq", [ "attack", "tune", "note", "reson" ],
+ "reson", [ "decay", "voiceoverlap", "freq", "_" ],
+ "tune", [ "freq", "decay", "note", "voiceoverlap" ],
+ "voiceoverlap",  [ "reson", "dcymd", "tune", "_" ]],
+ "tfsize" : [ 12, 162, 18, 18, 30, 18, 12, 24, 48 ],
+ "fblabels" : [ "ASSIGN", "PARAMS", "DRUM", "PURGE", "AUTO", "PLAY" ],
+ "fbtypes" : [ 0, 2, 0, 0, 1, 1 ]
+},
+"drum":
+{
+ "labels" : [ "Drum:", "Pad to internal sound:", "Pgm:", "Program Change:", "MIDI volume:", "Current val.:" ],
+ "x" : [ 3, 89, 9, 3, 21, 147],
+ "y" : [ 2, 2, 14, 26, 37, 37 ],
+ "parameters" : [
+ "drum", [ "_", "padtointernalsound", "_", "pgm" ],
+ "padtointernalsound", [ "drum", "pgm", "_", "current-val" ],
+ "pgm", [ "padtointernalsound", "program-change", "drum", "program-change" ],
+ "program-change", [ "pgm", "midi-volume", "pgm", "midi-volume" ],
+ "midi-volume", [ "program-change", "current-val", "program-change", "_" ],
+ "current-val", [ "midi-volume", "_", "padtointernalsound", "_" ]],
+ "tfsize" : [ 6, 18, 114, 42, 42, 18 ],
+ "fblabels" : [ "ASSIGN", "PARAMS", "DRUM", "PURGE", null, null ],
+ "fbtypes" : [ 0, 0, 2, 0, null, null ]
+},
+"purge":
+{
+ "infowidgets" : [ "value" ],
+ "infox" : [ 23 ],
+ "infoy" : [ 35 ],
+ "infosize" : [ 18 ],
+ "fblabels" : [[ "ASSIGN", "PARAMS", "DRUM", "PURGE", null, null ], [ "ASSIGN", "PARAMS", "DRUM", "PURGE", null, "DO IT" ]],
+ "fbtypes" : [[ 0, 0, 0, 2, null, null ], [ 0, 0, 0, 2, null, 1 ]]
+},
+"events":
+{
+ "labels" : [ "Edit:", "", ".", ".", "-", ".", ".", "", "-", "From sq:", "Tr:", "To sq:", "Tr:", "Mode:", "Start:", ".", ".", "Copies:" ],
+ "x" : [ 2, 8, 26, 44, 62, 86, 104, 8, 55, 132, 204, 145, 204, 150, 145, 198, 216, 138 ],
+ "y" : [ 2, 21, 21, 21, 21, 21, 21, 39, 39, 2, 2, 12, 12, 21, 30, 30, 30, 39 ],
+ "parameters" : [
+ "edit", [ "_", "from-sq", "_", "time0" ],
+ "time0", [ "_", "time1", "edit", "note0" ],
+ "time1", [ "time0", "time2", "edit", "note0" ],
+ "time2", [ "time1", "time3", "edit", "note0" ],
+ "time3", [ "time2", "time4", "edit", "note1,note0" ],
+ "time4", [ "time3", "time5", "edit", "note1,note0" ],
+ "time5", [ "time4", "mode", "edit", "note1,note0" ],
+ "note0", [ "_", "note1,copies", "time0", "_" ],
+ "note1,note0", [ "note0", "copies", "time0", "_" ],
+ "from-sq", [ "edit", "from-tr", "_", "to-sq,mode" ],
+ "from-tr", [ "from-sq", "_", "_", "to-tr,mode" ],
+ "to-sq", [ "time5", "to-tr", "from-sq", "mode" ],
+ "to-tr", [ "to-sq", "_", "from-tr", "mode" ],
+ "mode", [ "time5", "_", "to-sq,from-sq", "start0,copies" ],
+ "start0", [ "time5", "start1", "mode", "copies" ],
+ "start1", [ "start0", "start2", "mode", "copies" ],
+ "start2", [ "start1", "_", "mode", "copies" ],
+ "copies", [ "note1,note0", "_", "start0,mode", "_" ]],
+ "tfsize" : [ 55, 18, 12, 12, 18, 12, 12, 47, 47, 12, 12, 12, 12, 42, 18, 12, 12, 12 ],
+ "fblabels" : [ "EVENTS", "BARS", "TrMOVE", "USER", null, "DO IT"],
+ "fbtypes" : [ 2, 0, 0, 0, null, 1 ]
+},
+"bars":
+{
+ "labels" : [ "From  Sq:", "First bar:", "Last bar:", "To Sq:", "After bar:", "Copies:" ],
+ "x" : [ 4, 22, 28, 154, 154, 172 ],
+ "y" : [ 3, 14, 36, 3, 14, 36 ],
+ "parameters" : [
+ "fromsq", [ "_", "tosq", "_", "firstbar" ],
+ "firstbar", [ "_", "afterbar", "fromsq", "lastbar" ],
+ "lastbar", [ "_", "copies", "firstbar", "_" ],
+ "tosq", [ "fromsq", "afterbar", "_", "afterbar" ],
+ "afterbar", [ "firstbar", "_", "tosq", "copies" ],
+ "copies",  [ "lastbar", "_", "afterbar", "_" ]],
+ "tfsize" : [ 12, 18, 18, 12, 18, 12 ],
+ "fblabels" : [ "EVENTS", "BAR", "TrMOVE", "USER", null, "DO IT"],
+ "fbtypes" : [ 0, 2, 0, 0, null, 1 ]
+},  
+"tr-move":
+{
+ "labels" : [ "Sq:", "" ],
+ "x" : [ 2, 108 ],
+ "y" : [ 2, 26 ],
+ "parameters" : [
+ "sq", [ "_", "tr", "_", "tr" ],
+ "tr", [ "sq", "_", "_", "_" ]],
+ "tfsize" : [ 12, 120 ],
+ "infowidgets" : [ "sq-name", "tr0", "tr1", "selecttrack", "tomove" ],
+ "infox" : [ 32, 108, 108, 22, 22 ],
+ "infoy" : [ 1, 16, 36, 20, 30 ],
+ "infosize" : [ 102, 120, 120, 72, 48 ],
+ "fblabels" : [[ "EVENTS", "BARS", "TrMOVE", "USER", null, null], [ "EVENTS", "BARS", "TrMOVE", "USER", null, "SELECT" ], [ null, null, null, null, "CANCEL", "INSERT" ]],
+ "fbtypes" : [[ 0, 0, 2, 0, null, null ], [ 0, 0, 2, 0, null, 1 ], [ null, null, null, null, 1, 0 ]]
+},
+"user":
+{
+ "labels" : [ "\u00C0:", "Loop:", "Tsig:", "Bars:", "Pgm:", "", ":", ":", "Velo%:" ],
+ "x" : [ 8, 108, 185, 185, 190, 8, 14, 50, 178 ],
+ "y" : [ 12, 21, 12, 21, 31, 40, 40, 40, 40 ],
+ "parameters" : [
+ "tempo", [ "_", "loop", "_", "bus" ],
+ "loop", [ "tempo", "tsig", "tempo", "device" ],
+ "tsig", [ "loop", "_", "_", "bars" ],
+ "bars", [ "loop", "_", "tsig", "pgm" ],
+ "pgm", [ "device", "_", "bars", "velo" ],
+ "recordingmode", [ "_", "bus", "tempo", "_" ],
+ "bus", [ "recordingmode", "device", "tempo", "_" ],
+ "device", [ "bus", "velo", "tempo", "_" ],
+ "velo", [ "device", "_", "pgm", "_" ]],
+ "tfsize" : [ 30, 18, 30, 18, 18, 6, 30, 18, 18 ],
+ "infowidgets" : [ "devicename" ],
+ "infosize" : [ 96 ],
+ "infox" : [ 80 ],
+ "infoy" : [ 39 ],
+ "fblabels" : [ "EVENTS", "BARS", "TrMOVE", "USER", null, null],
+ "fbtypes" : [ 0, 0, 0, 2, null, null ]
+},
+"fx-edit":
+{
+ "labels" : [ "Drum:", "Pgm:", "Edit:", "", "", "", "", "", "", "Input:" ],
+ "x" : [ 2, 110, 2, 41, 77, 116, 149, 188, 224, 3 ],
+ "y" : [ 2, 2, 12, 26, 26, 26, 26, 26, 26, 26 ],
+ "parameters" : [ "drum", "pgm", "edit", "dist", "filt", "mod", "echo", "rev", "mix", "input" ],
+ "tfsize" : [ 6, 114, 54, 12, 12, 12, 12, 12, 12, 12 ],
+ "fblabels" : [ "DRUM 1", "DRUM 2", "DRUM 3", "DRUM 4", "SETUP", "ON/OFF" ],
+ "fbtypes" : [ 0, 1, 1, 1, 0, 1 ]
+},
+"others":
+{
+ "labels" : [ "Tap averaging:" ],
+ "x" : [ 16 ],
+ "y" : [ 3 ],
+ "parameters" : [ "tapaveraging" ],
+ "tfsize" : [ 6 ],
+ "fblabels" : [ "OTHERS", "INIT", "VER.", null, null, null ],
+ "fbtypes" : [ 2, 0, 0, null, null, null ]
+},
+"init":
+{
+ "fblabels" : [ "OTHERS", "INIT", "VER.", null, null, "DO IT" ],
+ "fbtypes" : [ 0, 2, 0, null, null, 1 ]
+},
+"ver":
+{
+ "fblabels" : [ "OTHERS", "INIT", "VER.", null, null, null ],
+ "fbtypes" : [ 0, 0, 2, null, null, null ]
+},
+"sync":
+{
+ "labels" : [ "Sync In     (In:", "Mode:", "Shift early(ms):", "Receive MMC:", "Sync Out (Out:", "Mode:", "Send MMC:" ],
+ "x" : [ 4, 4, 4, 4, 128, 128, 128 ],
+ "y" : [ 2, 12, 20, 38, 2, 12, 38 ],
+ "parameters" : [
+ "in", [ "_", "out", "_", "mode-in" ],
+ "mode-in", [ "_", "mode-out", "in", "shift-early,receive-mmc" ],
+ "shift-early", [ "_", "mode-out", "mode-in", "receive-mmc" ],
+ "receive-mmc", [ "_", "send-mmc", "shift-early,mode-in", "_" ],
+ "out", [ "in", "_", "_", "mode-out" ],
+ "mode-out", [ "mode-in", "_", "out", "send-mmc" ],
+ "send-mmc", [ "receive-mmc", "_", "mode-out", "_" ]],
+ "tfsize" : [ 6, 72, 12, 18, 18, 72, 18 ],
+ "fblabels" : [ "SYNC", "DUMP", "MIDIsw", null, null, null ],
+ "fbtypes" : [ 2, 0, 0, null, null, null ]
+},
+"dump":
+{
+ "labels" : [ "RECEIVE      (In:", "Request No.:", "TRANSMIT    (Out:", "", "device ID:" ],
+ "x" : [ 3, 3, 128, 128, 128 ],
+ "y" : [ 2, 37, 2, 23, 37 ],
+ "parameters" : [ "in", "requestno", "out", "soundname", "deviceid" ],
+ "tfsize" : [ 6, 30, 6, 96, 18 ],
+ "fblabels" : [ "SYNC", "DUMP", "MIDIsw", null, "REQUES", null ],
+ "fbtypes" : [ 0, 2, 0, null, 1, null ]
+},
+"midi-sw":
+{
+ "labels" : [ "Ctrl:", "", "Ctrl:", "", "Ctrl:", "", "Ctrl:", "" ],
+ "x" : [ 5, 5,  67, 67, 129, 129, 191, 191 ],
+ "y" : [ 15, 35, 15, 35, 15, 35, 15, 35],
+ "parameters" : [ "ctrl0", "function0", "ctrl1", "function1", "ctrl2", "function2", "ctrl3", "function3" ],
+ "tfsize" : [ 18, 54, 18, 54, 18, 54, 18, 54 ],
+ "infowidgets" : [ "switch0", "switch1", "switch2", "switch3" ],
+ "infox" : [ 5, 67, 129, 191 ],
+ "infoy" : [ 1, 1, 1, 1 ],
+ "infosize" : [ 54, 54, 54, 54 ], 
+"fblabels" : [ "SYNC", "DUMP", "MIDIsw", null, null, null ],
+ "fbtypes" : [ 0, 0, 2, null, null, null ]
+},
+"sample":
+{
+ "labels" : [ "Input:", "Mode:", "Monitor:", "Threshold:", "Time:", "Pre-rec:" ],
+ "x" : [ 1, 91, 169, 1, 91, 169 ],
+ "y" : [ 1, 1, 1, 10, 10, 10 ],
+ "parameters" : [ "input", "mode", "monitor", "threshold", "time", "prerec" ],
+ "tfsize" : [ 42, 36, 18, 18, 30, 18 ],
+ "infowidgets" : [ "vuleft", "vuright" ],
+ "infox" : [ 39, 39 ],
+ "infoy" : [ 29, 38 ],
+ "infosize" : [ 204, 204 ]
+},
+"trim":
+{
+ "labels" : [ "Snd:", "PLAY X:", "St:", "End:", "View:", "" ],
+ "x" : [ 2, 157, 8, 98, 186, 1 ],
+ "y" : [ 2, 1, 12, 12, 12, 1 ],
+ "parameters" : [
+ "snd,dummy", [ "_", "playx", "_", "st" ],
+ "playx,dummy", [ "snd", "st", "_", "view" ],
+ "st,dummy", [ "playx", "end", "snd", "_" ],
+ "end,dummy", [ "st", "view", "snd", "_" ],
+ "view,dummy", [ "end", "_", "playx", "_" ],
+ "dummy,snd" ],
+ "tfsize" : [ 120, 48, 48, 48, 30, 0 ],
+ "fblabels" : [[ "TRIM", "LOOP", "ZONE", "PARAMS", null, null ], [ "TRIM", "LOOP", "ZONE", "PARAMS", "EDIT", "PLAY X" ]],
+ "fbtypes" : [[ 2, 0, 0, 0, null, null],[ 2, 0, 0, 0, 1, 1]]
+},
+"loop":
+{
+ "labels" : [ "Snd:", "PLAY X:", "To:", "", ":", "Loop:", "" ],
+ "x" : [ 2, 157, 8, 86, 116, 186, 1 ],
+ "y" : [ 2, 1, 12, 12, 12, 12, 1 ],
+ "parameters" : [
+ "snd,dummy", [ "_", "playx", "_", "to" ],
+ "playx,dummy", [ "snd", "to", "_", "loop" ],
+ "to,dummy", [ "playx", "endlength", "snd", "_" ],
+ "endlength,dummy", [ "to", "endlengthvalue", "snd", "_" ],
+ "endlengthvalue,dummy", [ "endlength", "loop", "snd", "_" ],
+ "loop,dummy", [ "endlengthvalue", "_", "playx", "_" ], 
+ "dummy,snd" ],
+ "tfsize" : [ 120, 48, 48, 30, 48, 18, 0 ],
+"fblabels" : [[ "TRIM", "LOOP", "ZONE", "PARAMS", null, null ], [ "TRIM", "LOOP", "ZONE", "PARAMS", "EDIT", "PLAY X" ]],
+  "fbtypes" : [[ 0, 2, 0, 0, null, null], [ 0, 2, 0, 0, 1, 1]]
+},
+"zone":
+{
+ "labels" : [ "Snd:", "PLAY X:", "St:", "End:", "Zone:", "" ],
+ "x" : [ 2, 157, 8, 98, 190, 1 ],
+ "y" : [ 2, 1, 12, 12, 12, 1 ],
+ "parameters" : [
+ "snd,dummy", [ "_", "playx", "_", "st" ],
+ "playx,dummy", [ "snd", "st", "_", "zone" ],
+ "st,dummy", [ "playx", "end", "snd", "_" ],
+ "end,dummy", [ "st", "zone", "snd", "_" ],
+ "zone,dummy", [ "end", "_", "playx", "_" ],
+ "dummy,snd" ],
+ "tfsize" : [ 120, 48, 48, 48, 12, 0 ],
+"fblabels" : [[ "TRIM", "LOOP", "ZONE", "PARAMS", null, null ], [ "TRIM", "LOOP", "ZONE", "PARAMS", "EDIT", "PLAY X" ]],
+  "fbtypes" : [[ 0, 0, 2, 0, null, null],[ 0, 0, 2, 0, 1, 1]]
+},
+"params":
+{
+ "labels" : [ "Snd:", "PLAY X:", "Level:", "Beat:", "Tune:", "" ],
+ "x" : [ 2, 157, 14, 183, 14,  1 ],
+ "y" : [ 2, 1, 18, 17, 33, 1 ],
+ "parameters" : [
+ "snd,dummy", [ "_", "playx", "_", "level" ],
+ "playx,dummy", [ "snd", "level", "_", "beat" ],
+ "level,dummy", [ "playx", "beat", "snd", "tune" ],
+ "beat,dummy", [ "level", "tune", "playx", "_" ],
+ "tune,dummy", [ "beat", "_", "level", "_" ],
+ "dummy,snd" ],
+ "tfsize" : [ 120, 48, 18, 12, 24, 0 ],
+ "infowidgets" : [ "sample-tempo", "new-tempo" ],
+ "infox" : [ 135, 153 ],
+ "infoy" : [ 26, 35 ],
+ "infosize" : [ 108, 90 ],
+"fblabels" : [[ "TRIM", "LOOP", "ZONE", "PARAMS", null, null ], [ "TRIM", "LOOP", "ZONE", "PARAMS", null, "PLAY X" ]],
+  "fbtypes" : [[ 0, 0, 0, 2, null, null],[ 0, 0, 0, 2, null, 1]]
+},
+"song":
+{
+ "labels" : [ "Song:", "Now:", ".", ".", "TEMPO:", "\u00C0:", "LOOP:", "", "", "", "", "", "", "", "", "" ],
+ "x" : [ 2, 168, 210, 228, 6, 28, 12, 77, 77, 77, 105, 105, 105, 227, 227, 227  ],
+ "y" : [ 2, 1, 1, 1, 13, 22, 36, 23, 31, 39, 23, 31, 39, 23, 31, 39 ],
+ "parameters" : [
+ "song", [ "_", "now0", "_", "tempo-source" ],
+ "now0", [ "song", "now1", "_", "sequence1" ],
+ "now1", [ "now0", "now2", "_", "sequence1" ],
+ "now2", [ "now1", "tempo-source", "_", "sequence1" ],
+ "tempo-source", [ "now0", "step1", "song", "tempo" ],
+ "tempo", [ "tempo-source", "step1", "tempo-source", "loop" ],
+ "loop", [ "tempo", "step1", "tempo", "_" ],
+ "step0", [ "_", "_", "_", "_" ],
+ "step1", [ "tempo", "sequence1", "_", "_" ],
+ "step2", [ "_", "_", "_", "_" ],
+ "sequence0", [ "_", "_", "_", "_" ],
+ "sequence1", [ "step1", "reps1", "_", "_" ],
+ "sequence2", [ "_", "_", "_", "_" ],
+ "reps0", [ "_", "_", "_", "_" ],
+ "reps1", [ "sequence1", "now0", "_", "_" ],
+ "reps2", [ "_", "_", "_", "_" ]],
+ "tfsize" : [ 117, 18, 12, 12, 18, 27, 18, 26, 26, 26, 114, 114, 114, 12, 12, 12  ],
+ "fblabels" : [ null, null, null, "CONVRT", "DELETE", "INSERT" ],
+ "fbtypes" : [ null, null, null, 1, 1, 1 ]
+},
+"punch":
+{
+ "labels" : [ "Auto punch:", "", ".", ".", "-", ".", "." ],
+ "x" : [ 2, 68, 86, 104, 122, 146, 164  ],
+ "y" : [ 3, 23, 23, 23, 23, 23, 23 ],
+ "parameters" : [ "auto-punch", "time0", "time1", "time2", "time3", "time4", "time5" ],
+ "tfsize" : [ 84, 18, 12, 12, 18, 12, 12 ],
+ "infowidgets" : [ "inlabel", "outlabel" ],
+ "infosize" : [ 12, 18 ],
+ "infox" : [ 81, 139 ],
+ "infoy" : [ 14, 14 ],
+ "fblabels" : [[ "PUNCH", "TRANS", "2ndSEQ", null, null, "TurnON" ], [ "PUNCH", "TRANS", "2ndSEQ", null, null, "OFF" ]],
+ "fbtypes" : [[ 2, 0, 0, null, null, 1 ], [ 2, 0, 0, null, null, 1 ]]
+}, 
+"trans":
+{
+ "labels" : [ "Tr:", "Transpose amount:", "Bar:", "- " ],
+ "x" : [ 2, 4, 160, 208 ],
+ "y" : [ 2, 13, 36, 36 ],
+ "parameters" : [
+ "tr", [ "_", "transpose-amount", "_", "transpose-amount" ],
+ "transpose-amount", [ "tr", "bar0", "tr", "bar0" ],
+ "bar0", [ "transpose-amount", "bar1", "transpose-amount", "_" ],
+ "bar1", [ "bar0", "_", "transpose-amount", "bar0" ]],
+ "tfsize" : [ 12, 18, 18, 18 ],
+ "infowidgets" : [ "track-name" ],
+ "infosize" : [ 96 ],
+ "infox" : [ 37 ],
+ "infoy" : [ 1 ],
+ "fblabels" : [ "PUNCH", "TRANS", "2ndSEQ", null, null, "FIX" ],
+ "fbtypes" : [ 0, 2, 0, null, null, 1 ]
+},
+"second-seq":
+{
+ "labels" : [ "SQ:" ],
+ "x" : [ 22 ],
+ "y" : [ 10 ],
+ "parameters" : [ "sq" ],
+ "tfsize" : [ 12 ],
+ "infowidgets" : [ "sequence-name" ],
+ "infosize" : [ 96 ],
+ "infox" : [ 52 ],
+ "infoy" : [ 9 ],
+ "fblabels" : [[ "PUNCH", "TRANS", "2ndSEQ", null, null, "TurnON" ], [ "PUNCH", "TRANS", "2ndSEQ", null, null, null ], [ "PUNCH", "TRANS", "2ndSEQ", null, null, "OFF" ]],
+ "fbtypes" : [[ 0, 0, 2, null, null, 1 ], [ 0, 0, 2, null, null, null ], [ 0, 0, 2, null, null, 1 ]]
+},
+"assign":
+{
+ "labels" : [ "Assign note:", "Parameter:", "High range:", "Low  range:", "Assign NV slider to ctrl change:" ],
+ "x" : [ 6, 7, 131, 131, 6 ],
+ "y" : [ 2, 20, 14, 24, 36 ],
+ "parameters" : [
+ "assignnote", [ "parameter", "highrange", "_", "parameter" ],
+ "parameter", [ "_", "highrange", "assignnote", "assignnv" ],
+ "highrange", [ "parameter", "_", "assignnote", "lowrange" ],
+ "lowrange", [ "parameter", "_", "highrange", "assignnv" ],
+ "assignnv", [ "parameter", "_", "lowrange", "_" ]],
+ "tfsize" : [ 138, 36, 24, 24, 18 ],
+ "fblabels" : [ null, null, null, null, null, null ],
+ "fbtypes" : [ null, null, null, null, null, null ]
+},
+"track-mute":
+{
+ "labels" : [ "Sq:", "Now:", ".", "." ],
+ "x" : [ 2, 168, 210, 228 ],
+ "y" : [ 2, 1, 1, 1  ],
+ "parameters" : [ "sq", "now0", "now1", "now2" ],
+ "tfsize" : [ 114, 18, 12, 12 ],
+ "infowidgets" : [ "tracknumbers", "bank", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16" ],
+ "infosize" : [ 30, 6, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48 ],
+ "infox" : [ 6, 18, 39, 91, 143, 195, 39, 91, 143, 195, 39, 91, 143, 195, 39, 91, 143, 195 ],
+ "infoy" : [ 20, 36, 39, 39, 39, 39, 30, 30, 30, 30, 21, 21, 21, 21, 12, 12, 12, 12 ],
+ "fblabels" : [ null, null, null, null, null, "SOLO" ],
+ "fbtypes" : [ null, null, null, null, null, 1 ]
+},
+"next-seq":
+{
+ "labels" : [ "Sq:", "Now:", ".", ".", " \u00C0:", "", "Timing:", "Next Sq:" ],
+ "x" : [ 2, 168, 210, 228, 2, 48, 96,  2 ],
+ "y" : [ 2, 1, 1, 1, 12, 12, 12, 39  ],
+ "parameters" : [
+ "sq", [ "_", "_", "_", "tempo" ],
+ "now0", [ "_", "_", "_", "_" ],
+ "now1", [ "_", "_", "_", "_" ],
+ "now2", [ "_", "_", "_", "_" ],
+ "tempo", [ "_", "tempo-source", "sq", "nextsq" ],
+ "tempo-source", [ "tempo", "timing", "sq", "nextsq" ],
+ "timing", [ "tempo", "_", "sq", "nextsq" ],
+ "nextsq", [ "tempo", "timing", "tempo", "_" ]
+ ],
+ "tfsize" : [ 114, 18, 12, 12, 28, 30, 41, 114 ],
+ "fblabels" : [ null, null, null, "SUDDEN", "CLEAR", "PAD" ],
+ "fbtypes" : [ null, null, null, 1, 1, 1 ]
+},
+"next-seq-pad":
+{
+ "labels" : [ "Sq:", "Now:", ".", ".", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "" ],
+ "x" : [ 2, 168, 210, 228, 40, 92, 144, 196, 40, 92, 144, 196, 40, 92, 144, 196, 40, 92, 144, 196 ],
+ "y" : [ 2, 1, 1, 1, 13, 13, 13, 13, 22, 22, 22, 22, 31, 31, 31, 31, 40, 40, 40, 40  ],
+ "parameters" : [ "sq", "now0", "now1", "now2", "13", "14", "15", "16", "9", "10", "11", "12", "5", "6","7", "8", "1", "2", "3", "4" ],
+ "tfsize" : [ 114, 18, 12, 12, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48 ],
+ "infowidgets" : [ "seqnumbers", "bank", "nextsq" ],
+ "infosize" : [ 30, 6, 114 ],
+ "infox" : [ 6, 18, 2 ],
+ "infoy" : [ 20, 36, 50 ],
+ "fblabels" : [ null, null, null, "SUDDEN", "CLEAR", "CLOSE" ],
+ "fbtypes" : [ null, null, null, 1, 1, 0 ]
+},
+"vmpc-disk":
+{
+ "labels" : [ "SCSI-", "Access type:", "Root:" ],
+ "x" : [ 0, 0, 0 ],
+ "y" : [ 5, 16, 27 ],
+ "parameters" : [ "scsi", "access-type", "root" ],
+ "tfsize" : [ 6, 24, 216 ],
+ "fblabels" : [ "SETNGS", "DISK", null, null, null, "APPLY" ],
+ "fbtypes" : [ 0, 2, null, null, null, 1 ]
+},
+"vmpc-settings":
+{
+ "labels" : [ "Initial pad mapping : ", "16 levels erase mode: " ],
+ "x" : [ 5, 5 ],
+ "y" : [ 5, 16 ],
+ "parameters" : [ "initial-pad-mapping", "16-levels-erase-mode" ],
+ "tfsize" : [ 60, 108 ],
+ "fblabels" : [ "SETNGS", "KEYBRD", "AUTSAV", null, null, null ],
+ "fbtypes" : [ 2, 0, 0, null, null, null ]
+},
+"vmpc-keyboard":
+{
+ "fblabels" : [
+ ["SETNGS", "KEYBRD", "AUTSAV", "LEARN", "RESET", "SAVE" ],
+ ["SETNGS", "KEYBRD", "CANCEL", "ACCEPT", null, null ]],
+ "fbtypes" : [
+ [ 0, 2, 0, 1, 1, 1 ],
+ [ 0, 2, 1, 1, null, null ]]
+},
+"vmpc-auto-save":
+{
+ "labels" : [ " Auto-save on exit: ", "Auto-load on start: " ],
+ "parameters" : [
+ "auto-save-on-exit", [ "_", "_", "_", "auto-load-on-start" ],
+ "auto-load-on-start", [ "_", "_", "auto-save-on-exit", "_" ]
+ ],
+ "x" : [ 5, 5 ],
+ "y" : [ 5, 15 ],
+ "tfsize" : [ 48, 48 ],
+ "infowidgets" : [ "msg" ],
+ "infosize" : [ 168 ],
+ "infox" : [ 45 ],
+ "infoy" : [ 37 ],
+ "fblabels" : [ "SETNGS", "KEYBRD", "AUTSAV", null, null, null ],
+ "fbtypes" : [ 0, 0, 2, null, null, null ]
+}
+}
