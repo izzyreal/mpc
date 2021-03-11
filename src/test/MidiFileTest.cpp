@@ -51,14 +51,14 @@ SCENARIO("A MidiFile can be written", "[file]") {
 		fileToDelete.del();
 		fileToDelete.close();
 
-		auto midiWriter = MidiWriter(sequence.get());
+		MidiWriter midiWriter(sequence.get());
 
 		midiWriter.writeToFile(path);
 
 		disk->initFiles();
 
 		auto files = disk->getFiles();
-		auto fileIterator = find_if(begin(files), end(files), [](MpcFile* f) { return f->getName().compare("FOO.MID") == 0; });
+		auto fileIterator = find_if(begin(files), end(files), [](shared_ptr<MpcFile> f) { return f->getName().compare("FOO.MID") == 0; });
 
 		REQUIRE(fileIterator != files.end());
 
@@ -67,7 +67,7 @@ SCENARIO("A MidiFile can be written", "[file]") {
 
 		REQUIRE(file->exists());
 	
-		auto midiReader = MidiReader(mpcFile, sequence);
+//		MidiReader(mpcFile, sequence);
 
 		track = sequence->getTrack(0).lock();
 
@@ -75,7 +75,5 @@ SCENARIO("A MidiFile can be written", "[file]") {
 
 		REQUIRE(events.size() == 1);
 		
-		auto event = events[0];
-		
-	}
+    }
 }

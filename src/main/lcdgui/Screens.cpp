@@ -338,10 +338,10 @@ pair<vector<shared_ptr<Component>>, map<string, vector<string>>> Screens::get(co
 
 void Screens::init()
 {
-	auto layer1ScreensPath = string(mpc::Paths::resPath() + "layer_1_screens.json");
-	auto layer2ScreensPath = string(mpc::Paths::resPath() + "layer_2_screens.json");
-	auto layer3ScreensPath = string(mpc::Paths::resPath() + "layer_3_screens.json");
-	auto layer4ScreensPath = string(mpc::Paths::resPath() + "layer_4_screens.json");
+	auto layer1ScreensPath = string(mpc::Paths::screensPath() + "layer1.json");
+	auto layer2ScreensPath = string(mpc::Paths::screensPath() + "layer2.json");
+	auto layer3ScreensPath = string(mpc::Paths::screensPath() + "layer3.json");
+	auto layer4ScreensPath = string(mpc::Paths::screensPath() + "layer4.json");
 
 	vector<string> paths = { layer1ScreensPath, layer2ScreensPath, layer3ScreensPath, layer4ScreensPath };
 

@@ -36,13 +36,10 @@ using namespace moduru::lang;
 using namespace rapidjson;
 using namespace std;
 
-//std::vector<std::vector<bool>> LayeredScreen::atlas = _bmfParser.getAtlas();
-//moduru::gui::bmfont LayeredScreen::font = _bmfParser.getLoadedFont();
-
 LayeredScreen::LayeredScreen(mpc::Mpc& mpc)
 	: mpc(mpc)
 {
-	moduru::gui::BMFParser bmfParser(string(mpc::Paths::resPath() + moduru::file::FileUtil::getSeparator() + "mpc2000xl-font.fnt"));
+	moduru::gui::BMFParser bmfParser(string(mpc::Paths::fontsPath() + "mpc2000xl-font.fnt"));
 
 	font = bmfParser.getLoadedFont();
 	atlas = bmfParser.getAtlas();
@@ -55,15 +52,13 @@ LayeredScreen::LayeredScreen(mpc::Mpc& mpc)
 	{
 		auto layer = make_shared<Layer>();
 		layers.push_back(layer);
-		if (previousLayer)
-		{
+		
+        if (previousLayer)
 			previousLayer->addChild(layer);
-		}
 		else
-		{
 			root->addChild(layer);
-		}
-		previousLayer = layer;
+
+        previousLayer = layer;
 	}
 }
 

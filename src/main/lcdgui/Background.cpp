@@ -37,7 +37,7 @@ void Background::Draw(vector<vector<bool>>* pixels)
 	if (dirty)
 	{
 
-		string backgroundPath = mpc::Paths::resPath() + "bmp/" + name + ".bmp";
+		string backgroundPath = mpc::Paths::bgPath() + name + ".bmp";
 		const int infosize = 54;
 
 		FILE* f = moduru::file::FileUtil::fopenw(backgroundPath, "rb");

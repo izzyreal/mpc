@@ -1,3 +1,4 @@
+#define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
 #include <Mpc.hpp>
@@ -169,7 +170,6 @@ SCENARIO("All screens can be opened", "[gui]") {
 	GIVEN("An initialized Mpc with an initialized Sequence") {
 		mpc::Mpc mpc;
 		mpc.init(44100, 1, 5);
-		//mpc.getSequencer().lock()->getActiveSequence().lock()->init(1);
 		mpc.getDisk().lock()->moveForward("TEST1");
 		mpc.getDisk().lock()->initFiles();
 

@@ -169,7 +169,7 @@ void Sampler::init()
 		}
 	}
 
-	auto file = make_shared<moduru::file::File>(mpc::Paths::resPath() + "click.wav", nullptr);
+	auto file = make_shared<moduru::file::File>(mpc::Paths::audioPath() + "click.wav", nullptr);
 	clickSound = make_shared<Sound>();
 	mpc::disk::SoundLoader::getSampleDataFromWav(file, clickSound->getSampleData());
 	clickSound->setMono(true);
