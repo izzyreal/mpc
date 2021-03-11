@@ -65,7 +65,7 @@ void Mpc::init(const int sampleRate, const int inputCount, const int outputCount
 	mpcMidiInputs = vector<mpc::audiomidi::MpcMidiInput*>{ new mpc::audiomidi::MpcMidiInput(*this, 0), new mpc::audiomidi::MpcMidiInput(*this, 1) };
 
 	/*
-	* AudioMidiServices requires sampler to exist.
+	* AudioMidiServices requires sequencer to exist.
 	*/
 	audioMidiServices = make_shared<mpc::audiomidi::AudioMidiServices>(*this);
 	MLOG("AudioMidiServices created");
