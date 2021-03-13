@@ -61,6 +61,9 @@ void LoadASequenceFromAllScreen::function(int i)
 
 void LoadASequenceFromAllScreen::displayFile()
 {
+    if (sourceSeqIndex >= sequencesFromAllFile.size())
+        return;
+    
 	findField("file").lock()->setTextPadded(sourceSeqIndex + 1, "0");
 
     auto candidate = sequencesFromAllFile[sourceSeqIndex];

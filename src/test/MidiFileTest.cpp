@@ -45,7 +45,7 @@ SCENARIO("A MidiFile can be written", "[file]") {
 		noteEvent->setDuration(10);
 		noteEvent->setVelocity(127);
 
-		auto name = string("foo.mid");
+		string name = "foo.mid";
 		auto path = mpc::Paths::storesPath() + "MPC2000XL/" + name;
 		auto fileToDelete = File(path, nullptr);
 		fileToDelete.del();
@@ -58,7 +58,7 @@ SCENARIO("A MidiFile can be written", "[file]") {
 		disk->initFiles();
 
 		auto files = disk->getFiles();
-		auto fileIterator = find_if(begin(files), end(files), [](shared_ptr<MpcFile> f) { return f->getName().compare("FOO.MID") == 0; });
+		auto fileIterator = find_if(begin(files), end(files), [](shared_ptr<MpcFile> f) { return f->getName().compare("foo.mid") == 0 || f->getName().compare("FOO.MID") == 0; });
 
 		REQUIRE(fileIterator != files.end());
 
