@@ -14,7 +14,6 @@
 #include <file/mid/MidiReader.hpp>
 #include <file/mid/MidiWriter.hpp>
 
-
 #include <file/File.hpp>
 #include <file/FileUtil.hpp>
 

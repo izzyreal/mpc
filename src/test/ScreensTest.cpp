@@ -13,7 +13,6 @@
 #include <file/File.hpp>
 
 #include <disk/MpcFile.hpp>
-#include <disk/MpcFile.hpp>
 #include <disk/ApsLoader.hpp>
 #include <disk/AbstractDisk.hpp>
 
@@ -234,7 +233,7 @@ SCENARIO("All screens can be opened", "[gui]") {
 
 		printf("%i screens are fine and %i screens are broken. Check vmpc.log in ~/vMPC for more details.\n", good.size(), bad.size());
 
-		REQUIRE(good.size() >= 42); // This will be increased as the screens get refactored.
+		REQUIRE(good.size() >= 129); // This will be increased as the screens get refactored.
 
 	}
 }
