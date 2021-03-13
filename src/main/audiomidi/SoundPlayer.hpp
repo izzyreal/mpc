@@ -4,7 +4,7 @@
 
 #include <sampler/Sound.hpp>
 
-#include <io/TSCircularBuffer.hpp>
+#include <collections/TSCircularBuffer.hpp>
 #include <thirdp/libsamplerate/samplerate.h>
 
 #include <fstream>
