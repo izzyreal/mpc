@@ -15,10 +15,20 @@
 
 namespace mpc::sequencer
 {
+
+class Event;
+
 class RecordBuffer
 {
+private:
+    const int BUFFER_SIZE = 10;
     
+    moodycamel::ReaderWriterQueue<Event*> queue = moodycamel::ReaderWriterQueue<Event*>(BUFFER_SIZE);
     
+public:
+    void record(Event*);
+    
+    bool get(Event*);
     
 };
 }

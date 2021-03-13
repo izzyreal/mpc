@@ -46,6 +46,11 @@ Sequencer::Sequencer(mpc::Mpc& mpc)
 {
 }
 
+RecordBuffer& Sequencer::getRecordBuffer()
+{
+    return recordBuffer;
+}
+
 void Sequencer::init()
 {
 	lastTap = moduru::System::currentTimeMillis();
