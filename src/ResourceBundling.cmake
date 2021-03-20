@@ -25,7 +25,7 @@ function(_add_resource_files _target_name _rsrc_root_path _sub_dir _extension _t
   file(
     GLOB _list
     LIST_DIRECTORIES false
-    RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
+    RELATIVE "${CMAKE_CURRENT_LIST_DIR}"
     "${_rsrc_root_path}/${_sub_dir}/*.${_extension}"
     )
 
