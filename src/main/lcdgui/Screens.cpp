@@ -157,7 +157,10 @@
 #include <file/FileUtil.hpp>
 #include <lang/StrUtil.hpp>
 
-#include <rapidjson/filereadstream.h>
+#include <cmrc/cmrc.hpp>
+#include <string_view>
+
+CMRC_DECLARE(mpc);
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -338,23 +341,17 @@ pair<vector<shared_ptr<Component>>, map<string, vector<string>>> Screens::get(co
 
 void Screens::init()
 {
-	auto layer1ScreensPath = string(mpc::Paths::screensPath() + "layer1.json");
-	auto layer2ScreensPath = string(mpc::Paths::screensPath() + "layer2.json");
-	auto layer3ScreensPath = string(mpc::Paths::screensPath() + "layer3.json");
-	auto layer4ScreensPath = string(mpc::Paths::screensPath() + "layer4.json");
-
-	vector<string> paths = { layer1ScreensPath, layer2ScreensPath, layer3ScreensPath, layer4ScreensPath };
+    auto fs = cmrc::mpc::get_filesystem();
 
 	for (int i = 0; i < 4; i++)
 	{
 		
 		char readBuffer[256];
+        auto file = fs.open("screens/layer" + to_string(i + 1) + ".json");
+        char* data = (char*) string_view(file.begin(), file.end() - file.begin()).data();
 
-		auto fp = FileUtil::fopenw(paths[i], "r");;
-		FileReadStream is(fp, readBuffer, sizeof(readBuffer));
 		auto panelDoc = make_unique<Document>();
-		panelDoc->ParseStream(is);
-		fclose(fp);
+        panelDoc->Parse(data, file.size());
 
 		/*
 		This can be uncommented to list all screen names that are encountered in the json files.

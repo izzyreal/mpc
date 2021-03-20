@@ -2,8 +2,7 @@
 
 #include <Mpc.hpp>
 #include <audiomidi/AudioMidiServices.hpp>
-#include <disk/SoundLoader.hpp>
-#include <Paths.hpp>
+#include <audiomidi/WavInputStringStream.hpp>
 
 #include <sampler/NoteParameters.hpp>
 #include <sampler/Pad.hpp>
@@ -32,6 +31,11 @@
 #include <thirdp/libsamplerate/samplerate.h>
 
 #include <functional>
+
+#include <cmrc/cmrc.hpp>
+#include <string_view>
+
+CMRC_DECLARE(mpc);
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -169,11 +173,30 @@ void Sampler::init()
 		}
 	}
 
-	auto file = make_shared<moduru::file::File>(mpc::Paths::audioPath() + "click.wav", nullptr);
-	clickSound = make_shared<Sound>();
-	mpc::disk::SoundLoader::getSampleDataFromWav(file, clickSound->getSampleData());
-	clickSound->setMono(true);
-	clickSound->setLevel(100);
+    auto fs = cmrc::mpc::get_filesystem();
+    clickSound = make_shared<Sound>();
+    clickSound->setMono(true);
+    clickSound->setLevel(100);
+
+    if (fs.exists("audio/click.wav"))
+    {
+        auto clickFile = fs.open("audio/click.wav");
+        auto clickData = (char*) string_view(clickFile.begin(), clickFile.end() - clickFile.begin()).data();
+
+        auto stream = wav_init_istringstream(clickData, clickFile.size());
+        int sampleRate, validBits, numChannels, numFrames;
+        wav_read_header(stream, sampleRate, validBits, numChannels, numFrames);
+        
+        if (numChannels == 1 && validBits == 16) {
+            for (int i = 0; i < numFrames; i++)
+            {
+                float frame = wav_get_LE(stream, 2) / 32768.0;
+                clickSound->insertFrame(vector<float>{frame}, clickSound->getFrameCount());
+            }
+        }
+        clickSound->setEnd(numFrames);
+    }
+    
 	masterPadAssign = initMasterPadAssign;
 	autoChromaticAssign = vector<int>(64);
 

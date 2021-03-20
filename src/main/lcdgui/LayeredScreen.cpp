@@ -28,18 +28,32 @@
 #include <cmath>
 #include <set>
 
+#include <cmrc/cmrc.hpp>
+#include <string_view>
+
+CMRC_DECLARE(mpc);
+
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace moduru::file;
 using namespace moduru::lang;
 using namespace rapidjson;
+
 using namespace std;
 
 LayeredScreen::LayeredScreen(mpc::Mpc& mpc)
 	: mpc(mpc)
 {
-	moduru::gui::BMFParser bmfParser(string(mpc::Paths::fontsPath() + "mpc2000xl-font.fnt"));
+    auto fs = cmrc::mpc::get_filesystem();
+
+    auto fntFile = fs.open("fonts/mpc2000xl-font.fnt");
+    char* fntData = (char*) string_view(fntFile.begin(), fntFile.end() - fntFile.begin()).data();
+
+    auto bmpFile = fs.open("fonts/mpc2000xl-font_0.bmp");
+    char* bmpData = (char*) string_view(bmpFile.begin(), bmpFile.end() - bmpFile.begin()).data();
+
+	moduru::gui::BMFParser bmfParser(fntData, fntFile.size(), bmpData, bmpFile.size());
 
 	font = bmfParser.getLoadedFont();
 	atlas = bmfParser.getAtlas();

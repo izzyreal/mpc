@@ -31,11 +31,11 @@ string Paths::appConfigPath()
 }
 //----
 
-string Paths::fontsPath()
-{
-    static auto path = appDataPath()  + "fonts" + sep;
-    return path;
-}
+//string Paths::fontsPath()
+//{
+//    static auto path = appDataPath()  + "fonts" + sep;
+//    return path;
+//}
 
 string Paths::imgPath()
 {
@@ -43,23 +43,23 @@ string Paths::imgPath()
     return path;
 }
 
-string Paths::screensPath()
-{
-    static auto path = appDataPath()  + "screens" + sep;
-    return path;
-}
+//string Paths::screensPath()
+//{
+//    static auto path = appDataPath()  + "screens" + sep;
+//    return path;
+//}
 
-string Paths::bgPath()
-{
-    static auto path = screensPath()  + "bg" + sep;
-    return path;
-}
+//string Paths::bgPath()
+//{
+//    static auto path = screensPath()  + "bg" + sep;
+//    return path;
+//}
 
-string Paths::audioPath()
-{
-    static auto path = appDataPath()  + "audio" + sep;
-    return path;
-}
+//string Paths::audioPath()
+//{
+//    static auto path = appDataPath()  + "audio" + sep;
+//    return path;
+//}
 
 string Paths::configPath()
 {
@@ -71,6 +71,12 @@ string Paths::storesPath()
 {
 	static auto storesPath = appDocumentsPath() + "Volumes" + sep;
 	return storesPath;
+}
+
+string Paths::defaultStorePath()
+{
+    static auto storesPath = appDocumentsPath() + "Volumes" + sep + "MPC2000XL" + sep;
+    return storesPath;
 }
 
 string Paths::logFilePath()
