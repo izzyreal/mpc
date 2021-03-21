@@ -55,29 +55,20 @@ void Background::Draw(vector<vector<bool>>* pixels)
                 
         auto file = fs.open("screens/bg/" + name + ".bmp");
 
-        MLOG("Background " + fileName + " exists, file size " + to_string(file.size()));
-
         char* data = (char*) string_view(file.begin(), file.end() - file.begin()).data();
 
 		int imageDataOffset = data[10];
-        
-        MLOG("imageDataOffset " + to_string(imageDataOffset));
-        
 		int width = (unsigned char) data[18];
 		int height = 256 - (unsigned char)(data[22]);
 		int imageSize = width * height;
 		
 		int colorCount = (imageDataOffset - 54) / 4;
 
-        MLOG("colorCount " + to_string(colorCount));
-        MLOG("width " + to_string(width));
-        MLOG("height " + to_string(height));
-        
-		int byteCounter = imageDataOffset;
+		const bool unobtrusive = !unobtrusiveRect.Empty();
 
-		const auto unobtrusive = !unobtrusiveRect.Empty();
+        int byteCounter = imageDataOffset;
 
-		for (int y = 0; y < height; y++)
+        for (int y = 0; y < height; y++)
 		{
 			for (int x = 0; x < width; x++)
 			{
@@ -109,9 +100,7 @@ void Background::Draw(vector<vector<bool>>* pixels)
 			for (int y = height; y < 60; y++)
 			{
 				for (int x = 0; x < width; x++)
-				{
 					(*pixels)[x][y] = false;
-				}
 			}
 		}
 
