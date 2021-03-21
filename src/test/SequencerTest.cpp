@@ -9,7 +9,6 @@
 #include <audio/server/NonRealTimeAudioServer.hpp>
 
 #include <sequencer/Sequencer.hpp>
-#include <sequencer/RecordBuffer.hpp>
 #include <sequencer/NoteEvent.hpp>
 #include <sequencer/Track.hpp>
 
@@ -18,27 +17,6 @@ using namespace std;
 
 SCENARIO("Can record and playback from different threads", "[sequencer]")
 {
-    GIVEN("A RecordBuffer")
-    {
-        mpc::Mpc mpc;
-        mpc.init(44100, 0, 1);
-        
-        auto seq = mpc.getSequencer().lock();
-        auto& recBuf = seq->getRecordBuffer();
-        
-        auto event = new NoteEvent();
-        recBuf.record(event);
-        
-        vector<Event*> events;
-        Event* e;
-        
-        while (recBuf.get(e) == true)
-            events.push_back(e);
-        
-        REQUIRE(events.size() == 1);
-        REQUIRE(recBuf.get(e) == false);
-    }
-    
     char buffer[2][512];
     
     const int BUFFER_SIZE = 512;
@@ -55,118 +33,6 @@ SCENARIO("Can record and playback from different threads", "[sequencer]")
     vector<int> humanTickPositions{ 2, 23, 49, 70, 95, 124, 143, 167, 194, 218, 243, 264, 290, 310, 332, 361, 382};
     
     vector<int> quantizedPositions{ 0, 24, 48, 72, 96, 120, 144, 168, 192, 216, 240, 264, 288, 312, 336, 360 };
-    
-    GIVEN("A RecordBuffer and 2 threads")
-    {
-        bool mainThreadBusy = true;
-        bool audioThreadBusy = true;
-        
-        mpc::Mpc mpc;
-        mpc.init(44100, 0, 1);
-
-        auto seq = mpc.getSequencer().lock();
-        
-        auto sequence = seq->getActiveSequence().lock();
-        sequence->init(0);
-        
-        auto& recBuf = seq->getRecordBuffer();
-        
-        vector<Event*> eventsToRecord;
-        
-        auto server = mpc.getAudioMidiServices().lock()->getAudioServer();
-        server->resizeBuffers(512);
-        server->setSampleRate(44100);
-        
-        thread audioThread([&](){
-            
-            Event* e;
-            
-            int dspCycleCounter = 0;
-            
-            while (dspCycleCounter++ * PROCESS_BLOCK_INTERVAL < AUDIO_THREAD_TIMEOUT &&
-                   eventsToRecord.size() < humanTickPositions.size())
-            {
-                
-                server->work(nullptr, nullptr, BUFFER_SIZE, 0, 1);
-                
-                if (dspCycleCounter * PROCESS_BLOCK_INTERVAL < RECORD_DELAY)
-                {
-                    this_thread::sleep_for(chrono::milliseconds(PROCESS_BLOCK_INTERVAL));
-                    continue;
-                }
-                
-                int eventCounter = 0;
-                
-                while (recBuf.get(e) == true)
-                {
-                    eventsToRecord.push_back(e);
-                    printf("audio thread read event %i ...\n", (int) eventsToRecord.size());
-                    eventCounter++;
-                }
-                
-                printf("%i events found in DSP cycle %i\n", eventCounter, dspCycleCounter);
-                this_thread::sleep_for(chrono::milliseconds(PROCESS_BLOCK_INTERVAL));
-            }
-            
-            audioThreadBusy = false;
-        });
-        
-        thread mainThread([&](){
-            
-            int initialDelayCounter = 0;
-            
-            while (initialDelayCounter++ * 10 < INITIAL_EVENT_INSERTION_DELAY)
-                this_thread::sleep_for(chrono::milliseconds(10));
-            
-            int tickPos = seq->getTickPosition();
-            
-            if (!seq->isRecordingOrOverdubbing())
-                seq->recFromStart();
-            
-            vector<int> recordedTickPos;
-            int prevTickPos = -1;
-            
-            while (tickPos < 384 && prevTickPos <= tickPos)
-            {
-                for (int i = 0; i < humanTickPositions.size(); i++)
-                {
-                    auto hTickPos = humanTickPositions[i];
-                    
-                    if (tickPos >= hTickPos && tickPos < hTickPos + 24)
-                    {
-                        if (find(begin(recordedTickPos), end(recordedTickPos), hTickPos) == end(recordedTickPos))
-                        {
-                            auto noteEvent = new NoteEvent();
-                            noteEvent->setTick(hTickPos);
-                            recBuf.record(noteEvent);
-                        
-                            recordedTickPos.push_back(hTickPos);
-                        
-                            printf("main thread records event %i at tick %i ...\n", i, hTickPos);
-                        }
-                    }
-                }
-                
-                this_thread::sleep_for(chrono::milliseconds(5));
-                prevTickPos = tickPos;
-                tickPos = seq->getTickPosition();
-            }
-        
-            seq->stop();
-            mainThreadBusy = false;
-        });
-        
-        while (mainThreadBusy || audioThreadBusy)
-            this_thread::sleep_for(chrono::milliseconds(10));
-        
-        mainThread.join();
-        audioThread.join();
-        
-        REQUIRE(eventsToRecord.size() == humanTickPositions.size() - 1);
-        
-        Event* e;
-        REQUIRE(recBuf.get(e) == false);
-    }
     
     GIVEN("A running sequencer in record mode and some user input")
     {

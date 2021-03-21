@@ -17,7 +17,6 @@
 #include <lcdgui/screens/UserScreen.hpp>
 #include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
 
-#include <sequencer/RecordBuffer.hpp>
 #include <sequencer/Event.hpp>
 #include <sequencer/TempoChangeEvent.hpp>
 #include <sequencer/FrameSeq.hpp>
@@ -43,13 +42,8 @@ using namespace moduru::lang;
 using namespace std;
 
 Sequencer::Sequencer(mpc::Mpc& mpc)
-	: mpc(mpc), recordBuffer (new RecordBuffer())
+	: mpc (mpc)
 {
-}
-
-RecordBuffer& Sequencer::getRecordBuffer()
-{
-    return *recordBuffer;
 }
 
 void Sequencer::init()
