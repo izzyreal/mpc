@@ -1,6 +1,5 @@
 #pragma once
 #include <sequencer/Sequence.hpp>
-#include <sequencer/RecordBuffer.hpp>
 
 #include <observer/Observable.hpp>
 
@@ -16,6 +15,7 @@ namespace mpc { class Mpc; }
 namespace mpc::sequencer
 {
 	class Song;
+    class RecordBuffer;
 }
 
 namespace mpc::sequencer
@@ -40,7 +40,7 @@ namespace mpc::sequencer
 
 	private:
         const std::vector<int> TICK_VALUES{ 1, 48, 32, 24, 16, 12, 8 };
-        RecordBuffer recordBuffer;
+        RecordBuffer* recordBuffer;
         mpc::Mpc& mpc;
 		int lastNotifiedBar = -1;
 		int lastNotifiedBeat = -1;

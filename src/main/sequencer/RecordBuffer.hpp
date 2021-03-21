@@ -21,7 +21,7 @@ class Event;
 class RecordBuffer
 {
 private:
-    const int BUFFER_SIZE = 10;
+    const size_t BUFFER_SIZE = 10;
     
     moodycamel::ReaderWriterQueue<Event*> queue = moodycamel::ReaderWriterQueue<Event*>(BUFFER_SIZE);
     

@@ -6,6 +6,7 @@
 #include <audio/server/NonRealTimeAudioServer.hpp>
 
 #include <sequencer/Sequencer.hpp>
+#include <sequencer/RecordBuffer.hpp>
 #include <sequencer/NoteEvent.hpp>
 #include <sequencer/Track.hpp>
 
@@ -50,7 +51,7 @@ SCENARIO("Can record and playback from different threads", "[sequencer]")
         
         const int BUFFER_SIZE = 512;
         const int PROCESS_BLOCK_INTERVAL = 170;
-        const int AUDIO_THREAD_TIMEOUT = 20000;
+        const int AUDIO_THREAD_TIMEOUT = 4000;
         const int RECORD_DELAY = 500;
         
         const int INITIAL_EVENT_INSERTION_DELAY = 500;
@@ -114,6 +115,7 @@ SCENARIO("Can record and playback from different threads", "[sequencer]")
             
             vector<int> recordedTickPos;
             int prevTickPos = -1;
+            
             while (tickPos < 384 && prevTickPos < tickPos)
             {
                 for (int i = 0; i < humanTickPositions.size(); i++)
@@ -139,7 +141,8 @@ SCENARIO("Can record and playback from different threads", "[sequencer]")
                 prevTickPos = tickPos;
                 tickPos = seq->getTickPosition();
             }
-                        
+        
+            seq->stop();
             mainThreadBusy = false;
         });
         
@@ -149,7 +152,7 @@ SCENARIO("Can record and playback from different threads", "[sequencer]")
         mainThread.join();
         audioThread.join();
         
-        REQUIRE(eventsToRecord.size() == humanTickPositions.size());
+        REQUIRE(eventsToRecord.size() == quantizedPositions.size());
         
         Event* e;
         REQUIRE(recBuf.get(e) == false);
