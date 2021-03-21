@@ -42,7 +42,7 @@ using namespace moduru::lang;
 using namespace std;
 
 Sequencer::Sequencer(mpc::Mpc& mpc)
-	: mpc(mpc)
+	: mpc (mpc)
 {
 }
 

@@ -1,4 +1,3 @@
-#define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
 #include <Mpc.hpp>
@@ -12,7 +11,6 @@
 
 #include <file/File.hpp>
 
-#include <disk/MpcFile.hpp>
 #include <disk/MpcFile.hpp>
 #include <disk/ApsLoader.hpp>
 #include <disk/AbstractDisk.hpp>
@@ -65,7 +63,6 @@ vector<string> screenNames = {
 "audio",
 "audio_no_start",
 "midi",
-"vmpc-disk",
 "vmpc-settings",
 "vmpc-direct-to-disk-recorder",
 "vmpc-recording-finished",
@@ -234,7 +231,7 @@ SCENARIO("All screens can be opened", "[gui]") {
 
 		printf("%i screens are fine and %i screens are broken. Check vmpc.log in ~/vMPC for more details.\n", good.size(), bad.size());
 
-		REQUIRE(good.size() >= 42); // This will be increased as the screens get refactored.
+		REQUIRE(good.size() >= 129); // This will be increased as the screens get refactored.
 
 	}
 }

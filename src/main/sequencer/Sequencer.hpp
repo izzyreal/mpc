@@ -1,14 +1,14 @@
 #pragma once
 #include <sequencer/Sequence.hpp>
 
+#include <observer/Observable.hpp>
+
 #include <cstdint>
 #include <memory>
 #include <vector>
 #include <string>
 #include <cmath>
 #include <chrono>
-
-#include <observer/Observable.hpp>
 
 namespace mpc { class Mpc; }
 
@@ -25,7 +25,7 @@ namespace mpc::sequencer
 
 	public:
 		Sequencer(mpc::Mpc& mpc);
-
+        
         std::vector<int> getTickValues();
         void playToTick(int targetTick);
         int getActiveSequenceIndex();
@@ -38,7 +38,6 @@ namespace mpc::sequencer
 
 	private:
         const std::vector<int> TICK_VALUES{ 1, 48, 32, 24, 16, 12, 8 };
-
         mpc::Mpc& mpc;
 		int lastNotifiedBar = -1;
 		int lastNotifiedBeat = -1;
