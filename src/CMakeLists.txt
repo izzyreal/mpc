@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.13)
 
+include(ResourceBundling.cmake)
+
 project(mpc)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "-fPIC")
@@ -40,6 +42,8 @@ endforeach()
 
 add_library(mpc ${_source_list_main})
 conan_target_link_libraries(mpc)
+
+_bundle_mpc_resources(mpc)
 
 if(MSVC)
 	target_compile_options(mpc PRIVATE "/MP")

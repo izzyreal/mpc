@@ -34,16 +34,34 @@
 #include <lcdgui/screens/LoadScreen.hpp>
 #include <lcdgui/screens/window/LoadAProgramScreen.hpp>
 
+#include <file/Directory.hpp>
+
 #include <string>
 
 using namespace mpc;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
+using namespace moduru::file;
 using namespace std;
 
 Mpc::Mpc()
 {
+    vector<string> requiredPaths {
+        Paths::appDocumentsPath(),
+        Paths::configPath(),
+        Paths::storesPath(),
+        Paths::defaultStorePath(),
+        Paths::recordingsPath()
+    };
+    
+    for (auto& p : requiredPaths)
+    {
+        Directory dir(p);
+        if (!dir.exists())
+            dir.create();
+    }
+    
 	moduru::Logger::l.setPath(mpc::Paths::logFilePath());
 
 	hardware = make_shared<hardware::Hardware>(*this);
@@ -53,7 +71,6 @@ Mpc::Mpc()
 
 void Mpc::init(const int sampleRate, const int inputCount, const int outputCount)
 {
-
 	diskController = make_unique<mpc::disk::DiskController>(*this);
 	
 	sequencer = make_shared<mpc::sequencer::Sequencer>(*this);

@@ -3,6 +3,13 @@
 
 #include <file/FileUtil.hpp>
 
+#include <cmrc/cmrc.hpp>
+#include <string_view>
+
+CMRC_DECLARE(mpc);
+
+#include <Logger.hpp>
+
 using namespace mpc::lcdgui;
 using namespace std;
 
@@ -36,35 +43,32 @@ void Background::Draw(vector<vector<bool>>* pixels)
 
 	if (dirty)
 	{
+        auto fs = cmrc::mpc::get_filesystem();
+        auto fileName = "screens/bg/" + name + ".bmp";
+        
+        if (!fs.exists(fileName))
+        {
+            MLOG("Background " + fileName + " does not exist!");
+            Component::Draw(pixels);
+            return;
+        }
+                
+        auto file = fs.open("screens/bg/" + name + ".bmp");
 
-		string backgroundPath = mpc::Paths::resPath() + "bmp/" + name + ".bmp";
-		const int infosize = 54;
+        char* data = (char*) string_view(file.begin(), file.end() - file.begin()).data();
 
-		FILE* f = moduru::file::FileUtil::fopenw(backgroundPath, "rb");
-
-		if (f == NULL)
-		{
-			return;
-		}
-
-		unsigned char info[infosize];
-		fread(info, sizeof(unsigned char), infosize, f); // read the 54-byte header
-		int imageDataOffset = info[10];
-		int width = info[18];
-		int height = 256 - info[22];
+		int imageDataOffset = data[10];
+		int width = (unsigned char) data[18];
+		int height = 256 - (unsigned char)(data[22]);
 		int imageSize = width * height;
-		fseek(f, imageDataOffset, 0);
+		
+		int colorCount = (imageDataOffset - 54) / 4;
 
-		vector<unsigned char> data(imageSize);
-		fread(&data[0], sizeof(unsigned char), imageSize, f); // read the rest of the data at once
-		fclose(f);
-		int colorCount = (imageDataOffset - infosize) / 4;
+		const bool unobtrusive = !unobtrusiveRect.Empty();
 
-		int byteCounter = 0;
+        int byteCounter = imageDataOffset;
 
-		const auto unobtrusive = !unobtrusiveRect.Empty();
-
-		for (int y = 0; y < height; y++)
+        for (int y = 0; y < height; y++)
 		{
 			for (int x = 0; x < width; x++)
 			{
@@ -96,9 +100,7 @@ void Background::Draw(vector<vector<bool>>* pixels)
 			for (int y = height; y < 60; y++)
 			{
 				for (int x = 0; x < width; x++)
-				{
 					(*pixels)[x][y] = false;
-				}
 			}
 		}
 
