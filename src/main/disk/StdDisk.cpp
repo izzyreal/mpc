@@ -180,7 +180,7 @@ bool StdDisk::moveForward(const string& directoryName)
 		{
 			auto lFile = f->getFsNode().lock();
 			
-			if (lFile->isDirectory() && lFile->getPath().find("vMPC") != string::npos && lFile->getPath().find("Stores") != string::npos)
+			if (lFile->isDirectory() && lFile->getPath().find("VMPC2000XL") != string::npos && lFile->getPath().find("Volumes") != string::npos)
 			{
 				path.push_back(f->getName());
 				success = true;

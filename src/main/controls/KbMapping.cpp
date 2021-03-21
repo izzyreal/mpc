@@ -25,7 +25,7 @@ vector<string> KbMapping::getMappedLabels()
 }
 
 void KbMapping::exportMapping() {
-	auto path = mpc::Paths::resPath() + "/keys.txt";
+	auto path = mpc::Paths::configPath() + "keys.txt";
 	moduru::file::File f(path, nullptr);
 	
     if (f.exists())
@@ -56,12 +56,12 @@ void KbMapping::exportMapping() {
 
 void KbMapping::importMapping()
 {
-    auto path = mpc::Paths::resPath() + "/keys.txt";
+    auto path = mpc::Paths::configPath() + "keys.txt";
     moduru::file::File f(path, nullptr);
     
     if (!f.exists())
     {
-        MLOG("No keys.txt mapping found in vMPC/resources. Initializing default mapping...");
+        MLOG("Initializing default key mapping...");
         initializeDefaults();
         return;
     }

@@ -27,7 +27,7 @@ using namespace std;
 
 void NvRam::loadUserScreenValues(mpc::Mpc& mpc)
 {
-    string path = mpc::Paths::resPath() + "nvram.vmp";
+    string path = mpc::Paths::configPath() + "nvram.vmp";
     auto file = File(path, nullptr);
     
     if (!file.exists())
@@ -59,7 +59,7 @@ void NvRam::saveUserScreenValues(mpc::Mpc& mpc)
 {
     DefaultsParser dp(mpc);
     
-    string fileName = mpc::Paths::resPath() + "nvram.vmp";
+    string fileName = mpc::Paths::configPath() + "nvram.vmp";
     
     File file(fileName, nullptr);
     
@@ -77,7 +77,7 @@ void NvRam::saveVmpcSettings(mpc::Mpc& mpc)
     auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
     auto vmpcAutoSaveScreen = mpc.screens->get<VmpcAutoSaveScreen>("vmpc-auto-save");
     auto audioMidiServices  = mpc.getAudioMidiServices().lock();
-    string fileName = mpc::Paths::resPath() + "vmpc-specific.ini";
+    string fileName = mpc::Paths::configPath() + "vmpc-specific.ini";
     
     File file(fileName, nullptr);
     
@@ -102,7 +102,7 @@ void NvRam::saveVmpcSettings(mpc::Mpc& mpc)
 
 void NvRam::loadVmpcSettings(mpc::Mpc& mpc)
 {
-    string path = mpc::Paths::resPath() + "vmpc-specific.ini";
+    string path = mpc::Paths::configPath() + "vmpc-specific.ini";
     File file(path, nullptr);
 
     auto audioMidiServices  = mpc.getAudioMidiServices().lock();
