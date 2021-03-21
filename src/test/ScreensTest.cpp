@@ -63,7 +63,6 @@ vector<string> screenNames = {
 "audio",
 "audio_no_start",
 "midi",
-"vmpc-disk",
 "vmpc-settings",
 "vmpc-direct-to-disk-recorder",
 "vmpc-recording-finished",

@@ -50,7 +50,7 @@ SCENARIO("Can record and playback from different threads", "[sequencer]")
         
         const int BUFFER_SIZE = 512;
         const int PROCESS_BLOCK_INTERVAL = 170;
-        const int AUDIO_THREAD_TIMEOUT = 10000;
+        const int AUDIO_THREAD_TIMEOUT = 20000;
         const int RECORD_DELAY = 500;
         
         const int INITIAL_EVENT_INSERTION_DELAY = 500;
@@ -63,12 +63,13 @@ SCENARIO("Can record and playback from different threads", "[sequencer]")
         auto& recBuf = seq->getRecordBuffer();
         
         vector<Event*> eventsToRecord;
-        Event* e;
         
         auto server = mpc.getAudioMidiServices().lock()->getAudioServer();
         server->setRealTime(false);
         
         thread audioThread([&](){
+            
+            Event* e;
             
             int dspCycleCounter = 0;
             
@@ -112,8 +113,8 @@ SCENARIO("Can record and playback from different threads", "[sequencer]")
                 seq->recFromStart();
             
             vector<int> recordedTickPos;
-            
-            while (tickPos < 384)
+            int prevTickPos = -1;
+            while (tickPos < 384 && prevTickPos < tickPos)
             {
                 for (int i = 0; i < humanTickPositions.size(); i++)
                 {
@@ -129,12 +130,13 @@ SCENARIO("Can record and playback from different threads", "[sequencer]")
                         
                             recordedTickPos.push_back(hTickPos);
                         
-                            printf("main thread records event %i at tick %i ...\n", i, e->getTick());
+                            printf("main thread records event %i at tick %i ...\n", i, hTickPos);
                         }
                     }
                 }
                 
                 this_thread::sleep_for(chrono::milliseconds(5));
+                prevTickPos = tickPos;
                 tickPos = seq->getTickPosition();
             }
                         
@@ -148,6 +150,8 @@ SCENARIO("Can record and playback from different threads", "[sequencer]")
         audioThread.join();
         
         REQUIRE(eventsToRecord.size() == humanTickPositions.size());
+        
+        Event* e;
         REQUIRE(recBuf.get(e) == false);
     }
 }
