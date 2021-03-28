@@ -77,7 +77,7 @@ shared_ptr<MpcStereoMixerChannel> MixerScreen::getStereoMixerChannel(int xPos)
     auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>("mixer-setup");
     bool stereoMixSourceIsDrum = mixerSetupScreen->isStereoMixSourceDrum();
     
-    return stereoMixSourceIsDrum ? mpcSoundPlayerChannel->getStereoMixerChannels()[padIndex].lock() : noteParameters->getStereoMixerChannel().lock();
+    return stereoMixSourceIsDrum ? mpcSoundPlayerChannel->getStereoMixerChannels()[note - 35].lock() : noteParameters->getStereoMixerChannel().lock();
 }
 
 shared_ptr<MpcIndivFxMixerChannel> MixerScreen::getIndivFxMixerChannel(int xPos)
@@ -93,7 +93,7 @@ shared_ptr<MpcIndivFxMixerChannel> MixerScreen::getIndivFxMixerChannel(int xPos)
     auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>("mixer-setup");
     bool indivFxSourceIsDrum = mixerSetupScreen->isIndivFxSourceDrum();
     
-    return indivFxSourceIsDrum ? mpcSoundPlayerChannel->getIndivFxMixerChannels()[padIndex].lock() : noteParameters->getIndivFxMixerChannel().lock();
+    return indivFxSourceIsDrum ? mpcSoundPlayerChannel->getIndivFxMixerChannels()[note - 35].lock() : noteParameters->getIndivFxMixerChannel().lock();
 }
 
 void MixerScreen::displayMixerStrip(int i)
@@ -106,8 +106,11 @@ void MixerScreen::displayMixerStrip(int i)
     
     if (!stereoMixer || !indivFxMixer)
     {
-        strip->findChild<Knob>("").lock()->Hide(true);
-        strip->setValueAString("");
+        if (tab == 0)
+            strip->findChild<Knob>("").lock()->Hide(true);
+        else
+            strip->setValueAString("");
+        
         strip->setValueB(0);
         return;
     }

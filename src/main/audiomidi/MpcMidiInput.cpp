@@ -270,7 +270,8 @@ void MpcMidiInput::transport(MidiMessage* msg, int timeStamp)
         
         auto pad = p->getPadIndexFromNote(note->getNote());
         
-        mpc.setPadAndNote(pad, note->getNote());
+        if (pad != -1)
+            mpc.setPadAndNote(pad, note->getNote());
         
         mpc.getEventHandler().lock()->handleNoThru(note, track.get(), timeStamp);
         

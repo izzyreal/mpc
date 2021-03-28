@@ -1,0 +1,2 @@
+[*.{c,cpp,h,hpp}]
+indent_size = 4

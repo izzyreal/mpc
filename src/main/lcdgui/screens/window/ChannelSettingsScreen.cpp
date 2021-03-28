@@ -46,12 +46,7 @@ weak_ptr<MpcIndivFxMixerChannel> ChannelSettingsScreen::getIndivFxMixerChannel()
 
 	if (mixerSetupScreen->isIndivFxSourceDrum())
 	{
-		auto padIndex = program.lock()->getPadIndexFromNote(note);
-		
-		if (padIndex == -1)
-			return {};
-		
-		return mpcSoundPlayerChannel->getIndivFxMixerChannels()[padIndex];
+		return mpcSoundPlayerChannel->getIndivFxMixerChannels()[note - 35];
 	}
 	else
 	{
@@ -71,12 +66,7 @@ weak_ptr<MpcStereoMixerChannel> ChannelSettingsScreen::getStereoMixerChannel()
 
 	if (mixerSetupScreen->isStereoMixSourceDrum())
 	{
-		auto padIndex = program.lock()->getPadIndexFromNote(note);
-		
-		if (padIndex == -1)
-			return {};
-		
-		return mpcSoundPlayerChannel->getStereoMixerChannels()[padIndex];
+		return mpcSoundPlayerChannel->getStereoMixerChannels()[note - 35];
 	}
 	else
 	{
