@@ -185,9 +185,10 @@ void MixerStrip::setValueAString(string str)
 	}
 	else if (mixerScreen->getTab() == 2)
 	{
-		findLabel("0").lock()->setText(str.substr(0, 1));
-		findLabel("1").lock()->setText(str.substr(1, 2));
+		findLabel("0").lock()->setText(str.length() > 0 ? str.substr(0, 1) : "");
+		findLabel("1").lock()->setText(str.length() > 1 ? str.substr(1, 2) : "");
 	}
+    
 	SetDirty();
 }
 

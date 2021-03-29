@@ -206,6 +206,7 @@ void MpcMidiInput::transport(MidiMessage* msg, int timeStamp)
         {
             auto pgm = lSampler->getDrumBusProgramNumber(bus);
             auto p = lSampler->getProgram(pgm).lock();
+            
             auto pad = p->getPadIndexFromNote(note);
             
             if (pad != -1)
@@ -268,7 +269,10 @@ void MpcMidiInput::transport(MidiMessage* msg, int timeStamp)
         controls->setSliderNoteVar(note.get(), p);
         
         auto pad = p->getPadIndexFromNote(note->getNote());
-        mpc.setPadAndNote(pad, note->getNote());
+        
+        if (pad != -1)
+            mpc.setPadAndNote(pad, note->getNote());
+        
         mpc.getEventHandler().lock()->handleNoThru(note, track.get(), timeStamp);
         
         if (lSequencer->isRecordingOrOverdubbing())
