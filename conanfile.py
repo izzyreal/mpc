@@ -7,7 +7,7 @@ class Pkg(ConanFile):
     version = "0.1"
     settings = "os", "compiler", "arch", "build_type"
     generators = "cmake"
-    exports_sources = "src/*"
+    exports_sources = ["src/*", "resources/*"]
     requires = ("ctoot/0.1@izmar/dev", "moduru/0.1@izmar/dev", "rapidjson/1.1.0@bincrafters/stable", "catch2/2.13.4")
     url = "https://github.com/izzyreal/mpc.git"
 	
