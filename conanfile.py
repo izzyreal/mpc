@@ -23,7 +23,7 @@ class Pkg(ConanFile):
         self.copy("*.a", dst="lib", keep_path=False)
 
     def package_info(self):
-        self.cpp_info.libs=["mpc"]
+        self.cpp_info.libs=["mpc", "mpc_resources"]
         if not self.settings.os == "Windows":
             self.cpp_info.cxxflags = ["-pthread"]
             self.cpp_info.sharedlinkflags = ["-lpthread"]
