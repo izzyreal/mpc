@@ -72,6 +72,7 @@ Mpc::Mpc()
     
 	moduru::Logger::l.setPath(mpc::Paths::logFilePath());
 
+#ifndef __linux__
     auto demoSrc = Paths::demoDataSrcPath();
     auto demoDest = Paths::demoDataDestPath();
 
@@ -92,7 +93,8 @@ Mpc::Mpc()
 	{
 		MLOG(demoDest + " already exists, it will not be touched.");
 	}
-    
+#endif
+
 	hardware = make_shared<hardware::Hardware>(*this);
 	screens = make_shared<Screens>(*this);
 	layeredScreen = make_shared<lcdgui::LayeredScreen>(*this);
