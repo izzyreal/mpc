@@ -11,7 +11,6 @@ using namespace std;
 
 string Paths::sep = FileUtil::getSeparator();
 
-//----
 string Paths::appDocumentsPath()
 {
     static auto path = sago::getDocumentsFolder() + sep + "VMPC2000XL" + sep;
@@ -29,37 +28,6 @@ string Paths::appConfigPath()
     static auto path = sago::getConfig() + sep + "VMPC2000XL" + sep;
     return path;
 }
-//----
-
-//string Paths::fontsPath()
-//{
-//    static auto path = appDataPath()  + "fonts" + sep;
-//    return path;
-//}
-
-string Paths::imgPath()
-{
-    static auto path = appDataPath() + "img" + sep;
-    return path;
-}
-
-//string Paths::screensPath()
-//{
-//    static auto path = appDataPath()  + "screens" + sep;
-//    return path;
-//}
-
-//string Paths::bgPath()
-//{
-//    static auto path = screensPath()  + "bg" + sep;
-//    return path;
-//}
-
-//string Paths::audioPath()
-//{
-//    static auto path = appDataPath()  + "audio" + sep;
-//    return path;
-//}
 
 string Paths::configPath()
 {
@@ -89,4 +57,16 @@ string Paths::recordingsPath()
 {
     static auto recPath = appDocumentsPath() + "Recordings" + sep;
     return recPath;
+}
+
+string Paths::demoDataSrcPath()
+{
+    static auto demoDataPath = appDataPath() + "DemoData" + sep;
+    return demoDataPath;
+}
+
+string Paths::demoDataDestPath()
+{
+    static auto demoDataPath = defaultStorePath() + "Demos" + sep;
+    return demoDataPath;
 }

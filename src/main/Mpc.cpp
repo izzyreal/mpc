@@ -37,12 +37,16 @@
 #include <file/Directory.hpp>
 
 #include <string>
+#include <thirdp/filesystem.hpp>
 
 using namespace mpc;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace moduru::file;
+
+namespace fs = ghc::filesystem;
+
 using namespace std;
 
 Mpc::Mpc()
@@ -55,11 +59,24 @@ Mpc::Mpc()
         Paths::recordingsPath()
     };
     
-    for (auto& p : requiredPaths)
-    {
+    for (auto& p : requiredPaths) {
         Directory dir(p);
         if (!dir.exists())
             dir.create();
+    }
+    
+    auto demoSrc = Paths::demoDataSrcPath();
+    auto demoDest = Paths::demoDataDestPath();
+
+    if (!Directory(demoDest).exists())
+    try
+    {
+        fs::copy(demoSrc, demoDest, fs::copy_options::overwrite_existing | fs::copy_options::recursive);
+    }
+    catch (std::exception& e)
+    {
+        string errorMsg = e.what();
+        MLOG("An error occurred while copying demo data from " + demoSrc + " to " + demoDest);
     }
     
 	moduru::Logger::l.setPath(mpc::Paths::logFilePath());
