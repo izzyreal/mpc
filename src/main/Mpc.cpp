@@ -37,7 +37,6 @@
 #include <file/Directory.hpp>
 
 #include <string>
-#include <thirdp/filesystem.hpp>
 
 using namespace mpc;
 using namespace mpc::lcdgui;
@@ -45,7 +44,13 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace moduru::file;
 
+#ifdef _WIN32
+#include <filesystem>
+namespace fs = std::filesystem;
+#else
+#include <thirdp/filesystem.hpp>
 namespace fs = ghc::filesystem;
+#endif
 
 using namespace std;
 
@@ -65,22 +70,29 @@ Mpc::Mpc()
             dir.create();
     }
     
+	moduru::Logger::l.setPath(mpc::Paths::logFilePath());
+
     auto demoSrc = Paths::demoDataSrcPath();
     auto demoDest = Paths::demoDataDestPath();
 
-    if (!Directory(demoDest).exists())
-    try
-    {
-        fs::copy(demoSrc, demoDest, fs::copy_options::overwrite_existing | fs::copy_options::recursive);
-    }
-    catch (std::exception& e)
-    {
-        string errorMsg = e.what();
-        MLOG("An error occurred while copying demo data from " + demoSrc + " to " + demoDest);
-    }
+	if (!Directory(demoDest).exists())
+	{
+		try
+		{
+			MLOG("Copying demo data into " + demoDest);
+			fs::copy(demoSrc, demoDest, fs::copy_options::recursive | fs::copy_options::overwrite_existing);
+		}
+		catch (std::exception& e)
+		{
+			string errorMsg = e.what();
+			MLOG("An error occurred while copying demo data from " + demoSrc + " to " + demoDest);
+		}
+	}
+	else
+	{
+		MLOG(demoDest + " already exists, it will not be touched.");
+	}
     
-	moduru::Logger::l.setPath(mpc::Paths::logFilePath());
-
 	hardware = make_shared<hardware::Hardware>(*this);
 	screens = make_shared<Screens>(*this);
 	layeredScreen = make_shared<lcdgui::LayeredScreen>(*this);
