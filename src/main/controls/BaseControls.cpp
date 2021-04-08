@@ -219,14 +219,10 @@ void BaseControls::pad(int i, int velo, bool triggeredByRepeat, int tick)
 	}
     
     if (sequencer.lock()->isRecordingOrOverdubbing() && mpc.getControls().lock()->isErasePressed())
-    {
         return;
-    }
 
     if (controls->isNoteRepeatLocked() && !triggeredByRepeat)
-    {
         return;
-    }
     
 	auto note = track.lock()->getBus() > 0 ? program.lock()->getPad(i + (mpc.getBank() * 16))->getNote() : i + (mpc.getBank() * 16) + 35;
 	auto velocity = velo;
@@ -506,8 +502,7 @@ void BaseControls::rec()
     
 	init();
 
-	if (find(begin(allowPlay), end(allowPlay), currentScreenName) != end(allowPlay))
-		return;
+	if (allowPlay()) return;
 
 	auto hw = mpc.getHardware().lock();
 
@@ -536,7 +531,7 @@ void BaseControls::overDub()
 	controls->setOverDubPressed(true);
 	init();
 
-	if (find(begin(allowPlay), end(allowPlay), currentScreenName) != end(allowPlay))
+	if (allowPlay())
 		return;
 
 	auto hw = mpc.getHardware().lock();
@@ -576,9 +571,10 @@ void BaseControls::stop()
 
 	sequencer.lock()->stop();
 
-	if (find(begin(allowTransportScreens), end(allowTransportScreens), currentScreenName) == end(allowTransportScreens)
-		&& find(begin(allowPlay), end(allowPlay), currentScreenName) == end(allowPlay))
+	if (!allowTransport() && !allowPlay())
+	{
 		ls.lock()->openScreen("sequencer");
+	}
 }
 
 void BaseControls::play()
@@ -627,9 +623,10 @@ void BaseControls::play()
 			}
 			else
 			{
-				if (find(begin(allowTransportScreens), end(allowTransportScreens), currentScreenName) == end(allowTransportScreens)
-					&& find(begin(allowPlay), end(allowPlay), currentScreenName) == end(allowPlay))
+				if (!allowTransport() && !allowPlay())
+				{
 					ls.lock()->openScreen("sequencer");
+				}
 
 				sequencer.lock()->setSongModeEnabled(currentScreenName.compare("song") == 0);
 				sequencer.lock()->play();
@@ -675,9 +672,10 @@ void BaseControls::playStart()
 		}
 		else
 		{
-			if (find(begin(allowTransportScreens), end(allowTransportScreens), currentScreenName) == end(allowTransportScreens)
-				&& find(begin(allowPlay), end(allowPlay), currentScreenName) == end(allowPlay))
+			if (!allowTransport() && !allowPlay())
+			{
 				ls.lock()->openScreen("sequencer");
+			}
 			
 			sequencer.lock()->setSongModeEnabled(currentScreenName.compare("song") == 0);
 			sequencer.lock()->playFromStart();
@@ -1006,4 +1004,51 @@ void BaseControls::splitRight()
 			field->setSplit(false);
 		}
 	}
+}
+
+const std::vector<std::string> BaseControls::allowPlayScreens {
+	"song",
+	"track-mute",
+	"next-seq",
+	"next-seq-pad"
+};
+
+bool BaseControls::allowPlay()
+{
+	return find(
+		begin(BaseControls::allowPlayScreens),
+		end(BaseControls::allowPlayScreens),
+		ls.lock()->getCurrentScreenName()
+	) != end(BaseControls::allowPlayScreens);
+}
+
+const std::vector<std::string> BaseControls::allowTransportScreens {
+	"sequencer",
+	"select-drum",
+	"select-mixer-drum",
+	"program-assign",
+	"program-params",
+	"drum", "purge",
+	"program",
+	"create-new-program",
+	"name",
+	"delete-program",
+	"delete-all-programs",
+	"assignment-view",
+	"initialize-pad-assign",
+	"copy-note-parameters",
+	"velocity-modulation",
+	"velo-env-filter",
+	"velo-pitch",
+	"mute-assign",
+	"trans"
+};
+
+bool BaseControls::allowTransport()
+{
+	return find(
+		begin(BaseControls::allowTransportScreens),
+		end(BaseControls::allowTransportScreens),
+		ls.lock()->getCurrentScreenName()
+	) != end(BaseControls::allowTransportScreens);
 }

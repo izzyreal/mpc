@@ -46,20 +46,15 @@ namespace mpc::controls
 {
 	class BaseControls
 	{
-
-	protected:
-		const std::vector<std::string> allowTransportScreens{ "sequencer", "select-drum", "select-mixer-drum", "program-assign", "program-params", "drum", "purge", "program", "create-new-program", "name", "delete-program", "delete-all-programs", "assignment-view", "initialize-pad-assign", "copy-note-parameters", "velocity-modulation", "velo-env-filter", "velo-pitch", "mute-assign", "trans" };
-		const std::vector<std::string> allowPlay{ "song", "track-mute", "next-seq", "next-seq-pad" };
-		mpc::Mpc& mpc;
-		std::weak_ptr<mpc::sequencer::Sequencer> sequencer;
-		std::weak_ptr<mpc::sampler::Sampler> sampler;
-
 	public:
+		BaseControls(mpc::Mpc& mpc);
+		
 		bool splittable = false;
 		void splitLeft();
 		void splitRight();
 
-	public:
+		std::vector<std::string> typableParams;
+
 		std::string param = "";
 		std::string currentScreenName = "";
 
@@ -70,9 +65,6 @@ namespace mpc::controls
 		std::weak_ptr<mpc::lcdgui::LayeredScreen> ls;
 		std::weak_ptr<mpc::lcdgui::Field> activeField;
 
-		std::vector<std::string> typableParams;
-
-	public:
 		virtual void init();
 		int getSoundIncrement(int notch);
 		virtual void left();
@@ -110,12 +102,18 @@ namespace mpc::controls
 		virtual bool isTypable();
 
 		virtual void pad(int i, int velo, bool repeat, int tick);
-		void generateNoteOn(int nn, int padVelo, int tick);
-
 		void setSliderNoteVar(mpc::sequencer::NoteEvent* n, std::weak_ptr<mpc::sampler::Program> program);
 
-	public:
-		BaseControls(mpc::Mpc& mpc);
+	protected:
+		const static std::vector<std::string> allowTransportScreens;
+		const static std::vector<std::string> allowPlayScreens;
+		bool allowTransport();
+		bool allowPlay();
+		mpc::Mpc& mpc;
+		std::weak_ptr<mpc::sequencer::Sequencer> sequencer;
+		std::weak_ptr<mpc::sampler::Sampler> sampler;
 
+	private:
+		void generateNoteOn(int nn, int padVelo, int tick);
 	};
 }
