@@ -73,9 +73,14 @@ namespace mpc::lcdgui
 		std::string getFirstField();
 		const std::map<std::string, std::vector<std::string>>& getTransferMap();
 
-	protected:
-		std::vector<int> splitInc{ 10000000, 1000000, 100000, 10000, 1000, 100, 10, 1 };
-		virtual void init() { baseControls->init(); param = baseControls->param; program = baseControls->program; mpcSoundPlayerChannel = baseControls->mpcSoundPlayerChannel; track = baseControls->track; }
+	protected:		
+		virtual void init() {
+			baseControls->init();
+			param = baseControls->param;
+			program = baseControls->program;
+			mpcSoundPlayerChannel = baseControls->mpcSoundPlayerChannel;
+			track = baseControls->track;
+		}
 
 	public:
 		void splitLeft() { baseControls->splitLeft(); }

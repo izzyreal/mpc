@@ -39,7 +39,6 @@
 #include <Util.hpp>
 
 #include <mpc/MpcSoundPlayerChannel.hpp>
-#include <audio/server/NonRealTimeAudioServer.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;

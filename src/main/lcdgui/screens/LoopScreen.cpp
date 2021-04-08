@@ -136,7 +136,7 @@ void LoopScreen::turnWheel(int i)
 	auto field = findField(param).lock();
 	
 	if (field->isSplit())
-		soundInc = i >= 0 ? splitInc[field->getActiveSplit()] : -splitInc[field->getActiveSplit()];
+		soundInc = field->getSplitIncrement(i >= 0);
 
 	if (field->isTypeModeEnabled())
 		field->disableTypeMode();

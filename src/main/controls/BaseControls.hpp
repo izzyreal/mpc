@@ -40,6 +40,7 @@ namespace mpc::lcdgui
 {
 	class Field;
 	class LayeredScreen;
+	class ScreenComponent;
 }
 
 namespace mpc::controls
@@ -55,7 +56,6 @@ namespace mpc::controls
 
 		std::vector<std::string> typableParams;
 
-		std::string param = "";
 		std::string currentScreenName = "";
 
 		std::weak_ptr<mpc::sequencer::Track> track;
@@ -105,15 +105,19 @@ namespace mpc::controls
 		void setSliderNoteVar(mpc::sequencer::NoteEvent* n, std::weak_ptr<mpc::sampler::Program> program);
 
 	protected:
-		const static std::vector<std::string> allowTransportScreens;
-		const static std::vector<std::string> allowPlayScreens;
-		bool allowTransport();
-		bool allowPlay();
+		std::string param = "";
 		mpc::Mpc& mpc;
 		std::weak_ptr<mpc::sequencer::Sequencer> sequencer;
 		std::weak_ptr<mpc::sampler::Sampler> sampler;
 
 	private:
+		const static std::vector<std::string> allowTransportScreens;
+		const static std::vector<std::string> allowPlayScreens;
+
+		bool allowTransport();
+		bool allowPlay();
 		void generateNoteOn(int nn, int padVelo, int tick);
+
+		friend class mpc::lcdgui::ScreenComponent;
 	};
 }

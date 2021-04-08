@@ -44,6 +44,7 @@ namespace mpc::lcdgui
 		void takeFocus(std::string prev);
 		void setSplit(bool b);
 		bool isSplit();
+		int getSplitIncrement(bool positive);
 		int getActiveSplit();
 		bool setActiveSplit(int i);
 		bool enableTypeMode();
@@ -58,7 +59,6 @@ namespace mpc::lcdgui
 		void Draw(std::vector<std::vector<bool>>* pixels) override;
 		void Hide(bool b) override;
 
-	public:
 		Field(mpc::Mpc& mpc, const std::string& name, int x, int y, int width);
 
 	};
