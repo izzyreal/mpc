@@ -47,19 +47,16 @@ using namespace mpc::controls;
 using namespace mpc::sequencer;
 using namespace std;
 
-BaseControls::BaseControls(mpc::Mpc& mpc)
-	: mpc(mpc)
+BaseControls::BaseControls(mpc::Mpc& _mpc)
+	: mpc (_mpc),
+	ls (_mpc.getLayeredScreen()),
+	sampler (_mpc.getSampler()),
+	sequencer (_mpc.getSequencer())
 {
-	ls = mpc.getLayeredScreen();
-	sampler = mpc.getSampler();
-	sequencer = mpc.getSequencer();
 }
 
 void BaseControls::init()
 {
-	sampler = mpc.getSampler();
-	sequencer = mpc.getSequencer();
-
 	currentScreenName = ls.lock()->getCurrentScreenName();
 	param = ls.lock()->getFocus();
 	activeField = ls.lock()->getFocusedLayer().lock()->findField(param);

@@ -48,7 +48,7 @@ namespace mpc::controls
 	class BaseControls
 	{
 	public:
-		BaseControls(mpc::Mpc& mpc);
+		BaseControls(mpc::Mpc&);
 		
 		bool splittable = false;
 		void splitLeft();
