@@ -1,5 +1,10 @@
 #include <Util.hpp>
 
+#include <sequencer/NoteEvent.hpp>
+#include <lcdgui/screens/window/Assign16LevelsScreen.hpp>
+#include <hardware/Hardware.hpp>
+#include <hardware/TopPanel.hpp>>
+
 #include <cmath>
 #include <cstdlib>
 
@@ -10,6 +15,8 @@ using namespace std;
 using namespace mpc;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui::screens::window;
+using namespace mpc::sequencer;
 using namespace moduru::lang;
 
 string Util::replaceDotWithSmallSpaceDot(const string& s) {
@@ -243,4 +250,45 @@ void Util::initSequence(mpc::Mpc& mpc)
 	string name = StrUtil::trim(sequencer->getDefaultSequenceName()) + StrUtil::padLeft(to_string(index + 1), "0", 2);
 	sequence->setName(name);
 	sequencer->setActiveSequenceIndex(sequencer->getActiveSequenceIndex());
+}
+
+void Util::set16LevelsValues(mpc::Mpc& mpc, shared_ptr<NoteEvent> event, const int padIndex)
+{
+	auto assign16LevelsScreen = mpc.screens->get<Assign16LevelsScreen>("assign-16-levels");
+
+	auto _16l_type = assign16LevelsScreen->getType();
+	auto _16l_key = assign16LevelsScreen->getOriginalKeyPad();
+	auto _16l_note = assign16LevelsScreen->getNote();
+	auto _16l_param = assign16LevelsScreen->getParameter();
+
+	event->setNote(_16l_note);
+	event->setVariationTypeNumber(_16l_type);
+
+	if (mpc.getHardware().lock()->getTopPanel().lock()->isSixteenLevelsEnabled())
+	{
+		if (_16l_param == 0)
+		{
+			auto velocity = static_cast<int>((padIndex + 1) * (127.0 / 16.0));
+			event->setVelocity(velocity);
+		}
+		else if (_16l_param == 1)
+		{
+			if (_16l_type != 0)
+			{
+				auto value = static_cast<int>(floor(100 / 16.0) * (padIndex + 1));
+				event->setVariationValue(value);
+				return;
+			}
+
+			auto diff = padIndex - _16l_key;
+			auto candidate = 64 + (diff * 5);
+
+			if (candidate > 124)
+				candidate = 124;
+			else if (candidate < 4)
+				candidate = 4;
+
+			event->setVariationValue(candidate);
+		}
+	}
 }

@@ -15,15 +15,9 @@
 #include <memory>
 #include <vector>
 
-namespace ctoot::mpc
-{
-	class MpcSoundPlayerChannel;
-}
-
-namespace mpc
-{
-	class Mpc;
-}
+namespace ctoot::mpc { class MpcSoundPlayerChannel; }
+namespace mpc { class Mpc; }
+namespace mpc::controls { class GlobalReleaseControls; }
 
 namespace mpc::sequencer
 {
@@ -31,10 +25,7 @@ namespace mpc::sequencer
 	class NoteEvent;
 }
 
-namespace mpc::sampler
-{
-	class Program;
-}
+namespace mpc::sampler { class Program; }
 
 namespace mpc::lcdgui
 {
@@ -43,22 +34,20 @@ namespace mpc::lcdgui
 	class ScreenComponent;
 }
 
-namespace mpc::controls
-{
-	class BaseControls
-	{
+namespace mpc::controls {
+	
+	class BaseSamplerControls;
+	
+	class BaseControls {
 	public:
 		BaseControls(mpc::Mpc&);
-		
+
 		bool splittable = false;
 		void splitLeft();
 		void splitRight();
 
 		std::vector<std::string> typableParams;
 
-		std::string currentScreenName = "";
-
-		std::weak_ptr<mpc::sequencer::Track> track;
 		std::weak_ptr<mpc::sampler::Program> program;
 		ctoot::mpc::MpcSoundPlayerChannel* mpcSoundPlayerChannel = nullptr;
 
@@ -98,7 +87,7 @@ namespace mpc::controls
 		virtual void undoSeq();
 		virtual void erase();
 		virtual void setSlider(int i) {};
-		
+
 		virtual bool isTypable();
 
 		virtual void pad(int i, int velo, bool repeat, int tick);
@@ -108,9 +97,11 @@ namespace mpc::controls
 		std::string param = "";
 		mpc::Mpc& mpc;
 		std::weak_ptr<mpc::sequencer::Sequencer> sequencer;
-		std::weak_ptr<mpc::sampler::Sampler> sampler;
 
 	private:
+		std::weak_ptr<mpc::sampler::Sampler> sampler;
+		std::weak_ptr<mpc::sequencer::Track> track;
+		std::string currentScreenName = "";
 		const static std::vector<std::string> allowTransportScreens;
 		const static std::vector<std::string> allowPlayScreens;
 
@@ -119,5 +110,7 @@ namespace mpc::controls
 		void generateNoteOn(int nn, int padVelo, int tick);
 
 		friend class mpc::lcdgui::ScreenComponent;
+		friend class mpc::controls::GlobalReleaseControls;
+		friend class mpc::controls::BaseSamplerControls;
 	};
 }

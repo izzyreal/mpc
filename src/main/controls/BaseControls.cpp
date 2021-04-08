@@ -175,7 +175,7 @@ void BaseControls::function(int i)
 			{
 				auto loadScreen = mpc.screens->get<LoadScreen>("load");
 
-				if (loadScreen->fileLoad + 1 > mpc.getDisk().lock()->getFiles().size())
+				if (loadScreen->fileLoad >= mpc.getDisk().lock()->getFiles().size())
 					loadScreen->fileLoad = 0; // Can we avoid this? Who's leaving fileLoad in a bad state?
 			}
 		}
@@ -224,20 +224,7 @@ void BaseControls::pad(int i, int velo, bool triggeredByRepeat, int tick)
 	auto velocity = velo;
 	auto pad = i + (mpc.getBank() * 16);
 
-	auto assign16LevelsScreen = mpc.screens->get<Assign16LevelsScreen>("assign-16-levels");
-
-	if (mpc.getHardware().lock()->getTopPanel().lock()->isSixteenLevelsEnabled())
-	{
-		if (assign16LevelsScreen->getParameter() == 0)
-		{
-			note = assign16LevelsScreen->getNote();
-			velocity = (int)(i * (127.0 / 16.0));
-			
-			if (velocity == 0)
-				velocity = 1;
-		}
-	}
-	else
+	if (!mpc.getHardware().lock()->getTopPanel().lock()->isSixteenLevelsEnabled())
 	{
 		if (currentScreenName.compare("program-params") == 0)
 		{
@@ -266,12 +253,6 @@ void BaseControls::generateNoteOn(int note, int padVelo, int tick)
 	init();
 
 	auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
-	auto assign16LevelsScreen = mpc.screens->get<Assign16LevelsScreen>("assign-16-levels");
-
-	auto _16l_type = assign16LevelsScreen->getType();
-	auto _16l_key = assign16LevelsScreen->getOriginalKeyPad();
-	auto _16l_note = assign16LevelsScreen->getNote();
-	auto _16l_param = assign16LevelsScreen->getParameter();
 
 	auto pgm = program.lock();
 	auto seq = sequencer.lock();
@@ -294,44 +275,10 @@ void BaseControls::generateNoteOn(int note, int padVelo, int tick)
 		tc_note != 0 &&
 		!posIsLastTick;
 
-	shared_ptr<NoteEvent> recordedEvent;
-
-	auto setEventAttributes = [&](shared_ptr<NoteEvent> event)
-	{
-		event->setVelocity(padVelo);
-		event->setDuration(step ? 1 : -1);
-
-		if (mpc.getHardware().lock()->getTopPanel().lock()->isSixteenLevelsEnabled()) {
-			if (_16l_param == 1)
-			{
-				if (_16l_type == 0)
-				{
-					auto diff = padIndex - _16l_key;
-					auto candidate = 64 + (diff * 5);
-
-					if (candidate > 124)
-						candidate = 124;
-					else if (candidate < 4)
-						candidate = 4;
-
-					event->setVariationValue(candidate);
-				}
-				else
-				{
-					event->setVariationValue(static_cast<int>(floor(100 / 16.0) * padIndex));
-				}
-			}
-
-			event->setNote(_16l_note);
-			event->setVariationTypeNumber(_16l_type);
-		}
-
-		if (isSliderNote)
-			setSliderNoteVar(event.get(), program);
-	};
-
 	if (seq->isRecordingOrOverdubbing() || step || recMainWithoutPlaying)
 	{
+		shared_ptr<NoteEvent> recordedEvent;
+
 		if (step)
 		{
 			recordedEvent = trk->addNoteEvent(seq->getTickPosition(), note).lock();
@@ -362,14 +309,25 @@ void BaseControls::generateNoteOn(int note, int padVelo, int tick)
 		}
 
 		if (recordedEvent)
-			setEventAttributes(recordedEvent);
+		{
+			Util::set16LevelsValues(mpc, recordedEvent, padIndex);
+			
+			if (isSliderNote)
+				setSliderNoteVar(recordedEvent.get(), program);
+		}
 
 		if (step || recMainWithoutPlaying)
 			seq->playMetronomeTrack();
 	}
 
 	auto playableEvent = make_shared<NoteEvent>(note);
-	setEventAttributes(playableEvent);
+	playableEvent->setVelocity(padVelo);
+
+	Util::set16LevelsValues(mpc, playableEvent, padIndex);
+
+	if (isSliderNote)
+		setSliderNoteVar(playableEvent.get(), program);
+
 	playableEvent->setDuration(0);
 	playableEvent->setTick(tick);
 
