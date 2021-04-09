@@ -125,7 +125,6 @@ namespace mpc::lcdgui
 		virtual bool isTypable() { return mpc.getControls().lock()->getControls()->isTypable(); }
 
 		int getSoundIncrement(int notch) { return mpc.getControls().lock()->getControls()->getSoundIncrement(notch); }
-		void setSliderNoteVar(mpc::sequencer::NoteEvent* n, std::weak_ptr<mpc::sampler::Program> program) { mpc.getControls().lock()->getControls()->setSliderNoteVar(n, program); }
 
 		virtual void pad(int i, int velo, bool repeat, int tick) { mpc.getControls().lock()->getControls()->pad(i, velo, repeat, tick); }
 

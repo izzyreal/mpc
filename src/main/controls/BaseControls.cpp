@@ -313,7 +313,7 @@ void BaseControls::generateNoteOn(int note, int padVelo, int tick)
 			Util::set16LevelsValues(mpc, recordedEvent, padIndex);
 			
 			if (isSliderNote)
-				setSliderNoteVar(recordedEvent.get(), program);
+				Util::setSliderNoteVariationParameters(mpc, recordedEvent, program);
 		}
 
 		if (step || recMainWithoutPlaying)
@@ -326,7 +326,7 @@ void BaseControls::generateNoteOn(int note, int padVelo, int tick)
 	Util::set16LevelsValues(mpc, playableEvent, padIndex);
 
 	if (isSliderNote)
-		setSliderNoteVar(playableEvent.get(), program);
+        Util::setSliderNoteVariationParameters(mpc, playableEvent, program);
 
 	playableEvent->setDuration(0);
 	playableEvent->setTick(tick);
@@ -831,62 +831,6 @@ void BaseControls::shift()
 void BaseControls::undoSeq()
 {
 	sequencer.lock()->undoSeq();
-}
-
-void BaseControls::setSliderNoteVar(NoteEvent* n, weak_ptr<mpc::sampler::Program> program)
-{
-	auto lProgram = program.lock();
-
-	if (n->getNote() != lProgram->getSlider()->getNote())
-	{
-		return;
-	}
-
-	auto sliderParam = lProgram->getSlider()->getParameter();
-	int rangeLow = 0, rangeHigh = 0, sliderRange = 0;
-	n->setVariationTypeNumber(sliderParam);
-	int sliderValue = mpc.getHardware().lock()->getSlider().lock()->getValue();
-	double sliderRangeRatio = 0;
-	int tuneValue;
-	int decayValue;
-	int attackValue;
-	int filterValue;
-	switch (sliderParam)
-	{
-	case 0:
-		rangeLow = lProgram->getSlider()->getTuneLowRange();
-		rangeHigh = lProgram->getSlider()->getTuneHighRange();
-		sliderRange = rangeHigh - rangeLow;
-		sliderRangeRatio = sliderRange / 128.0;
-		tuneValue = (int)(sliderValue * sliderRangeRatio * 0.5);
-		tuneValue += (120 - rangeHigh) / 2;
-		n->setVariationValue(tuneValue);
-		break;
-	case 1:
-		rangeLow = lProgram->getSlider()->getDecayLowRange();
-		rangeHigh = lProgram->getSlider()->getDecayHighRange();
-		sliderRange = rangeHigh - rangeLow;
-		sliderRangeRatio = sliderRange / 128.0;
-		decayValue = (int)(sliderValue * sliderRangeRatio);
-		n->setVariationValue(decayValue);
-		break;
-	case 2:
-		rangeLow = lProgram->getSlider()->getAttackLowRange();
-		rangeHigh = lProgram->getSlider()->getAttackHighRange();
-		sliderRange = rangeHigh - rangeLow;
-		sliderRangeRatio = sliderRange / 128.0;
-		attackValue = (int)(sliderValue * sliderRangeRatio);
-		n->setVariationValue(attackValue);
-		break;
-	case 3:
-		rangeLow = lProgram->getSlider()->getFilterLowRange();
-		rangeHigh = lProgram->getSlider()->getFilterHighRange();
-		sliderRange = rangeHigh - rangeLow;
-		sliderRangeRatio = sliderRange / 128.0;
-		filterValue = (int)(sliderValue * sliderRangeRatio);
-		n->setVariationValue(filterValue);
-		break;
-	}
 }
 
 void BaseControls::erase()

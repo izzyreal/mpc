@@ -86,12 +86,11 @@ namespace mpc::controls {
 		virtual void shift();
 		virtual void undoSeq();
 		virtual void erase();
-		virtual void setSlider(int i) {};
+		virtual void setSlider(int) {}
 
 		virtual bool isTypable();
 
 		virtual void pad(int i, int velo, bool repeat, int tick);
-		void setSliderNoteVar(mpc::sequencer::NoteEvent* n, std::weak_ptr<mpc::sampler::Program> program);
 
 	protected:
 		std::string param = "";
