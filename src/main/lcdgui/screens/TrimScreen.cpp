@@ -20,12 +20,12 @@ using namespace std;
 TrimScreen::TrimScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "trim", layerIndex)
 {
-	baseControls = make_shared<BaseSamplerControls>(mpc);
+	//baseControls = make_shared<BaseSamplerControls>(mpc);
 
 	addChild(move(make_shared<Wave>()));
 	findWave().lock()->setFine(false);
 
-	baseControls->typableParams = { "st", "end" };
+	//baseControls->typableParams = { "st", "end" };
 }
 
 void TrimScreen::open()

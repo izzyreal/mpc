@@ -19,7 +19,7 @@ using namespace std;
 PgmAssignScreen::PgmAssignScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "program-assign", layerIndex)
 {
-	baseControls = make_shared<BaseSamplerControls>(mpc);
+	//baseControls = make_shared<BaseSamplerControls>(mpc);
 }
 
 void PgmAssignScreen::open()

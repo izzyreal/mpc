@@ -13,8 +13,8 @@ using namespace std;
 LoopEndFineScreen::LoopEndFineScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "loop-end-fine", layerIndex)
 {
-	baseControls = make_shared<BaseSamplerControls>(mpc);
-	baseControls->typableParams = { "end", "lngth" };
+	//baseControls = make_shared<BaseSamplerControls>(mpc);
+	//baseControls->typableParams = { "end", "lngth" };
 
 	addChild(move(make_shared<Wave>()));
 	findWave().lock()->setFine(true);

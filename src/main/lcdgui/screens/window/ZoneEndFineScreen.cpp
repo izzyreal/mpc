@@ -13,8 +13,8 @@ using namespace std;
 ZoneEndFineScreen::ZoneEndFineScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "zone-end-fine", layerIndex)
 {
-	baseControls = make_shared<BaseSamplerControls>(mpc);
-	baseControls->typableParams = { "end" };
+	//baseControls = make_shared<BaseSamplerControls>(mpc);
+	//baseControls->typableParams = { "end" };
 
 	addChild(move(make_shared<Wave>()));
 	findWave().lock()->setFine(true);

@@ -11,7 +11,7 @@ using namespace std;
 VeloEnvFilterScreen::VeloEnvFilterScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "velo-env-filter", layerIndex)
 {
-	baseControls = make_shared<BaseSamplerControls>(mpc);
+	//baseControls = make_shared<BaseSamplerControls>(mpc);
 	addChild(make_shared<EnvGraph>(mpc));
 }
 

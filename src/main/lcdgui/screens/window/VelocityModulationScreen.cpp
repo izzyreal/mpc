@@ -11,7 +11,7 @@ using namespace std;
 VelocityModulationScreen::VelocityModulationScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "velocity-modulation", layerIndex)
 {
-	baseControls = make_shared<BaseSamplerControls>(mpc);
+	//baseControls = make_shared<BaseSamplerControls>(mpc);
 }
 
 void VelocityModulationScreen::open()

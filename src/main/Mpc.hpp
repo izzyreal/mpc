@@ -97,7 +97,7 @@ public:
     std::weak_ptr<lcdgui::LayeredScreen> getLayeredScreen();
     std::weak_ptr<controls::Controls> getControls();
     std::weak_ptr<mpc::lcdgui::ScreenComponent> getActiveControls();
-    controls::GlobalReleaseControls* getReleaseControls();
+    std::shared_ptr<mpc::controls::GlobalReleaseControls> getReleaseControls();
     std::weak_ptr<hardware::Hardware> getHardware();
     
 public:

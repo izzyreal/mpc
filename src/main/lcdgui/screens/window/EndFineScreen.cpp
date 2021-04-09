@@ -12,8 +12,8 @@ using namespace std;
 EndFineScreen::EndFineScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "end-fine", layerIndex)
 {
-	baseControls = make_shared<BaseSamplerControls>(mpc);
-	baseControls->typableParams = { "end" };
+	//baseControls = make_shared<BaseSamplerControls>(mpc);
+	//baseControls->typableParams = { "end" };
 
 	addChild(move(make_shared<Wave>()));
 	findWave().lock()->setFine(true);

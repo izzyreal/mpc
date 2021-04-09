@@ -11,7 +11,7 @@ using namespace std;
 CreateNewProgramScreen::CreateNewProgramScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "create-new-program", layerIndex)
 {
-	baseControls = make_shared<BaseSamplerControls>(mpc);
+	//baseControls = make_shared<BaseSamplerControls>(mpc);
 }
 
 void CreateNewProgramScreen::turnWheel(int i)

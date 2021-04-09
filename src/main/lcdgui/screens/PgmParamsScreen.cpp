@@ -19,7 +19,7 @@ using namespace std;
 PgmParamsScreen::PgmParamsScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "program-params", layerIndex)
 {
-	baseControls = make_shared<BaseSamplerControls>(mpc);
+	//baseControls = make_shared<BaseSamplerControls>(mpc);
 	addChild(make_shared<EnvGraph>(mpc));
 }
 

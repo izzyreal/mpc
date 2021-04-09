@@ -12,7 +12,7 @@ using namespace std;
 ProgramScreen::ProgramScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "program", layerIndex)
 {
-	baseControls = make_shared<BaseSamplerControls>(mpc);
+	//baseControls = make_shared<BaseSamplerControls>(mpc);
 }
 
 void ProgramScreen::open()

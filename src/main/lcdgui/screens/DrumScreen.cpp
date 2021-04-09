@@ -13,7 +13,7 @@ using namespace std;
 DrumScreen::DrumScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "drum", layerIndex)
 {
-	baseControls = make_shared<BaseSamplerControls>(mpc);
+	//baseControls = make_shared<BaseSamplerControls>(mpc);
 }
 
 void DrumScreen::open()

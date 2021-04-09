@@ -210,7 +210,7 @@ weak_ptr<lcdgui::ScreenComponent> Mpc::getActiveControls() {
 	return layeredScreen->findScreenComponent().lock();
 }
 
-controls::GlobalReleaseControls* Mpc::getReleaseControls() {
+shared_ptr<mpc::controls::GlobalReleaseControls> Mpc::getReleaseControls() {
 	return controls->getReleaseControls();
 }
 
@@ -272,8 +272,8 @@ void Mpc::loadProgram()
 	auto loadScreen = screens->get<LoadScreen>("load");
 	auto loadAProgramScreen = screens->get<LoadAProgramScreen>("load-a-program");
 
-	getActiveControls().lock()->getBaseControls()->init();
-	auto activePgm = getActiveControls().lock()->getBaseControls()->mpcSoundPlayerChannel->getProgram();
+	controls->getControls()->init();
+	auto activePgm = controls->getControls()->mpcSoundPlayerChannel->getProgram();
 
 	programLoader = make_unique<mpc::disk::ProgramLoader>(*this, loadScreen->getSelectedFile(), loadAProgramScreen->loadReplaceSound ? activePgm : -1);
 }

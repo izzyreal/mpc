@@ -11,7 +11,7 @@ using namespace std;
 MuteAssignScreen::MuteAssignScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "mute-assign", layerIndex)
 {
-	baseControls = make_shared<BaseSamplerControls>(mpc);
+	//baseControls = make_shared<BaseSamplerControls>(mpc);
 }
 
 void MuteAssignScreen::open()

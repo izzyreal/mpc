@@ -13,8 +13,8 @@ using namespace std;
 ZoneStartFineScreen::ZoneStartFineScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "zone-start-fine", layerIndex)
 {
-	baseControls = make_shared<BaseSamplerControls>(mpc);
-	baseControls->typableParams = { "start" };
+//	baseControls = make_shared<BaseSamplerControls>(mpc);
+	//baseControls->typableParams = { "start" };
 
 	addChild(move(make_shared<Wave>()));
 	findWave().lock()->setFine(true);

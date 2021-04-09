@@ -20,7 +20,7 @@ using namespace std;
 EditSoundScreen::EditSoundScreen(mpc::Mpc& mpc, const int layerIndex)
     : ScreenComponent(mpc, "edit-sound", layerIndex)
 {
-	baseControls = make_shared<BaseSamplerControls>(mpc);
+	//baseControls = make_shared<BaseSamplerControls>(mpc);
 	vector<string> newTimeStretchPresetNames;
 	
 	const auto letters = vector<string>{ "A", "B", "C" };
@@ -404,7 +404,7 @@ void EditSoundScreen::turnWheel(int i)
 
 void EditSoundScreen::function(int j)
 {
-	baseControls->function(j);
+	ScreenComponent::function(j);
 
 	auto zoneScreen = mpc.screens->get<ZoneScreen>("zone");
 

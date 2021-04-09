@@ -23,7 +23,7 @@ using namespace std;
 MixerScreen::MixerScreen(mpc::Mpc& mpc, const int layerIndex) 
 : ScreenComponent(mpc, "mixer", layerIndex)
 {
-    baseControls = make_shared<BaseSamplerControls>(mpc);
+    //baseControls = make_shared<BaseSamplerControls>(mpc);
     addMixerStrips();
 }
 

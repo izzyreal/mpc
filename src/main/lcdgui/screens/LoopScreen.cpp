@@ -21,12 +21,12 @@ using namespace std;
 LoopScreen::LoopScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "loop", layerIndex)
 {
-	baseControls = make_shared<BaseSamplerControls>(mpc);
+	//baseControls = make_shared<BaseSamplerControls>(mpc);
 
 	addChild(move(make_shared<Wave>()));
 	findWave().lock()->setFine(false);
 
-	baseControls->typableParams = { "to", "endlengthvalue" };
+	//baseControls->typableParams = { "to", "endlengthvalue" };
 }
 
 void LoopScreen::open()

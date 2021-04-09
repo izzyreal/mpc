@@ -11,7 +11,7 @@ using namespace std;
 VeloPitchScreen::VeloPitchScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "velo-pitch", layerIndex)
 {
-	baseControls = make_shared<BaseSamplerControls>(mpc);
+	//baseControls = make_shared<BaseSamplerControls>(mpc);
 }
 
 void VeloPitchScreen::open()

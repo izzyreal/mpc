@@ -14,7 +14,7 @@ using namespace std;
 AutoChromaticAssignmentScreen::AutoChromaticAssignmentScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "auto-chromatic-assignment", layerIndex)
 {
-	baseControls = make_shared<BaseSamplerControls>(mpc);
+	//baseControls = make_shared<BaseSamplerControls>(mpc);
 }
 
 void AutoChromaticAssignmentScreen::open()

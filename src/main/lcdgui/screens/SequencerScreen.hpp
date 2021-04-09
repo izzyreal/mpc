@@ -64,7 +64,6 @@ namespace mpc::lcdgui::screens
 		void right() override;
 		void up() override;
 		void down() override;
-		void numpad(int i) override { baseControls->numpad(i); }
 		void play() override;
 		void playStart() override;
 		void stop() override;

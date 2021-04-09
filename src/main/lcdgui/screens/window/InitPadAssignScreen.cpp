@@ -9,7 +9,7 @@ using namespace std;
 InitPadAssignScreen::InitPadAssignScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "init-pad-assign", layerIndex)
 {
-	baseControls = make_shared<BaseSamplerControls>(mpc);
+	//baseControls = make_shared<BaseSamplerControls>(mpc);
 }
 
 void InitPadAssignScreen::open()

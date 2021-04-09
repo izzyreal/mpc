@@ -11,7 +11,6 @@ using namespace std;
 ScreenComponent::ScreenComponent(mpc::Mpc& mpc, const string& name, const int layer)
 	: Component(name), layer(layer), mpc(mpc)
 {
-	baseControls = make_shared<BaseControls>(mpc);
 	ls = mpc.getLayeredScreen();
 	sampler = mpc.getSampler();
 	sequencer = mpc.getSequencer();
