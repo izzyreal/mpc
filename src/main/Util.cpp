@@ -3,7 +3,7 @@
 #include <sequencer/NoteEvent.hpp>
 #include <lcdgui/screens/window/Assign16LevelsScreen.hpp>
 #include <hardware/Hardware.hpp>
-#include <hardware/TopPanel.hpp>>
+#include <hardware/TopPanel.hpp>
 
 #include <cmath>
 #include <cstdlib>
@@ -218,7 +218,7 @@ int Util::getTextWidthInPixels(const string& text)
 
 	int count = 0;
 
-	for (p; *p != 0; ++p)
+	for (; *p != 0; ++p)
 		count += (*p & 0xc0) != 0x80;
 
 	int halfSpaceCount = 0;
@@ -254,18 +254,18 @@ void Util::initSequence(mpc::Mpc& mpc)
 
 void Util::set16LevelsValues(mpc::Mpc& mpc, shared_ptr<NoteEvent> event, const int padIndex)
 {
-	auto assign16LevelsScreen = mpc.screens->get<Assign16LevelsScreen>("assign-16-levels");
-
-	auto _16l_type = assign16LevelsScreen->getType();
-	auto _16l_key = assign16LevelsScreen->getOriginalKeyPad();
-	auto _16l_note = assign16LevelsScreen->getNote();
-	auto _16l_param = assign16LevelsScreen->getParameter();
-
-	event->setNote(_16l_note);
-	event->setVariationTypeNumber(_16l_type);
-
 	if (mpc.getHardware().lock()->getTopPanel().lock()->isSixteenLevelsEnabled())
 	{
+        auto assign16LevelsScreen = mpc.screens->get<Assign16LevelsScreen>("assign-16-levels");
+
+        auto _16l_type = assign16LevelsScreen->getType();
+        auto _16l_key = assign16LevelsScreen->getOriginalKeyPad();
+        auto _16l_note = assign16LevelsScreen->getNote();
+        auto _16l_param = assign16LevelsScreen->getParameter();
+
+        event->setNote(_16l_note);
+        event->setVariationTypeNumber(_16l_type);
+
 		if (_16l_param == 0)
 		{
 			auto velocity = static_cast<int>((padIndex + 1) * (127.0 / 16.0));
