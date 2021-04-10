@@ -2,8 +2,6 @@
 
 #include "SelectDrumScreen.hpp"
 
-#include <controls/BaseSamplerControls.hpp>
-
 #include <sampler/NoteParameters.hpp>
 #include <sampler/Pad.hpp>
 #include <sampler/Program.hpp>
@@ -19,7 +17,6 @@ using namespace std;
 PgmAssignScreen::PgmAssignScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "program-assign", layerIndex)
 {
-	baseControls = make_shared<BaseSamplerControls>(mpc);
 }
 
 void PgmAssignScreen::open()

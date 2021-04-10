@@ -16,12 +16,10 @@ namespace mpc::controls {
 }
 
 namespace mpc::controls {
-
 	class Controls
 	{
 	public:
         Controls(mpc::Mpc& mpc);
-        ~Controls();
 
         void setErasePressed(bool);
         void setRecPressed(bool);
@@ -52,8 +50,8 @@ namespace mpc::controls {
 
         void releaseAll();
         std::weak_ptr<KeyEventHandler> getKeyEventHandler();
-        mpc::controls::BaseControls* getControls(std::string s);
-        mpc::controls::GlobalReleaseControls* getReleaseControls();
+        std::shared_ptr<BaseControls> getControls();
+        std::shared_ptr<GlobalReleaseControls> getReleaseControls();
 
 		void setCtrlPressed(bool);
 		void setAltPressed(bool);
@@ -77,9 +75,10 @@ namespace mpc::controls {
 		bool f5Pressed = false;
 		bool f6Pressed = false;
 		std::set<int> pressedPads;
-		std::vector<int> pressedPadVelos;
+        std::vector<int> pressedPadVelos = std::vector<int>(16);
         std::shared_ptr<KeyEventHandler> keyEventHandler;
-		std::unordered_map<std::string, controls::BaseControls*> controls;
+		std::shared_ptr<BaseControls> controls;
+        std::shared_ptr<GlobalReleaseControls> releaseControls;
 
 	};
 }

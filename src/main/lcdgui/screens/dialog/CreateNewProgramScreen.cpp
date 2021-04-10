@@ -1,7 +1,5 @@
 #include "CreateNewProgramScreen.hpp"
 
-#include <controls/BaseSamplerControls.hpp>
-
 #include <mpc/MpcSoundPlayerChannel.hpp>
 
 using namespace mpc::lcdgui::screens::dialog;
@@ -11,7 +9,6 @@ using namespace std;
 CreateNewProgramScreen::CreateNewProgramScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "create-new-program", layerIndex)
 {
-	baseControls = make_shared<BaseSamplerControls>(mpc);
 }
 
 void CreateNewProgramScreen::turnWheel(int i)
@@ -19,9 +16,7 @@ void CreateNewProgramScreen::turnWheel(int i)
 	init();
 
 	if (param.compare("midi-program-change") == 0)
-	{
 		setMidiProgramChange(midiProgramChange + i);
-	}
 }
 
 void CreateNewProgramScreen::open()
@@ -89,11 +84,8 @@ void CreateNewProgramScreen::displayNewName()
 
 void CreateNewProgramScreen::setMidiProgramChange(int i)
 {
-	if (i < 1)
-		i = 1;
-
-	if (i > 128)
-		i = 128;
+	if (i < 1) i = 1;
+    if (i > 128) i = 128;
 
 	if (midiProgramChange == i)
 		return;

@@ -1,6 +1,5 @@
 #include "VeloEnvFilterScreen.hpp"
 
-#include <controls/BaseSamplerControls.hpp>
 #include <sampler/NoteParameters.hpp>
 
 using namespace mpc::lcdgui::screens::window;
@@ -11,7 +10,6 @@ using namespace std;
 VeloEnvFilterScreen::VeloEnvFilterScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "velo-env-filter", layerIndex)
 {
-	baseControls = make_shared<BaseSamplerControls>(mpc);
 	addChild(make_shared<EnvGraph>(mpc));
 }
 

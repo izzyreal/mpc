@@ -3,7 +3,6 @@
 #include <lcdgui/screens/window/EditSoundScreen.hpp>
 #include <lcdgui/screens/dialog2/PopupScreen.hpp>
 #include <lcdgui/Layer.hpp>
-#include <controls/BaseSamplerControls.hpp>
 
 #ifdef __linux__
 #include <climits>
@@ -20,17 +19,15 @@ using namespace std;
 TrimScreen::TrimScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "trim", layerIndex)
 {
-	baseControls = make_shared<BaseSamplerControls>(mpc);
-
 	addChild(move(make_shared<Wave>()));
 	findWave().lock()->setFine(false);
-
-	baseControls->typableParams = { "st", "end" };
 }
 
 void TrimScreen::open()
 {
-	findField("view").lock()->setAlignment(Alignment::Centered);
+    mpc.getControls().lock()->getControls()->typableParams = { "st", "end" };
+
+    findField("view").lock()->setAlignment(Alignment::Centered);
 	bool sound = sampler.lock()->getSound().lock() ? true : false;
 
 	findField("snd").lock()->setFocusable(sound);
@@ -137,8 +134,8 @@ void TrimScreen::turnWheel(int i)
 	auto field = findField(param).lock();
 	
 	if (field->isSplit())
-		soundInc = i >= 0 ? splitInc[field->getActiveSplit()] : -splitInc[field->getActiveSplit()];
-	
+		soundInc = field->getSplitIncrement(i >= 0);
+
 	if (field->isTypeModeEnabled())
 		field->disableTypeMode();
 

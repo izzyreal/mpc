@@ -15,15 +15,9 @@
 #include <memory>
 #include <vector>
 
-namespace ctoot::mpc
-{
-	class MpcSoundPlayerChannel;
-}
-
-namespace mpc
-{
-	class Mpc;
-}
+namespace ctoot::mpc { class MpcSoundPlayerChannel; }
+namespace mpc { class Mpc; }
+namespace mpc::controls { class GlobalReleaseControls; }
 
 namespace mpc::sequencer
 {
@@ -31,48 +25,33 @@ namespace mpc::sequencer
 	class NoteEvent;
 }
 
-namespace mpc::sampler
-{
-	class Program;
-}
+namespace mpc::sampler { class Program; }
 
 namespace mpc::lcdgui
 {
 	class Field;
 	class LayeredScreen;
+	class ScreenComponent;
 }
 
-namespace mpc::controls
-{
-	class BaseControls
-	{
-
-	protected:
-		const std::vector<std::string> allowTransportScreens{ "sequencer", "select-drum", "select-mixer-drum", "program-assign", "program-params", "drum", "purge", "program", "create-new-program", "name", "delete-program", "delete-all-programs", "assignment-view", "initialize-pad-assign", "copy-note-parameters", "velocity-modulation", "velo-env-filter", "velo-pitch", "mute-assign", "trans" };
-		const std::vector<std::string> allowPlay{ "song", "track-mute", "next-seq", "next-seq-pad" };
-		mpc::Mpc& mpc;
-		std::weak_ptr<mpc::sequencer::Sequencer> sequencer;
-		std::weak_ptr<mpc::sampler::Sampler> sampler;
-
+namespace mpc::controls {
+		
+	class BaseControls {
 	public:
+		BaseControls(mpc::Mpc&);
+
 		bool splittable = false;
 		void splitLeft();
 		void splitRight();
 
-	public:
-		std::string param = "";
-		std::string currentScreenName = "";
+		std::vector<std::string> typableParams;
 
-		std::weak_ptr<mpc::sequencer::Track> track;
 		std::weak_ptr<mpc::sampler::Program> program;
 		ctoot::mpc::MpcSoundPlayerChannel* mpcSoundPlayerChannel = nullptr;
 
 		std::weak_ptr<mpc::lcdgui::LayeredScreen> ls;
 		std::weak_ptr<mpc::lcdgui::Field> activeField;
 
-		std::vector<std::string> typableParams;
-
-	public:
 		virtual void init();
 		int getSoundIncrement(int notch);
 		virtual void left();
@@ -105,17 +84,31 @@ namespace mpc::controls
 		virtual void shift();
 		virtual void undoSeq();
 		virtual void erase();
-		virtual void setSlider(int i) {};
-		
+		virtual void setSlider(int) {}
+
 		virtual bool isTypable();
 
 		virtual void pad(int i, int velo, bool repeat, int tick);
+
+	protected:
+		std::string param = "";
+		mpc::Mpc& mpc;
+		std::weak_ptr<mpc::sequencer::Sequencer> sequencer;
+
+	private:
+		std::weak_ptr<mpc::sampler::Sampler> sampler;
+		std::weak_ptr<mpc::sequencer::Track> track;
+		std::string currentScreenName = "";
+		const static std::vector<std::string> allowTransportScreens;
+		const static std::vector<std::string> allowPlayScreens;
+        const static std::vector<std::string> samplerScreens;
+
+		bool allowTransport();
+		bool allowPlay();
+        bool isSamplerScreen();
 		void generateNoteOn(int nn, int padVelo, int tick);
 
-		void setSliderNoteVar(mpc::sequencer::NoteEvent* n, std::weak_ptr<mpc::sampler::Program> program);
-
-	public:
-		BaseControls(mpc::Mpc& mpc);
-
+		friend class mpc::lcdgui::ScreenComponent;
+		friend class mpc::controls::GlobalReleaseControls;
 	};
 }

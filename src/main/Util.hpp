@@ -1,8 +1,14 @@
 #pragma once
+
 #include <string>
 #include <vector>
+#include <memory>
 
 namespace mpc { class Mpc; }
+
+namespace mpc::sequencer { class NoteEvent; }
+
+namespace mpc::sampler { class Program; }
 
 namespace mpc
 {
@@ -23,6 +29,8 @@ namespace mpc
 		static std::string tempoString(const double tempo);
 		static int getTextWidthInPixels(const std::string& text);
 		static void initSequence(mpc::Mpc& mpc);
+		static void set16LevelsValues(mpc::Mpc&, std::shared_ptr<mpc::sequencer::NoteEvent>, const int padIndex);
+        static void setSliderNoteVariationParameters(mpc::Mpc&, std::weak_ptr<mpc::sequencer::NoteEvent>, std::weak_ptr<mpc::sampler::Program>);
 
 	};
 }

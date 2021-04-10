@@ -473,7 +473,7 @@ void SequencerScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 void SequencerScreen::pressEnter()
 {
 	init();
-	baseControls->pressEnter();
+	ScreenComponent::pressEnter();
 
 	auto focusedField = findChild<Field>(param).lock();
 

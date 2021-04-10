@@ -1,6 +1,7 @@
 #include "MpcMidiInput.hpp"
 
 #include <Mpc.hpp>
+#include <Util.hpp>
 #include <hardware/Hardware.hpp>
 #include <hardware/HwSlider.hpp>
 #include <audiomidi/EventHandler.hpp>
@@ -30,20 +31,21 @@
 #include <midi/core/MidiInput.hpp>
 
 using namespace mpc::audiomidi;
+using namespace mpc::sequencer;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace ctoot::midi::core;
 using namespace std;
 
-MpcMidiInput::MpcMidiInput(mpc::Mpc& mpc, int index)
-: mpc(mpc)
+MpcMidiInput::MpcMidiInput(mpc::Mpc& _mpc, int _index)
+: mpc (_mpc),
+sequencer (_mpc.getSequencer()),
+sampler (_mpc.getSampler()),
+index (_index),
+midiAdapter (make_unique<MidiAdapter>()),
+eventAdapter(make_unique<EventAdapter>(mpc, sequencer))
 {
-    sequencer = mpc.getSequencer();
-    sampler = mpc.getSampler();
-    this->index = index;
-    midiAdapter = make_unique<mpc::sequencer::MidiAdapter>();
-    eventAdapter = make_unique<mpc::sequencer::EventAdapter>(mpc, sequencer);
 }
 
 string MpcMidiInput::getName()
@@ -266,12 +268,19 @@ void MpcMidiInput::transport(MidiMessage* msg, int timeStamp)
         auto p = lSampler->getProgram(lSampler->getDrumBusProgramNumber(track->getBus())).lock();
         auto controls = mpc.getActiveControls().lock();
         
-        controls->setSliderNoteVar(note.get(), p);
+        Util::setSliderNoteVariationParameters(mpc, note, p);
         
         auto pad = p->getPadIndexFromNote(note->getNote());
         
         if (pad != -1)
+        {
+            // The real 2KXL does neither of the below two lines of code.
+            // We do it because the current main use case for MIDI input
+            // is to use a controller to replace the real MPC2000XL's
+            // hardware pads.
             mpc.setPadAndNote(pad, note->getNote());
+            Util::set16LevelsValues(mpc, note, pad);
+        }
         
         mpc.getEventHandler().lock()->handleNoThru(note, track.get(), timeStamp);
         
@@ -299,7 +308,7 @@ void MpcMidiInput::transport(MidiMessage* msg, int timeStamp)
         switch (midiOutputScreen->getSoftThru())
         {
             case 0:
-                return;
+                break;
             case 1:
                 midiOut(eventAdapter->get(), track.get());
                 break;
@@ -328,6 +337,7 @@ void MpcMidiInput::midiOut(weak_ptr<mpc::sequencer::Event> e, mpc::sequencer::Tr
     if (deviceNumber != -1 && deviceNumber < 32)
     {
         auto channel = deviceNumber;
+        
         if (channel > 15)
             channel -= 16;
         
@@ -346,16 +356,19 @@ void MpcMidiInput::midiOut(weak_ptr<mpc::sequencer::Event> e, mpc::sequencer::Tr
     }
     
     if (mpc.getLayeredScreen().lock()->getCurrentScreenName().compare("midi-output-monitor") == 0)
+    {
         notifyObservers(notify_ + to_string(deviceNumber));
+    }
 }
 
 void MpcMidiInput::transportOmni(MidiMessage* msg, string outputLetter)
 {
     auto mpcMidiPorts = mpc.getMidiPorts().lock();
+    auto screenName = mpc.getLayeredScreen().lock()->getCurrentScreenName();
     
-    if (dynamic_cast<ShortMessage*>(msg) != nullptr)
+    if (dynamic_cast<ShortMessage*>(msg) != nullptr &&
+        screenName.compare("midi-output-monitor") == 0)
     {
-        if (mpc.getLayeredScreen().lock()->getCurrentScreenName().compare("midi-output-monitor") == 0)
-            notifyObservers(string(outputLetter + to_string(dynamic_cast<ShortMessage*>(msg)->getChannel())));
+        notifyObservers(string(outputLetter + to_string(dynamic_cast<ShortMessage*>(msg)->getChannel())));
     }
 }

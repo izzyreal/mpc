@@ -156,7 +156,7 @@ public:
     int getPlayX();
     
 public:
-    Sampler(mpc::Mpc& mpc);
+    Sampler(mpc::Mpc&);
     
 };
 }

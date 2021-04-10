@@ -13,12 +13,12 @@
 using namespace mpc::controls;
 using namespace std;
 
-Controls::Controls(mpc::Mpc& mpc)
+Controls::Controls(mpc::Mpc& _mpc)
+	: controls (make_shared<BaseControls>(_mpc)),
+	releaseControls (make_shared<GlobalReleaseControls>(_mpc)),
+	keyEventHandler (make_shared<KeyEventHandler>(_mpc)),
+	kbMapping (make_shared<KbMapping>())
 {
-	pressedPadVelos = vector<int>(16);
-	controls["release"] = new GlobalReleaseControls(mpc);
-    keyEventHandler = make_shared<KeyEventHandler>(mpc);
-    kbMapping = make_shared<KbMapping>();
 }
 
 weak_ptr<KeyEventHandler> Controls::getKeyEventHandler()
@@ -41,7 +41,6 @@ void Controls::releaseAll()
 	f5Pressed = false;
 	f6Pressed = false;
 	pressedPads.clear();
-	pressedPadVelos = vector<int>(16);
 }
 
 void Controls::setCtrlPressed(bool b)
@@ -184,22 +183,14 @@ void Controls::setF6Pressed(bool b)
 	f6Pressed = b;
 }
 
-BaseControls* Controls::getControls(string s)
+shared_ptr<BaseControls> Controls::getControls()
 {
-	return controls[s];
+	return controls;
 }
 
-GlobalReleaseControls* Controls::getReleaseControls()
+shared_ptr<GlobalReleaseControls> Controls::getReleaseControls()
 {
-	return (GlobalReleaseControls*) controls["release"];
-}
-
-Controls::~Controls()
-{
-	for (auto c : controls)
-	{
-		delete c.second;
-	}
+	return releaseControls;
 }
 
 weak_ptr<KbMapping> Controls::getKbMapping()

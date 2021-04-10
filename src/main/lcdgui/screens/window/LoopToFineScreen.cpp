@@ -2,7 +2,6 @@
 
 #include <lcdgui/screens/LoopScreen.hpp>
 #include <lcdgui/screens/TrimScreen.hpp>
-#include <controls/BaseSamplerControls.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::controls;
@@ -13,16 +12,15 @@ using namespace std;
 LoopToFineScreen::LoopToFineScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "loop-to-fine", layerIndex)
 {
-	baseControls = make_shared<BaseSamplerControls>(mpc);
-	baseControls->typableParams = { "to", "lngth" };
-
 	addChild(move(make_shared<Wave>()));
 	findWave().lock()->setFine(true);
 }
 
 void LoopToFineScreen::open()
 {
-	findField("loop-lngth").lock()->setAlignment(Alignment::Centered);
+    mpc.getControls().lock()->getControls()->typableParams = { "to", "lngth" };
+
+    findField("loop-lngth").lock()->setAlignment(Alignment::Centered);
 	displayTo();
 	findField("to").lock()->enableTwoDots();
 	displayLngthField();
@@ -113,7 +111,7 @@ void LoopToFineScreen::turnWheel(int i)
 	auto field = findField(param).lock();
 
 	if (field->isSplit())
-		soundInc = i >= 0 ? splitInc[field->getActiveSplit()] : -splitInc[field->getActiveSplit()];
+		soundInc = field->getSplitIncrement(i >= 0);
 
 	if (field->isTypeModeEnabled())
 		field->disableTypeMode();

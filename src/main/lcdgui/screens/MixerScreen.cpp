@@ -1,6 +1,5 @@
 #include "MixerScreen.hpp"
 
-#include <controls/BaseSamplerControls.hpp>
 #include <lcdgui/screens/DrumScreen.hpp>
 #include <lcdgui/screens/MixerSetupScreen.hpp>
 #include <lcdgui/Knob.hpp>
@@ -23,7 +22,6 @@ using namespace std;
 MixerScreen::MixerScreen(mpc::Mpc& mpc, const int layerIndex) 
 : ScreenComponent(mpc, "mixer", layerIndex)
 {
-    baseControls = make_shared<BaseSamplerControls>(mpc);
     addMixerStrips();
 }
 

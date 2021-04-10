@@ -208,6 +208,12 @@ int Field::getActiveSplit()
     return activeSplit;
 }
 
+int Field::getSplitIncrement(bool positive)
+{
+	static const vector<int> splitInc { 10000000, 1000000, 100000, 10000, 1000, 100, 10, 1 };
+	return splitInc[activeSplit] * (positive ? 1 : -1);
+}
+
 bool Field::setActiveSplit(int i)
 {
 	if (i < 0 || i > text.size() - 1)

@@ -665,7 +665,7 @@ void StepEditorScreen::down()
 void StepEditorScreen::shift()
 {
 	init();
-	baseControls->shift();
+	ScreenComponent::shift();
 
 	if (param.length() == 2)
 	{

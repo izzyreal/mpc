@@ -8,7 +8,7 @@ namespace mpc::lcdgui::screens
 
 namespace mpc::controls
 {
-	class BaseSamplerControls;
+	class BaseControls;
 }
 
 namespace mpc::lcdgui::screens
@@ -46,7 +46,7 @@ namespace mpc::lcdgui::screens
 		friend class MixerSetupScreen;
 		friend class SelectDrumScreen;
 		friend class SelectMixerDrumScreen;
-		friend class mpc::controls::BaseSamplerControls;
+		friend class mpc::controls::BaseControls;
 
 	};
 }
