@@ -1,7 +1,6 @@
 #include "StartFineScreen.hpp"
 
 #include <lcdgui/screens/TrimScreen.hpp>
-#include <controls/BaseSamplerControls.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::controls;
@@ -12,15 +11,14 @@ using namespace std;
 StartFineScreen::StartFineScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "start-fine", layerIndex)
 {
-	//baseControls = make_shared<BaseSamplerControls>(mpc);
-	//baseControls->typableParams = { "start" };
-
 	addChild(move(make_shared<Wave>()));
 	findWave().lock()->setFine(true);
 }
 
 void StartFineScreen::open()
 {
+    mpc.getControls().lock()->getControls()->typableParams = { "start" };
+
 	findField("smpllngth").lock()->setAlignment(Alignment::Centered);
 	displayStart();
 	findField("start").lock()->enableTwoDots();

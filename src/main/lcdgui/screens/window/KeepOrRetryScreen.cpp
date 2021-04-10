@@ -1,7 +1,6 @@
 #include "KeepOrRetryScreen.hpp"
 
 #include <lcdgui/screens/window/NameScreen.hpp>
-#include <controls/BaseSamplerControls.hpp>
 
 #include <sampler/NoteParameters.hpp>
 
@@ -12,7 +11,6 @@ using namespace std;
 KeepOrRetryScreen::KeepOrRetryScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "keep-or-retry", layerIndex)
 {
-	//baseControls = make_shared<BaseSamplerControls>(mpc);
 }
 
 void KeepOrRetryScreen::open()

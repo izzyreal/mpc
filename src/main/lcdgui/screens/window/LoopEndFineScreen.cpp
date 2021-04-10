@@ -2,7 +2,6 @@
 
 #include <lcdgui/screens/LoopScreen.hpp>
 #include <lcdgui/screens/TrimScreen.hpp>
-#include <controls/BaseSamplerControls.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::controls;
@@ -13,16 +12,15 @@ using namespace std;
 LoopEndFineScreen::LoopEndFineScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "loop-end-fine", layerIndex)
 {
-	//baseControls = make_shared<BaseSamplerControls>(mpc);
-	//baseControls->typableParams = { "end", "lngth" };
-
 	addChild(move(make_shared<Wave>()));
 	findWave().lock()->setFine(true);
 }
 
 void LoopEndFineScreen::open()
 {
-	findField("loop-lngth").lock()->setAlignment(Alignment::Centered);
+    mpc.getControls().lock()->getControls()->typableParams = { "end", "lngth" };
+
+    findField("loop-lngth").lock()->setAlignment(Alignment::Centered);
 	findField("end").lock()->enableTwoDots();
 	displayEnd();
 	displayLngthField();

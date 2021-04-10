@@ -2,7 +2,6 @@
 
 #include <lcdgui/screens/ZoneScreen.hpp>
 #include <lcdgui/screens/TrimScreen.hpp>
-#include <controls/BaseSamplerControls.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::controls;
@@ -13,16 +12,15 @@ using namespace std;
 ZoneEndFineScreen::ZoneEndFineScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "zone-end-fine", layerIndex)
 {
-	//baseControls = make_shared<BaseSamplerControls>(mpc);
-	//baseControls->typableParams = { "end" };
-
 	addChild(move(make_shared<Wave>()));
 	findWave().lock()->setFine(true);
 }
 
 void ZoneEndFineScreen::open()
 {
-	displayEnd();
+    mpc.getControls().lock()->getControls()->typableParams = { "end" };
+
+    displayEnd();
 	findField("end").lock()->enableTwoDots();
 	displayLngthLabel();
 	findLabel("lngth").lock()->enableTwoDots();

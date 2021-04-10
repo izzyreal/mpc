@@ -35,9 +35,7 @@ namespace mpc::lcdgui
 }
 
 namespace mpc::controls {
-	
-	class BaseSamplerControls;
-	
+		
 	class BaseControls {
 	public:
 		BaseControls(mpc::Mpc&);
@@ -103,13 +101,14 @@ namespace mpc::controls {
 		std::string currentScreenName = "";
 		const static std::vector<std::string> allowTransportScreens;
 		const static std::vector<std::string> allowPlayScreens;
+        const static std::vector<std::string> samplerScreens;
 
 		bool allowTransport();
 		bool allowPlay();
+        bool isSamplerScreen();
 		void generateNoteOn(int nn, int padVelo, int tick);
 
 		friend class mpc::lcdgui::ScreenComponent;
 		friend class mpc::controls::GlobalReleaseControls;
-		friend class mpc::controls::BaseSamplerControls;
 	};
 }

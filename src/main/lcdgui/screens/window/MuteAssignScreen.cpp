@@ -1,7 +1,6 @@
 #include "MuteAssignScreen.hpp"
 
 #include <sampler/NoteParameters.hpp>
-#include <controls/BaseSamplerControls.hpp>
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::controls;
@@ -11,7 +10,6 @@ using namespace std;
 MuteAssignScreen::MuteAssignScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "mute-assign", layerIndex)
 {
-	//baseControls = make_shared<BaseSamplerControls>(mpc);
 }
 
 void MuteAssignScreen::open()

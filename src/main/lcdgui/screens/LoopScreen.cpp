@@ -5,7 +5,6 @@
 #include <lcdgui/screens/TrimScreen.hpp>
 #include <lcdgui/screens/window/EditSoundScreen.hpp>
 #include <lcdgui/screens/dialog2/PopupScreen.hpp>
-#include <controls/BaseSamplerControls.hpp>
 
 #include <stdint.h>
 #include <limits.h>
@@ -21,17 +20,15 @@ using namespace std;
 LoopScreen::LoopScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "loop", layerIndex)
 {
-	//baseControls = make_shared<BaseSamplerControls>(mpc);
-
 	addChild(move(make_shared<Wave>()));
 	findWave().lock()->setFine(false);
-
-	//baseControls->typableParams = { "to", "endlengthvalue" };
 }
 
 void LoopScreen::open()
 {
-	findField("loop").lock()->setAlignment(Alignment::Centered);
+    mpc.getControls().lock()->getControls()->typableParams = { "to", "endlengthvalue" };
+
+    findField("loop").lock()->setAlignment(Alignment::Centered);
 	bool sound = sampler.lock()->getSound().lock() ? true : false;
 
 	findField("snd").lock()->setFocusable(sound);

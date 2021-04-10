@@ -27,14 +27,15 @@
 #include <sequencer/NoteEvent.hpp>
 #include <sequencer/Sequencer.hpp>
 
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/LoadScreen.hpp>
+#include <lcdgui/screens/DrumScreen.hpp>
 #include <lcdgui/screens/window/Assign16LevelsScreen.hpp>
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <lcdgui/screens/window/EditSoundScreen.hpp>
 #include <lcdgui/screens/window/DirectoryScreen.hpp>
 #include <lcdgui/screens/window/NameScreen.hpp>
 #include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
-#include <lcdgui/screens/LoadScreen.hpp>
-#include <lcdgui/Screens.hpp>
 
 #include <Util.hpp>
 
@@ -60,17 +61,34 @@ void BaseControls::init()
 	currentScreenName = ls.lock()->getCurrentScreenName();
 	param = ls.lock()->getFocus();
 	activeField = ls.lock()->getFocusedLayer().lock()->findField(param);
-	
-	if (sequencer.lock()->getActiveTrack().lock())
-	{
-		track = sequencer.lock()->getActiveTrack();
+    
+    auto isSampler = isSamplerScreen();
 
-		if (track.lock()->getBus() != 0)
-		{
-			mpcSoundPlayerChannel = sampler.lock()->getDrum(track.lock()->getBus() - 1);
-			program = sampler.lock()->getProgram(mpcSoundPlayerChannel->getProgram());
-		}
-	}
+    if (isSampler)
+    {
+        splittable = param.compare("st") == 0 || param.compare("end") == 0 || param.compare("to") == 0 || param.compare("endlengthvalue") == 0 || param.compare("start") == 0;
+    }
+    else
+    {
+        splittable = false;
+    }
+
+    track = sequencer.lock()->getActiveTrack();
+        
+    auto drumScreen = mpc.screens->get<DrumScreen>("drum");
+
+    auto drumIndex = isSampler ? drumScreen->drum : track.lock()->getBus() - 1;
+    
+    if (drumIndex != -1)
+    {
+        mpcSoundPlayerChannel = sampler.lock()->getDrum(track.lock()->getBus() - 1);
+        program = sampler.lock()->getProgram(mpcSoundPlayerChannel->getProgram());
+    }
+    else
+    {
+        mpcSoundPlayerChannel = nullptr;
+        program.reset();
+    }
 }
 
 void BaseControls::left()
@@ -336,9 +354,6 @@ void BaseControls::generateNoteOn(int note, int padVelo, int tick)
 
 bool BaseControls::isTypable()
 {
-	if (typableParams.size() == 0)
-		return false;
-
 	for (auto str : typableParams)
 	{
 		if (str.compare(param) == 0)
@@ -949,4 +964,41 @@ bool BaseControls::allowTransport()
 		end(BaseControls::allowTransportScreens),
 		ls.lock()->getCurrentScreenName()
 	) != end(BaseControls::allowTransportScreens);
+}
+
+const std::vector<std::string> BaseControls::samplerScreens {
+    "create-new-program",
+    "assignment-view",
+    "auto-chromatic-assignment",
+    "copy-note-parameters",
+    "edit-sound",
+    "end-fine",
+    "init-pad-assign",
+    "keep-or-retry",
+    "loop-end-fine",
+    "loop-to-fine",
+    "mute-assign",
+    "program",
+    "start-fine",
+    "velo-env-filter",
+    "velo-pitch",
+    "velocity-modulation",
+    "zone-end-fine",
+    "zone-start-fine",
+    "drum",
+    "loop",
+    "mixer",
+    "pgm-assign",
+    "select-drum",
+    "trim",
+    "zone"
+};
+
+bool BaseControls::isSamplerScreen()
+{
+    return find(
+        begin(BaseControls::samplerScreens),
+        end(BaseControls::samplerScreens),
+        ls.lock()->getCurrentScreenName()
+    ) != end(BaseControls::samplerScreens);
 }

@@ -1,7 +1,6 @@
 #include "VeloPitchScreen.hpp"
 
 #include <sampler/NoteParameters.hpp>
-#include <controls/BaseSamplerControls.hpp>
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::controls;
@@ -11,7 +10,6 @@ using namespace std;
 VeloPitchScreen::VeloPitchScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "velo-pitch", layerIndex)
 {
-	//baseControls = make_shared<BaseSamplerControls>(mpc);
 }
 
 void VeloPitchScreen::open()

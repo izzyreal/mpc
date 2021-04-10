@@ -4,7 +4,6 @@
 #include <lcdgui/screens/TrimScreen.hpp>
 #include <lcdgui/screens/window/NumberOfZonesScreen.hpp>
 #include <lcdgui/screens/window/EditSoundScreen.hpp>
-#include <controls/BaseSamplerControls.hpp>
 #include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
 #include <sampler/Sampler.hpp>
@@ -24,16 +23,15 @@ using namespace std;
 ZoneScreen::ZoneScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "zone", layerIndex)
 {
-	//baseControls = make_shared<BaseSamplerControls>(mpc);
-
 	addChild(move(make_shared<Wave>()));
 	findWave().lock()->setFine(false);
-	//baseControls->typableParams = { "st", "end" };
 }
 
 void ZoneScreen::open()
 {
-	if (zones.empty())
+    mpc.getControls().lock()->getControls()->typableParams = { "st", "end" };
+
+    if (zones.empty())
 		initZones();
 
 	bool sound = sampler.lock()->getSound().lock() ? true : false;

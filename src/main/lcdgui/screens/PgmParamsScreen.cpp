@@ -2,7 +2,6 @@
 
 #include "SelectDrumScreen.hpp"
 
-#include <controls/BaseSamplerControls.hpp>
 #include <sampler/NoteParameters.hpp>
 #include <sampler/Pad.hpp>
 
@@ -19,7 +18,6 @@ using namespace std;
 PgmParamsScreen::PgmParamsScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "program-params", layerIndex)
 {
-	//baseControls = make_shared<BaseSamplerControls>(mpc);
 	addChild(make_shared<EnvGraph>(mpc));
 }
 

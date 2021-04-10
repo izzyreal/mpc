@@ -143,8 +143,9 @@ int LayeredScreen::openScreen(string screenName)
 	if (screenComponent->findFields().size() > 0)
 		returnToLastFocus(screenComponent->getFirstField());
 
+    mpc.getControls().lock()->getControls()->typableParams.clear();
+    
 	screenComponent->open();
-
 
 	vector<string> overdubScreens{ "step-editor", "paste-event", "insert-event", "edit-multiple", "step-timing-correct" };
 
