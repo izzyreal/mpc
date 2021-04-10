@@ -60,6 +60,9 @@ void Wave::initSamplesPerPixel()
 	else
 	{
 		samplesPerPixel = (float)frameCount / (float)w;
+        
+        if (samplesPerPixel < 1)
+            samplesPerPixel = 1;
 	}
 }
 
@@ -127,7 +130,7 @@ void Wave::makeLine(std::vector<std::vector<std::vector<int>>>* lines, std::vect
 	if (!mono && view == 1)
 		offset += frameCount;
 
-	if (offset < 0 || offset >= frameCount && !fine)
+	if (offset < 0 || (offset >= frameCount && !fine))
 		return;
 
 	if (!mono && view == 0 && offset > frameCount && !fine)
