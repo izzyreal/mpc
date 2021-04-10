@@ -155,7 +155,7 @@ void KeyEventHandler::handle(const KeyEvent& keyEvent)
             if ((label.length() == 5 || label.length() == 6) && label.find("pad-") != string::npos)
             {
                 auto padIndex = stoi(label.substr(4)) - 1;
-                mpc.getActiveControls().lock()->pad(padIndex, 127, false, 0);
+                mpc.getActiveControls().lock()->pad(padIndex + (mpc.getBank() * 16), 127, false, 0);
             }
             else
             {
@@ -171,13 +171,9 @@ void KeyEventHandler::handle(const KeyEvent& keyEvent)
     {
         // We have some key codes that map to themselves, not to a hardware component.
         if (label.compare("ctrl") == 0)
-        {
             mpc.getControls().lock()->setCtrlPressed(keyEvent.keyDown);
-        }
         else if (label.compare("alt") == 0)
-        {
             mpc.getControls().lock()->setAltPressed(keyEvent.keyDown);
-        }
         
         // And we have some things that are not buttons. Probably pads should be handled here
         // as well, so we can do some velocity calculation based on the current state of Mpc.
@@ -186,19 +182,13 @@ void KeyEventHandler::handle(const KeyEvent& keyEvent)
             int increment = 1;
             
             if (mpc.getControls().lock()->isCtrlPressed())
-            {
                 increment *= 10;
-            }
             
             if (mpc.getControls().lock()->isAltPressed())
-            {
                 increment *= 10;
-            }
             
             if (mpc.getControls().lock()->isShiftPressed())
-            {
                 increment *= 10;
-            }
             
             if (label.find("down") != string::npos)
                 increment = -increment;

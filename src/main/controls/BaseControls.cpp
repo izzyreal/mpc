@@ -258,8 +258,6 @@ void BaseControls::generateNoteOn(int note, int padVelo, int tick)
 	auto seq = sequencer.lock();
 	auto trk = track.lock();
 
-	auto padIndex = program.lock()->getPadIndexFromNote(note) - (mpc.getBank() * 16);
-
 	bool isSliderNote = pgm && pgm->getSlider()->getNote() == note;
 
 	bool posIsLastTick = seq->getTickPosition() == seq->getActiveSequence().lock()->getLastTick();
@@ -274,6 +272,8 @@ void BaseControls::generateNoteOn(int note, int padVelo, int tick)
 		mpc.getControls().lock()->isRecPressed() &&
 		tc_note != 0 &&
 		!posIsLastTick;
+
+    auto padIndex = program.lock()->getPadIndexFromNote(note);
 
 	if (seq->isRecordingOrOverdubbing() || step || recMainWithoutPlaying)
 	{
