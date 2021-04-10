@@ -3,6 +3,7 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include <map>
 
 #include <gui/BMFParser.hpp>
 
@@ -54,7 +55,7 @@ namespace mpc::lcdgui {
 		std::weak_ptr<ScreenComponent> findScreenComponent();
 
 	private:
-		std::vector<std::vector<std::string>> lastFocuses{};
+		std::map<std::string, std::string> lastFocuses;
 		int focusedLayerIndex{ 0 };
 		std::string currentScreenName = "";
 		std::string previousScreenName = "";

@@ -210,47 +210,31 @@ void LayeredScreen::returnToLastFocus(string firstFieldOfCurrentScreen)
 {
 	auto focusCounter = 0;
 	
-	for (auto& lf : lastFocuses)
-	{
-		if (lf[0].compare(currentScreenName) == 0)
-		{
-			focusCounter++;
-			setFocus(lf[1]);
-		}
-	}
-
-	if (focusCounter == 0)
-	{
-		vector<string> sa(2);
-		sa[0] = currentScreenName;
-		sa[1] = firstFieldOfCurrentScreen;
-		lastFocuses.push_back(sa);
-		setFocus(firstFieldOfCurrentScreen);
-	}
+    auto lastFocus = lastFocuses.find(currentScreenName);
+    
+    if (lastFocus == end(lastFocuses))
+    {
+        lastFocuses[currentScreenName] = firstFieldOfCurrentScreen;
+        setFocus(firstFieldOfCurrentScreen);
+        return;
+    }
+    
+    setFocus(lastFocus->second);
 }
 
 void LayeredScreen::setLastFocus(string screenName, string newLastFocus)
 {
-	for (auto& lastFocus : lastFocuses)
-	{
-		if (lastFocus[0].compare(screenName) == 0)
-		{
-			lastFocus[1] = newLastFocus;
-		}
-	}
+    lastFocuses[screenName] = newLastFocus;
 }
 
 string LayeredScreen::getLastFocus(string screenName)
 {
-	string tfName = "";
-	for (auto& lf : lastFocuses)
-	{
-		if (lf[0].compare(screenName) == 0)
-		{
-			tfName = lf[1];
-		}
-	}
-	return tfName;
+    auto lastFocus = lastFocuses.find(currentScreenName);
+    
+    if (lastFocus == end(lastFocuses))
+        return "";
+    
+    return lastFocus->second;
 }
 
 void LayeredScreen::setCurrentScreenName(string screenName)
