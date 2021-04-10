@@ -38,7 +38,7 @@ namespace mpc::lcdgui::screens::window {
 		void displayTime() override;
 
 	public:
-		void update(moduru::observer::Observable* observable, nonstd::any message);
+		void update(moduru::observer::Observable* observable, nonstd::any message) override;
 
 	};
 }

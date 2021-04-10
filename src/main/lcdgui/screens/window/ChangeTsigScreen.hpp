@@ -31,8 +31,6 @@ namespace mpc::lcdgui::screens::window {
 	private:
 		void setBar0(int i, int max);
 		void setBar1(int i, int max);
-//		mpc::sequencer::TimeSignature& getNewTimeSignature();
-	//	void setNewTimeSignature(const mpc::sequencer::TimeSignature& ts);
 
 	};
 }
