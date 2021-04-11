@@ -375,11 +375,11 @@ void LoadScreen::loadSound()
 
     if (!result.success)
     {
+        sampler.lock()->deleteSound(sampler.lock()->getSoundCount() - 1);
+        disk->setBusy(false);
         openScreen("popup");
         popupScreen->setText(result.errorMessage);
         popupScreen->returnToScreenAfterMilliSeconds("load", 500);
-        disk->setBusy(false);
-        sampler.lock()->deleteSound(sampler.lock()->getSoundCount() - 1);
         return;
     }
     

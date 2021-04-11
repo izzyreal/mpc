@@ -88,52 +88,61 @@ void SoundLoader::loadSound(shared_ptr<MpcFile> f, SoundLoaderResult& r)
     {
         
         auto file = f->getFile().lock();
-        auto wavFile = WavFile::openWavFile(file->getPath());
         
-        if (wavFile.getValidBits() != 16)
+        try {
+            
+            auto wavFile = WavFile::openWavFile(file->getPath());
+            
+            if (wavFile.getValidBits() != 16)
+            {
+                wavFile.close();
+                r.errorMessage = "not 16bit .WAV file";
+                return;
+            }
+            
+            int numChannels = wavFile.getNumChannels();
+            
+            if (numChannels == 1)
+            {
+                wavFile.readFrames(&sampleData, wavFile.getNumFrames());
+            }
+            else
+            {
+                sampleData.clear();
+                vector<float> interleaved;
+                wavFile.readFrames(&interleaved, wavFile.getNumFrames());
+                
+                for (int i = 0; i < interleaved.size(); i += 2)
+                sampleData.push_back(interleaved[i]);
+                
+                for (int i = 1; i < interleaved.size(); i += 2)
+                sampleData.push_back(interleaved[i]);
+            }
+            
+            size = sampleData.size();
+            end = size;
+            
+            if (numChannels == 1)
+                mono = true;
+            else
+                end /= 2;
+            
+            sampleRate = wavFile.getSampleRate();
+            
+            loopTo = end;
+            
+            if (wavFile.getNumSampleLoops() > 0)
+            {
+                auto& sampleLoop = wavFile.getSampleLoop();
+                loopTo = sampleLoop.start;
+                end = sampleLoop.end;
+                loopEnabled = true;
+            }
+        }
+        catch (const exception&)
         {
-            wavFile.close();
             r.errorMessage = "not 16bit .WAV file";
             return;
-        }
-        
-        int numChannels = wavFile.getNumChannels();
-        
-        if (numChannels == 1)
-        {
-            wavFile.readFrames(&sampleData, wavFile.getNumFrames());
-        }
-        else
-        {
-            sampleData.clear();
-            vector<float> interleaved;
-            wavFile.readFrames(&interleaved, wavFile.getNumFrames());
-            
-            for (int i = 0; i < interleaved.size(); i += 2)
-            sampleData.push_back(interleaved[i]);
-            
-            for (int i = 1; i < interleaved.size(); i += 2)
-            sampleData.push_back(interleaved[i]);
-        }
-        
-        size = sampleData.size();
-        end = size;
-        
-        if (numChannels == 1)
-            mono = true;
-        else
-            end /= 2;
-        
-        sampleRate = wavFile.getSampleRate();
-        
-        loopTo = end;
-        
-        if (wavFile.getNumSampleLoops() > 0)
-        {
-            auto& sampleLoop = wavFile.getSampleLoop();
-            loopTo = sampleLoop.start;
-            end = sampleLoop.end;
-            loopEnabled = true;
         }
         
         auto tuneFactor = (float)(sampleRate / 44100.0);
