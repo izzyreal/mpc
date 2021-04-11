@@ -18,9 +18,11 @@ SndReader::SndReader(const vector<char>& loadBytes)
 {
     sndFileArray = loadBytes;
     sndHeaderReader = make_shared<SndHeaderReader>(this);
+}
 
-    if (!sndHeaderReader->hasValidId())
-        throw invalid_argument("This SND file does not have a valid 2KXL SND ID.");
+bool SndReader::isHeaderValid()
+{
+    return sndHeaderReader->hasValidId();
 }
 
 string SndReader::getName()
@@ -78,7 +80,7 @@ int SndReader::getNumberOfBeats()
     return sndHeaderReader->getNumberOfBeats();
 }
 
-void SndReader::writeSampleData(vector<float>* dest)
+void SndReader::readData(vector<float>& dest)
 {
 	int length = sndHeaderReader->getNumberOfFrames();
 
@@ -87,8 +89,8 @@ void SndReader::writeSampleData(vector<float>* dest)
 	if (!mono)
         length *= 2;
 
-	dest->clear();
-	dest->resize(length);
+	dest.clear();
+	dest.resize(length);
 
 	vector<short> shorts = moduru::VecUtil::BytesToShorts(vector<char>(sndFileArray.begin() + 42, sndFileArray.end()));
 	
@@ -103,7 +105,7 @@ void SndReader::writeSampleData(vector<float>* dest)
 		if (f > 1)
 			f = 1.0f;
 
-		(*dest)[i] = f;
+		dest[i] = f;
 	}
 }
 

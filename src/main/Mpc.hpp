@@ -11,7 +11,6 @@
 
 #include <vector>
 #include <string>
-#include <thread>
 #include <memory>
 
 namespace ctoot::mpc {
@@ -60,7 +59,6 @@ namespace mpc {
 class Mpc
 : public moduru::observer::Observable {
 private:
-    std::thread loadSoundThread;
     std::unique_ptr<mpc::disk::ProgramLoader> programLoader;
     std::shared_ptr<lcdgui::LayeredScreen> layeredScreen;
     std::shared_ptr<controls::Controls> controls;
@@ -113,13 +111,9 @@ public:
     mpc::audiomidi::MpcMidiInput* getMpcMidiInput(int i);
     
 public:
-    void loadSound(bool replace);
     void loadProgram();
     void importLoadedProgram();
-    
-private:
-    static void runLoadSoundThread(mpc::Mpc* mpc, int size);
-    
+        
 public:
     std::weak_ptr<mpc::disk::AbstractDisk> getDisk();
     std::weak_ptr<mpc::disk::Stores> getStores();

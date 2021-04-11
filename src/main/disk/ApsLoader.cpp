@@ -287,13 +287,14 @@ void ApsLoader::load()
 void ApsLoader::loadSound(mpc::Mpc& mpc, string soundFileName, string ext, weak_ptr<MpcFile> _soundFile, bool replace, int loadSoundIndex, bool headless)
 {
     auto soundFile = _soundFile.lock();
-    auto sl = SoundLoader(mpc, mpc.getSampler().lock()->getSounds(), replace);
-    sl.setPartOfProgram(true);
+    SoundLoader soundLoader(mpc, mpc.getSampler().lock()->getSounds(), replace);
+    soundLoader.setPartOfProgram(true);
     
     if (!headless)
         ApsLoader::showPopup(mpc, soundFileName, ext, soundFile->length());
     
-    sl.loadSound(soundFile);
+    SoundLoaderResult result;
+    soundLoader.loadSound(soundFile, result);
 }
 
 void ApsLoader::showPopup(mpc::Mpc& mpc, string name, string ext, int sampleSize)

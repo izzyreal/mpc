@@ -128,22 +128,24 @@ void ProgramLoader::loadSound
  const int loadSoundIndex
  )
 {
-    int addedSoundIndex = -1;
-    SoundLoader sl(mpc, mpc.getSampler().lock()->getSounds(), replace);
-    sl.setPartOfProgram(true);
-    
+    SoundLoader soundLoader(mpc, mpc.getSampler().lock()->getSounds(), replace);
+    soundLoader.setPartOfProgram(true);
+    auto file = soundFile.lock();
+    showPopup(soundName, ext, file->length());
+    SoundLoaderResult result;
+
     try
     {
-        showPopup(soundName, ext, soundFile.lock()->length());
-        addedSoundIndex = sl.loadSound(soundFile);
+        soundLoader.loadSound(file, result);
         
-        if (addedSoundIndex != -1)
-            (*soundsDestIndex)[loadSoundIndex] = addedSoundIndex;
+        if (result.existingIndex != -1)
+            (*soundsDestIndex)[loadSoundIndex] = result.existingIndex;
     }
     catch (const exception& e)
     {
         auto msg = string(e.what());
         MLOG("Exception occurred in ProgramLoader::loadSound(...) -- " + msg);
+        MLOG(result.errorMessage);
     }
 }
 
