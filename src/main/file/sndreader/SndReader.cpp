@@ -78,7 +78,7 @@ int SndReader::getNumberOfBeats()
     return sndHeaderReader->getNumberOfBeats();
 }
 
-void SndReader::writeSampleData(vector<float>* dest)
+void SndReader::readData(vector<float>& dest)
 {
 	int length = sndHeaderReader->getNumberOfFrames();
 
@@ -87,8 +87,8 @@ void SndReader::writeSampleData(vector<float>* dest)
 	if (!mono)
         length *= 2;
 
-	dest->clear();
-	dest->resize(length);
+	dest.clear();
+	dest.resize(length);
 
 	vector<short> shorts = moduru::VecUtil::BytesToShorts(vector<char>(sndFileArray.begin() + 42, sndFileArray.end()));
 	
@@ -103,7 +103,7 @@ void SndReader::writeSampleData(vector<float>* dest)
 		if (f > 1)
 			f = 1.0f;
 
-		(*dest)[i] = f;
+		dest[i] = f;
 	}
 }
 

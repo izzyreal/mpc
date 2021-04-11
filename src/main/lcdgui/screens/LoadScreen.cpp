@@ -354,22 +354,24 @@ void LoadScreen::loadSound()
     SoundLoader soundLoader(mpc, sampler.lock()->getSounds(), false);
     soundLoader.setPreview(true);
     soundLoader.setShowPopup(true);
-    bool isAlreadyLoaded = false;
 
+    SoundLoaderResult result;
+    
     try
     {
-        isAlreadyLoaded = soundLoader.loadSound(getSelectedFile()) != -1;
+        soundLoader.loadSound(getSelectedFile(), result);
     }
     catch (const exception& exception)
     {
         sampler.lock()->deleteSound(sampler.lock()->getSoundCount() - 1);
         
         MLOG("A problem occurred when trying to load " + getSelectedFileName() + ": " + string(exception.what()));
+        MLOG(result.errorMessage);
         
         openScreen("load");
     }
     
-    if (isAlreadyLoaded)
+    if (result.existingIndex != -1)
     {
         sampler.lock()->deleteSound(sampler.lock()->getSoundCount() - 1);
     }
