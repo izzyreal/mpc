@@ -7,8 +7,6 @@
 #include <sampler/Sampler.hpp>
 #include <sampler/Sound.hpp>
 
-#include <lcdgui/screens/dialog2/PopupScreen.hpp>
-
 #include <lang/StrUtil.hpp>
 #include <file/File.hpp>
 
@@ -18,7 +16,6 @@ using namespace mpc::disk;
 using namespace mpc::file::wav;
 using namespace mpc::file::sndreader;
 using namespace mpc::lcdgui;
-using namespace mpc::lcdgui::screens::dialog2;
 using namespace moduru::lang;
 using namespace std;
 
@@ -39,11 +36,6 @@ SoundLoader::SoundLoader(mpc::Mpc& mpc, vector<weak_ptr<mpc::sampler::Sound>> so
 void SoundLoader::setPartOfProgram(bool b)
 {
     partOfProgram = b;
-}
-
-void SoundLoader::setShowPopup(bool b)
-{
-    showPopup = b;
 }
 
 void SoundLoader::loadSound(shared_ptr<MpcFile> f, SoundLoaderResult& r)
@@ -74,14 +66,7 @@ void SoundLoader::loadSound(shared_ptr<MpcFile> f, SoundLoaderResult& r)
     
     auto sampler = mpc.getSampler().lock();
     auto existingSoundIndex = sampler->checkExists(soundName);
-    
-    if (showPopup && existingSoundIndex == -1)
-    {
-        mpc.getLayeredScreen().lock()->openScreen("popup");
-        auto popupScreen = mpc.screens->get<PopupScreen>("popup");
-        popupScreen->setText("LOADING " + StrUtil::padRight(soundFileName, " ", 16) + "." + extension);
-    }
-    
+        
     std::vector<float>& sampleData = *sound->getSampleData();
     
     if (StrUtil::eqIgnoreCase(extension, "wav"))
@@ -220,12 +205,6 @@ void SoundLoader::loadSound(shared_ptr<MpcFile> f, SoundLoaderResult& r)
         if (partOfProgram)
             r.existingIndex = existingSoundIndex;
     }
-}
-
-void SoundLoader::getSampleDataFromWav(weak_ptr<moduru::file::File> soundFile, vector<float>* dest)
-{
-    auto wavFile = mpc::file::wav::WavFile::openWavFile(soundFile.lock()->getPath());
-    wavFile.readFrames(dest, wavFile.getNumFrames());
 }
 
 void SoundLoader::setPreview(bool b)

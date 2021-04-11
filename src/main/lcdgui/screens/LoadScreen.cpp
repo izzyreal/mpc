@@ -353,7 +353,6 @@ void LoadScreen::loadSound()
     disk->setBusy(true);
     SoundLoader soundLoader(mpc, sampler.lock()->getSounds(), false);
     soundLoader.setPreview(true);
-    soundLoader.setShowPopup(true);
 
     SoundLoaderResult result;
     
