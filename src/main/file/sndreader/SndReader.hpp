@@ -27,6 +27,7 @@ private:
     
 public:
     std::string getName();
+    bool isHeaderValid();
     bool isMono();
     int getNumberOfFrames();
     int getSampleRate();
@@ -43,7 +44,7 @@ public:
     std::vector<char>& getSndFileArray();
     
 public:
-    SndReader(mpc::disk::MpcFile* soundFile);
+    SndReader(mpc::disk::MpcFile*);
     
     SndReader(const std::vector<char>& loadBytes);
 };

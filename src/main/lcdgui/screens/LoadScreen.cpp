@@ -367,8 +367,20 @@ void LoadScreen::loadSound()
         
         MLOG("A problem occurred when trying to load " + getSelectedFileName() + ": " + string(exception.what()));
         MLOG(result.errorMessage);
-        
+        disk->setBusy(false);
         openScreen("load");
+    }
+
+    auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+
+    if (!result.success)
+    {
+        openScreen("popup");
+        popupScreen->setText(result.errorMessage);
+        popupScreen->returnToScreenAfterMilliSeconds("load", 500);
+        disk->setBusy(false);
+        sampler.lock()->deleteSound(sampler.lock()->getSoundCount() - 1);
+        return;
     }
     
     if (result.existingIndex != -1)
@@ -378,7 +390,6 @@ void LoadScreen::loadSound()
     else
     {
         mpc.getLayeredScreen().lock()->openScreen("popup");
-        auto popupScreen = mpc.screens->get<PopupScreen>("popup");
         auto name = FileUtil::splitName(getSelectedFileName())[0];
         auto ext = FileUtil::splitName(getSelectedFileName())[1];
         popupScreen->setText("LOADING " + StrUtil::padRight(name, " ", 16) + "." + ext);

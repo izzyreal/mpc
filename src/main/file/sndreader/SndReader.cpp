@@ -18,9 +18,11 @@ SndReader::SndReader(const vector<char>& loadBytes)
 {
     sndFileArray = loadBytes;
     sndHeaderReader = make_shared<SndHeaderReader>(this);
+}
 
-    if (!sndHeaderReader->hasValidId())
-        throw invalid_argument("This SND file does not have a valid 2KXL SND ID.");
+bool SndReader::isHeaderValid()
+{
+    return sndHeaderReader->hasValidId();
 }
 
 string SndReader::getName()

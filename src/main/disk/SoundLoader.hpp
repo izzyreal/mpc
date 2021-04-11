@@ -34,12 +34,16 @@ namespace mpc::disk
 
 struct SoundLoaderResult {
     
+    // Set to true if the file could not be parsed.
+    bool success = false;
+    
     // If the sound you're attempting to load has already been
     // loaded, this will be filled with the index of the loaded
     // sound. It will be -1 if the sound hasn't already been
     // loaded. Most consumers treat this value as a boolean,
     // except ProgramLoader. It needs to know what sound index
     // a NoteParameters should have.
+    
     int existingIndex = -1;
     
     // The LOAD screen will want to display a popup message,

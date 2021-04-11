@@ -23,22 +23,22 @@ using namespace moduru::lang;
 using namespace std;
 
 SoundLoader::SoundLoader(mpc::Mpc& mpc)
-	: mpc(mpc)
+: mpc(mpc)
 {
 }
 float SoundLoader::rateToTuneBase = (float)(pow(2, (1.0 / 12.0)));
 
 SoundLoader::SoundLoader(mpc::Mpc& mpc, vector<weak_ptr<mpc::sampler::Sound>> sounds, bool replace)
-	: mpc(mpc)
+: mpc(mpc)
 {
-	
-	this->replace = replace;
-	this->sounds = sounds;
+    
+    this->replace = replace;
+    this->sounds = sounds;
 }
 
 void SoundLoader::setPartOfProgram(bool b)
 {
-	partOfProgram = b;
+    partOfProgram = b;
 }
 
 void SoundLoader::setShowPopup(bool b)
@@ -49,9 +49,9 @@ void SoundLoader::setShowPopup(bool b)
 void SoundLoader::loadSound(shared_ptr<MpcFile> f, SoundLoaderResult& r)
 {
     auto sound = mpc.getSampler().lock()->addSound().lock();
-
+    
     string soundFileName = f->getName();
-        
+    
     auto periodIndex = soundFileName.find_last_of('.');
     string extension = "";
     string soundName = "";
@@ -81,12 +81,12 @@ void SoundLoader::loadSound(shared_ptr<MpcFile> f, SoundLoaderResult& r)
         auto popupScreen = mpc.screens->get<PopupScreen>("popup");
         popupScreen->setText("LOADING " + StrUtil::padRight(soundFileName, " ", 16) + "." + extension);
     }
-
+    
     std::vector<float>& sampleData = *sound->getSampleData();
-
+    
     if (StrUtil::eqIgnoreCase(extension, "wav"))
     {
-
+        
         auto file = f->getFile().lock();
         auto wavFile = WavFile::openWavFile(file->getPath());
         
@@ -108,14 +108,14 @@ void SoundLoader::loadSound(shared_ptr<MpcFile> f, SoundLoaderResult& r)
             sampleData.clear();
             vector<float> interleaved;
             wavFile.readFrames(&interleaved, wavFile.getNumFrames());
-        
+            
             for (int i = 0; i < interleaved.size(); i += 2)
-                sampleData.push_back(interleaved[i]);
+            sampleData.push_back(interleaved[i]);
             
             for (int i = 1; i < interleaved.size(); i += 2)
-                sampleData.push_back(interleaved[i]);
+            sampleData.push_back(interleaved[i]);
         }
-
+        
         size = sampleData.size();
         end = size;
         
@@ -127,7 +127,7 @@ void SoundLoader::loadSound(shared_ptr<MpcFile> f, SoundLoaderResult& r)
         sampleRate = wavFile.getSampleRate();
         
         loopTo = end;
-
+        
         if (wavFile.getNumSampleLoops() > 0)
         {
             auto& sampleLoop = wavFile.getSampleLoop();
@@ -135,7 +135,7 @@ void SoundLoader::loadSound(shared_ptr<MpcFile> f, SoundLoaderResult& r)
             end = sampleLoop.end;
             loopEnabled = true;
         }
-
+        
         auto tuneFactor = (float)(sampleRate / 44100.0);
         
         tune = (int)(floor(logOfBase(tuneFactor, rateToTuneBase) * 10.0));
@@ -148,20 +148,31 @@ void SoundLoader::loadSound(shared_ptr<MpcFile> f, SoundLoaderResult& r)
     else if (StrUtil::eqIgnoreCase(extension, "snd"))
     {
         SndReader sndReader(f.get());
-        sndReader.readData(sampleData);
-        size = sampleData.size();
-        mono = sndReader.isMono();
-        start = sndReader.getStart();
-        end = sndReader.getEnd();
-        loopTo = end - sndReader.getLoopLength();
-        sampleRate = sndReader.getSampleRate();
-        soundName = sndReader.getName();
-        loopEnabled = sndReader.isLoopEnabled();
-        level = sndReader.getLevel();
-        tune = sndReader.getTune();
-        beats = sndReader.getNumberOfBeats();
+        
+        if (sndReader.isHeaderValid())
+        {
+            sndReader.readData(sampleData);
+            size = sampleData.size();
+            mono = sndReader.isMono();
+            start = sndReader.getStart();
+            end = sndReader.getEnd();
+            loopTo = end - sndReader.getLoopLength();
+            sampleRate = sndReader.getSampleRate();
+            soundName = sndReader.getName();
+            loopEnabled = sndReader.isLoopEnabled();
+            level = sndReader.getLevel();
+            tune = sndReader.getTune();
+            beats = sndReader.getNumberOfBeats();
+        }
+        else
+        {
+            r.errorMessage = "Wrong file format";
+            return;
+        }
     }
-
+    
+    r.success = true;
+    
     sound->setSampleRate(sampleRate);
     sound->setName(soundName);
     sound->setMono(mono);
@@ -178,7 +189,7 @@ void SoundLoader::loadSound(shared_ptr<MpcFile> f, SoundLoaderResult& r)
         r.existingIndex = existingSoundIndex;
         return;
     }
-
+    
     if (existingSoundIndex == -1)
     {
         if (partOfProgram)
@@ -204,21 +215,21 @@ void SoundLoader::loadSound(shared_ptr<MpcFile> f, SoundLoaderResult& r)
 
 void SoundLoader::getSampleDataFromWav(weak_ptr<moduru::file::File> soundFile, vector<float>* dest)
 {
-	auto wavFile = mpc::file::wav::WavFile::openWavFile(soundFile.lock()->getPath());
-	wavFile.readFrames(dest, wavFile.getNumFrames());
+    auto wavFile = mpc::file::wav::WavFile::openWavFile(soundFile.lock()->getPath());
+    wavFile.readFrames(dest, wavFile.getNumFrames());
 }
 
 void SoundLoader::setPreview(bool b)
 {
-	preview = b;
+    preview = b;
 }
 
 double SoundLoader::logOfBase(float num, float base)
 {
-	return log(num) / log(base);
+    return log(num) / log(base);
 }
 
 int SoundLoader::getSize()
 {
-	return size;
+    return size;
 }
