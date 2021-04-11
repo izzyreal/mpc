@@ -68,6 +68,8 @@ namespace mpc::lcdgui::screens
 		void setFileLoad(int i);
 
 		int getFileSize();
+        
+        void loadSound();
 
 	private:
 		friend class mpc::lcdgui::screens::window::DirectoryScreen;

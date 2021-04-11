@@ -227,44 +227,6 @@ weak_ptr<mpc::disk::Stores> Mpc::getStores()
 vector<char> Mpc::akaiAsciiChar { ' ', '!', '#', '$', '%', '&', '\'', '(', ')', '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '_', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '}' };
 vector<string> Mpc::akaiAscii { " ", "!", "#", "$", "%", "&", "'", "(", ")", "-", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "@", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "_", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "{", "}" };
 
-void Mpc::loadSound(bool replace)
-{
-	if (loadSoundThread.joinable())
-		loadSoundThread.join();
-	
-	auto lDisk = getDisk().lock();
-	lDisk->setBusy(true);
-	auto soundLoader = mpc::disk::SoundLoader(*this, sampler->getSounds(), replace);
-	soundLoader.setPreview(true);
-	soundLoader.setPartOfProgram(false);
-	bool hasNotBeenLoadedAlready = true;
-
-	auto loadScreen = screens->get<LoadScreen>("load");
-
-	try
-	{
-		hasNotBeenLoadedAlready = soundLoader.loadSound(loadScreen->getSelectedFile()) == -1;
-	}
-	catch (const exception& exception)
-	{
-		sampler->deleteSound(sampler->getSoundCount() - 1);
-		MLOG("A problem occurred when trying to load " + loadScreen->getSelectedFileName() + ": " + string(exception.what()));
-		lDisk->setBusy(false);
-		layeredScreen->openScreen("load");
-		return;
-	}
-	
-	if (hasNotBeenLoadedAlready)
-	{
-		loadSoundThread = thread(&Mpc::runLoadSoundThread, this, soundLoader.getSize());
-	}
-	else
-    {
-		sampler->deleteSound(sampler->getSoundCount() - 1);
-		lDisk->setBusy(false);
-	}
-}
-
 void Mpc::loadProgram()
 {
 	programLoader.reset();
@@ -290,20 +252,6 @@ void Mpc::importLoadedProgram()
 ctoot::mpc::MpcMultiMidiSynth* Mpc::getMms()
 {
 	return audioMidiServices->getMms().lock().get();
-}
-
-void Mpc::runLoadSoundThread(mpc::Mpc* mpc, int size)
-{
-	int sleepTime = size / 400;
-	
-	if (sleepTime < 300)
-	{
-		sleepTime = 300;
-	}
-	
-	this_thread::sleep_for(chrono::milliseconds((int)(sleepTime)));
-	mpc->getLayeredScreen().lock()->openScreen("load-a-sound");
-	mpc->getDisk().lock()->setBusy(false);
 }
 
 weak_ptr<audiomidi::MpcMidiPorts> Mpc::getMidiPorts()
@@ -419,7 +367,4 @@ Mpc::~Mpc() {
 		audioMidiServices->destroyServices();
 		MLOG("AudioMidiServices destroyed.");
 	}
-
-	if (loadSoundThread.joinable())
-		loadSoundThread.join();
 }

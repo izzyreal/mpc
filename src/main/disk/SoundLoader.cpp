@@ -39,6 +39,11 @@ void SoundLoader::setPartOfProgram(bool b)
 	partOfProgram = b;
 }
 
+void SoundLoader::setShowPopup(bool b)
+{
+    showPopup = b;
+}
+
 int SoundLoader::loadSound(weak_ptr<MpcFile> f)
 {
 	auto sound = mpc.getSampler().lock()->addSound().lock();
@@ -69,7 +74,7 @@ int SoundLoader::loadSound(weak_ptr<MpcFile> f)
 	auto sampler = mpc.getSampler().lock();
 	auto existingSoundIndex = sampler->checkExists(soundName);
 	
-	if (!partOfProgram && existingSoundIndex == -1)
+	if (showPopup && existingSoundIndex == -1)
 	{
 		mpc.getLayeredScreen().lock()->openScreen("popup");
 		auto popupScreen = mpc.screens->get<PopupScreen>("popup");

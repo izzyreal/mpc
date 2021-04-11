@@ -2,6 +2,7 @@
 
 #include <audiomidi/AudioMidiServices.hpp>
 #include <audiomidi/SoundPlayer.hpp>
+#include <disk/SoundLoader.hpp>
 
 #include <lcdgui/screens/window/DirectoryScreen.hpp>
 #include <lcdgui/screens/window/LoadASequenceScreen.hpp>
@@ -85,29 +86,23 @@ void LoadScreen::function(int i)
 			auto popupScreen = mpc.screens->get<PopupScreen>("popup");
 
 			if (started)
-			{
 				popupScreen->setText("Playing " + name);
-			}
 			else
-			{
 				popupScreen->setText("Can't play " + name);
-			}
 		}
 		break;
 	}
 	case 5:
 	{
 		if (!disk || disk->getFileNames().size() == 0)
-		{
 			return;
-		}
 		
 		auto selectedFile = getSelectedFile();
 		auto ext = moduru::file::FileUtil::splitName(selectedFile->getName())[1];
 		
 		if (StrUtil::eqIgnoreCase(ext, "snd") || StrUtil::eqIgnoreCase(ext, "wav"))
 		{
-			mpc.loadSound(false);
+			loadSound();
 			return;
 		}
 		
@@ -350,4 +345,48 @@ void LoadScreen::setFileLoad(int i)
 	fileLoad = i;
 	displayFile();
 	displaySize();
+}
+
+void LoadScreen::loadSound()
+{
+    auto disk = mpc.getDisk().lock();
+    disk->setBusy(true);
+    SoundLoader soundLoader(mpc, sampler.lock()->getSounds(), false);
+    soundLoader.setPreview(true);
+    soundLoader.setShowPopup(true);
+    bool isAlreadyLoaded = false;
+
+    try
+    {
+        isAlreadyLoaded = soundLoader.loadSound(getSelectedFile()) != -1;
+    }
+    catch (const exception& exception)
+    {
+        sampler.lock()->deleteSound(sampler.lock()->getSoundCount() - 1);
+        
+        MLOG("A problem occurred when trying to load " + getSelectedFileName() + ": " + string(exception.what()));
+        
+        openScreen("load");
+    }
+    
+    if (isAlreadyLoaded)
+    {
+        sampler.lock()->deleteSound(sampler.lock()->getSoundCount() - 1);
+    }
+    else
+    {
+        mpc.getLayeredScreen().lock()->openScreen("popup");
+        auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+        auto name = FileUtil::splitName(getSelectedFileName())[0];
+        auto ext = FileUtil::splitName(getSelectedFileName())[1];
+        popupScreen->setText("LOADING " + StrUtil::padRight(name, " ", 16) + "." + ext);
+     
+        int sleepTime = soundLoader.getSize() / 400;
+        if (sleepTime < 300) sleepTime = 300;
+        
+        popupScreen->returnToScreenAfterMilliSeconds("load-a-sound", sleepTime);
+    }
+
+    // PopupScreen should have a std::function delayedAction; that does the below
+    disk->setBusy(false);
 }
