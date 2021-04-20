@@ -19,7 +19,7 @@ string Paths::appDocumentsPath()
 
 string Paths::appDataPath()
 {
-    static auto path = sago::getData() + sep + "VMPC2000XL" + sep;
+    static auto path = sago::getConfigHome() + sep + "VMPC2000XL" + sep;
     return path;
 }
 
