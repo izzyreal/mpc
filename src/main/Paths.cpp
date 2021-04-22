@@ -17,7 +17,7 @@ string Paths::appDocumentsPath()
     return path;
 }
 
-string Paths::appDataPath()
+string Paths::appConfigHome()
 {
     static auto path = sago::getConfigHome() + sep + "VMPC2000XL" + sep;
     return path;
@@ -31,7 +31,7 @@ string Paths::appConfigPath()
 
 string Paths::configPath()
 {
-    static auto path = appConfigPath() + "config" + sep;
+    static auto path = appConfigHome() + "config" + sep;
     return path;
 }
 
@@ -61,7 +61,7 @@ string Paths::recordingsPath()
 
 string Paths::demoDataSrcPath()
 {
-    static auto demoDataPath = appDataPath() + "DemoData" + sep;
+    static auto demoDataPath = sago::getData() + sep + "VMPC2000XL" + sep + "DemoData" + sep;
     return demoDataPath;
 }
 
