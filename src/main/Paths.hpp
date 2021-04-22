@@ -8,7 +8,7 @@ class Paths
 private:
     static std::string sep;
 
-    static std::string appDataPath();
+    static std::string appConfigHome();
 
 public:
     static std::string appDocumentsPath();
