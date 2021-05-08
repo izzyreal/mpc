@@ -19,23 +19,23 @@ Hardware::Hardware(mpc::Mpc& mpc)
 {
     topPanel = make_shared<TopPanel>();
     
-    vector<string> buttonLabels{ "left", "right", "up", "down",	"rec", "overdub", "stop", "play", "play-start", "main-screen", "prev-step-event", "next-step-event", "go-to", "prev-bar-start", "next-bar-end", "tap", "next-seq", "track-mute", "open-window", "full-level", "sixteen-levels", "f1", "f2", "f3", "f4", "f5", "f6", "shift", "enter", "undo-seq", "erase", "after", "bank-a", "bank-b", "bank-c", "bank-d" };
+    buttonLabels = { "left", "right", "up", "down",	"rec", "overdub", "stop", "play", "play-start", "main-screen", "prev-step-event", "next-step-event", "go-to", "prev-bar-start", "next-bar-end", "tap", "next-seq", "track-mute", "open-window", "full-level", "sixteen-levels", "f1", "f2", "f3", "f4", "f5", "f6", "shift", "enter", "undo-seq", "erase", "after", "bank-a", "bank-b", "bank-c", "bank-d", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
     
     for (auto& l : buttonLabels)
     {
-        buttons.push_back(std::make_shared<Button>(mpc, l));
+        buttons.push_back(make_shared<Button>(mpc, l));
         components.push_back(buttons.back());
     }
     
     for (int i = 0; i <= 9; i++)
     {
-        buttons.push_back(std::make_shared<Button>(mpc, std::to_string(i)));
+        buttons.push_back(make_shared<Button>(mpc, to_string(i)));
         components.push_back(buttons.back());
     }
     
     for (int i = 0; i <= 15; i++)
     {
-        pads.push_back(std::make_shared<HwPad>(mpc, i));
+        pads.push_back(make_shared<HwPad>(mpc, i));
         components.push_back(pads.back());
     }
     
@@ -44,9 +44,7 @@ Hardware::Hardware(mpc::Mpc& mpc)
     vector<string> ledLabels{ "full-level", "sixteen-levels", "next-seq", "track-mute", "pad-bank-a", "pad-bank-b", "pad-bank-c", "pad-bank-d", "after", "undo-seq", "rec", "overdub", "play" };
     
     for (auto& l : ledLabels)
-    {
-        leds.push_back(std::make_shared<Led>(l));
-    }
+        leds.push_back(make_shared<Led>(l));
     
     recPot = make_shared<Pot>(mpc, "rec");
     volPot = make_shared<Pot>(mpc, "vol");
@@ -54,7 +52,12 @@ Hardware::Hardware(mpc::Mpc& mpc)
     slider = make_shared<Slider>(mpc);
 }
 
-std::weak_ptr<TopPanel> Hardware::getTopPanel()
+vector<string>& Hardware::getButtonLabels()
+{
+    return buttonLabels;
+}
+
+weak_ptr<TopPanel> Hardware::getTopPanel()
 {
     return topPanel;
 }
@@ -81,7 +84,7 @@ vector<weak_ptr<HwComponent>> Hardware::getPads()
     return result;
 }
 
-weak_ptr<Button> Hardware::getButton(std::string label)
+weak_ptr<Button> Hardware::getButton(string label)
 {
     for (auto b : buttons)
         if (b->getLabel().compare(label) == 0) return b;
@@ -95,7 +98,7 @@ vector<weak_ptr<HwComponent>> Hardware::getButtons()
     return result;
 }
 
-weak_ptr<Led> Hardware::getLed(std::string label)
+weak_ptr<Led> Hardware::getLed(string label)
 {
     for (auto l : leds)
     {

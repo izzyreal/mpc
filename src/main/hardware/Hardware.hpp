@@ -27,6 +27,7 @@ class Hardware final
 {
     
 private:
+    std::vector<std::string> buttonLabels;
     std::vector<std::weak_ptr<HwComponent>> components;
     
     std::shared_ptr<TopPanel> topPanel;
@@ -41,6 +42,7 @@ private:
     
 public:
     std::weak_ptr<TopPanel> getTopPanel();
+    std::vector<std::string>& getButtonLabels();
     std::weak_ptr<HwPad> getPad(int index);
     std::vector<std::weak_ptr<HwComponent>> getPads();
     std::vector<std::weak_ptr<HwComponent>> getButtons();
