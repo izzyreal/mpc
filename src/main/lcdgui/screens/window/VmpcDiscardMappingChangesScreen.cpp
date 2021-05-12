@@ -10,6 +10,11 @@ VmpcDiscardMappingChangesScreen::VmpcDiscardMappingChangesScreen(mpc::Mpc& mpc, 
 {
 }
 
+void VmpcDiscardMappingChangesScreen::close()
+{
+    nextScreen = "sequencer";
+}
+
 void VmpcDiscardMappingChangesScreen::function(int i)
 {
     ScreenComponent::function(i);
@@ -23,12 +28,12 @@ void VmpcDiscardMappingChangesScreen::function(int i)
         case 4:
             // discard and leave
             mpc.getControls().lock()->getKbMapping().lock()->importMapping();
-            openScreen("sequencer");
+            openScreen(nextScreen);
             break;
         case 5:
             // save and leave
             mpc.getControls().lock()->getKbMapping().lock()->exportMapping();
-            openScreen("sequencer");
+            openScreen(nextScreen);
             break;
     }
 }

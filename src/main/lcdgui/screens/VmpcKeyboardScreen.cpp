@@ -6,6 +6,8 @@
 #include <hardware/HwPad.hpp>
 
 #include <lcdgui/screens/dialog2/PopupScreen.hpp>
+#include <lcdgui/screens/window/VmpcDiscardMappingChangesScreen.hpp>
+
 #include <lcdgui/Parameter.hpp>
 #include <lcdgui/Label.hpp>
 #include <lcdgui/Field.hpp>
@@ -18,6 +20,7 @@
 #include <sys/KeyCodes.hpp>
 
 using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::lcdgui;
 using namespace mpc::controls;
@@ -118,6 +121,14 @@ void VmpcKeyboardScreen::function(int i)
             if (learning)
                 return;
             
+            if (hasMappingChanged())
+            {
+                auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>("vmpc-discard-mapping-changes");
+                screen->nextScreen = "vmpc-settings";
+                openScreen("vmpc-discard-mapping-changes");
+                return;
+            }
+
             openScreen("vmpc-settings");
             break;
         case 2:
@@ -129,6 +140,14 @@ void VmpcKeyboardScreen::function(int i)
                 return;
             }
             
+            if (hasMappingChanged())
+            {
+                auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>("vmpc-discard-mapping-changes");
+                screen->nextScreen = "vmpc-auto-save";
+                openScreen("vmpc-discard-mapping-changes");
+                return;
+            }
+
             openScreen("vmpc-auto-save");
             break;
         case 3:
