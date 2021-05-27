@@ -1,12 +1,14 @@
 #include "SaveAllFileScreen.hpp"
 
 #include <lcdgui/screens/window/NameScreen.hpp>
+#include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
 #include <Util.hpp>
 #include <disk/MpcFile.hpp>
 #include <disk/AbstractDisk.hpp>
 
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::lcdgui::screens::dialog2;
 using namespace moduru::lang;
 using namespace std;
 
@@ -74,7 +76,11 @@ void SaveAllFileScreen::function(int i)
 		f->setFileData(&bytes);
 		disk->flush();
 		disk->initFiles();
-		openScreen("save");
+        
+        auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+        popupScreen->setText("         Saving ...");
+        popupScreen->returnToScreenAfterMilliSeconds("save", 200);
+        openScreen("popup");
 		break;
 	}
 	}

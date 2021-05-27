@@ -2,10 +2,17 @@
 
 #include <Util.hpp>
 
+#include <disk/AbstractDisk.hpp>
+
 #include <lcdgui/screens/window/SaveAProgramScreen.hpp>
 #include <lcdgui/screens/window/NameScreen.hpp>
+#include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::lcdgui::screens::dialog2;
+
+using namespace moduru::lang;
+
 using namespace std;
 
 SaveApsFileScreen::SaveApsFileScreen(mpc::Mpc& mpc, const int layerIndex)
@@ -57,7 +64,21 @@ void SaveApsFileScreen::function(int i)
 	{
 		auto nameScreen = mpc.screens->get<NameScreen>("name");
 		string apsFileName = mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) + ".APS";
+        
+        auto disk = mpc.getDisk().lock();
+
+        if (disk->checkExists(apsFileName))
+        {
+            mpc.getLayeredScreen().lock()->openScreen("file-exists");
+            return;
+        }
+        
 		apsSaver = make_unique<mpc::disk::ApsSaver>(mpc, apsFileName);
+        
+        auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+        popupScreen->setText("Saving " + StrUtil::padRight(nameScreen->getNameWithoutSpaces(), " ", 16) + ".APS");
+        popupScreen->returnToScreenAfterMilliSeconds("save", 200);
+        openScreen("popup");
 		break;
 	}
 	}

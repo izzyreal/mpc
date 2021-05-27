@@ -180,13 +180,6 @@ void NameScreen::saveName()
 		openScreen("save-a-program");
 		return;
 	}
-	else if (parameterName.compare("save-aps-file") == 0)
-	{
-		string apsName = getNameWithoutSpaces();
-		apsName.append(".APS");
-		mpc::disk::ApsSaver apsSaver(mpc, mpc::Util::getFileName(apsName));
-		return;
-	}
 	else if (parameterName.compare("save-a-sequence") == 0)
 	{
 		openScreen("save-a-sequence");
@@ -412,7 +405,9 @@ void NameScreen::saveName()
     {
         auto newName = getNameWithoutSpaces();
         renamer(newName);
-        openScreen(screenToReturnTo);
+        
+        if (screenToReturnTo.length() > 0)
+            openScreen(screenToReturnTo);
     }
 }
 
@@ -448,7 +443,7 @@ void NameScreen::initEditColors()
 
 void NameScreen::setName(string name)
 {
-	this->name = StrUtil::padRight(name, " ", 16);
+    this->name = name;
 	nameLimit = 16;
 	originalName = name;
 }
@@ -474,11 +469,14 @@ string NameScreen::getNameWithoutSpaces()
 	for (int i = 0; i < s.length(); i++)
 		if (s[i] == ' ') s[i] = '_';
 
-	return StrUtil::padRight(s, " ", nameLimit);
+    return s;
 }
 
 void NameScreen::changeNameCharacter(int i, bool up)
 {
+    if (i >= name.length())
+        name = StrUtil::padRight(name, " ", i + 1);
+        
 	char schar = name[i];
 	string s{ schar };
 	auto stringCounter = 0;
@@ -508,9 +506,7 @@ void NameScreen::changeNameCharacter(int i, bool up)
 		s = mpc::Mpc::akaiAscii[stringCounter + change];
 	
 	name = name.substr(0, i).append(s).append(name.substr(i + 1, name.length()));
-
-	init();
-	findFocus().lock()->setText(getNameWithoutSpaces().substr(stoi(param), 1));
+    displayName();
 }
 
 void NameScreen::displayName()
@@ -518,14 +514,16 @@ void NameScreen::displayName()
 	if (nameLimit == 0)
 		return;
 
-	findField("0").lock()->setText(getNameWithoutSpaces().substr(0, 1));
-	findField("1").lock()->setText(getNameWithoutSpaces().substr(1, 1));
-	findField("2").lock()->setText(getNameWithoutSpaces().substr(2, 1));
-	findField("3").lock()->setText(getNameWithoutSpaces().substr(3, 1));
-	findField("4").lock()->setText(getNameWithoutSpaces().substr(4, 1));
-	findField("5").lock()->setText(getNameWithoutSpaces().substr(5, 1));
-	findField("6").lock()->setText(getNameWithoutSpaces().substr(6, 1));
-	findField("7").lock()->setText(getNameWithoutSpaces().substr(7, 1));
+    auto paddedName = StrUtil::padRight(name, " ", nameLimit);
+    
+	findField("0").lock()->setText(paddedName.substr(0, 1));
+	findField("1").lock()->setText(paddedName.substr(1, 1));
+	findField("2").lock()->setText(paddedName.substr(2, 1));
+	findField("3").lock()->setText(paddedName.substr(3, 1));
+	findField("4").lock()->setText(paddedName.substr(4, 1));
+	findField("5").lock()->setText(paddedName.substr(5, 1));
+	findField("6").lock()->setText(paddedName.substr(6, 1));
+	findField("7").lock()->setText(paddedName.substr(7, 1));
 
 	if (nameLimit > 8)
 	{
@@ -537,14 +535,14 @@ void NameScreen::displayName()
 		findField("13").lock()->Hide(false);
 		findField("14").lock()->Hide(false);
 		findField("15").lock()->Hide(false);
-		findField("8").lock()->setText(getNameWithoutSpaces().substr(8, 1));
-		findField("9").lock()->setText(getNameWithoutSpaces().substr(9, 1));
-		findField("10").lock()->setText(getNameWithoutSpaces().substr(10, 1));
-		findField("11").lock()->setText(getNameWithoutSpaces().substr(11, 1));
-		findField("12").lock()->setText(getNameWithoutSpaces().substr(12, 1));
-		findField("13").lock()->setText(getNameWithoutSpaces().substr(13, 1));
-		findField("14").lock()->setText(getNameWithoutSpaces().substr(14, 1));
-		findField("15").lock()->setText(getNameWithoutSpaces().substr(15, 1));
+		findField("8").lock()->setText(paddedName.substr(8, 1));
+		findField("9").lock()->setText(paddedName.substr(9, 1));
+		findField("10").lock()->setText(paddedName.substr(10, 1));
+		findField("11").lock()->setText(paddedName.substr(11, 1));
+		findField("12").lock()->setText(paddedName.substr(12, 1));
+		findField("13").lock()->setText(paddedName.substr(13, 1));
+		findField("14").lock()->setText(paddedName.substr(14, 1));
+		findField("15").lock()->setText(paddedName.substr(15, 1));
 	}
 	else
 	{
