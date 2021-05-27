@@ -76,7 +76,12 @@ void VmpcDirectToDiskRecorderScreen::turnWheel(int i)
 		auto nameScreen = mpc.screens->get<NameScreen>("name");
 		nameScreen->setName(outputFolder);
 		nameScreen->setNameLimit(8);
-		nameScreen->parameterName = "output-folder";
+        
+        auto renamer = [&](string& newName) {
+            outputFolder = newName;
+        };
+
+        nameScreen->setRenamerAndScreenToReturnTo(renamer, "vmpc-direct-to-disk-recorder");
 		openScreen("name");
 	}
 }

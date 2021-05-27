@@ -56,7 +56,7 @@ void SaveApsFileScreen::function(int i)
 	case 4:
 	{
 		auto nameScreen = mpc.screens->get<NameScreen>("name");
-		string apsFileName = mpc::Util::getFileName(nameScreen->getName()) + ".APS";
+		string apsFileName = mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) + ".APS";
 		apsSaver = make_unique<mpc::disk::ApsSaver>(mpc, apsFileName);
 		break;
 	}
@@ -66,7 +66,7 @@ void SaveApsFileScreen::function(int i)
 void SaveApsFileScreen::displayFile()
 {
 	auto nameScreen = mpc.screens->get<NameScreen>("name");
-	findField("file").lock()->setText(nameScreen->getName());
+	findField("file").lock()->setText(nameScreen->getNameWithoutSpaces());
 }
 
 void SaveApsFileScreen::displaySave()

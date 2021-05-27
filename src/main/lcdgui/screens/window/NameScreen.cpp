@@ -40,6 +40,12 @@ NameScreen::NameScreen(mpc::Mpc& mpc, const int layerIndex)
 	addChild(make_shared<Underline>());
 }
 
+void NameScreen::setRenamerAndScreenToReturnTo(const std::function<void(string&)>& renamer, const string& screen)
+{
+    this->renamer = renamer;
+    screenToReturnTo = screen;
+}
+
 weak_ptr<Underline> NameScreen::findUnderline()
 {
 	return dynamic_pointer_cast<Underline>(findChild("underline").lock());
@@ -142,15 +148,12 @@ void NameScreen::function(int i)
 			openScreen(parameterName);
 		else
 			openScreen(ls.lock()->getPreviousScreenName());
-
-		parameterName = "";
 		break;
 	}
 	case 4:
 		saveName();
 		break;
     }
-
 }
 
 void NameScreen::pressEnter()
@@ -162,13 +165,7 @@ void NameScreen::saveName()
 {	
 	auto prevScreen = ls.lock()->getPreviousScreenName();
 
-	if (parameterName.compare("output-folder") == 0)
-	{
-		auto directToDiskRecorderScreen = mpc.screens->get<VmpcDirectToDiskRecorderScreen>("vmpc-direct-to-disk-recorder");
-		directToDiskRecorderScreen->outputFolder = getNameWithoutSpaces();
-		openScreen("vmpc-direct-to-disk-recorder");
-	}
-	else if (parameterName.compare("save-all-file") == 0)
+    if (parameterName.compare("save-all-file") == 0)
 	{
 		openScreen("save-all-file");
 		return;
@@ -414,7 +411,8 @@ void NameScreen::saveName()
     else
     {
         auto newName = getNameWithoutSpaces();
-        setEntityToNewName(newName);
+        renamer(newName);
+        openScreen(screenToReturnTo);
     }
 }
 

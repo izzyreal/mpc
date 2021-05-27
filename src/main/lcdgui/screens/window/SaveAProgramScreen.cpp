@@ -49,7 +49,7 @@ void SaveAProgramScreen::function(int i)
 		break;
 	case 4:
 	{
-		auto fileName = mpc::Util::getFileName(nameScreen->getName()) + ".PGM";
+		auto fileName = mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) + ".PGM";
 		auto disk = mpc.getDisk().lock();
 
 		if (disk->checkExists(fileName))
@@ -89,5 +89,5 @@ void SaveAProgramScreen::displayReplaceSameSounds()
 void SaveAProgramScreen::displayFile()
 {
 	auto nameScreen = mpc.screens->get<NameScreen>("name");
-	findLabel("file").lock()->setText(nameScreen->getName() + ".PGM");
+	findLabel("file").lock()->setText(nameScreen->getNameWithoutSpaces() + ".PGM");
 }

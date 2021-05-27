@@ -28,15 +28,14 @@ void SoundScreen::turnWheel(int i)
 		auto nameScreen = mpc.screens->get<NameScreen>("name");
 		nameScreen->setName(findField("soundname").lock()->getText());
         
-        auto setter = [&](string& newName) {            
+        auto renamer = [&](string& newName) {
             if (sampler.lock()->isSoundNameOccupied(newName))
                 return;
 
             sampler.lock()->getSound().lock()->setName(newName);
-            openScreen("sound");
         };
 
-        nameScreen->setEntityToNewName = setter;
+        nameScreen->setRenamerAndScreenToReturnTo(renamer, "sound");
 		openScreen("name");
 	}
 }

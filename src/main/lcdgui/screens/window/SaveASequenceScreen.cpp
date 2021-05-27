@@ -46,7 +46,7 @@ void SaveASequenceScreen::function(int i)
 		openScreen("save");
 		break;
 	case 4:
-		auto fileName = mpc::Util::getFileName(nameScreen->getName()) + ".MID";
+		auto fileName = mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) + ".MID";
 		
 		if (mpc.getDisk().lock()->checkExists(fileName))
 		{
@@ -70,7 +70,7 @@ void SaveASequenceScreen::displaySaveAs()
 void SaveASequenceScreen::displayFile()
 {
 	auto nameScreen = mpc.screens->get<NameScreen>("name");
-	auto name = nameScreen->getName();
+	auto name = nameScreen->getNameWithoutSpaces();
 
 	if (name.length() < 2)
 	{

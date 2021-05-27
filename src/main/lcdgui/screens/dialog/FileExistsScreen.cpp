@@ -34,7 +34,7 @@ void FileExistsScreen::function(int i)
 
 		if (ls.lock()->getPreviousScreenName().compare("save-a-program") == 0)
 		{
-			auto pfileName = mpc::Util::getFileName(nameScreen->getName()) + ".PGM";
+			auto pfileName = mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) + ".PGM";
 			auto success = disk->getFile(pfileName)->del();
 
 			if (success)
@@ -46,7 +46,7 @@ void FileExistsScreen::function(int i)
 		}
 		else if (ls.lock()->getPreviousScreenName().compare("save-a-sequence") == 0)
 		{
-			auto sfileName = mpc::Util::getFileName(nameScreen->getName()) + ".MID";
+			auto sfileName = mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) + ".MID";
 			auto success = disk->getFile(sfileName)->del();
 
 			if (success)
@@ -60,7 +60,7 @@ void FileExistsScreen::function(int i)
 		}
 		else if (ls.lock()->getPreviousScreenName().compare("save-aps-file") == 0)
 		{
-			auto apsName = mpc::Util::getFileName(nameScreen->getName()) + ".APS";
+			auto apsName = mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) + ".APS";
 			auto success = disk->getFile(apsName)->del();
 			
 			if (success)
@@ -72,7 +72,7 @@ void FileExistsScreen::function(int i)
 		}
 		else if (ls.lock()->getPreviousScreenName().compare("save-all-file") == 0)
 		{
-			auto allName = mpc::Util::getFileName(nameScreen->getName()) + ".ALL";
+			auto allName = mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) + ".ALL";
 			disk->initFiles();
 			auto success = disk->getFile(allName)->del();
 			
@@ -80,7 +80,7 @@ void FileExistsScreen::function(int i)
 			{
 				disk->flush();
 				disk->initFiles();
-				auto allParser = mpc::file::all::AllParser(mpc, mpc::Util::getFileName(nameScreen->getName()));
+				auto allParser = mpc::file::all::AllParser(mpc, mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()));
 				auto f = disk->newFile(allName);
 				auto bytes = allParser.getBytes();
 				f->setFileData(&bytes);
@@ -98,7 +98,7 @@ void FileExistsScreen::function(int i)
 			auto type = saveASoundScreen->fileType;
 
 			auto ext = string(type == 0 ? ".SND" : ".WAV");
-			auto fileName = mpc::Util::getFileName(nameScreen->getName()) + ext;
+			auto fileName = mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) + ext;
 
 			disk->getFile(fileName)->del();
 			disk->flush();

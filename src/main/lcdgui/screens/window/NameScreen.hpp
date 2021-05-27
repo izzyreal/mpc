@@ -77,8 +77,11 @@ private:
     void setName(std::string str, int i);
     std::string getNameWithoutSpaces();
     void changeNameCharacter(int i, bool up);
+    void setRenamerAndScreenToReturnTo(const std::function<void(std::string&)>&, const std::string&);
     
-    std::function<void(std::string&)> setEntityToNewName = [](std::string&){};
+    std::function<void(std::string&)> renamer = [](std::string&){};
+    std::string screenToReturnTo = "";
+    
     std::string name = "";
     bool editing = false;
     std::string parameterName = "";

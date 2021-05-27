@@ -24,11 +24,11 @@ void SaveAllFileScreen::displayFile()
 {
 	auto nameScreen = mpc.screens->get<NameScreen>("name");
 
-	if (nameScreen->getName().length() < 2)
+	if (nameScreen->getNameWithoutSpaces().length() < 2)
 		return;
 
-	findField("file").lock()->setText(nameScreen->getName().substr(0, 1));
-	findLabel("file1").lock()->setText(StrUtil::padRight(nameScreen->getName().substr(1), " ", 15) + ".ALL");
+	findField("file").lock()->setText(nameScreen->getNameWithoutSpaces().substr(0, 1));
+	findLabel("file1").lock()->setText(StrUtil::padRight(nameScreen->getNameWithoutSpaces().substr(1), " ", 15) + ".ALL");
 }
 
 void SaveAllFileScreen::turnWheel(int i)
@@ -57,7 +57,7 @@ void SaveAllFileScreen::function(int i)
 		break;
 	case 4:
 	{
-		auto allName = mpc::Util::getFileName(nameScreen->getName());
+		auto allName = mpc::Util::getFileName(nameScreen->getNameWithoutSpaces());
 		auto existStr = allName + ".ALL";
 		
 		auto disk = mpc.getDisk().lock();
@@ -68,7 +68,7 @@ void SaveAllFileScreen::function(int i)
 			return;
 		}
 		
-		allParser = make_unique<mpc::file::all::AllParser>(mpc, mpc::Util::getFileName(nameScreen->getName()));
+		allParser = make_unique<mpc::file::all::AllParser>(mpc, mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()));
 		auto f = disk->newFile(allName + ".ALL");
 		auto bytes = allParser->getBytes();
 		f->setFileData(&bytes);
