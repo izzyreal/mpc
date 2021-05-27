@@ -1,6 +1,8 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
+#include <functional>
+
 namespace mpc::controls
 {
 class BaseControls;
@@ -66,28 +68,24 @@ public:
 private:
     void drawUnderline();
     void initEditColors();
-    void resetNameScreen();
     void saveName();
     void displayName();
-    
     std::weak_ptr<mpc::lcdgui::Underline> findUnderline();
     
-private:
-    std::string name = "";
-    bool editing{ false };
-    std::string parameterName = "";
-    int nameLimit{ 0 };
-    std::string originalName = "";
-    
-private:
     void setName(std::string name);
     void setNameLimit(int i);
     void setName(std::string str, int i);
-    std::string getName();
+    std::string getNameWithoutSpaces();
     void changeNameCharacter(int i, bool up);
     
+    std::function<void(std::string&)> setEntityToNewName = [](std::string&){};
+    std::string name = "";
+    bool editing = false;
+    std::string parameterName = "";
+    int nameLimit = 0;
+    std::string originalName = "";
+    
     friend class mpc::controls::BaseControls;
-
     friend class EditSoundScreen;
     friend class KeepOrRetryScreen;
     friend class SaveAllFileScreen;
