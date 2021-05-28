@@ -43,20 +43,27 @@ void SequenceScreen::function(int i)
 
 void SequenceScreen::turnWheel(int i)
 {
-	init();
+    init();
+    auto nameScreen = mpc.screens->get<NameScreen>("name");
+    std::function<void(string&)> renamer;
+    
+    if (param.find("default") != string::npos)
+    {
+        nameScreen->setName(sequencer.lock()->getDefaultSequenceName());
+        
+        renamer = [&](string& newName) {
+            sequencer.lock()->setDefaultSequenceName(newName);
+        };
+    }
+    else
+    {
+        nameScreen->setName(sequencer.lock()->getActiveSequence().lock()->getName());
+        
+        renamer = [&](string& newName) {
+            sequencer.lock()->getActiveSequence().lock()->setName(newName);
+        };
+    }
 
-	auto nameScreen = mpc.screens->get<NameScreen>("name");
-
-	if (param.find("default") != string::npos)
-	{
-		nameScreen->setName(sequencer.lock()->getDefaultSequenceName());
-	}
-	else
-	{
-		auto seq = sequencer.lock()->getActiveSequence().lock();
-		nameScreen->setName(seq->getName());
-	}
-
-	nameScreen->parameterName = param;
-	openScreen("name");
+    nameScreen->setRenamerAndScreenToReturnTo(renamer, "sequence");
+    openScreen("name");
 }

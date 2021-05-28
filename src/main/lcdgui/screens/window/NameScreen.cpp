@@ -185,13 +185,7 @@ void NameScreen::saveName()
 	}
 	else if (parameterName.find("default") != string::npos)
 	{
-		if (prevScreen.compare("sequence") == 0)
-		{
-			sequencer.lock()->setDefaultSequenceName(getNameWithoutSpaces());
-			openScreen(prevScreen);
-			return;
-		}
-		else if (prevScreen.compare("song-window") == 0)
+        if (prevScreen.compare("song-window") == 0)
 		{
 			auto songScreen = mpc.screens->get<SongScreen>("song");
 			songScreen->defaultSongName = getNameWithoutSpaces();
@@ -328,11 +322,6 @@ void NameScreen::saveName()
 	}
     else if (prevScreen.compare("save-a-sequence") == 0)
 	{
-		openScreen(prevScreen);
-	}
-	else if (prevScreen.compare("sequence") == 0)
-	{
-		sequencer.lock()->getActiveSequence().lock()->setName(getNameWithoutSpaces());
 		openScreen(prevScreen);
 	}
 	else if (prevScreen.compare("song-window") == 0)
