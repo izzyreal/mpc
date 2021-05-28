@@ -45,20 +45,28 @@ void TrackScreen::turnWheel(int i)
 {
 	init();
 	auto nameScreen = mpc.screens->get<NameScreen>("name");
-
+    std::function<void(string&)> renamer;
+    
 	if (param.find("default") != string::npos)
 	{
-		nameScreen->setName(sequencer.lock()->getDefaultTrackName(sequencer.lock()->getActiveTrackIndex()));
+        renamer = [&](string& newName) {
+            sequencer.lock()->setDefaultTrackName(newName, sequencer.lock()->getActiveTrackIndex());
+        };
+
+        nameScreen->setName(sequencer.lock()->getDefaultTrackName(sequencer.lock()->getActiveTrackIndex()));
 	}
 	else
 	{
 		if (!track.lock()->isUsed())
-		{
 			track.lock()->setUsed(true);
-		}
+
+        renamer = [&](string& newName) {
+            track.lock()->setName(newName);
+        };
 
 		nameScreen->setName(track.lock()->getName());
 	}
-	nameScreen->parameterName = param;
-	openScreen("name");
+
+    nameScreen->setRenamerAndScreenToReturnTo(renamer, "sequencer");
+    openScreen("name");
 }

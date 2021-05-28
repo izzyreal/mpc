@@ -21,9 +21,7 @@
 
 #include <disk/AbstractDisk.hpp>
 #include <disk/MpcFile.hpp>
-#include <disk/ApsSaver.hpp>
 
-#include <sequencer/Track.hpp>
 #include <sequencer/Song.hpp>
 
 using namespace mpc::lcdgui;
@@ -187,13 +185,7 @@ void NameScreen::saveName()
 	}
 	else if (parameterName.find("default") != string::npos)
 	{
-		if (prevScreen.compare("track") == 0)
-		{
-			sequencer.lock()->setDefaultTrackName(getNameWithoutSpaces(), sequencer.lock()->getActiveTrackIndex());
-			openScreen("sequencer");
-			return;
-		}
-		else if (prevScreen.compare("sequence") == 0)
+		if (prevScreen.compare("sequence") == 0)
 		{
 			sequencer.lock()->setDefaultSequenceName(getNameWithoutSpaces());
 			openScreen(prevScreen);
@@ -334,12 +326,7 @@ void NameScreen::saveName()
 		sampler.lock()->getPreviewSound().lock()->setName(getNameWithoutSpaces());
 		openScreen(prevScreen);
 	}
-	else if (prevScreen.compare("track") == 0)
-	{
-		track.lock()->setName(getNameWithoutSpaces());
-		openScreen("sequencer");
-	}
-	else if (prevScreen.compare("save-a-sequence") == 0)
+    else if (prevScreen.compare("save-a-sequence") == 0)
 	{
 		openScreen(prevScreen);
 	}
