@@ -63,7 +63,6 @@ namespace mpc::sequencer
 		double previousTempo = 0.0;
 		int recordStartTick = 0;
 
-		std::string defaultSongName = "";
 		std::string defaultSequenceName = "";
 		std::vector<std::string> defaultDeviceNames;
 		int timeDisplayStyle = 0;
@@ -107,8 +106,6 @@ namespace mpc::sequencer
 		bool isSoloEnabled();
 		void setSoloEnabled(bool b);
 		std::weak_ptr<Sequence> getSequence(int i);
-		std::string getDefaultSongName();
-		void setDefaultSongName(std::string s);
 		std::string getDefaultSequenceName();
 		void setDefaultSequenceName(std::string s);
 		void setActiveSequenceIndex(int i);

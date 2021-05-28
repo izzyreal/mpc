@@ -1,7 +1,6 @@
 #include "NameScreen.hpp"
 
 #include <lcdgui/screens/LoadScreen.hpp>
-#include <lcdgui/screens/SongScreen.hpp>
 #include <lcdgui/screens/window/DirectoryScreen.hpp>
 #include <lcdgui/screens/window/MidiOutputScreen.hpp>
 #include <lcdgui/screens/window/MidiOutputScreen.hpp>
@@ -21,8 +20,6 @@
 
 #include <disk/AbstractDisk.hpp>
 #include <disk/MpcFile.hpp>
-
-#include <sequencer/Song.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -183,16 +180,6 @@ void NameScreen::saveName()
 		openScreen("save-a-sequence");
 		return;
 	}
-	else if (parameterName.find("default") != string::npos)
-	{
-        if (prevScreen.compare("song-window") == 0)
-		{
-			auto songScreen = mpc.screens->get<SongScreen>("song");
-			songScreen->defaultSongName = getNameWithoutSpaces();
-			openScreen(prevScreen);
-			return;
-		}
-	}
 	else if (parameterName.compare("programname") == 0)
 	{
 		program.lock()->setName(getNameWithoutSpaces());
@@ -322,12 +309,6 @@ void NameScreen::saveName()
 	}
     else if (prevScreen.compare("save-a-sequence") == 0)
 	{
-		openScreen(prevScreen);
-	}
-	else if (prevScreen.compare("song-window") == 0)
-	{
-		auto songScreen = mpc.screens->get<SongScreen>("song");
-		sequencer.lock()->getSong(songScreen->activeSongIndex).lock()->setName(getNameWithoutSpaces());
 		openScreen(prevScreen);
 	}
 	else if (prevScreen.compare("midi-output") == 0)

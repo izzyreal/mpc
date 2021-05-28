@@ -49,21 +49,23 @@ void TrackScreen::turnWheel(int i)
     
 	if (param.find("default") != string::npos)
 	{
-        nameScreen->setName(sequencer.lock()->getDefaultTrackName(sequencer.lock()->getActiveTrackIndex()));
+        const auto _sequencer = sequencer.lock();
+        nameScreen->setName(_sequencer->getDefaultTrackName(_sequencer->getActiveTrackIndex()));
         
-        renamer = [&](string& newName) {
-            sequencer.lock()->setDefaultTrackName(newName, sequencer.lock()->getActiveTrackIndex());
+        renamer = [_sequencer](string& newName) {
+            _sequencer->setDefaultTrackName(newName, _sequencer->getActiveTrackIndex());
         };
 	}
 	else
 	{
-		if (!track.lock()->isUsed())
-			track.lock()->setUsed(true);
+        const auto _track = track.lock();
+		if (!_track->isUsed())
+			_track->setUsed(true);
 
-		nameScreen->setName(track.lock()->getName());
+		nameScreen->setName(_track->getName());
         
-        renamer = [&](string& newName) {
-            track.lock()->setName(newName);
+        renamer = [_track](string& newName) {
+            _track->setName(newName);
         };
 	}
 
