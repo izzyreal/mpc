@@ -1,7 +1,6 @@
 #include "NameScreen.hpp"
 
 #include <lcdgui/screens/LoadScreen.hpp>
-#include <lcdgui/screens/window/EditSoundScreen.hpp>
 #include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
 #include <lcdgui/screens/dialog/CopySoundScreen.hpp>
 #include <lcdgui/screens/dialog/ResampleScreen.hpp>
@@ -179,11 +178,6 @@ void NameScreen::saveName()
 
 	if (prevScreen.compare("save-aps-file") == 0)
 	{
-		openScreen(prevScreen);
-	}
-	else if (prevScreen.compare("keep-or-retry") == 0)
-	{
-		sampler.lock()->getPreviewSound().lock()->setName(getNameWithoutSpaces());
 		openScreen(prevScreen);
 	}
     else if (prevScreen.compare("save-a-sequence") == 0)
