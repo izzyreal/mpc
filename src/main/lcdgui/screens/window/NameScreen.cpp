@@ -2,7 +2,6 @@
 
 #include <lcdgui/screens/LoadScreen.hpp>
 #include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
-#include <lcdgui/screens/dialog/CopySoundScreen.hpp>
 #include <lcdgui/screens/dialog/CreateNewProgramScreen.hpp>
 #include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
@@ -179,12 +178,6 @@ void NameScreen::saveName()
 	}
     else if (prevScreen.compare("save-a-sequence") == 0)
 	{
-		openScreen(prevScreen);
-	}
-	else if (prevScreen.compare("copy-sound") == 0)
-	{
-		auto copySoundScreen = mpc.screens->get<CopySoundScreen>("copy-sound");
-		copySoundScreen->setNewName(getNameWithoutSpaces());
 		openScreen(prevScreen);
 	}
     else
