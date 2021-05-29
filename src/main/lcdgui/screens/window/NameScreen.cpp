@@ -190,12 +190,6 @@ void NameScreen::saveName()
 	{
 		openScreen(prevScreen);
 	}
-	else if (prevScreen.compare("edit-sound") == 0)
-	{
-		auto editSoundScreen = mpc.screens->get<EditSoundScreen>("edit-sound");
-		editSoundScreen->setNewName(getNameWithoutSpaces());
-		openScreen(prevScreen);
-	}
 	else if (prevScreen.compare("resample") == 0)
 	{
 		if (sampler.lock()->isSoundNameOccupied(getNameWithoutSpaces()))

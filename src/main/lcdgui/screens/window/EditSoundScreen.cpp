@@ -357,6 +357,31 @@ void EditSoundScreen::setEndMargin(int i)
     displayEndMargin();
 }
 
+void EditSoundScreen::right()
+{
+    init();
+    
+    if (param.compare("new-name") == 0 && (edit == 2 || edit == 7))
+        openNameScreen();
+    else
+        ScreenComponent::right();
+}
+
+void EditSoundScreen::openNameScreen()
+{
+    auto nameScreen = mpc.screens->get<NameScreen>("name");
+    auto editSoundScreen = this;
+    nameScreen->setName(newName);
+
+    auto renamer = [editSoundScreen](string& newName1) {
+        editSoundScreen->setNewName(newName1);
+    };
+
+    nameScreen->setRenamerAndScreenToReturnTo(renamer, "edit-sound");
+    
+    openScreen("name");
+}
+
 void EditSoundScreen::turnWheel(int i)
 {
 	init();
@@ -367,11 +392,7 @@ void EditSoundScreen::turnWheel(int i)
 	}
 	else if (param.compare("new-name") == 0 && (edit == 2 || edit == 7))
 	{
-		auto nameScreen = mpc.screens->get<NameScreen>("name");
-		nameScreen->setName(findField("new-name").lock()->getText());
-		nameScreen->parameterName =  "newname";
-
-		openScreen("name");
+        openNameScreen();
 	}
 	else if (param.compare("new-name") == 0 && edit == 3)
 	{
