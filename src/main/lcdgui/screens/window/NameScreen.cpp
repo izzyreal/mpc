@@ -180,12 +180,6 @@ void NameScreen::saveName()
 		openScreen("save-a-sequence");
 		return;
 	}
-	else if (parameterName.compare("programname") == 0)
-	{
-		program.lock()->setName(getNameWithoutSpaces());
-		openScreen("program");
-		return;
-	}
 	else if (parameterName.compare("create-new-program") == 0)
 	{
 		auto createNewProgramScreen = mpc.screens->get<CreateNewProgramScreen>("create-new-program");

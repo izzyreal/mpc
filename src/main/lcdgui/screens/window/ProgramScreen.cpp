@@ -26,9 +26,15 @@ void ProgramScreen::turnWheel(int i)
 
 	if (param.compare("programname") == 0)
 	{
-		auto nameScreen = mpc.screens->get<NameScreen>("name");
-		nameScreen->setName(program.lock()->getName());
-		nameScreen->parameterName = param;
+        auto nameScreen = mpc.screens->get<NameScreen>("name");
+        const auto _program = program.lock();
+        nameScreen->setName(_program->getName());
+
+        auto renamer = [_program](string& newName) {
+            _program->setName(newName);
+        };
+
+        nameScreen->setRenamerAndScreenToReturnTo(renamer, "program");
         openScreen("name");
     }
 	else if (param.compare("midiprogramchange") == 0)
