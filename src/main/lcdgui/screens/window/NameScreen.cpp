@@ -4,7 +4,6 @@
 #include <lcdgui/screens/window/MidiOutputScreen.hpp>
 #include <lcdgui/screens/window/MidiOutputScreen.hpp>
 #include <lcdgui/screens/window/EditSoundScreen.hpp>
-#include <lcdgui/screens/window/AutoChromaticAssignmentScreen.hpp>
 #include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
 #include <lcdgui/screens/dialog/CopySoundScreen.hpp>
 #include <lcdgui/screens/dialog/ResampleScreen.hpp>
@@ -177,14 +176,6 @@ void NameScreen::saveName()
 	else if (parameterName.compare("save-a-sequence") == 0)
 	{
 		openScreen("save-a-sequence");
-		return;
-	}
-	else if (parameterName.compare("autochrom") == 0)
-	{
-		auto autoChromaticAssignmentScreen = mpc.screens->get<AutoChromaticAssignmentScreen>("auto-chromatic-assignment");
-		autoChromaticAssignmentScreen->newName = getNameWithoutSpaces();
-		openScreen("auto-chromatic-assignment");
-		ls.lock()->setPreviousScreenName(mpc.getPreviousSamplerScreenName());
 		return;
 	}
 
