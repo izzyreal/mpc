@@ -1,8 +1,6 @@
 #include "NameScreen.hpp"
 
 #include <lcdgui/screens/LoadScreen.hpp>
-#include <lcdgui/screens/window/MidiOutputScreen.hpp>
-#include <lcdgui/screens/window/MidiOutputScreen.hpp>
 #include <lcdgui/screens/window/EditSoundScreen.hpp>
 #include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
 #include <lcdgui/screens/dialog/CopySoundScreen.hpp>
@@ -190,12 +188,6 @@ void NameScreen::saveName()
 	}
     else if (prevScreen.compare("save-a-sequence") == 0)
 	{
-		openScreen(prevScreen);
-	}
-	else if (prevScreen.compare("midi-output") == 0)
-	{
-		auto midiOutputScreen = mpc.screens->get<MidiOutputScreen>("midi-output");
-		sequencer.lock()->getActiveSequence().lock()->setDeviceName(midiOutputScreen->getDeviceNumber() + 1, getNameWithoutSpaces().substr(0, 8));
 		openScreen(prevScreen);
 	}
 	else if (prevScreen.compare("edit-sound") == 0)
