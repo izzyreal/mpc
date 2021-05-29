@@ -45,6 +45,7 @@ class StereoToMonoScreen;
 class MonoToStereoScreen;
 class FileExistsScreen;
 class ResampleScreen;
+class CreateNewProgramScreen;
 }
 
 namespace mpc::lcdgui::screens::window
@@ -101,6 +102,7 @@ private:
     friend class mpc::lcdgui::screens::dialog::MonoToStereoScreen;
     friend class mpc::lcdgui::screens::dialog::FileExistsScreen;
     friend class mpc::lcdgui::screens::dialog::ResampleScreen;
+    friend class mpc::lcdgui::screens::dialog::CreateNewProgramScreen;
     friend class SequenceScreen;
     friend class SongWindow;
     friend class SoundScreen;
