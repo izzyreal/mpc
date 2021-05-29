@@ -12,6 +12,7 @@ namespace mpc::lcdgui::screens::window {
 		void turnWheel(int j) override;
 		void function(int j) override;
 		void open() override;
+        void right() override;
 
 		void setNewName(std::string s);
 
@@ -26,8 +27,8 @@ namespace mpc::lcdgui::screens::window {
 		void displayCreateNewProgram();
 		void displayEndMargin();
 		void displayVariable();
-
-	private:
+        void openNameScreen();
+        
 		int edit = 0;
 		int insertSoundIndex = 0;
 		int timeStretchRatio = 10000;

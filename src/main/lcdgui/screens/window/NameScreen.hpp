@@ -1,6 +1,8 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
+#include <functional>
+
 namespace mpc::controls
 {
 class BaseControls;
@@ -43,6 +45,7 @@ class StereoToMonoScreen;
 class MonoToStereoScreen;
 class FileExistsScreen;
 class ResampleScreen;
+class CreateNewProgramScreen;
 }
 
 namespace mpc::lcdgui::screens::window
@@ -64,30 +67,31 @@ public:
     void pressEnter() override;
     
 private:
+    const std::vector<std::string> saveScreens = { "save-a-program", "save-a-sequence", "save-all-file", "save-a-sound" };
+    
     void drawUnderline();
     void initEditColors();
-    void resetNameScreen();
     void saveName();
     void displayName();
-    
     std::weak_ptr<mpc::lcdgui::Underline> findUnderline();
     
-private:
-    std::string name = "";
-    bool editing{ false };
-    std::string parameterName = "";
-    int nameLimit{ 0 };
-    std::string originalName = "";
-    
-private:
     void setName(std::string name);
     void setNameLimit(int i);
     void setName(std::string str, int i);
-    std::string getName();
+    std::string getNameWithoutSpaces();
     void changeNameCharacter(int i, bool up);
+    void setRenamerAndScreenToReturnTo(const std::function<void(std::string&)>&, const std::string&);
+    
+    std::function<void(std::string&)> renamer = [](std::string&){};
+    std::string screenToReturnTo = "";
+    
+    std::string name = "";
+    bool editing = false;
+    std::string parameterName = "";
+    int nameLimit = 0;
+    std::string originalName = "";
     
     friend class mpc::controls::BaseControls;
-
     friend class EditSoundScreen;
     friend class KeepOrRetryScreen;
     friend class SaveAllFileScreen;
@@ -100,6 +104,7 @@ private:
     friend class mpc::lcdgui::screens::dialog::MonoToStereoScreen;
     friend class mpc::lcdgui::screens::dialog::FileExistsScreen;
     friend class mpc::lcdgui::screens::dialog::ResampleScreen;
+    friend class mpc::lcdgui::screens::dialog::CreateNewProgramScreen;
     friend class SequenceScreen;
     friend class SongWindow;
     friend class SoundScreen;

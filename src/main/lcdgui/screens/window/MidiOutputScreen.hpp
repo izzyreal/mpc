@@ -10,6 +10,7 @@ namespace mpc::lcdgui::screens::window {
 	public:
 		void turnWheel(int i) override;
 		void function(int i) override;
+        void right() override;
 
 	public:
 		MidiOutputScreen(mpc::Mpc& mpc, const int layerIndex);
@@ -25,10 +26,10 @@ namespace mpc::lcdgui::screens::window {
 		void displayDeviceName();
 		void setSoftThru(int i);
 		void setDeviceIndex(int i);
+        void openNameScreen();
 
 	public:
 		int getSoftThru();
-		int getDeviceNumber();
 
 	};
 }

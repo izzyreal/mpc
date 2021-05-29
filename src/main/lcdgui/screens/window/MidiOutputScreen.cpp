@@ -31,19 +31,40 @@ void MidiOutputScreen::open()
 	displayDeviceName();
 }
 
+void MidiOutputScreen::openNameScreen()
+{
+    auto seq = sequencer.lock()->getActiveSequence().lock();
+    auto nameScreen = mpc.screens->get<NameScreen>("name");
+    auto renameDeviceIndex = deviceIndex == 0 ? 1 : deviceIndex + 1;
+    nameScreen->setName(seq->getDeviceName(renameDeviceIndex));
+    nameScreen->setNameLimit(8);
+    
+    auto _sequencer = sequencer.lock();
+    
+    auto renamer = [_sequencer, renameDeviceIndex](string& newName) {
+        _sequencer->getActiveSequence().lock()->setDeviceName(renameDeviceIndex, newName);
+    };
+    
+    nameScreen->setRenamerAndScreenToReturnTo(renamer, "midi-output");
+    openScreen("name");
+}
+
+void MidiOutputScreen::right()
+{
+    init();
+    if (param.compare("firstletter") == 0)
+        openNameScreen();
+    else
+        ScreenComponent::right();
+}
+
 void MidiOutputScreen::turnWheel(int i)
 {
 	init();
-	
-	auto seq = sequencer.lock()->getActiveSequence().lock();
-	
+		
 	if (param.compare("firstletter") == 0)
 	{
-		auto nameScreen = mpc.screens->get<NameScreen>("name");
-		nameScreen->setName(seq->getDeviceName(deviceIndex + i));
-		nameScreen->parameterName = "devicename";
-		nameScreen->setNameLimit(8);
-		openScreen("name");
+        openNameScreen();
 	}
 	else if (param.compare("softthru") == 0)
 	{
@@ -115,9 +136,3 @@ void MidiOutputScreen::setDeviceIndex(int i)
 	deviceIndex = i;
 	displayDeviceName();
 }
-
-int MidiOutputScreen::getDeviceNumber()
-{
-	return deviceIndex;
-}
-

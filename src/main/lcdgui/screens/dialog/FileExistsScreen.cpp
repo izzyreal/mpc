@@ -10,10 +10,17 @@
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/window/SaveASoundScreen.hpp>
 #include <lcdgui/screens/window/NameScreen.hpp>
+#include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
-using namespace mpc::lcdgui;
+#include <lang/StrUtil.hpp>
+
 using namespace mpc::lcdgui::screens::dialog;
+using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::lcdgui::screens::window;
+
+using namespace moduru::lang;
+
 using namespace std;
 
 FileExistsScreen::FileExistsScreen(mpc::Mpc& mpc, const int layerIndex) 
@@ -34,7 +41,7 @@ void FileExistsScreen::function(int i)
 
 		if (ls.lock()->getPreviousScreenName().compare("save-a-program") == 0)
 		{
-			auto pfileName = mpc::Util::getFileName(nameScreen->getName()) + ".PGM";
+			auto pfileName = mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) + ".PGM";
 			auto success = disk->getFile(pfileName)->del();
 
 			if (success)
@@ -46,7 +53,7 @@ void FileExistsScreen::function(int i)
 		}
 		else if (ls.lock()->getPreviousScreenName().compare("save-a-sequence") == 0)
 		{
-			auto sfileName = mpc::Util::getFileName(nameScreen->getName()) + ".MID";
+			auto sfileName = mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) + ".MID";
 			auto success = disk->getFile(sfileName)->del();
 
 			if (success)
@@ -60,7 +67,7 @@ void FileExistsScreen::function(int i)
 		}
 		else if (ls.lock()->getPreviousScreenName().compare("save-aps-file") == 0)
 		{
-			auto apsName = mpc::Util::getFileName(nameScreen->getName()) + ".APS";
+			auto apsName = mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) + ".APS";
 			auto success = disk->getFile(apsName)->del();
 			
 			if (success)
@@ -68,11 +75,15 @@ void FileExistsScreen::function(int i)
 				disk->flush();
 				disk->initFiles();
 				apsSaver = make_unique<mpc::disk::ApsSaver>(mpc, apsName);
+                auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+                popupScreen->setText("Saving " + StrUtil::padRight(nameScreen->getNameWithoutSpaces(), " ", 16) + ".APS");
+                popupScreen->returnToScreenAfterMilliSeconds("save", 200);
+                openScreen("popup");
 			}
 		}
 		else if (ls.lock()->getPreviousScreenName().compare("save-all-file") == 0)
 		{
-			auto allName = mpc::Util::getFileName(nameScreen->getName()) + ".ALL";
+			auto allName = mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) + ".ALL";
 			disk->initFiles();
 			auto success = disk->getFile(allName)->del();
 			
@@ -80,13 +91,16 @@ void FileExistsScreen::function(int i)
 			{
 				disk->flush();
 				disk->initFiles();
-				auto allParser = mpc::file::all::AllParser(mpc, mpc::Util::getFileName(nameScreen->getName()));
+				auto allParser = mpc::file::all::AllParser(mpc, mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()));
 				auto f = disk->newFile(allName);
 				auto bytes = allParser.getBytes();
 				f->setFileData(&bytes);
 				disk->flush();
 				disk->initFiles();
-				openScreen("save");
+                auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+                popupScreen->setText("         Saving ...");
+                popupScreen->returnToScreenAfterMilliSeconds("save", 200);
+                openScreen("popup");
 			}
 		}
 		else if (ls.lock()->getPreviousScreenName().compare("save-a-sound") == 0)
@@ -98,7 +112,7 @@ void FileExistsScreen::function(int i)
 			auto type = saveASoundScreen->fileType;
 
 			auto ext = string(type == 0 ? ".SND" : ".WAV");
-			auto fileName = mpc::Util::getFileName(nameScreen->getName()) + ext;
+			auto fileName = mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) + ext;
 
 			disk->getFile(fileName)->del();
 			disk->flush();
@@ -121,14 +135,44 @@ void FileExistsScreen::function(int i)
 	{
 		auto nameScreen = mpc.screens->get<NameScreen>("name");
 
-		vector<string> screens{ "save-a-program", "save-a-sequence", "save-aps-file", "save-all-file", "save-a-sound" };
+		vector<string> screens{ "save-a-program", "save-a-sequence", "save-a-sound" };
 
 		auto previousScreen = ls.lock()->getPreviousScreenName();
+        
+        if (previousScreen.compare("save-aps-file") == 0)
+        {
+            const auto renamer = [&](const string& newName) {
+                const auto apsName = newName + ".APS";
+                
+                auto disk = mpc.getDisk().lock();
 
-		if (find(begin(screens), end(screens), nameScreen->parameterName) != end(screens))
-			openScreen("name");
-
-		if (find(begin(screens), end(screens), previousScreen) != end(screens))
+                if (disk->checkExists(apsName))
+                {
+                    openScreen("file-exists");
+                    mpc.getLayeredScreen().lock()->setPreviousScreenName("save-aps-file");
+                    return;
+                }
+                
+                mpc::disk::ApsSaver apsSaver(mpc, mpc::Util::getFileName(apsName));
+                
+                auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+                popupScreen->setText("Saving " + StrUtil::padRight(newName, " ", 16) + ".APS");
+                popupScreen->returnToScreenAfterMilliSeconds("save", 200);
+                openScreen("popup");
+            };
+            
+            nameScreen->setRenamerAndScreenToReturnTo(renamer, "");
+            openScreen("name");
+        }
+        else if (previousScreen.compare("save-all-file") == 0)
+        {
+            openScreen(previousScreen);
+        }
+		else if (find(begin(screens), end(screens), nameScreen->parameterName) != end(screens))
+        {
+            openScreen("name");
+        }
+		else if (find(begin(screens), end(screens), previousScreen) != end(screens))
 		{
 			nameScreen->parameterName = previousScreen;
 			openScreen("name");

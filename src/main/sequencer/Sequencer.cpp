@@ -299,16 +299,6 @@ weak_ptr<Sequence> Sequencer::getSequence(int i)
     return sequences[i];
 }
 
-string Sequencer::getDefaultSongName()
-{
-    return defaultSongName;
-}
-
-void Sequencer::setDefaultSongName(string s)
-{
-    defaultSongName = s;
-}
-
 string Sequencer::getDefaultSequenceName()
 {
 	return defaultSequenceName;

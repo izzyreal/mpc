@@ -27,7 +27,16 @@ void SoundScreen::turnWheel(int i)
 	{
 		auto nameScreen = mpc.screens->get<NameScreen>("name");
 		nameScreen->setName(findField("soundname").lock()->getText());
-		nameScreen->parameterName = "soundname";
+        const auto _sampler = sampler.lock();
+        
+        auto renamer = [_sampler](string& newName) {
+            if (_sampler->isSoundNameOccupied(newName))
+                return;
+
+            _sampler->getSound().lock()->setName(newName);
+        };
+
+        nameScreen->setRenamerAndScreenToReturnTo(renamer, "sound");
 		openScreen("name");
 	}
 }

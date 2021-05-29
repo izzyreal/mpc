@@ -16,15 +16,9 @@ using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
 ApsSaver::ApsSaver(mpc::Mpc& mpc, string apsFileName)
-	: mpc(mpc)
+	: mpc (mpc), apsFileName (apsFileName)
 {
-	this->apsFileName = apsFileName;
-	auto disk = mpc.getDisk().lock();
-
-	if (disk->checkExists(apsFileName))
-		mpc.getLayeredScreen().lock()->openScreen("file-exists");
-	else
-		saveAps();
+    saveAps();
 }
 
 void ApsSaver::saveAps()

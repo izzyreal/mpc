@@ -15,7 +15,7 @@ namespace mpc::lcdgui::screens::dialog2
 
 	public:
 		PopupScreen(mpc::Mpc& mpc);
-		~PopupScreen();
+		~PopupScreen() override;
 
 		void close() override;
 
@@ -26,10 +26,10 @@ namespace mpc::lcdgui::screens::dialog2
 		void right() override { openScreen(returnToAfterInteractionScreen); }
 		void up() override { openScreen(returnToAfterInteractionScreen); }
 		void down() override { openScreen(returnToAfterInteractionScreen); }
-		void function(int i) override { openScreen(returnToAfterInteractionScreen); }
+		void function(int) override { openScreen(returnToAfterInteractionScreen); }
 		void openWindow() override { openScreen(returnToAfterInteractionScreen); }
-		void turnWheel(int i) override { openScreen(returnToAfterInteractionScreen); }
-		void numpad(int i) override { openScreen(returnToAfterInteractionScreen); }
+		void turnWheel(int) override { openScreen(returnToAfterInteractionScreen); }
+		void numpad(int) override { openScreen(returnToAfterInteractionScreen); }
 		void pressEnter() override { openScreen(returnToAfterInteractionScreen); }
 		void rec() override { openScreen(returnToAfterInteractionScreen); }
 		void overDub() override { openScreen(returnToAfterInteractionScreen); }
@@ -45,7 +45,7 @@ namespace mpc::lcdgui::screens::dialog2
 		void nextBarEnd() override { openScreen(returnToAfterInteractionScreen); }
 		void nextSeq() override { openScreen(returnToAfterInteractionScreen); }
 		void trackMute() override { openScreen(returnToAfterInteractionScreen); }
-		void bank(int i) override { openScreen(returnToAfterInteractionScreen); }
+		void bank(int) override { openScreen(returnToAfterInteractionScreen); }
 		void fullLevel() override { openScreen(returnToAfterInteractionScreen); }
 		void sixteenLevels() override { openScreen(returnToAfterInteractionScreen); }
 		void after() override { openScreen(returnToAfterInteractionScreen); }

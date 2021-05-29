@@ -1,8 +1,11 @@
 #include "CreateNewProgramScreen.hpp"
 
+#include <lcdgui/screens/window/NameScreen.hpp>
+
 #include <mpc/MpcSoundPlayerChannel.hpp>
 
 using namespace mpc::lcdgui::screens::dialog;
+using namespace mpc::lcdgui::screens::window;
 using namespace mpc::controls;
 using namespace std;
 
@@ -16,25 +19,43 @@ void CreateNewProgramScreen::turnWheel(int i)
 	init();
 
 	if (param.compare("midi-program-change") == 0)
-		setMidiProgramChange(midiProgramChange + i);
+    {
+        setMidiProgramChange(midiProgramChange + i);
+    }
+    else if (param.compare("new-name") == 0)
+    {
+        auto nameScreen = mpc.screens->get<NameScreen>("name");
+        auto createNewProgramScreen = this;
+        nameScreen->setName(newName);
+
+        auto renamer = [createNewProgramScreen](string& newName1) {
+            createNewProgramScreen->newName = newName1;
+        };
+
+        nameScreen->setRenamerAndScreenToReturnTo(renamer, "create-new-program");
+        openScreen("name");
+    }
 }
 
 void CreateNewProgramScreen::open()
 {
-	auto letterIndex = 21 + 24;
-
-	for (int i = 0; i < sampler.lock()->getPrograms().size(); i++)
-	{
-		if (!sampler.lock()->getProgram(i).lock())
-		{
-			letterIndex = 21 + i;
-			midiProgramChange = i + 1;
-			break;
-		}
-	}
-
-	newName = "NewPgm-" + mpc::Mpc::akaiAscii[letterIndex];
-	
+    if (ls.lock()->getPreviousScreenName().compare("name") != 0)
+    {
+        auto letterIndex = 21 + 24;
+        
+        for (int i = 0; i < sampler.lock()->getPrograms().size(); i++)
+        {
+            if (!sampler.lock()->getProgram(i).lock())
+            {
+                letterIndex = 21 + i;
+                midiProgramChange = i + 1;
+                break;
+            }
+        }
+        
+        newName = "NewPgm-" + mpc::Mpc::akaiAscii[letterIndex];
+    }
+    
 	init();
 
 	displayNewName();
@@ -85,7 +106,7 @@ void CreateNewProgramScreen::displayNewName()
 void CreateNewProgramScreen::setMidiProgramChange(int i)
 {
 	if (i < 1) i = 1;
-    if (i > 128) i = 128;
+    else if (i > 128) i = 128;
 
 	if (midiProgramChange == i)
 		return;

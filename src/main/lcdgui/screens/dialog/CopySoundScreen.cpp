@@ -18,7 +18,6 @@ void CopySoundScreen::open()
 	if (previousScreenName.compare("name") != 0 && sampler.lock()->getSound().lock())
 	{
 		newName = sampler.lock()->getSound().lock()->getName();
-		//newSampleName = newSampleName->replaceAll("\\s+$", "");
 		newName = sampler.lock()->addOrIncreaseNumber(newName);
 	}
 	displaySnd();
@@ -31,7 +30,7 @@ void CopySoundScreen::function(int i)
 
 	switch (i)
 	{
-	case int(3) :
+	case 3:
 		openScreen("sound");
 		break;
 	case 4:
@@ -54,16 +53,21 @@ void CopySoundScreen::turnWheel(int i)
 	{
 		sampler.lock()->setSoundIndex(sampler.lock()->getNextSoundIndex(sampler.lock()->getSoundIndex(), i > 0));
 		auto newSampleName = sampler.lock()->getSoundName(sampler.lock()->getSoundIndex());
-		//newSampleName = newSampleName->replaceAll("\\s+$", "");
 		newSampleName = sampler.lock()->addOrIncreaseNumber(newSampleName);
 		setNewName(newSampleName);
 		displaySnd();
 	}
 	else if (param.compare("newname") == 0)
 	{
-		auto nameScreen = mpc.screens->get<NameScreen>("name");
-		nameScreen->setName(findField("newname").lock()->getText());
-		nameScreen->parameterName = "newname";
+		const auto nameScreen = mpc.screens->get<NameScreen>("name");
+        const auto copySoundScreen = this;
+		nameScreen->setName(newName);
+        
+        auto renamer = [copySoundScreen](string& newName) {
+            copySoundScreen->setNewName(newName);
+        };
+
+        nameScreen->setRenamerAndScreenToReturnTo(renamer, "copy-sound");
 		openScreen("name");
 	}
 }

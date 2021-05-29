@@ -761,27 +761,26 @@ string Sampler::addOrIncreaseNumber2(string s)
 	int candidate = getLastInt(s);
 	string res = s;
 	
-	if (candidate != INT_MIN)
+	if (candidate == INT_MIN)
 	{
-		auto candidateStr = to_string(candidate);
-		int candidateLength = candidateStr.length();
-
-		res = res.substr(0, res.length() - candidateLength);
-
-		candidate++;
-
-		candidateStr = to_string(candidate);
-		candidateLength = candidateStr.length();
-
-		if (res.length() + candidateLength > 16)
-			res = res.substr(0, 16 - candidateLength);
-
-		res += candidateStr;
+        if (res.length() == 16) res = res.substr(0, 15);
+        return res + to_string(1);
 	}
-	else
-	{
-		res = s + to_string(1);
-	}
+
+    auto candidateStr = to_string(candidate);
+    int candidateLength = candidateStr.length();
+
+    res = res.substr(0, res.length() - candidateLength);
+
+    candidate++;
+
+    candidateStr = to_string(candidate);
+    candidateLength = candidateStr.length();
+
+    if (res.length() + candidateLength > 16)
+        res = res.substr(0, 16 - candidateLength);
+
+    res += candidateStr;
 	return res;
 }
 

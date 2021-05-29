@@ -57,9 +57,15 @@ void MonoToStereoScreen::turnWheel(int i)
 	}
 	else if (param.compare("newstname") == 0)
 	{
-		auto nameScreen = mpc.screens->get<NameScreen>("name");
+		const auto nameScreen = mpc.screens->get<NameScreen>("name");
+        const auto monoToStereoScreen = this;
 		nameScreen->setName(newStName);
-		nameScreen->parameterName = param;
+        
+        auto renamer = [monoToStereoScreen](string& newName) {
+            monoToStereoScreen->newStName = newName;
+        };
+
+        nameScreen->setRenamerAndScreenToReturnTo(renamer, "mono-to-stereo");
 		openScreen("name");
 	}
 }
@@ -109,8 +115,8 @@ void MonoToStereoScreen::function(int j)
 
 		auto newSound = sampler.lock()->addSound(left->getSampleRate()).lock();
 		newSound->setName(newStName);
-		newSound->setMono(false);
 		sampler.lock()->mergeToStereo(left->getSampleData(), &newSampleDataRight, newSound->getSampleData());
+        newSound->setMono(false);
 		openScreen("sound");
 	}
 	}
