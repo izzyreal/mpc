@@ -40,16 +40,18 @@ void StereoToMonoScreen::turnWheel(int i)
 		sampler.lock()->setSoundIndex(sampler.lock()->getNextSoundIndex(sampler.lock()->getSoundIndex(), i > 0));
 		displayStereoSource();
 	}
-	else if (param.compare("newlname") == 0)
+	else if (param.compare("newlname") == 0 || param.compare("newrname") == 0)
 	{
-		nameScreen->setName(findField("newlname").lock()->getText());
-		nameScreen->parameterName = "newlname";
-		openScreen("name");
-	}
-	else if (param.compare("newrname") == 0)
-	{
-		nameScreen->setName(findField("newrname").lock()->getText());
-		nameScreen->parameterName = "newrname";
+        const auto stereoToMonoScreen = this;
+        const auto isL = param.compare("newlname") == 0;
+        
+        nameScreen->setName(isL ? newLName : newRName);
+        auto renamer = [isL, stereoToMonoScreen](string& newName) {
+            if (isL) stereoToMonoScreen->setNewLName(newName);
+            else stereoToMonoScreen->setNewRName(newName);
+        };
+
+        nameScreen->setRenamerAndScreenToReturnTo(renamer, "stereo-to-mono");
 		openScreen("name");
 	}
 }

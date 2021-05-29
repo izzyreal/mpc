@@ -3,8 +3,6 @@
 #include <lcdgui/screens/LoadScreen.hpp>
 #include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
 #include <lcdgui/screens/dialog/CopySoundScreen.hpp>
-#include <lcdgui/screens/dialog/StereoToMonoScreen.hpp>
-#include <lcdgui/screens/dialog/MonoToStereoScreen.hpp>
 #include <lcdgui/screens/dialog/CreateNewProgramScreen.hpp>
 #include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
@@ -181,26 +179,6 @@ void NameScreen::saveName()
 	}
     else if (prevScreen.compare("save-a-sequence") == 0)
 	{
-		openScreen(prevScreen);
-	}
-	else if (prevScreen.compare("stereo-to-mono") == 0)
-	{
-		auto stereoToMonoScreen = mpc.screens->get<StereoToMonoScreen>("stereo-to-mono");
-
-		if (parameterName.compare("newlname") == 0)
-			stereoToMonoScreen->setNewLName(getNameWithoutSpaces());
-
-		else if (parameterName.compare("newrname") == 0)
-			stereoToMonoScreen->setNewRName(getNameWithoutSpaces());
-
-		openScreen(prevScreen);
-	}
-	else if (prevScreen.compare("mono-to-stereo") == 0)
-	{
-		auto monoToStereoScreen = mpc.screens->get<MonoToStereoScreen>("mono-to-stereo");
-
-		monoToStereoScreen->newStName = getNameWithoutSpaces();
-
 		openScreen(prevScreen);
 	}
 	else if (prevScreen.compare("copy-sound") == 0)
