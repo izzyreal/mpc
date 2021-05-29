@@ -1,7 +1,6 @@
 #include "NameScreen.hpp"
 
 #include <lcdgui/screens/LoadScreen.hpp>
-#include <lcdgui/screens/window/DirectoryScreen.hpp>
 #include <lcdgui/screens/window/MidiOutputScreen.hpp>
 #include <lcdgui/screens/window/MidiOutputScreen.hpp>
 #include <lcdgui/screens/window/EditSoundScreen.hpp>
@@ -56,7 +55,7 @@ void NameScreen::open()
 
 void NameScreen::close()
 {
-	ls.lock()->setFocus("0");
+    ls.lock()->setLastFocus("name", "0");
     editing = false;
     parameterName = "";
 }
@@ -194,102 +193,6 @@ void NameScreen::saveName()
 		openScreen("auto-chromatic-assignment");
 		ls.lock()->setPreviousScreenName(mpc.getPreviousSamplerScreenName());
 		return;
-	}
-	else if (parameterName.compare("rename") == 0)
-	{
-		auto directoryScreen = mpc.screens->get<DirectoryScreen>("directory");
-		auto file = directoryScreen->getSelectedFile();
-		auto ext = mpc::Util::splitName(file->getName())[1];
-		
-		if (ext.length() > 0)
-			ext = "." + ext;
-
-		auto disk = mpc.getDisk().lock();
-
-		auto newName = StrUtil::trim(StrUtil::toUpper(getNameWithoutSpaces())) + ext;
-		auto success = file->setName(newName);
-
-		if (!success)
-		{
-			openScreen("popup");
-			auto popupScreen = mpc.screens->get<PopupScreen>("popup");
-			popupScreen->setText("File name exists !!");
-			ls.lock()->setPreviousScreenName("directory");
-			return;
-		}
-		else
-		{
-			disk->flush();
-
-			if (file->isDirectory() && directoryScreen->getXPos() == 0)
-			{
-				disk->moveBack();
-				disk->initFiles();
-				disk->moveForward(newName);
-				disk->initFiles();
-
-				auto parentFileNames = disk->getParentFileNames();
-				auto it = find(begin(parentFileNames), end(parentFileNames), newName);
-
-				auto index = distance(begin(parentFileNames), it);
-
-				if (index > 4)
-				{
-					directoryScreen->setYOffset0(index - 5);
-					directoryScreen->setYPos0(4);
-				}
-				else
-				{
-					directoryScreen->setYOffset0(0);
-					directoryScreen->setYPos0(index);
-				}
-			}
-
-			disk->initFiles();
-			openScreen("directory");
-			return;
-		}
-	}
-	else if (parameterName.compare("newfolder") == 0)
-	{
-		auto disk = mpc.getDisk().lock();
-		bool success = disk->newFolder(StrUtil::toUpper(getNameWithoutSpaces()));
-
-		if (success)
-		{
-			disk->flush();
-			disk->initFiles();
-			auto counter = 0;
-
-			for (int i = 0; i < disk->getFileNames().size(); i++)
-			{
-				if (disk->getFileName(i).compare(StrUtil::toUpper(getNameWithoutSpaces())) == 0)
-				{
-					auto loadScreen = mpc.screens->get<LoadScreen>("load");
-					loadScreen->setFileLoad(counter);
-
-					auto directoryScreen = mpc.screens->get<DirectoryScreen>("directory");
-
-					if (counter > 4)
-						directoryScreen->yOffset1 = counter - 4;
-					else
-						directoryScreen->yOffset1 = 0;
-
-					break;
-				}
-				counter++;
-			}
-
-			openScreen("directory");
-			ls.lock()->setPreviousScreenName("load");
-		}
-
-		if (!success)
-		{
-			openScreen("popup");
-			auto popupScreen = mpc.screens->get<PopupScreen>("popup");
-			popupScreen->setText("Folder name exists !!");
-		}
 	}
 
 	if (prevScreen.compare("save-aps-file") == 0)

@@ -61,6 +61,10 @@ void DirectoryScreen::function(int f)
 	
 	auto loadScreen = mpc.screens->get<LoadScreen>("load");
 	auto nameScreen = mpc.screens->get<NameScreen>("name");
+    auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+    auto directoryScreen = this;
+    auto ls = mpc.getLayeredScreen().lock();
+    auto disk = mpc.getDisk().lock();
 
 	switch (f)
 	{
@@ -76,28 +80,113 @@ void DirectoryScreen::function(int f)
 		break;
 	case 2:
 	{
-		if (!getSelectedFile())
-			return;
+        auto file = getSelectedFile();
+        
+        if (!file) return;
 
-		auto fileNameNoExt = mpc::Util::splitName(getSelectedFile()->getName())[0];
-		nameScreen->setName(fileNameNoExt);
+        auto renamer = [file, disk, ls, popupScreen, directoryScreen](string& newName) {
+            auto ext = mpc::Util::splitName(file->getName())[1];
+            
+            if (ext.length() > 0) ext = "." + ext;
+
+            const auto finalNewName = StrUtil::trim(StrUtil::toUpper(newName)) + ext;
+            const auto success = file->setName(finalNewName);
+
+            if (!success)
+            {
+                ls->openScreen("popup");
+                popupScreen->setText("File name exists !!");
+                ls->setPreviousScreenName("directory");
+                return;
+            }
+
+            disk->flush();
+            
+            if (file->isDirectory() && directoryScreen->getXPos() == 0)
+            {
+                disk->moveBack();
+                disk->initFiles();
+                disk->moveForward(newName);
+                disk->initFiles();
+                
+                auto parentFileNames = disk->getParentFileNames();
+                auto it = find(begin(parentFileNames), end(parentFileNames), newName);
+                
+                auto index = distance(begin(parentFileNames), it);
+                
+                if (index > 4)
+                {
+                    directoryScreen->setYOffset0(index - 5);
+                    directoryScreen->setYPos0(4);
+                }
+                else
+                {
+                    directoryScreen->setYOffset0(0);
+                    directoryScreen->setYPos0(index);
+                }
+            }
+            
+            disk->initFiles();
+        };
+
+        nameScreen->setRenamerAndScreenToReturnTo(renamer, "directory");
+
+        auto fileName = mpc::Util::splitName(getSelectedFile()->getName())[0];
+		nameScreen->setName(fileName);
 		
-		if (getSelectedFile()->isDirectory())
+		if (file->isDirectory())
 			nameScreen->setNameLimit(8);
 		
-		nameScreen->parameterName = "rename";
 		openScreen("name");
 		break;
 	}
 	case 4:
-		if (xPos == 0)
-			return;
+    {
+        if (xPos == 0) return;
+    
+        nameScreen->setName("NEWFOLDR");
+        nameScreen->setNameLimit(8);
+        
+        auto renamer = [ls, disk, loadScreen, directoryScreen, popupScreen](string& newName) {
+            bool success = disk->newFolder(StrUtil::toUpper(newName));
+            
+            if (!success)
+            {
+                ls->openScreen("popup");
+                popupScreen->setText("Folder name exists !!");
+                popupScreen->returnToScreenAfterMilliSeconds("name", 1000);
+                return;
+            }
+            
+            disk->flush();
+            disk->initFiles();
+            auto counter = 0;
+            
+            for (int i = 0; i < disk->getFileNames().size(); i++)
+            {
+                if (disk->getFileName(i).compare(StrUtil::toUpper(newName)) == 0)
+                {
+                    loadScreen->setFileLoad(counter);
+                    
+                    if (counter > 4)
+                        directoryScreen->yOffset1 = counter - 4;
+                    else
+                        directoryScreen->yOffset1 = 0;
+                    
+                    break;
+                }
+                counter++;
+            }
+            
+            ls->openScreen("directory");
+            ls->setPreviousScreenName("load");
+        };
 
-		nameScreen->setName("NEWFOLDR");
-		nameScreen->setNameLimit(8);
-		nameScreen->parameterName = "newfolder";
-		openScreen("name");
-		break;
+        nameScreen->setRenamerAndScreenToReturnTo(renamer, "");
+        
+        openScreen("name");
+        break;
+    }
 	case 5:
 	{
 		auto controls = mpc.getControls().lock();
