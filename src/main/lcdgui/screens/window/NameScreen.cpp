@@ -1,23 +1,11 @@
 #include "NameScreen.hpp"
 
-#include <lcdgui/screens/LoadScreen.hpp>
-#include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
-#include <lcdgui/screens/dialog/CreateNewProgramScreen.hpp>
-#include <lcdgui/screens/dialog2/PopupScreen.hpp>
-
 #include <lcdgui/Underline.hpp>
 
-#include <Util.hpp>
-
-#include <disk/AbstractDisk.hpp>
-#include <disk/MpcFile.hpp>
-
-using namespace mpc::lcdgui;
-using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
-using namespace mpc::lcdgui::screens::dialog;
-using namespace mpc::lcdgui::screens::dialog2;
+using namespace mpc::lcdgui;
 using namespace std;
+
 using namespace moduru::lang;
 
 NameScreen::NameScreen(mpc::Mpc& mpc, const int layerIndex)
@@ -126,12 +114,11 @@ void NameScreen::function(int i)
 	{
     case 3:
 	{
-		name = originalName;
-
-		vector<string> screens{ "save-a-program", "save-a-sequence", "save-aps-file", "save-all-file", "save-a-sound" };
-
-		if (find(begin(screens), end(screens), parameterName) != end(screens))
-			openScreen(parameterName);
+		if (find(begin(saveScreens), end(saveScreens), parameterName) != end(saveScreens))
+        {
+            name = originalName;
+            openScreen(parameterName);
+        }
 		else
 			openScreen(ls.lock()->getPreviousScreenName());
 		break;
@@ -148,38 +135,11 @@ void NameScreen::pressEnter()
 }
 
 void NameScreen::saveName()
-{	
-	auto prevScreen = ls.lock()->getPreviousScreenName();
-
-    if (parameterName.compare("save-all-file") == 0)
-	{
-		openScreen("save-all-file");
-		return;
-	}
-	else if (parameterName.compare("save-a-sound") == 0)
-	{
-		openScreen("save-a-sound");
-		return;
-	}
-	else if (parameterName.compare("save-a-program") == 0)
-	{
-		openScreen("save-a-program");
-		return;
-	}
-	else if (parameterName.compare("save-a-sequence") == 0)
-	{
-		openScreen("save-a-sequence");
-		return;
-	}
-
-	if (prevScreen.compare("save-aps-file") == 0)
-	{
-		openScreen(prevScreen);
-	}
-    else if (prevScreen.compare("save-a-sequence") == 0)
-	{
-		openScreen(prevScreen);
-	}
+{
+    if (find(begin(saveScreens), end(saveScreens), parameterName) != end(saveScreens))
+    {
+        openScreen(parameterName);
+    }
     else
     {
         auto newName = getNameWithoutSpaces();

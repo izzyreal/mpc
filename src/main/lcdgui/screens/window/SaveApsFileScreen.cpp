@@ -36,7 +36,6 @@ void SaveApsFileScreen::turnWheel(int i)
 
 	if (param.compare("file") == 0)
 	{
-		nameScreen->parameterName = "saveapsname";
 		openScreen("name");
 	}
 	else if (param.compare("save") == 0)

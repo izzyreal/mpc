@@ -58,7 +58,7 @@ void SaveASoundScreen::function(int i)
 		auto disk = mpc.getDisk().lock();
 		auto s = sampler.lock()->getSound().lock();
 		auto ext = string(fileType == 0 ? ".SND" : ".WAV");
-		auto fileName = mpc::Util::getFileName(mpc.screens->get<NameScreen>("name")->getName()) + ext;
+		auto fileName = mpc::Util::getFileName(mpc.screens->get<NameScreen>("name")->getNameWithoutSpaces()) + ext;
 
 		if (disk->checkExists(fileName))
 		{
@@ -100,5 +100,5 @@ void SaveASoundScreen::displayFileType()
 
 void SaveASoundScreen::displayFile()
 {
-	findField("file").lock()->setText(mpc.screens->get<NameScreen>("name")->getName());
+	findField("file").lock()->setText(mpc.screens->get<NameScreen>("name")->getNameWithoutSpaces());
 }

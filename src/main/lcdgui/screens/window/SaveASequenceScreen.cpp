@@ -30,7 +30,7 @@ void SaveASequenceScreen::turnWheel(int i)
 	else if (param.compare("file") == 0)
 	{
 		auto nameScreen = mpc.screens->get<NameScreen>("name");
-		nameScreen->parameterName = "savesequencename";
+		nameScreen->parameterName = "save-a-sequence";
 		openScreen("name");
 	}
 }
