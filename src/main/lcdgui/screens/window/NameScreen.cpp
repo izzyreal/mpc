@@ -3,7 +3,6 @@
 #include <lcdgui/screens/LoadScreen.hpp>
 #include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
 #include <lcdgui/screens/dialog/CopySoundScreen.hpp>
-#include <lcdgui/screens/dialog/ResampleScreen.hpp>
 #include <lcdgui/screens/dialog/StereoToMonoScreen.hpp>
 #include <lcdgui/screens/dialog/MonoToStereoScreen.hpp>
 #include <lcdgui/screens/dialog/CreateNewProgramScreen.hpp>
@@ -182,15 +181,6 @@ void NameScreen::saveName()
 	}
     else if (prevScreen.compare("save-a-sequence") == 0)
 	{
-		openScreen(prevScreen);
-	}
-	else if (prevScreen.compare("resample") == 0)
-	{
-		if (sampler.lock()->isSoundNameOccupied(getNameWithoutSpaces()))
-			return;
-
-		auto resampleScreen = mpc.screens->get<ResampleScreen>("resample");
-		resampleScreen->setNewName(getNameWithoutSpaces());
 		openScreen(prevScreen);
 	}
 	else if (prevScreen.compare("stereo-to-mono") == 0)

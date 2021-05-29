@@ -53,8 +53,18 @@ void ResampleScreen::turnWheel(int i)
 	else if (param.compare("newname") == 0)
 	{
 		auto nameScreen = mpc.screens->get<NameScreen>("name");
+        auto resampleScreen = this;
+        auto _sampler = sampler.lock();
 		nameScreen->setName(findField("newname").lock()->getText());
-		nameScreen->parameterName = "newname";
+
+        auto renamer = [_sampler, resampleScreen](string& newName) {
+            if (_sampler->isSoundNameOccupied(newName))
+                return;
+
+            resampleScreen->setNewName(newName);
+        };
+
+        nameScreen->setRenamerAndScreenToReturnTo(renamer, "resample");
 		openScreen("name");
 	}
 }
