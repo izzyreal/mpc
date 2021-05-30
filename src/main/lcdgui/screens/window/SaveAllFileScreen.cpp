@@ -9,6 +9,7 @@
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
+using namespace mpc::file::all;
 using namespace moduru::lang;
 using namespace std;
 
@@ -24,33 +25,39 @@ void SaveAllFileScreen::open()
 
 void SaveAllFileScreen::displayFile()
 {
-	auto nameScreen = mpc.screens->get<NameScreen>("name");
+	if (fileName.length() == 0)
+    {
+        findField("file").lock()->setText("");
+        findLabel("file1").lock()->setText("");
+        return;
+    }
 
-	if (nameScreen->getNameWithoutSpaces().length() < 2)
-		return;
-
-	findField("file").lock()->setText(nameScreen->getNameWithoutSpaces().substr(0, 1));
-	findLabel("file1").lock()->setText(StrUtil::padRight(nameScreen->getNameWithoutSpaces().substr(1), " ", 15) + ".ALL");
+	findField("file").lock()->setText(fileName.substr(0, 1));
+    findLabel("file1").lock()->setText(StrUtil::padRight(fileName.substr(1), " ", 15) + ".ALL");
 }
 
 void SaveAllFileScreen::turnWheel(int i)
 {
 	init();
 
-	auto nameScreen = mpc.screens->get<NameScreen>("name");
-
 	if (param.compare("file") == 0)
 	{
-		nameScreen->parameterName = "save-all-file";
-		openScreen("name");
+        const auto nameScreen = mpc.screens->get<NameScreen>("name");
+        const auto saveAllFileScreen = this;
+        
+        auto renamer = [saveAllFileScreen](string& newName) {
+            saveAllFileScreen->fileName = newName;
+        };
+
+        nameScreen->setName(fileName);
+        nameScreen->setRenamerAndScreenToReturnTo(renamer, "save-all-file");
+        openScreen("name");
 	}
 }
 
 void SaveAllFileScreen::function(int i)
 {
 	init();
-
-	auto nameScreen = mpc.screens->get<NameScreen>("name");
 
 	switch (i)
 	{
@@ -59,19 +66,18 @@ void SaveAllFileScreen::function(int i)
 		break;
 	case 4:
 	{
-		auto allName = mpc::Util::getFileName(nameScreen->getNameWithoutSpaces());
-		auto existStr = allName + ".ALL";
-		
+		auto fileNameWithExt = fileName + ".ALL";
 		auto disk = mpc.getDisk().lock();
 
-		if (disk->checkExists(existStr))
+		if (disk->checkExists(fileNameWithExt))
 		{
 			openScreen("file-exists");
 			return;
 		}
 		
-		allParser = make_unique<mpc::file::all::AllParser>(mpc, mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()));
-		auto f = disk->newFile(allName + ".ALL");
+		allParser = make_unique<AllParser>(mpc, fileNameWithExt);
+		
+        auto f = disk->newFile(fileNameWithExt);
 		auto bytes = allParser->getBytes();
 		f->setFileData(&bytes);
 		disk->flush();

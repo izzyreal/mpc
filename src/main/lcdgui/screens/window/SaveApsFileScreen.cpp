@@ -36,7 +36,16 @@ void SaveApsFileScreen::turnWheel(int i)
 
 	if (param.compare("file") == 0)
 	{
-		openScreen("name");
+        const auto nameScreen = mpc.screens->get<NameScreen>("name");
+        const auto saveApsFileScreen = this;
+        
+        auto renamer = [saveApsFileScreen](string& newName) {
+            saveApsFileScreen->fileName = newName;
+        };
+
+        nameScreen->setName(fileName);
+        nameScreen->setRenamerAndScreenToReturnTo(renamer, "save-aps-file");
+        openScreen("name");
 	}
 	else if (param.compare("save") == 0)
 	{
@@ -62,7 +71,7 @@ void SaveApsFileScreen::function(int i)
 	case 4:
 	{
 		auto nameScreen = mpc.screens->get<NameScreen>("name");
-		string apsFileName = mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) + ".APS";
+		string apsFileName = fileName + ".APS";
         
         auto disk = mpc.getDisk().lock();
 
@@ -75,7 +84,7 @@ void SaveApsFileScreen::function(int i)
 		apsSaver = make_unique<mpc::disk::ApsSaver>(mpc, apsFileName);
         
         auto popupScreen = mpc.screens->get<PopupScreen>("popup");
-        popupScreen->setText("Saving " + StrUtil::padRight(nameScreen->getNameWithoutSpaces(), " ", 16) + ".APS");
+        popupScreen->setText("Saving " + StrUtil::padRight(fileName, " ", 16) + ".APS");
         popupScreen->returnToScreenAfterMilliSeconds("save", 200);
         openScreen("popup");
 		break;
@@ -86,7 +95,7 @@ void SaveApsFileScreen::function(int i)
 void SaveApsFileScreen::displayFile()
 {
 	auto nameScreen = mpc.screens->get<NameScreen>("name");
-	findField("file").lock()->setText(nameScreen->getNameWithoutSpaces());
+	findField("file").lock()->setText(fileName);
 }
 
 void SaveApsFileScreen::displaySave()

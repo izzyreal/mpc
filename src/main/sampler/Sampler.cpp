@@ -159,7 +159,7 @@ void Sampler::init()
 {
     initMasterPadAssign = Pad::getPadNotes(mpc);
 
-	auto program = addProgram().lock();;
+	auto program = addProgram().lock();
 	program->setName("NewPgm-A");
 	
 	for (int i = 0; i < 4; i++)
