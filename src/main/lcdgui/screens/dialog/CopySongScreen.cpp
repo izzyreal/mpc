@@ -87,7 +87,7 @@ void CopySongScreen::setSong1(int i)
 void CopySongScreen::displaySong0()
 {
 	auto songScreen = mpc.screens->get<SongScreen>("song");
-	auto song = sequencer.lock()->getSong(songScreen->activeSongIndex).lock();;
+	auto song = sequencer.lock()->getSong(songScreen->activeSongIndex).lock();
 	findField("song0").lock()->setText(StrUtil::padLeft(to_string(songScreen->activeSongIndex + 1), "0", 2) + "-" + song->getName());
 }
 

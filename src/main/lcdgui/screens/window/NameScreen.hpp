@@ -67,7 +67,7 @@ public:
     void pressEnter() override;
     
 private:
-    const std::vector<std::string> saveScreens = { "save-a-program", "save-a-sequence", "save-all-file", "save-a-sound" };
+    const std::vector<std::string> saveScreens = { "save-a-program", "save-a-sequence", "save-a-sound" };
     
     void drawUnderline();
     void initEditColors();
