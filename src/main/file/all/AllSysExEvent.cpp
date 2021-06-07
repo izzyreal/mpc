@@ -25,8 +25,6 @@ shared_ptr<Event> AllSysExEvent::bytesToMpcEvent(const vector<char>& bytes)
 	
     shared_ptr<Event> event;
 
-    event->setTrack(bytes[AllEvent::TRACK_OFFSET]);
-
     for (int i = 0; i < byteCount; i++)
 		sysexLoadData[i] = bytes[DATA_OFFSET + i];
 
@@ -51,7 +49,9 @@ shared_ptr<Event> AllSysExEvent::bytesToMpcEvent(const vector<char>& bytes)
 		//sysExEvent->setBytes(sysexLoadData);
         sysExEvent->setTick(AllEvent::readTick(bytes));
 	}
-        
+
+    event->setTrack(bytes[AllEvent::TRACK_OFFSET]);
+
     return event;
 }
 
