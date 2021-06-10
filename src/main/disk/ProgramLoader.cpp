@@ -117,7 +117,7 @@ void ProgramLoader::loadProgram(const int replaceIndex)
                         
             if (finalSoundIndices.find(noteParameters->getSoundIndex()) == end(finalSoundIndices)) continue;
             
-            auto finalSoundIndex = finalSoundIndices.at(noteParameters->getSoundIndex());
+            auto finalSoundIndex = finalSoundIndices[noteParameters->getSoundIndex()];
 
             noteParameters->setSoundIndex(finalSoundIndex);
         }

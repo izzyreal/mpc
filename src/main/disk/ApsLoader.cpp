@@ -173,7 +173,10 @@ void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool head
             
             auto srcNoteParams = apsProgram->getNoteParameters(noteIndex);
             
-            auto soundIndex = finalSoundIndices[srcNoteParams->getSoundNumber()];
+            auto soundIndex = srcNoteParams->getSoundNumber();
+            
+            if (soundIndex != -1 && finalSoundIndices.find(soundIndex) != end(finalSoundIndices))
+                soundIndex = finalSoundIndices[soundIndex];
             
             if (find(begin(unavailableSoundIndices), end(unavailableSoundIndices), srcNoteParams->getSoundNumber()) != end(unavailableSoundIndices))
                 soundIndex = -1;
