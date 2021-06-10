@@ -89,7 +89,10 @@ void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool head
     // For now when this is called by JUCE's get/setState routines,
     // we trust every sound could be saved/loaded.
     vector<int> unavailableSoundIndices;
-
+    map<int, int> finalSoundIndices;
+    
+    int skipCount = 0;
+    
     if (!withoutSounds)
     {
         sampler->deleteAllSamples();
@@ -125,12 +128,16 @@ void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool head
             if (!soundFile || !soundFile->getFsNode().lock()->exists())
             {
                 unavailableSoundIndices.push_back(i);
+                                
+                skipCount++;
                 
                 if (!headless)
                     ApsLoader::notFound(mpc, soundFileName, ext);
                 
                 continue;
             }
+            
+            finalSoundIndices[i] = i - skipCount;
             
             ApsLoader::loadSound(mpc, soundFileName, ext, soundFile, false, i, headless);
         }
@@ -166,9 +173,9 @@ void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool head
             
             auto srcNoteParams = apsProgram->getNoteParameters(noteIndex);
             
-            auto soundIndex = srcNoteParams->getSoundNumber();
+            auto soundIndex = finalSoundIndices[srcNoteParams->getSoundNumber()];
             
-            if (find(begin(unavailableSoundIndices), end(unavailableSoundIndices), soundIndex) != end(unavailableSoundIndices))
+            if (find(begin(unavailableSoundIndices), end(unavailableSoundIndices), srcNoteParams->getSoundNumber()) != end(unavailableSoundIndices))
                 soundIndex = -1;
             
             destNoteParams->setSoundIndex(soundIndex);

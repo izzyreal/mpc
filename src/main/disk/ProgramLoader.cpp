@@ -54,6 +54,9 @@ void ProgramLoader::loadProgram(const int replaceIndex)
 		auto soundsDestIndex = vector<int>(pgmSoundNames.size());
 
 		vector<int> unavailableSoundIndices;
+        map<int, int> finalSoundIndices;
+        
+        int skipCount = 0;
 
 		for (int i = 0; i < pgmSoundNames.size(); i++)
 		{
@@ -86,10 +89,13 @@ void ProgramLoader::loadProgram(const int replaceIndex)
 			if (!soundFile || !soundFile->getFsNode().lock()->exists())
 			{
 				unavailableSoundIndices.push_back(i);
+                skipCount++;
 				notFound(soundFileName, ext);
 				continue;
 			}
 
+            finalSoundIndices[i] = i - skipCount;
+            
             loadSound(
                       soundFileName,
                       pgmSoundNames[i],
@@ -102,7 +108,20 @@ void ProgramLoader::loadProgram(const int replaceIndex)
         }
 
 		auto adapter = ProgramImportAdapter(mpc.getSampler(), p, soundsDestIndex, unavailableSoundIndices);
-		result = adapter.get();
+		
+        result = adapter.get();
+        
+        for (auto& noteParameters : result.lock()->getNotesParameters()) {
+            
+            if (noteParameters->getSoundIndex() == -1) continue;
+                        
+            if (finalSoundIndices.find(noteParameters->getSoundIndex()) == end(finalSoundIndices)) continue;
+            
+            auto finalSoundIndex = finalSoundIndices.at(noteParameters->getSoundIndex());
+
+            noteParameters->setSoundIndex(finalSoundIndex);
+        }
+
 		mpc.importLoadedProgram();
 		disk->setBusy(false);
 		mpc.getLayeredScreen().lock()->openScreen("load");
