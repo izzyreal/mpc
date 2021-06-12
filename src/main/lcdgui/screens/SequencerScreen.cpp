@@ -658,7 +658,12 @@ void SequencerScreen::turnWheel(int i)
 		if (sequencer.lock()->isPlaying())
 		{
 			if (!punchScreen->on)
-				sequencer.lock()->setNextSq(sequencer.lock()->getCurrentlyPlayingSequenceIndex() + i);
+            {
+                const auto seqIndex = sequencer.lock()->getCurrentlyPlayingSequenceIndex();
+                
+                if (seqIndex + i >= 0)
+                    sequencer.lock()->setNextSq(seqIndex + i);
+            }
 		}
 		else
 		{
@@ -674,7 +679,8 @@ void SequencerScreen::turnWheel(int i)
 	}
 	else if (param.compare("nextsq") == 0)
 	{
-		sequencer.lock()->setNextSq(sequencer.lock()->getNextSq() + i);
+        if (sequencer.lock()->getNextSq() + i >= 0)
+            sequencer.lock()->setNextSq(sequencer.lock()->getNextSq() + i);
 	}
 	else if (param.compare("bars") == 0)
 	{
