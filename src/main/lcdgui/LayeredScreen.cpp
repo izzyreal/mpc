@@ -229,7 +229,7 @@ void LayeredScreen::setLastFocus(string screenName, string newLastFocus)
 
 string LayeredScreen::getLastFocus(string screenName)
 {
-    auto lastFocus = lastFocuses.find(currentScreenName);
+    auto lastFocus = lastFocuses.find(screenName);
     
     if (lastFocus == end(lastFocuses))
         return "";
