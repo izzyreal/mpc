@@ -5,209 +5,164 @@
 #include <file/FsNode.hpp>
 #include <file/File.hpp>
 
+#include <fat/AkaiFatLfnDirectoryEntry.hpp>
+
 #include <Logger.hpp>
 
 using namespace mpc::disk;
 using namespace moduru::lang;
 using namespace moduru::file;
-using namespace std;
+using namespace akaifat::fat;
 
 MpcFile::MpcFile(nonstd::any fileObject)
 {
-	//raw = dynamic_cast< ::de::waldheinz::fs::fat::AkaiFatLfnDirectoryEntry* >(fileObject) != nullptr;
-	try {
-        if (fileObject.has_value() && fileObject.type() == typeid(shared_ptr<File>))
-        {
-            stdEntry = nonstd::any_cast<shared_ptr<File>>(fileObject);
+    if (fileObject.has_value())
+    {
+        
+        try {
+            if (fileObject.type() == typeid(std::shared_ptr<File>))
+            {
+                stdNode = nonstd::any_cast<std::shared_ptr<File>>(fileObject);
+            }
+            else if (fileObject.type() == typeid(std::shared_ptr<FsNode>))
+            {
+                stdNode = nonstd::any_cast<std::shared_ptr<FsNode>>(fileObject);
+            }
+            else if (fileObject.type() == typeid(std::shared_ptr<AkaiFatLfnDirectoryEntry>))
+            {
+                rawEntry = nonstd::any_cast<std::shared_ptr<AkaiFatLfnDirectoryEntry>>(fileObject);
+                raw = true;
+            }
         }
-        else if (fileObject.has_value() && fileObject.type() == typeid(shared_ptr<FsNode>))
-        {
-            stdEntry = nonstd::any_cast<shared_ptr<FsNode>>(fileObject);
+        catch (const std::exception& e) {
+            MLOG("Failed to cast fileObject to shared_ptr<FsNode>: " + std::string(e.what()));
         }
     }
-	catch (const exception& e) {
-		string msg = e.what();
-        MLOG("Failed to cast fileObject to shared_ptr<FsNode>: " + msg);
-	}
-	//rawEntry = raw ? java_cast< ::de::waldheinz::fs::fat::AkaiFatLfnDirectoryEntry* >(fileObject) : static_cast< ::de::waldheinz::fs::fat::AkaiFatLfnDirectoryEntry* >(nullptr);
 }
 
 bool MpcFile::isDirectory()
 {
-	if (raw) {
-		//return rawEntry->isDirectory();
-		return false;
-	}
-	else {
-		auto dir = dynamic_pointer_cast<Directory>(getFsNode().lock());
-		if (dir) {
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
+    if (raw) {
+        return rawEntry->isDirectory();
+    }
+    else {
+        auto dir = std::dynamic_pointer_cast<Directory>(getFsNode().lock());
+        if (dir) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
 }
 
-string MpcFile::getName()
+std::string MpcFile::getName()
 {
-	if (raw) {
-		//return rawEntry->getName()->replaceAll(u" "_j, u""_j)->toUpperCase();
-		return "";
-	}
-	else
-		return stdEntry->getName();
+    if (raw)
+        return rawEntry->getName();
+    else
+        return stdNode->getName();
 }
 
-bool MpcFile::setName(string s)
+bool MpcFile::setName(std::string s)
 {
-	if (raw) {
-		try {
-			//rawEntry->setName(npc(s)->toUpperCase());
-			return true;
-		}
-		catch (exception e) {
-			return false;
-		}
-	}
-	else {
-		return stdEntry->renameTo(s);
-	}
+    if (raw) {
+        try {
+            rawEntry->setName(s);
+            return true;
+        }
+        catch (const std::exception&) {
+            return false;
+        }
+    }
+    else {
+        return stdNode->renameTo(s);
+    }
 }
 
 int MpcFile::length()
 {
-	if (raw) {
-		auto length = 0;
-		try {
-			//length = static_cast< int >(npc(entry->getFsNode())->getLength());
-		}
-		catch (exception e) {
-			//e->printStackTrace();
-			return 0;
-		}
-		return length;
-	}
-	else
-		return stdEntry->getLength();
+    if (raw) {
+        auto length = 0;
+        try {
+            if (rawEntry->isFile())
+                return rawEntry->getFile()->getLength();
+        }
+        catch (std::exception&) {
+            return 0;
+        }
+        return length;
+    }
+    else
+        return stdNode->getLength();
 }
 
 void MpcFile::setFileData(std::vector<char>* data)
 {
-	if (raw) {
-        /*
-		auto toWrite = data->size();
-		auto sectorSize = 512;
-		auto written = 0;
-		auto sector = 0;
-		auto block = vector<char>(sectorSize);
-		try {
-			while (toWrite - written > sectorSize) {
-				::java::lang::System::arraycopy(data, sector * sectorSize, block, 0, sectorSize);
-				npc(entry->getFsNode())->write(static_cast< int >(sector++ * sectorSize), ::java::nio::ByteBuffer::wrap(block));
-				written += sectorSize;
-			}
-			auto remaining = toWrite - written;
-			block = ::int8_tArray(remaining);
-			::java::lang::System::arraycopy(data, sector * sectorSize, block, 0, remaining);
-			npc(entry->getFsNode())->write(static_cast< int >(sector * sectorSize), ::java::nio::ByteBuffer::wrap(block));
-			npc(entry->getFsNode())->flush();
-		} catch (::java::lang::Exception* e) {
-			e->printStackTrace();
-		}
-		*/
-	}
-	else {
-		dynamic_pointer_cast<moduru::file::File>(stdEntry)->setData(data);
-	}
+    if (raw) {
+        ByteBuffer bb(*data);
+        auto f = rawEntry->getFile();
+        f->setLength(data->size());
+        f->write(0, bb);
+        f->flush();
+    }
+    else {
+        std::dynamic_pointer_cast<moduru::file::File>(stdNode)->setData(data);
+    }
 }
 
 bool MpcFile::del()
 {
-	if (raw) {
-		try {
-			//rawEntry->getParent()->remove(rawEntry->getName());
-			return true;
-		}
-		catch (exception e) {
-			//e->printStackTrace();
-			return false;
-		}
-	}
-	else {
-		return stdEntry->del();
-	}
-}
-
-weak_ptr<moduru::file::FsNode> MpcFile::getFsNode()
-{
-    //if(raw)
-      //  return RawDisk::entryToFile(rawEntry);
-    //else
-        return stdEntry;
-}
-
-weak_ptr<moduru::file::File> MpcFile::getFile() {
-	return dynamic_pointer_cast<moduru::file::File>(stdEntry);
-}
-
-/*
-de::waldheinz::fs::fat::AkaiFatLfnDirectoryEntry* MpcFile::getEntry()
-{
-    if(!raw)
-        return nullptr;
-
-    return rawEntry;
-}
-*/
-
-vector<char> MpcFile::getBytes()
-{
-	vector<char> bytes;
-    if(raw) {
-        int const toRead = length();
-		int const sectorSize = 512;
-		vector<char> byteList;
-        auto sector = 0;
-        auto read = 0;
-        /*
-		auto bb = ByteBuffer::allocate(sectorSize);
+    if (raw) {
         try {
-            while (toRead - read > sectorSize) {
-                npc(bb)->clear();
-                npc(entry->getFsNode())->read(static_cast< int >(sector++ * sectorSize), bb);
-                npc(bb)->position(0);
-                for (int i = 0; i < sectorSize; i++) 
-                                        npc(byteList)->add(::java::lang::Byte::valueOf(npc(bb)->get()));
-
-                read += sectorSize;
-            }
-            auto const remaining = toRead - read;
-            bb = ::java::nio::ByteBuffer::allocate(remaining);
-            npc(entry->getFsNode())->read(static_cast< int >(sector * sectorSize), bb);
-            npc(bb)->position(0);
-            for (int i = 0; i < remaining; i++) 
-                                npc(byteList)->add(::java::lang::Byte::valueOf(npc(bb)->get()));
-
-        } catch (::java::io::IOException* e) {
-            e->printStackTrace();
+            rawEntry->getParent()->remove(rawEntry->getName());
+            return true;
         }
-        for (int i = 0; i < bytes->length; i++) 
-                        (*bytes)[i] = (npc(java_cast< ::java::lang::Byte* >(npc(byteList)->get(i))))->byteValue();
-
-		*/
-        return bytes;
+        catch (const std::exception&) {
+            return false;
+        }
     }
-
-    try {
-		bytes = vector<char>(length());
-		dynamic_pointer_cast<moduru::file::File>(stdEntry)->getData(&bytes);
-    } catch (exception e) {
-		MLOG("Exception while getting file bytes: " + string(e.what()));
+    else {
+        return stdNode->del();
     }
+}
+
+std::weak_ptr<moduru::file::FsNode> MpcFile::getFsNode()
+{
+//    if (raw)
+//        return RawDisk::entryToFile(rawEntry);
+//    else
+        return stdNode;
+}
+
+std::weak_ptr<moduru::file::File> MpcFile::getFile() {
+    return std::dynamic_pointer_cast<moduru::file::File>(stdNode);
+}
+
+std::vector<char> MpcFile::getBytes()
+{
+    std::vector<char> bytes(length());
+    
+    if (raw) {
+        try {
+            ByteBuffer bb(bytes);
+            rawEntry->getFile()->read(0, bb);
+        } catch (const std::exception& e) {
+            MLOG("Exception while getting file bytes: " + std::string(e.what()));
+        }
+    }
+    else {
+        try {
+            std::dynamic_pointer_cast<moduru::file::File>(stdNode)->getData(&bytes);
+        } catch (std::exception& e) {
+            MLOG("Exception while getting file bytes: " + std::string(e.what()));
+        }
+    }
+    
     return bytes;
 }
 
-bool MpcFile::isStd() {
-	return stdEntry != nullptr;
+bool MpcFile::isStd()
+{
+    return stdNode != nullptr;
 }

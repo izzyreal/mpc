@@ -2,6 +2,8 @@
 
 #include <thirdp/any.hpp>
 
+#include <fat/AkaiFatLfnDirectoryEntry.hpp>
+
 #include <vector>
 #include <string>
 #include <memory>
@@ -28,8 +30,8 @@ class MpcFile
     
 private:
     bool raw = false;
-    //::de::waldheinz::fs::fat::AkaiFatLfnDirectoryEntry* rawEntry{};
-    std::shared_ptr<moduru::file::FsNode> stdEntry;
+    std::shared_ptr<akaifat::fat::AkaiFatLfnDirectoryEntry> rawEntry;
+    std::shared_ptr<moduru::file::FsNode> stdNode;
     
 public:
     bool isStd();
@@ -41,7 +43,6 @@ public:
     bool del();
     std::weak_ptr<moduru::file::FsNode> getFsNode();
     std::weak_ptr<moduru::file::File> getFile();
-    //::de::waldheinz::fs::fat::AkaiFatLfnDirectoryEntry* getEntry();
     std::vector<char> getBytes();
     
     MpcFile(nonstd::any a);
