@@ -1,6 +1,5 @@
 #pragma once
 #include <observer/Observable.hpp>
-#include <disk/device/Device.hpp>
 #include <disk/SoundSaver.hpp>
 
 #include <vector>
@@ -27,11 +26,9 @@ class Sound;
 }
 
 namespace mpc::disk {
-class MpcFile;
-class Store;
-}
 
-namespace mpc::disk {
+class MpcFile;
+class Volume;
 
 class AbstractDisk
 : public moduru::observer::Observable
@@ -39,12 +36,11 @@ class AbstractDisk
     
 private:
     bool busy = false;
-    std::weak_ptr<Store> store;
     std::unique_ptr<SoundSaver> soundSaver;
     
 protected:
     mpc::Mpc& mpc;
-    std::unique_ptr<mpc::disk::device::Device> device;
+    Volume& volume;
     
 public:
     const std::vector<std::string> extensions{ "", "SND", "PGM", "APS", "MID", "ALL", "WAV", "SEQ", "SET" };
@@ -77,7 +73,7 @@ public:
     void writeSequence(std::weak_ptr<mpc::sequencer::Sequence>, std::string fileName);
     bool checkExists(std::string fileName);
     void writeProgram(std::weak_ptr<mpc::sampler::Program> program, const std::string& fileName);
-    std::weak_ptr<mpc::disk::Store> getStore();
+    Volume& getStore();
     
     void setBusy(bool);
     bool isBusy();
@@ -99,6 +95,6 @@ protected:
     virtual int getPathDepth() = 0;
     
 protected:
-    AbstractDisk(mpc::Mpc& mpc, std::weak_ptr<Store> store);    
+    AbstractDisk(mpc::Mpc&, Volume&);
 };
 }

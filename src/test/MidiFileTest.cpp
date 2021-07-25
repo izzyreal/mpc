@@ -39,6 +39,8 @@ SCENARIO("A MidiFile can be written", "[file]") {
 		auto track = sequence->getTrack(0).lock();
 		track->setUsed(true);
 		auto disk = mpc.getDisk().lock();
+        
+        REQUIRE (disk);
 
 		auto noteEvent = track->addNoteEvent(0, 37).lock();
 		noteEvent->setDuration(10);

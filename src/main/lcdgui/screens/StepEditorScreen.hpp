@@ -37,7 +37,7 @@ namespace mpc::lcdgui::screens
 		void open() override;
 		void close() override;
 
-		void update(moduru::observer::Observable*, nonstd::any message);
+		void update(moduru::observer::Observable*, nonstd::any message) override;
 
 	private:
 		std::vector<std::weak_ptr<mpc::lcdgui::EventRowParameters>> findEventRowParameterss();

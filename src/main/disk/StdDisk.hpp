@@ -20,19 +20,15 @@ namespace device {
 class Device;
 }
 
-class Store;
+class Volume;
 class MpcFile;
 
 class StdDisk
 : public AbstractDisk
 {
-    
-public:
-    typedef AbstractDisk super;
-    
 private:
     std::vector<std::string> path;
-    std::weak_ptr<moduru::file::Directory> root;
+    std::shared_ptr<moduru::file::Directory> root;
     
 private:
     void initParentFiles();
@@ -63,7 +59,7 @@ public:
     std::shared_ptr<MpcFile> newFile(const std::string& newFileName) override;
     std::string getAbsolutePath() override;
     
-    StdDisk(mpc::Mpc& mpc, std::weak_ptr<Store> store);
+    StdDisk(mpc::Mpc&, Volume&);
     
 };
 }

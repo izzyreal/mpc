@@ -144,7 +144,7 @@
 #include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
 
-#include <lcdgui/screens/VmpcDiskScreen.hpp>
+#include <lcdgui/screens/VmpcDisksScreen.hpp>
 #include <lcdgui/screens/VmpcSettingsScreen.hpp>
 #include <lcdgui/screens/VmpcKeyboardScreen.hpp>
 #include <lcdgui/screens/VmpcAutoSaveScreen.hpp>
@@ -821,9 +821,9 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	{
 		screen = make_shared<NameScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("vmpc-disk") == 0)
+	else if (screenName.compare("vmpc-disks") == 0)
 	{
-		screen = make_shared<VmpcDiskScreen>(mpc, layerIndex);
+		screen = make_shared<VmpcDisksScreen>(mpc, layerIndex);
 	}
 	else if (screenName.compare("vmpc-settings") == 0)
 	{

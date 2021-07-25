@@ -24,7 +24,7 @@ class Hardware;
 }
 
 namespace mpc::disk {
-class Stores;
+class DiskDevices;
 class AbstractDisk;
 }
 
@@ -116,7 +116,6 @@ public:
         
 public:
     std::weak_ptr<mpc::disk::AbstractDisk> getDisk();
-    std::weak_ptr<mpc::disk::Stores> getStores();
     
 public:
     Mpc();
@@ -279,7 +278,7 @@ private:
         "delete-sequence",
         "midi-monitor",
         "delete-all-files",
-        "vmpc-disk",
+        "vmpc-disks",
         "vmpc-settings",
         "vmpc-direct-to-disk-recorder",
         "vmpc-recording-finished",

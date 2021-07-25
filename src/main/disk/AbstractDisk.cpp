@@ -3,6 +3,7 @@
 #include <Mpc.hpp>
 #include <Util.hpp>
 #include <disk/MpcFile.hpp>
+#include <disk/Volume.hpp>
 #include <file/wav/WavFile.hpp>
 #include <file/mid/MidiWriter.hpp>
 #include <file/pgmwriter/PgmWriter.hpp>
@@ -34,10 +35,9 @@ using namespace moduru::file;
 
 using namespace std;
 
-AbstractDisk::AbstractDisk(mpc::Mpc& mpc, weak_ptr<mpc::disk::Store> store)
-	: mpc(mpc)
+AbstractDisk::AbstractDisk(mpc::Mpc& _mpc, Volume& _volume)
+	: mpc (_mpc), volume (_volume)
 {
-	this->store = store;
 }
 
 void AbstractDisk::setBusy(bool b)
@@ -175,17 +175,17 @@ void AbstractDisk::writeSound(weak_ptr<Sound> s, weak_ptr<MpcFile> f)
 
 void AbstractDisk::close()
 {
-	device->close();
+	volume.close();
 }
 
 void AbstractDisk::flush()
 {
-	device->flush();
+	volume.flush();
 }
 
-weak_ptr<mpc::disk::Store> AbstractDisk::getStore()
+Volume& AbstractDisk::getStore()
 {
-	return store;
+	return volume;
 }
 
 

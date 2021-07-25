@@ -582,16 +582,6 @@
  "fblabels" : [ null, null, null, "SUDDEN", "CLEAR", "CLOSE" ],
  "fbtypes" : [ null, null, null, 1, 1, 0 ]
 },
-"vmpc-disk":
-{
- "labels" : [ "SCSI-", "Access type:", "Root:" ],
- "x" : [ 0, 0, 0 ],
- "y" : [ 5, 16, 27 ],
- "parameters" : [ "scsi", "access-type", "root" ],
- "tfsize" : [ 6, 24, 216 ],
- "fblabels" : [ "SETNGS", "DISK", null, null, null, "APPLY" ],
- "fbtypes" : [ 0, 2, null, null, null, 1 ]
-},
 "vmpc-settings":
 {
  "labels" : [ "Initial pad mapping : ", "16 levels erase mode: " ],
@@ -627,5 +617,15 @@
  "infoy" : [ 37 ],
  "fblabels" : [ "SETNGS", "KEYBRD", "AUTSAV", null, null, null ],
  "fbtypes" : [ 0, 0, 2, null, null, null ]
+},
+"vmpc-disks":
+{
+ "labels" : [ ],
+ "x" : [ ],
+ "y" : [ ],
+ "parameters" : [ ],
+ "tfsize" : [ ],
+ "fblabels" : [ "SETNGS", "KEYBRD", "AUTSAV", "DISKS", null, null ],
+ "fbtypes" : [ 0, 0, 0, 2, null, null ]
 }
 }

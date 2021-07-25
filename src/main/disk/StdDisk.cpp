@@ -1,11 +1,9 @@
-#include <disk/StdDisk.hpp>
+#include "StdDisk.hpp"
 
 #include <Mpc.hpp>
 
 #include <disk/MpcFile.hpp>
-#include <disk/Store.hpp>
-#include <disk/device/Device.hpp>
-#include <disk/device/StdDevice.hpp>
+#include <disk/Volume.hpp>
 
 #include <file/AkaiName.hpp>
 
@@ -32,16 +30,11 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace std;
 
-StdDisk::StdDisk(mpc::Mpc& mpc, weak_ptr<Store> store)
-	: AbstractDisk(mpc, store)
+StdDisk::StdDisk(mpc::Mpc& mpc, Volume& volume)
+	: AbstractDisk(mpc, volume)
 {
-	device = make_unique<mpc::disk::device::StdDevice>(store.lock()->path);
-	
-	if (device)
-	{
-		root = nonstd::any_cast<weak_ptr<Directory>>(device->getRoot());
-		initFiles();
-	}
+    root = volume.getRoot();
+    initFiles();
 }
 
 void StdDisk::renameFilesToAkai()
@@ -194,9 +187,9 @@ bool StdDisk::moveForward(const string& directoryName)
 shared_ptr<Directory> StdDisk::getDir()
 {
 	if (path.size() == 0)
-        return make_shared<Directory>(root.lock()->getPath(), nullptr);
+        return root;
 
-    string dirPath = root.lock()->getPath();
+    string dirPath = root->getPath();
     
     for (int i = 0; i < path.size(); i++)
         dirPath = dirPath + FileUtil::getSeparator() + path[i];
@@ -210,9 +203,9 @@ shared_ptr<Directory> StdDisk::getParentDir()
         return {};
 
 	if (path.size() == 1)
-		return make_shared<Directory>(root.lock()->getPath(), nullptr);
+        return root;
 
-    string dirPath = root.lock()->getPath();
+    string dirPath = root->getPath();
     
     for (int i = 0; i < path.size() - 1; i++)
     {

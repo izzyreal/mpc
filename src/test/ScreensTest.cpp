@@ -167,12 +167,17 @@ SCENARIO("All screens can be opened", "[gui]") {
 	GIVEN("An initialized Mpc with an initialized Sequence") {
 		mpc::Mpc mpc;
 		mpc.init(44100, 1, 5);
-		mpc.getDisk().lock()->moveForward("TEST1");
-		mpc.getDisk().lock()->initFiles();
+        
+        auto disk = mpc.getDisk().lock();
+        
+        REQUIRE (disk);
+        
+		disk->moveForward("TEST1");
+		disk->initFiles();
 
-		auto f = mpc.getDisk().lock()->getFile("BASIC_KIT.APS");
+		auto f = disk->getFile("BASIC_KIT.APS");
 		
-		auto apsLoader = mpc::disk::ApsLoader(mpc, f);
+		mpc::disk::ApsLoader apsLoader(mpc, f);
 
 		this_thread::sleep_for(chrono::milliseconds(500));
 		

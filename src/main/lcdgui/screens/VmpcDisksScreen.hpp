@@ -8,7 +8,7 @@ namespace mpc::disk
 
 namespace mpc::lcdgui::screens
 {
-	class VmpcDiskScreen
+	class VmpcDisksScreen
 		: public mpc::lcdgui::ScreenComponent
 	{
 
@@ -16,7 +16,7 @@ namespace mpc::lcdgui::screens
 		void function(int i) override;
 		void turnWheel(int i) override;
 
-		VmpcDiskScreen(mpc::Mpc& mpc, const int layerIndex);
+		VmpcDisksScreen(mpc::Mpc& mpc, const int layerIndex);
 
 		void open() override;
 

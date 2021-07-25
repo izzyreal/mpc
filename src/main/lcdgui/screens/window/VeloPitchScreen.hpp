@@ -15,7 +15,7 @@ namespace mpc::lcdgui::screens::window
 		void open() override;
 		void close() override;
 
-		void update(moduru::observer::Observable* observable, nonstd::any message);
+		void update(moduru::observer::Observable* observable, nonstd::any message) override;
 
 	private:
 		void displayVelo();

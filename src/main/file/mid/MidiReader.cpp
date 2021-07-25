@@ -282,7 +282,7 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
 			{
 				auto sysExData = sysEx->getData();
 			
-				if (sysExData.size() == 8 && sysExData[0] == 71 && sysExData[1] == 0 && sysExData[2] == 68 && sysExData[3] == 69 && sysExData[7] == 247)
+				if (sysExData.size() == 8 && sysExData[0] == 71 && sysExData[1] == 0 && sysExData[2] == 68 && sysExData[3] == 69 && sysExData[7] == (char) 247)
 				{
 					auto mixerEvent = dynamic_pointer_cast<MixerEvent>(track->addEvent(sysEx->getTick(), "mixer").lock());
 					mixerEvent->setParameter(sysExData[4] - 1);
