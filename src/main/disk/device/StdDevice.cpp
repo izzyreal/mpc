@@ -36,11 +36,6 @@ void StdDevice::flush()
 {
 }
 
-nonstd::any StdDevice::getFileSystem()
-{
-    return nullptr;
-}
-
 string StdDevice::getAbsolutePath()
 {
     return "stddevabspath";

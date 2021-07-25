@@ -46,7 +46,7 @@ namespace mpc::midi::event::meta
 		int log2(int den);
 
 	public:
-		std::string toString();
+		std::string toString() override;
 		virtual int compareTo(mpc::midi::event::MidiEvent* other);
 
 	public:

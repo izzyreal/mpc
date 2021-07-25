@@ -73,7 +73,7 @@ void MidiTrack::readTrackData(vector<char>& data)
 
 	int eventCounter = 0;
 
-	while (available = (int)in.rdbuf()->in_avail() > 0) {
+	while ( (available = (int)in.rdbuf()->in_avail() > 0) ) {
 		auto delta = mpc::midi::util::VariableLengthInt(in);
 		int value = delta.getValue();
 		totalTicks += value;

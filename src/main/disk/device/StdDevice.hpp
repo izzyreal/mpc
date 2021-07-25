@@ -30,7 +30,6 @@ namespace mpc::disk::device
 		virtual bool isValid();
 		void close() override;
 		void flush() override;
-		nonstd::any getFileSystem() override;
 		std::string getAbsolutePath() override;
 		int getSize() override;
 		std::string getVolumeName() override;
