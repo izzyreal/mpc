@@ -80,7 +80,7 @@ void LoadScreen::function(int i)
 			
 			bool started = mpc.getAudioMidiServices().lock()->getSoundPlayer().lock()->start(file->getFile().lock()->getPath());
 			
-			auto name = file->getFsNode().lock()->getNameWithoutExtension();
+			auto name = file->getNameWithoutExtension();
 
 			openScreen("popup");
 			auto popupScreen = mpc.screens->get<PopupScreen>("popup");

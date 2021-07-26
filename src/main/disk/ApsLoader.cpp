@@ -47,7 +47,7 @@ using namespace std;
 ApsLoader::ApsLoader(mpc::Mpc& _mpc, weak_ptr<MpcFile> _file)
 : mpc(_mpc), file(_file)
 {
-    if (!file.lock()->getFsNode().lock()->exists())
+    if (!file.lock()->exists())
         throw invalid_argument("File does not exist");
     
     auto cantFindFileScreen = mpc.screens->get<CantFindFileScreen>("cant-find-file");
@@ -112,7 +112,7 @@ void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool head
                 }
             }
             
-            if (!soundFile || !soundFile->getFsNode().lock()->exists())
+            if (!soundFile || !soundFile->exists())
             {
                 for (auto& f : disk->getAllFiles())
                 {
@@ -125,7 +125,7 @@ void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool head
                 }
             }
             
-            if (!soundFile || !soundFile->getFsNode().lock()->exists())
+            if (!soundFile || !soundFile->exists())
             {
                 unavailableSoundIndices.push_back(i);
                                 

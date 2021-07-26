@@ -36,14 +36,16 @@ private:
 public:
     bool isStd();
     bool isDirectory();
+    bool exists();
     std::string getName();
     bool setName(std::string s);
     int length();
     void setFileData(std::vector<char>* data);
     bool del();
-    std::weak_ptr<moduru::file::FsNode> getFsNode();
     std::weak_ptr<moduru::file::File> getFile();
     std::vector<char> getBytes();
+    std::vector<std::shared_ptr<MpcFile>> listFiles();
+    std::string getNameWithoutExtension();
     
     MpcFile(nonstd::any a);
     

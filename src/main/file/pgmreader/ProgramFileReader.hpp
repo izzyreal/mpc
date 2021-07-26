@@ -1,7 +1,5 @@
 #pragma once
 
-#include <file/File.hpp>
-
 #include <vector>
 #include <memory>
 
@@ -25,14 +23,14 @@ namespace mpc::file::pgmreader {
 	{
 
 	private:
-		PgmHeader* pgmHeader{};
-		SoundNames* sampleNames{};
-		ProgramName* programName{};
-		PgmAllNoteParameters* midiNotes{};
-		Mixer* mixer{};
-		Slider* slider{};
-		Pads* pads{};
-		std::weak_ptr<moduru::file::File> programFile{};
+		PgmHeader* pgmHeader;
+		SoundNames* sampleNames;
+		ProgramName* programName;
+		PgmAllNoteParameters* midiNotes;
+		Mixer* mixer;
+		Slider* slider;
+		Pads* pads;
+		std::weak_ptr<mpc::disk::MpcFile> programFile;
 
 	public:
 		std::vector<char> readProgramFileArray();
@@ -46,7 +44,7 @@ namespace mpc::file::pgmreader {
 		ProgramName* getProgramName();
 		Slider* getSlider();
 
-		ProgramFileReader(mpc::disk::MpcFile* f);
+		ProgramFileReader(std::weak_ptr<mpc::disk::MpcFile>);
 		~ProgramFileReader();
 	};
 }

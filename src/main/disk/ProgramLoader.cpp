@@ -73,7 +73,7 @@ void ProgramLoader::loadProgram(const int replaceIndex)
 				}
 			}
 
-			if (!soundFile || !soundFile->getFsNode().lock()->exists())
+			if (!soundFile || !soundFile->exists())
 			{
 				for (auto& f : disk->getAllFiles())
 				{
@@ -86,7 +86,7 @@ void ProgramLoader::loadProgram(const int replaceIndex)
 				}
 			}
 
-			if (!soundFile || !soundFile->getFsNode().lock()->exists())
+			if (!soundFile || !soundFile->exists())
 			{
 				unavailableSoundIndices.push_back(i);
                 skipCount++;

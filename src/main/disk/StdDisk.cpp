@@ -171,16 +171,12 @@ bool StdDisk::moveForward(const string& directoryName)
 	{
 		if (StrUtil::eqIgnoreCase(StrUtil::trim(f->getName()), StrUtil::trim(directoryName)))
 		{
-			auto lFile = f->getFsNode().lock();
-			
-			if (lFile->isDirectory() && lFile->getPath().find("VMPC2000XL") != string::npos && lFile->getPath().find("Volumes") != string::npos)
-			{
-				path.push_back(f->getName());
-				success = true;
-				break;
-			}
+            path.push_back(f->getName());
+			success = true;
+			break;
 		}
 	}
+    
 	return success;
 }
 
@@ -244,29 +240,20 @@ bool StdDisk::newFolder(const string& newDirName)
 
 bool StdDisk::deleteDir(weak_ptr<MpcFile> f)
 {
-    return deleteRecursive(f.lock()->getFsNode().lock().get());
+    return deleteRecursive(f);
 }
 
-bool StdDisk::deleteRecursive(FsNode* deleteMe)
+bool StdDisk::deleteRecursive(std::weak_ptr<MpcFile> _toDelete)
 {
-	auto deletedSomething = false;
-	auto deletedCurrentFile = false;
-	
-	if (deleteMe->isDirectory())
+    auto toDelete = _toDelete.lock();
+    
+	if (toDelete->isDirectory())
 	{
-		for (auto& f : dynamic_cast<Directory*>(deleteMe)->listFiles())
-			deleteRecursive(f.get());
+		for (auto& f : toDelete->listFiles())
+			deleteRecursive(f);
 	}
 	
-	deletedCurrentFile = deleteMe->del();
-	
-	if (deletedCurrentFile)
-		deletedSomething = true;
-
-	if (!deletedCurrentFile)
-		return false;
-
-	return deletedSomething;
+	return toDelete->del();
 }
 
 shared_ptr<MpcFile> StdDisk::newFile(const string& _newFileName)

@@ -12,9 +12,9 @@
 using namespace mpc::file::pgmreader;
 using namespace std;
 
-ProgramFileReader::ProgramFileReader(mpc::disk::MpcFile* f) 
+ProgramFileReader::ProgramFileReader(std::weak_ptr<mpc::disk::MpcFile> _programFile)
+: programFile (_programFile)
 {
-	this->programFile = dynamic_pointer_cast<moduru::file::File>(f->getFsNode().lock());
     pgmHeader = new PgmHeader(this);
     programName = new ProgramName(this);
     sampleNames = new SoundNames(this);
@@ -37,9 +37,7 @@ ProgramFileReader::~ProgramFileReader()
 
 std::vector<char> ProgramFileReader::readProgramFileArray()
 {
-	std::vector<char> res;
-	programFile.lock()->getData(&res);
-	return res;
+    return programFile.lock()->getBytes();
 }
 
 PgmHeader* ProgramFileReader::getHeader()

@@ -53,7 +53,7 @@ public:
     bool deleteDir(std::weak_ptr<MpcFile> f) override;
     
 private:
-    bool deleteRecursive(moduru::file::FsNode* deleteMe);
+    bool deleteRecursive(std::weak_ptr<MpcFile>);
     
 public:
     std::shared_ptr<MpcFile> newFile(const std::string& newFileName) override;

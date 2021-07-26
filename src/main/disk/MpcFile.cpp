@@ -40,20 +40,49 @@ MpcFile::MpcFile(nonstd::any fileObject)
     }
 }
 
-bool MpcFile::isDirectory()
+std::vector<std::shared_ptr<MpcFile>> MpcFile::listFiles()
+{
+    if (!isDirectory()) return {};
+    
+    std::vector<std::shared_ptr<MpcFile>> result;
+    
+    if (raw) {
+        auto dir = std::dynamic_pointer_cast<AkaiFatLfnDirectory>(rawEntry->getDirectory());
+        
+        for (auto& kv : dir->akaiNameIndex)
+            result.emplace_back(std::make_shared<MpcFile>(kv.second));
+    } else {
+        
+        auto dir = std::dynamic_pointer_cast<Directory>(stdNode);
+        
+        for (auto& node : dir->listFiles())
+            result.emplace_back(std::make_shared<MpcFile>(node));
+    }
+    
+    return result;
+}
+
+std::string MpcFile::getNameWithoutExtension()
 {
     if (raw) {
-        return rawEntry->isDirectory();
+        auto name = rawEntry->getName();
+        auto extIndex = name.find_last_of('.');
+        if (extIndex != std::string::npos) {
+            name = name.substr(0, extIndex);
+        }
+        return name;
     }
     else {
-        auto dir = std::dynamic_pointer_cast<Directory>(getFsNode().lock());
-        if (dir) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return stdNode->getNameWithoutExtension();
     }
+}
+
+bool MpcFile::isDirectory()
+{
+    if (raw)
+        return rawEntry->isDirectory();
+    else
+        return stdNode->isDirectory();
 }
 
 std::string MpcFile::getName()
@@ -111,6 +140,16 @@ void MpcFile::setFileData(std::vector<char>* data)
     }
 }
 
+bool MpcFile::exists()
+{
+    if (raw) {
+        return rawEntry->isValid();
+    }
+    else {
+        return stdNode->exists();
+    }
+}
+
 bool MpcFile::del()
 {
     if (raw) {
@@ -125,14 +164,6 @@ bool MpcFile::del()
     else {
         return stdNode->del();
     }
-}
-
-std::weak_ptr<moduru::file::FsNode> MpcFile::getFsNode()
-{
-//    if (raw)
-//        return RawDisk::entryToFile(rawEntry);
-//    else
-        return stdNode;
 }
 
 std::weak_ptr<moduru::file::File> MpcFile::getFile() {
