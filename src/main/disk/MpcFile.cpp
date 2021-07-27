@@ -4,6 +4,7 @@
 #include <lang/StrUtil.hpp>
 #include <file/FsNode.hpp>
 #include <file/File.hpp>
+#include <file/FileUtil.hpp>
 
 #include <fat/AkaiFatLfnDirectoryEntry.hpp>
 
@@ -166,10 +167,6 @@ bool MpcFile::del()
     }
 }
 
-std::weak_ptr<moduru::file::File> MpcFile::getFile() {
-    return std::dynamic_pointer_cast<moduru::file::File>(stdNode);
-}
-
 std::vector<char> MpcFile::getBytes()
 {
     std::vector<char> bytes(length());
@@ -191,6 +188,27 @@ std::vector<char> MpcFile::getBytes()
     }
     
     return bytes;
+}
+
+std::string MpcFile::getPath()
+{
+    if (raw) {
+        auto name = rawEntry->getName();
+        auto parent = rawEntry->getParent();
+        std::string path = name;
+        return path;
+    } else {
+        return stdNode->getPath();
+    }
+}
+
+std::unique_ptr<std::istream> MpcFile::getInputStream()
+{
+    if (raw) {
+        return std::dynamic_pointer_cast<akaifat::fat::FatFile>(rawEntry->getFile())->getInputStream();
+    } else {
+        return std::make_unique<std::ifstream>(std::move(FileUtil::ifstreamw(stdNode->getPath(), std::ios::in | std::ios::binary)));
+    }
 }
 
 bool MpcFile::isStd()

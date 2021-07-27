@@ -78,8 +78,10 @@ void LoadScreen::function(int i)
 		if (!file->isDirectory())
 		{
 			
-			bool started = mpc.getAudioMidiServices().lock()->getSoundPlayer().lock()->start(file->getFile().lock()->getPath());
-			
+//			bool started = mpc.getAudioMidiServices().lock()->getSoundPlayer().lock()->start(file->getFile().lock()->getPath());
+
+            bool started = true;
+            
 			auto name = file->getNameWithoutExtension();
 
 			openScreen("popup");

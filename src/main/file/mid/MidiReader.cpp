@@ -39,19 +39,19 @@ using namespace mpc::midi::event;
 using namespace mpc::sequencer;
 using namespace std;
 
-MidiReader::MidiReader(mpc::disk::MpcFile* file, weak_ptr<Sequence> dest)
+MidiReader::MidiReader(mpc::disk::MpcFile* file, weak_ptr<Sequence> _dest)
+: dest (_dest)
 {
-	
-	this->dest = dest;
 	auto sequence = dest.lock();
 	sequence->setUsed(true);
-	try {
-		auto path = file->getFile().lock()->getPath();
-		auto stream = FileUtil::ifstreamw(path, ios::in | ios::binary);
-		midiFile = make_unique<mpc::midi::MidiFile>(stream);
+
+    try {
+        auto inputStream = file->getInputStream();
+		midiFile = make_unique<mpc::midi::MidiFile>(*inputStream.get());
 	}
-	catch (exception* e) {
-		string logmsg = e->what();
+	catch (const std::exception& e) {
+        MLOG("An exception occurred while opening MIDI file " + file->getName());
+        MLOG(std::string(e.what()));
 	}
 }
 

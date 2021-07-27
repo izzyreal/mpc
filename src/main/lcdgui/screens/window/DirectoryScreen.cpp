@@ -200,8 +200,11 @@ void DirectoryScreen::function(int f)
 
 		if (!file->isDirectory())
 		{
-			bool started = mpc.getAudioMidiServices().lock()->getSoundPlayer().lock()->start(file->getFile().lock()->getPath());
-			auto name = file->getNameWithoutExtension();
+//			bool started = mpc.getAudioMidiServices().lock()->getSoundPlayer().lock()->start(file->getFile().lock()->getPath());
+			
+            bool started = true;
+            
+            auto name = file->getNameWithoutExtension();
 
 			openScreen("popup");
 			auto popupScreen = mpc.screens->get<PopupScreen>("popup");

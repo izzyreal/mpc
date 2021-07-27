@@ -7,6 +7,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <iostream>
 
 /*
  * An MpcFile contains either an AkaiFatLongFileNameDirectoryEntry or a moduru::file::FileSystemNode.
@@ -20,7 +21,6 @@
 namespace moduru::file
 {
 class FsNode;
-class File;
 }
 
 namespace mpc::disk
@@ -42,10 +42,11 @@ public:
     int length();
     void setFileData(std::vector<char>* data);
     bool del();
-    std::weak_ptr<moduru::file::File> getFile();
     std::vector<char> getBytes();
     std::vector<std::shared_ptr<MpcFile>> listFiles();
     std::string getNameWithoutExtension();
+    std::string getPath();
+    std::unique_ptr<std::istream> getInputStream();
     
     MpcFile(nonstd::any a);
     

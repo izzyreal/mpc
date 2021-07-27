@@ -72,11 +72,13 @@ void SoundLoader::loadSound(shared_ptr<MpcFile> f, SoundLoaderResult& r)
     if (StrUtil::eqIgnoreCase(extension, "wav"))
     {
         
-        auto file = f->getFile().lock();
+//        auto file = f->getFile().lock();
         
         try {
             
-            auto wavFile = WavFile::openWavFile(file->getPath());
+//            auto wavFile = WavFile::openWavFile(file->getPath());
+            
+            WavFile wavFile;
             
             if (wavFile.getValidBits() != 16)
             {

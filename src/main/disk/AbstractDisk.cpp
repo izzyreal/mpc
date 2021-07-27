@@ -195,7 +195,9 @@ void AbstractDisk::writeWav(weak_ptr<Sound> s, weak_ptr<MpcFile> f)
     auto data = sound->getSampleData();
     auto isMono = sound->isMono();
     
-    auto wavFile = mpc::file::wav::WavFile::newWavFile(f.lock()->getFile().lock()->getPath(), isMono ? 1 : 2, data->size() / (isMono ? 1 : 2), 16, sound->getSampleRate());
+    mpc::file::wav::WavFile wavFile;
+    
+//    auto wavFile = mpc::file::wav::WavFile::newWavFile(f.lock()->getFile().lock()->getPath(), isMono ? 1 : 2, data->size() / (isMono ? 1 : 2), 16, sound->getSampleRate());
     
     if (isMono)
     {
@@ -227,7 +229,7 @@ void AbstractDisk::writeSequence(weak_ptr<mpc::sequencer::Sequence> s, string fi
 	auto newMidFile = newFile(fileName);
 	
 	auto writer = mpc::file::mid::MidiWriter(s.lock().get());
-	writer.writeToFile(newMidFile->getFile().lock()->getPath());
+	//writer.writeToFile(newMidFile->getFile().lock()->getPath());
 
 	flush();
 	initFiles();
