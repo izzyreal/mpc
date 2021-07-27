@@ -20,8 +20,8 @@ namespace mpc::file::wav {
 	class WavFile
 	{
 	public:
-		static WavFile newWavFile(const std::string& path, int numChannels, int numFrames, int validBits, int sampleRate);
-		static WavFile openWavFile(const std::string& path);
+        static WavFile writeWavStream(std::shared_ptr<std::ostream>, int numChannels, int numFrames, int validBits, int sampleRate);
+        static WavFile readWavStream(std::shared_ptr<std::istream>);
 
 	private:
 		const static int SMPL_CHUNK_ID = 0x6C706D73; // 1819307379
@@ -36,8 +36,8 @@ namespace mpc::file::wav {
 		const static int NUM_SAMPLE_LOOPS = 0x1C; //4 Num Sample Loops 0 - 0xFFFFFFFF
 		const static int LIST_OF_SAMPLE_LOOPS_OFFSET = 0x24; // List of Sample Loops
 		std::vector<char> buffer;
-		std::ifstream iStream;
-		std::ofstream oStream;
+		std::shared_ptr<std::istream> iStream;
+		std::shared_ptr<std::ostream> oStream;
 
 	private:
 		static const int BUFFER_SIZE{ 2048 };
@@ -96,6 +96,7 @@ namespace mpc::file::wav {
 
 	public:
 		WavFile();
+//        ~WavFile();
 
 	};
 }

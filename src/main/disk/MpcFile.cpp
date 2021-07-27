@@ -202,12 +202,21 @@ std::string MpcFile::getPath()
     }
 }
 
-std::unique_ptr<std::istream> MpcFile::getInputStream()
+std::shared_ptr<std::istream> MpcFile::getInputStream()
 {
     if (raw) {
         return std::dynamic_pointer_cast<akaifat::fat::FatFile>(rawEntry->getFile())->getInputStream();
     } else {
-        return std::make_unique<std::ifstream>(std::move(FileUtil::ifstreamw(stdNode->getPath(), std::ios::in | std::ios::binary)));
+        return std::make_shared<std::ifstream>(std::move(FileUtil::ifstreamw(stdNode->getPath(), std::ios::in | std::ios::binary)));
+    }
+}
+
+std::shared_ptr<std::ostream> MpcFile::getOutputStream()
+{
+    if (raw) {
+        return std::dynamic_pointer_cast<akaifat::fat::FatFile>(rawEntry->getFile())->getOutputStream();
+    } else {
+        return std::make_shared<std::ofstream>(std::move(FileUtil::ofstreamw(stdNode->getPath(), std::ios::out | std::ios::binary)));
     }
 }
 

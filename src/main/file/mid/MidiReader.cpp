@@ -48,6 +48,8 @@ MidiReader::MidiReader(mpc::disk::MpcFile* file, weak_ptr<Sequence> _dest)
     try {
         auto inputStream = file->getInputStream();
 		midiFile = make_unique<mpc::midi::MidiFile>(*inputStream.get());
+        auto _ifstream = dynamic_pointer_cast<ifstream>(inputStream);
+        if (_ifstream && _ifstream->is_open()) _ifstream->close();
 	}
 	catch (const std::exception& e) {
         MLOG("An exception occurred while opening MIDI file " + file->getName());

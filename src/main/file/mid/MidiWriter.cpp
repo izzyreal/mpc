@@ -282,10 +282,10 @@ void MidiWriter::createDeltas(weak_ptr<mpc::midi::MidiTrack> midiTrack)
 	mt->setEndOfTrackDelta(sequence->getLastTick() - previousTick);
 }
 
-void MidiWriter::writeToFile(string path)
+void MidiWriter::writeToOStream(std::shared_ptr<std::ostream> _ostream)
 {
-	auto fout = moduru::file::FileUtil::ofstreamw(path, ios::out | ios::binary);
-	fout.unsetf(ios::skipws);
-	mf->writeToOutputStream(fout);
-	fout.close();
+    auto _ofstream = std::dynamic_pointer_cast<std::ofstream>(_ostream);
+    if (_ofstream) _ofstream->unsetf(std::ios::skipws);
+    mf->writeToOutputStream(*_ostream);
+    if (_ofstream) _ofstream->close();
 }

@@ -23,6 +23,7 @@
 #include <lang/StrUtil.hpp>
 
 using namespace mpc::disk;
+using namespace mpc::file::wav;
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -195,9 +196,9 @@ void AbstractDisk::writeWav(weak_ptr<Sound> s, weak_ptr<MpcFile> f)
     auto data = sound->getSampleData();
     auto isMono = sound->isMono();
     
-    mpc::file::wav::WavFile wavFile;
+    auto outputStream = f.lock()->getOutputStream();
     
-//    auto wavFile = mpc::file::wav::WavFile::newWavFile(f.lock()->getFile().lock()->getPath(), isMono ? 1 : 2, data->size() / (isMono ? 1 : 2), 16, sound->getSampleRate());
+    auto wavFile = WavFile::writeWavStream(outputStream, isMono ? 1 : 2, data->size() / (isMono ? 1 : 2), 16, sound->getSampleRate());
     
     if (isMono)
     {
@@ -229,7 +230,7 @@ void AbstractDisk::writeSequence(weak_ptr<mpc::sequencer::Sequence> s, string fi
 	auto newMidFile = newFile(fileName);
 	
 	auto writer = mpc::file::mid::MidiWriter(s.lock().get());
-	//writer.writeToFile(newMidFile->getFile().lock()->getPath());
+	writer.writeToOStream(newMidFile->getOutputStream());
 
 	flush();
 	initFiles();

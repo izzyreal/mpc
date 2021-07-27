@@ -16,6 +16,9 @@ namespace mpc::file::mid
 {
 	class MidiWriter
 	{
+    public:
+        MidiWriter(mpc::sequencer::Sequence* sequence);
+        void writeToOStream(std::shared_ptr<std::ostream>);
 
 	private:
 		std::vector<std::shared_ptr<mpc::midi::event::NoteOn>> noteOffs;
@@ -28,11 +31,5 @@ namespace mpc::file::mid
 	private:
 		void addNoteOn(std::shared_ptr<mpc::midi::event::NoteOn> noteOn);
 		void createDeltas(std::weak_ptr<mpc::midi::MidiTrack> mt);
-
-	public:
-		void writeToFile(std::string path);
-
-	public:
-		MidiWriter(mpc::sequencer::Sequence* sequence);
 	};
 }
