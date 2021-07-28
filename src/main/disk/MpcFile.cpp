@@ -190,18 +190,6 @@ std::vector<char> MpcFile::getBytes()
     return bytes;
 }
 
-std::string MpcFile::getPath()
-{
-    if (raw) {
-        auto name = rawEntry->getName();
-        auto parent = rawEntry->getParent();
-        std::string path = name;
-        return path;
-    } else {
-        return stdNode->getPath();
-    }
-}
-
 std::shared_ptr<std::istream> MpcFile::getInputStream()
 {
     if (raw) {
@@ -218,9 +206,4 @@ std::shared_ptr<std::ostream> MpcFile::getOutputStream()
     } else {
         return std::make_shared<std::ofstream>(std::move(FileUtil::ofstreamw(stdNode->getPath(), std::ios::out | std::ios::binary)));
     }
-}
-
-bool MpcFile::isStd()
-{
-    return stdNode != nullptr;
 }

@@ -18,15 +18,12 @@
  * and deleting directories, etc.
  */
 
-namespace moduru::file
-{
+namespace moduru::file {
 class FsNode;
 }
 
-namespace mpc::disk
-{
-class MpcFile
-{
+namespace mpc::disk{
+class MpcFile{
     
 private:
     bool raw = false;
@@ -34,7 +31,6 @@ private:
     std::shared_ptr<moduru::file::FsNode> stdNode;
     
 public:
-    bool isStd();
     bool isDirectory();
     bool exists();
     std::string getName();
@@ -45,7 +41,6 @@ public:
     std::vector<char> getBytes();
     std::vector<std::shared_ptr<MpcFile>> listFiles();
     std::string getNameWithoutExtension();
-    std::string getPath();
     std::shared_ptr<std::istream> getInputStream();
     std::shared_ptr<std::ostream> getOutputStream();
 

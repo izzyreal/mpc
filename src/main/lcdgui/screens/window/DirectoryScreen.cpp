@@ -200,9 +200,14 @@ void DirectoryScreen::function(int f)
 
 		if (!file->isDirectory())
 		{
-//			bool started = mpc.getAudioMidiServices().lock()->getSoundPlayer().lock()->start(file->getFile().lock()->getPath());
-			
-            bool started = true;
+            auto ext = FileUtil::splitName(file->getName())[1];
+            
+            bool isWav = StrUtil::eqIgnoreCase(ext, "wav");
+            bool isSnd = StrUtil::eqIgnoreCase(ext, "snd");
+
+            if (!isWav && !isSnd) return;
+
+            bool started = mpc.getAudioMidiServices().lock()->getSoundPlayer().lock()->start(file->getInputStream(), isSnd ? SoundPlayerFileFormat::SND : SoundPlayerFileFormat::WAV);
             
             auto name = file->getNameWithoutExtension();
 
