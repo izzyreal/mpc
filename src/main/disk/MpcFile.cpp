@@ -17,28 +17,26 @@ using namespace akaifat::fat;
 
 MpcFile::MpcFile(nonstd::any fileObject)
 {
-    if (fileObject.has_value())
+    if (!fileObject.has_value()) throw std::runtime_error("No object provided to MpcFile");
+    
+    if (fileObject.type() == typeid(std::shared_ptr<Directory>))
     {
-        
-        try {
-            if (fileObject.type() == typeid(std::shared_ptr<File>))
-            {
-                stdNode = nonstd::any_cast<std::shared_ptr<File>>(fileObject);
-            }
-            else if (fileObject.type() == typeid(std::shared_ptr<FsNode>))
-            {
-                stdNode = nonstd::any_cast<std::shared_ptr<FsNode>>(fileObject);
-            }
-            else if (fileObject.type() == typeid(std::shared_ptr<AkaiFatLfnDirectoryEntry>))
-            {
-                rawEntry = nonstd::any_cast<std::shared_ptr<AkaiFatLfnDirectoryEntry>>(fileObject);
-                raw = true;
-            }
-        }
-        catch (const std::exception& e) {
-            MLOG("Failed to cast fileObject to shared_ptr<FsNode>: " + std::string(e.what()));
-        }
+        stdNode = nonstd::any_cast<std::shared_ptr<Directory>>(fileObject);
     }
+    else if (fileObject.type() == typeid(std::shared_ptr<File>))
+    {
+        stdNode = nonstd::any_cast<std::shared_ptr<File>>(fileObject);
+    }
+    else if (fileObject.type() == typeid(std::shared_ptr<FsNode>))
+    {
+        stdNode = nonstd::any_cast<std::shared_ptr<FsNode>>(fileObject);
+    }
+    else if (fileObject.type() == typeid(std::shared_ptr<AkaiFatLfnDirectoryEntry>))
+    {
+        rawEntry = nonstd::any_cast<std::shared_ptr<AkaiFatLfnDirectoryEntry>>(fileObject);
+        raw = true;
+    }
+    else throw std::runtime_error("Invalid object provided to MpcFile");
 }
 
 std::vector<std::shared_ptr<MpcFile>> MpcFile::listFiles()
@@ -84,6 +82,11 @@ bool MpcFile::isDirectory()
         return rawEntry->isDirectory();
     else
         return stdNode->isDirectory();
+}
+
+bool MpcFile::isFile()
+{
+    return !isDirectory();
 }
 
 std::string MpcFile::getName()

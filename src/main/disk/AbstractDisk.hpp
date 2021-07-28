@@ -40,8 +40,7 @@ private:
     
 protected:
     mpc::Mpc& mpc;
-    Volume& volume;
-    
+ 
 public:
     const std::vector<std::string> extensions{ "", "SND", "PGM", "APS", "MID", "ALL", "WAV", "SEQ", "SET" };
     std::vector<std::shared_ptr<MpcFile>> files;
@@ -73,14 +72,14 @@ public:
     void writeSequence(std::weak_ptr<mpc::sequencer::Sequence>, std::string fileName);
     bool checkExists(std::string fileName);
     void writeProgram(std::weak_ptr<mpc::sampler::Program> program, const std::string& fileName);
-    Volume& getStore();
-    
+
     void setBusy(bool);
     bool isBusy();
-    void flush();
-    void close();
     bool isRoot();
     
+    virtual Volume& getStore() = 0;
+    virtual void flush() = 0;
+    virtual void close() = 0;
     virtual void initFiles() = 0;
     virtual std::shared_ptr<MpcFile> newFile(const std::string& name) = 0;
     virtual std::string getDirectoryName() = 0;
@@ -95,6 +94,6 @@ protected:
     virtual int getPathDepth() = 0;
     
 protected:
-    AbstractDisk(mpc::Mpc&, Volume&);
+    AbstractDisk(mpc::Mpc&);
 };
 }

@@ -22,16 +22,22 @@ namespace moduru::file {
 class FsNode;
 }
 
-namespace mpc::disk{
-class MpcFile{
+namespace mpc::disk {
+
+class StdDisk;
+
+class MpcFile {
     
 private:
     bool raw = false;
     std::shared_ptr<akaifat::fat::AkaiFatLfnDirectoryEntry> rawEntry;
     std::shared_ptr<moduru::file::FsNode> stdNode;
     
+    friend class StdDisk;
+    
 public:
     bool isDirectory();
+    bool isFile();
     bool exists();
     std::string getName();
     bool setName(std::string s);
@@ -43,7 +49,7 @@ public:
     std::string getNameWithoutExtension();
     std::shared_ptr<std::istream> getInputStream();
     std::shared_ptr<std::ostream> getOutputStream();
-
+    
     MpcFile(nonstd::any a);
     
 };

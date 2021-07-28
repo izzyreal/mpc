@@ -30,22 +30,36 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace std;
 
-StdDisk::StdDisk(mpc::Mpc& mpc, Volume& volume)
-	: AbstractDisk(mpc, volume)
+StdDisk::StdDisk(mpc::Mpc& mpc, Volume& _volume)
+	: AbstractDisk(mpc), volume (_volume), root (_volume.getRoot())
 {
-    root = volume.getRoot();
-    initFiles();
 }
+
+void StdDisk::close()
+{
+    volume.close();
+}
+
+void StdDisk::flush()
+{
+    volume.flush();
+}
+
+Volume& StdDisk::getStore()
+{
+    return volume;
+}
+
 
 void StdDisk::renameFilesToAkai()
 {
 	auto dirContent = getDir()->listFiles();
 	
-	vector<shared_ptr<FsNode>> files;
-	vector<shared_ptr<FsNode>> directories;
+	vector<shared_ptr<MpcFile>> files;
+	vector<shared_ptr<MpcFile>> directories;
 
-	copy_if(dirContent.begin(), dirContent.end(), back_inserter(files), [](const shared_ptr<FsNode> f) { return f->isFile(); });
-	copy_if(dirContent.begin(), dirContent.end(), back_inserter(directories), [](const shared_ptr<FsNode> f) { return f->isDirectory(); });
+	copy_if(dirContent.begin(), dirContent.end(), back_inserter(files), [](const shared_ptr<MpcFile> f) { return f->isFile(); });
+	copy_if(dirContent.begin(), dirContent.end(), back_inserter(directories), [](const shared_ptr<MpcFile> f) { return f->isDirectory(); });
 
 	dirContent.clear();
 
@@ -70,7 +84,7 @@ void StdDisk::renameFilesToAkai()
 		}
 
 		allCompatibleNames.push_back(akaiName);
-		file->renameTo(akaiName);
+        file->setName(akaiName);
 	}
 	
 	for (auto& dir : directories)
@@ -95,7 +109,7 @@ void StdDisk::renameFilesToAkai()
 			akaiName = akaiName.substr(0, akaiName.find_last_of("."));
 
 		allCompatibleNames.push_back(akaiName);
-		dir->renameTo(akaiName);
+		dir->setName(akaiName);
 	}
 }
 
@@ -113,18 +127,17 @@ void StdDisk::initFiles()
 
 	for (auto& f : dirList)
 	{
-		auto mpcFile = make_shared<MpcFile>(f);
-		allFiles.push_back(mpcFile);
+		allFiles.push_back(f);
 
 		if (view != 0 && f->isFile())
 		{
 			string name = f->getName();
 		
 			if (f->isFile() && name.find(".") != string::npos && name.substr(name.length() - 3).compare(extensions[view]) == 0)
-				files.push_back(mpcFile);
+				files.push_back(f);
 		}
 		else {
-			files.push_back(mpcFile);
+			files.push_back(f);
 		}
 	}
     
@@ -141,7 +154,7 @@ void StdDisk::initParentFiles()
 	for (auto& f : temp)
 	{
 		if (f->isDirectory())
-			parentFiles.push_back(make_shared<MpcFile>(f));
+			parentFiles.push_back(f);
 	}
 }
 
@@ -180,20 +193,20 @@ bool StdDisk::moveForward(const string& directoryName)
 	return success;
 }
 
-shared_ptr<Directory> StdDisk::getDir()
+std::shared_ptr<MpcFile> StdDisk::getDir()
 {
 	if (path.size() == 0)
         return root;
 
-    string dirPath = root->getPath();
+    string dirPath = root->stdNode->getPath();
     
     for (int i = 0; i < path.size(); i++)
         dirPath = dirPath + FileUtil::getSeparator() + path[i];
     
-	return make_shared<Directory>(dirPath, nullptr);
+	return std::make_shared<MpcFile>(std::make_shared<Directory>(dirPath, nullptr));
 }
 
-shared_ptr<Directory> StdDisk::getParentDir()
+std::shared_ptr<MpcFile> StdDisk::getParentDir()
 {
 	if (path.size() == 0)
         return {};
@@ -201,14 +214,15 @@ shared_ptr<Directory> StdDisk::getParentDir()
 	if (path.size() == 1)
         return root;
 
-    string dirPath = root->getPath();
+    string dirPath = root->stdNode->getPath();
     
     for (int i = 0; i < path.size() - 1; i++)
     {
         dirPath = dirPath + FileUtil::getSeparator() + path[i];
     }
     
-    return make_shared<Directory>(dirPath, nullptr);}
+    return std::make_shared<MpcFile>(std::make_shared<Directory>(dirPath, nullptr));
+}
 
 bool StdDisk::deleteAllFiles(int extension)
 {
@@ -234,7 +248,7 @@ bool StdDisk::deleteAllFiles(int extension)
 bool StdDisk::newFolder(const string& newDirName)
 {
     auto dir = getDir();
-	auto f = Directory(dir->getPath() + FileUtil::getSeparator() + StrUtil::toUpper(newDirName), dir);
+	auto f = Directory(dir->stdNode->getPath() + FileUtil::getSeparator() + StrUtil::toUpper(newDirName), std::dynamic_pointer_cast<Directory>(dir->stdNode));
 	return f.create();
 }
 
@@ -270,9 +284,9 @@ shared_ptr<MpcFile> StdDisk::newFile(const string& _newFileName)
 
         auto dir = getDir();
         
-		string filePath = dir->getPath() + FileUtil::getSeparator() + StrUtil::toUpper(StrUtil::replaceAll(fileName, ' ', "_"));
+		string filePath = dir->stdNode->getPath() + FileUtil::getSeparator() + StrUtil::toUpper(StrUtil::replaceAll(fileName, ' ', "_"));
         
-		f = make_shared<File>(filePath, dir);
+		f = make_shared<File>(filePath, std::dynamic_pointer_cast<Directory>(dir->stdNode));
 		auto success = f->create();
 		
         if (success)
@@ -291,7 +305,7 @@ shared_ptr<MpcFile> StdDisk::newFile(const string& _newFileName)
 
 string StdDisk::getAbsolutePath()
 {
-    return getDir()->getPath();
+    return getDir()->stdNode->getPath();
 }
 
 int StdDisk::getPathDepth() {
