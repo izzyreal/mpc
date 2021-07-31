@@ -30,8 +30,8 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace std;
 
-StdDisk::StdDisk(mpc::Mpc& mpc, Volume& _volume)
-	: AbstractDisk(mpc), volume (_volume), root (_volume.getRoot())
+StdDisk::StdDisk(mpc::Mpc& mpc)
+	: AbstractDisk(mpc)
 {
 }
 

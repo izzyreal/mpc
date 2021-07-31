@@ -10,30 +10,62 @@
 
 #include <file/FileUtil.hpp>
 
+#include <util/RemovableVolumes.h>
+
 using namespace mpc::disk;
 using namespace mpc::lcdgui;
 
+using namespace akaifat::util;
+
 DiskController::DiskController(mpc::Mpc& _mpc)
-	: mpc (_mpc)
+: mpc (_mpc)
 {
 }
 
 void DiskController::initDisks()
 {
-    static auto volume1 = Volume();
+    disks.emplace_back(std::make_shared<StdDisk>(mpc));
+    auto& volume1 = disks.back()->getVolume();
     volume1.type = LOCAL_DIRECTORY;
     volume1.mode = READ_WRITE;
     volume1.label = "MPC2000XL";
     volume1.localDirectoryPath = mpc::Paths::defaultLocalVolumePath();
     volume1.volumeSize = moduru::file::FileUtil::getTotalDiskSpace();
+    disks.back()->initRoot();
     
-    static auto volume2 = Volume();
-    volume2.type = USB_VOLUME;
-    volume2.volumePath = "disk4";
-    volume2.volumeSize = 123 * 1024 * 1024;
+    RemovableVolumes removableVolumes;
     
-    disks.emplace_back(std::make_shared<StdDisk>(mpc, volume1));
-//    disks.emplace_back(std::make_shared<RawDisk>(mpc, volume2));
+    class SimpleChangeListener : public VolumeChangeListener {
+    public:
+        std::vector<RemovableVolume> volumes;
+        void processChange(RemovableVolume v) override {
+            volumes.emplace_back(v);
+        }
+    };
+    
+    SimpleChangeListener listener;
+    
+    removableVolumes.addListener(&listener);
+    
+    removableVolumes.init();
+    
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    
+    for (auto& v : listener.volumes)
+    {
+        auto name = v.deviceName;
+        auto mediaSize = v.mediaSize;
+        
+        disks.emplace_back(std::make_shared<RawDisk>(mpc));
+        auto disk = disks.back();
+        auto& volume = disk->getVolume();
+        volume.volumePath = name;
+        volume.type = USB_VOLUME;
+        volume.mode = READ_WRITE;
+        volume.label = name;
+        volume.volumeSize = mediaSize;
+    }
+    
 }
 
 std::weak_ptr<AbstractDisk> DiskController::getActiveDisk()

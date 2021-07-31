@@ -4,14 +4,13 @@
 #include <lcdgui/screens/LoadScreen.hpp>
 
 #include <disk/MpcFile.hpp>
-#include <disk/Volume.hpp>
 
 using namespace mpc::disk;
 using namespace mpc::lcdgui::screens;
 using namespace std;
 
-RawDisk::RawDisk(mpc::Mpc& _mpc, Volume& _volume)
-	: AbstractDisk(_mpc), volume (_volume), root (_volume.getRawRoot())
+RawDisk::RawDisk(mpc::Mpc& _mpc)
+	: AbstractDisk(_mpc)
 {
 }
 

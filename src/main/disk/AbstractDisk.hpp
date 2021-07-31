@@ -28,6 +28,7 @@ class Sound;
 namespace mpc::disk {
 
 class MpcFile;
+class Volume;
 
 class AbstractDisk
 : public moduru::observer::Observable
@@ -91,6 +92,8 @@ public:
     virtual std::string getModeShortName() = 0;
     virtual uint64_t getTotalSize() = 0;
     virtual std::string getVolumeLabel() = 0;
+    virtual Volume& getVolume() = 0;
+    virtual void initRoot() = 0;
 
 protected:
     virtual int getPathDepth() = 0;

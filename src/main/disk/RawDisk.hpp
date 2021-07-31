@@ -1,5 +1,6 @@
 #pragma once
 #include <disk/AbstractDisk.hpp>
+#include <disk/Volume.hpp>
 
 #include <fat/AkaiFatLfnDirectory.hpp>
 #include <fat/AkaiFatLfnDirectoryEntry.hpp>
@@ -10,18 +11,17 @@
 
 namespace mpc::disk {
 
-class Volume;
 class MpcFile;
 
 class RawDisk
 : public AbstractDisk
 {
 public:
-    RawDisk(mpc::Mpc&, Volume&);
+    RawDisk(mpc::Mpc&);
     
 private:
     void initParentFiles();
-    Volume& volume;
+    Volume volume;
     std::vector<std::shared_ptr<akaifat::fat::AkaiFatLfnDirectoryEntry>> path;
     std::shared_ptr<akaifat::fat::AkaiFatLfnDirectory> root;
     std::shared_ptr<akaifat::fat::AkaiFatLfnDirectory> getDir();
@@ -46,6 +46,8 @@ public:
     std::string getModeShortName() override;
     uint64_t getTotalSize() override;
     std::string getVolumeLabel() override;
+    Volume& getVolume() override { return volume; }
+    void initRoot() override { root = volume.getRawRoot(); }
     
 protected:
     int getPathDepth() override;
