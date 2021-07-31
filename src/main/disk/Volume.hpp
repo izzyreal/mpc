@@ -14,7 +14,7 @@
 namespace mpc::disk {
 
 enum VolumeType { LOCAL_DIRECTORY, DISK_IMAGE, USB_VOLUME };
-enum MountMode { DISABLED, READ_ONLY, READ_WRITE };
+enum MountMode { DISABLED = 0, READ_ONLY = 1, READ_WRITE = 2 };
 
 struct Volume {
     

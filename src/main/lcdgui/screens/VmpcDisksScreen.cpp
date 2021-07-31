@@ -54,6 +54,10 @@ void VmpcDisksScreen::function(int i)
 
 void VmpcDisksScreen::turnWheel(int i)
 {
+    auto& volume = mpc.getDisks()[row]->getVolume();
+    if (volume.mode + i < 0 || volume.mode + i > 2) return;
+    volume.mode = static_cast<MountMode>(volume.mode + i);
+    displayRows();
 }
 
 void VmpcDisksScreen::displayRows()
@@ -86,4 +90,18 @@ void VmpcDisksScreen::displayRows()
         mode->setText(disk->getModeShortName());
 
     }
+}
+
+void VmpcDisksScreen::up()
+{
+    if (row == 0 && rowOffset == 0) return;
+    if (row == 0) rowOffset--; else row--;
+    displayRows();
+}
+
+void VmpcDisksScreen::down()
+{
+    if (row + rowOffset + 1 >= mpc.getDisks().size()) return;
+    if (row == 3) rowOffset++; else row++;
+    displayRows();
 }

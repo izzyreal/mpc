@@ -9,6 +9,8 @@ public:
     void open() override;
     void function(int i) override;
     void turnWheel(int i) override;
+    void up() override;
+    void down() override;
     
 private:
     int row = 0;

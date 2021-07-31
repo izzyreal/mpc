@@ -25,12 +25,12 @@ DiskController::DiskController(mpc::Mpc& _mpc)
 void DiskController::initDisks()
 {
     disks.emplace_back(std::make_shared<StdDisk>(mpc));
-    auto& volume1 = disks.back()->getVolume();
-    volume1.type = LOCAL_DIRECTORY;
-    volume1.mode = READ_WRITE;
-    volume1.label = "MPC2000XL";
-    volume1.localDirectoryPath = mpc::Paths::defaultLocalVolumePath();
-    volume1.volumeSize = moduru::file::FileUtil::getTotalDiskSpace();
+    auto& defaultVolume = disks.back()->getVolume();
+    defaultVolume.type = LOCAL_DIRECTORY;
+    defaultVolume.mode = READ_WRITE;
+    defaultVolume.label = "MPC2000XL";
+    defaultVolume.localDirectoryPath = mpc::Paths::defaultLocalVolumePath();
+    defaultVolume.volumeSize = moduru::file::FileUtil::getTotalDiskSpace();
     disks.back()->initRoot();
     
     RemovableVolumes removableVolumes;
