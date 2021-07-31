@@ -43,6 +43,9 @@ VmpcKeyboardScreen::VmpcKeyboardScreen(mpc::Mpc& mpc, int layerIndex)
 
 void VmpcKeyboardScreen::open()
 {
+    findChild<Label>("up").lock()->setText("\u00C7");
+    findChild<Label>("down").lock()->setText("\u00C6");
+    
     setLearning(false);
     setLearnCandidate(-1);
     updateKeyCodeNames();
@@ -245,6 +248,9 @@ void VmpcKeyboardScreen::updateRows()
             f->setBlinking(false);
         }
     }
+    
+    displayUp();
+    displayDown();
 }
 
 void VmpcKeyboardScreen::updateKeyCodeNames()
@@ -273,4 +279,16 @@ void VmpcKeyboardScreen::updateKeyCodeNames()
 
     labelsToKeyCodeNames.push_back({ "datawheel-up", keyCodeNames[kbMapping->getKeyCodeFromLabel("datawheel-up")] });
     labelsToKeyCodeNames.push_back({ "datawheel-down", keyCodeNames[kbMapping->getKeyCodeFromLabel("datawheel-down")] });
+}
+
+void VmpcKeyboardScreen::displayUp()
+{
+    auto label = findChild<Label>("up").lock();
+    label->Hide(rowOffset == 0);
+}
+
+void VmpcKeyboardScreen::displayDown()
+{
+    auto label = findChild<Label>("down").lock();
+    label->Hide(rowOffset + 5 >= labelsToKeyCodeNames.size());
 }

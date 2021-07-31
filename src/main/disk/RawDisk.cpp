@@ -407,3 +407,23 @@ void RawDisk::flush()
 {
     
 }
+
+std::string RawDisk::getTypeShortName()
+{
+    return volume.typeShortName();
+}
+
+std::string RawDisk::getModeShortName()
+{
+    return volume.modeShortName();
+}
+
+uint64_t RawDisk::getTotalSize()
+{
+    return volume.volumeSize;
+}
+
+std::string RawDisk::getVolumeLabel()
+{
+    return volume.label;
+}

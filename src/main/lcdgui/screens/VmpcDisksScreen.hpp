@@ -9,5 +9,11 @@ public:
     void open() override;
     void function(int i) override;
     void turnWheel(int i) override;
+    
+private:
+    int row = 0;
+    int rowOffset = 0;
+
+    void displayRows();
 };
 }

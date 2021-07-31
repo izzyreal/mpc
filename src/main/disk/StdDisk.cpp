@@ -305,3 +305,23 @@ string StdDisk::getAbsolutePath()
 int StdDisk::getPathDepth() {
 	return path.size();
 }
+
+std::string StdDisk::getTypeShortName()
+{
+    return volume.typeShortName();
+}
+
+std::string StdDisk::getModeShortName()
+{
+    return volume.modeShortName();
+}
+
+uint64_t StdDisk::getTotalSize()
+{
+    return volume.volumeSize;
+}
+
+std::string StdDisk::getVolumeLabel()
+{
+    return volume.label;
+}

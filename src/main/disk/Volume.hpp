@@ -66,6 +66,11 @@ struct Volume {
         }
     }
     
+    std::string sizeShortName()
+    {
+        
+    }
+    
     std::shared_ptr<mpc::disk::MpcFile> getRoot()
     {
         if (type == LOCAL_DIRECTORY)

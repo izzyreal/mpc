@@ -24,6 +24,9 @@ void VmpcSettingsScreen::function(int i)
         case 2:
             openScreen("vmpc-auto-save");
             break;
+        case 3:
+            openScreen("vmpc-disks");
+            break;
     }
 }
 

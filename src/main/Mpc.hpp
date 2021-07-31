@@ -116,6 +116,7 @@ public:
         
 public:
     std::weak_ptr<mpc::disk::AbstractDisk> getDisk();
+    std::vector<std::shared_ptr<mpc::disk::AbstractDisk>> getDisks();
     
 public:
     Mpc();

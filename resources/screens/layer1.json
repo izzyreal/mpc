@@ -589,11 +589,15 @@
  "y" : [ 5, 16 ],
  "parameters" : [ "initial-pad-mapping", "16-levels-erase-mode" ],
  "tfsize" : [ 60, 108 ],
- "fblabels" : [ "SETNGS", "KEYBRD", "AUTSAV", null, null, null ],
- "fbtypes" : [ 2, 0, 0, null, null, null ]
+ "fblabels" : [ "SETNGS", "KEYBRD", "AUTSAV", "DISKS", null, null ],
+ "fbtypes" : [ 2, 0, 0, 0, null, null ]
 },
 "vmpc-keyboard":
 {
+ "infowidgets" : [ "up", "down" ],
+ "infosize" : [ 5, 5 ],
+ "infox" : [ 202, 202 ],
+ "infoy" : [ 2, 38 ],
  "fblabels" : [
  ["SETNGS", "KEYBRD", "AUTSAV", "LEARN", "RESET", "SAVE" ],
  ["SETNGS", "KEYBRD", "CANCEL", "ACCEPT", null, null ]],
@@ -615,8 +619,8 @@
  "infosize" : [ 168 ],
  "infox" : [ 45 ],
  "infoy" : [ 37 ],
- "fblabels" : [ "SETNGS", "KEYBRD", "AUTSAV", null, null, null ],
- "fbtypes" : [ 0, 0, 2, null, null, null ]
+ "fblabels" : [ "SETNGS", "KEYBRD", "AUTSAV", "DISKS", null, null ],
+ "fbtypes" : [ 0, 0, 2, 0, null, null ]
 },
 "vmpc-disks":
 {
@@ -625,6 +629,10 @@
  "y" : [ ],
  "parameters" : [ ],
  "tfsize" : [ ],
+ "infowidgets" : [ "up", "down" ],
+ "infosize" : [ 5, 5 ],
+ "infox" : [ 240, 240 ],
+ "infoy" : [ 10, 38 ],
  "fblabels" : [ "SETNGS", "KEYBRD", "AUTSAV", "DISKS", null, null ],
  "fbtypes" : [ 0, 0, 0, 2, null, null ]
 }

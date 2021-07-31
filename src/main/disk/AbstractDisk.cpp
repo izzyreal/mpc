@@ -50,10 +50,10 @@ bool AbstractDisk::isBusy()
 	return busy;
 }
 
-string AbstractDisk::formatFileSize(int size)
+std::string AbstractDisk::formatFileSize(uint64_t size)
 {
-	string hrSize = "";
-	float b = size;
+	std::string hrSize = "";
+	uint64_t b = size;
 	float k = size / 1024.0;
 	float m = ((size / 1024.0) / 1024.0);
 	float g = (((size / 1024.0) / 1024.0) / 1024.0);
@@ -61,19 +61,19 @@ string AbstractDisk::formatFileSize(int size)
 
 	if(t > 1)
 	{
-		hrSize = StrUtil::TrimDecimals(t, 2) + " TB";
+		hrSize = StrUtil::TrimDecimals(t, 1) + "T";
 	} else if(g > 1)
 	{
-		hrSize = StrUtil::TrimDecimals(g, 2) + " GB";
+		hrSize = std::to_string((int)g) + "G";
 	} else if(m > 1)
 	{
-		hrSize = StrUtil::TrimDecimals(m, 2) + " MB";
+		hrSize = std::to_string((int)m) + "M";
 	} else if(k > 1)
 	{
-		hrSize = StrUtil::TrimDecimals(k, 2) + " KB";
+		hrSize = std::to_string((int)k) + "K";
 	} else
 	{
-		hrSize = StrUtil::TrimDecimals(b, 2) + " Bytes";
+		hrSize = std::to_string((int)b) + "B";
 	}
 	return hrSize;
 }

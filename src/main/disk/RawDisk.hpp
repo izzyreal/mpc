@@ -42,6 +42,10 @@ public:
     bool deleteDir(std::weak_ptr<MpcFile> f) override;
     std::shared_ptr<MpcFile> newFile(const std::string& newFileName) override;
     std::string getAbsolutePath() override;
+    std::string getTypeShortName() override;
+    std::string getModeShortName() override;
+    uint64_t getTotalSize() override;
+    std::string getVolumeLabel() override;
     
 protected:
     int getPathDepth() override;

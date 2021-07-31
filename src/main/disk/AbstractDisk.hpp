@@ -28,7 +28,6 @@ class Sound;
 namespace mpc::disk {
 
 class MpcFile;
-class Volume;
 
 class AbstractDisk
 : public moduru::observer::Observable
@@ -48,7 +47,7 @@ public:
     std::vector<std::shared_ptr<MpcFile>> parentFiles;
     
 public:
-    static std::string formatFileSize(int size);
+    static std::string formatFileSize(uint64_t size);
     static std::string padFileName16(std::string s);
     
     bool renameSelectedFile(std::string s);
@@ -88,7 +87,11 @@ public:
     virtual bool newFolder(const std::string& newDirName) = 0;
     virtual bool deleteDir(std::weak_ptr<MpcFile>) = 0;
     virtual std::string getAbsolutePath() = 0;
-    
+    virtual std::string getTypeShortName() = 0;
+    virtual std::string getModeShortName() = 0;
+    virtual uint64_t getTotalSize() = 0;
+    virtual std::string getVolumeLabel() = 0;
+
 protected:
     virtual int getPathDepth() = 0;
     

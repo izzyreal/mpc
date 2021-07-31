@@ -8,6 +8,8 @@
 #include <disk/RawDisk.hpp>
 #include <disk/Volume.hpp>
 
+#include <file/FileUtil.hpp>
+
 using namespace mpc::disk;
 using namespace mpc::lcdgui;
 
@@ -20,7 +22,10 @@ void DiskController::initDisks()
 {
     static auto volume1 = Volume();
     volume1.type = LOCAL_DIRECTORY;
+    volume1.mode = READ_WRITE;
+    volume1.label = "MPC2000XL";
     volume1.localDirectoryPath = mpc::Paths::defaultLocalVolumePath();
+    volume1.volumeSize = moduru::file::FileUtil::getTotalDiskSpace();
     
     static auto volume2 = Volume();
     volume2.type = USB_VOLUME;
@@ -31,7 +36,12 @@ void DiskController::initDisks()
 //    disks.emplace_back(std::make_shared<RawDisk>(mpc, volume2));
 }
 
-std::weak_ptr<AbstractDisk> DiskController::getDisk()
+std::weak_ptr<AbstractDisk> DiskController::getActiveDisk()
 {
     return disks[0];
+}
+
+std::vector<std::shared_ptr<AbstractDisk>>& DiskController::getDisks()
+{
+    return disks;
 }

@@ -35,6 +35,8 @@ private:
     void updateKeyCodeNames();
     void setLearning(bool b);
     void updateRows();
+    void displayUp();
+    void displayDown();
         
 };
 }
