@@ -1,9 +1,6 @@
 #include "VmpcDisksScreen.hpp"
 
-#include <disk/Volume.hpp>
-
 using namespace mpc::lcdgui::screens;
-using namespace std;
 
 VmpcDisksScreen::VmpcDisksScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "vmpc-disks", layerIndex)

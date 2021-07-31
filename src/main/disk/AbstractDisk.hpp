@@ -77,7 +77,6 @@ public:
     bool isBusy();
     bool isRoot();
     
-    virtual Volume& getStore() = 0;
     virtual void flush() = 0;
     virtual void close() = 0;
     virtual void initFiles() = 0;

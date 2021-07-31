@@ -60,7 +60,7 @@ Mpc::Mpc()
         Paths::appDocumentsPath(),
         Paths::configPath(),
         Paths::storesPath(),
-        Paths::defaultStorePath(),
+        Paths::defaultLocalVolumePath(),
         Paths::recordingsPath()
     };
     

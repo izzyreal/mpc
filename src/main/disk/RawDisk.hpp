@@ -1,32 +1,35 @@
 #pragma once
 #include <disk/AbstractDisk.hpp>
-#include <file/File.hpp>
+
+#include <fat/AkaiFatLfnDirectory.hpp>
+#include <fat/AkaiFatLfnDirectoryEntry.hpp>
 
 #include <memory>
-#include <string>
 #include <vector>
+#include <string>
 
 namespace mpc::disk {
+
 class Volume;
 class MpcFile;
 
-class StdDisk
+class RawDisk
 : public AbstractDisk
 {
-    
 public:
-    StdDisk(mpc::Mpc&, Volume&);
-    std::shared_ptr<MpcFile> getDir();
+    RawDisk(mpc::Mpc&, Volume&);
     
 private:
-    std::shared_ptr<mpc::disk::MpcFile> root;
-    Volume& volume;
-    std::vector<std::string> path;
     void initParentFiles();
-    std::shared_ptr<MpcFile> getParentDir();
-    void renameFilesToAkai();
-    bool deleteRecursive(std::weak_ptr<MpcFile>);
-    
+    Volume& volume;
+    std::vector<std::shared_ptr<akaifat::fat::AkaiFatLfnDirectoryEntry>> path;
+    std::shared_ptr<akaifat::fat::AkaiFatLfnDirectory> root;
+    std::shared_ptr<akaifat::fat::AkaiFatLfnDirectory> getDir();
+    std::shared_ptr<akaifat::fat::AkaiFatLfnDirectory> getParentDir();
+    bool deleteFilesRecursive(std::shared_ptr<akaifat::fat::AkaiFatLfnDirectoryEntry> entry);
+    bool deleteDirsRecursive(std::shared_ptr<akaifat::fat::AkaiFatLfnDirectoryEntry> entry, bool checkExist);
+    void refreshPath();
+
 public:
     void initFiles() override;
     std::string getDirectoryName() override;
@@ -42,6 +45,6 @@ public:
     
 protected:
     int getPathDepth() override;
-        
+
 };
 }

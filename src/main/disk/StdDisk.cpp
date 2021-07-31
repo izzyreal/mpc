@@ -45,12 +45,6 @@ void StdDisk::flush()
     volume.flush();
 }
 
-Volume& StdDisk::getStore()
-{
-    return volume;
-}
-
-
 void StdDisk::renameFilesToAkai()
 {
 	auto dirContent = getDir()->listFiles();

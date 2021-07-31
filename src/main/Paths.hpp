@@ -15,7 +15,7 @@ public:
     static std::string appConfigPath();
 
     static std::string storesPath();
-    static std::string defaultStorePath();
+    static std::string defaultLocalVolumePath();
 
     static std::string logFilePath();
     static std::string recordingsPath();

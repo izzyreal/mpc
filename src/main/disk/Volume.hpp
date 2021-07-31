@@ -3,6 +3,12 @@
 #include <disk/MpcFile.hpp>
 #include <file/Directory.hpp>
 
+#include <ImageBlockDevice.hpp>
+#include <FileSystemFactory.hpp>
+#include <fat/AkaiFatFileSystem.hpp>
+#include <fat/AkaiFatLfnDirectory.hpp>
+#include <util/VolumeMounter.h>
+
 #include <string>
 
 namespace mpc::disk {
@@ -13,7 +19,7 @@ enum MountMode { DISABLED, READ_ONLY, READ_WRITE };
 struct Volume {
     
     std::string label;
-    VolumeType type = VolumeType::LOCAL_DIRECTORY;
+    VolumeType type = LOCAL_DIRECTORY;
     
     /*
      Used when type == LOCAL_DIRECTORY. Absolute path of a directory
@@ -36,6 +42,7 @@ struct Volume {
     // Used when type == DISK_IMAGE || USB_VOLUME
     std::string volumeUUID;
     MountMode mode = MountMode::DISABLED;
+    uint64_t volumeSize;
     
     std::string typeShortName()
     {
@@ -63,10 +70,25 @@ struct Volume {
     {
         if (type == LOCAL_DIRECTORY)
             return std::make_shared<mpc::disk::MpcFile>(std::make_shared<moduru::file::Directory>(localDirectoryPath, nullptr));
-        else if (type == USB_VOLUME)
-            return {};
         else
             return {};
+    }
+    
+    std::shared_ptr<akaifat::fat::AkaiFatLfnDirectory> getRawRoot()
+    {
+        if (type == USB_VOLUME)
+        {
+            auto volumeStream = akaifat::util::VolumeMounter::mount(volumePath, false);
+         
+            if (volumeStream.is_open())
+            {
+                auto device = std::make_shared<akaifat::ImageBlockDevice>(volumeStream, volumeSize);
+                auto fs = dynamic_cast<akaifat::fat::AkaiFatFileSystem *>(akaifat::FileSystemFactory::createAkai(device, false));
+
+                return std::dynamic_pointer_cast<akaifat::fat::AkaiFatLfnDirectory>(fs->getRoot());
+            }
+        }
+        return {};
     }
     
     void close() {}
