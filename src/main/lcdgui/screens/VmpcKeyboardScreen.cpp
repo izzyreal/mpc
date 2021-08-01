@@ -249,8 +249,7 @@ void VmpcKeyboardScreen::updateRows()
         }
     }
     
-    displayUp();
-    displayDown();
+    displayUpAndDown();
 }
 
 void VmpcKeyboardScreen::updateKeyCodeNames()
@@ -281,14 +280,8 @@ void VmpcKeyboardScreen::updateKeyCodeNames()
     labelsToKeyCodeNames.push_back({ "datawheel-down", keyCodeNames[kbMapping->getKeyCodeFromLabel("datawheel-down")] });
 }
 
-void VmpcKeyboardScreen::displayUp()
+void VmpcKeyboardScreen::displayUpAndDown()
 {
-    auto label = findChild<Label>("up").lock();
-    label->Hide(rowOffset == 0);
-}
-
-void VmpcKeyboardScreen::displayDown()
-{
-    auto label = findChild<Label>("down").lock();
-    label->Hide(rowOffset + 5 >= labelsToKeyCodeNames.size());
+    findChild<Label>("up").lock()->Hide(rowOffset == 0);
+    findChild<Label>("down").lock()->Hide(rowOffset + 5 >= labelsToKeyCodeNames.size());
 }

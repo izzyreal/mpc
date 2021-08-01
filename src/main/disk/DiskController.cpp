@@ -26,6 +26,7 @@ void DiskController::initDisks()
 {
     disks.emplace_back(std::make_shared<StdDisk>(mpc));
     auto& defaultVolume = disks.back()->getVolume();
+    defaultVolume.volumeUUID = "default_volume";
     defaultVolume.type = LOCAL_DIRECTORY;
     defaultVolume.mode = READ_WRITE;
     defaultVolume.label = "MPC2000XL";
@@ -53,17 +54,17 @@ void DiskController::initDisks()
     
     for (auto& v : listener.volumes)
     {
-        auto name = v.deviceName;
-        auto mediaSize = v.mediaSize;
-        
         disks.emplace_back(std::make_shared<RawDisk>(mpc));
         auto disk = disks.back();
         auto& volume = disk->getVolume();
-        volume.volumePath = name;
+        
         volume.type = USB_VOLUME;
         volume.mode = READ_WRITE;
-        volume.label = name;
-        volume.volumeSize = mediaSize;
+        
+        volume.volumePath = v.deviceName;
+        volume.label = v.volumeName;
+        volume.volumeSize = v.mediaSize;
+        volume.volumeUUID = v.volumeUUID;
     }
     
 }

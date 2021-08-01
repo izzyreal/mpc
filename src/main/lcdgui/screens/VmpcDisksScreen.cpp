@@ -1,14 +1,19 @@
 #include "VmpcDisksScreen.hpp"
 
 #include <lcdgui/Parameter.hpp>
+#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/dialog2/PopupScreen.hpp>
 #include <disk/DiskController.hpp>
 #include <disk/AbstractDisk.hpp>
 #include <disk/RawDisk.hpp>
 #include <disk/StdDisk.hpp>
+#include <nvram/VolumesPersistence.hpp>
 
 using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::lcdgui;
 using namespace mpc::disk;
+using namespace mpc::nvram;
 
 VmpcDisksScreen::VmpcDisksScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "vmpc-disks", layerIndex)
@@ -32,8 +37,17 @@ void VmpcDisksScreen::open()
 {
     findChild<Label>("up").lock()->setText("\u00C7");
     findChild<Label>("down").lock()->setText("\u00C6");
+ 
+    config.clear();
+    
+    for (auto& d : mpc.getDisks())
+    {
+        auto& diskVol = d->getVolume();
+        config[diskVol.volumeUUID] = diskVol.mode;
+    }
     
     displayRows();
+    displayFunctionKeys();
 }
 
 void VmpcDisksScreen::function(int i)
@@ -49,15 +63,45 @@ void VmpcDisksScreen::function(int i)
         case 2:
             openScreen("vmpc-auto-save");
             break;
+        case 5:
+            auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+            mpc.getLayeredScreen().lock()->openScreen("popup");
+
+            if (hasConfigChanged())
+            {
+                for (auto& kv : config)
+                {
+                    auto uuid = kv.first;
+                    for (auto& d : mpc.getDisks())
+                    {
+                        if (d->getVolume().volumeUUID == uuid)
+                            d->getVolume().mode = kv.second;
+                    }
+                }
+                
+                VolumesPersistence::save(mpc);
+                popupScreen->setText("Volume configurations saved");
+            }
+            else
+            {
+                popupScreen->setText("Volume configurations unchanged");
+            }
+
+            popupScreen->returnToScreenAfterMilliSeconds("vmpc-disks", 1000);
+
+            break;
     }
 }
 
 void VmpcDisksScreen::turnWheel(int i)
 {
     auto& volume = mpc.getDisks()[row]->getVolume();
-    if (volume.mode + i < 0 || volume.mode + i > 2) return;
-    volume.mode = static_cast<MountMode>(volume.mode + i);
+    auto current = config[volume.volumeUUID];
+    if (current + i < 0 || current + i > 2) return;
+    config[volume.volumeUUID] = static_cast<MountMode>(current + i);
+    
     displayRows();
+    displayFunctionKeys();
 }
 
 void VmpcDisksScreen::displayRows()
@@ -87,9 +131,10 @@ void VmpcDisksScreen::displayRows()
         volume->setText(disk->getVolumeLabel());
         type->setText(disk->getTypeShortName());
         size->setText(AbstractDisk::formatFileSize(disk->getTotalSize()));
-        mode->setText(disk->getModeShortName());
-
+        mode->setText(Volume::modeShortName(config[disk->getVolume().volumeUUID]));
     }
+    
+    displayUpAndDown();
 }
 
 void VmpcDisksScreen::up()
@@ -104,4 +149,28 @@ void VmpcDisksScreen::down()
     if (row + rowOffset + 1 >= mpc.getDisks().size()) return;
     if (row == 3) rowOffset++; else row++;
     displayRows();
+}
+
+bool VmpcDisksScreen::hasConfigChanged()
+{
+    auto persisted = VolumesPersistence::getPersistedConfigs();
+    
+    for (auto& kv : config)
+    {
+        if (persisted.find(kv.first) == end(persisted)) return true;
+        if (persisted[kv.first] != kv.second) return true;
+    }
+    
+    return false;
+}
+
+void VmpcDisksScreen::displayFunctionKeys()
+{
+    ls.lock()->setFunctionKeysArrangement(hasConfigChanged() ? 0 : 1);
+}
+
+void VmpcDisksScreen::displayUpAndDown()
+{
+    findChild<Label>("up").lock()->Hide(rowOffset == 0);
+    findChild<Label>("down").lock()->Hide(rowOffset + 4 >= mpc.getDisks().size());
 }

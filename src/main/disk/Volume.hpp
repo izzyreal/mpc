@@ -55,9 +55,9 @@ struct Volume {
         }
     }
     
-    std::string modeShortName()
+    static std::string modeShortName(MountMode m)
     {
-        switch (mode)
+        switch (m)
         {
             case DISABLED:    return "DISABLED";
             case READ_ONLY:   return "READ-ONLY";
@@ -66,6 +66,11 @@ struct Volume {
         }
     }
     
+    std::string modeShortName()
+    {
+        return modeShortName(mode);
+    }
+
     std::string sizeShortName()
     {
         

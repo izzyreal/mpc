@@ -633,7 +633,11 @@
  "infosize" : [ 5, 5 ],
  "infox" : [ 240, 240 ],
  "infoy" : [ 10, 38 ],
- "fblabels" : [ "SETNGS", "KEYBRD", "AUTSAV", "DISKS", null, null ],
- "fbtypes" : [ 0, 0, 0, 2, null, null ]
+ "fblabels" : [
+  [ "SETNGS", "KEYBRD", "AUTSAV", "DISKS", "RESET", "SAVE" ],
+  [ "SETNGS", "KEYBRD", "AUTSAV", "DISKS", null, null ]],
+ "fbtypes" : [
+  [ 0, 0, 0, 2, 1, 1 ],
+  [ 0, 0, 0, 2, null, null ]]
 }
 }
