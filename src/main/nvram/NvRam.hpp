@@ -11,11 +11,12 @@ private:
     static const int DEFAULT_MAIN_VOLUME = 65;
     
 public:
-    static void loadUserScreenValues(mpc::Mpc& mpc);
-    static void saveUserScreenValues(mpc::Mpc& mpc);
+    static void loadUserScreenValues(mpc::Mpc&);
+    static void saveUserScreenValues(mpc::Mpc&);
+
+    static void loadVmpcSettings(mpc::Mpc&);
+    static void saveVmpcSettings(mpc::Mpc&);
     
-    static void saveVmpcSettings(mpc::Mpc& mpc);
-    static void loadVmpcSettings(mpc::Mpc& mpc);
     
 };
 }

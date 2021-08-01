@@ -36,6 +36,18 @@ Document read()
     
     return result;
 }
+std::string VolumesPersistence::getPersistedActiveUUID()
+{
+    Value& volumes = read()["volumes"];
+    for (auto i = volumes.GetArray().Begin(); i != volumes.GetArray().End(); i++)
+    {
+        auto uuid = (*i)["uuid"].GetString();
+        auto isActive = (*i)["active"].GetBool();
+        
+        if (isActive)
+            return uuid;
+    }
+}
 
 std::map<std::string, MountMode> VolumesPersistence::getPersistedConfigs()
 {
@@ -66,6 +78,8 @@ void VolumesPersistence::save(mpc::Mpc & mpc)
         alreadyPersistedUUIDs.emplace_back(std::string(uuid));
     }
     
+    auto activeUUID = mpc.getDisk().lock()->getVolume().volumeUUID;
+    
     auto disks = mpc.getDisks();
         
     for (int i = 0; i < disks.size(); i++)
@@ -82,6 +96,7 @@ void VolumesPersistence::save(mpc::Mpc & mpc)
                 if (std::string(uuid) == diskVol.volumeUUID)
                 {
                     (*i)["mode"].Swap(Value().SetInt(diskVol.mode));
+                    (*i)["active"].Swap(Value().SetBool(uuid == activeUUID));
                     break;
                 }
             }
@@ -91,6 +106,7 @@ void VolumesPersistence::save(mpc::Mpc & mpc)
             Value volume(kObjectType);
             volume.AddMember("uuid", StringRef(diskVol.volumeUUID.c_str()), d.GetAllocator());
             volume.AddMember("mode", diskVol.mode, d.GetAllocator());
+            volume.AddMember("active", Value().SetBool(diskVol.volumeUUID == activeUUID), d.GetAllocator());
             volumes.PushBack(volume, d.GetAllocator());
         }
     }

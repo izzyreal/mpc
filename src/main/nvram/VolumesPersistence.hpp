@@ -12,5 +12,7 @@ class VolumesPersistence {
 public:
     static void save(mpc::Mpc&);
     static std::map<std::string, mpc::disk::MountMode> getPersistedConfigs();
+    static std::string getPersistedActiveUUID();
+    
 };
 }

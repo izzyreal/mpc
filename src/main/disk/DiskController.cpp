@@ -27,6 +27,7 @@ DiskController::DiskController(mpc::Mpc& _mpc)
 void DiskController::initDisks()
 {
     auto persistedConfigs = VolumesPersistence::getPersistedConfigs();
+    auto persistedActiveUUID = VolumesPersistence::getPersistedActiveUUID();
     
     disks.emplace_back(std::make_shared<StdDisk>(mpc));
     auto& defaultVolume = disks.back()->getVolume();
@@ -74,6 +75,20 @@ void DiskController::initDisks()
         volume.volumeSize = v.mediaSize;
         volume.volumeUUID = v.volumeUUID;
     }
+    
+    for (int i = 0; i < disks.size(); i++)
+    {
+        auto uuid = disks[i]->getVolume().volumeUUID;
+        
+        if (uuid == persistedActiveUUID)
+        {
+            activeDiskIndex = i;
+            break;
+        }
+    }
+    
+    if (std::dynamic_pointer_cast<RawDisk>(getActiveDisk().lock()))
+        getActiveDisk().lock()->initRoot();
 }
 
 std::weak_ptr<AbstractDisk> DiskController::getActiveDisk()

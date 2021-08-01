@@ -7,6 +7,8 @@
 
 #include <util/VolumeMounter.h>
 
+#include <Logger.hpp>
+
 using namespace mpc::disk;
 using namespace mpc::lcdgui::screens;
 using namespace akaifat::util;
@@ -27,7 +29,7 @@ RawDisk::~RawDisk()
         }
         catch (const std::exception&)
         {
-            // Nothing to do
+            MLOG("Failed to unmount " + volume.volumePath + " from VMPC2000XL and mount it back to the host OS!");
         }
     }
 }

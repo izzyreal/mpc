@@ -2,15 +2,17 @@
 
 #include <audiomidi/AudioMidiServices.hpp>
 #include <audiomidi/SoundPlayer.hpp>
+
 #include <disk/SoundLoader.hpp>
+#include <disk/AbstractDisk.hpp>
+#include <disk/MpcFile.hpp>
+#include <disk/Volume.hpp>
 
 #include <lcdgui/screens/window/DirectoryScreen.hpp>
 #include <lcdgui/screens/window/LoadASequenceScreen.hpp>
 #include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
-#include <disk/AbstractDisk.hpp>
-#include <disk/MpcFile.hpp>
-#include <disk/Volume.hpp>
+#include <nvram/VolumesPersistence.hpp>
 
 #include <file/File.hpp>
 #include <file/FileUtil.hpp>
@@ -86,6 +88,9 @@ void LoadScreen::function(int i)
             displayDirectory();
             displayDevice();
             displayType();
+            
+            mpc::nvram::VolumesPersistence::save(mpc);
+            
             return;
         }
         
