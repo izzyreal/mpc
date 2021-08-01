@@ -5,13 +5,31 @@
 
 #include <disk/MpcFile.hpp>
 
+#include <util/VolumeMounter.h>
+
 using namespace mpc::disk;
 using namespace mpc::lcdgui::screens;
+using namespace akaifat::util;
 using namespace std;
 
 RawDisk::RawDisk(mpc::Mpc& _mpc)
 	: AbstractDisk(_mpc)
 {
+}
+
+RawDisk::~RawDisk()
+{
+    if (root)
+    {
+        try
+        {
+            VolumeMounter::unmount(volume.volumePath);
+        }
+        catch (const std::exception&)
+        {
+            // Nothing to do
+        }
+    }
 }
 
 void RawDisk::initFiles()

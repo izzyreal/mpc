@@ -18,6 +18,7 @@ class RawDisk
 {
 public:
     RawDisk(mpc::Mpc&);
+    ~RawDisk();
     
 private:
     void initParentFiles();
