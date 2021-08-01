@@ -7,6 +7,7 @@
 #include <disk/StdDisk.hpp>
 #include <disk/RawDisk.hpp>
 #include <disk/Volume.hpp>
+#include <nvram/VolumesPersistence.hpp>
 
 #include <file/FileUtil.hpp>
 
@@ -14,6 +15,7 @@
 
 using namespace mpc::disk;
 using namespace mpc::lcdgui;
+using namespace mpc::nvram;
 
 using namespace akaifat::util;
 
@@ -24,6 +26,8 @@ DiskController::DiskController(mpc::Mpc& _mpc)
 
 void DiskController::initDisks()
 {
+    auto persistedConfigs = VolumesPersistence::getPersistedConfigs();
+    
     disks.emplace_back(std::make_shared<StdDisk>(mpc));
     auto& defaultVolume = disks.back()->getVolume();
     defaultVolume.volumeUUID = "default_volume";
@@ -59,7 +63,11 @@ void DiskController::initDisks()
         auto& volume = disk->getVolume();
         
         volume.type = USB_VOLUME;
-        volume.mode = READ_WRITE;
+        
+        if (persistedConfigs.find(v.volumeUUID) == end(persistedConfigs))
+            volume.mode = READ_WRITE;
+        else
+            volume.mode = persistedConfigs[v.volumeUUID];
         
         volume.volumePath = v.deviceName;
         volume.label = v.volumeName;

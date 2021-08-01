@@ -96,6 +96,9 @@ void VmpcDisksScreen::function(int i)
 void VmpcDisksScreen::turnWheel(int i)
 {
     auto& volume = mpc.getDisks()[row]->getVolume();
+    
+    if (volume.volumeUUID == "default_volume") return;
+    
     auto current = config[volume.volumeUUID];
     if (current + i < 0 || current + i > 2) return;
     config[volume.volumeUUID] = static_cast<MountMode>(current + i);
