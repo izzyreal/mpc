@@ -47,7 +47,7 @@ public:
     uint64_t getTotalSize() override;
     std::string getVolumeLabel() override;
     Volume& getVolume() override { return volume; }
-    void initRoot() override { root = volume.getRawRoot(); }
+    void initRoot() override { if (root) return; root = volume.getRawRoot(); }
     
 protected:
     int getPathDepth() override;

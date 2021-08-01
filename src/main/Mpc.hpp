@@ -97,6 +97,7 @@ public:
     std::weak_ptr<mpc::lcdgui::ScreenComponent> getActiveControls();
     std::shared_ptr<mpc::controls::GlobalReleaseControls> getReleaseControls();
     std::weak_ptr<hardware::Hardware> getHardware();
+    mpc::disk::DiskController* getDiskController();
     
 public:
     std::weak_ptr<sequencer::Sequencer> getSequencer();

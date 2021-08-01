@@ -78,7 +78,7 @@ void DiskController::initDisks()
 
 std::weak_ptr<AbstractDisk> DiskController::getActiveDisk()
 {
-    return disks[0];
+    return disks[activeDiskIndex];
 }
 
 std::vector<std::shared_ptr<AbstractDisk>>& DiskController::getDisks()

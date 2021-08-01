@@ -10,6 +10,7 @@
 
 #include <disk/AbstractDisk.hpp>
 #include <disk/MpcFile.hpp>
+#include <disk/Volume.hpp>
 
 #include <file/File.hpp>
 #include <file/FileUtil.hpp>
@@ -30,12 +31,16 @@ LoadScreen::LoadScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void LoadScreen::open()
 {
+    device = mpc.getDiskController()->activeDiskIndex;
+    
 	findField("directory").lock()->setLocation(200, 0);
 	displayView();
 
 	displayDirectory();
 	displayFile();
 	displaySize();
+    displayDevice();
+    displayType();
 
 	displayFreeSnd();
 	findLabel("freeseq").lock()->setText("  2640K");
@@ -64,6 +69,26 @@ void LoadScreen::function(int i)
 		break;
 	case 4:
 	{
+        if (param.compare("device") == 0)
+        {
+            if (mpc.getDiskController()->activeDiskIndex == device)
+                return;
+            
+            mpc.getDiskController()->activeDiskIndex = device;
+            
+            auto newDisk = mpc.getDisk().lock();
+            
+            newDisk->initRoot();
+            newDisk->initFiles();
+            
+            displayFile();
+            displaySize();
+            displayDirectory();
+            displayDevice();
+            displayType();
+            return;
+        }
+        
 		auto controls = mpc.getControls().lock();
 
 		if (controls->isF5Pressed())
@@ -226,6 +251,17 @@ void LoadScreen::turnWheel(int i)
 			}
 		}
 	}
+    else if (param.compare("device") == 0)
+    {
+        if (device + i < 0 || device + i >= mpc.getDisks().size())
+            return;
+        
+        device += i;
+        displayDevice();
+        displayType();
+        ls.lock()->setFunctionKeysArrangement(mpc.getDiskController()->activeDiskIndex == device ? 0 : 2);
+        return;
+    }
 
 	auto splitFileName = StrUtil::split(getSelectedFileName(), '.');
 	auto playable = splitFileName.size() > 1 && (StrUtil::eqIgnoreCase(splitFileName[1], "snd") || StrUtil::eqIgnoreCase(splitFileName[1], "wav"));
@@ -408,4 +444,16 @@ void LoadScreen::loadSound()
 
     // PopupScreen should have a std::function delayedAction; that does the below
     disk->setBusy(false);
+}
+
+void LoadScreen::displayDevice()
+{
+    auto dev = findChild<Field>("device").lock();
+    dev->setText(mpc.getDisks()[device]->getVolume().label);
+}
+
+void LoadScreen::displayType()
+{
+    auto type = findChild<Label>("type").lock();
+    type->setText(mpc.getDisks()[device]->getVolume().typeShortName());
 }

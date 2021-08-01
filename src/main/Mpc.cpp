@@ -368,3 +368,8 @@ Mpc::~Mpc() {
 		MLOG("AudioMidiServices destroyed.");
 	}
 }
+
+mpc::disk::DiskController* Mpc::getDiskController()
+{
+    return diskController.get();
+}
