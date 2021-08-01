@@ -33,7 +33,7 @@ void DiskController::initDisks()
     defaultVolume.volumeUUID = "default_volume";
     defaultVolume.type = LOCAL_DIRECTORY;
     defaultVolume.mode = READ_WRITE;
-    defaultVolume.label = "MPC2000XL";
+    defaultVolume.label = "DEFAULT";
     defaultVolume.localDirectoryPath = mpc::Paths::defaultLocalVolumePath();
     defaultVolume.volumeSize = moduru::file::FileUtil::getTotalDiskSpace();
     disks.back()->initRoot();
@@ -65,7 +65,7 @@ void DiskController::initDisks()
         volume.type = USB_VOLUME;
         
         if (persistedConfigs.find(v.volumeUUID) == end(persistedConfigs))
-            volume.mode = READ_WRITE;
+            volume.mode = DISABLED;
         else
             volume.mode = persistedConfigs[v.volumeUUID];
         
@@ -74,7 +74,6 @@ void DiskController::initDisks()
         volume.volumeSize = v.mediaSize;
         volume.volumeUUID = v.volumeUUID;
     }
-    
 }
 
 std::weak_ptr<AbstractDisk> DiskController::getActiveDisk()

@@ -68,14 +68,15 @@
 },
 "load":
 {
- "labels" : [ "View:", "File:", "\u00C2" ],
- "x" : [ 0, 0, 186 ],
- "y" : [ 1, 9, 1  ],
+ "labels" : [ "View:", "File:", "\u00C2", "Device:" ],
+ "x" : [ 0, 0, 186, 0 ],
+ "y" : [ 1, 9, 1, 21 ],
  "parameters" : [
  "view", [ "_", "directory", "_", "file" ],
- "file", [ "view", "directory", "view", "_" ],
- "directory", [ "view", "file", "_", "file" ]],
- "tfsize" : [ 54, 120, 58 ],
+ "file", [ "view", "directory", "view", "device" ],
+ "directory", [ "view", "file", "_", "file" ],
+ "device", [ "_", "_", "file", "_"]],
+ "tfsize" : [ 54, 120, 58, 66 ],
  "infowidgets" : [ "size", "freesnd", "freeseq" ],
  "infosize" : [ 42, 42, 42 ],  
  "infox" : [ 206, 206, 206 ],
