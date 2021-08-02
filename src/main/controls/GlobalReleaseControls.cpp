@@ -77,8 +77,11 @@ void GlobalReleaseControls::function(int i)
 
 		if (ls.lock()->getPreviousScreenName().compare("load") == 0 && currentScreenName.compare("popup") == 0)
 		{
-			ls.lock()->openScreen("load");
-			mpc.getAudioMidiServices().lock()->getSoundPlayer().lock()->enableStopEarly();
+            if (mpc.getAudioMidiServices().lock()->getSoundPlayer().lock()->isPlaying())
+            {
+                ls.lock()->openScreen("load");
+                mpc.getAudioMidiServices().lock()->getSoundPlayer().lock()->enableStopEarly();
+            }
 		}
 
 		break;

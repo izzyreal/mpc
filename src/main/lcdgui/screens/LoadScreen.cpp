@@ -33,7 +33,8 @@ LoadScreen::LoadScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void LoadScreen::open()
 {
-    device = mpc.getDiskController()->activeDiskIndex;
+    if (ls.lock()->getPreviousScreenName() != "popup")
+        device = mpc.getDiskController()->activeDiskIndex;
     
 	findField("directory").lock()->setLocation(200, 0);
 	displayView();
@@ -49,7 +50,13 @@ void LoadScreen::open()
 
 	auto splitFileName = StrUtil::split(getSelectedFileName(), '.');
 	auto playable = splitFileName.size() > 1 && (StrUtil::eqIgnoreCase(splitFileName[1], "snd") || StrUtil::eqIgnoreCase(splitFileName[1], "wav"));
-	ls.lock()->setFunctionKeysArrangement(playable ? 1 : 0);
+    
+    init();
+    
+    if (param == "device")
+        ls.lock()->setFunctionKeysArrangement(device == mpc.getDiskController()->activeDiskIndex ? 0 : 2);
+    else
+        ls.lock()->setFunctionKeysArrangement(playable ? 1 : 0);
 }
 
 void LoadScreen::function(int i)
@@ -75,11 +82,21 @@ void LoadScreen::function(int i)
         {
             if (mpc.getDiskController()->activeDiskIndex == device)
                 return;
+
+            auto& candidateVolume = mpc.getDisks()[device]->getVolume();
+            
+            if (candidateVolume.mode == DISABLED)
+            {
+                auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+                popupScreen->setText("Device is disabled in DISKS");
+                popupScreen->returnToScreenAfterMilliSeconds("load", 2000);
+                openScreen("popup");
+                return;
+            }
             
             mpc.getDiskController()->activeDiskIndex = device;
-            
             auto newDisk = mpc.getDisk().lock();
-            
+
             newDisk->initRoot();
             newDisk->initFiles();
             

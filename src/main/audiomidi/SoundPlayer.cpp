@@ -281,5 +281,7 @@ void SoundPlayer::resampleChannel(bool left, vector<float>* inputBuffer, int sou
 	}
 }
 
-SoundPlayer::~SoundPlayer() {
+bool SoundPlayer::isPlaying()
+{
+    return playing;
 }

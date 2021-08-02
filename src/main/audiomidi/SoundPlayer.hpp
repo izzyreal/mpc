@@ -53,6 +53,7 @@ public:
     
 public:
     void enableStopEarly();
+    bool isPlaying();
     
 private:
     void stop();
@@ -60,7 +61,6 @@ private:
     
 public:
     SoundPlayer();
-    ~SoundPlayer();
     
 };
 }
