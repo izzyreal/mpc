@@ -36,7 +36,11 @@ void DiskController::initDisks()
     defaultVolume.mode = READ_WRITE;
     defaultVolume.label = "DEFAULT";
     defaultVolume.localDirectoryPath = mpc::Paths::defaultLocalVolumePath();
+#ifdef _WIN32
+    defaultVolume.volumeSize = moduru::file::FileUtil::getTotalDiskSpace(defaultVolume.localDirectoryPath.substr(0, 1));
+#else
     defaultVolume.volumeSize = moduru::file::FileUtil::getTotalDiskSpace();
+#endif
     disks.back()->initRoot();
     
     RemovableVolumes removableVolumes;
