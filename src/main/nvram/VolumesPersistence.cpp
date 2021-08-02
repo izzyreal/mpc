@@ -33,13 +33,15 @@ Document read()
     
     if (!result.HasMember("volumes"))
         result.AddMember("volumes", Value().SetArray(), result.GetAllocator());
-    
+
     return result;
 }
 std::string VolumesPersistence::getPersistedActiveUUID()
 {
-    Value& volumes = read()["volumes"];
-    for (auto i = volumes.GetArray().Begin(); i != volumes.GetArray().End(); i++)
+    Document doc = read();
+    Value& volumes = doc["volumes"];
+
+    for (auto i = volumes.Begin(); i != volumes.End(); i++)
     {
         auto uuid = (*i)["uuid"].GetString();
         auto isActive = (*i)["active"].GetBool();
@@ -47,14 +49,17 @@ std::string VolumesPersistence::getPersistedActiveUUID()
         if (isActive)
             return uuid;
     }
+
+    return "";
 }
 
 std::map<std::string, MountMode> VolumesPersistence::getPersistedConfigs()
 {
     std::map<std::string, MountMode> persistedConfigs;
     
-    Value& volumes = read()["volumes"];
-        
+    Document doc = read();
+    Value& volumes = doc["volumes"];
+    
     for (auto i = volumes.Begin(); i != volumes.End(); i++)
     {
         auto uuid = (*i)["uuid"].GetString();
