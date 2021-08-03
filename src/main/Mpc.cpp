@@ -58,18 +58,19 @@ Mpc::Mpc()
 {
     vector<string> requiredPaths {
         Paths::appDocumentsPath(),
+        Paths::appConfigHome(),
         Paths::configPath(),
         Paths::storesPath(),
         Paths::defaultLocalVolumePath(),
         Paths::recordingsPath()
     };
-    
+
     for (auto& p : requiredPaths) {
         Directory dir(p);
         if (!dir.exists())
             dir.create();
     }
-    
+
 	moduru::Logger::l.setPath(mpc::Paths::logFilePath());
 
 #ifndef __linux__
@@ -103,7 +104,7 @@ Mpc::Mpc()
 void Mpc::init(const int sampleRate, const int inputCount, const int outputCount)
 {
 	diskController = make_unique<mpc::disk::DiskController>(*this);
-	
+
 	sequencer = make_shared<mpc::sequencer::Sequencer>(*this);
 	MLOG("Sequencer created");
 
@@ -270,7 +271,7 @@ void Mpc::setBank(int i)
 	{
 		return;
 	}
-	
+
 	if (i < 0 || i > 3)
 	{
 		return;
@@ -278,7 +279,7 @@ void Mpc::setBank(int i)
 
 	bank = i;
 
-	
+
 	notifyObservers(string("bank"));
 
 	hardware->getLed("pad-bank-a").lock()->light(i == 0);
@@ -313,7 +314,7 @@ void Mpc::setPadAndNote(int pad, int note)
 
 	this->note = note;
 
-	
+
 	notifyObservers(string("padandnote"));
 }
 
