@@ -21,6 +21,8 @@
 #include <file/FileUtil.hpp>
 #include <lang/StrUtil.hpp>
 
+#include <math.h>
+
 using namespace mpc::disk;
 using namespace mpc::file::wav;
 
@@ -64,16 +66,16 @@ std::string AbstractDisk::formatFileSize(uint64_t size)
 		hrSize = StrUtil::TrimDecimals(t, 1) + "T";
 	} else if(g > 1)
 	{
-		hrSize = std::to_string((int)g) + "G";
+		hrSize = std::to_string((int)round(g)) + "G";
 	} else if(m > 1)
 	{
-		hrSize = std::to_string((int)m) + "M";
+		hrSize = std::to_string((int)round(m)) + "M";
 	} else if(k > 1)
 	{
-		hrSize = std::to_string((int)k) + "K";
+		hrSize = std::to_string((int)round(k)) + "K";
 	} else
 	{
-		hrSize = std::to_string((int)b) + "B";
+		hrSize = std::to_string(b) + "B";
 	}
 	return hrSize;
 }
@@ -119,7 +121,7 @@ bool AbstractDisk::renameSelectedFile(string s)
 {
 	auto directoryScreen = mpc.screens->get<DirectoryScreen>("directory");
 	auto loadScreen = mpc.screens->get<LoadScreen>("load");
-  
+
 	auto left = directoryScreen->xPos == 0;
 	auto fileIndex = left ? directoryScreen->yPos0 + directoryScreen->yOffset0 : loadScreen->fileLoad;
 
@@ -178,11 +180,11 @@ void AbstractDisk::writeWav(weak_ptr<Sound> s, weak_ptr<MpcFile> f)
     auto sound = s.lock();
     auto data = sound->getSampleData();
     auto isMono = sound->isMono();
-    
+
     auto outputStream = f.lock()->getOutputStream();
-    
+
     auto wavFile = WavFile::writeWavStream(outputStream, isMono ? 1 : 2, data->size() / (isMono ? 1 : 2), 16, sound->getSampleRate());
-    
+
     if (isMono)
     {
         wavFile.writeFrames(data, data->size());
@@ -190,16 +192,16 @@ void AbstractDisk::writeWav(weak_ptr<Sound> s, weak_ptr<MpcFile> f)
     else
     {
         vector<float> interleaved;
-        
+
         for (int i = 0; i < (int) (data->size() * 0.5); i++)
         {
             interleaved.push_back((*data)[i]);
             interleaved.push_back((*data)[(int) (i + data->size() * 0.5)]);
         }
-        
+
         wavFile.writeFrames(&interleaved, data->size() * 0.5);
     }
-    
+
     wavFile.close();
     flush();
     initFiles();
@@ -209,9 +211,9 @@ void AbstractDisk::writeSequence(weak_ptr<mpc::sequencer::Sequence> s, string fi
 {
 	if (checkExists(fileName))
 		return;
-	
+
 	auto newMidFile = newFile(fileName);
-	
+
 	auto writer = mpc::file::mid::MidiWriter(s.lock().get());
 	writer.writeToOStream(newMidFile->getOutputStream());
 
@@ -230,7 +232,7 @@ bool AbstractDisk::checkExists(string fileName)
 		auto name = FileUtil::splitName(file->getName());
 		auto nameIsSame = StrUtil::eqIgnoreCase(name[0], fileNameSplit[0]);
 		auto extIsSame = StrUtil::eqIgnoreCase(name[1], fileNameSplit[1]);
-		
+
 		if (nameIsSame && extIsSame)
 			return true;
 	}
@@ -241,19 +243,19 @@ bool AbstractDisk::checkExists(string fileName)
 shared_ptr<MpcFile> AbstractDisk::getFile(const string& fileName)
 {
 	auto tempfileName = StrUtil::replaceAll(fileName, ' ', "");
-	
+
     for (auto& f : files)
     {
 		if (StrUtil::eqIgnoreCase(StrUtil::replaceAll(f->getName(), ' ', ""), tempfileName))
 			return f;
 	}
-	
+
     for (auto& f : allFiles)
     {
 		if (StrUtil::eqIgnoreCase(StrUtil::replaceAll(f->getName(), ' ', ""), tempfileName))
 			return f;
 	}
-    
+
     return {};
 }
 
@@ -275,7 +277,7 @@ void AbstractDisk::writeProgram(weak_ptr<Program> program, const string& fileNam
 	}
 
 	auto saveAProgramScreen = mpc.screens->get<SaveAProgramScreen>("save-a-program");
-	
+
 	if (saveAProgramScreen->save != 0)
 	{
 		auto isWav = saveAProgramScreen->save == 2;
