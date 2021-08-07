@@ -297,3 +297,22 @@ bool AbstractDisk::isRoot()
 {
 	return getPathDepth() == 0;
 }
+
+bool AbstractDisk::deleteDir(std::weak_ptr<MpcFile> f)
+{
+    return deleteRecursive(f);
+}
+
+bool AbstractDisk::deleteRecursive(std::weak_ptr<MpcFile> _toDelete)
+{
+    auto toDelete = _toDelete.lock();
+    
+    if (toDelete->isDirectory())
+    {
+        for (auto& f : toDelete->listFiles())
+            deleteRecursive(f);
+    }
+    
+    return toDelete->del();
+}
+

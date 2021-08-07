@@ -75,9 +75,9 @@ void GlobalReleaseControls::function(int i)
 	case 4:
 		controls->setF5Pressed(false);
 
-		if (ls.lock()->getPreviousScreenName().compare("load") == 0 && currentScreenName.compare("popup") == 0)
+		if (ls.lock()->getPreviousScreenName() == "load" && currentScreenName == "popup")
 		{
-            if (mpc.getAudioMidiServices().lock()->getSoundPlayer().lock()->isPlaying())
+            if (ls.lock()->getLastFocus("load") == "file")
             {
                 ls.lock()->openScreen("load");
                 mpc.getAudioMidiServices().lock()->getSoundPlayer().lock()->enableStopEarly();

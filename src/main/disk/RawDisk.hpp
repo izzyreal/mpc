@@ -27,8 +27,6 @@ private:
     std::shared_ptr<akaifat::fat::AkaiFatLfnDirectory> root;
     std::shared_ptr<akaifat::fat::AkaiFatLfnDirectory> getDir();
     std::shared_ptr<akaifat::fat::AkaiFatLfnDirectory> getParentDir();
-    bool deleteFilesRecursive(std::shared_ptr<akaifat::fat::AkaiFatLfnDirectoryEntry> entry);
-    bool deleteDirsRecursive(std::shared_ptr<akaifat::fat::AkaiFatLfnDirectoryEntry> entry, bool checkExist);
     void refreshPath();
 
 public:
@@ -40,7 +38,6 @@ public:
     void flush() override;
     bool deleteAllFiles(int dwGuiDelete) override;
     bool newFolder(const std::string& newDirName) override;
-    bool deleteDir(std::weak_ptr<MpcFile> f) override;
     std::shared_ptr<MpcFile> newFile(const std::string& newFileName) override;
     std::string getAbsolutePath() override;
     std::string getTypeShortName() override;

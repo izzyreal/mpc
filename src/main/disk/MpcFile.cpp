@@ -172,12 +172,14 @@ bool MpcFile::del()
 
 std::vector<char> MpcFile::getBytes()
 {
-    std::vector<char> bytes(length());
+    std::vector<char> bytes;
     
     if (raw) {
         try {
-            ByteBuffer bb(bytes);
+            ByteBuffer bb(length());
             rawEntry->getFile()->read(0, bb);
+            bb.flip();
+            while (bb.hasRemaining()) bytes.emplace_back(bb.get());
         } catch (const std::exception& e) {
             MLOG("Exception while getting file bytes: " + std::string(e.what()));
         }

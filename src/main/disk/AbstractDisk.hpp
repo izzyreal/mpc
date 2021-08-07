@@ -38,6 +38,8 @@ private:
     bool busy = false;
     std::unique_ptr<SoundSaver> soundSaver;
     
+    bool deleteRecursive(std::weak_ptr<MpcFile>);
+    
 protected:
     mpc::Mpc& mpc;
  
@@ -86,7 +88,7 @@ public:
     virtual bool moveForward(const std::string& directoryName) = 0;
     virtual bool deleteAllFiles(int dwGuiDelete) = 0;
     virtual bool newFolder(const std::string& newDirName) = 0;
-    virtual bool deleteDir(std::weak_ptr<MpcFile>) = 0;
+    bool deleteDir(std::weak_ptr<MpcFile>);
     virtual std::string getAbsolutePath() = 0;
     virtual std::string getTypeShortName() = 0;
     virtual std::string getModeShortName() = 0;

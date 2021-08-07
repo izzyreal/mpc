@@ -26,7 +26,6 @@ private:
     void initParentFiles();
     std::shared_ptr<MpcFile> getParentDir();
     void renameFilesToAkai();
-    bool deleteRecursive(std::weak_ptr<MpcFile>);
     
 public:
     void initFiles() override;
@@ -37,7 +36,6 @@ public:
     void flush() override;
     bool deleteAllFiles(int dwGuiDelete) override;
     bool newFolder(const std::string& newDirName) override;
-    bool deleteDir(std::weak_ptr<MpcFile> f) override;
     std::shared_ptr<MpcFile> newFile(const std::string& newFileName) override;
     std::string getAbsolutePath() override;
     std::string getTypeShortName() override;

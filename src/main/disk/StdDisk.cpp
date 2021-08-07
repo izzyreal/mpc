@@ -246,24 +246,6 @@ bool StdDisk::newFolder(const string& newDirName)
 	return f.create();
 }
 
-bool StdDisk::deleteDir(weak_ptr<MpcFile> f)
-{
-    return deleteRecursive(f);
-}
-
-bool StdDisk::deleteRecursive(std::weak_ptr<MpcFile> _toDelete)
-{
-    auto toDelete = _toDelete.lock();
-    
-	if (toDelete->isDirectory())
-	{
-		for (auto& f : toDelete->listFiles())
-			deleteRecursive(f);
-	}
-	
-	return toDelete->del();
-}
-
 shared_ptr<MpcFile> StdDisk::newFile(const string& _newFileName)
 {
     shared_ptr<File> f;

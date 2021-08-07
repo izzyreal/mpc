@@ -88,12 +88,12 @@ struct Volume {
     {
         if (type == USB_VOLUME && mode != DISABLED)
         {
-            auto volumeStream = akaifat::util::VolumeMounter::mount(volumePath, mode == READ_ONLY);
+            static auto volumeStream = akaifat::util::VolumeMounter::mount(volumePath, mode == READ_ONLY);
          
             if (volumeStream.is_open())
             {
-                auto device = std::make_shared<akaifat::ImageBlockDevice>(volumeStream, volumeSize);
-                auto fs = dynamic_cast<akaifat::fat::AkaiFatFileSystem *>(akaifat::FileSystemFactory::createAkai(device, mode == READ_ONLY));
+                static auto device = std::make_shared<akaifat::ImageBlockDevice>(volumeStream, volumeSize);
+                static auto fs = dynamic_cast<akaifat::fat::AkaiFatFileSystem *>(akaifat::FileSystemFactory::createAkai(device, mode == READ_ONLY));
 
                 return std::dynamic_pointer_cast<akaifat::fat::AkaiFatLfnDirectory>(fs->getRoot());
             }
