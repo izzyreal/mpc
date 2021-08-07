@@ -79,6 +79,7 @@ void VolumesPersistence::save(mpc::Mpc & mpc)
     
     for (auto i = volumes.Begin(); i != volumes.End(); i++)
     {
+        (*i)["active"].Swap(Value().SetBool(false));
         auto uuid = (*i)["uuid"].GetString();
         alreadyPersistedUUIDs.emplace_back(std::string(uuid));
     }

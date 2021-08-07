@@ -49,7 +49,7 @@ void DiskController::initDisks()
     public:
         std::vector<RemovableVolume> volumes;
         void processChange(RemovableVolume v) override {
-            volumes.emplace_back(v);
+            volumes.push_back(v);
         }
     };
     
