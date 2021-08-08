@@ -33,13 +33,8 @@ void snd_read_bytes(std::shared_ptr<std::istream> stream, const std::vector<char
 
 std::string snd_get_string(std::shared_ptr<std::istream> stream, const int maxLength)
 {
-    std::vector<char> buffer(17);
+    std::vector<char> buffer(maxLength);
     snd_read_bytes(stream, buffer, maxLength);
-
-    if (buffer.size() > maxLength)
-    {
-        buffer = std::vector<char>(buffer.begin(), buffer.begin() + maxLength);
-    }
 
     for (int i = 0; i < buffer.size(); i++)
     {

@@ -129,9 +129,8 @@ int SoundPlayer::processAudio(AudioBuffer* buf, int nFrames)
 		auto totalChannelLengthInBytes = sourceFrameCount * 2;
 
 		stream->read(&byteBufferLeft[0], bytesPerChannel);
-		stream->seekg(-bytesPerChannel, ios_base::cur);
+		stream->seekg(-bytesPerChannel + totalChannelLengthInBytes, ios_base::cur);
 
-		stream->seekg(totalChannelLengthInBytes, ios_base::cur);
 		stream->read(&byteBufferRight[0], bytesPerChannel);
 
 		stream->seekg(-totalChannelLengthInBytes, ios_base::cur);
