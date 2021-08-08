@@ -21,7 +21,6 @@ SoundPlayer::SoundPlayer()
 }
 
 bool SoundPlayer::start(std::shared_ptr<std::istream> _istream, SoundPlayerFileFormat f) {
-
 	unique_lock<mutex> guard(_playing);
 
 	if (playing) return false;

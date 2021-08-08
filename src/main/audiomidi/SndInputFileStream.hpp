@@ -86,16 +86,13 @@ int snd_get_LE(std::shared_ptr<std::istream> stream, int numBytes)
 
 char snd_get_char(std::shared_ptr<std::istream> stream)
 {
-    char result = stream->get();
-    return result;
+    char buf[1];
+    stream->read(buf, 1);
+    return *buf;
 }
 
 bool snd_read_header(std::shared_ptr<std::istream> stream, int& sampleRate, int& validBits, int& numChannels, int& numFrames)
-{
-    stream->seekg(0, stream->end);
-    auto tell = stream->tellg();
-    stream->seekg(0, stream->beg);
-    
+{    
     auto sndId = snd_get_string(stream, 2);
     
     if (strcmp(sndId.c_str(), ID) != 0) {
