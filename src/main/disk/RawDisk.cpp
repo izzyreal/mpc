@@ -100,7 +100,6 @@ bool RawDisk::moveBack()
 	if (path.size() == 0) return false;
 
 	path.erase(begin(path) + path.size() - 1);
-	refreshPath();
 	return true;
 }
 
@@ -113,7 +112,6 @@ bool RawDisk::moveForward(const std::string& directoryName)
         return false;
 
 	path.emplace_back(entry);
-	refreshPath();
 	return true;
 }
 
@@ -138,28 +136,6 @@ std::shared_ptr<AkaiFatLfnDirectory> RawDisk::getParentDir()
         return root;
 
     return std::dynamic_pointer_cast<AkaiFatLfnDirectory>(path[path.size() - 2]->getDirectory());
-}
-
-void RawDisk::refreshPath()
-{
-    /*
-    if (path.size() > 0) {
-        ::java::util::List* refreshedPath = new ::java::util::ArrayList();
-        auto directory = root;
-        for (auto _i = path->iterator(); _i->hasNext(); ) {
-            ::de::waldheinz::fs::fat::AkaiFatLfnDirectoryEntry* e = dynamic_cast< ::de::waldheinz::fs::fat::AkaiFatLfnDirectoryEntry* >(_i->next());
-            {
-                npc(refreshedPath).push_back(dynamic_cast< ::de::waldheinz::fs::fat::AkaiFatLfnDirectoryEntry* >(npc(directory)->getEntry(e->getName()))));
-                try {
-                    directory = dynamic_cast< ::de::waldheinz::fs::fat::AkaiFatLfnDirectory* >(npc(dynamic_cast< ::de::waldheinz::fs::fat::AkaiFatLfnDirectoryEntry* >(npc(directory)->getEntry(e->getName())))->getDirectory());
-                } catch (exception e1) {
-                    npc(e1)->printStackTrace();
-                }
-            }
-        }
-        path = refreshedPath;
-    }
-	*/
 }
 
 bool RawDisk::deleteAllFiles(int extension)
@@ -203,10 +179,11 @@ std::shared_ptr<MpcFile> RawDisk::newFile(const std::string& newFileName)
 {
 	try {
         std::string copy = StrUtil::toUpper(StrUtil::replaceAll(newFileName, ' ', "_"));
-        auto newEntry = getDir()->addFile(copy);
+        auto newEntry = std::dynamic_pointer_cast<AkaiFatLfnDirectoryEntry>(getDir()->addFile(copy));
         return std::make_shared<MpcFile>(newEntry);
-    } catch (const std::exception&) {
-        // Nothing to do
+    } catch (const std::exception& e) {
+        std::string msg = e.what();
+        MLOG("Couldn't add new raw file: " + msg);
     }
 	return {};
 }
@@ -223,12 +200,12 @@ std::string RawDisk::getAbsolutePath()
 
 void RawDisk::close()
 {
-    
+    volume.close();
 }
 
 void RawDisk::flush()
 {
-    
+    volume.flush();
 }
 
 std::string RawDisk::getTypeShortName()

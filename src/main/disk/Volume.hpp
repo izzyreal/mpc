@@ -43,6 +43,9 @@ struct Volume {
     std::string volumeUUID;
     MountMode mode = MountMode::DISABLED;
     uint64_t volumeSize;
+    std::fstream volumeStream;
+    std::shared_ptr<akaifat::ImageBlockDevice> volumeDevice;
+    akaifat::fat::AkaiFatFileSystem* volumeFs;
     
     std::string typeShortName()
     {
@@ -88,20 +91,32 @@ struct Volume {
     {
         if (type == USB_VOLUME && mode != DISABLED)
         {
-            static auto volumeStream = akaifat::util::VolumeMounter::mount(volumePath, mode == READ_ONLY);
+            volumeStream = akaifat::util::VolumeMounter::mount(volumePath, mode == READ_ONLY);
          
             if (volumeStream.is_open())
             {
-                static auto device = std::make_shared<akaifat::ImageBlockDevice>(volumeStream, volumeSize);
-                static auto fs = dynamic_cast<akaifat::fat::AkaiFatFileSystem *>(akaifat::FileSystemFactory::createAkai(device, mode == READ_ONLY));
+                volumeDevice = std::make_shared<akaifat::ImageBlockDevice>(volumeStream, volumeSize);
+                volumeFs = dynamic_cast<akaifat::fat::AkaiFatFileSystem *>(akaifat::FileSystemFactory::createAkai(volumeDevice, mode == READ_ONLY));
 
-                return std::dynamic_pointer_cast<akaifat::fat::AkaiFatLfnDirectory>(fs->getRoot());
+                return std::dynamic_pointer_cast<akaifat::fat::AkaiFatLfnDirectory>(volumeFs->getRoot());
             }
         }
         return {};
     }
     
-    void close() {}
-    void flush() {}
+    void close() {
+        if (!volumeStream.is_open() || volumeFs == nullptr) throw std::runtime_error("Volume is not open");
+        flush();
+        volumeFs->close();
+        volumeDevice->close();
+        volumeStream.close();
+        delete volumeFs;
+    }
+    
+    void flush() {
+        if (!volumeStream.is_open() || volumeFs == nullptr) throw std::runtime_error("Volume is not open");
+        volumeFs->flush();
+        volumeStream.flush();
+    }
 };
 }

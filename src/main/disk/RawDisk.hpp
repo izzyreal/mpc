@@ -27,7 +27,6 @@ private:
     std::shared_ptr<akaifat::fat::AkaiFatLfnDirectory> root;
     std::shared_ptr<akaifat::fat::AkaiFatLfnDirectory> getDir();
     std::shared_ptr<akaifat::fat::AkaiFatLfnDirectory> getParentDir();
-    void refreshPath();
 
 public:
     void initFiles() override;
