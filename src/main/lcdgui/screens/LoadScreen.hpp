@@ -48,7 +48,8 @@ public:
     LoadScreen(mpc::Mpc& mpc, const int layerIndex);
     
     void open() override;
-    
+    void up() override;
+
 private:
     const std::vector<std::string> views{ "All Files", ".SND", ".PGM", ".APS", ".MID", ".ALL", ".WAV", ".SEQ", ".SET" };
     

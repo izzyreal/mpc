@@ -94,11 +94,25 @@ void LoadScreen::function(int i)
                 return;
             }
             
+			auto oldIndex = mpc.getDiskController()->activeDiskIndex;
+
             mpc.getDiskController()->activeDiskIndex = device;
             auto newDisk = mpc.getDisk().lock();
 
             newDisk->initRoot();
-            newDisk->initFiles();
+
+			if (newDisk->getVolume().type== USB_VOLUME) {
+				if (!newDisk->getVolume().volumeStream.is_open()) {
+					mpc.getDiskController()->activeDiskIndex = oldIndex;
+					auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+					popupScreen->setText("Error! Device seems in use");
+					popupScreen->returnToScreenAfterMilliSeconds("load", 2000);
+					openScreen("popup");
+					return;
+				}
+			}
+			
+			newDisk->initFiles();
             
             displayFile();
             displaySize();
@@ -478,4 +492,19 @@ void LoadScreen::displayType()
 {
     auto type = findChild<Label>("type").lock();
     type->setText(mpc.getDisks()[device]->getVolume().typeShortName());
+}
+
+void LoadScreen::up()
+{
+	init();
+	if (param == "device")
+	{
+		device = mpc.getDiskController()->activeDiskIndex;
+		displayDevice();
+		auto splitFileName = StrUtil::split(getSelectedFileName(), '.');
+		auto playable = splitFileName.size() > 1 && (StrUtil::eqIgnoreCase(splitFileName[1], "snd") || StrUtil::eqIgnoreCase(splitFileName[1], "wav"));
+		ls.lock()->setFunctionKeysArrangement(playable ? 1 : 0);
+	}
+
+	ScreenComponent::up();
 }

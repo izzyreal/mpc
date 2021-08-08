@@ -67,7 +67,7 @@ void RawDisk::initFiles()
             files.push_back(mpcFile);
         }
         
-        printf("Found a file: %s\n", mpcFile->getName().c_str());
+        MLOG("Found a file: " + mpcFile->getName());
     }
     
     initParentFiles();

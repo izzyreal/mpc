@@ -92,7 +92,13 @@ void DiskController::initDisks()
     }
     
     if (std::dynamic_pointer_cast<RawDisk>(getActiveDisk().lock()))
+    {
         getActiveDisk().lock()->initRoot();
+        if (!getActiveDisk().lock()->getVolume().volumeStream.is_open())
+        {
+            activeDiskIndex = 0;
+        }
+    }
 }
 
 std::weak_ptr<AbstractDisk> DiskController::getActiveDisk()
