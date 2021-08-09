@@ -310,7 +310,12 @@ bool AbstractDisk::deleteRecursive(std::weak_ptr<MpcFile> _toDelete)
     if (toDelete->isDirectory())
     {
         for (auto& f : toDelete->listFiles())
+        {
+            if (f->getName() == "" || f->getName() == "." || f->getName() == "..")
+                continue;
+            
             deleteRecursive(f);
+        }
     }
     
     return toDelete->del();

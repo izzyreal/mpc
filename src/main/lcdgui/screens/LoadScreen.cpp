@@ -99,10 +99,13 @@ void LoadScreen::function(int i)
             mpc.getDiskController()->activeDiskIndex = device;
             auto newDisk = mpc.getDisk().lock();
 
-            newDisk->initRoot();
-
+            fileLoad = 0;
+            
 			if (newDisk->getVolume().type== USB_VOLUME) {
-				if (!newDisk->getVolume().volumeStream.is_open()) {
+                
+                newDisk->initRoot();
+                
+                if (!newDisk->getVolume().volumeStream.is_open()) {
 					mpc.getDiskController()->activeDiskIndex = oldIndex;
 					auto popupScreen = mpc.screens->get<PopupScreen>("popup");
 					popupScreen->setText("Error! Device seems in use");
@@ -110,8 +113,10 @@ void LoadScreen::function(int i)
 					openScreen("popup");
 					return;
 				}
-			}
+            }
 			
+            ls.lock()->setFunctionKeysArrangement(0);
+            
 			newDisk->initFiles();
             
             displayFile();
