@@ -9,6 +9,7 @@
 
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/window/SaveASoundScreen.hpp>
+#include <lcdgui/screens/window/SaveAllFileScreen.hpp>
 #include <lcdgui/screens/window/NameScreen.hpp>
 #include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
@@ -83,7 +84,8 @@ void FileExistsScreen::function(int i)
 		}
 		else if (ls.lock()->getPreviousScreenName().compare("save-all-file") == 0)
 		{
-			auto allName = mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) + ".ALL";
+            auto saveAllFileScreen = mpc.screens->get<SaveAllFileScreen>("save-all-file");
+			auto allName = saveAllFileScreen->fileName + ".ALL";
 			disk->initFiles();
 			auto success = disk->getFile(allName)->del();
 			

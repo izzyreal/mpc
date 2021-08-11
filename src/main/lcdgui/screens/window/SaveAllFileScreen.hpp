@@ -11,6 +11,10 @@ namespace mpc::lcdgui::screens::window {
 class NameScreen;
 }
 
+namespace mpc::lcdgui::screens::dialog {
+class FileExistsScreen;
+}
+
 namespace mpc::lcdgui::screens::window
 {
 class SaveAllFileScreen
@@ -34,6 +38,7 @@ private:
     
     friend class NameScreen;
     friend class mpc::lcdgui::screens::SaveScreen;
+    friend class mpc::lcdgui::screens::dialog::FileExistsScreen;
     
 };
 }

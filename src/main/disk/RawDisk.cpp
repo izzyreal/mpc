@@ -50,7 +50,7 @@ void RawDisk::initFiles()
 
     for (auto& f : dirList)
     {
-        if (f.first == "." || f.first == ".." || f.first == "") continue;
+        if ( (f.first.length() > 0 && f.first[0] == '.') || f.first == ".." || f.first == "") continue;
         
         auto mpcFile = std::make_shared<MpcFile>(f.second);
         allFiles.push_back(mpcFile);
