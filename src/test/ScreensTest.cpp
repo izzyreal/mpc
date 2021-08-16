@@ -1,19 +1,12 @@
 #include <catch2/catch.hpp>
 
 #include <Mpc.hpp>
-#include <Paths.hpp>
 
 #include <sequencer/Sequencer.hpp>
 #include <sampler/Sampler.hpp>
 
 #include <lcdgui/LayeredScreen.hpp>
 #include <lcdgui/Layer.hpp>
-
-#include <file/File.hpp>
-
-#include <disk/MpcFile.hpp>
-#include <disk/ApsLoader.hpp>
-#include <disk/AbstractDisk.hpp>
 
 #include <vector>
 #include <string>
@@ -64,6 +57,9 @@ vector<string> screenNames = {
 "audio_no_start",
 "midi",
 "vmpc-settings",
+"vmpc-auto-save",
+"vmpc-keyboard",
+"vmpc-disks",
 "vmpc-direct-to-disk-recorder",
 "vmpc-recording-finished",
 "vmpc-record-jam",
@@ -168,20 +164,14 @@ SCENARIO("All screens can be opened", "[gui]") {
 		mpc::Mpc mpc;
 		mpc.init(44100, 1, 5);
         
-        auto disk = mpc.getDisk().lock();
         
-        REQUIRE (disk);
-        
-		disk->moveForward("TEST1");
-		disk->initFiles();
-
-		auto f = disk->getFile("BASIC_KIT.APS");
+        auto s = mpc.getSampler().lock()->addSound().lock();
+        s->setMono(true);
+        s->setName("test");
+        for (int i = 0; i < 1000; i ++)
+            s->insertFrame(std::vector<float>{0.0}, s->getSampleData()->size());
 		
-		mpc::disk::ApsLoader apsLoader(mpc, f);
-
-		this_thread::sleep_for(chrono::milliseconds(500));
-		
-		mpc.getSampler().lock()->setSoundIndex(0);
+        mpc.getSampler().lock()->setSoundIndex(0);
 
 		auto ls = mpc.getLayeredScreen().lock();
 
@@ -201,7 +191,7 @@ SCENARIO("All screens can be opened", "[gui]") {
 				bad.push_back(screenName + " could not be opened.");
 				continue;
 			}
-
+            
 			auto layer = ls->getFocusedLayer().lock();
 			vector<vector<bool>> pixels(248, vector<bool>(60));
 			layer->Draw(&pixels);
@@ -234,7 +224,7 @@ SCENARIO("All screens can be opened", "[gui]") {
 		for (auto& msg : bad)
 			MLOG(msg);
 
-		printf("%i screens are fine and %i screens are broken. Check vmpc.log in ~/vMPC for more details.\n", good.size(), bad.size());
+		printf("%i screens are fine and %i screens are broken. Check ~/Documents/VMPC2000XL/vmpc.log for more details.\n", good.size(), bad.size());
 
 		REQUIRE(good.size() >= 129); // This will be increased as the screens get refactored.
 

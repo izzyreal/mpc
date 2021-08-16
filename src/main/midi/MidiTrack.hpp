@@ -44,16 +44,15 @@ namespace mpc::midi
 		void insertEvent(std::weak_ptr<mpc::midi::event::MidiEvent> newEvent);
 		bool removeEvent(mpc::midi::event::MidiEvent* E);
 		void closeTrack();
-		void dumpEvents();
 
 	private:
 		void recalculateSize();
 
 	public:
-		void writeToOutputStream(std::ostream& stream);
+		void writeToOutputStream(std::shared_ptr<std::ostream>);
 
 	public:
 		MidiTrack();
-		MidiTrack(std::istream& in);
+		MidiTrack(std::shared_ptr<std::istream>);
 	};
 }

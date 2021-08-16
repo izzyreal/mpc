@@ -1,21 +1,14 @@
 #include <catch2/catch.hpp>
 
 #include <Mpc.hpp>
-#include <Paths.hpp>
 
 #include <sequencer/Sequencer.hpp>
 #include <sequencer/Sequence.hpp>
 #include <sequencer/Track.hpp>
 
-#include <disk/AbstractDisk.hpp>
-#include <disk/MpcFile.hpp>
-
 #include <midi/MidiFile.hpp>
 #include <file/mid/MidiReader.hpp>
 #include <file/mid/MidiWriter.hpp>
-
-#include <file/File.hpp>
-#include <file/FileUtil.hpp>
 
 #include <string>
 #include <vector>
@@ -24,8 +17,6 @@ using namespace mpc;
 using namespace mpc::disk;
 using namespace mpc::midi;
 using namespace mpc::file::mid;
-using namespace moduru::file;
-using namespace std;
 
 SCENARIO("A MidiFile can be written", "[file]") {
 
@@ -38,43 +29,24 @@ SCENARIO("A MidiFile can be written", "[file]") {
 		sequence->init(1);
 		auto track = sequence->getTrack(0).lock();
 		track->setUsed(true);
-		auto disk = mpc.getDisk().lock();
-        
-        REQUIRE (disk);
 
 		auto noteEvent = track->addNoteEvent(0, 37).lock();
 		noteEvent->setDuration(10);
 		noteEvent->setVelocity(127);
 
-		string name = "foo.mid";
-		auto path = mpc::Paths::storesPath() + "MPC2000XL/" + name;
-		auto fileToDelete = File(path, nullptr);
-		fileToDelete.del();
-		fileToDelete.close();
-
 		MidiWriter midiWriter(sequence.get());
-
-		midiWriter.writeToFile(path);
-
-		disk->initFiles();
-
-		auto files = disk->getFiles();
-		auto fileIterator = find_if(begin(files), end(files), [](shared_ptr<MpcFile> f) { return f->getName().compare("foo.mid") == 0 || f->getName().compare("FOO.MID") == 0; });
-
-		REQUIRE(fileIterator != files.end());
-
-		auto mpcFile = (*fileIterator);
-		auto file = mpcFile->getFile().lock();
-
-		REQUIRE(file->exists());
-	
-//		MidiReader(mpcFile, sequence);
-
-		track = sequence->getTrack(0).lock();
-
-		auto events = track->getNoteEvents();
-
-		REQUIRE(events.size() == 1);
+        auto ostream = std::make_shared<std::ostringstream>();
+        midiWriter.writeToOStream(ostream);
 		
+        sequence->init(1);
+        sequence->getTrack(0).lock()->removeEvents();
+        REQUIRE(sequence->getTrack(0).lock()->getEvents().size() == 0);
+        
+        auto istream = std::make_shared<std::istringstream>(ostream->str());
+        MidiReader midiReader(istream, sequence);
+        midiReader.parseSequence(mpc);
+        
+        REQUIRE(sequence->getTrack(0).lock()->getEvents().size() == 1);
+
     }
 }

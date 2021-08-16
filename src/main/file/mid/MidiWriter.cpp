@@ -286,6 +286,6 @@ void MidiWriter::writeToOStream(std::shared_ptr<std::ostream> _ostream)
 {
     auto _ofstream = std::dynamic_pointer_cast<std::ofstream>(_ostream);
     if (_ofstream) _ofstream->unsetf(std::ios::skipws);
-    mf->writeToOutputStream(*_ostream);
+    mf->writeToOutputStream(_ostream);
     if (_ofstream) _ofstream->close();
 }

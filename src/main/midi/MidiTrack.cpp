@@ -15,8 +15,8 @@
 #include <Logger.hpp>
 
 using namespace mpc::midi;
+using namespace mpc::midi::util;
 using namespace mpc::midi::event;
-using namespace std;
 
 MidiTrack::MidiTrack() 
 {
@@ -26,46 +26,47 @@ MidiTrack::MidiTrack()
 	mEndOfTrackDelta = 0;
 }
 
-MidiTrack::MidiTrack(istream& in)
+MidiTrack::MidiTrack(std::shared_ptr<std::istream> stream)
 {
 	mSize = 0;
 	mSizeNeedsRecalculating = false;
 	mClosed = false;
 	mEndOfTrackDelta = 0;
-	vector<char> buffer(4);
+	std::vector<char> buffer(4);
 	
-	in.read(&buffer[0], buffer.size());
+	stream->read(&buffer[0], buffer.size());
 	
-	if (!mpc::midi::util::MidiUtil::bytesEqual(buffer, IDENTIFIER, 0, 4)) {
-		string error = "Track identifier did not match MTrk!";
-		throw std::invalid_argument(error.c_str());
+	if (!MidiUtil::bytesEqual(buffer, IDENTIFIER, 0, 4)) {
+		std::string error = "Track identifier did not match MTrk!";
+		throw std::invalid_argument(error);
 	}
 
-	in.read(&buffer[0], buffer.size());
+	stream->read(&buffer[0], buffer.size());
 	
 	mSize = mpc::midi::util::MidiUtil::bytesToInt(buffer, 0, 4);
 	buffer.clear();
 	buffer.resize(mSize);
-	in.read(&buffer[0], mSize);
+	stream->read(&buffer[0], mSize);
 
 	readTrackData(buffer);
 }
+
 const bool MidiTrack::VERBOSE;
 
-vector<char> mpc::midi::MidiTrack::IDENTIFIER = vector<char>{ 'M', 'T', 'r', 'k' };
+std::vector<char> MidiTrack::IDENTIFIER{ 'M', 'T', 'r', 'k' };
 
 MidiTrack* MidiTrack::createTempoTrack()
 {
-	auto T = new MidiTrack();
-	T->insertEvent(make_shared<meta::TimeSignature>());
-	T->insertEvent(make_shared<meta::Tempo>());
-	return T;
+	auto track = new MidiTrack();
+	track->insertEvent(std::make_shared<meta::TimeSignature>());
+	track->insertEvent(std::make_shared<meta::Tempo>());
+	return track;
 }
 
-void MidiTrack::readTrackData(vector<char>& data)
+void MidiTrack::readTrackData(std::vector<char>& data)
 {
-	stringstream in(string(data.begin(), data.end()));
-	in.unsetf(ios_base::skipws);
+	std::stringstream in(std::string(data.begin(), data.end()));
+	in.unsetf(std::ios_base::skipws);
 
 	int totalTicks = 0;
 
@@ -81,24 +82,23 @@ void MidiTrack::readTrackData(vector<char>& data)
 		auto event = MidiEvent::parseEvent(totalTicks, value, in);
 
 		if (!event) {
-			string error = "Event skipped!\n";
+            MLOG("MidiTrack readTrackData skipped an event!");
 			continue;
 		}
 		
-		if (dynamic_pointer_cast<meta::EndOfTrack>(event)) {
+		if (std::dynamic_pointer_cast<meta::EndOfTrack>(event)) {
 			mEndOfTrackDelta = event->getDelta();
 			break;
 		}
 		
-		mEvents.push_back(event);
+		mEvents.emplace_back(event);
 	}
 }
 
-vector<weak_ptr<MidiEvent>> MidiTrack::getEvents()
+std::vector<std::weak_ptr<MidiEvent>> MidiTrack::getEvents()
 {
-	auto res = vector<weak_ptr<MidiEvent>>();
-	for (auto& e : mEvents)
-		res.push_back(e);
+	std::vector<std::weak_ptr<MidiEvent>> res;
+	for (auto& e : mEvents) res.push_back(e);
 	return res;
 }
 
@@ -136,8 +136,8 @@ void MidiTrack::setEndOfTrackDelta(int delta)
 
 void MidiTrack::insertNote(int channel, int pitch, int velocity, int tick, int duration)
 {
-	insertEvent(make_shared<NoteOn>(tick, channel, pitch, velocity));
-	insertEvent(make_shared<NoteOn>(tick + duration, channel, pitch, 0));
+	insertEvent(std::make_shared<NoteOn>(tick, channel, pitch, velocity));
+	insertEvent(std::make_shared<NoteOn>(tick + duration, channel, pitch, 0));
 }
 
 void MidiTrack::insertEvent(std::weak_ptr<event::MidiEvent> newE)
@@ -150,29 +150,25 @@ void MidiTrack::insertEvent(std::weak_ptr<event::MidiEvent> newE)
 		//npc(::java::lang::System::err())->println(u"Error: Cannot add an event to a closed track."_j);
 		return;
 	}
-	shared_ptr<MidiEvent> prev;
-	shared_ptr<MidiEvent> next;
+	std::shared_ptr<MidiEvent> prev;
+	std::shared_ptr<MidiEvent> next;
 	if (mEvents.size() > 0) prev = mEvents.back();
-	try {
-		//auto treeSet = ::java::lang::Class::forName(u"java.util.TreeSet"_j);
-		//auto floor = treeSet->getMethod(u"floor"_j, new ::java::lang::ClassArray({static_cast< ::java::lang::Class* >(::java::lang::Object::class_())}));
-		//auto ceiling = treeSet->getMethod(u"ceiling"_j, new ::java::lang::ClassArray({static_cast< ::java::lang::Class* >(::java::lang::Object::class_())}));
-		//prev = dynamic_cast< ::event::MidiEvent* >(npc(floor)->invoke(mEvents, new ::java::lang::ObjectArray({static_cast< ::java::lang::Object* >(newEvent)})));
-		//next = dynamic_cast< ::event::MidiEvent* >(npc(ceiling)->invoke(mEvents, new ::java::lang::ObjectArray({static_cast< ::java::lang::Object* >(newEvent)})));
-
-	}
-	catch (exception* e) {
-		for (auto& n : mEvents) {
-			next = n;
-			if (next->getTick() > newEvent->getTick()) {
-				break;
-			}
-			prev = next;
-		}
-	}
-	mEvents.push_back(newEvent);
+	
+    /*
+    for (auto& n : mEvents) {
+        next = n;
+        if (next->getTick() > newEvent->getTick()) {
+            break;
+        }
+        prev = next;
+        next.reset();
+    }
+    */
+	
+    mEvents.push_back(newEvent);
 	mSizeNeedsRecalculating = true;
-	if (prev) {
+	
+    if (prev) {
 		newEvent->setDelta(newEvent->getTick() - prev->getTick());
 	}
 	else {
@@ -181,8 +177,10 @@ void MidiTrack::insertEvent(std::weak_ptr<event::MidiEvent> newE)
 	if (next) {
 		next->setDelta(next->getTick() - newEvent->getTick());
 	}
+    
 	mSize += newEvent->getSize();
-	if (dynamic_pointer_cast<meta::EndOfTrack>(newEvent)) {
+	
+    if (std::dynamic_pointer_cast<meta::EndOfTrack>(newEvent)) {
 		if (next) {
 			throw std::invalid_argument("Attempting to insert EndOfTrack before an existing event. Use closeTrack() when finished with MidiTrack.");
 		}
@@ -190,14 +188,15 @@ void MidiTrack::insertEvent(std::weak_ptr<event::MidiEvent> newE)
 	}
 }
 
-bool MidiTrack::removeEvent(::event::MidiEvent* E)
+bool MidiTrack::removeEvent(mpc::midi::event::MidiEvent* e)
 {
-	shared_ptr<MidiEvent> prev;
-	shared_ptr<MidiEvent> curr;
-	shared_ptr<MidiEvent> next;
-	for (auto& n : mEvents) {
+	std::shared_ptr<MidiEvent> prev;
+	std::shared_ptr<MidiEvent> curr;
+	std::shared_ptr<MidiEvent> next;
+	
+    for (auto& n : mEvents) {
 		next = n;
-		if (E == curr.get()) {
+		if (e == curr.get()) {
 			break;
 		}
 		prev = curr;
@@ -224,35 +223,27 @@ void MidiTrack::closeTrack()
 {
 	int lastTick = 0;
 	if (mEvents.size() > 0) {
-		auto last = dynamic_pointer_cast<MidiEvent>(*std::next(mEvents.begin(), (int)(mEvents.size()) - 1));
+		auto last = std::dynamic_pointer_cast<MidiEvent>(*std::next(mEvents.begin(), (int)(mEvents.size()) - 1));
 		lastTick = last->getTick();
 	}
-	insertEvent(make_shared<meta::EndOfTrack>(lastTick + mEndOfTrackDelta, 0));
-}
-
-void MidiTrack::dumpEvents()
-{
-    //auto it = mEvents->iterator();
-    //while (npc(it)->hasNext()) {
-        //npc(::java::lang::System::out())->println(static_cast< ::java::lang::Object* >(dynamic_cast< ::event::MidiEvent* >(npc(it)->next())));
-    //}
+	insertEvent(std::make_shared<meta::EndOfTrack>(lastTick + mEndOfTrackDelta, 0));
 }
 
 void MidiTrack::recalculateSize()
 {
 	mSize = 0;
-	shared_ptr<MidiEvent> last;
-	for (auto& E : mEvents) {
-		mSize += E->getSize();
-		if (last && !E->requiresStatusByte(last.get())) {
+	std::shared_ptr<MidiEvent> last;
+	for (auto& e : mEvents) {
+		mSize += e->getSize();
+		if (last && !e->requiresStatusByte(last.get())) {
 			mSize--;
 		}
-		last = E;
+		last = e;
 	}
 	mSizeNeedsRecalculating = false;
 }
 
-void MidiTrack::writeToOutputStream(ostream& out)
+void MidiTrack::writeToOutputStream(std::shared_ptr<std::ostream> stream)
 {
 	if (!mClosed)
 	{
@@ -264,16 +255,16 @@ void MidiTrack::writeToOutputStream(ostream& out)
 		recalculateSize();
 	}
 
-	out.write(&IDENTIFIER[0], IDENTIFIER.size());
+	stream->write(&IDENTIFIER[0], IDENTIFIER.size());
 
 	auto trackSizeBuffer = mpc::midi::util::MidiUtil::intToBytes(mSize, 4);
-	out.write(&trackSizeBuffer[0], trackSizeBuffer.size());
+	stream->write(&trackSizeBuffer[0], trackSizeBuffer.size());
 
-	shared_ptr<MidiEvent> lastEvent;
+	std::shared_ptr<MidiEvent> lastEvent;
 	
 	for (auto& event : mEvents)
 	{
-		event->writeToOutputStream(out, event->requiresStatusByte(lastEvent.get()));
+		event->writeToOutputStream(*stream.get(), event->requiresStatusByte(lastEvent.get()));
 		lastEvent = event;
 	}
 }
