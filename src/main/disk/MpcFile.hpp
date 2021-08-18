@@ -1,5 +1,6 @@
 #pragma once
 
+#include <types.hpp>
 #include <thirdp/any.hpp>
 
 #include <fat/AkaiFatLfnDirectoryEntry.hpp>
@@ -18,10 +19,6 @@
  * and deleting directories, etc.
  */
 
-namespace moduru::file {
-class FsNode;
-}
-
 namespace mpc::disk {
 
 class StdDisk;
@@ -31,10 +28,10 @@ class MpcFile {
 private:
     bool raw = false;
     std::shared_ptr<akaifat::fat::AkaiFatLfnDirectoryEntry> rawEntry;
-    std::shared_ptr<moduru::file::FsNode> stdNode;
+    fs::path fs_path;
     
     friend class StdDisk;
-    
+        
 public:
     bool isDirectory();
     bool isFile();

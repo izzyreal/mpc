@@ -1,9 +1,6 @@
 #include <disk/MpcFile.hpp>
 
-#include <file/Directory.hpp>
 #include <lang/StrUtil.hpp>
-#include <file/FsNode.hpp>
-#include <file/File.hpp>
 #include <file/FileUtil.hpp>
 
 #include <fat/AkaiFatLfnDirectoryEntry.hpp>
@@ -19,17 +16,9 @@ MpcFile::MpcFile(nonstd::any fileObject)
 {
     if (!fileObject.has_value()) throw std::runtime_error("No object provided to MpcFile");
     
-    if (fileObject.type() == typeid(std::shared_ptr<Directory>))
+    if (fileObject.type() == typeid(fs::path))
     {
-        stdNode = nonstd::any_cast<std::shared_ptr<Directory>>(fileObject);
-    }
-    else if (fileObject.type() == typeid(std::shared_ptr<File>))
-    {
-        stdNode = nonstd::any_cast<std::shared_ptr<File>>(fileObject);
-    }
-    else if (fileObject.type() == typeid(std::shared_ptr<FsNode>))
-    {
-        stdNode = nonstd::any_cast<std::shared_ptr<FsNode>>(fileObject);
+        fs_path = nonstd::any_cast<fs::path>(fileObject);
     }
     else if (fileObject.type() == typeid(std::shared_ptr<AkaiFatLfnDirectoryEntry>))
     {
@@ -51,11 +40,20 @@ std::vector<std::shared_ptr<MpcFile>> MpcFile::listFiles()
         for (auto& kv : dir->akaiNameIndex)
             result.emplace_back(std::make_shared<MpcFile>(kv.second));
     } else {
-        
-        auto dir = std::dynamic_pointer_cast<Directory>(stdNode);
-        
-        for (auto& node : dir->listFiles())
-            result.emplace_back(std::make_shared<MpcFile>(node));
+        std::error_code ec;
+        for(auto pathIterator = fs::directory_iterator(fs_path, ec);
+            pathIterator != fs::directory_iterator(); pathIterator.increment(ec))
+        {
+            if(!ec) {
+                auto& path = pathIterator->path();
+                std::string filename = path.filename();
+                
+                if (filename.length() > 0 && filename[0] == '.')
+                    continue;
+                
+                result.emplace_back(std::make_shared<MpcFile>(path));
+            }
+        }
     }
     
     return result;
@@ -72,7 +70,7 @@ std::string MpcFile::getNameWithoutExtension()
         return name;
     }
     else {
-        return stdNode->getNameWithoutExtension();
+        return fs_path.stem().string();
     }
 }
 
@@ -81,7 +79,7 @@ bool MpcFile::isDirectory()
     if (raw)
         return rawEntry->isDirectory();
     else
-        return stdNode->isDirectory();
+        return fs::is_directory(fs_path);
 }
 
 bool MpcFile::isFile()
@@ -94,7 +92,7 @@ std::string MpcFile::getName()
     if (raw)
         return rawEntry->getName();
     else
-        return stdNode->getName();
+        return fs_path.filename();
 }
 
 bool MpcFile::setName(std::string s)
@@ -109,25 +107,23 @@ bool MpcFile::setName(std::string s)
         }
     }
     else {
-        return stdNode->renameTo(s);
+//        return stdNode->renameTo(s);
+        return false;
     }
 }
 
 int MpcFile::length()
 {
+    if (isDirectory()) return 0;
     if (raw) {
-        auto length = 0;
         try {
-            if (rawEntry->isFile())
-                return rawEntry->getFile()->getLength();
+            return rawEntry->getFile()->getLength();
         }
-        catch (std::exception&) {
-            return 0;
-        }
-        return length;
+        catch (std::exception&) {}
+        return 0;
     }
     else
-        return stdNode->getLength();
+        return fs::file_size(fs_path);
 }
 
 void MpcFile::setFileData(std::vector<char>* data)
@@ -140,7 +136,7 @@ void MpcFile::setFileData(std::vector<char>* data)
         f->flush();
     }
     else {
-        std::dynamic_pointer_cast<moduru::file::File>(stdNode)->setData(data);
+        //std::dynamic_pointer_cast<moduru::file::File>(stdNode)->setData(data);
     }
 }
 
@@ -150,7 +146,7 @@ bool MpcFile::exists()
         return rawEntry->isValid();
     }
     else {
-        return stdNode->exists();
+        return fs::exists(fs_path);
     }
 }
 
@@ -166,7 +162,7 @@ bool MpcFile::del()
         }
     }
     else {
-        return stdNode->del();
+        return false;
     }
 }
 
@@ -185,11 +181,9 @@ std::vector<char> MpcFile::getBytes()
         }
     }
     else {
-        try {
-            std::dynamic_pointer_cast<moduru::file::File>(stdNode)->getData(&bytes);
-        } catch (std::exception& e) {
-            MLOG("Exception while getting file bytes: " + std::string(e.what()));
-        }
+        auto ostream = getInputStream();
+        bytes.resize(length());
+        ostream->read(&bytes[0], length());
     }
     
     return bytes;
@@ -200,7 +194,7 @@ std::shared_ptr<std::istream> MpcFile::getInputStream()
     if (raw) {
         return std::dynamic_pointer_cast<akaifat::fat::FatFile>(rawEntry->getFile())->getInputStream();
     } else {
-        return std::make_shared<std::ifstream>(std::move(FileUtil::ifstreamw(stdNode->getPath(), std::ios::in | std::ios::binary)));
+        return std::make_shared<std::ifstream>(std::move(FileUtil::ifstreamw(fs_path, std::ios::in | std::ios::binary)));
     }
 }
 
@@ -209,6 +203,6 @@ std::shared_ptr<std::ostream> MpcFile::getOutputStream()
     if (raw) {
         return std::dynamic_pointer_cast<akaifat::fat::FatFile>(rawEntry->getFile())->getOutputStream();
     } else {
-        return std::make_shared<std::ofstream>(std::move(FileUtil::ofstreamw(stdNode->getPath(), std::ios::out | std::ios::binary)));
+        return std::make_shared<std::ofstream>(std::move(FileUtil::ofstreamw(fs_path, std::ios::out | std::ios::binary)));
     }
 }

@@ -43,7 +43,7 @@ string Paths::storesPath()
 
 string Paths::defaultLocalVolumePath()
 {
-    static auto storesPath = appDocumentsPath() + "Volumes" + sep + "MPC2000XL" + sep;
+    static auto storesPath = appDocumentsPath() + "Volumes" + sep + "MPC2000XL";
     return storesPath;
 }
 

@@ -82,9 +82,8 @@ struct Volume {
     std::shared_ptr<mpc::disk::MpcFile> getRoot()
     {
         if (type == LOCAL_DIRECTORY)
-            return std::make_shared<mpc::disk::MpcFile>(std::make_shared<moduru::file::Directory>(localDirectoryPath, nullptr));
-        else
-            return {};
+            return std::make_shared<mpc::disk::MpcFile>(fs::path(localDirectoryPath));
+        return {};
     }
     
     std::shared_ptr<akaifat::fat::AkaiFatLfnDirectory> getRawRoot()
