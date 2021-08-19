@@ -34,15 +34,12 @@
 #include <lcdgui/screens/LoadScreen.hpp>
 #include <lcdgui/screens/window/LoadAProgramScreen.hpp>
 
-#include <file/Directory.hpp>
-
 #include <string>
 
 using namespace mpc;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
-using namespace moduru::file;
 
 #ifdef _WIN32
 #include <filesystem>
@@ -66,9 +63,8 @@ Mpc::Mpc()
     };
 
     for (auto& p : requiredPaths) {
-        Directory dir(p);
-        if (!dir.exists())
-            dir.create();
+        if (!fs::exists(p))
+            fs::create_directories(p);
     }
 
 	moduru::Logger::l.setPath(mpc::Paths::logFilePath());
@@ -77,7 +73,7 @@ Mpc::Mpc()
     auto demoSrc = Paths::demoDataSrcPath();
     auto demoDest = Paths::demoDataDestPath();
 
-	if (!Directory(demoDest).exists())
+	if (!fs::exists(demoDest))
 	{
 		try
 		{
