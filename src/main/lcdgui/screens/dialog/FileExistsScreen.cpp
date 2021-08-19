@@ -96,8 +96,10 @@ void FileExistsScreen::function(int i)
 				auto allParser = mpc::file::all::AllParser(mpc, mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()));
 				auto f = disk->newFile(allName);
 				auto bytes = allParser.getBytes();
-				f->setFileData(&bytes);
-				disk->flush();
+				
+                f->setFileData(bytes);
+				
+                disk->flush();
 				disk->initFiles();
                 auto popupScreen = mpc.screens->get<PopupScreen>("popup");
                 popupScreen->setText("         Saving ...");

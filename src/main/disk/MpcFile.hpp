@@ -39,7 +39,7 @@ public:
     std::string getName();
     bool setName(std::string s);
     int length();
-    void setFileData(std::vector<char>* data);
+    void setFileData(std::vector<char>& data);
     bool del();
     std::vector<char> getBytes();
     std::vector<std::shared_ptr<MpcFile>> listFiles();

@@ -103,7 +103,11 @@ struct Volume {
         return {};
     }
     
-    void close() {
+    void close()
+    {
+        if (type == LOCAL_DIRECTORY)
+            return;
+        
         if (!volumeStream.is_open() || volumeFs == nullptr) throw std::runtime_error("Volume is not open");
         flush();
         volumeFs->close();
@@ -112,7 +116,11 @@ struct Volume {
         delete volumeFs;
     }
     
-    void flush() {
+    void flush()
+    {
+        if (type == LOCAL_DIRECTORY)
+            return;
+        
         if (!volumeStream.is_open() || volumeFs == nullptr) throw std::runtime_error("Volume is not open");
         volumeFs->flush();
         volumeStream.flush();

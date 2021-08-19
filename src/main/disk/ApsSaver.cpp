@@ -28,7 +28,7 @@ void ApsSaver::saveAps()
     auto file = disk->newFile(apsFileName);
 	ApsParser apsParser(mpc, apsFileName.substr(0, apsFileName.find(".")));
     auto bytes = apsParser.getBytes();
-    file->setFileData(&bytes);
+    file->setFileData(bytes);
 
 	auto saveAProgramScreen = mpc.screens->get<SaveAProgramScreen>("save-a-program");
 	

@@ -79,7 +79,7 @@ void SaveAllFileScreen::function(int i)
 		
         auto f = disk->newFile(fileNameWithExt);
 		auto bytes = allParser->getBytes();
-		f->setFileData(&bytes);
+		f->setFileData(bytes);
 		disk->flush();
 		disk->initFiles();
         

@@ -170,7 +170,7 @@ void AbstractDisk::writeSound(weak_ptr<Sound> s, weak_ptr<MpcFile> f)
 {
 	auto sw = mpc::file::sndwriter::SndWriter(s.lock().get());
 	auto sndArray = sw.getSndFileArray();
-	f.lock()->setFileData(&sndArray);
+	f.lock()->setFileData(sndArray);
 	flush();
 	initFiles();
 }
@@ -267,7 +267,8 @@ void AbstractDisk::writeProgram(weak_ptr<Program> program, const string& fileNam
 	auto writer = mpc::file::pgmwriter::PgmWriter(program.lock().get(), mpc.getSampler());
 	auto pgmFile = newFile(fileName);
     auto bytes = writer.get();
-	pgmFile->setFileData(&bytes);
+	pgmFile->setFileData(bytes);
+    
 	vector<weak_ptr<Sound>> sounds;
 
 	for (auto& n : program.lock()->getNotesParameters())

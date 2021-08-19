@@ -107,8 +107,11 @@ bool MpcFile::setName(std::string s)
         }
     }
     else {
-//        return stdNode->renameTo(s);
-        return false;
+        fs::path new_path = fs_path;
+        new_path.replace_filename(s);
+        std::error_code ec;
+        fs::rename(fs_path, new_path, ec);
+        return ec.value() == 0;
     }
 }
 
@@ -126,17 +129,18 @@ int MpcFile::length()
         return fs::file_size(fs_path);
 }
 
-void MpcFile::setFileData(std::vector<char>* data)
+void MpcFile::setFileData(std::vector<char>& data)
 {
     if (raw) {
-        ByteBuffer bb(*data);
+        ByteBuffer bb(data);
         auto f = rawEntry->getFile();
-        f->setLength(data->size());
+        f->setLength(data.size());
         f->write(0, bb);
         f->flush();
     }
     else {
-        //std::dynamic_pointer_cast<moduru::file::File>(stdNode)->setData(data);
+        auto ostream = getOutputStream();
+        ostream->write(&data[0], data.size());
     }
 }
 
@@ -162,7 +166,7 @@ bool MpcFile::del()
         }
     }
     else {
-        return false;
+        return fs::remove(fs_path);
     }
 }
 
@@ -181,9 +185,9 @@ std::vector<char> MpcFile::getBytes()
         }
     }
     else {
-        auto ostream = getInputStream();
+        auto istream = getInputStream();
         bytes.resize(length());
-        ostream->read(&bytes[0], length());
+        istream->read(&bytes[0], length());
     }
     
     return bytes;

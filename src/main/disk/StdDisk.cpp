@@ -15,14 +15,9 @@
 
 #include <lang/StrUtil.hpp>
 
-#include <file/FsNode.hpp>
-#include <file/Directory.hpp>
-#include <file/FileUtil.hpp>
-
 #include <set>
 
 using namespace moduru::lang;
-using namespace moduru::file;
 using namespace moduru::raw::fat;
 using namespace mpc::disk;
 using namespace mpc::file;
@@ -111,7 +106,7 @@ void StdDisk::initFiles()
 	files.clear();
 	allFiles.clear();
 
-//	renameFilesToAkai();
+	renameFilesToAkai();
 
 	auto loadScreen = mpc.screens->get<LoadScreen>("load");
 
@@ -272,34 +267,11 @@ bool StdDisk::newFolder(const std::string& newDirName)
 
 std::shared_ptr<MpcFile> StdDisk::newFile(const std::string& _newFileName)
 {
-    std::shared_ptr<File> f;
-    
-    auto fileName = _newFileName;
-    
-	try
-    {
-		auto split = FileUtil::splitName(fileName);
-		split[0] = moduru::lang::StrUtil::trim(split[0]);
-		fileName = split[0] + "." + split[1];
-
-        auto dir = getDir();
-        
-//		string filePath = dir->stdNode->getPath() + FileUtil::getSeparator() + StrUtil::toUpper(StrUtil::replaceAll(fileName, ' ', "_"));
-        
-//		f = make_shared<File>(filePath, std::dynamic_pointer_cast<Directory>(dir->stdNode));
-//		auto success = f->create();
-		
-//        if (success)
-//        {
-//			return make_shared<MpcFile>(f);
-//		}
-	}
-	catch (const std::exception& e) {
-        MLOG("Failed to create file " + _newFileName + ":");
-        std::string msg = e.what();
-        MLOG(msg);
-	}
-    
+    auto new_path = getDir()->fs_path;
+    new_path.append(_newFileName);
+    auto result = std::make_shared<MpcFile>(new_path);
+    result->getOutputStream();
+    if (result->exists()) return result;
 	return {};
 }
 
