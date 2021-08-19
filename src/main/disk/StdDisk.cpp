@@ -259,16 +259,17 @@ bool StdDisk::deleteAllFiles(int extension)
 
 bool StdDisk::newFolder(const std::string& newDirName)
 {
-    return false;
-//    auto dir = getDir();
-//	auto f = Directory(dir->fs_entry.path().string() + FileUtil::getSeparator() + StrUtil::toUpper(newDirName), std::dynamic_pointer_cast<Directory>(dir->stdNode));
-//	return f.create();
+    std::string copy = StrUtil::toUpper(StrUtil::replaceAll(newDirName, ' ', "_"));
+    auto new_path = getDir()->fs_path;
+    new_path.append(copy);
+    return fs::create_directory(new_path);
 }
 
-std::shared_ptr<MpcFile> StdDisk::newFile(const std::string& _newFileName)
+std::shared_ptr<MpcFile> StdDisk::newFile(const std::string& newFileName)
 {
+    std::string copy = StrUtil::toUpper(StrUtil::replaceAll(newFileName, ' ', "_"));
     auto new_path = getDir()->fs_path;
-    new_path.append(_newFileName);
+    new_path.append(copy);
     auto result = std::make_shared<MpcFile>(new_path);
     result->getOutputStream();
     if (result->exists()) return result;
