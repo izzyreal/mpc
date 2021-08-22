@@ -9,11 +9,14 @@
 #include <disk/StdDisk.hpp>
 #include <nvram/VolumesPersistence.hpp>
 
+#include <lang/StrUtil.hpp>
+
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::lcdgui;
 using namespace mpc::disk;
 using namespace mpc::nvram;
+using namespace moduru::lang;
 
 VmpcDisksScreen::VmpcDisksScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "vmpc-disks", layerIndex)
@@ -107,6 +110,34 @@ void VmpcDisksScreen::turnWheel(int i)
     displayFunctionKeys();
 }
 
+std::string formatFileSize(uint64_t size)
+{
+    std::string hrSize = "";
+    uint64_t b = size;
+    float k = size / 1024.0;
+    float m = (size / 1024.0) / 1024.0;
+    float g = ((size / 1024.0) / 1024.0) / 1024.0;
+    float t = (((size / 1024.0) / 1024.0) / 1024.0) / 1024.0;
+
+    if(t > 1)
+    {
+        hrSize = StrUtil::TrimDecimals(t, 1) + "T";
+    } else if(g > 1)
+    {
+        hrSize = std::to_string((int)round(g)) + "G";
+    } else if(m > 1)
+    {
+        hrSize = std::to_string((int)round(m)) + "M";
+    } else if(k > 1)
+    {
+        hrSize = std::to_string((int)round(k)) + "K";
+    } else
+    {
+        hrSize = std::to_string(b) + "B";
+    }
+    return hrSize;
+}
+
 void VmpcDisksScreen::displayRows()
 {
     auto disks = mpc.getDisks();
@@ -133,7 +164,7 @@ void VmpcDisksScreen::displayRows()
         
         volume->setText(disk->getVolumeLabel());
         type->setText(disk->getTypeShortName());
-        size->setText(AbstractDisk::formatFileSize(disk->getTotalSize()));
+        size->setText(formatFileSize(disk->getTotalSize()));
         mode->setText(Volume::modeShortName(config[disk->getVolume().volumeUUID]));
     }
     

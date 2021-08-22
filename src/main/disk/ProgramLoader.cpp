@@ -123,12 +123,10 @@ void ProgramLoader::loadProgram(const int replaceIndex)
         }
 
 		mpc.importLoadedProgram();
-		disk->setBusy(false);
 		mpc.getLayeredScreen().lock()->openScreen("load");
 	}
-	catch (const exception& e)
+	catch (const exception&)
 	{
-		disk->setBusy(false);
 		auto popupScreen = mpc.screens->get<PopupScreen>("popup");
 		popupScreen->setText("Wrong file format");
 		popupScreen->returnToScreenAfterInteraction("load");

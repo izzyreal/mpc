@@ -21,8 +21,6 @@
 #include <file/FileUtil.hpp>
 #include <lang/StrUtil.hpp>
 
-#include <math.h>
-
 using namespace mpc::disk;
 using namespace mpc::file::wav;
 
@@ -35,98 +33,36 @@ using namespace mpc::sampler;
 using namespace moduru::lang;
 using namespace moduru::file;
 
-using namespace std;
-
 AbstractDisk::AbstractDisk(mpc::Mpc& _mpc)
 	: mpc (_mpc)
 {
 }
 
-void AbstractDisk::setBusy(bool b)
-{
-	busy = b;
-}
-
-bool AbstractDisk::isBusy()
-{
-	return busy;
-}
-
-std::string AbstractDisk::formatFileSize(uint64_t size)
-{
-	std::string hrSize = "";
-	uint64_t b = size;
-	float k = size / 1024.0;
-	float m = ((size / 1024.0) / 1024.0);
-	float g = (((size / 1024.0) / 1024.0) / 1024.0);
-	float t = ((((size / 1024.0) / 1024.0) / 1024.0) / 1024.0);
-
-	if(t > 1)
-	{
-		hrSize = StrUtil::TrimDecimals(t, 1) + "T";
-	} else if(g > 1)
-	{
-		hrSize = std::to_string((int)round(g)) + "G";
-	} else if(m > 1)
-	{
-		hrSize = std::to_string((int)round(m)) + "M";
-	} else if(k > 1)
-	{
-		hrSize = std::to_string((int)round(k)) + "K";
-	} else
-	{
-		hrSize = std::to_string(b) + "B";
-	}
-	return hrSize;
-}
-
-string AbstractDisk::padFileName16(string s)
-{
-	if (s.find(".") == string::npos) return s;
-	auto periodIndex = s.find_last_of(".");
-	auto name = s.substr(0, periodIndex);
-	auto ext = s.substr(periodIndex);
-	name = StrUtil::padRight(name, " ", 16);
-	return name + ext;
-}
-
-shared_ptr<MpcFile> AbstractDisk::getFile(int i)
+std::shared_ptr<MpcFile> AbstractDisk::getFile(int i)
 {
 	return files[i];
 }
 
-vector<string> AbstractDisk::getFileNames()
+std::vector<std::string> AbstractDisk::getFileNames()
 {
-	vector<string> res;
-	transform(files.begin(), files.end(), back_inserter(res), [](shared_ptr<MpcFile> f) { return f->getName(); });
+    std::vector<std::string> res;
+	transform(files.begin(), files.end(), back_inserter(res), [](std::shared_ptr<MpcFile> f) { return f->getName(); });
 	return res;
 }
 
-string AbstractDisk::getFileName(int i)
+std::string AbstractDisk::getFileName(int i)
 {
 	return files[i]->getName();
 }
 
-vector<string> AbstractDisk::getParentFileNames()
+std::vector<std::string> AbstractDisk::getParentFileNames()
 {
-	vector<string> res;
+    std::vector<std::string> res;
 
 	for (auto& f : parentFiles)
 		res.push_back(f->getName().length() < 8 ? f->getName() : f->getName().substr(0, 8));
 
 	return res;
-}
-
-bool AbstractDisk::renameSelectedFile(string s)
-{
-	auto directoryScreen = mpc.screens->get<DirectoryScreen>("directory");
-	auto loadScreen = mpc.screens->get<LoadScreen>("load");
-
-	auto left = directoryScreen->xPos == 0;
-	auto fileIndex = left ? directoryScreen->yPos0 + directoryScreen->yOffset0 : loadScreen->fileLoad;
-
-    auto file = left ? getParentFile(fileIndex) : getFile(fileIndex);
-    return file->setName(s);
 }
 
 bool AbstractDisk::deleteSelectedFile()
@@ -135,38 +71,28 @@ bool AbstractDisk::deleteSelectedFile()
 	return files[loadScreen->fileLoad]->del();
 }
 
-vector<shared_ptr<MpcFile>>& AbstractDisk::getFiles()
-{
-	return files;
-}
-
-vector<shared_ptr<MpcFile>>& AbstractDisk::getAllFiles() {
+std::vector<std::shared_ptr<MpcFile>>& AbstractDisk::getAllFiles() {
 	return allFiles;
 }
 
-shared_ptr<MpcFile> AbstractDisk::getParentFile(int i)
+std::shared_ptr<MpcFile> AbstractDisk::getParentFile(int i)
 {
     return parentFiles[i];
 }
 
-vector<shared_ptr<MpcFile>>& AbstractDisk::getParentFiles()
-{
-	return parentFiles;
-}
-
-void AbstractDisk::writeSound(weak_ptr<Sound> s)
+void AbstractDisk::writeSound(std::weak_ptr<Sound> s)
 {
 	auto name = mpc::Util::getFileName(s.lock()->getName() + ".SND");
     writeSound(s, newFile(name));
 }
 
-void AbstractDisk::writeWav(weak_ptr<Sound> s)
+void AbstractDisk::writeWav(std::weak_ptr<Sound> s)
 {
 	auto name = mpc::Util::getFileName(s.lock()->getName() + ".WAV");
 	writeWav(s, newFile(name));
 }
 
-void AbstractDisk::writeSound(weak_ptr<Sound> s, weak_ptr<MpcFile> f)
+void AbstractDisk::writeSound(std::weak_ptr<Sound> s, std::weak_ptr<MpcFile> f)
 {
 	auto sw = mpc::file::sndwriter::SndWriter(s.lock().get());
 	auto sndArray = sw.getSndFileArray();
@@ -175,7 +101,7 @@ void AbstractDisk::writeSound(weak_ptr<Sound> s, weak_ptr<MpcFile> f)
 	initFiles();
 }
 
-void AbstractDisk::writeWav(weak_ptr<Sound> s, weak_ptr<MpcFile> f)
+void AbstractDisk::writeWav(std::weak_ptr<Sound> s, std::weak_ptr<MpcFile> f)
 {
     auto sound = s.lock();
     auto data = sound->getSampleData();
@@ -191,7 +117,7 @@ void AbstractDisk::writeWav(weak_ptr<Sound> s, weak_ptr<MpcFile> f)
     }
     else
     {
-        vector<float> interleaved;
+        std::vector<float> interleaved;
 
         for (int i = 0; i < (int) (data->size() * 0.5); i++)
         {
@@ -207,7 +133,7 @@ void AbstractDisk::writeWav(weak_ptr<Sound> s, weak_ptr<MpcFile> f)
     initFiles();
 }
 
-void AbstractDisk::writeSequence(weak_ptr<mpc::sequencer::Sequence> s, string fileName)
+void AbstractDisk::writeSequence(std::weak_ptr<mpc::sequencer::Sequence> s, std::string fileName)
 {
 	if (checkExists(fileName))
 		return;
@@ -221,7 +147,7 @@ void AbstractDisk::writeSequence(weak_ptr<mpc::sequencer::Sequence> s, string fi
 	initFiles();
 }
 
-bool AbstractDisk::checkExists(string fileName)
+bool AbstractDisk::checkExists(std::string fileName)
 {
 	initFiles();
 
@@ -240,7 +166,7 @@ bool AbstractDisk::checkExists(string fileName)
 	return false;
 }
 
-shared_ptr<MpcFile> AbstractDisk::getFile(const string& fileName)
+std::shared_ptr<MpcFile> AbstractDisk::getFile(const std::string& fileName)
 {
 	auto tempfileName = StrUtil::replaceAll(fileName, ' ', "");
 
@@ -259,7 +185,7 @@ shared_ptr<MpcFile> AbstractDisk::getFile(const string& fileName)
     return {};
 }
 
-void AbstractDisk::writeProgram(weak_ptr<Program> program, const string& fileName)
+void AbstractDisk::writeProgram(std::weak_ptr<Program> program, const std::string& fileName)
 {
 	if (checkExists(fileName))
 		return;
@@ -269,7 +195,7 @@ void AbstractDisk::writeProgram(weak_ptr<Program> program, const string& fileNam
     auto bytes = writer.get();
 	pgmFile->setFileData(bytes);
     
-	vector<weak_ptr<Sound>> sounds;
+    std::vector<std::weak_ptr<Sound>> sounds;
 
 	for (auto& n : program.lock()->getNotesParameters())
 	{
@@ -282,7 +208,7 @@ void AbstractDisk::writeProgram(weak_ptr<Program> program, const string& fileNam
 	if (saveAProgramScreen->save != 0)
 	{
 		auto isWav = saveAProgramScreen->save == 2;
-		soundSaver = make_unique<SoundSaver>(mpc, sounds, isWav);
+		soundSaver = std::make_unique<SoundSaver>(mpc, sounds, isWav);
 	}
 	else
     {
@@ -291,17 +217,11 @@ void AbstractDisk::writeProgram(weak_ptr<Program> program, const string& fileNam
 
 	flush();
 	initFiles();
-	setBusy(false);
 }
 
 bool AbstractDisk::isRoot()
 {
 	return getPathDepth() == 0;
-}
-
-bool AbstractDisk::deleteDir(std::weak_ptr<MpcFile> f)
-{
-    return deleteRecursive(f);
 }
 
 bool AbstractDisk::deleteRecursive(std::weak_ptr<MpcFile> _toDelete)

@@ -260,10 +260,7 @@ void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool head
 }
 
 void ApsLoader::load()
-{
-    auto disk = mpc.getDisk().lock();
-    disk->setBusy(true);
-    
+{    
     shared_ptr<ApsParser> apsParser;
     
     try
@@ -274,14 +271,12 @@ void ApsLoader::load()
     {
         string msg = e.what();
         MLOG("Failed to load APS file " + file.lock()->getName() + ": " + msg);
-        disk->setBusy(false);
         return;
     }
     
     if (!apsParser->isHeaderValid())
     {
         MLOG("The APS file you're trying to load does not have a valid ID. The first 2 bytes of an MPC2000XL APS file should be 0A 05. MPC2000 APS files start with 0A 04 and are not supported (yet?).");
-        disk->setBusy(false);
         return;
     }
     
@@ -291,10 +286,15 @@ void ApsLoader::load()
     mpc.getSampler().lock()->setSoundIndex(0);
     
     mpc.getLayeredScreen().lock()->openScreen("load");
-    disk->setBusy(false);
 }
 
-void ApsLoader::loadSound(mpc::Mpc& mpc, string soundFileName, string ext, weak_ptr<MpcFile> _soundFile, bool replace, int loadSoundIndex, bool headless)
+void ApsLoader::loadSound(mpc::Mpc& mpc,
+                          string soundFileName,
+                          string ext,
+                          weak_ptr<MpcFile> _soundFile,
+                          bool replace,
+                          int loadSoundIndex,
+                          bool headless)
 {
     auto soundFile = _soundFile.lock();
     SoundLoader soundLoader(mpc, mpc.getSampler().lock()->getSounds(), replace);

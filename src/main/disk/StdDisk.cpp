@@ -236,7 +236,7 @@ std::shared_ptr<MpcFile> StdDisk::getParentDir()
     return mpcFile;
 }
 
-bool StdDisk::deleteAllFiles(int extension)
+bool StdDisk::deleteAllFiles(int extensionIndex)
 {
     auto dir = getDir();
     
@@ -250,7 +250,7 @@ bool StdDisk::deleteAllFiles(int extension)
 	{
 		if (!f->isDirectory())
 		{
-			if (extension == 0 || StrUtil::hasEnding(f->getName(), extensions[extension]))
+			if (extensionIndex == 0 || StrUtil::hasEnding(f->getName(), extensions[extensionIndex]))
 				success = f->del();
 		}
 	}

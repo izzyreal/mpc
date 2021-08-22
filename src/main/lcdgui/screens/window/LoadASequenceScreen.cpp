@@ -110,6 +110,5 @@ void LoadASequenceScreen::displayLoadInto()
 void LoadASequenceScreen::displayFile()
 {
 	auto s = sequencer.lock()->getPlaceHolder().lock();
-	findLabel("file").lock()->setText("File:" + StrUtil::toUpper(mpc::disk::AbstractDisk::padFileName16(s->getName())) + ".MID");
-	return;
+	findLabel("file").lock()->setText("File:" + StrUtil::toUpper(s->getName()) + ".MID");
 }

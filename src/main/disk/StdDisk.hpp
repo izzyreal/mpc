@@ -32,7 +32,7 @@ public:
     bool moveForward(const std::string& directoryName) override;
     void close() override;
     void flush() override;
-    bool deleteAllFiles(int dwGuiDelete) override;
+    bool deleteAllFiles(int extensionIndex) override;
     bool newFolder(const std::string& newDirName) override;
     std::shared_ptr<MpcFile> newFile(const std::string& newFileName) override;
     std::string getAbsolutePath() override;

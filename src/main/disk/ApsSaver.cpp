@@ -24,7 +24,6 @@ ApsSaver::ApsSaver(mpc::Mpc& mpc, string apsFileName)
 void ApsSaver::saveAps()
 {
 	auto disk = mpc.getDisk().lock();
-	disk->setBusy(true);
     auto file = disk->newFile(apsFileName);
 	ApsParser apsParser(mpc, apsFileName.substr(0, apsFileName.find(".")));
     auto bytes = apsParser.getBytes();
@@ -38,7 +37,6 @@ void ApsSaver::saveAps()
 	}
 	else
 	{
-		disk->setBusy(false);
 		mpc.getLayeredScreen().lock()->openScreen("save");
 	}
 }

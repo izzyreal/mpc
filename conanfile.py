@@ -13,7 +13,8 @@ class Pkg(ConanFile):
                 "akaifat/0.1@izmar/dev",
                 "rapidjson/1.1.0@bincrafters/stable",
                 "catch2/2.13.4",
-                "ghc-filesystem/1.4.0")
+                "ghc-filesystem/1.4.0",
+                "tl-expected/20190710")
     url = "https://github.com/izzyreal/mpc.git"
 	
     def build(self):

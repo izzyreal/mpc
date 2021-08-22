@@ -257,13 +257,13 @@ void LoadScreen::turnWheel(int i)
 	{
 		auto disk = mpc.getDisk().lock();
 		auto currentDir = disk->getDirectoryName();
-		auto parents = disk->getParentFiles();
+		auto parents = disk->getParentFileNames();
 	
 		int position = -1;
 
 		for (int j = 0; j < parents.size(); j++)
 		{
-			if (parents[j]->getName().compare(currentDir) == 0)
+			if (parents[j] == currentDir)
 			{
 				position = j;
 				break;
@@ -278,7 +278,7 @@ void LoadScreen::turnWheel(int i)
 			{
 				disk->initFiles();
 
-				if (disk->moveForward(parents[candidate]->getName()))
+				if (disk->moveForward(parents[candidate]))
 				{
 					disk->initFiles();
 					displayDirectory();
@@ -433,8 +433,6 @@ void LoadScreen::setFileLoad(int i)
 
 void LoadScreen::loadSound()
 {
-    auto disk = mpc.getDisk().lock();
-    disk->setBusy(true);
     SoundLoader soundLoader(mpc, sampler.lock()->getSounds(), false);
     soundLoader.setPreview(true);
 
@@ -450,7 +448,6 @@ void LoadScreen::loadSound()
         
         MLOG("A problem occurred when trying to load " + getSelectedFileName() + ": " + string(exception.what()));
         MLOG(result.errorMessage);
-        disk->setBusy(false);
         openScreen("load");
     }
 
@@ -459,7 +456,6 @@ void LoadScreen::loadSound()
     if (!result.success)
     {
         sampler.lock()->deleteSound(sampler.lock()->getSoundCount() - 1);
-        disk->setBusy(false);
         openScreen("popup");
         popupScreen->setText(result.errorMessage);
         popupScreen->returnToScreenAfterMilliSeconds("load", 500);
@@ -482,9 +478,6 @@ void LoadScreen::loadSound()
         
         popupScreen->returnToScreenAfterMilliSeconds("load-a-sound", sleepTime);
     }
-
-    // PopupScreen should have a std::function delayedAction; that does the below
-    disk->setBusy(false);
 }
 
 void LoadScreen::displayDevice()
@@ -502,6 +495,7 @@ void LoadScreen::displayType()
 void LoadScreen::up()
 {
 	init();
+    
 	if (param == "device")
 	{
 		device = mpc.getDiskController()->activeDiskIndex;
