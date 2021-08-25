@@ -47,10 +47,8 @@ public:
     std::vector<std::shared_ptr<MpcFile>>& getAllFiles();
     std::shared_ptr<MpcFile> getParentFile(int i);
     
-    void writeSound(std::weak_ptr<mpc::sampler::Sound>);
-    void writeWav(std::weak_ptr<mpc::sampler::Sound>);
-    void writeSound(std::weak_ptr<mpc::sampler::Sound>, std::weak_ptr<MpcFile>);
-    void writeWav(std::weak_ptr<mpc::sampler::Sound>, std::weak_ptr<MpcFile>);
+    void writeSound(std::weak_ptr<mpc::sampler::Sound>, std::string fileName);
+    void writeWav(std::weak_ptr<mpc::sampler::Sound>, std::string fileName);
     void writeSequence(std::weak_ptr<mpc::sequencer::Sequence>, std::string fileName);
     bool checkExists(std::string fileName);
     void writeProgram(std::weak_ptr<mpc::sampler::Program> program, const std::string& fileName);
@@ -62,7 +60,6 @@ public:
     virtual void close() = 0;
     virtual void initFiles() = 0;
     virtual std::shared_ptr<MpcFile> newFile(const std::string& name) = 0;
-    virtual file_or_error newFile2(const std::string& name) = 0;
     virtual std::string getDirectoryName() = 0;
     virtual bool moveBack() = 0;
     virtual bool moveForward(const std::string& directoryName) = 0;
@@ -78,6 +75,8 @@ public:
 
 private:
     std::unique_ptr<SoundSaver> soundSaver;
+    file_or_error newFile2(const std::string& name);
+    file_or_error writeWav2(std::shared_ptr<mpc::sampler::Sound>, std::shared_ptr<MpcFile>);
 
 };
 }

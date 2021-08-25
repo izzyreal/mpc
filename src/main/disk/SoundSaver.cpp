@@ -54,9 +54,9 @@ void SoundSaver::saveSounds()
 		}
 		
 		if (wav)
-            disk->writeWav(s);
+            disk->writeWav(s, "");
 		else
-            disk->writeSound(s);
+            disk->writeSound(s, "");
 
         this_thread::sleep_for(chrono::milliseconds(300));
 	}

@@ -265,16 +265,6 @@ bool StdDisk::newFolder(const std::string& newDirName)
     return fs::create_directory(new_path);
 }
 
-file_or_error StdDisk::newFile2(const std::string& name)
-{
-    try {
-        return newFile(name);
-    } catch (const std::exception&) {
-    }
-    
-    return tl::make_unexpected(mpc_io_error{"Could not create new file"});
-}
-
 std::shared_ptr<MpcFile> StdDisk::newFile(const std::string& newFileName)
 {
     std::string copy = StrUtil::toUpper(StrUtil::replaceAll(newFileName, ' ', "_"));

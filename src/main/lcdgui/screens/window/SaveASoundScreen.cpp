@@ -69,12 +69,10 @@ void SaveASoundScreen::function(int i)
 		disk->flush();
 		disk->initFiles();
 		
-		auto f = disk->newFile(fileName);
-
 		if (fileType == 0)
-			disk->writeSound(s, f);
+			disk->writeSound(s, fileName);
 		else
-			disk->writeWav(s, f);
+			disk->writeWav(s, fileName);
 
 		disk->flush();
 		disk->initFiles();

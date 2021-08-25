@@ -80,57 +80,71 @@ std::shared_ptr<MpcFile> AbstractDisk::getParentFile(int i)
     return parentFiles[i];
 }
 
-void AbstractDisk::writeSound(std::weak_ptr<Sound> s)
-{
-	auto name = mpc::Util::getFileName(s.lock()->getName() + ".SND");
-    writeSound(s, newFile(name));
-}
-
-void AbstractDisk::writeWav(std::weak_ptr<Sound> s)
-{
-	auto name = mpc::Util::getFileName(s.lock()->getName() + ".WAV");
-	writeWav(s, newFile(name));
-}
-
-void AbstractDisk::writeSound(std::weak_ptr<Sound> s, std::weak_ptr<MpcFile> f)
+void AbstractDisk::writeSound(std::weak_ptr<Sound> s, std::string fileName)
 {
 	auto sw = mpc::file::sndwriter::SndWriter(s.lock().get());
 	auto sndArray = sw.getSndFileArray();
-	f.lock()->setFileData(sndArray);
+    auto name = mpc::Util::getFileName(fileName == "" ? s.lock()->getName() + ".WAV" : fileName);
+    auto f = newFile(name);
+    f->setFileData(sndArray);
 	flush();
 	initFiles();
 }
 
-void AbstractDisk::writeWav(std::weak_ptr<Sound> s, std::weak_ptr<MpcFile> f)
+file_or_error AbstractDisk::writeWav2(std::shared_ptr<mpc::sampler::Sound> sound, std::shared_ptr<MpcFile> f)
+{
+    auto outputStream = f->getOutputStream();
+    auto isMono = sound->isMono();
+    auto data = sound->getSampleData();
+
+    std::string msg;
+    
+    try {
+        auto wavFile = WavFile::writeWavStream(outputStream, isMono ? 1 : 2, data->size() / (isMono ? 1 : 2), 16, sound->getSampleRate());
+
+        if (isMono)
+        {
+            wavFile.writeFrames(data, data->size());
+        }
+        else
+        {
+            std::vector<float> interleaved;
+            
+            for (int i = 0; i < (int) (data->size() * 0.5); i++)
+            {
+                interleaved.push_back((*data)[i]);
+                interleaved.push_back((*data)[(int) (i + data->size() * 0.5)]);
+            }
+            
+            wavFile.writeFrames(&interleaved, data->size() * 0.5);
+        }
+        
+        wavFile.close();
+        flush();
+        initFiles();
+        
+        return f;
+        
+    } catch (const std::exception& e) {
+        msg = e.what();
+    }
+    
+    return tl::make_unexpected(mpc_io_error{"Could not write WAV file due to: " + msg});
+}
+
+void AbstractDisk::writeWav(std::weak_ptr<Sound> s, std::string fileName)
 {
     auto sound = s.lock();
-    auto data = sound->getSampleData();
-    auto isMono = sound->isMono();
-
-    auto outputStream = f.lock()->getOutputStream();
-
-    auto wavFile = WavFile::writeWavStream(outputStream, isMono ? 1 : 2, data->size() / (isMono ? 1 : 2), 16, sound->getSampleRate());
-
-    if (isMono)
-    {
-        wavFile.writeFrames(data, data->size());
-    }
-    else
-    {
-        std::vector<float> interleaved;
-
-        for (int i = 0; i < (int) (data->size() * 0.5); i++)
-        {
-            interleaved.push_back((*data)[i]);
-            interleaved.push_back((*data)[(int) (i + data->size() * 0.5)]);
-        }
-
-        wavFile.writeFrames(&interleaved, data->size() * 0.5);
-    }
-
-    wavFile.close();
-    flush();
-    initFiles();
+    auto name = mpc::Util::getFileName(fileName == "" ? sound->getName() + ".WAV" : fileName);
+    
+    newFile2(name)
+      .map([&](std::shared_ptr<MpcFile> f) {
+        return writeWav2(sound, f);
+      })
+      .map_error([](mpc_io_error e){
+        MLOG(e.msg);
+        // Show disk error popup
+      });
 }
 
 void AbstractDisk::writeSequence(std::weak_ptr<mpc::sequencer::Sequence> s, std::string fileName)
@@ -242,3 +256,12 @@ bool AbstractDisk::deleteRecursive(std::weak_ptr<MpcFile> _toDelete)
     return toDelete->del();
 }
 
+file_or_error AbstractDisk::newFile2(const std::string& name)
+{
+    std::string msg;
+    
+    try { return newFile(name); }
+    catch (const std::exception& e) { msg = e.what(); }
+    
+    return tl::make_unexpected(mpc_io_error{"Could not create new file: " + msg});
+}
