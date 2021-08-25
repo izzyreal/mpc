@@ -175,6 +175,11 @@ bool RawDisk::newFolder(const std::string& newDirName)
 	return true;
 }
 
+file_or_error RawDisk::newFile2(const std::string& name)
+{
+    return {};
+}
+
 std::shared_ptr<MpcFile> RawDisk::newFile(const std::string& newFileName)
 {
 	try {

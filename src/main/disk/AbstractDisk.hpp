@@ -24,9 +24,6 @@ class Volume;
 
 class AbstractDisk
 {
-private:
-    std::unique_ptr<SoundSaver> soundSaver;
-    
 protected:
     AbstractDisk(mpc::Mpc&);
 
@@ -65,6 +62,7 @@ public:
     virtual void close() = 0;
     virtual void initFiles() = 0;
     virtual std::shared_ptr<MpcFile> newFile(const std::string& name) = 0;
+    virtual file_or_error newFile2(const std::string& name) = 0;
     virtual std::string getDirectoryName() = 0;
     virtual bool moveBack() = 0;
     virtual bool moveForward(const std::string& directoryName) = 0;
@@ -77,6 +75,9 @@ public:
     virtual std::string getVolumeLabel() = 0;
     virtual Volume& getVolume() = 0;
     virtual void initRoot() = 0;
+
+private:
+    std::unique_ptr<SoundSaver> soundSaver;
 
 };
 }

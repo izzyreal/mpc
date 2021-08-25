@@ -38,6 +38,7 @@ public:
     bool deleteAllFiles(int dwGuiDelete) override;
     bool newFolder(const std::string& newDirName) override;
     std::shared_ptr<MpcFile> newFile(const std::string& newFileName) override;
+    file_or_error newFile2(const std::string& name) override;
     std::string getAbsolutePath() override;
     std::string getTypeShortName() override;
     std::string getModeShortName() override;
