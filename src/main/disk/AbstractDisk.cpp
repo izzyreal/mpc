@@ -17,6 +17,7 @@
 #include <lcdgui/screens/LoadScreen.hpp>
 #include <lcdgui/screens/window/DirectoryScreen.hpp>
 #include <lcdgui/screens/window/SaveAProgramScreen.hpp>
+#include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
 #include <file/FileUtil.hpp>
 #include <lang/StrUtil.hpp>
@@ -27,6 +28,7 @@ using namespace mpc::file::wav;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::lcdgui::screens::dialog2;
 
 using namespace mpc::sampler;
 
@@ -136,15 +138,25 @@ void AbstractDisk::writeWav(std::weak_ptr<Sound> s, std::string fileName)
 {
     auto sound = s.lock();
     auto name = mpc::Util::getFileName(fileName == "" ? sound->getName() + ".WAV" : fileName);
+
+    auto writeWavFunc = [&](std::shared_ptr<MpcFile> f){ return writeWav2(sound, f); };
+    
+    auto errorFunc = [&](mpc_io_error e){
+    
+        MLOG(e.msg);
+        
+        new std::thread([&](){
+            auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+            popupScreen->setText("Unknown disk error!");
+            auto currentScreenName = mpc.getLayeredScreen().lock()->getCurrentScreenName();
+            popupScreen->returnToScreenAfterMilliSeconds(currentScreenName, 1000);
+            mpc.getLayeredScreen().lock()->openScreen("popup");
+        });
+    };
     
     newFile2(name)
-      .map([&](std::shared_ptr<MpcFile> f) {
-        return writeWav2(sound, f);
-      })
-      .map_error([](mpc_io_error e){
-        MLOG(e.msg);
-        // Show disk error popup
-      });
+      .and_then(writeWavFunc)
+      .map_error(errorFunc);
 }
 
 void AbstractDisk::writeSequence(std::weak_ptr<mpc::sequencer::Sequence> s, std::string fileName)
