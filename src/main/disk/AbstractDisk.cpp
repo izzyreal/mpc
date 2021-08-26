@@ -24,17 +24,18 @@
 
 using namespace mpc::disk;
 using namespace mpc::file::wav;
+using namespace mpc::file::sndwriter;
+using namespace mpc::file::mid;
+using namespace mpc::file::pgmwriter;
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
-
 using namespace mpc::sampler;
 
 using namespace moduru::lang;
 using namespace moduru::file;
-
 
 AbstractDisk::AbstractDisk(mpc::Mpc& _mpc)
 : mpc (_mpc),
@@ -93,18 +94,43 @@ std::shared_ptr<MpcFile> AbstractDisk::getParentFile(int i)
     return parentFiles[i];
 }
 
-void AbstractDisk::writeSound(std::weak_ptr<Sound> s, std::string fileName)
+void AbstractDisk::writeSound(std::shared_ptr<Sound> s, std::string fileName)
 {
-    auto sw = mpc::file::sndwriter::SndWriter(s.lock().get());
-    auto sndArray = sw.getSndFileArray();
-    auto name = mpc::Util::getFileName(fileName == "" ? s.lock()->getName() + ".WAV" : fileName);
-    auto f = newFile(name);
-    f->setFileData(sndArray);
-    flush();
-    initFiles();
+    auto writeSndFunc = [&](std::shared_ptr<MpcFile> f){ return writeSnd2(s, f); };
+    auto name = mpc::Util::getFileName(fileName == "" ? s->getName() + ".SND" : fileName);
+    newFile2(name)
+    .and_then(writeSndFunc)
+    .map_error(errorFunc);
 }
 
-file_or_error AbstractDisk::writeWav2(std::shared_ptr<mpc::sampler::Sound> sound, std::shared_ptr<MpcFile> f)
+file_or_error AbstractDisk::writeSnd2(std::shared_ptr<Sound> s, std::shared_ptr<MpcFile> f)
+{
+    std::string msg;
+    
+    try {
+        auto sw = SndWriter(s.get());
+        auto sndArray = sw.getSndFileArray();
+        f->setFileData(sndArray);
+        flush();
+        initFiles();
+    } catch (const std::exception& e) {
+        msg = e.what();
+    }
+    
+    return tl::make_unexpected(mpc_io_error{"Could not write SND file due to: " + msg});
+}
+
+void AbstractDisk::writeWav(std::shared_ptr<Sound> s, std::string fileName)
+{
+    auto writeWavFunc = [&](std::shared_ptr<MpcFile> f){ return writeWav2(s, f); };
+    
+    auto name = mpc::Util::getFileName(fileName == "" ? s->getName() + ".WAV" : fileName);
+    newFile2(name)
+    .and_then(writeWavFunc)
+    .map_error(errorFunc);
+}
+
+file_or_error AbstractDisk::writeWav2(std::shared_ptr<Sound> sound, std::shared_ptr<MpcFile> f)
 {
     auto outputStream = f->getOutputStream();
     auto isMono = sound->isMono();
@@ -145,18 +171,6 @@ file_or_error AbstractDisk::writeWav2(std::shared_ptr<mpc::sampler::Sound> sound
     return tl::make_unexpected(mpc_io_error{"Could not write WAV file due to: " + msg});
 }
 
-void AbstractDisk::writeWav(std::weak_ptr<Sound> s, std::string fileName)
-{
-    auto sound = s.lock();
-    auto name = mpc::Util::getFileName(fileName == "" ? sound->getName() + ".WAV" : fileName);
-    
-    auto writeWavFunc = [&](std::shared_ptr<MpcFile> f){ return writeWav2(sound, f); };
-    
-    newFile2(name)
-    .and_then(writeWavFunc)
-    .map_error(errorFunc);
-}
-
 void AbstractDisk::writeSequence(std::weak_ptr<mpc::sequencer::Sequence> s, std::string fileName)
 {
     if (checkExists(fileName))
@@ -164,7 +178,7 @@ void AbstractDisk::writeSequence(std::weak_ptr<mpc::sequencer::Sequence> s, std:
     
     auto newMidFile = newFile(fileName);
     
-    auto writer = mpc::file::mid::MidiWriter(s.lock().get());
+    auto writer = MidiWriter(s.lock().get());
     writer.writeToOStream(newMidFile->getOutputStream());
     
     flush();
@@ -214,7 +228,7 @@ void AbstractDisk::writeProgram(std::weak_ptr<Program> program, const std::strin
     if (checkExists(fileName))
         return;
     
-    auto writer = mpc::file::pgmwriter::PgmWriter(program.lock().get(), mpc.getSampler());
+    auto writer = PgmWriter(program.lock().get(), mpc.getSampler());
     auto pgmFile = newFile(fileName);
     auto bytes = writer.get();
     pgmFile->setFileData(bytes);
