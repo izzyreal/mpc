@@ -77,6 +77,8 @@ private:
     std::unique_ptr<SoundSaver> soundSaver;
     file_or_error newFile2(const std::string& name);
     file_or_error writeWav2(std::shared_ptr<mpc::sampler::Sound>, std::shared_ptr<MpcFile>);
+    
+    std::function<void(mpc_io_error e)> errorFunc;
 
 };
 }
