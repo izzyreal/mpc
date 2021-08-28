@@ -472,11 +472,8 @@ void LoadScreen::loadSound()
         auto name = FileUtil::splitName(getSelectedFileName())[0];
         auto ext = FileUtil::splitName(getSelectedFileName())[1];
         popupScreen->setText("LOADING " + StrUtil::padRight(name, " ", 16) + "." + ext);
-     
-        int sleepTime = soundLoader.getSize() / 400;
-        if (sleepTime < 300) sleepTime = 300;
-        
-        popupScreen->returnToScreenAfterMilliSeconds("load-a-sound", sleepTime);
+             
+        popupScreen->returnToScreenAfterMilliSeconds("load-a-sound", 300);
     }
 }
 

@@ -44,6 +44,7 @@ public:
     std::vector<char> getBytes();
     std::vector<std::shared_ptr<MpcFile>> listFiles();
     std::string getNameWithoutExtension();
+    std::string getExtension();
     std::shared_ptr<std::istream> getInputStream();
     std::shared_ptr<std::ostream> getOutputStream();
     

@@ -7,6 +7,7 @@
 #include <file/mid/MidiWriter.hpp>
 #include <file/pgmwriter/PgmWriter.hpp>
 #include <file/sndwriter/SndWriter.hpp>
+#include <file/sndreader/SndReader.hpp>
 #include <file/aps/ApsParser.hpp>
 #include <file/all/AllParser.hpp>
 
@@ -24,9 +25,12 @@
 #include <file/FileUtil.hpp>
 #include <lang/StrUtil.hpp>
 
+#include <cmath>
+
 using namespace mpc::disk;
 using namespace mpc::file::wav;
 using namespace mpc::file::sndwriter;
+using namespace mpc::file::sndreader;
 using namespace mpc::file::mid;
 using namespace mpc::file::pgmwriter;
 using namespace mpc::file::aps;
@@ -44,7 +48,7 @@ using namespace moduru::file;
 AbstractDisk::AbstractDisk(mpc::Mpc& _mpc)
 : mpc (_mpc),
 errorFunc ([&](mpc_io_error e){
-    MLOG(e.msg);
+    MLOG(e.log_msg);
     new std::thread([&](){
         auto popupScreen = mpc.screens->get<PopupScreen>("popup");
         popupScreen->setText("Unknown disk error!");
@@ -377,4 +381,119 @@ file_or_error AbstractDisk::writeAll2(std::shared_ptr<MpcFile> f)
     } catch (const std::exception& e) { msg = e.what(); }
     
     return tl::make_unexpected(mpc_io_error{"Could not write ALL file: " + msg});
+}
+
+sound_or_error AbstractDisk::readWav2(std::shared_ptr<MpcFile> f)
+{
+    if (!StrUtil::eqIgnoreCase(f->getExtension(), ".wav"))
+        return tl::make_unexpected(mpc_io_error{ f->getName() + " does not have .WAV extension" });
+    
+    std::string msg;
+    
+    try {
+        auto sound = mpc.getSampler().lock()->addSound().lock();
+        auto inputStream = f->getInputStream();
+        auto wavFile = WavFile::readWavStream(inputStream);
+        
+        if (wavFile.getValidBits() != 16)
+        {
+            wavFile.close();
+            return tl::make_unexpected(mpc_io_error{ f->getName() + " is not a 16 bit .WAV file. " + std::to_string(wavFile.getValidBits()) + " .WAV files are not supported." });
+        }
+
+        if (wavFile.getSampleRate() < 8000 || wavFile.getSampleRate() > 44100)
+        {
+            wavFile.close();
+            return tl::make_unexpected(mpc_io_error{ f->getName() + " has a sample rate of " + std::to_string(wavFile.getSampleRate()) + ". Sample rate has to be between 8000 and 44100." });
+        }
+        
+        sound->setName(f->getNameWithoutExtension());
+        sound->setSampleRate(wavFile.getSampleRate());
+        sound->setLevel(100);
+        
+        int numChannels = wavFile.getNumChannels();
+        
+        auto sampleData = sound->getSampleData();
+        
+        if (numChannels == 1)
+        {
+            wavFile.readFrames(sampleData, wavFile.getNumFrames());
+        }
+        else
+        {
+            std::vector<float> interleaved;
+            wavFile.readFrames(&interleaved, wavFile.getNumFrames());
+            
+            for (int i = 0; i < interleaved.size(); i += 2)
+                sampleData->push_back(interleaved[i]);
+            
+            for (int i = 1; i < interleaved.size(); i += 2)
+                sampleData->push_back(interleaved[i]);
+        }
+        
+        sound->setMono(numChannels == 1);
+        
+        if (wavFile.getNumSampleLoops() > 0)
+        {
+            auto& sampleLoop = wavFile.getSampleLoop();
+            sound->setLoopTo(sampleLoop.start);
+            auto currentEnd = sound->getEnd();
+            sound->setEnd(sampleLoop.end <= 0 ? currentEnd : sampleLoop.end);
+            sound->setLoopEnabled(true);
+        }
+        
+        const auto tuneFactor = (float)(sound->getSampleRate() / 44100.0);
+        const auto rateToTuneBase = (float)(pow(2, (1.0 / 12.0)));
+        
+        int tune = (int)(floor(log(tuneFactor) / log(rateToTuneBase) * 10.0));
+        
+        if (tune < -120)
+            tune = -120;
+        else if (tune > 120)
+            tune = 120;
+        
+        sound->setTune(tune);
+        return sound;
+    }
+    catch (const std::exception& e)
+    {
+        msg = e.what();
+    }
+        
+    return tl::make_unexpected(mpc_io_error{"Could not read WAV file: " + msg});
+}
+
+sound_or_error AbstractDisk::readSnd2(std::shared_ptr<MpcFile> f)
+{
+    if (!StrUtil::eqIgnoreCase(f->getExtension(), ".snd"))
+        return tl::make_unexpected(mpc_io_error{ f->getName() + " does not have .SND extension" });
+        
+    std::string msg;
+    
+    SndReader sndReader(f.get());
+    
+    if (sndReader.isHeaderValid())
+    {
+        auto sound = mpc.getSampler().lock()->addSound().lock();
+        
+        sndReader.readData(*sound->getSampleData());
+        sound->setMono(sndReader.isMono());
+        sound->setStart(sndReader.getStart());
+        sound->setEnd(sndReader.getEnd());
+        sound->setLoopTo(sndReader.getEnd() - sndReader.getLoopLength());
+        sound->setSampleRate(sndReader.getSampleRate());
+        sound->setName(sndReader.getName());
+        sound->setLoopEnabled(sndReader.isLoopEnabled());
+        sound->setLevel(sndReader.getLevel());
+        sound->setTune(sndReader.getTune());
+        sound->setBeatCount(sndReader.getNumberOfBeats());
+        
+        return sound;
+    }
+    else
+    {
+        msg = "Invalid SND header";
+    }
+
+    return tl::make_unexpected(mpc_io_error{"Could not read SND file: " + msg});
 }

@@ -71,6 +71,7 @@ WavFile WavFile::writeWavStream(std::shared_ptr<std::ostream> _ostream, int numC
     result.bytesPerSample = (validBits + 7) / 8;
     result.blockAlign = result.bytesPerSample * numChannels;
     result.validBits = validBits;
+    result.numSampleLoops = 0;
 
     if (numChannels < 1 || numChannels > 65535) {
         throw std::invalid_argument("Illegal number of channels, valid range 1 to 65536");

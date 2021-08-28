@@ -88,5 +88,8 @@ private:
     file_or_error writeAps2(std::shared_ptr<MpcFile>);
     file_or_error writeAll2(std::shared_ptr<MpcFile>);
 
+    friend class SoundLoader; // Temporary access to readWav2 and readSnd2 until better design
+    sound_or_error readWav2(std::shared_ptr<MpcFile>);
+    sound_or_error readSnd2(std::shared_ptr<MpcFile>);
 };
 }

@@ -74,6 +74,23 @@ std::string MpcFile::getNameWithoutExtension()
     }
 }
 
+std::string MpcFile::getExtension()
+{
+    if (raw) {
+        auto ext = rawEntry->getName();
+        auto extIndex = ext.find_last_of('.');
+        if (extIndex != std::string::npos) {
+            ext = ext.substr(extIndex);
+        } else ext = "";
+        return ext;
+    }
+    else {
+        if (fs_path.has_extension())
+            return fs_path.extension().string();
+        return "";
+    }
+}
+
 bool MpcFile::isDirectory()
 {
     if (raw)

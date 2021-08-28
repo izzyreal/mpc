@@ -56,24 +56,19 @@ struct SoundLoaderResult {
 
 class SoundLoader
 {
+public:
+    SoundLoader(mpc::Mpc& mpc);
+    SoundLoader(mpc::Mpc& mpc, std::vector<std::weak_ptr<mpc::sampler::Sound>> sounds, bool replace);
+
+    void setPartOfProgram(bool);
+    void loadSound(std::shared_ptr<MpcFile>, SoundLoaderResult&);
+    void setPreview(bool);
+
 private:
-    static float rateToTuneBase;
     mpc::Mpc& mpc;
     bool partOfProgram = false;
     std::vector<std::weak_ptr<mpc::sampler::Sound>> sounds;
     bool preview = false;
     bool replace = false;
-    int size = 0;
-    
-public:
-    void setPartOfProgram(bool);
-    void loadSound(std::shared_ptr<MpcFile>, SoundLoaderResult&);
-    void setPreview(bool);
-    double logOfBase(float num, float base);
-    int getSize();
-    
-    SoundLoader(mpc::Mpc& mpc);
-    SoundLoader(mpc::Mpc& mpc, std::vector<std::weak_ptr<mpc::sampler::Sound>> sounds, bool replace);
-    
 };
 }
