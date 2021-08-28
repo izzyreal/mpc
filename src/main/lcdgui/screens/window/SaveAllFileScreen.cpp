@@ -9,7 +9,6 @@
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
-using namespace mpc::file::all;
 using namespace moduru::lang;
 using namespace std;
 
@@ -66,26 +65,20 @@ void SaveAllFileScreen::function(int i)
 		break;
 	case 4:
 	{
-		auto fileNameWithExt = fileName + ".ALL";
+		auto allFileName = fileName + ".ALL";
 		auto disk = mpc.getDisk().lock();
 
-		if (disk->checkExists(fileNameWithExt))
+		if (disk->checkExists(allFileName))
 		{
 			openScreen("file-exists");
 			return;
 		}
 		
-		allParser = make_unique<AllParser>(mpc, fileNameWithExt);
-		
-        auto f = disk->newFile(fileNameWithExt);
-		auto bytes = allParser->getBytes();
-		f->setFileData(bytes);
-		disk->flush();
-		disk->initFiles();
+        disk->writeAll(allFileName);
         
         auto popupScreen = mpc.screens->get<PopupScreen>("popup");
         popupScreen->setText("         Saving ...");
-        popupScreen->returnToScreenAfterMilliSeconds("save", 200);
+        popupScreen->returnToScreenAfterMilliSeconds("save", 400);
         openScreen("popup");
 		break;
 	}

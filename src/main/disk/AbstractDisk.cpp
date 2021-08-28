@@ -7,6 +7,8 @@
 #include <file/mid/MidiWriter.hpp>
 #include <file/pgmwriter/PgmWriter.hpp>
 #include <file/sndwriter/SndWriter.hpp>
+#include <file/aps/ApsParser.hpp>
+#include <file/all/AllParser.hpp>
 
 #include <sampler/NoteParameters.hpp>
 #include <sampler/Program.hpp>
@@ -27,6 +29,8 @@ using namespace mpc::file::wav;
 using namespace mpc::file::sndwriter;
 using namespace mpc::file::mid;
 using namespace mpc::file::pgmwriter;
+using namespace mpc::file::aps;
+using namespace mpc::file::all;
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -94,7 +98,7 @@ std::shared_ptr<MpcFile> AbstractDisk::getParentFile(int i)
     return parentFiles[i];
 }
 
-void AbstractDisk::writeSound(std::shared_ptr<Sound> s, std::string fileName)
+void AbstractDisk::writeSnd(std::shared_ptr<Sound> s, std::string fileName)
 {
     auto writeSndFunc = [&](std::shared_ptr<MpcFile> f){ return writeSnd2(s, f); };
     auto name = mpc::Util::getFileName(fileName == "" ? s->getName() + ".SND" : fileName);
@@ -171,18 +175,12 @@ file_or_error AbstractDisk::writeWav2(std::shared_ptr<Sound> sound, std::shared_
     return tl::make_unexpected(mpc_io_error{"Could not write WAV file due to: " + msg});
 }
 
-void AbstractDisk::writeSequence(std::weak_ptr<mpc::sequencer::Sequence> s, std::string fileName)
+void AbstractDisk::writeMid(std::shared_ptr<mpc::sequencer::Sequence> s, std::string fileName)
 {
-    if (checkExists(fileName))
-        return;
-    
-    auto newMidFile = newFile(fileName);
-    
-    auto writer = MidiWriter(s.lock().get());
-    writer.writeToOStream(newMidFile->getOutputStream());
-    
-    flush();
-    initFiles();
+    auto writeMidFunc = [&](std::shared_ptr<MpcFile> f){ return writeMid2(s, f); };
+    newFile2(fileName)
+    .and_then(writeMidFunc)
+    .map_error(errorFunc);
 }
 
 bool AbstractDisk::checkExists(std::string fileName)
@@ -223,40 +221,6 @@ std::shared_ptr<MpcFile> AbstractDisk::getFile(const std::string& fileName)
     return {};
 }
 
-void AbstractDisk::writeProgram(std::weak_ptr<Program> program, const std::string& fileName)
-{
-    if (checkExists(fileName))
-        return;
-    
-    auto writer = PgmWriter(program.lock().get(), mpc.getSampler());
-    auto pgmFile = newFile(fileName);
-    auto bytes = writer.get();
-    pgmFile->setFileData(bytes);
-    
-    std::vector<std::weak_ptr<Sound>> sounds;
-    
-    for (auto& n : program.lock()->getNotesParameters())
-    {
-        if (n->getSoundIndex() != -1)
-            sounds.push_back(mpc.getSampler().lock()->getSound(n->getSoundIndex()).lock());
-    }
-    
-    auto saveAProgramScreen = mpc.screens->get<SaveAProgramScreen>("save-a-program");
-    
-    if (saveAProgramScreen->save != 0)
-    {
-        auto isWav = saveAProgramScreen->save == 2;
-        soundSaver = std::make_unique<SoundSaver>(mpc, sounds, isWav);
-    }
-    else
-    {
-        mpc.getLayeredScreen().lock()->openScreen("save");
-    }
-    
-    flush();
-    initFiles();
-}
-
 bool AbstractDisk::isRoot()
 {
     return getPathDepth() == 0;
@@ -280,6 +244,34 @@ bool AbstractDisk::deleteRecursive(std::weak_ptr<MpcFile> _toDelete)
     return toDelete->del();
 }
 
+
+void AbstractDisk::writePgm(std::shared_ptr<Program> p, const std::string& fileName)
+{
+    auto writePgmFunc = [&](std::shared_ptr<MpcFile> f){ return writePgm2(p, f); };
+
+    newFile2(fileName)
+    .and_then(writePgmFunc)
+    .map_error(errorFunc);
+}
+
+void AbstractDisk::writeAps(const std::string& fileName)
+{
+    auto writeApsFunc = [&](std::shared_ptr<MpcFile> f){ return writeAps2(f); };
+    
+    newFile2(fileName)
+    .and_then(writeApsFunc)
+    .map_error(errorFunc);
+}
+
+void AbstractDisk::writeAll(const std::string& fileName)
+{
+    auto writeAllFunc = [&](std::shared_ptr<MpcFile> f){ return writeAll2(f); };
+    
+    newFile2(fileName)
+    .and_then(writeAllFunc)
+    .map_error(errorFunc);
+}
+
 file_or_error AbstractDisk::newFile2(const std::string& name)
 {
     std::string msg;
@@ -288,4 +280,101 @@ file_or_error AbstractDisk::newFile2(const std::string& name)
     catch (const std::exception& e) { msg = e.what(); }
     
     return tl::make_unexpected(mpc_io_error{"Could not create new file: " + msg});
+}
+
+file_or_error AbstractDisk::writeMid2(std::shared_ptr<mpc::sequencer::Sequence> s, std::shared_ptr<MpcFile> f)
+{
+    std::string msg;
+    
+    try {
+        MidiWriter writer(s.get());
+        writer.writeToOStream(f->getOutputStream());
+        flush();
+        initFiles();
+    } catch (const std::exception& e) { msg = e.what(); }
+    
+    return tl::make_unexpected(mpc_io_error{"Could not write MID file: " + msg});
+}
+
+file_or_error AbstractDisk::writePgm2(std::shared_ptr<mpc::sampler::Program> p, std::shared_ptr<MpcFile> f)
+{
+    std::string msg;
+    
+    try {
+        PgmWriter writer(p.get(), mpc.getSampler());
+        auto bytes = writer.get();
+        f->setFileData(bytes);
+        
+        auto saveAProgramScreen = mpc.screens->get<SaveAProgramScreen>("save-a-program");
+        
+        if (saveAProgramScreen->save != 0)
+        {
+            std::vector<std::weak_ptr<Sound>> sounds;
+            
+            for (auto& n : p->getNotesParameters())
+            {
+                if (n->getSoundIndex() != -1)
+                    sounds.push_back(mpc.getSampler().lock()->getSound(n->getSoundIndex()).lock());
+            }
+            
+            auto isWav = saveAProgramScreen->save == 2;
+            soundSaver = std::make_unique<SoundSaver>(mpc, sounds, isWav);
+        }
+        else
+        {
+            mpc.getLayeredScreen().lock()->openScreen("save");
+        }
+        
+        flush();
+        initFiles();
+
+    } catch (const std::exception& e) { msg = e.what(); }
+    
+    return tl::make_unexpected(mpc_io_error{"Could not write PGM file: " + msg});
+}
+
+file_or_error AbstractDisk::writeAps2(std::shared_ptr<MpcFile> f)
+{
+    std::string msg;
+    
+    try {
+        auto apsName = f->getNameWithoutExtension();
+        ApsParser apsParser(mpc, apsName);
+        auto bytes = apsParser.getBytes();
+        f->setFileData(bytes);
+
+        auto saveAProgramScreen = mpc.screens->get<SaveAProgramScreen>("save-a-program");
+        
+        if (saveAProgramScreen->save != 0)
+        {
+            soundSaver = std::make_unique<SoundSaver>(mpc, mpc.getSampler().lock()->getSounds(), saveAProgramScreen->save == 2);
+        }
+        else
+        {
+            mpc.getLayeredScreen().lock()->openScreen("save");
+        }
+
+        flush();
+        initFiles();
+
+    } catch (const std::exception& e) { msg = e.what(); }
+    
+    return tl::make_unexpected(mpc_io_error{"Could not write APS file: " + msg});
+}
+
+file_or_error AbstractDisk::writeAll2(std::shared_ptr<MpcFile> f)
+{
+    std::string msg;
+    
+    try {
+        AllParser allParser(mpc, f->getNameWithoutExtension());
+        auto bytes = allParser.getBytes();
+        f->setFileData(bytes);
+        
+        flush();
+        initFiles();
+        
+    } catch (const std::exception& e) { msg = e.what(); }
+    
+    return tl::make_unexpected(mpc_io_error{"Could not write ALL file: " + msg});
 }

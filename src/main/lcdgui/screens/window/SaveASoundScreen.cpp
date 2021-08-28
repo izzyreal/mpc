@@ -70,7 +70,7 @@ void SaveASoundScreen::function(int i)
 		disk->initFiles();
 		
 		if (fileType == 0)
-			disk->writeSound(s, fileName);
+			disk->writeSnd(s, fileName);
 		else
 			disk->writeWav(s, fileName);
 

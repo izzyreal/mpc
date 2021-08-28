@@ -49,7 +49,7 @@ void FileExistsScreen::function(int i)
 			{
 				disk->flush();
 				disk->initFiles();
-				disk->writeProgram(program, pfileName);
+				disk->writePgm(program.lock(), pfileName);
 			}
 		}
 		else if (ls.lock()->getPreviousScreenName().compare("save-a-sequence") == 0)
@@ -61,46 +61,41 @@ void FileExistsScreen::function(int i)
 			{
 				disk->flush();
 				disk->initFiles();
-				disk->writeSequence(sequencer.lock()->getActiveSequence(), sfileName);
+				disk->writeMid(sequencer.lock()->getActiveSequence().lock(), sfileName);
 				openScreen("save");
 			}
 			openScreen("save");
 		}
 		else if (ls.lock()->getPreviousScreenName().compare("save-aps-file") == 0)
 		{
-			auto apsName = mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) + ".APS";
-			auto success = disk->getFile(apsName)->del();
+			auto apsFileName = mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) + ".APS";
+			auto success = disk->getFile(apsFileName)->del();
 			
 			if (success)
 			{
 				disk->flush();
 				disk->initFiles();
-				apsSaver = make_unique<mpc::disk::ApsSaver>(mpc, apsName);
+                disk->writeAps(apsFileName);
                 auto popupScreen = mpc.screens->get<PopupScreen>("popup");
                 popupScreen->setText("Saving " + StrUtil::padRight(nameScreen->getNameWithoutSpaces(), " ", 16) + ".APS");
-                popupScreen->returnToScreenAfterMilliSeconds("save", 200);
+                popupScreen->returnToScreenAfterMilliSeconds("save", 400);
                 openScreen("popup");
 			}
 		}
 		else if (ls.lock()->getPreviousScreenName().compare("save-all-file") == 0)
 		{
             auto saveAllFileScreen = mpc.screens->get<SaveAllFileScreen>("save-all-file");
-			auto allName = saveAllFileScreen->fileName + ".ALL";
+			auto allFileName = saveAllFileScreen->fileName + ".ALL";
 			disk->initFiles();
-			auto success = disk->getFile(allName)->del();
+			auto success = disk->getFile(allFileName)->del();
 			
 			if (success)
 			{
 				disk->flush();
 				disk->initFiles();
-				auto allParser = mpc::file::all::AllParser(mpc, mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()));
-				auto f = disk->newFile(allName);
-				auto bytes = allParser.getBytes();
-				
-                f->setFileData(bytes);
-				
-                disk->flush();
-				disk->initFiles();
+
+                disk->writeAll(allFileName);
+
                 auto popupScreen = mpc.screens->get<PopupScreen>("popup");
                 popupScreen->setText("         Saving ...");
                 popupScreen->returnToScreenAfterMilliSeconds("save", 200);
@@ -123,7 +118,7 @@ void FileExistsScreen::function(int i)
 			disk->initFiles();
 
 			if (type == 0)
-				disk->writeSound(s, fileName);
+				disk->writeSnd(s, fileName);
 			else
 				disk->writeWav(s, fileName);
 
@@ -142,22 +137,22 @@ void FileExistsScreen::function(int i)
         if (previousScreen.compare("save-aps-file") == 0)
         {
             const auto renamer = [&](const string& newName) {
-                const auto apsName = newName + ".APS";
+                const auto apsFileName = newName + ".APS";
                 
                 auto disk = mpc.getDisk().lock();
 
-                if (disk->checkExists(apsName))
+                if (disk->checkExists(apsFileName))
                 {
                     openScreen("file-exists");
                     mpc.getLayeredScreen().lock()->setPreviousScreenName("save-aps-file");
                     return;
                 }
                 
-                mpc::disk::ApsSaver apsSaver(mpc, mpc::Util::getFileName(apsName));
+                disk->writeAps(mpc::Util::getFileName(apsFileName));
                 
                 auto popupScreen = mpc.screens->get<PopupScreen>("popup");
                 popupScreen->setText("Saving " + StrUtil::padRight(newName, " ", 16) + ".APS");
-                popupScreen->returnToScreenAfterMilliSeconds("save", 200);
+                popupScreen->returnToScreenAfterMilliSeconds("save", 400);
                 openScreen("popup");
             };
             

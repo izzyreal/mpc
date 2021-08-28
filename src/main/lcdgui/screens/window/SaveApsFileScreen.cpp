@@ -81,7 +81,7 @@ void SaveApsFileScreen::function(int i)
             return;
         }
         
-		apsSaver = make_unique<mpc::disk::ApsSaver>(mpc, apsFileName);
+		disk->writeAps(apsFileName);
         
         auto popupScreen = mpc.screens->get<PopupScreen>("popup");
         popupScreen->setText("Saving " + StrUtil::padRight(fileName, " ", 16) + ".APS");

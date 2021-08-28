@@ -1,8 +1,6 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
-#include <disk/ApsSaver.hpp>
-
 namespace mpc::lcdgui::screens {
 class SaveScreen;
 }
@@ -28,7 +26,6 @@ private:
     const std::vector<std::string> apsSaveNames{ "APS ONLY", "WITH SOUNDS", "WITH .WAV" };
     
     std::string fileName = "ALL_PROGRAM";
-    std::unique_ptr<mpc::disk::ApsSaver> apsSaver;
     
     void displayFile();
     void displaySave();

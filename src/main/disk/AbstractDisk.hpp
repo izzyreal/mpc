@@ -34,6 +34,7 @@ protected:
     std::vector<std::shared_ptr<MpcFile>> parentFiles;
 
     virtual int getPathDepth() = 0;
+    virtual std::shared_ptr<MpcFile> newFile(const std::string& name) = 0;
 
 public:
     bool deleteSelectedFile();
@@ -47,11 +48,14 @@ public:
     std::vector<std::shared_ptr<MpcFile>>& getAllFiles();
     std::shared_ptr<MpcFile> getParentFile(int i);
     
-    void writeSound(std::shared_ptr<mpc::sampler::Sound>, std::string fileName);
+    void writeSnd(std::shared_ptr<mpc::sampler::Sound>, std::string fileName);
     void writeWav(std::shared_ptr<mpc::sampler::Sound>, std::string fileName);
-    void writeSequence(std::weak_ptr<mpc::sequencer::Sequence>, std::string fileName);
+    void writeMid(std::shared_ptr<mpc::sequencer::Sequence>, std::string fileName);
+    void writePgm(std::shared_ptr<mpc::sampler::Program>, const std::string& fileName);
+    void writeAps(const std::string& fileName);
+    void writeAll(const std::string& fileName);
+    
     bool checkExists(std::string fileName);
-    void writeProgram(std::weak_ptr<mpc::sampler::Program> program, const std::string& fileName);
     bool deleteRecursive(std::weak_ptr<MpcFile>);
     
     bool isRoot();
@@ -59,7 +63,6 @@ public:
     virtual void flush() = 0;
     virtual void close() = 0;
     virtual void initFiles() = 0;
-    virtual std::shared_ptr<MpcFile> newFile(const std::string& name) = 0;
     virtual std::string getDirectoryName() = 0;
     virtual bool moveBack() = 0;
     virtual bool moveForward(const std::string& directoryName) = 0;
@@ -80,6 +83,10 @@ private:
     file_or_error newFile2(const std::string& name);
     file_or_error writeWav2(std::shared_ptr<mpc::sampler::Sound>, std::shared_ptr<MpcFile>);
     file_or_error writeSnd2(std::shared_ptr<mpc::sampler::Sound>, std::shared_ptr<MpcFile>);
+    file_or_error writeMid2(std::shared_ptr<mpc::sequencer::Sequence>, std::shared_ptr<MpcFile>);
+    file_or_error writePgm2(std::shared_ptr<mpc::sampler::Program>, std::shared_ptr<MpcFile>);
+    file_or_error writeAps2(std::shared_ptr<MpcFile>);
+    file_or_error writeAll2(std::shared_ptr<MpcFile>);
 
 };
 }

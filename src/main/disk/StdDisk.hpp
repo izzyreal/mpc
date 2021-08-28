@@ -34,7 +34,6 @@ public:
     void flush() override;
     bool deleteAllFiles(int extensionIndex) override;
     bool newFolder(const std::string& newDirName) override;
-    std::shared_ptr<MpcFile> newFile(const std::string& newFileName) override;
     std::string getAbsolutePath() override;
     std::string getTypeShortName() override;
     std::string getModeShortName() override;
@@ -45,6 +44,7 @@ public:
     
 protected:
     int getPathDepth() override;
+    std::shared_ptr<MpcFile> newFile(const std::string& newFileName) override;
         
 };
 }

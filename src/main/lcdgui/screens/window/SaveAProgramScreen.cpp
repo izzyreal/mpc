@@ -59,7 +59,7 @@ void SaveAProgramScreen::function(int i)
 			break;
 		}
 
-		disk->writeProgram(program, fileName);
+		disk->writePgm(program.lock(), fileName);
 		break;
 	}
 	}
