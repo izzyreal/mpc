@@ -230,15 +230,6 @@ void Mpc::loadProgram()
 	programLoader = std::make_unique<mpc::disk::ProgramLoader>(*this, loadScreen->getSelectedFile(), loadAProgramScreen->loadReplaceSound ? activePgm : -1);
 }
 
-void Mpc::importLoadedProgram()
-{
-	auto t = sequencer->getActiveSequence().lock()->getTrack(sequencer->getActiveTrackIndex()).lock();
-	auto loadAProgramScreen = screens->get<LoadAProgramScreen>("load-a-program");
-
-	if (!loadAProgramScreen->clearProgramWhenLoading)
-		getDrum(t->getBus() - 1)->setProgram(sampler->getProgramCount() - 1);
-}
-
 ctoot::mpc::MpcMultiMidiSynth* Mpc::getMms()
 {
 	return audioMidiServices->getMms().lock().get();

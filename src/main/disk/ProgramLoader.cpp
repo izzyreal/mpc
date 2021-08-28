@@ -10,9 +10,13 @@
 #include <disk/SoundLoader.hpp>
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>
+#include <sequencer/Track.hpp>
 
+#include <lcdgui/screens/window/LoadAProgramScreen.hpp>
 #include <lcdgui/screens/window/CantFindFileScreen.hpp>
 #include <lcdgui/screens/dialog2/PopupScreen.hpp>
+
+#include <mpc/MpcSoundPlayerChannel.hpp>
 
 #include <lang/StrUtil.hpp>
 
@@ -122,7 +126,12 @@ void ProgramLoader::loadProgram(const int replaceIndex)
             noteParameters->setSoundIndex(finalSoundIndex);
         }
 
-		mpc.importLoadedProgram();
+        auto track = mpc.getSequencer().lock()->getActiveTrack().lock();
+        auto loadAProgramScreen = mpc.screens->get<LoadAProgramScreen>("load-a-program");
+
+        if (!loadAProgramScreen->clearProgramWhenLoading)
+            mpc.getDrum(track->getBus() - 1)->setProgram(mpc.getSampler().lock()->getProgramCount() - 1);
+        
 		mpc.getLayeredScreen().lock()->openScreen("load");
 	}
 	catch (const exception&)

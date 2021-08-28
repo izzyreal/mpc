@@ -113,17 +113,12 @@ public:
     
 public:
     void loadProgram();
-    void importLoadedProgram();
-        
-public:
     std::weak_ptr<mpc::disk::AbstractDisk> getDisk();
     std::vector<std::shared_ptr<mpc::disk::AbstractDisk>> getDisks();
     
-public:
     Mpc();
     ~Mpc();
     
-public:
     static std::vector<char> akaiAsciiChar;
     static std::vector<std::string> akaiAscii;
     
