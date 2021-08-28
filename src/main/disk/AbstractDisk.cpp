@@ -385,9 +385,6 @@ file_or_error AbstractDisk::writeAll2(std::shared_ptr<MpcFile> f)
 
 sound_or_error AbstractDisk::readWav2(std::shared_ptr<MpcFile> f)
 {
-    if (!StrUtil::eqIgnoreCase(f->getExtension(), ".wav"))
-        return tl::make_unexpected(mpc_io_error{ f->getName() + " does not have .WAV extension" });
-    
     std::string msg;
     
     try {
@@ -465,35 +462,78 @@ sound_or_error AbstractDisk::readWav2(std::shared_ptr<MpcFile> f)
 
 sound_or_error AbstractDisk::readSnd2(std::shared_ptr<MpcFile> f)
 {
-    if (!StrUtil::eqIgnoreCase(f->getExtension(), ".snd"))
-        return tl::make_unexpected(mpc_io_error{ f->getName() + " does not have .SND extension" });
-        
     std::string msg;
     
-    SndReader sndReader(f.get());
-    
-    if (sndReader.isHeaderValid())
-    {
-        auto sound = mpc.getSampler().lock()->addSound().lock();
+    try {
+        SndReader sndReader(f.get());
         
-        sndReader.readData(*sound->getSampleData());
-        sound->setMono(sndReader.isMono());
-        sound->setStart(sndReader.getStart());
-        sound->setEnd(sndReader.getEnd());
-        sound->setLoopTo(sndReader.getEnd() - sndReader.getLoopLength());
-        sound->setSampleRate(sndReader.getSampleRate());
-        sound->setName(sndReader.getName());
-        sound->setLoopEnabled(sndReader.isLoopEnabled());
-        sound->setLevel(sndReader.getLevel());
-        sound->setTune(sndReader.getTune());
-        sound->setBeatCount(sndReader.getNumberOfBeats());
-        
-        return sound;
-    }
-    else
-    {
-        msg = "Invalid SND header";
-    }
+        if (sndReader.isHeaderValid())
+        {
+            auto sound = mpc.getSampler().lock()->addSound().lock();
+            
+            sndReader.readData(*sound->getSampleData());
+            sound->setMono(sndReader.isMono());
+            sound->setStart(sndReader.getStart());
+            sound->setEnd(sndReader.getEnd());
+            sound->setLoopTo(sndReader.getEnd() - sndReader.getLoopLength());
+            sound->setSampleRate(sndReader.getSampleRate());
+            sound->setName(sndReader.getName());
+            sound->setLoopEnabled(sndReader.isLoopEnabled());
+            sound->setLevel(sndReader.getLevel());
+            sound->setTune(sndReader.getTune());
+            sound->setBeatCount(sndReader.getNumberOfBeats());
+            
+            return sound;
+        }
+        else
+        {
+            msg = "Invalid SND header";
+        }
+    } catch (const std::exception& e) { msg = e.what(); };
 
     return tl::make_unexpected(mpc_io_error{"Could not read SND file: " + msg});
+}
+
+sequence_or_error AbstractDisk::readMid2(std::shared_ptr<MpcFile> f)
+{
+    std::string msg;
+    
+    try {
+        
+    } catch (const std::exception& e) { msg = e.what(); };
+    
+    return tl::make_unexpected(mpc_io_error{"Could not read MID file: " + msg});
+}
+
+program_or_error AbstractDisk::readPgm2(std::shared_ptr<MpcFile> f)
+{
+    std::string msg;
+    
+    try {
+        
+    } catch (const std::exception& e) { msg = e.what(); };
+    
+    return tl::make_unexpected(mpc_io_error{"Could not read PGM file: " + msg});
+}
+
+void_or_error AbstractDisk::readAps2(std::shared_ptr<MpcFile> f)
+{
+    std::string msg;
+    
+    try {
+        
+    } catch (const std::exception& e) { msg = e.what(); };
+    
+    return tl::make_unexpected(mpc_io_error{"Could not read APS file: " + msg});
+}
+
+void_or_error AbstractDisk::readAll2(std::shared_ptr<MpcFile> f)
+{
+    std::string msg;
+    
+    try {
+        
+    } catch (const std::exception& e) { msg = e.what(); };
+    
+    return tl::make_unexpected(mpc_io_error{"Could not read ALL file: " + msg});
 }

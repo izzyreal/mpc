@@ -2,15 +2,11 @@
 
 #include <disk/AbstractDisk.hpp>
 #include <disk/MpcFile.hpp>
+#include <lcdgui/screens/LoadScreen.hpp>
 
 #include <file/mid/MidiReader.hpp>
 
-#include <lcdgui/screens/LoadScreen.hpp>
-
-#include <file/FileUtil.hpp>
-
 using namespace mpc::lcdgui::screens::window;
-using namespace moduru::file;
 using namespace moduru::lang;
 using namespace std;
 
@@ -25,11 +21,10 @@ void LoadASequenceScreen::open()
 	newSeq->init(2);
 
 	auto loadScreen = mpc.screens->get<LoadScreen>("load");
-	auto ext = FileUtil::splitName(loadScreen->getSelectedFileName())[1];
+    auto ext = loadScreen->getSelectedFile()->getExtension();
 
-	if (ext.compare("mid") == 0 || ext.compare("MID") == 0)
+	if (StrUtil::eqIgnoreCase(ext, ".mid"))
 	{
-
 		mpc::file::mid::MidiReader midiReader(loadScreen->getSelectedFile()->getInputStream(), newSeq);
 
 		midiReader.parseSequence(mpc);
@@ -51,9 +46,7 @@ void LoadASequenceScreen::open()
 			}
 
 			if (!contains)
-			{
 				break;
-			}
 		}
 
 		loadInto = index;
@@ -68,9 +61,7 @@ void LoadASequenceScreen::turnWheel(int i)
 	init();
 	
 	if (param.compare("load-into") == 0)
-	{
 		setLoadInto(loadInto + i);
-	}
 }
 
 void LoadASequenceScreen::function(int i)
@@ -94,10 +85,9 @@ void LoadASequenceScreen::function(int i)
 void LoadASequenceScreen::setLoadInto(int i)
 {
 	if (i < 0 || i > 98)
-	{
 		return;
-	}
-	loadInto = i;
+
+    loadInto = i;
 	displayLoadInto();
 }
 

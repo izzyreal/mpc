@@ -4,7 +4,8 @@
 
 #include <memory>
 
-namespace mpc::sampler { class Sound; }
+namespace mpc::sampler { class Sound; class Program; }
+namespace mpc::sequencer { class Sequence; }
 
 namespace mpc::disk {
 
@@ -19,4 +20,6 @@ struct mpc_io_error {
 
 using file_or_error  = tl::expected<std::shared_ptr<mpc::disk::MpcFile>, mpc::disk::mpc_io_error>;
 using sound_or_error  = tl::expected<std::shared_ptr<mpc::sampler::Sound>, mpc::disk::mpc_io_error>;
-using file_operation = std::function<file_or_error()>;
+using program_or_error = tl::expected<std::shared_ptr<mpc::sampler::Program>, mpc::disk::mpc_io_error>;
+using sequence_or_error = tl::expected<std::shared_ptr<mpc::sequencer::Sequence>, mpc::disk::mpc_io_error>;
+using void_or_error = tl::expected<void, mpc::disk::mpc_io_error>;

@@ -91,5 +91,10 @@ private:
     friend class SoundLoader; // Temporary access to readWav2 and readSnd2 until better design
     sound_or_error readWav2(std::shared_ptr<MpcFile>);
     sound_or_error readSnd2(std::shared_ptr<MpcFile>);
+    sequence_or_error readMid2(std::shared_ptr<MpcFile>);
+    program_or_error readPgm2(std::shared_ptr<MpcFile>);
+    void_or_error readAps2(std::shared_ptr<MpcFile>);
+    void_or_error readAll2(std::shared_ptr<MpcFile>);
+
 };
 }

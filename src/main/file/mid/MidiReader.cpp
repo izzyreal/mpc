@@ -38,15 +38,11 @@ MidiReader::MidiReader(std::shared_ptr<std::istream> istream, std::weak_ptr<Sequ
 : dest (_dest)
 {
     midiFile = std::make_unique<mpc::midi::MidiFile>(istream);
-    
-	auto sequence = dest.lock();
-    sequence->setUsed(true);
 }
 
 void MidiReader::parseSequence(mpc::Mpc& mpc)
 {
 	auto lSequencer = mpc.getSequencer().lock();
-	auto sequence = dest.lock();
 	auto midiTracks = midiFile->getTracks();
 	int tmp = midiFile->getLengthInTicks();
 	auto lengthInTicks = (int)(midiFile->getLengthInTicks() + midiTracks[0].lock()->getEndOfTrackDelta());
@@ -58,38 +54,43 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
 	auto lastLoopBar = -1;
 	int eventCounter = 0;
 
-	for (auto& me : midiTracks[0].lock()->getEvents()) {
-		auto lMe = me.lock();
-		auto textEvent = std::dynamic_pointer_cast<meta::Text>(lMe);
-		auto trackNameEvent = std::dynamic_pointer_cast<meta::TrackName>(lMe);
-		auto tempoEvent = std::dynamic_pointer_cast<meta::Tempo>(lMe);
-		auto timeSigEvent = std::dynamic_pointer_cast<meta::TimeSignature>(lMe);
+    auto sequence = dest.lock();
+    sequence->setUsed(true);
 
-		if (textEvent) {
+	for (auto& event : midiTracks[0].lock()->getEvents())
+    {
+		auto textEvent = std::dynamic_pointer_cast<meta::Text>(event.lock());
+		auto trackNameEvent = std::dynamic_pointer_cast<meta::TrackName>(event.lock());
+		auto tempoEvent = std::dynamic_pointer_cast<meta::Tempo>(event.lock());
+		auto timeSigEvent = std::dynamic_pointer_cast<meta::TimeSignature>(event.lock());
+
+		if (textEvent)
+        {
 			auto text = textEvent->getText();
-			if (text.find("LOOP=ON") != std::string::npos) {
+			
+            if (text.find("LOOP=ON") != std::string::npos)
 				sequence->setLoopEnabled(true);
-			}
-			if (text.find("LOOP=OFF") != std::string::npos) {
+			else if (text.find("LOOP=OFF") != std::string::npos)
 				sequence->setLoopEnabled(false);
-			}
-			if (text.find("TEMPO=ON") != std::string::npos) {
+            
+			if (text.find("TEMPO=ON") != std::string::npos)
 				lSequencer->setTempoSourceSequence(true);
-			}
-			if (text.find("TEMPO=OFF") != std::string::npos) {
+			else if (text.find("TEMPO=OFF") != std::string::npos)
 				lSequencer->setTempoSourceSequence(false);
-			}
+            
 			firstLoopBar = stoi(text.substr(15, 18));
 			lastLoopBar = -1;
-			if (isInteger(text.substr(23, 26))) {
+			
+            if (isInteger(text.substr(23, 26)))
 				lastLoopBar = stoi(text.substr(23, 26));
-			}
 		}
-		else if (trackNameEvent) {
+		else if (trackNameEvent)
+        {
 			auto sequenceName = trackNameEvent->getTrackName().substr(16);
 			sequence->setName(sequenceName);
 		}
-		else if (tempoEvent) {
+		else if (tempoEvent)
+        {
 			tempoChanges.push_back(tempoEvent);
 		}
 		else if (timeSigEvent) {
@@ -102,9 +103,7 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
 	sequence->setInitialTempo(initialTempo);
 
 	if (!lSequencer->isTempoSourceSequenceEnabled())
-	{
 		lSequencer->setTempo(initialTempo);
-	}
 	
 	for (int i = 1; i < tempoChanges.size(); i++)
 	{
@@ -117,9 +116,7 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
 	}
 
 	if (timeSignatures.size() == 1)
-	{
 		lengthInTicks = midiTracks[0].lock()->getEndOfTrackDelta();
-	}
 
 	int accumLength = 0;
 	int barCounter = 0;
@@ -130,9 +127,7 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
         std::shared_ptr<meta::TimeSignature> next;
 
 		if (timeSignatures.size() > i + 1)
-		{
 			next = timeSignatures[i + 1].lock();
-		}
 
 		if (next)
 		{
@@ -153,6 +148,7 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
 			}
 		}
 	}
+    
 	sequence->setLastBar(barCounter - 1);
 	sequence->setFirstLoopBarIndex(firstLoopBar);
 
@@ -217,6 +213,7 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
 					{
 						ne->setVariationValue(64);
 					}
+                    
 					noteOns.emplace_back(ne);
 				}
 			}
@@ -331,6 +328,7 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
 			}
 		}
 	}
+    
 	sequence->initMetaTracks();
 }
 
@@ -347,20 +345,20 @@ bool MidiReader::isInteger(std::string s)
 
 int MidiReader::getNumberOfNoteOns(int noteValue, std::vector<std::shared_ptr<NoteOn>> allNotes)
 {
-    std::vector<std::weak_ptr<NoteOn>> oneNote;
-	for (auto& no : allNotes) {
-		if (no->getNoteValue() == noteValue)
-			oneNote.push_back(no);
-	}
-	return oneNote.size();
+    int counter = 0;
+	
+    for (auto& no : allNotes)
+		if (no->getNoteValue() == noteValue) counter++;
+	
+    return counter;
 }
 
 int MidiReader::getNumberOfNotes(int noteValue, std::vector<std::shared_ptr<NoteEvent>> allNotes)
 {
-    std::vector<std::weak_ptr<NoteEvent>> oneNote;
-	for (auto& ne : allNotes) {
-		if (ne->getNote() == noteValue)
-			oneNote.push_back(ne);
-	}
-	return oneNote.size();
+    int counter = 0;
+    
+    for (auto& ne : allNotes)
+        if (ne->getNote() == noteValue) counter++;
+    
+	return counter;
 }
