@@ -7,6 +7,7 @@
 #include <mpc_types.hpp>
 
 namespace mpc { class Mpc; }
+namespace mpc::lcdgui::screens::window { class LoadASequenceScreen; }
 
 namespace mpc::sequencer {
 class Sequence;
@@ -89,6 +90,7 @@ private:
     file_or_error writeAll2(std::shared_ptr<MpcFile>);
 
     friend class SoundLoader; // Temporary access to readWav2 and readSnd2 until better design
+    friend class mpc::lcdgui::screens::window::LoadASequenceScreen;
     sound_or_error readWav2(std::shared_ptr<MpcFile>);
     sound_or_error readSnd2(std::shared_ptr<MpcFile>);
     sequence_or_error readMid2(std::shared_ptr<MpcFile>);

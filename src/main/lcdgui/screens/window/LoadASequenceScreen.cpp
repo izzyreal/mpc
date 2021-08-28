@@ -4,8 +4,6 @@
 #include <disk/MpcFile.hpp>
 #include <lcdgui/screens/LoadScreen.hpp>
 
-#include <file/mid/MidiReader.hpp>
-
 using namespace mpc::lcdgui::screens::window;
 using namespace moduru::lang;
 using namespace std;
@@ -17,41 +15,24 @@ LoadASequenceScreen::LoadASequenceScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void LoadASequenceScreen::open()
 {
-	auto newSeq = sequencer.lock()->createSeqInPlaceHolder().lock();
-	newSeq->init(2);
-
 	auto loadScreen = mpc.screens->get<LoadScreen>("load");
-    auto ext = loadScreen->getSelectedFile()->getExtension();
-
-	if (StrUtil::eqIgnoreCase(ext, ".mid"))
-	{
-		mpc::file::mid::MidiReader midiReader(loadScreen->getSelectedFile()->getInputStream(), newSeq);
-
-		midiReader.parseSequence(mpc);
-
-		auto usedSeqs = sequencer.lock()->getUsedSequenceIndexes();
-		int index;
-
-		for (index = 0; index < 99; index++)
-		{
-			bool contains = false;
-
-			for (int i : usedSeqs)
-			{
-				if (i == index)
-				{
-					contains = true;
-					break;
-				}
-			}
-
-			if (!contains)
-				break;
-		}
-
-		loadInto = index;
-	}
-
+    auto midFile = loadScreen->getSelectedFile();
+    sequence_or_error parsedMidFile = mpc.getDisk().lock()->readMid2(midFile);
+    
+    if (parsedMidFile.has_value())
+    {
+        auto usedSeqs = sequencer.lock()->getUsedSequenceIndexes();
+        int index;
+        
+        for (index = 0; index < 99; index++)
+        {
+            if (find(begin(usedSeqs), end(usedSeqs), index) != end(usedSeqs))
+                break;
+        }
+        
+        loadInto = index;
+    }
+    
 	displayLoadInto();
 	displayFile();
 }

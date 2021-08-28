@@ -5,6 +5,7 @@
 #include <disk/MpcFile.hpp>
 #include <file/wav/WavFile.hpp>
 #include <file/mid/MidiWriter.hpp>
+#include <file/mid/MidiReader.hpp>
 #include <file/pgmwriter/PgmWriter.hpp>
 #include <file/sndwriter/SndWriter.hpp>
 #include <file/sndreader/SndReader.hpp>
@@ -499,7 +500,11 @@ sequence_or_error AbstractDisk::readMid2(std::shared_ptr<MpcFile> f)
     std::string msg;
     
     try {
-        
+        auto newSeq = mpc.getSequencer().lock()->createSeqInPlaceHolder().lock();
+        newSeq->init(2);
+        MidiReader midiReader(f->getInputStream(), newSeq);
+        midiReader.parseSequence(mpc);
+        return newSeq;
     } catch (const std::exception& e) { msg = e.what(); };
     
     return tl::make_unexpected(mpc_io_error{"Could not read MID file: " + msg});
