@@ -25,6 +25,7 @@ namespace mpc::lcdgui::screens::dialog
 namespace mpc::disk
 {
 	class AbstractDisk;
+    class MpcFile;
 }
 
 namespace mpc::lcdgui::screens::window

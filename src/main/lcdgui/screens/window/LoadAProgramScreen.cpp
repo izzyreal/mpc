@@ -1,6 +1,10 @@
 #include "LoadAProgramScreen.hpp"
 
+#include <disk/AbstractDisk.hpp>
+#include <lcdgui/screens/LoadScreen.hpp>
+
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::lcdgui::screens;
 using namespace std;
 
 LoadAProgramScreen::LoadAProgramScreen(mpc::Mpc& mpc, const int layerIndex) 
@@ -27,7 +31,9 @@ void LoadAProgramScreen::turnWheel(int i)
 void LoadAProgramScreen::function(int i)
 {
 	init();
-	
+
+    auto selectedFile = mpc.screens->get<LoadScreen>("load")->getSelectedFile();
+    
 	switch (i)
 	{
 	case 2:
@@ -35,7 +41,7 @@ void LoadAProgramScreen::function(int i)
 		clearProgramWhenLoading = true;
 		auto oldLoadReplaceSound = loadReplaceSound;
 		loadReplaceSound = true;
-		mpc.loadProgram();
+        mpc.getDisk().lock()->readPgm2(selectedFile);
 		loadReplaceSound = oldLoadReplaceSound;
 		break;
 	}
@@ -44,7 +50,7 @@ void LoadAProgramScreen::function(int i)
 		break;
 	case 4:
 		clearProgramWhenLoading = false;
-		mpc.loadProgram();
+        mpc.getDisk().lock()->readPgm2(selectedFile);
 		break;
 	}
 }

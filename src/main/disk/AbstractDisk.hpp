@@ -1,5 +1,6 @@
 #pragma once
 #include <disk/SoundSaver.hpp>
+#include <disk/ProgramLoader.hpp>
 
 #include <vector>
 #include <string>
@@ -7,7 +8,7 @@
 #include <mpc_types.hpp>
 
 namespace mpc { class Mpc; }
-namespace mpc::lcdgui::screens::window { class LoadASequenceScreen; }
+namespace mpc::lcdgui::screens::window { class LoadASequenceScreen; class LoadAProgramScreen; }
 
 namespace mpc::sequencer {
 class Sequence;
@@ -80,7 +81,8 @@ public:
 private:
     std::function<void(mpc_io_error e)> errorFunc;
     std::unique_ptr<SoundSaver> soundSaver;
-    
+    std::unique_ptr<ProgramLoader> programLoader;
+
     file_or_error newFile2(const std::string& name);
     file_or_error writeWav2(std::shared_ptr<mpc::sampler::Sound>, std::shared_ptr<MpcFile>);
     file_or_error writeSnd2(std::shared_ptr<mpc::sampler::Sound>, std::shared_ptr<MpcFile>);
@@ -91,6 +93,8 @@ private:
 
     friend class SoundLoader; // Temporary access to readWav2 and readSnd2 until better design
     friend class mpc::lcdgui::screens::window::LoadASequenceScreen;
+    friend class mpc::lcdgui::screens::window::LoadAProgramScreen;
+    
     sound_or_error readWav2(std::shared_ptr<MpcFile>);
     sound_or_error readSnd2(std::shared_ptr<MpcFile>);
     sequence_or_error readMid2(std::shared_ptr<MpcFile>);

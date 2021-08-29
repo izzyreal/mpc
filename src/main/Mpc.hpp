@@ -3,7 +3,6 @@
 #include <lcdgui/LayeredScreen.hpp>
 
 #include <disk/DiskController.hpp>
-#include <disk/ProgramLoader.hpp>
 
 #include <observer/Observable.hpp>
 
@@ -59,7 +58,6 @@ namespace mpc {
 class Mpc
 : public moduru::observer::Observable {
 private:
-    std::unique_ptr<mpc::disk::ProgramLoader> programLoader;
     std::shared_ptr<lcdgui::LayeredScreen> layeredScreen;
     std::shared_ptr<controls::Controls> controls;
     std::shared_ptr<audiomidi::EventHandler> eventHandler;
@@ -112,7 +110,6 @@ public:
     mpc::audiomidi::MpcMidiInput* getMpcMidiInput(int i);
     
 public:
-    void loadProgram();
     std::weak_ptr<mpc::disk::AbstractDisk> getDisk();
     std::vector<std::shared_ptr<mpc::disk::AbstractDisk>> getDisks();
     

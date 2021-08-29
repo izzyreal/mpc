@@ -20,6 +20,8 @@
 
 #include <lang/StrUtil.hpp>
 
+#include <thread>
+
 #ifdef __linux__
 #include <pthread.h>
 #endif // __linux__
@@ -29,16 +31,14 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace moduru::lang;
-using namespace std;
 
-// Only used by Mpc
-ProgramLoader::ProgramLoader(mpc::Mpc& _mpc, weak_ptr<MpcFile> _file, const int replaceIndex)
+ProgramLoader::ProgramLoader(mpc::Mpc& _mpc, std::shared_ptr<MpcFile> _file, const int replaceIndex)
 : mpc(_mpc), file(_file), replace (replaceIndex != -1)
 {
     auto cantFindFileScreen = mpc.screens->get<CantFindFileScreen>("cant-find-file");
     cantFindFileScreen->skipAll = false;
     
-    loadProgramThread = thread(&ProgramLoader::static_loadProgram, this, replaceIndex);
+    new std::thread(&ProgramLoader::static_loadProgram, this, replaceIndex);
 }
 
 void ProgramLoader::static_loadProgram(void* this_p, const int replaceIndex)
@@ -55,18 +55,18 @@ void ProgramLoader::loadProgram(const int replaceIndex)
 		PgmToProgramConverter converter(file, mpc.getSampler(), replaceIndex);
 		auto p = converter.get();
 		auto pgmSoundNames = converter.getSoundNames();
-		auto soundsDestIndex = vector<int>(pgmSoundNames.size());
+		auto soundsDestIndex = std::vector<int>(pgmSoundNames.size());
 
-		vector<int> unavailableSoundIndices;
-        map<int, int> finalSoundIndices;
+        std::vector<int> unavailableSoundIndices;
+        std::map<int, int> finalSoundIndices;
         
         int skipCount = 0;
 
 		for (int i = 0; i < pgmSoundNames.size(); i++)
 		{
 			auto ext = "snd";
-			shared_ptr<MpcFile> soundFile;
-			string soundFileName = StrUtil::replaceAll(pgmSoundNames[i], ' ', "");
+            std::shared_ptr<MpcFile> soundFile;
+            std::string soundFileName = StrUtil::replaceAll(pgmSoundNames[i], ' ', "");
 
 			for (auto& f : disk->getAllFiles())
 			{
@@ -111,11 +111,11 @@ void ProgramLoader::loadProgram(const int replaceIndex)
                       );
         }
 
-		auto adapter = ProgramImportAdapter(mpc.getSampler(), p, soundsDestIndex, unavailableSoundIndices);
+		ProgramImportAdapter adapter(mpc.getSampler(), p, soundsDestIndex, unavailableSoundIndices);
 		
-        result = adapter.get();
+        result = adapter.get().lock();
         
-        for (auto& noteParameters : result.lock()->getNotesParameters()) {
+        for (auto& noteParameters : result->getNotesParameters()) {
             
             if (noteParameters->getSoundIndex() == -1) continue;
                         
@@ -134,7 +134,7 @@ void ProgramLoader::loadProgram(const int replaceIndex)
         
 		mpc.getLayeredScreen().lock()->openScreen("load");
 	}
-	catch (const exception&)
+	catch (const std::exception&)
 	{
 		auto popupScreen = mpc.screens->get<PopupScreen>("popup");
 		popupScreen->setText("Wrong file format");
@@ -145,37 +145,36 @@ void ProgramLoader::loadProgram(const int replaceIndex)
 
 void ProgramLoader::loadSound
 (
- const string& soundFileName,
- const string& soundName,
- const string& ext,
- weak_ptr<MpcFile> soundFile,
- vector<int>* soundsDestIndex,
+ const std::string& soundFileName,
+ const std::string& soundName,
+ const std::string& ext,
+ std::shared_ptr<MpcFile> soundFile,
+ std::vector<int>* soundsDestIndex,
  const bool replace,
  const int loadSoundIndex
  )
 {
     SoundLoader soundLoader(mpc, mpc.getSampler().lock()->getSounds(), replace);
     soundLoader.setPartOfProgram(true);
-    auto file = soundFile.lock();
-    showPopup(soundName, ext, file->length());
-    SoundLoaderResult result;
+    showPopup(soundName, ext, soundFile->length());
+    SoundLoaderResult soundLoaderResult;
 
     try
     {
-        soundLoader.loadSound(file, result);
+        soundLoader.loadSound(soundFile, soundLoaderResult);
         
-        if (result.existingIndex != -1)
-            (*soundsDestIndex)[loadSoundIndex] = result.existingIndex;
+        if (soundLoaderResult.existingIndex != -1)
+            (*soundsDestIndex)[loadSoundIndex] = soundLoaderResult.existingIndex;
     }
-    catch (const exception& e)
+    catch (const std::exception& e)
     {
-        auto msg = string(e.what());
+        auto msg = std::string(e.what());
         MLOG("Exception occurred in ProgramLoader::loadSound(...) -- " + msg);
-        MLOG(result.errorMessage);
+        MLOG(soundLoaderResult.errorMessage);
     }
 }
 
-void ProgramLoader::showPopup(string name, string ext, int sampleSize)
+void ProgramLoader::showPopup(std::string name, std::string ext, int sampleSize)
 {
 	mpc.getLayeredScreen().lock()->openScreen("popup");
 	auto popupScreen = mpc.screens->get<PopupScreen>("popup");
@@ -186,10 +185,10 @@ void ProgramLoader::showPopup(string name, string ext, int sampleSize)
 	if (sleepTime < 300)
 		sleepTime = 300;
 
-	this_thread::sleep_for(chrono::milliseconds((int)(sleepTime * 0.2)));
+    std::this_thread::sleep_for(std::chrono::milliseconds((int)(sleepTime * 0.2)));
 }
 
-void ProgramLoader::notFound(string soundFileName, string ext)
+void ProgramLoader::notFound(std::string soundFileName, std::string ext)
 {
 	auto cantFindFileScreen = mpc.screens->get<CantFindFileScreen>("cant-find-file");
 	auto skipAll = cantFindFileScreen->skipAll;
@@ -203,17 +202,11 @@ void ProgramLoader::notFound(string soundFileName, string ext)
 		mpc.getLayeredScreen().lock()->openScreen("cant-find-file");
 
 		while (cantFindFileScreen->waitingForUser)
-			this_thread::sleep_for(chrono::milliseconds(25));
+            std::this_thread::sleep_for(std::chrono::milliseconds(25));
 	}
 }
 
-weak_ptr<mpc::sampler::Program> ProgramLoader::get()
+std::shared_ptr<mpc::sampler::Program> ProgramLoader::get()
 {
     return result;
-}
-
-ProgramLoader::~ProgramLoader()
-{
-	if (loadProgramThread.joinable())
-		loadProgramThread.join();
 }

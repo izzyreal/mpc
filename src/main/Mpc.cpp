@@ -33,15 +33,11 @@
 #include <hardware/Led.hpp>
 
 #include <lcdgui/Screens.hpp>
-#include <lcdgui/screens/LoadScreen.hpp>
-#include <lcdgui/screens/window/LoadAProgramScreen.hpp>
 
 #include <string>
 
 using namespace mpc;
 using namespace mpc::lcdgui;
-using namespace mpc::lcdgui::screens;
-using namespace mpc::lcdgui::screens::window;
 
 Mpc::Mpc()
 {
@@ -216,19 +212,6 @@ std::vector<std::shared_ptr<mpc::disk::AbstractDisk>> Mpc::getDisks()
 
 std::vector<char> Mpc::akaiAsciiChar { ' ', '!', '#', '$', '%', '&', '\'', '(', ')', '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '_', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '}' };
 std::vector<std::string> Mpc::akaiAscii { " ", "!", "#", "$", "%", "&", "'", "(", ")", "-", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "@", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "_", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "{", "}" };
-
-void Mpc::loadProgram()
-{
-	programLoader.reset();
-
-	auto loadScreen = screens->get<LoadScreen>("load");
-	auto loadAProgramScreen = screens->get<LoadAProgramScreen>("load-a-program");
-
-	controls->getControls()->init();
-	auto activePgm = controls->getControls()->mpcSoundPlayerChannel->getProgram();
-
-	programLoader = std::make_unique<mpc::disk::ProgramLoader>(*this, loadScreen->getSelectedFile(), loadAProgramScreen->loadReplaceSound ? activePgm : -1);
-}
 
 ctoot::mpc::MpcMultiMidiSynth* Mpc::getMms()
 {

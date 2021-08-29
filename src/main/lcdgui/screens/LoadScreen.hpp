@@ -11,6 +11,7 @@ namespace mpc::disk
 class AbstractDisk;
 class StdDisk;
 class RawDisk;
+class MpcFile;
 }
 
 namespace mpc::lcdgui::screens::window
@@ -22,6 +23,7 @@ class Mpc2000XlAllFileScreen;
 class LoadASoundScreen;
 class LoadASequenceScreen;
 class NameScreen;
+class LoadAProgramScreen;
 }
 
 namespace mpc::lcdgui::screens::dialog2
@@ -78,6 +80,7 @@ private:
     void loadSound();
     
 private:
+    friend class mpc::lcdgui::screens::window::LoadAProgramScreen;
     friend class mpc::lcdgui::screens::window::DirectoryScreen;
     friend class mpc::lcdgui::screens::window::LoadApsFileScreen;
     friend class mpc::lcdgui::screens::window::LoadASequenceFromAllScreen;

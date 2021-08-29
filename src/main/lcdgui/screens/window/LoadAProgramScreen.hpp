@@ -2,7 +2,7 @@
 #include <lcdgui/ScreenComponent.hpp>
 
 namespace mpc { class Mpc; }
-namespace mpc::disk { class ProgramLoader; }
+namespace mpc::disk { class ProgramLoader; class AbstractDisk; }
 
 namespace mpc::lcdgui::screens::window
 {
@@ -24,6 +24,7 @@ namespace mpc::lcdgui::screens::window
 		void displayLoadReplaceSound();
 
         friend class mpc::Mpc;
+        friend class mpc::disk::AbstractDisk;
 		friend class mpc::disk::ProgramLoader;
 
 	};

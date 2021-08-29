@@ -17,11 +17,16 @@
 #include <sampler/Sampler.hpp>
 #include <sampler/Sound.hpp>
 
+#include <sequencer/Track.hpp>
+
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/LoadScreen.hpp>
 #include <lcdgui/screens/window/DirectoryScreen.hpp>
+#include <lcdgui/screens/window/LoadAProgramScreen.hpp>
 #include <lcdgui/screens/window/SaveAProgramScreen.hpp>
 #include <lcdgui/screens/dialog2/PopupScreen.hpp>
+
+#include <mpc/MpcSoundPlayerChannel.hpp>
 
 #include <file/FileUtil.hpp>
 #include <lang/StrUtil.hpp>
@@ -515,7 +520,13 @@ program_or_error AbstractDisk::readPgm2(std::shared_ptr<MpcFile> f)
     std::string msg;
     
     try {
+        auto loadScreen = mpc.screens->get<LoadScreen>("load");
+        auto loadAProgramScreen = mpc.screens->get<LoadAProgramScreen>("load-a-program");
+        auto bus = mpc.getSequencer().lock()->getActiveTrack().lock()->getBus();
         
+        auto activePgm = bus == 0 ? 0 : mpc.getDrum(bus)->getProgram();
+        programLoader.reset();
+        programLoader = std::make_unique<ProgramLoader>(mpc, f, loadAProgramScreen->loadReplaceSound ? activePgm : -1);
     } catch (const std::exception& e) { msg = e.what(); };
     
     return tl::make_unexpected(mpc_io_error{"Could not read PGM file: " + msg});
