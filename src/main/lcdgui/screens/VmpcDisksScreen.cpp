@@ -68,7 +68,7 @@ void VmpcDisksScreen::function(int i)
             break;
         case 5:
             auto popupScreen = mpc.screens->get<PopupScreen>("popup");
-            mpc.getLayeredScreen().lock()->openScreen("popup");
+            openScreen("popup");
 
             if (hasConfigChanged())
             {

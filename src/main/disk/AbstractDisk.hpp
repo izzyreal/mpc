@@ -2,6 +2,7 @@
 #include <disk/SoundSaver.hpp>
 #include <disk/ProgramLoader.hpp>
 #include <disk/ApsLoader.hpp>
+#include <disk/AllLoader.hpp>
 
 #include <vector>
 #include <string>
@@ -9,16 +10,17 @@
 #include <mpc_types.hpp>
 
 namespace mpc { class Mpc; }
-namespace mpc::lcdgui::screens::window { class LoadASequenceScreen; class LoadAProgramScreen; class LoadApsFileScreen; }
 
-namespace mpc::sequencer {
-class Sequence;
+namespace mpc::lcdgui::screens::window {
+class LoadASequenceScreen;
+class LoadAProgramScreen;
+class LoadApsFileScreen;
+class Mpc2000XlAllFileScreen;
 }
 
-namespace mpc::sampler {
-class Program;
-class Sound;
-}
+namespace mpc::sequencer { class Sequence; }
+
+namespace mpc::sampler { class Program; class Sound; }
 
 namespace mpc::disk {
 
@@ -84,6 +86,7 @@ private:
     std::unique_ptr<SoundSaver> soundSaver;
     std::unique_ptr<ProgramLoader> programLoader;
     std::unique_ptr<ApsLoader> apsLoader;
+    std::unique_ptr<AllLoader> allLoader;
 
     file_or_error newFile2(const std::string& name);
     file_or_error writeWav2(std::shared_ptr<mpc::sampler::Sound>, std::shared_ptr<MpcFile>);
@@ -97,6 +100,7 @@ private:
     friend class mpc::lcdgui::screens::window::LoadASequenceScreen;
     friend class mpc::lcdgui::screens::window::LoadAProgramScreen;
     friend class mpc::lcdgui::screens::window::LoadApsFileScreen;
+    friend class mpc::lcdgui::screens::window::Mpc2000XlAllFileScreen;
     
     sound_or_error readWav2(std::shared_ptr<MpcFile>);
     sound_or_error readSnd2(std::shared_ptr<MpcFile>);
@@ -104,6 +108,7 @@ private:
     program_or_error readPgm2(std::shared_ptr<MpcFile>);
     void_or_error readAps2(std::shared_ptr<MpcFile>);
     void_or_error readAll2(std::shared_ptr<MpcFile>);
+    sequences_or_error readSequencesFromAll2(std::shared_ptr<MpcFile>);
 
 };
 }

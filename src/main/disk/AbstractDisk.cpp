@@ -556,8 +556,36 @@ void_or_error AbstractDisk::readAll2(std::shared_ptr<MpcFile> f)
     std::string msg;
     
     try {
-        
-    } catch (const std::exception& e) { msg = e.what(); };
+        AllLoader::loadEverythingFromFile(mpc, f.get());
+    } catch (const std::exception& e) {
+        msg = e.what();
+        auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+        popupScreen->setText("Wrong file format");
+        popupScreen->returnToScreenAfterInteraction("load");
+        mpc.getLayeredScreen().lock()->openScreen("popup");
+        return;
+    };
+    
+    return tl::make_unexpected(mpc_io_error{"Could not read APS file: " + msg});
+}
+
+sequences_or_error AbstractDisk::readSequencesFromAll2(std::shared_ptr<MpcFile> f)
+{
+    std::string msg;
+    
+    try
+    {
+        auto loadScreen = mpc.screens->get<LoadScreen>("load");
+        auto result = AllLoader::loadOnlySequencesFromFile(mpc, loadScreen->getSelectedFile().get());
+        loadScreen->fileLoad = 0;
+        return result;
+    } catch (const std::exception& e) {
+        msg = e.what();
+        auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+        popupScreen->setText("Wrong file format");
+        popupScreen->returnToScreenAfterInteraction("load");
+        mpc.getLayeredScreen().lock()->openScreen("popup");
+    };
     
     return tl::make_unexpected(mpc_io_error{"Could not read ALL file: " + msg});
 }

@@ -183,7 +183,7 @@ void VmpcKeyboardScreen::function(int i)
                 return;
 
             auto popupScreen = mpc.screens->get<PopupScreen>("popup");
-            mpc.getLayeredScreen().lock()->openScreen("popup");
+            openScreen("popup");
 
             if (hasMappingChanged())
             {
