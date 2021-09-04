@@ -40,7 +40,8 @@ void Mpc2000XlAllFileScreen::function(int i)
 	case 4:
 	{
         auto result = mpc.getDisk().lock()->readAll2(loadScreen->getSelectedFile());
-		if (result.has_value()) openScreen("sequencer");
+		if (result.has_value())
+            openScreen("sequencer");
 		break;
 	}
 	}

@@ -540,6 +540,7 @@ void_or_error AbstractDisk::readAps2(std::shared_ptr<MpcFile> f)
         auto loadScreen = mpc.screens->get<LoadScreen>("load");
         apsLoader.reset();
         apsLoader = std::make_unique<ApsLoader>(mpc, loadScreen->getSelectedFile());
+        return {};
     } catch (const std::exception& e) {
         msg = e.what();
         auto popupScreen = mpc.screens->get<PopupScreen>("popup");
@@ -557,13 +558,13 @@ void_or_error AbstractDisk::readAll2(std::shared_ptr<MpcFile> f)
     
     try {
         AllLoader::loadEverythingFromFile(mpc, f.get());
+        return {};
     } catch (const std::exception& e) {
         msg = e.what();
         auto popupScreen = mpc.screens->get<PopupScreen>("popup");
         popupScreen->setText("Wrong file format");
         popupScreen->returnToScreenAfterInteraction("load");
         mpc.getLayeredScreen().lock()->openScreen("popup");
-        return;
     };
     
     return tl::make_unexpected(mpc_io_error{"Could not read APS file: " + msg});

@@ -227,7 +227,7 @@ std::shared_ptr<MpcFile> StdDisk::getParentDir()
             if (f->getName() == path[path_counter])
             {
                 mpcFile = f;
-                if (path_counter++ == path.size() - 1) found = true;
+                if (path_counter++ == path.size() - 2) found = true;
                 break;
             }
         }

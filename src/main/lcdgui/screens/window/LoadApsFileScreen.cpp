@@ -22,8 +22,12 @@ void LoadApsFileScreen::function(int i)
 	case 4:
 	{
 		auto loadScreen = mpc.screens->get<LoadScreen>("load");
-        mpc.getDisk().lock()->readAps2(loadScreen->getSelectedFile());
-		break;
+        auto result = mpc.getDisk().lock()->readAps2(loadScreen->getSelectedFile());
+        
+        if (result.has_value())
+            openScreen("load");
+            
+        break;
 	}
 	}
 }
