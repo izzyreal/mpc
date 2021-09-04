@@ -33,7 +33,6 @@
 #include <lang/StrUtil.hpp>
 
 #include <stdexcept>
-#include <thread>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -44,39 +43,29 @@ using namespace mpc::sampler;
 using namespace mpc::file::aps;
 using namespace moduru::lang;
 
-ApsLoader::ApsLoader(mpc::Mpc& _mpc, std::shared_ptr<MpcFile> _file)
-: mpc (_mpc), file (_file)
+void ApsLoader::load(mpc::Mpc& mpc, std::shared_ptr<MpcFile> file)
 {
-    if (!file.lock()->exists())
+    if (!file->exists())
         throw std::invalid_argument("File does not exist");
     
     auto cantFindFileScreen = mpc.screens->get<CantFindFileScreen>("cant-find-file");
     cantFindFileScreen->skipAll = false;
-    
-    new std::thread(&ApsLoader::static_load, this);
-}
 
-void ApsLoader::static_load(void* this_p)
-{
-    static_cast<ApsLoader*>(this_p)->load();
-}
-
-void ApsLoader::notFound(mpc::Mpc& mpc, std::string soundFileName, std::string ext)
-{
-    auto cantFindFileScreen = mpc.screens->get<CantFindFileScreen>("cant-find-file");
-    auto skipAll = cantFindFileScreen->skipAll;
+    ApsParser apsParser(mpc, file);
     
-    if (!skipAll)
+    if (!apsParser.isHeaderValid())
     {
-        cantFindFileScreen->waitingForUser = true;
+        MLOG("The APS file you're trying to load does not have a valid ID. The first 2 bytes of an MPC2000XL APS file should be 0A 05. MPC2000 APS files start with 0A 04 and are not supported (yet?).");
         
-        cantFindFileScreen->fileName = soundFileName;
-        
-        mpc.getLayeredScreen().lock()->openScreen("cant-find-file");
-        
-        while (cantFindFileScreen->waitingForUser)
-            std::this_thread::sleep_for(std::chrono::milliseconds(25));
+        throw std::runtime_error("Invalid APS header");
     }
+    
+    auto withoutSounds = false;
+    ApsLoader::loadFromParsedAps(apsParser, mpc, withoutSounds);
+    
+    mpc.getSampler().lock()->setSoundIndex(0);
+    
+    mpc.getLayeredScreen().lock()->openScreen("load");
 }
 
 void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool headless, bool withoutSounds)
@@ -132,7 +121,7 @@ void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool head
                 skipCount++;
                 
                 if (!headless)
-                    ApsLoader::notFound(mpc, soundFileName, ext);
+                    ApsLoader::handleSoundNotFound(mpc, soundFileName, ext);
                 
                 continue;
             }
@@ -259,35 +248,6 @@ void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool head
     drumScreen->setPadToIntSound(globals->isPadToIntSoundEnabled());
 }
 
-void ApsLoader::load()
-{    
-    std::shared_ptr<ApsParser> apsParser;
-    
-    try
-    {
-        apsParser = std::make_shared<ApsParser>(mpc, file);
-    }
-    catch (const std::exception& e)
-    {
-        std::string msg = e.what();
-        MLOG("Failed to load APS file " + file.lock()->getName() + ": " + msg);
-        return;
-    }
-    
-    if (!apsParser->isHeaderValid())
-    {
-        MLOG("The APS file you're trying to load does not have a valid ID. The first 2 bytes of an MPC2000XL APS file should be 0A 05. MPC2000 APS files start with 0A 04 and are not supported (yet?).");
-        return;
-    }
-    
-    auto withoutSounds = false;
-    ApsLoader::loadFromParsedAps(*apsParser.get(), mpc, withoutSounds);
-    
-    mpc.getSampler().lock()->setSoundIndex(0);
-    
-    mpc.getLayeredScreen().lock()->openScreen("load");
-}
-
 void ApsLoader::loadSound(mpc::Mpc& mpc,
                           std::string soundFileName,
                           std::string ext,
@@ -321,5 +281,23 @@ void ApsLoader::showPopup(mpc::Mpc& mpc, std::string name, std::string ext, int 
             sleepTime = 300;
         
         std::this_thread::sleep_for(std::chrono::milliseconds((int)(sleepTime * 0.2)));
+    }
+}
+
+void ApsLoader::handleSoundNotFound(mpc::Mpc& mpc, std::string soundFileName, std::string ext)
+{
+    auto cantFindFileScreen = mpc.screens->get<CantFindFileScreen>("cant-find-file");
+    auto skipAll = cantFindFileScreen->skipAll;
+    
+    if (!skipAll)
+    {
+        cantFindFileScreen->waitingForUser = true;
+        
+        cantFindFileScreen->fileName = soundFileName;
+        
+        mpc.getLayeredScreen().lock()->openScreen("cant-find-file");
+        
+        while (cantFindFileScreen->waitingForUser)
+            std::this_thread::sleep_for(std::chrono::milliseconds(25));
     }
 }

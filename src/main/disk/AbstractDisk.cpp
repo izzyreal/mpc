@@ -9,6 +9,7 @@
 #include <file/pgmwriter/PgmWriter.hpp>
 #include <file/sndwriter/SndWriter.hpp>
 #include <file/sndreader/SndReader.hpp>
+#include <disk/ApsLoader.hpp>
 #include <file/aps/ApsParser.hpp>
 #include <file/all/AllParser.hpp>
 
@@ -532,24 +533,18 @@ program_or_error AbstractDisk::readPgm2(std::shared_ptr<MpcFile> f)
     return tl::make_unexpected(mpc_io_error{"Could not read PGM file: " + msg});
 }
 
-void_or_error AbstractDisk::readAps2(std::shared_ptr<MpcFile> f)
+void AbstractDisk::readAps2(std::shared_ptr<MpcFile> f, std::function<void()> on_success)
 {
-    std::string msg;
-    
-    try {
-        auto loadScreen = mpc.screens->get<LoadScreen>("load");
-        apsLoader.reset();
-        apsLoader = std::make_unique<ApsLoader>(mpc, loadScreen->getSelectedFile());
-        return {};
-    } catch (const std::exception& e) {
-        msg = e.what();
-        auto popupScreen = mpc.screens->get<PopupScreen>("popup");
-        popupScreen->setText("Wrong file format");
-        popupScreen->returnToScreenAfterInteraction("load");
-        mpc.getLayeredScreen().lock()->openScreen("popup");
-    };
-    
-    return tl::make_unexpected(mpc_io_error{"Could not read APS file: " + msg});
+    new std::thread([&, f, on_success]() {
+        std::string msg;
+        try {
+            ApsLoader::load(mpc, f);
+            on_success();
+        } catch (const std::exception& e) {
+            msg = e.what();
+            errorFunc(mpc_io_error{"Could not read APS file: " + msg});
+        };
+    });
 }
 
 void_or_error AbstractDisk::readAll2(std::shared_ptr<MpcFile> f)
@@ -576,8 +571,8 @@ sequences_or_error AbstractDisk::readSequencesFromAll2(std::shared_ptr<MpcFile> 
     
     try
     {
+        auto result = AllLoader::loadOnlySequencesFromFile(mpc, f.get());
         auto loadScreen = mpc.screens->get<LoadScreen>("load");
-        auto result = AllLoader::loadOnlySequencesFromFile(mpc, loadScreen->getSelectedFile().get());
         loadScreen->fileLoad = 0;
         return result;
     } catch (const std::exception& e) {

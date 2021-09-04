@@ -197,6 +197,3 @@ vector<char> ApsParser::getBytes()
 {
     return saveBytes;
 }
-
-ApsParser::~ApsParser() {
-}
