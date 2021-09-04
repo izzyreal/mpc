@@ -1,6 +1,5 @@
 #pragma once
 #include <disk/SoundSaver.hpp>
-#include <disk/ProgramLoader.hpp>
 #include <disk/AllLoader.hpp>
 
 #include <vector>
@@ -83,7 +82,6 @@ public:
 private:
     std::function<void(mpc_io_error e)> errorFunc;
     std::unique_ptr<SoundSaver> soundSaver;
-    std::unique_ptr<ProgramLoader> programLoader;
     std::unique_ptr<AllLoader> allLoader;
 
     file_or_error newFile2(const std::string& name);
@@ -103,9 +101,9 @@ private:
     sound_or_error readWav2(std::shared_ptr<MpcFile>);
     sound_or_error readSnd2(std::shared_ptr<MpcFile>);
     sequence_or_error readMid2(std::shared_ptr<MpcFile>);
-    program_or_error readPgm2(std::shared_ptr<MpcFile>);
+    void readPgm2(std::shared_ptr<MpcFile>);
     void readAps2(std::shared_ptr<MpcFile>, std::function<void()> on_success);
-    void_or_error readAll2(std::shared_ptr<MpcFile>);
+    void readAll2(std::shared_ptr<MpcFile>, std::function<void()> on_success);
     sequences_or_error readSequencesFromAll2(std::shared_ptr<MpcFile>);
 
 };

@@ -24,9 +24,9 @@ void LoadASequenceScreen::open()
         auto usedSeqs = sequencer.lock()->getUsedSequenceIndexes();
         int index;
         
-        for (index = 0; index < 99; index++)
+        for (index = 0; index < 98; index++)
         {
-            if (find(begin(usedSeqs), end(usedSeqs), index) != end(usedSeqs))
+            if (find(begin(usedSeqs), end(usedSeqs), index) == end(usedSeqs))
                 break;
         }
         

@@ -10,6 +10,7 @@
 #include <file/sndwriter/SndWriter.hpp>
 #include <file/sndreader/SndReader.hpp>
 #include <disk/ApsLoader.hpp>
+#include <disk/ProgramLoader.hpp>
 #include <file/aps/ApsParser.hpp>
 #include <file/all/AllParser.hpp>
 
@@ -128,6 +129,7 @@ file_or_error AbstractDisk::writeSnd2(std::shared_ptr<Sound> s, std::shared_ptr<
         f->setFileData(sndArray);
         flush();
         initFiles();
+        return f;
     } catch (const std::exception& e) {
         msg = e.what();
     }
@@ -302,6 +304,7 @@ file_or_error AbstractDisk::writeMid2(std::shared_ptr<mpc::sequencer::Sequence> 
         writer.writeToOStream(f->getOutputStream());
         flush();
         initFiles();
+        return f;
     } catch (const std::exception& e) { msg = e.what(); }
     
     return tl::make_unexpected(mpc_io_error{"Could not write MID file: " + msg});
@@ -338,7 +341,7 @@ file_or_error AbstractDisk::writePgm2(std::shared_ptr<mpc::sampler::Program> p, 
         
         flush();
         initFiles();
-
+        return f;
     } catch (const std::exception& e) { msg = e.what(); }
     
     return tl::make_unexpected(mpc_io_error{"Could not write PGM file: " + msg});
@@ -367,7 +370,7 @@ file_or_error AbstractDisk::writeAps2(std::shared_ptr<MpcFile> f)
 
         flush();
         initFiles();
-
+        return f;
     } catch (const std::exception& e) { msg = e.what(); }
     
     return tl::make_unexpected(mpc_io_error{"Could not write APS file: " + msg});
@@ -384,7 +387,7 @@ file_or_error AbstractDisk::writeAll2(std::shared_ptr<MpcFile> f)
         
         flush();
         initFiles();
-        
+        return f;
     } catch (const std::exception& e) { msg = e.what(); }
     
     return tl::make_unexpected(mpc_io_error{"Could not write ALL file: " + msg});
@@ -516,53 +519,47 @@ sequence_or_error AbstractDisk::readMid2(std::shared_ptr<MpcFile> f)
     return tl::make_unexpected(mpc_io_error{"Could not read MID file: " + msg});
 }
 
-program_or_error AbstractDisk::readPgm2(std::shared_ptr<MpcFile> f)
+void AbstractDisk::readPgm2(std::shared_ptr<MpcFile> f)
 {
-    std::string msg;
-    
-    try {
-        auto loadScreen = mpc.screens->get<LoadScreen>("load");
-        auto loadAProgramScreen = mpc.screens->get<LoadAProgramScreen>("load-a-program");
-        auto bus = mpc.getSequencer().lock()->getActiveTrack().lock()->getBus();
+    new std::thread([&, f]() {
+        std::string msg;
         
-        auto activePgm = bus == 0 ? 0 : mpc.getDrum(bus)->getProgram();
-        programLoader.reset();
-        programLoader = std::make_unique<ProgramLoader>(mpc, f, loadAProgramScreen->loadReplaceSound ? activePgm : -1);
-    } catch (const std::exception& e) { msg = e.what(); };
-    
-    return tl::make_unexpected(mpc_io_error{"Could not read PGM file: " + msg});
+        try {
+            auto loadScreen = mpc.screens->get<LoadScreen>("load");
+            auto loadAProgramScreen = mpc.screens->get<LoadAProgramScreen>("load-a-program");
+            auto bus = mpc.getSequencer().lock()->getActiveTrack().lock()->getBus();
+            
+            auto activePgm = bus == 0 ? 0 : mpc.getDrum(bus)->getProgram();
+            ProgramLoader::loadProgram(mpc, f, loadAProgramScreen->loadReplaceSound ? activePgm : -1);
+        } catch (const std::exception& e) {
+            std::string msg = e.what();
+            errorFunc(mpc_io_error{"Could not read PGM file: " + msg});
+        };
+    });
 }
 
 void AbstractDisk::readAps2(std::shared_ptr<MpcFile> f, std::function<void()> on_success)
 {
     new std::thread([&, f, on_success]() {
-        std::string msg;
         try {
             ApsLoader::load(mpc, f);
             on_success();
         } catch (const std::exception& e) {
-            msg = e.what();
+            std::string msg = e.what();
             errorFunc(mpc_io_error{"Could not read APS file: " + msg});
         };
     });
 }
 
-void_or_error AbstractDisk::readAll2(std::shared_ptr<MpcFile> f)
+void AbstractDisk::readAll2(std::shared_ptr<MpcFile> f, std::function<void()> on_success)
 {
-    std::string msg;
-    
     try {
         AllLoader::loadEverythingFromFile(mpc, f.get());
-        return {};
+        on_success();
     } catch (const std::exception& e) {
-        msg = e.what();
-        auto popupScreen = mpc.screens->get<PopupScreen>("popup");
-        popupScreen->setText("Wrong file format");
-        popupScreen->returnToScreenAfterInteraction("load");
-        mpc.getLayeredScreen().lock()->openScreen("popup");
+        std::string msg = e.what();
+        errorFunc(mpc_io_error{"Could not read ALL file: " + msg});
     };
-    
-    return tl::make_unexpected(mpc_io_error{"Could not read APS file: " + msg});
 }
 
 sequences_or_error AbstractDisk::readSequencesFromAll2(std::shared_ptr<MpcFile> f)
@@ -577,10 +574,7 @@ sequences_or_error AbstractDisk::readSequencesFromAll2(std::shared_ptr<MpcFile> 
         return result;
     } catch (const std::exception& e) {
         msg = e.what();
-        auto popupScreen = mpc.screens->get<PopupScreen>("popup");
-        popupScreen->setText("Wrong file format");
-        popupScreen->returnToScreenAfterInteraction("load");
-        mpc.getLayeredScreen().lock()->openScreen("popup");
+        errorFunc(mpc_io_error{"Could not read ALL file: " + msg});
     };
     
     return tl::make_unexpected(mpc_io_error{"Could not read ALL file: " + msg});

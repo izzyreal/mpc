@@ -67,6 +67,6 @@ string Paths::demoDataSrcPath()
 
 string Paths::demoDataDestPath()
 {
-    static auto demoDataPath = defaultLocalVolumePath() + "Demos" + sep;
+    static auto demoDataPath = defaultLocalVolumePath() + sep + "Demos" + sep;
     return demoDataPath;
 }

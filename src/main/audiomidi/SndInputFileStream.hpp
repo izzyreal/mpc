@@ -52,7 +52,7 @@ uint16_t snd_get_unsigned_short_LE(std::shared_ptr<std::istream> stream)
 {
     char buffer[2];
     stream->read(buffer, 2);
-    return static_cast<uint16_t>((buffer[1] << 8) | buffer[0]);
+    return static_cast<uint16_t>(( (buffer[1] & 0xFF) << 8) | (buffer[0] & 0xFF) );
 }
 
 
