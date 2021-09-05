@@ -62,7 +62,7 @@ std::vector<std::shared_ptr<MpcFile>> MpcFile::listFiles()
 std::string MpcFile::getNameWithoutExtension()
 {
     if (raw) {
-        auto name = rawEntry->getName();
+        auto name = rawEntry->getAkaiName();
         auto extIndex = name.find_last_of('.');
         if (extIndex != std::string::npos) {
             name = name.substr(0, extIndex);
@@ -77,7 +77,7 @@ std::string MpcFile::getNameWithoutExtension()
 std::string MpcFile::getExtension()
 {
     if (raw) {
-        auto ext = rawEntry->getName();
+        auto ext = rawEntry->getAkaiName();
         auto extIndex = ext.find_last_of('.');
         if (extIndex != std::string::npos) {
             ext = ext.substr(extIndex);
@@ -107,7 +107,7 @@ bool MpcFile::isFile()
 std::string MpcFile::getName()
 {
     if (raw)
-        return rawEntry->getName();
+        return rawEntry->getAkaiName();
     else
         return fs_path.filename();
 }

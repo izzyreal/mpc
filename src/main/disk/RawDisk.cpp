@@ -66,8 +66,6 @@ void RawDisk::initFiles()
         else {
             files.push_back(mpcFile);
         }
-        
-        MLOG("Found a file: " + mpcFile->getName());
     }
     
     initParentFiles();
@@ -92,7 +90,7 @@ void RawDisk::initParentFiles()
 std::string RawDisk::getDirectoryName()
 {
     if (path.size() == 0) return "ROOT";
-    return path[static_cast<int>(path.size()) -1]->getName();
+    return path[static_cast<int>(path.size()) -1]->getAkaiName();
 }
 
 bool RawDisk::moveBack()
@@ -193,7 +191,7 @@ std::string RawDisk::getAbsolutePath()
 	std::string pathString = "";
 	
     for (auto& entry : path)
-		pathString = pathString + FileUtil::getSeparator() + entry->getName();
+		pathString = pathString + FileUtil::getSeparator() + entry->getAkaiName();
     
 	return pathString;
 }
