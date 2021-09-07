@@ -20,14 +20,9 @@ using namespace mpc::lcdgui::screens::dialog2;
 using namespace moduru::lang;
 using namespace std;
 
-SoundSaver::SoundSaver(mpc::Mpc& mpc, vector<weak_ptr<mpc::sampler::Sound>> sounds, bool wav)
-	: mpc(mpc)
-{	
-	disk = mpc.getDisk();
-	disk.lock()->setBusy(true);
-	this->sounds = sounds;
-	this->wav = wav;
-	saveSoundsThread = thread(&SoundSaver::static_saveSounds, this);
+SoundSaver::SoundSaver(mpc::Mpc& _mpc, vector<weak_ptr<mpc::sampler::Sound>> _sounds, bool _wav)
+: mpc (_mpc), sounds (_sounds), wav (_wav), saveSoundsThread (std::thread(&SoundSaver::static_saveSounds, this))
+{
 }
 
 void SoundSaver::static_saveSounds(void* this_p)
@@ -38,7 +33,7 @@ void SoundSaver::static_saveSounds(void* this_p)
 void SoundSaver::saveSounds()
 {
 	string const ext = string(wav ? ".WAV" : ".SND");
-	auto lDisk = disk.lock();
+    auto disk = mpc.getDisk().lock();
 	
 	for (auto s : sounds)
 	{
@@ -48,33 +43,25 @@ void SoundSaver::saveSounds()
 		auto popupScreen = mpc.screens->get<PopupScreen>("popup");
 		popupScreen->setText("Saving " + StrUtil::padRight(fileName, " ", 16) + ext);
 
-		if (lDisk->checkExists(fileName + ext))
+		if (disk->checkExists(fileName + ext))
 		{
 			auto saveAProgramScreen = mpc.screens->get<SaveAProgramScreen>("save-a-program");
 
 			if (saveAProgramScreen->replaceSameSounds)
-                lDisk->getFile(fileName + ext)->del(); // possibly prepend auto success =
+                disk->getFile(fileName + ext)->del(); // possibly prepend auto success =
 			else
 				continue;
 		}
 		
-		if (!wav)
-			lDisk->writeSound(s);
+		if (wav)
+            disk->writeWav(s.lock(), "");
 		else
-			lDisk->writeWav(s);
+            disk->writeSnd(s.lock(), "");
 
-		try
-		{
-			this_thread::sleep_for(chrono::milliseconds(300));
-		}
-		catch (exception e)
-		{
-			e.what();
-		}
+        this_thread::sleep_for(chrono::milliseconds(300));
 	}
 
 	mpc.getLayeredScreen().lock()->openScreen("save");
-	lDisk->setBusy(false);
 }
 
 SoundSaver::~SoundSaver()

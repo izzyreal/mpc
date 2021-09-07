@@ -1,11 +1,9 @@
-#include <disk/StdDisk.hpp>
+#include "StdDisk.hpp"
 
 #include <Mpc.hpp>
 
 #include <disk/MpcFile.hpp>
-#include <disk/Store.hpp>
-#include <disk/device/Device.hpp>
-#include <disk/device/StdDevice.hpp>
+#include <disk/Volume.hpp>
 
 #include <file/AkaiName.hpp>
 
@@ -17,46 +15,43 @@
 
 #include <lang/StrUtil.hpp>
 
-#include <file/FsNode.hpp>
-#include <file/Directory.hpp>
-#include <file/FileUtil.hpp>
-
 #include <set>
 
 using namespace moduru::lang;
-using namespace moduru::file;
 using namespace moduru::raw::fat;
 using namespace mpc::disk;
 using namespace mpc::file;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
-using namespace std;
 
-StdDisk::StdDisk(mpc::Mpc& mpc, weak_ptr<Store> store)
-	: AbstractDisk(mpc, store)
+StdDisk::StdDisk(mpc::Mpc& mpc)
+	: AbstractDisk(mpc)
 {
-	device = make_unique<mpc::disk::device::StdDevice>(store.lock()->path);
-	
-	if (device)
-	{
-		root = nonstd::any_cast<weak_ptr<Directory>>(device->getRoot());
-		initFiles();
-	}
+}
+
+void StdDisk::close()
+{
+    volume.close();
+}
+
+void StdDisk::flush()
+{
+    volume.flush();
 }
 
 void StdDisk::renameFilesToAkai()
 {
 	auto dirContent = getDir()->listFiles();
 	
-	vector<shared_ptr<FsNode>> files;
-	vector<shared_ptr<FsNode>> directories;
+	std::vector<std::shared_ptr<MpcFile>> files;
+    std::vector<std::shared_ptr<MpcFile>> directories;
 
-	copy_if(dirContent.begin(), dirContent.end(), back_inserter(files), [](const shared_ptr<FsNode> f) { return f->isFile(); });
-	copy_if(dirContent.begin(), dirContent.end(), back_inserter(directories), [](const shared_ptr<FsNode> f) { return f->isDirectory(); });
+	copy_if(dirContent.begin(), dirContent.end(), back_inserter(files), [](const std::shared_ptr<MpcFile> f) { return f->isFile(); });
+	copy_if(dirContent.begin(), dirContent.end(), back_inserter(directories), [](const std::shared_ptr<MpcFile> f) { return f->isDirectory(); });
 
 	dirContent.clear();
 
-	vector<string> allCompatibleNames;
+	std::vector<std::string> allCompatibleNames;
 
 	for (auto& file : files)
     {
@@ -77,12 +72,12 @@ void StdDisk::renameFilesToAkai()
 		}
 
 		allCompatibleNames.push_back(akaiName);
-		file->renameTo(akaiName);
+        file->setName(akaiName);
 	}
 	
 	for (auto& dir : directories)
     {
-		set<string> namesAsSet(allCompatibleNames.begin(), allCompatibleNames.end());
+		std::set<std::string> namesAsSet(allCompatibleNames.begin(), allCompatibleNames.end());
 		
 		auto itself = namesAsSet.find(dir->getName());
 		
@@ -98,11 +93,11 @@ void StdDisk::renameFilesToAkai()
 			continue;
 		}
 
-		if (akaiName.find(".") != string::npos)
+		if (akaiName.find(".") != std::string::npos)
 			akaiName = akaiName.substr(0, akaiName.find_last_of("."));
 
 		allCompatibleNames.push_back(akaiName);
-		dir->renameTo(akaiName);
+		dir->setName(akaiName);
 	}
 }
 
@@ -120,18 +115,17 @@ void StdDisk::initFiles()
 
 	for (auto& f : dirList)
 	{
-		auto mpcFile = make_shared<MpcFile>(f);
-		allFiles.push_back(mpcFile);
+		allFiles.push_back(f);
 
 		if (view != 0 && f->isFile())
 		{
-			string name = f->getName();
+			std::string name = f->getName();
 		
-			if (f->isFile() && name.find(".") != string::npos && name.substr(name.length() - 3).compare(extensions[view]) == 0)
-				files.push_back(mpcFile);
+			if (f->isFile() && name.find(".") != std::string::npos && name.substr(name.length() - 3).compare(extensions[view]) == 0)
+				files.push_back(f);
 		}
 		else {
-			files.push_back(mpcFile);
+			files.push_back(f);
 		}
 	}
     
@@ -148,11 +142,11 @@ void StdDisk::initParentFiles()
 	for (auto& f : temp)
 	{
 		if (f->isDirectory())
-			parentFiles.push_back(make_shared<MpcFile>(f));
+			parentFiles.push_back(f);
 	}
 }
 
-string StdDisk::getDirectoryName()
+std::string StdDisk::getDirectoryName()
 {
 	if (path.size() == 0)
 		return "ROOT";
@@ -171,57 +165,78 @@ bool StdDisk::moveBack()
 	return true;
 }
 
-bool StdDisk::moveForward(const string& directoryName)
+bool StdDisk::moveForward(const std::string& directoryName)
 {
 	bool success = false;
 	for (auto& f : files)
 	{
 		if (StrUtil::eqIgnoreCase(StrUtil::trim(f->getName()), StrUtil::trim(directoryName)))
 		{
-			auto lFile = f->getFsNode().lock();
-			
-			if (lFile->isDirectory() && lFile->getPath().find("VMPC2000XL") != string::npos && lFile->getPath().find("Volumes") != string::npos)
-			{
-				path.push_back(f->getName());
-				success = true;
-				break;
-			}
+            path.push_back(f->getName());
+			success = true;
+			break;
 		}
 	}
+    
 	return success;
 }
 
-shared_ptr<Directory> StdDisk::getDir()
+std::shared_ptr<MpcFile> StdDisk::getDir()
 {
 	if (path.size() == 0)
-        return make_shared<Directory>(root.lock()->getPath(), nullptr);
-
-    string dirPath = root.lock()->getPath();
+        return root;
     
-    for (int i = 0; i < path.size(); i++)
-        dirPath = dirPath + FileUtil::getSeparator() + path[i];
+    auto mpcFile = root;
+    bool found = false;
+    int path_counter = 0;
     
-	return make_shared<Directory>(dirPath, nullptr);
+    while (!found) {
+        for (auto& f : mpcFile->listFiles())
+        {
+            if (f->isFile()) continue;
+            
+            if (f->getName() == path[path_counter])
+            {
+                mpcFile = f;
+                if (path_counter++ == path.size() - 1) found = true;
+                break;
+            }
+        }
+    }
+    
+    return mpcFile;
 }
 
-shared_ptr<Directory> StdDisk::getParentDir()
+std::shared_ptr<MpcFile> StdDisk::getParentDir()
 {
 	if (path.size() == 0)
         return {};
 
 	if (path.size() == 1)
-		return make_shared<Directory>(root.lock()->getPath(), nullptr);
+        return root;
 
-    string dirPath = root.lock()->getPath();
+    auto mpcFile = root;
+    bool found = false;
+    int path_counter = 0;
     
-    for (int i = 0; i < path.size() - 1; i++)
-    {
-        dirPath = dirPath + FileUtil::getSeparator() + path[i];
+    while (!found) {
+        for (auto& f : mpcFile->listFiles())
+        {
+            if (f->isFile()) continue;
+            
+            if (f->getName() == path[path_counter])
+            {
+                mpcFile = f;
+                if (path_counter++ == path.size() - 2) found = true;
+                break;
+            }
+        }
     }
     
-    return make_shared<Directory>(dirPath, nullptr);}
+    return mpcFile;
+}
 
-bool StdDisk::deleteAllFiles(int extension)
+bool StdDisk::deleteAllFiles(int extensionIndex)
 {
     auto dir = getDir();
     
@@ -235,85 +250,57 @@ bool StdDisk::deleteAllFiles(int extension)
 	{
 		if (!f->isDirectory())
 		{
-			if (extension == 0 || StrUtil::hasEnding(f->getName(), extensions[extension]))
+			if (extensionIndex == 0 || StrUtil::hasEnding(f->getName(), extensions[extensionIndex]))
 				success = f->del();
 		}
 	}
 	return success;
 }
 
-bool StdDisk::newFolder(const string& newDirName)
+bool StdDisk::newFolder(const std::string& newDirName)
 {
-    auto dir = getDir();
-	auto f = Directory(dir->getPath() + FileUtil::getSeparator() + StrUtil::toUpper(newDirName), dir);
-	return f.create();
+    std::string copy = StrUtil::toUpper(StrUtil::replaceAll(newDirName, ' ', "_"));
+    auto new_path = getDir()->fs_path;
+    new_path.append(copy);
+    return fs::create_directory(new_path);
 }
 
-bool StdDisk::deleteDir(weak_ptr<MpcFile> f)
+std::shared_ptr<MpcFile> StdDisk::newFile(const std::string& newFileName)
 {
-    return deleteRecursive(f.lock()->getFsNode().lock().get());
-}
-
-bool StdDisk::deleteRecursive(FsNode* deleteMe)
-{
-	auto deletedSomething = false;
-	auto deletedCurrentFile = false;
-	
-	if (deleteMe->isDirectory())
-	{
-		for (auto& f : dynamic_cast<Directory*>(deleteMe)->listFiles())
-			deleteRecursive(f.get());
-	}
-	
-	deletedCurrentFile = deleteMe->del();
-	
-	if (deletedCurrentFile)
-		deletedSomething = true;
-
-	if (!deletedCurrentFile)
-		return false;
-
-	return deletedSomething;
-}
-
-shared_ptr<MpcFile> StdDisk::newFile(const string& _newFileName)
-{
-    shared_ptr<File> f;
-    
-    auto fileName = _newFileName;
-    
-	try
-    {
-		auto split = FileUtil::splitName(fileName);
-		split[0] = moduru::lang::StrUtil::trim(split[0]);
-		fileName = split[0] + "." + split[1];
-
-        auto dir = getDir();
-        
-		string filePath = dir->getPath() + FileUtil::getSeparator() + StrUtil::toUpper(StrUtil::replaceAll(fileName, ' ', "_"));
-        
-		f = make_shared<File>(filePath, dir);
-		auto success = f->create();
-		
-        if (success)
-        {
-			return make_shared<MpcFile>(f);
-		}
-	}
-	catch (const exception& e) {
-        MLOG("Failed to create file " + _newFileName + ":");
-        string msg = e.what();
-        MLOG(msg);
-	}
-    
+    std::string copy = StrUtil::toUpper(StrUtil::replaceAll(newFileName, ' ', "_"));
+    auto new_path = getDir()->fs_path;
+    new_path.append(copy);
+    auto result = std::make_shared<MpcFile>(new_path);
+    result->getOutputStream();
+    if (result->exists()) return result;
 	return {};
 }
 
-string StdDisk::getAbsolutePath()
+std::string StdDisk::getAbsolutePath()
 {
-    return getDir()->getPath();
+    return getDir()->fs_path.string();
 }
 
 int StdDisk::getPathDepth() {
 	return path.size();
+}
+
+std::string StdDisk::getTypeShortName()
+{
+    return volume.typeShortName();
+}
+
+std::string StdDisk::getModeShortName()
+{
+    return volume.modeShortName();
+}
+
+uint64_t StdDisk::getTotalSize()
+{
+    return volume.volumeSize;
+}
+
+std::string StdDisk::getVolumeLabel()
+{
+    return volume.label;
 }

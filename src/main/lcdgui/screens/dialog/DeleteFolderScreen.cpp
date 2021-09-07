@@ -28,9 +28,6 @@ void DeleteFolderScreen::static_deleteFolder(void* this_p)
 
 void DeleteFolderScreen::deleteFolder()
 {
-	auto disk = mpc.getDisk().lock();
-	disk->setBusy(true);
-
 	auto directoryScreen = mpc.screens->get<DirectoryScreen>("directory");
 	openScreen("popup");
 	auto popupScreen = mpc.screens->get<PopupScreen>("popup");
@@ -38,9 +35,10 @@ void DeleteFolderScreen::deleteFolder()
 	auto fileName = file->getName();
 	popupScreen->setText("Delete:" + fileName);
 
+    auto disk = mpc.getDisk().lock();
 	auto parentFileNames = disk->getParentFileNames();
 
-	if (disk->deleteDir(file))
+	if (disk->deleteRecursive(file))
 	{
 		auto currentIndex = directoryScreen->yPos0 + directoryScreen->yOffset0;
 	
@@ -50,7 +48,7 @@ void DeleteFolderScreen::deleteFolder()
 		
 		for (int i = 0; i < parentFileNames.size(); i++)
 		{
-			if (parentFileNames[i].compare(fileName) == 0)
+			if (parentFileNames[i] == fileName)
 			{
 				parentFileNames.erase(begin(parentFileNames) + i);
 				break;
@@ -84,7 +82,6 @@ void DeleteFolderScreen::deleteFolder()
 
 	this_thread::sleep_for(chrono::milliseconds(400));
 	openScreen("directory");
-	disk->setBusy(false);
 }
 
 void DeleteFolderScreen::function(int i)

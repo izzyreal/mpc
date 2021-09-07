@@ -4,9 +4,10 @@
 
 #include <sstream>
 
+#include <Logger.hpp>
+
 using namespace mpc::midi;
 using namespace mpc::midi::util;
-using namespace std;
 
 MidiFile::MidiFile() 
 	: MidiFile(DEFAULT_RESOLUTION)
@@ -14,31 +15,29 @@ MidiFile::MidiFile()
 }
 
 MidiFile::MidiFile(int resolution) 
-: MidiFile(resolution, vector<MidiTrack*>(0))
+: MidiFile(resolution, std::vector<MidiTrack*>(0))
 {
 }
 
-MidiFile::MidiFile(int resolution, vector<MidiTrack*> tracks)
+MidiFile::MidiFile(int resolution, std::vector<MidiTrack*> tracks)
 {
 	mResolution = resolution >= 0 ? resolution : DEFAULT_RESOLUTION;
 	mTrackCount = tracks.size();
 	mType = mTrackCount > 1 ? 1 : 0;
 }
 
-MidiFile::MidiFile(istream& stream)
+MidiFile::MidiFile(std::shared_ptr<std::istream> stream)
 {
-	stream.unsetf(ios_base::skipws);
-	auto buffer = vector<char>(HEADER_SIZE);
-	stream.read(&buffer[0], buffer.size());
+	std::vector<char> buffer(HEADER_SIZE);
+	stream->read(&buffer[0], buffer.size());
 	initFromBuffer(buffer);
 	mTracks.clear();
 
-	for (int i = 0; i < mTrackCount; i++) {
-		mTracks.push_back(std::move(make_shared<MidiTrack>(stream)));
-	}
+	for (int i = 0; i < mTrackCount; i++)
+		mTracks.emplace_back(std::make_shared<MidiTrack>(stream));
 }
 
-vector<char> MidiFile::IDENTIFIER = { 'M', 'T', 'h', 'd' };
+std::vector<char> MidiFile::IDENTIFIER = { 'M', 'T', 'h', 'd' };
 
 void MidiFile::setType(int type)
 {
@@ -88,21 +87,20 @@ int MidiFile::getLengthInTicks()
 	return length;
 }
 
-vector<weak_ptr<MidiTrack>> MidiFile::getTracks()
+std::vector<std::weak_ptr<MidiTrack>> MidiFile::getTracks()
 {
-	auto res = vector<weak_ptr<MidiTrack>>();
-	for (auto& t : mTracks) {
+	auto res = std::vector<std::weak_ptr<MidiTrack>>();
+	for (auto& t : mTracks)
 		res.push_back(t);
-	}
     return res;
 }
 
-void MidiFile::addTrack(shared_ptr<MidiTrack> T)
+void MidiFile::addTrack(std::shared_ptr<MidiTrack> track)
 {
-	addTrack(T, mTracks.size());
+	addTrack(track, mTracks.size());
 }
 
-void MidiFile::addTrack(shared_ptr<MidiTrack> T, int pos)
+void MidiFile::addTrack(std::shared_ptr<MidiTrack> track, int pos)
 {
 	if (pos > mTracks.size()) {
 		pos = mTracks.size();
@@ -110,7 +108,7 @@ void MidiFile::addTrack(shared_ptr<MidiTrack> T, int pos)
 	else if (pos < 0) {
 		pos = 0;
 	}
-	mTracks.insert(mTracks.begin() + pos, std::move(T));
+	mTracks.insert(mTracks.begin() + pos, std::move(track));
 	mTrackCount = mTracks.size();
 	mType = mTrackCount > 1 ? 1 : 0;
 }
@@ -125,34 +123,33 @@ void MidiFile::removeTrack(int pos)
 	mType = mTrackCount > 1 ? 1 : 0;
 }
 
-void MidiFile::writeToOutputStream(ostream& stream)
+void MidiFile::writeToOutputStream(std::shared_ptr<std::ostream> stream)
 {
-	stream.write(&IDENTIFIER[0], IDENTIFIER.size());
+	stream->write(&IDENTIFIER[0], IDENTIFIER.size());
 	
 	auto val1 = MidiUtil::intToBytes(6, 4);
-	stream.write(&val1[0], val1.size());
+	stream->write(&val1[0], val1.size());
 
 	auto type = MidiUtil::intToBytes(mType, 2);
-	stream.write(&type[0], type.size());
+	stream->write(&type[0], type.size());
 
 	auto trackCount = MidiUtil::intToBytes(mTrackCount, 2);
-	stream.write(&trackCount[0], trackCount.size());
+	stream->write(&trackCount[0], trackCount.size());
 
 	auto resolution = MidiUtil::intToBytes(mResolution, 2);
-	stream.write(&resolution[0], resolution.size());
+	stream->write(&resolution[0], resolution.size());
 
-	for (auto& track : mTracks) {
+	for (auto& track : mTracks)
 		track->writeToOutputStream(stream);
-	}
 }
 
-void MidiFile::initFromBuffer(vector<char>& buffer)
+void MidiFile::initFromBuffer(std::vector<char>& buffer)
 {
-    if(!mpc::midi::util::MidiUtil::bytesEqual(buffer, IDENTIFIER, 0, 4)) {
-		string error = "File identifier not MThd. Exiting.\n";
+    if (!mpc::midi::util::MidiUtil::bytesEqual(buffer, IDENTIFIER, 0, 4)) {
         mType = 0;
         mTrackCount = 0;
         mResolution = DEFAULT_RESOLUTION;
+        MLOG("File header does not indicate this is a MIDI file");
         return;
     }
 	mType = MidiUtil::bytesToInt(buffer, 8, 2);

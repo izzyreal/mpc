@@ -42,41 +42,30 @@ using namespace mpc::disk;
 using namespace mpc::sampler;
 using namespace mpc::file::aps;
 using namespace moduru::lang;
-using namespace std;
 
-ApsLoader::ApsLoader(mpc::Mpc& _mpc, weak_ptr<MpcFile> _file)
-: mpc(_mpc), file(_file)
+void ApsLoader::load(mpc::Mpc& mpc, std::shared_ptr<MpcFile> file)
 {
-    if (!file.lock()->getFsNode().lock()->exists())
-        throw invalid_argument("File does not exist");
+    if (!file->exists())
+        throw std::invalid_argument("File does not exist");
     
     auto cantFindFileScreen = mpc.screens->get<CantFindFileScreen>("cant-find-file");
     cantFindFileScreen->skipAll = false;
-    
-    loadThread = thread(&ApsLoader::static_load, this);
-}
 
-void ApsLoader::static_load(void* this_p)
-{
-    static_cast<ApsLoader*>(this_p)->load();
-}
-
-void ApsLoader::notFound(mpc::Mpc& mpc, string soundFileName, string ext)
-{
-    auto cantFindFileScreen = mpc.screens->get<CantFindFileScreen>("cant-find-file");
-    auto skipAll = cantFindFileScreen->skipAll;
+    ApsParser apsParser(mpc, file);
     
-    if (!skipAll)
+    if (!apsParser.isHeaderValid())
     {
-        cantFindFileScreen->waitingForUser = true;
+        MLOG("The APS file you're trying to load does not have a valid ID. The first 2 bytes of an MPC2000XL APS file should be 0A 05. MPC2000 APS files start with 0A 04 and are not supported (yet?).");
         
-        cantFindFileScreen->fileName = soundFileName;
-        
-        mpc.getLayeredScreen().lock()->openScreen("cant-find-file");
-        
-        while (cantFindFileScreen->waitingForUser)
-            this_thread::sleep_for(chrono::milliseconds(25));
+        throw std::runtime_error("Invalid APS header");
     }
+    
+    auto withoutSounds = false;
+    ApsLoader::loadFromParsedAps(apsParser, mpc, withoutSounds);
+    
+    mpc.getSampler().lock()->setSoundIndex(0);
+    
+    mpc.getLayeredScreen().lock()->openScreen("load");
 }
 
 void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool headless, bool withoutSounds)
@@ -88,8 +77,8 @@ void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool head
 
     // For now when this is called by JUCE's get/setState routines,
     // we trust every sound could be saved/loaded.
-    vector<int> unavailableSoundIndices;
-    map<int, int> finalSoundIndices;
+    std::vector<int> unavailableSoundIndices;
+    std::map<int, int> finalSoundIndices;
     
     int skipCount = 0;
     
@@ -100,8 +89,8 @@ void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool head
         for (int i = 0; i < apsParser.getSoundNames().size(); i++)
         {
             auto ext = "snd";
-            shared_ptr<MpcFile> soundFile;
-            string soundFileName = StrUtil::replaceAll(apsParser.getSoundNames()[i], ' ', "");
+            std::shared_ptr<MpcFile> soundFile;
+            std::string soundFileName = StrUtil::replaceAll(apsParser.getSoundNames()[i], ' ', "");
             
             for (auto& f : disk->getAllFiles())
             {
@@ -112,7 +101,7 @@ void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool head
                 }
             }
             
-            if (!soundFile || !soundFile->getFsNode().lock()->exists())
+            if (!soundFile || !soundFile->exists())
             {
                 for (auto& f : disk->getAllFiles())
                 {
@@ -125,14 +114,14 @@ void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool head
                 }
             }
             
-            if (!soundFile || !soundFile->getFsNode().lock()->exists())
+            if (!soundFile || !soundFile->exists())
             {
                 unavailableSoundIndices.push_back(i);
                                 
                 skipCount++;
                 
                 if (!headless)
-                    ApsLoader::notFound(mpc, soundFileName, ext);
+                    ApsLoader::handleSoundNotFound(mpc, soundFileName, ext);
                 
                 continue;
             }
@@ -259,42 +248,13 @@ void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool head
     drumScreen->setPadToIntSound(globals->isPadToIntSoundEnabled());
 }
 
-void ApsLoader::load()
-{
-    auto disk = mpc.getDisk().lock();
-    disk->setBusy(true);
-    
-    shared_ptr<ApsParser> apsParser;
-    
-    try
-    {
-        apsParser = make_shared<ApsParser>(mpc, file);
-    }
-    catch (const exception& e)
-    {
-        string msg = e.what();
-        MLOG("Failed to load APS file " + file.lock()->getName() + ": " + msg);
-        disk->setBusy(false);
-        return;
-    }
-    
-    if (!apsParser->isHeaderValid())
-    {
-        MLOG("The APS file you're trying to load does not have a valid ID. The first 2 bytes of an MPC2000XL APS file should be 0A 05. MPC2000 APS files start with 0A 04 and are not supported (yet?).");
-        disk->setBusy(false);
-        return;
-    }
-    
-    auto withoutSounds = false;
-    ApsLoader::loadFromParsedAps(*apsParser.get(), mpc, withoutSounds);
-    
-    mpc.getSampler().lock()->setSoundIndex(0);
-    
-    mpc.getLayeredScreen().lock()->openScreen("load");
-    disk->setBusy(false);
-}
-
-void ApsLoader::loadSound(mpc::Mpc& mpc, string soundFileName, string ext, weak_ptr<MpcFile> _soundFile, bool replace, int loadSoundIndex, bool headless)
+void ApsLoader::loadSound(mpc::Mpc& mpc,
+                          std::string soundFileName,
+                          std::string ext,
+                          std::weak_ptr<MpcFile> _soundFile,
+                          bool replace,
+                          int loadSoundIndex,
+                          bool headless)
 {
     auto soundFile = _soundFile.lock();
     SoundLoader soundLoader(mpc, mpc.getSampler().lock()->getSounds(), replace);
@@ -307,25 +267,37 @@ void ApsLoader::loadSound(mpc::Mpc& mpc, string soundFileName, string ext, weak_
     soundLoader.loadSound(soundFile, result);
 }
 
-void ApsLoader::showPopup(mpc::Mpc& mpc, string name, string ext, int sampleSize)
+void ApsLoader::showPopup(mpc::Mpc& mpc, std::string name, std::string ext, int sampleSize)
 {
     mpc.getLayeredScreen().lock()->openScreen("popup");
     auto popupScreen = mpc.screens->get<PopupScreen>("popup");
     popupScreen->setText("LOADING " + StrUtil::toUpper(StrUtil::padRight(name, " ", 16) + "." + ext));
     
-    if (dynamic_pointer_cast<StdDisk>(mpc.getDisk().lock()))
+    if (std::dynamic_pointer_cast<StdDisk>(mpc.getDisk().lock()))
     {
         auto sleepTime = sampleSize / 800;
         
         if (sleepTime < 300)
             sleepTime = 300;
         
-        this_thread::sleep_for(chrono::milliseconds((int)(sleepTime * 0.2)));
+        std::this_thread::sleep_for(std::chrono::milliseconds((int)(sleepTime * 0.2)));
     }
 }
 
-ApsLoader::~ApsLoader()
+void ApsLoader::handleSoundNotFound(mpc::Mpc& mpc, std::string soundFileName, std::string ext)
 {
-    if (loadThread.joinable())
-        loadThread.join();
+    auto cantFindFileScreen = mpc.screens->get<CantFindFileScreen>("cant-find-file");
+    auto skipAll = cantFindFileScreen->skipAll;
+    
+    if (!skipAll)
+    {
+        cantFindFileScreen->waitingForUser = true;
+        
+        cantFindFileScreen->fileName = soundFileName;
+        
+        mpc.getLayeredScreen().lock()->openScreen("cant-find-file");
+        
+        while (cantFindFileScreen->waitingForUser)
+            std::this_thread::sleep_for(std::chrono::milliseconds(25));
+    }
 }

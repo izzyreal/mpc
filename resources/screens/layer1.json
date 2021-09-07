@@ -68,21 +68,24 @@
 },
 "load":
 {
- "labels" : [ "View:", "File:", "\u00C2" ],
- "x" : [ 0, 0, 186 ],
- "y" : [ 1, 9, 1  ],
+ "labels" : [ "View:", "File:", "\u00C2", "Device:" ],
+ "x" : [ 0, 0, 186, 0 ],
+ "y" : [ 1, 9, 1, 21 ],
  "parameters" : [
  "view", [ "_", "directory", "_", "file" ],
- "file", [ "view", "directory", "view", "_" ],
- "directory", [ "view", "file", "_", "file" ]],
- "tfsize" : [ 54, 120, 58 ],
- "infowidgets" : [ "size", "freesnd", "freeseq" ],
- "infosize" : [ 42, 42, 42 ],  
- "infox" : [ 206, 206, 206 ],
- "infoy" : [ 8, 29, 38 ],
+ "file", [ "view", "directory", "view", "device" ],
+ "directory", [ "view", "file", "_", "file" ],
+ "device", [ "_", "_", "file", "_"]],
+ "tfsize" : [ 54, 120, 58, 66 ],
+ "infowidgets" : [ "size", "freesnd", "freeseq", "type" ],
+ "infosize" : [ 42, 42, 42, 18 ],  
+ "infox" : [ 206, 206, 206, 42 ],
+ "infoy" : [ 8, 29, 38, 38 ],
  "fblabels" : [[ "LOAD", "SAVE", "FORMAT", "SETUP", null, "DO IT" ],
-               [ "LOAD", "SAVE", "FORMAT", "SETUP", "PLAY", "DO IT" ]],
+               [ "LOAD", "SAVE", "FORMAT", "SETUP", "PLAY", "DO IT" ],
+               [ "LOAD", "SAVE", "FORMAT", "SETUP", "APPLY", "DO IT" ]],
  "fbtypes" : [[ 2, 0, 0, 0, null, 1 ],
+              [ 2, 0, 0, 0, 1, 1 ],
               [ 2, 0, 0, 0, 1, 1 ]]
 },
 "save":
@@ -582,16 +585,6 @@
  "fblabels" : [ null, null, null, "SUDDEN", "CLEAR", "CLOSE" ],
  "fbtypes" : [ null, null, null, 1, 1, 0 ]
 },
-"vmpc-disk":
-{
- "labels" : [ "SCSI-", "Access type:", "Root:" ],
- "x" : [ 0, 0, 0 ],
- "y" : [ 5, 16, 27 ],
- "parameters" : [ "scsi", "access-type", "root" ],
- "tfsize" : [ 6, 24, 216 ],
- "fblabels" : [ "SETNGS", "DISK", null, null, null, "APPLY" ],
- "fbtypes" : [ 0, 2, null, null, null, 1 ]
-},
 "vmpc-settings":
 {
  "labels" : [ "Initial pad mapping : ", "16 levels erase mode: " ],
@@ -599,11 +592,15 @@
  "y" : [ 5, 16 ],
  "parameters" : [ "initial-pad-mapping", "16-levels-erase-mode" ],
  "tfsize" : [ 60, 108 ],
- "fblabels" : [ "SETNGS", "KEYBRD", "AUTSAV", null, null, null ],
- "fbtypes" : [ 2, 0, 0, null, null, null ]
+ "fblabels" : [ "SETNGS", "KEYBRD", "AUTSAV", "DISKS", null, null ],
+ "fbtypes" : [ 2, 0, 0, 0, null, null ]
 },
 "vmpc-keyboard":
 {
+ "infowidgets" : [ "up", "down" ],
+ "infosize" : [ 5, 5 ],
+ "infox" : [ 202, 202 ],
+ "infoy" : [ 2, 38 ],
  "fblabels" : [
  ["SETNGS", "KEYBRD", "AUTSAV", "LEARN", "RESET", "SAVE" ],
  ["SETNGS", "KEYBRD", "CANCEL", "ACCEPT", null, null ]],
@@ -625,7 +622,25 @@
  "infosize" : [ 168 ],
  "infox" : [ 45 ],
  "infoy" : [ 37 ],
- "fblabels" : [ "SETNGS", "KEYBRD", "AUTSAV", null, null, null ],
- "fbtypes" : [ 0, 0, 2, null, null, null ]
+ "fblabels" : [ "SETNGS", "KEYBRD", "AUTSAV", "DISKS", null, null ],
+ "fbtypes" : [ 0, 0, 2, 0, null, null ]
+},
+"vmpc-disks":
+{
+ "labels" : [ ],
+ "x" : [ ],
+ "y" : [ ],
+ "parameters" : [ ],
+ "tfsize" : [ ],
+ "infowidgets" : [ "up", "down" ],
+ "infosize" : [ 5, 5 ],
+ "infox" : [ 240, 240 ],
+ "infoy" : [ 10, 38 ],
+ "fblabels" : [
+  [ "SETNGS", "KEYBRD", "AUTSAV", "DISKS", "RESET", "SAVE" ],
+  [ "SETNGS", "KEYBRD", "AUTSAV", "DISKS", null, null ]],
+ "fbtypes" : [
+  [ 0, 0, 0, 2, 1, 1 ],
+  [ 0, 0, 0, 2, null, null ]]
 }
 }

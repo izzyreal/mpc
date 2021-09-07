@@ -3,7 +3,6 @@
 #include <lcdgui/LayeredScreen.hpp>
 
 #include <disk/DiskController.hpp>
-#include <disk/ProgramLoader.hpp>
 
 #include <observer/Observable.hpp>
 
@@ -24,7 +23,7 @@ class Hardware;
 }
 
 namespace mpc::disk {
-class Stores;
+class DiskDevices;
 class AbstractDisk;
 }
 
@@ -59,7 +58,6 @@ namespace mpc {
 class Mpc
 : public moduru::observer::Observable {
 private:
-    std::unique_ptr<mpc::disk::ProgramLoader> programLoader;
     std::shared_ptr<lcdgui::LayeredScreen> layeredScreen;
     std::shared_ptr<controls::Controls> controls;
     std::shared_ptr<audiomidi::EventHandler> eventHandler;
@@ -97,6 +95,7 @@ public:
     std::weak_ptr<mpc::lcdgui::ScreenComponent> getActiveControls();
     std::shared_ptr<mpc::controls::GlobalReleaseControls> getReleaseControls();
     std::weak_ptr<hardware::Hardware> getHardware();
+    mpc::disk::DiskController* getDiskController();
     
 public:
     std::weak_ptr<sequencer::Sequencer> getSequencer();
@@ -111,18 +110,12 @@ public:
     mpc::audiomidi::MpcMidiInput* getMpcMidiInput(int i);
     
 public:
-    void loadProgram();
-    void importLoadedProgram();
-        
-public:
     std::weak_ptr<mpc::disk::AbstractDisk> getDisk();
-    std::weak_ptr<mpc::disk::Stores> getStores();
+    std::vector<std::shared_ptr<mpc::disk::AbstractDisk>> getDisks();
     
-public:
     Mpc();
     ~Mpc();
     
-public:
     static std::vector<char> akaiAsciiChar;
     static std::vector<std::string> akaiAscii;
     
@@ -279,7 +272,7 @@ private:
         "delete-sequence",
         "midi-monitor",
         "delete-all-files",
-        "vmpc-disk",
+        "vmpc-disks",
         "vmpc-settings",
         "vmpc-direct-to-disk-recorder",
         "vmpc-recording-finished",

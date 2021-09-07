@@ -48,6 +48,6 @@ namespace mpc::lcdgui::screens::window
 		void setSwing(int i);
 		
 	public:
-		void update(moduru::observer::Observable* observable, nonstd::any message);
+		void update(moduru::observer::Observable* observable, nonstd::any message) override;
 	};
 }

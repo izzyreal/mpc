@@ -15,8 +15,8 @@ DataWheel::DataWheel(mpc::Mpc& mpc)
 void DataWheel::turn(int increment)
 {
 	auto controls = mpc.getActiveControls().lock();
-	if (!mpc.getDisk().lock()->isBusy() && controls)
-		controls->turnWheel(increment);
+	
+    if (controls) controls->turnWheel(increment);
 
 	notifyObservers(increment);
 }

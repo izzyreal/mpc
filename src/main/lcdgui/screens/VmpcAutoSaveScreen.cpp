@@ -26,6 +26,9 @@ void VmpcAutoSaveScreen::function(int i)
         case 1:
             openScreen("vmpc-keyboard");
             break;
+        case 3:
+            openScreen("vmpc-disks");
+            break;
     }
 }
 

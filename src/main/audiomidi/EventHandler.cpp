@@ -38,8 +38,6 @@
 #include <mpc/MpcStereoMixerChannel.hpp>
 #include <mpc/MpcIndivFxMixerChannel.hpp>
 
-#include <file/File.hpp>
-
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;

@@ -26,21 +26,17 @@ namespace mpc::disk {
 namespace mpc::file::mid {
 	class MidiReader
 	{
+    public:
+        MidiReader(std::shared_ptr<std::istream>, std::weak_ptr<mpc::sequencer::Sequence> dest);
+        void parseSequence(mpc::Mpc&);
 
 	private:
-		std::unique_ptr<mpc::midi::MidiFile> midiFile;
+        static bool isInteger(std::string);
+
+        std::unique_ptr<mpc::midi::MidiFile> midiFile;
 		std::weak_ptr<mpc::sequencer::Sequence> dest;
 
-
-	public:
-		void parseSequence(mpc::Mpc& mpc);
-
-	private:
-		static bool isInteger(std::string s);
 		int getNumberOfNoteOns(int noteValue, std::vector<std::shared_ptr<mpc::midi::event::NoteOn>> allNotes);
 		int getNumberOfNotes(int noteValue, std::vector<std::shared_ptr<mpc::sequencer::NoteEvent>> allNotes);
-
-	public:
-		MidiReader(mpc::disk::MpcFile* file, std::weak_ptr<mpc::sequencer::Sequence> dest);
 	};
 }

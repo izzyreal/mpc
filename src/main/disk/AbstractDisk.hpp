@@ -1,62 +1,45 @@
 #pragma once
-#include <observer/Observable.hpp>
-#include <disk/device/Device.hpp>
 #include <disk/SoundSaver.hpp>
+#include <disk/AllLoader.hpp>
 
 #include <vector>
 #include <string>
 
-/*
- * Children of AbstractDisk provide a direct interface to the rest of the application to perform
- * file operations. These operations are mostly domain-specific implementations of create, read,
- * write and rename.
- *
- * Lower level functionality like opening file handles and reading from and writing to file streams
- * is delegated to the moduru::file library by the MpcFiles that AbstractDisk uses.
- */
+#include <mpc_types.hpp>
 
 namespace mpc { class Mpc; }
 
-namespace mpc::sequencer {
-class Sequence;
+namespace mpc::lcdgui::screens::window {
+class LoadASequenceScreen;
+class LoadAProgramScreen;
+class LoadApsFileScreen;
+class Mpc2000XlAllFileScreen;
 }
 
-namespace mpc::sampler {
-class Program;
-class Sound;
-}
+namespace mpc::sequencer { class Sequence; }
+
+namespace mpc::sampler { class Program; class Sound; }
 
 namespace mpc::disk {
+
 class MpcFile;
-class Store;
-}
-
-namespace mpc::disk {
+class Volume;
 
 class AbstractDisk
-: public moduru::observer::Observable
 {
-    
-private:
-    bool busy = false;
-    std::weak_ptr<Store> store;
-    std::unique_ptr<SoundSaver> soundSaver;
-    
 protected:
+    AbstractDisk(mpc::Mpc&);
+
     mpc::Mpc& mpc;
-    std::unique_ptr<mpc::disk::device::Device> device;
-    
-public:
     const std::vector<std::string> extensions{ "", "SND", "PGM", "APS", "MID", "ALL", "WAV", "SEQ", "SET" };
     std::vector<std::shared_ptr<MpcFile>> files;
     std::vector<std::shared_ptr<MpcFile>> allFiles;
     std::vector<std::shared_ptr<MpcFile>> parentFiles;
-    
+
+    virtual int getPathDepth() = 0;
+    virtual std::shared_ptr<MpcFile> newFile(const std::string& name) = 0;
+
 public:
-    static std::string formatFileSize(int size);
-    static std::string padFileName16(std::string s);
-    
-    bool renameSelectedFile(std::string s);
     bool deleteSelectedFile();
     
     std::vector<std::string> getFileNames();
@@ -65,40 +48,63 @@ public:
     
     std::shared_ptr<MpcFile> getFile(int i);
     std::shared_ptr<MpcFile> getFile(const std::string& fileName);
-    std::vector<std::shared_ptr<MpcFile>>& getFiles(); // filtered by extension
     std::vector<std::shared_ptr<MpcFile>>& getAllFiles();
     std::shared_ptr<MpcFile> getParentFile(int i);
-    std::vector<std::shared_ptr<MpcFile>>& getParentFiles();
     
-    void writeSound(std::weak_ptr<mpc::sampler::Sound>);
-    void writeWav(std::weak_ptr<mpc::sampler::Sound>);
-    void writeSound(std::weak_ptr<mpc::sampler::Sound>, std::weak_ptr<MpcFile>);
-    void writeWav(std::weak_ptr<mpc::sampler::Sound>, std::weak_ptr<MpcFile>);
-    void writeSequence(std::weak_ptr<mpc::sequencer::Sequence>, std::string fileName);
+    void writeSnd(std::shared_ptr<mpc::sampler::Sound>, std::string fileName);
+    void writeWav(std::shared_ptr<mpc::sampler::Sound>, std::string fileName);
+    void writeMid(std::shared_ptr<mpc::sequencer::Sequence>, std::string fileName);
+    void writePgm(std::shared_ptr<mpc::sampler::Program>, const std::string& fileName);
+    void writeAps(const std::string& fileName);
+    void writeAll(const std::string& fileName);
+    
     bool checkExists(std::string fileName);
-    void writeProgram(std::weak_ptr<mpc::sampler::Program> program, const std::string& fileName);
-    std::weak_ptr<mpc::disk::Store> getStore();
+    bool deleteRecursive(std::weak_ptr<MpcFile>);
     
-    void setBusy(bool);
-    bool isBusy();
-    void flush();
-    void close();
     bool isRoot();
     
+    virtual void flush() = 0;
+    virtual void close() = 0;
     virtual void initFiles() = 0;
-    virtual std::shared_ptr<MpcFile> newFile(const std::string& name) = 0;
     virtual std::string getDirectoryName() = 0;
     virtual bool moveBack() = 0;
     virtual bool moveForward(const std::string& directoryName) = 0;
     virtual bool deleteAllFiles(int dwGuiDelete) = 0;
     virtual bool newFolder(const std::string& newDirName) = 0;
-    virtual bool deleteDir(std::weak_ptr<MpcFile>) = 0;
     virtual std::string getAbsolutePath() = 0;
+    virtual std::string getTypeShortName() = 0;
+    virtual std::string getModeShortName() = 0;
+    virtual uint64_t getTotalSize() = 0;
+    virtual std::string getVolumeLabel() = 0;
+    virtual Volume& getVolume() = 0;
+    virtual void initRoot() = 0;
+
+private:
+    std::function<void(mpc_io_error e)> errorFunc;
+    std::unique_ptr<SoundSaver> soundSaver;
+    std::unique_ptr<AllLoader> allLoader;
+
+    file_or_error newFile2(const std::string& name);
+    file_or_error writeWav2(std::shared_ptr<mpc::sampler::Sound>, std::shared_ptr<MpcFile>);
+    file_or_error writeSnd2(std::shared_ptr<mpc::sampler::Sound>, std::shared_ptr<MpcFile>);
+    file_or_error writeMid2(std::shared_ptr<mpc::sequencer::Sequence>, std::shared_ptr<MpcFile>);
+    file_or_error writePgm2(std::shared_ptr<mpc::sampler::Program>, std::shared_ptr<MpcFile>);
+    file_or_error writeAps2(std::shared_ptr<MpcFile>);
+    file_or_error writeAll2(std::shared_ptr<MpcFile>);
+
+    friend class SoundLoader; // Temporary access to readWav2 and readSnd2 until a readWav/readSnd/etc interface is exposed
+    friend class mpc::lcdgui::screens::window::LoadASequenceScreen;
+    friend class mpc::lcdgui::screens::window::LoadAProgramScreen;
+    friend class mpc::lcdgui::screens::window::LoadApsFileScreen;
+    friend class mpc::lcdgui::screens::window::Mpc2000XlAllFileScreen;
     
-protected:
-    virtual int getPathDepth() = 0;
-    
-protected:
-    AbstractDisk(mpc::Mpc& mpc, std::weak_ptr<Store> store);    
+    sound_or_error readWav2(std::shared_ptr<MpcFile>);
+    sound_or_error readSnd2(std::shared_ptr<MpcFile>);
+    sequence_or_error readMid2(std::shared_ptr<MpcFile>);
+    void readPgm2(std::shared_ptr<MpcFile>);
+    void readAps2(std::shared_ptr<MpcFile>, std::function<void()> on_success);
+    void readAll2(std::shared_ptr<MpcFile>, std::function<void()> on_success);
+    sequences_or_error readSequencesFromAll2(std::shared_ptr<MpcFile>);
+
 };
 }

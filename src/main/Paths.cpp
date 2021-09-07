@@ -41,9 +41,9 @@ string Paths::storesPath()
 	return storesPath;
 }
 
-string Paths::defaultStorePath()
+string Paths::defaultLocalVolumePath()
 {
-    static auto storesPath = appDocumentsPath() + "Volumes" + sep + "MPC2000XL" + sep;
+    static auto storesPath = appDocumentsPath() + "Volumes" + sep + "MPC2000XL";
     return storesPath;
 }
 
@@ -67,6 +67,6 @@ string Paths::demoDataSrcPath()
 
 string Paths::demoDataDestPath()
 {
-    static auto demoDataPath = defaultStorePath() + "Demos" + sep;
+    static auto demoDataPath = defaultLocalVolumePath() + sep + "Demos" + sep;
     return demoDataPath;
 }

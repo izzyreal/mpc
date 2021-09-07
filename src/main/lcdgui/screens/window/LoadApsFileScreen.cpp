@@ -1,10 +1,9 @@
 #include "LoadApsFileScreen.hpp"
 
+#include <disk/AbstractDisk.hpp>
 #include <lcdgui/screens/LoadScreen.hpp>
-#include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
 using namespace mpc::lcdgui::screens::window;
-using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::lcdgui::screens;
 using namespace std;
 
@@ -22,19 +21,10 @@ void LoadApsFileScreen::function(int i)
 		break;
 	case 4:
 	{
+        std::function<void()> on_success = [&]() { openScreen("load"); };
 		auto loadScreen = mpc.screens->get<LoadScreen>("load");
-		try
-		{
-			apsLoader = make_unique<mpc::disk::ApsLoader>(mpc, loadScreen->getSelectedFile());
-		}
-		catch (const exception& e)
-		{
-			auto popupScreen = mpc.screens->get<PopupScreen>("popup");
-			popupScreen->setText("Wrong file format");
-			popupScreen->returnToScreenAfterInteraction("load");
-			mpc.getLayeredScreen().lock()->openScreen("popup");
-		}
-		break;
+        mpc.getDisk().lock()->readAps2(loadScreen->getSelectedFile(), on_success);
+        break;
 	}
 	}
 }

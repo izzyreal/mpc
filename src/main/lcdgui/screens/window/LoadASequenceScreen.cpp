@@ -2,15 +2,9 @@
 
 #include <disk/AbstractDisk.hpp>
 #include <disk/MpcFile.hpp>
-
-#include <file/mid/MidiReader.hpp>
-
 #include <lcdgui/screens/LoadScreen.hpp>
 
-#include <file/FileUtil.hpp>
-
 using namespace mpc::lcdgui::screens::window;
-using namespace moduru::file;
 using namespace moduru::lang;
 using namespace std;
 
@@ -21,44 +15,24 @@ LoadASequenceScreen::LoadASequenceScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void LoadASequenceScreen::open()
 {
-	auto newSeq = sequencer.lock()->createSeqInPlaceHolder().lock();
-	newSeq->init(2);
-
 	auto loadScreen = mpc.screens->get<LoadScreen>("load");
-	auto ext = FileUtil::splitName(loadScreen->getSelectedFileName())[1];
-
-	if (ext.compare("mid") == 0 || ext.compare("MID") == 0)
-	{
-
-		auto midiReader = mpc::file::mid::MidiReader(loadScreen->getSelectedFile().get(), newSeq);
-
-		midiReader.parseSequence(mpc);
-
-		auto usedSeqs = sequencer.lock()->getUsedSequenceIndexes();
-		int index;
-
-		for (index = 0; index < 99; index++)
-		{
-			bool contains = false;
-
-			for (int i : usedSeqs)
-			{
-				if (i == index)
-				{
-					contains = true;
-					break;
-				}
-			}
-
-			if (!contains)
-			{
-				break;
-			}
-		}
-
-		loadInto = index;
-	}
-
+    auto midFile = loadScreen->getSelectedFile();
+    sequence_or_error parsedMidFile = mpc.getDisk().lock()->readMid2(midFile);
+    
+    if (parsedMidFile.has_value())
+    {
+        auto usedSeqs = sequencer.lock()->getUsedSequenceIndexes();
+        int index;
+        
+        for (index = 0; index < 98; index++)
+        {
+            if (find(begin(usedSeqs), end(usedSeqs), index) == end(usedSeqs))
+                break;
+        }
+        
+        loadInto = index;
+    }
+    
 	displayLoadInto();
 	displayFile();
 }
@@ -68,9 +42,7 @@ void LoadASequenceScreen::turnWheel(int i)
 	init();
 	
 	if (param.compare("load-into") == 0)
-	{
 		setLoadInto(loadInto + i);
-	}
 }
 
 void LoadASequenceScreen::function(int i)
@@ -94,10 +66,9 @@ void LoadASequenceScreen::function(int i)
 void LoadASequenceScreen::setLoadInto(int i)
 {
 	if (i < 0 || i > 98)
-	{
 		return;
-	}
-	loadInto = i;
+
+    loadInto = i;
 	displayLoadInto();
 }
 
@@ -110,6 +81,5 @@ void LoadASequenceScreen::displayLoadInto()
 void LoadASequenceScreen::displayFile()
 {
 	auto s = sequencer.lock()->getPlaceHolder().lock();
-	findLabel("file").lock()->setText("File:" + StrUtil::toUpper(mpc::disk::AbstractDisk::padFileName16(s->getName())) + ".MID");
-	return;
+	findLabel("file").lock()->setText("File:" + StrUtil::toUpper(s->getName()) + ".MID");
 }

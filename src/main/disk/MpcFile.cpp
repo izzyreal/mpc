@@ -1,213 +1,229 @@
 #include <disk/MpcFile.hpp>
 
-#include <file/Directory.hpp>
 #include <lang/StrUtil.hpp>
-#include <file/FsNode.hpp>
-#include <file/File.hpp>
+#include <file/FileUtil.hpp>
+
+#include <fat/AkaiFatLfnDirectoryEntry.hpp>
 
 #include <Logger.hpp>
 
 using namespace mpc::disk;
 using namespace moduru::lang;
 using namespace moduru::file;
-using namespace std;
+using namespace akaifat::fat;
 
 MpcFile::MpcFile(nonstd::any fileObject)
 {
-	//raw = dynamic_cast< ::de::waldheinz::fs::fat::AkaiFatLfnDirectoryEntry* >(fileObject) != nullptr;
-	try {
-        if (fileObject.has_value() && fileObject.type() == typeid(shared_ptr<File>))
+    if (!fileObject.has_value()) throw std::runtime_error("No object provided to MpcFile");
+    
+    if (fileObject.type() == typeid(fs::path))
+    {
+        fs_path = nonstd::any_cast<fs::path>(fileObject);
+    }
+    else if (fileObject.type() == typeid(std::shared_ptr<AkaiFatLfnDirectoryEntry>))
+    {
+        rawEntry = nonstd::any_cast<std::shared_ptr<AkaiFatLfnDirectoryEntry>>(fileObject);
+        raw = true;
+    }
+    else throw std::runtime_error("Invalid object provided to MpcFile");
+}
+
+std::vector<std::shared_ptr<MpcFile>> MpcFile::listFiles()
+{
+    if (!isDirectory()) return {};
+    
+    std::vector<std::shared_ptr<MpcFile>> result;
+    
+    if (raw) {
+        auto dir = std::dynamic_pointer_cast<AkaiFatLfnDirectory>(rawEntry->getDirectory());
+        
+        for (auto& kv : dir->akaiNameIndex)
+            result.emplace_back(std::make_shared<MpcFile>(kv.second));
+    } else {
+        std::error_code ec;
+        for(auto pathIterator = fs::directory_iterator(fs_path, ec);
+            pathIterator != fs::directory_iterator(); pathIterator.increment(ec))
         {
-            stdEntry = nonstd::any_cast<shared_ptr<File>>(fileObject);
-        }
-        else if (fileObject.has_value() && fileObject.type() == typeid(shared_ptr<FsNode>))
-        {
-            stdEntry = nonstd::any_cast<shared_ptr<FsNode>>(fileObject);
+            if(!ec) {
+                auto& path = pathIterator->path();
+                std::string filename = path.filename();
+                
+                if (filename.length() > 0 && filename[0] == '.')
+                    continue;
+                
+                result.emplace_back(std::make_shared<MpcFile>(path));
+            }
         }
     }
-	catch (const exception& e) {
-		string msg = e.what();
-        MLOG("Failed to cast fileObject to shared_ptr<FsNode>: " + msg);
-	}
-	//rawEntry = raw ? java_cast< ::de::waldheinz::fs::fat::AkaiFatLfnDirectoryEntry* >(fileObject) : static_cast< ::de::waldheinz::fs::fat::AkaiFatLfnDirectoryEntry* >(nullptr);
+    
+    return result;
+}
+
+std::string MpcFile::getNameWithoutExtension()
+{
+    if (raw) {
+        auto name = rawEntry->getAkaiName();
+        auto extIndex = name.find_last_of('.');
+        if (extIndex != std::string::npos) {
+            name = name.substr(0, extIndex);
+        }
+        return name;
+    }
+    else {
+        return fs_path.stem().string();
+    }
+}
+
+std::string MpcFile::getExtension()
+{
+    if (raw) {
+        auto ext = rawEntry->getAkaiName();
+        auto extIndex = ext.find_last_of('.');
+        if (extIndex != std::string::npos) {
+            ext = ext.substr(extIndex);
+        } else ext = "";
+        return ext;
+    }
+    else {
+        if (fs_path.has_extension())
+            return fs_path.extension().string();
+        return "";
+    }
 }
 
 bool MpcFile::isDirectory()
 {
-	if (raw) {
-		//return rawEntry->isDirectory();
-		return false;
-	}
-	else {
-		auto dir = dynamic_pointer_cast<Directory>(getFsNode().lock());
-		if (dir) {
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
+    if (raw)
+        return rawEntry->isDirectory();
+    else
+        return fs::is_directory(fs_path);
 }
 
-string MpcFile::getName()
+bool MpcFile::isFile()
 {
-	if (raw) {
-		//return rawEntry->getName()->replaceAll(u" "_j, u""_j)->toUpperCase();
-		return "";
-	}
-	else
-		return stdEntry->getName();
+    return !isDirectory();
 }
 
-bool MpcFile::setName(string s)
+std::string MpcFile::getName()
 {
-	if (raw) {
-		try {
-			//rawEntry->setName(npc(s)->toUpperCase());
-			return true;
-		}
-		catch (exception e) {
-			return false;
-		}
-	}
-	else {
-		return stdEntry->renameTo(s);
-	}
+    if (raw)
+        return rawEntry->getAkaiName();
+    else
+        return fs_path.filename();
+}
+
+bool MpcFile::setName(std::string s)
+{
+    if (raw) {
+        try {
+            rawEntry->setName(s);
+            return true;
+        }
+        catch (const std::exception&) {
+            return false;
+        }
+    }
+    else {
+        fs::path new_path = fs_path;
+        new_path.replace_filename(s);
+        std::error_code ec;
+        fs::rename(fs_path, new_path, ec);
+        return ec.value() == 0;
+    }
 }
 
 int MpcFile::length()
 {
-	if (raw) {
-		auto length = 0;
-		try {
-			//length = static_cast< int >(npc(entry->getFsNode())->getLength());
-		}
-		catch (exception e) {
-			//e->printStackTrace();
-			return 0;
-		}
-		return length;
-	}
-	else
-		return stdEntry->getLength();
+    if (isDirectory()) return 0;
+    if (raw) {
+        try {
+            return rawEntry->getFile()->getLength();
+        }
+        catch (std::exception&) {}
+        return 0;
+    }
+    else
+        return fs::file_size(fs_path);
 }
 
-void MpcFile::setFileData(std::vector<char>* data)
+void MpcFile::setFileData(std::vector<char>& data)
 {
-	if (raw) {
-        /*
-		auto toWrite = data->size();
-		auto sectorSize = 512;
-		auto written = 0;
-		auto sector = 0;
-		auto block = vector<char>(sectorSize);
-		try {
-			while (toWrite - written > sectorSize) {
-				::java::lang::System::arraycopy(data, sector * sectorSize, block, 0, sectorSize);
-				npc(entry->getFsNode())->write(static_cast< int >(sector++ * sectorSize), ::java::nio::ByteBuffer::wrap(block));
-				written += sectorSize;
-			}
-			auto remaining = toWrite - written;
-			block = ::int8_tArray(remaining);
-			::java::lang::System::arraycopy(data, sector * sectorSize, block, 0, remaining);
-			npc(entry->getFsNode())->write(static_cast< int >(sector * sectorSize), ::java::nio::ByteBuffer::wrap(block));
-			npc(entry->getFsNode())->flush();
-		} catch (::java::lang::Exception* e) {
-			e->printStackTrace();
-		}
-		*/
-	}
-	else {
-		dynamic_pointer_cast<moduru::file::File>(stdEntry)->setData(data);
-	}
+    if (raw) {
+        ByteBuffer bb(data);
+        auto f = rawEntry->getFile();
+        f->setLength(data.size());
+        f->write(0, bb);
+        f->flush();
+    }
+    else {
+        auto ostream = getOutputStream();
+        ostream->write(&data[0], data.size());
+    }
+}
+
+bool MpcFile::exists()
+{
+    if (raw) {
+        return rawEntry->isValid();
+    }
+    else {
+        return fs::exists(fs_path);
+    }
 }
 
 bool MpcFile::del()
 {
-	if (raw) {
-		try {
-			//rawEntry->getParent()->remove(rawEntry->getName());
-			return true;
-		}
-		catch (exception e) {
-			//e->printStackTrace();
-			return false;
-		}
-	}
-	else {
-		return stdEntry->del();
-	}
-}
-
-weak_ptr<moduru::file::FsNode> MpcFile::getFsNode()
-{
-    //if(raw)
-      //  return RawDisk::entryToFile(rawEntry);
-    //else
-        return stdEntry;
-}
-
-weak_ptr<moduru::file::File> MpcFile::getFile() {
-	return dynamic_pointer_cast<moduru::file::File>(stdEntry);
-}
-
-/*
-de::waldheinz::fs::fat::AkaiFatLfnDirectoryEntry* MpcFile::getEntry()
-{
-    if(!raw)
-        return nullptr;
-
-    return rawEntry;
-}
-*/
-
-vector<char> MpcFile::getBytes()
-{
-	vector<char> bytes;
-    if(raw) {
-        int const toRead = length();
-		int const sectorSize = 512;
-		vector<char> byteList;
-        auto sector = 0;
-        auto read = 0;
-        /*
-		auto bb = ByteBuffer::allocate(sectorSize);
+    if (raw) {
         try {
-            while (toRead - read > sectorSize) {
-                npc(bb)->clear();
-                npc(entry->getFsNode())->read(static_cast< int >(sector++ * sectorSize), bb);
-                npc(bb)->position(0);
-                for (int i = 0; i < sectorSize; i++) 
-                                        npc(byteList)->add(::java::lang::Byte::valueOf(npc(bb)->get()));
-
-                read += sectorSize;
-            }
-            auto const remaining = toRead - read;
-            bb = ::java::nio::ByteBuffer::allocate(remaining);
-            npc(entry->getFsNode())->read(static_cast< int >(sector * sectorSize), bb);
-            npc(bb)->position(0);
-            for (int i = 0; i < remaining; i++) 
-                                npc(byteList)->add(::java::lang::Byte::valueOf(npc(bb)->get()));
-
-        } catch (::java::io::IOException* e) {
-            e->printStackTrace();
+            rawEntry->getParent()->remove(rawEntry->getName());
+            return true;
         }
-        for (int i = 0; i < bytes->length; i++) 
-                        (*bytes)[i] = (npc(java_cast< ::java::lang::Byte* >(npc(byteList)->get(i))))->byteValue();
-
-		*/
-        return bytes;
+        catch (const std::exception&) {
+            return false;
+        }
     }
-
-    try {
-		bytes = vector<char>(length());
-		dynamic_pointer_cast<moduru::file::File>(stdEntry)->getData(&bytes);
-    } catch (exception e) {
-		MLOG("Exception while getting file bytes: " + string(e.what()));
+    else {
+        return fs::remove(fs_path);
     }
+}
+
+std::vector<char> MpcFile::getBytes()
+{
+    std::vector<char> bytes;
+    
+    if (raw) {
+        try {
+            ByteBuffer bb(length());
+            rawEntry->getFile()->read(0, bb);
+            bb.flip();
+            while (bb.hasRemaining()) bytes.emplace_back(bb.get());
+        } catch (const std::exception& e) {
+            MLOG("Exception while getting file bytes: " + std::string(e.what()));
+        }
+    }
+    else {
+        auto istream = getInputStream();
+        bytes.resize(length());
+        istream->read(&bytes[0], length());
+    }
+    
     return bytes;
 }
 
-bool MpcFile::isStd() {
-	return stdEntry != nullptr;
+std::shared_ptr<std::istream> MpcFile::getInputStream()
+{
+    if (raw) {
+        return std::dynamic_pointer_cast<akaifat::fat::FatFile>(rawEntry->getFile())->getInputStream();
+    } else {
+        return std::make_shared<std::ifstream>(std::move(FileUtil::ifstreamw(fs_path, std::ios::in | std::ios::binary)));
+    }
+}
+
+std::shared_ptr<std::ostream> MpcFile::getOutputStream()
+{
+    if (raw) {
+        return std::dynamic_pointer_cast<akaifat::fat::FatFile>(rawEntry->getFile())->getOutputStream();
+    } else {
+        return std::make_shared<std::ofstream>(std::move(FileUtil::ofstreamw(fs_path, std::ios::out | std::ios::binary)));
+    }
 }

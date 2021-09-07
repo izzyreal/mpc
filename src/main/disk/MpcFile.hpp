@@ -1,10 +1,14 @@
 #pragma once
 
+#include <mpc_fs.hpp>
 #include <thirdp/any.hpp>
+
+#include <fat/AkaiFatLfnDirectoryEntry.hpp>
 
 #include <vector>
 #include <string>
 #include <memory>
+#include <iostream>
 
 /*
  * An MpcFile contains either an AkaiFatLongFileNameDirectoryEntry or a moduru::file::FileSystemNode.
@@ -15,34 +19,34 @@
  * and deleting directories, etc.
  */
 
-namespace moduru::file
-{
-class FsNode;
-class File;
-}
+namespace mpc::disk {
 
-namespace mpc::disk
-{
-class MpcFile
-{
+class StdDisk;
+
+class MpcFile {
     
 private:
     bool raw = false;
-    //::de::waldheinz::fs::fat::AkaiFatLfnDirectoryEntry* rawEntry{};
-    std::shared_ptr<moduru::file::FsNode> stdEntry;
+    std::shared_ptr<akaifat::fat::AkaiFatLfnDirectoryEntry> rawEntry;
+    fs::path fs_path;
     
+    friend class StdDisk;
+        
 public:
-    bool isStd();
     bool isDirectory();
+    bool isFile();
+    bool exists();
     std::string getName();
     bool setName(std::string s);
     int length();
-    void setFileData(std::vector<char>* data);
+    void setFileData(std::vector<char>& data);
     bool del();
-    std::weak_ptr<moduru::file::FsNode> getFsNode();
-    std::weak_ptr<moduru::file::File> getFile();
-    //::de::waldheinz::fs::fat::AkaiFatLfnDirectoryEntry* getEntry();
     std::vector<char> getBytes();
+    std::vector<std::shared_ptr<MpcFile>> listFiles();
+    std::string getNameWithoutExtension();
+    std::string getExtension();
+    std::shared_ptr<std::istream> getInputStream();
+    std::shared_ptr<std::ostream> getOutputStream();
     
     MpcFile(nonstd::any a);
     

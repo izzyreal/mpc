@@ -77,7 +77,7 @@ void TrimScreen::function(int f)
 	case 0:
 	{
 		sampler.lock()->sort();
-		mpc.getLayeredScreen().lock()->openScreen("popup");
+		openScreen("popup");
 		auto popupScreen = mpc.screens->get<PopupScreen>("popup");
 		popupScreen->setText("Sorting by " + sampler.lock()->getSoundSortingTypeName());
 		popupScreen->returnToScreenAfterMilliSeconds("trim", 200);

@@ -25,28 +25,16 @@ const int LOOP_ENABLED_INDEX = 38; // 1 byte, 1 if true
 const int BEAT_COUNT_INDEX = 39; // 1 byte
 const int SAMPLE_RATE_INDEX = 40; // 2 byte unsigned short
 
-std::ifstream snd_init_ifstream(const std::string& path)
-{
-    auto result = moduru::file::FileUtil::ifstreamw(path.c_str(), std::ios::in | std::ios::binary);
-    result.unsetf(std::ios_base::skipws);
-    return result;
-}
-
-void snd_read_bytes(std::ifstream& stream, const std::vector<char>& bytes, const int maxLength)
+void snd_read_bytes(std::shared_ptr<std::istream> stream, const std::vector<char>& bytes, const int maxLength)
 {
     auto byteCountToRead = std::min((int)bytes.size(), maxLength);
-    stream.read((char*)(&bytes[0]), byteCountToRead);
+    stream->read((char*)(&bytes[0]), byteCountToRead);
 }
 
-std::string snd_get_string(std::ifstream& stream, const int maxLength)
+std::string snd_get_string(std::shared_ptr<std::istream> stream, const int maxLength)
 {
-    std::vector<char> buffer(17);
+    std::vector<char> buffer(maxLength);
     snd_read_bytes(stream, buffer, maxLength);
-
-    if (buffer.size() > maxLength)
-    {
-        buffer = std::vector<char>(buffer.begin(), buffer.begin() + maxLength);
-    }
 
     for (int i = 0; i < buffer.size(); i++)
     {
@@ -60,16 +48,15 @@ std::string snd_get_string(std::ifstream& stream, const int maxLength)
     return std::string(buffer.begin(), buffer.end());
 }
 
-uint16_t snd_get_unsigned_short_LE(std::ifstream& stream)
+uint16_t snd_get_unsigned_short_LE(std::shared_ptr<std::istream> stream)
 {
-    unsigned char buffer[2];
-    stream >> buffer[0];
-    stream >> buffer[1];
-    return static_cast<uint16_t>((buffer[1] << 8) | buffer[0]);
+    char buffer[2];
+    stream->read(buffer, 2);
+    return static_cast<uint16_t>(( (buffer[1] & 0xFF) << 8) | (buffer[0] & 0xFF) );
 }
 
 
-int snd_get_LE(std::ifstream& stream, int numBytes)
+int snd_get_LE(std::shared_ptr<std::istream> stream, int numBytes)
 {
 
     if (numBytes < 1 || numBytes > 4) {
@@ -79,35 +66,28 @@ int snd_get_LE(std::ifstream& stream, int numBytes)
     int pos = 0;
     char buffer[4];
 
-    for (int i = 0; i < numBytes; i++) {
-        stream >> buffer[i];
-    }
+    stream->read(buffer, numBytes);
 
     numBytes--;
     pos = numBytes;
 
     int val = buffer[pos] & 255;
 
-    for (auto b = 0; b < numBytes; b++) {
+    for (auto b = 0; b < numBytes; b++)
         val = (val << 8) + (buffer[--pos] & 255);
-    }
 
     return val;
 }
 
-char snd_get_char(std::ifstream& stream)
+char snd_get_char(std::shared_ptr<std::istream> stream)
 {
-    char result;
-    stream >> result;
-    return result;
+    char buf[1];
+    stream->read(buf, 1);
+    return *buf;
 }
 
-bool snd_read_header(std::ifstream& stream, int& sampleRate, int& validBits, int& numChannels, int& numFrames)
-{
-    stream.seekg(0, stream.end);
-    auto tell = stream.tellg();
-    stream.seekg(0, stream.beg);
-    
+bool snd_read_header(std::shared_ptr<std::istream> stream, int& sampleRate, int& validBits, int& numChannels, int& numFrames)
+{    
     auto sndId = snd_get_string(stream, 2);
     
     if (strcmp(sndId.c_str(), ID) != 0) {
@@ -143,9 +123,4 @@ bool snd_read_header(std::ifstream& stream, int& sampleRate, int& validBits, int
     }
 
     return true;
-}
-
-void snd_close(std::ifstream& stream)
-{
-    stream.close();
 }

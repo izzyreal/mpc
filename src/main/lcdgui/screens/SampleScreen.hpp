@@ -26,7 +26,7 @@ namespace mpc::lcdgui::screens
 		SampleScreen(mpc::Mpc& mpc, const int layerIndex);
 		void open() override;
 		void close() override;
-		void update(moduru::observer::Observable* observable, nonstd::any message);
+		void update(moduru::observer::Observable* observable, nonstd::any message) override;
 
 	private:
 		std::map<int, int> vuPosToDb{ { 0, -63 }, { 1, -59 }, { 2, -55 }, { 3, -51 }, { 4 , -47}, { 5 , -43}, { 6 , -39}, { 7 , -35}, { 8 , -34}, { 9 , -33}, { 10, -31}, { 11, -29}, { 12, -27}, { 13, -25}, { 14, -23}, { 15, -21}, { 16, -19}, { 17, -17}, { 18, -15}, { 19, -14}, { 20, -13}, { 21, -12 }, { 22, -11}, { 23, -10}, { 24, -9 }, { 25, -8 }, { 26, -7 }, { 27, -6 }, { 28, -5 }, { 29, -4 }, { 30, -3 }, { 31, -2 }, { 32, -1 }, { 33, 0  } };

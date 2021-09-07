@@ -1,6 +1,5 @@
 #pragma once
 
-#include <thread>
 #include <memory>
 #include <vector>
 #include <string>
@@ -21,26 +20,13 @@ namespace mpc::disk
 {
 class ProgramLoader
 {
-private:
-    mpc::Mpc& mpc;
-    std::thread loadProgramThread;
-    std::weak_ptr<mpc::sampler::Program> result;
-    
-    std::weak_ptr<MpcFile> file;
-    bool replace = false;
-    
-private:
-    void loadProgram(const int replaceIndex);
-    static void static_loadProgram(void* this_p, const int replaceIndex);
-    
-    void loadSound(const std::string& soundFileName, const std::string& soundName, const std::string& ext, std::weak_ptr<MpcFile> soundFile, std::vector<int>* soundsDestIndex, const bool replace, const int loadSoundIndex);
-    void showPopup(std::string name, std::string ext, int sampleSize);
-    void notFound(std::string soundFileName, std::string ext);
-    
 public:
-    std::weak_ptr<mpc::sampler::Program> get();
+    static std::shared_ptr<mpc::sampler::Program> loadProgram(mpc::Mpc&, std::shared_ptr<mpc::disk::MpcFile>, const int replaceIndex);
     
-    ProgramLoader(mpc::Mpc&, std::weak_ptr<MpcFile>, const int replaceIndex);
-    ~ProgramLoader();
+private:
+    static void loadSound(mpc::Mpc&, const std::string& soundFileName, const std::string& soundName, const std::string& ext, std::shared_ptr<MpcFile> soundFile, std::vector<int>* soundsDestIndex, const bool replace, const int loadSoundIndex);
+    static void showPopup(mpc::Mpc&, std::string name, std::string ext, int sampleSize);
+    static void notFound(mpc::Mpc&, std::string soundFileName, std::string ext);
+
 };
 }

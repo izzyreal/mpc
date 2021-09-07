@@ -74,7 +74,6 @@
 #include <synth/SynthChannelServices.hpp>
 
 // moduru
-#include <file/File.hpp>
 #include <file/FileUtil.hpp>
 #include <lang/StrUtil.hpp>
 

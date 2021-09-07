@@ -28,10 +28,10 @@ PgmToProgramConverter::PgmToProgramConverter(weak_ptr<MpcFile> _file, weak_ptr<S
 {
     auto file = _file.lock();
     
-	if (!file->getFsNode().lock()->exists())
+	if (!file->exists())
 		throw invalid_argument("File does not exist");
 
-	reader = new mpc::file::pgmreader::ProgramFileReader(file.get());
+	reader = new mpc::file::pgmreader::ProgramFileReader(file);
 	
 	if (!reader->getHeader()->verifyFirstTwoBytes())
 		throw invalid_argument("PGM first 2 bytes are incorrect");

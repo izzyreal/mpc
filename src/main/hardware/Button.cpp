@@ -20,8 +20,8 @@ void Button::push()
 {
 	auto ls = mpc.getLayeredScreen().lock();
 
-	if (mpc.getDisk().lock()->isBusy() && ls->getCurrentScreenName().compare("cant-find-file") != 0)
-		return;
+//	if (mpc.getDisk().lock()->isBusy() && ls->getCurrentScreenName().compare("cant-find-file") != 0)
+//		return;
 
 	auto controls = ls->findScreenComponent().lock();
 	
@@ -169,9 +169,11 @@ void Button::push()
 }
 
 void Button::release() {
-	if (mpc.getDisk().lock()->isBusy()) return;
-	auto c = mpc.getReleaseControls();
-	if (label.compare("shift") == 0) {
+//	if (mpc.getDisk().lock()->isBusy()) return;
+	
+    auto c = mpc.getReleaseControls();
+	
+    if (label.compare("shift") == 0) {
 		c->shift();
 	}
 	else if (label.compare("erase") == 0) {

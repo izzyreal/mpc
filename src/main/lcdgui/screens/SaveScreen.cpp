@@ -40,6 +40,7 @@ void SaveScreen::function(int i)
     switch (i)
     {
         case 0:
+            mpc.getDisk().lock()->initFiles();
             openScreen("load");
             break;
         case 2:

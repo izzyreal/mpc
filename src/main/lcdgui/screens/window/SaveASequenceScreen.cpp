@@ -56,7 +56,7 @@ void SaveASequenceScreen::function(int i)
 		
 		auto seq = sequencer.lock()->getActiveSequence().lock();
 		
-		mpc.getDisk().lock()->writeSequence(seq, fileName);
+		mpc.getDisk().lock()->writeMid(seq, fileName);
 		openScreen("save");
 		break;
 	}

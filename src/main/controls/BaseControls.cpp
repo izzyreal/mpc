@@ -188,14 +188,6 @@ void BaseControls::function(int i)
                     auto directoryScreen = mpc.screens->get<DirectoryScreen>("directory");
                     ls.lock()->setPreviousScreenName(directoryScreen->previousScreenName);
                 }
-                
-                if (ls.lock()->getPreviousScreenName().compare("load") == 0)
-                {
-                    auto loadScreen = mpc.screens->get<LoadScreen>("load");
-                    
-                    if (loadScreen->fileLoad >= mpc.getDisk().lock()->getFiles().size())
-                        loadScreen->fileLoad = 0; // Can we avoid this? Who's leaving fileLoad in a bad state?
-                }
             }
             
             if (ls.lock()->getFocusedLayerIndex() == 1 || ls.lock()->getFocusedLayerIndex() == 2 || ls.lock()->getFocusedLayerIndex() == 3)
@@ -408,11 +400,6 @@ void BaseControls::numpad(int i)
                     break;
                 
                 disk->initFiles();
-                
-                auto loadScreen = mpc.screens->get<LoadScreen>("load");
-                
-                if (loadScreen->fileLoad + 1 > (int)(disk->getFiles().size()))
-                    loadScreen->fileLoad = (int)(disk->getFiles().size() - 1); // Same here, can we avoid this?
                 
                 ls.lock()->openScreen("load");
                 break;

@@ -1,8 +1,6 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
-#include <file/all/AllParser.hpp>
-
 namespace mpc::lcdgui::screens {
 class SaveScreen;
 }
@@ -11,14 +9,15 @@ namespace mpc::lcdgui::screens::window {
 class NameScreen;
 }
 
+namespace mpc::lcdgui::screens::dialog {
+class FileExistsScreen;
+}
+
 namespace mpc::lcdgui::screens::window
 {
 class SaveAllFileScreen
 : public mpc::lcdgui::ScreenComponent
 {
-    
-private:
-    std::unique_ptr<mpc::file::all::AllParser> allParser;
     
 public:
     void turnWheel(int i) override;
@@ -34,6 +33,7 @@ private:
     
     friend class NameScreen;
     friend class mpc::lcdgui::screens::SaveScreen;
+    friend class mpc::lcdgui::screens::dialog::FileExistsScreen;
     
 };
 }

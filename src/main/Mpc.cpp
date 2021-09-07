@@ -1,3 +1,5 @@
+#include <mpc_fs.hpp>
+
 #include "Mpc.hpp"
 
 #include <lcdgui/Component.hpp>
@@ -31,52 +33,35 @@
 #include <hardware/Led.hpp>
 
 #include <lcdgui/Screens.hpp>
-#include <lcdgui/screens/LoadScreen.hpp>
-#include <lcdgui/screens/window/LoadAProgramScreen.hpp>
-
-#include <file/Directory.hpp>
 
 #include <string>
 
 using namespace mpc;
 using namespace mpc::lcdgui;
-using namespace mpc::lcdgui::screens;
-using namespace mpc::lcdgui::screens::window;
-using namespace moduru::file;
-
-#ifdef _WIN32
-#include <filesystem>
-namespace fs = std::filesystem;
-#else
-#include <thirdp/filesystem.hpp>
-namespace fs = ghc::filesystem;
-#endif
-
-using namespace std;
 
 Mpc::Mpc()
 {
-    vector<string> requiredPaths {
+    std::vector<std::string> requiredPaths {
         Paths::appDocumentsPath(),
+        Paths::appConfigHome(),
         Paths::configPath(),
         Paths::storesPath(),
-        Paths::defaultStorePath(),
+        Paths::defaultLocalVolumePath(),
         Paths::recordingsPath()
     };
-    
+
     for (auto& p : requiredPaths) {
-        Directory dir(p);
-        if (!dir.exists())
-            dir.create();
+        if (!fs::exists(p))
+            fs::create_directories(p);
     }
-    
+
 	moduru::Logger::l.setPath(mpc::Paths::logFilePath());
 
 #ifndef __linux__
     auto demoSrc = Paths::demoDataSrcPath();
     auto demoDest = Paths::demoDataDestPath();
 
-	if (!Directory(demoDest).exists())
+	if (!fs::exists(demoDest))
 	{
 		try
 		{
@@ -85,7 +70,7 @@ Mpc::Mpc()
 		}
 		catch (std::exception& e)
 		{
-			string errorMsg = e.what();
+            std::string errorMsg = e.what();
 			MLOG("An error occurred while copying demo data from " + demoSrc + " to " + demoDest);
 		}
 	}
@@ -95,27 +80,27 @@ Mpc::Mpc()
 	}
 #endif
 
-	hardware = make_shared<hardware::Hardware>(*this);
-	screens = make_shared<Screens>(*this);
-	layeredScreen = make_shared<lcdgui::LayeredScreen>(*this);
+	hardware = std::make_shared<hardware::Hardware>(*this);
+	screens = std::make_shared<Screens>(*this);
+	layeredScreen = std::make_shared<lcdgui::LayeredScreen>(*this);
 }
 
 void Mpc::init(const int sampleRate, const int inputCount, const int outputCount)
 {
-	diskController = make_unique<mpc::disk::DiskController>(*this);
-	
-	sequencer = make_shared<mpc::sequencer::Sequencer>(*this);
+	diskController = std::make_unique<mpc::disk::DiskController>(*this);
+
+	sequencer = std::make_shared<mpc::sequencer::Sequencer>(*this);
 	MLOG("Sequencer created");
 
-	sampler = make_shared<mpc::sampler::Sampler>(*this);
+	sampler = std::make_shared<mpc::sampler::Sampler>(*this);
 	MLOG("Sampler created");
 
-	mpcMidiInputs = vector<mpc::audiomidi::MpcMidiInput*>{ new mpc::audiomidi::MpcMidiInput(*this, 0), new mpc::audiomidi::MpcMidiInput(*this, 1) };
+	mpcMidiInputs = std::vector<mpc::audiomidi::MpcMidiInput*>{ new mpc::audiomidi::MpcMidiInput(*this, 0), new mpc::audiomidi::MpcMidiInput(*this, 1) };
 
 	/*
 	* AudioMidiServices requires sequencer to exist.
 	*/
-	audioMidiServices = make_shared<mpc::audiomidi::AudioMidiServices>(*this);
+	audioMidiServices = std::make_shared<mpc::audiomidi::AudioMidiServices>(*this);
 	MLOG("AudioMidiServices created");
 
 	sequencer->init();
@@ -131,10 +116,10 @@ void Mpc::init(const int sampleRate, const int inputCount, const int outputCount
     sampler->init();
 	MLOG("Sampler initialized");
 
-	eventHandler = make_shared<mpc::audiomidi::EventHandler>(*this);
+	eventHandler = std::make_shared<mpc::audiomidi::EventHandler>(*this);
 	MLOG("Eeventhandler created");
 
-	controls = make_shared<controls::Controls>(*this);
+	controls = std::make_shared<controls::Controls>(*this);
 
 	diskController->initDisks();
 
@@ -150,22 +135,22 @@ void Mpc::init(const int sampleRate, const int inputCount, const int outputCount
 	MLOG("Mpc is ready")
 }
 
-weak_ptr<controls::Controls> Mpc::getControls()
+std::weak_ptr<controls::Controls> Mpc::getControls()
 {
 	return controls;
 }
 
-weak_ptr<hardware::Hardware> Mpc::getHardware()
+std::weak_ptr<hardware::Hardware> Mpc::getHardware()
 {
 	return hardware;
 }
 
-weak_ptr<mpc::sequencer::Sequencer> Mpc::getSequencer()
+std::weak_ptr<mpc::sequencer::Sequencer> Mpc::getSequencer()
 {
     return sequencer;
 }
 
-weak_ptr<sampler::Sampler> Mpc::getSampler()
+std::weak_ptr<sampler::Sampler> Mpc::getSampler()
 {
     return sampler;
 }
@@ -177,12 +162,13 @@ ctoot::mpc::MpcSoundPlayerChannel* Mpc::getDrum(int i)
 	return dynamic_cast< ctoot::mpc::MpcSoundPlayerChannel*>(channel);
 }
 
-vector<ctoot::mpc::MpcSoundPlayerChannel*> Mpc::getDrums()
+std::vector<ctoot::mpc::MpcSoundPlayerChannel*> Mpc::getDrums()
 {
-	auto drums = vector<ctoot::mpc::MpcSoundPlayerChannel*>(4);
-	for (int i = 0; i < 4; i++) {
+    std::vector<ctoot::mpc::MpcSoundPlayerChannel*> drums(4);
+	
+    for (int i = 0; i < 4; i++)
 		drums[i] = getDrum(i);
-	}
+	
 	return drums;
 }
 
@@ -193,68 +179,46 @@ ctoot::mpc::MpcBasicSoundPlayerChannel* Mpc::getBasicPlayer()
 	return dynamic_cast< ctoot::mpc::MpcBasicSoundPlayerChannel*>(channel);
 }
 
-weak_ptr<audiomidi::AudioMidiServices> Mpc::getAudioMidiServices()
+std::weak_ptr<audiomidi::AudioMidiServices> Mpc::getAudioMidiServices()
 {
     return audioMidiServices;
 }
 
-weak_ptr<audiomidi::EventHandler> Mpc::getEventHandler() {
+std::weak_ptr<audiomidi::EventHandler> Mpc::getEventHandler() {
 	return eventHandler;
 }
 
-weak_ptr<lcdgui::LayeredScreen> Mpc::getLayeredScreen() {
+std::weak_ptr<lcdgui::LayeredScreen> Mpc::getLayeredScreen() {
 	return layeredScreen;
 }
 
-weak_ptr<lcdgui::ScreenComponent> Mpc::getActiveControls() {
+std::weak_ptr<lcdgui::ScreenComponent> Mpc::getActiveControls() {
 	return layeredScreen->findScreenComponent().lock();
 }
 
-shared_ptr<mpc::controls::GlobalReleaseControls> Mpc::getReleaseControls() {
+std::shared_ptr<mpc::controls::GlobalReleaseControls> Mpc::getReleaseControls() {
 	return controls->getReleaseControls();
 }
 
-weak_ptr<mpc::disk::AbstractDisk> Mpc::getDisk()
+std::weak_ptr<mpc::disk::AbstractDisk> Mpc::getDisk()
 {
-	return diskController->getDisk();
+	return diskController->getActiveDisk();
 }
 
-weak_ptr<mpc::disk::Stores> Mpc::getStores()
+std::vector<std::shared_ptr<mpc::disk::AbstractDisk>> Mpc::getDisks()
 {
-	return diskController->getStores();
+    return diskController->getDisks();
 }
 
-vector<char> Mpc::akaiAsciiChar { ' ', '!', '#', '$', '%', '&', '\'', '(', ')', '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '_', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '}' };
-vector<string> Mpc::akaiAscii { " ", "!", "#", "$", "%", "&", "'", "(", ")", "-", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "@", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "_", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "{", "}" };
-
-void Mpc::loadProgram()
-{
-	programLoader.reset();
-
-	auto loadScreen = screens->get<LoadScreen>("load");
-	auto loadAProgramScreen = screens->get<LoadAProgramScreen>("load-a-program");
-
-	controls->getControls()->init();
-	auto activePgm = controls->getControls()->mpcSoundPlayerChannel->getProgram();
-
-	programLoader = make_unique<mpc::disk::ProgramLoader>(*this, loadScreen->getSelectedFile(), loadAProgramScreen->loadReplaceSound ? activePgm : -1);
-}
-
-void Mpc::importLoadedProgram()
-{
-	auto t = sequencer->getActiveSequence().lock()->getTrack(sequencer->getActiveTrackIndex()).lock();
-	auto loadAProgramScreen = screens->get<LoadAProgramScreen>("load-a-program");
-
-	if (!loadAProgramScreen->clearProgramWhenLoading)
-		getDrum(t->getBus() - 1)->setProgram(sampler->getProgramCount() - 1);
-}
+std::vector<char> Mpc::akaiAsciiChar { ' ', '!', '#', '$', '%', '&', '\'', '(', ')', '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '_', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '}' };
+std::vector<std::string> Mpc::akaiAscii { " ", "!", "#", "$", "%", "&", "'", "(", ")", "-", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "@", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "_", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "{", "}" };
 
 ctoot::mpc::MpcMultiMidiSynth* Mpc::getMms()
 {
 	return audioMidiServices->getMms().lock().get();
 }
 
-weak_ptr<audiomidi::MpcMidiPorts> Mpc::getMidiPorts()
+std::weak_ptr<audiomidi::MpcMidiPorts> Mpc::getMidiPorts()
 {
 	return audioMidiServices->getMidiPorts();
 }
@@ -267,19 +231,14 @@ audiomidi::MpcMidiInput* Mpc::getMpcMidiInput(int i)
 void Mpc::setBank(int i)
 {
 	if (i == bank)
-	{
 		return;
-	}
-	
+
 	if (i < 0 || i > 3)
-	{
 		return;
-	}
 
 	bank = i;
 
-	
-	notifyObservers(string("bank"));
+	notifyObservers(std::string("bank"));
 
 	hardware->getLed("pad-bank-a").lock()->light(i == 0);
 	hardware->getLed("pad-bank-b").lock()->light(i == 1);
@@ -295,26 +254,20 @@ int Mpc::getBank()
 void Mpc::setPadAndNote(int pad, int note)
 {
 	if (pad < -1 || pad > 63 || note < 34 || note > 98)
-	{
 		return;
-	}
 
 	if (prevPad != pad && pad != -1)
-	{
 		prevPad = pad;
-	}
 
 	this->pad = pad;
 
 	if (note != 34)
-	{
 		prevNote = note;
-	}
 
 	this->note = note;
 
-	
-	notifyObservers(string("padandnote"));
+
+	notifyObservers(std::string("padandnote"));
 }
 
 int Mpc::getNote()
@@ -337,19 +290,23 @@ int Mpc::getPrevPad()
 	return prevPad;
 }
 
-string Mpc::getPreviousSamplerScreenName()
+std::string Mpc::getPreviousSamplerScreenName()
 {
 	return previousSamplerScreenName;
 }
 
-void Mpc::setPreviousSamplerScreenName(string s)
+void Mpc::setPreviousSamplerScreenName(std::string s)
 {
 	previousSamplerScreenName = s;
 }
 
-Mpc::~Mpc() {
-	MLOG("Entering Mpc destructor");
+mpc::disk::DiskController* Mpc::getDiskController()
+{
+    return diskController.get();
+}
 
+Mpc::~Mpc()
+{
 	mpc::nvram::NvRam::saveUserScreenValues(*this);
 	mpc::nvram::NvRam::saveVmpcSettings(*this);
 
@@ -363,8 +320,5 @@ Mpc::~Mpc() {
 		layeredScreen.reset();
 
 	if (audioMidiServices)
-	{
 		audioMidiServices->destroyServices();
-		MLOG("AudioMidiServices destroyed.");
-	}
 }

@@ -2,14 +2,17 @@
 
 #include <audiomidi/AudioMidiServices.hpp>
 #include <audiomidi/SoundPlayer.hpp>
+
 #include <disk/SoundLoader.hpp>
+#include <disk/AbstractDisk.hpp>
+#include <disk/MpcFile.hpp>
+#include <disk/Volume.hpp>
 
 #include <lcdgui/screens/window/DirectoryScreen.hpp>
 #include <lcdgui/screens/window/LoadASequenceScreen.hpp>
 #include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
-#include <disk/AbstractDisk.hpp>
-#include <disk/MpcFile.hpp>
+#include <nvram/VolumesPersistence.hpp>
 
 #include <file/File.hpp>
 #include <file/FileUtil.hpp>
@@ -30,19 +33,30 @@ LoadScreen::LoadScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void LoadScreen::open()
 {
+    if (ls.lock()->getPreviousScreenName() != "popup")
+        device = mpc.getDiskController()->activeDiskIndex;
+    
 	findField("directory").lock()->setLocation(200, 0);
 	displayView();
 
 	displayDirectory();
 	displayFile();
 	displaySize();
+    displayDevice();
+    displayType();
 
 	displayFreeSnd();
 	findLabel("freeseq").lock()->setText("  2640K");
 
 	auto splitFileName = StrUtil::split(getSelectedFileName(), '.');
 	auto playable = splitFileName.size() > 1 && (StrUtil::eqIgnoreCase(splitFileName[1], "snd") || StrUtil::eqIgnoreCase(splitFileName[1], "wav"));
-	ls.lock()->setFunctionKeysArrangement(playable ? 1 : 0);
+    
+    init();
+    
+    if (param == "device")
+        ls.lock()->setFunctionKeysArrangement(device == mpc.getDiskController()->activeDiskIndex ? 0 : 2);
+    else
+        ls.lock()->setFunctionKeysArrangement(playable ? 1 : 0);
 }
 
 void LoadScreen::function(int i)
@@ -64,6 +78,58 @@ void LoadScreen::function(int i)
 		break;
 	case 4:
 	{
+        if (param.compare("device") == 0)
+        {
+            if (mpc.getDiskController()->activeDiskIndex == device)
+                return;
+
+            auto& candidateVolume = mpc.getDisks()[device]->getVolume();
+            
+            if (candidateVolume.mode == DISABLED)
+            {
+                auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+                popupScreen->setText("Device is disabled in DISKS");
+                popupScreen->returnToScreenAfterMilliSeconds("load", 2000);
+                openScreen("popup");
+                return;
+            }
+            
+			auto oldIndex = mpc.getDiskController()->activeDiskIndex;
+
+            mpc.getDiskController()->activeDiskIndex = device;
+            auto newDisk = mpc.getDisk().lock();
+
+            fileLoad = 0;
+            
+			if (newDisk->getVolume().type== USB_VOLUME) {
+                
+                newDisk->initRoot();
+                
+                if (!newDisk->getVolume().volumeStream.is_open()) {
+					mpc.getDiskController()->activeDiskIndex = oldIndex;
+					auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+					popupScreen->setText("Error! Device seems in use");
+					popupScreen->returnToScreenAfterMilliSeconds("load", 2000);
+					openScreen("popup");
+					return;
+				}
+            }
+			
+            ls.lock()->setFunctionKeysArrangement(0);
+            
+			newDisk->initFiles();
+            
+            displayFile();
+            displaySize();
+            displayDirectory();
+            displayDevice();
+            displayType();
+            
+            mpc::nvram::VolumesPersistence::save(mpc);
+            
+            return;
+        }
+        
 		auto controls = mpc.getControls().lock();
 
 		if (controls->isF5Pressed())
@@ -74,13 +140,20 @@ void LoadScreen::function(int i)
 		controls->setF5Pressed(true);
 
 		auto file = getSelectedFile();
-
+        
 		if (!file->isDirectory())
 		{
-			
-			bool started = mpc.getAudioMidiServices().lock()->getSoundPlayer().lock()->start(file->getFile().lock()->getPath());
-			
-			auto name = file->getFsNode().lock()->getNameWithoutExtension();
+            
+            auto ext = FileUtil::splitName(file->getName())[1];
+            
+            bool isWav = StrUtil::eqIgnoreCase(ext, "wav");
+            bool isSnd = StrUtil::eqIgnoreCase(ext, "snd");
+
+            if (!isWav && !isSnd) return;
+                
+			bool started = mpc.getAudioMidiServices().lock()->getSoundPlayer().lock()->start(file->getInputStream(), isSnd ? SoundPlayerFileFormat::SND : SoundPlayerFileFormat::WAV);
+            
+			auto name = file->getNameWithoutExtension();
 
 			openScreen("popup");
 			auto popupScreen = mpc.screens->get<PopupScreen>("popup");
@@ -184,13 +257,13 @@ void LoadScreen::turnWheel(int i)
 	{
 		auto disk = mpc.getDisk().lock();
 		auto currentDir = disk->getDirectoryName();
-		auto parents = disk->getParentFiles();
+		auto parents = disk->getParentFileNames();
 	
 		int position = -1;
 
 		for (int j = 0; j < parents.size(); j++)
 		{
-			if (parents[j]->getName().compare(currentDir) == 0)
+			if (parents[j] == currentDir)
 			{
 				position = j;
 				break;
@@ -205,7 +278,7 @@ void LoadScreen::turnWheel(int i)
 			{
 				disk->initFiles();
 
-				if (disk->moveForward(parents[candidate]->getName()))
+				if (disk->moveForward(parents[candidate]))
 				{
 					disk->initFiles();
 					displayDirectory();
@@ -219,6 +292,17 @@ void LoadScreen::turnWheel(int i)
 			}
 		}
 	}
+    else if (param.compare("device") == 0)
+    {
+        if (device + i < 0 || device + i >= mpc.getDisks().size())
+            return;
+        
+        device += i;
+        displayDevice();
+        displayType();
+        ls.lock()->setFunctionKeysArrangement(mpc.getDiskController()->activeDiskIndex == device ? 0 : 2);
+        return;
+    }
 
 	auto splitFileName = StrUtil::split(getSelectedFileName(), '.');
 	auto playable = splitFileName.size() > 1 && (StrUtil::eqIgnoreCase(splitFileName[1], "snd") || StrUtil::eqIgnoreCase(splitFileName[1], "wav"));
@@ -349,8 +433,6 @@ void LoadScreen::setFileLoad(int i)
 
 void LoadScreen::loadSound()
 {
-    auto disk = mpc.getDisk().lock();
-    disk->setBusy(true);
     SoundLoader soundLoader(mpc, sampler.lock()->getSounds(), false);
     soundLoader.setPreview(true);
 
@@ -366,7 +448,6 @@ void LoadScreen::loadSound()
         
         MLOG("A problem occurred when trying to load " + getSelectedFileName() + ": " + string(exception.what()));
         MLOG(result.errorMessage);
-        disk->setBusy(false);
         openScreen("load");
     }
 
@@ -375,7 +456,6 @@ void LoadScreen::loadSound()
     if (!result.success)
     {
         sampler.lock()->deleteSound(sampler.lock()->getSoundCount() - 1);
-        disk->setBusy(false);
         openScreen("popup");
         popupScreen->setText(result.errorMessage);
         popupScreen->returnToScreenAfterMilliSeconds("load", 500);
@@ -392,13 +472,35 @@ void LoadScreen::loadSound()
         auto name = FileUtil::splitName(getSelectedFileName())[0];
         auto ext = FileUtil::splitName(getSelectedFileName())[1];
         popupScreen->setText("LOADING " + StrUtil::padRight(name, " ", 16) + "." + ext);
-     
-        int sleepTime = soundLoader.getSize() / 400;
-        if (sleepTime < 300) sleepTime = 300;
-        
-        popupScreen->returnToScreenAfterMilliSeconds("load-a-sound", sleepTime);
+             
+        popupScreen->returnToScreenAfterMilliSeconds("load-a-sound", 300);
     }
+}
 
-    // PopupScreen should have a std::function delayedAction; that does the below
-    disk->setBusy(false);
+void LoadScreen::displayDevice()
+{
+    auto dev = findChild<Field>("device").lock();
+    dev->setText(mpc.getDisks()[device]->getVolume().label);
+}
+
+void LoadScreen::displayType()
+{
+    auto type = findChild<Label>("type").lock();
+    type->setText(mpc.getDisks()[device]->getVolume().typeShortName());
+}
+
+void LoadScreen::up()
+{
+	init();
+    
+	if (param == "device")
+	{
+		device = mpc.getDiskController()->activeDiskIndex;
+		displayDevice();
+		auto splitFileName = StrUtil::split(getSelectedFileName(), '.');
+		auto playable = splitFileName.size() > 1 && (StrUtil::eqIgnoreCase(splitFileName[1], "snd") || StrUtil::eqIgnoreCase(splitFileName[1], "wav"));
+		ls.lock()->setFunctionKeysArrangement(playable ? 1 : 0);
+	}
+
+	ScreenComponent::up();
 }

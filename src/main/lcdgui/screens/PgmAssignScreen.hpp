@@ -23,7 +23,7 @@ namespace mpc::lcdgui::screens {
 		void openWindow() override;
 
 		PgmAssignScreen(mpc::Mpc& mpc, const int layerIndex);
-		void update(moduru::observer::Observable* o, nonstd::any arg);
+		void update(moduru::observer::Observable* o, nonstd::any arg) override;
 		void open() override;
 		void close() override;
 
