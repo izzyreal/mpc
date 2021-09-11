@@ -46,7 +46,7 @@ std::vector<std::shared_ptr<MpcFile>> MpcFile::listFiles()
         {
             if(!ec) {
                 auto& path = pathIterator->path();
-                std::string filename = path.filename();
+                std::string filename = path.filename().string();
                 
                 if (filename.length() > 0 && filename[0] == '.')
                     continue;
@@ -109,7 +109,7 @@ std::string MpcFile::getName()
     if (raw)
         return rawEntry->getAkaiName();
     else
-        return fs_path.filename();
+        return fs_path.filename().string();
 }
 
 bool MpcFile::setName(std::string s)
@@ -215,7 +215,7 @@ std::shared_ptr<std::istream> MpcFile::getInputStream()
     if (raw) {
         return std::dynamic_pointer_cast<akaifat::fat::FatFile>(rawEntry->getFile())->getInputStream();
     } else {
-        return std::make_shared<std::ifstream>(std::move(FileUtil::ifstreamw(fs_path, std::ios::in | std::ios::binary)));
+        return std::make_shared<std::ifstream>(std::move(FileUtil::ifstreamw(fs_path.string(), std::ios::in | std::ios::binary)));
     }
 }
 
@@ -224,6 +224,6 @@ std::shared_ptr<std::ostream> MpcFile::getOutputStream()
     if (raw) {
         return std::dynamic_pointer_cast<akaifat::fat::FatFile>(rawEntry->getFile())->getOutputStream();
     } else {
-        return std::make_shared<std::ofstream>(std::move(FileUtil::ofstreamw(fs_path, std::ios::out | std::ios::binary)));
+        return std::make_shared<std::ofstream>(std::move(FileUtil::ofstreamw(fs_path.string(), std::ios::out | std::ios::binary)));
     }
 }
