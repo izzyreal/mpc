@@ -43,7 +43,9 @@ namespace mpc::lcdgui::screens::window
 		int record = 0;
 		int sq = 0;
 		int song = 0;
-		std::string outputFolder = "DEFAULT";
+		
+        // Currently unused
+        std::string outputFolder = "DEFAULT";
 		bool offline = false;
 		bool splitLR = true;
 		int sampleRate = 0;
@@ -54,13 +56,11 @@ namespace mpc::lcdgui::screens::window
 		void setOffline(bool b);
 		void setSplitLR(bool b);
 		void setSampleRate(int rate);
-		void setOutputFolder(std::string s);
 
 		void displayRate();
 		void displaySong();
 		void displayOffline();
 		void displaySplitLR();
-		void displayOutputFolder();
 		void displayRecord();
 		void displaySq();
 		

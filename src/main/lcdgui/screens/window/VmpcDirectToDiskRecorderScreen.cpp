@@ -33,7 +33,6 @@ void VmpcDirectToDiskRecorderScreen::open()
 	displayRecord();
 	displaySong();
 	displayTime();
-	displayOutputFolder();
 	displayOffline();
 	displaySplitLR();
 	displayRate();
@@ -70,19 +69,6 @@ void VmpcDirectToDiskRecorderScreen::turnWheel(int i)
 	else if (param.compare("offline") == 0)
 	{
 		setOffline(i > 0);
-	}
-	else if (param.compare("output-folder") == 0)
-	{
-		auto nameScreen = mpc.screens->get<NameScreen>("name");
-		nameScreen->setName(outputFolder);
-		nameScreen->setNameLimit(8);
-        
-        auto renamer = [&](string& newName) {
-            outputFolder = newName;
-        };
-
-        nameScreen->setRenamerAndScreenToReturnTo(renamer, "vmpc-direct-to-disk-recorder");
-		openScreen("name");
 	}
 }
 
@@ -236,12 +222,6 @@ void VmpcDirectToDiskRecorderScreen::setSong(int i)
 	displaySong();
 }
 
-void VmpcDirectToDiskRecorderScreen::setOutputFolder(string s)
-{
-	outputFolder = s;
-	displayOutputFolder();
-}
-
 void VmpcDirectToDiskRecorderScreen::setOffline(bool b)
 {
 	offline = b;
@@ -291,11 +271,6 @@ void VmpcDirectToDiskRecorderScreen::displayOffline()
 void VmpcDirectToDiskRecorderScreen::displaySplitLR()
 {
 	findField("split-lr").lock()->setText(splitLR ? "YES" : "NO");
-}
-
-void VmpcDirectToDiskRecorderScreen::displayOutputFolder()
-{
-	findField("output-folder").lock()->setText(outputFolder);
 }
 
 void VmpcDirectToDiskRecorderScreen::displayRecord()
