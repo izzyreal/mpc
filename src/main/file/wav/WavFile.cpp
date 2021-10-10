@@ -139,6 +139,7 @@ WavFile WavFile::writeWavStream(std::shared_ptr<std::ostream> _ostream, int numC
 WavFile WavFile::readWavStream(std::shared_ptr<std::istream> _istream)
 {
     WavFile result;
+    result.numSampleLoops = 0;
     result.iStream = _istream;
     result.iStream->seekg(0, ios::end);
 
