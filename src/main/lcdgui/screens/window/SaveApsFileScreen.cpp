@@ -82,12 +82,7 @@ void SaveApsFileScreen::function(int i)
         }
         
 		disk->writeAps(apsFileName);
-        
-        auto popupScreen = mpc.screens->get<PopupScreen>("popup");
-        popupScreen->setText("Saving " + StrUtil::padRight(fileName, " ", 16) + ".APS");
-        popupScreen->returnToScreenAfterMilliSeconds("save", 200);
-        openScreen("popup");
-		break;
+        break;
 	}
 	}
 }

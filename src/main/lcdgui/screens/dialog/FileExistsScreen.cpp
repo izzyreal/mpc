@@ -76,10 +76,6 @@ void FileExistsScreen::function(int i)
 				disk->flush();
 				disk->initFiles();
                 disk->writeAps(apsFileName);
-                auto popupScreen = mpc.screens->get<PopupScreen>("popup");
-                popupScreen->setText("Saving " + StrUtil::padRight(nameScreen->getNameWithoutSpaces(), " ", 16) + ".APS");
-                popupScreen->returnToScreenAfterMilliSeconds("save", 400);
-                openScreen("popup");
 			}
 		}
 		else if (ls.lock()->getPreviousScreenName().compare("save-all-file") == 0)
@@ -95,11 +91,6 @@ void FileExistsScreen::function(int i)
 				disk->initFiles();
 
                 disk->writeAll(allFileName);
-
-                auto popupScreen = mpc.screens->get<PopupScreen>("popup");
-                popupScreen->setText("         Saving ...");
-                popupScreen->returnToScreenAfterMilliSeconds("save", 200);
-                openScreen("popup");
 			}
 		}
 		else if (ls.lock()->getPreviousScreenName().compare("save-a-sound") == 0)
@@ -149,11 +140,6 @@ void FileExistsScreen::function(int i)
                 }
                 
                 disk->writeAps(mpc::Util::getFileName(apsFileName));
-                
-                auto popupScreen = mpc.screens->get<PopupScreen>("popup");
-                popupScreen->setText("Saving " + StrUtil::padRight(newName, " ", 16) + ".APS");
-                popupScreen->returnToScreenAfterMilliSeconds("save", 400);
-                openScreen("popup");
             };
             
             nameScreen->setRenamerAndScreenToReturnTo(renamer, "");

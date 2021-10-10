@@ -7,6 +7,7 @@
 
 #include <disk/MpcFile.hpp>
 #include <disk/AbstractDisk.hpp>
+#include <disk/Volume.hpp>
 
 #include <audiomidi/AudioMidiServices.hpp>
 #include <audiomidi/SoundPlayer.hpp>
@@ -153,8 +154,15 @@ void DirectoryScreen::function(int f)
             if (!success)
             {
                 ls->openScreen("popup");
-                popupScreen->setText("Folder name exists !!");
+                
+                if (disk->getVolume().mode == MountMode::READ_ONLY) {
+                    popupScreen->setText("Disk is read only !!");
+                } else {
+                    popupScreen->setText("Folder name exists !!");
+                }
+                
                 popupScreen->returnToScreenAfterMilliSeconds("name", 1000);
+                ls->setPreviousScreenName("directory");
                 return;
             }
             

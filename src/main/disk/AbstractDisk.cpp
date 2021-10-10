@@ -271,8 +271,16 @@ void AbstractDisk::writeAps(const std::string& fileName)
 {
     auto writeApsFunc = [&](std::shared_ptr<MpcFile> f){ return writeAps2(f); };
     
+    auto onSuccess = [&](std::shared_ptr<MpcFile>) {
+        auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+        popupScreen->setText("Saving " + StrUtil::padRight(fileName, " ", 16) + ".APS");
+        popupScreen->returnToScreenAfterMilliSeconds("save", 400);
+        mpc.getLayeredScreen().lock()->openScreen("popup");
+    };
+    
     newFile2(fileName)
     .and_then(writeApsFunc)
+    .map(onSuccess)
     .map_error(errorFunc);
 }
 
@@ -280,8 +288,16 @@ void AbstractDisk::writeAll(const std::string& fileName)
 {
     auto writeAllFunc = [&](std::shared_ptr<MpcFile> f){ return writeAll2(f); };
     
+    auto onSuccess = [&](std::shared_ptr<MpcFile>) {
+        auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+        popupScreen->setText("         Saving ...");
+        popupScreen->returnToScreenAfterMilliSeconds("save", 400);
+        mpc.getLayeredScreen().lock()->openScreen("popup");
+    };
+    
     newFile2(fileName)
     .and_then(writeAllFunc)
+    .map(onSuccess)
     .map_error(errorFunc);
 }
 

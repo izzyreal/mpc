@@ -125,7 +125,7 @@ int LayeredScreen::openScreen(string screenName)
     if (focus)
         focus->loseFocus("");
 
-	previousScreenName = currentScreenName;
+    if (currentScreenName != "popup") previousScreenName = currentScreenName;
 	currentScreenName = screenName;
 
 	auto oldScreenComponent = getFocusedLayer().lock()->findScreenComponent().lock();

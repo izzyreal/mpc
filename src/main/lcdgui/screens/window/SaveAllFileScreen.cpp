@@ -75,12 +75,7 @@ void SaveAllFileScreen::function(int i)
 		}
 		
         disk->writeAll(allFileName);
-        
-        auto popupScreen = mpc.screens->get<PopupScreen>("popup");
-        popupScreen->setText("         Saving ...");
-        popupScreen->returnToScreenAfterMilliSeconds("save", 400);
-        openScreen("popup");
-		break;
+        break;
 	}
 	}
 }

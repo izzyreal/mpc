@@ -175,15 +175,9 @@ bool RawDisk::newFolder(const std::string& newDirName)
 
 std::shared_ptr<MpcFile> RawDisk::newFile(const std::string& newFileName)
 {
-	try {
-        std::string copy = StrUtil::toUpper(StrUtil::replaceAll(newFileName, ' ', "_"));
-        auto newEntry = std::dynamic_pointer_cast<AkaiFatLfnDirectoryEntry>(getDir()->addFile(copy));
-        return std::make_shared<MpcFile>(newEntry);
-    } catch (const std::exception& e) {
-        std::string msg = e.what();
-        MLOG("Couldn't add new raw file: " + msg);
-    }
-	return {};
+    std::string copy = StrUtil::toUpper(StrUtil::replaceAll(newFileName, ' ', "_"));
+    auto newEntry = std::dynamic_pointer_cast<AkaiFatLfnDirectoryEntry>(getDir()->addFile(copy));
+    return std::make_shared<MpcFile>(newEntry);
 }
 
 std::string RawDisk::getAbsolutePath()
