@@ -10,6 +10,7 @@
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/window/SaveASoundScreen.hpp>
 #include <lcdgui/screens/window/SaveAllFileScreen.hpp>
+#include <lcdgui/screens/window/SaveApsFileScreen.hpp>
 #include <lcdgui/screens/window/NameScreen.hpp>
 #include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
@@ -68,7 +69,9 @@ void FileExistsScreen::function(int i)
 		}
 		else if (ls.lock()->getPreviousScreenName().compare("save-aps-file") == 0)
 		{
-			auto apsFileName = mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) + ".APS";
+			auto saveApsFileScreen = mpc.screens->get<SaveApsFileScreen>("save-aps-file");
+			auto apsFileName = saveApsFileScreen->fileName + ".APS";
+
 			auto success = disk->getFile(apsFileName)->del();
 			
 			if (success)

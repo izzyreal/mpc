@@ -5,8 +5,8 @@ namespace mpc::lcdgui::screens {
 class SaveScreen;
 }
 
-namespace mpc::lcdgui::screens::window {
-    class NameScreen;
+namespace mpc::lcdgui::screens::dialog {
+    class FileExistsScreen;
 }
 
 namespace mpc::lcdgui::screens::window
@@ -25,13 +25,13 @@ public:
 private:
     const std::vector<std::string> apsSaveNames{ "APS ONLY", "WITH SOUNDS", "WITH .WAV" };
     
-    std::string fileName = "ALL_PROGRAM";
+    std::string fileName = "ALL_PGMS";
     
     void displayFile();
     void displaySave();
     void displayReplaceSameSounds();
     
-    friend class NameScreen;
     friend class mpc::lcdgui::screens::SaveScreen;
+    friend class mpc::lcdgui::screens::dialog::FileExistsScreen;
 };
 }
