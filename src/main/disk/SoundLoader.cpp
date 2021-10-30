@@ -9,7 +9,6 @@
 #include <sampler/Sound.hpp>
 
 #include <lang/StrUtil.hpp>
-#include <file/File.hpp>
 
 #include <cmath>
 

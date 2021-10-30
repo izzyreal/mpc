@@ -24,8 +24,6 @@
 #include <sequencer/SystemExclusiveEvent.hpp>
 #include <mpc/MpcSoundPlayerChannel.hpp>
 
-#include <file/File.hpp>
-
 #include <cmath>
 #include <lang/StrUtil.hpp>
 

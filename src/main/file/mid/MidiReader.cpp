@@ -32,7 +32,6 @@
 using namespace mpc::file::mid;
 using namespace mpc::midi::event;
 using namespace mpc::sequencer;
-using namespace moduru::file;
 
 MidiReader::MidiReader(std::shared_ptr<std::istream> istream, std::weak_ptr<Sequence> _dest)
 : dest (_dest)

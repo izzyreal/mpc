@@ -11,8 +11,6 @@
 
 #include <lang/StrUtil.hpp>
 
-#include <file/File.hpp>
-
 #include <stdexcept>
 
 #ifdef __linux__

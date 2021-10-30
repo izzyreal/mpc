@@ -25,7 +25,6 @@
 #include <mpc/MpcStereoMixerChannel.hpp>
 #include <mpc/MpcIndivFxMixerChannel.hpp>
 
-#include <file/File.hpp>
 #include <lang/StrUtil.hpp>
 
 #include <thirdp/libsamplerate/samplerate.h>
