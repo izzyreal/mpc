@@ -1,4 +1,4 @@
-## v0.4.0 (7-11-2021)
+## v0.4.0 (14-11-2021)
 * Installers installs standalone and plugins
 * Self-contained, portable binaries with [new file locations](https://vmpcdocs.izmar.nl/install.html#file-locations)
 * User guide at https://vmpcdocs.izmar.nl
