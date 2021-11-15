@@ -31,7 +31,7 @@ namespace mpc::sequencer {
 		void start(float sampleRate);
 		void startMetronome(int sampleRate);
 		void work(int nFrames) override;
-		void setEnabled(bool b) override {};
+		void setEnabled(bool) override {};
 		int getEventFrameOffset(int tick);
 		void stop();
 		bool isRunning();
