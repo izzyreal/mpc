@@ -1,3 +1,25 @@
+## v0.4.0 (14-11-2021)
+* Installers installs standalone and plugins
+* Self-contained, portable binaries with [new file locations](https://vmpcdocs.izmar.nl/install.html#file-locations)
+* User guide at https://vmpcdocs.izmar.nl
+* [Raw USB volume support](https://vmpcdocs.izmar.nl/vmpc_specific_settings.html#configuring-usb-disk-devices-in-the-disks-tab)
+* Fix AU/VST3 crashes on MacOS when the UI is closed
+* Better error handling when loading/saving
+* Fix bug when changing DRUM in MAIN screen
+* Fix bug when setting next sequence to below 1
+* Fix incorrect sound index assignment crashes when encountering missing SND/WAV files in APS/PGM files
+* Fix crash when loading ALL file with sysex/mixer events
+* Various fixes to custom file names when saving APS, ALL, etc.
+* MIDI in respects 16 LEVELS mode
+* Display waveform of very short samples correctly
+* Show popup when trying to load unsupported/invalid SND/WAV
+* Numeric keys are clickable with the mouse
+* Data wheel, slider and rec gain/main volume knobs are mouse-wheel controllable
+* Fix crash when receiving unassigned MIDI notes from external MIDI controller
+* Self-recovering demo beats on Windows and MacOS (if you remove them, they will be restored anew)
+* Fixed a bug when loading WAV files without loops
+* Fixed a bug when saving and replacing an existing APS file
+
 ## v0.3.1 (7-3-2021)
 * Native M1 included in MacOS universal binary
 * Support for variable sized buffers, i.e. improved FL Studio support
