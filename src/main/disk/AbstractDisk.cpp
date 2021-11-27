@@ -70,6 +70,7 @@ errorFunc ([&](mpc_io_error e){
 
 std::shared_ptr<MpcFile> AbstractDisk::getFile(int i)
 {
+    if (i >= files.size()) return {};
     return files[i];
 }
 
@@ -522,6 +523,8 @@ sound_or_error AbstractDisk::readSnd2(std::shared_ptr<MpcFile> f)
 
 sequence_or_error AbstractDisk::readMid2(std::shared_ptr<MpcFile> f)
 {
+    if (!f) return tl::make_unexpected(mpc_io_error{"Empty MpcFile passed to AbstractDisk::readMid2"});
+    
     std::string msg;
     
     try {

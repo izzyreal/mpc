@@ -31,10 +31,9 @@ void LoadASequenceScreen::open()
         }
         
         loadInto = index;
+        displayFile();
     }
-    
-	displayLoadInto();
-	displayFile();
+    displayLoadInto();
 }
 
 void LoadASequenceScreen::turnWheel(int i)
