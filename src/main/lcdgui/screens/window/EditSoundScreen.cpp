@@ -48,7 +48,7 @@ void EditSoundScreen::open()
 	}
 
 	if (previous.compare("zone") == 0)
-		setEdit(8);
+		setEdit(9);
 	else if (previous.compare("loop") == 0)
 		setEdit(1);
 	else if (previous.compare("name") != 0)
@@ -56,7 +56,7 @@ void EditSoundScreen::open()
 
 	displayVariable();
 
-	if (edit == 8)
+	if (edit == 9)
 	{
 		displayEndMargin();
 		displayCreateNewProgram();
@@ -99,7 +99,7 @@ void EditSoundScreen::displayEdit()
         findLabel("create-new-program").lock()->Hide(true);
         findField("create-new-program").lock()->Hide(true);
     }
-    else if (edit == 2)
+    else if (edit == 2 || edit == 3)
     {
         findBackground().lock()->setName("edit-empty");
 		findField("new-name").lock()->Hide(false);
@@ -115,55 +115,7 @@ void EditSoundScreen::displayEdit()
         findLabel("create-new-program").lock()->Hide(true);
         findField("create-new-program").lock()->Hide(true);
     }
-    else if (edit == 3)
-    {
-        findBackground().lock()->setName("edit-empty");
-		findField("new-name").lock()->Hide(false);
-        findLabel("new-name").lock()->Hide(false);
-        findField("ratio").lock()->Hide(true);
-        findLabel("ratio").lock()->Hide(true);
-        findField("preset").lock()->Hide(true);
-        findLabel("preset").lock()->Hide(true);
-        findField("adjust").lock()->Hide(true);
-        findLabel("adjust").lock()->Hide(true);
-        findLabel("end-margin").lock()->Hide(true);
-        findField("end-margin").lock()->Hide(true);
-        findLabel("create-new-program").lock()->Hide(true);
-        findField("create-new-program").lock()->Hide(true);
-    }
-    else if (edit == 4)
-    {
-        findBackground().lock()->setName("edit-execute");
-		findField("new-name").lock()->Hide(true);
-        findLabel("new-name").lock()->Hide(true);
-        findField("ratio").lock()->Hide(true);
-        findLabel("ratio").lock()->Hide(true);
-        findField("preset").lock()->Hide(true);
-        findLabel("preset").lock()->Hide(true);
-        findField("adjust").lock()->Hide(true);
-        findLabel("adjust").lock()->Hide(true);
-        findLabel("end-margin").lock()->Hide(true);
-        findField("end-margin").lock()->Hide(true);
-        findLabel("create-new-program").lock()->Hide(true);
-        findField("create-new-program").lock()->Hide(true);
-    }
-    else if (edit == 5)
-    {
-        findBackground().lock()->setName("edit-execute");
-		findField("new-name").lock()->Hide(true);
-        findLabel("new-name").lock()->Hide(true);
-        findField("ratio").lock()->Hide(true);
-        findLabel("ratio").lock()->Hide(true);
-        findField("preset").lock()->Hide(true);
-        findLabel("preset").lock()->Hide(true);
-        findField("adjust").lock()->Hide(true);
-        findLabel("adjust").lock()->Hide(true);
-        findLabel("end-margin").lock()->Hide(true);
-        findField("end-margin").lock()->Hide(true);
-        findLabel("create-new-program").lock()->Hide(true);
-        findField("create-new-program").lock()->Hide(true);
-    }
-    else if (edit == 6)
+    else if (edit == 4 || edit == 5 || edit == 6 || edit == 8)
     {
         findBackground().lock()->setName("edit-execute");
         findField("new-name").lock()->Hide(true);
@@ -196,7 +148,7 @@ void EditSoundScreen::displayEdit()
         findField("create-new-program").lock()->Hide(true);
         displayVariable();
     }
-    else if(edit == 8)
+    else if(edit == 9)
     {
         findBackground().lock()->setName("edit-empty");
 		findField("new-name").lock()->Hide(true);
@@ -274,12 +226,12 @@ void EditSoundScreen::setNewName(string s)
 
 void EditSoundScreen::setEdit(int i)
 {
-    if (i < 0 || i > 8)
+    if (i < 0 || i > 9)
     {
         return;
     }
     
-    if (returnToScreenName.compare("zone") != 0 && i > 7)
+    if (returnToScreenName.compare("zone") != 0 && i > 8)
     {
         return;
     }
@@ -701,7 +653,51 @@ void EditSoundScreen::function(int j)
 				newSample->setName(newName);
 			}
 		}
-		else if (edit == 8)
+        else if (edit == 8)
+        {
+            auto source = sampler.lock()->getSound().lock();
+            auto start = sound->getStart();
+            auto end = sound->getEnd();
+            
+            if (returnToScreenName.compare("loop") == 0)
+            {
+                start = sound->getLoopTo();
+            }
+            else if (returnToScreenName.compare("zone") == 0)
+            {
+                const auto zone = zoneScreen->zone;
+                start = zoneScreen->getZoneStart(zone);
+                end = zoneScreen->getZoneEnd(zone);
+            }
+
+            float peak = 0.0f;
+            
+            for (int i = start; i < end; i++)
+            {
+                float v = abs((*sound->getSampleData())[i]);
+                peak = max(peak, v);
+
+                if (!sound->isMono()) {
+                    v = (*sound->getSampleData())[(i + sound->getFrameCount())];
+                    peak = max(peak, v);
+                }
+            }
+            
+            peak = min(1.0f, peak);
+            
+            float factor = 1.0 / peak;
+
+            for (int i = start; i < end; i++)
+            {
+                (*sound->getSampleData())[i] *= factor;
+                if (!sound->isMono())
+                    (*sound->getSampleData())[(i + sound->getFrameCount())] *= factor;
+            }
+            
+            openScreen(returnToScreenName);
+            break;
+        }
+		else if (edit == 9)
 		{
 			auto source = sampler.lock()->getSound().lock();
 			auto zoneCount = zoneScreen->numberOfZones;
