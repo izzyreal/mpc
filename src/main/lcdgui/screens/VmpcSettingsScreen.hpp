@@ -27,12 +27,15 @@ namespace mpc::lcdgui::screens
         
 		int initialPadMapping = 0;
         int _16LevelsEraseMode = 0;
+        int autoConvertWavs = 0;
 		
         void setInitialPadMapping(int i);
         void set16LevelsEraseMode(int i);
+        void setAutoConvertWavs(int i);
 		
         void displayInitialPadMapping();
         void display16LevelsEraseMode();
+        void displayAutoConvertWavs();
 		
 		friend class mpc::sampler::Pad;
 		friend class mpc::nvram::NvRam;

@@ -587,11 +587,15 @@
 },
 "vmpc-settings":
 {
- "labels" : [ "Initial pad mapping : ", "16 levels erase mode: " ],
- "x" : [ 5, 5 ],
- "y" : [ 5, 16 ],
- "parameters" : [ "initial-pad-mapping", "16-levels-erase-mode" ],
- "tfsize" : [ 60, 108 ],
+ "labels" : [ "Initial pad mapping :", "16 levels erase mode:", "Auto-convert WAVs   :" ],
+ "x" : [ 5, 5, 5 ],
+ "y" : [ 5, 16, 27 ],
+ "parameters" : [
+  "initial-pad-mapping", [ "_", "_", "_", "16-levels-erase-mode" ],
+  "16-levels-erase-mode", [ "_", "_", "initial-pad-mapping", "auto-convert-wavs" ],
+  "auto-convert-wavs", [ "_", "_", "16-levels-erase-mode", "_" ]
+ ],
+ "tfsize" : [ 60, 108, 18 ],
  "fblabels" : [ "SETNGS", "KEYBRD", "AUTSAV", "DISKS", null, null ],
  "fbtypes" : [ 2, 0, 0, 0, null, null ]
 },
