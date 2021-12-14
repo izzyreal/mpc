@@ -9,7 +9,6 @@
 #include <nvram/NvRam.hpp>
 
 #include <disk/AbstractDisk.hpp>
-#include <disk/SoundLoader.hpp>
 
 #include <controls/Controls.hpp>
 

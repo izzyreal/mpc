@@ -9,17 +9,6 @@ using namespace std;
 
 using namespace moduru::file;
 
-WavFile::WavFile() 
-{
-	buffer = vector<char>(BUFFER_SIZE);
-}
-
-//WavFile::~WavFile()
-//{
-//    if (std::dynamic_pointer_cast<std::ifstream>(iStream))
-//        printf("yay");
-//}
-
 const int WavFile::BUFFER_SIZE;
 const int WavFile::FMT_CHUNK_ID;
 const int WavFile::DATA_CHUNK_ID;

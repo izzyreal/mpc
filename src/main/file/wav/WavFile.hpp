@@ -35,7 +35,7 @@ namespace mpc::file::wav {
 		const static int SMPTE_OFFSET = 0x20; //4 SMPTE Offset 0 - 0xFFFFFFFF
 		const static int NUM_SAMPLE_LOOPS = 0x1C; //4 Num Sample Loops 0 - 0xFFFFFFFF
 		const static int LIST_OF_SAMPLE_LOOPS_OFFSET = 0x24; // List of Sample Loops
-		std::vector<char> buffer;
+        std::vector<char> buffer = std::vector<char>(BUFFER_SIZE);
 		std::shared_ptr<std::istream> iStream;
 		std::shared_ptr<std::ostream> oStream;
 
@@ -93,10 +93,6 @@ namespace mpc::file::wav {
 		int writeFrames(std::vector<std::vector<float>>* sampleBuffer, int numFramesToWrite);
 		int writeFrames(std::vector<std::vector<float>>* sampleBuffer, int offset, int numFramesToWrite);
 		void close();
-
-	public:
-		WavFile();
-//        ~WavFile();
 
 	};
 }
