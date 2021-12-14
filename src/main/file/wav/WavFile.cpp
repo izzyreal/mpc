@@ -1,13 +1,6 @@
 #include "WavFile.hpp"
 
-#include <file/FileUtil.hpp>
-
-#include <Logger.hpp>
-
 using namespace mpc::file::wav;
-using namespace std;
-
-using namespace moduru::file;
 
 const int WavFile::BUFFER_SIZE;
 const int WavFile::FMT_CHUNK_ID;
@@ -130,11 +123,11 @@ WavFile WavFile::readWavStream(std::shared_ptr<std::istream> _istream)
     WavFile result;
     result.numSampleLoops = 0;
     result.iStream = _istream;
-    result.iStream->seekg(0, ios::end);
+    result.iStream->seekg(0, std::ios::end);
 
     auto fileSize = result.iStream->tellg();
 
-    result.iStream->seekg(0, ios::beg);
+    result.iStream->seekg(0, std::ios::beg);
     
     result.iStream->read(&result.buffer[0], 12);
     
@@ -195,7 +188,7 @@ WavFile WavFile::readWavStream(std::shared_ptr<std::istream> _istream)
             auto compressionCode = static_cast< int >(getLE(result.buffer, 0, 2));
 
             if (compressionCode != 1) {
-                string exc = "Compression Code " + to_string(compressionCode)+ " not supported";
+                std::string exc = "Compression Code " + std::to_string(compressionCode)+ " not supported";
                 throw std::invalid_argument(exc.c_str());
             }
 
@@ -292,7 +285,7 @@ WavFile WavFile::readWavStream(std::shared_ptr<std::istream> _istream)
     return result;
 }
 
-int WavFile::getLE(vector<char>& buffer, int pos, int numBytes)
+int WavFile::getLE(std::vector<char>& buffer, int pos, int numBytes)
 {
 	numBytes--;
 	pos += numBytes;
@@ -302,7 +295,7 @@ int WavFile::getLE(vector<char>& buffer, int pos, int numBytes)
 	return val;
 }
 
-void WavFile::putLE(int val, vector<char>& buffer, int pos, int numBytes)
+void WavFile::putLE(int val, std::vector<char>& buffer, int pos, int numBytes)
 {
 	for (auto b = 0; b < numBytes; b++) {
 		buffer[pos] = static_cast<char>(val & 255);
@@ -348,137 +341,30 @@ int WavFile::readSample()
 	return val;
 }
 
-int WavFile::readFrames(vector<int>* sampleBuffer, int numFramesToRead) 
+int WavFile::readFrames(std::vector<float>* sampleBuffer, int numFramesToRead)
 {
-    return readFrames(sampleBuffer, 0, numFramesToRead);
+    int offset = 0;
+    
+    if (sampleBuffer->size() != numFramesToRead * numChannels) {
+        sampleBuffer->resize(numFramesToRead * numChannels);
+    }
+
+    for (auto f = 0; f < numFramesToRead; f++) {
+        if (frameCounter == numFrames)
+            return f;
+        for (auto c = 0; c < numChannels; c++) {
+            auto v = readSample();
+            (*sampleBuffer)[offset] = floatOffset + static_cast<double>(v) / floatScale;
+            offset++;
+        }
+        frameCounter++;
+    }
+    return numFramesToRead;
 }
 
-int WavFile::readFrames(vector<int>* sampleBuffer, int offset, int numFramesToRead)
+int WavFile::writeFrames(std::vector<float>* sampleBuffer, int numFramesToWrite)
 {
-	for (auto f = 0; f < numFramesToRead; f++) {
-		if (frameCounter == numFrames)
-			return f;
-
-		for (auto c = 0; c < numChannels; c++) {
-			(*sampleBuffer)[offset] = static_cast<int>(readSample());
-			offset++;
-		}
-		frameCounter++;
-	}
-	return numFramesToRead;
-}
-
-int WavFile::readFrames(vector<vector<int>>* sampleBuffer, int numFramesToRead) 
-{
-    return readFrames(sampleBuffer, 0, numFramesToRead);
-}
-
-int WavFile::readFrames(vector<vector<int>>* sampleBuffer, int offset, int numFramesToRead)
-{
-	for (auto f = 0; f < numFramesToRead; f++) {
-		if (frameCounter == numFrames)
-			return f;
-
-		for (auto c = 0; c < numChannels; c++)
-			(*sampleBuffer)[c][offset] = static_cast<int>(readSample());
-
-		offset++;
-		frameCounter++;
-	}
-	return numFramesToRead;
-}
-
-int WavFile::writeFrames(vector<int>* sampleBuffer, int numFramesToWrite) 
-{
-    return writeFrames(sampleBuffer, 0, numFramesToWrite);
-}
-
-int WavFile::writeFrames(vector<int>* sampleBuffer, int offset, int numFramesToWrite)
-{
-	for (auto f = 0; f < numFramesToWrite; f++) {
-		if (frameCounter == numFrames)
-			return f;
-
-		for (auto c = 0; c < numChannels; c++) {
-			writeSample((*sampleBuffer)[offset]);
-			offset++;
-		}
-		frameCounter++;
-	}
-	return numFramesToWrite;
-}
-
-int WavFile::writeFrames(vector<vector<int>>* sampleBuffer, int numFramesToWrite) 
-{
-    return writeFrames(sampleBuffer, 0, numFramesToWrite);
-}
-
-int WavFile::writeFrames(vector<vector<int>>* sampleBuffer, int offset, int numFramesToWrite)
-{
-	for (int f = 0; f < numFramesToWrite; f++) {
-		if (frameCounter == numFrames)
-			return f;
-
-		for (int c = 0; c < numChannels; c++)
-			writeSample((*sampleBuffer)[c][offset]);
-
-		offset++;
-		frameCounter++;
-	}
-	return numFramesToWrite;
-}
-
-int WavFile::readFrames(vector<float>* sampleBuffer, int numFramesToRead) 
-{
-    return readFrames(sampleBuffer, 0, numFramesToRead);
-}
-
-int WavFile::readFrames(vector<float>* sampleBuffer, int offset, int numFramesToRead)
-{
-	if (sampleBuffer->size() != numFramesToRead * numChannels) {
-		sampleBuffer->resize(numFramesToRead * numChannels);
-	}
-
-	for (auto f = 0; f < numFramesToRead; f++) {
-		if (frameCounter == numFrames)
-			return f;
-		for (auto c = 0; c < numChannels; c++) {
-			auto v = readSample();
-			(*sampleBuffer)[offset] = floatOffset + static_cast<double>(v) / floatScale;
-			offset++;
-		}
-		frameCounter++;
-	}
-	return numFramesToRead;
-}
-
-int WavFile::readFrames(vector<vector<float>>* sampleBuffer, int numFramesToRead) 
-{
-    return readFrames(sampleBuffer, 0, numFramesToRead);
-}
-
-int WavFile::readFrames(vector<vector<float>>* sampleBuffer, int offset, int numFramesToRead)
-{
-	for (auto f = 0; f < numFramesToRead; f++) {
-		if (frameCounter == numFrames)
-			return f;
-
-		for (auto c = 0; c < numChannels; c++)
-			(*sampleBuffer)[c][offset] = floatOffset + static_cast<double>(readSample()) / floatScale;
-
-		offset++;
-		frameCounter++;
-	}
-	return numFramesToRead;
-}
-
-int WavFile::writeFrames(vector<float>* sampleBuffer, int numFramesToWrite) 
-{
-    return writeFrames(sampleBuffer, 0, numFramesToWrite);
-}
-
-int WavFile::writeFrames(vector<float>* sampleBuffer, int offset, int numFramesToWrite) 
-{
+    int offset = 0;
     for (auto f = 0; f < numFramesToWrite; f++) {
         if(frameCounter == numFrames)
             return f;
@@ -492,26 +378,6 @@ int WavFile::writeFrames(vector<float>* sampleBuffer, int offset, int numFramesT
     return numFramesToWrite;
 }
 
-int WavFile::writeFrames(vector<vector<float>>* sampleBuffer, int numFramesToWrite) 
-{
-    return writeFrames(sampleBuffer, 0, numFramesToWrite);
-}
-
-int WavFile::writeFrames(vector<vector<float>>* sampleBuffer, int offset, int numFramesToWrite)
-{
-	for (auto f = 0; f < numFramesToWrite; f++) {
-		if (frameCounter == numFrames)
-			return f;
-
-		for (auto c = 0; c < numChannels; c++)
-			writeSample(static_cast<int>((floatScale * (floatOffset + (*sampleBuffer)[c][offset]))));
-
-		offset++;
-		frameCounter++;
-	}
-	return numFramesToWrite;
-}
-
 void WavFile::close()
 {
     if (bufferPointer > 0) {
@@ -522,6 +388,6 @@ void WavFile::close()
         oStream->write(buf, 1);
     }
     
-    auto ofStream = dynamic_pointer_cast<ofstream>(oStream);
+    auto ofStream = std::dynamic_pointer_cast<std::ofstream>(oStream);
     if (ofStream && ofStream->is_open()) ofStream->close();
 }
