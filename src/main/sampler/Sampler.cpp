@@ -621,6 +621,33 @@ void Sampler::process8Bit(vector<float>* fa)
 	}
 }
 
+void Sampler::resample(std::vector<float>& data, int sourceRate, std::shared_ptr<Sound> destSnd)
+{
+    float* srcArray = &data[0];
+
+    SRC_DATA srcData;
+    srcData.data_in = srcArray;
+    srcData.input_frames = data.size();
+    srcData.src_ratio = (double)(destSnd->getSampleRate()) / (double)(sourceRate);
+    
+    srcData.output_frames = (floor)(data.size() * srcData.src_ratio);
+
+    auto dest = destSnd->getSampleData();
+    dest->resize(srcData.output_frames);
+
+    float* destArray = &(*dest)[0];
+    srcData.data_out = destArray;
+
+    auto error = src_simple(&srcData, 0, 1);
+
+    if (error != 0)
+    {
+        const char* errormsg = src_strerror(error);
+        string errorStr(errormsg);
+        MLOG("libsamplerate error: " + errorStr);
+    }
+}
+
 weak_ptr<Sound> Sampler::createZone(weak_ptr<Sound> source, int start, int end, int endMargin)
 {
 	auto overlap = (int)(endMargin * source.lock()->getSampleRate() * 0.001);

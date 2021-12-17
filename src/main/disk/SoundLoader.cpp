@@ -40,7 +40,7 @@ void SoundLoader::setPreview(bool b)
     preview = b;
 }
 
-void SoundLoader::loadSound(shared_ptr<MpcFile> f, SoundLoaderResult& r)
+void SoundLoader::loadSound(shared_ptr<MpcFile> f, SoundLoaderResult& r, bool convertTo16Bit)
 {
     string soundFileName = f->getName();
     string extension = f->getExtension();
@@ -53,7 +53,7 @@ void SoundLoader::loadSound(shared_ptr<MpcFile> f, SoundLoaderResult& r)
     
     if (StrUtil::eqIgnoreCase(extension, ".wav"))
     {
-        sound = mpc.getDisk().lock()->readWav2(f);
+        sound = mpc.getDisk().lock()->readWav2(f, convertTo16Bit);
     }
     else if (StrUtil::eqIgnoreCase(extension, ".snd"))
     {

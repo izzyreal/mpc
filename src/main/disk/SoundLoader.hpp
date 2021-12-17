@@ -61,7 +61,7 @@ public:
     SoundLoader(mpc::Mpc& mpc, std::vector<std::weak_ptr<mpc::sampler::Sound>> sounds, bool replace);
 
     void setPartOfProgram(bool);
-    void loadSound(std::shared_ptr<MpcFile>, SoundLoaderResult&);
+    void loadSound(std::shared_ptr<MpcFile>, SoundLoaderResult&, bool convertTo16Bit);
     void setPreview(bool);
 
 private:

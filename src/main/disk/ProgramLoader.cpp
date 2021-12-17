@@ -144,10 +144,11 @@ void ProgramLoader::loadSound(mpc::Mpc& mpc, const std::string& soundFileName, c
     soundLoader.setPartOfProgram(true);
     showPopup(mpc, soundName, ext, soundFile->length());
     SoundLoaderResult soundLoaderResult;
+    bool convertTo16Bit = false;
 
     try
     {
-        soundLoader.loadSound(soundFile, soundLoaderResult);
+        soundLoader.loadSound(soundFile, soundLoaderResult, convertTo16Bit);
         
         if (soundLoaderResult.existingIndex != -1)
             (*soundsDestIndex)[loadSoundIndex] = soundLoaderResult.existingIndex;

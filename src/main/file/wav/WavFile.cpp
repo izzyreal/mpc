@@ -317,7 +317,7 @@ void WavFile::writeSample(int val)
 	}
 }
 
-int WavFile::readSample()
+int WavFile::readSample(bool convertTo16Bit)
 {
 	int val = 0;
 	for (auto b = 0; b < bytesPerSample; b++) {
@@ -338,23 +338,27 @@ int WavFile::readSample()
 		val += v << (b * 8);
 		bufferPointer++;
 	}
+    
+    if (bytesPerSample == 3 && convertTo16Bit) val = val >> 8;
+    else if (bytesPerSample == 4 && convertTo16Bit) val = val >> 16;
+    
 	return val;
 }
 
-int WavFile::readFrames(std::vector<float>* sampleBuffer, int numFramesToRead)
+int WavFile::readFrames(std::vector<float>& sampleBuffer, int numFramesToRead, bool convertTo16Bit)
 {
     int offset = 0;
     
-    if (sampleBuffer->size() != numFramesToRead * numChannels) {
-        sampleBuffer->resize(numFramesToRead * numChannels);
+    if (sampleBuffer.size() != numFramesToRead * numChannels) {
+        sampleBuffer.resize(numFramesToRead * numChannels);
     }
 
     for (auto f = 0; f < numFramesToRead; f++) {
         if (frameCounter == numFrames)
             return f;
         for (auto c = 0; c < numChannels; c++) {
-            auto v = readSample();
-            (*sampleBuffer)[offset] = floatOffset + static_cast<double>(v) / floatScale;
+            auto v = readSample(convertTo16Bit);
+            sampleBuffer[offset] = floatOffset + static_cast<double>(v) / floatScale;
             offset++;
         }
         frameCounter++;
@@ -362,7 +366,7 @@ int WavFile::readFrames(std::vector<float>* sampleBuffer, int numFramesToRead)
     return numFramesToRead;
 }
 
-int WavFile::writeFrames(std::vector<float>* sampleBuffer, int numFramesToWrite)
+int WavFile::writeFrames(std::vector<float>& sampleBuffer, int numFramesToWrite)
 {
     int offset = 0;
     for (auto f = 0; f < numFramesToWrite; f++) {
@@ -370,7 +374,7 @@ int WavFile::writeFrames(std::vector<float>* sampleBuffer, int numFramesToWrite)
             return f;
 
         for (auto c = 0; c < numChannels; c++) {
-            writeSample(static_cast< int >((floatScale * (floatOffset + (*sampleBuffer)[offset]))));
+            writeSample(static_cast<int>(floatScale * (floatOffset + sampleBuffer[offset])));
             offset++;
         }
         frameCounter++;
