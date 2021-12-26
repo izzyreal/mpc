@@ -1,3 +1,6 @@
+## v0.4.1 (26-12-2021)
+* [Normalize low volume sounds](https://vmpcdocs.izmar.nl/vmpc_specific_settings.html#normalize)
+
 ## v0.4.0 (14-11-2021)
 * Installers installs standalone and plugins
 * Self-contained, portable binaries with [new file locations](https://vmpcdocs.izmar.nl/install.html#file-locations)
