@@ -863,5 +863,10 @@
 {
  "fblabels": [ null, null, null, "STAY", "DISCRD", "SAVE" ],
  "fbtypes": [ null, null, null, 0, 1, 1 ]
+},
+"vmpc-convert-and-load-wav":
+{
+ "fblabels" : [ null, null, null, "CANCEL", "DO IT", null ],
+ "fbtypes" : [ null, null, null, 0, 1, null ]
 }
 }

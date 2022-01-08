@@ -111,6 +111,7 @@
 #include <lcdgui/screens/window/IgnoreTempoChangeScreen.hpp>
 #include <lcdgui/screens/window/LoopSongScreen.hpp>
 #include <lcdgui/screens/window/LoopSongScreen.hpp>
+#include <lcdgui/screens/window/VmpcConvertAndLoadWavScreen.hpp>
 
 #include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
 #include <lcdgui/screens/dialog/MidiMonitorScreen.hpp>
@@ -941,7 +942,11 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
     {
         screen = make_shared<MidiSwScreen>(mpc, layerIndex);
     }
-    
+    else if (screenName.compare("vmpc-convert-and-load-wav") == 0)
+    {
+        screen = make_shared<VmpcConvertAndLoadWavScreen>(mpc, layerIndex);
+    }
+
 	if (screen)
 	{
 		screen->findChild<Background>("").lock()->addChildren(children);

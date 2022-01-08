@@ -127,5 +127,5 @@ void NvRam::loadVmpcSettings(mpc::Mpc& mpc)
     if (bytes.size() > 4) audioMidiServices->setRecordLevel(bytes[4]);
     if (bytes.size() > 5) audioMidiServices->setMasterLevel(bytes[5]);
     if (bytes.size() > 6) mpc.getHardware().lock()->getSlider().lock()->setValue(bytes[6]);
-    if (bytes.size() > 7) vmpcSettingsScreen->_16LevelsEraseMode = bytes[7];
+    if (bytes.size() > 7) vmpcSettingsScreen->autoConvertWavs = bytes[7];
 }

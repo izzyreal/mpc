@@ -174,7 +174,8 @@ void LoadScreen::function(int i)
 		
 		if (StrUtil::eqIgnoreCase(ext, "snd") || StrUtil::eqIgnoreCase(ext, "wav"))
 		{
-			loadSound();
+            bool shouldBeConverted = false;
+			loadSound(shouldBeConverted);
 			return;
 		}
 		
@@ -430,22 +431,20 @@ void LoadScreen::setFileLoad(int i)
 	displaySize();
 }
 
-void LoadScreen::loadSound()
+void LoadScreen::loadSound(bool shouldBeConverted)
 {
     SoundLoader soundLoader(mpc, sampler.lock()->getSounds(), false);
     soundLoader.setPreview(true);
 
     SoundLoaderResult result;
-    
-    bool shouldBeConverted = true;
-    
+        
     try
     {
         soundLoader.loadSound(getSelectedFile(), result, shouldBeConverted);
     }
     catch (const exception& exception)
     {
-        sampler.lock()->deleteSound(sampler.lock()->getSoundCount() - 1);
+        sampler.lock()->deleteSound(sampler.lock()->getPreviewSound());
         
         MLOG("A problem occurred when trying to load " + getSelectedFileName() + ": " + string(exception.what()));
         MLOG(result.errorMessage);
@@ -457,12 +456,18 @@ void LoadScreen::loadSound()
     if (!result.success)
     {
         sampler.lock()->deleteSound(sampler.lock()->getSoundCount() - 1);
-        openScreen("popup");
-        popupScreen->setText(result.errorMessage);
-        popupScreen->returnToScreenAfterMilliSeconds("load", 500);
+        
+        if (result.canBeConverted) {
+            openScreen("vmpc-convert-and-load-wav");
+        } else {
+            openScreen("popup");
+            popupScreen->setText(result.errorMessage);
+            popupScreen->returnToScreenAfterMilliSeconds("load", 500);
+        }
+        
         return;
     }
-    
+        
     if (result.existingIndex != -1)
     {
         sampler.lock()->deleteSound(sampler.lock()->getSoundCount() - 1);
