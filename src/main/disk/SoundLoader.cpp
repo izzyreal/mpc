@@ -65,7 +65,7 @@ void SoundLoader::loadSound(shared_ptr<MpcFile> f, SoundLoaderResult& r, bool sh
             const auto bitDepth = wavFile.getValidBits();
             const auto sampleRate = wavFile.getSampleRate();
             
-            if (bitDepth == 24 || bitDepth == 32 || sampleRate > 48000) {
+            if (bitDepth == 24 || bitDepth == 32 || sampleRate > 44100) {
                 
                 auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
                 

@@ -111,7 +111,7 @@ bool wav_read_header(std::istringstream& stream, int& sampleRate, int& validBits
         return false;
     }
 
-    if (sampleRate < 11025 || sampleRate > 48000)
+    if (sampleRate < 11025 || sampleRate > 44100)
     {
         return false;
     }

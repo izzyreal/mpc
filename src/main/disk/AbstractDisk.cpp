@@ -436,20 +436,26 @@ sound_or_error AbstractDisk::readWav2(std::shared_ptr<MpcFile> f, bool shouldBeC
         auto inputStream = f->getInputStream();
         auto wavFile = WavFile::readWavStream(inputStream);
         
-        if (wavFile.getValidBits() != 16)
+        if (wavFile.getValidBits() != 16 && !shouldBeConverted)
         {
             wavFile.close();
             return tl::make_unexpected(mpc_io_error{ f->getName() + " is not a 16 bit .WAV file. " + std::to_string(wavFile.getValidBits()) + " .WAV files are not supported." });
         }
 
-        if (wavFile.getSampleRate() < 8000 || wavFile.getSampleRate() > 44100)
+        if ( (wavFile.getSampleRate() < 8000 || wavFile.getSampleRate() > 44100) && !shouldBeConverted)
         {
             wavFile.close();
             return tl::make_unexpected(mpc_io_error{ f->getName() + " has a sample rate of " + std::to_string(wavFile.getSampleRate()) + ". Sample rate has to be between 8000 and 44100." });
         }
         
         sound->setName(f->getNameWithoutExtension());
-        sound->setSampleRate(wavFile.getSampleRate());
+        
+        int sampleRate = wavFile.getSampleRate();
+        
+        if (sampleRate > 44100 && shouldBeConverted) sampleRate = 44100;
+        
+        sound->setSampleRate(sampleRate);
+        
         sound->setLevel(100);
         
         int numChannels = wavFile.getNumChannels();
@@ -471,6 +477,9 @@ sound_or_error AbstractDisk::readWav2(std::shared_ptr<MpcFile> f, bool shouldBeC
             for (int i = 1; i < interleaved.size(); i += 2)
                 sampleData->push_back(interleaved[i]);
         }
+        
+        if (wavFile.getSampleRate() > 44100 && shouldBeConverted)
+            mpc::sampler::Sampler::resample(*sampleData, wavFile.getSampleRate(), sound);
         
         sound->setMono(numChannels == 1);
         
