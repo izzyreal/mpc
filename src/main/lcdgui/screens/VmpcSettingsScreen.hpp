@@ -2,10 +2,9 @@
 #include <lcdgui/ScreenComponent.hpp>
 
 namespace mpc::sampler { class Pad; }
-
 namespace mpc::sequencer { class Track; }
-
 namespace mpc::nvram { class NvRam; }
+namespace mpc::disk { class SoundLoader; }
 
 namespace mpc::lcdgui::screens
 {
@@ -40,6 +39,7 @@ namespace mpc::lcdgui::screens
 		friend class mpc::sampler::Pad;
 		friend class mpc::nvram::NvRam;
         friend class mpc::sequencer::Track;
+        friend class mpc::disk::SoundLoader;
 
 	};
 }

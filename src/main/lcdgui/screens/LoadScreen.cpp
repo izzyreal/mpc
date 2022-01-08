@@ -437,11 +437,11 @@ void LoadScreen::loadSound()
 
     SoundLoaderResult result;
     
-    bool convertTo16Bit = true;
+    bool shouldBeConverted = true;
     
     try
     {
-        soundLoader.loadSound(getSelectedFile(), result, convertTo16Bit);
+        soundLoader.loadSound(getSelectedFile(), result, shouldBeConverted);
     }
     catch (const exception& exception)
     {

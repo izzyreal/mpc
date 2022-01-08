@@ -410,7 +410,24 @@ file_or_error AbstractDisk::writeAll2(std::shared_ptr<MpcFile> f)
     return tl::make_unexpected(mpc_io_error{"Could not write ALL file: " + msg});
 }
 
-sound_or_error AbstractDisk::readWav2(std::shared_ptr<MpcFile> f, bool convertTo16Bit)
+wav_or_error AbstractDisk::readWavMeta(std::shared_ptr<MpcFile> f)
+{
+    std::string msg;
+    
+    try {
+        auto inputStream = f->getInputStream();
+        auto wavFile = WavFile::readWavStream(inputStream);
+        return wavFile;
+    }
+    catch (const std::exception& e)
+    {
+        msg = e.what();
+    }
+        
+    return tl::make_unexpected(mpc_io_error{"Could not read WAV file: " + msg});
+}
+
+sound_or_error AbstractDisk::readWav2(std::shared_ptr<MpcFile> f, bool shouldBeConverted)
 {
     std::string msg;
     
@@ -441,12 +458,12 @@ sound_or_error AbstractDisk::readWav2(std::shared_ptr<MpcFile> f, bool convertTo
         
         if (numChannels == 1)
         {
-            wavFile.readFrames(*sampleData, wavFile.getNumFrames(), convertTo16Bit);
+            wavFile.readFrames(*sampleData, wavFile.getNumFrames(), shouldBeConverted);
         }
         else
         {
             std::vector<float> interleaved;
-            wavFile.readFrames(interleaved, wavFile.getNumFrames(), convertTo16Bit);
+            wavFile.readFrames(interleaved, wavFile.getNumFrames(), shouldBeConverted);
             
             for (int i = 0; i < interleaved.size(); i += 2)
                 sampleData->push_back(interleaved[i]);

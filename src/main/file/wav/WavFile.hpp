@@ -73,10 +73,10 @@ namespace mpc::file::wav {
 		static int getLE(std::vector<char>& buffer, int pos, int numBytes);
 		static void putLE(int val, std::vector<char>& buffer, int pos, int numBytes);
 		void writeSample(int val);
-		int readSample(bool convertTo16Bit = false);
+		int readSample(bool shouldBeConverted = false);
 
 	public:
-		int readFrames(std::vector<float>& sampleBuffer, int numFramesToRead, bool convertTo16Bit);
+		int readFrames(std::vector<float>& sampleBuffer, int numFramesToRead, bool shouldBeConverted);
 		int writeFrames(std::vector<float>& sampleBuffer, int numFramesToWrite);
 		void close();
 

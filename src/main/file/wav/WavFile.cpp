@@ -317,7 +317,7 @@ void WavFile::writeSample(int val)
 	}
 }
 
-int WavFile::readSample(bool convertTo16Bit)
+int WavFile::readSample(bool shouldBeConverted)
 {
 	int val = 0;
 	for (auto b = 0; b < bytesPerSample; b++) {
@@ -339,13 +339,13 @@ int WavFile::readSample(bool convertTo16Bit)
 		bufferPointer++;
 	}
     
-    if (bytesPerSample == 3 && convertTo16Bit) val = val >> 8;
-    else if (bytesPerSample == 4 && convertTo16Bit) val = val >> 16;
+    if (bytesPerSample == 3 && shouldBeConverted) val = val >> 8;
+    else if (bytesPerSample == 4 && shouldBeConverted) val = val >> 16;
     
 	return val;
 }
 
-int WavFile::readFrames(std::vector<float>& sampleBuffer, int numFramesToRead, bool convertTo16Bit)
+int WavFile::readFrames(std::vector<float>& sampleBuffer, int numFramesToRead, bool shouldBeConverted)
 {
     int offset = 0;
     
@@ -357,7 +357,7 @@ int WavFile::readFrames(std::vector<float>& sampleBuffer, int numFramesToRead, b
         if (frameCounter == numFrames)
             return f;
         for (auto c = 0; c < numChannels; c++) {
-            auto v = readSample(convertTo16Bit);
+            auto v = readSample(shouldBeConverted);
             sampleBuffer[offset] = floatOffset + static_cast<double>(v) / floatScale;
             offset++;
         }
