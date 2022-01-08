@@ -464,12 +464,12 @@ sound_or_error AbstractDisk::readWav2(std::shared_ptr<MpcFile> f, bool shouldBeC
         
         if (numChannels == 1)
         {
-            wavFile.readFrames(*sampleData, wavFile.getNumFrames(), shouldBeConverted);
+            wavFile.readFrames(*sampleData, wavFile.getNumFrames());
         }
         else
         {
             std::vector<float> interleaved;
-            wavFile.readFrames(interleaved, wavFile.getNumFrames(), shouldBeConverted);
+            wavFile.readFrames(interleaved, wavFile.getNumFrames());
             
             for (int i = 0; i < interleaved.size(); i += 2)
                 sampleData->push_back(interleaved[i]);
@@ -479,7 +479,12 @@ sound_or_error AbstractDisk::readWav2(std::shared_ptr<MpcFile> f, bool shouldBeC
         }
         
         if (wavFile.getSampleRate() > 44100 && shouldBeConverted)
-            mpc::sampler::Sampler::resample(*sampleData, wavFile.getSampleRate(), sound);
+        {
+            auto tempSound = std::make_shared<mpc::sampler::Sound>();
+            mpc::sampler::Sampler::resample(*sampleData, wavFile.getSampleRate(), tempSound);
+            auto tempData = *tempSound->getSampleData();
+            sampleData->swap(tempData);
+        }
         
         sound->setMono(numChannels == 1);
         
