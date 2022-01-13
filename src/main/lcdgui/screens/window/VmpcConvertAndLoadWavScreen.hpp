@@ -1,6 +1,8 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
+
+
 namespace mpc::lcdgui::screens::window {
 
 	class VmpcConvertAndLoadWavScreen
@@ -12,5 +14,10 @@ namespace mpc::lcdgui::screens::window {
 
         VmpcConvertAndLoadWavScreen(mpc::Mpc& mpc, const int layerIndex);
 
+        void setLoadRoutine(std::function<void()> loadRoutine);
+        
+    private:
+        std::function<void()> loadRoutine;
+        
 	};
 }

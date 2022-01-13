@@ -10,6 +10,7 @@
 
 #include <lcdgui/screens/window/DirectoryScreen.hpp>
 #include <lcdgui/screens/window/LoadASequenceScreen.hpp>
+#include <lcdgui/screens/window/VmpcConvertAndLoadWavScreen.hpp>
 #include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
 #include <nvram/VolumesPersistence.hpp>
@@ -458,6 +459,13 @@ void LoadScreen::loadSound(bool shouldBeConverted)
         sampler.lock()->deleteSound(sampler.lock()->getSoundCount() - 1);
         
         if (result.canBeConverted) {
+            auto loadRoutine = [&]() {
+                const bool shouldBeConverted2 = true;
+                loadSound(shouldBeConverted2);
+            };
+            
+            auto convertAndLoadWavScreen = mpc.screens->get<VmpcConvertAndLoadWavScreen>("vmpc-convert-and-load-wav");
+            convertAndLoadWavScreen->setLoadRoutine(loadRoutine);
             openScreen("vmpc-convert-and-load-wav");
         } else {
             openScreen("popup");

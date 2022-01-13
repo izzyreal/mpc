@@ -12,18 +12,20 @@ VmpcConvertAndLoadWavScreen::VmpcConvertAndLoadWavScreen(mpc::Mpc& mpc, const in
 {
 }
 
+void VmpcConvertAndLoadWavScreen::setLoadRoutine(std::function<void()> loadRoutine)
+{
+    this->loadRoutine = loadRoutine;
+}
+
 void VmpcConvertAndLoadWavScreen::function(int i)
 {
     switch (i)
     {
         case 3:
-            openScreen("load");
+            openScreen(mpc.getLayeredScreen().lock()->getPreviousScreenName());
             break;
         case 4:
-            auto disk = mpc.getDisk().lock();
-            auto loadScreen = mpc.screens->get<LoadScreen>("load");
-            const bool shouldBeConverted = true;
-            loadScreen->loadSound(shouldBeConverted);
+            loadRoutine();
             break;
     }
 }
