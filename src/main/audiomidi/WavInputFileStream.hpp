@@ -102,12 +102,12 @@ bool wav_read_header(std::shared_ptr<std::istream> stream, int& sampleRate, int&
         return false;
     }
 
-    if (sampleRate < 11025 || sampleRate > 44100)
+    if (sampleRate < 11025 || sampleRate > 96000)
     {
         return false;
     }
 
-    if (validBits != 16)
+    if (validBits != 16 && validBits != 24 && validBits != 32)
     {
         return false;
     }
@@ -124,7 +124,6 @@ bool wav_read_header(std::shared_ptr<std::istream> stream, int& sampleRate, int&
     }
 
     numFrames = (dataChunkSize / (validBits / 8)) / numChannels;
-
     return true;
 }
 
