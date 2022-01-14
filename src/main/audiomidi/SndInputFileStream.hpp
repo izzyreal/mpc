@@ -118,7 +118,7 @@ bool snd_read_header(std::shared_ptr<std::istream> stream, int& sampleRate, int&
         return false;
     }
 
-    if (sampleRate < 11025 || sampleRate > 48000) {
+    if (sampleRate < 11025 || sampleRate > 65000) {
         return false;
     }
 

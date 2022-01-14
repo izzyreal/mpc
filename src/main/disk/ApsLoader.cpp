@@ -264,7 +264,8 @@ void ApsLoader::loadSound(mpc::Mpc& mpc,
         ApsLoader::showPopup(mpc, soundFileName, ext, soundFile->length());
     
     SoundLoaderResult result;
-    soundLoader.loadSound(soundFile, result);
+    bool shouldBeConverted = false;
+    soundLoader.loadSound(soundFile, result, shouldBeConverted);
 }
 
 void ApsLoader::showPopup(mpc::Mpc& mpc, std::string name, std::string ext, int sampleSize)

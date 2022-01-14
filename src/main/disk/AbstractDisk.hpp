@@ -98,7 +98,8 @@ private:
     friend class mpc::lcdgui::screens::window::LoadApsFileScreen;
     friend class mpc::lcdgui::screens::window::Mpc2000XlAllFileScreen;
     
-    sound_or_error readWav2(std::shared_ptr<MpcFile>);
+    wav_or_error readWavMeta(std::shared_ptr<MpcFile>);
+    sound_or_error readWav2(std::shared_ptr<MpcFile>, bool shouldBeConverted);
     sound_or_error readSnd2(std::shared_ptr<MpcFile>);
     sequence_or_error readMid2(std::shared_ptr<MpcFile>);
     void readPgm2(std::shared_ptr<MpcFile>);

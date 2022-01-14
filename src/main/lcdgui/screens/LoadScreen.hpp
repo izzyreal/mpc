@@ -24,6 +24,7 @@ class LoadASoundScreen;
 class LoadASequenceScreen;
 class NameScreen;
 class LoadAProgramScreen;
+class VmpcConvertAndLoadWavScreen;
 }
 
 namespace mpc::lcdgui::screens::dialog2
@@ -77,7 +78,7 @@ private:
     
     int getFileSize();
     
-    void loadSound();
+    void loadSound(bool shouldBeConverted);
     
 private:
     friend class mpc::lcdgui::screens::window::LoadAProgramScreen;
@@ -88,6 +89,7 @@ private:
     friend class mpc::lcdgui::screens::window::LoadASoundScreen;
     friend class mpc::lcdgui::screens::window::LoadASequenceScreen;
     friend class mpc::lcdgui::screens::window::NameScreen;
+    friend class mpc::lcdgui::screens::window::VmpcConvertAndLoadWavScreen;
     friend class mpc::lcdgui::screens::dialog2::DeleteAllFilesScreen;
     friend class mpc::lcdgui::screens::dialog::DeleteFileScreen;
     friend class mpc::controls::BaseControls;

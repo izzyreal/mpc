@@ -4,30 +4,11 @@
 #include <memory>
 #include <vector>
 
-namespace moduru::file
-{
-class File;
-}
-
-namespace mpc
-{
-class Mpc;
-}
-
-namespace mpc::file::wav
-{
-class WavFile;
-}
-
-namespace mpc::sampler
-{
-class Sound;
-}
-
-namespace mpc::disk
-{
-class MpcFile;
-}
+namespace moduru::file { class File; }
+namespace mpc { class Mpc; }
+namespace mpc::file::wav { class WavFile; }
+namespace mpc::sampler { class Sound; }
+namespace mpc::disk { class MpcFile; }
 
 namespace mpc::disk
 {
@@ -52,6 +33,8 @@ struct SoundLoaderResult {
     // SoundLoader can store the message exactly like how it will
     // be displayed.
     std::string errorMessage = "";
+    
+    bool canBeConverted = false;
 };
 
 class SoundLoader
@@ -61,7 +44,7 @@ public:
     SoundLoader(mpc::Mpc& mpc, std::vector<std::weak_ptr<mpc::sampler::Sound>> sounds, bool replace);
 
     void setPartOfProgram(bool);
-    void loadSound(std::shared_ptr<MpcFile>, SoundLoaderResult&);
+    void loadSound(std::shared_ptr<MpcFile>, SoundLoaderResult&, bool shouldBeConverted);
     void setPreview(bool);
 
 private:

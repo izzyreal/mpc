@@ -7,6 +7,7 @@
 #include <file/wav/WavFile.hpp>
 #include <sampler/Sampler.hpp>
 #include <sampler/Sound.hpp>
+#include <lcdgui/screens/VmpcSettingsScreen.hpp>
 
 #include <lang/StrUtil.hpp>
 
@@ -17,6 +18,7 @@ using namespace mpc::disk;
 using namespace mpc::file::wav;
 using namespace mpc::file::sndreader;
 using namespace mpc::lcdgui;
+using namespace mpc::lcdgui::screens;
 using namespace moduru::lang;
 using namespace std;
 
@@ -40,7 +42,7 @@ void SoundLoader::setPreview(bool b)
     preview = b;
 }
 
-void SoundLoader::loadSound(shared_ptr<MpcFile> f, SoundLoaderResult& r)
+void SoundLoader::loadSound(shared_ptr<MpcFile> f, SoundLoaderResult& r, bool shouldBeConverted)
 {
     string soundFileName = f->getName();
     string extension = f->getExtension();
@@ -53,7 +55,30 @@ void SoundLoader::loadSound(shared_ptr<MpcFile> f, SoundLoaderResult& r)
     
     if (StrUtil::eqIgnoreCase(extension, ".wav"))
     {
-        sound = mpc.getDisk().lock()->readWav2(f);
+        bool willBeConverted = shouldBeConverted;
+        auto wavMeta = mpc.getDisk().lock()->readWavMeta(f);
+        
+        if (!wavMeta.has_value()) return;
+        
+        wavMeta.map([&](mpc::file::wav::WavFile wavFile) {
+            
+            const auto bitDepth = wavFile.getValidBits();
+            const auto sampleRate = wavFile.getSampleRate();
+            
+            if (bitDepth == 24 || bitDepth == 32 || sampleRate > 44100) {
+                
+                auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
+                
+                if (!vmpcSettingsScreen->autoConvertWavs && !shouldBeConverted) {
+                    r.canBeConverted = true;
+                    return;
+                } else {
+                    willBeConverted = true;
+                }
+            }
+        });
+        
+        sound = mpc.getDisk().lock()->readWav2(f, willBeConverted);
     }
     else if (StrUtil::eqIgnoreCase(extension, ".snd"))
     {

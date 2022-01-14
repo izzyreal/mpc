@@ -14,7 +14,7 @@
 using namespace std;
 
 vector<string> screenNames = {
-	"tr-move",
+"tr-move",
 "black",
 "mpc2000xl",
 "sequencer",
@@ -146,7 +146,8 @@ vector<string> screenNames = {
 "copy-sequence",
 "delete-sequence",
 "delete-all-files",
-"popup"
+"popup",
+"vmpc-convert-and-load-wav"
 };
 
 SCENARIO("All screens can be opened", "[gui]") {

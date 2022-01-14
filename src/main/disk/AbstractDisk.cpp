@@ -161,7 +161,7 @@ file_or_error AbstractDisk::writeWav2(std::shared_ptr<Sound> sound, std::shared_
         
         if (isMono)
         {
-            wavFile.writeFrames(data, data->size());
+            wavFile.writeFrames(*data, data->size());
         }
         else
         {
@@ -173,7 +173,7 @@ file_or_error AbstractDisk::writeWav2(std::shared_ptr<Sound> sound, std::shared_
                 interleaved.push_back((*data)[(int) (i + data->size() * 0.5)]);
             }
             
-            wavFile.writeFrames(&interleaved, data->size() * 0.5);
+            wavFile.writeFrames(interleaved, data->size() * 0.5);
         }
         
         wavFile.close();
@@ -410,7 +410,24 @@ file_or_error AbstractDisk::writeAll2(std::shared_ptr<MpcFile> f)
     return tl::make_unexpected(mpc_io_error{"Could not write ALL file: " + msg});
 }
 
-sound_or_error AbstractDisk::readWav2(std::shared_ptr<MpcFile> f)
+wav_or_error AbstractDisk::readWavMeta(std::shared_ptr<MpcFile> f)
+{
+    std::string msg;
+    
+    try {
+        auto inputStream = f->getInputStream();
+        auto wavFile = WavFile::readWavStream(inputStream);
+        return wavFile;
+    }
+    catch (const std::exception& e)
+    {
+        msg = e.what();
+    }
+        
+    return tl::make_unexpected(mpc_io_error{"Could not read WAV file: " + msg});
+}
+
+sound_or_error AbstractDisk::readWav2(std::shared_ptr<MpcFile> f, bool shouldBeConverted)
 {
     std::string msg;
     
@@ -419,20 +436,26 @@ sound_or_error AbstractDisk::readWav2(std::shared_ptr<MpcFile> f)
         auto inputStream = f->getInputStream();
         auto wavFile = WavFile::readWavStream(inputStream);
         
-        if (wavFile.getValidBits() != 16)
+        if (wavFile.getValidBits() != 16 && !shouldBeConverted)
         {
             wavFile.close();
             return tl::make_unexpected(mpc_io_error{ f->getName() + " is not a 16 bit .WAV file. " + std::to_string(wavFile.getValidBits()) + " .WAV files are not supported." });
         }
 
-        if (wavFile.getSampleRate() < 8000 || wavFile.getSampleRate() > 44100)
+        if ( (wavFile.getSampleRate() < 8000 || wavFile.getSampleRate() > 44100) && !shouldBeConverted)
         {
             wavFile.close();
             return tl::make_unexpected(mpc_io_error{ f->getName() + " has a sample rate of " + std::to_string(wavFile.getSampleRate()) + ". Sample rate has to be between 8000 and 44100." });
         }
         
         sound->setName(f->getNameWithoutExtension());
-        sound->setSampleRate(wavFile.getSampleRate());
+        
+        int sampleRate = wavFile.getSampleRate();
+        
+        if (sampleRate > 44100 && shouldBeConverted) sampleRate = 44100;
+        
+        sound->setSampleRate(sampleRate);
+        
         sound->setLevel(100);
         
         int numChannels = wavFile.getNumChannels();
@@ -441,12 +464,12 @@ sound_or_error AbstractDisk::readWav2(std::shared_ptr<MpcFile> f)
         
         if (numChannels == 1)
         {
-            wavFile.readFrames(sampleData, wavFile.getNumFrames());
+            wavFile.readFrames(*sampleData, wavFile.getNumFrames());
         }
         else
         {
             std::vector<float> interleaved;
-            wavFile.readFrames(&interleaved, wavFile.getNumFrames());
+            wavFile.readFrames(interleaved, wavFile.getNumFrames());
             
             for (int i = 0; i < interleaved.size(); i += 2)
                 sampleData->push_back(interleaved[i]);
@@ -455,14 +478,26 @@ sound_or_error AbstractDisk::readWav2(std::shared_ptr<MpcFile> f)
                 sampleData->push_back(interleaved[i]);
         }
         
+        if (wavFile.getSampleRate() > 44100 && shouldBeConverted)
+        {
+            auto tempSound = std::make_shared<mpc::sampler::Sound>();
+            mpc::sampler::Sampler::resample(*sampleData, wavFile.getSampleRate(), tempSound);
+            auto tempData = *tempSound->getSampleData();
+            sampleData->swap(tempData);
+        }
+        
         sound->setMono(numChannels == 1);
         
         if (wavFile.getNumSampleLoops() > 0)
         {
             auto& sampleLoop = wavFile.getSampleLoop();
-            sound->setLoopTo(sampleLoop.start);
+            const bool hasBeenConverted = wavFile.getSampleRate() > 44100 && shouldBeConverted;
+            const float conversionRatio = wavFile.getSampleRate() / 44100.0;
+            const auto sampleLoopStart = hasBeenConverted ? (sampleLoop.start / conversionRatio) : sampleLoop.start;
+            sound->setLoopTo(sampleLoopStart);
             auto currentEnd = sound->getEnd();
-            sound->setEnd(sampleLoop.end <= 0 ? currentEnd : sampleLoop.end);
+            const auto sampleLoopEnd = hasBeenConverted ? (sampleLoop.end / conversionRatio) : sampleLoop.end;
+            sound->setEnd(sampleLoopEnd <= 0 ? currentEnd : sampleLoopEnd);
             sound->setLoopEnabled(true);
         }
         

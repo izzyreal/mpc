@@ -35,10 +35,10 @@ private:
     std::mutex _playing;
     bool playing = false;
     std::string filePath = "";
-    circular_buffer<float> resampleInputBufferLeft = circular_buffer<float>(20000);
-    circular_buffer<float> resampleInputBufferRight = circular_buffer<float>(20000);
-    circular_buffer<float> resampleOutputBufferLeft = circular_buffer<float>(20000);
-    circular_buffer<float> resampleOutputBufferRight = circular_buffer<float>(20000);
+    circular_buffer<float> resampleInputBufferLeft = circular_buffer<float>(60000);
+    circular_buffer<float> resampleInputBufferRight = circular_buffer<float>(60000);
+    circular_buffer<float> resampleOutputBufferLeft = circular_buffer<float>(60000);
+    circular_buffer<float> resampleOutputBufferRight = circular_buffer<float>(60000);
     SRC_STATE* srcLeft = nullptr;
     SRC_STATE* srcRight = nullptr;
     int srcLeftError = 0;

@@ -2,8 +2,6 @@
 
 #include <lcdgui/screens/window/NameScreen.hpp>
 
-#include <thirdp/libsamplerate/samplerate.h>
-
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
@@ -88,30 +86,8 @@ void ResampleScreen::function(int i)
 
 		if (newFs != snd->getSampleRate())
 		{
-			float* srcArray = &(*source)[0];
-
-			SRC_DATA srcData;
-			srcData.data_in = srcArray;
-			srcData.input_frames = source->size();
-			srcData.src_ratio = (double)(newFs) / (double)(snd->getSampleRate());
-            
-			srcData.output_frames = (floor)(source->size() * srcData.src_ratio);
-
-			auto dest = destSnd->getSampleData();
-			dest->resize(srcData.output_frames);
-
-			float* destArray = &(*dest)[0];
-			srcData.data_out = destArray;
-
-			auto error = src_simple(&srcData, 0, 1);
-
-			if (error != 0)
-			{
-				const char* errormsg = src_strerror(error);
-				string errorStr(errormsg);
-				MLOG("libsamplerate error: " + errorStr);
-			}
-		}
+            sampler::Sampler::resample(*source, snd->getSampleRate(), destSnd);
+        }
 		else
 		{
 			*destSnd->getSampleData() = *source;
@@ -119,14 +95,8 @@ void ResampleScreen::function(int i)
 
 		for (auto& f : *destSnd->getSampleData())
 		{
-			if (f > 1)
-			{
-				f = 1;
-			}
-			else if (f < -1)
-			{
-				f = -1;
-			}
+			if (f > 1) f = 1;
+			else if (f < -1) f = -1;
 		}
 
 		destSnd->setSampleRate(newFs);
@@ -135,11 +105,11 @@ void ResampleScreen::function(int i)
 
 		if (newBit == 1)
 		{
-			sampler.lock()->process12Bit(destSnd->getSampleData());
+			sampler::Sampler::process12Bit(destSnd->getSampleData());
 		}
 		else if (newBit == 2)
 		{
-			sampler.lock()->process8Bit(destSnd->getSampleData());
+            sampler::Sampler::process8Bit(destSnd->getSampleData());
 		}
 
 		sampler.lock()->setSoundIndex(sampler.lock()->getSoundCount() - 1);

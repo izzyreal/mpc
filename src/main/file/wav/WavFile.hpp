@@ -76,22 +76,8 @@ namespace mpc::file::wav {
 		int readSample();
 
 	public:
-		int readFrames(std::vector<int>* sampleBuffer, int numFramesToRead);
-		int readFrames(std::vector<int>* sampleBuffer, int offset, int numFramesToRead);
-		int readFrames(std::vector<std::vector<int>>* sampleBuffer, int numFramesToRead);
-		int readFrames(std::vector<std::vector<int>>* sampleBuffer, int offset, int numFramesToRead);
-		int writeFrames(std::vector<int>* sampleBuffer, int numFramesToWrite);
-		int writeFrames(std::vector<int>* sampleBuffer, int offset, int numFramesToWrite);
-		int writeFrames(std::vector<std::vector<int>>* sampleBuffer, int numFramesToWrite);
-		int writeFrames(std::vector<std::vector<int>>* sampleBuffer, int offset, int numFramesToWrite);
-		int readFrames(std::vector<float>* sampleBuffer, int numFramesToRead);
-		int readFrames(std::vector<float>* sampleBuffer, int offset, int numFramesToRead);
-		int readFrames(std::vector<std::vector<float>>* sampleBuffer, int numFramesToRead);
-		int readFrames(std::vector<std::vector<float>>* sampleBuffer, int offset, int numFramesToRead);
-		int writeFrames(std::vector<float>* sampleBuffer, int numFramesToWrite);
-		int writeFrames(std::vector<float>* sampleBuffer, int offset, int numFramesToWrite);
-		int writeFrames(std::vector<std::vector<float>>* sampleBuffer, int numFramesToWrite);
-		int writeFrames(std::vector<std::vector<float>>* sampleBuffer, int offset, int numFramesToWrite);
+		int readFrames(std::vector<float>& sampleBuffer, int numFramesToRead);
+		int writeFrames(std::vector<float>& sampleBuffer, int numFramesToWrite);
 		void close();
 
 	};

@@ -12,6 +12,7 @@ void VmpcSettingsScreen::open()
 {
 	displayInitialPadMapping();
     display16LevelsEraseMode();
+    displayAutoConvertWavs();
 }
 
 void VmpcSettingsScreen::function(int i)
@@ -42,6 +43,10 @@ void VmpcSettingsScreen::turnWheel(int i)
     {
         set16LevelsEraseMode(_16LevelsEraseMode + i);
     }
+    else if (param.compare("auto-convert-wavs") == 0)
+    {
+        setAutoConvertWavs(autoConvertWavs + i);
+    }
 }
 
 void VmpcSettingsScreen::setInitialPadMapping(int i)
@@ -71,4 +76,18 @@ void VmpcSettingsScreen::set16LevelsEraseMode(int i)
 
     _16LevelsEraseMode = i;
     display16LevelsEraseMode();
+}
+
+void VmpcSettingsScreen::setAutoConvertWavs(int i)
+{
+    if (i < 0 || i > 1)
+        return;
+
+    autoConvertWavs = i;
+    displayAutoConvertWavs();
+}
+
+void VmpcSettingsScreen::displayAutoConvertWavs()
+{
+    findField("auto-convert-wavs").lock()->setText(autoConvertWavs == 1 ? "YES" : "NO");
 }
