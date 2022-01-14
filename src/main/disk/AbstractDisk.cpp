@@ -491,9 +491,13 @@ sound_or_error AbstractDisk::readWav2(std::shared_ptr<MpcFile> f, bool shouldBeC
         if (wavFile.getNumSampleLoops() > 0)
         {
             auto& sampleLoop = wavFile.getSampleLoop();
-            sound->setLoopTo(sampleLoop.start);
+            const bool hasBeenConverted = wavFile.getSampleRate() > 44100 && shouldBeConverted;
+            const float conversionRatio = wavFile.getSampleRate() / 44100.0;
+            const auto sampleLoopStart = hasBeenConverted ? (sampleLoop.start / conversionRatio) : sampleLoop.start;
+            sound->setLoopTo(sampleLoopStart);
             auto currentEnd = sound->getEnd();
-            sound->setEnd(sampleLoop.end <= 0 ? currentEnd : sampleLoop.end);
+            const auto sampleLoopEnd = hasBeenConverted ? (sampleLoop.end / conversionRatio) : sampleLoop.end;
+            sound->setEnd(sampleLoopEnd <= 0 ? currentEnd : sampleLoopEnd);
             sound->setLoopEnabled(true);
         }
         
