@@ -1,5 +1,9 @@
 #include "WavFile.hpp"
 
+#ifdef _MSC_VER
+#include <string>
+#endif
+
 using namespace mpc::file::wav;
 
 const int WavFile::BUFFER_SIZE;
