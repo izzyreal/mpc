@@ -1,3 +1,6 @@
+## v0.4.2 (17-1-2022)
+* [Convert 24- and 32-bit and > 44.1KHz WAV files (optionally automatic)](https://vmpcdocs.izmar.nl/vmpc_specific_settings.html#auto-convert-wavs)
+
 ## v0.4.1 (26-12-2021)
 * [Normalize low volume sounds](https://vmpcdocs.izmar.nl/vmpc_specific_settings.html#normalize)
 
