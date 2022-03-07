@@ -1,3 +1,6 @@
+## v0.4.3 (7-3-2022)
+* Pads light up when dragging a WAV or SND file over them (to indicate you can drop 'm there)
+
 ## v0.4.2 (17-1-2022)
 * [Convert 24- and 32-bit and > 44.1KHz WAV files (optionally automatic)](https://vmpcdocs.izmar.nl/vmpc_specific_settings.html#auto-convert-wavs)
 
