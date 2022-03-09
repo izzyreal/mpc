@@ -158,11 +158,7 @@ WavFile WavFile::readWavStream(std::shared_ptr<std::istream> _istream)
     if (chunkSize % 2 != 0) {
         chunkSize += 1;
     }
-
-    if (fileSize != chunkSize + 8) {
-        throw std::invalid_argument("Invalid Wav Header data, incorrect chunk size");
-    }
-
+    
     auto foundFormat = false;
     auto foundData = false;
     std::ios::pos_type dataPos;
@@ -326,12 +322,10 @@ int WavFile::readSample()
 	int val = 0;
 	for (auto b = 0; b < bytesPerSample; b++) {
 		if (bufferPointer == bytesRead) {
-            
             iStream->read(&buffer[0], BUFFER_SIZE);
             auto read = iStream->gcount();
 
-			if (read == 0)
-				throw std::invalid_argument("Not enough data available");
+            if (read == 0) return 0;
 
             bytesRead = read;
 			bufferPointer = 0;

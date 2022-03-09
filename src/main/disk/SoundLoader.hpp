@@ -35,6 +35,12 @@ struct SoundLoaderResult {
     std::string errorMessage = "";
     
     bool canBeConverted = false;
+    
+    // This will be set to true when everything prior to and including
+    // adding a sound went fine. It is used by error handlers to decide
+    // whether to remove an added sound or not. See in vmpc-juce the
+    // file PadControl.cpp
+    bool soundWasAdded = false;
 };
 
 class SoundLoader

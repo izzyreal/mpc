@@ -84,7 +84,7 @@ void SoundLoader::loadSound(shared_ptr<MpcFile> f, SoundLoaderResult& r, bool sh
     {
         sound = mpc.getDisk().lock()->readSnd2(f);
     }
-    
+    r.soundWasAdded = true;
     if (!sound.has_value()) return;
     
     r.success = true;

@@ -429,10 +429,10 @@ wav_or_error AbstractDisk::readWavMeta(std::shared_ptr<MpcFile> f)
 
 sound_or_error AbstractDisk::readWav2(std::shared_ptr<MpcFile> f, bool shouldBeConverted)
 {
+    auto sound = mpc.getSampler().lock()->addSound().lock();
     std::string msg;
-    
+
     try {
-        auto sound = mpc.getSampler().lock()->addSound().lock();
         auto inputStream = f->getInputStream();
         auto wavFile = WavFile::readWavStream(inputStream);
         
@@ -524,6 +524,7 @@ sound_or_error AbstractDisk::readWav2(std::shared_ptr<MpcFile> f, bool shouldBeC
 
 sound_or_error AbstractDisk::readSnd2(std::shared_ptr<MpcFile> f)
 {
+    auto sound = mpc.getSampler().lock()->addSound().lock();
     std::string msg;
     
     try {
@@ -531,7 +532,6 @@ sound_or_error AbstractDisk::readSnd2(std::shared_ptr<MpcFile> f)
         
         if (sndReader.isHeaderValid())
         {
-            auto sound = mpc.getSampler().lock()->addSound().lock();
             
             sndReader.readData(*sound->getSampleData());
             sound->setMono(sndReader.isMono());
