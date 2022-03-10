@@ -1,4 +1,4 @@
-## v0.4.3 (7-3-2022)
+## v0.4.3 (10-3-2022)
 * Pads light up when dragging a WAV or SND file over them (to indicate you can drop 'm there)
 * Fix crash when loading WAV files with corrupt chunk size information -- If file is too small, silence is loaded for the missing data
 * Fix crash when drag 'n dropping a WAV with filename length over 16 characters
