@@ -66,6 +66,7 @@ public:
     std::weak_ptr<Sound> addSound(int sampleRate);
     int getSoundCount();
     std::string getSoundName(int i);
+    std::vector<std::string> getSoundNames();
     std::string getPadName(int i);
     std::vector<std::weak_ptr<Program>> getPrograms();
     std::vector<float>* getClickSample();

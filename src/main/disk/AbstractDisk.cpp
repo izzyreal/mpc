@@ -2,17 +2,22 @@
 
 #include <Mpc.hpp>
 #include <Util.hpp>
+
+#include <mpc/MpcSoundPlayerChannel.hpp>
+
 #include <disk/MpcFile.hpp>
+#include <disk/ApsLoader.hpp>
+#include <disk/ProgramLoader.hpp>
+
 #include <file/wav/WavFile.hpp>
 #include <file/mid/MidiWriter.hpp>
 #include <file/mid/MidiReader.hpp>
 #include <file/pgmwriter/PgmWriter.hpp>
 #include <file/sndwriter/SndWriter.hpp>
 #include <file/sndreader/SndReader.hpp>
-#include <disk/ApsLoader.hpp>
-#include <disk/ProgramLoader.hpp>
 #include <file/aps/ApsParser.hpp>
 #include <file/all/AllParser.hpp>
+#include <file/AkaiName.hpp>
 
 #include <sampler/NoteParameters.hpp>
 #include <sampler/Program.hpp>
@@ -28,14 +33,13 @@
 #include <lcdgui/screens/window/SaveAProgramScreen.hpp>
 #include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
-#include <mpc/MpcSoundPlayerChannel.hpp>
-
 #include <file/FileUtil.hpp>
 #include <lang/StrUtil.hpp>
 
 #include <cmath>
 
 using namespace mpc::disk;
+using namespace mpc::file;
 using namespace mpc::file::wav;
 using namespace mpc::file::sndwriter;
 using namespace mpc::file::sndreader;
@@ -429,7 +433,8 @@ wav_or_error AbstractDisk::readWavMeta(std::shared_ptr<MpcFile> f)
 
 sound_or_error AbstractDisk::readWav2(std::shared_ptr<MpcFile> f, bool shouldBeConverted)
 {
-    auto sound = mpc.getSampler().lock()->addSound().lock();
+    auto sampler = mpc.getSampler().lock();
+    auto sound = sampler->addSound().lock();
     std::string msg;
 
     try {
@@ -442,13 +447,15 @@ sound_or_error AbstractDisk::readWav2(std::shared_ptr<MpcFile> f, bool shouldBeC
             return tl::make_unexpected(mpc_io_error{ f->getName() + " is not a 16 bit .WAV file. " + std::to_string(wavFile.getValidBits()) + " .WAV files are not supported." });
         }
 
-        if ( (wavFile.getSampleRate() < 8000 || wavFile.getSampleRate() > 44100) && !shouldBeConverted)
+        if ((wavFile.getSampleRate() < 8000 || wavFile.getSampleRate() > 44100) && !shouldBeConverted)
         {
             wavFile.close();
             return tl::make_unexpected(mpc_io_error{ f->getName() + " has a sample rate of " + std::to_string(wavFile.getSampleRate()) + ". Sample rate has to be between 8000 and 44100." });
         }
         
-        sound->setName(f->getNameWithoutExtension());
+        auto newSoundName = sampler->addOrIncreaseNumber(f->getNameWithoutExtension());
+        
+        sound->setName(newSoundName);
         
         int sampleRate = wavFile.getSampleRate();
         

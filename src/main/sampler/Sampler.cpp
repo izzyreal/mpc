@@ -42,19 +42,18 @@ using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::sampler;
 using namespace ctoot::mpc;
 using namespace moduru::lang;
-using namespace std;
 
 Sampler::Sampler(mpc::Mpc& mpc)
 	: mpc(mpc)
 {
 }
 
-weak_ptr<Sound> Sampler::getPreviewSound()
+std::weak_ptr<Sound> Sampler::getPreviewSound()
 {
     return sounds[sounds.size() - 1];
 }
 
-weak_ptr<Sound> Sampler::getSound(int index)
+std::weak_ptr<Sound> Sampler::getSound(int index)
 {
     if (index < 0 || index >= sounds.size())
         return {};
@@ -62,7 +61,7 @@ weak_ptr<Sound> Sampler::getSound(int index)
     return sounds[index];
 }
 
-weak_ptr<Program> Sampler::getProgram(int index)
+std::weak_ptr<Program> Sampler::getProgram(int index)
 {
     return programs[index];
 }
@@ -83,7 +82,7 @@ int Sampler::getSoundIndex()
 	return soundIndex;
 }
 
-weak_ptr<Sound> Sampler::getSound()
+std::weak_ptr<Sound> Sampler::getSound()
 {
 	if (soundIndex < 0)
 	{
@@ -124,32 +123,32 @@ int Sampler::getInputLevel()
 	return inputLevel;
 }
 
-vector<weak_ptr<MpcStereoMixerChannel>> Sampler::getDrumStereoMixerChannels(int i)
+std::vector<std::weak_ptr<MpcStereoMixerChannel>> Sampler::getDrumStereoMixerChannels(int i)
 {
 	return mpc.getDrums()[i]->getStereoMixerChannels();
 }
 
-vector<weak_ptr<MpcIndivFxMixerChannel>> Sampler::getDrumIndivFxMixerChannels(int i)
+std::vector<std::weak_ptr<MpcIndivFxMixerChannel>> Sampler::getDrumIndivFxMixerChannels(int i)
 {
 	return mpc.getDrums()[i]->getIndivFxMixerChannels();
 }
 
-vector<int>* Sampler::getInitMasterPadAssign()
+std::vector<int>* Sampler::getInitMasterPadAssign()
 {
 	return &initMasterPadAssign;
 }
 
-vector<int>* Sampler::getMasterPadAssign()
+std::vector<int>* Sampler::getMasterPadAssign()
 {
 	return &masterPadAssign;
 }
 
-void Sampler::setMasterPadAssign(vector<int> v)
+void Sampler::setMasterPadAssign(std::vector<int> v)
 {
 	masterPadAssign = v;
 }
 
-vector<int>* Sampler::getAutoChromaticAssign()
+std::vector<int>* Sampler::getAutoChromaticAssign()
 {
 	return &autoChromaticAssign;
 }
@@ -165,22 +164,22 @@ void Sampler::init()
 	{
 		for (auto j = 0; j < 16; j++)
 		{
-			string result = "";
+			std::string result = "";
 			result.append(abcd[i]);
-			result.append(StrUtil::padLeft(to_string(j + 1), "0", 2));
+			result.append(StrUtil::padLeft(std::to_string(j + 1), "0", 2));
 			padNames.push_back(result);
 		}
 	}
 
     auto fs = cmrc::mpc::get_filesystem();
-    clickSound = make_shared<Sound>();
+    clickSound = std::make_shared<Sound>();
     clickSound->setMono(true);
     clickSound->setLevel(100);
 
     if (fs.exists("audio/click.wav"))
     {
         auto clickFile = fs.open("audio/click.wav");
-        auto clickData = (char*) string_view(clickFile.begin(), clickFile.end() - clickFile.begin()).data();
+        auto clickData = (char*) std::string_view(clickFile.begin(), clickFile.end() - clickFile.begin()).data();
 
         auto stream = wav_init_istringstream(clickData, clickFile.size());
         int sampleRate, validBits, numChannels, numFrames;
@@ -190,14 +189,14 @@ void Sampler::init()
             for (int i = 0; i < numFrames; i++)
             {
                 float frame = wav_get_LE(stream, 2) / 32768.0;
-                clickSound->insertFrame(vector<float>{frame}, clickSound->getFrameCount());
+                clickSound->insertFrame(std::vector<float>{frame}, clickSound->getFrameCount());
             }
         }
         clickSound->setEnd(numFrames);
     }
     
 	masterPadAssign = initMasterPadAssign;
-	autoChromaticAssign = vector<int>(64);
+	autoChromaticAssign = std::vector<int>(64);
 
 	for (int i = 0; i < 64; i++)
 		autoChromaticAssign[i] = i;
@@ -247,7 +246,7 @@ void Sampler::playPreviewSample(int start, int end, int loopTo, int overlapMode)
 	previewSound->setLoopTo(oldLoopTo);
 }
 
-weak_ptr<MpcProgram> Sampler::getMpcProgram(int index)
+std::weak_ptr<MpcProgram> Sampler::getMpcProgram(int index)
 {
 	return programs[index];
 }
@@ -265,29 +264,29 @@ int Sampler::getProgramCount()
 	return res;
 }
 
-weak_ptr<Program> Sampler::addProgram(int i)
+std::weak_ptr<Program> Sampler::addProgram(int i)
 {
 	if (programs[i])
-		return weak_ptr<Program>();
+		return std::weak_ptr<Program>();
 
-	programs[i] = make_shared<Program>(mpc, this);
+	programs[i] = std::make_shared<Program>(mpc, this);
 	return programs[i];
 }
 
-weak_ptr<Program> Sampler::addProgram()
+std::weak_ptr<Program> Sampler::addProgram()
 {
 	for (auto& p : programs)
 	{
 		if (!p)
 		{
-			p = make_shared<Program>(mpc, this);
+			p = std::make_shared<Program>(mpc, this);
 			return p;
 		}
 	}
-	return weak_ptr<Program>();
+	return std::weak_ptr<Program>();
 }
 
-void Sampler::deleteProgram(weak_ptr<Program> _program)
+void Sampler::deleteProgram(std::weak_ptr<Program> _program)
 {
 	auto program = _program.lock();
 	
@@ -317,9 +316,9 @@ void Sampler::deleteProgram(weak_ptr<Program> _program)
 	}
 }
 
-vector<weak_ptr<Sound>> Sampler::getSounds()
+std::vector<std::weak_ptr<Sound>> Sampler::getSounds()
 {
-	auto res = vector<weak_ptr<Sound>>();
+	auto res = std::vector<std::weak_ptr<Sound>>();
 
 	for (auto& s : sounds)
 		res.push_back(s);
@@ -327,14 +326,14 @@ vector<weak_ptr<Sound>> Sampler::getSounds()
 	return res;
 }
 
-weak_ptr<Sound> Sampler::addSound()
+std::weak_ptr<Sound> Sampler::addSound()
 {
 	return addSound(44100);
 }
 
-weak_ptr<Sound> Sampler::addSound(int sampleRate)
+std::weak_ptr<Sound> Sampler::addSound(int sampleRate)
 {
-	auto res = make_shared<Sound>(sampleRate, sounds.size());
+	auto res = std::make_shared<Sound>(sampleRate, sounds.size());
 	sounds.push_back(res);
 	return res;
 }
@@ -344,19 +343,28 @@ int Sampler::getSoundCount()
 	return sounds.size();
 }
 
-string Sampler::getSoundName(int i)
+std::string Sampler::getSoundName(int i)
 {
 	return sounds[i]->getName();
 }
 
-string Sampler::getPadName(int i)
+std::vector<std::string> Sampler::getSoundNames()
+{
+    std::vector<std::string> result;
+    for (int i = 0; i < getSoundCount(); i++)
+        result.push_back(sounds[i]->getName());
+    return result;
+}
+
+
+std::string Sampler::getPadName(int i)
 {
 	return padNames[i];
 }
 
-vector<weak_ptr<Program>> Sampler::getPrograms()
+std::vector<std::weak_ptr<Program>> Sampler::getPrograms()
 {
-	auto res = vector<weak_ptr<Program>>();
+	auto res = std::vector<std::weak_ptr<Program>>();
 
 	for (auto& p : programs)
 		res.push_back(p);
@@ -364,7 +372,7 @@ vector<weak_ptr<Program>> Sampler::getPrograms()
 	return res;
 }
 
-void Sampler::replaceProgram(weak_ptr<Program> p, int index)
+void Sampler::replaceProgram(std::weak_ptr<Program> p, int index)
 {
 	auto sourceProgram = p.lock();
 	auto destProgram = programs[index];
@@ -406,12 +414,12 @@ void Sampler::checkProgramReferences()
 	}
 }
 
-vector<float>* Sampler::getClickSample()
+std::vector<float>* Sampler::getClickSample()
 {
 	return &clickSample;
 }
 
-weak_ptr<MpcSound> Sampler::getMpcSound(int index)
+std::weak_ptr<MpcSound> Sampler::getMpcSound(int index)
 {
     if (index < 0 || index >= sounds.size())
         return {};
@@ -419,10 +427,10 @@ weak_ptr<MpcSound> Sampler::getMpcSound(int index)
 	return sounds[index];
 }
 
-weak_ptr<MpcSound> Sampler::getMpcPreviewSound()
+std::weak_ptr<MpcSound> Sampler::getMpcPreviewSound()
 {
 	if (sounds.size() == 0)
-		return weak_ptr<Sound>();
+		return std::weak_ptr<Sound>();
 
 	return sounds[sounds.size() - 1];
 }
@@ -433,7 +441,7 @@ void Sampler::trimSample(int sampleNumber, int start, int end)
 	trimSample(s, start, end);
 }
 
-void Sampler::trimSample(weak_ptr<Sound> sound, int start, int end)
+void Sampler::trimSample(std::weak_ptr<Sound> sound, int start, int end)
 {
 	auto s = sound.lock();
 	auto data = s->getSampleData();
@@ -479,7 +487,7 @@ void Sampler::deleteSection(const unsigned int sampleNumber, const unsigned int 
 	data->erase(data->begin() + start, data->begin() + end);
 }
 
-string Sampler::getSoundSortingTypeName()
+std::string Sampler::getSoundSortingTypeName()
 {
 	if (soundSortingType == 0)
 		return "MEMORY";
@@ -501,8 +509,8 @@ void Sampler::sort()
 
 	auto currentSoundMemoryIndex = soundIndex == -1 ? -1 : sounds[soundIndex]->getMemoryIndex();
 
-	vector<string> oldSoundNames;
-	std::transform(begin(sounds), end(sounds), std::back_inserter(oldSoundNames), [](shared_ptr<Sound> sound) { return sound->getName(); });
+	std::vector<std::string> oldSoundNames;
+	std::transform(begin(sounds), end(sounds), std::back_inserter(oldSoundNames), [](std::shared_ptr<Sound> sound) { return sound->getName(); });
 
 	switch (soundSortingType)
 	{
@@ -517,10 +525,10 @@ void Sampler::sort()
 		break;
 	}
 
-	vector<string> newSoundNames;
-	std::transform(begin(sounds), end(sounds), std::back_inserter(newSoundNames), [](shared_ptr<Sound> sound) { return sound->getName(); });
+	std::vector<std::string> newSoundNames;
+	std::transform(begin(sounds), end(sounds), std::back_inserter(newSoundNames), [](std::shared_ptr<Sound> sound) { return sound->getName(); });
 
-	vector<NoteParameters*> correctedNoteParameters;
+	std::vector<NoteParameters*> correctedNoteParameters;
 
 	for (auto& program : programs)
 	{
@@ -566,7 +574,7 @@ void Sampler::deleteAllSamples()
 	}
 }
 
-void Sampler::process12Bit(vector<float>* fa)
+void Sampler::process12Bit(std::vector<float>* fa)
 {
 	for (auto j = 0; j < fa->size(); j++)
 	{
@@ -592,7 +600,7 @@ void Sampler::process12Bit(vector<float>* fa)
 	}
 }
 
-void Sampler::process8Bit(vector<float>* fa)
+void Sampler::process8Bit(std::vector<float>* fa)
 {
 	for (auto j = 0; j < fa->size(); j++)
 	{
@@ -643,12 +651,12 @@ void Sampler::resample(std::vector<float>& data, int sourceRate, std::shared_ptr
     if (error != 0)
     {
         const char* errormsg = src_strerror(error);
-        string errorStr(errormsg);
+        std::string errorStr(errormsg);
         MLOG("libsamplerate error: " + errorStr);
     }
 }
 
-weak_ptr<Sound> Sampler::createZone(weak_ptr<Sound> source, int start, int end, int endMargin)
+std::weak_ptr<Sound> Sampler::createZone(std::weak_ptr<Sound> source, int start, int end, int endMargin)
 {
 	auto overlap = (int)(endMargin * source.lock()->getSampleRate() * 0.001);
 
@@ -721,7 +729,7 @@ void Sampler::playX()
 	sound->setEnd(oldEnd);
 }
 
-weak_ptr<MpcSound> Sampler::getPlayXSound()
+std::weak_ptr<MpcSound> Sampler::getPlayXSound()
 {
 	return sounds[soundIndex];
 }
@@ -736,7 +744,7 @@ int Sampler::getFreeSampleSpace()
 	return (int) floor(freeSpace);
 }
 
-int Sampler::getLastInt(string s)
+int Sampler::getLastInt(std::string s)
 {
 	auto offset = s.length();
 
@@ -759,7 +767,7 @@ int Sampler::getLastInt(string s)
 	return stoi(s.substr(offset));
 }
 
-string Sampler::addOrIncreaseNumber(string s)
+std::string Sampler::addOrIncreaseNumber(std::string s)
 {
 	auto res = addOrIncreaseNumber2(s);
 	bool exists = true;
@@ -782,25 +790,25 @@ string Sampler::addOrIncreaseNumber(string s)
 	return res;
 }
 
-string Sampler::addOrIncreaseNumber2(string s)
+std::string Sampler::addOrIncreaseNumber2(std::string s)
 {
 	int candidate = getLastInt(s);
-	string res = s;
+	std::string res = s;
 	
 	if (candidate == INT_MIN)
 	{
-        if (res.length() == 16) res = res.substr(0, 15);
-        return res + to_string(1);
+        if (res.length() >= 16) res = res.substr(0, 15);
+        return res + std::to_string(1);
 	}
 
-    auto candidateStr = to_string(candidate);
+    auto candidateStr = std::to_string(candidate);
     int candidateLength = candidateStr.length();
 
     res = res.substr(0, res.length() - candidateLength);
 
     candidate++;
 
-    candidateStr = to_string(candidate);
+    candidateStr = std::to_string(candidate);
     candidateLength = candidateStr.length();
 
     if (res.length() + candidateLength > 16)
@@ -830,9 +838,9 @@ NoteParameters* Sampler::getLastNp(Program* program)
 	return dynamic_cast<mpc::sampler::NoteParameters*>(program->getNoteParameters(lastValidNote));
 }
 
-vector<weak_ptr<Sound>> Sampler::getUsedSounds()
+std::vector<std::weak_ptr<Sound>> Sampler::getUsedSounds()
 {
-	set<weak_ptr<Sound>, owner_less<weak_ptr<Sound>>> usedSounds;
+	std::set<std::weak_ptr<Sound>, std::owner_less<std::weak_ptr<Sound>>> usedSounds;
 
 	for (auto& p : programs)
 	{
@@ -845,7 +853,7 @@ vector<weak_ptr<Sound>> Sampler::getUsedSounds()
 				usedSounds.emplace(sounds[nn->getSoundIndex()]);
 		}
 	}
-	return vector<weak_ptr<Sound>>(begin(usedSounds), end(usedSounds));
+	return std::vector<std::weak_ptr<Sound>>(begin(usedSounds), end(usedSounds));
 }
 
 int Sampler::getUnusedSampleCount()
@@ -860,7 +868,7 @@ void Sampler::purge()
 	for (int i = 0; i < sounds.size(); i++)
 	{
 		auto maybeUsedSound = sounds[i];
-		const auto pos = find_if(begin(usedSounds), end(usedSounds), [&maybeUsedSound](const weak_ptr<Sound>& sound) {
+		const auto pos = find_if(begin(usedSounds), end(usedSounds), [&maybeUsedSound](const std::weak_ptr<Sound>& sound) {
 			return sound.lock() == maybeUsedSound;
 		});
 		
@@ -878,7 +886,7 @@ void Sampler::deleteSound(int soundIndex)
 	deleteSound(sounds[soundIndex]);
 }
 
-void Sampler::deleteSound(weak_ptr<Sound> sound)
+void Sampler::deleteSound(std::weak_ptr<Sound> sound)
 {
 	auto index = sound.lock()->getMemoryIndex();
 
@@ -893,7 +901,7 @@ void Sampler::deleteSound(weak_ptr<Sound> sound)
 
 	stable_sort(sounds.begin(), sounds.end(), compareMemoryIndex);
 
-	vector<NoteParameters*> correctedNoteParameters;
+	std::vector<NoteParameters*> correctedNoteParameters;
 
 	for (int i = 0; i < sounds.size(); i++)
 	{
@@ -945,10 +953,10 @@ void Sampler::deleteSound(weak_ptr<Sound> sound)
 		soundIndex = 0;
 }
 
-vector<float> Sampler::mergeToStereo(vector<float> fa0, vector<float> fa1)
+std::vector<float> Sampler::mergeToStereo(std::vector<float> fa0, std::vector<float> fa1)
 {
 	const int newLengthFrames = fa0.size() > fa1.size() ? fa0.size() : fa1.size();
-	vector<float> newSampleData = vector<float>(newLengthFrames * 2);
+	std::vector<float> newSampleData = std::vector<float>(newLengthFrames * 2);
 
 	for (int i = 0; i < newLengthFrames; i++)
 	{
@@ -972,7 +980,7 @@ vector<float> Sampler::mergeToStereo(vector<float> fa0, vector<float> fa1)
 	return newSampleData;
 }
 
-void Sampler::mergeToStereo(vector<float>* sourceLeft, vector<float>* sourceRight, vector<float>* dest)
+void Sampler::mergeToStereo(std::vector<float>* sourceLeft, std::vector<float>* sourceRight, std::vector<float>* dest)
 {
 	dest->clear();
 
@@ -1021,12 +1029,12 @@ MpcSoundPlayerChannel* Sampler::getDrum(int i)
 	return mpc.getDrum(i);
 }
 
-weak_ptr<MpcSound> Sampler::getClickSound()
+std::weak_ptr<MpcSound> Sampler::getClickSound()
 {
 	return clickSound;
 }
 
-int Sampler::checkExists(string soundName)
+int Sampler::checkExists(std::string soundName)
 {
 	for (int i = 0; i < getSoundCount(); i++)
 	{
@@ -1056,7 +1064,7 @@ void Sampler::selectNextSound()
 	setSoundIndex(getNextSoundIndex(soundIndex, true));
 }
 
-weak_ptr<Sound> Sampler::copySound(weak_ptr<Sound> source)
+std::weak_ptr<Sound> Sampler::copySound(std::weak_ptr<Sound> source)
 {
 	auto sound = source.lock();
 	auto newSound = addSound(sound->getSampleRate()).lock();
@@ -1123,15 +1131,15 @@ void Sampler::copyProgram(const int sourceIndex, const int destIndex)
 	destSlider->setTuneLowRange(srcSlider->getTuneLowRange());
 }
 
-bool Sampler::compareMemoryIndex(weak_ptr<Sound> a, weak_ptr<Sound> b) {
+bool Sampler::compareMemoryIndex(std::weak_ptr<Sound> a, std::weak_ptr<Sound> b) {
 	return a.lock()->getMemoryIndex() < b.lock()->getMemoryIndex();
 }
 
-bool Sampler::compareName(weak_ptr<Sound> a, weak_ptr<Sound> b) {
+bool Sampler::compareName(std::weak_ptr<Sound> a, std::weak_ptr<Sound> b) {
 	return a.lock()->getName() < b.lock()->getName();
 }
 
-bool Sampler::compareSize(weak_ptr<Sound> a, weak_ptr<Sound> b) {
+bool Sampler::compareSize(std::weak_ptr<Sound> a, std::weak_ptr<Sound> b) {
 	return a.lock()->getFrameCount() < b.lock()->getFrameCount();
 }
 
@@ -1179,7 +1187,7 @@ int Sampler::getPlayX()
 	return playX_;
 }
 
-bool Sampler::isSoundNameOccupied(const string& name)
+bool Sampler::isSoundNameOccupied(const std::string& name)
 {
 	for (auto& s : sounds)
 		if (StrUtil::eqIgnoreCase(StrUtil::trim(s->getName()), StrUtil::trim(name)))
