@@ -91,3 +91,7 @@ if (UNIX AND NOT APPLE)
     target_include_directories(mpc-tests SYSTEM PUBLIC ${udisks2_INCLUDE_DIRS})
     target_link_libraries(mpc-tests ${udisks2_LIBRARIES})
 endif()
+
+if (APPLE)
+    target_link_libraries(mpc-tests stdc++ "-framework Foundation -framework Security -framework DiskArbitration -framework SystemConfiguration")
+endif()
