@@ -12,7 +12,7 @@ class Pkg(ConanFile):
                 "moduru/0.1@izmar/dev",
                 "akaifat/0.1@izmar/dev",
                 "rapidjson/1.1.0",
-                "catch2/2.13.4",
+                "catch2/2.13.8",
                 "ghc-filesystem/1.4.0",
                 "tl-expected/20190710")
     url = "https://github.com/izzyreal/mpc.git"
