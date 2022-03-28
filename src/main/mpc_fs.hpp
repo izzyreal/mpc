@@ -6,7 +6,7 @@
 #ifdef __APPLE__
 #include <TargetConditionals.h>
 #endif
-#if !defined(__linux__) && !defined(TARGET_IPHONE_SIMULATOR)
+#if !defined(__linux__) && !TARGET_OS_IOS
 #define GHC_USE_STD_FS
 #include <filesystem>
 namespace fs = std::filesystem;
