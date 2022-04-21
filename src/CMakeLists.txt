@@ -53,6 +53,10 @@ if(MSVC)
 	target_compile_options(mpc PRIVATE "/MP")
 endif()
 
+if(VMPC2000XL_WIN7)
+    target_compile_definitions(mpc PRIVATE VMPC2000XL_WIN7)
+endif()
+
 ## Configure test suite application ##
 
 set(_src_root_path_test "${CMAKE_CURRENT_SOURCE_DIR}/test")

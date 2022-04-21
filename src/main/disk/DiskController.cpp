@@ -43,8 +43,14 @@ void DiskController::initDisks()
 #endif
     disks.back()->initRoot();
     
+    MLOG("Disk root initialized");
+    
+#ifndef VMPC2000XL_WIN7
+
     RemovableVolumes removableVolumes;
     
+    MLOG("RemovableVolumes instantiated");
+
     class SimpleChangeListener : public VolumeChangeListener {
     public:
         std::vector<RemovableVolume> volumes;
@@ -55,14 +61,23 @@ void DiskController::initDisks()
     
     SimpleChangeListener listener;
     
+    MLOG("SimpleChangeListener instantiated");
+
     removableVolumes.addListener(&listener);
     
+    MLOG("Listener was added to removableVolumes");
+
     removableVolumes.init();
     
+    MLOG("RemovableVolumes initialized");
+
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     
+    MLOG("Iterating through scraped USB volumes...");
+
     for (auto& v : listener.volumes)
     {
+        MLOG("Discovered volume UUID " + v.volumeUUID);
         disks.emplace_back(std::make_shared<RawDisk>(mpc));
         auto disk = disks.back();
         auto& volume = disk->getVolume();
@@ -79,11 +94,20 @@ void DiskController::initDisks()
         volume.volumeSize = v.mediaSize;
         volume.volumeUUID = v.volumeUUID;
     }
+
+#endif
+
+    MLOG("Persisted UUID: " + persistedActiveUUID);
     
     for (int i = 0; i < disks.size(); i++)
     {
+        MLOG("\nIterating through disks: " + std::to_string(i));
+        MLOG("Absolute path: " + disks[i]->getAbsolutePath());
+
         auto uuid = disks[i]->getVolume().volumeUUID;
         
+        MLOG("UUID: " + uuid);
+
         if (uuid == persistedActiveUUID)
         {
             activeDiskIndex = i;
@@ -91,13 +115,22 @@ void DiskController::initDisks()
         }
     }
     
+    auto activeDisk = getActiveDisk().lock();
+
+    MLOG("Active disk is set to the one with absolute path: " + activeDisk->getAbsolutePath());
+
     if (std::dynamic_pointer_cast<RawDisk>(getActiveDisk().lock()))
     {
         getActiveDisk().lock()->initRoot();
+
         if (!getActiveDisk().lock()->getVolume().volumeStream.is_open())
         {
             activeDiskIndex = 0;
         }
+    }
+    else
+    {
+        MLOG("The active disk is not a raw USB volume.");
     }
 }
 
