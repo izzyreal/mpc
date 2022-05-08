@@ -5,6 +5,10 @@
 
 #include <thirdp/PlatformFolders/platform_folders.h>
 
+#ifdef __APPLE__
+#include <TargetConditionals.h>
+#endif
+
 using namespace mpc;
 using namespace moduru::file;
 using namespace std;
@@ -13,7 +17,11 @@ string Paths::sep = FileUtil::getSeparator();
 
 string Paths::appDocumentsPath()
 {
+#if TARGET_OS_IOS
+    static auto path = sago::getDocumentsFolder() + sep;
+#else
     static auto path = sago::getDocumentsFolder() + sep + "VMPC2000XL" + sep;
+#endif
     return path;
 }
 
@@ -37,8 +45,8 @@ string Paths::configPath()
 
 string Paths::storesPath()
 {
-	static auto storesPath = appDocumentsPath() + "Volumes" + sep;
-	return storesPath;
+  static auto storesPath = appDocumentsPath() + "Volumes" + sep;
+  return storesPath;
 }
 
 string Paths::defaultLocalVolumePath()
@@ -49,8 +57,8 @@ string Paths::defaultLocalVolumePath()
 
 string Paths::logFilePath()
 {
-	static auto logFilePath = appDocumentsPath() + "vmpc.log";
-	return logFilePath;
+  static auto logFilePath = appDocumentsPath() + "vmpc.log";
+  return logFilePath;
 }
 
 string Paths::recordingsPath()
