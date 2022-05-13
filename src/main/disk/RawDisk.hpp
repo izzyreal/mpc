@@ -29,6 +29,7 @@ private:
     std::shared_ptr<akaifat::fat::AkaiFatLfnDirectory> getParentDir();
 
 public:
+    std::shared_ptr<MpcFile> newFile(const std::string& newFileName) override;
     void initFiles() override;
     std::string getDirectoryName() override;
     bool moveBack() override;
@@ -47,7 +48,6 @@ public:
     
 protected:
     int getPathDepth() override;
-    std::shared_ptr<MpcFile> newFile(const std::string& newFileName) override;
 
 };
 }

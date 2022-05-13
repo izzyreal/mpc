@@ -35,9 +35,10 @@ AllParser::AllParser(mpc::Mpc& _mpc, mpc::disk::MpcFile* file)
 AllParser::AllParser(mpc::Mpc& _mpc, const vector<char>& loadBytes)
 	: mpc (_mpc)
 {
-	header = new Header(VecUtil::CopyOfRange(loadBytes, HEADER_OFFSET, HEADER_OFFSET + HEADER_LENGTH));
+  if (loadBytes.size() >= HEADER_OFFSET + HEADER_LENGTH)
+    header = new Header(VecUtil::CopyOfRange(loadBytes, HEADER_OFFSET, HEADER_OFFSET + HEADER_LENGTH));
 	
-	if (!header->verifyFileID())
+	if (header == nullptr || !header->verifyFileID())
 		throw invalid_argument("Invalid ALL file header ID");
 	
 	defaults = new Defaults(mpc, VecUtil::CopyOfRange(loadBytes, DEFAULTS_OFFSET, DEFAULTS_OFFSET + DEFAULTS_LENGTH));

@@ -37,9 +37,9 @@ protected:
     std::vector<std::shared_ptr<MpcFile>> parentFiles;
 
     virtual int getPathDepth() = 0;
-    virtual std::shared_ptr<MpcFile> newFile(const std::string& name) = 0;
 
 public:
+    virtual std::shared_ptr<MpcFile> newFile(const std::string& name) = 0;
     bool deleteSelectedFile();
     
     std::vector<std::string> getFileNames();
