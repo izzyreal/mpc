@@ -1,3 +1,6 @@
+## v0.4.4 (13-5-2022)
+* Fix crash when loading 24 or 32 bit WAV files
+
 ## v0.4.3 (10-3-2022)
 * Pads light up when dragging a WAV or SND file over them (to indicate you can drop 'm there)
 * Fix crash when loading WAV files with corrupt chunk size information -- If file is too small, silence is loaded for the missing data
