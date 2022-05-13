@@ -379,6 +379,8 @@ int WavFile::writeFrames(std::vector<float>& sampleBuffer, int numFramesToWrite)
 
 void WavFile::close()
 {
+  auto ofStream = std::dynamic_pointer_cast<std::ofstream>(oStream);
+  if (ofStream && ofStream->is_open()) {
     if (bufferPointer > 0) {
         oStream->write(&buffer[0], bufferPointer);
     }
@@ -386,7 +388,6 @@ void WavFile::close()
         char buf[1] {0x00};
         oStream->write(buf, 1);
     }
-    
-    auto ofStream = std::dynamic_pointer_cast<std::ofstream>(oStream);
-    if (ofStream && ofStream->is_open()) ofStream->close();
+    ofStream->close();
+  }
 }
