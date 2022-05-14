@@ -1,6 +1,7 @@
 ## v0.4.4 (13-5-2022)
 * Fix crash when loading 24 or 32 bit WAV files
 * Fix stuck modifier keys when changing focus (DATA wheel is incrementing too much)
+* Lower CPU usage
 
 ## v0.4.3 (10-3-2022)
 * Pads light up when dragging a WAV or SND file over them (to indicate you can drop 'm there)
