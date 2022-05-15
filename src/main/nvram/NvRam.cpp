@@ -8,6 +8,7 @@
 #include <lcdgui/screens/UserScreen.hpp>
 #include <lcdgui/screens/VmpcSettingsScreen.hpp>
 #include <lcdgui/screens/VmpcAutoSaveScreen.hpp>
+#include <lcdgui/screens/OthersScreen.hpp>
 
 #include <audiomidi/AudioMidiServices.hpp>
 
@@ -27,105 +28,112 @@ using namespace std;
 
 void NvRam::loadUserScreenValues(mpc::Mpc& mpc)
 {
-    string path = mpc::Paths::configPath() + "nvram.vmp";
-    auto file = File(path, nullptr);
-    
-    if (!file.exists())
-        return;
-    
-    auto defaults = DefaultsParser::AllDefaultsFromFile(mpc, file);
-    auto userScreen = mpc.screens->get<UserScreen>("user");
-    
-    userScreen->lastBar = defaults.getBarCount() - 1;
-    userScreen->bus = defaults.getBusses()[0];
-    
-    for (int i = 0; i < 33; i++)
+  string path = mpc::Paths::configPath() + "nvram.vmp";
+  auto file = File(path, nullptr);
+  
+  if (!file.exists())
+    return;
+  
+  auto defaults = DefaultsParser::AllDefaultsFromFile(mpc, file);
+  auto userScreen = mpc.screens->get<UserScreen>("user");
+  
+  userScreen->lastBar = defaults.getBarCount() - 1;
+  userScreen->bus = defaults.getBusses()[0];
+  
+  for (int i = 0; i < 33; i++)
     userScreen->setDeviceName(i, defaults.getDefaultDevNames()[i]);
-    
-    userScreen->setSequenceName(defaults.getDefaultSeqName());
-    auto defTrackNames = defaults.getDefaultTrackNames();
-    
-    for (int i = 0; i < 64; i++)
+  
+  userScreen->setSequenceName(defaults.getDefaultSeqName());
+  auto defTrackNames = defaults.getDefaultTrackNames();
+  
+  for (int i = 0; i < 64; i++)
     userScreen->setTrackName(i, defTrackNames[i]);
-    
-    userScreen->setDeviceNumber(defaults.getDevices()[0]);
-    userScreen->setTimeSig(defaults.getTimeSigNum(), defaults.getTimeSigDen());
-    userScreen->setPgm(defaults.getPgms()[0]);
-    userScreen->setTempo(defaults.getTempo() / 10.0);
-    userScreen->setVelo(defaults.getTrVelos()[0]);
+  
+  userScreen->setDeviceNumber(defaults.getDevices()[0]);
+  userScreen->setTimeSig(defaults.getTimeSigNum(), defaults.getTimeSigDen());
+  userScreen->setPgm(defaults.getPgms()[0]);
+  userScreen->setTempo(defaults.getTempo() / 10.0);
+  userScreen->setVelo(defaults.getTrVelos()[0]);
 }
 
 void NvRam::saveUserScreenValues(mpc::Mpc& mpc)
 {
-    DefaultsParser dp(mpc);
-    
-    string fileName = mpc::Paths::configPath() + "nvram.vmp";
-    
-    File file(fileName, nullptr);
-    
-    if (!file.exists())
-        file.create();
-    
-    auto stream = FileUtil::ofstreamw(fileName, ios::binary | ios::out);
-    auto bytes = dp.getBytes();
-    stream.write(&bytes[0], bytes.size());
-    stream.close();
+  DefaultsParser dp(mpc);
+  
+  string fileName = mpc::Paths::configPath() + "nvram.vmp";
+  
+  File file(fileName, nullptr);
+  
+  if (!file.exists())
+    file.create();
+  
+  auto stream = FileUtil::ofstreamw(fileName, ios::binary | ios::out);
+  auto bytes = dp.getBytes();
+  stream.write(&bytes[0], bytes.size());
+  stream.close();
 }
 
 void NvRam::saveVmpcSettings(mpc::Mpc& mpc)
 {
-    auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
-    auto vmpcAutoSaveScreen = mpc.screens->get<VmpcAutoSaveScreen>("vmpc-auto-save");
-    auto audioMidiServices  = mpc.getAudioMidiServices().lock();
-    string fileName = mpc::Paths::configPath() + "vmpc-specific.ini";
-    
-    File file(fileName, nullptr);
-    
-    if (!file.exists()) file.create();
-    
-    auto stream = FileUtil::ofstreamw(fileName, ios::binary | ios::out);
-
-    vector<char> bytes{
-        (char) (vmpcSettingsScreen->initialPadMapping),
-        (char) (vmpcSettingsScreen->_16LevelsEraseMode),
-        (char) (vmpcAutoSaveScreen->autoSaveOnExit),
-        (char) (vmpcAutoSaveScreen->autoLoadOnStart),
-        (char) (audioMidiServices->getRecordLevel()),
-        (char) (audioMidiServices->getMasterLevel()),
-        (char) (mpc.getHardware().lock()->getSlider().lock()->getValue()),
-        (char) (vmpcSettingsScreen->autoConvertWavs)
-    };
-    
-    stream.write(&bytes[0], bytes.size());
-    stream.close();
+  auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
+  auto vmpcAutoSaveScreen = mpc.screens->get<VmpcAutoSaveScreen>("vmpc-auto-save");
+  auto othersScreen = mpc.screens->get<OthersScreen>("others");
+  
+  auto audioMidiServices  = mpc.getAudioMidiServices().lock();
+  string fileName = mpc::Paths::configPath() + "vmpc-specific.ini";
+  
+  File file(fileName, nullptr);
+  
+  if (!file.exists()) file.create();
+  
+  auto stream = FileUtil::ofstreamw(fileName, ios::binary | ios::out);
+  
+  vector<char> bytes{
+    (char) (vmpcSettingsScreen->initialPadMapping),
+    (char) (vmpcSettingsScreen->_16LevelsEraseMode),
+    (char) (vmpcAutoSaveScreen->autoSaveOnExit),
+    (char) (vmpcAutoSaveScreen->autoLoadOnStart),
+    (char) (audioMidiServices->getRecordLevel()),
+    (char) (audioMidiServices->getMasterLevel()),
+    (char) (mpc.getHardware().lock()->getSlider().lock()->getValue()),
+    (char) (vmpcSettingsScreen->autoConvertWavs),
+    (char) (othersScreen->getTapAveraging()),
+    (char) (othersScreen->getContrast())
+  };
+  
+  stream.write(&bytes[0], bytes.size());
+  stream.close();
 }
 
 void NvRam::loadVmpcSettings(mpc::Mpc& mpc)
 {
-    string path = mpc::Paths::configPath() + "vmpc-specific.ini";
-    File file(path, nullptr);
-
-    auto audioMidiServices  = mpc.getAudioMidiServices().lock();
-
-    if (!file.exists())
-    {
-        audioMidiServices->setRecordLevel(DEFAULT_REC_GAIN);
-        audioMidiServices->setMasterLevel(DEFAULT_MAIN_VOLUME);
-        return;
-    }
-    
-    auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
-    auto vmpcAutoSaveScreen = mpc.screens->get<VmpcAutoSaveScreen>("vmpc-auto-save");
-    
-    vector<char> bytes;
-    file.getData(&bytes);
-    
-    if (bytes.size() > 0) vmpcSettingsScreen->initialPadMapping = bytes[0];
-    if (bytes.size() > 1) vmpcSettingsScreen->_16LevelsEraseMode = bytes[1];
-    if (bytes.size() > 2) vmpcAutoSaveScreen->autoSaveOnExit = bytes[2];
-    if (bytes.size() > 3) vmpcAutoSaveScreen->autoLoadOnStart = bytes[3];
-    if (bytes.size() > 4) audioMidiServices->setRecordLevel(bytes[4]);
-    if (bytes.size() > 5) audioMidiServices->setMasterLevel(bytes[5]);
-    if (bytes.size() > 6) mpc.getHardware().lock()->getSlider().lock()->setValue(bytes[6]);
-    if (bytes.size() > 7) vmpcSettingsScreen->autoConvertWavs = bytes[7];
+  string path = mpc::Paths::configPath() + "vmpc-specific.ini";
+  File file(path, nullptr);
+  
+  auto audioMidiServices  = mpc.getAudioMidiServices().lock();
+  
+  if (!file.exists())
+  {
+    audioMidiServices->setRecordLevel(DEFAULT_REC_GAIN);
+    audioMidiServices->setMasterLevel(DEFAULT_MAIN_VOLUME);
+    return;
+  }
+  
+  auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
+  auto vmpcAutoSaveScreen = mpc.screens->get<VmpcAutoSaveScreen>("vmpc-auto-save");
+  auto othersScreen = mpc.screens->get<OthersScreen>("others");
+  
+  vector<char> bytes;
+  file.getData(&bytes);
+  
+  if (bytes.size() > 0) vmpcSettingsScreen->initialPadMapping = bytes[0];
+  if (bytes.size() > 1) vmpcSettingsScreen->_16LevelsEraseMode = bytes[1];
+  if (bytes.size() > 2) vmpcAutoSaveScreen->autoSaveOnExit = bytes[2];
+  if (bytes.size() > 3) vmpcAutoSaveScreen->autoLoadOnStart = bytes[3];
+  if (bytes.size() > 4) audioMidiServices->setRecordLevel(bytes[4]);
+  if (bytes.size() > 5) audioMidiServices->setMasterLevel(bytes[5]);
+  if (bytes.size() > 6) mpc.getHardware().lock()->getSlider().lock()->setValue(bytes[6]);
+  if (bytes.size() > 7) vmpcSettingsScreen->autoConvertWavs = bytes[7];
+  if (bytes.size() > 8) othersScreen->setTapAveraging(bytes[8]);
+  if (bytes.size() > 9) othersScreen->setContrast(bytes[9]);
 }
