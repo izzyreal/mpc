@@ -123,7 +123,7 @@ void SaveScreen::turnWheel(int i)
 
 void SaveScreen::setType(int i)
 {
-    if (i < 0 || i > 5)
+    if (i < 0 || i > 4)
         return;
     
     type = i;
