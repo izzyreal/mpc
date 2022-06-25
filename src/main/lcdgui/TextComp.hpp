@@ -12,7 +12,7 @@ namespace mpc { class Mpc; }
 namespace mpc::lcdgui
 {
 
-	enum Alignment { None, Centered };
+	enum class Alignment { None, Centered };
 
 	class TextComp
 		: public Component
