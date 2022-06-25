@@ -4,8 +4,6 @@
 
 #include <gui/BMFParser.hpp>
 
-#include <rapidjson/document.h>
-
 #include <string>
 #include <vector>
 

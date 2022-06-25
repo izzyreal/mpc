@@ -1,8 +1,5 @@
 #pragma once
 
-#include <rapidjson/document.h>
-#include <rapidjson/rapidjson.h>
-
 #include <vector>
 #include <string>
 #include <memory>
@@ -37,9 +34,6 @@ private:
     
     mpc::Mpc& mpc;
     
-    void init();
-    
-    std::vector<std::unique_ptr<rapidjson::Document>> layerDocuments;
     std::map<std::string, std::shared_ptr<ScreenComponent>> screens;
     
     std::pair<

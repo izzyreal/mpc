@@ -38,7 +38,6 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace moduru::file;
 using namespace moduru::lang;
-using namespace rapidjson;
 
 using namespace std;
 

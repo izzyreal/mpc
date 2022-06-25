@@ -161,6 +161,8 @@
 #include <cmrc/cmrc.hpp>
 #include <string_view>
 
+#include <rapidjson/document.h>
+
 #ifdef _MSC_VER
 #undef GetObject
 #include <rapidjson/rapidjson.h>
@@ -181,6 +183,38 @@ using namespace std;
 Screens::Screens(mpc::Mpc& mpc)
 	: mpc(mpc)
 {
+}
+
+std::vector<std::unique_ptr<rapidjson::Document>>& layerDocuments()
+{
+    static std::vector<std::unique_ptr<rapidjson::Document>> result;
+    
+    if (result.empty()) {
+        auto fs = cmrc::mpc::get_filesystem();
+
+        for (int i = 0; i < 4; i++)
+        {
+            char readBuffer[256];
+            auto file = fs.open("screens/layer" + to_string(i + 1) + ".json");
+            char* data = (char*) string_view(file.begin(), file.end() - file.begin()).data();
+
+            auto panelDoc = make_unique<Document>();
+            panelDoc->Parse(data, file.size());
+
+            /*
+            This can be uncommented to list all screen names that are encountered in the json files.
+            for (Value::ConstMemberIterator itr = panelDoc->MemberBegin();
+                itr != panelDoc->MemberEnd(); ++itr)
+            {
+                MLOG("\"" + string(itr->name.GetString()) + "\", ");
+            }
+            */
+
+            result.push_back(move(panelDoc));
+        }
+    }
+    
+    return result;
 }
 
 vector<int> getFunctionKeyTypes(Value& functionKeyTypes)
@@ -215,12 +249,9 @@ vector<string> getFunctionKeyLabels(Value& functionKeyLabels)
 
 pair<vector<shared_ptr<Component>>, map<string, vector<string>>> Screens::get(const string& screenName, int& foundInLayer, string& firstField)
 {	
-	if (Screens::layerDocuments.empty())
-		init();
-
 	for (int i = 0; i < 4; i++)
 	{
-		if (layerDocuments[i]->HasMember(screenName.c_str()))
+		if (layerDocuments()[i]->HasMember(screenName.c_str()))
 		{
 			foundInLayer = i;
 			break;
@@ -230,7 +261,7 @@ pair<vector<shared_ptr<Component>>, map<string, vector<string>>> Screens::get(co
 	if (foundInLayer < 0)
 		return {};
 
-	Value& arrangement = layerDocuments[foundInLayer]->GetObject()[screenName.c_str()];
+	Value& arrangement = layerDocuments()[foundInLayer]->GetObject()[screenName.c_str()];
 
 	vector<shared_ptr<Component>> components;
 
@@ -343,33 +374,6 @@ pair<vector<shared_ptr<Component>>, map<string, vector<string>>> Screens::get(co
 	}
 
 	return { components, transferMap };
-}
-
-void Screens::init()
-{
-    auto fs = cmrc::mpc::get_filesystem();
-
-	for (int i = 0; i < 4; i++)
-	{
-		
-		char readBuffer[256];
-        auto file = fs.open("screens/layer" + to_string(i + 1) + ".json");
-        char* data = (char*) string_view(file.begin(), file.end() - file.begin()).data();
-
-		auto panelDoc = make_unique<Document>();
-        panelDoc->Parse(data, file.size());
-
-		/*
-		This can be uncommented to list all screen names that are encountered in the json files.
-		for (Value::ConstMemberIterator itr = panelDoc->MemberBegin();
-			itr != panelDoc->MemberEnd(); ++itr)
-		{
-			MLOG("\"" + string(itr->name.GetString()) + "\", ");
-		}
-		*/
-
-		layerDocuments.push_back(move(panelDoc));
-	}
 }
 
 shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName)
