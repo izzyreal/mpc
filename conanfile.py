@@ -8,8 +8,8 @@ class Pkg(ConanFile):
     settings = "os", "compiler", "arch", "build_type"
     generators = "cmake"
     exports_sources = ["src/*", "resources/*"]
-    requires = ("ctoot/0.1@izmar/dev",
-                "moduru/0.1@izmar/dev",
+    requires = ("ctoot/0.2@izmar/dev",
+                "moduru/0.2@izmar/dev",
                 "akaifat/0.1@izmar/dev",
                 "rapidjson/1.1.0",
                 "catch2/2.13.8",
