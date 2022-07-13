@@ -163,11 +163,6 @@
 
 #include <rapidjson/document.h>
 
-#ifdef _MSC_VER
-#undef GetObject
-#include <rapidjson/rapidjson.h>
-#endif
-
 CMRC_DECLARE(mpc);
 
 using namespace mpc::lcdgui;
