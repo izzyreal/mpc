@@ -1,6 +1,6 @@
 include(CMakeRC.cmake)
 
-set(_mpc_resources_root ${CMAKE_CURRENT_LIST_DIR}/../resources)
+set(_mpc_resources_root ${CMAKE_CURRENT_LIST_DIR}/resources)
 
 function(_bundle_mpc_resources _target_name)
   set(total_list "")

@@ -3,12 +3,12 @@
 #include <mpc_fs.hpp>
 #include <thirdp/any.hpp>
 
-#include <fat/AkaiFatLfnDirectoryEntry.hpp>
-
 #include <vector>
 #include <string>
 #include <memory>
 #include <iostream>
+
+namespace akaifat::fat { class AkaiFatLfnDirectoryEntry; }
 
 /*
  * An MpcFile contains either an AkaiFatLongFileNameDirectoryEntry or a moduru::file::FileSystemNode.

@@ -1,8 +1,24 @@
 cmake_minimum_required(VERSION 3.13)
 
+set(MPC_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}" CACHE STRING "Setting MPC_SOURCE_DIR")
+set(MPC_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}" CACHE STRING "Setting MPC_BINARY_DIR")
+
+include("${CMAKE_CURRENT_SOURCE_DIR}/CPM.cmake")
+
+add_definitions(-w)
+
 include(ResourceBundling.cmake)
 
+CPMAddPackage("gh:izzyreal/moduru#no-conan")
+CPMAddPackage("gh:izzyreal/ctoot#no-conan")
+CPMAddPackage("gh:izzyreal/akaifat#no-conan")
+CPMAddPackage("gh:Tencent/rapidjson#v1.1.0")
+CPMAddPackage("gh:gulrak/filesystem#v1.5.12")
+
+CPMAddPackage("gh:catchorg/Catch2#v3.1.0")
+
 project(mpc)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "-fPIC -DCATCH_CONFIG_NO_CPP17_UNCAUGHT_EXCEPTIONS")
 
@@ -14,19 +30,14 @@ if(APPLE)
   set(CMAKE_OSX_DEPLOYMENT_TARGET "10.9" CACHE INTERNAL "Minimum OS X deployment version")
 endif()
 
-if(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/conanbuildinfo_multi.cmake)
-    include(${CMAKE_CURRENT_BINARY_DIR}/conanbuildinfo_multi.cmake)
-else()
-    include(${CMAKE_CURRENT_BINARY_DIR}/conanbuildinfo.cmake)
-endif()
-
-conan_basic_setup(NO_OUTPUT_DIRS)
-
 ## Configure main lib ##
 
-set(_src_root_path_main "${CMAKE_CURRENT_SOURCE_DIR}/main")
+set(_src_root_path_main "${CMAKE_CURRENT_SOURCE_DIR}/src/main")
 
-include_directories(${_src_root_path_main})
+message("\n\n=============== expected: ${expected_SOURCE_DIR}\n\n")
+
+include_directories(${expected_SOURCE_DIR}/include ${_src_root_path_main} ${CTOOT_SOURCE_DIR}/src/main ${AKAIFAT_SOURCE_DIR}/src/main ${MODURU_SOURCE_DIR}/src/main ${rapidjson_SOURCE_DIR})
+link_directories(${CTOOT_BINARY_DIR} ${AKAIFAT_BINARY_DIR} ${MODURU_BINARY_DIR})
 
 file(
     GLOB_RECURSE _source_list_main 
@@ -45,7 +56,7 @@ foreach(_source IN ITEMS ${_source_list_main})
 endforeach()
 
 add_library(mpc ${_source_list_main})
-conan_target_link_libraries(mpc)
+target_link_libraries(mpc ctoot akaifat moduru ghc_filesystem)
 
 _bundle_mpc_resources(mpc)
 
@@ -59,7 +70,7 @@ endif()
 
 ## Configure test suite application ##
 
-set(_src_root_path_test "${CMAKE_CURRENT_SOURCE_DIR}/test")
+set(_src_root_path_test "${CMAKE_CURRENT_SOURCE_DIR}/src/test")
 
 include_directories(${_src_root_path_test})
 
@@ -98,5 +109,5 @@ if (UNIX AND NOT APPLE)
 endif()
 
 if (APPLE)
-    target_link_libraries(mpc-tests stdc++ "-framework Foundation -framework Security -framework DiskArbitration -framework SystemConfiguration")
+    target_link_libraries(mpc-tests Catch2::Catch2WithMain stdc++ "-framework Foundation -framework Security -framework DiskArbitration -framework SystemConfiguration")
 endif()
