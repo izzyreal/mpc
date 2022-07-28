@@ -120,8 +120,6 @@ void Mpc::init(const int sampleRate, const int inputCount, const int outputCount
 
 	controls = std::make_shared<controls::Controls>(*this);
 
-	diskController->initDisks();
-
 	mpc::nvram::NvRam::loadUserScreenValues(*this);
 
     // We fetch all screens once so they're all cached in Screens,

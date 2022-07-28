@@ -136,6 +136,16 @@ void DiskController::initDisks()
 
 std::weak_ptr<AbstractDisk> DiskController::getActiveDisk()
 {
+    if (disks.size() == 0)
+    {
+        initDisks();
+    }
+
+    if (disks.size() == 0 || activeDiskIndex >= disks.size())
+    {
+        return {};
+    }
+
     return disks[activeDiskIndex];
 }
 
