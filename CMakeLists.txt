@@ -1,13 +1,13 @@
 cmake_minimum_required(VERSION 3.13)
 
+include(cmake/CPM.cmake)
+include(cmake/ResourceBundling.cmake)
+
 set(MPC_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}" CACHE STRING "Setting MPC_SOURCE_DIR")
 set(MPC_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}" CACHE STRING "Setting MPC_BINARY_DIR")
 
-include("${CMAKE_CURRENT_SOURCE_DIR}/CPM.cmake")
-
 add_definitions(-w)
 
-include(ResourceBundling.cmake)
 
 CPMAddPackage("gh:izzyreal/moduru#no-conan")
 CPMAddPackage("gh:izzyreal/ctoot#no-conan")
