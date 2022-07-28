@@ -16,13 +16,14 @@ namespace mpc::disk
 		mpc::Mpc& mpc;
         std::vector<std::shared_ptr<AbstractDisk>> disks;
         int activeDiskIndex = 0;
-        
+
+        void initDisks();
+
         friend class mpc::lcdgui::screens::LoadScreen;
         
 	public:
         std::vector<std::shared_ptr<AbstractDisk>>& getDisks();
 		DiskController(mpc::Mpc&);
-		void initDisks();
 		std::weak_ptr<AbstractDisk> getActiveDisk();
 
 	};
