@@ -27,16 +27,14 @@ if(DEFINED ENV{APPLE_M1})
 endif()
 
 if(APPLE)
-  set(CMAKE_OSX_DEPLOYMENT_TARGET "10.9" CACHE INTERNAL "Minimum OS X deployment version")
+  set(CMAKE_OSX_DEPLOYMENT_TARGET "10.11" CACHE INTERNAL "Minimum OS X deployment version")
 endif()
 
 ## Configure main lib ##
 
 set(_src_root_path_main "${CMAKE_CURRENT_SOURCE_DIR}/src/main")
 
-message("\n\n=============== expected: ${expected_SOURCE_DIR}\n\n")
-
-include_directories(${expected_SOURCE_DIR}/include ${_src_root_path_main} ${CTOOT_SOURCE_DIR}/src/main ${AKAIFAT_SOURCE_DIR}/src/main ${MODURU_SOURCE_DIR}/src/main ${rapidjson_SOURCE_DIR})
+include_directories(${_src_root_path_main} ${CTOOT_SOURCE_DIR}/src/main ${AKAIFAT_SOURCE_DIR}/src/main ${MODURU_SOURCE_DIR}/src/main ${rapidjson_SOURCE_DIR} ${expected_INCLUDE_DIR})
 link_directories(${CTOOT_BINARY_DIR} ${AKAIFAT_BINARY_DIR} ${MODURU_BINARY_DIR})
 
 file(
