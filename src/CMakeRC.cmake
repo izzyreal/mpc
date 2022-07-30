@@ -36,9 +36,6 @@ set(_version 2.0.0)
 
 cmake_minimum_required(VERSION 3.3)
 set(CMAKE_CXX_FLAGS "-fPIC")
-if(DEFINED ENV{APPLE_M1})
-    set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE INTERNAL "")
-endif()
 
 include(CMakeParseArguments)
 
