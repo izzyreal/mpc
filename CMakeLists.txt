@@ -88,13 +88,12 @@ foreach(_source IN ITEMS ${_source_list_test})
 endforeach()
 
 add_executable(mpc-tests ${_source_list_test})
+target_link_libraries(mpc-tests mpc Catch2::Catch2WithMain)
 
 if (UNIX)
     set(THREADS_PREFER_PTHREAD_FLAG ON)
     find_package(Threads REQUIRED)
-    target_link_libraries(mpc-tests Threads::Threads mpc)
-else()
-    target_link_libraries(mpc-tests mpc)
+    target_link_libraries(mpc-tests Threads::Threads)
 endif (UNIX)
 
 if (UNIX AND NOT APPLE)
@@ -107,5 +106,5 @@ if (UNIX AND NOT APPLE)
 endif()
 
 if (APPLE)
-    target_link_libraries(mpc-tests Catch2::Catch2WithMain stdc++ "-framework Foundation -framework Security -framework DiskArbitration -framework SystemConfiguration")
+    target_link_libraries(mpc-tests stdc++ "-framework Foundation -framework Security -framework DiskArbitration -framework SystemConfiguration")
 endif()
