@@ -1,21 +1,65 @@
 cmake_minimum_required(VERSION 3.13)
+set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
-include(cmake/CPM.cmake)
 include(cmake/ResourceBundling.cmake)
 
-set(MPC_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}" CACHE STRING "Setting MPC_SOURCE_DIR")
-set(MPC_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}" CACHE STRING "Setting MPC_BINARY_DIR")
+include(FetchContent)
 
-add_definitions(-w)
+FetchContent_Declare(moduru
+  GIT_REPOSITORY https://github.com/izzyreal/moduru.git
+  GIT_TAG        native-cmake
+  SOURCE_DIR     ${CMAKE_SOURCE_DIR}/editables/moduru
+)
 
+FetchContent_Declare(akaifat
+  GIT_REPOSITORY https://github.com/izzyreal/akaifat.git
+  GIT_TAG        native-cmake
+  SOURCE_DIR     ${CMAKE_SOURCE_DIR}/editables/akaifat
+)
 
-CPMAddPackage("gh:izzyreal/moduru#no-conan")
-CPMAddPackage("gh:izzyreal/ctoot#no-conan")
-CPMAddPackage("gh:izzyreal/akaifat#no-conan")
-CPMAddPackage("gh:Tencent/rapidjson#v1.1.0")
-CPMAddPackage("gh:gulrak/filesystem#v1.5.12")
+FetchContent_Declare(ctoot
+  GIT_REPOSITORY https://github.com/izzyreal/ctoot.git
+  GIT_TAG        native-cmake
+  SOURCE_DIR     ${CMAKE_SOURCE_DIR}/editables/ctoot
+)
 
-CPMAddPackage("gh:catchorg/Catch2#v3.1.0")
+FetchContent_Declare(Catch2
+  GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+  GIT_TAG        v3.1.0
+  SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/Catch2
+)
+
+FetchContent_Declare(filesystem
+  GIT_REPOSITORY https://github.com/gulrak/filesystem.git
+  GIT_TAG        v1.5.12
+  SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/filesystem
+)
+
+FetchContent_Declare(tl-expected
+  GIT_REPOSITORY https://github.com/TartanLlama/expected.git
+  GIT_TAG        v1.0.0
+  SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/expected
+  CONFIGURE_COMMAND ""
+  BUILD_COMMAND ""
+)
+
+set(RAPIDJSON_BUILD_EXAMPLES OFF)
+set(RAPIDJSON_BUILD_DOC OFF)
+set(RAPIDJSON_BUILD_TESTS OFF)
+
+FetchContent_Declare(rapidjson
+  GIT_REPOSITORY https://github.com/Tencent/rapidjson.git
+  GIT_TAG        v1.1.0
+  SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/rapidjson
+)
+
+FetchContent_MakeAvailable(moduru akaifat ctoot filesystem rapidjson Catch2)
+
+FetchContent_GetProperties(tl-expected)
+
+if(NOT tl-expected_POPULATED)
+  FetchContent_Populate(tl-expected)
+endif()
 
 project(mpc)
 
@@ -34,17 +78,12 @@ endif()
 
 set(_src_root_path_main "${CMAKE_CURRENT_SOURCE_DIR}/src/main")
 
-include_directories(${_src_root_path_main} ${CTOOT_SOURCE_DIR}/src/main ${AKAIFAT_SOURCE_DIR}/src/main ${MODURU_SOURCE_DIR}/src/main ${rapidjson_SOURCE_DIR} ${expected_INCLUDE_DIR})
-link_directories(${CTOOT_BINARY_DIR} ${AKAIFAT_BINARY_DIR} ${MODURU_BINARY_DIR})
-
 file(
     GLOB_RECURSE _source_list_main 
     LIST_DIRECTORIES false
     RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
     "${_src_root_path_main}/*.c*"
-    "${_src_root_path_main}/*.cpp*"
-    "${_src_root_path_main}/*.hpp*"
-	"${_src_root_path_main}/*.hxx*"
+    "${_src_root_path_main}/*.h*"
 )
 
 foreach(_source IN ITEMS ${_source_list_main})
@@ -54,6 +93,17 @@ foreach(_source IN ITEMS ${_source_list_main})
 endforeach()
 
 add_library(mpc ${_source_list_main})
+
+target_include_directories(mpc PUBLIC
+    ${_src_root_path_main}
+    ${ctoot_SOURCE_DIR}/src/main
+    ${akaifat_SOURCE_DIR}/src/main
+    ${moduru_SOURCE_DIR}/src/main
+    ${rapidjson_SOURCE_DIR}/include
+    ${filesystem_SOURCE_DIR}/include
+    ${tl-expected_SOURCE_DIR}/include
+)
+
 target_link_libraries(mpc ctoot akaifat moduru ghc_filesystem)
 
 _bundle_mpc_resources(mpc)
@@ -77,8 +127,7 @@ file(
     LIST_DIRECTORIES false
     RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
     "${_src_root_path_test}/*.c*"
-    "${_src_root_path_test}/*.cpp*"
-    "${_src_root_path_test}/*.hpp*"
+    "${_src_root_path_test}/*.h*"
 )
 
 foreach(_source IN ITEMS ${_source_list_test})
@@ -108,3 +157,11 @@ endif()
 if (APPLE)
     target_link_libraries(mpc-tests stdc++ "-framework Foundation -framework Security -framework DiskArbitration -framework SystemConfiguration")
 endif()
+
+set(CPACK_SOURCE_GENERATOR "TGZ")
+set(CPACK_SOURCE_IGNORE_FILES
+    /.git
+    /build
+    /\\\\.DS_Store
+)
+include(CPack)

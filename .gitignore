@@ -1,2 +1,3 @@
-build
-test_package/build
+build/
+editables/
+deps/
