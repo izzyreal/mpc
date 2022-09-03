@@ -469,3 +469,25 @@ const bool AudioMidiServices::isBouncing()
 const bool AudioMidiServices::isRecordingSound() {
 	return recordingSound.load();
 }
+
+// Should be called from the audio thread only!
+void AudioMidiServices::changeSoundRecorderStateIfRequired()
+{
+  if (wasRecordingSound && !soundRecorder->isRecording())
+  {
+    soundRecorder->stop();
+    stopSoundRecorder();
+  }
+  
+  if (!wasRecordingSound && isRecordingSound())
+  {
+    wasRecordingSound = true;
+    soundRecorder->start();
+  }
+  else if (wasRecordingSound && !isRecordingSound())
+  {
+    wasRecordingSound = false;
+    soundRecorder->stop();
+  }
+}
+

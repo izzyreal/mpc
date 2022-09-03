@@ -74,9 +74,11 @@ namespace mpc::audiomidi
 		bool stopBouncingEarly();
 		void startRecordingSound();
 		void stopSoundRecorder(bool cancel = false);
-		
+    void changeSoundRecorderStateIfRequired();
+    
 	private:
 		bool bouncePrepared = false;
+    bool wasRecordingSound = false;
 		std::vector<std::shared_ptr<ctoot::mpc::MpcVoice>> voices;
 		std::shared_ptr<ctoot::mpc::MpcVoice> basicVoice;
 		std::vector<std::shared_ptr<ctoot::synth::SynthChannelControls>> synthChannelControls;
