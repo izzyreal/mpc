@@ -50,7 +50,7 @@ void GlobalReleaseControls::function(int i)
 {
 	init();
 	auto controls = mpc.getControls().lock();
-	
+
 	switch (i)
 	{
 	case 0:
@@ -60,14 +60,14 @@ void GlobalReleaseControls::function(int i)
 		break;
 	case 2:
 		controls->setF3Pressed(false);
-		
+
 		if (currentScreenName.compare("load-a-sound") == 0)
 			sampler.lock()->finishBasicVoice();
 
 		break;
 	case 3:
 		controls->setF4Pressed(false);
-		
+
 		if (currentScreenName.compare("keep-or-retry") == 0)
 			sampler.lock()->finishBasicVoice();
 
@@ -77,7 +77,7 @@ void GlobalReleaseControls::function(int i)
 
 		if (ls.lock()->getPreviousScreenName() == "load" && currentScreenName == "popup")
 		{
-            if (ls.lock()->getLastFocus("load") == "file")
+            if (ls.lock()->getLastFocus("load") == "file" || ls.lock()->getLastFocus("load") == "view")
             {
                 ls.lock()->openScreen("load");
                 mpc.getAudioMidiServices().lock()->getSoundPlayer().lock()->enableStopEarly();
@@ -90,7 +90,7 @@ void GlobalReleaseControls::function(int i)
 
 		if (!sequencer.lock()->isPlaying() && currentScreenName.compare("sequencer") != 0)
 			sampler.lock()->finishBasicVoice();
-		
+
 		if (currentScreenName.compare("track-mute") == 0)
 		{
 			if (!sequencer.lock()->isSoloEnabled())
@@ -110,7 +110,7 @@ void GlobalReleaseControls::function(int i)
 			sampler.lock()->stopAllVoices();
 
 			controls->getPressedPads()->clear();
-			
+
 			for (int j = 0; j < 16; j++)
 			{
 				controls->getPressedPadVelos()->at(j) = 0;
@@ -125,19 +125,19 @@ void GlobalReleaseControls::simplePad(int i)
 {
 	init();
 	auto bank = mpc.getBank();
-	
+
 	auto controls = mpc.getControls().lock();
-	
+
 	if (controls->getPressedPads()->find(i) == controls->getPressedPads()->end())
 		return;
-	
+
 	controls->getPressedPads()->erase(controls->getPressedPads()->find(i));
 
     if (sequencer.lock()->isRecordingOrOverdubbing() && mpc.getControls().lock()->isErasePressed())
     {
         return;
     }
-    
+
 	auto lTrk = track.lock();
 	auto note = lTrk->getBus() > 0 ? program.lock()->getPad(i + (bank * 16))->getNote() : i + (bank * 16) + 35;
 
@@ -146,13 +146,13 @@ void GlobalReleaseControls::simplePad(int i)
 
 	bool maybeRecWithoutPlaying = currentScreenName.compare("sequencer") == 0 && !posIsLastTick;
 	bool stepRec = currentScreenName.compare("step-editor") == 0 && !posIsLastTick;
-	
+
 	if (stepRec || maybeRecWithoutPlaying)
 	{
 		auto newDur = static_cast<int>(mpc.getAudioMidiServices().lock()->getFrameSequencer().lock()->getTickPosition());
 		sequencer.lock()->stopMetronomeTrack();
 		bool durationHasBeenAdjusted = lTrk->adjustDurLastEvent(newDur);
-		
+
 		if (durationHasBeenAdjusted && maybeRecWithoutPlaying)
 		{
 			auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
@@ -164,7 +164,7 @@ void GlobalReleaseControls::simplePad(int i)
 			auto bar = sequencer.lock()->getCurrentBarIndex() + 1;
 			nextPos = lTrk->timingCorrectTick(0, bar, nextPos, stepLength);
 			auto lastTick = sequencer.lock()->getActiveSequence().lock()->getLastTick();
-			
+
 			if (nextPos != 0 && nextPos < lastTick)
 			{
 				nextPos = lTrk->swingTick(nextPos, noteVal, timingCorrectScreen->getSwing());
@@ -182,7 +182,7 @@ void GlobalReleaseControls::generateNoteOff(int note)
 {
     init();
 	auto lTrk = track.lock();
-    
+
 	auto assign16LevelsScreen = mpc.screens->get<Assign16LevelsScreen>("assign-16-levels");
 
 	if (mpc.getHardware().lock()->getTopPanel().lock()->isSixteenLevelsEnabled())
@@ -229,7 +229,7 @@ void GlobalReleaseControls::tap()
 
 	if (sequencer.lock()->isRecordingOrOverdubbing())
 		sequencer.lock()->flushTrackNoteCache();
-    
+
     if (!controls->isNoteRepeatLocked())
     {
         auto sequencerScreen = mpc.screens->get<SequencerScreen>("sequencer");
