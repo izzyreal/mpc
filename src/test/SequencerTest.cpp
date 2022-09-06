@@ -62,8 +62,7 @@ SCENARIO("Can record and playback from different threads", "[sequencer]")
             while (dspCycleCounter++ * PROCESS_BLOCK_INTERVAL < AUDIO_THREAD_TIMEOUT &&
                    track->getEvents().size() < humanTickPositions.size())
             {
-                auto eventCount = track->getEvents().size();
-                server->work(nullptr, nullptr, BUFFER_SIZE, 0, 1);
+                server->work((float*)nullptr, (float*)nullptr, BUFFER_SIZE, 0, 1);
                 
                 if (dspCycleCounter * PROCESS_BLOCK_INTERVAL < RECORD_DELAY)
                 {

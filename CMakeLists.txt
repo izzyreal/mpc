@@ -23,6 +23,8 @@ FetchContent_Declare(ctoot
   SOURCE_DIR     ${CMAKE_SOURCE_DIR}/editables/ctoot
 )
 
+set(CATCH_CONFIG_NO_CPP17_UNCAUGHT_EXCEPTIONS ON)
+
 FetchContent_Declare(Catch2
   GIT_REPOSITORY https://github.com/catchorg/Catch2.git
   GIT_TAG        v3.1.0
@@ -64,7 +66,7 @@ endif()
 project(mpc)
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS "-fPIC -DCATCH_CONFIG_NO_CPP17_UNCAUGHT_EXCEPTIONS")
+set(CMAKE_CXX_FLAGS "-fPIC")
 
 if(DEFINED ENV{APPLE_M1})
     set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE INTERNAL "")
