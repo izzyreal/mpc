@@ -318,9 +318,9 @@ void FrameSeq::repeatPad(int tick)
 	if (!controls)
 		return;
 
-	auto pp = *controls->getPressedPads();
+	auto pp = controls->getPressedPads();
 
-	for (auto& i : pp)
+	for (auto& i : *pp)
     {
         mpc.getReleaseControls()->simplePad(i);
         mpc.getActiveControls().lock()->pad(i, (*controls->getPressedPadVelos())[i], true, tick);
