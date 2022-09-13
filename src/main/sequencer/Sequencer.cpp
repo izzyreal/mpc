@@ -7,8 +7,6 @@
 #include <hardware/Hardware.hpp>
 #include <hardware/HwPad.hpp>
 
-#include <lcdgui/LayeredScreen.hpp>
-#include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/SongScreen.hpp>
 #include <lcdgui/screens/SecondSeqScreen.hpp>
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
@@ -21,11 +19,8 @@
 #include <sequencer/TempoChangeEvent.hpp>
 #include <sequencer/FrameSeq.hpp>
 #include <sequencer/Track.hpp>
-#include <sequencer/TimeSignature.hpp>
 #include <sequencer/Song.hpp>
 #include <sequencer/Step.hpp>
-
-#include <sampler/Sampler.hpp>
 
 // ctoot
 #include <audio/server/NonRealTimeAudioServer.hpp>
@@ -445,7 +440,7 @@ void Sequencer::play(bool fromStart)
 	auto countMetronomeScreen = mpc.screens->get<CountMetronomeScreen>("count-metronome");
 	auto countInMode = countMetronomeScreen->getCountInMode();
 
-    if (!countEnabled || countInMode == 0 || (countInMode == 1 && recording == false))
+    if (!countEnabled || countInMode == 0 || (countInMode == 1 && !recording))
 	{
 		if (fromStart)
 			move(0);
@@ -455,10 +450,10 @@ void Sequencer::play(bool fromStart)
 	
 	if (countEnabled && !songMode)
 	{
-		if (countInMode == 2 || (countInMode == 1 && recording == true))
+		if (countInMode == 2 || (countInMode == 1 && recording))
 		{
 			move(s->getLoopStart());
-			startCountingIn();
+			countingIn = true;
 		}
 	}
 
@@ -602,6 +597,7 @@ void Sequencer::overdubFromStart()
 
 void Sequencer::stop()
 {
+    countingIn = false;
 	stop(-1);
 }
 
@@ -688,11 +684,6 @@ bool Sequencer::isCountingIn()
 void Sequencer::setCountingIn(bool b)
 {
     countingIn = b;
-}
-
-void Sequencer::startCountingIn()
-{
-    countingIn = true;
 }
 
 void Sequencer::notifyTrack()

@@ -141,7 +141,6 @@ namespace mpc::sequencer
 		void stop(int tick);
 		bool isCountingIn();
 		void setCountingIn(bool b);
-		void startCountingIn();
 		void notifyTrack();
 		void setSequence(int i, std::shared_ptr<Sequence> s);
 		void purgeAllSequences();
