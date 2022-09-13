@@ -81,7 +81,7 @@ void BaseControls::init()
     
     if (drumIndex != -1)
     {
-        mpcSoundPlayerChannel = sampler.lock()->getDrum(track.lock()->getBus() - 1);
+        mpcSoundPlayerChannel = sampler.lock()->getDrum(drumIndex);
         program = sampler.lock()->getProgram(mpcSoundPlayerChannel->getProgram());
     }
     else
@@ -979,7 +979,8 @@ const std::vector<std::string> BaseControls::samplerScreens {
     "drum",
     "loop",
     "mixer",
-    "pgm-assign",
+    "program-assign",
+    "program-params",
     "select-drum",
     "trim",
     "zone"

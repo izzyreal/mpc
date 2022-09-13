@@ -2,9 +2,7 @@
 
 #include "SelectDrumScreen.hpp"
 
-#include <sampler/NoteParameters.hpp>
 #include <sampler/Pad.hpp>
-#include <sampler/Program.hpp>
 
 #include <mpc/MpcSoundPlayerChannel.hpp>
 #include <mpc/MpcStereoMixerChannel.hpp>
