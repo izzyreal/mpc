@@ -29,6 +29,9 @@ void NumberOfZonesScreen::function(int i)
 {
 	switch (i)
 	{
+    case 3:
+        openScreen("zone");
+        break;
 	case 4:
 		auto zoneScreen = mpc.screens->get<ZoneScreen>("zone");
 		auto sound = sampler.lock()->getSound().lock();
