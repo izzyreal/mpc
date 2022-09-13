@@ -3,7 +3,6 @@
 #include "AllEvent.hpp"
 #include "AllSequence.hpp"
 
-#include <sequencer/Event.hpp>
 #include <sequencer/NoteEvent.hpp>
 
 #include <file/BitUtil.hpp>
@@ -36,12 +35,12 @@ vector<char> AllNoteEvent::mpcEventToBytes(std::shared_ptr<NoteEvent> event)
 	bytes[NOTE_NUMBER_OFFSET] = static_cast<int8_t>(event->getNote());
 	
     try {
-		writeVelocity(bytes, event->getVelocity());
 		writeTrackNumber(bytes, event->getTrack());
 		writeVariationType(bytes, event->getVariationType());
 		writeVariationValue(bytes, event->getVariationValue());
 		AllEvent::writeTick(bytes, static_cast<int>(event->getTick()));
 		writeDuration(bytes, static_cast<int>(event->getDuration()));
+        writeVelocity(bytes, event->getVelocity());
 	}
 	catch (exception e) {
 		throw e;
@@ -79,19 +78,40 @@ int AllNoteEvent::readDuration(const vector<char>& bytes)
 
 int AllNoteEvent::readTrackNumber(const vector<char>& bytes)
 {
-    auto b = BitUtil::removeUnusedBits(bytes[TRACK_NUMBER_OFFSET], TRACK_NUMBER_BIT_RANGE);
+    auto b = static_cast<unsigned char>(bytes[TRACK_NUMBER_OFFSET]);
+    for (int i = 0; i < 8; i++)
+    {
+        if (i < TRACK_NUMBER_BIT_RANGE[0] || i > TRACK_NUMBER_BIT_RANGE[1])
+        {
+            b = BitUtil::setBit(static_cast<unsigned char>(b), i, false);
+        }
+    }
     return b;
 }
 
 int AllNoteEvent::readVelocity(const vector<char>& bytes)
 {
-    auto b = BitUtil::removeUnusedBits(bytes[VELOCITY_OFFSET], VELOCITY_BIT_RANGE);
+    auto b = static_cast<unsigned char>(bytes[VELOCITY_OFFSET]);
+    for (int i = 0; i < 8; i++)
+    {
+        if (i < VELOCITY_BIT_RANGE[0] || i > VELOCITY_BIT_RANGE[1])
+        {
+            b = BitUtil::setBit(static_cast<unsigned char>(b), i, false);
+        }
+    }
     return b;
 }
 
 int AllNoteEvent::readVariationValue(const vector<char>& bytes)
 {
-    auto b = BitUtil::removeUnusedBits(bytes[VAR_VALUE_OFFSET], VAR_VALUE_BIT_RANGE);
+    auto b = static_cast<unsigned char>(bytes[VAR_VALUE_OFFSET]);
+    for (int i = 0; i < 8; i++)
+    {
+        if (i < VAR_VALUE_BIT_RANGE[0] || i > VAR_VALUE_BIT_RANGE[1])
+        {
+            b = BitUtil::setBit(static_cast<unsigned char>(b), i, false);
+        }
+    }
     return b;
 }
 
@@ -153,25 +173,8 @@ void AllNoteEvent::writeVariationType(vector<char>& event, int type)
 {
     auto byte1 = event[VAR_TYPE_BYTE1_OFFSET];
     auto byte2 = event[VAR_TYPE_BYTE2_OFFSET];
-    switch (type) {
-    case 0:
-        BitUtil::setBit(byte1, VAR_TYPE_BYTE1_BIT, false);
-        BitUtil::setBit(byte2, VAR_TYPE_BYTE2_BIT, false);
-        break;
-    case 1:
-        BitUtil::setBit(byte1, VAR_TYPE_BYTE1_BIT, false);
-        BitUtil::setBit(byte2, VAR_TYPE_BYTE2_BIT, true);
-        break;
-    case 2:
-        BitUtil::setBit(byte1, VAR_TYPE_BYTE1_BIT, true);
-        BitUtil::setBit(byte2, VAR_TYPE_BYTE2_BIT, false);
-        break;
-    case 3:
-        BitUtil::setBit(byte1, VAR_TYPE_BYTE1_BIT, true);
-        BitUtil::setBit(byte2, VAR_TYPE_BYTE2_BIT, true);
-        break;
-    }
-
+    byte1 = static_cast<char>(BitUtil::setBit(byte1, VAR_TYPE_BYTE1_BIT, type == 2 || type == 3));
+    byte2 = static_cast<char>(BitUtil::setBit(byte2, VAR_TYPE_BYTE2_BIT, type == 1 || type == 3));
     event[VAR_TYPE_BYTE1_OFFSET] = byte1;
     event[VAR_TYPE_BYTE2_OFFSET] = byte2;
 }

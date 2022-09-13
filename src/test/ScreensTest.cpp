@@ -5,7 +5,6 @@
 #include <sequencer/Sequencer.hpp>
 #include <sampler/Sampler.hpp>
 
-#include <lcdgui/LayeredScreen.hpp>
 #include <lcdgui/Layer.hpp>
 
 #include <vector>
