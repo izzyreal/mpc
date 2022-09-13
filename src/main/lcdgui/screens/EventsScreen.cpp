@@ -3,7 +3,6 @@
 #include <sequencer/Event.hpp>
 #include <sequencer/Track.hpp>
 #include <sequencer/NoteEvent.hpp>
-#include <sequencer/TimeSignature.hpp>
 #include <sequencer/SeqUtil.hpp>
 
 #include <lcdgui/screens/UserScreen.hpp>
@@ -228,7 +227,10 @@ void EventsScreen::function(int i)
 			}
 		}
 		else if (editFunctionNumber == 3)
- {
+        {
+            // The original does not process DRUM tracks.
+            // We do, because it's nice and doesn't bother anyone,
+            // so you won't see any filtering of that kind here.
 			for (auto& e : sourceTrack->getEvents())
 			{
 				auto event = e.lock();
@@ -236,8 +238,7 @@ void EventsScreen::function(int i)
 			
 				if (n)
 				{
-					n->setNote(n->getNote() + velocityValue);
-					break;
+					n->setNote(n->getNote() + transposeAmount);
 				}
 			}
 		}
