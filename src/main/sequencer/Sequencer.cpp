@@ -440,7 +440,7 @@ void Sequencer::play(bool fromStart)
 	auto countMetronomeScreen = mpc.screens->get<CountMetronomeScreen>("count-metronome");
 	auto countInMode = countMetronomeScreen->getCountInMode();
 
-    if (!countEnabled || countInMode == 0 || (countInMode == 1 && !recording))
+    if (!countEnabled || countInMode == 0 || (countInMode == 1 && !isRecordingOrOverdubbing()))
 	{
 		if (fromStart)
 			move(0);
@@ -450,7 +450,7 @@ void Sequencer::play(bool fromStart)
 	
 	if (countEnabled && !songMode)
 	{
-		if (countInMode == 2 || (countInMode == 1 && recording))
+		if (countInMode == 2 || (countInMode == 1 && (isRecordingOrOverdubbing())))
 		{
 			move(s->getLoopStart());
 			countingIn = true;
