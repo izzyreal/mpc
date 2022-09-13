@@ -890,6 +890,19 @@ void Sampler::deleteSound(std::weak_ptr<Sound> sound)
 {
 	auto index = sound.lock()->getMemoryIndex();
 
+    for (auto& p : programs)
+    {
+        if (!p) continue;
+
+        for (auto& n : p->getNotesParameters())
+        {
+            if (n->getSoundIndex() == index)
+            {
+                n->setSoundIndex(-1);
+            }
+        }
+    }
+
 	for (int i = 0; i < sounds.size(); i++)
 	{
 		if (sounds[i] == sound.lock())
@@ -901,8 +914,6 @@ void Sampler::deleteSound(std::weak_ptr<Sound> sound)
 
 	stable_sort(sounds.begin(), sounds.end(), compareMemoryIndex);
 
-	std::vector<NoteParameters*> correctedNoteParameters;
-
 	for (int i = 0; i < sounds.size(); i++)
 	{
 		auto oldMemoryIndex = sounds[i]->getMemoryIndex();
@@ -911,23 +922,13 @@ void Sampler::deleteSound(std::weak_ptr<Sound> sound)
 
 		for (auto& program : programs)
 		{
-			if (!program)
-				continue;
+			if (!program) continue;
 
 			for (auto noteParameters : program->getNotesParameters())
 			{
-				if (find(correctedNoteParameters.begin(), correctedNoteParameters.end(), noteParameters) != correctedNoteParameters.end())
-					continue;
-			
 				if (noteParameters->getSoundIndex() == oldMemoryIndex)
 				{
 					noteParameters->setSoundIndex(i);
-					correctedNoteParameters.push_back(noteParameters);
-				}
-				else if (noteParameters->getSoundIndex() == index)
-				{
-					noteParameters->setSoundIndex(-1);
-					correctedNoteParameters.push_back(noteParameters);
 				}
 			}
 		}
