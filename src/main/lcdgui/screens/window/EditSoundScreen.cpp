@@ -368,7 +368,7 @@ void EditSoundScreen::turnWheel(int i)
 	}
 	else if (param.compare("create-new-program") == 0)
 	{
-		setCreateNewProgram(true);
+		setCreateNewProgram(i > 0);
 	}
 }
 
