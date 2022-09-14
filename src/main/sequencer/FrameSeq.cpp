@@ -334,4 +334,8 @@ void FrameSeq::checkNextSq()
 	lSeq->setNextSq(-1);
 	lSeq->notify("nextsqoff");
 	lSeq->notify("seqnumbername");
+    lSeq->notify("timesignature");
+    lSeq->notify("numberofbars");
+    lSeq->notify("tempo");
+    lSeq->notify("loop");
 }
