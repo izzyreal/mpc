@@ -65,7 +65,10 @@ public:
     void turnWheel(int j) override;
     void function(int i) override;
     void pressEnter() override;
-    
+
+    void typeCharacter(char c);
+    void backSpace();
+
 private:
     const std::vector<std::string> saveScreens = { "save-a-program", "save-a-sequence", "save-a-sound" };
     
@@ -115,6 +118,5 @@ private:
     friend class SaveASequenceScreen;
     friend class ProgramScreen;
     friend class mpc::lcdgui::screens::SaveScreen;
-    
 };
 }

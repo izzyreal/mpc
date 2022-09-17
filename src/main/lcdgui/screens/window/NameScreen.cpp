@@ -82,7 +82,7 @@ void NameScreen::turnWheel(int j)
 	{
 		for (int i = 0; i < 16; i++)
 		{
-			if (param.compare(to_string(i)) == 0)
+			if (param == to_string(i))
 			{
 				changeNameCharacter(i, j > 0);
 				drawUnderline();
@@ -222,7 +222,7 @@ void NameScreen::changeNameCharacter(int i, bool up)
 	
 	for (auto str : mpc::Mpc::akaiAscii)
 	{
-		if (str.compare(s) == 0)
+		if (str == s)
 			break;
 
 		stringCounter++;
@@ -294,4 +294,86 @@ void NameScreen::displayName()
 		findField("14").lock()->Hide(true);
 		findField("15").lock()->Hide(true);
 	}
+}
+
+void NameScreen::typeCharacter(char c)
+{
+    init();
+    auto charWithCasing = static_cast<char>(mpc.getControls().lock()->isShiftPressed() ? toupper(c) : tolower(c));
+
+    if (std::find(mpc::Mpc::akaiAsciiChar.begin(), mpc::Mpc::akaiAsciiChar.end(),
+            charWithCasing) == mpc::Mpc::akaiAsciiChar.end())
+    {
+        return;
+    }
+
+    if (editing)
+    {
+        for (int i = 0; i < 16; i++)
+        {
+            if (param == to_string(i))
+            {
+                if (i >= name.length())
+                {
+                    name = StrUtil::padRight(name, " ", i + 1);
+                }
+
+                name[i] = charWithCasing;
+                displayName();
+                drawUnderline();
+                if (i <= 14) right();
+                break;
+            }
+        }
+    }
+    else
+    {
+        for (int i = 0; i < 16; i++)
+        {
+            if (param == to_string(i))
+            {
+                if (i >= name.length())
+                {
+                    name = StrUtil::padRight(name, " ", i + 1);
+                }
+
+                name[i] = charWithCasing;
+
+                editing = true;
+                initEditColors();
+                displayName();
+                drawUnderline();
+                if (i <= 14) right();
+                break;
+            }
+        }
+    }
+}
+
+void NameScreen::backSpace()
+{
+    init();
+
+    for (int i = 1; i < 16; i++)
+    {
+        if (param == to_string(i))
+        {
+            if (i >= name.length())
+            {
+                name = StrUtil::padRight(name, " ", i + 1);
+            }
+
+            name = name.substr(0, i - 1) + name.substr(i);
+
+            if (!editing)
+            {
+                editing = true;
+                initEditColors();
+            }
+
+            displayName();
+            drawUnderline();
+            left();
+        }
+    }
 }
