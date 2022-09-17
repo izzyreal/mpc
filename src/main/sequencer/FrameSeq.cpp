@@ -1,25 +1,17 @@
 #include "FrameSeq.hpp"
 
 #include <Mpc.hpp>
-#include <controls/Controls.hpp>
-#include <controls/BaseControls.hpp>
 #include <controls/GlobalReleaseControls.hpp>
 
-#include <sequencer/Sequencer.hpp>
-#include <sequencer/Clock.hpp>
-#include <sequencer/Sequence.hpp>
 #include <sequencer/Song.hpp>
 #include <sequencer/Step.hpp>
 #include <sequencer/Track.hpp>
-
-#include <sequencer/SeqUtil.hpp>
 
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <lcdgui/screens/SongScreen.hpp>
 #include <lcdgui/screens/PunchScreen.hpp>
 #include <lcdgui/screens/UserScreen.hpp>
 #include <lcdgui/screens/SequencerScreen.hpp>
-#include <lcdgui/Screens.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -123,11 +115,8 @@ void FrameSeq::work(int nFrames)
 			{				
 				if (tcValue == 24 || tcValue == 48)
 				{
-					if (getTickPosition() % (tcValue * 2) == swingOffset + tcValue)
-					{
-						repeatPad(getTickPosition());
-					}
-					else if (getTickPosition() % (tcValue * 2) == 0)
+					if (getTickPosition() % (tcValue * 2) == swingOffset + tcValue ||
+                            getTickPosition() % (tcValue * 2) == 0)
 					{
 						repeatPad(getTickPosition());
 					}
@@ -188,7 +177,13 @@ void FrameSeq::work(int nFrames)
 							auto newStep = song->getStep(songScreen->getOffset() + 1).lock();
 
 							if (!lSequencer->getSequence(newStep->getSequence()).lock()->isUsed())
-								lSequencer->stop();
+                            {
+
+                                lSequencer->playToTick(seq->getLastTick() - 1);
+                                lSequencer->stop();
+                                move(0);
+                                continue;
+                            }
 							
 							move(0);
 						}
@@ -212,7 +207,12 @@ void FrameSeq::work(int nFrames)
 								auto newStep = song->getStep(songScreen->getOffset() + 1).lock();
 								
 								if (!lSequencer->getSequence(newStep->getSequence()).lock()->isUsed())
-									lSequencer->stop();
+                                {
+                                    lSequencer->playToTick(seq->getLastTick() - 1);
+                                    lSequencer->stop();
+                                    move(0);
+                                    continue;
+                                }
 							}
 							
 							move(0);

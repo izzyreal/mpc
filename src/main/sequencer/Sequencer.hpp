@@ -122,8 +122,7 @@ namespace mpc::sequencer
 		void trackDown();
 		bool isPlaying();
 		int getPlayedStepRepetitions();
-		bool isEndOfSong();
-		void setEndOfSong(bool b);
+        void setEndOfSong(bool b);
 		void incrementPlayedStepRepetitions();
 		void resetPlayedStepRepetitions();
 

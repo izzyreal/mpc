@@ -19,20 +19,16 @@
 #include <disk/MpcFile.hpp>
 #include <file/FsNode.hpp>
 
-#include <sequencer/Event.hpp>
 #include <sequencer/Sequence.hpp>
 #include <sequencer/Track.hpp>
-#include <sequencer/Sequencer.hpp>
 #include <sequencer/Song.hpp>
+#include <sequencer/Step.hpp>
 #include <sequencer/TempoChangeEvent.hpp>
-
-#include <lcdgui/Screens.hpp>
 
 #include <lcdgui/screens/window/CountMetronomeScreen.hpp>
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <lcdgui/screens/window/MultiRecordingSetupScreen.hpp>
 #include <lcdgui/screens/window/MidiInputScreen.hpp>
-#include <lcdgui/screens/window/MultiRecordingSetupLine.hpp>
 #include <lcdgui/screens/StepEditorScreen.hpp>
 #include <lcdgui/screens/SecondSeqScreen.hpp>
 #include <lcdgui/screens/SongScreen.hpp>
@@ -184,7 +180,27 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc& mpc, AllParser& allParser)
     auto songs = allParser.getSongs();
 
     for (int i = 0; i < 20; i++)
-        lSequencer->getSong(i).lock()->setName(songs[i]->name);
+    {
+        auto allSong = songs[i];
+        auto mpcSong = lSequencer->getSong(i).lock();
+        mpcSong->setUsed(false);
+
+        if (allSong->getIsUsed())
+        {
+            mpcSong->setUsed(true);
+            mpcSong->setName(allSong->name);
+
+            auto steps = allSong->getSteps();
+
+            for (int j = 0; j < steps.size(); j++)
+            {
+                mpcSong->insertStep(mpcSong->getStepCount());
+                auto step = mpcSong->getStep(j).lock();
+                step->setSequence(steps[j].first);
+                step->setRepeats(steps[j].second);
+            }
+        }
+    }
 }
 
 vector<shared_ptr<Sequence>> AllLoader::loadOnlySequencesFromFile(mpc::Mpc& mpc, mpc::disk::MpcFile* f)

@@ -72,6 +72,12 @@ void TextComp::Draw(std::vector<std::vector<bool>>* pixels)
 		}
 	}
 
+    if (invisibleDueToBlinking)
+    {
+        dirty = false;
+        return;
+    }
+
 	auto& font = mpc.getLayeredScreen().lock()->font;
 	auto& atlas = mpc.getLayeredScreen().lock()->atlas;
 
@@ -278,9 +284,15 @@ void TextComp::runBlinkThread()
 		while (blinking && counter++ != BLINK_INTERVAL)
 			this_thread::sleep_for(chrono::milliseconds(1));
 
-		Hide(!IsHidden());
+		invisibleDueToBlinking = !invisibleDueToBlinking;
+        SetDirty();
 	}
-	Hide(false);
+
+    if (invisibleDueToBlinking)
+    {
+        invisibleDueToBlinking = false;
+        SetDirty();
+    }
 }
 
 void TextComp::setBlinking(bool b)

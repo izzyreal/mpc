@@ -21,6 +21,7 @@ namespace mpc::lcdgui
 		mpc::Mpc& mpc;
 		static const int BLINK_INTERVAL = 300;
 		bool blinking = false;
+        bool invisibleDueToBlinking = false;
 		std::thread blinkThread;
 		static void static_blink(void* args);
 		void runBlinkThread();

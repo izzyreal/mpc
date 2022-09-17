@@ -37,6 +37,7 @@ int Song::getFirstStep()
 void Song::setLastStep(int i)
 {
     if (i >= steps.size()) i = steps.size() - 1;
+
     if (i < 0) i = 0;
 
     if (lastStep == i)
@@ -99,5 +100,11 @@ bool Song::isUsed()
 
 void Song::setUsed(bool b)
 {
-    used = true;
+    used = b;
+
+    if (!used)
+    {
+        name = "";
+        steps.clear();
+    }
 }

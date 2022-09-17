@@ -14,12 +14,6 @@ SongScreen::SongScreen(mpc::Mpc& mpc, const int layerIndex)
 {
 }
 
-SongScreen::~SongScreen()
-{
-	if (blinkThread.joinable())
-		blinkThread.join();
-}
-
 void SongScreen::open()
 {
 	findField("loop").lock()->setAlignment(Alignment::Centered);
@@ -161,7 +155,24 @@ void SongScreen::turnWheel(int i)
 	auto song = sequencer.lock()->getSong(activeSongIndex).lock();
 	
 	if (param.find("sequence") != string::npos)
-	{		
+	{
+        if (offset + 1 > song->getStepCount() - 1)
+        {
+            song->insertStep(offset + 1);
+
+            if (!song->isUsed())
+            {
+                song->setUsed(true);
+                auto songName = StrUtil::trim(defaultSongName) + StrUtil::padLeft(to_string(activeSongIndex + 1), "0", 2);
+                song->setName(songName);
+            }
+
+            displaySongName();
+            displaySteps();
+            displayTempo();
+            return;
+        }
+
 		auto step = song->getStep(offset + 1).lock();
 		
 		step->setSequence(step->getSequence() + i);		
@@ -176,7 +187,7 @@ void SongScreen::turnWheel(int i)
 	{
 		if (offset + 1 > song->getStepCount() - 1)
 			return;
-	
+
 		song->getStep(offset + 1).lock()->setRepeats(song->getStep(offset + 1).lock()->getRepeats() + i);
 		displaySteps();
 	}
@@ -392,50 +403,32 @@ void SongScreen::update(moduru::observer::Observable* observable, nonstd::any me
 {
 	auto msg = nonstd::any_cast<string>(message);
 
-	if (msg.compare("bar") == 0)
+	if (msg == "bar")
 	{
 		displayNow0();
 	}
-	else if (msg.compare("beat") == 0)
+	else if (msg == "beat")
 	{
 		displayNow1();
 	}
-	else if (msg.compare("clock") == 0)
+	else if (msg == "clock")
 	{
 		displayNow2();
 	}
-	else if (msg.compare("tempo") == 0)
+	else if (msg == "tempo")
 	{
 		displayTempo();
 	}
-	else if (msg.compare("play") == 0)
-	{
-		auto blinkThreadFunction = [&]
-		{
-			const auto blinkInterval = 380;
-			const auto checkInterval = 38;
-			bool on = true;
-			
-			while (sequencer.lock()->isPlaying())
-			{
-				int counter = 0;
-
-				while (counter++ * checkInterval < blinkInterval && sequencer.lock()->isPlaying())
-					this_thread::sleep_for(chrono::milliseconds(checkInterval));
-
-				auto playing = sequencer.lock()->isPlaying();
-
-				findField("sequence1").lock()->setRectangleOnly(on && playing);
-				findField("reps1").lock()->setRectangleOnly(on && playing);
-				on = !on;
-			}
-		};
-
-		if (blinkThread.joinable())
-			blinkThread.join();
-
-		blinkThread = std::thread(blinkThreadFunction);
-	}
+	else if (msg == "play")
+    {
+        findField("sequence1").lock()->setBlinking(true);
+        findField("reps1").lock()->setBlinking(true);
+    }
+	else if (msg == "stop")
+    {
+        findField("sequence1").lock()->setBlinking(false);
+        findField("reps1").lock()->setBlinking(false);
+    }
 }
 
 string SongScreen::getDefaultSongName()

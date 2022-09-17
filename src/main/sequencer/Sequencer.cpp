@@ -1654,11 +1654,6 @@ int Sequencer::getPlayedStepRepetitions()
 	return playedStepRepetitions;
 }
 
-bool Sequencer::isEndOfSong()
-{
-	return endOfSong;
-}
-
 void Sequencer::setEndOfSong(bool b)
 {
 	endOfSong = b;
