@@ -200,7 +200,7 @@ void KbMapping::initializeDefaults()
 #ifdef __APPLE__
     labelKeyMap.emplace_back("alt", kh->code("option"));
 #elif defined _WIN32 || defined __linux__
-    labelKeyMap["alt"] = kh->code("alternate");
+    labelKeyMap.emplace_back("alt", kh->code("alternate"));
 #endif
 }
 
