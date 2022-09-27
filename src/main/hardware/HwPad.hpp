@@ -19,12 +19,16 @@ namespace mpc::hardware {
 
 	private:
 		int index;
-		std::weak_ptr<mpc::controls::BaseControls> controls;
+    bool down = false;
+    unsigned char pressure = 0;
 
 	public:
 		int getIndex();
 		void push(int velo) override;
 		void release() override;
+    bool isDown();
+    unsigned char getPressure();
+    void setPressure(unsigned char);
 
 	public:
 		HwPad(mpc::Mpc& mpc, int index);

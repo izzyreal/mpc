@@ -29,6 +29,7 @@
 #include <lcdgui/screens/VmpcSettingsScreen.hpp>
 
 #include <hardware/Hardware.hpp>
+#include <hardware/HwPad.hpp>
 #include <hardware/TopPanel.hpp>
 
 using namespace mpc::lcdgui;
@@ -608,12 +609,20 @@ void Track::playNext()
                     _delete = true;
             }
             
-            auto pressedPads = *mpc.getControls().lock()->getPressedPads();
-            auto pressedPadVelos = *mpc.getControls().lock()->getPressedPadVelos();
+            bool oneOrMorePadsArePressed = false;
+            auto hardware = mpc.getHardware().lock();
             
-            if (!_delete &&
-                pressedPads.size() != 0 &&
-                mpc.getHardware().lock()->getTopPanel().lock()->isSixteenLevelsEnabled())
+          for (auto& p : hardware->getPads())
+            {
+              if (p->isDown())
+              {
+                oneOrMorePadsArePressed = true;
+                break;
+              }
+            }
+          
+            if (!_delete && oneOrMorePadsArePressed &&
+                hardware->getTopPanel().lock()->isSixteenLevelsEnabled())
             {
                 auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
                 auto assign16LevelsScreen = mpc.screens->get<Assign16LevelsScreen>("assign-16-levels");
@@ -629,17 +638,16 @@ void Track::playNext()
                     auto _16l_key = assign16LevelsScreen->getOriginalKeyPad();
                     auto _16l_type = assign16LevelsScreen->getType();
 
-                    for (int i = 0 ; i < 16; i++)
+                    for (auto& p : hardware->getPads())
                     {
-                        const auto isPressed = pressedPads.find(i) != end(pressedPads);
-                        if (isPressed)
+                        if (p->isDown())
                         {
-                            const auto& velo = pressedPadVelos[i];
+                            const auto& velo = p->getPressure();
                             int wouldBeVarValue = 0;
                             
                             if (_16l_type == 0)
                             {
-                                auto diff = i - _16l_key;
+                                auto diff = p->getIndex() - _16l_key;
                                 auto candidate = 64 + (diff * 5);
 
                                 if (candidate > 124)
@@ -651,7 +659,7 @@ void Track::playNext()
                             }
                             else
                             {
-                                wouldBeVarValue = static_cast<int>(floor(100 / 16.0) * i);
+                                wouldBeVarValue = static_cast<int>(floor(100 / 16.0) * p->getIndex());
                             }
                             
                             if (varValue == wouldBeVarValue)

@@ -21,6 +21,9 @@ int HwPad::getIndex()
 
 void HwPad::push(int velo)
 {
+  down = true;
+  pressure = velo;
+  
 	auto c = mpc.getActiveControls().lock();
 	
 	if (!c)
@@ -31,10 +34,33 @@ void HwPad::push(int velo)
 
 void HwPad::release()
 {
+  down = false;
+  pressure = 0;
+  
 	auto c = mpc.getReleaseControls();
 
 	if (!c)
 		return;
 
 	c->simplePad(index);
+}
+
+bool HwPad::isDown()
+{
+  return down;
+}
+
+unsigned char HwPad::getPressure()
+{
+  return pressure;
+}
+
+void HwPad::setPressure(unsigned char newPressure)
+{
+  if (newPressure < 0 || newPressure > 127)
+  {
+    return;
+  }
+  
+  pressure = newPressure;
 }

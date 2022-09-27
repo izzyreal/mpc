@@ -77,11 +77,9 @@ weak_ptr<HwPad> Hardware::getPad(int index)
     return pads.at(index);
 }
 
-vector<weak_ptr<HwComponent>> Hardware::getPads()
+vector<shared_ptr<HwPad>>& Hardware::getPads()
 {
-    vector<weak_ptr<HwComponent>> result(pads.size());
-    copy(begin(pads), end(pads), begin(result));
-    return result;
+  return pads;
 }
 
 weak_ptr<Button> Hardware::getButton(string label)
