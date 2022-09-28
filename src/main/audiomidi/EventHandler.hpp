@@ -21,11 +21,11 @@ namespace mpc::audiomidi {
 		std::map<std::pair<int, int>, int> transposeCache;
 
 	public:
-		void handle(std::weak_ptr<mpc::sequencer::Event> event, mpc::sequencer::Track* track);
-		void handleNoThru(std::weak_ptr<mpc::sequencer::Event> event, mpc::sequencer::Track* track, int timeStamp);
+		void handle(const std::weak_ptr<mpc::sequencer::Event>& event, mpc::sequencer::Track* track);
+		void handleNoThru(const std::weak_ptr<mpc::sequencer::Event>& event, mpc::sequencer::Track* track, int timeStamp);
 
 	private:
-		void midiOut(std::weak_ptr<mpc::sequencer::Event> event, mpc::sequencer::Track* track);
+		void midiOut(const std::weak_ptr<mpc::sequencer::Event> &event, mpc::sequencer::Track* track);
 
 	public:
 		EventHandler(mpc::Mpc& mpc);

@@ -10,16 +10,11 @@
 #include <sequencer/MixerEvent.hpp>
 #include <sequencer/Track.hpp>
 #include <sequencer/NoteEvent.hpp>
-#include <sequencer/Sequencer.hpp>
 #include <sequencer/TempoChangeEvent.hpp>
 
 #include <hardware/Hardware.hpp>
 #include <hardware/HwPad.hpp>
 
-#include <sampler/Program.hpp>
-#include <sampler/Sampler.hpp>
-
-#include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/MixerSetupScreen.hpp>
 #include <lcdgui/screens/TransScreen.hpp>
 #include <lcdgui/screens/SyncScreen.hpp>
@@ -32,11 +27,8 @@
 
 #include <audio/server/NonRealTimeAudioServer.hpp>
 
-#include <mpc/MpcStereoMixerChannel.hpp>
 #include <mpc/MpcMultiMidiSynth.hpp>
 #include <mpc/MpcSoundPlayerChannel.hpp>
-#include <mpc/MpcStereoMixerChannel.hpp>
-#include <mpc/MpcIndivFxMixerChannel.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -52,7 +44,7 @@ sampler (_mpc.getSampler())
 {
 }
 
-void EventHandler::handle(weak_ptr<Event> event, Track* track)
+void EventHandler::handle(const weak_ptr<Event>& event, Track* track)
 {
     if (!track->isOn() && event.lock()->getTick() != -1)
         return;
@@ -63,7 +55,7 @@ void EventHandler::handle(weak_ptr<Event> event, Track* track)
     midiOut(event, track);
 }
 
-void EventHandler::handleNoThru(weak_ptr<Event> e, Track* track, int timeStamp)
+void EventHandler::handleNoThru(const weak_ptr<Event>& e, Track* track, int timeStamp)
 {
     auto event = e.lock();
     
@@ -71,10 +63,8 @@ void EventHandler::handleNoThru(weak_ptr<Event> e, Track* track, int timeStamp)
     
     auto countMetronomeScreen = mpc.screens->get<CountMetronomeScreen>("count-metronome");
     
-    if (track->getName().compare("click") == 0)
+    if (track->getName() == "click")
     {
-        auto lSequencer = sequencer.lock();
-        
         if (!lSequencer->isCountEnabled())
             return;
         
@@ -218,7 +208,7 @@ void EventHandler::handleNoThru(weak_ptr<Event> e, Track* track, int timeStamp)
     }
 }
 
-void EventHandler::midiOut(weak_ptr<Event> e, Track* track)
+void EventHandler::midiOut(const weak_ptr<Event>& e, Track* track)
 {
     auto noteEvent = dynamic_pointer_cast<NoteEvent>(e.lock());
     
@@ -264,7 +254,7 @@ void EventHandler::midiOut(weak_ptr<Event> e, Track* track)
         
         MidiAdapter midiAdapter;
         midiAdapter.process(noteEvent, channel, -1);
-        ctoot::midi::core::ShortMessage msg = *midiAdapter.get().lock().get();
+        ctoot::midi::core::ShortMessage& msg = *midiAdapter.get().lock();
         
         auto mpcMidiPorts = mpc.getMidiPorts().lock();
         

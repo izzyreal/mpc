@@ -174,7 +174,15 @@ void MpcMidiInput::handleControl(ShortMessage *shortMsg)
 
   // As per the MPC2000XL's MIDI implementation chart
   if (controller == 7)
-    mpc.getHardware().lock()->getSlider().lock()->setValue(value);
+  {
+      // It looks like the internal implementation of the slider is inverted.
+      // At least, the Akai MPD16 sends value 0 at the bottom of the slider
+      // and 127 at the top.
+      // For now we're safe to simply invert the input, but it would be nice
+      // to make this congruent with the MPD16 (assuming it's the same for
+      // other controllers, but it would be nice to verify some).
+      mpc.getHardware().lock()->getSlider().lock()->setValue(127 - value);
+  }
 
   auto midiInputScreen = mpc.screens->get<MidiInputScreen>("midi-input");
   auto midiSwScreen = mpc.screens->get<MidiSwScreen>("midi-sw");

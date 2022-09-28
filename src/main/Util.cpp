@@ -63,7 +63,7 @@ vector<int> Util::getPadAndVelo(const int x, const int y)
         }
     }
     
-    if (yPos == -1 || yPos == -1)
+    if (xPos == -1 || yPos == -1)
         return vector<int>{ -1, -1 };
     
     int padNumber = -1;
@@ -95,7 +95,7 @@ string Util::getFileName(const string& s)
 
 vector<string> Util::splitName(const string& s)
 {
-    if (s.find(".") == string::npos)
+    if (s.find('.') == string::npos)
     {
         vector<string> res(2);
         res[0] = s;
@@ -103,7 +103,7 @@ vector<string> Util::splitName(const string& s)
         return res;
     }
     
-    size_t i = s.find_last_of(".");
+    size_t i = s.find_last_of('.');
     vector<string> res(2);
     res[0] = s.substr(0, i);
     res[1] = s.substr(i + 1);
@@ -170,7 +170,7 @@ vector<string>& Util::noteNames()
 {
     static vector<string> noteNames;
     
-    if (noteNames.size() == 0)
+    if (noteNames.empty())
     {
         noteNames = vector<string>(128);
         
@@ -255,7 +255,7 @@ void Util::initSequence(mpc::Mpc& mpc)
     sequencer->setActiveSequenceIndex(sequencer->getActiveSequenceIndex());
 }
 
-void Util::set16LevelsValues(mpc::Mpc& mpc, shared_ptr<NoteEvent> event, const int padIndex)
+void Util::set16LevelsValues(mpc::Mpc& mpc, const shared_ptr<NoteEvent>& event, const int padIndex)
 {
     if (mpc.getHardware().lock()->getTopPanel().lock()->isSixteenLevelsEnabled())
     {
@@ -269,7 +269,7 @@ void Util::set16LevelsValues(mpc::Mpc& mpc, shared_ptr<NoteEvent> event, const i
         event->setNote(_16l_note);
         event->setVariationTypeNumber(_16l_type);
         
-        if (_16l_param == 0)
+        if (_16l_param == 0 && event->getVelocity() != 0)
         {
             auto velocity = static_cast<int>((padIndex + 1) * (127.0 / 16.0));
             event->setVelocity(velocity);
@@ -296,7 +296,7 @@ void Util::set16LevelsValues(mpc::Mpc& mpc, shared_ptr<NoteEvent> event, const i
     }
 }
 
-void Util::setSliderNoteVariationParameters(mpc::Mpc& mpc, weak_ptr<NoteEvent> _n, weak_ptr<mpc::sampler::Program> program)
+void Util::setSliderNoteVariationParameters(mpc::Mpc& mpc, const weak_ptr<NoteEvent>& _n, const weak_ptr<mpc::sampler::Program>& program)
 {
     auto pgm = program.lock();
     auto n = _n.lock();
