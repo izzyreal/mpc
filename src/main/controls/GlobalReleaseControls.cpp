@@ -1,7 +1,5 @@
 #include "GlobalReleaseControls.hpp"
 
-#include <controls/Controls.hpp>
-
 #include <Mpc.hpp>
 #include <audiomidi/AudioMidiServices.hpp>
 #include <audiomidi/SoundPlayer.hpp>
@@ -11,17 +9,10 @@
 #include <hardware/TopPanel.hpp>
 #include <hardware/HwPad.hpp>
 
-#include <sampler/Pad.hpp>
-#include <sampler/Program.hpp>
-#include <sampler/Sampler.hpp>
-
 #include <sequencer/FrameSeq.hpp>
-#include <sequencer/Sequence.hpp>
 #include <sequencer/Track.hpp>
 #include <sequencer/NoteEvent.hpp>
-#include <sequencer/Sequencer.hpp>
 
-#include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/SequencerScreen.hpp>
 #include <lcdgui/screens/StepEditorScreen.hpp>
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
@@ -54,21 +45,21 @@ void GlobalReleaseControls::function(int i)
 	switch (i)
 	{
 	case 0:
-		if (currentScreenName.compare("step-timing-correct") == 0)
+		if (currentScreenName == "step-timing-correct")
 			ls.lock()->openScreen("step-editor");
 
 		break;
 	case 2:
 		controls->setF3Pressed(false);
 
-		if (currentScreenName.compare("load-a-sound") == 0)
+		if (currentScreenName == "load-a-sound")
 			sampler.lock()->finishBasicVoice();
 
 		break;
 	case 3:
 		controls->setF4Pressed(false);
 
-		if (currentScreenName.compare("keep-or-retry") == 0)
+		if (currentScreenName == "keep-or-retry")
 			sampler.lock()->finishBasicVoice();
 
 		break;
@@ -88,34 +79,20 @@ void GlobalReleaseControls::function(int i)
 	case 5:
 		controls->setF6Pressed(false);
 
-		if (!sequencer.lock()->isPlaying() && currentScreenName.compare("sequencer") != 0)
+		if (!sequencer.lock()->isPlaying() && currentScreenName != "sequencer")
 			sampler.lock()->finishBasicVoice();
 
-		if (currentScreenName.compare("track-mute") == 0)
+		if (currentScreenName == "track-mute")
 		{
 			if (!sequencer.lock()->isSoloEnabled())
 				ls.lock()->setCurrentBackground("track-mute");
 
 			sequencer.lock()->setSoloEnabled(sequencer.lock()->isSoloEnabled());
 		}
-		else if (ls.lock()->getPreviousScreenName().compare("directory") == 0 && currentScreenName.compare("popup") == 0)
+		else if (ls.lock()->getPreviousScreenName() == "directory" && currentScreenName == "popup")
 		{
 			ls.lock()->openScreen("directory");
 			mpc.getAudioMidiServices().lock()->getSoundPlayer().lock()->enableStopEarly();
-		}
-		else if (ls.lock()->getCurrentScreenName().compare("step-editor") == 0)
-		{
-			// Temporary solution until we know what the real 2kxl does.
-
-			sampler.lock()->stopAllVoices();
-
-			controls->getPressedPads()->clear();
-
-			for (int j = 0; j < 16; j++)
-			{
-				controls->getPressedPadVelos()->at(j) = 0;
-				mpc.getHardware().lock()->getPad(j).lock()->notifyObservers(255);
-			}
 		}
 		break;
 	}
@@ -128,15 +105,10 @@ void GlobalReleaseControls::simplePad(int i)
 
 	auto controls = mpc.getControls().lock();
 
-	if (controls->getPressedPads()->find(i) == controls->getPressedPads()->end())
-		return;
-
-	controls->getPressedPads()->erase(controls->getPressedPads()->find(i));
-
-    if (sequencer.lock()->isRecordingOrOverdubbing() && mpc.getControls().lock()->isErasePressed())
-    {
-        return;
-    }
+  if (sequencer.lock()->isRecordingOrOverdubbing() && mpc.getControls().lock()->isErasePressed())
+  {
+    return;
+  }
 
 	auto lTrk = track.lock();
 	auto note = lTrk->getBus() > 0 ? program.lock()->getPad(i + (bank * 16))->getNote() : i + (bank * 16) + 35;
@@ -144,8 +116,8 @@ void GlobalReleaseControls::simplePad(int i)
 	generateNoteOff(note);
 	bool posIsLastTick = sequencer.lock()->getTickPosition() == sequencer.lock()->getActiveSequence().lock()->getLastTick();
 
-	bool maybeRecWithoutPlaying = currentScreenName.compare("sequencer") == 0 && !posIsLastTick;
-	bool stepRec = currentScreenName.compare("step-editor") == 0 && !posIsLastTick;
+	bool maybeRecWithoutPlaying = currentScreenName == "sequencer" && !posIsLastTick;
+	bool stepRec = currentScreenName == "step-editor" && !posIsLastTick;
 
 	if (stepRec || maybeRecWithoutPlaying)
 	{
@@ -156,7 +128,6 @@ void GlobalReleaseControls::simplePad(int i)
 		if (durationHasBeenAdjusted && maybeRecWithoutPlaying)
 		{
 			auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
-			auto noteValue = timingCorrectScreen->getNoteValue();
 
 			int noteVal = timingCorrectScreen->getNoteValue();
 			int stepLength = sequencer.lock()->getTickValues()[noteVal];
@@ -243,7 +214,7 @@ void GlobalReleaseControls::shift()
 	controls->setShiftPressed(false);
 	init();
 
-	if (currentScreenName.compare("step-editor") == 0 && param.length() == 2)
+	if (currentScreenName == "step-editor" && param.length() == 2)
 	{
 		auto eventNumber = stoi(param.substr(1, 2));
 		auto stepEditorScreen = mpc.screens->get<StepEditorScreen>("step-editor");
