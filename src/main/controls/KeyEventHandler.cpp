@@ -169,8 +169,7 @@ void KeyEventHandler::handle(const KeyEvent &keyEvent)
         {
             if ((label.length() == 5 || label.length() == 6) && label.find("pad-") != string::npos)
             {
-                auto padIndex = stoi(label.substr(4)) - 1;
-                mpc.getActiveControls().lock()->pad(padIndex, 127, false, 0);
+                hardwareComponent->push(127);
             }
             else
             {
