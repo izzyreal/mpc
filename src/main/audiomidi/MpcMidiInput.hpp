@@ -9,6 +9,8 @@
 
 #include <memory>
 
+namespace ctoot::midi::core { class ShortMessage; }
+
 namespace mpc::audiomidi
 {
 	class MpcMidiPorts;
@@ -40,6 +42,8 @@ namespace mpc::audiomidi
 	private:
 		void midiOut(std::weak_ptr<sequencer::Event> event, sequencer::Track* track);
 		void transportOmni(ctoot::midi::core::MidiMessage* msg, std::string outputLetter);
+    void handleControl(ctoot::midi::core::ShortMessage* shortMsg);
+    void handlePolyAndNote(ctoot::midi::core::MidiMessage* msg);
 
 	public:
 		MpcMidiInput(mpc::Mpc& mpc, int index);

@@ -10,7 +10,6 @@
 #include "HwSlider.hpp"
 
 #include <Mpc.hpp>
-#include <nvram/NvRam.hpp>
 
 using namespace mpc::hardware;
 using namespace std;
@@ -79,7 +78,7 @@ weak_ptr<HwPad> Hardware::getPad(int index)
 
 vector<shared_ptr<HwPad>>& Hardware::getPads()
 {
-  return pads;
+    return pads;
 }
 
 weak_ptr<Button> Hardware::getButton(string label)

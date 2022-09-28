@@ -4,34 +4,37 @@
 #include <observer/Observable.hpp>
 
 namespace mpc {
-	class Mpc;
+    class Mpc;
 }
 
 namespace mpc::controls {
-	class BaseControls;
+    class BaseControls;
 }
 
 namespace mpc::hardware {
-	class HwPad
-		: public HwComponent
-        , public moduru::observer::Observable
-	{
+    class HwPad
+            : public HwComponent
+                    , public moduru::observer::Observable
+    {
 
-	private:
-		int index;
-    bool down = false;
-    unsigned char pressure = 0;
+    private:
+        int index;
+        std::weak_ptr<mpc::controls::BaseControls> controls;
+        unsigned char pressure = 0;
+        char padIndexWithBankWhenLastPressed = -1;
 
-	public:
-		int getIndex();
-		void push(int velo) override;
-		void release() override;
-    bool isDown();
-    unsigned char getPressure();
-    void setPressure(unsigned char);
+    public:
+        int getIndex();
+        char getPadIndexWithBankWhenLastPressed();
+        void setPadIndexWithBankWhenLastPressed(char padIndexWithBank);
+        void push(int velo) override;
+        void release() override;
+        bool isPressed();
+        void setPressure(unsigned char newPressure);
+        unsigned char getPressure();
 
-	public:
-		HwPad(mpc::Mpc& mpc, int index);
+    public:
+        HwPad(mpc::Mpc& mpc, int index);
 
-	};
+    };
 }

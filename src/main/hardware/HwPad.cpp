@@ -9,58 +9,78 @@ using namespace mpc::hardware;
 using namespace std;
 
 HwPad::HwPad(mpc::Mpc& mpc, int index)
-	: HwComponent(mpc, "pad-" + to_string(index + 1))
+        : HwComponent(mpc, "pad-" + to_string(index + 1))
 {
-	this->index = index;
+    this->index = index;
 }
 
 int HwPad::getIndex()
 {
-	return index;
+    return index;
 }
 
 void HwPad::push(int velo)
 {
-  down = true;
-  pressure = velo;
-  
-	auto c = mpc.getActiveControls().lock();
-	
-	if (!c)
-		return;
-	
-	c->pad(index, velo, false, 0);
+    if (isPressed())
+    {
+        return;
+    }
+
+    pressure = velo;
+
+    padIndexWithBankWhenLastPressed = index + (mpc.getBank() * 16);
+
+    auto c = mpc.getActiveControls().lock();
+
+    if (!c)
+        return;
+
+    c->pad(padIndexWithBankWhenLastPressed, velo, false, 0);
 }
 
 void HwPad::release()
 {
-  down = false;
-  pressure = 0;
-  
-	auto c = mpc.getReleaseControls();
+    if (!isPressed())
+    {
+        return;
+    }
 
-	if (!c)
-		return;
+    pressure = 0;
 
-	c->simplePad(index);
+    auto c = mpc.getReleaseControls();
+
+    if (!c || padIndexWithBankWhenLastPressed == -1)
+    {
+        padIndexWithBankWhenLastPressed = -1;
+        return;
+    }
+
+    c->simplePad(padIndexWithBankWhenLastPressed);
+
+    padIndexWithBankWhenLastPressed = -1;
 }
 
-bool HwPad::isDown()
+bool HwPad::isPressed()
 {
-  return down;
-}
-
-unsigned char HwPad::getPressure()
-{
-  return pressure;
+    return pressure > 0;
 }
 
 void HwPad::setPressure(unsigned char newPressure)
 {
-  if (newPressure < 0 || newPressure > 127)
-  {
-    return;
-  }
-  
-  pressure = newPressure;
+    pressure = newPressure;
+}
+
+char HwPad::getPadIndexWithBankWhenLastPressed()
+{
+    return padIndexWithBankWhenLastPressed;
+}
+
+unsigned char HwPad::getPressure()
+{
+    return pressure;
+}
+
+void HwPad::setPadIndexWithBankWhenLastPressed(char padIndexWithBank)
+{
+    padIndexWithBankWhenLastPressed = padIndexWithBank;
 }

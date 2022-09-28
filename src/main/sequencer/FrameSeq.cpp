@@ -1,6 +1,8 @@
 #include "FrameSeq.hpp"
 
 #include <Mpc.hpp>
+#include <hardware/Hardware.hpp>
+#include <hardware/HwPad.hpp>
 #include <controls/GlobalReleaseControls.hpp>
 
 #include <sequencer/Song.hpp>
@@ -318,13 +320,16 @@ void FrameSeq::repeatPad(int tick)
 	if (!controls)
 		return;
 
-	auto pp = controls->getPressedPads();
+  const bool isNoteRepeat = true;
 
-	for (auto& i : *pp)
-    {
-        mpc.getReleaseControls()->simplePad(i);
-        mpc.getActiveControls().lock()->pad(i, (*controls->getPressedPadVelos())[i], true, tick);
-    }
+  for (auto& p : mpc.getHardware().lock()->getPads())
+  {
+    if (!p->isPressed()) continue;
+
+    auto padIndex = p->getPadIndexWithBankWhenLastPressed();
+    mpc.getReleaseControls()->simplePad(padIndex);
+    mpc.getActiveControls().lock()->pad(padIndex, p->getPressure(), isNoteRepeat, tick);
+  }
 }
 
 void FrameSeq::checkNextSq()
