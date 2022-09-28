@@ -84,3 +84,8 @@ void HwPad::setPadIndexWithBankWhenLastPressed(char padIndexWithBank)
 {
     padIndexWithBankWhenLastPressed = padIndexWithBank;
 }
+
+void HwPad::setPadIndexWithBankWhenLastPressed(char padIndexWithBank)
+{
+  padIndexWithBankWhenLastPressed = padIndexWithBank;
+}

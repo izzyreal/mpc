@@ -3,6 +3,7 @@
 #include <Mpc.hpp>
 #include <Util.hpp>
 #include <hardware/Hardware.hpp>
+#include <hardware/HwPad.hpp>
 #include <hardware/HwSlider.hpp>
 #include <audiomidi/EventHandler.hpp>
 #include <audiomidi/MpcMidiPorts.hpp>
@@ -344,29 +345,42 @@ void MpcMidiInput::handlePolyAndNote(MidiMessage* msg)
     auto pgm = sampler.lock()->getDrumBusProgramNumber(bus);
     auto p = sampler.lock()->getProgram(pgm).lock();
 
-    auto pad = p->getPadIndexFromNote(note);
+    auto padIndexWithBank = p->getPadIndexFromNote(note);
 
-    if (pad != -1)
+    if (padIndexWithBank != -1)
     {
+      auto hwPad = mpc.getHardware().lock()->getPad(padIndexWithBank % 16).lock();
+
       auto status = msg->getStatus();
       auto isPolyPressure = status >= ShortMessage::POLY_PRESSURE && status < ShortMessage::POLY_PRESSURE + 16;
       auto isNoteOn = status >= ShortMessage::NOTE_ON && status < ShortMessage::NOTE_ON + 16;
       auto isNoteOff = status >= ShortMessage::NOTE_OFF && status < ShortMessage::NOTE_OFF + 16;
 
+
       if (isPolyPressure)
       {
-        (*mpc.getControls().lock()->getPressedPadVelos())[pad] = velo;
+        if (hwPad->getPadIndexWithBankWhenLastPressed() == padIndexWithBank)
+        {
+          hwPad->setPressure(velo);
+        }
       }
       else if (isNoteOn)
       {
         if (velo > 0)
-          mpc.getControls().lock()->getPressedPads()->emplace(pad);
+        {
+          hwPad->setPadIndexWithBankWhenLastPressed(padIndexWithBank);
+          hwPad->setPressure(velo);
+        }
         else
-          mpc.getControls().lock()->getPressedPads()->erase(pad);
+        {
+          hwPad->setPadIndexWithBankWhenLastPressed(-1);
+          hwPad->setPressure(0);
+        }
       }
       else if (isNoteOff)
       {
-        mpc.getControls().lock()->getPressedPads()->erase(pad);
+        hwPad->setPadIndexWithBankWhenLastPressed(-1);
+        hwPad->setPressure(0);
       }
     }
   }
