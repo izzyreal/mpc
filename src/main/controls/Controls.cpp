@@ -26,23 +26,6 @@ weak_ptr<KeyEventHandler> Controls::getKeyEventHandler()
     return keyEventHandler;
 }
 
-void Controls::releaseAll()
-{
-	ctrlPressed = false;
-	altPressed = false;
-	shiftPressed = false;
-	recPressed = false;
-	overDubPressed = false;
-	tapPressed = false;
-	goToPressed = false;
-	erasePressed = false;
-	f3Pressed = false;
-	f4Pressed = false;
-	f5Pressed = false;
-	f6Pressed = false;
-	pressedPads.clear();
-}
-
 void Controls::setCtrlPressed(bool b)
 {
 	ctrlPressed = b;
@@ -116,16 +99,6 @@ bool Controls::isF5Pressed()
 bool Controls::isF6Pressed()
 {
 	return f6Pressed;
-}
-
-set<int>* Controls::getPressedPads()
-{
-	return &pressedPads;
-}
-
-vector<int>* Controls::getPressedPadVelos()
-{
-	return &pressedPadVelos;
 }
 
 void Controls::setErasePressed(bool b)

@@ -267,7 +267,7 @@ void MpcMidiInput::handleControl(ShortMessage *shortMsg)
           else if (func >= 12 && func < 28)
           {
             auto pad = func - 12;
-            mpc.getActiveControls().lock()->pad(pad, value, false, -1);
+            mpc.getHardware().lock()->getPad(pad).lock()->push(value);
           }
         }
         else // value < 64
@@ -279,7 +279,7 @@ void MpcMidiInput::handleControl(ShortMessage *shortMsg)
           else if (func >= 12 && func < 28)
           {
             auto pad = func - 12;
-            mpc.getReleaseControls()->simplePad(pad);
+            mpc.getHardware().lock()->getPad(pad).lock()->release();
           }
         }
       }

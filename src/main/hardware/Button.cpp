@@ -23,148 +23,148 @@ void Button::push()
 //	if (mpc.getDisk().lock()->isBusy() && ls->getCurrentScreenName().compare("cant-find-file") != 0)
 //		return;
 
-	auto controls = ls->findScreenComponent().lock();
+	auto screen = ls->findScreenComponent().lock();
 	
-	if (!controls)
+	if (!screen)
 		return;
 	
 	if (label.compare("left") == 0) {
-		controls->left();
+		screen->left();
 	}
 	else if (label.compare("right") == 0) {
-		controls->right();
+		screen->right();
 	}
 	else if (label.compare("up") == 0) {
-		controls->up();
+		screen->up();
 	}
 	else if (label.compare("down") == 0) {
-		controls->down();
+		screen->down();
 	}
 	else if (label.compare("rec") == 0) {
-		controls->rec();
+		screen->rec();
 	}
 	else if (label.compare("overdub") == 0) {
-		controls->overDub();
+		screen->overDub();
 	}
 	else if (label.compare("stop") == 0) {
-		controls->stop();
+		screen->stop();
 	}
 	else if (label.compare("play") == 0) {
-		controls->play();
+		screen->play();
 	}
 	else if (label.compare("play-start") == 0) {
-		controls->playStart();
+		screen->playStart();
 	}
 	else if (label.compare("main-screen") == 0) {
-		controls->mainScreen();
+		screen->mainScreen();
 	}
 	else if (label.compare("open-window") == 0) {
-		controls->openWindow();
+		screen->openWindow();
 	}
 	else if (label.compare("prev-step-event") == 0) {
-		controls->prevStepEvent();
+		screen->prevStepEvent();
 	}
 	else if (label.compare("next-step-event") == 0) {
-		controls->nextStepEvent();
+		screen->nextStepEvent();
 	}
 	else if (label.compare("go-to") == 0) {
-		controls->goTo();
+		screen->goTo();
 	}
 	else if (label.compare("prev-bar-start") == 0) {
-		controls->prevBarStart();
+		screen->prevBarStart();
 	}
 	else if (label.compare("next-bar-end") == 0) {
-		controls->nextBarEnd();
+		screen->nextBarEnd();
 	}
 	else if (label.compare("tap") == 0) {
-		controls->tap();
+		screen->tap();
 	}
 	else if (label.compare("next-seq") == 0) {
-		controls->nextSeq();
+		screen->nextSeq();
 	}
 	else if (label.compare("track-mute") == 0) {
-		controls->trackMute();
+		screen->trackMute();
 	}
 	else if (label.compare("full-level") == 0) {
-		controls->fullLevel();
+		screen->fullLevel();
 	}
 	else if (label.compare("sixteen-levels") == 0) {
-		controls->sixteenLevels();
+		screen->sixteenLevels();
 	}
 	else if (label.compare("f1") == 0) {
-		controls->function(0);
+		screen->function(0);
 	}
 	else if (label.compare("f2") == 0) {
-		controls->function(1);
+		screen->function(1);
 	}
 	else if (label.compare("f3") == 0) {
-		controls->function(2);
+		screen->function(2);
 	}
 	else if (label.compare("f4") == 0) {
-		controls->function(3);
+		screen->function(3);
 	}
 	else if (label.compare("f5") == 0) {
-		controls->function(4);
+		screen->function(4);
 	}
 	else if (label.compare("f6") == 0) {
-		controls->function(5);
+		screen->function(5);
 	}
 	else if (label.compare("shift") == 0) {
-		controls->shift();
+		screen->shift();
 	}
 	else if (label.compare("enter") == 0) {
-		controls->pressEnter();
+		screen->pressEnter();
 	}
 	else if (label.compare("undo-seq") == 0) {
-		controls->undoSeq();
+		screen->undoSeq();
 	}
 	else if (label.compare("erase") == 0) {
-		controls->erase();
+		screen->erase();
 	}
 	else if (label.compare("after") == 0) {
-		controls->after();
+		screen->after();
 	}
 	else if (label.compare("bank-a") == 0) {
-		controls->bank(0);
+		screen->bank(0);
 	}
 	else if (label.compare("bank-b") == 0) {
-		controls->bank(1);
+		screen->bank(1);
 	}
 	else if (label.compare("bank-c") == 0) {
-		controls->bank(2);
+		screen->bank(2);
 	}
 	else if (label.compare("bank-d") == 0) {
-		controls->bank(3);
+		screen->bank(3);
 	}
 	else if (label.compare("0") == 0) {
-		controls->numpad(0);
+		screen->numpad(0);
 	}
 	else if (label.compare("1") == 0) {
-		controls->numpad(1);
+		screen->numpad(1);
 	}
 	else if (label.compare("2") == 0) {
-		controls->numpad(2);
+		screen->numpad(2);
 	}
 	else if (label.compare("3") == 0) {
-		controls->numpad(3);
+		screen->numpad(3);
 	}
 	else if (label.compare("4") == 0) {
-		controls->numpad(4);
+		screen->numpad(4);
 	}
 	else if (label.compare("5") == 0) {
-		controls->numpad(5);
+		screen->numpad(5);
 	}
 	else if (label.compare("6") == 0) {
-		controls->numpad(6);
+		screen->numpad(6);
 	}
 	else if (label.compare("7") == 0) {
-		controls->numpad(7);
+		screen->numpad(7);
 	}
 	else if (label.compare("8") == 0) {
-		controls->numpad(8);
+		screen->numpad(8);
 	}
 	else if (label.compare("9") == 0) {
-		controls->numpad(9);
+		screen->numpad(9);
 	}
 }
 

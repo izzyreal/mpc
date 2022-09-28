@@ -98,10 +98,9 @@ void GlobalReleaseControls::function(int i)
 	}
 }
 
-void GlobalReleaseControls::simplePad(int i)
+void GlobalReleaseControls::simplePad(int padIndexWithBank)
 {
 	init();
-	auto bank = mpc.getBank();
 
 	auto controls = mpc.getControls().lock();
 
@@ -111,7 +110,7 @@ void GlobalReleaseControls::simplePad(int i)
   }
 
 	auto lTrk = track.lock();
-	auto note = lTrk->getBus() > 0 ? program.lock()->getPad(i + (bank * 16))->getNote() : i + (bank * 16) + 35;
+	auto note = lTrk->getBus() > 0 ? program.lock()->getPad(padIndexWithBank)->getNote() : padIndexWithBank + 35;
 
 	generateNoteOff(note);
 	bool posIsLastTick = sequencer.lock()->getTickPosition() == sequencer.lock()->getActiveSequence().lock()->getLastTick();

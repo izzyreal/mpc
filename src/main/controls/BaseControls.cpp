@@ -187,15 +187,7 @@ void BaseControls::function(int i)
     }
 }
 
-void BaseControls::openWindow()
-{
-}
-
-void BaseControls::turnWheel(int i)
-{
-}
-
-void BaseControls::pad(int hwPadIndex, int velo, bool triggeredByRepeat, int tick)
+void BaseControls::pad(int padIndexWithBank, int velo, bool triggeredByRepeat, int tick)
 {
     init();
     
@@ -213,20 +205,19 @@ void BaseControls::pad(int hwPadIndex, int velo, bool triggeredByRepeat, int tic
     if (controls->isNoteRepeatLocked() && !triggeredByRepeat)
         return;
     
-    auto note = track.lock()->getBus() > 0 ? program.lock()->getPad(hwPadIndex + (mpc.getBank() * 16))->getNote() : hwPadIndex + (mpc.getBank() * 16) + 35;
+    auto note = track.lock()->getBus() > 0 ? program.lock()->getPad(padIndexWithBank)->getNote() : padIndexWithBank + 35;
     auto velocity = velo;
-    auto pad = hwPadIndex + (mpc.getBank() * 16);
-    
+
     if (!mpc.getHardware().lock()->getTopPanel().lock()->isSixteenLevelsEnabled())
     {
         if (currentScreenName == "program-params")
         {
             if (note > 34)
-                mpc.setPadAndNote(pad, note);
+                mpc.setPadAndNote(padIndexWithBank, note);
         }
         else if (currentScreenName != "copy-note-parameters")
         {
-            mpc.setPadAndNote(pad, note);
+            mpc.setPadAndNote(padIndexWithBank, note);
         }
     }
     

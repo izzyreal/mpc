@@ -95,8 +95,8 @@ namespace mpc::lcdgui
 		virtual void up() { mpc.getControls().lock()->getControls()->up(); }
 		virtual void down() { mpc.getControls().lock()->getControls()->down(); }
 		virtual void function(int i) { init(); mpc.getControls().lock()->getControls()->function(i); }
-		virtual void openWindow() { mpc.getControls().lock()->getControls()->openWindow(); }
-		virtual void turnWheel(int i) { mpc.getControls().lock()->getControls()->turnWheel(i); }
+		virtual void openWindow() {}
+		virtual void turnWheel(int i) {}
 		virtual void numpad(int i) { mpc.getControls().lock()->getControls()->numpad(i); }
 		virtual void pressEnter() { mpc.getControls().lock()->getControls()->pressEnter(); }
 		virtual void rec() { mpc.getControls().lock()->getControls()->rec(); }

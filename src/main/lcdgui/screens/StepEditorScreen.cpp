@@ -2,6 +2,9 @@
 
 #include <audiomidi/EventHandler.hpp>
 
+#include <hardware/Hardware.hpp>
+#include <hardware/HwPad.hpp>
+
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <lcdgui/screens/window/EditMultipleScreen.hpp>
 
@@ -163,9 +166,9 @@ void StepEditorScreen::function(int i)
 		{
 			// CopySelectedNote
 			auto eventIndex = stoi(param.substr(1, 1));
-			auto emptyEvent = dynamic_pointer_cast<EmptyEvent>(visibleEvents[eventIndex].lock());
+			auto maybeEmptyEvent = dynamic_pointer_cast<EmptyEvent>(visibleEvents[eventIndex].lock());
 
-			if (!emptyEvent)
+			if (!maybeEmptyEvent)
 				placeHolder = { visibleEvents[eventIndex].lock() };
 		}
 		break;
@@ -185,11 +188,11 @@ void StepEditorScreen::function(int i)
 		
 		if (!dynamic_pointer_cast<EmptyEvent>(visibleEvents[rowIndex].lock()))
 		{
-			for (int i = 0; i < track.lock()->getEvents().size(); i++)
+			for (int e = 0; e < track.lock()->getEvents().size(); e++)
 			{
-				if (track.lock()->getEvents()[i].lock() == visibleEvents[rowIndex].lock())
+				if (track.lock()->getEvents()[e].lock() == visibleEvents[rowIndex].lock())
 				{
-					track.lock()->removeEvent(i);
+					track.lock()->removeEvent(e);
 					break;
 				}
 			}
@@ -225,9 +228,9 @@ void StepEditorScreen::function(int i)
 			auto pitchEvent = dynamic_pointer_cast<PitchBendEvent>(event);
 			auto mixerEvent = dynamic_pointer_cast<MixerEvent>(event);
 			auto sysexEvent = dynamic_pointer_cast<SystemExclusiveEvent>(event);
-			auto emptyEvent = dynamic_pointer_cast<EmptyEvent>(event);
+			auto maybeEmptyEvent = dynamic_pointer_cast<EmptyEvent>(event);
 
-			if (pitchEvent || mixerEvent || sysexEvent || emptyEvent)
+			if (pitchEvent || mixerEvent || sysexEvent || maybeEmptyEvent)
 				return;
 
 			auto noteEvent = dynamic_pointer_cast<NoteEvent>(event);
@@ -1207,7 +1210,16 @@ void StepEditorScreen::update(moduru::observer::Observable*, nonstd::any message
 	}
 	else if (msg.compare("step-editor") == 0)
 	{
-		if (mpc.getControls().lock()->getPressedPads()->size() != 0)
+    auto& pads = mpc.getHardware().lock()->getPads();
+
+    auto anyPadIsPressed = std::any_of(
+        pads.begin(),
+        pads.end(),
+        [](const std::shared_ptr<mpc::hardware::HwPad> &p) {
+          return p->isPressed();
+        });
+
+    if (anyPadIsPressed)
 		{
 			// a note is currently being recorded by the user pressing a pad
 			initVisibleEvents();

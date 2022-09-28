@@ -52,15 +52,13 @@ namespace mpc::controls {
 		std::weak_ptr<mpc::lcdgui::LayeredScreen> ls;
 		std::weak_ptr<mpc::lcdgui::Field> activeField;
 
-		virtual void init();
+		void init();
 		int getSoundIncrement(int notch);
 		virtual void left();
 		virtual void right();
 		virtual void up();
 		virtual void down();
 		virtual void function(int i);
-		virtual void openWindow();
-		virtual void turnWheel(int i);
 		virtual void numpad(int i);
 		virtual void pressEnter();
 		virtual void rec();
@@ -88,7 +86,7 @@ namespace mpc::controls {
 
 		virtual bool isTypable();
 
-		virtual void pad(int hwPadIndex, int velo, bool repeat, int tick);
+		void pad(int padIndexWithBank, int velo, bool repeat, int tick);
 
 	protected:
 		std::string param = "";

@@ -26,7 +26,7 @@ namespace mpc {
 		{
 
 		public:
-			void simplePad(int i);
+			void simplePad(int padIndexWithBank);
 
 		private:
 			void generateNoteOff(int note);
@@ -46,7 +46,6 @@ namespace mpc {
 			void right() override {};
 			void up() override {};
 			void down() override {};
-			void openWindow() override {};
 			void numpad(int i) override {};
 			void pressEnter() override {};
 			void stop() override {};
