@@ -70,11 +70,11 @@ namespace mpc::controls {
 		virtual void playStart();
 		virtual void mainScreen();
 		virtual void tap();
-		virtual void prevStepEvent();
-		virtual void nextStepEvent();
+		virtual void prevStepEvent() {}
+		virtual void nextStepEvent() {}
 		virtual void goTo();
-		virtual void prevBarStart();
-		virtual void nextBarEnd();
+		virtual void prevBarStart() {}
+		virtual void nextBarEnd() {}
 		virtual void nextSeq();
 		virtual void trackMute();
 		virtual void bank(int i);
@@ -88,7 +88,7 @@ namespace mpc::controls {
 
 		virtual bool isTypable();
 
-		virtual void pad(int i, int velo, bool repeat, int tick);
+		virtual void pad(int hwPadIndex, int velo, bool repeat, int tick);
 
 	protected:
 		std::string param = "";
