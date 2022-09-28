@@ -698,19 +698,8 @@ void BaseControls::trackMute()
 
 void BaseControls::bank(int i)
 {
-    init();
-    
-    auto oldBank = mpc.getBank();
-    
-    auto diff = 16 * (i - oldBank);
-    auto newPadIndex = mpc.getPad() + diff;
-    
     mpc.setBank(i);
-    
-    auto newNote = program.lock()->getPad(newPadIndex)->getNote();
-    
-    mpc.setPadAndNote(newPadIndex, newNote);
-    
+
     for (int p = 0; p < 16; p++)
     {
       mpc.getHardware().lock()->getPad(p).lock()->notifyObservers(255);
