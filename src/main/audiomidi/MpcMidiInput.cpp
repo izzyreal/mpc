@@ -123,6 +123,11 @@ void MpcMidiInput::transport(MidiMessage *msg, int timeStamp)
       Util::set16LevelsValues(mpc, note, pad);
     }
 
+    if (note->getVelocity() != 0 && track->getBus() > 0 && track->getIndex() < 64 && mpc.getControls().lock()->isTapPressed() && lSequencer->isPlaying())
+    {
+        return;
+    }
+            
     mpc.getEventHandler().lock()->handleNoThru(note, track.get(), timeStamp);
 
     if (lSequencer->isRecordingOrOverdubbing())

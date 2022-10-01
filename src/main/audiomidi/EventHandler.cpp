@@ -84,10 +84,10 @@ void EventHandler::handleNoThru(const weak_ptr<Event>& e, Track* track, int time
         sampler.lock()->playMetronome(ne.get(), eventFrame);
         return;
     }
-    else
+    
+    if (lSequencer->isCountingIn() && event->getTick() != -1)
     {
-        if (lSequencer->isCountingIn() && event->getTick() != -1)
-            return;
+        return;
     }
     
     auto tce = dynamic_pointer_cast<TempoChangeEvent>(event);
@@ -139,6 +139,7 @@ void EventHandler::handleNoThru(const weak_ptr<Event>& e, Track* track, int time
         if (busNumber != 0)
         {
             auto drum = busNumber - 1;
+            
             if (ne->getDuration() != -1)
             {
                 if (!(lSequencer->isSoloEnabled() && track->getIndex() != lSequencer->getActiveTrackIndex()))
