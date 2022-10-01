@@ -19,7 +19,7 @@ namespace mpc::sequencer
 		ctoot::midi::core::ShortMessage* shortMessage = nullptr;
 
 	public:
-		void setTick(int relativeTick);
+		virtual void setTick(int relativeTick);
 		int getTick();
 		int getTrack();
 		void setTrack(int i);

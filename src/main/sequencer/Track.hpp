@@ -36,10 +36,8 @@ private:
     int device = 0;
     int trackIndex = 0;
     bool used{ false };
-    int relativeTick = 0;
     int eventIndex = 0;
     std::weak_ptr<NoteEvent> lastAdded;
-    bool eventAvailable{ false };
     bool multi{ false };
     bool _delete{ false };
     int tcValue = 0;

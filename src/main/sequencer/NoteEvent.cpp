@@ -11,12 +11,13 @@ NoteEvent::NoteEvent()
 NoteEvent::NoteEvent(int i) 
 {
 	number = i;
-	noteOff = make_shared<NoteEvent>(false);
+	noteOff = make_shared<NoteEvent>(false, 0);
 }
 
-NoteEvent::NoteEvent(bool dummyParameter) 
+NoteEvent::NoteEvent(bool dummyParameter, int _noteOnTick)
 {
 	// noteoff ctor should not create a noteoff
+    noteOnTick = _noteOnTick;
 }
 
 weak_ptr<NoteEvent> NoteEvent::getNoteOff()
@@ -107,7 +108,8 @@ int NoteEvent::getVelocity()
     return velocity;
 }
 
-void NoteEvent::CopyValuesTo(weak_ptr<Event> dest) {
+void NoteEvent::CopyValuesTo(weak_ptr<Event> dest)
+{
 	Event::CopyValuesTo(dest);
 	auto lDest = dynamic_pointer_cast<NoteEvent>(dest.lock());
 	lDest->setVariationTypeNumber(getVariationType());
@@ -115,4 +117,18 @@ void NoteEvent::CopyValuesTo(weak_ptr<Event> dest) {
 	lDest->setNote(getNote());
     lDest->velocity = velocity;
 	lDest->setDuration(getDuration());
+}
+
+void NoteEvent::setTick(int tick)
+{
+    Event::setTick(tick);
+
+    if (noteOff)
+    {
+        noteOff->noteOnTick = tick;
+    }
+}
+
+int NoteEvent::getNoteOnTick() {
+    return noteOnTick;
 }

@@ -508,29 +508,18 @@ vector<weak_ptr<Event>> Track::getEvents()
 
 int Track::getNextTick()
 {
-	if (eventIndex + 1 > events.size() && noteOffs.empty())
+	if (eventIndex >= events.size() && noteOffs.empty())
 		return MAX_TICK;
 
-	eventAvailable = eventIndex < events.size();
-	sort(noteOffs.begin(), noteOffs.end(), tickCmp);
-
-	if (noteOffs.size() != 0)
+    if (noteOffs.size() != 0)
 	{
 		for (auto& no : noteOffs)
 		{
-			if (eventAvailable)
-			{
-				if (no->getTick() < events[eventIndex]->getTick())
-					return no->getTick();
-			}
-			else
-			{
 				return no->getTick();
-			}
 		}
 	}
 
-	if (eventAvailable)
+	if (eventIndex < events.size())
 		return events[eventIndex]->getTick();
 
 	return MAX_TICK;

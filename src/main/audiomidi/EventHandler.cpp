@@ -151,8 +151,10 @@ void EventHandler::handleNoThru(const weak_ptr<Event>& e, Track* track, int time
                     
                     if (timeStamp != -1)
                         eventFrame = timeStamp;
-                    
-                    mpc.getMms()->mpcTransport(track->getIndex(), midiAdapter.get().lock().get(), 0, ne->getVariationType(), ne->getVariationValue(), eventFrame);
+
+                    int startTick = ne->getNoteOff().lock() ? ne->getTick() : ne->getNoteOnTick();
+
+                    mpc.getMms()->mpcTransport(midiAdapter.get().lock().get(), 0, ne->getVariationType(), ne->getVariationValue(), eventFrame, startTick);
                     
                     if (mpc.getAudioMidiServices().lock()->getAudioServer()->isRealTime())
                     {
