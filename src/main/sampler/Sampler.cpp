@@ -667,17 +667,6 @@ std::weak_ptr<Sound> Sampler::createZone(std::weak_ptr<Sound> source, int start,
 	return zone;
 }
 
-void Sampler::stopAllVoices()
-{
-	if (!mpc.getAudioMidiServices().lock()->getAudioServer()->isRunning())
-		return;
-	
-	mpc.getBasicPlayer()->allSoundOff();
-	
-	for (auto m : mpc.getDrums())
-		m->allSoundOff();
-}
-
 void Sampler::stopAllVoices(int frameOffset)
 {
 	dynamic_cast<MpcSoundPlayerChannel*>(mpc.getDrums()[0])->allSoundOff(frameOffset);

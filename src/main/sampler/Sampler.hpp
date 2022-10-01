@@ -78,7 +78,7 @@ public:
     std::string getSoundSortingTypeName();
     void deleteAllSamples();
     std::weak_ptr<Sound> createZone(std::weak_ptr<Sound> source, int start, int end, int endMargin);
-    void stopAllVoices();
+
     void stopAllVoices(int frameOffset);
     void playX();
     int getFreeSampleSpace();

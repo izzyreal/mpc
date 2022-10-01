@@ -658,7 +658,11 @@ void Sequencer::stop(int tick)
 		mpc.getSampler().lock()->stopAllVoices(frameOffset);
 
 	for (int i = 0; i < 16; i++)
-		mpc.getHardware().lock()->getPad(i).lock()->release();
+    {
+        auto pad = mpc.getHardware().lock()->getPad(i).lock();
+        pad->release();
+        pad->notifyObservers(255);
+    }
 
     if (notifynextsq)
         notifyObservers(string("nextsqoff"));
