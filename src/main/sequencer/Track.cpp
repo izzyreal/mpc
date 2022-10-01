@@ -511,13 +511,22 @@ int Track::getNextTick()
 	if (eventIndex >= events.size() && noteOffs.empty())
 		return MAX_TICK;
 
-    if (noteOffs.size() != 0)
-	{
-		for (auto& no : noteOffs)
-		{
-				return no->getTick();
-		}
-	}
+    sort(noteOffs.begin(), noteOffs.end(), tickCmp);
+
+    auto noteOnAvailable = eventIndex < events.size();
+
+    for (auto& noteOff : noteOffs)
+    {
+        if (noteOnAvailable)
+        {
+            if (noteOff->getTick() < events[eventIndex]->getTick())
+                return noteOff->getTick();
+        }
+        else
+        {
+            return noteOff->getTick();
+        }
+    }
 
 	if (eventIndex < events.size())
 		return events[eventIndex]->getTick();
