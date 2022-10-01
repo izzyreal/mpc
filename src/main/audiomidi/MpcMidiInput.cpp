@@ -352,6 +352,21 @@ void MpcMidiInput::handlePolyAndNote(MidiMessage* msg)
 
   if (bus != 0)
   {
+    auto status = msg->getStatus();
+    auto isChannelPressure = status >= ShortMessage::CHANNEL_PRESSURE && status < ShortMessage::CHANNEL_PRESSURE + 16;
+    
+    if (isChannelPressure)
+    {
+      for (auto& p : mpc.getHardware().lock()->getPads())
+      {
+          if (p->isPressed())
+          {
+              p->setPressure((*msg->getMessage())[1]);
+          }
+      }
+      return;
+    }
+
     int note = (*msg->getMessage())[1];
     int velo = (*msg->getMessage())[2];
 
@@ -363,19 +378,13 @@ void MpcMidiInput::handlePolyAndNote(MidiMessage* msg)
     if (padIndexWithBank != -1)
     {
       auto hwPad = mpc.getHardware().lock()->getPad(padIndexWithBank % 16).lock();
-
-      auto status = msg->getStatus();
       auto isPolyPressure = status >= ShortMessage::POLY_PRESSURE && status < ShortMessage::POLY_PRESSURE + 16;
       auto isNoteOn = status >= ShortMessage::NOTE_ON && status < ShortMessage::NOTE_ON + 16;
       auto isNoteOff = status >= ShortMessage::NOTE_OFF && status < ShortMessage::NOTE_OFF + 16;
 
-
-      if (isPolyPressure)
+      if (isPolyPressure && hwPad->getPadIndexWithBankWhenLastPressed() == padIndexWithBank)
       {
-        if (hwPad->getPadIndexWithBankWhenLastPressed() == padIndexWithBank)
-        {
-          hwPad->setPressure(velo);
-        }
+        hwPad->setPressure(velo);
       }
       else if (isNoteOn)
       {
