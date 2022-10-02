@@ -40,7 +40,6 @@ namespace mpc::lcdgui::screens
 		void update(moduru::observer::Observable*, nonstd::any message) override;
 
 	private:
-		std::vector<std::weak_ptr<mpc::lcdgui::EventRowParameters>> findEventRowParameterss();
 		std::vector<std::weak_ptr<mpc::lcdgui::EventRow>> findEventRows();
 		void refreshSelection();
 		void initVisibleEvents();
@@ -51,6 +50,7 @@ namespace mpc::lcdgui::screens
 		void setViewNotesText();
 
 	private:
+        int playSingleEventCounter = 0;
 		const std::vector<std::string> viewNames { "ALL EVENTS", "NOTES", "PITCH BEND", "CTRL:", "PROG CHANGE", "CH PRESSURE", "POLY PRESS", "EXCLUSIVE" };
 		std::shared_ptr<mpc::sequencer::EmptyEvent> emptyEvent = std::make_shared<mpc::sequencer::EmptyEvent>();
 		std::vector<std::weak_ptr<mpc::sequencer::Event>> visibleEvents;

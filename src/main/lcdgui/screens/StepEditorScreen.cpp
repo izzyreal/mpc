@@ -1,6 +1,7 @@
 #include "StepEditorScreen.hpp"
 
 #include <audiomidi/EventHandler.hpp>
+#include <audiomidi/AudioMidiServices.hpp>
 
 #include <hardware/Hardware.hpp>
 #include <hardware/HwPad.hpp>
@@ -19,8 +20,13 @@
 #include <sequencer/PolyPressureEvent.hpp>
 #include <sequencer/ProgramChangeEvent.hpp>
 #include <sequencer/SystemExclusiveEvent.hpp>
+#include <sequencer/SeqUtil.hpp>
 
 #include <Util.hpp>
+
+#include <mpc/MpcMultiMidiSynth.hpp>
+#include <midi/core/ShortMessage.hpp>
+#include <audio/server/NonRealTimeAudioServer.hpp>
 
 #include <stdexcept>
 
@@ -322,15 +328,58 @@ void StepEditorScreen::function(int i)
 			{
 				auto eventNumber = stoi(param.substr(1, 2));
 				auto event = visibleEvents[eventNumber].lock();
-				auto empty = dynamic_pointer_cast<EmptyEvent>(event);
+				auto noteEvent = dynamic_pointer_cast<NoteEvent>(event);
 			
-				if (!empty)
-				{
-					auto tick = event->getTick();
-					event->setTick(-1);
-					mpc.getEventHandler().lock()->handle(event, track.lock().get());
-					event->setTick(tick);
-				}
+				if (noteEvent)
+                {
+                    auto tick = event->getTick();
+                    event->setTick(-1);
+                    auto eventHandler = mpc.getEventHandler().lock();
+                    auto tr = track.lock().get();
+
+                    MidiAdapter midiAdapter;
+
+                    auto mms = mpc.getMms();
+
+                    midiAdapter.process(event, tr->getBus() - 1, noteEvent ? noteEvent->getVelocity() : 0);
+
+                    auto varType = noteEvent->getVariationType();
+                    auto varValue = noteEvent->getVariationValue();
+
+                    int uniqueEnoughID = playSingleEventCounter++;
+
+                    if (playSingleEventCounter < 0) playSingleEventCounter = 0;
+
+                    mms->mpcTransport(midiAdapter.get().lock().get(), 0, varType, varValue, 0, uniqueEnoughID);
+
+                    event->setTick(tick);
+
+                    auto frameSeq = mpc.getAudioMidiServices().lock()->getFrameSequencer().lock();
+                    auto sampleRate = mpc.getAudioMidiServices().lock()->getAudioServer()->getSampleRate();
+                    auto tempo = mpc.getSequencer().lock()->getTempo();
+                    auto &events = frameSeq->eventsAfterNFrames;
+
+                    for (auto &e: events)
+                    {
+                        if (!e.occupied.load())
+                        {
+                            auto durationInFrames = mpc::sequencer::SeqUtil::ticksToFrames(noteEvent->getDuration(),
+                                                                                           tempo, sampleRate);
+                            e.init(durationInFrames, [noteEvent, tr, mms, uniqueEnoughID]() {
+                                auto noteOff = noteEvent->getNoteOff().lock();
+                                auto noteOffTick = noteOff->getTick();
+                                noteOff->setTick(-1);
+                                noteOff->setNote(noteEvent->getNote());
+                                MidiAdapter midiAdapter2;
+                                midiAdapter2.process(noteOff, tr->getBus() - 1, 0);
+                                auto noteOffToSend = midiAdapter2.get();
+                                noteOff->setTick(noteOffTick);
+                                mms->mpcTransport(noteOffToSend.lock().get(), 0, 0, 0, 0, uniqueEnoughID);
+                            });
+                            break;
+                        }
+                    }
+                }
 			}
 		}
 		else
@@ -1352,24 +1401,6 @@ bool StepEditorScreen::isDurationTcPercentageEnabled()
 int StepEditorScreen::getTcValueRecordedNotes()
 {
 	return tcValueRecordedNotes;
-}
-
-vector<weak_ptr<EventRowParameters>> StepEditorScreen::findEventRowParameterss()
-{
-	vector<weak_ptr<EventRowParameters>> result;
-
-	for (auto& eventRow : findEventRows())
-	{
-		auto child = eventRow.lock()->findChild("event-row-parameters").lock();
-		{
-			auto candidate = dynamic_pointer_cast<EventRowParameters>(child);
-			
-			if (candidate)
-				result.push_back(candidate);
-		}
-	}
-
-	return result;
 }
 
 vector<weak_ptr<EventRow>> StepEditorScreen::findEventRows()

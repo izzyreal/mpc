@@ -48,6 +48,19 @@ void FrameSeq::startMetronome(int sampleRate) {
 
 void FrameSeq::work(int nFrames)
 {
+    for (auto& e : eventsAfterNFrames)
+    {
+        if (!e.occupied.load()) continue;
+
+        e.frameCounter += nFrames;
+
+        if (e.frameCounter >= e.nFrames)
+        {
+            e.f();
+            e.reset();
+        }
+    }
+
 	if (!running)
 		return;
 
