@@ -33,10 +33,10 @@ public:
     void openWindow() override;
     
     MixerScreen(mpc::Mpc& mpc, const int layerIndex);
+    ~MixerScreen();
     
     void open() override;
-    void close() override;
-    
+
 private:
     void recordMixerEvent(int pad, int param, int value);
     void turnWheelLinked(int i);
@@ -50,7 +50,8 @@ private:
     int tab = 0;
     int lastTab = -1;
     bool link = false;
-    
+
+    int xPos = 0;
     int yPos = 0;
     std::vector<std::weak_ptr<mpc::lcdgui::MixerStrip>> mixerStrips;
     void addMixerStrips();
@@ -64,9 +65,9 @@ private:
     void displayFxPaths();
     void displayFxSendLevels();
     
-    std::shared_ptr<ctoot::mpc::MpcStereoMixerChannel> getStereoMixerChannel(int xPos);
+    std::shared_ptr<ctoot::mpc::MpcStereoMixerChannel> getStereoMixerChannel(int index);
     
-    std::shared_ptr<ctoot::mpc::MpcIndivFxMixerChannel> getIndivFxMixerChannel(int xPos);
+    std::shared_ptr<ctoot::mpc::MpcIndivFxMixerChannel> getIndivFxMixerChannel(int index);
     
     void setLink(bool b);
     void setTab(int i);

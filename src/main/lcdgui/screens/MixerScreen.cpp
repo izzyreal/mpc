@@ -23,6 +23,12 @@ MixerScreen::MixerScreen(mpc::Mpc& mpc, const int layerIndex)
 : ScreenComponent(mpc, "mixer", layerIndex)
 {
     addMixerStrips();
+    mpc.addObserver(this);
+}
+
+MixerScreen::~MixerScreen()
+{
+    mpc.deleteObserver(this);
 }
 
 void MixerScreen::open()
@@ -32,29 +38,22 @@ void MixerScreen::open()
         setTab(lastTab);
         lastTab = -1;
     }
-    
-    mpc.addObserver(this);
-    
+
     for (auto& m : mixerStrips)
     {
         m.lock()->initLabels();
         m.lock()->setColors();
     }
-    
+
     displayMixerStrips();
     displayFunctionKeys();
-}
-
-void MixerScreen::close()
-{
-    mpc.deleteObserver(this);
 }
 
 void MixerScreen::addMixerStrips()
 {
     for (int i = 0; i < 16; i++)
     {
-        mixerStrips.push_back(move(dynamic_pointer_cast<MixerStrip>(addChild(make_shared<MixerStrip>(mpc, i)).lock())));
+        mixerStrips.push_back(std::move(dynamic_pointer_cast<MixerStrip>(addChild(make_shared<MixerStrip>(mpc, i)).lock())));
         mixerStrips.back().lock()->setBank(mpc.getBank());
     }
     
@@ -62,9 +61,9 @@ void MixerScreen::addMixerStrips()
     mixerStrips[getXPos()].lock()->setSelection(yPos);
 }
 
-shared_ptr<MpcStereoMixerChannel> MixerScreen::getStereoMixerChannel(int xPos)
+shared_ptr<MpcStereoMixerChannel> MixerScreen::getStereoMixerChannel(int index)
 {
-    const auto padIndex = xPos + (mpc.getBank() * 16);
+    const auto padIndex = index + (mpc.getBank() * 16);
     const auto pad = program.lock()->getPad(padIndex);
     const auto note = pad->getNote();
     
@@ -78,9 +77,9 @@ shared_ptr<MpcStereoMixerChannel> MixerScreen::getStereoMixerChannel(int xPos)
     return stereoMixSourceIsDrum ? mpcSoundPlayerChannel->getStereoMixerChannels()[note - 35].lock() : noteParameters->getStereoMixerChannel().lock();
 }
 
-shared_ptr<MpcIndivFxMixerChannel> MixerScreen::getIndivFxMixerChannel(int xPos)
+shared_ptr<MpcIndivFxMixerChannel> MixerScreen::getIndivFxMixerChannel(int index)
 {
-    const auto padIndex = xPos + (mpc.getBank() * 16);
+    const auto padIndex = index + (mpc.getBank() * 16);
     const auto pad = program.lock()->getPad(padIndex);
     const auto note = pad->getNote();
     
@@ -134,12 +133,16 @@ void MixerScreen::displayMixerStrip(int i)
         strip->setValueAString(fxPathNames[indivFxMixer->getFxPath()]);
         strip->setValueB(indivFxMixer->getFxSendLevel());
     }
+
+    mixerStrips[i].lock()->setSelection(getXPos() == i ? yPos : -1);
 }
 
 void MixerScreen::displayMixerStrips()
 {
     for (int i = 0; i < 16; i++)
-    displayMixerStrip(i);
+    {
+        displayMixerStrip(i);
+    }
 }
 
 void MixerScreen::update(moduru::observer::Observable* o, nonstd::any arg)
@@ -157,6 +160,8 @@ void MixerScreen::update(moduru::observer::Observable* o, nonstd::any arg)
     }
     else if (s.compare("padandnote") == 0)
     {
+        xPos = mpc.getPad() - (mpc.getBank() * 16);
+
         if (link)
         {
             for (auto& m : mixerStrips)
@@ -242,10 +247,10 @@ int MixerScreen::getTab()
     return tab;
 }
 
-
 int MixerScreen::getXPos()
 {
-    return mpc.getPad() - (mpc.getBank() * 16);
+//    return mpc.getPad() - (mpc.getBank() * 16);
+    return xPos;
 }
 
 void MixerScreen::setYPos(int i)
@@ -285,8 +290,10 @@ void MixerScreen::left()
     
     if (getXPos() <= 0)
         return;
-    
-    auto newPad = mpc.getPad() - 1;
+
+    xPos--;
+
+    auto newPad = xPos + (mpc.getBank() * 16);
     auto newNote = program.lock()->getNoteFromPad(newPad);
     mpc.setPadAndNote(newPad, newNote);
 }
@@ -297,8 +304,10 @@ void MixerScreen::right()
     
     if (getXPos() >= 15)
         return;
-    
-    auto newPad = mpc.getPad() + 1;
+
+    xPos++;
+
+    auto newPad = xPos + (mpc.getBank() * 16);
     auto newNote = program.lock()->getNoteFromPad(newPad);
     mpc.setPadAndNote(newPad, newNote);
 }
