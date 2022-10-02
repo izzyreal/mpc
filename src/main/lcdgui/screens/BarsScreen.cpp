@@ -1,6 +1,5 @@
 #include "BarsScreen.hpp"
 
-#include <sequencer/Event.hpp>
 #include <sequencer/Track.hpp>
 
 #include <lcdgui/screens/EventsScreen.hpp>

@@ -16,7 +16,6 @@
 #include <lcdgui/screens/EventsScreen.hpp>
 #include <lcdgui/screens/NextSeqPadScreen.hpp>
 #include <lcdgui/screens/NextSeqScreen.hpp>
-#include <lcdgui/screens/SequencerScreen.hpp>
 #include <lcdgui/screens/SongScreen.hpp>
 #include <lcdgui/screens/StepEditorScreen.hpp>
 #include <lcdgui/screens/TrMoveScreen.hpp>

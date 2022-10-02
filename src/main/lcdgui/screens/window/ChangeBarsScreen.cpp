@@ -1,6 +1,5 @@
 #include "ChangeBarsScreen.hpp"
 
-#include <lcdgui/LayeredScreen.hpp>
 #include <sequencer/Sequence.hpp>
 
 using namespace mpc::lcdgui::screens::window;
