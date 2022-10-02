@@ -55,7 +55,7 @@ namespace mpc::sequencer {
 		void startMetronome(int sampleRate);
 		void work(int nFrames) override;
 		void setEnabled(bool) override {};
-		int getEventFrameOffset(int tick);
+		int getEventFrameOffset();
 		void stop();
 		bool isRunning();
 		int getTickPosition();

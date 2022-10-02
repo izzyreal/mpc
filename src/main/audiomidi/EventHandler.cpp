@@ -80,7 +80,7 @@ void EventHandler::handleNoThru(const weak_ptr<Event>& e, Track* track, int time
             return;
         
         auto fs = mpc.getAudioMidiServices().lock()->getFrameSequencer().lock();
-        auto eventFrame = fs->getEventFrameOffset(event->getTick());
+        auto eventFrame = fs->getEventFrameOffset();
         sampler.lock()->playMetronome(ne.get(), eventFrame);
         return;
     }
@@ -147,7 +147,7 @@ void EventHandler::handleNoThru(const weak_ptr<Event>& e, Track* track, int time
                     auto newVelo = static_cast<int>(ne->getVelocity() * (track->getVelocityRatio() * 0.01));
                     MidiAdapter midiAdapter;
                     midiAdapter.process(ne, drum, newVelo);
-                    auto eventFrame = mpc.getAudioMidiServices().lock()->getFrameSequencer().lock()->getEventFrameOffset(event->getTick());
+                    auto eventFrame = mpc.getAudioMidiServices().lock()->getFrameSequencer().lock()->getEventFrameOffset();
                     
                     if (timeStamp != -1)
                         eventFrame = timeStamp;
@@ -279,7 +279,7 @@ void EventHandler::midiOut(const weak_ptr<Event>& e, Track* track)
             track->getDevice() != 0)
         {
             auto fs = mpc.getAudioMidiServices().lock()->getFrameSequencer().lock();
-            auto eventFrame = fs->getEventFrameOffset(noteEvent->getTick());
+            auto eventFrame = fs->getEventFrameOffset();
             msg.bufferPos = eventFrame;
             
             if (r.size() < 100)

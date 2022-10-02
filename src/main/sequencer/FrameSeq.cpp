@@ -295,7 +295,7 @@ void FrameSeq::work(int nFrames)
 	}
 }
 
-int FrameSeq::getEventFrameOffset(int tick)
+int FrameSeq::getEventFrameOffset()
 {
 	return tickFrameOffset;
 }

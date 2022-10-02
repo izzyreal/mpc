@@ -627,7 +627,7 @@ void Sequencer::stop(int tick)
 	if (pos > s1->getLastTick())
 		pos = s1->getLastTick();
 
-	int frameOffset = tick == -1 ? 0 : ams->getFrameSequencer().lock()->getEventFrameOffset(tick);
+	int frameOffset = tick == -1 ? 0 : ams->getFrameSequencer().lock()->getEventFrameOffset();
 	ams->getFrameSequencer().lock()->stop();
 	
 	if (recording || overdubbing)
