@@ -37,14 +37,15 @@ void EventsScreen::open()
 	note1Field->setSize(47, 9);
 	note1Field->setAlignment(Alignment::Centered, 18);
 
+    setFromSq(sequencer.lock()->getActiveSequenceIndex());
+    setToSq(sequencer.lock()->getActiveSequenceIndex());
+
 	if (tab != 0)
 	{
 		openScreen(tabNames[tab]);
 		return;
 	}
 
-	setFromSq(sequencer.lock()->getActiveSequenceIndex());
-	setToSq(sequencer.lock()->getActiveSequenceIndex());
 	setFromTr(sequencer.lock()->getActiveTrackIndex());
 	setToTr(sequencer.lock()->getActiveTrackIndex());
 
