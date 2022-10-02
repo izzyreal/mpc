@@ -40,7 +40,6 @@ private:
     std::weak_ptr<NoteEvent> lastAdded;
     bool multi{ false };
     bool _delete{ false };
-    int tcValue = 0;
     std::vector<std::weak_ptr<Event>> tempEvents;
     
 protected:
@@ -101,20 +100,14 @@ public:
     
 private:
     std::vector<std::weak_ptr<NoteEvent>> getNoteEventsAtTick(int tick);
-    
-public:
-    void sortEventsByNotePerTick();
-    
-private:
-    void sortEventsOfTickByNote(std::vector<std::weak_ptr<NoteEvent>> noteEvents);
-    
+
 public:
     void timingCorrect(int fromBar, int toBar, NoteEvent* noteEvent, int stepLength);
     int timingCorrectTick(int fromBar, int toBar, int tick, int stepLength);
     int swingTick(int tick, int noteValue, int percentage);
-    void swing(int noteValue, int percentage, std::vector<int> noteRange);
+
     void swing(std::vector<std::weak_ptr<Event>> eventsToSwing, int noteValue, int percentage, std::vector<int> noteRange);
-    void shiftTiming(bool later, int amount, int lastTick);
+
     void shiftTiming(std::vector<std::weak_ptr<Event>> eventsToShift, bool later, int amount, int lastTick);
     
 public:

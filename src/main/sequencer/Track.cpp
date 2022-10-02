@@ -224,12 +224,15 @@ void Track::setOn(bool b)
 void Track::addEventRealTime(shared_ptr<NoteEvent> e1)
 {
 	auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
-	tcValue = timingCorrectScreen->getNoteValue();
+	auto tcValue = timingCorrectScreen->getNoteValue();
 
 	auto lSequencer = sequencer.lock();
 
 	if (tcValue > 0 && e1)
+    {
         timingCorrect(0, parent->getLastBarIndex(), e1.get(), lSequencer->getTickValues()[tcValue]);
+        e1->setTick(swingTick(e1->getTick(), tcValue, timingCorrectScreen->getSwing()));
+    }
 
     for (auto& _e2 : events)
     {
@@ -627,7 +630,7 @@ void Track::playNext()
                     {
                         if (hwPad->isPressed())
                         {
-                            int wouldBeVarValue = 0;
+                            int wouldBeVarValue;
                             auto padIndexWithoutBank = hwPad->getPadIndexWithBankWhenLastPressed() % 16;
 
                             if (_16l_type == 0)
@@ -940,22 +943,6 @@ vector<weak_ptr<NoteEvent>> Track::getNoteEventsAtTick(int tick)
 	return noteEvents;
 }
 
-void Track::sortEventsByNotePerTick()
-{
-	for (auto& ne : getNoteEvents())
-		sortEventsOfTickByNote(getNoteEventsAtTick(ne.lock()->getTick()));
-}
-
-void Track::sortEventsOfTickByNote(vector<weak_ptr<NoteEvent>> noteEvents)
-{
-    sort(noteEvents.begin(), noteEvents.end(), noteCmp);
-}
-
-void Track::swing(int noteValue, int percentage, vector<int> noteRange)
-{
-	swing(getEvents(), noteValue, percentage, noteRange);
-}
-
 void Track::swing(vector<weak_ptr<Event>> eventsToSwing, int noteValue, int percentage, vector<int> noteRange)
 {
 	if (noteValue != 1 && noteValue != 3)
@@ -987,11 +974,6 @@ int Track::swingTick(int tick, int noteValue, int percentage)
 		tick += ((percentage - 50) * (4.0 / 100.0) * (base / 2.0));
 
 	return tick;
-}
-
-void Track::shiftTiming(bool later, int amount, int lastTick)
-{
-	shiftTiming(getEvents(), later, amount, lastTick);
 }
 
 void Track::shiftTiming(vector<weak_ptr<Event>> eventsToShift, bool later, int amount, int lastTick)
