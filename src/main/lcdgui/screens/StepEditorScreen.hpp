@@ -18,6 +18,8 @@ namespace mpc::lcdgui::screens
 
 	private:
 		void downOrUp(int increment);
+        void adhocPlayNoteEvent(const std::shared_ptr<mpc::sequencer::NoteEvent>& noteEvent);
+        void adhocPlayNoteEventsAtCurrentPosition();
 
 	public:
 		void function(int i) override;

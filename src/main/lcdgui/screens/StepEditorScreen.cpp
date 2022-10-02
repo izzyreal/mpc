@@ -332,53 +332,7 @@ void StepEditorScreen::function(int i)
 			
 				if (noteEvent)
                 {
-                    auto tick = event->getTick();
-                    event->setTick(-1);
-                    auto eventHandler = mpc.getEventHandler().lock();
-                    auto tr = track.lock().get();
-
-                    MidiAdapter midiAdapter;
-
-                    auto mms = mpc.getMms();
-
-                    midiAdapter.process(event, tr->getBus() - 1, noteEvent ? noteEvent->getVelocity() : 0);
-
-                    auto varType = noteEvent->getVariationType();
-                    auto varValue = noteEvent->getVariationValue();
-
-                    int uniqueEnoughID = playSingleEventCounter++;
-
-                    if (playSingleEventCounter < 0) playSingleEventCounter = 0;
-
-                    mms->mpcTransport(midiAdapter.get().lock().get(), 0, varType, varValue, 0, uniqueEnoughID);
-
-                    event->setTick(tick);
-
-                    auto frameSeq = mpc.getAudioMidiServices().lock()->getFrameSequencer().lock();
-                    auto sampleRate = mpc.getAudioMidiServices().lock()->getAudioServer()->getSampleRate();
-                    auto tempo = mpc.getSequencer().lock()->getTempo();
-                    auto &events = frameSeq->eventsAfterNFrames;
-
-                    for (auto &e: events)
-                    {
-                        if (!e.occupied.load())
-                        {
-                            auto durationInFrames = mpc::sequencer::SeqUtil::ticksToFrames(noteEvent->getDuration(),
-                                                                                           tempo, sampleRate);
-                            e.init(durationInFrames, [noteEvent, tr, mms, uniqueEnoughID]() {
-                                auto noteOff = noteEvent->getNoteOff().lock();
-                                auto noteOffTick = noteOff->getTick();
-                                noteOff->setTick(-1);
-                                noteOff->setNote(noteEvent->getNote());
-                                MidiAdapter midiAdapter2;
-                                midiAdapter2.process(noteOff, tr->getBus() - 1, 0);
-                                auto noteOffToSend = midiAdapter2.get();
-                                noteOff->setTick(noteOffTick);
-                                mms->mpcTransport(noteOffToSend.lock().get(), 0, 0, 0, 0, uniqueEnoughID);
-                            });
-                            break;
-                        }
-                    }
+                    adhocPlayNoteEvent(noteEvent);
                 }
 			}
 		}
@@ -546,6 +500,11 @@ void StepEditorScreen::turnWheel(int i)
 		}
 	}
 
+    if (param.find("now") != std::string::npos)
+    {
+        adhocPlayNoteEventsAtCurrentPosition();
+    }
+
 	refreshSelection();
 }
 
@@ -559,6 +518,8 @@ void StepEditorScreen::prevStepEvent()
 		sequencer.lock()->goToPreviousEvent();
 	else
 		sequencer.lock()->goToPreviousStep();
+
+    adhocPlayNoteEventsAtCurrentPosition();
 }
 
 void StepEditorScreen::nextStepEvent()
@@ -571,6 +532,8 @@ void StepEditorScreen::nextStepEvent()
 		sequencer.lock()->goToNextEvent();
 	else
 		sequencer.lock()->goToNextStep();
+
+    adhocPlayNoteEventsAtCurrentPosition();
 }
 
 void StepEditorScreen::prevBarStart()
@@ -582,6 +545,8 @@ void StepEditorScreen::prevBarStart()
 		sequencer.lock()->setBar(0);
 	else
 		sequencer.lock()->setBar(sequencer.lock()->getCurrentBarIndex() - 1);
+
+    adhocPlayNoteEventsAtCurrentPosition();
 }
 
 void StepEditorScreen::nextBarEnd()
@@ -594,6 +559,8 @@ void StepEditorScreen::nextBarEnd()
 		sequencer.lock()->setBar(sequencer.lock()->getActiveSequence().lock()->getLastBarIndex() + 1);
 	else
 		sequencer.lock()->setBar(sequencer.lock()->getCurrentBarIndex() + 1);
+
+    adhocPlayNoteEventsAtCurrentPosition();
 }
 
 void StepEditorScreen::left()
@@ -1411,4 +1378,68 @@ vector<weak_ptr<EventRow>> StepEditorScreen::findEventRows()
 		result.push_back(dynamic_pointer_cast<EventRow>(findChild("event-row-" + to_string(i)).lock()));
 
 	return result;
+}
+
+void screens::StepEditorScreen::adhocPlayNoteEvent(const shared_ptr<mpc::sequencer::NoteEvent> &noteEvent)
+{
+    auto tick = noteEvent->getTick();
+    noteEvent->setTick(-1);
+    auto eventHandler = mpc.getEventHandler().lock();
+    auto tr = track.lock().get();
+
+    MidiAdapter midiAdapter;
+
+    auto mms = mpc.getMms();
+
+    midiAdapter.process(noteEvent, tr->getBus() - 1, noteEvent ? noteEvent->getVelocity() : 0);
+
+    auto varType = noteEvent->getVariationType();
+    auto varValue = noteEvent->getVariationValue();
+
+    int uniqueEnoughID = playSingleEventCounter++;
+
+    if (playSingleEventCounter < 0) playSingleEventCounter = 0;
+
+    mms->mpcTransport(midiAdapter.get().lock().get(), 0, varType, varValue, 0, uniqueEnoughID);
+
+    noteEvent->setTick(tick);
+
+    auto frameSeq = mpc.getAudioMidiServices().lock()->getFrameSequencer().lock();
+    auto sampleRate = mpc.getAudioMidiServices().lock()->getAudioServer()->getSampleRate();
+    auto tempo = mpc.getSequencer().lock()->getTempo();
+    auto &events = frameSeq->eventsAfterNFrames;
+
+    for (auto &e: events)
+    {
+        if (!e.occupied.load())
+        {
+            auto durationInFrames = mpc::sequencer::SeqUtil::ticksToFrames(noteEvent->getDuration(),
+                                                                           tempo, sampleRate);
+            e.init(durationInFrames, [noteEvent, tr, mms, uniqueEnoughID]() {
+                auto noteOff = noteEvent->getNoteOff().lock();
+                auto noteOffTick = noteOff->getTick();
+                noteOff->setTick(-1);
+                noteOff->setNote(noteEvent->getNote());
+                MidiAdapter midiAdapter2;
+                midiAdapter2.process(noteOff, tr->getBus() - 1, 0);
+                auto noteOffToSend = midiAdapter2.get();
+                noteOff->setTick(noteOffTick);
+                mms->mpcTransport(noteOffToSend.lock().get(), 0, 0, 0, 0, uniqueEnoughID);
+            });
+            break;
+        }
+    }
+}
+
+void screens::StepEditorScreen::adhocPlayNoteEventsAtCurrentPosition()
+{
+    auto tick = sequencer.lock()->getTickPosition();
+    for (auto& e : track.lock()->getEventRange(tick, tick))
+    {
+        auto noteEvent = std::dynamic_pointer_cast<NoteEvent>(e.lock());
+        if (noteEvent)
+        {
+            adhocPlayNoteEvent(noteEvent);
+        }
+    }
 }
