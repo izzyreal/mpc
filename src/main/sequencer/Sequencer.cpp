@@ -609,7 +609,9 @@ void Sequencer::stop(int tick)
 	if (!isPlaying() && !bouncing)
 	{
 		if (position != 0)
+        {
             setBar(0); // real 2kxl doesn't do this
+        }
         return;
     }
 

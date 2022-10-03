@@ -178,18 +178,18 @@ void GlobalReleaseControls::overDub()
 {
 	auto controls = mpc.getControls().lock();
 	controls->setOverDubPressed(false);
-    init();
-	auto hw = mpc.getHardware().lock();
-	hw->getLed("overdub").lock()->light(sequencer.lock()->isOverDubbing());
 }
 
 void GlobalReleaseControls::rec()
 {
 	auto controls = mpc.getControls().lock();
 	controls->setRecPressed(false);
-    init();
-	auto hw = mpc.getHardware().lock();
-	hw->getLed("rec").lock()->light(sequencer.lock()->isRecording());
+}
+
+void GlobalReleaseControls::play()
+{
+    auto controls = mpc.getControls().lock();
+    controls->setPlayPressed(false);
 }
 
 void GlobalReleaseControls::tap()

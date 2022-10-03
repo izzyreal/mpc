@@ -170,3 +170,12 @@ weak_ptr<KbMapping> Controls::getKbMapping()
 {
     return kbMapping;
 }
+
+void Controls::setPlayPressed(bool b)
+{
+    playPressed = b;
+}
+
+bool Controls::isPlayPressed() {
+    return playPressed;
+}

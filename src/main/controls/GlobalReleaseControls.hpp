@@ -34,7 +34,8 @@ namespace mpc {
 		public:
 			void overDub() override;
 			void rec() override;
-			void tap() override;
+            void play() override;
+            void tap() override;
 			void shift() override;
 			void erase() override;
 			void function(int i) override;
@@ -49,7 +50,6 @@ namespace mpc {
 			void numpad(int i) override {};
 			void pressEnter() override {};
 			void stop() override {};
-			void play() override {};
 			void playStart() override {};
 			void mainScreen() override {};
 			void prevStepEvent() override {};

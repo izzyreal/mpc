@@ -361,7 +361,9 @@ void BaseControls::numpad(int i)
                 break;
             case 1:
                 if (sequencer.lock()->isPlaying())
+                {
                     return;
+                }
                 
                 ls.lock()->openScreen("song");
                 break;
@@ -371,7 +373,9 @@ void BaseControls::numpad(int i)
             case 3:
             {
                 if (sequencer.lock()->isPlaying())
+                {
                     break;
+                }
                 
                 disk->initFiles();
                 
@@ -380,13 +384,17 @@ void BaseControls::numpad(int i)
             }
             case 4:
                 if (sequencer.lock()->isPlaying())
+                {
                     break;
+                }
                 
                 ls.lock()->openScreen("sample");
                 break;
             case 5:
                 if (sequencer.lock()->isPlaying())
+                {
                     break;
+                }
                 
                 ls.lock()->openScreen("trim");
                 break;
@@ -398,13 +406,17 @@ void BaseControls::numpad(int i)
                 break;
             case 8:
                 if (sequencer.lock()->isPlaying())
+                {
                     break;
+                }
                 
                 ls.lock()->openScreen("others");
                 break;
             case 9:
                 if (sequencer.lock()->isPlaying())
+                {
                     break;
+                }
                 
                 ls.lock()->openScreen("sync");
                 break;
@@ -425,64 +437,57 @@ void BaseControls::pressEnter()
 
 void BaseControls::rec()
 {
+    init();
+
+    if (currentScreenAllowsPlayAndDisallowsRecOverdub())
+    {
+        return;
+    }
+
     auto controls = mpc.getControls().lock();
     
     if (controls->isRecPressed())
+    {
         return;
+    }
     
     controls->setRecPressed(true);
-    
-    init();
-    
-    if (allowPlay()) return;
-    
+
     auto hw = mpc.getHardware().lock();
     
-    if (!sequencer.lock()->isPlaying())
+    if (sequencer.lock()->isRecordingOrOverdubbing())
     {
-        hw->getLed("rec").lock()->light(true);
+        sequencer.lock()->setRecording(false);
+        sequencer.lock()->setOverdubbing(false);
     }
-    else
+
+    if (!currentScreenAllowsTransport())
     {
-        if (sequencer.lock()->isRecordingOrOverdubbing())
-        {
-            sequencer.lock()->setRecording(false);
-            sequencer.lock()->setOverdubbing(false);
-            hw->getLed("rec").lock()->light(false);
-            hw->getLed("overdub").lock()->light(false);
-        }
-    }
-    
-    if (find(begin(allowTransportScreens), end(allowTransportScreens), currentScreenName) == end(allowTransportScreens))
         ls.lock()->openScreen("sequencer");
+    }
 }
 
 void BaseControls::overDub()
 {
+    init();
+
+    if (currentScreenAllowsPlayAndDisallowsRecOverdub())
+    {
+        return;
+    }
+
     auto controls = mpc.getControls().lock();
     controls->setOverDubPressed(true);
-    init();
-    
-    if (allowPlay())
-        return;
-    
+
     auto hw = mpc.getHardware().lock();
     
-    if (!sequencer.lock()->isPlaying())
+
+    if (sequencer.lock()->isRecordingOrOverdubbing())
     {
-        hw->getLed("overdub").lock()->light(true);
+        sequencer.lock()->setRecording(false);
+        sequencer.lock()->setOverdubbing(false);
     }
-    else
-    {
-        if (sequencer.lock()->isRecordingOrOverdubbing())
-        {
-            sequencer.lock()->setRecording(false);
-            sequencer.lock()->setOverdubbing(false);
-            hw->getLed("rec").lock()->light(false);
-            hw->getLed("overdub").lock()->light(false);
-        }
-    }
-    
+
     if (find(begin(allowTransportScreens), end(allowTransportScreens), currentScreenName) == end(allowTransportScreens))
         ls.lock()->openScreen("sequencer");
 }
@@ -503,7 +508,7 @@ void BaseControls::stop()
     
     sequencer.lock()->stop();
     
-    if (!allowTransport() && !allowPlay())
+    if (!currentScreenAllowsTransport() && !currentScreenAllowsPlayAndDisallowsRecOverdub())
     {
         ls.lock()->openScreen("sequencer");
     }
@@ -511,8 +516,16 @@ void BaseControls::stop()
 
 void BaseControls::play()
 {
-    init();
     auto controls = mpc.getControls().lock();
+
+    if (controls->isPlayPressed())
+    {
+        return;
+    }
+
+    controls->setPlayPressed(true);
+
+    init();
     auto hw = mpc.getHardware().lock();
     
     if (sequencer.lock()->isPlaying())
@@ -521,15 +534,11 @@ void BaseControls::play()
         {
             sequencer.lock()->setOverdubbing(false);
             sequencer.lock()->setRecording(true);
-            hw->getLed("overdub").lock()->light(false);
-            hw->getLed("rec").lock()->light(true);
         }
         else if (controls->isOverDubPressed() && !sequencer.lock()->isRecording())
         {
             sequencer.lock()->setOverdubbing(true);
             sequencer.lock()->setRecording(false);
-            hw->getLed("overdub").lock()->light(true);
-            hw->getLed("rec").lock()->light(false);
         }
     }
     else
@@ -555,7 +564,7 @@ void BaseControls::play()
             }
             else
             {
-                if (!allowTransport() && !allowPlay())
+                if (!currentScreenAllowsTransport() && !currentScreenAllowsPlayAndDisallowsRecOverdub())
                 {
                     ls.lock()->openScreen("sequencer");
                 }
@@ -574,7 +583,9 @@ void BaseControls::playStart()
     auto controls = mpc.getControls().lock();
     
     if (sequencer.lock()->isPlaying())
+    {
         return;
+    }
     
     if (controls->isRecPressed())
     {
@@ -604,7 +615,7 @@ void BaseControls::playStart()
         }
         else
         {
-            if (!allowTransport() && !allowPlay())
+            if (!currentScreenAllowsTransport() && !currentScreenAllowsPlayAndDisallowsRecOverdub())
             {
                 ls.lock()->openScreen("sequencer");
             }
@@ -613,10 +624,6 @@ void BaseControls::playStart()
             sequencer.lock()->playFromStart();
         }
     }
-    
-    hw->getLed("play").lock()->light(sequencer.lock()->isPlaying());
-    hw->getLed("rec").lock()->light(sequencer.lock()->isRecording());
-    hw->getLed("overdub").lock()->light(sequencer.lock()->isOverDubbing());
 }
 
 void BaseControls::mainScreen()
@@ -795,9 +802,12 @@ void BaseControls::erase()
     controls->setErasePressed(true);
     
     if (!sequencer.lock()->getActiveSequence().lock()->isUsed())
+    {
         return;
+    }
     
-    if (!sequencer.lock()->isRecordingOrOverdubbing()) {
+    if (!sequencer.lock()->isRecordingOrOverdubbing())
+    {
         ls.lock()->openScreen("erase");
     }
 }
@@ -807,7 +817,9 @@ int BaseControls::getSoundIncrement(int notch_inc)
     auto soundInc = notch_inc;
     
     if (abs(notch_inc) != 1)
+    {
         soundInc *= (int)(ceil(sampler.lock()->getSound().lock()->getFrameCount() / 15000.0));
+    }
     
     return soundInc;
 }
@@ -826,7 +838,9 @@ void BaseControls::splitLeft()
     }
     
     if (!splittable)
+    {
         return;
+    }
     
     if (field->isSplit())
     {
@@ -866,7 +880,7 @@ const std::vector<std::string> BaseControls::allowPlayScreens {
     "next-seq-pad"
 };
 
-bool BaseControls::allowPlay()
+bool BaseControls::currentScreenAllowsPlayAndDisallowsRecOverdub()
 {
     return find(
                 begin(BaseControls::allowPlayScreens),
@@ -897,7 +911,7 @@ const std::vector<std::string> BaseControls::allowTransportScreens {
     "trans"
 };
 
-bool BaseControls::allowTransport()
+bool BaseControls::currentScreenAllowsTransport()
 {
     return find(
                 begin(BaseControls::allowTransportScreens),

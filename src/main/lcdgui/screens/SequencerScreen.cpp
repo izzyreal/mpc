@@ -890,8 +890,10 @@ void SequencerScreen::displayNextSq()
 
 void SequencerScreen::play()
 {
-	if (sequencer.lock()->isPlaying())
-		return;
+    if (mpc.getControls().lock()->isPlayPressed())
+    {
+        return;
+    }
 
 	displayPunchWhileRecording();
 

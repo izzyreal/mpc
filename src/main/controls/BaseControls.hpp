@@ -101,8 +101,8 @@ namespace mpc::controls {
 		const static std::vector<std::string> allowPlayScreens;
         const static std::vector<std::string> samplerScreens;
 
-		bool allowTransport();
-		bool allowPlay();
+		bool currentScreenAllowsTransport();
+		bool currentScreenAllowsPlayAndDisallowsRecOverdub();
         bool isSamplerScreen();
 		void generateNoteOn(int nn, int padVelo, int tick);
 
