@@ -5,6 +5,7 @@
 #include <memory>
 #include <vector>
 #include <functional>
+#include <atomic>
 
 struct EventAfterNFrames {
     std::atomic<bool> occupied = ATOMIC_VAR_INIT(false);
