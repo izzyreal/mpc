@@ -62,6 +62,7 @@ void EventHandler::handleNoThru(const weak_ptr<Event>& e, Track* track, int time
     auto lSequencer = sequencer.lock();
     
     auto countMetronomeScreen = mpc.screens->get<CountMetronomeScreen>("count-metronome");
+    auto isStepEditor = mpc.getLayeredScreen().lock()->getCurrentScreenName() == "step-editor";
     
     if (track->getName() == "click")
     {
@@ -71,7 +72,7 @@ void EventHandler::handleNoThru(const weak_ptr<Event>& e, Track* track, int time
         if (lSequencer->isRecordingOrOverdubbing() && !countMetronomeScreen->getInRec() && !lSequencer->isCountingIn())
             return;
         
-        if (lSequencer->isPlaying() && !lSequencer->isRecordingOrOverdubbing() && !countMetronomeScreen->getInPlay() && !lSequencer->isCountingIn())
+        if (!isStepEditor && lSequencer->isPlaying() && !lSequencer->isRecordingOrOverdubbing() && !countMetronomeScreen->getInPlay() && !lSequencer->isCountingIn())
             return;
         
         auto ne = dynamic_pointer_cast<NoteEvent>(event);

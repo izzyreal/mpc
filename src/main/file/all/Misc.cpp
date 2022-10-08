@@ -2,12 +2,13 @@
 
 #include <Mpc.hpp>
 
-#include <lcdgui/screens/StepEditorScreen.hpp>
+#include <lcdgui/screens/window/StepEditOptionsScreen.hpp>
 #include <lcdgui/screens/OthersScreen.hpp>
 #include <lcdgui/screens/SyncScreen.hpp>
 #include <lcdgui/screens/MidiSwScreen.hpp>
 
 using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui;
 using namespace mpc::file::all;
 using namespace std;
@@ -32,7 +33,7 @@ Misc::Misc(const vector<char>& b)
 
 Misc::Misc(mpc::Mpc& mpc)
 {
-	auto stepEditorScreen = mpc.screens->get<StepEditorScreen>("step-editor");
+	auto stepEditOptionsScreen = mpc.screens->get<StepEditOptionsScreen>("step-edit-options");
 	auto othersScreen = mpc.screens->get<OthersScreen>("others");
 	saveBytes = vector<char>(LENGTH);
 	saveBytes[TAP_AVG_OFFSET] = (char)(othersScreen->getTapAveraging());
@@ -51,9 +52,9 @@ Misc::Misc(mpc::Mpc& mpc)
         saveBytes[MIDI_SWITCH_OFFSET + (i * 2) + 1] = (char) func;
     }
     
-	saveBytes[AUTO_STEP_INCREMENT_OFFSET] = (char)(stepEditorScreen->isAutoStepIncrementEnabled() ? 1 : 0);
-	saveBytes[DURATION_OF_REC_NOTES_OFFSET] = (char)(stepEditorScreen->isDurationTcPercentageEnabled() ? 1 : 0);
-	saveBytes[DURATION_TC_PERCENTAGE_OFFSET] = (char)(stepEditorScreen->getTcValueRecordedNotes());
+	saveBytes[AUTO_STEP_INCREMENT_OFFSET] = (char)(stepEditOptionsScreen->isAutoStepIncrementEnabled() ? 1 : 0);
+	saveBytes[DURATION_OF_REC_NOTES_OFFSET] = (char)(stepEditOptionsScreen->isDurationOfRecordedNotesTcValue() ? 1 : 0);
+	saveBytes[DURATION_TC_PERCENTAGE_OFFSET] = (char)(stepEditOptionsScreen->getTcValuePercentage());
 	saveBytes[MIDI_PGM_CHANGE_TO_SEQ_OFFSET] = 0; // Unimplemented
 }
 

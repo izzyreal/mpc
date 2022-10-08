@@ -203,6 +203,20 @@
  "fblabels" : [ null, null, null, null, null, null ],
  "fbtypes" : [ null, null, null, null, null, null ]
 },
+ "step-edit-options":
+ {
+  "labels" : [ "Auto step increment:", "", "" ],
+  "x" : [ 44, 56, 112 ],
+  "y" : [ 20, 40, 40 ],
+  "tfsize" : [ 18, 54, 24 ],
+  "parameters" : [
+   "auto-step-increment", [ "_", "_", "_", "duration-of-recorded-notes" ],
+   "duration-of-recorded-notes", ["_", "tc-value", "auto-step-increment", "_" ],
+   "tc-value", ["duration-of-recorded-notes", "_", "auto-step-increment", "_" ]
+  ],
+  "fblabels" : [ null, null, null, null, "CLOSE", null ],
+  "fbtypes" : [ null, null, null, null, 0, null ]
+ },
 "insert-event":
 {
  "labels" : [ "Type:" ],

@@ -61,6 +61,12 @@ StepEditorScreen::StepEditorScreen(mpc::Mpc& mpc, const int layerIndex)
 	addChildT<Rectangle>("view-background", r);
 }
 
+void StepEditorScreen::openWindow()
+{
+    openScreen("step-edit-options");
+}
+
+
 void StepEditorScreen::open()
 {
 	findField("tonote").lock()->setLocation(115, 0);
@@ -1041,24 +1047,6 @@ void StepEditorScreen::setControl(int i)
 	refreshSelection();
 }
 
-void StepEditorScreen::setAutoStepIncrementEnabled(bool b)
-{
-	autoStepIncrementEnabled = b;
-}
-
-void StepEditorScreen::setDurationOfRecordedNotes(bool b)
-{
-	durationOfRecordedNotes = b;
-}
-
-void StepEditorScreen::setTcValueRecordedNotes(int i)
-{
-	if (i < 0 || i > 100)
-		return;
-
-	tcValueRecordedNotes = i;
-}
-
 void StepEditorScreen::setyOffset(int i)
 {
 	if (i < 0)
@@ -1069,11 +1057,6 @@ void StepEditorScreen::setyOffset(int i)
 	initVisibleEvents();
 	refreshEventRows();
 	refreshSelection();
-}
-
-void StepEditorScreen::setSelectedEventIndex(int i)
-{
-	selectedEventNumber = i;
 }
 
 void StepEditorScreen::setFromNote(int i)
@@ -1350,21 +1333,6 @@ vector<shared_ptr<Event>>& StepEditorScreen::getPlaceHolder()
 int StepEditorScreen::getYOffset()
 {
 	return yOffset;
-}
-
-bool StepEditorScreen::isAutoStepIncrementEnabled()
-{
-	return autoStepIncrementEnabled;
-}
-
-bool StepEditorScreen::isDurationTcPercentageEnabled()
-{
-	return durationTcPercentageEnabled;
-}
-
-int StepEditorScreen::getTcValueRecordedNotes()
-{
-	return tcValueRecordedNotes;
 }
 
 vector<weak_ptr<EventRow>> StepEditorScreen::findEventRows()

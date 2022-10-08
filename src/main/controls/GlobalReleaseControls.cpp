@@ -17,6 +17,7 @@
 #include <lcdgui/screens/StepEditorScreen.hpp>
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <lcdgui/screens/window/Assign16LevelsScreen.hpp>
+#include <lcdgui/screens/window/StepEditOptionsScreen.hpp>
 
 #include <mpc/MpcSoundPlayerChannel.hpp>
 
@@ -120,16 +121,33 @@ void GlobalReleaseControls::simplePad(int padIndexWithBank)
 
 	if (stepRec || maybeRecWithoutPlaying)
 	{
-		auto newDur = static_cast<int>(mpc.getAudioMidiServices().lock()->getFrameSequencer().lock()->getTickPosition());
+		auto newDuration = static_cast<int>(mpc.getAudioMidiServices().lock()->getFrameSequencer().lock()->getTickPosition());
+
+        const auto stepEditOptionsScreen = mpc.screens->get<StepEditOptionsScreen>("step-edit-options");
+        const auto increment = stepEditOptionsScreen->isAutoStepIncrementEnabled();
+        const auto durationIsTcValue = stepEditOptionsScreen->isDurationOfRecordedNotesTcValue();
+        const auto tcValuePercentage = stepEditOptionsScreen->getTcValuePercentage();
+
+        const auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
+        const int noteVal = timingCorrectScreen->getNoteValue();
+
+        const int stepLength = sequencer.lock()->getTickValues()[noteVal];
+
+        if (stepRec && durationIsTcValue)
+        {
+            newDuration = static_cast<int>(stepLength * (tcValuePercentage * 0.01));
+
+            if (newDuration < 1)
+            {
+                newDuration = 1;
+            }
+        }
+
 		sequencer.lock()->stopMetronomeTrack();
-		bool durationHasBeenAdjusted = lTrk->adjustDurLastEvent(newDur);
+		bool durationHasBeenAdjusted = lTrk->adjustDurLastEvent(newDuration);
 
-		if (durationHasBeenAdjusted && maybeRecWithoutPlaying)
+		if ( (durationHasBeenAdjusted && maybeRecWithoutPlaying) || (stepRec && increment))
 		{
-			auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
-
-			int noteVal = timingCorrectScreen->getNoteValue();
-			int stepLength = sequencer.lock()->getTickValues()[noteVal];
 			int nextPos = sequencer.lock()->getTickPosition() + stepLength;
 			auto bar = sequencer.lock()->getCurrentBarIndex() + 1;
 			nextPos = lTrk->timingCorrectTick(0, bar, nextPos, stepLength);

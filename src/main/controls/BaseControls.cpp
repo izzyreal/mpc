@@ -287,7 +287,7 @@ void BaseControls::generateNoteOn(int note, int padVelo, int tick)
         
         if (step)
         {
-            if (trk->getBus() == 0 || note > 35)
+            if (trk->getBus() == 0 || note >= 35)
             {
                 recordedEvent = trk->addNoteEvent(seq->getTickPosition(), note).lock();
             }

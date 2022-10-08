@@ -19,6 +19,7 @@ vector<string> screenNames = {
 "next-seq",
 "mixer",
 "step-editor",
+"step-edit-options",
 "load",
 "save",
 "select-drum",

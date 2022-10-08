@@ -29,7 +29,7 @@
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <lcdgui/screens/window/MultiRecordingSetupScreen.hpp>
 #include <lcdgui/screens/window/MidiInputScreen.hpp>
-#include <lcdgui/screens/StepEditorScreen.hpp>
+#include <lcdgui/screens/window/StepEditOptionsScreen.hpp>
 #include <lcdgui/screens/SecondSeqScreen.hpp>
 #include <lcdgui/screens/SongScreen.hpp>
 #include <lcdgui/screens/OthersScreen.hpp>
@@ -146,10 +146,10 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc& mpc, AllParser& allParser)
     auto midiSyncMisc = allParser.getMidiSync();
 
     auto misc = allParser.getMisc();
-    auto stepEditorScreen = mpc.screens->get<StepEditorScreen>("step-editor");
-    stepEditorScreen->setAutoStepIncrementEnabled(misc->isAutoStepIncEnabled());
-    stepEditorScreen->setTcValueRecordedNotes(misc->getDurationTcPercentage());
-    stepEditorScreen->setDurationOfRecordedNotes(misc->isDurationOfRecNotesTc());
+    auto stepEditOptionsScreen = mpc.screens->get<StepEditOptionsScreen>("step-edit-options");
+    stepEditOptionsScreen->setAutoStepIncrementEnabled(misc->isAutoStepIncEnabled());
+    stepEditOptionsScreen->setDurationOfRecordedNotesTcValue(misc->isDurationOfRecNotesTc());
+    stepEditOptionsScreen->setTcValueRecordedNotes(misc->getDurationTcPercentage());
 
     auto midiSwScreen = mpc.screens->get<MidiSwScreen>("midi-sw");
     midiSwScreen->setSwitches(misc->getSwitches());

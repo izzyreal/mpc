@@ -38,6 +38,7 @@ namespace mpc::lcdgui::screens
 
 		void open() override;
 		void close() override;
+        void openWindow() override;
 
 		void update(moduru::observer::Observable*, nonstd::any message) override;
 
@@ -69,11 +70,7 @@ namespace mpc::lcdgui::screens
 		int noteA = 0;
 		int noteB = 127;
 		int control = -1;
-		bool autoStepIncrementEnabled = false;
-		bool durationOfRecordedNotes = false;
-		int tcValueRecordedNotes = 100;
 		int yOffset = 0;
-		int selectedEventNumber = 0;
 		int fromNote = 34;
 		int selectionStartIndex = -1;
 		int selectionEndIndex = -1;
@@ -103,13 +100,6 @@ namespace mpc::lcdgui::screens
 
 	public:
 		void finalizeSelection(int i);
-		void setAutoStepIncrementEnabled(bool b);
-		void setDurationOfRecordedNotes(bool b);
-		void setTcValueRecordedNotes(int i);
-
-		bool isAutoStepIncrementEnabled();
-		bool isDurationTcPercentageEnabled();
-		int getTcValueRecordedNotes();
 
 		std::vector<std::weak_ptr<mpc::sequencer::Event>>& getVisibleEvents();
 		std::vector<std::shared_ptr<mpc::sequencer::Event>>& getSelectedEvents();
