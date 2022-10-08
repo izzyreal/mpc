@@ -3,9 +3,7 @@
 #include <Mpc.hpp>
 
 #include <lcdgui/Background.hpp>
-#include <lcdgui/Field.hpp>
 #include <sampler/Program.hpp>
-#include <sampler/Sampler.hpp>
 
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::sampler;
@@ -20,7 +18,7 @@ MetronomeSoundScreen::MetronomeSoundScreen(mpc::Mpc& mpc, const int layerIndex)
 void MetronomeSoundScreen::open()
 {
     setSound(sound);
-    mpc.addObserver(this); // Subscribe to "padandnote" messages
+    mpc.addObserver(this); // Subscribe to "note" messages
 }
 
 void MetronomeSoundScreen::close()
@@ -237,7 +235,7 @@ void MetronomeSoundScreen::update(moduru::observer::Observable* o, nonstd::any m
     init();
     auto s = nonstd::any_cast<string>(msg);
 
-    if (s.compare("padandnote") == 0)
+    if (s.compare("note") == 0)
     {
         if (param.compare("accent") == 0)
             setAccentPad(mpc.getPad());

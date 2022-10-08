@@ -1,7 +1,5 @@
 #include "UserScreen.hpp"
 
-#include <sequencer/TimeSignature.hpp>
-
 #include <lcdgui/screens/EventsScreen.hpp>
 
 #include <nvram/NvRam.hpp>

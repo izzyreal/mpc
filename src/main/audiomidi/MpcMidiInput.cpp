@@ -119,7 +119,8 @@ void MpcMidiInput::transport(MidiMessage *msg, int timeStamp)
       // We do it because the current main use case for MIDI input
       // is to use a controller to replace the real MPC2000XL's
       // hardware pads.
-      mpc.setPadAndNote(pad, note->getNote());
+      mpc.setPad(pad);
+      mpc.setNote(note->getNote());
       Util::set16LevelsValues(mpc, note, pad);
     }
 

@@ -23,8 +23,7 @@ namespace mpc::lcdgui::screens
 		EventsScreen(mpc::Mpc& mpc, const int layerIndex);
 
 		void open() override;
-		void close() override;
-		void update(moduru::observer::Observable* o, nonstd::any arg) override;
+        void pad(int padIndexWithBank, int velo, bool isNoteRepeat, int tick) override;
 
 	private:
         void displayTime() override;
@@ -59,9 +58,8 @@ namespace mpc::lcdgui::screens
 		int durationValue = 1;
 		int velocityValue = 1;
 
-	public:
+	private:
 		void setEdit(int i);
-		void setDrumNote(int i);
 		void setFromSq(int i);
 		void setFromTr(int i);
 		void setToSq(int i);

@@ -23,6 +23,7 @@ namespace mpc::lcdgui::screens::window
 		void displayNameForNewSound();
 		void displayAssignToNote();
         void openNameScreen();
+        unsigned char assignToNote = 34;
 
 	};
 }

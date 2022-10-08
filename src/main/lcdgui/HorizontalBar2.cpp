@@ -2,8 +2,6 @@
 
 #include <cmath>
 
-#include <Mpc.hpp>
-
 using namespace mpc::lcdgui;
 
 HorizontalBar2::HorizontalBar2(MRECT rect)

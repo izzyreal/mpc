@@ -126,7 +126,7 @@ namespace mpc::lcdgui
 
 		int getSoundIncrement(int notch) { return mpc.getControls().lock()->getControls()->getSoundIncrement(notch); }
 
-		virtual void pad(int i, int velo, bool repeat, int tick) { mpc.getControls().lock()->getControls()->pad(i, velo, repeat, tick); }
+		virtual void pad(int padIndexWithBank, int velo, bool repeat, int tick) { mpc.getControls().lock()->getControls()->pad(padIndexWithBank, velo, repeat, tick); }
 
 	};
 }

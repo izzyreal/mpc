@@ -4,7 +4,6 @@
 #include <midi/MidiTrack.hpp>
 #include <midi/event/ChannelAftertouch.hpp>
 #include <midi/event/Controller.hpp>
-#include <midi/event/MidiEvent.hpp>
 #include <midi/event/NoteAftertouch.hpp>
 #include <midi/event/NoteOff.hpp>
 #include <midi/event/NoteOn.hpp>

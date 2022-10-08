@@ -23,12 +23,6 @@ MixerScreen::MixerScreen(mpc::Mpc& mpc, const int layerIndex)
 : ScreenComponent(mpc, "mixer", layerIndex)
 {
     addMixerStrips();
-    mpc.addObserver(this);
-}
-
-MixerScreen::~MixerScreen()
-{
-    mpc.deleteObserver(this);
 }
 
 void MixerScreen::open()
@@ -47,6 +41,12 @@ void MixerScreen::open()
 
     displayMixerStrips();
     displayFunctionKeys();
+    mpc.addObserver(this);
+}
+
+void MixerScreen::close()
+{
+    mpc.deleteObserver(this);
 }
 
 void MixerScreen::addMixerStrips()
@@ -151,16 +151,16 @@ void MixerScreen::update(moduru::observer::Observable* o, nonstd::any arg)
     
     init();
     
-    if (s.compare("bank") == 0)
+    if (s == "bank")
     {
         for (auto& m : mixerStrips)
             m.lock()->setBank(mpc.getBank());
         
         displayMixerStrips();
     }
-    else if (s.compare("padandnote") == 0)
+    else if (s == "pad")
     {
-        xPos = mpc.getPad() - (mpc.getBank() * 16);
+        xPos = mpc.getPad() % 16;
 
         if (link)
         {
@@ -294,8 +294,7 @@ void MixerScreen::left()
     xPos--;
 
     auto newPad = xPos + (mpc.getBank() * 16);
-    auto newNote = program.lock()->getNoteFromPad(newPad);
-    mpc.setPadAndNote(newPad, newNote);
+    mpc.setPad(newPad);
 }
 
 void MixerScreen::right()
@@ -308,8 +307,7 @@ void MixerScreen::right()
     xPos++;
 
     auto newPad = xPos + (mpc.getBank() * 16);
-    auto newNote = program.lock()->getNoteFromPad(newPad);
-    mpc.setPadAndNote(newPad, newNote);
+    mpc.setPad(newPad);
 }
 
 void MixerScreen::openWindow()

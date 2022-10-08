@@ -45,10 +45,8 @@ void Sequencer::init()
 {
 	lastTap = moduru::System::currentTimeMillis();
 	sequences = vector<shared_ptr<Sequence>>(99);
-	reposition = -1;
 	nextSq = -1;
-	previousTempo = 0.0;
-	
+
 	auto userScreen = mpc.screens->get<UserScreen>("user");
 	defaultSequenceName = StrUtil::trim(userScreen->sequenceName);
 	
@@ -61,12 +59,6 @@ void Sequencer::init()
 
 	activeTrackIndex = 0;
 	songs = vector<shared_ptr<Song>>(20);
-	defaultDeviceNames = vector<string>(33);
-	
-	for (int i = 0; i < 33; i++)
-	{
-		defaultDeviceNames[i] = userScreen->getDeviceName(i);
-	}
 
 	recordingModeMulti = userScreen->recordingModeMulti;
 
@@ -325,16 +317,6 @@ void Sequencer::setActiveSequenceIndex(int i)
 	notifyTrack();
 }
 
-string Sequencer::getDefaultDeviceName(int i)
-{
-    return defaultDeviceNames[i];
-}
-
-void Sequencer::setDefaultDeviceName(int i, string s)
-{
-	defaultDeviceNames[i] = s;
-}
-
 bool Sequencer::isCountEnabled()
 {
     return countEnabled;
@@ -474,7 +456,6 @@ void Sequencer::play(bool fromStart)
 			auto copy = copySequence(s);
 			undoPlaceHolder.swap(copy);
 			undoSeqAvailable = true;
-			recordStartTick = getTickPosition();
 		}
 
 	}
@@ -519,18 +500,6 @@ void Sequencer::undoSeq()
 bool Sequencer::isUndoSeqAvailable()
 {
     return undoSeqAvailable;
-}
-
-void Sequencer::clearUndoSeq()
-{
-	if (isPlaying()) {
-		return;
-	}
-	
-	undoPlaceHolder.reset();
-
-    undoSeqAvailable = false;
-	auto hw = mpc.getHardware().lock();
 }
 
 void Sequencer::playFromStart()
@@ -763,8 +732,8 @@ shared_ptr<Sequence> Sequencer::copySequence(weak_ptr<Sequence> src)
 		copyTrack(source->getMetaTracks()[i], copy->getMetaTracks()[i]);
 	}
 
-	for (auto& tempo : copy->getTempoChangeEvents())
-		tempo.lock()->setParent(copy.get());
+	for (auto& event : copy->getTempoChangeEvents())
+		event.lock()->setParent(copy.get());
 
 	return copy;
 }
@@ -1383,9 +1352,9 @@ void Sequencer::tap()
 	if (accum == 0)
 		return;
 
-	auto tempo = 60000.0 / (accum / usedTapsCounter);
-	tempo = floor(tempo * 10) / 10;
-	setTempo(tempo);
+	auto newTempo = 60000.0 / (accum / usedTapsCounter);
+	newTempo = floor(newTempo * 10) / 10;
+	setTempo(newTempo);
 }
 
 int Sequencer::getResolution()
@@ -1396,7 +1365,6 @@ int Sequencer::getResolution()
 void Sequencer::move(int tick)
 {
 	auto oldTick = getTickPosition();
-	reposition = tick;
 	position = tick;
 	playStartTick = tick;
 	

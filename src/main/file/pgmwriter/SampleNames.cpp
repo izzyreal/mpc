@@ -1,6 +1,5 @@
 #include <file/pgmwriter/SampleNames.hpp>
 
-#include <sampler/NoteParameters.hpp>
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>
 

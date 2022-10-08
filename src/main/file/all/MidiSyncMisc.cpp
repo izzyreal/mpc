@@ -6,7 +6,6 @@
 #include <lang/StrUtil.hpp>
 #include <VecUtil.hpp>
 
-#include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/SongScreen.hpp>
 #include <lcdgui/screens/SyncScreen.hpp>
 

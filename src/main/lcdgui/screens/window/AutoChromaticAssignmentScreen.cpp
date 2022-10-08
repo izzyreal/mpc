@@ -89,7 +89,7 @@ void AutoChromaticAssignmentScreen::turnWheel(int i)
     
     if (param.compare("source") == 0)
     {
-        mpc.setPadAndNote(mpc.getPad(), mpc.getNote() + i);
+        mpc.setNote(mpc.getNote() + i);
         displaySource();
         setSourceSoundIndex(sampler.lock()->getLastNp(program.lock().get())->getSoundIndex());
     }
@@ -152,7 +152,7 @@ void AutoChromaticAssignmentScreen::displaySource()
 {
     auto note = sampler.lock()->getLastNp(program.lock().get())->getNumber();
     auto padIndex = program.lock()->getPadIndexFromNote(note);
-    auto padName = padIndex == -1 ? "OFF" : sampler.lock()->getPadName(padIndex);
+    auto padName = sampler.lock()->getPadName(padIndex);
     findField("source").lock()->setText(to_string(note) + "/" + padName);
 }
 
@@ -183,7 +183,7 @@ void AutoChromaticAssignmentScreen::update(moduru::observer::Observable* observa
 {
     auto msg = nonstd::any_cast<string>(message);
     
-    if (msg.compare("padandnote") == 0)
+    if (msg.compare("note") == 0)
     {
         displaySource();
         setSourceSoundIndex(sampler.lock()->getLastNp(program.lock().get())->getSoundIndex());

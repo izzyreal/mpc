@@ -1,7 +1,5 @@
 #include "SelectDrumScreen.hpp"
 
-#include <sampler/Program.hpp>
-
 #include <lcdgui/screens/DrumScreen.hpp>
 
 using namespace mpc::lcdgui;
@@ -30,16 +28,13 @@ void SelectDrumScreen::function(int i)
 	auto drumScreen = mpc.screens->get<DrumScreen>("drum");
 	drumScreen->drum = i;
 
-	if (mpc.getNote() < 35)
-		mpc.setPadAndNote(program.lock()->getPadIndexFromNote(35), 35);
-
-	if (redirectScreen.compare("") != 0)
+	if (redirectScreen.empty())
 	{
-		openScreen(redirectScreen);
-		redirectScreen = "";
+        openScreen("program-assign");
 	}
 	else {
-		openScreen("program-assign");
+        openScreen(redirectScreen);
+        redirectScreen = "";
 	}
 	return;
 }

@@ -16,9 +16,7 @@ namespace mpc::lcdgui::screens
 		void update(moduru::observer::Observable* o, nonstd::any arg) override;
 		void open() override;
 		void close() override;
-
-	public:
-		void pad(int i, int velo, bool repeat, int tick) override;
+        void pad(int padIndexWithBank, int velo, bool repeat, int tick) override;
 
 	private:
 		const std::vector<std::string> letters{ "A", "B", "C", "D" };

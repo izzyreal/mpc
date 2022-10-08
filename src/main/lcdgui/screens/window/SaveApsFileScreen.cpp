@@ -6,10 +6,8 @@
 
 #include <lcdgui/screens/window/SaveAProgramScreen.hpp>
 #include <lcdgui/screens/window/NameScreen.hpp>
-#include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
 using namespace mpc::lcdgui::screens::window;
-using namespace mpc::lcdgui::screens::dialog2;
 
 using namespace moduru::lang;
 

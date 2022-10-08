@@ -7,18 +7,13 @@
 
 #include <file/all/AllParser.hpp>
 
-#include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/window/SaveASoundScreen.hpp>
 #include <lcdgui/screens/window/SaveAllFileScreen.hpp>
 #include <lcdgui/screens/window/SaveApsFileScreen.hpp>
 #include <lcdgui/screens/window/NameScreen.hpp>
-#include <lcdgui/screens/dialog2/PopupScreen.hpp>
-
-#include <lang/StrUtil.hpp>
 
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui;
-using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::lcdgui::screens::window;
 
 using namespace moduru::lang;

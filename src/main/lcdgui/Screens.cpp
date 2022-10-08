@@ -109,7 +109,6 @@
 #include <lcdgui/screens/window/SongWindow.hpp>
 #include <lcdgui/screens/window/IgnoreTempoChangeScreen.hpp>
 #include <lcdgui/screens/window/LoopSongScreen.hpp>
-#include <lcdgui/screens/window/LoopSongScreen.hpp>
 #include <lcdgui/screens/window/VmpcConvertAndLoadWavScreen.hpp>
 
 #include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
@@ -154,7 +153,6 @@
 #include <lcdgui/screens/window/VmpcResetKeyboardScreen.hpp>
 #include <lcdgui/screens/window/VmpcDiscardMappingChangesScreen.hpp>
 
-#include <file/FileUtil.hpp>
 #include <lang/StrUtil.hpp>
 
 #include <cmrc/cmrc.hpp>
@@ -169,7 +167,6 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::dialog2;
-using namespace moduru::file;
 using namespace moduru::lang;
 using namespace rapidjson;
 using namespace std;

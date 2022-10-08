@@ -2,7 +2,6 @@
 
 #include <disk/MpcFile.hpp>
 #include <file/sndreader/SndHeaderReader.hpp>
-#include <sampler/Sampler.hpp>
 
 #include <Logger.hpp>
 

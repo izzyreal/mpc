@@ -21,7 +21,7 @@ void AssignmentViewScreen::open()
 
 	init();
 	displayAssignmentView();
-	mpc.addObserver(this); // Subscribe to "padandnote" and "bank" messages
+	mpc.addObserver(this); // Subscribe to "pad" and "bank" messages
 }
 
 void AssignmentViewScreen::close()
@@ -38,16 +38,9 @@ void AssignmentViewScreen::up()
 		return;
 	}
 
-	auto note = program.lock()->getPad(mpc.getPad() + 4)->getNote();
-	auto focusPadIndex = mpc.getPad() + 4;
-	
-	while (focusPadIndex > 15)
-	{
-		focusPadIndex -= 16;
-	}
-
-	ls.lock()->setFocus(padFocusNames[focusPadIndex]);
-	mpc.setPadAndNote(mpc.getPad() + 4, note);
+	auto padIndex = mpc.getPad() + 4;
+	ls.lock()->setFocus(padFocusNames[padIndex % 16]);
+	mpc.setPad(padIndex);
 }
 
 void AssignmentViewScreen::down()
@@ -59,16 +52,9 @@ void AssignmentViewScreen::down()
 		return;
 	}
 
-	auto note = program.lock()->getPad(mpc.getPad() - 4)->getNote();
-	auto focusPadIndex = mpc.getPad() - 4;
-
-	while (focusPadIndex > 15)
-	{
-		focusPadIndex -= 16;
-	}
-
-	ls.lock()->setFocus(padFocusNames[focusPadIndex]);
-	mpc.setPadAndNote(mpc.getPad() - 4, note);
+	auto padIndex = mpc.getPad() - 4;
+	ls.lock()->setFocus(padFocusNames[padIndex % 16]);
+	mpc.setPad(padIndex);
 }
 
 void AssignmentViewScreen::left()
@@ -83,8 +69,8 @@ void AssignmentViewScreen::left()
     ScreenComponent::left();
     
 	auto padIndex = mpc.getPad() - 1;
-    auto note = program.lock()->getPad(padIndex)->getNote();
-    mpc.setPadAndNote(padIndex, note);
+    ls.lock()->setFocus(padFocusNames[padIndex % 16]);
+    mpc.setPad(padIndex);
 }
 
 void AssignmentViewScreen::right()
@@ -98,30 +84,34 @@ void AssignmentViewScreen::right()
 
 	ScreenComponent::right();
 	auto padIndex = mpc.getPad() + 1;
-	auto note = program.lock()->getPad(padIndex)->getNote();
-	mpc.setPadAndNote(padIndex, note);
+    ls.lock()->setFocus(padFocusNames[padIndex % 16]);
+    mpc.setPad(padIndex);
 }
 
 void AssignmentViewScreen::turnWheel(int i)
 {
-	init();	
-	sampler.lock()->getLastPad(program.lock().get())->setNote(sampler.lock()->getLastPad(program.lock().get())->getNote() + i);
+	init();
+    auto lastPad = sampler.lock()->getLastPad(program.lock().get());
+	lastPad->setNote(lastPad->getNote() + i);
+    displayNote();
+    displaySoundName();
+    displayPad(lastPad->getIndex() % 16);
 }
 
 void AssignmentViewScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 {
 	string s = nonstd::any_cast<string>(arg);
 
-	if (s.compare("bank") == 0)
+	if (s == "bank")
 	{
 		displayAssignmentView();
 	}
-	else if (s.compare("padandnote") == 0)
+	else if (s == "pad")
 	{
 		mpc.getLayeredScreen().lock()->setFocus(getFocusFromPadIndex());
 		displayAssignmentView();
 	}
-	else if (s.compare("note") == 0)
+	else if (s == "note")
 	{
 		displayNote();
 		displaySoundName();
@@ -134,7 +124,7 @@ void AssignmentViewScreen::displayAssignmentView()
 	for (int i = 0; i < 16; i++)
 		displayPad(i);
 
-	displayInfo0();
+    displayBankInfoAndNoteLabel();
 	displayNote();
 	displaySoundName();
 }
@@ -157,7 +147,7 @@ void AssignmentViewScreen::displayPad(int i)
 	findField(padFocusNames[i]).lock()->setText(sampleName);
 }
 
-void AssignmentViewScreen::displayInfo0()
+void AssignmentViewScreen::displayBankInfoAndNoteLabel()
 {
 	findLabel("info0").lock()->setText("Bank:" + letters[mpc.getBank()] + " Note:");
 }
@@ -204,14 +194,14 @@ int AssignmentViewScreen::getPadIndexFromFocus()
 
 	for (int i = 0; i < padFocusNames.size(); i++)
 	{
-		if (padFocusNames[i].compare(param) == 0)
+		if (padFocusNames[i] == param)
 		{
 			padIndex = i;
 			break;
 		}
 	}
 
-	return padIndex + mpc.getBank() * 16;
+	return padIndex;
 }
 
 

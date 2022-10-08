@@ -1,7 +1,6 @@
 #include "LoopScreen.hpp"
 
 #include <lcdgui/Layer.hpp>
-#include <lcdgui/screens/LoopScreen.hpp>
 #include <lcdgui/screens/TrimScreen.hpp>
 #include <lcdgui/screens/window/EditSoundScreen.hpp>
 #include <lcdgui/screens/dialog2/PopupScreen.hpp>

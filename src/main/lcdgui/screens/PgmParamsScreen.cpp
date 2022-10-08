@@ -43,8 +43,6 @@ void PgmParamsScreen::function(int i)
 {
 	init();
 		
-	auto sc = sampler.lock()->getSoundCount();
-
 	switch (i)
 	{
 	case 0:
@@ -145,7 +143,7 @@ void PgmParamsScreen::turnWheel(int i)
         auto candidate = mpc.getNote() + i;
 		if (candidate > 34)
 		{
-			mpc.setPadAndNote(mpc.getPad(), candidate);
+			mpc.setNote(candidate);
 			displayAttackDecay();
 			displayDecayMode();
 			displayFreq();
@@ -193,7 +191,7 @@ void PgmParamsScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 {
 	string s = nonstd::any_cast<string>(arg);
 
-	if (s.compare("padandnote") == 0)
+	if (s.compare("note") == 0)
 	{
 		displayAttackDecay();
 		displayDecayMode();
@@ -234,23 +232,13 @@ void PgmParamsScreen::displayAttackDecay()
 void PgmParamsScreen::displayNote()
 {
 	init();
-	auto lProgram = program.lock();
-	auto sampleNumber = sampler.lock()->getLastNp(lProgram.get())->getSoundIndex();
-	auto noteParameters = sampler.lock()->getLastNp(lProgram.get());
-	auto note = noteParameters->getNumber();
-	auto sampleName = sampleNumber != -1 ? sampler.lock()->getSoundName(sampleNumber) : "OFF";
-	auto padNumber = lProgram->getPadIndexFromNote(note);
-	
-	if (padNumber != -1)
-	{
-		auto stereo = noteParameters->getStereoMixerChannel().lock()->isStereo() && sampleNumber != -1 ? "(ST)" : "";
-		auto padName = sampler.lock()->getPadName(padNumber);
-		findField("note").lock()->setText(to_string(note) + "/" + padName + "-" + StrUtil::padRight(sampleName, " ", 16) + stereo);
-	}
-	else
-	{
-		findField("note").lock()->setText(to_string(note) + "/OFF-" + sampleName);
-	}
+    auto noteParameters = sampler.lock()->getLastNp(program.lock().get());
+    auto soundIndex = noteParameters->getSoundIndex();
+    auto padIndex = program.lock()->getPadIndexFromNote(noteParameters->getNumber());
+    auto padName = sampler.lock()->getPadName(padIndex);
+    auto sampleName = soundIndex != -1 ? sampler.lock()->getSoundName(soundIndex) : "OFF";
+    string stereo = noteParameters->getStereoMixerChannel().lock()->isStereo() && soundIndex != -1 ? "(ST)" : "";
+    findField("note").lock()->setText(to_string(noteParameters->getNumber()) + "/" + padName + "-" + StrUtil::padRight(sampleName, " ", 16) + stereo);
 }
 
 void PgmParamsScreen::displayPgm()

@@ -79,7 +79,7 @@ void PgmAssignScreen::turnWheel(int i)
 	auto lastPad = sampler.lock()->getLastPad(program.lock().get());
 	auto lastNoteParameters = sampler.lock()->getLastNp(program.lock().get());
 
-	if (param.compare("pad-assign") == 0)
+	if (param == "pad-assign")
 	{
 		padAssign = i > 0;
 		displayPadAssign();
@@ -89,7 +89,7 @@ void PgmAssignScreen::turnWheel(int i)
 		displaySoundGenerationMode();
 		displaySoundName();
 	}
-	else if (param.compare("pgm") == 0)
+	else if (param == "pgm")
 	{
 		auto pgm = mpcSoundPlayerChannel->getProgram();
 		auto candidate = sampler.lock()->getUsedProgram(pgm, i > 0);
@@ -110,7 +110,7 @@ void PgmAssignScreen::turnWheel(int i)
 			displayVeloRangeUpper();
 		}
 	}
-	else if (param.compare("pad") == 0)
+	else if (param == "pad")
 	{
 		auto candidate = mpc.getPad() + i;
 		
@@ -118,7 +118,8 @@ void PgmAssignScreen::turnWheel(int i)
 			return;
 
 		auto nextNote = program.lock()->getPad(candidate)->getNote();
-		mpc.setPadAndNote(candidate, nextNote);
+		mpc.setNote(nextNote);
+		mpc.setPad(candidate);
 		displayPad();
 		displayNote();
 		displayOptionalNoteA();
@@ -128,14 +129,11 @@ void PgmAssignScreen::turnWheel(int i)
 		displaySoundGenerationMode();
 		displaySoundName();
 	}
-	else if (param.compare("pad-note") == 0)
+	else if (param == "pad-note")
 	{
 		lastPad->setNote(lastPad->getNote() + i);
 
-		auto candidate = lastPad->getNote();
-		
-		if (candidate > 34)
-			mpc.setPadAndNote(mpc.getPad(), candidate);
+        mpc.setNote(lastPad->getNote());
 
 		displayPad();
 		displayNote();
@@ -146,18 +144,18 @@ void PgmAssignScreen::turnWheel(int i)
 		displaySoundGenerationMode();
 		displaySoundName();
 	}
-	else if (param.compare("note") == 0)
+	else if (param == "note")
 	{
 		auto candidate = mpc.getNote() + i;
 	
-		if (candidate > 34)
-			mpc.setPadAndNote(mpc.getPad(), candidate);
-
-		displayNote();
-		displaySoundName();
-
-	}
-	else if (param.compare("snd") == 0)
+		if (candidate < 35) {
+            candidate = 35;
+        }
+        mpc.setNote(candidate);
+        displayNote();
+        displaySoundName();
+    }
+	else if (param == "snd")
  {		
 		lastNoteParameters->setSoundIndex(sampler.lock()->getNextSoundIndex(lastNoteParameters->getSoundIndex(), i > 0));
 
@@ -171,27 +169,27 @@ void PgmAssignScreen::turnWheel(int i)
 				lastNoteParameters->getStereoMixerChannel().lock()->setStereo(false);
         }
 	}
-	else if (param.compare("mode") == 0)
+	else if (param == "mode")
 	{
 		lastNoteParameters->setSoundGenMode(lastNoteParameters->getSoundGenerationMode() + i);
 		displaySoundGenerationMode();
 	}
-	else if (param.compare("velocity-range-lower") == 0)
+	else if (param == "velocity-range-lower")
 	{
 		lastNoteParameters->setVeloRangeLower(lastNoteParameters->getVelocityRangeLower() + i);
 		displayVeloRangeLower();
 	}
-	else if (param.compare("velocity-range-upper") == 0)
+	else if (param == "velocity-range-upper")
 	{
 		lastNoteParameters->setVeloRangeUpper(lastNoteParameters->getVelocityRangeUpper() + i);
 		displayVeloRangeUpper();
 	}
-	else if (param.compare("optional-note-a") == 0)
+	else if (param == "optional-note-a")
 	{
 		lastNoteParameters->setOptNoteA(lastNoteParameters->getOptionalNoteA() + i);
 		displayOptionalNoteA();
 	}
-	else if (param.compare("optional-note-b") == 0)
+	else if (param == "optional-note-b")
 	{
 		lastNoteParameters->setOptionalNoteB(lastNoteParameters->getOptionalNoteB() + i);
 		displayOptionalNoteB();
@@ -202,24 +200,24 @@ void PgmAssignScreen::openWindow()
 {
 	init();
 	
-	if (param.compare("pgm") == 0)
+	if (param == "pgm")
 	{
 		mpc.setPreviousSamplerScreenName("program-assign");
 		openScreen("program");
 	}
-	else if (param.compare("pad") == 0 || param.compare("pad-note") == 0)
+	else if (param == "pad" || param == "pad-note")
 	{
 		openScreen("assignment-view");
 	}
-	else if (param.compare("pad-assign") == 0)
+	else if (param == "pad-assign")
 	{
 		openScreen("init-pad-assign");
 	}
-	else if (param.compare("note") == 0)
+	else if (param == "note")
 	{
 		openScreen("copy-note-parameters");
 	}
-	else if (param.compare("snd") == 0)
+	else if (param == "snd")
 	{
 		auto sn = sampler.lock()->getLastNp(program.lock().get())->getSoundIndex();
 		if (sn != -1)
@@ -358,7 +356,7 @@ void PgmAssignScreen::displayOptionalNoteA()
 	auto noteIntA = sampler.lock()->getLastNp(lProgram.get())->getOptionalNoteA();
 	auto padIntA = lProgram->getPadIndexFromNote(noteIntA);
 	auto noteA = noteIntA != 34 ? to_string(noteIntA) : "--";
-	auto padA = padIntA != -1 ? sampler.lock()->getPadName(padIntA) : "OFF";
+	auto padA = sampler.lock()->getPadName(padIntA);
 	findField("optional-note-a").lock()->setText(noteA + "/" + padA);
 }
 
@@ -370,7 +368,7 @@ void PgmAssignScreen::displayOptionalNoteB()
 	auto noteIntB = sampler.lock()->getLastNp(lProgram.get())->getOptionalNoteB();
 	auto padIntB = lProgram->getPadIndexFromNote(noteIntB);
 	auto noteB = noteIntB != 34 ? to_string(noteIntB) : "--";
-	auto padB = padIntB != -1 ? sampler.lock()->getPadName(padIntB) : "OFF";
+	auto padB = sampler.lock()->getPadName(padIntB);
 	findField("optional-note-b").lock()->setText(noteB + "/" + padB);
 }
 
@@ -390,7 +388,12 @@ void PgmAssignScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 {
 	string s = nonstd::any_cast<string>(arg);
 
-	if (s.compare("padandnote") == 0)
+	if (s == "note")
+	{
+		displayNote();
+		displaySoundName();
+	}
+	else if (s == "pad")
 	{
 		displayNote();
 		displayPad();

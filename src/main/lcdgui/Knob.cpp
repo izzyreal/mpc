@@ -3,7 +3,7 @@
 #include <Util.hpp>
 #include <gui/Bressenham.hpp>
 
-#include <Logger.hpp>
+//#include <Logger.hpp>
 
 #include <cmath>
 

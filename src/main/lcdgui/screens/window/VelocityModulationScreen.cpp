@@ -21,7 +21,7 @@ void VelocityModulationScreen::open()
 	displayVeloLevel();
 	displayVelo();
 
-	mpc.addObserver(this); // Subscribe to "padandnote" messages
+	mpc.addObserver(this); // Subscribe to "note" messages
 }
 
 void VelocityModulationScreen::close()
@@ -52,7 +52,7 @@ void VelocityModulationScreen::turnWheel(int i)
 	}
 	else if (param.compare("note") == 0)
 	{
-		mpc.setPadAndNote(mpc.getPad(), mpc.getNote() + i);
+		mpc.setNote(mpc.getNote() + i);
 		displayNote();
 	}
 }
@@ -62,7 +62,7 @@ void VelocityModulationScreen::displayNote()
 	auto noteParameters = sampler.lock()->getLastNp(program.lock().get());
 	auto soundIndex = noteParameters->getSoundIndex();
 	auto padIndex = program.lock()->getPadIndexFromNote(noteParameters->getNumber());
-	auto padName = padIndex != -1 ? sampler.lock()->getPadName(padIndex) : "OFF";
+	auto padName = sampler.lock()->getPadName(padIndex);
 	auto sampleName = soundIndex != -1 ? sampler.lock()->getSoundName(soundIndex) : "OFF";
 	string stereo = noteParameters->getStereoMixerChannel().lock()->isStereo() && soundIndex != -1 ? "(ST)" : "";
 	findField("note").lock()->setText(to_string(noteParameters->getNumber()) + "/" + padName + "-" + StrUtil::padRight(sampleName, " ", 16) + stereo);
@@ -94,7 +94,7 @@ void VelocityModulationScreen::update(moduru::observer::Observable* observable, 
 {
 	auto msg = nonstd::any_cast<string>(message);
 
-	if (msg.compare("padandnote") == 0)
+	if (msg.compare("note") == 0)
 	{
 		displayNote();
 		displayVeloAttack();

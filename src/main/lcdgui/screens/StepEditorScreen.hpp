@@ -41,7 +41,9 @@ namespace mpc::lcdgui::screens
 
 		void update(moduru::observer::Observable*, nonstd::any message) override;
 
-	private:
+        void setFromNote(int i);
+
+    private:
 		std::vector<std::weak_ptr<mpc::lcdgui::EventRow>> findEventRows();
 		void refreshSelection();
 		void initVisibleEvents();
@@ -86,8 +88,8 @@ namespace mpc::lcdgui::screens
 		void setyOffset(int i);
 		void setSelectedEventIndex(int i);
 		void setSelectionEndIndex(int i);
-		void setFromNote(int i);
-		void setSelectionStartIndex(int i);
+
+        void setSelectionStartIndex(int i);
 		void setSelectedEvents();
 		void setSelectedEvent(std::weak_ptr<mpc::sequencer::Event> event);
 		void setSelectedParameterLetter(std::string str);

@@ -18,7 +18,7 @@ void MuteAssignScreen::open()
 	displayNote();
 	displayNote0();
 	displayNote1();
-	mpc.addObserver(this); // Subscribe to "padandnote" messages
+	mpc.addObserver(this); // Subscribe to "note" messages
 }
 
 void MuteAssignScreen::close()
@@ -33,7 +33,7 @@ void MuteAssignScreen::turnWheel(int i)
 
 	if (param.compare("note") == 0)
 	{
-		mpc.setPadAndNote(mpc.getPad(), mpc.getNote() + i);
+		mpc.setNote(mpc.getNote() + i);
 	}
 	else if (param.compare("note0") == 0)
 	{
@@ -52,9 +52,14 @@ void MuteAssignScreen::displayNote()
 	auto note = sampler.lock()->getLastNp(program.lock().get())->getNumber();
 	auto pad = program.lock()->getPadIndexFromNote(note);
 	string soundName = "OFF";
-	auto padName = pad == -1 ? "OFF" : sampler.lock()->getPadName(pad);
+
+    auto padName = sampler.lock()->getPadName(pad);
 	auto sound = program.lock()->getNoteParameters(note)->getSoundIndex();
-	if (sound != -1) soundName = sampler.lock()->getSoundName(sound);
+
+    if (sound != -1)
+    {
+        soundName = sampler.lock()->getSoundName(sound);
+    }
 
 	findField("note").lock()->setText(to_string(note) + "/" + padName + "-" + soundName);
 }
@@ -108,7 +113,7 @@ void MuteAssignScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 {
 	string s = nonstd::any_cast<string>(arg);
 
-	if (s.compare("padandnote") == 0)
+	if (s.compare("note") == 0)
 	{
 		displayNote();
 		displayNote0();

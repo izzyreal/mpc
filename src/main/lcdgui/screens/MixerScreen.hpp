@@ -33,9 +33,9 @@ public:
     void openWindow() override;
     
     MixerScreen(mpc::Mpc& mpc, const int layerIndex);
-    ~MixerScreen();
-    
+
     void open() override;
+    void close() override;
 
 private:
     void recordMixerEvent(int pad, int param, int value);

@@ -23,6 +23,7 @@ namespace mpc::lcdgui::screens::window
 
 	private:
 		void displayAssignToNote();
+        unsigned int assignToNote = 60;
 
 	};
 }

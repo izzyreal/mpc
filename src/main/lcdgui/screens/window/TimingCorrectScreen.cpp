@@ -20,8 +20,6 @@ void TimingCorrectScreen::open()
 	findField("note1").lock()->setAlignment(Alignment::Centered, 18);
 	findField("note1").lock()->setLocation(116, 40);
 
-	mpc.addObserver(this);
-
 	auto seq = sequencer.lock()->getActiveSequence().lock();
 
 	setTime0(0);
@@ -35,14 +33,10 @@ void TimingCorrectScreen::open()
 	displayNotes();
 }
 
-void TimingCorrectScreen::close()
-{
-	mpc.deleteObserver(this);
-}
-
 void TimingCorrectScreen::function(int i)
 {
 	ScreenComponent::function(i);
+
 	switch (i)
 	{
 	case 4:
@@ -55,15 +49,15 @@ void TimingCorrectScreen::function(int i)
 
 		if (track.lock()->getBus() != 0)
 		{
-			if (mpc.getNote() != 34)
+			if (note0 == 34)
 			{
-				noteRange[0] = mpc.getNote();
-				noteRange[1] = mpc.getNote();
+                noteRange[0] = 0;
+                noteRange[1] = 127;
 			}
 			else
 			{
-				noteRange[0] = 0;
-				noteRange[1] = 127;
+                noteRange[0] = note0;
+                noteRange[1] = note0;
 			}
 		}
 		else
@@ -142,10 +136,16 @@ void TimingCorrectScreen::displayNotes()
 		findField("note0").lock()->setLocation(61, 40);
 		findField("note0").lock()->setSize(37, 9);
 		
-		if (mpc.getNote() == 34)
-			findField("note0").lock()->setText("ALL");
+		if (note0 == 34)
+        {
+            findField("note0").lock()->setText("ALL");
+        }
 		else
-			findField("note0").lock()->setText(to_string(mpc.getNote()) + "/" + sampler.lock()->getPadName(mpc.getPad()));
+        {
+            auto padIndex = program.lock()->getPadIndexFromNote(note0);
+            auto padName = sampler.lock()->getPadName(padIndex);
+            findField("note0").lock()->setText(std::to_string(note0) + "/" + padName);
+        }
 
 		findLabel("note1").lock()->Hide(true);
 		findField("note1").lock()->Hide(true);
@@ -284,14 +284,4 @@ void TimingCorrectScreen::setNoteValue(int i)
 	
 	init();
 	displayNoteValue();
-}
-
-void TimingCorrectScreen::update(moduru::observer::Observable* observable, nonstd::any message)
-{
-	auto msg = nonstd::any_cast<string>(message);
-
-	if (msg.compare("padandnote") == 0)
-	{
-		displayNotes();
-	}
 }

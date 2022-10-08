@@ -1,6 +1,5 @@
 #include "EditVelocityScreen.hpp"
 
-#include <sequencer/Event.hpp>
 #include <sequencer/Track.hpp>
 #include <sequencer/NoteEvent.hpp>
 #include <sequencer/SeqUtil.hpp>
@@ -23,7 +22,6 @@ EditVelocityScreen::EditVelocityScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void EditVelocityScreen::open()
 {
-
 	auto bus = sequencer.lock()->getActiveTrack().lock()->getBus();
 
 	if (bus == 0)
@@ -50,23 +48,7 @@ void EditVelocityScreen::open()
 	displayValue();
 	displayTime();
 	displayNotes();
-
-	mpc.addObserver(this); // Subscribe to "padandnote" messages
 }
-
-void EditVelocityScreen::close()
-{
-	mpc.deleteObserver(this);
-}
-
-void EditVelocityScreen::update(moduru::observer::Observable* observable, nonstd::any message)
-{
-	auto msg = nonstd::any_cast<string>(message);
-
-	if (msg.compare("padandnote") == 0)
-		displayNotes();
-}
-
 
 void EditVelocityScreen::function(int i)
 {
@@ -147,13 +129,14 @@ void EditVelocityScreen::displayNotes()
 	{
 		findField("note0").lock()->setSize(37, 9);
 		
-		if (mpc.getNote() != 34)
+		if (note0 == 34)
 		{
-			findField("note0").lock()->setText(to_string(mpc.getNote()) + "/" + sampler.lock()->getPadName(mpc.getPad()));
+            findField("note0").lock()->setText("ALL");
 		}
 		else
 		{
-			findField("note0").lock()->setText("ALL");
+            auto padName = sampler.lock()->getPadName(program.lock()->getPadIndexFromNote(note0));
+            findField("note0").lock()->setText(to_string(note0) + "/" + padName);
 		}
 		
 		findLabel("note1").lock()->Hide(true);

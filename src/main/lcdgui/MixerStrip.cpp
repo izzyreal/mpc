@@ -6,7 +6,6 @@
 #include <lcdgui/MixerTopBackground.hpp>
 #include <lcdgui/MixerFader.hpp>
 #include <lcdgui/screens/MixerScreen.hpp>
-#include <lcdgui/Screens.hpp>
 
 #include <lang/StrUtil.hpp>
 

@@ -5,7 +5,6 @@
 #include <gui/BasicStructs.hpp>
 
 #include <Mpc.hpp>
-#include <Paths.hpp>
 
 #include "Field.hpp"
 #include "Component.hpp"
@@ -15,14 +14,11 @@
 
 #include <lcdgui/Layer.hpp>
 #include <lcdgui/ScreenComponent.hpp>
-#include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/SampleScreen.hpp>
-#include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
 #include <hardware/Hardware.hpp>
 #include <hardware/Led.hpp>
 
-#include <file/FileUtil.hpp>
 #include <lang/StrUtil.hpp>
 
 #include <cmath>
@@ -35,8 +31,6 @@ CMRC_DECLARE(mpc);
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
-using namespace mpc::lcdgui::screens::dialog2;
-using namespace moduru::file;
 using namespace moduru::lang;
 
 using namespace std;

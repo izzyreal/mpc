@@ -1,7 +1,5 @@
 #include <sampler/Sound.hpp>
 
-#include <Mpc.hpp>
-#include <sampler/Sampler.hpp>
 #include <mpc/MpcSoundOscillatorControls.hpp>
 
 using namespace mpc::sampler;
@@ -11,6 +9,7 @@ Sound::Sound(int rate, int index)
 {
 	this->memoryIndex = index;
 	oscillatorControls = new ctoot::mpc::MpcSoundOscillatorControls(memoryIndex, 0);
+    setSampleRate(rate);
 }
 
 Sound::Sound() 

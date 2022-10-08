@@ -1,6 +1,5 @@
 #include "CopyTrackScreen.hpp"
 
-#include <sequencer/Sequencer.hpp>
 #include <sequencer/Track.hpp>
 
 #include <lang/StrUtil.hpp>

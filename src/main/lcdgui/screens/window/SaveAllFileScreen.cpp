@@ -1,14 +1,12 @@
 #include "SaveAllFileScreen.hpp"
 
 #include <lcdgui/screens/window/NameScreen.hpp>
-#include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
 #include <Util.hpp>
 #include <disk/MpcFile.hpp>
 #include <disk/AbstractDisk.hpp>
 
 using namespace mpc::lcdgui::screens::window;
-using namespace mpc::lcdgui::screens::dialog2;
 using namespace moduru::lang;
 using namespace std;
 

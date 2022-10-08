@@ -2,10 +2,6 @@
 
 #include <Mpc.hpp>
 
-#include <Paths.hpp>
-#include <sampler/Sampler.hpp>
-
-#include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/PgmAssignScreen.hpp>
 #include <lcdgui/screens/VmpcSettingsScreen.hpp>
 
@@ -69,7 +65,7 @@ int Pad::getNote()
 	return note;
 }
 
-int Pad::getNumber()
+int Pad::getIndex()
 {
     return index;
 }

@@ -5,7 +5,6 @@
 #include <midi/event/meta/EndOfTrack.hpp>
 #include <midi/event/meta/Tempo.hpp>
 #include <midi/event/meta/TimeSignatureEvent.hpp>
-#include <midi/event/meta/TextualMetaEvent.hpp>
 #include <midi/util/MidiUtil.hpp>
 #include <midi/util/VariableLengthInt.hpp>
 

@@ -13,20 +13,23 @@
 
 #include <disk/AbstractDisk.hpp>
 
-#include <lcdgui/Layer.hpp>
-
 #include <sampler/Pad.hpp>
 #include <sequencer/Track.hpp>
 #include <sequencer/NoteEvent.hpp>
 #include <sequencer/Sequencer.hpp>
 
+#include <lcdgui/Layer.hpp>
+
 #include <lcdgui/screens/LoadScreen.hpp>
 #include <lcdgui/screens/DrumScreen.hpp>
+#include <lcdgui/screens/StepEditorScreen.hpp>
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <lcdgui/screens/window/EditSoundScreen.hpp>
 #include <lcdgui/screens/window/DirectoryScreen.hpp>
 #include <lcdgui/screens/window/NameScreen.hpp>
 #include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
+#include <lcdgui/screens/window/Assign16LevelsScreen.hpp>
+#include <lcdgui/screens/window/EditMultipleScreen.hpp>
 
 #include <Util.hpp>
 
@@ -141,6 +144,8 @@ void BaseControls::function(int i)
     switch (i)
     {
         case 3:
+            auto controls = mpc.getControls().lock();
+            controls->setF4Pressed(true);
             if (ls.lock()->getFocusedLayerIndex() == 1)
             {
                 if (currentScreenName == "sequence")
@@ -210,14 +215,31 @@ void BaseControls::pad(int padIndexWithBank, int velo, bool triggeredByRepeat, i
 
     if (!mpc.getHardware().lock()->getTopPanel().lock()->isSixteenLevelsEnabled())
     {
-        if (currentScreenName == "program-params")
+        auto withNotes = std::dynamic_pointer_cast<WithTimesAndNotes>(mpc.screens->getScreenComponent(currentScreenName));
+        auto assign16LevelsScreen = std::dynamic_pointer_cast<Assign16LevelsScreen>(mpc.screens->getScreenComponent(currentScreenName));
+        auto stepEditorScreen = std::dynamic_pointer_cast<StepEditorScreen>(mpc.screens->getScreenComponent(currentScreenName));
+        auto editMultipleScreen = std::dynamic_pointer_cast<EditMultipleScreen>(mpc.screens->getScreenComponent(currentScreenName));
+
+        if (note >= 35 && note <= 98 && collectionContainsCurrentScreen(allowCentralNoteAndPadUpdateScreens))
         {
-            if (note > 34)
-                mpc.setPadAndNote(padIndexWithBank, note);
+            mpc.setNote(note);
+            mpc.setPad(padIndexWithBank);
         }
-        else if (currentScreenName != "copy-note-parameters")
+        else if (withNotes && note >= 35)
         {
-            mpc.setPadAndNote(padIndexWithBank, note);
+            withNotes->setNote0(note);
+        }
+        else if (assign16LevelsScreen)
+        {
+            assign16LevelsScreen->setNote(note);
+        }
+        else if (editMultipleScreen)
+        {
+            editMultipleScreen->setChangeNoteTo(note);
+        }
+        else if (stepEditorScreen && param == "fromnote" && note > 34)
+        {
+            stepEditorScreen->setFromNote(note);
         }
     }
     
@@ -265,7 +287,10 @@ void BaseControls::generateNoteOn(int note, int padVelo, int tick)
         
         if (step)
         {
-            recordedEvent = trk->addNoteEvent(seq->getTickPosition(), note).lock();
+            if (trk->getBus() == 0 || note > 35)
+            {
+                recordedEvent = trk->addNoteEvent(seq->getTickPosition(), note).lock();
+            }
         }
         else if (recMainWithoutPlaying)
         {
@@ -300,10 +325,10 @@ void BaseControls::generateNoteOn(int note, int padVelo, int tick)
             
             if (isSliderNote)
                 Util::setSliderNoteVariationParameters(mpc, recordedEvent, program);
+
+            if (step || recMainWithoutPlaying)
+                seq->playMetronomeTrack();
         }
-        
-        if (step || recMainWithoutPlaying)
-            seq->playMetronomeTrack();
     }
     
     auto playableEvent = make_shared<NoteEvent>(note);
@@ -439,7 +464,7 @@ void BaseControls::rec()
 {
     init();
 
-    if (currentScreenAllowsPlayAndDisallowsRecOverdub())
+    if (collectionContainsCurrentScreen(allowPlayScreens))
     {
         return;
     }
@@ -461,7 +486,7 @@ void BaseControls::rec()
         sequencer.lock()->setOverdubbing(false);
     }
 
-    if (!currentScreenAllowsTransport())
+    if (!collectionContainsCurrentScreen(allowTransportScreens))
     {
         ls.lock()->openScreen("sequencer");
     }
@@ -471,7 +496,7 @@ void BaseControls::overDub()
 {
     init();
 
-    if (currentScreenAllowsPlayAndDisallowsRecOverdub())
+    if (collectionContainsCurrentScreen(allowPlayScreens))
     {
         return;
     }
@@ -508,7 +533,7 @@ void BaseControls::stop()
     
     sequencer.lock()->stop();
     
-    if (!currentScreenAllowsTransport() && !currentScreenAllowsPlayAndDisallowsRecOverdub())
+    if (!collectionContainsCurrentScreen(allowPlayScreens) && !collectionContainsCurrentScreen(allowTransportScreens))
     {
         ls.lock()->openScreen("sequencer");
     }
@@ -564,7 +589,7 @@ void BaseControls::play()
             }
             else
             {
-                if (!currentScreenAllowsTransport() && !currentScreenAllowsPlayAndDisallowsRecOverdub())
+                if (!collectionContainsCurrentScreen(allowPlayScreens) && !collectionContainsCurrentScreen(allowTransportScreens))
                 {
                     ls.lock()->openScreen("sequencer");
                 }
@@ -615,7 +640,7 @@ void BaseControls::playStart()
         }
         else
         {
-            if (!currentScreenAllowsTransport() && !currentScreenAllowsPlayAndDisallowsRecOverdub())
+            if (!collectionContainsCurrentScreen(allowPlayScreens) && !collectionContainsCurrentScreen(allowTransportScreens))
             {
                 ls.lock()->openScreen("sequencer");
             }
@@ -873,6 +898,15 @@ void BaseControls::splitRight()
     }
 }
 
+bool BaseControls::collectionContainsCurrentScreen(const std::vector<std::string>& v)
+{
+    return find(
+            v.begin(),
+            v.end(),
+            ls.lock()->getCurrentScreenName()
+    ) != v.end();
+}
+
 const std::vector<std::string> BaseControls::allowPlayScreens {
     "song",
     "track-mute",
@@ -880,14 +914,17 @@ const std::vector<std::string> BaseControls::allowPlayScreens {
     "next-seq-pad"
 };
 
-bool BaseControls::currentScreenAllowsPlayAndDisallowsRecOverdub()
-{
-    return find(
-                begin(BaseControls::allowPlayScreens),
-                end(BaseControls::allowPlayScreens),
-                ls.lock()->getCurrentScreenName()
-                ) != end(BaseControls::allowPlayScreens);
-}
+const std::vector<std::string> BaseControls::allowCentralNoteAndPadUpdateScreens{
+    "program-assign",
+    "program-params",
+    "velocity-modulation",
+    "velo-env-filter",
+    "velo-pitch",
+    "mute-assign",
+    "assignment-view",
+    "keep-or-retry",
+    "load-a-sound"
+};
 
 const std::vector<std::string> BaseControls::allowTransportScreens {
     "sequencer",
@@ -910,15 +947,6 @@ const std::vector<std::string> BaseControls::allowTransportScreens {
     "mute-assign",
     "trans"
 };
-
-bool BaseControls::currentScreenAllowsTransport()
-{
-    return find(
-                begin(BaseControls::allowTransportScreens),
-                end(BaseControls::allowTransportScreens),
-                ls.lock()->getCurrentScreenName()
-                ) != end(BaseControls::allowTransportScreens);
-}
 
 const std::vector<std::string> BaseControls::samplerScreens {
     "create-new-program",

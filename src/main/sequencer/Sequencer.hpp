@@ -60,11 +60,8 @@ namespace mpc::sequencer
 		bool secondSequenceEnabled = false;
 		bool undoSeqAvailable = false;
 		int playStartTick = 0;
-		double previousTempo = 0.0;
-		int recordStartTick = 0;
 
 		std::string defaultSequenceName = "";
-		std::vector<std::string> defaultDeviceNames;
 		int timeDisplayStyle = 0;
 		bool recordingModeMulti = false;
 		int frameRate = 0;
@@ -73,7 +70,6 @@ namespace mpc::sequencer
 		bool tempoSourceSequenceEnabled = false;
 
 		bool countingIn = false;
-		int reposition = 0;
 		int position = 0;
 		uint64_t lastTap = 0;
 		int tapIndex = 0;
@@ -109,8 +105,6 @@ namespace mpc::sequencer
 		std::string getDefaultSequenceName();
 		void setDefaultSequenceName(std::string s);
 		void setActiveSequenceIndex(int i);
-		std::string getDefaultDeviceName(int i);
-		void setDefaultDeviceName(int i, std::string s);
 		bool isCountEnabled();
 		void setCountEnabled(bool b);
 		void setTimeDisplayStyle(int i);
@@ -128,7 +122,6 @@ namespace mpc::sequencer
 
 	public:
 		void undoSeq();
-		void clearUndoSeq();
 		void playFromStart();
 		void play();
 		void rec();

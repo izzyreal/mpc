@@ -102,16 +102,22 @@ void NextSeqScreen::function(int i)
 {
 	init();
 	
-	if (i == 3)
+    if (i == 3 || i == 4)
 	{
-		// SUDDEN unimplemented
-	}
-	else if (i == 4)
-	{
-		sequencer.lock()->setNextSq(-1);
-		selectNextSqFromScratch = true;
+        auto seq = sequencer.lock();
+        auto nextSq = seq->getNextSq();
+		seq->setNextSq(-1);
+        selectNextSqFromScratch = true;
 		displayNextSq();
-	}
+
+        if (i == 3)
+        {
+            seq->stop();
+            seq->move(0);
+            seq->setActiveSequenceIndex(nextSq);
+            seq->playFromStart();
+        }
+    }
 	else if (i == 5)
 	{
 		openScreen("next-seq-pad");

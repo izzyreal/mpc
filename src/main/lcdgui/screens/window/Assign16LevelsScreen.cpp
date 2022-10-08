@@ -4,9 +4,6 @@
 
 #include <sequencer/Track.hpp>
 
-#include <lcdgui/LayeredScreen.hpp>
-#include <lcdgui/Label.hpp>
-
 #include <hardware/Hardware.hpp>
 #include <hardware/TopPanel.hpp>
 #include <hardware/Led.hpp>
@@ -25,12 +22,6 @@ void Assign16LevelsScreen::open()
     displayParameter();
     displayType();
     displayOriginalKeyPad();
-    mpc.addObserver(this); // Subscribe to "padandnote" messages
-}
-
-void Assign16LevelsScreen::close()
-{
-    mpc.deleteObserver(this);
 }
 
 void Assign16LevelsScreen::function(int i)
@@ -53,19 +44,30 @@ void Assign16LevelsScreen::turnWheel(int i)
 {
     init();
 
-    if (param.compare("note") == 0)
+    if (param == "note")
     {
-        setNote(note + i);
+        auto candidate = note + i;
+
+        if (candidate < 35)
+        {
+            candidate = 35;
+        }
+        else if (candidate > 98)
+        {
+            candidate = 98;
+        }
+
+        setNote(candidate);
     }
-    else if (param.compare("param") == 0)
+    else if (param == "param")
     {
         setParam(parameter + i);
     }
-    else if (param.compare("type") == 0)
+    else if (param == "type")
     {
         setType(type + i);
     }
-    else if (param.compare("originalkeypad") == 0)
+    else if (param == "originalkeypad")
     {
         setOriginalKeyPad(originalKeyPad + i);
     }
@@ -73,8 +75,8 @@ void Assign16LevelsScreen::turnWheel(int i)
 
 void Assign16LevelsScreen::setNote(int newNote)
 {
-    if (newNote < 35)
-        newNote = 35;
+    if (newNote < 34)
+        newNote = 34;
     else if (newNote > 98)
         newNote = 98;
 
@@ -144,7 +146,7 @@ void Assign16LevelsScreen::displayNote()
     auto program = sampler.lock()->getProgram(pgmNumber).lock();
     auto padIndex = program->getPadIndexFromNote(note);
 
-    auto padName = padIndex == -1 ? "OFF" : sampler.lock()->getPadName(padIndex);
+    auto padName = sampler.lock()->getPadName(padIndex);
 
     auto soundIndex = note == 34 ? -1 : program->getNoteParameters(note)->getSoundIndex();
     auto soundName = soundIndex == -1 ? "(No sound)" : sampler.lock()->getSoundName(soundIndex);
@@ -186,15 +188,4 @@ void Assign16LevelsScreen::displayOriginalKeyPad()
 void Assign16LevelsScreen::openWindow()
 {
     mainScreen();
-}
-
-void Assign16LevelsScreen::update(moduru::observer::Observable* o, nonstd::any msg)
-{
-    auto s = nonstd::any_cast<string>(msg);
-
-    if (s.compare("padandnote") == 0)
-    {
-        note = mpc.getNote();
-        displayNote();
-    }
 }

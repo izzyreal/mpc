@@ -4,8 +4,6 @@
 #include <sequencer/NoteEvent.hpp>
 #include <midi/core/ShortMessage.hpp>
 
-#include <Mpc.hpp>
-
 using namespace mpc::sequencer;
 using namespace std;
 

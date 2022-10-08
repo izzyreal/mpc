@@ -95,6 +95,38 @@ TEST_CASE("ALL file song", "[allfile]")
     REQUIRE(song->getStep(1).lock()->getRepeats() == 2);
 }
 
+TEST_CASE("ALL file track is on and used", "[allfile]")
+{
+    mpc::Mpc mpc;
+    mpc.init(44100, 1, 1);
+    auto seq = mpc.getSequencer().lock()->getSequence(0).lock();
+    seq->init(1);
+    seq->getTrack(60).lock()->setUsed(false);
+    seq->getTrack(60).lock()->setOn(true);
+    seq->getTrack(61).lock()->setUsed(false);
+    seq->getTrack(61).lock()->setOn(false);
+    seq->getTrack(62).lock()->setUsed(true);
+    seq->getTrack(62).lock()->setOn(true);
+    seq->getTrack(63).lock()->setUsed(true);
+    seq->getTrack(63).lock()->setOn(false);
+    auto disk = mpc.getDisk().lock();
+
+    deleteTestAllFile(disk);
+
+    saveAndLoadTestAllFile(mpc);
+
+    REQUIRE(mpc.getSequencer().lock()->getUsedSequenceCount() == 1);
+    auto seq1 = mpc.getSequencer().lock()->getActiveSequence().lock();
+    REQUIRE(!seq1->getTrack(60).lock()->isUsed());
+    REQUIRE(seq1->getTrack(60).lock()->isOn());
+    REQUIRE(!seq1->getTrack(61).lock()->isUsed());
+    REQUIRE(!seq1->getTrack(61).lock()->isOn());
+    REQUIRE(seq1->getTrack(62).lock()->isUsed());
+    REQUIRE(seq1->getTrack(62).lock()->isOn());
+    REQUIRE(seq1->getTrack(63).lock()->isUsed());
+    REQUIRE(!seq1->getTrack(63).lock()->isOn());
+}
+
 TEST_CASE("ALL file note event", "[allfile]")
 {
     mpc::Mpc mpc;

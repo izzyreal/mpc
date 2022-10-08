@@ -6,7 +6,6 @@
 #include <sequencer/Sequence.hpp>
 #include <sequencer/Track.hpp>
 
-#include <midi/MidiFile.hpp>
 #include <file/mid/MidiReader.hpp>
 #include <file/mid/MidiWriter.hpp>
 

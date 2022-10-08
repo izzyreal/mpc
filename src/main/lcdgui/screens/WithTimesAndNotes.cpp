@@ -69,12 +69,16 @@ bool WithTimesAndNotes::checkAllTimesAndNotes(mpc::Mpc& mpc, int notch, Sequence
 
 		if (track->getBus() != 0)
 		{
-			auto note = mpc.getNote() + notch;
-			auto mpcSoundPlayerChannel = mpc.getSampler().lock()->getDrum(track->getBus() - 1);
-			auto program = mpc.getSampler().lock()->getProgram(mpcSoundPlayerChannel->getProgram()).lock();
-			auto pad = program->getPadIndexFromNote(note);
-			mpc.setPadAndNote(pad, note);
-			displayDrumNotes();
+			auto note = note0 + notch;
+
+            if (note < 34 || note > 98)
+            {
+                return true;
+            }
+
+			note0 = note;
+
+            displayDrumNotes();
 		}
 		else
 		{

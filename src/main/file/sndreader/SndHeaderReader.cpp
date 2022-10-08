@@ -22,8 +22,6 @@ vector<char>& SndHeaderReader::getHeaderArray()
 
 bool SndHeaderReader::hasValidId()
 {
-    auto verifyFirstTwoBytes = false;
-
     int i = headerArray[0];
     int j = headerArray[1];
 

@@ -1,12 +1,9 @@
 #include "Component.hpp"
 
 #include "Label.hpp"
-#include "Background.hpp"
 #include "Field.hpp"
 #include "Parameter.hpp"
 #include "ScreenComponent.hpp"
-
-#include <Mpc.hpp>
 
 #include <string>
 

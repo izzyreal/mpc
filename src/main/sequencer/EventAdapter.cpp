@@ -8,10 +8,8 @@
 #include <midi/core/MidiMessage.hpp>
 #include <midi/core/ShortMessage.hpp>
 
-#include <lcdgui/screens/window/MultiRecordingSetupLine.hpp>
 #include <lcdgui/screens/window/MultiRecordingSetupScreen.hpp>
 #include <lcdgui/screens/window/MidiInputScreen.hpp>
-#include <lcdgui/Screens.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;

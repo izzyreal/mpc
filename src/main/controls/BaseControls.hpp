@@ -99,10 +99,10 @@ namespace mpc::controls {
 		std::string currentScreenName = "";
 		const static std::vector<std::string> allowTransportScreens;
 		const static std::vector<std::string> allowPlayScreens;
+		const static std::vector<std::string> allowCentralNoteAndPadUpdateScreens;
         const static std::vector<std::string> samplerScreens;
 
-		bool currentScreenAllowsTransport();
-		bool currentScreenAllowsPlayAndDisallowsRecOverdub();
+        bool collectionContainsCurrentScreen(const std::vector<std::string>&);
         bool isSamplerScreen();
 		void generateNoteOn(int nn, int padVelo, int tick);
 

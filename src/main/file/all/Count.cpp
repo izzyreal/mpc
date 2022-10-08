@@ -3,9 +3,7 @@
 #include <Mpc.hpp>
 
 #include <file/all/AllParser.hpp>
-#include <sequencer/Sequencer.hpp>
 
-#include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/window/CountMetronomeScreen.hpp>
 #include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
 

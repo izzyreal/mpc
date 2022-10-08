@@ -3,9 +3,7 @@
 #include <Mpc.hpp>
 #include <disk/MpcFile.hpp>
 #include <disk/AbstractDisk.hpp>
-#include <file/sndreader/SndReader.hpp>
 #include <file/wav/WavFile.hpp>
-#include <sampler/Sampler.hpp>
 #include <sampler/Sound.hpp>
 #include <lcdgui/screens/VmpcSettingsScreen.hpp>
 
@@ -16,7 +14,6 @@
 using namespace mpc::sampler;
 using namespace mpc::disk;
 using namespace mpc::file::wav;
-using namespace mpc::file::sndreader;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace moduru::lang;

@@ -1,12 +1,10 @@
 #include <disk/ProgramImportAdapter.hpp>
 
 #include <Mpc.hpp>
-#include <mpc/MpcStereoMixerChannel.hpp>
 #include <sampler/NoteParameters.hpp>
 #include <sampler/Pad.hpp>
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>
-#include <sampler/Sound.hpp>
 
 using namespace mpc::disk;
 using namespace mpc::sampler;

@@ -6,8 +6,6 @@
 #include <lcdgui/screens/window/EditSoundScreen.hpp>
 #include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
-#include <sampler/Sampler.hpp>
-
 #ifdef __linux__
 #include <climits>
 #endif

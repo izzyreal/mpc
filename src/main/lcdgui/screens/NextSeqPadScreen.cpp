@@ -41,21 +41,35 @@ void NextSeqPadScreen::right()
 	// Block ScreenComponent::right() default action. Nothing to do.
 }
 
-void NextSeqPadScreen::pad(int i, int velo, bool repeat, int tick)
+void NextSeqPadScreen::pad(int padIndexWithBank, int velo, bool repeat, int tick)
 {
 	init();
-	sequencer.lock()->setNextSqPad(i + (mpc.getBank() * 16));
+
+    if (sequencer.lock()->isPlaying() && mpc.getControls().lock()->isF4Pressed())
+    {
+        if (!sequencer.lock()->getSequence(padIndexWithBank).lock()->isUsed())
+        {
+            return;
+        }
+
+        sequencer.lock()->stop();
+        sequencer.lock()->move(0);
+        sequencer.lock()->setActiveSequenceIndex(padIndexWithBank);
+        sequencer.lock()->playFromStart();
+        refreshSeqs();
+        return;
+    }
+
+	sequencer.lock()->setNextSqPad(padIndexWithBank);
 	refreshSeqs();
 }
 
 void NextSeqPadScreen::function(int i)
 {
 	init();
+    ScreenComponent::function(i);
 	switch (i)
 	{
-	case 3:
-		// SUDDEN unimplemented
-		break;
 	case 4:
 		sequencer.lock()->setNextSq(-1);
 		displayNextSq();
@@ -141,29 +155,36 @@ void NextSeqPadScreen::refreshSeqs()
 void NextSeqPadScreen::update(moduru::observer::Observable* observable, nonstd::any message)
 {
 	string msg = nonstd::any_cast<string>(message);
-	
-	if (msg.compare("soloenabled") == 0 || msg.compare("bank") == 0)
+	if (msg == "bank")
+    {
+        displayBank();
+        displaySeqNumbers();
+
+        for (int i = 0; i < 16; i++)
+        {
+            displaySeq(i);
+        }
+    }
+	else if (msg == "soloenabled")
 	{
-		displayBank();
-		displaySeqNumbers();
 		refreshSeqs();
 	}
-	else if (msg.compare("seqnumbername") == 0)
+	else if (msg == "seqnumbername")
 	{
 		displaySq();
 		refreshSeqs();
 	}
-	else if (msg.compare("nextsqoff") == 0)
+	else if (msg == "nextsqoff")
 	{
 		refreshSeqs();
 		displayNextSq();
 	}
-	else if (msg.compare("nextsqvalue") == 0 || msg.compare("nextsq") == 0)
+	else if (msg == "nextsqvalue" || msg == "nextsq")
 	{
 		refreshSeqs();
 		displayNextSq();
 	}
-	else if (msg.compare("now") == 0 || msg.compare("clock") == 0)
+	else if (msg == "now" || msg == "clock")
 	{
 		displayNow0();
 		displayNow1();

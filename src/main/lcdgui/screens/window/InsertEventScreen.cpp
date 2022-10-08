@@ -9,7 +9,6 @@
 #include <sequencer/PitchBendEvent.hpp>
 #include <sequencer/PolyPressureEvent.hpp>
 #include <sequencer/ProgramChangeEvent.hpp>
-#include <sequencer/Sequencer.hpp>
 #include <sequencer/SystemExclusiveEvent.hpp>
 
 using namespace mpc::lcdgui::screens::window;

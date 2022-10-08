@@ -7,8 +7,6 @@
 #include "SequenceNames.hpp"
 #include "Tracks.hpp"
 
-#include <Util.hpp>
-
 #include <sequencer/Event.hpp>
 #include <sequencer/MixerEvent.hpp>
 #include <sequencer/Sequence.hpp>
@@ -100,11 +98,11 @@ void AllSequence::applyToMpcSeq(shared_ptr<mpc::sequencer::Sequence> mpcSeq)
     for (int i = 0; i < 64; i++)
     {
         auto t = mpcSeq->getTrack(i).lock();
-        t->setUsed(at->getStatus(i) != 6);
+        t->setUsed(at->getStatus(i) == 5 || at->getStatus(i) == 7);
         t->setName(at->getName(i));
         t->setBusNumber(at->getBus(i));
         t->setProgramChange(at->getPgm(i));
-        t->setOn(at->getStatus(i) != 5);
+        t->setOn(at->getStatus(i) == 6 || at->getStatus(i) == 7);
         t->setVelocityRatio(at->getVelo(i));
     }
 
@@ -193,18 +191,18 @@ AllSequence::AllSequence(mpc::sequencer::Sequence* seq, int number)
             saveBytes[offset + j] = StrUtil::padRight(seq->getDeviceName(i), " ", AllParser::DEV_NAME_LENGTH)[j];
         }
     }
-    auto tracks = Tracks(seq);
+    Tracks allFileSeqTracks(seq);
     
     for (int i = 0; i < TRACKS_LENGTH; i++)
     {
-        saveBytes[i + TRACKS_OFFSET] = tracks.getBytes()[i];
+        saveBytes[i + TRACKS_OFFSET] = allFileSeqTracks.getBytes()[i];
     }
     
-    auto barList = BarList(seq);
+    BarList allFileBarList(seq);
     
     for (int i = AllSequence::BAR_LIST_OFFSET; i < BAR_LIST_OFFSET + BAR_LIST_LENGTH; i++)
     {
-        saveBytes[i] = barList.getBytes()[i - BAR_LIST_OFFSET];
+        saveBytes[i] = allFileBarList.getBytes()[i - BAR_LIST_OFFSET];
     }
     
     auto eventArraysChunk = createEventSegmentsChunk(seq);
@@ -216,7 +214,7 @@ AllSequence::AllSequence(mpc::sequencer::Sequence* seq, int number)
     
     for (int i = (int)(saveBytes.size()) - 8; i < saveBytes.size(); i++)
     {
-        saveBytes[i] = (255);
+        saveBytes[i] = static_cast<char>(255);
     }
 }
 
@@ -413,9 +411,9 @@ vector<char> AllSequence::createEventSegmentsChunk(mpc::sequencer::Sequence* seq
     return ByteUtil::stitchByteArrays(ea);
 }
 
-void AllSequence::setTempoDouble(double tempo)
+void AllSequence::setTempoDouble(double tempoForSaveBytes)
 {
-    auto ba = ByteUtil::ushort2bytes((unsigned short)(tempo * 10.0));
+    auto ba = ByteUtil::ushort2bytes((unsigned short)(tempoForSaveBytes * 10.0));
     saveBytes[TEMPO_BYTE1_OFFSET] = ba[0];
     saveBytes[TEMPO_BYTE2_OFFSET] = ba[1];
 }

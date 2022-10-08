@@ -1,6 +1,5 @@
 #include <file/all/Tracks.hpp>
 
-#include <Util.hpp>
 #include <file/all/AllParser.hpp>
 #include <file/all/AllSequence.hpp>
 #include <sequencer/Sequence.hpp>
@@ -53,7 +52,27 @@ Tracks::Tracks(mpc::sequencer::Sequence* seq)
         saveBytes[BUSSES_OFFSET + i] = (t->getBus());
 		saveBytes[PGMS_OFFSET + i] = (t->getProgramChange());
 		saveBytes[VELO_RATIOS_OFFSET + i] = (t->getVelocityRatio());
-		auto status = t->isUsed() ? 7 : 6;
+
+        /**
+         * 4 == track is unused and off
+         * 5 == track is used and off
+         * 6 == track is unused and on
+         * 7 == track is used and on
+         */
+        int status = 4;
+
+        if (t->isUsed() && t->isOn())
+        {
+            status = 7;
+        }
+        else if (t->isUsed())
+        {
+            status = 5;
+        }
+        else if (t->isOn())
+        {
+            status = 6;
+        }
         
 		if (t->isUsed() && !t->isOn())
 			status = 5;

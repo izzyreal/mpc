@@ -106,7 +106,7 @@ private:
     void setUnknown32BitInt(mpc::sequencer::Sequence* seq);
     void setBarCount(int i);
     std::vector<char> createEventSegmentsChunk(mpc::sequencer::Sequence* seq);
-    void setTempoDouble(double tempo);
+    void setTempoDouble(double tempoForSaveBytes);
     void setLastTick(mpc::sequencer::Sequence* seq);
     
 public:

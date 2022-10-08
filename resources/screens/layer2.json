@@ -252,7 +252,7 @@
  "labels" : [ "Note:", "Vol:", "Vol: ", "", "Pan:", "Out:", "", "" ],
  "x" : [ 31, 43, 97, 160, 43, 97, 163, 199  ],
  "y" : [ 11, 32, 32, 32, 41, 41, 41, 41  ],
- "tfsize" : [ 144, 18, 18, 18, 18, 18, 12, 18 ],
+ "tfsize" : [ 156, 18, 18, 18, 18, 18, 12, 18 ],
  "parameters" : [
  "note", [ "_", "individualvolume", "_", "stereovolume" ],
  "stereovolume", [ "note", "individualvolume", "note", "panning" ],
@@ -336,7 +336,11 @@
  "x" : [ 25, 25, 25 ],
  "y" : [ 11, 30, 39 ],
  "tfsize" : [ 138, 138, 138 ],
- "parameters" : [ "note", "note0", "note1" ],
+ "parameters" : [
+  "note", [ "_", "_", "_", "note0"],
+  "note0", [ "_", "_", "note", "note1"],
+  "note1", [ "_", "_", "note0", "_" ]
+ ],
  "fblabels" : [ null, null, null, "CLOSE", "PLAY", null ],
  "fbtypes" : [ null, null, null, 0, 1, null ]
 },

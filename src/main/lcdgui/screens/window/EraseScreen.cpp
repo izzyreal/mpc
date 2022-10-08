@@ -48,13 +48,6 @@ void EraseScreen::open()
 	displayTime();
 	displayTrack();
 	displayType();
-
-	mpc.addObserver(this);
-}
-
-void EraseScreen::close()
-{
-	mpc.deleteObserver(this);
 }
 
 void EraseScreen::turnWheel(int i)
@@ -100,7 +93,7 @@ void EraseScreen::function(int i)
 
 		auto midi = sequencer.lock()->getActiveTrack().lock()->getBus() == 0;
 
-		auto noteA = midi ? note0 : mpc.getNote();
+		auto noteA = note0;
 		auto noteB = midi ? note1 : -1;
 
 		auto seq = sequencer.lock()->getActiveSequence().lock();
@@ -199,14 +192,6 @@ void EraseScreen::function(int i)
 	}
 }
 
-void EraseScreen::update(moduru::observer::Observable* observable, nonstd::any message)
-{
-	auto msg = nonstd::any_cast<string>(message);
-
-	if (msg.compare("padandnote") == 0)
-		displayNotes();
-}
-
 void EraseScreen::displayTrack()
 {
 	string trackName = "";
@@ -279,10 +264,14 @@ void EraseScreen::displayNotes()
 	{
 		findField("note0").lock()->setSize(37, 9);
 
-		if (mpc.getNote() == 34)
+		if (note0 == 34)
 			findField("note0").lock()->setText("ALL");
 		else
-			findField("note0").lock()->setText(to_string(mpc.getNote()) + "/" + sampler.lock()->getPadName(mpc.getPad()));
+        {
+            auto padIndexWithBank = program.lock()->getPadIndexFromNote(note0);
+            auto padName = sampler.lock()->getPadName(padIndexWithBank);
+            findField("note0").lock()->setText(to_string(note0) + "/" + padName);
+        }
 	}
 }
 

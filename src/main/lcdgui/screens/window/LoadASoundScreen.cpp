@@ -1,6 +1,5 @@
 #include "LoadASoundScreen.hpp"
 
-#include <sampler/NoteParameters.hpp>
 #include <sampler/Pad.hpp>
 
 #include <sequencer/Track.hpp>
@@ -23,8 +22,9 @@ void LoadASoundScreen::open()
 	init();
 	auto loadScreen = mpc.screens->get<LoadScreen>("load");
 	findLabel("filename").lock()->setText("File:" + loadScreen->getSelectedFileName());
+    assignToNote = mpc.getNote();
 	displayAssignToNote();
-	mpc.addObserver(this); // Subscribe to "padandnote" messages
+	mpc.addObserver(this); // Subscribe to "note" messages
 }
 
 void LoadASoundScreen::close()
@@ -38,10 +38,28 @@ void LoadASoundScreen::turnWheel(int i)
 
 	if (param.compare("assign-to-note") == 0)
 	{
-		auto nextNn = mpc.getNote() + i;
-		auto nextPn = program.lock()->getPadIndexFromNote(nextNn);
-		mpc.setPadAndNote(nextPn, nextNn);
-	}
+		auto newAssignToNote = assignToNote + i;
+
+        if (newAssignToNote < 34)
+        {
+            newAssignToNote = 34;
+        }
+        else if (newAssignToNote > 98)
+        {
+            newAssignToNote = 98;
+        }
+
+        if (newAssignToNote == 34)
+        {
+            mpc.setNote(35);
+            assignToNote = newAssignToNote;
+            displayAssignToNote();
+        }
+        else
+        {
+            mpc.setNote(newAssignToNote);
+        }
+    }
 }
 
 void LoadASoundScreen::function(int i)
@@ -89,46 +107,39 @@ void LoadASoundScreen::function(int i)
 
 void LoadASoundScreen::keepSound()
 {
-	auto sequencer = mpc.getSequencer().lock();
-	auto sequence = sequencer->getActiveSequence().lock();
-	auto sampler = mpc.getSampler();
-	auto track = sequence->getTrack(sequencer->getActiveTrackIndex()).lock();
+    if (assignToNote != 34)
+    {
+        auto sequencer = mpc.getSequencer().lock();
+        auto sequence = sequencer->getActiveSequence().lock();
+        auto sampler = mpc.getSampler();
+        auto track = sequence->getTrack(sequencer->getActiveTrackIndex()).lock();
 
-	auto bus = track->getBus();
-	auto programNumber = sampler.lock()->getDrumBusProgramNumber(bus);
-	auto program = sampler.lock()->getProgram(programNumber);
-	auto sound = sampler.lock()->getPreviewSound();
-
-	if (mpc.getNote() != 34)
-	{
-		auto noteParameters = dynamic_cast<mpc::sampler::NoteParameters*>(program.lock()->getNoteParameters(mpc.getNote()));
-		noteParameters->setSoundIndex(sampler.lock()->getSoundCount() - 1);
-
-		auto padIndex = program.lock()->getPadIndexFromNote(mpc.getNote());
-
-		if (padIndex != -1)
-		{
-			auto mixerChannel = noteParameters->getStereoMixerChannel().lock();
-			mixerChannel->setStereo(!sound.lock()->isMono());
-		}
-	}
+        auto bus = track->getBus();
+        auto programNumber = sampler.lock()->getDrumBusProgramNumber(bus);
+        auto program = sampler.lock()->getProgram(programNumber);
+        auto sound = sampler.lock()->getPreviewSound();
+        auto noteParameters = sampler.lock()->getLastNp(program.lock().get());
+        noteParameters->setSoundIndex(sampler.lock()->getSoundCount() - 1);
+        auto mixerChannel = noteParameters->getStereoMixerChannel().lock();
+        mixerChannel->setStereo(!sound.lock()->isMono());
+    }
 }
 
 void LoadASoundScreen::displayAssignToNote()
 {
 	init();
-	auto note = mpc.getNote();
-	auto padIndex = program.lock()->getPadIndexFromNote(note);
-	auto padName = string(padIndex == -1 ? "OFF" : sampler.lock()->getPadName(padIndex));
-	auto noteName = string(note == 34 ? "--" : to_string(note));
+	auto padIndex = program.lock()->getPadIndexFromNote(assignToNote);
+	auto padName = sampler.lock()->getPadName(padIndex);
+	auto noteName = string(assignToNote == 34 ? "--" : to_string(assignToNote));
 	findField("assign-to-note").lock()->setText(noteName + "/" + padName);
 }
 
 void LoadASoundScreen::update(moduru::observer::Observable* observable, nonstd::any message)
 {
 	auto msg = nonstd::any_cast<string>(message);
-	if (msg.compare("padandnote") == 0)
+	if (msg == "note")
 	{
+        assignToNote = mpc.getNote();
 		displayAssignToNote();
 	}
 }

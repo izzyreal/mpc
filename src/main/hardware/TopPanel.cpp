@@ -1,7 +1,5 @@
 #include "TopPanel.hpp"
 
-#include <Mpc.hpp>
-
 using namespace mpc::hardware;
 using namespace std;
 

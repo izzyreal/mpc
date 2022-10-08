@@ -17,10 +17,6 @@ namespace mpc::lcdgui::screens::window
 
 	public:
 		void open() override;
-		void close() override;
-
-	public:
-		void update(moduru::observer::Observable* observable, nonstd::any message) override;
 
 	private:
 		void displayTrack();

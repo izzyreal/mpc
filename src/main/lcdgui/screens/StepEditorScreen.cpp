@@ -91,7 +91,7 @@ void StepEditorScreen::open()
 	displayView();
 	sequencer.lock()->addObserver(this);
 	track.lock()->addObserver(this);
-	
+
 	findField("now0").lock()->setTextPadded(sequencer.lock()->getCurrentBarIndex() + 1, "0");
 	findField("now1").lock()->setTextPadded(sequencer.lock()->getCurrentBeatIndex() + 1, "0");
 	findField("now2").lock()->setTextPadded(sequencer.lock()->getCurrentClockNumber(), "0");
@@ -110,8 +110,6 @@ void StepEditorScreen::open()
 		auto eventType = visibleEvents[0].lock()->getTypeName();
 		ls.lock()->setFocus(lastColumn[eventType] + "0");
 	}
-
-	mpc.addObserver(this); // Subscribe to "padandnote" messages
 }
 
 void StepEditorScreen::close()
@@ -119,7 +117,6 @@ void StepEditorScreen::close()
 	init();
 	sequencer.lock()->deleteObserver(this);
 	track.lock()->deleteObserver(this);
-	mpc.deleteObserver(this);
 
 	if (param.length() == 2)
 	{
@@ -191,7 +188,7 @@ void StepEditorScreen::function(int i)
 			ls.lock()->setFocus("a0");
 			return;
 		}
-		
+
 		if (!dynamic_pointer_cast<EmptyEvent>(visibleEvents[rowIndex].lock()))
 		{
 			for (int e = 0; e < track.lock()->getEvents().size(); e++)
@@ -219,7 +216,7 @@ void StepEditorScreen::function(int i)
 	case 3:
 	{
 		bool posIsLastTick = sequencer.lock()->getTickPosition() == sequencer.lock()->getActiveSequence().lock()->getLastTick();
-		
+
 		if (selectionEndIndex == -1)
 		{
 			if (!posIsLastTick)
@@ -329,7 +326,7 @@ void StepEditorScreen::function(int i)
 				auto eventNumber = stoi(param.substr(1, 2));
 				auto event = visibleEvents[eventNumber].lock();
 				auto noteEvent = dynamic_pointer_cast<NoteEvent>(event);
-			
+
 				if (noteEvent)
                 {
                     adhocPlayNoteEvent(noteEvent);
@@ -347,7 +344,7 @@ void StepEditorScreen::function(int i)
 void StepEditorScreen::turnWheel(int i)
 {
 	init();
-	
+
 	if (param.compare("view") == 0)
 	{
 		setView(view + i);
@@ -478,7 +475,7 @@ void StepEditorScreen::turnWheel(int i)
 					note->setNote(98);
 					return;
 				}
-				
+
 				note->setNote(note->getNote() + i);
 			}
 			else if (param.find("b") != string::npos)
@@ -511,7 +508,7 @@ void StepEditorScreen::turnWheel(int i)
 void StepEditorScreen::prevStepEvent()
 {
 	init();
-	
+
 	auto controls = mpc.getControls().lock();
 
 	if (controls->isGoToPressed())
@@ -525,9 +522,9 @@ void StepEditorScreen::prevStepEvent()
 void StepEditorScreen::nextStepEvent()
 {
 	init();
-	
+
 	auto controls = mpc.getControls().lock();
-	
+
 	if (controls->isGoToPressed())
 		sequencer.lock()->goToNextEvent();
 	else
@@ -540,7 +537,7 @@ void StepEditorScreen::prevBarStart()
 {
 	init();
 	auto controls = mpc.getControls().lock();
-	
+
 	if (controls->isGoToPressed())
 		sequencer.lock()->setBar(0);
 	else
@@ -552,9 +549,9 @@ void StepEditorScreen::prevBarStart()
 void StepEditorScreen::nextBarEnd()
 {
 	init();
-	
+
 	auto controls = mpc.getControls().lock();
-	
+
 	if (controls->isGoToPressed())
 		sequencer.lock()->setBar(sequencer.lock()->getActiveSequence().lock()->getLastBarIndex() + 1);
 	else
@@ -591,14 +588,14 @@ void StepEditorScreen::right()
 void StepEditorScreen::up()
 {
 	init();
-	
+
 	if (param.length() == 2)
 	{
 		auto src = param;
 		auto srcLetter = src.substr(0, 1);
 		int srcNumber = stoi(src.substr(1, 2));
 		auto controls = mpc.getControls().lock();
-		
+
 		if (controls->isShiftPressed() && selectionStartIndex == -1 && dynamic_pointer_cast<EmptyEvent>(visibleEvents[srcNumber].lock()))
 			return;
 
@@ -612,7 +609,7 @@ void StepEditorScreen::up()
 			refreshSelection();
 			return;
 		}
-		
+
 		if (srcNumber == 0 && yOffset != 0)
 		{
 			auto oldEventType = visibleEvents[srcNumber].lock()->getTypeName();
@@ -645,21 +642,21 @@ void StepEditorScreen::down()
 		ls.lock()->setFocus(lastColumn[eventType] + to_string(lastRow));
 		return;
 	}
-	
+
 	if (param.length() == 2)
 	{
 		auto src = param;
 		auto srcLetter = src.substr(0, 1);
 		int srcNumber = stoi(src.substr(1, 2));
 		auto controls = mpc.getControls().lock();
-		
+
 		if (srcNumber == 3)
 		{
 			if (yOffset + 4 == eventsAtCurrentTick.size())
 			{
 				return;
 			}
-			
+
 			auto oldEventType = visibleEvents[srcNumber].lock()->getTypeName();
 			lastColumn[oldEventType] = srcLetter;
 
@@ -672,7 +669,7 @@ void StepEditorScreen::down()
 
 			if (controls->isShiftPressed() && dynamic_pointer_cast<EmptyEvent>(visibleEvents[3].lock()))
 				setSelectionEndIndex(srcNumber + yOffset);
-			
+
 			refreshSelection();
 			return;
 		}
@@ -702,7 +699,7 @@ void StepEditorScreen::downOrUp(int increment)
 		int srcNumber = stoi(src.substr(1, 2));
 		auto controls = mpc.getControls().lock();
 		auto destination = srcLetter + to_string(srcNumber + increment);
-		
+
 		if (srcNumber + increment != -1)
 		{
 			if (visibleEvents[srcNumber + increment].lock())
@@ -733,7 +730,7 @@ void StepEditorScreen::refreshSelection()
 	auto lastEventIndex = max(selectionStartIndex, selectionEndIndex);
 
 	bool somethingSelected = false;
-	
+
 	if (firstEventIndex != -1)
 	{
 		for (int i = 0; i < EVENT_ROW_COUNT; i++)
@@ -773,11 +770,11 @@ void StepEditorScreen::initVisibleEvents()
 
 	for (auto& e : eventsAtCurrentTick)
 		if (e.lock()) e.lock()->deleteObserver(this);
-	
+
 	eventsAtCurrentTick.clear();
-	
+
 	auto lSequencer = sequencer.lock();
-	
+
 	for (auto& event : track.lock()->getEvents())
 	{
 		auto lEvent = event.lock();
@@ -789,7 +786,7 @@ void StepEditorScreen::initVisibleEvents()
 				&& dynamic_pointer_cast<NoteEvent>(lEvent))
 			{
 				auto ne = dynamic_pointer_cast<NoteEvent>(lEvent);
-			
+
 				if (track.lock()->getBus() != 0)
 				{
 					if (fromNote == 34 || view == 0)
@@ -864,7 +861,7 @@ void StepEditorScreen::initVisibleEvents()
 	}
 
 	eventsAtCurrentTick.push_back(emptyEvent);
-	
+
 	for (auto& e : visibleEvents)
 	{
 		if (e.lock())
@@ -872,11 +869,11 @@ void StepEditorScreen::initVisibleEvents()
 			e.lock()->deleteObserver(this);
 		}
 	}
-	
+
 	visibleEvents = vector<weak_ptr<Event>>(4);
 	int firstVisibleEventIndex = yOffset;
 	int visibleEventCounter = 0;
-	
+
 	for (int i = 0; i < EVENT_ROW_COUNT; i++)
 	{
 		visibleEvents[visibleEventCounter] = eventsAtCurrentTick[i + firstVisibleEventIndex];
@@ -895,7 +892,7 @@ void StepEditorScreen::refreshEventRows()
 	{
 		auto eventRow = findEventRows()[i].lock();
 		auto event = visibleEvents[i].lock();
-	
+
 		if (event)
 		{
 			eventRow->Hide(false);
@@ -915,7 +912,7 @@ void StepEditorScreen::refreshEventRows()
 void StepEditorScreen::updateComponents()
 {
 	init();
-	
+
 	if (view == 1 && track.lock()->getBus() != 0)
 	{
 		findField("fromnote").lock()->Hide(false);
@@ -955,13 +952,17 @@ void StepEditorScreen::updateComponents()
 void StepEditorScreen::setViewNotesText()
 {
 	init();
-	
+
 	if (view == 1 && track.lock()->getBus() != 0)
 	{
-		if (fromNote == 34)
-			findField("fromnote").lock()->setText("ALL");
+		if (fromNote == 34) {
+            findField("fromnote").lock()->setText("ALL");
+        }
 		else
-			findField("fromnote").lock()->setText(to_string(fromNote) + "/" + sampler.lock()->getPadName(program.lock()->getPadIndexFromNote(fromNote)));
+        {
+            auto padName = sampler.lock()->getPadName(program.lock()->getPadIndexFromNote(fromNote));
+			findField("fromnote").lock()->setText(to_string(fromNote) + "/" + padName);
+        }
 	}
 	else if (view == 1 && track.lock()->getBus() == 0)
 	{
@@ -1001,7 +1002,7 @@ void StepEditorScreen::setNoteA(int i)
 		return;
 
 	noteA = i;
-	
+
 	if (noteA > noteB)
 		noteB = noteA;
 
@@ -1015,9 +1016,9 @@ void StepEditorScreen::setNoteB(int i)
 {
 	if (i < 0 || i > 127)
 		return;
-	
+
 	noteB = i;
-	
+
 	if (noteB < noteA)
 		noteA = noteB;
 
@@ -1033,7 +1034,7 @@ void StepEditorScreen::setControl(int i)
 		return;
 
 	control = i;
-	
+
 	setViewNotesText();
 	initVisibleEvents();
 	refreshEventRows();
@@ -1098,7 +1099,7 @@ void StepEditorScreen::setSelectionStartIndex(int i)
 
 	selectionStartIndex = i;
 	selectionEndIndex = i;
-	
+
 	ls.lock()->setFunctionKeysArrangement(1);
 	refreshSelection();
 }
@@ -1116,14 +1117,14 @@ void StepEditorScreen::setSelectionEndIndex(int i)
 	if (i == -1)
 		return;
 
-	selectionEndIndex = i;	
+	selectionEndIndex = i;
 	refreshSelection();
 }
 
 void StepEditorScreen::finalizeSelection(int i)
 {
 	selectionEndIndex = i;
-	
+
 	if (selectionEndIndex < selectionStartIndex)
 	{
 		auto oldSelectionStartIndex = selectionStartIndex;
@@ -1139,13 +1140,13 @@ void StepEditorScreen::setSelectedEvents()
 	selectedEvents.clear();
 	auto firstEventIndex = selectionStartIndex;
 	auto lastEventIndex = selectionEndIndex;
-	
+
 	if (firstEventIndex > lastEventIndex)
 	{
 		firstEventIndex = selectionEndIndex;
 		lastEventIndex = selectionStartIndex;
 	}
-	
+
 	for (int i = firstEventIndex; i < lastEventIndex + 1; i++)
 		selectedEvents.push_back(eventsAtCurrentTick[i].lock());
 }
@@ -1183,20 +1184,20 @@ void StepEditorScreen::removeEvents()
 	init();
 	auto firstEventIndex = selectionStartIndex;
 	auto lastEventIndex = selectionEndIndex;
-	
+
 	if (firstEventIndex > lastEventIndex)
 	{
 		firstEventIndex = selectionEndIndex;
 		lastEventIndex = selectionStartIndex;
 	}
-	
+
 	int eventCounter = 0;
-	
+
 	vector<weak_ptr<Event>> tempList;
-	
+
 	for (auto& e : eventsAtCurrentTick)
 		tempList.push_back(e);
-	
+
 	for (auto& event : tempList)
 	{
 		if (eventCounter >= firstEventIndex && eventCounter <= lastEventIndex)
@@ -1220,22 +1221,18 @@ void StepEditorScreen::update(moduru::observer::Observable*, nonstd::any message
 {
 	auto msg = nonstd::any_cast<string>(message);
 
-	if (msg.compare("padandnote") == 0)
+    if (msg.compare("step-editor") == 0)
 	{
-		setFromNote(mpc.getNote());
-	}
-	else if (msg.compare("step-editor") == 0)
-	{
-    auto& pads = mpc.getHardware().lock()->getPads();
+        auto& pads = mpc.getHardware().lock()->getPads();
 
-    auto anyPadIsPressed = std::any_of(
-        pads.begin(),
-        pads.end(),
-        [](const std::shared_ptr<mpc::hardware::HwPad> &p) {
-          return p->isPressed();
-        });
+        auto anyPadIsPressed = std::any_of(
+                pads.begin(),
+                pads.end(),
+                [](const std::shared_ptr<mpc::hardware::HwPad> &p) {
+                    return p->isPressed();
+                });
 
-    if (anyPadIsPressed)
+        if (anyPadIsPressed)
 		{
 			// a note is currently being recorded by the user pressing a pad
 			initVisibleEvents();

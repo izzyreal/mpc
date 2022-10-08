@@ -15,7 +15,6 @@
 
 #include <disk/MpcFile.hpp>
 
-#include <mpc/MpcStereoMixerChannel.hpp>
 #include <mpc/MpcNoteParameters.hpp>
 
 #include <stdexcept>

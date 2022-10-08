@@ -11,13 +11,10 @@
 #include <sequencer/NoteEvent.hpp>
 #include <sequencer/Sequencer.hpp>
 #include <sequencer/Track.hpp>
-#include <sequencer/Sequence.hpp>
 
-#include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/ZoneScreen.hpp>
 #include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
 
-#include <synth/SynthChannel.hpp>
 #include <audio/server/NonRealTimeAudioServer.hpp>
 
 #include <mpc/MpcBasicSoundPlayerChannel.hpp>
@@ -359,6 +356,10 @@ std::vector<std::string> Sampler::getSoundNames()
 
 std::string Sampler::getPadName(int i)
 {
+    if (i < 0)
+    {
+        return "OFF";
+    }
 	return padNames[i];
 }
 
@@ -572,6 +573,8 @@ void Sampler::deleteAllSamples()
 		for (auto& n : p->getNotesParameters())
 			n->setSoundIndex(-1);
 	}
+
+    soundIndex = 0;
 }
 
 void Sampler::process12Bit(std::vector<float>* fa)
@@ -809,22 +812,12 @@ std::string Sampler::addOrIncreaseNumber2(std::string s)
 
 Pad* Sampler::getLastPad(Program* program)
 {
-	auto lastValidPad = mpc.getPad();
-	
-	if (lastValidPad == -1)
-		lastValidPad = mpc.getPrevPad();
-
-	return program->getPad(lastValidPad);
+	return program->getPad(mpc.getPad());
 }
 
 NoteParameters* Sampler::getLastNp(Program* program)
 {
-	auto lastValidNote = mpc.getNote();
-	
-	if (lastValidNote == 34)
-		lastValidNote = mpc.getPrevNote();
-
-	return dynamic_cast<mpc::sampler::NoteParameters*>(program->getNoteParameters(lastValidNote));
+	return dynamic_cast<mpc::sampler::NoteParameters*>(program->getNoteParameters(mpc.getNote()));
 }
 
 std::vector<std::weak_ptr<Sound>> Sampler::getUsedSounds()

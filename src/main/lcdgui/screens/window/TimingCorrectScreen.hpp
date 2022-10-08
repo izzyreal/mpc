@@ -18,7 +18,6 @@ namespace mpc::lcdgui::screens::window
 
 	public:
 		void open() override;
-		void close() override;
 
 	private:
 		void displayNoteValue();
@@ -46,8 +45,5 @@ namespace mpc::lcdgui::screens::window
 		void setAmount(int i);
 		void setShiftTimingLater(bool b);
 		void setSwing(int i);
-		
-	public:
-		void update(moduru::observer::Observable* observable, nonstd::any message) override;
 	};
 }

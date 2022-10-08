@@ -1,6 +1,5 @@
 #include "EventsScreen.hpp"
 
-#include <sequencer/Event.hpp>
 #include <sequencer/Track.hpp>
 #include <sequencer/NoteEvent.hpp>
 #include <sequencer/SeqUtil.hpp>
@@ -20,6 +19,26 @@ using namespace std;
 EventsScreen::EventsScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "events", layerIndex)
 {
+}
+
+void EventsScreen::pad(int padIndexWithBank, int velo, bool isNoteRepeat, int tick)
+{
+    ScreenComponent::pad(padIndexWithBank, velo, isNoteRepeat, tick);
+
+    init();
+
+    if (param != "note0")
+    {
+        return;
+    }
+
+    int newNote = program.lock()->getNoteFromPad(padIndexWithBank);
+
+    if (newNote >= 35)
+    {
+        note0 = newNote;
+        displayNotes();
+    }
 }
 
 void EventsScreen::open()
@@ -67,23 +86,6 @@ void EventsScreen::open()
 	displayMode();
 	displayStart();
 	displayCopies();
-
-	mpc.addObserver(this); // Subscribe to "padandnote" events
-}
-
-void EventsScreen::close()
-{
-	mpc.deleteObserver(this);
-}
-
-void EventsScreen::update(moduru::observer::Observable* observable, nonstd::any message)
-{
-	string msg = nonstd::any_cast<string>(message);
-
-	if (msg.compare("padandnote") == 0)
-	{
-		displayNotes();
-	}
 }
 
 void EventsScreen::function(int i)
@@ -144,7 +146,7 @@ void EventsScreen::function(int i)
 					}
 					else
 					{
-						if (mpc.getNote() != 34 && mpc.getNote() != ne->getNote())
+						if (note0 != 34 && note0 != ne->getNote())
 							continue;
 					}
 				}
@@ -255,26 +257,28 @@ void EventsScreen::turnWheel(int i)
 	init();
 	auto toSequence = sequencer.lock()->getSequence(toSq).lock();
 
-	if (checkAllTimesAndNotes(mpc, i, sequencer.lock()->getActiveSequence().lock().get(), sequencer.lock()->getActiveTrack().lock().get()))
-		return;
+    if (checkAllTimesAndNotes(mpc, i, sequencer.lock()->getActiveSequence().lock().get(), sequencer.lock()->getActiveTrack().lock().get()))
+    {
+        return;
+    }
 
-	if (param.compare("start0") == 0)
+    if (param == "start0")
 	{
 		setStart(SeqUtil::setBar(SeqUtil::getBar(toSequence.get(), start) + i, toSequence.get(), start));
 	}
-	else if (param.compare("start1") == 0)
+	else if (param == "start1")
 	{
 		setStart(SeqUtil::setBeat(SeqUtil::getBeat(toSequence.get(), start) + i, toSequence.get(), start));
 	}
-	else if (param.compare("start2") == 0)
+	else if (param == "start2")
 	{
 		setStart(SeqUtil::setClock(SeqUtil::getClock(toSequence.get(), start) + i, toSequence.get(), start));
 	}
-	else if (param.compare("edit") == 0)
+	else if (param == "edit")
 	{
 		setEdit(editFunctionNumber + i);
 	}
-	else if (param.compare("from-sq") == 0)
+	else if (param == "from-sq")
 	{
 		setFromSq(sequencer.lock()->getActiveSequenceIndex() + i);
 		
@@ -283,11 +287,11 @@ void EventsScreen::turnWheel(int i)
 		if (time1 > fromSeq->getLastTick())
 			setTime1(fromSeq->getLastTick());
 	}
-	else if (param.compare("from-tr") == 0)
+	else if (param == "from-tr")
 	{
 		setFromTr(sequencer.lock()->getActiveTrackIndex() +i);
 	}
-	else if (param.compare("to-sq") == 0)
+	else if (param == "to-sq")
 	{
 		setToSq(toSq + i);
 		auto toSeq = sequencer.lock()->getSequence(toSq).lock();
@@ -295,11 +299,11 @@ void EventsScreen::turnWheel(int i)
 		if (start > toSeq->getLastTick())
 			setStart(toSeq->getLastTick());
 	}
-	else if (param.compare("to-tr") == 0)
+	else if (param == "to-tr")
 	{
 		setToTr(toTr + i);
 	}
-	else if (param.compare("mode") == 0)
+	else if (param == "mode")
 	{
 		if (editFunctionNumber == 0)
 		{
@@ -318,7 +322,7 @@ void EventsScreen::turnWheel(int i)
 			setTransposeAmount(transposeAmount + i);
 		}
 	}
-	else if (param.compare("copies") == 0)
+	else if (param == "copies")
 	{
 		if (editFunctionNumber == 0)
 		{
@@ -532,9 +536,7 @@ void EventsScreen::displayMidiNotes()
 
 void EventsScreen::displayDrumNotes()
 {
-	auto drumNote = mpc.getNote();
-
-	if (drumNote == 34)
+	if (note0 == 34)
 	{
 		findField("note0").lock()->setText("ALL");
 	}
@@ -543,10 +545,9 @@ void EventsScreen::displayDrumNotes()
 		auto track = sequencer.lock()->getActiveTrack().lock();
 		auto program = sampler.lock()->getProgram(sampler.lock()->getDrum(track->getBus() - 1)->getProgram()).lock();
 		
-		auto noteText = StrUtil::padLeft(to_string(drumNote), " ", 2);
-		auto padText = sampler.lock()->getPadName(program->getPadIndexFromNote(drumNote));
-		
-		findField("note0").lock()->setText(noteText + "/" + padText);
+		auto noteText = StrUtil::padLeft(to_string(note0), " ", 2);
+		auto padName = sampler.lock()->getPadName(program->getPadIndexFromNote(note0));
+		findField("note0").lock()->setText(noteText + "/" + padName);
 	}
 }
 

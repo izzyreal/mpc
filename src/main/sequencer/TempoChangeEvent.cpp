@@ -1,7 +1,6 @@
 #include "TempoChangeEvent.hpp"
 
 #include <sequencer/Sequence.hpp>
-#include <sequencer/Sequence.hpp>
 #include <sequencer/SeqUtil.hpp>
 
 using namespace mpc::sequencer;

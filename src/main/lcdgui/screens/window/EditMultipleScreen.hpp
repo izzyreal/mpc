@@ -15,22 +15,15 @@ namespace mpc::lcdgui::screens::window {
 	public:
 		void function(int i) override;
 		void turnWheel(int i) override;
+        EditMultipleScreen(mpc::Mpc& mpc, const int layerIndex);
+        void open() override;
+        void close() override;
+
+        void setChangeNoteTo(int i);
 
 	private:
 		int editType = 0;
-
-		void checkThreeParameters();
-		void checkFiveParameters();
-		void checkNotes();
-
-	public:
-		EditMultipleScreen(mpc::Mpc& mpc, const int layerIndex);
-		void open() override;
-		void close() override;
-		void update(moduru::observer::Observable* o, nonstd::any arg) override;
-
-	private:
-		std::vector<std::string> noteVariationParameterNames = { "Tun", "Dcy", "Atk", "Flt" };
+        std::vector<std::string> noteVariationParameterNames = { "Tun", "Dcy", "Atk", "Flt" };
 		std::vector<std::string> editTypeNames = { "ADD VALUE", "SUB VALUE", "MULT VAL%", "SET TO VAL" };
 		std::vector<std::string> singleLabels = { "Change note to:", "Variation type:", "Variation value:" };
 		const int xPosSingle = 60;
@@ -44,11 +37,14 @@ namespace mpc::lcdgui::screens::window {
 		int variationValue = 0;
 		int editValue = 0;
 
-		void updateEditMultiple();
+        void checkThreeParameters();
+        void checkFiveParameters();
+        void checkNotes();
+
+        void updateEditMultiple();
 		void updateDouble();
 		void setEditType(int i);
 
-		void setChangeNoteTo(int i);
 		void setVariationType(int i);
 		void seVariationValue(int i);
 		void setEditValue(int i);

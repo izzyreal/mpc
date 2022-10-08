@@ -7,7 +7,6 @@
 #include <sequencer/SeqUtil.hpp>
 #include <audio/server/NonRealTimeAudioServer.hpp>
 
-#include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/SongScreen.hpp>
 #include <lcdgui/screens/window/NameScreen.hpp>
 

@@ -10,15 +10,11 @@ namespace mpc::lcdgui::screens::window {
 	{
 
 	public:
+        EditVelocityScreen(mpc::Mpc& mpc, const int layerIndex);
+
 		void function(int i) override;
 		void turnWheel(int i) override;
-
-	public:
-		EditVelocityScreen(mpc::Mpc& mpc, const int layerIndex);
-
-	public:
-		void open() override;
-		void close() override;
+        void open() override;
 
 	private:
 		int editType = 0;
@@ -28,17 +24,12 @@ namespace mpc::lcdgui::screens::window {
 	private:
 		void setEditType(int i);
 		void setValue(int i);
-
-	private:
-		void displayValue();
+        void displayValue();
 		void displayEditType();
 
 	protected:
 		void displayNotes() override;
 		void displayTime() override;
-
-	public:
-		void update(moduru::observer::Observable* observable, nonstd::any message) override;
 
 	};
 }

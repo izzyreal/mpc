@@ -9,7 +9,6 @@
 #include <disk/ProgramImportAdapter.hpp>
 #include <disk/SoundLoader.hpp>
 #include <sampler/Program.hpp>
-#include <sampler/Sampler.hpp>
 #include <sequencer/Track.hpp>
 
 #include <lcdgui/screens/window/LoadAProgramScreen.hpp>

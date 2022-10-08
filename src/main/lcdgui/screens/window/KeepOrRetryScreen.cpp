@@ -16,9 +16,10 @@ KeepOrRetryScreen::KeepOrRetryScreen(mpc::Mpc& mpc, const int layerIndex)
 void KeepOrRetryScreen::open()
 {
     init();
+    assignToNote = 34;
     displayNameForNewSound();
     displayAssignToNote();
-    mpc.addObserver(this); // Subscribe to "padandnote" message
+    mpc.addObserver(this); // Subscribe to "note" message
 }
 
 void KeepOrRetryScreen::close()
@@ -47,16 +48,11 @@ void KeepOrRetryScreen::function(int i)
             {
                 return;
             }
-            mpc.getControls().lock()->setF4Pressed(true);
             sampler.lock()->playPreviewSample(0, sampler.lock()->getPreviewSound().lock()->getLastFrameIndex(), 0, 2);
             break;
         case 4:
             auto index = sampler.lock()->getSoundCount() - 1;
-            auto note = mpc.getNote();
-            
-            if (note != 34)
-                sampler.lock()->getLastNp(program.lock().get())->setSoundIndex(index);
-            
+            sampler.lock()->getLastNp(program.lock().get())->setSoundIndex(index);
             sampler.lock()->setSoundIndex(index);
             openScreen("sample");
             break;
@@ -96,20 +92,27 @@ void KeepOrRetryScreen::turnWheel(int i)
     }
     else if (param.compare("assign-to-note") == 0)
     {
-        auto note = mpc.getNote();
-        
-        if ( (note == 34 && i < 0) || (note == 98 && i > 0) )
+        auto newAssignToNote = assignToNote + i;
+
+        if (newAssignToNote < 34)
         {
-            return;
+            newAssignToNote = 34;
         }
-        
-        auto candidate = note + i;
-        if (candidate < 34) candidate = 34;
-        else if (candidate > 98) candidate = 98;
-        
-        auto pad = program.lock()->getPadIndexFromNote(candidate);
-        
-        mpc.setPadAndNote(pad, candidate);
+        else if (newAssignToNote > 98)
+        {
+            newAssignToNote = 98;
+        }
+
+        if (newAssignToNote == 34)
+        {
+            mpc.setNote(35);
+            assignToNote = newAssignToNote;
+            displayAssignToNote();
+        }
+        else
+        {
+            mpc.setNote(newAssignToNote);
+        }
     }
 }
 
@@ -123,10 +126,9 @@ void KeepOrRetryScreen::displayNameForNewSound()
 
 void KeepOrRetryScreen::displayAssignToNote()
 {
-    auto pad = mpc.getPad();
-    auto note = mpc.getNote();
-    auto noteStr = note == 34 ? "--" : to_string(note);
-    auto padStr = pad == -1 ? "OFF" : sampler.lock()->getPadName(pad);
+    init();
+    auto noteStr = assignToNote == 34 ? "--" : std::to_string(assignToNote);
+    auto padStr = sampler.lock()->getPadName(program.lock()->getPadIndexFromNote(assignToNote));
     findField("assign-to-note").lock()->setText(noteStr + "/" + padStr);
 }
 
@@ -134,6 +136,9 @@ void KeepOrRetryScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 {
     string s = nonstd::any_cast<string>(arg);
     
-    if (s.compare("padandnote") == 0)
+    if (s.compare("note") == 0)
+    {
+        assignToNote = mpc.getNote();
         displayAssignToNote();
+    }
 }

@@ -27,8 +27,6 @@
 #include <cmath>
 #include <lang/StrUtil.hpp>
 
-#include <sstream>
-
 using namespace mpc::lcdgui;
 using namespace mpc::sequencer;
 using namespace moduru::lang;
@@ -338,7 +336,8 @@ void EventRow::setMixerEventValues()
 	auto program = sampler->getProgram(sampler->getDrumBusProgramNumber(bus)).lock();
 	auto nn = program->getPad(mixerEvent->getPad())->getNote();
 
-	fields[1].lock()->setText(string(nn == 34 ? "--" : to_string(nn)) + "/" + sampler->getPadName(mixerEvent->getPad()));
+    auto padName = sampler->getPadName(mixerEvent->getPad());
+    fields[1].lock()->setText(string(nn == 34 ? "--" : to_string(nn)) + "/" + padName);
 	
 	if (mixerEvent->getParameter() == 1)
 	{
@@ -393,7 +392,8 @@ void EventRow::setDrumNoteEventValues()
 		{
 			auto sampler = mpc.getSampler().lock();
 			auto program = sampler->getProgram(sampler->getDrumBusProgramNumber(bus)).lock();
-			fields[0].lock()->setText(to_string(ne->getNote()) + "/" + sampler->getPadName(program->getPadIndexFromNote(ne->getNote())));
+            auto padName = sampler->getPadName(program->getPadIndexFromNote(ne->getNote()));
+            fields[0].lock()->setText(to_string(ne->getNote()) + "/" + padName);
 		}
 	}
 

@@ -2,15 +2,12 @@
 
 #include <Mpc.hpp>
 
-#include <sequencer/Event.hpp>
 #include <sequencer/Track.hpp>
 #include <sequencer/NoteEvent.hpp>
 #include <sequencer/SeqUtil.hpp>
-#include <sequencer/Sequencer.hpp>
 #include <sequencer/TempoChangeEvent.hpp>
 #include <sequencer/TimeSignature.hpp>
 
-#include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/UserScreen.hpp>
 #include <lcdgui/screens/window/CountMetronomeScreen.hpp>
 #include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>

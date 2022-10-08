@@ -2,7 +2,6 @@
 
 #include "Mpc.hpp"
 
-#include <lcdgui/Component.hpp>
 #include <lcdgui/ScreenComponent.hpp>
 
 #include "Paths.hpp"
@@ -17,15 +16,12 @@
 #include <audiomidi/MpcMidiInput.hpp>
 
 #include <sampler/Sampler.hpp>
-#include <sequencer/Sequence.hpp>
-#include <sequencer/Track.hpp>
 #include <sequencer/Sequencer.hpp>
 #include <mpc/MpcBasicSoundPlayerChannel.hpp>
 #include <mpc/MpcMultiMidiSynth.hpp>
 #include <mpc/MpcSoundPlayerChannel.hpp>
 
 #include <midi/core/MidiTransport.hpp>
-#include <synth/SynthChannel.hpp>
 
 #include <hardware/Hardware.hpp>
 #include <hardware/HwSlider.hpp>
@@ -248,23 +244,15 @@ int Mpc::getBank()
 	return bank;
 }
 
-void Mpc::setPadAndNote(int pad, int note)
+void Mpc::setNote(int newNote)
 {
-	if (pad < -1 || pad > 63 || note < 34 || note > 98)
-		return;
+    if (newNote < 35 || newNote > 98)
+    {
+        return;
+    }
 
-	if (prevPad != pad && pad != -1)
-		prevPad = pad;
-
-	this->pad = pad;
-
-	if (note != 34)
-		prevNote = note;
-
-	this->note = note;
-
-
-	notifyObservers(std::string("padandnote"));
+    note = newNote;
+    notifyObservers(std::string("note"));
 }
 
 int Mpc::getNote()
@@ -275,16 +263,6 @@ int Mpc::getNote()
 int Mpc::getPad()
 {
 	return pad;
-}
-
-int Mpc::getPrevNote()
-{
-	return prevNote;
-}
-
-int Mpc::getPrevPad()
-{
-	return prevPad;
 }
 
 std::string Mpc::getPreviousSamplerScreenName()
@@ -318,4 +296,16 @@ Mpc::~Mpc()
 
 	if (audioMidiServices)
 		audioMidiServices->destroyServices();
+}
+
+void Mpc::setPad(unsigned char padIndexWithBank)
+{
+    if (padIndexWithBank > 63)
+    {
+        return;
+    }
+
+    pad = padIndexWithBank;
+
+    notifyObservers(std::string("pad"));
 }

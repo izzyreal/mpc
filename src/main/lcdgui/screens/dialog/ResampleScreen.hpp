@@ -13,7 +13,7 @@ namespace mpc::lcdgui::screens::dialog
 	{
 
 	public:
-		void turnWheel(int i) override;
+		void turnWheel(int newName2) override;
 		void function(int i) override;
 
 		ResampleScreen(mpc::Mpc& mpc, const int layerIndex);

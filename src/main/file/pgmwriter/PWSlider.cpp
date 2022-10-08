@@ -1,7 +1,6 @@
 #include <file/pgmwriter/PWSlider.hpp>
 
 #include <sampler/Program.hpp>
-#include <sampler/PgmSlider.hpp>
 
 using namespace mpc::file::pgmwriter;
 using namespace std;

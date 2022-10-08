@@ -1,8 +1,6 @@
 #include "PunchRect.hpp"
 #include <Paths.hpp>
 
-#include <file/FileUtil.hpp>
-
 using namespace mpc::lcdgui;
 using namespace std;
 

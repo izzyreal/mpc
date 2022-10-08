@@ -24,7 +24,7 @@ namespace mpc::sampler
 	public:
 		void setNote(int i);
 		int getNote();
-		int getNumber();
+		int getIndex();
 
 	public:
 		Pad(mpc::Mpc& mpc, int index);

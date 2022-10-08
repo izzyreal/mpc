@@ -1,13 +1,9 @@
 #include "MidiInput.hpp"
 
 #include <Mpc.hpp>
-#include <lcdgui/screens/window/MultiRecordingSetupLine.hpp>
-#include <sequencer/Sequencer.hpp>
 
 #include <lcdgui/screens/window/MultiRecordingSetupScreen.hpp>
 #include <lcdgui/screens/window/MidiInputScreen.hpp>
-
-#include <lcdgui/Screens.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;

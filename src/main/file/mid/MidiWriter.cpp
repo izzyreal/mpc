@@ -22,7 +22,6 @@
 #include <disk/AbstractDisk.hpp>
 #include <sequencer/ChannelPressureEvent.hpp>
 #include <sequencer/ControlChangeEvent.hpp>
-#include <sequencer/Event.hpp>
 #include <sequencer/MixerEvent.hpp>
 #include <sequencer/Sequence.hpp>
 #include <sequencer/Track.hpp>
@@ -35,7 +34,6 @@
 
 #include <lang/StrUtil.hpp>
 #include <file/ByteUtil.hpp>
-#include <file/FileUtil.hpp>
 
 #include <set>
 

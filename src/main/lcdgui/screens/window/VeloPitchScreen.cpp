@@ -21,7 +21,7 @@ void VeloPitchScreen::open()
 	displayVeloPitch();
 	displayVelo();
 
-	mpc.addObserver(this); // Subscribe to "padandnote" messages
+	mpc.addObserver(this); // Subscribe to "note" messages
 }
 
 void VeloPitchScreen::close()
@@ -47,8 +47,8 @@ void VeloPitchScreen::turnWheel(int i)
 	}
 	else if (param.compare("note") == 0)
 	{
-		mpc.setPadAndNote(mpc.getPad(), mpc.getNote() + i);
-		// We could call all display methods here, but we instead rely on the "padandnote" message
+		mpc.setNote(mpc.getNote() + i);
+		// We could call all display methods here, but we instead rely on the "note" message
 	}
 }
 
@@ -76,7 +76,7 @@ void VeloPitchScreen::update(moduru::observer::Observable* observable, nonstd::a
 {
 	auto msg = nonstd::any_cast<string>(message);
 
-	if (msg.compare("padandnote") == 0)
+	if (msg.compare("note") == 0)
 	{
 		displayNote();
 		displayTune();
@@ -89,7 +89,7 @@ void VeloPitchScreen::displayNote()
 	auto noteParameters = sampler.lock()->getLastNp(program.lock().get());
 	auto soundIndex = noteParameters->getSoundIndex();
 	auto padIndex = program.lock()->getPadIndexFromNote(noteParameters->getNumber());
-	auto padName = padIndex != -1 ? sampler.lock()->getPadName(padIndex) : "OFF";
+	auto padName = sampler.lock()->getPadName(padIndex);
 	auto sampleName = soundIndex != -1 ? sampler.lock()->getSoundName(soundIndex) : "OFF";
 	string stereo = noteParameters->getStereoMixerChannel().lock()->isStereo() && soundIndex != -1 ? "(ST)" : "";
 	findField("note").lock()->setText(to_string(noteParameters->getNumber()) + "/" + padName + "-" + StrUtil::padRight(sampleName, " ", 16) + stereo);
