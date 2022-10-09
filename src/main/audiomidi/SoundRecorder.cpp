@@ -131,10 +131,10 @@ void SoundRecorder::cancel()
 	cancelled = true;
 }
 
-void applyGain(float gain, vector<float>* data)
+void applyGain(float gain, vector<float>& data)
 {
-	for (int i = 0; i < data->size(); i++)
-		(*data)[i] *= gain;
+	for (int i = 0; i < data.size(); i++)
+		data[i] *= gain;
 }
 
 void SoundRecorder::setSampleScreenActive(bool active)
@@ -144,8 +144,8 @@ void SoundRecorder::setSampleScreenActive(bool active)
 
 int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf, int nFrames)
 {
-	auto left = buf->getChannel(0);
-	auto right = buf->getChannel(1);
+	auto& left = buf->getChannel(0);
+	auto& right = buf->getChannel(1);
 
 	applyGain(inputGain * 0.01, left);
 	applyGain(inputGain * 0.01, right);
@@ -163,7 +163,7 @@ int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf, int nFrame
 		
 		int frameCounter = 0;
 
-		for (auto& f : (*left))
+		for (auto& f : left)
 		{
 			if ((mode == 0 || mode == 2) && abs(f) > peakL) peakL = abs(f);
 			if (!recording) preRecBufferLeft.put(f);
@@ -172,7 +172,7 @@ int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf, int nFrame
 		}
 
 		frameCounter = 0;
-		for (auto& f : (*right))
+		for (auto& f : right)
 		{
 			if ((mode == 1 || mode == 2) && abs(f) > peakR) peakR = abs(f);
 			if (!recording) preRecBufferRight.put(f);
@@ -243,8 +243,8 @@ int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf, int nFrame
 
 			if (resample)
 			{
-				auto resampledLeft = resampleChannel(true, &preLeft, buf->getSampleRate());
-				auto resampledRight = resampleChannel(false, &preRight, buf->getSampleRate());
+				auto resampledLeft = resampleChannel(true, preLeft, buf->getSampleRate());
+				auto resampledRight = resampleChannel(false, preRight, buf->getSampleRate());
 
 				if (mode == 0) {
 					osc->insertFrames(resampledLeft, 0);
@@ -276,22 +276,22 @@ int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf, int nFrame
 
 		if ((mode == 0 || mode == 2) && resample) {
 			resampledLeft = resampleChannel(true, left, buf->getSampleRate());
-			left = &resampledLeft;
+			left = resampledLeft;
 		}
 
 		vector<float> resampledRight;
 
 		if ((mode == 1 || mode == 2) && resample) {
 			resampledRight = resampleChannel(false, right, buf->getSampleRate());
-			right = &resampledRight;
+			right = resampledRight;
 		}
 
 		if (mode == 0)
-			osc->insertFrames(*left, currentLength);
+			osc->insertFrames(left, currentLength);
 		else if (mode == 1)
-			osc->insertFrames(*right, currentLength);
+			osc->insertFrames(right, currentLength);
 		else if (mode == 2)
-			osc->insertFrames(*left, *right, currentLength);
+			osc->insertFrames(left, right, currentLength);
 
 		if (osc->getFrameCount() >= lengthInFrames) {
 			recording = false;
@@ -303,12 +303,12 @@ int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf, int nFrame
 	return AUDIO_SILENCE;
 }
 
-vector<float> SoundRecorder::resampleChannel(bool left, vector<float>* buffer, int sourceSampleRate)
+vector<float> SoundRecorder::resampleChannel(bool left, vector<float>& buffer, int sourceSampleRate)
 {
 	auto ratio = 44100.f / sourceSampleRate;
 	auto circBuf = left ? &resampleBufferLeft : &resampleBufferRight;
 
-	for (auto f : (*buffer)) {
+	for (auto f : buffer) {
 		circBuf->put(f);
 	}
 

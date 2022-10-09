@@ -57,7 +57,7 @@ public:
     
 private:
     void stop();
-    void resampleChannel(bool left, std::vector<float>* input, int sourceSampleRate, int destinationSampleRate, bool endOfInput);
+    void resampleChannel(bool left, std::vector<float>& input, int sourceSampleRate, int destinationSampleRate, bool endOfInput);
     
 public:
     SoundPlayer();

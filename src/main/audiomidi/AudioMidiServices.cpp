@@ -28,9 +28,6 @@
 #include <lcdgui/Screens.hpp>
 
 // ctoot
-#include <audio/core/AudioFormat.hpp>
-#include <audio/core/AudioControlsChain.hpp>
-#include <audio/core/AudioProcess.hpp>
 #include <audio/core/ChannelFormat.hpp>
 
 #include <audio/mixer/AudioMixer.hpp>
@@ -42,34 +39,25 @@
 
 #include <audio/server/CompoundAudioClient.hpp>
 #include <audio/server/IOAudioProcess.hpp>
-#include <audio/server/AudioServer.hpp>
 #include <audio/server/NonRealTimeAudioServer.hpp>
 #include <audio/server/ExternalAudioServer.hpp>
 
 #include <audio/system/MixerConnectedAudioSystem.hpp>
-#include <audio/system/AudioDevice.hpp>
 #include <audio/system/AudioOutput.hpp>
 
 #include <control/CompoundControl.hpp>
-#include <control/Control.hpp>
 
-#include <midi/core/MidiSystem.hpp>
 #include <midi/core/DefaultConnectedMidiSystem.hpp>
 
-#include <synth/MidiChannel.hpp>
-#include <synth/MidiSynth.hpp>
 #include <synth/SynthChannel.hpp>
-#include <synth/SynthChannelControls.hpp>
 #include <synth/SynthRack.hpp>
 #include <synth/SynthRackControls.hpp>
 
 #include <audio/reverb/BarrControls.hpp>
-#include <audio/reverb/BarrProcess.hpp>
 
 #include <audio/core/AudioServices.hpp>
 #include <audio/spi/AudioServiceProvider.hpp>
 
-#include <synth/synths/multi/MultiSynthServiceProvider.hpp>
 #include <synth/SynthServices.hpp>
 #include <synth/SynthChannelServices.hpp>
 
@@ -104,6 +92,7 @@ AudioMidiServices::AudioMidiServices(mpc::Mpc& mpc)
 	AudioServices::scan();
 	ctoot::synth::SynthServices::scan();
 	ctoot::synth::SynthChannelServices::scan();
+    ctoot::synth::SynthChannel::freqTable();
 }
 
 void AudioMidiServices::start(const int sampleRate, const int inputCount, const int outputCount) {

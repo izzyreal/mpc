@@ -97,8 +97,8 @@ int SoundPlayer::processAudio(AudioBuffer* buf, int nFrames)
 {
 	std::unique_lock<std::mutex> guard(_playing);
 
-	auto left = buf->getChannel(0);
-	auto right = buf->getChannel(1);
+	auto& left = buf->getChannel(0);
+	auto& right = buf->getChannel(1);
 
 	if (!playing) {
 		buf->makeSilence();
@@ -169,7 +169,7 @@ int SoundPlayer::processAudio(AudioBuffer* buf, int nFrames)
 		if (resampleOutputBufferLeft.available() >= nFrames) {
 
 			for (int i = 0; i < nFrames; i++) {
-				(*left)[i] = resampleOutputBufferLeft.get();
+				left[i] = resampleOutputBufferLeft.get();
 			}
 
 			if (audioFormat->getChannels() == 1) {
@@ -177,7 +177,7 @@ int SoundPlayer::processAudio(AudioBuffer* buf, int nFrames)
 			}
 			else {
 				for (int i = 0; i < nFrames; i++) {
-					(*right)[i] = resampleOutputBufferRight.get();
+					right[i] = resampleOutputBufferRight.get();
 				}
 			}
 		}
@@ -186,7 +186,7 @@ int SoundPlayer::processAudio(AudioBuffer* buf, int nFrames)
 			auto remaining = resampleOutputBufferLeft.available();
 
 			for (int i = 0; i < std::min( (int) remaining, nFrames); i++) {
-				(*left)[i] = resampleOutputBufferLeft.get();
+				left[i] = resampleOutputBufferLeft.get();
 			}
 
 			if (audioFormat->getChannels() == 1) {
@@ -194,7 +194,7 @@ int SoundPlayer::processAudio(AudioBuffer* buf, int nFrames)
 			}
 			else {
 				for (int i = 0; i < std::min( (int)remaining, nFrames); i++) {
-					(*right)[i] = resampleOutputBufferRight.get();
+					right[i] = resampleOutputBufferRight.get();
 				}
 			}
 		}
@@ -205,14 +205,14 @@ int SoundPlayer::processAudio(AudioBuffer* buf, int nFrames)
 		if (sourceBuffer->getChannelCount() == 1) {
 			
 			for (int i = 0; i < frameCountToWrite; i++) {
-				(*left)[i] = (*sourceBuffer->getChannel(0))[i];
-				(*right)[i] = (*left)[i];
+				left[i] = sourceBuffer->getChannel(0)[i];
+				right[i] = left[i];
 			}
 		}
 		else {
 			for (int i = 0; i < frameCountToWrite; i++) {
-				(*left)[i] = (*sourceBuffer->getChannel(0))[i];
-				(*right)[i] = (*sourceBuffer->getChannel(1))[i];
+				left[i] = sourceBuffer->getChannel(0)[i];
+				right[i] = sourceBuffer->getChannel(1)[i];
 			}
 		}
 	}
@@ -223,16 +223,16 @@ int SoundPlayer::processAudio(AudioBuffer* buf, int nFrames)
 		int bufferIndex = 0;
 
 		while (fadeFactor >= 0.0f && bufferIndex < nFrames) {
-			(*left)[bufferIndex] = (*left)[bufferIndex] * fadeFactor;
-			(*right)[bufferIndex] = (*right)[bufferIndex] * fadeFactor;
+			left[bufferIndex] = left[bufferIndex] * fadeFactor;
+			right[bufferIndex] = right[bufferIndex] * fadeFactor;
 			fadeFactor -= 0.002f;
 			bufferIndex++;
 		}
 
 		if (bufferIndex != nFrames) {
 			for (int i = bufferIndex; i < nFrames; i++) {
-				(*left)[i] = 0;
-				(*right)[i] = 0;
+				left[i] = 0;
+				right[i] = 0;
 			}
 		}
 	}
@@ -249,13 +249,13 @@ int SoundPlayer::processAudio(AudioBuffer* buf, int nFrames)
 	return AUDIO_OK;
 }
 
-void SoundPlayer::resampleChannel(bool left, std::vector<float>* inputBuffer, int sourceSampleRate, int destinationSampleRate, bool endOfInput)
+void SoundPlayer::resampleChannel(bool left, std::vector<float>& inputBuffer, int sourceSampleRate, int destinationSampleRate, bool endOfInput)
 {
 	auto ratio = static_cast<float>(destinationSampleRate) / static_cast<float>(sourceSampleRate);
 	auto circularInputBuffer = left ? &resampleInputBufferLeft : &resampleInputBufferRight;
 	auto circularOutputBuffer = left ? &resampleOutputBufferLeft : &resampleOutputBufferRight;
 
-	for (auto f : (*inputBuffer)) {
+	for (auto f : inputBuffer) {
 		circularInputBuffer->put(f);
 	}
 
