@@ -33,6 +33,9 @@ void FileExistsScreen::mainScreen()
 	if (loadASoundCandidate && existingSound)
 	{
 		sampler.lock()->deleteSound(sampler.lock()->getPreviewSound());
+		loadASoundCandidate = {};
+		existingSound = {};
+		actionAfterAddingSound = [](bool){};
 	}
 	ScreenComponent::mainScreen();
 }
@@ -48,13 +51,6 @@ void FileExistsScreen::setLoadASoundCandidateAndExistingSound(
 void FileExistsScreen::setActionAfterAddingSound(std::function<void(bool)> action)
 {
 	actionAfterAddingSound = action;
-}
-
-void FileExistsScreen::close()
-{
-	loadASoundCandidate = {};
-	existingSound = {};
-	actionAfterAddingSound = [](bool){};
 }
 
 void FileExistsScreen::function(int i)
@@ -75,6 +71,9 @@ void FileExistsScreen::function(int i)
 			loadASoundCandidate->setMemoryIndex(candidateSoundMemoryIndex);
 			sampler.lock()->deleteSound(loadASoundCandidate);
 			actionAfterAddingSound(existingSound->isMono());
+			loadASoundCandidate = {};
+			existingSound = {};
+			actionAfterAddingSound = [](bool){};
 			openScreen("load");
 			return;
 		}
@@ -165,18 +164,41 @@ void FileExistsScreen::function(int i)
 		if (loadASoundCandidate && existingSound)
 		{
 			sampler.lock()->deleteSound(sampler.lock()->getPreviewSound());
+			loadASoundCandidate = {};
+			existingSound = {};
+			actionAfterAddingSound = [](bool){};
 		}
 		ScreenComponent::function(3);
 		break;
 	case 4:
 	{
+		auto nameScreen = mpc.screens->get<NameScreen>("name");
+
 		if (existingSound && loadASoundCandidate)
 		{
 			// rename
+			const auto renamer = [this, nameScreen](const string& newName) {
+				if (StrUtil::eqIgnoreCase(loadASoundCandidate->getName(), newName))
+				{
+					nameScreen->screenToReturnTo = "";
+				}
+				else
+				{
+					loadASoundCandidate->setName(newName);
+					nameScreen->screenToReturnTo = "load";
+					loadASoundCandidate = {};
+					existingSound = {};
+					actionAfterAddingSound = [](bool){};
+				}
+			};
+
+			nameScreen->actionWhenGoingToMainScreen = [&](){ sampler.lock()->deleteSound(sampler.lock()->getPreviewSound()); };
+			nameScreen->setRenamerAndScreenToReturnTo(renamer, "load-a-sound");
+			nameScreen->setName(loadASoundCandidate->getName());
+			nameScreen->setNameLimit(16);
+			openScreen("name");
 			return;
 		}
-
-		auto nameScreen = mpc.screens->get<NameScreen>("name");
 
 		vector<string> screens{ "save-a-program", "save-a-sequence", "save-a-sound" };
 

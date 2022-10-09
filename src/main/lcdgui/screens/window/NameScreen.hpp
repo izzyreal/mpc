@@ -65,6 +65,8 @@ public:
     void turnWheel(int j) override;
     void function(int i) override;
     void pressEnter() override;
+    void mainScreen() override;
+    void numpad() {} // Block ways to leave the screen inadvertently
 
     void typeCharacter(char c);
     void backSpace();
@@ -86,6 +88,7 @@ private:
     void setRenamerAndScreenToReturnTo(const std::function<void(std::string&)>&, const std::string&);
     
     std::function<void(std::string&)> renamer = [](std::string&){};
+    std::function<void()> actionWhenGoingToMainScreen = [](){};
     std::string screenToReturnTo = "";
     
     std::string name = "";

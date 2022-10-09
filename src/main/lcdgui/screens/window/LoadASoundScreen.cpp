@@ -121,7 +121,8 @@ void LoadASoundScreen::keepSound()
     for (auto& s : sampler.lock()->getSounds())
     {
         if (s.lock() == sound) continue;
-        if (s.lock()->getName() == candidateSoundName)
+
+        if (moduru::lang::StrUtil::eqIgnoreCase(s.lock()->getName(), candidateSoundName))
         {
             existingSound = s.lock();
             break;

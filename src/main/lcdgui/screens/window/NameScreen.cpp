@@ -14,6 +14,12 @@ NameScreen::NameScreen(mpc::Mpc& mpc, const int layerIndex)
 	addChild(make_shared<Underline>());
 }
 
+void NameScreen::mainScreen()
+{
+    actionWhenGoingToMainScreen();
+    ScreenComponent::mainScreen();
+}
+
 void NameScreen::setRenamerAndScreenToReturnTo(const std::function<void(string&)>& renamer, const string& screen)
 {
     this->renamer = renamer;
@@ -38,6 +44,7 @@ void NameScreen::close()
     ls.lock()->setLastFocus("name", "0");
     editing = false;
     parameterName = "";
+    actionWhenGoingToMainScreen = [](){};
 }
 
 void NameScreen::left()
