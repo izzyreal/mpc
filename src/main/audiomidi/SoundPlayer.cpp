@@ -19,6 +19,12 @@ SoundPlayer::SoundPlayer()
 	srcRight = src_new(0, 1, &srcRightError);
 }
 
+SoundPlayer::~SoundPlayer()
+{
+    delete srcLeft;
+    delete srcRight;
+}
+
 bool SoundPlayer::start(std::shared_ptr<std::istream> _istream, SoundPlayerFileFormat f) {
 	std::unique_lock<std::mutex> guard(_playing);
 

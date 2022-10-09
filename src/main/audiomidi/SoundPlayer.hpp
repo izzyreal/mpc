@@ -61,6 +61,7 @@ private:
     
 public:
     SoundPlayer();
+    ~SoundPlayer();
     
 };
 }
