@@ -119,35 +119,49 @@ void MpcMidiInput::transport(MidiMessage *msg, int timeStamp)
       // We do it because the current main use case for MIDI input
       // is to use a controller to replace the real MPC2000XL's
       // hardware pads.
-      mpc.setPad(pad);
-      mpc.setNote(note->getNote());
-      Util::set16LevelsValues(mpc, note, pad);
+//      mpc.setPad(pad);
+//      mpc.setNote(note->getNote());
+//      Util::set16LevelsValues(mpc, note, pad);
     }
 
     if (note->getVelocity() != 0 && track->getBus() > 0 && track->getIndex() < 64 && mpc.getControls().lock()->isTapPressed() && lSequencer->isPlaying())
     {
         return;
     }
-            
-    mpc.getEventHandler().lock()->handleNoThru(note, track.get(), timeStamp);
 
-    if (lSequencer->isRecordingOrOverdubbing())
+    if (pad == -1)
     {
-      note->setDuration(note->getVelocity() == 0 ? 0 : -1);
-      note->setTick(lSequencer->getTickPosition());
+        mpc.getEventHandler().lock()->handleNoThru(note, track.get(), timeStamp);
 
-      if (note->getVelocity() == 0)
-      {
-        mpc::sequencer::NoteEvent &noteOff = *note.get();
-        track->recordNoteOff(noteOff);
-      }
-      else
-      {
-        auto recEvent = track->recordNoteOn().lock();
+        if (lSequencer->isRecordingOrOverdubbing())
+        {
+            note->setDuration(note->getVelocity() == 0 ? 0 : -1);
+            note->setTick(lSequencer->getTickPosition());
 
-        if (recEvent)
-          note->CopyValuesTo(recEvent);
-      }
+            if (note->getVelocity() == 0)
+            {
+                mpc::sequencer::NoteEvent &noteOff = *note.get();
+                track->recordNoteOff(noteOff);
+            }
+            else
+            {
+                auto recEvent = track->recordNoteOn().lock();
+
+                if (recEvent)
+                    note->CopyValuesTo(recEvent);
+            }
+        }
+    }
+    else
+    {
+        if (note->getVelocity() == 0)
+        {
+            mpc.getReleaseControls()->simplePad(pad);
+        }
+        else
+        {
+            mpc.getActiveControls().lock()->pad(pad, note->getVelocity(), false, -1);
+        }
     }
 
     auto midiOutputScreen = mpc.screens->get<MidiOutputScreen>("midi-output");
