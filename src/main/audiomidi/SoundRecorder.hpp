@@ -32,8 +32,6 @@ namespace mpc::audiomidi
 		mpc::Mpc& mpc;
 		bool recording = false;
 		bool cancelled = false;
-		bool sampleScreenWasActive = false;
-		int recordedFrameCount = 0;
 		int lengthInFrames = 0;
 		int mode = 0;
 		std::weak_ptr<Sound> sound;
@@ -44,8 +42,8 @@ namespace mpc::audiomidi
 		circular_buffer<float> preRecBufferLeft = circular_buffer<float>(10000);
 		circular_buffer<float> preRecBufferRight = circular_buffer<float>(10000);
 		
-		SRC_STATE* srcLeft = NULL;
-		SRC_STATE* srcRight = NULL;
+		SRC_STATE* srcLeft = nullptr;
+		SRC_STATE* srcRight = nullptr;
 		int srcLeftError = 0;
 		int srcRightError = 0;
 		unsigned int inputGain = 0;
@@ -57,7 +55,7 @@ namespace mpc::audiomidi
 
 	public:
 		void setSampleScreenActive(bool active);
-		void prepare(const std::weak_ptr<Sound>, int lengthInFrames);
+		void prepare(const std::weak_ptr<Sound>, int newLengthInFrames);
 		void start();
 		void stop();
 		void cancel();
@@ -69,6 +67,7 @@ namespace mpc::audiomidi
 		bool isArmed();
 
 		SoundRecorder(mpc::Mpc& mpc);
+		~SoundRecorder();
 
 		void open() override {}
 		void close() override {}

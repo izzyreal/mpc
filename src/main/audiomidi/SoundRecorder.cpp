@@ -28,7 +28,7 @@ unsigned int SoundRecorder::getInputGain()
 
 void SoundRecorder::setInputGain(unsigned int gain)
 {
-	if (gain < 0 || gain > 100)
+	if (gain > 100)
 		return;
 
 	inputGain = gain;
@@ -45,18 +45,18 @@ bool SoundRecorder::isArmed()
 }
 
 // modes: 0 = MONO L, 1 = MONO R, 2 = STEREO
-void SoundRecorder::prepare(const weak_ptr<Sound> sound, int lengthInFrames)
+void SoundRecorder::prepare(const weak_ptr<Sound> newSound, int newLengthInFrames)
 {
 	if (recording)
 		return;
 
 	cancelled = false;
 
-	this->sound = sound;
-	this->lengthInFrames = lengthInFrames;
+	this->sound = newSound;
+	this->lengthInFrames = newLengthInFrames;
 
 	if (mode != 2)
-		sound.lock()->setMono(true);
+		newSound.lock()->setMono(true);
 }
 
 // Should be called from the audio thread
@@ -336,10 +336,22 @@ vector<float> SoundRecorder::resampleChannel(bool left, vector<float>& buffer, i
 
 void SoundRecorder::initSrc() {
 	if (mode == 0 || mode == 2) {
+        if (srcLeft != nullptr)
+            delete srcLeft;
 		srcLeft = src_new(0, 1, &srcLeftError);
 	}
 
 	if (mode == 1 || mode == 2) {
+        if (srcRight != nullptr)
+            delete srcRight;
 		srcRight = src_new(0, 1, &srcRightError);
 	}
+}
+
+SoundRecorder::~SoundRecorder()
+{
+    if (srcLeft != nullptr)
+        delete srcLeft;
+    if (srcRight != nullptr)
+        delete srcRight;
 }

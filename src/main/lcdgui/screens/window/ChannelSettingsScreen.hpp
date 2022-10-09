@@ -15,8 +15,10 @@ namespace mpc::lcdgui::screens::window
 
 	public:
 		ChannelSettingsScreen(mpc::Mpc& mpc, const int layerIndex);
-		
-		void turnWheel(int increment) override;
+
+        void setNote(int newNote);
+
+        void turnWheel(int increment) override;
 		
 		void open() override;
 		void close() override;
@@ -36,7 +38,6 @@ namespace mpc::lcdgui::screens::window
 		void displayFxPath();
 		void displayFollowStereo();
 		void displayChannel();
-		void setNote(int newNote);
 
 		std::weak_ptr<ctoot::mpc::MpcIndivFxMixerChannel> getIndivFxMixerChannel();
 		std::weak_ptr<ctoot::mpc::MpcStereoMixerChannel> getStereoMixerChannel();

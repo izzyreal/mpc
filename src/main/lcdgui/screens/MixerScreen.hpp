@@ -72,11 +72,11 @@ private:
     void setLink(bool b);
     void setTab(int i);
     void setYPos(int i);
-    
+
 public:
     int getTab();
-    int getXPos();
-    
+    void setXPos(unsigned char newXPos);
+
 public:
     void update(moduru::observer::Observable* o, nonstd::any arg) override;
     

@@ -1,6 +1,8 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
+namespace mpc::audiomidi { class EventHandler; }
+
 namespace mpc::lcdgui::screens
 {
 	class MixerScreen;
@@ -47,6 +49,7 @@ namespace mpc::lcdgui::screens
 		friend class SelectDrumScreen;
 		friend class SelectMixerDrumScreen;
 		friend class mpc::controls::BaseControls;
+		friend class mpc::audiomidi::EventHandler;
 
 	};
 }

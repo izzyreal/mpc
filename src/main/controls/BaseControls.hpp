@@ -40,7 +40,10 @@ namespace mpc::controls {
 	public:
 		BaseControls(mpc::Mpc&);
 
-		bool splittable = false;
+        bool collectionContainsCurrentScreen(const std::vector<std::string>&);
+        const static std::vector<std::string> samplerScreens;
+
+        bool splittable = false;
 		void splitLeft();
 		void splitRight();
 
@@ -100,10 +103,6 @@ namespace mpc::controls {
 		const static std::vector<std::string> allowTransportScreens;
 		const static std::vector<std::string> allowPlayScreens;
 		const static std::vector<std::string> allowCentralNoteAndPadUpdateScreens;
-        const static std::vector<std::string> samplerScreens;
-
-        bool collectionContainsCurrentScreen(const std::vector<std::string>&);
-        bool isSamplerScreen();
 		void generateNoteOn(int nn, int padVelo, int tick);
 
 		friend class mpc::lcdgui::ScreenComponent;

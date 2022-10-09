@@ -22,6 +22,7 @@
 
 #include <lcdgui/screens/LoadScreen.hpp>
 #include <lcdgui/screens/DrumScreen.hpp>
+#include <lcdgui/screens/MixerScreen.hpp>
 #include <lcdgui/screens/StepEditorScreen.hpp>
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <lcdgui/screens/window/EditSoundScreen.hpp>
@@ -30,6 +31,7 @@
 #include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
 #include <lcdgui/screens/window/Assign16LevelsScreen.hpp>
 #include <lcdgui/screens/window/EditMultipleScreen.hpp>
+#include <lcdgui/screens/window/ChannelSettingsScreen.hpp>
 
 #include <Util.hpp>
 
@@ -56,7 +58,7 @@ void BaseControls::init()
     param = ls.lock()->getFocus();
     activeField = ls.lock()->getFocusedLayer().lock()->findField(param);
     
-    auto isSampler = isSamplerScreen();
+    auto isSampler = collectionContainsCurrentScreen(samplerScreens);
     
     if (isSampler)
     {
@@ -215,10 +217,13 @@ void BaseControls::pad(int padIndexWithBank, int velo, bool triggeredByRepeat, i
 
     if (!mpc.getHardware().lock()->getTopPanel().lock()->isSixteenLevelsEnabled())
     {
-        auto withNotes = std::dynamic_pointer_cast<WithTimesAndNotes>(mpc.screens->getScreenComponent(currentScreenName));
-        auto assign16LevelsScreen = std::dynamic_pointer_cast<Assign16LevelsScreen>(mpc.screens->getScreenComponent(currentScreenName));
-        auto stepEditorScreen = std::dynamic_pointer_cast<StepEditorScreen>(mpc.screens->getScreenComponent(currentScreenName));
-        auto editMultipleScreen = std::dynamic_pointer_cast<EditMultipleScreen>(mpc.screens->getScreenComponent(currentScreenName));
+        auto screenComponent = mpc.screens->getScreenComponent(currentScreenName);
+        auto withNotes = std::dynamic_pointer_cast<WithTimesAndNotes>(screenComponent);
+        auto assign16LevelsScreen = std::dynamic_pointer_cast<Assign16LevelsScreen>(screenComponent);
+        auto stepEditorScreen = std::dynamic_pointer_cast<StepEditorScreen>(screenComponent);
+        auto editMultipleScreen = std::dynamic_pointer_cast<EditMultipleScreen>(screenComponent);
+        auto mixerScreen = std::dynamic_pointer_cast<MixerScreen>(screenComponent);
+        auto channelSettingsScreen = std::dynamic_pointer_cast<ChannelSettingsScreen>(screenComponent);
 
         if (note >= 35 && note <= 98 && collectionContainsCurrentScreen(allowCentralNoteAndPadUpdateScreens))
         {
@@ -240,6 +245,19 @@ void BaseControls::pad(int padIndexWithBank, int velo, bool triggeredByRepeat, i
         else if (stepEditorScreen && param == "fromnote" && note > 34)
         {
             stepEditorScreen->setFromNote(note);
+        }
+        else if (mixerScreen)
+        {
+            unsigned char bankStartPadIndex = mpc.getBank() * 16;
+            unsigned char bankEndPadIndex = bankStartPadIndex + 16;
+            if (padIndexWithBank >= bankStartPadIndex && padIndexWithBank < bankEndPadIndex)
+            {
+                mixerScreen->setXPos(padIndexWithBank % 16);
+            }
+        }
+        else if (channelSettingsScreen)
+        {
+            channelSettingsScreen->setNote(note);
         }
     }
     
@@ -976,12 +994,3 @@ const std::vector<std::string> BaseControls::samplerScreens {
     "trim",
     "zone"
 };
-
-bool BaseControls::isSamplerScreen()
-{
-    return find(
-                begin(BaseControls::samplerScreens),
-                end(BaseControls::samplerScreens),
-                ls.lock()->getCurrentScreenName()
-                ) != end(BaseControls::samplerScreens);
-}

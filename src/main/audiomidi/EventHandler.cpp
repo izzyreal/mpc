@@ -18,6 +18,7 @@
 #include <lcdgui/screens/MixerSetupScreen.hpp>
 #include <lcdgui/screens/TransScreen.hpp>
 #include <lcdgui/screens/SyncScreen.hpp>
+#include <lcdgui/screens/DrumScreen.hpp>
 #include <lcdgui/screens/window/CountMetronomeScreen.hpp>
 #include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
 
@@ -135,19 +136,22 @@ void EventHandler::handleNoThru(const weak_ptr<Event>& e, Track* track, int time
     }
     else if (ne)
     {
-        auto busNumber = track->getBus();
+        auto isSamplerScreen = mpc.getControls().lock()->getControls()->
+                collectionContainsCurrentScreen(mpc::controls::BaseControls::samplerScreens);
+        auto drumScreen = mpc.screens->get<DrumScreen>("drum");
+        auto drumIndex = isSamplerScreen ? drumScreen->drum : track->getBus() - 1;
         
-        if (busNumber != 0)
+        if (drumIndex >= 0)
         {
-            auto drum = busNumber - 1;
-            
             if (ne->getDuration() != -1)
             {
                 if (!(lSequencer->isSoloEnabled() && track->getIndex() != lSequencer->getActiveTrackIndex()))
                 {
                     auto newVelo = static_cast<int>(ne->getVelocity() * (track->getVelocityRatio() * 0.01));
                     MidiAdapter midiAdapter;
-                    midiAdapter.process(ne, drum, newVelo);
+                    // Each of the 4 DRUMs is routed to their respective 0-based MIDI channel.
+                    // This MIDI channel is part of a MIDI system that is internal to VMPC2000XL's sound player engine.
+                    midiAdapter.process(ne, drumIndex, newVelo);
                     auto eventFrame = mpc.getAudioMidiServices().lock()->getFrameSequencer().lock()->getEventFrameOffset();
                     
                     if (timeStamp != -1)
@@ -160,7 +164,7 @@ void EventHandler::handleNoThru(const weak_ptr<Event>& e, Track* track, int time
                     if (mpc.getAudioMidiServices().lock()->getAudioServer()->isRealTime())
                     {
                         auto note = ne->getNote();
-                        auto program = mpc.getSampler().lock()->getProgram(mpc.getDrum(drum)->getProgram());
+                        auto program = mpc.getSampler().lock()->getProgram(mpc.getDrum(drumIndex)->getProgram());
                         
                         int pad = program.lock()->getPadIndexFromNote(note);
                         int bank = mpc.getBank();
