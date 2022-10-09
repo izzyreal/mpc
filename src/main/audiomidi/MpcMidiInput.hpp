@@ -27,6 +27,7 @@ namespace mpc::audiomidi
 		int index = 0;
 
 	private:
+        int previousDataWheelValue = -1;
 		mpc::Mpc& mpc;
 		std::weak_ptr<mpc::sequencer::Sequencer> sequencer;
 		std::weak_ptr<mpc::sampler::Sampler> sampler;

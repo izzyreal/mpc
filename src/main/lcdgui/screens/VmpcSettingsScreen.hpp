@@ -1,6 +1,7 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
+namespace mpc::audiomidi { class MpcMidiInput; }
 namespace mpc::sampler { class Pad; }
 namespace mpc::sequencer { class Track; }
 namespace mpc::nvram { class NvRam; }
@@ -40,6 +41,7 @@ namespace mpc::lcdgui::screens
 		friend class mpc::nvram::NvRam;
         friend class mpc::sequencer::Track;
         friend class mpc::disk::SoundLoader;
+        friend class mpc::audiomidi::MpcMidiInput;
 
 	};
 }

@@ -28,6 +28,8 @@ void Pot::setValue(int i) {
 	{
 		mpc.getAudioMidiServices().lock()->setRecordLevel(i);
 	}
+
+    updateUi();
 }
 
 int Pot::getValue() {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <functional>
 
 namespace mpc { class Mpc; }
 
@@ -13,7 +14,6 @@ namespace mpc::hardware {
 		std::string label = "";
 		int value{ 0 };
 
-
 	public:
 		std::string getLabel();
 		void setValue(int i);
@@ -21,6 +21,7 @@ namespace mpc::hardware {
 
 	public:
 		Pot(mpc::Mpc& mpc, std::string label);
+        std::function<void()> updateUi = [](){};
 
 	};
 }

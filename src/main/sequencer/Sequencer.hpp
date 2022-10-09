@@ -39,6 +39,7 @@ namespace mpc::sequencer
 	private:
         const std::vector<int> TICK_VALUES{ 1, 48, 32, 24, 16, 12, 8 };
         mpc::Mpc& mpc;
+        bool playing = false;
 		int lastNotifiedBar = -1;
 		int lastNotifiedBeat = -1;
 		int lastNotifiedClock = -1;

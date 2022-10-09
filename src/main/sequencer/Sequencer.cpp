@@ -379,7 +379,7 @@ bool Sequencer::isPlaying()
 	if (!server->isRunning() || !frameSequencer)
 		return false;
 
-	return ams->getFrameSequencer().lock()->isRunning();
+	return !metronomeOnly && ams->getFrameSequencer().lock()->isRunning();
 }
 
 void Sequencer::play(bool fromStart)
@@ -1574,7 +1574,7 @@ void Sequencer::setOverdubbing(bool b)
 
 void Sequencer::playMetronomeTrack()
 {
-	if (isPlaying() || metronomeOnly) {
+	if (isPlaying()) {
 		return;
 	}
 

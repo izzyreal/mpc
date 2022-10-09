@@ -5,11 +5,14 @@
 #include <hardware/Hardware.hpp>
 #include <hardware/HwPad.hpp>
 #include <hardware/HwSlider.hpp>
+#include <hardware/Button.hpp>
+#include <hardware/Pot.hpp>
 #include <audiomidi/EventHandler.hpp>
 #include <audiomidi/MpcMidiPorts.hpp>
 #include <controls/GlobalReleaseControls.hpp>
 
 #include <lcdgui/screens/SyncScreen.hpp>
+#include <lcdgui/screens/VmpcSettingsScreen.hpp>
 #include <lcdgui/screens/MidiSwScreen.hpp>
 #include <lcdgui/screens/window/MidiInputScreen.hpp>
 #include <lcdgui/screens/window/MidiOutputScreen.hpp>
@@ -192,16 +195,75 @@ void MpcMidiInput::handleControl(ShortMessage *shortMsg)
   const auto controller = shortMsg->getData1();
   const auto value = shortMsg->getData2();
 
-  // As per the MPC2000XL's MIDI implementation chart
-  if (controller == 7)
+  auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
+  auto iRigPads = vmpcSettingsScreen->initialPadMapping == 2;
+
+  if (iRigPads)
   {
-      // It looks like the internal implementation of the slider is inverted.
-      // At least, the Akai MPD16 sends value 0 at the bottom of the slider
-      // and 127 at the top.
-      // For now we're safe to simply invert the input, but it would be nice
-      // to make this congruent with the MPD16 (assuming it's the same for
-      // other controllers, but it would be nice to verify some).
-      mpc.getHardware().lock()->getSlider().lock()->setValue(127 - value);
+      // Default slider controller
+      if (controller == 1)
+      {
+          mpc.getHardware().lock()->getSlider().lock()->setValue(127 - value);
+      }
+      // Default DATA controller
+      else if (controller == 7)
+      {
+          if (previousDataWheelValue == -1)
+          {
+              previousDataWheelValue = value;
+          }
+
+          auto controls = mpc.getActiveControls().lock();
+
+          if (previousDataWheelValue == 0 && value == 0)
+          {
+            controls->turnWheel(-1);
+          }
+          else if (previousDataWheelValue == 127 && value == 127)
+          {
+              controls->turnWheel(1);
+          }
+          else if (value - previousDataWheelValue != 0)
+          {
+              controls->turnWheel(value - previousDataWheelValue);
+          }
+          previousDataWheelValue = value;
+      }
+      // Default rotary #1
+      else if (controller == 10)
+      {
+          mpc.getHardware().lock()->getVolPot().lock()->setValue((100 / 127.f) * value);
+      }
+      // Default rotary #2
+      else if (controller == 11)
+      {
+          mpc.getHardware().lock()->getRecPot().lock()->setValue((100 / 127.f) * value);
+      }
+      // DATA PUSH
+      else if (controller == 22)
+      {
+          std::string buttonName = sequencer.lock()->isPlaying() ? "stop" : "play-start";
+          if (value == 127)
+          {
+              mpc.getHardware().lock()->getButton(buttonName).lock()->push();
+          }
+          else
+          {
+              mpc.getHardware().lock()->getButton(buttonName).lock()->release();
+          }
+      }
+  }
+  else {
+      // As per the MPC2000XL's MIDI implementation chart
+      if (controller == 7) {
+          // It looks like the internal implementation of the slider is inverted.
+          // At least, the Akai MPD16 sends value 0 at the bottom of the slider
+          // and 127 at the top.
+          // For now we're safe to simply invert the input, but it would be nice
+          // to make this congruent with the MPD16 (assuming it's the same for
+          // other controllers, but it would be nice to verify some).
+          mpc.getHardware().lock()->getSlider().lock()->setValue(127 - value);
+      }
   }
 
   auto midiInputScreen = mpc.screens->get<MidiInputScreen>("midi-input");
