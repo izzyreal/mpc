@@ -18,5 +18,5 @@ void DataWheel::turn(int increment)
 	
     if (controls) controls->turnWheel(increment);
 
-	notifyObservers(increment);
+	updateUi(increment);
 }

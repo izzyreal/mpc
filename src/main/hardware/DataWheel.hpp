@@ -2,6 +2,8 @@
 
 #include <observer/Observable.hpp>
 
+#include <functional>
+
 namespace mpc { class Mpc; }
 
 namespace mpc::hardware
@@ -15,7 +17,8 @@ namespace mpc::hardware
 
 	public:
 		DataWheel(mpc::Mpc& mpc);
-		void turn(int increment);
+        std::function<void(int)> updateUi = [](int increment){};
+        void turn(int increment);
 
 	};
 }

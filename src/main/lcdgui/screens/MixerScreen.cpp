@@ -291,7 +291,7 @@ void MixerScreen::left()
     if (xPos <= 0)
         return;
 
-    xPos--;
+    setXPos(xPos - 1);
 
     auto newPad = xPos + (mpc.getBank() * 16);
     mpc.setPad(newPad);
@@ -304,7 +304,7 @@ void MixerScreen::right()
     if (xPos >= 15)
         return;
 
-    xPos++;
+    setXPos(xPos + 1);
 
     auto newPad = xPos + (mpc.getBank() * 16);
     mpc.setPad(newPad);

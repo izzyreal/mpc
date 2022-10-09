@@ -3,6 +3,7 @@
 #include <Mpc.hpp>
 #include <Util.hpp>
 #include <hardware/Hardware.hpp>
+#include <hardware/DataWheel.hpp>
 #include <hardware/HwPad.hpp>
 #include <hardware/HwSlider.hpp>
 #include <hardware/Button.hpp>
@@ -22,11 +23,14 @@
 #include <sequencer/Track.hpp>
 #include <sequencer/NoteEvent.hpp>
 
+#include "sampler/Pad.hpp"
+
 #include <midi/core/MidiMessage.hpp>
 #include <midi/core/ShortMessage.hpp>
 
 using namespace mpc::audiomidi;
 using namespace mpc::sequencer;
+using namespace mpc::sampler;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
@@ -114,18 +118,16 @@ void MpcMidiInput::transport(MidiMessage *msg, int timeStamp)
 
     Util::setSliderNoteVariationParameters(mpc, note, p);
 
-    auto pad = p->getPadIndexFromNote(note->getNote());
+    auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
+    auto iRigPads = vmpcSettingsScreen->initialPadMapping == 2;
+    auto indexInIrigPadsMappingIt = iRigPads ? std::find(Pad::iRigPadsDefaultMapping.begin(),
+                                                    Pad::iRigPadsDefaultMapping.end(),
+                                                    note->getNote()) : Pad::iRigPadsDefaultMapping.end();
 
-    if (pad != -1)
-    {
-      // The real 2KXL does neither of the below two lines of code.
-      // We do it because the current main use case for MIDI input
-      // is to use a controller to replace the real MPC2000XL's
-      // hardware pads.
-//      mpc.setPad(pad);
-//      mpc.setNote(note->getNote());
-//      Util::set16LevelsValues(mpc, note, pad);
-    }
+    int indexInIrigPadsMapping = indexInIrigPadsMappingIt == Pad::iRigPadsDefaultMapping.end() ? -1 :
+            (indexInIrigPadsMappingIt - Pad::iRigPadsDefaultMapping.begin());
+
+    auto pad = indexInIrigPadsMapping >= 0 ? indexInIrigPadsMapping : p->getPadIndexFromNote(note->getNote());
 
     if (note->getVelocity() != 0 && track->getBus() > 0 && track->getIndex() < 64 && mpc.getControls().lock()->isTapPressed() && lSequencer->isPlaying())
     {
@@ -213,19 +215,19 @@ void MpcMidiInput::handleControl(ShortMessage *shortMsg)
               previousDataWheelValue = value;
           }
 
-          auto controls = mpc.getActiveControls().lock();
+          auto dataWheel = mpc.getHardware().lock()->getDataWheel().lock();
 
           if (previousDataWheelValue == 0 && value == 0)
           {
-            controls->turnWheel(-1);
+                dataWheel->turn(-1);
           }
           else if (previousDataWheelValue == 127 && value == 127)
           {
-              controls->turnWheel(1);
+              dataWheel->turn(1);
           }
           else if (value - previousDataWheelValue != 0)
           {
-              controls->turnWheel(value - previousDataWheelValue);
+              dataWheel->turn(value - previousDataWheelValue);
           }
           previousDataWheelValue = value;
       }
