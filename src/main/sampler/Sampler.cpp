@@ -761,7 +761,8 @@ int Sampler::getLastInt(std::string s)
 
 std::string Sampler::addOrIncreaseNumber(std::string s)
 {
-	auto res = addOrIncreaseNumber2(s);
+//	auto res = addOrIncreaseNumber2(s);
+	auto res = s;
 	bool exists = true;
 	
 	while (exists)
@@ -770,7 +771,7 @@ std::string Sampler::addOrIncreaseNumber(std::string s)
 
 		for (int i = 0; i < getSoundCount(); i++)
 		{
-			if (getSoundName(i).compare(res) == 0)
+			if (getSoundName(i) == res)
 			{
 				exists = true;
 				res = addOrIncreaseNumber2(res);
