@@ -51,7 +51,7 @@ void VmpcSettingsScreen::turnWheel(int i)
 
 void VmpcSettingsScreen::setInitialPadMapping(int i)
 {
-	if (i < 0 || i > 1)
+	if (i < 0 || i > 2)
 		return;
 
 	initialPadMapping = i;
