@@ -476,19 +476,11 @@ void LoadScreen::loadSound(bool shouldBeConverted)
         return;
     }
         
-    if (result.existingIndex != -1)
-    {
-        sampler.lock()->deleteSound(sampler.lock()->getSoundCount() - 1);
-    }
-    else
-    {
-        mpc.getLayeredScreen().lock()->openScreen("popup");
-        auto name = FileUtil::splitName(getSelectedFileName())[0];
-        auto ext = FileUtil::splitName(getSelectedFileName())[1];
-        popupScreen->setText("LOADING " + StrUtil::padRight(name, " ", 16) + "." + ext);
-             
-        popupScreen->returnToScreenAfterMilliSeconds("load-a-sound", 300);
-    }
+    mpc.getLayeredScreen().lock()->openScreen("popup");
+    auto name = FileUtil::splitName(getSelectedFileName())[0];
+    auto ext = FileUtil::splitName(getSelectedFileName())[1];
+    popupScreen->setText("LOADING " + StrUtil::padRight(name, " ", 16) + "." + ext);
+    popupScreen->returnToScreenAfterMilliSeconds("load-a-sound", 300);
 }
 
 void LoadScreen::displayDevice()

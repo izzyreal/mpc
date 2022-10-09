@@ -5,16 +5,24 @@
 #include <sequencer/Track.hpp>
 
 #include <lcdgui/screens/LoadScreen.hpp>
+#include <lcdgui/screens/dialog/FileExistsScreen.hpp>
 
 #include <mpc/MpcStereoMixerChannel.hpp>
 
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens;
 using namespace std;
 
 LoadASoundScreen::LoadASoundScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "load-a-sound", layerIndex)
 {
+}
+
+void LoadASoundScreen::mainScreen()
+{
+    sampler.lock()->deleteSound(sampler.lock()->getPreviewSound());
+    ScreenComponent::mainScreen();
 }
 
 void LoadASoundScreen::open()
@@ -100,29 +108,55 @@ void LoadASoundScreen::function(int i)
 		break;
 	case 4:
 		keepSound();
-		openScreen("load");
 		break;
 	}
 }
 
 void LoadASoundScreen::keepSound()
 {
-    if (assignToNote != 34)
-    {
-        auto sequencer = mpc.getSequencer().lock();
-        auto sequence = sequencer->getActiveSequence().lock();
-        auto sampler = mpc.getSampler();
-        auto track = sequence->getTrack(sequencer->getActiveTrackIndex()).lock();
+    auto sound = sampler.lock()->getPreviewSound().lock();
+    auto candidateSoundName = sound->getName();
+    std::shared_ptr<mpc::sampler::Sound> existingSound;
 
-        auto bus = track->getBus();
-        auto programNumber = sampler.lock()->getDrumBusProgramNumber(bus);
-        auto program = sampler.lock()->getProgram(programNumber);
-        auto sound = sampler.lock()->getPreviewSound();
-        auto noteParameters = sampler.lock()->getLastNp(program.lock().get());
-        noteParameters->setSoundIndex(sampler.lock()->getSoundCount() - 1);
-        auto mixerChannel = noteParameters->getStereoMixerChannel().lock();
-        mixerChannel->setStereo(!sound.lock()->isMono());
+    for (auto& s : sampler.lock()->getSounds())
+    {
+        if (s.lock() == sound) continue;
+        if (s.lock()->getName() == candidateSoundName)
+        {
+            existingSound = s.lock();
+            break;
+        }
     }
+
+    auto action = [&](bool newSoundIsMono){
+        if (assignToNote != 34)
+        {
+            auto sequencer = mpc.getSequencer().lock();
+            auto sequence = sequencer->getActiveSequence().lock();
+            auto sampler = mpc.getSampler();
+            auto track = sequence->getTrack(sequencer->getActiveTrackIndex()).lock();
+
+            auto bus = track->getBus();
+            auto programNumber = sampler.lock()->getDrumBusProgramNumber(bus);
+            auto program = sampler.lock()->getProgram(programNumber);
+            auto noteParameters = sampler.lock()->getLastNp(program.lock().get());
+            noteParameters->setSoundIndex(sampler.lock()->getSoundCount() - 1);
+            auto mixerChannel = noteParameters->getStereoMixerChannel().lock();
+            mixerChannel->setStereo(!newSoundIsMono);
+        }
+    };
+
+    if (existingSound)
+    {
+        auto fileExistsScreen = mpc.screens->get<FileExistsScreen>("file-exists");
+        fileExistsScreen->setLoadASoundCandidateAndExistingSound(sound, existingSound);
+        fileExistsScreen->setActionAfterAddingSound(action);
+        openScreen("file-exists");
+        return;
+    }
+
+    action(sound->isMono());
+    openScreen("load");
 }
 
 void LoadASoundScreen::displayAssignToNote()

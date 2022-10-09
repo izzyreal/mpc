@@ -453,7 +453,7 @@ sound_or_error AbstractDisk::readWav2(std::shared_ptr<MpcFile> f, bool shouldBeC
             return tl::make_unexpected(mpc_io_error{ f->getName() + " has a sample rate of " + std::to_string(wavFile.getSampleRate()) + ". Sample rate has to be between 8000 and 44100." });
         }
         
-        auto newSoundName = sampler->addOrIncreaseNumber(f->getNameWithoutExtension());
+        auto newSoundName = f->getNameWithoutExtension();
         
         sound->setName(newSoundName);
         

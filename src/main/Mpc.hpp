@@ -236,7 +236,7 @@ namespace mpc {
                 "number-of-zones",
                 "cant-find-file",
                 "name",
-                "file-already-exists",
+                "file-exists",
                 "vmpc-record-jam",
                 "delete-all-sequences",
                 "delete-all-tracks",

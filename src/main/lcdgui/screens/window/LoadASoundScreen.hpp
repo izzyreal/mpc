@@ -16,6 +16,10 @@ namespace mpc::lcdgui::screens::window
 		void open() override;
 		void close() override;
 
+        // Block uncontrolled ways to leave this screen
+        void mainScreen() override;
+        void numpad(int i) override {}
+
 		void update(moduru::observer::Observable* observable, nonstd::any message) override;
 
 		void turnWheel(int i) override;

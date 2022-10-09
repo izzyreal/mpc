@@ -12,17 +12,49 @@
 #include <lcdgui/screens/window/SaveApsFileScreen.hpp>
 #include <lcdgui/screens/window/NameScreen.hpp>
 
+#include "sampler/Sound.hpp"
+
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::sampler;
 
 using namespace moduru::lang;
 
 using namespace std;
 
-FileExistsScreen::FileExistsScreen(mpc::Mpc& mpc, const int layerIndex) 
+FileExistsScreen::FileExistsScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "file-exists", layerIndex)
 {
+}
+
+void FileExistsScreen::mainScreen()
+{
+	if (loadASoundCandidate && existingSound)
+	{
+		sampler.lock()->deleteSound(sampler.lock()->getPreviewSound());
+	}
+	ScreenComponent::mainScreen();
+}
+
+void FileExistsScreen::setLoadASoundCandidateAndExistingSound(
+		std::shared_ptr<Sound> candidate,
+		std::shared_ptr<Sound> existing)
+{
+	loadASoundCandidate = candidate;
+	existingSound = existing;
+}
+
+void FileExistsScreen::setActionAfterAddingSound(std::function<void(bool)> action)
+{
+	actionAfterAddingSound = action;
+}
+
+void FileExistsScreen::close()
+{
+	loadASoundCandidate = {};
+	existingSound = {};
+	actionAfterAddingSound = [](bool){};
 }
 
 void FileExistsScreen::function(int i)
@@ -33,6 +65,20 @@ void FileExistsScreen::function(int i)
 	{
 	case 2:
 	{
+		if (existingSound && loadASoundCandidate)
+		{
+			// replace
+			auto existingSoundMemoryIndex = existingSound->getMemoryIndex();
+			auto candidateSoundMemoryIndex = loadASoundCandidate->getMemoryIndex();
+			existingSound.swap(loadASoundCandidate);
+			existingSound->setMemoryIndex(existingSoundMemoryIndex);
+			loadASoundCandidate->setMemoryIndex(candidateSoundMemoryIndex);
+			sampler.lock()->deleteSound(loadASoundCandidate);
+			actionAfterAddingSound(existingSound->isMono());
+			openScreen("load");
+			return;
+		}
+
 		auto disk = mpc.getDisk().lock();
 		auto nameScreen = mpc.screens->get<NameScreen>("name");
 
@@ -115,8 +161,21 @@ void FileExistsScreen::function(int i)
 		}
 		break;
 	}
+	case 3:
+		if (loadASoundCandidate && existingSound)
+		{
+			sampler.lock()->deleteSound(sampler.lock()->getPreviewSound());
+		}
+		ScreenComponent::function(3);
+		break;
 	case 4:
 	{
+		if (existingSound && loadASoundCandidate)
+		{
+			// rename
+			return;
+		}
+
 		auto nameScreen = mpc.screens->get<NameScreen>("name");
 
 		vector<string> screens{ "save-a-program", "save-a-sequence", "save-a-sound" };
