@@ -5,24 +5,14 @@
 #include <disk/StdDisk.hpp>
 #include <disk/MpcFile.hpp>
 #include <disk/SoundLoader.hpp>
-#include <file/aps/ApsAssignTable.hpp>
-#include <file/aps/ApsDrumConfiguration.hpp>
-#include <file/aps/ApsGlobalParameters.hpp>
-#include <file/aps/ApsMixer.hpp>
 #include <file/aps/ApsNoteParameters.hpp>
 #include <file/aps/ApsParser.hpp>
-#include <file/aps/ApsProgram.hpp>
 #include <file/aps/ApsSlider.hpp>
 
 #include <sampler/NoteParameters.hpp>
-#include <sampler/Pad.hpp>
-#include <sampler/Program.hpp>
-#include <sampler/Sampler.hpp>
 #include <sampler/PgmSlider.hpp>
 
 #include <mpc/MpcSoundPlayerChannel.hpp>
-#include <mpc/MpcStereoMixerChannel.hpp>
-#include <mpc/MpcIndivFxMixerChannel.hpp>
 
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/DrumScreen.hpp>
@@ -153,12 +143,12 @@ void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool head
             auto destStereoMixerCh = destNoteParams->getStereoMixerChannel().lock();
             auto destIndivFxCh = destNoteParams->getIndivFxMixerChannel().lock();
             
-            destIndivFxCh->setFxPath(sourceIndivFxMixerChannel->getFxPath());
-            destStereoMixerCh->setLevel(sourceStereoMixerChannel->getLevel());
-            destStereoMixerCh->setPanning(sourceStereoMixerChannel->getPanning());
-            destIndivFxCh->setVolumeIndividualOut(sourceIndivFxMixerChannel->getVolumeIndividualOut());
-            destIndivFxCh->setFxSendLevel(sourceIndivFxMixerChannel->getFxSendLevel());
-            destIndivFxCh->setOutput(sourceIndivFxMixerChannel->getOutput());
+            destIndivFxCh->setFxPath(sourceIndivFxMixerChannel.getFxPath());
+            destStereoMixerCh->setLevel(sourceStereoMixerChannel.getLevel());
+            destStereoMixerCh->setPanning(sourceStereoMixerChannel.getPanning());
+            destIndivFxCh->setVolumeIndividualOut(sourceIndivFxMixerChannel.getVolumeIndividualOut());
+            destIndivFxCh->setFxSendLevel(sourceIndivFxMixerChannel.getFxSendLevel());
+            destIndivFxCh->setOutput(sourceIndivFxMixerChannel.getOutput());
             
             auto srcNoteParams = apsProgram->getNoteParameters(noteIndex);
             
@@ -220,12 +210,13 @@ void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool head
             auto apsifmc = m->getIndivFxMixerChannel(noteIndex);
             auto drumsmc = drum->getStereoMixerChannels()[noteIndex].lock();
             auto drumifmc = drum->getIndivFxMixerChannels()[noteIndex].lock();
-            drumifmc->setFxPath(apsifmc->getFxPath());
-            drumsmc->setLevel(apssmc->getLevel());
-            drumsmc->setPanning(apssmc->getPanning());
-            drumifmc->setVolumeIndividualOut(apsifmc->getVolumeIndividualOut());
-            drumifmc->setOutput(apsifmc->getOutput());
-            drumifmc->setFxSendLevel(apsifmc->getFxSendLevel());
+
+            drumifmc->setFxPath(apsifmc.getFxPath());
+            drumsmc->setLevel(apssmc.getLevel());
+            drumsmc->setPanning(apssmc.getPanning());
+            drumifmc->setVolumeIndividualOut(apsifmc.getVolumeIndividualOut());
+            drumifmc->setOutput(apsifmc.getOutput());
+            drumifmc->setFxSendLevel(apsifmc.getFxSendLevel());
         }
         
         auto pgm = apsParser.getDrumConfiguration(i)->getProgram();

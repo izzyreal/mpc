@@ -17,7 +17,10 @@ BarList::BarList(const vector<char>& loadBytes)
 		auto bar = new Bar(moduru::VecUtil::CopyOfRange(loadBytes, i * 4, (i * 4) + 4), previousBar);
 		
         if (bar->lastTick == 0)
+        {
+            delete bar;
             break;
+        }
 	
         bars.push_back(bar);
 		previousBar = bar;

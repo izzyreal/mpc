@@ -24,8 +24,8 @@ namespace mpc::file::aps
 		std::vector<char> saveBytes = std::vector<char>(384);
 
 	public:
-		ctoot::mpc::MpcStereoMixerChannel* getStereoMixerChannel(int noteIndex);
-		ctoot::mpc::MpcIndivFxMixerChannel* getIndivFxMixerChannel(int noteIndex);
+		ctoot::mpc::MpcStereoMixerChannel getStereoMixerChannel(int noteIndex);
+		ctoot::mpc::MpcIndivFxMixerChannel getIndivFxMixerChannel(int noteIndex);
 		int getFxPath(int noteIndex);
 		int getLevel(int noteIndex);
 		int getPanning(int noteIndex);

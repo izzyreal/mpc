@@ -62,8 +62,8 @@ namespace mpc::file::aps
 
 	public:
 		std::vector<char> getBytes();
-		ctoot::mpc::MpcStereoMixerChannel* getStereoMixerChannel(int noteIndex);
-		ctoot::mpc::MpcIndivFxMixerChannel* getIndivFxMixerChannel(int noteIndex);
+		ctoot::mpc::MpcStereoMixerChannel getStereoMixerChannel(int noteIndex);
+		ctoot::mpc::MpcIndivFxMixerChannel getIndivFxMixerChannel(int noteIndex);
 
 	public:
 		ApsProgram(const std::vector<char>& loadBytes);

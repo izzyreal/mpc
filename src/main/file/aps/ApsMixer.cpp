@@ -32,22 +32,22 @@ ApsMixer::ApsMixer(vector<weak_ptr<ctoot::mpc::MpcStereoMixerChannel>> smcs, vec
 	}
 }
 
-ctoot::mpc::MpcStereoMixerChannel* ApsMixer::getStereoMixerChannel(int noteIndex)
+ctoot::mpc::MpcStereoMixerChannel ApsMixer::getStereoMixerChannel(int noteIndex)
 {
-	auto params = new ctoot::mpc::MpcStereoMixerChannel();
-	params->setLevel(getLevel(noteIndex));
-	params->setPanning(getPanning(noteIndex));
-	return params;
+	ctoot::mpc::MpcStereoMixerChannel result;
+	result.setLevel(getLevel(noteIndex));
+	result.setPanning(getPanning(noteIndex));
+	return result;
 }
 
-ctoot::mpc::MpcIndivFxMixerChannel* ApsMixer::getIndivFxMixerChannel(int noteIndex)
+ctoot::mpc::MpcIndivFxMixerChannel ApsMixer::getIndivFxMixerChannel(int noteIndex)
 {
-	auto params = new ctoot::mpc::MpcIndivFxMixerChannel();
-	params->setVolumeIndividualOut(getIndividualLevel(noteIndex));
-	params->setOutput(getIndividualOutput(noteIndex));
-	params->setFxSendLevel(getSendLevel(noteIndex));
-	params->setFxPath(getFxPath(noteIndex));
-	return params;
+	ctoot::mpc::MpcIndivFxMixerChannel result;
+	result.setVolumeIndividualOut(getIndividualLevel(noteIndex));
+	result.setOutput(getIndividualOutput(noteIndex));
+	result.setFxSendLevel(getSendLevel(noteIndex));
+	result.setFxPath(getFxPath(noteIndex));
+	return result;
 }
 
 int ApsMixer::getFxPath(int noteIndex)

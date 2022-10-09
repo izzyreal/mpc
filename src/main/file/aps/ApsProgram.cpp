@@ -47,15 +47,15 @@ ApsProgram::ApsProgram(mpc::sampler::Program* program, int index)
 	this->index = index;
 	byteList.push_back(vector<char>{ (char) index });
 	byteList.push_back(UNKNOWN);
-	string name = moduru::lang::StrUtil::padRight(program->getName(), " ", 16);
+	string programName = moduru::lang::StrUtil::padRight(program->getName(), " ", 16);
 
-	for (char c : name)
+	for (char c : programName)
 		byteList.push_back(vector<char>{ c });
 	
 	byteList.push_back(vector<char>{ 0 }); // Name terminator
 
-	ApsSlider slider(program->getSlider());
-	byteList.push_back(slider.getBytes());
+	ApsSlider apsSlider(program->getSlider());
+	byteList.push_back(apsSlider.getBytes());
 	byteList.push_back(vector<char>{ 35, 64, 0, 26, 0 });
 
 	for (int i = 0; i < 64; i++)
@@ -74,15 +74,15 @@ ApsProgram::ApsProgram(mpc::sampler::Program* program, int index)
 		ifmcs[i] = program->getIndivFxMixerChannel(i);
 	}
 
-	ApsMixer mixer(smcs, ifmcs);
-	byteList.push_back(mixer.getBytes());
+	ApsMixer apsMixer(smcs, ifmcs);
+	byteList.push_back(apsMixer.getBytes());
 	byteList.push_back(vector<char>{ 0, 64, 0 });
-	auto assignTable = vector<int>(64);
+	auto apsAssignTable = vector<int>(64);
 	
 	for (int i = 0; i < 64; i++)
-		assignTable[i] = program->getNoteFromPad(i);
+		apsAssignTable[i] = program->getNoteFromPad(i);
 
-	ApsAssignTable table(assignTable);
+	ApsAssignTable table(apsAssignTable);
 	byteList.push_back(table.getBytes());
 	byteList.push_back(mpc::file::pgmwriter::Pads::getFxBoardSettings());
 	auto totalSize = 0;
@@ -145,12 +145,12 @@ vector<char> ApsProgram::getBytes()
     return saveBytes;
 }
 
-ctoot::mpc::MpcStereoMixerChannel* ApsProgram::getStereoMixerChannel(int noteIndex)
+ctoot::mpc::MpcStereoMixerChannel ApsProgram::getStereoMixerChannel(int noteIndex)
 {
 	return mixer->getStereoMixerChannel(noteIndex);
 }
 
-ctoot::mpc::MpcIndivFxMixerChannel* ApsProgram::getIndivFxMixerChannel(int noteIndex)
+ctoot::mpc::MpcIndivFxMixerChannel ApsProgram::getIndivFxMixerChannel(int noteIndex)
 {
 	return mixer->getIndivFxMixerChannel(noteIndex);
 }

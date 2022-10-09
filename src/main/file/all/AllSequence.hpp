@@ -85,8 +85,8 @@ public:
     bool loop;
     double tempo;
     std::vector<std::string> devNames = std::vector<std::string>(33);
-    Tracks* tracks;
-    BarList* barList;
+    Tracks* tracks = nullptr;
+    BarList* barList = nullptr;
     std::vector<std::shared_ptr<mpc::sequencer::Event>> allEvents;
     
 private:
@@ -116,6 +116,7 @@ public:
     
     AllSequence(const std::vector<char>& b);
     AllSequence(mpc::sequencer::Sequence* seq, int number);
+    ~AllSequence();
     
 };
 }

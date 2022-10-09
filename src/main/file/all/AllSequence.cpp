@@ -80,6 +80,15 @@ AllSequence::AllSequence(const vector<char>& bytes)
     allEvents = readEvents(bytes);
 }
 
+AllSequence::~AllSequence()
+{
+    if (tracks != nullptr)
+        delete tracks;
+
+    if (barList != nullptr)
+        delete barList;
+}
+
 void AllSequence::applyToMpcSeq(shared_ptr<mpc::sequencer::Sequence> mpcSeq)
 {
     mpcSeq->init(barCount - 1);
