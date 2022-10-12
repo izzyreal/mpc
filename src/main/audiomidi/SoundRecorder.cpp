@@ -144,8 +144,8 @@ void SoundRecorder::setSampleScreenActive(bool active)
 
 int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf, int nFrames)
 {
-	auto& left = buf->getChannel(0);
-	auto& right = buf->getChannel(1);
+	auto left = buf->getChannel(0);
+	auto right = buf->getChannel(1);
 
 	applyGain(inputGain * 0.01, left);
 	applyGain(inputGain * 0.01, right);
