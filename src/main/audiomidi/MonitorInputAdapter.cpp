@@ -28,11 +28,11 @@ int32_t MonitorInputAdapter::processAudio(ctoot::audio::core::AudioBuffer* buffe
     
 	if (sampleScreen->getMode() == 0)
 	{
-        buffer->copy(0, 1, nFrames);
+        buffer->copyChannel(0, 1);
 	}
 	else if (sampleScreen->getMode() == 1)
 	{
-        buffer->copy(1, 0, nFrames);
+        buffer->copyChannel(1, 0);
 	}
 
 	return ret;
