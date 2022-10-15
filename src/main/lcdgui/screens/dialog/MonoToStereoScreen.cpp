@@ -18,19 +18,19 @@ void MonoToStereoScreen::open()
 {
 	auto prevScreen = ls.lock()->getPreviousScreenName();
 
-	if (sampler.lock()->getSound().lock() && prevScreen.compare("name") != 0 && prevScreen.compare("popup") != 0)
+	if (sampler->getSound().lock() && prevScreen != "name" && prevScreen != "popup")
 	{
-		string name = sampler.lock()->getSound().lock()->getName();
+		string name = sampler->getSound().lock()->getName();
 		name = StrUtil::trim(name);
 		name = StrUtil::padRight(name, "_", 16);
 		name = name.substr(0, 14);
 		newStName = name + "-S";
 	}
 
-	if (prevScreen.compare("name") != 0 && prevScreen.compare("popup") != 0)
+	if (prevScreen != "name" && prevScreen != "popup")
 		ls.lock()->setFocus("lsource");
 
-	setRSource(sampler.lock()->getSoundIndex());
+	setRSource(sampler->getSoundIndex());
 	displayLSource();
 	displayNewStName();
 }
@@ -39,23 +39,23 @@ void MonoToStereoScreen::turnWheel(int i)
 {
 	init();
 	
-	if (param.compare("lsource") == 0 && i < 0)
+	if (param == "lsource" && i < 0)
 	{
-		sampler.lock()->selectPreviousSound();
+		sampler->selectPreviousSound();
 		displayLSource();
 
 	}
-	else if (param.compare("lsource") == 0 && i > 0)
+	else if (param == "lsource" && i > 0)
 	{
-		sampler.lock()->selectNextSound();
+		sampler->selectNextSound();
 		displayLSource();
 	}
-	else if (param.compare("rsource") == 0)
+	else if (param == "rsource")
 	{
-		setRSource(sampler.lock()->getNextSoundIndex(rSource, i > 0));
+		setRSource(sampler->getNextSoundIndex(rSource, i > 0));
 		displayRSource();
 	}
-	else if (param.compare("newstname") == 0)
+	else if (param == "newstname")
 	{
 		const auto nameScreen = mpc.screens->get<NameScreen>("name");
         const auto monoToStereoScreen = this;
@@ -81,12 +81,12 @@ void MonoToStereoScreen::function(int j)
 		break;
 	case 4:
 	{
-		if (!sampler.lock()->getSound().lock()->isMono() || !sampler.lock()->getSound(rSource).lock()->isMono())
+		if (!sampler->getSound().lock()->isMono() || !sampler->getSound(rSource).lock()->isMono())
 			return;
 
-		for (auto& s : sampler.lock()->getSounds())
+		for (auto& s : sampler->getSounds())
 		{
-			if (s.lock()->getName().compare(newStName) == 0)
+			if (s.lock()->getName() == newStName)
 			{
 				auto popupScreen = mpc.screens->get<PopupScreen>("popup");
 				popupScreen->setText("Name already used");
@@ -96,8 +96,8 @@ void MonoToStereoScreen::function(int j)
 			}
 		}
 
-		auto left = sampler.lock()->getSound().lock();
-		auto right = sampler.lock()->getSound(rSource).lock();
+		auto left = sampler->getSound().lock();
+		auto right = sampler->getSound(rSource).lock();
 
 		vector<float> newSampleDataRight;
 
@@ -113,9 +113,9 @@ void MonoToStereoScreen::function(int j)
 			newSampleDataRight = *right->getSampleData();
 		}
 
-		auto newSound = sampler.lock()->addSound(left->getSampleRate()).lock();
+		auto newSound = sampler->addSound(left->getSampleRate()).lock();
 		newSound->setName(newStName);
-		sampler.lock()->mergeToStereo(left->getSampleData(), &newSampleDataRight, newSound->getSampleData());
+		sampler->mergeToStereo(left->getSampleData(), &newSampleDataRight, newSound->getSampleData());
         newSound->setMono(false);
 		openScreen("sound");
 	}
@@ -124,12 +124,12 @@ void MonoToStereoScreen::function(int j)
 
 void MonoToStereoScreen::displayLSource()
 {
-	if (!sampler.lock()->getSound().lock())
+	if (!sampler->getSound().lock())
 		return;
 
-	findField("lsource").lock()->setText(sampler.lock()->getSound().lock()->getName());
+	findField("lsource").lock()->setText(sampler->getSound().lock()->getName());
 
-	if (sampler.lock()->getSound().lock()->isMono() && sampler.lock()->getSound().lock()->isMono())
+	if (sampler->getSound().lock()->isMono() && sampler->getSound().lock()->isMono())
 	{
 		ls.lock()->setFunctionKeysArrangement(0);
 	}
@@ -142,12 +142,12 @@ void MonoToStereoScreen::displayLSource()
 
 void MonoToStereoScreen::displayRSource()
 {
-	if (!sampler.lock()->getSound(rSource).lock())
+	if (!sampler->getSound(rSource).lock())
 		return;
 
-	findField("rsource").lock()->setText(sampler.lock()->getSoundName(rSource));
+	findField("rsource").lock()->setText(sampler->getSoundName(rSource));
 
-	if (sampler.lock()->getSound().lock()->isMono() && sampler.lock()->getSound(rSource).lock()->isMono())
+	if (sampler->getSound().lock()->isMono() && sampler->getSound(rSource).lock()->isMono())
 	{
 		ls.lock()->setFunctionKeysArrangement(0);
 	}
@@ -165,7 +165,7 @@ void MonoToStereoScreen::displayNewStName()
 
 void MonoToStereoScreen::setRSource(int i)
 {
-	if (i < 0 || i >= sampler.lock()->getSoundCount())
+	if (i < 0 || i >= sampler->getSoundCount())
 		return;
 
 	rSource = i;

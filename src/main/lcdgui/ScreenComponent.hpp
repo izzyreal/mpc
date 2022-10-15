@@ -34,7 +34,7 @@ namespace mpc::lcdgui
 		
 	protected:
 		mpc::Mpc& mpc;
-		std::weak_ptr<mpc::sampler::Sampler> sampler;
+		std::shared_ptr<mpc::sampler::Sampler> sampler;
 		std::weak_ptr<mpc::sequencer::Sequencer> sequencer;
 		std::weak_ptr<mpc::lcdgui::LayeredScreen> ls;
 		std::string param = "";
@@ -47,10 +47,8 @@ namespace mpc::lcdgui
 		void openScreen(const std::string& screenName);
 		void setLastFocus(const std::string& screenName, const std::string& newLastFocus);
 		const std::string getLastFocus(const std::string& screenName);
-		std::weak_ptr<Background> findBackground();
 		std::weak_ptr<Wave> findWave();
 		std::weak_ptr<EnvGraph> findEnvGraph();
-		std::weak_ptr<Component> addChild(std::shared_ptr<Component> child) override;
 
 		template<typename T, typename... Args>
 		std::weak_ptr<T> addChildT(Args... args)
@@ -66,8 +64,8 @@ namespace mpc::lcdgui
 
 	public:
 		ScreenComponent(mpc::Mpc& mpc, const std::string& name, const int layer);
-		void setTransferMap(const std::map<std::string, std::vector<std::string>>& transferMap);
-		void setFirstField(const std::string& firstField);
+		void setTransferMap(const std::map<std::string, std::vector<std::string>>& newTransferMap);
+		void setFirstField(const std::string& newFirstField);
 		std::string getFirstField();
 		const std::map<std::string, std::vector<std::string>>& getTransferMap();
 

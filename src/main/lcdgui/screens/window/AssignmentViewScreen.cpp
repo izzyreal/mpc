@@ -91,7 +91,7 @@ void AssignmentViewScreen::right()
 void AssignmentViewScreen::turnWheel(int i)
 {
 	init();
-    auto lastPad = sampler.lock()->getLastPad(program.lock().get());
+    auto lastPad = sampler->getLastPad(program.lock().get());
 	lastPad->setNote(lastPad->getNote() + i);
     displayNote();
     displaySoundName();
@@ -138,7 +138,7 @@ void AssignmentViewScreen::displayPad(int i)
 	if (note != 34)
 	{
 		auto sampleNumber = program.lock()->getNoteParameters(note)->getSoundIndex();
-		sampleName = sampleNumber != -1 ? sampler.lock()->getSoundName(sampleNumber) : "--";
+		sampleName = sampleNumber != -1 ? sampler->getSoundName(sampleNumber) : "--";
 	
 		if (sampleName.length() > 8)
 			sampleName = StrUtil::trim(sampleName.substr(0, 8));
@@ -172,11 +172,11 @@ void AssignmentViewScreen::displaySoundName()
 
 	int soundIndex = program.lock()->getNoteParameters(note)->getSoundIndex();
 
-	string soundName = soundIndex == -1 ? "OFF" : sampler.lock()->getSoundName(soundIndex);
+	string soundName = soundIndex == -1 ? "OFF" : sampler->getSoundName(soundIndex);
 
 	init();
 
-	auto noteParameters = sampler.lock()->getLastNp(program.lock().get());
+	auto noteParameters = sampler->getLastNp(program.lock().get());
 	
 	string stereo = "";
 

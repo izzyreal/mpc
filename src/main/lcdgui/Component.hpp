@@ -13,6 +13,7 @@ namespace mpc::lcdgui
 	class Field;
 	class Parameter;
 	class ScreenComponent;
+    class Background;
 }
 
 namespace mpc::lcdgui
@@ -57,7 +58,7 @@ namespace mpc::lcdgui
 			return {};
 		}
 
-		virtual std::weak_ptr<Component> addChild(std::shared_ptr<Component> child);
+		std::weak_ptr<Component> addChild(std::shared_ptr<Component> child);
 		void removeChild(std::weak_ptr<Component> child);
 		void addChildren(std::vector<std::shared_ptr<Component>> children);
 		std::weak_ptr<Component> findChild(const std::string& name);
@@ -68,7 +69,8 @@ namespace mpc::lcdgui
 		std::vector<std::weak_ptr<Field>> findFields();
 		std::vector<std::weak_ptr<Parameter>> findParameters();
 		std::weak_ptr<ScreenComponent> findScreenComponent();
-		MRECT getRect();
+        std::weak_ptr<Background> findBackground();
+        MRECT getRect();
 		std::vector<std::weak_ptr<Component>> findHiddenChildren();
 		void deleteChildren(const std::string& name);
 

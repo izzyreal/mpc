@@ -12,7 +12,7 @@ using namespace std;
 LoopToFineScreen::LoopToFineScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "loop-to-fine", layerIndex)
 {
-	addChild(move(make_shared<Wave>()));
+	addChild(std::move(make_shared<Wave>()));
 	findWave().lock()->setFine(true);
 }
 
@@ -39,7 +39,7 @@ void LoopToFineScreen::displayLoopLngth()
 
 void LoopToFineScreen::displayLngthField()
 {
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 	
 	if (!sound)
 	{
@@ -52,7 +52,7 @@ void LoopToFineScreen::displayLngthField()
 void LoopToFineScreen::displayFineWave()
 {
 	auto trimScreen = mpc.screens->get<TrimScreen>("trim");
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 	
 	if (!sound)
 	{
@@ -65,12 +65,12 @@ void LoopToFineScreen::displayFineWave()
 
 void LoopToFineScreen::displayPlayX()
 {
-    findField("playx").lock()->setText(playXNames[sampler.lock()->getPlayX()]);
+    findField("playx").lock()->setText(playXNames[sampler->getPlayX()]);
 }
 
 void LoopToFineScreen::displayTo()
 {
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 
 	if (!sound)
 	{
@@ -94,7 +94,7 @@ void LoopToFineScreen::function(int i)
 		findWave().lock()->zoomMinus();
 		break;
 	case 4:
-		sampler.lock()->playX();
+		sampler->playX();
 		break;
 	}
 }
@@ -102,7 +102,7 @@ void LoopToFineScreen::function(int i)
 void LoopToFineScreen::turnWheel(int i)
 {
 	init();
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 	auto startEndLength = static_cast<int>(sound->getEnd() - sound->getStart());
 	auto loopLength = static_cast<int>(sound->getEnd() - sound->getLoopTo());
 	auto loopScreen = mpc.screens->get<LoopScreen>("loop");
@@ -149,7 +149,7 @@ void LoopToFineScreen::turnWheel(int i)
 	}
 	else if (param.compare("playx") == 0)
 	{
-		sampler.lock()->setPlayX(sampler.lock()->getPlayX() + i);
+		sampler->setPlayX(sampler->getPlayX() + i);
 		displayPlayX();
 	}
 }

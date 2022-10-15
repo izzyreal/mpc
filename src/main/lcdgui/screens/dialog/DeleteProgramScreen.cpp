@@ -14,7 +14,7 @@ DeleteProgramScreen::DeleteProgramScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void DeleteProgramScreen::open()
 {
-    auto allPrograms = sampler.lock()->getPrograms();
+    auto allPrograms = sampler->getPrograms();
 
     init();
 
@@ -36,14 +36,14 @@ void DeleteProgramScreen::function(int i)
         openScreen("program");
         break;
     case 4:
-        if (sampler.lock()->getProgramCount() > 1)
+        if (sampler->getProgramCount() > 1)
         {
-			sampler.lock()->deleteProgram(sampler.lock()->getProgram(pgm));
+			sampler->deleteProgram(sampler->getProgram(pgm));
         }
         else
         {
 			const bool initPgms = true;
-			sampler.lock()->deleteAllPrograms(initPgms);
+			sampler->deleteAllPrograms(initPgms);
 		}
         
         openScreen("program");
@@ -55,13 +55,13 @@ void DeleteProgramScreen::turnWheel(int i)
 {
     init();
 
-    if (param.compare("pgm") == 0)
+    if (param == "pgm")
 		setPgm(pgm + i);
 }
 
 void DeleteProgramScreen::displayPgm()
 {
-    findField("pgm").lock()->setText(StrUtil::padLeft(to_string(pgm + 1), " ", 2) + "-" + sampler.lock()->getProgram(pgm).lock()->getName());
+    findField("pgm").lock()->setText(StrUtil::padLeft(to_string(pgm + 1), " ", 2) + "-" + sampler->getProgram(pgm).lock()->getName());
 }
 
 void DeleteProgramScreen::setPgm(int i)
@@ -74,9 +74,9 @@ void DeleteProgramScreen::setPgm(int i)
     do {
         candidate = up ? candidate + 1 : candidate - 1;
 
-        if (candidate < 0 || candidate >= sampler.lock()->getPrograms().size())
+        if (candidate < 0 || candidate >= sampler->getPrograms().size())
             return;
-    } while (!sampler.lock()->getProgram(candidate).lock());
+    } while (!sampler->getProgram(candidate).lock());
 
     pgm = candidate;
     displayPgm();

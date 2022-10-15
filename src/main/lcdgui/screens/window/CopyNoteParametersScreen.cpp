@@ -16,7 +16,7 @@ void CopyNoteParametersScreen::open()
 {
 	init();
 
-	auto note = sampler.lock()->getLastNp(program.lock().get())->getNumber();
+	auto note = sampler->getLastNp(program.lock().get())->getNumber();
 
 	auto programIndex = mpcSoundPlayerChannel->getProgram();
 	setProg0(programIndex);
@@ -29,19 +29,19 @@ void CopyNoteParametersScreen::turnWheel(int i)
 {
     init();
     
-	if (param.compare("prog0") == 0)
+	if (param == "prog0")
 	{
 		setProg0(prog0 + i);
 	}
-	else if (param.compare("note0") == 0)
+	else if (param == "note0")
 	{
 		setNote0(mpc.getNote() + i);
 	}
-	else if (param.compare("prog1") == 0)
+	else if (param == "prog1")
 	{
 		setProg1(prog1 + i);
 	}
-	else if (param.compare("note1") == 0)
+	else if (param == "note1")
 	{
 		setNote1(note1 + i);
 	}
@@ -55,8 +55,8 @@ void CopyNoteParametersScreen::function(int i)
 	{
 	case 4:
 	{
-		auto source = dynamic_cast<mpc::sampler::NoteParameters*>(sampler.lock()->getProgram(prog0).lock()->getNoteParameters(mpc.getNote()));
-		auto dest = dynamic_cast<mpc::sampler::Program*>(sampler.lock()->getProgram(prog1).lock().get());
+		auto source = dynamic_cast<mpc::sampler::NoteParameters*>(sampler->getProgram(prog0).lock()->getNoteParameters(mpc.getNote()));
+		auto dest = dynamic_cast<mpc::sampler::Program*>(sampler->getProgram(prog1).lock().get());
 		auto clone = source->clone(note1);
 		dest->setNoteParameters(note1, clone);
 		openScreen("program-assign");
@@ -67,20 +67,20 @@ void CopyNoteParametersScreen::function(int i)
 
 void CopyNoteParametersScreen::displayProg0()
 {
-	auto program = sampler.lock()->getProgram(prog0).lock();
+	auto program = sampler->getProgram(prog0).lock();
 	findField("prog0").lock()->setText(StrUtil::padLeft(to_string(prog0 + 1), " ", 2) + "-" + program->getName());
 }
 
 void CopyNoteParametersScreen::displayNote0()
 {
-	auto noteParameters = sampler.lock()->getLastNp(program.lock().get());
+	auto noteParameters = sampler->getLastNp(program.lock().get());
 	auto note0 = noteParameters->getNumber();
-	auto program = sampler.lock()->getProgram(prog0).lock();
+	auto program = sampler->getProgram(prog0).lock();
 	auto padIndex = program->getPadIndexFromNote(note0);
 	auto soundIndex = note0 != -1 ? noteParameters->getSoundIndex() : -1;
 	auto noteText = note0 == -1 ? "--" : to_string(note0);
-	auto padName = sampler.lock()->getPadName(padIndex);
-	auto sampleName = soundIndex != -1 ? "-" + sampler.lock()->getSoundName(soundIndex) : "-OFF";
+	auto padName = sampler->getPadName(padIndex);
+	auto sampleName = soundIndex != -1 ? "-" + sampler->getSoundName(soundIndex) : "-OFF";
 	
 	if (note0 == -1)
 		sampleName = "";
@@ -90,18 +90,18 @@ void CopyNoteParametersScreen::displayNote0()
 
 void CopyNoteParametersScreen::displayProg1()
 {
-	auto program = sampler.lock()->getProgram(prog1).lock();
+	auto program = sampler->getProgram(prog1).lock();
 	findField("prog1").lock()->setText(StrUtil::padLeft(to_string(prog1 + 1), " ", 2) + "-" + program->getName());
 }
 
 void CopyNoteParametersScreen::displayNote1()
 {
-	auto program = sampler.lock()->getProgram(prog1).lock();
+	auto program = sampler->getProgram(prog1).lock();
 	auto padIndex = program->getPadIndexFromNote(note1 + 35);
 	auto soundIndex = note1 != -1 ? program->getNoteParameters(note1 + 35)->getSoundIndex() : -1;
 	auto noteText = note1 == -1 ? "--" : to_string(note1 + 35);
-	auto padName = sampler.lock()->getPadName(padIndex);
-	auto sampleName = soundIndex != -1 ? "-" + sampler.lock()->getSoundName(soundIndex) : "-OFF";
+	auto padName = sampler->getPadName(padIndex);
+	auto sampleName = soundIndex != -1 ? "-" + sampler->getSoundName(soundIndex) : "-OFF";
 
 	if (note1 == -1)
 		sampleName = "";
@@ -112,7 +112,7 @@ void CopyNoteParametersScreen::displayNote1()
 
 void CopyNoteParametersScreen::setProg0(int i)
 {
-	if (i < 0 || i >= sampler.lock()->getProgramCount())
+	if (i < 0 || i >= sampler->getProgramCount())
 		return;
 	
 	prog0 = i;
@@ -121,7 +121,7 @@ void CopyNoteParametersScreen::setProg0(int i)
 
 void CopyNoteParametersScreen::setProg1(int i)
 {
-	if (i < 0 || i >= sampler.lock()->getProgramCount())
+	if (i < 0 || i >= sampler->getProgramCount())
 		return;
 
 	prog1 = i;

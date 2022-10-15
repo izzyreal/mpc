@@ -26,7 +26,7 @@ void SoundMemoryScreen::displayFreeMemoryTime()
 {
 	auto total = 33374880;
 	
-	for (auto& s : sampler.lock()->getSounds())
+	for (auto& s : sampler->getSounds())
 		total -= (s.lock()->getSampleData()->size() * 2);
 
 	auto time = StrUtil::padLeft(StrUtil::TrimDecimals(total / 176400.0, 1), " ", 6);
@@ -35,7 +35,7 @@ void SoundMemoryScreen::displayFreeMemoryTime()
 
 void SoundMemoryScreen::displayIndicator()
 {
-	auto free = (32620.0 - sampler.lock()->getFreeSampleSpace()) / 32620.0;
+	auto free = (32620.0 - sampler->getFreeSampleSpace()) / 32620.0;
 	findChild<PunchRect>("free-memory").lock()->setSize((int)floor(200.0 * free), 9);
 }
 

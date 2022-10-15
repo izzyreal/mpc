@@ -283,7 +283,7 @@ void EditMultipleScreen::updateEditMultiple()
                 findLabel("value0").lock()->setText(singleLabels[0]);
                 findField("value0").lock()->setSize(6 * 6 + 1, 9);
 
-                auto padName = sampler.lock()->getPadName(program.lock()->getPadIndexFromNote(changeNoteTo));
+                auto padName = sampler->getPadName(program.lock()->getPadIndexFromNote(changeNoteTo));
                 auto noteName = changeNoteTo == 34 ? "--" : std::to_string(changeNoteTo);
                 findField("value0").lock()->setText(noteName + "/" + padName);
             }

@@ -26,15 +26,15 @@ void DeleteSoundScreen::function(int i)
         openScreen("sound");
         break;
     case 4:
-        sampler.lock()->deleteSound(sampler.lock()->getSoundIndex());
+        sampler->deleteSound(sampler->getSoundIndex());
 
-		if (sampler.lock()->getSoundIndex() > sampler.lock()->getSoundCount() - 1)
-			sampler.lock()->setSoundIndex(sampler.lock()->getSoundCount() - 1);
+		if (sampler->getSoundIndex() > sampler->getSoundCount() - 1)
+			sampler->setSoundIndex(sampler->getSoundCount() - 1);
 		
-		if (sampler.lock()->getSoundCount() > 0)
+		if (sampler->getSoundCount() > 0)
 			openScreen("sound");
 		else
-			openScreen(sampler.lock()->getPreviousScreenName());
+			openScreen(sampler->getPreviousScreenName());
 
 		break;
     }
@@ -43,19 +43,19 @@ void DeleteSoundScreen::function(int i)
 void DeleteSoundScreen::turnWheel(int i)
 {
 	init();
-	if (param.compare("snd") == 0)
+	if (param == "snd")
 	{
-		sampler.lock()->setSoundIndex(sampler.lock()->getSoundIndex() + i);
+		sampler->setSoundIndex(sampler->getSoundIndex() + i);
 		displaySnd();
 	}
 }
 
 void DeleteSoundScreen::displaySnd()
 {
-	if (!sampler.lock()->getSound().lock())
+	if (!sampler->getSound().lock())
 	{
 		return;
 	}
 
-	findField("snd").lock()->setText(sampler.lock()->getSound().lock()->getName());
+	findField("snd").lock()->setText(sampler->getSound().lock()->getName());
 }

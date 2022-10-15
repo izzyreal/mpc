@@ -55,7 +55,7 @@ void ProgramScreen::function(int i)
 		break;
 	case 2:
 	{
-		if (sampler.lock()->getProgramCount() == 24)
+		if (sampler->getProgramCount() == 24)
 		{
 			auto popupScreen = mpc.screens->get<PopupScreen>("popup");
 			popupScreen->setText("Prog. directory full(24 max)");

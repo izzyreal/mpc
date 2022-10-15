@@ -29,7 +29,7 @@ void MuteAssignScreen::close()
 void MuteAssignScreen::turnWheel(int i)
 {
     init();
-	auto lastNoteParameters = sampler.lock()->getLastNp(program.lock().get());
+	auto lastNoteParameters = sampler->getLastNp(program.lock().get());
 
 	if (param.compare("note") == 0)
 	{
@@ -49,16 +49,16 @@ void MuteAssignScreen::turnWheel(int i)
 
 void MuteAssignScreen::displayNote()
 {
-	auto note = sampler.lock()->getLastNp(program.lock().get())->getNumber();
+	auto note = sampler->getLastNp(program.lock().get())->getNumber();
 	auto pad = program.lock()->getPadIndexFromNote(note);
 	string soundName = "OFF";
 
-    auto padName = sampler.lock()->getPadName(pad);
+    auto padName = sampler->getPadName(pad);
 	auto sound = program.lock()->getNoteParameters(note)->getSoundIndex();
 
     if (sound != -1)
     {
-        soundName = sampler.lock()->getSoundName(sound);
+        soundName = sampler->getSoundName(sound);
     }
 
 	findField("note").lock()->setText(to_string(note) + "/" + padName + "-" + soundName);
@@ -67,7 +67,7 @@ void MuteAssignScreen::displayNote()
 void MuteAssignScreen::displayNote0()
 {
 
-	auto note0 = sampler.lock()->getLastNp(program.lock().get())->getMuteAssignA();
+	auto note0 = sampler->getLastNp(program.lock().get())->getMuteAssignA();
 
 	if (note0 == 34)
 	{
@@ -81,15 +81,15 @@ void MuteAssignScreen::displayNote0()
 	
 	if (sound != -1)
 	{
-		soundName = sampler.lock()->getSoundName(sound);
+		soundName = sampler->getSoundName(sound);
 	}
 
-	findField("note0").lock()->setText(to_string(note0) + "/" + sampler.lock()->getPadName(pad) + "-" + soundName);
+	findField("note0").lock()->setText(to_string(note0) + "/" + sampler->getPadName(pad) + "-" + soundName);
 }
 
 void MuteAssignScreen::displayNote1()
 {
-	auto note1 = sampler.lock()->getLastNp(program.lock().get())->getMuteAssignB();
+	auto note1 = sampler->getLastNp(program.lock().get())->getMuteAssignB();
 
 	if (note1 == 34)
 	{
@@ -103,10 +103,10 @@ void MuteAssignScreen::displayNote1()
 
 	if (sound != -1)
 	{
-		soundName = sampler.lock()->getSoundName(sound);
+		soundName = sampler->getSoundName(sound);
 	}
 
-	findField("note1").lock()->setText(to_string(note1) + "/" + sampler.lock()->getPadName(pad) + "-" + soundName);
+	findField("note1").lock()->setText(to_string(note1) + "/" + sampler->getPadName(pad) + "-" + soundName);
 }
 
 void MuteAssignScreen::update(moduru::observer::Observable* o, nonstd::any arg)

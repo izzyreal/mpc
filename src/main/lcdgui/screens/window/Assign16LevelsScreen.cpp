@@ -142,14 +142,14 @@ void Assign16LevelsScreen::displayNote()
 {
     init();
 
-    auto pgmNumber = sampler.lock()->getDrumBusProgramNumber(track.lock()->getBus());
-    auto program = sampler.lock()->getProgram(pgmNumber).lock();
+    auto pgmNumber = sampler->getDrumBusProgramNumber(track.lock()->getBus());
+    auto program = sampler->getProgram(pgmNumber).lock();
     auto padIndex = program->getPadIndexFromNote(note);
 
-    auto padName = sampler.lock()->getPadName(padIndex);
+    auto padName = sampler->getPadName(padIndex);
 
     auto soundIndex = note == 34 ? -1 : program->getNoteParameters(note)->getSoundIndex();
-    auto soundName = soundIndex == -1 ? "(No sound)" : sampler.lock()->getSoundName(soundIndex);
+    auto soundName = soundIndex == -1 ? "(No sound)" : sampler->getSoundName(soundIndex);
 
     auto noteName = note == 34 ? "--" : to_string(note);
 

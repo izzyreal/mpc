@@ -143,7 +143,7 @@ void TimingCorrectScreen::displayNotes()
 		else
         {
             auto padIndex = program.lock()->getPadIndexFromNote(note0);
-            auto padName = sampler.lock()->getPadName(padIndex);
+            auto padName = sampler->getPadName(padIndex);
             findField("note0").lock()->setText(std::to_string(note0) + "/" + padName);
         }
 

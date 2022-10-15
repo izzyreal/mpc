@@ -12,27 +12,15 @@ ScreenComponent::ScreenComponent(mpc::Mpc& mpc, const string& name, const int la
 	: Component(name), layer(layer), mpc(mpc)
 {
 	ls = mpc.getLayeredScreen();
-	sampler = mpc.getSampler();
+	sampler = mpc.getSampler().lock();
 	sequencer = mpc.getSequencer();
 	auto background = dynamic_pointer_cast<Background>(addChild(make_shared<Background>()).lock());
 	background->setName(name);
 }
 
-weak_ptr<Component> ScreenComponent::addChild(shared_ptr<Component> child)
+void ScreenComponent::setTransferMap(const map<string, vector<string>>& newTransferMap)
 {
-	auto background = findBackground().lock();
-	
-	if (background)
-	{
-		return background->addChild(child);
-	}
-
-	return Component::addChild(child);
-}
-
-void ScreenComponent::setTransferMap(const map<string, vector<string>>& transferMap)
-{
-	this->transferMap = transferMap;
+	transferMap = newTransferMap;
 }
 
 const map<string, vector<string>>& ScreenComponent::getTransferMap()
@@ -40,9 +28,9 @@ const map<string, vector<string>>& ScreenComponent::getTransferMap()
 	return transferMap;
 }
 
-void ScreenComponent::setFirstField(const std::string& firstField)
+void ScreenComponent::setFirstField(const std::string& newFirstField)
 {
-	this->firstField = firstField;
+	firstField = newFirstField;
 }
 
 std::string ScreenComponent::getFirstField()
@@ -88,9 +76,4 @@ void ScreenComponent::setLastFocus(const string& screenName, const string& newLa
 const string ScreenComponent::getLastFocus(const string& screenName)
 {
 	return mpc.getLayeredScreen().lock()->getLastFocus(screenName);
-}
-
-weak_ptr<Background> ScreenComponent::findBackground()
-{
-	return findChild<Background>("");
 }

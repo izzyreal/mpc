@@ -33,19 +33,19 @@ void VeloPitchScreen::turnWheel(int i)
 {
 	init();
 
-	auto lastNp = sampler.lock()->getLastNp(program.lock().get());
+	auto lastNp = sampler->getLastNp(program.lock().get());
 
-	if (param.compare("tune") == 0)
+	if (param == "tune")
 	{
 		lastNp->setTune(lastNp->getTune() + i);
 		displayTune();
 	}
-	else if (param.compare("velo-pitch") == 0)
+	else if (param == "velo-pitch")
 	{
 		lastNp->setVelocityToPitch(lastNp->getVelocityToPitch() + i);
 		displayVeloPitch();
 	}
-	else if (param.compare("note") == 0)
+	else if (param == "note")
 	{
 		mpc.setNote(mpc.getNote() + i);
 		// We could call all display methods here, but we instead rely on the "note" message
@@ -54,14 +54,14 @@ void VeloPitchScreen::turnWheel(int i)
 
 void VeloPitchScreen::displayTune()
 {
-	auto value = sampler.lock()->getLastNp(program.lock().get())->getTune();
+	auto value = sampler->getLastNp(program.lock().get())->getTune();
 	string prefix = value < 0 ? "-" : " ";
 	findField("tune").lock()->setText(prefix + StrUtil::padLeft(to_string(abs(value)), " ", 3));
 }
 
 void VeloPitchScreen::displayVeloPitch()
 {
-	auto value = sampler.lock()->getLastNp(program.lock().get())->getVelocityToPitch();
+	auto value = sampler->getLastNp(program.lock().get())->getVelocityToPitch();
 	string prefix = value < 0 ? "-" : " ";
 	findField("velo-pitch").lock()->setText(prefix + StrUtil::padLeft(to_string(abs(value)), " ", 3));
 }
@@ -76,7 +76,7 @@ void VeloPitchScreen::update(moduru::observer::Observable* observable, nonstd::a
 {
 	auto msg = nonstd::any_cast<string>(message);
 
-	if (msg.compare("note") == 0)
+	if (msg == "note")
 	{
 		displayNote();
 		displayTune();
@@ -86,11 +86,11 @@ void VeloPitchScreen::update(moduru::observer::Observable* observable, nonstd::a
 
 void VeloPitchScreen::displayNote()
 {
-	auto noteParameters = sampler.lock()->getLastNp(program.lock().get());
+	auto noteParameters = sampler->getLastNp(program.lock().get());
 	auto soundIndex = noteParameters->getSoundIndex();
 	auto padIndex = program.lock()->getPadIndexFromNote(noteParameters->getNumber());
-	auto padName = sampler.lock()->getPadName(padIndex);
-	auto sampleName = soundIndex != -1 ? sampler.lock()->getSoundName(soundIndex) : "OFF";
+	auto padName = sampler->getPadName(padIndex);
+	auto sampleName = soundIndex != -1 ? sampler->getSoundName(soundIndex) : "OFF";
 	string stereo = noteParameters->getStereoMixerChannel().lock()->isStereo() && soundIndex != -1 ? "(ST)" : "";
 	findField("note").lock()->setText(to_string(noteParameters->getNumber()) + "/" + padName + "-" + StrUtil::padRight(sampleName, " ", 16) + stereo);
 }

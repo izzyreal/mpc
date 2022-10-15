@@ -15,15 +15,15 @@ void ResampleScreen::open()
 {
 	auto previousScreenName = ls.lock()->getPreviousScreenName();
 
-	if (previousScreenName.compare("name") != 0 && sampler.lock()->getSound().lock())
+	if (previousScreenName != "name" && sampler->getSound().lock())
 	{
-		newName = sampler.lock()->getSound().lock()->getName();
-		newName = sampler.lock()->addOrIncreaseNumber(newName);
+		newName = sampler->getSound().lock()->getName();
+		newName = sampler->addOrIncreaseNumber(newName);
 	}
 
-	if (sampler.lock()->getSound().lock())
+	if (sampler->getSound().lock())
 	{
-		setNewFs(sampler.lock()->getSound().lock()->getSampleRate());
+		setNewFs(sampler->getSound().lock()->getSampleRate());
 	}
 
 	displayNewBit();
@@ -36,23 +36,23 @@ void ResampleScreen::turnWheel(int i)
 {
 	init();
 
-	if (param.compare("newfs") == 0)
+	if (param == "newfs")
 	{
 		setNewFs(newFs + i);
 	}
-	else if (param.compare("newbit") == 0)
+	else if (param == "newbit")
 	{
 		setNewBit(newBit + i);
 	}
-	else if (param.compare("quality") == 0)
+	else if (param == "quality")
 	{
 		setQuality(quality + i);
 	}
-	else if (param.compare("newname") == 0)
+	else if (param == "newname")
 	{
 		auto nameScreen = mpc.screens->get<NameScreen>("name");
         auto resampleScreen = this;
-        auto _sampler = sampler.lock();
+        auto _sampler = sampler;
 		nameScreen->setName(findField("newname").lock()->getText());
 
         auto renamer = [_sampler, resampleScreen](string& newName2) {
@@ -78,8 +78,8 @@ void ResampleScreen::function(int i)
 		break;
 	case 4:
 	{
-		auto snd = sampler.lock()->getSound(sampler.lock()->getSoundIndex()).lock();
-		auto destSnd = sampler.lock()->addSound().lock();
+		auto snd = sampler->getSound(sampler->getSoundIndex()).lock();
+		auto destSnd = sampler->addSound().lock();
 		destSnd->setName(newName);
         destSnd->setSampleRate(newFs);
 
@@ -117,7 +117,7 @@ void ResampleScreen::function(int i)
             sampler::Sampler::process8Bit(destSnd->getSampleData());
 		}
 
-		sampler.lock()->setSoundIndex(sampler.lock()->getSoundCount() - 1);
+		sampler->setSoundIndex(sampler->getSoundCount() - 1);
 		openScreen("sound");
 		break;
 	}

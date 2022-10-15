@@ -27,13 +27,12 @@ void SoundScreen::turnWheel(int i)
 	{
 		auto nameScreen = mpc.screens->get<NameScreen>("name");
 		nameScreen->setName(findField("soundname").lock()->getText());
-        const auto _sampler = sampler.lock();
-        
-        auto renamer = [_sampler](string& newName) {
-            if (_sampler->isSoundNameOccupied(newName))
+
+        auto renamer = [&](string& newName) {
+            if (sampler->isSoundNameOccupied(newName))
                 return;
 
-            _sampler->getSound().lock()->setName(newName);
+            sampler->getSound().lock()->setName(newName);
         };
 
         nameScreen->setRenamerAndScreenToReturnTo(renamer, "sound");
@@ -61,7 +60,7 @@ void SoundScreen::function(int i)
 
 void SoundScreen::displaySoundName()
 {
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 
 	if (!sound)
 	{
@@ -74,7 +73,7 @@ void SoundScreen::displaySoundName()
 
 void SoundScreen::displayType()
 {
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 
 	if (!sound)
 	{
@@ -87,7 +86,7 @@ void SoundScreen::displayType()
 
 void SoundScreen::displayRate()
 {
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 
 	if (!sound)
 	{
@@ -100,7 +99,7 @@ void SoundScreen::displayRate()
 
 void SoundScreen::displaySize()
 {
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 
 	if (!sound)
 	{

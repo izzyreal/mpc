@@ -43,9 +43,9 @@ void CreateNewProgramScreen::open()
     {
         auto letterIndex = 21 + 24;
         
-        for (int i = 0; i < sampler.lock()->getPrograms().size(); i++)
+        for (int i = 0; i < sampler->getPrograms().size(); i++)
         {
-            if (!sampler.lock()->getProgram(i).lock())
+            if (!sampler->getProgram(i).lock())
             {
                 letterIndex = 21 + i;
                 midiProgramChange = i + 1;
@@ -72,15 +72,15 @@ void CreateNewProgramScreen::function(int i)
 		openScreen("program");
 		break;
 	case 4:
-		auto newProgram = sampler.lock()->addProgram().lock();
+		auto newProgram = sampler->addProgram().lock();
 		newProgram->setName(newName);
 		newProgram->setMidiProgramChange(midiProgramChange);
 		
-		auto index = sampler.lock()->getProgramCount() - 1;
+		auto index = sampler->getProgramCount() - 1;
 
-		for (int j = 0; j < sampler.lock()->getPrograms().size(); j++)
+		for (int j = 0; j < sampler->getPrograms().size(); j++)
 		{
-			if (sampler.lock()->getProgram(j).lock() == newProgram)
+			if (sampler->getProgram(j).lock() == newProgram)
 			{
 				index = j;
 				break;

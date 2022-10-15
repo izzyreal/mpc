@@ -94,9 +94,9 @@ void EditVelocityScreen::turnWheel(int i)
 {
 	init();
 
-	if (param.compare("edittype") == 0)
+	if (param == "edittype")
 		setEditType(editType + i);
-	else if (param.compare("value") == 0)
+	else if (param == "value")
 		setValue(value + i);
 	
 	checkAllTimesAndNotes(mpc, i);
@@ -135,7 +135,7 @@ void EditVelocityScreen::displayNotes()
 		}
 		else
 		{
-            auto padName = sampler.lock()->getPadName(program.lock()->getPadIndexFromNote(note0));
+            auto padName = sampler->getPadName(program.lock()->getPadIndexFromNote(note0));
             findField("note0").lock()->setText(to_string(note0) + "/" + padName);
 		}
 		

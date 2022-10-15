@@ -11,7 +11,7 @@ using namespace std;
 StartFineScreen::StartFineScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "start-fine", layerIndex)
 {
-	addChild(move(make_shared<Wave>()));
+	addChild(std::move(make_shared<Wave>()));
 	findWave().lock()->setFine(true);
 }
 
@@ -33,7 +33,7 @@ void StartFineScreen::displayFineWave()
 {
 	auto trimScreen = mpc.screens->get<TrimScreen>("trim");
 
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 
 	if (!sound)
 		return;
@@ -44,7 +44,7 @@ void StartFineScreen::displayFineWave()
 
 void StartFineScreen::displayStart()
 {
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 
 	if (!sound)
 		return;
@@ -54,7 +54,7 @@ void StartFineScreen::displayStart()
 
 void StartFineScreen::displayLngthLabel()
 {
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 
 	if (!sound)
 		return;
@@ -70,7 +70,7 @@ void StartFineScreen::displaySmplLngth()
 
 void StartFineScreen::displayPlayX()
 {
-    findField("playx").lock()->setText(playXNames[sampler.lock()->getPlayX()]);
+    findField("playx").lock()->setText(playXNames[sampler->getPlayX()]);
 }
 
 void StartFineScreen::function(int i)
@@ -87,7 +87,7 @@ void StartFineScreen::function(int i)
 		findWave().lock()->zoomMinus();
 		break;
 	case 4:
-		sampler.lock()->playX();
+		sampler->playX();
 		break;
 	}
 }
@@ -95,7 +95,7 @@ void StartFineScreen::function(int i)
 void StartFineScreen::turnWheel(int i)
 {
 	init();
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 	auto startEndLength = static_cast<int>(sound->getEnd() - sound->getStart());
 	auto trimScreen = mpc.screens->get<TrimScreen>("trim");
 
@@ -138,7 +138,7 @@ void StartFineScreen::turnWheel(int i)
 	}
 	else if (param.compare("playx") == 0)
 	{
-		sampler.lock()->setPlayX(sampler.lock()->getPlayX() + i);
+		sampler->setPlayX(sampler->getPlayX() + i);
 		displayPlayX();
 	}
 }

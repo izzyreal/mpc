@@ -1,6 +1,5 @@
 #include "EraseScreen.hpp"
 
-#include <sequencer/Event.hpp>
 #include <sequencer/Track.hpp>
 #include <sequencer/NoteEvent.hpp>
 #include <sequencer/SeqUtil.hpp>
@@ -57,15 +56,15 @@ void EraseScreen::turnWheel(int i)
 	if (checkAllTimesAndNotes(mpc, i))
 		return;
 
-	if (param.compare("track") == 0)
+	if (param == "track")
 	{
 		setTrack(track + i);
 	}
-	else if (param.compare("erase") == 0)
+	else if (param == "erase")
 	{
 		setErase(erase + i);
 	}
-	else if (param.compare("type") == 0)
+	else if (param == "type")
 	{
 		setType(type + i);
 	}
@@ -134,7 +133,7 @@ void EraseScreen::function(int i)
 					case 1:
 						excludeClass = eventClassNames[type];
 
-						if (System::demangle(typeid(e).name()).compare(excludeClass) != 0)
+						if (System::demangle(typeid(e).name()) != excludeClass)
 						{
 							if (ne)
 							{
@@ -269,7 +268,7 @@ void EraseScreen::displayNotes()
 		else
         {
             auto padIndexWithBank = program.lock()->getPadIndexFromNote(note0);
-            auto padName = sampler.lock()->getPadName(padIndexWithBank);
+            auto padName = sampler->getPadName(padIndexWithBank);
             findField("note0").lock()->setText(to_string(note0) + "/" + padName);
         }
 	}

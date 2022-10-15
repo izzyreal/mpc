@@ -18,7 +18,7 @@ void InitPadAssignScreen::open()
 void InitPadAssignScreen::turnWheel(int i)
 {
     init();
-	if (param.compare("init-pad-assign") == 0)
+	if (param == "init-pad-assign")
 	{
 		initPadAssignIsMaster = i > 0;
 		displayInitPadAssign();
@@ -36,7 +36,7 @@ void InitPadAssignScreen::function(int i)
 	case 4:
 		if (initPadAssignIsMaster)
 		{
-			sampler.lock()->setMasterPadAssign(*sampler.lock()->getInitMasterPadAssign());
+			sampler->setMasterPadAssign(*sampler->getInitMasterPadAssign());
 		}
 		else {
 			program.lock()->initPadAssign();

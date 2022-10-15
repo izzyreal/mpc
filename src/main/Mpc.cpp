@@ -76,8 +76,6 @@ Mpc::Mpc()
 #endif
 
 	hardware = std::make_shared<hardware::Hardware>(*this);
-	screens = std::make_shared<Screens>(*this);
-	layeredScreen = std::make_shared<lcdgui::LayeredScreen>(*this);
 }
 
 void Mpc::init(const int sampleRate, const int inputCount, const int outputCount)
@@ -92,13 +90,16 @@ void Mpc::init(const int sampleRate, const int inputCount, const int outputCount
 
 	mpcMidiInputs = std::vector<mpc::audiomidi::MpcMidiInput*>{ new mpc::audiomidi::MpcMidiInput(*this, 0), new mpc::audiomidi::MpcMidiInput(*this, 1) };
 
-	/*
-	* AudioMidiServices requires sequencer to exist.
-	*/
+    /*
+    * AudioMidiServices requires sequencer to exist.
+    */
 	audioMidiServices = std::make_shared<mpc::audiomidi::AudioMidiServices>(*this);
 	MLOG("AudioMidiServices created");
 
-	sequencer->init();
+    screens = std::make_shared<Screens>(*this);
+    layeredScreen = std::make_shared<lcdgui::LayeredScreen>(*this);
+
+    sequencer->init();
 	MLOG("Sequencer initialized");
 
     audioMidiServices->start(sampleRate, inputCount, outputCount);

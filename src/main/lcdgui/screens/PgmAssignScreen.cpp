@@ -76,8 +76,8 @@ void PgmAssignScreen::turnWheel(int i)
 {
 	init();
 
-	auto lastPad = sampler.lock()->getLastPad(program.lock().get());
-	auto lastNoteParameters = sampler.lock()->getLastNp(program.lock().get());
+	auto lastPad = sampler->getLastPad(program.lock().get());
+	auto lastNoteParameters = sampler->getLastNp(program.lock().get());
 
 	if (param == "pad-assign")
 	{
@@ -92,7 +92,7 @@ void PgmAssignScreen::turnWheel(int i)
 	else if (param == "pgm")
 	{
 		auto pgm = mpcSoundPlayerChannel->getProgram();
-		auto candidate = sampler.lock()->getUsedProgram(pgm, i > 0);
+		auto candidate = sampler->getUsedProgram(pgm, i > 0);
 
 		if (candidate != pgm)
 		{
@@ -157,11 +157,11 @@ void PgmAssignScreen::turnWheel(int i)
     }
 	else if (param == "snd")
  {		
-		lastNoteParameters->setSoundIndex(sampler.lock()->getNextSoundIndex(lastNoteParameters->getSoundIndex(), i > 0));
+		lastNoteParameters->setSoundIndex(sampler->getNextSoundIndex(lastNoteParameters->getSoundIndex(), i > 0));
 
 		displaySoundName();
 
-		auto sound = sampler.lock()->getSound(lastNoteParameters->getSoundIndex()).lock();
+		auto sound = sampler->getSound(lastNoteParameters->getSoundIndex()).lock();
 		
 		if (sound)
 		{
@@ -219,11 +219,11 @@ void PgmAssignScreen::openWindow()
 	}
 	else if (param == "snd")
 	{
-		auto sn = sampler.lock()->getLastNp(program.lock().get())->getSoundIndex();
+		auto sn = sampler->getLastNp(program.lock().get())->getSoundIndex();
 		if (sn != -1)
 		{
-			sampler.lock()->setSoundIndex(sn);
-			sampler.lock()->setPreviousScreenName("program-assign");
+			sampler->setSoundIndex(sn);
+			sampler->setPreviousScreenName("program-assign");
 			openScreen("sound");
 		}
 	}
@@ -236,7 +236,7 @@ void PgmAssignScreen::displayPgm()
 
 void PgmAssignScreen::displaySoundName()
 {
-	int sndNumber = sampler.lock()->getLastNp(program.lock().get())->getSoundIndex();
+	int sndNumber = sampler->getLastNp(program.lock().get())->getSoundIndex();
 
 	if (sndNumber == -1)
 	{
@@ -245,13 +245,13 @@ void PgmAssignScreen::displaySoundName()
 	}
 	else
 	{
-		string name = sampler.lock()->getSoundName(sndNumber);
+		string name = sampler->getSoundName(sndNumber);
 		findField("snd").lock()->setText(name);
 	}
 
-	if (sampler.lock()->getSoundCount() != 0 && sndNumber != -1)
+	if (sampler->getSoundCount() != 0 && sndNumber != -1)
 	{
-		if (sampler.lock()->getSound(sndNumber).lock()->isMono())
+		if (sampler->getSound(sndNumber).lock()->isMono())
 			findLabel("issoundstereo").lock()->setText("");
 		else
 			findLabel("issoundstereo").lock()->setText("(ST)");
@@ -267,25 +267,23 @@ void PgmAssignScreen::displayPadAssign()
 void PgmAssignScreen::displayPadNote()
 {
 	init();
-	auto lSampler = sampler.lock();
 	auto lProgram = program.lock();
 
-	if (sampler.lock()->getLastPad(lProgram.get())->getNote() == 34)
+	if (sampler->getLastPad(lProgram.get())->getNote() == 34)
 		findField("pad-note").lock()->setText("--");
 	else
-		findField("pad-note").lock()->setText(to_string(sampler.lock()->getLastPad(lProgram.get())->getNote()));
+		findField("pad-note").lock()->setText(to_string(sampler->getLastPad(lProgram.get())->getNote()));
 }
 
 void PgmAssignScreen::displaySoundGenerationMode()
 {
 	init();
-	auto lSampler = sampler.lock();
 	auto sgm = -1;
 	auto lProgram = program.lock();
 	
-	if (sampler.lock()->getLastNp(lProgram.get()) != nullptr)
+	if (sampler->getLastNp(lProgram.get()) != nullptr)
 	{
-		sgm = sampler.lock()->getLastNp(lProgram.get())->getSoundGenerationMode();
+		sgm = sampler->getLastNp(lProgram.get())->getSoundGenerationMode();
 		findField("mode").lock()->setText(soundGenerationModes[sgm]);
 		
 		if (sgm != 0)
@@ -321,7 +319,7 @@ void PgmAssignScreen::displaySoundGenerationMode()
 		}
 	}
 
-	if (sampler.lock()->getLastNp(lProgram.get()) == nullptr || sgm == -1 || sgm == 0)
+	if (sampler->getLastNp(lProgram.get()) == nullptr || sgm == -1 || sgm == 0)
 	{
 		findLabel("velocity-range-lower").lock()->Hide(true);
 		findField("velocity-range-lower").lock()->Hide(true);
@@ -337,51 +335,49 @@ void PgmAssignScreen::displaySoundGenerationMode()
 void PgmAssignScreen::displayVeloRangeUpper()
 {
 	init();
-	auto rangeB = sampler.lock()->getLastNp(program.lock().get())->getVelocityRangeUpper();
+	auto rangeB = sampler->getLastNp(program.lock().get())->getVelocityRangeUpper();
 	findField("velocity-range-upper").lock()->setTextPadded(rangeB, " ");
 }
 
 void PgmAssignScreen::displayVeloRangeLower()
 {
 	init();
-	auto rangeA = sampler.lock()->getLastNp(program.lock().get())->getVelocityRangeLower();
+	auto rangeA = sampler->getLastNp(program.lock().get())->getVelocityRangeLower();
 	findField("velocity-range-lower").lock()->setTextPadded(rangeA, " ");
 }
 
 void PgmAssignScreen::displayOptionalNoteA()
 {
 	init();
-	auto lSampler = sampler.lock();
 	auto lProgram = program.lock();
-	auto noteIntA = sampler.lock()->getLastNp(lProgram.get())->getOptionalNoteA();
+	auto noteIntA = sampler->getLastNp(lProgram.get())->getOptionalNoteA();
 	auto padIntA = lProgram->getPadIndexFromNote(noteIntA);
 	auto noteA = noteIntA != 34 ? to_string(noteIntA) : "--";
-	auto padA = sampler.lock()->getPadName(padIntA);
+	auto padA = sampler->getPadName(padIntA);
 	findField("optional-note-a").lock()->setText(noteA + "/" + padA);
 }
 
 void PgmAssignScreen::displayOptionalNoteB()
 {
 	init();
-	auto lSampler = sampler.lock();
 	auto lProgram = program.lock();
-	auto noteIntB = sampler.lock()->getLastNp(lProgram.get())->getOptionalNoteB();
+	auto noteIntB = sampler->getLastNp(lProgram.get())->getOptionalNoteB();
 	auto padIntB = lProgram->getPadIndexFromNote(noteIntB);
 	auto noteB = noteIntB != 34 ? to_string(noteIntB) : "--";
-	auto padB = sampler.lock()->getPadName(padIntB);
+	auto padB = sampler->getPadName(padIntB);
 	findField("optional-note-b").lock()->setText(noteB + "/" + padB);
 }
 
 void PgmAssignScreen::displayNote()
 {
 	init();
-	findField("note").lock()->setText(to_string(sampler.lock()->getLastNp(program.lock().get())->getNumber()));
+	findField("note").lock()->setText(to_string(sampler->getLastNp(program.lock().get())->getNumber()));
 }
 
 void PgmAssignScreen::displayPad()
 {
 	init();
-	findField("pad").lock()->setText(sampler.lock()->getPadName(mpc.getPad()));
+	findField("pad").lock()->setText(sampler->getPadName(mpc.getPad()));
 }
 
 void PgmAssignScreen::update(moduru::observer::Observable* o, nonstd::any arg)

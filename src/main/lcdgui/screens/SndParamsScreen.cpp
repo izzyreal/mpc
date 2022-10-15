@@ -18,7 +18,7 @@ SndParamsScreen::SndParamsScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void SndParamsScreen::open()
 {
-	auto sound = sampler.lock()->getSound().lock() ? true : false;
+	auto sound = sampler->getSound().lock() ? true : false;
 
 	findField("snd").lock()->setFocusable(sound);
 	findField("playx").lock()->setFocusable(sound);
@@ -43,7 +43,7 @@ void SndParamsScreen::openWindow()
 
 	if (param.compare("snd") == 0)
 	{
-		sampler.lock()->setPreviousScreenName("params");
+		sampler->setPreviousScreenName("params");
 		openScreen("sound");
 	}
 }
@@ -65,16 +65,16 @@ void SndParamsScreen::function(int f)
 		break;
 	case 3:
 	{
-		sampler.lock()->sort();
+		sampler->sort();
 		openScreen("popup");
 		auto popupScreen = mpc.screens->get<PopupScreen>("popup");
-		popupScreen->setText("Sorting by " + sampler.lock()->getSoundSortingTypeName());
+		popupScreen->setText("Sorting by " + sampler->getSoundSortingTypeName());
 		popupScreen->returnToScreenAfterMilliSeconds("params", 200);
 		break;
 	}
 	case 4:
 	{
-		if (sampler.lock()->getSoundCount() == 0)
+		if (sampler->getSoundCount() == 0)
 			return;
 
 		auto editSoundScreen = mpc.screens->get<EditSoundScreen>("edit-sound");
@@ -88,7 +88,7 @@ void SndParamsScreen::function(int f)
 			return;
 
 		mpc.getControls().lock()->setF6Pressed(true);
-		sampler.lock()->playX();
+		sampler->playX();
 		break;
 	}
 	}
@@ -97,16 +97,16 @@ void SndParamsScreen::function(int f)
 void SndParamsScreen::turnWheel(int i)
 {
 	init();
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 
 	if (param.compare("playx") == 0)
 	{
-		sampler.lock()->setPlayX(sampler.lock()->getPlayX() + i);
+		sampler->setPlayX(sampler->getPlayX() + i);
 		displayPlayX();
 	}
 	else if (param.compare("snd") == 0 && i > 0)
 	{
-		sampler.lock()->selectNextSound();
+		sampler->selectNextSound();
 		displayBeat();
 		displayLevel();
 		displaySampleAndNewTempo();
@@ -115,7 +115,7 @@ void SndParamsScreen::turnWheel(int i)
 	}
 	else if (param.compare("snd") == 0 && i < 0)
 	{
-		sampler.lock()->selectPreviousSound();
+		sampler->selectPreviousSound();
 		displayBeat();
 		displayLevel();
 		displaySampleAndNewTempo();
@@ -143,7 +143,7 @@ void SndParamsScreen::turnWheel(int i)
 
 void SndParamsScreen::displayLevel()
 {
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 
 	if (sound)
 		findField("level").lock()->setText(to_string(sound->getSndLevel()));
@@ -153,7 +153,7 @@ void SndParamsScreen::displayLevel()
 
 void SndParamsScreen::displayTune()
 {
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 
 	if (sound)
 		findField("tune").lock()->setText(to_string(sound->getTune()));
@@ -163,7 +163,7 @@ void SndParamsScreen::displayTune()
 
 void SndParamsScreen::displayBeat()
 {
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 
 	if (sound)
 		findField("beat").lock()->setText(to_string(sound->getBeatCount()));
@@ -173,7 +173,7 @@ void SndParamsScreen::displayBeat()
 
 void SndParamsScreen::displaySampleAndNewTempo()
 {
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 
 	if (!sound || !sound->isLoopEnabled())
 	{
@@ -224,9 +224,9 @@ void SndParamsScreen::displaySampleAndNewTempo()
 
 void SndParamsScreen::displaySnd()
 {
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 
-	if (sampler.lock()->getSoundCount() == 0)
+	if (sampler->getSoundCount() == 0)
 	{
 		findField("snd").lock()->setText("(no sound)");
 		ls.lock()->setFocus("dummy");
@@ -247,5 +247,5 @@ void SndParamsScreen::displaySnd()
 
 void SndParamsScreen::displayPlayX()
 {
-	findField("playx").lock()->setText(playXNames[sampler.lock()->getPlayX()]);
+	findField("playx").lock()->setText(playXNames[sampler->getPlayX()]);
 }

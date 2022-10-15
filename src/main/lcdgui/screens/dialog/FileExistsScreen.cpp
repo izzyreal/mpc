@@ -32,7 +32,7 @@ void FileExistsScreen::mainScreen()
 {
 	if (loadASoundCandidate && existingSound)
 	{
-		sampler.lock()->deleteSound(sampler.lock()->getPreviewSound());
+		sampler->deleteSound(sampler->getPreviewSound());
 		loadASoundCandidate = {};
 		existingSound = {};
 		actionAfterAddingSound = [](bool){};
@@ -67,7 +67,7 @@ void FileExistsScreen::function(int i)
 			existingSound.swap(loadASoundCandidate);
 			existingSound->setMemoryIndex(existingSoundMemoryIndex);
 			loadASoundCandidate->setMemoryIndex(candidateSoundMemoryIndex);
-			sampler.lock()->deleteSound(loadASoundCandidate);
+			sampler->deleteSound(loadASoundCandidate);
 			actionAfterAddingSound(existingSound->isMono());
 			loadASoundCandidate = {};
 			existingSound = {};
@@ -79,7 +79,7 @@ void FileExistsScreen::function(int i)
 		auto disk = mpc.getDisk().lock();
 		auto nameScreen = mpc.screens->get<NameScreen>("name");
 
-		if (ls.lock()->getPreviousScreenName().compare("save-a-program") == 0)
+		if (ls.lock()->getPreviousScreenName() == "save-a-program")
 		{
 			auto pfileName = mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) + ".PGM";
 			auto success = disk->getFile(pfileName)->del();
@@ -91,7 +91,7 @@ void FileExistsScreen::function(int i)
 				disk->writePgm(program.lock(), pfileName);
 			}
 		}
-		else if (ls.lock()->getPreviousScreenName().compare("save-a-sequence") == 0)
+		else if (ls.lock()->getPreviousScreenName() == "save-a-sequence")
 		{
 			auto sfileName = mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) + ".MID";
 			auto success = disk->getFile(sfileName)->del();
@@ -105,7 +105,7 @@ void FileExistsScreen::function(int i)
 			}
 			openScreen("save");
 		}
-		else if (ls.lock()->getPreviousScreenName().compare("save-aps-file") == 0)
+		else if (ls.lock()->getPreviousScreenName() == "save-aps-file")
 		{
 			auto saveApsFileScreen = mpc.screens->get<SaveApsFileScreen>("save-aps-file");
 			auto apsFileName = saveApsFileScreen->fileName + ".APS";
@@ -119,7 +119,7 @@ void FileExistsScreen::function(int i)
                 disk->writeAps(apsFileName);
 			}
 		}
-		else if (ls.lock()->getPreviousScreenName().compare("save-all-file") == 0)
+		else if (ls.lock()->getPreviousScreenName() == "save-all-file")
 		{
             auto saveAllFileScreen = mpc.screens->get<SaveAllFileScreen>("save-all-file");
 			auto allFileName = saveAllFileScreen->fileName + ".ALL";
@@ -134,9 +134,9 @@ void FileExistsScreen::function(int i)
                 disk->writeAll(allFileName);
 			}
 		}
-		else if (ls.lock()->getPreviousScreenName().compare("save-a-sound") == 0)
+		else if (ls.lock()->getPreviousScreenName() == "save-a-sound")
 		{
-			auto s = sampler.lock()->getSound().lock();
+			auto s = sampler->getSound().lock();
 
 			auto saveASoundScreen = mpc.screens->get<SaveASoundScreen>("save-a-sound");
 
@@ -161,7 +161,7 @@ void FileExistsScreen::function(int i)
 	case 3:
 		if (loadASoundCandidate && existingSound)
 		{
-			sampler.lock()->deleteSound(sampler.lock()->getPreviewSound());
+			sampler->deleteSound(sampler->getPreviewSound());
 			loadASoundCandidate = {};
 			existingSound = {};
 			actionAfterAddingSound = [](bool){};
@@ -190,7 +190,7 @@ void FileExistsScreen::function(int i)
 				}
 			};
 
-			nameScreen->actionWhenGoingToMainScreen = [&](){ sampler.lock()->deleteSound(sampler.lock()->getPreviewSound()); };
+			nameScreen->actionWhenGoingToMainScreen = [&](){ sampler->deleteSound(sampler->getPreviewSound()); };
 			nameScreen->setRenamerAndScreenToReturnTo(renamer, "load-a-sound");
 			nameScreen->setName(loadASoundCandidate->getName());
 			nameScreen->setNameLimit(16);
@@ -202,7 +202,7 @@ void FileExistsScreen::function(int i)
 
 		auto previousScreen = ls.lock()->getPreviousScreenName();
         
-        if (previousScreen.compare("save-aps-file") == 0)
+        if (previousScreen == "save-aps-file")
         {
             const auto renamer = [&](const string& newName) {
                 const auto apsFileName = newName + ".APS";
@@ -222,7 +222,7 @@ void FileExistsScreen::function(int i)
             nameScreen->setRenamerAndScreenToReturnTo(renamer, "");
             openScreen("name");
         }
-        else if (previousScreen.compare("save-all-file") == 0)
+        else if (previousScreen == "save-all-file")
         {
             openScreen(previousScreen);
         }

@@ -36,7 +36,7 @@ void CopyProgramScreen::function(int i)
 		if (pgm0 == pgm1)
 			return;
 
-		sampler.lock()->copyProgram(pgm0, pgm1);
+		sampler->copyProgram(pgm0, pgm1);
 		mpcSoundPlayerChannel->setProgram(pgm1);
 		openScreen("program");
 		break;
@@ -47,9 +47,9 @@ void CopyProgramScreen::turnWheel(int i)
 {
 	init();
 		
-	if (param.compare("pgm0") == 0)
+	if (param == "pgm0")
 		setPgm0(pgm0 + i);
-	else if (param.compare("pgm1") == 0)
+	else if (param == "pgm1")
 		setPgm1(pgm1 + i);
 }
 
@@ -63,10 +63,10 @@ void CopyProgramScreen::setPgm0(int i)
 	do {
 		candidate = up ? candidate + 1 : candidate - 1;
 
-		if (candidate < 0 || candidate >= sampler.lock()->getPrograms().size())
+		if (candidate < 0 || candidate >= sampler->getPrograms().size())
 			return;
 	}
-	while (!sampler.lock()->getProgram(candidate).lock());
+	while (!sampler->getProgram(candidate).lock());
 	
 	pgm0 = candidate;
 
@@ -76,7 +76,7 @@ void CopyProgramScreen::setPgm0(int i)
 
 void CopyProgramScreen::setPgm1(int i)
 {
-	if (i < 0 || i >= sampler.lock()->getPrograms().size())
+	if (i < 0 || i >= sampler->getPrograms().size())
 		return;
 
 	pgm1 = i;
@@ -86,13 +86,13 @@ void CopyProgramScreen::setPgm1(int i)
 
 void CopyProgramScreen::displayPgm0()
 {
-	auto programName = sampler.lock()->getProgram(pgm0).lock()->getName();
+	auto programName = sampler->getProgram(pgm0).lock()->getName();
 	findField("pgm0").lock()->setText(StrUtil::padLeft(to_string(pgm0 + 1), " ", 2) + "-" + programName);
 }
 
 void CopyProgramScreen::displayPgm1()
 {
-	auto program1 = sampler.lock()->getProgram(pgm1).lock();
+	auto program1 = sampler->getProgram(pgm1).lock();
 
 	auto programName = program1 ? program1->getName() : "(no program)";
 	findField("pgm1").lock()->setText(StrUtil::padLeft(to_string(pgm1 + 1), " ", 2) + "-" + programName);

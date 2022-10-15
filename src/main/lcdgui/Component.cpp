@@ -9,15 +9,14 @@
 
 #include <cmath>
 
-using namespace std;
 using namespace mpc::lcdgui;
 
-Component::Component(const string& name)
+Component::Component(const std::string& name)
 {
 	this->name = name;
 }
 
-void Component::sendToBack(weak_ptr<Component> childToSendBack)
+void Component::sendToBack(std::weak_ptr<Component> childToSendBack)
 {
 	for (int i = 0; i < children.size(); i++)
 	{
@@ -25,7 +24,7 @@ void Component::sendToBack(weak_ptr<Component> childToSendBack)
 		{
 			auto placeHolder = children[i];
 			children.erase(begin(children) + i);
-			children.insert(children.begin(), move(placeHolder));
+			children.insert(children.begin(), std::move(placeHolder));
 			break;
 		}
 	}
@@ -44,7 +43,7 @@ bool Component::bringToFront(Component* childToBringToFront)
 		{
 			auto placeHolder = children[i];
 			children.erase(begin(children) + i);
-			children.push_back(move(placeHolder));
+			children.push_back(std::move(placeHolder));
 
 			if (parent != nullptr)
 				parent->bringToFront(this);
@@ -62,7 +61,7 @@ bool Component::bringToFront(Component* childToBringToFront)
 	return false;
 }
 
-bool Component::shouldNotDraw(vector<vector<bool>>* pixels)
+bool Component::shouldNotDraw(std::vector<std::vector<bool>>* pixels)
 {
 	if (!IsDirty())
 	{
@@ -79,11 +78,11 @@ bool Component::shouldNotDraw(vector<vector<bool>>* pixels)
 	return false;
 }
 
-weak_ptr<Parameter> Component::findParameter(const string& name)
+std::weak_ptr<Parameter> Component::findParameter(const std::string& name)
 {
 	for (auto& c : children)
 	{
-		auto candidate = dynamic_pointer_cast<Parameter>(c);
+		auto candidate = std::dynamic_pointer_cast<Parameter>(c);
 
 		if (candidate && candidate->getName().compare(name) == 0)
 		{
@@ -103,11 +102,11 @@ weak_ptr<Parameter> Component::findParameter(const string& name)
 
 
 
-weak_ptr<Label> Component::findLabel(const string& name)
+std::weak_ptr<Label> Component::findLabel(const std::string& name)
 {
 	for (auto& c : children)
 	{
-		auto candidate = dynamic_pointer_cast<Label>(c);
+		auto candidate = std::dynamic_pointer_cast<Label>(c);
 
 		if (candidate && candidate->getName().compare(name) == 0)
 			return candidate;
@@ -121,11 +120,11 @@ weak_ptr<Label> Component::findLabel(const string& name)
 	return {};
 }
 
-weak_ptr<Field> Component::findField(const string& name)
+std::weak_ptr<Field> Component::findField(const std::string& name)
 {
 	for (auto& c : children)
 	{
-		auto candidate = dynamic_pointer_cast<Field>(c);
+		auto candidate = std::dynamic_pointer_cast<Field>(c);
 
 		if (candidate && candidate->getName().compare(name) == 0)
 			return candidate;
@@ -139,13 +138,13 @@ weak_ptr<Field> Component::findField(const string& name)
 	return {};
 }
 
-vector<weak_ptr<Label>> Component::findLabels()
+std::vector<std::weak_ptr<Label>> Component::findLabels()
 {
-	vector<weak_ptr<Label>> result;
+    std::vector<std::weak_ptr<Label>> result;
 
 	for (auto& c : children)
 	{
-		auto candidate = dynamic_pointer_cast<Label>(c);
+		auto candidate = std::dynamic_pointer_cast<Label>(c);
 		if (candidate)
 			result.push_back(candidate);
 
@@ -156,13 +155,13 @@ vector<weak_ptr<Label>> Component::findLabels()
 	return result;
 }
 
-vector<weak_ptr<Field>> Component::findFields()
+std::vector<std::weak_ptr<Field>> Component::findFields()
 {
-	vector<weak_ptr<Field>> result;
+    std::vector<std::weak_ptr<Field>> result;
 
 	for (auto& c : children)
 	{
-		auto candidate = dynamic_pointer_cast<Field>(c);
+		auto candidate = std::dynamic_pointer_cast<Field>(c);
 
 		if (candidate)
 			result.push_back(candidate);
@@ -174,9 +173,9 @@ vector<weak_ptr<Field>> Component::findFields()
 	return result;
 }
 
-vector<weak_ptr<Parameter>> Component::findParameters()
+std::vector<std::weak_ptr<Parameter>> Component::findParameters()
 {
-	vector<weak_ptr<Parameter>> result;
+    std::vector<std::weak_ptr<Parameter>> result;
 	
 	for (auto& c : children)
 	{
@@ -190,15 +189,25 @@ vector<weak_ptr<Parameter>> Component::findParameters()
 	return result;
 }
 
-weak_ptr<Component> Component::addChild(shared_ptr<Component> child)
+std::weak_ptr<Component> Component::addChild(std::shared_ptr<Component> child)
 {
+    if (dynamic_cast<ScreenComponent*>(this))
+    {
+        auto background = findBackground().lock();
+
+        if (background)
+        {
+            return background->addChild(child);
+        }
+    }
+
 	child->parent = this;
-	children.push_back(move(child));
+	children.push_back(std::move(child));
 	SetDirty();
 	return children.back();
 }
 
-void Component::removeChild(weak_ptr<Component> child)
+void Component::removeChild(std::weak_ptr<Component> child)
 {
 	if (!child.lock())
 		return;
@@ -216,13 +225,13 @@ void Component::removeChild(weak_ptr<Component> child)
 		c->removeChild(child);
 }
 
-void Component::addChildren(vector<shared_ptr<Component>> children)
+void Component::addChildren(std::vector<std::shared_ptr<Component>> children)
 {
 	for (auto& c : children)
 		addChild(c);
 }
 
-weak_ptr<Component> Component::findChild(const string& name)
+std::weak_ptr<Component> Component::findChild(const std::string& name)
 {
 	for (auto& c : children)
 	{
@@ -237,7 +246,7 @@ weak_ptr<Component> Component::findChild(const string& name)
 	return {};
 }
 
-void Component::Draw(vector<vector<bool>>* pixels)
+void Component::Draw(std::vector<std::vector<bool>>* pixels)
 {
 	if (shouldNotDraw(pixels))
 		return;
@@ -253,7 +262,7 @@ void Component::Draw(vector<vector<bool>>* pixels)
 	dirty = false;
 }
 
-const string& Component::getName()
+const std::string& Component::getName()
 {
 	return name;
 }
@@ -365,14 +374,14 @@ bool Component::IsDirty()
 
 MRECT Component::getRect()
 {
-	auto x1 = max(0, x);
-	auto x2 = min(248, x + w);
-	auto y1 = max(0, y);
-	auto y2 = min(60, y + h);
+	auto x1 = std::max(0, x);
+	auto x2 = std::min(248, x + w);
+	auto y1 = std::max(0, y);
+	auto y2 = std::min(60, y + h);
 	return MRECT(x1, y1, x2, y2);
 }
 
-void Component::Clear(vector<vector<bool>>* pixels)
+void Component::Clear(std::vector<std::vector<bool>>* pixels)
 {
 	auto r = getRect();
 
@@ -386,7 +395,7 @@ void Component::Clear(vector<vector<bool>>* pixels)
 	}
 }
 
-void Component::preDrawClear(vector<vector<bool>>* pixels)
+void Component::preDrawClear(std::vector<std::vector<bool>>* pixels)
 {
 	auto r = preDrawClearRect;
 
@@ -408,9 +417,9 @@ void Component::preDrawClear(vector<vector<bool>>* pixels)
 	preDrawClearRect.Clear();
 }
 
-vector<weak_ptr<Component>> Component::findHiddenChildren()
+std::vector<std::weak_ptr<Component>> Component::findHiddenChildren()
 {
-	vector<weak_ptr<Component>> result;
+    std::vector<std::weak_ptr<Component>> result;
 
 	for (auto& c : children)
 	{
@@ -424,11 +433,11 @@ vector<weak_ptr<Component>> Component::findHiddenChildren()
 	return result;
 }
 
-weak_ptr<ScreenComponent> Component::findScreenComponent()
+std::weak_ptr<ScreenComponent> Component::findScreenComponent()
 {
 	for (auto& c : children)
 	{
-		auto candidate = dynamic_pointer_cast<ScreenComponent>(c);
+		auto candidate = std::dynamic_pointer_cast<ScreenComponent>(c);
 		
 		if (candidate)
 			return candidate;
@@ -442,7 +451,12 @@ weak_ptr<ScreenComponent> Component::findScreenComponent()
 	return {};
 }
 
-void Component::deleteChildren(const string& name)
+std::weak_ptr<Background> Component::findBackground()
+{
+    return findChild<Background>("");
+}
+
+void Component::deleteChildren(const std::string& name)
 {
 	for (int i = children.size() - 1; i >= 0; i--)
 	{

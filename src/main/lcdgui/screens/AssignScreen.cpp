@@ -104,10 +104,10 @@ void AssignScreen::displayAssignNote()
 	auto note = slider->getNote();
 
 	auto padIndex = program.lock()->getPadIndexFromNote(note);
-	auto padName = sampler.lock()->getPadName(padIndex);
+	auto padName = sampler->getPadName(padIndex);
 	
 	auto soundIndex = note == 34 ? -1 : program.lock()->getNoteParameters(note)->getSoundIndex();
-	auto soundName = soundIndex == -1 ? "(No sound)" : sampler.lock()->getSoundName(soundIndex);
+	auto soundName = soundIndex == -1 ? "(No sound)" : sampler->getSoundName(soundIndex);
 	
 	auto noteName = note == 34 ? "--" : to_string(note);
 

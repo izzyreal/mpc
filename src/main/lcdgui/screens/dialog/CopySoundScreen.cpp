@@ -15,10 +15,10 @@ void CopySoundScreen::open()
 {
 	auto previousScreenName = ls.lock()->getPreviousScreenName();
 
-	if (previousScreenName.compare("name") != 0 && sampler.lock()->getSound().lock())
+	if (previousScreenName != "name" && sampler->getSound().lock())
 	{
-		newName = sampler.lock()->getSound().lock()->getName();
-		newName = sampler.lock()->addOrIncreaseNumber(newName);
+		newName = sampler->getSound().lock()->getName();
+		newName = sampler->addOrIncreaseNumber(newName);
 	}
 	displaySnd();
 	displayNewName();
@@ -35,10 +35,10 @@ void CopySoundScreen::function(int i)
 		break;
 	case 4:
 	{
-		auto sound = sampler.lock()->getSound().lock();
-		auto newSound = sampler.lock()->copySound(sound);
+		auto sound = sampler->getSound().lock();
+		auto newSound = sampler->copySound(sound);
 		newSound.lock()->setName(newName);
-		sampler.lock()->setSoundIndex(sampler.lock()->getSoundCount() - 1);
+		sampler->setSoundIndex(sampler->getSoundCount() - 1);
 		openScreen("sound");
 		break;
 	}
@@ -49,22 +49,22 @@ void CopySoundScreen::turnWheel(int i)
 {
 	init();
 	
-	if (param.compare("snd") == 0)
+	if (param == "snd")
 	{
-		sampler.lock()->setSoundIndex(sampler.lock()->getNextSoundIndex(sampler.lock()->getSoundIndex(), i > 0));
-		auto newSampleName = sampler.lock()->getSoundName(sampler.lock()->getSoundIndex());
-		newSampleName = sampler.lock()->addOrIncreaseNumber(newSampleName);
+		sampler->setSoundIndex(sampler->getNextSoundIndex(sampler->getSoundIndex(), i > 0));
+		auto newSampleName = sampler->getSoundName(sampler->getSoundIndex());
+		newSampleName = sampler->addOrIncreaseNumber(newSampleName);
 		setNewName(newSampleName);
 		displaySnd();
 	}
-	else if (param.compare("newname") == 0)
+	else if (param == "newname")
 	{
 		const auto nameScreen = mpc.screens->get<NameScreen>("name");
         const auto copySoundScreen = this;
 		nameScreen->setName(newName);
         
-        auto renamer = [copySoundScreen](string& newName) {
-            copySoundScreen->setNewName(newName);
+        auto renamer = [copySoundScreen](string& renamerNewName) {
+            copySoundScreen->setNewName(renamerNewName);
         };
 
         nameScreen->setRenamerAndScreenToReturnTo(renamer, "copy-sound");
@@ -79,12 +79,12 @@ void CopySoundScreen::displayNewName()
 
 void CopySoundScreen::displaySnd()
 {
-	if (!sampler.lock()->getSound().lock())
+	if (!sampler->getSound().lock())
 	{
 		return;
 	}
 
-	findField("snd").lock()->setText(sampler.lock()->getSound().lock()->getName());
+	findField("snd").lock()->setText(sampler->getSound().lock()->getName());
 }
 
 void CopySoundScreen::setNewName(string s)

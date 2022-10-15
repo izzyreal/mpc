@@ -25,11 +25,11 @@ void SaveASoundScreen::turnWheel(int i)
 	
 	if (param.compare("file") == 0 && i > 0)
 	{
-		sampler.lock()->selectPreviousSound();
+		sampler->selectPreviousSound();
 	}
 	else if (param.compare("file") == 0 && i < 0)
 	{
-		sampler.lock()->selectNextSound();
+		sampler->selectNextSound();
 	}
 	else if (param.compare("file-type") == 0)
 	{
@@ -38,7 +38,7 @@ void SaveASoundScreen::turnWheel(int i)
     
     if (param.compare("file") == 0)
     {
-        auto saveName = sampler.lock()->getSound().lock()->getName();
+        auto saveName = sampler->getSound().lock()->getName();
         mpc.screens->get<NameScreen>("name")->setName(saveName);
         displayFile();
     }
@@ -56,7 +56,7 @@ void SaveASoundScreen::function(int i)
 	case 4:
 	{
 		auto disk = mpc.getDisk().lock();
-		auto s = sampler.lock()->getSound().lock();
+		auto s = sampler->getSound().lock();
 		auto ext = string(fileType == 0 ? ".SND" : ".WAV");
 		auto fileName = mpc::Util::getFileName(mpc.screens->get<NameScreen>("name")->getNameWithoutSpaces()) + ext;
 

@@ -78,7 +78,7 @@ void LoadScreen::function(int i)
 		break;
 	case 4:
 	{
-        if (param.compare("device") == 0)
+        if (param == "device")
         {
             if (mpc.getDiskController()->activeDiskIndex == device)
                 return;
@@ -246,15 +246,15 @@ void LoadScreen::turnWheel(int i)
 {
 	init();
 
-	if (param.compare("view") == 0)
+	if (param == "view")
 	{
 		setView(view + i);
 	}
-	else if (param.compare("file") == 0)
+	else if (param == "file")
 	{
 		setFileLoadWithMaxCheck(fileLoad + i);
 	}
-	else if (param.compare("directory") == 0)
+	else if (param == "directory")
 	{
 		auto disk = mpc.getDisk().lock();
 		auto currentDir = disk->getDirectoryName();
@@ -293,7 +293,7 @@ void LoadScreen::turnWheel(int i)
 			}
 		}
 	}
-    else if (param.compare("device") == 0)
+    else if (param == "device")
     {
         if (device + i < 0 || device + i >= mpc.getDisks().size())
             return;
@@ -434,7 +434,7 @@ void LoadScreen::setFileLoad(int i)
 
 void LoadScreen::loadSound(bool shouldBeConverted)
 {
-    SoundLoader soundLoader(mpc, sampler.lock()->getSounds(), false);
+    SoundLoader soundLoader(mpc, sampler->getSounds(), false);
     soundLoader.setPreview(true);
 
     SoundLoaderResult result;
@@ -445,7 +445,7 @@ void LoadScreen::loadSound(bool shouldBeConverted)
     }
     catch (const exception& exception)
     {
-        sampler.lock()->deleteSound(sampler.lock()->getPreviewSound());
+        sampler->deleteSound(sampler->getPreviewSound());
         
         MLOG("A problem occurred when trying to load " + getSelectedFileName() + ": " + string(exception.what()));
         MLOG(result.errorMessage);
@@ -456,7 +456,7 @@ void LoadScreen::loadSound(bool shouldBeConverted)
 
     if (!result.success)
     {
-        sampler.lock()->deleteSound(sampler.lock()->getSoundCount() - 1);
+        sampler->deleteSound(sampler->getSoundCount() - 1);
         
         if (result.canBeConverted) {
             auto loadRoutine = [&]() {

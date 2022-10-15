@@ -18,8 +18,8 @@ void DeleteAllSoundScreen::function(int i)
 		openScreen("delete-sound");
 		break;
 	case 4:
-		sampler.lock()->deleteAllSamples();
-		openScreen(sampler.lock()->getPreviousScreenName());
+		sampler->deleteAllSamples();
+		openScreen(sampler->getPreviousScreenName());
 		break;
 	}
 }

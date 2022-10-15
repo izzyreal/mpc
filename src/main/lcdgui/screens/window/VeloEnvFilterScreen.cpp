@@ -36,33 +36,33 @@ void VeloEnvFilterScreen::turnWheel(int i)
 {
     init();
 
-	auto lastNp = sampler.lock()->getLastNp(program.lock().get());
+	auto lastNp = sampler->getLastNp(program.lock().get());
 
-    if (param.compare("attack") == 0)
+    if (param == "attack")
 	{
 		lastNp->setFilterAttack(lastNp->getFilterAttack() + i);
 		displayAttack();
 	}
-	else if (param.compare("decay") == 0)
+	else if (param == "decay")
 	{
 		lastNp->setFilterDecay(lastNp->getFilterDecay() + i);
 		displayDecay();
 	}
-	else if (param.compare("amount") == 0)
+	else if (param == "amount")
 	{
 		lastNp->setFilterEnvelopeAmount(lastNp->getFilterEnvelopeAmount() + i);
 		displayAmount();
 	}
-	else if (param.compare("velofreq") == 0)
+	else if (param == "velofreq")
 	{
 		lastNp->setVelocityToFilterFrequency(lastNp->getVelocityToFilterFrequency() + i);
 		displayVeloFreq();
 	}
-	else if (param.compare("note") == 0)
+	else if (param == "note")
 	{
 		mpc.setNote(mpc.getNote() + i);
 	}
-	else if (param.compare("velo") == 0)
+	else if (param == "velo")
 	{
 		setVelo(velo + i);
 	}
@@ -72,7 +72,7 @@ void VeloEnvFilterScreen::update(moduru::observer::Observable* observable, nonst
 {
 	auto msg = nonstd::any_cast<string>(message);
 
-	if (msg.compare("note") == 0)
+	if (msg == "note")
 	{
 		displayNote();
 		displayAttack();
@@ -84,11 +84,11 @@ void VeloEnvFilterScreen::update(moduru::observer::Observable* observable, nonst
 
 void VeloEnvFilterScreen::displayNote()
 {
-	auto noteParameters = sampler.lock()->getLastNp(program.lock().get());
+	auto noteParameters = sampler->getLastNp(program.lock().get());
 	auto soundIndex = noteParameters->getSoundIndex();
 	auto padIndex = program.lock()->getPadIndexFromNote(noteParameters->getNumber());
-	auto padName = sampler.lock()->getPadName(padIndex);
-	auto sampleName = soundIndex != -1 ? sampler.lock()->getSoundName(soundIndex) : "OFF";
+	auto padName = sampler->getPadName(padIndex);
+	auto sampleName = soundIndex != -1 ? sampler->getSoundName(soundIndex) : "OFF";
 	string stereo = noteParameters->getStereoMixerChannel().lock()->isStereo() && soundIndex != -1 ? "(ST)" : "";
 	findField("note").lock()->setText(to_string(noteParameters->getNumber()) + "/" + padName + "-" + StrUtil::padRight(sampleName, " ", 16) + stereo);
 }
@@ -100,28 +100,28 @@ void VeloEnvFilterScreen::displayVelo()
 
 void VeloEnvFilterScreen::displayAttack()
 {
-	auto attack = sampler.lock()->getLastNp(program.lock().get())->getFilterAttack();
-	auto decay = sampler.lock()->getLastNp(program.lock().get())->getFilterDecay();
+	auto attack = sampler->getLastNp(program.lock().get())->getFilterAttack();
+	auto decay = sampler->getLastNp(program.lock().get())->getFilterDecay();
 	findField("attack").lock()->setTextPadded(attack, " ");
 	findEnvGraph().lock()->setCoordinates(attack, decay, true);
 }
 
 void VeloEnvFilterScreen::displayDecay()
 {
-	auto attack = sampler.lock()->getLastNp(program.lock().get())->getFilterAttack();
-	auto decay = sampler.lock()->getLastNp(program.lock().get())->getFilterDecay();
+	auto attack = sampler->getLastNp(program.lock().get())->getFilterAttack();
+	auto decay = sampler->getLastNp(program.lock().get())->getFilterDecay();
 	findField("decay").lock()->setTextPadded(decay, " ");
 	findEnvGraph().lock()->setCoordinates(attack, decay, true);
 }
 
 void VeloEnvFilterScreen::displayAmount()
 {
-	findField("amount").lock()->setTextPadded(sampler.lock()->getLastNp(program.lock().get())->getFilterEnvelopeAmount(), " ");
+	findField("amount").lock()->setTextPadded(sampler->getLastNp(program.lock().get())->getFilterEnvelopeAmount(), " ");
 }
 
 void VeloEnvFilterScreen::displayVeloFreq()
 {
-	findField("velofreq").lock()->setTextPadded(sampler.lock()->getLastNp(program.lock().get())->getVelocityToFilterFrequency(), " ");
+	findField("velofreq").lock()->setTextPadded(sampler->getLastNp(program.lock().get())->getVelocityToFilterFrequency(), " ");
 }
 
 void VeloEnvFilterScreen::setVelo(int i)

@@ -21,7 +21,7 @@ using namespace std;
 ZoneScreen::ZoneScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "zone", layerIndex)
 {
-	addChild(move(make_shared<Wave>()));
+	addChild(std::move(make_shared<Wave>()));
 	findWave().lock()->setFine(false);
 }
 
@@ -32,7 +32,7 @@ void ZoneScreen::open()
     if (zones.empty())
 		initZones();
 
-	bool sound = sampler.lock()->getSound().lock() ? true : false;
+	bool sound = sampler->getSound().lock() ? true : false;
 	findField("snd").lock()->setFocusable(sound);
 	findField("playx").lock()->setFocusable(sound);
 	findField("st").lock()->setFocusable(sound);
@@ -58,7 +58,7 @@ void ZoneScreen::openWindow()
 
 	if (param.compare("snd") == 0)
 	{
-		sampler.lock()->setPreviousScreenName("zone");
+		sampler->setPreviousScreenName("zone");
 		openScreen("sound");
 	}
 	else if (param.compare("zone") == 0)
@@ -89,10 +89,10 @@ void ZoneScreen::function(int f)
 		break;
 	case 2:
 	{
-		sampler.lock()->sort();
+		sampler->sort();
 		openScreen("popup");
 		auto popupScreen = mpc.screens->get<PopupScreen>("popup");
-		popupScreen->setText("Sorting by " + sampler.lock()->getSoundSortingTypeName());
+		popupScreen->setText("Sorting by " + sampler->getSoundSortingTypeName());
 		popupScreen->returnToScreenAfterMilliSeconds("zone", 200);
 		break;
 	}
@@ -101,7 +101,7 @@ void ZoneScreen::function(int f)
 		break;
 	case 4:
 	{
-		if (sampler.lock()->getSoundCount() == 0)
+		if (sampler->getSoundCount() == 0)
 			return;
 
 		auto editSoundScreen = mpc.screens->get<EditSoundScreen>("edit-sound");
@@ -115,7 +115,7 @@ void ZoneScreen::function(int f)
 			return;
 
 		mpc.getControls().lock()->setF6Pressed(true);
-		sampler.lock()->playX();
+		sampler->playX();
 		break;
 	}
 	}
@@ -135,7 +135,7 @@ void ZoneScreen::turnWheel(int i)
 {
 	init();
 
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 
 	if (param == "" || !sound)
 		return;
@@ -171,12 +171,12 @@ void ZoneScreen::turnWheel(int i)
 	}
 	else if (param.compare("playx") == 0)
 	{
-		sampler.lock()->setPlayX(sampler.lock()->getPlayX() + i);
+		sampler->setPlayX(sampler->getPlayX() + i);
 		displayPlayX();
 	}
 	else if (param.compare("snd") == 0 && i > 0)
 	{
-		sampler.lock()->selectNextSound();
+		sampler->selectNextSound();
 		displayEnd();
 		displaySnd();
 		displaySt();
@@ -185,7 +185,7 @@ void ZoneScreen::turnWheel(int i)
 	}
 	else if (param.compare("snd") == 0 && i < 0)
 	{
-		sampler.lock()->selectPreviousSound();
+		sampler->selectPreviousSound();
 		displayEnd();
 		displaySnd();
 		displaySt();
@@ -196,7 +196,7 @@ void ZoneScreen::turnWheel(int i)
 
 void ZoneScreen::displayWave()
 {
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 
 	if (!sound)
 	{
@@ -207,13 +207,13 @@ void ZoneScreen::displayWave()
 
 	auto sampleData = sound->getSampleData();
 	auto trimScreen = mpc.screens->get<TrimScreen>("trim");
-	findWave().lock()->setSampleData(sampleData, sampler.lock()->getSound().lock()->isMono(), trimScreen->view);
+	findWave().lock()->setSampleData(sampleData, sampler->getSound().lock()->isMono(), trimScreen->view);
 	findWave().lock()->setSelection(getZoneStart(zone), getZoneEnd(zone));
 }
 
 void ZoneScreen::displaySnd()
 {
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 
 	if (!sound)
 	{
@@ -235,12 +235,12 @@ void ZoneScreen::displaySnd()
 
 void ZoneScreen::displayPlayX()
 {
-	findField("playx").lock()->setText(playXNames[sampler.lock()->getPlayX()]);
+	findField("playx").lock()->setText(playXNames[sampler->getPlayX()]);
 }
 
 void ZoneScreen::displaySt()
 {
-	if (sampler.lock()->getSoundCount() != 0)
+	if (sampler->getSoundCount() != 0)
 	{
 		findField("st").lock()->setTextPadded(getZoneStart(zone), " ");
 	}
@@ -251,7 +251,7 @@ void ZoneScreen::displaySt()
 
 void ZoneScreen::displayEnd()
 {
-	if (sampler.lock()->getSoundCount() != 0)
+	if (sampler->getSoundCount() != 0)
 	{
 		findField("end").lock()->setTextPadded(getZoneEnd(zone), " ");
 	}
@@ -262,7 +262,7 @@ void ZoneScreen::displayEnd()
 
 void ZoneScreen::displayZone()
 {
-	if (sampler.lock()->getSoundCount() == 0)
+	if (sampler->getSoundCount() == 0)
 	{
 		findField("zone").lock()->setTextPadded(1);
 		return;
@@ -275,7 +275,7 @@ void ZoneScreen::initZones()
 {
 	zones.clear();
 	
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 
 	if (!sound)
 	{
@@ -330,7 +330,7 @@ int ZoneScreen::getZoneStart(int zoneIndex)
 
 void ZoneScreen::setZoneEnd(int zoneIndex, int end)
 {
-	auto length = sampler.lock()->getSound().lock()->getFrameCount();
+	auto length = sampler->getSound().lock()->getFrameCount();
 
 	if (end < zones[zoneIndex][0])
 		end = zones[zoneIndex][0];
@@ -392,7 +392,7 @@ void ZoneScreen::pressEnter()
 		return;
 
 	auto candidate = field->enter();
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 
 	if (candidate != INT_MAX)
 	{

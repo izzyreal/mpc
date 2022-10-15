@@ -35,15 +35,15 @@ void StereoToMonoScreen::turnWheel(int i)
 
 	auto nameScreen = mpc.screens->get<NameScreen>("name");
 
-	if (param.compare("stereosource") == 0)
+	if (param == "stereosource")
 	{
-		sampler.lock()->setSoundIndex(sampler.lock()->getNextSoundIndex(sampler.lock()->getSoundIndex(), i > 0));
+		sampler->setSoundIndex(sampler->getNextSoundIndex(sampler->getSoundIndex(), i > 0));
 		displayStereoSource();
 	}
-	else if (param.compare("newlname") == 0 || param.compare("newrname") == 0)
+	else if (param == "newlname" || param == "newrname")
 	{
         const auto stereoToMonoScreen = this;
-        const auto isL = param.compare("newlname") == 0;
+        const auto isL = param == "newlname";
         
         nameScreen->setName(isL ? newLName : newRName);
         auto renamer = [isL, stereoToMonoScreen](string& newName) {
@@ -67,12 +67,12 @@ void StereoToMonoScreen::function(int i)
 		break;
 	case 4:
 	{
-		auto sound = sampler.lock()->getSound().lock();
+		auto sound = sampler->getSound().lock();
 
 		if (sound->isMono())
 			return;
 
-		for (auto& s : sampler.lock()->getSounds())
+		for (auto& s : sampler->getSounds())
 		{
 			if (s.lock()->getName().compare(newLName) == 0 || s.lock()->getName().compare(newRName) == 0)
 			{
@@ -84,8 +84,8 @@ void StereoToMonoScreen::function(int i)
 			}
 		}
 
-		auto left = sampler.lock()->addSound(sound->getSampleRate()).lock();
-		auto right = sampler.lock()->addSound(sound->getSampleRate()).lock();
+		auto left = sampler->addSound(sound->getSampleRate()).lock();
+		auto right = sampler->addSound(sound->getSampleRate()).lock();
 
 		left->setName(newLName);
 		right->setName(newRName);
@@ -96,10 +96,10 @@ void StereoToMonoScreen::function(int i)
 		auto leftData = left->getSampleData();
 		auto rightData = right->getSampleData();
 
-		for (int i = 0; i < sound->getFrameCount(); i++)
+		for (int frameIndex = 0; frameIndex < sound->getFrameCount(); frameIndex++)
 		{
-			leftData->push_back((*sound->getSampleData())[i]);
-			rightData->push_back((*sound->getSampleData())[i + sound->getFrameCount()]);
+			leftData->push_back((*sound->getSampleData())[frameIndex]);
+			rightData->push_back((*sound->getSampleData())[frameIndex + sound->getFrameCount()]);
 		}
 		
 		left->setEnd(left->getSampleData()->size());
@@ -113,10 +113,10 @@ void StereoToMonoScreen::function(int i)
 
 void StereoToMonoScreen::updateNewNames()
 {
-	if (! sampler.lock()->getSound().lock() || sampler.lock()->getSound().lock()->isMono())
+	if (! sampler->getSound().lock() || sampler->getSound().lock()->isMono())
 		return;
 
-	string name = sampler.lock()->getSound().lock()->getName();
+	string name = sampler->getSound().lock()->getName();
 	name = StrUtil::trim(name);
 	name = StrUtil::padRight(name, "_", 16);
 	name = name.substr(0, 14);
@@ -127,7 +127,7 @@ void StereoToMonoScreen::updateNewNames()
 
 void StereoToMonoScreen::displayStereoSource()
 {
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 
 	if (!sound)
 	{

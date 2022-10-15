@@ -79,8 +79,8 @@ void StepEditorScreen::open()
 
 	if (track.lock()->getBus() != 0)
 	{
-		int pgm = sampler.lock()->getDrumBusProgramNumber(track.lock()->getBus());
-		program = sampler.lock()->getProgram(pgm);
+		int pgm = sampler->getDrumBusProgramNumber(track.lock()->getBus());
+		program = sampler->getProgram(pgm);
 		findField("fromnote").lock()->setAlignment(Alignment::None);
 	}
 	else
@@ -966,7 +966,7 @@ void StepEditorScreen::setViewNotesText()
         }
 		else
         {
-            auto padName = sampler.lock()->getPadName(program.lock()->getPadIndexFromNote(fromNote));
+            auto padName = sampler->getPadName(program.lock()->getPadIndexFromNote(fromNote));
 			findField("fromnote").lock()->setText(to_string(fromNote) + "/" + padName);
         }
 	}

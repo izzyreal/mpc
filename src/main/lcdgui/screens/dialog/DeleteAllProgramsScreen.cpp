@@ -20,7 +20,7 @@ void DeleteAllProgramsScreen::function(int j)
 	case 4:
 	{
 		const bool initPgms = true;
-		sampler.lock()->deleteAllPrograms(initPgms);
+		sampler->deleteAllPrograms(initPgms);
 		openScreen("delete-program");
 		break;
 	}

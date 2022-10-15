@@ -11,7 +11,7 @@ using namespace std;
 EndFineScreen::EndFineScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "end-fine", layerIndex)
 {
-	addChild(move(make_shared<Wave>()));
+	addChild(std::move(make_shared<Wave>()));
 	findWave().lock()->setFine(true);
 }
 
@@ -33,7 +33,7 @@ void EndFineScreen::displayFineWave()
 {
 	auto trimScreen = mpc.screens->get<TrimScreen>("trim");
 
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 
 	if (!sound)
 		return;
@@ -45,7 +45,7 @@ void EndFineScreen::displayFineWave()
 
 void EndFineScreen::displayEnd()
 {
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 
 	if (!sound)
 		return;
@@ -55,7 +55,7 @@ void EndFineScreen::displayEnd()
 
 void EndFineScreen::displayLngthLabel()
 {
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 
 	if (!sound)
 		return;
@@ -71,7 +71,7 @@ void EndFineScreen::displaySmplLngth()
 
 void EndFineScreen::displayPlayX()
 {
-    findField("playx").lock()->setText(playXNames[sampler.lock()->getPlayX()]);
+    findField("playx").lock()->setText(playXNames[sampler->getPlayX()]);
 }
 
 void EndFineScreen::function(int i)
@@ -87,7 +87,7 @@ void EndFineScreen::function(int i)
 		findWave().lock()->zoomMinus();
 		break;
 	case 4:
-		sampler.lock()->playX();
+		sampler->playX();
 		break;
 	}
 }
@@ -95,7 +95,7 @@ void EndFineScreen::function(int i)
 void EndFineScreen::turnWheel(int i)
 {
 	init();
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 
 	auto startEndLength = static_cast<int>(sound->getEnd() - sound->getStart());
 	auto trimScreen = mpc.screens->get<TrimScreen>("trim");
@@ -111,7 +111,7 @@ void EndFineScreen::turnWheel(int i)
 		field->disableTypeMode();
 
 
-	if (param.compare("end") == 0)
+	if (param == "end")
 	{
 		auto candidate = sound->getEnd() + soundInc;
 
@@ -127,14 +127,14 @@ void EndFineScreen::turnWheel(int i)
 		displayEnd();
 		displayFineWave();
 	}
-	else if (param.compare("smpllngth") == 0)
+	else if (param == "smpllngth")
 	{
 		trimScreen->smplLngthFix = i > 0;
 		displaySmplLngth();
 	}
-	else if (param.compare("playx") == 0)
+	else if (param == "playx")
 	{
-		sampler.lock()->setPlayX(sampler.lock()->getPlayX() + i);
+		sampler->setPlayX(sampler->getPlayX() + i);
 		displayPlayX();
 	}
 }

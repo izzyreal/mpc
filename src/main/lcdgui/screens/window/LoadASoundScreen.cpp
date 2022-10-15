@@ -21,7 +21,7 @@ LoadASoundScreen::LoadASoundScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void LoadASoundScreen::mainScreen()
 {
-    sampler.lock()->deleteSound(sampler.lock()->getPreviewSound());
+    sampler->deleteSound(sampler->getPreviewSound());
     ScreenComponent::mainScreen();
 }
 
@@ -44,7 +44,7 @@ void LoadASoundScreen::turnWheel(int i)
 {
 	init();
 
-	if (param.compare("assign-to-note") == 0)
+	if (param == "assign-to-note")
 	{
 		auto newAssignToNote = assignToNote + i;
 
@@ -83,7 +83,7 @@ void LoadASoundScreen::function(int i)
 			return;
 
 		controls->setF3Pressed(true);
-		auto s = sampler.lock()->getPreviewSound().lock();
+		auto s = sampler->getPreviewSound().lock();
 		auto start = s->getStart();
 		auto end = s->getSampleData()->size();
 		auto loopTo = -1;
@@ -98,12 +98,12 @@ void LoadASoundScreen::function(int i)
 		if (!s->isMono())
 			end *= 0.5;
 
-        sampler.lock()->playPreviewSample(start, end, loopTo, overlapMode);
+        sampler->playPreviewSample(start, end, loopTo, overlapMode);
 		break;
 	}
 	case 3:
-		sampler.lock()->finishBasicVoice(); // Here we make sure the sound is not being played, so it can be removed from memory.
-		sampler.lock()->deleteSound(sampler.lock()->getPreviewSound());
+		sampler->finishBasicVoice(); // Here we make sure the sound is not being played, so it can be removed from memory.
+		sampler->deleteSound(sampler->getPreviewSound());
 		openScreen("load");
 		break;
 	case 4:
@@ -114,11 +114,11 @@ void LoadASoundScreen::function(int i)
 
 void LoadASoundScreen::keepSound()
 {
-    auto sound = sampler.lock()->getPreviewSound().lock();
+    auto sound = sampler->getPreviewSound().lock();
     auto candidateSoundName = sound->getName();
     std::shared_ptr<mpc::sampler::Sound> existingSound;
 
-    for (auto& s : sampler.lock()->getSounds())
+    for (auto& s : sampler->getSounds())
     {
         if (s.lock() == sound) continue;
 
@@ -132,16 +132,14 @@ void LoadASoundScreen::keepSound()
     auto action = [&](bool newSoundIsMono){
         if (assignToNote != 34)
         {
-            auto sequencer = mpc.getSequencer().lock();
-            auto sequence = sequencer->getActiveSequence().lock();
-            auto sampler = mpc.getSampler();
-            auto track = sequence->getTrack(sequencer->getActiveTrackIndex()).lock();
+            auto sequence = sequencer.lock()->getActiveSequence().lock();
+            auto track = sequence->getTrack(sequencer.lock()->getActiveTrackIndex()).lock();
 
             auto bus = track->getBus();
-            auto programNumber = sampler.lock()->getDrumBusProgramNumber(bus);
-            auto program = sampler.lock()->getProgram(programNumber);
-            auto noteParameters = sampler.lock()->getLastNp(program.lock().get());
-            noteParameters->setSoundIndex(sampler.lock()->getSoundCount() - 1);
+            auto programNumber = sampler->getDrumBusProgramNumber(bus);
+            auto program = sampler->getProgram(programNumber);
+            auto noteParameters = sampler->getLastNp(program.lock().get());
+            noteParameters->setSoundIndex(sampler->getSoundCount() - 1);
             auto mixerChannel = noteParameters->getStereoMixerChannel().lock();
             mixerChannel->setStereo(!newSoundIsMono);
         }
@@ -164,7 +162,7 @@ void LoadASoundScreen::displayAssignToNote()
 {
 	init();
 	auto padIndex = program.lock()->getPadIndexFromNote(assignToNote);
-	auto padName = sampler.lock()->getPadName(padIndex);
+	auto padName = sampler->getPadName(padIndex);
 	auto noteName = string(assignToNote == 34 ? "--" : to_string(assignToNote));
 	findField("assign-to-note").lock()->setText(noteName + "/" + padName);
 }

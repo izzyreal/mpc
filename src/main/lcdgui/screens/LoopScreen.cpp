@@ -19,7 +19,7 @@ using namespace std;
 LoopScreen::LoopScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "loop", layerIndex)
 {
-	addChild(move(make_shared<Wave>()));
+	addChild(std::move(make_shared<Wave>()));
 	findWave().lock()->setFine(false);
 }
 
@@ -28,7 +28,7 @@ void LoopScreen::open()
     mpc.getControls().lock()->getControls()->typableParams = { "to", "endlengthvalue" };
 
     findField("loop").lock()->setAlignment(Alignment::Centered);
-	bool sound = sampler.lock()->getSound().lock() ? true : false;
+	bool sound = sampler->getSound().lock() ? true : false;
 
 	findField("snd").lock()->setFocusable(sound);
 	findField("playx").lock()->setFocusable(sound);
@@ -57,7 +57,7 @@ void LoopScreen::openWindow()
 	
 	if (param.compare("snd") == 0)
 	{
-		sampler.lock()->setPreviousScreenName("loop");
+		sampler->setPreviousScreenName("loop");
 		openScreen("sound");
 	}
 	else if (param.compare("to") == 0)
@@ -81,10 +81,10 @@ void LoopScreen::function(int f)
 		break;
 	case 1:
 	{
-		sampler.lock()->sort();
+		sampler->sort();
 		openScreen("popup");
 		auto popupScreen = mpc.screens->get<PopupScreen>("popup");
-		popupScreen->setText("Sorting by " + sampler.lock()->getSoundSortingTypeName());
+		popupScreen->setText("Sorting by " + sampler->getSoundSortingTypeName());
 		popupScreen->returnToScreenAfterMilliSeconds("loop", 200);
 		break;
 	}
@@ -96,7 +96,7 @@ void LoopScreen::function(int f)
 		break;
 	case 4:
 	{
-		if (sampler.lock()->getSoundCount() == 0)
+		if (sampler->getSoundCount() == 0)
 			return;
 
 		auto editSoundScreen = mpc.screens->get<EditSoundScreen>("edit-sound");
@@ -109,7 +109,7 @@ void LoopScreen::function(int f)
 			return;
 
 		mpc.getControls().lock()->setF6Pressed(true);
-		sampler.lock()->playX();
+		sampler->playX();
 		break;
 	}
 }
@@ -119,7 +119,7 @@ void LoopScreen::turnWheel(int i)
     init();
 
     auto soundInc = getSoundIncrement(i);
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 
 	if (param == "" || !sound)
 		return;
@@ -208,12 +208,12 @@ void LoopScreen::turnWheel(int i)
     }
 	else if (param.compare("playx") == 0)
 	{
-		sampler.lock()->setPlayX(sampler.lock()->getPlayX() + i);
+		sampler->setPlayX(sampler->getPlayX() + i);
 		displayPlayX();
 	}
 	else if (param.compare("loop") == 0)
 	{
-        sampler.lock()->getSound().lock()->setLoopEnabled(i > 0);
+        sampler->getSound().lock()->setLoopEnabled(i > 0);
         displayLoop();
 	}
 	else if (param.compare("endlength") == 0)
@@ -224,7 +224,7 @@ void LoopScreen::turnWheel(int i)
 	}
 	else if (param.compare("snd") == 0 && i > 0)
 	{
-		sampler.lock()->selectNextSound();
+		sampler->selectNextSound();
 		displaySnd();
 		displayPlayX();
 		displayEndLength();
@@ -235,7 +235,7 @@ void LoopScreen::turnWheel(int i)
 	}
 	else if (param.compare("snd") == 0 && i < 0)
 	{
-		sampler.lock()->selectPreviousSound();
+		sampler->selectPreviousSound();
 		displaySnd();
 		displayPlayX();
 		displayEndLength();
@@ -254,7 +254,7 @@ void LoopScreen::setSlider(int i)
 	init();
 
 	auto trimScreen = mpc.screens->get<TrimScreen>("trim");
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 
 	auto const oldLength = sound->getEnd() - sound->getLoopTo();
 	auto const lengthFix = trimScreen->smplLngthFix;
@@ -324,7 +324,7 @@ void LoopScreen::pressEnter()
 		return;
 
 	auto candidate = field->enter();
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 
 	auto const oldLength = sound->getEnd() - sound->getLoopTo();
 
@@ -383,7 +383,7 @@ void LoopScreen::pressEnter()
 
 void LoopScreen::displaySnd()
 {
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 
 	if (!sound)
 	{
@@ -405,14 +405,14 @@ void LoopScreen::displaySnd()
 
 void LoopScreen::displayPlayX()
 {
-	findField("playx").lock()->setText(playXNames[sampler.lock()->getPlayX()]);
+	findField("playx").lock()->setText(playXNames[sampler->getPlayX()]);
 }
 
 void LoopScreen::displayTo()
 {
-	if (sampler.lock()->getSoundCount() != 0)
+	if (sampler->getSoundCount() != 0)
 	{
-		auto sound = sampler.lock()->getSound().lock();
+		auto sound = sampler->getSound().lock();
 		findField("to").lock()->setTextPadded(sound->getLoopTo(), " ");
 	}
 	else
@@ -433,13 +433,13 @@ void LoopScreen::displayEndLength()
 
 void LoopScreen::displayEndLengthValue()
 {
-	if (sampler.lock()->getSoundCount() == 0)
+	if (sampler->getSoundCount() == 0)
 	{
 		findField("endlengthvalue").lock()->setTextPadded("0", " ");
 		return;
 	}
 
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 
 	auto text = to_string(endSelected ? sound->getEnd() : sound->getEnd() - sound->getLoopTo());
 	findField("endlengthvalue").lock()->setTextPadded(text, " ");
@@ -447,19 +447,19 @@ void LoopScreen::displayEndLengthValue()
 
 void LoopScreen::displayLoop()
 {
-	if (sampler.lock()->getSoundCount() == 0)
+	if (sampler->getSoundCount() == 0)
 	{
 		findField("loop").lock()->setText("OFF");
 		return;
 	}
 
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 	findField("loop").lock()->setText(sound->isLoopEnabled() ? "ON" : "OFF");
 }
 
 void LoopScreen::displayWave()
 {
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 
 	if (!sound)
 	{

@@ -17,9 +17,9 @@ AutoChromaticAssignmentScreen::AutoChromaticAssignmentScreen(mpc::Mpc& mpc, cons
 
 void AutoChromaticAssignmentScreen::open()
 {
-    if (ls.lock()->getPreviousScreenName().compare("name") != 0)
+    if (ls.lock()->getPreviousScreenName() != "name")
     {
-        auto letterNumber = sampler.lock()->getProgramCount() + 21;
+        auto letterNumber = sampler->getProgramCount() + 21;
         newName = "NewPgm-" + mpc::Mpc::akaiAscii[letterNumber];
         originalKey = 67;
         tune = 0;
@@ -27,7 +27,7 @@ void AutoChromaticAssignmentScreen::open()
     
     init();
     
-    setSourceSoundIndex(sampler.lock()->getLastNp(program.lock().get())->getSoundIndex());
+    setSourceSoundIndex(sampler->getLastNp(program.lock().get())->getSoundIndex());
     displayOriginalKey();
     displayTune();
     displayProgramName();
@@ -52,7 +52,7 @@ void AutoChromaticAssignmentScreen::function(int i)
             break;
         case 4:
         {
-            auto newProgram = sampler.lock()->addProgram().lock();
+            auto newProgram = sampler->addProgram().lock();
             newProgram->setName(newName);
             
             for (int j = 35; j <= 98; j++)
@@ -66,7 +66,7 @@ void AutoChromaticAssignmentScreen::function(int i)
                 noteParameters->setTune(((j - originalKey) * 10) + tune);
             }
             
-            auto programs = sampler.lock()->getPrograms();
+            auto programs = sampler->getPrograms();
             
             for (int j = 0; j < programs.size(); j++)
             {
@@ -87,13 +87,13 @@ void AutoChromaticAssignmentScreen::turnWheel(int i)
 {
     init();
     
-    if (param.compare("source") == 0)
+    if (param == "source")
     {
         mpc.setNote(mpc.getNote() + i);
         displaySource();
-        setSourceSoundIndex(sampler.lock()->getLastNp(program.lock().get())->getSoundIndex());
+        setSourceSoundIndex(sampler->getLastNp(program.lock().get())->getSoundIndex());
     }
-    else if (param.compare("program-name") == 0)
+    else if (param == "program-name")
     {
         auto nameScreen = mpc.screens->get<NameScreen>("name");
         auto autoChromaticAssignmentScreen = this;
@@ -107,15 +107,15 @@ void AutoChromaticAssignmentScreen::turnWheel(int i)
         
         openScreen("name");
     }
-    else if (param.compare("snd") == 0)
+    else if (param == "snd")
     {
         setSourceSoundIndex(sourceSoundIndex + i);
     }
-    else if (param.compare("original-key") == 0)
+    else if (param == "original-key")
     {
         setOriginalKey(originalKey + i);
     }
-    else if (param.compare("tune") == 0)
+    else if (param == "tune")
     {
         setTune(tune + i);
     }
@@ -123,7 +123,7 @@ void AutoChromaticAssignmentScreen::turnWheel(int i)
 
 void AutoChromaticAssignmentScreen::setSourceSoundIndex(int i)
 {
-    if (i < -1 || i >= sampler.lock()->getSoundCount())
+    if (i < -1 || i >= sampler->getSoundCount())
         return;
     
     sourceSoundIndex = i;
@@ -150,9 +150,9 @@ void AutoChromaticAssignmentScreen::setTune(int i)
 
 void AutoChromaticAssignmentScreen::displaySource()
 {
-    auto note = sampler.lock()->getLastNp(program.lock().get())->getNumber();
+    auto note = sampler->getLastNp(program.lock().get())->getNumber();
     auto padIndex = program.lock()->getPadIndexFromNote(note);
-    auto padName = sampler.lock()->getPadName(padIndex);
+    auto padName = sampler->getPadName(padIndex);
     findField("source").lock()->setText(to_string(note) + "/" + padName);
 }
 
@@ -164,14 +164,14 @@ void AutoChromaticAssignmentScreen::displayTune()
 
 void AutoChromaticAssignmentScreen::displayOriginalKey()
 {
-    auto padName = sampler.lock()->getPadName(originalKey - 35);
+    auto padName = sampler->getPadName(originalKey - 35);
     findField("original-key").lock()->setText(to_string(originalKey) + "/" + padName);
 }
 
 void AutoChromaticAssignmentScreen::displaySnd()
 {
-    auto sampleName = sourceSoundIndex == -1 ? "OFF" : sampler.lock()->getSoundName(sourceSoundIndex);
-    string stereo = sourceSoundIndex == -1 ? "" : sampler.lock()->getSound(sourceSoundIndex).lock()->isMono() ? "" : "(ST)";
+    auto sampleName = sourceSoundIndex == -1 ? "OFF" : sampler->getSoundName(sourceSoundIndex);
+    string stereo = sourceSoundIndex == -1 ? "" : sampler->getSound(sourceSoundIndex).lock()->isMono() ? "" : "(ST)";
     findField("snd").lock()->setText(StrUtil::padRight(sampleName, " ", 16) + stereo);
 }
 void AutoChromaticAssignmentScreen::displayProgramName()
@@ -183,9 +183,9 @@ void AutoChromaticAssignmentScreen::update(moduru::observer::Observable* observa
 {
     auto msg = nonstd::any_cast<string>(message);
     
-    if (msg.compare("note") == 0)
+    if (msg == "note")
     {
         displaySource();
-        setSourceSoundIndex(sampler.lock()->getLastNp(program.lock().get())->getSoundIndex());
+        setSourceSoundIndex(sampler->getLastNp(program.lock().get())->getSoundIndex());
     }
 }

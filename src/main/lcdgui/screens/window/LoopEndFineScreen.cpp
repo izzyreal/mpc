@@ -12,7 +12,7 @@ using namespace std;
 LoopEndFineScreen::LoopEndFineScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "loop-end-fine", layerIndex)
 {
-	addChild(move(make_shared<Wave>()));
+	addChild(std::move(make_shared<Wave>()));
 	findWave().lock()->setFine(true);
 }
 
@@ -39,7 +39,7 @@ void LoopEndFineScreen::displayLoopLngth()
 
 void LoopEndFineScreen::displayLngthField()
 {
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 
 	if (!sound)
 		return;
@@ -51,7 +51,7 @@ void LoopEndFineScreen::displayFineWave()
 {
 	auto trimScreen = mpc.screens->get<TrimScreen>("trim");
 
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 
 	if (!sound)
 	{
@@ -64,7 +64,7 @@ void LoopEndFineScreen::displayFineWave()
 
 void LoopEndFineScreen::displayEnd()
 {
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 
 	if (!sound)
 	{
@@ -76,7 +76,7 @@ void LoopEndFineScreen::displayEnd()
 
 void LoopEndFineScreen::displayPlayX()
 {
-    findField("playx").lock()->setText(playXNames[sampler.lock()->getPlayX()]);
+    findField("playx").lock()->setText(playXNames[sampler->getPlayX()]);
 }
 
 void LoopEndFineScreen::function(int i)
@@ -92,7 +92,7 @@ void LoopEndFineScreen::function(int i)
 		findWave().lock()->zoomMinus();
 		break;
 	case 4:
-		sampler.lock()->playX();
+		sampler->playX();
 		break;
 	}
 }
@@ -100,7 +100,7 @@ void LoopEndFineScreen::function(int i)
 void LoopEndFineScreen::turnWheel(int i)
 {
 	init();
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 	auto startEndLength = static_cast<int>(sound->getEnd() - sound->getStart());
 	auto loopLength = static_cast<int>((sound->getEnd() - sound->getLoopTo()));
 	auto loopScreen = mpc.screens->get<LoopScreen>("loop");
@@ -116,12 +116,12 @@ void LoopEndFineScreen::turnWheel(int i)
 	if (field->isTypeModeEnabled())
 		field->disableTypeMode();
 
-	if (param.compare("loop-lngth") == 0)
+	if (param == "loop-lngth")
 	{
 		loopScreen->loopLngthFix = i > 0;
 		displayLoopLngth();
 	}
-	else if (param.compare("lngth") == 0)
+	else if (param == "lngth")
 	{		
 		sound->setEnd(sound->getEnd() + soundInc);
 
@@ -129,7 +129,7 @@ void LoopEndFineScreen::turnWheel(int i)
 		displayLngthField();
 		displayFineWave();
 	}
-	else if (param.compare("end") == 0)
+	else if (param == "end")
 	{
 		auto candidate = sound->getEnd() + soundInc;
 
@@ -148,9 +148,9 @@ void LoopEndFineScreen::turnWheel(int i)
 		displayLngthField();
 		displayFineWave();
 	}
-	else if (param.compare("playx") == 0)
+	else if (param == "playx")
 	{
-		sampler.lock()->setPlayX(sampler.lock()->getPlayX() + i);
+		sampler->setPlayX(sampler->getPlayX() + i);
 		displayPlayX();
 	}
 }

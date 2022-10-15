@@ -19,7 +19,7 @@ using namespace std;
 TrimScreen::TrimScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "trim", layerIndex)
 {
-	addChild(move(make_shared<Wave>()));
+	addChild(std::move(make_shared<Wave>()));
 	findWave().lock()->setFine(false);
 }
 
@@ -28,7 +28,7 @@ void TrimScreen::open()
     mpc.getControls().lock()->getControls()->typableParams = { "st", "end" };
 
     findField("view").lock()->setAlignment(Alignment::Centered);
-	bool sound = sampler.lock()->getSound().lock() ? true : false;
+	bool sound = sampler->getSound().lock() ? true : false;
 
 	findField("snd").lock()->setFocusable(sound);
 	findField("playx").lock()->setFocusable(sound);
@@ -55,7 +55,7 @@ void TrimScreen::openWindow()
 	
 	if (param.compare("snd") == 0)
 	{
-		sampler.lock()->setPreviousScreenName("trim");
+		sampler->setPreviousScreenName("trim");
 		openScreen("sound");
 	}
 	else if (param.compare("st") == 0)
@@ -76,10 +76,10 @@ void TrimScreen::function(int f)
 	{
 	case 0:
 	{
-		sampler.lock()->sort();
+		sampler->sort();
 		openScreen("popup");
 		auto popupScreen = mpc.screens->get<PopupScreen>("popup");
-		popupScreen->setText("Sorting by " + sampler.lock()->getSoundSortingTypeName());
+		popupScreen->setText("Sorting by " + sampler->getSoundSortingTypeName());
 		popupScreen->returnToScreenAfterMilliSeconds("trim", 200);
 		break;
 	}
@@ -94,7 +94,7 @@ void TrimScreen::function(int f)
 		break;
 	case 4:
 	{
-		if (sampler.lock()->getSoundCount() == 0)
+		if (sampler->getSoundCount() == 0)
 		{
 			return;
 		}
@@ -113,7 +113,7 @@ void TrimScreen::function(int f)
 		}
 
 		mpc.getControls().lock()->setF6Pressed(true);
-		sampler.lock()->playX();
+		sampler->playX();
 		break;
 	}
 	}
@@ -123,7 +123,7 @@ void TrimScreen::turnWheel(int i)
 {
 	init();
 
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 
 	if (param == "" || !sound)
 		return;
@@ -178,12 +178,12 @@ void TrimScreen::turnWheel(int i)
 	}
 	else if (param.compare("playx") == 0)
 	{
-		sampler.lock()->setPlayX(sampler.lock()->getPlayX() + i);
+		sampler->setPlayX(sampler->getPlayX() + i);
 		displayPlayX();
 	}
 	else if (param.compare("snd") == 0 && i > 0)
 	{
-		sampler.lock()->selectNextSound();
+		sampler->selectNextSound();
 		displaySnd();
 		displayEnd();
 		displayPlayX();
@@ -193,7 +193,7 @@ void TrimScreen::turnWheel(int i)
 	}
 	else if (param.compare("snd") == 0 && i < 0)
 	{
-		sampler.lock()->selectPreviousSound();
+		sampler->selectPreviousSound();
 		displaySnd();
 		displayEnd();
 		displayPlayX();
@@ -210,7 +210,7 @@ void TrimScreen::setSlider(int i)
     
 	init();
 
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 	auto const oldLength = sound->getEnd() - sound->getStart();
     auto candidatePos = (int) ((i / 124.0) * sound->getFrameCount());
     auto maxPos = int (0);
@@ -280,7 +280,7 @@ void TrimScreen::pressEnter()
 		return;
 
 	auto candidate = field->enter();
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 	auto const oldLength = sound->getEnd() - sound->getStart();
 	
 	if (candidate != INT_MAX)
@@ -320,7 +320,7 @@ void TrimScreen::pressEnter()
 
 void TrimScreen::displayWave()
 {
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 
 	if (!sound)
 	{
@@ -337,7 +337,7 @@ void TrimScreen::displayWave()
 
 void TrimScreen::displaySnd()
 {
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 
 	if (!sound)
 	{
@@ -361,14 +361,14 @@ void TrimScreen::displaySnd()
 
 void TrimScreen::displayPlayX()
 {
-	findField("playx").lock()->setText(playXNames[sampler.lock()->getPlayX()]);
+	findField("playx").lock()->setText(playXNames[sampler->getPlayX()]);
 }
 
 void TrimScreen::displaySt()
 {
-	if (sampler.lock()->getSoundCount() != 0)
+	if (sampler->getSoundCount() != 0)
 	{
-		auto sound = sampler.lock()->getSound().lock();
+		auto sound = sampler->getSound().lock();
 		findField("st").lock()->setTextPadded(sound->getStart(), " ");
 	}
 	else {
@@ -378,9 +378,9 @@ void TrimScreen::displaySt()
 
 void TrimScreen::displayEnd()
 {
-	if (sampler.lock()->getSoundCount() != 0)
+	if (sampler->getSoundCount() != 0)
 	{
-		auto sound = sampler.lock()->getSound().lock();
+		auto sound = sampler->getSound().lock();
 		findField("end").lock()->setTextPadded(sound->getEnd(), " ");
 	}
 	else {

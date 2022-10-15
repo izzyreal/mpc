@@ -94,7 +94,7 @@ void SampleScreen::function(int i)
 		else if (mpc.getAudioMidiServices().lock()->getSoundRecorder().lock()->isArmed())
 		{
 			mpc.getAudioMidiServices().lock()->getSoundRecorder().lock()->setArmed(false);
-			sampler.lock()->deleteSound(sampler.lock()->getSoundCount() - 1);
+			sampler->deleteSound(sampler->getSoundCount() - 1);
 			findBackground().lock()->setName("sample");
 		}
 		break;
@@ -119,8 +119,8 @@ void SampleScreen::function(int i)
 		}
 		else
 		{
-			auto sound = sampler.lock()->addSound();
-			sound.lock()->setName(sampler.lock()->addOrIncreaseNumber("sound"));
+			auto sound = sampler->addSound();
+			sound.lock()->setName(sampler->addOrIncreaseNumber("sound"));
 			auto lengthInFrames = time * (44100 * 0.1);
 			ams->getSoundRecorder().lock()->prepare(sound, lengthInFrames);
 			ams->getSoundRecorder().lock()->setArmed(true);

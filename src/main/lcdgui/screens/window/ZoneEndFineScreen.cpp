@@ -12,7 +12,7 @@ using namespace std;
 ZoneEndFineScreen::ZoneEndFineScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "zone-end-fine", layerIndex)
 {
-	addChild(move(make_shared<Wave>()));
+	addChild(std::move(make_shared<Wave>()));
 	findWave().lock()->setFine(true);
 }
 
@@ -34,7 +34,7 @@ void ZoneEndFineScreen::displayFineWave()
 	auto zoneScreen = mpc.screens->get<ZoneScreen>("zone");
 	auto trimScreen = mpc.screens->get<TrimScreen>("trim");
 
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 
 	if (!sound)
 		return;
@@ -57,7 +57,7 @@ void ZoneEndFineScreen::displayLngthLabel()
 
 void ZoneEndFineScreen::displayPlayX()
 {
-    findField("playx").lock()->setText(playXNames[sampler.lock()->getPlayX()]);
+    findField("playx").lock()->setText(playXNames[sampler->getPlayX()]);
 }
 
 void ZoneEndFineScreen::function(int i)
@@ -73,7 +73,7 @@ void ZoneEndFineScreen::function(int i)
 		findWave().lock()->zoomMinus();
 		break;
 	case 4:
-		sampler.lock()->playX();
+		sampler->playX();
 		break;
 	}
 }
@@ -81,7 +81,7 @@ void ZoneEndFineScreen::function(int i)
 void ZoneEndFineScreen::turnWheel(int i)
 {
 	init();
-	auto sound = sampler.lock()->getSound().lock();
+	auto sound = sampler->getSound().lock();
 	auto zoneScreen = mpc.screens->get<ZoneScreen>("zone");
 
 	auto soundInc = getSoundIncrement(i);
@@ -102,7 +102,7 @@ void ZoneEndFineScreen::turnWheel(int i)
 	}
 	else if (param.compare("playx") == 0)
 	{
-		sampler.lock()->setPlayX(sampler.lock()->getPlayX() + i);
+		sampler->setPlayX(sampler->getPlayX() + i);
 		displayPlayX();
 	}
 }

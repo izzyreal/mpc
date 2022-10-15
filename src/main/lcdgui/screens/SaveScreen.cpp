@@ -79,10 +79,10 @@ void SaveScreen::function(int i)
                     openScreen("save-a-program");
                     break;
                 case 4:
-                    if (sampler.lock()->getSoundCount() == 0)
+                    if (sampler->getSoundCount() == 0)
                         break;
                     
-                    nameScreen->setName(sampler.lock()->getSoundName(sampler.lock()->getSoundIndex()));
+                    nameScreen->setName(sampler->getSoundName(sampler->getSoundIndex()));
                     
                     openScreen("save-a-sound");
                     break;
@@ -109,11 +109,11 @@ void SaveScreen::turnWheel(int i)
             case 3:
             {
                 auto nr = sequencer.lock()->getActiveSequence().lock()->getTrack(sequencer.lock()->getActiveTrackIndex()).lock()->getBus();
-                sampler.lock()->setDrumBusProgramNumber(nr, sampler.lock()->getDrumBusProgramNumber(nr) + i);
+                sampler->setDrumBusProgramNumber(nr, sampler->getDrumBusProgramNumber(nr) + i);
                 break;
             }
             case 4:
-                sampler.lock()->setSoundIndex(sampler.lock()->getSoundIndex() + i);
+                sampler->setSoundIndex(sampler->getSoundIndex() + i);
                 break;
         }
         displayFile();
@@ -168,7 +168,7 @@ void SaveScreen::displayFile()
             fileName = program.lock()->getName();
             break;
         case 4:
-            fileName = string(sampler.lock()->getSoundCount() == 0 ? " (No sound)" : sampler.lock()->getSound().lock()->getName());
+            fileName = string(sampler->getSoundCount() == 0 ? " (No sound)" : sampler->getSound().lock()->getName());
             break;
         case 5:
             fileName = "MPC2KXL         .BIN";
@@ -191,13 +191,13 @@ void SaveScreen::displaySize()
             size = seq->isUsed() ? 10 + static_cast<int>(seq->getEventCount() * 0.001) : -1;
             break;
         case 2:
-            size = sampler.lock()->getProgramCount() * 4;
+            size = sampler->getProgramCount() * 4;
             break;
         case 3:
             size = 4;
             break;
         case 4:
-            size = sampler.lock()->getSoundCount() == 0 ? -1 : (sampler.lock()->getSound().lock()->getSampleData()->size() * 2 * 0.001);
+            size = sampler->getSoundCount() == 0 ? -1 : (sampler->getSound().lock()->getSampleData()->size() * 2 * 0.001);
             break;
         case 5:
             size = 512;

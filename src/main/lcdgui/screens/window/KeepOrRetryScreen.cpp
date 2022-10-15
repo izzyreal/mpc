@@ -29,7 +29,7 @@ void KeepOrRetryScreen::close()
 
 void KeepOrRetryScreen::mainScreen() {
     
-    sampler.lock()->deleteSound(sampler.lock()->getPreviewSound());
+    sampler->deleteSound(sampler->getPreviewSound());
     ScreenComponent::mainScreen();
 }
 
@@ -40,7 +40,7 @@ void KeepOrRetryScreen::function(int i)
     switch (i)
     {
         case 1:
-            sampler.lock()->deleteSound(sampler.lock()->getPreviewSound());
+            sampler->deleteSound(sampler->getPreviewSound());
             openScreen("sample");
             break;
         case 3 :
@@ -48,12 +48,12 @@ void KeepOrRetryScreen::function(int i)
             {
                 return;
             }
-            sampler.lock()->playPreviewSample(0, sampler.lock()->getPreviewSound().lock()->getLastFrameIndex(), 0, 2);
+            sampler->playPreviewSample(0, sampler->getPreviewSound().lock()->getLastFrameIndex(), 0, 2);
             break;
         case 4:
-            auto index = sampler.lock()->getSoundCount() - 1;
-            sampler.lock()->getLastNp(program.lock().get())->setSoundIndex(index);
-            sampler.lock()->setSoundIndex(index);
+            auto index = sampler->getSoundCount() - 1;
+            sampler->getLastNp(program.lock().get())->setSoundIndex(index);
+            sampler->setSoundIndex(index);
             openScreen("sample");
             break;
     }
@@ -62,8 +62,8 @@ void KeepOrRetryScreen::function(int i)
 void KeepOrRetryScreen::openNameScreen()
 {
     auto nameScreen = mpc.screens->get<NameScreen>("name");
-    nameScreen->setName(sampler.lock()->getPreviewSound().lock()->getName());
-    auto _sampler = sampler.lock();
+    nameScreen->setName(sampler->getPreviewSound().lock()->getName());
+    auto _sampler = sampler;
     
     auto renamer = [_sampler](string& newName) {
         _sampler->getPreviewSound().lock()->setName(newName);
@@ -78,7 +78,7 @@ void KeepOrRetryScreen::right()
 {
     init();
     
-    if (param.compare("name-for-new-sound") == 0)
+    if (param == "name-for-new-sound")
         openNameScreen();
 }
 
@@ -86,11 +86,11 @@ void KeepOrRetryScreen::turnWheel(int i)
 {
     init();
     
-    if (param.compare("name-for-new-sound") == 0)
+    if (param == "name-for-new-sound")
     {
         openNameScreen();
     }
-    else if (param.compare("assign-to-note") == 0)
+    else if (param == "assign-to-note")
     {
         auto newAssignToNote = assignToNote + i;
 
@@ -118,17 +118,17 @@ void KeepOrRetryScreen::turnWheel(int i)
 
 void KeepOrRetryScreen::displayNameForNewSound()
 {
-    if (!sampler.lock()->getSound().lock())
+    if (!sampler->getSound().lock())
         return;
     
-    findField("name-for-new-sound").lock()->setText(sampler.lock()->getPreviewSound().lock()->getName());
+    findField("name-for-new-sound").lock()->setText(sampler->getPreviewSound().lock()->getName());
 }
 
 void KeepOrRetryScreen::displayAssignToNote()
 {
     init();
     auto noteStr = assignToNote == 34 ? "--" : std::to_string(assignToNote);
-    auto padStr = sampler.lock()->getPadName(program.lock()->getPadIndexFromNote(assignToNote));
+    auto padStr = sampler->getPadName(program.lock()->getPadIndexFromNote(assignToNote));
     findField("assign-to-note").lock()->setText(noteStr + "/" + padStr);
 }
 
@@ -136,7 +136,7 @@ void KeepOrRetryScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 {
     string s = nonstd::any_cast<string>(arg);
     
-    if (s.compare("note") == 0)
+    if (s == "note")
     {
         assignToNote = mpc.getNote();
         displayAssignToNote();

@@ -543,10 +543,10 @@ void EventsScreen::displayDrumNotes()
 	else
 	{
 		auto track = sequencer.lock()->getActiveTrack().lock();
-		auto program = sampler.lock()->getProgram(sampler.lock()->getDrum(track->getBus() - 1)->getProgram()).lock();
+		auto program = sampler->getProgram(sampler->getDrum(track->getBus() - 1)->getProgram()).lock();
 		
 		auto noteText = StrUtil::padLeft(to_string(note0), " ", 2);
-		auto padName = sampler.lock()->getPadName(program->getPadIndexFromNote(note0));
+		auto padName = sampler->getPadName(program->getPadIndexFromNote(note0));
 		findField("note0").lock()->setText(noteText + "/" + padName);
 	}
 }

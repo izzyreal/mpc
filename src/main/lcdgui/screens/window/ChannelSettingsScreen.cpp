@@ -152,16 +152,16 @@ void ChannelSettingsScreen::displayNoteField()
 	string soundName = "OFF";
 	auto soundIndex = program.lock()->getNoteParameters(note)->getSoundIndex();
 
-	if (soundIndex >= 0 && soundIndex < sampler.lock()->getSoundCount())
+	if (soundIndex >= 0 && soundIndex < sampler->getSoundCount())
 	{
-		soundName = sampler.lock()->getSoundName(soundIndex);
+		soundName = sampler->getSoundName(soundIndex);
 
-		if (!sampler.lock()->getSound(soundIndex).lock()->isMono())
+		if (!sampler->getSound(soundIndex).lock()->isMono())
 			soundName += StrUtil::padLeft("(ST)", " ", 19 - soundName.length());
 	}
 
     auto padIndex = program.lock()->getPadIndexFromNote(note);
-    auto padName = sampler.lock()->getPadName(padIndex);
+    auto padName = sampler->getPadName(padIndex);
     findField("note").lock()->setText(to_string(note) + "/" + padName + "-" + soundName);
 }
 
