@@ -88,13 +88,6 @@ void FrameSeq::work(int nFrames)
 		lSequencer->notify("tempo");
 	}
 
-	auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
-
-	int tcValue = lSequencer->getTickValues()[timingCorrectScreen->getNoteValue()];
-	int swingPercentage = timingCorrectScreen->getSwing();
-	int swingOffset = (int)((swingPercentage - 50) * (4.0 * 0.01) * (tcValue * 0.5));
-	int start = (*seq->getBarLengths())[seq->getFirstLoopBarIndex()];
-
 	auto punchScreen = mpc.screens->get<PunchScreen>("punch");
 
 	auto punch = punchScreen->on && lSequencer->isRecordingOrOverdubbing();
@@ -126,30 +119,13 @@ void FrameSeq::work(int nFrames)
 				}
 			}
 
-			if (controls && (controls->isTapPressed() || controls->isNoteRepeatLocked()))
-			{				
-				if (tcValue == 24 || tcValue == 48)
-				{
-					if (getTickPosition() % (tcValue * 2) == swingOffset + tcValue ||
-                            getTickPosition() % (tcValue * 2) == 0)
-					{
-						repeatPad(getTickPosition());
-					}
-				}
-				else
-				{
-					if (tcValue != 1 && getTickPosition() % tcValue == 0)
-					{
-						repeatPad(getTickPosition());
-					}
-				}
-			}
-
 			if (!metronome)
 			{
 				if (lSequencer->isCountingIn())
 				{
-					if (getTickPosition() >= start - 1)
+                    const int start = (*seq->getBarLengths())[seq->getFirstLoopBarIndex()];
+
+                    if (getTickPosition() >= start - 1)
 					{
 						lSequencer->playToTick(start - 1);
 						move(seq->isLoopEnabled() ? seq->getLoopStart() : 0);
@@ -278,7 +254,7 @@ void FrameSeq::work(int nFrames)
 					{
 						if (lSequencer->isRecordingOrOverdubbing())
 						{
-							seq->insertBars(1, seq->getLastBarIndex() + 1);
+							seq->insertBars(1, seq->getLastBarIndex());
 							seq->setTimeSignature(seq->getLastBarIndex(), seq->getLastBarIndex(), userScreen->timeSig.getNumerator(), userScreen->timeSig.getDenominator());
 						}
 						else
@@ -290,7 +266,31 @@ void FrameSeq::work(int nFrames)
 				}
 			}
 
-			lSequencer->playToTick(getTickPosition());
+            if (controls && (controls->isTapPressed() || controls->isNoteRepeatLocked()))
+            {
+                auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
+                int tcValue = lSequencer->getTickValues()[timingCorrectScreen->getNoteValue()];
+	            int swingPercentage = timingCorrectScreen->getSwing();
+	            int swingOffset = (int)((swingPercentage - 50) * (4.0 * 0.01) * (tcValue * 0.5));
+
+                if (tcValue == 24 || tcValue == 48)
+                {
+                    if (getTickPosition() % (tcValue * 2) == swingOffset + tcValue ||
+                        getTickPosition() % (tcValue * 2) == 0)
+                    {
+                        repeatPad(getTickPosition());
+                    }
+                }
+                else
+                {
+                    if (tcValue != 1 && getTickPosition() % tcValue == 0)
+                    {
+                        repeatPad(getTickPosition());
+                    }
+                }
+            }
+
+            lSequencer->playToTick(getTickPosition());
 		}
 	}
 }

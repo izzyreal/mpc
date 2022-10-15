@@ -572,6 +572,8 @@ void Sequence::deleteBars(int firstBar, int _lastBar)
 
 void Sequence::insertBars(int barCount, int afterBar)
 {
+    const bool isAppending = afterBar == lastBarIndex;
+
 	lastBarIndex += barCount;
 
 	for (int i = afterBar; i < 999; i++)
@@ -615,19 +617,22 @@ void Sequence::insertBars(int barCount, int afterBar)
 		barCounter++;
 	}
 
-	for (auto& t : tracks)
-	{
-		if (t->getIndex() == 64 || t->getIndex() == 65)
-			continue;
-		
-		for (auto& event : t->getEvents())
-		{
-			auto e = event.lock();
-			
-			if (e->getTick() >= barStart)
-				e->setTick(e->getTick() + (newBarStart - barStart));
-		}
-	}
+    if (!isAppending)
+    {
+        for (auto& t : tracks)
+        {
+            if (t->getIndex() == 64 || t->getIndex() == 65)
+                continue;
+
+            for (auto& event : t->getEvents())
+            {
+                auto e = event.lock();
+
+                if (e->getTick() >= barStart)
+                    e->setTick(e->getTick() + (newBarStart - barStart));
+            }
+        }
+    }
 
 	createClickTrack();
 	createMidiClockTrack();
