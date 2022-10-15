@@ -51,7 +51,7 @@ void SecondSeqScreen::turnWheel(int i)
 
 void SecondSeqScreen::setSq(int i)
 {
-    if (i < 0 || i > 99)
+    if (i < 0 || i > 98)
         return;
     
     sq = i;
@@ -62,7 +62,7 @@ void SecondSeqScreen::setSq(int i)
 
 void SecondSeqScreen::displaySq()
 {
-    auto sqName = mpc.getSequencer().lock()->getSequence(sq).lock()->getName();
+    auto sqName = sequencer->getSequence(sq).lock()->getName();
     findField("sq").lock()->setTextPadded(sq + 1, "0");
     findLabel("sequence-name").lock()->setText("-" + sqName);
 }

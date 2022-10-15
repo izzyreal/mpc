@@ -322,7 +322,7 @@ void LoadScreen::displayDirectory()
 
 void LoadScreen::displayFreeSnd()
 {
-	findLabel("freesnd").lock()->setText(" " + StrUtil::padLeft(to_string(mpc.getSampler().lock()->getFreeSampleSpace()), " ", 5) + "K");
+	findLabel("freesnd").lock()->setText(" " + StrUtil::padLeft(to_string(sampler->getFreeSampleSpace()), " ", 5) + "K");
 }
 
 void LoadScreen::displayFile()

@@ -130,7 +130,7 @@ void TrMoveScreen::function(int i)
 
 		if (isSelected())
 		{
-			auto sequence = mpc.getSequencer().lock()->getActiveSequence().lock();
+			auto sequence = sequencer->getActiveSequence().lock();
 			insert(sequence.get());
 		}
 		else
@@ -174,7 +174,7 @@ void TrMoveScreen::displayTrLabels()
 	}
 
 	auto eventsScreen = mpc.screens->get<EventsScreen>("events");
-	auto sequence = mpc.getSequencer().lock()->getActiveSequence().lock();
+	auto sequence = sequencer->getActiveSequence().lock();
 
 	if (tr0Index >= 0)
 	{
@@ -219,7 +219,7 @@ void TrMoveScreen::displayTrLabels()
 void TrMoveScreen::displayTrFields()
 {
 	auto eventsScreen = mpc.screens->get<EventsScreen>("events");
-	auto sequence = mpc.getSequencer().lock()->getActiveSequence().lock();
+	auto sequence = sequencer->getActiveSequence().lock();
 	
 	if (isSelected())
 	{
@@ -248,7 +248,7 @@ void TrMoveScreen::displayTrFields()
 
 void TrMoveScreen::displaySq()
 {
-	auto sequence = mpc.getSequencer().lock()->getActiveSequence().lock();
+	auto sequence = sequencer->getActiveSequence().lock();
 	findField("sq").lock()->setText(StrUtil::padLeft(to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2));
 	auto sequenceName = "-" + sequence->getName();
 	findLabel("sq-name").lock()->setText(sequenceName);

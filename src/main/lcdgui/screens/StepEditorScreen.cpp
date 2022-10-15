@@ -1369,7 +1369,7 @@ void screens::StepEditorScreen::adhocPlayNoteEvent(const shared_ptr<mpc::sequenc
 
     auto frameSeq = mpc.getAudioMidiServices().lock()->getFrameSequencer().lock();
     auto sampleRate = mpc.getAudioMidiServices().lock()->getAudioServer()->getSampleRate();
-    auto tempo = mpc.getSequencer().lock()->getTempo();
+    auto tempo = sequencer->getTempo();
     auto &events = frameSeq->eventsAfterNFrames;
 
     for (auto &e: events)

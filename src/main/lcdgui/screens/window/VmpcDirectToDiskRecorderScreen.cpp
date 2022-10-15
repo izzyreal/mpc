@@ -41,7 +41,7 @@ void VmpcDirectToDiskRecorderScreen::turnWheel(int i)
 {
 	init();
 
-	auto seq = mpc.getSequencer().lock()->getSequence(sq).lock().get();
+	auto seq = sequencer->getSequence(sq).lock().get();
 
 	checkAllTimes(mpc, i, seq);
 
@@ -196,14 +196,14 @@ void VmpcDirectToDiskRecorderScreen::setRecord(int i)
 
 void VmpcDirectToDiskRecorderScreen::setSq(int i)
 {
-	if (i < 0 || i > 99)
+	if (i < 0 || i > 98)
 		return;
 
 	sq = i;
 	
 	setTime0(0);
 	
-	auto s = mpc.getSequencer().lock()->getSequence(sq).lock();
+	auto s = sequencer->getSequence(sq).lock();
 	
 	if (s->isUsed())
 		setTime1(s->getLastTick());
@@ -256,7 +256,7 @@ void VmpcDirectToDiskRecorderScreen::displaySong()
 	if (record != 3)
 		return;
 
-	findField("song").lock()->setText(StrUtil::padLeft(to_string(song + 1), "0", 2) + "-" + mpc.getSequencer().lock()->getSong(song).lock()->getName());
+	findField("song").lock()->setText(StrUtil::padLeft(to_string(song + 1), "0", 2) + "-" + sequencer->getSong(song).lock()->getName());
 }
 
 void VmpcDirectToDiskRecorderScreen::displayOffline()
@@ -288,7 +288,7 @@ void VmpcDirectToDiskRecorderScreen::displaySq()
 	if (!visible)
 		return;
 
-	findField("sq").lock()->setText(StrUtil::padLeft(to_string(sq + 1), "0", 2) + "-" + mpc.getSequencer().lock()->getSequence(sq).lock()->getName());
+	findField("sq").lock()->setText(StrUtil::padLeft(to_string(sq + 1), "0", 2) + "-" + sequencer->getSequence(sq).lock()->getName());
 }
 
 void VmpcDirectToDiskRecorderScreen::displayTime()
@@ -304,7 +304,7 @@ void VmpcDirectToDiskRecorderScreen::displayTime()
 	if (invisible)
 		return;
 
-	auto sequence = mpc.getSequencer().lock()->getSequence(sq).lock();
+	auto sequence = sequencer->getSequence(sq).lock();
 
 	findField("time0").lock()->setTextPadded(SeqUtil::getBar(sequence.get(), time0 ) + 1, "0");
 	findField("time1").lock()->setTextPadded(SeqUtil::getBeat(sequence.get(), time0) + 1, "0");
