@@ -179,8 +179,8 @@ std::vector<std::weak_ptr<Parameter>> Component::findParameters()
 	
 	for (auto& c : children)
 	{
-		if (dynamic_pointer_cast<Parameter>(c))
-			result.push_back(dynamic_pointer_cast<Parameter>(c));
+		if (std::dynamic_pointer_cast<Parameter>(c))
+			result.push_back(std::dynamic_pointer_cast<Parameter>(c));
 		
 		for (auto& parameter : c->findParameters())
 			result.push_back(parameter);
