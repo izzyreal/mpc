@@ -10,10 +10,6 @@
 #include <audiomidi/MonitorInputAdapter.hpp>
 #include <audiomidi/MpcMidiPorts.hpp>
 
-#include <nvram/NvRam.hpp>
-#include <sampler/Sampler.hpp>
-#include <sequencer/Sequencer.hpp>
-
 #include <mpc/MpcVoice.hpp>
 #include <mpc/MpcBasicSoundPlayerChannel.hpp>
 #include <mpc/MpcBasicSoundPlayerControls.hpp>
@@ -25,7 +21,7 @@
 #include <mpc/MpcSoundPlayerControls.hpp>
 
 #include <lcdgui/screens/MixerSetupScreen.hpp>
-#include <lcdgui/Screens.hpp>
+#include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
 
 // ctoot
 #include <audio/core/ChannelFormat.hpp>
@@ -61,14 +57,10 @@
 #include <synth/SynthServices.hpp>
 #include <synth/SynthChannelServices.hpp>
 
+#include <mpc/MpcSampler.hpp>
+
 // moduru
 #include <file/FileUtil.hpp>
-#include <lang/StrUtil.hpp>
-
-#include <mpc/MpcSampler.hpp>
-#include <mpc/MpcMixerSetupGui.hpp>
-
-#include <Logger.hpp>
 
 // stl
 #include <cmath>
@@ -77,6 +69,7 @@
 using namespace mpc;
 using namespace mpc::audiomidi;
 using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui;
 
 using namespace ctoot::audio::server;
@@ -480,3 +473,47 @@ void AudioMidiServices::changeSoundRecorderStateIfRequired()
   }
 }
 
+// Should be called from the audio thread only!
+void AudioMidiServices::changeBounceStateIfRequired()
+{
+    auto ams = mpc.getAudioMidiServices().lock();
+    auto directToDiskRecorderScreen = mpc.screens->get<VmpcDirectToDiskRecorderScreen>("vmpc-direct-to-disk-recorder");
+
+    if (isBouncing() && !wasBouncing) {
+
+        wasBouncing = true;
+
+        if (directToDiskRecorderScreen->isOffline())
+        {
+            std::vector<int> rates{ 44100, 48000, 88200 };
+            auto rate = rates[static_cast<size_t>(directToDiskRecorderScreen->getSampleRate())];
+            ams->getFrameSequencer().lock()->start(rate);
+
+            if (getAudioServer()->isRealTime())
+            {
+                server->setSampleRate(rate);
+                getAudioServer()->setRealTime(false);
+            }
+        }
+        else if (directToDiskRecorderScreen->getRecord() != 4)
+        {
+            ams->getFrameSequencer().lock()->start(static_cast<int>(server->getSampleRate()));
+        }
+
+        for (auto& diskRecorder : ams->getDiskRecorders())
+            diskRecorder.lock()->start();
+    }
+    else if (!isBouncing() && wasBouncing)
+    {
+        wasBouncing = false;
+
+        if (directToDiskRecorderScreen->isOffline())
+        {
+            if (!getAudioServer()->isRealTime())
+            {
+                server->setSampleRate(static_cast<int>(getAudioServer()->getSampleRate()));
+                getAudioServer()->setRealTime(true);
+            }
+        }
+    }
+}
