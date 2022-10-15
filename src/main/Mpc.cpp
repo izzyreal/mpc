@@ -283,6 +283,8 @@ mpc::disk::DiskController* Mpc::getDiskController()
 
 Mpc::~Mpc()
 {
+    sampler->stopAllVoices(0);
+    sequencer->stop();
 	mpc::nvram::NvRam::saveUserScreenValues(*this);
 	mpc::nvram::NvRam::saveVmpcSettings(*this);
 
