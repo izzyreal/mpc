@@ -64,7 +64,7 @@ void SaveScreen::function(int i)
                     break;
                 }
                 case 1:
-                    seq = sequencer.lock()->getActiveSequence().lock();
+                    seq = sequencer->getActiveSequence().lock();
                     if (!seq->isUsed()) return;
                     
                     nameScreen->setName(seq->getName());
@@ -104,11 +104,11 @@ void SaveScreen::turnWheel(int i)
         switch (type)
         {
             case 1:
-                sequencer.lock()->setActiveSequenceIndex(sequencer.lock()->getActiveSequenceIndex() + i);
+                sequencer->setActiveSequenceIndex(sequencer->getActiveSequenceIndex() + i);
                 break;
             case 3:
             {
-                auto nr = sequencer.lock()->getActiveSequence().lock()->getTrack(sequencer.lock()->getActiveTrackIndex()).lock()->getBus();
+                auto nr = sequencer->getActiveSequence().lock()->getTrack(sequencer->getActiveTrackIndex()).lock()->getBus();
                 sampler->setDrumBusProgramNumber(nr, sampler->getDrumBusProgramNumber(nr) + i);
                 break;
             }
@@ -140,7 +140,7 @@ void SaveScreen::displayType()
 
 void SaveScreen::displayFile()
 {
-    auto seq = sequencer.lock()->getActiveSequence().lock();
+    auto seq = sequencer->getActiveSequence().lock();
     string fileName = "";
     
     switch (type)
@@ -153,7 +153,7 @@ void SaveScreen::displayFile()
         }
         case 1:
         {
-            auto num = StrUtil::padLeft(to_string(sequencer.lock()->getActiveSequenceIndex() + 1), "0", 2);
+            auto num = StrUtil::padLeft(to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2);
             name = seq->getName();
             fileName = num + "-" + name;
             break;
@@ -179,13 +179,13 @@ void SaveScreen::displayFile()
 
 void SaveScreen::displaySize()
 {
-    auto seq = sequencer.lock()->getActiveSequence().lock();
+    auto seq = sequencer->getActiveSequence().lock();
     auto size = 0;
     
     switch (type)
     {
         case 0:
-            size = sequencer.lock()->getUsedSequenceCount() * 25;
+            size = sequencer->getUsedSequenceCount() * 25;
             break;
         case 1:
             size = seq->isUsed() ? 10 + static_cast<int>(seq->getEventCount() * 0.001) : -1;

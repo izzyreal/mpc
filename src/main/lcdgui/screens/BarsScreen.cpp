@@ -49,8 +49,8 @@ void BarsScreen::function(int j)
 	{
 		auto numberOfBars = (lastBar - firstBar + 1) * eventsScreen->copies;
 
-		auto fromSequence = sequencer.lock()->getActiveSequence().lock();
-		auto toSequence = sequencer.lock()->getSequence(eventsScreen->toSq).lock();
+		auto fromSequence = sequencer->getActiveSequence().lock();
+		auto toSequence = sequencer->getSequence(eventsScreen->toSq).lock();
 
 		if (!toSequence->isUsed())
 		{
@@ -140,12 +140,12 @@ void BarsScreen::turnWheel(int i)
 	init();
 
 	auto eventsScreen = mpc.screens->get<EventsScreen>("events");
-	auto fromSequence = sequencer.lock()->getActiveSequence().lock();
-	auto toSequence = sequencer.lock()->getSequence(eventsScreen->toSq).lock();
+	auto fromSequence = sequencer->getActiveSequence().lock();
+	auto toSequence = sequencer->getSequence(eventsScreen->toSq).lock();
 
 	if (param.compare("fromsq") == 0)
 	{
-		sequencer.lock()->setActiveSequenceIndex(sequencer.lock()->getActiveSequenceIndex() + i);
+		sequencer->setActiveSequenceIndex(sequencer->getActiveSequenceIndex() + i);
 
 		displayFromSq();
 
@@ -195,7 +195,7 @@ void BarsScreen::displayToSq()
 
 void BarsScreen::displayFromSq()
 {
-	findField("fromsq").lock()->setText(to_string(sequencer.lock()->getActiveSequenceIndex() + 1));
+	findField("fromsq").lock()->setText(to_string(sequencer->getActiveSequenceIndex() + 1));
 }
 
 void BarsScreen::displayAfterBar()

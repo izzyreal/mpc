@@ -40,7 +40,7 @@ void TrMoveScreen::turnWheel(int i)
 	else if (param.compare("sq") == 0)
 	{
 		auto eventsScreen = mpc.screens->get<EventsScreen>("events");
-		eventsScreen->setFromSq(sequencer.lock()->getActiveSequenceIndex() + i);
+		eventsScreen->setFromSq(sequencer->getActiveSequenceIndex() + i);
 		displaySq();
 		displayTrFields();
 		displayTrLabels();
@@ -249,7 +249,7 @@ void TrMoveScreen::displayTrFields()
 void TrMoveScreen::displaySq()
 {
 	auto sequence = mpc.getSequencer().lock()->getActiveSequence().lock();
-	findField("sq").lock()->setText(StrUtil::padLeft(to_string(sequencer.lock()->getActiveSequenceIndex() + 1), "0", 2));
+	findField("sq").lock()->setText(StrUtil::padLeft(to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2));
 	auto sequenceName = "-" + sequence->getName();
 	findLabel("sq-name").lock()->setText(sequenceName);
 }

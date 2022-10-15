@@ -35,9 +35,9 @@ void NextSeqScreen::open()
 	displayTiming();
 	displayNextSq();
 	
-	sequencer.lock()->addObserver(this);
+	sequencer->addObserver(this);
 
-	if (sequencer.lock()->getNextSq() == -1)
+	if (sequencer->getNextSq() == -1)
 		ls.lock()->setFocus("sq");
 	else
 		ls.lock()->setFocus("nextsq");
@@ -45,7 +45,7 @@ void NextSeqScreen::open()
 
 void NextSeqScreen::close()
 {
-	sequencer.lock()->deleteObserver(this);
+	sequencer->deleteObserver(this);
 }
 
 void NextSeqScreen::turnWheel(int i)
@@ -54,30 +54,30 @@ void NextSeqScreen::turnWheel(int i)
 	
 	if (param.compare("sq") == 0)
 	{
-		if (sequencer.lock()->isPlaying())
+		if (sequencer->isPlaying())
 		{
-			sequencer.lock()->setNextSq(sequencer.lock()->getCurrentlyPlayingSequenceIndex() + i);
+			sequencer->setNextSq(sequencer->getCurrentlyPlayingSequenceIndex() + i);
 			ls.lock()->setFocus("nextsq");
 		}
 		else
-			sequencer.lock()->setActiveSequenceIndex(sequencer.lock()->getActiveSequenceIndex() + i);
+			sequencer->setActiveSequenceIndex(sequencer->getActiveSequenceIndex() + i);
 	}
 	else if (param.compare("nextsq") == 0)
 	{
-		auto nextSq = sequencer.lock()->getNextSq();
+		auto nextSq = sequencer->getNextSq();
 		
 		if (nextSq == -1 && i < 0)
 			return;
 
 		if (nextSq == -1 && selectNextSqFromScratch)
 		{
-			nextSq = sequencer.lock()->getActiveSequenceIndex();
+			nextSq = sequencer->getActiveSequenceIndex();
 			selectNextSqFromScratch = false;
 		}
 		else
 			nextSq += i;
 
-		sequencer.lock()->setNextSq(nextSq);
+		sequencer->setNextSq(nextSq);
 
 		displayNextSq();
 	}
@@ -91,9 +91,9 @@ void NextSeqScreen::turnWheel(int i)
 	}
 	else if (param.compare("tempo") == 0)
 	{
-		double oldTempo = sequencer.lock()->getTempo();
+		double oldTempo = sequencer->getTempo();
 		double newTempo = oldTempo + (i * 0.1);
-		sequencer.lock()->setTempo(newTempo);
+		sequencer->setTempo(newTempo);
 		displayTempo();
 	}
 }
@@ -101,21 +101,20 @@ void NextSeqScreen::turnWheel(int i)
 void NextSeqScreen::function(int i)
 {
 	init();
-	
+
     if (i == 3 || i == 4)
-	{
-        auto seq = sequencer.lock();
-        auto nextSq = seq->getNextSq();
-		seq->setNextSq(-1);
+    {
+        auto nextSq = sequencer->getNextSq();
+        sequencer->setNextSq(-1);
         selectNextSqFromScratch = true;
-		displayNextSq();
+        displayNextSq();
 
         if (i == 3)
         {
-            seq->stop();
-            seq->move(0);
-            seq->setActiveSequenceIndex(nextSq);
-            seq->playFromStart();
+            sequencer->stop();
+            sequencer->move(0);
+            sequencer->setActiveSequenceIndex(nextSq);
+            sequencer->playFromStart();
         }
     }
 	else if (i == 5)
@@ -127,34 +126,32 @@ void NextSeqScreen::function(int i)
 void NextSeqScreen::displaySq()
 {
 	string result = "";
-	auto lSequencer = sequencer.lock();
 
-	if (lSequencer->isPlaying())
+	if (sequencer->isPlaying())
 	{
-		result.append(StrUtil::padLeft(to_string(lSequencer->getCurrentlyPlayingSequenceIndex() + 1), "0", 2));
+		result.append(StrUtil::padLeft(to_string(sequencer->getCurrentlyPlayingSequenceIndex() + 1), "0", 2));
 		result.append("-");
-		result.append(lSequencer->getCurrentlyPlayingSequence().lock()->getName());
+		result.append(sequencer->getCurrentlyPlayingSequence().lock()->getName());
 		findField("sq").lock()->setText(result);
 	}
 	else
 	{
-		result.append(StrUtil::padLeft(to_string(lSequencer->getActiveSequenceIndex() + 1), "0", 2));
+		result.append(StrUtil::padLeft(to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2));
 		result.append("-");
-		result.append(lSequencer->getActiveSequence().lock()->getName());
+		result.append(sequencer->getActiveSequence().lock()->getName());
 		findField("sq").lock()->setText(result);
 	}
 }
 
 void NextSeqScreen::displayNextSq()
 {
-	auto lSequencer = sequencer.lock();
-	auto nextSq = lSequencer->getNextSq();
+	auto nextSq = sequencer->getNextSq();
 	string res = "";
 
 	if (nextSq != -1)
 	{
-		auto seqName = lSequencer->getSequence(nextSq).lock()->getName();
-		res = StrUtil::padLeft(to_string(lSequencer->getNextSq() + 1), "0", 2) + "-" + seqName;
+		auto seqName = sequencer->getSequence(nextSq).lock()->getName();
+		res = StrUtil::padLeft(to_string(sequencer->getNextSq() + 1), "0", 2) + "-" + seqName;
 	}
 	
 	findField("nextsq").lock()->setText(res);
@@ -162,35 +159,34 @@ void NextSeqScreen::displayNextSq()
 
 void NextSeqScreen::displayNow0()
 {
-	findField("now0").lock()->setTextPadded(sequencer.lock()->getCurrentBarIndex() + 1, "0");
+	findField("now0").lock()->setTextPadded(sequencer->getCurrentBarIndex() + 1, "0");
 }
 
 void NextSeqScreen::displayNow1()
 {
-	findField("now1").lock()->setTextPadded(sequencer.lock()->getCurrentBeatIndex() + 1, "0");
+	findField("now1").lock()->setTextPadded(sequencer->getCurrentBeatIndex() + 1, "0");
 }
 
 void NextSeqScreen::displayNow2()
 {
-	findField("now2").lock()->setTextPadded(sequencer.lock()->getCurrentClockNumber(), "0");
+	findField("now2").lock()->setTextPadded(sequencer->getCurrentClockNumber(), "0");
 }
 
 void NextSeqScreen::displayTempo()
 {
 	displayTempoLabel();
-	findField("tempo").lock()->setText(Util::tempoString(sequencer.lock()->getTempo()));
+	findField("tempo").lock()->setText(Util::tempoString(sequencer->getTempo()));
 }
 
 void NextSeqScreen::displayTempoLabel()
 {
 	auto currentRatio = -1;
-	auto lSequencer = sequencer.lock();
-	auto seq = lSequencer->isPlaying() ? lSequencer->getCurrentlyPlayingSequence().lock() : lSequencer->getActiveSequence().lock();
-	for (auto& e : seq->getTempoChangeEvents())
+	auto sequence = sequencer->isPlaying() ? sequencer->getCurrentlyPlayingSequence().lock() : sequencer->getActiveSequence().lock();
+	for (auto& e : sequence->getTempoChangeEvents())
 	{
 		auto tce = e.lock();
 
-		if (tce->getTick() > lSequencer->getTickPosition())
+		if (tce->getTick() > sequencer->getTickPosition())
 			break;
 
 		currentRatio = tce->getRatio();
@@ -204,7 +200,7 @@ void NextSeqScreen::displayTempoLabel()
 
 void NextSeqScreen::displayTempoSource()
 {
-	findField("tempo-source").lock()->setText(sequencer.lock()->isTempoSourceSequenceEnabled() ? "(SEQ)" : "(MAS)");
+	findField("tempo-source").lock()->setText(sequencer->isTempoSourceSequenceEnabled() ? "(SEQ)" : "(MAS)");
 }
 
 void NextSeqScreen::displayTiming()

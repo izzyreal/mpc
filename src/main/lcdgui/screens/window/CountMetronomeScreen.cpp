@@ -75,7 +75,7 @@ void CountMetronomeScreen::turnWheel(int i)
 	else if (param.compare("rate") == 0)
 	{
 		setRate(rate + i);
-		sequencer.lock()->getActiveSequence().lock()->initMetaTracks();
+		sequencer->getActiveSequence().lock()->initMetaTracks();
 	}
 	else if (param.compare("in-rec") == 0)
 	{

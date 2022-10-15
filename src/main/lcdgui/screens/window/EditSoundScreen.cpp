@@ -732,8 +732,8 @@ void EditSoundScreen::function(int j)
 					dynamic_cast<mpc::sampler::NoteParameters*>(noteParameters)->setSoundIndex(sampler->getSoundCount() - zoneCount + i);
 				}
 
-				auto s = sequencer.lock()->getSequence(sequencer.lock()->getActiveSequenceIndex()).lock();
-				auto t = s->getTrack(sequencer.lock()->getActiveTrackIndex()).lock();
+				auto s = sequencer->getSequence(sequencer->getActiveSequenceIndex()).lock();
+				auto t = s->getTrack(sequencer->getActiveTrackIndex()).lock();
 
 				if (t->getBus() != 0)
 				{

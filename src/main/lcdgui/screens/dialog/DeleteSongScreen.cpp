@@ -51,7 +51,7 @@ void DeleteSongScreen::function(int i)
 		break;
 	case 4:
 		auto songScreen = mpc.screens->get<SongScreen>("song");
-		sequencer.lock()->deleteSong(songScreen->activeSongIndex);
+		sequencer->deleteSong(songScreen->activeSongIndex);
 		openScreen("song");
 		break;
 	}
@@ -60,6 +60,6 @@ void DeleteSongScreen::function(int i)
 void DeleteSongScreen::displaySong()
 {
 	auto songScreen = mpc.screens->get<SongScreen>("song");
-	auto song = sequencer.lock()->getSong(songScreen->activeSongIndex).lock();
+	auto song = sequencer->getSong(songScreen->activeSongIndex).lock();
 	findField("song").lock()->setText(StrUtil::padLeft(to_string(songScreen->activeSongIndex + 1), "0", 2) + "-" + song->getName());
 }

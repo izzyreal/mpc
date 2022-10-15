@@ -13,8 +13,8 @@ CopySequenceScreen::CopySequenceScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void CopySequenceScreen::open()
 {
-	sq0 = sequencer.lock()->getActiveSequenceIndex();
-	sq1 = sequencer.lock()->getFirstUsedSeqUp(0, true);
+	sq0 = sequencer->getActiveSequenceIndex();
+	sq1 = sequencer->getFirstUsedSeqUp(0, true);
 
 	displaySq0();
 	displaySq1();
@@ -27,15 +27,15 @@ void CopySequenceScreen::function(int i)
 	switch (i)
 	{
 	case 2:
-		sequencer.lock()->copySequenceParameters(sq0, sq1);
+		sequencer->copySequenceParameters(sq0, sq1);
 		openScreen("sequencer");
 		break;
 	case 3:
 		openScreen("sequence");
 		break;
 	case 4:
-		sequencer.lock()->copySequence(sq0, sq1);
-		sequencer.lock()->setActiveSequenceIndex(sq1);
+		sequencer->copySequence(sq0, sq1);
+		sequencer->setActiveSequenceIndex(sq1);
 		openScreen("sequencer");
 		break;
 	}
@@ -78,12 +78,12 @@ void CopySequenceScreen::setSq1(int i)
 
 void CopySequenceScreen::displaySq0()
 {
-	auto sq0Name = sequencer.lock()->getSequence(sq0).lock()->getName();
+	auto sq0Name = sequencer->getSequence(sq0).lock()->getName();
 	findField("sq0").lock()->setText(StrUtil::padLeft(to_string(sq0 + 1), "0", 2) + "-" + sq0Name);
 }
 
 void CopySequenceScreen::displaySq1()
 {
-	auto sq1Name = sequencer.lock()->getSequence(sq1).lock()->getName();
+	auto sq1Name = sequencer->getSequence(sq1).lock()->getName();
 	findField("sq1").lock()->setText(StrUtil::padLeft(to_string(sq1 + 1), "0", 2) + "-" + sq1Name);
 }

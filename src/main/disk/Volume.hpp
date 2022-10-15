@@ -73,11 +73,6 @@ struct Volume {
         return modeShortName(mode);
     }
 
-    std::string sizeShortName()
-    {
-        
-    }
-    
     std::shared_ptr<mpc::disk::MpcFile> getRoot()
     {
         if (type == LOCAL_DIRECTORY)

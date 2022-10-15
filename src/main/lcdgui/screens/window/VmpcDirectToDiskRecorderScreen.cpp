@@ -28,7 +28,7 @@ VmpcDirectToDiskRecorderScreen::VmpcDirectToDiskRecorderScreen(mpc::Mpc& mpc, co
 
 void VmpcDirectToDiskRecorderScreen::open()
 {
-	setSq(sequencer.lock()->getActiveSequenceIndex());
+	setSq(sequencer->getActiveSequenceIndex());
 	displayRecord();
 	displaySong();
 	displayTime();
@@ -90,7 +90,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 			rate = mpc.getAudioMidiServices().lock()->getAudioServer()->getSampleRate();
 
 		auto split = false;
-		auto sequence = sequencer.lock()->getSequence(seq).lock();
+		auto sequence = sequencer->getSequence(seq).lock();
         loopWasEnabled = sequence->isLoopEnabled();
 
 		switch (record)
@@ -105,7 +105,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 			if (!mpc.getAudioMidiServices().lock()->prepareBouncing(settings.get()))
 				openScreen("vmpc-file-in-use");
 			else			
-				sequencer.lock()->playFromStart();
+				sequencer->playFromStart();
 
 			break;
 		}
@@ -115,12 +115,12 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 			auto lengthInFrames = SeqUtil::loopFrameLength(sequence.get(), rate);
 			auto settings = make_unique<DirectToDiskSettings>(lengthInFrames, outputFolder, split, rate);
             if (loopWasEnabled) sequence->setLoopEnabled(false);
-			sequencer.lock()->move(sequence->getLoopStart());
+			sequencer->move(sequence->getLoopStart());
 
 			if (!mpc.getAudioMidiServices().lock()->prepareBouncing(settings.get()))
 				openScreen("vmpc-file-in-use");
 			else
-				sequencer.lock()->play();
+				sequencer->play();
 
 			break;
 		}
@@ -130,28 +130,28 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 			auto lengthInFrames = SeqUtil::sequenceFrameLength(sequence.get(), time0, time1, rate);
 			auto settings = make_unique<DirectToDiskSettings>(lengthInFrames, outputFolder, split, rate);
             if (loopWasEnabled) sequence->setLoopEnabled(false);
-			sequencer.lock()->move(time0);
+			sequencer->move(time0);
 			
 			if (!mpc.getAudioMidiServices().lock()->prepareBouncing(settings.get()))
 				openScreen("vmpc-file-in-use");
 			else
-				sequencer.lock()->play();
+				sequencer->play();
 			
 			break;
 		}
 		case 3:
 		{
-			auto mpcSong = sequencer.lock()->getSong(song).lock();
+			auto mpcSong = sequencer->getSong(song).lock();
 
 			if (!mpcSong->isUsed())
 				return;
 
-			auto lengthInFrames = SeqUtil::songFrameLength(mpcSong.get(), sequencer.lock().get(), rate);
+			auto lengthInFrames = SeqUtil::songFrameLength(mpcSong.get(), sequencer.get(), rate);
 			auto settings = make_unique<DirectToDiskSettings>(lengthInFrames, outputFolder, split, rate);
 
 			openScreen("song");
 
-			sequencer.lock()->setSongModeEnabled(true);
+			sequencer->setSongModeEnabled(true);
 
 			auto songScreen = mpc.screens->get<SongScreen>("song");
 			songScreen->setLoop(false);
@@ -159,7 +159,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 			if (!mpc.getAudioMidiServices().lock()->prepareBouncing(settings.get()))
 				openScreen("vmpc-file-in-use");
 			else
-				sequencer.lock()->playFromStart();
+				sequencer->playFromStart();
 
 			break;
 		}

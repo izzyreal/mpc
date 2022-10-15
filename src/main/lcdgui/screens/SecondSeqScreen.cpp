@@ -28,14 +28,14 @@ void SecondSeqScreen::function(int i)
         openScreen(punchScreen->tabNames[i]);
         break;
     case 5:
-        if (sequencer.lock()->isSecondSequenceEnabled())
+        if (sequencer->isSecondSequenceEnabled())
         {
-            sequencer.lock()->setSecondSequenceEnabled(false);
+            sequencer->setSecondSequenceEnabled(false);
             openScreen("sequencer");
             return;
         }
  
-        sequencer.lock()->setSecondSequenceEnabled(true);
+        sequencer->setSecondSequenceEnabled(true);
         openScreen("sequencer");
         break;
     }
@@ -69,7 +69,7 @@ void SecondSeqScreen::displaySq()
 
 void SecondSeqScreen::displayFunctionKeys()
 {
-    if (sequencer.lock()->isSecondSequenceEnabled())
+    if (sequencer->isSecondSequenceEnabled())
         ls.lock()->setFunctionKeysArrangement(2);
     else
         ls.lock()->setFunctionKeysArrangement(0);

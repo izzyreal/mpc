@@ -25,7 +25,7 @@ void PasteEventScreen::function(int i)
 		for (auto& event : stepEditorScreen->getPlaceHolder())
 		{
 			auto eventClone = track.lock()->cloneEvent(event).lock();
-			eventClone->setTick(sequencer.lock()->getTickPosition());
+			eventClone->setTick(sequencer->getTickPosition());
 		}
 		openScreen("step-editor");
 		break;

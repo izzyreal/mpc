@@ -32,12 +32,12 @@ void SongScreen::open()
 	displayTempo();
 	displayLoop();
 	displaySteps();
-	sequencer.lock()->addObserver(this);
+	sequencer->addObserver(this);
 }
 
 void SongScreen::close()
 {
-	sequencer.lock()->deleteObserver(this);
+	sequencer->deleteObserver(this);
 }
 
 void SongScreen::up()
@@ -46,12 +46,12 @@ void SongScreen::up()
 	
 	if (param.compare("step1") == 0 || param.compare("sequence1") == 0 || param.compare("reps1") == 0)
 	{
-		if (offset == -1 || sequencer.lock()->isPlaying())
+		if (offset == -1 || sequencer->isPlaying())
 			return;
 	
 		setOffset(offset - 1);
-		sequencer.lock()->setActiveSequenceIndex(sequencer.lock()->getSongSequenceIndex());
-		sequencer.lock()->setBar(0);
+		sequencer->setActiveSequenceIndex(sequencer->getSongSequenceIndex());
+		sequencer->setBar(0);
 	}
 	else
 	{
@@ -105,12 +105,12 @@ void SongScreen::right()
 
 void SongScreen::openWindow()
 {
-	if (sequencer.lock()->isPlaying())
+	if (sequencer->isPlaying())
 		return;
 
 	init();
 
-	auto song = sequencer.lock()->getSong(activeSongIndex).lock();
+	auto song = sequencer->getSong(activeSongIndex).lock();
 
 	if (param.find("now") == string::npos && !song->isUsed())
 	{
@@ -133,14 +133,14 @@ void SongScreen::down()
 
 	if (param.compare("step1") == 0 || param.compare("sequence1") == 0 || param.compare("reps1") == 0)
 	{	
-		auto song = sequencer.lock()->getSong(activeSongIndex).lock();
+		auto song = sequencer->getSong(activeSongIndex).lock();
 		
-		if (offset == song->getStepCount() - 1 || sequencer.lock()->isPlaying())
+		if (offset == song->getStepCount() - 1 || sequencer->isPlaying())
 			return;
 
 		setOffset(offset + 1);
-		sequencer.lock()->setActiveSequenceIndex(sequencer.lock()->getSongSequenceIndex());
-		sequencer.lock()->setBar(0);
+		sequencer->setActiveSequenceIndex(sequencer->getSongSequenceIndex());
+		sequencer->setBar(0);
 	}
 	else
 	{
@@ -152,7 +152,7 @@ void SongScreen::turnWheel(int i)
 {
 	init();
 	
-	auto song = sequencer.lock()->getSong(activeSongIndex).lock();
+	auto song = sequencer->getSong(activeSongIndex).lock();
 	
 	if (param.find("sequence") != string::npos)
 	{
@@ -176,8 +176,8 @@ void SongScreen::turnWheel(int i)
 		auto step = song->getStep(offset + 1).lock();
 		
 		step->setSequence(step->getSequence() + i);		
-		sequencer.lock()->setActiveSequenceIndex(step->getSequence());
-		sequencer.lock()->setBar(0);
+		sequencer->setActiveSequenceIndex(step->getSequence());
+		sequencer->setBar(0);
 		displayNow0();
 		displayNow1();
 		displayNow2();
@@ -198,15 +198,15 @@ void SongScreen::turnWheel(int i)
 		init();
 
 		if (song->isUsed() && song->getStepCount() != 0)
-			sequencer.lock()->setActiveSequenceIndex(song->getStep(0).lock()->getSequence());
+			sequencer->setActiveSequenceIndex(song->getStep(0).lock()->getSequence());
 	}
-	else if (param.compare("tempo") == 0 && !sequencer.lock()->isTempoSourceSequenceEnabled())
+	else if (param.compare("tempo") == 0 && !sequencer->isTempoSourceSequenceEnabled())
 	{
-		sequencer.lock()->setTempo(sequencer.lock()->getTempo() + (i * 0.1));
+		sequencer->setTempo(sequencer->getTempo() + (i * 0.1));
 	}
 	else if (param.compare("tempo-source") == 0)
 	{
-		sequencer.lock()->setTempoSourceSequence(i > 0);
+		sequencer->setTempoSourceSequence(i > 0);
 		displayTempoSource();
 		displayTempo();
 	}
@@ -222,16 +222,16 @@ void SongScreen::turnWheel(int i)
 
 void SongScreen::function(int i)
 {
-	if (sequencer.lock()->isPlaying())
+	if (sequencer->isPlaying())
 		return;
 
 	init();
-	auto song = sequencer.lock()->getSong(activeSongIndex).lock();
+	auto song = sequencer->getSong(activeSongIndex).lock();
 	
 	switch (i)
 	{
 	case 4:
-		if (sequencer.lock()->isPlaying())
+		if (sequencer->isPlaying())
 			return;
 
 		song->deleteStep(offset + 1);
@@ -270,7 +270,7 @@ void SongScreen::function(int i)
 
 void SongScreen::displayTempo()
 {
-	findField("tempo").lock()->setText(Util::tempoString(sequencer.lock()->getTempo()));
+	findField("tempo").lock()->setText(Util::tempoString(sequencer->getTempo()));
 }
 
 void SongScreen::displayLoop()
@@ -280,10 +280,9 @@ void SongScreen::displayLoop()
 
 void SongScreen::displaySteps()
 {
-	auto song = sequencer.lock()->getSong(activeSongIndex).lock();
+	auto song = sequencer->getSong(activeSongIndex).lock();
 	int steps = song->getStepCount();
-	auto s = sequencer.lock();
-	
+
 	auto stepArray = vector<weak_ptr<mpc::lcdgui::Field>>{ findField("step0"), findField("step1"), findField("step2") };
 	auto sequenceArray = vector<weak_ptr<mpc::lcdgui::Field>>{ findField("sequence0"), findField("sequence1"), findField("sequence2") };
 	auto repsArray = vector<weak_ptr<mpc::lcdgui::Field>>{ findField("reps0"), findField("reps1"), findField("reps2") };
@@ -295,7 +294,7 @@ void SongScreen::displaySteps()
 		if (stepIndex >= 0 && stepIndex < steps)
 		{
 			stepArray[i].lock()->setText(to_string(stepIndex + 1));
-			auto seqname = s->getSequence(song->getStep(stepIndex).lock()->getSequence()).lock()->getName();
+			auto seqname = sequencer->getSequence(song->getStep(stepIndex).lock()->getSequence()).lock()->getName();
 			sequenceArray[i].lock()->setText(StrUtil::padLeft(to_string(song->getStep(stepIndex).lock()->getSequence() + 1), "0", 2) + "-" + seqname);
 			repsArray[i].lock()->setText(to_string(song->getStep(stepIndex).lock()->getRepeats()));
 		}
@@ -310,14 +309,14 @@ void SongScreen::displaySteps()
 
 void SongScreen::displayTempoSource()
 {
-	findField("tempo-source").lock()->setText(sequencer.lock()->isTempoSourceSequenceEnabled() ? "SEQ" : "MAS");
+	findField("tempo-source").lock()->setText(sequencer->isTempoSourceSequenceEnabled() ? "SEQ" : "MAS");
 }
 
 void SongScreen::displayNow0()
 {
 	int pastBars = 0;
 
-	auto song = sequencer.lock()->getSong(activeSongIndex).lock();
+	auto song = sequencer->getSong(activeSongIndex).lock();
 
 	for (int i = 0; i < offset + 1; i++)
 	{
@@ -325,7 +324,7 @@ void SongScreen::displayNow0()
 			break;
 
 		auto step = song->getStep(i).lock();
-		auto seq = sequencer.lock()->getSequence(step->getSequence()).lock();
+		auto seq = sequencer->getSequence(step->getSequence()).lock();
 
 		if (!seq->isUsed())
 			continue;
@@ -335,24 +334,24 @@ void SongScreen::displayNow0()
 		pastBars += bars;
 	}
 
-	pastBars += sequencer.lock()->getPlayedStepRepetitions() * (sequencer.lock()->getActiveSequence().lock()->getLastBarIndex() + 1);
+	pastBars += sequencer->getPlayedStepRepetitions() * (sequencer->getActiveSequence().lock()->getLastBarIndex() + 1);
 	
-	findField("now0").lock()->setTextPadded(sequencer.lock()->getCurrentBarIndex() + 1 + pastBars, "0");
+	findField("now0").lock()->setTextPadded(sequencer->getCurrentBarIndex() + 1 + pastBars, "0");
 }
 
 void SongScreen::displayNow1()
 {
-	findField("now1").lock()->setTextPadded(sequencer.lock()->getCurrentBeatIndex() + 1, "0");
+	findField("now1").lock()->setTextPadded(sequencer->getCurrentBeatIndex() + 1, "0");
 }
 
 void SongScreen::displayNow2()
 {
-	findField("now2").lock()->setTextPadded(sequencer.lock()->getCurrentClockNumber(), "0");
+	findField("now2").lock()->setTextPadded(sequencer->getCurrentClockNumber(), "0");
 }
 
 void SongScreen::displaySongName()
 {
-	auto song = sequencer.lock()->getSong(activeSongIndex).lock();
+	auto song = sequencer->getSong(activeSongIndex).lock();
 	findField("song").lock()->setText(StrUtil::padLeft(to_string(activeSongIndex + 1), "0", 2) + "-" + song->getName());
 }
 
@@ -361,7 +360,7 @@ void SongScreen::setOffset(int i)
 	if (i < -1)
 		i = -1;
 
-	auto song = sequencer.lock()->getSong(activeSongIndex).lock();
+	auto song = sequencer->getSong(activeSongIndex).lock();
 
 	if (i >= song->getStepCount() - 1)
 		i = song->getStepCount() - 1;

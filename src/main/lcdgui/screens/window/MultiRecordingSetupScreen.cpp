@@ -73,7 +73,7 @@ void MultiRecordingSetupScreen::turnWheel(int i)
 {
 	init();
 	
-	auto seq = sequencer.lock()->getActiveSequence().lock();
+	auto seq = sequencer->getActiveSequence().lock();
 	
 	if (param[0] == 'a')
 	{
@@ -157,7 +157,7 @@ void MultiRecordingSetupScreen::down()
 
 void MultiRecordingSetupScreen::displayMrsLine(int i)
 {
-	auto seq = sequencer.lock()->getActiveSequence().lock();
+	auto seq = sequencer->getActiveSequence().lock();
 	auto trackIndex = visibleMrsLines[i]->getTrack();
 
 	auto aField = findField("a" + to_string(i)).lock();

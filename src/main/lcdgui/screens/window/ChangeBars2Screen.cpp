@@ -19,21 +19,21 @@ ChangeBars2Screen::ChangeBars2Screen(mpc::Mpc& mpc, const int layerIndex)
 
 void ChangeBars2Screen::open()
 {
-	setNewBars(sequencer.lock()->getActiveSequence().lock()->getLastBarIndex());
+	setNewBars(sequencer->getActiveSequence().lock()->getLastBarIndex());
 	displayCurrent();
 	displayNewBars();
 }
 
 void ChangeBars2Screen::displayCurrent()
 {
-	auto seq = sequencer.lock()->getActiveSequence().lock();
+	auto seq = sequencer->getActiveSequence().lock();
 	findLabel("current").lock()->setText(to_string(seq->getLastBarIndex() + 1));
 }
 
 void ChangeBars2Screen::function(int i)
 {
 	ScreenComponent::function(i);
-	auto seq = sequencer.lock()->getActiveSequence().lock();
+	auto seq = sequencer->getActiveSequence().lock();
 
 	switch (i)
 	{
@@ -60,7 +60,7 @@ void ChangeBars2Screen::function(int i)
 		}
 
 		if (changed)
-			sequencer.lock()->move(0);
+			sequencer->move(0);
 
 		openScreen("sequencer");
 		break;
@@ -70,7 +70,7 @@ void ChangeBars2Screen::function(int i)
 
 void ChangeBars2Screen::displayNewBars()
 {
-	auto seq = sequencer.lock()->getActiveSequence().lock();
+	auto seq = sequencer->getActiveSequence().lock();
 
 	auto message0 = findLabel("message0").lock();
 	auto message1 = findLabel("message1").lock();

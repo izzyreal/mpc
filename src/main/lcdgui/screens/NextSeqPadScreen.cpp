@@ -26,13 +26,13 @@ void NextSeqPadScreen::open()
 	displaySeqNumbers();
 	displayNextSq();
 
-	sequencer.lock()->addObserver(this);
+	sequencer->addObserver(this);
 	mpc.addObserver(this);
 }
 
 void NextSeqPadScreen::close()
 {
-	sequencer.lock()->deleteObserver(this);
+	sequencer->deleteObserver(this);
 	mpc.deleteObserver(this);
 }
 
@@ -45,22 +45,22 @@ void NextSeqPadScreen::pad(int padIndexWithBank, int velo, bool repeat, int tick
 {
 	init();
 
-    if (sequencer.lock()->isPlaying() && mpc.getControls().lock()->isF4Pressed())
+    if (sequencer->isPlaying() && mpc.getControls().lock()->isF4Pressed())
     {
-        if (!sequencer.lock()->getSequence(padIndexWithBank).lock()->isUsed())
+        if (!sequencer->getSequence(padIndexWithBank).lock()->isUsed())
         {
             return;
         }
 
-        sequencer.lock()->stop();
-        sequencer.lock()->move(0);
-        sequencer.lock()->setActiveSequenceIndex(padIndexWithBank);
-        sequencer.lock()->playFromStart();
+        sequencer->stop();
+        sequencer->move(0);
+        sequencer->setActiveSequenceIndex(padIndexWithBank);
+        sequencer->playFromStart();
         refreshSeqs();
         return;
     }
 
-	sequencer.lock()->setNextSqPad(padIndexWithBank);
+	sequencer->setNextSqPad(padIndexWithBank);
 	refreshSeqs();
 }
 
@@ -71,7 +71,7 @@ void NextSeqPadScreen::function(int i)
 	switch (i)
 	{
 	case 4:
-		sequencer.lock()->setNextSq(-1);
+		sequencer->setNextSq(-1);
 		displayNextSq();
 		refreshSeqs();
 		break;
@@ -83,7 +83,7 @@ void NextSeqPadScreen::function(int i)
 
 void NextSeqPadScreen::displayNextSq()
 {
-	auto nextSq = sequencer.lock()->getNextSq();
+	auto nextSq = sequencer->getNextSq();
 
 	if (nextSq == -1)
 	{
@@ -92,7 +92,7 @@ void NextSeqPadScreen::displayNextSq()
 	}
 
 	auto number = StrUtil::padLeft(to_string(nextSq + 1), "0", 2);
-	auto name = sequencer.lock()->getSequence(nextSq).lock()->getName();
+	auto name = sequencer->getSequence(nextSq).lock()->getName();
 	findLabel("nextsq").lock()->setText(number + "-" + name);
 }
 
@@ -114,33 +114,32 @@ void NextSeqPadScreen::displaySeqNumbers()
 
 void NextSeqPadScreen::displaySq()
 {
-	auto lSequencer = sequencer.lock();
-	findField("sq").lock()->setText(StrUtil::padLeft(to_string(lSequencer->getActiveSequenceIndex() + 1), "0", 2) + "-" + lSequencer->getActiveSequence().lock()->getName());
+	findField("sq").lock()->setText(StrUtil::padLeft(to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2) + "-" + sequencer->getActiveSequence().lock()->getName());
 }
 
 void NextSeqPadScreen::displaySeq(int i)
 {
-	findField(to_string(i + 1)).lock()->setText(sequencer.lock()->getSequence(i + bankOffset()).lock()->getName().substr(0, 8));
+	findField(to_string(i + 1)).lock()->setText(sequencer->getSequence(i + bankOffset()).lock()->getName().substr(0, 8));
 }
 
 void NextSeqPadScreen::setSeqColor(int i)
 {
-	findField(to_string(i + 1)).lock()->setInverted(i + bankOffset() == sequencer.lock()->getNextSq());
+	findField(to_string(i + 1)).lock()->setInverted(i + bankOffset() == sequencer->getNextSq());
 }
 
 void NextSeqPadScreen::displayNow0()
 {
-	findField("now0").lock()->setTextPadded(sequencer.lock()->getCurrentBarIndex() + 1, "0");
+	findField("now0").lock()->setTextPadded(sequencer->getCurrentBarIndex() + 1, "0");
 }
 
 void NextSeqPadScreen::displayNow1()
 {
-	findField("now1").lock()->setTextPadded(sequencer.lock()->getCurrentBeatIndex() + 1, "0");
+	findField("now1").lock()->setTextPadded(sequencer->getCurrentBeatIndex() + 1, "0");
 }
 
 void NextSeqPadScreen::displayNow2()
 {
-	findField("now2").lock()->setTextPadded(sequencer.lock()->getCurrentClockNumber(), "0");
+	findField("now2").lock()->setTextPadded(sequencer->getCurrentClockNumber(), "0");
 }
 
 void NextSeqPadScreen::refreshSeqs()

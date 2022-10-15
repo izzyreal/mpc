@@ -358,7 +358,7 @@ void MixerScreen::turnWheelLinked(int i)
         if (tab == 0)
         {
             auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>("mixer-setup");
-            bool record = sequencer.lock()->isRecordingOrOverdubbing() && mixerSetupScreen->isRecordMixChangesEnabled();
+            bool record = sequencer->isRecordingOrOverdubbing() && mixerSetupScreen->isRecordMixChangesEnabled();
             
             if (yPos == 0)
             {
@@ -434,7 +434,7 @@ void MixerScreen::turnWheel(int i)
     {
         auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>("mixer-setup");
         
-        bool record = sequencer.lock()->isRecordingOrOverdubbing() && mixerSetupScreen->isRecordMixChangesEnabled();
+        bool record = sequencer->isRecordingOrOverdubbing() && mixerSetupScreen->isRecordMixChangesEnabled();
         
         if (yPos == 0)
         {
@@ -485,8 +485,8 @@ void MixerScreen::turnWheel(int i)
 
 void MixerScreen::recordMixerEvent(int pad, int param, int value)
 {
-    auto track = sequencer.lock()->getActiveTrack().lock();
-    auto e = dynamic_pointer_cast<mpc::sequencer::MixerEvent>(track->addEvent(sequencer.lock()->getTickPosition(), "mixer").lock());
+    auto track = sequencer->getActiveTrack().lock();
+    auto e = dynamic_pointer_cast<mpc::sequencer::MixerEvent>(track->addEvent(sequencer->getTickPosition(), "mixer").lock());
     e->setPadNumber(pad);
     e->setParameter(param);
     e->setValue(value);

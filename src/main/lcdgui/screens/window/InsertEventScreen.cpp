@@ -50,7 +50,7 @@ void InsertEventScreen::insertEvent()
 	init();
 	if (insertEventType == 0)
 	{
-		auto event = track.lock()->addEvent(sequencer.lock()->getTickPosition(), "note").lock();
+		auto event = track.lock()->addEvent(sequencer->getTickPosition(), "note").lock();
 		auto noteEvent = dynamic_pointer_cast<NoteEvent>(event);
 		noteEvent->setDuration(24);
 		noteEvent->setNote(60);
@@ -60,45 +60,45 @@ void InsertEventScreen::insertEvent()
 	}
 	else if (insertEventType == 1)
 	{
-		auto event = track.lock()->addEvent(sequencer.lock()->getTickPosition(), "pitchbend").lock();
+		auto event = track.lock()->addEvent(sequencer->getTickPosition(), "pitchbend").lock();
 		auto pitchBendEvent = dynamic_pointer_cast<PitchBendEvent>(event);
 		pitchBendEvent->setAmount(0);
 	}
 	else if (insertEventType == 2)
 	{
-		auto event = track.lock()->addEvent(sequencer.lock()->getTickPosition(), "controlchange").lock();
+		auto event = track.lock()->addEvent(sequencer->getTickPosition(), "controlchange").lock();
 		auto controlChangeEvent = dynamic_pointer_cast<ControlChangeEvent>(event);
 		controlChangeEvent->setController(0);
 		controlChangeEvent->setAmount(0);
 	}
 	else if (insertEventType == 3)
 	{
-		auto event = track.lock()->addEvent(sequencer.lock()->getTickPosition(), "programchange").lock();
+		auto event = track.lock()->addEvent(sequencer->getTickPosition(), "programchange").lock();
 		auto programChangeEvent = dynamic_pointer_cast<ProgramChangeEvent>(event);
 		programChangeEvent->setProgram(1);
 	}
 	else if (insertEventType == 4)
 	{
-		auto event = track.lock()->addEvent(sequencer.lock()->getTickPosition(), "channelpressure").lock();
+		auto event = track.lock()->addEvent(sequencer->getTickPosition(), "channelpressure").lock();
 		auto channelPressureEvent = dynamic_pointer_cast<ChannelPressureEvent>(event);
 		channelPressureEvent->setAmount(0);
 	}
 	else if (insertEventType == 5)
 	{
-		auto event = track.lock()->addEvent(sequencer.lock()->getTickPosition(), "polypressure").lock();
+		auto event = track.lock()->addEvent(sequencer->getTickPosition(), "polypressure").lock();
 		auto polyPressureEvent = dynamic_pointer_cast<PolyPressureEvent>(event);
 		polyPressureEvent->setNote(60);
 		polyPressureEvent->setAmount(0);
 	}
 	else if (insertEventType == 6)
 	{
-		auto event = track.lock()->addEvent(sequencer.lock()->getTickPosition(), "systemexclusive").lock();
+		auto event = track.lock()->addEvent(sequencer->getTickPosition(), "systemexclusive").lock();
 		auto systemExclusiveEvent = dynamic_pointer_cast<SystemExclusiveEvent>(event);
 		systemExclusiveEvent->setByteB(247);
 	}
 	else if (insertEventType == 7)
 	{
-		auto event = track.lock()->addEvent(sequencer.lock()->getTickPosition(), "mixer").lock();
+		auto event = track.lock()->addEvent(sequencer->getTickPosition(), "mixer").lock();
 		auto mixerEvent = dynamic_pointer_cast<MixerEvent>(event);
 		mixerEvent->setPadNumber(0);
 		mixerEvent->setParameter(0);

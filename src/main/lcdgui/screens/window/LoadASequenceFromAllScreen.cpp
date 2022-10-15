@@ -52,7 +52,7 @@ void LoadASequenceFromAllScreen::function(int i)
 		if (candidate)
 		{
 			auto loadASequenceScreen = mpc.screens->get<LoadASequenceScreen>("load-a-sequence");
-			sequencer.lock()->setSequence(loadASequenceScreen->loadInto, candidate);
+			sequencer->setSequence(loadASequenceScreen->loadInto, candidate);
 			openScreen("sequencer");
 		}
 		break;

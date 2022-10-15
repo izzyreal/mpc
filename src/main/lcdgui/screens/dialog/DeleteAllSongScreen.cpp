@@ -20,7 +20,7 @@ void DeleteAllSongScreen::function(int i)
 	case 4:
 		
 		for (int j = 0; j < 20; j++)
-			sequencer.lock()->deleteSong(j);
+			sequencer->deleteSong(j);
 
 		openScreen("sequencer");
 		break;

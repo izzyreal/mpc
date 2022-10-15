@@ -36,7 +36,7 @@ void TransposePermanentScreen::function(int i)
 			tracks.push_back(transScreen->tr);
 		}
 
-		auto seq = sequencer.lock()->getActiveSequence().lock();
+		auto seq = sequencer->getActiveSequence().lock();
 		auto firstTick = seq->getFirstTickOfBar(transScreen->bar0);
 		auto lastTick = seq->getLastTickOfBar(transScreen->bar1);
 		

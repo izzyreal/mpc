@@ -17,8 +17,8 @@ void TrackScreen::open()
 	ls.lock()->setPreviousScreenName("sequencer");
 
 	init();
-	auto activeTrackIndex = sequencer.lock()->getActiveTrackIndex();
-	auto defaultTrackName = sequencer.lock()->getDefaultTrackName(activeTrackIndex);
+	auto activeTrackIndex = sequencer->getActiveTrackIndex();
+	auto defaultTrackName = sequencer->getDefaultTrackName(activeTrackIndex);
 
 	findField("tracknamefirstletter").lock()->setText(track.lock()->getName().substr(0, 1));
 	findLabel("tracknamerest").lock()->setText(track.lock()->getName().substr(1));
@@ -49,11 +49,10 @@ void TrackScreen::turnWheel(int i)
     
 	if (param.find("default") != string::npos)
 	{
-        const auto _sequencer = sequencer.lock();
-        nameScreen->setName(_sequencer->getDefaultTrackName(_sequencer->getActiveTrackIndex()));
+        nameScreen->setName(sequencer->getDefaultTrackName(sequencer->getActiveTrackIndex()));
         
-        renamer = [_sequencer](string& newName) {
-            _sequencer->setDefaultTrackName(newName, _sequencer->getActiveTrackIndex());
+        renamer = [&](string& newName) {
+            sequencer->setDefaultTrackName(newName, sequencer->getActiveTrackIndex());
         };
 	}
 	else

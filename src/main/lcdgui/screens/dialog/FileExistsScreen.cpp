@@ -100,7 +100,7 @@ void FileExistsScreen::function(int i)
 			{
 				disk->flush();
 				disk->initFiles();
-				disk->writeMid(sequencer.lock()->getActiveSequence().lock(), sfileName);
+				disk->writeMid(sequencer->getActiveSequence().lock(), sfileName);
 				openScreen("save");
 			}
 			openScreen("save");

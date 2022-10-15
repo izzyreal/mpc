@@ -20,7 +20,7 @@ void EraseAllOffTracksScreen::function(int i)
 	{
 	case 4:
 	{
-		auto seq = sequencer.lock()->getActiveSequence().lock();
+		auto seq = sequencer->getActiveSequence().lock();
 		int trackCounter = 0;
 
 		for (auto& track : seq->getTracks())

@@ -95,12 +95,12 @@ void StepEditorScreen::open()
 	updateComponents();
 	setViewNotesText();
 	displayView();
-	sequencer.lock()->addObserver(this);
+	sequencer->addObserver(this);
 	track.lock()->addObserver(this);
 
-	findField("now0").lock()->setTextPadded(sequencer.lock()->getCurrentBarIndex() + 1, "0");
-	findField("now1").lock()->setTextPadded(sequencer.lock()->getCurrentBeatIndex() + 1, "0");
-	findField("now2").lock()->setTextPadded(sequencer.lock()->getCurrentClockNumber(), "0");
+	findField("now0").lock()->setTextPadded(sequencer->getCurrentBarIndex() + 1, "0");
+	findField("now1").lock()->setTextPadded(sequencer->getCurrentBeatIndex() + 1, "0");
+	findField("now2").lock()->setTextPadded(sequencer->getCurrentClockNumber(), "0");
 
 	initVisibleEvents();
 
@@ -121,7 +121,7 @@ void StepEditorScreen::open()
 void StepEditorScreen::close()
 {
 	init();
-	sequencer.lock()->deleteObserver(this);
+	sequencer->deleteObserver(this);
 	track.lock()->deleteObserver(this);
 
 	if (param.length() == 2)
@@ -221,7 +221,7 @@ void StepEditorScreen::function(int i)
 	}
 	case 3:
 	{
-		bool posIsLastTick = sequencer.lock()->getTickPosition() == sequencer.lock()->getActiveSequence().lock()->getLastTick();
+		bool posIsLastTick = sequencer->getTickPosition() == sequencer->getActiveSequence().lock()->getLastTick();
 
 		if (selectionEndIndex == -1)
 		{
@@ -357,15 +357,15 @@ void StepEditorScreen::turnWheel(int i)
 	}
 	else if (param.compare("now0") == 0)
 	{
-		sequencer.lock()->setBar(sequencer.lock()->getCurrentBarIndex() + i);
+		sequencer->setBar(sequencer->getCurrentBarIndex() + i);
 	}
 	else if (param.compare("now1") == 0)
 	{
-		sequencer.lock()->setBeat(sequencer.lock()->getCurrentBeatIndex() + i);
+		sequencer->setBeat(sequencer->getCurrentBeatIndex() + i);
 	}
 	else if (param.compare("now2") == 0)
 	{
-		sequencer.lock()->setClock(sequencer.lock()->getCurrentClockNumber() + i);
+		sequencer->setClock(sequencer->getCurrentClockNumber() + i);
 	}
 	else if (param.compare("tcvalue") == 0)
 	{
@@ -518,9 +518,9 @@ void StepEditorScreen::prevStepEvent()
 	auto controls = mpc.getControls().lock();
 
 	if (controls->isGoToPressed())
-		sequencer.lock()->goToPreviousEvent();
+		sequencer->goToPreviousEvent();
 	else
-		sequencer.lock()->goToPreviousStep();
+		sequencer->goToPreviousStep();
 
     adhocPlayNoteEventsAtCurrentPosition();
 }
@@ -532,9 +532,9 @@ void StepEditorScreen::nextStepEvent()
 	auto controls = mpc.getControls().lock();
 
 	if (controls->isGoToPressed())
-		sequencer.lock()->goToNextEvent();
+		sequencer->goToNextEvent();
 	else
-		sequencer.lock()->goToNextStep();
+		sequencer->goToNextStep();
 
     adhocPlayNoteEventsAtCurrentPosition();
 }
@@ -545,9 +545,9 @@ void StepEditorScreen::prevBarStart()
 	auto controls = mpc.getControls().lock();
 
 	if (controls->isGoToPressed())
-		sequencer.lock()->setBar(0);
+		sequencer->setBar(0);
 	else
-		sequencer.lock()->setBar(sequencer.lock()->getCurrentBarIndex() - 1);
+		sequencer->setBar(sequencer->getCurrentBarIndex() - 1);
 
     adhocPlayNoteEventsAtCurrentPosition();
 }
@@ -559,9 +559,9 @@ void StepEditorScreen::nextBarEnd()
 	auto controls = mpc.getControls().lock();
 
 	if (controls->isGoToPressed())
-		sequencer.lock()->setBar(sequencer.lock()->getActiveSequence().lock()->getLastBarIndex() + 1);
+		sequencer->setBar(sequencer->getActiveSequence().lock()->getLastBarIndex() + 1);
 	else
-		sequencer.lock()->setBar(sequencer.lock()->getCurrentBarIndex() + 1);
+		sequencer->setBar(sequencer->getCurrentBarIndex() + 1);
 
     adhocPlayNoteEventsAtCurrentPosition();
 }
@@ -779,13 +779,11 @@ void StepEditorScreen::initVisibleEvents()
 
 	eventsAtCurrentTick.clear();
 
-	auto lSequencer = sequencer.lock();
-
 	for (auto& event : track.lock()->getEvents())
 	{
 		auto lEvent = event.lock();
 
-		if (lEvent->getTick() == sequencer.lock()->getTickPosition())
+		if (lEvent->getTick() == sequencer->getTickPosition())
 		{
 			if ((view == 0
 				|| view == 1)
@@ -903,7 +901,7 @@ void StepEditorScreen::refreshEventRows()
 		{
 			eventRow->Hide(false);
 			event->addObserver(this);
-			eventRow->setBus(sequencer.lock()->getActiveTrack().lock()->getBus());
+			eventRow->setBus(sequencer->getActiveTrack().lock()->getBus());
 		}
 		else
 		{
@@ -1281,26 +1279,26 @@ void StepEditorScreen::update(moduru::observer::Observable*, nonstd::any message
 	}
 	else if (msg.compare("bar") == 0)
 	{
-		if (sequencer.lock()->isPlaying())
+		if (sequencer->isPlaying())
 			return;
 
-		findField("now0").lock()->setTextPadded(sequencer.lock()->getCurrentBarIndex() + 1, "0");
+		findField("now0").lock()->setTextPadded(sequencer->getCurrentBarIndex() + 1, "0");
 		setyOffset(0);
 	}
 	else if (msg.compare("beat") == 0)
 	{
-		if (sequencer.lock()->isPlaying())
+		if (sequencer->isPlaying())
 			return;
 
-		findField("now1").lock()->setTextPadded(sequencer.lock()->getCurrentBeatIndex() + 1, "0");
+		findField("now1").lock()->setTextPadded(sequencer->getCurrentBeatIndex() + 1, "0");
 		setyOffset(0);
 	}
 	else if (msg.compare("clock") == 0)
 	{
-		if (sequencer.lock()->isPlaying())
+		if (sequencer->isPlaying())
 			return;
 
-		findField("now2").lock()->setTextPadded(sequencer.lock()->getCurrentClockNumber(), "0");
+		findField("now2").lock()->setTextPadded(sequencer->getCurrentClockNumber(), "0");
 		setyOffset(0);
 	}
 }
@@ -1398,7 +1396,7 @@ void screens::StepEditorScreen::adhocPlayNoteEvent(const shared_ptr<mpc::sequenc
 
 void screens::StepEditorScreen::adhocPlayNoteEventsAtCurrentPosition()
 {
-    auto tick = sequencer.lock()->getTickPosition();
+    auto tick = sequencer->getTickPosition();
     for (auto& e : track.lock()->getEventRange(tick, tick))
     {
         auto noteEvent = std::dynamic_pointer_cast<NoteEvent>(e.lock());

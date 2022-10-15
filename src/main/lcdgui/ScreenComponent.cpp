@@ -13,7 +13,7 @@ ScreenComponent::ScreenComponent(mpc::Mpc& mpc, const string& name, const int la
 {
 	ls = mpc.getLayeredScreen();
 	sampler = mpc.getSampler().lock();
-	sequencer = mpc.getSequencer();
+	sequencer = mpc.getSequencer().lock();
 	auto background = dynamic_pointer_cast<Background>(addChild(make_shared<Background>()).lock());
 	background->setName(name);
 }

@@ -18,8 +18,8 @@ void DeleteAllSequencesScreen::function(int i)
 		openScreen("delete-sequence");
 		break;
 	case 4:
-		sequencer.lock()->move(0);
-		sequencer.lock()->purgeAllSequences();
+		sequencer->move(0);
+		sequencer->purgeAllSequences();
 		openScreen("sequencer");
 		break;
 	}

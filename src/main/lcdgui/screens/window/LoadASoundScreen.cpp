@@ -132,8 +132,8 @@ void LoadASoundScreen::keepSound()
     auto action = [&](bool newSoundIsMono){
         if (assignToNote != 34)
         {
-            auto sequence = sequencer.lock()->getActiveSequence().lock();
-            auto track = sequence->getTrack(sequencer.lock()->getActiveTrackIndex()).lock();
+            auto sequence = sequencer->getActiveSequence().lock();
+            auto track = sequence->getTrack(sequencer->getActiveTrackIndex()).lock();
 
             auto bus = track->getBus();
             auto programNumber = sampler->getDrumBusProgramNumber(bus);
