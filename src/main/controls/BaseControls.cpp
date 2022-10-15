@@ -358,8 +358,16 @@ void BaseControls::generateNoteOn(int note, int padVelo, int tick)
     
     playableEvent->setDuration(0);
     playableEvent->setTick(tick);
-    
-    mpc.getEventHandler().lock()->handle(playableEvent, trk.get());
+
+    char drum = -1;
+    auto drumScreen = mpc.screens->get<DrumScreen>("drum");
+
+    if (collectionContainsCurrentScreen(samplerScreens))
+    {
+        drum = drumScreen->drum;
+    }
+
+    mpc.getEventHandler().lock()->handle(playableEvent, trk.get(), drum);
 }
 
 bool BaseControls::isTypable()

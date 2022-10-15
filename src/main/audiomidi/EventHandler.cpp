@@ -45,18 +45,18 @@ sampler (_mpc.getSampler())
 {
 }
 
-void EventHandler::handle(const weak_ptr<Event>& event, Track* track)
+void EventHandler::handle(const weak_ptr<Event>& event, Track* track, char drum)
 {
     if (!track->isOn() && event.lock()->getTick() != -1)
         return;
     
     auto ne = dynamic_pointer_cast<NoteEvent>(event.lock());
     
-    handleNoThru(event, track, -1);
+    handleNoThru(event, track, -1, drum);
     midiOut(event, track);
 }
 
-void EventHandler::handleNoThru(const weak_ptr<Event>& e, Track* track, int timeStamp)
+void EventHandler::handleNoThru(const weak_ptr<Event>& e, Track* track, int timeStamp, char drum)
 {
     auto event = e.lock();
     
@@ -64,7 +64,7 @@ void EventHandler::handleNoThru(const weak_ptr<Event>& e, Track* track, int time
     
     auto countMetronomeScreen = mpc.screens->get<CountMetronomeScreen>("count-metronome");
     auto isStepEditor = mpc.getLayeredScreen().lock()->getCurrentScreenName() == "step-editor";
-    
+
     if (track->getName() == "click")
     {
         if (!lSequencer->isCountEnabled())
@@ -136,11 +136,8 @@ void EventHandler::handleNoThru(const weak_ptr<Event>& e, Track* track, int time
     }
     else if (ne)
     {
-        auto isSamplerScreen = mpc.getControls().lock()->getControls()->
-                collectionContainsCurrentScreen(mpc::controls::BaseControls::samplerScreens);
-        auto drumScreen = mpc.screens->get<DrumScreen>("drum");
-        auto drumIndex = isSamplerScreen ? drumScreen->drum : track->getBus() - 1;
-        
+        auto drumIndex = drum == -1 ? track->getBus() - 1 : drum;
+
         if (drumIndex >= 0)
         {
             if (ne->getDuration() != -1)

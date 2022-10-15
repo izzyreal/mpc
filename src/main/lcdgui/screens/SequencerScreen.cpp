@@ -378,93 +378,93 @@ void SequencerScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 
 	string s = nonstd::any_cast<string>(arg);
 
-	if (s.compare("nextsqvalue") == 0)
+	if (s == "nextsqvalue")
 	{
 		displayNextSq();
 	}
-	else if (s.compare("nextsq") == 0)
+	else if (s == "nextsq")
 	{
 		displayNextSq();
 		ls.lock()->setFocus("nextsq");
 	}
-	else if (s.compare("nextsqoff") == 0)
+	else if (s == "nextsqoff")
 	{
 		ls.lock()->setFocus("sq");
 		displayNextSq();
 	}
-	else if (s.compare("count") == 0)
+	else if (s == "count")
 	{
 		displayCount();
 	}
-	else if (s.compare("tracknumbername") == 0)
+	else if (s == "tracknumbername")
 	{
 		displayTr();
 		displayOn();
 	}
-	else if (s.compare("seqnumbername") == 0)
+	else if (s == "seqnumbername")
 	{
 		displaySq();
 	}
-	else if (s.compare("loop") == 0)
+	else if (s == "loop")
 	{
 		displayLoop();
 	}
-	else if (s.compare("recordingmode") == 0)
+	else if (s == "recordingmode")
 	{
 		displayRecordingMode();
 	}
-	else if (s.compare("numberofbars") == 0)
+	else if (s == "numberofbars")
 	{
 		displayBars();
 	}
-	else if (s.compare("trackon") == 0)
+	else if (s == "trackon")
 	{
 		displayOn();
 	}
-	else if (s.compare("bar") == 0)
+	else if (s == "bar")
 	{
 		displayNow0();
 		displayTempoLabel();
 	}
-	else if (s.compare("beat") == 0)
+	else if (s == "beat")
 	{
 		displayNow1();
 		displayTempoLabel();
 	}
-	else if (s.compare("clock") == 0)
+	else if (s == "clock")
 	{
 		displayNow2();
 		displayTempoLabel();
 	}
-	else if (s.compare("tempo") == 0)
+	else if (s == "tempo")
 	{
 		displayTempo();
 	}
-	else if (s.compare("tempo-source") == 0)
+	else if (s == "tempo-source")
 	{
 		displayTempoSource();
 	}
-	else if (s.compare("timesignature") == 0)
+	else if (s == "timesignature")
 	{
 		displayTsig();
 	}
-	else if (s.compare("programchange") == 0)
+	else if (s == "programchange")
 	{
 		displayPgm();
 	}
-	else if (s.compare("velocityratio") == 0)
+	else if (s == "velocityratio")
 	{
 		displayVelo();
 	}
-	else if (s.compare("bus") == 0)
+	else if (s == "bus")
 	{
 		displayBus();
 	}
-	else if (s.compare("device") == 0)
+	else if (s == "device")
 	{
 		displayDeviceNumber();
 	}
-	else if (s.compare("devicename") == 0)
+	else if (s == "devicename")
 	{
 		displayDeviceName();
 	}

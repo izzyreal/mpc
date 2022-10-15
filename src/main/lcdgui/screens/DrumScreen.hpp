@@ -11,6 +11,7 @@ namespace mpc::lcdgui::screens
 namespace mpc::controls
 {
 	class BaseControls;
+    class GlobalReleaseControls;
 }
 
 namespace mpc::lcdgui::screens
@@ -49,6 +50,7 @@ namespace mpc::lcdgui::screens
 		friend class SelectDrumScreen;
 		friend class SelectMixerDrumScreen;
 		friend class mpc::controls::BaseControls;
+		friend class mpc::controls::GlobalReleaseControls;
 		friend class mpc::audiomidi::EventHandler;
 
 	};

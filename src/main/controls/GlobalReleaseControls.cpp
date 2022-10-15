@@ -15,6 +15,7 @@
 
 #include <lcdgui/screens/SequencerScreen.hpp>
 #include <lcdgui/screens/StepEditorScreen.hpp>
+#include <lcdgui/screens/DrumScreen.hpp>
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <lcdgui/screens/window/Assign16LevelsScreen.hpp>
 #include <lcdgui/screens/window/StepEditOptionsScreen.hpp>
@@ -189,7 +190,16 @@ void GlobalReleaseControls::generateNoteOff(int note)
     noteEvent->setVelocity(0);
     noteEvent->setDuration(0);
     noteEvent->setTick(-1);
-    mpc.getEventHandler().lock()->handle(noteEvent, lTrk.get());
+
+    char drum = -1;
+    auto drumScreen = mpc.screens->get<DrumScreen>("drum");
+
+    if (collectionContainsCurrentScreen(samplerScreens))
+    {
+        drum = drumScreen->drum;
+    }
+
+    mpc.getEventHandler().lock()->handle(noteEvent, lTrk.get(), drum);
 }
 
 void GlobalReleaseControls::overDub()
