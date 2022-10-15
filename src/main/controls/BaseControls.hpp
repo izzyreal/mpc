@@ -52,7 +52,7 @@ namespace mpc::controls {
 		std::weak_ptr<mpc::sampler::Program> program;
 		ctoot::mpc::MpcSoundPlayerChannel* mpcSoundPlayerChannel = nullptr;
 
-		std::weak_ptr<mpc::lcdgui::LayeredScreen> ls;
+		std::shared_ptr<mpc::lcdgui::LayeredScreen> ls;
 		std::weak_ptr<mpc::lcdgui::Field> activeField;
 
 		void init();
@@ -94,10 +94,10 @@ namespace mpc::controls {
 	protected:
 		std::string param = "";
 		mpc::Mpc& mpc;
-		std::weak_ptr<mpc::sequencer::Sequencer> sequencer;
+		std::shared_ptr<mpc::sequencer::Sequencer> sequencer;
 
 	private:
-		std::weak_ptr<mpc::sampler::Sampler> sampler;
+		std::shared_ptr<mpc::sampler::Sampler> sampler;
 		std::weak_ptr<mpc::sequencer::Track> track;
 		std::string currentScreenName = "";
 		const static std::vector<std::string> allowTransportScreens;

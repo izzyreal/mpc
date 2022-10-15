@@ -54,9 +54,9 @@ sequencer (_mpc.getSequencer())
 
 void BaseControls::init()
 {
-    currentScreenName = ls.lock()->getCurrentScreenName();
-    param = ls.lock()->getFocus();
-    activeField = ls.lock()->getFocusedLayer().lock()->findField(param);
+    currentScreenName = ls->getCurrentScreenName();
+    param = ls->getFocus();
+    activeField = ls->getFocusedLayer().lock()->findField(param);
     
     auto isSampler = collectionContainsCurrentScreen(samplerScreens);
     
@@ -69,7 +69,7 @@ void BaseControls::init()
         splittable = false;
     }
     
-    track = sequencer.lock()->getActiveTrack();
+    track = sequencer->getActiveTrack();
     
     auto drumScreen = mpc.screens->get<DrumScreen>("drum");
     
@@ -77,8 +77,8 @@ void BaseControls::init()
     
     if (drumIndex != -1)
     {
-        mpcSoundPlayerChannel = sampler.lock()->getDrum(drumIndex);
-        program = sampler.lock()->getProgram(mpcSoundPlayerChannel->getProgram());
+        mpcSoundPlayerChannel = sampler->getDrum(drumIndex);
+        program = sampler->getProgram(mpcSoundPlayerChannel->getProgram());
     }
     else
     {
@@ -97,7 +97,7 @@ void BaseControls::left()
     if (param == "dummy")
         return;
     
-    ls.lock()->transferLeft();
+    ls->transferLeft();
 }
 
 void BaseControls::right()
@@ -110,7 +110,7 @@ void BaseControls::right()
     if (param == "dummy")
         return;
     
-    ls.lock()->transferRight();
+    ls->transferRight();
 }
 
 void BaseControls::up()
@@ -123,7 +123,7 @@ void BaseControls::up()
     if (param == "dummy")
         return;
     
-    ls.lock()->transferUp();
+    ls->transferUp();
 }
 
 void BaseControls::down()
@@ -136,7 +136,7 @@ void BaseControls::down()
     if (param == "dummy")
         return;
     
-    ls.lock()->transferDown();
+    ls->transferDown();
 }
 
 void BaseControls::function(int i)
@@ -148,48 +148,48 @@ void BaseControls::function(int i)
         case 3:
             auto controls = mpc.getControls().lock();
             controls->setF4Pressed(true);
-            if (ls.lock()->getFocusedLayerIndex() == 1)
+            if (ls->getFocusedLayerIndex() == 1)
             {
                 if (currentScreenName == "sequence")
                 {
-                    ls.lock()->setPreviousScreenName("sequencer");
+                    ls->setPreviousScreenName("sequencer");
                 }
                 else if (currentScreenName == "midi-input")
                 {
-                    ls.lock()->setPreviousScreenName("sequencer");
+                    ls->setPreviousScreenName("sequencer");
                 }
                 else if (currentScreenName == "midi-output")
                 {
-                    ls.lock()->setPreviousScreenName("sequencer");
+                    ls->setPreviousScreenName("sequencer");
                 }
                 else if (currentScreenName == "edit-sound")
                 {
                     auto editSoundScreen = mpc.screens->get<EditSoundScreen>("edit-sound");
-                    ls.lock()->setPreviousScreenName(editSoundScreen->getReturnToScreenName());
+                    ls->setPreviousScreenName(editSoundScreen->getReturnToScreenName());
                 }
                 else if (currentScreenName == "sound")
                 {
-                    ls.lock()->setPreviousScreenName(sampler.lock()->getPreviousScreenName());
+                    ls->setPreviousScreenName(sampler->getPreviousScreenName());
                 }
                 else if (currentScreenName == "program")
                 {
-                    ls.lock()->setPreviousScreenName(mpc.getPreviousSamplerScreenName());
+                    ls->setPreviousScreenName(mpc.getPreviousSamplerScreenName());
                 }
                 else if (currentScreenName == "name")
                 {
                     auto nameScreen = mpc.screens->get<NameScreen>("name");
                     nameScreen->editing = false;
-                    ls.lock()->setLastFocus("name", "0");
+                    ls->setLastFocus("name", "0");
                 }
                 else if (currentScreenName == "directory")
                 {
                     auto directoryScreen = mpc.screens->get<DirectoryScreen>("directory");
-                    ls.lock()->setPreviousScreenName(directoryScreen->previousScreenName);
+                    ls->setPreviousScreenName(directoryScreen->previousScreenName);
                 }
             }
             
-            if (ls.lock()->getFocusedLayerIndex() == 1 || ls.lock()->getFocusedLayerIndex() == 2 || ls.lock()->getFocusedLayerIndex() == 3)
-                ls.lock()->openScreen(ls.lock()->getPreviousScreenName());
+            if (ls->getFocusedLayerIndex() == 1 || ls->getFocusedLayerIndex() == 2 || ls->getFocusedLayerIndex() == 3)
+                ls->openScreen(ls->getPreviousScreenName());
             break;
     }
 }
@@ -206,7 +206,7 @@ void BaseControls::pad(int padIndexWithBank, int velo, bool triggeredByRepeat, i
       velo = 127;
     }
 
-    if (sequencer.lock()->isRecordingOrOverdubbing() && mpc.getControls().lock()->isErasePressed())
+    if (sequencer->isRecordingOrOverdubbing() && mpc.getControls().lock()->isErasePressed())
         return;
     
     if (controls->isNoteRepeatLocked() && !triggeredByRepeat)
@@ -261,7 +261,7 @@ void BaseControls::pad(int padIndexWithBank, int velo, bool triggeredByRepeat, i
         }
     }
     
-    if (controls->isTapPressed() && sequencer.lock()->isPlaying())
+    if (controls->isTapPressed() && sequencer->isPlaying())
     {
         if (triggeredByRepeat)
             generateNoteOn(note, velocity, tick);
@@ -279,12 +279,11 @@ void BaseControls::generateNoteOn(int note, int padVelo, int tick)
     auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
     
     auto pgm = program.lock();
-    auto seq = sequencer.lock();
     auto trk = track.lock();
     
     bool isSliderNote = pgm && pgm->getSlider()->getNote() == note;
     
-    bool posIsLastTick = seq->getTickPosition() == seq->getActiveSequence().lock()->getLastTick();
+    bool posIsLastTick = sequencer->getTickPosition() == sequencer->getActiveSequence().lock()->getLastTick();
     
     bool step = currentScreenName == "step-editor" && !posIsLastTick;
     
@@ -292,14 +291,14 @@ void BaseControls::generateNoteOn(int note, int padVelo, int tick)
     auto tc_swing = timingCorrectScreen->getSwing();
     
     bool recMainWithoutPlaying = currentScreenName == "sequencer" &&
-    !seq->isPlaying() &&
+    !sequencer->isPlaying() &&
     mpc.getControls().lock()->isRecPressed() &&
     tc_note != 0 &&
     !posIsLastTick;
     
     auto padIndex = program.lock()->getPadIndexFromNote(note);
     
-    if (seq->isRecordingOrOverdubbing() || step || recMainWithoutPlaying)
+    if (sequencer->isRecordingOrOverdubbing() || step || recMainWithoutPlaying)
     {
         shared_ptr<NoteEvent> recordedEvent;
         
@@ -307,24 +306,24 @@ void BaseControls::generateNoteOn(int note, int padVelo, int tick)
         {
             if (trk->getBus() == 0 || note >= 35)
             {
-                recordedEvent = trk->addNoteEvent(seq->getTickPosition(), note).lock();
+                recordedEvent = trk->addNoteEvent(sequencer->getTickPosition(), note).lock();
             }
         }
         else if (recMainWithoutPlaying)
         {
-            recordedEvent = trk->addNoteEvent(seq->getTickPosition(), note).lock();
-            int stepLength = seq->getTickValues()[tc_note];
+            recordedEvent = trk->addNoteEvent(sequencer->getTickPosition(), note).lock();
+            int stepLength = sequencer->getTickValues()[tc_note];
             
             if (stepLength != 1)
             {
-                int bar = seq->getCurrentBarIndex() + 1;
+                int bar = sequencer->getCurrentBarIndex() + 1;
                 trk->timingCorrect(0, bar, recordedEvent.get(), stepLength);
                 
                 vector<weak_ptr<Event>> events{ recordedEvent };
                 trk->swing(events, tc_note, tc_swing, vector<int>{0, 127});
                 
-                if (recordedEvent->getTick() != seq->getTickPosition())
-                    seq->move(recordedEvent->getTick());
+                if (recordedEvent->getTick() != sequencer->getTickPosition())
+                    sequencer->move(recordedEvent->getTick());
             }
         }
         else
@@ -345,7 +344,7 @@ void BaseControls::generateNoteOn(int note, int padVelo, int tick)
                 Util::setSliderNoteVariationParameters(mpc, recordedEvent, program);
 
             if (step || recMainWithoutPlaying)
-                seq->playMetronomeTrack();
+                sequencer->playMetronomeTrack();
         }
     }
     
@@ -382,7 +381,7 @@ void BaseControls::numpad(int i)
     
     if (!controls->isShiftPressed())
     {
-        auto field = ls.lock()->getFocusedLayer().lock()->findField(param).lock();
+        auto field = ls->getFocusedLayer().lock()->findField(param).lock();
         
         if (isTypable())
         {
@@ -400,68 +399,68 @@ void BaseControls::numpad(int i)
         switch (i)
         {
             case 0:
-                ls.lock()->openScreen("vmpc-settings");
+                ls->openScreen("vmpc-settings");
                 break;
             case 1:
-                if (sequencer.lock()->isPlaying())
+                if (sequencer->isPlaying())
                 {
                     return;
                 }
                 
-                ls.lock()->openScreen("song");
+                ls->openScreen("song");
                 break;
             case 2:
-                ls.lock()->openScreen("punch");
+                ls->openScreen("punch");
                 break;
             case 3:
             {
-                if (sequencer.lock()->isPlaying())
+                if (sequencer->isPlaying())
                 {
                     break;
                 }
                 
                 disk->initFiles();
                 
-                ls.lock()->openScreen("load");
+                ls->openScreen("load");
                 break;
             }
             case 4:
-                if (sequencer.lock()->isPlaying())
+                if (sequencer->isPlaying())
                 {
                     break;
                 }
                 
-                ls.lock()->openScreen("sample");
+                ls->openScreen("sample");
                 break;
             case 5:
-                if (sequencer.lock()->isPlaying())
+                if (sequencer->isPlaying())
                 {
                     break;
                 }
                 
-                ls.lock()->openScreen("trim");
+                ls->openScreen("trim");
                 break;
             case 6:
-                ls.lock()->openScreen("select-drum");
+                ls->openScreen("select-drum");
                 break;
             case 7:
-                ls.lock()->openScreen("select-mixer-drum");
+                ls->openScreen("select-mixer-drum");
                 break;
             case 8:
-                if (sequencer.lock()->isPlaying())
+                if (sequencer->isPlaying())
                 {
                     break;
                 }
                 
-                ls.lock()->openScreen("others");
+                ls->openScreen("others");
                 break;
             case 9:
-                if (sequencer.lock()->isPlaying())
+                if (sequencer->isPlaying())
                 {
                     break;
                 }
                 
-                ls.lock()->openScreen("sync");
+                ls->openScreen("sync");
                 break;
         }
         
@@ -475,7 +474,7 @@ void BaseControls::pressEnter()
     auto controls = mpc.getControls().lock();
     
     if (controls->isShiftPressed())
-        ls.lock()->openScreen("save");
+        ls->openScreen("save");
 }
 
 void BaseControls::rec()
@@ -498,15 +497,15 @@ void BaseControls::rec()
 
     auto hw = mpc.getHardware().lock();
     
-    if (sequencer.lock()->isRecordingOrOverdubbing())
+    if (sequencer->isRecordingOrOverdubbing())
     {
-        sequencer.lock()->setRecording(false);
-        sequencer.lock()->setOverdubbing(false);
+        sequencer->setRecording(false);
+        sequencer->setOverdubbing(false);
     }
 
     if (!collectionContainsCurrentScreen(allowTransportScreens))
     {
-        ls.lock()->openScreen("sequencer");
+        ls->openScreen("sequencer");
     }
 }
 
@@ -525,14 +524,14 @@ void BaseControls::overDub()
     auto hw = mpc.getHardware().lock();
     
 
-    if (sequencer.lock()->isRecordingOrOverdubbing())
+    if (sequencer->isRecordingOrOverdubbing())
     {
-        sequencer.lock()->setRecording(false);
-        sequencer.lock()->setOverdubbing(false);
+        sequencer->setRecording(false);
+        sequencer->setOverdubbing(false);
     }
 
     if (find(begin(allowTransportScreens), end(allowTransportScreens), currentScreenName) == end(allowTransportScreens))
-        ls.lock()->openScreen("sequencer");
+        ls->openScreen("sequencer");
 }
 
 void BaseControls::stop()
@@ -549,11 +548,11 @@ void BaseControls::stop()
     if (ams->isBouncing() && (vmpcDirectToDiskRecorderScreen->record != 4 || controls->isShiftPressed()))
         ams->stopBouncingEarly();
     
-    sequencer.lock()->stop();
+    sequencer->stop();
     
     if (!collectionContainsCurrentScreen(allowPlayScreens) && !collectionContainsCurrentScreen(allowTransportScreens))
     {
-        ls.lock()->openScreen("sequencer");
+        ls->openScreen("sequencer");
     }
 }
 
@@ -571,17 +570,17 @@ void BaseControls::play()
     init();
     auto hw = mpc.getHardware().lock();
     
-    if (sequencer.lock()->isPlaying())
+    if (sequencer->isPlaying())
     {
-        if (controls->isRecPressed() && !sequencer.lock()->isOverDubbing())
+        if (controls->isRecPressed() && !sequencer->isOverDubbing())
         {
-            sequencer.lock()->setOverdubbing(false);
-            sequencer.lock()->setRecording(true);
+            sequencer->setOverdubbing(false);
+            sequencer->setRecording(true);
         }
-        else if (controls->isOverDubPressed() && !sequencer.lock()->isRecording())
+        else if (controls->isOverDubPressed() && !sequencer->isRecording())
         {
-            sequencer.lock()->setOverdubbing(true);
-            sequencer.lock()->setRecording(false);
+            sequencer->setOverdubbing(true);
+            sequencer->setRecording(false);
         }
     }
     else
@@ -589,31 +588,31 @@ void BaseControls::play()
         if (controls->isRecPressed())
         {
             if (find(begin(allowTransportScreens), end(allowTransportScreens), currentScreenName) == end(allowTransportScreens))
-                ls.lock()->openScreen("sequencer");
+                ls->openScreen("sequencer");
             
-            sequencer.lock()->rec();
+            sequencer->rec();
         }
         else if (controls->isOverDubPressed())
         {
             if (find(begin(allowTransportScreens), end(allowTransportScreens), currentScreenName) == end(allowTransportScreens))
-                ls.lock()->openScreen("sequencer");
+                ls->openScreen("sequencer");
             
-            sequencer.lock()->overdub();
+            sequencer->overdub();
         }
         else {
             if (controls->isShiftPressed() && !mpc.getAudioMidiServices().lock()->isBouncing())
             {
-                ls.lock()->openScreen("vmpc-direct-to-disk-recorder");
+                ls->openScreen("vmpc-direct-to-disk-recorder");
             }
             else
             {
                 if (!collectionContainsCurrentScreen(allowPlayScreens) && !collectionContainsCurrentScreen(allowTransportScreens))
                 {
-                    ls.lock()->openScreen("sequencer");
+                    ls->openScreen("sequencer");
                 }
                 
-                sequencer.lock()->setSongModeEnabled(currentScreenName == "song");
-                sequencer.lock()->play();
+                sequencer->setSongModeEnabled(currentScreenName == "song");
+                sequencer->play();
             }
         }
     }
@@ -625,7 +624,7 @@ void BaseControls::playStart()
     auto hw = mpc.getHardware().lock();
     auto controls = mpc.getControls().lock();
     
-    if (sequencer.lock()->isPlaying())
+    if (sequencer->isPlaying())
     {
         return;
     }
@@ -633,38 +632,38 @@ void BaseControls::playStart()
     if (controls->isRecPressed())
     {
         if (find(begin(allowTransportScreens), end(allowTransportScreens), currentScreenName) == end(allowTransportScreens))
-            ls.lock()->openScreen("sequencer");
+            ls->openScreen("sequencer");
         
-        sequencer.lock()->recFromStart();
+        sequencer->recFromStart();
         
-        if (!sequencer.lock()->isRecording())
+        if (!sequencer->isRecording())
             return;
     }
     else if (controls->isOverDubPressed())
     {
         if (find(begin(allowTransportScreens), end(allowTransportScreens), currentScreenName) == end(allowTransportScreens))
-            ls.lock()->openScreen("sequencer");
+            ls->openScreen("sequencer");
         
-        sequencer.lock()->overdubFromStart();
+        sequencer->overdubFromStart();
         
-        if (!sequencer.lock()->isOverDubbing())
+        if (!sequencer->isOverDubbing())
             return;
     }
     else
     {
         if (controls->isShiftPressed())
         {
-            ls.lock()->openScreen("vmpc-direct-to-disk-recorder");
+            ls->openScreen("vmpc-direct-to-disk-recorder");
         }
         else
         {
             if (!collectionContainsCurrentScreen(allowPlayScreens) && !collectionContainsCurrentScreen(allowTransportScreens))
             {
-                ls.lock()->openScreen("sequencer");
+                ls->openScreen("sequencer");
             }
             
-            sequencer.lock()->setSongModeEnabled(currentScreenName == "song");
-            sequencer.lock()->playFromStart();
+            sequencer->setSongModeEnabled(currentScreenName == "song");
+            sequencer->playFromStart();
         }
     }
 }
@@ -678,8 +677,8 @@ void BaseControls::mainScreen()
     if (ams->isRecordingSound())
         ams->stopSoundRecorder();
     
-    ls.lock()->openScreen("sequencer");
-    sequencer.lock()->setSoloEnabled(sequencer.lock()->isSoloEnabled());
+    ls->openScreen("sequencer");
+    sequencer->setSoloEnabled(sequencer->isSoloEnabled());
     
     auto hw = mpc.getHardware().lock();
     hw->getLed("next-seq").lock()->light(false);
@@ -691,7 +690,7 @@ void BaseControls::tap()
     init();
     auto controls = mpc.getControls().lock();
     controls->setTapPressed(true);
-    sequencer.lock()->tap();
+    sequencer->tap();
 }
 
 void BaseControls::goTo()
@@ -708,14 +707,14 @@ void BaseControls::nextSeq()
     if (currentScreenName == "next-seq" ||
         currentScreenName == "next-seq-pad")
     {
-        ls.lock()->openScreen("sequencer");
+        ls->openScreen("sequencer");
         mpc.getHardware().lock()->getLed("next-seq").lock()->light(false);
     }
     else if (currentScreenName == "sequencer" ||
              currentScreenName == "track-mute")
     {
         Util::initSequence(mpc);
-        ls.lock()->openScreen("next-seq");
+        ls->openScreen("next-seq");
         mpc.getHardware().lock()->getLed("next-seq").lock()->light(true);
         mpc.getHardware().lock()->getLed("track-mute").lock()->light(false);
     }
@@ -727,11 +726,11 @@ void BaseControls::trackMute()
     
     if (currentScreenName == "track-mute")
     {
-        auto previous = ls.lock()->getPreviousScreenName();
+        auto previous = ls->getPreviousScreenName();
         if (previous == "next-seq" || previous == "next-seq-pad")
-            ls.lock()->openScreen("next-seq");
+            ls->openScreen("next-seq");
         else
-            ls.lock()->openScreen("sequencer");
+            ls->openScreen("sequencer");
         
         mpc.getHardware().lock()->getLed("track-mute").lock()->light(false);
     }
@@ -741,7 +740,7 @@ void BaseControls::trackMute()
          currentScreenName == "sequencer")
     {
         Util::initSequence(mpc);
-        ls.lock()->openScreen("track-mute");
+        ls->openScreen("track-mute");
         mpc.getHardware().lock()->getLed("track-mute").lock()->light(true);
     }
 }
@@ -786,7 +785,7 @@ void BaseControls::sixteenLevels()
         hardware->getLed("sixteen-levels").lock()->light(false);
     }
     else {
-        ls.lock()->openScreen("assign-16-levels");
+        ls->openScreen("assign-16-levels");
     }
 }
 
@@ -799,7 +798,7 @@ void BaseControls::after()
     
     if (controls->isShiftPressed())
     {
-        ls.lock()->openScreen("assign");
+        ls->openScreen("assign");
     }
     else
     {
@@ -818,7 +817,7 @@ void BaseControls::shift()
     controls->setShiftPressed(true);
     
     init();
-    auto focus = ls.lock()->getFocusedLayer().lock()->findField(param).lock();
+    auto focus = ls->getFocusedLayer().lock()->findField(param).lock();
     
     if (focus && focus->isTypeModeEnabled())
     {
@@ -835,7 +834,7 @@ void BaseControls::shift()
 
 void BaseControls::undoSeq()
 {
-    sequencer.lock()->undoSeq();
+    sequencer->undoSeq();
 }
 
 void BaseControls::erase()
@@ -844,14 +843,14 @@ void BaseControls::erase()
     auto controls = mpc.getControls().lock();
     controls->setErasePressed(true);
     
-    if (!sequencer.lock()->getActiveSequence().lock()->isUsed())
+    if (!sequencer->getActiveSequence().lock()->isUsed())
     {
         return;
     }
     
-    if (!sequencer.lock()->isRecordingOrOverdubbing())
+    if (!sequencer->isRecordingOrOverdubbing())
     {
-        ls.lock()->openScreen("erase");
+        ls->openScreen("erase");
     }
 }
 
@@ -861,7 +860,7 @@ int BaseControls::getSoundIncrement(int notch_inc)
     
     if (abs(notch_inc) != 1)
     {
-        soundInc *= (int)(ceil(sampler.lock()->getSound().lock()->getFrameCount() / 15000.0));
+        soundInc *= (int)(ceil(sampler->getSound().lock()->getFrameCount() / 15000.0));
     }
     
     return soundInc;
@@ -871,7 +870,7 @@ void BaseControls::splitLeft()
 {
     init();
     
-    auto field = ls.lock()->getFocusedLayer().lock()->findField(param).lock();
+    auto field = ls->getFocusedLayer().lock()->findField(param).lock();
     auto controls = mpc.getControls().lock();
     
     if (!controls->isShiftPressed())
@@ -898,7 +897,7 @@ void BaseControls::splitLeft()
 void BaseControls::splitRight()
 {
     init();
-    auto field = ls.lock()->getFocusedLayer().lock()->findField(param).lock();
+    auto field = ls->getFocusedLayer().lock()->findField(param).lock();
     auto controls = mpc.getControls().lock();
     
     if (!controls->isShiftPressed())
@@ -921,7 +920,7 @@ bool BaseControls::collectionContainsCurrentScreen(const std::vector<std::string
     return find(
             v.begin(),
             v.end(),
-            ls.lock()->getCurrentScreenName()
+            ls->getCurrentScreenName()
     ) != v.end();
 }
 

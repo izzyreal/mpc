@@ -55,8 +55,6 @@ void FileExistsScreen::setActionAfterAddingSound(std::function<void(bool)> actio
 
 void FileExistsScreen::function(int i)
 {
-	ScreenComponent::function(i);
-		
 	switch (i)
 	{
 	case 2:
