@@ -326,9 +326,9 @@ void AudioMidiServices::initializeDiskRecorders()
 {
 	for (int i = 0; i < outputProcesses.size(); i++) {
 		auto diskRecorder = make_shared<DiskRecorder>(outputProcesses[i], "diskwriter" + to_string(i));
-        
+
         diskRecorders.push_back(diskRecorder);
-		
+
         if (i == 0)
 			mixer->getMainStrip().lock()->setDirectOutputProcess(diskRecorders.back());
 		else
@@ -401,10 +401,20 @@ bool AudioMidiServices::stopBouncing()
 {
 	if (!bouncing.load())
 		return false;
-	
+
 	mpc.getLayeredScreen().lock()->openScreen("vmpc-recording-finished");
 	bouncing.store(false);
-	return true;
+
+    auto directToDiskRecorderScreen = mpc.screens->get<VmpcDirectToDiskRecorderScreen>("vmpc-direct-to-disk-recorder");
+
+    if (directToDiskRecorderScreen->loopWasEnabled)
+    {
+        auto seq = mpc.getSequencer().lock()->getSequence(directToDiskRecorderScreen->sq).lock();
+        seq->setLoopEnabled(true);
+        directToDiskRecorderScreen->loopWasEnabled = false;
+    }
+
+    return true;
 }
 
 bool AudioMidiServices::stopBouncingEarly()
@@ -429,7 +439,7 @@ void AudioMidiServices::stopSoundRecorder(bool cancel)
 {
 	if (cancel)
 		soundRecorder->cancel();
-	
+
 	recordingSound.store(false);
 }
 
@@ -460,7 +470,7 @@ void AudioMidiServices::changeSoundRecorderStateIfRequired()
     soundRecorder->stop();
     stopSoundRecorder();
   }
-  
+
   if (!wasRecordingSound && isRecordingSound())
   {
     wasRecordingSound = true;

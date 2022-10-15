@@ -91,13 +91,14 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 
 		auto split = false;
 		auto sequence = sequencer.lock()->getSequence(seq).lock();
+        loopWasEnabled = sequence->isLoopEnabled();
 
 		switch (record)
 		{
 		case 0:
 		{
 			openScreen("sequencer");
-			sequence->setLoopEnabled(false);
+			if (loopWasEnabled) sequence->setLoopEnabled(false);
 			auto lengthInFrames = SeqUtil::sequenceFrameLength(sequence.get(), 0, sequence->getLastTick(), rate);
 			auto settings = make_unique<DirectToDiskSettings>(lengthInFrames, outputFolder, split, rate);
 			
@@ -113,7 +114,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 			openScreen("sequencer");
 			auto lengthInFrames = SeqUtil::loopFrameLength(sequence.get(), rate);
 			auto settings = make_unique<DirectToDiskSettings>(lengthInFrames, outputFolder, split, rate);
-			sequence->setLoopEnabled(false);
+            if (loopWasEnabled) sequence->setLoopEnabled(false);
 			sequencer.lock()->move(sequence->getLoopStart());
 
 			if (!mpc.getAudioMidiServices().lock()->prepareBouncing(settings.get()))
@@ -128,7 +129,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 			openScreen("sequencer");
 			auto lengthInFrames = SeqUtil::sequenceFrameLength(sequence.get(), time0, time1, rate);
 			auto settings = make_unique<DirectToDiskSettings>(lengthInFrames, outputFolder, split, rate);
-			sequence->setLoopEnabled(false);
+            if (loopWasEnabled) sequence->setLoopEnabled(false);
 			sequencer.lock()->move(time0);
 			
 			if (!mpc.getAudioMidiServices().lock()->prepareBouncing(settings.get()))

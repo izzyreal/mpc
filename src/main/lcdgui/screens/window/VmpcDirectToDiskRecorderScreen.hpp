@@ -5,6 +5,7 @@
 
 namespace mpc::audiomidi {
 	class EventHandler;
+    class AudioMidiServices;
 }
 
 namespace mpc::lcdgui::screens::window {
@@ -49,6 +50,7 @@ namespace mpc::lcdgui::screens::window
 		bool offline = false;
 		bool splitLR = true;
 		int sampleRate = 0;
+        bool loopWasEnabled = false;
 
 		void setRecord(int i);
 		void setSq(int i);
@@ -69,6 +71,7 @@ namespace mpc::lcdgui::screens::window
 
 		friend class NameScreen;
 		friend class mpc::audiomidi::EventHandler;
+		friend class mpc::audiomidi::AudioMidiServices;
 		friend class mpc::lcdgui::screens::dialog::VmpcRecordJamScreen;
 		friend class mpc::controls::BaseControls;
 
