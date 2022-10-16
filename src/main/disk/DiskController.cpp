@@ -153,3 +153,13 @@ std::vector<std::shared_ptr<AbstractDisk>>& DiskController::getDisks()
 {
     return disks;
 }
+
+int DiskController::getActiveDiskIndex()
+{
+    return activeDiskIndex;
+}
+
+void DiskController::setActiveDiskIndex(int newActiveDiskIndex)
+{
+    activeDiskIndex = newActiveDiskIndex;
+}

@@ -9,6 +9,7 @@ namespace mpc::lcdgui::screens::window
 namespace mpc::lcdgui::screens
 {
 	class LoadScreen;
+    class SaveScreen;
 }
 
 namespace mpc::lcdgui::screens::dialog2
@@ -34,15 +35,16 @@ namespace mpc::lcdgui::screens::window
 		: public mpc::lcdgui::ScreenComponent
 	{
 	public:
-		void function(int f) override;
+        DirectoryScreen(mpc::Mpc& mpc, const int layerIndex);
+
+        void setPreviousScreenName(std::string newPreviousScreenName);
+
+        void function(int f) override;
 		void left() override;
 		void right() override;
 		void up() override;
 		void down() override;
 		void turnWheel(int i) override;
-
-		DirectoryScreen(mpc::Mpc& mpc, const int layerIndex);
-
 		void open() override;
 
 	private:
@@ -50,9 +52,8 @@ namespace mpc::lcdgui::screens::window
 		int yPos0 = 0;
 		int yOffset0 = 0;
 		int yOffset1 = 0;
-		std::string previousScreenName = "";
+		std::string previousScreenName = "load";
 
-	private:
 		void setFunctionKeys();
 		std::shared_ptr<mpc::disk::MpcFile> getSelectedFile();
         std::shared_ptr<mpc::disk::MpcFile> getFileFromGrid(int x, int y);
@@ -72,10 +73,10 @@ namespace mpc::lcdgui::screens::window
 		void drawGraphicsLeft();
 		void drawGraphicsRight();
 
-	private:
 		friend class mpc::controls::BaseControls;
 		friend class mpc::disk::AbstractDisk;
 		friend class mpc::lcdgui::screens::LoadScreen;
+		friend class mpc::lcdgui::screens::SaveScreen;
 		friend class mpc::lcdgui::screens::window::NameScreen;
 		friend class mpc::lcdgui::screens::dialog2::DeleteAllFilesScreen;
 		friend class mpc::lcdgui::screens::dialog::DeleteFileScreen;

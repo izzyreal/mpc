@@ -67,7 +67,7 @@ private:
     void displayFile();
     void displaySize();
     void displayDevice();
-    void displayType();
+    void displayDeviceType();
     
     void setView(int i);
     std::shared_ptr<mpc::disk::MpcFile> getSelectedFile();

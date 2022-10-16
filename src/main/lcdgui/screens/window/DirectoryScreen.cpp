@@ -1,6 +1,5 @@
 #include "DirectoryScreen.hpp"
 
-#include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/LoadScreen.hpp>
 #include <lcdgui/screens/window/NameScreen.hpp>
 #include <lcdgui/screens/dialog2/PopupScreen.hpp>
@@ -28,6 +27,11 @@ using namespace std;
 DirectoryScreen::DirectoryScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "directory", layerIndex)
 {
+}
+
+void DirectoryScreen::setPreviousScreenName(std::string newPreviousScreenName)
+{
+    previousScreenName = newPreviousScreenName;
 }
 
 void DirectoryScreen::open()
@@ -219,7 +223,6 @@ void DirectoryScreen::function(int f)
             auto name = file->getNameWithoutExtension();
 
 			openScreen("popup");
-			auto popupScreen = mpc.screens->get<PopupScreen>("popup");
 
 			if (started)
 				popupScreen->setText("Playing " + name);

@@ -77,10 +77,10 @@
  "directory", [ "view", "file", "_", "file" ],
  "device", [ "_", "_", "file", "_"]],
  "tfsize" : [ 54, 120, 58, 66 ],
- "infowidgets" : [ "size", "freesnd", "freeseq", "type" ],
+ "infowidgets" : [ "size", "freesnd", "freeseq", "device-type" ],
  "infosize" : [ 42, 42, 42, 18 ],  
  "infox" : [ 206, 206, 206, 42 ],
- "infoy" : [ 8, 29, 38, 38 ],
+ "infoy" : [ 8, 29, 38, 39 ],
  "fblabels" : [[ "LOAD", "SAVE", "FORMAT", "SETUP", null, "DO IT" ],
                [ "LOAD", "SAVE", "FORMAT", "SETUP", "PLAY", "DO IT" ],
                [ "LOAD", "SAVE", "FORMAT", "SETUP", "APPLY", "DO IT" ]],
@@ -90,17 +90,23 @@
 },
 "save":
 {
- "labels" : [ "Type:", "File:", "Device:" ],
- "x" : [ 0, 0, 165 ],
- "y" : [ 1, 9, 21 ],
- "parameters" : ["type", "file", "device" ],
- "tfsize" : [ 150, 120, 36 ],
- "infowidgets" : ["directory", "size", "free" ],
- "infosize" : [ 58, 42, 42 ],  
- "infox" : [ 186, 206, 208 ],
- "infoy" : [ 0, 8, 38 ],
- "fblabels" : [ "LOAD", "SAVE", "FORMAT", "SETUP", null, "DO IT" ],
- "fbtypes" : [ 0, 2, 0, 0, null, 1 ]
+ "labels" : [ "Type:", "File:", "\u00C2", "Device:" ],
+ "x" : [ 0, 0, 186, 0 ],
+ "y" : [ 1, 9, 1, 21 ],
+ "parameters" : [
+  "type", [ "_", "directory", "_", "file" ],
+  "file", [ "type", "directory", "type", "device" ],
+  "directory", [ "type", "file", "_", "file" ],
+  "device", [ "_", "_", "file", "_"]],
+ "tfsize" : [ 150, 120, 58, 66 ],
+ "infowidgets" : [ "size", "free", "device-type" ],
+ "infosize" : [ 42, 42, 18 ],
+ "infox" : [ 206, 208, 42 ],
+ "infoy" : [ 8, 38, 39 ],
+ "fblabels" : [[ "LOAD", "SAVE", "FORMAT", "SETUP", null, "DO IT" ],
+  [ "LOAD", "SAVE", "FORMAT", "SETUP", "APPLY", "DO IT" ]],
+ "fbtypes" : [[ 0, 2, 0, 0, null, 1 ],
+  [ 0, 2, 0, 0, 1, 1 ]]
 },
 "select-drum":
 {

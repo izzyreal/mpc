@@ -5,7 +5,11 @@
 #include <lcdgui/screens/window/NameScreen.hpp>
 #include <lcdgui/screens/window/SaveAllFileScreen.hpp>
 #include <lcdgui/screens/window/SaveApsFileScreen.hpp>
+#include <lcdgui/screens/window/DirectoryScreen.hpp>
+#include <lcdgui/screens/dialog2/PopupScreen.hpp>
 #include <disk/AbstractDisk.hpp>
+#include <disk/Volume.hpp>
+#include <nvram/VolumesPersistence.hpp>
 
 #include <Util.hpp>
 
@@ -13,6 +17,7 @@
 
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::lcdgui::screens::dialog2;
 using namespace moduru::lang;
 using namespace moduru::file;
 using namespace std;
@@ -24,13 +29,39 @@ SaveScreen::SaveScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void SaveScreen::open()
 {
+    if (ls.lock()->getPreviousScreenName() != "popup")
+    {
+        device = mpc.getDiskController()->getActiveDiskIndex();
+    }
+
+    findField("directory").lock()->setLocation(200, 0);
+
     displaySize();
     displayType();
     displayFile();
     displayFree();
     displayDirectory();
-    
-    findField("device").lock()->setText("SCSI-1");
+    displayDevice();
+    displayDeviceType();
+
+    init();
+
+    if (param == "device")
+        ls.lock()->setFunctionKeysArrangement(device == mpc.getDiskController()->getActiveDiskIndex() ? 0 : 1);
+    else
+        ls.lock()->setFunctionKeysArrangement(0);
+}
+
+void SaveScreen::openWindow()
+{
+    init();
+
+    if (param == "directory")
+    {
+        auto directoryScreen = mpc.screens->get<DirectoryScreen>("directory");
+        directoryScreen->previousScreenName = "save";
+        openScreen("directory");
+    }
 }
 
 void SaveScreen::function(int i)
@@ -49,6 +80,57 @@ void SaveScreen::function(int i)
         case 3:
             //openScreen("setup");
             break;
+        case 4:
+            if (param == "device")
+            {
+                if (mpc.getDiskController()->getActiveDiskIndex() == device)
+                    return;
+
+                auto& candidateVolume = mpc.getDisks()[device]->getVolume();
+
+                if (candidateVolume.mode == mpc::disk::MountMode::DISABLED)
+                {
+                    auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+                    popupScreen->setText("Device is disabled in DISKS");
+                    popupScreen->returnToScreenAfterMilliSeconds("save", 2000);
+                    openScreen("popup");
+                    return;
+                }
+
+                auto oldIndex = mpc.getDiskController()->getActiveDiskIndex();
+
+                mpc.getDiskController()->setActiveDiskIndex(device);
+                auto newDisk = mpc.getDisk().lock();
+
+                if (newDisk->getVolume().type== mpc::disk::VolumeType::USB_VOLUME) {
+
+                    newDisk->initRoot();
+
+                    if (!newDisk->getVolume().volumeStream.is_open())
+                    {
+                        mpc.getDiskController()->setActiveDiskIndex(oldIndex);
+                        auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+                        popupScreen->setText("Error! Device seems in use");
+                        popupScreen->returnToScreenAfterMilliSeconds("save", 2000);
+                        openScreen("popup");
+                        return;
+                    }
+                }
+
+                ls.lock()->setFunctionKeysArrangement(0);
+
+                newDisk->initFiles();
+
+                displayFile();
+                displaySize();
+                displayDirectory();
+                displayDevice();
+                displayDeviceType();
+
+                mpc::nvram::VolumesPersistence::save(mpc);
+
+                return;
+            }
         case 5:
         {
             shared_ptr<mpc::sequencer::Sequence> seq;
@@ -95,11 +177,50 @@ void SaveScreen::turnWheel(int i)
 {
     init();
     
-    if (param.compare("type") == 0)
+    if (param == "type")
     {
         setType(type + i);
     }
-    else if (param.compare("file") == 0)
+    else if (param == "directory")
+    {
+        auto disk = mpc.getDisk().lock();
+        auto currentDir = disk->getDirectoryName();
+        auto parents = disk->getParentFileNames();
+
+        int position = -1;
+
+        for (int j = 0; j < parents.size(); j++)
+        {
+            if (parents[j] == currentDir)
+            {
+                position = j;
+                break;
+            }
+        }
+
+        const int candidate = position + i;
+
+        if (position != -1 && candidate >= 0 && candidate < parents.size())
+        {
+            if (disk->moveBack())
+            {
+                disk->initFiles();
+
+                if (disk->moveForward(parents[candidate]))
+                {
+                    disk->initFiles();
+                    displayDirectory();
+                    displayFile();
+                    displaySize();
+                }
+                else {
+                    // From the user's perspective we stay where we are if the above moveForward call fails.
+                    disk->moveForward(currentDir);
+                }
+            }
+        }
+    }
+    else if (param == "file")
     {
         switch (type)
         {
@@ -118,6 +239,17 @@ void SaveScreen::turnWheel(int i)
         }
         displayFile();
         displaySize();
+    }
+    else if (param == "device")
+    {
+        if (device + i < 0 || device + i >= mpc.getDisks().size())
+            return;
+
+        device += i;
+        displayDevice();
+        displayDeviceType();
+        ls.lock()->setFunctionKeysArrangement(mpc.getDiskController()->getActiveDiskIndex() == device ? 0 : 1);
+        return;
     }
 }
 
@@ -215,5 +347,31 @@ void SaveScreen::displayFree()
 
 void SaveScreen::displayDirectory()
 {
-    findLabel("directory").lock()->setText(u8"\u00C2" + mpc.getDisk().lock()->getDirectoryName());
+    findField("directory").lock()->setText(mpc.getDisk().lock()->getDirectoryName());
+}
+
+void SaveScreen::displayDevice()
+{
+    auto dev = findChild<Field>("device").lock();
+    dev->setText(mpc.getDisks()[device]->getVolume().label);
+}
+
+void SaveScreen::displayDeviceType()
+{
+    auto type = findChild<Label>("device-type").lock();
+    type->setText(mpc.getDisks()[device]->getVolume().typeShortName());
+}
+
+void SaveScreen::up()
+{
+    init();
+
+    if (param == "device")
+    {
+        device = mpc.getDiskController()->getActiveDiskIndex();
+        displayDevice();
+        ls.lock()->setFunctionKeysArrangement(0);
+    }
+
+    ScreenComponent::up();
 }

@@ -34,7 +34,9 @@ LoadScreen::LoadScreen(mpc::Mpc& mpc, const int layerIndex)
 void LoadScreen::open()
 {
     if (ls.lock()->getPreviousScreenName() != "popup")
-        device = mpc.getDiskController()->activeDiskIndex;
+    {
+        device = mpc.getDiskController()->getActiveDiskIndex();
+    }
     
 	findField("directory").lock()->setLocation(200, 0);
 	displayView();
@@ -43,7 +45,7 @@ void LoadScreen::open()
 	displayFile();
 	displaySize();
     displayDevice();
-    displayType();
+    displayDeviceType();
 
 	displayFreeSnd();
 	findLabel("freeseq").lock()->setText("  2640K");
@@ -123,7 +125,7 @@ void LoadScreen::function(int i)
             displaySize();
             displayDirectory();
             displayDevice();
-            displayType();
+            displayDeviceType();
             
             mpc::nvram::VolumesPersistence::save(mpc);
             
@@ -300,7 +302,7 @@ void LoadScreen::turnWheel(int i)
         
         device += i;
         displayDevice();
-        displayType();
+        displayDeviceType();
         ls.lock()->setFunctionKeysArrangement(mpc.getDiskController()->activeDiskIndex == device ? 0 : 2);
         return;
     }
@@ -489,9 +491,9 @@ void LoadScreen::displayDevice()
     dev->setText(mpc.getDisks()[device]->getVolume().label);
 }
 
-void LoadScreen::displayType()
+void LoadScreen::displayDeviceType()
 {
-    auto type = findChild<Label>("type").lock();
+    auto type = findChild<Label>("device-type").lock();
     type->setText(mpc.getDisks()[device]->getVolume().typeShortName());
 }
 
