@@ -134,7 +134,7 @@ TEST_CASE("ALL file note event", "[allfile]")
     auto seq = mpc.getSequencer().lock()->getSequence(0).lock();
     seq->init(1);
     auto tr = seq->getTrack(63).lock();
-    auto event = std::dynamic_pointer_cast<mpc::sequencer::NoteEvent>(tr->addEvent(0, "note").lock());
+    auto event = std::dynamic_pointer_cast<mpc::sequencer::NoteEvent>(tr->addEvent(0, "note"));
     event->setNote(0);
     event->setTrack(tr->getIndex());
     event->setVelocity(127);

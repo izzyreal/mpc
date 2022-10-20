@@ -27,7 +27,7 @@ private:
     
     mpc::sequencer::Sequence* parent{ nullptr };
     
-    std::weak_ptr<Sequencer> sequencer;
+    std::shared_ptr<Sequencer> sequencer;
     int busNumber = 0;
     std::string name = "";
     bool on{ false };
@@ -40,12 +40,10 @@ private:
     std::weak_ptr<NoteEvent> lastAdded;
     bool multi{ false };
     bool _delete{ false };
-    std::vector<std::weak_ptr<Event>> tempEvents;
-    
+
 protected:
-    static bool tickCmp(std::weak_ptr<Event> a, std::weak_ptr<Event> b);
-    static bool noteCmp(std::weak_ptr<Event> a, std::weak_ptr<Event> b);
-    
+    static bool tickCmp(const std::shared_ptr<Event>& a, const std::shared_ptr<Event>& b);
+
 public:
     void move(int tick, int oldTick);
     void setTrackIndex(int i);
@@ -58,11 +56,11 @@ public:
     
 private:
     void addEventRealTime(std::shared_ptr<NoteEvent> event);
-    std::weak_ptr<NoteEvent> getNoteEvent(int tick, int note);
+    std::shared_ptr<NoteEvent> getNoteEvent(int tick, int note);
     
 public:
-    std::weak_ptr<NoteEvent> addNoteEvent(int tick, int note);
-    std::weak_ptr<Event> addEvent(int tick, std::string type);
+    std::shared_ptr<NoteEvent> addNoteEvent(int tick, int note);
+    std::shared_ptr<Event> addEvent(int tick, const std::string& type);
     std::weak_ptr<Event> cloneEvent(std::weak_ptr<Event> src);
     bool adjustDurLastEvent(int newDur);
     void removeEvent(int i);
@@ -90,25 +88,25 @@ public:
     void setEventIndex(int i);
     
 public:
-    std::vector<std::weak_ptr<Event>> getEventRange(int startTick, int endTick);
+    std::vector<std::shared_ptr<Event>> getEventRange(int startTick, int endTick);
     void correctTimeRange(int startPos, int endPos, int stepLength);
     
 public:
     void removeDoubles();
     void sortEvents();
-    std::vector<std::weak_ptr<NoteEvent>> getNoteEvents();
+    std::vector<std::shared_ptr<NoteEvent>> getNoteEvents();
     
 private:
-    std::vector<std::weak_ptr<NoteEvent>> getNoteEventsAtTick(int tick);
+    std::vector<std::shared_ptr<NoteEvent>> getNoteEventsAtTick(int tick);
 
 public:
     void timingCorrect(int fromBar, int toBar, NoteEvent* noteEvent, int stepLength);
     int timingCorrectTick(int fromBar, int toBar, int tick, int stepLength);
     int swingTick(int tick, int noteValue, int percentage);
 
-    void swing(std::vector<std::weak_ptr<Event>> eventsToSwing, int noteValue, int percentage, std::vector<int> noteRange);
+    void swing(std::vector<std::shared_ptr<Event>>& eventsToSwing, int noteValue, int percentage, std::vector<int>& noteRange);
 
-    void shiftTiming(std::vector<std::weak_ptr<Event>> eventsToShift, bool later, int amount, int lastTick);
+    void shiftTiming(std::vector<std::shared_ptr<Event>>& eventsToShift, bool later, int amount, int lastTick);
     
 public:
     int getEventIndex();

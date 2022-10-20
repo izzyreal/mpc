@@ -28,8 +28,8 @@ void TransposePermanentScreen::function(int i)
 		
 		if (all)
 		{
-			for (int i = 0; i < 64; i++)
-				tracks.push_back(i);
+			for (int trackIndex = 0; trackIndex < 64; trackIndex++)
+				tracks.push_back(trackIndex);
 		}
 		else
 		{
@@ -40,18 +40,16 @@ void TransposePermanentScreen::function(int i)
 		auto firstTick = seq->getFirstTickOfBar(transScreen->bar0);
 		auto lastTick = seq->getLastTickOfBar(transScreen->bar1);
 		
-		for (auto& i : tracks)
+		for (auto& trackIndex : tracks)
 		{
-			auto t = seq->getTrack(i);
+			auto t = seq->getTrack(trackIndex);
 		
 			for (auto& n : t.lock()->getNoteEvents())
 			{
-				auto noteEvent = n.lock();
-				
-				if (noteEvent->getTick() < firstTick || noteEvent->getTick() > lastTick)
+				if (n->getTick() < firstTick || n->getTick() > lastTick)
 					continue;
 			
-				noteEvent->setNote(noteEvent->getNote() + transScreen->transposeAmount);
+				n->setNote(n->getNote() + transScreen->transposeAmount);
 			}
 		}
 

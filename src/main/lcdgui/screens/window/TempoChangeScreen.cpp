@@ -377,7 +377,7 @@ void TempoChangeScreen::function(int j)
 
 		if (nowDetected == -1)
 		{
-			auto tce = seq->addTempoChangeEvent().lock();
+			auto tce = seq->addTempoChangeEvent();
 			tce->setTick(sequencer->getTickPosition());
 			seq->sortTempoChangeEvents();
 			initVisibleEvents();
@@ -405,7 +405,7 @@ void TempoChangeScreen::function(int j)
 
 		if (tceList.size() == 1)
 		{
-			auto tce = seq->addTempoChangeEvent().lock();
+			auto tce = seq->addTempoChangeEvent();
 			tce->setTick(seq->getLastTick() - 1);
 			tce->setStepNumber(1);
 		}
@@ -422,7 +422,7 @@ void TempoChangeScreen::function(int j)
 				if (lCurrent->getTick() == 1)
 					return;
 				
-				auto tce = seq->addTempoChangeEvent().lock();
+				auto tce = seq->addTempoChangeEvent();
 				tce->setTick(next.lock()->getTick() - 1);
 			}
 			else if (yPos + offset > 0)
@@ -430,7 +430,7 @@ void TempoChangeScreen::function(int j)
 				if (lCurrent->getTick() - 1 == lPrevious->getTick())
 					return;
 
-				auto tce = seq->addTempoChangeEvent().lock();
+				auto tce = seq->addTempoChangeEvent();
 				tce->setTick(lCurrent->getTick() - 1);
 			}
 		}
@@ -535,7 +535,6 @@ void TempoChangeScreen::turnWheel(int j)
 		}
 		else if (param.compare("f" + to_string(i)) == 0)
 		{
-			auto seq = sequencer->getActiveSequence().lock();
 			auto ratio = (event->getTempo() + j * 0.1) / seq->getInitialTempo();
 			event->setRatio((int)round(ratio * 1000.0));
 		}

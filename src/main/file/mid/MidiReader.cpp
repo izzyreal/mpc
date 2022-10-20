@@ -105,7 +105,7 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
 	
 	for (int i = 1; i < tempoChanges.size(); i++)
 	{
-		auto tce = sequence->addTempoChangeEvent().lock();
+		auto tce = sequence->addTempoChangeEvent();
 		auto lTcMidi = tempoChanges[i].lock();
 		auto ratio = (float)(lTcMidi->getBpm()) / initialTempo;
 		tce->setRatio((int)(ratio * 1000.0));
@@ -132,7 +132,7 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
 			while (accumLength < next->getTick())
 			{
 				sequence->setTimeSignature(barCounter, current->getNumerator(), current->getRealDenominator());
-				int barLength = (*sequence->getBarLengths())[barCounter++];
+				int barLength = sequence->getBarLengthsInTicks()[barCounter++];
 				accumLength += barLength;
 			}
 		}
@@ -141,7 +141,7 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
 			while (accumLength < lengthInTicks)
 			{
 				sequence->setTimeSignature(barCounter, current->getNumerator(), current->getRealDenominator());
-				int barLength = (*sequence->getBarLengths())[barCounter++];
+				int barLength = sequence->getBarLengthsInTicks()[barCounter++];
 				accumLength += barLength;
 			}
 		}
@@ -219,7 +219,7 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
 
 		for (auto& n: noteOns)
 		{
-			auto noteOn = std::dynamic_pointer_cast<mpc::sequencer::NoteEvent>(track->addEvent(n->getTick(), "note").lock());
+			auto noteOn = std::dynamic_pointer_cast<mpc::sequencer::NoteEvent>(track->addEvent(n->getTick(), "note"));
 			n->CopyValuesTo(noteOn);
 			int indexCandidate = -1;
 			int tickCandidate = 999999999;
@@ -267,7 +267,7 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
 			
 				if (sysExData.size() == 8 && sysExData[0] == 71 && sysExData[1] == 0 && sysExData[2] == 68 && sysExData[3] == 69 && sysExData[7] == (char) 247)
 				{
-					auto mixerEvent = std::dynamic_pointer_cast<MixerEvent>(track->addEvent(sysEx->getTick(), "mixer").lock());
+					auto mixerEvent = std::dynamic_pointer_cast<MixerEvent>(track->addEvent(sysEx->getTick(), "mixer"));
 					mixerEvent->setParameter(sysExData[4] - 1);
 					mixerEvent->setPadNumber(sysExData[5]);
 					mixerEvent->setValue(sysExData[6]);
@@ -282,7 +282,7 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
 						sysExData[j + 1] = sysEx->getData()[j];
 					}
 
-					auto see = std::dynamic_pointer_cast<mpc::sequencer::SystemExclusiveEvent>(track->addEvent(sysEx->getTick(), "systemexclusive").lock());
+					auto see = std::dynamic_pointer_cast<mpc::sequencer::SystemExclusiveEvent>(track->addEvent(sysEx->getTick(), "systemexclusive"));
                     std::vector<unsigned char> tmp;
 
 					for (char c : sysExData)
@@ -295,18 +295,18 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
 			}
 			else if (noteAfterTouch)
 			{
-				auto ppe = std::dynamic_pointer_cast<PolyPressureEvent>(track->addEvent(noteAfterTouch->getTick(), "polypressure").lock());
+				auto ppe = std::dynamic_pointer_cast<PolyPressureEvent>(track->addEvent(noteAfterTouch->getTick(), "polypressure"));
 				ppe->setNote(noteAfterTouch->getNoteValue());
 				ppe->setAmount(noteAfterTouch->getAmount());
 			}
 			else if (channelAfterTouch)
 			{
-				auto cpe = std::dynamic_pointer_cast<ChannelPressureEvent>(track->addEvent(channelAfterTouch->getTick(), "channelpressure").lock());
+				auto cpe = std::dynamic_pointer_cast<ChannelPressureEvent>(track->addEvent(channelAfterTouch->getTick(), "channelpressure"));
 				cpe->setAmount(channelAfterTouch->getAmount());
 			}
 			else if (programChange)
 			{
-				auto pce = std::dynamic_pointer_cast<ProgramChangeEvent>(track->addEvent(programChange->getTick(), "programchange").lock());
+				auto pce = std::dynamic_pointer_cast<ProgramChangeEvent>(track->addEvent(programChange->getTick(), "programchange"));
 				pce->setProgram(programChange->getProgramNumber() + 1);
 			}
 			else if (trackName)
@@ -315,13 +315,13 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
 			}
 			else if (controller)
 			{
-				auto cce = std::dynamic_pointer_cast<ControlChangeEvent>(track->addEvent(controller->getTick(), "controlchange").lock());
+				auto cce = std::dynamic_pointer_cast<ControlChangeEvent>(track->addEvent(controller->getTick(), "controlchange"));
 				cce->setController(controller->getControllerType());
 				cce->setAmount(controller->getValue());
 			}
 			else if (pitchBend)
 			{
-				auto pbe = std::dynamic_pointer_cast<PitchBendEvent>(track->addEvent(pitchBend->getTick(), "pitchbend").lock());
+				auto pbe = std::dynamic_pointer_cast<PitchBendEvent>(track->addEvent(pitchBend->getTick(), "pitchbend"));
 				pbe->setAmount(pitchBend->getBendAmount() - 8192);
 			}
 		}

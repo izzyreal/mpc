@@ -29,7 +29,7 @@ SCENARIO("A MidiFile can be written", "[file]") {
 		auto track = sequence->getTrack(0).lock();
 		track->setUsed(true);
 
-		auto noteEvent = track->addNoteEvent(0, 37).lock();
+		auto noteEvent = track->addNoteEvent(0, 37);
 		noteEvent->setDuration(10);
 		noteEvent->setVelocity(127);
 

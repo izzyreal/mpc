@@ -86,7 +86,7 @@ MidiWriter::MidiWriter(mpc::sequencer::Sequence* sequence)
 			lastAdded[1] = sequence->getDenominator(i);
 			lastAdded[2] = actualTick;
 		}
-		tSigTick += (*sequence->getBarLengths())[i];
+		tSigTick += sequence->getBarLengthsInTicks()[i];
 	}
 	previousTick = 0;
 	for (auto& ia : tSigs) {

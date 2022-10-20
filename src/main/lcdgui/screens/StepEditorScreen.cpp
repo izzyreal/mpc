@@ -1399,7 +1399,7 @@ void screens::StepEditorScreen::adhocPlayNoteEventsAtCurrentPosition()
     auto tick = sequencer->getTickPosition();
     for (auto& e : track.lock()->getEventRange(tick, tick))
     {
-        auto noteEvent = std::dynamic_pointer_cast<NoteEvent>(e.lock());
+        auto noteEvent = std::dynamic_pointer_cast<NoteEvent>(e);
         if (noteEvent)
         {
             adhocPlayNoteEvent(noteEvent);

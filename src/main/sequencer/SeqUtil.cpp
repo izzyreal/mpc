@@ -150,7 +150,7 @@ void SeqUtil::setTimeSignature(Sequence* sequence, int bar, int num, int den)
 	auto lastBar = sequence->getLastBarIndex();
 
 	for (int i = 0; i < 999; i++)
-		newBarLengths[i] = (*sequence->getBarLengths())[i];
+		newBarLengths[i] = sequence->getBarLengthsInTicks()[i];
 
 	newBarLengths[bar] = newDenTicks * num;
 	
@@ -179,7 +179,7 @@ void SeqUtil::setTimeSignature(Sequence* sequence, int bar, int num, int den)
 			continue;
 		}
 		
-		oldBarStartPos[i] = oldBarStartPos[i - 1] + (*sequence->getBarLengths())[i - 1];
+		oldBarStartPos[i] = oldBarStartPos[i - 1] + sequence->getBarLengthsInTicks()[i - 1];
 	}
 
 	auto newBarStartPos = vector<int>(999);
@@ -212,7 +212,7 @@ void SeqUtil::setTimeSignature(Sequence* sequence, int bar, int num, int den)
 
 			for (int i = 0; i < bar; i++)
 			{
-				if (e->getTick() >= oldBarStartPos[i] && e->getTick() < (oldBarStartPos[i] + (*sequence->getBarLengths())[i]))
+				if (e->getTick() >= oldBarStartPos[i] && e->getTick() < (oldBarStartPos[i] + sequence->getBarLengthsInTicks()[i]))
 				{
 					keep = true;
 					break;
@@ -221,7 +221,7 @@ void SeqUtil::setTimeSignature(Sequence* sequence, int bar, int num, int den)
 
 			for (int i = bar; i < 999; i++)
 			{
-				if (e->getTick() >= oldBarStartPos[i] && e->getTick() < (oldBarStartPos[i] + (*sequence->getBarLengths())[i]))
+				if (e->getTick() >= oldBarStartPos[i] && e->getTick() < (oldBarStartPos[i] + sequence->getBarLengthsInTicks()[i]))
 				{
 					e->setTick(e->getTick() - (oldBarStartPos[i] - newBarStartPos[i]));
 					keep = true;
@@ -238,7 +238,7 @@ void SeqUtil::setTimeSignature(Sequence* sequence, int bar, int num, int den)
 	}
 
 	for (int i = 0; i < 999; i++)
-		(*sequence->getBarLengths())[i] = newBarLengths[i];
+		sequence->getBarLengthsInTicks()[i] = newBarLengths[i];
 	
 	sequence->createClickTrack();
 	sequence->createMidiClockTrack();

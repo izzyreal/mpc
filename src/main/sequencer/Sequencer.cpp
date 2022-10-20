@@ -748,7 +748,7 @@ void Sequencer::copySequenceParameters(weak_ptr<Sequence> src, weak_ptr<Sequence
 	dest->setUsed(source->isUsed());
 	dest->setDeviceNames(source->getDeviceNames());
 	dest->setInitialTempo(source->getInitialTempo());
-	dest->setBarLengths(*source->getBarLengths());
+	dest->setBarLengths(source->getBarLengthsInTicks());
 	dest->setNumeratorsAndDenominators(*source->getNumerators(), *source->getDenominators());
 	dest->setLoopStart(source->getLoopStart());
 	dest->setLoopEnd(source->getLoopEnd());
@@ -850,7 +850,7 @@ int Sequencer::getCurrentBarIndex()
 	if (pos == s->getLastTick())
 		return s->getLastBarIndex() + 1;
 		
-	auto barLengths = s->getBarLengths();
+	auto& barLengths = s->getBarLengthsInTicks();
 	
 	int tickCounter = 0;
 	
@@ -859,7 +859,7 @@ int Sequencer::getCurrentBarIndex()
 		if (i > s->getLastBarIndex())
 			return 0; // Should not happen
 	
-		tickCounter += (*barLengths)[i];
+		tickCounter += barLengths[i];
 		
 		if (tickCounter > pos)
 			return i;
@@ -892,7 +892,7 @@ int Sequencer::getCurrentBeatIndex()
 
 	const auto currentBarIndex = getCurrentBarIndex();
 
-	for (auto l : *s->getBarLengths())
+	for (auto& l : s->getBarLengthsInTicks())
 	{
 		if (barCounter == currentBarIndex)
 			break;
@@ -930,7 +930,7 @@ int Sequencer::getCurrentClockNumber()
 	auto barCounter = 0;
 	auto currentBarIndex = getCurrentBarIndex();
 
-	for (auto l : *s->getBarLengths())
+	for (auto& l : s->getBarLengthsInTicks())
 	{
 		if (barCounter == currentBarIndex)
 			break;
@@ -976,13 +976,13 @@ void Sequencer::setBar(int i)
 		ts.setDenominator(s->getDenominator(i));
 	}
 
-	auto barLengths = s->getBarLengths();
+	auto& barLengths = s->getBarLengthsInTicks();
 	auto currentClock = getCurrentClockNumber();
 	auto currentBeat = getCurrentBeatIndex();
 	int pos = 0;
 	auto barCounter = 0;
 	
-	for (auto l : *barLengths)
+	for (auto& l : barLengths)
 	{
 		if (barCounter == i)
 			break;

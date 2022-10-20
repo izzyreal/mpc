@@ -45,7 +45,7 @@ void TimingCorrectScreen::function(int i)
 
 		track.lock()->correctTimeRange(time0, time1, sequencer->getTickValues()[noteValue]);
 
-		vector<int> noteRange(2);
+		std::vector<int> noteRange(2);
 
 		if (track.lock()->getBus() != 0)
 		{
@@ -66,10 +66,11 @@ void TimingCorrectScreen::function(int i)
 			noteRange[1] = note1;
 		}
 
-		track.lock()->swing(track.lock()->getEventRange(time0, time1), noteValue, swing, noteRange);
+        auto eventRange = track.lock()->getEventRange(time0, time1);
+		track.lock()->swing(eventRange, noteValue, swing, noteRange);
 
 		auto sequence = sequencer->getActiveSequence().lock();
-		track.lock()->shiftTiming(track.lock()->getEventRange(time0, time1), shiftTimingLater, amount, sequence->getLastTick());
+		track.lock()->shiftTiming(eventRange, shiftTimingLater, amount, sequence->getLastTick());
 		openScreen("sequencer");
 		break;
 	}

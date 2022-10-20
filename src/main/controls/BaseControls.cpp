@@ -306,12 +306,12 @@ void BaseControls::generateNoteOn(int note, int padVelo, int tick)
         {
             if (trk->getBus() == 0 || note >= 35)
             {
-                recordedEvent = trk->addNoteEvent(sequencer->getTickPosition(), note).lock();
+                recordedEvent = trk->addNoteEvent(sequencer->getTickPosition(), note);
             }
         }
         else if (recMainWithoutPlaying)
         {
-            recordedEvent = trk->addNoteEvent(sequencer->getTickPosition(), note).lock();
+            recordedEvent = trk->addNoteEvent(sequencer->getTickPosition(), note);
             int stepLength = sequencer->getTickValues()[tc_note];
             
             if (stepLength != 1)
@@ -319,8 +319,9 @@ void BaseControls::generateNoteOn(int note, int padVelo, int tick)
                 int bar = sequencer->getCurrentBarIndex() + 1;
                 trk->timingCorrect(0, bar, recordedEvent.get(), stepLength);
                 
-                vector<weak_ptr<Event>> events{ recordedEvent };
-                trk->swing(events, tc_note, tc_swing, vector<int>{0, 127});
+                std::vector<std::shared_ptr<Event>> events{ recordedEvent };
+                std::vector<int> noteRange {0, 127};
+                trk->swing(events, tc_note, tc_swing, noteRange);
                 
                 if (recordedEvent->getTick() != sequencer->getTickPosition())
                     sequencer->move(recordedEvent->getTick());

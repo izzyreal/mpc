@@ -82,12 +82,12 @@ void BarsScreen::function(int j)
 			if (i == firstBar)
 				break;
 
-			firstTick += (*fromSequence->getBarLengths())[i];
+			firstTick += fromSequence->getBarLengthsInTicks()[i];
 		}
 
 		for (int i = 0; i < 999; i++)
 		{
-			lastTick += (*fromSequence->getBarLengths())[i];
+			lastTick += fromSequence->getBarLengthsInTicks()[i];
 			
 			if (i == lastBar)
 			{
@@ -102,7 +102,7 @@ void BarsScreen::function(int j)
 			if (i == afterBar)
 				break;
 
-			firstTickOfToSeq += (*toSequence->getBarLengths())[i];
+			firstTickOfToSeq += toSequence->getBarLengthsInTicks()[i];
 		}
 
 		offset = firstTickOfToSeq - firstTick;

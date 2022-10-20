@@ -37,14 +37,14 @@ BarList::~BarList()
 BarList::BarList(mpc::sequencer::Sequence* seq)
 {
 	saveBytes = vector<char>(3996);
-	auto barLengths = seq->getBarLengths();
+	auto& barLengths = seq->getBarLengthsInTicks();
 	auto ticksPerBeat = 0;
 	auto lastTick = 0;
 	
     for (int i = 0; i < seq->getLastBarIndex() + 1; i++)
     {
-		lastTick += (*barLengths)[i];
-		ticksPerBeat = static_cast<int>((*barLengths)[i] / seq->getNumerator(i));
+		lastTick += barLengths[i];
+		ticksPerBeat = static_cast<int>(barLengths[i] / seq->getNumerator(i));
 		
         Bar bar(ticksPerBeat, lastTick);
         

@@ -123,7 +123,7 @@ void FrameSeq::work(int nFrames)
 			{
 				if (lSequencer->isCountingIn())
 				{
-                    const int start = (*seq->getBarLengths())[seq->getFirstLoopBarIndex()];
+                    const int start = seq->getBarLengthsInTicks()[seq->getFirstLoopBarIndex()];
 
                     if (getTickPosition() >= start - 1)
 					{

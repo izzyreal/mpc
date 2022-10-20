@@ -30,7 +30,7 @@ private:
     std::vector<std::string> deviceNames = std::vector<std::string>(33);
     std::vector<std::string> defaultTrackNames;
     
-    std::vector<int> barLengths = std::vector<int>(999);
+    std::vector<int> barLengthsInTicks = std::vector<int>(999);
     std::vector<int> numerators = std::vector<int>(999);
     std::vector<int> denominators = std::vector<int>(999);
     
@@ -86,7 +86,7 @@ public:
     std::vector<std::string> getDeviceNames();
     void setDeviceNames(std::vector<std::string> sa);
     std::vector<std::weak_ptr<TempoChangeEvent>> getTempoChangeEvents();
-    std::weak_ptr<TempoChangeEvent> addTempoChangeEvent();
+    std::shared_ptr<TempoChangeEvent> addTempoChangeEvent();
     void removeTempoChangeEvent(int i);
     void removeTempoChangeEvent(std::weak_ptr<TempoChangeEvent> tce);
     
@@ -99,7 +99,7 @@ public:
     std::weak_ptr<Track> purgeTrack(int i);
     int getDenominator(int i);
     int getNumerator(int i);
-    std::vector<int>* getBarLengths();
+    std::vector<int>& getBarLengthsInTicks();
     void setBarLengths(std::vector<int>&);
     void setNumeratorsAndDenominators(std::vector<int>& numerators, std::vector<int>& denominators);
     void deleteBars(int firstBar, int lBar);

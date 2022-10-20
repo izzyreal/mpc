@@ -486,7 +486,7 @@ void MixerScreen::turnWheel(int i)
 void MixerScreen::recordMixerEvent(int pad, int param, int value)
 {
     auto track = sequencer->getActiveTrack().lock();
-    auto e = dynamic_pointer_cast<mpc::sequencer::MixerEvent>(track->addEvent(sequencer->getTickPosition(), "mixer").lock());
+    auto e = dynamic_pointer_cast<mpc::sequencer::MixerEvent>(track->addEvent(sequencer->getTickPosition(), "mixer"));
     e->setPadNumber(pad);
     e->setParameter(param);
     e->setValue(value);
