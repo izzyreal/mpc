@@ -252,15 +252,15 @@ void SequencerScreen::displayTempo()
 void SequencerScreen::displayTempoLabel()
 {
 	auto currentRatio = -1;
-	auto sequence = sequencer->getActiveSequence().lock();
+	auto seq = sequencer->getActiveSequence().lock();
 
-	if (!sequence->isUsed() || !sequence->isTempoChangeOn())
+	if (!seq->isUsed() || !seq->isTempoChangeOn())
 	{
 		findLabel("tempo").lock()->setText(u8" \u00C0:");
 		return;
 	}
 
-	for (auto& tce : sequence->getTempoChangeEvents())
+	for (auto& tce : seq->getTempoChangeEvents())
 	{
 		auto lTce = tce.lock();
 		
@@ -793,42 +793,50 @@ void SequencerScreen::openWindow()
 
 void SequencerScreen::left()
 {
-	init();
-
-	if (sequencer->getNextSq() != -1)
-		return;
-
-	ScreenComponent::left();
+    moveCursor([&](){ ScreenComponent::left(); });
 }
 
 void SequencerScreen::right()
 {
-	init();
+    moveCursor([&](){ ScreenComponent::right(); });
+}
 
-	if (sequencer->getNextSq() != -1)
-		return;
+void SequencerScreen::moveCursor(const std::function<void()>& cursorCall)
+{
+    if (sequencer->getNextSq() == -1)
+    {
+        cursorCall();
+        return;
+    }
 
-	ScreenComponent::right();
+    auto defaultTransferMap = getTransferMap();
+
+    for (auto& fieldMap : getTransferMap())
+    {
+        for (auto& destinationField : fieldMap.second)
+        {
+            if (destinationField == "sq")
+            {
+                destinationField = "nextsq";
+            }
+        }
+    }
+
+    getTransferMap()["nextsq"] = defaultTransferMap["sq"];
+    getTransferMap()["now0"] = {"nextsq", "_", "_", "tsig"};
+
+    cursorCall();
+    setTransferMap(defaultTransferMap);
 }
 
 void SequencerScreen::up()
 {
-	init();
-
-	if (sequencer->getNextSq() != -1)
-		return;
-
-	ScreenComponent::up();
+    moveCursor([&](){ ScreenComponent::up(); });
 }
 
 void SequencerScreen::down()
 {
-	init();
-
-	if (sequencer->getNextSq() != -1)
-		return;
-
-	ScreenComponent::down();
+    moveCursor([&](){ ScreenComponent::down(); });
 }
 
 void SequencerScreen::setPunchRectOn(int i, bool b)

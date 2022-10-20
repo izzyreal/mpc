@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <vector>
+#include <functional>
 
 namespace mpc::sequencer
 {
@@ -38,7 +39,11 @@ namespace mpc::lcdgui::screens
 		void displayCount();
 		void displayTiming();
 
-	public:
+        // Moving the cursor is wrapped in order to handle some alternative
+        // destination mapping while there is a next sequence queued up.
+        void moveCursor(const std::function<void()>& cursorCall);
+
+    public:
 		// Shared with NextSeqObserver, find better home
 		static std::vector<std::string> timingCorrectNames;
 
@@ -80,5 +85,6 @@ namespace mpc::lcdgui::screens
         
         void releaseErase();
         void releaseTap();
-	};
+
+    };
 }

@@ -19,11 +19,11 @@
  "tr", [ "bars", "on", "count", "bus" ],
  "on", [ "tr", "pgm", "loop", "_" ],
  "pgm", [ "on", "recordingmode", "bars", "velo" ],
- "recordingmode", [ "pgm", "bus", "tr", "nextsq" ],
- "bus", [ "recordingmode", "devicenumber", "tr", "nextsq" ],
- "devicenumber", [ "bus", "velo", "tr", "nextsq" ],
+ "recordingmode", [ "pgm", "bus", "tr", "_" ],
+ "bus", [ "recordingmode", "devicenumber", "tr", "_" ],
+ "devicenumber", [ "bus", "velo", "tr", "_" ],
  "velo", [ "devicenumber", "_", "pgm", "_" ],
- "nextsq,sq", [ "_", "_", "bus", "_" ] 
+ "nextsq,sq"
  ],
  "tfsize" : [ 114, 18, 12, 12, 28, 30, 41, 30, 18, 18, 18, 114, 18, 18, 6, 30, 18, 18, 12 ],
  "infowidgets" : [ "devicename", "punch-time-0", "punch-time-1" ],

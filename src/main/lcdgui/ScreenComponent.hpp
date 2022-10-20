@@ -67,7 +67,7 @@ namespace mpc::lcdgui
 		void setTransferMap(const std::map<std::string, std::vector<std::string>>& newTransferMap);
 		void setFirstField(const std::string& newFirstField);
 		std::string getFirstField();
-		const std::map<std::string, std::vector<std::string>>& getTransferMap();
+		std::map<std::string, std::vector<std::string>>& getTransferMap();
 
 	protected:		
 		virtual void init() {

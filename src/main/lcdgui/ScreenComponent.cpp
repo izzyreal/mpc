@@ -23,7 +23,7 @@ void ScreenComponent::setTransferMap(const map<string, vector<string>>& newTrans
 	transferMap = newTransferMap;
 }
 
-const map<string, vector<string>>& ScreenComponent::getTransferMap()
+map<string, vector<string>>& ScreenComponent::getTransferMap()
 {
 	return transferMap;
 }
