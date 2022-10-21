@@ -123,7 +123,7 @@ void BarsScreen::function(int j)
 
 					for (auto k = 0; k < eventsScreen->copies; k++)
 					{
-						auto clone = t2->cloneEvent(event).lock();
+						auto clone = t2->cloneEventIntoTrack(event).lock();
 						clone->setTick(clone->getTick() + offset + (k * segmentLengthTicks));
 					}
 				}

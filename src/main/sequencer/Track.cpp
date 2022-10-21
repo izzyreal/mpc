@@ -106,101 +106,29 @@ int Track::getIndex()
     return trackIndex;
 }
 
-weak_ptr<NoteEvent> Track::recordNoteOn()
+// This is called from the UI thread. Results in incorrect tickpos.
+// We should only queue the fact that a note of n wants to be recorded.
+// Then we let getNextTick, from the audio thread, set the tickpos.
+std::shared_ptr<NoteEvent> Track::recordNoteOnNow(unsigned char note)
 {
-	auto punchScreen = mpc.screens->get<PunchScreen>("punch");
-
-	auto pos = sequencer->getTickPosition();
-
-	if (sequencer->isRecordingOrOverdubbing() && punchScreen->on)
-	{
-		auto mode = punchScreen->autoPunch;
-
-		if (mode == 0 && pos < punchScreen->time0)
-			return {};
-
-		if (mode == 1 && pos >= punchScreen->time1)
-			return {};
-
-		if (mode == 2 && (pos < punchScreen->time0 || pos >= punchScreen-> time1))
-			return {};
-	}
-
-	auto n = std::make_shared<NoteEvent>();
-
-	n->setTick(pos);
-
-	for (auto& noteOnEvent : queuedNoteOnEvents)
-	{
-		if (noteOnEvent->getNote() == n->getNote())
-		{
-			NoteEvent noteOff;
-			noteOff.setNote(n->getNote());
-			noteOff.setVelocity(0);
-			noteOff.setTick(pos);
-			recordNoteOff(noteOff);
-			break;
-		}
-	}
-
-	if (n->getTick() >= sequencer->getCurrentlyPlayingSequence().lock()->getLastTick())
-        n->setTick(0);
-
-	queuedNoteOnEvents.push_back(n);
-
+	auto n = std::make_shared<NoteEvent>(note);
+    n->setTick(-2);
+	queuedNoteOnEvents.enqueue(n);
 	return n;
 }
 
 void Track::flushNoteCache()
 {
-	queuedNoteOnEvents.clear();
+    std::shared_ptr<NoteEvent> e;
+	while (queuedNoteOnEvents.try_dequeue(e)) {}
+    while (queuedNoteOffEvents.try_dequeue(e)) {}
 }
 
-void Track::recordNoteOff(NoteEvent& n)
+void Track::recordNoteOffNow(unsigned char note)
 {
-    auto note = n.getNote();
-    shared_ptr<NoteEvent> noteOn;
-    int eraseIndex = -1;
-
-    for (auto& noteEvent : queuedNoteOnEvents)
-    {
-        eraseIndex++;
-
-        if (noteEvent->getNote() == note)
-        {
-            noteOn.swap(noteEvent);
-            break;
-        }
-    }
-
-    if (!noteOn)
-        return;
-
-    if (eraseIndex != -1 && eraseIndex != queuedNoteOnEvents.size())
-        queuedNoteOnEvents.erase(queuedNoteOnEvents.begin() + eraseIndex);
-
-    if (n.getTick() >= noteOn->getTick())
-    {
-        int candidate = n.getTick() - noteOn->getTick();
-
-        if (candidate < 1)
-            candidate = 1;
-
-        noteOn->setDuration(candidate);
-    }
-    else
-    {
-        noteOn->setDuration(sequencer->getLoopEnd() - 1 - noteOn->getTick());
-    }
-
-    auto eventsSize = events.size();
-
-    addEventRealTime(noteOn);
-
-    if (eventsSize != events.size())
-    {
-        eventIndex++;
-    }
+    auto event = std::make_shared<NoteEvent>(note);
+    event->setTick(-2);
+    queuedNoteOffEvents.enqueue(event);
 }
 
 void Track::setUsed(bool b)
@@ -221,47 +149,14 @@ void Track::setOn(bool b)
     notifyObservers(string("trackon"));
 }
 
-void Track::addEventRealTime(shared_ptr<NoteEvent> e1)
-{
-	auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
-	auto tcValue = timingCorrectScreen->getNoteValue();
-
-	if (tcValue > 0 && e1)
-    {
-        timingCorrect(0, parent->getLastBarIndex(), e1.get(), sequencer->getTickValues()[tcValue]);
-        e1->setTick(swingTick(e1->getTick(), tcValue, timingCorrectScreen->getSwing()));
-    }
-
-    for (auto& _e2 : events)
-    {
-        if (_e2->getTick() == e1->getTick())
-        {
-            auto e2 = dynamic_pointer_cast<NoteEvent>(_e2);
-
-            if (!e2) continue;
-
-            if (e2->getNote() == e1->getNote())
-            {
-                e2->setDuration(e1->getDuration());
-                e2->setVelocity(e1->getVelocity());
-                return;
-            }
-        }
-    }
-
-    if (events.size() == 0)
-        setUsed(true);
-
-	events.push_back(std::move(e1));
-    sortEvents();
-}
-
 void Track::removeEvent(weak_ptr<Event> event)
 {
 	for (int i = 0; i < events.size(); i++)
 	{
 		if (events[i] == event.lock())
-			events.erase(events.begin() + i);
+        {
+            events.erase(events.begin() + i);
+        }
 	}
 
 	notifyObservers(string("step-editor"));
@@ -302,8 +197,6 @@ std::shared_ptr<NoteEvent> Track::addNoteEvent(int tick, int note)
 
 std::shared_ptr<Event> Track::addEvent(int tick, const std::string& type)
 {
-    const bool sortRequired = !events.empty() && events.back()->getTick() >= tick;
-
 	std::shared_ptr<Event> res;
 
 	if (type == "note")
@@ -350,22 +243,17 @@ std::shared_ptr<Event> Track::addEvent(int tick, const std::string& type)
 	}
 
 	res->setTick(tick);
-	events.push_back(res);
 
-    if (sortRequired)
-    {
-        sortEvents();
-    }
+    insertEventWhileRetainingSort(res);
 
 	notifyObservers(string("step-editor"));
-
 	notifyObservers(string(type) + "added");
+
 	return res;
 }
 
-weak_ptr<Event> Track::cloneEvent(weak_ptr<Event> src)
+weak_ptr<Event> Track::cloneEventIntoTrack(weak_ptr<Event> src)
 {
-
 	auto seq = sequencer->getActiveSequence().lock().get();
 
 	shared_ptr<Event> res;
@@ -398,14 +286,9 @@ weak_ptr<Event> Track::cloneEvent(weak_ptr<Event> src)
 	if (!used)
 		setUsed(true);
 
-	auto result = weak_ptr<Event>(res);
-
-	events.push_back(res);
-
-	sortEvents();
-
+    insertEventWhileRetainingSort(res);
 	notifyObservers(string("step-editor"));
-	return result;
+	return res;
 }
 
 void Track::removeEvent(int i)
@@ -513,10 +396,56 @@ vector<weak_ptr<Event>> Track::getEvents()
     return res;
 }
 
+void Track::addEventsIfBeforePos()
+{
+    auto pos = this->sequencer->getTickPosition();
+
+    std::vector<std::shared_ptr<NoteEvent>> bulkNoteOns(20);
+    std::vector<std::shared_ptr<NoteEvent>> bulkNoteOffs(20);
+
+    auto noteOnCount = this->queuedNoteOnEvents.try_dequeue_bulk(bulkNoteOns.begin(), 20);
+    auto noteOffCount = this->queuedNoteOffEvents.try_dequeue_bulk(bulkNoteOffs.begin(), 20);
+
+    for (int noteOffIndex = 0; noteOffIndex < noteOffCount; noteOffIndex++) {
+        auto noteOff = bulkNoteOffs[noteOffIndex];
+        if (noteOff->getTick() == -2) {
+            noteOff->setTick(pos);
+        }
+    }
+
+    for (int noteOnIndex = 0; noteOnIndex < noteOnCount; noteOnIndex++) {
+        auto noteOn = bulkNoteOns[noteOnIndex];
+        if (noteOn->getTick() == -2) {
+            noteOn->setTick(pos);
+        }
+
+        bool needsToBeRequeued = true;
+
+        for (int noteOffIndex = 0; noteOffIndex < noteOffCount; noteOffIndex++) {
+            auto noteOff = bulkNoteOffs[noteOffIndex];
+            if (noteOff->getNote() == noteOn->getNote() /*&& noteOn->getTick() < pos*/) {
+                auto duration = noteOff->getTick() - noteOn->getTick();
+                if (duration < 1) duration = 1;
+                noteOn->setDuration(duration);
+                insertEventWhileRetainingSort(std::shared_ptr<NoteEvent>(noteOn));
+                needsToBeRequeued = false;
+            } else {
+                this->queuedNoteOffEvents.enqueue(noteOff);
+            }
+        }
+
+        if (needsToBeRequeued) {
+            this->queuedNoteOnEvents.enqueue(noteOn);
+        }
+    }
+}
+
 int Track::getNextTick()
 {
-	if (eventIndex >= events.size() && noteOffs.empty())
-		return MAX_TICK;
+	if (eventIndex >= events.size() && noteOffs.empty()) {
+        addEventsIfBeforePos();
+        return MAX_TICK;
+    }
 
     sort(noteOffs.begin(), noteOffs.end(), tickCmp);
 
@@ -527,17 +456,25 @@ int Track::getNextTick()
         if (noteOnAvailable)
         {
             if (noteOff->getTick() < events[eventIndex]->getTick())
+            {
+                addEventsIfBeforePos();
                 return noteOff->getTick();
+            }
         }
         else
         {
+            addEventsIfBeforePos();
             return noteOff->getTick();
         }
     }
 
 	if (eventIndex < events.size())
-		return events[eventIndex]->getTick();
+    {
+        addEventsIfBeforePos();
+        return events[eventIndex]->getTick();
+    }
 
+    addEventsIfBeforePos();
 	return MAX_TICK;
 }
 
@@ -988,4 +925,36 @@ int Track::getEventIndex()
 string Track::getActualName()
 {
     return name;
+}
+
+void Track::insertEventWhileRetainingSort(std::shared_ptr<Event> event)
+{
+    if (!isUsed())
+    {
+        setUsed(true);
+    }
+
+    auto tick = event->getTick();
+    const bool insertRequired = !events.empty() && events.back()->getTick() >= tick;
+
+    if (insertRequired)
+    {
+        auto insertAt = std::find_if(events.begin(),
+                                     events.end(),
+                                     [&tick](std::shared_ptr<Event> e) { return e->getTick() >= tick; });
+
+        if (insertAt == events.end())
+        {
+            events.emplace_back(event);
+        }
+        else
+        {
+            events.insert(insertAt, event);
+        }
+    }
+    else
+    {
+        events.emplace_back(event);
+    }
+    eventIndex++;
 }

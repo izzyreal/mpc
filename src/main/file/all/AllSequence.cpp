@@ -123,7 +123,7 @@ void AllSequence::applyToMpcSeq(shared_ptr<mpc::sequencer::Sequence> mpcSeq)
         if (track > 128) track -= 128;
         if (track < 0) track += 128;
         if (track > 63) track -= 64;
-        mpcSeq->getTrack(track).lock()->cloneEvent(shared_ptr<mpc::sequencer::Event>(e));
+        mpcSeq->getTrack(track).lock()->cloneEventIntoTrack(shared_ptr<mpc::sequencer::Event>(e));
     }
 
     for (int i = 0; i < 32; i++)

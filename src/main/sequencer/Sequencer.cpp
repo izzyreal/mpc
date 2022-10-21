@@ -808,7 +808,7 @@ void Sequencer::copyTrack(weak_ptr<Track> src, weak_ptr<Track> dest)
 	
 	for (auto& e : lSrc->getEvents())
 	{
-		lDest->cloneEvent(e);
+        lDest->cloneEventIntoTrack(e);
 	}
 
 	copyTrackParameters(src, dest);

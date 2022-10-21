@@ -162,7 +162,7 @@ void EventsScreen::function(int i)
 						
 						if (tickCandidate < toSequence->getLastTick())
 						{
-							auto temp = destTrack->cloneEvent(event).lock();
+							auto temp = destTrack->cloneEventIntoTrack(event).lock();
 							temp->setTick(tickCandidate);
 						}
 					}

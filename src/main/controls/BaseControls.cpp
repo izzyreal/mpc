@@ -329,10 +329,7 @@ void BaseControls::generateNoteOn(int note, int padVelo, int tick)
         }
         else
         {
-            recordedEvent = trk->recordNoteOn().lock();
-            
-            if (recordedEvent)
-                recordedEvent->setNote(note);
+            recordedEvent = trk->recordNoteOnNow(note);
         }
         
         if (recordedEvent)

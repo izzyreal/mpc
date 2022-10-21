@@ -145,15 +145,12 @@ void MpcMidiInput::transport(MidiMessage *msg, int timeStamp)
 
             if (note->getVelocity() == 0)
             {
-                mpc::sequencer::NoteEvent &noteOff = *note.get();
-                track->recordNoteOff(noteOff);
+                track->recordNoteOffNow(note->getNote());
             }
             else
             {
-                auto recEvent = track->recordNoteOn().lock();
-
-                if (recEvent)
-                    note->CopyValuesTo(recEvent);
+                auto recordedEvent = track->recordNoteOnNow(note->getNote());
+                note->CopyValuesTo(recordedEvent);
             }
         }
     }

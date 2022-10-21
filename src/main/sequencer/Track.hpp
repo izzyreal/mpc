@@ -6,6 +6,7 @@
 #include <sequencer/NoteEvent.hpp>
 #include <observer/Observable.hpp>
 
+#include "thirdp/concurrentqueue.h"
 #include <memory>
 
 namespace mpc { class Mpc; }
@@ -21,8 +22,14 @@ private:
     static const int MAX_TICK{ 2147483647 };
     
     std::vector<std::shared_ptr<Event>> events;
-    
-    std::vector<std::shared_ptr<NoteEvent>> queuedNoteOnEvents;
+    moodycamel::ConcurrentQueue<std::shared_ptr<NoteEvent>> realtimeEvents;
+
+    moodycamel::ConcurrentQueue<std::shared_ptr<NoteEvent>> queuedNoteOnEvents;
+    moodycamel::ConcurrentQueue<std::shared_ptr<NoteEvent>> queuedNoteOffEvents;
+
+    // Used for on-the-fly generated note off events based on
+    // the duration of a sequenced note on. While playing, only the
+    // audio thread interacts with this collection.
     std::vector<std::shared_ptr<NoteEvent>> noteOffs;
     
     mpc::sequencer::Sequence* parent{ nullptr };
@@ -48,20 +55,29 @@ public:
     void move(int tick, int oldTick);
     void setTrackIndex(int i);
     int getIndex();
-    std::weak_ptr<mpc::sequencer::NoteEvent> recordNoteOn();
     void flushNoteCache();
-    void recordNoteOff(NoteEvent&);
     void setUsed(bool b);
     void setOn(bool b);
-    
+
+    // The below 2 methods are threadsafe, intended for the UI
+    // thread (keyboard, mouse) to record notes.
+    // MIDI will also go through this, in case that runs on a
+    // different thread.
+    // As a bare minimum the note must be passed in, in order to
+    // match against counterpart (off with on and vice versa).
+    std::shared_ptr<mpc::sequencer::NoteEvent> recordNoteOnNow(unsigned char note);
+    void recordNoteOffNow(unsigned char note);
+
 private:
     void addEventRealTime(std::shared_ptr<NoteEvent> event);
     std::shared_ptr<NoteEvent> getNoteEvent(int tick, int note);
-    
+    void insertEventWhileRetainingSort(std::shared_ptr<Event> event);
+    void addEventsIfBeforePos();
+
 public:
     std::shared_ptr<NoteEvent> addNoteEvent(int tick, int note);
     std::shared_ptr<Event> addEvent(int tick, const std::string& type);
-    std::weak_ptr<Event> cloneEvent(std::weak_ptr<Event> src);
+    std::weak_ptr<Event> cloneEventIntoTrack(std::weak_ptr<Event> src);
     bool adjustDurLastEvent(int newDur);
     void removeEvent(int i);
     void removeEvent(std::weak_ptr<Event> event);

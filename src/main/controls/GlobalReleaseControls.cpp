@@ -179,11 +179,7 @@ void GlobalReleaseControls::generateNoteOff(int note)
 
 	if (sequencer->isRecordingOrOverdubbing())
 	{
-		mpc::sequencer::NoteEvent noteOff;
-		noteOff.setNote(note);
-		noteOff.setVelocity(0);
-		noteOff.setTick(sequencer->getTickPosition());
-		lTrk->recordNoteOff(noteOff);
+        lTrk->recordNoteOffNow(note);
 	}
 
     auto noteEvent = make_shared<mpc::sequencer::NoteEvent>(note);
