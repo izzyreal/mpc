@@ -52,7 +52,16 @@ Track::Track(mpc::Mpc& mpc, mpc::sequencer::Sequence* parent, int i)
 
 void Track::move(int tick, int oldTick)
 {
-	if (tick == 0) {
+    if (sequencer->getTickPosition() > tick)
+    {
+        for (auto& noteOff : noteOffs)
+        {
+            noteOff->setTick(noteOff->getTick() % parent->getLastTick());
+        }
+    }
+
+    if (tick == 0)
+    {
 		eventIndex = 0;
 		return;
 	}
@@ -425,9 +434,18 @@ void Track::addEventsIfBeforePos()
             auto noteOff = bulkNoteOffs[noteOffIndex];
             if (noteOff->getNote() == noteOn->getNote() /*&& noteOn->getTick() < pos*/) {
                 auto duration = noteOff->getTick() - noteOn->getTick();
+                bool fixEventIndex = false;
+                if (noteOff->getTick() < noteOn->getTick())
+                {
+                    duration = parent->getLastTick() - noteOn->getTick();
+                    fixEventIndex = true;
+                    noteOn->dontDelete = true;
+                }
+
                 if (duration < 1) duration = 1;
                 noteOn->setDuration(duration);
                 insertEventWhileRetainingSort(std::shared_ptr<NoteEvent>(noteOn));
+                if (fixEventIndex) eventIndex--;
                 needsToBeRequeued = false;
             } else {
                 this->queuedNoteOffEvents.enqueue(noteOff);
@@ -599,11 +617,13 @@ void Track::playNext()
         }
     }
 
-	if (_delete)
+	if (_delete && !events[eventIndex]->dontDelete)
 	{
-		events.erase(events.begin() + eventIndex);
+        events.erase(events.begin() + eventIndex);
 		return;
 	}
+
+    events[eventIndex]->dontDelete = false;
 
 	mpc.getEventHandler().lock()->handle(event, this);
 
@@ -945,7 +965,7 @@ void Track::insertEventWhileRetainingSort(std::shared_ptr<Event> event)
 
         if (insertAt == events.end())
         {
-            events.emplace_back(event);
+            events.push_back(event);
         }
         else
         {
@@ -954,7 +974,7 @@ void Track::insertEventWhileRetainingSort(std::shared_ptr<Event> event)
     }
     else
     {
-        events.emplace_back(event);
+        events.push_back(event);
     }
     eventIndex++;
 }

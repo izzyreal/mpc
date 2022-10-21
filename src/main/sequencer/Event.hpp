@@ -12,6 +12,7 @@ namespace mpc::sequencer
 		: public moduru::observer::Observable
 	{
 	public:
+        bool dontDelete = false;
 		int tick = 0;
 		int track = 0;
 
