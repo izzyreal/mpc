@@ -2,7 +2,6 @@
 
 #include <Mpc.hpp>
 
-#include <Util.hpp>
 #include <disk/MpcFile.hpp>
 #include <file/all/Count.hpp>
 #include <file/all/Defaults.hpp>
@@ -58,16 +57,15 @@ AllParser::AllParser(mpc::Mpc& _mpc, const vector<char>& loadBytes)
 	sequences = readSequences(VecUtil::CopyOfRange(loadBytes, SEQUENCES_OFFSET, loadBytes.size()));
 }
 
-AllParser::AllParser(mpc::Mpc& _mpc, const string& allName)
+AllParser::AllParser(mpc::Mpc& _mpc)
 	: mpc (_mpc)
 {
 	vector<vector<char>> chunks;
-	auto header = Header();
-	chunks.push_back(header.getBytes());
+	chunks.push_back(Header().getBytes());
 	
-	Defaults defaults(mpc);
+	Defaults saveDefaults(mpc);
 	
-	chunks.push_back(defaults.getBytes());
+	chunks.push_back(saveDefaults.getBytes());
 	chunks.push_back(UNKNOWN_CHUNK);
 	sequencer = new AllSequencer(mpc);
 	chunks.push_back(sequencer->getBytes());
@@ -85,20 +83,20 @@ AllParser::AllParser(mpc::Mpc& _mpc, const string& allName)
 	chunks.push_back(misc->getBytes());
 	seqNames = new SequenceNames(mpc);
 	chunks.push_back(seqNames->getBytes());
-    
-	auto sequencer = mpc.getSequencer().lock();
+
+	auto mpcSequencer = mpc.getSequencer().lock();
 
 	for (int i = 0; i < 20; i++) {
-		songs[i] = new Song(sequencer->getSong(i).lock().get());
+		songs[i] = new Song(mpcSequencer->getSong(i).lock().get());
 		chunks.push_back(songs[i]->getBytes());
 	}
 	
-	auto usedSeqs = sequencer->getUsedSequences();
+	auto usedSeqs = mpcSequencer->getUsedSequences();
 	
 	for (int i = 0; i < usedSeqs.size(); i++)
 	{
 		auto seq = usedSeqs[i];
-		AllSequence allSeq(seq.lock().get(), sequencer->getUsedSequenceIndexes()[i] + 1);
+		AllSequence allSeq(seq.lock().get(), mpcSequencer->getUsedSequenceIndexes()[i] + 1);
 		chunks.push_back(allSeq.getBytes());
 	}
 	

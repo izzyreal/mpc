@@ -17,16 +17,13 @@
 #include <file/sndreader/SndReader.hpp>
 #include <file/aps/ApsParser.hpp>
 #include <file/all/AllParser.hpp>
-#include <file/AkaiName.hpp>
 
-#include <sampler/NoteParameters.hpp>
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>
 #include <sampler/Sound.hpp>
 
 #include <sequencer/Track.hpp>
 
-#include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/LoadScreen.hpp>
 #include <lcdgui/screens/window/DirectoryScreen.hpp>
 #include <lcdgui/screens/window/LoadAProgramScreen.hpp>
@@ -402,7 +399,7 @@ file_or_error AbstractDisk::writeAll2(std::shared_ptr<MpcFile> f)
     std::string msg;
     
     try {
-        AllParser allParser(mpc, f->getNameWithoutExtension());
+        AllParser allParser(mpc);
         auto bytes = allParser.getBytes();
         f->setFileData(bytes);
         

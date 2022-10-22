@@ -59,25 +59,25 @@ Tracks::Tracks(mpc::sequencer::Sequence* seq)
          * 6 == track is unused and on
          * 7 == track is used and on
          */
-        int status = 4;
+        int saveStatus = 4;
 
         if (t->isUsed() && t->isOn())
         {
-            status = 7;
+            saveStatus = 7;
         }
         else if (t->isUsed())
         {
-            status = 5;
+            saveStatus = 5;
         }
         else if (t->isOn())
         {
-            status = 6;
+            saveStatus = 6;
         }
         
 		if (t->isUsed() && !t->isOn())
-			status = 5;
+            saveStatus = 5;
 
-		saveBytes[STATUS_OFFSET + i] = (status);
+		saveBytes[STATUS_OFFSET + i] = (saveStatus);
 	}
     
 	for (int i = 0; i < PADDING1.size(); i++)
