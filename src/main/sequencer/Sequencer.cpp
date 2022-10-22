@@ -276,6 +276,19 @@ void Sequencer::setSoloEnabled(bool b)
 		return;
 
     soloEnabled = b;
+
+    if (soloEnabled)
+    {
+        for (auto& t : getActiveSequence()->getTracks())
+        {
+            if (t->getIndex() == getActiveTrackIndex())
+            {
+                continue;
+            }
+            t->triggerPendingNoteOffs();
+        }
+    }
+
     notifyObservers(string("soloenabled"));
 }
 

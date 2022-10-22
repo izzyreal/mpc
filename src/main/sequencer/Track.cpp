@@ -158,6 +158,15 @@ void Track::setOn(bool b)
     notifyObservers(string("trackon"));
 }
 
+void Track::triggerPendingNoteOffs()
+{
+    auto pos = sequencer->getTickPosition();
+    for (auto& noteOff : noteOffs)
+    {
+        noteOff->setTick(pos);
+    }
+}
+
 void Track::removeEvent(weak_ptr<Event> event)
 {
 	for (int i = 0; i < events.size(); i++)

@@ -61,6 +61,7 @@ public:
     void flushNoteCache();
     void setUsed(bool b);
     void setOn(bool b);
+    void triggerPendingNoteOffs();
 
     // The below 2 methods are threadsafe, intended for the UI
     // thread (keyboard, mouse) to record notes.

@@ -119,7 +119,10 @@ void EventHandler::handleNoThru(const weak_ptr<Event>& e, Track* track, int time
         {
             if (ne->getDuration() != -1)
             {
-                if (!(lSequencer->isSoloEnabled() && track->getIndex() != lSequencer->getActiveTrackIndex()))
+                auto isSolo = lSequencer->isSoloEnabled();
+                auto eventTrackIsSoloTrack = track->getIndex() == lSequencer->getActiveTrackIndex();
+
+                if (!isSolo || eventTrackIsSoloTrack || ne->getVelocity() == 0)
                 {
                     auto newVelo = static_cast<int>(ne->getVelocity() * (track->getVelocityRatio() * 0.01));
                     MidiAdapter midiAdapter;
