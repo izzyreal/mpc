@@ -24,10 +24,11 @@ private:
     static const int MAX_TICK{ 2147483647 };
     
     std::vector<std::shared_ptr<Event>> events;
-    moodycamel::ConcurrentQueue<std::shared_ptr<NoteEvent>> realtimeEvents;
 
     moodycamel::ConcurrentQueue<std::shared_ptr<NoteEvent>> queuedNoteOnEvents;
     moodycamel::ConcurrentQueue<std::shared_ptr<NoteEvent>> queuedNoteOffEvents;
+    std::vector<std::shared_ptr<NoteEvent>> bulkNoteOns = std::vector<std::shared_ptr<NoteEvent>>(20);
+    std::vector<std::shared_ptr<NoteEvent>> bulkNoteOffs = std::vector<std::shared_ptr<NoteEvent>>(20);
 
     // Used for on-the-fly generated note off events based on
     // the duration of a sequenced note on. While playing, only the

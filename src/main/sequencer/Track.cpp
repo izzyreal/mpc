@@ -409,9 +409,6 @@ void Track::addEventsIfBeforePos()
 {
     auto pos = this->sequencer->getTickPosition();
 
-    std::vector<std::shared_ptr<NoteEvent>> bulkNoteOns(20);
-    std::vector<std::shared_ptr<NoteEvent>> bulkNoteOffs(20);
-
     auto noteOnCount = this->queuedNoteOnEvents.try_dequeue_bulk(bulkNoteOns.begin(), 20);
     auto noteOffCount = this->queuedNoteOffEvents.try_dequeue_bulk(bulkNoteOffs.begin(), 20);
 
@@ -424,8 +421,18 @@ void Track::addEventsIfBeforePos()
 
     for (int noteOnIndex = 0; noteOnIndex < noteOnCount; noteOnIndex++) {
         auto noteOn = bulkNoteOns[noteOnIndex];
-        if (noteOn->getTick() == -2) {
+
+        if (noteOn->getTick() == -2)
+        {
+            auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
+            auto tcValue = timingCorrectScreen->getNoteValue();
             noteOn->setTick(pos);
+
+            if (tcValue > 0)
+            {
+                timingCorrect(0, parent->getLastBarIndex(), noteOn.get(), sequencer->getTickValues()[tcValue]);
+                noteOn->setTick(swingTick(noteOn->getTick(), tcValue, timingCorrectScreen->getSwing()));
+            }
         }
 
         bool needsToBeRequeued = true;
@@ -435,7 +442,7 @@ void Track::addEventsIfBeforePos()
 
             auto noteOff = bulkNoteOffs[noteOffIndex];
 
-            if (noteOff->getNote() == noteOn->getNote() /*&& noteOn->getTick() < pos*/)
+            if (noteOff->getNote() == noteOn->getNote())
             {
                 auto duration = noteOff->getTick() - noteOn->getTick();
                 bool fixEventIndex = false;
