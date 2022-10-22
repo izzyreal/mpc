@@ -62,7 +62,6 @@ void EventHandler::handleNoThru(const weak_ptr<Event>& e, Track* track, int time
     auto lSequencer = sequencer.lock();
     
     auto countMetronomeScreen = mpc.screens->get<CountMetronomeScreen>("count-metronome");
-    auto isStepEditor = mpc.getLayeredScreen().lock()->getCurrentScreenName() == "step-editor";
 
     if (lSequencer->isCountingIn() && event->getTick() != -1)
     {
