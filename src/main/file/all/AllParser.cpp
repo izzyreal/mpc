@@ -178,9 +178,17 @@ vector<AllSequence*> AllParser::readSequences(vector<char> trimmedSeqsArray)
     
 	vector<AllSequence*> seqs;
 	int eventSegments, currentSeqEnd, read = 0;
-    
-	for (int i = 0; i < 99; i++)
+
+    auto usednesses = seqNames->getUsednesses();
+
+	for (const auto& u : usednesses)
     {
+        if (!u)
+        {
+            seqs.push_back(nullptr);
+            continue;
+        }
+
 		eventSegments = AllSequence::getNumberOfEventSegmentsForThisSeq(trimmedSeqsArray);
 		currentSeqEnd = EMPTY_SEQ_LENGTH + (eventSegments * EVENT_LENGTH);
 	

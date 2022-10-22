@@ -60,6 +60,7 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc& mpc, AllParser& allParser)
 {
     auto lSequencer = mpc.getSequencer().lock();
     auto allSequences = allParser.getAllSequences();
+    auto allSeqNames = allParser.getSeqNames()->getNames();
     auto defaults = allParser.getDefaults();
 
     auto userScreen = mpc.screens->get<UserScreen>("user");
@@ -89,7 +90,10 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc& mpc, AllParser& allParser)
     for (auto& as : allSequences)
     {
         if (as == nullptr)
+        {
+            index++;
             continue;
+        }
 
         auto mpcSeq = mpc.getSequencer().lock()->getSequence(index++).lock();
         as->applyToMpcSeq(mpcSeq);

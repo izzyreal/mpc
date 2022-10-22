@@ -274,21 +274,20 @@ void FrameSeq::work(int nFrames)
                 int tcValue = lSequencer->getTickValues()[timingCorrectScreen->getNoteValue()];
                 int swingPercentage = timingCorrectScreen->getSwing();
                 int swingOffset = (int)((swingPercentage - 50) * (4.0 * 0.01) * (tcValue * 0.5));
+                auto shiftTiming = timingCorrectScreen->getAmount() * timingCorrectScreen->isShiftTimingLater() ? 1 : -1;
+                auto tickPosWithShift = getTickPosition() + shiftTiming;
 
                 if (tcValue == 24 || tcValue == 48)
                 {
-                    if (getTickPosition() % (tcValue * 2) == swingOffset + tcValue ||
-                        getTickPosition() % (tcValue * 2) == 0)
+                    if (tickPosWithShift % (tcValue * 2) == swingOffset + tcValue ||
+                        tickPosWithShift % (tcValue * 2) == 0)
                     {
-                        repeatPad(getTickPosition(), tcValue);
+                        repeatPad(tickPosWithShift, tcValue);
                     }
                 }
-                else
+                else if (tcValue != 1 && tickPosWithShift % tcValue == 0)
                 {
-                    if (tcValue != 1 && getTickPosition() % tcValue == 0)
-                    {
-                        repeatPad(getTickPosition(), tcValue);
-                    }
+                    repeatPad(tickPosWithShift, tcValue);
                 }
             }
         }

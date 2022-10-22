@@ -35,6 +35,9 @@ SequenceNames::SequenceNames(const vector<char>& b)
 			stringBuffer.push_back(c);
 		}
 		names[i] = stringBuffer;
+
+		auto usednessBytes = moduru::VecUtil::CopyOfRange(b, offset + AllParser::NAME_LENGTH, offset + AllParser::NAME_LENGTH + 2);
+		usednesses[i] = usednessBytes[0] != 0 || usednessBytes[1] != 0;
 	}
 }
 
@@ -80,6 +83,11 @@ SequenceNames::SequenceNames(mpc::Mpc& mpc)
 vector<string>& SequenceNames::getNames()
 {
     return names;
+}
+
+std::vector<bool>& SequenceNames::getUsednesses()
+{
+    return usednesses;
 }
 
 vector<char>& SequenceNames::getBytes()
