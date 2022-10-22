@@ -89,7 +89,7 @@ namespace mpc::controls {
 
 		virtual bool isTypable();
 
-		void pad(int padIndexWithBank, int velo, bool repeat, int tick);
+		void pad(int padIndexWithBank, int velo, int tick);
 
 	protected:
 		std::string param = "";

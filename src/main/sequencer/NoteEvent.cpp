@@ -12,6 +12,7 @@ NoteEvent::NoteEvent(int i)
 {
 	number = i;
 	noteOff = make_shared<NoteEvent>(false, 0);
+    noteOff->number = number;
 }
 
 NoteEvent::NoteEvent(bool dummyParameter, int _noteOnTick)
@@ -34,6 +35,8 @@ void NoteEvent::setNote(int i)
     if(number == i) return;
 
     number = i;
+
+    noteOff->number = number;
     
     notifyObservers(string("step-editor"));
 }

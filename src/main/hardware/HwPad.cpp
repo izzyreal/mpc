@@ -35,7 +35,7 @@ void HwPad::push(int velo)
     if (!c)
         return;
 
-    c->pad(padIndexWithBankWhenLastPressed, velo, false, 0);
+    c->pad(padIndexWithBankWhenLastPressed, velo, 0);
 }
 
 void HwPad::release()

@@ -194,12 +194,17 @@ void BaseControls::function(int i)
     }
 }
 
-void BaseControls::pad(int padIndexWithBank, int velo, bool triggeredByRepeat, int tick)
+void BaseControls::pad(int padIndexWithBank, int velo, int tick)
 {
     init();
     
     auto controls = mpc.getControls().lock();
     auto hardware = mpc.getHardware().lock();
+
+    if (controls->isTapPressed() && sequencer->isPlaying())
+    {
+        return;
+    }
 
     if (hardware->getTopPanel().lock()->isFullLevelEnabled())
     {
@@ -209,7 +214,7 @@ void BaseControls::pad(int padIndexWithBank, int velo, bool triggeredByRepeat, i
     if (sequencer->isRecordingOrOverdubbing() && mpc.getControls().lock()->isErasePressed())
         return;
     
-    if (controls->isNoteRepeatLocked() && !triggeredByRepeat)
+    if (controls->isNoteRepeatLocked())
         return;
     
     auto note = track.lock()->getBus() > 0 ? program.lock()->getPad(padIndexWithBank)->getNote() : padIndexWithBank + 35;
@@ -261,15 +266,7 @@ void BaseControls::pad(int padIndexWithBank, int velo, bool triggeredByRepeat, i
         }
     }
     
-    if (controls->isTapPressed() && sequencer->isPlaying())
-    {
-        if (triggeredByRepeat)
-            generateNoteOn(note, velocity, tick);
-    }
-    else
-    {
-        generateNoteOn(note, velocity, -1);
-    }
+    generateNoteOn(note, velocity, -1);
 }
 
 void BaseControls::generateNoteOn(int note, int padVelo, int tick)

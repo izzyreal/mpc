@@ -1,8 +1,12 @@
 #include "FrameSeq.hpp"
 
 #include <Mpc.hpp>
+
+#include "audiomidi/EventHandler.hpp"
+
 #include <hardware/Hardware.hpp>
 #include <hardware/HwPad.hpp>
+#include <hardware/TopPanel.hpp>
 #include <controls/GlobalReleaseControls.hpp>
 
 #include <sequencer/Song.hpp>
@@ -14,6 +18,12 @@
 #include <lcdgui/screens/PunchScreen.hpp>
 #include <lcdgui/screens/UserScreen.hpp>
 #include <lcdgui/screens/SequencerScreen.hpp>
+
+#include "mpc/MpcSoundPlayerChannel.hpp"
+#include "mpc/MpcMultiMidiSynth.hpp"
+#include "midi/core/ShortMessage.hpp"
+
+#include "Util.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -67,10 +77,10 @@ void FrameSeq::work(int nFrames)
 	auto controls = mpc.getControls().lock();
 	auto songScreen = mpc.screens->get<SongScreen>("song");
 	auto lSequencer = sequencer.lock();
-	
+
 
 	frameCounter += nFrames;
-	
+
 	if (frameCounter > 2048)
 	{
 		if (!lSequencer->isCountingIn() && !metronome)
@@ -175,7 +185,7 @@ void FrameSeq::work(int nFrames)
                                 move(0);
                                 continue;
                             }
-							
+
 							move(0);
 						}
 						else if (doneRepeating && reachedLastStep)
@@ -189,14 +199,14 @@ void FrameSeq::work(int nFrames)
 						else
 						{
 							lSequencer->playToTick(seq->getLastTick() - 1);
-							
+
 							if (doneRepeating)
 							{
 								lSequencer->resetPlayedStepRepetitions();
 								songScreen->setOffset(songScreen->getOffset() + 1);
-								
+
 								auto newStep = song->getStep(songScreen->getOffset() + 1).lock();
-								
+
 								if (!lSequencer->getSequence(newStep->getSequence()).lock()->isUsed())
                                 {
                                     lSequencer->playToTick(seq->getLastTick() - 1);
@@ -205,7 +215,7 @@ void FrameSeq::work(int nFrames)
                                     continue;
                                 }
 							}
-							
+
 							move(0);
 						}
 					}
@@ -227,8 +237,8 @@ void FrameSeq::work(int nFrames)
 							sequencerScreen->setPunchRectOn(1, true);
 
 						lSequencer->playToTick(getTickPosition());
-						move(seq->getLoopStart());	
-					
+						move(seq->getLoopStart());
+
 						if (lSequencer->isRecordingOrOverdubbing())
 						{
 							if (lSequencer->isRecording())
@@ -266,32 +276,32 @@ void FrameSeq::work(int nFrames)
 				}
 			}
 
+            lSequencer->playToTick(getTickPosition());
+
             if (controls && (controls->isTapPressed() || controls->isNoteRepeatLocked()))
             {
                 auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
                 int tcValue = lSequencer->getTickValues()[timingCorrectScreen->getNoteValue()];
-	            int swingPercentage = timingCorrectScreen->getSwing();
-	            int swingOffset = (int)((swingPercentage - 50) * (4.0 * 0.01) * (tcValue * 0.5));
+                int swingPercentage = timingCorrectScreen->getSwing();
+                int swingOffset = (int)((swingPercentage - 50) * (4.0 * 0.01) * (tcValue * 0.5));
 
                 if (tcValue == 24 || tcValue == 48)
                 {
                     if (getTickPosition() % (tcValue * 2) == swingOffset + tcValue ||
                         getTickPosition() % (tcValue * 2) == 0)
                     {
-                        repeatPad(getTickPosition());
+                        repeatPad(getTickPosition(), tcValue);
                     }
                 }
                 else
                 {
                     if (tcValue != 1 && getTickPosition() % tcValue == 0)
                     {
-                        repeatPad(getTickPosition());
+                        repeatPad(getTickPosition(), tcValue);
                     }
                 }
             }
-
-            lSequencer->playToTick(getTickPosition());
-		}
+        }
 	}
 }
 
@@ -326,22 +336,61 @@ void FrameSeq::move(int newTickPos)
 	clock.setTick(newTickPos);
 }
 
-void FrameSeq::repeatPad(int tick)
+void FrameSeq::repeatPad(int tick, int duration)
 {
+    auto track = sequencer.lock()->getActiveTrack().lock();
+
+    if (mpc.getLayeredScreen().lock()->getCurrentScreenName() != "sequencer" ||
+        track->getBus() == 0)
+    {
+        return;
+    }
+
 	auto controls = mpc.getControls().lock();
 
 	if (!controls)
 		return;
 
-  const bool isNoteRepeat = true;
+  auto program = mpc.getSampler().lock()->getProgram(mpc.getDrum(track->getBus() - 1)->getProgram()).lock();
+  auto hardware = mpc.getHardware().lock();
+  auto fullLevel = hardware->getTopPanel().lock()->isFullLevelEnabled();
 
-  for (auto& p : mpc.getHardware().lock()->getPads())
+    for (auto& p : mpc.getHardware().lock()->getPads())
   {
     if (!p->isPressed()) continue;
 
     auto padIndex = p->getPadIndexWithBankWhenLastPressed();
-    mpc.getReleaseControls()->simplePad(padIndex);
-    mpc.getActiveControls().lock()->pad(padIndex, p->getPressure(), isNoteRepeat, tick);
+
+    auto note = program->getNoteFromPad(padIndex);
+
+    if (note != 34)
+    {
+        auto noteEvent = std::make_shared<NoteEvent>(note);
+        noteEvent->setTick(tick);
+        noteEvent->setNote(note);
+        mpc::Util::setSliderNoteVariationParameters(mpc, noteEvent, program);
+        noteEvent->setVelocity(fullLevel ? 127 : p->getPressure());
+        noteEvent->setDuration(duration);
+
+        noteEvent->getNoteOff().lock()->setTick(tick + duration);
+        noteEvent->getNoteOff().lock()->setVelocity(0);
+        auto eventFrame = getEventFrameOffset();
+
+        MidiAdapter midiAdapter;
+
+        midiAdapter.process(noteEvent->getNoteOff(), track->getBus() - 1, 0);
+        mpc.getMms()->mpcTransport(midiAdapter.get().lock().get(), 0, 0, 0, eventFrame, -1);
+
+        auto newVelo = static_cast<int>(noteEvent->getVelocity() * (track->getVelocityRatio() * 0.01));
+        midiAdapter.process(noteEvent, track->getBus() - 1, newVelo);
+        mpc.getMms()->mpcTransport(midiAdapter.get().lock().get(), 0, noteEvent->getVariationType(), noteEvent->getVariationValue(), eventFrame, -1);
+        p->notifyObservers(newVelo);
+
+        if (sequencer.lock()->isRecordingOrOverdubbing())
+        {
+            track->insertEventWhileRetainingSort(noteEvent);
+        }
+    }
   }
 }
 

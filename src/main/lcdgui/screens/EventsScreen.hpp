@@ -23,7 +23,7 @@ namespace mpc::lcdgui::screens
 		EventsScreen(mpc::Mpc& mpc, const int layerIndex);
 
 		void open() override;
-        void pad(int padIndexWithBank, int velo, bool isNoteRepeat, int tick) override;
+        void pad(int padIndexWithBank, int velo, int tick) override;
 
 	private:
         void displayTime() override;

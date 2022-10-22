@@ -13,6 +13,8 @@ namespace mpc { class Mpc; }
 
 namespace mpc::sequencer {
 
+    class FrameSeq;
+
 class Track
 : public moduru::observer::Observable
 {
@@ -71,10 +73,10 @@ public:
 private:
     void addEventRealTime(std::shared_ptr<NoteEvent> event);
     std::shared_ptr<NoteEvent> getNoteEvent(int tick, int note);
-    void insertEventWhileRetainingSort(std::shared_ptr<Event> event);
     void addEventsIfBeforePos();
 
 public:
+    void insertEventWhileRetainingSort(std::shared_ptr<Event> event);
     std::shared_ptr<NoteEvent> addNoteEvent(int tick, int note);
     std::shared_ptr<Event> addEvent(int tick, const std::string& type);
     std::weak_ptr<Event> cloneEventIntoTrack(std::weak_ptr<Event> src);
@@ -135,6 +137,7 @@ public:
     
 private:
     friend class Sequence;
+    friend class mpc::sequencer::FrameSeq;
     
 };
 }

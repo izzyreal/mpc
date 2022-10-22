@@ -12,7 +12,7 @@ namespace mpc::lcdgui::screens
 
 	public:
 		void turnWheel(int i) override;
-		void pad(int i, int velo, bool repeat, int tick) override;
+		void pad(int i, int velo, int tick) override;
 		void open() override;
 		void close() override;
 		void update(moduru::observer::Observable* o, nonstd::any arg) override;

@@ -21,9 +21,9 @@ EventsScreen::EventsScreen(mpc::Mpc& mpc, const int layerIndex)
 {
 }
 
-void EventsScreen::pad(int padIndexWithBank, int velo, bool isNoteRepeat, int tick)
+void EventsScreen::pad(int padIndexWithBank, int velo, int tick)
 {
-    ScreenComponent::pad(padIndexWithBank, velo, isNoteRepeat, tick);
+    ScreenComponent::pad(padIndexWithBank, velo, tick);
 
     init();
 

@@ -66,7 +66,7 @@ void TrMuteScreen::right()
 	// Stop right from propgating to BaseController
 }
 
-void TrMuteScreen::pad(int padIndexWithBank, int velo, bool repeat, int tick)
+void TrMuteScreen::pad(int padIndexWithBank, int velo, int tick)
 {
 	init();
 	

@@ -430,11 +430,16 @@ void Track::addEventsIfBeforePos()
 
         bool needsToBeRequeued = true;
 
-        for (int noteOffIndex = 0; noteOffIndex < noteOffCount; noteOffIndex++) {
+        for (int noteOffIndex = 0; noteOffIndex < noteOffCount; noteOffIndex++)
+        {
+
             auto noteOff = bulkNoteOffs[noteOffIndex];
-            if (noteOff->getNote() == noteOn->getNote() /*&& noteOn->getTick() < pos*/) {
+
+            if (noteOff->getNote() == noteOn->getNote() /*&& noteOn->getTick() < pos*/)
+            {
                 auto duration = noteOff->getTick() - noteOn->getTick();
                 bool fixEventIndex = false;
+
                 if (noteOff->getTick() < noteOn->getTick())
                 {
                     duration = parent->getLastTick() - noteOn->getTick();
@@ -640,6 +645,7 @@ void Track::playNext()
 			if (dur < 1) dur = 1;
 
 			noteOff->setTick(note->getTick() + dur);
+
 			noteOff->setVelocity(0);
 			noteOffs.push_back(noteOff);
 		}

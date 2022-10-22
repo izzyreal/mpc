@@ -41,7 +41,7 @@ void NextSeqPadScreen::right()
 	// Block ScreenComponent::right() default action. Nothing to do.
 }
 
-void NextSeqPadScreen::pad(int padIndexWithBank, int velo, bool repeat, int tick)
+void NextSeqPadScreen::pad(int padIndexWithBank, int velo, int tick)
 {
 	init();
 

@@ -162,7 +162,7 @@ void MpcMidiInput::transport(MidiMessage *msg, int timeStamp)
         }
         else
         {
-            mpc.getActiveControls().lock()->pad(pad, note->getVelocity(), false, -1);
+            mpc.getActiveControls().lock()->pad(pad, note->getVelocity(), -1);
         }
     }
 
