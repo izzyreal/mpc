@@ -449,7 +449,17 @@ void MpcMidiInput::handlePolyAndNote(MidiMessage* msg)
     auto pgm = sampler.lock()->getDrumBusProgramNumber(bus);
     auto p = sampler.lock()->getProgram(pgm).lock();
 
-    auto padIndexWithBank = p->getPadIndexFromNote(note);
+      auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
+      auto iRigPads = vmpcSettingsScreen->initialPadMapping == 2;
+
+      auto indexInIrigPadsMappingIt = iRigPads ? std::find(Pad::iRigPadsDefaultMapping.begin(),
+                                                           Pad::iRigPadsDefaultMapping.end(),
+                                                           note) : Pad::iRigPadsDefaultMapping.end();
+
+      int indexInIrigPadsMapping = indexInIrigPadsMappingIt == Pad::iRigPadsDefaultMapping.end() ? -1 :
+                                   (indexInIrigPadsMappingIt - Pad::iRigPadsDefaultMapping.begin());
+
+      auto padIndexWithBank = indexInIrigPadsMapping >= 0 ? indexInIrigPadsMapping : p->getPadIndexFromNote(note);
 
     if (padIndexWithBank != -1)
     {
