@@ -243,17 +243,7 @@ void FrameSeq::work(int nFrames)
 						{
 							if (lSequencer->isRecording())
 								lSequencer->switchRecordToOverDub();
-
-							if (lSequencer->isRecordingModeMulti())
-							{
-								for (auto& t : seq->getTracks())
-									t.lock()->removeDoubles();
-							}
-							else
-							{
-								seq->getTrack(lSequencer->getActiveTrackIndex()).lock()->removeDoubles();
-							}
-						}
+                        }
 
 						continue;
 					}

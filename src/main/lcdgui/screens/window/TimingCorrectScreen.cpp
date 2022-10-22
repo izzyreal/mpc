@@ -70,7 +70,12 @@ void TimingCorrectScreen::function(int i)
 		track.lock()->swing(eventRange, noteValue, swing, noteRange);
 
 		auto sequence = sequencer->getActiveSequence().lock();
-		track.lock()->shiftTiming(eventRange, shiftTimingLater, amount, sequence->getLastTick());
+
+        for (auto& e: eventRange)
+        {
+            track.lock()->shiftTiming(e, shiftTimingLater, amount, sequence->getLastTick());
+        }
+
 		openScreen("sequencer");
 		break;
 	}
@@ -285,4 +290,14 @@ void TimingCorrectScreen::setNoteValue(int i)
 	
 	init();
 	displayNoteValue();
+}
+
+int TimingCorrectScreen::getAmount()
+{
+    return amount;
+}
+
+int TimingCorrectScreen::isShiftTimingLater()
+{
+    return shiftTimingLater;
 }

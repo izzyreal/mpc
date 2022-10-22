@@ -601,13 +601,6 @@ void Sequencer::stop(int tick)
 	int frameOffset = tick == -1 ? 0 : ams->getFrameSequencer().lock()->getEventFrameOffset();
 	ams->getFrameSequencer().lock()->stop();
 	
-	if (recording || overdubbing)
-	{
-		auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
-		auto noteValue = timingCorrectScreen->getNoteValue();
-		s2->getTrack(activeTrackIndex).lock()->correctTimeRange(0, s2->getLastTick(), TICK_VALUES[noteValue]);
-	}
-
     auto notifynextsq = false;
 	
 	if (nextSq != -1)

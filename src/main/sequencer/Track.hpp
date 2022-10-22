@@ -72,12 +72,12 @@ public:
     void recordNoteOffNow(unsigned char note);
 
 private:
-    void addEventRealTime(std::shared_ptr<NoteEvent> event);
     std::shared_ptr<NoteEvent> getNoteEvent(int tick, int note);
-    void addEventsIfBeforePos();
+    void processRealtimeQueuedEvents();
+    int getCorrectedTickPos();
 
 public:
-    void insertEventWhileRetainingSort(std::shared_ptr<Event> event);
+    bool insertEventWhileRetainingSort(std::shared_ptr<Event> event);
     std::shared_ptr<NoteEvent> addNoteEvent(int tick, int note);
     std::shared_ptr<Event> addEvent(int tick, const std::string& type);
     std::weak_ptr<Event> cloneEventIntoTrack(std::weak_ptr<Event> src);
@@ -108,11 +108,16 @@ public:
     
 public:
     std::vector<std::shared_ptr<Event>> getEventRange(int startTick, int endTick);
+
+    // Do not call from audio thread
     void correctTimeRange(int startPos, int endPos, int stepLength);
     
 public:
+    // Do not call from audio thread
     void removeDoubles();
+    // Do not call from audio thread
     void sortEvents();
+
     std::vector<std::shared_ptr<NoteEvent>> getNoteEvents();
     
 private:
@@ -125,7 +130,7 @@ public:
 
     void swing(std::vector<std::shared_ptr<Event>>& eventsToSwing, int noteValue, int percentage, std::vector<int>& noteRange);
 
-    void shiftTiming(std::vector<std::shared_ptr<Event>>& eventsToShift, bool later, int amount, int lastTick);
+    void shiftTiming(std::shared_ptr<Event> eventsToShift, bool later, int amount, int lastTick);
     
 public:
     int getEventIndex();

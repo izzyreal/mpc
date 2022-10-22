@@ -40,6 +40,8 @@ namespace mpc::lcdgui::screens::window
 		int getNoteValue();
 		void setNoteValue(int i);
 		int getSwing();
+        int getAmount();
+        int isShiftTimingLater();
 
 	private:
 		void setAmount(int i);

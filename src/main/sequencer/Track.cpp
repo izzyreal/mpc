@@ -405,12 +405,59 @@ vector<weak_ptr<Event>> Track::getEvents()
     return res;
 }
 
-void Track::addEventsIfBeforePos()
+int Track::getCorrectedTickPos()
 {
-    auto pos = this->sequencer->getTickPosition();
+    auto pos = sequencer->getTickPosition();
+    auto correctedTickPos = -1;
 
+    auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
+    auto tcValue = timingCorrectScreen->getNoteValue();
+
+    if (tcValue > 0)
+    {
+        auto tcTick = timingCorrectTick(0, parent->getLastBarIndex(), pos, sequencer->getTickValues()[tcValue]);
+        tcTick = swingTick(tcTick, tcValue, timingCorrectScreen->getSwing());
+        correctedTickPos = tcTick;
+    }
+
+    if (timingCorrectScreen->getAmount() != 0)
+    {
+        auto shiftedTick = correctedTickPos != -1 ? correctedTickPos : pos;
+        auto amount = timingCorrectScreen->getAmount();
+
+        if (!timingCorrectScreen->isShiftTimingLater())
+        {
+            amount *= -1;
+        }
+
+        shiftedTick += amount;
+
+        if (shiftedTick < 0)
+            shiftedTick = 0;
+
+        auto lastTick = parent->getLastTick();
+
+        if (shiftedTick > lastTick)
+            shiftedTick = lastTick;
+
+        correctedTickPos = shiftedTick;
+    }
+
+    return correctedTickPos;
+}
+
+void Track::processRealtimeQueuedEvents()
+{
     auto noteOnCount = this->queuedNoteOnEvents.try_dequeue_bulk(bulkNoteOns.begin(), 20);
     auto noteOffCount = this->queuedNoteOffEvents.try_dequeue_bulk(bulkNoteOffs.begin(), 20);
+
+    if (noteOnCount == 0 && noteOffCount == 0)
+    {
+        return;
+    }
+
+    auto pos = this->sequencer->getTickPosition();
+    auto correctedTickPos = getCorrectedTickPos();
 
     for (int noteOffIndex = 0; noteOffIndex < noteOffCount; noteOffIndex++) {
         auto noteOff = bulkNoteOffs[noteOffIndex];
@@ -424,15 +471,14 @@ void Track::addEventsIfBeforePos()
 
         if (noteOn->getTick() == -2)
         {
-            auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
-            auto tcValue = timingCorrectScreen->getNoteValue();
             noteOn->setTick(pos);
 
-            if (tcValue > 0)
+            if (correctedTickPos != pos && correctedTickPos != -1)
             {
-                timingCorrect(0, parent->getLastBarIndex(), noteOn.get(), sequencer->getTickValues()[tcValue]);
-                noteOn->setTick(swingTick(noteOn->getTick(), tcValue, timingCorrectScreen->getSwing()));
+                noteOn->setTick(correctedTickPos);
             }
+
+            noteOn->wasMoved = noteOn->getTick() - pos;
         }
 
         bool needsToBeRequeued = true;
@@ -444,6 +490,11 @@ void Track::addEventsIfBeforePos()
 
             if (noteOff->getNote() == noteOn->getNote())
             {
+                auto newTick = noteOff->getTick() + noteOn->wasMoved;
+                if (newTick < 0) newTick += parent->getLastTick();
+                else if (newTick > parent->getLastTick()) newTick -= parent->getLastTick();
+                noteOff->setTick(newTick);
+
                 auto duration = noteOff->getTick() - noteOn->getTick();
                 bool fixEventIndex = false;
 
@@ -454,10 +505,16 @@ void Track::addEventsIfBeforePos()
                     noteOn->dontDelete = true;
                 }
 
-                if (duration < 1) duration = 1;
+                if (duration < 1)
+                {
+                    duration = 1;
+                }
                 noteOn->setDuration(duration);
-                insertEventWhileRetainingSort(std::shared_ptr<NoteEvent>(noteOn));
-                if (fixEventIndex) eventIndex--;
+
+                bool wasInserted = insertEventWhileRetainingSort(std::shared_ptr<NoteEvent>(noteOn));
+
+                if (fixEventIndex && wasInserted) eventIndex--;
+
                 needsToBeRequeued = false;
             } else {
                 this->queuedNoteOffEvents.enqueue(noteOff);
@@ -473,7 +530,7 @@ void Track::addEventsIfBeforePos()
 int Track::getNextTick()
 {
 	if (eventIndex >= events.size() && noteOffs.empty()) {
-        addEventsIfBeforePos();
+        processRealtimeQueuedEvents();
         return MAX_TICK;
     }
 
@@ -487,24 +544,24 @@ int Track::getNextTick()
         {
             if (noteOff->getTick() < events[eventIndex]->getTick())
             {
-                addEventsIfBeforePos();
+                processRealtimeQueuedEvents();
                 return noteOff->getTick();
             }
         }
         else
         {
-            addEventsIfBeforePos();
+            processRealtimeQueuedEvents();
             return noteOff->getTick();
         }
     }
 
 	if (eventIndex < events.size())
     {
-        addEventsIfBeforePos();
+        processRealtimeQueuedEvents();
         return events[eventIndex]->getTick();
     }
 
-    addEventsIfBeforePos();
+    processRealtimeQueuedEvents();
 	return MAX_TICK;
 }
 
@@ -535,7 +592,6 @@ void Track::playNext()
 	}
 
 	int counter = 0;
-    sortEvents();
 
     auto event = eventIndex >= events.size() ? shared_ptr<Event>() : events[eventIndex];
 
@@ -569,7 +625,7 @@ void Track::playNext()
 
             bool oneOrMorePadsArePressed = false;
             auto hardware = mpc.getHardware().lock();
-            
+
           for (auto& p : hardware->getPads())
             {
               if (p->isPressed())
@@ -742,7 +798,6 @@ void Track::correctTimeRange(int startPos, int endPos, int stepLength)
 	}
 
 	removeDoubles();
-	sortEvents();
 }
 
 void Track::timingCorrect(int fromBar, int toBar, NoteEvent* noteEvent, int stepLength)
@@ -933,21 +988,18 @@ int Track::swingTick(int tick, int noteValue, int percentage)
 	return tick;
 }
 
-void Track::shiftTiming(std::vector<std::shared_ptr<Event>>& eventsToShift, bool later, int amount, int lastTick)
+void Track::shiftTiming(std::shared_ptr<Event> event, bool later, int amount, int lastTick)
 {
-	if (!later)
-		amount *= -1;
+    if (!later)
+        amount *= -1;
 
-	for (auto& event : eventsToShift)
-	{
-		event->setTick(event->getTick() + amount);
+    event->setTick(event->getTick() + amount);
 
-		if (event->getTick() < 0)
-			event->setTick(0);
+    if (event->getTick() < 0)
+        event->setTick(0);
 
-		if (event->getTick() > lastTick)
-			event->setTick(lastTick);
-	}
+    if (event->getTick() > lastTick)
+        event->setTick(lastTick);
 }
 
 int Track::getEventIndex()
@@ -960,7 +1012,7 @@ string Track::getActualName()
     return name;
 }
 
-void Track::insertEventWhileRetainingSort(std::shared_ptr<Event> event)
+bool Track::insertEventWhileRetainingSort(std::shared_ptr<Event> event)
 {
     if (!isUsed())
     {
@@ -968,6 +1020,18 @@ void Track::insertEventWhileRetainingSort(std::shared_ptr<Event> event)
     }
 
     auto tick = event->getTick();
+
+    auto noteEvent = std::dynamic_pointer_cast<NoteEvent>(event);
+
+    if (noteEvent) {
+        for (auto &e: getNoteEventsAtTick(tick)) {
+            if (e->getNote() == noteEvent->getNote()) {
+                e.swap(noteEvent);
+                return false;
+            }
+        }
+    }
+
     const bool insertRequired = !events.empty() && events.back()->getTick() >= tick;
 
     if (insertRequired)
@@ -989,5 +1053,8 @@ void Track::insertEventWhileRetainingSort(std::shared_ptr<Event> event)
     {
         events.push_back(event);
     }
+
     eventIndex++;
+
+    return true;
 }

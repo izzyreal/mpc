@@ -13,6 +13,8 @@ namespace mpc::sequencer
 	{
 	public:
         bool dontDelete = false;
+        int wasMoved = 0;
+
 		int tick = 0;
 		int track = 0;
 
