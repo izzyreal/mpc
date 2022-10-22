@@ -3,6 +3,7 @@
 #include <sequencer/Track.hpp>
 
 #include <lcdgui/screens/EventsScreen.hpp>
+#include <lcdgui/screens/UserScreen.hpp>
 
 #include <Util.hpp>
 
@@ -16,7 +17,31 @@ BarsScreen::BarsScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void BarsScreen::open()
 {
-	displayFromSq();
+    auto fromSequence = sequencer->getActiveSequence();
+    auto eventsScreen = mpc.screens->get<EventsScreen>("events");
+    auto toSequence = sequencer->getSequence(eventsScreen->toSq).lock();
+    auto userScreen = mpc.screens->get<UserScreen>("user");
+    auto userLastBar = userScreen->lastBar;
+
+    auto lastBarIndexFrom = fromSequence->isUsed() ? fromSequence->getLastBarIndex() : userLastBar;
+    auto maxAfterBarIndex = toSequence->isUsed() ? toSequence->getLastBarIndex() + 1 : 0;
+
+    if (firstBar > lastBarIndexFrom)
+    {
+        setFirstBar(lastBarIndexFrom, lastBarIndexFrom);
+    }
+
+    if (lastBar > lastBarIndexFrom)
+    {
+        setLastBar(lastBarIndexFrom, lastBarIndexFrom);
+    }
+
+    if (afterBar > maxAfterBarIndex)
+    {
+        setAfterBar(maxAfterBarIndex, maxAfterBarIndex);
+    }
+
+    displayFromSq();
 	displayToSq();
 	displayFirstBar();
 	displayLastBar();
@@ -47,16 +72,22 @@ void BarsScreen::function(int j)
 		break;
 	case 5:
 	{
-		auto numberOfBars = (lastBar - firstBar + 1) * eventsScreen->copies;
-
 		auto fromSequence = sequencer->getActiveSequence();
+
+        if (!fromSequence->isUsed())
+        {
+            return;
+        }
+
 		auto toSequence = sequencer->getSequence(eventsScreen->toSq).lock();
+        auto numberOfBars = (lastBar - firstBar + 1) * eventsScreen->copies;
 
 		if (!toSequence->isUsed())
 		{
 			toSequence->init(numberOfBars - 1);
 		}
-		else {
+		else
+        {
 			toSequence->insertBars(numberOfBars, afterBar);
 		}
 
@@ -74,8 +105,6 @@ void BarsScreen::function(int j)
 		auto firstTick = 0;
 		auto lastTick = 0;
 		auto firstTickOfToSeq = 0;
-		auto offset = 0;
-		auto segmentLengthTicks = 0;
 
 		for (int i = 0; i < 999; i++)
 		{
@@ -95,7 +124,7 @@ void BarsScreen::function(int j)
 			}
 		}
 
-		segmentLengthTicks = lastTick - firstTick;
+        auto segmentLengthTicks = lastTick - firstTick;
 
 		for (int i = 0; i < 999; i++)
 		{
@@ -105,7 +134,7 @@ void BarsScreen::function(int j)
 			firstTickOfToSeq += toSequence->getBarLengthsInTicks()[i];
 		}
 
-		offset = firstTickOfToSeq - firstTick;
+		auto offset = firstTickOfToSeq - firstTick;
 
 		for (int i = 0; i < 64; i++)
 		{
@@ -129,6 +158,7 @@ void BarsScreen::function(int j)
 				}
 			}
 		}
+        sequencer->setActiveSequenceIndex(eventsScreen->toSq);
 		openScreen("sequencer");
 		break;
 	}
@@ -140,44 +170,77 @@ void BarsScreen::turnWheel(int i)
 	init();
 
 	auto eventsScreen = mpc.screens->get<EventsScreen>("events");
-	auto fromSequence = sequencer->getActiveSequence();
-	auto toSequence = sequencer->getSequence(eventsScreen->toSq).lock();
+    auto userScreen = mpc.screens->get<UserScreen>("user");
+    auto userLastBar = userScreen->lastBar;
 
-	if (param.compare("fromsq") == 0)
+	if (param == "fromsq")
 	{
 		sequencer->setActiveSequenceIndex(sequencer->getActiveSequenceIndex() + i);
 
 		displayFromSq();
 
-		auto lastBarIndex = fromSequence->getLastBarIndex();
+    	auto fromSequence = sequencer->getActiveSequence();
+		auto lastBarIndex = fromSequence->isUsed() ? fromSequence->getLastBarIndex() : userLastBar;
+
+        if (firstBar > lastBarIndex)
+        {
+            setFirstBar(lastBarIndex, lastBarIndex);
+        }
 
 		if (lastBar > lastBarIndex)
-			setLastBar(lastBarIndex, lastBarIndex); // Implies any necessary calls to setFirstBar
+        {
+            setLastBar(lastBarIndex, lastBarIndex);
+        }
 	}
-	else if (param.compare("tosq") == 0)
+	else if (param == "tosq")
 	{
 		eventsScreen->setToSq(eventsScreen->toSq + i);
 
 		displayToSq();
 
-		if (afterBar > toSequence->getLastBarIndex())
-			setAfterBar(toSequence->getLastBarIndex(), toSequence->getLastBarIndex());
+        auto toSequence = sequencer->getSequence(eventsScreen->toSq).lock();
+        auto maxAfterBarIndex = toSequence->isUsed() ? toSequence->getLastBarIndex() + 1 : 0;
+
+        if (afterBar > maxAfterBarIndex)
+        {
+            setAfterBar(maxAfterBarIndex, maxAfterBarIndex);
+        }
 	}
-	else if (param.compare("afterbar") == 0)
+	else if (param == "afterbar")
 	{
-		setAfterBar(afterBar + i, toSequence->getLastBarIndex());
+        auto toSequence = sequencer->getSequence(eventsScreen->toSq).lock();
+
+        if (!toSequence->isUsed())
+        {
+            return;
+        }
+
+		setAfterBar(afterBar + i, toSequence->getLastBarIndex() + 1);
 	}
-	else if (param.compare("firstbar") == 0)
+	else if (param == "firstbar")
 	{
-		setFirstBar(firstBar + i, fromSequence->getLastBarIndex());
+        auto fromSequence = sequencer->getActiveSequence();
+        auto lastBarIndex = fromSequence->isUsed() ? fromSequence->getLastBarIndex() : userLastBar;
+
+        setFirstBar(firstBar + i, lastBarIndex);
 	}
-	else if (param.compare("lastbar") == 0)
+	else if (param == "lastbar")
 	{
-		setLastBar(lastBar + i, fromSequence->getLastBarIndex());
+        auto fromSequence = sequencer->getActiveSequence();
+        auto lastBarIndex = fromSequence->isUsed() ? fromSequence->getLastBarIndex() : userLastBar;
+
+        setLastBar(lastBar + i, lastBarIndex);
 	}
-	else if (param.compare("copies") == 0)
+	else if (param == "copies")
 	{
-		setCopies(eventsScreen->copies + i);
+        auto toSequence = sequencer->getSequence(eventsScreen->toSq).lock();
+
+        if (!toSequence->isUsed())
+        {
+            mpc::Util::initSequence(eventsScreen->toSq, mpc);
+        }
+
+        setCopies(eventsScreen->copies + i);
 	}
 }
 
@@ -215,8 +278,19 @@ void BarsScreen::displayFirstBar()
 
 void BarsScreen::setLastBar(int i, int max)
 {
-	if (i < 0 || i > max)
-		return;
+	if (i < 0)
+    {
+        return;
+    }
+
+    if (i > max)
+    {
+        if (lastBar == max)
+        {
+            return;
+        }
+        i = max;
+    }
 
 	lastBar = i;
 
@@ -228,8 +302,18 @@ void BarsScreen::setLastBar(int i, int max)
 
 void BarsScreen::setFirstBar(int i, int max)
 {
-	if (i < 0 || i > max)
-		return;
+	if (i < 0)
+    {
+        return;
+    }
+    if (i > max)
+    {
+        if (firstBar == max)
+        {
+            return;
+        }
+        i = max;
+    }
 
 	firstBar = i;
 	
@@ -241,8 +325,19 @@ void BarsScreen::setFirstBar(int i, int max)
 
 void BarsScreen::setAfterBar(int i, int max)
 {
-	if (i < 0 || i > max + 1)
-		return;
+	if (i < 0)
+    {
+        return;
+    }
+
+    if (i > max)
+    {
+        if (afterBar == max)
+        {
+            return;
+        }
+        i = max;
+    }
 
 	afterBar = i;
 	displayAfterBar();

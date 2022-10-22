@@ -32,6 +32,7 @@ namespace mpc::lcdgui::screens
 	class InitScreen;
 	class SequencerScreen;
 	class EventsScreen;
+	class BarsScreen;
 }
 
 namespace mpc::lcdgui::screens
@@ -100,6 +101,7 @@ namespace mpc::lcdgui::screens
 		friend class mpc::file::all::Defaults;
 		friend class mpc::lcdgui::screens::SequencerScreen;
 		friend class mpc::lcdgui::screens::EventsScreen;
+		friend class mpc::lcdgui::screens::BarsScreen;
 		friend class mpc::nvram::NvRam;
 		friend class mpc::sequencer::Sequence;
 		friend class mpc::sequencer::Sequencer;

@@ -56,33 +56,55 @@ void EventsScreen::open()
 	note1Field->setSize(47, 9);
 	note1Field->setAlignment(Alignment::Centered, 18);
 
-    setFromSq(sequencer->getActiveSequenceIndex());
-    setToSq(sequencer->getActiveSequenceIndex());
-
 	if (tab != 0)
 	{
 		openScreen(tabNames[tab]);
 		return;
 	}
 
-	setFromTr(sequencer->getActiveTrackIndex());
-	setToTr(sequencer->getActiveTrackIndex());
+    auto previousScreenWasSequencer = ls.lock()->getPreviousScreenName() == "sequencer";
+    auto seq = sequencer->getActiveSequence();
 
-	auto seq = sequencer->getActiveSequence();
+    if (previousScreenWasSequencer)
+    {
+        setFromTr(sequencer->getActiveTrackIndex());
+        setToTr(sequencer->getActiveTrackIndex());
 
-	if (!seq->isUsed())
-	{
-		auto userScreen = mpc.screens->get<UserScreen>("user");
-		seq->init(userScreen->lastBar);
-	}
+        if (!seq->isUsed())
+        {
+            auto userScreen = mpc.screens->get<UserScreen>("user");
+            seq->init(userScreen->lastBar);
+        }
 
-	time0 = 0;
-	time1 = seq->getLastTick();
+        setToSq(sequencer->getActiveSequenceIndex());
+        time0 = 0;
+        time1 = seq->getLastTick();
+        start = 0;
+    }
+    else
+    {
+        if (time0 > seq->getLastTick())
+        {
+            time0 = 0;
+        }
+
+        if (time1 > seq->getLastTick())
+        {
+            time1 = 0;
+        }
+
+        auto toSeqLastTick = sequencer->getSequence(toSq).lock()->getLastTick();
+
+        if (start > toSeqLastTick)
+        {
+            start = toSeqLastTick;
+        }
+    }
+
+    displayFromSq();
 	displayTime();
-
 	displayEdit();
 	displayNotes();
-
 	displayMode();
 	displayStart();
 	displayCopies();
@@ -113,6 +135,11 @@ void EventsScreen::function(int i)
 
 		if (editFunctionNumber == 0)
 		{
+            if (!fromSequence->isUsed())
+            {
+                return;
+            }
+
 			auto destStart = start;
 			auto destOffset = destStart - sourceStart;
 			
@@ -170,6 +197,7 @@ void EventsScreen::function(int i)
 			}
 
 			destTrack->sortEvents();
+            sequencer->setActiveSequenceIndex(toSq);
 		}
 		else if (editFunctionNumber == 1)
 		{

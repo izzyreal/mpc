@@ -241,16 +241,21 @@ int Util::getTextWidthInPixels(const string& text)
 
 void Util::initSequence(mpc::Mpc& mpc)
 {
+    initSequence(mpc.getSequencer().lock()->getActiveSequenceIndex(), mpc);
+}
+
+void Util::initSequence(int sequenceIndex, mpc::Mpc& mpc)
+{
     auto sequencer = mpc.getSequencer().lock();
-    auto sequence = sequencer->getActiveSequence();
+    auto sequence = sequencer->getSequence(sequenceIndex).lock();
     
     if (sequence->isUsed())
         return;
     
     auto userScreen = mpc.screens->get<UserScreen>("user");
     sequence->init(userScreen->lastBar);
-    int index = sequencer->getActiveSequenceIndex();
-    string name = StrUtil::trim(sequencer->getDefaultSequenceName()) + StrUtil::padLeft(to_string(index + 1), "0", 2);
+    auto numberString = StrUtil::padLeft(to_string(sequenceIndex + 1), "0", 2);
+    std::string name = StrUtil::trim(sequencer->getDefaultSequenceName()) + numberString;
     sequence->setName(name);
     sequencer->setActiveSequenceIndex(sequencer->getActiveSequenceIndex());
 }
