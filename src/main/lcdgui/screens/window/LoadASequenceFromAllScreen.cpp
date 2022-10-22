@@ -1,7 +1,6 @@
 #include "LoadASequenceFromAllScreen.hpp"
 
 #include <sequencer/Sequence.hpp>
-#include <sequencer/Sequencer.hpp>
 
 #include <lcdgui/screens/window/LoadASequenceScreen.hpp>
 
@@ -53,7 +52,7 @@ void LoadASequenceFromAllScreen::function(int i)
 		{
 			auto loadASequenceScreen = mpc.screens->get<LoadASequenceScreen>("load-a-sequence");
 			sequencer->setSequence(loadASequenceScreen->loadInto, candidate);
-			openScreen("sequencer");
+			openScreen("load");
 		}
 		break;
 	}
