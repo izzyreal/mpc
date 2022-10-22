@@ -79,7 +79,7 @@ void StepEditorScreen::open()
 
 	if (track.lock()->getBus() != 0)
 	{
-		int pgm = sampler->getDrumBusProgramNumber(track.lock()->getBus());
+		int pgm = sampler->getDrumBusProgramIndex(track.lock()->getBus());
 		program = sampler->getProgram(pgm);
 		findField("fromnote").lock()->setAlignment(Alignment::None);
 	}

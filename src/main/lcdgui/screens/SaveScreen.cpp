@@ -230,7 +230,7 @@ void SaveScreen::turnWheel(int i)
             case 3:
             {
                 auto nr = sequencer->getActiveSequence()->getTrack(sequencer->getActiveTrackIndex())->getBus();
-                sampler->setDrumBusProgramNumber(nr, sampler->getDrumBusProgramNumber(nr) + i);
+                sampler->setDrumBusProgramIndex(nr, sampler->getDrumBusProgramIndex(nr) + i);
                 break;
             }
             case 4:

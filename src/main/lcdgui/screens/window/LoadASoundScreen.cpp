@@ -136,7 +136,7 @@ void LoadASoundScreen::keepSound()
             auto track = sequence->getTrack(sequencer->getActiveTrackIndex());
 
             auto bus = track->getBus();
-            auto programNumber = sampler->getDrumBusProgramNumber(bus);
+            auto programNumber = sampler->getDrumBusProgramIndex(bus);
             auto program = sampler->getProgram(programNumber);
             auto noteParameters = sampler->getLastNp(program.lock().get());
             noteParameters->setSoundIndex(sampler->getSoundCount() - 1);

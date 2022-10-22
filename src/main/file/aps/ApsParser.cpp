@@ -88,7 +88,7 @@ ApsParser::ApsParser(mpc::Mpc& mpc, string apsNameString)
 	for (int i = 0; i < 4; i++)
 	{
 		auto mixer = ApsMixer(sampler->getDrumStereoMixerChannels(i), sampler->getDrumIndivFxMixerChannels(i));
-		auto drumConfig = ApsDrumConfiguration(sampler->getDrumBusProgramNumber(i + 1), sampler->getDrum(i)->receivesPgmChange(), sampler->getDrum(i)->receivesMidiVolume());
+		auto drumConfig = ApsDrumConfiguration(sampler->getDrumBusProgramIndex(i + 1), sampler->getDrum(i)->receivesPgmChange(), sampler->getDrum(i)->receivesMidiVolume());
 	
 		chunks.push_back(mixer.getBytes());
 		

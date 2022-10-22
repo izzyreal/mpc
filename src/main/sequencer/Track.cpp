@@ -620,7 +620,7 @@ void Track::playNext()
             trackIndex < 64 &&
             busNumber > 0)
         {
-            auto pgmIndex = mpc.getSampler().lock()->getDrumBusProgramNumber(busNumber);
+            auto pgmIndex = mpc.getSampler().lock()->getDrumBusProgramIndex(busNumber);
             auto pgm = mpc.getSampler().lock()->getProgram(pgmIndex).lock();
 
             bool oneOrMorePadsArePressed = false;

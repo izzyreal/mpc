@@ -285,32 +285,16 @@ std::weak_ptr<Program> Sampler::addProgram()
 
 void Sampler::deleteProgram(std::weak_ptr<Program> _program)
 {
-	auto program = _program.lock();
-	
-	int firstValidProgram;
-	
-	for (firstValidProgram = 0; firstValidProgram < programs.size(); firstValidProgram++)
-	{
-		if (programs[firstValidProgram] && programs[firstValidProgram] != program)
-		{
-			for (auto& bus : mpc.getDrums())
-			{
-				if (programs[bus->getProgram()] == program)
-					bus->setProgram(firstValidProgram);
-			}
-	
-			break;
-		}
-	}
-
 	for (auto&& p : programs)
 	{
-		if (p == program)
+		if (p == _program.lock())
 		{
 			p.reset();
 			break;
 		}
 	}
+
+    repairProgramReferences();
 }
 
 std::vector<std::weak_ptr<Sound>> Sampler::getSounds()
@@ -390,18 +374,14 @@ void Sampler::deleteAllPrograms(bool init)
 		return;
 
 	addProgram().lock()->setName("NewPgm-A");
-	checkProgramReferences();
+    repairProgramReferences();
 }
 
-void Sampler::checkProgramReferences()
+void Sampler::repairProgramReferences()
 {
-	auto lSequencer = mpc.getSequencer().lock();
-//	auto t = lSequencer->getActiveSequence()->getTrack(lSequencer->getActiveTrackIndex());
-//	auto bus = t->getBus();
-
 	for (int busIndex = 1; busIndex < 5; busIndex++)
 	{
-		auto pgm = getDrumBusProgramNumber(busIndex);
+		auto pgm = getDrumBusProgramIndex(busIndex);
 		
 		if (!programs[pgm])
 		{
@@ -423,7 +403,7 @@ void Sampler::checkProgramReferences()
                 }
             }
 
-            setDrumBusProgramNumber(busIndex, pgm);
+            setDrumBusProgramIndex(busIndex, pgm);
 		}
 	}
 }
@@ -1005,12 +985,12 @@ void Sampler::mergeToStereo(std::vector<float>* sourceLeft, std::vector<float>* 
 	}
 }
 
-void Sampler::setDrumBusProgramNumber(int busNumber, int programNumber)
+void Sampler::setDrumBusProgramIndex(int busNumber, int programIndex)
 {
-	mpc.getDrums()[busNumber - 1]->setProgram(programNumber);
+	mpc.getDrums()[busNumber - 1]->setProgram(programIndex);
 }
 
-int Sampler::getDrumBusProgramNumber(int busNumber)
+int Sampler::getDrumBusProgramIndex(int busNumber)
 {
 	return mpc.getDrums()[busNumber - 1]->getProgram();
 }

@@ -60,7 +60,7 @@ public:
     void replaceProgram(std::weak_ptr<Program> p, int index);
     void deleteProgram(std::weak_ptr<Program> program);
     void deleteAllPrograms(bool init);
-    void checkProgramReferences();
+    void repairProgramReferences();
     std::vector<std::weak_ptr<Sound>> getSounds();
     std::weak_ptr<Sound> addSound();
     std::weak_ptr<Sound> addSound(int sampleRate);
@@ -87,8 +87,8 @@ public:
     int getUnusedSampleCount();
     void purge();
     void mergeToStereo(std::vector<float>* sourceLeft, std::vector<float>* sourceRight, std::vector<float>* dest);
-    void setDrumBusProgramNumber(int busNumber, int programNumber);
-    int getDrumBusProgramNumber(int busNumber);
+    void setDrumBusProgramIndex(int busNumber, int programIndex);
+    int getDrumBusProgramIndex(int busNumber);
     ctoot::mpc::MpcSoundPlayerChannel* getDrum(int i);
     int getUsedProgram(int startIndex, bool up);
     int checkExists(std::string soundName);

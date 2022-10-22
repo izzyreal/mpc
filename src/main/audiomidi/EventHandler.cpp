@@ -162,7 +162,7 @@ void EventHandler::handleNoThru(const weak_ptr<Event>& e, Track* track, int time
     {
         auto pad = me->getPad();
         auto lSampler = sampler.lock();
-        auto p = lSampler->getProgram(lSampler->getDrumBusProgramNumber(track->getBus())).lock();
+        auto p = lSampler->getProgram(lSampler->getDrumBusProgramIndex(track->getBus())).lock();
         auto mixer = p->getStereoMixerChannel(pad).lock();
         
         auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>("mixer-setup");

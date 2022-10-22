@@ -113,7 +113,7 @@ void MpcMidiInput::transport(MidiMessage *msg, int timeStamp)
     auto s = lSequencer->isPlaying() ? lSequencer->getCurrentlyPlayingSequence().lock()
                                      : lSequencer->getActiveSequence();
     auto track = dynamic_pointer_cast<mpc::sequencer::Track>(s->getTrack(note->getTrack()));
-    auto p = lSampler->getProgram(lSampler->getDrumBusProgramNumber(track->getBus())).lock();
+    auto p = lSampler->getProgram(lSampler->getDrumBusProgramIndex(track->getBus())).lock();
     auto controls = mpc.getActiveControls().lock();
 
     Util::setSliderNoteVariationParameters(mpc, note, p);
@@ -446,7 +446,7 @@ void MpcMidiInput::handlePolyAndNote(MidiMessage* msg)
     int note = (*msg->getMessage())[1];
     int velo = (*msg->getMessage())[2];
 
-    auto pgm = sampler.lock()->getDrumBusProgramNumber(bus);
+    auto pgm = sampler.lock()->getDrumBusProgramIndex(bus);
     auto p = sampler.lock()->getProgram(pgm).lock();
 
       auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
