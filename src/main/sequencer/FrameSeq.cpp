@@ -140,6 +140,8 @@ void FrameSeq::work(int nFrames)
                     {
                         move(sequencer->countInStartPos);
                         sequencer->setCountingIn(false);
+                        sequencer->countInStartPos = -1;
+                        sequencer->countInEndPos = -1;
                     }
 
                     continue;

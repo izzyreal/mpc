@@ -571,7 +571,6 @@ void Sequencer::overdubFromStart()
 
 void Sequencer::stop()
 {
-    countingIn = false;
 	stop(-1);
 }
 
@@ -620,7 +619,15 @@ void Sequencer::stop(int tick)
 
     recording = false;
     overdubbing = false;
-    
+
+    if (countingIn)
+    {
+        pos = countInStartPos;
+        countInStartPos = -1;
+        countInEndPos = -1;
+        countingIn = false;
+    }
+
     move(pos);
 
 	if (!bouncing)
@@ -657,6 +664,12 @@ bool Sequencer::isCountingIn()
 void Sequencer::setCountingIn(bool b)
 {
     countingIn = b;
+
+    if (!countingIn)
+    {
+        countInStartPos = -1;
+        countInEndPos = -1;
+    }
 }
 
 void Sequencer::notifyTrack()
