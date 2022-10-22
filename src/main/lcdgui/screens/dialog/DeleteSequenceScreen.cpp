@@ -49,6 +49,6 @@ void DeleteSequenceScreen::function(int i)
 
 void DeleteSequenceScreen::displaySequenceNumberName()
 {
-	auto sequenceName = sequencer->getActiveSequence().lock()->getName();
+	auto sequenceName = sequencer->getActiveSequence()->getName();
 	findField("sq").lock()->setText(StrUtil::padLeft(to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2) + "-" + sequenceName);
 }

@@ -100,13 +100,11 @@ int SequenceNames::getSegmentCount(mpc::sequencer::Sequence* seq)
 	auto segmentCount = 0;
 	for (auto& track : seq->getTracks())
 	{
-	
-		auto t = track.lock();
 
-		if (t->getIndex() > 63)
+		if (track->getIndex() > 63)
 			break;
 
-		for (auto& e : t->getEvents())
+		for (auto& e : track->getEvents())
 		{
 			auto sysEx = dynamic_pointer_cast<mpc::sequencer::SystemExclusiveEvent>(e.lock());
 		

@@ -69,8 +69,7 @@ public:
     std::vector<std::string> getSoundNames();
     std::string getPadName(int i);
     std::vector<std::weak_ptr<Program>> getPrograms();
-    std::vector<float>* getClickSample();
-    void deleteSound(int soundIndex);
+    void deleteSound(int deleteSoundIndex);
     void deleteSound(std::weak_ptr<Sound> sound);
     void trimSample(int sampleNumber, int start, int end);
     void deleteSection(const unsigned int sampleNumber, const unsigned int start, const unsigned int end);

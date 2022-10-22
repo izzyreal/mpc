@@ -197,15 +197,13 @@ void SeqUtil::setTimeSignature(Sequence* sequence, int bar, int num, int den)
 
 	for (auto& t : sequence->getTracks())
 	{
-		auto lTrk = t.lock();
-
-		if (lTrk->getIndex() == 64 || lTrk->getIndex() == 65)
+		if (t->getIndex() == 64 || t->getIndex() == 65)
 			continue;
 
 		vector<weak_ptr<Event>> toRemove;
 		bool keep;
 
-		for (auto& event : lTrk->getEvents())
+		for (auto& event : t->getEvents())
 		{
 			keep = false;
 			auto e = event.lock();
@@ -234,7 +232,7 @@ void SeqUtil::setTimeSignature(Sequence* sequence, int bar, int num, int den)
 		}
 
 		for (auto& e : toRemove)
-			lTrk->removeEvent(e);
+			t->removeEvent(e);
 	}
 
 	for (int i = 0; i < 999; i++)

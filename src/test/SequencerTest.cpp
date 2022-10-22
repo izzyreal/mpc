@@ -17,8 +17,6 @@ using namespace std;
 
 SCENARIO("Can record and playback from different threads", "[sequencer]")
 {
-    char buffer[2][512];
-    
     const int BUFFER_SIZE = 512;
     const int PROCESS_BLOCK_INTERVAL = 12; // Approximate duration of 512 frames at 44100khz
     const int AUDIO_THREAD_TIMEOUT = 4000;
@@ -43,20 +41,19 @@ SCENARIO("Can record and playback from different threads", "[sequencer]")
         mpc.init(44100, 1, 5);
         
         auto seq = mpc.getSequencer().lock();
+        seq->setCountEnabled(false);
         
-        auto sequence = seq->getActiveSequence().lock();
+        auto sequence = seq->getActiveSequence();
         sequence->init(0);
         
-        auto track = seq->getActiveTrack().lock();
+        auto track = seq->getActiveTrack();
                 
         auto server = mpc.getAudioMidiServices().lock()->getAudioServer();
         server->resizeBuffers(512);
         server->setSampleRate(44100);
         
         thread audioThread([&](){
-            
-            Event* e;
-            
+
             int dspCycleCounter = 0;
             
             while (dspCycleCounter++ * PROCESS_BLOCK_INTERVAL < AUDIO_THREAD_TIMEOUT &&
@@ -101,12 +98,12 @@ SCENARIO("Can record and playback from different threads", "[sequencer]")
                     {
                         if (find(begin(recordedTickPos), end(recordedTickPos), hTickPos) == end(recordedTickPos))
                         {
-                            //printf("main thread hits pad 0 at tick %i ...\n", hTickPos);
-                            mpc.getActiveControls().lock()->pad(0, 127, false, hTickPos);
+                            printf("main thread hits pad 0 at tick %i ...\n", hTickPos);
+                            mpc.getActiveControls().lock()->pad(0, 127);
                             
                             this_thread::sleep_for(chrono::milliseconds(2));
                             
-                            //printf("main thread releases pad 0 ...\n");
+                            printf("main thread releases pad 0 ...\n");
                             mpc.getReleaseControls()->simplePad(0);
                         }
                     }

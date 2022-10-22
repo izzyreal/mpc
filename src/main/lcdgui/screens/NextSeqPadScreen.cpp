@@ -41,7 +41,7 @@ void NextSeqPadScreen::right()
 	// Block ScreenComponent::right() default action. Nothing to do.
 }
 
-void NextSeqPadScreen::pad(int padIndexWithBank, int velo, int tick)
+void NextSeqPadScreen::pad(int padIndexWithBank, int velo)
 {
 	init();
 
@@ -114,7 +114,7 @@ void NextSeqPadScreen::displaySeqNumbers()
 
 void NextSeqPadScreen::displaySq()
 {
-	findField("sq").lock()->setText(StrUtil::padLeft(to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2) + "-" + sequencer->getActiveSequence().lock()->getName());
+	findField("sq").lock()->setText(StrUtil::padLeft(to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2) + "-" + sequencer->getActiveSequence()->getName());
 }
 
 void NextSeqPadScreen::displaySeq(int i)

@@ -19,17 +19,13 @@ Sequence::Sequence(mpc::Mpc& _mpc)
 {
 	for (int i = 0; i < 64; i++)
 	{
-		tracks.push_back(make_shared<Track>(mpc, this, i));
-        weakTracks.push_back(tracks.back());
+		tracks.emplace_back(std::make_shared<Track>(mpc, this, i));
 		tracks[i]->setName(defaultTrackNames[i]);
 	}
 
 	metaTracks.push_back(make_shared<Track>(mpc, this, 64));
 	metaTracks.push_back(make_shared<Track>(mpc, this, 65));
 
-    for (auto& mt : metaTracks)
-        weakMetaTracks.push_back(mt);
-    
 	metaTracks[0]->setUsed(true);
 	metaTracks[1]->setUsed(true);
 	metaTracks[0]->setName("midiclock");
@@ -136,9 +132,9 @@ int Sequence::getLastLoopBarIndex()
 	return lastLoopBarIndex;
 }
 
-vector<weak_ptr<Track>> Sequence::getMetaTracks()
+std::vector<std::shared_ptr<Track>> Sequence::getMetaTracks()
 {
-    return weakMetaTracks;
+    return metaTracks;
 }
 
 void Sequence::initMetaTracks()
@@ -214,7 +210,7 @@ void Sequence::setLoopEnabled(bool b)
 	notifyObservers(string("loop"));
 }
 
-weak_ptr<Track> Sequence::getTrack(int i)
+std::shared_ptr<Track> Sequence::getTrack(int i)
 {
 	return tracks[i];
 }
@@ -262,9 +258,9 @@ void Sequence::setTimeSignature(int bar, int num, int den)
 	sequencer::SeqUtil::setTimeSignature(this, bar, num, den);
 }
 
-vector<weak_ptr<Track>> Sequence::getTracks()
+std::vector<std::shared_ptr<Track>> Sequence::getTracks()
 {
-    return weakTracks;
+    return tracks;
 }
 
 vector<string> Sequence::getDeviceNames()
@@ -372,10 +368,9 @@ void Sequence::purgeAllTracks()
 
 weak_ptr<Track> Sequence::purgeTrack(int i)
 {
-	tracks[i] = make_shared<Track>(mpc, this, i);
+	tracks[i] = std::make_shared<Track>(mpc, this, i);
 	tracks[i]->setName(defaultTrackNames[i]);
-    weakTracks[i] = tracks[i];
-	return tracks[i];
+    return tracks[i];
 }
 
 int Sequence::getDenominator(int i)
@@ -590,7 +585,6 @@ void Sequence::moveTrack(int source, int destination)
 	}
     
     sort(begin(tracks), end(tracks), trackIndexComparator);
-    sort(begin(weakTracks), end(weakTracks), trackIndexComparator);
 }
 
 bool Sequence::isLastLoopBarEnd()

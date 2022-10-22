@@ -70,14 +70,14 @@ void CopyTrackScreen::setTr1(int i)
 
 void CopyTrackScreen::displayTr0()
 {
-	auto seq = sequencer->getActiveSequence().lock();
-	auto tr0Name = seq->getTrack(tr0).lock()->getName();
+	auto seq = sequencer->getActiveSequence();
+	auto tr0Name = seq->getTrack(tr0)->getName();
 	findField("tr0").lock()->setText(StrUtil::padLeft(to_string(tr0 + 1), "0", 2) + "-" + tr0Name);
 }
 
 void CopyTrackScreen::displayTr1()
 {
-	auto seq = sequencer->getActiveSequence().lock();
-	auto tr1Name = seq->getTrack(tr1).lock()->getName();
+	auto seq = sequencer->getActiveSequence();
+	auto tr1Name = seq->getTrack(tr1)->getName();
 	findField("tr1").lock()->setText(StrUtil::padLeft(to_string(tr1 + 1), "0", 2) + "-" + tr1Name);
 }

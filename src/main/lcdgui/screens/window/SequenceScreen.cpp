@@ -18,7 +18,7 @@ void SequenceScreen::open()
 	auto sequenceNameFirstLetterField = findField("sequencenamefirstletter").lock();
 	auto defaultSequenceNameFirstLetterField = findField("defaultnamefirstletter").lock();
 
-	auto seq = sequencer->getActiveSequence().lock();
+	auto seq = sequencer->getActiveSequence();
 
 	sequenceNameFirstLetterField->setText(seq->getName().substr(0, 1));
 	defaultSequenceNameFirstLetterField->setText(sequencer->getDefaultSequenceName().substr(0, 1));
@@ -57,10 +57,10 @@ void SequenceScreen::turnWheel(int i)
     }
     else
     {
-        nameScreen->setName(sequencer->getActiveSequence().lock()->getName());
+        nameScreen->setName(sequencer->getActiveSequence()->getName());
         
         renamer = [&](string& newName) {
-            sequencer->getActiveSequence().lock()->setName(newName);
+            sequencer->getActiveSequence()->setName(newName);
         };
     }
 

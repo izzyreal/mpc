@@ -130,7 +130,7 @@ void TrMoveScreen::function(int i)
 
 		if (isSelected())
 		{
-			auto sequence = sequencer->getActiveSequence().lock();
+			auto sequence = sequencer->getActiveSequence();
 			insert(sequence.get());
 		}
 		else
@@ -174,11 +174,11 @@ void TrMoveScreen::displayTrLabels()
 	}
 
 	auto eventsScreen = mpc.screens->get<EventsScreen>("events");
-	auto sequence = sequencer->getActiveSequence().lock();
+	auto sequence = sequencer->getActiveSequence();
 
 	if (tr0Index >= 0)
 	{
-		tr0Name = sequence->getTrack(tr0Index).lock()->getName();
+		tr0Name = sequence->getTrack(tr0Index)->getName();
 		tr0 += "Tr:" + StrUtil::padLeft(to_string(tr0Index + 1), "0", 2) + "-" + tr0Name;
 	}
 	else
@@ -187,7 +187,7 @@ void TrMoveScreen::displayTrLabels()
 	}
 	if (tr1Index < 64)
 	{
-		tr1Name = sequence->getTrack(tr1Index).lock()->getName();
+		tr1Name = sequence->getTrack(tr1Index)->getName();
 		tr1 += "Tr:" + StrUtil::padLeft(to_string(tr1Index + 1), "0", 2) + "-" + tr1Name;
 	}
 	else
@@ -219,7 +219,7 @@ void TrMoveScreen::displayTrLabels()
 void TrMoveScreen::displayTrFields()
 {
 	auto eventsScreen = mpc.screens->get<EventsScreen>("events");
-	auto sequence = sequencer->getActiveSequence().lock();
+	auto sequence = sequencer->getActiveSequence();
 	
 	if (isSelected())
 	{
@@ -227,7 +227,7 @@ void TrMoveScreen::displayTrFields()
 		findLabel("tomove").lock()->Hide(true);
 		findField("tr").lock()->setLocation(9, 26);
 
-		auto tr0Name = sequence->getTrack(selectedTrackIndex).lock()->getName();
+		auto tr0Name = sequence->getTrack(selectedTrackIndex)->getName();
 		
 		if (tr0Name.length() < 10)
 		{
@@ -241,14 +241,15 @@ void TrMoveScreen::displayTrFields()
 		findLabel("selecttrack").lock()->Hide(false);
 		findLabel("tomove").lock()->Hide(false);
 		findField("tr").lock()->setLocation(108, 26);
-
-		findField("tr").lock()->setText("Tr:" + StrUtil::padLeft(to_string(currentTrackIndex + 1), "0", 2) + "-" + sequence->getTrack(currentTrackIndex).lock()->getName());
+        auto trackName = sequence->getTrack(currentTrackIndex)->getName();
+        auto trackIndex = StrUtil::padLeft(to_string(currentTrackIndex + 1), "0", 2);
+		findField("tr").lock()->setText("Tr:" + trackIndex + "-" + trackName);
 	}
 }
 
 void TrMoveScreen::displaySq()
 {
-	auto sequence = sequencer->getActiveSequence().lock();
+	auto sequence = sequencer->getActiveSequence();
 	findField("sq").lock()->setText(StrUtil::padLeft(to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2));
 	auto sequenceName = "-" + sequence->getName();
 	findLabel("sq-name").lock()->setText(sequenceName);

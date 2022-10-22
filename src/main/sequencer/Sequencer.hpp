@@ -31,7 +31,7 @@ namespace mpc::sequencer
         std::vector<int> getTickValues();
         void playToTick(int targetTick);
         int getActiveSequenceIndex();
-        std::weak_ptr<Track> getActiveTrack();
+        std::shared_ptr<Track> getActiveTrack();
         std::weak_ptr<Sequence> createSeqInPlaceHolder();
         void clearPlaceHolder();
         void movePlaceHolderTo(int destIndex);
@@ -156,9 +156,9 @@ namespace mpc::sequencer
 		void setBeat(int i);
 		void setClock(int i);
 		int getLoopEnd();
-		std::weak_ptr<Sequence> getActiveSequence();
+		std::shared_ptr<Sequence> getActiveSequence();
 		int getUsedSequenceCount();
-		std::vector<std::weak_ptr<Sequence>> getUsedSequences();
+		std::vector<std::shared_ptr<Sequence>> getUsedSequences();
 		std::vector<int> getUsedSequenceIndexes();
 		void goToPreviousEvent();
 		void goToNextEvent();

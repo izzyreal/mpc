@@ -334,7 +334,7 @@ void SongScreen::displayNow0()
 		pastBars += bars;
 	}
 
-	pastBars += sequencer->getPlayedStepRepetitions() * (sequencer->getActiveSequence().lock()->getLastBarIndex() + 1);
+	pastBars += sequencer->getPlayedStepRepetitions() * (sequencer->getActiveSequence()->getLastBarIndex() + 1);
 	
 	findField("now0").lock()->setTextPadded(sequencer->getCurrentBarIndex() + 1 + pastBars, "0");
 }

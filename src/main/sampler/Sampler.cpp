@@ -396,28 +396,36 @@ void Sampler::deleteAllPrograms(bool init)
 void Sampler::checkProgramReferences()
 {
 	auto lSequencer = mpc.getSequencer().lock();
-	auto t = lSequencer->getActiveSequence().lock()->getTrack(lSequencer->getActiveTrackIndex()).lock();
-	auto bus = t->getBus();
+//	auto t = lSequencer->getActiveSequence()->getTrack(lSequencer->getActiveTrackIndex());
+//	auto bus = t->getBus();
 
-	for (int i = 0; i < 4; i++)
+	for (int busIndex = 1; busIndex < 5; busIndex++)
 	{
-		auto pgm = getDrumBusProgramNumber(bus);
+		auto pgm = getDrumBusProgramNumber(busIndex);
 		
 		if (!programs[pgm])
 		{
-			// check what real MPC does in this condition
-			for (int i = 0; i < 24; i++)
-			{
-				if (programs[i])
-					setDrumBusProgramNumber(bus, i);
-			}
+            for (int programIndex = pgm - 1; programIndex > 0; programIndex--) {
+                if (programs[programIndex]) {
+                    pgm = programIndex;
+                    break;
+                }
+            }
+
+            if (!programs[pgm]) {
+                for (int programIndex = 0; programIndex < 24; programIndex++)
+                {
+                    if (programs[programIndex])
+                    {
+                        pgm = programIndex;
+                        break;
+                    }
+                }
+            }
+
+            setDrumBusProgramNumber(busIndex, pgm);
 		}
 	}
-}
-
-std::vector<float>* Sampler::getClickSample()
-{
-	return &clickSample;
 }
 
 std::weak_ptr<MpcSound> Sampler::getMpcSound(int index)
@@ -863,9 +871,9 @@ void Sampler::purge()
 }
 
 
-void Sampler::deleteSound(int soundIndex)
+void Sampler::deleteSound(int deleteSoundIndex)
 {
-	deleteSound(sounds[soundIndex]);
+	deleteSound(sounds[deleteSoundIndex]);
 }
 
 void Sampler::deleteSound(std::weak_ptr<Sound> sound)

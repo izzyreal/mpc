@@ -1,7 +1,6 @@
 #include "DeleteTrackScreen.hpp"
 
 #include <sequencer/Sequence.hpp>
-#include <sequencer/Sequencer.hpp>
 #include <sequencer/Track.hpp>
 
 #include <lang/StrUtil.hpp>
@@ -43,7 +42,7 @@ void DeleteTrackScreen::function(int i)
 		break;
 	case 4:
 	{
-		auto s = sequencer->getActiveSequence().lock();
+		auto s = sequencer->getActiveSequence();
 		s->purgeTrack(tr);
 		openScreen("sequencer");
 	}
@@ -61,7 +60,7 @@ void DeleteTrackScreen::setTr(int i)
 
 void DeleteTrackScreen::displayTr()
 {
-	auto trackName = sequencer->getActiveSequence().lock()->getTrack(tr).lock()->getName();
+	auto trackName = sequencer->getActiveSequence()->getTrack(tr)->getName();
 	findField("tr").lock()->setText(StrUtil::padLeft(to_string(tr + 1), "0", 2) + "-" + trackName);
 }
 

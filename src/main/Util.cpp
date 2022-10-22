@@ -242,7 +242,7 @@ int Util::getTextWidthInPixels(const string& text)
 void Util::initSequence(mpc::Mpc& mpc)
 {
     auto sequencer = mpc.getSequencer().lock();
-    auto sequence = sequencer->getActiveSequence().lock();
+    auto sequence = sequencer->getActiveSequence();
     
     if (sequence->isUsed())
         return;

@@ -96,7 +96,7 @@ AllParser::AllParser(mpc::Mpc& _mpc)
 	for (int i = 0; i < usedSeqs.size(); i++)
 	{
 		auto seq = usedSeqs[i];
-		AllSequence allSeq(seq.lock().get(), mpcSequencer->getUsedSequenceIndexes()[i] + 1);
+		AllSequence allSeq(seq.get(), mpcSequencer->getUsedSequenceIndexes()[i] + 1);
 		chunks.push_back(allSeq.getBytes());
 	}
 	

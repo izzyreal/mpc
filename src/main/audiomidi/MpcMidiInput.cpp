@@ -111,8 +111,8 @@ void MpcMidiInput::transport(MidiMessage *msg, int timeStamp)
   {
     note->setTick(-1);
     auto s = lSequencer->isPlaying() ? lSequencer->getCurrentlyPlayingSequence().lock()
-                                     : lSequencer->getActiveSequence().lock();
-    auto track = dynamic_pointer_cast<mpc::sequencer::Track>(s->getTrack(note->getTrack()).lock());
+                                     : lSequencer->getActiveSequence();
+    auto track = dynamic_pointer_cast<mpc::sequencer::Track>(s->getTrack(note->getTrack()));
     auto p = lSampler->getProgram(lSampler->getDrumBusProgramNumber(track->getBus())).lock();
     auto controls = mpc.getActiveControls().lock();
 
@@ -162,7 +162,7 @@ void MpcMidiInput::transport(MidiMessage *msg, int timeStamp)
         }
         else
         {
-            mpc.getActiveControls().lock()->pad(pad, note->getVelocity(), -1);
+            mpc.getActiveControls().lock()->pad(pad, note->getVelocity());
         }
     }
 
@@ -421,8 +421,8 @@ void MpcMidiInput::transportOmni(MidiMessage *msg, string outputLetter)
 
 void MpcMidiInput::handlePolyAndNote(MidiMessage* msg)
 {
-  auto s = sequencer.lock()->getActiveSequence().lock();
-  auto t = s->getTrack(sequencer.lock()->getActiveTrackIndex()).lock();
+  auto s = sequencer.lock()->getActiveSequence();
+  auto t = s->getTrack(sequencer.lock()->getActiveTrackIndex());
 
   auto bus = t->getBus();
 

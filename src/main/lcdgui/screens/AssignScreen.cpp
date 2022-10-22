@@ -90,9 +90,9 @@ void AssignScreen::turnWheel(int i)
 	}
 }
 
-void AssignScreen::pad(int i, int velo, int tick)
+void AssignScreen::pad(int i, int velo)
 {
-	ScreenComponent::pad(i, velo, 0);
+	ScreenComponent::pad(i, velo);
 	auto nn = program.lock()->getNoteFromPad(i + (mpc.getBank() * 16));
     program.lock()->getSlider()->setAssignNote(nn);
 }

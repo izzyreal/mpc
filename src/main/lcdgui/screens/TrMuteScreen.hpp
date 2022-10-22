@@ -13,7 +13,7 @@ namespace mpc::lcdgui::screens
 		void function(int i) override;
 
 	public:
-		void pad(int padIndexWithBank, int velo, int tick) override;
+		void pad(int padIndexWithBank, int velo) override;
 
 	public:
 		TrMuteScreen(mpc::Mpc& mpc, const int layerIndex);

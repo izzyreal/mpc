@@ -138,7 +138,7 @@ void NextSeqScreen::displaySq()
 	{
 		result.append(StrUtil::padLeft(to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2));
 		result.append("-");
-		result.append(sequencer->getActiveSequence().lock()->getName());
+		result.append(sequencer->getActiveSequence()->getName());
 		findField("sq").lock()->setText(result);
 	}
 }
@@ -181,7 +181,7 @@ void NextSeqScreen::displayTempo()
 void NextSeqScreen::displayTempoLabel()
 {
 	auto currentRatio = -1;
-	auto sequence = sequencer->isPlaying() ? sequencer->getCurrentlyPlayingSequence().lock() : sequencer->getActiveSequence().lock();
+	auto sequence = sequencer->isPlaying() ? sequencer->getCurrentlyPlayingSequence().lock() : sequencer->getActiveSequence();
 	for (auto& e : sequence->getTempoChangeEvents())
 	{
 		auto tce = e.lock();

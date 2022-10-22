@@ -180,7 +180,7 @@ void SequencerScreen::close()
 
 void SequencerScreen::displayVelo()
 {
-	findField("velo").lock()->setTextPadded(to_string(sequencer->getActiveTrack().lock()->getVelocityRatio()));
+	findField("velo").lock()->setTextPadded(to_string(sequencer->getActiveTrack()->getVelocityRatio()));
 }
 
 void SequencerScreen::displayDeviceNumber()
@@ -202,13 +202,13 @@ vector<string> SequencerScreen::busNames = vector<string>{ "MIDI", "DRUM1", "DRU
 
 void SequencerScreen::displayBus()
 {
-	findField("bus").lock()->setText(busNames[sequencer->getActiveTrack().lock()->getBus()]);
+	findField("bus").lock()->setText(busNames[sequencer->getActiveTrack()->getBus()]);
 	displayDeviceName();
 }
 
 void SequencerScreen::displayBars()
 {
-	findField("bars").lock()->setText(to_string(sequencer->getActiveSequence().lock()->getLastBarIndex() + 1));
+	findField("bars").lock()->setText(to_string(sequencer->getActiveSequence()->getLastBarIndex() + 1));
 }
 
 void SequencerScreen::displayPgm()
@@ -231,7 +231,7 @@ void SequencerScreen::displayDeviceName()
 		}
 		else
 		{
-			findLabel("devicename").lock()->setText(sequencer->getActiveSequence().lock()->getDeviceName(track.lock()->getDevice()));
+			findLabel("devicename").lock()->setText(sequencer->getActiveSequence()->getDeviceName(track.lock()->getDevice()));
 		}
 	}
 	else if (track.lock()->getBus() == 0)
@@ -239,7 +239,7 @@ void SequencerScreen::displayDeviceName()
 		if (track.lock()->getDevice() == 0)
 			findLabel("devicename").lock()->setText("NewPgm-A");
 		else
-			findLabel("devicename").lock()->setText(sequencer->getActiveSequence().lock()->getDeviceName(track.lock()->getDevice()));
+			findLabel("devicename").lock()->setText(sequencer->getActiveSequence()->getDeviceName(track.lock()->getDevice()));
 	}
 }
 
@@ -252,7 +252,7 @@ void SequencerScreen::displayTempo()
 void SequencerScreen::displayTempoLabel()
 {
 	auto currentRatio = -1;
-	auto seq = sequencer->getActiveSequence().lock();
+	auto seq = sequencer->getActiveSequence();
 
 	if (!seq->isUsed() || !seq->isTempoChangeOn())
 	{
@@ -297,7 +297,7 @@ void SequencerScreen::displaySq()
 	{
 		result.append(StrUtil::padLeft(to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2));
 		result.append("-");
-		result.append(sequencer->getActiveSequence().lock()->getName());
+		result.append(sequencer->getActiveSequence()->getName());
 		findField("sq").lock()->setText(result);
 	}
 }
@@ -338,14 +338,14 @@ void SequencerScreen::displayLoop()
 }
 
 void SequencerScreen::displayOn() {
-	findField("on").lock()->setText(sequencer->getActiveTrack().lock()->isOn() ? "YES" : "NO");
+	findField("on").lock()->setText(sequencer->getActiveTrack()->isOn() ? "YES" : "NO");
 }
 
 void SequencerScreen::displayTr() {
 	
 	string result = StrUtil::padLeft(to_string(sequencer->getActiveTrackIndex() + 1), "0", 2);
 	result.append("-");
-	result.append(sequencer->getActiveTrack().lock()->getName());
+	result.append(sequencer->getActiveTrack()->getName());
 	findField("tr").lock()->setText(result);
 }
 

@@ -92,12 +92,12 @@ int Sequencer::getActiveSequenceIndex()
 	return activeSequenceIndex;
 }
 
-weak_ptr<Track> Sequencer::getActiveTrack()
+std::shared_ptr<Track> Sequencer::getActiveTrack()
 {
-	if (!getActiveSequence().lock())
+	if (!getActiveSequence())
 		return {};
 
-	return getActiveSequence().lock()->getTrack(activeTrackIndex);
+	return getActiveSequence()->getTrack(activeTrackIndex);
 }
 
 void Sequencer::playToTick(int targetTick)
@@ -119,16 +119,14 @@ void Sequencer::playToTick(int targetTick)
 				break;
 		}
 
-		for (auto& track_ : seq->getTracks()) {
-			auto track = track_.lock();
-
+		for (auto& track : seq->getTracks())
+        {
 			while (track->getNextTick() <= targetTick)
 				track->playNext();
 		}
 
-		for (auto& track_ : seq->getMetaTracks()) {
-			auto track = track_.lock();
-
+		for (auto& track : seq->getMetaTracks())
+        {
 			while (track->getNextTick() <= targetTick)
 				track->playNext();
 		}
@@ -146,7 +144,7 @@ void Sequencer::setTempo(double newTempo)
 	else if (newTempo > 300.0)
 		newTempo = 300.0;
 
-	auto s = getActiveSequence().lock();
+	auto s = getActiveSequence();
 	auto tce = getCurrentTempoChangeEvent().lock();
 
 	if (!s || !s->isUsed() || !tempoSourceSequenceEnabled)
@@ -190,10 +188,10 @@ void Sequencer::setTempo(double newTempo)
 
 double Sequencer::getTempo()
 {
-	if (!isPlaying() && !getActiveSequence().lock()->isUsed())
+	if (!isPlaying() && !getActiveSequence()->isUsed())
 		return tempo;
 
-	auto seq = getActiveSequence().lock();
+	auto seq = getActiveSequence();
 	auto tce = getCurrentTempoChangeEvent().lock();
 
 	if (mpc.getLayeredScreen().lock()->getCurrentScreenName().compare("song") == 0)
@@ -212,7 +210,7 @@ double Sequencer::getTempo()
 				return tce->getTempo();
 		}
 
-		return getActiveSequence().lock()->getInitialTempo();
+		return getActiveSequence()->getInitialTempo();
 	}
 
 	if (seq->isTempoChangeOn() && tce)
@@ -224,7 +222,7 @@ double Sequencer::getTempo()
 weak_ptr<TempoChangeEvent> Sequencer::getCurrentTempoChangeEvent()
 {
 	auto index = -1;
-	auto s = getActiveSequence().lock();
+	auto s = getActiveSequence();
 
 	if (!s->isUsed())
 		return {};
@@ -428,7 +426,7 @@ void Sequencer::play(bool fromStart)
 			move(0);
     }
 	
-	auto s = getActiveSequence().lock();
+	auto s = getActiveSequence();
 	
 	if (countEnabled && !songMode)
 	{
@@ -598,7 +596,7 @@ void Sequencer::stop(int tick)
 	lastNotifiedBeat = -1;
 	lastNotifiedClock = -1;
     //mpc.getEventHandler()->handle(MidiClockEvent(ctoot::midi::core::ShortMessage::STOP), Track(999));
-	auto s1 = getActiveSequence().lock();
+	auto s1 = getActiveSequence();
 	auto s2 = getCurrentlyPlayingSequence().lock();
 	auto pos = getTickPosition();
 	
@@ -728,7 +726,7 @@ shared_ptr<Sequence> Sequencer::copySequence(weak_ptr<Sequence> src)
 
 	for (int i = 0; i < source->getMetaTracks().size(); i++)
 	{
-		copy->getMetaTracks()[i].lock()->removeEvents();
+		copy->getMetaTracks()[i]->removeEvents();
 		copyTrack(source->getMetaTracks()[i], copy->getMetaTracks()[i]);
 	}
 
@@ -764,7 +762,7 @@ void Sequencer::copyTrack(int sourceTrackIndex, int destinationTrackIndex, int s
 	if (sourceSequenceIndex == destinationSequenceIndex && sourceTrackIndex == destinationTrackIndex)
 		return;
 
-	auto src = sequences[sourceSequenceIndex]->getTrack(sourceTrackIndex).lock();
+	auto src = sequences[sourceSequenceIndex]->getTrack(sourceTrackIndex);
 	auto dest = sequences[destinationSequenceIndex]->purgeTrack(destinationTrackIndex).lock();
 	copyTrack(src, dest);
 }
@@ -844,7 +842,7 @@ void Sequencer::setDefaultTrackName(string s, int i)
 
 int Sequencer::getCurrentBarIndex()
 {
-	auto s = isPlaying() ? getCurrentlyPlayingSequence().lock() : getActiveSequence().lock();
+	auto s = isPlaying() ? getCurrentlyPlayingSequence().lock() : getActiveSequence();
 	auto pos = getTickPosition();
 
 	if (pos == s->getLastTick())
@@ -870,7 +868,7 @@ int Sequencer::getCurrentBarIndex()
 
 int Sequencer::getCurrentBeatIndex()
 {
-	auto s = isPlaying() ? getCurrentlyPlayingSequence().lock() : getActiveSequence().lock();
+	auto s = isPlaying() ? getCurrentlyPlayingSequence().lock() : getActiveSequence();
 	auto pos = getTickPosition();
 	if (pos == s->getLastTick()) return 0;
 	auto index = pos;
@@ -907,7 +905,7 @@ int Sequencer::getCurrentBeatIndex()
 
 int Sequencer::getCurrentClockNumber()
 {
-	auto s = isPlaying() ? getCurrentlyPlayingSequence().lock() : getActiveSequence().lock();
+	auto s = isPlaying() ? getCurrentlyPlayingSequence().lock() : getActiveSequence();
 
 	auto clock = getTickPosition();
 	
@@ -958,7 +956,7 @@ void Sequencer::setBar(int i)
 		return;
 	}
 
-	auto s = getActiveSequence().lock();
+	auto s = getActiveSequence();
 	
 	if (i > s->getLastBarIndex() + 1)
 		return;
@@ -1009,7 +1007,7 @@ void Sequencer::setBeat(int i)
 	if (i < 0 || isPlaying())
 		return;
 
-	auto s = getActiveSequence().lock();
+	auto s = getActiveSequence();
 	auto pos = getTickPosition();
 	
 	if (pos == s->getLastTick())
@@ -1033,7 +1031,7 @@ void Sequencer::setClock(int i)
 	if (i < 0 || isPlaying())
 		return;
 
-	auto s = getActiveSequence().lock();
+	auto s = getActiveSequence();
 	int pos = getTickPosition();
 	
 	if (pos == s->getLastTick())
@@ -1056,10 +1054,10 @@ void Sequencer::setClock(int i)
 
 int Sequencer::getLoopEnd()
 {
-    return getActiveSequence().lock()->getLoopEnd();
+    return getActiveSequence()->getLoopEnd();
 }
 
-weak_ptr<Sequence> Sequencer::getActiveSequence()
+std::shared_ptr<Sequence> Sequencer::getActiveSequence()
 {
 	auto songScreen = mpc.screens->get<SongScreen>("song");
 
@@ -1074,9 +1072,9 @@ int Sequencer::getUsedSequenceCount()
     return getUsedSequences().size();
 }
 
-vector<weak_ptr<Sequence>> Sequencer::getUsedSequences()
+std::vector<shared_ptr<Sequence>> Sequencer::getUsedSequences()
 {
-	vector<weak_ptr<Sequence>> usedSeqs;
+	std::vector<std::shared_ptr<Sequence>> usedSeqs;
 
 	for (auto s : sequences)
 	{
@@ -1087,9 +1085,9 @@ vector<weak_ptr<Sequence>> Sequencer::getUsedSequences()
     return usedSeqs;
 }
 
-vector<int> Sequencer::getUsedSequenceIndexes()
+std::vector<int> Sequencer::getUsedSequenceIndexes()
 {
-	vector<int> usedSeqs;
+	std::vector<int> usedSeqs;
 
 	for (int i = 0; i < 99; i++)
 	{
@@ -1103,7 +1101,7 @@ vector<int> Sequencer::getUsedSequenceIndexes()
 
 void Sequencer::goToPreviousEvent()
 {
-	auto t = getActiveSequence().lock()->getTrack(getActiveTrackIndex()).lock();
+	auto t = getActiveSequence()->getTrack(getActiveTrackIndex());
 
 	if (t->getEventIndex() == 0)
 	{
@@ -1150,8 +1148,8 @@ void Sequencer::goToPreviousEvent()
 
 void Sequencer::goToNextEvent()
 {
-	auto s = getActiveSequence().lock();
-	auto t = s->getTrack(getActiveTrackIndex()).lock();
+	auto s = getActiveSequence();
+	auto t = s->getTrack(getActiveTrackIndex());
 
 	if (t->getEvents().size() == 0)
 	{
@@ -1250,7 +1248,7 @@ void Sequencer::goToPreviousStep()
 
 	auto stepSize = TICK_VALUES[noteValue];
 	auto pos = getTickPosition();
-	auto stepCount = static_cast<int>(ceil(getActiveSequence().lock()->getLastTick() / stepSize)) + 1;
+	auto stepCount = static_cast<int>(ceil(getActiveSequence()->getLastTick() / stepSize)) + 1;
 	vector<int> stepGrid(stepCount);
 
 	for (int i = 0; i < stepGrid.size(); i++)
@@ -1281,7 +1279,7 @@ void Sequencer::goToNextStep()
 	auto stepSize = TICK_VALUES[noteValue];
 	auto pos = getTickPosition();
 
-	vector<int> stepGrid(ceil(getActiveSequence().lock()->getLastTick() / stepSize));
+	vector<int> stepGrid(ceil(getActiveSequence()->getLastTick() / stepSize));
 
 	for (int i = 0; i < stepGrid.size(); i++)
 		stepGrid[i] = i * stepSize;
@@ -1368,7 +1366,7 @@ void Sequencer::move(int tick)
 	position = tick;
 	playStartTick = tick;
 
-	auto s = isPlaying() ? getCurrentlyPlayingSequence().lock() : getActiveSequence().lock();
+	auto s = isPlaying() ? getCurrentlyPlayingSequence().lock() : getActiveSequence();
 
 	if (!isPlaying() && songMode)
 		s = sequences[getSongSequenceIndex()];
@@ -1536,7 +1534,7 @@ void Sequencer::setSecondSequenceEnabled(bool b)
 void Sequencer::flushTrackNoteCache()
 {
 	for (auto& t : getCurrentlyPlayingSequence().lock()->getTracks())
-		t.lock()->flushNoteCache();
+		t->flushNoteCache();
 }
 
 void Sequencer::storeActiveSequenceInUndoPlaceHolder()
@@ -1581,7 +1579,7 @@ void Sequencer::playMetronomeTrack()
 
 	metronomeOnly = true;
 	metronomeSeq = make_unique<Sequence>(mpc);
-	auto s = getActiveSequence().lock();
+	auto s = getActiveSequence();
 	metronomeSeq->init(8);
 	metronomeSeq->setTimeSignature(0, 3, s->getNumerator(getCurrentBarIndex()), s->getDenominator(getCurrentBarIndex()));
 	metronomeSeq->setInitialTempo(getTempo());

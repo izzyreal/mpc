@@ -32,10 +32,10 @@ void TrMuteScreen::open()
 
 	sequencer->addObserver(this);
 
-	auto sequence = sequencer->getActiveSequence().lock();
+	auto sequence = sequencer->getActiveSequence();
 	
 	for (int i = 0; i < 64; i++)
-		sequence->getTrack(i).lock()->addObserver(this);
+		sequence->getTrack(i)->addObserver(this);
 
 	for (int i = 0; i < 16; i++)
 	{
@@ -55,10 +55,10 @@ void TrMuteScreen::close()
 {
     mpc.deleteObserver(this);
 	sequencer->deleteObserver(this);
-	auto sequence = sequencer->getActiveSequence().lock();
+	auto sequence = sequencer->getActiveSequence();
 	
 	for (int i = 0; i < 64; i++)
-		sequence->getTrack(i).lock()->deleteObserver(this);
+		sequence->getTrack(i)->deleteObserver(this);
 }
 
 void TrMuteScreen::right()
@@ -66,7 +66,7 @@ void TrMuteScreen::right()
 	// Stop right from propgating to BaseController
 }
 
-void TrMuteScreen::pad(int padIndexWithBank, int velo, int tick)
+void TrMuteScreen::pad(int padIndexWithBank, int velo)
 {
 	init();
 	
@@ -82,8 +82,8 @@ void TrMuteScreen::pad(int padIndexWithBank, int velo, int tick)
 	}
 	else
 	{
-		auto s = sequencer->getActiveSequence().lock();
-		auto t = s->getTrack(padIndexWithBank).lock();
+		auto s = sequencer->getActiveSequence();
+		auto t = s->getTrack(padIndexWithBank);
 		t->setOn(!t->isOn());
 	}
 }
@@ -94,16 +94,16 @@ void TrMuteScreen::turnWheel(int i)
 	
 	if (param.compare("sq") == 0)
 	{
-		auto oldSequence = sequencer->getActiveSequence().lock();
+		auto oldSequence = sequencer->getActiveSequence();
 
 		for (int trackIndex = 0; trackIndex < 64; trackIndex++)
-			oldSequence->getTrack(trackIndex).lock()->deleteObserver(this);
+			oldSequence->getTrack(trackIndex)->deleteObserver(this);
 
 		sequencer->setActiveSequenceIndex(sequencer->getActiveSequenceIndex() + i);
-		auto newSequence = sequencer->getActiveSequence().lock();
+		auto newSequence = sequencer->getActiveSequence();
 		
 		for (int trackIndex = 0; trackIndex < 64; trackIndex++)
-			newSequence->getTrack(trackIndex).lock()->addObserver(this);
+			newSequence->getTrack(trackIndex)->addObserver(this);
 
 		displaySq();
 		refreshTracks();
@@ -159,13 +159,13 @@ void TrMuteScreen::displayTrackNumbers()
 void TrMuteScreen::displaySq()
 {
 	auto sequenceNumber = StrUtil::padLeft(to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2);
-	auto sequenceName = sequencer->getActiveSequence().lock()->getName();
+	auto sequenceName = sequencer->getActiveSequence()->getName();
 	findField("sq").lock()->setText(sequenceNumber + "-" + sequenceName);
 }
 
 void TrMuteScreen::displayTrack(int i)
 {
-	findField(to_string(i + 1)).lock()->setText(sequencer->getActiveSequence().lock()->getTrack(i + bankoffset()).lock()->getName().substr(0, 8));
+	findField(to_string(i + 1)).lock()->setText(sequencer->getActiveSequence()->getTrack(i + bankoffset())->getName().substr(0, 8));
 }
 
 void TrMuteScreen::setTrackColor(int i)
@@ -176,7 +176,7 @@ void TrMuteScreen::setTrackColor(int i)
 	}
 	else
 	{
-		findField(to_string(i + 1)).lock()->setInverted(sequencer->getActiveSequence().lock()->getTrack(i + bankoffset()).lock()->isOn());
+		findField(to_string(i + 1)).lock()->setInverted(sequencer->getActiveSequence()->getTrack(i + bankoffset())->isOn());
 	}
 }
 

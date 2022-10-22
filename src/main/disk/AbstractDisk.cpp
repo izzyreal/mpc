@@ -585,7 +585,7 @@ void AbstractDisk::readPgm2(std::shared_ptr<MpcFile> f)
         try {
             auto loadScreen = mpc.screens->get<LoadScreen>("load");
             auto loadAProgramScreen = mpc.screens->get<LoadAProgramScreen>("load-a-program");
-            auto bus = mpc.getSequencer().lock()->getActiveTrack().lock()->getBus();
+            auto bus = mpc.getSequencer().lock()->getActiveTrack()->getBus();
             
             auto activePgm = bus == 0 ? 0 : mpc.getDrum(bus)->getProgram();
             ProgramLoader::loadProgram(mpc, f, loadAProgramScreen->loadReplaceSound ? activePgm : -1);

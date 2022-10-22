@@ -75,7 +75,7 @@ void TempoChangeScreen::open()
 	a1Field.lock()->setAlignment(Alignment::Centered);
 	a2Field.lock()->setAlignment(Alignment::Centered);
 
-	auto events = sequencer->getActiveSequence().lock()->getTempoChangeEvents();
+	auto events = sequencer->getActiveSequence()->getTempoChangeEvents();
 
 	if (param.length() == 2)
 	{
@@ -104,7 +104,7 @@ void TempoChangeScreen::open()
 
 void TempoChangeScreen::initVisibleEvents()
 {
-	auto seq = sequencer->getActiveSequence().lock();
+	auto seq = sequencer->getActiveSequence();
 
 	for (auto& t : visibleTempoChanges)
 	{
@@ -133,19 +133,19 @@ void TempoChangeScreen::initVisibleEvents()
 
 void TempoChangeScreen::displayInitialTempo()
 {
-	auto seq = sequencer->getActiveSequence().lock();
+	auto seq = sequencer->getActiveSequence();
 	findField("initial-tempo").lock()->setText(Util::tempoString(seq->getInitialTempo()));
 }
 
 void TempoChangeScreen::displayTempoChangeOn()
 {
-	auto sequence = sequencer->getActiveSequence().lock();
+	auto sequence = sequencer->getActiveSequence();
 	findField("tempo-change").lock()->setText(sequence->isTempoChangeOn() ? "YES" : "NO");
 }
 
 void TempoChangeScreen::displayTempoChange0()
 {
-	auto sequence = sequencer->getActiveSequence().lock();
+	auto sequence = sequencer->getActiveSequence();
 	bars[0].lock()->Hide(false);
 	
 	auto tce = visibleTempoChanges[0].lock();
@@ -212,7 +212,7 @@ void TempoChangeScreen::displayTempoChange1()
 
 	a1Field.lock()->setText(to_string(tce->getStepNumber() + 1));
 	
-	auto sequence = sequencer->getActiveSequence().lock();
+	auto sequence = sequencer->getActiveSequence();
 	auto timeSig = sequence->getTimeSignature();
 
 	b1Field.lock()->setTextPadded(tce->getBar(timeSig.getNumerator(), timeSig.getDenominator()) + 1, "0");
@@ -276,7 +276,7 @@ void TempoChangeScreen::displayTempoChange2()
 	bars[2].lock()->Hide(false);
 	a2Field.lock()->setText(to_string(tce->getStepNumber() + 1));
 
-	auto sequence = sequencer->getActiveSequence().lock();
+	auto sequence = sequencer->getActiveSequence();
 	auto timeSig = sequence->getTimeSignature();
 	b2Field.lock()->setTextPadded(tce->getBar(timeSig.getNumerator(), timeSig.getDenominator()) + 1, "0");
 	c2Field.lock()->setTextPadded(tce->getBeat(timeSig.getNumerator(), timeSig.getDenominator()) + 1, "0");
@@ -336,7 +336,7 @@ void TempoChangeScreen::function(int j)
 	if (param.length() == 2)
 		yPos = stoi(param.substr(1, 2));
 
-	auto seq = sequencer->getActiveSequence().lock();
+	auto seq = sequencer->getActiveSequence();
 
 	auto tceList = seq->getTempoChangeEvents();
 
@@ -450,7 +450,7 @@ void TempoChangeScreen::function(int j)
 void TempoChangeScreen::init()
 {
 	ScreenComponent::init();
-	auto seq = sequencer->getActiveSequence().lock();
+	auto seq = sequencer->getActiveSequence();
 	auto tceList = seq->getTempoChangeEvents();
 
 	if (param.length() != 2)
@@ -482,7 +482,7 @@ void TempoChangeScreen::turnWheel(int j)
 {
 	init();
 	
-	auto seq = sequencer->getActiveSequence().lock();
+	auto seq = sequencer->getActiveSequence();
 	auto tceList = seq->getTempoChangeEvents();
 
 	if (param.compare("tempo-change") == 0)
@@ -583,7 +583,7 @@ void TempoChangeScreen::down()
 	{
 		setOffset(offset + 1);
 
-		auto sequence = sequencer->getActiveSequence().lock();
+		auto sequence = sequencer->getActiveSequence();
 
 		if (offset + yPos == sequence->getTempoChangeEvents().size() && param[0] != 'a')
 			ls.lock()->setFocus("a2");

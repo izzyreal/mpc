@@ -263,7 +263,7 @@ std::shared_ptr<Event> Track::addEvent(int tick, const std::string& type)
 
 weak_ptr<Event> Track::cloneEventIntoTrack(weak_ptr<Event> src)
 {
-	auto seq = sequencer->getActiveSequence().lock().get();
+	auto seq = sequencer->getActiveSequence().get();
 
 	shared_ptr<Event> res;
 	auto tce = dynamic_pointer_cast<TempoChangeEvent>(src.lock());
@@ -756,7 +756,7 @@ std::vector<std::shared_ptr<Event>> Track::getEventRange(int startTick, int endT
 
 void Track::correctTimeRange(int startPos, int endPos, int stepLength)
 {
-	auto s = sequencer->getActiveSequence().lock();
+	auto s = sequencer->getActiveSequence();
 	int accumBarLengths = 0;
 	auto fromBar = 0;
 	auto toBar = 0;
@@ -814,7 +814,7 @@ int Track::timingCorrectTick(int fromBar, int toBar, int tick, int stepLength)
 	int previousAccumBarLengths = 0;
 	auto barNumber = 0;
 	auto numberOfSteps = 0;
-	auto sequence = sequencer->getActiveSequence().lock();
+	auto sequence = sequencer->getActiveSequence();
 	int segmentStart = 0;
 	int segmentEnd = 0;
 

@@ -17,7 +17,7 @@ void TransScreen::open()
 	findChild("function-keys").lock()->Hide(sequencer->isPlaying());
 
 	setBar0(0);
-	setBar1(sequencer->getActiveSequence().lock()->getLastBarIndex());
+	setBar1(sequencer->getActiveSequence()->getLastBarIndex());
 
 	displayTransposeAmount();
 	displayTr();
@@ -58,7 +58,7 @@ void TransScreen::turnWheel(int i)
 	{
 		auto candidate = bar0 + i;
 		
-		if (candidate < 0 || candidate > sequencer->getActiveSequence().lock()->getLastBarIndex())
+		if (candidate < 0 || candidate > sequencer->getActiveSequence()->getLastBarIndex())
 			return;
 
 		setBar0(candidate);
@@ -67,7 +67,7 @@ void TransScreen::turnWheel(int i)
 	{
 		auto candidate = bar1 + i;
 	
-		if (candidate < 0 || candidate > sequencer->getActiveSequence().lock()->getLastBarIndex())
+		if (candidate < 0 || candidate > sequencer->getActiveSequence()->getLastBarIndex())
 			return;
 
 		setBar1(candidate);
@@ -126,7 +126,7 @@ void TransScreen::displayTransposeAmount()
 
 void TransScreen::displayTr()
 {
-	auto trName = string(tr == -1 ? "ALL" : sequencer->getActiveSequence().lock()->getTrack(tr).lock()->getName());
+	auto trName = string(tr == -1 ? "ALL" : sequencer->getActiveSequence()->getTrack(tr)->getName());
 	findField("tr").lock()->setTextPadded(tr + 1, "0");
 	findLabel("track-name").lock()->setText(trName);
 }

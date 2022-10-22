@@ -330,7 +330,7 @@ void FrameSeq::move(int newTickPos)
 
 void FrameSeq::repeatPad(int tick, int duration)
 {
-    auto track = sequencer->getActiveTrack().lock();
+    auto track = sequencer->getActiveTrack();
 
     if (mpc.getLayeredScreen().lock()->getCurrentScreenName() != "sequencer" ||
         track->getBus() == 0)
@@ -419,7 +419,7 @@ void FrameSeq::triggerClickIfNeeded()
 
     auto pos = getTickPosition();
     auto bar = sequencer->getCurrentBarIndex();
-    auto seq = sequencer->getActiveSequence().lock();
+    auto seq = sequencer->getActiveSequence();
     auto firstTickOfBar = seq->getFirstTickOfBar(bar);
     auto relativePos = pos - firstTickOfBar;
 

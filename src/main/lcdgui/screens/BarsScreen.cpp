@@ -49,7 +49,7 @@ void BarsScreen::function(int j)
 	{
 		auto numberOfBars = (lastBar - firstBar + 1) * eventsScreen->copies;
 
-		auto fromSequence = sequencer->getActiveSequence().lock();
+		auto fromSequence = sequencer->getActiveSequence();
 		auto toSequence = sequencer->getSequence(eventsScreen->toSq).lock();
 
 		if (!toSequence->isUsed())
@@ -109,8 +109,8 @@ void BarsScreen::function(int j)
 
 		for (int i = 0; i < 64; i++)
 		{
-			auto t1 = fromSequence->getTrack(i).lock();
-			auto t2 = toSequence->getTrack(i).lock();
+			auto t1 = fromSequence->getTrack(i);
+			auto t2 = toSequence->getTrack(i);
 
 			for (auto& e : t1->getEvents())
 			{
@@ -140,7 +140,7 @@ void BarsScreen::turnWheel(int i)
 	init();
 
 	auto eventsScreen = mpc.screens->get<EventsScreen>("events");
-	auto fromSequence = sequencer->getActiveSequence().lock();
+	auto fromSequence = sequencer->getActiveSequence();
 	auto toSequence = sequencer->getSequence(eventsScreen->toSq).lock();
 
 	if (param.compare("fromsq") == 0)

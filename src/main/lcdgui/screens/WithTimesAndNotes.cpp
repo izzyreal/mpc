@@ -16,7 +16,7 @@ using namespace std;
 
 bool WithTimesAndNotes::checkAllTimes(mpc::Mpc& mpc, int notch, Sequence* seq)
 {
-	auto sequence = seq != nullptr ? seq : mpc.getSequencer().lock()->getActiveSequence().lock().get();
+	auto sequence = seq != nullptr ? seq : mpc.getSequencer().lock()->getActiveSequence().get();
 	auto param = mpc.getLayeredScreen().lock()->getFocus();
 
 	if (param.compare("time0") == 0)
@@ -62,7 +62,7 @@ bool WithTimesAndNotes::checkAllTimesAndNotes(mpc::Mpc& mpc, int notch, Sequence
 
 	if (param.compare("note0") == 0)
 	{
-		auto track = mpc.getSequencer().lock()->getActiveTrack().lock().get();
+		auto track = mpc.getSequencer().lock()->getActiveTrack().get();
 
 		if (_track != nullptr)
 			track = _track;

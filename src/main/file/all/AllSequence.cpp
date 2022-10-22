@@ -106,7 +106,7 @@ void AllSequence::applyToMpcSeq(shared_ptr<mpc::sequencer::Sequence> mpcSeq)
 
     for (int i = 0; i < 64; i++)
     {
-        auto t = mpcSeq->getTrack(i).lock();
+        auto t = mpcSeq->getTrack(i);
         t->setUsed(at->getStatus(i) == 5 || at->getStatus(i) == 7);
         t->setName(at->getName(i));
         t->setBusNumber(at->getBus(i));
@@ -123,7 +123,7 @@ void AllSequence::applyToMpcSeq(shared_ptr<mpc::sequencer::Sequence> mpcSeq)
         if (track > 128) track -= 128;
         if (track < 0) track += 128;
         if (track > 63) track -= 64;
-        mpcSeq->getTrack(track).lock()->cloneEventIntoTrack(shared_ptr<mpc::sequencer::Event>(e));
+        mpcSeq->getTrack(track)->cloneEventIntoTrack(shared_ptr<mpc::sequencer::Event>(e));
     }
 
     for (int i = 0; i < 32; i++)
@@ -337,12 +337,10 @@ int AllSequence::getSegmentCount(mpc::sequencer::Sequence* seq)
     
     for (auto& track : seq->getTracks())
     {
-        auto t = track.lock();
-        
-        if (t->getIndex() > 63)
+        if (track->getIndex() > 63)
             break;
         
-        for (auto& e : t->getEvents())
+        for (auto& e : track->getEvents())
         {
             auto sysExEvent = dynamic_pointer_cast<mpc::sequencer::SystemExclusiveEvent>(e.lock());
             auto mixerEvent = dynamic_pointer_cast<mpc::sequencer::MixerEvent>(e.lock());
@@ -398,18 +396,16 @@ vector<char> AllSequence::createEventSegmentsChunk(mpc::sequencer::Sequence* seq
     {
         for (auto& track : seq->getTracks())
         {
-            auto t = track.lock();
-            
-            if (t->getIndex() > 63)
+            if (track->getIndex() > 63)
                 break;
             
-            for (auto& event : t->getEvents())
+            for (auto& event : track->getEvents())
             {
                 auto e = event.lock();
                 
                 if (e->getTick() == i)
                 {
-                    e->setTrack(t->getIndex());
+                    e->setTrack(track->getIndex());
                     ea.push_back(AllEvent::mpcEventToBytes(e));
                 }
             }

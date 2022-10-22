@@ -194,7 +194,7 @@ void BaseControls::function(int i)
     }
 }
 
-void BaseControls::pad(int padIndexWithBank, int velo, int tick)
+void BaseControls::pad(int padIndexWithBank, int velo)
 {
     init();
     
@@ -266,10 +266,10 @@ void BaseControls::pad(int padIndexWithBank, int velo, int tick)
         }
     }
     
-    generateNoteOn(note, velocity, -1);
+    generateNoteOn(note, velocity);
 }
 
-void BaseControls::generateNoteOn(int note, int padVelo, int tick)
+void BaseControls::generateNoteOn(int note, int padVelo)
 {
     init();
     
@@ -280,7 +280,7 @@ void BaseControls::generateNoteOn(int note, int padVelo, int tick)
     
     bool isSliderNote = pgm && pgm->getSlider()->getNote() == note;
     
-    bool posIsLastTick = sequencer->getTickPosition() == sequencer->getActiveSequence().lock()->getLastTick();
+    bool posIsLastTick = sequencer->getTickPosition() == sequencer->getActiveSequence()->getLastTick();
     
     bool step = currentScreenName == "step-editor" && !posIsLastTick;
     
@@ -352,7 +352,7 @@ void BaseControls::generateNoteOn(int note, int padVelo, int tick)
         Util::setSliderNoteVariationParameters(mpc, playableEvent, program);
     
     playableEvent->setDuration(0);
-    playableEvent->setTick(tick);
+    playableEvent->setTick(-1);
 
     char drum = -1;
     auto drumScreen = mpc.screens->get<DrumScreen>("drum");
@@ -846,7 +846,7 @@ void BaseControls::erase()
     auto controls = mpc.getControls().lock();
     controls->setErasePressed(true);
     
-    if (!sequencer->getActiveSequence().lock()->isUsed())
+    if (!sequencer->getActiveSequence()->isUsed())
     {
         return;
     }

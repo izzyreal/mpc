@@ -115,7 +115,7 @@ void GlobalReleaseControls::simplePad(int padIndexWithBank)
 	auto note = lTrk->getBus() > 0 ? program.lock()->getPad(padIndexWithBank)->getNote() : padIndexWithBank + 35;
 
 	generateNoteOff(note);
-	bool posIsLastTick = sequencer->getTickPosition() == sequencer->getActiveSequence().lock()->getLastTick();
+	bool posIsLastTick = sequencer->getTickPosition() == sequencer->getActiveSequence()->getLastTick();
 
 	bool maybeRecWithoutPlaying = currentScreenName == "sequencer" && !posIsLastTick;
 	bool stepRec = currentScreenName == "step-editor" && !posIsLastTick;
@@ -152,7 +152,7 @@ void GlobalReleaseControls::simplePad(int padIndexWithBank)
 			int nextPos = sequencer->getTickPosition() + stepLength;
 			auto bar = sequencer->getCurrentBarIndex() + 1;
 			nextPos = lTrk->timingCorrectTick(0, bar, nextPos, stepLength);
-			auto lastTick = sequencer->getActiveSequence().lock()->getLastTick();
+			auto lastTick = sequencer->getActiveSequence()->getLastTick();
 
 			if (nextPos != 0 && nextPos < lastTick)
 			{

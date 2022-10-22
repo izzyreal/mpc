@@ -36,7 +36,7 @@ void TransposePermanentScreen::function(int i)
 			tracks.push_back(transScreen->tr);
 		}
 
-		auto seq = sequencer->getActiveSequence().lock();
+		auto seq = sequencer->getActiveSequence();
 		auto firstTick = seq->getFirstTickOfBar(transScreen->bar0);
 		auto lastTick = seq->getLastTickOfBar(transScreen->bar1);
 		
@@ -44,7 +44,7 @@ void TransposePermanentScreen::function(int i)
 		{
 			auto t = seq->getTrack(trackIndex);
 		
-			for (auto& n : t.lock()->getNoteEvents())
+			for (auto& n : t->getNoteEvents())
 			{
 				if (n->getTick() < firstTick || n->getTick() > lastTick)
 					continue;

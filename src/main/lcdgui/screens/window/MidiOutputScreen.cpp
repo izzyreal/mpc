@@ -33,14 +33,14 @@ void MidiOutputScreen::open()
 
 void MidiOutputScreen::openNameScreen()
 {
-    auto seq = sequencer->getActiveSequence().lock();
+    auto seq = sequencer->getActiveSequence();
     auto nameScreen = mpc.screens->get<NameScreen>("name");
     auto renameDeviceIndex = deviceIndex == 0 ? 1 : deviceIndex + 1;
     nameScreen->setName(seq->getDeviceName(renameDeviceIndex));
     nameScreen->setNameLimit(8);
 
     auto renamer = [&, renameDeviceIndex](string& newName) {
-        sequencer->getActiveSequence().lock()->setDeviceName(renameDeviceIndex, newName);
+        sequencer->getActiveSequence()->setDeviceName(renameDeviceIndex, newName);
     };
     
     nameScreen->setRenamerAndScreenToReturnTo(renamer, "midi-output");
@@ -96,7 +96,7 @@ void MidiOutputScreen::displaySoftThru()
 
 void MidiOutputScreen::displayDeviceName()
 {
-	auto sequence = sequencer->getActiveSequence().lock();
+	auto sequence = sequencer->getActiveSequence();
 	auto devName = sequence->getDeviceName(deviceIndex + 1);
 	
 	findField("firstletter").lock()->setText(devName.substr(0, 1));

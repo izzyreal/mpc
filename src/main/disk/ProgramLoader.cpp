@@ -115,7 +115,7 @@ std::shared_ptr<mpc::sampler::Program> ProgramLoader::loadProgram(mpc::Mpc& mpc,
             noteParameters->setSoundIndex(finalSoundIndex);
         }
 
-        auto track = mpc.getSequencer().lock()->getActiveTrack().lock();
+        auto track = mpc.getSequencer().lock()->getActiveTrack();
         auto loadAProgramScreen = mpc.screens->get<LoadAProgramScreen>("load-a-program");
 
         if (!loadAProgramScreen->clearProgramWhenLoading)

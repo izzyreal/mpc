@@ -17,10 +17,10 @@ ChangeTsigScreen::ChangeTsigScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void ChangeTsigScreen::open()
 {
-	timesignature = sequencer->getActiveSequence().lock()->getTimeSignature();
+	timesignature = sequencer->getActiveSequence()->getTimeSignature();
 
 	bar0 = 0;
-	bar1 = sequencer->getActiveSequence().lock()->getLastBarIndex();
+	bar1 = sequencer->getActiveSequence()->getLastBarIndex();
 
 	displayBars();
 	displayNewTsig();
@@ -33,7 +33,7 @@ void ChangeTsigScreen::function(int i)
 	switch (i)
 	{
 	case 4:
-		auto sequence = sequencer->getActiveSequence().lock();
+		auto sequence = sequencer->getActiveSequence();
 
 		auto barLengths = sequence->getBarLengthsInTicks();
 
@@ -59,7 +59,7 @@ void ChangeTsigScreen::turnWheel(int i)
 {
     init();
 
-	auto seq = sequencer->getActiveSequence().lock();
+	auto seq = sequencer->getActiveSequence();
 
 	if (param.compare("bar0") == 0)
 	{

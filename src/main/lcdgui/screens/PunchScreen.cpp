@@ -25,12 +25,12 @@ void PunchScreen::open()
         return;
     }
     
-    auto lastTick = sequencer->getActiveSequence().lock()->getLastTick();
+    auto lastTick = sequencer->getActiveSequence()->getLastTick();
     
     if (lastTick < time0 || lastTick < time1 || (time0 == 0 && time1 == 0))
     {
         setTime0(0);
-        setTime1(sequencer->getActiveSequence().lock()->getLastTick());
+        setTime1(sequencer->getActiveSequence()->getLastTick());
     }
 
     displayBackground();
@@ -88,7 +88,7 @@ void PunchScreen::displayTime()
 {
     auto ls = mpc.getLayeredScreen().lock();
 
-    auto sequence = sequencer->getActiveSequence().lock().get();
+    auto sequence = sequencer->getActiveSequence().get();
 
     for (int i = 0; i < 3; i++)
     {

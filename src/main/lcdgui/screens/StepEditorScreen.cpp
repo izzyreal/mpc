@@ -221,7 +221,7 @@ void StepEditorScreen::function(int i)
 	}
 	case 3:
 	{
-		bool posIsLastTick = sequencer->getTickPosition() == sequencer->getActiveSequence().lock()->getLastTick();
+		bool posIsLastTick = sequencer->getTickPosition() == sequencer->getActiveSequence()->getLastTick();
 
 		if (selectionEndIndex == -1)
 		{
@@ -559,7 +559,7 @@ void StepEditorScreen::nextBarEnd()
 	auto controls = mpc.getControls().lock();
 
 	if (controls->isGoToPressed())
-		sequencer->setBar(sequencer->getActiveSequence().lock()->getLastBarIndex() + 1);
+		sequencer->setBar(sequencer->getActiveSequence()->getLastBarIndex() + 1);
 	else
 		sequencer->setBar(sequencer->getCurrentBarIndex() + 1);
 
@@ -901,7 +901,7 @@ void StepEditorScreen::refreshEventRows()
 		{
 			eventRow->Hide(false);
 			event->addObserver(this);
-			eventRow->setBus(sequencer->getActiveTrack().lock()->getBus());
+			eventRow->setBus(sequencer->getActiveTrack()->getBus());
 		}
 		else
 		{

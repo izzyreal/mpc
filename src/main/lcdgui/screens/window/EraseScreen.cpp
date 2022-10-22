@@ -20,7 +20,7 @@ EraseScreen::EraseScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void EraseScreen::open()
 {
-	auto bus = sequencer->getActiveTrack().lock()->getBus();
+	auto bus = sequencer->getActiveTrack()->getBus();
 
 	if (bus == 0)
 	{
@@ -39,7 +39,7 @@ void EraseScreen::open()
 
 	setTime0(0);
 
-	auto seq = sequencer->getActiveSequence().lock();
+	auto seq = sequencer->getActiveSequence();
 	setTime1(seq->getLastTick());
 	
 	displayErase();
@@ -90,17 +90,17 @@ void EraseScreen::function(int i)
 			lastIndex = 63;
 		}
 
-		auto midi = sequencer->getActiveTrack().lock()->getBus() == 0;
+		auto midi = sequencer->getActiveTrack()->getBus() == 0;
 
 		auto noteA = note0;
 		auto noteB = midi ? note1 : -1;
 
-		auto seq = sequencer->getActiveSequence().lock();
+		auto seq = sequencer->getActiveSequence();
 
 		for (auto j = startIndex; j < lastIndex + 1; j++)
 		{
 			vector<int> removalIndices;
-			auto t = seq->getTrack(j).lock();
+			auto t = seq->getTrack(j);
 			
 			for (auto k = 0; k < t->getEvents().size(); k++)
 			{
@@ -201,8 +201,8 @@ void EraseScreen::displayTrack()
 	}
 	else
 	{
-		auto sequence = sequencer->getActiveSequence().lock();
-		trackName = sequence->getTrack(track).lock()->getActualName();
+		auto sequence = sequencer->getActiveSequence();
+		trackName = sequence->getTrack(track)->getActualName();
 	}
 
 	findField("track").lock()->setTextPadded(track + 1, " ");
@@ -211,7 +211,7 @@ void EraseScreen::displayTrack()
 
 void EraseScreen::displayTime()
 {
-	auto sequence = sequencer->getActiveSequence().lock().get();
+	auto sequence = sequencer->getActiveSequence().get();
 	findField("time0").lock()->setTextPadded(SeqUtil::getBarFromTick(sequence, time0) + 1, "0");
 	findField("time1").lock()->setTextPadded(SeqUtil::getBeat(sequence, time0) + 1, "0");
 	findField("time2").lock()->setTextPadded(SeqUtil::getClock(sequence, time0), "0");
@@ -246,7 +246,7 @@ void EraseScreen::displayNotes()
 		return;
 	}
 
-	auto bus = sequencer->getActiveTrack().lock()->getBus();
+	auto bus = sequencer->getActiveTrack()->getBus();
 
 	findField("note0").lock()->Hide(false);
 	findLabel("note0").lock()->Hide(false);

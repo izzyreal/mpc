@@ -73,7 +73,7 @@ void MultiRecordingSetupScreen::turnWheel(int i)
 {
 	init();
 	
-	auto seq = sequencer->getActiveSequence().lock();
+	auto seq = sequencer->getActiveSequence();
 	
 	if (param[0] == 'a')
 	{
@@ -111,7 +111,7 @@ void MultiRecordingSetupScreen::turnWheel(int i)
 	{
 		if (visibleMrsLines[yPos]->getTrack() != -1)
 		{
-			auto track = seq->getTrack(visibleMrsLines[yPos]->getTrack()).lock();
+			auto track = seq->getTrack(visibleMrsLines[yPos]->getTrack());
 			track->setDeviceNumber(track->getDevice() + i);
 			displayMrsLine(yPos);
 		}
@@ -157,7 +157,7 @@ void MultiRecordingSetupScreen::down()
 
 void MultiRecordingSetupScreen::displayMrsLine(int i)
 {
-	auto seq = sequencer->getActiveSequence().lock();
+	auto seq = sequencer->getActiveSequence();
 	auto trackIndex = visibleMrsLines[i]->getTrack();
 
 	auto aField = findField("a" + to_string(i)).lock();
@@ -172,7 +172,7 @@ void MultiRecordingSetupScreen::displayMrsLine(int i)
 	}
 	else
 	{
-		auto track = seq->getTrack(visibleMrsLines[i]->getTrack()).lock();
+		auto track = seq->getTrack(visibleMrsLines[i]->getTrack());
 		auto trackNumber = to_string(trackIndex + 1);
 		trackNumber = StrUtil::padLeft(trackNumber, "0", 2);
 		bField->setText(string(trackNumber + "-" + track->getName()));
@@ -184,7 +184,7 @@ void MultiRecordingSetupScreen::displayMrsLine(int i)
 	}
 	else
 	{
-		auto track = seq->getTrack(visibleMrsLines[i]->getTrack()).lock();
+		auto track = seq->getTrack(visibleMrsLines[i]->getTrack());
 		auto dev = track->getDevice();
 
 		if (dev == 0)
@@ -231,8 +231,8 @@ void MultiRecordingSetupScreen::setMrsTrack(int inputNumber, int newTrackNumber)
 		visibleMrsLines[j] = &mrsLines[yOffset + j];
 	
 	init();
-	auto yPos = stoi(param.substr(1, 2));
-	displayMrsLine(yPos);
+	auto displayYPos = stoi(param.substr(1, 2));
+	displayMrsLine(displayYPos);
 }
 
 vector<MultiRecordingSetupLine*> MultiRecordingSetupScreen::getMrsLines()

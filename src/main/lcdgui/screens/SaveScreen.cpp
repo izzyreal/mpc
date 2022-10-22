@@ -146,7 +146,7 @@ void SaveScreen::function(int i)
                     break;
                 }
                 case 1:
-                    seq = sequencer->getActiveSequence().lock();
+                    seq = sequencer->getActiveSequence();
                     if (!seq->isUsed()) return;
                     
                     nameScreen->setName(seq->getName());
@@ -229,7 +229,7 @@ void SaveScreen::turnWheel(int i)
                 break;
             case 3:
             {
-                auto nr = sequencer->getActiveSequence().lock()->getTrack(sequencer->getActiveTrackIndex()).lock()->getBus();
+                auto nr = sequencer->getActiveSequence()->getTrack(sequencer->getActiveTrackIndex())->getBus();
                 sampler->setDrumBusProgramNumber(nr, sampler->getDrumBusProgramNumber(nr) + i);
                 break;
             }
@@ -272,7 +272,7 @@ void SaveScreen::displayType()
 
 void SaveScreen::displayFile()
 {
-    auto seq = sequencer->getActiveSequence().lock();
+    auto seq = sequencer->getActiveSequence();
     string fileName = "";
     
     switch (type)
@@ -311,7 +311,7 @@ void SaveScreen::displayFile()
 
 void SaveScreen::displaySize()
 {
-    auto seq = sequencer->getActiveSequence().lock();
+    auto seq = sequencer->getActiveSequence();
     auto size = 0;
     
     switch (type)
@@ -358,8 +358,8 @@ void SaveScreen::displayDevice()
 
 void SaveScreen::displayDeviceType()
 {
-    auto type = findChild<Label>("device-type").lock();
-    type->setText(mpc.getDisks()[device]->getVolume().typeShortName());
+    auto deviceTypeLabel = findChild<Label>("device-type").lock();
+    deviceTypeLabel->setText(mpc.getDisks()[device]->getVolume().typeShortName());
 }
 
 void SaveScreen::up()

@@ -1,6 +1,5 @@
 #include <lcdgui/screens/window/EraseAllOffTracksScreen.hpp>
 
-#include <lcdgui/LayeredScreen.hpp>
 #include <sequencer/Sequence.hpp>
 #include <sequencer/Track.hpp>
 
@@ -20,14 +19,12 @@ void EraseAllOffTracksScreen::function(int i)
 	{
 	case 4:
 	{
-		auto seq = sequencer->getActiveSequence().lock();
+		auto seq = sequencer->getActiveSequence();
 		int trackCounter = 0;
 
 		for (auto& track : seq->getTracks())
 		{
-			auto t = track.lock();
-
-			if (!t->isOn())
+			if (!track->isOn())
 			{
 				seq->purgeTrack(trackCounter);
 			}

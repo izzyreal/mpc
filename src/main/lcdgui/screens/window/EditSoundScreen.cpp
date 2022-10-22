@@ -733,7 +733,7 @@ void EditSoundScreen::function(int j)
 				}
 
 				auto s = sequencer->getSequence(sequencer->getActiveSequenceIndex()).lock();
-				auto t = s->getTrack(sequencer->getActiveTrackIndex()).lock();
+				auto t = sequencer->getActiveTrack();
 
 				if (t->getBus() != 0)
 				{
