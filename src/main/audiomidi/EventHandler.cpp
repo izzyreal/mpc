@@ -64,28 +64,6 @@ void EventHandler::handleNoThru(const weak_ptr<Event>& e, Track* track, int time
     auto countMetronomeScreen = mpc.screens->get<CountMetronomeScreen>("count-metronome");
     auto isStepEditor = mpc.getLayeredScreen().lock()->getCurrentScreenName() == "step-editor";
 
-    if (track->getName() == "click")
-    {
-        if (!lSequencer->isCountEnabled())
-            return;
-        
-        if (lSequencer->isRecordingOrOverdubbing() && !countMetronomeScreen->getInRec() && !lSequencer->isCountingIn())
-            return;
-        
-        if (!isStepEditor && lSequencer->isPlaying() && !lSequencer->isRecordingOrOverdubbing() && !countMetronomeScreen->getInPlay() && !lSequencer->isCountingIn())
-            return;
-        
-        auto ne = dynamic_pointer_cast<NoteEvent>(event);
-        
-        if (ne->getVelocity() == 0)
-            return;
-        
-        auto fs = mpc.getAudioMidiServices().lock()->getFrameSequencer().lock();
-        auto eventFrame = fs->getEventFrameOffset();
-        sampler.lock()->playMetronome(ne.get(), eventFrame);
-        return;
-    }
-    
     if (lSequencer->isCountingIn() && event->getTick() != -1)
     {
         return;
@@ -196,8 +174,8 @@ void EventHandler::handleNoThru(const weak_ptr<Event>& e, Track* track, int time
             if (busNumber != 0)
             {
                 auto drumIndex = busNumber - 1;
-                auto drum = mpc.getDrum(drumIndex);
-                mixer = drum->getStereoMixerChannels().at(pad).lock();
+                auto mpcSoundPlayerChannel = mpc.getDrum(drumIndex);
+                mixer = mpcSoundPlayerChannel->getStereoMixerChannels().at(pad).lock();
             }
             else
             {

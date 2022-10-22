@@ -240,7 +240,6 @@ void SeqUtil::setTimeSignature(Sequence* sequence, int bar, int num, int den)
 	for (int i = 0; i < 999; i++)
 		sequence->getBarLengthsInTicks()[i] = newBarLengths[i];
 	
-	sequence->createClickTrack();
 	sequence->createMidiClockTrack();
 }
 

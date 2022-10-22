@@ -434,7 +434,14 @@ void Sequencer::play(bool fromStart)
 	{
 		if (countInMode == 2 || (countInMode == 1 && (isRecordingOrOverdubbing())))
 		{
-			move(s->getLoopStart());
+            if (fromStart)
+			    move(s->getLoopStart());
+            else
+                move(s->getFirstTickOfBar(getCurrentBarIndex()));
+
+            countInStartPos = position;
+            countInEndPos = s->getLastTickOfBar(getCurrentBarIndex());
+
 			countingIn = true;
 		}
 	}
@@ -1360,7 +1367,7 @@ void Sequencer::move(int tick)
 	auto oldTick = getTickPosition();
 	position = tick;
 	playStartTick = tick;
-	
+
 	auto s = isPlaying() ? getCurrentlyPlayingSequence().lock() : getActiveSequence().lock();
 
 	if (!isPlaying() && songMode)
@@ -1375,7 +1382,8 @@ void Sequencer::move(int tick)
 	}
 
 	notifyTimeDisplay();
-	notifyObservers(string("tempo"));
+    notifyObservers(string("timesignature"));
+    notifyObservers(string("tempo"));
 }
 
 int Sequencer::getTickPosition()
@@ -1577,7 +1585,6 @@ void Sequencer::playMetronomeTrack()
 	metronomeSeq->init(8);
 	metronomeSeq->setTimeSignature(0, 3, s->getNumerator(getCurrentBarIndex()), s->getDenominator(getCurrentBarIndex()));
 	metronomeSeq->setInitialTempo(getTempo());
-	metronomeSeq->removeFirstMetronomeClick();
 	auto lAms = mpc.getAudioMidiServices().lock();
 	auto fs = lAms->getFrameSequencer().lock();
 	playStartTick = 0;

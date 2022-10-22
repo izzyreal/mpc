@@ -24,6 +24,8 @@ namespace mpc::sequencer
 	{
 
 	public:
+        int countInStartPos = -1;
+        int countInEndPos = -1;
 		Sequencer(mpc::Mpc& mpc);
         
         std::vector<int> getTickValues();

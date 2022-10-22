@@ -43,12 +43,13 @@ namespace mpc::sequencer {
 		bool running = false;
 		bool metronome = false;
 		Clock clock;
-		std::weak_ptr<Sequencer> sequencer;
+		std::shared_ptr<Sequencer> sequencer;
 		int tickFrameOffset = 0;
 
 		void move(int newTickPos);
 		void repeatPad(int tick, int duration);
 		void checkNextSq();
+        void triggerClickIfNeeded();
 
 	public:
         std::vector<EventAfterNFrames> eventsAfterNFrames = std::vector<EventAfterNFrames>(10);

@@ -47,7 +47,7 @@ private:
     
 public:
     double getInitialTempo();
-    void setInitialTempo(const double initialTempo);
+    void setInitialTempo(const double newInitialTempo);
     
     void setLoopStart(int l);
     int getLoopStart();
@@ -60,7 +60,6 @@ public:
     void initMetaTracks();
     
 public:
-    void createClickTrack();
     void createMidiClockTrack();
     void createTempoChangeTrack();
     
@@ -78,7 +77,7 @@ public:
     std::weak_ptr<Track> getTrack(int i);
     void setUsed(bool b);
     bool isUsed();
-    void init(int lastBarIndex);
+    void init(int newLastBarIndex);
     void setTimeSignature(int firstBar, int tsLastBar, int num, int den);
     void setTimeSignature(int bar, int num, int den);
     std::vector<std::weak_ptr<Track>> getTracks();
@@ -88,8 +87,7 @@ public:
     std::vector<std::weak_ptr<TempoChangeEvent>> getTempoChangeEvents();
     std::shared_ptr<TempoChangeEvent> addTempoChangeEvent();
     void removeTempoChangeEvent(int i);
-    void removeTempoChangeEvent(std::weak_ptr<TempoChangeEvent> tce);
-    
+
     bool isTempoChangeOn();
     void setTempoChangeOn(bool b);
     int getLastTick();
@@ -111,9 +109,7 @@ public:
     void initLoop();
     std::vector<int>* getNumerators();
     std::vector<int>* getDenominators();
-    void removeFirstMetronomeClick();
-    int getNoteEventCount();
-    
+
     int getFirstTickOfBar(int index);
     int getLastTickOfBar(int index);
     int getFirstTickOfBeat(int bar, int beat);

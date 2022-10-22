@@ -1,9 +1,6 @@
 #include "Field.hpp"
 
-#include "Label.hpp"
-
 #include <Mpc.hpp>
-#include <lcdgui/LayeredScreen.hpp>
 #include <lcdgui/ScreenComponent.hpp>
 #include <lcdgui/Rectangle.hpp>
 

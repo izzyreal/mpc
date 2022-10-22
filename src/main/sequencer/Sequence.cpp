@@ -3,19 +3,14 @@
 #include <Mpc.hpp>
 
 #include <sequencer/Track.hpp>
-#include <sequencer/NoteEvent.hpp>
 #include <sequencer/SeqUtil.hpp>
 #include <sequencer/TempoChangeEvent.hpp>
 #include <sequencer/TimeSignature.hpp>
 
 #include <lcdgui/screens/UserScreen.hpp>
-#include <lcdgui/screens/window/CountMetronomeScreen.hpp>
-#include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
-using namespace mpc::lcdgui::screens::window;
-using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::sequencer;
 using namespace std;
 
@@ -31,17 +26,14 @@ Sequence::Sequence(mpc::Mpc& _mpc)
 
 	metaTracks.push_back(make_shared<Track>(mpc, this, 64));
 	metaTracks.push_back(make_shared<Track>(mpc, this, 65));
-	metaTracks.push_back(make_shared<Track>(mpc, this, 66));
-    
+
     for (auto& mt : metaTracks)
         weakMetaTracks.push_back(mt);
     
 	metaTracks[0]->setUsed(true);
 	metaTracks[1]->setUsed(true);
-	metaTracks[2]->setUsed(true);
-	metaTracks[0]->setName("click");
-	metaTracks[1]->setName("midiclock");
-	metaTracks[2]->setName("tempo");
+	metaTracks[0]->setName("midiclock");
+	metaTracks[1]->setName("tempo");
 
 	auto userScreen = mpc.screens->get<UserScreen>("user");
 
@@ -151,95 +143,26 @@ vector<weak_ptr<Track>> Sequence::getMetaTracks()
 
 void Sequence::initMetaTracks()
 {
-	createClickTrack();
 	createTempoChangeTrack();
 	createMidiClockTrack();
 }
 
-void Sequence::createClickTrack()
-{
-	metaTracks[0]->removeEvents();
-	auto bars = getLastBarIndex() + 1;
-	auto den = 0;
-	auto denTicks = 0;
-
-	auto countMetronomeScreen = mpc.screens->get<CountMetronomeScreen>("count-metronome");
-	auto metronomeSoundScreen = mpc.screens->get<MetronomeSoundScreen>("metronome-sound");
-
-	for (int i = 0; i < bars; i++)
-	{
-		den = denominators[i];
-		denTicks = (int)(96 * (4.0 / den));
-		int barStartPos = 0;
-	
-		for (auto k = 0; k < i; k++)
-		{
-			barStartPos += barLengthsInTicks[k];
-		}
-
-		switch (countMetronomeScreen->getRate())
-		{
-		case 1:
-			denTicks *= 2.0f / 3;
-			break;
-		case 2:
-			denTicks *= 1.0f / 2;
-			break;
-		case 3:
-			denTicks *= 1.0f / 3;
-			break;
-		case 4:
-			denTicks *= 1.0f / 4;
-			break;
-		case 5:
-			denTicks *= 1.0f / 6;
-			break;
-		case 6:
-			denTicks *= 1.0f / 8;
-			break;
-		case 7:
-			denTicks *= 1.0f / 12;
-			break;
-		}
-
-		for (auto j = 0; j < barLengthsInTicks[i]; j += denTicks)
-		{
-			auto n = dynamic_pointer_cast<NoteEvent>(metaTracks[0]->addEvent(barStartPos + j, "note"));
-			n->setDuration(1);
-		
-			if (j == 0)
-			{
-				n->setVelocity(127);
-				n->setNote(1);
-			}
-			else
-			{
-				n->setVelocity(64);
-				n->setNote(1);
-		
-			}
-		}
-	}
-
-	metaTracks[0]->sortEvents();
-}
-
 void Sequence::createMidiClockTrack()
 {
-    auto lastTick = getLastTick();
+//    auto lastTick = getLastTick();
 	//(*metaTracks)[1]->getEvents()->clear();
 	//(*metaTracks)[1]->addEvent(new MidiClockEvent(midi::ShortMessage::START));
-	for (int i = 0; i < lastTick; i += 4) {
+//	for (int i = 0; i < lastTick; i += 4) {
 		// auto mcm = new MidiClockEvent(::javax::sound::midi::ShortMessage::TIMING_CLOCK);
 		//mcm->setTick(i);
 		//(*metaTracks)[1]->addEvent(mcm);
-	}
+//	}
 }
 
 void Sequence::createTempoChangeTrack()
 {
-	metaTracks[2]->removeEvents();
-	auto tce = metaTracks[2]->addEvent(0, "tempo-change");
+	metaTracks[1]->removeEvents();
+	auto tce = metaTracks[1]->addEvent(0, "tempo-change");
 	dynamic_pointer_cast<mpc::sequencer::TempoChangeEvent>(tce)->setStepNumber(0);
 }
 
@@ -306,7 +229,7 @@ bool Sequence::isUsed()
 	return used;
 }
 
-void Sequence::init(int lastBarIndex)
+void Sequence::init(int newLastBarIndex)
 {
 	used = true;
 
@@ -322,7 +245,7 @@ void Sequence::init(int lastBarIndex)
 		t->setVelocityRatio(userScreen->velo);
 	}
 	
-	setLastBar(lastBarIndex);
+	setLastBar(newLastBarIndex);
 	initMetaTracks();
 	initLoop();
     
@@ -358,7 +281,7 @@ vector<weak_ptr<TempoChangeEvent>> Sequence::getTempoChangeEvents()
 {
 	auto res = vector<weak_ptr<TempoChangeEvent>>();
 	
-	for (auto& t : metaTracks[2]->getEvents())
+	for (auto& t : metaTracks[1]->getEvents())
 		res.push_back(dynamic_pointer_cast<TempoChangeEvent>(t.lock()));
 
 	return res;
@@ -366,7 +289,7 @@ vector<weak_ptr<TempoChangeEvent>> Sequence::getTempoChangeEvents()
 
 std::shared_ptr<TempoChangeEvent> Sequence::addTempoChangeEvent()
 {
-	auto res = metaTracks[2]->addEvent(0, "tempo-change");
+	auto res = metaTracks[1]->addEvent(0, "tempo-change");
 	return dynamic_pointer_cast<TempoChangeEvent>(res);
 }
 
@@ -375,13 +298,13 @@ double Sequence::getInitialTempo()
 	return initialTempo;
 }
 
-void Sequence::setInitialTempo(const double initialTempo)
+void Sequence::setInitialTempo(const double newInitialTempo)
 {	
-	this->initialTempo = initialTempo;
+	this->initialTempo = newInitialTempo;
 
-	if (initialTempo < 30.0)
+	if (newInitialTempo < 30.0)
 		this->initialTempo = 30.0;
-	else if (initialTempo > 300.0)
+	else if (newInitialTempo > 300.0)
 		this->initialTempo = 300.0;
 	
 	notifyObservers(string("initial-tempo"));
@@ -390,12 +313,7 @@ void Sequence::setInitialTempo(const double initialTempo)
 
 void Sequence::removeTempoChangeEvent(int i)
 {
-	metaTracks[2]->removeEvent(i);
-}
-
-void Sequence::removeTempoChangeEvent(weak_ptr<TempoChangeEvent> tce)
-{
-	metaTracks[2]->removeEvent(tce);
+	metaTracks[1]->removeEvent(i);
 }
 
 bool Sequence::isTempoChangeOn()
@@ -435,10 +353,10 @@ TimeSignature Sequence::getTimeSignature()
 
 void Sequence::sortTempoChangeEvents()
 {
-	metaTracks[2]->sortEvents();
+	metaTracks[1]->sortEvents();
 	int tceCounter = 0;
 
-	for (auto& e : metaTracks[2]->getEvents())
+	for (auto& e : metaTracks[1]->getEvents())
 	{
 		auto tce = dynamic_pointer_cast<TempoChangeEvent>(e.lock());
 		tce->setStepNumber(tceCounter);
@@ -567,7 +485,6 @@ void Sequence::deleteBars(int firstBar, int _lastBar)
 	if (lastBarIndex  == -1)
 		setUsed(false);
 
-	createClickTrack();
 	createMidiClockTrack();
 }
 
@@ -635,7 +552,6 @@ void Sequence::insertBars(int barCount, int afterBar)
         }
     }
 
-	createClickTrack();
 	createMidiClockTrack();
 
 	if (lastBarIndex != -1)
@@ -707,19 +623,19 @@ void Sequence::initLoop()
 
 	auto firstBar = getFirstLoopBarIndex();
 	auto lastBar = getLastLoopBarIndex() + 1;
-	int loopStart = 0;
-	int loopEnd = 0;
+	int newLoopStart = 0;
+	int newLoopEnd = 0;
 
 	for (int i = 0; i < lastBar; i++)
 	{
 		if (i < firstBar)
-			loopStart += barLengthsInTicks[i];
-	
-		loopEnd += barLengthsInTicks[i];
+            newLoopStart += barLengthsInTicks[i];
+
+        newLoopEnd += barLengthsInTicks[i];
 	}
 
-	setLoopStart(loopStart);
-	setLoopEnd(loopEnd);
+	setLoopStart(newLoopStart);
+	setLoopEnd(newLoopEnd);
 }
 
 vector<int>* Sequence::getNumerators()
@@ -732,25 +648,10 @@ vector<int>* Sequence::getDenominators()
 	return &denominators;
 }
 
-void Sequence::setNumeratorsAndDenominators(vector<int>& numerators, vector<int>& denominators)
+void Sequence::setNumeratorsAndDenominators(vector<int>& newNumerators, vector<int>& newDenominators)
 {
-	this->numerators = numerators;
-	this->denominators = denominators;
-}
-
-void Sequence::removeFirstMetronomeClick()
-{
-	metaTracks[0]->removeEvent(0);
-}
-
-int Sequence::getNoteEventCount()
-{
-	auto eventCounter = 0;
-	
-	for (int i = 0; i < 64; i++)
-		eventCounter += tracks[i]->getNoteEvents().size();
-	
-	return eventCounter;
+	this->numerators = newNumerators;
+	this->denominators = newDenominators;
 }
 
 bool Sequence::trackIndexComparator(weak_ptr<Track> t0, weak_ptr<Track> t1)

@@ -14,6 +14,7 @@
 #include <sequencer/Track.hpp>
 
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
+#include <lcdgui/screens/window/CountMetronomeScreen.hpp>
 #include <lcdgui/screens/SongScreen.hpp>
 #include <lcdgui/screens/PunchScreen.hpp>
 #include <lcdgui/screens/UserScreen.hpp>
@@ -32,9 +33,8 @@ using namespace mpc::sequencer;
 using namespace std;
 
 FrameSeq::FrameSeq(mpc::Mpc& mpc)
-	: mpc(mpc)
+	: mpc(mpc), sequencer(mpc.getSequencer().lock())
 {
-	sequencer = mpc.getSequencer();
 }
 
 void FrameSeq::start(float sampleRate) {
@@ -44,7 +44,7 @@ void FrameSeq::start(float sampleRate) {
 		return;
 
 	clock.init(sampleRate);
-	clock.setTick(sequencer.lock()->getPlayStartTick());
+	clock.setTick(sequencer->getPlayStartTick());
 	running = true;
 }
 
@@ -76,31 +76,32 @@ void FrameSeq::work(int nFrames)
 
 	auto controls = mpc.getControls().lock();
 	auto songScreen = mpc.screens->get<SongScreen>("song");
-	auto lSequencer = sequencer.lock();
-
 
 	frameCounter += nFrames;
 
 	if (frameCounter > 2048)
 	{
-		if (!lSequencer->isCountingIn() && !metronome)
-			lSequencer->notifyTimeDisplayRealtime();
+		if (!sequencer->isCountingIn() && !metronome)
+        {
+            sequencer->notifyTimeDisplayRealtime();
+            sequencer->notifyObservers(std::string("timesignature"));
+        }
 
 		frameCounter = 0;
 	}
 
-	auto seq = lSequencer->getCurrentlyPlayingSequence().lock();
-	double tempo = lSequencer->getTempo();
+	auto seq = sequencer->getCurrentlyPlayingSequence().lock();
+	double tempo = sequencer->getTempo();
 
 	if (tempo != clock.getBpm())
 	{
 		clock.set_bpm(tempo);
-		lSequencer->notify("tempo");
+		sequencer->notify("tempo");
 	}
 
 	auto punchScreen = mpc.screens->get<PunchScreen>("punch");
 
-	auto punch = punchScreen->on && lSequencer->isRecordingOrOverdubbing();
+	auto punch = punchScreen->on && sequencer->isRecordingOrOverdubbing();
 
 	auto punchInTime = punchScreen->time0;
 	auto punchOutTime = punchScreen->time1;
@@ -115,6 +116,8 @@ void FrameSeq::work(int nFrames)
 		if (clock.proc())
 		{
 			tickFrameOffset = i;
+
+            triggerClickIfNeeded();
 
 			if (punch)
 			{
@@ -131,57 +134,53 @@ void FrameSeq::work(int nFrames)
 
 			if (!metronome)
 			{
-				if (lSequencer->isCountingIn())
+				if (sequencer->isCountingIn())
 				{
-                    const int start = seq->getBarLengthsInTicks()[seq->getFirstLoopBarIndex()];
+                    if (getTickPosition() >= sequencer->countInEndPos)
+                    {
+                        move(sequencer->countInStartPos);
+                        sequencer->setCountingIn(false);
+                    }
 
-                    if (getTickPosition() >= start - 1)
-					{
-						lSequencer->playToTick(start - 1);
-						move(seq->isLoopEnabled() ? seq->getLoopStart() : 0);
-						lSequencer->setCountingIn(false);
-						continue;
-					}
-					else {
-						lSequencer->playToTick(getTickPosition());
-						continue;
-					}
+                    continue;
 				}
 
-				if (getTickPosition() >= seq->getLastTick() - 1 && !lSequencer->isSongModeEnabled() && lSequencer->getNextSq() != -1)
+				if (getTickPosition() >= seq->getLastTick() - 1 &&
+                    !sequencer->isSongModeEnabled() &&
+                    sequencer->getNextSq() != -1)
 				{
-					lSequencer->playToTick(getTickPosition());
+					sequencer->playToTick(getTickPosition());
 					checkNextSq();
-					sequencer.lock()->move(0);
-					seq = lSequencer->getCurrentlyPlayingSequence().lock();
+					sequencer->move(0);
+					seq = sequencer->getCurrentlyPlayingSequence().lock();
 					seq->initLoop();
 					move(0);
 					continue;
 				}
-				else if (lSequencer->isSongModeEnabled())
+				else if (sequencer->isSongModeEnabled())
 				{
 					if (getTickPosition() >= seq->getLastTick() - 1)
 					{
-						lSequencer->playToTick(seq->getLastTick() - 1);
-						lSequencer->incrementPlayedStepRepetitions();
-						auto song = lSequencer->getSong(songScreen->getActiveSongIndex()).lock();
+						sequencer->playToTick(seq->getLastTick() - 1);
+						sequencer->incrementPlayedStepRepetitions();
+						auto song = sequencer->getSong(songScreen->getActiveSongIndex()).lock();
 						auto step = songScreen->getOffset() + 1;
 
-						auto doneRepeating = lSequencer->getPlayedStepRepetitions() >= song->getStep(step).lock()->getRepeats();
+						auto doneRepeating = sequencer->getPlayedStepRepetitions() >= song->getStep(step).lock()->getRepeats();
 						auto reachedLastStep = step == song->getStepCount() - 1;
 
 						if (doneRepeating && songScreen->isLoopEnabled() && step == song->getLastStep())
 						{
-							lSequencer->playToTick(seq->getLastTick() - 1);
-							lSequencer->resetPlayedStepRepetitions();
+							sequencer->playToTick(seq->getLastTick() - 1);
+							sequencer->resetPlayedStepRepetitions();
 							songScreen->setOffset(song->getFirstStep() - 1);
 							auto newStep = song->getStep(songScreen->getOffset() + 1).lock();
 
-							if (!lSequencer->getSequence(newStep->getSequence()).lock()->isUsed())
+							if (!sequencer->getSequence(newStep->getSequence()).lock()->isUsed())
                             {
 
-                                lSequencer->playToTick(seq->getLastTick() - 1);
-                                lSequencer->stop();
+                                sequencer->playToTick(seq->getLastTick() - 1);
+                                sequencer->stop();
                                 move(0);
                                 continue;
                             }
@@ -190,27 +189,27 @@ void FrameSeq::work(int nFrames)
 						}
 						else if (doneRepeating && reachedLastStep)
 						{
-							lSequencer->playToTick(seq->getLastTick() - 1);
-							lSequencer->setEndOfSong(true);
-							lSequencer->stop();
-							lSequencer->move(0);
+							sequencer->playToTick(seq->getLastTick() - 1);
+							sequencer->setEndOfSong(true);
+							sequencer->stop();
+							sequencer->move(0);
 							continue;
 						}
 						else
 						{
-							lSequencer->playToTick(seq->getLastTick() - 1);
+							sequencer->playToTick(seq->getLastTick() - 1);
 
 							if (doneRepeating)
 							{
-								lSequencer->resetPlayedStepRepetitions();
+								sequencer->resetPlayedStepRepetitions();
 								songScreen->setOffset(songScreen->getOffset() + 1);
 
 								auto newStep = song->getStep(songScreen->getOffset() + 1).lock();
 
-								if (!lSequencer->getSequence(newStep->getSequence()).lock()->isUsed())
+								if (!sequencer->getSequence(newStep->getSequence()).lock()->isUsed())
                                 {
-                                    lSequencer->playToTick(seq->getLastTick() - 1);
-                                    lSequencer->stop();
+                                    sequencer->playToTick(seq->getLastTick() - 1);
+                                    sequencer->stop();
                                     move(0);
                                     continue;
                                 }
@@ -236,13 +235,13 @@ void FrameSeq::work(int nFrames)
 						if (punch && punchOut && !punchIn)
 							sequencerScreen->setPunchRectOn(1, true);
 
-						lSequencer->playToTick(getTickPosition());
+						sequencer->playToTick(getTickPosition());
 						move(seq->getLoopStart());
 
-						if (lSequencer->isRecordingOrOverdubbing())
+						if (sequencer->isRecordingOrOverdubbing())
 						{
-							if (lSequencer->isRecording())
-								lSequencer->switchRecordToOverDub();
+							if (sequencer->isRecording())
+								sequencer->switchRecordToOverDub();
                         }
 
 						continue;
@@ -252,26 +251,26 @@ void FrameSeq::work(int nFrames)
 				{
 					if (getTickPosition() >= seq->getLastTick())
 					{
-						if (lSequencer->isRecordingOrOverdubbing())
+						if (sequencer->isRecordingOrOverdubbing())
 						{
 							seq->insertBars(1, seq->getLastBarIndex());
 							seq->setTimeSignature(seq->getLastBarIndex(), seq->getLastBarIndex(), userScreen->timeSig.getNumerator(), userScreen->timeSig.getDenominator());
 						}
 						else
 						{
-							lSequencer->stop(seq->getLastTick());
-							lSequencer->move(seq->getLastTick());
+							sequencer->stop(seq->getLastTick());
+							sequencer->move(seq->getLastTick());
 						}
 					}
 				}
 			}
 
-            lSequencer->playToTick(getTickPosition());
+            sequencer->playToTick(getTickPosition());
 
             if (controls && (controls->isTapPressed() || controls->isNoteRepeatLocked()))
             {
                 auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
-                int tcValue = lSequencer->getTickValues()[timingCorrectScreen->getNoteValue()];
+                int tcValue = sequencer->getTickValues()[timingCorrectScreen->getNoteValue()];
                 int swingPercentage = timingCorrectScreen->getSwing();
                 int swingOffset = (int)((swingPercentage - 50) * (4.0 * 0.01) * (tcValue * 0.5));
                 auto shiftTiming = timingCorrectScreen->getAmount() * timingCorrectScreen->isShiftTimingLater() ? 1 : -1;
@@ -321,13 +320,17 @@ int FrameSeq::getTickPosition()
 
 void FrameSeq::move(int newTickPos)
 {
-	sequencer.lock()->move(newTickPos);
-	clock.setTick(newTickPos);
+	// Ugly hack to make sure the expected clock position is shown when
+    // sequencer->move(...) notifies observers.
+    clock.setTick(newTickPos + 1);
+
+    sequencer->move(newTickPos);
+    clock.setTick(newTickPos);
 }
 
 void FrameSeq::repeatPad(int tick, int duration)
 {
-    auto track = sequencer.lock()->getActiveTrack().lock();
+    auto track = sequencer->getActiveTrack().lock();
 
     if (mpc.getLayeredScreen().lock()->getCurrentScreenName() != "sequencer" ||
         track->getBus() == 0)
@@ -375,7 +378,7 @@ void FrameSeq::repeatPad(int tick, int duration)
         mpc.getMms()->mpcTransport(midiAdapter.get().lock().get(), 0, noteEvent->getVariationType(), noteEvent->getVariationValue(), eventFrame, -1);
         p->notifyObservers(newVelo);
 
-        if (sequencer.lock()->isRecordingOrOverdubbing())
+        if (sequencer->isRecordingOrOverdubbing())
         {
             track->insertEventWhileRetainingSort(noteEvent);
         }
@@ -385,13 +388,79 @@ void FrameSeq::repeatPad(int tick, int duration)
 
 void FrameSeq::checkNextSq()
 {
-	auto lSeq = sequencer.lock();
-	lSeq->setCurrentlyPlayingSequenceIndex(lSeq->getNextSq());
-	lSeq->setNextSq(-1);
-	lSeq->notify("nextsqoff");
-	lSeq->notify("seqnumbername");
-    lSeq->notify("timesignature");
-    lSeq->notify("numberofbars");
-    lSeq->notify("tempo");
-    lSeq->notify("loop");
+	sequencer->setCurrentlyPlayingSequenceIndex(sequencer->getNextSq());
+	sequencer->setNextSq(-1);
+	sequencer->notify("nextsqoff");
+	sequencer->notify("seqnumbername");
+    sequencer->notify("timesignature");
+    sequencer->notify("numberofbars");
+    sequencer->notify("tempo");
+    sequencer->notify("loop");
+}
+
+void FrameSeq::triggerClickIfNeeded()
+{
+    if (!sequencer->isCountEnabled())
+        return;
+
+    auto countMetronomeScreen = mpc.screens->get<CountMetronomeScreen>("count-metronome");
+
+    if (sequencer->isRecordingOrOverdubbing() && !countMetronomeScreen->getInRec() && !sequencer->isCountingIn())
+        return;
+
+    auto isStepEditor = mpc.getLayeredScreen().lock()->getCurrentScreenName() == "step-editor";
+
+    if (!isStepEditor &&
+        sequencer->isPlaying() &&
+        !sequencer->isRecordingOrOverdubbing() &&
+        !countMetronomeScreen->getInPlay() &&
+        !sequencer->isCountingIn())
+        return;
+
+    auto pos = getTickPosition();
+    auto bar = sequencer->getCurrentBarIndex();
+    auto seq = sequencer->getActiveSequence().lock();
+    auto firstTickOfBar = seq->getFirstTickOfBar(bar);
+    auto relativePos = pos - firstTickOfBar;
+
+    if (isStepEditor && relativePos == 0)
+    {
+        return;
+    }
+
+    auto den = seq->getDenominator(bar);
+    auto denTicks = (int)(96 * (4.0 / den));
+
+    switch (countMetronomeScreen->getRate())
+    {
+        case 1:
+            denTicks *= 2.0f / 3;
+            break;
+        case 2:
+            denTicks *= 1.0f / 2;
+            break;
+        case 3:
+            denTicks *= 1.0f / 3;
+            break;
+        case 4:
+            denTicks *= 1.0f / 4;
+            break;
+        case 5:
+            denTicks *= 1.0f / 6;
+            break;
+        case 6:
+            denTicks *= 1.0f / 8;
+            break;
+        case 7:
+            denTicks *= 1.0f / 12;
+            break;
+    }
+
+    if (relativePos % denTicks == 0)
+    {
+        NoteEvent clickEvent(1);
+        clickEvent.setVelocity(relativePos == 0 ? 127 : 64);
+        mpc.getSampler().lock()->playMetronome(&clickEvent, getEventFrameOffset());
+        return;
+    }
 }
