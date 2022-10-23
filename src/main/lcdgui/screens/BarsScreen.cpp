@@ -138,10 +138,10 @@ void BarsScreen::function(int j)
 
 		for (int i = 0; i < 64; i++)
 		{
-			auto t1 = fromSequence->getTrack(i);
+			auto t1Events = fromSequence->getTrack(i)->getEventRange(firstTick, lastTick);
 			auto t2 = toSequence->getTrack(i);
 
-			for (auto& event : t1->getEvents())
+			for (auto& event : t1Events)
 			{
 				if (event->getTick() >= firstTick && event->getTick() < lastTick)
 				{

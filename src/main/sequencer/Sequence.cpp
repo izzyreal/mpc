@@ -411,7 +411,9 @@ void Sequence::deleteBars(int firstBar, int _lastBar)
 
 	for (auto& t : tracks)
 	{
-		for (auto& e : t->getEvents())
+        auto events = t->getEvents();
+
+		for (auto& e : events)
 		{
 			if (e->getTick() >= deleteFirstTick && e->getTick() < deleteLastTick)
 				t->removeEvent(e);

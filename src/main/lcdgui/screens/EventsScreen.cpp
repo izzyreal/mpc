@@ -150,7 +150,8 @@ void EventsScreen::function(int i)
 
 			if (!modeMerge)
 			{
-				for (auto& e : destTrack->getEvents())
+                auto destTrackEvents = destTrack->getEvents();
+				for (auto& e : destTrackEvents)
 				{
 					auto tick = e->getTick();
 
@@ -159,7 +160,9 @@ void EventsScreen::function(int i)
 				}
 			}
 
-			for (auto& e : sourceTrack->getEvents())
+            auto sourceTrackEvents = sourceTrack->getEvents();
+
+			for (auto& e : sourceTrackEvents)
 			{
 				auto ne = dynamic_pointer_cast<NoteEvent>(e);
 			
