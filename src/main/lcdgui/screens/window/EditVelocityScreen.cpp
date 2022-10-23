@@ -59,7 +59,7 @@ void EditVelocityScreen::function(int i)
 	case 4:
 		for (auto& event : track.lock()->getEvents())
 		{
-			auto ne = dynamic_pointer_cast<NoteEvent>(event.lock());
+			auto ne = dynamic_pointer_cast<NoteEvent>(event);
 
 			if (ne)
 			{

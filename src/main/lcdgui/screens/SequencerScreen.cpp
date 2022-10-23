@@ -7,7 +7,6 @@
 
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <lcdgui/screens/StepEditorScreen.hpp>
-#include <lcdgui/screens/UserScreen.hpp>
 #include <lcdgui/screens/PunchScreen.hpp>
 #include <lcdgui/PunchRect.hpp>
 
@@ -262,12 +261,10 @@ void SequencerScreen::displayTempoLabel()
 
 	for (auto& tce : seq->getTempoChangeEvents())
 	{
-		auto lTce = tce.lock();
-		
-		if (lTce->getTick() > sequencer->getTickPosition())
+		if (tce->getTick() > sequencer->getTickPosition())
 			break;
 	
-		currentRatio = lTce->getRatio();
+		currentRatio = tce->getRatio();
 	}
 
 	if (currentRatio != 1000)
@@ -290,7 +287,7 @@ void SequencerScreen::displaySq()
 	{
 		result.append(StrUtil::padLeft(to_string(sequencer->getCurrentlyPlayingSequenceIndex() + 1), "0", 2));
 		result.append("-");
-		result.append(sequencer->getCurrentlyPlayingSequence().lock()->getName());
+		result.append(sequencer->getCurrentlyPlayingSequence()->getName());
 		findField("sq").lock()->setText(result);
 	}
 	else
@@ -621,7 +618,7 @@ void SequencerScreen::turnWheel(int i)
 
 			auto stepEditorScreen = mpc.screens->get<StepEditorScreen>("step-editor");
 
-			if (dynamic_pointer_cast<mpc::sequencer::NoteEvent>(stepEditorScreen->getVisibleEvents()[eventNumber].lock()))
+			if (dynamic_pointer_cast<NoteEvent>(stepEditorScreen->getVisibleEvents()[eventNumber]))
 			{
 				if (track.lock()->getBus() == 0)
 				{

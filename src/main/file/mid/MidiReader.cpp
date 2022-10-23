@@ -42,7 +42,6 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
 {
 	auto lSequencer = mpc.getSequencer().lock();
 	auto midiTracks = midiFile->getTracks();
-	int tmp = midiFile->getLengthInTicks();
 	auto lengthInTicks = (int)(midiFile->getLengthInTicks() + midiTracks[0].lock()->getEndOfTrackDelta());
 
 	std::vector<std::weak_ptr<meta::TimeSignature>> timeSignatures;
@@ -50,7 +49,6 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
 
 	auto firstLoopBar = -1;
 	auto lastLoopBar = -1;
-	int eventCounter = 0;
 
     auto sequence = dest.lock();
     sequence->setUsed(true);
@@ -161,13 +159,14 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
 	}
 	
 	std::unique_ptr<NoteEvent> nVariation;
-	
-	for (int i = 1; i < midiTracks.size(); i++)
+    const int maxNoteOffTick = 999999999;
+
+    for (int i = 1; i < midiTracks.size(); i++)
 	{
 		auto mt = midiTracks[i].lock();
         std::vector<std::shared_ptr<NoteOn>> noteOffs;
         std::vector<std::shared_ptr<NoteEvent>> noteOns;
-		auto track = sequence->purgeTrack(i - 1).lock();
+		auto track = sequence->purgeTrack(i - 1);
 		track->setUsed(true);
 
 		for (auto& me : mt->getEvents())
@@ -194,8 +193,7 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
 				{
 					if (getNumberOfNotes(noteOn->getNoteValue(), noteOns) > getNumberOfNoteOns(noteOn->getNoteValue(), noteOffs))
 					{
-						auto noteOff = std::make_shared<NoteOn>(noteOn->getTick(), 0, (noteOn->getNoteValue()), 0);
-						noteOffs.emplace_back(noteOff);
+						noteOffs.emplace_back(std::make_shared<NoteOn>(noteOn->getTick(), 0, (noteOn->getNoteValue()), 0));
 					}
 
 					auto ne = std::make_shared<NoteEvent>(noteOn->getNoteValue());
@@ -217,12 +215,11 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
 			}
 		}
 
-		for (auto& n: noteOns)
+        for (auto& n: noteOns)
 		{
 			auto noteOn = std::dynamic_pointer_cast<mpc::sequencer::NoteEvent>(track->addEvent(n->getTick(), "note"));
 			n->CopyValuesTo(noteOn);
 			int indexCandidate = -1;
-			int tickCandidate = 999999999;
 
 			for (int k = 0; k < noteOffs.size(); k++)
 			{
@@ -230,9 +227,8 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
 
 				if (noteOff->getNoteValue() == noteOn->getNote() && noteOff->getTick() >= noteOn->getTick())
 				{
-					if (noteOff->getTick() < tickCandidate)
+					if (noteOff->getTick() < maxNoteOffTick)
 					{
-						tickCandidate = noteOff->getTick();
 						indexCandidate = k;
 						break;
 					}

@@ -78,13 +78,13 @@ private:
     int getCorrectedTickPos();
 
 public:
-    bool insertEventWhileRetainingSort(std::shared_ptr<Event> event);
+    bool insertEventWhileRetainingSort(std::shared_ptr<Event> event, bool allowMultipleNotesOnSameTick = false);
     std::shared_ptr<NoteEvent> addNoteEvent(int tick, int note);
-    std::shared_ptr<Event> addEvent(int tick, const std::string& type);
-    std::weak_ptr<Event> cloneEventIntoTrack(std::weak_ptr<Event> src);
+    std::shared_ptr<Event> addEvent(int tick, const std::string& type, bool allowMultipleNotesOnSameTick = false);
+    void cloneEventIntoTrack(std::shared_ptr<Event>& src, int tick, bool allowMultipleNotesOnSameTick = false);
     bool adjustDurLastEvent(int newDur);
     void removeEvent(int i);
-    void removeEvent(std::weak_ptr<Event> event);
+    void removeEvent(std::shared_ptr<Event> event);
     void removeEvents();
     void setVelocityRatio(int i);
     int getVelocityRatio();
@@ -94,10 +94,10 @@ public:
     int getBus();
     void setDeviceNumber(int i);
     int getDevice();
-    std::weak_ptr<Event> getEvent(int i);
+    std::shared_ptr<Event> getEvent(int i);
     void setName(std::string s);
     std::string getName();
-    std::vector<std::weak_ptr<Event>> getEvents();
+    std::vector<std::shared_ptr<Event>>& getEvents();
     
     int getNextTick();
     void playNext();

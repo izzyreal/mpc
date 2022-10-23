@@ -23,7 +23,7 @@ void SongWindow::open()
 	auto defaultSongNameFirstLetterField = findField("default-name-first-letter").lock();
 
 	auto songScreen = mpc.screens->get<SongScreen>("song");
-	auto song = sequencer->getSong(songScreen->activeSongIndex).lock();
+	auto song = sequencer->getSong(songScreen->activeSongIndex);
 
 	songNameFirstLetterField->setText(song->getName().substr(0, 1));
 	defaultSongNameFirstLetterField->setText(songScreen->defaultSongName.substr(0, 1));
@@ -67,7 +67,7 @@ void SongWindow::turnWheel(int i)
 	else
 	{
         const auto songIndex = songScreen->getActiveSongIndex();
-        const auto song = sequencer->getSong(songIndex).lock();
+        const auto song = sequencer->getSong(songIndex);
 		nameScreen->setName(song->getName());
         
         renamer = [song](string& newName) {

@@ -34,7 +34,6 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 using namespace moduru::lang;
-using namespace std;
 
 Sequencer::Sequencer(mpc::Mpc& mpc)
 	: mpc (mpc)
@@ -44,7 +43,6 @@ Sequencer::Sequencer(mpc::Mpc& mpc)
 void Sequencer::init()
 {
 	lastTap = moduru::System::currentTimeMillis();
-	sequences = vector<shared_ptr<Sequence>>(99);
 	nextSq = -1;
 
 	auto userScreen = mpc.screens->get<UserScreen>("user");
@@ -52,13 +50,12 @@ void Sequencer::init()
 	
 	for (int i = 0; i < 64; i++)
 	{
-		string name = "Track-";
-		name = name.append(StrUtil::padLeft(to_string(i + 1), "0", 2));
+        std::string name = "Track-";
+		name = name.append(StrUtil::padLeft(std::to_string(i + 1), "0", 2));
 		defaultTrackNames.push_back(name);
 	}
 
 	activeTrackIndex = 0;
-	songs = vector<shared_ptr<Song>>(20);
 
 	recordingModeMulti = userScreen->recordingModeMulti;
 
@@ -79,12 +76,12 @@ void Sequencer::init()
 	purgeAllSequences();
 	
 	for (int i = 0; i < 20; i++)
-		songs[i] = make_shared<Song>();
+		songs[i] = std::make_shared<Song>();
 }
 
 void Sequencer::deleteSong(int i)
 {
-	songs[i] = make_shared<Song>();
+	songs[i] = std::make_shared<Song>();
 }
 
 int Sequencer::getActiveSequenceIndex()
@@ -133,7 +130,7 @@ void Sequencer::playToTick(int targetTick)
 	}
 }
 
-vector<int> Sequencer::getTickValues() {
+std::vector<int> Sequencer::getTickValues() {
 	return TICK_VALUES;
 }
 
@@ -145,7 +142,7 @@ void Sequencer::setTempo(double newTempo)
 		newTempo = 300.0;
 
 	auto s = getActiveSequence();
-	auto tce = getCurrentTempoChangeEvent().lock();
+	auto tce = getCurrentTempoChangeEvent();
 
 	if (!s || !s->isUsed() || !tempoSourceSequenceEnabled)
 	{
@@ -164,7 +161,7 @@ void Sequencer::setTempo(double newTempo)
 		{
 			tempo = newTempo;
 		}
-		notifyObservers(string("tempo"));
+		notifyObservers(std::string("tempo"));
 		return;
 	}
 
@@ -183,7 +180,7 @@ void Sequencer::setTempo(double newTempo)
 		s->setInitialTempo(newTempo);
 	}
 
-	notifyObservers(string("tempo"));
+	notifyObservers(std::string("tempo"));
 }
 
 double Sequencer::getTempo()
@@ -192,7 +189,7 @@ double Sequencer::getTempo()
 		return tempo;
 
 	auto seq = getActiveSequence();
-	auto tce = getCurrentTempoChangeEvent().lock();
+	auto tce = getCurrentTempoChangeEvent();
 
 	if (mpc.getLayeredScreen().lock()->getCurrentScreenName().compare("song") == 0)
 	{
@@ -219,7 +216,7 @@ double Sequencer::getTempo()
 	return tempo;
 }
 
-weak_ptr<TempoChangeEvent> Sequencer::getCurrentTempoChangeEvent()
+std::shared_ptr<TempoChangeEvent> Sequencer::getCurrentTempoChangeEvent()
 {
 	auto index = -1;
 	auto s = getActiveSequence();
@@ -229,8 +226,7 @@ weak_ptr<TempoChangeEvent> Sequencer::getCurrentTempoChangeEvent()
 
 	for (auto& tce : s->getTempoChangeEvents())
 	{
-		auto lTce = tce.lock();
-		if (getTickPosition() >= lTce->getTick())
+		if (getTickPosition() >= tce->getTick())
 			index++;
 		else
 			break;
@@ -251,8 +247,8 @@ void Sequencer::setTempoSourceSequence(bool b)
 {
 	tempoSourceSequenceEnabled = b;
 	
-	notifyObservers(string("tempo-source"));
-	notifyObservers(string("tempo"));
+	notifyObservers(std::string("tempo-source"));
+	notifyObservers(std::string("tempo"));
 }
 
 bool Sequencer::isRecordingOrOverdubbing()
@@ -289,20 +285,20 @@ void Sequencer::setSoloEnabled(bool b)
         }
     }
 
-    notifyObservers(string("soloenabled"));
+    notifyObservers(std::string("soloenabled"));
 }
 
-weak_ptr<Sequence> Sequencer::getSequence(int i)
+std::shared_ptr<Sequence> Sequencer::getSequence(int i)
 {
     return sequences[i];
 }
 
-string Sequencer::getDefaultSequenceName()
+std::string Sequencer::getDefaultSequenceName()
 {
 	return defaultSequenceName;
 }
 
-void Sequencer::setDefaultSequenceName(string s)
+void Sequencer::setDefaultSequenceName(std::string s)
 {
     defaultSequenceName = s;
 }
@@ -320,11 +316,11 @@ void Sequencer::setActiveSequenceIndex(int i)
 		notifyTimeDisplay();
 	}
 	
-	notifyObservers(string("seqnumbername"));
-	notifyObservers(string("timesignature"));
-	notifyObservers(string("numberofbars"));
-	notifyObservers(string("tempo"));
-	notifyObservers(string("loop"));
+	notifyObservers(std::string("seqnumbername"));
+	notifyObservers(std::string("timesignature"));
+	notifyObservers(std::string("numberofbars"));
+	notifyObservers(std::string("tempo"));
+	notifyObservers(std::string("loop"));
 	notifyTrack();
 }
 
@@ -337,7 +333,7 @@ void Sequencer::setCountEnabled(bool b)
 {
     countEnabled = b;
     
-    notifyObservers(string("count"));
+    notifyObservers(std::string("count"));
 }
 
 void Sequencer::setTimeDisplayStyle(int i)
@@ -354,7 +350,7 @@ void Sequencer::setRecordingModeMulti(bool b)
 {
     recordingModeMulti = b;
     
-    notifyObservers(string("recordingmode"));
+    notifyObservers(std::string("recordingmode"));
 }
 
 bool Sequencer::isRecordingModeMulti()
@@ -402,7 +398,7 @@ void Sequencer::play(bool fromStart)
 	auto songScreen = mpc.screens->get<SongScreen>("song");
 	auto currentSong = songs[songScreen->getActiveSongIndex()];
     
-	shared_ptr<Step> currentStep;
+	std::shared_ptr<Step> currentStep;
 
 	if (songMode)
 	{
@@ -490,7 +486,7 @@ void Sequencer::play(bool fromStart)
 		ams->getFrameSequencer().lock()->start(rate);
 	}
 
-    notifyObservers(string("play"));
+    notifyObservers(std::string("play"));
 }
 
 void Sequencer::undoSeq()
@@ -609,7 +605,7 @@ void Sequencer::stop(int tick)
 	lastNotifiedClock = -1;
     //mpc.getEventHandler()->handle(MidiClockEvent(ctoot::midi::core::ShortMessage::STOP), Track(999));
 	auto s1 = getActiveSequence();
-	auto s2 = getCurrentlyPlayingSequence().lock();
+	auto s2 = getCurrentlyPlayingSequence();
 	auto pos = getTickPosition();
 	
 	if (pos > s1->getLastTick())
@@ -654,7 +650,7 @@ void Sequencer::stop(int tick)
     }
 
     if (notifynextsq)
-        notifyObservers(string("nextsqoff"));
+        notifyObservers(std::string("nextsqoff"));
     	
 	auto songScreen = mpc.screens->get<SongScreen>("song");
 
@@ -666,7 +662,7 @@ void Sequencer::stop(int tick)
 	if (bouncing && vmpcDirectToDiskRecorderScreen->getRecord() != 4)
 		ams->stopBouncing();
 	
-	notifyObservers(string("stop"));
+	notifyObservers(std::string("stop"));
 }
 
 bool Sequencer::isCountingIn()
@@ -688,22 +684,22 @@ void Sequencer::setCountingIn(bool b)
 void Sequencer::notifyTrack()
 {
     
-    notifyObservers(string("tracknumbername"));
+    notifyObservers(std::string("tracknumbername"));
     
-    notifyObservers(string("trackon"));
+    notifyObservers(std::string("trackon"));
     
-    notifyObservers(string("programchange"));
+    notifyObservers(std::string("programchange"));
     
-    notifyObservers(string("velocityratio"));
+    notifyObservers(std::string("velocityratio"));
     
-    notifyObservers(string("bus"));
+    notifyObservers(std::string("bus"));
     
-    notifyObservers(string("device"));
+    notifyObservers(std::string("device"));
     
-    notifyObservers(string("devicename"));
+    notifyObservers(std::string("devicename"));
 }
 
-void Sequencer::setSequence(int i, shared_ptr<Sequence> s)
+void Sequencer::setSequence(int i, std::shared_ptr<Sequence> s)
 {
 	sequences[i].swap(s);
 	sequences[i]->resetTrackEventIndices(position);
@@ -719,11 +715,11 @@ void Sequencer::purgeAllSequences()
 
 void Sequencer::purgeSequence(int i) {
 	sequences[i].reset();
-	auto sequence = make_shared<Sequence>(mpc);
+	auto sequence = std::make_shared<Sequence>(mpc);
 	sequences[i].swap(sequence);
 	sequences[i]->resetTrackEventIndices(position);
-	string res = defaultSequenceName;
-	res.append(StrUtil::padLeft(to_string(i + 1), "0", 2));
+	std::string res = defaultSequenceName;
+	res.append(StrUtil::padLeft(std::to_string(i + 1), "0", 2));
 	sequences[i]->setName(res);
 }
 
@@ -740,10 +736,9 @@ void Sequencer::copySequenceParameters(const int source, const int dest)
 	copySequenceParameters(sequences[source], sequences[dest]);
 }
 
-shared_ptr<Sequence> Sequencer::copySequence(weak_ptr<Sequence> src)
+std::shared_ptr<Sequence> Sequencer::copySequence(std::shared_ptr<Sequence> source)
 {
-	auto source = src.lock();
-	auto copy = make_shared<Sequence>(mpc);
+	auto copy = std::make_shared<Sequence>(mpc);
 	copy->init(source->getLastBarIndex());
 	copySequenceParameters(source, copy);
 	
@@ -757,30 +752,30 @@ shared_ptr<Sequence> Sequencer::copySequence(weak_ptr<Sequence> src)
 	}
 
 	for (auto& event : copy->getTempoChangeEvents())
-		event.lock()->setParent(copy.get());
+		event->setParent(copy.get());
 
 	return copy;
 }
 
-void Sequencer::copySequenceParameters(weak_ptr<Sequence> src, weak_ptr<Sequence> dst)
+void Sequencer::copySequenceParameters(std::shared_ptr<Sequence> source, std::shared_ptr<Sequence> dest)
 {
-	auto source = src.lock();
-	auto dest = dst.lock();
 	dest->setName(source->getName());
-	copyTempoChangeEvents(src, dst);
 	dest->setLoopEnabled(source->isLoopEnabled());
 	dest->setUsed(source->isUsed());
 	dest->setDeviceNames(source->getDeviceNames());
 	dest->setInitialTempo(source->getInitialTempo());
 	dest->setBarLengths(source->getBarLengthsInTicks());
-	dest->setNumeratorsAndDenominators(*source->getNumerators(), *source->getDenominators());
+	dest->setNumeratorsAndDenominators(source->getNumerators(), source->getDenominators());
 	dest->setLoopStart(source->getLoopStart());
 	dest->setLoopEnd(source->getLoopEnd());
+    copyTempoChangeEvents(source, dest);
 }
 
-void Sequencer::copyTempoChangeEvents(weak_ptr<Sequence> src, weak_ptr<Sequence> dst) {
-	auto srcList = src.lock()->getTempoChangeEvents();
-	
+void Sequencer::copyTempoChangeEvents(std::shared_ptr<Sequence> src, std::shared_ptr<Sequence> dst) {
+	for (auto& e1 : src->getTempoChangeEvents())
+    {
+        e1->CopyValuesTo(dst->addTempoChangeEvent());
+    }
 }
 
 void Sequencer::copyTrack(int sourceTrackIndex, int destinationTrackIndex, int sourceSequenceIndex, int destinationSequenceIndex)
@@ -789,7 +784,7 @@ void Sequencer::copyTrack(int sourceTrackIndex, int destinationTrackIndex, int s
 		return;
 
 	auto src = sequences[sourceSequenceIndex]->getTrack(sourceTrackIndex);
-	auto dest = sequences[destinationSequenceIndex]->purgeTrack(destinationTrackIndex).lock();
+	auto dest = sequences[destinationSequenceIndex]->purgeTrack(destinationTrackIndex);
 	copyTrack(src, dest);
 }
 
@@ -823,52 +818,47 @@ void Sequencer::copySong(const int source, const int dest)
 	s1->setLoopEnabled(s0->isLoopEnabled());
 }
 
-void Sequencer::copyTrack(weak_ptr<Track> src, weak_ptr<Track> dest)
+void Sequencer::copyTrack(std::shared_ptr<Track> src, std::shared_ptr<Track> dest)
 {
-	auto lSrc = src.lock();
-	auto lDest = dest.lock();
+	dest->setTrackIndex(src->getIndex());
 	
-	lDest->setTrackIndex(lSrc->getIndex());
-	
-	for (auto& e : lSrc->getEvents())
+	for (auto& e : src->getEvents())
 	{
-        lDest->cloneEventIntoTrack(e);
+        dest->cloneEventIntoTrack(e, e->getTick());
 	}
 
 	copyTrackParameters(src, dest);
 }
 
-void Sequencer::copyTrackParameters(weak_ptr<Track> source, weak_ptr<Track> dest)
+void Sequencer::copyTrackParameters(std::shared_ptr<Track> source, std::shared_ptr<Track> dest)
 {
-	auto lSrc = source.lock();
-	auto lDest = dest.lock();
-	lDest->setUsed(lSrc->isUsed());
-    lDest->setOn(lSrc->isOn());
-    lDest->setDeviceNumber(lSrc->getDevice());
-    lDest->setBusNumber(lSrc->getBus());
-    lDest->setVelocityRatio(lSrc->getVelocityRatio());
-    lDest->setProgramChange(lSrc->getProgramChange());
-    lDest->setName(lSrc->getName());
+	dest->setUsed(source->isUsed());
+    dest->setOn(source->isOn());
+    dest->setDeviceNumber(source->getDevice());
+    dest->setBusNumber(source->getBus());
+    dest->setVelocityRatio(source->getVelocityRatio());
+    dest->setProgramChange(source->getProgramChange());
+    dest->setName(source->getName());
 }
 
-string Sequencer::getDefaultTrackName(int i)
+std::string Sequencer::getDefaultTrackName(int i)
 {
 	return defaultTrackNames[i];
 }
 
-vector<string> Sequencer::getDefaultTrackNames()
+std::vector<std::string>& Sequencer::getDefaultTrackNames()
 {
 	return defaultTrackNames;
 }
 
-void Sequencer::setDefaultTrackName(string s, int i)
+void Sequencer::setDefaultTrackName(std::string s, int i)
 {
 	defaultTrackNames[i] = s;
 }
 
 int Sequencer::getCurrentBarIndex()
 {
-	auto s = isPlaying() ? getCurrentlyPlayingSequence().lock() : getActiveSequence();
+	auto s = isPlaying() ? getCurrentlyPlayingSequence() : getActiveSequence();
 	auto pos = getTickPosition();
 
 	if (pos == s->getLastTick())
@@ -894,7 +884,7 @@ int Sequencer::getCurrentBarIndex()
 
 int Sequencer::getCurrentBeatIndex()
 {
-	auto s = isPlaying() ? getCurrentlyPlayingSequence().lock() : getActiveSequence();
+	auto s = isPlaying() ? getCurrentlyPlayingSequence() : getActiveSequence();
 	auto pos = getTickPosition();
 	if (pos == s->getLastTick()) return 0;
 	auto index = pos;
@@ -931,7 +921,7 @@ int Sequencer::getCurrentBeatIndex()
 
 int Sequencer::getCurrentClockNumber()
 {
-	auto s = isPlaying() ? getCurrentlyPlayingSequence().lock() : getActiveSequence();
+	auto s = isPlaying() ? getCurrentlyPlayingSequence() : getActiveSequence();
 
 	auto clock = getTickPosition();
 	
@@ -1023,7 +1013,7 @@ void Sequencer::setBar(int i)
 
 	move(pos);
 	
-	notifyObservers(string("timesignature"));
+	notifyObservers(std::string("timesignature"));
 	setBeat(0);
 	setClock(0);
 }
@@ -1098,7 +1088,7 @@ int Sequencer::getUsedSequenceCount()
     return getUsedSequences().size();
 }
 
-std::vector<shared_ptr<Sequence>> Sequencer::getUsedSequences()
+std::vector<std::shared_ptr<Sequence>> Sequencer::getUsedSequences()
 {
 	std::vector<std::shared_ptr<Sequence>> usedSeqs;
 
@@ -1135,20 +1125,20 @@ void Sequencer::goToPreviousEvent()
 		return;
 	}
 
-	if (t->getEventIndex() + 1 >= t->getEvents().size() && t->getEvent((int)(t->getEvents().size()) - 1).lock()->getTick() < position)
+	if (t->getEventIndex() + 1 >= t->getEvents().size() && t->getEvent((int)(t->getEvents().size()) - 1)->getTick() < position)
 	{
 		t->setEventIndex((int)(t->getEvents().size()) - 1);
-		move(t->getEvent(t->getEventIndex()).lock()->getTick());
+		move(t->getEvent(t->getEventIndex())->getTick());
 		return;
 	}
 
-	shared_ptr<Event> event;
-	shared_ptr<Event> prev;
+	std::shared_ptr<Event> event;
+    std::shared_ptr<Event> prev;
 	
 	while (t->getEventIndex() > 0)
 	{
-		event = t->getEvent(t->getEventIndex()).lock();
-		prev = t->getEvent(t->getEventIndex() - 1).lock();
+		event = t->getEvent(t->getEventIndex());
+		prev = t->getEvent(t->getEventIndex() - 1);
 	
 		if (prev->getTick() == event->getTick())
 			t->setEventIndex(t->getEventIndex() - 1);
@@ -1160,8 +1150,8 @@ void Sequencer::goToPreviousEvent()
 	
 	while (t->getEventIndex() > 0)
 	{
-		event = t->getEvent(t->getEventIndex()).lock();
-		prev = t->getEvent(t->getEventIndex() - 1).lock();
+		event = t->getEvent(t->getEventIndex());
+		prev = t->getEvent(t->getEventIndex() - 1);
 	
 		if (prev->getTick() != event->getTick())
 			break;
@@ -1169,7 +1159,7 @@ void Sequencer::goToPreviousEvent()
 		t->setEventIndex(t->getEventIndex() - 1);
 	}
 
-	move(t->getEvents()[t->getEventIndex()].lock()->getTick());
+	move(t->getEvents()[t->getEventIndex()]->getTick());
 }
 
 void Sequencer::goToNextEvent()
@@ -1190,27 +1180,27 @@ void Sequencer::goToNextEvent()
 	if (position == s->getLastTick())
 		return;
 
-	if (t->getEventIndex() >= eventCount - 1 && position >= t->getEvent(eventCount - 1).lock()->getTick())
+	if (t->getEventIndex() >= eventCount - 1 && position >= t->getEvent(eventCount - 1)->getTick())
 	{
 		move(s->getLastTick());
 		return;
 	}
 	
-	if (t->getEvent(t->getEventIndex()).lock()->getTick() > position)
+	if (t->getEvent(t->getEventIndex())->getTick() > position)
 	{
-		move(t->getEvent(t->getEventIndex()).lock()->getTick());
+		move(t->getEvent(t->getEventIndex())->getTick());
 		return;
 	}
 	
-	shared_ptr<Event> event;
-	shared_ptr<Event> next;
+	std::shared_ptr<Event> event;
+    std::shared_ptr<Event> next;
 	
-	if (t->getEvent(t->getEventIndex()).lock()->getTick() == position)
+	if (t->getEvent(t->getEventIndex())->getTick() == position)
 	{
 		while (t->getEventIndex() < eventCount - 2)
 		{
-			event = t->getEvent(t->getEventIndex()).lock();
-			next = t->getEvent(t->getEventIndex() + 1).lock();
+			event = t->getEvent(t->getEventIndex());
+			next = t->getEvent(t->getEventIndex() + 1);
 		
 			if (next->getTick() != event->getTick())
 				break;
@@ -1223,8 +1213,8 @@ void Sequencer::goToNextEvent()
 	
 	while (t->getEventIndex() < eventCount - 2)
 	{
-		event = t->getEvent(t->getEventIndex()).lock();
-		next = t->getEvent(t->getEventIndex() + 1).lock();
+		event = t->getEvent(t->getEventIndex());
+		next = t->getEvent(t->getEventIndex() + 1);
 
 		if (next->getTick() != event->getTick())
 			break;
@@ -1232,14 +1222,14 @@ void Sequencer::goToNextEvent()
 		t->setEventIndex(t->getEventIndex() + 1);
 	}
 
-	move(t->getEvent(t->getEventIndex()).lock()->getTick());
+	move(t->getEvent(t->getEventIndex())->getTick());
 }
 
 void Sequencer::notifyTimeDisplay()
 {
-	notifyObservers(string("bar"));
-	notifyObservers(string("beat"));
-	notifyObservers(string("clock"));
+	notifyObservers(std::string("bar"));
+	notifyObservers(std::string("beat"));
+	notifyObservers(std::string("clock"));
 }
 
 void Sequencer::notifyTimeDisplayRealtime()
@@ -1250,19 +1240,19 @@ void Sequencer::notifyTimeDisplayRealtime()
 	
 	if (lastNotifiedBar != bar) {
 		
-		notifyObservers(string("bar"));
+		notifyObservers(std::string("bar"));
 		lastNotifiedBar = bar;
 	}
 	
 	if (lastNotifiedBeat != beat) {
 		
-		notifyObservers(string("beat"));
+		notifyObservers(std::string("beat"));
 		lastNotifiedBeat = beat;
 	}
 
 	if (lastNotifiedClock != clock) {
 		
-		notifyObservers(string("clock"));
+		notifyObservers(std::string("clock"));
 		lastNotifiedClock = clock;
 	}
 }
@@ -1275,26 +1265,26 @@ void Sequencer::goToPreviousStep()
 	auto stepSize = TICK_VALUES[noteValue];
 	auto pos = getTickPosition();
 	auto stepCount = static_cast<int>(ceil(getActiveSequence()->getLastTick() / stepSize)) + 1;
-	vector<int> stepGrid(stepCount);
+    std::vector<int> stepGrid(stepCount);
 
 	for (int i = 0; i < stepGrid.size(); i++)
 		stepGrid[i] = i * stepSize;
 
-	auto currentStep = 0;
+	auto prevStepIndex = 0;
 
 	for (auto l : stepGrid)
 	{
 		if (pos <= l)
 			break;
 		
-		currentStep++;
+		prevStepIndex++;
 	}
 
-	if (currentStep == 0)
-		return;
+	prevStepIndex--;
 
-	currentStep--;
-	move(currentStep * stepSize);
+    if (prevStepIndex < 0) prevStepIndex = 0;
+
+    move(prevStepIndex * stepSize);
 }
 
 void Sequencer::goToNextStep()
@@ -1305,26 +1295,27 @@ void Sequencer::goToNextStep()
 	auto stepSize = TICK_VALUES[noteValue];
 	auto pos = getTickPosition();
 
-	vector<int> stepGrid(ceil(getActiveSequence()->getLastTick() / stepSize));
+    std::vector<int> stepGrid(ceil(getActiveSequence()->getLastTick() / stepSize));
 
 	for (int i = 0; i < stepGrid.size(); i++)
 		stepGrid[i] = i * stepSize;
 
-	auto currentStep = -1;
+	auto nextStepIndex = -1;
 
 	for (auto l : stepGrid)
 	{
 		if (pos < l)
 			break;
 
-		currentStep++;
+		nextStepIndex++;
 	}
 
-	if (currentStep == stepGrid.size())
-		return;
+	nextStepIndex++;
 
-	currentStep++;
-	move(currentStep * stepSize);
+    if (nextStepIndex >= stepGrid.size())
+        nextStepIndex = stepGrid.size() - 1;
+
+    move(nextStepIndex * stepSize);
 }
 
 void Sequencer::tap()
@@ -1392,7 +1383,7 @@ void Sequencer::move(int tick)
 	position = tick;
 	playStartTick = tick;
 
-	auto s = isPlaying() ? getCurrentlyPlayingSequence().lock() : getActiveSequence();
+	auto s = isPlaying() ? getCurrentlyPlayingSequence() : getActiveSequence();
 
 	if (!isPlaying() && songMode)
 		s = sequences[getSongSequenceIndex()];
@@ -1406,8 +1397,8 @@ void Sequencer::move(int tick)
 	}
 
 	notifyTimeDisplay();
-    notifyObservers(string("timesignature"));
-    notifyObservers(string("tempo"));
+    notifyObservers(std::string("timesignature"));
+    notifyObservers(std::string("tempo"));
 }
 
 int Sequencer::getTickPosition()
@@ -1418,7 +1409,7 @@ int Sequencer::getTickPosition()
     return position;
 }
 
-weak_ptr<Sequence> Sequencer::getCurrentlyPlayingSequence()
+std::shared_ptr<Sequence> Sequencer::getCurrentlyPlayingSequence()
 {
 	return sequences[getCurrentlyPlayingSequenceIndex()];
 }
@@ -1426,7 +1417,7 @@ weak_ptr<Sequence> Sequencer::getCurrentlyPlayingSequence()
 void Sequencer::setActiveTrackIndex(int i)
 {
     activeTrackIndex = i;
-	notifyObservers(string("active-track-index"));
+	notifyObservers(std::string("active-track-index"));
 }
 
 int Sequencer::getCurrentlyPlayingSequenceIndex()
@@ -1493,11 +1484,11 @@ void Sequencer::setNextSq(int i)
 	nextSq = candidate;
 
 	if (nextSq == -1)
-		notifyObservers(string("nextoff"));
+		notifyObservers(std::string("nextoff"));
 	else if (firstNotification)
-		notifyObservers(string("nextsq"));
+		notifyObservers(std::string("nextsq"));
 	else
-		notifyObservers(string("nextsqvalue"));
+		notifyObservers(std::string("nextsqvalue"));
 }
 
 void Sequencer::setNextSqPad(int i)
@@ -1505,7 +1496,7 @@ void Sequencer::setNextSqPad(int i)
 	if (!sequences[i]->isUsed())
 	{
 		nextSq = -1;
-		notifyObservers(string("nextsqoff"));
+		notifyObservers(std::string("nextsqoff"));
 		return;
 	}
 
@@ -1514,12 +1505,12 @@ void Sequencer::setNextSqPad(int i)
 	nextSq = i;
 	
 	if (firstNotification)
-		notifyObservers(string("nextsq"));
+		notifyObservers(std::string("nextsq"));
 	else
-		notifyObservers(string("nextsqvalue"));
+		notifyObservers(std::string("nextsqvalue"));
 }
 
-weak_ptr<Song> Sequencer::getSong(int i)
+std::shared_ptr<Song> Sequencer::getSong(int i)
 {
     return songs[i];
 }
@@ -1559,7 +1550,7 @@ void Sequencer::setSecondSequenceEnabled(bool b)
 
 void Sequencer::flushTrackNoteCache()
 {
-	for (auto& t : getCurrentlyPlayingSequence().lock()->getTracks())
+	for (auto& t : getCurrentlyPlayingSequence()->getTracks())
 		t->flushNoteCache();
 }
 
@@ -1581,7 +1572,7 @@ int Sequencer::getPlayStartTick()
     return playStartTick;
 }
 
-void Sequencer::notify(string s)
+void Sequencer::notify(std::string s)
 {
 	
 	notifyObservers(s);
@@ -1604,7 +1595,7 @@ void Sequencer::playMetronomeTrack()
 	}
 
 	metronomeOnly = true;
-	metronomeSeq = make_unique<Sequence>(mpc);
+	metronomeSeq = std::make_unique<Sequence>(mpc);
 	auto s = getActiveSequence();
 	metronomeSeq->init(8);
 	metronomeSeq->setTimeSignature(0, 3, s->getNumerator(getCurrentBarIndex()), s->getDenominator(getCurrentBarIndex()));
@@ -1624,9 +1615,9 @@ void Sequencer::stopMetronomeTrack()
 	mpc.getAudioMidiServices().lock()->getFrameSequencer().lock()->stop();
 }
 
-weak_ptr<Sequence> Sequencer::createSeqInPlaceHolder()
+std::shared_ptr<Sequence> Sequencer::createSeqInPlaceHolder()
 {
-	placeHolder = make_shared<Sequence>(mpc);
+	placeHolder = std::make_shared<Sequence>(mpc);
 	return placeHolder;
 }
 
@@ -1642,7 +1633,7 @@ void Sequencer::movePlaceHolderTo(int destIndex)
 	clearPlaceHolder();
 }
 
-weak_ptr<Sequence> Sequencer::getPlaceHolder()
+std::shared_ptr<Sequence> Sequencer::getPlaceHolder()
 {
 	return placeHolder;
 }

@@ -32,10 +32,10 @@ namespace mpc::sequencer
         void playToTick(int targetTick);
         int getActiveSequenceIndex();
         std::shared_ptr<Track> getActiveTrack();
-        std::weak_ptr<Sequence> createSeqInPlaceHolder();
+        std::shared_ptr<Sequence> createSeqInPlaceHolder();
         void clearPlaceHolder();
         void movePlaceHolderTo(int destIndex);
-        std::weak_ptr<Sequence> getPlaceHolder();
+        std::shared_ptr<Sequence> getPlaceHolder();
         bool isUndoSeqAvailable();
 
 	private:
@@ -54,8 +54,8 @@ namespace mpc::sequencer
 		int playedStepRepetitions = 0;
 		bool endOfSong = false;
 
-		std::vector<std::shared_ptr<Sequence>> sequences;
-		std::vector<std::shared_ptr<Song>> songs;
+		std::vector<std::shared_ptr<Sequence>> sequences = std::vector<std::shared_ptr<Sequence>>(99);
+		std::vector<std::shared_ptr<Song>> songs = std::vector<std::shared_ptr<Song>>(20);
 		std::vector<uint64_t> taps{ 0, 0, 0, 0 };
 
 		std::shared_ptr<Sequence> undoPlaceHolder;
@@ -84,13 +84,13 @@ namespace mpc::sequencer
 		double tempo = 120.0;
 		int nextSq = -1;
 
-		std::weak_ptr<TempoChangeEvent> getCurrentTempoChangeEvent();
+		std::shared_ptr<TempoChangeEvent> getCurrentTempoChangeEvent();
 		void play(bool fromStart);
-		std::shared_ptr<Sequence> copySequence(std::weak_ptr<Sequence> source);
-		void copySequenceParameters(std::weak_ptr<Sequence> source, std::weak_ptr<Sequence> dest);
-		void copyTempoChangeEvents(std::weak_ptr<Sequence> src, std::weak_ptr<Sequence> dst);
-		void copyTrackParameters(std::weak_ptr<Track> source, std::weak_ptr<Track> dest);
-		void copyTrack(std::weak_ptr<Track> src, std::weak_ptr<Track> dest);
+		std::shared_ptr<Sequence> copySequence(std::shared_ptr<Sequence> source);
+		void copySequenceParameters(std::shared_ptr<Sequence> source, std::shared_ptr<Sequence> dest);
+		void copyTempoChangeEvents(std::shared_ptr<Sequence> src, std::shared_ptr<Sequence> dst);
+		void copyTrackParameters(std::shared_ptr<Track> source, std::shared_ptr<Track> dest);
+		void copyTrack(std::shared_ptr<Track> src, std::shared_ptr<Track> dest);
 
 	public:
 		void notifyTimeDisplay();
@@ -104,7 +104,7 @@ namespace mpc::sequencer
 		bool isRecording();
 		bool isSoloEnabled();
 		void setSoloEnabled(bool b);
-		std::weak_ptr<Sequence> getSequence(int i);
+		std::shared_ptr<Sequence> getSequence(int i);
 		std::string getDefaultSequenceName();
 		void setDefaultSequenceName(std::string s);
 		void setActiveSequenceIndex(int i);
@@ -146,7 +146,7 @@ namespace mpc::sequencer
 
 	public:
 		void copyTrack(int sourceTrackIndex, int destinationTrackIndex, int sourceSequenceIndex, int destinationSequenceIndex);
-		std::vector<std::string> getDefaultTrackNames();
+		std::vector<std::string>& getDefaultTrackNames();
 		std::string getDefaultTrackName(int i);
 		void setDefaultTrackName(std::string s, int i);
 		int getCurrentBarIndex();
@@ -168,7 +168,7 @@ namespace mpc::sequencer
 		int getResolution();
 		void move(int tick);
 		int getTickPosition();
-		std::weak_ptr<Sequence> getCurrentlyPlayingSequence();
+		std::shared_ptr<Sequence> getCurrentlyPlayingSequence();
 		void setActiveTrackIndex(int i);
 		int getCurrentlyPlayingSequenceIndex();
 		void setCurrentlyPlayingSequenceIndex(int i);
@@ -177,7 +177,7 @@ namespace mpc::sequencer
 		int getFirstUsedSeqUp(int from, bool unused = false);
 		void setNextSq(int i);
 		void setNextSqPad(int i);
-		std::weak_ptr<Song> getSong(int i);
+		std::shared_ptr<Song> getSong(int i);
 		void deleteSong(int i);
 		bool isSongModeEnabled();
 		void setSongModeEnabled(bool b);

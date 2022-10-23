@@ -247,7 +247,7 @@ void Util::initSequence(mpc::Mpc& mpc)
 void Util::initSequence(int sequenceIndex, mpc::Mpc& mpc)
 {
     auto sequencer = mpc.getSequencer().lock();
-    auto sequence = sequencer->getSequence(sequenceIndex).lock();
+    auto sequence = sequencer->getSequence(sequenceIndex);
     
     if (sequence->isUsed())
         return;

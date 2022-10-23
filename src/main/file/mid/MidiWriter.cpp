@@ -58,11 +58,10 @@ MidiWriter::MidiWriter(mpc::sequencer::Sequence* sequence)
 
 	for (auto& e : sequence->getTempoChangeEvents())
 	{
-		auto tce = e.lock();
-		tempo = tce->getTempo();
+		tempo = e->getTempo();
 		mpqn = (int)(6.0E7 / tempo);
-		tempos.push_back(make_shared<mpc::midi::event::meta::Tempo>(tce->getTick(), tce->getTick() - previousTick, mpqn));
-		previousTick = tce->getTick();
+		tempos.push_back(make_shared<mpc::midi::event::meta::Tempo>(e->getTick(), e->getTick() - previousTick, mpqn));
+		previousTick = e->getTick();
 	}
 
 	for (auto& t : tempos)
@@ -112,14 +111,14 @@ MidiWriter::MidiWriter(mpc::sequencer::Sequence* sequence)
 		auto tn = make_shared<meta::TrackName>(0, 0, moduru::lang::StrUtil::padRight(t->getName(), " ", 16));
 		mt->insertEvent(tn);
 		for (auto& event : t->getEvents()) {
-			auto noteEvent = dynamic_pointer_cast<mpc::sequencer::NoteEvent>(event.lock());
-			auto mpcSysExEvent = dynamic_pointer_cast<mpc::sequencer::SystemExclusiveEvent>(event.lock());
-			auto pitchBendEvent = dynamic_pointer_cast<mpc::sequencer::PitchBendEvent>(event.lock());
-			auto channelPressureEvent = dynamic_pointer_cast<mpc::sequencer::ChannelPressureEvent>(event.lock());
-			auto polyPressureEvent = dynamic_pointer_cast<mpc::sequencer::PolyPressureEvent>(event.lock());
-			auto controlChangeEvent = dynamic_pointer_cast<mpc::sequencer::ControlChangeEvent>(event.lock());
-			auto programChangeEvent = dynamic_pointer_cast<mpc::sequencer::ProgramChangeEvent>(event.lock());
-			auto mixerEvent = dynamic_pointer_cast<mpc::sequencer::MixerEvent>(event.lock());
+			auto noteEvent = dynamic_pointer_cast<mpc::sequencer::NoteEvent>(event);
+			auto mpcSysExEvent = dynamic_pointer_cast<mpc::sequencer::SystemExclusiveEvent>(event);
+			auto pitchBendEvent = dynamic_pointer_cast<mpc::sequencer::PitchBendEvent>(event);
+			auto channelPressureEvent = dynamic_pointer_cast<mpc::sequencer::ChannelPressureEvent>(event);
+			auto polyPressureEvent = dynamic_pointer_cast<mpc::sequencer::PolyPressureEvent>(event);
+			auto controlChangeEvent = dynamic_pointer_cast<mpc::sequencer::ControlChangeEvent>(event);
+			auto programChangeEvent = dynamic_pointer_cast<mpc::sequencer::ProgramChangeEvent>(event);
+			auto mixerEvent = dynamic_pointer_cast<mpc::sequencer::MixerEvent>(event);
 			if (noteEvent) {
 				addNoteOn(make_shared<NoteOn>(noteEvent->getTick(), t->getIndex(), noteEvent->getNote(), noteEvent->getVelocity()));
 				noteOffs.push_back(make_shared<NoteOn>(noteEvent->getTick() + noteEvent->getDuration(), t->getIndex(), noteEvent->getNote(), 0));

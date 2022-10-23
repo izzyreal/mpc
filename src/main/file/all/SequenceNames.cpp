@@ -16,14 +16,13 @@
 
 using namespace mpc::file::all;
 using namespace moduru::lang;
-using namespace std; 
 
-SequenceNames::SequenceNames(const vector<char>& b)
+SequenceNames::SequenceNames(const std::vector<char>& b)
 {
 	for (int i = 0; i < names.size(); i++)
 	{	
 		int offset = i * ENTRY_LENGTH;
-		string stringBuffer = "";
+		std::string stringBuffer = "";
 		auto nameBytes = moduru::VecUtil::CopyOfRange(b, offset, offset + AllParser::NAME_LENGTH);
 
 		for (char c : nameBytes)
@@ -43,12 +42,12 @@ SequenceNames::SequenceNames(const vector<char>& b)
 
 SequenceNames::SequenceNames(mpc::Mpc& mpc)
 {
-	saveBytes = vector<char>(LENGTH);
+	saveBytes = std::vector<char>(LENGTH);
 	auto sequencer = mpc.getSequencer().lock();
 
 	for (int i = 0; i < 99; i++)
 	{
-		auto seq = sequencer->getSequence(i).lock();
+		auto seq = sequencer->getSequence(i);
 		auto name = seq->getName();
 		auto offset = i * ENTRY_LENGTH;
 		
@@ -57,7 +56,7 @@ SequenceNames::SequenceNames(mpc::Mpc& mpc)
 			saveBytes[offset + j] = StrUtil::padRight(name, " ", 16)[j];
 		}
 
-		if (name.find("(Unused)") == string::npos)
+		if (name.find("(Unused)") == std::string::npos)
 		{
 			auto eventSegmentCount = getSegmentCount(seq.get());
 		
@@ -80,7 +79,7 @@ SequenceNames::SequenceNames(mpc::Mpc& mpc)
 	}
 }
 
-vector<string>& SequenceNames::getNames()
+std::vector<std::string>& SequenceNames::getNames()
 {
     return names;
 }
@@ -90,7 +89,7 @@ std::vector<bool>& SequenceNames::getUsednesses()
     return usednesses;
 }
 
-vector<char>& SequenceNames::getBytes()
+std::vector<char>& SequenceNames::getBytes()
 {
     return saveBytes;
 }
@@ -106,14 +105,14 @@ int SequenceNames::getSegmentCount(mpc::sequencer::Sequence* seq)
 
 		for (auto& e : track->getEvents())
 		{
-			auto sysEx = dynamic_pointer_cast<mpc::sequencer::SystemExclusiveEvent>(e.lock());
+			auto sysEx = std::dynamic_pointer_cast<mpc::sequencer::SystemExclusiveEvent>(e);
 		
 			if (sysEx)
 			{
 				auto dataSegments = (int)(ceil(sysEx->getBytes().size() / 8.0));
 				segmentCount += dataSegments + 1;
 			}
-			else if (dynamic_pointer_cast<mpc::sequencer::MixerEvent>(e.lock()))
+			else if (std::dynamic_pointer_cast<mpc::sequencer::MixerEvent>(e))
 			{
 				segmentCount += 2;
 			}

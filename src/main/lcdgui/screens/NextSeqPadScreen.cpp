@@ -47,7 +47,7 @@ void NextSeqPadScreen::pad(int padIndexWithBank, int velo)
 
     if (sequencer->isPlaying() && mpc.getControls().lock()->isF4Pressed())
     {
-        if (!sequencer->getSequence(padIndexWithBank).lock()->isUsed())
+        if (!sequencer->getSequence(padIndexWithBank)->isUsed())
         {
             return;
         }
@@ -92,7 +92,7 @@ void NextSeqPadScreen::displayNextSq()
 	}
 
 	auto number = StrUtil::padLeft(to_string(nextSq + 1), "0", 2);
-	auto name = sequencer->getSequence(nextSq).lock()->getName();
+	auto name = sequencer->getSequence(nextSq)->getName();
 	findLabel("nextsq").lock()->setText(number + "-" + name);
 }
 
@@ -119,7 +119,7 @@ void NextSeqPadScreen::displaySq()
 
 void NextSeqPadScreen::displaySeq(int i)
 {
-	findField(to_string(i + 1)).lock()->setText(sequencer->getSequence(i + bankOffset()).lock()->getName().substr(0, 8));
+	findField(to_string(i + 1)).lock()->setText(sequencer->getSequence(i + bankOffset())->getName().substr(0, 8));
 }
 
 void NextSeqPadScreen::setSeqColor(int i)

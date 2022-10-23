@@ -110,7 +110,7 @@ void MpcMidiInput::transport(MidiMessage *msg, int timeStamp)
   else if (note)
   {
     note->setTick(-1);
-    auto s = lSequencer->isPlaying() ? lSequencer->getCurrentlyPlayingSequence().lock()
+    auto s = lSequencer->isPlaying() ? lSequencer->getCurrentlyPlayingSequence()
                                      : lSequencer->getActiveSequence();
     auto track = dynamic_pointer_cast<mpc::sequencer::Track>(s->getTrack(note->getTrack()));
     auto p = lSampler->getProgram(lSampler->getDrumBusProgramIndex(track->getBus())).lock();

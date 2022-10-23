@@ -11,7 +11,6 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace moduru::lang;
-using namespace std;
 
 NextSeqScreen::NextSeqScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "next-seq", layerIndex)
@@ -52,7 +51,7 @@ void NextSeqScreen::turnWheel(int i)
 {
 	init();
 	
-	if (param.compare("sq") == 0)
+	if (param == "sq")
 	{
 		if (sequencer->isPlaying())
 		{
@@ -62,7 +61,7 @@ void NextSeqScreen::turnWheel(int i)
 		else
 			sequencer->setActiveSequenceIndex(sequencer->getActiveSequenceIndex() + i);
 	}
-	else if (param.compare("nextsq") == 0)
+	else if (param == "nextsq")
 	{
 		auto nextSq = sequencer->getNextSq();
 		
@@ -81,7 +80,7 @@ void NextSeqScreen::turnWheel(int i)
 
 		displayNextSq();
 	}
-	else if (param.compare("timing") == 0)
+	else if (param == "timing")
 	{
 		auto screen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
 		auto noteValue = screen->getNoteValue();
@@ -89,7 +88,7 @@ void NextSeqScreen::turnWheel(int i)
 		setLastFocus("timing-correct", "notevalue");
 		displayTiming();
 	}
-	else if (param.compare("tempo") == 0)
+	else if (param == "tempo")
 	{
 		double oldTempo = sequencer->getTempo();
 		double newTempo = oldTempo + (i * 0.1);
@@ -125,18 +124,18 @@ void NextSeqScreen::function(int i)
 
 void NextSeqScreen::displaySq()
 {
-	string result = "";
+	std::string result = "";
 
 	if (sequencer->isPlaying())
 	{
-		result.append(StrUtil::padLeft(to_string(sequencer->getCurrentlyPlayingSequenceIndex() + 1), "0", 2));
+		result.append(StrUtil::padLeft(std::to_string(sequencer->getCurrentlyPlayingSequenceIndex() + 1), "0", 2));
 		result.append("-");
-		result.append(sequencer->getCurrentlyPlayingSequence().lock()->getName());
+		result.append(sequencer->getCurrentlyPlayingSequence()->getName());
 		findField("sq").lock()->setText(result);
 	}
 	else
 	{
-		result.append(StrUtil::padLeft(to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2));
+		result.append(StrUtil::padLeft(std::to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2));
 		result.append("-");
 		result.append(sequencer->getActiveSequence()->getName());
 		findField("sq").lock()->setText(result);
@@ -146,12 +145,12 @@ void NextSeqScreen::displaySq()
 void NextSeqScreen::displayNextSq()
 {
 	auto nextSq = sequencer->getNextSq();
-	string res = "";
+    std::string res = "";
 
 	if (nextSq != -1)
 	{
-		auto seqName = sequencer->getSequence(nextSq).lock()->getName();
-		res = StrUtil::padLeft(to_string(sequencer->getNextSq() + 1), "0", 2) + "-" + seqName;
+		auto seqName = sequencer->getSequence(nextSq)->getName();
+		res = StrUtil::padLeft(std::to_string(sequencer->getNextSq() + 1), "0", 2) + "-" + seqName;
 	}
 	
 	findField("nextsq").lock()->setText(res);
@@ -181,15 +180,13 @@ void NextSeqScreen::displayTempo()
 void NextSeqScreen::displayTempoLabel()
 {
 	auto currentRatio = -1;
-	auto sequence = sequencer->isPlaying() ? sequencer->getCurrentlyPlayingSequence().lock() : sequencer->getActiveSequence();
+	auto sequence = sequencer->isPlaying() ? sequencer->getCurrentlyPlayingSequence() : sequencer->getActiveSequence();
 	for (auto& e : sequence->getTempoChangeEvents())
 	{
-		auto tce = e.lock();
-
-		if (tce->getTick() > sequencer->getTickPosition())
+		if (e->getTick() > sequencer->getTickPosition())
 			break;
 
-		currentRatio = tce->getRatio();
+		currentRatio = e->getRatio();
 	}
 
 	if (currentRatio != 1000)
@@ -212,48 +209,48 @@ void NextSeqScreen::displayTiming()
 
 void NextSeqScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 {
-	string s = nonstd::any_cast<string>(arg);
+    std::string s = nonstd::any_cast<std::string>(arg);
 
-	if (s.compare("seqnumbername") == 0)
+	if (s == "seqnumbername")
 	{
 		displaySq();
 	}
-	else if (s.compare("bar") == 0)
+	else if (s == "bar")
 	{
 		displayNow0();
 	}
-	else if (s.compare("beat") == 0)
+	else if (s == "beat")
 	{
 		displayNow1();
 	}
-	else if (s.compare("clock") == 0)
+	else if (s == "clock")
 	{
 		displayNow2();
 	}
-	else if (s.compare("now") == 0)
+	else if (s == "now")
 	{
 		displayNow0();
 		displayNow1();
 		displayNow2();
 	}
-	else if (s.compare("nextsqvalue") == 0)
+	else if (s == "nextsqvalue")
 	{
 		displayNextSq();
 	}
-	else if (s.compare("nextsq") == 0)
+	else if (s == "nextsq")
 	{
 		displayNextSq();
 	}
-	else if (s.compare("nextsqoff") == 0)
+	else if (s == "nextsqoff")
 	{
 		selectNextSqFromScratch = true;
 		displayNextSq();
 	}
-	else if (s.compare("timing") == 0)
+	else if (s == "timing")
 	{
 		displayTiming();
 	}
-	else if (s.compare("tempo") == 0)
+	else if (s == "tempo")
 	{
 		displayTempo();
 	}

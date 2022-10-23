@@ -346,7 +346,7 @@ void TempoChangeScreen::function(int j)
 		if (yPos + offset >= tceList.size())
 			return;
 		
-		if (tceList[offset + yPos].lock()->getStepNumber() == 0)
+		if (tceList[offset + yPos]->getStepNumber() == 0)
 			return;
 		
 		seq->removeTempoChangeEvent(offset + yPos);
@@ -368,7 +368,7 @@ void TempoChangeScreen::function(int j)
 		auto nowDetected = -1;
 		for (int i = 0; i < tceList.size(); i++)
 		{
-			if (tceList[i].lock()->getTick() == sequencer->getTickPosition())
+			if (tceList[i]->getTick() == sequencer->getTickPosition())
 			{
 				nowDetected = i;
 				break;
@@ -485,15 +485,15 @@ void TempoChangeScreen::turnWheel(int j)
 	auto seq = sequencer->getActiveSequence();
 	auto tceList = seq->getTempoChangeEvents();
 
-	if (param.compare("tempo-change") == 0)
+	if (param == "tempo-change")
 	{
 		seq->setTempoChangeOn(j > 0);
 		displayTempoChangeOn();
 		return;
 	}
-	else if (param.compare("initial-tempo") == 0)
+	else if (param == "initial-tempo")
 	{
-		auto tce = tceList[0].lock();
+		auto tce = tceList[0];
 		seq->setInitialTempo(seq->getInitialTempo()+ (j * 0.1));
 		displayInitialTempo();
 		displayTempoChange0();
@@ -508,32 +508,32 @@ void TempoChangeScreen::turnWheel(int j)
 	{
 		auto event = visibleTempoChanges[i].lock();
 
-		if (param.compare("b" + to_string(i)) == 0)
+		if (param == "b" + to_string(i))
 		{
 			if (j > 0)
 				event->plusOneBar(ts.getNumerator(), ts.getDenominator(), next.lock().get());
 			else
 				event->minusOneBar(ts.getNumerator(), ts.getDenominator(), previous.lock().get());
 		}
-		else if (param.compare("c" + to_string(i)) == 0)
+		else if (param == "c" + to_string(i))
 		{
 			if (j > 0)
 				event->plusOneBeat(ts.getDenominator(), next.lock().get());
 			else
 				event->minusOneBeat(ts.getDenominator(), previous.lock().get());
 		}
-		else if (param.compare("d" + to_string(i)) == 0)
+		else if (param == "d" + to_string(i))
 		{
 			if (j > 0)
 				event->plusOneClock(next.lock().get());
 			else
 				event->minusOneClock(previous.lock().get());
 		}
-		else if (param.compare("e" + to_string(i)) == 0)
+		else if (param == "e" + to_string(i))
 		{
 			event->setRatio(event->getRatio() + j);
 		}
-		else if (param.compare("f" + to_string(i)) == 0)
+		else if (param == "f" + to_string(i))
 		{
 			auto ratio = (event->getTempo() + j * 0.1) / seq->getInitialTempo();
 			event->setRatio((int)round(ratio * 1000.0));
@@ -560,9 +560,9 @@ void TempoChangeScreen::down()
 	auto tce1 = visibleTempoChanges[1].lock();
 	auto tce2 = visibleTempoChanges[2].lock();
 
-	if (param.compare("tempo-change") == 0)
+	if (param == "tempo-change")
 		ls.lock()->setFocus("e0");
-	else if (param.compare("initial-tempo") == 0)
+	else if (param == "initial-tempo")
 		ls.lock()->setFocus("f0");
 	
 	if (param.length() != 2)
@@ -612,9 +612,9 @@ void TempoChangeScreen::up()
 	{
 		if (offset == 0)
 		{
-			if (param.compare("e0") == 0)
+			if (param == "e0")
 				ls.lock()->setFocus("tempo-change");
-			else if (param.compare("f0") == 0)
+			else if (param == "f0")
 				ls.lock()->setFocus("initial-tempo");
 
 			return;

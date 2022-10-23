@@ -48,9 +48,11 @@ void InsertEventScreen::function(int i)
 void InsertEventScreen::insertEvent()
 {
 	init();
+
 	if (insertEventType == 0)
 	{
-		auto event = track.lock()->addEvent(sequencer->getTickPosition(), "note");
+        const bool allowMultipleNotesOnSameTick = true;
+        auto event = track.lock()->addEvent(sequencer->getTickPosition(), "note", allowMultipleNotesOnSameTick);
 		auto noteEvent = dynamic_pointer_cast<NoteEvent>(event);
 		noteEvent->setDuration(24);
 		noteEvent->setNote(60);

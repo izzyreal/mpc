@@ -93,7 +93,7 @@ void EventsScreen::open()
             time1 = 0;
         }
 
-        auto toSeqLastTick = sequencer->getSequence(toSq).lock()->getLastTick();
+        auto toSeqLastTick = sequencer->getSequence(toSq)->getLastTick();
 
         if (start > toSeqLastTick)
         {
@@ -115,7 +115,7 @@ void EventsScreen::function(int i)
 	init();
 	
 	auto fromSequence = sequencer->getActiveSequence();
-	auto toSequence = sequencer->getSequence(toSq).lock();
+	auto toSequence = sequencer->getSequence(toSq);
 	
 	switch (i)
 	{
@@ -152,7 +152,7 @@ void EventsScreen::function(int i)
 			{
 				for (auto& e : destTrack->getEvents())
 				{
-					auto tick = e.lock()->getTick();
+					auto tick = e->getTick();
 
 					if (tick >= destOffset && tick < destOffset + (segLength * copies))
 						destTrack->removeEvent(e);
@@ -161,8 +161,7 @@ void EventsScreen::function(int i)
 
 			for (auto& e : sourceTrack->getEvents())
 			{
-				auto event = e.lock();
-				auto ne = dynamic_pointer_cast<NoteEvent>(event);
+				auto ne = dynamic_pointer_cast<NoteEvent>(e);
 			
 				if (ne)
 				{
@@ -178,19 +177,18 @@ void EventsScreen::function(int i)
 					}
 				}
 
-				if (event->getTick() >= sourceEnd)
+				if (e->getTick() >= sourceEnd)
 					break;
 
-				if (event->getTick() >= sourceStart)
+				if (e->getTick() >= sourceStart)
 				{
 					for (int copy = 0; copy < copies; copy++)
 					{
-						int tickCandidate = event->getTick() + destOffset + (copy * segLength);
+						int tickCandidate = e->getTick() + destOffset + (copy * segLength);
 						
 						if (tickCandidate < toSequence->getLastTick())
 						{
-							auto temp = destTrack->cloneEventIntoTrack(event).lock();
-							temp->setTick(tickCandidate);
+							destTrack->cloneEventIntoTrack(e, tickCandidate);
 						}
 					}
 				}
@@ -201,76 +199,40 @@ void EventsScreen::function(int i)
 		}
 		else if (editFunctionNumber == 1)
 		{
-			for (auto& e : sourceTrack->getEvents())
-			{
-				auto event = e.lock();
-			
-				auto noteEvent = dynamic_pointer_cast<NoteEvent>(event);
-				
-				if (noteEvent)
-				{
-					if (durationMode == 0)
-					{
-						noteEvent->setDuration(noteEvent->getDuration() + durationValue);
-					}
-					else if (durationMode == 1)
-					{
-						noteEvent->setDuration(noteEvent->getDuration() - durationValue);
-					}
-					else if (durationMode == 2)
-					{
-						noteEvent->setDuration(noteEvent->getDuration() * durationValue * 0.01);
-					}
-					else if (durationMode == 3)
-					{
-						noteEvent->setDuration(durationValue);
-					}
-				}
-			}
+			for (auto& noteEvent : sourceTrack->getNoteEvents()) {
+                if (durationMode == 0) {
+                    noteEvent->setDuration(noteEvent->getDuration() + durationValue);
+                } else if (durationMode == 1) {
+                    noteEvent->setDuration(noteEvent->getDuration() - durationValue);
+                } else if (durationMode == 2) {
+                    noteEvent->setDuration(noteEvent->getDuration() * durationValue * 0.01);
+                } else if (durationMode == 3) {
+                    noteEvent->setDuration(durationValue);
+                }
+            }
 		}
 		else if (editFunctionNumber == 2)
  {
-			for (auto& e : sourceTrack->getEvents())
-			{
-				auto event = e.lock();
-			
-				auto n = dynamic_pointer_cast<NoteEvent>(event);
-				
-				if (n)
-				{
-					if (velocityMode == 0)
-					{
-						n->setVelocity(n->getVelocity() + velocityValue);
-					}
-					else if (velocityMode == 1)
-					{
-						n->setVelocity(n->getVelocity() - velocityValue);
-					}
-					else if (velocityMode == 2)
-					{
-						n->setVelocity((n->getVelocity() * velocityValue * 0.01));
-					}
-					else if (velocityMode == 3)
-					{
-						n->setVelocity(velocityValue);
-					}
-				}
-			}
+			for (auto& n : sourceTrack->getNoteEvents()) {
+                if (velocityMode == 0) {
+                    n->setVelocity(n->getVelocity() + velocityValue);
+                } else if (velocityMode == 1) {
+                    n->setVelocity(n->getVelocity() - velocityValue);
+                } else if (velocityMode == 2) {
+                    n->setVelocity((n->getVelocity() * velocityValue * 0.01));
+                } else if (velocityMode == 3) {
+                    n->setVelocity(velocityValue);
+                }
+            }
 		}
 		else if (editFunctionNumber == 3)
         {
             // The original does not process DRUM tracks.
             // We do, because it's nice and doesn't bother anyone,
             // so you won't see any filtering of that kind here.
-			for (auto& e : sourceTrack->getEvents())
+			for (auto& n : sourceTrack->getNoteEvents())
 			{
-				auto event = e.lock();
-				auto n = dynamic_pointer_cast<NoteEvent>(event);
-			
-				if (n)
-				{
-					n->setNote(n->getNote() + transposeAmount);
-				}
+                n->setNote(n->getNote() + transposeAmount);
 			}
 		}
 
@@ -283,7 +245,7 @@ void EventsScreen::function(int i)
 void EventsScreen::turnWheel(int i)
 {
 	init();
-	auto toSequence = sequencer->getSequence(toSq).lock();
+	auto toSequence = sequencer->getSequence(toSq);
 
     if (checkAllTimesAndNotes(mpc, i, sequencer->getActiveSequence().get(), sequencer->getActiveTrack().get()))
     {
@@ -322,7 +284,7 @@ void EventsScreen::turnWheel(int i)
 	else if (param == "to-sq")
 	{
 		setToSq(toSq + i);
-		auto toSeq = sequencer->getSequence(toSq).lock();
+		auto toSeq = sequencer->getSequence(toSq);
 		
 		if (start > toSeq->getLastTick())
 			setStart(toSeq->getLastTick());
@@ -369,7 +331,7 @@ void EventsScreen::turnWheel(int i)
 
 void EventsScreen::displayStart()
 {
-	auto seq = sequencer->getSequence(toSq).lock();
+	auto seq = sequencer->getSequence(toSq);
 	findField("start0").lock()->setTextPadded(SeqUtil::getBar(seq.get(), start) + 1, "0");
 	findField("start1").lock()->setTextPadded(SeqUtil::getBeat(seq.get(), start) + 1, "0");
 	findField("start2").lock()->setTextPadded(SeqUtil::getClock(seq.get(), start), "0");

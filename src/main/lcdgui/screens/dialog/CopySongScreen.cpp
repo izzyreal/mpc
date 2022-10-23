@@ -20,7 +20,7 @@ void CopySongScreen::open()
 
 	for (int i = 0; i < 20; i++)
 	{
-		if (!sequencer->getSong(i).lock()->isUsed())
+		if (!sequencer->getSong(i)->isUsed())
 		{
 			song1 = i;
 			break;
@@ -56,9 +56,8 @@ void CopySongScreen::turnWheel(int i)
 
 	auto songScreen = mpc.screens->get<SongScreen>("song");
 
-	if (param.compare("song0") == 0)
+	if (param == "song0")
 	{
-		auto songScreen = mpc.screens->get<SongScreen>("song");
 		auto candidate = songScreen->activeSongIndex + i;
 
 		if (candidate < 0) candidate = 0;
@@ -68,7 +67,7 @@ void CopySongScreen::turnWheel(int i)
 
 		displaySong0();
 	}
-	else if (param.find("1") != string::npos)
+	else if (param == "song1")
 	{
 		setSong1(song1 + i);
 	}
@@ -87,12 +86,12 @@ void CopySongScreen::setSong1(int i)
 void CopySongScreen::displaySong0()
 {
 	auto songScreen = mpc.screens->get<SongScreen>("song");
-	auto song = sequencer->getSong(songScreen->activeSongIndex).lock();
+	auto song = sequencer->getSong(songScreen->activeSongIndex);
 	findField("song0").lock()->setText(StrUtil::padLeft(to_string(songScreen->activeSongIndex + 1), "0", 2) + "-" + song->getName());
 }
 
 void CopySongScreen::displaySong1()
 {
-	auto song = sequencer->getSong(song1).lock();
+	auto song = sequencer->getSong(song1);
 	findField("song1").lock()->setText(StrUtil::padLeft(to_string(song1 + 1), "0", 2) + "-" + song->getName());
 }

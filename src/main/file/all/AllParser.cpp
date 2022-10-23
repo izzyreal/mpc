@@ -87,7 +87,7 @@ AllParser::AllParser(mpc::Mpc& _mpc)
 	auto mpcSequencer = mpc.getSequencer().lock();
 
 	for (int i = 0; i < 20; i++) {
-		songs[i] = new Song(mpcSequencer->getSong(i).lock().get());
+		songs[i] = new Song(mpcSequencer->getSong(i).get());
 		chunks.push_back(songs[i]->getBytes());
 	}
 	

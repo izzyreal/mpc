@@ -12,7 +12,6 @@
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::sequencer;
-using namespace std;
 
 Sequence::Sequence(mpc::Mpc& _mpc)
 	: mpc (_mpc), defaultTrackNames (_mpc.getSequencer().lock()->getDefaultTrackNames())
@@ -23,8 +22,8 @@ Sequence::Sequence(mpc::Mpc& _mpc)
 		tracks[i]->setName(defaultTrackNames[i]);
 	}
 
-	metaTracks.push_back(make_shared<Track>(mpc, this, 64));
-	metaTracks.push_back(make_shared<Track>(mpc, this, 65));
+	metaTracks.push_back(std::make_shared<Track>(mpc, this, 64));
+	metaTracks.push_back(std::make_shared<Track>(mpc, this, 65));
 
 	metaTracks[0]->setUsed(true);
 	metaTracks[1]->setUsed(true);
@@ -64,12 +63,12 @@ void Sequence::setFirstLoopBarIndex(int i)
 
 	firstLoopBarIndex = i;
 	
-	notifyObservers(string("firstloopbar"));
+	notifyObservers(std::string("firstloopbar"));
 	
 	if (i > lastLoopBarIndex)
 	{
 		lastLoopBarIndex = i;
-		notifyObservers(string("lastloopbar"));
+		notifyObservers(std::string("lastloopbar"));
 	}
 }
 
@@ -90,7 +89,7 @@ void Sequence::setLastLoopBarIndex(int i)
 			lastLoopBarEnd = false;
 			lastLoopBarIndex = lastBarIndex;
 			
-			notifyObservers(string("lastloopbar"));
+			notifyObservers(std::string("lastloopbar"));
 			return;
 		}
 		else
@@ -103,25 +102,25 @@ void Sequence::setLastLoopBarIndex(int i)
 		if (i > lastBarIndex)
 		{
 			lastLoopBarEnd = true;	
-			notifyObservers(string("lastloopbar"));
+			notifyObservers(std::string("lastloopbar"));
 		}
 		else
 		{
 			lastLoopBarIndex = i;
 			
-			notifyObservers(string("lastloopbar"));
+			notifyObservers(std::string("lastloopbar"));
 		
 			if (i < firstLoopBarIndex)
 			{
 				firstLoopBarIndex = i;
-				notifyObservers(string("firstloopbar"));
+				notifyObservers(std::string("firstloopbar"));
 			}
 		}
 	}
 
 	lastLoopBarIndex = i;
 	
-	notifyObservers(string("lastloopbar"));
+	notifyObservers(std::string("lastloopbar"));
 }
 
 int Sequence::getLastLoopBarIndex()
@@ -159,7 +158,7 @@ void Sequence::createTempoChangeTrack()
 {
 	metaTracks[1]->removeEvents();
 	auto tce = metaTracks[1]->addEvent(0, "tempo-change");
-	dynamic_pointer_cast<mpc::sequencer::TempoChangeEvent>(tce)->setStepNumber(0);
+	std::dynamic_pointer_cast<mpc::sequencer::TempoChangeEvent>(tce)->setStepNumber(0);
 }
 
 bool Sequence::isLoopEnabled()
@@ -167,25 +166,25 @@ bool Sequence::isLoopEnabled()
 	return loopEnabled;
 }
 
-void Sequence::setName(string s)
+void Sequence::setName(std::string s)
 {
 	name = s;
 }
 
-string Sequence::getName()
+std::string Sequence::getName()
 {
 	if (!used)
-		return string("(Unused)");
+		return std::string("(Unused)");
 
 	return name;
 }
 
-void Sequence::setDeviceName(int i, string s)
+void Sequence::setDeviceName(int i, std::string s)
 {
 	deviceNames[i] = s;
 }
 
-string Sequence::getDeviceName(int i)
+std::string Sequence::getDeviceName(int i)
 {
 	return deviceNames[i];
 }
@@ -207,7 +206,7 @@ void Sequence::setLoopEnabled(bool b)
 {
 	loopEnabled = b;
 	
-	notifyObservers(string("loop"));
+	notifyObservers(std::string("loop"));
 }
 
 std::shared_ptr<Track> Sequence::getTrack(int i)
@@ -263,22 +262,22 @@ std::vector<std::shared_ptr<Track>> Sequence::getTracks()
     return tracks;
 }
 
-vector<string> Sequence::getDeviceNames()
+std::vector<std::string>& Sequence::getDeviceNames()
 {
 	return deviceNames;
 }
 
-void Sequence::setDeviceNames(vector<string> sa)
+void Sequence::setDeviceNames(std::vector<std::string>& sa)
 {
 	deviceNames = sa;
 }
 
-vector<weak_ptr<TempoChangeEvent>> Sequence::getTempoChangeEvents()
+std::vector<std::shared_ptr<TempoChangeEvent>> Sequence::getTempoChangeEvents()
 {
-	auto res = vector<weak_ptr<TempoChangeEvent>>();
+	std::vector<std::shared_ptr<TempoChangeEvent>> res;
 	
 	for (auto& t : metaTracks[1]->getEvents())
-		res.push_back(dynamic_pointer_cast<TempoChangeEvent>(t.lock()));
+		res.push_back(std::dynamic_pointer_cast<TempoChangeEvent>(t));
 
 	return res;
 }
@@ -286,7 +285,7 @@ vector<weak_ptr<TempoChangeEvent>> Sequence::getTempoChangeEvents()
 std::shared_ptr<TempoChangeEvent> Sequence::addTempoChangeEvent()
 {
 	auto res = metaTracks[1]->addEvent(0, "tempo-change");
-	return dynamic_pointer_cast<TempoChangeEvent>(res);
+	return std::dynamic_pointer_cast<TempoChangeEvent>(res);
 }
 
 double Sequence::getInitialTempo()
@@ -303,7 +302,7 @@ void Sequence::setInitialTempo(const double newInitialTempo)
 	else if (newInitialTempo > 300.0)
 		this->initialTempo = 300.0;
 	
-	notifyObservers(string("initial-tempo"));
+	notifyObservers(std::string("initial-tempo"));
 }
 
 
@@ -320,7 +319,7 @@ bool Sequence::isTempoChangeOn()
 void Sequence::setTempoChangeOn(bool b)
 {
 	tempoChangeOn = b;
-	notifyObservers(string("tempochangeon"));
+	notifyObservers(std::string("tempochangeon"));
 }
 
 int Sequence::getLastTick()
@@ -354,7 +353,7 @@ void Sequence::sortTempoChangeEvents()
 
 	for (auto& e : metaTracks[1]->getEvents())
 	{
-		auto tce = dynamic_pointer_cast<TempoChangeEvent>(e.lock());
+		auto tce = std::dynamic_pointer_cast<TempoChangeEvent>(e);
 		tce->setStepNumber(tceCounter);
 		tceCounter++;
 	}
@@ -366,7 +365,7 @@ void Sequence::purgeAllTracks()
 		purgeTrack(i);
 }
 
-weak_ptr<Track> Sequence::purgeTrack(int i)
+std::shared_ptr<Track> Sequence::purgeTrack(int i)
 {
 	tracks[i] = std::make_shared<Track>(mpc, this, i);
 	tracks[i]->setName(defaultTrackNames[i]);
@@ -383,12 +382,12 @@ int Sequence::getNumerator(int i)
 	return numerators[i];
 }
 
-vector<int>& Sequence::getBarLengthsInTicks()
+std::vector<int>& Sequence::getBarLengthsInTicks()
 {
 	return barLengthsInTicks;
 }
 
-void Sequence::setBarLengths(vector<int>& newBarLengths)
+void Sequence::setBarLengths(std::vector<int>& newBarLengths)
 {
     barLengthsInTicks = newBarLengths;
 }
@@ -414,7 +413,7 @@ void Sequence::deleteBars(int firstBar, int _lastBar)
 	{
 		for (auto& e : t->getEvents())
 		{
-			if (e.lock()->getTick() >= deleteFirstTick && e.lock()->getTick() < deleteLastTick)
+			if (e->getTick() >= deleteFirstTick && e->getTick() < deleteLastTick)
 				t->removeEvent(e);
 		}
 	}
@@ -462,10 +461,8 @@ void Sequence::deleteBars(int firstBar, int _lastBar)
 		if (t->getIndex() >= 64 || t->getIndex() == 65)
 			continue;
 
-		for (auto& event : t->getEvents())
+		for (auto& e : t->getEvents())
 		{
-			auto e = event.lock();
-			
 			if (e->getTick() >= oldBarStartPos)
 				e->setTick(e->getTick() - tickDifference);
 		}
@@ -537,10 +534,8 @@ void Sequence::insertBars(int barCount, int afterBar)
             if (t->getIndex() == 64 || t->getIndex() == 65)
                 continue;
 
-            for (auto& event : t->getEvents())
+            for (auto& e : t->getEvents())
             {
-                auto e = event.lock();
-
                 if (e->getTick() >= barStart)
                     e->setTick(e->getTick() + (newBarStart - barStart));
             }
@@ -552,9 +547,9 @@ void Sequence::insertBars(int barCount, int afterBar)
 	if (lastBarIndex != -1)
 		setUsed(true);
 
-	notifyObservers(string("numberofbars"));
-	notifyObservers(string("tempo"));
-	notifyObservers(string("timesignature"));
+	notifyObservers(std::string("numberofbars"));
+	notifyObservers(std::string("tempo"));
+	notifyObservers(std::string("timesignature"));
 }
 
 void Sequence::moveTrack(int source, int destination)
@@ -632,25 +627,25 @@ void Sequence::initLoop()
 	setLoopEnd(newLoopEnd);
 }
 
-vector<int>* Sequence::getNumerators()
+std::vector<int>& Sequence::getNumerators()
 {
-	return &numerators;
+	return numerators;
 }
 
-vector<int>* Sequence::getDenominators()
+std::vector<int>& Sequence::getDenominators()
 {
-	return &denominators;
+	return denominators;
 }
 
-void Sequence::setNumeratorsAndDenominators(vector<int>& newNumerators, vector<int>& newDenominators)
+void Sequence::setNumeratorsAndDenominators(std::vector<int>& newNumerators, std::vector<int>& newDenominators)
 {
-	this->numerators = newNumerators;
-	this->denominators = newDenominators;
+	numerators = newNumerators;
+	denominators = newDenominators;
 }
 
-bool Sequence::trackIndexComparator(weak_ptr<Track> t0, weak_ptr<Track> t1)
+bool Sequence::trackIndexComparator(std::shared_ptr<Track>& t0, std::shared_ptr<Track>& t1)
 {
-	return t0.lock()->getIndex() < t1.lock()->getIndex();
+	return t0->getIndex() < t1->getIndex();
 }
 
 int Sequence::getFirstTickOfBeat(int bar, int beat)

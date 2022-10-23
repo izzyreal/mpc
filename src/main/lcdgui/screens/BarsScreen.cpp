@@ -19,7 +19,7 @@ void BarsScreen::open()
 {
     auto fromSequence = sequencer->getActiveSequence();
     auto eventsScreen = mpc.screens->get<EventsScreen>("events");
-    auto toSequence = sequencer->getSequence(eventsScreen->toSq).lock();
+    auto toSequence = sequencer->getSequence(eventsScreen->toSq);
     auto userScreen = mpc.screens->get<UserScreen>("user");
     auto userLastBar = userScreen->lastBar;
 
@@ -79,7 +79,7 @@ void BarsScreen::function(int j)
             return;
         }
 
-		auto toSequence = sequencer->getSequence(eventsScreen->toSq).lock();
+		auto toSequence = sequencer->getSequence(eventsScreen->toSq);
         auto numberOfBars = (lastBar - firstBar + 1) * eventsScreen->copies;
 
 		if (!toSequence->isUsed())
@@ -141,10 +141,8 @@ void BarsScreen::function(int j)
 			auto t1 = fromSequence->getTrack(i);
 			auto t2 = toSequence->getTrack(i);
 
-			for (auto& e : t1->getEvents())
+			for (auto& event : t1->getEvents())
 			{
-				auto event = e.lock();
-
 				if (event->getTick() >= firstTick && event->getTick() < lastTick)
 				{
 					if (!t2->isUsed())
@@ -152,8 +150,8 @@ void BarsScreen::function(int j)
 
 					for (auto k = 0; k < eventsScreen->copies; k++)
 					{
-						auto clone = t2->cloneEventIntoTrack(event).lock();
-						clone->setTick(clone->getTick() + offset + (k * segmentLengthTicks));
+                        auto tick = event->getTick() + offset + (k * segmentLengthTicks);
+						t2->cloneEventIntoTrack(event, tick);
 					}
 				}
 			}
@@ -198,7 +196,7 @@ void BarsScreen::turnWheel(int i)
 
 		displayToSq();
 
-        auto toSequence = sequencer->getSequence(eventsScreen->toSq).lock();
+        auto toSequence = sequencer->getSequence(eventsScreen->toSq);
         auto maxAfterBarIndex = toSequence->isUsed() ? toSequence->getLastBarIndex() + 1 : 0;
 
         if (afterBar > maxAfterBarIndex)
@@ -208,7 +206,7 @@ void BarsScreen::turnWheel(int i)
 	}
 	else if (param == "afterbar")
 	{
-        auto toSequence = sequencer->getSequence(eventsScreen->toSq).lock();
+        auto toSequence = sequencer->getSequence(eventsScreen->toSq);
 
         if (!toSequence->isUsed())
         {
@@ -233,7 +231,7 @@ void BarsScreen::turnWheel(int i)
 	}
 	else if (param == "copies")
 	{
-        auto toSequence = sequencer->getSequence(eventsScreen->toSq).lock();
+        auto toSequence = sequencer->getSequence(eventsScreen->toSq);
 
         if (!toSequence->isUsed())
         {

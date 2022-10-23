@@ -41,7 +41,7 @@ void VmpcDirectToDiskRecorderScreen::turnWheel(int i)
 {
 	init();
 
-	auto seq = sequencer->getSequence(sq).lock().get();
+	auto seq = sequencer->getSequence(sq).get();
 
 	checkAllTimes(mpc, i, seq);
 
@@ -90,7 +90,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 			rate = mpc.getAudioMidiServices().lock()->getAudioServer()->getSampleRate();
 
 		auto split = false;
-		auto sequence = sequencer->getSequence(seq).lock();
+		auto sequence = sequencer->getSequence(seq);
         loopWasEnabled = sequence->isLoopEnabled();
 
 		switch (record)
@@ -141,7 +141,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 		}
 		case 3:
 		{
-			auto mpcSong = sequencer->getSong(song).lock();
+			auto mpcSong = sequencer->getSong(song);
 
 			if (!mpcSong->isUsed())
 				return;
@@ -203,7 +203,7 @@ void VmpcDirectToDiskRecorderScreen::setSq(int i)
 	
 	setTime0(0);
 	
-	auto s = sequencer->getSequence(sq).lock();
+	auto s = sequencer->getSequence(sq);
 	
 	if (s->isUsed())
 		setTime1(s->getLastTick());
@@ -255,8 +255,8 @@ void VmpcDirectToDiskRecorderScreen::displaySong()
 
 	if (record != 3)
 		return;
-
-	findField("song").lock()->setText(StrUtil::padLeft(to_string(song + 1), "0", 2) + "-" + sequencer->getSong(song).lock()->getName());
+    auto songName = sequencer->getSong(song)->getName();
+	findField("song").lock()->setText(StrUtil::padLeft(to_string(song + 1), "0", 2) + "-" + songName);
 }
 
 void VmpcDirectToDiskRecorderScreen::displayOffline()
@@ -288,7 +288,8 @@ void VmpcDirectToDiskRecorderScreen::displaySq()
 	if (!visible)
 		return;
 
-	findField("sq").lock()->setText(StrUtil::padLeft(to_string(sq + 1), "0", 2) + "-" + sequencer->getSequence(sq).lock()->getName());
+    auto seqName = sequencer->getSequence(sq)->getName();
+	findField("sq").lock()->setText(StrUtil::padLeft(to_string(sq + 1), "0", 2) + "-" + seqName);
 }
 
 void VmpcDirectToDiskRecorderScreen::displayTime()
@@ -304,7 +305,7 @@ void VmpcDirectToDiskRecorderScreen::displayTime()
 	if (invisible)
 		return;
 
-	auto sequence = sequencer->getSequence(sq).lock();
+	auto sequence = sequencer->getSequence(sq);
 
 	findField("time0").lock()->setTextPadded(SeqUtil::getBar(sequence.get(), time0 ) + 1, "0");
 	findField("time1").lock()->setTextPadded(SeqUtil::getBeat(sequence.get(), time0) + 1, "0");

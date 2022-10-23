@@ -95,7 +95,7 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc& mpc, AllParser& allParser)
             continue;
         }
 
-        auto mpcSeq = mpc.getSequencer().lock()->getSequence(index++).lock();
+        auto mpcSeq = mpc.getSequencer().lock()->getSequence(index++);
         as->applyToMpcSeq(mpcSeq);
     }
 
@@ -186,7 +186,7 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc& mpc, AllParser& allParser)
     for (int i = 0; i < 20; i++)
     {
         auto allSong = songs[i];
-        auto mpcSong = lSequencer->getSong(i).lock();
+        auto mpcSong = lSequencer->getSong(i);
         mpcSong->setUsed(false);
 
         if (allSong->getIsUsed())

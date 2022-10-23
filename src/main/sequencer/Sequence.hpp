@@ -61,7 +61,7 @@ public:
     void createMidiClockTrack();
     void createTempoChangeTrack();
     
-    static bool trackIndexComparator(std::weak_ptr<Track> t0, std::weak_ptr<Track> t1);
+    static bool trackIndexComparator(std::shared_ptr<Track>& t0, std::shared_ptr<Track>& t1);
     
 public:
     bool isLoopEnabled();
@@ -80,9 +80,9 @@ public:
     void setTimeSignature(int bar, int num, int den);
     std::vector<std::shared_ptr<Track>> getTracks();
     std::vector<std::shared_ptr<Track>> getMetaTracks();
-    std::vector<std::string> getDeviceNames();
-    void setDeviceNames(std::vector<std::string> sa);
-    std::vector<std::weak_ptr<TempoChangeEvent>> getTempoChangeEvents();
+    std::vector<std::string>& getDeviceNames();
+    void setDeviceNames(std::vector<std::string>& sa);
+    std::vector<std::shared_ptr<TempoChangeEvent>> getTempoChangeEvents();
     std::shared_ptr<TempoChangeEvent> addTempoChangeEvent();
     void removeTempoChangeEvent(int i);
 
@@ -92,7 +92,7 @@ public:
     TimeSignature getTimeSignature();
     void sortTempoChangeEvents();
     void purgeAllTracks();
-    std::weak_ptr<Track> purgeTrack(int i);
+    std::shared_ptr<Track> purgeTrack(int i);
     int getDenominator(int i);
     int getNumerator(int i);
     std::vector<int>& getBarLengthsInTicks();
@@ -105,8 +105,8 @@ public:
     
     int getEventCount();
     void initLoop();
-    std::vector<int>* getNumerators();
-    std::vector<int>* getDenominators();
+    std::vector<int>& getNumerators();
+    std::vector<int>& getDenominators();
 
     int getFirstTickOfBar(int index);
     int getLastTickOfBar(int index);

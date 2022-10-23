@@ -74,11 +74,11 @@ void LoadASequenceScreen::setLoadInto(int i)
 void LoadASequenceScreen::displayLoadInto()
 {
 	findField("load-into").lock()->setTextPadded(loadInto + 1, "0");
-	findLabel("name").lock()->setText("-" + sequencer->getSequence(loadInto).lock()->getName());
+	findLabel("name").lock()->setText("-" + sequencer->getSequence(loadInto)->getName());
 }
 
 void LoadASequenceScreen::displayFile()
 {
-	auto s = sequencer->getPlaceHolder().lock();
+	auto s = sequencer->getPlaceHolder();
 	findLabel("file").lock()->setText("File:" + StrUtil::toUpper(s->getName()) + ".MID");
 }

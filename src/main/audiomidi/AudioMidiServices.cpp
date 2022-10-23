@@ -409,7 +409,7 @@ bool AudioMidiServices::stopBouncing()
 
     if (directToDiskRecorderScreen->loopWasEnabled)
     {
-        auto seq = mpc.getSequencer().lock()->getSequence(directToDiskRecorderScreen->sq).lock();
+        auto seq = mpc.getSequencer().lock()->getSequence(directToDiskRecorderScreen->sq);
         seq->setLoopEnabled(true);
         directToDiskRecorderScreen->loopWasEnabled = false;
     }

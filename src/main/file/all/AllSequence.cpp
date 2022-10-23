@@ -123,7 +123,7 @@ void AllSequence::applyToMpcSeq(shared_ptr<mpc::sequencer::Sequence> mpcSeq)
         if (track > 128) track -= 128;
         if (track < 0) track += 128;
         if (track > 63) track -= 64;
-        mpcSeq->getTrack(track)->cloneEventIntoTrack(shared_ptr<mpc::sequencer::Event>(e));
+        mpcSeq->getTrack(track)->cloneEventIntoTrack(e, e->getTick());
     }
 
     for (int i = 0; i < 32; i++)
@@ -342,8 +342,8 @@ int AllSequence::getSegmentCount(mpc::sequencer::Sequence* seq)
         
         for (auto& e : track->getEvents())
         {
-            auto sysExEvent = dynamic_pointer_cast<mpc::sequencer::SystemExclusiveEvent>(e.lock());
-            auto mixerEvent = dynamic_pointer_cast<mpc::sequencer::MixerEvent>(e.lock());
+            auto sysExEvent = dynamic_pointer_cast<mpc::sequencer::SystemExclusiveEvent>(e);
+            auto mixerEvent = dynamic_pointer_cast<mpc::sequencer::MixerEvent>(e);
             
             if (sysExEvent)
             {
@@ -401,12 +401,10 @@ vector<char> AllSequence::createEventSegmentsChunk(mpc::sequencer::Sequence* seq
             
             for (auto& event : track->getEvents())
             {
-                auto e = event.lock();
-                
-                if (e->getTick() == i)
+                if (event->getTick() == i)
                 {
-                    e->setTrack(track->getIndex());
-                    ea.push_back(AllEvent::mpcEventToBytes(e));
+                    event->setTrack(track->getIndex());
+                    ea.push_back(AllEvent::mpcEventToBytes(event));
                 }
             }
         }

@@ -88,7 +88,7 @@ void StepEditorScreen::open()
 		findField("fromnote").lock()->setAlignment(Alignment::Centered, 18);
 		findField("tonote").lock()->setAlignment(Alignment::Centered, 18);
 
-		if (lastColumn["note"].compare("e") == 0)
+		if (lastColumn["note"] == "e")
 			lastColumn["note"] = "c";
 	}
 
@@ -109,11 +109,11 @@ void StepEditorScreen::open()
 
 	auto previousScreen = ls.lock()->getPreviousScreenName();
 
-	if (previousScreen.compare("step-timing-correct") != 0 &&
-		previousScreen.compare("insert-event") != 0 &&
-		previousScreen.compare("paste-event") != 0)
+	if (previousScreen != "step-timing-correct" &&
+		previousScreen != "insert-event" &&
+		previousScreen != "paste-event")
 	{
-		auto eventType = visibleEvents[0].lock()->getTypeName();
+		auto eventType = visibleEvents[0]->getTypeName();
 		ls.lock()->setFocus(lastColumn[eventType] + "0");
 	}
 }
@@ -128,28 +128,28 @@ void StepEditorScreen::close()
 	{
 		int srcNumber = stoi(param.substr(1, 2));
 		auto srcLetter = param.substr(0, 1);
-		auto eventType = visibleEvents[srcNumber].lock()->getTypeName();
+		auto eventType = visibleEvents[srcNumber]->getTypeName();
 		lastColumn[eventType] = srcLetter;
 	}
 
 	auto nextScreen = ls.lock()->getCurrentScreenName();
 
-	if (nextScreen.compare("step-timing-correct") != 0 &&
-		nextScreen.compare("insert-event") != 0 &&
-		nextScreen.compare("paste-event") != 0)
+	if (nextScreen != "step-timing-correct" &&
+		nextScreen != "insert-event" &&
+		nextScreen != "paste-event")
 	{
 		track.lock()->removeDoubles();
 	}
 
 	for (auto& e : visibleEvents)
 	{
-		if (e.lock())
-			e.lock()->deleteObserver(this);
+		if (e) e->deleteObserver(this);
 	}
 
 	for (auto& e : eventsAtCurrentTick)
-		if (e.lock())
-			e.lock()->deleteObserver(this);
+    {
+        if (e) e->deleteObserver(this);
+    }
 
 	clearSelection();
 }
@@ -175,10 +175,10 @@ void StepEditorScreen::function(int i)
 		{
 			// CopySelectedNote
 			auto eventIndex = stoi(param.substr(1, 1));
-			auto maybeEmptyEvent = dynamic_pointer_cast<EmptyEvent>(visibleEvents[eventIndex].lock());
+			auto maybeEmptyEvent = std::dynamic_pointer_cast<EmptyEvent>(visibleEvents[eventIndex]);
 
 			if (!maybeEmptyEvent)
-				placeHolder = { visibleEvents[eventIndex].lock() };
+				placeHolder = { visibleEvents[eventIndex] };
 		}
 		break;
 	case 2:
@@ -195,11 +195,11 @@ void StepEditorScreen::function(int i)
 			return;
 		}
 
-		if (!dynamic_pointer_cast<EmptyEvent>(visibleEvents[rowIndex].lock()))
+		if (!dynamic_pointer_cast<EmptyEvent>(visibleEvents[rowIndex]))
 		{
 			for (int e = 0; e < track.lock()->getEvents().size(); e++)
 			{
-				if (track.lock()->getEvents()[e].lock() == visibleEvents[rowIndex].lock())
+				if (track.lock()->getEvents()[e] == visibleEvents[rowIndex])
 				{
 					track.lock()->removeEvent(e);
 					break;
@@ -214,7 +214,7 @@ void StepEditorScreen::function(int i)
 		refreshEventRows();
 		refreshSelection();
 
-		auto eventType = visibleEvents[rowIndex].lock()->getTypeName();
+		auto eventType = visibleEvents[rowIndex]->getTypeName();
 
 		ls.lock()->setFocus(lastColumn[eventType] + to_string(rowIndex));
 		break;
@@ -232,29 +232,29 @@ void StepEditorScreen::function(int i)
 		{
 			auto row = stoi(param.substr(1, 2));
 
-			auto event = visibleEvents[row].lock();
+			auto event = visibleEvents[row];
 
-			auto pitchEvent = dynamic_pointer_cast<PitchBendEvent>(event);
-			auto mixerEvent = dynamic_pointer_cast<MixerEvent>(event);
-			auto sysexEvent = dynamic_pointer_cast<SystemExclusiveEvent>(event);
-			auto maybeEmptyEvent = dynamic_pointer_cast<EmptyEvent>(event);
+			auto pitchEvent = std::dynamic_pointer_cast<PitchBendEvent>(event);
+			auto mixerEvent = std::dynamic_pointer_cast<MixerEvent>(event);
+			auto sysexEvent = std::dynamic_pointer_cast<SystemExclusiveEvent>(event);
+			auto maybeEmptyEvent = std::dynamic_pointer_cast<EmptyEvent>(event);
 
 			if (pitchEvent || mixerEvent || sysexEvent || maybeEmptyEvent)
 				return;
 
-			auto noteEvent = dynamic_pointer_cast<NoteEvent>(event);
-			auto pgmChangeEvent = dynamic_pointer_cast<ProgramChangeEvent>(event);
-			auto chPressEvent = dynamic_pointer_cast<ChannelPressureEvent>(event);
-			auto polyPressEvent = dynamic_pointer_cast<PolyPressureEvent>(event);
-			auto controlChangeEvent = dynamic_pointer_cast<ControlChangeEvent>(event);
+			auto noteEvent = std::dynamic_pointer_cast<NoteEvent>(event);
+			auto pgmChangeEvent = std::dynamic_pointer_cast<ProgramChangeEvent>(event);
+			auto chPressEvent = std::dynamic_pointer_cast<ChannelPressureEvent>(event);
+			auto polyPressEvent = std::dynamic_pointer_cast<PolyPressureEvent>(event);
+			auto controlChangeEvent = std::dynamic_pointer_cast<ControlChangeEvent>(event);
 
 			auto column = param.substr(0, 1);
 
-			bool isA = column.compare("a") == 0;
-			bool isB = column.compare("b") == 0;
-			bool isC = column.compare("c") == 0;
-			bool isD = column.compare("d") == 0;
-			bool isE = column.compare("e") == 0;
+			bool isA = column == "a";
+			bool isB = column == "b";
+			bool isC = column == "c";
+			bool isD = column == "d";
+			bool isE = column == "e";
 
 			if ((polyPressEvent || controlChangeEvent) && isA)
 				return;
@@ -330,8 +330,8 @@ void StepEditorScreen::function(int i)
 			if (param.length() == 2)
 			{
 				auto eventNumber = stoi(param.substr(1, 2));
-				auto event = visibleEvents[eventNumber].lock();
-				auto noteEvent = dynamic_pointer_cast<NoteEvent>(event);
+				auto event = visibleEvents[eventNumber];
+				auto noteEvent = std::dynamic_pointer_cast<NoteEvent>(event);
 
 				if (noteEvent)
                 {
@@ -351,38 +351,38 @@ void StepEditorScreen::turnWheel(int i)
 {
 	init();
 
-	if (param.compare("view") == 0)
+	if (param == "view")
 	{
 		setView(view + i);
 	}
-	else if (param.compare("now0") == 0)
+	else if (param == "now0")
 	{
 		sequencer->setBar(sequencer->getCurrentBarIndex() + i);
-	}
-	else if (param.compare("now1") == 0)
+    }
+	else if (param == "now1")
 	{
 		sequencer->setBeat(sequencer->getCurrentBeatIndex() + i);
 	}
-	else if (param.compare("now2") == 0)
+	else if (param == "now2")
 	{
 		sequencer->setClock(sequencer->getCurrentClockNumber() + i);
 	}
-	else if (param.compare("tcvalue") == 0)
+	else if (param == "tcvalue")
 	{
 		auto screen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
 		auto noteValue = screen->getNoteValue();
 		screen->setNoteValue(noteValue + i);
 	}
-	else if (param.compare("fromnote") == 0 && view == 1)
+	else if (param == "fromnote" && view == 1)
 	{
 		if (track.lock()->getBus() != 0) setFromNote(fromNote + i);
 		if (track.lock()->getBus() == 0) setNoteA(noteA + i);
 	}
-	else if (param.compare("tonote") == 0)
+	else if (param == "tonote")
 	{
 		setNoteB(noteB + i);
 	}
-	else if (param.compare("fromnote") == 0 && view == 3)
+	else if (param == "fromnote" && view == 3)
 	{
 		setControl(control + i);
 	}
@@ -390,14 +390,14 @@ void StepEditorScreen::turnWheel(int i)
 	{
 		auto eventNumber = stoi(param.substr(1, 2));
 
-		auto sysEx = dynamic_pointer_cast<SystemExclusiveEvent>(visibleEvents[eventNumber].lock());
-		auto channelPressure = dynamic_pointer_cast<ChannelPressureEvent>(visibleEvents[eventNumber].lock());
-		auto polyPressure = dynamic_pointer_cast<PolyPressureEvent>(visibleEvents[eventNumber].lock());
-		auto controlChange = dynamic_pointer_cast<ControlChangeEvent>(visibleEvents[eventNumber].lock());
-		auto programChange = dynamic_pointer_cast<ProgramChangeEvent>(visibleEvents[eventNumber].lock());
-		auto pitchBend = dynamic_pointer_cast<PitchBendEvent>(visibleEvents[eventNumber].lock());
-		auto mixer = dynamic_pointer_cast<MixerEvent>(visibleEvents[eventNumber].lock());
-		auto note = dynamic_pointer_cast<NoteEvent>(visibleEvents[eventNumber].lock());
+		auto sysEx = std::dynamic_pointer_cast<SystemExclusiveEvent>(visibleEvents[eventNumber]);
+		auto channelPressure = std::dynamic_pointer_cast<ChannelPressureEvent>(visibleEvents[eventNumber]);
+		auto polyPressure = std::dynamic_pointer_cast<PolyPressureEvent>(visibleEvents[eventNumber]);
+		auto controlChange = std::dynamic_pointer_cast<ControlChangeEvent>(visibleEvents[eventNumber]);
+		auto programChange = std::dynamic_pointer_cast<ProgramChangeEvent>(visibleEvents[eventNumber]);
+		auto pitchBend = std::dynamic_pointer_cast<PitchBendEvent>(visibleEvents[eventNumber]);
+		auto mixer = std::dynamic_pointer_cast<MixerEvent>(visibleEvents[eventNumber]);
+		auto note = std::dynamic_pointer_cast<NoteEvent>(visibleEvents[eventNumber]);
 
 		if (sysEx)
 		{
@@ -515,7 +515,9 @@ void StepEditorScreen::prevStepEvent()
 {
 	init();
 
-	auto controls = mpc.getControls().lock();
+    track.lock()->removeDoubles();
+
+    auto controls = mpc.getControls().lock();
 
 	if (controls->isGoToPressed())
 		sequencer->goToPreviousEvent();
@@ -529,7 +531,9 @@ void StepEditorScreen::nextStepEvent()
 {
 	init();
 
-	auto controls = mpc.getControls().lock();
+    track.lock()->removeDoubles();
+
+    auto controls = mpc.getControls().lock();
 
 	if (controls->isGoToPressed())
 		sequencer->goToNextEvent();
@@ -542,7 +546,10 @@ void StepEditorScreen::nextStepEvent()
 void StepEditorScreen::prevBarStart()
 {
 	init();
-	auto controls = mpc.getControls().lock();
+
+    track.lock()->removeDoubles();
+
+    auto controls = mpc.getControls().lock();
 
 	if (controls->isGoToPressed())
 		sequencer->setBar(0);
@@ -556,7 +563,9 @@ void StepEditorScreen::nextBarEnd()
 {
 	init();
 
-	auto controls = mpc.getControls().lock();
+    track.lock()->removeDoubles();
+
+    auto controls = mpc.getControls().lock();
 
 	if (controls->isGoToPressed())
 		sequencer->setBar(sequencer->getActiveSequence()->getLastBarIndex() + 1);
@@ -570,7 +579,7 @@ void StepEditorScreen::left()
 {
 	init();
 
-	if (param.length() == 2 && param.substr(0, 1).compare("a") == 0)
+	if (param.length() == 2 && param.substr(0, 1) == "a")
 	{
 		lastRow = stoi(param.substr(1, 2));
 		ls.lock()->setFocus("view");
@@ -602,13 +611,13 @@ void StepEditorScreen::up()
 		int srcNumber = stoi(src.substr(1, 2));
 		auto controls = mpc.getControls().lock();
 
-		if (controls->isShiftPressed() && selectionStartIndex == -1 && dynamic_pointer_cast<EmptyEvent>(visibleEvents[srcNumber].lock()))
+		if (controls->isShiftPressed() && selectionStartIndex == -1 && std::dynamic_pointer_cast<EmptyEvent>(visibleEvents[srcNumber]))
 			return;
 
 		if (!controls->isShiftPressed() && srcNumber == 0 && yOffset == 0)
 		{
 			clearSelection();
-			auto eventType = visibleEvents[srcNumber].lock()->getTypeName();
+			auto eventType = visibleEvents[srcNumber]->getTypeName();
 			lastColumn[eventType] = srcLetter;
 			lastRow = 0;
 			ls.lock()->setFocus("view");
@@ -618,12 +627,12 @@ void StepEditorScreen::up()
 
 		if (srcNumber == 0 && yOffset != 0)
 		{
-			auto oldEventType = visibleEvents[srcNumber].lock()->getTypeName();
+			auto oldEventType = visibleEvents[srcNumber]->getTypeName();
 			lastColumn[oldEventType] = srcLetter;
 
 			setyOffset(yOffset - 1);
 
-			auto newEventType = visibleEvents[srcNumber].lock()->getTypeName();
+			auto newEventType = visibleEvents[srcNumber]->getTypeName();
 
 			ls.lock()->setFocus(lastColumn[newEventType] + to_string(srcNumber));
 
@@ -642,9 +651,12 @@ void StepEditorScreen::down()
 {
 	init();
 
-	if (param.compare("view") == 0 || param.find("now") != string::npos || param.compare("fromnote") == 0 || param.compare("tonote") == 0)
+	if (param == "view" ||
+        param.find("now") != string::npos ||
+        param == "fromnote" ||
+        param == "tonote")
 	{
-		auto eventType = visibleEvents[lastRow].lock()->getTypeName();
+		auto eventType = visibleEvents[lastRow]->getTypeName();
 		ls.lock()->setFocus(lastColumn[eventType] + to_string(lastRow));
 		return;
 	}
@@ -663,17 +675,17 @@ void StepEditorScreen::down()
 				return;
 			}
 
-			auto oldEventType = visibleEvents[srcNumber].lock()->getTypeName();
+			auto oldEventType = visibleEvents[srcNumber]->getTypeName();
 			lastColumn[oldEventType] = srcLetter;
 
 			setyOffset(yOffset + 1);
 
-			auto newEventType = visibleEvents[srcNumber].lock()->getTypeName();
+			auto newEventType = visibleEvents[srcNumber]->getTypeName();
 			auto newColumn = lastColumn[newEventType];
 
 			ls.lock()->setFocus(newColumn + "3");
 
-			if (controls->isShiftPressed() && dynamic_pointer_cast<EmptyEvent>(visibleEvents[3].lock()))
+			if (controls->isShiftPressed() && std::dynamic_pointer_cast<EmptyEvent>(visibleEvents[3]))
 				setSelectionEndIndex(srcNumber + yOffset);
 
 			refreshSelection();
@@ -708,12 +720,12 @@ void StepEditorScreen::downOrUp(int increment)
 
 		if (srcNumber + increment != -1)
 		{
-			if (visibleEvents[srcNumber + increment].lock())
+			if (visibleEvents[srcNumber + increment])
 			{
-				auto oldEventType = visibleEvents[srcNumber].lock()->getTypeName();
+				auto oldEventType = visibleEvents[srcNumber]->getTypeName();
 				lastColumn[oldEventType] = srcLetter;
 
-				auto newEventType = visibleEvents[srcNumber + increment].lock()->getTypeName();
+				auto newEventType = visibleEvents[srcNumber + increment]->getTypeName();
 				ls.lock()->setFocus(lastColumn[newEventType] + to_string(srcNumber + increment));
 			}
 		}
@@ -775,21 +787,19 @@ void StepEditorScreen::initVisibleEvents()
 	init();
 
 	for (auto& e : eventsAtCurrentTick)
-		if (e.lock()) e.lock()->deleteObserver(this);
+		if (e) e->deleteObserver(this);
 
 	eventsAtCurrentTick.clear();
 
 	for (auto& event : track.lock()->getEvents())
 	{
-		auto lEvent = event.lock();
-
-		if (lEvent->getTick() == sequencer->getTickPosition())
+		if (event->getTick() == sequencer->getTickPosition())
 		{
 			if ((view == 0
 				|| view == 1)
-				&& dynamic_pointer_cast<NoteEvent>(lEvent))
+				&& std::dynamic_pointer_cast<NoteEvent>(event))
 			{
-				auto ne = dynamic_pointer_cast<NoteEvent>(lEvent);
+				auto ne = std::dynamic_pointer_cast<NoteEvent>(event);
 
 				if (track.lock()->getBus() != 0)
 				{
@@ -816,47 +826,47 @@ void StepEditorScreen::initVisibleEvents()
 
 			if ((view == 0
 				|| view == 2)
-				&& dynamic_pointer_cast<PitchBendEvent>(lEvent))
+				&& std::dynamic_pointer_cast<PitchBendEvent>(event))
 			{
 				eventsAtCurrentTick.push_back(event);
 			}
 
 			if ((view == 0 || view == 3)
-				&& dynamic_pointer_cast<ControlChangeEvent>(lEvent))
+				&& std::dynamic_pointer_cast<ControlChangeEvent>(event))
 			{
 				if (control == -1) {
 					eventsAtCurrentTick.push_back(event);
 				}
-				if (control == dynamic_pointer_cast<ControlChangeEvent>(lEvent)->getController())
+				if (control == std::dynamic_pointer_cast<ControlChangeEvent>(event)->getController())
 				{
 					eventsAtCurrentTick.push_back(event);
 				}
 			}
 			if ((view == 0
 				|| view == 4)
-				&& dynamic_pointer_cast<ProgramChangeEvent>(lEvent))
+				&& std::dynamic_pointer_cast<ProgramChangeEvent>(event))
 			{
 				eventsAtCurrentTick.push_back(event);
 			}
 
 			if ((view == 0
 				|| view == 5)
-				&& dynamic_pointer_cast<ChannelPressureEvent>(lEvent))
+				&& std::dynamic_pointer_cast<ChannelPressureEvent>(event))
 			{
 				eventsAtCurrentTick.push_back(event);
 			}
 
 			if ((view == 0
 				|| view == 6)
-				&& dynamic_pointer_cast<PolyPressureEvent>(lEvent))
+				&& std::dynamic_pointer_cast<PolyPressureEvent>(event))
 			{
 				eventsAtCurrentTick.push_back(event);
 			}
 
 			if ((view == 0
 				|| view == 7)
-				&& (dynamic_pointer_cast<SystemExclusiveEvent>(lEvent)
-					|| dynamic_pointer_cast<MixerEvent>(lEvent)))
+				&& (std::dynamic_pointer_cast<SystemExclusiveEvent>(event)
+					|| std::dynamic_pointer_cast<MixerEvent>(event)))
 			{
 				eventsAtCurrentTick.push_back(event);
 			}
@@ -868,13 +878,10 @@ void StepEditorScreen::initVisibleEvents()
 
 	for (auto& e : visibleEvents)
 	{
-		if (e.lock())
-		{
-			e.lock()->deleteObserver(this);
-		}
+		if (e) e->deleteObserver(this);
 	}
 
-	visibleEvents = vector<weak_ptr<Event>>(4);
+	visibleEvents = std::vector<std::shared_ptr<Event>>(4);
 	int firstVisibleEventIndex = yOffset;
 	int visibleEventCounter = 0;
 
@@ -895,7 +902,7 @@ void StepEditorScreen::refreshEventRows()
 	for (int i = 0; i < EVENT_ROW_COUNT; i++)
 	{
 		auto eventRow = findEventRows()[i].lock();
-		auto event = visibleEvents[i].lock();
+		auto event = visibleEvents[i];
 
 		if (event)
 		{
@@ -1075,7 +1082,7 @@ void StepEditorScreen::setFromNote(int i)
 
 void StepEditorScreen::setSelectionStartIndex(int i)
 {
-	if (dynamic_pointer_cast<EmptyEvent>(eventsAtCurrentTick[i].lock()))
+	if (std::dynamic_pointer_cast<EmptyEvent>(eventsAtCurrentTick[i]))
 		return;
 
 	selectionStartIndex = i;
@@ -1129,7 +1136,7 @@ void StepEditorScreen::setSelectedEvents()
 	}
 
 	for (int i = firstEventIndex; i < lastEventIndex + 1; i++)
-		selectedEvents.push_back(eventsAtCurrentTick[i].lock());
+		selectedEvents.push_back(eventsAtCurrentTick[i]);
 }
 
 void StepEditorScreen::checkSelection()
@@ -1174,7 +1181,7 @@ void StepEditorScreen::removeEvents()
 
 	int eventCounter = 0;
 
-	vector<weak_ptr<Event>> tempList;
+	std::vector<std::shared_ptr<Event>> tempList;
 
 	for (auto& e : eventsAtCurrentTick)
 		tempList.push_back(e);
@@ -1183,7 +1190,7 @@ void StepEditorScreen::removeEvents()
 	{
 		if (eventCounter >= firstEventIndex && eventCounter <= lastEventIndex)
 		{
-			if (!dynamic_pointer_cast<EmptyEvent>(event.lock()))
+			if (!dynamic_pointer_cast<EmptyEvent>(event))
 				track.lock()->removeEvent(event);
 		}
 		eventCounter++;
@@ -1202,7 +1209,7 @@ void StepEditorScreen::update(moduru::observer::Observable*, nonstd::any message
 {
 	auto msg = nonstd::any_cast<string>(message);
 
-    if (msg.compare("step-editor") == 0)
+    if (msg == "step-editor")
 	{
         auto& pads = mpc.getHardware().lock()->getPads();
 
@@ -1235,49 +1242,49 @@ void StepEditorScreen::update(moduru::observer::Observable*, nonstd::any message
 
 		auto eventRow = findEventRows()[eventNumber].lock();
 
-		if (dynamic_pointer_cast<NoteEvent>(visibleEvents[eventNumber].lock()))
+		if (std::dynamic_pointer_cast<NoteEvent>(visibleEvents[eventNumber]))
 		{
 			if (track.lock()->getBus() != 0)
 				eventRow->setDrumNoteEventValues();
 			else
 				eventRow->setMidiNoteEventValues();
 		}
-		else if (dynamic_pointer_cast<MixerEvent>(visibleEvents[eventNumber].lock()))
+		else if (std::dynamic_pointer_cast<MixerEvent>(visibleEvents[eventNumber]))
 		{
 			eventRow->setMixerEventValues();
 		}
-		else if (dynamic_pointer_cast<PitchBendEvent>(visibleEvents[eventNumber].lock())
-			|| dynamic_pointer_cast<ProgramChangeEvent>(visibleEvents[eventNumber].lock()))
+		else if (std::dynamic_pointer_cast<PitchBendEvent>(visibleEvents[eventNumber])
+			|| std::dynamic_pointer_cast<ProgramChangeEvent>(visibleEvents[eventNumber]))
 		{
 			eventRow->setMiscEventValues();
 		}
-		else if (dynamic_pointer_cast<ControlChangeEvent>(visibleEvents[eventNumber].lock()))
+		else if (std::dynamic_pointer_cast<ControlChangeEvent>(visibleEvents[eventNumber]))
 		{
 			eventRow->setControlChangeEventValues();
 		}
-		else if (dynamic_pointer_cast<ChannelPressureEvent>(visibleEvents[eventNumber].lock()))
+		else if (std::dynamic_pointer_cast<ChannelPressureEvent>(visibleEvents[eventNumber]))
 		{
 			eventRow->setChannelPressureEventValues();
 		}
-		else if (dynamic_pointer_cast<PolyPressureEvent>(visibleEvents[eventNumber].lock()))
+		else if (std::dynamic_pointer_cast<PolyPressureEvent>(visibleEvents[eventNumber]))
 		{
 			eventRow->setPolyPressureEventValues();
 		}
-		else if (dynamic_pointer_cast<SystemExclusiveEvent>(visibleEvents[eventNumber].lock()))
+		else if (std::dynamic_pointer_cast<SystemExclusiveEvent>(visibleEvents[eventNumber]))
 		{
 			eventRow->setSystemExclusiveEventValues();
 		}
-		else if (dynamic_pointer_cast<EmptyEvent>(visibleEvents[eventNumber].lock()))
+		else if (std::dynamic_pointer_cast<EmptyEvent>(visibleEvents[eventNumber]))
 		{
 			eventRow->setEmptyEventValues();
 		}
 	}
-	else if (msg.compare("adjust-duration") == 0)
+	else if (msg == "adjust-duration")
 	{
 		initVisibleEvents();
 		refreshEventRows();
 	}
-	else if (msg.compare("bar") == 0)
+	else if (msg == "bar")
 	{
 		if (sequencer->isPlaying())
 			return;
@@ -1285,7 +1292,7 @@ void StepEditorScreen::update(moduru::observer::Observable*, nonstd::any message
 		findField("now0").lock()->setTextPadded(sequencer->getCurrentBarIndex() + 1, "0");
 		setyOffset(0);
 	}
-	else if (msg.compare("beat") == 0)
+	else if (msg == "beat")
 	{
 		if (sequencer->isPlaying())
 			return;
@@ -1293,7 +1300,7 @@ void StepEditorScreen::update(moduru::observer::Observable*, nonstd::any message
 		findField("now1").lock()->setTextPadded(sequencer->getCurrentBeatIndex() + 1, "0");
 		setyOffset(0);
 	}
-	else if (msg.compare("clock") == 0)
+	else if (msg == "clock")
 	{
 		if (sequencer->isPlaying())
 			return;
@@ -1303,7 +1310,7 @@ void StepEditorScreen::update(moduru::observer::Observable*, nonstd::any message
 	}
 }
 
-vector<weak_ptr<Event>>& StepEditorScreen::getVisibleEvents()
+std::vector<std::shared_ptr<Event>>& StepEditorScreen::getVisibleEvents()
 {
 	return visibleEvents;
 }
@@ -1338,7 +1345,7 @@ vector<weak_ptr<EventRow>> StepEditorScreen::findEventRows()
 	vector<weak_ptr<EventRow>> result;
 
 	for (int i = 0; i < 4; i++)
-		result.push_back(dynamic_pointer_cast<EventRow>(findChild("event-row-" + to_string(i)).lock()));
+		result.push_back(std::dynamic_pointer_cast<EventRow>(findChild("event-row-" + to_string(i)).lock()));
 
 	return result;
 }

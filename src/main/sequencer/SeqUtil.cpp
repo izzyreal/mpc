@@ -11,7 +11,6 @@
 #include <cmath>
 
 using namespace mpc::sequencer;
-using namespace std;
 
 int SeqUtil::getTickFromBar(int i, Sequence* s, int position)
 {
@@ -70,8 +69,9 @@ double SeqUtil::sequenceFrameLength(Sequence* seq, int firstTick, int lastTick, 
 {
 	double result = 0;
 	auto lastTceTick = firstTick;
-	auto tceSize = seq->getTempoChangeEvents().size();
-	weak_ptr<TempoChangeEvent> lastTce;
+    auto tempoChangeEvents = seq->getTempoChangeEvents();
+	auto tceSize = tempoChangeEvents.size();
+    std::shared_ptr<TempoChangeEvent> lastTce;
 
 	if (tceSize == 0)
 	{
@@ -80,7 +80,7 @@ double SeqUtil::sequenceFrameLength(Sequence* seq, int firstTick, int lastTick, 
 	}
 	else
 	{
-		auto firstTceTick = seq->getTempoChangeEvents()[0].lock()->getTick();
+		auto firstTceTick = tempoChangeEvents[0]->getTick();
 
         if (firstTick < firstTceTick)
 			result = ticksToFrames(firstTceTick - firstTick, seq->getInitialTempo(), sr);
@@ -88,7 +88,7 @@ double SeqUtil::sequenceFrameLength(Sequence* seq, int firstTick, int lastTick, 
 
 	for (int i = 0; i < tceSize - 1; i++)
 	{
-		auto nextTce = seq->getTempoChangeEvents()[i + 1].lock();
+		auto nextTce = tempoChangeEvents[i + 1];
 	
 		if (firstTick > nextTce->getTick())
 			continue;
@@ -99,20 +99,17 @@ double SeqUtil::sequenceFrameLength(Sequence* seq, int firstTick, int lastTick, 
 			break;
 		}
 
-		auto tce = seq->getTempoChangeEvents()[i].lock();
+		auto tce = tempoChangeEvents[i];
 		result += ticksToFrames(nextTce->getTick() - lastTceTick, tce->getTempo(), sr);
 		lastTceTick = nextTce->getTick();
 	}
 
-	auto lLastTce = lastTce.lock();
-	
-	if (!lLastTce)
+	if (!lastTce)
 	{
-		lastTce = seq->getTempoChangeEvents()[0];
-		lLastTce = lastTce.lock();
+		lastTce = tempoChangeEvents[0];
 	}
 
-	result += ticksToFrames(lastTick - lLastTce->getTick(), lLastTce->getTempo(), sr);
+	result += ticksToFrames(lastTick - lastTce->getTick(), lastTce->getTempo(), sr);
 	return (int)(ceil(result));
 }
 
@@ -130,7 +127,7 @@ int SeqUtil::songFrameLength(Song* song, Sequencer* sequencer, float sr)
 	{
 		for (int j = 0; j < song->getStep(i).lock()->getRepeats(); j++)
 		{
-			auto seq = sequencer->getSequence(song->getStep(i).lock()->getSequence()).lock().get();
+			auto seq = sequencer->getSequence(song->getStep(i).lock()->getSequence()).get();
 			result += sequenceFrameLength(seq, 0, seq->getLastTick(), sr);
 		}
 	}
@@ -146,7 +143,7 @@ void SeqUtil::setTimeSignature(Sequence* sequence, int firstBarIndex, int tsLast
 void SeqUtil::setTimeSignature(Sequence* sequence, int bar, int num, int den)
 {
 	auto newDenTicks = 96 * (4.0 / den);
-	auto newBarLengths = vector<int>(999);
+    std::vector<int> newBarLengths(999);
 	auto lastBar = sequence->getLastBarIndex();
 
 	for (int i = 0; i < 999; i++)
@@ -154,21 +151,21 @@ void SeqUtil::setTimeSignature(Sequence* sequence, int bar, int num, int den)
 
 	newBarLengths[bar] = newDenTicks * num;
 	
-	(*sequence->getNumerators())[bar] = num;
-	(*sequence->getDenominators())[bar] = den;
+	sequence->getNumerators()[bar] = num;
+	sequence->getDenominators()[bar] = den;
 	
 	if (bar == sequence->getLastBarIndex())
 	{
-		(*sequence->getNumerators())[sequence->getLastBarIndex() + 1] = num;
-		(*sequence->getDenominators())[sequence->getLastBarIndex() + 1] = den;
+		sequence->getNumerators()[sequence->getLastBarIndex() + 1] = num;
+		sequence->getDenominators()[sequence->getLastBarIndex() + 1] = den;
 	}
 	else
 	{
-		(*sequence->getNumerators())[lastBar + 1] = (*sequence->getNumerators())[lastBar];
-		(*sequence->getDenominators())[lastBar + 1] = (*sequence->getDenominators())[lastBar];
+		sequence->getNumerators()[lastBar + 1] = sequence->getNumerators()[lastBar];
+		sequence->getDenominators()[lastBar + 1] = sequence->getDenominators()[lastBar];
 	}
 	
-	auto oldBarStartPos = vector<int>(999);
+	std::vector<int> oldBarStartPos(999);
 	oldBarStartPos[0] = 0;
 
 	for (int i = bar; i < 999; i++)
@@ -182,7 +179,7 @@ void SeqUtil::setTimeSignature(Sequence* sequence, int bar, int num, int den)
 		oldBarStartPos[i] = oldBarStartPos[i - 1] + sequence->getBarLengthsInTicks()[i - 1];
 	}
 
-	auto newBarStartPos = vector<int>(999);
+	std::vector<int> newBarStartPos(999);
 	
 	for (int i = bar; i < 999; i++)
 	{
@@ -200,17 +197,16 @@ void SeqUtil::setTimeSignature(Sequence* sequence, int bar, int num, int den)
 		if (t->getIndex() == 64 || t->getIndex() == 65)
 			continue;
 
-		vector<weak_ptr<Event>> toRemove;
+        std::vector<std::shared_ptr<Event>> toRemove;
 		bool keep;
 
 		for (auto& event : t->getEvents())
 		{
 			keep = false;
-			auto e = event.lock();
 
 			for (int i = 0; i < bar; i++)
 			{
-				if (e->getTick() >= oldBarStartPos[i] && e->getTick() < (oldBarStartPos[i] + sequence->getBarLengthsInTicks()[i]))
+				if (event->getTick() >= oldBarStartPos[i] && event->getTick() < (oldBarStartPos[i] + sequence->getBarLengthsInTicks()[i]))
 				{
 					keep = true;
 					break;
@@ -219,16 +215,16 @@ void SeqUtil::setTimeSignature(Sequence* sequence, int bar, int num, int den)
 
 			for (int i = bar; i < 999; i++)
 			{
-				if (e->getTick() >= oldBarStartPos[i] && e->getTick() < (oldBarStartPos[i] + sequence->getBarLengthsInTicks()[i]))
+				if (event->getTick() >= oldBarStartPos[i] && event->getTick() < (oldBarStartPos[i] + sequence->getBarLengthsInTicks()[i]))
 				{
-					e->setTick(e->getTick() - (oldBarStartPos[i] - newBarStartPos[i]));
+					event->setTick(event->getTick() - (oldBarStartPos[i] - newBarStartPos[i]));
 					keep = true;
 					break;
 				}
 			}
 
 			if (!keep)
-				toRemove.push_back(e);
+				toRemove.push_back(event);
 		}
 
 		for (auto& e : toRemove)

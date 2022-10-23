@@ -22,10 +22,12 @@ void PasteEventScreen::function(int i)
 	{
 	case 4:
 		auto stepEditorScreen = mpc.screens->get<StepEditorScreen>("step-editor");
+
+        const bool allowMultipleNotesOnSameTick = true;
+
 		for (auto& event : stepEditorScreen->getPlaceHolder())
 		{
-			auto eventClone = track.lock()->cloneEventIntoTrack(event).lock();
-			eventClone->setTick(sequencer->getTickPosition());
+			track.lock()->cloneEventIntoTrack(event, sequencer->getTickPosition(), allowMultipleNotesOnSameTick);
 		}
 		openScreen("step-editor");
 		break;

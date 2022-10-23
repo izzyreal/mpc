@@ -78,12 +78,12 @@ void CopySequenceScreen::setSq1(int i)
 
 void CopySequenceScreen::displaySq0()
 {
-	auto sq0Name = sequencer->getSequence(sq0).lock()->getName();
+	auto sq0Name = sequencer->getSequence(sq0)->getName();
 	findField("sq0").lock()->setText(StrUtil::padLeft(to_string(sq0 + 1), "0", 2) + "-" + sq0Name);
 }
 
 void CopySequenceScreen::displaySq1()
 {
-	auto sq1Name = sequencer->getSequence(sq1).lock()->getName();
+	auto sq1Name = sequencer->getSequence(sq1)->getName();
 	findField("sq1").lock()->setText(StrUtil::padLeft(to_string(sq1 + 1), "0", 2) + "-" + sq1Name);
 }

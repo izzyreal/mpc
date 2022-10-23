@@ -90,7 +90,7 @@ void FrameSeq::work(int nFrames)
 		frameCounter = 0;
 	}
 
-	auto seq = sequencer->getCurrentlyPlayingSequence().lock();
+	auto seq = sequencer->getCurrentlyPlayingSequence();
 	double tempo = sequencer->getTempo();
 
 	if (tempo != clock.getBpm())
@@ -154,7 +154,7 @@ void FrameSeq::work(int nFrames)
 					sequencer->playToTick(getTickPosition());
 					checkNextSq();
 					sequencer->move(0);
-					seq = sequencer->getCurrentlyPlayingSequence().lock();
+					seq = sequencer->getCurrentlyPlayingSequence();
 					seq->initLoop();
 					move(0);
 					continue;
@@ -165,7 +165,7 @@ void FrameSeq::work(int nFrames)
 					{
 						sequencer->playToTick(seq->getLastTick() - 1);
 						sequencer->incrementPlayedStepRepetitions();
-						auto song = sequencer->getSong(songScreen->getActiveSongIndex()).lock();
+						auto song = sequencer->getSong(songScreen->getActiveSongIndex());
 						auto step = songScreen->getOffset() + 1;
 
 						auto doneRepeating = sequencer->getPlayedStepRepetitions() >= song->getStep(step).lock()->getRepeats();
@@ -178,7 +178,7 @@ void FrameSeq::work(int nFrames)
 							songScreen->setOffset(song->getFirstStep() - 1);
 							auto newStep = song->getStep(songScreen->getOffset() + 1).lock();
 
-							if (!sequencer->getSequence(newStep->getSequence()).lock()->isUsed())
+							if (!sequencer->getSequence(newStep->getSequence())->isUsed())
                             {
 
                                 sequencer->playToTick(seq->getLastTick() - 1);
@@ -208,7 +208,7 @@ void FrameSeq::work(int nFrames)
 
 								auto newStep = song->getStep(songScreen->getOffset() + 1).lock();
 
-								if (!sequencer->getSequence(newStep->getSequence()).lock()->isUsed())
+								if (!sequencer->getSequence(newStep->getSequence())->isUsed())
                                 {
                                     sequencer->playToTick(seq->getLastTick() - 1);
                                     sequencer->stop();
