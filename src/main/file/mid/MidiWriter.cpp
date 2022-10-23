@@ -209,10 +209,10 @@ MidiWriter::MidiWriter(mpc::sequencer::Sequence* sequence)
 				sysExData[1] = 0;
 				sysExData[2] = 68;
 				sysExData[3] = 69;
-				sysExData[7] = 247;
 				sysExData[4] = mixerEvent->getParameter() + 1;
 				sysExData[5] = mixerEvent->getPad();
 				sysExData[6] = mixerEvent->getValue();
+                sysExData[7] = 0xF7;
 				auto see = make_shared<SystemExclusiveEvent>(240, mixerEvent->getTick(), sysExData);
 				miscEvents.push_back(see);
 			}

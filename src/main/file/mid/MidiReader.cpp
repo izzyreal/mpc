@@ -275,29 +275,29 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
 
 			if (sysEx)
 			{
-				auto sysExData = sysEx->getData();
+				auto sysExEventBytes = sysEx->getData();
 			
-				if (sysExData.size() == 8 && sysExData[0] == 71 && sysExData[1] == 0 && sysExData[2] == 68 && sysExData[3] == 69 && sysExData[7] == (char) 247)
+				if (sysExEventBytes.size() == 8 && sysExEventBytes[0] == 71 && sysExEventBytes[1] == 0 && sysExEventBytes[2] == 68 && sysExEventBytes[3] == 69 && sysExEventBytes[7] == (char) 247)
 				{
 					auto mixerEvent = std::dynamic_pointer_cast<MixerEvent>(track->addEvent(sysEx->getTick(), "mixer"));
-					mixerEvent->setParameter(sysExData[4] - 1);
-					mixerEvent->setPadNumber(sysExData[5]);
-					mixerEvent->setValue(sysExData[6]);
+					mixerEvent->setParameter(sysExEventBytes[4] - 1);
+					mixerEvent->setPadNumber(sysExEventBytes[5]);
+					mixerEvent->setValue(sysExEventBytes[6]);
 				}
 				else
 				{
-					sysExData = std::vector<char>(sysEx->getData().size() + 1);
-					sysExData[0] = 240;
+                    sysExEventBytes = std::vector<char>(sysEx->getData().size() + 1);
+                    sysExEventBytes[0] = 0xF0;
 				
 					for (int j = 0; j < sysEx->getData().size(); j++)
 					{
-						sysExData[j + 1] = sysEx->getData()[j];
+                        sysExEventBytes[j + 1] = sysEx->getData()[j];
 					}
 
 					auto see = std::dynamic_pointer_cast<mpc::sequencer::SystemExclusiveEvent>(track->addEvent(sysEx->getTick(), "systemexclusive"));
                     std::vector<unsigned char> tmp;
 
-					for (char c : sysExData)
+					for (char c : sysExEventBytes)
 					{
 						tmp.push_back(static_cast<unsigned char>(c));
 					}
