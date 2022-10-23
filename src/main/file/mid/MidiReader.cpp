@@ -161,12 +161,28 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
 	std::unique_ptr<NoteEvent> nVariation;
     const int maxNoteOffTick = 999999999;
 
+    const std::string trackDataPrefix = "TRACK DATA:";
+
     for (int i = 1; i < midiTracks.size(); i++)
 	{
 		auto mt = midiTracks[i].lock();
+        auto trackIndex = i - 1;
+        for (auto& e: mt->getEvents())
+        {
+            auto textEvent = std::dynamic_pointer_cast<meta::Text>(e.lock());
+            if (textEvent) {
+                auto text = textEvent->getText();
+                if (text.find(trackDataPrefix) != std::string::npos)
+                {
+                    auto payload = text.substr(trackDataPrefix.length());
+                    trackIndex = stoi(payload.substr(0, 2));
+                }
+            }
+        }
         std::vector<std::shared_ptr<NoteOn>> noteOffs;
         std::vector<std::shared_ptr<NoteEvent>> noteOns;
-		auto track = sequence->purgeTrack(i - 1);
+
+		auto track = sequence->purgeTrack(trackIndex);
 		track->setUsed(true);
 
 		for (auto& me : mt->getEvents())

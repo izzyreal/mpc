@@ -94,12 +94,33 @@ MidiWriter::MidiWriter(mpc::sequencer::Sequence* sequence)
 	}
 	meta->setEndOfTrackDelta(sequence->getLastTick());
 	mf->addTrack(meta);
-	for (auto& t : sequence->getTracks()) {
+
+    int firstUsedTrackIndex = -1;
+    int lastUsedTrackIndex = -1;
+
+    for (int i = 0; i < 64; i++)
+    {
+        if (sequence->getTrack(i)->isUsed())
+        {
+            if (firstUsedTrackIndex == -1)
+            {
+                firstUsedTrackIndex = i;
+            }
+            lastUsedTrackIndex = i;
+        }
+    }
+
+	for (int trackIndex = firstUsedTrackIndex;
+         trackIndex >=0 && trackIndex <= lastUsedTrackIndex;
+         trackIndex++) {
 		noteOffs.clear();
 		variations.clear();
 		noteOns.clear();
 		miscEvents.clear();
-		if (t->getIndex() > 63 || !t->isUsed())
+
+        auto t = sequence->getTrack(trackIndex);
+
+		if (t->getIndex() > 63)
 			break;
 
 		auto mt = make_shared<mpc::midi::MidiTrack>();
