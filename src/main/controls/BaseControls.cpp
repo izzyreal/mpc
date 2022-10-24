@@ -444,11 +444,23 @@ void BaseControls::numpad(int i)
                 ls->openScreen("trim");
                 break;
             case 6:
+            {
+                auto newDrum = sequencer->getActiveTrack()->getBus() - 1;
+                if (newDrum < 0) newDrum = 0;
+                auto drumScreen = mpc.screens->get<DrumScreen>("drum");
+                drumScreen->drum = newDrum;
                 ls->openScreen("select-drum");
                 break;
+            }
             case 7:
+            {
+                auto newDrum = sequencer->getActiveTrack()->getBus() - 1;
+                if (newDrum < 0) newDrum = 0;
+                auto drumScreen = mpc.screens->get<DrumScreen>("drum");
+                drumScreen->drum = newDrum;
                 ls->openScreen("select-mixer-drum");
                 break;
+            }
             case 8:
                 if (sequencer->isPlaying())
                 {
