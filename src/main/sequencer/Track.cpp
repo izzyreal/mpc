@@ -51,24 +51,10 @@ Track::Track(mpc::Mpc& mpc, mpc::sequencer::Sequence* parent, int i)
 
 void Track::move(int tick, int oldTick)
 {
-    if (sequencer->getTickPosition() > tick)
-    {
-        for (auto& noteOff : noteOffs)
-        {
-            noteOff->setTick(noteOff->getTick() % parent->getLastTick());
-        }
-    }
-
     if (tick == 0)
     {
 		eventIndex = 0;
 		return;
-	}
-
-	sort(noteOffs.begin(), noteOffs.end(), tickCmp);
-
-	for (auto& no : noteOffs) {
-		no->setTick((no->getTick() - oldTick) + tick);
 	}
 
 	auto startIndex = 0;
@@ -155,15 +141,6 @@ void Track::setOn(bool b)
     on = b;
 
     notifyObservers(std::string("trackon"));
-}
-
-void Track::triggerPendingNoteOffs()
-{
-    auto pos = sequencer->getTickPosition();
-    for (auto& noteOff : noteOffs)
-    {
-        noteOff->setTick(pos);
-    }
 }
 
 void Track::removeEvent(std::shared_ptr<Event> event)
@@ -533,45 +510,18 @@ void Track::processRealtimeQueuedEvents()
 
 int Track::getNextTick()
 {
-	if (eventIndex >= events.size() && noteOffs.empty()) {
+	if (eventIndex >= events.size()) {
         processRealtimeQueuedEvents();
         return MAX_TICK;
     }
 
-    sort(noteOffs.begin(), noteOffs.end(), tickCmp);
-
-    auto noteOnAvailable = eventIndex < events.size();
-
-    for (auto& noteOff : noteOffs)
-    {
-        if (noteOnAvailable)
-        {
-            if (noteOff->getTick() < events[eventIndex]->getTick())
-            {
-                processRealtimeQueuedEvents();
-                return noteOff->getTick();
-            }
-        }
-        else
-        {
-            processRealtimeQueuedEvents();
-            return noteOff->getTick();
-        }
-    }
-
-	if (eventIndex < events.size())
-    {
-        processRealtimeQueuedEvents();
-        return events[eventIndex]->getTick();
-    }
-
-    processRealtimeQueuedEvents();
-	return MAX_TICK;
+	processRealtimeQueuedEvents();
+    return events[eventIndex]->getTick();
 }
 
 void Track::playNext()
 {
-	if (eventIndex >= events.size() && noteOffs.empty())
+	if (eventIndex >= events.size())
 		return;
 
 	multi = sequencer->isRecordingModeMulti();
@@ -595,23 +545,7 @@ void Track::playNext()
 			_delete = true;
 	}
 
-	int counter = 0;
-
     auto event = eventIndex >= events.size() ? std::shared_ptr<Event>() : events[eventIndex];
-
-	for (auto& no : noteOffs)
-	{
-		if (eventIndex >= events.size() || no->getTick() < event->getTick())
-		{
-			if (!_delete)
-				mpc.getEventHandler().lock()->handle(no, this);
-
-			noteOffs.erase(noteOffs.begin() + counter);
-			return;
-		}
-		counter++;
-	}
-
 	auto note = std::dynamic_pointer_cast<NoteEvent>(event);
 
 	if (note)
@@ -698,28 +632,7 @@ void Track::playNext()
     events[eventIndex]->dontDelete = false;
 
 	mpc.getEventHandler().lock()->handle(event, this);
-
-	if (note)
-	{
-		if (note->getVelocity() > 0 && note->getDuration() >= 0)
-		{
-			auto noteOff = note->getNoteOff().lock();
-			noteOff->setDuration(0);
-			noteOff->setNote(note->getNote());
-			noteOff->setTrack(note->getTrack());
-			auto dur = note->getDuration();
-
-			if (dur < 1) dur = 1;
-
-			noteOff->setTick(note->getTick() + dur);
-
-			noteOff->setVelocity(0);
-			noteOffs.push_back(noteOff);
-		}
-	}
-
-	if (!(note && note->getVelocity() == 0))
-		eventIndex++;
+    eventIndex++;
 }
 
 bool Track::tickCmp(const std::shared_ptr<Event>& a, const std::shared_ptr<Event>& b)

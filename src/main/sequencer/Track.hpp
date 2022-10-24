@@ -30,11 +30,6 @@ private:
     std::vector<std::shared_ptr<NoteEvent>> bulkNoteOns = std::vector<std::shared_ptr<NoteEvent>>(20);
     std::vector<std::shared_ptr<NoteEvent>> bulkNoteOffs = std::vector<std::shared_ptr<NoteEvent>>(20);
 
-    // Used for on-the-fly generated note off events based on
-    // the duration of a sequenced note on. While playing, only the
-    // audio thread interacts with this collection.
-    std::vector<std::shared_ptr<NoteEvent>> noteOffs;
-    
     mpc::sequencer::Sequence* parent{ nullptr };
     
     std::shared_ptr<Sequencer> sequencer;
@@ -61,7 +56,6 @@ public:
     void flushNoteCache();
     void setUsed(bool b);
     void setOn(bool b);
-    void triggerPendingNoteOffs();
 
     // The below 2 methods are threadsafe, intended for the UI
     // thread (keyboard, mouse) to record notes.

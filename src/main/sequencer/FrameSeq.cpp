@@ -12,6 +12,7 @@
 #include <sequencer/Song.hpp>
 #include <sequencer/Step.hpp>
 #include <sequencer/Track.hpp>
+#include <sequencer/SeqUtil.hpp>
 
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <lcdgui/screens/window/CountMetronomeScreen.hpp>
@@ -373,11 +374,14 @@ void FrameSeq::repeatPad(int tick, int duration)
         MidiAdapter midiAdapter;
 
         midiAdapter.process(noteEvent->getNoteOff(), track->getBus() - 1, 0);
-        mpc.getMms()->mpcTransport(midiAdapter.get().lock().get(), 0, 0, 0, eventFrame, -1);
+        auto voiceOverlap = program->getNoteParameters(note)->getVoiceOverlap();
+        mpc.getMms()->mpcTransport(midiAdapter.get().lock().get(), 0, 0, 0, eventFrame, -1, -1);
 
         auto newVelo = static_cast<int>(noteEvent->getVelocity() * (track->getVelocityRatio() * 0.01));
         midiAdapter.process(noteEvent, track->getBus() - 1, newVelo);
-        mpc.getMms()->mpcTransport(midiAdapter.get().lock().get(), 0, noteEvent->getVariationType(), noteEvent->getVariationValue(), eventFrame, -1);
+        auto durationFrames = duration == -1 ? -1 : mpc::sequencer::SeqUtil::ticksToFrames(duration, clock.getBpm(), clock.getSampleRate());
+
+        mpc.getMms()->mpcTransport(midiAdapter.get().lock().get(), 0, noteEvent->getVariationType(), noteEvent->getVariationValue(), eventFrame, -1, voiceOverlap == 2 ? durationFrames : -1);
         p->notifyObservers(newVelo);
 
         if (sequencer->isRecordingOrOverdubbing())

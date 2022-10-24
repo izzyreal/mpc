@@ -21,6 +21,7 @@ namespace mpc {
 		public:
 			void init(double Fs);
 			void set_bpm(const double &BPM);
+            double getSampleRate() { return 1.0 / Fs_rec; }
 			bool proc();
 			void reset();
 			void zero();

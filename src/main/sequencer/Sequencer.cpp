@@ -281,7 +281,7 @@ void Sequencer::setSoloEnabled(bool b)
             {
                 continue;
             }
-            t->triggerPendingNoteOffs();
+//            t->triggerPendingNoteOffs();
         }
     }
 

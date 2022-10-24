@@ -11,6 +11,7 @@
 #include <sequencer/Track.hpp>
 #include <sequencer/NoteEvent.hpp>
 #include <sequencer/TempoChangeEvent.hpp>
+#include <sequencer/SeqUtil.hpp>
 
 #include <hardware/Hardware.hpp>
 #include <hardware/HwPad.hpp>
@@ -135,9 +136,16 @@ void EventHandler::handleNoThru(const weak_ptr<Event>& e, Track* track, int time
 
                     int startTick = ne->getNoteOff().lock() ? ne->getTick() : ne->getNoteOnTick();
 
-                    mpc.getMms()->mpcTransport(midiAdapter.get().lock().get(), 0, ne->getVariationType(), ne->getVariationValue(), eventFrame, startTick);
+                    auto pgmIndex = sampler.lock()->getDrumBusProgramIndex(drumIndex + 1);
+                    auto pgm = sampler.lock()->getProgram(pgmIndex).lock();
+                    auto voiceOverlap = pgm->getNoteParameters(ne->getNote())->getVoiceOverlap();
+                    auto duration = voiceOverlap == 2 ? ne->getDuration() : -1;
+                    auto audioServer = mpc.getAudioMidiServices().lock()->getAudioServer();
+                    auto durationFrames = (duration == -1 || duration == 0) ? -1 : mpc::sequencer::SeqUtil::ticksToFrames(duration, sequencer.lock()->getTempo(), audioServer->getSampleRate());
+
+                    mpc.getMms()->mpcTransport(midiAdapter.get().lock().get(), 0, ne->getVariationType(), ne->getVariationValue(), eventFrame, startTick, durationFrames);
                     
-                    if (mpc.getAudioMidiServices().lock()->getAudioServer()->isRealTime())
+                    if (audioServer->isRealTime())
                     {
                         auto note = ne->getNote();
                         auto program = mpc.getSampler().lock()->getProgram(mpc.getDrum(drumIndex)->getProgram());

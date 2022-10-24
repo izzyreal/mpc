@@ -1370,7 +1370,7 @@ void screens::StepEditorScreen::adhocPlayNoteEvent(const shared_ptr<mpc::sequenc
 
     if (playSingleEventCounter < 0) playSingleEventCounter = 0;
 
-    mms->mpcTransport(midiAdapter.get().lock().get(), 0, varType, varValue, 0, uniqueEnoughID);
+    mms->mpcTransport(midiAdapter.get().lock().get(), 0, varType, varValue, 0, uniqueEnoughID, -1);
 
     noteEvent->setTick(tick);
 
@@ -1394,7 +1394,7 @@ void screens::StepEditorScreen::adhocPlayNoteEvent(const shared_ptr<mpc::sequenc
                 midiAdapter2.process(noteOff, tr->getBus() - 1, 0);
                 auto noteOffToSend = midiAdapter2.get();
                 noteOff->setTick(noteOffTick);
-                mms->mpcTransport(noteOffToSend.lock().get(), 0, 0, 0, 0, uniqueEnoughID);
+                mms->mpcTransport(noteOffToSend.lock().get(), 0, 0, 0, 0, uniqueEnoughID, -1);
             });
             break;
         }
