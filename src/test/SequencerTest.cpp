@@ -98,12 +98,12 @@ SCENARIO("Can record and playback from different threads", "[sequencer]")
                     {
                         if (find(begin(recordedTickPos), end(recordedTickPos), hTickPos) == end(recordedTickPos))
                         {
-                            printf("main thread hits pad 0 at tick %i ...\n", hTickPos);
+//                            printf("main thread hits pad 0 at tick %i ...\n", hTickPos);
                             mpc.getActiveControls().lock()->pad(0, 127);
                             
                             this_thread::sleep_for(chrono::milliseconds(2));
                             
-                            printf("main thread releases pad 0 ...\n");
+//                            printf("main thread releases pad 0 ...\n");
                             mpc.getReleaseControls()->simplePad(0);
                         }
                     }

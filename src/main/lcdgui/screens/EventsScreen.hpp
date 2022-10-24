@@ -25,6 +25,9 @@ namespace mpc::lcdgui::screens
 		void open() override;
         void pad(int padIndexWithBank, int velo) override;
 
+        void performCopy(int sourceStart, int sourceEnd, int toSequenceIndex,
+                         int destStart, int toTrackIndex, bool copyModeMerge, int copyCount, int copyNote0, int copyNote1);
+
 	private:
         void displayTime() override;
         void displayNotes() override;

@@ -113,10 +113,10 @@ void EventsScreen::open()
 void EventsScreen::function(int i)
 {
 	init();
-	
+
 	auto fromSequence = sequencer->getActiveSequence();
 	auto toSequence = sequencer->getSequence(toSq);
-	
+
 	switch (i)
 	{
 	// Intentional fall-through
@@ -135,70 +135,7 @@ void EventsScreen::function(int i)
 
 		if (editFunctionNumber == 0)
 		{
-            if (!fromSequence->isUsed())
-            {
-                return;
-            }
-
-			auto destStart = start;
-			auto destOffset = destStart - sourceStart;
-			
-			if (!toSequence->isUsed())
-				toSequence->init(fromSequence->getLastBarIndex());
-
-			auto destTrack = toSequence->getTrack(toTr);
-
-			if (!modeMerge)
-			{
-                auto destTrackEvents = destTrack->getEvents();
-				for (auto& e : destTrackEvents)
-				{
-					auto tick = e->getTick();
-
-					if (tick >= destOffset && tick < destOffset + (segLength * copies))
-						destTrack->removeEvent(e);
-				}
-			}
-
-            auto sourceTrackEvents = sourceTrack->getEvents();
-
-			for (auto& e : sourceTrackEvents)
-			{
-				auto ne = dynamic_pointer_cast<NoteEvent>(e);
-			
-				if (ne)
-				{
-					if (sourceTrack->getBus() == 0)
-					{
-						if (ne->getNote() < note0 || ne->getNote() > note1)
-							continue;
-					}
-					else
-					{
-						if (note0 != 34 && note0 != ne->getNote())
-							continue;
-					}
-				}
-
-				if (e->getTick() >= sourceEnd)
-					break;
-
-				if (e->getTick() >= sourceStart)
-				{
-					for (int copy = 0; copy < copies; copy++)
-					{
-						int tickCandidate = e->getTick() + destOffset + (copy * segLength);
-						
-						if (tickCandidate < toSequence->getLastTick())
-						{
-							destTrack->cloneEventIntoTrack(e, tickCandidate);
-						}
-					}
-				}
-			}
-
-			destTrack->sortEvents();
-            sequencer->setActiveSequenceIndex(toSq);
+            performCopy(time0, time1, toSq, start, toTr, modeMerge, copies, note0, note1);
 		}
 		else if (editFunctionNumber == 1)
 		{
@@ -694,4 +631,79 @@ void EventsScreen::displayToSq()
 void EventsScreen::displayToTr()
 {
 	findField("to-tr").lock()->setTextPadded(toTr + 1);
+}
+
+void EventsScreen::performCopy(int sourceStart, int sourceEnd, int toSequenceIndex, int destStart,
+                               int toTrackIndex, bool copyModeMerge, int copyCount, int copyNote0, int copyNote1)
+{
+    const auto segLength = sourceEnd - sourceStart;
+    auto sourceTrack = sequencer->getActiveTrack();
+
+    auto fromSequence = sequencer->getActiveSequence();
+
+    if (!fromSequence->isUsed())
+    {
+        return;
+    }
+
+    auto destOffset = destStart - sourceStart;
+
+    auto toSequence = sequencer->getSequence(toSequenceIndex);
+
+    if (!toSequence->isUsed())
+        toSequence->init(fromSequence->getLastBarIndex());
+
+    auto destTrack = toSequence->getTrack(toTrackIndex);
+
+    if (!copyModeMerge)
+    {
+        auto destTrackEvents = destTrack->getEvents();
+        for (auto& e : destTrackEvents)
+        {
+            auto tick = e->getTick();
+
+            if (tick >= destOffset && tick < destOffset + (segLength * copyCount))
+                destTrack->removeEvent(e);
+        }
+    }
+
+    auto sourceTrackEvents = sourceTrack->getEvents();
+
+    for (auto& e : sourceTrackEvents)
+    {
+        auto ne = dynamic_pointer_cast<NoteEvent>(e);
+
+        if (ne)
+        {
+            if (sourceTrack->getBus() == 0)
+            {
+                if (ne->getNote() < copyNote0 || ne->getNote() > copyNote1)
+                    continue;
+            }
+            else
+            {
+                if (copyNote0 != 34 && copyNote0 != ne->getNote())
+                    continue;
+            }
+        }
+
+        if (e->getTick() >= sourceEnd)
+            break;
+
+        if (e->getTick() >= sourceStart)
+        {
+            for (int copy = 0; copy < copyCount; copy++)
+            {
+                int tickCandidate = e->getTick() + destOffset + (copy * segLength);
+
+                if (tickCandidate < toSequence->getLastTick())
+                {
+                    destTrack->cloneEventIntoTrack(e, tickCandidate);
+                }
+            }
+        }
+    }
+
+    destTrack->sortEvents();
+    sequencer->setActiveSequenceIndex(toSequenceIndex);
 }
