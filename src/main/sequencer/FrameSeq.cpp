@@ -153,7 +153,7 @@ void FrameSeq::work(int nFrames)
                     sequencer->getNextSq() != -1)
 				{
 					sequencer->playToTick(getTickPosition());
-					checkNextSq();
+                    switchToNextSequence();
 					sequencer->move(0);
 					seq = sequencer->getCurrentlyPlayingSequence();
 					seq->initLoop();
@@ -393,16 +393,10 @@ void FrameSeq::repeatPad(int duration)
   }
 }
 
-void FrameSeq::checkNextSq()
+void FrameSeq::switchToNextSequence()
 {
 	sequencer->setCurrentlyPlayingSequenceIndex(sequencer->getNextSq());
 	sequencer->setNextSq(-1);
-	sequencer->notify("nextsqoff");
-	sequencer->notify("seqnumbername");
-    sequencer->notify("timesignature");
-    sequencer->notify("numberofbars");
-    sequencer->notify("tempo");
-    sequencer->notify("loop");
 }
 
 void FrameSeq::triggerClickIfNeeded()

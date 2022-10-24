@@ -386,7 +386,6 @@ void SequencerScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 	}
 	else if (s == "nextsqoff")
 	{
-		ls.lock()->setFocus("sq");
 		displayNextSq();
 	}
 	else if (s == "count")
@@ -481,26 +480,26 @@ void SequencerScreen::pressEnter()
 
 	if (candidate != INT_MAX)
 	{
-		if (param.compare("now0") == 0)
+		if (param == "now0")
 		{
 			sequencer->setBar(candidate - 1);
 			setLastFocus("step-editor", "view");
 		}
-		else if (param.compare("now1") == 0)
+		else if (param == "now1")
 		{
 			sequencer->setBeat(candidate - 1);
 			setLastFocus("step-editor", "view");
 		}
-		else if (param.compare("now2") == 0)
+		else if (param == "now2")
 		{
 			sequencer->setClock(candidate);
 			setLastFocus("step-editor", "view");
 		}
-		else if (param.compare("tempo") == 0)
+		else if (param == "tempo")
 		{
 			sequencer->setTempo(candidate * 0.1);
 		}
-		else if (param.compare("velo") == 0)
+		else if (param == "velo")
 		{
 			track.lock()->setVelocityRatio(candidate);
 		}
@@ -573,27 +572,27 @@ void SequencerScreen::turnWheel(int i)
 {
 	init();
 
-	if (param.size() >= 3 && param.substr(0, 3).compare("now") == 0)
+	if (param.size() >= 3 && param.substr(0, 3) == "now")
 		setLastFocus("step-editor", "view");
 
-	if (param.compare("now0") == 0)
+	if (param == "now0")
 	{
 		sequencer->setBar(sequencer->getCurrentBarIndex() + i);
 	}
-	else if (param.compare("now1") == 0)
+	else if (param == "now1")
 	{
 		sequencer->setBeat(sequencer->getCurrentBeatIndex() + i);
 	}
-	else if (param.compare("now2") == 0)
+	else if (param == "now2")
 	{
 		sequencer->setClock(sequencer->getCurrentClockNumber() + i);
 	}
-	else if (param.compare("devicenumber") == 0)
+	else if (param == "devicenumber")
 	{
 		checkTrackUsed();
 		track.lock()->setDeviceNumber(track.lock()->getDevice() + i);
 	}
-	else if (param.compare("tr") == 0)
+	else if (param == "tr")
 	{
 		if (i > 0)
 		{
@@ -604,7 +603,7 @@ void SequencerScreen::turnWheel(int i)
 			sequencer->trackDown();
 		}
 	}
-	else if (param.compare("bus") == 0)
+	else if (param == "bus")
 	{
 		checkTrackUsed();
 
@@ -630,17 +629,17 @@ void SequencerScreen::turnWheel(int i)
 			}
 		}
 	}
-	else if (param.compare("pgm") == 0)
+	else if (param == "pgm")
 	{
 		checkTrackUsed();
 		track.lock()->setProgramChange(track.lock()->getProgramChange() + i);
 	}
-	else if (param.compare("velo") == 0)
+	else if (param == "velo")
 	{
 		checkTrackUsed();
 		track.lock()->setVelocityRatio(track.lock()->getVelocityRatio() + i);
 	}
-	else if (param.compare("timing") == 0)
+	else if (param == "timing")
 	{
 		auto screen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
 		auto noteValue = screen->getNoteValue();
@@ -648,7 +647,7 @@ void SequencerScreen::turnWheel(int i)
 		setLastFocus("timing-correct", "notevalue");
 		displayTiming();
 	}
-	else if (param.compare("sq") == 0)
+	else if (param == "sq")
 	{
 		auto punchScreen = mpc.screens->get<PunchScreen>("punch");
 		
@@ -674,42 +673,42 @@ void SequencerScreen::turnWheel(int i)
 			sequencer->setActiveSequenceIndex(sequencer->getActiveSequenceIndex() + i);
 		}
 	}
-	else if (param.compare("nextsq") == 0)
+	else if (param == "nextsq")
 	{
         if (sequencer->getNextSq() + i >= 0)
             sequencer->setNextSq(sequencer->getNextSq() + i);
 	}
-	else if (param.compare("bars") == 0)
+	else if (param == "bars")
 	{
 		openScreen("change-bars-2");
 	}
-	else if (param.compare("tempo") == 0)
+	else if (param == "tempo")
 	{
 		double oldTempo = sequencer->getTempo();
 		double newTempo = oldTempo + (i * 0.1);
 		sequencer->setTempo(newTempo);
 	}
-	else if (param.compare("tsig") == 0)
+	else if (param == "tsig")
 	{
 		openScreen("change-tsig");
 	}
-	else if (param.compare("tempo-source") == 0)
+	else if (param == "tempo-source")
 	{
 		sequencer->setTempoSourceSequence(i > 0);
 	}
-	else if (param.compare("count") == 0)
+	else if (param == "count")
 	{
 		sequencer->setCountEnabled(i > 0);
 	}
-	else if (param.compare("loop") == 0)
+	else if (param == "loop")
 	{
 		sequence.lock()->setLoopEnabled(i > 0);
 	}
-	else if (param.compare("recordingmode") == 0)
+	else if (param == "recordingmode")
 	{
 		sequencer->setRecordingModeMulti(i > 0);
 	}
-	else if (param.compare("on") == 0)
+	else if (param == "on")
 	{
 		checkTrackUsed();
 		track.lock()->setOn(i > 0);
@@ -723,7 +722,7 @@ void SequencerScreen::openWindow()
 	if (sequencer->isPlaying())
 		return;
 	
-	if (param.compare("sq") == 0)
+	if (param == "sq")
 	{
 		Util::initSequence(mpc);
 		openScreen("sequence");
@@ -736,54 +735,54 @@ void SequencerScreen::openWindow()
 	{
 		openScreen("tempo-change");
 	}
-	else if (param.compare("timing") == 0)
+	else if (param == "timing")
 	{
 		openScreen("timing-correct");
 	}
-	else if (param.compare("tsig") == 0)
+	else if (param == "tsig")
 	{
 		openScreen("change-tsig");
 	}
-	else if (param.compare("count") == 0)
+	else if (param == "count")
 	{
 		openScreen("count-metronome");
 	}
-	else if (param.compare("loop") == 0)
+	else if (param == "loop")
 	{
 		openScreen("loop-bars-window");
 	}
-	else if (param.compare("tr") == 0)
+	else if (param == "tr")
 	{
 		if (!track.lock()->isUsed())
 			track.lock()->setUsed(true);
 
 		openScreen("track");
 	}
-	else if (param.compare("on") == 0)
+	else if (param == "on")
 	{
 		openScreen("erase-all-off-tracks");
 	}
-	else if (param.compare("pgm") == 0)
+	else if (param == "pgm")
 	{
 		openScreen("transmit-program-changes");
 	}
-	else if (param.compare("recordingmode") == 0)
+	else if (param == "recordingmode")
 	{
 		openScreen("multi-recording-setup");
 	}
-	else if (param.compare("bus") == 0)
+	else if (param == "bus")
 	{
 		openScreen("midi-input");
 	}
-	else if (param.compare("devicenumber") == 0)
+	else if (param == "devicenumber")
 	{
 		openScreen("midi-output");
 	}
-	else if (param.compare("bars") == 0)
+	else if (param == "bars")
 	{
 		openScreen("change-bars");
 	}
-	else if (param.compare("velo") == 0) {
+	else if (param == "velo") {
 		openScreen("edit-velocity");
 	}
 }

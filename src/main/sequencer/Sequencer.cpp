@@ -1360,7 +1360,7 @@ int Sequencer::getCurrentlyPlayingSequenceIndex()
 void Sequencer::setCurrentlyPlayingSequenceIndex(int i)
 {
 	currentlyPlayingSequenceIndex = i;
-	activeSequenceIndex = i;
+    setActiveSequenceIndex(i);
 }
 
 int Sequencer::getNextSq()
@@ -1414,7 +1414,7 @@ void Sequencer::setNextSq(int i)
 	nextSq = candidate;
 
 	if (nextSq == -1)
-		notifyObservers(std::string("nextoff"));
+		notifyObservers(std::string("nextsqoff"));
 	else if (firstNotification)
 		notifyObservers(std::string("nextsq"));
 	else
