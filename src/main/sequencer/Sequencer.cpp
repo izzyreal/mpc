@@ -15,7 +15,6 @@
 #include <lcdgui/screens/UserScreen.hpp>
 #include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
 
-#include <sequencer/Event.hpp>
 #include <sequencer/TempoChangeEvent.hpp>
 #include <sequencer/FrameSeq.hpp>
 #include <sequencer/Track.hpp>
@@ -28,6 +27,8 @@
 // moduru
 #include <System.hpp>
 #include <lang/StrUtil.hpp>
+
+#include <algorithm>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -1119,49 +1120,23 @@ std::vector<int> Sequencer::getUsedSequenceIndexes()
 
 void Sequencer::goToPreviousEvent()
 {
-	auto t = getActiveSequence()->getTrack(getActiveTrackIndex());
+    auto s = getActiveSequence();
+    auto t = s->getTrack(getActiveTrackIndex());
 
-	if (t->getEventIndex() == 0)
-	{
-		setBar(0);
-		return;
-	}
+    auto newPos = 0;
+    auto events = t->getEvents();
+    std::reverse(events.begin(), events.end());
 
-	if (t->getEventIndex() + 1 >= t->getEvents().size() && t->getEvent((int)(t->getEvents().size()) - 1)->getTick() < position)
-	{
-		t->setEventIndex((int)(t->getEvents().size()) - 1);
-		move(t->getEvent(t->getEventIndex())->getTick());
-		return;
-	}
+    for (auto& e : events)
+    {
+        if (e->getTick() < getTickPosition())
+        {
+            newPos = e->getTick();
+            break;
+        }
+    }
 
-	std::shared_ptr<Event> event;
-    std::shared_ptr<Event> prev;
-	
-	while (t->getEventIndex() > 0)
-	{
-		event = t->getEvent(t->getEventIndex());
-		prev = t->getEvent(t->getEventIndex() - 1);
-	
-		if (prev->getTick() == event->getTick())
-			t->setEventIndex(t->getEventIndex() - 1);
-		else
-			break;
-	}
-
-	t->setEventIndex(t->getEventIndex() - 1);
-	
-	while (t->getEventIndex() > 0)
-	{
-		event = t->getEvent(t->getEventIndex());
-		prev = t->getEvent(t->getEventIndex() - 1);
-	
-		if (prev->getTick() != event->getTick())
-			break;
-
-		t->setEventIndex(t->getEventIndex() - 1);
-	}
-
-	move(t->getEvents()[t->getEventIndex()]->getTick());
+    move(newPos);
 }
 
 void Sequencer::goToNextEvent()
@@ -1169,62 +1144,18 @@ void Sequencer::goToNextEvent()
 	auto s = getActiveSequence();
 	auto t = s->getTrack(getActiveTrackIndex());
 
-	if (t->getEvents().size() == 0)
-	{
-		if (position != s->getLastTick())
-			move(s->getLastTick());
+    auto newPos = s->getLastTick();
 
-		return;
-	}
+    for (auto& e : t->getEvents())
+    {
+        if (e->getTick() > getTickPosition())
+        {
+            newPos = e->getTick();
+            break;
+        }
+    }
 
-	const int eventCount = t->getEvents().size();
-	
-	if (position == s->getLastTick())
-		return;
-
-	if (t->getEventIndex() >= eventCount - 1 && position >= t->getEvent(eventCount - 1)->getTick())
-	{
-		move(s->getLastTick());
-		return;
-	}
-	
-	if (t->getEvent(t->getEventIndex())->getTick() > position)
-	{
-		move(t->getEvent(t->getEventIndex())->getTick());
-		return;
-	}
-	
-	std::shared_ptr<Event> event;
-    std::shared_ptr<Event> next;
-	
-	if (t->getEvent(t->getEventIndex())->getTick() == position)
-	{
-		while (t->getEventIndex() < eventCount - 2)
-		{
-			event = t->getEvent(t->getEventIndex());
-			next = t->getEvent(t->getEventIndex() + 1);
-		
-			if (next->getTick() != event->getTick())
-				break;
-
-			t->setEventIndex(t->getEventIndex() + 1);
-		}
-	}
-
-	t->setEventIndex(t->getEventIndex() + 1);
-	
-	while (t->getEventIndex() < eventCount - 2)
-	{
-		event = t->getEvent(t->getEventIndex());
-		next = t->getEvent(t->getEventIndex() + 1);
-
-		if (next->getTick() != event->getTick())
-			break;
-
-		t->setEventIndex(t->getEventIndex() + 1);
-	}
-
-	move(t->getEvent(t->getEventIndex())->getTick());
+    move(newPos);
 }
 
 void Sequencer::notifyTimeDisplay()
