@@ -276,20 +276,20 @@ void FrameSeq::work(int nFrames)
                 int tcValue = sequencer->getTickValues()[timingCorrectScreen->getNoteValue()];
                 int swingPercentage = timingCorrectScreen->getSwing();
                 int swingOffset = (int)((swingPercentage - 50) * (4.0 * 0.01) * (tcValue * 0.5));
-                auto shiftTiming = timingCorrectScreen->getAmount() * timingCorrectScreen->isShiftTimingLater() ? 1 : -1;
-                auto tickPosWithShift = getTickPosition() + shiftTiming;
+                auto shiftTiming = timingCorrectScreen->getAmount() * (timingCorrectScreen->isShiftTimingLater() ? 1 : -1);
+                auto tickPosWithShift = getTickPosition() - shiftTiming;
 
                 if (tcValue == 24 || tcValue == 48)
                 {
                     if (tickPosWithShift % (tcValue * 2) == swingOffset + tcValue ||
                         tickPosWithShift % (tcValue * 2) == 0)
                     {
-                        repeatPad(tickPosWithShift, tcValue);
+                        repeatPad(tcValue);
                     }
                 }
                 else if (tcValue != 1 && tickPosWithShift % tcValue == 0)
                 {
-                    repeatPad(tickPosWithShift, tcValue);
+                    repeatPad(tcValue);
                 }
             }
         }
@@ -331,7 +331,7 @@ void FrameSeq::move(int newTickPos)
     clock.setTick(newTickPos);
 }
 
-void FrameSeq::repeatPad(int tick, int duration)
+void FrameSeq::repeatPad(int duration)
 {
     auto track = sequencer->getActiveTrack();
 
@@ -360,6 +360,7 @@ void FrameSeq::repeatPad(int tick, int duration)
 
     if (note != 34)
     {
+        auto tick = getTickPosition();
         auto noteEvent = std::make_shared<NoteEvent>(note);
         noteEvent->setTick(tick);
         noteEvent->setNote(note);

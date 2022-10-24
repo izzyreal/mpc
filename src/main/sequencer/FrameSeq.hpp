@@ -47,7 +47,7 @@ namespace mpc::sequencer {
 		int tickFrameOffset = 0;
 
 		void move(int newTickPos);
-		void repeatPad(int tick, int duration);
+		void repeatPad(int duration);
 		void checkNextSq();
         void triggerClickIfNeeded();
 
