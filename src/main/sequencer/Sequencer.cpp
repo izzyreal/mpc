@@ -23,6 +23,7 @@
 
 // ctoot
 #include <audio/server/NonRealTimeAudioServer.hpp>
+#include <mpc/MpcSoundPlayerChannel.hpp>
 
 // moduru
 #include <System.hpp>
@@ -276,13 +277,9 @@ void Sequencer::setSoloEnabled(bool b)
 
     if (soloEnabled)
     {
-        for (auto& t : getActiveSequence()->getTracks())
+        for (int i = 0; i < 4; i++)
         {
-            if (t->getIndex() == getActiveTrackIndex())
-            {
-                continue;
-            }
-//            t->triggerPendingNoteOffs();
+            mpc.getDrum(i)->allNotesOff();
         }
     }
 
