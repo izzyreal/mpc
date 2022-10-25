@@ -128,9 +128,6 @@ void EventsScreen::function(int i)
 		break;
 	case 5:
 	{
-		auto sourceStart = time0;
-		auto sourceEnd = time1;
-		auto segLength = sourceEnd - sourceStart;
 		auto sourceTrack = sequencer->getActiveTrack();
 
 		if (editFunctionNumber == 0)
@@ -676,6 +673,10 @@ void EventsScreen::performCopy(int sourceStart, int sourceEnd, int toSequenceInd
     for (int i = 0; i < barsToAdd; i++)
     {
        const auto afterBar = toSequence->getLastBarIndex() + i;
+
+       if (afterBar >= 998)
+           break;
+
        toSequence->insertBars(1, afterBar);
        toSequence->setTimeSignature(afterBar, destNumerator, destDenominator);
     }
@@ -726,10 +727,10 @@ void EventsScreen::performCopy(int sourceStart, int sourceEnd, int toSequenceInd
             {
                 int tickCandidate = e->getTick() + destOffset + (copy * segLength);
 
-                if (tickCandidate < toSequence->getLastTick())
-                {
-                    destTrack->cloneEventIntoTrack(e, tickCandidate);
-                }
+                if (tickCandidate >= toSequence->getLastTick())
+                    break;
+
+                destTrack->cloneEventIntoTrack(e, tickCandidate);
             }
         }
     }

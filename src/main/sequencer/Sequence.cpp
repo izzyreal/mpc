@@ -546,8 +546,10 @@ void Sequence::insertBars(int barCount, int afterBar)
 
 	createMidiClockTrack();
 
-	if (lastBarIndex != -1)
-		setUsed(true);
+	if (lastBarIndex != -1 && !isUsed())
+    {
+        setUsed(true);
+    }
 
 	notifyObservers(std::string("numberofbars"));
 	notifyObservers(std::string("tempo"));
