@@ -252,9 +252,9 @@ void Sequence::setTimeSignature(int firstBar, int tsLastBar, int num, int den)
 	sequencer::SeqUtil::setTimeSignature(this, firstBar, tsLastBar, num, den);
 }
 
-void Sequence::setTimeSignature(int bar, int num, int den)
+void Sequence::setTimeSignature(int barIndex, int num, int den)
 {
-	sequencer::SeqUtil::setTimeSignature(this, bar, num, den);
+	sequencer::SeqUtil::setTimeSignature(this, barIndex, num, den);
 }
 
 std::vector<std::shared_ptr<Track>> Sequence::getTracks()

@@ -650,6 +650,36 @@ void EventsScreen::performCopy(int sourceStart, int sourceEnd, int toSequenceInd
 
     auto toSequence = sequencer->getSequence(toSequenceIndex);
 
+
+    auto destNumerator = -1;
+    auto destDenominator = -1;
+    auto destBarLength = -1;
+
+    for (int i = 0; i <= toSequence->getLastBarIndex(); i++)
+    {
+        auto firstTickOfBar = toSequence->getFirstTickOfBar(i);
+        auto barLength = toSequence->getBarLengthsInTicks()[i];
+        if (destStart >= firstTickOfBar &&
+            destStart <= firstTickOfBar + barLength)
+        {
+            destNumerator = toSequence->getNumerator(i);
+            destDenominator = toSequence->getDenominator(i);
+            destBarLength = barLength;
+            break;
+        }
+    }
+
+    auto minimumRequiredNewSequenceLength = destStart + (segLength);
+    auto ticksToAdd = minimumRequiredNewSequenceLength - toSequence->getLastTick();
+    auto barsToAdd = (int) (ceil((float)ticksToAdd / destBarLength));
+
+    for (int i = 0; i < barsToAdd; i++)
+    {
+       const auto afterBar = toSequence->getLastBarIndex() + i;
+       toSequence->insertBars(1, afterBar);
+       toSequence->setTimeSignature(afterBar, destNumerator, destDenominator);
+    }
+
     if (!toSequence->isUsed())
         toSequence->init(fromSequence->getLastBarIndex());
 

@@ -77,7 +77,7 @@ public:
     bool isUsed();
     void init(int newLastBarIndex);
     void setTimeSignature(int firstBar, int tsLastBar, int num, int den);
-    void setTimeSignature(int bar, int num, int den);
+    void setTimeSignature(int barIndex, int num, int den);
     std::vector<std::shared_ptr<Track>> getTracks();
     std::vector<std::shared_ptr<Track>> getMetaTracks();
     std::vector<std::string>& getDeviceNames();
