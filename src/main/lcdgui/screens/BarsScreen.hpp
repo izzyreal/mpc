@@ -12,6 +12,8 @@ namespace mpc::lcdgui::screens
 		void turnWheel(int i) override;
 
 		BarsScreen(mpc::Mpc& mpc, const int layerIndex);
+        void copyBars(int toSeqIndex, int copyFirstBar, int copyLastBar, int copyCount, int copyAfterBar);
+
 		void open() override;
 		void close() override;
 

@@ -72,95 +72,136 @@ void BarsScreen::function(int j)
 		break;
 	case 5:
 	{
-		auto fromSequence = sequencer->getActiveSequence();
-
-        if (!fromSequence->isUsed())
-        {
-            return;
-        }
-
-		auto toSequence = sequencer->getSequence(eventsScreen->toSq);
-        auto numberOfBars = (lastBar - firstBar + 1) * eventsScreen->copies;
-
-		if (!toSequence->isUsed())
-		{
-			toSequence->init(numberOfBars - 1);
-		}
-		else
-        {
-			toSequence->insertBars(numberOfBars, afterBar);
-		}
-
-		int copyCounter = 0;
-
-		for (int i = 0; i < numberOfBars; i++)
-		{
-			toSequence->setTimeSignature(i + afterBar, fromSequence->getNumerator(copyCounter + firstBar), fromSequence->getDenominator(copyCounter + firstBar));
-			copyCounter++;
-			
-			if (copyCounter >= eventsScreen->copies)
-				copyCounter = 0;
-		}
-
-		auto firstTick = 0;
-		auto lastTick = 0;
-		auto firstTickOfToSeq = 0;
-
-		for (int i = 0; i < 999; i++)
-		{
-			if (i == firstBar)
-				break;
-
-			firstTick += fromSequence->getBarLengthsInTicks()[i];
-		}
-
-		for (int i = 0; i < 999; i++)
-		{
-			lastTick += fromSequence->getBarLengthsInTicks()[i];
-			
-			if (i == lastBar)
-			{
-				break;
-			}
-		}
-
-        auto segmentLengthTicks = lastTick - firstTick;
-
-		for (int i = 0; i < 999; i++)
-		{
-			if (i == afterBar)
-				break;
-
-			firstTickOfToSeq += toSequence->getBarLengthsInTicks()[i];
-		}
-
-		auto offset = firstTickOfToSeq - firstTick;
-
-		for (int i = 0; i < 64; i++)
-		{
-			auto t1Events = fromSequence->getTrack(i)->getEventRange(firstTick, lastTick);
-			auto t2 = toSequence->getTrack(i);
-
-			for (auto& event : t1Events)
-			{
-				if (event->getTick() >= firstTick && event->getTick() < lastTick)
-				{
-					if (!t2->isUsed())
-						t2->setUsed(true);
-
-					for (auto k = 0; k < eventsScreen->copies; k++)
-					{
-                        auto tick = event->getTick() + offset + (k * segmentLengthTicks);
-						t2->cloneEventIntoTrack(event, tick);
-					}
-				}
-			}
-		}
+        copyBars(eventsScreen->toSq, firstBar, lastBar, eventsScreen->copies, afterBar);
         sequencer->setActiveSequenceIndex(eventsScreen->toSq);
 		openScreen("sequencer");
 		break;
 	}
 	}
+}
+
+void BarsScreen::copyBars(int toSeqIndex, int copyFirstBar, int copyLastBar, int copyCount, int copyAfterBar)
+{
+    auto fromSequence = sequencer->getActiveSequence();
+
+    if (!fromSequence->isUsed())
+    {
+        return;
+    }
+
+    auto eventsScreen = mpc.screens->get<EventsScreen>("events");
+
+    auto toSequence = sequencer->getSequence(toSeqIndex);
+    auto numberOfBars = (copyLastBar - copyFirstBar + 1) * copyCount;
+
+    if (numberOfBars > 999)
+    {
+        numberOfBars = 999;
+    }
+
+    if (!toSequence->isUsed())
+    {
+        toSequence->init(numberOfBars - 1);
+    }
+    else
+    {
+        if (toSequence->getLastBarIndex() + numberOfBars > 998)
+        {
+            numberOfBars = 998 - toSequence->getLastBarIndex();
+        }
+
+        toSequence->insertBars(numberOfBars, copyAfterBar);
+    }
+
+    int copyCounter = 0;
+
+    for (int i = 0; i < numberOfBars; i++)
+    {
+        toSequence->setTimeSignature(i + copyAfterBar, fromSequence->getNumerator(copyCounter + copyFirstBar), fromSequence->getDenominator(copyCounter + copyFirstBar));
+        copyCounter++;
+
+        if (copyCounter >= copyCount)
+            copyCounter = 0;
+    }
+
+    auto firstTick = 0;
+    auto lastTick = 0;
+    auto firstTickOfToSeq = 0;
+
+    for (int i = 0; i < 999; i++)
+    {
+        if (i == copyFirstBar)
+            break;
+
+        firstTick += fromSequence->getBarLengthsInTicks()[i];
+    }
+
+    for (int i = 0; i < 999; i++)
+    {
+        lastTick += fromSequence->getBarLengthsInTicks()[i];
+
+        if (i == copyLastBar)
+        {
+            break;
+        }
+    }
+
+    for (int i = 0; i < 999; i++)
+    {
+        if (i == copyAfterBar)
+            break;
+
+        firstTickOfToSeq += toSequence->getBarLengthsInTicks()[i];
+    }
+
+    auto segmentLengthTicks = lastTick - firstTick;
+    auto offset = firstTickOfToSeq - firstTick;
+
+    for (int i = 0; i < 64; i++)
+    {
+        auto t1 = fromSequence->getTrack(i);
+
+        if (!t1->isUsed())
+        {
+            continue;
+        }
+
+        auto t1Events = t1->getEventRange(firstTick, lastTick);
+        auto t2 = toSequence->getTrack(i);
+
+        if (!t2->isUsed())
+        {
+            t2->setUsed(true);
+        }
+
+        auto toSeqLastTick = toSequence->getLastTick();
+
+        for (auto& event : t1Events)
+        {
+            auto firstCopyTick = event->getTick() + offset;
+
+            if (firstCopyTick >= toSeqLastTick)
+            {
+                // The events in Track are ordered by tick, so this and
+                // any following event copies would be out of bounds.
+                break;
+            }
+
+            for (auto k = 0; k < copyCount; k++)
+            {
+                auto tick = firstCopyTick + (k * segmentLengthTicks);
+
+                // We do a more specific exit-check here, since within-bounds
+                // copies may be followed by out-of-bounds ones.
+                if (tick >= toSeqLastTick)
+                {
+                    break;
+                }
+
+                t2->cloneEventIntoTrack(event, tick);
+            }
+        }
+    }
 }
 
 void BarsScreen::turnWheel(int i)

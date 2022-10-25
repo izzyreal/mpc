@@ -484,20 +484,30 @@ void Sequence::deleteBars(int firstBar, int _lastBar)
 
 void Sequence::insertBars(int barCount, int afterBar)
 {
-    const bool isAppending = afterBar == lastBarIndex;
+    const bool isAppending = afterBar - 1 == lastBarIndex;
+
+    if (lastBarIndex + barCount > 998)
+    {
+        barCount = 998 - lastBarIndex;
+    }
+
+    if (barCount == 0)
+    {
+        return;
+    }
 
 	lastBarIndex += barCount;
 
 	for (int i = afterBar; i < 999; i++)
 	{
-		if (i + barCount > 998)
-			break;
-
         barLengthsInTicks[i + barCount] = barLengthsInTicks[i];
 		numerators[i + barCount] = numerators[i];
 		denominators[i + barCount] = denominators[i];
 	}
 
+    // The below are sane defaults for the fresh bars, but the
+    // caller of this method is expected to set them to what they
+    // should be, given the use case.
 	for (int i = afterBar; i < afterBar + barCount; i++)
 	{
         barLengthsInTicks[i] = 384;
