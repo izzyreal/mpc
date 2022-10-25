@@ -211,3 +211,121 @@ TEST_CASE("COPY4", "[events-screen]")
     REQUIRE(seq->getBarLengthsInTicks()[2] == 288);
     REQUIRE(seq->getBarLengthsInTicks()[3] == 288);
 }
+
+TEST_CASE("COPY5", "[events-screen]")
+{
+/**
+ * Before: A note with note noteIndex + 35 at every 16th
+ * Copy operation: Replace 2nd half of the bar with the first
+ * After: A note with note noteIndex + 35 at every 16th, resetting noteIndex to 0 at note 8
+ */
+    mpc::Mpc mpc;
+    mpc.init(44100, 1, 5);
+    auto seq = mpc.getSequencer().lock()->getActiveSequence();
+    seq->init(0);
+    auto tr = seq->getTrack(0);
+
+    int tickPos = 0;
+
+    for (int i = 0; i < 16; i++)
+    {
+        auto noteEvent = std::make_shared<NoteEvent>(35 + i);
+        noteEvent->setVelocity(127);
+        noteEvent->setDuration(42);
+        noteEvent->setTick(tickPos);
+        tr->insertEventWhileRetainingSort(noteEvent);
+        tickPos += 24;
+    }
+
+    auto eventsScreen = mpc.screens->get<EventsScreen>("events");
+
+    int start = 0;
+    int end = 192;
+    int toSeq = 0;
+    int destStart = 192;
+    int toTrack = 0;
+    bool merge = false;
+    int copies = 1;
+    int note0 = 34;
+    int note1 = 0;
+
+    eventsScreen->performCopy(start, end, toSeq, destStart, toTrack, merge, copies, note0, note1);
+
+    REQUIRE(tr->getEvents().size() == 16);
+
+    tickPos = 0;
+
+    for (int i = 0; i < 16; i++)
+    {
+        auto noteEvent = std::dynamic_pointer_cast<NoteEvent>(tr->getEvent(i));
+        REQUIRE(noteEvent->getTick() == tickPos);
+        REQUIRE(noteEvent->getNote() == 35 + (i % 8));
+        tickPos += 24;
+    }
+}
+
+TEST_CASE("COPY6", "[events-screen]")
+{
+/**
+ * Before: A note with note noteIndex + 35 at every 16th
+ * Copy operation: Merge first half of the bar into the second
+ * After: 24 notes in total. The first half repeats in the second half,
+ *        while the original 8 notes of the 2nd half are still there.
+ */
+    mpc::Mpc mpc;
+    mpc.init(44100, 1, 5);
+    auto seq = mpc.getSequencer().lock()->getActiveSequence();
+    seq->init(0);
+    auto tr = seq->getTrack(0);
+
+    int tickPos = 0;
+
+    for (int i = 0; i < 16; i++)
+    {
+        auto noteEvent = std::make_shared<NoteEvent>(35 + i);
+        noteEvent->setVelocity(127);
+        noteEvent->setDuration(42);
+        noteEvent->setTick(tickPos);
+        tr->insertEventWhileRetainingSort(noteEvent);
+        tickPos += 24;
+    }
+
+    auto eventsScreen = mpc.screens->get<EventsScreen>("events");
+
+    int start = 0;
+    int end = 192;
+    int toSeq = 0;
+    int destStart = 192;
+    int toTrack = 0;
+    bool merge = true;
+    int copies = 1;
+    int note0 = 34;
+    int note1 = 0;
+
+    eventsScreen->performCopy(start, end, toSeq, destStart, toTrack, merge, copies, note0, note1);
+
+    REQUIRE(tr->getEvents().size() == 24);
+
+    tickPos = 0;
+
+    for (int i = 0; i < 8; i++)
+    {
+        auto noteEvent = std::dynamic_pointer_cast<NoteEvent>(tr->getEvent(i));
+        REQUIRE(noteEvent->getTick() == tickPos);
+        REQUIRE(noteEvent->getNote() == 35 + i);
+        tickPos += 24;
+    }
+
+    int eventIndex = 8;
+
+    for (int i = 8; i < 16; i++)
+    {
+        auto e1 = std::dynamic_pointer_cast<NoteEvent>(tr->getEvent(eventIndex++));
+        auto e2 = std::dynamic_pointer_cast<NoteEvent>(tr->getEvent(eventIndex++));
+        REQUIRE(e1->getTick() == tickPos);
+        REQUIRE(e1->getNote() == 27 + i);
+        REQUIRE(e2->getTick() == tickPos);
+        REQUIRE(e2->getNote() == 35 + i);
+        tickPos += 24;
+    }
+}
