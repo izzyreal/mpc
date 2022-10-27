@@ -12,6 +12,8 @@ namespace mpc::lcdgui::screens::window {
 	public:
         EditVelocityScreen(mpc::Mpc& mpc, const int layerIndex);
 
+        void setNote0(int i) override;
+
 		void function(int i) override;
 		void turnWheel(int i) override;
         void open() override;

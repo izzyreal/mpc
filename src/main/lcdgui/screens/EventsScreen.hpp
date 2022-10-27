@@ -20,6 +20,8 @@ namespace mpc::lcdgui::screens
 		void function(int i) override;
 		void turnWheel(int i) override;
 
+        void setNote0(int i) override;
+
 		EventsScreen(mpc::Mpc& mpc, const int layerIndex);
 
 		void open() override;

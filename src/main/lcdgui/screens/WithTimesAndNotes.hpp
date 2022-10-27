@@ -23,7 +23,7 @@ namespace mpc::lcdgui::screens
 		void setTime0(int time0);
 		void setTime1(int time1);
 		
-		void setNote0(int note);
+		virtual void setNote0(int note);
 		void setNote1(int note);
 
 	protected:

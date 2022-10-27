@@ -21,6 +21,16 @@ EventsScreen::EventsScreen(mpc::Mpc& mpc, const int layerIndex)
 {
 }
 
+void EventsScreen::setNote0(int i)
+{
+    init();
+
+    if (param == "note0")
+    {
+        WithTimesAndNotes::setNote0(i);
+    }
+}
+
 void EventsScreen::pad(int padIndexWithBank, int velo)
 {
     ScreenComponent::pad(padIndexWithBank, velo);

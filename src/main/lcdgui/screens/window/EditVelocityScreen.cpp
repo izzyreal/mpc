@@ -20,6 +20,16 @@ EditVelocityScreen::EditVelocityScreen(mpc::Mpc& mpc, const int layerIndex)
 {
 }
 
+void EditVelocityScreen::setNote0(int i)
+{
+    init();
+
+    if (param == "note0")
+    {
+        WithTimesAndNotes::setNote0(i);
+    }
+}
+
 void EditVelocityScreen::open()
 {
 	auto bus = sequencer->getActiveTrack()->getBus();

@@ -107,6 +107,16 @@ void TimingCorrectScreen::turnWheel(int i)
 	displayTime();
 }
 
+void TimingCorrectScreen::setNote0(int i)
+{
+    init();
+
+    if (param == "note0")
+    {
+        WithTimesAndNotes::setNote0(i);
+    }
+}
+
 void TimingCorrectScreen::displayNoteValue()
 {
 	findChild<FunctionKey>("fk4").lock()->Hide(noteValue == 0);
