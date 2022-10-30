@@ -28,6 +28,9 @@ void VmpcSettingsScreen::function(int i)
         case 3:
             openScreen("vmpc-disks");
             break;
+        case 4:
+            openScreen("vmpc-midi");
+            break;
     }
 }
 

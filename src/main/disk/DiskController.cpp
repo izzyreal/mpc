@@ -26,9 +26,6 @@ DiskController::DiskController(mpc::Mpc& _mpc)
 
 void DiskController::initDisks()
 {
-    auto persistedConfigs = VolumesPersistence::getPersistedConfigs();
-    auto persistedActiveUUID = VolumesPersistence::getPersistedActiveUUID();
-    
     disks.emplace_back(std::make_shared<StdDisk>(mpc));
     auto& defaultVolume = disks.back()->getVolume();
     defaultVolume.volumeUUID = "default_volume";
@@ -44,59 +41,10 @@ void DiskController::initDisks()
     disks.back()->initRoot();
     
     MLOG("Disk root initialized");
-    
-#ifndef VMPC2000XL_WIN7
 
-    RemovableVolumes removableVolumes;
-    
-    MLOG("RemovableVolumes instantiated");
+    detectRawUsbVolumes();
 
-    class SimpleChangeListener : public VolumeChangeListener {
-    public:
-        std::vector<RemovableVolume> volumes;
-        void processChange(RemovableVolume v) override {
-            volumes.push_back(v);
-        }
-    };
-    
-    SimpleChangeListener listener;
-    
-    MLOG("SimpleChangeListener instantiated");
-
-    removableVolumes.addListener(&listener);
-    
-    MLOG("Listener was added to removableVolumes");
-
-    removableVolumes.init();
-    
-    MLOG("RemovableVolumes initialized");
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    
-    MLOG("Iterating through scraped USB volumes...");
-
-    for (auto& v : listener.volumes)
-    {
-        MLOG("Discovered volume UUID " + v.volumeUUID);
-        disks.emplace_back(std::make_shared<RawDisk>(mpc));
-        auto disk = disks.back();
-        auto& volume = disk->getVolume();
-        
-        volume.type = USB_VOLUME;
-        
-        if (persistedConfigs.find(v.volumeUUID) == end(persistedConfigs))
-            volume.mode = DISABLED;
-        else
-            volume.mode = persistedConfigs[v.volumeUUID];
-        
-        volume.volumePath = v.deviceName;
-        volume.label = v.volumeName;
-        volume.volumeSize = v.mediaSize;
-        volume.volumeUUID = v.volumeUUID;
-    }
-
-#endif
-
+    auto persistedActiveUUID = VolumesPersistence::getPersistedActiveUUID();
     MLOG("Persisted UUID: " + persistedActiveUUID);
     
     for (int i = 0; i < disks.size(); i++)
@@ -162,4 +110,100 @@ int DiskController::getActiveDiskIndex()
 void DiskController::setActiveDiskIndex(int newActiveDiskIndex)
 {
     activeDiskIndex = newActiveDiskIndex;
+}
+
+void DiskController::detectRawUsbVolumes()
+{
+#ifndef VMPC2000XL_WIN7
+    RemovableVolumes removableVolumes;
+
+    MLOG("RemovableVolumes instantiated");
+
+    class SimpleChangeListener : public VolumeChangeListener {
+    public:
+        std::vector<RemovableVolume> volumes;
+        void processChange(RemovableVolume v) override {
+            volumes.push_back(v);
+        }
+    };
+
+    SimpleChangeListener listener;
+
+    MLOG("SimpleChangeListener instantiated");
+
+    removableVolumes.addListener(&listener);
+
+    MLOG("Listener was added to removableVolumes");
+
+    removableVolumes.init();
+
+    MLOG("RemovableVolumes initialized");
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+    MLOG("Iterating through scraped USB volumes...");
+    auto persistedConfigs = VolumesPersistence::getPersistedConfigs();
+
+    for (int i = disks.size() - 1; i >= 0; i--)
+    {
+        auto d = disks[i];
+
+        if (d->getVolume().type == USB_VOLUME)
+        {
+            bool isConnected = false;
+
+            for (auto& v : listener.volumes)
+            {
+                if (v.volumeUUID == d->getVolume().volumeUUID)
+                {
+                    isConnected = true;
+                    break;
+                }
+            }
+
+            if (!isConnected)
+            {
+                disks.erase(disks.begin() + i);
+            }
+        }
+    }
+
+    for (auto& v : listener.volumes)
+    {
+        MLOG("Discovered volume UUID " + v.volumeUUID);
+
+        bool alreadyInitialized = false;
+
+        for (auto& d : disks)
+        {
+            if (d->getVolume().volumeUUID == v.volumeUUID)
+            {
+                alreadyInitialized = true;
+                break;
+            }
+        }
+
+        if (alreadyInitialized)
+        {
+            continue;
+        }
+
+        disks.emplace_back(std::make_shared<RawDisk>(mpc));
+        auto disk = disks.back();
+        auto& volume = disk->getVolume();
+
+        volume.type = USB_VOLUME;
+
+        if (persistedConfigs.find(v.volumeUUID) == end(persistedConfigs))
+            volume.mode = DISABLED;
+        else
+            volume.mode = persistedConfigs[v.volumeUUID];
+
+        volume.volumePath = v.deviceName;
+        volume.label = v.volumeName;
+        volume.volumeSize = v.mediaSize;
+        volume.volumeUUID = v.volumeUUID;
+    }
+
+#endif
 }

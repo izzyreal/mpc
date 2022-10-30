@@ -6,6 +6,7 @@
 
 #include "Paths.hpp"
 #include <nvram/NvRam.hpp>
+#include <nvram/MidiMappingPersistence.hpp>
 
 #include <disk/AbstractDisk.hpp>
 
@@ -124,9 +125,11 @@ void Mpc::init(const int sampleRate, const int inputCount, const int outputCount
 	for (auto& screenName : screenNames)
         screens->get<ScreenComponent>(screenName);
 
+    mpc::nvram::MidiMappingPersistence::load(*this);
+
     layeredScreen->openScreen("sequencer");
 
-	MLOG("Mpc is ready")
+	MLOG("Mpc is ready");
 }
 
 std::weak_ptr<controls::Controls> Mpc::getControls()

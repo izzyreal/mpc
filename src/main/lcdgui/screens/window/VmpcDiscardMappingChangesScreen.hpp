@@ -3,6 +3,7 @@
 
 namespace mpc::lcdgui::screens {
 class VmpcKeyboardScreen;
+class VmpcMidiScreen;
 }
 
 namespace mpc::lcdgui::screens::window {
@@ -21,5 +22,6 @@ private:
     std::string nextScreen = "sequencer";
     
     friend class mpc::lcdgui::screens::VmpcKeyboardScreen;
+    friend class mpc::lcdgui::screens::VmpcMidiScreen;
 };
 }

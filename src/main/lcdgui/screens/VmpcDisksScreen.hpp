@@ -13,7 +13,9 @@ public:
     void turnWheel(int i) override;
     void up() override;
     void down() override;
-    
+
+    void refreshConfig();
+
 private:
     std::map<std::string, mpc::disk::MountMode> config;
     int row = 0;

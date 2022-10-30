@@ -147,6 +147,7 @@
 #include <lcdgui/screens/VmpcDisksScreen.hpp>
 #include <lcdgui/screens/VmpcSettingsScreen.hpp>
 #include <lcdgui/screens/VmpcKeyboardScreen.hpp>
+#include <lcdgui/screens/VmpcMidiScreen.hpp>
 #include <lcdgui/screens/VmpcAutoSaveScreen.hpp>
 
 #include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
@@ -186,23 +187,12 @@ std::vector<std::unique_ptr<rapidjson::Document>>& layerDocuments()
 
         for (int i = 0; i < 4; i++)
         {
-            char readBuffer[256];
             auto file = fs.open("screens/layer" + to_string(i + 1) + ".json");
             char* data = (char*) string_view(file.begin(), file.end() - file.begin()).data();
 
             auto panelDoc = make_unique<Document>();
             panelDoc->Parse(data, file.size());
-
-            /*
-            This can be uncommented to list all screen names that are encountered in the json files.
-            for (Value::ConstMemberIterator itr = panelDoc->MemberBegin();
-                itr != panelDoc->MemberEnd(); ++itr)
-            {
-                MLOG("\"" + string(itr->name.GetString()) + "\", ");
-            }
-            */
-
-            result.push_back(move(panelDoc));
+            result.push_back(std::move(panelDoc));
         }
     }
     
@@ -284,7 +274,7 @@ pair<vector<shared_ptr<Component>>, map<string, vector<string>>> Screens::get(co
 		}
         
 		auto functionKeysComponent = make_unique<FunctionKeys>(mpc, "function-keys", allLabels, allTypes);
-		components.push_back(move(functionKeysComponent));
+		components.push_back(std::move(functionKeysComponent));
 	}
 
 	map<string, vector<string>> transferMap;
@@ -383,562 +373,563 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
 	auto children = arrangement.first;
 	auto transferMap = arrangement.second;
 
-	if (screenName.compare("sequencer") == 0)
+	if (screenName == "sequencer")
 	{
 		screen = make_shared<SequencerScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("sequence") == 0)
+	else if (screenName == "sequence")
 	{
 		screen = make_shared<SequenceScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("tempo-change") == 0)
+	else if (screenName == "tempo-change")
 	{
 		screen = make_shared<TempoChangeScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("count-metronome") == 0)
+	else if (screenName == "count-metronome")
 	{
 		screen = make_shared<CountMetronomeScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("edit-multiple") == 0)
+	else if (screenName == "edit-multiple")
 	{
 		screen = make_shared<EditMultipleScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("transmit-program-changes") == 0)
+	else if (screenName == "transmit-program-changes")
 	{
 		screen = make_shared<TransmitProgramChangesScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("timing-correct") == 0)
+	else if (screenName == "timing-correct")
 	{
 		screen = make_shared<TimingCorrectScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("time-display") == 0)
+	else if (screenName == "time-display")
 	{
 		screen = make_shared<TimeDisplayScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("paste-event") == 0)
+	else if (screenName == "paste-event")
 	{
 		screen = make_shared<PasteEventScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("multi-recording-setup") == 0)
+	else if (screenName == "multi-recording-setup")
 	{
 		screen = make_shared<MultiRecordingSetupScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("midi-output") == 0)
+	else if (screenName == "midi-output")
 	{
 		screen = make_shared<MidiOutputScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("midi-input") == 0)
+	else if (screenName == "midi-input")
 	{
 		screen = make_shared<MidiInputScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("loop-bars-window") == 0)
+	else if (screenName == "loop-bars-window")
 	{
 		screen = make_shared<LoopBarsScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("insert-event") == 0)
+	else if (screenName == "insert-event")
 	{
 		screen = make_shared<InsertEventScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("erase-all-off-tracks") == 0)
+	else if (screenName == "erase-all-off-tracks")
 	{
 		screen = make_shared<EraseAllOffTracksScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("change-tsig") == 0)
+	else if (screenName == "change-tsig")
 	{
 		screen = make_shared<ChangeTsigScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("edit-velocity") == 0)
+	else if (screenName == "edit-velocity")
 	{
 		screen = make_shared<EditVelocityScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("erase") == 0)
+	else if (screenName == "erase")
 	{
 		screen = make_shared<EraseScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("change-bars") == 0)
+	else if (screenName == "change-bars")
 	{
 		screen = make_shared<ChangeBarsScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("change-bars-2") == 0)
+	else if (screenName == "change-bars-2")
 	{
 		screen = make_shared<ChangeBars2Screen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("track") == 0)
+	else if (screenName == "track")
 	{
 		screen = make_shared<TrackScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("assign-16-levels") == 0)
+	else if (screenName == "assign-16-levels")
 	{
 		screen = make_shared<Assign16LevelsScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("midi-input-monitor") == 0)
+	else if (screenName == "midi-input-monitor")
 	{
 		screen = make_shared<MidiMonitorScreen>(mpc, screenName, layerIndex);
 	}
-	else if (screenName.compare("midi-output-monitor") == 0)
+	else if (screenName == "midi-output-monitor")
 	{
 		screen = make_shared<MidiMonitorScreen>(mpc, screenName, layerIndex);
 	}
-	else if (screenName.compare("metronome-sound") == 0)
+	else if (screenName == "metronome-sound")
 	{
 		screen = make_shared<MetronomeSoundScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("copy-sequence") == 0)
+	else if (screenName == "copy-sequence")
 	{
 		screen = make_shared<CopySequenceScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("copy-track") == 0)
+	else if (screenName == "copy-track")
 	{
 		screen = make_shared<CopyTrackScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("delete-sequence") == 0)
+	else if (screenName == "delete-sequence")
 	{
 		screen = make_shared<DeleteSequenceScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("delete-track") == 0)
+	else if (screenName == "delete-track")
 	{
 		screen = make_shared<DeleteTrackScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("delete-all-sequences") == 0)
+	else if (screenName == "delete-all-sequences")
 	{
 		screen = make_shared<DeleteAllSequencesScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("delete-all-tracks") == 0)
+	else if (screenName == "delete-all-tracks")
 	{
 		screen = make_shared<DeleteAllTracksScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("next-seq-pad") == 0)
+	else if (screenName == "next-seq-pad")
 	{
 		screen = make_shared<NextSeqPadScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("next-seq") == 0)
+	else if (screenName == "next-seq")
 	{
 		screen = make_shared<NextSeqScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("song") == 0)
+	else if (screenName == "song")
 	{
 		screen = make_shared<SongScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("track-mute") == 0)
+	else if (screenName == "track-mute")
 	{
 		screen = make_shared<TrMuteScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("step-editor") == 0)
+	else if (screenName == "step-editor")
 	{
 		screen = make_shared<StepEditorScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("events") == 0)
+	else if (screenName == "events")
 	{
 		screen = make_shared<EventsScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("bars") == 0)
+	else if (screenName == "bars")
 	{
 		screen = make_shared<BarsScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("tr-move") == 0)
+	else if (screenName == "tr-move")
 	{
 		screen = make_shared<TrMoveScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("user") == 0)
+	else if (screenName == "user")
 	{
 		screen = make_shared<UserScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("assign") == 0)
+	else if (screenName == "assign")
 	{
 		screen = make_shared<AssignScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("step-timing-correct") == 0)
+	else if (screenName == "step-timing-correct")
 	{
 		screen = make_shared<StepTcScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("others") == 0)
+	else if (screenName == "others")
 	{
 		screen = make_shared<OthersScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("purge") == 0)
+	else if (screenName == "purge")
 	{
 		screen = make_shared<PurgeScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("drum") == 0)
+	else if (screenName == "drum")
 	{
 		screen = make_shared<DrumScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("trim") == 0)
+	else if (screenName == "trim")
 	{
 		screen = make_shared<TrimScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("loop") == 0)
+	else if (screenName == "loop")
 	{
 		screen = make_shared<LoopScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("zone") == 0)
+	else if (screenName == "zone")
 	{
 		screen = make_shared<ZoneScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("number-of-zones") == 0)
+	else if (screenName == "number-of-zones")
 	{
 		screen = make_shared<NumberOfZonesScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("params") == 0)
+	else if (screenName == "params")
 	{
 		screen = make_shared<SndParamsScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("program-params") == 0)
+	else if (screenName == "program-params")
 	{
 		screen = make_shared<PgmParamsScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("program-assign") == 0)
+	else if (screenName == "program-assign")
 	{
 		screen = make_shared<PgmAssignScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("select-drum") == 0)
+	else if (screenName == "select-drum")
 	{
 		screen = make_shared<SelectDrumScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("sample") == 0)
+	else if (screenName == "sample")
 	{
 		screen = make_shared<SampleScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("sound") == 0)
+	else if (screenName == "sound")
 	{
 		screen = make_shared<SoundScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("convert-sound") == 0)
+	else if (screenName == "convert-sound")
 	{
 		screen = make_shared<ConvertSoundScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("copy-sound") == 0)
+	else if (screenName == "copy-sound")
 	{
 		screen = make_shared<CopySoundScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("delete-sound") == 0)
+	else if (screenName == "delete-sound")
 	{
 		screen = make_shared<DeleteSoundScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("mono-to-stereo") == 0)
+	else if (screenName == "mono-to-stereo")
 	{
 		screen = make_shared<MonoToStereoScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("resample") == 0)
+	else if (screenName == "resample")
 	{
 		screen = make_shared<ResampleScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("stereo-to-mono") == 0)
+	else if (screenName == "stereo-to-mono")
 	{
 		screen = make_shared<StereoToMonoScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("mixer") == 0)
+	else if (screenName == "mixer")
 	{
 		screen = make_shared<MixerScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("mixer-setup") == 0)
+	else if (screenName == "mixer-setup")
 	{
 		screen = make_shared<MixerSetupScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("select-mixer-drum") == 0)
+	else if (screenName == "select-mixer-drum")
 	{
 		screen = make_shared<SelectMixerDrumScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("fx-edit") == 0)
+	else if (screenName == "fx-edit")
 	{
 		screen = make_shared<FxEditScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("start-fine") == 0)
+	else if (screenName == "start-fine")
 	{
 		screen = make_shared<StartFineScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("end-fine") == 0)
+	else if (screenName == "end-fine")
 	{
 		screen = make_shared<EndFineScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("loop-to-fine") == 0)
+	else if (screenName == "loop-to-fine")
 	{
 		screen = make_shared<LoopToFineScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("loop-end-fine") == 0)
+	else if (screenName == "loop-end-fine")
 	{
 		screen = make_shared<LoopEndFineScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("zone-start-fine") == 0)
+	else if (screenName == "zone-start-fine")
 	{
 		screen = make_shared<ZoneStartFineScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("zone-end-fine") == 0)
+	else if (screenName == "zone-end-fine")
 	{
 		screen = make_shared<ZoneEndFineScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("channel-settings") == 0)
+	else if (screenName == "channel-settings")
 	{
 		screen = make_shared<ChannelSettingsScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("edit-sound") == 0)
+	else if (screenName == "edit-sound")
 	{
 		screen = make_shared<EditSoundScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("assignment-view") == 0)
+	else if (screenName == "assignment-view")
 	{
 		screen = make_shared<AssignmentViewScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("auto-chromatic-assignment") == 0)
+	else if (screenName == "auto-chromatic-assignment")
 	{
 		screen = make_shared<AutoChromaticAssignmentScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("copy-note-parameters") == 0)
+	else if (screenName == "copy-note-parameters")
 	{
 		screen = make_shared<CopyNoteParametersScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("keep-or-retry") == 0)
+	else if (screenName == "keep-or-retry")
 	{
 		screen = make_shared<KeepOrRetryScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("mute-assign") == 0)
+	else if (screenName == "mute-assign")
 	{
 		screen = make_shared<MuteAssignScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("program") == 0)
+	else if (screenName == "program")
 	{
 		screen = make_shared<ProgramScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("velocity-modulation") == 0)
+	else if (screenName == "velocity-modulation")
 	{
 		screen = make_shared<VelocityModulationScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("velo-env-filter") == 0)
+	else if (screenName == "velo-env-filter")
 	{
 		screen = make_shared<VeloEnvFilterScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("velo-pitch") == 0)
+	else if (screenName == "velo-pitch")
 	{
 		screen = make_shared<VeloPitchScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("init-pad-assign") == 0)
+	else if (screenName == "init-pad-assign")
 	{
 		screen = make_shared<InitPadAssignScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("create-new-program") == 0)
+	else if (screenName == "create-new-program")
 	{
 		screen = make_shared<CreateNewProgramScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("copy-program") == 0)
+	else if (screenName == "copy-program")
 	{
 		screen = make_shared<CopyProgramScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("delete-all-programs") == 0)
+	else if (screenName == "delete-all-programs")
 	{
 		screen = make_shared<DeleteAllProgramsScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("delete-all-sound") == 0)
+	else if (screenName == "delete-all-sound")
 	{
 		screen = make_shared<DeleteAllSoundScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("delete-program") == 0)
+	else if (screenName == "delete-program")
 	{
 		screen = make_shared<DeleteProgramScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("load") == 0)
+	else if (screenName == "load")
 	{
 		screen = make_shared<LoadScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("format") == 0)
+	else if (screenName == "format")
 	{
 		screen = make_shared<FormatScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("setup") == 0)
+	else if (screenName == "setup")
 	{
 		screen = make_shared<SetupScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("save") == 0)
+	else if (screenName == "save")
 	{
 		screen = make_shared<SaveScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("directory") == 0)
+	else if (screenName == "directory")
 	{
 		screen = make_shared<DirectoryScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("load-a-program") == 0)
+	else if (screenName == "load-a-program")
 	{
 		screen = make_shared<LoadAProgramScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("load-a-sequence") == 0)
+	else if (screenName == "load-a-sequence")
 	{
 		screen = make_shared<LoadASequenceScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("load-a-sequence-from-all") == 0)
+	else if (screenName == "load-a-sequence-from-all")
 	{
 		screen = make_shared<LoadASequenceFromAllScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("load-a-sound") == 0)
+	else if (screenName == "load-a-sound")
 	{
 		screen = make_shared<LoadASoundScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("load-aps-file") == 0)
+	else if (screenName == "load-aps-file")
 	{
 		screen = make_shared<LoadApsFileScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("mpc2000xl-all-file") == 0)
+	else if (screenName == "mpc2000xl-all-file")
 	{
 		screen = make_shared<Mpc2000XlAllFileScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("save-a-program") == 0)
+	else if (screenName == "save-a-program")
 	{
 		screen = make_shared<SaveAProgramScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("save-a-sequence") == 0)
+	else if (screenName == "save-a-sequence")
 	{
 		screen = make_shared<SaveASequenceScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("save-a-sound") == 0)
+	else if (screenName == "save-a-sound")
 	{
 		screen = make_shared<SaveASoundScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("save-all-file") == 0)
+	else if (screenName == "save-all-file")
 	{
 		screen = make_shared<SaveAllFileScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("save-aps-file") == 0)
+	else if (screenName == "save-aps-file")
 	{
 		screen = make_shared<SaveApsFileScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("delete-all-files") == 0)
+	else if (screenName == "delete-all-files")
 	{
 		screen = make_shared<DeleteAllFilesScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("delete-file") == 0)
+	else if (screenName == "delete-file")
 	{
 		screen = make_shared<DeleteFileScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("delete-folder") == 0)
+	else if (screenName == "delete-folder")
 	{
 		screen = make_shared<DeleteFolderScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("cant-find-file") == 0)
+	else if (screenName == "cant-find-file")
 	{
 		screen = make_shared<CantFindFileScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("file-exists") == 0)
+	else if (screenName == "file-exists")
 	{
 		screen = make_shared<FileExistsScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("name") == 0)
+	else if (screenName == "name")
 	{
 		screen = make_shared<NameScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("vmpc-disks") == 0)
+	else if (screenName == "vmpc-disks")
 	{
 		screen = make_shared<VmpcDisksScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("vmpc-settings") == 0)
+	else if (screenName == "vmpc-settings")
 	{
 		screen = make_shared<VmpcSettingsScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("vmpc-direct-to-disk-recorder") == 0)
+	else if (screenName == "vmpc-direct-to-disk-recorder")
 	{
 		screen = make_shared<VmpcDirectToDiskRecorderScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("vmpc-record-jam") == 0)
+	else if (screenName == "vmpc-record-jam")
 	{
 		screen = make_shared<VmpcRecordJamScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("vmpc-recording-finished") == 0)
+	else if (screenName == "vmpc-recording-finished")
 	{
 		screen = make_shared<VmpcRecordingFinishedScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("ver") == 0)
+	else if (screenName == "ver")
 	{
 		screen = make_shared<VerScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("init") == 0)
+	else if (screenName == "init")
 	{
 		screen = make_shared<InitScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("second-seq") == 0)
+	else if (screenName == "second-seq")
 	{
 		screen = make_shared<SecondSeqScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("trans") == 0)
+	else if (screenName == "trans")
 	{
 		screen = make_shared<TransScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("transpose-permanent") == 0)
+	else if (screenName == "transpose-permanent")
 	{
 		screen = make_shared<TransposePermanentScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("punch") == 0)
+	else if (screenName == "punch")
 	{
 		screen = make_shared<PunchScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("sync") == 0)
+	else if (screenName == "sync")
 	{
 		screen = make_shared<SyncScreen>(mpc, layerIndex);
 	}
 	
 	// We break up the else-if chain due to "C1061 Compiler limit: blocks nested too deeply" on Visual Studio
 	
-	if (screenName.compare("popup") == 0)
+	if (screenName == "popup")
 	{
 		screen = make_shared<PopupScreen>(mpc);
 	}
-	else if (screenName.compare("mpc2000xl") == 0 ||
-		screenName.compare("black") == 0 ||
-		screenName.compare("half-black") == 0 ||
-		screenName.compare("empty") == 0)
+	else if (screenName == "mpc2000xl" || screenName == "black" || screenName == "half-black" || screenName == "empty")
 	{
 		screen = make_shared<StaticScreen>(mpc);
 		screen->findChild<Background>("").lock()->setName(screenName);
 	}
-	else if (screenName.compare("sound-memory") == 0)
+	else if (screenName == "sound-memory")
 	{
 		screen = make_shared<SoundMemoryScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("song-window") == 0)
+	else if (screenName == "song-window")
 	{
 		screen = make_shared<SongWindow>(mpc, layerIndex);
 	}
-	else if (screenName.compare("vmpc-file-in-use") == 0)
+	else if (screenName == "vmpc-file-in-use")
 	{
 		screen = make_shared<VmpcFileInUseScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("ignore-tempo-change") == 0)
+	else if (screenName == "ignore-tempo-change")
 	{
 		screen = make_shared<IgnoreTempoChangeScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("loop-song") == 0)
+	else if (screenName == "loop-song")
 	{
 		screen = make_shared<LoopSongScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("delete-song") == 0)
+	else if (screenName == "delete-song")
 	{
 		screen = make_shared<DeleteSongScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("delete-all-song") == 0)
+	else if (screenName == "delete-all-song")
 	{
 		screen = make_shared<DeleteAllSongScreen>(mpc, layerIndex);
 	}
-	else if (screenName.compare("copy-song") == 0)
+	else if (screenName == "copy-song")
 	{
 		screen = make_shared<CopySongScreen>(mpc, layerIndex);
 	}
-    else if (screenName.compare("vmpc-keyboard") == 0)
+    else if (screenName == "vmpc-keyboard")
     {
         screen = make_shared<VmpcKeyboardScreen>(mpc, layerIndex);
     }
-    else if (screenName.compare("vmpc-reset-keyboard") == 0)
+    else if (screenName == "vmpc-midi")
+    {
+        screen = make_shared<VmpcMidiScreen>(mpc, layerIndex);
+    }
+    else if (screenName == "vmpc-reset-keyboard")
     {
         screen = make_shared<VmpcResetKeyboardScreen>(mpc, layerIndex);
     }
-    else if (screenName.compare("vmpc-discard-mapping-changes") == 0)
+    else if (screenName == "vmpc-discard-mapping-changes")
     {
         screen = make_shared<VmpcDiscardMappingChangesScreen>(mpc, layerIndex);
     }
-    else if (screenName.compare("vmpc-auto-save") == 0)
+    else if (screenName == "vmpc-auto-save")
     {
         screen = make_shared<VmpcAutoSaveScreen>(mpc, layerIndex);
     }
-    else if (screenName.compare("midi-sw") == 0)
+    else if (screenName == "midi-sw")
     {
         screen = make_shared<MidiSwScreen>(mpc, layerIndex);
     }
-    else if (screenName.compare("vmpc-convert-and-load-wav") == 0)
+    else if (screenName == "vmpc-convert-and-load-wav")
     {
         screen = make_shared<VmpcConvertAndLoadWavScreen>(mpc, layerIndex);
     }

@@ -28,142 +28,142 @@ void Button::push()
 	if (!screen)
 		return;
 	
-	if (label.compare("left") == 0) {
+	if (label == "left") {
 		screen->left();
 	}
-	else if (label.compare("right") == 0) {
+	else if (label == "right") {
 		screen->right();
 	}
-	else if (label.compare("up") == 0) {
+	else if (label == "up") {
 		screen->up();
 	}
-	else if (label.compare("down") == 0) {
+	else if (label == "down") {
 		screen->down();
 	}
-	else if (label.compare("rec") == 0) {
+	else if (label == "rec") {
 		screen->rec();
 	}
-	else if (label.compare("overdub") == 0) {
+	else if (label == "overdub") {
 		screen->overDub();
 	}
-	else if (label.compare("stop") == 0) {
+	else if (label == "stop") {
 		screen->stop();
 	}
-	else if (label.compare("play") == 0) {
+	else if (label == "play") {
 		screen->play();
 	}
-	else if (label.compare("play-start") == 0) {
+	else if (label == "play-start") {
 		screen->playStart();
 	}
-	else if (label.compare("main-screen") == 0) {
+	else if (label == "main-screen") {
 		screen->mainScreen();
 	}
-	else if (label.compare("open-window") == 0) {
+	else if (label == "open-window") {
 		screen->openWindow();
 	}
-	else if (label.compare("prev-step-event") == 0) {
+	else if (label == "prev-step-event") {
 		screen->prevStepEvent();
 	}
-	else if (label.compare("next-step-event") == 0) {
+	else if (label == "next-step-event") {
 		screen->nextStepEvent();
 	}
-	else if (label.compare("go-to") == 0) {
+	else if (label == "go-to") {
 		screen->goTo();
 	}
-	else if (label.compare("prev-bar-start") == 0) {
+	else if (label == "prev-bar-start") {
 		screen->prevBarStart();
 	}
-	else if (label.compare("next-bar-end") == 0) {
+	else if (label == "next-bar-end") {
 		screen->nextBarEnd();
 	}
-	else if (label.compare("tap") == 0) {
+	else if (label == "tap") {
 		screen->tap();
 	}
-	else if (label.compare("next-seq") == 0) {
+	else if (label == "next-seq") {
 		screen->nextSeq();
 	}
-	else if (label.compare("track-mute") == 0) {
+	else if (label == "track-mute") {
 		screen->trackMute();
 	}
-	else if (label.compare("full-level") == 0) {
+	else if (label == "full-level") {
 		screen->fullLevel();
 	}
-	else if (label.compare("sixteen-levels") == 0) {
+	else if (label == "sixteen-levels") {
 		screen->sixteenLevels();
 	}
-	else if (label.compare("f1") == 0) {
+	else if (label == "f1") {
 		screen->function(0);
 	}
-	else if (label.compare("f2") == 0) {
+	else if (label == "f2") {
 		screen->function(1);
 	}
-	else if (label.compare("f3") == 0) {
+	else if (label == "f3") {
 		screen->function(2);
 	}
-	else if (label.compare("f4") == 0) {
+	else if (label == "f4") {
 		screen->function(3);
 	}
-	else if (label.compare("f5") == 0) {
+	else if (label == "f5") {
 		screen->function(4);
 	}
-	else if (label.compare("f6") == 0) {
+	else if (label == "f6") {
 		screen->function(5);
 	}
-	else if (label.compare("shift") == 0) {
+	else if (label == "shift") {
 		screen->shift();
 	}
-	else if (label.compare("enter") == 0) {
+	else if (label == "enter") {
 		screen->pressEnter();
 	}
-	else if (label.compare("undo-seq") == 0) {
+	else if (label == "undo-seq") {
 		screen->undoSeq();
 	}
-	else if (label.compare("erase") == 0) {
+	else if (label == "erase") {
 		screen->erase();
 	}
-	else if (label.compare("after") == 0) {
+	else if (label == "after") {
 		screen->after();
 	}
-	else if (label.compare("bank-a") == 0) {
+	else if (label == "bank-a") {
 		screen->bank(0);
 	}
-	else if (label.compare("bank-b") == 0) {
+	else if (label == "bank-b") {
 		screen->bank(1);
 	}
-	else if (label.compare("bank-c") == 0) {
+	else if (label == "bank-c") {
 		screen->bank(2);
 	}
-	else if (label.compare("bank-d") == 0) {
+	else if (label == "bank-d") {
 		screen->bank(3);
 	}
-	else if (label.compare("0") == 0) {
+	else if (label == "0") {
 		screen->numpad(0);
 	}
-	else if (label.compare("1") == 0) {
+	else if (label == "1") {
 		screen->numpad(1);
 	}
-	else if (label.compare("2") == 0) {
+	else if (label == "2") {
 		screen->numpad(2);
 	}
-	else if (label.compare("3") == 0) {
+	else if (label == "3") {
 		screen->numpad(3);
 	}
-	else if (label.compare("4") == 0) {
+	else if (label == "4") {
 		screen->numpad(4);
 	}
-	else if (label.compare("5") == 0) {
+	else if (label == "5") {
 		screen->numpad(5);
 	}
-	else if (label.compare("6") == 0) {
+	else if (label == "6") {
 		screen->numpad(6);
 	}
-	else if (label.compare("7") == 0) {
+	else if (label == "7") {
 		screen->numpad(7);
 	}
-	else if (label.compare("8") == 0) {
+	else if (label == "8") {
 		screen->numpad(8);
 	}
-	else if (label.compare("9") == 0) {
+	else if (label == "9") {
 		screen->numpad(9);
 	}
 }
@@ -173,40 +173,40 @@ void Button::release() {
 	
     auto c = mpc.getReleaseControls();
 	
-    if (label.compare("shift") == 0) {
+    if (label == "shift") {
 		c->shift();
 	}
-	else if (label.compare("erase") == 0) {
+	else if (label == "erase") {
 		c->erase();
 	}
-	else if (label.compare("f1") == 0) {
+	else if (label == "f1") {
 		c->function(0);
 	}
-	else if (label.compare("f3") == 0) {
+	else if (label == "f3") {
 		c->function(2);
 	}
-	else if (label.compare("f4") == 0) {
+	else if (label == "f4") {
 		c->function(3);
 	}
-	else if (label.compare("f5") == 0) {
+	else if (label == "f5") {
 		c->function(4);
 	}
-	else if (label.compare("f6") == 0) {
+	else if (label == "f6") {
 		c->function(5);
 	}
-	else if (label.compare("rec") == 0) {
+	else if (label == "rec") {
 		c->rec();
 	}
-	else if (label.compare("overdub") == 0) {
+	else if (label == "overdub") {
 		c->overDub();
 	}
-	else if (label.compare("play") == 0) {
+	else if (label == "play") {
 		c->play();
 	}
-	else if (label.compare("tap") == 0) {
+	else if (label == "tap") {
 		c->tap();
 	}
-	else if (label.compare("go-to") == 0) {
+	else if (label == "go-to") {
 		c->goTo();
 	}
 }

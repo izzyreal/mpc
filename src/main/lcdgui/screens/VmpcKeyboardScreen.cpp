@@ -245,7 +245,7 @@ void VmpcKeyboardScreen::updateRows()
         
         int length = 15;
         
-        auto labelText = StrUtil::padRight(labelsToKeyCodeNames[i + rowOffset].first, " ", length) + ": ";
+        auto labelText = StrUtil::padRight(labelsToKeyCodeNames[i + rowOffset].first, " ", length) + ":";
         
         l->setText(labelText);
         f->setText(labelsToKeyCodeNames[i + rowOffset].second);

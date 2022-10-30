@@ -4,6 +4,8 @@
 #include <Paths.hpp>
 #include <disk/AbstractDisk.hpp>
 
+#include "file/FileUtil.hpp"
+
 #include <rapidjson/document.h>
 #include "rapidjson/filewritestream.h"
 #include <rapidjson/writer.h>
@@ -18,7 +20,8 @@ const size_t bufSize = 2048;
 Document read()
 {
     Document result;
-    FILE* fp = fopen(volumesPersistencePath.c_str(), "r");
+
+    auto fp = moduru::file::FileUtil::fopenw(volumesPersistencePath.c_str(), "r");
     
     if (fp != NULL)
     {
@@ -116,9 +119,9 @@ void VolumesPersistence::save(mpc::Mpc & mpc)
             volumes.PushBack(volume, d.GetAllocator());
         }
     }
-    
-    FILE* fp = fopen(volumesPersistencePath.c_str(), "w");
-    
+
+    auto fp = moduru::file::FileUtil::fopenw(volumesPersistencePath.c_str(), "w");
+
     char writeBuffer[bufSize];
     FileWriteStream os(fp, writeBuffer, sizeof(writeBuffer));
     

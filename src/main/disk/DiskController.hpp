@@ -28,5 +28,7 @@ namespace mpc::disk
         int getActiveDiskIndex();
         void setActiveDiskIndex(int newActiveDiskIndex);
 
+        void detectRawUsbVolumes();
+
 	};
 }

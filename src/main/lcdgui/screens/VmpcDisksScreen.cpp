@@ -40,17 +40,10 @@ void VmpcDisksScreen::open()
 {
     findChild<Label>("up").lock()->setText("\u00C7");
     findChild<Label>("down").lock()->setText("\u00C6");
- 
-    config.clear();
-    
-    for (auto& d : mpc.getDisks())
-    {
-        auto& diskVol = d->getVolume();
-        config[diskVol.volumeUUID] = diskVol.mode;
-    }
-    
-    displayRows();
-    displayFunctionKeys();
+
+    mpc.getDiskController()->detectRawUsbVolumes();
+
+    refreshConfig();
 }
 
 void VmpcDisksScreen::function(int i)
@@ -65,6 +58,9 @@ void VmpcDisksScreen::function(int i)
             break;
         case 2:
             openScreen("vmpc-auto-save");
+            break;
+        case 4:
+            openScreen("vmpc-midi");
             break;
         case 5:
             auto popupScreen = mpc.screens->get<PopupScreen>("popup");
@@ -207,4 +203,24 @@ void VmpcDisksScreen::displayUpAndDown()
 {
     findChild<Label>("up").lock()->Hide(rowOffset == 0);
     findChild<Label>("down").lock()->Hide(rowOffset + 4 >= mpc.getDisks().size());
+}
+
+void VmpcDisksScreen::refreshConfig()
+{
+    config.clear();
+
+    for (auto& d : mpc.getDisks())
+    {
+        auto& diskVol = d->getVolume();
+        config[diskVol.volumeUUID] = diskVol.mode;
+    }
+
+    if (row + rowOffset >= config.size())
+    {
+        row = 0;
+        rowOffset = 0;
+    }
+
+    displayRows();
+    displayFunctionKeys();
 }

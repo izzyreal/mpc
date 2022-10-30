@@ -602,8 +602,8 @@
   "auto-convert-wavs", [ "_", "_", "16-levels-erase-mode", "_" ]
  ],
  "tfsize" : [ 60, 108, 18 ],
- "fblabels" : [ "SETNGS", "KEYBRD", "AUTSAV", "DISKS", null, null ],
- "fbtypes" : [ 2, 0, 0, 0, null, null ]
+ "fblabels" : [ "SETNGS", "KEYBRD", "AUTSAV", "DISKS", "MIDI", null ],
+ "fbtypes" : [ 2, 0, 0, 0, 0, null ]
 },
 "vmpc-keyboard":
 {
@@ -613,10 +613,10 @@
  "infoy" : [ 2, 38 ],
  "fblabels" : [
  ["SETNGS", "KEYBRD", "AUTSAV", "LEARN", "RESET", "SAVE" ],
- ["SETNGS", "KEYBRD", "CANCEL", "ACCEPT", null, null ]],
+ [null, null, "CANCEL", "ACCEPT", null, null ]],
  "fbtypes" : [
  [ 0, 2, 0, 1, 1, 1 ],
- [ 0, 2, 1, 1, null, null ]]
+ [ null, null, 1, 1, null, null ]]
 },
 "vmpc-auto-save":
 {
@@ -632,8 +632,8 @@
  "infosize" : [ 168 ],
  "infox" : [ 45 ],
  "infoy" : [ 37 ],
- "fblabels" : [ "SETNGS", "KEYBRD", "AUTSAV", "DISKS", null, null ],
- "fbtypes" : [ 0, 0, 2, 0, null, null ]
+ "fblabels" : [ "SETNGS", "KEYBRD", "AUTSAV", "DISKS", "MIDI", null ],
+ "fbtypes" : [ 0, 0, 2, 0, 0, null ]
 },
 "vmpc-disks":
 {
@@ -647,10 +647,23 @@
  "infox" : [ 240, 240 ],
  "infoy" : [ 10, 38 ],
  "fblabels" : [
-  [ "SETNGS", "KEYBRD", "AUTSAV", "DISKS", "RESET", "SAVE" ],
-  [ "SETNGS", "KEYBRD", "AUTSAV", "DISKS", null, null ]],
+  [ "SETNGS", "KEYBRD", "AUTSAV", "DISKS", "MIDI", "SAVE" ],
+  [ "SETNGS", "KEYBRD", "AUTSAV", "DISKS", "MIDI", null ]],
  "fbtypes" : [
-  [ 0, 0, 0, 2, 1, 1 ],
-  [ 0, 0, 0, 2, null, null ]]
+  [ 0, 0, 0, 2, 0, 1 ],
+  [ 0, 0, 0, 2, 0, null ]]
+},
+"vmpc-midi":
+{
+ "infowidgets" : [ "up", "down" ],
+ "infosize" : [ 5, 5 ],
+ "infox" : [ 239, 239 ],
+ "infoy" : [ 2, 38 ],
+ "fblabels" : [
+  ["SETNGS", "KEYBRD", "RESET", "LEARN", "MIDI", "SAVE" ],
+  [null, null, "CANCEL", "ACCEPT", null, null ]],
+ "fbtypes" : [
+  [ 0, 0, 1, 1, 2, 1 ],
+  [ null, null, 1, 1, null, null ]]
 }
 }
