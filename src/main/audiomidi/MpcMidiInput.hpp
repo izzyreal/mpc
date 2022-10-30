@@ -45,6 +45,7 @@ namespace mpc::audiomidi
 		void transportOmni(ctoot::midi::core::MidiMessage* msg, std::string outputLetter);
     void handleControl(ctoot::midi::core::ShortMessage* shortMsg);
     void handlePolyAndNote(ctoot::midi::core::MidiMessage* msg);
+    void handleVmpcMidi(ctoot::midi::core::ShortMessage* shortMsg);
 
 	public:
 		MpcMidiInput(mpc::Mpc& mpc, int index);

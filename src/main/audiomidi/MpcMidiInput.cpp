@@ -15,6 +15,7 @@
 #include <lcdgui/screens/SyncScreen.hpp>
 #include <lcdgui/screens/VmpcSettingsScreen.hpp>
 #include <lcdgui/screens/MidiSwScreen.hpp>
+#include <lcdgui/screens/VmpcMidiScreen.hpp>
 #include <lcdgui/screens/window/MidiInputScreen.hpp>
 #include <lcdgui/screens/window/MidiOutputScreen.hpp>
 
@@ -60,6 +61,9 @@ void MpcMidiInput::transport(MidiMessage *msg, int timeStamp)
   auto lSampler = sampler.lock();
   string notificationMessage = string(index == 0 ? "a" : "b");
   auto shortMsg = dynamic_cast<ShortMessage *>(msg);
+
+  handleVmpcMidi(shortMsg);
+
   auto channel = shortMsg->getChannel();
 
   notificationMessage += to_string(channel);
@@ -274,7 +278,7 @@ void MpcMidiInput::handleControl(ShortMessage *shortMsg)
   {
     vector<int> processedControllers;
 
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < MidiSwScreen::SWITCH_COUNT; i++)
     {
       auto ctrl = midiSwScreen->getSwitch(i).first;
 
@@ -492,4 +496,65 @@ void MpcMidiInput::handlePolyAndNote(MidiMessage* msg)
       }
     }
   }
+}
+
+void MpcMidiInput::handleVmpcMidi(ctoot::midi::core::ShortMessage *shortMsg)
+{
+    auto status = shortMsg->getStatus();
+    auto isControl = status >= ShortMessage::CONTROL_CHANGE && status < ShortMessage::CONTROL_CHANGE + 16;
+    auto isNoteOn = status >= ShortMessage::NOTE_ON && status < ShortMessage::NOTE_ON + 16;
+    auto isNoteOff = status >= ShortMessage::NOTE_OFF && status < ShortMessage::NOTE_OFF + 16;
+
+    if (!isNoteOn && !isNoteOff && !isControl)
+    {
+        return;
+    }
+
+    auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
+
+    if (vmpcMidiScreen->isLearning())
+    {
+        if (!isNoteOn && !isControl)
+        {
+            return;
+        }
+        vmpcMidiScreen->setLearnCandidate(isNoteOn, shortMsg->getChannel(), shortMsg->getData1());
+        return;
+    }
+
+    for (auto& labelCommand : vmpcMidiScreen->labelCommands)
+    {
+        auto command = labelCommand.second;
+        auto channelIndex = command.channelIndex;
+
+        if (channelIndex >= 0 && shortMsg->getChannel() != channelIndex)
+        {
+            continue;
+        }
+
+        auto label = labelCommand.first;
+        auto isNote = command.isNote;
+        auto value = command.value;
+
+        if (shortMsg->getData1() != value)
+        {
+            continue;
+        }
+
+        auto hwComponent = mpc.getHardware().lock()->getComponentByLabel(label).lock();
+
+        if ((isNote && (isNoteOn || isNoteOff)) ||
+            (!isNote && isControl))
+        {
+            if (shortMsg->getData2() == 0)
+            {
+                hwComponent->release();
+            }
+            else
+            {
+                hwComponent->push(shortMsg->getData2());
+                hwComponent->push();
+            }
+        }
+    }
 }

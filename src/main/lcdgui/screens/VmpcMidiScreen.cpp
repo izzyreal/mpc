@@ -82,7 +82,7 @@ void VmpcMidiScreen::open()
     findChild<Label>("down").lock()->setText("\u00C6");
     
     setLearning(false);
-    setLearnCandidate(-1);
+    learnCandidate.reset();
     updateRows();
 }
 
@@ -184,7 +184,7 @@ void VmpcMidiScreen::function(int i)
             if (learning)
             {
                 setLearning(false);
-                setLearnCandidate(-1);
+                learnCandidate.reset();
                 updateRows();
                 return;
             }
@@ -202,18 +202,15 @@ void VmpcMidiScreen::function(int i)
         case 3:
             if (learning)
             {
-                auto label = labelCommands[row + rowOffset].first;
-                auto oldMidiCommand = labelCommands[row + rowOffset].second;
-
-//                if (learnCandidate != oldMidiCommand)
-//                {
-//                    //
-//                }
+                if (!learnCandidate.isEmpty() && !learnCandidate.equals(labelCommands[row + rowOffset].second))
+                {
+                    labelCommands[row + rowOffset].second = learnCandidate;
+                    updateRows();
+                }
             }
             
             setLearning(!learning);
-            
-            setLearnCandidate(-1);
+            learnCandidate.reset();
             updateRows();
             break;
         case 4:
@@ -257,9 +254,9 @@ void VmpcMidiScreen::mainScreen()
     ScreenComponent::mainScreen();
 }
 
-void VmpcMidiScreen::setLearnCandidate(const int rawKeyCode)
+void VmpcMidiScreen::setLearnCandidate(const bool isNote, const char channelIndex, const char value)
 {
-    learnCandidate = rawKeyCode;
+    learnCandidate = {isNote, channelIndex, value};
     updateRows();
 }
 
@@ -296,8 +293,10 @@ void VmpcMidiScreen::updateRows()
         auto labelText = StrUtil::padRight(labelCommands[i + rowOffset].first, " ", length) + ":";
         
         typeLabel->setText(labelText);
-        auto cmd = labelCommands[i + rowOffset].second;
+        Command& cmd = (learning && row == i && !learnCandidate.isEmpty()) ? learnCandidate : labelCommands[i + rowOffset].second;
+
         std::string type = cmd.isNote ? "Note" : "CC";
+
         typeField->setText(type);
         typeField->setInverted(row == i && column == 0);
 
@@ -327,15 +326,9 @@ void VmpcMidiScreen::updateRows()
 
         valueField->setInverted(row == i && column == 2);
 
-        if (learning && i == row)
-        {
-            // TODO Display new MIDI command description
-            typeField->setBlinking(true);
-        }
-        else
-        {
-            typeField->setBlinking(false);
-        }
+        typeField->setBlinking(learning && i == row);
+        channelField->setBlinking(learning && i == row);
+        valueField->setBlinking(learning && i == row);
     }
     
     displayUpAndDown();
