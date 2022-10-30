@@ -24,7 +24,10 @@ public:
     void importMapping();
     
     KbMapping();
-    
+
+    static int getNextKeyCode(int keyCode);
+    static int getPreviousKeyCode(int keyCode);
+
 private:
     const static WonderRabbitProject::key::key_helper_t* kh;
     std::vector<std::pair<std::string, int>> labelKeyMap;

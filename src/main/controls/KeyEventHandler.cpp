@@ -36,7 +36,7 @@ void KeyEventHandler::handle(const KeyEvent &keyEvent)
 
     auto it = find(begin(pressed), end(pressed), keyEvent.rawKeyCode);
 
-    bool isCapsLock = KeyCodes::keyCodeNames[keyEvent.rawKeyCode] == "caps lock";
+    bool isCapsLock = KeyCodes::getKeyCodeName(keyEvent.rawKeyCode) == "caps lock";
 
     // Special case as caps lock only sends key releases on OSX
     if (isCapsLock)
@@ -76,7 +76,7 @@ void KeyEventHandler::handle(const KeyEvent &keyEvent)
     }
 
     auto currentScreenName = mpc.getLayeredScreen().lock()->getCurrentScreenName();
-    auto keyCodeDisplayName = KeyCodes::keyCodeNames[keyEvent.rawKeyCode];
+    auto keyCodeDisplayName = KeyCodes::getKeyCodeName(keyEvent.rawKeyCode);
 
     if (currentScreenName == "vmpc-keyboard")
     {
@@ -124,6 +124,14 @@ void KeyEventHandler::handle(const KeyEvent &keyEvent)
             else if (keyCodeDisplayName == KeyCodes::names[KeyCodes::MVK_Escape])
             {
                 screen->mainScreen();
+            }
+            else if (keyCodeDisplayName == KeyCodes::names[KeyCodes::MVK_ANSI_Equal])
+            {
+                screen->turnWheel(1);
+            }
+            else if (keyCodeDisplayName == KeyCodes::names[KeyCodes::MVK_ANSI_Minus])
+            {
+                screen->turnWheel(-1);
             }
         }
 

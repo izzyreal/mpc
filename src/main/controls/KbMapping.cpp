@@ -1,6 +1,5 @@
 #include "KbMapping.hpp"
-#include <thirdp/wrpkey/key.hxx>
-
+#include <sys/KeyCodes.hpp>
 #include <file/File.hpp>
 #include <Paths.hpp>
 
@@ -8,6 +7,7 @@
 
 using namespace mpc::controls;
 using namespace WonderRabbitProject::key;
+using namespace moduru::sys;
 using namespace std;
 
 KbMapping::KbMapping()
@@ -56,6 +56,7 @@ void KbMapping::exportMapping() {
 
 void KbMapping::importMapping()
 {
+    labelKeyMap.clear();
     auto path = mpc::Paths::configPath() + "keys.txt";
     moduru::file::File f(path, nullptr);
     
@@ -131,6 +132,7 @@ void KbMapping::importMapping()
 
 void KbMapping::initializeDefaults()
 {
+    labelKeyMap.clear();
     labelKeyMap.emplace_back("left", kh->code("left"));
     labelKeyMap.emplace_back("right", kh->code("right"));
     labelKeyMap.emplace_back("up", kh->code("up"));
@@ -243,4 +245,62 @@ void KbMapping::setKeyCodeForLabel(const int keyCode, std::string label)
     {
         if (kv.first == label) kv.second = keyCode;
     }
+}
+
+int KbMapping::getNextKeyCode(int keyCode)
+{
+    bool wasFound = false;
+    int last = -1;
+
+    int result = -1;
+
+    for (auto& kv : KeyCodes::keyCodeNames)
+    {
+        auto keyCode2 = kv.first;
+        if (wasFound)
+        {
+            result = keyCode2;
+            wasFound = false;
+        }
+
+        if (keyCode2 == keyCode)
+        {
+            wasFound = true;
+        }
+
+        last = keyCode2;
+    }
+
+    if (result != -1)
+    {
+        return result;
+    }
+    return last;
+}
+
+int KbMapping::getPreviousKeyCode(int keyCode)
+{
+    int first = -1;
+
+    int previous = -1;
+    int counter = 0;
+    for (auto& kv : KeyCodes::keyCodeNames)
+    {
+        auto keyCode2 = kv.first;
+
+        if (first == -1)
+        {
+            first = keyCode2;
+        }
+
+        if (keyCode2 == keyCode && counter > 0)
+        {
+            return previous;
+        }
+
+        previous = keyCode2;
+        counter++;
+    }
+
+    return first;
 }

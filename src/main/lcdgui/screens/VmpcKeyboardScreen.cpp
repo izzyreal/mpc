@@ -41,6 +41,19 @@ VmpcKeyboardScreen::VmpcKeyboardScreen(mpc::Mpc& mpc, int layerIndex)
     updateKeyCodeNames();
 }
 
+void VmpcKeyboardScreen::turnWheel(int i)
+{
+    init();
+    auto label = labelsToKeyCodeNames[row + rowOffset].first;
+    auto kbMapping = mpc.getControls().lock()->getKbMapping().lock();
+    auto oldKeyCode = kbMapping->getKeyCodeFromLabel(label);
+    auto newKeyCode = i > 0 ? KbMapping::getNextKeyCode(oldKeyCode) : KbMapping::getPreviousKeyCode(oldKeyCode);
+
+    kbMapping->setKeyCodeForLabel(newKeyCode, label);
+    updateKeyCodeNames();
+    updateRows();
+}
+
 void VmpcKeyboardScreen::open()
 {
     findChild<Label>("up").lock()->setText("\u00C7");
@@ -240,7 +253,7 @@ void VmpcKeyboardScreen::updateRows()
         
         if (learning && i == row)
         {
-            f->setText(KeyCodes::keyCodeNames[learnCandidate]);
+            f->setText(KeyCodes::getKeyCodeName(learnCandidate));
             f->setBlinking(true);
         }
         else
@@ -255,8 +268,6 @@ void VmpcKeyboardScreen::updateRows()
 void VmpcKeyboardScreen::updateKeyCodeNames()
 {
     labelsToKeyCodeNames.clear();
-    
-    auto& keyCodeNames = KeyCodes::keyCodeNames;
 
     auto kbMapping = mpc.getControls().lock()->getKbMapping().lock();
     auto hw = mpc.getHardware().lock();
@@ -273,11 +284,11 @@ void VmpcKeyboardScreen::updateKeyCodeNames()
     for (auto c : components)
     {
         auto label = c.lock()->getLabel();
-        labelsToKeyCodeNames.push_back({label, keyCodeNames[kbMapping->getKeyCodeFromLabel(label)]});
+        labelsToKeyCodeNames.push_back({label, KeyCodes::getKeyCodeName(kbMapping->getKeyCodeFromLabel(label))});
     }
 
-    labelsToKeyCodeNames.push_back({ "datawheel-up", keyCodeNames[kbMapping->getKeyCodeFromLabel("datawheel-up")] });
-    labelsToKeyCodeNames.push_back({ "datawheel-down", keyCodeNames[kbMapping->getKeyCodeFromLabel("datawheel-down")] });
+    labelsToKeyCodeNames.push_back({ "datawheel-up", KeyCodes::getKeyCodeName(kbMapping->getKeyCodeFromLabel("datawheel-up")) });
+    labelsToKeyCodeNames.push_back({ "datawheel-down", KeyCodes::getKeyCodeName(kbMapping->getKeyCodeFromLabel("datawheel-down")) });
 }
 
 void VmpcKeyboardScreen::displayUpAndDown()

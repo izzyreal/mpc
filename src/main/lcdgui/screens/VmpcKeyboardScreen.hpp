@@ -19,6 +19,7 @@ public:
     void down() override;
     void function(int i) override;
     void mainScreen() override;
+    void turnWheel(int i) override;
     
     bool isLearning();
     void setLearnCandidate(const int rawKeyCode);
