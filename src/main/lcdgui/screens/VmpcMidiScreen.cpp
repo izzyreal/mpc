@@ -2,6 +2,8 @@
 
 #include <Mpc.hpp>
 
+#include "nvram/MidiMappingPersistence.hpp"
+
 #include <hardware/Hardware.hpp>
 #include <hardware/HwPad.hpp>
 
@@ -42,7 +44,7 @@ void VmpcMidiScreen::turnWheel(int i)
 {
     init();
 
-    Command& cmd = labelCommands[row + rowOffset].second;
+    Command& cmd = editableLabelCommands[row + rowOffset].second;
 
     if (column == 0)
     {
@@ -78,6 +80,16 @@ void VmpcMidiScreen::turnWheel(int i)
 
 void VmpcMidiScreen::open()
 {
+    auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>("vmpc-discard-mapping-changes");
+    screen->discardAndLeave = [this](){this->editableLabelCommands.clear();};
+    screen->saveAndLeave = [this](){this->labelCommands = this->editableLabelCommands;};
+    screen->stayScreen = "vmpc-midi";
+
+    if (ls.lock()->getPreviousScreenName() != "vmpc-discard-mapping-changes")
+    {
+        editableLabelCommands = labelCommands;
+    }
+
     findChild<Label>("up").lock()->setText("\u00C7");
     findChild<Label>("down").lock()->setText("\u00C6");
     
@@ -112,7 +124,7 @@ void VmpcMidiScreen::down()
     
     if (row == 4)
     {
-        if (rowOffset + 5 >= labelCommands.size())
+        if (rowOffset + 5 >= editableLabelCommands.size())
             return;
         
         rowOffset++;
@@ -148,6 +160,19 @@ void VmpcMidiScreen::setLearning(bool b)
 
 bool VmpcMidiScreen::hasMappingChanged()
 {
+    if (labelCommands.size() != editableLabelCommands.size())
+    {
+        return true;
+    }
+
+    for (int i = 0; i < labelCommands.size(); i++)
+    {
+        if (labelCommands[i].first != editableLabelCommands[i].first ||
+            !labelCommands[i].second.equals(editableLabelCommands[i].second))
+        {
+            return true;
+        }
+    }
     return false;
 }
 
@@ -171,13 +196,18 @@ void VmpcMidiScreen::function(int i)
             break;
         case 1:
             if (learning)
+            {
                 return;
+            }
+
             if (hasMappingChanged())
             {
                 auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>("vmpc-discard-mapping-changes");
                 screen->nextScreen = "vmpc-keyboard";
                 openScreen("vmpc-discard-mapping-changes");
+                return;
             }
+
             openScreen("vmpc-keyboard");
             break;
         case 2:
@@ -191,20 +221,21 @@ void VmpcMidiScreen::function(int i)
             
             if (hasMappingChanged())
             {
+                labelCommands = editableLabelCommands;
                 auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>("vmpc-discard-mapping-changes");
                 screen->nextScreen = "vmpc-auto-save";
                 openScreen("vmpc-discard-mapping-changes");
                 return;
             }
 
-            openScreen("vmpc-auto-save");
+            openScreen("vmpc-discard-mapping-changes");
             break;
         case 3:
             if (learning)
             {
-                if (!learnCandidate.isEmpty() && !learnCandidate.equals(labelCommands[row + rowOffset].second))
+                if (!learnCandidate.isEmpty() && !learnCandidate.equals(editableLabelCommands[row + rowOffset].second))
                 {
-                    labelCommands[row + rowOffset].second = learnCandidate;
+                    editableLabelCommands[row + rowOffset].second = learnCandidate;
                     updateRows();
                 }
             }
@@ -218,7 +249,7 @@ void VmpcMidiScreen::function(int i)
                 return;
 
             // TODO Implement vmpc-reset-midi screen
-            openScreen("vmpc-reset-midi");
+//            openScreen("vmpc-reset-midi");
             break;
         case 5:
             if (learning)
@@ -229,7 +260,7 @@ void VmpcMidiScreen::function(int i)
 
             if (hasMappingChanged())
             {
-                // TODO Persist mapping
+                mpc::nvram::MidiMappingPersistence::save(mpc);
                 popupScreen->setText("MIDI mapping saved");
             }
             else
@@ -290,10 +321,10 @@ void VmpcMidiScreen::updateRows()
         
         int length = 15;
         
-        auto labelText = StrUtil::padRight(labelCommands[i + rowOffset].first, " ", length) + ":";
+        auto labelText = StrUtil::padRight(editableLabelCommands[i + rowOffset].first, " ", length) + ":";
         
         typeLabel->setText(labelText);
-        Command& cmd = (learning && row == i && !learnCandidate.isEmpty()) ? learnCandidate : labelCommands[i + rowOffset].second;
+        Command& cmd = (learning && row == i && !learnCandidate.isEmpty()) ? learnCandidate : editableLabelCommands[i + rowOffset].second;
 
         std::string type = cmd.isNote ? "Note" : "CC";
 
@@ -337,5 +368,5 @@ void VmpcMidiScreen::updateRows()
 void VmpcMidiScreen::displayUpAndDown()
 {
     findChild<Label>("up").lock()->Hide(rowOffset == 0);
-    findChild<Label>("down").lock()->Hide(rowOffset + 5 >= labelCommands.size());
+    findChild<Label>("down").lock()->Hide(rowOffset + 5 >= editableLabelCommands.size());
 }

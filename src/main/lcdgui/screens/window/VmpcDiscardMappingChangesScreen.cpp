@@ -1,9 +1,6 @@
 #include "VmpcDiscardMappingChangesScreen.hpp"
 
-#include <controls/KbMapping.hpp>
-
 using namespace mpc::lcdgui::screens::window;
-using namespace std;
 
 VmpcDiscardMappingChangesScreen::VmpcDiscardMappingChangesScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "vmpc-discard-mapping-changes", layerIndex)
@@ -23,16 +20,16 @@ void VmpcDiscardMappingChangesScreen::function(int i)
     {
         case 3:
             // stay
-            openScreen("vmpc-keyboard");
+            openScreen(stayScreen);
             break;
         case 4:
             // discard and leave
-            mpc.getControls().lock()->getKbMapping().lock()->importMapping();
+            discardAndLeave();
             openScreen(nextScreen);
             break;
         case 5:
             // save and leave
-            mpc.getControls().lock()->getKbMapping().lock()->exportMapping();
+            saveAndLeave();
             openScreen(nextScreen);
             break;
     }

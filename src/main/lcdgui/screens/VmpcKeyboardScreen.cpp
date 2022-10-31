@@ -56,6 +56,11 @@ void VmpcKeyboardScreen::turnWheel(int i)
 
 void VmpcKeyboardScreen::open()
 {
+    auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>("vmpc-discard-mapping-changes");
+    screen->saveAndLeave = [this](){this->mpc.getControls().lock()->getKbMapping().lock()->exportMapping();};
+    screen->discardAndLeave = [this](){this->mpc.getControls().lock()->getKbMapping().lock()->importMapping();};
+    screen->stayScreen = "vmpc-keyboard";
+
     findChild<Label>("up").lock()->setText("\u00C7");
     findChild<Label>("down").lock()->setText("\u00C6");
     

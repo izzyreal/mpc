@@ -1,6 +1,8 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
+#include <functional>
+
 namespace mpc::lcdgui::screens {
 class VmpcKeyboardScreen;
 class VmpcMidiScreen;
@@ -17,7 +19,11 @@ public:
     void function(int i) override;
     void close() override;
     void mainScreen() override {}
-    
+
+    std::function<void()> discardAndLeave = [](){};
+    std::function<void()> saveAndLeave = [](){};
+    std::string stayScreen;
+
 private:
     std::string nextScreen = "sequencer";
     

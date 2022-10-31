@@ -54,6 +54,7 @@ namespace mpc::lcdgui::screens{
         bool learning = false;
         bool hasMappingChanged();
 
+        std::vector<std::pair<std::string, Command>> editableLabelCommands;
         std::vector<std::pair<std::string, Command>> labelCommands;
         void setLearning(bool b);
         void updateRows();

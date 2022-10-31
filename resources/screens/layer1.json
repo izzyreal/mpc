@@ -660,7 +660,7 @@
  "infox" : [ 239, 239 ],
  "infoy" : [ 2, 38 ],
  "fblabels" : [
-  ["SETNGS", "KEYBRD", "RESET", "LEARN", "MIDI", "SAVE" ],
+  ["SETNGS", "KEYBRD", "AUTSAV", "LEARN", "MIDI", "SAVE" ],
   [null, null, "CANCEL", "ACCEPT", null, null ]],
  "fbtypes" : [
   [ 0, 0, 1, 1, 2, 1 ],
