@@ -657,6 +657,8 @@ void EventsScreen::performCopy(int sourceStart, int sourceEnd, int toSequenceInd
 
     auto toSequence = sequencer->getSequence(toSequenceIndex);
 
+    if (!toSequence->isUsed())
+        toSequence->init(fromSequence->getLastBarIndex());
 
     auto destNumerator = -1;
     auto destDenominator = -1;
@@ -679,10 +681,10 @@ void EventsScreen::performCopy(int sourceStart, int sourceEnd, int toSequenceInd
     auto minimumRequiredNewSequenceLength = destStart + (segLength);
     auto ticksToAdd = minimumRequiredNewSequenceLength - toSequence->getLastTick();
     auto barsToAdd = (int) (ceil((float)ticksToAdd / destBarLength));
-
+    auto initialLastBarIndex = toSequence->getLastBarIndex();
     for (int i = 0; i < barsToAdd; i++)
     {
-       const auto afterBar = toSequence->getLastBarIndex() + i;
+       const auto afterBar = initialLastBarIndex + i + 1;
 
        if (afterBar >= 998)
            break;
@@ -690,9 +692,6 @@ void EventsScreen::performCopy(int sourceStart, int sourceEnd, int toSequenceInd
        toSequence->insertBars(1, afterBar);
        toSequence->setTimeSignature(afterBar, destNumerator, destDenominator);
     }
-
-    if (!toSequence->isUsed())
-        toSequence->init(fromSequence->getLastBarIndex());
 
     auto destTrack = toSequence->getTrack(toTrackIndex);
 

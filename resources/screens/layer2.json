@@ -886,5 +886,10 @@
 {
  "fblabels" : [ null, null, null, "CANCEL", "DO IT", null ],
  "fbtypes" : [ null, null, null, 0, 1, null ]
-}
+},
+ "vmpc-midi-presets":
+ {
+  "fblabels" : [ null, null, null, "CLOSE", "SAVE", "LOAD" ],
+  "fbtypes" : [ null, null, null, 0, 1, 1 ]
+ }
 }

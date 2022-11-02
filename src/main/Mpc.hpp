@@ -268,7 +268,9 @@ namespace mpc {
                 "vmpc-keyboard",
                 "vmpc-reset-keyboard",
                 "vmpc-discard-mapping-changes",
-                "vmpc-auto-save"
+                "vmpc-auto-save",
+                "vmpc-midi",
+                "vmpc-midi-presets"
         };
     };
 }

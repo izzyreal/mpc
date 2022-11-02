@@ -154,6 +154,7 @@
 #include <lcdgui/screens/window/VmpcRecordingFinishedScreen.hpp>
 #include <lcdgui/screens/window/VmpcResetKeyboardScreen.hpp>
 #include <lcdgui/screens/window/VmpcDiscardMappingChangesScreen.hpp>
+#include <lcdgui/screens/window/VmpcMidiPresetsScreen.hpp>
 
 #include <lang/StrUtil.hpp>
 
@@ -936,6 +937,10 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
     else if (screenName == "step-edit-options")
     {
         screen = make_shared<StepEditOptionsScreen>(mpc, layerIndex);
+    }
+    else if (screenName == "vmpc-midi-presets")
+    {
+        screen = make_shared<VmpcMidiPresetsScreen>(mpc, layerIndex);
     }
 
 	if (screen)

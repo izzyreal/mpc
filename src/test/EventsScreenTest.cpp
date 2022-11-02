@@ -147,6 +147,8 @@ TEST_CASE("COPY3", "[events-screen]")
         tickPos += 24;
     }
 
+    assert(tr->getEvents().size() == 8);
+
     auto eventsScreen = mpc.screens->get<EventsScreen>("events");
 
     int start = 0;
