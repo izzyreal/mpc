@@ -36,6 +36,8 @@ namespace mpc::nvram {
                 return result;
             }
         };
+
+        static void loadDefaultMapping(Mpc &mpc);
     };
 
 }

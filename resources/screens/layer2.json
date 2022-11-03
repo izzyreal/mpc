@@ -889,7 +889,11 @@
 },
  "vmpc-midi-presets":
  {
-  "fblabels" : [ null, null, null, "CLOSE", "SAVE", "LOAD" ],
-  "fbtypes" : [ null, null, null, 0, 1, 1 ]
+  "infowidgets" : [ "up", "down" ],
+  "infosize" : [ 5, 5 ],
+  "infox" : [ 220, 220 ],
+  "infoy" : [ 10, 38 ],
+  "fblabels" : [ null, null, "SAVE", "CLOSE", "LOAD", null ],
+  "fbtypes" : [ null, null, 1, 0, 1, null ]
  }
 }

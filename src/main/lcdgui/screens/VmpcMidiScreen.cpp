@@ -117,6 +117,11 @@ void VmpcMidiScreen::up()
     updateRows();
 }
 
+void VmpcMidiScreen::openWindow()
+{
+    openScreen("vmpc-midi-presets");
+}
+
 void VmpcMidiScreen::down()
 {
     if (learning)

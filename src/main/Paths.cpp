@@ -66,6 +66,12 @@ string Paths::recordingsPath()
     return recPath;
 }
 
+std::string Paths::midiControllerPresetsPath()
+{
+    static auto path = appDocumentsPath() + "MidiControllerPresets" + sep;
+    return path;
+}
+
 string Paths::demoDataSrcPath()
 {
     static auto demoDataPath = sago::getData() + sep + "VMPC2000XL" + sep + "DemoData" + sep;

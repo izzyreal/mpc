@@ -1,12 +1,8 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
-#include <functional>
-
-namespace mpc::lcdgui::screens {
-class VmpcKeyboardScreen;
-class VmpcMidiScreen;
-}
+#include <vector>
+#include <string>
 
 namespace mpc::lcdgui::screens::window {
 class VmpcMidiPresetsScreen
@@ -15,7 +11,21 @@ class VmpcMidiPresetsScreen
     
 public:
     VmpcMidiPresetsScreen(mpc::Mpc& mpc, const int layerIndex);
-    
+
+    void open() override;
     void function(int i) override;
+    void up() override;
+    void down() override;
+
+    void displayUpAndDown();
+    void displayRows();
+
+private:
+    int row = 0;
+    int rowOffset = 0;
+
+    void initPresets();
+
+    std::vector<std::string> presets;
 };
 }

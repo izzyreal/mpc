@@ -14,13 +14,14 @@ const auto midiMappingPersistencePath = mpc::Paths::configPath() + "midimapping.
 void MidiMappingPersistence::load(mpc::Mpc& mpc)
 {
     moduru::file::File f(midiMappingPersistencePath, {});
-    auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
 
     if (f.exists())
     {
         auto data = std::vector<char>(f.getLength());
         f.getData(&data);
         int pointer = 0;
+
+        auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
 
         while (true)
         {
@@ -46,20 +47,28 @@ void MidiMappingPersistence::load(mpc::Mpc& mpc)
     }
     else
     {
-        auto hardware = mpc.getHardware().lock();
-        auto labels = hardware->getButtonLabels();
+        loadDefaultMapping(mpc);
 
-        labels.push_back("datawheel");
-        labels.push_back("slider");
-
-        for (auto& label : labels)
-        {
-            VmpcMidiScreen::Command command { false, -1, -1 };
-            vmpcMidiScreen->setLabelCommand(label, command);
-        }
     }
 
     f.close();
+}
+
+void MidiMappingPersistence::loadDefaultMapping(mpc::Mpc &mpc)
+{
+    auto hardware = mpc.getHardware().lock();
+    auto labels = hardware->getButtonLabels();
+
+    labels.push_back("datawheel");
+    labels.push_back("slider");
+
+    auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
+
+    for (auto& label : labels)
+    {
+        VmpcMidiScreen::Command command { false, -1, -1 };
+        vmpcMidiScreen->setLabelCommand(label, command);
+    }
 }
 
 void MidiMappingPersistence::save(mpc::Mpc& mpc)

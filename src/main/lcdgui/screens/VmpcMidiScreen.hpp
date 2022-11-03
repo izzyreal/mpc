@@ -38,6 +38,7 @@ namespace mpc::lcdgui::screens{
         void left() override;
         void right() override;
         void function(int i) override;
+        void openWindow() override;
         void mainScreen() override;
         void turnWheel(int i) override;
 
