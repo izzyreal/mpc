@@ -3,20 +3,11 @@
 
 #include <functional>
 
-namespace mpc::controls
-{
-class BaseControls;
-}
+namespace mpc::controls { class BaseControls; }
 
-namespace mpc::lcdgui
-{
-class Underline;
-}
+namespace mpc::lcdgui { class Underline;}
 
-namespace mpc::lcdgui::screens
-{
-class SaveScreen;
-}
+namespace mpc::lcdgui::screens { class SaveScreen; }
 
 namespace mpc::lcdgui::screens::window
 {
@@ -36,6 +27,7 @@ class SaveASequenceScreen;
 class SaveASoundScreen;
 class ProgramScreen;
 class VmpcDirectToDiskRecorderScreen;
+class VmpcMidiPresetsScreen;
 }
 
 namespace mpc::lcdgui::screens::dialog
@@ -121,5 +113,6 @@ private:
     friend class SaveASequenceScreen;
     friend class ProgramScreen;
     friend class mpc::lcdgui::screens::SaveScreen;
+    friend class mpc::lcdgui::screens::window::VmpcMidiPresetsScreen;
 };
 }

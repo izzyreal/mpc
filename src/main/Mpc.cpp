@@ -125,7 +125,7 @@ void Mpc::init(const int sampleRate, const int inputCount, const int outputCount
 	for (auto& screenName : screenNames)
         screens->get<ScreenComponent>(screenName);
 
-    mpc::nvram::MidiMappingPersistence::load(*this);
+    mpc::nvram::MidiMappingPersistence::restoreLastState(*this);
 
     layeredScreen->openScreen("sequencer");
 
@@ -288,6 +288,7 @@ Mpc::~Mpc()
 {
     sampler->stopAllVoices(0);
     sequencer->stop();
+    mpc::nvram::MidiMappingPersistence::saveCurrentState(*this);
 	mpc::nvram::NvRam::saveUserScreenValues(*this);
 	mpc::nvram::NvRam::saveVmpcSettings(*this);
 

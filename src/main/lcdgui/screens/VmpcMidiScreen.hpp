@@ -58,6 +58,7 @@ namespace mpc::lcdgui::screens{
         std::vector<std::pair<std::string, Command>> editableLabelCommands;
         std::vector<std::pair<std::string, Command>> labelCommands;
         void setLearning(bool b);
+        void acceptLearnCandidate();
         void updateRows();
         void displayUpAndDown();
 

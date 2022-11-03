@@ -101,7 +101,10 @@ void VmpcMidiScreen::open()
 void VmpcMidiScreen::up()
 {
     if (learning)
-        return;
+    {
+        acceptLearnCandidate();
+        learnCandidate.reset();
+    }
     
     if (row == 0)
     {
@@ -122,10 +125,23 @@ void VmpcMidiScreen::openWindow()
     openScreen("vmpc-midi-presets");
 }
 
+void VmpcMidiScreen::acceptLearnCandidate()
+{
+    if (learnCandidate.isEmpty())
+    {
+        return;
+    }
+
+    editableLabelCommands[row + rowOffset].second = learnCandidate;
+}
+
 void VmpcMidiScreen::down()
 {
     if (learning)
-        return;
+    {
+        acceptLearnCandidate();
+        learnCandidate.reset();
+    }
     
     if (row == 4)
     {
@@ -226,7 +242,6 @@ void VmpcMidiScreen::function(int i)
             
             if (hasMappingChanged())
             {
-                labelCommands = editableLabelCommands;
                 auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>("vmpc-discard-mapping-changes");
                 screen->nextScreen = "vmpc-auto-save";
                 openScreen("vmpc-discard-mapping-changes");
@@ -238,34 +253,27 @@ void VmpcMidiScreen::function(int i)
         case 3:
             if (learning)
             {
-                if (!learnCandidate.isEmpty() && !learnCandidate.equals(editableLabelCommands[row + rowOffset].second))
-                {
-                    editableLabelCommands[row + rowOffset].second = learnCandidate;
-                    updateRows();
-                }
+                acceptLearnCandidate();
             }
             
             setLearning(!learning);
             learnCandidate.reset();
             updateRows();
             break;
-        case 4:
-            if (learning)
-                return;
-
-            // TODO Implement vmpc-reset-midi screen
-//            openScreen("vmpc-reset-midi");
-            break;
         case 5:
+        {
             if (learning)
+            {
                 return;
+            }
 
             auto popupScreen = mpc.screens->get<PopupScreen>("popup");
             openScreen("popup");
 
             if (hasMappingChanged())
             {
-                mpc::nvram::MidiMappingPersistence::save(mpc);
+                labelCommands = editableLabelCommands;
+                mpc::nvram::MidiMappingPersistence::saveCurrentState(mpc);
                 popupScreen->setText("MIDI mapping saved");
             }
             else
@@ -276,6 +284,7 @@ void VmpcMidiScreen::function(int i)
             popupScreen->returnToScreenAfterMilliSeconds("vmpc-midi", 1000);
 
             break;
+        }
     }
 }
 

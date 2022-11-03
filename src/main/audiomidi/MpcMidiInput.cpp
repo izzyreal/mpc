@@ -113,62 +113,64 @@ void MpcMidiInput::transport(MidiMessage *msg, int timeStamp)
   }
   else if (note)
   {
-    note->setTick(-1);
-    auto s = lSequencer->isPlaying() ? lSequencer->getCurrentlyPlayingSequence()
-                                     : lSequencer->getActiveSequence();
-    auto track = dynamic_pointer_cast<mpc::sequencer::Track>(s->getTrack(note->getTrack()));
-    auto p = lSampler->getProgram(lSampler->getDrumBusProgramIndex(track->getBus())).lock();
-    auto controls = mpc.getActiveControls().lock();
+      note->setTick(-1);
+      auto s = lSequencer->isPlaying() ? lSequencer->getCurrentlyPlayingSequence()
+                                       : lSequencer->getActiveSequence();
+      auto track = dynamic_pointer_cast<mpc::sequencer::Track>(s->getTrack(note->getTrack()));
+      /*
+      auto p = lSampler->getProgram(lSampler->getDrumBusProgramIndex(track->getBus())).lock();
+      auto controls = mpc.getActiveControls().lock();
 
-    Util::setSliderNoteVariationParameters(mpc, note, p);
+      Util::setSliderNoteVariationParameters(mpc, note, p);
 
-    auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
-    auto iRigPads = vmpcSettingsScreen->initialPadMapping == 2;
-    auto indexInIrigPadsMappingIt = iRigPads ? std::find(Pad::iRigPadsDefaultMapping.begin(),
-                                                    Pad::iRigPadsDefaultMapping.end(),
-                                                    note->getNote()) : Pad::iRigPadsDefaultMapping.end();
+      auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
+      auto iRigPads = vmpcSettingsScreen->initialPadMapping == 2;
+      auto indexInIrigPadsMappingIt = iRigPads ? std::find(Pad::iRigPadsDefaultMapping.begin(),
+                                                      Pad::iRigPadsDefaultMapping.end(),
+                                                      note->getNote()) : Pad::iRigPadsDefaultMapping.end();
 
-    int indexInIrigPadsMapping = indexInIrigPadsMappingIt == Pad::iRigPadsDefaultMapping.end() ? -1 :
-            (indexInIrigPadsMappingIt - Pad::iRigPadsDefaultMapping.begin());
+      int indexInIrigPadsMapping = indexInIrigPadsMappingIt == Pad::iRigPadsDefaultMapping.end() ? -1 :
+              (indexInIrigPadsMappingIt - Pad::iRigPadsDefaultMapping.begin());
 
-    auto pad = indexInIrigPadsMapping >= 0 ? indexInIrigPadsMapping : p->getPadIndexFromNote(note->getNote());
+      auto pad = indexInIrigPadsMapping >= 0 ? indexInIrigPadsMapping : p->getPadIndexFromNote(note->getNote());
 
-    if (note->getVelocity() != 0 && track->getBus() > 0 && track->getIndex() < 64 && mpc.getControls().lock()->isTapPressed() && lSequencer->isPlaying())
-    {
-        return;
+      if (note->getVelocity() != 0 && track->getBus() > 0 && track->getIndex() < 64 && mpc.getControls().lock()->isTapPressed() && lSequencer->isPlaying())
+      {
+          return;
+      }
+
+      if (pad == -1)
+      {
+          mpc.getEventHandler().lock()->handleNoThru(note, track.get(), timeStamp);
+
+          if (lSequencer->isRecordingOrOverdubbing())
+          {
+              note->setDuration(note->getVelocity() == 0 ? 0 : -1);
+              note->setTick(lSequencer->getTickPosition());
+
+              if (note->getVelocity() == 0)
+              {
+                  track->recordNoteOffNow(note->getNote());
+              }
+              else
+              {
+                  auto recordedEvent = track->recordNoteOnNow(note->getNote());
+                  note->CopyValuesTo(recordedEvent);
+              }
+          }
     }
-
-    if (pad == -1)
-    {
-        mpc.getEventHandler().lock()->handleNoThru(note, track.get(), timeStamp);
-
-        if (lSequencer->isRecordingOrOverdubbing())
-        {
-            note->setDuration(note->getVelocity() == 0 ? 0 : -1);
-            note->setTick(lSequencer->getTickPosition());
-
-            if (note->getVelocity() == 0)
-            {
-                track->recordNoteOffNow(note->getNote());
-            }
-            else
-            {
-                auto recordedEvent = track->recordNoteOnNow(note->getNote());
-                note->CopyValuesTo(recordedEvent);
-            }
-        }
-    }
-    else
-    {
-        if (note->getVelocity() == 0)
-        {
-            mpc.getReleaseControls()->simplePad(pad);
-        }
-        else
-        {
-            mpc.getActiveControls().lock()->pad(pad, note->getVelocity());
-        }
-    }
+      else
+      {
+          if (note->getVelocity() == 0)
+          {
+              mpc.getReleaseControls()->simplePad(pad);
+          }
+          else
+          {
+              mpc.getActiveControls().lock()->pad(pad, note->getVelocity());
+          }
+      }
+          */
 
     auto midiOutputScreen = mpc.screens->get<MidiOutputScreen>("midi-output");
 
@@ -434,19 +436,22 @@ void MpcMidiInput::handlePolyAndNote(MidiMessage* msg)
   {
     auto status = msg->getStatus();
     auto isChannelPressure = status >= ShortMessage::CHANNEL_PRESSURE && status < ShortMessage::CHANNEL_PRESSURE + 16;
-    
     if (isChannelPressure)
     {
-      for (auto& p : mpc.getHardware().lock()->getPads())
-      {
-          if (p->isPressed())
-          {
-              p->setPressure((*msg->getMessage())[1]);
+      auto channelPressureValue = (*msg->getMessage())[1];
+
+      // Alternatively we could process these like note offs,
+      // but this seems better.
+      if (channelPressureValue > 0) {
+          for (auto &p: mpc.getHardware().lock()->getPads()) {
+              if (p->isPressed()) {
+                  p->setPressure(channelPressureValue);
+              }
           }
       }
       return;
     }
-
+/*
     int note = (*msg->getMessage())[1];
     int velo = (*msg->getMessage())[2];
 
@@ -495,6 +500,7 @@ void MpcMidiInput::handlePolyAndNote(MidiMessage* msg)
         hwPad->setPressure(0);
       }
     }
+    */
   }
 }
 
@@ -534,19 +540,48 @@ void MpcMidiInput::handleVmpcMidi(ctoot::midi::core::ShortMessage *shortMsg)
 
         auto label = labelCommand.first;
         auto isNote = command.isNote;
-        auto value = command.value;
+        auto commandValue = command.value;
 
-        if (shortMsg->getData1() != value)
+        if (shortMsg->getData1() != commandValue)
         {
             continue;
         }
+
+        auto controllerValue = shortMsg->getData2();
 
         auto hwComponent = mpc.getHardware().lock()->getComponentByLabel(label).lock();
 
         if ((isNote && (isNoteOn || isNoteOff)) ||
             (!isNote && isControl))
         {
-            if (shortMsg->getData2() == 0)
+            if (label == "datawheel")
+            {
+                if (previousDataWheelValue == -1)
+                {
+                    previousDataWheelValue = controllerValue;
+                }
+
+                auto dataWheel = mpc.getHardware().lock()->getDataWheel().lock();
+
+                if (previousDataWheelValue == 0 && controllerValue == 0)
+                {
+                    dataWheel->turn(-1);
+                }
+                else if (previousDataWheelValue == 127 && controllerValue == 127)
+                {
+                    dataWheel->turn(1);
+                }
+                else if (controllerValue - previousDataWheelValue != 0)
+                {
+                    dataWheel->turn(controllerValue - previousDataWheelValue);
+                }
+                previousDataWheelValue = controllerValue;
+            }
+            else if (label == "slider")
+            {
+                mpc.getHardware().lock()->getSlider().lock()->setValue(127 - controllerValue);
+            }
+            else if (shortMsg->getData2() == 0)
             {
                 hwComponent->release();
             }
