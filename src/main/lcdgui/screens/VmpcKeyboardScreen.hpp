@@ -32,8 +32,6 @@ private:
     bool learning = false;
     bool hasMappingChanged();
     
-    std::vector<std::pair<std::string, std::string>> labelsToKeyCodeNames;
-    void updateKeyCodeNames();
     void setLearning(bool b);
     void updateRows();
     void displayUpAndDown();

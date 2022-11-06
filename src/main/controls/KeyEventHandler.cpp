@@ -139,7 +139,7 @@ void KeyEventHandler::handle(const KeyEvent &keyEvent)
     }
 
     bool allowTypingOfNames = true;
-    auto label = kbMapping->getLabelFromKeyCode(keyEvent.rawKeyCode);
+    auto label = kbMapping->getHardwareComponentLabelAssociatedWithKeycode(keyEvent.rawKeyCode);
 
     if (keyEvent.keyDown && currentScreenName == "name" && allowTypingOfNames)
     {

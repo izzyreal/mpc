@@ -8,21 +8,12 @@
 using namespace mpc::controls;
 using namespace WonderRabbitProject::key;
 using namespace moduru::sys;
-using namespace std;
 
 KbMapping::KbMapping()
 {
     importMapping();
 }
 const key_helper_t* mpc::controls::KbMapping::kh = &key_helper_t::instance();
-
-vector<string> KbMapping::getMappedLabels()
-{
-    vector<string> result;
-    for (auto kv : labelKeyMap)
-        result.push_back(kv.first);
-    return result;
-}
 
 void KbMapping::exportMapping() {
 	auto path = mpc::Paths::configPath() + "keys.txt";
@@ -33,16 +24,16 @@ void KbMapping::exportMapping() {
 	else
 		f.create();
 	
-    vector<char> bytes;
+    std::vector<char> bytes;
 	
-    for (pair<string, int> x : labelKeyMap)
+    for (auto& mapping : labelKeyMap)
     {
-		for (char& c : x.first)
+		for (char& c : mapping.first)
 			bytes.push_back(c);
         
 		bytes.push_back(' ');
 		
-        string keyCode = to_string(x.second);
+        auto keyCode = std::to_string(mapping.second);
 		
         for (char& c : keyCode)
 			bytes.push_back(c);
@@ -67,14 +58,13 @@ void KbMapping::importMapping()
         return;
     }
     
-    vector<char> bytes(f.getLength());
+    std::vector<char> bytes(f.getLength());
     
     f.getData(&bytes);
-    
-    string label = "";
-    string keyCode = "";
+
+    std::string label;
+    std::string keyCode;
     bool parsingLabel = true;
-    std::vector<int> shifts;
 
     for (int i = 0; i < bytes.size(); i++)
     {
@@ -104,30 +94,23 @@ void KbMapping::importMapping()
             {
                 parsedKeyCode = stoi(keyCode);
             }
-            catch (const exception& e)
+            catch (const std::exception& e)
             {
-                // Cancel the whole function?
+                MLOG("There is an issue with the stored keyboard mapping. Best reset your mapping and start from scratch. We'll try to make the best of what is stored though.");
             }
             
             if (parsedKeyCode != -1)
             {
                 labelKeyMap.emplace_back(label, parsedKeyCode);
-                if (label == "shift") shifts.push_back(parsedKeyCode);
             }
             
-            label = "";
-            keyCode = "";
+            label.clear();
+            keyCode.clear();
             parsingLabel = true;
         }
     }
 
-    if (shifts.size() == 1)
-    {
-        if (kh->name(shifts[0]) == "shift" || kh->name(shifts[0]) == "left shift")
-        {
-            labelKeyMap.emplace_back("shift", kh->code("right shift"));
-        }
-    }
+    migrateV0_4_4MappingToV0_5();
 }
 
 void KbMapping::initializeDefaults()
@@ -160,8 +143,9 @@ void KbMapping::initializeDefaults()
     labelKeyMap.emplace_back("f4", kh->code("f4"));
     labelKeyMap.emplace_back("f5", kh->code("f5"));
     labelKeyMap.emplace_back("f6", kh->code("f6"));
-    labelKeyMap.emplace_back("shift", kh->code("left shift"));
-    labelKeyMap.emplace_back("shift", kh->code("right shift"));
+    labelKeyMap.emplace_back("shift_#1", kh->code("shift"));
+    labelKeyMap.emplace_back("shift_#2", kh->code("left shift"));
+    labelKeyMap.emplace_back("shift_#3", kh->code("right shift"));
     labelKeyMap.emplace_back("enter", kh->code("enter"));
     labelKeyMap.emplace_back("undo-seq", kh->code("f10"));
     labelKeyMap.emplace_back("erase", kh->code("f8"));
@@ -217,10 +201,19 @@ int KbMapping::getKeyCodeFromLabel(const std::string& label) {
 	return -1;
 }
 
-std::string KbMapping::getLabelFromKeyCode(int keyCode) {
-	for (std::pair<std::string, int> x : labelKeyMap) {
-		std::string key = x.first;
-		if (keyCode == x.second) return key;
+std::string KbMapping::getHardwareComponentLabelAssociatedWithKeycode(int keyCode) {
+	for (std::pair<std::string, int>& mapping : labelKeyMap) {
+		std::string label = mapping.first;
+		if (keyCode == mapping.second)
+        {
+            std::string sanitized;
+            for (auto& c : label)
+            {
+                if (c == '_') break;
+                sanitized.push_back(c);
+            }
+            return sanitized;
+        }
 	}
 	return "";
 }
@@ -228,11 +221,7 @@ std::string KbMapping::getLabelFromKeyCode(int keyCode) {
 std::string KbMapping::getKeyCodeString(int keyCode) {
 	auto names = kh->names(keyCode);
 	if (names.size() > 1) {
-		//MLOG("\nKeycode: " + std::to_string(keyCode));
-		//MLOG("Button label: " + getLabelFromKeyCode(keyCode));
-		//MLOG("Key names:");
 		for (auto& s : names) {
-			//MLOG(s);
 			if (s.length() > 3) return s;
 		}
 	}
@@ -257,7 +246,7 @@ int KbMapping::getNextKeyCode(int keyCode)
     for (auto& kv : KeyCodes::keyCodeNames)
     {
         auto keyCode2 = kv.first;
-        if (wasFound)
+        if (wasFound && kh->is_valid(keyCode2))
         {
             result = keyCode2;
             wasFound = false;
@@ -298,9 +287,42 @@ int KbMapping::getPreviousKeyCode(int keyCode)
             return previous;
         }
 
-        previous = keyCode2;
+        if (kh->is_valid(keyCode2))
+        {
+            previous = keyCode2;
+        }
+
         counter++;
     }
 
     return first;
+}
+
+std::vector<std::pair<std::string, int>>& KbMapping::getLabelKeyMap()
+{
+    return labelKeyMap;
+}
+
+void KbMapping::migrateV0_4_4MappingToV0_5()
+{
+    std::vector<std::pair<std::string, int>> shifts;
+    std::vector<std::pair<std::string, int>> newLabelKeyMap;
+    bool shiftHasBeenProcessed = false;
+
+    for (auto& mapping : labelKeyMap)
+    {
+        if (mapping.first == "shift" && !shiftHasBeenProcessed)
+        {
+            newLabelKeyMap.push_back({"shift_#1", kh->code("shift")});
+            newLabelKeyMap.push_back({"shift_#2", kh->code("left shift")});
+            newLabelKeyMap.push_back({"shift_#3", kh->code("right shift")});
+            shiftHasBeenProcessed = true;
+        }
+        else
+        {
+            newLabelKeyMap.push_back(mapping);
+        }
+    }
+
+    labelKeyMap = newLabelKeyMap;
 }
