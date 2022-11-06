@@ -305,24 +305,18 @@ std::vector<std::pair<std::string, int>>& KbMapping::getLabelKeyMap()
 
 void KbMapping::migrateV0_4_4MappingToV0_5()
 {
-    std::vector<std::pair<std::string, int>> shifts;
-    std::vector<std::pair<std::string, int>> newLabelKeyMap;
-    bool shiftHasBeenProcessed = false;
+    auto importedMap = labelKeyMap;
+
+    initializeDefaults();
 
     for (auto& mapping : labelKeyMap)
     {
-        if (mapping.first == "shift" && !shiftHasBeenProcessed)
+        for (auto& mapping2 : importedMap)
         {
-            newLabelKeyMap.push_back({"shift_#1", kh->code("shift")});
-            newLabelKeyMap.push_back({"shift_#2", kh->code("left shift")});
-            newLabelKeyMap.push_back({"shift_#3", kh->code("right shift")});
-            shiftHasBeenProcessed = true;
-        }
-        else
-        {
-            newLabelKeyMap.push_back(mapping);
+            if (mapping.first == mapping2.first)
+            {
+                mapping.second = mapping2.second;
+            }
         }
     }
-
-    labelKeyMap = newLabelKeyMap;
 }
