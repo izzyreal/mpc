@@ -11,12 +11,9 @@
 using namespace mpc::nvram;
 using namespace mpc::lcdgui::screens;
 
-const auto midiMappingPersistencePath = mpc::Paths::configPath() + "midimapping.ini";
-const auto midiMappingPresetsPath = mpc::Paths::midiControllerPresetsPath();
-
 void MidiMappingPersistence::restoreLastState(mpc::Mpc& mpc)
 {
-    moduru::file::File f(midiMappingPersistencePath, {});
+    moduru::file::File f(mpc::Paths::configPath() + "midimapping.ini", {});
 
     if (f.exists())
     {
@@ -62,13 +59,13 @@ void MidiMappingPersistence::loadDefaultMapping(mpc::Mpc &mpc)
 
 void MidiMappingPersistence::saveCurrentState(mpc::Mpc& mpc)
 {
-    moduru::file::File f(midiMappingPersistencePath, {});
+    moduru::file::File f(mpc::Paths::configPath() + "midimapping.ini", {});
     saveMappingToFile(mpc, f);
 }
 
 void MidiMappingPersistence::loadMappingFromFile(mpc::Mpc &mpc, std::string name)
 {
-    moduru::file::Directory dir(midiMappingPresetsPath, nullptr);
+    moduru::file::Directory dir(mpc::Paths::midiControllerPresetsPath(), nullptr);
 
     for (auto& node : dir.listFiles())
     {
@@ -83,7 +80,7 @@ void MidiMappingPersistence::loadMappingFromFile(mpc::Mpc &mpc, std::string name
 
 void MidiMappingPersistence::saveMappingToFile(mpc::Mpc &mpc, std::string name)
 {
-    auto dir = std::make_shared<moduru::file::Directory>(midiMappingPresetsPath, nullptr);
+    auto dir = std::make_shared<moduru::file::Directory>(mpc::Paths::midiControllerPresetsPath(), nullptr);
     moduru::file::File f(name, dir);
 
     if (f.exists())
@@ -154,7 +151,7 @@ void MidiMappingPersistence::saveMappingToFile(mpc::Mpc &mpc, moduru::file::File
 std::vector<std::string> MidiMappingPersistence::getAvailablePresetNames()
 {
     std::vector<std::string> result;
-    moduru::file::Directory dir(midiMappingPresetsPath, nullptr);
+    moduru::file::Directory dir(mpc::Paths::midiControllerPresetsPath(), nullptr);
 
     for (auto& node : dir.listFiles())
     {

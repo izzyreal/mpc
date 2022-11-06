@@ -6,7 +6,7 @@ namespace mpc {
 class Paths
 {
 private:
-    static std::string sep;
+    static std::string sep();
 
 public:
     static std::string appConfigHome();
