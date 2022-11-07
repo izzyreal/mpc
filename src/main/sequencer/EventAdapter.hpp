@@ -3,6 +3,24 @@
 #include <vector>
 #include <memory>
 
+/**
+ * Class for crude adaptation from MIDI event to MPC2000XL internal mpc::sequencer::Event.
+ *
+ * Any processing as per the MIDI Input screen, such as filtering by channel or event type,
+ * is also performed by this class.
+ *
+ * If any of the filtering blocks the event from internal propagation, get() will return
+ * an empty value. It is up to the consumer (at the time of writing only MpcMidiInput) to
+ * check this.
+ *
+ * If the value is not empty, it will contain the emitted Event, which will have the
+ * correct track as per the Multi Recording Setup screen, if Multi Track Recording
+ * (M: rather than S: in the bottom left of the MAIN screen) is enabled.
+ *
+ * If Single Track Recording is enabled, the Event will have the active track associated
+ * with it.
+ */
+
 namespace mpc { class Mpc; }
 
 namespace ctoot::midi::core

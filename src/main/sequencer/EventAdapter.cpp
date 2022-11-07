@@ -15,14 +15,13 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 using namespace ctoot::midi::core;
-using namespace std;
 
-EventAdapter::EventAdapter(mpc::Mpc& mpc, weak_ptr<Sequencer> sequencer)
+EventAdapter::EventAdapter(mpc::Mpc& mpc, std::weak_ptr<Sequencer> sequencer)
 	: mpc(mpc)
 {
 	this->sequencer = sequencer;
-	midiClockEvent = make_shared<MidiClockEvent>(0);
-	noteEvent = make_shared<NoteEvent>(35);
+	midiClockEvent = std::make_shared<MidiClockEvent>(0);
+	noteEvent = std::make_shared<NoteEvent>(35);
 }
 
 void EventAdapter::process(MidiMessage* msg)
@@ -31,7 +30,7 @@ void EventAdapter::process(MidiMessage* msg)
 		event = convert(dynamic_cast<ShortMessage*>(msg));
 }
 
-weak_ptr<Event> EventAdapter::convert(ShortMessage* msg)
+std::weak_ptr<Event> EventAdapter::convert(ShortMessage* msg)
 {
 	if (msg->getStatus() == ShortMessage::TIMING_CLOCK || msg->getStatus() == ShortMessage::START || msg->getStatus() == ShortMessage::STOP)
 	{
@@ -71,7 +70,7 @@ weak_ptr<Event> EventAdapter::convert(ShortMessage* msg)
 	return {};
 }
 
-weak_ptr<Event> EventAdapter::get()
+std::weak_ptr<Event> EventAdapter::get()
 {
     return event;
 }

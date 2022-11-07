@@ -4,7 +4,7 @@
 #include <string>
 
 namespace mpc::nvram { class MidiMappingPersistence; }
-namespace mpc::audiomidi { class MpcMidiInput; }
+namespace mpc::audiomidi { class MidiFullControl; }
 
 namespace mpc::lcdgui::screens{
 
@@ -63,6 +63,6 @@ namespace mpc::lcdgui::screens{
         void displayUpAndDown();
 
         friend class mpc::nvram::MidiMappingPersistence;
-        friend class mpc::audiomidi::MpcMidiInput;
+        friend class mpc::audiomidi::MidiFullControl;
     };
 }

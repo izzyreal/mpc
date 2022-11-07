@@ -15,8 +15,6 @@ std::vector<int> Pad::originalPadNotes = {	37, 36, 42, 82, 40, 38, 46, 44, 48, 4
 											52, 57, 58, 59, 60, 61, 67, 68, 70, 72, 75, 78, 79, 35, 41, 50,
 											83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98 };
 
-std::vector<int> Pad::iRigPadsDefaultMapping = { 35, 36, 38, 40, 37, 39, 42, 44, 50, 45, 41, 46, 51, 53, 49, 52 };
-
 std::vector<int>& Pad::getPadNotes(mpc::Mpc& mpc)
 {
 	auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
@@ -35,19 +33,10 @@ std::vector<int>& Pad::getPadNotes(mpc::Mpc& mpc)
 		
 		return vmpcPadNotes;
 	}
-    else if (vmpcSettingsScreen->initialPadMapping == 1)
+    else
     {
         return originalPadNotes;
     }
-
-    // iRig PADS default mapping
-    while (iRigPadsDefaultMapping.size() < 64)
-    {
-        // iRig PADS has only one bank as far as I know,
-        // so the rest of the pads will have no notenumber (i.e. 34).
-        iRigPadsDefaultMapping.push_back(34);
-    }
-    return iRigPadsDefaultMapping;
 }
 
 Pad::Pad(mpc::Mpc& mpc, int number)

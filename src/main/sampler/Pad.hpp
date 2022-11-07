@@ -14,7 +14,6 @@ namespace mpc::sampler
 		static std::vector<int> originalPadNotes;
 
 	public:
-        static std::vector<int> iRigPadsDefaultMapping;
 		static std::vector<int>& getPadNotes(mpc::Mpc& mpc);
 
 	private:
