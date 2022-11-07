@@ -22,39 +22,37 @@ void MidiInputScreen::function(int i)
 {
 	ScreenComponent::function(i);
 
-	switch (i)
-	{
-	case 1:
-		openScreen("midi-input-monitor");
-		break;
-	}
+	if (i == 1)
+    {
+        openScreen("midi-input-monitor");
+    }
 }
 
 void MidiInputScreen::turnWheel(int i)
 {
 	init();
 
-	if (param.compare("receivech") == 0)
+	if (param == "receivech")
 	{
 		setReceiveCh(receiveCh + i);
 	}
-	else if (param.compare("seq") == 0)
+	else if (param == "seq")
 	{
 		setProgChangeSeq(i > 0);
 	}
-	else if (param.compare("duration") == 0)
+	else if (param == "duration")
 	{
 		setSustainPedalToDuration(i > 0);
 	}
-	else if (param.compare("midifilter") == 0)
+	else if (param == "midifilter")
 	{
 		setMidiFilterEnabled(i > 0);
 	}
-	else if (param.compare("type") == 0)
+	else if (param == "type")
 	{
 		setType(type + i);
 	}
-	else if (param.compare("pass") == 0)
+	else if (param == "pass")
 	{
 		setPass(i > 0);
 	}

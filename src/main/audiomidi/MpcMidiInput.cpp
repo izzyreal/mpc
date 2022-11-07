@@ -55,7 +55,14 @@ string MpcMidiInput::getName()
 
 void MpcMidiInput::transport(MidiMessage *msg, int timeStamp)
 {
-  eventAdapter->process(msg);
+    auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
+
+    if (vmpcSettingsScreen->midiControlMode == VmpcSettingsScreen::MidiControlMode::VMPC)
+    {
+
+    }
+
+    eventAdapter->process(msg);
 
   auto status = msg->getStatus();
   auto lSampler = sampler.lock();
@@ -86,7 +93,9 @@ void MpcMidiInput::transport(MidiMessage *msg, int timeStamp)
   auto event = eventAdapter->get().lock();
 
   if (!event)
-    return;
+  {
+      return;
+  }
 
   auto mce = dynamic_pointer_cast<mpc::sequencer::MidiClockEvent>(event);
   auto note = dynamic_pointer_cast<mpc::sequencer::NoteEvent>(event);

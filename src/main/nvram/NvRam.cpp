@@ -98,7 +98,8 @@ void NvRam::saveVmpcSettings(mpc::Mpc& mpc)
     (char) (mpc.getHardware().lock()->getSlider().lock()->getValue()),
     (char) (vmpcSettingsScreen->autoConvertWavs),
     (char) (othersScreen->getTapAveraging()),
-    (char) (othersScreen->getContrast())
+    (char) (othersScreen->getContrast()),
+    (char) (vmpcSettingsScreen->midiControlMode)
   };
   
   stream.write(&bytes[0], bytes.size());
@@ -136,4 +137,5 @@ void NvRam::loadVmpcSettings(mpc::Mpc& mpc)
   if (bytes.size() > 7) vmpcSettingsScreen->autoConvertWavs = bytes[7];
   if (bytes.size() > 8) othersScreen->setTapAveraging(bytes[8]);
   if (bytes.size() > 9) othersScreen->setContrast(bytes[9]);
+  if (bytes.size() > 10) vmpcSettingsScreen->midiControlMode = bytes[10];
 }
