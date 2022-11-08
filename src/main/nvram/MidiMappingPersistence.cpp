@@ -80,8 +80,14 @@ void MidiMappingPersistence::loadMappingFromFile(mpc::Mpc &mpc, std::string name
 
 void MidiMappingPersistence::saveMappingToFile(mpc::Mpc &mpc, std::string name)
 {
-    auto dir = std::make_shared<moduru::file::Directory>(mpc::Paths::midiControllerPresetsPath(), nullptr);
-    moduru::file::File f(name, dir);
+    moduru::file::Directory dir(mpc::Paths::midiControllerPresetsPath(), nullptr);
+
+    if (!dir.exists())
+    {
+        dir.create();
+    }
+
+    moduru::file::File f(mpc::Paths::midiControllerPresetsPath() + name, nullptr);
 
     if (f.exists())
     {
@@ -151,9 +157,14 @@ void MidiMappingPersistence::saveMappingToFile(mpc::Mpc &mpc, moduru::file::File
 std::vector<std::string> MidiMappingPersistence::getAvailablePresetNames()
 {
     std::vector<std::string> result;
-    moduru::file::Directory dir(mpc::Paths::midiControllerPresetsPath(), nullptr);
+    auto dir = std::make_shared<moduru::file::Directory>(mpc::Paths::midiControllerPresetsPath(), nullptr);
 
-    for (auto& node : dir.listFiles())
+    if (!dir->exists())
+    {
+        return {};
+    }
+
+    for (auto& node : dir->listFiles())
     {
         if (node->isDirectory()) continue;
         result.emplace_back(node->getNameWithoutExtension());
