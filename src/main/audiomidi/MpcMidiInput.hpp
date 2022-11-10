@@ -6,7 +6,7 @@
 #include <midi/core/MidiInput.hpp>
 #include <sequencer/EventAdapter.hpp>
 #include <sequencer/MidiAdapter.hpp>
-#include "MidiFullControl.hpp"
+#include "VmpcMidiControlMode.hpp"
 
 #include <memory>
 
@@ -31,7 +31,7 @@ namespace mpc::audiomidi {
 
         std::unique_ptr<mpc::sequencer::MidiAdapter> midiAdapter;
         std::unique_ptr<mpc::sequencer::EventAdapter> eventAdapter;
-        std::unique_ptr<MidiFullControl> midiFullControl;
+        std::unique_ptr<VmpcMidiControlMode> midiFullControl;
         std::string notify = "";
 
     public:

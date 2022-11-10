@@ -44,7 +44,7 @@ void VmpcMidiScreen::turnWheel(int i)
 {
     init();
 
-    Command& cmd = editableLabelCommands[row + rowOffset].second;
+    Command& cmd = labelCommands[row + rowOffset].second;
 
     if (column == 0)
     {
@@ -81,13 +81,13 @@ void VmpcMidiScreen::turnWheel(int i)
 void VmpcMidiScreen::open()
 {
     auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>("vmpc-discard-mapping-changes");
-    screen->discardAndLeave = [this](){this->editableLabelCommands.clear();};
-    screen->saveAndLeave = [this](){this->labelCommands = this->editableLabelCommands;};
+    screen->discardAndLeave = [this](){this->labelCommands = this->uneditedLabelCommands; this->uneditedLabelCommands.clear();};
+    screen->saveAndLeave = [this](){this->uneditedLabelCommands.clear();};
     screen->stayScreen = "vmpc-midi";
 
     if (ls.lock()->getPreviousScreenName() != "vmpc-discard-mapping-changes")
     {
-        editableLabelCommands = labelCommands;
+        uneditedLabelCommands = labelCommands;
     }
 
     findChild<Label>("up").lock()->setText("\u00C7");
@@ -132,7 +132,7 @@ void VmpcMidiScreen::acceptLearnCandidate()
         return;
     }
 
-    editableLabelCommands[row + rowOffset].second = learnCandidate;
+    labelCommands[row + rowOffset].second = learnCandidate;
 }
 
 void VmpcMidiScreen::down()
@@ -145,7 +145,7 @@ void VmpcMidiScreen::down()
     
     if (row == 4)
     {
-        if (rowOffset + 5 >= editableLabelCommands.size())
+        if (rowOffset + 5 >= labelCommands.size())
             return;
         
         rowOffset++;
@@ -181,15 +181,15 @@ void VmpcMidiScreen::setLearning(bool b)
 
 bool VmpcMidiScreen::hasMappingChanged()
 {
-    if (labelCommands.size() != editableLabelCommands.size())
+    if (labelCommands.size() != uneditedLabelCommands.size())
     {
         return true;
     }
 
     for (int i = 0; i < labelCommands.size(); i++)
     {
-        if (labelCommands[i].first != editableLabelCommands[i].first ||
-            !labelCommands[i].second.equals(editableLabelCommands[i].second))
+        if (labelCommands[i].first != uneditedLabelCommands[i].first ||
+            !labelCommands[i].second.equals(uneditedLabelCommands[i].second))
         {
             return true;
         }
@@ -272,9 +272,9 @@ void VmpcMidiScreen::function(int i)
 
             if (hasMappingChanged())
             {
-                labelCommands = editableLabelCommands;
                 mpc::nvram::MidiMappingPersistence::saveCurrentState(mpc);
                 popupScreen->setText("MIDI mapping saved");
+                uneditedLabelCommands = labelCommands;
             }
             else
             {
@@ -335,10 +335,10 @@ void VmpcMidiScreen::updateRows()
         
         int length = 15;
         
-        auto labelText = StrUtil::padRight(editableLabelCommands[i + rowOffset].first, " ", length) + ":";
+        auto labelText = StrUtil::padRight(labelCommands[i + rowOffset].first, " ", length) + ":";
         
         typeLabel->setText(labelText);
-        Command& cmd = (learning && row == i && !learnCandidate.isEmpty()) ? learnCandidate : editableLabelCommands[i + rowOffset].second;
+        Command& cmd = (learning && row == i && !learnCandidate.isEmpty()) ? learnCandidate : labelCommands[i + rowOffset].second;
 
         std::string type = cmd.isNote ? "Note" : "CC";
 
@@ -382,5 +382,5 @@ void VmpcMidiScreen::updateRows()
 void VmpcMidiScreen::displayUpAndDown()
 {
     findChild<Label>("up").lock()->Hide(rowOffset == 0);
-    findChild<Label>("down").lock()->Hide(rowOffset + 5 >= editableLabelCommands.size());
+    findChild<Label>("down").lock()->Hide(rowOffset + 5 >= labelCommands.size());
 }

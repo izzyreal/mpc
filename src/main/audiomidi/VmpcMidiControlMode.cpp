@@ -1,5 +1,6 @@
-#include "MidiFullControl.hpp"
+#include "VmpcMidiControlMode.hpp"
 
+#include "audiomidi/AudioMidiServices.hpp"
 #include "hardware/Hardware.hpp"
 #include "hardware/HwComponent.hpp"
 #include "hardware/DataWheel.hpp"
@@ -12,7 +13,7 @@ using namespace mpc::audiomidi;
 using namespace mpc::lcdgui::screens;
 using namespace ctoot::midi::core;
 
-void MidiFullControl::processMidiInputEvent(mpc::Mpc& mpc, ctoot::midi::core::ShortMessage *msg)
+void VmpcMidiControlMode::processMidiInputEvent(mpc::Mpc& mpc, ctoot::midi::core::ShortMessage *msg)
 {
     auto status = msg->getStatus();
     auto isControl = status >= ShortMessage::CONTROL_CHANGE && status < ShortMessage::CONTROL_CHANGE + 16;
@@ -90,6 +91,16 @@ void MidiFullControl::processMidiInputEvent(mpc::Mpc& mpc, ctoot::midi::core::Sh
             else if (label == "slider")
             {
                 hardware->getSlider().lock()->setValue(127 - controllerValue);
+            }
+            else if (label == "rec-gain")
+            {
+                auto normalized = static_cast<unsigned char>(controllerValue / 1.27f);
+                mpc.getAudioMidiServices().lock()->setRecordLevel(normalized);
+            }
+            else if (label == "main-volume")
+            {
+                auto normalized = static_cast<unsigned char>(controllerValue / 1.27f);
+                mpc.getAudioMidiServices().lock()->setMasterLevel(normalized);
             }
             else if (msg->getData2() == 0)
             {

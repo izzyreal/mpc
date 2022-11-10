@@ -1,6 +1,8 @@
 #include "MultiRecordingSetupScreen.hpp"
 
-#include <sequencer/Track.hpp>
+#include "lcdgui/screens/VmpcSettingsScreen.hpp"
+
+#include "sequencer/Track.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 using namespace moduru::lang;
@@ -31,12 +33,29 @@ MultiRecordingSetupScreen::MultiRecordingSetupScreen(mpc::Mpc& mpc, const int la
 	}
 }
 
+void MultiRecordingSetupScreen::function(int i)
+{
+    if (i == 3)
+    {
+        openScreen("sequencer");
+    }
+}
+
 void MultiRecordingSetupScreen::open()
 {	
 	setYOffset(yOffset);
 	displayMrsLine(0);
 	displayMrsLine(1);
 	displayMrsLine(2);
+
+    auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
+
+    if (ls.lock()->getPreviousScreenName() != "vmpc-warning-settings-ignored" &&
+        vmpcSettingsScreen->midiControlMode == VmpcSettingsScreen::MidiControlMode::VMPC)
+    {
+        ls.lock()->Draw();
+        openScreen("vmpc-warning-settings-ignored");
+    }
 }
 
 void MultiRecordingSetupScreen::init()

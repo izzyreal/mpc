@@ -97,7 +97,7 @@ void VmpcSettingsScreen::setAutoConvertWavs(int i)
 
 void VmpcSettingsScreen::displayAutoConvertWavs()
 {
-    findField("auto-convert-wavs").lock()->setText(autoConvertWavs == 1 ? "YES" : "NO");
+    findField("auto-convert-wavs").lock()->setText(autoConvertWavs == 1 ? "YES" : "ASK");
 }
 
 void VmpcSettingsScreen::setMidiControlMode(int i)

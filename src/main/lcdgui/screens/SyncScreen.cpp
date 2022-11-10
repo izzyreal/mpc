@@ -10,7 +10,7 @@ SyncScreen::SyncScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void SyncScreen::open()
 {
-    if (tab == 2 && ls.lock()->getPreviousScreenName().compare("midi-sw") == 0)
+    if (tab == 2 && ls.lock()->getPreviousScreenName() == "midi-sw")
         tab = 0;
     
     if (tab == 2)
@@ -32,36 +32,36 @@ void SyncScreen::turnWheel(int i)
 {
     init();
     
-    if (param.compare("in") == 0)
+    if (param == "in")
     {
         setIn(in + i);
     }
-    else if (param.compare("out") == 0)
+    else if (param == "out")
     {
         setOut(out + i);
     }
-    else if (param.compare("mode-in") == 0)
+    else if (param == "mode-in")
     {
-        setModeIn(getModeIn() + i);
+        setModeIn(modeIn + i);
     }
-    else if (param.compare("mode-out") == 0)
+    else if (param == "mode-out")
     {
         setModeOut(getModeOut() + i);
     }
-    else if (param.compare("shift-early") == 0)
+    else if (param == "shift-early")
     {
-        if (modeIns[in] == 1) {
+        if (modeIn == 1) {
             setShiftEarly(shiftEarly + i);
         }
         else {
             setFrameRate(frameRate + i);
         }
     }
-    else if (param.compare("receive-mmc") == 0)
+    else if (param == "receive-mmc")
     {
         setReceiveMMCEnabled(i > 0);
     }
-    else if (param.compare("send-mmc") == 0)
+    else if (param == "send-mmc")
     {
         setSendMMCEnabled(i > 0);
     }
@@ -122,43 +122,32 @@ void SyncScreen::setFrameRate(int i)
     displayShiftEarly();
 }
 
-void SyncScreen::setModeIn(int i)
+void SyncScreen::setModeIn(unsigned char c)
 {
-    if (i < 0 || i > 2)
+    if (c < 0 || c > 2)
     {
         return;
     }
     
-    modeIns[in] = i;
+    modeIn = c;
     displayModeIn();
     displayShiftEarly();
 }
 
 int SyncScreen::getModeOut()
 {
-    if (out > 1)
-    {
-        return modeOuts[0];
-    }
-    return modeOuts[out];
+    return modeOut;
 }
 
-void SyncScreen::setModeOut(int i)
+void SyncScreen::setModeOut(unsigned char c)
 {
-    if (i < 0 || i > 2)
+    if (c < 0 || c > 2)
     {
         return;
     }
-    
-    if (out <= 1)
-    {
-        modeOuts[out] = i;
-    }
-    else
-    {
-        modeOuts[0] = i;
-        modeOuts[1] = i;
-    }
+
+    modeOut = c;
+
     displayModeOut();
 }
 
@@ -171,11 +160,11 @@ void SyncScreen::setReceiveMMCEnabled(bool b)
 // Also used to display "Frame rate:" field}
 void SyncScreen::displayShiftEarly()
 {
-    if (modeIns[in] == 0) {
+    if (modeIn == 0) {
         findLabel("shift-early").lock()->Hide(true);
         findField("shift-early").lock()->Hide(true);
     }
-    else if (modeIns[in] == 1)
+    else if (modeIn == 1)
     {
         auto label = findLabel("shift-early").lock();
         auto field = findField("shift-early").lock();
@@ -185,7 +174,7 @@ void SyncScreen::displayShiftEarly()
         label->setText("Shift early(ms):");
         field->setTextPadded(shiftEarly);
     }
-    else if (modeIns[in] == 2)
+    else if (modeIn == 2)
     {
         auto label = findLabel("shift-early").lock();
         auto field = findField("shift-early").lock();
@@ -243,5 +232,5 @@ void SyncScreen::displaySendMMC()
 
 int SyncScreen::getModeIn()
 {
-    return modeIns[in];
+    return modeIn;
 }

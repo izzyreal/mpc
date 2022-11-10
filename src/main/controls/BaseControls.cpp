@@ -174,6 +174,7 @@ void BaseControls::function(int i)
                 else if (currentScreenName == "program")
                 {
                     ls->setPreviousScreenName(mpc.getPreviousSamplerScreenName());
+                    mpc.setPreviousSamplerScreenName("");
                 }
                 else if (currentScreenName == "name")
                 {

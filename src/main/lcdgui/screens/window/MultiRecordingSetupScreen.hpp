@@ -25,6 +25,7 @@ namespace mpc::lcdgui::screens::window {
 		void up() override;
 		void down() override;
 		void turnWheel(int i) override;
+		void function(int i) override;
 
 	public:
 		MultiRecordingSetupScreen(mpc::Mpc& mpc, const int layerIndex);

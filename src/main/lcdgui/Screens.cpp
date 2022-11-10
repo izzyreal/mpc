@@ -111,6 +111,7 @@
 #include <lcdgui/screens/window/LoopSongScreen.hpp>
 #include <lcdgui/screens/window/VmpcConvertAndLoadWavScreen.hpp>
 #include <lcdgui/screens/window/StepEditOptionsScreen.hpp>
+#include <lcdgui/screens/window/VmpcWarningSettingsIgnoredScreen.hpp>
 
 #include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
 #include <lcdgui/screens/dialog/MidiMonitorScreen.hpp>
@@ -941,6 +942,10 @@ shared_ptr<ScreenComponent> Screens::getScreenComponent(const string& screenName
     else if (screenName == "vmpc-midi-presets")
     {
         screen = make_shared<VmpcMidiPresetsScreen>(mpc, layerIndex);
+    }
+    else if (screenName == "vmpc-warning-settings-ignored")
+    {
+        screen = make_shared<VmpcWarningSettingsIgnoredScreen>(mpc, layerIndex);
     }
 
 	if (screen)

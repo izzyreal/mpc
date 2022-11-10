@@ -4,7 +4,7 @@
 #include <string>
 
 namespace mpc::nvram { class MidiMappingPersistence; }
-namespace mpc::audiomidi { class MidiFullControl; }
+namespace mpc::audiomidi { class VmpcMidiControlMode; }
 
 namespace mpc::lcdgui::screens{
 
@@ -55,7 +55,7 @@ namespace mpc::lcdgui::screens{
         bool learning = false;
         bool hasMappingChanged();
 
-        std::vector<std::pair<std::string, Command>> editableLabelCommands;
+        std::vector<std::pair<std::string, Command>> uneditedLabelCommands;
         std::vector<std::pair<std::string, Command>> labelCommands;
         void setLearning(bool b);
         void acceptLearnCandidate();
@@ -63,6 +63,6 @@ namespace mpc::lcdgui::screens{
         void displayUpAndDown();
 
         friend class mpc::nvram::MidiMappingPersistence;
-        friend class mpc::audiomidi::MidiFullControl;
+        friend class mpc::audiomidi::VmpcMidiControlMode;
     };
 }

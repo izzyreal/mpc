@@ -1,7 +1,7 @@
 #include "MidiSwScreen.hpp"
+#include "VmpcSettingsScreen.hpp"
 
 using namespace mpc::lcdgui::screens;
-using namespace std;
 
 MidiSwScreen::MidiSwScreen(mpc::Mpc& mpc, const int layerIndex)
 : ScreenComponent(mpc, "midi-sw", layerIndex)
@@ -12,10 +12,10 @@ MidiSwScreen::MidiSwScreen(mpc::Mpc& mpc, const int layerIndex)
 void MidiSwScreen::initializeDefaultMapping()
 {
     for (int i = 0; i < SWITCH_COUNT; i++)
-        controllerToFunctionMapping.push_back(pair(0, 0));
+        controllerToFunctionMapping.push_back({0, 0});
 }
 
-pair<int, int> MidiSwScreen::getSwitch(int index)
+std::pair<int, int> MidiSwScreen::getSwitch(int index)
 {
     return controllerToFunctionMapping[index];
 }
@@ -24,12 +24,24 @@ void MidiSwScreen::open()
 {
     displaySwitchLabels();
     displayCtrlsAndFunctions();
+
+    auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
+
+    if (ls.lock()->getPreviousScreenName() != "vmpc-warning-settings-ignored" &&
+        vmpcSettingsScreen->midiControlMode == VmpcSettingsScreen::MidiControlMode::VMPC)
+    {
+        ls.lock()->Draw();
+        openScreen("vmpc-warning-settings-ignored");
+    }
 }
 
 void MidiSwScreen::displaySwitchLabels()
 {
     for (int i = 0; i < 4; i++)
-        findChild<TextComp>("switch" + to_string(i)).lock()->setText("Switch " + to_string(i + 1 + xOffset));
+    {
+        auto label = findChild<TextComp>("switch" + std::to_string(i)).lock();
+        label->setText("Switch " + std::to_string(i + 1 + xOffset));
+    }
 }
 
 void MidiSwScreen::displayCtrlsAndFunctions()
@@ -38,11 +50,11 @@ void MidiSwScreen::displayCtrlsAndFunctions()
     {
         auto association = controllerToFunctionMapping[i + xOffset];
         
-        auto ctrlField = findChild<Field>("ctrl" + to_string(i)).lock();
-        auto functionField = findChild<Field>("function" + to_string(i)).lock();
+        auto ctrlField = findChild<Field>("ctrl" + std::to_string(i)).lock();
+        auto functionField = findChild<Field>("function" + std::to_string(i)).lock();
         
         auto ctrl = association.first;
-        ctrlField->setText(ctrl == 0 ? "OFF" : to_string(ctrl - 1));
+        ctrlField->setText(ctrl == 0 ? "OFF" : std::to_string(ctrl - 1));
         
         auto fn = association.second;
         functionField->setText(functionNames[fn]);

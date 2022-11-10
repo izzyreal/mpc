@@ -6,6 +6,8 @@ namespace mpc::sampler { class Pad; }
 namespace mpc::sequencer { class Track; }
 namespace mpc::nvram { class NvRam; }
 namespace mpc::disk { class SoundLoader; }
+namespace mpc::lcdgui::screens { class MidiSwScreen; }
+namespace mpc::lcdgui::screens::window { class MidiInputScreen; class MultiRecordingSetupScreen; }
 
 namespace mpc::lcdgui::screens
 {
@@ -29,7 +31,7 @@ namespace mpc::lcdgui::screens
 
 		int initialPadMapping = 0;
         int _16LevelsEraseMode = 0;
-        int autoConvertWavs = 0;
+        int autoConvertWavs = 1;
         int midiControlMode = 0;
 
         void setInitialPadMapping(int i);
@@ -47,6 +49,9 @@ namespace mpc::lcdgui::screens
         friend class mpc::sequencer::Track;
         friend class mpc::disk::SoundLoader;
         friend class mpc::audiomidi::MpcMidiInput;
+        friend class mpc::lcdgui::screens::MidiSwScreen;
+        friend class mpc::lcdgui::screens::window::MidiInputScreen;
+        friend class mpc::lcdgui::screens::window::MultiRecordingSetupScreen;
 
 	};
 }

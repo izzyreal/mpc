@@ -63,6 +63,7 @@ vector<string> screenNames = {
 "vmpc-midi",
 "vmpc-midi-presets",
 "vmpc-discard-mapping-changes",
+"vmpc-warning-settings-ignored",
 "mpc2000xl-all-file",
 "copy-note-parameters",
 "assignment-view",

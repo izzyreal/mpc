@@ -6,7 +6,7 @@ namespace ctoot::midi::core { class ShortMessage; }
 
 namespace mpc::audiomidi {
 
-    class MidiFullControl
+    class VmpcMidiControlMode
     {
     public:
         int previousDataWheelValue = -1;

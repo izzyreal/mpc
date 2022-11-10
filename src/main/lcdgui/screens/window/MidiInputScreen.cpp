@@ -1,5 +1,7 @@
-#include <lcdgui/screens/window/MidiInputScreen.hpp>
+#include "MidiInputScreen.hpp"
+#include "lcdgui/screens/VmpcSettingsScreen.hpp"
 
+using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
@@ -16,6 +18,15 @@ void MidiInputScreen::open()
 	displayMidiFilter();
 	displayType();
 	displayPass();
+
+    auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
+
+    if (ls.lock()->getPreviousScreenName() != "vmpc-warning-settings-ignored" &&
+        vmpcSettingsScreen->midiControlMode == VmpcSettingsScreen::MidiControlMode::VMPC)
+    {
+        ls.lock()->Draw();
+        openScreen("vmpc-warning-settings-ignored");
+    }
 }
 
 void MidiInputScreen::function(int i)

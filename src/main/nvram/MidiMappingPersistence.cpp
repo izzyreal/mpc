@@ -41,6 +41,8 @@ void MidiMappingPersistence::loadDefaultMapping(mpc::Mpc &mpc)
 
     labels.push_back("datawheel");
     labels.push_back("slider");
+    labels.push_back("rec-gain");
+    labels.push_back("main-volume");
 
     for (auto& b : hardware->getButtonLabels())
     {

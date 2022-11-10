@@ -10,7 +10,7 @@
 #include <hardware/Pot.hpp>
 #include <audiomidi/EventHandler.hpp>
 #include <audiomidi/MpcMidiPorts.hpp>
-#include <audiomidi/MidiFullControl.hpp>
+#include <audiomidi/VmpcMidiControlMode.hpp>
 #include <controls/GlobalReleaseControls.hpp>
 
 #include <lcdgui/screens/SyncScreen.hpp>
@@ -42,7 +42,7 @@ MpcMidiInput::MpcMidiInput(mpc::Mpc &_mpc, int _index)
           index(_index),
           midiAdapter(std::make_unique<MidiAdapter>()),
           eventAdapter(std::make_unique<EventAdapter>(mpc, sequencer)),
-          midiFullControl(std::make_unique<MidiFullControl>())
+          midiFullControl(std::make_unique<VmpcMidiControlMode>())
 {
 }
 

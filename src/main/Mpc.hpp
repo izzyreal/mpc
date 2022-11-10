@@ -270,7 +270,8 @@ namespace mpc {
                 "vmpc-discard-mapping-changes",
                 "vmpc-auto-save",
                 "vmpc-midi",
-                "vmpc-midi-presets"
+                "vmpc-midi-presets",
+                "vmpc-warning-settings-ignored"
         };
     };
 }

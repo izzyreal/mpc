@@ -33,8 +33,8 @@ namespace mpc::lcdgui::screens
 
 		void open() override;
 
-		std::vector<int> modeIns{ 0, 0 };
-		std::vector<int> modeOuts{ 0, 0 };
+		unsigned char modeIn = 1;
+		unsigned char modeOut = 1;
 
 	private:
 		const std::vector<std::string> modeNames{ "OFF", "MIDI CLOCK", "TIME CODE" };
@@ -53,8 +53,8 @@ namespace mpc::lcdgui::screens
 		void setShiftEarly(int i);
 		void setSendMMCEnabled(bool b);
 		void setFrameRate(int i);
-		void setModeIn(int i);
-		void setModeOut(int i);
+		void setModeIn(unsigned char);
+		void setModeOut(unsigned char);
 		int getModeOut();
 		void setReceiveMMCEnabled(bool b);
 
