@@ -63,9 +63,16 @@ void VmpcMidiPresetsScreen::function(int i)
             break;
         case 4: {
             auto index = row + rowOffset;
-            if (index == 0) {
+
+            if (index == 0)
+            {
                 mpc::nvram::MidiMappingPersistence::loadDefaultMapping(mpc);
             }
+            else
+            {
+                mpc::nvram::MidiMappingPersistence::loadMappingFromFile(mpc, presets[index]);
+            }
+
             openScreen("vmpc-midi");
             break;
         }
