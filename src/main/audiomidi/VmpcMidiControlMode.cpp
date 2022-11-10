@@ -1,10 +1,10 @@
 #include "VmpcMidiControlMode.hpp"
 
-#include "audiomidi/AudioMidiServices.hpp"
 #include "hardware/Hardware.hpp"
 #include "hardware/HwComponent.hpp"
 #include "hardware/DataWheel.hpp"
 #include "hardware/HwSlider.hpp"
+#include "hardware/Pot.hpp"
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
 
 #include "midi/core/ShortMessage.hpp"
@@ -95,12 +95,12 @@ void VmpcMidiControlMode::processMidiInputEvent(mpc::Mpc& mpc, ctoot::midi::core
             else if (label == "rec-gain")
             {
                 auto normalized = static_cast<unsigned char>(controllerValue / 1.27f);
-                mpc.getAudioMidiServices().lock()->setRecordLevel(normalized);
+                hardware->getRecPot().lock()->setValue(normalized);
             }
             else if (label == "main-volume")
             {
                 auto normalized = static_cast<unsigned char>(controllerValue / 1.27f);
-                mpc.getAudioMidiServices().lock()->setMasterLevel(normalized);
+                hardware->getVolPot().lock()->setValue(normalized);
             }
             else if (msg->getData2() == 0)
             {

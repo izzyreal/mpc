@@ -13,16 +13,14 @@ using namespace mpc::lcdgui::screens;
 
 void MidiMappingPersistence::restoreLastState(mpc::Mpc& mpc)
 {
+    loadDefaultMapping(mpc);
+
     moduru::file::File f(mpc::Paths::configPath() + "midimapping.ini", {});
 
     if (f.exists())
     {
         loadMappingFromFile(mpc, f);
         f.close();
-    }
-    else
-    {
-        loadDefaultMapping(mpc);
     }
 
     f.close();
@@ -67,9 +65,9 @@ void MidiMappingPersistence::saveCurrentState(mpc::Mpc& mpc)
 
 void MidiMappingPersistence::loadMappingFromFile(mpc::Mpc &mpc, std::string name)
 {
-    moduru::file::Directory dir(mpc::Paths::midiControllerPresetsPath(), nullptr);
+    auto dir = std::make_shared<moduru::file::Directory>(mpc::Paths::midiControllerPresetsPath(), nullptr);
 
-    for (auto& node : dir.listFiles())
+    for (auto& node : dir->listFiles())
     {
         if (node->isDirectory()) continue;
         auto f = std::dynamic_pointer_cast<moduru::file::File>(node);
