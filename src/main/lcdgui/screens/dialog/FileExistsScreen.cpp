@@ -2,6 +2,8 @@
 
 #include <Util.hpp>
 
+#include "nvram/MidiMappingPersistence.hpp"
+
 #include <disk/AbstractDisk.hpp>
 #include <disk/MpcFile.hpp>
 
@@ -11,6 +13,7 @@
 #include <lcdgui/screens/window/SaveAllFileScreen.hpp>
 #include <lcdgui/screens/window/SaveApsFileScreen.hpp>
 #include <lcdgui/screens/window/NameScreen.hpp>
+#include <lcdgui/screens/window/VmpcMidiPresetsScreen.hpp>
 
 #include "sampler/Sound.hpp"
 
@@ -18,6 +21,7 @@ using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sampler;
+using namespace mpc::nvram;
 
 using namespace moduru::lang;
 
@@ -78,8 +82,9 @@ void FileExistsScreen::function(int i)
 
 		auto disk = mpc.getDisk().lock();
 		auto nameScreen = mpc.screens->get<NameScreen>("name");
+        auto previousScreen = ls.lock()->getPreviousScreenName();
 
-		if (ls.lock()->getPreviousScreenName() == "save-a-program")
+		if (previousScreen == "save-a-program")
 		{
 			auto pfileName = mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) + ".PGM";
 			auto success = disk->getFile(pfileName)->del();
@@ -105,7 +110,7 @@ void FileExistsScreen::function(int i)
 			}
 			openScreen("save");
 		}
-		else if (ls.lock()->getPreviousScreenName() == "save-aps-file")
+		else if (previousScreen == "save-aps-file")
 		{
 			auto saveApsFileScreen = mpc.screens->get<SaveApsFileScreen>("save-aps-file");
 			auto apsFileName = saveApsFileScreen->fileName + ".APS";
@@ -119,7 +124,7 @@ void FileExistsScreen::function(int i)
                 disk->writeAps(apsFileName);
 			}
 		}
-		else if (ls.lock()->getPreviousScreenName() == "save-all-file")
+		else if (previousScreen == "save-all-file")
 		{
             auto saveAllFileScreen = mpc.screens->get<SaveAllFileScreen>("save-all-file");
 			auto allFileName = saveAllFileScreen->fileName + ".ALL";
@@ -134,7 +139,7 @@ void FileExistsScreen::function(int i)
                 disk->writeAll(allFileName);
 			}
 		}
-		else if (ls.lock()->getPreviousScreenName() == "save-a-sound")
+		else if (previousScreen == "save-a-sound")
 		{
 			auto s = sampler->getSound().lock();
 
@@ -156,6 +161,11 @@ void FileExistsScreen::function(int i)
 
 			openScreen("save");
 		}
+        else if (previousScreen == "vmpc-midi-presets")
+        {
+            MidiMappingPersistence::saveMappingToFile(mpc, nameScreen->getName());
+            openScreen("vmpc-midi-presets");
+        }
 		break;
 	}
 	case 3:
@@ -235,6 +245,10 @@ void FileExistsScreen::function(int i)
 			nameScreen->parameterName = previousScreen;
 			openScreen("name");
 		}
+        else if (previousScreen == "vmpc-midi-presets")
+        {
+            openScreen("name");
+        }
 
 		break;
 	}

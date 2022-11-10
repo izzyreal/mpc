@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <functional>
 
 namespace mpc::lcdgui::screens::window {
 class VmpcMidiPresetsScreen
@@ -19,8 +20,10 @@ public:
 
     void displayUpAndDown();
     void displayRows();
+    std::function<void(std::string&)>& getRenamer();
 
 private:
+    std::function<void(std::string&)> saveMappingAndShowPopup;
     int row = 0;
     int rowOffset = 0;
 

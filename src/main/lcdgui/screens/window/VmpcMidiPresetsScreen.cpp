@@ -1,10 +1,13 @@
 #include "VmpcMidiPresetsScreen.hpp"
 
 #include "lcdgui/Parameter.hpp"
+#include "lcdgui/screens/dialog2/PopupScreen.hpp"
 #include "nvram/MidiMappingPersistence.hpp"
 #include "NameScreen.hpp"
 
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::lcdgui::screens::dialog2;
+using namespace mpc::nvram;
 
 VmpcMidiPresetsScreen::VmpcMidiPresetsScreen(mpc::Mpc& mpc, const int layerIndex)
         : ScreenComponent(mpc, "vmpc-midi-presets", layerIndex)
@@ -15,6 +18,13 @@ VmpcMidiPresetsScreen::VmpcMidiPresetsScreen(mpc::Mpc& mpc, const int layerIndex
         auto nameParam = std::make_shared<Parameter>(mpc, "", "name" + std::to_string(i), 23, y + 1, 16 * 6);
         addChild(nameParam);
     }
+
+    saveMappingAndShowPopup = [this](std::string& newName1) {
+        MidiMappingPersistence::saveMappingToFile(this->mpc, newName1);
+        auto popupScreen = this->mpc.screens->get<PopupScreen>("popup");
+        popupScreen->setText("Saving " + newName1);
+        popupScreen->returnToScreenAfterMilliSeconds("vmpc-midi-presets", 1000);
+    };
 }
 
 void VmpcMidiPresetsScreen::open()
@@ -40,21 +50,18 @@ void VmpcMidiPresetsScreen::function(int i)
     {
         case 2: {
             auto index = row + rowOffset;
+            auto nameScreen = mpc.screens->get<NameScreen>("name");
+            nameScreen->setNameLimit(16);
+            nameScreen->setRenamerAndScreenToReturnTo(saveMappingAndShowPopup, "popup");
+
             if (index == 0) {
-                auto nameScreen = mpc.screens->get<NameScreen>("name");
                 nameScreen->setName("New preset");
-                nameScreen->setNameLimit(16);
-
-                auto renamer = [this](std::string& newName1) {
-                    mpc::nvram::MidiMappingPersistence::saveMappingToFile(this->mpc, newName1);
-                };
-
-                nameScreen->setRenamerAndScreenToReturnTo(renamer, "vmpc-midi-presets");
                 openScreen("name");
             }
             else
             {
-                mpc::nvram::MidiMappingPersistence::saveMappingToFile(this->mpc, presets[index]);
+                nameScreen->setName(presets[index]);
+                openScreen("file-exists");
             }
             break;
         }
@@ -66,11 +73,11 @@ void VmpcMidiPresetsScreen::function(int i)
 
             if (index == 0)
             {
-                mpc::nvram::MidiMappingPersistence::loadDefaultMapping(mpc);
+                MidiMappingPersistence::loadDefaultMapping(mpc);
             }
             else
             {
-                mpc::nvram::MidiMappingPersistence::loadMappingFromFile(mpc, presets[index]);
+                MidiMappingPersistence::loadMappingFromFile(mpc, presets[index]);
             }
 
             openScreen("vmpc-midi");
@@ -117,7 +124,7 @@ void VmpcMidiPresetsScreen::initPresets()
     presets.clear();
     presets.emplace_back("New preset");
 
-    for (auto& name : mpc::nvram::MidiMappingPersistence::getAvailablePresetNames())
+    for (auto& name : MidiMappingPersistence::getAvailablePresetNames())
     {
         presets.emplace_back(name);
     }
