@@ -27,7 +27,10 @@ struct EventAfterNFrames {
     }
 };
 
+namespace ctoot::midi::core { class ShortMessage; }
+
 namespace mpc { class Mpc; }
+namespace mpc::lcdgui::screens::window { class CountMetronomeScreen; }
 
 namespace mpc::sequencer {
 
@@ -38,11 +41,13 @@ namespace mpc::sequencer {
 	{
 
 	private:
-		mpc::Mpc& mpc;
+        std::shared_ptr<ctoot::midi::core::ShortMessage> clockMsg;
+        mpc::Mpc& mpc;
 		int frameCounter = 0;
 		bool running = false;
 		bool metronome = false;
-		Clock clock;
+        std::shared_ptr<mpc::lcdgui::screens::window::CountMetronomeScreen> countMetronomeScreen;
+        Clock clock;
 		std::shared_ptr<Sequencer> sequencer;
 		int tickFrameOffset = 0;
 

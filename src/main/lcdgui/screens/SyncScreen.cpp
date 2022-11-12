@@ -233,3 +233,8 @@ int SyncScreen::getModeIn()
 {
     return modeIn;
 }
+
+int SyncScreen::getOut()
+{
+    return out;
+}

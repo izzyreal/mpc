@@ -42,7 +42,7 @@ namespace mpc::audiomidi {
     class EventHandler;
     class AudioMidiServices;
     class MpcMidiInput;
-    class MpcMidiPorts;
+    class MpcMidiOutput;
 }
 
 namespace mpc::sequencer {
@@ -102,7 +102,7 @@ namespace mpc {
         std::vector<ctoot::mpc::MpcSoundPlayerChannel*> getDrums();
         std::shared_ptr<audiomidi::EventHandler> getEventHandler();
         ctoot::mpc::MpcMultiMidiSynth* getMms();
-        std::shared_ptr<mpc::audiomidi::MpcMidiPorts> getMidiPorts();
+        std::shared_ptr<mpc::audiomidi::MpcMidiOutput> getMidiOutput();
         mpc::audiomidi::MpcMidiInput* getMpcMidiInput(int i);
 
     public:

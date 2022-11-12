@@ -3,6 +3,7 @@
 #include <Mpc.hpp>
 
 #include "audiomidi/EventHandler.hpp"
+#include "audiomidi/MpcMidiOutput.hpp"
 
 #include <hardware/Hardware.hpp>
 #include <hardware/HwPad.hpp>
@@ -16,6 +17,7 @@
 
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <lcdgui/screens/window/CountMetronomeScreen.hpp>
+#include <lcdgui/screens/SyncScreen.hpp>
 #include <lcdgui/screens/SongScreen.hpp>
 #include <lcdgui/screens/PunchScreen.hpp>
 #include <lcdgui/screens/UserScreen.hpp>
@@ -33,8 +35,12 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 
 FrameSeq::FrameSeq(mpc::Mpc& mpc)
-	: mpc(mpc), sequencer(mpc.getSequencer())
+	: mpc(mpc),
+    sequencer(mpc.getSequencer()),
+    countMetronomeScreen(mpc.screens->get<CountMetronomeScreen>("count-metronome"))
 {
+    clockMsg = std::make_shared<ctoot::midi::core::ShortMessage>();
+    clockMsg->setMessage(ctoot::midi::core::ShortMessage::TIMING_CLOCK);
 }
 
 void FrameSeq::start(float sampleRate) {
@@ -110,12 +116,14 @@ void FrameSeq::work(int nFrames)
 
 	auto sequencerScreen = mpc.screens->get<SequencerScreen>("sequencer");
 	auto userScreen = mpc.screens->get<UserScreen>("user");
+    auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
+    auto syncScreen = mpc.screens->get<SyncScreen>("sync");
 
-	for (int i = 0; i < nFrames; i++)
+    for (int frameIndex = 0; frameIndex < nFrames; frameIndex++)
 	{
 		if (clock.proc())
 		{
-			tickFrameOffset = i;
+			tickFrameOffset = frameIndex;
 
             triggerClickIfNeeded();
 
@@ -271,7 +279,6 @@ void FrameSeq::work(int nFrames)
 
             if (controls && (controls->isTapPressed() || controls->isNoteRepeatLocked()))
             {
-                auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
                 int tcValue = sequencer->getTickValues()[timingCorrectScreen->getNoteValue()];
                 int swingPercentage = timingCorrectScreen->getSwing();
                 int swingOffset = (int)((swingPercentage - 50) * (4.0 * 0.01) * (tcValue * 0.5));
@@ -289,6 +296,20 @@ void FrameSeq::work(int nFrames)
                 else if (tcValue != 1 && tickPosWithShift % tcValue == 0)
                 {
                     repeatPad(tcValue);
+                }
+            }
+
+            if (getTickPosition() % 4 == 0 && syncScreen->getModeOut() > 0)
+            {
+                clockMsg->bufferPos = frameIndex;
+
+                if (syncScreen->getOut() == 0 || syncScreen->getOut() == 2)
+                {
+                    mpc.getMidiOutput()->enqueMessageOutputA(clockMsg);
+                }
+                if (syncScreen->getOut() == 1 || syncScreen->getOut() == 2)
+                {
+                    mpc.getMidiOutput()->enqueMessageOutputB(clockMsg);
                 }
             }
         }
@@ -402,8 +423,6 @@ void FrameSeq::triggerClickIfNeeded()
 {
     if (!sequencer->isCountEnabled())
         return;
-
-    auto countMetronomeScreen = mpc.screens->get<CountMetronomeScreen>("count-metronome");
 
     if (sequencer->isRecordingOrOverdubbing() && !countMetronomeScreen->getInRec() && !sequencer->isCountingIn())
         return;

@@ -650,14 +650,6 @@ bool Track::isUsed()
     return used || events.size() > 0;
 }
 
-void Track::setEventIndex(int i)
-{
-	if (i < 0 || i >= events.size())
-		return;
-
-    eventIndex = i;
-}
-
 std::vector<std::shared_ptr<Event>> Track::getEventRange(int startTick, int endTick)
 {
 	std::vector<std::shared_ptr<Event>> res;
@@ -917,11 +909,6 @@ void Track::shiftTiming(std::shared_ptr<Event> event, bool later, int amount, in
 
     if (event->getTick() > lastTick)
         event->setTick(lastTick);
-}
-
-int Track::getEventIndex()
-{
-    return eventIndex;
 }
 
 std::string Track::getActualName()

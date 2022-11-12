@@ -10,6 +10,8 @@
 #include <cmath>
 #include <chrono>
 
+namespace ctoot::midi::core { class ShortMessage; }
+
 namespace mpc { class Mpc; }
 
 namespace mpc::sequencer
@@ -39,6 +41,8 @@ namespace mpc::sequencer
         bool isUndoSeqAvailable();
 
 	private:
+        std::shared_ptr<ctoot::midi::core::ShortMessage> reusableStartStopMsg;
+
         const std::vector<int> TICK_VALUES{ 1, 48, 32, 24, 16, 12, 8 };
         mpc::Mpc& mpc;
         bool playing = false;
@@ -91,6 +95,8 @@ namespace mpc::sequencer
 		void copyTempoChangeEvents(std::shared_ptr<Sequence> src, std::shared_ptr<Sequence> dst);
 		void copyTrackParameters(std::shared_ptr<Track> source, std::shared_ptr<Track> dest);
 		void copyTrack(std::shared_ptr<Track> src, std::shared_ptr<Track> dest);
+
+        void sendClockMsg(unsigned char status);
 
 	public:
 		void notifyTimeDisplay();

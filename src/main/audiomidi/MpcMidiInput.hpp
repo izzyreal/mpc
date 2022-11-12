@@ -13,7 +13,7 @@
 namespace ctoot::midi::core { class ShortMessage; }
 
 namespace mpc::audiomidi {
-    class MpcMidiPorts;
+    class MpcMidiOutput;
 }
 
 namespace mpc::audiomidi {

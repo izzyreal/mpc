@@ -32,7 +32,7 @@ void EventAdapter::process(MidiMessage* msg)
 
 std::weak_ptr<Event> EventAdapter::convert(ShortMessage* msg)
 {
-	if (msg->getStatus() == ShortMessage::TIMING_CLOCK || msg->getStatus() == ShortMessage::START || msg->getStatus() == ShortMessage::STOP)
+	if (msg->getStatus() == ShortMessage::TIMING_CLOCK || msg->getStatus() == ShortMessage::START || msg->getStatus() == ShortMessage::STOP || msg->getStatus() == ShortMessage::CONTINUE)
 	{
 		midiClockEvent->setStatus(msg->getStatus());
 		return midiClockEvent;

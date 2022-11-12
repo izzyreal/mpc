@@ -2,7 +2,7 @@
 
 #include <Mpc.hpp>
 #include <audiomidi/AudioMidiServices.hpp>
-#include <audiomidi/MpcMidiPorts.hpp>
+#include <audiomidi/MpcMidiOutput.hpp>
 
 #include <sequencer/Event.hpp>
 #include <sequencer/FrameSeq.hpp>
@@ -83,26 +83,23 @@ void EventHandler::handleNoThru(const std::shared_ptr<Event>& event, Track* trac
     }
     else if (mce)
     {
-        auto mpcMidiPorts = mpc.getMidiPorts();
-        auto clockMsg = dynamic_cast<ctoot::midi::core::ShortMessage*>(mce->getShortMessage());
+        auto mpcMidiOutput = mpc.getMidiOutput();
+        auto clockMsg = std::shared_ptr<ctoot::midi::core::ShortMessage>(mce->getShortMessage());
         clockMsg->setMessage(mce->getStatus());
-        
-        auto midiOutputStreamA = &mpcMidiPorts->getReceivers()[0];
-        auto midiOutputStreamB = &mpcMidiPorts->getReceivers()[1];
-        
+
         auto syncScreen = mpc.screens->get<SyncScreen>("sync");
         
         switch (syncScreen->out)
         {
             case 0:
-                midiOutputStreamA->push_back(*clockMsg);
+                mpcMidiOutput->enqueMessageOutputA(clockMsg);
                 break;
             case 1:
-                midiOutputStreamB->push_back(*clockMsg);
+                mpcMidiOutput->enqueMessageOutputB(clockMsg);
                 break;
             case 2:
-                midiOutputStreamA->push_back(*clockMsg);
-                midiOutputStreamB->push_back(*clockMsg);
+                mpcMidiOutput->enqueMessageOutputA(clockMsg);
+                mpcMidiOutput->enqueMessageOutputB(clockMsg);
                 break;
         }
     }
@@ -240,21 +237,18 @@ void EventHandler::midiOut(const std::shared_ptr<Event>& e, Track* track)
         
         MidiAdapter midiAdapter;
         midiAdapter.process(noteEvent, channel, -1);
-        ctoot::midi::core::ShortMessage& msg = *midiAdapter.get().lock();
+        auto msg = midiAdapter.get().lock();
         
-        auto mpcMidiPorts = mpc.getMidiPorts();
-        
-        std::vector<ctoot::midi::core::ShortMessage>& r = mpcMidiPorts->getReceivers()[0];
-        
+        auto mpcMidiOutput = mpc.getMidiOutput();
+
         std::string notifyLetter = "a";
         
         if (deviceNumber > 15)
         {
             deviceNumber -= 16;
-            r = mpcMidiPorts->getReceivers()[1];
             notifyLetter = "b";
         }
-        
+
         auto directToDiskRecorderScreen = mpc.screens->get<VmpcDirectToDiskRecorderScreen>("vmpc-direct-to-disk-recorder");
         
         if (!(mpc.getAudioMidiServices()->isBouncing() &&
@@ -263,12 +257,16 @@ void EventHandler::midiOut(const std::shared_ptr<Event>& e, Track* track)
         {
             auto fs = mpc.getAudioMidiServices()->getFrameSequencer();
             auto eventFrame = fs->getEventFrameOffset();
-            msg.bufferPos = eventFrame;
+            msg->bufferPos = eventFrame;
             
-            if (r.size() < 100)
-                r.push_back(msg);
+            if (deviceNumber < 16)
+            {
+                mpcMidiOutput->enqueMessageOutputA(msg);
+            }
             else
-                r.clear();
+            {
+                mpcMidiOutput->enqueMessageOutputB(msg);
+            }
         }
         
         notifyObservers(notifyLetter + std::to_string(deviceNumber));

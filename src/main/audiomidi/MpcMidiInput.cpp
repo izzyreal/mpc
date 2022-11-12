@@ -9,7 +9,7 @@
 #include <hardware/Button.hpp>
 #include <hardware/Pot.hpp>
 #include <audiomidi/EventHandler.hpp>
-#include <audiomidi/MpcMidiPorts.hpp>
+#include <audiomidi/MpcMidiOutput.hpp>
 #include <audiomidi/VmpcMidiControlMode.hpp>
 #include <controls/GlobalReleaseControls.hpp>
 
@@ -105,6 +105,9 @@ void MpcMidiInput::transport(MidiMessage *msg, int timeStamp)
             {
                 case ShortMessage::START:
                     sequencer->playFromStart();
+                    break;
+                case ShortMessage::CONTINUE:
+                    sequencer->play();
                     break;
                 case ShortMessage::STOP:
                     sequencer->stop();
@@ -341,7 +344,7 @@ void MpcMidiInput::midiOut(std::weak_ptr<mpc::sequencer::Event> e, mpc::sequence
         midiAdapter->process(event, channel, -1);
     }
 
-    auto mpcMidiPorts = mpc.getMidiPorts();
+    auto mpcMidiOutput = mpc.getMidiOutput();
 
     notificationLetter = "a";
 
@@ -359,7 +362,7 @@ void MpcMidiInput::midiOut(std::weak_ptr<mpc::sequencer::Event> e, mpc::sequence
 
 void MpcMidiInput::transportOmni(MidiMessage *msg, std::string outputLetter)
 {
-    auto mpcMidiPorts = mpc.getMidiPorts();
+    auto mpcMidiOutput = mpc.getMidiOutput();
     auto screenName = mpc.getLayeredScreen()->getCurrentScreenName();
 
     if (dynamic_cast<ShortMessage*>(msg) != nullptr && screenName == "midi-output-monitor")

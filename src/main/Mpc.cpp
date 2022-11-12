@@ -91,13 +91,14 @@ void Mpc::init(const int inputCount, const int outputCount)
 
 	mpcMidiInputs = std::vector<mpc::audiomidi::MpcMidiInput*>{ new mpc::audiomidi::MpcMidiInput(*this, 0), new mpc::audiomidi::MpcMidiInput(*this, 1) };
 
+    screens = std::make_shared<Screens>(*this);
+
     /*
     * AudioMidiServices requires sequencer to exist.
     */
 	audioMidiServices = std::make_shared<mpc::audiomidi::AudioMidiServices>(*this);
 	MLOG("AudioMidiServices created");
 
-    screens = std::make_shared<Screens>(*this);
     layeredScreen = std::make_shared<lcdgui::LayeredScreen>(*this);
 
     sequencer->init();
@@ -215,7 +216,7 @@ ctoot::mpc::MpcMultiMidiSynth* Mpc::getMms()
 	return audioMidiServices->getMms().get();
 }
 
-std::shared_ptr<audiomidi::MpcMidiPorts> Mpc::getMidiPorts()
+std::shared_ptr<audiomidi::MpcMidiOutput> Mpc::getMidiOutput()
 {
 	return audioMidiServices->getMidiPorts();
 }

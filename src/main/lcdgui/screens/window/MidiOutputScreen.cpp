@@ -1,7 +1,7 @@
 #include "MidiOutputScreen.hpp"
 
 #include <lcdgui/screens/window/NameScreen.hpp>
-#include <audiomidi/MpcMidiPorts.hpp>
+#include <audiomidi/MpcMidiOutput.hpp>
 
 #include <sequencer/Track.hpp>
 
@@ -83,7 +83,7 @@ void MidiOutputScreen::function(int i)
 		openScreen("midi-output-monitor");
 		break;
 	case 4:
-		mpc.getMidiPorts()->panic();
+        mpc.getMidiOutput()->panic();
 		break;
 	}
 }

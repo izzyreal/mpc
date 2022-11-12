@@ -44,7 +44,7 @@ namespace ctoot::synth {
 
 
 namespace mpc::audiomidi {
-	class MpcMidiPorts;
+	class MpcMidiOutput;
 	class DirectToDiskSettings;
 	class DiskRecorder;
 	class SoundRecorder;
@@ -99,7 +99,7 @@ namespace mpc::audiomidi
 		std::shared_ptr<ctoot::mpc::MpcMixerControls> mixerControls;
 		std::shared_ptr<ctoot::mpc::MpcMultiMidiSynth> mms;
 		std::shared_ptr<ctoot::audio::server::CompoundAudioClient> cac;
-		std::shared_ptr<MpcMidiPorts> mpcMidiPorts;
+		std::shared_ptr<MpcMidiOutput> mpcMidiOutput;
 		std::vector<std::shared_ptr<ctoot::audio::server::IOAudioProcess>> inputProcesses;
 		std::vector<ctoot::audio::server::IOAudioProcess*> outputProcesses;
 		std::shared_ptr<mpc::sequencer::FrameSeq> frameSeq;
@@ -133,7 +133,7 @@ namespace mpc::audiomidi
 
 	public:
 		void connectVoices();
-		std::shared_ptr<MpcMidiPorts> getMidiPorts();
+		std::shared_ptr<MpcMidiOutput> getMidiPorts();
 		void destroyServices();
 		bool prepareBouncing(DirectToDiskSettings* settings);
 		std::shared_ptr<mpc::sequencer::FrameSeq> getFrameSequencer();

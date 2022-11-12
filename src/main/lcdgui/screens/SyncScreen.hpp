@@ -28,7 +28,11 @@ namespace mpc::lcdgui::screens
 		void turnWheel(int i) override;
 		void function(int i) override;
 
-	public:
+        int getModeOut();
+        int getModeIn();
+        int getOut();
+
+    public:
 		SyncScreen(mpc::Mpc&, const int layerIndex);
 
 		void open() override;
@@ -55,8 +59,8 @@ namespace mpc::lcdgui::screens
 		void setFrameRate(int i);
 		void setModeIn(unsigned char);
 		void setModeOut(unsigned char);
-		int getModeOut();
-		void setReceiveMMCEnabled(bool b);
+
+        void setReceiveMMCEnabled(bool b);
 
 		void displayIn();
 		void displayOut();
@@ -65,9 +69,6 @@ namespace mpc::lcdgui::screens
 		void displayReceiveMMC();
 		void displaySendMMC();
 		void displayShiftEarly(); // Also used to display "Frame rate:" field
-
-	public:
-		int getModeIn();
 
 	private:
 		friend class mpc::audiomidi::EventHandler;

@@ -97,10 +97,7 @@ public:
     void playNext();
     bool isOn();
     bool isUsed();
-    
-public:
-    void setEventIndex(int i);
-    
+
 public:
     std::vector<std::shared_ptr<Event>> getEventRange(int startTick, int endTick);
 
@@ -113,12 +110,11 @@ public:
     // Do not call from audio thread
     void sortEvents();
 
-    std::vector<std::shared_ptr<NoteEvent>> getNoteEvents();
-    
 private:
     std::vector<std::shared_ptr<NoteEvent>> getNoteEventsAtTick(int tick);
 
 public:
+    std::vector<std::shared_ptr<NoteEvent>> getNoteEvents();
     void timingCorrect(int fromBar, int toBar, NoteEvent* noteEvent, int stepLength);
     int timingCorrectTick(int fromBar, int toBar, int tick, int stepLength);
     int swingTick(int tick, int noteValue, int percentage);
@@ -126,14 +122,9 @@ public:
     void swing(std::vector<std::shared_ptr<Event>>& eventsToSwing, int noteValue, int percentage, std::vector<int>& noteRange);
 
     void shiftTiming(std::shared_ptr<Event> eventsToShift, bool later, int amount, int lastTick);
-    
-public:
-    int getEventIndex();
-    
-public:
+
     std::string getActualName();
     
-public:
     Track(mpc::Mpc& mpc, mpc::sequencer::Sequence* parent, int i);
     
 private:
