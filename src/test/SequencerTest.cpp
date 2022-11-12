@@ -38,9 +38,9 @@ SCENARIO("Can record and playback from different threads", "[sequencer]")
         bool audioThreadBusy = true;
         
         mpc::Mpc mpc;
-        mpc.init(44100, 1, 5);
+        mpc.init(1, 5);
         
-        auto seq = mpc.getSequencer().lock();
+        auto seq = mpc.getSequencer();
         seq->setCountEnabled(false);
         
         auto sequence = seq->getActiveSequence();
@@ -48,7 +48,7 @@ SCENARIO("Can record and playback from different threads", "[sequencer]")
         
         auto track = seq->getActiveTrack();
                 
-        auto server = mpc.getAudioMidiServices().lock()->getAudioServer();
+        auto server = mpc.getAudioMidiServices()->getAudioServer();
         server->resizeBuffers(512);
         server->setSampleRate(44100);
         

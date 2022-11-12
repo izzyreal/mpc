@@ -23,20 +23,20 @@ void SampleScreen::open()
 	displayMonitor();
 	displayPreRec();
 
-	auto ams = mpc.getAudioMidiServices().lock();
-	ams->getSoundRecorder().lock()->addObserver(this);
+	auto ams = mpc.getAudioMidiServices();
+	ams->getSoundRecorder()->addObserver(this);
 }
 
 void SampleScreen::close()
 {
-	auto ams = mpc.getAudioMidiServices().lock();
-	ams->getSoundRecorder().lock()->deleteObserver(this);
+	auto ams = mpc.getAudioMidiServices();
+	ams->getSoundRecorder()->deleteObserver(this);
 
 }
 
 void SampleScreen::left()
 {
-	if (mpc.getAudioMidiServices().lock()->isRecordingSound())
+	if (mpc.getAudioMidiServices()->isRecordingSound())
 		return;
 
 	ScreenComponent::left();
@@ -44,7 +44,7 @@ void SampleScreen::left()
 
 void SampleScreen::right()
 {
-	if (mpc.getAudioMidiServices().lock()->isRecordingSound())
+	if (mpc.getAudioMidiServices()->isRecordingSound())
 		return;
 
 	ScreenComponent::right();
@@ -52,7 +52,7 @@ void SampleScreen::right()
 
 void SampleScreen::up()
 {
-	if (mpc.getAudioMidiServices().lock()->isRecordingSound())
+	if (mpc.getAudioMidiServices()->isRecordingSound())
 		return;
 
 	ScreenComponent::up();
@@ -60,7 +60,7 @@ void SampleScreen::up()
 
 void SampleScreen::down()
 {
-	if (mpc.getAudioMidiServices().lock()->isRecordingSound())
+	if (mpc.getAudioMidiServices()->isRecordingSound())
 		return;
 
 	ScreenComponent::down();
@@ -78,21 +78,21 @@ void SampleScreen::function(int i)
 	switch (i)
 	{
 	case 0:
-		if (mpc.getAudioMidiServices().lock()->isRecordingSound())
+		if (mpc.getAudioMidiServices()->isRecordingSound())
 			return;
 
 		peakL = 0.f;
 		peakR = 0.f;
 		break;
 	case 4:
-		if (mpc.getAudioMidiServices().lock()->isRecordingSound())
+		if (mpc.getAudioMidiServices()->isRecordingSound())
 		{
-			mpc.getAudioMidiServices().lock()->stopSoundRecorder(true);
+			mpc.getAudioMidiServices()->stopSoundRecorder(true);
 			findBackground()->setName("sample");
 		}
-		else if (mpc.getAudioMidiServices().lock()->getSoundRecorder().lock()->isArmed())
+		else if (mpc.getAudioMidiServices()->getSoundRecorder()->isArmed())
 		{
-			mpc.getAudioMidiServices().lock()->getSoundRecorder().lock()->setArmed(false);
+			mpc.getAudioMidiServices()->getSoundRecorder()->setArmed(false);
 			sampler->deleteSound(sampler->getSoundCount() - 1);
 			findBackground()->setName("sample");
 		}
@@ -103,7 +103,7 @@ void SampleScreen::function(int i)
 
 		mpc.getControls().lock()->setF6Pressed(true);
 
-		auto ams = mpc.getAudioMidiServices().lock();
+		auto ams = mpc.getAudioMidiServices();
 
 		if (ams->isRecordingSound())
 		{
@@ -111,7 +111,7 @@ void SampleScreen::function(int i)
 			return;
 		}
 
-		if (ams->getSoundRecorder().lock()->isArmed())
+		if (ams->getSoundRecorder()->isArmed())
 		{
 			ams->startRecordingSound();
 			findBackground()->setName("recording");
@@ -121,8 +121,8 @@ void SampleScreen::function(int i)
 			auto sound = sampler->addSound();
 			sound.lock()->setName(sampler->addOrIncreaseNumber("sound1"));
 			auto lengthInFrames = time * (44100 * 0.1);
-			ams->getSoundRecorder().lock()->prepare(sound, lengthInFrames);
-			ams->getSoundRecorder().lock()->setArmed(true);
+			ams->getSoundRecorder()->prepare(sound, lengthInFrames);
+			ams->getSoundRecorder()->setArmed(true);
 			findBackground()->setName("waiting-for-input-signal");
 		}
 
@@ -133,7 +133,7 @@ void SampleScreen::function(int i)
 void SampleScreen::turnWheel(int i)
 {
     init();
-	auto ams = mpc.getAudioMidiServices().lock();
+	auto ams = mpc.getAudioMidiServices();
 
 	if (!ams->isRecordingSound())
 	{
@@ -157,7 +157,7 @@ void SampleScreen::turnWheel(int i)
 		{
 			setMonitor(monitor + i);
 			bool muteMonitor = monitor == 0;
-			mpc.getAudioMidiServices().lock()->muteMonitor(muteMonitor);
+			mpc.getAudioMidiServices()->muteMonitor(muteMonitor);
 		}
 		else if (param.compare("prerec") == 0)
 		{

@@ -16,22 +16,22 @@ namespace mpc::audiomidi {
 
 	private:
 		mpc::Mpc& mpc;
-		std::weak_ptr<mpc::sequencer::Sequencer> sequencer;
-		std::weak_ptr<mpc::sampler::Sampler> sampler;
+		std::shared_ptr<mpc::sequencer::Sequencer> sequencer;
+		std::shared_ptr<mpc::sampler::Sampler> sampler;
 		std::map<std::pair<int, int>, int> transposeCache;
 
 	public:
 		void handle(
-                const std::weak_ptr<mpc::sequencer::Event>& event,
+                const std::shared_ptr<mpc::sequencer::Event>& event,
                 mpc::sequencer::Track* track,
                 char drum = -1);
-		void handleNoThru(const std::weak_ptr<mpc::sequencer::Event>& event,
+		void handleNoThru(const std::shared_ptr<mpc::sequencer::Event>& event,
                           mpc::sequencer::Track* track,
                           int timeStamp,
                           char drum = -1);
 
 	private:
-		void midiOut(const std::weak_ptr<mpc::sequencer::Event> &event, mpc::sequencer::Track* track);
+		void midiOut(const std::shared_ptr<mpc::sequencer::Event> &event, mpc::sequencer::Track* track);
 
 	public:
 		EventHandler(mpc::Mpc& mpc);

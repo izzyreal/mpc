@@ -59,7 +59,7 @@ ApsParser::ApsParser(mpc::Mpc& mpc, const std::vector<char>& loadBytes, const st
 
 ApsParser::ApsParser(mpc::Mpc& mpc, std::string apsNameString)
 {
-	auto sampler = mpc.getSampler().lock();
+	auto sampler = mpc.getSampler();
 	std::vector<std::vector<char>> chunks;
 	programCount = sampler->getProgramCount();
 	int const soundCount = sampler->getSoundCount();

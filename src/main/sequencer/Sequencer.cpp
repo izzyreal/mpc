@@ -377,14 +377,14 @@ void Sequencer::trackDown()
 
 bool Sequencer::isPlaying()
 {
-	auto ams = mpc.getAudioMidiServices().lock();
-	auto frameSequencer = ams->getFrameSequencer().lock();
+	auto ams = mpc.getAudioMidiServices();
+	auto frameSequencer = ams->getFrameSequencer();
 	auto server = ams->getAudioServer();
 	
 	if (!server->isRunning() || !frameSequencer)
 		return false;
 
-	return !metronomeOnly && ams->getFrameSequencer().lock()->isRunning();
+	return !metronomeOnly && ams->getFrameSequencer()->isRunning();
 }
 
 void Sequencer::play(bool fromStart)
@@ -472,7 +472,7 @@ void Sequencer::play(bool fromStart)
 
 	}
 
-	auto ams = mpc.getAudioMidiServices().lock();
+	auto ams = mpc.getAudioMidiServices();
 
 	if (ams->isBouncePrepared())
 	{
@@ -481,7 +481,7 @@ void Sequencer::play(bool fromStart)
 	else
 	{
 		int rate = ams->getAudioServer()->getSampleRate();
-		ams->getFrameSequencer().lock()->start(rate);
+		ams->getFrameSequencer()->start(rate);
 	}
 
     notifyObservers(std::string("play"));
@@ -583,7 +583,7 @@ void Sequencer::stop()
 
 void Sequencer::stop(int tick)
 {
-	auto ams = mpc.getAudioMidiServices().lock();
+	auto ams = mpc.getAudioMidiServices();
 	bool bouncing = ams->isBouncing();
 
 	if (!isPlaying() && !bouncing)
@@ -609,8 +609,8 @@ void Sequencer::stop(int tick)
 	if (pos > s1->getLastTick())
 		pos = s1->getLastTick();
 
-	int frameOffset = tick == -1 ? 0 : ams->getFrameSequencer().lock()->getEventFrameOffset();
-	ams->getFrameSequencer().lock()->stop();
+	int frameOffset = tick == -1 ? 0 : ams->getFrameSequencer()->getEventFrameOffset();
+	ams->getFrameSequencer()->stop();
 	
     auto notifynextsq = false;
 	
@@ -638,7 +638,7 @@ void Sequencer::stop(int tick)
     move(pos);
 
 	if (!bouncing)
-		mpc.getSampler().lock()->stopAllVoices(frameOffset);
+		mpc.getSampler()->stopAllVoices(frameOffset);
 
 	for (int i = 0; i < 16; i++)
     {
@@ -1334,7 +1334,7 @@ void Sequencer::move(int tick)
 int Sequencer::getTickPosition()
 {
     if (isPlaying())
-        return mpc.getAudioMidiServices().lock()->getFrameSequencer().lock()->getTickPosition();
+        return mpc.getAudioMidiServices()->getFrameSequencer()->getTickPosition();
  
     return position;
 }
@@ -1530,8 +1530,8 @@ void Sequencer::playMetronomeTrack()
 	metronomeSeq->init(8);
 	metronomeSeq->setTimeSignature(0, 3, s->getNumerator(getCurrentBarIndex()), s->getDenominator(getCurrentBarIndex()));
 	metronomeSeq->setInitialTempo(getTempo());
-	auto lAms = mpc.getAudioMidiServices().lock();
-	auto fs = lAms->getFrameSequencer().lock();
+	auto lAms = mpc.getAudioMidiServices();
+	auto fs = lAms->getFrameSequencer();
 	playStartTick = 0;
 	fs->startMetronome(lAms->getAudioServer()->getSampleRate());
 }
@@ -1542,7 +1542,7 @@ void Sequencer::stopMetronomeTrack()
         return;
 	
     metronomeOnly = false;
-	mpc.getAudioMidiServices().lock()->getFrameSequencer().lock()->stop();
+	mpc.getAudioMidiServices()->getFrameSequencer()->stop();
 }
 
 std::shared_ptr<Sequence> Sequencer::createSeqInPlaceHolder()

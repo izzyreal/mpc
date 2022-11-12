@@ -24,7 +24,7 @@ AllSequencer::AllSequencer(mpc::Mpc& mpc)
 	saveBytes = std::vector<char>(LENGTH);
 	for (int i = 0; i < LENGTH; i++)
 		saveBytes[i] = TEMPLATE[i];
-	auto seq = mpc.getSequencer().lock();
+	auto seq = mpc.getSequencer();
 	saveBytes[SEQ_OFFSET] = seq->getActiveSequenceIndex();
 	saveBytes[TR_OFFSET] = seq->getActiveTrackIndex();
 

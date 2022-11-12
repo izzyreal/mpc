@@ -48,11 +48,11 @@ void saveAndLoadTestAllFile(mpc::Mpc& mpc)
     disk->flush();
     disk->initFiles();
 
-    mpc.getSequencer().lock()->purgeAllSequences();
+    mpc.getSequencer()->purgeAllSequences();
 
     for (int i = 0; i < 20; i++)
     {
-        mpc.getSequencer().lock()->deleteSong(i);
+        mpc.getSequencer()->deleteSong(i);
     }
 
     AllLoader::loadEverythingFromFile(mpc, disk->getFile(filename).get());
@@ -61,8 +61,8 @@ void saveAndLoadTestAllFile(mpc::Mpc& mpc)
 TEST_CASE("ALL file song", "[allfile]")
 {
     mpc::Mpc mpc;
-    mpc.init(44100, 1, 1);
-    auto sequencer = mpc.getSequencer().lock();
+    mpc.init(1, 1);
+    auto sequencer = mpc.getSequencer();
 
     sequencer->getSequence(0)->init(1);
     sequencer->getSequence(1)->init(1);
@@ -98,8 +98,8 @@ TEST_CASE("ALL file song", "[allfile]")
 TEST_CASE("ALL file track is on and used", "[allfile]")
 {
     mpc::Mpc mpc;
-    mpc.init(44100, 1, 1);
-    auto seq = mpc.getSequencer().lock()->getSequence(0);
+    mpc.init(1, 1);
+    auto seq = mpc.getSequencer()->getSequence(0);
     seq->init(1);
     seq->getTrack(60)->setUsed(false);
     seq->getTrack(60)->setOn(true);
@@ -115,8 +115,8 @@ TEST_CASE("ALL file track is on and used", "[allfile]")
 
     saveAndLoadTestAllFile(mpc);
 
-    REQUIRE(mpc.getSequencer().lock()->getUsedSequenceCount() == 1);
-    auto seq1 = mpc.getSequencer().lock()->getActiveSequence();
+    REQUIRE(mpc.getSequencer()->getUsedSequenceCount() == 1);
+    auto seq1 = mpc.getSequencer()->getActiveSequence();
     REQUIRE(!seq1->getTrack(60)->isUsed());
     REQUIRE(seq1->getTrack(60)->isOn());
     REQUIRE(!seq1->getTrack(61)->isUsed());
@@ -130,8 +130,8 @@ TEST_CASE("ALL file track is on and used", "[allfile]")
 TEST_CASE("ALL file note event", "[allfile]")
 {
     mpc::Mpc mpc;
-    mpc.init(44100, 1, 1);
-    auto seq = mpc.getSequencer().lock()->getSequence(0);
+    mpc.init(1, 1);
+    auto seq = mpc.getSequencer()->getSequence(0);
     seq->init(1);
     auto tr = seq->getTrack(63);
     auto event = std::dynamic_pointer_cast<mpc::sequencer::NoteEvent>(tr->addEvent(0, "note"));
@@ -149,8 +149,8 @@ TEST_CASE("ALL file note event", "[allfile]")
 
     saveAndLoadTestAllFile(mpc);
 
-    REQUIRE(mpc.getSequencer().lock()->getUsedSequenceCount() == 1);
-    auto seq1 = mpc.getSequencer().lock()->getActiveSequence();
+    REQUIRE(mpc.getSequencer()->getUsedSequenceCount() == 1);
+    auto seq1 = mpc.getSequencer()->getActiveSequence();
     auto tr1 = seq1->getTrack(63);
     auto event1 = tr1->getEvent(0);
     REQUIRE(event1->getTypeName() == "note");

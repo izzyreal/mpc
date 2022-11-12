@@ -57,7 +57,7 @@ void AllLoader::loadEverythingFromFile(mpc::Mpc& mpc, mpc::disk::MpcFile* f)
 
 void AllLoader::loadEverythingFromAllParser(mpc::Mpc& mpc, AllParser& allParser)
 {
-    auto lSequencer = mpc.getSequencer().lock();
+    auto lSequencer = mpc.getSequencer();
     auto allSequences = allParser.getAllSequences();
     auto allSeqNames = allParser.getSeqNames()->getNames();
     auto defaults = allParser.getDefaults();
@@ -84,7 +84,7 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc& mpc, AllParser& allParser)
 
     int index = 0;
 
-    mpc.getSequencer().lock()->purgeAllSequences();
+    mpc.getSequencer()->purgeAllSequences();
 
     for (auto& as : allSequences)
     {
@@ -94,7 +94,7 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc& mpc, AllParser& allParser)
             continue;
         }
 
-        auto mpcSeq = mpc.getSequencer().lock()->getSequence(index++);
+        auto mpcSeq = mpc.getSequencer()->getSequence(index++);
         as->applyToMpcSeq(mpcSeq);
     }
 

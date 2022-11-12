@@ -327,7 +327,7 @@ void EventRow::setMixerEventValues()
 	
 	fields[0]->setText(mixerParamNames[mixerEvent->getParameter()]);
 
-	auto sampler = mpc.getSampler().lock();
+	auto sampler = mpc.getSampler();
 	
 	if (bus == 0)
 		return;
@@ -389,7 +389,7 @@ void EventRow::setDrumNoteEventValues()
 	{
 		if (bus != 0)
 		{
-			auto sampler = mpc.getSampler().lock();
+			auto sampler = mpc.getSampler();
 			auto program = sampler->getProgram(sampler->getDrumBusProgramIndex(bus)).lock();
             auto padName = sampler->getPadName(program->getPadIndexFromNote(ne->getNote()));
             fields[0]->setText(std::to_string(ne->getNote()) + "/" + padName);

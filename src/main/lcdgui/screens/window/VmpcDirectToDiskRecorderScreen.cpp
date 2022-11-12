@@ -86,7 +86,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 		auto rate = rates[sampleRate];
 
 		if (!offline)
-			rate = mpc.getAudioMidiServices().lock()->getAudioServer()->getSampleRate();
+			rate = mpc.getAudioMidiServices()->getAudioServer()->getSampleRate();
 
 		auto split = false;
 		auto sequence = sequencer->getSequence(seq);
@@ -101,7 +101,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 			auto lengthInFrames = SeqUtil::sequenceFrameLength(sequence.get(), 0, sequence->getLastTick(), rate);
 			auto settings = std::make_unique<DirectToDiskSettings>(lengthInFrames, outputFolder, split, rate);
 			
-			if (!mpc.getAudioMidiServices().lock()->prepareBouncing(settings.get()))
+			if (!mpc.getAudioMidiServices()->prepareBouncing(settings.get()))
 				openScreen("vmpc-file-in-use");
 			else			
 				sequencer->playFromStart();
@@ -116,7 +116,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
             if (loopWasEnabled) sequence->setLoopEnabled(false);
 			sequencer->move(sequence->getLoopStart());
 
-			if (!mpc.getAudioMidiServices().lock()->prepareBouncing(settings.get()))
+			if (!mpc.getAudioMidiServices()->prepareBouncing(settings.get()))
 				openScreen("vmpc-file-in-use");
 			else
 				sequencer->play();
@@ -131,7 +131,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
             if (loopWasEnabled) sequence->setLoopEnabled(false);
 			sequencer->move(time0);
 			
-			if (!mpc.getAudioMidiServices().lock()->prepareBouncing(settings.get()))
+			if (!mpc.getAudioMidiServices()->prepareBouncing(settings.get()))
 				openScreen("vmpc-file-in-use");
 			else
 				sequencer->play();
@@ -155,7 +155,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 			auto songScreen = mpc.screens->get<SongScreen>("song");
 			songScreen->setLoop(false);
 
-			if (!mpc.getAudioMidiServices().lock()->prepareBouncing(settings.get()))
+			if (!mpc.getAudioMidiServices()->prepareBouncing(settings.get()))
 				openScreen("vmpc-file-in-use");
 			else
 				sequencer->playFromStart();

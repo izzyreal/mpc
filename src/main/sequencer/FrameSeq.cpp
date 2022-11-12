@@ -33,7 +33,7 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 
 FrameSeq::FrameSeq(mpc::Mpc& mpc)
-	: mpc(mpc), sequencer(mpc.getSequencer().lock())
+	: mpc(mpc), sequencer(mpc.getSequencer())
 {
 }
 
@@ -345,7 +345,7 @@ void FrameSeq::repeatPad(int duration)
 	if (!controls)
 		return;
 
-  auto program = mpc.getSampler().lock()->getProgram(mpc.getDrum(track->getBus() - 1)->getProgram()).lock();
+  auto program = mpc.getSampler()->getProgram(mpc.getDrum(track->getBus() - 1)->getProgram()).lock();
   auto hardware = mpc.getHardware().lock();
   auto fullLevel = hardware->getTopPanel().lock()->isFullLevelEnabled();
 
@@ -460,7 +460,7 @@ void FrameSeq::triggerClickIfNeeded()
     {
         NoteEvent clickEvent(1);
         clickEvent.setVelocity(relativePos == 0 ? 127 : 64);
-        mpc.getSampler().lock()->playMetronome(&clickEvent, getEventFrameOffset());
+        mpc.getSampler()->playMetronome(&clickEvent, getEventFrameOffset());
         return;
     }
 }

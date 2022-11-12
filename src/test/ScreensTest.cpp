@@ -158,16 +158,16 @@ SCENARIO("All screens can be opened", "[gui]") {
 
 	GIVEN("An initialized Mpc with an initialized Sequence") {
 		mpc::Mpc mpc;
-		mpc.init(44100, 1, 5);
+		mpc.init(1, 5);
         
         
-        auto s = mpc.getSampler().lock()->addSound().lock();
+        auto s = mpc.getSampler()->addSound().lock();
         s->setMono(true);
         s->setName("test");
         for (int i = 0; i < 1000; i ++)
             s->insertFrame(std::vector<float>{0.0}, s->getSampleData()->size());
 		
-        mpc.getSampler().lock()->setSoundIndex(0);
+        mpc.getSampler()->setSoundIndex(0);
 
 		auto ls = mpc.getLayeredScreen();
 

@@ -38,7 +38,7 @@ Track::Track(mpc::Mpc& mpc, mpc::sequencer::Sequence* parent, int i)
 {
 	this->parent = parent;
 
-	sequencer = mpc.getSequencer().lock();
+	sequencer = mpc.getSequencer();
 	trackIndex = i;
 	programChange = 0;
 	velocityRatio = 100;
@@ -128,7 +128,7 @@ void Track::recordNoteOffNow(unsigned char note)
 void Track::setUsed(bool b)
 {
 	if (!used && b && trackIndex < 64)
-		name = mpc.getSequencer().lock()->getDefaultTrackName(trackIndex);
+		name = mpc.getSequencer()->getDefaultTrackName(trackIndex);
 
 	used = b;
 
@@ -558,8 +558,8 @@ void Track::playNext()
             trackIndex < 64 &&
             busNumber > 0)
         {
-            auto pgmIndex = mpc.getSampler().lock()->getDrumBusProgramIndex(busNumber);
-            auto pgm = mpc.getSampler().lock()->getProgram(pgmIndex).lock();
+            auto pgmIndex = mpc.getSampler()->getDrumBusProgramIndex(busNumber);
+            auto pgm = mpc.getSampler()->getProgram(pgmIndex).lock();
 
             bool oneOrMorePadsArePressed = false;
             auto hardware = mpc.getHardware().lock();

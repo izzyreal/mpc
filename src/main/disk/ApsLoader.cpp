@@ -53,14 +53,14 @@ void ApsLoader::load(mpc::Mpc& mpc, std::shared_ptr<MpcFile> file)
     auto withoutSounds = false;
     ApsLoader::loadFromParsedAps(apsParser, mpc, withoutSounds);
     
-    mpc.getSampler().lock()->setSoundIndex(0);
+    mpc.getSampler()->setSoundIndex(0);
     
     mpc.getLayeredScreen()->openScreen("load");
 }
 
 void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool headless, bool withoutSounds)
 {
-    auto sampler = mpc.getSampler().lock();
+    auto sampler = mpc.getSampler();
     auto disk = mpc.getDisk().lock();
         
     const bool initPgms = false;
@@ -248,7 +248,7 @@ void ApsLoader::loadSound(mpc::Mpc& mpc,
                           bool headless)
 {
     auto soundFile = _soundFile.lock();
-    SoundLoader soundLoader(mpc, mpc.getSampler().lock()->getSounds(), replace);
+    SoundLoader soundLoader(mpc, mpc.getSampler()->getSounds(), replace);
     soundLoader.setPartOfProgram(true);
     
     if (!headless)

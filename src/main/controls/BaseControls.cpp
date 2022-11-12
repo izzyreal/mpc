@@ -554,7 +554,7 @@ void BaseControls::stop()
     init();
     
     auto vmpcDirectToDiskRecorderScreen = mpc.screens->get<VmpcDirectToDiskRecorderScreen>("vmpc-direct-to-disk-recorder");
-    auto ams = mpc.getAudioMidiServices().lock();
+    auto ams = mpc.getAudioMidiServices();
     auto controls = mpc.getControls().lock();
     
     if (controls->isNoteRepeatLocked())
@@ -615,7 +615,7 @@ void BaseControls::play()
             sequencer->overdub();
         }
         else {
-            if (controls->isShiftPressed() && !mpc.getAudioMidiServices().lock()->isBouncing())
+            if (controls->isShiftPressed() && !mpc.getAudioMidiServices()->isBouncing())
             {
                 ls->openScreen("vmpc-direct-to-disk-recorder");
             }
@@ -687,7 +687,7 @@ void BaseControls::mainScreen()
 {
     init();
     
-    auto ams = mpc.getAudioMidiServices().lock();
+    auto ams = mpc.getAudioMidiServices();
     
     if (ams->isRecordingSound())
         ams->stopSoundRecorder();

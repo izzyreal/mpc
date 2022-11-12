@@ -44,7 +44,7 @@ void SoundLoader::loadSound(std::shared_ptr<MpcFile> f, SoundLoaderResult& r, bo
     std::string extension = f->getExtension();
     std::string soundName = f->getNameWithoutExtension();
     
-    auto sampler = mpc.getSampler().lock();
+    auto sampler = mpc.getSampler();
     auto existingSoundIndex = sampler->checkExists(soundName);
  
     sound_or_error sound;

@@ -86,7 +86,7 @@ AudioMidiServices::AudioMidiServices(mpc::Mpc& mpc)
     ctoot::synth::SynthChannel::freqTable();
 }
 
-void AudioMidiServices::start(const int sampleRate, const int inputCount, const int outputCount) {
+void AudioMidiServices::start(const int inputCount, const int outputCount) {
 
 	midiSystem = std::make_shared<ctoot::midi::core::DefaultConnectedMidiSystem>();
 
@@ -172,21 +172,12 @@ void AudioMidiServices::muteMonitor(bool mute)
 	mc->setValue(mute);
 }
 
-std::vector<std::weak_ptr<DiskRecorder>> AudioMidiServices::getDiskRecorders()
-{
-	std::vector <std::weak_ptr<DiskRecorder>> res;
-	for (auto& diskRecorder : diskRecorders) {
-		res.push_back(diskRecorder);
-	}
-	return res;
-}
-
-std::weak_ptr<SoundRecorder> AudioMidiServices::getSoundRecorder()
+std::shared_ptr<SoundRecorder> AudioMidiServices::getSoundRecorder()
 {
 	return soundRecorder;
 }
 
-std::weak_ptr<SoundPlayer> AudioMidiServices::getSoundPlayer()
+std::shared_ptr<SoundPlayer> AudioMidiServices::getSoundPlayer()
 {
 	return soundPlayer;
 }
@@ -281,7 +272,7 @@ std::vector<std::string> AudioMidiServices::getOutputNames()
 	return server->getAvailableOutputNames();
 }
 
-std::weak_ptr<ctoot::mpc::MpcMultiMidiSynth> AudioMidiServices::getMms()
+std::shared_ptr<ctoot::mpc::MpcMultiMidiSynth> AudioMidiServices::getMms()
 {
 	return mms;
 }
@@ -298,7 +289,7 @@ void AudioMidiServices::createSynth()
 
 	for (int i = 0; i < 4; i++)
 	{
-		auto m = std::make_shared<ctoot::mpc::MpcSoundPlayerControls>(mms, std::dynamic_pointer_cast<ctoot::mpc::MpcSampler>(mpc.getSampler().lock()), i, mixer, server, mixerSetupScreen.get());
+		auto m = std::make_shared<ctoot::mpc::MpcSoundPlayerControls>(mms, std::dynamic_pointer_cast<ctoot::mpc::MpcSampler>(mpc.getSampler()), i, mixer, server, mixerSetupScreen.get());
 		msc->setChannelControls(i, m);
 		synthChannelControls.push_back(m);
 	}
@@ -311,11 +302,11 @@ void AudioMidiServices::createSynth()
 
 void AudioMidiServices::connectVoices()
 {
-	mpc.getDrums()[0]->connectVoices();
+    mpc.getDrum(0)->connectVoices();
 	mpc.getBasicPlayer()->connectVoice();
 }
 
-std::weak_ptr<MpcMidiPorts> AudioMidiServices::getMidiPorts()
+std::shared_ptr<MpcMidiPorts> AudioMidiServices::getMidiPorts()
 {
 	return mpcMidiPorts;
 }
@@ -407,7 +398,7 @@ bool AudioMidiServices::stopBouncing()
 
     if (directToDiskRecorderScreen->loopWasEnabled)
     {
-        auto seq = mpc.getSequencer().lock()->getSequence(directToDiskRecorderScreen->sq);
+        auto seq = mpc.getSequencer()->getSequence(directToDiskRecorderScreen->sq);
         seq->setLoopEnabled(true);
         directToDiskRecorderScreen->loopWasEnabled = false;
     }
@@ -441,7 +432,7 @@ void AudioMidiServices::stopSoundRecorder(bool cancel)
 	recordingSound.store(false);
 }
 
-std::weak_ptr<mpc::sequencer::FrameSeq> AudioMidiServices::getFrameSequencer()
+std::shared_ptr<mpc::sequencer::FrameSeq> AudioMidiServices::getFrameSequencer()
 {
 	return frameSeq;
 }
@@ -484,7 +475,6 @@ void AudioMidiServices::changeSoundRecorderStateIfRequired()
 // Should be called from the audio thread only!
 void AudioMidiServices::changeBounceStateIfRequired()
 {
-    auto ams = mpc.getAudioMidiServices().lock();
     auto directToDiskRecorderScreen = mpc.screens->get<VmpcDirectToDiskRecorderScreen>("vmpc-direct-to-disk-recorder");
 
     if (isBouncing() && !wasBouncing) {
@@ -495,7 +485,7 @@ void AudioMidiServices::changeBounceStateIfRequired()
         {
             std::vector<int> rates{ 44100, 48000, 88200 };
             auto rate = rates[static_cast<size_t>(directToDiskRecorderScreen->getSampleRate())];
-            ams->getFrameSequencer().lock()->start(rate);
+            getFrameSequencer()->start(rate);
 
             if (getAudioServer()->isRealTime())
             {
@@ -505,11 +495,11 @@ void AudioMidiServices::changeBounceStateIfRequired()
         }
         else if (directToDiskRecorderScreen->getRecord() != 4)
         {
-            ams->getFrameSequencer().lock()->start(static_cast<int>(server->getSampleRate()));
+            getFrameSequencer()->start(static_cast<int>(server->getSampleRate()));
         }
 
-        for (auto& diskRecorder : ams->getDiskRecorders())
-            diskRecorder.lock()->start();
+        for (auto& diskRecorder : diskRecorders)
+            diskRecorder->start();
     }
     else if (!isBouncing() && wasBouncing)
     {

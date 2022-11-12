@@ -43,7 +43,7 @@ SequenceNames::SequenceNames(const std::vector<char>& b)
 SequenceNames::SequenceNames(mpc::Mpc& mpc)
 {
 	saveBytes = std::vector<char>(LENGTH);
-	auto sequencer = mpc.getSequencer().lock();
+	auto sequencer = mpc.getSequencer();
 
 	for (int i = 0; i < 99; i++)
 	{

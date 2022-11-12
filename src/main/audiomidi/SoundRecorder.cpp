@@ -96,7 +96,7 @@ void SoundRecorder::stop()
 
 	if (cancelled)
 	{
-		mpc.getSampler().lock()->deleteSound(sound);
+		mpc.getSampler()->deleteSound(sound);
 		cancelled = false;
 	}
 	else
@@ -185,7 +185,7 @@ int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf, int nFrame
 		{
 			armed = false;
 			mpc.getLayeredScreen()->getCurrentBackground()->setName("recording");
-			mpc.getAudioMidiServices().lock()->startRecordingSound();
+			mpc.getAudioMidiServices()->startRecordingSound();
 		}
 
 		notifyObservers(std::pair<float, float>(peakL, peakR));

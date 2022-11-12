@@ -7,8 +7,8 @@
 TEST_CASE("Delete program", "[program]")
 {
     mpc::Mpc mpc;
-    mpc.init(44100, 1, 5);
-    auto sampler = mpc.getSampler().lock();
+    mpc.init(1, 5);
+    auto sampler = mpc.getSampler();
     sampler->addProgram();
     sampler->addProgram();
     sampler->addProgram();

@@ -55,16 +55,16 @@ void MetronomeSoundScreen::displayOutput()
 
 void MetronomeSoundScreen::displayAccent()
 {
-	auto program = sampler.lock()->getDrumBusProgramIndex(sound);
-    auto note = dynamic_cast<Program*>(sampler.lock()->getProgram(program).lock().get())->getPad(accentPad)->getNote();
-	findField("accent")->setText((note == 34 ? "--" : std::to_string(note)) + "/" + sampler.lock()->getPadName(accentPad));
+	auto program = sampler->getDrumBusProgramIndex(sound);
+    auto note = dynamic_cast<Program*>(sampler->getProgram(program).lock().get())->getPad(accentPad)->getNote();
+	findField("accent")->setText((note == 34 ? "--" : std::to_string(note)) + "/" + sampler->getPadName(accentPad));
 }
 
 void MetronomeSoundScreen::displayNormal()
 {
-    auto program = sampler.lock()->getDrumBusProgramIndex(sound);
-    auto note = dynamic_cast<Program*>(sampler.lock()->getProgram(program).lock().get())->getPad(normalPad)->getNote();
-    findField("normal")->setText((note == 34 ? "--" : std::to_string(note)) + "/" + sampler.lock()->getPadName(normalPad));
+    auto program = sampler->getDrumBusProgramIndex(sound);
+    auto note = dynamic_cast<Program*>(sampler->getProgram(program).lock().get())->getPad(normalPad)->getNote();
+    findField("normal")->setText((note == 34 ? "--" : std::to_string(note)) + "/" + sampler->getPadName(normalPad));
 }
 
 void MetronomeSoundScreen::displayAccentVelo()

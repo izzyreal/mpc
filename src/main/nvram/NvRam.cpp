@@ -78,7 +78,7 @@ void NvRam::saveVmpcSettings(mpc::Mpc& mpc)
   auto vmpcAutoSaveScreen = mpc.screens->get<VmpcAutoSaveScreen>("vmpc-auto-save");
   auto othersScreen = mpc.screens->get<OthersScreen>("others");
   
-  auto audioMidiServices  = mpc.getAudioMidiServices().lock();
+  auto audioMidiServices  = mpc.getAudioMidiServices();
   std::string fileName = mpc::Paths::configPath() + "vmpc-specific.ini";
   
   File file(fileName, nullptr);
@@ -110,7 +110,7 @@ void NvRam::loadVmpcSettings(mpc::Mpc& mpc)
     std::string path = mpc::Paths::configPath() + "vmpc-specific.ini";
   File file(path, nullptr);
   
-  auto audioMidiServices  = mpc.getAudioMidiServices().lock();
+  auto audioMidiServices  = mpc.getAudioMidiServices();
   
   if (!file.exists())
   {

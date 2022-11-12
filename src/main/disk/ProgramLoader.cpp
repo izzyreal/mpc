@@ -115,11 +115,11 @@ std::shared_ptr<mpc::sampler::Program> ProgramLoader::loadProgram(mpc::Mpc& mpc,
             noteParameters->setSoundIndex(finalSoundIndex);
         }
 
-        auto track = mpc.getSequencer().lock()->getActiveTrack();
+        auto track = mpc.getSequencer()->getActiveTrack();
         auto loadAProgramScreen = mpc.screens->get<LoadAProgramScreen>("load-a-program");
 
         if (!loadAProgramScreen->clearProgramWhenLoading)
-            mpc.getDrum(track->getBus() - 1)->setProgram(mpc.getSampler().lock()->getProgramCount() - 1);
+            mpc.getDrum(track->getBus() - 1)->setProgram(mpc.getSampler()->getProgramCount() - 1);
         
 		mpc.getLayeredScreen()->openScreen("load");
 	}
@@ -139,7 +139,7 @@ void ProgramLoader::loadSound(mpc::Mpc& mpc, const std::string& soundFileName, c
  const std::string& ext, std::shared_ptr<MpcFile> soundFile, std::vector<int>* soundsDestIndex,
  const bool replace, const int loadSoundIndex)
 {
-    SoundLoader soundLoader(mpc, mpc.getSampler().lock()->getSounds(), replace);
+    SoundLoader soundLoader(mpc, mpc.getSampler()->getSounds(), replace);
     soundLoader.setPartOfProgram(true);
     showPopup(mpc, soundName, ext, soundFile->length());
     SoundLoaderResult soundLoaderResult;

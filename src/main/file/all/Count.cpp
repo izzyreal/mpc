@@ -32,7 +32,7 @@ Count::Count(mpc::Mpc& mpc)
 	auto countMetronomeScreen = mpc.screens->get<CountMetronomeScreen>("count-metronome");
 	auto metronomeSoundScreen = mpc.screens->get<MetronomeSoundScreen>("metronome-sound");
 
-	auto lSequencer = mpc.getSequencer().lock();
+	auto lSequencer = mpc.getSequencer();
 
 	saveBytes = std::vector<char>(AllParser::COUNT_LENGTH);
 	saveBytes[ENABLED_OFFSET] = static_cast< int8_t >((lSequencer->isCountEnabled() ? 1 : 0));

@@ -346,7 +346,7 @@ file_or_error AbstractDisk::writePgm2(std::shared_ptr<mpc::sampler::Program> p, 
             for (auto& n : p->getNotesParameters())
             {
                 if (n->getSoundIndex() != -1)
-                    sounds.push_back(mpc.getSampler().lock()->getSound(n->getSoundIndex()).lock());
+                    sounds.push_back(mpc.getSampler()->getSound(n->getSoundIndex()).lock());
             }
             
             auto isWav = saveAProgramScreen->save == 2;
@@ -379,7 +379,7 @@ file_or_error AbstractDisk::writeAps2(std::shared_ptr<MpcFile> f)
         
         if (saveAProgramScreen->save != 0)
         {
-            soundSaver = std::make_unique<SoundSaver>(mpc, mpc.getSampler().lock()->getSounds(), saveAProgramScreen->save == 2);
+            soundSaver = std::make_unique<SoundSaver>(mpc, mpc.getSampler()->getSounds(), saveAProgramScreen->save == 2);
         }
         else
         {
@@ -430,7 +430,7 @@ wav_or_error AbstractDisk::readWavMeta(std::shared_ptr<MpcFile> f)
 
 sound_or_error AbstractDisk::readWav2(std::shared_ptr<MpcFile> f, bool shouldBeConverted)
 {
-    auto sampler = mpc.getSampler().lock();
+    auto sampler = mpc.getSampler();
     auto sound = sampler->addSound().lock();
     std::string msg;
 
@@ -528,7 +528,7 @@ sound_or_error AbstractDisk::readWav2(std::shared_ptr<MpcFile> f, bool shouldBeC
 
 sound_or_error AbstractDisk::readSnd2(std::shared_ptr<MpcFile> f)
 {
-    auto sound = mpc.getSampler().lock()->addSound().lock();
+    auto sound = mpc.getSampler()->addSound().lock();
     std::string msg;
     
     try {
@@ -567,7 +567,7 @@ sequence_or_error AbstractDisk::readMid2(std::shared_ptr<MpcFile> f)
     std::string msg;
     
     try {
-        auto newSeq = mpc.getSequencer().lock()->createSeqInPlaceHolder();
+        auto newSeq = mpc.getSequencer()->createSeqInPlaceHolder();
         newSeq->init(2);
         MidiReader midiReader(f->getInputStream(), newSeq);
         midiReader.parseSequence(mpc);
@@ -585,7 +585,7 @@ void AbstractDisk::readPgm2(std::shared_ptr<MpcFile> f)
         try {
             auto loadScreen = mpc.screens->get<LoadScreen>("load");
             auto loadAProgramScreen = mpc.screens->get<LoadAProgramScreen>("load-a-program");
-            auto bus = mpc.getSequencer().lock()->getActiveTrack()->getBus();
+            auto bus = mpc.getSequencer()->getActiveTrack()->getBus();
             
             auto activePgm = bus == 0 ? 0 : mpc.getDrum(bus)->getProgram();
             ProgramLoader::loadProgram(mpc, f, loadAProgramScreen->loadReplaceSound ? activePgm : -1);

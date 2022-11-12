@@ -45,7 +45,7 @@ MidiInput::MidiInput(mpc::Mpc& mpc)
 	saveBytes[SUSTAIN_PEDAL_TO_DURATION_OFFSET] = static_cast<int8_t>(midiInputScreen->isSustainPedalToDurationEnabled() ? 1 : 0);
 	saveBytes[FILTER_ENABLED_OFFSET] = static_cast<int8_t>((midiInputScreen->isMidiFilterEnabled() ? 1 : 0));
 	saveBytes[FILTER_TYPE_OFFSET] = static_cast<int8_t>(midiInputScreen->getType());
-	saveBytes[MULTI_REC_ENABLED_OFFSET] = static_cast<int8_t>(mpc.getSequencer().lock()->isRecordingModeMulti() ? 1 : 0);
+	saveBytes[MULTI_REC_ENABLED_OFFSET] = static_cast<int8_t>(mpc.getSequencer()->isRecordingModeMulti() ? 1 : 0);
 	
 	auto screen = mpc.screens->get<MultiRecordingSetupScreen>("multi-recording-setup");
 

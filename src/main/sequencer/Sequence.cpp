@@ -14,7 +14,7 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::sequencer;
 
 Sequence::Sequence(mpc::Mpc& _mpc)
-	: mpc (_mpc), defaultTrackNames (_mpc.getSequencer().lock()->getDefaultTrackNames())
+	: mpc (_mpc), defaultTrackNames (_mpc.getSequencer()->getDefaultTrackNames())
 {
 	for (int i = 0; i < 64; i++)
 	{
@@ -335,7 +335,7 @@ int Sequence::getLastTick()
 TimeSignature Sequence::getTimeSignature()
 {
 	auto ts = TimeSignature();
-	int bar = mpc.getSequencer().lock()->getCurrentBarIndex();
+	int bar = mpc.getSequencer()->getCurrentBarIndex();
 
 	if (bar > lastBarIndex && bar != 0)
 		bar--;

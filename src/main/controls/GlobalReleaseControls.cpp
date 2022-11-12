@@ -72,7 +72,7 @@ void GlobalReleaseControls::function(int i)
             if (ls->getLastFocus("load") == "file" || ls->getLastFocus("load") == "view")
             {
                 ls->openScreen("load");
-                mpc.getAudioMidiServices().lock()->getSoundPlayer().lock()->enableStopEarly();
+                mpc.getAudioMidiServices()->getSoundPlayer()->enableStopEarly();
             }
 		}
 
@@ -93,7 +93,7 @@ void GlobalReleaseControls::function(int i)
 		else if (ls->getPreviousScreenName() == "directory" && currentScreenName == "popup")
 		{
 			ls->openScreen("directory");
-			mpc.getAudioMidiServices().lock()->getSoundPlayer().lock()->enableStopEarly();
+			mpc.getAudioMidiServices()->getSoundPlayer()->enableStopEarly();
 		}
 		break;
 	}
@@ -121,7 +121,7 @@ void GlobalReleaseControls::simplePad(int padIndexWithBank)
 
 	if (stepRec || maybeRecWithoutPlaying)
 	{
-		auto newDuration = static_cast<int>(mpc.getAudioMidiServices().lock()->getFrameSequencer().lock()->getTickPosition());
+		auto newDuration = static_cast<int>(mpc.getAudioMidiServices()->getFrameSequencer()->getTickPosition());
 
         const auto stepEditOptionsScreen = mpc.screens->get<StepEditOptionsScreen>("step-edit-options");
         const auto increment = stepEditOptionsScreen->isAutoStepIncrementEnabled();

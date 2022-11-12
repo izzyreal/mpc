@@ -21,11 +21,11 @@ void Pot::setValue(int i) {
 
 	if (label == "vol")
 	{
-		mpc.getAudioMidiServices().lock()->setMasterLevel(i);
+		mpc.getAudioMidiServices()->setMasterLevel(i);
 	}
 	else if (label == "rec")
 	{
-		mpc.getAudioMidiServices().lock()->setRecordLevel(i);
+		mpc.getAudioMidiServices()->setRecordLevel(i);
 	}
 
     updateUi();
@@ -34,11 +34,11 @@ void Pot::setValue(int i) {
 int Pot::getValue() {
 	if (label == "vol")
 	{
-		return mpc.getAudioMidiServices().lock()->getMasterLevel();
+		return mpc.getAudioMidiServices()->getMasterLevel();
 	}
 	else if (label == "rec")
 	{
-		return mpc.getAudioMidiServices().lock()->getRecordLevel();
+		return mpc.getAudioMidiServices()->getRecordLevel();
 	}
 	return 0;
 }

@@ -13,8 +13,8 @@ using namespace mpc::lcdgui::screens;
 TEST_CASE("Insert bar and move event forward", "[sequence]")
 {
     mpc::Mpc mpc;
-    mpc.init(44100, 1, 5);
-    auto seq = mpc.getSequencer().lock()->getActiveSequence();
+    mpc.init(1, 5);
+    auto seq = mpc.getSequencer()->getActiveSequence();
     seq->init(0);
     seq->setTimeSignature(0, 4, 4);
     auto tr = seq->getTrack(0);

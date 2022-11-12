@@ -97,7 +97,7 @@ namespace mpc::audiomidi
 		std::shared_ptr<ctoot::synth::SynthRack> synthRack;
 		std::shared_ptr<ctoot::mpc::MpcMultiSynthControls> msc;
 		std::shared_ptr<ctoot::mpc::MpcMixerControls> mixerControls;
-		std::weak_ptr<ctoot::mpc::MpcMultiMidiSynth> mms;
+		std::shared_ptr<ctoot::mpc::MpcMultiMidiSynth> mms;
 		std::shared_ptr<ctoot::audio::server::CompoundAudioClient> cac;
 		std::shared_ptr<MpcMidiPorts> mpcMidiPorts;
 		std::vector<std::shared_ptr<ctoot::audio::server::IOAudioProcess>> inputProcesses;
@@ -119,28 +119,28 @@ namespace mpc::audiomidi
 
 	public:
 		ctoot::audio::server::NonRealTimeAudioServer* getAudioServer();
-		std::vector<std::weak_ptr<DiskRecorder>> getDiskRecorders();
-		std::weak_ptr<SoundRecorder> getSoundRecorder();
-		std::weak_ptr<SoundPlayer> getSoundPlayer();
+
+        std::shared_ptr<SoundRecorder> getSoundRecorder();
+		std::shared_ptr<SoundPlayer> getSoundPlayer();
 		void setMasterLevel(int i);
 		int getMasterLevel();
 		void setRecordLevel(int i);
 		int getRecordLevel();
 		void muteMonitor(bool mute);
-		std::weak_ptr<ctoot::mpc::MpcMultiMidiSynth> getMms();
+		std::shared_ptr<ctoot::mpc::MpcMultiMidiSynth> getMms();
 		void initializeDiskRecorders();
 		void closeIO();
 
 	public:
 		void connectVoices();
-		std::weak_ptr<MpcMidiPorts> getMidiPorts();
+		std::shared_ptr<MpcMidiPorts> getMidiPorts();
 		void destroyServices();
 		bool prepareBouncing(DirectToDiskSettings* settings);
-		std::weak_ptr<mpc::sequencer::FrameSeq> getFrameSequencer();
+		std::shared_ptr<mpc::sequencer::FrameSeq> getFrameSequencer();
 		bool isBouncePrepared();
 
 	public:
-		void start(const int sampleRate, const int inputCount, const int outputCount);
+		void start(const int inputCount, const int outputCount);
 
 	public:
 		AudioMidiServices(mpc::Mpc& mpc);

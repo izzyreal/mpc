@@ -52,7 +52,7 @@ void Pad::setNote(int i)
 	auto pgmAssignScreen = mpc.screens->get<PgmAssignScreen>("program-assign");
 
 	if (pgmAssignScreen->padAssign)
-		(*mpc.getSampler().lock()->getMasterPadAssign())[index] = i;
+		(*mpc.getSampler()->getMasterPadAssign())[index] = i;
 	else
 		note = i;
 }
@@ -62,7 +62,7 @@ int Pad::getNote()
 	auto pgmAssignScreen = mpc.screens->get<PgmAssignScreen>("program-assign");
 
 	if (pgmAssignScreen->padAssign)
-		return (*mpc.getSampler().lock()->getMasterPadAssign())[index];
+		return (*mpc.getSampler()->getMasterPadAssign())[index];
 
 	return note;
 }

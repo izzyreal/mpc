@@ -15,7 +15,7 @@ using namespace mpc::lcdgui::screens;
 
 bool WithTimesAndNotes::checkAllTimes(mpc::Mpc& mpc, int notch, Sequence* seq)
 {
-	auto sequence = seq != nullptr ? seq : mpc.getSequencer().lock()->getActiveSequence().get();
+	auto sequence = seq != nullptr ? seq : mpc.getSequencer()->getActiveSequence().get();
 	auto param = mpc.getLayeredScreen()->getFocus();
 
 	if (param == "time0")
@@ -61,7 +61,7 @@ bool WithTimesAndNotes::checkAllTimesAndNotes(mpc::Mpc& mpc, int notch, Sequence
 
 	if (param == "note0")
 	{
-		auto track = mpc.getSequencer().lock()->getActiveTrack().get();
+		auto track = mpc.getSequencer()->getActiveTrack().get();
 
 		if (_track != nullptr)
 			track = _track;

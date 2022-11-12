@@ -82,22 +82,22 @@ int LayeredScreen::openScreen(std::string screenName)
     if (!screenComponent)
         return -1;
     
-	auto ams = mpc.getAudioMidiServices().lock();
+	auto ams = mpc.getAudioMidiServices();
 
-	if (currentScreenName == "song" && mpc.getSequencer().lock()->isPlaying())
+	if (currentScreenName == "song" && mpc.getSequencer()->isPlaying())
 		return -1;
 
 	if (currentScreenName == "sample")
 	{
 		ams->muteMonitor(true);
-		ams->getSoundRecorder().lock()->setSampleScreenActive(false);
+		ams->getSoundRecorder()->setSampleScreenActive(false);
 	}
 	else if (screenName == "sample")
 	{
 		auto sampleScreen = mpc.screens->get<SampleScreen>("sample");
 		bool muteMonitor = sampleScreen->getMonitor() == 0;
 		ams->muteMonitor(muteMonitor);
-		ams->getSoundRecorder().lock()->setSampleScreenActive(true);
+		ams->getSoundRecorder()->setSampleScreenActive(true);
 	}
 
 	if (currentScreenName == "erase" || currentScreenName == "timing-correct")
@@ -147,8 +147,8 @@ int LayeredScreen::openScreen(std::string screenName)
 
 	auto isNextSeqScreen = find(begin(nextSeqScreens), end(nextSeqScreens), currentScreenName) != end(nextSeqScreens);
 	
-	if (!isNextSeqScreen || (currentScreenName == "sequencer" && !mpc.getSequencer().lock()->isPlaying()))
-		mpc.getSequencer().lock()->setNextSq(-1);
+	if (!isNextSeqScreen || (currentScreenName == "sequencer" && !mpc.getSequencer()->isPlaying()))
+		mpc.getSequencer()->setNextSq(-1);
 
 	return focusedLayerIndex;
 }

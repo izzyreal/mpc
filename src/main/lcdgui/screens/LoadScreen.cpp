@@ -152,7 +152,7 @@ void LoadScreen::function(int i)
 
             if (!isWav && !isSnd) return;
                 
-			bool started = mpc.getAudioMidiServices().lock()->getSoundPlayer().lock()->start(file->getInputStream(), isSnd ? SoundPlayerFileFormat::SND : SoundPlayerFileFormat::WAV);
+			bool started = mpc.getAudioMidiServices()->getSoundPlayer()->start(file->getInputStream(), isSnd ? SoundPlayerFileFormat::SND : SoundPlayerFileFormat::WAV);
             
 			auto name = file->getNameWithoutExtension();
 

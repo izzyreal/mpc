@@ -1373,8 +1373,8 @@ void StepEditorScreen::adhocPlayNoteEvent(const std::shared_ptr<mpc::sequencer::
 
     noteEvent->setTick(tick);
 
-    auto frameSeq = mpc.getAudioMidiServices().lock()->getFrameSequencer().lock();
-    auto sampleRate = mpc.getAudioMidiServices().lock()->getAudioServer()->getSampleRate();
+    auto frameSeq = mpc.getAudioMidiServices()->getFrameSequencer();
+    auto sampleRate = mpc.getAudioMidiServices()->getAudioServer()->getSampleRate();
     auto tempo = sequencer->getTempo();
     auto &events = frameSeq->eventsAfterNFrames;
 

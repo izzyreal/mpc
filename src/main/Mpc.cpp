@@ -79,7 +79,7 @@ Mpc::Mpc()
 	hardware = std::make_shared<hardware::Hardware>(*this);
 }
 
-void Mpc::init(const int sampleRate, const int inputCount, const int outputCount)
+void Mpc::init(const int inputCount, const int outputCount)
 {
 	diskController = std::make_unique<mpc::disk::DiskController>(*this);
 
@@ -103,7 +103,7 @@ void Mpc::init(const int sampleRate, const int inputCount, const int outputCount
     sequencer->init();
 	MLOG("Sequencer initialized");
 
-    audioMidiServices->start(sampleRate, inputCount, outputCount);
+    audioMidiServices->start(inputCount, outputCount);
     MLOG("AudioMidiServices started");
 
     // This needs to happen before the sampler initializes initMasterPadAssign
@@ -142,19 +142,19 @@ std::weak_ptr<hardware::Hardware> Mpc::getHardware()
 	return hardware;
 }
 
-std::weak_ptr<mpc::sequencer::Sequencer> Mpc::getSequencer()
+std::shared_ptr<mpc::sequencer::Sequencer> Mpc::getSequencer()
 {
     return sequencer;
 }
 
-std::weak_ptr<sampler::Sampler> Mpc::getSampler()
+std::shared_ptr<sampler::Sampler> Mpc::getSampler()
 {
     return sampler;
 }
 
 ctoot::mpc::MpcSoundPlayerChannel* Mpc::getDrum(int i)
 {
-	auto mms = audioMidiServices->getMms().lock();
+	auto mms = audioMidiServices->getMms();
 	auto channel = mms->getChannel(i).lock().get();
 	return dynamic_cast< ctoot::mpc::MpcSoundPlayerChannel*>(channel);
 }
@@ -171,12 +171,12 @@ std::vector<ctoot::mpc::MpcSoundPlayerChannel*> Mpc::getDrums()
 
 ctoot::mpc::MpcBasicSoundPlayerChannel* Mpc::getBasicPlayer()
 {
-	auto mms = audioMidiServices->getMms().lock();
+	auto mms = audioMidiServices->getMms();
 	auto channel = mms->getChannel(4).lock().get();
 	return dynamic_cast< ctoot::mpc::MpcBasicSoundPlayerChannel*>(channel);
 }
 
-std::weak_ptr<audiomidi::AudioMidiServices> Mpc::getAudioMidiServices()
+std::shared_ptr<audiomidi::AudioMidiServices> Mpc::getAudioMidiServices()
 {
     return audioMidiServices;
 }
@@ -212,7 +212,7 @@ std::vector<std::string> Mpc::akaiAscii { " ", "!", "#", "$", "%", "&", "'", "("
 
 ctoot::mpc::MpcMultiMidiSynth* Mpc::getMms()
 {
-	return audioMidiServices->getMms().lock().get();
+	return audioMidiServices->getMms().get();
 }
 
 std::weak_ptr<audiomidi::MpcMidiPorts> Mpc::getMidiPorts()

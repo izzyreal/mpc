@@ -75,7 +75,7 @@ namespace mpc {
 
     public:
         std::shared_ptr<mpc::lcdgui::Screens> screens;
-        void init(const int sampleRate, const int inputCount, const int outputCount);
+        void init(const int inputCount, const int outputCount);
         void setBank(int i);
         int getBank();
         void setNote(int note);
@@ -94,11 +94,11 @@ namespace mpc {
         mpc::disk::DiskController* getDiskController();
 
     public:
-        std::weak_ptr<sequencer::Sequencer> getSequencer();
-        std::weak_ptr<sampler::Sampler> getSampler();
+        std::shared_ptr<sequencer::Sequencer> getSequencer();
+        std::shared_ptr<sampler::Sampler> getSampler();
         ctoot::mpc::MpcSoundPlayerChannel* getDrum(int i);
         ctoot::mpc::MpcBasicSoundPlayerChannel* getBasicPlayer();
-        std::weak_ptr<audiomidi::AudioMidiServices> getAudioMidiServices();
+        std::shared_ptr<audiomidi::AudioMidiServices> getAudioMidiServices();
         std::vector<ctoot::mpc::MpcSoundPlayerChannel*> getDrums();
         std::shared_ptr<audiomidi::EventHandler> getEventHandler();
         ctoot::mpc::MpcMultiMidiSynth* getMms();

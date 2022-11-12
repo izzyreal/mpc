@@ -40,7 +40,7 @@ MidiReader::MidiReader(std::shared_ptr<std::istream> istream, std::weak_ptr<Sequ
 
 void MidiReader::parseSequence(mpc::Mpc& mpc)
 {
-	auto lSequencer = mpc.getSequencer().lock();
+	auto lSequencer = mpc.getSequencer();
 	auto midiTracks = midiFile->getTracks();
 	auto lengthInTicks = (int)(midiFile->getLengthInTicks() + midiTracks[0].lock()->getEndOfTrackDelta());
 

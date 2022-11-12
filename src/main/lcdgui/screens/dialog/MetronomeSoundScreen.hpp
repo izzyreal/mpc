@@ -30,7 +30,6 @@ namespace mpc::lcdgui::screens::dialog
 		void update(moduru::observer::Observable* o, nonstd::any msg) override;
 
 	private:
-		std::weak_ptr<mpc::sampler::Sampler> sampler;
 		std::vector<std::string> soundNames = { "CLICK", "DRUM1", "DRUM2", "DRUM3", "DRUM4" };
 
 	private:

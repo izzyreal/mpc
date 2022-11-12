@@ -22,8 +22,8 @@ SCENARIO("A MidiFile can be written", "[file]") {
 	GIVEN("An Mpc with a Sequence") {
 
 		mpc::Mpc mpc;
-		mpc.init(44100, 1, 1);
-		auto sequencer = mpc.getSequencer().lock();
+		mpc.init(1, 1);
+		auto sequencer = mpc.getSequencer();
 		auto sequence = sequencer->getSequence(0);
 		sequence->init(1);
 		auto track = sequence->getTrack(0);

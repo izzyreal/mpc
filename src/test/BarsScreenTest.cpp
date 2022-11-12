@@ -13,8 +13,8 @@ using namespace mpc::lcdgui::screens;
 TEST_CASE("BARS1", "[bars-screen]")
 {
     mpc::Mpc mpc;
-    mpc.init(44100, 1, 5);
-    auto seq = mpc.getSequencer().lock()->getActiveSequence();
+    mpc.init(1, 5);
+    auto seq = mpc.getSequencer()->getActiveSequence();
     seq->init(0);
     seq->setTimeSignature(0, 4, 4);
     auto tr = seq->getTrack(0);
@@ -40,7 +40,7 @@ TEST_CASE("BARS1", "[bars-screen]")
 
     barsScreen->copyBars(toSeqIndex, firstBar, lastBar, copies, afterBar);
 
-    auto toSeq = mpc.getSequencer().lock()->getSequence(toSeqIndex);
+    auto toSeq = mpc.getSequencer()->getSequence(toSeqIndex);
 
     REQUIRE(toSeq->isUsed());
 
@@ -57,8 +57,8 @@ TEST_CASE("BARS1", "[bars-screen]")
 TEST_CASE("BARS2", "[bars-screen]")
 {
     mpc::Mpc mpc;
-    mpc.init(44100, 1, 5);
-    auto seq = mpc.getSequencer().lock()->getActiveSequence();
+    mpc.init(1, 5);
+    auto seq = mpc.getSequencer()->getActiveSequence();
     seq->init(0);
     seq->setTimeSignature(0, 4, 4);
     auto tr = seq->getTrack(0);
@@ -82,7 +82,7 @@ TEST_CASE("BARS2", "[bars-screen]")
     int copies = 1;
     int afterBar = 0;
 
-    auto toSeq = mpc.getSequencer().lock()->getSequence(toSeqIndex);
+    auto toSeq = mpc.getSequencer()->getSequence(toSeqIndex);
 
     toSeq->init(0);
     toSeq->setTimeSignature(0, 4, 4);

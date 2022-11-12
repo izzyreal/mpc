@@ -33,7 +33,7 @@ ApsGlobalParameters::ApsGlobalParameters(mpc::Mpc& mpc)
 	saveBytes = std::vector<char>(ApsParser::PARAMETERS_LENGTH);
 	
 	for (int i = 0; i < saveBytes.size(); i++)
-		if (mpc.getSampler().lock()->getSoundCount() == 0)
+		if (mpc.getSampler()->getSoundCount() == 0)
 			saveBytes[i] = TEMPLATE_NO_SOUNDS[i];
 		else
 			saveBytes[i] = TEMPLATE_SOUNDS[i];
