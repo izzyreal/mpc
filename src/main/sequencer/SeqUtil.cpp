@@ -232,8 +232,6 @@ void SeqUtil::setTimeSignature(Sequence* sequence, int bar, int num, int den)
 	}
 
     sequence->setBarLengths(newBarLengths);
-	
-	sequence->createMidiClockTrack();
 }
 
 int SeqUtil::setBar(int i, Sequence* sequence, int position)

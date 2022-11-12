@@ -64,14 +64,14 @@ void OthersScreen::function(int i)
 void OthersScreen::turnWheel(int i)
 {
 	init();
-	auto controls = mpc.getControls().lock();
+	auto controls = mpc.getControls();
 	
-	if (mpc.getControls().lock()->isAltPressed())
+	if (mpc.getControls()->isAltPressed())
 	{
 		auto increment = i > 0 ? 1 : -1;
 		setContrast(contrast + increment);
 	}
-	else if (param.compare("tapaveraging") == 0)
+	else if (param == "tapaveraging")
 	{
 		setTapAveraging(tapAveraging + i);
 	}

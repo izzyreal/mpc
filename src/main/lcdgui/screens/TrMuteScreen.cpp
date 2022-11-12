@@ -69,7 +69,7 @@ void TrMuteScreen::pad(int padIndexWithBank, int velo)
 {
 	init();
 	
-	auto controls = mpc.getControls().lock();
+	auto controls = mpc.getControls();
 
 	if (controls->isF6Pressed() || sequencer->isSoloEnabled())
 	{
@@ -117,7 +117,7 @@ void TrMuteScreen::function(int i)
 	switch (i)
 	{
 	case 5:
-		auto controls = mpc.getControls().lock();
+		auto controls = mpc.getControls();
 		
 		if (controls->isF6Pressed())
 			return;

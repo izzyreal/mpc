@@ -19,7 +19,7 @@ void VmpcResetKeyboardScreen::function(int i)
             openScreen("vmpc-keyboard");
             break;
         case 4:
-            mpc.getControls().lock()->getKbMapping().lock()->initializeDefaults();
+            mpc.getControls()->getKbMapping().lock()->initializeDefaults();
             openScreen("vmpc-keyboard");
             break;
     }

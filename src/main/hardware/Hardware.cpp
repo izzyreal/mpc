@@ -55,24 +55,24 @@ std::vector<std::string>& Hardware::getButtonLabels()
     return buttonLabels;
 }
 
-std::weak_ptr<TopPanel> Hardware::getTopPanel()
+std::shared_ptr<TopPanel> Hardware::getTopPanel()
 {
     return topPanel;
 }
 
-std::weak_ptr<Pot> Hardware::getRecPot()
+std::shared_ptr<Pot> Hardware::getRecPot()
 {
     return recPot;
 }
 
-std::weak_ptr<Pot> Hardware::getVolPot()
+std::shared_ptr<Pot> Hardware::getVolPot()
 {
     return volPot;
 }
 
-std::weak_ptr<HwPad> Hardware::getPad(int index)
+std::shared_ptr<HwPad> Hardware::getPad(int index)
 {
-    return pads.at(index);
+    return pads[index];
 }
 
 std::vector<std::shared_ptr<HwPad>>& Hardware::getPads()
@@ -80,47 +80,44 @@ std::vector<std::shared_ptr<HwPad>>& Hardware::getPads()
     return pads;
 }
 
-std::weak_ptr<Button> Hardware::getButton(std::string label)
+std::shared_ptr<Button> Hardware::getButton(std::string label)
 {
     for (auto b : buttons)
-        if (b->getLabel().compare(label) == 0) return b;
-    return std::weak_ptr<Button>();
+        if (b->getLabel() == label) return b;
+    return {};
 }
 
-std::weak_ptr<Led> Hardware::getLed(std::string label)
+std::shared_ptr<Led> Hardware::getLed(std::string label)
 {
-    for (auto l : leds)
+    for (auto& l : leds)
     {
-        if (l->getLabel().compare(label) == 0)
+        if (l->getLabel() == label)
             return l;
     }
-    return std::weak_ptr<Led>();
+    return {};
 }
 
 std::vector<std::shared_ptr<Led>> Hardware::getLeds() {
     return leds;
 }
 
-std::weak_ptr<DataWheel> Hardware::getDataWheel() {
+std::shared_ptr<DataWheel> Hardware::getDataWheel() {
     return dataWheel;
 }
 
-std::weak_ptr<Slider> Hardware::getSlider() {
+std::shared_ptr<Slider> Hardware::getSlider() {
     return slider;
 }
 
-std::weak_ptr<HwComponent> Hardware::getComponentByLabel(const std::string& label)
+std::shared_ptr<HwComponent> Hardware::getComponentByLabel(const std::string& label)
 {
-    std::weak_ptr<HwComponent> result;
-    
     for (auto& c : components)
     {
-        if (c.lock()->getLabel().compare(label) == 0)
+        if (c->getLabel() == label)
         {
-            result = c;
-            break;
+            return c;
         }
     }
     
-    return result;
+    return {};
 }

@@ -24,7 +24,7 @@ namespace mpc::disk
 	public:
         std::vector<std::shared_ptr<AbstractDisk>>& getDisks();
 		DiskController(mpc::Mpc&);
-		std::weak_ptr<AbstractDisk> getActiveDisk();
+		std::shared_ptr<AbstractDisk> getActiveDisk();
         int getActiveDiskIndex();
         void setActiveDiskIndex(int newActiveDiskIndex);
 

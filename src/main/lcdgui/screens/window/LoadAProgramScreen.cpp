@@ -40,7 +40,7 @@ void LoadAProgramScreen::function(int i)
 		clearProgramWhenLoading = true;
 		auto oldLoadReplaceSound = loadReplaceSound;
 		loadReplaceSound = true;
-        mpc.getDisk().lock()->readPgm2(selectedFile);
+        mpc.getDisk()->readPgm2(selectedFile);
 		loadReplaceSound = oldLoadReplaceSound;
 		break;
 	}
@@ -49,7 +49,7 @@ void LoadAProgramScreen::function(int i)
 		break;
 	case 4:
 		clearProgramWhenLoading = false;
-        mpc.getDisk().lock()->readPgm2(selectedFile);
+        mpc.getDisk()->readPgm2(selectedFile);
 		break;
 	}
 }

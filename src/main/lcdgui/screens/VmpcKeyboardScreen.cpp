@@ -40,7 +40,7 @@ VmpcKeyboardScreen::VmpcKeyboardScreen(mpc::Mpc& mpc, int layerIndex)
 void VmpcKeyboardScreen::turnWheel(int i)
 {
     init();
-    auto kbMapping = mpc.getControls().lock()->getKbMapping().lock();
+    auto kbMapping = mpc.getControls()->getKbMapping().lock();
     auto label = kbMapping->getLabelKeyMap()[row + rowOffset].first;
     auto oldKeyCode = kbMapping->getKeyCodeFromLabel(label);
     auto newKeyCode = i > 0 ? KbMapping::getNextKeyCode(oldKeyCode) : KbMapping::getPreviousKeyCode(oldKeyCode);
@@ -52,8 +52,8 @@ void VmpcKeyboardScreen::turnWheel(int i)
 void VmpcKeyboardScreen::open()
 {
     auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>("vmpc-discard-mapping-changes");
-    screen->saveAndLeave = [this](){this->mpc.getControls().lock()->getKbMapping().lock()->exportMapping();};
-    screen->discardAndLeave = [this](){this->mpc.getControls().lock()->getKbMapping().lock()->importMapping();};
+    screen->saveAndLeave = [this](){this->mpc.getControls()->getKbMapping().lock()->exportMapping();};
+    screen->discardAndLeave = [this](){this->mpc.getControls()->getKbMapping().lock()->importMapping();};
     screen->stayScreen = "vmpc-keyboard";
 
     findChild<Label>("up")->setText("\u00C7");
@@ -88,7 +88,7 @@ void VmpcKeyboardScreen::down()
     if (learning)
         return;
 
-    auto kbMapping = mpc.getControls().lock()->getKbMapping().lock();
+    auto kbMapping = mpc.getControls()->getKbMapping().lock();
 
     if (row == 4)
     {
@@ -115,7 +115,7 @@ void VmpcKeyboardScreen::setLearning(bool b)
 bool VmpcKeyboardScreen::hasMappingChanged()
 {
     auto persisted = KbMapping();
-    auto inMem = mpc.getControls().lock()->getKbMapping().lock();
+    auto inMem = mpc.getControls()->getKbMapping().lock();
 
     for (auto& mapping : inMem->getLabelKeyMap())
     {
@@ -172,7 +172,7 @@ void VmpcKeyboardScreen::function(int i)
         case 3:
             if (learning)
             {
-                auto kbMapping = mpc.getControls().lock()->getKbMapping().lock();
+                auto kbMapping = mpc.getControls()->getKbMapping().lock();
                 auto mapping = kbMapping->getLabelKeyMap()[row + rowOffset];
                 auto oldKeyCode = mapping.second;
                 
@@ -202,7 +202,7 @@ void VmpcKeyboardScreen::function(int i)
 
             if (hasMappingChanged())
             {
-                mpc.getControls().lock()->getKbMapping().lock()->exportMapping();
+                mpc.getControls()->getKbMapping().lock()->exportMapping();
                 popupScreen->setText("Keyboard mapping saved");
             }
             else
@@ -240,7 +240,7 @@ bool VmpcKeyboardScreen::isLearning()
 
 void VmpcKeyboardScreen::updateRows()
 {
-    auto kbMapping = mpc.getControls().lock()->getKbMapping().lock();
+    auto kbMapping = mpc.getControls()->getKbMapping().lock();
     auto& labelKeyMap = kbMapping->getLabelKeyMap();
 
     for (int i = 0; i < 5; i++)
@@ -277,7 +277,7 @@ void VmpcKeyboardScreen::updateRows()
 
 void VmpcKeyboardScreen::displayUpAndDown()
 {
-    auto labelKeyMapSize = mpc.getControls().lock()->getKbMapping().lock()->getLabelKeyMap().size();
+    auto labelKeyMapSize = mpc.getControls()->getKbMapping().lock()->getLabelKeyMap().size();
     findChild<Label>("up")->Hide(rowOffset == 0);
     findChild<Label>("down")->Hide(rowOffset + 5 >= labelKeyMapSize);
 }

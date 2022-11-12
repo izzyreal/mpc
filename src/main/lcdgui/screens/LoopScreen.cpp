@@ -23,7 +23,7 @@ LoopScreen::LoopScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void LoopScreen::open()
 {
-    mpc.getControls().lock()->getControls()->typableParams = { "to", "endlengthvalue" };
+    mpc.getControls()->getControls()->typableParams = { "to", "endlengthvalue" };
 
     findField("loop")->setAlignment(Alignment::Centered);
 	bool sound = sampler->getSound().lock() ? true : false;
@@ -103,10 +103,10 @@ void LoopScreen::function(int f)
 		break;
 	}
 	case 5:
-		if (mpc.getControls().lock()->isF6Pressed())
+		if (mpc.getControls()->isF6Pressed())
 			return;
 
-		mpc.getControls().lock()->setF6Pressed(true);
+		mpc.getControls()->setF6Pressed(true);
 		sampler->playX();
 		break;
 	}
@@ -246,7 +246,7 @@ void LoopScreen::turnWheel(int i)
 
 void LoopScreen::setSlider(int i)
 {
-	if (!mpc.getControls().lock()->isShiftPressed())
+	if (!mpc.getControls()->isShiftPressed())
 		return;
 
 	init();
@@ -308,7 +308,7 @@ void LoopScreen::right()
 
 void LoopScreen::pressEnter()
 {
-	if (mpc.getControls().lock()->isShiftPressed())
+	if (mpc.getControls()->isShiftPressed())
 	{
 		openScreen("save");
 		return;

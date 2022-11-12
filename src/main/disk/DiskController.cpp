@@ -63,15 +63,15 @@ void DiskController::initDisks()
         }
     }
     
-    auto activeDisk = getActiveDisk().lock();
+    auto activeDisk = getActiveDisk();
 
     MLOG("Active disk is set to the one with absolute path: " + activeDisk->getAbsolutePath());
 
-    if (std::dynamic_pointer_cast<RawDisk>(getActiveDisk().lock()))
+    if (std::dynamic_pointer_cast<RawDisk>(activeDisk))
     {
-        getActiveDisk().lock()->initRoot();
+        activeDisk->initRoot();
 
-        if (!getActiveDisk().lock()->getVolume().volumeStream.is_open())
+        if (!activeDisk->getVolume().volumeStream.is_open())
         {
             activeDiskIndex = 0;
         }
@@ -82,7 +82,7 @@ void DiskController::initDisks()
     }
 }
 
-std::weak_ptr<AbstractDisk> DiskController::getActiveDisk()
+std::shared_ptr<AbstractDisk> DiskController::getActiveDisk()
 {
     if (disks.size() == 0)
     {

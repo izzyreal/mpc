@@ -23,7 +23,7 @@ void Mpc2000XlAllFileScreen::function(int i)
 	{
 	case 2:
 	{
-        auto result = mpc.getDisk().lock()->readSequencesFromAll2(loadScreen->getSelectedFile());
+        auto result = mpc.getDisk()->readSequencesFromAll2(loadScreen->getSelectedFile());
         
         if (result.has_value())
         {
@@ -40,7 +40,7 @@ void Mpc2000XlAllFileScreen::function(int i)
 	case 4:
 	{
         auto on_success = [&](){openScreen("load");};
-        mpc.getDisk().lock()->readAll2(loadScreen->getSelectedFile(), on_success);
+        mpc.getDisk()->readAll2(loadScreen->getSelectedFile(), on_success);
 		break;
 	}
 	}

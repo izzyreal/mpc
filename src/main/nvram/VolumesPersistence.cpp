@@ -87,7 +87,7 @@ void VolumesPersistence::save(mpc::Mpc & mpc)
         alreadyPersistedUUIDs.emplace_back(std::string(uuid));
     }
     
-    auto activeUUID = mpc.getDisk().lock()->getVolume().volumeUUID;
+    auto activeUUID = mpc.getDisk()->getVolume().volumeUUID;
     
     auto disks = mpc.getDisks();
         

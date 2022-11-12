@@ -16,7 +16,7 @@ void LoadASequenceScreen::open()
 {
 	auto loadScreen = mpc.screens->get<LoadScreen>("load");
     auto midFile = loadScreen->getSelectedFile();
-    sequence_or_error parsedMidFile = mpc.getDisk().lock()->readMid2(midFile);
+    sequence_or_error parsedMidFile = mpc.getDisk()->readMid2(midFile);
     
     if (parsedMidFile.has_value())
     {

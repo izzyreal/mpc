@@ -34,7 +34,7 @@ void DeleteFolderScreen::deleteFolder()
 	auto fileName = file->getName();
 	popupScreen->setText("Delete:" + fileName);
 
-    auto disk = mpc.getDisk().lock();
+    auto disk = mpc.getDisk();
 	auto parentFileNames = disk->getParentFileNames();
 
 	if (disk->deleteRecursive(file))

@@ -83,7 +83,7 @@ void EventHandler::handleNoThru(const std::shared_ptr<Event>& event, Track* trac
     }
     else if (mce)
     {
-        auto mpcMidiPorts = mpc.getMidiPorts().lock();
+        auto mpcMidiPorts = mpc.getMidiPorts();
         auto clockMsg = dynamic_cast<ctoot::midi::core::ShortMessage*>(mce->getShortMessage());
         clockMsg->setMessage(mce->getStatus());
         
@@ -156,7 +156,7 @@ void EventHandler::handleNoThru(const std::shared_ptr<Event>& event, Track* trac
                             if (notifyVelo == 0)
                                 notifyVelo = 255;
                             
-                            mpc.getHardware().lock()->getPad(pad).lock()->notifyObservers(notifyVelo);
+                            mpc.getHardware()->getPad(pad)->notifyObservers(notifyVelo);
                         }
                     }
                 }
@@ -242,7 +242,7 @@ void EventHandler::midiOut(const std::shared_ptr<Event>& e, Track* track)
         midiAdapter.process(noteEvent, channel, -1);
         ctoot::midi::core::ShortMessage& msg = *midiAdapter.get().lock();
         
-        auto mpcMidiPorts = mpc.getMidiPorts().lock();
+        auto mpcMidiPorts = mpc.getMidiPorts();
         
         std::vector<ctoot::midi::core::ShortMessage>& r = mpcMidiPorts->getReceivers()[0];
         

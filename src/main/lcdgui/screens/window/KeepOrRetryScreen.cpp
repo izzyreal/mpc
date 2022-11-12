@@ -43,7 +43,7 @@ void KeepOrRetryScreen::function(int i)
             openScreen("sample");
             break;
         case 3 :
-            if (mpc.getControls().lock()->isF4Pressed())
+            if (mpc.getControls()->isF4Pressed())
             {
                 return;
             }

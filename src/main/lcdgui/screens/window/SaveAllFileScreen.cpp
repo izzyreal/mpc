@@ -63,7 +63,7 @@ void SaveAllFileScreen::function(int i)
 	case 4:
 	{
 		auto allFileName = fileName + ".ALL";
-		auto disk = mpc.getDisk().lock();
+		auto disk = mpc.getDisk();
 
 		if (disk->checkExists(allFileName))
 		{

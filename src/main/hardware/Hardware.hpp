@@ -28,7 +28,7 @@ class Hardware final
     
 private:
     std::vector<std::string> buttonLabels;
-    std::vector<std::weak_ptr<HwComponent>> components;
+    std::vector<std::shared_ptr<HwComponent>> components;
     
     std::shared_ptr<TopPanel> topPanel;
     std::vector<std::shared_ptr<HwPad>> pads;
@@ -41,19 +41,19 @@ private:
     std::shared_ptr<Pot> volPot;
     
 public:
-    std::weak_ptr<TopPanel> getTopPanel();
+    std::shared_ptr<TopPanel> getTopPanel();
     std::vector<std::string>& getButtonLabels();
-    std::weak_ptr<HwPad> getPad(int index);
+    std::shared_ptr<HwPad> getPad(int index);
     std::vector<std::shared_ptr<HwPad>>& getPads();
-    std::weak_ptr<Button> getButton(std::string label);
-    std::weak_ptr<Led> getLed(std::string label);
+    std::shared_ptr<Button> getButton(std::string label);
+    std::shared_ptr<Led> getLed(std::string label);
     std::vector<std::shared_ptr<Led>> getLeds();
-    std::weak_ptr<DataWheel> getDataWheel();
-    std::weak_ptr<Pot> getRecPot();
-    std::weak_ptr<Pot> getVolPot();
-    std::weak_ptr<Slider> getSlider();
+    std::shared_ptr<DataWheel> getDataWheel();
+    std::shared_ptr<Pot> getRecPot();
+    std::shared_ptr<Pot> getVolPot();
+    std::shared_ptr<Slider> getSlider();
 
-    std::weak_ptr<HwComponent> getComponentByLabel(const std::string& label);
+    std::shared_ptr<HwComponent> getComponentByLabel(const std::string& label);
     
     Hardware(mpc::Mpc& mpc);
     

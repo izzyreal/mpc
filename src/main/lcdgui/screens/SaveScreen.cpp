@@ -70,7 +70,7 @@ void SaveScreen::function(int i)
     switch (i)
     {
         case 0:
-            mpc.getDisk().lock()->initFiles();
+            mpc.getDisk()->initFiles();
             openScreen("load");
             break;
         case 2:
@@ -99,7 +99,7 @@ void SaveScreen::function(int i)
                 auto oldIndex = mpc.getDiskController()->getActiveDiskIndex();
 
                 mpc.getDiskController()->setActiveDiskIndex(device);
-                auto newDisk = mpc.getDisk().lock();
+                auto newDisk = mpc.getDisk();
 
                 if (newDisk->getVolume().type== mpc::disk::VolumeType::USB_VOLUME) {
 
@@ -182,7 +182,7 @@ void SaveScreen::turnWheel(int i)
     }
     else if (param == "directory")
     {
-        auto disk = mpc.getDisk().lock();
+        auto disk = mpc.getDisk();
         auto currentDir = disk->getDirectoryName();
         auto parents = disk->getParentFileNames();
 
@@ -346,7 +346,7 @@ void SaveScreen::displayFree()
 
 void SaveScreen::displayDirectory()
 {
-    findField("directory")->setText(mpc.getDisk().lock()->getDirectoryName());
+    findField("directory")->setText(mpc.getDisk()->getDirectoryName());
 }
 
 void SaveScreen::displayDevice()

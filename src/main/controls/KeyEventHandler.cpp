@@ -31,7 +31,7 @@ void KeyEventHandler::handle(const KeyEvent &keyEvent)
     //MLOG("KeyEventHandler::handle keyEvent.rawKeyCode " + std::to_string(keyEvent.rawKeyCode) + std::string(keyEvent.keyDown ? " down" : " up"));
 
     auto screen = mpc.screens->get<VmpcKeyboardScreen>("vmpc-keyboard");
-    auto kbMapping = mpc.getControls().lock()->getKbMapping().lock();
+    auto kbMapping = mpc.getControls()->getKbMapping().lock();
 
     auto it = find(begin(pressed), end(pressed), keyEvent.rawKeyCode);
 
@@ -168,7 +168,7 @@ void KeyEventHandler::handle(const KeyEvent &keyEvent)
 
     //MLOG("Label associated with key code: " + label);
 
-    auto hardwareComponent = mpc.getHardware().lock()->getComponentByLabel(label).lock();
+    auto hardwareComponent = mpc.getHardware()->getComponentByLabel(label);
 
     if (hardwareComponent)
     {
@@ -192,9 +192,9 @@ void KeyEventHandler::handle(const KeyEvent &keyEvent)
     {
         // We have some key codes that map to themselves, not to a hardware component.
         if (label == "ctrl")
-            mpc.getControls().lock()->setCtrlPressed(keyEvent.keyDown);
+            mpc.getControls()->setCtrlPressed(keyEvent.keyDown);
         else if (label == "alt")
-            mpc.getControls().lock()->setAltPressed(keyEvent.keyDown);
+            mpc.getControls()->setAltPressed(keyEvent.keyDown);
 
             // And we have some things that are not buttons. Probably pads should be handled here
             // as well, so we can do some velocity calculation based on the current state of Mpc.
@@ -202,19 +202,19 @@ void KeyEventHandler::handle(const KeyEvent &keyEvent)
         {
             int increment = 1;
 
-            if (mpc.getControls().lock()->isCtrlPressed())
+            if (mpc.getControls()->isCtrlPressed())
                 increment *= 10;
 
-            if (mpc.getControls().lock()->isAltPressed())
+            if (mpc.getControls()->isAltPressed())
                 increment *= 10;
 
-            if (mpc.getControls().lock()->isShiftPressed())
+            if (mpc.getControls()->isShiftPressed())
                 increment *= 10;
 
             if (label.find("down") != std::string::npos)
                 increment = -increment;
 
-            mpc.getHardware().lock()->getDataWheel().lock()->turn(increment);
+            mpc.getHardware()->getDataWheel()->turn(increment);
         }
     }
 }

@@ -64,7 +64,7 @@ void LoadScreen::function(int i)
 {
 	init();
 	
-	auto disk = mpc.getDisk().lock();
+	auto disk = mpc.getDisk();
 
 	switch (i)
 	{
@@ -98,7 +98,7 @@ void LoadScreen::function(int i)
 			auto oldIndex = mpc.getDiskController()->activeDiskIndex;
 
             mpc.getDiskController()->activeDiskIndex = device;
-            auto newDisk = mpc.getDisk().lock();
+            auto newDisk = mpc.getDisk();
 
             fileLoad = 0;
             
@@ -131,7 +131,7 @@ void LoadScreen::function(int i)
             return;
         }
         
-		auto controls = mpc.getControls().lock();
+		auto controls = mpc.getControls();
 
 		if (controls->isF5Pressed())
 		{
@@ -209,7 +209,7 @@ void LoadScreen::function(int i)
 		{
 			if (disk->moveForward(getSelectedFile()->getName()))
 			{
-				mpc.getDisk().lock()->initFiles();
+				mpc.getDisk()->initFiles();
 
 				fileLoad = 0;
 
@@ -231,7 +231,7 @@ void LoadScreen::function(int i)
 void LoadScreen::openWindow()
 {
 	init();
-	auto disk = mpc.getDisk().lock();
+	auto disk = mpc.getDisk();
 
 	if (!disk)
 		return;
@@ -257,7 +257,7 @@ void LoadScreen::turnWheel(int i)
 	}
 	else if (param == "directory")
 	{
-		auto disk = mpc.getDisk().lock();
+		auto disk = mpc.getDisk();
 		auto currentDir = disk->getDirectoryName();
 		auto parents = disk->getParentFileNames();
 	
@@ -318,7 +318,7 @@ void LoadScreen::displayView()
 
 void LoadScreen::displayDirectory()
 {
-	findField("directory")->setText(mpc.getDisk().lock()->getDirectoryName());
+	findField("directory")->setText(mpc.getDisk()->getDirectoryName());
 }
 
 void LoadScreen::displayFreeSnd()
@@ -328,7 +328,7 @@ void LoadScreen::displayFreeSnd()
 
 void LoadScreen::displayFile()
 {
-	if (mpc.getDisk().lock()->getFileNames().size() == 0)
+	if (mpc.getDisk()->getFileNames().size() == 0)
 	{
 		findField("file")->setText("");
 		return;
@@ -358,7 +358,7 @@ void LoadScreen::displayFile()
 
 int LoadScreen::getFileSize()
 {
-	auto disk = mpc.getDisk().lock();
+	auto disk = mpc.getDisk();
 	
 	if (!disk->getFile(fileLoad) || disk->getFile(fileLoad)->isDirectory())
 		return 0;
@@ -368,7 +368,7 @@ int LoadScreen::getFileSize()
 
 void LoadScreen::displaySize()
 {
-	if (mpc.getDisk().lock()->getFileNames().size() == 0)
+	if (mpc.getDisk()->getFileNames().size() == 0)
 	{
 		findLabel("size")->setText("      K");
 		return;
@@ -384,7 +384,7 @@ void LoadScreen::setView(int i)
 	
 	view = i;
 	
-	mpc.getDisk().lock()->initFiles();
+	mpc.getDisk()->initFiles();
 	
 	fileLoad = 0;
 
@@ -397,12 +397,12 @@ void LoadScreen::setView(int i)
 
 std::shared_ptr<MpcFile> LoadScreen::getSelectedFile()
 {
-	return mpc.getDisk().lock()->getFile(fileLoad);
+	return mpc.getDisk()->getFile(fileLoad);
 }
 
 std::string LoadScreen::getSelectedFileName()
 {
-	auto fileNames = mpc.getDisk().lock()->getFileNames();
+	auto fileNames = mpc.getDisk()->getFileNames();
 	
 	if (fileNames.size() <= fileLoad)
 		return "";
@@ -412,12 +412,12 @@ std::string LoadScreen::getSelectedFileName()
 
 bool LoadScreen::isSelectedFileDirectory()
 {
-	return mpc.getDisk().lock()->getFile(fileLoad)->isDirectory();
+	return mpc.getDisk()->getFile(fileLoad)->isDirectory();
 }
 
 void LoadScreen::setFileLoadWithMaxCheck(int i)
 {
-	if (i >= mpc.getDisk().lock()->getFileNames().size())
+	if (i >= mpc.getDisk()->getFileNames().size())
 		return;
 
 	setFileLoad(i);

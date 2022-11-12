@@ -49,7 +49,7 @@ void SaveAProgramScreen::function(int i)
 	case 4:
 	{
 		auto fileName = mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) + ".PGM";
-		auto disk = mpc.getDisk().lock();
+		auto disk = mpc.getDisk();
 
 		if (disk->checkExists(fileName))
 		{

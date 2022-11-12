@@ -87,10 +87,10 @@ namespace mpc {
 
     public:
         std::shared_ptr<lcdgui::LayeredScreen> getLayeredScreen();
-        std::weak_ptr<controls::Controls> getControls();
+        std::shared_ptr<controls::Controls> getControls();
         std::shared_ptr<mpc::lcdgui::ScreenComponent> getActiveControls();
         std::shared_ptr<mpc::controls::GlobalReleaseControls> getReleaseControls();
-        std::weak_ptr<hardware::Hardware> getHardware();
+        std::shared_ptr<hardware::Hardware> getHardware();
         mpc::disk::DiskController* getDiskController();
 
     public:
@@ -102,11 +102,11 @@ namespace mpc {
         std::vector<ctoot::mpc::MpcSoundPlayerChannel*> getDrums();
         std::shared_ptr<audiomidi::EventHandler> getEventHandler();
         ctoot::mpc::MpcMultiMidiSynth* getMms();
-        std::weak_ptr<mpc::audiomidi::MpcMidiPorts> getMidiPorts();
+        std::shared_ptr<mpc::audiomidi::MpcMidiPorts> getMidiPorts();
         mpc::audiomidi::MpcMidiInput* getMpcMidiInput(int i);
 
     public:
-        std::weak_ptr<mpc::disk::AbstractDisk> getDisk();
+        std::shared_ptr<mpc::disk::AbstractDisk> getDisk();
         std::vector<std::shared_ptr<mpc::disk::AbstractDisk>> getDisks();
 
         Mpc();

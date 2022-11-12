@@ -91,7 +91,7 @@ void SequencerScreen::open()
 
 	auto punchScreen = mpc.screens->get<PunchScreen>("punch");
 
-	findChild("function-keys")->Hide(punchScreen->on || (mpc.getControls().lock()->isErasePressed() && sequencer->isRecordingOrOverdubbing()));
+	findChild("function-keys")->Hide(punchScreen->on || (mpc.getControls()->isErasePressed() && sequencer->isRecordingOrOverdubbing()));
 
 	if (sequencer->isSecondSequenceEnabled())
 		findBackground()->setName("sequencer-2nd");
@@ -104,7 +104,7 @@ void SequencerScreen::open()
 		ls->setFocus("nextsq");
     
     
-    const auto footerIsInvisible = !mpc.getControls().lock()->isNoteRepeatLocked() && !(mpc.getControls().lock()->isErasePressed() && sequencer->isRecordingOrOverdubbing());
+    const auto footerIsInvisible = !mpc.getControls()->isNoteRepeatLocked() && !(mpc.getControls()->isErasePressed() && sequencer->isRecordingOrOverdubbing());
     
     findChild("footer-label")->Hide(footerIsInvisible);
     findChild("function-keys")->Hide(!footerIsInvisible);
@@ -122,9 +122,9 @@ void SequencerScreen::tap()
 {
     if (sequencer->isPlaying())
     {
-        if (mpc.getControls().lock()->isNoteRepeatLocked())
+        if (mpc.getControls()->isNoteRepeatLocked())
         {
-            mpc.getControls().lock()->setNoteRepeatLocked(false);
+            mpc.getControls()->setNoteRepeatLocked(false);
             findChild("function-keys")->Hide(false);
             findChild("footer-label")->Hide(true);
         }
@@ -141,9 +141,9 @@ void SequencerScreen::tap()
 
 void SequencerScreen::shift()
 {
-    if (mpc.getControls().lock()->isTapPressed())
+    if (mpc.getControls()->isTapPressed())
     {
-        mpc.getControls().lock()->setNoteRepeatLocked(true);
+        mpc.getControls()->setNoteRepeatLocked(true);
     }
     ScreenComponent::shift();
 }
@@ -842,7 +842,7 @@ void SequencerScreen::setPunchRectOn(int i, bool b)
 void SequencerScreen::displayPunchWhileRecording()
 {
 	auto punchScreen = mpc.screens->get<PunchScreen>("punch");
-	auto controls = mpc.getControls().lock();
+	auto controls = mpc.getControls();
 
 	if (punchScreen->on && (controls->isRecPressed() || controls->isOverDubPressed()))
 	{
@@ -893,7 +893,7 @@ void SequencerScreen::displayNextSq()
 
 void SequencerScreen::play()
 {
-    if (mpc.getControls().lock()->isPlayPressed())
+    if (mpc.getControls()->isPlayPressed())
     {
         return;
     }
@@ -932,7 +932,7 @@ void SequencerScreen::stop()
 
 	}
 
-    if (mpc.getControls().lock()->isNoteRepeatLocked())
+    if (mpc.getControls()->isNoteRepeatLocked())
     {
         releaseTap();
     }

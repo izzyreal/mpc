@@ -23,12 +23,9 @@ Sequence::Sequence(mpc::Mpc& _mpc)
 	}
 
 	metaTracks.push_back(std::make_shared<Track>(mpc, this, 64));
-	metaTracks.push_back(std::make_shared<Track>(mpc, this, 65));
 
 	metaTracks[0]->setUsed(true);
-	metaTracks[1]->setUsed(true);
-	metaTracks[0]->setName("midiclock");
-	metaTracks[1]->setName("tempo");
+	metaTracks[0]->setName("tempo");
 
 	auto userScreen = mpc.screens->get<UserScreen>("user");
 
@@ -139,25 +136,12 @@ std::vector<std::shared_ptr<Track>> Sequence::getMetaTracks()
 void Sequence::initMetaTracks()
 {
 	createTempoChangeTrack();
-	createMidiClockTrack();
-}
-
-void Sequence::createMidiClockTrack()
-{
-//    auto lastTick = getLastTick();
-	//(*metaTracks)[1]->getEvents()->clear();
-	//(*metaTracks)[1]->addEvent(new MidiClockEvent(midi::ShortMessage::START));
-//	for (int i = 0; i < lastTick; i += 4) {
-		// auto mcm = new MidiClockEvent(::javax::sound::midi::ShortMessage::TIMING_CLOCK);
-		//mcm->setTick(i);
-		//(*metaTracks)[1]->addEvent(mcm);
-//	}
 }
 
 void Sequence::createTempoChangeTrack()
 {
-	metaTracks[1]->removeEvents();
-	auto tce = metaTracks[1]->addEvent(0, "tempo-change");
+	metaTracks[0]->removeEvents();
+	auto tce = metaTracks[0]->addEvent(0, "tempo-change");
 	std::dynamic_pointer_cast<mpc::sequencer::TempoChangeEvent>(tce)->setStepNumber(0);
 }
 
@@ -276,7 +260,7 @@ std::vector<std::shared_ptr<TempoChangeEvent>> Sequence::getTempoChangeEvents()
 {
 	std::vector<std::shared_ptr<TempoChangeEvent>> res;
 	
-	for (auto& t : metaTracks[1]->getEvents())
+	for (auto& t : metaTracks[0]->getEvents())
 		res.push_back(std::dynamic_pointer_cast<TempoChangeEvent>(t));
 
 	return res;
@@ -284,7 +268,7 @@ std::vector<std::shared_ptr<TempoChangeEvent>> Sequence::getTempoChangeEvents()
 
 std::shared_ptr<TempoChangeEvent> Sequence::addTempoChangeEvent()
 {
-	auto res = metaTracks[1]->addEvent(0, "tempo-change");
+	auto res = metaTracks[0]->addEvent(0, "tempo-change");
 	return std::dynamic_pointer_cast<TempoChangeEvent>(res);
 }
 
@@ -308,7 +292,7 @@ void Sequence::setInitialTempo(const double newInitialTempo)
 
 void Sequence::removeTempoChangeEvent(int i)
 {
-	metaTracks[1]->removeEvent(i);
+	metaTracks[0]->removeEvent(i);
 }
 
 bool Sequence::isTempoChangeOn()
@@ -348,10 +332,10 @@ TimeSignature Sequence::getTimeSignature()
 
 void Sequence::sortTempoChangeEvents()
 {
-	metaTracks[1]->sortEvents();
+	metaTracks[0]->sortEvents();
 	int tceCounter = 0;
 
-	for (auto& e : metaTracks[1]->getEvents())
+	for (auto& e : metaTracks[0]->getEvents())
 	{
 		auto tce = std::dynamic_pointer_cast<TempoChangeEvent>(e);
 		tce->setStepNumber(tceCounter);
@@ -479,7 +463,6 @@ void Sequence::deleteBars(int firstBar, int _lastBar)
 	if (lastBarIndex  == -1)
 		setUsed(false);
 
-	createMidiClockTrack();
 }
 
 void Sequence::insertBars(int barCount, int afterBar)
@@ -553,8 +536,6 @@ void Sequence::insertBars(int barCount, int afterBar)
             }
         }
     }
-
-	createMidiClockTrack();
 
 	if (lastBarIndex != -1 && !isUsed())
     {

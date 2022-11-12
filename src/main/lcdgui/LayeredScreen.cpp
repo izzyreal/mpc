@@ -134,14 +134,14 @@ int LayeredScreen::openScreen(std::string screenName)
 	if (screenComponent->findFields().size() > 0)
 		returnToLastFocus(screenComponent->getFirstField());
 
-    mpc.getControls().lock()->getControls()->typableParams.clear();
+    mpc.getControls()->getControls()->typableParams.clear();
     
 	screenComponent->open();
 
 	std::vector<std::string> overdubScreens{ "step-editor", "paste-event", "insert-event", "edit-multiple", "step-timing-correct" };
 
 	auto isOverdubScreen = find(begin(overdubScreens), end(overdubScreens), currentScreenName) != end(overdubScreens);
-	mpc.getHardware().lock()->getLed("overdub").lock()->light(isOverdubScreen || mpc.getControls().lock()->isOverDubPressed());
+	mpc.getHardware()->getLed("overdub")->light(isOverdubScreen || mpc.getControls()->isOverDubPressed());
 
 	std::vector<std::string> nextSeqScreens{ "sequencer", "next-seq", "next-seq-pad", "track-mute", "time-display", "assign" };
 

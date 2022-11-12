@@ -261,7 +261,7 @@ void Util::initSequence(int sequenceIndex, mpc::Mpc& mpc)
 
 void Util::set16LevelsValues(mpc::Mpc& mpc, const std::shared_ptr<NoteEvent>& event, const int padIndex)
 {
-    if (mpc.getHardware().lock()->getTopPanel().lock()->isSixteenLevelsEnabled())
+    if (mpc.getHardware()->getTopPanel()->isSixteenLevelsEnabled())
     {
         auto assign16LevelsScreen = mpc.screens->get<Assign16LevelsScreen>("assign-16-levels");
         
@@ -310,7 +310,7 @@ void Util::setSliderNoteVariationParameters(mpc::Mpc& mpc, const std::weak_ptr<N
     
     auto sliderParam = pgm->getSlider()->getParameter();
     n->setVariationTypeNumber(sliderParam);
-    int sliderValue = mpc.getHardware().lock()->getSlider().lock()->getValue();
+    int sliderValue = mpc.getHardware()->getSlider()->getValue();
     
     switch (sliderParam)
     {

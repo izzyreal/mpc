@@ -72,7 +72,7 @@ void LoadASoundScreen::turnWheel(int i)
 void LoadASoundScreen::function(int i)
 {
 	init();
-	auto controls = mpc.getControls().lock();
+	auto controls = mpc.getControls();
 	
 	switch (i)
 	{

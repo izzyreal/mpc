@@ -451,7 +451,7 @@ void Sequencer::play(bool fromStart)
 		}
 	}
 
-	auto hw = mpc.getHardware().lock();
+	auto hw = mpc.getHardware();
 	
 	if (!songMode)
 	{
@@ -504,7 +504,7 @@ void Sequencer::undoSeq()
 	sequences[activeSequenceIndex]->resetTrackEventIndices(position);
 
 	undoSeqAvailable = !undoSeqAvailable;
-	auto hw = mpc.getHardware().lock();
+	auto hw = mpc.getHardware();
 
 	setActiveSequenceIndex(getActiveSequenceIndex()); // Shortcut to notifying SequencerObserver
 }
@@ -642,7 +642,7 @@ void Sequencer::stop(int tick)
 
 	for (int i = 0; i < 16; i++)
     {
-        auto pad = mpc.getHardware().lock()->getPad(i).lock();
+        auto pad = mpc.getHardware()->getPad(i);
         pad->release();
         pad->notifyObservers(255);
     }

@@ -553,7 +553,7 @@ void Track::playNext()
         note->setTrack(trackIndex);
 
         if (sequencer->isOverDubbing() &&
-            mpc.getControls().lock()->isErasePressed() &&
+            mpc.getControls()->isErasePressed() &&
             (trackIndex == sequencer->getActiveTrackIndex() || multi) &&
             trackIndex < 64 &&
             busNumber > 0)
@@ -562,7 +562,7 @@ void Track::playNext()
             auto pgm = mpc.getSampler()->getProgram(pgmIndex).lock();
 
             bool oneOrMorePadsArePressed = false;
-            auto hardware = mpc.getHardware().lock();
+            auto hardware = mpc.getHardware();
 
           for (auto& p : hardware->getPads())
             {
@@ -574,7 +574,7 @@ void Track::playNext()
             }
           
             if (!_delete && oneOrMorePadsArePressed &&
-                hardware->getTopPanel().lock()->isSixteenLevelsEnabled())
+                hardware->getTopPanel()->isSixteenLevelsEnabled())
             {
                 auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
                 auto assign16LevelsScreen = mpc.screens->get<Assign16LevelsScreen>("assign-16-levels");

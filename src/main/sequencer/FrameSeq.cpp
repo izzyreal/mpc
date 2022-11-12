@@ -74,7 +74,7 @@ void FrameSeq::work(int nFrames)
 	if (!running)
 		return;
 
-	auto controls = mpc.getControls().lock();
+	auto controls = mpc.getControls();
 	auto songScreen = mpc.screens->get<SongScreen>("song");
 
 	frameCounter += nFrames;
@@ -340,16 +340,16 @@ void FrameSeq::repeatPad(int duration)
         return;
     }
 
-	auto controls = mpc.getControls().lock();
+	auto controls = mpc.getControls();
 
 	if (!controls)
 		return;
 
   auto program = mpc.getSampler()->getProgram(mpc.getDrum(track->getBus() - 1)->getProgram()).lock();
-  auto hardware = mpc.getHardware().lock();
-  auto fullLevel = hardware->getTopPanel().lock()->isFullLevelEnabled();
+  auto hardware = mpc.getHardware();
+  auto fullLevel = hardware->getTopPanel()->isFullLevelEnabled();
 
-    for (auto& p : mpc.getHardware().lock()->getPads())
+    for (auto& p : mpc.getHardware()->getPads())
   {
     if (!p->isPressed()) continue;
 

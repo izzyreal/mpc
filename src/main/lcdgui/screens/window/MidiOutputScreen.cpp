@@ -83,7 +83,7 @@ void MidiOutputScreen::function(int i)
 		openScreen("midi-output-monitor");
 		break;
 	case 4:
-		mpc.getMidiPorts().lock()->panic();
+		mpc.getMidiPorts()->panic();
 		break;
 	}
 }

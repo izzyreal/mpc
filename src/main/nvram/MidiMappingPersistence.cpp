@@ -30,7 +30,7 @@ void MidiMappingPersistence::loadDefaultMapping(mpc::Mpc &mpc)
 {
     std::vector<std::string> labels;
 
-    auto hardware = mpc.getHardware().lock();
+    auto hardware = mpc.getHardware();
 
     for (auto& p : hardware->getPads())
     {

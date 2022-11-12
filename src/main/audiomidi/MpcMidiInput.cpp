@@ -130,7 +130,7 @@ void MpcMidiInput::transport(MidiMessage *msg, int timeStamp)
         auto pad = p->getPadIndexFromNote(note->getNote());
 
         if (note->getVelocity() != 0 && track->getBus() > 0 && track->getIndex() < 64 &&
-            mpc.getControls().lock()->isTapPressed() && lSequencer->isPlaying())
+            mpc.getControls()->isTapPressed() && lSequencer->isPlaying())
         {
             return;
         }
@@ -197,7 +197,7 @@ void MpcMidiInput::handleControl(ShortMessage *shortMsg)
     const auto value = shortMsg->getData2();
 
     auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
-    auto hardware = mpc.getHardware().lock();
+    auto hardware = mpc.getHardware();
 
     // As per MPC2000XL's MIDI implementation chart
     if (controller == 7)
@@ -208,7 +208,7 @@ void MpcMidiInput::handleControl(ShortMessage *shortMsg)
         // For now, we're safe to simply invert the input, but it would be nice
         // to make this congruent with the MPD16 (assuming it's the same for
         // other controllers, but it would be nice to verify some).
-        hardware->getSlider().lock()->setValue(127 - value);
+        hardware->getSlider()->setValue(127 - value);
     }
 
     auto midiInputScreen = mpc.screens->get<MidiInputScreen>("midi-input");
@@ -307,7 +307,7 @@ void MpcMidiInput::handleControl(ShortMessage *shortMsg)
                     else if (func >= 12 && func < 28)
                     {
                         auto pad = func - 12;
-                        hardware->getPad(pad).lock()->push(value);
+                        hardware->getPad(pad)->push(value);
                     }
                 }
                 else // value < 64
@@ -319,7 +319,7 @@ void MpcMidiInput::handleControl(ShortMessage *shortMsg)
                     else if (func >= 12 && func < 28)
                     {
                         auto pad = func - 12;
-                        hardware->getPad(pad).lock()->release();
+                        hardware->getPad(pad)->release();
                     }
                 }
             }
@@ -345,7 +345,7 @@ void MpcMidiInput::midiOut(std::weak_ptr<mpc::sequencer::Event> e, mpc::sequence
         midiAdapter->process(event, channel, -1);
     }
 
-    auto mpcMidiPorts = mpc.getMidiPorts().lock();
+    auto mpcMidiPorts = mpc.getMidiPorts();
 
     notificationLetter = "a";
 
@@ -363,12 +363,12 @@ void MpcMidiInput::midiOut(std::weak_ptr<mpc::sequencer::Event> e, mpc::sequence
 
 void MpcMidiInput::transportOmni(MidiMessage *msg, std::string outputLetter)
 {
-    auto mpcMidiPorts = mpc.getMidiPorts().lock();
+    auto mpcMidiPorts = mpc.getMidiPorts();
     auto screenName = mpc.getLayeredScreen()->getCurrentScreenName();
 
-    if (dynamic_cast<ShortMessage *>(msg) != nullptr && screenName == "midi-output-monitor")
+    if (dynamic_cast<ShortMessage*>(msg) != nullptr && screenName == "midi-output-monitor")
     {
-        notifyObservers(std::string(outputLetter + std::to_string(dynamic_cast<ShortMessage *>(msg)->getChannel())));
+        notifyObservers(std::string(outputLetter + std::to_string(dynamic_cast<ShortMessage*>(msg)->getChannel())));
     }
 }
 
@@ -392,7 +392,7 @@ void MpcMidiInput::handlePolyAndNote(MidiMessage *msg)
             // but this seems better.
             if (channelPressureValue > 0)
             {
-                for (auto &p: mpc.getHardware().lock()->getPads())
+                for (auto &p: mpc.getHardware()->getPads())
                 {
                     if (p->isPressed())
                     {

@@ -64,7 +64,7 @@ namespace mpc::lcdgui
 	protected:		
 		virtual void init() {
 	
-			auto controls = mpc.getControls().lock()->getControls();
+			auto controls = mpc.getControls()->getControls();
 			
 			// Happens when loading NVRAM
 			if (!controls)
@@ -78,45 +78,45 @@ namespace mpc::lcdgui
 		}
 
 	public:
-		void splitLeft() { mpc.getControls().lock()->getControls()->splitLeft(); }
-		void splitRight() { mpc.getControls().lock()->getControls()->splitRight(); }
-		virtual void left() { mpc.getControls().lock()->getControls()->left(); }
-		virtual void right() { mpc.getControls().lock()->getControls()->right(); }
-		virtual void up() { mpc.getControls().lock()->getControls()->up(); }
-		virtual void down() { mpc.getControls().lock()->getControls()->down(); }
-		virtual void function(int i) { init(); mpc.getControls().lock()->getControls()->function(i); }
+		void splitLeft() { mpc.getControls()->getControls()->splitLeft(); }
+		void splitRight() { mpc.getControls()->getControls()->splitRight(); }
+		virtual void left() { mpc.getControls()->getControls()->left(); }
+		virtual void right() { mpc.getControls()->getControls()->right(); }
+		virtual void up() { mpc.getControls()->getControls()->up(); }
+		virtual void down() { mpc.getControls()->getControls()->down(); }
+		virtual void function(int i) { init(); mpc.getControls()->getControls()->function(i); }
 		virtual void openWindow() {}
 		virtual void turnWheel(int i) {}
-		virtual void numpad(int i) { mpc.getControls().lock()->getControls()->numpad(i); }
-		virtual void pressEnter() { mpc.getControls().lock()->getControls()->pressEnter(); }
-		virtual void rec() { mpc.getControls().lock()->getControls()->rec(); }
-		virtual void overDub() { mpc.getControls().lock()->getControls()->overDub(); }
-		virtual void stop() { mpc.getControls().lock()->getControls()->stop(); }
-		virtual void play() { mpc.getControls().lock()->getControls()->play(); }
-		virtual void playStart() { mpc.getControls().lock()->getControls()->playStart(); }
-		virtual void mainScreen() { mpc.getControls().lock()->getControls()->mainScreen(); }
-		virtual void tap() { mpc.getControls().lock()->getControls()->tap(); }
-		virtual void prevStepEvent() { mpc.getControls().lock()->getControls()->prevStepEvent(); }
-		virtual void nextStepEvent() { mpc.getControls().lock()->getControls()->nextStepEvent(); }
-		virtual void goTo() { mpc.getControls().lock()->getControls()->goTo(); }
-		virtual void prevBarStart() { mpc.getControls().lock()->getControls()->prevBarStart(); }
-		virtual void nextBarEnd() { mpc.getControls().lock()->getControls()->nextBarEnd(); }
-		virtual void nextSeq() { mpc.getControls().lock()->getControls()->nextSeq(); }
-		virtual void trackMute() { mpc.getControls().lock()->getControls()->trackMute(); }
-		virtual void bank(int i) { mpc.getControls().lock()->getControls()->bank(i); }
-		virtual void fullLevel() { mpc.getControls().lock()->getControls()->fullLevel(); }
-		virtual void sixteenLevels() { mpc.getControls().lock()->getControls()->sixteenLevels(); }
-		virtual void after() { mpc.getControls().lock()->getControls()->after(); }
-		virtual void shift() { mpc.getControls().lock()->getControls()->shift(); }
-		virtual void undoSeq() { mpc.getControls().lock()->getControls()->undoSeq(); }
-		virtual void erase() { mpc.getControls().lock()->getControls()->erase(); }
-		virtual void setSlider(int i) { mpc.getControls().lock()->getControls()->setSlider(i); }
+		virtual void numpad(int i) { mpc.getControls()->getControls()->numpad(i); }
+		virtual void pressEnter() { mpc.getControls()->getControls()->pressEnter(); }
+		virtual void rec() { mpc.getControls()->getControls()->rec(); }
+		virtual void overDub() { mpc.getControls()->getControls()->overDub(); }
+		virtual void stop() { mpc.getControls()->getControls()->stop(); }
+		virtual void play() { mpc.getControls()->getControls()->play(); }
+		virtual void playStart() { mpc.getControls()->getControls()->playStart(); }
+		virtual void mainScreen() { mpc.getControls()->getControls()->mainScreen(); }
+		virtual void tap() { mpc.getControls()->getControls()->tap(); }
+		virtual void prevStepEvent() { mpc.getControls()->getControls()->prevStepEvent(); }
+		virtual void nextStepEvent() { mpc.getControls()->getControls()->nextStepEvent(); }
+		virtual void goTo() { mpc.getControls()->getControls()->goTo(); }
+		virtual void prevBarStart() { mpc.getControls()->getControls()->prevBarStart(); }
+		virtual void nextBarEnd() { mpc.getControls()->getControls()->nextBarEnd(); }
+		virtual void nextSeq() { mpc.getControls()->getControls()->nextSeq(); }
+		virtual void trackMute() { mpc.getControls()->getControls()->trackMute(); }
+		virtual void bank(int i) { mpc.getControls()->getControls()->bank(i); }
+		virtual void fullLevel() { mpc.getControls()->getControls()->fullLevel(); }
+		virtual void sixteenLevels() { mpc.getControls()->getControls()->sixteenLevels(); }
+		virtual void after() { mpc.getControls()->getControls()->after(); }
+		virtual void shift() { mpc.getControls()->getControls()->shift(); }
+		virtual void undoSeq() { mpc.getControls()->getControls()->undoSeq(); }
+		virtual void erase() { mpc.getControls()->getControls()->erase(); }
+		virtual void setSlider(int i) { mpc.getControls()->getControls()->setSlider(i); }
 
-		virtual bool isTypable() { return mpc.getControls().lock()->getControls()->isTypable(); }
+		virtual bool isTypable() { return mpc.getControls()->getControls()->isTypable(); }
 
-		int getSoundIncrement(int notch) { return mpc.getControls().lock()->getControls()->getSoundIncrement(notch); }
+		int getSoundIncrement(int notch) { return mpc.getControls()->getControls()->getSoundIncrement(notch); }
 
-		virtual void pad(int padIndexWithBank, int velo) { mpc.getControls().lock()->getControls()->pad(padIndexWithBank, velo); }
+		virtual void pad(int padIndexWithBank, int velo) { mpc.getControls()->getControls()->pad(padIndexWithBank, velo); }
 
 	};
 }

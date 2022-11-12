@@ -52,7 +52,7 @@ void SoundLoader::loadSound(std::shared_ptr<MpcFile> f, SoundLoaderResult& r, bo
     if (StrUtil::eqIgnoreCase(extension, ".wav"))
     {
         bool willBeConverted = shouldBeConverted;
-        auto wavMeta = mpc.getDisk().lock()->readWavMeta(f);
+        auto wavMeta = mpc.getDisk()->readWavMeta(f);
         
         if (!wavMeta.has_value()) return;
         
@@ -74,11 +74,11 @@ void SoundLoader::loadSound(std::shared_ptr<MpcFile> f, SoundLoaderResult& r, bo
             }
         });
         
-        sound = mpc.getDisk().lock()->readWav2(f, willBeConverted);
+        sound = mpc.getDisk()->readWav2(f, willBeConverted);
     }
     else if (StrUtil::eqIgnoreCase(extension, ".snd"))
     {
-        sound = mpc.getDisk().lock()->readSnd2(f);
+        sound = mpc.getDisk()->readSnd2(f);
     }
     r.soundWasAdded = true;
     if (!sound.has_value()) return;

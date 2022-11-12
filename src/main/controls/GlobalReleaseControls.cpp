@@ -34,14 +34,14 @@ GlobalReleaseControls::GlobalReleaseControls(mpc::Mpc& mpc)
 
 void GlobalReleaseControls::goTo()
 {
-	auto controls = mpc.getControls().lock();
+	auto controls = mpc.getControls();
 	controls->setGoToPressed(false);
 }
 
 void GlobalReleaseControls::function(int i)
 {
 	init();
-	auto controls = mpc.getControls().lock();
+	auto controls = mpc.getControls();
 
 	switch (i)
 	{
@@ -103,9 +103,9 @@ void GlobalReleaseControls::simplePad(int padIndexWithBank)
 {
 	init();
 
-	auto controls = mpc.getControls().lock();
+	auto controls = mpc.getControls();
 
-  if (sequencer->isRecordingOrOverdubbing() && mpc.getControls().lock()->isErasePressed())
+  if (sequencer->isRecordingOrOverdubbing() && mpc.getControls()->isErasePressed())
   {
     return;
   }
@@ -173,7 +173,7 @@ void GlobalReleaseControls::generateNoteOff(int note)
 
 	auto assign16LevelsScreen = mpc.screens->get<Assign16LevelsScreen>("assign-16-levels");
 
-	if (mpc.getHardware().lock()->getTopPanel().lock()->isSixteenLevelsEnabled())
+	if (mpc.getHardware()->getTopPanel()->isSixteenLevelsEnabled())
 		note = assign16LevelsScreen->getNote();
 
 	if (sequencer->isRecordingOrOverdubbing())
@@ -199,25 +199,25 @@ void GlobalReleaseControls::generateNoteOff(int note)
 
 void GlobalReleaseControls::overDub()
 {
-	auto controls = mpc.getControls().lock();
+	auto controls = mpc.getControls();
 	controls->setOverDubPressed(false);
 }
 
 void GlobalReleaseControls::rec()
 {
-	auto controls = mpc.getControls().lock();
+	auto controls = mpc.getControls();
 	controls->setRecPressed(false);
 }
 
 void GlobalReleaseControls::play()
 {
-    auto controls = mpc.getControls().lock();
+    auto controls = mpc.getControls();
     controls->setPlayPressed(false);
 }
 
 void GlobalReleaseControls::tap()
 {
-	auto controls = mpc.getControls().lock();
+	auto controls = mpc.getControls();
 	controls->setTapPressed(false);
 
 	if (sequencer->isRecordingOrOverdubbing())
@@ -232,7 +232,7 @@ void GlobalReleaseControls::tap()
 
 void GlobalReleaseControls::shift()
 {
-	auto controls = mpc.getControls().lock();
+	auto controls = mpc.getControls();
 	controls->setShiftPressed(false);
 	init();
 
@@ -247,7 +247,7 @@ void GlobalReleaseControls::shift()
 
 void GlobalReleaseControls::erase()
 {
-	auto controls = mpc.getControls().lock();
+	auto controls = mpc.getControls();
 	controls->setErasePressed(false);
     auto sequencerScreen = mpc.screens->get<SequencerScreen>("sequencer");
     sequencerScreen->releaseErase();

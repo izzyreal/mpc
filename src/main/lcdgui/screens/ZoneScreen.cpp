@@ -25,7 +25,7 @@ ZoneScreen::ZoneScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void ZoneScreen::open()
 {
-    mpc.getControls().lock()->getControls()->typableParams = { "st", "end" };
+    mpc.getControls()->getControls()->typableParams = { "st", "end" };
 
     if (zones.empty())
 		initZones();
@@ -109,10 +109,10 @@ void ZoneScreen::function(int f)
 	}
 	case 5:
 	{
-		if (mpc.getControls().lock()->isF6Pressed())
+		if (mpc.getControls()->isF6Pressed())
 			return;
 
-		mpc.getControls().lock()->setF6Pressed(true);
+		mpc.getControls()->setF6Pressed(true);
 		sampler->playX();
 		break;
 	}
@@ -376,7 +376,7 @@ std::vector<int> ZoneScreen::getZone()
 
 void ZoneScreen::pressEnter()
 {
-	if (mpc.getControls().lock()->isShiftPressed())
+	if (mpc.getControls()->isShiftPressed())
 	{
 		openScreen("save");
 		return;

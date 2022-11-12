@@ -31,7 +31,7 @@ void SoundSaver::static_saveSounds(void* this_p)
 void SoundSaver::saveSounds()
 {
 	const auto ext = std::string(wav ? ".WAV" : ".SND");
-    auto disk = mpc.getDisk().lock();
+    auto disk = mpc.getDisk();
 	
 	for (auto s : sounds)
 	{

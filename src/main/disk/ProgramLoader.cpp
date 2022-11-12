@@ -38,7 +38,7 @@ std::shared_ptr<mpc::sampler::Program> ProgramLoader::loadProgram(mpc::Mpc& mpc,
     auto cantFindFileScreen = mpc.screens->get<CantFindFileScreen>("cant-find-file");
     cantFindFileScreen->skipAll = false;
     
-	auto disk = mpc.getDisk().lock();
+	auto disk = mpc.getDisk();
 
     std::shared_ptr<sampler::Program> p;
     

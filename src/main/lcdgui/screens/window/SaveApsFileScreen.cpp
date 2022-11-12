@@ -68,7 +68,7 @@ void SaveApsFileScreen::function(int i)
 		auto nameScreen = mpc.screens->get<NameScreen>("name");
         std::string apsFileName = fileName + ".APS";
         
-        auto disk = mpc.getDisk().lock();
+        auto disk = mpc.getDisk();
 
         if (disk->checkExists(apsFileName))
         {

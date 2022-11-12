@@ -38,8 +38,8 @@ void VmpcMidiControlMode::processMidiInputEvent(mpc::Mpc& mpc, ctoot::midi::core
         return;
     }
 
-    auto hardware = mpc.getHardware().lock();
-    auto dataWheel = hardware->getDataWheel().lock();
+    auto hardware = mpc.getHardware();
+    auto dataWheel = hardware->getDataWheel();
 
     for (auto& labelCommand : vmpcMidiScreen->labelCommands)
     {
@@ -65,7 +65,7 @@ void VmpcMidiControlMode::processMidiInputEvent(mpc::Mpc& mpc, ctoot::midi::core
         if ((isNote && (isNoteOn || isNoteOff)) ||
             (!isNote && isControl))
         {
-            auto hwComponent = hardware->getComponentByLabel(label).lock();
+            auto hwComponent = hardware->getComponentByLabel(label);
 
             if (label == "datawheel")
             {
@@ -90,17 +90,17 @@ void VmpcMidiControlMode::processMidiInputEvent(mpc::Mpc& mpc, ctoot::midi::core
             }
             else if (label == "slider")
             {
-                hardware->getSlider().lock()->setValue(127 - controllerValue);
+                hardware->getSlider()->setValue(127 - controllerValue);
             }
             else if (label == "rec-gain")
             {
                 auto normalized = static_cast<unsigned char>(controllerValue / 1.27f);
-                hardware->getRecPot().lock()->setValue(normalized);
+                hardware->getRecPot()->setValue(normalized);
             }
             else if (label == "main-volume")
             {
                 auto normalized = static_cast<unsigned char>(controllerValue / 1.27f);
-                hardware->getVolPot().lock()->setValue(normalized);
+                hardware->getVolPot()->setValue(normalized);
             }
             else if (msg->getData2() == 0)
             {

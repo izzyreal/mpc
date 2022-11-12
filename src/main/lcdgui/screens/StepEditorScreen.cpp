@@ -516,7 +516,7 @@ void StepEditorScreen::prevStepEvent()
 
     track.lock()->removeDoubles();
 
-    auto controls = mpc.getControls().lock();
+    auto controls = mpc.getControls();
 
 	if (controls->isGoToPressed())
 		sequencer->goToPreviousEvent();
@@ -532,7 +532,7 @@ void StepEditorScreen::nextStepEvent()
 
     track.lock()->removeDoubles();
 
-    auto controls = mpc.getControls().lock();
+    auto controls = mpc.getControls();
 
 	if (controls->isGoToPressed())
 		sequencer->goToNextEvent();
@@ -548,7 +548,7 @@ void StepEditorScreen::prevBarStart()
 
     track.lock()->removeDoubles();
 
-    auto controls = mpc.getControls().lock();
+    auto controls = mpc.getControls();
 
 	if (controls->isGoToPressed())
 		sequencer->setBar(0);
@@ -564,7 +564,7 @@ void StepEditorScreen::nextBarEnd()
 
     track.lock()->removeDoubles();
 
-    auto controls = mpc.getControls().lock();
+    auto controls = mpc.getControls();
 
 	if (controls->isGoToPressed())
 		sequencer->setBar(sequencer->getActiveSequence()->getLastBarIndex() + 1);
@@ -608,7 +608,7 @@ void StepEditorScreen::up()
 		auto src = param;
 		auto srcLetter = src.substr(0, 1);
 		int srcNumber = stoi(src.substr(1, 2));
-		auto controls = mpc.getControls().lock();
+		auto controls = mpc.getControls();
 
 		if (controls->isShiftPressed() && selectionStartIndex == -1 && std::dynamic_pointer_cast<EmptyEvent>(visibleEvents[srcNumber]))
 			return;
@@ -665,7 +665,7 @@ void StepEditorScreen::down()
 		auto src = param;
 		auto srcLetter = src.substr(0, 1);
 		int srcNumber = stoi(src.substr(1, 2));
-		auto controls = mpc.getControls().lock();
+		auto controls = mpc.getControls();
 
 		if (srcNumber == 3)
 		{
@@ -714,7 +714,7 @@ void StepEditorScreen::downOrUp(int increment)
 		auto src = param;
 		auto srcLetter = src.substr(0, 1);
 		int srcNumber = stoi(src.substr(1, 2));
-		auto controls = mpc.getControls().lock();
+		auto controls = mpc.getControls();
 		auto destination = srcLetter + std::to_string(srcNumber + increment);
 
 		if (srcNumber + increment != -1)
@@ -1210,7 +1210,7 @@ void StepEditorScreen::update(moduru::observer::Observable*, nonstd::any message
 
     if (msg == "step-editor")
 	{
-        auto& pads = mpc.getHardware().lock()->getPads();
+        auto& pads = mpc.getHardware()->getPads();
 
         auto anyPadIsPressed = std::any_of(
                 pads.begin(),

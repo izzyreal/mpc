@@ -16,7 +16,7 @@ LoopToFineScreen::LoopToFineScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void LoopToFineScreen::open()
 {
-    mpc.getControls().lock()->getControls()->typableParams = { "to", "lngth" };
+    mpc.getControls()->getControls()->typableParams = { "to", "lngth" };
 
     findField("loop-lngth")->setAlignment(Alignment::Centered);
 	displayTo();

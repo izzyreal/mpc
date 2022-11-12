@@ -61,7 +61,7 @@ void ApsLoader::load(mpc::Mpc& mpc, std::shared_ptr<MpcFile> file)
 void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool headless, bool withoutSounds)
 {
     auto sampler = mpc.getSampler();
-    auto disk = mpc.getDisk().lock();
+    auto disk = mpc.getDisk();
         
     const bool initPgms = false;
 
@@ -265,7 +265,7 @@ void ApsLoader::showPopup(mpc::Mpc& mpc, std::string name, std::string ext, int 
     auto popupScreen = mpc.screens->get<PopupScreen>("popup");
     popupScreen->setText("LOADING " + StrUtil::toUpper(StrUtil::padRight(name, " ", 16) + "." + ext));
     
-    if (std::dynamic_pointer_cast<StdDisk>(mpc.getDisk().lock()))
+    if (std::dynamic_pointer_cast<StdDisk>(mpc.getDisk()))
     {
         auto sleepTime = sampleSize / 800;
         

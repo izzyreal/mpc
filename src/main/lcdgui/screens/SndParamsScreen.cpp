@@ -83,10 +83,10 @@ void SndParamsScreen::function(int f)
 	}
 	case 5:
 	{
-		if (mpc.getControls().lock()->isF6Pressed())
+		if (mpc.getControls()->isF6Pressed())
 			return;
 
-		mpc.getControls().lock()->setF6Pressed(true);
+		mpc.getControls()->setF6Pressed(true);
 		sampler->playX();
 		break;
 	}

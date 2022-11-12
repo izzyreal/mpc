@@ -58,7 +58,6 @@ public:
     void initMetaTracks();
     
 public:
-    void createMidiClockTrack();
     void createTempoChangeTrack();
     
     static bool trackIndexComparator(std::shared_ptr<Track>& t0, std::shared_ptr<Track>& t1);

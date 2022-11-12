@@ -23,7 +23,7 @@ TrimScreen::TrimScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void TrimScreen::open()
 {
-    mpc.getControls().lock()->getControls()->typableParams = { "st", "end" };
+    mpc.getControls()->getControls()->typableParams = { "st", "end" };
 
     findField("view")->setAlignment(Alignment::Centered);
 	bool sound = sampler->getSound().lock() ? true : false;
@@ -105,12 +105,12 @@ void TrimScreen::function(int f)
 	}
 	case 5:
 	{
-		if (mpc.getControls().lock()->isF6Pressed())
+		if (mpc.getControls()->isF6Pressed())
 		{
 			return;
 		}
 
-		mpc.getControls().lock()->setF6Pressed(true);
+		mpc.getControls()->setF6Pressed(true);
 		sampler->playX();
 		break;
 	}
@@ -203,7 +203,7 @@ void TrimScreen::turnWheel(int i)
 
 void TrimScreen::setSlider(int i)
 {
-	if (!mpc.getControls().lock()->isShiftPressed())
+	if (!mpc.getControls()->isShiftPressed())
 		return;
     
 	init();
@@ -263,7 +263,7 @@ void TrimScreen::right()
 // Can be called from another layer, i.e. Start Fine and End Fine windows
 void TrimScreen::pressEnter()
 {
-	if (mpc.getControls().lock()->isShiftPressed())
+	if (mpc.getControls()->isShiftPressed())
 	{
 		openScreen("save");
 		return;

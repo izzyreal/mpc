@@ -38,7 +38,7 @@ void deleteTestAllFile(const std::shared_ptr<mpc::disk::AbstractDisk>& disk)
 
 void saveAndLoadTestAllFile(mpc::Mpc& mpc)
 {
-    auto disk = mpc.getDisk().lock();
+    auto disk = mpc.getDisk();
     auto f = disk->newFile(filename);
 
     mpc::file::all::AllParser allParser(mpc);
@@ -80,7 +80,7 @@ TEST_CASE("ALL file song", "[allfile]")
     song->getStep(1).lock()->setSequence(1);
     song->getStep(1).lock()->setRepeats(2);
 
-    auto disk = mpc.getDisk().lock();
+    auto disk = mpc.getDisk();
 
     deleteTestAllFile(disk);
 
@@ -109,7 +109,7 @@ TEST_CASE("ALL file track is on and used", "[allfile]")
     seq->getTrack(62)->setOn(true);
     seq->getTrack(63)->setUsed(true);
     seq->getTrack(63)->setOn(false);
-    auto disk = mpc.getDisk().lock();
+    auto disk = mpc.getDisk();
 
     deleteTestAllFile(disk);
 
@@ -143,7 +143,7 @@ TEST_CASE("ALL file note event", "[allfile]")
     event->setVariationTypeNumber(3);
     event->setVariationValue(20);
 
-    auto disk = mpc.getDisk().lock();
+    auto disk = mpc.getDisk();
 
     deleteTestAllFile(disk);
 

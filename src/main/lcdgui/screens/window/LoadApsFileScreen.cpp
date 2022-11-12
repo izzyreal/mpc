@@ -22,7 +22,7 @@ void LoadApsFileScreen::function(int i)
 	{
         std::function<void()> on_success = [&]() { openScreen("load"); };
 		auto loadScreen = mpc.screens->get<LoadScreen>("load");
-        mpc.getDisk().lock()->readAps2(loadScreen->getSelectedFile(), on_success);
+        mpc.getDisk()->readAps2(loadScreen->getSelectedFile(), on_success);
         break;
 	}
 	}

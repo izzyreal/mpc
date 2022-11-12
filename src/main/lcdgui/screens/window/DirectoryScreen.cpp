@@ -66,7 +66,7 @@ void DirectoryScreen::function(int f)
 	auto nameScreen = mpc.screens->get<NameScreen>("name");
     auto popupScreen = mpc.screens->get<PopupScreen>("popup");
     auto directoryScreen = this;
-    auto disk = mpc.getDisk().lock();
+    auto disk = mpc.getDisk();
 
 	switch (f)
 	{
@@ -202,7 +202,7 @@ void DirectoryScreen::function(int f)
     }
 	case 5:
 	{
-		auto controls = mpc.getControls().lock();
+		auto controls = mpc.getControls();
 
 		if (controls->isF6Pressed())
 			return;
@@ -247,7 +247,7 @@ void DirectoryScreen::turnWheel(int i)
 
 void DirectoryScreen::left()
 {
-	auto disk = mpc.getDisk().lock();
+	auto disk = mpc.getDisk();
 	auto prevDirName = disk->getDirectoryName();
 
 	if (xPos == 1)
@@ -311,7 +311,7 @@ void DirectoryScreen::right()
 	}
 	else
 	{
-		auto disk = mpc.getDisk().lock();
+		auto disk = mpc.getDisk();
 		
 		if (!getSelectedFile() || disk->getFileNames().size() == 0 || !getSelectedFile()->isDirectory())
 			return;
@@ -351,7 +351,7 @@ void DirectoryScreen::right()
 
 void DirectoryScreen::up()
 {
-	auto disk = mpc.getDisk().lock();
+	auto disk = mpc.getDisk();
 	auto loadScreen = mpc.screens->get<LoadScreen>("load");
 
 	if (xPos == 0)
@@ -431,7 +431,7 @@ void DirectoryScreen::up()
 
 void DirectoryScreen::down()
 {
-	auto disk = mpc.getDisk().lock();
+	auto disk = mpc.getDisk();
 	auto loadScreen = mpc.screens->get<LoadScreen>("load");
 
 	if (xPos == 0)
@@ -526,7 +526,7 @@ std::shared_ptr<MpcFile> DirectoryScreen::getSelectedFile()
 
 std::shared_ptr<MpcFile> DirectoryScreen::getFileFromGrid(int x, int y)
 {
-	auto disk = mpc.getDisk().lock();
+	auto disk = mpc.getDisk();
 	
 	if (x == 0 && disk->getParentFileNames().size() > y + yOffset0)
 		return disk->getParentFile(y + yOffset0);
@@ -538,7 +538,7 @@ std::shared_ptr<MpcFile> DirectoryScreen::getFileFromGrid(int x, int y)
 
 void DirectoryScreen::displayLeftFields()
 {
-	auto disk = mpc.getDisk().lock();
+	auto disk = mpc.getDisk();
 	auto names = disk->getParentFileNames();
 
 	int size = names.size();
@@ -557,7 +557,7 @@ void DirectoryScreen::displayLeftFields()
 
 void DirectoryScreen::displayRightFields()
 {
-	auto disk = mpc.getDisk().lock();
+	auto disk = mpc.getDisk();
 	int size = disk->getFileNames().size();
 
 	for (int i = 0; i < 5; i++)
@@ -597,12 +597,12 @@ void DirectoryScreen::refreshFocus()
 
 std::vector<std::string> DirectoryScreen::getFirstColumn()
 {
-	return mpc.getDisk().lock()->getParentFileNames();
+	return mpc.getDisk()->getParentFileNames();
 }
 
 std::vector<std::string> DirectoryScreen::getSecondColumn()
 {
-	return mpc.getDisk().lock()->getFileNames();
+	return mpc.getDisk()->getFileNames();
 }
 
 int DirectoryScreen::getXPos()
@@ -617,7 +617,7 @@ int DirectoryScreen::getYpos0()
 
 void DirectoryScreen::findYOffset0()
 {
-	auto disk = mpc.getDisk().lock();
+	auto disk = mpc.getDisk();
 	auto names = disk->getParentFileNames();
 	auto dirName = disk->getDirectoryName();
 	auto size = names.size();
@@ -706,7 +706,7 @@ void DirectoryScreen::drawGraphicsLeft()
 		lastVisibleFile = getFileFromGrid(0, bottomVisibleFileIndex);
 	}
 
-	auto disk = mpc.getDisk().lock();
+	auto disk = mpc.getDisk();
 	auto dirName = disk->getDirectoryName();
 	int visibleListLength = bottomVisibleFileIndex + 1;
 
@@ -822,7 +822,7 @@ void DirectoryScreen::drawGraphicsRight()
 	auto firstColumn = getFirstColumn();
 	auto secondColumn = getSecondColumn();
 
-	auto disk = mpc.getDisk().lock();
+	auto disk = mpc.getDisk();
 
 	auto parentNames = disk->getParentFileNames();
 	auto dirName = disk->getDirectoryName();

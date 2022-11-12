@@ -132,12 +132,12 @@ void Mpc::init(const int inputCount, const int outputCount)
 	MLOG("Mpc is ready");
 }
 
-std::weak_ptr<controls::Controls> Mpc::getControls()
+std::shared_ptr<controls::Controls> Mpc::getControls()
 {
 	return controls;
 }
 
-std::weak_ptr<hardware::Hardware> Mpc::getHardware()
+std::shared_ptr<hardware::Hardware> Mpc::getHardware()
 {
 	return hardware;
 }
@@ -197,7 +197,7 @@ std::shared_ptr<mpc::controls::GlobalReleaseControls> Mpc::getReleaseControls() 
 	return controls->getReleaseControls();
 }
 
-std::weak_ptr<mpc::disk::AbstractDisk> Mpc::getDisk()
+std::shared_ptr<mpc::disk::AbstractDisk> Mpc::getDisk()
 {
 	return diskController->getActiveDisk();
 }
@@ -215,7 +215,7 @@ ctoot::mpc::MpcMultiMidiSynth* Mpc::getMms()
 	return audioMidiServices->getMms().get();
 }
 
-std::weak_ptr<audiomidi::MpcMidiPorts> Mpc::getMidiPorts()
+std::shared_ptr<audiomidi::MpcMidiPorts> Mpc::getMidiPorts()
 {
 	return audioMidiServices->getMidiPorts();
 }
@@ -237,10 +237,10 @@ void Mpc::setBank(int i)
 
 	notifyObservers(std::string("bank"));
 
-	hardware->getLed("pad-bank-a").lock()->light(i == 0);
-	hardware->getLed("pad-bank-b").lock()->light(i == 1);
-	hardware->getLed("pad-bank-c").lock()->light(i == 2);
-	hardware->getLed("pad-bank-d").lock()->light(i == 3);
+	hardware->getLed("pad-bank-a")->light(i == 0);
+	hardware->getLed("pad-bank-b")->light(i == 1);
+	hardware->getLed("pad-bank-c")->light(i == 2);
+	hardware->getLed("pad-bank-d")->light(i == 3);
 }
 
 int Mpc::getBank()

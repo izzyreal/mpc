@@ -54,7 +54,7 @@ void DeleteFileScreen::deleteFile()
 {
 	std::this_thread::sleep_for(std::chrono::milliseconds(400));
 
-	auto disk = mpc.getDisk().lock();
+	auto disk = mpc.getDisk();
 
 	if (disk->deleteSelectedFile())
 	{

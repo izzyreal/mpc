@@ -94,7 +94,7 @@ void NvRam::saveVmpcSettings(mpc::Mpc& mpc)
     (char) (vmpcAutoSaveScreen->autoLoadOnStart),
     (char) (audioMidiServices->getRecordLevel()),
     (char) (audioMidiServices->getMasterLevel()),
-    (char) (mpc.getHardware().lock()->getSlider().lock()->getValue()),
+    (char) (mpc.getHardware()->getSlider()->getValue()),
     (char) (vmpcSettingsScreen->autoConvertWavs),
     (char) (othersScreen->getTapAveraging()),
     (char) (othersScreen->getContrast()),
@@ -132,7 +132,7 @@ void NvRam::loadVmpcSettings(mpc::Mpc& mpc)
   if (bytes.size() > 3) vmpcAutoSaveScreen->autoLoadOnStart = bytes[3];
   if (bytes.size() > 4) audioMidiServices->setRecordLevel(bytes[4]);
   if (bytes.size() > 5) audioMidiServices->setMasterLevel(bytes[5]);
-  if (bytes.size() > 6) mpc.getHardware().lock()->getSlider().lock()->setValue(bytes[6]);
+  if (bytes.size() > 6) mpc.getHardware()->getSlider()->setValue(bytes[6]);
   if (bytes.size() > 7) vmpcSettingsScreen->autoConvertWavs = bytes[7];
   if (bytes.size() > 8) othersScreen->setTapAveraging(bytes[8]);
   if (bytes.size() > 9) othersScreen->setContrast(bytes[9]);

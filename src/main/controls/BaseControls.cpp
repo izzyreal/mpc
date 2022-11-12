@@ -145,7 +145,7 @@ void BaseControls::function(int i)
     switch (i)
     {
         case 3:
-            auto controls = mpc.getControls().lock();
+            auto controls = mpc.getControls();
             controls->setF4Pressed(true);
             if (ls->getFocusedLayerIndex() == 1)
             {
@@ -198,20 +198,20 @@ void BaseControls::pad(int padIndexWithBank, int velo)
 {
     init();
     
-    auto controls = mpc.getControls().lock();
-    auto hardware = mpc.getHardware().lock();
+    auto controls = mpc.getControls();
+    auto hardware = mpc.getHardware();
 
     if (controls->isTapPressed() && sequencer->isPlaying())
     {
         return;
     }
 
-    if (hardware->getTopPanel().lock()->isFullLevelEnabled())
+    if (hardware->getTopPanel()->isFullLevelEnabled())
     {
       velo = 127;
     }
 
-    if (sequencer->isRecordingOrOverdubbing() && mpc.getControls().lock()->isErasePressed())
+    if (sequencer->isRecordingOrOverdubbing() && mpc.getControls()->isErasePressed())
         return;
     
     if (controls->isNoteRepeatLocked())
@@ -220,7 +220,7 @@ void BaseControls::pad(int padIndexWithBank, int velo)
     auto note = track.lock()->getBus() > 0 ? program.lock()->getPad(padIndexWithBank)->getNote() : padIndexWithBank + 35;
     auto velocity = velo;
 
-    if (!mpc.getHardware().lock()->getTopPanel().lock()->isSixteenLevelsEnabled())
+    if (!mpc.getHardware()->getTopPanel()->isSixteenLevelsEnabled())
     {
         auto screenComponent = mpc.screens->getScreenComponent(currentScreenName);
         auto withNotes = std::dynamic_pointer_cast<WithTimesAndNotes>(screenComponent);
@@ -289,7 +289,7 @@ void BaseControls::generateNoteOn(int note, int padVelo)
     
     bool recMainWithoutPlaying = currentScreenName == "sequencer" &&
     !sequencer->isPlaying() &&
-    mpc.getControls().lock()->isRecPressed() &&
+    mpc.getControls()->isRecPressed() &&
     tc_note != 0 &&
     !posIsLastTick;
     
@@ -380,7 +380,7 @@ void BaseControls::numpad(int i)
 {
     init();
     
-    auto controls = mpc.getControls().lock();
+    auto controls = mpc.getControls();
     
     if (!controls->isShiftPressed())
     {
@@ -395,7 +395,7 @@ void BaseControls::numpad(int i)
         }
     }
     
-    auto disk = mpc.getDisk().lock();
+    auto disk = mpc.getDisk();
     
     if (controls->isShiftPressed())
     {
@@ -486,7 +486,7 @@ void BaseControls::pressEnter()
 {
     init();
     
-    auto controls = mpc.getControls().lock();
+    auto controls = mpc.getControls();
     
     if (controls->isShiftPressed())
         ls->openScreen("save");
@@ -501,7 +501,7 @@ void BaseControls::rec()
         return;
     }
 
-    auto controls = mpc.getControls().lock();
+    auto controls = mpc.getControls();
     
     if (controls->isRecPressed())
     {
@@ -510,7 +510,7 @@ void BaseControls::rec()
     
     controls->setRecPressed(true);
 
-    auto hw = mpc.getHardware().lock();
+    auto hw = mpc.getHardware();
     
     if (sequencer->isRecordingOrOverdubbing())
     {
@@ -533,10 +533,10 @@ void BaseControls::overDub()
         return;
     }
 
-    auto controls = mpc.getControls().lock();
+    auto controls = mpc.getControls();
     controls->setOverDubPressed(true);
 
-    auto hw = mpc.getHardware().lock();
+    auto hw = mpc.getHardware();
     
 
     if (sequencer->isRecordingOrOverdubbing())
@@ -555,7 +555,7 @@ void BaseControls::stop()
     
     auto vmpcDirectToDiskRecorderScreen = mpc.screens->get<VmpcDirectToDiskRecorderScreen>("vmpc-direct-to-disk-recorder");
     auto ams = mpc.getAudioMidiServices();
-    auto controls = mpc.getControls().lock();
+    auto controls = mpc.getControls();
     
     if (controls->isNoteRepeatLocked())
         controls->setNoteRepeatLocked(false);
@@ -573,7 +573,7 @@ void BaseControls::stop()
 
 void BaseControls::play()
 {
-    auto controls = mpc.getControls().lock();
+    auto controls = mpc.getControls();
 
     if (controls->isPlayPressed())
     {
@@ -583,7 +583,7 @@ void BaseControls::play()
     controls->setPlayPressed(true);
 
     init();
-    auto hw = mpc.getHardware().lock();
+    auto hw = mpc.getHardware();
     
     if (sequencer->isPlaying())
     {
@@ -636,8 +636,8 @@ void BaseControls::play()
 void BaseControls::playStart()
 {
     init();
-    auto hw = mpc.getHardware().lock();
-    auto controls = mpc.getControls().lock();
+    auto hw = mpc.getHardware();
+    auto controls = mpc.getControls();
     
     if (sequencer->isPlaying())
     {
@@ -695,15 +695,15 @@ void BaseControls::mainScreen()
     ls->openScreen("sequencer");
     sequencer->setSoloEnabled(sequencer->isSoloEnabled());
     
-    auto hw = mpc.getHardware().lock();
-    hw->getLed("next-seq").lock()->light(false);
-    hw->getLed("track-mute").lock()->light(false);
+    auto hw = mpc.getHardware();
+    hw->getLed("next-seq")->light(false);
+    hw->getLed("track-mute")->light(false);
 }
 
 void BaseControls::tap()
 {
     init();
-    auto controls = mpc.getControls().lock();
+    auto controls = mpc.getControls();
     controls->setTapPressed(true);
     sequencer->tap();
 }
@@ -711,7 +711,7 @@ void BaseControls::tap()
 void BaseControls::goTo()
 {
     init();
-    auto controls = mpc.getControls().lock();
+    auto controls = mpc.getControls();
     controls->setGoToPressed(true);
 }
 
@@ -723,15 +723,15 @@ void BaseControls::nextSeq()
         currentScreenName == "next-seq-pad")
     {
         ls->openScreen("sequencer");
-        mpc.getHardware().lock()->getLed("next-seq").lock()->light(false);
+        mpc.getHardware()->getLed("next-seq")->light(false);
     }
     else if (currentScreenName == "sequencer" ||
              currentScreenName == "track-mute")
     {
         Util::initSequence(mpc);
         ls->openScreen("next-seq");
-        mpc.getHardware().lock()->getLed("next-seq").lock()->light(true);
-        mpc.getHardware().lock()->getLed("track-mute").lock()->light(false);
+        mpc.getHardware()->getLed("next-seq")->light(true);
+        mpc.getHardware()->getLed("track-mute")->light(false);
     }
 }
 
@@ -747,7 +747,7 @@ void BaseControls::trackMute()
         else
             ls->openScreen("sequencer");
         
-        mpc.getHardware().lock()->getLed("track-mute").lock()->light(false);
+        mpc.getHardware()->getLed("track-mute")->light(false);
     }
     else if
         (currentScreenName == "next-seq" ||
@@ -756,7 +756,7 @@ void BaseControls::trackMute()
     {
         Util::initSequence(mpc);
         ls->openScreen("track-mute");
-        mpc.getHardware().lock()->getLed("track-mute").lock()->light(true);
+        mpc.getHardware()->getLed("track-mute")->light(true);
     }
 }
 
@@ -766,19 +766,19 @@ void BaseControls::bank(int i)
 
     for (int p = 0; p < 16; p++)
     {
-      mpc.getHardware().lock()->getPad(p).lock()->notifyObservers(255);
+      mpc.getHardware()->getPad(p)->notifyObservers(255);
     }
 }
 
 void BaseControls::fullLevel()
 {
     init();
-    auto hardware = mpc.getHardware().lock();
-    auto topPanel = hardware->getTopPanel().lock();
+    auto hardware = mpc.getHardware();
+    auto topPanel = hardware->getTopPanel();
     
     topPanel->setFullLevelEnabled(!topPanel->isFullLevelEnabled());
     
-    hardware->getLed("full-level").lock()->light(topPanel->isFullLevelEnabled());
+    hardware->getLed("full-level")->light(topPanel->isFullLevelEnabled());
 }
 
 void BaseControls::sixteenLevels()
@@ -791,13 +791,13 @@ void BaseControls::sixteenLevels()
         return;
     }
     
-    auto hardware = mpc.getHardware().lock();
-    auto topPanel = hardware->getTopPanel().lock();
+    auto hardware = mpc.getHardware();
+    auto topPanel = hardware->getTopPanel();
     
     if (topPanel->isSixteenLevelsEnabled())
     {
         topPanel->setSixteenLevelsEnabled(false);
-        hardware->getLed("sixteen-levels").lock()->light(false);
+        hardware->getLed("sixteen-levels")->light(false);
     }
     else {
         ls->openScreen("assign-16-levels");
@@ -807,9 +807,9 @@ void BaseControls::sixteenLevels()
 void BaseControls::after()
 {
     init();
-    auto hw = mpc.getHardware().lock();
-    auto topPanel = hw->getTopPanel().lock();
-    auto controls = mpc.getControls().lock();
+    auto hw = mpc.getHardware();
+    auto topPanel = hw->getTopPanel();
+    auto controls = mpc.getControls();
     
     if (controls->isShiftPressed())
     {
@@ -818,13 +818,13 @@ void BaseControls::after()
     else
     {
         topPanel->setAfterEnabled(!topPanel->isAfterEnabled());
-        hw->getLed("after").lock()->light(topPanel->isAfterEnabled());
+        hw->getLed("after")->light(topPanel->isAfterEnabled());
     }
 }
 
 void BaseControls::shift()
 {
-    auto controls = mpc.getControls().lock();
+    auto controls = mpc.getControls();
     
     if (controls->isShiftPressed())
         return;
@@ -855,7 +855,7 @@ void BaseControls::undoSeq()
 void BaseControls::erase()
 {
     init();
-    auto controls = mpc.getControls().lock();
+    auto controls = mpc.getControls();
     controls->setErasePressed(true);
     
     if (!sequencer->getActiveSequence()->isUsed())
@@ -886,7 +886,7 @@ void BaseControls::splitLeft()
     init();
     
     auto field = ls->getFocusedLayer()->findField(param);
-    auto controls = mpc.getControls().lock();
+    auto controls = mpc.getControls();
     
     if (!controls->isShiftPressed())
     {
@@ -913,7 +913,7 @@ void BaseControls::splitRight()
 {
     init();
     auto field = ls->getFocusedLayer()->findField(param);
-    auto controls = mpc.getControls().lock();
+    auto controls = mpc.getControls();
     
     if (!controls->isShiftPressed())
     {

@@ -303,7 +303,7 @@ void NameScreen::displayName()
 void NameScreen::typeCharacter(char c)
 {
     init();
-    auto charWithCasing = static_cast<char>(mpc.getControls().lock()->isShiftPressed() ? toupper(c) : tolower(c));
+    auto charWithCasing = static_cast<char>(mpc.getControls()->isShiftPressed() ? toupper(c) : tolower(c));
 
     if (std::find(mpc::Mpc::akaiAsciiChar.begin(), mpc::Mpc::akaiAsciiChar.end(),
             charWithCasing) == mpc::Mpc::akaiAsciiChar.end())

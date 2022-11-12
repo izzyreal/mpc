@@ -47,7 +47,7 @@ void SaveASequenceScreen::function(int i)
 	case 4:
 		auto fileName = mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) + ".MID";
 
-		if (mpc.getDisk().lock()->checkExists(fileName))
+		if (mpc.getDisk()->checkExists(fileName))
 		{
 			openScreen("file-exists");
 			return;
@@ -55,7 +55,7 @@ void SaveASequenceScreen::function(int i)
 		
 		auto seq = sequencer->getActiveSequence();
 		
-		mpc.getDisk().lock()->writeMid(seq, fileName);
+		mpc.getDisk()->writeMid(seq, fileName);
 		openScreen("save");
 		break;
 	}

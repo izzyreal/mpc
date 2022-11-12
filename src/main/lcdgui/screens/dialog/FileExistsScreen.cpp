@@ -78,7 +78,7 @@ void FileExistsScreen::function(int i)
 			return;
 		}
 
-		auto disk = mpc.getDisk().lock();
+		auto disk = mpc.getDisk();
 		auto nameScreen = mpc.screens->get<NameScreen>("name");
         auto previousScreen = ls->getPreviousScreenName();
 
@@ -215,7 +215,7 @@ void FileExistsScreen::function(int i)
             const auto renamer = [&](const std::string& newName) {
                 const auto apsFileName = newName + ".APS";
                 
-                auto disk = mpc.getDisk().lock();
+                auto disk = mpc.getDisk();
 
                 if (disk->checkExists(apsFileName))
                 {
