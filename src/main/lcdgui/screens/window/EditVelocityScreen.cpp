@@ -65,7 +65,7 @@ void EditVelocityScreen::function(int i)
 	switch (i)
 	{
 	case 4:
-		for (auto& event : track.lock()->getEvents())
+		for (auto& event : track->getEvents())
 		{
 			auto ne = std::dynamic_pointer_cast<NoteEvent>(event);
 
@@ -125,7 +125,7 @@ void EditVelocityScreen::displayNotes()
 {
 	init();
 	
-	if (track.lock()->getBus() == 0)
+	if (track->getBus() == 0)
 	{
 		findField("note0")->setSize(47, 9);
 		findLabel("note1")->Hide(false);
@@ -143,7 +143,7 @@ void EditVelocityScreen::displayNotes()
 		}
 		else
 		{
-            auto padName = sampler->getPadName(program.lock()->getPadIndexFromNote(note0));
+            auto padName = sampler->getPadName(program->getPadIndexFromNote(note0));
             findField("note0")->setText(std::to_string(note0) + "/" + padName);
 		}
 		

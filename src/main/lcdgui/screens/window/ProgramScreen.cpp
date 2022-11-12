@@ -26,7 +26,7 @@ void ProgramScreen::turnWheel(int i)
 	if (param.compare("programname") == 0)
 	{
         auto nameScreen = mpc.screens->get<NameScreen>("name");
-        const auto _program = program.lock();
+        const auto _program = program;
         nameScreen->setName(_program->getName());
 
         auto renamer = [_program](std::string& newName) {
@@ -38,7 +38,7 @@ void ProgramScreen::turnWheel(int i)
     }
 	else if (param.compare("midiprogramchange") == 0)
 	{
-		program.lock()->setMidiProgramChange(program.lock()->getMidiProgramChange() + i);
+		program->setMidiProgramChange(program->getMidiProgramChange() + i);
 		displayMidiProgramChange();
 	}
 }
@@ -74,10 +74,10 @@ void ProgramScreen::function(int i)
 
 void ProgramScreen::displayProgramName()
 {
-	findField("programname")->setText(program.lock()->getName());
+	findField("programname")->setText(program->getName());
 }
 
 void ProgramScreen::displayMidiProgramChange()
 {
-	findField("midiprogramchange")->setTextPadded(program.lock()->getMidiProgramChange(), " ");
+	findField("midiprogramchange")->setTextPadded(program->getMidiProgramChange(), " ");
 }

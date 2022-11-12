@@ -25,7 +25,7 @@ void ChannelSettingsScreen::open()
 	auto mixerScreen = mpc.screens->get<MixerScreen>("mixer");
     const int padIndexWithoutBank = mixerScreen->xPos;
     const int padIndexWithBank = padIndexWithoutBank + (mpc.getBank() * 16);
-    auto padNote = program.lock()->getNoteFromPad(padIndexWithBank);
+    auto padNote = program->getNoteFromPad(padIndexWithBank);
 	note = padNote == 34 ? 35 : padNote;
 	displayChannel();
 	mpc.addObserver(this);
@@ -48,7 +48,7 @@ std::weak_ptr<MpcIndivFxMixerChannel> ChannelSettingsScreen::getIndivFxMixerChan
 	}
 	else
 	{
-		auto noteParameters = dynamic_cast<NoteParameters*>(program.lock()->getNoteParameters(note));
+		auto noteParameters = dynamic_cast<NoteParameters*>(program->getNoteParameters(note));
 		return noteParameters->getIndivFxMixerChannel().lock();
 	}
 }
@@ -65,7 +65,7 @@ std::weak_ptr<MpcStereoMixerChannel> ChannelSettingsScreen::getStereoMixerChanne
 	}
 	else
 	{
-		auto noteParameters = dynamic_cast<NoteParameters*>(program.lock()->getNoteParameters(note));
+		auto noteParameters = dynamic_cast<NoteParameters*>(program->getNoteParameters(note));
 		return noteParameters->getStereoMixerChannel().lock();
 	}
 }
@@ -149,7 +149,7 @@ void ChannelSettingsScreen::displayChannel()
 void ChannelSettingsScreen::displayNoteField()
 {
     std::string soundName = "OFF";
-	auto soundIndex = program.lock()->getNoteParameters(note)->getSoundIndex();
+	auto soundIndex = program->getNoteParameters(note)->getSoundIndex();
 
 	if (soundIndex >= 0 && soundIndex < sampler->getSoundCount())
 	{
@@ -159,35 +159,35 @@ void ChannelSettingsScreen::displayNoteField()
 			soundName += StrUtil::padLeft("(ST)", " ", 19 - soundName.length());
 	}
 
-    auto padIndex = program.lock()->getPadIndexFromNote(note);
+    auto padIndex = program->getPadIndexFromNote(note);
     auto padName = sampler->getPadName(padIndex);
     findField("note")->setText(std::to_string(note) + "/" + padName + "-" + soundName);
 }
 
 void ChannelSettingsScreen::displayStereoVolume()
 {
-    auto noteParameters = dynamic_cast<NoteParameters*>(program.lock()->getNoteParameters(note));
+    auto noteParameters = dynamic_cast<NoteParameters*>(program->getNoteParameters(note));
     auto mixerChannel = noteParameters->getStereoMixerChannel();
     findField("stereovolume")->setTextPadded(mixerChannel.lock()->getLevel(), " ");
 }
 
 void ChannelSettingsScreen::displayIndividualVolume()
 {
-    auto noteParameters = dynamic_cast<NoteParameters *>(program.lock()->getNoteParameters(note));
+    auto noteParameters = dynamic_cast<NoteParameters *>(program->getNoteParameters(note));
     auto mixerChannel = noteParameters->getIndivFxMixerChannel();
     findField("individualvolume")->setTextPadded(mixerChannel.lock()->getVolumeIndividualOut(), " ");
 }
 
 void ChannelSettingsScreen::displayFxSendLevel()
 {
-    auto noteParameters = dynamic_cast<NoteParameters *>(program.lock()->getNoteParameters(note));
+    auto noteParameters = dynamic_cast<NoteParameters *>(program->getNoteParameters(note));
     auto mixerChannel = noteParameters->getIndivFxMixerChannel();
     findField("fxsendlevel")->setTextPadded(mixerChannel.lock()->getFxSendLevel(), " ");
 }
 
 void ChannelSettingsScreen::displayPanning()
 {
-    auto noteParameters = dynamic_cast<NoteParameters *>(program.lock()->getNoteParameters(note));
+    auto noteParameters = dynamic_cast<NoteParameters *>(program->getNoteParameters(note));
     auto mixerChannel = noteParameters->getStereoMixerChannel();
 
     if (mixerChannel.lock()->getPanning() != 0) {
@@ -205,7 +205,7 @@ void ChannelSettingsScreen::displayPanning()
 
 void ChannelSettingsScreen::displayOutput()
 {
-    auto noteParameters = dynamic_cast<NoteParameters *>(program.lock()->getNoteParameters(note));
+    auto noteParameters = dynamic_cast<NoteParameters *>(program->getNoteParameters(note));
     auto indivFxMixerChannel = noteParameters->getIndivFxMixerChannel().lock();
     auto stereoMixerChannel = noteParameters->getStereoMixerChannel().lock();
 
@@ -217,14 +217,14 @@ void ChannelSettingsScreen::displayOutput()
 
 void ChannelSettingsScreen::displayFxPath()
 {
-    auto noteParameters = dynamic_cast<NoteParameters *>(program.lock()->getNoteParameters(note));
+    auto noteParameters = dynamic_cast<NoteParameters *>(program->getNoteParameters(note));
     auto mixerChannel = noteParameters->getIndivFxMixerChannel();
     findField("fxpath")->setText(fxPathNames[mixerChannel.lock()->getFxPath()]);
 }
 
 void ChannelSettingsScreen::displayFollowStereo()
 {
-    auto noteParameters = dynamic_cast<NoteParameters *>(program.lock()->getNoteParameters(note));
+    auto noteParameters = dynamic_cast<NoteParameters *>(program->getNoteParameters(note));
     auto mixerChannel = noteParameters->getIndivFxMixerChannel();
     findField("followstereo")->setText(mixerChannel.lock()->isFollowingStereo() ? "YES" : "NO");
 }

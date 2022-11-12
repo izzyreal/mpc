@@ -49,11 +49,11 @@ namespace mpc::controls {
 
 		std::vector<std::string> typableParams;
 
-		std::weak_ptr<mpc::sampler::Program> program;
+		std::shared_ptr<mpc::sampler::Program> program;
 		ctoot::mpc::MpcSoundPlayerChannel* mpcSoundPlayerChannel = nullptr;
 
 		std::shared_ptr<mpc::lcdgui::LayeredScreen> ls;
-		std::weak_ptr<mpc::lcdgui::Field> activeField;
+		std::shared_ptr<mpc::lcdgui::Field> activeField;
 
 		void init();
 		int getSoundIncrement(int notch);
@@ -98,7 +98,7 @@ namespace mpc::controls {
 
 	private:
 		std::shared_ptr<mpc::sampler::Sampler> sampler;
-		std::weak_ptr<mpc::sequencer::Track> track;
+		std::shared_ptr<mpc::sequencer::Track> track;
 		std::string currentScreenName = "";
 		const static std::vector<std::string> allowTransportScreens;
 		const static std::vector<std::string> allowPlayScreens;

@@ -47,7 +47,7 @@ void EditMultipleScreen::function(int i)
         {
             auto noteEvent = std::dynamic_pointer_cast<NoteEvent>(selectedEvent);
             
-            if (noteEvent && track.lock()->getBus() != 0)
+            if (noteEvent && track->getBus() != 0)
             {
                 if (paramLetter == "a")
                 {
@@ -82,7 +82,7 @@ void EditMultipleScreen::function(int i)
                 }
             }
             
-            if (noteEvent && track.lock()->getBus() == 0)
+            if (noteEvent && track->getBus() == 0)
             {
                 if (paramLetter == "a")
                     checkNotes();
@@ -132,7 +132,7 @@ void EditMultipleScreen::turnWheel(int i)
     {
         auto noteEvent = std::dynamic_pointer_cast<NoteEvent>(event);
         
-        if (noteEvent && track.lock()->getBus() != 0)
+        if (noteEvent && track->getBus() != 0)
         {
             if (paramLetter == "a")
             {
@@ -167,7 +167,7 @@ void EditMultipleScreen::turnWheel(int i)
                 setEditType(editType + i);
             }
         }
-        else if (noteEvent && track.lock()->getBus() == 0)
+        else if (noteEvent && track->getBus() == 0)
         {
             if (paramLetter == "a")
                 setChangeNoteTo(changeNoteTo + i);
@@ -268,7 +268,7 @@ void EditMultipleScreen::updateEditMultiple()
     auto event = stepEditorScreen->getSelectedEvent();
     auto letter = stepEditorScreen->getSelectedParameterLetter();
     
-    if (std::dynamic_pointer_cast<NoteEvent>(event) && track.lock()->getBus() != 0)
+    if (std::dynamic_pointer_cast<NoteEvent>(event) && track->getBus() != 0)
     {
         if (letter == "a" || letter == "b" || letter == "c")
         {
@@ -282,7 +282,7 @@ void EditMultipleScreen::updateEditMultiple()
                 findLabel("value0")->setText(singleLabels[0]);
                 findField("value0")->setSize(6 * 6 + 1, 9);
 
-                auto padName = sampler->getPadName(program.lock()->getPadIndexFromNote(changeNoteTo));
+                auto padName = sampler->getPadName(program->getPadIndexFromNote(changeNoteTo));
                 auto noteName = changeNoteTo == 34 ? "--" : std::to_string(changeNoteTo);
                 findField("value0")->setText(noteName + "/" + padName);
             }
@@ -365,7 +365,7 @@ void EditMultipleScreen::updateEditMultiple()
         }
     }
     
-    if (std::dynamic_pointer_cast<NoteEvent>(event) && track.lock()->getBus() == 0)
+    if (std::dynamic_pointer_cast<NoteEvent>(event) && track->getBus() == 0)
     {
         if (letter == "a")
         {
@@ -420,7 +420,7 @@ void EditMultipleScreen::setChangeNoteTo(int i)
 {
     init();
     
-    auto midi = track.lock()->getBus() == 0;
+    auto midi = track->getBus() == 0;
     
     if (midi)
     {

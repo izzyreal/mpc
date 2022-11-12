@@ -141,7 +141,7 @@ void Assign16LevelsScreen::displayNote()
 {
     init();
 
-    auto pgmNumber = sampler->getDrumBusProgramIndex(track.lock()->getBus());
+    auto pgmNumber = sampler->getDrumBusProgramIndex(track->getBus());
     auto program = sampler->getProgram(pgmNumber);
     auto padIndex = program->getPadIndexFromNote(note);
 

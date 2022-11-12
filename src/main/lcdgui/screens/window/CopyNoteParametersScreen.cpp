@@ -15,7 +15,7 @@ void CopyNoteParametersScreen::open()
 {
 	init();
 
-	auto note = sampler->getLastNp(program.lock().get())->getNumber();
+	auto note = sampler->getLastNp(program.get())->getNumber();
 
 	auto programIndex = mpcSoundPlayerChannel->getProgram();
 	setProg0(programIndex);
@@ -72,7 +72,7 @@ void CopyNoteParametersScreen::displayProg0()
 
 void CopyNoteParametersScreen::displayNote0()
 {
-	auto noteParameters = sampler->getLastNp(program.lock().get());
+	auto noteParameters = sampler->getLastNp(program.get());
 	auto note0 = noteParameters->getNumber();
 	auto program = sampler->getProgram(prog0);
 	auto padIndex = program->getPadIndexFromNote(note0);

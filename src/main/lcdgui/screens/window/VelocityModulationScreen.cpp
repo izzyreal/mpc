@@ -32,7 +32,7 @@ void VelocityModulationScreen::turnWheel(int i)
 {
 	init();
 
-	auto lastNp = sampler->getLastNp(program.lock().get());
+	auto lastNp = sampler->getLastNp(program.get());
 
 	if (param == "veloattack")
 	{
@@ -58,9 +58,9 @@ void VelocityModulationScreen::turnWheel(int i)
 
 void VelocityModulationScreen::displayNote()
 {
-	auto noteParameters = sampler->getLastNp(program.lock().get());
+	auto noteParameters = sampler->getLastNp(program.get());
 	auto soundIndex = noteParameters->getSoundIndex();
-	auto padIndex = program.lock()->getPadIndexFromNote(noteParameters->getNumber());
+	auto padIndex = program->getPadIndexFromNote(noteParameters->getNumber());
 	auto padName = sampler->getPadName(padIndex);
 	auto sampleName = soundIndex != -1 ? sampler->getSoundName(soundIndex) : "OFF";
     std::string stereo = noteParameters->getStereoMixerChannel().lock()->isStereo() && soundIndex != -1 ? "(ST)" : "";
@@ -74,19 +74,17 @@ void VelocityModulationScreen::displayVelo()
 
 void VelocityModulationScreen::displayVeloAttack()
 {
-	findField("veloattack")->setTextPadded(sampler->getLastNp(program.lock().get())->getVelocityToAttack(), " ");
+	findField("veloattack")->setTextPadded(sampler->getLastNp(program.get())->getVelocityToAttack(), " ");
 }
 
 void VelocityModulationScreen::displayVeloStart()
 {
-	auto lProgram = program.lock();
-	findField("velostart")->setTextPadded(sampler->getLastNp(program.lock().get())->getVelocityToStart(), " ");
+	findField("velostart")->setTextPadded(sampler->getLastNp(program.get())->getVelocityToStart(), " ");
 }
 
 void VelocityModulationScreen::displayVeloLevel()
 {
-	auto lProgram = program.lock();
-	findField("velolevel")->setTextPadded(sampler->getLastNp(program.lock().get())->getVeloToLevel(), " ");
+	findField("velolevel")->setTextPadded(sampler->getLastNp(program.get())->getVeloToLevel(), " ");
 }
 
 void VelocityModulationScreen::update(moduru::observer::Observable* observable, nonstd::any message)

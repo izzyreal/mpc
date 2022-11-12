@@ -42,11 +42,11 @@ void TimingCorrectScreen::function(int i)
 	{
 		sequencer->storeActiveSequenceInUndoPlaceHolder();
 
-		track.lock()->correctTimeRange(time0, time1, sequencer->getTickValues()[noteValue]);
+		track->correctTimeRange(time0, time1, sequencer->getTickValues()[noteValue]);
 
 		std::vector<int> noteRange(2);
 
-		if (track.lock()->getBus() != 0)
+		if (track->getBus() != 0)
 		{
 			if (note0 == 34)
 			{
@@ -65,14 +65,14 @@ void TimingCorrectScreen::function(int i)
 			noteRange[1] = note1;
 		}
 
-        auto eventRange = track.lock()->getEventRange(time0, time1);
-		track.lock()->swing(eventRange, noteValue, swing, noteRange);
+        auto eventRange = track->getEventRange(time0, time1);
+		track->swing(eventRange, noteValue, swing, noteRange);
 
 		auto sequence = sequencer->getActiveSequence();
 
         for (auto& e: eventRange)
         {
-            track.lock()->shiftTiming(e, shiftTimingLater, amount, sequence->getLastTick());
+            track->shiftTiming(e, shiftTimingLater, amount, sequence->getLastTick());
         }
 
 		openScreen("sequencer");
@@ -135,7 +135,7 @@ void TimingCorrectScreen::displayNotes()
 {
 	init();
 	
-	if (track.lock()->getBus() == 0)
+	if (track->getBus() == 0)
 	{
 		findField("note0")->setAlignment(Alignment::Centered, 18);
 		findField("note0")->setLocation(62, 40);
@@ -157,7 +157,7 @@ void TimingCorrectScreen::displayNotes()
         }
 		else
         {
-            auto padIndex = program.lock()->getPadIndexFromNote(note0);
+            auto padIndex = program->getPadIndexFromNote(note0);
             auto padName = sampler->getPadName(padIndex);
             findField("note0")->setText(std::to_string(note0) + "/" + padName);
         }

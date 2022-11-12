@@ -38,7 +38,7 @@ void InitPadAssignScreen::function(int i)
 			sampler->setMasterPadAssign(*sampler->getInitMasterPadAssign());
 		}
 		else {
-			program.lock()->initPadAssign();
+			program->initPadAssign();
 		}
 		
 		openScreen("program-assign");

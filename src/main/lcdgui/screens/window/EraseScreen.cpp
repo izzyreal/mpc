@@ -266,7 +266,7 @@ void EraseScreen::displayNotes()
 			findField("note0")->setText("ALL");
 		else
         {
-            auto padIndexWithBank = program.lock()->getPadIndexFromNote(note0);
+            auto padIndexWithBank = program->getPadIndexFromNote(note0);
             auto padName = sampler->getPadName(padIndexWithBank);
             findField("note0")->setText(std::to_string(note0) + "/" + padName);
         }

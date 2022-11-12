@@ -26,7 +26,7 @@ void AutoChromaticAssignmentScreen::open()
     
     init();
     
-    setSourceSoundIndex(sampler->getLastNp(program.lock().get())->getSoundIndex());
+    setSourceSoundIndex(sampler->getLastNp(program.get())->getSoundIndex());
     displayOriginalKey();
     displayTune();
     displayProgramName();
@@ -90,7 +90,7 @@ void AutoChromaticAssignmentScreen::turnWheel(int i)
     {
         mpc.setNote(mpc.getNote() + i);
         displaySource();
-        setSourceSoundIndex(sampler->getLastNp(program.lock().get())->getSoundIndex());
+        setSourceSoundIndex(sampler->getLastNp(program.get())->getSoundIndex());
     }
     else if (param == "program-name")
     {
@@ -149,8 +149,8 @@ void AutoChromaticAssignmentScreen::setTune(int i)
 
 void AutoChromaticAssignmentScreen::displaySource()
 {
-    auto note = sampler->getLastNp(program.lock().get())->getNumber();
-    auto padIndex = program.lock()->getPadIndexFromNote(note);
+    auto note = sampler->getLastNp(program.get())->getNumber();
+    auto padIndex = program->getPadIndexFromNote(note);
     auto padName = sampler->getPadName(padIndex);
     findField("source")->setText(std::to_string(note) + "/" + padName);
 }
@@ -185,6 +185,6 @@ void AutoChromaticAssignmentScreen::update(moduru::observer::Observable* observa
     if (msg == "note")
     {
         displaySource();
-        setSourceSoundIndex(sampler->getLastNp(program.lock().get())->getSoundIndex());
+        setSourceSoundIndex(sampler->getLastNp(program.get())->getSoundIndex());
     }
 }

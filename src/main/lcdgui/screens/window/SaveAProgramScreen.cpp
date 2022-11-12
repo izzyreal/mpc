@@ -53,12 +53,12 @@ void SaveAProgramScreen::function(int i)
 
 		if (disk->checkExists(fileName))
 		{
-			nameScreen->setName(program.lock()->getName());
+			nameScreen->setName(program->getName());
 			openScreen("file-exists");
 			break;
 		}
 
-		disk->writePgm(program.lock(), fileName);
+		disk->writePgm(program, fileName);
 		break;
 	}
 	}

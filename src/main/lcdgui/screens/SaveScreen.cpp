@@ -134,7 +134,6 @@ void SaveScreen::function(int i)
         {
             std::shared_ptr<mpc::sequencer::Sequence> seq;
             
-            auto lProgram = program.lock();
             auto nameScreen = mpc.screens->get<NameScreen>("name");
             
             switch (type)
@@ -156,7 +155,7 @@ void SaveScreen::function(int i)
                     openScreen("save-aps-file");
                     break;
                 case 3:
-                    nameScreen->setName(mpc::Util::getFileName(lProgram->getName()));
+                    nameScreen->setName(mpc::Util::getFileName(program->getName()));
                     openScreen("save-a-program");
                     break;
                 case 4:
@@ -296,7 +295,7 @@ void SaveScreen::displayFile()
             break;
         }
         case 3:
-            fileName = program.lock()->getName();
+            fileName = program->getName();
             break;
         case 4:
             fileName = std::string(sampler->getSoundCount() == 0 ? " (No sound)" : sampler->getSound()->getName());

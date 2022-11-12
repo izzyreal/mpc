@@ -85,7 +85,7 @@ void SequencerScreen::open()
 
 	sequencer->addObserver(this);
 	sequence.lock()->addObserver(this);
-	track.lock()->addObserver(this);
+	track->addObserver(this);
 
 	findChild<TextComp>("fk3")->setBlinking(sequencer->isSoloEnabled());
 
@@ -173,7 +173,7 @@ void SequencerScreen::close()
     
 	sequencer->deleteObserver(this);
 	sequence.lock()->deleteObserver(this);
-	track.lock()->deleteObserver(this);
+	track->deleteObserver(this);
 }
 
 void SequencerScreen::displayVelo()
@@ -183,16 +183,16 @@ void SequencerScreen::displayVelo()
 
 void SequencerScreen::displayDeviceNumber()
 {
-	if (track.lock()->getDevice() == 0)
+	if (track->getDevice() == 0)
 	{
 		findField("devicenumber")->setText("OFF");
 	}
 	else
 	{
-		if (track.lock()->getDevice() >= 17)
-			findField("devicenumber")->setText(std::to_string(track.lock()->getDevice() - 16) + "B");
+		if (track->getDevice() >= 17)
+			findField("devicenumber")->setText(std::to_string(track->getDevice() - 16) + "B");
 		else
-			findField("devicenumber")->setText(std::to_string(track.lock()->getDevice()) + "A");
+			findField("devicenumber")->setText(std::to_string(track->getDevice()) + "A");
 	}
 }
 
@@ -211,33 +211,33 @@ void SequencerScreen::displayBars()
 
 void SequencerScreen::displayPgm()
 {
-	if (track.lock()->getProgramChange() == 0)
+	if (track->getProgramChange() == 0)
 		findField("pgm")->setText("OFF");
 	else
-		findField("pgm")->setText(std::to_string(track.lock()->getProgramChange()));
+		findField("pgm")->setText(std::to_string(track->getProgramChange()));
 }
 
 void SequencerScreen::displayDeviceName()
 {
-	if (track.lock()->getBus() != 0)
+	if (track->getBus() != 0)
 	{
-		if (track.lock()->getDevice() == 0)
+		if (track->getDevice() == 0)
 		{
-			int pgm = sampler->getDrumBusProgramIndex(track.lock()->getBus());
+			int pgm = sampler->getDrumBusProgramIndex(track->getBus());
 			auto p = sampler->getProgram(pgm);
 			findLabel("devicename")->setText(p->getName());
 		}
 		else
 		{
-			findLabel("devicename")->setText(sequencer->getActiveSequence()->getDeviceName(track.lock()->getDevice()));
+			findLabel("devicename")->setText(sequencer->getActiveSequence()->getDeviceName(track->getDevice()));
 		}
 	}
-	else if (track.lock()->getBus() == 0)
+	else if (track->getBus() == 0)
 	{
-		if (track.lock()->getDevice() == 0)
+		if (track->getDevice() == 0)
 			findLabel("devicename")->setText("NewPgm-A");
 		else
-			findLabel("devicename")->setText(sequencer->getActiveSequence()->getDeviceName(track.lock()->getDevice()));
+			findLabel("devicename")->setText(sequencer->getActiveSequence()->getDeviceName(track->getDevice()));
 	}
 }
 
@@ -366,11 +366,11 @@ void SequencerScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 	sequence = sequencer->getActiveSequence();
 	sequence.lock()->addObserver(this);
 
-	if (track.lock())
-		track.lock()->deleteObserver(this);
+	if (track)
+		track->deleteObserver(this);
 
 	track = sequencer->getActiveTrack();
-	track.lock()->addObserver(this);
+	track->addObserver(this);
 
 	auto s = nonstd::any_cast<std::string>(arg);
 
@@ -500,7 +500,7 @@ void SequencerScreen::pressEnter()
 		}
 		else if (param == "velo")
 		{
-			track.lock()->setVelocityRatio(candidate);
+			track->setVelocityRatio(candidate);
 		}
 	}
 }
@@ -541,7 +541,7 @@ void SequencerScreen::function(int i)
 		break;
 	}
 	case 2:
-		track.lock()->setOn(!track.lock()->isOn());
+		track->setOn(!track->isOn());
 		break;
 	case 3:
 	{
@@ -560,9 +560,9 @@ void SequencerScreen::function(int i)
 
 void SequencerScreen::checkTrackUsed()
 {
-	if (!track.lock()->isUsed())
+	if (!track->isUsed())
 	{
-		track.lock()->setUsed(true);
+		track->setUsed(true);
 		displayTr();
 	}
 }
@@ -589,7 +589,7 @@ void SequencerScreen::turnWheel(int i)
 	else if (param == "devicenumber")
 	{
 		checkTrackUsed();
-		track.lock()->setDeviceNumber(track.lock()->getDevice() + i);
+		track->setDeviceNumber(track->getDevice() + i);
 	}
 	else if (param == "tr")
 	{
@@ -606,7 +606,7 @@ void SequencerScreen::turnWheel(int i)
 	{
 		checkTrackUsed();
 
-		track.lock()->setBusNumber(track.lock()->getBus() + i);
+		track->setBusNumber(track->getBus() + i);
 		
 		auto lastFocus = getLastFocus("step-editor");
 
@@ -618,7 +618,7 @@ void SequencerScreen::turnWheel(int i)
 
 			if (std::dynamic_pointer_cast<NoteEvent>(stepEditorScreen->getVisibleEvents()[eventNumber]))
 			{
-				if (track.lock()->getBus() == 0)
+				if (track->getBus() == 0)
 				{
 					if (lastFocus[0] == 'd' || lastFocus[0] == 'e')
 					{
@@ -631,12 +631,12 @@ void SequencerScreen::turnWheel(int i)
 	else if (param == "pgm")
 	{
 		checkTrackUsed();
-		track.lock()->setProgramChange(track.lock()->getProgramChange() + i);
+		track->setProgramChange(track->getProgramChange() + i);
 	}
 	else if (param == "velo")
 	{
 		checkTrackUsed();
-		track.lock()->setVelocityRatio(track.lock()->getVelocityRatio() + i);
+		track->setVelocityRatio(track->getVelocityRatio() + i);
 	}
 	else if (param == "timing")
 	{
@@ -710,7 +710,7 @@ void SequencerScreen::turnWheel(int i)
 	else if (param == "on")
 	{
 		checkTrackUsed();
-		track.lock()->setOn(i > 0);
+		track->setOn(i > 0);
 	}
 }
 
@@ -752,8 +752,8 @@ void SequencerScreen::openWindow()
 	}
 	else if (param == "tr")
 	{
-		if (!track.lock()->isUsed())
-			track.lock()->setUsed(true);
+		if (!track->isUsed())
+			track->setUsed(true);
 
 		openScreen("track");
 	}

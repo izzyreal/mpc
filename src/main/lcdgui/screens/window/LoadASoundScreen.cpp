@@ -160,7 +160,7 @@ void LoadASoundScreen::keepSound()
 void LoadASoundScreen::displayAssignToNote()
 {
 	init();
-	auto padIndex = program.lock()->getPadIndexFromNote(assignToNote);
+	auto padIndex = program->getPadIndexFromNote(assignToNote);
 	auto padName = sampler->getPadName(padIndex);
 	auto noteName = std::string(assignToNote == 34 ? "--" : std::to_string(assignToNote));
 	findField("assign-to-note")->setText(noteName + "/" + padName);

@@ -18,7 +18,7 @@ void MidiOutputScreen::open()
 	auto prevScreen = ls->getPreviousScreenName();
 	if (prevScreen != "name" && prevScreen != "midi-output-monitor")
 	{
-		auto dev = track.lock()->getDevice();
+		auto dev = track->getDevice();
 
 		if (dev > 0)
 			deviceIndex = dev - 1;

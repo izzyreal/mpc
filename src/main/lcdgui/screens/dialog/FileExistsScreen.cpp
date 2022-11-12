@@ -91,7 +91,7 @@ void FileExistsScreen::function(int i)
 			{
 				disk->flush();
 				disk->initFiles();
-				disk->writePgm(program.lock(), pfileName);
+				disk->writePgm(program, pfileName);
 			}
 		}
 		else if (ls->getPreviousScreenName() == "save-a-sequence")

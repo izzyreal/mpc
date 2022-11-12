@@ -75,8 +75,8 @@ void PgmAssignScreen::turnWheel(int i)
 {
 	init();
 
-	auto lastPad = sampler->getLastPad(program.lock().get());
-	auto lastNoteParameters = sampler->getLastNp(program.lock().get());
+	auto lastPad = sampler->getLastPad(program.get());
+	auto lastNoteParameters = sampler->getLastNp(program.get());
 
 	if (param == "pad-assign")
 	{
@@ -116,7 +116,7 @@ void PgmAssignScreen::turnWheel(int i)
 		if (candidate < 0 || candidate > 63)
 			return;
 
-		auto nextNote = program.lock()->getPad(candidate)->getNote();
+		auto nextNote = program->getPad(candidate)->getNote();
 		mpc.setNote(nextNote);
 		mpc.setPad(candidate);
 		displayPad();
@@ -218,7 +218,7 @@ void PgmAssignScreen::openWindow()
 	}
 	else if (param == "snd")
 	{
-		auto sn = sampler->getLastNp(program.lock().get())->getSoundIndex();
+		auto sn = sampler->getLastNp(program.get())->getSoundIndex();
 		if (sn != -1)
 		{
 			sampler->setSoundIndex(sn);
@@ -230,12 +230,12 @@ void PgmAssignScreen::openWindow()
 
 void PgmAssignScreen::displayPgm()
 {
-	findField("pgm")->setText(StrUtil::padLeft(std::to_string(mpcSoundPlayerChannel->getProgram() + 1), " ", 2) + "-" + program.lock()->getName());
+	findField("pgm")->setText(StrUtil::padLeft(std::to_string(mpcSoundPlayerChannel->getProgram() + 1), " ", 2) + "-" + program->getName());
 }
 
 void PgmAssignScreen::displaySoundName()
 {
-	int sndNumber = sampler->getLastNp(program.lock().get())->getSoundIndex();
+	int sndNumber = sampler->getLastNp(program.get())->getSoundIndex();
 
 	if (sndNumber == -1)
 	{
@@ -266,23 +266,21 @@ void PgmAssignScreen::displayPadAssign()
 void PgmAssignScreen::displayPadNote()
 {
 	init();
-	auto lProgram = program.lock();
 
-	if (sampler->getLastPad(lProgram.get())->getNote() == 34)
+	if (sampler->getLastPad(program.get())->getNote() == 34)
 		findField("pad-note")->setText("--");
 	else
-		findField("pad-note")->setText(std::to_string(sampler->getLastPad(lProgram.get())->getNote()));
+		findField("pad-note")->setText(std::to_string(sampler->getLastPad(program.get())->getNote()));
 }
 
 void PgmAssignScreen::displaySoundGenerationMode()
 {
 	init();
 	auto sgm = -1;
-	auto lProgram = program.lock();
-	
-	if (sampler->getLastNp(lProgram.get()) != nullptr)
+
+	if (sampler->getLastNp(program.get()) != nullptr)
 	{
-		sgm = sampler->getLastNp(lProgram.get())->getSoundGenerationMode();
+		sgm = sampler->getLastNp(program.get())->getSoundGenerationMode();
 		findField("mode")->setText(soundGenerationModes[sgm]);
 		
 		if (sgm != 0)
@@ -318,7 +316,7 @@ void PgmAssignScreen::displaySoundGenerationMode()
 		}
 	}
 
-	if (sampler->getLastNp(lProgram.get()) == nullptr || sgm == -1 || sgm == 0)
+	if (sampler->getLastNp(program.get()) == nullptr || sgm == -1 || sgm == 0)
 	{
 		findLabel("velocity-range-lower")->Hide(true);
 		findField("velocity-range-lower")->Hide(true);
@@ -334,23 +332,22 @@ void PgmAssignScreen::displaySoundGenerationMode()
 void PgmAssignScreen::displayVeloRangeUpper()
 {
 	init();
-	auto rangeB = sampler->getLastNp(program.lock().get())->getVelocityRangeUpper();
+	auto rangeB = sampler->getLastNp(program.get())->getVelocityRangeUpper();
 	findField("velocity-range-upper")->setTextPadded(rangeB, " ");
 }
 
 void PgmAssignScreen::displayVeloRangeLower()
 {
 	init();
-	auto rangeA = sampler->getLastNp(program.lock().get())->getVelocityRangeLower();
+	auto rangeA = sampler->getLastNp(program.get())->getVelocityRangeLower();
 	findField("velocity-range-lower")->setTextPadded(rangeA, " ");
 }
 
 void PgmAssignScreen::displayOptionalNoteA()
 {
 	init();
-	auto lProgram = program.lock();
-	auto noteIntA = sampler->getLastNp(lProgram.get())->getOptionalNoteA();
-	auto padIntA = lProgram->getPadIndexFromNote(noteIntA);
+	auto noteIntA = sampler->getLastNp(program.get())->getOptionalNoteA();
+	auto padIntA = program->getPadIndexFromNote(noteIntA);
 	auto noteA = noteIntA != 34 ? std::to_string(noteIntA) : "--";
 	auto padA = sampler->getPadName(padIntA);
 	findField("optional-note-a")->setText(noteA + "/" + padA);
@@ -359,9 +356,8 @@ void PgmAssignScreen::displayOptionalNoteA()
 void PgmAssignScreen::displayOptionalNoteB()
 {
 	init();
-	auto lProgram = program.lock();
-	auto noteIntB = sampler->getLastNp(lProgram.get())->getOptionalNoteB();
-	auto padIntB = lProgram->getPadIndexFromNote(noteIntB);
+	auto noteIntB = sampler->getLastNp(program.get())->getOptionalNoteB();
+	auto padIntB = program->getPadIndexFromNote(noteIntB);
 	auto noteB = noteIntB != 34 ? std::to_string(noteIntB) : "--";
 	auto padB = sampler->getPadName(padIntB);
 	findField("optional-note-b")->setText(noteB + "/" + padB);
@@ -370,7 +366,7 @@ void PgmAssignScreen::displayOptionalNoteB()
 void PgmAssignScreen::displayNote()
 {
 	init();
-	findField("note")->setText(std::to_string(sampler->getLastNp(program.lock().get())->getNumber()));
+	findField("note")->setText(std::to_string(sampler->getLastNp(program.get())->getNumber()));
 }
 
 void PgmAssignScreen::displayPad()

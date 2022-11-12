@@ -19,8 +19,8 @@ void TrackScreen::open()
 	auto activeTrackIndex = sequencer->getActiveTrackIndex();
 	auto defaultTrackName = sequencer->getDefaultTrackName(activeTrackIndex);
 
-	findField("tracknamefirstletter")->setText(track.lock()->getName().substr(0, 1));
-	findLabel("tracknamerest")->setText(track.lock()->getName().substr(1));
+	findField("tracknamefirstletter")->setText(track->getName().substr(0, 1));
+	findLabel("tracknamerest")->setText(track->getName().substr(1));
 
 	findField("defaultnamefirstletter")->setText(defaultTrackName.substr(0, 1));
 	findLabel("defaultnamerest")->setText(defaultTrackName.substr(1));
@@ -56,7 +56,7 @@ void TrackScreen::turnWheel(int i)
 	}
 	else
 	{
-        const auto _track = track.lock();
+        const auto _track = track;
 		if (!_track->isUsed())
 			_track->setUsed(true);
 

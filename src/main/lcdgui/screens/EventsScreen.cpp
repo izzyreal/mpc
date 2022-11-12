@@ -41,7 +41,7 @@ void EventsScreen::pad(int padIndexWithBank, int velo)
         return;
     }
 
-    int newNote = program.lock()->getNoteFromPad(padIndexWithBank);
+    int newNote = program->getNoteFromPad(padIndexWithBank);
 
     if (newNote >= 35)
     {

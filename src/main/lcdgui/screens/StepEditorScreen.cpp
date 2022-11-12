@@ -76,9 +76,9 @@ void StepEditorScreen::open()
 
 	init();
 
-	if (track.lock()->getBus() != 0)
+	if (track->getBus() != 0)
 	{
-		int pgm = sampler->getDrumBusProgramIndex(track.lock()->getBus());
+		int pgm = sampler->getDrumBusProgramIndex(track->getBus());
 		program = sampler->getProgram(pgm);
 		findField("fromnote")->setAlignment(Alignment::None);
 	}
@@ -95,7 +95,7 @@ void StepEditorScreen::open()
 	setViewNotesText();
 	displayView();
 	sequencer->addObserver(this);
-	track.lock()->addObserver(this);
+	track->addObserver(this);
 
 	findField("now0")->setTextPadded(sequencer->getCurrentBarIndex() + 1, "0");
 	findField("now1")->setTextPadded(sequencer->getCurrentBeatIndex() + 1, "0");
@@ -121,7 +121,7 @@ void StepEditorScreen::close()
 {
 	init();
 	sequencer->deleteObserver(this);
-	track.lock()->deleteObserver(this);
+	track->deleteObserver(this);
 
 	if (param.length() == 2)
 	{
@@ -137,7 +137,7 @@ void StepEditorScreen::close()
 		nextScreen != "insert-event" &&
 		nextScreen != "paste-event")
 	{
-		track.lock()->removeDoubles();
+		track->removeDoubles();
 	}
 
 	for (auto& e : visibleEvents)
@@ -196,11 +196,11 @@ void StepEditorScreen::function(int i)
 
 		if (!std::dynamic_pointer_cast<EmptyEvent>(visibleEvents[rowIndex]))
 		{
-			for (int e = 0; e < track.lock()->getEvents().size(); e++)
+			for (int e = 0; e < track->getEvents().size(); e++)
 			{
-				if (track.lock()->getEvents()[e] == visibleEvents[rowIndex])
+				if (track->getEvents()[e] == visibleEvents[rowIndex])
 				{
-					track.lock()->removeEvent(e);
+					track->removeEvent(e);
 					break;
 				}
 			}
@@ -260,7 +260,7 @@ void StepEditorScreen::function(int i)
 
 			auto editMultipleScreen = mpc.screens->get<EditMultipleScreen>("edit-multiple");
 
-			if (noteEvent && track.lock()->getBus() != 0)
+			if (noteEvent && track->getBus() != 0)
 			{
 				if (isA)
 				{
@@ -285,7 +285,7 @@ void StepEditorScreen::function(int i)
 				}
 			}
 
-			if (noteEvent && track.lock()->getBus() == 0)
+			if (noteEvent && track->getBus() == 0)
 			{
 				if (isA)
 					editMultipleScreen->setChangeNoteTo(noteEvent->getNote());
@@ -374,8 +374,8 @@ void StepEditorScreen::turnWheel(int i)
 	}
 	else if (param == "fromnote" && view == 1)
 	{
-		if (track.lock()->getBus() != 0) setFromNote(fromNote + i);
-		if (track.lock()->getBus() == 0) setNoteA(noteA + i);
+		if (track->getBus() != 0) setFromNote(fromNote + i);
+		if (track->getBus() == 0) setNoteA(noteA + i);
 	}
 	else if (param == "tonote")
 	{
@@ -443,7 +443,7 @@ void StepEditorScreen::turnWheel(int i)
 			else if (param.find("c") != std::string::npos)
 				mixer->setValue(mixer->getValue() + i);
 		}
-		else if (note && track.lock()->getBus() == 0)
+		else if (note && track->getBus() == 0)
 		{
 			if (param.find("a") != std::string::npos)
 				note->setNote(note->getNote() + i);
@@ -452,7 +452,7 @@ void StepEditorScreen::turnWheel(int i)
 			else if (param.find("c") != std::string::npos)
 				note->setVelocity(note->getVelocity() + i);
 		}
-		else if (note && track.lock()->getBus() != 0)
+		else if (note && track->getBus() != 0)
 		{
 			if (param.find("a") != std::string::npos)
 			{
@@ -514,7 +514,7 @@ void StepEditorScreen::prevStepEvent()
 {
 	init();
 
-    track.lock()->removeDoubles();
+    track->removeDoubles();
 
     auto controls = mpc.getControls();
 
@@ -530,7 +530,7 @@ void StepEditorScreen::nextStepEvent()
 {
 	init();
 
-    track.lock()->removeDoubles();
+    track->removeDoubles();
 
     auto controls = mpc.getControls();
 
@@ -546,7 +546,7 @@ void StepEditorScreen::prevBarStart()
 {
 	init();
 
-    track.lock()->removeDoubles();
+    track->removeDoubles();
 
     auto controls = mpc.getControls();
 
@@ -562,7 +562,7 @@ void StepEditorScreen::nextBarEnd()
 {
 	init();
 
-    track.lock()->removeDoubles();
+    track->removeDoubles();
 
     auto controls = mpc.getControls();
 
@@ -790,7 +790,7 @@ void StepEditorScreen::initVisibleEvents()
 
 	eventsAtCurrentTick.clear();
 
-	for (auto& event : track.lock()->getEvents())
+	for (auto& event : track->getEvents())
 	{
 		if (event->getTick() == sequencer->getTickPosition())
 		{
@@ -800,7 +800,7 @@ void StepEditorScreen::initVisibleEvents()
 			{
 				auto ne = std::dynamic_pointer_cast<NoteEvent>(event);
 
-				if (track.lock()->getBus() != 0)
+				if (track->getBus() != 0)
 				{
 					if (fromNote == 34 || view == 0)
 					{
@@ -923,7 +923,7 @@ void StepEditorScreen::updateComponents()
 {
 	init();
 
-	if (view == 1 && track.lock()->getBus() != 0)
+	if (view == 1 && track->getBus() != 0)
 	{
 		findField("fromnote")->Hide(false);
 		findField("fromnote")->setSize(37, 9);
@@ -931,7 +931,7 @@ void StepEditorScreen::updateComponents()
 		findLabel("tonote")->Hide(true);
 		findField("tonote")->Hide(true);
 	}
-	else if (view == 1 && track.lock()->getBus() == 0)
+	else if (view == 1 && track->getBus() == 0)
 	{
 		findField("fromnote")->Hide(false);
 		findField("fromnote")->setLocation(61, 0);
@@ -963,18 +963,18 @@ void StepEditorScreen::setViewNotesText()
 {
 	init();
 
-	if (view == 1 && track.lock()->getBus() != 0)
+	if (view == 1 && track->getBus() != 0)
 	{
 		if (fromNote == 34) {
             findField("fromnote")->setText("ALL");
         }
 		else
         {
-            auto padName = sampler->getPadName(program.lock()->getPadIndexFromNote(fromNote));
+            auto padName = sampler->getPadName(program->getPadIndexFromNote(fromNote));
 			findField("fromnote")->setText(std::to_string(fromNote) + "/" + padName);
         }
 	}
-	else if (view == 1 && track.lock()->getBus() == 0)
+	else if (view == 1 && track->getBus() == 0)
 	{
 		findField("fromnote")->setText(StrUtil::padLeft(std::to_string(noteA), " ", 3) + "(" + mpc::Util::noteNames()[noteA] + u8"\u00D4");
 		findField("tonote")->setText(StrUtil::padLeft(std::to_string(noteB), " ", 3) + "(" + mpc::Util::noteNames()[noteB] + u8"\u00D4");
@@ -1190,7 +1190,7 @@ void StepEditorScreen::removeEvents()
 		if (eventCounter >= firstEventIndex && eventCounter <= lastEventIndex)
 		{
 			if (!std::dynamic_pointer_cast<EmptyEvent>(event))
-				track.lock()->removeEvent(event);
+				track->removeEvent(event);
 		}
 		eventCounter++;
 	}
@@ -1243,7 +1243,7 @@ void StepEditorScreen::update(moduru::observer::Observable*, nonstd::any message
 
 		if (std::dynamic_pointer_cast<NoteEvent>(visibleEvents[eventNumber]))
 		{
-			if (track.lock()->getBus() != 0)
+			if (track->getBus() != 0)
 				eventRow->setDrumNoteEventValues();
 			else
 				eventRow->setMidiNoteEventValues();
@@ -1354,7 +1354,7 @@ void StepEditorScreen::adhocPlayNoteEvent(const std::shared_ptr<mpc::sequencer::
     auto tick = noteEvent->getTick();
     noteEvent->setTick(-1);
     auto eventHandler = mpc.getEventHandler();
-    auto tr = track.lock().get();
+    auto tr = track.get();
 
     MidiAdapter midiAdapter;
 
@@ -1403,7 +1403,7 @@ void StepEditorScreen::adhocPlayNoteEvent(const std::shared_ptr<mpc::sequencer::
 void StepEditorScreen::adhocPlayNoteEventsAtCurrentPosition()
 {
     auto tick = sequencer->getTickPosition();
-    for (auto& e : track.lock()->getEventRange(tick, tick))
+    for (auto& e : track->getEventRange(tick, tick))
     {
         auto noteEvent = std::dynamic_pointer_cast<NoteEvent>(e);
         if (noteEvent)

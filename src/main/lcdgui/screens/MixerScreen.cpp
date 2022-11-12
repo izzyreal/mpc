@@ -63,13 +63,13 @@ void MixerScreen::addMixerStrips()
 std::shared_ptr<MpcStereoMixerChannel> MixerScreen::getStereoMixerChannel(int index)
 {
     const auto padIndex = index + (mpc.getBank() * 16);
-    const auto pad = program.lock()->getPad(padIndex);
+    const auto pad = program->getPad(padIndex);
     const auto note = pad->getNote();
     
     if (note < 35 || note > 98)
         return {};
     
-    auto noteParameters = dynamic_cast<NoteParameters*>(program.lock()->getNoteParameters(note));
+    auto noteParameters = dynamic_cast<NoteParameters*>(program->getNoteParameters(note));
     auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>("mixer-setup");
     bool stereoMixSourceIsDrum = mixerSetupScreen->isStereoMixSourceDrum();
     
@@ -79,13 +79,13 @@ std::shared_ptr<MpcStereoMixerChannel> MixerScreen::getStereoMixerChannel(int in
 std::shared_ptr<MpcIndivFxMixerChannel> MixerScreen::getIndivFxMixerChannel(int index)
 {
     const auto padIndex = index + (mpc.getBank() * 16);
-    const auto pad = program.lock()->getPad(padIndex);
+    const auto pad = program->getPad(padIndex);
     const auto note = pad->getNote();
     
     if (note < 35 || note > 98)
         return {};
     
-    auto noteParameters = dynamic_cast<NoteParameters*>(program.lock()->getNoteParameters(note));
+    auto noteParameters = dynamic_cast<NoteParameters*>(program->getNoteParameters(note));
     auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>("mixer-setup");
     bool indivFxSourceIsDrum = mixerSetupScreen->isIndivFxSourceDrum();
     
@@ -514,8 +514,8 @@ void MixerScreen::displayStereoFaders()
     
     auto stereoMixer = getStereoMixerChannel(xPos);
     auto pad = xPos + (mpc.getBank() * 16);
-    auto note = program.lock()->getNoteFromPad(pad);
-    auto padsWithSameNote = program.lock()->getPadIndicesFromNote(note);
+    auto note = program->getNoteFromPad(pad);
+    auto padsWithSameNote = program->getPadIndicesFromNote(note);
     
     for (auto& p : padsWithSameNote)
     {
@@ -557,8 +557,8 @@ void MixerScreen::displayPanning()
     
     auto stereoMixer = getStereoMixerChannel(xPos);
     auto pad = xPos + (mpc.getBank() * 16);
-    auto note = program.lock()->getNoteFromPad(pad);
-    auto padsWithSameNote = program.lock()->getPadIndicesFromNote(note);
+    auto note = program->getNoteFromPad(pad);
+    auto padsWithSameNote = program->getPadIndicesFromNote(note);
     
     for (auto& p : padsWithSameNote)
     {
@@ -606,8 +606,8 @@ void MixerScreen::displayIndividualOutputs()
     auto indivFxMixer = getIndivFxMixerChannel(xPos);
     
     auto pad = xPos + (mpc.getBank() * 16);
-    auto note = program.lock()->getNoteFromPad(pad);
-    auto padsWithSameNote = program.lock()->getPadIndicesFromNote(note);
+    auto note = program->getNoteFromPad(pad);
+    auto padsWithSameNote = program->getPadIndicesFromNote(note);
     
     for (auto& p : padsWithSameNote)
     {
@@ -652,8 +652,8 @@ void MixerScreen::displayIndivFaders()
     
     auto indivFxMixer = getIndivFxMixerChannel(xPos);
     auto pad = xPos + (mpc.getBank() * 16);
-    auto note = program.lock()->getNoteFromPad(pad);
-    auto padsWithSameNote = program.lock()->getPadIndicesFromNote(note);
+    auto note = program->getNoteFromPad(pad);
+    auto padsWithSameNote = program->getPadIndicesFromNote(note);
     
     for (auto& p : padsWithSameNote)
     {
@@ -695,8 +695,8 @@ void MixerScreen::displayFxPaths()
     
     auto indivFxMixer = getIndivFxMixerChannel(xPos);
     auto pad = xPos + (mpc.getBank() * 16);
-    auto note = program.lock()->getNoteFromPad(pad);
-    auto padsWithSameNote = program.lock()->getPadIndicesFromNote(note);
+    auto note = program->getNoteFromPad(pad);
+    auto padsWithSameNote = program->getPadIndicesFromNote(note);
     
     for (auto& p : padsWithSameNote)
     {
@@ -738,8 +738,8 @@ void MixerScreen::displayFxSendLevels()
     
     auto indivFxMixer = getIndivFxMixerChannel(xPos);
     auto pad = xPos + (mpc.getBank() * 16);
-    auto note = program.lock()->getNoteFromPad(pad);
-    auto padsWithSameNote = program.lock()->getPadIndicesFromNote(note);
+    auto note = program->getNoteFromPad(pad);
+    auto padsWithSameNote = program->getPadIndicesFromNote(note);
     
     for (auto& p : padsWithSameNote)
     {

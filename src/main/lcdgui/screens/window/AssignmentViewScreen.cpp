@@ -90,7 +90,7 @@ void AssignmentViewScreen::right()
 void AssignmentViewScreen::turnWheel(int i)
 {
 	init();
-    auto lastPad = sampler->getLastPad(program.lock().get());
+    auto lastPad = sampler->getLastPad(program.get());
 	lastPad->setNote(lastPad->getNote() + i);
     displayNote();
     displaySoundName();
@@ -130,13 +130,13 @@ void AssignmentViewScreen::displayAssignmentView()
 
 void AssignmentViewScreen::displayPad(int i)
 {
-	auto note = program.lock()->getPad(i + (16 * mpc.getBank()))->getNote();
+	auto note = program->getPad(i + (16 * mpc.getBank()))->getNote();
 
 	std::string sampleName;
 
 	if (note != 34)
 	{
-		auto sampleNumber = program.lock()->getNoteParameters(note)->getSoundIndex();
+		auto sampleNumber = program->getNoteParameters(note)->getSoundIndex();
 		sampleName = sampleNumber != -1 ? sampler->getSoundName(sampleNumber) : "--";
 	
 		if (sampleName.length() > 8)
@@ -153,7 +153,7 @@ void AssignmentViewScreen::displayBankInfoAndNoteLabel()
 
 void AssignmentViewScreen::displayNote()
 {
-	auto note = program.lock()->getPad(getPadIndexFromFocus())->getNote();
+	auto note = program->getPad(getPadIndexFromFocus())->getNote();
 	auto text = note == 34 ? "--" : std::to_string(note);
 	findField("note")->setText(text);
 }
@@ -161,7 +161,7 @@ void AssignmentViewScreen::displayNote()
 void AssignmentViewScreen::displaySoundName()
 {
 	auto padIndex = getPadIndexFromFocus();
-	int note = program.lock()->getPad(padIndex)->getNote();
+	int note = program->getPad(padIndex)->getNote();
 
 	if (note == 34)
 	{
@@ -169,13 +169,13 @@ void AssignmentViewScreen::displaySoundName()
 		return;
 	}
 
-	int soundIndex = program.lock()->getNoteParameters(note)->getSoundIndex();
+	int soundIndex = program->getNoteParameters(note)->getSoundIndex();
 
     std::string soundName = soundIndex == -1 ? "OFF" : sampler->getSoundName(soundIndex);
 
 	init();
 
-	auto noteParameters = sampler->getLastNp(program.lock().get());
+	auto noteParameters = sampler->getLastNp(program.get());
 
     std::string stereo;
 

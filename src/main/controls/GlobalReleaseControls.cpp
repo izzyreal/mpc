@@ -110,8 +110,7 @@ void GlobalReleaseControls::simplePad(int padIndexWithBank)
     return;
   }
 
-	auto lTrk = track.lock();
-	auto note = lTrk->getBus() > 0 ? program.lock()->getPad(padIndexWithBank)->getNote() : padIndexWithBank + 35;
+	auto note = track->getBus() > 0 ? program->getPad(padIndexWithBank)->getNote() : padIndexWithBank + 35;
 
 	generateNoteOff(note);
 	bool posIsLastTick = sequencer->getTickPosition() == sequencer->getActiveSequence()->getLastTick();
@@ -144,18 +143,18 @@ void GlobalReleaseControls::simplePad(int padIndexWithBank)
         }
 
 		sequencer->stopMetronomeTrack();
-		bool durationHasBeenAdjusted = lTrk->adjustDurLastEvent(newDuration);
+		bool durationHasBeenAdjusted = track->adjustDurLastEvent(newDuration);
 
 		if ( (durationHasBeenAdjusted && maybeRecWithoutPlaying) || (stepRec && increment))
 		{
 			int nextPos = sequencer->getTickPosition() + stepLength;
 			auto bar = sequencer->getCurrentBarIndex() + 1;
-			nextPos = lTrk->timingCorrectTick(0, bar, nextPos, stepLength);
+			nextPos = track->timingCorrectTick(0, bar, nextPos, stepLength);
 			auto lastTick = sequencer->getActiveSequence()->getLastTick();
 
 			if (nextPos != 0 && nextPos < lastTick)
 			{
-				nextPos = lTrk->swingTick(nextPos, noteVal, timingCorrectScreen->getSwing());
+				nextPos = track->swingTick(nextPos, noteVal, timingCorrectScreen->getSwing());
 				sequencer->move(nextPos);
 			}
 			else
@@ -169,7 +168,6 @@ void GlobalReleaseControls::simplePad(int padIndexWithBank)
 void GlobalReleaseControls::generateNoteOff(int note)
 {
     init();
-	auto lTrk = track.lock();
 
 	auto assign16LevelsScreen = mpc.screens->get<Assign16LevelsScreen>("assign-16-levels");
 
@@ -178,7 +176,7 @@ void GlobalReleaseControls::generateNoteOff(int note)
 
 	if (sequencer->isRecordingOrOverdubbing())
 	{
-        lTrk->recordNoteOffNow(note);
+        track->recordNoteOffNow(note);
 	}
 
     auto noteEvent = std::make_shared<mpc::sequencer::NoteEvent>(note);
@@ -194,7 +192,7 @@ void GlobalReleaseControls::generateNoteOff(int note)
         drum = drumScreen->drum;
     }
 
-    mpc.getEventHandler()->handle(noteEvent, lTrk.get(), drum);
+    mpc.getEventHandler()->handle(noteEvent, track.get(), drum);
 }
 
 void GlobalReleaseControls::overDub()

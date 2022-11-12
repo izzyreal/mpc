@@ -38,8 +38,8 @@ namespace mpc::lcdgui
 		std::shared_ptr<mpc::sequencer::Sequencer> sequencer;
 		std::shared_ptr<mpc::lcdgui::LayeredScreen> ls;
 		std::string param = "";
-		std::weak_ptr<mpc::sampler::Program> program;
-		std::weak_ptr<mpc::sequencer::Track> track;
+		std::shared_ptr<mpc::sampler::Program> program;
+		std::shared_ptr<mpc::sequencer::Track> track;
 		ctoot::mpc::MpcSoundPlayerChannel* mpcSoundPlayerChannel = nullptr;
 
 	protected:

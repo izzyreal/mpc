@@ -72,7 +72,7 @@ void BaseControls::init()
     
     auto drumScreen = mpc.screens->get<DrumScreen>("drum");
     
-    auto drumIndex = isSampler ? drumScreen->drum : track.lock()->getBus() - 1;
+    auto drumIndex = isSampler ? drumScreen->drum : track->getBus() - 1;
     
     if (drumIndex != -1)
     {
@@ -90,7 +90,7 @@ void BaseControls::left()
 {
     init();
     
-    if (!activeField.lock())
+    if (!activeField)
         return;
     
     if (param == "dummy")
@@ -103,7 +103,7 @@ void BaseControls::right()
 {
     init();
     
-    if (!activeField.lock())
+    if (!activeField)
         return;
     
     if (param == "dummy")
@@ -116,7 +116,7 @@ void BaseControls::up()
 {
     init();
     
-    if (!activeField.lock())
+    if (!activeField)
         return;
     
     if (param == "dummy")
@@ -129,7 +129,7 @@ void BaseControls::down()
 {
     init();
     
-    if (!activeField.lock())
+    if (!activeField)
         return;
     
     if (param == "dummy")
@@ -217,7 +217,7 @@ void BaseControls::pad(int padIndexWithBank, int velo)
     if (controls->isNoteRepeatLocked())
         return;
     
-    auto note = track.lock()->getBus() > 0 ? program.lock()->getPad(padIndexWithBank)->getNote() : padIndexWithBank + 35;
+    auto note = track->getBus() > 0 ? program->getPad(padIndexWithBank)->getNote() : padIndexWithBank + 35;
     auto velocity = velo;
 
     if (!mpc.getHardware()->getTopPanel()->isSixteenLevelsEnabled())
@@ -274,11 +274,8 @@ void BaseControls::generateNoteOn(int note, int padVelo)
     init();
     
     auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
-    
-    auto pgm = program.lock();
-    auto trk = track.lock();
-    
-    bool isSliderNote = pgm && pgm->getSlider()->getNote() == note;
+
+    bool isSliderNote = program && program->getSlider()->getNote() == note;
     
     bool posIsLastTick = sequencer->getTickPosition() == sequencer->getActiveSequence()->getLastTick();
     
@@ -293,7 +290,7 @@ void BaseControls::generateNoteOn(int note, int padVelo)
     tc_note != 0 &&
     !posIsLastTick;
     
-    auto padIndex = program.lock()->getPadIndexFromNote(note);
+    auto padIndex = program->getPadIndexFromNote(note);
     
     if (sequencer->isRecordingOrOverdubbing() || step || recMainWithoutPlaying)
     {
@@ -301,24 +298,24 @@ void BaseControls::generateNoteOn(int note, int padVelo)
         
         if (step)
         {
-            if (trk->getBus() == 0 || note >= 35)
+            if (track->getBus() == 0 || note >= 35)
             {
-                recordedEvent = trk->addNoteEvent(sequencer->getTickPosition(), note);
+                recordedEvent = track->addNoteEvent(sequencer->getTickPosition(), note);
             }
         }
         else if (recMainWithoutPlaying)
         {
-            recordedEvent = trk->addNoteEvent(sequencer->getTickPosition(), note);
+            recordedEvent = track->addNoteEvent(sequencer->getTickPosition(), note);
             int stepLength = sequencer->getTickValues()[tc_note];
             
             if (stepLength != 1)
             {
                 int bar = sequencer->getCurrentBarIndex() + 1;
-                trk->timingCorrect(0, bar, recordedEvent.get(), stepLength);
+                track->timingCorrect(0, bar, recordedEvent.get(), stepLength);
                 
                 std::vector<std::shared_ptr<Event>> events{ recordedEvent };
                 std::vector<int> noteRange {0, 127};
-                trk->swing(events, tc_note, tc_swing, noteRange);
+                track->swing(events, tc_note, tc_swing, noteRange);
                 
                 if (recordedEvent->getTick() != sequencer->getTickPosition())
                     sequencer->move(recordedEvent->getTick());
@@ -326,7 +323,7 @@ void BaseControls::generateNoteOn(int note, int padVelo)
         }
         else
         {
-            recordedEvent = trk->recordNoteOnNow(note);
+            recordedEvent = track->recordNoteOnNow(note);
         }
         
         if (recordedEvent)
@@ -362,7 +359,7 @@ void BaseControls::generateNoteOn(int note, int padVelo)
         drum = drumScreen->drum;
     }
 
-    mpc.getEventHandler()->handle(playableEvent, trk.get(), drum);
+    mpc.getEventHandler()->handle(playableEvent, track.get(), drum);
 }
 
 bool BaseControls::isTypable()

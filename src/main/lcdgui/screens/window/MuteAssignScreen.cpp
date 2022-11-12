@@ -28,7 +28,7 @@ void MuteAssignScreen::close()
 void MuteAssignScreen::turnWheel(int i)
 {
     init();
-	auto lastNoteParameters = sampler->getLastNp(program.lock().get());
+	auto lastNoteParameters = sampler->getLastNp(program.get());
 
 	if (param.compare("note") == 0)
 	{
@@ -48,12 +48,12 @@ void MuteAssignScreen::turnWheel(int i)
 
 void MuteAssignScreen::displayNote()
 {
-	auto note = sampler->getLastNp(program.lock().get())->getNumber();
-	auto pad = program.lock()->getPadIndexFromNote(note);
+	auto note = sampler->getLastNp(program.get())->getNumber();
+	auto pad = program->getPadIndexFromNote(note);
     std::string soundName = "OFF";
 
     auto padName = sampler->getPadName(pad);
-	auto sound = program.lock()->getNoteParameters(note)->getSoundIndex();
+	auto sound = program->getNoteParameters(note)->getSoundIndex();
 
     if (sound != -1)
     {
@@ -66,7 +66,7 @@ void MuteAssignScreen::displayNote()
 void MuteAssignScreen::displayNote0()
 {
 
-	auto note0 = sampler->getLastNp(program.lock().get())->getMuteAssignA();
+	auto note0 = sampler->getLastNp(program.get())->getMuteAssignA();
 
 	if (note0 == 34)
 	{
@@ -74,9 +74,9 @@ void MuteAssignScreen::displayNote0()
 		return;
 	}
 
-	auto pad = program.lock()->getPadIndexFromNote(note0);
+	auto pad = program->getPadIndexFromNote(note0);
     std::string soundName = "OFF";
-	auto sound = program.lock()->getNoteParameters(note0)->getSoundIndex();
+	auto sound = program->getNoteParameters(note0)->getSoundIndex();
 	
 	if (sound != -1)
 	{
@@ -88,7 +88,7 @@ void MuteAssignScreen::displayNote0()
 
 void MuteAssignScreen::displayNote1()
 {
-	auto note1 = sampler->getLastNp(program.lock().get())->getMuteAssignB();
+	auto note1 = sampler->getLastNp(program.get())->getMuteAssignB();
 
 	if (note1 == 34)
 	{
@@ -96,9 +96,9 @@ void MuteAssignScreen::displayNote1()
 		return;
 	}
 	
-	auto pad = program.lock()->getPadIndexFromNote(note1);
+	auto pad = program->getPadIndexFromNote(note1);
     std::string soundName = "OFF";
-	auto sound = program.lock()->getNoteParameters(note1)->getSoundIndex();
+	auto sound = program->getNoteParameters(note1)->getSoundIndex();
 
 	if (sound != -1)
 	{
