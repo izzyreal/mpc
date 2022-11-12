@@ -47,7 +47,7 @@ void KeepOrRetryScreen::function(int i)
             {
                 return;
             }
-            sampler->playPreviewSample(0, sampler->getPreviewSound().lock()->getLastFrameIndex(), 0, 2);
+            sampler->playPreviewSample(0, sampler->getPreviewSound()->getLastFrameIndex(), 0, 2);
             break;
         case 4:
             auto index = sampler->getSoundCount() - 1;
@@ -61,11 +61,11 @@ void KeepOrRetryScreen::function(int i)
 void KeepOrRetryScreen::openNameScreen()
 {
     auto nameScreen = mpc.screens->get<NameScreen>("name");
-    nameScreen->setName(sampler->getPreviewSound().lock()->getName());
+    nameScreen->setName(sampler->getPreviewSound()->getName());
     auto _sampler = sampler;
     
     auto renamer = [_sampler](std::string& newName) {
-        _sampler->getPreviewSound().lock()->setName(newName);
+        _sampler->getPreviewSound()->setName(newName);
     };
     
     nameScreen->setRenamerAndScreenToReturnTo(renamer, "keep-or-retry");
@@ -117,10 +117,10 @@ void KeepOrRetryScreen::turnWheel(int i)
 
 void KeepOrRetryScreen::displayNameForNewSound()
 {
-    if (!sampler->getSound().lock())
+    if (!sampler->getSound())
         return;
     
-    findField("name-for-new-sound")->setText(sampler->getPreviewSound().lock()->getName());
+    findField("name-for-new-sound")->setText(sampler->getPreviewSound()->getName());
 }
 
 void KeepOrRetryScreen::displayAssignToNote()

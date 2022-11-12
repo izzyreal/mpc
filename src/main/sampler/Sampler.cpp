@@ -45,12 +45,12 @@ Sampler::Sampler(mpc::Mpc& mpc)
 {
 }
 
-std::weak_ptr<Sound> Sampler::getPreviewSound()
+std::shared_ptr<Sound> Sampler::getPreviewSound()
 {
     return sounds[sounds.size() - 1];
 }
 
-std::weak_ptr<Sound> Sampler::getSound(int index)
+std::shared_ptr<Sound> Sampler::getSound(int index)
 {
     if (index < 0 || index >= sounds.size())
         return {};
@@ -58,7 +58,7 @@ std::weak_ptr<Sound> Sampler::getSound(int index)
     return sounds[index];
 }
 
-std::weak_ptr<Program> Sampler::getProgram(int index)
+std::shared_ptr<Program> Sampler::getProgram(int index)
 {
     return programs[index];
 }
@@ -79,7 +79,7 @@ int Sampler::getSoundIndex()
 	return soundIndex;
 }
 
-std::weak_ptr<Sound> Sampler::getSound()
+std::shared_ptr<Sound> Sampler::getSound()
 {
 	if (soundIndex < 0)
 	{
@@ -243,7 +243,7 @@ void Sampler::playPreviewSample(int start, int end, int loopTo, int overlapMode)
 	previewSound->setLoopTo(oldLoopTo);
 }
 
-std::weak_ptr<MpcProgram> Sampler::getMpcProgram(int index)
+std::shared_ptr<MpcProgram> Sampler::getMpcProgram(int index)
 {
 	return programs[index];
 }
@@ -297,22 +297,17 @@ void Sampler::deleteProgram(std::weak_ptr<Program> _program)
     repairProgramReferences();
 }
 
-std::vector<std::weak_ptr<Sound>> Sampler::getSounds()
+std::vector<std::shared_ptr<Sound>>& Sampler::getSounds()
 {
-	auto res = std::vector<std::weak_ptr<Sound>>();
-
-	for (auto& s : sounds)
-		res.push_back(s);
-
-	return res;
+	return sounds;
 }
 
-std::weak_ptr<Sound> Sampler::addSound()
+std::shared_ptr<Sound> Sampler::addSound()
 {
 	return addSound(44100);
 }
 
-std::weak_ptr<Sound> Sampler::addSound(int sampleRate)
+std::shared_ptr<Sound> Sampler::addSound(int sampleRate)
 {
 	auto res = std::make_shared<Sound>(sampleRate, sounds.size());
 	sounds.push_back(res);
@@ -408,7 +403,7 @@ void Sampler::repairProgramReferences()
 	}
 }
 
-std::weak_ptr<MpcSound> Sampler::getMpcSound(int index)
+std::shared_ptr<MpcSound> Sampler::getMpcSound(int index)
 {
     if (index < 0 || index >= sounds.size())
         return {};
@@ -416,10 +411,10 @@ std::weak_ptr<MpcSound> Sampler::getMpcSound(int index)
 	return sounds[index];
 }
 
-std::weak_ptr<MpcSound> Sampler::getMpcPreviewSound()
+std::shared_ptr<MpcSound> Sampler::getMpcPreviewSound()
 {
-	if (sounds.size() == 0)
-		return std::weak_ptr<Sound>();
+	if (sounds.empty())
+		return {};
 
 	return sounds[sounds.size() - 1];
 }
@@ -709,7 +704,7 @@ void Sampler::playX()
 	sound->setEnd(oldEnd);
 }
 
-std::weak_ptr<MpcSound> Sampler::getPlayXSound()
+std::shared_ptr<MpcSound> Sampler::getPlayXSound()
 {
 	return sounds[soundIndex];
 }
@@ -1000,7 +995,7 @@ MpcSoundPlayerChannel* Sampler::getDrum(int i)
 	return mpc.getDrum(i);
 }
 
-std::weak_ptr<MpcSound> Sampler::getClickSound()
+std::shared_ptr<MpcSound> Sampler::getClickSound()
 {
 	return clickSound;
 }
@@ -1038,7 +1033,7 @@ void Sampler::selectNextSound()
 std::weak_ptr<Sound> Sampler::copySound(std::weak_ptr<Sound> source)
 {
 	auto sound = source.lock();
-	auto newSound = addSound(sound->getSampleRate()).lock();
+	auto newSound = addSound(sound->getSampleRate());
 	newSound->setName(sound->getName());
 	newSound->setLoopEnabled(sound->isLoopEnabled());
 	auto dest = newSound->getSampleData();

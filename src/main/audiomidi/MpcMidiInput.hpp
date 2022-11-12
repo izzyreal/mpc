@@ -26,8 +26,8 @@ namespace mpc::audiomidi {
 
     private:
         mpc::Mpc &mpc;
-        std::weak_ptr<mpc::sequencer::Sequencer> sequencer;
-        std::weak_ptr<mpc::sampler::Sampler> sampler;
+        std::shared_ptr<mpc::sequencer::Sequencer> sequencer;
+        std::shared_ptr<mpc::sampler::Sampler> sampler;
 
         std::unique_ptr<mpc::sequencer::MidiAdapter> midiAdapter;
         std::unique_ptr<mpc::sequencer::EventAdapter> eventAdapter;

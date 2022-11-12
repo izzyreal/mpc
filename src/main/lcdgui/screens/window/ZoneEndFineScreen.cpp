@@ -32,7 +32,7 @@ void ZoneEndFineScreen::displayFineWave()
 	auto zoneScreen = mpc.screens->get<ZoneScreen>("zone");
 	auto trimScreen = mpc.screens->get<TrimScreen>("trim");
 
-	auto sound = sampler->getSound().lock();
+	auto sound = sampler->getSound();
 
 	if (!sound)
 		return;
@@ -79,7 +79,7 @@ void ZoneEndFineScreen::function(int i)
 void ZoneEndFineScreen::turnWheel(int i)
 {
 	init();
-	auto sound = sampler->getSound().lock();
+	auto sound = sampler->getSound();
 	auto zoneScreen = mpc.screens->get<ZoneScreen>("zone");
 
 	auto soundInc = getSoundIncrement(i);

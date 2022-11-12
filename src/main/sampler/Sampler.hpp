@@ -30,19 +30,19 @@ class Sampler final
 public:
     Sampler(mpc::Mpc&);
 
-    std::weak_ptr<ctoot::mpc::MpcSound> getMpcPreviewSound() override;
-    std::weak_ptr<ctoot::mpc::MpcSound> getPlayXSound() override;
-    std::weak_ptr<ctoot::mpc::MpcSound> getClickSound() override;
-    std::weak_ptr<ctoot::mpc::MpcSound> getMpcSound(int index) override;
-    std::weak_ptr<ctoot::mpc::MpcProgram> getMpcProgram(int programNumber) override;
+    std::shared_ptr<ctoot::mpc::MpcSound> getMpcPreviewSound() override;
+    std::shared_ptr<ctoot::mpc::MpcSound> getPlayXSound() override;
+    std::shared_ptr<ctoot::mpc::MpcSound> getClickSound() override;
+    std::shared_ptr<ctoot::mpc::MpcSound> getMpcSound(int index) override;
+    std::shared_ptr<ctoot::mpc::MpcProgram> getMpcProgram(int programNumber) override;
     
-    std::weak_ptr<Sound> getPreviewSound();
-    std::weak_ptr<Sound> getSound(int index);
-    std::weak_ptr<Program> getProgram(int index);
+    std::shared_ptr<Sound> getPreviewSound();
+    std::shared_ptr<Sound> getSound(int index);
+    std::shared_ptr<Program> getProgram(int index);
         
     void setSoundIndex(int i);
     int getSoundIndex();
-    std::weak_ptr<Sound> getSound();
+    std::shared_ptr<Sound> getSound();
     std::string getPreviousScreenName();
     void setPreviousScreenName(std::string s);
     bool isSoundNameOccupied(const std::string&);
@@ -61,9 +61,9 @@ public:
     void deleteProgram(std::weak_ptr<Program> program);
     void deleteAllPrograms(bool init);
     void repairProgramReferences();
-    std::vector<std::weak_ptr<Sound>> getSounds();
-    std::weak_ptr<Sound> addSound();
-    std::weak_ptr<Sound> addSound(int sampleRate);
+    std::vector<std::shared_ptr<Sound>>& getSounds();
+    std::shared_ptr<Sound> addSound();
+    std::shared_ptr<Sound> addSound(int sampleRate);
     int getSoundCount();
     std::string getSoundName(int i);
     std::vector<std::string> getSoundNames();

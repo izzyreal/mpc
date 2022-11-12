@@ -26,7 +26,7 @@ void TrimScreen::open()
     mpc.getControls()->getControls()->typableParams = { "st", "end" };
 
     findField("view")->setAlignment(Alignment::Centered);
-	bool sound = sampler->getSound().lock() ? true : false;
+	bool sound = sampler->getSound() ? true : false;
 
 	findField("snd")->setFocusable(sound);
 	findField("playx")->setFocusable(sound);
@@ -121,7 +121,7 @@ void TrimScreen::turnWheel(int i)
 {
 	init();
 
-	auto sound = sampler->getSound().lock();
+	auto sound = sampler->getSound();
 
 	if (param == "" || !sound)
 		return;
@@ -208,7 +208,7 @@ void TrimScreen::setSlider(int i)
     
 	init();
 
-	auto sound = sampler->getSound().lock();
+	auto sound = sampler->getSound();
 	auto const oldLength = sound->getEnd() - sound->getStart();
     auto candidatePos = (int) ((i / 124.0) * sound->getFrameCount());
 
@@ -277,7 +277,7 @@ void TrimScreen::pressEnter()
 		return;
 
 	auto candidate = field->enter();
-	auto sound = sampler->getSound().lock();
+	auto sound = sampler->getSound();
 	auto const oldLength = sound->getEnd() - sound->getStart();
 	
 	if (candidate != INT_MAX)
@@ -317,7 +317,7 @@ void TrimScreen::pressEnter()
 
 void TrimScreen::displayWave()
 {
-	auto sound = sampler->getSound().lock();
+	auto sound = sampler->getSound();
 
 	if (!sound)
 	{
@@ -334,7 +334,7 @@ void TrimScreen::displayWave()
 
 void TrimScreen::displaySnd()
 {
-	auto sound = sampler->getSound().lock();
+	auto sound = sampler->getSound();
 
 	if (!sound)
 	{
@@ -365,7 +365,7 @@ void TrimScreen::displaySt()
 {
 	if (sampler->getSoundCount() != 0)
 	{
-		auto sound = sampler->getSound().lock();
+		auto sound = sampler->getSound();
 		findField("st")->setTextPadded(sound->getStart(), " ");
 	}
 	else {
@@ -377,7 +377,7 @@ void TrimScreen::displayEnd()
 {
 	if (sampler->getSoundCount() != 0)
 	{
-		auto sound = sampler->getSound().lock();
+		auto sound = sampler->getSound();
 		findField("end")->setTextPadded(sound->getEnd(), " ");
 	}
 	else {

@@ -341,12 +341,12 @@ file_or_error AbstractDisk::writePgm2(std::shared_ptr<mpc::sampler::Program> p, 
         
         if (saveAProgramScreen->save != 0)
         {
-            std::vector<std::weak_ptr<Sound>> sounds;
+            std::vector<std::shared_ptr<Sound>> sounds;
             
             for (auto& n : p->getNotesParameters())
             {
                 if (n->getSoundIndex() != -1)
-                    sounds.push_back(mpc.getSampler()->getSound(n->getSoundIndex()).lock());
+                    sounds.push_back(mpc.getSampler()->getSound(n->getSoundIndex()));
             }
             
             auto isWav = saveAProgramScreen->save == 2;
@@ -431,7 +431,7 @@ wav_or_error AbstractDisk::readWavMeta(std::shared_ptr<MpcFile> f)
 sound_or_error AbstractDisk::readWav2(std::shared_ptr<MpcFile> f, bool shouldBeConverted)
 {
     auto sampler = mpc.getSampler();
-    auto sound = sampler->addSound().lock();
+    auto sound = sampler->addSound();
     std::string msg;
 
     try {
@@ -528,7 +528,7 @@ sound_or_error AbstractDisk::readWav2(std::shared_ptr<MpcFile> f, bool shouldBeC
 
 sound_or_error AbstractDisk::readSnd2(std::shared_ptr<MpcFile> f)
 {
-    auto sound = mpc.getSampler()->addSound().lock();
+    auto sound = mpc.getSampler()->addSound();
     std::string msg;
     
     try {

@@ -14,15 +14,15 @@ void ResampleScreen::open()
 {
 	auto previousScreenName = ls->getPreviousScreenName();
 
-	if (previousScreenName != "name" && sampler->getSound().lock())
+	if (previousScreenName != "name" && sampler->getSound())
 	{
-		newName = sampler->getSound().lock()->getName();
+		newName = sampler->getSound()->getName();
 		newName = sampler->addOrIncreaseNumber(newName);
 	}
 
-	if (sampler->getSound().lock())
+	if (sampler->getSound())
 	{
-		setNewFs(sampler->getSound().lock()->getSampleRate());
+		setNewFs(sampler->getSound()->getSampleRate());
 	}
 
 	displayNewBit();
@@ -77,8 +77,8 @@ void ResampleScreen::function(int i)
 		break;
 	case 4:
 	{
-		auto snd = sampler->getSound(sampler->getSoundIndex()).lock();
-		auto destSnd = sampler->addSound().lock();
+		auto snd = sampler->getSound(sampler->getSoundIndex());
+		auto destSnd = sampler->addSound();
 		destSnd->setName(newName);
         destSnd->setSampleRate(newFs);
 

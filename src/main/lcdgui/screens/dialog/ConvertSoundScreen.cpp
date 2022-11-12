@@ -35,7 +35,7 @@ void ConvertSoundScreen::function(int i)
 	case 4:
 		if (convert == 0)
 		{
-			if (sampler->getSound().lock()->isMono())
+			if (sampler->getSound()->isMono())
 			{
 				openScreen("mono-to-stereo");
 			}
@@ -53,12 +53,12 @@ void ConvertSoundScreen::function(int i)
 
 void ConvertSoundScreen::displayConvert()
 {
-	if (!sampler->getSound().lock())
+	if (!sampler->getSound())
 	{
 		return;
 	}
 
-	if (convert == 0 && sampler->getSound().lock()->isMono())
+	if (convert == 0 && sampler->getSound()->isMono())
 	{
 		findField("convert")->setText("MONO TO STEREO");
 	}

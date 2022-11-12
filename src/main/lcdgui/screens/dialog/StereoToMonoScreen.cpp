@@ -66,14 +66,14 @@ void StereoToMonoScreen::function(int i)
 		break;
 	case 4:
 	{
-		auto sound = sampler->getSound().lock();
+		auto sound = sampler->getSound();
 
 		if (sound->isMono())
 			return;
 
 		for (auto& s : sampler->getSounds())
 		{
-			if (s.lock()->getName() == newLName || s.lock()->getName() == newRName)
+			if (s->getName() == newLName || s->getName() == newRName)
 			{
 				auto popupScreen = mpc.screens->get<PopupScreen>("popup");
 				popupScreen->setText("Name already used");
@@ -83,8 +83,8 @@ void StereoToMonoScreen::function(int i)
 			}
 		}
 
-		auto left = sampler->addSound(sound->getSampleRate()).lock();
-		auto right = sampler->addSound(sound->getSampleRate()).lock();
+		auto left = sampler->addSound(sound->getSampleRate());
+		auto right = sampler->addSound(sound->getSampleRate());
 
 		left->setName(newLName);
 		right->setName(newRName);
@@ -112,10 +112,10 @@ void StereoToMonoScreen::function(int i)
 
 void StereoToMonoScreen::updateNewNames()
 {
-	if (! sampler->getSound().lock() || sampler->getSound().lock()->isMono())
+	if (! sampler->getSound() || sampler->getSound()->isMono())
 		return;
 
-	auto name = sampler->getSound().lock()->getName();
+	auto name = sampler->getSound()->getName();
 	name = StrUtil::trim(name);
 	name = StrUtil::padRight(name, "_", 16);
 	name = name.substr(0, 14);
@@ -126,7 +126,7 @@ void StereoToMonoScreen::updateNewNames()
 
 void StereoToMonoScreen::displayStereoSource()
 {
-	auto sound = sampler->getSound().lock();
+	auto sound = sampler->getSound();
 
 	if (!sound)
 	{

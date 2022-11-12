@@ -189,7 +189,7 @@ void UserScreen::displayDeviceName()
 	{
 		if (device == 0)
 		{
-			auto programName = sampler->getProgram(mpc.getDrum(bus - 1)->getProgram()).lock()->getName();
+			auto programName = sampler->getProgram(mpc.getDrum(bus - 1)->getProgram())->getName();
 			findLabel("devicename")->setText(programName);
 		}
 		else

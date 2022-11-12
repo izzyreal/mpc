@@ -66,7 +66,6 @@ void MpcMidiInput::transport(MidiMessage *msg, int timeStamp)
     eventAdapter->process(msg);
 
     auto status = msg->getStatus();
-    auto lSampler = sampler.lock();
     std::string notificationMessage = std::string(index == 0 ? "a" : "b");
 
     auto channel = shortMsg->getChannel();
@@ -74,8 +73,6 @@ void MpcMidiInput::transport(MidiMessage *msg, int timeStamp)
     notificationMessage += std::to_string(channel);
 
     notifyObservers(notificationMessage);
-
-    auto lSequencer = sequencer.lock();
 
     auto isControl = status >= ShortMessage::CONTROL_CHANGE && status < ShortMessage::CONTROL_CHANGE + 16;
 
@@ -107,10 +104,10 @@ void MpcMidiInput::transport(MidiMessage *msg, int timeStamp)
             switch (mce->getStatus())
             {
                 case ShortMessage::START:
-                    lSequencer->playFromStart();
+                    sequencer->playFromStart();
                     break;
                 case ShortMessage::STOP:
-                    lSequencer->stop();
+                    sequencer->stop();
                     break;
                 case ShortMessage::TIMING_CLOCK:
                     break;
@@ -120,17 +117,17 @@ void MpcMidiInput::transport(MidiMessage *msg, int timeStamp)
     else if (note)
     {
         note->setTick(-1);
-        auto s = lSequencer->isPlaying() ? lSequencer->getCurrentlyPlayingSequence()
-                                         : lSequencer->getActiveSequence();
+        auto s = sequencer->isPlaying() ? sequencer->getCurrentlyPlayingSequence()
+                                         : sequencer->getActiveSequence();
         auto track = s->getTrack(note->getTrack());
-        auto p = lSampler->getProgram(lSampler->getDrumBusProgramIndex(track->getBus())).lock();
+        auto p = sampler->getProgram(sampler->getDrumBusProgramIndex(track->getBus()));
 
         Util::setSliderNoteVariationParameters(mpc, note, p);
 
         auto pad = p->getPadIndexFromNote(note->getNote());
 
         if (note->getVelocity() != 0 && track->getBus() > 0 && track->getIndex() < 64 &&
-            mpc.getControls()->isTapPressed() && lSequencer->isPlaying())
+            mpc.getControls()->isTapPressed() && sequencer->isPlaying())
         {
             return;
         }
@@ -139,10 +136,10 @@ void MpcMidiInput::transport(MidiMessage *msg, int timeStamp)
         {
             mpc.getEventHandler()->handleNoThru(note, track.get(), timeStamp);
 
-            if (lSequencer->isRecordingOrOverdubbing())
+            if (sequencer->isRecordingOrOverdubbing())
             {
                 note->setDuration(note->getVelocity() == 0 ? 0 : -1);
-                note->setTick(lSequencer->getTickPosition());
+                note->setTick(sequencer->getTickPosition());
 
                 if (note->getVelocity() == 0)
                 {
@@ -213,7 +210,6 @@ void MpcMidiInput::handleControl(ShortMessage *shortMsg)
 
     auto midiInputScreen = mpc.screens->get<MidiInputScreen>("midi-input");
     auto midiSwScreen = mpc.screens->get<MidiSwScreen>("midi-sw");
-    auto seq = sequencer.lock();
 
     if (midiInputScreen->getReceiveCh() == -1 ||
         midiInputScreen->getReceiveCh() == shortMsg->getChannel())
@@ -246,52 +242,52 @@ void MpcMidiInput::handleControl(ShortMessage *shortMsg)
                 {
                     if (func == 0)
                     {
-                        seq->playFromStart();
+                        sequencer->playFromStart();
                     }
                     else if (func == 1)
                     {
-                        seq->play();
+                        sequencer->play();
                     }
                     else if (func == 2)
                     {
-                        seq->stop();
+                        sequencer->stop();
                     }
                     else if (func == 3)
                     {
-                        seq->rec();
+                        sequencer->rec();
                     }
                     else if (func == 4)
                     {
-                        seq->overdub();
+                        sequencer->overdub();
                     }
                     else if (func == 5)
                     {
-                        if (seq->isRecording())
+                        if (sequencer->isRecording())
                         {
-                            seq->setRecording(false);
+                            sequencer->setRecording(false);
                         }
-                        else if (seq->isPlaying())
+                        else if (sequencer->isPlaying())
                         {
-                            seq->setRecording(true);
+                            sequencer->setRecording(true);
                         }
                         else
                         {
-                            seq->play();
+                            sequencer->play();
                         }
                     }
                     else if (func == 6)
                     {
-                        if (seq->isOverDubbing())
+                        if (sequencer->isOverDubbing())
                         {
-                            seq->setOverdubbing(false);
+                            sequencer->setOverdubbing(false);
                         }
-                        else if (seq->isPlaying())
+                        else if (sequencer->isPlaying())
                         {
-                            seq->setOverdubbing(true);
+                            sequencer->setOverdubbing(true);
                         }
                         else
                         {
-                            seq->play();
+                            sequencer->play();
                         }
                     }
                     else if (func == 7)
@@ -374,8 +370,8 @@ void MpcMidiInput::transportOmni(MidiMessage *msg, std::string outputLetter)
 
 void MpcMidiInput::handlePolyAndNote(MidiMessage *msg)
 {
-    auto s = sequencer.lock()->getActiveSequence();
-    auto t = s->getTrack(sequencer.lock()->getActiveTrackIndex());
+    auto s = sequencer->getActiveSequence();
+    auto t = s->getTrack(sequencer->getActiveTrackIndex());
 
     auto bus = t->getBus();
 

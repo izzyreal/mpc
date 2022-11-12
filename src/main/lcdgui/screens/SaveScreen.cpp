@@ -299,7 +299,7 @@ void SaveScreen::displayFile()
             fileName = program.lock()->getName();
             break;
         case 4:
-            fileName = std::string(sampler->getSoundCount() == 0 ? " (No sound)" : sampler->getSound().lock()->getName());
+            fileName = std::string(sampler->getSoundCount() == 0 ? " (No sound)" : sampler->getSound()->getName());
             break;
         case 5:
             fileName = "MPC2KXL         .BIN";
@@ -328,7 +328,7 @@ void SaveScreen::displaySize()
             size = 4;
             break;
         case 4:
-            size = sampler->getSoundCount() == 0 ? -1 : (sampler->getSound().lock()->getSampleData()->size() * 2 * 0.001);
+            size = sampler->getSoundCount() == 0 ? -1 : (sampler->getSound()->getSampleData()->size() * 2 * 0.001);
             break;
         case 5:
             size = 512;

@@ -559,7 +559,7 @@ void Track::playNext()
             busNumber > 0)
         {
             auto pgmIndex = mpc.getSampler()->getDrumBusProgramIndex(busNumber);
-            auto pgm = mpc.getSampler()->getProgram(pgmIndex).lock();
+            auto pgm = mpc.getSampler()->getProgram(pgmIndex);
 
             bool oneOrMorePadsArePressed = false;
             auto hardware = mpc.getHardware();

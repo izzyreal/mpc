@@ -82,7 +82,7 @@ void LoadASoundScreen::function(int i)
 			return;
 
 		controls->setF3Pressed(true);
-		auto s = sampler->getPreviewSound().lock();
+		auto s = sampler->getPreviewSound();
 		auto start = s->getStart();
 		auto end = s->getSampleData()->size();
 		auto loopTo = -1;
@@ -113,17 +113,17 @@ void LoadASoundScreen::function(int i)
 
 void LoadASoundScreen::keepSound()
 {
-    auto sound = sampler->getPreviewSound().lock();
+    auto sound = sampler->getPreviewSound();
     auto candidateSoundName = sound->getName();
     std::shared_ptr<mpc::sampler::Sound> existingSound;
 
     for (auto& s : sampler->getSounds())
     {
-        if (s.lock() == sound) continue;
+        if (s == sound) continue;
 
-        if (moduru::lang::StrUtil::eqIgnoreCase(s.lock()->getName(), candidateSoundName))
+        if (moduru::lang::StrUtil::eqIgnoreCase(s->getName(), candidateSoundName))
         {
-            existingSound = s.lock();
+            existingSound = s;
             break;
         }
     }
@@ -137,7 +137,7 @@ void LoadASoundScreen::keepSound()
             auto bus = track->getBus();
             auto programNumber = sampler->getDrumBusProgramIndex(bus);
             auto program = sampler->getProgram(programNumber);
-            auto noteParameters = sampler->getLastNp(program.lock().get());
+            auto noteParameters = sampler->getLastNp(program.get());
             noteParameters->setSoundIndex(sampler->getSoundCount() - 1);
             auto mixerChannel = noteParameters->getStereoMixerChannel().lock();
             mixerChannel->setStereo(!newSoundIsMono);

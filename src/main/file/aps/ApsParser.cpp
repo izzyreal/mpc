@@ -16,13 +16,13 @@ using namespace mpc::disk;
 using namespace mpc::sampler;
 
 ApsParser::ApsParser(mpc::Mpc& mpc, std::weak_ptr<MpcFile> file)
-: ApsParser(mpc, file.lock()->getBytes(), file.lock()->getName())
+: ApsParser(mpc, file.lock()->getBytes())
 {
 }
 
-ApsParser::ApsParser(mpc::Mpc& mpc, const std::vector<char>& loadBytes, const std::string& name)
+ApsParser::ApsParser(mpc::Mpc &mpc, const std::vector<char> &loadBytes)
 {
-    if (loadBytes.size() == 0)
+    if (loadBytes.empty())
     {
 //        throw invalid_argument(name + " has no data");
         return;
@@ -100,11 +100,11 @@ ApsParser::ApsParser(mpc::Mpc& mpc, std::string apsNameString)
 		}
 	}
 
-    chunks.push_back(std::vector<char>{ 1, 127 });
+    chunks.push_back({ 1, 127 });
 	
 	for (int i = 0; i < 24; i++)
 	{
-		auto p = sampler->getProgram(i).lock();
+		auto p = sampler->getProgram(i);
 		
 		if (!p)
 			continue;

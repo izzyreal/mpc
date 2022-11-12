@@ -160,7 +160,7 @@ void PgmAssignScreen::turnWheel(int i)
 
 		displaySoundName();
 
-		auto sound = sampler->getSound(lastNoteParameters->getSoundIndex()).lock();
+		auto sound = sampler->getSound(lastNoteParameters->getSoundIndex());
 		
 		if (sound)
 		{
@@ -250,7 +250,7 @@ void PgmAssignScreen::displaySoundName()
 
 	if (sampler->getSoundCount() != 0 && sndNumber != -1)
 	{
-		if (sampler->getSound(sndNumber).lock()->isMono())
+		if (sampler->getSound(sndNumber)->isMono())
 			findLabel("issoundstereo")->setText("");
 		else
 			findLabel("issoundstereo")->setText("(ST)");

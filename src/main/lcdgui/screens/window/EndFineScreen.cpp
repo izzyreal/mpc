@@ -31,7 +31,7 @@ void EndFineScreen::displayFineWave()
 {
 	auto trimScreen = mpc.screens->get<TrimScreen>("trim");
 
-	auto sound = sampler->getSound().lock();
+	auto sound = sampler->getSound();
 
 	if (!sound)
 		return;
@@ -43,7 +43,7 @@ void EndFineScreen::displayFineWave()
 
 void EndFineScreen::displayEnd()
 {
-	auto sound = sampler->getSound().lock();
+	auto sound = sampler->getSound();
 
 	if (!sound)
 		return;
@@ -53,7 +53,7 @@ void EndFineScreen::displayEnd()
 
 void EndFineScreen::displayLngthLabel()
 {
-	auto sound = sampler->getSound().lock();
+	auto sound = sampler->getSound();
 
 	if (!sound)
 		return;
@@ -93,7 +93,7 @@ void EndFineScreen::function(int i)
 void EndFineScreen::turnWheel(int i)
 {
 	init();
-	auto sound = sampler->getSound().lock();
+	auto sound = sampler->getSound();
 
 	auto startEndLength = static_cast<int>(sound->getEnd() - sound->getStart());
 	auto trimScreen = mpc.screens->get<TrimScreen>("trim");

@@ -89,7 +89,7 @@ void PgmParamsScreen::turnWheel(int i)
 	}
 	else if(param == "voiceoverlap")
 	{
-        auto s = sampler->getSound(lastNoteParameters->getSoundIndex()).lock();
+        auto s = sampler->getSound(lastNoteParameters->getSoundIndex());
 		
 		if (s && s->isLoopEnabled())
 		{
@@ -272,7 +272,7 @@ void PgmParamsScreen::displayVoiceOverlap()
     auto lastNoteParameters = sampler->getLastNp(lProgram.get());
     auto mode = lastNoteParameters->getVoiceOverlap();
     
-    auto sound = sampler->getSound(lastNoteParameters->getSoundIndex()).lock();
+    auto sound = sampler->getSound(lastNoteParameters->getSoundIndex());
     
     if (sound && sound->isLoopEnabled())
         mode = 2;

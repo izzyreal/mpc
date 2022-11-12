@@ -37,7 +37,7 @@ void SaveASoundScreen::turnWheel(int i)
     
     if (param == "file")
     {
-        auto saveName = sampler->getSound().lock()->getName();
+        auto saveName = sampler->getSound()->getName();
         mpc.screens->get<NameScreen>("name")->setName(saveName);
         displayFile();
     }
@@ -55,7 +55,7 @@ void SaveASoundScreen::function(int i)
 	case 4:
 	{
 		auto disk = mpc.getDisk();
-		auto s = sampler->getSound().lock();
+		auto s = sampler->getSound();
 		auto ext = std::string(fileType == 0 ? ".SND" : ".WAV");
 		auto fileName = mpc::Util::getFileName(mpc.screens->get<NameScreen>("name")->getNameWithoutSpaces()) + ext;
 

@@ -132,7 +132,7 @@ void EventHandler::handleNoThru(const std::shared_ptr<Event>& event, Track* trac
                     int startTick = ne->getNoteOff().lock() ? ne->getTick() : ne->getNoteOnTick();
 
                     auto pgmIndex = sampler->getDrumBusProgramIndex(drumIndex + 1);
-                    auto pgm = sampler->getProgram(pgmIndex).lock();
+                    auto pgm = sampler->getProgram(pgmIndex);
                     auto voiceOverlap = pgm->getNoteParameters(ne->getNote())->getVoiceOverlap();
                     auto duration = voiceOverlap == 2 ? ne->getDuration() : -1;
                     auto audioServer = mpc.getAudioMidiServices()->getAudioServer();
@@ -145,7 +145,7 @@ void EventHandler::handleNoThru(const std::shared_ptr<Event>& event, Track* trac
                         auto note = ne->getNote();
                         auto program = mpc.getSampler()->getProgram(mpc.getDrum(drumIndex)->getProgram());
                         
-                        int pad = program.lock()->getPadIndexFromNote(note);
+                        int pad = program->getPadIndexFromNote(note);
                         int bank = mpc.getBank();
                         pad -= bank * 16;
                         
@@ -166,7 +166,7 @@ void EventHandler::handleNoThru(const std::shared_ptr<Event>& event, Track* trac
     else if (me)
     {
         auto pad = me->getPad();
-        auto p = sampler->getProgram(sampler->getDrumBusProgramIndex(track->getBus())).lock();
+        auto p = sampler->getProgram(sampler->getDrumBusProgramIndex(track->getBus()));
         auto mixer = p->getStereoMixerChannel(pad).lock();
         
         auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>("mixer-setup");

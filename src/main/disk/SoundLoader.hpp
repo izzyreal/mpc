@@ -47,7 +47,7 @@ class SoundLoader
 {
 public:
     SoundLoader(mpc::Mpc& mpc);
-    SoundLoader(mpc::Mpc& mpc, std::vector<std::weak_ptr<mpc::sampler::Sound>> sounds, bool replace);
+    SoundLoader(mpc::Mpc& mpc, std::vector<std::shared_ptr<mpc::sampler::Sound>> sounds, bool replace);
 
     void setPartOfProgram(bool);
     void loadSound(std::shared_ptr<MpcFile>, SoundLoaderResult&, bool shouldBeConverted);
@@ -56,7 +56,7 @@ public:
 private:
     mpc::Mpc& mpc;
     bool partOfProgram = false;
-    std::vector<std::weak_ptr<mpc::sampler::Sound>> sounds;
+    std::vector<std::shared_ptr<mpc::sampler::Sound>> sounds;
     bool preview = false;
     bool replace = false;
 };

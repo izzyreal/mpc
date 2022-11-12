@@ -31,7 +31,7 @@ void SoundScreen::turnWheel(int i)
             if (sampler->isSoundNameOccupied(newName))
                 return;
 
-            sampler->getSound().lock()->setName(newName);
+            sampler->getSound()->setName(newName);
         };
 
         nameScreen->setRenamerAndScreenToReturnTo(renamer, "sound");
@@ -59,7 +59,7 @@ void SoundScreen::function(int i)
 
 void SoundScreen::displaySoundName()
 {
-	auto sound = sampler->getSound().lock();
+	auto sound = sampler->getSound();
 
 	if (!sound)
 	{
@@ -72,7 +72,7 @@ void SoundScreen::displaySoundName()
 
 void SoundScreen::displayType()
 {
-	auto sound = sampler->getSound().lock();
+	auto sound = sampler->getSound();
 
 	if (!sound)
 	{
@@ -85,7 +85,7 @@ void SoundScreen::displayType()
 
 void SoundScreen::displayRate()
 {
-	auto sound = sampler->getSound().lock();
+	auto sound = sampler->getSound();
 
 	if (!sound)
 	{
@@ -98,7 +98,7 @@ void SoundScreen::displayRate()
 
 void SoundScreen::displaySize()
 {
-	auto sound = sampler->getSound().lock();
+	auto sound = sampler->getSound();
 
 	if (!sound)
 	{

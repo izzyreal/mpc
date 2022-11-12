@@ -875,7 +875,7 @@ int BaseControls::getSoundIncrement(int notch_inc)
     
     if (abs(notch_inc) != 1)
     {
-        soundInc *= (int)(ceil(sampler->getSound().lock()->getFrameCount() / 15000.0));
+        soundInc *= (int)(ceil(sampler->getSound()->getFrameCount() / 15000.0));
     }
     
     return soundInc;

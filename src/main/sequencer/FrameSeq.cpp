@@ -345,7 +345,7 @@ void FrameSeq::repeatPad(int duration)
 	if (!controls)
 		return;
 
-  auto program = mpc.getSampler()->getProgram(mpc.getDrum(track->getBus() - 1)->getProgram()).lock();
+  auto program = mpc.getSampler()->getProgram(mpc.getDrum(track->getBus() - 1)->getProgram());
   auto hardware = mpc.getHardware();
   auto fullLevel = hardware->getTopPanel()->isFullLevelEnabled();
 

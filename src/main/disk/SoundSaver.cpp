@@ -18,7 +18,7 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace moduru::lang;
 
-SoundSaver::SoundSaver(mpc::Mpc& _mpc, std::vector<std::weak_ptr<mpc::sampler::Sound>> _sounds, bool _wav)
+SoundSaver::SoundSaver(mpc::Mpc& _mpc, std::vector<std::shared_ptr<mpc::sampler::Sound>> _sounds, bool _wav)
 : mpc (_mpc), sounds (_sounds), wav (_wav), saveSoundsThread (std::thread(&SoundSaver::static_saveSounds, this))
 {
 }
@@ -35,7 +35,7 @@ void SoundSaver::saveSounds()
 	
 	for (auto s : sounds)
 	{
-		auto fileName = StrUtil::replaceAll(s.lock()->getName(), ' ', "");
+		auto fileName = StrUtil::replaceAll(s->getName(), ' ', "");
 		
 		mpc.getLayeredScreen()->openScreen("popup");
 		auto popupScreen = mpc.screens->get<PopupScreen>("popup");
@@ -52,9 +52,9 @@ void SoundSaver::saveSounds()
 		}
 		
 		if (wav)
-            disk->writeWav(s.lock(), "");
+            disk->writeWav(s, "");
 		else
-            disk->writeSnd(s.lock(), "");
+            disk->writeSnd(s, "");
 
         std::this_thread::sleep_for(std::chrono::milliseconds(300));
 	}

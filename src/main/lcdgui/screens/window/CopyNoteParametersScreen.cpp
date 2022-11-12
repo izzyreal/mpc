@@ -54,8 +54,8 @@ void CopyNoteParametersScreen::function(int i)
 	{
 	case 4:
 	{
-		auto source = dynamic_cast<mpc::sampler::NoteParameters*>(sampler->getProgram(prog0).lock()->getNoteParameters(mpc.getNote()));
-		auto dest = dynamic_cast<mpc::sampler::Program*>(sampler->getProgram(prog1).lock().get());
+		auto source = dynamic_cast<mpc::sampler::NoteParameters*>(sampler->getProgram(prog0)->getNoteParameters(mpc.getNote()));
+		auto dest = dynamic_cast<mpc::sampler::Program*>(sampler->getProgram(prog1).get());
 		auto clone = source->clone(note1);
 		dest->setNoteParameters(note1, clone);
 		openScreen("program-assign");
@@ -66,7 +66,7 @@ void CopyNoteParametersScreen::function(int i)
 
 void CopyNoteParametersScreen::displayProg0()
 {
-	auto program = sampler->getProgram(prog0).lock();
+	auto program = sampler->getProgram(prog0);
 	findField("prog0")->setText(StrUtil::padLeft(std::to_string(prog0 + 1), " ", 2) + "-" + program->getName());
 }
 
@@ -74,7 +74,7 @@ void CopyNoteParametersScreen::displayNote0()
 {
 	auto noteParameters = sampler->getLastNp(program.lock().get());
 	auto note0 = noteParameters->getNumber();
-	auto program = sampler->getProgram(prog0).lock();
+	auto program = sampler->getProgram(prog0);
 	auto padIndex = program->getPadIndexFromNote(note0);
 	auto soundIndex = note0 != -1 ? noteParameters->getSoundIndex() : -1;
 	auto noteText = note0 == -1 ? "--" : std::to_string(note0);
@@ -89,13 +89,13 @@ void CopyNoteParametersScreen::displayNote0()
 
 void CopyNoteParametersScreen::displayProg1()
 {
-	auto program = sampler->getProgram(prog1).lock();
+	auto program = sampler->getProgram(prog1);
 	findField("prog1")->setText(StrUtil::padLeft(std::to_string(prog1 + 1), " ", 2) + "-" + program->getName());
 }
 
 void CopyNoteParametersScreen::displayNote1()
 {
-	auto program = sampler->getProgram(prog1).lock();
+	auto program = sampler->getProgram(prog1);
 	auto padIndex = program->getPadIndexFromNote(note1 + 35);
 	auto soundIndex = note1 != -1 ? program->getNoteParameters(note1 + 35)->getSoundIndex() : -1;
 	auto noteText = note1 == -1 ? "--" : std::to_string(note1 + 35);

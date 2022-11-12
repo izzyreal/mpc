@@ -17,7 +17,7 @@ SndParamsScreen::SndParamsScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void SndParamsScreen::open()
 {
-	auto sound = sampler->getSound().lock() ? true : false;
+	auto sound = sampler->getSound() ? true : false;
 
 	findField("snd")->setFocusable(sound);
 	findField("playx")->setFocusable(sound);
@@ -96,7 +96,7 @@ void SndParamsScreen::function(int f)
 void SndParamsScreen::turnWheel(int i)
 {
 	init();
-	auto sound = sampler->getSound().lock();
+	auto sound = sampler->getSound();
 
 	if (param.compare("playx") == 0)
 	{
@@ -142,7 +142,7 @@ void SndParamsScreen::turnWheel(int i)
 
 void SndParamsScreen::displayLevel()
 {
-	auto sound = sampler->getSound().lock();
+	auto sound = sampler->getSound();
 
 	if (sound)
 		findField("level")->setText(std::to_string(sound->getSndLevel()));
@@ -152,7 +152,7 @@ void SndParamsScreen::displayLevel()
 
 void SndParamsScreen::displayTune()
 {
-	auto sound = sampler->getSound().lock();
+	auto sound = sampler->getSound();
 
 	if (sound)
 		findField("tune")->setText(std::to_string(sound->getTune()));
@@ -162,7 +162,7 @@ void SndParamsScreen::displayTune()
 
 void SndParamsScreen::displayBeat()
 {
-	auto sound = sampler->getSound().lock();
+	auto sound = sampler->getSound();
 
 	if (sound)
 		findField("beat")->setText(std::to_string(sound->getBeatCount()));
@@ -172,7 +172,7 @@ void SndParamsScreen::displayBeat()
 
 void SndParamsScreen::displaySampleAndNewTempo()
 {
-	auto sound = sampler->getSound().lock();
+	auto sound = sampler->getSound();
 
 	if (!sound || !sound->isLoopEnabled())
 	{
@@ -223,7 +223,7 @@ void SndParamsScreen::displaySampleAndNewTempo()
 
 void SndParamsScreen::displaySnd()
 {
-	auto sound = sampler->getSound().lock();
+	auto sound = sampler->getSound();
 
 	if (sampler->getSoundCount() == 0)
 	{

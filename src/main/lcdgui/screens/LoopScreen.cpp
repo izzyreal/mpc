@@ -26,7 +26,7 @@ void LoopScreen::open()
     mpc.getControls()->getControls()->typableParams = { "to", "endlengthvalue" };
 
     findField("loop")->setAlignment(Alignment::Centered);
-	bool sound = sampler->getSound().lock() ? true : false;
+	bool sound = sampler->getSound() ? true : false;
 
 	findField("snd")->setFocusable(sound);
 	findField("playx")->setFocusable(sound);
@@ -117,7 +117,7 @@ void LoopScreen::turnWheel(int i)
     init();
 
     auto soundInc = getSoundIncrement(i);
-	auto sound = sampler->getSound().lock();
+	auto sound = sampler->getSound();
 
 	if (param == "" || !sound)
 		return;
@@ -211,7 +211,7 @@ void LoopScreen::turnWheel(int i)
 	}
 	else if (param.compare("loop") == 0)
 	{
-        sampler->getSound().lock()->setLoopEnabled(i > 0);
+        sampler->getSound()->setLoopEnabled(i > 0);
         displayLoop();
 	}
 	else if (param.compare("endlength") == 0)
@@ -252,7 +252,7 @@ void LoopScreen::setSlider(int i)
 	init();
 
 	auto trimScreen = mpc.screens->get<TrimScreen>("trim");
-	auto sound = sampler->getSound().lock();
+	auto sound = sampler->getSound();
 
 	auto const oldLength = sound->getEnd() - sound->getLoopTo();
 	auto const lengthFix = trimScreen->smplLngthFix;
@@ -322,7 +322,7 @@ void LoopScreen::pressEnter()
 		return;
 
 	auto candidate = field->enter();
-	auto sound = sampler->getSound().lock();
+	auto sound = sampler->getSound();
 
 	auto const oldLength = sound->getEnd() - sound->getLoopTo();
 
@@ -381,7 +381,7 @@ void LoopScreen::pressEnter()
 
 void LoopScreen::displaySnd()
 {
-	auto sound = sampler->getSound().lock();
+	auto sound = sampler->getSound();
 
 	if (!sound)
 	{
@@ -410,7 +410,7 @@ void LoopScreen::displayTo()
 {
 	if (sampler->getSoundCount() != 0)
 	{
-		auto sound = sampler->getSound().lock();
+		auto sound = sampler->getSound();
 		findField("to")->setTextPadded(sound->getLoopTo(), " ");
 	}
 	else
@@ -437,7 +437,7 @@ void LoopScreen::displayEndLengthValue()
 		return;
 	}
 
-	auto sound = sampler->getSound().lock();
+	auto sound = sampler->getSound();
 
 	auto text = std::to_string(endSelected ? sound->getEnd() : sound->getEnd() - sound->getLoopTo());
 	findField("endlengthvalue")->setTextPadded(text, " ");
@@ -451,13 +451,13 @@ void LoopScreen::displayLoop()
 		return;
 	}
 
-	auto sound = sampler->getSound().lock();
+	auto sound = sampler->getSound();
 	findField("loop")->setText(sound->isLoopEnabled() ? "ON" : "OFF");
 }
 
 void LoopScreen::displayWave()
 {
-	auto sound = sampler->getSound().lock();
+	auto sound = sampler->getSound();
 
 	if (!sound)
 	{

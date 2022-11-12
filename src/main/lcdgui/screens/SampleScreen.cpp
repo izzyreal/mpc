@@ -119,7 +119,7 @@ void SampleScreen::function(int i)
 		else
 		{
 			auto sound = sampler->addSound();
-			sound.lock()->setName(sampler->addOrIncreaseNumber("sound1"));
+			sound->setName(sampler->addOrIncreaseNumber("sound1"));
 			auto lengthInFrames = time * (44100 * 0.1);
 			ams->getSoundRecorder()->prepare(sound, lengthInFrames);
 			ams->getSoundRecorder()->setArmed(true);

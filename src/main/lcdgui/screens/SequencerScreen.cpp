@@ -224,7 +224,7 @@ void SequencerScreen::displayDeviceName()
 		if (track.lock()->getDevice() == 0)
 		{
 			int pgm = sampler->getDrumBusProgramIndex(track.lock()->getBus());
-			auto p = sampler->getProgram(pgm).lock();
+			auto p = sampler->getProgram(pgm);
 			findLabel("devicename")->setText(p->getName());
 		}
 		else

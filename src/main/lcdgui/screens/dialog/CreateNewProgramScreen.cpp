@@ -17,11 +17,11 @@ void CreateNewProgramScreen::turnWheel(int i)
 {
 	init();
 
-	if (param.compare("midi-program-change") == 0)
+	if (param == "midi-program-change")
     {
         setMidiProgramChange(midiProgramChange + i);
     }
-    else if (param.compare("new-name") == 0)
+    else if (param == "new-name")
     {
         auto nameScreen = mpc.screens->get<NameScreen>("name");
         auto createNewProgramScreen = this;
@@ -38,13 +38,13 @@ void CreateNewProgramScreen::turnWheel(int i)
 
 void CreateNewProgramScreen::open()
 {
-    if (ls->getPreviousScreenName().compare("name") != 0)
+    if (ls->getPreviousScreenName() != "name")
     {
         auto letterIndex = 21 + 24;
         
         for (int i = 0; i < sampler->getPrograms().size(); i++)
         {
-            if (!sampler->getProgram(i).lock())
+            if (!sampler->getProgram(i))
             {
                 letterIndex = 21 + i;
                 midiProgramChange = i + 1;
@@ -79,7 +79,7 @@ void CreateNewProgramScreen::function(int i)
 
 		for (int j = 0; j < sampler->getPrograms().size(); j++)
 		{
-			if (sampler->getProgram(j).lock() == newProgram)
+			if (sampler->getProgram(j) == newProgram)
 			{
 				index = j;
 				break;

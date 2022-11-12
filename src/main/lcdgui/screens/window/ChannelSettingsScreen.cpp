@@ -155,7 +155,7 @@ void ChannelSettingsScreen::displayNoteField()
 	{
 		soundName = sampler->getSoundName(soundIndex);
 
-		if (!sampler->getSound(soundIndex).lock()->isMono())
+		if (!sampler->getSound(soundIndex)->isMono())
 			soundName += StrUtil::padLeft("(ST)", " ", 19 - soundName.length());
 	}
 

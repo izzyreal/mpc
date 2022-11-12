@@ -37,7 +37,7 @@ void LoopEndFineScreen::displayLoopLngth()
 
 void LoopEndFineScreen::displayLngthField()
 {
-	auto sound = sampler->getSound().lock();
+	auto sound = sampler->getSound();
 
 	if (!sound)
 		return;
@@ -49,7 +49,7 @@ void LoopEndFineScreen::displayFineWave()
 {
 	auto trimScreen = mpc.screens->get<TrimScreen>("trim");
 
-	auto sound = sampler->getSound().lock();
+	auto sound = sampler->getSound();
 
 	if (!sound)
 	{
@@ -62,7 +62,7 @@ void LoopEndFineScreen::displayFineWave()
 
 void LoopEndFineScreen::displayEnd()
 {
-	auto sound = sampler->getSound().lock();
+	auto sound = sampler->getSound();
 
 	if (!sound)
 	{
@@ -98,7 +98,7 @@ void LoopEndFineScreen::function(int i)
 void LoopEndFineScreen::turnWheel(int i)
 {
 	init();
-	auto sound = sampler->getSound().lock();
+	auto sound = sampler->getSound();
 	auto startEndLength = static_cast<int>(sound->getEnd() - sound->getStart());
 	auto loopLength = static_cast<int>((sound->getEnd() - sound->getLoopTo()));
 	auto loopScreen = mpc.screens->get<LoopScreen>("loop");

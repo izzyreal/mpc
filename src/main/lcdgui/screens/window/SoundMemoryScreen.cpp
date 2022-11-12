@@ -26,7 +26,7 @@ void SoundMemoryScreen::displayFreeMemoryTime()
 	auto total = 33374880;
 	
 	for (auto& s : sampler->getSounds())
-		total -= (s.lock()->getSampleData()->size() * 2);
+		total -= (s->getSampleData()->size() * 2);
 
 	auto time = StrUtil::padLeft(StrUtil::TrimDecimals(total / 176400.0, 1), " ", 6);
 	findLabel("free-memory-time")->setText("Free memory(time):" + time);

@@ -139,7 +139,7 @@ void FileExistsScreen::function(int i)
 		}
 		else if (previousScreen == "save-a-sound")
 		{
-			auto s = sampler->getSound().lock();
+			auto s = sampler->getSound();
 
 			auto saveASoundScreen = mpc.screens->get<SaveASoundScreen>("save-a-sound");
 

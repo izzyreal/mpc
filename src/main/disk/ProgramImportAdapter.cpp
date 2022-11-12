@@ -54,7 +54,7 @@ void ProgramImportAdapter::initMixer(int note)
 {
 	auto lResult = result.lock();
 	auto noteParameters = dynamic_cast<NoteParameters*>(lResult->getNoteParameters(note));
-	auto sound = sampler.lock()->getSound(noteParameters->getSoundIndex()).lock();
+	auto sound = sampler.lock()->getSound(noteParameters->getSoundIndex());
 
 	if (!sound)
 		return;

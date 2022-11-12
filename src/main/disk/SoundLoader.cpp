@@ -23,7 +23,7 @@ SoundLoader::SoundLoader(mpc::Mpc& _mpc)
 {
 }
 
-SoundLoader::SoundLoader(mpc::Mpc& _mpc, std::vector<std::weak_ptr<mpc::sampler::Sound>> _sounds, bool _replace)
+SoundLoader::SoundLoader(mpc::Mpc& _mpc, std::vector<std::shared_ptr<mpc::sampler::Sound>> _sounds, bool _replace)
 : mpc (_mpc), sounds (_sounds), replace (_replace)
 {
 }

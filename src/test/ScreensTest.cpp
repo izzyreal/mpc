@@ -161,7 +161,7 @@ SCENARIO("All screens can be opened", "[gui]") {
 		mpc.init(1, 5);
         
         
-        auto s = mpc.getSampler()->addSound().lock();
+        auto s = mpc.getSampler()->addSound();
         s->setMono(true);
         s->setName("test");
         for (int i = 0; i < 1000; i ++)

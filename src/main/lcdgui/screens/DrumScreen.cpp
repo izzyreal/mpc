@@ -105,7 +105,7 @@ void DrumScreen::displayPadToInternalSound()
 void DrumScreen::displayPgm()
 {
 	auto pn = mpcSoundPlayerChannel->getProgram();
-	findField("pgm")->setText(StrUtil::padLeft(std::to_string(pn + 1), " ", 2) + "-" + sampler->getProgram(pn).lock()->getName());
+	findField("pgm")->setText(StrUtil::padLeft(std::to_string(pn + 1), " ", 2) + "-" + sampler->getProgram(pn)->getName());
 }
 
 void DrumScreen::displayPgmChange()

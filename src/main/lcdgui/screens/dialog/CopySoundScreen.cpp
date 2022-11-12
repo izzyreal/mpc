@@ -14,9 +14,9 @@ void CopySoundScreen::open()
 {
 	auto previousScreenName = ls->getPreviousScreenName();
 
-	if (previousScreenName != "name" && sampler->getSound().lock())
+	if (previousScreenName != "name" && sampler->getSound())
 	{
-		newName = sampler->getSound().lock()->getName();
+		newName = sampler->getSound()->getName();
 		newName = sampler->addOrIncreaseNumber(newName);
 	}
 	displaySnd();
@@ -34,7 +34,7 @@ void CopySoundScreen::function(int i)
 		break;
 	case 4:
 	{
-		auto sound = sampler->getSound().lock();
+		auto sound = sampler->getSound();
 		auto newSound = sampler->copySound(sound);
 		newSound.lock()->setName(newName);
 		sampler->setSoundIndex(sampler->getSoundCount() - 1);
@@ -78,12 +78,12 @@ void CopySoundScreen::displayNewName()
 
 void CopySoundScreen::displaySnd()
 {
-	if (!sampler->getSound().lock())
+	if (!sampler->getSound())
 	{
 		return;
 	}
 
-	findField("snd")->setText(sampler->getSound().lock()->getName());
+	findField("snd")->setText(sampler->getSound()->getName());
 }
 
 void CopySoundScreen::setNewName(std::string s)
