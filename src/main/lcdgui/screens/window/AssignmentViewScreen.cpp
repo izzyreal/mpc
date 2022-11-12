@@ -16,7 +16,7 @@ void AssignmentViewScreen::open()
 	findField("note")->setFocusable(false);
 	findField("note")->setInverted(true);
 
-	ls.lock()->setFocus(getFocusFromPadIndex());
+	ls->setFocus(getFocusFromPadIndex());
 
 	init();
 	displayAssignmentView();
@@ -38,7 +38,7 @@ void AssignmentViewScreen::up()
 	}
 
 	auto padIndex = mpc.getPad() + 4;
-	ls.lock()->setFocus(padFocusNames[padIndex % 16]);
+	ls->setFocus(padFocusNames[padIndex % 16]);
 	mpc.setPad(padIndex);
 }
 
@@ -52,7 +52,7 @@ void AssignmentViewScreen::down()
 	}
 
 	auto padIndex = mpc.getPad() - 4;
-	ls.lock()->setFocus(padFocusNames[padIndex % 16]);
+	ls->setFocus(padFocusNames[padIndex % 16]);
 	mpc.setPad(padIndex);
 }
 
@@ -68,7 +68,7 @@ void AssignmentViewScreen::left()
     ScreenComponent::left();
     
 	auto padIndex = mpc.getPad() - 1;
-    ls.lock()->setFocus(padFocusNames[padIndex % 16]);
+    ls->setFocus(padFocusNames[padIndex % 16]);
     mpc.setPad(padIndex);
 }
 
@@ -83,7 +83,7 @@ void AssignmentViewScreen::right()
 
 	ScreenComponent::right();
 	auto padIndex = mpc.getPad() + 1;
-    ls.lock()->setFocus(padFocusNames[padIndex % 16]);
+    ls->setFocus(padFocusNames[padIndex % 16]);
     mpc.setPad(padIndex);
 }
 
@@ -107,7 +107,7 @@ void AssignmentViewScreen::update(moduru::observer::Observable* o, nonstd::any a
 	}
 	else if (s == "pad")
 	{
-		mpc.getLayeredScreen().lock()->setFocus(getFocusFromPadIndex());
+		ls->setFocus(getFocusFromPadIndex());
 		displayAssignmentView();
 	}
 	else if (s == "note")

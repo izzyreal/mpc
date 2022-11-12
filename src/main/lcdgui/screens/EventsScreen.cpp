@@ -71,7 +71,7 @@ void EventsScreen::open()
 		return;
 	}
 
-    auto previousScreenWasSequencer = ls.lock()->getPreviousScreenName() == "sequencer";
+    auto previousScreenWasSequencer = ls->getPreviousScreenName() == "sequencer";
     auto seq = sequencer->getActiveSequence();
 
     if (previousScreenWasSequencer)

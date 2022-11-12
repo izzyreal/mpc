@@ -17,7 +17,7 @@ Button::Button(mpc::Mpc& mpc, const std::string& label)
 
 void Button::push()
 {
-	auto ls = mpc.getLayeredScreen().lock();
+	auto ls = mpc.getLayeredScreen();
 
 	auto screen = ls->findScreenComponent();
 	

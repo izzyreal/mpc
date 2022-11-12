@@ -14,7 +14,7 @@ SampleScreen::SampleScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void SampleScreen::open()
 {
-	ls.lock()->getCurrentBackground()->setName("sample");
+	ls->getCurrentBackground()->setName("sample");
 
 	displayInput();
 	displayThreshold();

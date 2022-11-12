@@ -85,7 +85,7 @@ void VmpcMidiScreen::open()
     screen->saveAndLeave = [this](){this->uneditedLabelCommands.clear();};
     screen->stayScreen = "vmpc-midi";
 
-    if (ls.lock()->getPreviousScreenName() != "vmpc-discard-mapping-changes")
+    if (ls->getPreviousScreenName() != "vmpc-discard-mapping-changes")
     {
         uneditedLabelCommands = labelCommands;
     }
@@ -176,7 +176,7 @@ void VmpcMidiScreen::setLearning(bool b)
     learning = b;
     findChild<TextComp>("fk2")->setBlinking(learning);
     findChild<TextComp>("fk3")->setBlinking(learning);
-    ls.lock()->setFunctionKeysArrangement(learning ? 1 : 0);
+    ls->setFunctionKeysArrangement(learning ? 1 : 0);
 }
 
 bool VmpcMidiScreen::hasMappingChanged()

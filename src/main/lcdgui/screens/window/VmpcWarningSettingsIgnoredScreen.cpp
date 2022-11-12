@@ -13,10 +13,10 @@ void VmpcWarningSettingsIgnoredScreen::function(int i)
     if (i == 3)
     {
         openScreen("vmpc-settings");
-        ls.lock()->setFocus("midi-control-mode");
+        ls->setFocus("midi-control-mode");
     }
     else if (i == 4)
     {
-        openScreen(ls.lock()->getPreviousScreenName());
+        openScreen(ls->getPreviousScreenName());
     }
 }

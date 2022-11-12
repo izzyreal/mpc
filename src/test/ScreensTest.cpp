@@ -169,7 +169,7 @@ SCENARIO("All screens can be opened", "[gui]") {
 		
         mpc.getSampler().lock()->setSoundIndex(0);
 
-		auto ls = mpc.getLayeredScreen().lock();
+		auto ls = mpc.getLayeredScreen();
 
 		vector<string> good;
 		vector<string> bad;

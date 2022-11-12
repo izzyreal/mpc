@@ -355,7 +355,7 @@ void MpcMidiInput::midiOut(std::weak_ptr<mpc::sequencer::Event> e, mpc::sequence
         notificationLetter = "b";
     }
 
-    if (mpc.getLayeredScreen().lock()->getCurrentScreenName() == "midi-output-monitor")
+    if (mpc.getLayeredScreen()->getCurrentScreenName() == "midi-output-monitor")
     {
         notifyObservers(notificationLetter + std::to_string(deviceNumber));
     }
@@ -364,7 +364,7 @@ void MpcMidiInput::midiOut(std::weak_ptr<mpc::sequencer::Event> e, mpc::sequence
 void MpcMidiInput::transportOmni(MidiMessage *msg, std::string outputLetter)
 {
     auto mpcMidiPorts = mpc.getMidiPorts().lock();
-    auto screenName = mpc.getLayeredScreen().lock()->getCurrentScreenName();
+    auto screenName = mpc.getLayeredScreen()->getCurrentScreenName();
 
     if (dynamic_cast<ShortMessage *>(msg) != nullptr && screenName == "midi-output-monitor")
     {

@@ -15,7 +15,7 @@ MonoToStereoScreen::MonoToStereoScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void MonoToStereoScreen::open()
 {
-	auto prevScreen = ls.lock()->getPreviousScreenName();
+	auto prevScreen = ls->getPreviousScreenName();
 
 	if (sampler->getSound().lock() && prevScreen != "name" && prevScreen != "popup")
 	{
@@ -27,7 +27,7 @@ void MonoToStereoScreen::open()
 	}
 
 	if (prevScreen != "name" && prevScreen != "popup")
-		ls.lock()->setFocus("lsource");
+		ls->setFocus("lsource");
 
 	setRSource(sampler->getSoundIndex());
 	displayLSource();
@@ -130,11 +130,11 @@ void MonoToStereoScreen::displayLSource()
 
 	if (sampler->getSound().lock()->isMono() && sampler->getSound().lock()->isMono())
 	{
-		ls.lock()->setFunctionKeysArrangement(0);
+		ls->setFunctionKeysArrangement(0);
 	}
 	else
 	{
-		ls.lock()->setFunctionKeysArrangement(1);
+		ls->setFunctionKeysArrangement(1);
 		findChild<Background>("")->repaintUnobtrusive(findChild<FunctionKey>("fk4")->getRect());
 	}
 }
@@ -148,11 +148,11 @@ void MonoToStereoScreen::displayRSource()
 
 	if (sampler->getSound().lock()->isMono() && sampler->getSound(rSource).lock()->isMono())
 	{
-		ls.lock()->setFunctionKeysArrangement(0);
+		ls->setFunctionKeysArrangement(0);
 	}
 	else
 	{
-		ls.lock()->setFunctionKeysArrangement(1);
+		ls->setFunctionKeysArrangement(1);
 		findBackground()->repaintUnobtrusive(findChild<FunctionKey>("fk4")->getRect());
 	}
 }

@@ -35,14 +35,14 @@ void PunchScreen::open()
     displayBackground();
     displayAutoPunch();
 
-    ls.lock()->setFunctionKeysArrangement(on);
+    ls->setFunctionKeysArrangement(on);
 }
 
 void PunchScreen::turnWheel(int i)
 {
     init();
     
-	if (param.compare("auto-punch") == 0)
+	if (param == "auto-punch")
 		setAutoPunch(autoPunch + i);
 
     checkAllTimes(mpc, i);
@@ -85,8 +85,6 @@ void PunchScreen::displayAutoPunch()
 
 void PunchScreen::displayTime()
 {
-    auto ls = mpc.getLayeredScreen().lock();
-
     auto sequence = sequencer->getActiveSequence().get();
 
     for (int i = 0; i < 3; i++)

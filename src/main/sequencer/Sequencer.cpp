@@ -193,7 +193,7 @@ double Sequencer::getTempo()
 	auto seq = getActiveSequence();
 	auto tce = getCurrentTempoChangeEvent();
 
-	if (mpc.getLayeredScreen().lock()->getCurrentScreenName().compare("song") == 0)
+	if (mpc.getLayeredScreen()->getCurrentScreenName().compare("song") == 0)
 	{
 		if (!seq->isUsed())
 			return 120.0;
@@ -621,7 +621,7 @@ void Sequencer::stop(int tick)
 
 		// This is called from the audio thread, should be called from the UI thread instead.
 		// stop() is called by FrameSeq.
-		mpc.getLayeredScreen().lock()->setFocus("sq");
+		mpc.getLayeredScreen()->setFocus("sq");
 	}
 
     recording = false;

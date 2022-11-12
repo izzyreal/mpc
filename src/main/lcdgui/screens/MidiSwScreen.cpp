@@ -27,10 +27,10 @@ void MidiSwScreen::open()
 
     auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
 
-    if (ls.lock()->getPreviousScreenName() != "vmpc-warning-settings-ignored" &&
+    if (ls->getPreviousScreenName() != "vmpc-warning-settings-ignored" &&
         vmpcSettingsScreen->midiControlMode == VmpcSettingsScreen::MidiControlMode::VMPC)
     {
-        ls.lock()->Draw();
+        ls->Draw();
         openScreen("vmpc-warning-settings-ignored");
     }
 }

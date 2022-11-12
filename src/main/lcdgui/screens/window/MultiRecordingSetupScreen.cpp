@@ -49,10 +49,10 @@ void MultiRecordingSetupScreen::open()
 
     auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
 
-    if (ls.lock()->getPreviousScreenName() != "vmpc-warning-settings-ignored" &&
+    if (ls->getPreviousScreenName() != "vmpc-warning-settings-ignored" &&
         vmpcSettingsScreen->midiControlMode == VmpcSettingsScreen::MidiControlMode::VMPC)
     {
-        ls.lock()->Draw();
+        ls->Draw();
         openScreen("vmpc-warning-settings-ignored");
     }
 }
@@ -100,11 +100,11 @@ void MultiRecordingSetupScreen::turnWheel(int i)
 			if (yPos == 0)
 			{
                 std::string res = param.substr(0, 1) + std::to_string(yPos + 1);
-				ls.lock()->setFocus(param.substr(0, 1).append(std::to_string(yPos + 1)));
+				ls->setFocus(param.substr(0, 1).append(std::to_string(yPos + 1)));
 			}
 			else if (yPos == 1)
 			{
-				ls.lock()->setFocus(param.substr(0, 1).append(std::to_string(yPos + 1)));
+				ls->setFocus(param.substr(0, 1).append(std::to_string(yPos + 1)));
 			}
 			else if (yPos == 2)
 			{
@@ -116,9 +116,9 @@ void MultiRecordingSetupScreen::turnWheel(int i)
 			if (yPos == 0)
 				setYOffset(yOffset - 1);
 			else if (yPos == 1)
-				ls.lock()->setFocus(param.substr(0, 1).append(std::to_string(yPos - 1)));
+				ls->setFocus(param.substr(0, 1).append(std::to_string(yPos - 1)));
 			else if (yPos == 2)
-				ls.lock()->setFocus(param.substr(0, 1).append(std::to_string(yPos - 1)));
+				ls->setFocus(param.substr(0, 1).append(std::to_string(yPos - 1)));
 		}
 	}
 	else if (param[0] == 'b')
@@ -146,11 +146,11 @@ void MultiRecordingSetupScreen::up()
 	}
 	else if (yPos == 1)
 	{
-		ls.lock()->setFocus(param.substr(0, 1).append(std::to_string(yPos - 1)));
+		ls->setFocus(param.substr(0, 1).append(std::to_string(yPos - 1)));
 	}
 	else if (yPos == 2)
 	{
-		ls.lock()->setFocus(param.substr(0, 1).append(std::to_string(yPos - 1)));
+		ls->setFocus(param.substr(0, 1).append(std::to_string(yPos - 1)));
 	}
 }
 
@@ -161,11 +161,11 @@ void MultiRecordingSetupScreen::down()
 	if (yPos == 0)
 	{
         std::string res = param.substr(0, 1) + std::to_string(yPos + 1);
-		ls.lock()->setFocus(param.substr(0, 1).append(std::to_string(yPos + 1)));
+		ls->setFocus(param.substr(0, 1).append(std::to_string(yPos + 1)));
 	}
 	else if (yPos == 1)
 	{
-		ls.lock()->setFocus(param.substr(0, 1).append(std::to_string(yPos + 1)));
+		ls->setFocus(param.substr(0, 1).append(std::to_string(yPos + 1)));
 	}
 	else if (yPos == 2)
 	{

@@ -31,7 +31,7 @@ void PopupScreen::returnToScreenAfterMilliSeconds(const std::string& screenName,
 		returnToScreenThread.join();
 
 	auto screen = screenName;
-	auto layeredScreen = ls.lock();
+	auto layeredScreen = ls;
 
 	returnToScreenThread = std::thread([screen, delayInMs, layeredScreen]() {
         std::this_thread::sleep_for(std::chrono::milliseconds(delayInMs));

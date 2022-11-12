@@ -64,15 +64,15 @@ std::shared_ptr<Field> ScreenComponent::findFocus()
 
 void ScreenComponent::openScreen(const std::string& screenName)
 {
-	mpc.getLayeredScreen().lock()->openScreen(screenName);
+	mpc.getLayeredScreen()->openScreen(screenName);
 }
 
 void ScreenComponent::setLastFocus(const std::string& screenName, const std::string& newLastFocus)
 {
-	mpc.getLayeredScreen().lock()->setLastFocus(screenName, newLastFocus);
+	mpc.getLayeredScreen()->setLastFocus(screenName, newLastFocus);
 }
 
 const std::string ScreenComponent::getLastFocus(const std::string& screenName)
 {
-	return mpc.getLayeredScreen().lock()->getLastFocus(screenName);
+	return mpc.getLayeredScreen()->getLastFocus(screenName);
 }

@@ -36,7 +36,7 @@ namespace mpc::lcdgui
 		mpc::Mpc& mpc;
 		std::shared_ptr<mpc::sampler::Sampler> sampler;
 		std::shared_ptr<mpc::sequencer::Sequencer> sequencer;
-		std::weak_ptr<mpc::lcdgui::LayeredScreen> ls;
+		std::shared_ptr<mpc::lcdgui::LayeredScreen> ls;
 		std::string param = "";
 		std::weak_ptr<mpc::sampler::Program> program;
 		std::weak_ptr<mpc::sequencer::Track> track;

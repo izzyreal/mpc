@@ -61,9 +61,9 @@ errorFunc ([&](mpc_io_error e){
     new std::thread([&](){
         auto popupScreen = mpc.screens->get<PopupScreen>("popup");
         popupScreen->setText("Unknown disk error!");
-        auto currentScreenName = mpc.getLayeredScreen().lock()->getCurrentScreenName();
+        auto currentScreenName = mpc.getLayeredScreen()->getCurrentScreenName();
         popupScreen->returnToScreenAfterMilliSeconds(currentScreenName, 1000);
-        mpc.getLayeredScreen().lock()->openScreen("popup");
+        mpc.getLayeredScreen()->openScreen("popup");
     });
 })
 {
@@ -277,7 +277,7 @@ void AbstractDisk::writeAps(const std::string& fileName)
         auto popupScreen = mpc.screens->get<PopupScreen>("popup");
         popupScreen->setText("Saving " + StrUtil::padRight(fileName, " ", 16) + ".APS");
         popupScreen->returnToScreenAfterMilliSeconds("save", 400);
-        mpc.getLayeredScreen().lock()->openScreen("popup");
+        mpc.getLayeredScreen()->openScreen("popup");
     };
     
     newFile2(fileName)
@@ -294,7 +294,7 @@ void AbstractDisk::writeAll(const std::string& fileName)
         auto popupScreen = mpc.screens->get<PopupScreen>("popup");
         popupScreen->setText("         Saving ...");
         popupScreen->returnToScreenAfterMilliSeconds("save", 400);
-        mpc.getLayeredScreen().lock()->openScreen("popup");
+        mpc.getLayeredScreen()->openScreen("popup");
     };
     
     newFile2(fileName)
@@ -354,7 +354,7 @@ file_or_error AbstractDisk::writePgm2(std::shared_ptr<mpc::sampler::Program> p, 
         }
         else
         {
-            mpc.getLayeredScreen().lock()->openScreen("save");
+            mpc.getLayeredScreen()->openScreen("save");
         }
         
         flush();
@@ -383,7 +383,7 @@ file_or_error AbstractDisk::writeAps2(std::shared_ptr<MpcFile> f)
         }
         else
         {
-            mpc.getLayeredScreen().lock()->openScreen("save");
+            mpc.getLayeredScreen()->openScreen("save");
         }
 
         flush();

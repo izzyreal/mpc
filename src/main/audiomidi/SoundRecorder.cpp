@@ -64,7 +64,7 @@ void SoundRecorder::start()
 	if (recording)
 		return;
 
-	mpc.getLayeredScreen().lock()->getCurrentBackground()->setName("recording");
+	mpc.getLayeredScreen()->getCurrentBackground()->setName("recording");
 
 	armed = false;
 
@@ -121,7 +121,7 @@ void SoundRecorder::stop()
 		s->setStart(preRecFrames);
 		s->setEnd(s->getOscillatorControls()->getFrameCount());
 
-		mpc.getLayeredScreen().lock()->openScreen("keep-or-retry");
+		mpc.getLayeredScreen()->openScreen("keep-or-retry");
 	}
 }
 
@@ -184,7 +184,7 @@ int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf, int nFrame
 		if (armed && (log10(peakL) * 20 > sampleScreen->threshold || log10(peakR) * 20 > sampleScreen->threshold))
 		{
 			armed = false;
-			mpc.getLayeredScreen().lock()->getCurrentBackground()->setName("recording");
+			mpc.getLayeredScreen()->getCurrentBackground()->setName("recording");
 			mpc.getAudioMidiServices().lock()->startRecordingSound();
 		}
 

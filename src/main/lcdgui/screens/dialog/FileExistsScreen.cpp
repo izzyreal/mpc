@@ -80,7 +80,7 @@ void FileExistsScreen::function(int i)
 
 		auto disk = mpc.getDisk().lock();
 		auto nameScreen = mpc.screens->get<NameScreen>("name");
-        auto previousScreen = ls.lock()->getPreviousScreenName();
+        auto previousScreen = ls->getPreviousScreenName();
 
 		if (previousScreen == "save-a-program")
 		{
@@ -94,7 +94,7 @@ void FileExistsScreen::function(int i)
 				disk->writePgm(program.lock(), pfileName);
 			}
 		}
-		else if (ls.lock()->getPreviousScreenName() == "save-a-sequence")
+		else if (ls->getPreviousScreenName() == "save-a-sequence")
 		{
 			auto sfileName = mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) + ".MID";
 			auto success = disk->getFile(sfileName)->del();
@@ -208,7 +208,7 @@ void FileExistsScreen::function(int i)
 
 		std::vector<std::string> screens{ "save-a-program", "save-a-sequence", "save-a-sound" };
 
-		auto previousScreen = ls.lock()->getPreviousScreenName();
+		auto previousScreen = ls->getPreviousScreenName();
         
         if (previousScreen == "save-aps-file")
         {
@@ -220,7 +220,7 @@ void FileExistsScreen::function(int i)
                 if (disk->checkExists(apsFileName))
                 {
                     openScreen("file-exists");
-                    mpc.getLayeredScreen().lock()->setPreviousScreenName("save-aps-file");
+                    ls->setPreviousScreenName("save-aps-file");
                     return;
                 }
                 

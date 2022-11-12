@@ -69,7 +69,7 @@ void SecondSeqScreen::displaySq()
 void SecondSeqScreen::displayFunctionKeys()
 {
     if (sequencer->isSecondSequenceEnabled())
-        ls.lock()->setFunctionKeysArrangement(2);
+        ls->setFunctionKeysArrangement(2);
     else
-        ls.lock()->setFunctionKeysArrangement(0);
+        ls->setFunctionKeysArrangement(0);
 }

@@ -47,7 +47,7 @@ void ZoneScreen::open()
 	displayEnd();
 	displayZone();
 
-	ls.lock()->setFunctionKeysArrangement(sound ? 1 : 0);
+	ls->setFunctionKeysArrangement(sound ? 1 : 0);
 }
 
 void ZoneScreen::openWindow()
@@ -216,12 +216,12 @@ void ZoneScreen::displaySnd()
 	if (!sound)
 	{
 		findField("snd")->setText("(no sound)");
-		ls.lock()->setFocus("dummy");
+		ls->setFocus("dummy");
 		return;
 	}
 
-	if (ls.lock()->getFocus().compare("dummy") == 0)
-		ls.lock()->setFocus("snd");
+	if (ls->getFocus().compare("dummy") == 0)
+		ls->setFocus("snd");
 
 	auto sampleName = sound->getName();
 
@@ -384,7 +384,7 @@ void ZoneScreen::pressEnter()
 
 	init();
 
-	auto field = ls.lock()->getFocusedLayer()->findField(param);
+	auto field = ls->getFocusedLayer()->findField(param);
 
 	if (!field->isTypeModeEnabled())
 		return;

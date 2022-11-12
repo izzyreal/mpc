@@ -12,7 +12,7 @@ ResampleScreen::ResampleScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void ResampleScreen::open()
 {
-	auto previousScreenName = ls.lock()->getPreviousScreenName();
+	auto previousScreenName = ls->getPreviousScreenName();
 
 	if (previousScreenName != "name" && sampler->getSound().lock())
 	{

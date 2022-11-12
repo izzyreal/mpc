@@ -121,14 +121,14 @@ std::shared_ptr<mpc::sampler::Program> ProgramLoader::loadProgram(mpc::Mpc& mpc,
         if (!loadAProgramScreen->clearProgramWhenLoading)
             mpc.getDrum(track->getBus() - 1)->setProgram(mpc.getSampler().lock()->getProgramCount() - 1);
         
-		mpc.getLayeredScreen().lock()->openScreen("load");
+		mpc.getLayeredScreen()->openScreen("load");
 	}
 	catch (const std::exception&)
 	{
 		auto popupScreen = mpc.screens->get<PopupScreen>("popup");
 		popupScreen->setText("Wrong file format");
 		popupScreen->returnToScreenAfterInteraction("load");
-		mpc.getLayeredScreen().lock()->openScreen("popup");
+		mpc.getLayeredScreen()->openScreen("popup");
         throw;
 	}
     
@@ -163,7 +163,7 @@ void ProgramLoader::loadSound(mpc::Mpc& mpc, const std::string& soundFileName, c
 
 void ProgramLoader::showPopup(mpc::Mpc& mpc, std::string name, std::string ext, int sampleSize)
 {
-	mpc.getLayeredScreen().lock()->openScreen("popup");
+	mpc.getLayeredScreen()->openScreen("popup");
 	auto popupScreen = mpc.screens->get<PopupScreen>("popup");
 	popupScreen->setText("Loading " + StrUtil::padRight(name, " ", 16) + "." + StrUtil::toUpper(ext));
 
@@ -186,7 +186,7 @@ void ProgramLoader::notFound(mpc::Mpc& mpc, std::string soundFileName, std::stri
 		
 		cantFindFileScreen->fileName = soundFileName;
 		
-		mpc.getLayeredScreen().lock()->openScreen("cant-find-file");
+		mpc.getLayeredScreen()->openScreen("cant-find-file");
 
 		while (cantFindFileScreen->waitingForUser)
             std::this_thread::sleep_for(std::chrono::milliseconds(25));

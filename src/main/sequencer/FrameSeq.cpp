@@ -334,7 +334,7 @@ void FrameSeq::repeatPad(int duration)
 {
     auto track = sequencer->getActiveTrack();
 
-    if (mpc.getLayeredScreen().lock()->getCurrentScreenName() != "sequencer" ||
+    if (mpc.getLayeredScreen()->getCurrentScreenName() != "sequencer" ||
         track->getBus() == 0)
     {
         return;
@@ -408,7 +408,7 @@ void FrameSeq::triggerClickIfNeeded()
     if (sequencer->isRecordingOrOverdubbing() && !countMetronomeScreen->getInRec() && !sequencer->isCountingIn())
         return;
 
-    auto isStepEditor = mpc.getLayeredScreen().lock()->getCurrentScreenName() == "step-editor";
+    auto isStepEditor = mpc.getLayeredScreen()->getCurrentScreenName() == "step-editor";
 
     if (!isStepEditor &&
         sequencer->isPlaying() &&

@@ -106,14 +106,14 @@ void StepEditorScreen::open()
 	refreshEventRows();
 	refreshSelection();
 
-	auto previousScreen = ls.lock()->getPreviousScreenName();
+	auto previousScreen = ls->getPreviousScreenName();
 
 	if (previousScreen != "step-timing-correct" &&
 		previousScreen != "insert-event" &&
 		previousScreen != "paste-event")
 	{
 		auto eventType = visibleEvents[0]->getTypeName();
-		ls.lock()->setFocus(lastColumn[eventType] + "0");
+		ls->setFocus(lastColumn[eventType] + "0");
 	}
 }
 
@@ -131,7 +131,7 @@ void StepEditorScreen::close()
 		lastColumn[eventType] = srcLetter;
 	}
 
-	auto nextScreen = ls.lock()->getCurrentScreenName();
+	auto nextScreen = ls->getCurrentScreenName();
 
 	if (nextScreen != "step-timing-correct" &&
 		nextScreen != "insert-event" &&
@@ -190,7 +190,7 @@ void StepEditorScreen::function(int i)
 		if (selectionStartIndex != -1)
 		{
 			removeEvents();
-			ls.lock()->setFocus("a0");
+			ls->setFocus("a0");
 			return;
 		}
 
@@ -215,7 +215,7 @@ void StepEditorScreen::function(int i)
 
 		auto eventType = visibleEvents[rowIndex]->getTypeName();
 
-		ls.lock()->setFocus(lastColumn[eventType] + std::to_string(rowIndex));
+		ls->setFocus(lastColumn[eventType] + std::to_string(rowIndex));
 		break;
 	}
 	case 3:
@@ -581,7 +581,7 @@ void StepEditorScreen::left()
 	if (param.length() == 2 && param.substr(0, 1) == "a")
 	{
 		lastRow = stoi(param.substr(1, 2));
-		ls.lock()->setFocus("view");
+		ls->setFocus("view");
 	}
 	else
 	{
@@ -619,7 +619,7 @@ void StepEditorScreen::up()
 			auto eventType = visibleEvents[srcNumber]->getTypeName();
 			lastColumn[eventType] = srcLetter;
 			lastRow = 0;
-			ls.lock()->setFocus("view");
+			ls->setFocus("view");
 			refreshSelection();
 			return;
 		}
@@ -633,7 +633,7 @@ void StepEditorScreen::up()
 
 			auto newEventType = visibleEvents[srcNumber]->getTypeName();
 
-			ls.lock()->setFocus(lastColumn[newEventType] + std::to_string(srcNumber));
+			ls->setFocus(lastColumn[newEventType] + std::to_string(srcNumber));
 
 			if (controls->isShiftPressed())
 				setSelectionEndIndex(srcNumber + yOffset);
@@ -656,7 +656,7 @@ void StepEditorScreen::down()
         param == "tonote")
 	{
 		auto eventType = visibleEvents[lastRow]->getTypeName();
-		ls.lock()->setFocus(lastColumn[eventType] + std::to_string(lastRow));
+		ls->setFocus(lastColumn[eventType] + std::to_string(lastRow));
 		return;
 	}
 
@@ -682,7 +682,7 @@ void StepEditorScreen::down()
 			auto newEventType = visibleEvents[srcNumber]->getTypeName();
 			auto newColumn = lastColumn[newEventType];
 
-			ls.lock()->setFocus(newColumn + "3");
+			ls->setFocus(newColumn + "3");
 
 			if (controls->isShiftPressed() && std::dynamic_pointer_cast<EmptyEvent>(visibleEvents[3]))
 				setSelectionEndIndex(srcNumber + yOffset);
@@ -725,7 +725,7 @@ void StepEditorScreen::downOrUp(int increment)
 				lastColumn[oldEventType] = srcLetter;
 
 				auto newEventType = visibleEvents[srcNumber + increment]->getTypeName();
-				ls.lock()->setFocus(lastColumn[newEventType] + std::to_string(srcNumber + increment));
+				ls->setFocus(lastColumn[newEventType] + std::to_string(srcNumber + increment));
 			}
 		}
 
@@ -777,7 +777,7 @@ void StepEditorScreen::refreshSelection()
 
 	if (somethingSelected)
 	{
-		ls.lock()->setFunctionKeysArrangement(1);
+		ls->setFunctionKeysArrangement(1);
 	}
 }
 
@@ -1087,7 +1087,7 @@ void StepEditorScreen::setSelectionStartIndex(int i)
 	selectionStartIndex = i;
 	selectionEndIndex = i;
 
-	ls.lock()->setFunctionKeysArrangement(1);
+	ls->setFunctionKeysArrangement(1);
 	refreshSelection();
 }
 
@@ -1095,7 +1095,7 @@ void StepEditorScreen::clearSelection()
 {
 	selectionStartIndex = -1;
 	selectionEndIndex = -1;
-	ls.lock()->setFunctionKeysArrangement(0);
+	ls->setFunctionKeysArrangement(0);
 	refreshSelection();
 }
 
@@ -1140,7 +1140,7 @@ void StepEditorScreen::setSelectedEvents()
 
 void StepEditorScreen::checkSelection()
 {
-    std::string focus = ls.lock()->getFocus();
+    std::string focus = ls->getFocus();
 
 	if (focus.length() != 2)
 	{

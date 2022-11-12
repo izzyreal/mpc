@@ -196,7 +196,7 @@ bool VmpcDisksScreen::hasConfigChanged()
 
 void VmpcDisksScreen::displayFunctionKeys()
 {
-    ls.lock()->setFunctionKeysArrangement(hasConfigChanged() ? 0 : 1);
+    ls->setFunctionKeysArrangement(hasConfigChanged() ? 0 : 1);
 }
 
 void VmpcDisksScreen::displayUpAndDown()

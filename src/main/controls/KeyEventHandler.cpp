@@ -74,7 +74,7 @@ void KeyEventHandler::handle(const KeyEvent &keyEvent)
         }
     }
 
-    auto currentScreenName = mpc.getLayeredScreen().lock()->getCurrentScreenName();
+    auto currentScreenName = mpc.getLayeredScreen()->getCurrentScreenName();
     auto keyCodeDisplayName = KeyCodes::getKeyCodeName(keyEvent.rawKeyCode);
 
     if (currentScreenName == "vmpc-keyboard")

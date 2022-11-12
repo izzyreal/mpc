@@ -40,7 +40,7 @@ void NameScreen::open()
 
 void NameScreen::close()
 {
-    ls.lock()->setLastFocus("name", "0");
+    ls->setLastFocus("name", "0");
     editing = false;
     parameterName = "";
     actionWhenGoingToMainScreen = [](){};
@@ -124,7 +124,7 @@ void NameScreen::function(int i)
             openScreen(parameterName);
         }
 		else
-			openScreen(ls.lock()->getPreviousScreenName());
+			openScreen(ls->getPreviousScreenName());
 		break;
 	}
 	case 4:
@@ -158,7 +158,7 @@ void NameScreen::drawUnderline()
 {
 	if (editing)
 	{
-        std::string focus = ls.lock()->getFocus();
+        std::string focus = ls->getFocus();
 	
 		if (focus.length() != 1 && focus.length() != 2)
 			return;

@@ -46,7 +46,7 @@ void LoopScreen::open()
 	displayTo();
 	displayWave();
 
-	ls.lock()->setFunctionKeysArrangement(sound ? 1 : 0);
+	ls->setFunctionKeysArrangement(sound ? 1 : 0);
 }
 
 void LoopScreen::openWindow()
@@ -316,7 +316,7 @@ void LoopScreen::pressEnter()
 	
 	init();
 
-	auto field = ls.lock()->getFocusedLayer()->findField(param);
+	auto field = ls->getFocusedLayer()->findField(param);
 
 	if (!field->isTypeModeEnabled())
 		return;
@@ -386,12 +386,12 @@ void LoopScreen::displaySnd()
 	if (!sound)
 	{
 		findField("snd")->setText("(no sound)");
-		ls.lock()->setFocus("dummy");
+		ls->setFocus("dummy");
 		return;
 	}
 
-	if (ls.lock()->getFocus().compare("dummy") == 0)
-		ls.lock()->setFocus("snd");
+	if (ls->getFocus().compare("dummy") == 0)
+		ls->setFocus("snd");
 
 	auto sampleName = sound->getName();
 

@@ -36,7 +36,7 @@ EditSoundScreen::EditSoundScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void EditSoundScreen::open()
 {
-	auto previous = ls.lock()->getPreviousScreenName();
+	auto previous = ls->getPreviousScreenName();
 	findField("create-new-program")->setAlignment(Alignment::Centered);
 
 	if (previous != "name" && sampler->getSound().lock())

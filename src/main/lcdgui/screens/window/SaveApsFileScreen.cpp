@@ -72,7 +72,7 @@ void SaveApsFileScreen::function(int i)
 
         if (disk->checkExists(apsFileName))
         {
-            mpc.getLayeredScreen().lock()->openScreen("file-exists");
+            ls->openScreen("file-exists");
             return;
         }
         

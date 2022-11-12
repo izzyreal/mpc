@@ -86,7 +86,7 @@ namespace mpc {
         void setPreviousSamplerScreenName(std::string s);
 
     public:
-        std::weak_ptr<lcdgui::LayeredScreen> getLayeredScreen();
+        std::shared_ptr<lcdgui::LayeredScreen> getLayeredScreen();
         std::weak_ptr<controls::Controls> getControls();
         std::shared_ptr<mpc::lcdgui::ScreenComponent> getActiveControls();
         std::shared_ptr<mpc::controls::GlobalReleaseControls> getReleaseControls();

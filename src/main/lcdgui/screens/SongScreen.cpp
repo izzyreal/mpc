@@ -63,15 +63,15 @@ void SongScreen::left()
 	init();
 	if (param == "sequence1")
 	{
-		ls.lock()->setFocus("step1");
+		ls->setFocus("step1");
 	}
 	else if (param == "reps1")
 	{
-		ls.lock()->setFocus("sequence1");
+		ls->setFocus("sequence1");
 	}
 	else if (param == "step1")
 	{
-		ls.lock()->setFocus("loop");
+		ls->setFocus("loop");
 	}
 	else
 	{
@@ -86,15 +86,15 @@ void SongScreen::right()
 	
 	if (param == "sequence1")
 	{
-		ls.lock()->setFocus("reps1");
+		ls->setFocus("reps1");
 	}
 	else if (param == "step1")
 	{
-		ls.lock()->setFocus("sequence1");
+		ls->setFocus("sequence1");
 	}
 	else if (param == "loop")
 	{
-		ls.lock()->setFocus("step1");
+		ls->setFocus("step1");
 	}
 	else
 	{

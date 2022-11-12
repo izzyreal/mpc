@@ -65,7 +65,7 @@ void TrMoveScreen::down()
 	else
 	{
 		ScreenComponent::down();
-		ls.lock()->setFunctionKeysArrangement(1);
+		ls->setFunctionKeysArrangement(1);
 	}
 }
 
@@ -84,7 +84,7 @@ void TrMoveScreen::left()
 	}
 
 	ScreenComponent::left();
-	ls.lock()->setFunctionKeysArrangement(0);
+	ls->setFunctionKeysArrangement(0);
 }
 
 void TrMoveScreen::right()
@@ -97,7 +97,7 @@ void TrMoveScreen::right()
 	}
 
 	ScreenComponent::right();
-	ls.lock()->setFunctionKeysArrangement(1);
+	ls->setFunctionKeysArrangement(1);
 }
 
 void TrMoveScreen::function(int i)
@@ -292,7 +292,7 @@ void TrMoveScreen::select()
 	selectedTrackIndex = currentTrackIndex;
 	displayTrLabels();
 	displayTrFields();
-	ls.lock()->setFunctionKeysArrangement(2);
+	ls->setFunctionKeysArrangement(2);
 	SetDirty();
 }
 
@@ -301,7 +301,7 @@ void TrMoveScreen::cancel()
 	selectedTrackIndex = -1;
 	displayTrLabels();
 	displayTrFields();
-	ls.lock()->setFunctionKeysArrangement(1);
+	ls->setFunctionKeysArrangement(1);
 	SetDirty();
 }
 
@@ -311,6 +311,6 @@ void TrMoveScreen::insert(mpc::sequencer::Sequence* s)
 	selectedTrackIndex = -1;
 	displayTrLabels();
 	displayTrFields();
-	ls.lock()->setFunctionKeysArrangement(1);
+	ls->setFunctionKeysArrangement(1);
 	SetDirty();
 }

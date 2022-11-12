@@ -43,7 +43,7 @@ void Field::setNextFocus(const std::string& newNextFocus)
 void Field::Hide(bool b)
 {
 	if (b && focus)
-		mpc.getLayeredScreen().lock()->setFocus(nextFocus);
+		mpc.getLayeredScreen()->setFocus(nextFocus);
 
 	Component::Hide(b);
 }
@@ -98,7 +98,7 @@ void Field::Draw(std::vector<std::vector<bool>>* pixels)
 
 void Field::takeFocus()
 {
-	auto ls = mpc.getLayeredScreen().lock();
+	auto ls = mpc.getLayeredScreen();
 	csn = ls->getCurrentScreenName();
 
 	if (csn == "step-editor")
@@ -133,7 +133,7 @@ void Field::takeFocus()
 
 void Field::loseFocus(std::string next)
 {
-	auto ls = mpc.getLayeredScreen().lock();
+	auto ls = mpc.getLayeredScreen();
 	csn = ls->getCurrentScreenName();
 
 	focus = false;
@@ -289,7 +289,7 @@ void Field::setFocusable(bool b)
 	focusable = b;
 
 	if (!focusable && focus)
-		mpc.getLayeredScreen().lock()->setFocus(nextFocus);
+		mpc.getLayeredScreen()->setFocus(nextFocus);
 }
 
 bool Field::isFocusable()

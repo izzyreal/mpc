@@ -12,7 +12,7 @@ PurgeScreen::PurgeScreen(mpc::Mpc& mpc, const int layerIndex)
 void PurgeScreen::open()
 {
 	findLabel("value")->setTextPadded(sampler->getUnusedSampleCount(), " ");
-	ls.lock()->setFunctionKeysArrangement(sampler->getUnusedSampleCount() > 0 ? 1 : 0);
+	ls->setFunctionKeysArrangement(sampler->getUnusedSampleCount() > 0 ? 1 : 0);
 }
 
 void PurgeScreen::function(int f)

@@ -83,7 +83,7 @@ void TempoChangeScreen::open()
 			if (row + offset >= events.size())
 			{
 				offset = 0;
-				ls.lock()->setFocus("a0");
+				ls->setFocus("a0");
 			}
 		}
 	}
@@ -302,7 +302,7 @@ void TempoChangeScreen::left()
 	{
 		if (param[0] == 'a')
 		{
-			ls.lock()->setFocus("tempo-change");
+			ls->setFocus("tempo-change");
 			return;
 		}
 	}
@@ -317,7 +317,7 @@ void TempoChangeScreen::right()
 	{
 		if (param[0] == 'f')
 		{
-			ls.lock()->setFocus("initial-tempo");
+			ls->setFocus("initial-tempo");
 			return;
 		}
 	}
@@ -359,7 +359,7 @@ void TempoChangeScreen::function(int j)
 		displayTempoChange1();
 		displayTempoChange2();
 		
-		ls.lock()->setFocus("a" + std::to_string(yPos));
+		ls->setFocus("a" + std::to_string(yPos));
 		break;
 	case 2:
 	{
@@ -383,14 +383,14 @@ void TempoChangeScreen::function(int j)
 			displayTempoChange1();
 			displayTempoChange2();
 
-			ls.lock()->setFocus(std::string("a" + std::to_string(yPos)));
+			ls->setFocus(std::string("a" + std::to_string(yPos)));
 		}
 		else
 		{
 			if (nowDetected > offset + 3 || nowDetected < offset)
 				setOffset(nowDetected);
 
-			ls.lock()->setFocus(param.substr(0, 1) + std::to_string(nowDetected - offset));
+			ls->setFocus(param.substr(0, 1) + std::to_string(nowDetected - offset));
 		}
 	}
 		break;
@@ -439,7 +439,7 @@ void TempoChangeScreen::function(int j)
 		displayTempoChange1();
 		displayTempoChange2();
 
-		ls.lock()->setFocus(param);
+		ls->setFocus(param);
 		break;
 	}
 	}
@@ -559,9 +559,9 @@ void TempoChangeScreen::down()
 	auto tce2 = visibleTempoChanges[2];
 
 	if (param == "tempo-change")
-		ls.lock()->setFocus("e0");
+		ls->setFocus("e0");
 	else if (param == "initial-tempo")
-		ls.lock()->setFocus("f0");
+		ls->setFocus("f0");
 	
 	if (param.length() != 2)
 		return;
@@ -574,7 +574,7 @@ void TempoChangeScreen::down()
 	}
 	else if (yPos == 1 && !tce2)
 	{
-		ls.lock()->setFocus("a2");
+		ls->setFocus("a2");
 		return;
 	}
 	else if (yPos == 2)
@@ -584,7 +584,7 @@ void TempoChangeScreen::down()
 		auto sequence = sequencer->getActiveSequence();
 
 		if (offset + yPos == sequence->getTempoChangeEvents().size() && param[0] != 'a')
-			ls.lock()->setFocus("a2");
+			ls->setFocus("a2");
 
 		return;
 	}
@@ -594,7 +594,7 @@ void TempoChangeScreen::down()
 	if ((yPos == 0 && !tce1) || (yPos == 1 && !tce2))
 		paramToFocus = "a";
 
-	ls.lock()->setFocus(std::string(paramToFocus + std::to_string(yPos + 1)));
+	ls->setFocus(std::string(paramToFocus + std::to_string(yPos + 1)));
 }
 
 void TempoChangeScreen::up()
@@ -611,9 +611,9 @@ void TempoChangeScreen::up()
 		if (offset == 0)
 		{
 			if (param == "e0")
-				ls.lock()->setFocus("tempo-change");
+				ls->setFocus("tempo-change");
 			else if (param == "f0")
-				ls.lock()->setFocus("initial-tempo");
+				ls->setFocus("initial-tempo");
 
 			return;
 		}
@@ -621,7 +621,7 @@ void TempoChangeScreen::up()
 		return;
 	}
 
-	ls.lock()->setFocus(param.substr(0, 1) + std::to_string(yPos - 1));
+	ls->setFocus(param.substr(0, 1) + std::to_string(yPos - 1));
 	return;
 }
 

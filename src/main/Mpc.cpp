@@ -185,7 +185,7 @@ std::shared_ptr<audiomidi::EventHandler> Mpc::getEventHandler() {
 	return eventHandler;
 }
 
-std::weak_ptr<lcdgui::LayeredScreen> Mpc::getLayeredScreen() {
+std::shared_ptr<lcdgui::LayeredScreen> Mpc::getLayeredScreen() {
 	return layeredScreen;
 }
 

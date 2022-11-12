@@ -493,7 +493,7 @@ void EventRow::setMidiNoteEventValues()
 
 void EventRow::setColors()
 {
-	auto ls = mpc.getLayeredScreen().lock();
+	auto ls = mpc.getLayeredScreen();
 
 	for (int i = 0; i < 5; i++)
 	{

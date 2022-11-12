@@ -15,12 +15,12 @@ StereoToMonoScreen::StereoToMonoScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void StereoToMonoScreen::open()
 {
-	auto previousScreenName = ls.lock()->getPreviousScreenName();
+	auto previousScreenName = ls->getPreviousScreenName();
 
 	if (previousScreenName != "name" && previousScreenName != "popup")
 	{
 		updateNewNames();
-		ls.lock()->setFocus("stereosource");
+		ls->setFocus("stereosource");
 	}
 	
 	displayNewLName();
@@ -137,12 +137,12 @@ void StereoToMonoScreen::displayStereoSource()
 
 	if (sound->isMono())
 	{
-		ls.lock()->setFunctionKeysArrangement(1);
+		ls->setFunctionKeysArrangement(1);
 		findBackground()->repaintUnobtrusive(findChild<FunctionKey>("fk4")->getRect());
 	}
 	else
 	{
-		ls.lock()->setFunctionKeysArrangement(0);
+		ls->setFunctionKeysArrangement(0);
 	}
 }
 

@@ -33,7 +33,7 @@ void SndParamsScreen::open()
 	displayBeat();
 	displaySampleAndNewTempo();
 
-	ls.lock()->setFunctionKeysArrangement(sound ? 1 : 0);
+	ls->setFunctionKeysArrangement(sound ? 1 : 0);
 }
 
 void SndParamsScreen::openWindow()
@@ -228,12 +228,12 @@ void SndParamsScreen::displaySnd()
 	if (sampler->getSoundCount() == 0)
 	{
 		findField("snd")->setText("(no sound)");
-		ls.lock()->setFocus("dummy");
+		ls->setFocus("dummy");
 		return;
 	}
 
-	if (ls.lock()->getFocus().compare("dummy") == 0)
-		ls.lock()->setFocus("snd");
+	if (ls->getFocus().compare("dummy") == 0)
+		ls->setFocus("snd");
 
 	auto sampleName = sound->getName();
 

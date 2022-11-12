@@ -48,11 +48,11 @@ void DirectoryScreen::setFunctionKeys()
 	{
 		auto splitFileName = StrUtil::split(getSelectedFile()->getName(), '.');
 		auto playable = splitFileName.size() > 1 && (StrUtil::eqIgnoreCase(splitFileName[1], "snd") || StrUtil::eqIgnoreCase(splitFileName[1], "wav"));
-		ls.lock()->setFunctionKeysArrangement(playable ? 1 : 0);
+		ls->setFunctionKeysArrangement(playable ? 1 : 0);
 	}
 	else
 	{
-		ls.lock()->setFunctionKeysArrangement(0);
+		ls->setFunctionKeysArrangement(0);
 	}
 
 	findBackground()->repaintUnobtrusive(findChild<FunctionKey>("fk5")->getRect());
@@ -66,7 +66,6 @@ void DirectoryScreen::function(int f)
 	auto nameScreen = mpc.screens->get<NameScreen>("name");
     auto popupScreen = mpc.screens->get<PopupScreen>("popup");
     auto directoryScreen = this;
-    auto ls = mpc.getLayeredScreen().lock();
     auto disk = mpc.getDisk().lock();
 
 	switch (f)
@@ -87,7 +86,9 @@ void DirectoryScreen::function(int f)
         
         if (!file) return;
 
-        auto renamer = [file, disk, ls, popupScreen, directoryScreen](std::string& newName) {
+        auto layeredScreen = ls;
+
+        auto renamer = [file, disk, layeredScreen, popupScreen, directoryScreen](std::string& newName) {
             auto ext = mpc::Util::splitName(file->getName())[1];
             
             if (ext.length() > 0) ext = "." + ext;
@@ -97,9 +98,9 @@ void DirectoryScreen::function(int f)
 
             if (!success)
             {
-                ls->openScreen("popup");
+                layeredScreen->openScreen("popup");
                 popupScreen->setText("File name exists !!");
-                ls->setPreviousScreenName("directory");
+                layeredScreen->setPreviousScreenName("directory");
                 return;
             }
 
@@ -149,13 +150,15 @@ void DirectoryScreen::function(int f)
     
         nameScreen->setName("NEWFOLDR");
         nameScreen->setNameLimit(8);
-        
-        auto renamer = [ls, disk, loadScreen, directoryScreen, popupScreen](std::string& newName) {
+
+        auto layeredScreen = ls;
+
+        auto renamer = [layeredScreen, disk, loadScreen, directoryScreen, popupScreen](std::string& newName) {
             bool success = disk->newFolder(StrUtil::toUpper(newName));
             
             if (!success)
             {
-                ls->openScreen("popup");
+                layeredScreen->openScreen("popup");
                 
                 if (disk->getVolume().mode == MountMode::READ_ONLY) {
                     popupScreen->setText("Disk is read only !!");
@@ -164,7 +167,7 @@ void DirectoryScreen::function(int f)
                 }
                 
                 popupScreen->returnToScreenAfterMilliSeconds("name", 1000);
-                ls->setPreviousScreenName("directory");
+                layeredScreen->setPreviousScreenName("directory");
                 return;
             }
             
@@ -187,9 +190,9 @@ void DirectoryScreen::function(int f)
                 }
                 counter++;
             }
-            
-            ls->openScreen("directory");
-            ls->setPreviousScreenName("load");
+
+            layeredScreen->openScreen("directory");
+            layeredScreen->setPreviousScreenName("load");
         };
 
         nameScreen->setRenamerAndScreenToReturnTo(renamer, "");
@@ -583,12 +586,12 @@ void DirectoryScreen::refreshFocus()
 {
 	if (xPos == 0)
 	{
-		ls.lock()->setFocus("a" + std::to_string(yPos0));
+		ls->setFocus("a" + std::to_string(yPos0));
 	}
 	else if (xPos == 1)
 	{
 		auto loadScreen = mpc.screens->get<LoadScreen>("load");
-		ls.lock()->setFocus("b" + std::to_string(loadScreen->fileLoad - yOffset1));
+		ls->setFocus("b" + std::to_string(loadScreen->fileLoad - yOffset1));
 	}
 }
 

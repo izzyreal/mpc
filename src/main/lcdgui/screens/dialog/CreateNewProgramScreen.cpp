@@ -38,7 +38,7 @@ void CreateNewProgramScreen::turnWheel(int i)
 
 void CreateNewProgramScreen::open()
 {
-    if (ls.lock()->getPreviousScreenName().compare("name") != 0)
+    if (ls->getPreviousScreenName().compare("name") != 0)
     {
         auto letterIndex = 21 + 24;
         

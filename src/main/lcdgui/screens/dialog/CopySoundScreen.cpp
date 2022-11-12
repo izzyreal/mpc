@@ -12,7 +12,7 @@ CopySoundScreen::CopySoundScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void CopySoundScreen::open()
 {
-	auto previousScreenName = ls.lock()->getPreviousScreenName();
+	auto previousScreenName = ls->getPreviousScreenName();
 
 	if (previousScreenName != "name" && sampler->getSound().lock())
 	{

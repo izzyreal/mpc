@@ -88,7 +88,7 @@ void ChangeTsigScreen::displayBars()
 
 void ChangeTsigScreen::displayNewTsig()
 {
-	if (ls.lock()->getCurrentScreenName().compare("delete-sequence") == 0)
+	if (ls->getCurrentScreenName().compare("delete-sequence") == 0)
 		return;
 
 	auto result = StrUtil::padLeft(std::to_string(timesignature.getNumerator()), " ", 2) +

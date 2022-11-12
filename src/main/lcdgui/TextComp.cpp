@@ -77,8 +77,8 @@ void TextComp::Draw(std::vector<std::vector<bool>>* pixels)
         return;
     }
 
-	auto& font = mpc.getLayeredScreen().lock()->font;
-	auto& atlas = mpc.getLayeredScreen().lock()->atlas;
+	auto& font = mpc.getLayeredScreen()->font;
+	auto& atlas = mpc.getLayeredScreen()->atlas;
 
 	int textx = x + 1;
 	int texty = y;

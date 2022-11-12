@@ -37,9 +37,9 @@ void NextSeqScreen::open()
 	sequencer->addObserver(this);
 
 	if (sequencer->getNextSq() == -1)
-		ls.lock()->setFocus("sq");
+		ls->setFocus("sq");
 	else
-		ls.lock()->setFocus("nextsq");
+		ls->setFocus("nextsq");
 }
 
 void NextSeqScreen::close()
@@ -56,7 +56,7 @@ void NextSeqScreen::turnWheel(int i)
 		if (sequencer->isPlaying())
 		{
 			sequencer->setNextSq(sequencer->getCurrentlyPlayingSequenceIndex() + i);
-			ls.lock()->setFocus("nextsq");
+			ls->setFocus("nextsq");
 		}
 		else
 			sequencer->setActiveSequenceIndex(sequencer->getActiveSequenceIndex() + i);

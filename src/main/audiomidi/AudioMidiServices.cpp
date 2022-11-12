@@ -400,7 +400,7 @@ bool AudioMidiServices::stopBouncing()
 	if (!bouncing.load())
 		return false;
 
-	mpc.getLayeredScreen().lock()->openScreen("vmpc-recording-finished");
+	mpc.getLayeredScreen()->openScreen("vmpc-recording-finished");
 	bouncing.store(false);
 
     auto directToDiskRecorderScreen = mpc.screens->get<VmpcDirectToDiskRecorderScreen>("vmpc-direct-to-disk-recorder");
@@ -423,7 +423,7 @@ bool AudioMidiServices::stopBouncingEarly()
 	for (auto& recorder : diskRecorders)
 		recorder->stopEarly();
 
-	mpc.getLayeredScreen().lock()->openScreen("vmpc-recording-finished");
+	mpc.getLayeredScreen()->openScreen("vmpc-recording-finished");
 	bouncing.store(false);
 	return true;
 }

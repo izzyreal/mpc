@@ -163,15 +163,15 @@ void MixerScreen::displayFunctionKeys()
 {
     if (tab == 0)
     {
-        ls.lock()->setFunctionKeysArrangement(link ? 3 : 0);
+        ls->setFunctionKeysArrangement(link ? 3 : 0);
     }
     else if (tab == 1)
     {
-        ls.lock()->setFunctionKeysArrangement(link ? 4 : 1);
+        ls->setFunctionKeysArrangement(link ? 4 : 1);
     }
     else if (tab == 2)
     {
-        ls.lock()->setFunctionKeysArrangement(link ? 5 : 2);
+        ls->setFunctionKeysArrangement(link ? 5 : 2);
     }
 }
 

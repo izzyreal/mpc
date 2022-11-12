@@ -15,7 +15,7 @@ MidiOutputScreen::MidiOutputScreen(mpc::Mpc& mpc, const int layerIndex)
 void MidiOutputScreen::open()
 {
 	init();
-	auto prevScreen = ls.lock()->getPreviousScreenName();
+	auto prevScreen = ls->getPreviousScreenName();
 	if (prevScreen != "name" && prevScreen != "midi-output-monitor")
 	{
 		auto dev = track.lock()->getDevice();

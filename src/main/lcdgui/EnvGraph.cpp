@@ -53,7 +53,7 @@ void EnvGraph::Draw(std::vector<std::vector<bool>>* pixels)
 		return;
 	}
 
-	auto csn = mpc.getLayeredScreen().lock()->getCurrentScreenName();
+	auto csn = mpc.getLayeredScreen()->getCurrentScreenName();
 	int xoff = (csn.compare("program-params") == 0) ? 76 : 92;
 	int yoff = (csn.compare("program-params") == 0) ? 16 : 22;
 

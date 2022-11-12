@@ -28,7 +28,7 @@ SaveScreen::SaveScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void SaveScreen::open()
 {
-    if (ls.lock()->getPreviousScreenName() != "popup")
+    if (ls->getPreviousScreenName() != "popup")
     {
         device = mpc.getDiskController()->getActiveDiskIndex();
     }
@@ -46,9 +46,9 @@ void SaveScreen::open()
     init();
 
     if (param == "device")
-        ls.lock()->setFunctionKeysArrangement(device == mpc.getDiskController()->getActiveDiskIndex() ? 0 : 1);
+        ls->setFunctionKeysArrangement(device == mpc.getDiskController()->getActiveDiskIndex() ? 0 : 1);
     else
-        ls.lock()->setFunctionKeysArrangement(0);
+        ls->setFunctionKeysArrangement(0);
 }
 
 void SaveScreen::openWindow()
@@ -116,7 +116,7 @@ void SaveScreen::function(int i)
                     }
                 }
 
-                ls.lock()->setFunctionKeysArrangement(0);
+                ls->setFunctionKeysArrangement(0);
 
                 newDisk->initFiles();
 
@@ -247,7 +247,7 @@ void SaveScreen::turnWheel(int i)
         device += i;
         displayDevice();
         displayDeviceType();
-        ls.lock()->setFunctionKeysArrangement(mpc.getDiskController()->getActiveDiskIndex() == device ? 0 : 1);
+        ls->setFunctionKeysArrangement(mpc.getDiskController()->getActiveDiskIndex() == device ? 0 : 1);
         return;
     }
 }
@@ -369,7 +369,7 @@ void SaveScreen::up()
     {
         device = mpc.getDiskController()->getActiveDiskIndex();
         displayDevice();
-        ls.lock()->setFunctionKeysArrangement(0);
+        ls->setFunctionKeysArrangement(0);
     }
 
     ScreenComponent::up();

@@ -101,7 +101,7 @@ void SequencerScreen::open()
 		findBackground()->setName("sequencer");
 
 	if (sequencer->getNextSq() != -1)
-		ls.lock()->setFocus("nextsq");
+		ls->setFocus("nextsq");
     
     
     const auto footerIsInvisible = !mpc.getControls().lock()->isNoteRepeatLocked() && !(mpc.getControls().lock()->isErasePressed() && sequencer->isRecordingOrOverdubbing());
@@ -163,7 +163,7 @@ void SequencerScreen::releaseTap()
 void SequencerScreen::close()
 {
 	std::vector<std::string> screensThatDisablePunch{ "song", "load", "save", "others", "next-seq" };
-	auto nextScreen = ls.lock()->getCurrentScreenName();
+	auto nextScreen = ls->getCurrentScreenName();
 
 	if (find(begin(screensThatDisablePunch), end(screensThatDisablePunch), nextScreen) != end(screensThatDisablePunch))
 	{
@@ -381,7 +381,7 @@ void SequencerScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 	else if (s == "nextsq")
 	{
 		displayNextSq();
-		ls.lock()->setFocus("nextsq");
+		ls->setFocus("nextsq");
 	}
 	else if (s == "nextsqoff")
 	{
@@ -879,7 +879,7 @@ void SequencerScreen::displayPunchWhileRecording()
 
 void SequencerScreen::displayNextSq()
 {
-	ls.lock()->setFunctionKeysArrangement(sequencer->getNextSq() == -1 ? 0 : 1);
+	ls->setFunctionKeysArrangement(sequencer->getNextSq() == -1 ? 0 : 1);
 
 	auto noNextSq = sequencer->getNextSq() == -1;
 	findLabel("nextsq")->Hide(noNextSq);
