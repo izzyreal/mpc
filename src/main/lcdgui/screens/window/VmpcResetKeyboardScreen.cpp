@@ -3,7 +3,6 @@
 #include <controls/KbMapping.hpp>
 
 using namespace mpc::lcdgui::screens::window;
-using namespace std;
 
 VmpcResetKeyboardScreen::VmpcResetKeyboardScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "vmpc-reset-keyboard", layerIndex)

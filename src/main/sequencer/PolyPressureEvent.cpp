@@ -1,18 +1,13 @@
 #include <sequencer/PolyPressureEvent.hpp>
 
 using namespace mpc::sequencer;
-using namespace std;
-
-PolyPressureEvent::PolyPressureEvent()
-{
-}
 
 void PolyPressureEvent::setNote(int i)
 {
-    if(i < 0 || i > 127) return;
+    if (i < 0 || i > 127) return;
     note = i;
     
-    notifyObservers(string("step-editor"));
+    notifyObservers(std::string("step-editor"));
 }
 
 int PolyPressureEvent::getNote()
@@ -27,7 +22,7 @@ void PolyPressureEvent::setAmount(int i)
 
     polyPressureValue = i;
     
-    notifyObservers(string("step-editor"));
+    notifyObservers(std::string("step-editor"));
 }
 
 int PolyPressureEvent::getAmount()
@@ -37,7 +32,7 @@ int PolyPressureEvent::getAmount()
 
 void PolyPressureEvent::CopyValuesTo(std::weak_ptr<Event> dest) {
 	Event::CopyValuesTo(dest);
-	auto lDest = dynamic_pointer_cast<PolyPressureEvent>(dest.lock());
+	auto lDest = std::dynamic_pointer_cast<PolyPressureEvent>(dest.lock());
 	lDest->setAmount(getAmount());
 	lDest->setNote(getNote());
 }

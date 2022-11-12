@@ -9,7 +9,6 @@
 #include <cmath>
 
 using namespace mpc::midi::event::meta;
-using namespace std;
 
 TimeSignature::TimeSignature()
     : TimeSignature(0, 0, 4, 4, DEFAULT_METER, DEFAULT_DIVISION)
@@ -68,7 +67,7 @@ int TimeSignature::getEventSize()
     return 7;
 }
 
-void TimeSignature::writeToOutputStream(ostream& out) 
+void TimeSignature::writeToOutputStream(std::ostream& out)
 {
     MetaEvent::writeToOutputStream(out);
     out << (char) 4;
@@ -78,22 +77,22 @@ void TimeSignature::writeToOutputStream(ostream& out)
     out << (char) mDivision;
 }
 
-void TimeSignature::writeToOutputStream(ostream& out, bool writeType)
+void TimeSignature::writeToOutputStream(std::ostream& out, bool writeType)
 {
     MetaEvent::writeToOutputStream(out, writeType);
 }
 
-shared_ptr<MetaEvent> TimeSignature::parseTimeSignature(int tick, int delta, MetaEventData* info)
+std::shared_ptr<MetaEvent> TimeSignature::parseTimeSignature(int tick, int delta, MetaEventData* info)
 {
 	if (info->length.getValue() != 4) {
-		return make_shared<GenericMetaEvent>(tick, delta, info);
+		return std::make_shared<GenericMetaEvent>(tick, delta, info);
 	}
 	int num = info->data[0];
 	int den = info->data[1];
 	int met = info->data[2];
 	int fps = info->data[3];
 	den = (int)(pow(2, den));
-	return make_shared<TimeSignature>(tick, delta, num, den, met, fps);
+	return std::make_shared<TimeSignature>(tick, delta, num, den, met, fps);
 }
 
 int TimeSignature::log2(int den)
@@ -114,9 +113,9 @@ int TimeSignature::log2(int den)
 	return 0;
 }
 
-string TimeSignature::toString()
+std::string TimeSignature::toString()
 {
-	return MetaEvent::toString() + " " + to_string(mNumerator) + "/" + to_string(getRealDenominator());
+	return MetaEvent::toString() + " " + std::to_string(mNumerator) + "/" + std::to_string(getRealDenominator());
 }
 
 int TimeSignature::compareTo(mpc::midi::event::MidiEvent* other)
@@ -127,10 +126,10 @@ int TimeSignature::compareTo(mpc::midi::event::MidiEvent* other)
     if(mDelta.getValue() != other->getDelta()) {
         return mDelta.getValue() < other->getDelta() ? 1 : -1;
     }
-    if(!(dynamic_cast< TimeSignature* >(other) != nullptr)) {
+    if(dynamic_cast<TimeSignature*>(other) == nullptr) {
         return 1;
     }
-    auto o = dynamic_cast< TimeSignature* >(other);
+    auto o = dynamic_cast<TimeSignature*>(other);
     if(mNumerator != o->mNumerator) {
         return mNumerator < o->mNumerator ? -1 : 1;
     }

@@ -9,7 +9,6 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::audiomidi;
-using namespace std;
 
 VmpcRecordJamScreen::VmpcRecordJamScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "vmpc-record-jam", layerIndex)
@@ -32,7 +31,7 @@ void VmpcRecordJamScreen::function(int i)
 		auto vmpcDirectToDiskRecorderScreen = mpc.screens->get<VmpcDirectToDiskRecorderScreen>("vmpc-direct-to-disk-recorder");
 		auto ams = mpc.getAudioMidiServices().lock();
 		auto rate = ams->getAudioServer()->getSampleRate();
-		auto settings = make_unique<DirectToDiskSettings>(lengthInFrames, vmpcDirectToDiskRecorderScreen->outputFolder, false, rate);
+		auto settings = std::make_unique<DirectToDiskSettings>(lengthInFrames, vmpcDirectToDiskRecorderScreen->outputFolder, false, rate);
 
 		if (ams->prepareBouncing(settings.get()))
 		{

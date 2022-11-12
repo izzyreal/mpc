@@ -4,7 +4,6 @@
 
 using namespace mpc::lcdgui::screens;
 using namespace mpc::sequencer;
-using namespace std;
 
 PunchScreen::PunchScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "punch", layerIndex)
@@ -92,10 +91,10 @@ void PunchScreen::displayTime()
 
     for (int i = 0; i < 3; i++)
     {
-        findField("time" + to_string(i)).lock()->Hide(autoPunch == 1);
-        findLabel("time" + to_string(i)).lock()->Hide(autoPunch == 1);
-        findField("time" + to_string(i + 3)).lock()->Hide(autoPunch == 0);
-        findLabel("time" + to_string(i + 3)).lock()->Hide(autoPunch == 0);
+        findField("time" + std::to_string(i)).lock()->Hide(autoPunch == 1);
+        findLabel("time" + std::to_string(i)).lock()->Hide(autoPunch == 1);
+        findField("time" + std::to_string(i + 3)).lock()->Hide(autoPunch == 0);
+        findLabel("time" + std::to_string(i + 3)).lock()->Hide(autoPunch == 0);
     }
 
     findLabel("time3").lock()->Hide(autoPunch != 2);
@@ -110,7 +109,7 @@ void PunchScreen::displayTime()
 
 void PunchScreen::displayBackground()
 {
-    string bgName = "punch-in";
+    std::string bgName = "punch-in";
     
     if (autoPunch == 1)
     {

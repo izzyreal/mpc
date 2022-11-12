@@ -5,7 +5,6 @@
 #include <midi/util/VariableLengthInt.hpp>
 
 using namespace mpc::midi::event::meta;
-using namespace std;
 
 EndOfTrack::EndOfTrack(int tick, int delta)
 	: MetaEvent(tick, delta, MetaEvent::END_OF_TRACK)
@@ -18,14 +17,14 @@ int EndOfTrack::getEventSize()
     return 3;
 }
 
-void EndOfTrack::writeToOutputStream(ostream& out) 
+void EndOfTrack::writeToOutputStream(std::ostream& out)
 {
 	MetaEvent::writeToOutputStream(out);
 	out << (char) 0x00;
 }
 
 
-void EndOfTrack::writeToOutputStream(ostream& out, bool writeType)
+void EndOfTrack::writeToOutputStream(std::ostream& out, bool writeType)
 {
 	MetaEvent::writeToOutputStream(out, writeType);
 }

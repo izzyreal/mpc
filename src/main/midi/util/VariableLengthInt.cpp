@@ -3,7 +3,6 @@
 #include <midi/util/MidiUtil.hpp>
 
 using namespace mpc::midi::util;
-using namespace std;
 
 VariableLengthInt::VariableLengthInt()
 	: VariableLengthInt::VariableLengthInt(0)
@@ -15,7 +14,7 @@ VariableLengthInt::VariableLengthInt(int value)
 	setValue(value);
 }
 
-VariableLengthInt::VariableLengthInt(stringstream& in)
+VariableLengthInt::VariableLengthInt(std::stringstream& in)
 {
 	parseBytes(in);
 }
@@ -36,21 +35,21 @@ int VariableLengthInt::getByteCount()
     return mSizeInBytes;
 }
 
-vector<char> VariableLengthInt::getBytes()
+std::vector<char> VariableLengthInt::getBytes()
 {
     return mBytes;
 }
 
-void VariableLengthInt::parseBytes(stringstream& in)
+void VariableLengthInt::parseBytes(std::stringstream& in)
 {
-	auto ints = vector<int>(4);
+	auto ints = std::vector<int>(4);
 	mSizeInBytes = 0;
 	mValue = 0;
 	int shift = 0;
 	
 	auto b = in.get();
 
-	auto firstB = to_string(b);
+	auto firstB = std::to_string(b);
 
 	while (mSizeInBytes < 4) {
 		mSizeInBytes++;
@@ -68,7 +67,7 @@ void VariableLengthInt::parseBytes(stringstream& in)
 	for (int i = 1; i < mSizeInBytes; i++) {
 		shift += 7;
 	}
-	mBytes = vector<char>(mSizeInBytes);
+	mBytes = std::vector<char>(mSizeInBytes);
 	
 	for (int i = 0; i < mSizeInBytes; i++) {
 		mBytes[i] = static_cast<char>(ints[i]);
@@ -80,13 +79,13 @@ void VariableLengthInt::parseBytes(stringstream& in)
 void VariableLengthInt::buildBytes()
 {
 	if (mValue == 0) {
-		mBytes = vector<char>(1);
+		mBytes = std::vector<char>(1);
 		mBytes[0] = 0;
 		mSizeInBytes = 1;
 		return;
 	}
 	mSizeInBytes = 0;
-	auto vals = vector<int>(4);
+	auto vals = std::vector<int>(4);
 	auto tmpVal = mValue;
 	while (mSizeInBytes < 4 && tmpVal > 0) {
 		vals[mSizeInBytes] = tmpVal & 127;
@@ -96,13 +95,13 @@ void VariableLengthInt::buildBytes()
 	for (int i = 1; i < mSizeInBytes; i++) {
 		vals[i] |= 128;
 	}
-	mBytes = vector<char>(mSizeInBytes);
+	mBytes = std::vector<char>(mSizeInBytes);
 	for (int i = 0; i < mSizeInBytes; i++) {
 		mBytes[i] = static_cast<char>(vals[mSizeInBytes - i - 1]);
 	}
 }
 
-string VariableLengthInt::toString()
+std::string VariableLengthInt::toString()
 {
-	return MidiUtil::bytesToHex(mBytes) + " (" + to_string(mValue) + ")";
+	return MidiUtil::bytesToHex(mBytes) + " (" + std::to_string(mValue) + ")";
 }

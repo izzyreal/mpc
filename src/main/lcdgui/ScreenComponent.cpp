@@ -6,24 +6,23 @@
 
 using namespace mpc::lcdgui;
 using namespace mpc::controls;
-using namespace std;
 
-ScreenComponent::ScreenComponent(mpc::Mpc& mpc, const string& name, const int layer)
+ScreenComponent::ScreenComponent(mpc::Mpc& mpc, const std::string& name, const int layer)
 	: Component(name), layer(layer), mpc(mpc)
 {
 	ls = mpc.getLayeredScreen();
 	sampler = mpc.getSampler().lock();
 	sequencer = mpc.getSequencer().lock();
-	auto background = dynamic_pointer_cast<Background>(addChild(make_shared<Background>()).lock());
+	auto background = std::dynamic_pointer_cast<Background>(addChild(std::make_shared<Background>()).lock());
 	background->setName(name);
 }
 
-void ScreenComponent::setTransferMap(const map<string, vector<string>>& newTransferMap)
+void ScreenComponent::setTransferMap(const std::map<std::string, std::vector<std::string>>& newTransferMap)
 {
 	transferMap = newTransferMap;
 }
 
-map<string, vector<string>>& ScreenComponent::getTransferMap()
+std::map<std::string, std::vector<std::string>>& ScreenComponent::getTransferMap()
 {
 	return transferMap;
 }
@@ -38,14 +37,14 @@ std::string ScreenComponent::getFirstField()
 	return firstField;
 }
 
-weak_ptr<Wave> ScreenComponent::findWave()
+std::weak_ptr<Wave> ScreenComponent::findWave()
 {
-	return dynamic_pointer_cast<Wave>(findChild("wave").lock());
+	return std::dynamic_pointer_cast<Wave>(findChild("wave").lock());
 }
 
-weak_ptr<EnvGraph> ScreenComponent::findEnvGraph()
+std::weak_ptr<EnvGraph> ScreenComponent::findEnvGraph()
 {
-	return dynamic_pointer_cast<EnvGraph>(findChild("env-graph").lock());
+	return std::dynamic_pointer_cast<EnvGraph>(findChild("env-graph").lock());
 }
 
 const int& ScreenComponent::getLayerIndex()
@@ -53,7 +52,7 @@ const int& ScreenComponent::getLayerIndex()
 	return layer;
 }
 
-weak_ptr<Field> ScreenComponent::findFocus()
+std::weak_ptr<Field> ScreenComponent::findFocus()
 {
 	for (auto& field : findFields())
 	{
@@ -63,17 +62,17 @@ weak_ptr<Field> ScreenComponent::findFocus()
 	return {};
 }
 
-void ScreenComponent::openScreen(const string& screenName)
+void ScreenComponent::openScreen(const std::string& screenName)
 {
 	mpc.getLayeredScreen().lock()->openScreen(screenName);
 }
 
-void ScreenComponent::setLastFocus(const string& screenName, const string& newLastFocus)
+void ScreenComponent::setLastFocus(const std::string& screenName, const std::string& newLastFocus)
 {
 	mpc.getLayeredScreen().lock()->setLastFocus(screenName, newLastFocus);
 }
 
-const string ScreenComponent::getLastFocus(const string& screenName)
+const std::string ScreenComponent::getLastFocus(const std::string& screenName)
 {
 	return mpc.getLayeredScreen().lock()->getLastFocus(screenName);
 }

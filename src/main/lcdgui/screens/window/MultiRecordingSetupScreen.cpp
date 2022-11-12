@@ -6,7 +6,6 @@
 
 using namespace mpc::lcdgui::screens::window;
 using namespace moduru::lang;
-using namespace std;
 
 MultiRecordingSetupScreen::MultiRecordingSetupScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "multi-recording-setup", layerIndex)
@@ -20,13 +19,13 @@ MultiRecordingSetupScreen::MultiRecordingSetupScreen(mpc::Mpc& mpc, const int la
 	for (int i = 0; i < 34; i++)
 	{
 		if (i < 16)
-			inNames[i] = "1-" + StrUtil::padLeft(to_string(i + 1), "0", 2);
+			inNames[i] = "1-" + StrUtil::padLeft(std::to_string(i + 1), "0", 2);
 
 		if (i == 16)
 			inNames[i] = "1-Ex";
 
 		if (i > 16 && i < 33)
-			inNames[i] = "2-" + StrUtil::padLeft(to_string(i - 16), "0", 2);
+			inNames[i] = "2-" + StrUtil::padLeft(std::to_string(i - 16), "0", 2);
 
 		if (i == 33)
 			inNames[i] = "2-Ex";
@@ -100,12 +99,12 @@ void MultiRecordingSetupScreen::turnWheel(int i)
 		{
 			if (yPos == 0)
 			{
-				string res = param.substr(0, 1) + to_string(yPos + 1);
-				ls.lock()->setFocus(param.substr(0, 1).append(to_string(yPos + 1)));
+                std::string res = param.substr(0, 1) + std::to_string(yPos + 1);
+				ls.lock()->setFocus(param.substr(0, 1).append(std::to_string(yPos + 1)));
 			}
 			else if (yPos == 1)
 			{
-				ls.lock()->setFocus(param.substr(0, 1).append(to_string(yPos + 1)));
+				ls.lock()->setFocus(param.substr(0, 1).append(std::to_string(yPos + 1)));
 			}
 			else if (yPos == 2)
 			{
@@ -117,9 +116,9 @@ void MultiRecordingSetupScreen::turnWheel(int i)
 			if (yPos == 0)
 				setYOffset(yOffset - 1);
 			else if (yPos == 1)
-				ls.lock()->setFocus(param.substr(0, 1).append(to_string(yPos - 1)));
+				ls.lock()->setFocus(param.substr(0, 1).append(std::to_string(yPos - 1)));
 			else if (yPos == 2)
-				ls.lock()->setFocus(param.substr(0, 1).append(to_string(yPos - 1)));
+				ls.lock()->setFocus(param.substr(0, 1).append(std::to_string(yPos - 1)));
 		}
 	}
 	else if (param[0] == 'b')
@@ -147,11 +146,11 @@ void MultiRecordingSetupScreen::up()
 	}
 	else if (yPos == 1)
 	{
-		ls.lock()->setFocus(param.substr(0, 1).append(to_string(yPos - 1)));
+		ls.lock()->setFocus(param.substr(0, 1).append(std::to_string(yPos - 1)));
 	}
 	else if (yPos == 2)
 	{
-		ls.lock()->setFocus(param.substr(0, 1).append(to_string(yPos - 1)));
+		ls.lock()->setFocus(param.substr(0, 1).append(std::to_string(yPos - 1)));
 	}
 }
 
@@ -161,12 +160,12 @@ void MultiRecordingSetupScreen::down()
 	
 	if (yPos == 0)
 	{
-		string res = param.substr(0, 1) + to_string(yPos + 1);
-		ls.lock()->setFocus(param.substr(0, 1).append(to_string(yPos + 1)));
+        std::string res = param.substr(0, 1) + std::to_string(yPos + 1);
+		ls.lock()->setFocus(param.substr(0, 1).append(std::to_string(yPos + 1)));
 	}
 	else if (yPos == 1)
 	{
-		ls.lock()->setFocus(param.substr(0, 1).append(to_string(yPos + 1)));
+		ls.lock()->setFocus(param.substr(0, 1).append(std::to_string(yPos + 1)));
 	}
 	else if (yPos == 2)
 	{
@@ -179,9 +178,9 @@ void MultiRecordingSetupScreen::displayMrsLine(int i)
 	auto seq = sequencer->getActiveSequence();
 	auto trackIndex = visibleMrsLines[i]->getTrack();
 
-	auto aField = findField("a" + to_string(i)).lock();
-	auto bField = findField("b" + to_string(i)).lock();
-	auto cField = findField("c" + to_string(i)).lock();
+	auto aField = findField("a" + std::to_string(i)).lock();
+	auto bField = findField("b" + std::to_string(i)).lock();
+	auto cField = findField("c" + std::to_string(i)).lock();
 
 	aField->setText(inNames[visibleMrsLines[i]->getIn()]);
 
@@ -192,9 +191,9 @@ void MultiRecordingSetupScreen::displayMrsLine(int i)
 	else
 	{
 		auto track = seq->getTrack(visibleMrsLines[i]->getTrack());
-		auto trackNumber = to_string(trackIndex + 1);
+		auto trackNumber = std::to_string(trackIndex + 1);
 		trackNumber = StrUtil::padLeft(trackNumber, "0", 2);
-		bField->setText(string(trackNumber + "-" + track->getName()));
+		bField->setText(std::string(trackNumber + "-" + track->getName()));
 	}
 
 	if (trackIndex == -1)
@@ -212,11 +211,11 @@ void MultiRecordingSetupScreen::displayMrsLine(int i)
 		}
 		else if (dev < 17)
 		{
-			cField->setTextPadded(to_string(dev) + "A", " ");
+			cField->setTextPadded(std::to_string(dev) + "A", " ");
 		}
 		else if (dev <= 32)
 		{
-			cField->setTextPadded(to_string(dev - 16) + "B", " ");
+			cField->setTextPadded(std::to_string(dev - 16) + "B", " ");
 		}
 	}
 }
@@ -229,7 +228,7 @@ void MultiRecordingSetupScreen::setYOffset(int i)
 	if (i + 3 > mrsLines.size())
 		return;
 
-	visibleMrsLines = vector<MultiRecordingSetupLine*>(3);
+	visibleMrsLines = std::vector<MultiRecordingSetupLine*>(3);
 	yOffset = i;
 	
 	for (auto j = 0; j < 3; j++)
@@ -244,7 +243,7 @@ void MultiRecordingSetupScreen::setMrsTrack(int inputNumber, int newTrackNumber)
 {
 	mrsLines[inputNumber].setTrack(newTrackNumber);
 	
-	visibleMrsLines = vector<MultiRecordingSetupLine*>(3);
+	visibleMrsLines = std::vector<MultiRecordingSetupLine*>(3);
 	
 	for (auto j = 0; j < 3; j++)
 		visibleMrsLines[j] = &mrsLines[yOffset + j];
@@ -254,9 +253,9 @@ void MultiRecordingSetupScreen::setMrsTrack(int inputNumber, int newTrackNumber)
 	displayMrsLine(displayYPos);
 }
 
-vector<MultiRecordingSetupLine*> MultiRecordingSetupScreen::getMrsLines()
+std::vector<MultiRecordingSetupLine*> MultiRecordingSetupScreen::getMrsLines()
 {
-	vector<MultiRecordingSetupLine*> result;
+    std::vector<MultiRecordingSetupLine*> result;
 
 	for (auto& mrsLine : mrsLines)
 		result.push_back(&mrsLine);

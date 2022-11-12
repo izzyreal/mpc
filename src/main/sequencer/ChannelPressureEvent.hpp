@@ -18,7 +18,6 @@ namespace mpc::sequencer
 
 		void CopyValuesTo(std::weak_ptr<Event> dest) override;
 
-		ChannelPressureEvent();
 		std::string getTypeName() override { return "channel-pressure"; }
 
 	};

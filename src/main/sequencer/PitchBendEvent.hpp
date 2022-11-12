@@ -16,7 +16,6 @@ namespace mpc::sequencer
 
 		void CopyValuesTo(std::weak_ptr<Event> dest) override;
 
-		PitchBendEvent();
 		std::string getTypeName() override { return "pitch-bend"; }
 
 	};

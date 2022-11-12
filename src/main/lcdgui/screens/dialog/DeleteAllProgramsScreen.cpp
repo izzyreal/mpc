@@ -1,7 +1,6 @@
 #include "DeleteAllProgramsScreen.hpp"
 
 using namespace mpc::lcdgui::screens::dialog;
-using namespace std;
 
 DeleteAllProgramsScreen::DeleteAllProgramsScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "delete-all-programs", layerIndex)

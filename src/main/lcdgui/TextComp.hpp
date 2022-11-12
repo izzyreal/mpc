@@ -47,7 +47,7 @@ namespace mpc::lcdgui
 		void enableTwoDots();
 		void setBlinking(bool b);
 		void setInverted(bool b);
-		void setAlignment(const Alignment alignment, int endX = -1);
+		void setAlignment(const Alignment newAlignment, int endX = -1);
 		int getX();
 		int getY();
 		int getW();

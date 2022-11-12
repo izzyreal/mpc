@@ -1,6 +1,5 @@
 #include "VmpcFileInUseScreen.hpp"
 using namespace mpc::lcdgui::screens::dialog;
-using namespace std;
 
 VmpcFileInUseScreen::VmpcFileInUseScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "vmpc-file-in-use", layerIndex)

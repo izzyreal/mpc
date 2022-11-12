@@ -17,7 +17,6 @@ using namespace mpc::controls;
 using namespace mpc::sampler;
 using namespace ctoot::mpc;
 using namespace moduru::lang;
-using namespace std;
 
 MixerScreen::MixerScreen(mpc::Mpc& mpc, const int layerIndex) 
 : ScreenComponent(mpc, "mixer", layerIndex)
@@ -53,7 +52,7 @@ void MixerScreen::addMixerStrips()
 {
     for (int i = 0; i < 16; i++)
     {
-        mixerStrips.push_back(std::move(dynamic_pointer_cast<MixerStrip>(addChild(make_shared<MixerStrip>(mpc, i)).lock())));
+        mixerStrips.push_back(std::move(std::dynamic_pointer_cast<MixerStrip>(addChild(std::make_shared<MixerStrip>(mpc, i)).lock())));
         mixerStrips.back().lock()->setBank(mpc.getBank());
     }
     
@@ -61,7 +60,7 @@ void MixerScreen::addMixerStrips()
     mixerStrips[xPos].lock()->setSelection(yPos);
 }
 
-shared_ptr<MpcStereoMixerChannel> MixerScreen::getStereoMixerChannel(int index)
+std::shared_ptr<MpcStereoMixerChannel> MixerScreen::getStereoMixerChannel(int index)
 {
     const auto padIndex = index + (mpc.getBank() * 16);
     const auto pad = program.lock()->getPad(padIndex);
@@ -77,7 +76,7 @@ shared_ptr<MpcStereoMixerChannel> MixerScreen::getStereoMixerChannel(int index)
     return stereoMixSourceIsDrum ? mpcSoundPlayerChannel->getStereoMixerChannels()[note - 35].lock() : noteParameters->getStereoMixerChannel().lock();
 }
 
-shared_ptr<MpcIndivFxMixerChannel> MixerScreen::getIndivFxMixerChannel(int index)
+std::shared_ptr<MpcIndivFxMixerChannel> MixerScreen::getIndivFxMixerChannel(int index)
 {
     const auto padIndex = index + (mpc.getBank() * 16);
     const auto pad = program.lock()->getPad(padIndex);
@@ -147,7 +146,7 @@ void MixerScreen::displayMixerStrips()
 
 void MixerScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 {
-    string s = nonstd::any_cast<string>(arg);
+    auto s = nonstd::any_cast<std::string>(arg);
     
     init();
     
@@ -486,7 +485,7 @@ void MixerScreen::turnWheel(int i)
 void MixerScreen::recordMixerEvent(int pad, int param, int value)
 {
     auto track = sequencer->getActiveTrack();
-    auto e = dynamic_pointer_cast<mpc::sequencer::MixerEvent>(track->addEvent(sequencer->getTickPosition(), "mixer"));
+    auto e = std::dynamic_pointer_cast<mpc::sequencer::MixerEvent>(track->addEvent(sequencer->getTickPosition(), "mixer"));
     e->setPadNumber(pad);
     e->setParameter(param);
     e->setValue(value);

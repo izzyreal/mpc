@@ -7,10 +7,9 @@
 
 #include <Logger.hpp>
 
-using namespace std;
 using namespace mpc::audiomidi;
 
-DiskRecorder::DiskRecorder(ctoot::audio::core::AudioProcess* process, string name)
+DiskRecorder::DiskRecorder(ctoot::audio::core::AudioProcess* process, std::string name)
 	: AudioProcessAdapter(process)
 {
 	this->name = name;
@@ -50,7 +49,7 @@ int DiskRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf, int nFrames
 	
 	if (writing.load())
 	{
-        vector<char> audioBufferAsBytes (buf->getByteArrayBufferSize(format, nFrames));
+        std::vector<char> audioBufferAsBytes (buf->getByteArrayBufferSize(format, nFrames));
 		buf->convertToByteArray_(0, nFrames, &audioBufferAsBytes, 0, format);
 		
 		if (audioBufferAsBytes.size() + writtenByteCount >= lengthInBytes)

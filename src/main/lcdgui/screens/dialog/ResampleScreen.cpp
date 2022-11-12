@@ -4,7 +4,6 @@
 
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::window;
-using namespace std;
 
 ResampleScreen::ResampleScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "resample", layerIndex)
@@ -55,7 +54,7 @@ void ResampleScreen::turnWheel(int i)
         auto _sampler = sampler;
 		nameScreen->setName(findField("newname").lock()->getText());
 
-        auto renamer = [_sampler, resampleScreen](string& newName2) {
+        auto renamer = [_sampler, resampleScreen](std::string& newName2) {
             if (_sampler->isSoundNameOccupied(newName2))
                 return;
 
@@ -126,7 +125,7 @@ void ResampleScreen::function(int i)
 
 void ResampleScreen::displayNewFs()
 {
-	findField("newfs").lock()->setText(to_string(newFs));
+	findField("newfs").lock()->setText(std::to_string(newFs));
 }
 
 void ResampleScreen::displayQuality()
@@ -177,7 +176,7 @@ void ResampleScreen::setNewBit(int i)
 	displayNewBit();
 }
 
-void ResampleScreen::setNewName(string s)
+void ResampleScreen::setNewName(std::string s)
 {
 	newName = s;
 	displayNewName();

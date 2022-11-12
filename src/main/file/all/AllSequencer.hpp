@@ -13,7 +13,6 @@ public:
     static const int LENGTH = 16;
     
 private:
-    mpc::Mpc& mpc;
     static std::vector<char> TEMPLATE;
     
 public:
@@ -33,8 +32,8 @@ public:
 public:
     std::vector<char>& getBytes();
     
-    AllSequencer(mpc::Mpc& mpc, const std::vector<char>& loadBytes);
-    AllSequencer(mpc::Mpc& mpc);
+    AllSequencer(const std::vector<char>& loadBytes);
+    AllSequencer(mpc::Mpc&);
     
 };
 }

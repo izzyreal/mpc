@@ -4,7 +4,6 @@
 
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::window;
-using namespace std;
 
 CopySoundScreen::CopySoundScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "copy-sound", layerIndex)
@@ -63,7 +62,7 @@ void CopySoundScreen::turnWheel(int i)
         const auto copySoundScreen = this;
 		nameScreen->setName(newName);
         
-        auto renamer = [copySoundScreen](string& renamerNewName) {
+        auto renamer = [copySoundScreen](std::string& renamerNewName) {
             copySoundScreen->setNewName(renamerNewName);
         };
 
@@ -87,7 +86,7 @@ void CopySoundScreen::displaySnd()
 	findField("snd").lock()->setText(sampler->getSound().lock()->getName());
 }
 
-void CopySoundScreen::setNewName(string s)
+void CopySoundScreen::setNewName(std::string s)
 {
 	newName = s;
 	displayNewName();

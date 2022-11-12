@@ -2,7 +2,6 @@
 
 using namespace mpc::lcdgui::screens;
 using namespace moduru::lang;
-using namespace std;
 
 NextSeqPadScreen::NextSeqPadScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "next-seq-pad", layerIndex)
@@ -13,7 +12,7 @@ void NextSeqPadScreen::open()
 {
 	for (int i = 0; i < 16; i++)
 	{
-		findField(to_string(i + 1)).lock()->setFocusable(false);
+		findField(std::to_string(i + 1)).lock()->setFocusable(false);
 		displaySeq(i);
 		setSeqColor(i);
 	}
@@ -91,7 +90,7 @@ void NextSeqPadScreen::displayNextSq()
 		return;
 	}
 
-	auto number = StrUtil::padLeft(to_string(nextSq + 1), "0", 2);
+	auto number = StrUtil::padLeft(std::to_string(nextSq + 1), "0", 2);
 	auto name = sequencer->getSequence(nextSq)->getName();
 	findLabel("nextsq").lock()->setText(number + "-" + name);
 }
@@ -108,23 +107,23 @@ void NextSeqPadScreen::displayBank()
 
 void NextSeqPadScreen::displaySeqNumbers()
 {
-	auto seqn = vector<string>{ "01-16", "17-32", "33-48", "49-64" };
+	std::vector<std::string> seqn{ "01-16", "17-32", "33-48", "49-64" };
 	findLabel("seqnumbers").lock()->setText(seqn[mpc.getBank()]);
 }
 
 void NextSeqPadScreen::displaySq()
 {
-	findField("sq").lock()->setText(StrUtil::padLeft(to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2) + "-" + sequencer->getActiveSequence()->getName());
+	findField("sq").lock()->setText(StrUtil::padLeft(std::to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2) + "-" + sequencer->getActiveSequence()->getName());
 }
 
 void NextSeqPadScreen::displaySeq(int i)
 {
-	findField(to_string(i + 1)).lock()->setText(sequencer->getSequence(i + bankOffset())->getName().substr(0, 8));
+	findField(std::to_string(i + 1)).lock()->setText(sequencer->getSequence(i + bankOffset())->getName().substr(0, 8));
 }
 
 void NextSeqPadScreen::setSeqColor(int i)
 {
-	findField(to_string(i + 1)).lock()->setInverted(i + bankOffset() == sequencer->getNextSq());
+	findField(std::to_string(i + 1)).lock()->setInverted(i + bankOffset() == sequencer->getNextSq());
 }
 
 void NextSeqPadScreen::displayNow0()
@@ -153,7 +152,7 @@ void NextSeqPadScreen::refreshSeqs()
 
 void NextSeqPadScreen::update(moduru::observer::Observable* observable, nonstd::any message)
 {
-	string msg = nonstd::any_cast<string>(message);
+	auto msg = nonstd::any_cast<std::string>(message);
 	if (msg == "bank")
     {
         displayBank();

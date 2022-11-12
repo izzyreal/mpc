@@ -7,7 +7,6 @@
 
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::sampler;
-using namespace std;
 
 MetronomeSoundScreen::MetronomeSoundScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "metronome-sound", layerIndex)
@@ -50,7 +49,7 @@ void MetronomeSoundScreen::displayVolume()
 
 void MetronomeSoundScreen::displayOutput()
 {
-    auto outputText = output == 0 ? "STEREO" : "OUT" + to_string(output);
+    auto outputText = output == 0 ? "STEREO" : "OUT" + std::to_string(output);
     findField("output").lock()->setText(outputText);
 }
 
@@ -58,14 +57,14 @@ void MetronomeSoundScreen::displayAccent()
 {
 	auto program = sampler.lock()->getDrumBusProgramIndex(sound);
     auto note = dynamic_cast<Program*>(sampler.lock()->getProgram(program).lock().get())->getPad(accentPad)->getNote();
-	findField("accent").lock()->setText((note == 34 ? "--" : to_string(note)) + "/" + sampler.lock()->getPadName(accentPad));
+	findField("accent").lock()->setText((note == 34 ? "--" : std::to_string(note)) + "/" + sampler.lock()->getPadName(accentPad));
 }
 
 void MetronomeSoundScreen::displayNormal()
 {
     auto program = sampler.lock()->getDrumBusProgramIndex(sound);
     auto note = dynamic_cast<Program*>(sampler.lock()->getProgram(program).lock().get())->getPad(normalPad)->getNote();
-    findField("normal").lock()->setText((note == 34 ? "--" : to_string(note)) + "/" + sampler.lock()->getPadName(normalPad));
+    findField("normal").lock()->setText((note == 34 ? "--" : std::to_string(note)) + "/" + sampler.lock()->getPadName(normalPad));
 }
 
 void MetronomeSoundScreen::displayAccentVelo()
@@ -233,7 +232,7 @@ void MetronomeSoundScreen::turnWheel(int i)
 void MetronomeSoundScreen::update(moduru::observer::Observable* o, nonstd::any msg)
 {
     init();
-    auto s = nonstd::any_cast<string>(msg);
+    auto s = nonstd::any_cast<std::string>(msg);
 
     if (s.compare("note") == 0)
     {

@@ -1,7 +1,6 @@
 #include "DeleteSoundScreen.hpp"
 
 using namespace mpc::lcdgui::screens::dialog;
-using namespace std;
 
 DeleteSoundScreen::DeleteSoundScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "delete-sound", layerIndex)

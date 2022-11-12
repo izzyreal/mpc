@@ -56,7 +56,7 @@ namespace mpc::sampler {
 		std::vector<int> getPadIndicesFromNote(const int note);
 
 	public:
-		Program(mpc::Mpc& mpc, mpc::sampler::Sampler* sampler);
+		Program(mpc::Mpc& mpc, mpc::sampler::Sampler* samplerToUse);
 		~Program();
 
 	};

@@ -3,19 +3,18 @@
 #include <file/ByteUtil.hpp>
 
 using namespace mpc::file::all;
-using namespace std;
 
-Bar::Bar(const vector<char>& bytes, Bar* previousBar)
+Bar::Bar(const std::vector<char>& bytes, Bar* previousBar)
 {
 	ticksPerBeat = bytes[0] & 255;
-	auto intVal = moduru::file::ByteUtil::bytes2ushort(vector<char>{ bytes[1] , bytes[2] });
+	auto intVal = moduru::file::ByteUtil::bytes2ushort({ bytes[1] , bytes[2] });
 	lastTick = ((bytes[3] & 255) * 65536) + intVal;
 	barLength = lastTick - (previousBar == nullptr ? 0 : previousBar->lastTick);
 }
 
 Bar::Bar(int ticksPerBeat, int lastTick) 
 {
-	saveBytes = vector<char>(4);
+	saveBytes = std::vector<char>(4);
 	saveBytes[0] = static_cast< int8_t >(ticksPerBeat);
 	auto intVal = lastTick % 65536;
 	auto bytePair = moduru::file::ByteUtil::ushort2bytes(intVal);
@@ -60,7 +59,7 @@ int Bar::getLastTick()
     return lastTick;
 }
 
-vector<char>& Bar::getBytes()
+std::vector<char>& Bar::getBytes()
 {
     return saveBytes;
 }

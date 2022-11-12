@@ -8,14 +8,13 @@
 
 using namespace mpc::file;
 using namespace moduru::lang;
-using namespace std;
 
-bool AkaiName::isAkaiName(const string& name)
+bool AkaiName::isAkaiName(const std::string& name)
 {
 	return name.compare(generate(name)) == 0;
 }
 
-vector<char> AkaiName::allowedSpecialCharacters = { '_', '^', '$', '~', '!', '#', '%', '&', '-', '{', '}', '(', ')', '@', '\\', '`' };
+std::vector<char> AkaiName::allowedSpecialCharacters = { '_', '^', '$', '~', '!', '#', '%', '&', '-', '{', '}', '(', ')', '@', '\\', '`' };
 
 bool AkaiName::isValidChar(const char& c)				  
 {																  
@@ -39,9 +38,9 @@ bool AkaiName::isCharThatShouldBeRemoved(const char& c)
 	return (c == '.') || (c == ' ');
 }
 
-string AkaiName::cleanUpName(const string& name)
+std::string AkaiName::cleanUpName(const std::string& name)
 {
-	string result = "";
+	std::string result = "";
 	
 	for (int src = 0; src < name.length(); src++) {
 		char c = toupper(name[src]);
@@ -61,9 +60,9 @@ string AkaiName::cleanUpName(const string& name)
 	return result;
 }
 
-string AkaiName::removeLeadingPeriod(const string& s)
+std::string AkaiName::removeLeadingPeriod(const std::string& s)
 {
-	string result = "";
+	std::string result = "";
 	for (int i = 0; i < s.length(); i++) {
 		if (s[i] != '.') {
 			result.append(s.substr(i));
@@ -73,16 +72,16 @@ string AkaiName::removeLeadingPeriod(const string& s)
 	return s;
 }
 
-string AkaiName::generate(const string& name, const vector<string>& usedNames)
+std::string AkaiName::generate(const std::string& name, const std::vector<std::string>& usedNames)
 {
 	auto nameWithoutLeadingPeriod = StrUtil::toUpper(removeLeadingPeriod(name));
 	
-	string longName;
-	string longExt;
+	std::string longName;
+	std::string longExt;
 	
 	int dotIdx = nameWithoutLeadingPeriod.find_last_of(".");
 	
-	if (dotIdx == string::npos) {
+	if (dotIdx == std::string::npos) {
 		longName = cleanUpName(nameWithoutLeadingPeriod);
 		longExt = "";
 	}
@@ -103,7 +102,7 @@ string AkaiName::generate(const string& name, const vector<string>& usedNames)
 		int maxLongIdx = longName.length() < 16 ? longName.length() : 16;
 
 		for (int i = 1; i < 99999; i++) {
-			auto serial = "~" + to_string(i);
+			auto serial = "~" + std::to_string(i);
 			int serialLen = serial.length();
 			int trimIndex = maxLongIdx < 16 - serialLen ? maxLongIdx : 16 - serialLen;
 			
@@ -115,7 +114,7 @@ string AkaiName::generate(const string& name, const vector<string>& usedNames)
 				return secondCandidate;
 			}
 		}
-		string error = "could not generate short name for " + name;
+		std::string error = "could not generate short name for " + name;
 		MLOG(error);
 	}
 

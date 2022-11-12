@@ -24,25 +24,24 @@
 
 using namespace mpc::file::all;
 using namespace moduru;
-using namespace std;
 
 AllParser::AllParser(mpc::Mpc& _mpc, mpc::disk::MpcFile* file)
     : AllParser(_mpc, file->getBytes())
 {
 }
 
-AllParser::AllParser(mpc::Mpc& _mpc, const vector<char>& loadBytes)
+AllParser::AllParser(mpc::Mpc& _mpc, const std::vector<char>& loadBytes)
 	: mpc (_mpc)
 {
   if (loadBytes.size() >= HEADER_OFFSET + HEADER_LENGTH)
     header = new Header(VecUtil::CopyOfRange(loadBytes, HEADER_OFFSET, HEADER_OFFSET + HEADER_LENGTH));
 	
 	if (header == nullptr || !header->verifyFileID())
-		throw invalid_argument("Invalid ALL file header ID");
+		throw std::invalid_argument("Invalid ALL file header ID");
 	
 	defaults = new Defaults(mpc, VecUtil::CopyOfRange(loadBytes, DEFAULTS_OFFSET, DEFAULTS_OFFSET + DEFAULTS_LENGTH));
-	sequencer = new AllSequencer(mpc, VecUtil::CopyOfRange(loadBytes, SEQUENCER_OFFSET, SEQUENCER_OFFSET + AllSequencer::LENGTH));
-	count = new Count(mpc, VecUtil::CopyOfRange(loadBytes, COUNT_OFFSET, COUNT_OFFSET + COUNT_LENGTH));
+	sequencer = new AllSequencer(VecUtil::CopyOfRange(loadBytes, SEQUENCER_OFFSET, SEQUENCER_OFFSET + AllSequencer::LENGTH));
+	count = new Count(VecUtil::CopyOfRange(loadBytes, COUNT_OFFSET, COUNT_OFFSET + COUNT_LENGTH));
 	midiInput = new MidiInput(VecUtil::CopyOfRange(loadBytes, MIDI_INPUT_OFFSET, MIDI_INPUT_OFFSET + MidiInput::LENGTH));
 	midiSyncMisc = new MidiSyncMisc(VecUtil::CopyOfRange(loadBytes, MIDI_SYNC_OFFSET, MIDI_SYNC_OFFSET + MidiSyncMisc::LENGTH));
 	misc = new Misc(VecUtil::CopyOfRange(loadBytes, MISC_OFFSET, MISC_OFFSET + Misc::LENGTH));
@@ -60,7 +59,7 @@ AllParser::AllParser(mpc::Mpc& _mpc, const vector<char>& loadBytes)
 AllParser::AllParser(mpc::Mpc& _mpc)
 	: mpc (_mpc)
 {
-	vector<vector<char>> chunks;
+	std::vector<std::vector<char>> chunks;
 	chunks.push_back(Header().getBytes());
 	
 	Defaults saveDefaults(mpc);
@@ -75,7 +74,7 @@ AllParser::AllParser(mpc::Mpc& _mpc)
 	chunks.push_back(midiInput->getBytes());
 	
 	for (int i = 0; i < 16; i++)
-		chunks.push_back(vector<char>{ (char)0xFF });
+		chunks.push_back(std::vector<char>{ (char)0xFF });
 
 	midiSyncMisc = new MidiSyncMisc(mpc);
 	chunks.push_back(midiSyncMisc->getBytes());
@@ -122,7 +121,7 @@ AllParser::~AllParser()
 		if (s != nullptr) delete s;
 }
 
-vector<AllSequence*> AllParser::getAllSequences()
+std::vector<AllSequence*> AllParser::getAllSequences()
 {
     return sequences;
 }
@@ -162,19 +161,19 @@ SequenceNames* AllParser::getSeqNames()
     return seqNames;
 }
 
-vector<mpc::file::all::Song*> AllParser::getSongs()
+std::vector<mpc::file::all::Song*> AllParser::getSongs()
 {
 	return songs;
 }
 
-vector<AllSequence*> AllParser::readSequences(vector<char> trimmedSeqsArray)
+std::vector<AllSequence*> AllParser::readSequences(std::vector<char> trimmedSeqsArray)
 {
 	const int totalSeqChunkLength = trimmedSeqsArray.size();
     
     if (totalSeqChunkLength == 0)
         return {};
     
-	vector<AllSequence*> seqs;
+	std::vector<AllSequence*> seqs;
 	int eventSegments, currentSeqEnd, read = 0;
 
     auto usednesses = seqNames->getUsednesses();
@@ -212,9 +211,9 @@ vector<AllSequence*> AllParser::readSequences(vector<char> trimmedSeqsArray)
 	return seqs;
 }
 
-vector<char>& AllParser::getBytes()
+std::vector<char>& AllParser::getBytes()
 {
     return saveBytes;
 }
 
-vector<char> AllParser::UNKNOWN_CHUNK = vector<char>(64);
+std::vector<char> AllParser::UNKNOWN_CHUNK = std::vector<char>(64);

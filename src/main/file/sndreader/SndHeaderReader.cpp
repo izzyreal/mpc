@@ -7,15 +7,14 @@
 #include <lang/StrUtil.hpp>
 
 using namespace mpc::file::sndreader;
-using namespace std;
 
 SndHeaderReader::SndHeaderReader(SndReader* sndReader)
 {
-	vector<char> sndFileArray = sndReader->getSndFileArray();
+	auto sndFileArray = sndReader->getSndFileArray();
 	headerArray = moduru::VecUtil::CopyOfRange(sndFileArray, 0, 42);
 }
 
-vector<char>& SndHeaderReader::getHeaderArray()
+std::vector<char>& SndHeaderReader::getHeaderArray()
 {
     return headerArray;
 }
@@ -28,9 +27,9 @@ bool SndHeaderReader::hasValidId()
 	return (i == 1 && j < 5);
 }
 
-string SndHeaderReader::getName()
+std::string SndHeaderReader::getName()
 {
-	string name = "";
+	std::string name;
 	
 	for (int i = 2; i < 18; i++) {
 		if (headerArray[i] == 0x00) {
@@ -75,7 +74,7 @@ int SndHeaderReader::getEnd()
 
 int SndHeaderReader::getNumberOfFrames()
 {
-	vector<char> numberOfFramesArray = moduru::VecUtil::CopyOfRange(headerArray, 30, 34);
+	auto numberOfFramesArray = moduru::VecUtil::CopyOfRange(headerArray, 30, 34);
 	int numberOfFrames = moduru::file::ByteUtil::bytes2uint(numberOfFramesArray);
 	return numberOfFrames;
 }

@@ -6,7 +6,6 @@
 
 using namespace mpc::lcdgui::screens;
 using namespace moduru::lang;
-using namespace std;
 
 AssignScreen::AssignScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "assign", layerIndex)
@@ -39,15 +38,15 @@ void AssignScreen::turnWheel(int i)
 	auto slider = program.lock()->getSlider();
 	auto parameter = slider->getParameter();
 
-	if (param.compare("assignnote") == 0)
+	if (param == "assignnote")
 	{
 		slider->setAssignNote(slider->getNote() + i);
 	}
-	else if (param.compare("parameter") == 0)
+	else if (param == "parameter")
 	{
 		slider->setParameter(slider->getParameter() + i);
 	}
-	else if (param.compare("highrange") == 0)
+	else if (param == "highrange")
 	{
 		switch (parameter)
 		{
@@ -65,7 +64,7 @@ void AssignScreen::turnWheel(int i)
 			break;
 		}
 	}
-	else if (param.compare("lowrange") == 0)
+	else if (param == "lowrange")
 	{
 		switch (parameter)
 		{
@@ -84,7 +83,7 @@ void AssignScreen::turnWheel(int i)
 		}
 
 	}
-	else if (param.compare("assignnv") == 0)
+	else if (param == "assignnv")
 	{
 		slider->setControlChange(slider->getControlChange() + i);
 	}
@@ -109,7 +108,7 @@ void AssignScreen::displayAssignNote()
 	auto soundIndex = note == 34 ? -1 : program.lock()->getNoteParameters(note)->getSoundIndex();
 	auto soundName = soundIndex == -1 ? "(No sound)" : sampler->getSoundName(soundIndex);
 	
-	auto noteName = note == 34 ? "--" : to_string(note);
+	auto noteName = note == 34 ? "--" : std::to_string(note);
 
 	findField("assignnote").lock()->setText(noteName + "/" + padName + "-" + soundName);
 }
@@ -150,7 +149,7 @@ void AssignScreen::displayHighRange()
 		break;
 	}
 
-	findField("highrange").lock()->setText(sign + StrUtil::padLeft(to_string(abs(value)), " ", 3));
+	findField("highrange").lock()->setText(sign + StrUtil::padLeft(std::to_string(abs(value)), " ", 3));
 }
 
 void AssignScreen::displayLowRange()
@@ -182,40 +181,40 @@ void AssignScreen::displayLowRange()
 		break;
 	}
 
-	findField("lowrange").lock()->setText(sign + StrUtil::padLeft(to_string(abs(value)), " ", 3));
+	findField("lowrange").lock()->setText(sign + StrUtil::padLeft(std::to_string(abs(value)), " ", 3));
 }
 
 void AssignScreen::displayAssignNv()
 {
 	init();
 	auto slider = program.lock()->getSlider();
-	auto assignNvString = slider->getControlChange() == 0 ? "OFF" : to_string(slider->getControlChange());
+	auto assignNvString = slider->getControlChange() == 0 ? "OFF" : std::to_string(slider->getControlChange());
 	findField("assignnv").lock()->setTextPadded(assignNvString, " ");
 }
 
 void AssignScreen::update(moduru::observer::Observable* observable, nonstd::any message)
 {
-	string msg = nonstd::any_cast<string>(message);
+	auto msg = nonstd::any_cast<std::string>(message);
 	
-	if (msg.compare("assignnote") == 0)
+	if (msg == "assignnote")
 	{
 		displayAssignNote();
 	}
-	else if (msg.compare("parameter") == 0)
+	else if (msg == "parameter")
 	{
 		displayParameter();
 		displayHighRange();
 		displayLowRange();
 	}
-	else if (msg.compare("highrange") == 0)
+	else if (msg == "highrange")
 	{
 		displayHighRange();
 	}
-	else if (msg.compare("lowrange") == 0)
+	else if (msg == "lowrange")
 	{
 		displayLowRange();
 	}
-	else if (msg.compare("controlchange") == 0)
+	else if (msg == "controlchange")
 	{
 		displayAssignNv();
 	}

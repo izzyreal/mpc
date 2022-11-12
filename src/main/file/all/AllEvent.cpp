@@ -8,8 +8,6 @@
 #include "AllProgramChangeEvent.hpp"
 #include "AllSysExEvent.hpp"
 
-#include <Util.hpp>
-
 #include <sequencer/ChannelPressureEvent.hpp>
 #include <sequencer/ControlChangeEvent.hpp>
 #include <sequencer/Event.hpp>
@@ -28,11 +26,10 @@
 using namespace mpc::file::all;
 using namespace mpc::sequencer;
 using namespace moduru::file;
-using namespace std;
 
-vector<int> AllEvent::TICK_BYTE3_BIT_RANGE = vector<int>{ 0, 3 };
+std::vector<int> AllEvent::TICK_BYTE3_BIT_RANGE = std::vector<int>{ 0, 3 };
 
-shared_ptr<Event> AllEvent::bytesToMpcEvent(const vector<char>& bytes)
+std::shared_ptr<Event> AllEvent::bytesToMpcEvent(const std::vector<char>& bytes)
 {
     auto eventID = bytes[EVENT_ID_OFFSET];
     
@@ -60,16 +57,16 @@ shared_ptr<Event> AllEvent::bytesToMpcEvent(const vector<char>& bytes)
     }
 }
 
-vector<char> AllEvent::mpcEventToBytes(std::shared_ptr<mpc::sequencer::Event> event)
+std::vector<char> AllEvent::mpcEventToBytes(std::shared_ptr<mpc::sequencer::Event> event)
 {
-    auto note = dynamic_pointer_cast<mpc::sequencer::NoteEvent>(event);
-    auto polyPressure = dynamic_pointer_cast<mpc::sequencer::PolyPressureEvent>(event);
-    auto controlChange = dynamic_pointer_cast<mpc::sequencer::ControlChangeEvent>(event);
-    auto programChange = dynamic_pointer_cast<mpc::sequencer::ProgramChangeEvent>(event);
-    auto channelPressure = dynamic_pointer_cast<mpc::sequencer::ChannelPressureEvent>(event);
-    auto pitchBend = dynamic_pointer_cast<mpc::sequencer::PitchBendEvent>(event);
-    auto sysEx = dynamic_pointer_cast<mpc::sequencer::SystemExclusiveEvent>(event);
-    auto mixer = dynamic_pointer_cast<mpc::sequencer::MixerEvent>(event);
+    auto note = std::dynamic_pointer_cast<mpc::sequencer::NoteEvent>(event);
+    auto polyPressure = std::dynamic_pointer_cast<mpc::sequencer::PolyPressureEvent>(event);
+    auto controlChange = std::dynamic_pointer_cast<mpc::sequencer::ControlChangeEvent>(event);
+    auto programChange = std::dynamic_pointer_cast<mpc::sequencer::ProgramChangeEvent>(event);
+    auto channelPressure = std::dynamic_pointer_cast<mpc::sequencer::ChannelPressureEvent>(event);
+    auto pitchBend = std::dynamic_pointer_cast<mpc::sequencer::PitchBendEvent>(event);
+    auto sysEx = std::dynamic_pointer_cast<mpc::sequencer::SystemExclusiveEvent>(event);
+    auto mixer = std::dynamic_pointer_cast<mpc::sequencer::MixerEvent>(event);
     
     if (note)
         return AllNoteEvent::mpcEventToBytes(note);
@@ -89,16 +86,16 @@ vector<char> AllEvent::mpcEventToBytes(std::shared_ptr<mpc::sequencer::Event> ev
         return AllSysExEvent::mpcEventToBytes(mixer);
 }
 
-int AllEvent::readTick(const vector<char>& bytes)
+int AllEvent::readTick(const std::vector<char>& bytes)
 {
     unsigned short s3 = BitUtil::removeUnusedBits(bytes[TICK_BYTE3_OFFSET], TICK_BYTE3_BIT_RANGE);
     
-    int result = ByteUtil::bytes2ushort(vector<char>{ bytes[TICK_BYTE1_OFFSET], bytes[TICK_BYTE2_OFFSET] }) + (s3 * 65536);
+    int result = ByteUtil::bytes2ushort(std::vector<char>{ bytes[TICK_BYTE1_OFFSET], bytes[TICK_BYTE2_OFFSET] }) + (s3 * 65536);
     
     return result;
 }
 
-void AllEvent::writeTick(vector<char>& event, int tick)
+void AllEvent::writeTick(std::vector<char>& event, int tick)
 {
     auto remainder = tick % 65536;
     auto ba = ByteUtil::ushort2bytes(remainder);

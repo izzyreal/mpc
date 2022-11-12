@@ -4,9 +4,8 @@
 #include <mpc/MpcIndivFxMixerChannel.hpp>
 
 using namespace mpc::file::aps;
-using namespace std;
 
-ApsMixer::ApsMixer(const vector<char>& loadBytes) 
+ApsMixer::ApsMixer(const std::vector<char>& loadBytes)
 {
 	for (int i = 0; i < 64; i++) {
 		fxPaths[i] = loadBytes[(i * 6) + 0];
@@ -18,7 +17,7 @@ ApsMixer::ApsMixer(const vector<char>& loadBytes)
 	}
 }
 
-ApsMixer::ApsMixer(vector<weak_ptr<ctoot::mpc::MpcStereoMixerChannel>> smcs, vector<weak_ptr<ctoot::mpc::MpcIndivFxMixerChannel>> ifmcs)
+ApsMixer::ApsMixer(std::vector<std::weak_ptr<ctoot::mpc::MpcStereoMixerChannel>> smcs, std::vector<std::weak_ptr<ctoot::mpc::MpcIndivFxMixerChannel>> ifmcs)
 {
 	for (int i = 0; i < 64; i++) {
 		auto mixerChannel = smcs[i].lock();
@@ -80,7 +79,7 @@ int ApsMixer::getSendLevel(int noteIndex)
     return sendLevels[noteIndex];
 }
 
-vector<char> ApsMixer::getBytes()
+std::vector<char> ApsMixer::getBytes()
 {
     return saveBytes;
 }

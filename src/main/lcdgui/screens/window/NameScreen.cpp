@@ -4,14 +4,13 @@
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui;
-using namespace std;
 
 using namespace moduru::lang;
 
 NameScreen::NameScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "name", layerIndex)
 {
-	addChild(make_shared<Underline>());
+	addChild(std::make_shared<Underline>());
 }
 
 void NameScreen::mainScreen()
@@ -20,15 +19,15 @@ void NameScreen::mainScreen()
     ScreenComponent::mainScreen();
 }
 
-void NameScreen::setRenamerAndScreenToReturnTo(const std::function<void(string&)>& renamer, const string& screen)
+void NameScreen::setRenamerAndScreenToReturnTo(const std::function<void(std::string&)>& newRenamer, const std::string& screen)
 {
-    this->renamer = renamer;
+    renamer = newRenamer;
     screenToReturnTo = screen;
 }
 
-weak_ptr<Underline> NameScreen::findUnderline()
+std::weak_ptr<Underline> NameScreen::findUnderline()
 {
-	return dynamic_pointer_cast<Underline>(findChild("underline").lock());
+	return std::dynamic_pointer_cast<Underline>(findChild("underline").lock());
 }
 
 void NameScreen::open()
@@ -89,7 +88,7 @@ void NameScreen::turnWheel(int j)
 	{
 		for (int i = 0; i < 16; i++)
 		{
-			if (param == to_string(i))
+			if (param == std::to_string(i))
 			{
 				changeNameCharacter(i, j > 0);
 				drawUnderline();
@@ -101,7 +100,7 @@ void NameScreen::turnWheel(int j)
 	{
 		for (int i = 0; i < 16; i++)
 		{
-			if (param.compare(to_string(i)) == 0)
+			if (param == std::to_string(i))
 			{
 				changeNameCharacter(i, j > 0);
 				editing = true;
@@ -161,7 +160,7 @@ void NameScreen::drawUnderline()
 {
 	if (editing)
 	{
-		string focus = ls.lock()->getFocus();
+        std::string focus = ls.lock()->getFocus();
 	
 		if (focus.length() != 1 && focus.length() != 2)
 			return;
@@ -179,7 +178,7 @@ void NameScreen::initEditColors()
 {
     for (int i = 0; i < 16; i++)
 	{
-		auto field = findField(to_string(i)).lock();
+		auto field = findField(std::to_string(i)).lock();
 		field->setInverted(false);
     }
 
@@ -187,11 +186,11 @@ void NameScreen::initEditColors()
 	findField(param).lock()->setInverted(false);
 }
 
-void NameScreen::setName(string name)
+void NameScreen::setName(std::string newName)
 {
-    this->name = name;
+    name = newName;
 	nameLimit = 16;
-	originalName = name;
+	originalName = newName;
 }
 
 void NameScreen::setNameLimit(int i)
@@ -200,14 +199,14 @@ void NameScreen::setNameLimit(int i)
 	nameLimit = i;
 }
 
-void NameScreen::setName(string str, int i)
+void NameScreen::setName(std::string str, int i)
 {
 	name[i] = str[0];
 }
 
-string NameScreen::getNameWithoutSpaces()
+std::string NameScreen::getNameWithoutSpaces()
 {
-	string s = name;
+	auto s = name;
 
 	while (!s.empty() && isspace(s.back()))
 		s.pop_back();
@@ -224,7 +223,7 @@ void NameScreen::changeNameCharacter(int i, bool up)
         name = StrUtil::padRight(name, " ", i + 1);
         
 	char schar = name[i];
-	string s{ schar };
+    std::string s{ schar };
 	auto stringCounter = 0;
 	
 	for (auto str : mpc::Mpc::akaiAscii)
@@ -318,7 +317,7 @@ void NameScreen::typeCharacter(char c)
     {
         for (int i = 0; i < 16; i++)
         {
-            if (param == to_string(i))
+            if (param == std::to_string(i))
             {
                 if (i >= name.length())
                 {
@@ -337,7 +336,7 @@ void NameScreen::typeCharacter(char c)
     {
         for (int i = 0; i < 16; i++)
         {
-            if (param == to_string(i))
+            if (param == std::to_string(i))
             {
                 if (i >= name.length())
                 {
@@ -363,7 +362,7 @@ void NameScreen::backSpace()
 
     for (int i = 1; i < 16; i++)
     {
-        if (param == to_string(i))
+        if (param == std::to_string(i))
         {
             if (i >= name.length())
             {

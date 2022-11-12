@@ -3,10 +3,8 @@
 #include "Label.hpp"
 
 using namespace mpc::lcdgui;
-using namespace std;
 
-Layer::Layer()
-	: Component("layer")
+Layer::Layer() : Component("layer")
 {
 }
 
@@ -20,7 +18,7 @@ mpc::lcdgui::FunctionKeys* Layer::getFunctionKeys()
 	return findChild<FunctionKeys>("function-keys").lock().get();
 }
 
-bool Layer::setFocus(string fieldName)
+bool Layer::setFocus(std::string fieldName)
 {
 	auto newFocus = findField(fieldName).lock();
 
@@ -32,16 +30,14 @@ bool Layer::setFocus(string fieldName)
 	if (oldFocus)
 		oldFocus->loseFocus(fieldName);
 
-	string oldFocusName = focus;
-
 	focus = fieldName;
 
-	newFocus->takeFocus(oldFocusName);
+    newFocus->takeFocus();
 	bringToFront(newFocus.get());
 	return true;
 }
 
-string Layer::getFocus()
+std::string Layer::getFocus()
 {
 	return focus;
 }

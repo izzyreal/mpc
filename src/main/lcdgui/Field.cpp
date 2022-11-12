@@ -18,9 +18,8 @@
 
 using namespace mpc::lcdgui;
 using namespace moduru::lang;
-using namespace std;
 
-Field::Field(mpc::Mpc& mpc, const string& name, int x, int y, int width)
+Field::Field(mpc::Mpc& mpc, const std::string& name, int x, int y, int width)
 	: TextComp(mpc, name), mpc(mpc)
 {
 	this->name = name;
@@ -31,20 +30,14 @@ Field::Field(mpc::Mpc& mpc, const string& name, int x, int y, int width)
 		width = 0;
 	}
 
-	setSize(width, 9);
+	TextComp::setSize(width, 9);
 	setLocation(x - 1, y - 1);
 	preDrawClearRect.Clear();
 }
 
-void Field::setRectangleOnly(bool b)
+void Field::setNextFocus(const std::string& newNextFocus)
 {
-	rectangleOnly = b;
-	SetDirty();
-}
-
-void Field::setNextFocus(const std::string& nextFocus)
-{
-	this->nextFocus = nextFocus;
+	nextFocus = newNextFocus;
 }
 
 void Field::Hide(bool b)
@@ -92,8 +85,7 @@ void Field::Draw(std::vector<std::vector<bool>>* pixels)
 	if (typeModeEnabled)
 		inverted = false;
 
-	if (!rectangleOnly)
-		TextComp::Draw(pixels);
+    TextComp::Draw(pixels);
 
 	if (typeModeEnabled)
 	{
@@ -104,14 +96,14 @@ void Field::Draw(std::vector<std::vector<bool>>* pixels)
 	}
 }
 
-void Field::takeFocus(string prev)
+void Field::takeFocus()
 {
 	auto ls = mpc.getLayeredScreen().lock();
 	csn = ls->getCurrentScreenName();
 
-	if (csn.compare("step-editor") == 0)
+	if (csn == "step-editor")
 	{
-		if (name.compare("view") == 0)
+		if (name == "view")
 		{
 			auto screen = ls->findScreenComponent().lock();
 			screen->findField("fromnote").lock()->setInverted(true);
@@ -120,7 +112,7 @@ void Field::takeFocus(string prev)
 			screen->findChild<Rectangle>("").lock()->setOn(true);
 		}
 	}
-	else if (csn.compare("multi-recording-setup") == 0)
+	else if (csn == "multi-recording-setup")
 	{
 		if (name.length() == 2 && name[0] == 'b')
 		{
@@ -128,9 +120,9 @@ void Field::takeFocus(string prev)
 			setActiveSplit(1);
 		}	
 	}
-	else if (csn.compare("sequencer") == 0)
+	else if (csn == "sequencer")
 	{
-		if (name.find("now") != string::npos || name.compare("tempo") == 0)
+		if (name.find("now") != std::string::npos || name == "tempo")
 			Util::initSequence(mpc);
 	}
 
@@ -139,7 +131,7 @@ void Field::takeFocus(string prev)
 	SetDirty();
 }
 
-void Field::loseFocus(string next)
+void Field::loseFocus(std::string next)
 {
 	auto ls = mpc.getLayeredScreen().lock();
 	csn = ls->getCurrentScreenName();
@@ -147,14 +139,14 @@ void Field::loseFocus(string next)
 	focus = false;
 	inverted = false;
 
-	if (csn.compare("step-editor") == 0)
+	if (csn == "step-editor")
 	{
-		if (name.compare("view") == 0)
+		if (name == "view")
 		{
 			auto screen = ls->findScreenComponent().lock();
 			screen->findChild<Rectangle>("").lock()->setOn(false);
 
-			if (next.compare("fromnote") != 0)
+			if (next != "fromnote")
 				screen->findField("fromnote").lock()->setInverted(false);
 
 			screen->findField("tonote").lock()->setInverted(false);
@@ -205,7 +197,7 @@ int Field::getActiveSplit()
 
 int Field::getSplitIncrement(bool positive)
 {
-	static const vector<int> splitInc { 10000000, 1000000, 100000, 10000, 1000, 100, 10, 1 };
+	static const std::vector<int> splitInc { 10000000, 1000000, 100000, 10000, 1000, 100, 10, 1 };
 	return splitInc[activeSplit] * (positive ? 1 : -1);
 }
 
@@ -268,13 +260,13 @@ void Field::type(int i)
 	if (textCopy.length() == floor(w / FONT_WIDTH))
 		textCopy = "";
 
-	if (textCopy.compare("0") == 0 && i == 0)
+	if (textCopy == "0" && i == 0)
 		return;
 
-	if (textCopy.compare("0") == 0)
+	if (textCopy == "0")
 		textCopy = "";
 
-	auto newText = textCopy.append(to_string(i));
+	auto newText = textCopy.append(std::to_string(i));
 	setTextPadded(newText.c_str());
 }
 

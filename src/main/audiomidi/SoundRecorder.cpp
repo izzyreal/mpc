@@ -14,7 +14,6 @@ using namespace mpc::sampler;
 using namespace mpc::audiomidi;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
-using namespace std;
 
 SoundRecorder::SoundRecorder(mpc::Mpc& mpc)
 	: mpc(mpc)
@@ -45,7 +44,7 @@ bool SoundRecorder::isArmed()
 }
 
 // modes: 0 = MONO L, 1 = MONO R, 2 = STEREO
-void SoundRecorder::prepare(const weak_ptr<Sound> newSound, int newLengthInFrames)
+void SoundRecorder::prepare(const std::weak_ptr<Sound> newSound, int newLengthInFrames)
 {
 	if (recording)
 		return;
@@ -131,7 +130,7 @@ void SoundRecorder::cancel()
 	cancelled = true;
 }
 
-void applyGain(float gain, vector<float>& data)
+void applyGain(float gain, std::vector<float>& data)
 {
 	for (int i = 0; i < data.size(); i++)
 		data[i] *= gain;
@@ -189,7 +188,7 @@ int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf, int nFrame
 			mpc.getAudioMidiServices().lock()->startRecordingSound();
 		}
 
-		notifyObservers(pair<float, float>(peakL, peakR));
+		notifyObservers(std::pair<float, float>(peakL, peakR));
 	}
 	else
 	{
@@ -220,8 +219,8 @@ int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf, int nFrame
 		if (currentLength == 0 && sampleScreen->preRec != 0)
 		{
 			auto preRecFrames = (int)(buf->getSampleRate() * 0.001 * sampleScreen->preRec);
-			vector<float> preLeft(preRecFrames);
-			vector<float> preRight(preRecFrames);
+			std::vector<float> preLeft(preRecFrames);
+			std::vector<float> preRight(preRecFrames);
 
 			int offset = 0;
 			
@@ -272,14 +271,14 @@ int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf, int nFrame
 			preRecBufferRight.reset();
 		}
 
-		vector<float> resampledLeft;
+		std::vector<float> resampledLeft;
 
 		if ((mode == 0 || mode == 2) && resample) {
 			resampledLeft = resampleChannel(true, left, buf->getSampleRate());
 			left = resampledLeft;
 		}
 
-		vector<float> resampledRight;
+		std::vector<float> resampledRight;
 
 		if ((mode == 1 || mode == 2) && resample) {
 			resampledRight = resampleChannel(false, right, buf->getSampleRate());
@@ -303,7 +302,7 @@ int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf, int nFrame
 	return AUDIO_SILENCE;
 }
 
-vector<float> SoundRecorder::resampleChannel(bool left, vector<float>& buffer, int sourceSampleRate)
+std::vector<float> SoundRecorder::resampleChannel(bool left, std::vector<float>& buffer, int sourceSampleRate)
 {
 	auto ratio = 44100.f / sourceSampleRate;
 	auto circBuf = left ? &resampleBufferLeft : &resampleBufferRight;
@@ -312,12 +311,12 @@ vector<float> SoundRecorder::resampleChannel(bool left, vector<float>& buffer, i
 		circBuf->put(f);
 	}
 
-	vector<float> input;
+	std::vector<float> input;
 	while (!circBuf->empty()) {
 		input.push_back(circBuf->get());
 	}
 
-	vector<float> res(ceil(input.size() * ratio));
+	std::vector<float> res(ceil(input.size() * ratio));
 
 	SRC_DATA data;
 	data.data_in = &input[0];

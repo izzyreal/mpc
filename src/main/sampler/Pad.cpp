@@ -8,7 +8,6 @@
 using namespace mpc::sampler;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
-using namespace std;
 
 std::vector<int> Pad::originalPadNotes = {	37, 36, 42, 82, 40, 38, 46, 44, 48, 47, 45, 43, 49, 55, 51, 53,
 											54, 69, 81, 80, 65, 66, 76, 77, 56, 62, 63, 64, 73, 74, 71, 39,
@@ -23,7 +22,7 @@ std::vector<int>& Pad::getPadNotes(mpc::Mpc& mpc)
 	{
         // VMPC2000XL's default pad mapping, which is different to the original.
         // It is simply a collection of ascending note numbers from 35 to 98.
-		static vector<int> vmpcPadNotes;
+		static std::vector<int> vmpcPadNotes;
 
 		if (vmpcPadNotes.size() == 0)
 		{
@@ -39,12 +38,10 @@ std::vector<int>& Pad::getPadNotes(mpc::Mpc& mpc)
     }
 }
 
-Pad::Pad(mpc::Mpc& mpc, int number)
-	: mpc(mpc)
+Pad::Pad(mpc::Mpc& mpc, int indexToUse) : mpc(mpc)
 {
-	this->index = number;
-
-	note = getPadNotes(mpc)[number];
+	index = indexToUse;
+	note = getPadNotes(mpc)[indexToUse];
 }
 
 void Pad::setNote(int i)

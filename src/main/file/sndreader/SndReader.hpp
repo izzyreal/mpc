@@ -29,7 +29,7 @@ public:
     std::string getName();
     bool isHeaderValid();
     bool isMono();
-    int getNumberOfFrames();
+
     int getSampleRate();
     int getLevel();
     int getStart();

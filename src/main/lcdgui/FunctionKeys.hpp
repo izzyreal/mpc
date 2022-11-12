@@ -20,7 +20,7 @@ namespace mpc::lcdgui
 		void Draw(std::vector<std::vector<bool>>* pixels) override;
 		int type = -1;
 		void setText(const std::string& text);
-		void setType(const int type);
+		void setType(const int newType);
 	};
 
 	class FunctionKeys

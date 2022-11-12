@@ -7,12 +7,11 @@ using namespace mpc::lcdgui;
 using namespace mpc::controls;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
-using namespace std;
 
 LoopToFineScreen::LoopToFineScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "loop-to-fine", layerIndex)
 {
-	addChild(std::move(make_shared<Wave>()));
+	addChild(std::move(std::make_shared<Wave>()));
 	findWave().lock()->setFine(true);
 }
 
@@ -116,19 +115,19 @@ void LoopToFineScreen::turnWheel(int i)
 	if (field->isTypeModeEnabled())
 		field->disableTypeMode();
 
-	if (param.compare("loop-lngth") == 0)
+	if (param == "loop-lngth")
 	{
 		loopScreen->loopLngthFix = i > 0;
 		displayLoopLngth();
 	}
-	else if (param.compare("lngth") == 0)
+	else if (param == "lngth")
 	{		
 		sound->setEnd(sound->getEnd() + soundInc);
 		
 		displayLngthField();
 		displayFineWave();
 	}
-	else if (param.compare("to") == 0)
+	else if (param == "to")
 	{
 		if (loopScreen->loopLngthFix)
 		{
@@ -147,7 +146,7 @@ void LoopToFineScreen::turnWheel(int i)
 		displayLngthField();
 		displayFineWave();
 	}
-	else if (param.compare("playx") == 0)
+	else if (param == "playx")
 	{
 		sampler->setPlayX(sampler->getPlayX() + i);
 		displayPlayX();

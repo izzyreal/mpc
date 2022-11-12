@@ -5,7 +5,6 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::controls;
 using namespace moduru::lang;
-using namespace std;
 
 VelocityModulationScreen::VelocityModulationScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "velocity-modulation", layerIndex)
@@ -64,8 +63,8 @@ void VelocityModulationScreen::displayNote()
 	auto padIndex = program.lock()->getPadIndexFromNote(noteParameters->getNumber());
 	auto padName = sampler->getPadName(padIndex);
 	auto sampleName = soundIndex != -1 ? sampler->getSoundName(soundIndex) : "OFF";
-	string stereo = noteParameters->getStereoMixerChannel().lock()->isStereo() && soundIndex != -1 ? "(ST)" : "";
-	findField("note").lock()->setText(to_string(noteParameters->getNumber()) + "/" + padName + "-" + StrUtil::padRight(sampleName, " ", 16) + stereo);
+    std::string stereo = noteParameters->getStereoMixerChannel().lock()->isStereo() && soundIndex != -1 ? "(ST)" : "";
+	findField("note").lock()->setText(std::to_string(noteParameters->getNumber()) + "/" + padName + "-" + StrUtil::padRight(sampleName, " ", 16) + stereo);
 }
 
 void VelocityModulationScreen::displayVelo()
@@ -92,7 +91,7 @@ void VelocityModulationScreen::displayVeloLevel()
 
 void VelocityModulationScreen::update(moduru::observer::Observable* observable, nonstd::any message)
 {
-	auto msg = nonstd::any_cast<string>(message);
+	auto msg = nonstd::any_cast<std::string>(message);
 
 	if (msg == "note")
 	{

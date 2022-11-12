@@ -4,7 +4,6 @@
 
 using namespace mpc::lcdgui::screens::dialog;
 using namespace moduru::lang;
-using namespace std;
 
 CopyProgramScreen::CopyProgramScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "copy-program", layerIndex)
@@ -87,7 +86,7 @@ void CopyProgramScreen::setPgm1(int i)
 void CopyProgramScreen::displayPgm0()
 {
 	auto programName = sampler->getProgram(pgm0).lock()->getName();
-	findField("pgm0").lock()->setText(StrUtil::padLeft(to_string(pgm0 + 1), " ", 2) + "-" + programName);
+	findField("pgm0").lock()->setText(StrUtil::padLeft(std::to_string(pgm0 + 1), " ", 2) + "-" + programName);
 }
 
 void CopyProgramScreen::displayPgm1()
@@ -95,7 +94,7 @@ void CopyProgramScreen::displayPgm1()
 	auto program1 = sampler->getProgram(pgm1).lock();
 
 	auto programName = program1 ? program1->getName() : "(no program)";
-	findField("pgm1").lock()->setText(StrUtil::padLeft(to_string(pgm1 + 1), " ", 2) + "-" + programName);
+	findField("pgm1").lock()->setText(StrUtil::padLeft(std::to_string(pgm1 + 1), " ", 2) + "-" + programName);
 }
 
 void CopyProgramScreen::displayFunctionKeys()

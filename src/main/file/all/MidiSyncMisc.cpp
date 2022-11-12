@@ -12,9 +12,8 @@
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui;
 using namespace mpc::file::all;
-using namespace std;
 
-MidiSyncMisc::MidiSyncMisc(const vector<char>& b) 
+MidiSyncMisc::MidiSyncMisc(const std::vector<char>& b)
 {
 	inMode = b[IN_MODE_OFFSET];
 	outMode = b[OUT_MODE_OFFSET];
@@ -25,12 +24,12 @@ MidiSyncMisc::MidiSyncMisc(const vector<char>& b)
 	output = b[OUTPUT_OFFSET];
 
 	auto stringBuffer = moduru::VecUtil::CopyOfRange(b, DEF_SONG_NAME_OFFSET, DEF_SONG_NAME_OFFSET + AllParser::NAME_LENGTH);
-	defSongName = string(stringBuffer.begin(), stringBuffer.end());
+	defSongName = std::string(stringBuffer.begin(), stringBuffer.end());
 }
 
 MidiSyncMisc::MidiSyncMisc(mpc::Mpc& mpc)
 {
-	saveBytes = vector<char>(LENGTH);
+	saveBytes = std::vector<char>(LENGTH);
 
 	auto syncScreen = mpc.screens->get<SyncScreen>("sync");
 
@@ -87,12 +86,12 @@ int MidiSyncMisc::getOutput()
     return output;
 }
 
-string MidiSyncMisc::getDefSongName()
+std::string MidiSyncMisc::getDefSongName()
 {
     return defSongName;
 }
 
-vector<char>& MidiSyncMisc::getBytes()
+std::vector<char>& MidiSyncMisc::getBytes()
 {
     return saveBytes;
 }

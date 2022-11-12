@@ -1,19 +1,14 @@
 #include <sequencer/TimeSignature.hpp>
 
 using namespace mpc::sequencer;
-using namespace std;
-
-TimeSignature::TimeSignature() 
-{
-}
 
 void TimeSignature::setNumerator(int i)
 {
     numerator = i;
     
-    notifyObservers(string("timesignature"));
+    notifyObservers(std::string("timesignature"));
     
-    notifyObservers(string("beat"));
+    notifyObservers(std::string("beat"));
 }
 
 int TimeSignature::getNumerator()
@@ -25,9 +20,9 @@ void TimeSignature::setDenominator(int i)
 {
     denominator = i;
     
-    notifyObservers(string("timesignature"));
+    notifyObservers(std::string("timesignature"));
     
-    notifyObservers(string("beat"));
+    notifyObservers(std::string("beat"));
 }
 
 int TimeSignature::getDenominator()

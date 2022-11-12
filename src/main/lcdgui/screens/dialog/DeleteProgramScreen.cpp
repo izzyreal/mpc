@@ -5,7 +5,6 @@
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::sampler;
 using namespace moduru::lang;
-using namespace std;
 
 DeleteProgramScreen::DeleteProgramScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "delete-program", layerIndex)
@@ -61,7 +60,7 @@ void DeleteProgramScreen::turnWheel(int i)
 
 void DeleteProgramScreen::displayPgm()
 {
-    findField("pgm").lock()->setText(StrUtil::padLeft(to_string(pgm + 1), " ", 2) + "-" + sampler->getProgram(pgm).lock()->getName());
+    findField("pgm").lock()->setText(StrUtil::padLeft(std::to_string(pgm + 1), " ", 2) + "-" + sampler->getProgram(pgm).lock()->getName());
 }
 
 void DeleteProgramScreen::setPgm(int i)

@@ -43,7 +43,5 @@ namespace mpc::sampler
 		int getControlChange();
 		int getParameter();
 		void setParameter(int i);
-
-		PgmSlider();
 	};
 }

@@ -14,12 +14,11 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::controls;
 using namespace moduru::lang;
-using namespace std;
 
 TrimScreen::TrimScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "trim", layerIndex)
 {
-	addChild(std::move(make_shared<Wave>()));
+	addChild(std::move(std::make_shared<Wave>()));
 	findWave().lock()->setFine(false);
 }
 
@@ -53,16 +52,16 @@ void TrimScreen::openWindow()
 {
 	init();
 	
-	if (param.compare("snd") == 0)
+	if (param == "snd")
 	{
 		sampler->setPreviousScreenName("trim");
 		openScreen("sound");
 	}
-	else if (param.compare("st") == 0)
+	else if (param == "st")
 	{
 		openScreen("start-fine");
 	}
-	else if (param.compare("end") == 0)
+	else if (param == "end")
 	{
 		openScreen("end-fine");
 	}
@@ -139,7 +138,7 @@ void TrimScreen::turnWheel(int i)
 	if (field->isTypeModeEnabled())
 		field->disableTypeMode();
 
-	if (param.compare("st") == 0)
+	if (param == "st")
 	{
 		if (smplLngthFix && sound->getStart() + soundInc + oldLength > sound->getFrameCount())
 			return;
@@ -156,7 +155,7 @@ void TrimScreen::turnWheel(int i)
 
 		displayWave();
 	}
-	else if (param.compare("end") == 0)
+	else if (param == "end")
 	{
 		if (smplLngthFix && sound->getEnd() + soundInc - oldLength < 0)
 			return;
@@ -172,16 +171,16 @@ void TrimScreen::turnWheel(int i)
 		}
 		displayWave();
 	}
-	else if (param.compare("view") == 0)
+	else if (param == "view")
 	{
 		setView(view + i);
 	}
-	else if (param.compare("playx") == 0)
+	else if (param == "playx")
 	{
 		sampler->setPlayX(sampler->getPlayX() + i);
 		displayPlayX();
 	}
-	else if (param.compare("snd") == 0 && i > 0)
+	else if (param == "snd" && i > 0)
 	{
 		sampler->selectNextSound();
 		displaySnd();
@@ -191,7 +190,7 @@ void TrimScreen::turnWheel(int i)
 		displayView();
 		displayWave();
 	}
-	else if (param.compare("snd") == 0 && i < 0)
+	else if (param == "snd" && i < 0)
 	{
 		sampler->selectPreviousSound();
 		displaySnd();
@@ -213,11 +212,10 @@ void TrimScreen::setSlider(int i)
 	auto sound = sampler->getSound().lock();
 	auto const oldLength = sound->getEnd() - sound->getStart();
     auto candidatePos = (int) ((i / 124.0) * sound->getFrameCount());
-    auto maxPos = int (0);
-	
-	if (param.compare("st") == 0)
+
+	if (param == "st")
 	{
-		maxPos = smplLngthFix ? sound->getFrameCount() - oldLength : sound->getFrameCount();
+		auto maxPos = smplLngthFix ? sound->getFrameCount() - oldLength : sound->getFrameCount();
 
 		if (candidatePos > maxPos)
 			candidatePos = maxPos;
@@ -233,9 +231,9 @@ void TrimScreen::setSlider(int i)
 
 		displayWave();
 	}
-	else if (param.compare("end") == 0)
+	else if (param == "end")
 	{
-		maxPos = smplLngthFix ? oldLength : int(0);
+		auto maxPos = smplLngthFix ? oldLength : int(0);
 	
 		if (candidatePos < maxPos)
 			candidatePos = maxPos;
@@ -285,7 +283,7 @@ void TrimScreen::pressEnter()
 	
 	if (candidate != INT_MAX)
 	{
-		if (param.compare("st") == 0 || param.compare("start") == 0)
+		if (param == "st" || param == "start")
 		{
 			if (smplLngthFix && candidate + oldLength > sound->getFrameCount())
 				candidate = sound->getFrameCount() - oldLength;
@@ -299,7 +297,7 @@ void TrimScreen::pressEnter()
 			displayEnd();
 			displayWave();
 		}
-		else if (param.compare("end") == 0)
+		else if (param == "end")
 		{
 			if (smplLngthFix && candidate - oldLength < 0)
 				candidate = oldLength;
@@ -346,7 +344,7 @@ void TrimScreen::displaySnd()
 		return;
 	}
 
-	if (ls.lock()->getFocus().compare("dummy") == 0)
+	if (ls.lock()->getFocus() == "dummy")
 		ls.lock()->setFocus("snd");
 
 	auto sampleName = sound->getName();

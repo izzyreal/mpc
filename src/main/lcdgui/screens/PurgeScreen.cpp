@@ -3,7 +3,6 @@
 #include "SelectDrumScreen.hpp"
 
 using namespace mpc::lcdgui::screens;
-using namespace std;
 
 PurgeScreen::PurgeScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "purge", layerIndex)

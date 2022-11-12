@@ -1,11 +1,6 @@
 #include <sequencer/PitchBendEvent.hpp>
 
 using namespace mpc::sequencer;
-using namespace std;
-
-PitchBendEvent::PitchBendEvent()
-{
-}
 
 void PitchBendEvent::setAmount(int i)
 {
@@ -13,7 +8,7 @@ void PitchBendEvent::setAmount(int i)
 
     pitchBendAmount = i;
     
-    notifyObservers(string("step-editor"));
+    notifyObservers(std::string("step-editor"));
 }
 
 int PitchBendEvent::getAmount()
@@ -23,6 +18,6 @@ int PitchBendEvent::getAmount()
 
 void PitchBendEvent::CopyValuesTo(std::weak_ptr<Event> dest) {
 	Event::CopyValuesTo(dest);
-	auto lDest = dynamic_pointer_cast<PitchBendEvent>(dest.lock());
+	auto lDest = std::dynamic_pointer_cast<PitchBendEvent>(dest.lock());
 	lDest->setAmount(getAmount());
 }

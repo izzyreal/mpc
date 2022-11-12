@@ -19,7 +19,6 @@ namespace mpc::sequencer
 
 		void CopyValuesTo(std::weak_ptr<Event> dest) override;
 
-		PolyPressureEvent();
 		std::string getTypeName() override { return "poly-pressure"; }
 
 	};

@@ -12,7 +12,6 @@
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui;
 using namespace moduru::lang;
-using namespace std;
 
 MixerStrip::MixerStrip(mpc::Mpc& mpc, int columnIndex)
 	: Component("mixer-strip"), mpc(mpc)
@@ -26,11 +25,11 @@ MixerStrip::MixerStrip(mpc::Mpc& mpc, int columnIndex)
 	selection = -1;
 
 	auto x1 = 4 + (columnIndex * 15);
-	addChild(move(make_shared<MixerTopBackground>(MRECT(x1, 0, x1 + 14, 13))));
-	addChild(move(make_shared<MixerFaderBackground>(MRECT(x1, 14, x1 + 14, 50))));
+	addChild(std::move(std::make_shared<MixerTopBackground>(MRECT(x1, 0, x1 + 14, 13))));
+	addChild(std::move(std::make_shared<MixerFaderBackground>(MRECT(x1, 14, x1 + 14, 50))));
 
 	auto x2 = 5 + (columnIndex * 15);
-	findChild("mixer-top-background").lock()->addChild(move(make_shared<Knob>(MRECT(x2, 1, x2 + 12, 12))));
+	findChild("mixer-top-background").lock()->addChild(std::move(std::make_shared<Knob>(MRECT(x2, 1, x2 + 12, 12))));
 
 	for (int i = 0; i < 5; i++)
 	{
@@ -48,22 +47,22 @@ MixerStrip::MixerStrip(mpc::Mpc& mpc, int columnIndex)
 			yPos -= 13;
 		}
 
-		auto label = make_shared<Label>(mpc, to_string(i), "", xPos, yPos, 5);
+		auto label = std::make_shared<Label>(mpc, std::to_string(i), "", xPos, yPos, 5);
 
 		if (i < 2)
 		{
-			findMixerTopBackground().lock()->addChild(move(label));
+			findMixerTopBackground().lock()->addChild(std::move(label));
 		}
 		else
 		{
-			findMixerFaderBackground().lock()->addChild(move(label));
+			findMixerFaderBackground().lock()->addChild(std::move(label));
 		}
 	}
 
 	auto x3 = 12 + (columnIndex * 15);
-	findMixerFaderBackground().lock()->addChild(move(make_shared<MixerFader>(MRECT(x3, 15, x3 + 4, 49))));
+	findMixerFaderBackground().lock()->addChild(std::move(std::make_shared<MixerFader>(MRECT(x3, 15, x3 + 4, 49))));
 
-	auto padName = StrUtil::padLeft(to_string(columnIndex + 1), "0", 2);
+	auto padName = StrUtil::padLeft(std::to_string(columnIndex + 1), "0", 2);
 	findLabel("3").lock()->setText(padName.substr(0, 1));
 	findLabel("4").lock()->setText(padName.substr(1, 2));
 }
@@ -121,7 +120,7 @@ void MixerStrip::setColors()
 	{
 		for (int i = 0; i < 5; i++)
 		{
-			findLabel(to_string(i)).lock()->setInverted(false);
+			findLabel(std::to_string(i)).lock()->setInverted(false);
 		}
 		
 		findMixerTopBackground().lock()->setColor(false);
@@ -162,7 +161,7 @@ void MixerStrip::setSelection(int i)
     setColors();
 }
 
-void MixerStrip::setValueAString(string str)
+void MixerStrip::setValueAString(std::string str)
 {
 	auto mixerScreen = mpc.screens->get<MixerScreen>("mixer");
 
@@ -191,35 +190,35 @@ void MixerStrip::setValueAString(string str)
 	SetDirty();
 }
 
-weak_ptr<MixerFader> MixerStrip::findMixerFader()
+std::weak_ptr<MixerFader> MixerStrip::findMixerFader()
 {
-	return dynamic_pointer_cast<MixerFader>(findChild("mixer-fader-background").lock()->findChild("mixer-fader").lock());
+	return std::dynamic_pointer_cast<MixerFader>(findChild("mixer-fader-background").lock()->findChild("mixer-fader").lock());
 }
 
-weak_ptr<Knob> MixerStrip::findKnob()
+std::weak_ptr<Knob> MixerStrip::findKnob()
 {
-	return dynamic_pointer_cast<Knob>(findChild("mixer-top-background").lock()->findChild("knob").lock());
+	return std::dynamic_pointer_cast<Knob>(findChild("mixer-top-background").lock()->findChild("knob").lock());
 }
 
-weak_ptr<MixerTopBackground> MixerStrip::findMixerTopBackground()
+std::weak_ptr<MixerTopBackground> MixerStrip::findMixerTopBackground()
 {
 	for (auto& c : children)
 	{
-		if (c->getName().compare("mixer-top-background") == 0)
+		if (c->getName() == "mixer-top-background")
 		{
-			return dynamic_pointer_cast<MixerTopBackground>(c);
+			return std::dynamic_pointer_cast<MixerTopBackground>(c);
 		}
 	}
 	return {};
 }
 
-weak_ptr<MixerFaderBackground> MixerStrip::findMixerFaderBackground()
+std::weak_ptr<MixerFaderBackground> MixerStrip::findMixerFaderBackground()
 {
 	for (auto& c : children)
 	{
-		if (c->getName().compare("mixer-fader-background") == 0)
+		if (c->getName() == "mixer-fader-background")
 		{
-			return dynamic_pointer_cast<MixerFaderBackground>(c);
+			return std::dynamic_pointer_cast<MixerFaderBackground>(c);
 		}
 	}
 	return {};

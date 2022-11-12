@@ -20,7 +20,6 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace moduru::lang;
 using namespace moduru::file;
-using namespace std;
 
 SaveScreen::SaveScreen(mpc::Mpc& mpc, const int layerIndex) 
 : ScreenComponent(mpc, "save", layerIndex)
@@ -133,7 +132,7 @@ void SaveScreen::function(int i)
             }
         case 5:
         {
-            shared_ptr<mpc::sequencer::Sequence> seq;
+            std::shared_ptr<mpc::sequencer::Sequence> seq;
             
             auto lProgram = program.lock();
             auto nameScreen = mpc.screens->get<NameScreen>("name");
@@ -273,7 +272,7 @@ void SaveScreen::displayType()
 void SaveScreen::displayFile()
 {
     auto seq = sequencer->getActiveSequence();
-    string fileName = "";
+    std::string fileName;
     
     switch (type)
     {
@@ -285,7 +284,7 @@ void SaveScreen::displayFile()
         }
         case 1:
         {
-            auto num = StrUtil::padLeft(to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2);
+            auto num = StrUtil::padLeft(std::to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2);
             name = seq->getName();
             fileName = num + "-" + name;
             break;
@@ -300,7 +299,7 @@ void SaveScreen::displayFile()
             fileName = program.lock()->getName();
             break;
         case 4:
-            fileName = string(sampler->getSoundCount() == 0 ? " (No sound)" : sampler->getSound().lock()->getName());
+            fileName = std::string(sampler->getSoundCount() == 0 ? " (No sound)" : sampler->getSound().lock()->getName());
             break;
         case 5:
             fileName = "MPC2KXL         .BIN";
@@ -336,7 +335,7 @@ void SaveScreen::displaySize()
             break;
     }
     
-    findLabel("size").lock()->setText(StrUtil::padLeft(to_string(size == -1 ? 0 : size), " ", 6) + "K");
+    findLabel("size").lock()->setText(StrUtil::padLeft(std::to_string(size == -1 ? 0 : size), " ", 6) + "K");
 }
 
 void SaveScreen::displayFree()

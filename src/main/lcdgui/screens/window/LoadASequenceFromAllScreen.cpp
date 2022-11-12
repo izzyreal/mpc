@@ -6,7 +6,6 @@
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;
-using namespace std;
 
 LoadASequenceFromAllScreen::LoadASequenceFromAllScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "load-a-sequence-from-all", layerIndex)

@@ -7,8 +7,6 @@
 #include <sampler/Sampler.hpp>
 #include <sampler/Pad.hpp>
 #include <mpc/MpcSoundPlayerChannel.hpp>
-#include <mpc/MpcStereoMixerChannel.hpp>
-#include <mpc/MpcIndivFxMixerChannel.hpp>
 
 #include <VecUtil.hpp>
 
@@ -16,14 +14,13 @@ using namespace moduru;
 using namespace mpc::file::aps;
 using namespace mpc::disk;
 using namespace mpc::sampler;
-using namespace std;
 
-ApsParser::ApsParser(mpc::Mpc& mpc, weak_ptr<MpcFile> file)
+ApsParser::ApsParser(mpc::Mpc& mpc, std::weak_ptr<MpcFile> file)
 : ApsParser(mpc, file.lock()->getBytes(), file.lock()->getName())
 {
 }
 
-ApsParser::ApsParser(mpc::Mpc& mpc, const std::vector<char>& loadBytes, const string& name)
+ApsParser::ApsParser(mpc::Mpc& mpc, const std::vector<char>& loadBytes, const std::string& name)
 {
     if (loadBytes.size() == 0)
     {
@@ -31,24 +28,24 @@ ApsParser::ApsParser(mpc::Mpc& mpc, const std::vector<char>& loadBytes, const st
         return;
     }
     
-    header = make_unique<ApsHeader>(VecUtil::CopyOfRange(loadBytes, HEADER_OFFSET, HEADER_OFFSET + HEADER_LENGTH));
+    header = std::make_unique<ApsHeader>(VecUtil::CopyOfRange(loadBytes, HEADER_OFFSET, HEADER_OFFSET + HEADER_LENGTH));
     
     auto const soundNamesEnd = HEADER_LENGTH + (header->getSoundAmount() * SOUND_NAME_LENGTH);
-    soundNames = make_unique<ApsSoundNames>(VecUtil::CopyOfRange(loadBytes, HEADER_OFFSET + HEADER_LENGTH, soundNamesEnd));
+    soundNames = std::make_unique<ApsSoundNames>(VecUtil::CopyOfRange(loadBytes, HEADER_OFFSET + HEADER_LENGTH, soundNamesEnd));
     programCount = (loadBytes.size() - 1689 - (soundNames->get().size() * 17)) / PROGRAM_LENGTH;
     auto const nameEnd = soundNamesEnd + PAD_LENGTH1 + APS_NAME_LENGTH;
     auto const nameOffset = soundNamesEnd + PAD_LENGTH1;
-    apsName = make_unique<ApsName>(VecUtil::CopyOfRange(loadBytes, nameOffset, nameEnd));
+    apsName = std::make_unique<ApsName>(VecUtil::CopyOfRange(loadBytes, nameOffset, nameEnd));
     auto const parametersEnd = nameEnd + PARAMETERS_LENGTH;
-    globalParameters = make_unique<ApsGlobalParameters>(mpc, VecUtil::CopyOfRange(loadBytes, nameEnd, parametersEnd));
+    globalParameters = std::make_unique<ApsGlobalParameters>(mpc, VecUtil::CopyOfRange(loadBytes, nameEnd, parametersEnd));
     auto const maTableEnd = parametersEnd + TABLE_LENGTH;
-    maTable = make_unique<ApsAssignTable>(VecUtil::CopyOfRange(loadBytes, parametersEnd, maTableEnd));
+    maTable = std::make_unique<ApsAssignTable>(VecUtil::CopyOfRange(loadBytes, parametersEnd, maTableEnd));
     int const drum1MixerOffset = maTableEnd + PAD_LENGTH2;
 
     for (int i = 0; i < 4; i++) {
         int offset = drum1MixerOffset + (i * (MIXER_LENGTH + DRUM_CONFIG_LENGTH + DRUM_PAD_LENGTH));
-        drumMixers[i] = make_unique<ApsMixer>(VecUtil::CopyOfRange(loadBytes, offset, offset + MIXER_LENGTH));
-        drumConfigurations[i] = make_unique<ApsDrumConfiguration>(VecUtil::CopyOfRange(loadBytes, offset + MIXER_LENGTH, offset + MIXER_LENGTH + DRUM_CONFIG_LENGTH));
+        drumMixers[i] = std::make_unique<ApsMixer>(VecUtil::CopyOfRange(loadBytes, offset, offset + MIXER_LENGTH));
+        drumConfigurations[i] = std::make_unique<ApsDrumConfiguration>(VecUtil::CopyOfRange(loadBytes, offset + MIXER_LENGTH, offset + MIXER_LENGTH + DRUM_CONFIG_LENGTH));
     }
     
     int const firstProgramOffset = drum1MixerOffset + ((MIXER_LENGTH + DRUM_CONFIG_LENGTH) * 4) + PAD_LENGTH3 - 6;
@@ -56,34 +53,31 @@ ApsParser::ApsParser(mpc::Mpc& mpc, const std::vector<char>& loadBytes, const st
     for (int i = 0; i < programCount; i++)
     {
         int offset = firstProgramOffset + (i * (PROGRAM_LENGTH + PROGRAM_PAD_LENGTH));
-        programs.push_back(make_unique<ApsProgram>(VecUtil::CopyOfRange(loadBytes, offset, offset + PROGRAM_LENGTH)));
+        programs.push_back(std::make_unique<ApsProgram>(VecUtil::CopyOfRange(loadBytes, offset, offset + PROGRAM_LENGTH)));
     }
 }
 
-ApsParser::ApsParser(mpc::Mpc& mpc, string apsNameString)
+ApsParser::ApsParser(mpc::Mpc& mpc, std::string apsNameString)
 {
 	auto sampler = mpc.getSampler().lock();
-	vector<vector<char>> chunks;
+	std::vector<std::vector<char>> chunks;
 	programCount = sampler->getProgramCount();
 	int const soundCount = sampler->getSoundCount();
 	
-	auto header = ApsHeader(soundCount);
-	chunks.push_back(header.getBytes());
+	chunks.push_back(ApsHeader(soundCount).getBytes());
 
-	auto soundNames = ApsSoundNames(sampler.get());
-	chunks.push_back(soundNames.getBytes());
+	chunks.push_back(ApsSoundNames(sampler.get()).getBytes());
 	
-	chunks.push_back(vector<char>{ 24, 0 });
+	chunks.push_back(std::vector<char>{ 24, 0 });
 	
-	auto apsName = ApsName(apsNameString);
-	chunks.push_back(apsName.getBytes());
+	chunks.push_back(ApsName(apsNameString).getBytes());
 	
 	auto parameters = ApsGlobalParameters(mpc);
 	chunks.push_back(parameters.getBytes());
 
 	auto masterTable = ApsAssignTable(*sampler->getMasterPadAssign());
 	chunks.push_back(masterTable.getBytes());
-	chunks.push_back(vector<char>{ 4, 0, (char) 136, 1, 64, 0, 6 });
+	chunks.push_back(std::vector<char>{ 4, 0, (char) 136, 1, 64, 0, 6 });
 
 	for (int i = 0; i < 4; i++)
 	{
@@ -97,7 +91,7 @@ ApsParser::ApsParser(mpc::Mpc& mpc, string apsNameString)
 		}
 		else {
 			auto ba = drumConfig.getBytes();
-			auto ba1 = vector<char>(7);
+			auto ba1 = std::vector<char>(7);
 			
 			for (int j = 0; j < 7; j++)
 				ba1[j] = ba[j];
@@ -106,7 +100,7 @@ ApsParser::ApsParser(mpc::Mpc& mpc, string apsNameString)
 		}
 	}
 
-    chunks.push_back(vector<char>{ 1, 127 });
+    chunks.push_back(std::vector<char>{ 1, 127 });
 	
 	for (int i = 0; i < 24; i++)
 	{
@@ -119,13 +113,13 @@ ApsParser::ApsParser(mpc::Mpc& mpc, string apsNameString)
 		chunks.push_back(program.getBytes());
 	}
 	
-	chunks.push_back(vector<char>{ (char)255, (char)255 });
+	chunks.push_back(std::vector<char>{ (char)255, (char)255 });
 	auto totalSize = 0;
 	
 	for (auto& ba : chunks)
 		totalSize += ba.size();
 	
-	saveBytes = vector<char>(totalSize);
+	saveBytes = std::vector<char>(totalSize);
 	auto counter = 0;
 	
 	for (auto& ba : chunks)
@@ -152,7 +146,7 @@ const int ApsParser::PROGRAM_PAD_LENGTH;
 const int ApsParser::LAST_PROGRAM_PAD_LENGTH;
 const char ApsParser::NAME_TERMINATOR;
 
-vector<string> ApsParser::getSoundNames()
+std::vector<std::string> ApsParser::getSoundNames()
 {
     return soundNames->get();
 }
@@ -162,22 +156,22 @@ bool ApsParser::isHeaderValid()
     return header->isValid();
 }
 
-string ApsParser::getApsName()
+std::string ApsParser::getApsName()
 {
     return apsName->get();
 }
 
-vector<ApsProgram*> ApsParser::getPrograms()
+std::vector<ApsProgram*> ApsParser::getPrograms()
 {
-	vector<ApsProgram*> res;
+	std::vector<ApsProgram*> res;
 	for (auto& ap : programs)
 		res.push_back(ap.get());
 	return res;
 }
 
-vector<ApsMixer*> ApsParser::getDrumMixers()
+std::vector<ApsMixer*> ApsParser::getDrumMixers()
 {
-	vector<ApsMixer*> res;
+	std::vector<ApsMixer*> res;
 	for (auto& am : drumMixers)
 		res.push_back(am.get());
 	return res;
@@ -193,7 +187,7 @@ ApsGlobalParameters* ApsParser::getGlobalParameters()
     return globalParameters.get();
 }
 
-vector<char> ApsParser::getBytes()
+std::vector<char> ApsParser::getBytes()
 {
     return saveBytes;
 }

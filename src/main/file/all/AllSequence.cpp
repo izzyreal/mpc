@@ -29,9 +29,8 @@ using namespace mpc::sequencer;
 using namespace moduru::file;
 using namespace moduru::lang;
 using namespace moduru;
-using namespace std;
 
-AllSequence::AllSequence(const vector<char>& bytes)
+AllSequence::AllSequence(const std::vector<char>& bytes)
 {
     barList = new BarList(VecUtil::CopyOfRange(bytes, BAR_LIST_OFFSET, BAR_LIST_OFFSET + BAR_LIST_LENGTH));
     auto nameBytes = VecUtil::CopyOfRange(bytes, NAME_OFFSET, NAME_OFFSET + AllParser::NAME_LENGTH);
@@ -45,11 +44,11 @@ AllSequence::AllSequence(const vector<char>& bytes)
         name.push_back(c);
     }
     
-    tempo = getTempoDouble(vector<char>{ bytes[TEMPO_BYTE1_OFFSET] , bytes[TEMPO_BYTE2_OFFSET] });
-    auto barCountBytes = vector<char>{ bytes[BAR_COUNT_BYTE1_OFFSET], bytes[BAR_COUNT_BYTE2_OFFSET] };
+    tempo = getTempoDouble(std::vector<char>{ bytes[TEMPO_BYTE1_OFFSET] , bytes[TEMPO_BYTE2_OFFSET] });
+    auto barCountBytes = std::vector<char>{ bytes[BAR_COUNT_BYTE1_OFFSET], bytes[BAR_COUNT_BYTE2_OFFSET] };
     barCount = ByteUtil::bytes2ushort(barCountBytes);
-    loopFirst = ByteUtil::bytes2ushort(vector<char>{ bytes[LOOP_FIRST_OFFSET], bytes[LOOP_FIRST_OFFSET + 1] });
-    loopLast = ByteUtil::bytes2ushort(vector<char>{ bytes[LOOP_LAST_OFFSET], bytes[LOOP_LAST_OFFSET + 1] });
+    loopFirst = ByteUtil::bytes2ushort(std::vector<char>{ bytes[LOOP_FIRST_OFFSET], bytes[LOOP_FIRST_OFFSET + 1] });
+    loopLast = ByteUtil::bytes2ushort(std::vector<char>{ bytes[LOOP_LAST_OFFSET], bytes[LOOP_LAST_OFFSET + 1] });
     
     if (loopLast > 998)
     {
@@ -62,7 +61,7 @@ AllSequence::AllSequence(const vector<char>& bytes)
     for (int i = 0; i < 33; i++)
     {
         auto offset = DEVICE_NAMES_OFFSET + (i * AllParser::DEV_NAME_LENGTH);
-        string stringBuffer = "";
+        std::string stringBuffer;
         auto stringBytes = VecUtil::CopyOfRange(bytes, offset, offset + AllParser::DEV_NAME_LENGTH);
         
         for (char c : stringBytes)
@@ -89,7 +88,7 @@ AllSequence::~AllSequence()
         delete barList;
 }
 
-void AllSequence::applyToMpcSeq(shared_ptr<mpc::sequencer::Sequence> mpcSeq)
+void AllSequence::applyToMpcSeq(std::shared_ptr<mpc::sequencer::Sequence> mpcSeq)
 {
     mpcSeq->init(barCount - 1);
 
@@ -146,7 +145,7 @@ AllSequence::AllSequence(mpc::sequencer::Sequence* seq, int number)
     auto segmentCountLastEventIndex = SequenceNames::getSegmentCount(seq);
     auto segmentCount = getSegmentCount(seq);
     auto terminatorCount = (segmentCount & 1) == 0 ? 2 : 1;
-    saveBytes = vector<char>(10240 + (segmentCount * AllSequence::EVENT_SEG_LENGTH) + (terminatorCount * AllSequence::EVENT_SEG_LENGTH));
+    saveBytes = std::vector<char>(10240 + (segmentCount * AllSequence::EVENT_SEG_LENGTH) + (terminatorCount * AllSequence::EVENT_SEG_LENGTH));
     
     for (int i = 0; i < AllParser::NAME_LENGTH; i++)
         saveBytes[i] = StrUtil::padRight(seq->getName(), " ", AllParser::NAME_LENGTH)[i];
@@ -177,7 +176,7 @@ AllSequence::AllSequence(mpc::sequencer::Sequence* seq, int number)
     
     if (seq->isLastLoopBarEnd())
     {
-        loopEndBytes = vector<char>{ (char)255, (char)255 };
+        loopEndBytes = std::vector<char>{ (char)255, (char)255 };
     }
     
     saveBytes[LOOP_FIRST_OFFSET] = loopStartBytes[0];
@@ -236,18 +235,18 @@ const char AllSequence::CH_PRESSURE_ID;
 const char AllSequence::PITCH_BEND_ID;
 const char AllSequence::SYS_EX_ID;
 const char AllSequence::SYS_EX_TERMINATOR_ID;
-vector<char> AllSequence::TERMINATOR = vector<char>{ (char) 0xFF, (char)0xFF, (char)0xFF, (char)0xFF, (char)0xFF, (char)0xFF, (char)0xFF, (char)0xFF };
+std::vector<char> AllSequence::TERMINATOR = std::vector<char>{ (char) 0xFF, (char)0xFF, (char)0xFF, (char)0xFF, (char)0xFF, (char)0xFF, (char)0xFF, (char)0xFF };
 const int AllSequence::MAX_EVENT_SEG_COUNT;
 const int AllSequence::EVENT_SEG_LENGTH;
 const int AllSequence::NAME_OFFSET;
 const int AllSequence::LAST_EVENT_INDEX_OFFSET;
 const int AllSequence::SEQUENCE_INDEX_OFFSET;
 const int AllSequence::PADDING1_OFFSET;
-vector<char> AllSequence::PADDING1 = vector<char>{ 1, 1, 0 };
+std::vector<char> AllSequence::PADDING1 = std::vector<char>{ 1, 1, 0 };
 const int AllSequence::TEMPO_BYTE1_OFFSET;
 const int AllSequence::TEMPO_BYTE2_OFFSET;
 const int AllSequence::PADDING2_OFFSET;
-vector<char> AllSequence::PADDING2 = vector<char>{ 4, 4 };
+std::vector<char> AllSequence::PADDING2 = std::vector<char>{ 4, 4 };
 const int AllSequence::BAR_COUNT_BYTE1_OFFSET;
 const int AllSequence::BAR_COUNT_BYTE2_OFFSET;
 const int AllSequence::LAST_TICK_BYTE1_OFFSET;
@@ -257,7 +256,7 @@ const int AllSequence::LOOP_FIRST_OFFSET;
 const int AllSequence::LOOP_LAST_OFFSET;
 const int AllSequence::LOOP_ENABLED_OFFSET;
 const int AllSequence::PADDING4_OFFSET;
-vector<char> AllSequence::PADDING4 = vector<char>{ 40, 0, (char) 128, 0, 0 };
+std::vector<char> AllSequence::PADDING4 = std::vector<char>{ 40, 0, (char) 128, 0, 0 };
 const int AllSequence::LAST_TICK_BYTE3_OFFSET;
 const int AllSequence::LAST_TICK_BYTE4_OFFSET;
 const int AllSequence::DEVICE_NAMES_OFFSET;
@@ -267,9 +266,9 @@ const int AllSequence::BAR_LIST_OFFSET;
 const int AllSequence::BAR_LIST_LENGTH;
 const int AllSequence::EVENTS_OFFSET;
 
-vector<shared_ptr<mpc::sequencer::Event>> AllSequence::readEvents(const vector<char>& sequenceBytes)
+std::vector<std::shared_ptr<mpc::sequencer::Event>> AllSequence::readEvents(const std::vector<char>& sequenceBytes)
 {
-    vector<shared_ptr<Event>> events;
+    std::vector<std::shared_ptr<Event>> events;
     
     for (auto& eventBytes : readEventSegments(sequenceBytes))
         events.push_back(AllEvent::bytesToMpcEvent(eventBytes));
@@ -277,19 +276,19 @@ vector<shared_ptr<mpc::sequencer::Event>> AllSequence::readEvents(const vector<c
     return events;
 }
 
-vector<vector<char>> AllSequence::readEventSegments(const vector<char>& seqBytes)
+std::vector<std::vector<char>> AllSequence::readEventSegments(const std::vector<char>& seqBytes)
 {
-    vector<vector<char>> eventArrays;
+    std::vector<std::vector<char>> eventArrays;
     int candidateOffset = AllSequence::EVENTS_OFFSET;
     
     for (int i = 0; i < MAX_EVENT_SEG_COUNT; i++)
     {
-        int sysexSegs = 0;
         auto ea = VecUtil::CopyOfRange(seqBytes, candidateOffset, candidateOffset + EVENT_SEG_LENGTH);
         
         if (VecUtil::Equals(ea, TERMINATOR))
             break;
-        
+
+        int sysexSegs;
         if (ea[EVENT_ID_OFFSET] == SYS_EX_ID) {
             for (sysexSegs = 0; sysexSegs < MAX_SYSEX_SIZE; sysexSegs++)
             {
@@ -308,15 +307,13 @@ vector<vector<char>> AllSequence::readEventSegments(const vector<char>& seqBytes
     return eventArrays;
 }
 
-double AllSequence::getTempoDouble(const vector<char>& bytePair)
+double AllSequence::getTempoDouble(const std::vector<char>& bytePair)
 {
-    double k = 0;
     auto s = ByteUtil::bytes2ushort(bytePair);
-    k = static_cast<double>(s);
-    return k / 10.0;
+    return static_cast<double>(s) / 10.0;
 }
 
-int AllSequence::getNumberOfEventSegmentsForThisSeq(const vector<char>& seqBytes)
+int AllSequence::getNumberOfEventSegmentsForThisSeq(const std::vector<char>& seqBytes)
 {
     auto accum = 0;
     
@@ -342,8 +339,8 @@ int AllSequence::getSegmentCount(mpc::sequencer::Sequence* seq)
         
         for (auto& e : track->getEvents())
         {
-            auto sysExEvent = dynamic_pointer_cast<mpc::sequencer::SystemExclusiveEvent>(e);
-            auto mixerEvent = dynamic_pointer_cast<mpc::sequencer::MixerEvent>(e);
+            auto sysExEvent = std::dynamic_pointer_cast<mpc::sequencer::SystemExclusiveEvent>(e);
+            auto mixerEvent = std::dynamic_pointer_cast<mpc::sequencer::MixerEvent>(e);
             
             if (sysExEvent)
             {
@@ -388,9 +385,9 @@ void AllSequence::setBarCount(int i)
     saveBytes[BAR_COUNT_BYTE2_OFFSET] = ba[1];
 }
 
-vector<char> AllSequence::createEventSegmentsChunk(mpc::sequencer::Sequence* seq)
+std::vector<char> AllSequence::createEventSegmentsChunk(mpc::sequencer::Sequence* seq)
 {
-    vector<vector<char>> ea;
+    std::vector<std::vector<char>> ea;
     
     for (int i = 0; i < seq->getLastTick(); i++)
     {
@@ -435,7 +432,7 @@ void AllSequence::setLastTick(mpc::sequencer::Sequence* seq)
     saveBytes[LAST_TICK_BYTE4_OFFSET + 1] = (large);
 }
 
-vector<char>& AllSequence::getBytes()
+std::vector<char>& AllSequence::getBytes()
 {
     return saveBytes;
 }

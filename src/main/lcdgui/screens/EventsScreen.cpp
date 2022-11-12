@@ -14,7 +14,6 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::sequencer;
 using namespace moduru::lang;
-using namespace std;
 
 EventsScreen::EventsScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "events", layerIndex)
@@ -337,7 +336,7 @@ void EventsScreen::displayMode()
 		}
 		else
 		{
-			findField("mode").lock()->setTextPadded("+" + to_string(transposeAmount));
+			findField("mode").lock()->setTextPadded("+" + std::to_string(transposeAmount));
 		}
 	}
 }
@@ -467,8 +466,8 @@ void EventsScreen::displayNotes()
 
 void EventsScreen::displayMidiNotes()
 {
-	findField("note0").lock()->setText(StrUtil::padLeft(to_string(note0), " ", 3) + "(" + mpc::Util::noteNames()[note0] + u8"\u00D4");
-	findField("note1").lock()->setText(StrUtil::padLeft(to_string(note1), " ", 3) + "(" + mpc::Util::noteNames()[note1] + u8"\u00D4");
+	findField("note0").lock()->setText(StrUtil::padLeft(std::to_string(note0), " ", 3) + "(" + mpc::Util::noteNames()[note0] + u8"\u00D4");
+	findField("note1").lock()->setText(StrUtil::padLeft(std::to_string(note1), " ", 3) + "(" + mpc::Util::noteNames()[note1] + u8"\u00D4");
 }
 
 void EventsScreen::displayDrumNotes()
@@ -482,7 +481,7 @@ void EventsScreen::displayDrumNotes()
 		auto track = sequencer->getActiveTrack();
 		auto program = sampler->getProgram(sampler->getDrum(track->getBus() - 1)->getProgram()).lock();
 		
-		auto noteText = StrUtil::padLeft(to_string(note0), " ", 2);
+		auto noteText = StrUtil::padLeft(std::to_string(note0), " ", 2);
 		auto padName = sampler->getPadName(program->getPadIndexFromNote(note0));
 		findField("note0").lock()->setText(noteText + "/" + padName);
 	}
@@ -711,7 +710,7 @@ void EventsScreen::performCopy(int sourceStart, int sourceEnd, int toSequenceInd
 
     for (auto& e : sourceTrackEvents)
     {
-        auto ne = dynamic_pointer_cast<NoteEvent>(e);
+        auto ne = std::dynamic_pointer_cast<NoteEvent>(e);
 
         if (ne)
         {

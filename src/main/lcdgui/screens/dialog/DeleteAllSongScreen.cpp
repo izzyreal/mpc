@@ -1,7 +1,6 @@
 #include "DeleteAllSongScreen.hpp"
 
 using namespace mpc::lcdgui::screens::dialog;
-using namespace std;
 
 DeleteAllSongScreen::DeleteAllSongScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "delete-all-song", layerIndex)

@@ -3,7 +3,6 @@
 #include <mpc/MpcSoundOscillatorControls.hpp>
 
 using namespace mpc::sampler;
-using namespace std;
 
 Sound::Sound(int rate, int index) 
 {
@@ -18,11 +17,11 @@ Sound::Sound()
 	oscillatorControls->setName("click");
 }
 
-void Sound::setName(string s)
+void Sound::setName(std::string s)
 {
     name = s;
     
-    notifyObservers(string("samplename"));
+    notifyObservers(std::string("samplename"));
 }
 
 int Sound::getMemoryIndex()
@@ -42,7 +41,7 @@ void Sound::setBeatCount(int i)
 
     numberOfBeats = i;
     
-    notifyObservers(string("beat"));
+    notifyObservers(std::string("beat"));
 }
 
 int Sound::getBeatCount()
@@ -50,12 +49,12 @@ int Sound::getBeatCount()
     return numberOfBeats;
 }
 
-string Sound::getName()
+std::string Sound::getName()
 {
     return name;
 }
 
-vector<float>* Sound::getSampleData()
+std::vector<float>* Sound::getSampleData()
 {
     return oscillatorControls->getSampleData();
 }
@@ -154,7 +153,7 @@ ctoot::mpc::MpcSoundOscillatorControls* Sound::getOscillatorControls()
     return oscillatorControls;
 }
 
-void Sound::insertFrame(vector<float> frame, unsigned int index) {
+void Sound::insertFrame(std::vector<float> frame, unsigned int index) {
 	oscillatorControls->insertFrame(frame, index);
 }
 

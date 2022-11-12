@@ -5,16 +5,15 @@
 #include <midi/core/ShortMessage.hpp>
 
 using namespace mpc::sequencer;
-using namespace std;
 
 MidiAdapter::MidiAdapter() 
 {
-	message = make_shared<ctoot::midi::core::ShortMessage>();
+	message = std::make_shared<ctoot::midi::core::ShortMessage>();
 }
 
-void MidiAdapter::process(weak_ptr<Event> event, int channel, int newVelo)
+void MidiAdapter::process(std::weak_ptr<Event> event, int channel, int newVelo)
 {
-	auto note = dynamic_pointer_cast<NoteEvent>(event.lock());
+	auto note = std::dynamic_pointer_cast<NoteEvent>(event.lock());
 	if (note) {
 		convert(note.get(), channel, newVelo);
 	}

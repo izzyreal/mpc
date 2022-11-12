@@ -4,7 +4,6 @@
 #include <sequencer/Track.hpp>
 
 using namespace mpc::lcdgui::screens::window;
-using namespace std;
 
 EraseAllOffTracksScreen::EraseAllOffTracksScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "erase-all-off-tracks", layerIndex)

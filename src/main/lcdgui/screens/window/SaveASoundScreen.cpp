@@ -6,7 +6,6 @@
 #include <Util.hpp>
 
 using namespace mpc::lcdgui::screens::window;
-using namespace std;
 
 SaveASoundScreen::SaveASoundScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "save-a-sound", layerIndex)
@@ -23,20 +22,20 @@ void SaveASoundScreen::turnWheel(int i)
 {
 	init();
 	
-	if (param.compare("file") == 0 && i > 0)
+	if (param == "file" && i > 0)
 	{
 		sampler->selectPreviousSound();
 	}
-	else if (param.compare("file") == 0 && i < 0)
+	else if (param == "file" && i < 0)
 	{
 		sampler->selectNextSound();
 	}
-	else if (param.compare("file-type") == 0)
+	else if (param == "file-type")
 	{
 		setFileType(fileType + i);
 	}
     
-    if (param.compare("file") == 0)
+    if (param == "file")
     {
         auto saveName = sampler->getSound().lock()->getName();
         mpc.screens->get<NameScreen>("name")->setName(saveName);
@@ -57,7 +56,7 @@ void SaveASoundScreen::function(int i)
 	{
 		auto disk = mpc.getDisk().lock();
 		auto s = sampler->getSound().lock();
-		auto ext = string(fileType == 0 ? ".SND" : ".WAV");
+		auto ext = std::string(fileType == 0 ? ".SND" : ".WAV");
 		auto fileName = mpc::Util::getFileName(mpc.screens->get<NameScreen>("name")->getNameWithoutSpaces()) + ext;
 
 		if (disk->checkExists(fileName))
@@ -93,7 +92,7 @@ void SaveASoundScreen::setFileType(int i)
 
 void SaveASoundScreen::displayFileType()
 {
-	findField("file-type").lock()->setText(string(fileType == 0 ? "MPC2000" : "WAV"));
+	findField("file-type").lock()->setText(std::string(fileType == 0 ? "MPC2000" : "WAV"));
 }
 
 void SaveASoundScreen::displayFile()

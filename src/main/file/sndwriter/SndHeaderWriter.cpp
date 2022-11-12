@@ -2,14 +2,13 @@
 #include <file/ByteUtil.hpp>
 
 using namespace mpc::file::sndwriter;
-using namespace std;
 
 SndHeaderWriter::SndHeaderWriter(SndWriter* sndWriter) 
 {
     setFirstTwoBytes();
 }
 
-vector<char>& SndHeaderWriter::getHeaderArray()
+std::vector<char>& SndHeaderWriter::getHeaderArray()
 {
     return headerArray;
 }
@@ -20,9 +19,9 @@ void SndHeaderWriter::setFirstTwoBytes()
     headerArray[1] = 4;
 }
 
-void SndHeaderWriter::setName(const string& name)
+void SndHeaderWriter::setName(const std::string& name)
 {
-	vector<char> nameArray(16);
+	std::vector<char> nameArray(16);
 	
     for (int i = 0; i < name.length(); i++) {
         nameArray[i] = name[i];

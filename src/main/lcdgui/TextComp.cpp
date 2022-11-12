@@ -19,7 +19,6 @@
 
 using namespace mpc::lcdgui;
 using namespace moduru::lang;
-using namespace std;
 
 TextComp::TextComp(mpc::Mpc& mpc, const std::string& name)
 	: Component(name), mpc(mpc)
@@ -67,7 +66,7 @@ void TextComp::Draw(std::vector<std::vector<bool>>* pixels)
 		{
 			for (int y1 = rect.T; y1 < rect.B - 1; y1++)
 			{
-				(*pixels)[x1][y1] = inverted ? true : false;
+				(*pixels)[x1][y1] = inverted;
 			}
 		}
 	}
@@ -86,11 +85,11 @@ void TextComp::Draw(std::vector<std::vector<bool>>* pixels)
 
 	int alignmentOffset = 0;
 
-	string textToRender = text;
+    std::string textToRender = text;
 
 	if (alignment == Alignment::Centered && !textuallyAligned)
 	{
-		auto charsToAlignCount = min(int(ceil(alignmentEndX / float(FONT_WIDTH))), (int)text.length());
+		auto charsToAlignCount = std::min(int(ceil(alignmentEndX / float(FONT_WIDTH))), (int)text.length());
 		auto charsToAlign = StrUtil::replaceAll(text.substr(0, charsToAlignCount), ' ', "");
 		textToRender = charsToAlign + text.substr(charsToAlignCount);
 		auto charsWidthInPixels = mpc::Util::getTextWidthInPixels(charsToAlign);
@@ -141,7 +140,7 @@ void TextComp::Draw(std::vector<std::vector<bool>>* pixels)
 						xpos += alignmentOffset;
 					}
 
-					if (w == 47 && name.find("note") != string::npos)
+					if (w == 47 && name.find("note") != std::string::npos)
 					{
 						// Super hacky way to cram as much text in the amount of pixels that
 						// the original leet coders of the Akai MPC2000XL OS did. Respect.
@@ -151,7 +150,7 @@ void TextComp::Draw(std::vector<std::vector<bool>>* pixels)
 					if (h <= 7)
 						ypos--;
 
-					(*pixels)[xpos][ypos] = inverted ? false : true;
+					(*pixels)[xpos][ypos] = !inverted;
 
 					if (field != nullptr && field->isSplit())
 						(*pixels)[xpos][ypos] = charCounter > field->getActiveSplit();
@@ -168,12 +167,12 @@ void TextComp::Draw(std::vector<std::vector<bool>>* pixels)
 	
 	if (twoDots)
 	{
-		for (auto xPos : vector<int>{ 12, 30 })
+		for (auto xPos : std::vector<int>{ 12, 30 })
 		{
 			bool doubleInverted = field != nullptr && field->isSplit() && field->getActiveSplit() + 2 <= xPos / 6;
 
 			if (w > xPos)
-				(*pixels)[xPos + x][y + 8] = inverted && !doubleInverted ? false : true;
+				(*pixels)[xPos + x][y + 8] = !(inverted && !doubleInverted);
 		}
 	}
 
@@ -209,12 +208,12 @@ void TextComp::setInverted(bool b)
 	}
 }
 
-string TextComp::getName()
+std::string TextComp::getName()
 {
 	return name;
 }
 
-string TextComp::getText()
+std::string TextComp::getText()
 {
 	return text;
 }
@@ -224,13 +223,13 @@ unsigned int TextComp::GetTextEntryLength()
 	return text.length();
 }
 
-void TextComp::setText(const string& s)
+void TextComp::setText(const std::string& s)
 {
 	text = s;
 
 	if (alignment == Alignment::Centered && alignmentEndX != w)
 	{
-		auto charsToAlignCount = min(int(ceil(alignmentEndX / float(FONT_WIDTH))), (int)text.length());
+		auto charsToAlignCount = std::min(int(ceil(alignmentEndX / float(FONT_WIDTH))), (int)text.length());
 		auto charsToAlign = StrUtil::replaceAll(text.substr(0, charsToAlignCount), ' ', "");
 		
 		if ((charsToAlignCount - charsToAlign.length()) % 2 == 0)
@@ -258,16 +257,16 @@ void TextComp::setText(const string& s)
 	SetDirty();
 }
 
-void TextComp::setTextPadded(string s, string padding)
+void TextComp::setTextPadded(std::string s, std::string padding)
 {
 	auto columns = (int)floor(w / FONT_WIDTH);
-	string padded = StrUtil::padLeft(s, padding, columns);
+    std::string padded = StrUtil::padLeft(s, padding, columns);
 	setText(padded);
 }
 
-void TextComp::setTextPadded(int i, string padding)
+void TextComp::setTextPadded(int i, std::string padding)
 {
-	setTextPadded(to_string(i), padding);
+	setTextPadded(std::to_string(i), padding);
 }
 
 void TextComp::static_blink(void* args)
@@ -282,7 +281,7 @@ void TextComp::runBlinkThread()
 		int counter = 0;
 		
 		while (blinking && counter++ != BLINK_INTERVAL)
-			this_thread::sleep_for(chrono::milliseconds(1));
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
 		invisibleDueToBlinking = !invisibleDueToBlinking;
         SetDirty();
@@ -306,12 +305,12 @@ void TextComp::setBlinking(bool b)
 		blinkThread.join();
 
 	if (blinking)
-		blinkThread = thread(&TextComp::static_blink, this);
+		blinkThread = std::thread(&TextComp::static_blink, this);
 }
 
-void TextComp::setAlignment(const Alignment alignment, int endX)
+void TextComp::setAlignment(const Alignment newAlignment, int endX)
 {
-	this->alignment = alignment;
+	alignment = newAlignment;
 	alignmentEndX = endX;
 
 	if (alignmentEndX == -1)

@@ -8,13 +8,12 @@
 
 using namespace mpc::disk;
 using namespace mpc::sampler;
-using namespace std;
 
 ProgramImportAdapter::ProgramImportAdapter(
-	weak_ptr<Sampler> sampler,
-	weak_ptr<Program> inputProgram,
-	vector<int> soundsDestIndex,
-	vector<int> unavailableSoundIndices
+	std::weak_ptr<Sampler> sampler,
+	std::weak_ptr<Program> inputProgram,
+	std::vector<int> soundsDestIndex,
+	std::vector<int> unavailableSoundIndices
 )
 {
 	this->sampler = sampler;
@@ -64,7 +63,7 @@ void ProgramImportAdapter::initMixer(int note)
 	mc->setStereo(!sound->isMono());
 }
 
-weak_ptr<Program> ProgramImportAdapter::get()
+std::weak_ptr<Program> ProgramImportAdapter::get()
 {
     return result;
 }

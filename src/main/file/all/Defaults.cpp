@@ -2,9 +2,7 @@
 
 #include <Util.hpp>
 #include <file/all/AllParser.hpp>
-#include <sequencer/TimeSignature.hpp>
 
-#include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/UserScreen.hpp>
 
 #include <file/ByteUtil.hpp>
@@ -16,23 +14,22 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace moduru::file;
 using namespace moduru::lang;
-using namespace std;
 
-vector<char> Defaults::UNKNOWN1 = vector<char>{ 1, 0, 0, 1, 1, 0 };
-vector<char> Defaults::UNKNOWN2 = vector<char>{ 0, 0, (char) 0xFF, (char) 0xFF, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+std::vector<char> Defaults::UNKNOWN1 = { 1, 0, 0, 1, 1, 0 };
+std::vector<char> Defaults::UNKNOWN2 = { 0, 0, (char) 0xFF, (char) 0xFF, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 32, 32, 32, 32, 32, 32, 32 };
 
-Defaults::Defaults(mpc::Mpc& mpc, const vector<char>& loadBytes)
+Defaults::Defaults(mpc::Mpc& mpc, const std::vector<char>& loadBytes)
 	: mpc(mpc)
 {
 	parseNames(loadBytes);
 
-	auto tempoBytes = vector<char>{ loadBytes[TEMPO_BYTE1_OFFSET], loadBytes[TEMPO_BYTE2_OFFSET] };
+	auto tempoBytes = std::vector<char>{ loadBytes[TEMPO_BYTE1_OFFSET], loadBytes[TEMPO_BYTE2_OFFSET] };
 	tempo = ByteUtil::bytes2ushort(tempoBytes);
 	timeSigNum = loadBytes[TIMESIG_NUM_OFFSET];
 	timeSigDen = loadBytes[TIMESIG_DEN_OFFSET];
     
-	auto barCountBytes = vector<char>{ loadBytes[BAR_COUNT_BYTE1_OFFSET], loadBytes[BAR_COUNT_BYTE2_OFFSET] };
+	auto barCountBytes = std::vector<char>{ loadBytes[BAR_COUNT_BYTE1_OFFSET], loadBytes[BAR_COUNT_BYTE2_OFFSET] };
 
     barCount = ByteUtil::bytes2ushort(barCountBytes);
 
@@ -49,7 +46,7 @@ Defaults::Defaults(mpc::Mpc& mpc, const vector<char>& loadBytes)
 Defaults::Defaults(mpc::Mpc& mpc)
 	: mpc(mpc)
 {
-	saveBytes = vector<char>(AllParser::DEFAULTS_LENGTH);
+	saveBytes = std::vector<char>(AllParser::DEFAULTS_LENGTH);
 	
 	setNames();
 	
@@ -85,9 +82,9 @@ Defaults::Defaults(mpc::Mpc& mpc)
 	setTrackSettings();
 }
 
-void Defaults::parseNames(vector<char> loadBytes)
+void Defaults::parseNames(std::vector<char> loadBytes)
 {
-	vector<char> stringBuffer;
+	std::vector<char> stringBuffer;
 	
     stringBuffer = moduru::VecUtil::CopyOfRange(loadBytes, DEF_SEQ_NAME_OFFSET, DEF_SEQ_NAME_OFFSET + AllParser::NAME_LENGTH);
 	
@@ -101,13 +98,13 @@ void Defaults::parseNames(vector<char> loadBytes)
 		defaultSeqName.push_back(c);
 	}
 	
-    auto offset = 0;
+    int offset;
     
 	for (int i = 0; i < 33; i++)
     {
 		offset = DEV_NAMES_OFFSET + (i * AllParser::DEV_NAME_LENGTH);
 		stringBuffer = moduru::VecUtil::CopyOfRange(loadBytes, offset, offset + AllParser::DEV_NAME_LENGTH);
-		string s = "";
+		std::string s;
 		
         for (char c : stringBuffer)
         {
@@ -124,7 +121,7 @@ void Defaults::parseNames(vector<char> loadBytes)
     {
 		offset = TR_NAMES_OFFSET + (i * AllParser::NAME_LENGTH);
 		stringBuffer = moduru::VecUtil::CopyOfRange(loadBytes, offset, offset + AllParser::NAME_LENGTH);
-		string s = "";
+		std::string s;
 	
         for (char c : stringBuffer)
         {
@@ -137,7 +134,7 @@ void Defaults::parseNames(vector<char> loadBytes)
 	}
 }
 
-string Defaults::getDefaultSeqName()
+std::string Defaults::getDefaultSeqName()
 {
     return defaultSeqName;
 }
@@ -162,32 +159,32 @@ int Defaults::getBarCount()
     return barCount;
 }
 
-vector<string> Defaults::getDefaultDevNames()
+std::vector<std::string> Defaults::getDefaultDevNames()
 {
     return devNames;
 }
 
-vector<string> Defaults::getDefaultTrackNames()
+std::vector<std::string> Defaults::getDefaultTrackNames()
 {
     return trackNames;
 }
 
-vector<int> Defaults::getDevices()
+std::vector<int> Defaults::getDevices()
 {
     return devices;
 }
 
-vector<int> Defaults::getBusses()
+std::vector<int> Defaults::getBusses()
 {
     return busses;
 }
 
-vector<int> Defaults::getPgms()
+std::vector<int> Defaults::getPgms()
 {
     return pgms;
 }
 
-vector<int> Defaults::getTrVelos()
+std::vector<int> Defaults::getTrVelos()
 {
     return trVelos;
 }
@@ -241,7 +238,7 @@ void Defaults::setNames()
 		saveBytes[DEF_SEQ_NAME_OFFSET + i] = defSeqName[i];
 	}
 
-	string stringBuffer;
+	std::string stringBuffer;
 
 	for (int i = 0; i < 33; i++)
 	{
@@ -271,13 +268,12 @@ void Defaults::setNames()
 void Defaults::setTempo()
 {
 	auto userScreen = mpc.screens->get<UserScreen>("user");
-	auto tempo = static_cast<int>(userScreen->tempo * 10.0);
-	auto tempoBytes = moduru::file::ByteUtil::ushort2bytes(tempo);
+	auto tempoBytes = moduru::file::ByteUtil::ushort2bytes(static_cast<int>(userScreen->tempo * 10.0));
 	saveBytes[TEMPO_BYTE1_OFFSET] = tempoBytes[0];
 	saveBytes[TEMPO_BYTE2_OFFSET] = tempoBytes[1];
 }
 
-vector<char>& Defaults::getBytes()
+std::vector<char>& Defaults::getBytes()
 {
 	return saveBytes;
 }

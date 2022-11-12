@@ -20,8 +20,8 @@ namespace mpc::lcdgui::screens
 		int note1 = 127;
 
 	public:
-		void setTime0(int time0);
-		void setTime1(int time1);
+		void setTime0(int newTime0);
+		void setTime1(int newTime1);
 		
 		virtual void setNote0(int note);
 		void setNote1(int note);

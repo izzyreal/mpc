@@ -3,18 +3,18 @@
 #include <midi/event/meta/MetaEvent.hpp>
 
 using namespace mpc::midi::event::meta;
-using namespace std;
 
-CuePoint::CuePoint(int tick, int delta, string marker) : TextualMetaEvent(tick, delta, MetaEvent::CUE_POINT, marker)
+CuePoint::CuePoint(int tick, int delta, std::string marker)
+: TextualMetaEvent(tick, delta, MetaEvent::CUE_POINT, marker)
 {
 }
 
-void CuePoint::setCue(string name)
+void CuePoint::setCue(std::string name)
 {
     setText(name);
 }
 
-string CuePoint::getCue()
+std::string CuePoint::getCue()
 {
     return getText();
 }

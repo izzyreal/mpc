@@ -1,7 +1,6 @@
 #include "VmpcSettingsScreen.hpp"
 
 using namespace mpc::lcdgui::screens;
-using namespace std;
 
 VmpcSettingsScreen::VmpcSettingsScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "vmpc-settings", layerIndex)

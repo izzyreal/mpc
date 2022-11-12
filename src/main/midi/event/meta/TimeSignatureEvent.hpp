@@ -27,12 +27,12 @@ namespace mpc::midi::event::meta
 		int mDivision;
 
 	public:
-		virtual void setTimeSignature(int num, int den, int meter, int div);
-		virtual int getNumerator();
-		virtual int getDenominatorValue();
-		virtual int getRealDenominator();
-		virtual int getMeter();
-		virtual int getDivision();
+		void setTimeSignature(int num, int den, int meter, int div);
+		int getNumerator();
+		int getDenominatorValue();
+		int getRealDenominator();
+		int getMeter();
+		int getDivision();
 
 	public:
 		int getEventSize() override;

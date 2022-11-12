@@ -20,7 +20,6 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::controls;
 using namespace mpc::hardware;
 using namespace moduru::sys;
-using namespace std;
 
 KeyEventHandler::KeyEventHandler(mpc::Mpc &mpc)
         : mpc(mpc)
@@ -29,7 +28,7 @@ KeyEventHandler::KeyEventHandler(mpc::Mpc &mpc)
 
 void KeyEventHandler::handle(const KeyEvent &keyEvent)
 {
-    //MLOG("KeyEventHandler::handle keyEvent.rawKeyCode " + to_string(keyEvent.rawKeyCode) + string(keyEvent.keyDown ? " down" : " up"));
+    //MLOG("KeyEventHandler::handle keyEvent.rawKeyCode " + std::to_string(keyEvent.rawKeyCode) + std::string(keyEvent.keyDown ? " down" : " up"));
 
     auto screen = mpc.screens->get<VmpcKeyboardScreen>("vmpc-keyboard");
     auto kbMapping = mpc.getControls().lock()->getKbMapping().lock();
@@ -175,7 +174,7 @@ void KeyEventHandler::handle(const KeyEvent &keyEvent)
     {
         if (keyEvent.keyDown)
         {
-            if ((label.length() == 5 || label.length() == 6) && label.find("pad-") != string::npos)
+            if ((label.length() == 5 || label.length() == 6) && label.find("pad-") != std::string::npos)
             {
                 hardwareComponent->push(127);
             }
@@ -199,7 +198,7 @@ void KeyEventHandler::handle(const KeyEvent &keyEvent)
 
             // And we have some things that are not buttons. Probably pads should be handled here
             // as well, so we can do some velocity calculation based on the current state of Mpc.
-        else if (label.find("datawheel-") != string::npos && keyEvent.keyDown)
+        else if (label.find("datawheel-") != std::string::npos && keyEvent.keyDown)
         {
             int increment = 1;
 
@@ -212,7 +211,7 @@ void KeyEventHandler::handle(const KeyEvent &keyEvent)
             if (mpc.getControls().lock()->isShiftPressed())
                 increment *= 10;
 
-            if (label.find("down") != string::npos)
+            if (label.find("down") != std::string::npos)
                 increment = -increment;
 
             mpc.getHardware().lock()->getDataWheel().lock()->turn(increment);

@@ -7,7 +7,6 @@
 
 using namespace mpc::lcdgui::screens::dialog;
 using namespace moduru::lang;
-using namespace std;
 
 DeleteSongScreen::DeleteSongScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "delete-song", layerIndex)
@@ -22,8 +21,8 @@ void DeleteSongScreen::open()
 void DeleteSongScreen::turnWheel(int i)
 {
 	init();
-	
-	if (param.compare("song") == 0)
+
+	if (param == "song")
 	{
 		auto songScreen = mpc.screens->get<SongScreen>("song");
 		auto candidate = songScreen->activeSongIndex + i;
@@ -61,5 +60,5 @@ void DeleteSongScreen::displaySong()
 {
 	auto songScreen = mpc.screens->get<SongScreen>("song");
 	auto song = sequencer->getSong(songScreen->activeSongIndex);
-	findField("song").lock()->setText(StrUtil::padLeft(to_string(songScreen->activeSongIndex + 1), "0", 2) + "-" + song->getName());
+	findField("song").lock()->setText(StrUtil::padLeft(std::to_string(songScreen->activeSongIndex + 1), "0", 2) + "-" + song->getName());
 }

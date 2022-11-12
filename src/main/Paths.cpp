@@ -10,15 +10,14 @@
 
 using namespace mpc;
 using namespace moduru::file;
-using namespace std;
 
-string Paths::sep()
+std::string Paths::sep()
 {
     static auto res = FileUtil::getSeparator();
     return res;
 }
 
-string Paths::appDocumentsPath()
+std::string Paths::appDocumentsPath()
 {
 #if TARGET_OS_IOS
     static auto path = sago::getDocumentsFolder() + sep;
@@ -28,43 +27,43 @@ string Paths::appDocumentsPath()
     return path;
 }
 
-string Paths::appConfigHome()
+std::string Paths::appConfigHome()
 {
     static auto path = sago::getConfigHome() + sep() + "VMPC2000XL" + sep();
     return path;
 }
 
-string Paths::appConfigPath()
+std::string Paths::appConfigPath()
 {
     static auto path = sago::getConfig() + sep() + "VMPC2000XL" + sep();
     return path;
 }
 
-string Paths::configPath()
+std::string Paths::configPath()
 {
     static auto path = appConfigHome() + "config" + sep();
     return path;
 }
 
-string Paths::storesPath()
+std::string Paths::storesPath()
 {
   static auto storesPath = appDocumentsPath() + "Volumes" + sep();
   return storesPath;
 }
 
-string Paths::defaultLocalVolumePath()
+std::string Paths::defaultLocalVolumePath()
 {
     static auto storesPath = appDocumentsPath() + "Volumes" + sep() + "MPC2000XL";
     return storesPath;
 }
 
-string Paths::logFilePath()
+std::string Paths::logFilePath()
 {
   static auto logFilePath = appDocumentsPath() + "vmpc.log";
   return logFilePath;
 }
 
-string Paths::recordingsPath()
+std::string Paths::recordingsPath()
 {
     static auto recPath = appDocumentsPath() + "Recordings" + sep();
     return recPath;
@@ -76,13 +75,13 @@ std::string Paths::midiControllerPresetsPath()
     return path;
 }
 
-string Paths::demoDataSrcPath()
+std::string Paths::demoDataSrcPath()
 {
     static auto demoDataPath = sago::getData() + sep() + "VMPC2000XL" + sep() + "DemoData" + sep();
     return demoDataPath;
 }
 
-string Paths::demoDataDestPath()
+std::string Paths::demoDataDestPath()
 {
     static auto demoDataPath = defaultLocalVolumePath() + sep() + "Demos" + sep();
     return demoDataPath;

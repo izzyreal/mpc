@@ -5,9 +5,8 @@
 #include <audiomidi/AudioMidiServices.hpp>
 
 using namespace mpc::hardware;
-using namespace std;
 
-Pot::Pot(mpc::Mpc& mpc, string label)
+Pot::Pot(mpc::Mpc& mpc, std::string label)
 	: mpc(mpc)
 {
 	this->label = label;
@@ -20,11 +19,11 @@ void Pot::setValue(int i) {
 		return;
 	}
 
-	if (label.compare("vol") == 0)
+	if (label == "vol")
 	{
 		mpc.getAudioMidiServices().lock()->setMasterLevel(i);
 	}
-	else if (label.compare("rec") == 0)
+	else if (label == "rec")
 	{
 		mpc.getAudioMidiServices().lock()->setRecordLevel(i);
 	}
@@ -33,18 +32,18 @@ void Pot::setValue(int i) {
 }
 
 int Pot::getValue() {
-	if (label.compare("vol") == 0)
+	if (label == "vol")
 	{
 		return mpc.getAudioMidiServices().lock()->getMasterLevel();
 	}
-	else if (label.compare("rec") == 0)
+	else if (label == "rec")
 	{
 		return mpc.getAudioMidiServices().lock()->getRecordLevel();
 	}
 	return 0;
 }
 
-string Pot::getLabel()
+std::string Pot::getLabel()
 {
 	return label;
 }

@@ -2,9 +2,8 @@
 #include <Paths.hpp>
 
 using namespace mpc::lcdgui;
-using namespace std;
 
-PunchRect::PunchRect(const string& name, MRECT rect)
+PunchRect::PunchRect(const std::string& name, MRECT rect)
 	: Component(name)
 {
 	w = rect.W();
@@ -33,12 +32,12 @@ void PunchRect::Draw(std::vector< std::vector<bool>>* pixels)
 	dirty = false;
 }
 
-void PunchRect::setOn(bool on)
+void PunchRect::setOn(bool newOn)
 {
-	if (this->on == on)
+	if (on == newOn)
 		return;
 
-	this->on = on;
+	on = newOn;
 
 	dirty = true;
 }

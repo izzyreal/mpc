@@ -5,11 +5,10 @@
 
 using namespace mpc::file::pgmwriter;
 using namespace mpc::sampler;
-using namespace std;
 
 Mixer::Mixer(mpc::sampler::Program* program)
 {
-	mixerArray = vector<char>(384 + 3);
+	mixerArray = std::vector<char>(384 + 3);
 
 	for (int i = 0; i < 64; i++)
 	{
@@ -29,7 +28,7 @@ Mixer::Mixer(mpc::sampler::Program* program)
 	mixerArray[386] = 0;
 }
 
-vector<char> Mixer::getMixerArray()
+std::vector<char> Mixer::getMixerArray()
 {
     return mixerArray;
 }

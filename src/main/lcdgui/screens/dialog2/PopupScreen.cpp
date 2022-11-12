@@ -6,12 +6,11 @@
 #include <cmath>
 
 using namespace mpc::lcdgui::screens::dialog2;
-using namespace std;
 
 PopupScreen::PopupScreen(mpc::Mpc& mpc)
 	: ScreenComponent(mpc, "popup", 3)
 {
-	addChild(make_shared<Label>(mpc, "popup", "", 43, 23, 0));
+	addChild(std::make_shared<Label>(mpc, "popup", "", 43, 23, 0));
 	findChild<Label>("popup").lock()->setInverted(true);
 }
 
@@ -20,13 +19,13 @@ void PopupScreen::close()
 	returnToAfterInteractionScreen = "";
 }
 
-void PopupScreen::setText(string text)
+void PopupScreen::setText(std::string text)
 {
 	findChild<Label>("popup").lock()->setText(text);
 	SetDirty();
 }
 
-void PopupScreen::returnToScreenAfterMilliSeconds(const string& screenName, const int delayInMs)
+void PopupScreen::returnToScreenAfterMilliSeconds(const std::string& screenName, const int delayInMs)
 {
 	if (returnToScreenThread.joinable())
 		returnToScreenThread.join();
@@ -34,13 +33,13 @@ void PopupScreen::returnToScreenAfterMilliSeconds(const string& screenName, cons
 	auto screen = screenName;
 	auto layeredScreen = ls.lock();
 
-	returnToScreenThread = thread([screen, delayInMs, layeredScreen]() {
-		this_thread::sleep_for(chrono::milliseconds(delayInMs));
+	returnToScreenThread = std::thread([screen, delayInMs, layeredScreen]() {
+        std::this_thread::sleep_for(std::chrono::milliseconds(delayInMs));
 		layeredScreen->openScreen(screen);
 	});
 }
 
-void PopupScreen::returnToScreenAfterInteraction(const string& screenName)
+void PopupScreen::returnToScreenAfterInteraction(const std::string& screenName)
 {
 	returnToAfterInteractionScreen = screenName;
 }

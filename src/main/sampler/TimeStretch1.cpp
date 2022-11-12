@@ -3,15 +3,14 @@
 #include <Logger.hpp>
 
 using namespace mpc::sampler;
-using namespace std;
 
-TimeStretch::TimeStretch(vector<float> sampleData, float ratio, int sampleRate, int adjust) 
+TimeStretch::TimeStretch(std::vector<float> sampleData, float ratio, int sampleRate, int adjust)
 {
 	int oldLength = sampleData.size();
 
 	int desiredNewLength = oldLength * ratio;
 
-	MLOG("desired new length: " + to_string(desiredNewLength));
+	MLOG("desired new length: " + std::to_string(desiredNewLength));
 
 	cycleLength = 1500;
 	const int fadeLength = 250;
@@ -58,19 +57,19 @@ TimeStretch::TimeStretch(vector<float> sampleData, float ratio, int sampleRate, 
 	MLOG("actual new length: " + std::to_string(processedData.size()));
 }
 
-vector<float> TimeStretch::getProcessedData()
+std::vector<float> TimeStretch::getProcessedData()
 {
     return processedData;
 }
 
-vector<float> TimeStretch::seg(vector<float>* src, int length, int offset) {
-	vector<float> res;
+std::vector<float> TimeStretch::seg(std::vector<float>* src, int length, int offset) {
+    std::vector<float> res;
 	for (int i = 0; i < length; i++)
 		res.push_back((*src)[i + offset]);
 	return res;
 }
 
-void TimeStretch::fade(int length, vector<float>* fa)
+void TimeStretch::fade(int length, std::vector<float>* fa)
 {
 	float ampCoeff = 0.0f;
 	float inc = 1.0f / ((float)(length));

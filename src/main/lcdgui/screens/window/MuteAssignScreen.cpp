@@ -5,7 +5,6 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::controls;
 using namespace moduru::lang;
-using namespace std;
 
 MuteAssignScreen::MuteAssignScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "mute-assign", layerIndex)
@@ -51,7 +50,7 @@ void MuteAssignScreen::displayNote()
 {
 	auto note = sampler->getLastNp(program.lock().get())->getNumber();
 	auto pad = program.lock()->getPadIndexFromNote(note);
-	string soundName = "OFF";
+    std::string soundName = "OFF";
 
     auto padName = sampler->getPadName(pad);
 	auto sound = program.lock()->getNoteParameters(note)->getSoundIndex();
@@ -61,7 +60,7 @@ void MuteAssignScreen::displayNote()
         soundName = sampler->getSoundName(sound);
     }
 
-	findField("note").lock()->setText(to_string(note) + "/" + padName + "-" + soundName);
+	findField("note").lock()->setText(std::to_string(note) + "/" + padName + "-" + soundName);
 }
 
 void MuteAssignScreen::displayNote0()
@@ -76,7 +75,7 @@ void MuteAssignScreen::displayNote0()
 	}
 
 	auto pad = program.lock()->getPadIndexFromNote(note0);
-	string soundName = "OFF";
+    std::string soundName = "OFF";
 	auto sound = program.lock()->getNoteParameters(note0)->getSoundIndex();
 	
 	if (sound != -1)
@@ -84,7 +83,7 @@ void MuteAssignScreen::displayNote0()
 		soundName = sampler->getSoundName(sound);
 	}
 
-	findField("note0").lock()->setText(to_string(note0) + "/" + sampler->getPadName(pad) + "-" + soundName);
+	findField("note0").lock()->setText(std::to_string(note0) + "/" + sampler->getPadName(pad) + "-" + soundName);
 }
 
 void MuteAssignScreen::displayNote1()
@@ -98,7 +97,7 @@ void MuteAssignScreen::displayNote1()
 	}
 	
 	auto pad = program.lock()->getPadIndexFromNote(note1);
-	string soundName = "OFF";
+    std::string soundName = "OFF";
 	auto sound = program.lock()->getNoteParameters(note1)->getSoundIndex();
 
 	if (sound != -1)
@@ -106,14 +105,14 @@ void MuteAssignScreen::displayNote1()
 		soundName = sampler->getSoundName(sound);
 	}
 
-	findField("note1").lock()->setText(to_string(note1) + "/" + sampler->getPadName(pad) + "-" + soundName);
+	findField("note1").lock()->setText(std::to_string(note1) + "/" + sampler->getPadName(pad) + "-" + soundName);
 }
 
 void MuteAssignScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 {
-	string s = nonstd::any_cast<string>(arg);
+	auto s = nonstd::any_cast<std::string>(arg);
 
-	if (s.compare("note") == 0)
+	if (s == "note")
 	{
 		displayNote();
 		displayNote0();

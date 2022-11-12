@@ -12,7 +12,7 @@ namespace mpc::lcdgui
 		bool color{ true };
 
 	public:
-		void setValue(int value);
+		void setValue(int newValue);
 		void setColor(bool on);
 
 	public:

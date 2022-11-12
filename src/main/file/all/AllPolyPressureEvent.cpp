@@ -5,11 +5,10 @@
 
 using namespace mpc::file::all;
 using namespace mpc::sequencer;
-using namespace std;
 
-shared_ptr<PolyPressureEvent> AllPolyPressureEvent::bytesToMpcEvent(const vector<char>& bytes)
+std::shared_ptr<PolyPressureEvent> AllPolyPressureEvent::bytesToMpcEvent(const std::vector<char>& bytes)
 {
-	auto event = make_shared<PolyPressureEvent>();
+	auto event = std::make_shared<PolyPressureEvent>();
 	
     event->setTick(AllEvent::readTick(bytes));
 	event->setTrack(bytes[AllEvent::TRACK_OFFSET]);
@@ -19,9 +18,9 @@ shared_ptr<PolyPressureEvent> AllPolyPressureEvent::bytesToMpcEvent(const vector
     return event;
 }
 
-vector<char> AllPolyPressureEvent::mpcEventToBytes(shared_ptr<PolyPressureEvent> event)
+std::vector<char> AllPolyPressureEvent::mpcEventToBytes(std::shared_ptr<PolyPressureEvent> event)
 {
-	vector<char> bytes(8);
+	std::vector<char> bytes(8);
 	
     bytes[AllEvent::EVENT_ID_OFFSET] = AllEvent::POLY_PRESSURE_ID;
 	AllEvent::writeTick(bytes, static_cast< int >(event->getTick()));

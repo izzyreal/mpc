@@ -4,7 +4,6 @@
 
 using namespace moduru::lang;
 using namespace mpc::lcdgui::screens;
-using namespace std;
 
 TrMuteScreen::TrMuteScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "track-mute", layerIndex)
@@ -22,7 +21,7 @@ void TrMuteScreen::open()
 
 	for (int i = 0; i < 16; i++)
     {
-        auto trackField = findField(to_string(i + 1)).lock();
+        auto trackField = findField(std::to_string(i + 1)).lock();
         trackField->setSize(49, 9);
         trackField->setFocusable(false);
     }
@@ -92,7 +91,7 @@ void TrMuteScreen::turnWheel(int i)
 {
 	init();
 	
-	if (param.compare("sq") == 0)
+	if (param == "sq")
 	{
 		auto oldSequence = sequencer->getActiveSequence();
 
@@ -146,37 +145,37 @@ int TrMuteScreen::bankoffset()
 
 void TrMuteScreen::displayBank()
 {
-	auto letters = vector<string>{ "A", "B", "C", "D" };
+	std::vector<std::string> letters{ "A", "B", "C", "D" };
 	findLabel("bank").lock()->setText(letters[mpc.getBank()]);
 }
 
 void TrMuteScreen::displayTrackNumbers()
 {
-	auto trn = vector<string>{ "01-16", "17-32", "33-48", "49-64" };
+	std::vector<std::string> trn{ "01-16", "17-32", "33-48", "49-64" };
 	findLabel("tracknumbers").lock()->setText(trn[mpc.getBank()]);
 }
 
 void TrMuteScreen::displaySq()
 {
-	auto sequenceNumber = StrUtil::padLeft(to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2);
+	auto sequenceNumber = StrUtil::padLeft(std::to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2);
 	auto sequenceName = sequencer->getActiveSequence()->getName();
 	findField("sq").lock()->setText(sequenceNumber + "-" + sequenceName);
 }
 
 void TrMuteScreen::displayTrack(int i)
 {
-	findField(to_string(i + 1)).lock()->setText(sequencer->getActiveSequence()->getTrack(i + bankoffset())->getName().substr(0, 8));
+	findField(std::to_string(i + 1)).lock()->setText(sequencer->getActiveSequence()->getTrack(i + bankoffset())->getName().substr(0, 8));
 }
 
 void TrMuteScreen::setTrackColor(int i)
 {	
 	if (sequencer->isSoloEnabled())
 	{
-		findField(to_string(i + 1)).lock()->setInverted(i + bankoffset() == sequencer->getActiveTrackIndex());
+		findField(std::to_string(i + 1)).lock()->setInverted(i + bankoffset() == sequencer->getActiveTrackIndex());
 	}
 	else
 	{
-		findField(to_string(i + 1)).lock()->setInverted(sequencer->getActiveSequence()->getTrack(i + bankoffset())->isOn());
+		findField(std::to_string(i + 1)).lock()->setInverted(sequencer->getActiveSequence()->getTrack(i + bankoffset())->isOn());
 	}
 }
 
@@ -206,17 +205,17 @@ void TrMuteScreen::refreshTracks()
 
 void TrMuteScreen::update(moduru::observer::Observable* o, nonstd::any message)
 {
-	string msg = nonstd::any_cast<string>(message);
+	auto msg = nonstd::any_cast<std::string>(message);
 
-	if (msg.compare("soloenabled") == 0)
+	if (msg == "soloenabled")
 	{
 		refreshTracks();
 	}
-	else if (msg.compare("active-track-index") == 0)
+	else if (msg == "active-track-index")
 	{
 		refreshTracks();
 	}
-	else if (msg.compare("bank") == 0)
+	else if (msg == "bank")
 	{
 		displayBank();
 		displayTrackNumbers();
@@ -226,17 +225,17 @@ void TrMuteScreen::update(moduru::observer::Observable* o, nonstd::any message)
 
 		refreshTracks();
 	}
-	else if (msg.compare("seqnumbername") == 0)
+	else if (msg == "seqnumbername")
 	{
 		displaySq();
 		refreshTracks();
 	}
-	else if (msg.compare("trackon") == 0)
+	else if (msg == "trackon")
 	{
 		for (int i = 0; i < 16; i++)
 			setTrackColor(i);
 	}
-	else if (msg.compare("now") == 0 || msg.compare("clock") == 0)
+	else if (msg == "now" || msg == "clock")
 	{
 		displayNow0();
 		displayNow1();

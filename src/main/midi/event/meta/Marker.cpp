@@ -3,18 +3,17 @@
 #include <midi/event/meta/MetaEvent.hpp>
 
 using namespace mpc::midi::event::meta;
-using namespace std;
 
-Marker::Marker(int tick, int delta, string marker) : TextualMetaEvent(tick, delta, MetaEvent::MARKER, marker)
+Marker::Marker(int tick, int delta, std::string marker) : TextualMetaEvent(tick, delta, MetaEvent::MARKER, marker)
 {
 }
 
-void Marker::setMarkerName(string name)
+void Marker::setMarkerName(std::string name)
 {
     setText(name);
 }
 
-string Marker::getMarkerName()
+std::string Marker::getMarkerName()
 {
     return getText();
 }

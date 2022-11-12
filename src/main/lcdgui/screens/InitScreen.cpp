@@ -4,7 +4,6 @@
 #include <lcdgui/screens/SetupScreen.hpp>
 
 using namespace mpc::lcdgui::screens;
-using namespace std;
 
 InitScreen::InitScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "init", layerIndex)

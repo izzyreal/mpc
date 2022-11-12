@@ -1,7 +1,6 @@
 #include "VmpcAutoSaveScreen.hpp"
 
 using namespace mpc::lcdgui::screens;
-using namespace std;
 
 VmpcAutoSaveScreen::VmpcAutoSaveScreen(mpc::Mpc& mpc, const int layerIndex)
 : ScreenComponent(mpc, "vmpc-auto-save", layerIndex)
@@ -39,11 +38,11 @@ void VmpcAutoSaveScreen::turnWheel(int i)
 {
     init();
     
-    if (param.compare("auto-save-on-exit") == 0)
+    if (param == "auto-save-on-exit")
     {
         setAutoSaveOnExit(autoSaveOnExit + i);
     }
-    else if (param.compare("auto-load-on-start") == 0)
+    else if (param == "auto-load-on-start")
     {
         setAutoLoadOnStart(autoLoadOnStart + i);
     }

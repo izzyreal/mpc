@@ -6,9 +6,8 @@
 
 using namespace mpc::file::aps;
 using namespace moduru;
-using namespace std;
 
-ApsName::ApsName(const vector<char>& loadBytes)
+ApsName::ApsName(const std::vector<char>& loadBytes)
 {
 	auto nameBytes = VecUtil::CopyOfRange(loadBytes, 0, NAME_STRING_LENGTH);
 	name = "";
@@ -18,9 +17,9 @@ ApsName::ApsName(const vector<char>& loadBytes)
 	}
 }
 
-ApsName::ApsName(string name)
+ApsName::ApsName(std::string name)
 {
-	saveBytes = vector<char>(ApsParser::APS_NAME_LENGTH);
+	saveBytes = std::vector<char>(ApsParser::APS_NAME_LENGTH);
 	while (name.length() < NAME_STRING_LENGTH)
 		name.push_back(' ');
 
@@ -32,12 +31,12 @@ ApsName::ApsName(string name)
 
 const int ApsName::NAME_STRING_LENGTH;
 
-string ApsName::get()
+std::string ApsName::get()
 {
     return name;
 }
 
-vector<char> ApsName::getBytes()
+std::vector<char> ApsName::getBytes()
 {
     return saveBytes;
 }

@@ -51,11 +51,8 @@ public:
 public:
     std::vector<char>& getBytes();
     
-    Count(mpc::Mpc& mpc, const std::vector<char>& b);
+    Count(const std::vector<char>& b);
     Count(mpc::Mpc& mpc);
-    
-private:
-    mpc::Mpc& mpc;
-    
+
 };
 }

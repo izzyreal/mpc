@@ -3,7 +3,6 @@
 #include "PunchScreen.hpp"
 
 using namespace mpc::lcdgui::screens;
-using namespace std;
 
 SecondSeqScreen::SecondSeqScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "second-seq", layerIndex)
@@ -45,7 +44,7 @@ void SecondSeqScreen::turnWheel(int i)
 {
 	init();
 
-	if (param.compare("sq") == 0)
+	if (param == "sq")
 		setSq(sq + i);
 }
 

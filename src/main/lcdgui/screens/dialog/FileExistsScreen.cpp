@@ -25,8 +25,6 @@ using namespace mpc::nvram;
 
 using namespace moduru::lang;
 
-using namespace std;
-
 FileExistsScreen::FileExistsScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "file-exists", layerIndex)
 {
@@ -147,7 +145,7 @@ void FileExistsScreen::function(int i)
 
 			auto type = saveASoundScreen->fileType;
 
-			auto ext = string(type == 0 ? ".SND" : ".WAV");
+			auto ext = std::string(type == 0 ? ".SND" : ".WAV");
 			auto fileName = mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) + ext;
 
 			disk->getFile(fileName)->del();
@@ -185,7 +183,7 @@ void FileExistsScreen::function(int i)
 		if (existingSound && loadASoundCandidate)
 		{
 			// rename
-			const auto renamer = [this, nameScreen](const string& newName) {
+			const auto renamer = [this, nameScreen](const std::string& newName) {
 				if (StrUtil::eqIgnoreCase(loadASoundCandidate->getName(), newName))
 				{
 					nameScreen->screenToReturnTo = "";
@@ -208,13 +206,13 @@ void FileExistsScreen::function(int i)
 			return;
 		}
 
-		vector<string> screens{ "save-a-program", "save-a-sequence", "save-a-sound" };
+		std::vector<std::string> screens{ "save-a-program", "save-a-sequence", "save-a-sound" };
 
 		auto previousScreen = ls.lock()->getPreviousScreenName();
         
         if (previousScreen == "save-aps-file")
         {
-            const auto renamer = [&](const string& newName) {
+            const auto renamer = [&](const std::string& newName) {
                 const auto apsFileName = newName + ".APS";
                 
                 auto disk = mpc.getDisk().lock();

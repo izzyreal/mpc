@@ -10,20 +10,18 @@
 
 using namespace mpc::lcdgui;
 using namespace moduru::gui;
-using namespace std;
 
-Wave::Wave()
-	: Component("wave")
+Wave::Wave() : Component("wave")
 {
-	setSize(246, 27);
+	Component::setSize(246, 27);
 	setLocation(1, 21);
 }
 
-void Wave::setFine(bool fine)
+void Wave::setFine(bool newFineEnabled)
 {
-	this->fine = fine;
-	setSize(fine ? 109 : 246, 27);
-	setLocation(fine ? 23 : 1, fine ? 16 : 21);
+	fine = newFineEnabled;
+	setSize(newFineEnabled ? 109 : 246, 27);
+	setLocation(newFineEnabled ? 23 : 1, newFineEnabled ? 16 : 21);
 }
 
 void Wave::zoomPlus()
@@ -66,33 +64,33 @@ void Wave::initSamplesPerPixel()
 	}
 }
 
-void Wave::setCenterSamplePos(unsigned int centerSamplePos)
+void Wave::setCenterSamplePos(unsigned int newCenterSamplePos)
 {
-	this->centerSamplePos = centerSamplePos;
+	centerSamplePos = newCenterSamplePos;
 	SetDirty();
 }
 
-void Wave::setSampleData(vector<float>* sampleData, bool mono, unsigned int view)
+void Wave::setSampleData(std::vector<float>* newSampleData, bool newMono, unsigned int newView)
 {
-	auto newFrameCount = sampleData != nullptr ? (int) floor(mono ? sampleData->size() : (sampleData->size() * 0.5)) : 0;
+	auto newFrameCount = newSampleData != nullptr ? (int) floor(newMono ? newSampleData->size() : (newSampleData->size() * 0.5)) : 0;
 
-	if (this->sampleData == sampleData &&
+	if (sampleData == newSampleData &&
 		newFrameCount == frameCount &&
-		this->mono == mono && this->view == view)
+        mono == newMono && view == newView)
 	{
 		return;
 	}
 
-	this->sampleData = sampleData;
+	this->sampleData = newSampleData;
 
-	if (sampleData == nullptr)
+	if (newSampleData == nullptr)
 	{
 		frameCount = 0;
 		return;
 	}
 
-	this->mono = mono;
-	this->view = view;
+	this->mono = newMono;
+	this->view = newView;
 	
 	frameCount = newFrameCount;
 	
@@ -253,8 +251,8 @@ void Wave::Draw(std::vector<std::vector<bool>>* pixels)
 
 	Clear(pixels);
 
-	vector<vector<vector<int>>> lines;
-	vector<bool> colors;
+	std::vector<std::vector<std::vector<int>>> lines;
+	std::vector<bool> colors;
 
 	for (int i = 0; i < w; i++)
 	{
@@ -262,7 +260,7 @@ void Wave::Draw(std::vector<std::vector<bool>>* pixels)
 		int counter = 0;
 		
 		for (auto& l : lines)
-			mpc::Util::drawLine(*pixels, l, colors[counter++], vector<int>{x, y});
+			mpc::Util::drawLine(*pixels, l, colors[counter++], std::vector<int>{x, y});
 	}
 
 	dirty = false;

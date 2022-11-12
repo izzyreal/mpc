@@ -7,7 +7,6 @@
 #include <Logger.hpp>
 
 using namespace mpc::midi::event;
-using namespace std;
 
 MidiEvent::MidiEvent(int tick, int delta)
 {
@@ -52,7 +51,7 @@ bool MidiEvent::requiresStatusByte(MidiEvent* prevEvent)
 	return true;
 }
 
-void MidiEvent::writeToOutputStream(ostream& out, bool writeType)
+void MidiEvent::writeToOutputStream(std::ostream& out, bool writeType)
 {
 	auto bytes = mDelta.getBytes();
 	out.write(&bytes[0], bytes.size());
@@ -62,7 +61,7 @@ int MidiEvent::sId = -1;
 int MidiEvent::sType = -1;
 int MidiEvent::sChannel = -1;
 
-shared_ptr<MidiEvent> MidiEvent::parseEvent(int tick, int delta, stringstream& in)
+std::shared_ptr<MidiEvent> MidiEvent::parseEvent(int tick, int delta, std::stringstream& in)
 {
 	auto reset = false;
 
@@ -83,18 +82,18 @@ shared_ptr<MidiEvent> MidiEvent::parseEvent(int tick, int delta, stringstream& i
 	}
 	else if (sId == 240 || sId == 247) {
 		auto size = mpc::midi::util::VariableLengthInt(in);
-		auto data = vector<char>(size.getValue());
+		auto data = std::vector<char>(size.getValue());
 		in.read(&data[0], data.size());
-		return make_shared<SystemExclusiveEvent>(sId, tick, delta, data);
+		return std::make_shared<SystemExclusiveEvent>(sId, tick, delta, data);
 	}
 	else {
-		string error = "Unable to handle status byte, skipping: " + to_string(sId);
+		std::string error = "Unable to handle status byte, skipping: " + std::to_string(sId);
 		if (reset) {
 			in.ignore(1);
 		}
 	}
 
-	return shared_ptr<MidiEvent>();
+	return {};
 }
 
 bool MidiEvent::verifyIdentifier(int id)
@@ -123,7 +122,7 @@ bool MidiEvent::verifyIdentifier(int id)
 	return true;
 }
 
-string MidiEvent::toString()
+std::string MidiEvent::toString()
 {
-	return to_string(mTick) + " (" + to_string(mDelta.getValue()) + "): " + typeid(this).name();
+	return std::to_string(mTick) + " (" + std::to_string(mDelta.getValue()) + "): " + typeid(this).name();
 }

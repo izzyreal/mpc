@@ -5,9 +5,8 @@
 #include <file/ByteUtil.hpp>
 
 using namespace mpc::file::aps;
-using namespace std;
 
-ApsNoteParameters::ApsNoteParameters(const vector<char>& loadBytes)
+ApsNoteParameters::ApsNoteParameters(const std::vector<char>& loadBytes)
 {
 	soundNumber = loadBytes[0] == '\xff' ? -1 : loadBytes[0];
 	soundGenerationMode = loadBytes[2];
@@ -18,7 +17,7 @@ ApsNoteParameters::ApsNoteParameters(const vector<char>& loadBytes)
 	voiceOverlap = loadBytes[7];
 	mute1 = loadBytes[8] == 0 ? 34 : loadBytes[8];
 	mute2 = loadBytes[9] == 0 ? 34 : loadBytes[9];
-	auto buf = vector<char>{ loadBytes[10], loadBytes[11] };
+	auto buf = std::vector<char>{ loadBytes[10], loadBytes[11] };
 	tune = moduru::file::ByteUtil::bytes2short(buf);
 	attack = loadBytes[12];
 	decay = loadBytes[13];
@@ -187,7 +186,7 @@ int ApsNoteParameters::getVelocityToPitch()
     return velocityToPitch;
 }
 
-vector<char> ApsNoteParameters::getBytes()
+std::vector<char> ApsNoteParameters::getBytes()
 {
     return saveBytes;
 }

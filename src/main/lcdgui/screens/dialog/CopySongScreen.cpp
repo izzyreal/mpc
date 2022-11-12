@@ -7,7 +7,6 @@
 
 using namespace mpc::lcdgui::screens::dialog;
 using namespace moduru::lang;
-using namespace std;
 
 CopySongScreen::CopySongScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "copy-song", layerIndex)
@@ -87,11 +86,11 @@ void CopySongScreen::displaySong0()
 {
 	auto songScreen = mpc.screens->get<SongScreen>("song");
 	auto song = sequencer->getSong(songScreen->activeSongIndex);
-	findField("song0").lock()->setText(StrUtil::padLeft(to_string(songScreen->activeSongIndex + 1), "0", 2) + "-" + song->getName());
+	findField("song0").lock()->setText(StrUtil::padLeft(std::to_string(songScreen->activeSongIndex + 1), "0", 2) + "-" + song->getName());
 }
 
 void CopySongScreen::displaySong1()
 {
 	auto song = sequencer->getSong(song1);
-	findField("song1").lock()->setText(StrUtil::padLeft(to_string(song1 + 1), "0", 2) + "-" + song->getName());
+	findField("song1").lock()->setText(StrUtil::padLeft(std::to_string(song1 + 1), "0", 2) + "-" + song->getName());
 }

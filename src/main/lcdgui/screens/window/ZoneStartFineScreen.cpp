@@ -7,12 +7,11 @@ using namespace mpc::controls;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
-using namespace std;
 
 ZoneStartFineScreen::ZoneStartFineScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "zone-start-fine", layerIndex)
 {
-	addChild(std::move(make_shared<Wave>()));
+	addChild(std::move(std::make_shared<Wave>()));
 	findWave().lock()->setFine(true);
 }
 
@@ -99,14 +98,14 @@ void ZoneStartFineScreen::turnWheel(int i)
 	if (field->isTypeModeEnabled())
 		field->disableTypeMode();
 
-	if (param.compare("start") == 0)
+	if (param == "start")
 	{
 		zoneScreen->setZoneStart(zoneScreen->zone, zoneScreen->getZoneStart(zoneScreen->zone) + soundInc);
 		displayStart();
 		displayLngthLabel();
 		displayFineWave();
 	}
-	else if (param.compare("playx") == 0)
+	else if (param == "playx")
 	{
 		sampler->setPlayX(sampler->getPlayX() + i);
 		displayPlayX();

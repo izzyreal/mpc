@@ -7,7 +7,6 @@
 using namespace mpc::lcdgui::screens;
 using namespace mpc::controls;
 using namespace moduru::lang;
-using namespace std;
 
 DrumScreen::DrumScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "drum", layerIndex)
@@ -95,7 +94,7 @@ void DrumScreen::displayCurrentVal()
 
 void DrumScreen::displayDrum()
 {
-	findField("drum").lock()->setText(to_string(drum + 1));
+	findField("drum").lock()->setText(std::to_string(drum + 1));
 }
 
 void DrumScreen::displayPadToInternalSound()
@@ -106,7 +105,7 @@ void DrumScreen::displayPadToInternalSound()
 void DrumScreen::displayPgm()
 {
 	auto pn = mpcSoundPlayerChannel->getProgram();
-	findField("pgm").lock()->setText(StrUtil::padLeft(to_string(pn + 1), " ", 2) + "-" + sampler->getProgram(pn).lock()->getName());
+	findField("pgm").lock()->setText(StrUtil::padLeft(std::to_string(pn + 1), " ", 2) + "-" + sampler->getProgram(pn).lock()->getName());
 }
 
 void DrumScreen::displayPgmChange()

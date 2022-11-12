@@ -6,7 +6,6 @@
 #include <disk/AbstractDisk.hpp>
 
 using namespace mpc::lcdgui::screens::window;
-using namespace std;
 
 SaveASequenceScreen::SaveASequenceScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "save-a-sequence", layerIndex)
@@ -23,11 +22,11 @@ void SaveASequenceScreen::turnWheel(int i)
 {
 	init();
 
-	if (param.compare("saveas") == 0)
+	if (param == "saveas")
 	{
 		setSaveSequenceAs(saveSequenceAs + i);
 	}
-	else if (param.compare("file") == 0)
+	else if (param == "file")
 	{
 		auto nameScreen = mpc.screens->get<NameScreen>("name");
 		nameScreen->parameterName = "save-a-sequence";
@@ -47,7 +46,7 @@ void SaveASequenceScreen::function(int i)
 		break;
 	case 4:
 		auto fileName = mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) + ".MID";
-		
+
 		if (mpc.getDisk().lock()->checkExists(fileName))
 		{
 			openScreen("file-exists");
@@ -64,7 +63,7 @@ void SaveASequenceScreen::function(int i)
 
 void SaveASequenceScreen::displaySaveAs()
 {
-	findField("saveas").lock()->setText("MIDI FILE TYPE " + to_string(saveSequenceAs));
+	findField("saveas").lock()->setText("MIDI FILE TYPE " + std::to_string(saveSequenceAs));
 }
 
 void SaveASequenceScreen::displayFile()

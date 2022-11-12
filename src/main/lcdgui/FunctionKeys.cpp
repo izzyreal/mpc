@@ -8,19 +8,18 @@
 #include <Mpc.hpp>
 
 using namespace mpc::lcdgui;
-using namespace std;
 
 FunctionKey::FunctionKey(mpc::Mpc& mpc, const std::string& name, const int xPos)
 	: Component(name)
 {
-	setSize(39, 9);
+	Component::setSize(39, 9);
 	setLocation(xPos, 51);
 
-	auto label = addChild(make_shared<TextComp>(mpc, name)).lock();
+	auto label = addChild(std::make_shared<TextComp>(mpc, name)).lock();
 	label->setSize(0, 0);
 	label->setLocation(xPos + 1, 52);
 	label->preDrawClearRect.Clear();
-	Hide(true);
+	Component::Hide(true);
 	preDrawClearRect.Clear();
 }
 
@@ -29,8 +28,8 @@ void FunctionKey::Draw(std::vector<std::vector<bool>>* pixels)
 	if (shouldNotDraw(pixels))
 		return;
 
-	bool border = false;
-	bool bg = false;
+	bool border;
+	bool bg;
 
 	if (type == 0)
 	{
@@ -69,7 +68,7 @@ void FunctionKey::Draw(std::vector<std::vector<bool>>* pixels)
 	Component::Draw(pixels);
 }
 
-void FunctionKey::setText(const string& text)
+void FunctionKey::setText(const std::string& text)
 {
 	auto label = findChild<TextComp>(name).lock();
 	label->setText(text);
@@ -82,17 +81,20 @@ void FunctionKey::setText(const string& text)
 	label->setSize(39 - offsetx - 1, 7);
 }
 
-void FunctionKey::setType(const int type)
+void FunctionKey::setType(const int newType)
 {
-	if (this->type == type)
+	if (type == newType)
 		return;
 
-	this->type = type;
-	Hide(type == -1);
+	type = newType;
+	Hide(newType == -1);
 	SetDirty();
 }
 
-FunctionKeys::FunctionKeys(mpc::Mpc& mpc, const string& name, vector<vector<string>> allTexts, vector<vector<int>> allTypes)
+FunctionKeys::FunctionKeys(mpc::Mpc& mpc,
+                           const std::string& name,
+                           std::vector<std::vector<std::string>> allTexts,
+                           std::vector<std::vector<int>> allTypes)
 	: Component(name)
 {
 	this->texts = allTexts;
@@ -101,14 +103,14 @@ FunctionKeys::FunctionKeys(mpc::Mpc& mpc, const string& name, vector<vector<stri
 	int firstFunctionKey = -1;
 	int lastFunctionKey = -1;
 
-	for (auto& texts : allTexts)
+	for (auto& texts2 : allTexts)
 	{
-		for (int i = 0; i < texts.size(); i++)
+		for (int i = 0; i < texts2.size(); i++)
 		{
-			if (texts[i].compare("") != 0 && (firstFunctionKey == -1 || i < firstFunctionKey))
+			if (!texts2[i].empty() && (firstFunctionKey == -1 || i < firstFunctionKey))
 				firstFunctionKey = i;
 
-			if (firstFunctionKey != -1 && texts[i].compare("") != 0 && i > lastFunctionKey)
+			if (firstFunctionKey != -1 && !texts2[i].empty() && i > lastFunctionKey)
 				lastFunctionKey = i;
 		}
 	}
@@ -116,7 +118,7 @@ FunctionKeys::FunctionKeys(mpc::Mpc& mpc, const string& name, vector<vector<stri
 	if (firstFunctionKey >= 0)
 	{
 		for (int i = firstFunctionKey; i <= lastFunctionKey; i++)
-			addChild(make_shared<FunctionKey>(mpc, "fk" + to_string(i), xPoses[i]));
+			addChild(std::make_shared<FunctionKey>(mpc, "fk" + std::to_string(i), xPoses[i]));
 	}
 
 	setActiveArrangement(0);
@@ -131,7 +133,7 @@ void FunctionKeys::setActiveArrangement(int i)
 
 	for (int j = 0; j < 6; j++)
 	{
-		auto fk = findChild<FunctionKey>("fk" + to_string(j)).lock();
+		auto fk = findChild<FunctionKey>("fk" + std::to_string(j)).lock();
 
 		if (!fk)
 			continue;

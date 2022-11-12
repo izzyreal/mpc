@@ -5,7 +5,6 @@
 #include <disk/AbstractDisk.hpp>
 
 using namespace mpc::hardware;
-using namespace std;
 
 DataWheel::DataWheel(mpc::Mpc& mpc)
 	: mpc(mpc)

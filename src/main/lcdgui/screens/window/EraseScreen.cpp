@@ -11,7 +11,6 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 using namespace moduru::lang;
 using namespace moduru;
-using namespace std;
 
 EraseScreen::EraseScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "erase", layerIndex)
@@ -99,18 +98,18 @@ void EraseScreen::function(int i)
 
 		for (auto j = startIndex; j < lastIndex + 1; j++)
 		{
-			vector<int> removalIndices;
+            std::vector<int> removalIndices;
 			auto t = seq->getTrack(j);
 			
 			for (auto k = 0; k < t->getEvents().size(); k++)
 			{
 				auto e = t->getEvent(k);
-				auto ne = dynamic_pointer_cast<NoteEvent>(e);
+				auto ne = std::dynamic_pointer_cast<NoteEvent>(e);
 
 				if (e->getTick() >= time0 && e->getTick() < time1)
 				{
-					string excludeClass = "";
-					string includeClass = "";
+                    std::string excludeClass;
+                    std::string includeClass;
 					
 					switch (erase)
 					{
@@ -154,7 +153,7 @@ void EraseScreen::function(int i)
 					case 2:
 						includeClass = eventClassNames[type];
 						
-						if (System::demangle(typeid(e).name()).compare(includeClass) == 0)
+						if (System::demangle(typeid(e).name()) == includeClass)
 						{
 							if (ne)
 							{
@@ -193,7 +192,7 @@ void EraseScreen::function(int i)
 
 void EraseScreen::displayTrack()
 {
-	string trackName = "";
+    std::string trackName;
 
 	if (track == -1)
 	{
@@ -256,8 +255,8 @@ void EraseScreen::displayNotes()
 	if (bus == 0)
 	{
 		findField("note0").lock()->setSize(47, 9);
-		findField("note0").lock()->setText((StrUtil::padLeft(to_string(note0), " ", 3) + "(" + mpc::Util::noteNames()[note0]) + ")");
-		findField("note1").lock()->setText((StrUtil::padLeft(to_string(note1), " ", 3) + "(" + mpc::Util::noteNames()[note1]) + ")");
+		findField("note0").lock()->setText((StrUtil::padLeft(std::to_string(note0), " ", 3) + "(" + mpc::Util::noteNames()[note0]) + ")");
+		findField("note1").lock()->setText((StrUtil::padLeft(std::to_string(note1), " ", 3) + "(" + mpc::Util::noteNames()[note1]) + ")");
 	}
 	else
 	{
@@ -269,7 +268,7 @@ void EraseScreen::displayNotes()
         {
             auto padIndexWithBank = program.lock()->getPadIndexFromNote(note0);
             auto padName = sampler->getPadName(padIndexWithBank);
-            findField("note0").lock()->setText(to_string(note0) + "/" + padName);
+            findField("note0").lock()->setText(std::to_string(note0) + "/" + padName);
         }
 	}
 }

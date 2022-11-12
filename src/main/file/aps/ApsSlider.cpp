@@ -4,9 +4,8 @@
 #include <sampler/PgmSlider.hpp>
 
 using namespace mpc::file::aps;
-using namespace std;
 
-ApsSlider::ApsSlider(const vector<char>& loadBytes) 
+ApsSlider::ApsSlider(const std::vector<char>& loadBytes)
 {
 	note = loadBytes[0] == 0 ? 34 : loadBytes[0];
 	tuneLow = loadBytes[1];
@@ -22,7 +21,7 @@ ApsSlider::ApsSlider(const vector<char>& loadBytes)
 
 ApsSlider::ApsSlider(mpc::sampler::PgmSlider* slider) 
 {
-	saveBytes = vector<char>(ApsProgram::SLIDER_LENGTH);
+	saveBytes = std::vector<char>(ApsProgram::SLIDER_LENGTH);
 	saveBytes[0] = slider->getNote() == 34 ? 0 : slider->getNote();
 	saveBytes[1] = slider->getTuneLowRange();
 	saveBytes[2] = slider->getTuneHighRange();
@@ -35,7 +34,7 @@ ApsSlider::ApsSlider(mpc::sampler::PgmSlider* slider)
 	saveBytes[9] = slider->getControlChange();
 }
 
-vector<char> ApsSlider::PADDING = vector<char>{ 0, 35, 64, 0, 26, 0 };
+std::vector<char> ApsSlider::PADDING = std::vector<char>{ 0, 35, 64, 0, 26, 0 };
 
 int ApsSlider::getNote()
 {
@@ -87,7 +86,7 @@ int ApsSlider::getProgramChange()
     return programChange;
 }
 
-vector<char> ApsSlider::getBytes()
+std::vector<char> ApsSlider::getBytes()
 {
     return saveBytes;
 }

@@ -26,14 +26,13 @@ using namespace mpc::lcdgui;
 using namespace mpc::controls;
 using namespace moduru::lang;
 using namespace moduru::sys;
-using namespace std;
 
 VmpcKeyboardScreen::VmpcKeyboardScreen(mpc::Mpc& mpc, int layerIndex)
 : ScreenComponent(mpc, "vmpc-keyboard", layerIndex)
 {
     for (int i = 0; i < 5; i++)
     {
-        auto param = make_shared<Parameter>(mpc, "                ", "row" + to_string(i), 2, 3 + (i * 9), 17 * 6);
+        auto param = std::make_shared<Parameter>(mpc, "                ", "row" + std::to_string(i), 2, 3 + (i * 9), 17 * 6);
         addChild(param);
     }
 }
@@ -246,8 +245,8 @@ void VmpcKeyboardScreen::updateRows()
 
     for (int i = 0; i < 5; i++)
     {
-        auto l = findChild<Label>("row" + to_string(i)).lock();
-        auto f = findChild<Field>("row" + to_string(i)).lock();
+        auto l = findChild<Label>("row" + std::to_string(i)).lock();
+        auto f = findChild<Field>("row" + std::to_string(i)).lock();
         
         int length = 15;
         auto mapping = labelKeyMap[i + rowOffset];

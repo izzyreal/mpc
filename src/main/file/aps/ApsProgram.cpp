@@ -13,9 +13,8 @@
 
 using namespace mpc::file::aps;
 using namespace moduru;
-using namespace std;
 
-ApsProgram::ApsProgram(const vector<char>& loadBytes) 
+ApsProgram::ApsProgram(const std::vector<char>& loadBytes)
 {
 	index = loadBytes[INDEX_OFFSET];
 	auto nameBytes = VecUtil::CopyOfRange(loadBytes, NAME_OFFSET, NAME_OFFSET + NAME_LENGTH);
@@ -43,20 +42,20 @@ ApsProgram::ApsProgram(const vector<char>& loadBytes)
 
 ApsProgram::ApsProgram(mpc::sampler::Program* program, int index)
 {
-	vector<vector<char>> byteList;
+	std::vector<std::vector<char>> byteList;
 	this->index = index;
-	byteList.push_back(vector<char>{ (char) index });
+	byteList.push_back({ (char) index });
 	byteList.push_back(UNKNOWN);
-	string programName = moduru::lang::StrUtil::padRight(program->getName(), " ", 16);
+	auto programName = moduru::lang::StrUtil::padRight(program->getName(), " ", 16);
 
 	for (char c : programName)
-		byteList.push_back(vector<char>{ c });
+		byteList.push_back({ c });
 	
-	byteList.push_back(vector<char>{ 0 }); // Name terminator
+	byteList.push_back({ 0 }); // Name terminator
 
 	ApsSlider apsSlider(program->getSlider());
 	byteList.push_back(apsSlider.getBytes());
-	byteList.push_back(vector<char>{ 35, 64, 0, 26, 0 });
+	byteList.push_back({ 35, 64, 0, 26, 0 });
 
 	for (int i = 0; i < 64; i++)
 	{
@@ -64,9 +63,9 @@ ApsProgram::ApsProgram(mpc::sampler::Program* program, int index)
 		byteList.push_back(np.getBytes());
 	}
 	
-	byteList.push_back(vector<char>{ 6 });
-	auto smcs = vector<weak_ptr<ctoot::mpc::MpcStereoMixerChannel>>(64);
-	auto ifmcs = vector<weak_ptr<ctoot::mpc::MpcIndivFxMixerChannel>>(64);
+	byteList.push_back({ 6 });
+	auto smcs = std::vector<std::weak_ptr<ctoot::mpc::MpcStereoMixerChannel>>(64);
+	auto ifmcs = std::vector<std::weak_ptr<ctoot::mpc::MpcIndivFxMixerChannel>>(64);
 	
 	for (int i = 0; i < 64; i++)
 	{
@@ -76,8 +75,8 @@ ApsProgram::ApsProgram(mpc::sampler::Program* program, int index)
 
 	ApsMixer apsMixer(smcs, ifmcs);
 	byteList.push_back(apsMixer.getBytes());
-	byteList.push_back(vector<char>{ 0, 64, 0 });
-	auto apsAssignTable = vector<int>(64);
+	byteList.push_back({ 0, 64, 0 });
+	auto apsAssignTable = std::vector<int>(64);
 	
 	for (int i = 0; i < 64; i++)
 		apsAssignTable[i] = program->getNoteFromPad(i);
@@ -90,7 +89,7 @@ ApsProgram::ApsProgram(mpc::sampler::Program* program, int index)
 	for (auto& ba : byteList)
 		totalSize += ba.size();
 
-	saveBytes = vector<char>(totalSize);
+	saveBytes = std::vector<char>(totalSize);
 	auto counter = 0;
 
 	for (auto& ba : byteList)
@@ -135,12 +134,12 @@ ApsSlider* ApsProgram::getSlider()
     return slider;
 }
 
-string ApsProgram::getName()
+std::string ApsProgram::getName()
 {
     return name;
 }
 
-vector<char> ApsProgram::getBytes()
+std::vector<char> ApsProgram::getBytes()
 {
     return saveBytes;
 }

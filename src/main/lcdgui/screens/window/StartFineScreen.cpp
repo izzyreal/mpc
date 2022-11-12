@@ -6,12 +6,11 @@ using namespace mpc::lcdgui;
 using namespace mpc::controls;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
-using namespace std;
 
 StartFineScreen::StartFineScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "start-fine", layerIndex)
 {
-	addChild(std::move(make_shared<Wave>()));
+	addChild(std::move(std::make_shared<Wave>()));
 	findWave().lock()->setFine(true);
 }
 
@@ -109,7 +108,7 @@ void StartFineScreen::turnWheel(int i)
 	if (field->isTypeModeEnabled())
 		field->disableTypeMode();
 
-	if (param.compare("start") == 0)
+	if (param == "start")
 	{
 		auto highestStartPos = sampleLength - 1;
 		auto length = sound->getEnd() - sound->getStart();
@@ -131,12 +130,12 @@ void StartFineScreen::turnWheel(int i)
 		displayLngthLabel();
 		displayStart();
 	}
-	else if (param.compare("smpllngth") == 0)
+	else if (param == "smpllngth")
 	{
 		trimScreen->smplLngthFix = i > 0;
 		displaySmplLngth();
 	}
-	else if (param.compare("playx") == 0)
+	else if (param == "playx")
 	{
 		sampler->setPlayX(sampler->getPlayX() + i);
 		displayPlayX();

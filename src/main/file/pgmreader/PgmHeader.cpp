@@ -5,7 +5,6 @@
 #include <VecUtil.hpp>
 
 using namespace moduru;
-using namespace std;
 using namespace mpc::file::pgmreader;
 
 PgmHeader::PgmHeader(ProgramFileReader* programFile)
@@ -14,7 +13,7 @@ PgmHeader::PgmHeader(ProgramFileReader* programFile)
 	headerArray = VecUtil::CopyOfRange(pgmFileArray, 0, 4);
 }
 
-vector<char> PgmHeader::getHeaderArray()
+std::vector<char> PgmHeader::getHeaderArray()
 {
     return headerArray;
 }

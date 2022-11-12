@@ -1,9 +1,8 @@
 #include <audiomidi/DirectToDiskSettings.hpp>
 
 using namespace mpc::audiomidi;
-using namespace std;
 
-DirectToDiskSettings::DirectToDiskSettings(int lengthInFrames, string outputFolder, bool split, int sampleRate)
+DirectToDiskSettings::DirectToDiskSettings(int lengthInFrames, std::string outputFolder, bool split, int sampleRate)
 {
 	this->lengthInFrames = lengthInFrames;
 	this->outputFolder = outputFolder;

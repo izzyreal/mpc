@@ -3,7 +3,6 @@
 #include <sequencer/Sequence.hpp>
 
 using namespace mpc::lcdgui::screens::window;
-using namespace std;
 
 ChangeBarsScreen::ChangeBarsScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "change-bars", layerIndex)
@@ -51,19 +50,19 @@ void ChangeBarsScreen::turnWheel(int i)
 {
 	init();
 
-	if (param.compare("afterbar") == 0)
+	if (param == "afterbar")
 	{
 		setAfterBar(afterBar + i);
 	}
-	else if (param.compare("numberofbars") == 0)
+	else if (param == "numberofbars")
 	{
 		setNumberOfBars(numberOfBars + i);
 	}
-	else if (param.compare("firstbar") == 0)
+	else if (param == "firstbar")
 	{
 		setFirstBar(firstBar + i);
 	}
-	else if (param.compare("lastbar") == 0)
+	else if (param == "lastbar")
 	{
 		setLastBar(lastBar + i);
 	}

@@ -4,7 +4,6 @@
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui;
-using namespace std;
 
 StepTcScreen::StepTcScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "step-timing-correct", layerIndex)

@@ -1,7 +1,6 @@
 #include <sequencer/NoteEvent.hpp>
 
 using namespace mpc::sequencer;
-using namespace std;
 
 NoteEvent::NoteEvent()
 	: NoteEvent(60)
@@ -11,34 +10,34 @@ NoteEvent::NoteEvent()
 NoteEvent::NoteEvent(int i) 
 {
 	number = i;
-	noteOff = make_shared<NoteEvent>(false, 0);
+	noteOff = std::make_shared<NoteEvent>(false, 0);
     noteOff->number = number;
 }
 
-NoteEvent::NoteEvent(bool dummyParameter, int _noteOnTick)
+NoteEvent::NoteEvent(bool /*dummyParameter*/, int _noteOnTick)
 {
 	// noteoff ctor should not create a noteoff
     noteOnTick = _noteOnTick;
 }
 
-weak_ptr<NoteEvent> NoteEvent::getNoteOff()
+std::weak_ptr<NoteEvent> NoteEvent::getNoteOff()
 {
     return noteOff;
 }
 
 void NoteEvent::setNote(int i)
 {
-    if(i < 0) return;
+    if (i < 0) return;
 
-    if(i > 127 && i != 256) return;
+    if (i > 127 && i != 256) return;
 
-    if(number == i) return;
+    if (number == i) return;
 
     number = i;
 
     noteOff->number = number;
     
-    notifyObservers(string("step-editor"));
+    notifyObservers(std::string("step-editor"));
 }
 
 int NoteEvent::getNote()
@@ -54,7 +53,7 @@ void NoteEvent::setDuration(int i)
     }
 	duration = i;
 	
-	notifyObservers(string("step-editor"));
+	notifyObservers(std::string("step-editor"));
 }
 
 int NoteEvent::getDuration()
@@ -73,7 +72,7 @@ void NoteEvent::setVariationTypeNumber(int i)
 
     variationTypeNumber = i;
     
-    notifyObservers(string("step-editor"));
+    notifyObservers(std::string("step-editor"));
 }
 
 void NoteEvent::setVariationValue(int i)
@@ -84,7 +83,7 @@ void NoteEvent::setVariationValue(int i)
 
     variationValue = i;
     
-    notifyObservers(string("step-editor"));
+    notifyObservers(std::string("step-editor"));
 }
 
 int NoteEvent::getVariationValue()
@@ -98,7 +97,7 @@ void NoteEvent::setVelocity(int i)
 
     velocity = i;
     
-    notifyObservers(string("step-editor"));
+    notifyObservers(std::string("step-editor"));
 }
 
 void NoteEvent::setVelocityZero()
@@ -111,10 +110,10 @@ int NoteEvent::getVelocity()
     return velocity;
 }
 
-void NoteEvent::CopyValuesTo(weak_ptr<Event> dest)
+void NoteEvent::CopyValuesTo(std::weak_ptr<Event> dest)
 {
 	Event::CopyValuesTo(dest);
-	auto lDest = dynamic_pointer_cast<NoteEvent>(dest.lock());
+	auto lDest = std::dynamic_pointer_cast<NoteEvent>(dest.lock());
 	lDest->setVariationTypeNumber(getVariationType());
 	lDest->setVariationValue(getVariationValue());
 	lDest->setNote(getNote());

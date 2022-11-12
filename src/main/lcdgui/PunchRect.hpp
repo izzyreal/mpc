@@ -11,7 +11,7 @@ namespace mpc::lcdgui {
 		bool on = false;
 
 	public:
-		void setOn(bool on);
+		void setOn(bool newOn);
 
 	public:
 		void Draw(std::vector< std::vector<bool>>* pixels) override;

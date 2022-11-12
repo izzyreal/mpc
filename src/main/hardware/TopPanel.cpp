@@ -1,7 +1,6 @@
 #include "TopPanel.hpp"
 
 using namespace mpc::hardware;
-using namespace std;
 
 bool TopPanel::isAfterEnabled()
 {

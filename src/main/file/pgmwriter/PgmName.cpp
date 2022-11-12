@@ -3,12 +3,11 @@
 #include <sampler/Program.hpp>
 
 using namespace mpc::file::pgmwriter;
-using namespace std;
 
 PgmName::PgmName(mpc::sampler::Program* program)
 {
 	auto ca = program->getName();
-	auto temp = vector<char>(17);
+	std::vector<char> temp(17);
 	for (int i = 0; i < ca.length(); i++)
 		temp[i] = ca[i];
 
@@ -20,7 +19,7 @@ PgmName::PgmName(mpc::sampler::Program* program)
 	sampleNamesSize = program->getNumberOfSamples() * 17;
 }
 
-vector<char> PgmName::getPgmNameArray()
+std::vector<char> PgmName::getPgmNameArray()
 {
     return programNameArray;
 }

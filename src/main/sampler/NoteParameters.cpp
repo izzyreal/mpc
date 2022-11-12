@@ -2,7 +2,6 @@
 
 using namespace mpc::sampler;
 using namespace ctoot::mpc;
-using namespace std;
 
 NoteParameters::NoteParameters(const int index)
     : index(index)
@@ -427,12 +426,12 @@ int NoteParameters::getNumber()
     return index + 35;
 }
 
-weak_ptr<MpcStereoMixerChannel> NoteParameters::getStereoMixerChannel()
+std::weak_ptr<MpcStereoMixerChannel> NoteParameters::getStereoMixerChannel()
 {
     return stereoMixerChannel;
 }
 
-weak_ptr<MpcIndivFxMixerChannel> NoteParameters::getIndivFxMixerChannel()
+std::weak_ptr<MpcIndivFxMixerChannel> NoteParameters::getIndivFxMixerChannel()
 {
     return indivFxMixerChannel;
 }

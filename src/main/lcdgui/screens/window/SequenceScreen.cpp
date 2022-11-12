@@ -3,7 +3,6 @@
 #include <lcdgui/screens/window/NameScreen.hpp>
 
 using namespace mpc::lcdgui::screens::window;
-using namespace std;
 
 SequenceScreen::SequenceScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "sequence", layerIndex)
@@ -45,13 +44,13 @@ void SequenceScreen::turnWheel(int i)
 {
     init();
     auto nameScreen = mpc.screens->get<NameScreen>("name");
-    std::function<void(string&)> renamer;
+    std::function<void(std::string&)> renamer;
     
-    if (param.find("default") != string::npos)
+    if (param.find("default") != std::string::npos)
     {
         nameScreen->setName(sequencer->getDefaultSequenceName());
         
-        renamer = [&](string& newName) {
+        renamer = [&](std::string& newName) {
             sequencer->setDefaultSequenceName(newName);
         };
     }
@@ -59,7 +58,7 @@ void SequenceScreen::turnWheel(int i)
     {
         nameScreen->setName(sequencer->getActiveSequence()->getName());
         
-        renamer = [&](string& newName) {
+        renamer = [&](std::string& newName) {
             sequencer->getActiveSequence()->setName(newName);
         };
     }

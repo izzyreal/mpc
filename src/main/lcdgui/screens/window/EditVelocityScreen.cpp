@@ -13,8 +13,6 @@ using namespace mpc::sequencer;
 
 using namespace moduru::lang;
 
-using namespace std;
-
 EditVelocityScreen::EditVelocityScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "edit-velocity", layerIndex)
 {
@@ -69,7 +67,7 @@ void EditVelocityScreen::function(int i)
 	case 4:
 		for (auto& event : track.lock()->getEvents())
 		{
-			auto ne = dynamic_pointer_cast<NoteEvent>(event);
+			auto ne = std::dynamic_pointer_cast<NoteEvent>(event);
 
 			if (ne)
 			{
@@ -132,8 +130,8 @@ void EditVelocityScreen::displayNotes()
 		findField("note0").lock()->setSize(47, 9);
 		findLabel("note1").lock()->Hide(false);
 		findField("note1").lock()->Hide(false);
-		findField("note0").lock()->setText(moduru::lang::StrUtil::padLeft(to_string(note0), " ", 3) + "(" + mpc::Util::noteNames()[note0] + u8"\u00D4");
-		findField("note1").lock()->setText(moduru::lang::StrUtil::padLeft(to_string(note1), " ", 3) + "(" + mpc::Util::noteNames()[note1] + u8"\u00D4");
+		findField("note0").lock()->setText(moduru::lang::StrUtil::padLeft(std::to_string(note0), " ", 3) + "(" + mpc::Util::noteNames()[note0] + u8"\u00D4");
+		findField("note1").lock()->setText(moduru::lang::StrUtil::padLeft(std::to_string(note1), " ", 3) + "(" + mpc::Util::noteNames()[note1] + u8"\u00D4");
 	}
 	else
 	{
@@ -146,7 +144,7 @@ void EditVelocityScreen::displayNotes()
 		else
 		{
             auto padName = sampler->getPadName(program.lock()->getPadIndexFromNote(note0));
-            findField("note0").lock()->setText(to_string(note0) + "/" + padName);
+            findField("note0").lock()->setText(std::to_string(note0) + "/" + padName);
 		}
 		
 		findLabel("note1").lock()->Hide(true);
@@ -183,7 +181,7 @@ void EditVelocityScreen::setValue(int i)
 
 void EditVelocityScreen::displayValue()
 {
-	findField("value").lock()->setText(to_string(value));
+	findField("value").lock()->setText(std::to_string(value));
 }
 
 void EditVelocityScreen::displayEditType()

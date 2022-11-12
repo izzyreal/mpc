@@ -1,7 +1,6 @@
 #include "SetupScreen.hpp"
 
 using namespace mpc::lcdgui::screens;
-using namespace std;
 
 SetupScreen::SetupScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "setup", layerIndex)

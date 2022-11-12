@@ -9,7 +9,6 @@
 #include <hardware/Led.hpp>
 
 using namespace mpc::lcdgui::screens::window;
-using namespace std;
 
 Assign16LevelsScreen::Assign16LevelsScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "assign-16-levels", layerIndex)
@@ -151,7 +150,7 @@ void Assign16LevelsScreen::displayNote()
     auto soundIndex = note == 34 ? -1 : program->getNoteParameters(note)->getSoundIndex();
     auto soundName = soundIndex == -1 ? "(No sound)" : sampler->getSoundName(soundIndex);
 
-    auto noteName = note == 34 ? "--" : to_string(note);
+    auto noteName = note == 34 ? "--" : std::to_string(note);
 
     findField("note").lock()->setText(noteName + "/" + padName + "-" + soundName);
 }

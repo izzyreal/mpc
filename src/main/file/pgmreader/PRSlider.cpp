@@ -7,7 +7,6 @@
 
 using namespace moduru;
 using namespace mpc::file::pgmreader;
-using namespace std;
 
 Slider::Slider(ProgramFileReader* programFile) 
 {
@@ -32,7 +31,7 @@ int Slider::getSliderEnd()
     return sliderEnd;
 }
 
-vector<char> Slider::getSliderArray()
+std::vector<char> Slider::getSliderArray()
 {
     auto pgmFileArray = programFile->readProgramFileArray();
     sliderArray = VecUtil::CopyOfRange(pgmFileArray, getSliderStart(), getSliderEnd());

@@ -3,7 +3,6 @@
 #include <sequencer/Step.hpp>
 
 using namespace mpc::sequencer;
-using namespace std;
 
 void Song::setLoopEnabled(bool b)
 {
@@ -54,12 +53,12 @@ int Song::getLastStep()
     return lastStep;
 }
 
-void Song::setName(string str)
+void Song::setName(std::string str)
 {
     name = str;
 }
 
-string Song::getName()
+std::string Song::getName()
 {
 	if (!used)
         return "(Unused)";
@@ -80,10 +79,10 @@ void Song::deleteStep(int stepIndex)
 
 void Song::insertStep(int stepIndex)
 {
-	steps.insert(steps.begin() + stepIndex, make_shared<Step>());
+	steps.insert(steps.begin() + stepIndex, std::make_shared<Step>());
 }
 
-weak_ptr<Step> Song::getStep(int i)
+std::weak_ptr<Step> Song::getStep(int i)
 {
 	return steps[i];
 }

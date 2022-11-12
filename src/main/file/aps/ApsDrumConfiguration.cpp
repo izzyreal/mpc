@@ -5,9 +5,8 @@
 
 using namespace moduru::file;
 using namespace mpc::file::aps;
-using namespace std;
 
-ApsDrumConfiguration::ApsDrumConfiguration(const vector<char>& loadBytes)
+ApsDrumConfiguration::ApsDrumConfiguration(const std::vector<char>& loadBytes)
 {
 	program = loadBytes[5];
 	receivePgmChange = BitUtil::getBits(loadBytes[2])[7] == '1';
@@ -16,7 +15,7 @@ ApsDrumConfiguration::ApsDrumConfiguration(const vector<char>& loadBytes)
 
 ApsDrumConfiguration::ApsDrumConfiguration(int program, bool recPgmChange, bool recMidiVolume)
 {
-	saveBytes = vector<char>(12);
+	saveBytes = std::vector<char>(12);
 	for (int i = 0; i < 9; i++)
 		saveBytes[i] = TEMPLATE[i];
 
@@ -29,8 +28,8 @@ ApsDrumConfiguration::ApsDrumConfiguration(int program, bool recPgmChange, bool 
 	saveBytes[5] = program;
 }
 
-vector<char> ApsDrumConfiguration::TEMPLATE = vector<char>{ 0, 0, 1, 1, 127, 0, 1, 1, 127 };
-vector<char> ApsDrumConfiguration::PADDING = vector<char>{ 64, 0, 6 };
+std::vector<char> ApsDrumConfiguration::TEMPLATE = std::vector<char>{ 0, 0, 1, 1, 127, 0, 1, 1, 127 };
+std::vector<char> ApsDrumConfiguration::PADDING = std::vector<char>{ 64, 0, 6 };
 
 int ApsDrumConfiguration::getProgram()
 {
@@ -47,7 +46,7 @@ bool ApsDrumConfiguration::getReceiveMidiVolume()
     return receiveMidiVolume;
 }
 
-vector<char> ApsDrumConfiguration::getBytes()
+std::vector<char> ApsDrumConfiguration::getBytes()
 {
     return saveBytes;
 }

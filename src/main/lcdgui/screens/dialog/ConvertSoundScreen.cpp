@@ -2,7 +2,6 @@
 
 using namespace mpc::lcdgui::screens::dialog;
 using namespace moduru::lang;
-using namespace std;
 
 ConvertSoundScreen::ConvertSoundScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "convert-sound", layerIndex)
@@ -18,7 +17,7 @@ void ConvertSoundScreen::turnWheel(int i)
 {
 	init();
 
-	if (param.compare("convert") == 0)
+	if (param == "convert")
 	{
 		setConvert(i < 0 ? 0 : 1);
 	}

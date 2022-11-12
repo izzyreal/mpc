@@ -5,7 +5,6 @@
 #include <midi/util/VariableLengthInt.hpp>
 
 using namespace mpc::midi::event::meta;
-using namespace std;
 
 GenericMetaEvent::GenericMetaEvent(int tick, int delta, MetaEventData* info) 
 	: MetaEvent(tick, delta, info->type)
@@ -19,7 +18,7 @@ int GenericMetaEvent::getEventSize()
 	return 1 + 1 + mLength.getByteCount() + mLength.getValue();
 }
 
-void GenericMetaEvent::writeToOutputStream(ostream& out)
+void GenericMetaEvent::writeToOutputStream(std::ostream& out)
 {
 	MetaEvent::writeToOutputStream(out);
 	auto length = mLength.getBytes();
@@ -27,7 +26,7 @@ void GenericMetaEvent::writeToOutputStream(ostream& out)
 	out.write(&mData[0], mData.size());
 }
 
-void GenericMetaEvent::writeToOutputStream(ostream& out, bool writeType)
+void GenericMetaEvent::writeToOutputStream(std::ostream& out, bool writeType)
 {
 	MetaEvent::writeToOutputStream(out, writeType);
 }

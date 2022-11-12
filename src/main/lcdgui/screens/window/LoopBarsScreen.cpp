@@ -3,7 +3,6 @@
 #include <sequencer/Sequence.hpp>
 
 using namespace mpc::lcdgui::screens::window;
-using namespace std;
 
 LoopBarsScreen::LoopBarsScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "loop-bars-window", layerIndex)
@@ -25,21 +24,21 @@ void LoopBarsScreen::turnWheel(int i)
 	init();
 	auto seq = sequencer->getActiveSequence();
 
-	if (param.compare("firstbar") == 0)
+	if (param == "firstbar")
 	{
 		seq->setFirstLoopBarIndex(seq->getFirstLoopBarIndex() + i);
 		displayFirstBar();
 		displayLastBar();
 		displayNumberOfBars();
 	}
-	else if (param.compare("lastbar") == 0)
+	else if (param == "lastbar")
 	{
 		seq->setLastLoopBarIndex(seq->getLastLoopBarIndex() + i);
 		displayLastBar();
 		displayFirstBar();
 		displayNumberOfBars();
 	}
-	else if (param.compare("numberofbars") == 0 && i < 0)
+	else if (param == "numberofbars" && i < 0)
 	{
 		if (seq->isLastLoopBarEnd())
 		{
@@ -54,7 +53,7 @@ void LoopBarsScreen::turnWheel(int i)
 			displayNumberOfBars();
 		}
 	}
-	else if (param.compare("numberofbars") == 0)
+	else if (param == "numberofbars")
 	{
 		seq->setLastLoopBarIndex(seq->getLastLoopBarIndex() + i);
 		displayLastBar();
@@ -71,18 +70,18 @@ void LoopBarsScreen::displayLastBar()
 		findField("lastbar").lock()->setText("END");
 	}
 	else {
-		findField("lastbar").lock()->setText(to_string(seq->getLastLoopBarIndex() + 1));
+		findField("lastbar").lock()->setText(std::to_string(seq->getLastLoopBarIndex() + 1));
 	}
 }
 
 void LoopBarsScreen::displayNumberOfBars()
 {
 	auto seq = sequencer->getActiveSequence();
-	findField("numberofbars").lock()->setText(to_string(seq->getLastLoopBarIndex() - seq->getFirstLoopBarIndex() + 1));
+	findField("numberofbars").lock()->setText(std::to_string(seq->getLastLoopBarIndex() - seq->getFirstLoopBarIndex() + 1));
 }
 
 void LoopBarsScreen::displayFirstBar()
 {
 	auto seq = sequencer->getActiveSequence();
-	findField("firstbar").lock()->setText(to_string(seq->getFirstLoopBarIndex() + 1));
+	findField("firstbar").lock()->setText(std::to_string(seq->getFirstLoopBarIndex() + 1));
 }

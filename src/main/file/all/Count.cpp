@@ -11,10 +11,8 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::file::all;
-using namespace std;
 
-Count::Count(mpc::Mpc& mpc, const vector<char>& b)
-	: mpc(mpc)
+Count::Count(const std::vector<char>& b)
 {
 	enabled = b[ENABLED_OFFSET] > 0;
 	countInMode = b[COUNT_IN_MODE_OFFSET];
@@ -30,14 +28,13 @@ Count::Count(mpc::Mpc& mpc, const vector<char>& b)
 }
 
 Count::Count(mpc::Mpc& mpc)
-	: mpc(mpc)
 {
 	auto countMetronomeScreen = mpc.screens->get<CountMetronomeScreen>("count-metronome");
 	auto metronomeSoundScreen = mpc.screens->get<MetronomeSoundScreen>("metronome-sound");
 
 	auto lSequencer = mpc.getSequencer().lock();
 
-	saveBytes = vector<char>(AllParser::COUNT_LENGTH);
+	saveBytes = std::vector<char>(AllParser::COUNT_LENGTH);
 	saveBytes[ENABLED_OFFSET] = static_cast< int8_t >((lSequencer->isCountEnabled() ? 1 : 0));
 	saveBytes[COUNT_IN_MODE_OFFSET] = static_cast< int8_t >(countMetronomeScreen->getCountInMode());
 	saveBytes[CLICK_VOLUME_OFFSET] = static_cast< int8_t >(metronomeSoundScreen->getVolume());
@@ -106,7 +103,7 @@ int Count::getNormalVelo()
     return normalVelo;
 }
 
-vector<char>& Count::getBytes()
+std::vector<char>& Count::getBytes()
 {
     return saveBytes;
 }

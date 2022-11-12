@@ -1,13 +1,12 @@
 #include "Led.hpp"
 
 using namespace mpc::hardware;
-using namespace std;
 
-Led::Led(string label) : label(label)
+Led::Led(std::string label) : label(label)
 {
 }
 
-string Led::getLabel()
+std::string Led::getLabel()
 {
 	return label;
 }
@@ -15,7 +14,7 @@ string Led::getLabel()
 void Led::light(bool b)
 {
 	if (b)
-		notifyObservers(string(label + "-on"));
+		notifyObservers(std::string(label + "-on"));
 	else
-		notifyObservers(string(label + "-off"));
+		notifyObservers(std::string(label + "-off"));
 }

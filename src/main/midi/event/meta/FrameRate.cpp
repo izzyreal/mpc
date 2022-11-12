@@ -7,9 +7,8 @@
 #endif // __linux__
 
 using namespace mpc::midi::event::meta;
-using namespace std;
 
-FrameRate::FrameRate(string name, int ordinal, int v)
+FrameRate::FrameRate(std::string name, int ordinal, int v)
 {
 	this->name = name;
 	this->ordinal = ordinal;
@@ -36,7 +35,7 @@ FrameRate* FrameRate::fromInt(int val)
     return nullptr;
 }
 
-FrameRate* FrameRate::valueOf(string a0)
+FrameRate* FrameRate::valueOf(std::string a0)
 {
 	if (FRAME_RATE_24->name.compare(a0) == 0)
 		return FRAME_RATE_24;
@@ -49,7 +48,7 @@ FrameRate* FrameRate::valueOf(string a0)
 	throw std::invalid_argument("Illegal argument");
 }
 
-vector<FrameRate*> FrameRate::values()
+std::vector<FrameRate*> FrameRate::values()
 {
-	return vector<FrameRate*>{ FRAME_RATE_24, FRAME_RATE_25, FRAME_RATE_30, FRAME_RATE_30_DROP, };
+	return std::vector<FrameRate*>{ FRAME_RATE_24, FRAME_RATE_25, FRAME_RATE_30, FRAME_RATE_30_DROP, };
 }

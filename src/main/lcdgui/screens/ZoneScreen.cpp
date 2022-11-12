@@ -16,12 +16,11 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::controls;
 using namespace moduru::lang;
-using namespace std;
 
 ZoneScreen::ZoneScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "zone", layerIndex)
 {
-	addChild(std::move(make_shared<Wave>()));
+	addChild(std::move(std::make_shared<Wave>()));
 	findWave().lock()->setFine(false);
 }
 
@@ -288,13 +287,13 @@ void ZoneScreen::initZones()
 
 	for (int i = 0; i < numberOfZones - 1; i++)
 	{
-		zones.push_back(vector<int>(2));
+		zones.push_back(std::vector<int>(2));
 		zones[i][0] = (int) floor(zoneStart);
 		zones[i][1] = (int) floor(zoneStart + zoneLength);
 		zoneStart += zoneLength;
 	}
 
-	zones.push_back(vector<int>(2));
+	zones.push_back(std::vector<int>(2));
 	zones[numberOfZones - 1][0] = (int)floor(zoneStart);
 	zones[numberOfZones - 1][1] = sound->getFrameCount();
 	zone = 0;
@@ -371,9 +370,9 @@ void ZoneScreen::setZone(int i)
 	displayZone();
 }
 
-vector<int> ZoneScreen::getZone()
+std::vector<int> ZoneScreen::getZone()
 {
-	return vector<int>{ getZoneStart(zone), getZoneEnd(zone) };
+	return std::vector<int>{ getZoneStart(zone), getZoneEnd(zone) };
 }
 
 void ZoneScreen::pressEnter()

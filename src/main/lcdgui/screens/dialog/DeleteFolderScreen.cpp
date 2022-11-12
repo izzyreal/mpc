@@ -14,7 +14,6 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::dialog2;
-using namespace std;
 
 DeleteFolderScreen::DeleteFolderScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "delete-folder", layerIndex)
@@ -80,7 +79,7 @@ void DeleteFolderScreen::deleteFolder()
 		}
 	}
 
-	this_thread::sleep_for(chrono::milliseconds(400));
+    std::this_thread::sleep_for(std::chrono::milliseconds(400));
 	openScreen("directory");
 }
 
@@ -94,7 +93,7 @@ void DeleteFolderScreen::function(int i)
 		if (deleteFolderThread.joinable())
 			deleteFolderThread.join();
 
-		deleteFolderThread = thread(&DeleteFolderScreen::static_deleteFolder, this);
+		deleteFolderThread = std::thread(&DeleteFolderScreen::static_deleteFolder, this);
 		break;
 	}
 }

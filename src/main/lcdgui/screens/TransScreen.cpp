@@ -5,7 +5,6 @@
 #include <sequencer/Track.hpp>
 
 using namespace mpc::lcdgui::screens;
-using namespace std;
 
 TransScreen::TransScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "trans", layerIndex)
@@ -126,15 +125,15 @@ void TransScreen::displayTransposeAmount()
 
 void TransScreen::displayTr()
 {
-	auto trName = string(tr == -1 ? "ALL" : sequencer->getActiveSequence()->getTrack(tr)->getName());
+	auto trName = std::string(tr == -1 ? "ALL" : sequencer->getActiveSequence()->getTrack(tr)->getName());
 	findField("tr").lock()->setTextPadded(tr + 1, "0");
 	findLabel("track-name").lock()->setText(trName);
 }
 
 void TransScreen::displayBars()
 {
-	findField("bar0").lock()->setTextPadded(to_string(bar0 + 1), "0");
-	findField("bar1").lock()->setTextPadded(to_string(bar1 + 1), "0");
+	findField("bar0").lock()->setTextPadded(std::to_string(bar0 + 1), "0");
+	findField("bar1").lock()->setTextPadded(std::to_string(bar1 + 1), "0");
 }
 
 void TransScreen::play()

@@ -1,7 +1,6 @@
 #include "DeleteAllSequencesScreen.hpp"
 
 using namespace mpc::lcdgui::screens::dialog;
-using namespace std;
 
 DeleteAllSequencesScreen::DeleteAllSequencesScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "delete-all-sequences", layerIndex)

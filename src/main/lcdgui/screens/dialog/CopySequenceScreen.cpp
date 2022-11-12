@@ -4,7 +4,6 @@
 
 using namespace mpc::lcdgui::screens::dialog;
 using namespace moduru::lang;
-using namespace std;
 
 CopySequenceScreen::CopySequenceScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "copy-sequence", layerIndex)
@@ -44,11 +43,11 @@ void CopySequenceScreen::function(int i)
 void CopySequenceScreen::turnWheel(int i)
 {
     init();
-	if (param.find("0") != string::npos)
+	if (param.find("0") != std::string::npos)
 	{
 		setSq0(sq0 + i);
 	}
-	else if (param.find("1") != string::npos)
+	else if (param.find("1") != std::string::npos)
 	{
 		setSq1(sq1 + i);
 	}
@@ -79,11 +78,11 @@ void CopySequenceScreen::setSq1(int i)
 void CopySequenceScreen::displaySq0()
 {
 	auto sq0Name = sequencer->getSequence(sq0)->getName();
-	findField("sq0").lock()->setText(StrUtil::padLeft(to_string(sq0 + 1), "0", 2) + "-" + sq0Name);
+	findField("sq0").lock()->setText(StrUtil::padLeft(std::to_string(sq0 + 1), "0", 2) + "-" + sq0Name);
 }
 
 void CopySequenceScreen::displaySq1()
 {
 	auto sq1Name = sequencer->getSequence(sq1)->getName();
-	findField("sq1").lock()->setText(StrUtil::padLeft(to_string(sq1 + 1), "0", 2) + "-" + sq1Name);
+	findField("sq1").lock()->setText(StrUtil::padLeft(std::to_string(sq1 + 1), "0", 2) + "-" + sq1Name);
 }

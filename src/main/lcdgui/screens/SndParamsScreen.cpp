@@ -9,7 +9,6 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace moduru::lang;
-using namespace std;
 
 SndParamsScreen::SndParamsScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "params", layerIndex)
@@ -146,7 +145,7 @@ void SndParamsScreen::displayLevel()
 	auto sound = sampler->getSound().lock();
 
 	if (sound)
-		findField("level").lock()->setText(to_string(sound->getSndLevel()));
+		findField("level").lock()->setText(std::to_string(sound->getSndLevel()));
 	else
 		findField("level").lock()->setText("100");
 }
@@ -156,7 +155,7 @@ void SndParamsScreen::displayTune()
 	auto sound = sampler->getSound().lock();
 
 	if (sound)
-		findField("tune").lock()->setText(to_string(sound->getTune()));
+		findField("tune").lock()->setText(std::to_string(sound->getTune()));
 	else
 		findField("tune").lock()->setText("0");
 }
@@ -166,7 +165,7 @@ void SndParamsScreen::displayBeat()
 	auto sound = sampler->getSound().lock();
 
 	if (sound)
-		findField("beat").lock()->setText(to_string(sound->getBeatCount()));
+		findField("beat").lock()->setText(std::to_string(sound->getBeatCount()));
 	else
 		findField("beat").lock()->setText("4");
 }
@@ -186,7 +185,7 @@ void SndParamsScreen::displaySampleAndNewTempo()
 	auto lengthMs = (float)(length / (sound->getSampleRate() * 0.001));
 	
 	auto bpm = (int)(600000.0 / (lengthMs / sound->getBeatCount()));
-	auto bpmString = to_string(bpm);
+	auto bpmString = std::to_string(bpm);
 	auto part1 = bpmString.substr(0, bpmString.length() - 1);
 	auto part2 = bpmString.substr(bpmString.length() - 1);
 
@@ -204,7 +203,7 @@ void SndParamsScreen::displaySampleAndNewTempo()
 	findLabel("sample-tempo").lock()->setText("Sample tempo=" + bpmString);
 
 	auto newBpm = (int)(pow(2.0, (sound->getTune() / 120.0)) * bpm);
-	bpmString = to_string(newBpm);
+	bpmString = std::to_string(newBpm);
 	part1 = bpmString.substr(0, bpmString.length() - 1);
 	part2 = bpmString.substr(bpmString.length() - 1);
 	

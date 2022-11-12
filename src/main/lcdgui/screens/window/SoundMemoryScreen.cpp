@@ -6,7 +6,6 @@
 
 using namespace mpc::lcdgui::screens::window;
 using namespace moduru::lang;
-using namespace std;
 
 SoundMemoryScreen::SoundMemoryScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "sound-memory", layerIndex)

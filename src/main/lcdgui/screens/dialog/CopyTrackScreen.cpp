@@ -6,7 +6,6 @@
 
 using namespace mpc::lcdgui::screens::dialog;
 using namespace moduru::lang;
-using namespace std;
 
 CopyTrackScreen::CopyTrackScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "copy-track", layerIndex)
@@ -42,9 +41,9 @@ void CopyTrackScreen::turnWheel(int i)
 {
 	init();
 
-	if (param.find("0") != string::npos)
+	if (param.find("0") != std::string::npos)
 		setTr0(tr0 + i);
-	else if (param.find("1") != string::npos)
+	else if (param.find("1") != std::string::npos)
 		setTr1(tr1 + i);
 }
 
@@ -72,12 +71,12 @@ void CopyTrackScreen::displayTr0()
 {
 	auto seq = sequencer->getActiveSequence();
 	auto tr0Name = seq->getTrack(tr0)->getName();
-	findField("tr0").lock()->setText(StrUtil::padLeft(to_string(tr0 + 1), "0", 2) + "-" + tr0Name);
+	findField("tr0").lock()->setText(StrUtil::padLeft(std::to_string(tr0 + 1), "0", 2) + "-" + tr0Name);
 }
 
 void CopyTrackScreen::displayTr1()
 {
 	auto seq = sequencer->getActiveSequence();
 	auto tr1Name = seq->getTrack(tr1)->getName();
-	findField("tr1").lock()->setText(StrUtil::padLeft(to_string(tr1 + 1), "0", 2) + "-" + tr1Name);
+	findField("tr1").lock()->setText(StrUtil::padLeft(std::to_string(tr1 + 1), "0", 2) + "-" + tr1Name);
 }

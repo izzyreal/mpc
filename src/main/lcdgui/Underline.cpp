@@ -1,17 +1,15 @@
 #include <lcdgui/Underline.hpp>
 
 using namespace mpc::lcdgui;
-using namespace std;
 
-Underline::Underline()
-	: Component("underline")
+Underline::Underline() : Component("underline")
 {
-	states = vector<bool>(16);
-	setSize(95, 1);
+	states = std::vector<bool>(16);
+	Component::setSize(95, 1);
 	setLocation(106, 27);
 }
 
-void Underline::Draw(vector<vector<bool>>* pixels)
+void Underline::Draw(std::vector<std::vector<bool>>* pixels)
 {
 	if (shouldNotDraw(pixels))
 	{

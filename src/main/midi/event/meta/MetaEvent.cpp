@@ -19,7 +19,6 @@
 #include <midi/util/VariableLengthInt.hpp>
 
 using namespace mpc::midi::event::meta;
-using namespace std;
 
 MetaEvent::MetaEvent(int tick, int delta, int type)
 	: mpc::midi::event::MidiEvent(tick, delta)
@@ -27,12 +26,12 @@ MetaEvent::MetaEvent(int tick, int delta, int type)
 	mType = type & 255;
 }
 
-void MetaEvent::writeToOutputStream(ostream& out, bool writeType)
+void MetaEvent::writeToOutputStream(std::ostream& out, bool writeType)
 {
 	writeToOutputStream(out);
 }
 
-void MetaEvent::writeToOutputStream(ostream& out)
+void MetaEvent::writeToOutputStream(std::ostream& out)
 {
 	MidiEvent::writeToOutputStream(out, true);
 	out << (char) 0xFF;
@@ -40,7 +39,7 @@ void MetaEvent::writeToOutputStream(ostream& out)
 }
 
 
-shared_ptr<MetaEvent> MetaEvent::parseMetaEvent(int tick, int delta, stringstream& in)
+std::shared_ptr<MetaEvent> MetaEvent::parseMetaEvent(int tick, int delta, std::stringstream& in)
 {
 	auto eventData = MetaEventData(in);
 	auto isText = false;
@@ -67,30 +66,30 @@ shared_ptr<MetaEvent> MetaEvent::parseMetaEvent(int tick, int delta, stringstrea
 	}
 
 	if (isText) {
-		string text = "";
+        std::string text;
 		for (char c : eventData.data) {
 			text.push_back(c);
 		}
 		switch (eventData.type) {
 		case TEXT_EVENT:
-			return make_shared<Text>(tick, delta, text);
+			return std::make_shared<Text>(tick, delta, text);
 		case COPYRIGHT_NOTICE:
-			return make_shared<CopyrightNotice>(tick, delta, text);
+			return std::make_shared<CopyrightNotice>(tick, delta, text);
 		case TRACK_NAME:
-			return make_shared<TrackName>(tick, delta, text);
+			return std::make_shared<TrackName>(tick, delta, text);
 		case INSTRUMENT_NAME:
-			return make_shared<InstrumentName>(tick, delta, text);
+			return std::make_shared<InstrumentName>(tick, delta, text);
 		case LYRICS:
 			//return new Lyrics(tick, delta, text);
 			return nullptr;
 		case MARKER:
-			return make_shared<Marker>(tick, delta, text);
+			return std::make_shared<Marker>(tick, delta, text);
 		case CUE_POINT:
-			return make_shared<CuePoint>(tick, delta, text);
+			return std::make_shared<CuePoint>(tick, delta, text);
 		case SEQUENCER_SPECIFIC:
-			return make_shared<SequencerSpecificEvent>(tick, delta, eventData.data);
+			return std::make_shared<SequencerSpecificEvent>(tick, delta, eventData.data);
 		default:
-			return make_shared<GenericMetaEvent>(tick, delta, &eventData);
+			return std::make_shared<GenericMetaEvent>(tick, delta, &eventData);
 		}
 
 	}
@@ -101,7 +100,7 @@ shared_ptr<MetaEvent> MetaEvent::parseMetaEvent(int tick, int delta, stringstrea
 	case MIDI_CHANNEL_PREFIX:
 		return MidiChannelPrefix::parseMidiChannelPrefix(tick, delta, &eventData);
 	case END_OF_TRACK:
-		return make_shared<EndOfTrack>(tick, delta);
+		return std::make_shared<EndOfTrack>(tick, delta);
 	case TEMPO:
 		return Tempo::parseTempo(tick, delta, &eventData);
 	case SMPTE_OFFSET:
@@ -112,7 +111,7 @@ shared_ptr<MetaEvent> MetaEvent::parseMetaEvent(int tick, int delta, stringstrea
 		return KeySignature::parseKeySignature(tick, delta, &eventData);
 	}
 
-	string error = "Completely broken in MetaEvent.parseMetaEvent()";
+    std::string error = "Completely broken in MetaEvent.parseMetaEvent()";
 	return nullptr;
 }
 

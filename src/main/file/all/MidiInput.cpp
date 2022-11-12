@@ -8,9 +8,8 @@
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::file::all;
-using namespace std;
 
-MidiInput::MidiInput(const vector<char>& b)
+MidiInput::MidiInput(const std::vector<char>& b)
 {
 	receiveCh = b[RECEIVE_CH_OFFSET];
 	sustainPedalToDuration = b[SUSTAIN_PEDAL_TO_DURATION_OFFSET] > 0;
@@ -33,7 +32,7 @@ MidiInput::MidiInput(const vector<char>& b)
 
 MidiInput::MidiInput(mpc::Mpc& mpc)
 {
-	saveBytes = vector<char>(LENGTH);
+	saveBytes = std::vector<char>(LENGTH);
 	
 	for (int i = 0; i < LENGTH; i++)
 	{
@@ -63,7 +62,7 @@ MidiInput::MidiInput(mpc::Mpc& mpc)
 	saveBytes[EXCLUSIVE_PASS_ENABLED_OFFSET] = static_cast<int8_t>(exclusivePassEnabled ? 1 : 0);
 }
 
-vector<char> MidiInput::TEMPLATE = vector<char>{ 127, 64, 1, 0, 1, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 1, 0, 0, 0, 0, 0 };
+std::vector<char> MidiInput::TEMPLATE = std::vector<char>{ 127, 64, 1, 0, 1, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 1, 0, 0, 0, 0, 0 };
 
 int MidiInput::getReceiveCh()
 {
@@ -90,7 +89,7 @@ bool MidiInput::isMultiRecEnabled()
     return multiRecEnabled;
 }
 
-vector<int> MidiInput::getMultiRecTrackDests()
+std::vector<int> MidiInput::getMultiRecTrackDests()
 {
     return multiRecTrackDests;
 }
@@ -125,7 +124,7 @@ bool MidiInput::isExclusivePassEnabled()
     return exclusivePassEnabled;
 }
 
-vector<char>& MidiInput::getBytes()
+std::vector<char>& MidiInput::getBytes()
 {
     return saveBytes;
 }

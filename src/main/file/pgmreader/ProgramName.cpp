@@ -7,7 +7,6 @@
 
 using namespace moduru;
 using namespace mpc::file::pgmreader;
-using namespace std;
 
 ProgramName::ProgramName(ProgramFileReader* programFile) 
 {
@@ -32,16 +31,16 @@ int ProgramName::getProgramNameEnd()
     return programNameEnd;
 }
 
-vector<char> ProgramName::getProgramNameArray()
+std::vector<char> ProgramName::getProgramNameArray()
 {
     auto pgmFileArray = programFile->readProgramFileArray();
     programNameArray = VecUtil::CopyOfRange(pgmFileArray, getProgramNameStart(), getProgramNameEnd());
     return programNameArray;
 }
 
-string ProgramName::getProgramNameASCII()
+std::string ProgramName::getProgramNameASCII()
 {
-	string programNameASCII = "";
+	std::string programNameASCII;
 	auto bytes = getProgramNameArray();
 	for (char c : bytes) {
 		if (c == 0x00) break;
@@ -50,13 +49,4 @@ string ProgramName::getProgramNameASCII()
 	if (programNameASCII.length() > 16)
 		programNameASCII = programNameASCII.substr(0, 16);
 	return programNameASCII;
-}
-
-void ProgramName::setProgramNameASCII(string programName)
-{
-	int j = 0;
-	for (int i = getProgramNameStart(); i < getProgramNameEnd(); i++) {
-		programFile->readProgramFileArray()[i] = programName[j];
-		j++;
-	}
 }

@@ -3,18 +3,18 @@
 #include <midi/event/meta/MetaEvent.hpp>
 
 using namespace mpc::midi::event::meta;
-using namespace std;
 
-InstrumentName::InstrumentName(int tick, int delta, string name) : TextualMetaEvent(tick, delta, MetaEvent::INSTRUMENT_NAME, name)
+InstrumentName::InstrumentName(int tick, int delta, std::string name)
+: TextualMetaEvent(tick, delta, MetaEvent::INSTRUMENT_NAME, name)
 {
 }
 
-void InstrumentName::setName(string name)
+void InstrumentName::setName(std::string name)
 {
     setText(name);
 }
 
-string InstrumentName::getName()
+std::string InstrumentName::getName()
 {
     return getText();
 }

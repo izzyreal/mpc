@@ -48,7 +48,6 @@ using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::disk;
 using namespace mpc::file::all;
 using namespace mpc::sequencer;
-using namespace std;
 
 void AllLoader::loadEverythingFromFile(mpc::Mpc& mpc, mpc::disk::MpcFile* f)
 {
@@ -207,9 +206,9 @@ void AllLoader::loadEverythingFromAllParser(mpc::Mpc& mpc, AllParser& allParser)
     }
 }
 
-vector<shared_ptr<Sequence>> AllLoader::loadOnlySequencesFromFile(mpc::Mpc& mpc, mpc::disk::MpcFile* f)
+std::vector<std::shared_ptr<Sequence>> AllLoader::loadOnlySequencesFromFile(mpc::Mpc& mpc, mpc::disk::MpcFile* f)
 {
-    vector<shared_ptr<Sequence>> mpcSequences;
+    std::vector<std::shared_ptr<Sequence>> mpcSequences;
 
     AllParser allParser(mpc, f);
     
@@ -220,13 +219,13 @@ vector<shared_ptr<Sequence>> AllLoader::loadOnlySequencesFromFile(mpc::Mpc& mpc,
 
     for (int i = 0; i < 99; i++)
     {
-        if (allSeqNames[i].find("(Unused)") != string::npos)
+        if (allSeqNames[i].find("(Unused)") != std::string::npos)
         {
             mpcSequences.push_back({});
             continue;
         }
         
-        auto mpcSeq = make_shared<Sequence>(mpc);
+        auto mpcSeq = std::make_shared<Sequence>(mpc);
         
         allSequences[counter++]->applyToMpcSeq(mpcSeq);
         

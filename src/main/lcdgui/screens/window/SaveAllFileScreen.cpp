@@ -8,7 +8,6 @@
 
 using namespace mpc::lcdgui::screens::window;
 using namespace moduru::lang;
-using namespace std;
 
 SaveAllFileScreen::SaveAllFileScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "save-all-file", layerIndex)
@@ -42,7 +41,7 @@ void SaveAllFileScreen::turnWheel(int i)
         const auto nameScreen = mpc.screens->get<NameScreen>("name");
         const auto saveAllFileScreen = this;
         
-        auto renamer = [saveAllFileScreen](string& newName) {
+        auto renamer = [saveAllFileScreen](std::string& newName) {
             saveAllFileScreen->fileName = newName;
         };
 

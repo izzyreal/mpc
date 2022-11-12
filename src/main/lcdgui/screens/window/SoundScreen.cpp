@@ -4,7 +4,6 @@
 
 using namespace mpc::lcdgui::screens::window;
 using namespace moduru::lang;
-using namespace std;
 
 SoundScreen::SoundScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "sound", layerIndex)
@@ -23,12 +22,12 @@ void SoundScreen::turnWheel(int i)
 {
 	init();
 	
-	if (param.compare("soundname") == 0)
+	if (param == "soundname")
 	{
 		auto nameScreen = mpc.screens->get<NameScreen>("name");
 		nameScreen->setName(findField("soundname").lock()->getText());
 
-        auto renamer = [&](string& newName) {
+        auto renamer = [&](std::string& newName) {
             if (sampler->isSoundNameOccupied(newName))
                 return;
 
@@ -81,7 +80,7 @@ void SoundScreen::displayType()
 		return;
 	}
 
-	findLabel("type").lock()->setText("Type:" + string(sound->isMono() ? "MONO" : "STEREO"));
+	findLabel("type").lock()->setText("Type:" + std::string(sound->isMono() ? "MONO" : "STEREO"));
 }
 
 void SoundScreen::displayRate()
@@ -94,7 +93,7 @@ void SoundScreen::displayRate()
 		return;
 	}
 
-	findLabel("rate").lock()->setText("Rate: " + to_string(sound->getSampleRate()) + "Hz");
+	findLabel("rate").lock()->setText("Rate: " + std::to_string(sound->getSampleRate()) + "Hz");
 }
 
 void SoundScreen::displaySize()
@@ -107,5 +106,5 @@ void SoundScreen::displaySize()
 		return;
 	}
 
-	findLabel("size").lock()->setText("Size:" + StrUtil::padLeft(to_string(sound->getSampleData()->size() / 500), " ", 4) + "kbytes");
+	findLabel("size").lock()->setText("Size:" + StrUtil::padLeft(std::to_string(sound->getSampleData()->size() / 500), " ", 4) + "kbytes");
 }

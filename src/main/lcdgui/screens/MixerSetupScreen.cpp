@@ -5,7 +5,6 @@
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui;
 using namespace moduru::lang;
-using namespace std;
 
 MixerSetupScreen::MixerSetupScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "mixer-setup", layerIndex)
@@ -37,7 +36,7 @@ void MixerSetupScreen::displayMasterLevel() {
 }
 
 void MixerSetupScreen::displayFxDrum() {
-	findField("fxdrum").lock()->setText(to_string(getFxDrum() + 1));
+	findField("fxdrum").lock()->setText(std::to_string(getFxDrum() + 1));
 }
 
 void MixerSetupScreen::displayStereoMixSource() {
@@ -167,7 +166,7 @@ void MixerSetupScreen::setRecordMixChangesEnabled(bool b)
 	displayRecordMixChanges();
 }
 
-string MixerSetupScreen::getMasterLevelString()
+std::string MixerSetupScreen::getMasterLevelString()
 {
 	return masterLevelNames[masterLevel + 13];
 }

@@ -26,7 +26,6 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::controls;
-using namespace std;
 
 GlobalReleaseControls::GlobalReleaseControls(mpc::Mpc& mpc)
 	: BaseControls(mpc)
@@ -182,7 +181,7 @@ void GlobalReleaseControls::generateNoteOff(int note)
         lTrk->recordNoteOffNow(note);
 	}
 
-    auto noteEvent = make_shared<mpc::sequencer::NoteEvent>(note);
+    auto noteEvent = std::make_shared<mpc::sequencer::NoteEvent>(note);
     noteEvent->setVelocity(0);
     noteEvent->setDuration(0);
     noteEvent->setTick(-1);

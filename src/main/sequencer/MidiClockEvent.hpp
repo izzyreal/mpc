@@ -20,7 +20,7 @@ namespace mpc::sequencer
 
 		void CopyValuesTo(std::weak_ptr<Event> dest) override;
 
-		MidiClockEvent(int status);
+		MidiClockEvent(int statusToUse);
 		std::string getTypeName() override { return "midi-clock"; }
 
 	};

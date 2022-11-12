@@ -7,7 +7,6 @@
 
 using namespace moduru;
 using namespace mpc::file::pgmreader;
-using namespace std;
 
 SoundNames::SoundNames(ProgramFileReader* programFile) 
 {
@@ -20,7 +19,7 @@ int SoundNames::getSampleNamesSize()
 	return sampleNamesSize;
 }
 
-vector<char> SoundNames::getSampleNamesArray()
+std::vector<char> SoundNames::getSampleNamesArray()
 {
 	auto sampleNamesSize = getSampleNamesSize();
     auto pgmFileArray = programFile->readProgramFileArray();
@@ -28,9 +27,9 @@ vector<char> SoundNames::getSampleNamesArray()
 	return sampleNamesArray;
 }
 
-string SoundNames::getSampleName(int sampleNumber)
+std::string SoundNames::getSampleName(int sampleNumber)
 {
-	string sampleNameString = "";
+	std::string sampleNameString;
 	auto h = programFile->getHeader();
 	if (sampleNumber < h->getNumberOfSamples()) {
 		sampleNamesArray = getSampleNamesArray();

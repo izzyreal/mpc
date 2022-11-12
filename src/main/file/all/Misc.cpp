@@ -11,9 +11,8 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui;
 using namespace mpc::file::all;
-using namespace std;
 
-Misc::Misc(const vector<char>& b)
+Misc::Misc(const std::vector<char>& b)
 {
 	tapAvg = b[TAP_AVG_OFFSET];
 	inReceiveMMCEnabled = b[MIDI_SYNC_IN_RECEIVE_MMC_OFFSET] > 0;
@@ -22,7 +21,7 @@ Misc::Misc(const vector<char>& b)
     {
         auto ctrl = b[MIDI_SWITCH_OFFSET + (i * 2)];
         auto func = b[MIDI_SWITCH_OFFSET + (i * 2) + 1];
-        switches[i] = pair(ctrl, func);
+        switches[i] = std::pair(ctrl, func);
     }
     
 	autoStepInc = b[AUTO_STEP_INCREMENT_OFFSET] > 0;
@@ -35,7 +34,7 @@ Misc::Misc(mpc::Mpc& mpc)
 {
 	auto stepEditOptionsScreen = mpc.screens->get<StepEditOptionsScreen>("step-edit-options");
 	auto othersScreen = mpc.screens->get<OthersScreen>("others");
-	saveBytes = vector<char>(LENGTH);
+	saveBytes = std::vector<char>(LENGTH);
 	saveBytes[TAP_AVG_OFFSET] = (char)(othersScreen->getTapAveraging());
 
 	auto syncScreen = mpc.screens->get<SyncScreen>("sync");
@@ -88,12 +87,12 @@ bool Misc::isPgmChToSeqEnabled()
     return pgmChToSeqEnabled;
 }
 
-vector<pair<int, int>> Misc::getSwitches()
+std::vector<std::pair<int, int>> Misc::getSwitches()
 {
     return switches;
 }
 
-vector<char>& Misc::getBytes()
+std::vector<char>& Misc::getBytes()
 {
     return saveBytes;
 }

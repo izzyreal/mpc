@@ -11,8 +11,6 @@ using namespace mpc::lcdgui::screens::window;
 
 using namespace moduru::lang;
 
-using namespace std;
-
 SaveApsFileScreen::SaveApsFileScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "save-aps-file", layerIndex)
 {
@@ -32,12 +30,11 @@ void SaveApsFileScreen::turnWheel(int i)
 	auto nameScreen = mpc.screens->get<NameScreen>("name");
 	auto saveAProgramScreen = mpc.screens->get<SaveAProgramScreen>("save-a-program");
 
-	if (param.compare("file") == 0)
+	if (param == "file")
 	{
-        const auto nameScreen = mpc.screens->get<NameScreen>("name");
         const auto saveApsFileScreen = this;
         
-        auto renamer = [saveApsFileScreen](string& newName) {
+        auto renamer = [saveApsFileScreen](std::string& newName) {
             saveApsFileScreen->fileName = newName;
         };
 
@@ -45,12 +42,12 @@ void SaveApsFileScreen::turnWheel(int i)
         nameScreen->setRenamerAndScreenToReturnTo(renamer, "save-aps-file");
         openScreen("name");
 	}
-	else if (param.compare("save") == 0)
+	else if (param == "save")
 	{
 		saveAProgramScreen->setSave(saveAProgramScreen->save + i);
 		displaySave();
 	}
-	else if (param.compare("replace-same-sounds") == 0)
+	else if (param == "replace-same-sounds")
 	{
 		saveAProgramScreen->replaceSameSounds = i > 0;
 		displayReplaceSameSounds();
@@ -69,7 +66,7 @@ void SaveApsFileScreen::function(int i)
 	case 4:
 	{
 		auto nameScreen = mpc.screens->get<NameScreen>("name");
-		string apsFileName = fileName + ".APS";
+        std::string apsFileName = fileName + ".APS";
         
         auto disk = mpc.getDisk().lock();
 
@@ -100,5 +97,5 @@ void SaveApsFileScreen::displaySave()
 void SaveApsFileScreen::displayReplaceSameSounds()
 {
 	auto saveAProgramScreen = mpc.screens->get<SaveAProgramScreen>("save-a-program");
-	findField("replace-same-sounds").lock()->setText(string(saveAProgramScreen->replaceSameSounds ? "YES" : "NO"));
+	findField("replace-same-sounds").lock()->setText(std::string(saveAProgramScreen->replaceSameSounds ? "YES" : "NO"));
 }

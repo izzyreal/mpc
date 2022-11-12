@@ -12,7 +12,6 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens;
-using namespace std;
 
 LoadASoundScreen::LoadASoundScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "load-a-sound", layerIndex)
@@ -163,13 +162,13 @@ void LoadASoundScreen::displayAssignToNote()
 	init();
 	auto padIndex = program.lock()->getPadIndexFromNote(assignToNote);
 	auto padName = sampler->getPadName(padIndex);
-	auto noteName = string(assignToNote == 34 ? "--" : to_string(assignToNote));
+	auto noteName = std::string(assignToNote == 34 ? "--" : std::to_string(assignToNote));
 	findField("assign-to-note").lock()->setText(noteName + "/" + padName);
 }
 
 void LoadASoundScreen::update(moduru::observer::Observable* observable, nonstd::any message)
 {
-	auto msg = nonstd::any_cast<string>(message);
+	auto msg = nonstd::any_cast<std::string>(message);
 	if (msg == "note")
 	{
         assignToNote = mpc.getNote();

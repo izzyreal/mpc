@@ -6,9 +6,8 @@
 #include <VecUtil.hpp>
 
 using namespace mpc::file::all;
-using namespace std;
 
-BarList::BarList(const vector<char>& loadBytes)
+BarList::BarList(const std::vector<char>& loadBytes)
 {
 	Bar* previousBar = nullptr;
 	
@@ -36,7 +35,7 @@ BarList::~BarList()
 
 BarList::BarList(mpc::sequencer::Sequence* seq)
 {
-	saveBytes = vector<char>(3996);
+	saveBytes = std::vector<char>(3996);
 	auto& barLengths = seq->getBarLengthsInTicks();
 	auto ticksPerBeat = 0;
 	auto lastTick = 0;
@@ -60,12 +59,12 @@ BarList::BarList(mpc::sequencer::Sequence* seq)
 
 }
 
-vector<Bar*> BarList::getBars()
+std::vector<Bar*> BarList::getBars()
 {
     return bars;
 }
 
-vector<char>& BarList::getBytes()
+std::vector<char>& BarList::getBytes()
 {
     return saveBytes;
 }

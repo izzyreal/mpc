@@ -13,7 +13,6 @@
 #include <lang/StrUtil.hpp>
 #include <lcdgui/screens/UserScreen.hpp>
 
-using namespace std;
 using namespace mpc;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -22,15 +21,15 @@ using namespace mpc::sequencer;
 using namespace mpc::sampler;
 using namespace moduru::lang;
 
-string Util::replaceDotWithSmallSpaceDot(const string& s) {
+std::string Util::replaceDotWithSmallSpaceDot(const std::string& s) {
     const auto dotindex = static_cast<int>(s.find('.'));
     const auto part1 = s.substr(0, dotindex);
     const auto part2 = s.substr(dotindex + 1);
-    const string tempoDot = u8"\u00CB";
+    const std::string tempoDot = u8"\u00CB";
     return part1 + tempoDot + part2;
 }
 
-vector<int> Util::getPadAndVelo(const int x, const int y)
+std::vector<int> Util::getPadAndVelo(const int x, const int y)
 {
     int velocity;
     int padSize = 93;
@@ -64,25 +63,25 @@ vector<int> Util::getPadAndVelo(const int x, const int y)
     }
     
     if (xPos == -1 || yPos == -1)
-        return vector<int>{ -1, -1 };
+        return std::vector<int>{ -1, -1 };
     
     int padNumber = -1;
-    vector<int> column0 = { 12, 8, 4, 0 };
-    vector<int> column1 = { 13, 9, 5, 1 };
-    vector<int> column2 = { 14, 10, 6, 2 };
-    vector<int> column3 = { 15, 11, 7, 3 };
-    auto columns = vector<vector<int>>(4);
+    std::vector<int> column0 = { 12, 8, 4, 0 };
+    std::vector<int> column1 = { 13, 9, 5, 1 };
+    std::vector<int> column2 = { 14, 10, 6, 2 };
+    std::vector<int> column3 = { 15, 11, 7, 3 };
+    auto columns = std::vector<std::vector<int>>(4);
     columns[0] = column0;
     columns[1] = column1;
     columns[2] = column2;
     columns[3] = column3;
     padNumber = columns[xPos][yPos];
-    return vector<int>{ (int)padNumber, (int)velocity };
+    return std::vector<int>{ (int)padNumber, (int)velocity };
 }
 
-string Util::getFileName(const string& s)
+std::string Util::getFileName(const std::string& s)
 {
-    string copy = s;
+    std::string copy = s;
     copy = StrUtil::trim(copy);
     for (auto c : copy)
     {
@@ -93,28 +92,28 @@ string Util::getFileName(const string& s)
     return copy;
 }
 
-vector<string> Util::splitName(const string& s)
+std::vector<std::string> Util::splitName(const std::string& s)
 {
-    if (s.find('.') == string::npos)
+    if (s.find('.') == std::string::npos)
     {
-        vector<string> res(2);
+        std::vector<std::string> res(2);
         res[0] = s;
         res[1] = "";
         return res;
     }
     
     size_t i = s.find_last_of('.');
-    vector<string> res(2);
+    std::vector<std::string> res(2);
     res[0] = s.substr(0, i);
     res[1] = s.substr(i + 1);
     return res;
 }
 
-string Util::distributeTimeSig(const string& s)
+std::string Util::distributeTimeSig(const std::string& s)
 {
     const auto pos = s.find("/");
     
-    if (pos == string::npos)
+    if (pos == std::string::npos)
         return s;
     
     auto s0 = s.substr(0, pos);
@@ -129,26 +128,26 @@ string Util::distributeTimeSig(const string& s)
     return s0 + "/" + s1;
 }
 
-void Util::drawLine(vector<vector<bool>>& pixels,
-                    const vector<vector<int>>& line,
+void Util::drawLine(std::vector<std::vector<bool>>& pixels,
+                    const std::vector<std::vector<int>>& line,
                     const bool color)
 {
     for (auto& l : line)
         pixels[l[0]][l[1]] = color;
 }
 
-void Util::drawLine(vector<vector<bool>>& pixels,
-                    const vector<vector<int>>& line,
+void Util::drawLine(std::vector<std::vector<bool>>& pixels,
+                    const std::vector<std::vector<int>>& line,
                     const bool color,
-                    const vector<int>& offsetxy)
+                    const std::vector<int>& offsetxy)
 {
     for (auto& l : line)
         pixels[l[0] + offsetxy[0]][l[1] + offsetxy[1]] = color;
 }
 
-void Util::drawLines(vector<vector<bool>>& pixels,
-                     const vector<vector<vector<int>>>& lines,
-                     const vector<bool>& colors)
+void Util::drawLines(std::vector<std::vector<bool>>& pixels,
+                     const std::vector<std::vector<std::vector<int>>>& lines,
+                     const std::vector<bool>& colors)
 {
     int colorCounter = 0;
     
@@ -156,23 +155,23 @@ void Util::drawLines(vector<vector<bool>>& pixels,
         drawLine(pixels, l, colors[colorCounter++]);
 }
 
-void Util::drawLines(vector<vector<bool>>& pixels,
-                     const vector<vector<vector<int>>>& lines,
-                     const vector<bool>& colors,
-                     const vector<int>& offsetxy)
+void Util::drawLines(std::vector<std::vector<bool>>& pixels,
+                     const std::vector<std::vector<std::vector<int>>>& lines,
+                     const std::vector<bool>& colors,
+                     const std::vector<int>& offsetxy)
 {
     int colorCounter = 0;
     for (auto& l : lines)
         drawLine(pixels, l, colors[colorCounter++], offsetxy);
 }
 
-vector<string>& Util::noteNames()
+std::vector<std::string>& Util::noteNames()
 {
-    static vector<string> noteNames;
+    static std::vector<std::string> noteNames;
     
     if (noteNames.empty())
     {
-        noteNames = vector<string>(128);
+        noteNames = std::vector<std::string>(128);
         
         int octave = -2;
         int noteCounter = 0;
@@ -181,7 +180,7 @@ vector<string>& Util::noteNames()
         
         for (int j = 0; j < 128; j++)
         {
-            string octaveString = to_string(octave);
+            std::string octaveString = std::to_string(octave);
             
             if (octave == -2)
                 octaveString = u8"\u00D2";
@@ -203,11 +202,11 @@ vector<string>& Util::noteNames()
     return noteNames;
 }
 
-string Util::tempoString(const double tempo)
+std::string Util::tempoString(const double tempo)
 {
-    string result = to_string(tempo);
+    std::string result = std::to_string(tempo);
     
-    if (result.find(".") == string::npos)
+    if (result.find(".") == std::string::npos)
         result += ".0";
     else
         result = result.substr(0, result.find(".") + 2);
@@ -215,7 +214,7 @@ string Util::tempoString(const double tempo)
     return replaceDotWithSmallSpaceDot(result);
 }
 
-int Util::getTextWidthInPixels(const string& text)
+int Util::getTextWidthInPixels(const std::string& text)
 {
     const char* p = text.c_str();
     
@@ -226,11 +225,11 @@ int Util::getTextWidthInPixels(const string& text)
     
     int halfSpaceCount = 0;
     
-    const string halfSpace = u8"\u00CE";
+    const std::string halfSpace = u8"\u00CE";
     
     int nPos = text.find(halfSpace, 0);
     
-    while (nPos != string::npos)
+    while (nPos != std::string::npos)
     {
         halfSpaceCount++;
         nPos = text.find(halfSpace, nPos + halfSpace.size());
@@ -254,13 +253,13 @@ void Util::initSequence(int sequenceIndex, mpc::Mpc& mpc)
     
     auto userScreen = mpc.screens->get<UserScreen>("user");
     sequence->init(userScreen->lastBar);
-    auto numberString = StrUtil::padLeft(to_string(sequenceIndex + 1), "0", 2);
+    auto numberString = StrUtil::padLeft(std::to_string(sequenceIndex + 1), "0", 2);
     std::string name = StrUtil::trim(sequencer->getDefaultSequenceName()) + numberString;
     sequence->setName(name);
     sequencer->setActiveSequenceIndex(sequencer->getActiveSequenceIndex());
 }
 
-void Util::set16LevelsValues(mpc::Mpc& mpc, const shared_ptr<NoteEvent>& event, const int padIndex)
+void Util::set16LevelsValues(mpc::Mpc& mpc, const std::shared_ptr<NoteEvent>& event, const int padIndex)
 {
     if (mpc.getHardware().lock()->getTopPanel().lock()->isSixteenLevelsEnabled())
     {
@@ -301,7 +300,7 @@ void Util::set16LevelsValues(mpc::Mpc& mpc, const shared_ptr<NoteEvent>& event, 
     }
 }
 
-void Util::setSliderNoteVariationParameters(mpc::Mpc& mpc, const weak_ptr<NoteEvent>& _n, const weak_ptr<mpc::sampler::Program>& program)
+void Util::setSliderNoteVariationParameters(mpc::Mpc& mpc, const std::weak_ptr<NoteEvent>& _n, const std::weak_ptr<mpc::sampler::Program>& program)
 {
     auto pgm = program.lock();
     auto n = _n.lock();

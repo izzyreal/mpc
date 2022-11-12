@@ -10,7 +10,6 @@
 using namespace mpc::lcdgui::screens;
 using namespace mpc::controls;
 using namespace moduru::lang;
-using namespace std;
 
 PgmAssignScreen::PgmAssignScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "program-assign", layerIndex)
@@ -231,7 +230,7 @@ void PgmAssignScreen::openWindow()
 
 void PgmAssignScreen::displayPgm()
 {
-	findField("pgm").lock()->setText(StrUtil::padLeft(to_string(mpcSoundPlayerChannel->getProgram() + 1), " ", 2) + "-" + program.lock()->getName());
+	findField("pgm").lock()->setText(StrUtil::padLeft(std::to_string(mpcSoundPlayerChannel->getProgram() + 1), " ", 2) + "-" + program.lock()->getName());
 }
 
 void PgmAssignScreen::displaySoundName()
@@ -245,7 +244,7 @@ void PgmAssignScreen::displaySoundName()
 	}
 	else
 	{
-		string name = sampler->getSoundName(sndNumber);
+		auto name = sampler->getSoundName(sndNumber);
 		findField("snd").lock()->setText(name);
 	}
 
@@ -272,7 +271,7 @@ void PgmAssignScreen::displayPadNote()
 	if (sampler->getLastPad(lProgram.get())->getNote() == 34)
 		findField("pad-note").lock()->setText("--");
 	else
-		findField("pad-note").lock()->setText(to_string(sampler->getLastPad(lProgram.get())->getNote()));
+		findField("pad-note").lock()->setText(std::to_string(sampler->getLastPad(lProgram.get())->getNote()));
 }
 
 void PgmAssignScreen::displaySoundGenerationMode()
@@ -352,7 +351,7 @@ void PgmAssignScreen::displayOptionalNoteA()
 	auto lProgram = program.lock();
 	auto noteIntA = sampler->getLastNp(lProgram.get())->getOptionalNoteA();
 	auto padIntA = lProgram->getPadIndexFromNote(noteIntA);
-	auto noteA = noteIntA != 34 ? to_string(noteIntA) : "--";
+	auto noteA = noteIntA != 34 ? std::to_string(noteIntA) : "--";
 	auto padA = sampler->getPadName(padIntA);
 	findField("optional-note-a").lock()->setText(noteA + "/" + padA);
 }
@@ -363,7 +362,7 @@ void PgmAssignScreen::displayOptionalNoteB()
 	auto lProgram = program.lock();
 	auto noteIntB = sampler->getLastNp(lProgram.get())->getOptionalNoteB();
 	auto padIntB = lProgram->getPadIndexFromNote(noteIntB);
-	auto noteB = noteIntB != 34 ? to_string(noteIntB) : "--";
+	auto noteB = noteIntB != 34 ? std::to_string(noteIntB) : "--";
 	auto padB = sampler->getPadName(padIntB);
 	findField("optional-note-b").lock()->setText(noteB + "/" + padB);
 }
@@ -371,7 +370,7 @@ void PgmAssignScreen::displayOptionalNoteB()
 void PgmAssignScreen::displayNote()
 {
 	init();
-	findField("note").lock()->setText(to_string(sampler->getLastNp(program.lock().get())->getNumber()));
+	findField("note").lock()->setText(std::to_string(sampler->getLastNp(program.lock().get())->getNumber()));
 }
 
 void PgmAssignScreen::displayPad()
@@ -382,7 +381,7 @@ void PgmAssignScreen::displayPad()
 
 void PgmAssignScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 {
-	string s = nonstd::any_cast<string>(arg);
+	auto s = nonstd::any_cast<std::string>(arg);
 
 	if (s == "note")
 	{

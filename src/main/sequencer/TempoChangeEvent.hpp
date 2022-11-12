@@ -18,10 +18,10 @@ namespace mpc::sequencer
 		Sequence* parent = nullptr;
 
 	public:
-		void plusOneBar(int numerator, int denominator, TempoChangeEvent* next);
-		void minusOneBar(int numerator, int denominator, TempoChangeEvent* previous);
-		void plusOneBeat(int denominator, TempoChangeEvent* next);
-		void minusOneBeat(int denominator, TempoChangeEvent* previous);
+		void plusOneBar(TempoChangeEvent *next);
+		void minusOneBar(TempoChangeEvent *previous);
+		void plusOneBeat(TempoChangeEvent *next);
+		void minusOneBeat(TempoChangeEvent *previous);
 		void plusOneClock(TempoChangeEvent* next);
 		void minusOneClock(TempoChangeEvent* previous);
 		void setRatio(int i);
@@ -30,7 +30,7 @@ namespace mpc::sequencer
 		int getStepNumber();
 		int getBar(int n, int d);
 		int getBeat(int n, int d);
-		int getClock(int n, int d);
+		int getClock(int denominator);
 		double getTempo();
 
 	public:

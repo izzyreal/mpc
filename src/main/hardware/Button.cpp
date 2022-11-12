@@ -9,9 +9,8 @@
 #include <disk/AbstractDisk.hpp>
 
 using namespace mpc::hardware;
-using namespace std;
 
-Button::Button(mpc::Mpc& mpc, const string& label)
+Button::Button(mpc::Mpc& mpc, const std::string& label)
 	: HwComponent(mpc, label)
 {
 }
@@ -19,9 +18,6 @@ Button::Button(mpc::Mpc& mpc, const string& label)
 void Button::push()
 {
 	auto ls = mpc.getLayeredScreen().lock();
-
-//	if (mpc.getDisk().lock()->isBusy() && ls->getCurrentScreenName().compare("cant-find-file") != 0)
-//		return;
 
 	auto screen = ls->findScreenComponent().lock();
 	
@@ -169,8 +165,6 @@ void Button::push()
 }
 
 void Button::release() {
-//	if (mpc.getDisk().lock()->isBusy()) return;
-	
     auto c = mpc.getReleaseControls();
 	
     if (label == "shift") {

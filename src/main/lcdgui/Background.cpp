@@ -11,7 +11,6 @@ CMRC_DECLARE(mpc);
 #include <Logger.hpp>
 
 using namespace mpc::lcdgui;
-using namespace std;
 
 Background::Background()
 	: Component("background")
@@ -28,13 +27,13 @@ void Background::repaintUnobtrusive(MRECT rect)
 	SetDirty();
 }
 
-void Background::setName(const string& name)
+void Background::setName(const std::string& name)
 { 
 	this->name = name;
 	SetDirty();
 }
 
-void Background::Draw(vector<vector<bool>>* pixels)
+void Background::Draw(std::vector<std::vector<bool>>* pixels)
 {
 	if (shouldNotDraw(pixels))
 	{
@@ -55,13 +54,12 @@ void Background::Draw(vector<vector<bool>>* pixels)
                 
         auto file = fs.open("screens/bg/" + name + ".bmp");
 
-        char* data = (char*) string_view(file.begin(), file.end() - file.begin()).data();
+        char* data = (char*) std::string_view(file.begin(), file.end() - file.begin()).data();
 
 		int imageDataOffset = data[10];
 		int width = (unsigned char) data[18];
 		int height = 256 - (unsigned char)(data[22]);
-		int imageSize = width * height;
-		
+
 		int colorCount = (imageDataOffset - 54) / 4;
 
 		const bool unobtrusive = !unobtrusiveRect.Empty();

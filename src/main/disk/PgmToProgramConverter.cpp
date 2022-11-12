@@ -21,19 +21,18 @@
 
 using namespace mpc::disk;
 using namespace mpc::sampler;
-using namespace std;
 
-PgmToProgramConverter::PgmToProgramConverter(weak_ptr<MpcFile> _file, weak_ptr<Sampler> sampler, const int replaceIndex)
+PgmToProgramConverter::PgmToProgramConverter(std::weak_ptr<MpcFile> _file, std::weak_ptr<Sampler> sampler, const int replaceIndex)
 {
     auto file = _file.lock();
     
 	if (!file->exists())
-		throw invalid_argument("File does not exist");
+		throw std::invalid_argument("File does not exist");
 
 	reader = new mpc::file::pgmreader::ProgramFileReader(file);
 	
 	if (!reader->getHeader()->verifyFirstTwoBytes())
-		throw invalid_argument("PGM first 2 bytes are incorrect");
+		throw std::invalid_argument("PGM first 2 bytes are incorrect");
 	
 	if (replaceIndex == -1)
 		program = sampler.lock()->addProgram();
@@ -80,7 +79,7 @@ void PgmToProgramConverter::setNoteParameters()
 {
 	auto pgmNoteParameters = reader->getAllNoteParameters();
 	auto pgmPads = reader->getPads();
-	NoteParameters* programNoteParameters = nullptr;
+	NoteParameters* programNoteParameters;
 	auto lProgram = program.lock();
 	
 	for (int i = 0; i < 64; i++)
@@ -122,7 +121,6 @@ void PgmToProgramConverter::setNoteParameters()
 void PgmToProgramConverter::setMixer()
 {
 	auto pgmMixer = reader->getMixer();
-	auto pgmPads = reader->getPads();
 	auto lProgram = program.lock();
 
 	for (int i = 0; i < 64; i++)
@@ -139,18 +137,18 @@ void PgmToProgramConverter::setMixer()
 	}
 }
 
-weak_ptr<Program> PgmToProgramConverter::get()
+std::weak_ptr<Program> PgmToProgramConverter::get()
 {
 	if (!done)
-		return weak_ptr<Program>();
+		return {};
 
 	return program;
 }
 
-vector<string> PgmToProgramConverter::getSoundNames()
+std::vector<std::string> PgmToProgramConverter::getSoundNames()
 {
 	if (!done)
-		return vector<string>(0);
+		return {};
 
     return soundNames;
 }

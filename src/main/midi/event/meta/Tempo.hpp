@@ -13,18 +13,16 @@ namespace mpc::midi::event::meta
 	{
 
 	public:
-		static float DEFAULT_BPM;
-		static const int DEFAULT_MPQN{ 500000 };
+        static const int DEFAULT_MPQN{ 500000 };
 
 	private:
 		int mMPQN;
 		float mBPM;
 
 	public:
-		virtual int getMpqn();
-		virtual float getBpm();
-		virtual void setMpqn(int m);
-		virtual void setBpm(float b);
+        float getBpm();
+		void setMpqn(int m);
+		void setBpm(float b);
 
 	public:
 		int getEventSize() override;

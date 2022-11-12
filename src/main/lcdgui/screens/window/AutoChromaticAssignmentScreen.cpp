@@ -8,7 +8,6 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::controls;
 using namespace mpc::sampler;
 using namespace moduru::lang;
-using namespace std;
 
 AutoChromaticAssignmentScreen::AutoChromaticAssignmentScreen(mpc::Mpc& mpc, const int layerIndex) 
 : ScreenComponent(mpc, "auto-chromatic-assignment", layerIndex)
@@ -98,7 +97,7 @@ void AutoChromaticAssignmentScreen::turnWheel(int i)
         auto nameScreen = mpc.screens->get<NameScreen>("name");
         auto autoChromaticAssignmentScreen = this;
         
-        auto renamer = [autoChromaticAssignmentScreen](string& newName1) {
+        auto renamer = [autoChromaticAssignmentScreen](std::string& newName1) {
             autoChromaticAssignmentScreen->newName = newName1;
         };
         
@@ -153,25 +152,25 @@ void AutoChromaticAssignmentScreen::displaySource()
     auto note = sampler->getLastNp(program.lock().get())->getNumber();
     auto padIndex = program.lock()->getPadIndexFromNote(note);
     auto padName = sampler->getPadName(padIndex);
-    findField("source").lock()->setText(to_string(note) + "/" + padName);
+    findField("source").lock()->setText(std::to_string(note) + "/" + padName);
 }
 
 void AutoChromaticAssignmentScreen::displayTune()
 {
-    string prefix = tune < 0 ? "-" : " ";
-    findField("tune").lock()->setText(prefix + StrUtil::padLeft(to_string(abs(tune)), " ", 3));
+    std::string prefix = tune < 0 ? "-" : " ";
+    findField("tune").lock()->setText(prefix + StrUtil::padLeft(std::to_string(abs(tune)), " ", 3));
 }
 
 void AutoChromaticAssignmentScreen::displayOriginalKey()
 {
     auto padName = sampler->getPadName(originalKey - 35);
-    findField("original-key").lock()->setText(to_string(originalKey) + "/" + padName);
+    findField("original-key").lock()->setText(std::to_string(originalKey) + "/" + padName);
 }
 
 void AutoChromaticAssignmentScreen::displaySnd()
 {
     auto sampleName = sourceSoundIndex == -1 ? "OFF" : sampler->getSoundName(sourceSoundIndex);
-    string stereo = sourceSoundIndex == -1 ? "" : sampler->getSound(sourceSoundIndex).lock()->isMono() ? "" : "(ST)";
+    std::string stereo = sourceSoundIndex == -1 ? "" : sampler->getSound(sourceSoundIndex).lock()->isMono() ? "" : "(ST)";
     findField("snd").lock()->setText(StrUtil::padRight(sampleName, " ", 16) + stereo);
 }
 void AutoChromaticAssignmentScreen::displayProgramName()
@@ -181,7 +180,7 @@ void AutoChromaticAssignmentScreen::displayProgramName()
 
 void AutoChromaticAssignmentScreen::update(moduru::observer::Observable* observable, nonstd::any message)
 {
-    auto msg = nonstd::any_cast<string>(message);
+    auto msg = nonstd::any_cast<std::string>(message);
     
     if (msg == "note")
     {

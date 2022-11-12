@@ -8,7 +8,6 @@
 
 using namespace moduru;
 using namespace mpc::file::pgmreader;
-using namespace std;
 
 Pads::Pads(ProgramFileReader* programFile) 
 {
@@ -33,7 +32,7 @@ int Pads::getPadsEnd()
 	return padsEnd;
 }
 
-vector<char> Pads::getPadsArray()
+std::vector<char> Pads::getPadsArray()
 {
     auto pgmFileArray = programFile->readProgramFileArray();
 	padsArray = VecUtil::CopyOfRange(pgmFileArray, getPadsStart(), getPadsEnd());
@@ -44,23 +43,4 @@ int Pads::getNote(int pad)
 {
 	int padMidiNote = getPadsArray()[pad];
 	return padMidiNote;
-}
-
-int Pads::getPadSampleSelect(int pad)
-{
-	auto midiNote = getNote(pad);
-	auto m = programFile->getAllNoteParameters();
-	auto padSampleSelect = m->getSampleSelect(midiNote);
-	return padSampleSelect;
-}
-
-string Pads::getPadSampleName(int pad)
-{
-	string sampleName;
-	auto midiNote = getNote(pad);
-	auto m = programFile->getAllNoteParameters();
-	auto sampleNumber = m->getSampleSelect(midiNote);
-	auto s = programFile->getSampleNames();
-	sampleName = s->getSampleName(sampleNumber);
-	return sampleName;
 }

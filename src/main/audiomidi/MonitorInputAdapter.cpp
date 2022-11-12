@@ -1,7 +1,6 @@
 #include "MonitorInputAdapter.hpp"
 
 #include <Mpc.hpp>
-#include <sampler/Sampler.hpp>
 
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/SampleScreen.hpp>
@@ -12,7 +11,6 @@ using namespace mpc::audiomidi;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace ctoot::audio::core;
-using namespace std;
 
 MonitorInputAdapter::MonitorInputAdapter(mpc::Mpc& mpc, AudioProcess* process)
 	: AudioProcessAdapter(process), mpc(mpc)

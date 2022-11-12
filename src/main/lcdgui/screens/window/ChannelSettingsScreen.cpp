@@ -13,7 +13,6 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sampler;
 using namespace ctoot::mpc;
 using namespace moduru::lang;
-using namespace std;
 
 ChannelSettingsScreen::ChannelSettingsScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "channel-settings", layerIndex)
@@ -37,7 +36,7 @@ void ChannelSettingsScreen::close()
 	mpc.deleteObserver(this);
 }
 
-weak_ptr<MpcIndivFxMixerChannel> ChannelSettingsScreen::getIndivFxMixerChannel()
+std::weak_ptr<MpcIndivFxMixerChannel> ChannelSettingsScreen::getIndivFxMixerChannel()
 {
 	init();
 
@@ -54,7 +53,7 @@ weak_ptr<MpcIndivFxMixerChannel> ChannelSettingsScreen::getIndivFxMixerChannel()
 	}
 }
 
-weak_ptr<MpcStereoMixerChannel> ChannelSettingsScreen::getStereoMixerChannel()
+std::weak_ptr<MpcStereoMixerChannel> ChannelSettingsScreen::getStereoMixerChannel()
 {
 	init();
 
@@ -121,7 +120,7 @@ void ChannelSettingsScreen::turnWheel(int i)
 
 void ChannelSettingsScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 {
-	string s = nonstd::any_cast<string>(arg);
+	auto s = nonstd::any_cast<std::string>(arg);
 
 	init();
 
@@ -149,7 +148,7 @@ void ChannelSettingsScreen::displayChannel()
 
 void ChannelSettingsScreen::displayNoteField()
 {
-	string soundName = "OFF";
+    std::string soundName = "OFF";
 	auto soundIndex = program.lock()->getNoteParameters(note)->getSoundIndex();
 
 	if (soundIndex >= 0 && soundIndex < sampler->getSoundCount())
@@ -162,7 +161,7 @@ void ChannelSettingsScreen::displayNoteField()
 
     auto padIndex = program.lock()->getPadIndexFromNote(note);
     auto padName = sampler->getPadName(padIndex);
-    findField("note").lock()->setText(to_string(note) + "/" + padName + "-" + soundName);
+    findField("note").lock()->setText(std::to_string(note) + "/" + padName + "-" + soundName);
 }
 
 void ChannelSettingsScreen::displayStereoVolume()
@@ -198,7 +197,7 @@ void ChannelSettingsScreen::displayPanning()
             panning = "R";
 
         findField("panning").lock()->setText(
-                panning + StrUtil::padLeft(to_string(abs(mixerChannel.lock()->getPanning())), " ", 2));
+                panning + StrUtil::padLeft(std::to_string(abs(mixerChannel.lock()->getPanning())), " ", 2));
     } else {
         findField("panning").lock()->setText("MID");
     }
@@ -213,7 +212,7 @@ void ChannelSettingsScreen::displayOutput()
     if (stereoMixerChannel->isStereo())
         findField("output").lock()->setText(stereoNamesSlash[indivFxMixerChannel->getOutput()]);
     else
-        findField("output").lock()->setText(" " + to_string(indivFxMixerChannel->getOutput()));
+        findField("output").lock()->setText(" " + std::to_string(indivFxMixerChannel->getOutput()));
 }
 
 void ChannelSettingsScreen::displayFxPath()

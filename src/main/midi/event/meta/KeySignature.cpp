@@ -7,7 +7,6 @@
 #include <midi/util/VariableLengthInt.hpp>
 
 using namespace mpc::midi::event::meta;
-using namespace std;
 
 KeySignature::KeySignature(int tick, int delta, int key, int scale)
     : MetaEvent(tick, delta, MetaEvent::KEY_SIGNATURE)
@@ -49,7 +48,7 @@ int KeySignature::getEventSize()
     return 5;
 }
 
-void KeySignature::writeToOutputStream(ostream& out) 
+void KeySignature::writeToOutputStream(std::ostream& out)
 {
     MetaEvent::writeToOutputStream(out);
     out << (char) 0x02;
@@ -57,38 +56,44 @@ void KeySignature::writeToOutputStream(ostream& out)
     out << (char) mScale;
 }
 
-void KeySignature::writeToOutputStream(ostream& out, bool writeType)
+void KeySignature::writeToOutputStream(std::ostream& out, bool writeType)
 {
     MetaEvent::writeToOutputStream(out, writeType);
 }
 
-shared_ptr<MetaEvent> KeySignature::parseKeySignature(int tick, int delta, MetaEventData* info)
+std::shared_ptr<MetaEvent> KeySignature::parseKeySignature(int tick, int delta, MetaEventData* info)
 {
 	if (info->length.getValue() != 2) {
-		return make_shared<GenericMetaEvent>(tick, delta, info);
+		return std::make_shared<GenericMetaEvent>(tick, delta, info);
 	}
 	int key = info->data[0];
 	int scale = info->data[1];
-	return make_shared<KeySignature>(tick, delta, key, scale);
+	return std::make_shared<KeySignature>(tick, delta, key, scale);
 }
 
 int KeySignature::compareTo(mpc::midi::event::MidiEvent* other)
 {
-    if(mTick != other->getTick()) {
+    if (mTick != other->getTick()) {
         return mTick < other->getTick() ? -1 : 1;
     }
-    if(mDelta.getValue() != other->getDelta()) {
+
+    if (mDelta.getValue() != other->getDelta()) {
         return mDelta.getValue() < other->getDelta() ? 1 : -1;
     }
-    if(!(dynamic_cast< KeySignature* >(other) != nullptr)) {
+
+    if (dynamic_cast<KeySignature*>(other) == nullptr) {
         return 1;
     }
+
     auto o = dynamic_cast< KeySignature* >(other);
-    if(mKey != o->mKey) {
+
+    if (mKey != o->mKey) {
         return mKey < o->mKey ? -1 : 1;
     }
-    if(mScale != o->mScale) {
+
+    if (mScale != o->mScale) {
         return mKey < o->mScale ? -1 : 1;
     }
+
     return 0;
 }

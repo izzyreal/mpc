@@ -7,7 +7,6 @@ using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::lcdgui::screens::window;
 using namespace moduru::lang;
-using namespace std;
 
 MonoToStereoScreen::MonoToStereoScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "mono-to-stereo", layerIndex)
@@ -20,7 +19,7 @@ void MonoToStereoScreen::open()
 
 	if (sampler->getSound().lock() && prevScreen != "name" && prevScreen != "popup")
 	{
-		string name = sampler->getSound().lock()->getName();
+		auto name = sampler->getSound().lock()->getName();
 		name = StrUtil::trim(name);
 		name = StrUtil::padRight(name, "_", 16);
 		name = name.substr(0, 14);
@@ -61,7 +60,7 @@ void MonoToStereoScreen::turnWheel(int i)
         const auto monoToStereoScreen = this;
 		nameScreen->setName(newStName);
         
-        auto renamer = [monoToStereoScreen](string& newName) {
+        auto renamer = [monoToStereoScreen](std::string& newName) {
             monoToStereoScreen->newStName = newName;
         };
 
@@ -99,11 +98,11 @@ void MonoToStereoScreen::function(int j)
 		auto left = sampler->getSound().lock();
 		auto right = sampler->getSound(rSource).lock();
 
-		vector<float> newSampleDataRight;
+		std::vector<float> newSampleDataRight;
 
 		if (right->getSampleRate() > left->getSampleRate())
 		{
-			newSampleDataRight = vector<float>(left->getSampleData()->size());
+			newSampleDataRight = std::vector<float>(left->getSampleData()->size());
 
 			for (int i = 0; i < newSampleDataRight.size(); i++)
 				newSampleDataRight[i] = (*right->getSampleData())[i];

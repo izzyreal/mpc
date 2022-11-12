@@ -34,14 +34,13 @@ namespace mpc::lcdgui
 		bool typeModeEnabled = false;
 		std::string oldText = "";
 		bool scrolling = false;
-		bool rectangleOnly = false;
 
 	public:
 		bool hasFocus();
 		void setFocusable(bool b);
 		bool isFocusable();
 		void loseFocus(std::string next);
-		void takeFocus(std::string prev);
+		void takeFocus();
 		void setSplit(bool b);
 		bool isSplit();
 		int getSplitIncrement(bool positive);
@@ -52,10 +51,9 @@ namespace mpc::lcdgui
 		void type(int i);
 		bool isTypeModeEnabled();
 		void disableTypeMode();
-		void setNextFocus(const std::string& nextFocus);
-		void setRectangleOnly(bool b);
+		void setNextFocus(const std::string& newNextFocus);
 
-	public:
+    public:
 		void Draw(std::vector<std::vector<bool>>* pixels) override;
 		void Hide(bool b) override;
 

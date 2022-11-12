@@ -3,43 +3,8 @@
 using namespace mpc::midi::util;
 using namespace std;
 
-int MidiUtil::ticksToMs(int ticks, int mpqn, int resolution)
+int MidiUtil::bytesToInt(std::vector<char> buff, int off, int len)
 {
-    return ((ticks * mpqn) / resolution) / 1000;
-}
-
-int MidiUtil::ticksToMs(int ticks, float bpm, int resolution)
-{   
-    return ticksToMs(ticks, bpmToMpqn(bpm), resolution);
-}
-
-double MidiUtil::msToTicks(int ms, int mpqn, int ppq)
-{
-    
-    return ((ms * 1000.0) * ppq) / mpqn;
-}
-
-double MidiUtil::msToTicks(int ms, float bpm, int ppq)
-{
-    
-    return msToTicks(ms, bpmToMpqn(bpm), ppq);
-}
-
-int MidiUtil::bpmToMpqn(float bpm)
-{
-
-	return (int) (bpm * 60000000);
-}
-
-float MidiUtil::mpqnToBpm(int mpqn)
-{
-    
-    return mpqn / 6.0E7f;
-}
-
-int MidiUtil::bytesToInt(vector<char> buff, int off, int len)
-{
-
 	int num = 0;
 	int shift = 0;
 	for (int i = off + len - 1; i >= off; i--) {
@@ -52,8 +17,8 @@ int MidiUtil::bytesToInt(vector<char> buff, int off, int len)
 vector<char> MidiUtil::intToBytes(int val, int byteCount)
 {
 
-	auto buffer = vector<char>(byteCount);
-	auto ints = vector<char>(byteCount);
+	auto buffer = std::vector<char>(byteCount);
+	auto ints = std::vector<char>(byteCount);
 	for (int i = 0; i < byteCount; i++) {
 		ints[i] = val & 255;
 		buffer[byteCount - i - 1] = ints[i];
@@ -65,7 +30,7 @@ vector<char> MidiUtil::intToBytes(int val, int byteCount)
 	return buffer;
 }
 
-bool MidiUtil::bytesEqual(vector<char> buf1, vector<char> buf2, int off, int len)
+bool MidiUtil::bytesEqual(std::vector<char> buf1, std::vector<char> buf2, int off, int len)
 {
 	for (int i = off; i < off + len; i++) {
 		if (i >= buf1.size() || i >= buf2.size()) {
@@ -76,16 +41,6 @@ bool MidiUtil::bytesEqual(vector<char> buf1, vector<char> buf2, int off, int len
 		}
 	}
 	return true;
-}
-
-vector<char> MidiUtil::extractBytes(vector<char> buffer, int off, int len)
-{
-
-	auto ret = vector<char>(len);
-	for (int i = 0; i < len; i++) {
-		ret[i] = buffer[off + i];
-	}
-	return ret;
 }
 
 string MidiUtil::HEX = "0123456789ABCDEF";
@@ -101,7 +56,7 @@ string MidiUtil::byteToHex(char b)
 	return res;
 }
 
-string MidiUtil::bytesToHex(vector<char> b)
+string MidiUtil::bytesToHex(std::vector<char> b)
 {
 	string res = "";
 	for (int i = 0; i < b.size(); i++) {

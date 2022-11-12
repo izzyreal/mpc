@@ -10,7 +10,6 @@
 #include <file/pgmreader/SoundNames.hpp>
 
 using namespace mpc::file::pgmreader;
-using namespace std;
 
 ProgramFileReader::ProgramFileReader(std::weak_ptr<mpc::disk::MpcFile> _programFile)
 : programFile (_programFile)

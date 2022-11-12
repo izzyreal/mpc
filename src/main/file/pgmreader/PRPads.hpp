@@ -30,13 +30,9 @@ namespace mpc {
 			public:
 				int getNote(int pad);
 
-			public:
-				int getPadSampleSelect(int pad);
+            public:
 
-			public:
-				std::string getPadSampleName(int pad);
-
-				Pads(ProgramFileReader* programFile);
+                Pads(ProgramFileReader* programFile);
 			};
 
 		}

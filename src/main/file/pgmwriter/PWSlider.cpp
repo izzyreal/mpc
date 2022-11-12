@@ -3,11 +3,10 @@
 #include <sampler/Program.hpp>
 
 using namespace mpc::file::pgmwriter;
-using namespace std;
 
 Slider::Slider(mpc::sampler::Program* program) 
 {
-	sliderArray = vector<char>(15);
+	sliderArray = std::vector<char>(15);
     if(program->getSlider()->getNote() == 34) {
         setMidiNoteAssign(0);
     } else {
@@ -29,7 +28,7 @@ Slider::Slider(mpc::sampler::Program* program)
     sliderArray[14] = 0;
 }
 
-vector<char> Slider::getSliderArray()
+std::vector<char> Slider::getSliderArray()
 {
     return sliderArray;
 }

@@ -10,7 +10,6 @@
 
 using namespace mpc::lcdgui::screens;
 using namespace moduru::lang;
-using namespace std;
 
 UserScreen::UserScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "user", layerIndex)
@@ -115,14 +114,14 @@ void UserScreen::displayLoop()
 
 void UserScreen::displayTsig()
 {
-	auto numerator = to_string(timeSig.getNumerator());
-	auto denominator = to_string(timeSig.getDenominator());
+	auto numerator = std::to_string(timeSig.getNumerator());
+	auto denominator = std::to_string(timeSig.getDenominator());
 	findField("tsig").lock()->setText(numerator + "/" + denominator);
 }
 
 void UserScreen::displayBars()
 {
-	findField("bars").lock()->setText(to_string(lastBar + 1));
+	findField("bars").lock()->setText(std::to_string(lastBar + 1));
 }
 
 void UserScreen::displayPgm()
@@ -133,7 +132,7 @@ void UserScreen::displayPgm()
 	}
 	else
 	{
-		findField("pgm").lock()->setText(to_string(pgm));
+		findField("pgm").lock()->setText(std::to_string(pgm));
 	}
 }
 
@@ -158,17 +157,17 @@ void UserScreen::displayDeviceNumber()
 
 	if (device >= 17)
 	{
-		findField("device").lock()->setTextPadded(to_string(device - 16) + "B", " ");
+		findField("device").lock()->setTextPadded(std::to_string(device - 16) + "B", " ");
 	}
 	else
 	{
-		findField("device").lock()->setTextPadded(to_string(device) + "A", " ");
+		findField("device").lock()->setTextPadded(std::to_string(device) + "A", " ");
 	}
 }
 
 void UserScreen::displayVelo()
 {
-	findField("velo").lock()->setText(to_string(velo));
+	findField("velo").lock()->setText(std::to_string(velo));
 }
 
 void UserScreen::displayDeviceName()
@@ -202,7 +201,7 @@ void UserScreen::displayDeviceName()
 
 void UserScreen::resetPreferences()
 {
-	sequenceName = string("Sequence");
+	sequenceName = std::string("Sequence");
 	bus = 1;
 	tempo = 120.0;
 	velo = 100;
@@ -215,7 +214,7 @@ void UserScreen::resetPreferences()
 
 	for (int i = 0; i < 64; i++)
 	{
-		trackNames.push_back(string("Track-" + moduru::lang::StrUtil::padLeft(to_string((int)(i + 1)), "0", 2)));
+		trackNames.push_back(std::string("Track-" + moduru::lang::StrUtil::padLeft(std::to_string((int)(i + 1)), "0", 2)));
 	}
 
 	lastBar = 1;
@@ -224,22 +223,22 @@ void UserScreen::resetPreferences()
 
 	deviceNames.clear();
 
-	deviceNames.push_back(string("        "));
+	deviceNames.push_back(std::string("        "));
 
 	for (int i = 1; i < 33; i++)
 	{
-		deviceNames.push_back("Device" + moduru::lang::StrUtil::padLeft(to_string(i), "0", 2));
+		deviceNames.push_back("Device" + moduru::lang::StrUtil::padLeft(std::to_string(i), "0", 2));
 	}
 }
 
-string UserScreen::getDeviceName(int i)
+std::string UserScreen::getDeviceName(int i)
 {
 	return deviceNames[i];
 }
 
 void UserScreen::setTempo(const double newTempo)
 {
-	auto str = to_string(newTempo);
+	auto str = std::to_string(newTempo);
 
 	if (newTempo < 30.0)
 	{
@@ -340,7 +339,7 @@ void UserScreen::setVelo(int i)
 	displayVelo();
 }
 
-string UserScreen::getTrackName(int i)
+std::string UserScreen::getTrackName(int i)
 {
 	return trackNames[i];
 }
@@ -351,12 +350,12 @@ int8_t UserScreen::getTrackStatus()
 	return 6;
 }
 
-void UserScreen::setDeviceName(int i, string s)
+void UserScreen::setDeviceName(int i, std::string s)
 {
 	deviceNames[i] = s;
 }
 
-void UserScreen::setSequenceName(string name)
+void UserScreen::setSequenceName(std::string name)
 {
 	sequenceName = name;
 }
@@ -367,7 +366,7 @@ void UserScreen::setTimeSig(int num, int den)
 	timeSig.setDenominator(den);
 }
 
-void UserScreen::setTrackName(int i, string s)
+void UserScreen::setTrackName(int i, std::string s)
 {
 	trackNames[i] = s;
 }

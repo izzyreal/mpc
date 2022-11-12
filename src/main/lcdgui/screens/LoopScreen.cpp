@@ -14,12 +14,11 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui;
 using namespace mpc::controls;
 using namespace moduru::lang;
-using namespace std;
 
 LoopScreen::LoopScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "loop", layerIndex)
 {
-	addChild(std::move(make_shared<Wave>()));
+	addChild(std::move(std::make_shared<Wave>()));
 	findWave().lock()->setFine(false);
 }
 
@@ -441,7 +440,7 @@ void LoopScreen::displayEndLengthValue()
 
 	auto sound = sampler->getSound().lock();
 
-	auto text = to_string(endSelected ? sound->getEnd() : sound->getEnd() - sound->getLoopTo());
+	auto text = std::to_string(endSelected ? sound->getEnd() : sound->getEnd() - sound->getLoopTo());
 	findField("endlengthvalue").lock()->setTextPadded(text, " ");
 }
 

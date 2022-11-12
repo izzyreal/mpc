@@ -36,7 +36,6 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::audiomidi;
 using namespace mpc::sequencer;
-using namespace std;
 
 EventHandler::EventHandler(mpc::Mpc& _mpc)
 : mpc (_mpc),
@@ -45,18 +44,18 @@ sampler (_mpc.getSampler())
 {
 }
 
-void EventHandler::handle(const weak_ptr<Event>& event, Track* track, char drum)
+void EventHandler::handle(const std::weak_ptr<Event>& event, Track* track, char drum)
 {
     if (!track->isOn() && event.lock()->getTick() != -1)
         return;
     
-    auto ne = dynamic_pointer_cast<NoteEvent>(event.lock());
+    auto ne = std::dynamic_pointer_cast<NoteEvent>(event.lock());
     
     handleNoThru(event, track, -1, drum);
     midiOut(event, track);
 }
 
-void EventHandler::handleNoThru(const weak_ptr<Event>& e, Track* track, int timeStamp, char drum)
+void EventHandler::handleNoThru(const std::weak_ptr<Event>& e, Track* track, int timeStamp, char drum)
 {
     auto event = e.lock();
     
@@ -69,10 +68,10 @@ void EventHandler::handleNoThru(const weak_ptr<Event>& e, Track* track, int time
         return;
     }
     
-    auto tce = dynamic_pointer_cast<TempoChangeEvent>(event);
-    auto mce = dynamic_pointer_cast<MidiClockEvent>(event);
-    auto ne = dynamic_pointer_cast<NoteEvent>(event);
-    auto me = dynamic_pointer_cast<MixerEvent>(event);
+    auto tce = std::dynamic_pointer_cast<TempoChangeEvent>(event);
+    auto mce = std::dynamic_pointer_cast<MidiClockEvent>(event);
+    auto ne = std::dynamic_pointer_cast<NoteEvent>(event);
+    auto me = std::dynamic_pointer_cast<MixerEvent>(event);
     
     if (tce && tce->getTempo() != lSequencer->getTempo())
     {
@@ -200,9 +199,9 @@ void EventHandler::handleNoThru(const weak_ptr<Event>& e, Track* track, int time
     }
 }
 
-void EventHandler::midiOut(const weak_ptr<Event>& e, Track* track)
+void EventHandler::midiOut(const std::weak_ptr<Event>& e, Track* track)
 {
-    auto noteEvent = dynamic_pointer_cast<NoteEvent>(e.lock());
+    auto noteEvent = std::dynamic_pointer_cast<NoteEvent>(e.lock());
     
     if (noteEvent)
     {
@@ -213,7 +212,7 @@ void EventHandler::midiOut(const weak_ptr<Event>& e, Track* track)
             if (candidate != end(transposeCache))
             {
                 auto transposeParameters = *candidate;
-                auto copy = make_shared<NoteEvent>(true);
+                auto copy = std::make_shared<NoteEvent>(true);
                 noteEvent->CopyValuesTo(copy);
                 noteEvent = copy;
                 noteEvent->setNote(noteEvent->getNote() + transposeParameters.second);
@@ -227,7 +226,7 @@ void EventHandler::midiOut(const weak_ptr<Event>& e, Track* track)
             (transScreen->tr == -1 || transScreen->tr == noteEvent->getTrack()) &&
             noteEvent->getVelocity() > 0)
         {
-            auto copy = make_shared<NoteEvent>();
+            auto copy = std::make_shared<NoteEvent>();
             noteEvent->CopyValuesTo(copy);
             noteEvent = copy;
             transposeCache[{ noteEvent->getNote(), track->getIndex() }] = transScreen->transposeAmount;
@@ -250,9 +249,9 @@ void EventHandler::midiOut(const weak_ptr<Event>& e, Track* track)
         
         auto mpcMidiPorts = mpc.getMidiPorts().lock();
         
-        vector<ctoot::midi::core::ShortMessage>& r = mpcMidiPorts->getReceivers()[0];
+        std::vector<ctoot::midi::core::ShortMessage>& r = mpcMidiPorts->getReceivers()[0];
         
-        auto notifyLetter = "a";
+        std::string notifyLetter = "a";
         
         if (deviceNumber > 15)
         {
@@ -277,6 +276,6 @@ void EventHandler::midiOut(const weak_ptr<Event>& e, Track* track)
                 r.clear();
         }
         
-        notifyObservers(string(notifyLetter + to_string(deviceNumber)));
+        notifyObservers(notifyLetter + std::to_string(deviceNumber));
     }
 }

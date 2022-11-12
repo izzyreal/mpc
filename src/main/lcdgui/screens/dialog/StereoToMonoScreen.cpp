@@ -7,7 +7,6 @@ using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::lcdgui::screens::window;
 using namespace moduru::lang;
-using namespace std;
 
 StereoToMonoScreen::StereoToMonoScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "stereo-to-mono", layerIndex)
@@ -18,7 +17,7 @@ void StereoToMonoScreen::open()
 {
 	auto previousScreenName = ls.lock()->getPreviousScreenName();
 
-	if (previousScreenName.compare("name") != 0 && previousScreenName.compare("popup") != 0)
+	if (previousScreenName != "name" && previousScreenName != "popup")
 	{
 		updateNewNames();
 		ls.lock()->setFocus("stereosource");
@@ -46,7 +45,7 @@ void StereoToMonoScreen::turnWheel(int i)
         const auto isL = param == "newlname";
         
         nameScreen->setName(isL ? newLName : newRName);
-        auto renamer = [isL, stereoToMonoScreen](string& newName) {
+        auto renamer = [isL, stereoToMonoScreen](std::string& newName) {
             if (isL) stereoToMonoScreen->setNewLName(newName);
             else stereoToMonoScreen->setNewRName(newName);
         };
@@ -74,7 +73,7 @@ void StereoToMonoScreen::function(int i)
 
 		for (auto& s : sampler->getSounds())
 		{
-			if (s.lock()->getName().compare(newLName) == 0 || s.lock()->getName().compare(newRName) == 0)
+			if (s.lock()->getName() == newLName || s.lock()->getName() == newRName)
 			{
 				auto popupScreen = mpc.screens->get<PopupScreen>("popup");
 				popupScreen->setText("Name already used");
@@ -116,7 +115,7 @@ void StereoToMonoScreen::updateNewNames()
 	if (! sampler->getSound().lock() || sampler->getSound().lock()->isMono())
 		return;
 
-	string name = sampler->getSound().lock()->getName();
+	auto name = sampler->getSound().lock()->getName();
 	name = StrUtil::trim(name);
 	name = StrUtil::padRight(name, "_", 16);
 	name = name.substr(0, 14);
@@ -157,13 +156,13 @@ void StereoToMonoScreen::displayNewRName()
 	findField("newrname").lock()->setText(newRName);
 }
 
-void StereoToMonoScreen::setNewLName(string s)
+void StereoToMonoScreen::setNewLName(std::string s)
 {
 	newLName = s;
 	displayNewLName();
 }
 
-void StereoToMonoScreen::setNewRName(string s)
+void StereoToMonoScreen::setNewRName(std::string s)
 {
 	newRName = s;
 	displayNewRName();

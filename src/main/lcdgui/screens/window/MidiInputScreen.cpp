@@ -3,7 +3,6 @@
 
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
-using namespace std;
 
 MidiInputScreen::MidiInputScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "midi-input", layerIndex)
@@ -102,7 +101,7 @@ void MidiInputScreen::displayReceiveCh()
 	}
 	else
 	{
-		findField("receivech").lock()->setText(to_string(receiveCh + 1));
+		findField("receivech").lock()->setText(std::to_string(receiveCh + 1));
 	}
 }
 

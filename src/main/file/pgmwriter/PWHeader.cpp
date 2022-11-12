@@ -1,11 +1,10 @@
 #include <file/pgmwriter/PWHeader.hpp>
 
 using namespace mpc::file::pgmwriter;
-using namespace std;
 
 PWHeader::PWHeader(int numberOfSamples) 
 {
-    headerArray = vector<char>(4);
+    headerArray = std::vector<char>(4);
     writeFirstTwoBytes();
     setNumberOfSamples(numberOfSamples);
     headerArray[3] = 0;
@@ -22,7 +21,7 @@ void PWHeader::setNumberOfSamples(int numberOfSamples)
     headerArray[2] = numberOfSamples;
 }
 
-vector<char> PWHeader::getHeaderArray()
+std::vector<char> PWHeader::getHeaderArray()
 {
 	return headerArray;
 }

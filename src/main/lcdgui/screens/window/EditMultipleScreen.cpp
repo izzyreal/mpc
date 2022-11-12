@@ -16,7 +16,6 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui;
 using namespace mpc::sequencer;
 using namespace moduru::lang;
-using namespace std;
 
 EditMultipleScreen::EditMultipleScreen(mpc::Mpc& mpc, const int layerIndex)
 : ScreenComponent(mpc, "edit-multiple", layerIndex)
@@ -40,13 +39,13 @@ void EditMultipleScreen::function(int i)
     auto stepEditorScreen = mpc.screens->get<StepEditorScreen>("step-editor");
     
     auto selectedEvent = stepEditorScreen->getSelectedEvent();
-    string paramLetter = stepEditorScreen->getSelectedParameterLetter();
+    auto paramLetter = stepEditorScreen->getSelectedParameterLetter();
     
     switch (i)
     {
         case 4:
         {
-            auto noteEvent = dynamic_pointer_cast<NoteEvent>(selectedEvent);
+            auto noteEvent = std::dynamic_pointer_cast<NoteEvent>(selectedEvent);
             
             if (noteEvent && track.lock()->getBus() != 0)
             {
@@ -58,7 +57,7 @@ void EditMultipleScreen::function(int i)
                 {
                     for (auto& event : stepEditorScreen->getSelectedEvents())
                     {
-                        auto _noteEvent = dynamic_pointer_cast<NoteEvent>(event);
+                        auto _noteEvent = std::dynamic_pointer_cast<NoteEvent>(event);
                         if (_noteEvent)
                             _noteEvent->setVariationTypeNumber(variationType);
                     }
@@ -67,7 +66,7 @@ void EditMultipleScreen::function(int i)
                 {
                     for (auto& event : stepEditorScreen->getSelectedEvents())
                     {
-                        auto _noteEvent = dynamic_pointer_cast<NoteEvent>(event);
+                        auto _noteEvent = std::dynamic_pointer_cast<NoteEvent>(event);
 
                         if (_noteEvent)
                             _noteEvent->setVariationValue(variationValue);
@@ -93,7 +92,7 @@ void EditMultipleScreen::function(int i)
                     checkThreeParameters();
             }
             
-            if (dynamic_pointer_cast<ControlChangeEvent>(selectedEvent))
+            if (std::dynamic_pointer_cast<ControlChangeEvent>(selectedEvent))
             {
                 if (paramLetter == "a")
                     checkFiveParameters();
@@ -101,12 +100,12 @@ void EditMultipleScreen::function(int i)
                     checkThreeParameters();
             }
             
-            if (dynamic_pointer_cast<ProgramChangeEvent>(selectedEvent) || dynamic_pointer_cast<ChannelPressureEvent>(selectedEvent))
+            if (std::dynamic_pointer_cast<ProgramChangeEvent>(selectedEvent) || std::dynamic_pointer_cast<ChannelPressureEvent>(selectedEvent))
             {
                 checkFiveParameters();
             }
             
-            if (dynamic_pointer_cast<PolyPressureEvent>(selectedEvent))
+            if (std::dynamic_pointer_cast<PolyPressureEvent>(selectedEvent))
             {
                 if (paramLetter == "a")
                     checkFiveParameters();
@@ -127,11 +126,11 @@ void EditMultipleScreen::turnWheel(int i)
     auto stepEditorScreen = mpc.screens->get<StepEditorScreen>("step-editor");
     auto event = stepEditorScreen->getSelectedEvent();
     
-    string paramLetter = stepEditorScreen->getSelectedParameterLetter();
+    auto paramLetter = stepEditorScreen->getSelectedParameterLetter();
     
     if (param == "value0")
     {
-        auto noteEvent = dynamic_pointer_cast<NoteEvent>(event);
+        auto noteEvent = std::dynamic_pointer_cast<NoteEvent>(event);
         
         if (noteEvent && track.lock()->getBus() != 0)
         {
@@ -175,10 +174,10 @@ void EditMultipleScreen::turnWheel(int i)
             else if (paramLetter == "b" || paramLetter == "c")
                 setEditType(editType + i);
         }
-        else if (dynamic_pointer_cast<ProgramChangeEvent>(event)
-                 || dynamic_pointer_cast<PolyPressureEvent>(event)
-                 || dynamic_pointer_cast<ChannelPressureEvent>(event)
-                 || dynamic_pointer_cast<ControlChangeEvent>(event))
+        else if (std::dynamic_pointer_cast<ProgramChangeEvent>(event)
+                 || std::dynamic_pointer_cast<PolyPressureEvent>(event)
+                 || std::dynamic_pointer_cast<ChannelPressureEvent>(event)
+                 || std::dynamic_pointer_cast<ControlChangeEvent>(event))
         {
             setEditType(editType + i);
         }
@@ -198,9 +197,9 @@ void EditMultipleScreen::checkThreeParameters()
     for (auto& event : stepEditorScreen->getSelectedEvents())
     {
         
-        auto note = dynamic_pointer_cast<NoteEvent>(event);
-        auto controlChange = dynamic_pointer_cast<ControlChangeEvent>(event);
-        auto polyPressure = dynamic_pointer_cast<PolyPressureEvent>(event);
+        auto note = std::dynamic_pointer_cast<NoteEvent>(event);
+        auto controlChange = std::dynamic_pointer_cast<ControlChangeEvent>(event);
+        auto polyPressure = std::dynamic_pointer_cast<PolyPressureEvent>(event);
         
         if (note)
             note->setVelocity(editValue);
@@ -217,11 +216,11 @@ void EditMultipleScreen::checkFiveParameters()
     
     for (auto& event : stepEditorScreen->getSelectedEvents())
     {
-        auto note = dynamic_pointer_cast<NoteEvent>(event);
-        auto programChange = dynamic_pointer_cast<ProgramChangeEvent>(event);
-        auto controlChange = dynamic_pointer_cast<ControlChangeEvent>(event);
-        auto channelPressure = dynamic_pointer_cast<ChannelPressureEvent>(event);
-        auto polyPressure = dynamic_pointer_cast<PolyPressureEvent>(event);
+        auto note = std::dynamic_pointer_cast<NoteEvent>(event);
+        auto programChange = std::dynamic_pointer_cast<ProgramChangeEvent>(event);
+        auto controlChange = std::dynamic_pointer_cast<ControlChangeEvent>(event);
+        auto channelPressure = std::dynamic_pointer_cast<ChannelPressureEvent>(event);
+        auto polyPressure = std::dynamic_pointer_cast<PolyPressureEvent>(event);
         
         if (note)
             note->setDuration(editValue);
@@ -241,7 +240,7 @@ void EditMultipleScreen::checkNotes()
     auto stepEditorScreen = mpc.screens->get<StepEditorScreen>("step-editor");
     for (auto& event : stepEditorScreen->getSelectedEvents())
     {
-        auto note = dynamic_pointer_cast<NoteEvent>(event);
+        auto note = std::dynamic_pointer_cast<NoteEvent>(event);
         
         if (note)
             note->setNote(changeNoteTo);
@@ -269,7 +268,7 @@ void EditMultipleScreen::updateEditMultiple()
     auto event = stepEditorScreen->getSelectedEvent();
     auto letter = stepEditorScreen->getSelectedParameterLetter();
     
-    if (dynamic_pointer_cast<NoteEvent>(event) && track.lock()->getBus() != 0)
+    if (std::dynamic_pointer_cast<NoteEvent>(event) && track.lock()->getBus() != 0)
     {
         if (letter == "a" || letter == "b" || letter == "c")
         {
@@ -318,11 +317,11 @@ void EditMultipleScreen::updateEditMultiple()
                     }
                     else if (noteVarValue < 0)
                     {
-                        findField("value0").lock()->setText("-" + StrUtil::padLeft(to_string(abs(noteVarValue)), " ", 3));
+                        findField("value0").lock()->setText("-" + StrUtil::padLeft(std::to_string(abs(noteVarValue)), " ", 3));
                     }
                     else
                     {
-                        findField("value0").lock()->setText("+" + StrUtil::padLeft(to_string(noteVarValue), " ", 3));
+                        findField("value0").lock()->setText("+" + StrUtil::padLeft(std::to_string(noteVarValue), " ", 3));
                     }
                 }
                 
@@ -333,7 +332,7 @@ void EditMultipleScreen::updateEditMultiple()
                     if (noteVarValue > 100)
                         noteVarValue = 100;
                     
-                    findField("value0").lock()->setText(StrUtil::padLeft(to_string(noteVarValue), " ", 3));
+                    findField("value0").lock()->setText(StrUtil::padLeft(std::to_string(noteVarValue), " ", 3));
                     findField("value0").lock()->setSize(3 * 6 + 1, 9);
                     findField("value0").lock()->setLocation(51, findField("value0").lock()->getY());
                 }
@@ -348,9 +347,9 @@ void EditMultipleScreen::updateEditMultiple()
                         noteVarValue = 50;
                     
                     if (noteVarValue < 0)
-                        findField("value0").lock()->setText("-" + StrUtil::padLeft(to_string(abs(noteVarValue)), " ", 2));
+                        findField("value0").lock()->setText("-" + StrUtil::padLeft(std::to_string(abs(noteVarValue)), " ", 2));
                     else if (noteVarValue > 0)
-                        findField("value0").lock()->setText("+" + StrUtil::padLeft(to_string(noteVarValue), " ", 2));
+                        findField("value0").lock()->setText("+" + StrUtil::padLeft(std::to_string(noteVarValue), " ", 2));
                     else
                         findField("value0").lock()->setTextPadded("0", " ");
                 }
@@ -366,7 +365,7 @@ void EditMultipleScreen::updateEditMultiple()
         }
     }
     
-    if (dynamic_pointer_cast<NoteEvent>(event) && track.lock()->getBus() == 0)
+    if (std::dynamic_pointer_cast<NoteEvent>(event) && track.lock()->getBus() == 0)
     {
         if (letter == "a")
         {
@@ -376,7 +375,7 @@ void EditMultipleScreen::updateEditMultiple()
             findLabel("value0").lock()->setLocation(xPosSingle, yPosSingle);
             findLabel("value0").lock()->setText(singleLabels[0]);
             findField("value0").lock()->setSize(8 * 6 + 1, 9);
-            findField("value0").lock()->setText((StrUtil::padLeft(to_string(changeNoteTo), " ", 3) + "(" + mpc::Util::noteNames()[changeNoteTo]) + ")");
+            findField("value0").lock()->setText((StrUtil::padLeft(std::to_string(changeNoteTo), " ", 3) + "(" + mpc::Util::noteNames()[changeNoteTo]) + ")");
             findLabel("value0").lock()->setSize(findLabel("value0").lock()->GetTextEntryLength() * 6 + 1, 9);
             findField("value0").lock()->Hide(false);
             findField("value0").lock()->setLocation(xPosSingle + findLabel("value0").lock()->getW(), yPosSingle);
@@ -386,10 +385,10 @@ void EditMultipleScreen::updateEditMultiple()
             updateDouble();
         }
     }
-    if (dynamic_pointer_cast<ProgramChangeEvent>(event)
-        || dynamic_pointer_cast<PolyPressureEvent>(event)
-        || dynamic_pointer_cast<ChannelPressureEvent>(event)
-        || dynamic_pointer_cast<ControlChangeEvent>(event))
+    if (std::dynamic_pointer_cast<ProgramChangeEvent>(event)
+        || std::dynamic_pointer_cast<PolyPressureEvent>(event)
+        || std::dynamic_pointer_cast<ChannelPressureEvent>(event)
+        || std::dynamic_pointer_cast<ControlChangeEvent>(event))
     {
         updateDouble();
     }
@@ -412,7 +411,7 @@ void EditMultipleScreen::updateDouble()
     findField("value0").lock()->setLocation((xPosDouble[0] + findLabel("value0").lock()->getW()), yPosDouble[0]);
     findField("value1").lock()->setLocation((xPosDouble[1] + findLabel("value1").lock()->getW()), yPosDouble[1]);
     findField("value0").lock()->setText(editTypeNames[editType]);
-    findField("value1").lock()->setText(to_string(editValue));
+    findField("value1").lock()->setText(std::to_string(editValue));
     findField("value0").lock()->setSize(10 * 6 + 1, 9);
     findField("value1").lock()->setSize(3 * 6 + 1, 9);
 }

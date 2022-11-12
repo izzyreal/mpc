@@ -5,7 +5,6 @@
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
-using namespace std;
 
 FxEditScreen::FxEditScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "fx-edit", layerIndex)
@@ -21,7 +20,7 @@ FxEditScreen::FxEditScreen(mpc::Mpc& mpc, const int layerIndex)
 	{
 		int x = (i * (effectWidth + effectDistance)) + effectOffset;
 		MRECT r(x, effectY, x + effectWidth - 1, effectY + effectHeight - 1);
-		addChild(make_shared<Effect>(r));
+		addChild(std::make_shared<Effect>(r));
 	}
 
 }
@@ -73,13 +72,13 @@ void FxEditScreen::down()
 	checkEffects();
 }
 
-vector<weak_ptr<Effect>> FxEditScreen::findEffects()
+std::vector<std::weak_ptr<Effect>> FxEditScreen::findEffects()
 {
-	vector<weak_ptr<Effect>> result;
+	std::vector<std::weak_ptr<Effect>> result;
 
 	for (auto& c : children)
 	{
-		auto candidate = dynamic_pointer_cast<Effect>(c);
+		auto candidate = std::dynamic_pointer_cast<Effect>(c);
 		if (candidate)
 		{
 			result.push_back(candidate);
@@ -91,13 +90,13 @@ vector<weak_ptr<Effect>> FxEditScreen::findEffects()
 
 
 void FxEditScreen::checkEffects() {
-	string prevParam = param;
+    std::string prevParam = param;
 
 	init();
 
 	if (prevParam.compare(param) != 0)
 	{
-		vector<string> effects{ "dist", "filt", "mod", "echo", "rev", "mix" };
+        std::vector<std::string> effects{ "dist", "filt", "mod", "echo", "rev", "mix" };
 		for (int i = 0; i < 6; i++)
 		{
 			auto effect = findEffects()[i].lock();
@@ -118,7 +117,7 @@ void FxEditScreen::checkEffects() {
 void FxEditScreen::displayDrum()
 {
 	auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>("mixer-setup");
-	findField("drum").lock()->setText(to_string(mixerSetupScreen->getFxDrum() + 1));
+	findField("drum").lock()->setText(std::to_string(mixerSetupScreen->getFxDrum() + 1));
 }
 
 void FxEditScreen::displayPgm()

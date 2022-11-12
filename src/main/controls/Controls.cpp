@@ -11,17 +11,16 @@
 #include <controls/GlobalReleaseControls.hpp>
 
 using namespace mpc::controls;
-using namespace std;
 
 Controls::Controls(mpc::Mpc& _mpc)
-	: controls (make_shared<BaseControls>(_mpc)),
-	releaseControls (make_shared<GlobalReleaseControls>(_mpc)),
-	keyEventHandler (make_shared<KeyEventHandler>(_mpc)),
-	kbMapping (make_shared<KbMapping>())
+	: controls (std::make_shared<BaseControls>(_mpc)),
+	releaseControls (std::make_shared<GlobalReleaseControls>(_mpc)),
+	keyEventHandler (std::make_shared<KeyEventHandler>(_mpc)),
+	kbMapping (std::make_shared<KbMapping>())
 {
 }
 
-weak_ptr<KeyEventHandler> Controls::getKeyEventHandler()
+std::weak_ptr<KeyEventHandler> Controls::getKeyEventHandler()
 {
     return keyEventHandler;
 }
@@ -156,17 +155,17 @@ void Controls::setF6Pressed(bool b)
 	f6Pressed = b;
 }
 
-shared_ptr<BaseControls> Controls::getControls()
+std::shared_ptr<BaseControls> Controls::getControls()
 {
 	return controls;
 }
 
-shared_ptr<GlobalReleaseControls> Controls::getReleaseControls()
+std::shared_ptr<GlobalReleaseControls> Controls::getReleaseControls()
 {
 	return releaseControls;
 }
 
-weak_ptr<KbMapping> Controls::getKbMapping()
+std::weak_ptr<KbMapping> Controls::getKbMapping()
 {
     return kbMapping;
 }

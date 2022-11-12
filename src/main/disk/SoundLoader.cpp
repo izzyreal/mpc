@@ -17,14 +17,13 @@ using namespace mpc::file::wav;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace moduru::lang;
-using namespace std;
 
 SoundLoader::SoundLoader(mpc::Mpc& _mpc)
 : mpc (_mpc)
 {
 }
 
-SoundLoader::SoundLoader(mpc::Mpc& _mpc, vector<weak_ptr<mpc::sampler::Sound>> _sounds, bool _replace)
+SoundLoader::SoundLoader(mpc::Mpc& _mpc, std::vector<std::weak_ptr<mpc::sampler::Sound>> _sounds, bool _replace)
 : mpc (_mpc), sounds (_sounds), replace (_replace)
 {
 }
@@ -39,11 +38,11 @@ void SoundLoader::setPreview(bool b)
     preview = b;
 }
 
-void SoundLoader::loadSound(shared_ptr<MpcFile> f, SoundLoaderResult& r, bool shouldBeConverted)
+void SoundLoader::loadSound(std::shared_ptr<MpcFile> f, SoundLoaderResult& r, bool shouldBeConverted)
 {
-    string soundFileName = f->getName();
-    string extension = f->getExtension();
-    string soundName = f->getNameWithoutExtension();
+    std::string soundFileName = f->getName();
+    std::string extension = f->getExtension();
+    std::string soundName = f->getNameWithoutExtension();
     
     auto sampler = mpc.getSampler().lock();
     auto existingSoundIndex = sampler->checkExists(soundName);

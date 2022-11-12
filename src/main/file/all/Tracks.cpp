@@ -12,9 +12,8 @@
 #include <cmath>
 
 using namespace mpc::file::all;
-using namespace std;
 
-Tracks::Tracks(const vector<char>& loadBytes)
+Tracks::Tracks(const std::vector<char>& loadBytes)
 {
 	for (int i = 0; i < 64; i++)
     {
@@ -22,7 +21,7 @@ Tracks::Tracks(const vector<char>& loadBytes)
 		pgms[i] = loadBytes[PGMS_OFFSET + i];
 		veloRatios[i] = loadBytes[VELO_RATIOS_OFFSET + i];
 		auto offset = TRACK_NAMES_OFFSET + (i * AllParser::NAME_LENGTH);
-		string name = "";
+		std::string name;
         
 		for (char c : moduru::VecUtil::CopyOfRange(loadBytes, offset, offset + AllParser::NAME_LENGTH))
         {
@@ -37,7 +36,7 @@ Tracks::Tracks(const vector<char>& loadBytes)
 
 Tracks::Tracks(mpc::sequencer::Sequence* seq)
 {
-	saveBytes = vector<char>(AllSequence::TRACKS_LENGTH);
+	saveBytes = std::vector<char>(AllSequence::TRACKS_LENGTH);
 	for (int i = 0; i < 64; i++)
     {
 		auto t = seq->getTrack(i);
@@ -45,7 +44,7 @@ Tracks::Tracks(mpc::sequencer::Sequence* seq)
 		for (auto j = 0; j < AllParser::NAME_LENGTH; j++)
         {
 			auto offset = TRACK_NAMES_OFFSET + (i * AllParser::NAME_LENGTH);
-			string name = moduru::lang::StrUtil::padRight(t->getActualName(), " ", AllParser::NAME_LENGTH);
+			auto name = moduru::lang::StrUtil::padRight(t->getActualName(), " ", AllParser::NAME_LENGTH);
 			saveBytes[offset + j] = name[j];
 		}
 		
@@ -104,7 +103,7 @@ Tracks::Tracks(mpc::sequencer::Sequence* seq)
 		saveBytes[UNKNOWN32_BIT_INT_OFFSET + j + 4] = unknown32BitIntBytes2[j];
 }
 
-vector<char> Tracks::PADDING1 = vector<char>{ (char) 232, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, (char) 232, 3 };
+std::vector<char> Tracks::PADDING1 = std::vector<char>{ (char) 232, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, (char) 232, 3 };
 
 int Tracks::getBus(int i)
 {
@@ -121,7 +120,7 @@ int Tracks::getPgm(int i)
     return pgms[i];
 }
 
-string Tracks::getName(int i)
+std::string Tracks::getName(int i)
 {
     return names[i];
 }
@@ -131,7 +130,7 @@ int Tracks::getStatus(int i)
     return status[i];
 }
 
-vector<char>& Tracks::getBytes()
+std::vector<char>& Tracks::getBytes()
 {
     return saveBytes;
 }

@@ -42,7 +42,6 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::controls;
 using namespace mpc::sequencer;
-using namespace std;
 
 BaseControls::BaseControls(mpc::Mpc& _mpc)
 : mpc (_mpc),
@@ -298,7 +297,7 @@ void BaseControls::generateNoteOn(int note, int padVelo)
     
     if (sequencer->isRecordingOrOverdubbing() || step || recMainWithoutPlaying)
     {
-        shared_ptr<NoteEvent> recordedEvent;
+        std::shared_ptr<NoteEvent> recordedEvent;
         
         if (step)
         {
@@ -344,7 +343,7 @@ void BaseControls::generateNoteOn(int note, int padVelo)
         }
     }
     
-    auto playableEvent = make_shared<NoteEvent>(note);
+    auto playableEvent = std::make_shared<NoteEvent>(note);
     playableEvent->setVelocity(padVelo);
     
     Util::set16LevelsValues(mpc, playableEvent, padIndex);

@@ -4,14 +4,14 @@
 #include <midi/util/VariableLengthInt.hpp>
 
 using namespace mpc::midi::event;
-using namespace std;
 
-SystemExclusiveEvent::SystemExclusiveEvent(int type, int tick, vector<char> data) : SystemExclusiveEvent(type, tick, 0, data)
+SystemExclusiveEvent::SystemExclusiveEvent(int type, int tick, std::vector<char> data)
+: SystemExclusiveEvent(type, tick, 0, data)
 {
-	
 }
 
-SystemExclusiveEvent::SystemExclusiveEvent(int type, int tick, int delta, vector<char> data) : MidiEvent(tick, delta)
+SystemExclusiveEvent::SystemExclusiveEvent(int type, int tick, int delta, std::vector<char> data)
+: MidiEvent(tick, delta)
 {
 	mType = type & 255;
 	if (mType != 240 && mType != 247) {
@@ -21,12 +21,12 @@ SystemExclusiveEvent::SystemExclusiveEvent(int type, int tick, int delta, vector
 	mData = data;
 }
 
-vector<char> SystemExclusiveEvent::getData()
+std::vector<char> SystemExclusiveEvent::getData()
 {
     return mData;
 }
 
-void SystemExclusiveEvent::setData(vector<char> data)
+void SystemExclusiveEvent::setData(std::vector<char> data)
 {
 	mLength->setValue(data.size());
 	mData = data;
@@ -37,7 +37,7 @@ bool SystemExclusiveEvent::requiresStatusByte(MidiEvent* prevEvent)
     return true;
 }
 
-void SystemExclusiveEvent::writeToOutputStream(ostream& out, bool writeType)
+void SystemExclusiveEvent::writeToOutputStream(std::ostream& out, bool writeType)
 {
 	MidiEvent::writeToOutputStream(out, writeType);
 	out << (char) mType;
@@ -63,16 +63,16 @@ int SystemExclusiveEvent::compareTo(MidiEvent* other)
 		return 1;
 	}
 
-    if(dynamic_cast< SystemExclusiveEvent* >(other) != nullptr) {
-		string curr = "";
+    if(dynamic_cast<SystemExclusiveEvent*>(other) != nullptr) {
+        std::string curr;
 		
 		for (char c : mData) {
 			curr.push_back(c);
 		}
 		
 		auto tmp = dynamic_cast<SystemExclusiveEvent*>(other)->mData;
-		
-		string comp = "";
+
+        std::string comp;
 		
 		for (char c : tmp) {
 			comp.push_back(c);

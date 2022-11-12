@@ -7,7 +7,6 @@
 
 using namespace moduru;
 using namespace mpc::file::pgmreader;
-using namespace std;
 
 Mixer::Mixer(ProgramFileReader* programFile) 
 {
@@ -32,7 +31,7 @@ int Mixer::getMixerEnd()
 	return mixerEnd;
 }
 
-vector<char> Mixer::getMixerArray()
+std::vector<char> Mixer::getMixerArray()
 {
     auto pgmFileArray = programFile->readProgramFileArray();
     if (mixerArray.size() == 0) mixerArray = VecUtil::CopyOfRange(pgmFileArray, getMixerStart(), getMixerEnd());

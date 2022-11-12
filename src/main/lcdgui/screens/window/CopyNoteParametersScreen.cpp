@@ -5,7 +5,6 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::controls;
 using namespace moduru::lang;
-using namespace std;
 
 CopyNoteParametersScreen::CopyNoteParametersScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "copy-note-parameters", layerIndex)
@@ -68,7 +67,7 @@ void CopyNoteParametersScreen::function(int i)
 void CopyNoteParametersScreen::displayProg0()
 {
 	auto program = sampler->getProgram(prog0).lock();
-	findField("prog0").lock()->setText(StrUtil::padLeft(to_string(prog0 + 1), " ", 2) + "-" + program->getName());
+	findField("prog0").lock()->setText(StrUtil::padLeft(std::to_string(prog0 + 1), " ", 2) + "-" + program->getName());
 }
 
 void CopyNoteParametersScreen::displayNote0()
@@ -78,7 +77,7 @@ void CopyNoteParametersScreen::displayNote0()
 	auto program = sampler->getProgram(prog0).lock();
 	auto padIndex = program->getPadIndexFromNote(note0);
 	auto soundIndex = note0 != -1 ? noteParameters->getSoundIndex() : -1;
-	auto noteText = note0 == -1 ? "--" : to_string(note0);
+	auto noteText = note0 == -1 ? "--" : std::to_string(note0);
 	auto padName = sampler->getPadName(padIndex);
 	auto sampleName = soundIndex != -1 ? "-" + sampler->getSoundName(soundIndex) : "-OFF";
 	
@@ -91,7 +90,7 @@ void CopyNoteParametersScreen::displayNote0()
 void CopyNoteParametersScreen::displayProg1()
 {
 	auto program = sampler->getProgram(prog1).lock();
-	findField("prog1").lock()->setText(StrUtil::padLeft(to_string(prog1 + 1), " ", 2) + "-" + program->getName());
+	findField("prog1").lock()->setText(StrUtil::padLeft(std::to_string(prog1 + 1), " ", 2) + "-" + program->getName());
 }
 
 void CopyNoteParametersScreen::displayNote1()
@@ -99,7 +98,7 @@ void CopyNoteParametersScreen::displayNote1()
 	auto program = sampler->getProgram(prog1).lock();
 	auto padIndex = program->getPadIndexFromNote(note1 + 35);
 	auto soundIndex = note1 != -1 ? program->getNoteParameters(note1 + 35)->getSoundIndex() : -1;
-	auto noteText = note1 == -1 ? "--" : to_string(note1 + 35);
+	auto noteText = note1 == -1 ? "--" : std::to_string(note1 + 35);
 	auto padName = sampler->getPadName(padIndex);
 	auto sampleName = soundIndex != -1 ? "-" + sampler->getSoundName(soundIndex) : "-OFF";
 

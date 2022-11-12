@@ -1,11 +1,9 @@
 #include <sequencer/MidiClockEvent.hpp>
 
 using namespace mpc::sequencer;
-using namespace std;
 
-MidiClockEvent::MidiClockEvent(int status) 
+MidiClockEvent::MidiClockEvent(int statusToUse) : status(statusToUse)
 {
-	this->status = status;
 }
 
 int MidiClockEvent::getStatus()
@@ -19,7 +17,7 @@ void MidiClockEvent::setStatus(int i)
 }
 
 void MidiClockEvent::CopyValuesTo(std::weak_ptr<Event> dest) {
-	auto lDest = dynamic_pointer_cast<MidiClockEvent>(dest.lock());
+	auto lDest = std::dynamic_pointer_cast<MidiClockEvent>(dest.lock());
 	Event::CopyValuesTo(dest);
 	lDest->setStatus(getStatus());
 }

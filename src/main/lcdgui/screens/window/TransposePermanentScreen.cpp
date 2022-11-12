@@ -7,7 +7,6 @@
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;
-using namespace std;
 
 TransposePermanentScreen::TransposePermanentScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "transpose-permanent", layerIndex)
@@ -24,7 +23,7 @@ void TransposePermanentScreen::function(int i)
 		auto transScreen = mpc.screens->get<TransScreen>("trans");
 		auto all = transScreen->tr == -1;
 
-		vector<int> tracks;
+		std::vector<int> tracks;
 		
 		if (all)
 		{

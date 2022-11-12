@@ -16,7 +16,6 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::lcdgui;
-using namespace std;
 
 DeleteFileScreen::DeleteFileScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "delete-file", layerIndex)
@@ -41,7 +40,7 @@ void DeleteFileScreen::function(int i)
 		if (deleteThread.joinable())
 			deleteThread.join();
 		
-		deleteThread = thread(&DeleteFileScreen::static_delete, this);
+		deleteThread = std::thread(&DeleteFileScreen::static_delete, this);
 		break;
 	}
 }
@@ -53,7 +52,7 @@ void DeleteFileScreen::static_delete(void * args)
 
 void DeleteFileScreen::deleteFile()
 {
-	this_thread::sleep_for(chrono::milliseconds(400));
+	std::this_thread::sleep_for(std::chrono::milliseconds(400));
 
 	auto disk = mpc.getDisk().lock();
 

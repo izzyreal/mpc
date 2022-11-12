@@ -6,7 +6,6 @@
 #include <disk/AbstractDisk.hpp>
 
 using namespace mpc::lcdgui::screens::window;
-using namespace std;
 
 SaveAProgramScreen::SaveAProgramScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "save-a-program", layerIndex)
@@ -83,7 +82,7 @@ void SaveAProgramScreen::displaySave()
 
 void SaveAProgramScreen::displayReplaceSameSounds()
 {
-	findField("replace-same-sounds").lock()->setText(string(replaceSameSounds ? "YES" : "NO"));
+	findField("replace-same-sounds").lock()->setText(std::string(replaceSameSounds ? "YES" : "NO"));
 }
 
 void SaveAProgramScreen::displayFile()

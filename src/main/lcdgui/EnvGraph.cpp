@@ -1,30 +1,28 @@
 #include "EnvGraph.hpp"
 
 #include <Mpc.hpp>
-#include <lcdgui/LayeredScreen.hpp>
 
 #include <gui/Bressenham.hpp>
 
 #include <Util.hpp>
 
 using namespace mpc::lcdgui;
-using namespace std;
 
 EnvGraph::EnvGraph(mpc::Mpc& mpc)
 	: Component("env-graph"), mpc(mpc)
 {
-	setSize(190, 40);
+	Component::setSize(190, 40);
 	setLocation(10, 10);
 }
 
 void EnvGraph::setCoordinates(int attack, int decay, bool decayModeStart)
 {
-	vector<int> line1{ 75, 43, 75 + (int)(attack * 0.2), 24 };
+	std::vector<int> line1{ 75, 43, 75 + (int)(attack * 0.2), 24 };
 
-	vector<int> line2;
-	vector<int> line3;
+	std::vector<int> line2;
+	std::vector<int> line3;
 
-	vector<vector<int>> lines;
+	std::vector<std::vector<int>> lines;
 
 	if (decayModeStart)
 	{
@@ -42,9 +40,9 @@ void EnvGraph::setCoordinates(int attack, int decay, bool decayModeStart)
 	setCoordinates(lines);
 }
 
-void EnvGraph::setCoordinates(vector<vector<int>> coordinates)
+void EnvGraph::setCoordinates(std::vector<std::vector<int>> newCoordinates)
 {
-	this->coordinates = coordinates;
+	coordinates = newCoordinates;
 	SetDirty();
 }
 

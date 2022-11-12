@@ -27,14 +27,14 @@ namespace mpc::lcdgui
 		void initSamplesPerPixel();
 
 	public:
-		void setSampleData(std::vector<float>* sampleData, bool mono, unsigned int view);
+		void setSampleData(std::vector<float>* newSampleData, bool newMono, unsigned int newView);
 		void setSelection(unsigned int start, unsigned int end);
 
 	public:
-		void setFine(bool fine);
+		void setFine(bool newFineEnabled);
 		void zoomPlus();
 		void zoomMinus();
-		void setCenterSamplePos(unsigned int centerSamplePos);
+		void setCenterSamplePos(unsigned int newCenterSamplePos);
 
 	public:
 		void Draw(std::vector<std::vector<bool>>* pixels) override;

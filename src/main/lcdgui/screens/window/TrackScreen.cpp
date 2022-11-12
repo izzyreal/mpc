@@ -5,7 +5,6 @@
 #include <lcdgui/screens/window/NameScreen.hpp>
 
 using namespace mpc::lcdgui::screens::window;
-using namespace std;
 
 TrackScreen::TrackScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "track", layerIndex)
@@ -45,13 +44,13 @@ void TrackScreen::turnWheel(int i)
 {
 	init();
 	auto nameScreen = mpc.screens->get<NameScreen>("name");
-    std::function<void(string&)> renamer;
+    std::function<void(std::string&)> renamer;
     
-	if (param.find("default") != string::npos)
+	if (param.find("default") != std::string::npos)
 	{
         nameScreen->setName(sequencer->getDefaultTrackName(sequencer->getActiveTrackIndex()));
         
-        renamer = [&](string& newName) {
+        renamer = [&](std::string& newName) {
             sequencer->setDefaultTrackName(newName, sequencer->getActiveTrackIndex());
         };
 	}
@@ -63,7 +62,7 @@ void TrackScreen::turnWheel(int i)
 
 		nameScreen->setName(_track->getName());
         
-        renamer = [_track](string& newName) {
+        renamer = [_track](std::string& newName) {
             _track->setName(newName);
         };
 	}

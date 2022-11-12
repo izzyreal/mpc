@@ -4,11 +4,10 @@
 #include <sampler/Program.hpp>
 
 using namespace mpc::file::pgmwriter;
-using namespace std;
 
-MidiNotes::MidiNotes(mpc::sampler::Program* program, vector<int> snConvTable)
+MidiNotes::MidiNotes(mpc::sampler::Program* program, std::vector<int> snConvTable)
 {
-	midiNotesArray = vector<char>(1601);
+	midiNotesArray = std::vector<char>(1601);
 	
 	for (int i = 0; i < 64; i++)
 	{
@@ -169,7 +168,7 @@ void MidiNotes::setVelocityToPitch(int midiNote, int velocityToPitch)
     midiNotesArray[(midiNote * 25) + 24] = velocityToPitch;
 }
 
-void MidiNotes::setShort(vector<char>& ca, int offset, int16_t s)
+void MidiNotes::setShort(std::vector<char>& ca, int offset, int16_t s)
 {
 	ca[offset] = s;
 	ca[offset + 1] = s >> 8;

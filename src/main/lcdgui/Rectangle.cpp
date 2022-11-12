@@ -2,9 +2,8 @@
 #include <Paths.hpp>
 
 using namespace mpc::lcdgui;
-using namespace std;
 
-Rectangle::Rectangle(const string& name, MRECT rect)
+Rectangle::Rectangle(const std::string& name, MRECT rect)
 	: Component(name)
 {
 	w = rect.W();
@@ -27,12 +26,12 @@ void Rectangle::Draw(std::vector< std::vector<bool>>* pixels)
 	Component::Draw(pixels);
 }
 
-void Rectangle::setOn(bool on)
+void Rectangle::setOn(bool newOn)
 {
-	if (this->on == on)
+	if (on == newOn)
 		return;
 
-	this->on = on;
+	on = newOn;
 
 	SetDirty(true);
 }

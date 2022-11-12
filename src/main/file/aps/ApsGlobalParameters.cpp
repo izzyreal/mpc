@@ -3,7 +3,6 @@
 #include <Mpc.hpp>
 #include <file/aps/ApsParser.hpp>
 
-#include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/MixerSetupScreen.hpp>
 #include <lcdgui/screens/DrumScreen.hpp>
 #include <lcdgui/screens/PgmAssignScreen.hpp>
@@ -14,9 +13,8 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens; 
 using namespace moduru::file;
 using namespace mpc::file::aps;
-using namespace std;
 
-ApsGlobalParameters::ApsGlobalParameters(mpc::Mpc& mpc, const vector<char>& loadBytes)
+ApsGlobalParameters::ApsGlobalParameters(mpc::Mpc& mpc, const std::vector<char>& loadBytes)
 	: mpc(mpc)
 {
 	padToInternalSound = BitUtil::getBits(loadBytes[0])[7] == '1';
@@ -32,7 +30,7 @@ ApsGlobalParameters::ApsGlobalParameters(mpc::Mpc& mpc, const vector<char>& load
 ApsGlobalParameters::ApsGlobalParameters(mpc::Mpc& mpc)
 	: mpc(mpc)
 {
-	saveBytes = vector<char>(ApsParser::PARAMETERS_LENGTH);
+	saveBytes = std::vector<char>(ApsParser::PARAMETERS_LENGTH);
 	
 	for (int i = 0; i < saveBytes.size(); i++)
 		if (mpc.getSampler().lock()->getSoundCount() == 0)
@@ -65,8 +63,8 @@ ApsGlobalParameters::ApsGlobalParameters(mpc::Mpc& mpc)
 	saveBytes[6] = masterLevelVal;
 }
 
-vector<char> ApsGlobalParameters::TEMPLATE_NO_SOUNDS = vector<char>{ 127, (char) (254 & 0xff), 124, (char) (238 & 0xff), 0, 0, 0, 64 };
-vector<char> ApsGlobalParameters::TEMPLATE_SOUNDS = vector<char>{ '\x03', '\x38', '\x00', '\xa1', 0, 0, 0, 64 };
+std::vector<char> ApsGlobalParameters::TEMPLATE_NO_SOUNDS = { 127, (char) (254 & 0xff), 124, (char) (238 & 0xff), 0, 0, 0, 64 };
+std::vector<char> ApsGlobalParameters::TEMPLATE_SOUNDS = { '\x03', '\x38', '\x00', '\xa1', 0, 0, 0, 64 };
 
 int ApsGlobalParameters::readFxDrum(char b)
 {
@@ -116,7 +114,7 @@ int ApsGlobalParameters::getMasterLevel()
     return masterLevel;
 }
 
-vector<char> ApsGlobalParameters::getBytes()
+std::vector<char> ApsGlobalParameters::getBytes()
 {
     return saveBytes;
 }

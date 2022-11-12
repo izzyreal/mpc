@@ -6,7 +6,6 @@
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;
-using namespace std;
 
 LoopSongScreen::LoopSongScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "loop-song", layerIndex)
@@ -27,21 +26,21 @@ void LoopSongScreen::turnWheel(int i)
 	auto songScreen = mpc.screens->get<SongScreen>("song");
 	auto song = sequencer->getSong(songScreen->getActiveSongIndex());
 
-	if (param.compare("first-step") == 0)
+	if (param == "first-step")
 	{
 		song->setFirstStep(song->getFirstStep() + i);
 		displayFirstStep();
 		displayLastStep();
 		displayNumberOfSteps();
 	}
-	else if (param.compare("last-step") == 0)
+	else if (param == "last-step")
 	{
 		song->setLastStep(song->getLastStep() + i);
 		displayLastStep();
 		displayFirstStep();
 		displayNumberOfSteps();
 	}
-	else if (param.compare("number-of-steps") == 0)
+	else if (param == "number-of-steps")
 	{
 		auto candidate = song->getLastStep() + i;
 		
@@ -59,7 +58,7 @@ void LoopSongScreen::displayFirstStep()
 {
 	auto songScreen = mpc.screens->get<SongScreen>("song");
 	auto song = sequencer->getSong(songScreen->getActiveSongIndex());
-	findField("first-step").lock()->setTextPadded(to_string(song->getFirstStep() + 1));
+	findField("first-step").lock()->setTextPadded(std::to_string(song->getFirstStep() + 1));
 }
 
 void LoopSongScreen::displayLastStep()
@@ -67,12 +66,12 @@ void LoopSongScreen::displayLastStep()
 	auto songScreen = mpc.screens->get<SongScreen>("song");
 	auto song = sequencer->getSong(songScreen->getActiveSongIndex());
 
-	findField("last-step").lock()->setTextPadded(to_string(song->getLastStep() + 1));
+	findField("last-step").lock()->setTextPadded(std::to_string(song->getLastStep() + 1));
 }
 
 void LoopSongScreen::displayNumberOfSteps()
 {
 	auto songScreen = mpc.screens->get<SongScreen>("song");
 	auto song = sequencer->getSong(songScreen->getActiveSongIndex());
-	findField("number-of-steps").lock()->setTextPadded(to_string(song->getLastStep() - song->getFirstStep() + 1));
+	findField("number-of-steps").lock()->setTextPadded(std::to_string(song->getLastStep() - song->getFirstStep() + 1));
 }

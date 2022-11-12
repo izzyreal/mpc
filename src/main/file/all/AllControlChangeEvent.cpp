@@ -2,15 +2,13 @@
 
 #include <file/all/AllEvent.hpp>
 #include <sequencer/ControlChangeEvent.hpp>
-#include <sequencer/Event.hpp>
 
 using namespace mpc::file::all;
 using namespace mpc::sequencer;
-using namespace std;
 
-shared_ptr<ControlChangeEvent> AllControlChangeEvent::bytesToMpcEvent(const vector<char>& bytes)
+std::shared_ptr<ControlChangeEvent> AllControlChangeEvent::bytesToMpcEvent(const std::vector<char>& bytes)
 {
-	auto event = make_shared<ControlChangeEvent>();
+	auto event = std::make_shared<ControlChangeEvent>();
 	
     event->setTick(AllEvent::readTick(bytes));
 	event->setTrack(bytes[AllEvent::TRACK_OFFSET]);
@@ -20,9 +18,9 @@ shared_ptr<ControlChangeEvent> AllControlChangeEvent::bytesToMpcEvent(const vect
     return event;
 }
 
-vector<char> AllControlChangeEvent::mpcEventToBytes(shared_ptr<ControlChangeEvent> event)
+std::vector<char> AllControlChangeEvent::mpcEventToBytes(std::shared_ptr<ControlChangeEvent> event)
 {
-	vector<char> bytes(8);
+	std::vector<char> bytes(8);
     
     bytes[AllEvent::EVENT_ID_OFFSET] = AllEvent::CONTROL_CHANGE_ID;
 	AllEvent::writeTick(bytes, static_cast<int>(event->getTick()));

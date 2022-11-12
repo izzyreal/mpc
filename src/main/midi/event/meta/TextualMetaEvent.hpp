@@ -13,8 +13,8 @@ namespace mpc::midi::event::meta
 		std::string mText = "";
 
 	public:
-		virtual void setText(std::string t);
-		virtual std::string getText();
+		void setText(std::string t);
+		std::string getText();
 
 	public:
 		void writeToOutputStream(std::ostream& out) override;

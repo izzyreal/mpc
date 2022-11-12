@@ -33,31 +33,29 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace moduru::lang;
 
-using namespace std;
-
 LayeredScreen::LayeredScreen(mpc::Mpc& mpc)
 	: mpc(mpc)
 {
     auto fs = cmrc::mpc::get_filesystem();
 
     auto fntFile = fs.open("fonts/mpc2000xl-font.fnt");
-    char* fntData = (char*) string_view(fntFile.begin(), fntFile.end() - fntFile.begin()).data();
+    char* fntData = (char*) std::string_view(fntFile.begin(), fntFile.end() - fntFile.begin()).data();
 
     auto bmpFile = fs.open("fonts/mpc2000xl-font_0.bmp");
-    char* bmpData = (char*) string_view(bmpFile.begin(), bmpFile.end() - bmpFile.begin()).data();
+    char* bmpData = (char*) std::string_view(bmpFile.begin(), bmpFile.end() - bmpFile.begin()).data();
 
 	moduru::gui::BMFParser bmfParser(fntData, fntFile.size(), bmpData, bmpFile.size());
 
 	font = bmfParser.getLoadedFont();
 	atlas = bmfParser.getAtlas();
 
-	root = make_unique<Component>("root");
+	root = std::make_unique<Component>("root");
 	
-	shared_ptr<Layer> previousLayer;
+	std::shared_ptr<Layer> previousLayer;
 
 	for (int i = 0; i < LAYER_COUNT; i++)
 	{
-		auto layer = make_shared<Layer>();
+		auto layer = std::make_shared<Layer>();
 		layers.push_back(layer);
 		
         if (previousLayer)
@@ -69,14 +67,14 @@ LayeredScreen::LayeredScreen(mpc::Mpc& mpc)
 	}
 }
 
-weak_ptr<ScreenComponent> LayeredScreen::findScreenComponent()
+std::weak_ptr<ScreenComponent> LayeredScreen::findScreenComponent()
 {
 	return getFocusedLayer().lock()->findScreenComponent();
 }
 
-int LayeredScreen::openScreen(string screenName)
+int LayeredScreen::openScreen(std::string screenName)
 {
-	if (currentScreenName.compare(screenName) == 0)
+	if (currentScreenName == screenName)
 		return -1;
 
     auto screenComponent = mpc.screens->getScreenComponent(screenName);
@@ -86,15 +84,15 @@ int LayeredScreen::openScreen(string screenName)
     
 	auto ams = mpc.getAudioMidiServices().lock();
 
-	if (currentScreenName.compare("song") == 0 && mpc.getSequencer().lock()->isPlaying())
+	if (currentScreenName == "song" && mpc.getSequencer().lock()->isPlaying())
 		return -1;
 
-	if (currentScreenName.compare("sample") == 0)
+	if (currentScreenName == "sample")
 	{
 		ams->muteMonitor(true);
 		ams->getSoundRecorder().lock()->setSampleScreenActive(false);
 	}
-	else if (screenName.compare("sample") == 0)
+	else if (screenName == "sample")
 	{
 		auto sampleScreen = mpc.screens->get<SampleScreen>("sample");
 		bool muteMonitor = sampleScreen->getMonitor() == 0;
@@ -102,12 +100,12 @@ int LayeredScreen::openScreen(string screenName)
 		ams->getSoundRecorder().lock()->setSampleScreenActive(true);
 	}
 
-	if (currentScreenName.compare("erase") == 0 || currentScreenName.compare("timing-correct") == 0)
+	if (currentScreenName == "erase" || currentScreenName == "timing-correct")
 	{
 		// This field may not be visible the next time we visit this screen.
 		// Like the real 2KXL we always set focus to the first Notes: field
 		// if the current focus is hte second Notes: field.
-		if (getFocus().compare("note1") == 0)
+		if (getFocus() == "note1")
 			setFocus("note0");
 	}
 
@@ -140,12 +138,12 @@ int LayeredScreen::openScreen(string screenName)
     
 	screenComponent->open();
 
-	vector<string> overdubScreens{ "step-editor", "paste-event", "insert-event", "edit-multiple", "step-timing-correct" };
+	std::vector<std::string> overdubScreens{ "step-editor", "paste-event", "insert-event", "edit-multiple", "step-timing-correct" };
 
 	auto isOverdubScreen = find(begin(overdubScreens), end(overdubScreens), currentScreenName) != end(overdubScreens);
 	mpc.getHardware().lock()->getLed("overdub").lock()->light(isOverdubScreen || mpc.getControls().lock()->isOverDubPressed());
 
-	vector<string> nextSeqScreens{ "sequencer", "next-seq", "next-seq-pad", "track-mute", "time-display", "assign" };
+	std::vector<std::string> nextSeqScreens{ "sequencer", "next-seq", "next-seq-pad", "track-mute", "time-display", "assign" };
 
 	auto isNextSeqScreen = find(begin(nextSeqScreens), end(nextSeqScreens), currentScreenName) != end(nextSeqScreens);
 	
@@ -155,7 +153,7 @@ int LayeredScreen::openScreen(string screenName)
 	return focusedLayerIndex;
 }
 
-vector<vector<bool>>* LayeredScreen::getPixels()
+std::vector<std::vector<bool>>* LayeredScreen::getPixels()
 {
 	return &pixels;
 }
@@ -194,15 +192,13 @@ Background* LayeredScreen::getCurrentBackground()
 	return getFocusedLayer().lock()->getBackground();
 }
 
-void LayeredScreen::setCurrentBackground(string s)
+void LayeredScreen::setCurrentBackground(std::string s)
 {
 	getCurrentBackground()->setName(s);
 }
 
-void LayeredScreen::returnToLastFocus(string firstFieldOfCurrentScreen)
+void LayeredScreen::returnToLastFocus(std::string firstFieldOfCurrentScreen)
 {
-	auto focusCounter = 0;
-	
     auto lastFocus = lastFocuses.find(currentScreenName);
     
     if (lastFocus == end(lastFocuses))
@@ -215,12 +211,12 @@ void LayeredScreen::returnToLastFocus(string firstFieldOfCurrentScreen)
     setFocus(lastFocus->second);
 }
 
-void LayeredScreen::setLastFocus(string screenName, string newLastFocus)
+void LayeredScreen::setLastFocus(std::string screenName, std::string newLastFocus)
 {
     lastFocuses[screenName] = newLastFocus;
 }
 
-string LayeredScreen::getLastFocus(string screenName)
+std::string LayeredScreen::getLastFocus(std::string screenName)
 {
     auto lastFocus = lastFocuses.find(screenName);
     
@@ -230,22 +226,17 @@ string LayeredScreen::getLastFocus(string screenName)
     return lastFocus->second;
 }
 
-void LayeredScreen::setCurrentScreenName(string screenName)
-{
-	currentScreenName = screenName;
-}
-
-string LayeredScreen::getCurrentScreenName()
+std::string LayeredScreen::getCurrentScreenName()
 {
 	return currentScreenName;
 }
 
-void LayeredScreen::setPreviousScreenName(string screenName)
+void LayeredScreen::setPreviousScreenName(std::string screenName)
 {
 	previousScreenName = screenName;
 }
 
-string LayeredScreen::getPreviousScreenName()
+std::string LayeredScreen::getPreviousScreenName()
 {
 	return previousScreenName;
 }
@@ -300,7 +291,7 @@ void LayeredScreen::transferLeft()
 	
 	auto currentFocus = getFocusedLayer().lock()->findField(getFocus()).lock();
 
-	shared_ptr<Field> candidate;
+	std::shared_ptr<Field> candidate;
 
 	for (auto& f : getFocusedLayer().lock()->findFields())
 	{
@@ -349,7 +340,7 @@ void LayeredScreen::transferRight()
 		return;
 	}
 
-	shared_ptr<Field> candidate;
+	std::shared_ptr<Field> candidate;
 
 	auto source = getFocusedLayer().lock()->findField(getFocus()).lock();
 
@@ -404,7 +395,7 @@ void LayeredScreen::transferDown()
 	int minDistV = 7;
 	int maxDistH = 6 * marginChars;
 	auto current = getFocusedLayer().lock()->findField(getFocus()).lock();
-	shared_ptr<Field> next;
+	std::shared_ptr<Field> next;
 
 	for (auto& field : getFocusedLayer().lock()->findFields())
 	{
@@ -458,7 +449,7 @@ void LayeredScreen::transferDown()
 
 void LayeredScreen::transferUp()
 {
-	shared_ptr<Field> newCandidate;
+	std::shared_ptr<Field> newCandidate;
 
 	if (transfer(2))
 		return;
@@ -467,7 +458,7 @@ void LayeredScreen::transferUp()
 	int minDistV = -7;
 	int maxDistH = 6 * marginChars;
 	auto result = getFocusedLayer().lock()->findField(getFocus()).lock();
-	shared_ptr<Field> next;
+	std::shared_ptr<Field> next;
 	
 	auto revComponents = getFocusedLayer().lock()->findFields();
 
@@ -525,12 +516,12 @@ void LayeredScreen::transferUp()
 	}
 }
 
-string LayeredScreen::getFocus()
+std::string LayeredScreen::getFocus()
 {
 	return getFocusedLayer().lock()->getFocus();
 }
 
-bool LayeredScreen::setFocus(const string& focus)
+bool LayeredScreen::setFocus(const std::string& focus)
 {
 	return getFocusedLayer().lock()->setFocus(focus);
 }

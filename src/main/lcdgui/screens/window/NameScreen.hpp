@@ -72,7 +72,7 @@ private:
     void displayName();
     std::weak_ptr<mpc::lcdgui::Underline> findUnderline();
     
-    void setName(std::string name);
+    void setName(std::string newName);
     void setNameLimit(int i);
     void setName(std::string str, int i);
     std::string getNameWithoutSpaces();

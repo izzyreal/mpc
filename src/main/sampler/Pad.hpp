@@ -27,7 +27,7 @@ namespace mpc::sampler
 		int getIndex();
 
 	public:
-		Pad(mpc::Mpc& mpc, int index);
+		Pad(mpc::Mpc& mpc, int indexToUse);
 
 	};
 }

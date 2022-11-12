@@ -16,7 +16,6 @@ namespace mpc::sequencer
 
 		void CopyValuesTo(std::weak_ptr<Event> dest) override;
 
-		ProgramChangeEvent();
 		std::string getTypeName() override { return "program-change"; }
 
 	};

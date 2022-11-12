@@ -6,7 +6,6 @@
 #include <midi/util/VariableLengthInt.hpp>
 
 using namespace mpc::midi::event::meta;
-using namespace std;
 
 SequencerSpecificEvent::SequencerSpecificEvent(int tick, int delta, std::vector<char> data)
 	: MetaEvent(tick, delta, MetaEvent::SEQUENCER_SPECIFIC)
@@ -31,7 +30,7 @@ int SequencerSpecificEvent::getEventSize()
 	return 1 + 1 + mLength.getByteCount() + mData.size();
 }
 
-void SequencerSpecificEvent::writeToOutputStream(ostream& out)
+void SequencerSpecificEvent::writeToOutputStream(std::ostream& out)
 {
 	MetaEvent::writeToOutputStream(out);
 	auto length = mLength.getBytes();
@@ -39,7 +38,7 @@ void SequencerSpecificEvent::writeToOutputStream(ostream& out)
 	out.write(&mData[0], mData.size());
 }
 
-void SequencerSpecificEvent::writeToOutputStream(ostream& out, bool writeType)
+void SequencerSpecificEvent::writeToOutputStream(std::ostream& out, bool writeType)
 {
 	MetaEvent::writeToOutputStream(out, writeType);
 }
@@ -52,7 +51,7 @@ int SequencerSpecificEvent::compareTo(mpc::midi::event::MidiEvent* other)
 	if (mDelta.getValue() != other->getDelta()) {
 		return mDelta.getValue() < other->getDelta() ? 1 : -1;
 	}
-	if (!(dynamic_cast<SequencerSpecificEvent*>(other) != nullptr)) {
+	if (dynamic_cast<SequencerSpecificEvent*>(other) == nullptr) {
 		return 1;
 	}
 	auto o = dynamic_cast<SequencerSpecificEvent*>(other);

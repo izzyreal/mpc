@@ -1,18 +1,13 @@
 #include <sequencer/MixerEvent.hpp>
 
 using namespace mpc::sequencer;
-using namespace std;
-
-MixerEvent::MixerEvent()
-{
-}
 
 void MixerEvent::setParameter(int i)
 {
 	if (i < 0 || i > 3) return;
 	mixerParameter = i;
 	
-	notifyObservers(string("step-editor"));
+	notifyObservers(std::string("step-editor"));
 }
 
 int MixerEvent::getParameter()
@@ -26,7 +21,7 @@ void MixerEvent::setPadNumber(int i)
 
     padNumber = i;
     
-    notifyObservers(string("step-editor"));
+    notifyObservers(std::string("step-editor"));
 }
 
 int MixerEvent::getPad()
@@ -40,7 +35,7 @@ void MixerEvent::setValue(int i)
 
     mixerParameterValue = i;
     
-    notifyObservers(string("step-editor"));
+    notifyObservers(std::string("step-editor"));
 }
 
 int MixerEvent::getValue()
@@ -50,7 +45,7 @@ int MixerEvent::getValue()
 
 void MixerEvent::CopyValuesTo(std::weak_ptr<Event> dest) {
 	Event::CopyValuesTo(dest);
-	auto lDest = dynamic_pointer_cast<MixerEvent>(dest.lock());
+	auto lDest = std::dynamic_pointer_cast<MixerEvent>(dest.lock());
 	lDest->setPadNumber(getPad());
 	lDest->setParameter(getParameter());
 	lDest->setValue(getValue());

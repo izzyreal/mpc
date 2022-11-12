@@ -12,39 +12,38 @@
 
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui::screens;
-using namespace std;
 
 bool WithTimesAndNotes::checkAllTimes(mpc::Mpc& mpc, int notch, Sequence* seq)
 {
 	auto sequence = seq != nullptr ? seq : mpc.getSequencer().lock()->getActiveSequence().get();
 	auto param = mpc.getLayeredScreen().lock()->getFocus();
 
-	if (param.compare("time0") == 0)
+	if (param == "time0")
 	{
 		setTime0(SeqUtil::getTickFromBar((SeqUtil::getBarFromTick(sequence, time0)) + notch, sequence, time0));
 		return true;
 	}
-	else if (param.compare("time1") == 0)
+	else if (param == "time1")
 	{
 		setTime0(SeqUtil::setBeat((SeqUtil::getBeat(sequence, time0)) + notch, sequence, time0));
 		return true;
 	}
-	else if (param.compare("time2") == 0)
+	else if (param == "time2")
 	{
 		setTime0(SeqUtil::setClock((SeqUtil::getClock(sequence, time0)) + notch, sequence, time0));
 		return true;
 	}
-	else if (param.compare("time3") == 0)
+	else if (param == "time3")
 	{
 		setTime1(SeqUtil::getTickFromBar((SeqUtil::getBarFromTick(sequence, time1)) + notch, sequence, time1));
 		return true;
 	}
-	else if (param.compare("time4") == 0)
+	else if (param == "time4")
 	{
 		setTime1(SeqUtil::setBeat((SeqUtil::getBeat(sequence, time1)) + notch, sequence, time1));
 		return true;
 	}
-	else if (param.compare("time5") == 0)
+	else if (param == "time5")
 	{
 		setTime1(SeqUtil::setClock((SeqUtil::getClock(sequence, time1)) + notch, sequence, time1));
 		return true;
@@ -60,7 +59,7 @@ bool WithTimesAndNotes::checkAllTimesAndNotes(mpc::Mpc& mpc, int notch, Sequence
 	auto timesHaveChanged = checkAllTimes(mpc, notch, seq);
 	auto notesHaveChanged = false;
 
-	if (param.compare("note0") == 0)
+	if (param == "note0")
 	{
 		auto track = mpc.getSequencer().lock()->getActiveTrack().get();
 
@@ -87,7 +86,7 @@ bool WithTimesAndNotes::checkAllTimesAndNotes(mpc::Mpc& mpc, int notch, Sequence
 
 		notesHaveChanged = true;
 	}
-	else if (param.compare("note1") == 0)
+	else if (param == "note1")
 	{
 		setNote1(note1 + notch);
 		notesHaveChanged = true;
@@ -122,22 +121,22 @@ void WithTimesAndNotes::setNote1(int i)
 	displayNotes();
 }
 
-void WithTimesAndNotes::setTime0(int time0)
+void WithTimesAndNotes::setTime0(int newTime0)
 {
-	this->time0 = time0;
+	time0 = newTime0;
 
-	if (time0 > time1)
-		time1 = time0;
+	if (newTime0 > time1)
+		time1 = newTime0;
 
 	displayTime();
 }
 
-void WithTimesAndNotes::setTime1(int time1)
+void WithTimesAndNotes::setTime1(int newTime1)
 {
-	this->time1 = time1;
+	time1 = newTime1;
 
-	if (time1 < time0)
-		time0 = time1;
+	if (newTime1 < time0)
+		time0 = newTime1;
 
 	displayTime();
 }

@@ -3,18 +3,17 @@
 #include <midi/event/meta/MetaEvent.hpp>
 
 using namespace mpc::midi::event::meta;
-using namespace std;
 
-TrackName::TrackName(int tick, int delta, string name) : TextualMetaEvent(tick, delta, MetaEvent::TRACK_NAME, name)
+TrackName::TrackName(int tick, int delta, std::string name) : TextualMetaEvent(tick, delta, MetaEvent::TRACK_NAME, name)
 {
 }
 
-void TrackName::setName(string name)
+void TrackName::setName(std::string name)
 {
     setText(name);
 }
 
-string TrackName::getTrackName()
+std::string TrackName::getTrackName()
 {
     return getText();
 }

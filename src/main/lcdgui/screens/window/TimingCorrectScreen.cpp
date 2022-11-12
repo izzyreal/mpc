@@ -8,7 +8,6 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 using namespace moduru::lang;
-using namespace std;
 
 TimingCorrectScreen::TimingCorrectScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "timing-correct", layerIndex)
@@ -86,19 +85,19 @@ void TimingCorrectScreen::turnWheel(int i)
 {
 	init();
 	
-	if (param.compare("notevalue") == 0)
+	if (param == "notevalue")
 	{
 		setNoteValue(noteValue + i);
 	}
-	else if (param.compare("swing") == 0)
+	else if (param == "swing")
 	{
 		setSwing(swing + i);
 	}
-	else if (param.compare("shifttiming") == 0)
+	else if (param == "shifttiming")
 	{
 		setShiftTimingLater(i > 0);
 	}
-	else if (param.compare("amount") == 0)
+	else if (param == "amount")
 	{
 		setAmount(amount + i);
 	}
@@ -129,7 +128,7 @@ void TimingCorrectScreen::displayNoteValue()
 
 void TimingCorrectScreen::displaySwing()
 {
-	findField("swing").lock()->setText(to_string(swing));
+	findField("swing").lock()->setText(std::to_string(swing));
 }
 
 void TimingCorrectScreen::displayNotes()
@@ -141,8 +140,8 @@ void TimingCorrectScreen::displayNotes()
 		findField("note0").lock()->setAlignment(Alignment::Centered, 18);
 		findField("note0").lock()->setLocation(62, 40);
 		findField("note0").lock()->setSize(47, 9);
-		findField("note0").lock()->setText(StrUtil::padLeft(to_string(note0), " ", 3) + "(" + mpc::Util::noteNames()[note0] + u8"\u00D4");
-		findField("note1").lock()->setText(StrUtil::padLeft(to_string(note1), " ", 3) + "(" + mpc::Util::noteNames()[note1] + u8"\u00D4");
+		findField("note0").lock()->setText(StrUtil::padLeft(std::to_string(note0), " ", 3) + "(" + mpc::Util::noteNames()[note0] + u8"\u00D4");
+		findField("note1").lock()->setText(StrUtil::padLeft(std::to_string(note1), " ", 3) + "(" + mpc::Util::noteNames()[note1] + u8"\u00D4");
 		findLabel("note1").lock()->Hide(false);
 		findField("note1").lock()->Hide(false);
 	}

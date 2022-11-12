@@ -6,7 +6,6 @@
 #include <cmath>
 
 using namespace mpc::lcdgui::screens;
-using namespace std;
 
 SampleScreen::SampleScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "sample", layerIndex)
@@ -229,7 +228,7 @@ void SampleScreen::displayInput()
 
 void SampleScreen::displayThreshold()
 {
-	auto thresholdText = threshold == -64 ? u8"-\u00D9\u00DA" : to_string(threshold);
+	auto thresholdText = threshold == -64 ? u8"-\u00D9\u00DA" : std::to_string(threshold);
 	findField("threshold").lock()->setTextPadded(thresholdText);
 }
 
@@ -240,7 +239,7 @@ void SampleScreen::displayMode()
 
 void SampleScreen::displayTime()
 {
-	string timeText = to_string(time);
+	auto timeText = std::to_string(time);
 	timeText = timeText.substr(0, timeText.length() - 1) + "." + timeText.substr(timeText.length() - 1);
 	findField("time").lock()->setTextPadded(timeText);
 }
@@ -257,8 +256,8 @@ void SampleScreen::displayPreRec()
 
 void SampleScreen::updateVU(const float levelL, const float levelR)
 {
-	string lString = "";
-	string rString = "";
+    std::string lString;
+    std::string rString;
 
 	int peaklValue = (int) floor(log10(peakL) * 20);
 	int peakrValue = (int) floor(log10(peakR) * 20);
@@ -268,8 +267,8 @@ void SampleScreen::updateVU(const float levelL, const float levelR)
 
 	for (int i = 0; i < 34; i++)
 	{
-		string l = " ";
-		string r = " ";
+        std::string l = " ";
+        std::string r = " ";
 		bool normall = vuPosToDb[i] <= levell;
 		bool normalr = vuPosToDb[i] <= levelr;
 		
@@ -320,7 +319,7 @@ void SampleScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 	{
 		try
 		{
-			auto vuValue = nonstd::any_cast<pair<float, float>>(arg);
+			auto vuValue = nonstd::any_cast<std::pair<float, float>>(arg);
 			auto left = vuValue.first;
 			auto right = vuValue.second;
 			if (left > peakL) peakL = left;

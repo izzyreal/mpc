@@ -24,7 +24,6 @@ using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::sampler;
 using namespace moduru::lang;
 using namespace moduru::file;
-using namespace std;
 
 LoadScreen::LoadScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "load", layerIndex)
@@ -324,7 +323,7 @@ void LoadScreen::displayDirectory()
 
 void LoadScreen::displayFreeSnd()
 {
-	findLabel("freesnd").lock()->setText(" " + StrUtil::padLeft(to_string(sampler->getFreeSampleSpace()), " ", 5) + "K");
+	findLabel("freesnd").lock()->setText(" " + StrUtil::padLeft(std::to_string(sampler->getFreeSampleSpace()), " ", 5) + "K");
 }
 
 void LoadScreen::displayFile()
@@ -346,7 +345,7 @@ void LoadScreen::displayFile()
 	{
 		auto periodIndex = selectedFileName.find_last_of(".");
 
-		if (periodIndex != string::npos)
+		if (periodIndex != std::string::npos)
 		{
 			auto extension = selectedFileName.substr(periodIndex, selectedFileName.length());
 			auto fileName = StrUtil::padRight(selectedFileName.substr(0, periodIndex), " ", 16);
@@ -375,7 +374,7 @@ void LoadScreen::displaySize()
 		return;
 	}
 	
-	findLabel("size").lock()->setText(StrUtil::padLeft(to_string(getFileSize()), " ", 6) + "K");
+	findLabel("size").lock()->setText(StrUtil::padLeft(std::to_string(getFileSize()), " ", 6) + "K");
 }
 
 void LoadScreen::setView(int i)
@@ -396,12 +395,12 @@ void LoadScreen::setView(int i)
 }
 
 
-shared_ptr<MpcFile> LoadScreen::getSelectedFile()
+std::shared_ptr<MpcFile> LoadScreen::getSelectedFile()
 {
 	return mpc.getDisk().lock()->getFile(fileLoad);
 }
 
-string LoadScreen::getSelectedFileName()
+std::string LoadScreen::getSelectedFileName()
 {
 	auto fileNames = mpc.getDisk().lock()->getFileNames();
 	
@@ -445,11 +444,11 @@ void LoadScreen::loadSound(bool shouldBeConverted)
     {
         soundLoader.loadSound(getSelectedFile(), result, shouldBeConverted);
     }
-    catch (const exception& exception)
+    catch (const std::exception& exception)
     {
         sampler->deleteSound(sampler->getPreviewSound());
         
-        MLOG("A problem occurred when trying to load " + getSelectedFileName() + ": " + string(exception.what()));
+        MLOG("A problem occurred when trying to load " + getSelectedFileName() + ": " + std::string(exception.what()));
         MLOG(result.errorMessage);
         openScreen("load");
     }

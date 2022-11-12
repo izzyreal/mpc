@@ -29,9 +29,8 @@ namespace mpc {
 
 			public:
 				std::string getProgramNameASCII();
-				void setProgramNameASCII(std::string programName);
 
-				ProgramName(ProgramFileReader* programFile);
+                ProgramName(ProgramFileReader* programFile);
 			};
 
 		}

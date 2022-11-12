@@ -13,14 +13,13 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::controls;
 using namespace moduru::lang;
-using namespace std;
 
 EditSoundScreen::EditSoundScreen(mpc::Mpc& mpc, const int layerIndex)
     : ScreenComponent(mpc, "edit-sound", layerIndex)
 {
-	vector<string> newTimeStretchPresetNames;
+	std::vector<std::string> newTimeStretchPresetNames;
 	
-	const auto letters = vector<string>{ "A", "B", "C" };
+	const std::vector<std::string> letters{ "A", "B", "C" };
 	
     for (auto& s : timeStretchPresetNames)
     {
@@ -195,7 +194,7 @@ void EditSoundScreen::displayVariable()
 		findLabel("new-name").lock()->setSize(11 * 6, 9);
 		findLabel("new-name").lock()->setText("Insert Snd:");
 		findField("new-name").lock()->setLocation(findLabel("new-name").lock()->getW() + 19, 20);
-		string stereo = "";
+        std::string stereo;
 		
 		if (!sampler->getSound(insertSoundIndex).lock()->isMono())
 		{
@@ -211,15 +210,15 @@ void EditSoundScreen::displayVariable()
 		findField("new-name").lock()->setLocation(findLabel("new-name").lock()->getW() + 19, 20); // , 20 is that still from the old days?
 		findField("new-name").lock()->setText(newName);
 
-		auto trimmedPercentage = StrUtil::TrimDecimals(to_string(timeStretchRatio * 0.01), 2);
+		auto trimmedPercentage = StrUtil::TrimDecimals(std::to_string(timeStretchRatio * 0.01), 2);
 		findField("ratio").lock()->setText(StrUtil::padLeft(trimmedPercentage, " ", 6) + "%");
 
 		findField("preset").lock()->setText(timeStretchPresetNames[timeStretchPresetIndex]);
-		findField("adjust").lock()->setText(to_string(timeStretchAdjust));
+		findField("adjust").lock()->setText(std::to_string(timeStretchAdjust));
 	}
 }
 
-void EditSoundScreen::setNewName(string s)
+void EditSoundScreen::setNewName(std::string s)
 {
     newName = s;
 }
@@ -231,7 +230,7 @@ void EditSoundScreen::setEdit(int i)
         return;
     }
     
-    if (returnToScreenName.compare("zone") != 0 && i > 8)
+    if (returnToScreenName != "zone" && i > 8)
     {
         return;
     }
@@ -283,12 +282,12 @@ void EditSoundScreen::setTimeStretchAdjust(int i)
 	displayVariable();
 }
 
-void EditSoundScreen::setReturnToScreenName(string s)
+void EditSoundScreen::setReturnToScreenName(std::string s)
 {
     returnToScreenName = s;
 }
 
-string EditSoundScreen::getReturnToScreenName()
+std::string EditSoundScreen::getReturnToScreenName()
 {
     return returnToScreenName;
 }
@@ -325,7 +324,7 @@ void EditSoundScreen::openNameScreen()
     auto editSoundScreen = this;
     nameScreen->setName(newName);
 
-    auto renamer = [editSoundScreen](string& newName1) {
+    auto renamer = [editSoundScreen](std::string& newName1) {
         editSoundScreen->setNewName(newName1);
     };
 
@@ -460,7 +459,7 @@ void EditSoundScreen::function(int j)
 			if (!destination->isMono())
 				newSoundSampleCount *= 2;
 
-			vector<float> newData(newSoundSampleCount);
+            std::vector<float> newData(newSoundSampleCount);
 			int sourceFrameCounter = 0;
 			int destinationFrameCounter = 0;
 
@@ -577,7 +576,7 @@ void EditSoundScreen::function(int j)
 			}
 
 			auto reverseCounter = end - 1;
-			auto newSampleData = vector<float>(sound->getSampleData()->size());
+			auto newSampleData = std::vector<float>(sound->getSampleData()->size());
 
 			if (sound->isMono())
 			{
@@ -591,8 +590,8 @@ void EditSoundScreen::function(int j)
 			}
 			else
 			{
-				vector<float> newSampleDataLeft(sound->getSampleData()->size() * 0.5);
-				vector<float> newSampleDataRight(sound->getSampleData()->size() * 0.5);
+                std::vector<float> newSampleDataLeft(sound->getSampleData()->size() * 0.5);
+                std::vector<float> newSampleDataRight(sound->getSampleData()->size() * 0.5);
 				auto sampleData = sound->getSampleData();
 
 				for (int i = 0; i < start; i++)
@@ -636,9 +635,9 @@ void EditSoundScreen::function(int j)
 			}
 			else
 			{
-				vector<float> sampleDataLeft = *sound->getSampleData();
+                std::vector<float> sampleDataLeft = *sound->getSampleData();
 				sampleDataLeft.erase(sampleDataLeft.begin() + (sampleDataLeft.size() * 0.5), sampleDataLeft.end());
-				vector<float> sampleDataRight = *sound->getSampleData();
+                std::vector<float> sampleDataRight = *sound->getSampleData();
 				sampleDataRight.erase(sampleDataRight.begin(), sampleDataRight.begin() + (sampleDataRight.size() * 0.5));
 
 				auto ts0 = mpc::sampler::TimeStretch(sampleDataLeft, (float)(timeStretchRatio / 10000.0), sound->getSampleRate(), timeStretchAdjust);
@@ -675,15 +674,15 @@ void EditSoundScreen::function(int j)
             for (int i = start; i < end; i++)
             {
                 float v = abs((*sound->getSampleData())[i]);
-                peak = max(peak, v);
+                peak = std::max(peak, v);
 
                 if (!sound->isMono()) {
                     v = (*sound->getSampleData())[(i + sound->getFrameCount())];
-                    peak = max(peak, v);
+                    peak = std::max(peak, v);
                 }
             }
             
-            peak = min(1.0f, peak);
+            peak = std::min(1.0f, peak);
             
             float factor = 1.0 / peak;
 

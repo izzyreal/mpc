@@ -2,9 +2,6 @@
 
 #include <Mpc.hpp>
 
-#include <sequencer/Sequencer.hpp>
-
-#include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/SecondSeqScreen.hpp>
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 
@@ -12,10 +9,8 @@ using namespace mpc::file::all;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
-using namespace std;
 
-AllSequencer::AllSequencer(mpc::Mpc& mpc, const vector<char>& loadBytes)
-	: mpc(mpc)
+AllSequencer::AllSequencer(const std::vector<char>& loadBytes)
 {
 	sequence = loadBytes[SEQ_OFFSET];
 	track = loadBytes[TR_OFFSET];
@@ -25,9 +20,8 @@ AllSequencer::AllSequencer(mpc::Mpc& mpc, const vector<char>& loadBytes)
 }
 
 AllSequencer::AllSequencer(mpc::Mpc& mpc)
-	: mpc(mpc)
 {
-	saveBytes = vector<char>(LENGTH);
+	saveBytes = std::vector<char>(LENGTH);
 	for (int i = 0; i < LENGTH; i++)
 		saveBytes[i] = TEMPLATE[i];
 	auto seq = mpc.getSequencer().lock();
@@ -44,9 +38,9 @@ AllSequencer::AllSequencer(mpc::Mpc& mpc)
 	saveBytes[SECOND_SEQ_INDEX_OFFSET] = secondSequenceScreen->sq;
 }
 
-vector<char> AllSequencer::TEMPLATE = vector<char>{ 0, 0, 0, 0 , (char) 176, 4, 1, 3, 0, 0, 0, 0, 12, 0, 0, 0 };
+std::vector<char> AllSequencer::TEMPLATE = { 0, 0, 0, 0 , (char) 176, 4, 1, 3, 0, 0, 0, 0, 12, 0, 0, 0 };
 
-vector<char>& AllSequencer::getBytes()
+std::vector<char>& AllSequencer::getBytes()
 {
     return saveBytes;
 }

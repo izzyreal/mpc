@@ -5,7 +5,6 @@
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;
-using namespace std;
 
 LoadAProgramScreen::LoadAProgramScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "load-a-program", layerIndex)
@@ -57,5 +56,5 @@ void LoadAProgramScreen::function(int i)
 
 void LoadAProgramScreen::displayLoadReplaceSound()
 {
-	findField("load-replace-sound").lock()->setText(string(loadReplaceSound ? "YES" : "NO(FASTER)"));
+	findField("load-replace-sound").lock()->setText(std::string(loadReplaceSound ? "YES" : "NO(FASTER)"));
 }

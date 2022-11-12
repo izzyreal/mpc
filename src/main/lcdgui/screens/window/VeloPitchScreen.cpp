@@ -5,7 +5,6 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::controls;
 using namespace moduru::lang;
-using namespace std;
 
 VeloPitchScreen::VeloPitchScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "velo-pitch", layerIndex)
@@ -55,15 +54,15 @@ void VeloPitchScreen::turnWheel(int i)
 void VeloPitchScreen::displayTune()
 {
 	auto value = sampler->getLastNp(program.lock().get())->getTune();
-	string prefix = value < 0 ? "-" : " ";
-	findField("tune").lock()->setText(prefix + StrUtil::padLeft(to_string(abs(value)), " ", 3));
+    std::string prefix = value < 0 ? "-" : " ";
+	findField("tune").lock()->setText(prefix + StrUtil::padLeft(std::to_string(abs(value)), " ", 3));
 }
 
 void VeloPitchScreen::displayVeloPitch()
 {
 	auto value = sampler->getLastNp(program.lock().get())->getVelocityToPitch();
-	string prefix = value < 0 ? "-" : " ";
-	findField("velo-pitch").lock()->setText(prefix + StrUtil::padLeft(to_string(abs(value)), " ", 3));
+    std::string prefix = value < 0 ? "-" : " ";
+	findField("velo-pitch").lock()->setText(prefix + StrUtil::padLeft(std::to_string(abs(value)), " ", 3));
 }
 
 
@@ -74,7 +73,7 @@ void VeloPitchScreen::displayVelo()
 
 void VeloPitchScreen::update(moduru::observer::Observable* observable, nonstd::any message)
 {
-	auto msg = nonstd::any_cast<string>(message);
+	auto msg = nonstd::any_cast<std::string>(message);
 
 	if (msg == "note")
 	{
@@ -91,6 +90,6 @@ void VeloPitchScreen::displayNote()
 	auto padIndex = program.lock()->getPadIndexFromNote(noteParameters->getNumber());
 	auto padName = sampler->getPadName(padIndex);
 	auto sampleName = soundIndex != -1 ? sampler->getSoundName(soundIndex) : "OFF";
-	string stereo = noteParameters->getStereoMixerChannel().lock()->isStereo() && soundIndex != -1 ? "(ST)" : "";
-	findField("note").lock()->setText(to_string(noteParameters->getNumber()) + "/" + padName + "-" + StrUtil::padRight(sampleName, " ", 16) + stereo);
+    std::string stereo = noteParameters->getStereoMixerChannel().lock()->isStereo() && soundIndex != -1 ? "(ST)" : "";
+	findField("note").lock()->setText(std::to_string(noteParameters->getNumber()) + "/" + padName + "-" + StrUtil::padRight(sampleName, " ", 16) + stereo);
 }

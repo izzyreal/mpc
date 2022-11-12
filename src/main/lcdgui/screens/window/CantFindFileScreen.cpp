@@ -1,7 +1,6 @@
 #include "CantFindFileScreen.hpp"
 
 using namespace mpc::lcdgui::screens::window;
-using namespace std;
 
 CantFindFileScreen::CantFindFileScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "cant-find-file", layerIndex)

@@ -1,7 +1,6 @@
 #include <sequencer/SystemExclusiveEvent.hpp>
 
 using namespace mpc::sequencer;
-using namespace std;
 
 void SystemExclusiveEvent::setByteA(unsigned char i)
 {
@@ -12,7 +11,7 @@ void SystemExclusiveEvent::setByteA(unsigned char i)
 
     bytes[0] = i;
     
-    notifyObservers(string("step-editor"));
+    notifyObservers(std::string("step-editor"));
 }
 
 unsigned char SystemExclusiveEvent::getByteA()
@@ -29,7 +28,7 @@ void SystemExclusiveEvent::setByteB(unsigned char i)
 
     bytes[1] = i;
     
-    notifyObservers(string("step-editor"));
+    notifyObservers(std::string("step-editor"));
 }
 
 unsigned char SystemExclusiveEvent::getByteB()
@@ -37,12 +36,12 @@ unsigned char SystemExclusiveEvent::getByteB()
     return bytes[1];
 }
 
-void SystemExclusiveEvent::setBytes(const vector<unsigned char>& ba)
+void SystemExclusiveEvent::setBytes(const std::vector<unsigned char>& ba)
 {
     bytes = ba;
 }
 
-vector<unsigned char>& SystemExclusiveEvent::getBytes()
+std::vector<unsigned char>& SystemExclusiveEvent::getBytes()
 {
     return bytes;
 }
@@ -50,6 +49,6 @@ vector<unsigned char>& SystemExclusiveEvent::getBytes()
 void SystemExclusiveEvent::CopyValuesTo(std::weak_ptr<Event> dest)
 {
 	Event::CopyValuesTo(dest);
-	auto lDest = dynamic_pointer_cast<SystemExclusiveEvent>(dest.lock());
+	auto lDest = std::dynamic_pointer_cast<SystemExclusiveEvent>(dest.lock());
 	lDest->setBytes(getBytes());
 }

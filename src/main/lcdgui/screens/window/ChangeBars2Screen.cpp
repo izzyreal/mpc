@@ -1,16 +1,12 @@
 #include "ChangeBars2Screen.hpp"
 
-#include <lcdgui/Label.hpp>
-#include <lcdgui/LayeredScreen.hpp>
 #include <sequencer/Sequence.hpp>
-#include <sequencer/Sequencer.hpp>
 
 #include <lang/StrUtil.hpp>
 
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace moduru::lang;
-using namespace std;
 
 ChangeBars2Screen::ChangeBars2Screen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "change-bars-2", layerIndex)
@@ -27,7 +23,7 @@ void ChangeBars2Screen::open()
 void ChangeBars2Screen::displayCurrent()
 {
 	auto seq = sequencer->getActiveSequence();
-	findLabel("current").lock()->setText(to_string(seq->getLastBarIndex() + 1));
+	findLabel("current").lock()->setText(std::to_string(seq->getLastBarIndex() + 1));
 }
 
 void ChangeBars2Screen::function(int i)
@@ -75,7 +71,7 @@ void ChangeBars2Screen::displayNewBars()
 	auto message0 = findLabel("message0").lock();
 	auto message1 = findLabel("message1").lock();
 
-	findField("newbars").lock()->setText(StrUtil::padLeft(to_string(newBars + 1), " ", 3));
+	findField("newbars").lock()->setText(StrUtil::padLeft(std::to_string(newBars + 1), " ", 3));
 
 	if (newBars == seq->getLastBarIndex())
 	{

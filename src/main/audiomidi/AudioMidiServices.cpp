@@ -76,12 +76,10 @@ using namespace ctoot::audio::server;
 using namespace ctoot::audio::core;
 using namespace ctoot::audio::mixer;
 
-using namespace std;
-
 AudioMidiServices::AudioMidiServices(mpc::Mpc& mpc)
 	: mpc(mpc)
 {
-	frameSeq = make_shared<mpc::sequencer::FrameSeq>(mpc);
+	frameSeq = std::make_shared<mpc::sequencer::FrameSeq>(mpc);
 	AudioServices::scan();
 	ctoot::synth::SynthServices::scan();
 	ctoot::synth::SynthChannelServices::scan();
@@ -90,18 +88,18 @@ AudioMidiServices::AudioMidiServices(mpc::Mpc& mpc)
 
 void AudioMidiServices::start(const int sampleRate, const int inputCount, const int outputCount) {
 
-	midiSystem = make_shared<ctoot::midi::core::DefaultConnectedMidiSystem>();
+	midiSystem = std::make_shared<ctoot::midi::core::DefaultConnectedMidiSystem>();
 
-	server = make_shared<ExternalAudioServer>();
-	offlineServer = make_shared<NonRealTimeAudioServer>(server);
+	server = std::make_shared<ExternalAudioServer>();
+	offlineServer = std::make_shared<NonRealTimeAudioServer>(server);
 
-	soundRecorder = make_shared<SoundRecorder>(mpc);
-	soundPlayer = make_shared<SoundPlayer>();
+	soundRecorder = std::make_shared<SoundRecorder>(mpc);
+	soundPlayer = std::make_shared<SoundPlayer>();
 
 	setupMixer();
 
-	inputProcesses = vector<shared_ptr<IOAudioProcess>>(inputCount <= 1 ? inputCount : 1);
-	outputProcesses = vector<IOAudioProcess*>(outputCount <= 5 ? outputCount : 5);
+	inputProcesses = std::vector<std::shared_ptr<IOAudioProcess>>(inputCount <= 1 ? inputCount : 1);
+	outputProcesses = std::vector<IOAudioProcess*>(outputCount <= 5 ? outputCount : 5);
 
 	for (auto& p : inputProcesses)
 	{
@@ -115,31 +113,31 @@ void AudioMidiServices::start(const int sampleRate, const int inputCount, const 
 
 	for (int i = 0; i < inputProcesses.size(); i++)
 	{
-		inputProcesses[i] = shared_ptr<IOAudioProcess>(server->openAudioInput(getInputNames()[i], "mpc_in" + to_string(i)));
+		inputProcesses[i] = std::shared_ptr<IOAudioProcess>(server->openAudioInput(getInputNames()[i], "mpc_in" + std::to_string(i)));
 		// For now we assume there is only 1 stereo input pair max
 		if (i == 0)
-			monitorInputAdapter = make_shared<MonitorInputAdapter>(mpc, inputProcesses[i].get());
+			monitorInputAdapter = std::make_shared<MonitorInputAdapter>(mpc, inputProcesses[i].get());
 	}
 
 	for (int i = 0; i < outputProcesses.size(); i++)
 	{
-		outputProcesses[i] = server->openAudioOutput(getOutputNames()[i], "mpc_out" + to_string(i));
+		outputProcesses[i] = server->openAudioOutput(getOutputNames()[i], "mpc_out" + std::to_string(i));
 	}
 
 	createSynth();
 	connectVoices();
 
-	mpcMidiPorts = make_shared<MpcMidiPorts>();
+	mpcMidiPorts = std::make_shared<MpcMidiPorts>();
 
 	initializeDiskRecorders();
 
-	mixer->getStrip(string("66")).lock()->setDirectOutputProcess(soundRecorder);
-	mixer->getStrip(string("67")).lock()->setInputProcess(soundPlayer);
+	mixer->getStrip(std::string("66")).lock()->setDirectOutputProcess(soundRecorder);
+	mixer->getStrip(std::string("67")).lock()->setInputProcess(soundPlayer);
 	auto sc = mixer->getMixerControls().lock()->getStripControls("67").lock();
-	auto mmc = dynamic_pointer_cast<MainMixControls>(sc->find("Main").lock());
-	dynamic_pointer_cast<ctoot::audio::fader::FaderControl>(mmc->find("Level").lock())->setValue(static_cast<float>(100));
+	auto mmc = std::dynamic_pointer_cast<MainMixControls>(sc->find("Main").lock());
+	std::dynamic_pointer_cast<ctoot::audio::fader::FaderControl>(mmc->find("Level").lock())->setValue(static_cast<float>(100));
 
-	cac = make_shared<CompoundAudioClient>();
+	cac = std::make_shared<CompoundAudioClient>();
 	cac->add(frameSeq.get());
 	cac->add(mixer.get());
 
@@ -154,41 +152,41 @@ void AudioMidiServices::start(const int sampleRate, const int inputCount, const 
 void AudioMidiServices::setPreviewClickVolume(int volume)
 {
 	auto sc = mixer->getMixerControls().lock()->getStripControls("65").lock();
-	auto mmc = dynamic_pointer_cast<MainMixControls>(sc->find("Main").lock());
-	dynamic_pointer_cast<ctoot::audio::fader::FaderControl>(mmc->find("Level").lock())->setValue(static_cast<float>(volume));
+	auto mmc = std::dynamic_pointer_cast<MainMixControls>(sc->find("Main").lock());
+	std::dynamic_pointer_cast<ctoot::audio::fader::FaderControl>(mmc->find("Level").lock())->setValue(static_cast<float>(volume));
 }
 
 void AudioMidiServices::setMonitorLevel(int level)
 {
 	auto sc = mixer->getMixerControls().lock()->getStripControls("66").lock();
-	auto mmc = dynamic_pointer_cast<MainMixControls>(sc->find("Main").lock());
-	dynamic_pointer_cast<ctoot::audio::fader::FaderControl>(mmc->find("Level").lock())->setValue(static_cast<float>(level));
+	auto mmc = std::dynamic_pointer_cast<MainMixControls>(sc->find("Main").lock());
+	std::dynamic_pointer_cast<ctoot::audio::fader::FaderControl>(mmc->find("Level").lock())->setValue(static_cast<float>(level));
 }
 
 void AudioMidiServices::muteMonitor(bool mute)
 {
 	auto sc = mixer->getMixerControls().lock()->getStripControls("66").lock();
-	auto mmc = dynamic_pointer_cast<MainMixControls>(sc->find("Main").lock());
-	auto controlRow = dynamic_pointer_cast<CompoundControl>(mmc->find("ControlRow").lock());
-	auto mc = dynamic_pointer_cast<BooleanControl>(controlRow->find("Mute").lock());
+	auto mmc = std::dynamic_pointer_cast<MainMixControls>(sc->find("Main").lock());
+	auto controlRow = std::dynamic_pointer_cast<CompoundControl>(mmc->find("ControlRow").lock());
+	auto mc = std::dynamic_pointer_cast<BooleanControl>(controlRow->find("Mute").lock());
 	mc->setValue(mute);
 }
 
-vector<weak_ptr<DiskRecorder>> AudioMidiServices::getDiskRecorders()
+std::vector<std::weak_ptr<DiskRecorder>> AudioMidiServices::getDiskRecorders()
 {
-	vector <weak_ptr<DiskRecorder>> res;
+	std::vector <std::weak_ptr<DiskRecorder>> res;
 	for (auto& diskRecorder : diskRecorders) {
 		res.push_back(diskRecorder);
 	}
 	return res;
 }
 
-weak_ptr<SoundRecorder> AudioMidiServices::getSoundRecorder()
+std::weak_ptr<SoundRecorder> AudioMidiServices::getSoundRecorder()
 {
 	return soundRecorder;
 }
 
-weak_ptr<SoundPlayer> AudioMidiServices::getSoundPlayer()
+std::weak_ptr<SoundPlayer> AudioMidiServices::getSoundPlayer()
 {
 	return soundPlayer;
 }
@@ -199,7 +197,7 @@ NonRealTimeAudioServer* AudioMidiServices::getAudioServer() {
 
 void AudioMidiServices::setupMixer()
 {
-	mixerControls = make_shared<ctoot::mpc::MpcMixerControls>("MpcMixerControls", 1.f);
+	mixerControls = std::make_shared<ctoot::mpc::MpcMixerControls>("MpcMixerControls", 1.f);
 
 	// AUX#1 - #4 represent ASSIGNABLE MIX OUT 1/2, 3/4, 5/6 and 7/8
 	mixerControls->createAuxBusControls("AUX#1", ChannelFormat::STEREO());
@@ -212,7 +210,7 @@ void AudioMidiServices::setupMixer()
 	int nReturns = 1;
 
 	// L/R represents STEREO OUT L/R
-	ctoot::audio::mixer::MixerControlsFactory::createBusStrips(dynamic_pointer_cast<ctoot::audio::mixer::MixerControls>(mixerControls), "L-R", ChannelFormat::STEREO(), nReturns);
+	ctoot::audio::mixer::MixerControlsFactory::createBusStrips(std::dynamic_pointer_cast<ctoot::audio::mixer::MixerControls>(mixerControls), "L-R", ChannelFormat::STEREO(), nReturns);
 
 	/*
 	* There are 32 voices. Each voice has one channel for mixing to STEREO OUT L/R, and one channel for mixing to an ASSIGNABLE MIX OUT. These are strips 1-64.
@@ -222,8 +220,8 @@ void AudioMidiServices::setupMixer()
 	*/
 	int nMixerChans = 67;
 	ctoot::audio::mixer::MixerControlsFactory::createChannelStrips(mixerControls, nMixerChans);
-	mixer = make_shared<ctoot::audio::mixer::AudioMixer>(mixerControls, offlineServer);
-	audioSystem = make_shared<ctoot::audio::system::MixerConnectedAudioSystem>(mixer);
+	mixer = std::make_shared<ctoot::audio::mixer::AudioMixer>(mixerControls, offlineServer);
+	audioSystem = std::make_shared<ctoot::audio::system::MixerConnectedAudioSystem>(mixer);
 	audioSystem->setAutoConnect(false);
 	muteMonitor(true);
 	setAssignableMixOutLevels();
@@ -232,14 +230,14 @@ void AudioMidiServices::setupMixer()
 void AudioMidiServices::setMasterLevel(int i)
 {
 	auto sc = mixer->getMixerControls().lock()->getStripControls("L-R").lock();
-	auto cc = dynamic_pointer_cast<ctoot::control::CompoundControl>(sc->find("Main").lock());
-	dynamic_pointer_cast<ctoot::mpc::MpcFaderControl>(cc->find("Level").lock())->setValue(i);
+	auto cc = std::dynamic_pointer_cast<ctoot::control::CompoundControl>(sc->find("Main").lock());
+	std::dynamic_pointer_cast<ctoot::mpc::MpcFaderControl>(cc->find("Level").lock())->setValue(i);
 }
 
 int AudioMidiServices::getMasterLevel() {
 	auto sc = mixer->getMixerControls().lock()->getStripControls("L-R").lock();
-	auto cc = dynamic_pointer_cast<ctoot::control::CompoundControl>(sc->find("Main").lock());
-	auto val = dynamic_pointer_cast<ctoot::mpc::MpcFaderControl>(cc->find("Level").lock())->getValue();
+	auto cc = std::dynamic_pointer_cast<ctoot::control::CompoundControl>(sc->find("Main").lock());
+	auto val = std::dynamic_pointer_cast<ctoot::mpc::MpcFaderControl>(cc->find("Level").lock())->getValue();
 	return (int)(val);
 }
 
@@ -253,8 +251,8 @@ int AudioMidiServices::getRecordLevel() {
 	/*
 	// This is how we can get monitor output level
 	auto sc = mixer->getMixerControls().lock()->getStripControls("66").lock();
-	auto mmc = dynamic_pointer_cast<ctoot::audio::mixer::MainMixControls>(sc->find("Main").lock());
-	return static_cast<int>(dynamic_pointer_cast<ctoot::audio::fader::FaderControl>(mmc->find("Level").lock())->getValue());
+	auto mmc = std::dynamic_pointer_cast<ctoot::audio::mixer::MainMixControls>(sc->find("Main").lock());
+	return static_cast<int>(std::dynamic_pointer_cast<ctoot::audio::fader::FaderControl>(mmc->find("Level").lock())->getValue());
 	*/
 }
 
@@ -264,49 +262,49 @@ void AudioMidiServices::setAssignableMixOutLevels()
 	* We have to make sure the ASSIGNABLE MIX OUTs are audible. They're fixed at value 100.
 	*/
 	for (auto j = 1; j <= 4; j++) {
-		string name = "AUX#" + to_string(j);
+		std::string name = "AUX#" + std::to_string(j);
 		auto sc = mixer->getMixerControls().lock()->getStripControls(name).lock();
-		auto cc = dynamic_pointer_cast<ctoot::control::CompoundControl>(sc->find(name).lock());
-		dynamic_pointer_cast<ctoot::mpc::MpcFaderControl>(cc->find("Level").lock())->setValue(100);
+		auto cc = std::dynamic_pointer_cast<ctoot::control::CompoundControl>(sc->find(name).lock());
+		std::dynamic_pointer_cast<ctoot::mpc::MpcFaderControl>(cc->find("Level").lock())->setValue(100);
 	}
 }
 
-vector<string> AudioMidiServices::getInputNames()
+std::vector<std::string> AudioMidiServices::getInputNames()
 {
-	if (!server) return vector<string>{"<disabled>"};
+	if (!server) return std::vector<std::string>{"<disabled>"};
 	return server->getAvailableInputNames();
 }
 
-vector<string> AudioMidiServices::getOutputNames()
+std::vector<std::string> AudioMidiServices::getOutputNames()
 {
-	if (!server) return vector<string>{"<disabled>"};
+	if (!server) return std::vector<std::string>{"<disabled>"};
 	return server->getAvailableOutputNames();
 }
 
-weak_ptr<ctoot::mpc::MpcMultiMidiSynth> AudioMidiServices::getMms()
+std::weak_ptr<ctoot::mpc::MpcMultiMidiSynth> AudioMidiServices::getMms()
 {
 	return mms;
 }
 
 void AudioMidiServices::createSynth()
 {
-	synthRackControls = make_shared<ctoot::synth::SynthRackControls>(1);
-	synthRack = make_shared<ctoot::synth::SynthRack>(synthRackControls, midiSystem, audioSystem);
-	msc = make_shared<ctoot::mpc::MpcMultiSynthControls>();
+	synthRackControls = std::make_shared<ctoot::synth::SynthRackControls>(1);
+	synthRack = std::make_shared<ctoot::synth::SynthRack>(synthRackControls, midiSystem, audioSystem);
+	msc = std::make_shared<ctoot::mpc::MpcMultiSynthControls>();
 	synthRackControls->setSynthControls(0, msc);
-	mms = dynamic_pointer_cast<ctoot::mpc::MpcMultiMidiSynth>(synthRack->getMidiSynth(0).lock());
+	mms = std::dynamic_pointer_cast<ctoot::mpc::MpcMultiMidiSynth>(synthRack->getMidiSynth(0).lock());
 
 	auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>("mixer-setup");
 
 	for (int i = 0; i < 4; i++)
 	{
-		auto m = make_shared<ctoot::mpc::MpcSoundPlayerControls>(mms, dynamic_pointer_cast<ctoot::mpc::MpcSampler>(mpc.getSampler().lock()), i, mixer, server, mixerSetupScreen.get());
+		auto m = std::make_shared<ctoot::mpc::MpcSoundPlayerControls>(mms, std::dynamic_pointer_cast<ctoot::mpc::MpcSampler>(mpc.getSampler().lock()), i, mixer, server, mixerSetupScreen.get());
 		msc->setChannelControls(i, m);
 		synthChannelControls.push_back(m);
 	}
 
-	basicVoice = make_shared<ctoot::mpc::MpcVoice>(65, true);
-	auto m = make_shared<ctoot::mpc::MpcBasicSoundPlayerControls>(mpc.getSampler(), mixer, basicVoice);
+	basicVoice = std::make_shared<ctoot::mpc::MpcVoice>(65, true);
+	auto m = std::make_shared<ctoot::mpc::MpcBasicSoundPlayerControls>(mpc.getSampler(), mixer, basicVoice);
 	msc->setChannelControls(4, m);
 	synthChannelControls.push_back(std::move(m));
 }
@@ -317,7 +315,7 @@ void AudioMidiServices::connectVoices()
 	mpc.getBasicPlayer()->connectVoice();
 }
 
-weak_ptr<MpcMidiPorts> AudioMidiServices::getMidiPorts()
+std::weak_ptr<MpcMidiPorts> AudioMidiServices::getMidiPorts()
 {
 	return mpcMidiPorts;
 }
@@ -325,14 +323,14 @@ weak_ptr<MpcMidiPorts> AudioMidiServices::getMidiPorts()
 void AudioMidiServices::initializeDiskRecorders()
 {
 	for (int i = 0; i < outputProcesses.size(); i++) {
-		auto diskRecorder = make_shared<DiskRecorder>(outputProcesses[i], "diskwriter" + to_string(i));
+		auto diskRecorder = std::make_shared<DiskRecorder>(outputProcesses[i], "diskwriter" + std::to_string(i));
 
         diskRecorders.push_back(diskRecorder);
 
         if (i == 0)
 			mixer->getMainStrip().lock()->setDirectOutputProcess(diskRecorders.back());
 		else
-			mixer->getStrip(string("AUX#" + to_string(i))).lock()->setDirectOutputProcess(diskRecorders.back());
+			mixer->getStrip(std::string("AUX#" + std::to_string(i))).lock()->setDirectOutputProcess(diskRecorders.back());
 	}
 }
 
@@ -371,8 +369,8 @@ void AudioMidiServices::closeIO()
 
 bool AudioMidiServices::prepareBouncing(DirectToDiskSettings* settings)
 {
-	auto indivFileNames = vector<string>{ "L-R.wav", "1-2.wav", "3-4.wav", "5-6.wav", "7-8.wav" };
-	string sep = moduru::file::FileUtil::getSeparator();
+	auto indivFileNames = std::vector<std::string>{ "L-R.wav", "1-2.wav", "3-4.wav", "5-6.wav", "7-8.wav" };
+	std::string sep = moduru::file::FileUtil::getSeparator();
 
 	for (int i = 0; i < diskRecorders.size(); i++)
 	{
@@ -443,7 +441,7 @@ void AudioMidiServices::stopSoundRecorder(bool cancel)
 	recordingSound.store(false);
 }
 
-weak_ptr<mpc::sequencer::FrameSeq> AudioMidiServices::getFrameSequencer()
+std::weak_ptr<mpc::sequencer::FrameSeq> AudioMidiServices::getFrameSequencer()
 {
 	return frameSeq;
 }

@@ -3,7 +3,6 @@
 #include <midi/core/ShortMessage.hpp>
 
 using namespace mpc::sequencer;
-using namespace std;
 
 Event::Event()
 {
@@ -14,7 +13,7 @@ void Event::setTick(int relativeTick)
 {
     tick = relativeTick;
 	
-	notifyObservers(string("tick"));
+	notifyObservers(std::string("tick"));
 }
 
 int Event::getTick()
@@ -32,7 +31,7 @@ void Event::setTrack(int i)
     track = i;
 }
 
-void Event::CopyValuesTo(weak_ptr<Event> dest) {
+void Event::CopyValuesTo(std::weak_ptr<Event> dest) {
 	auto lDest = dest.lock();
 	lDest->setTick(getTick());
 	lDest->setTrack(getTrack());

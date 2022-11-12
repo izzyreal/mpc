@@ -2,8 +2,6 @@
 
 #include <midi/event/MidiEvent.hpp>
 
-#include <unordered_map>
-
 namespace mpc::midi::event {
 
 	class ChannelEvent
@@ -15,9 +13,6 @@ namespace mpc::midi::event {
 		int mChannel{ 0 };
 		int mValue1{ 0 };
 		int mValue2{ 0 };
-
-	private:
-		static std::unordered_map<int, int> mOrderMap;
 
 	public:
 		virtual int getType();
@@ -33,10 +28,7 @@ namespace mpc::midi::event {
 		virtual void writeToOutputStream(std::ostream& out, bool writeType) override;
 		static std::shared_ptr<ChannelEvent> parseChannelEvent(int tick, int delta, int type, int channel, std::stringstream& in);
 
-	private:
-		static void buildOrderMap();
-
-	public:
+    public:
 		static const int NOTE_OFF{ 8 };
 		static const int NOTE_ON{ 9 };
 		static const int NOTE_AFTERTOUCH{ 10 };

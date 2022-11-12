@@ -1,7 +1,6 @@
 #include "SyncScreen.hpp"
 
 using namespace mpc::lcdgui::screens;
-using namespace std;
 
 SyncScreen::SyncScreen(mpc::Mpc& mpc, const int layerIndex) 
 : ScreenComponent(mpc, "sync", layerIndex)
@@ -188,7 +187,7 @@ void SyncScreen::displayShiftEarly()
 
 void SyncScreen::displayIn()
 {
-    string result = to_string(in + 1);
+    auto result = std::to_string(in + 1);
     findField("in").lock()->setText(result);
 }
 
@@ -220,13 +219,13 @@ void SyncScreen::displayModeOut()
 
 void SyncScreen::displayReceiveMMC()
 {
-    auto mmc = string(receiveMMCEnabled ? "ON" : "OFF");
+    auto mmc = std::string(receiveMMCEnabled ? "ON" : "OFF");
     findField("receive-mmc").lock()->setText(mmc);
 }
 
 void SyncScreen::displaySendMMC()
 {
-    auto mmc = string(sendMMCEnabled ? "ON" : "OFF");
+    auto mmc = std::string(sendMMCEnabled ? "ON" : "OFF");
     findField("send-mmc").lock()->setText(mmc);
 }
 

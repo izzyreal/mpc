@@ -6,7 +6,6 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::controls;
-using namespace std;
 
 ProgramScreen::ProgramScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "program", layerIndex)
@@ -30,7 +29,7 @@ void ProgramScreen::turnWheel(int i)
         const auto _program = program.lock();
         nameScreen->setName(_program->getName());
 
-        auto renamer = [_program](string& newName) {
+        auto renamer = [_program](std::string& newName) {
             _program->setName(newName);
         };
 

@@ -9,11 +9,10 @@
 
 using namespace mpc::sampler;
 using namespace ctoot::mpc;
-using namespace std;
 
-Program::Program(mpc::Mpc& mpc, mpc::sampler::Sampler* sampler)
+Program::Program(mpc::Mpc& mpc, mpc::sampler::Sampler* samplerToUse)
 {
-	this->sampler = sampler;
+	sampler = samplerToUse;
 	init();
 	
 	for (int i = 0; i < 64; i++)
@@ -51,12 +50,12 @@ int Program::getNumberOfSamples()
 	return counter;
 }
 
-void Program::setName(string s)
+void Program::setName(std::string s)
 {
     name = s;
 }
 
-string Program::getName()
+std::string Program::getName()
 {
     return name;
 }
@@ -74,14 +73,14 @@ Pad* Program::getPad(int i)
 	return pads[i];
 }
 
-weak_ptr<MpcStereoMixerChannel> Program::getStereoMixerChannel(int noteIndex)
+std::weak_ptr<MpcStereoMixerChannel> Program::getStereoMixerChannel(int noteIndex)
 {
-	return dynamic_pointer_cast<MpcStereoMixerChannel>(noteParameters[noteIndex]->getStereoMixerChannel().lock());
+	return std::dynamic_pointer_cast<MpcStereoMixerChannel>(noteParameters[noteIndex]->getStereoMixerChannel().lock());
 }
 
-weak_ptr<MpcIndivFxMixerChannel> Program::getIndivFxMixerChannel(int noteIndex)
+std::weak_ptr<MpcIndivFxMixerChannel> Program::getIndivFxMixerChannel(int noteIndex)
 {
-	return dynamic_pointer_cast<MpcIndivFxMixerChannel>(noteParameters[noteIndex]->getIndivFxMixerChannel().lock());
+	return std::dynamic_pointer_cast<MpcIndivFxMixerChannel>(noteParameters[noteIndex]->getIndivFxMixerChannel().lock());
 }
 
 int Program::getPadIndexFromNote(int note)
@@ -98,7 +97,7 @@ int Program::getPadIndexFromNote(int note)
 	return -1;
 }
 
-vector<NoteParameters*> Program::getNotesParameters()
+std::vector<NoteParameters*> Program::getNotesParameters()
 {
     return noteParameters;
 }
@@ -140,9 +139,9 @@ int Program::getNoteFromPad(int i)
 	return pads[i]->getNote();
 }
 
-vector<int> Program::getPadIndicesFromNote(int note)
+std::vector<int> Program::getPadIndicesFromNote(int note)
 {
-	vector<int> result;
+    std::vector<int> result;
 	
 	for (int i = 0; i < pads.size(); i++)
 	{

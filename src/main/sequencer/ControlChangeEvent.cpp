@@ -1,18 +1,13 @@
 #include <sequencer/ControlChangeEvent.hpp>
 
 using namespace mpc::sequencer;
-using namespace std;
-
-ControlChangeEvent::ControlChangeEvent()
-{
-}
 
 void ControlChangeEvent::setController(int i)
 {
 	if (i < 0 || i > 127) return;
 	controllerNumber = i;
 	
-	notifyObservers(string("step-editor"));
+	notifyObservers(std::string("step-editor"));
 }
 
 int ControlChangeEvent::getController()
@@ -26,7 +21,7 @@ void ControlChangeEvent::setAmount(int i)
 
     controllerValue = i;
     
-    notifyObservers(string("step-editor"));
+    notifyObservers(std::string("step-editor"));
 }
 
 int ControlChangeEvent::getAmount()
@@ -35,7 +30,7 @@ int ControlChangeEvent::getAmount()
 }
 
 void ControlChangeEvent::CopyValuesTo(std::weak_ptr<Event> dest) {
-	auto lDest = dynamic_pointer_cast<ControlChangeEvent>(dest.lock());
+	auto lDest = std::dynamic_pointer_cast<ControlChangeEvent>(dest.lock());
 	Event::CopyValuesTo(dest);
 	lDest->setAmount(this->getAmount());
 	lDest->setController(this->getController());

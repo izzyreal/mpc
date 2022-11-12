@@ -5,7 +5,6 @@
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;
-using namespace std;
 
 LoadApsFileScreen::LoadApsFileScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "load-aps-file", layerIndex)

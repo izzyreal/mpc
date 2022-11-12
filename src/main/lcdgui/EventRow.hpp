@@ -75,7 +75,7 @@ namespace mpc::lcdgui
 		int rowIndex = 0;
 
 	public:
-		void setBus(const int bus);
+		void setBus(const int newBus);
 		void init();
 		void setEmptyEventValues();
 		void setSystemExclusiveEventValues();
@@ -93,7 +93,7 @@ namespace mpc::lcdgui
 		void setSizesAndLocations(const std::vector<int>& xPosArray, const std::vector<int>& sizeArray);
 
 	public:
-		void setEvent(std::weak_ptr<mpc::sequencer::Event> event);
+		void setEvent(std::weak_ptr<mpc::sequencer::Event> newEvent);
 		void setSelected(bool b);
 		bool isSelected();
 

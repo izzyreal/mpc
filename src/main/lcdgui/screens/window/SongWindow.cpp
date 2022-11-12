@@ -7,7 +7,6 @@
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;
-using namespace std;
 
 SongWindow::SongWindow(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "song-window", layerIndex)
@@ -54,13 +53,13 @@ void SongWindow::turnWheel(int i)
 	auto nameScreen = mpc.screens->get<NameScreen>("name");
     auto songScreen = mpc.screens->get<SongScreen>("song");
 
-    std::function<void(string&)> renamer;
+    std::function<void(std::string&)> renamer;
 
-	if (param.find("default") != string::npos)
+	if (param.find("default") != std::string::npos)
 	{
 		nameScreen->setName(songScreen->getDefaultSongName());
         
-        renamer = [songScreen](string& newName) {
+        renamer = [songScreen](std::string& newName) {
             songScreen->setDefaultSongName(newName);
         };
 	}
@@ -70,7 +69,7 @@ void SongWindow::turnWheel(int i)
         const auto song = sequencer->getSong(songIndex);
 		nameScreen->setName(song->getName());
         
-        renamer = [song](string& newName) {
+        renamer = [song](std::string& newName) {
             song->setName(newName);
         };
 	}

@@ -4,7 +4,6 @@
 #include <sequencer/SeqUtil.hpp>
 
 using namespace mpc::sequencer;
-using namespace std;
 
 TempoChangeEvent::TempoChangeEvent(Sequence* parent)
 	: TempoChangeEvent(parent, 1000)
@@ -28,7 +27,7 @@ void TempoChangeEvent::setParent(Sequence* newParent) {
 	parent = newParent;
 }
 
-void TempoChangeEvent::plusOneBar(int numerator, int denominator, TempoChangeEvent* next)
+void TempoChangeEvent::plusOneBar(TempoChangeEvent *next)
 {
     if (stepNumber == 0)
 		return;
@@ -44,10 +43,10 @@ void TempoChangeEvent::plusOneBar(int numerator, int denominator, TempoChangeEve
             tick = next->getTick() - 1;
     }
     
-    notifyObservers(string("tempo-change"));
+    notifyObservers(std::string("tempo-change"));
 }
 
-void TempoChangeEvent::minusOneBar(int numerator, int denominator, TempoChangeEvent* previous)
+void TempoChangeEvent::minusOneBar(TempoChangeEvent *previous)
 {
 	if (stepNumber == 0)
 		return;
@@ -63,10 +62,10 @@ void TempoChangeEvent::minusOneBar(int numerator, int denominator, TempoChangeEv
 			tick = previous->getTick() + 1;
 	}
 	
-	notifyObservers(string("tempo-change"));
+	notifyObservers(std::string("tempo-change"));
 }
 
-void TempoChangeEvent::plusOneBeat(int denominator, TempoChangeEvent* next)
+void TempoChangeEvent::plusOneBeat(TempoChangeEvent *next)
 {
 	if (stepNumber == 0)
 		return;
@@ -82,10 +81,10 @@ void TempoChangeEvent::plusOneBeat(int denominator, TempoChangeEvent* next)
 			tick = next->getTick() - 1;
 	}
 	
-	notifyObservers(string("tempo-change"));
+	notifyObservers(std::string("tempo-change"));
 }
 
-void TempoChangeEvent::minusOneBeat(int denominator, TempoChangeEvent* previous)
+void TempoChangeEvent::minusOneBeat(TempoChangeEvent *previous)
 {
 	if (stepNumber == 0)
 		return;
@@ -101,7 +100,7 @@ void TempoChangeEvent::minusOneBeat(int denominator, TempoChangeEvent* previous)
 			tick = previous->getTick() + 1;
 	}
 	
-	notifyObservers(string("tempo-change"));
+	notifyObservers(std::string("tempo-change"));
 }
 
 void TempoChangeEvent::plusOneClock(TempoChangeEvent* next)
@@ -120,7 +119,7 @@ void TempoChangeEvent::plusOneClock(TempoChangeEvent* next)
 	if (tick > parent->getLastTick())
 		tick = parent->getLastTick();
 
-	notifyObservers(string("tempo-change"));
+	notifyObservers(std::string("tempo-change"));
 }
 
 void TempoChangeEvent::minusOneClock(TempoChangeEvent* previous)
@@ -135,7 +134,7 @@ void TempoChangeEvent::minusOneClock(TempoChangeEvent* previous)
 
 	tick--;
 
-	notifyObservers(string("tempo-change"));
+	notifyObservers(std::string("tempo-change"));
 }
 
 void TempoChangeEvent::setRatio(int i)
@@ -145,7 +144,7 @@ void TempoChangeEvent::setRatio(int i)
 	
 	ratio = i;
 	
-	notifyObservers(string("tempo-change"));
+	notifyObservers(std::string("tempo-change"));
 }
 
 int TempoChangeEvent::getRatio()
@@ -160,7 +159,7 @@ void TempoChangeEvent::setStepNumber(int i)
 	
 	stepNumber = i;
 	
-	notifyObservers(string("tempo-change"));
+	notifyObservers(std::string("tempo-change"));
 }
 
 int TempoChangeEvent::getStepNumber()
@@ -182,9 +181,9 @@ int TempoChangeEvent::getBeat(int n, int d)
 	return beat;
 }
 
-int TempoChangeEvent::getClock(int n, int d)
+int TempoChangeEvent::getClock(int denominator)
 {
-	auto beatLength = static_cast<int>(96 * (4.0 / d));
+	auto beatLength = static_cast<int>(96 * (4.0 / denominator));
 	auto clock = static_cast<int>(tick % beatLength);
 	return clock;
 }
@@ -205,7 +204,7 @@ double TempoChangeEvent::getTempo()
 void TempoChangeEvent::CopyValuesTo(std::weak_ptr<Event> dest)
 {
 	Event::CopyValuesTo(dest);
-	auto lDest = dynamic_pointer_cast<TempoChangeEvent>(dest.lock());
+	auto lDest = std::dynamic_pointer_cast<TempoChangeEvent>(dest.lock());
 	lDest->setRatio(getRatio());
 	lDest->setStepNumber(getStepNumber());
 }

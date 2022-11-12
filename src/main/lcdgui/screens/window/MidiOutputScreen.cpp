@@ -6,7 +6,6 @@
 #include <sequencer/Track.hpp>
 
 using namespace mpc::lcdgui::screens::window;
-using namespace std;
 
 MidiOutputScreen::MidiOutputScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "midi-output", layerIndex)
@@ -17,7 +16,7 @@ void MidiOutputScreen::open()
 {
 	init();
 	auto prevScreen = ls.lock()->getPreviousScreenName();
-	if (prevScreen.compare("name") != 0 && prevScreen.compare("midi-output-monitor") != 0)
+	if (prevScreen != "name" && prevScreen != "midi-output-monitor")
 	{
 		auto dev = track.lock()->getDevice();
 
@@ -39,7 +38,7 @@ void MidiOutputScreen::openNameScreen()
     nameScreen->setName(seq->getDeviceName(renameDeviceIndex));
     nameScreen->setNameLimit(8);
 
-    auto renamer = [&, renameDeviceIndex](string& newName) {
+    auto renamer = [&, renameDeviceIndex](std::string& newName) {
         sequencer->getActiveSequence()->setDeviceName(renameDeviceIndex, newName);
     };
     
@@ -50,7 +49,7 @@ void MidiOutputScreen::openNameScreen()
 void MidiOutputScreen::right()
 {
     init();
-    if (param.compare("firstletter") == 0)
+    if (param == "firstletter")
         openNameScreen();
     else
         ScreenComponent::right();
@@ -60,15 +59,15 @@ void MidiOutputScreen::turnWheel(int i)
 {
 	init();
 		
-	if (param.compare("firstletter") == 0)
+	if (param == "firstletter")
 	{
         openNameScreen();
 	}
-	else if (param.compare("softthru") == 0)
+	else if (param == "softthru")
 	{
 		setSoftThru(softThru + i);
 	}
-	else if (param.compare("devicenumber") == 0)
+	else if (param == "devicenumber")
 	{
 		setDeviceIndex(deviceIndex + i);
 	}
@@ -101,13 +100,13 @@ void MidiOutputScreen::displayDeviceName()
 	
 	findField("firstletter").lock()->setText(devName.substr(0, 1));
 	findLabel("devicename").lock()->setText(devName.substr(1, devName.length()));
-	
-	string devNumber = "";
+
+	std::string devNumber;
 	
 	if (deviceIndex >= 16)
-		devNumber = moduru::lang::StrUtil::padLeft(to_string(deviceIndex - 15), " ", 2) + "B";
+		devNumber = moduru::lang::StrUtil::padLeft(std::to_string(deviceIndex - 15), " ", 2) + "B";
 	else
-		devNumber = moduru::lang::StrUtil::padLeft(to_string(deviceIndex + 1), " ", 2) + "A";
+		devNumber = moduru::lang::StrUtil::padLeft(std::to_string(deviceIndex + 1), " ", 2) + "A";
 
 	findField("devicenumber").lock()->setText(devNumber);
 }

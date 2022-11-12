@@ -10,12 +10,9 @@
 #include <sampler/Program.hpp>
 
 using namespace mpc::file::pgmwriter;
-using namespace std;
 
-PgmWriter::PgmWriter(mpc::sampler::Program* program, weak_ptr<mpc::sampler::Sampler> sampler)
+PgmWriter::PgmWriter(mpc::sampler::Program* program, std::weak_ptr<mpc::sampler::Sampler> sampler)
 {
-	this->program = program;
-	
 	SampleNames pwSampleNames(program, sampler);
 	sampleNames = pwSampleNames.getSampleNamesArray();
 	
@@ -38,9 +35,9 @@ PgmWriter::PgmWriter(mpc::sampler::Program* program, weak_ptr<mpc::sampler::Samp
 	pads = pwPads.getPadsArray();
 }
 
-vector<char> PgmWriter::get()
+std::vector<char> PgmWriter::get()
 {
-	auto charArrayChunks = vector<vector<char>>(7);
+	std::vector<std::vector<char>> charArrayChunks(7);
 	charArrayChunks[0] = header;
 	charArrayChunks[1] = sampleNames;
 	charArrayChunks[2] = pgmName;
@@ -53,7 +50,7 @@ vector<char> PgmWriter::get()
 	for (auto ca : charArrayChunks)
 		programFileSize += ca.size();
 
-	vector<char> result(programFileSize);
+	std::vector<char> result(programFileSize);
 	int counter = 0;
 
 	for (auto ca : charArrayChunks)

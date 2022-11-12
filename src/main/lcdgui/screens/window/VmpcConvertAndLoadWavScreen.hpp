@@ -14,7 +14,7 @@ namespace mpc::lcdgui::screens::window {
 
         VmpcConvertAndLoadWavScreen(mpc::Mpc& mpc, const int layerIndex);
 
-        void setLoadRoutine(std::function<void()> loadRoutine);
+        void setLoadRoutine(std::function<void()> newLoadRoutine);
         
     private:
         std::function<void()> loadRoutine;

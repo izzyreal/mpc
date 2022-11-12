@@ -4,22 +4,21 @@
 #include <midi/util/VariableLengthInt.hpp>
 
 using namespace mpc::midi::event::meta;
-using namespace std;
 
-TextualMetaEvent::TextualMetaEvent(int tick, int delta, int type, string text)
+TextualMetaEvent::TextualMetaEvent(int tick, int delta, int type, std::string text)
 	: MetaEvent(tick, delta, type)
 {
 	setText(text);
 	mLength = mpc::midi::util::VariableLengthInt(text.length());
 }
 
-void TextualMetaEvent::setText(string t)
+void TextualMetaEvent::setText(std::string t)
 {
 	mText = t;
 	mLength.setValue(t.length());
 }
 
-string TextualMetaEvent::getText()
+std::string TextualMetaEvent::getText()
 {
     return mText;
 }
@@ -29,7 +28,7 @@ int TextualMetaEvent::getEventSize()
     return 1 + 1 + mLength.getByteCount()+ mLength.getValue();
 }
 
-void TextualMetaEvent::writeToOutputStream(ostream& out)
+void TextualMetaEvent::writeToOutputStream(std::ostream& out)
 {
 	MetaEvent::writeToOutputStream(out);
 	auto length = mLength.getBytes();
@@ -37,7 +36,7 @@ void TextualMetaEvent::writeToOutputStream(ostream& out)
 	out.write(&mText[0], mText.size());
 }
 
-void TextualMetaEvent::writeToOutputStream(ostream& out, bool writeType)
+void TextualMetaEvent::writeToOutputStream(std::ostream& out, bool writeType)
 {
 	MetaEvent::writeToOutputStream(out, writeType);
 }
@@ -50,14 +49,14 @@ int TextualMetaEvent::compareTo(mpc::midi::event::MidiEvent* other)
 	if (mDelta.getValue() != other->getDelta()) {
 		return mDelta.getValue() < other->getDelta() ? 1 : -1;
 	}
-	if (!(dynamic_cast<TextualMetaEvent*>(other) != nullptr)) {
+	if (dynamic_cast<TextualMetaEvent*>(other) == nullptr) {
 		return 1;
 	}
 	auto o = dynamic_cast<TextualMetaEvent*>(other);
 	return mText.compare(o->mText);
 }
 
-string TextualMetaEvent::toString()
+std::string TextualMetaEvent::toString()
 {
 	return MetaEvent::toString() + ": " + mText;
 }

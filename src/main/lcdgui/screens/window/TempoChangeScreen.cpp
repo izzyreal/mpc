@@ -10,7 +10,6 @@
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui::screens::window;
 using namespace moduru::lang;
-using namespace std;
 
 TempoChangeScreen::TempoChangeScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "tempo-change", layerIndex)
@@ -112,7 +111,7 @@ void TempoChangeScreen::initVisibleEvents()
 			t.lock()->deleteObserver(this);
 	}
 
-	visibleTempoChanges = vector<weak_ptr<TempoChangeEvent>>(3);
+	visibleTempoChanges = std::vector<std::weak_ptr<TempoChangeEvent>>(3);
 	
 	auto allTce = seq->getTempoChangeEvents();
 	
@@ -124,7 +123,7 @@ void TempoChangeScreen::initVisibleEvents()
 		if (allTce.size() <= i + offset + 1)
 		{
 			for (int j = i + 1; j < 2; j++)
-				visibleTempoChanges[j] = weak_ptr<TempoChangeEvent>();
+				visibleTempoChanges[j] = std::weak_ptr<TempoChangeEvent>();
 
 			break;
 		}
@@ -149,17 +148,17 @@ void TempoChangeScreen::displayTempoChange0()
 	bars[0].lock()->Hide(false);
 	
 	auto tce = visibleTempoChanges[0].lock();
-	a0Field.lock()->setText(to_string(tce->getStepNumber() + 1));
+	a0Field.lock()->setText(std::to_string(tce->getStepNumber() + 1));
 	auto timeSig = sequence->getTimeSignature();
 	
 	int value = tce->getBar(timeSig.getNumerator(), timeSig.getDenominator()) + 1;
 	b0Field.lock()->setTextPadded(value, "0");
 	value = tce->getBeat(timeSig.getNumerator(), timeSig.getDenominator()) + 1;
 	c0Field.lock()->setTextPadded(value, "0");
-	value = tce->getClock(timeSig.getNumerator(), timeSig.getDenominator());
+	value = tce->getClock(timeSig.getDenominator());
 	d0Field.lock()->setTextPadded(value, "0");
 
-	string ratioStr = StrUtil::TrimDecimals(tce->getRatio() * 0.1, 1);
+    std::string ratioStr = StrUtil::TrimDecimals(tce->getRatio() * 0.1, 1);
 	ratioStr = StrUtil::padLeft(ratioStr, " ", 5);
 	ratioStr = Util::replaceDotWithSmallSpaceDot(ratioStr);
 	e0Field.lock()->setText(ratioStr);
@@ -210,16 +209,16 @@ void TempoChangeScreen::displayTempoChange1()
 	f1Label.lock()->Hide(false);
 	bars[1].lock()->Hide(false);
 
-	a1Field.lock()->setText(to_string(tce->getStepNumber() + 1));
+	a1Field.lock()->setText(std::to_string(tce->getStepNumber() + 1));
 	
 	auto sequence = sequencer->getActiveSequence();
 	auto timeSig = sequence->getTimeSignature();
 
 	b1Field.lock()->setTextPadded(tce->getBar(timeSig.getNumerator(), timeSig.getDenominator()) + 1, "0");
 	c1Field.lock()->setTextPadded(tce->getBeat(timeSig.getNumerator(), timeSig.getDenominator()) + 1, "0");
-	d1Field.lock()->setTextPadded(tce->getClock(timeSig.getNumerator(), timeSig.getDenominator()), "0");
+	d1Field.lock()->setTextPadded(tce->getClock(timeSig.getDenominator()), "0");
 
-	string ratioStr = StrUtil::TrimDecimals(tce->getRatio() * 0.1, 1);
+    std::string ratioStr = StrUtil::TrimDecimals(tce->getRatio() * 0.1, 1);
 	ratioStr = StrUtil::padLeft(ratioStr, " ", 5);
 	ratioStr = Util::replaceDotWithSmallSpaceDot(ratioStr);
 	e1Field.lock()->setText(ratioStr);
@@ -274,15 +273,15 @@ void TempoChangeScreen::displayTempoChange2()
 	e2Label.lock()->Hide(false);
 	f2Label.lock()->Hide(false);
 	bars[2].lock()->Hide(false);
-	a2Field.lock()->setText(to_string(tce->getStepNumber() + 1));
+	a2Field.lock()->setText(std::to_string(tce->getStepNumber() + 1));
 
 	auto sequence = sequencer->getActiveSequence();
 	auto timeSig = sequence->getTimeSignature();
 	b2Field.lock()->setTextPadded(tce->getBar(timeSig.getNumerator(), timeSig.getDenominator()) + 1, "0");
 	c2Field.lock()->setTextPadded(tce->getBeat(timeSig.getNumerator(), timeSig.getDenominator()) + 1, "0");
-	d2Field.lock()->setTextPadded(tce->getClock(timeSig.getNumerator(), timeSig.getDenominator()), "0");
+	d2Field.lock()->setTextPadded(tce->getClock(timeSig.getDenominator()), "0");
 
-	string ratioStr = StrUtil::TrimDecimals(tce->getRatio() * 0.1, 1);
+    std::string ratioStr = StrUtil::TrimDecimals(tce->getRatio() * 0.1, 1);
 	ratioStr = StrUtil::padLeft(ratioStr, " ", 5);
 	ratioStr = Util::replaceDotWithSmallSpaceDot(ratioStr);
 	e2Field.lock()->setText(ratioStr);
@@ -361,7 +360,7 @@ void TempoChangeScreen::function(int j)
 		displayTempoChange1();
 		displayTempoChange2();
 		
-		ls.lock()->setFocus("a" + to_string(yPos));
+		ls.lock()->setFocus("a" + std::to_string(yPos));
 		break;
 	case 2:
 	{
@@ -385,14 +384,14 @@ void TempoChangeScreen::function(int j)
 			displayTempoChange1();
 			displayTempoChange2();
 
-			ls.lock()->setFocus(string("a" + to_string(yPos)));
+			ls.lock()->setFocus(std::string("a" + std::to_string(yPos)));
 		}
 		else
 		{
 			if (nowDetected > offset + 3 || nowDetected < offset)
 				setOffset(nowDetected);
 
-			ls.lock()->setFocus(param.substr(0, 1) + to_string(nowDetected - offset));
+			ls.lock()->setFocus(param.substr(0, 1) + std::to_string(nowDetected - offset));
 		}
 	}
 		break;
@@ -508,32 +507,32 @@ void TempoChangeScreen::turnWheel(int j)
 	{
 		auto event = visibleTempoChanges[i].lock();
 
-		if (param == "b" + to_string(i))
+		if (param == "b" + std::to_string(i))
 		{
 			if (j > 0)
-				event->plusOneBar(ts.getNumerator(), ts.getDenominator(), next.lock().get());
+                event->plusOneBar(next.lock().get());
 			else
-				event->minusOneBar(ts.getNumerator(), ts.getDenominator(), previous.lock().get());
+                event->minusOneBar(previous.lock().get());
 		}
-		else if (param == "c" + to_string(i))
+		else if (param == "c" + std::to_string(i))
 		{
 			if (j > 0)
-				event->plusOneBeat(ts.getDenominator(), next.lock().get());
+                event->plusOneBeat(next.lock().get());
 			else
-				event->minusOneBeat(ts.getDenominator(), previous.lock().get());
+                event->minusOneBeat(previous.lock().get());
 		}
-		else if (param == "d" + to_string(i))
+		else if (param == "d" + std::to_string(i))
 		{
 			if (j > 0)
 				event->plusOneClock(next.lock().get());
 			else
 				event->minusOneClock(previous.lock().get());
 		}
-		else if (param == "e" + to_string(i))
+		else if (param == "e" + std::to_string(i))
 		{
 			event->setRatio(event->getRatio() + j);
 		}
-		else if (param == "f" + to_string(i))
+		else if (param == "f" + std::to_string(i))
 		{
 			auto ratio = (event->getTempo() + j * 0.1) / seq->getInitialTempo();
 			event->setRatio((int)round(ratio * 1000.0));
@@ -596,7 +595,7 @@ void TempoChangeScreen::down()
 	if ((yPos == 0 && !tce1) || (yPos == 1 && !tce2))
 		paramToFocus = "a";
 
-	ls.lock()->setFocus(string(paramToFocus + to_string(yPos + 1)));
+	ls.lock()->setFocus(std::string(paramToFocus + std::to_string(yPos + 1)));
 }
 
 void TempoChangeScreen::up()
@@ -623,7 +622,7 @@ void TempoChangeScreen::up()
 		return;
 	}
 
-	ls.lock()->setFocus(param.substr(0, 1) + to_string(yPos - 1));
+	ls.lock()->setFocus(param.substr(0, 1) + std::to_string(yPos - 1));
 	return;
 }
 

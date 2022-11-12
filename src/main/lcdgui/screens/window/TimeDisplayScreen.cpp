@@ -2,7 +2,6 @@
 
 using namespace mpc::lcdgui::screens::window;
 using namespace moduru::lang;
-using namespace std;
 
 TimeDisplayScreen::TimeDisplayScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "time-display", layerIndex)
@@ -20,31 +19,31 @@ void TimeDisplayScreen::turnWheel(int i)
 {
 	init();
 	
-	if (param.compare("displaystyle") == 0)
+	if (param == "displaystyle")
 	{
 		setDisplayStyle(displayStyle + i);
 	}
-	else if (param.compare("starttime") == 0)
+	else if (param == "starttime")
 	{
 		setStartTime(startTime + i);
 	}
-	else if (param.compare("h") == 0)
+	else if (param == "h")
 	{
 		setH(h + i);
 	}
-	else if (param.compare("m") == 0)
+	else if (param == "m")
 	{
 		setM(m + i);
 	}
-	else if (param.compare("s") == 0)
+	else if (param == "s")
 	{
 		setS(s + i);
 	}
-	else if (param.compare("f") == 0)
+	else if (param == "f")
 	{
 		setF(f + i);
 	}
-	else if (param.compare("framerate") == 0)
+	else if (param == "framerate")
 	{
 		setFrameRate(frameRate + i);
 	}
@@ -57,11 +56,11 @@ void TimeDisplayScreen::displayDisplayStyle()
 
 void TimeDisplayScreen::displayStartTime()
 {
-	findField("starttime").lock()->setText(StrUtil::padLeft(to_string(startTime), "0", 2));
-	findField("h").lock()->setText(StrUtil::padLeft(to_string(h), "0", 2));
-	findField("m").lock()->setText(StrUtil::padLeft(to_string(m), "0", 2));
-	findField("s").lock()->setText(StrUtil::padLeft(to_string(s), "0", 2));
-	findField("f").lock()->setText(StrUtil::padLeft(to_string(f), "0", 2));
+	findField("starttime").lock()->setText(StrUtil::padLeft(std::to_string(startTime), "0", 2));
+	findField("h").lock()->setText(StrUtil::padLeft(std::to_string(h), "0", 2));
+	findField("m").lock()->setText(StrUtil::padLeft(std::to_string(m), "0", 2));
+	findField("s").lock()->setText(StrUtil::padLeft(std::to_string(s), "0", 2));
+	findField("f").lock()->setText(StrUtil::padLeft(std::to_string(f), "0", 2));
 }
 
 void TimeDisplayScreen::displayFrameRate()

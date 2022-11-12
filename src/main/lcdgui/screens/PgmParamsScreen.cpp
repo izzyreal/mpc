@@ -13,12 +13,11 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::controls;
 using namespace moduru::lang;
-using namespace std;
 
 PgmParamsScreen::PgmParamsScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "program-params", layerIndex)
 {
-	addChild(make_shared<EnvGraph>(mpc));
+	addChild(std::make_shared<EnvGraph>(mpc));
 }
 
 void PgmParamsScreen::open()
@@ -189,7 +188,7 @@ void PgmParamsScreen::openWindow()
 
 void PgmParamsScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 {
-	string s = nonstd::any_cast<string>(arg);
+	auto s = nonstd::any_cast<std::string>(arg);
 
 	if (s == "note")
 	{
@@ -237,8 +236,8 @@ void PgmParamsScreen::displayNote()
     auto padIndex = program.lock()->getPadIndexFromNote(noteParameters->getNumber());
     auto padName = sampler->getPadName(padIndex);
     auto sampleName = soundIndex != -1 ? sampler->getSoundName(soundIndex) : "OFF";
-    string stereo = noteParameters->getStereoMixerChannel().lock()->isStereo() && soundIndex != -1 ? "(ST)" : "";
-    findField("note").lock()->setText(to_string(noteParameters->getNumber()) + "/" + padName + "-" + StrUtil::padRight(sampleName, " ", 16) + stereo);
+    std::string stereo = noteParameters->getStereoMixerChannel().lock()->isStereo() && soundIndex != -1 ? "(ST)" : "";
+    findField("note").lock()->setText(std::to_string(noteParameters->getNumber()) + "/" + padName + "-" + StrUtil::padRight(sampleName, " ", 16) + stereo);
 }
 
 void PgmParamsScreen::displayPgm()
@@ -253,7 +252,7 @@ void PgmParamsScreen::displayTune()
 	auto lProgram = program.lock();
 	auto tune = sampler->getLastNp(lProgram.get())->getTune();
 	auto sign = tune < 0 ? "-" : " ";
-	auto number = StrUtil::padLeft(to_string(abs(tune)), " ", 3);
+	auto number = StrUtil::padLeft(std::to_string(abs(tune)), " ", 3);
 	findField("tune").lock()->setText(sign + number);
 }
 

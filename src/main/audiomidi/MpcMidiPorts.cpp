@@ -2,9 +2,8 @@
 
 using namespace mpc::audiomidi;
 using namespace ctoot::midi::core;
-using namespace std;
 
-vector<vector<ShortMessage>>& MpcMidiPorts::getReceivers() {
+std::vector<std::vector<ShortMessage>>& MpcMidiPorts::getReceivers() {
 	return receivers;
 }
 

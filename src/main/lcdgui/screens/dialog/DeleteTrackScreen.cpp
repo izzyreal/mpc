@@ -7,7 +7,6 @@
 
 using namespace mpc::lcdgui::screens::dialog;
 using namespace moduru::lang;
-using namespace std;
 
 DeleteTrackScreen::DeleteTrackScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "delete-track", layerIndex)
@@ -24,7 +23,7 @@ void DeleteTrackScreen::turnWheel(int i)
 {
 	init();
 
-	if (param.compare("tr") == 0)
+	if (param == "tr")
 		setTr(tr + i);
 }
 
@@ -61,6 +60,6 @@ void DeleteTrackScreen::setTr(int i)
 void DeleteTrackScreen::displayTr()
 {
 	auto trackName = sequencer->getActiveSequence()->getTrack(tr)->getName();
-	findField("tr").lock()->setText(StrUtil::padLeft(to_string(tr + 1), "0", 2) + "-" + trackName);
+	findField("tr").lock()->setText(StrUtil::padLeft(std::to_string(tr + 1), "0", 2) + "-" + trackName);
 }
 

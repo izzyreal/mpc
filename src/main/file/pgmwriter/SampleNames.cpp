@@ -6,20 +6,22 @@
 #include <set>
 
 using namespace mpc::file::pgmwriter;
-using namespace std;
 
-SampleNames::SampleNames(mpc::sampler::Program* program, weak_ptr<mpc::sampler::Sampler> sampler)
+SampleNames::SampleNames(mpc::sampler::Program* program, std::weak_ptr<mpc::sampler::Sampler> sampler)
 {
-	vector<int> list;
+	std::vector<int> list;
+
 	for (auto& nn : program->getNotesParameters()) {
 		if (nn->getSoundIndex() != -1)
 			list.push_back(nn->getSoundIndex());
 	}
-	//Collections::sort(list);
-	set<string> sampleNamesSet;
-	vector<string> finalNames;
-	auto lSampler = sampler.lock();
-	for (int i = 0; i < list.size(); i++) {
+
+    std::set<std::string> sampleNamesSet;
+	std::vector<std::string> finalNames;
+
+    auto lSampler = sampler.lock();
+
+    for (int i = 0; i < list.size(); i++) {
 		if (sampleNamesSet.emplace(lSampler->getSoundName(list[i])).second) {
 			finalNames.push_back(lSampler->getSoundName(list[i]));
 		}
@@ -36,7 +38,7 @@ SampleNames::SampleNames(mpc::sampler::Program* program, weak_ptr<mpc::sampler::
 		snConvTable.push_back(j);
 	}
 	numberOfSamples = finalNames.size();
-	sampleNamesArray = vector<char>((numberOfSamples * 17) + 2);
+	sampleNamesArray = std::vector<char>((numberOfSamples * 17) + 2);
 	int counter = 0;
 	for (auto&s : finalNames) {
 		setSampleName(counter++, s);
@@ -45,12 +47,12 @@ SampleNames::SampleNames(mpc::sampler::Program* program, weak_ptr<mpc::sampler::
 	sampleNamesArray[(int)(sampleNamesArray.size()) - 1] = 0;
 }
 
-vector<char> SampleNames::getSampleNamesArray()
+std::vector<char> SampleNames::getSampleNamesArray()
 {
     return sampleNamesArray;
 }
 
-void SampleNames::setSampleName(int sampleNumber, string name)
+void SampleNames::setSampleName(int sampleNumber, std::string name)
 {
 	for (int i = 0; i < name.length(); i++)
 		sampleNamesArray[i + (sampleNumber * 17)] = name[i];
@@ -66,7 +68,7 @@ int SampleNames::getNumberOfSamples()
     return numberOfSamples;
 }
 
-vector<int> SampleNames::getSnConvTable()
+std::vector<int> SampleNames::getSnConvTable()
 {
     return snConvTable;
 }

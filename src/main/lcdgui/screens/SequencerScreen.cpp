@@ -23,7 +23,6 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
 using namespace moduru::lang;
-using namespace std;
 
 SequencerScreen::SequencerScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "sequencer", layerIndex)
@@ -37,7 +36,7 @@ SequencerScreen::SequencerScreen(mpc::Mpc& mpc, const int layerIndex)
 	MRECT punch2(217, 52, 247, 59);
 	addChildT<PunchRect>("punch-rect-2", punch2).lock()->Hide(true);
     
-    addChild(make_shared<TextComp>(mpc, "footer-label"));
+    addChild(std::make_shared<TextComp>(mpc, "footer-label"));
     auto footerLabel = findChild<TextComp>("footer-label").lock();
     footerLabel->setLocation(36, 51);
     footerLabel->setText("(Hold pads or keys to repeat)");
@@ -163,7 +162,7 @@ void SequencerScreen::releaseTap()
 
 void SequencerScreen::close()
 {
-	vector<string> screensThatDisablePunch{ "song", "load", "save", "others", "next-seq" };
+	std::vector<std::string> screensThatDisablePunch{ "song", "load", "save", "others", "next-seq" };
 	auto nextScreen = ls.lock()->getCurrentScreenName();
 
 	if (find(begin(screensThatDisablePunch), end(screensThatDisablePunch), nextScreen) != end(screensThatDisablePunch))
@@ -179,7 +178,7 @@ void SequencerScreen::close()
 
 void SequencerScreen::displayVelo()
 {
-	findField("velo").lock()->setTextPadded(to_string(sequencer->getActiveTrack()->getVelocityRatio()));
+	findField("velo").lock()->setTextPadded(std::to_string(sequencer->getActiveTrack()->getVelocityRatio()));
 }
 
 void SequencerScreen::displayDeviceNumber()
@@ -191,13 +190,13 @@ void SequencerScreen::displayDeviceNumber()
 	else
 	{
 		if (track.lock()->getDevice() >= 17)
-			findField("devicenumber").lock()->setText(to_string(track.lock()->getDevice() - 16) + "B");
+			findField("devicenumber").lock()->setText(std::to_string(track.lock()->getDevice() - 16) + "B");
 		else
-			findField("devicenumber").lock()->setText(to_string(track.lock()->getDevice()) + "A");
+			findField("devicenumber").lock()->setText(std::to_string(track.lock()->getDevice()) + "A");
 	}
 }
 
-vector<string> SequencerScreen::busNames = vector<string>{ "MIDI", "DRUM1", "DRUM2", "DRUM3", "DRUM4" };
+std::vector<std::string> SequencerScreen::busNames = std::vector<std::string>{ "MIDI", "DRUM1", "DRUM2", "DRUM3", "DRUM4" };
 
 void SequencerScreen::displayBus()
 {
@@ -207,7 +206,7 @@ void SequencerScreen::displayBus()
 
 void SequencerScreen::displayBars()
 {
-	findField("bars").lock()->setText(to_string(sequencer->getActiveSequence()->getLastBarIndex() + 1));
+	findField("bars").lock()->setText(std::to_string(sequencer->getActiveSequence()->getLastBarIndex() + 1));
 }
 
 void SequencerScreen::displayPgm()
@@ -215,7 +214,7 @@ void SequencerScreen::displayPgm()
 	if (track.lock()->getProgramChange() == 0)
 		findField("pgm").lock()->setText("OFF");
 	else
-		findField("pgm").lock()->setText(to_string(track.lock()->getProgramChange()));
+		findField("pgm").lock()->setText(std::to_string(track.lock()->getProgramChange()));
 }
 
 void SequencerScreen::displayDeviceName()
@@ -281,18 +280,18 @@ void SequencerScreen::displayTempoSource()
 
 void SequencerScreen::displaySq()
 {
-	string result = "";
+    std::string result;
 
 	if (sequencer->isPlaying())
 	{
-		result.append(StrUtil::padLeft(to_string(sequencer->getCurrentlyPlayingSequenceIndex() + 1), "0", 2));
+		result.append(StrUtil::padLeft(std::to_string(sequencer->getCurrentlyPlayingSequenceIndex() + 1), "0", 2));
 		result.append("-");
 		result.append(sequencer->getCurrentlyPlayingSequence()->getName());
 		findField("sq").lock()->setText(result);
 	}
 	else
 	{
-		result.append(StrUtil::padLeft(to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2));
+		result.append(StrUtil::padLeft(std::to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2));
 		result.append("-");
 		result.append(sequencer->getActiveSequence()->getName());
 		findField("sq").lock()->setText(result);
@@ -321,11 +320,11 @@ void SequencerScreen::displayRecordingMode()
 
 void SequencerScreen::displayTsig()
 {
-	string result = "";
+    std::string result;
 	auto ts = sequence.lock()->getTimeSignature();
-	result.append(to_string(ts.getNumerator()));
+	result.append(std::to_string(ts.getNumerator()));
 	result.append("/");
-	result.append(to_string(ts.getDenominator()));
+	result.append(std::to_string(ts.getDenominator()));
 	findField("tsig").lock()->setText(mpc::Util::distributeTimeSig(result));
 }
 
@@ -339,8 +338,8 @@ void SequencerScreen::displayOn() {
 }
 
 void SequencerScreen::displayTr() {
-	
-	string result = StrUtil::padLeft(to_string(sequencer->getActiveTrackIndex() + 1), "0", 2);
+
+    auto result = StrUtil::padLeft(std::to_string(sequencer->getActiveTrackIndex() + 1), "0", 2);
 	result.append("-");
 	result.append(sequencer->getActiveTrack()->getName());
 	findField("tr").lock()->setText(result);
@@ -351,7 +350,7 @@ void SequencerScreen::displayCount()
 	findField("count").lock()->setText(sequencer->isCountEnabled() ? "ON" : "OFF");
 }
 
-vector<string> SequencerScreen::timingCorrectNames = vector<string>{ "OFF", "1/8", "1/8(3)", "1/16", "1/16(3)", "1/32", "1/32(3)" };
+std::vector<std::string> SequencerScreen::timingCorrectNames = std::vector<std::string>{ "OFF", "1/8", "1/8(3)", "1/16", "1/16(3)", "1/32", "1/32(3)" };
 
 void SequencerScreen::displayTiming()
 {
@@ -373,7 +372,7 @@ void SequencerScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 	track = sequencer->getActiveTrack();
 	track.lock()->addObserver(this);
 
-	string s = nonstd::any_cast<string>(arg);
+	auto s = nonstd::any_cast<std::string>(arg);
 
 	if (s == "nextsqvalue")
 	{
@@ -617,13 +616,13 @@ void SequencerScreen::turnWheel(int i)
 
 			auto stepEditorScreen = mpc.screens->get<StepEditorScreen>("step-editor");
 
-			if (dynamic_pointer_cast<NoteEvent>(stepEditorScreen->getVisibleEvents()[eventNumber]))
+			if (std::dynamic_pointer_cast<NoteEvent>(stepEditorScreen->getVisibleEvents()[eventNumber]))
 			{
 				if (track.lock()->getBus() == 0)
 				{
 					if (lastFocus[0] == 'd' || lastFocus[0] == 'e')
 					{
-						setLastFocus("step-editor", "a" + to_string(eventNumber));
+						setLastFocus("step-editor", "a" + std::to_string(eventNumber));
 					}
 				}
 			}
@@ -727,11 +726,11 @@ void SequencerScreen::openWindow()
 		Util::initSequence(mpc);
 		openScreen("sequence");
 	}
-	else if (param.find("now") != string::npos)
+	else if (param.find("now") != std::string::npos)
 	{
 		openScreen("time-display");
 	}
-	else if (param.find("tempo") != string::npos)
+	else if (param.find("tempo") != std::string::npos)
 	{
 		openScreen("tempo-change");
 	}
@@ -837,7 +836,7 @@ void SequencerScreen::down()
 
 void SequencerScreen::setPunchRectOn(int i, bool b)
 {
-	findChild<PunchRect>("punch-rect-" + to_string(i)).lock()->setOn(b);
+	findChild<PunchRect>("punch-rect-" + std::to_string(i)).lock()->setOn(b);
 }
 
 void SequencerScreen::displayPunchWhileRecording()
@@ -851,7 +850,7 @@ void SequencerScreen::displayPunchWhileRecording()
 
 		for (int i = 0; i < 3; i++)
 		{
-			auto punchRect = findChild<PunchRect>("punch-rect-" + to_string(i)).lock();
+			auto punchRect = findChild<PunchRect>("punch-rect-" + std::to_string(i)).lock();
 			punchRect->Hide((i == 0 && punchScreen->autoPunch == 1) || (i == 2 && punchScreen->autoPunch == 0));
 			punchRect->setOn((i == 0 && punchScreen->autoPunch != 1) || (i == 1 && punchScreen->autoPunch == 1));
 		}
@@ -866,12 +865,12 @@ void SequencerScreen::displayPunchWhileRecording()
 
 		auto seq = sequence.lock();
 
-		auto text1 = StrUtil::padLeft(to_string(SeqUtil::getBar(seq.get(), punchScreen->time0) + 1), "0", 3);
-		auto text2 = StrUtil::padLeft(to_string(SeqUtil::getBeat(seq.get(), punchScreen->time0) + 1), "0", 2);
-		auto text3 = StrUtil::padLeft(to_string(SeqUtil::getClock(seq.get(), punchScreen->time0)), "0", 2);
-		auto text4 = StrUtil::padLeft(to_string(SeqUtil::getBar(seq.get(), punchScreen->time1) + 1), "0", 3);
-		auto text5 = StrUtil::padLeft(to_string(SeqUtil::getBeat(seq.get(), punchScreen->time1) + 1), "0", 2);
-		auto text6 = StrUtil::padLeft(to_string(SeqUtil::getClock(seq.get(), punchScreen->time1)), "0", 2);
+		auto text1 = StrUtil::padLeft(std::to_string(SeqUtil::getBar(seq.get(), punchScreen->time0) + 1), "0", 3);
+		auto text2 = StrUtil::padLeft(std::to_string(SeqUtil::getBeat(seq.get(), punchScreen->time0) + 1), "0", 2);
+		auto text3 = StrUtil::padLeft(std::to_string(SeqUtil::getClock(seq.get(), punchScreen->time0)), "0", 2);
+		auto text4 = StrUtil::padLeft(std::to_string(SeqUtil::getBar(seq.get(), punchScreen->time1) + 1), "0", 3);
+		auto text5 = StrUtil::padLeft(std::to_string(SeqUtil::getBeat(seq.get(), punchScreen->time1) + 1), "0", 2);
+		auto text6 = StrUtil::padLeft(std::to_string(SeqUtil::getClock(seq.get(), punchScreen->time1)), "0", 2);
 
 		time0->setText("IN:" + text1 + "." + text2 + "." + text3);
 		time1->setText("OUT:" + text4 + "." + text5 + "." + text6);
@@ -923,7 +922,7 @@ void SequencerScreen::stop()
 		findBackground().lock()->setName("sequencer-punch-active");
 
 		for (int i = 0; i < 3; i++)
-			findChild<PunchRect>("punch-rect-" + to_string(i)).lock()->Hide(true);
+			findChild<PunchRect>("punch-rect-" + std::to_string(i)).lock()->Hide(true);
 		
 		auto time0 = findLabel("punch-time-0").lock();
 		auto time1 = findLabel("punch-time-1").lock();

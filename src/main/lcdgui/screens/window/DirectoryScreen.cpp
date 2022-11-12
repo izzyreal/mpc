@@ -22,7 +22,6 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace moduru::lang;
 using namespace moduru::file;
-using namespace std;
 
 DirectoryScreen::DirectoryScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "directory", layerIndex)
@@ -88,7 +87,7 @@ void DirectoryScreen::function(int f)
         
         if (!file) return;
 
-        auto renamer = [file, disk, ls, popupScreen, directoryScreen](string& newName) {
+        auto renamer = [file, disk, ls, popupScreen, directoryScreen](std::string& newName) {
             auto ext = mpc::Util::splitName(file->getName())[1];
             
             if (ext.length() > 0) ext = "." + ext;
@@ -151,7 +150,7 @@ void DirectoryScreen::function(int f)
         nameScreen->setName("NEWFOLDR");
         nameScreen->setNameLimit(8);
         
-        auto renamer = [ls, disk, loadScreen, directoryScreen, popupScreen](string& newName) {
+        auto renamer = [ls, disk, loadScreen, directoryScreen, popupScreen](std::string& newName) {
             bool success = disk->newFolder(StrUtil::toUpper(newName));
             
             if (!success)
@@ -175,7 +174,7 @@ void DirectoryScreen::function(int f)
             
             for (int i = 0; i < disk->getFileNames().size(); i++)
             {
-                if (disk->getFileName(i).compare(StrUtil::toUpper(newName)) == 0)
+                if (disk->getFileName(i) == StrUtil::toUpper(newName))
                 {
                     loadScreen->setFileLoad(counter);
                     
@@ -265,7 +264,7 @@ void DirectoryScreen::left()
 			
 			for (int i = 0; i < disk->getParentFileNames().size(); i++)
 			{
-				if (disk->getParentFileNames()[i].compare(disk->getDirectoryName()) == 0)
+				if (disk->getParentFileNames()[i] == disk->getDirectoryName())
 				{
 					yOffset0 = i;
 					break;
@@ -274,7 +273,7 @@ void DirectoryScreen::left()
 
 			for (int i = 0; i < disk->getFileNames().size(); i++)
 			{
-				if (disk->getFileNames()[i].compare(prevDirName) == 0)
+				if (disk->getFileNames()[i] == prevDirName)
 				{
 					yOffset1 = i;
 					loadScreen->fileLoad = i;
@@ -329,7 +328,7 @@ void DirectoryScreen::right()
 
 		for (int i = 0; i < disk->getParentFileNames().size(); i++)
 		{
-			if (disk->getParentFileNames()[i].compare(f->getName()) == 0)
+			if (disk->getParentFileNames()[i] == f->getName())
 			{
 				yOffset0 = i;
 				break;
@@ -509,7 +508,7 @@ void DirectoryScreen::down()
 	}
 }
 
-shared_ptr<MpcFile> DirectoryScreen::getSelectedFile()
+std::shared_ptr<MpcFile> DirectoryScreen::getSelectedFile()
 {
 	auto yPos = yPos0;
 
@@ -522,7 +521,7 @@ shared_ptr<MpcFile> DirectoryScreen::getSelectedFile()
 	return getFileFromGrid(xPos, yPos);
 }
 
-shared_ptr<MpcFile> DirectoryScreen::getFileFromGrid(int x, int y)
+std::shared_ptr<MpcFile> DirectoryScreen::getFileFromGrid(int x, int y)
 {
 	auto disk = mpc.getDisk().lock();
 	
@@ -544,9 +543,9 @@ void DirectoryScreen::displayLeftFields()
 	for (int i = 0; i < 5; i++)
 	{
 		if (i + yOffset0 > size - 1)
-			findField("a" + to_string(i)).lock()->setText(" ");
+			findField("a" + std::to_string(i)).lock()->setText(" ");
 		else
-			findField("a" + to_string(i)).lock()->setText(names[i + yOffset0]);
+			findField("a" + std::to_string(i)).lock()->setText(names[i + yOffset0]);
 	}
 
 	if (disk->isRoot())
@@ -562,20 +561,20 @@ void DirectoryScreen::displayRightFields()
 	{
 		if (i + yOffset1 > size - 1)
 		{
-			findField("b" + to_string(i)).lock()->setText(" ");
+			findField("b" + std::to_string(i)).lock()->setText(" ");
 		}
 		else
 		{
-			string fileName = disk->getFileName(i + yOffset1);
-			string name = StrUtil::padRight(FileUtil::splitName(fileName)[0], " ", 16);
-			string ext = FileUtil::splitName(fileName)[1];
+			auto fileName = disk->getFileName(i + yOffset1);
+			auto name = StrUtil::padRight(FileUtil::splitName(fileName)[0], " ", 16);
+			auto ext = FileUtil::splitName(fileName)[1];
 
 			if (ext.length() > 0)
 			{
 				ext = "." + ext;
 			}
 
-			findField("b" + to_string(i)).lock()->setText(name + ext);
+			findField("b" + std::to_string(i)).lock()->setText(name + ext);
 		}
 	}
 }
@@ -584,21 +583,21 @@ void DirectoryScreen::refreshFocus()
 {
 	if (xPos == 0)
 	{
-		ls.lock()->setFocus("a" + to_string(yPos0));
+		ls.lock()->setFocus("a" + std::to_string(yPos0));
 	}
 	else if (xPos == 1)
 	{
 		auto loadScreen = mpc.screens->get<LoadScreen>("load");
-		ls.lock()->setFocus("b" + to_string(loadScreen->fileLoad - yOffset1));
+		ls.lock()->setFocus("b" + std::to_string(loadScreen->fileLoad - yOffset1));
 	}
 }
 
-vector<string> DirectoryScreen::getFirstColumn()
+std::vector<std::string> DirectoryScreen::getFirstColumn()
 {
 	return mpc.getDisk().lock()->getParentFileNames();
 }
 
-vector<string> DirectoryScreen::getSecondColumn()
+std::vector<std::string> DirectoryScreen::getSecondColumn()
 {
 	return mpc.getDisk().lock()->getFileNames();
 }
@@ -619,10 +618,10 @@ void DirectoryScreen::findYOffset0()
 	auto names = disk->getParentFileNames();
 	auto dirName = disk->getDirectoryName();
 	auto size = names.size();
-	
+
 	for (int i = 0; i < size; i++)
 	{
-		if (names[i].compare(dirName) == 0)
+		if (names[i] == dirName)
 		{
 			yOffset0 = i;
 			yPos0 = 0;
@@ -665,12 +664,12 @@ void DirectoryScreen::drawGraphicsLeft()
 	a4->setText(" ");
 
 	auto fc = getFirstColumn();
-	auto currentDirIcons = vector<string>{ u8"\u00EF", u8"\u00F1", u8"\u00F0" };
-	auto dirIcons = vector<string>{ u8"\u00EA", u8"\u00EB", u8"\u00EC" };
-	
-	string notRootDash = u8"\u00ED";
-	string onlyDirIcon = u8"\u00F3";
-	string rootIcon = u8"\u00EE";
+	std::vector<std::string> currentDirIcons{ u8"\u00EF", u8"\u00F1", u8"\u00F0" };
+	std::vector<std::string> dirIcons{ u8"\u00EA", u8"\u00EB", u8"\u00EC" };
+
+    std::string notRootDash = u8"\u00ED";
+    std::string onlyDirIcon = u8"\u00F3";
+    std::string rootIcon = u8"\u00EE";
 	
 	int size = fc.size();
 	
@@ -694,7 +693,7 @@ void DirectoryScreen::drawGraphicsLeft()
 	
 	int bottomVisibleFileIndex = size - yOffset0 - 1;
 	auto firstVisibleFile = getFileFromGrid(0, 0);
-    shared_ptr<MpcFile> lastVisibleFile;
+    std::shared_ptr<MpcFile> lastVisibleFile;
 	
 	if (bottomVisibleFileIndex > 0)
 	{
@@ -710,12 +709,12 @@ void DirectoryScreen::drawGraphicsLeft()
 
 	if ( (size - yOffset0) == 2)
 	{
-		if (firstVisibleFile->getName().compare(dirName) == 0)
+		if (firstVisibleFile->getName() == dirName)
 			a0->setText(currentDirIcons[0]);
 		else
 			a0->setText(dirIcons[0]);
 		
-		if (lastVisibleFile->getName().compare(dirName) == 0)
+		if (lastVisibleFile->getName() == dirName)
 			a1->setText(currentDirIcons[2]);
 		else
 			a1->setText(dirIcons[2]);
@@ -723,20 +722,20 @@ void DirectoryScreen::drawGraphicsLeft()
 		return;
 	}
 
-	auto aLabels = vector < shared_ptr<mpc::lcdgui::Label>>{ a0, a1, a2, a3, a4 };
+	std::vector<std::shared_ptr<mpc::lcdgui::Label>> aLabels{ a0, a1, a2, a3, a4 };
 	
 	if (size - yOffset0 <= 4)
 	{
-		if (firstVisibleFile->getName().compare(dirName) == 0)
+		if (firstVisibleFile->getName() == dirName)
 		{
-			if (firstVisibleFile->getName().compare(disk->getParentFileNames()[0]) == 0)
+			if (firstVisibleFile->getName() == disk->getParentFileNames()[0])
 				a0->setText(currentDirIcons[0]);
 			else
 				a0->setText(currentDirIcons[1]);
 		}
 		else
 		{
-			if (firstVisibleFile->getName().compare(disk->getParentFileNames()[0]) == 0)
+			if (firstVisibleFile->getName() == disk->getParentFileNames()[0])
 				a0->setText(dirIcons[0]);
 			else
 				a0->setText(dirIcons[1]);
@@ -744,13 +743,13 @@ void DirectoryScreen::drawGraphicsLeft()
 		
 		for (int i = 1; i < visibleListLength - 1; i++)
 		{
-			if (getFileFromGrid(0, i)->getName().compare(dirName) == 0)
+			if (getFileFromGrid(0, i)->getName() == dirName)
 				aLabels[i]->setText(currentDirIcons[1]);
 			else
 				aLabels[i]->setText(dirIcons[1]);
 		}
 
-		if (lastVisibleFile->getName().compare(dirName) == 0)
+		if (lastVisibleFile->getName() == dirName)
 			aLabels[visibleListLength - 1]->setText(currentDirIcons[2]);
 		else
 			aLabels[visibleListLength - 1]->setText(dirIcons[2]);
@@ -760,16 +759,16 @@ void DirectoryScreen::drawGraphicsLeft()
 	
 	if (size - yOffset0 >= 5)
 	{
-		if (firstVisibleFile->getName().compare(dirName) == 0)
+		if (firstVisibleFile->getName() == dirName)
 		{
-			if (firstVisibleFile->getName().compare(fc[0]) == 0)
+			if (firstVisibleFile->getName() == fc[0])
 				a0->setText(currentDirIcons[0]);
 			else
 				a0->setText(currentDirIcons[1]);
 		}
 		else
 		{
-			if (firstVisibleFile->getName().compare(fc[0]) == 0)
+			if (firstVisibleFile->getName() == fc[0])
 				a0->setText(dirIcons[0]);
 			else
 				a0->setText(dirIcons[1]);
@@ -777,7 +776,7 @@ void DirectoryScreen::drawGraphicsLeft()
 		
 		for (int i = 1; i < visibleListLength - 1; i++)
 		{
-			if (fc[i + yOffset0].compare(dirName) == 0)
+			if (fc[i + yOffset0] == dirName)
 				aLabels[i]->setText(currentDirIcons[1]);
 			else
 				aLabels[i]->setText(dirIcons[1]);
@@ -786,16 +785,16 @@ void DirectoryScreen::drawGraphicsLeft()
 				break;
 		}
 
-		if (lastVisibleFile->getName().compare(dirName) == 0)
+		if (lastVisibleFile->getName() == dirName)
 		{
-			if (lastVisibleFile->getName().compare(fc[(int)(size)-1]) == 0)
+			if (lastVisibleFile->getName() == fc[(int)(size)-1])
 				a4->setText(currentDirIcons[2]);
 			else
 				a4->setText(currentDirIcons[1]);
 		}
 		else
 		{
-			if (lastVisibleFile->getName().compare(fc[(int)(size)-1]) == 0)
+			if (lastVisibleFile->getName() == fc[(int)(size)-1])
 				a4->setText(dirIcons[2]);
 			else
 				a4->setText(dirIcons[1]);
@@ -845,31 +844,31 @@ void DirectoryScreen::drawGraphicsRight()
 	auto file03 = getFileFromGrid(0, 3);
 	auto file04 = getFileFromGrid(0, 4);
 
-	if (size - yOffset0 > 0 && file00->getName().compare(dirName) == 0)
+	if (size - yOffset0 > 0 && file00->getName() == dirName)
 	{
 		a0->setText(padFileName(a0->getText(), u8"\u00DF"));
 		b0->setText(u8"\u00E0");
 	}
 
-	if (size - yOffset0 > 1 && file01->getName().compare(dirName) == 0)
+	if (size - yOffset0 > 1 && file01->getName() == dirName)
 	{
 		a1->setText(padFileName(a1->getText(), u8"\u00DF"));
 		b1->setText(u8"\u00E0");
 	}
 
-	if (size - yOffset0 > 2 && getFileFromGrid(0, 2)->getName().compare(dirName) == 0)
+	if (size - yOffset0 > 2 && file02->getName() == dirName)
 	{
 		a2->setText(padFileName(a2->getText(), u8"\u00DF"));
 		b2->setText(u8"\u00E0");
 	}
 
-	if (size - yOffset0 > 3 && file03->getName().compare(dirName) == 0)
+	if (size - yOffset0 > 3 && file03->getName() == dirName)
 	{
 		a3->setText(padFileName(a3->getText(), u8"\u00DF"));
 		b3->setText(u8"\u00E0");
 	}
 
-	if (size - yOffset0 > 4 && file04->getName().compare(dirName) == 0)
+	if (size - yOffset0 > 4 && file04->getName() == dirName)
 	{
 		a4->setText(padFileName(a4->getText(), u8"\u00DF"));
 		b4->setText(u8"\u00E0");
@@ -948,7 +947,7 @@ void DirectoryScreen::drawGraphicsRight()
 	}
 }
 
-string DirectoryScreen::padFileName(string s, string pad)
+std::string DirectoryScreen::padFileName(std::string s, std::string pad)
 {
 	return StrUtil::padRight(moduru::lang::StrUtil::trim(s), pad, 8);
 }

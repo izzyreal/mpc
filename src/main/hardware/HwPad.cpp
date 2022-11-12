@@ -6,10 +6,9 @@
 #include <controls/GlobalReleaseControls.hpp>
 
 using namespace mpc::hardware;
-using namespace std;
 
 HwPad::HwPad(mpc::Mpc& mpc, int index)
-        : HwComponent(mpc, "pad-" + to_string(index + 1))
+        : HwComponent(mpc, "pad-" + std::to_string(index + 1))
 {
     this->index = index;
 }

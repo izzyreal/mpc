@@ -4,7 +4,6 @@
 #include <lcdgui/ScreenComponent.hpp>
 
 using namespace mpc::hardware;
-using namespace std;
 
 Slider::Slider(mpc::Mpc& mpc)
 	: mpc(mpc)

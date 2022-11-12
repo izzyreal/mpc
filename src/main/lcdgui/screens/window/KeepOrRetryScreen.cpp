@@ -6,7 +6,6 @@
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::controls;
-using namespace std;
 
 KeepOrRetryScreen::KeepOrRetryScreen(mpc::Mpc& mpc, const int layerIndex) 
 : ScreenComponent(mpc, "keep-or-retry", layerIndex)
@@ -65,7 +64,7 @@ void KeepOrRetryScreen::openNameScreen()
     nameScreen->setName(sampler->getPreviewSound().lock()->getName());
     auto _sampler = sampler;
     
-    auto renamer = [_sampler](string& newName) {
+    auto renamer = [_sampler](std::string& newName) {
         _sampler->getPreviewSound().lock()->setName(newName);
     };
     
@@ -134,7 +133,7 @@ void KeepOrRetryScreen::displayAssignToNote()
 
 void KeepOrRetryScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 {
-    string s = nonstd::any_cast<string>(arg);
+    auto s = nonstd::any_cast<std::string>(arg);
     
     if (s == "note")
     {

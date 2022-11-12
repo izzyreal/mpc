@@ -3,14 +3,13 @@
 #include <Mpc.hpp>
 
 using namespace mpc::hardware;
-using namespace std;
 
-HwComponent::HwComponent(mpc::Mpc& mpc, const string& label)
+HwComponent::HwComponent(mpc::Mpc& mpc, const std::string& label)
 	: mpc(mpc), label(label)
 {
 }
 
-string HwComponent::getLabel()
+std::string HwComponent::getLabel()
 {
 	return label;
 }

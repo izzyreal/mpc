@@ -6,17 +6,16 @@
 #include <Logger.hpp>
 
 using namespace mpc::file::sndreader;
-using namespace std;
 
 SndReader::SndReader(mpc::disk::MpcFile* soundFile)
 : SndReader(soundFile->getBytes())
 {
 }
 
-SndReader::SndReader(const vector<char>& loadBytes)
+SndReader::SndReader(const std::vector<char>& loadBytes)
 {
     sndFileArray = loadBytes;
-    sndHeaderReader = make_shared<SndHeaderReader>(this);
+    sndHeaderReader = std::make_shared<SndHeaderReader>(this);
 }
 
 bool SndReader::isHeaderValid()
@@ -24,7 +23,7 @@ bool SndReader::isHeaderValid()
     return sndHeaderReader->hasValidId();
 }
 
-string SndReader::getName()
+std::string SndReader::getName()
 {
     return sndHeaderReader->getName();
 }
@@ -32,11 +31,6 @@ string SndReader::getName()
 bool SndReader::isMono()
 {
     return sndHeaderReader->isMono();
-}
-
-int SndReader::getNumberOfFrames()
-{
-    return sndHeaderReader->getNumberOfFrames();
 }
 
 int SndReader::getSampleRate()
@@ -79,7 +73,7 @@ int SndReader::getNumberOfBeats()
     return sndHeaderReader->getNumberOfBeats();
 }
 
-void SndReader::readData(vector<float>& dest)
+void SndReader::readData(std::vector<float>& dest)
 {
 	int length = sndHeaderReader->getNumberOfFrames();
 
@@ -91,7 +85,7 @@ void SndReader::readData(vector<float>& dest)
 	dest.clear();
 	dest.resize(length);
 
-	vector<short> shorts = moduru::VecUtil::BytesToShorts(vector<char>(sndFileArray.begin() + 42, sndFileArray.end()));
+	auto shorts = moduru::VecUtil::BytesToShorts(std::vector<char>(sndFileArray.begin() + 42, sndFileArray.end()));
 	
     for (int i = 0; i < length; ++i)
     {
@@ -108,7 +102,7 @@ void SndReader::readData(vector<float>& dest)
 	}
 }
 
-vector<char>& SndReader::getSndFileArray()
+std::vector<char>& SndReader::getSndFileArray()
 {
 	return sndFileArray;
 }

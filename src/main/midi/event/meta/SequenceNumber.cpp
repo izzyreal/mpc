@@ -7,7 +7,6 @@
 #include <midi/util/VariableLengthInt.hpp>
 
 using namespace mpc::midi::event::meta;
-using namespace std;
 
 SequenceNumber::SequenceNumber(int tick, int delta, int number)
 	: MetaEvent(tick, delta, MetaEvent::SEQUENCE_NUMBER)
@@ -31,7 +30,7 @@ int SequenceNumber::getSequenceNumber()
     return mNumber;
 }
 
-void SequenceNumber::writeToOutputStream(ostream& out) 
+void SequenceNumber::writeToOutputStream(std::ostream& out)
 {
     MetaEvent::writeToOutputStream(out);
     out << (char) 2;
@@ -39,20 +38,20 @@ void SequenceNumber::writeToOutputStream(ostream& out)
     out << (char) getLeastSignificantBits();
 }
 
-void SequenceNumber::writeToOutputStream(ostream& out, bool writeType)
+void SequenceNumber::writeToOutputStream(std::ostream& out, bool writeType)
 {
     MetaEvent::writeToOutputStream(out, writeType);
 }
 
-shared_ptr<MetaEvent> SequenceNumber::parseSequenceNumber(int tick, int delta, MetaEventData* info)
+std::shared_ptr<MetaEvent> SequenceNumber::parseSequenceNumber(int tick, int delta, MetaEventData* info)
 {
 	if (info->length.getValue() != 2) {
-		return make_shared<GenericMetaEvent>(tick, delta, info);
+		return std::make_shared<GenericMetaEvent>(tick, delta, info);
 	}
 	int msb = info->data[0];
 	int lsb = info->data[1];
 	auto number = (msb << 8) + lsb;
-	return make_shared<SequenceNumber>(tick, delta, number);
+	return std::make_shared<SequenceNumber>(tick, delta, number);
 }
 
 int SequenceNumber::getEventSize()
@@ -68,10 +67,10 @@ int SequenceNumber::compareTo(mpc::midi::event::MidiEvent* other)
     if(mDelta.getValue() != other->getDelta()) {
         return mDelta.getValue() < other->getDelta() ? 1 : -1;
     }
-    if(!(dynamic_cast< SequenceNumber* >(other) != nullptr)) {
+    if(dynamic_cast<SequenceNumber*>(other) == nullptr) {
         return 1;
     }
-    auto o = dynamic_cast< SequenceNumber* >(other);
+    auto o = dynamic_cast<SequenceNumber*>(other);
     if(mNumber != o->mNumber) {
         return mNumber < o->mNumber ? -1 : 1;
     }

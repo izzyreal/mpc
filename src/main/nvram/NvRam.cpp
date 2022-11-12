@@ -24,11 +24,10 @@ using namespace mpc::nvram;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace moduru::file;
-using namespace std;
 
 void NvRam::loadUserScreenValues(mpc::Mpc& mpc)
 {
-  string path = mpc::Paths::configPath() + "nvram.vmp";
+  std::string path = mpc::Paths::configPath() + "nvram.vmp";
   auto file = File(path, nullptr);
   
   if (!file.exists())
@@ -59,15 +58,15 @@ void NvRam::loadUserScreenValues(mpc::Mpc& mpc)
 void NvRam::saveUserScreenValues(mpc::Mpc& mpc)
 {
   DefaultsParser dp(mpc);
-  
-  string fileName = mpc::Paths::configPath() + "nvram.vmp";
+
+  std::string fileName = mpc::Paths::configPath() + "nvram.vmp";
   
   File file(fileName, nullptr);
   
   if (!file.exists())
     file.create();
   
-  auto stream = FileUtil::ofstreamw(fileName, ios::binary | ios::out);
+  auto stream = FileUtil::ofstreamw(fileName, std::ios::binary | std::ios::out);
   auto bytes = dp.getBytes();
   stream.write(&bytes[0], bytes.size());
   stream.close();
@@ -80,15 +79,15 @@ void NvRam::saveVmpcSettings(mpc::Mpc& mpc)
   auto othersScreen = mpc.screens->get<OthersScreen>("others");
   
   auto audioMidiServices  = mpc.getAudioMidiServices().lock();
-  string fileName = mpc::Paths::configPath() + "vmpc-specific.ini";
+  std::string fileName = mpc::Paths::configPath() + "vmpc-specific.ini";
   
   File file(fileName, nullptr);
   
   if (!file.exists()) file.create();
   
-  auto stream = FileUtil::ofstreamw(fileName, ios::binary | ios::out);
+  auto stream = FileUtil::ofstreamw(fileName, std::ios::binary | std::ios::out);
   
-  vector<char> bytes{
+  std::vector<char> bytes{
     (char) (vmpcSettingsScreen->initialPadMapping),
     (char) (vmpcSettingsScreen->_16LevelsEraseMode),
     (char) (vmpcAutoSaveScreen->autoSaveOnExit),
@@ -108,7 +107,7 @@ void NvRam::saveVmpcSettings(mpc::Mpc& mpc)
 
 void NvRam::loadVmpcSettings(mpc::Mpc& mpc)
 {
-  string path = mpc::Paths::configPath() + "vmpc-specific.ini";
+    std::string path = mpc::Paths::configPath() + "vmpc-specific.ini";
   File file(path, nullptr);
   
   auto audioMidiServices  = mpc.getAudioMidiServices().lock();
@@ -124,7 +123,7 @@ void NvRam::loadVmpcSettings(mpc::Mpc& mpc)
   auto vmpcAutoSaveScreen = mpc.screens->get<VmpcAutoSaveScreen>("vmpc-auto-save");
   auto othersScreen = mpc.screens->get<OthersScreen>("others");
   
-  vector<char> bytes;
+  std::vector<char> bytes;
   file.getData(&bytes);
   
   if (bytes.size() > 0) vmpcSettingsScreen->initialPadMapping = bytes[0];

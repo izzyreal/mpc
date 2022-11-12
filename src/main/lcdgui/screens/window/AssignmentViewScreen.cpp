@@ -5,7 +5,6 @@
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::controls;
 using namespace moduru::lang;
-using namespace std;
 
 AssignmentViewScreen::AssignmentViewScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "assignment-view", layerIndex)
@@ -33,7 +32,7 @@ void AssignmentViewScreen::up()
 {
 	init();
 
-	if (param.find("0") != string::npos)
+	if (param.find("0") != std::string::npos)
 	{
 		return;
 	}
@@ -47,7 +46,7 @@ void AssignmentViewScreen::down()
 {
 	init();
 	
-	if (param.find("3") != string::npos)
+	if (param.find("3") != std::string::npos)
 	{
 		return;
 	}
@@ -61,7 +60,7 @@ void AssignmentViewScreen::left()
 {
     init();
 	
-	if (param.find("a") != string::npos)
+	if (param.find("a") != std::string::npos)
 	{
 		return;
 	}
@@ -77,7 +76,7 @@ void AssignmentViewScreen::right()
 {
 	init();
 
-	if (param.find("d") != string::npos)
+	if (param.find("d") != std::string::npos)
 	{
 		return;
 	}
@@ -100,7 +99,7 @@ void AssignmentViewScreen::turnWheel(int i)
 
 void AssignmentViewScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 {
-	string s = nonstd::any_cast<string>(arg);
+	auto s = nonstd::any_cast<std::string>(arg);
 
 	if (s == "bank")
 	{
@@ -133,7 +132,7 @@ void AssignmentViewScreen::displayPad(int i)
 {
 	auto note = program.lock()->getPad(i + (16 * mpc.getBank()))->getNote();
 
-	string sampleName = "";
+	std::string sampleName;
 
 	if (note != 34)
 	{
@@ -155,7 +154,7 @@ void AssignmentViewScreen::displayBankInfoAndNoteLabel()
 void AssignmentViewScreen::displayNote()
 {
 	auto note = program.lock()->getPad(getPadIndexFromFocus())->getNote();
-	auto text = note == 34 ? "--" : to_string(note);
+	auto text = note == 34 ? "--" : std::to_string(note);
 	findField("note").lock()->setText(text);
 }
 
@@ -172,13 +171,13 @@ void AssignmentViewScreen::displaySoundName()
 
 	int soundIndex = program.lock()->getNoteParameters(note)->getSoundIndex();
 
-	string soundName = soundIndex == -1 ? "OFF" : sampler->getSoundName(soundIndex);
+    std::string soundName = soundIndex == -1 ? "OFF" : sampler->getSoundName(soundIndex);
 
 	init();
 
 	auto noteParameters = sampler->getLastNp(program.lock().get());
-	
-	string stereo = "";
+
+    std::string stereo;
 
 	if (soundIndex != -1 && noteParameters->getStereoMixerChannel().lock()->isStereo())
 		stereo = "(ST)";
@@ -204,8 +203,7 @@ int AssignmentViewScreen::getPadIndexFromFocus()
 	return padIndex;
 }
 
-
-string AssignmentViewScreen::getFocusFromPadIndex()
+std::string AssignmentViewScreen::getFocusFromPadIndex()
 {
 	auto padIndex = mpc.getPad();
 	
