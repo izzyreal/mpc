@@ -23,18 +23,18 @@ void EraseScreen::open()
 
 	if (bus == 0)
 	{
-		findField("note0").lock()->setAlignment(Alignment::Centered, 18);
-		findField("note1").lock()->setAlignment(Alignment::Centered, 18);
-		findField("note0").lock()->setLocation(62, 42);
+		findField("note0")->setAlignment(Alignment::Centered, 18);
+		findField("note1")->setAlignment(Alignment::Centered, 18);
+		findField("note0")->setLocation(62, 42);
 	}
 	else
 	{
-		findField("note0").lock()->setAlignment(Alignment::None);
-		findField("note1").lock()->setAlignment(Alignment::None);
-		findField("note0").lock()->setLocation(61, 42);
+		findField("note0")->setAlignment(Alignment::None);
+		findField("note1")->setAlignment(Alignment::None);
+		findField("note0")->setLocation(61, 42);
 	}
 
-	findField("note1").lock()->setLocation(116, 42);
+	findField("note1")->setLocation(116, 42);
 
 	setTime0(0);
 
@@ -204,32 +204,32 @@ void EraseScreen::displayTrack()
 		trackName = sequence->getTrack(track)->getActualName();
 	}
 
-	findField("track").lock()->setTextPadded(track + 1, " ");
-	findLabel("track-name").lock()->setText("-" + trackName);
+	findField("track")->setTextPadded(track + 1, " ");
+	findLabel("track-name")->setText("-" + trackName);
 }
 
 void EraseScreen::displayTime()
 {
 	auto sequence = sequencer->getActiveSequence().get();
-	findField("time0").lock()->setTextPadded(SeqUtil::getBarFromTick(sequence, time0) + 1, "0");
-	findField("time1").lock()->setTextPadded(SeqUtil::getBeat(sequence, time0) + 1, "0");
-	findField("time2").lock()->setTextPadded(SeqUtil::getClock(sequence, time0), "0");
-	findField("time3").lock()->setTextPadded(SeqUtil::getBarFromTick(sequence, time1) + 1, "0");
-	findField("time4").lock()->setTextPadded(SeqUtil::getBeat(sequence, time1) + 1, "0");
-	findField("time5").lock()->setTextPadded(SeqUtil::getClock(sequence, time1), "0");
+	findField("time0")->setTextPadded(SeqUtil::getBarFromTick(sequence, time0) + 1, "0");
+	findField("time1")->setTextPadded(SeqUtil::getBeat(sequence, time0) + 1, "0");
+	findField("time2")->setTextPadded(SeqUtil::getClock(sequence, time0), "0");
+	findField("time3")->setTextPadded(SeqUtil::getBarFromTick(sequence, time1) + 1, "0");
+	findField("time4")->setTextPadded(SeqUtil::getBeat(sequence, time1) + 1, "0");
+	findField("time5")->setTextPadded(SeqUtil::getClock(sequence, time1), "0");
 }
 
 void EraseScreen::displayErase()
 {
-	findField("erase").lock()->setText(eraseNames[erase]);
+	findField("erase")->setText(eraseNames[erase]);
 }
 
 void EraseScreen::displayType()
 {
-	findField("type").lock()->Hide(erase == 0);
+	findField("type")->Hide(erase == 0);
 
 	if (erase > 0)
-		findField("type").lock()->setText(typeNames[type]);
+		findField("type")->setText(typeNames[type]);
 }
 
 void EraseScreen::displayNotes()
@@ -238,37 +238,37 @@ void EraseScreen::displayNotes()
 
 	if (erase != 0 && ((erase == 1 && type != 0) || (erase == 2 && type != 0)))
 	{
-		findField("note0").lock()->Hide(true);
-		findLabel("note0").lock()->Hide(true);
-		findField("note1").lock()->Hide(true);
-		findLabel("note1").lock()->Hide(true);
+		findField("note0")->Hide(true);
+		findLabel("note0")->Hide(true);
+		findField("note1")->Hide(true);
+		findLabel("note1")->Hide(true);
 		return;
 	}
 
 	auto bus = sequencer->getActiveTrack()->getBus();
 
-	findField("note0").lock()->Hide(false);
-	findLabel("note0").lock()->Hide(false);
-	findField("note1").lock()->Hide(bus != 0);
-	findLabel("note1").lock()->Hide(bus != 0);
+	findField("note0")->Hide(false);
+	findLabel("note0")->Hide(false);
+	findField("note1")->Hide(bus != 0);
+	findLabel("note1")->Hide(bus != 0);
 
 	if (bus == 0)
 	{
-		findField("note0").lock()->setSize(47, 9);
-		findField("note0").lock()->setText((StrUtil::padLeft(std::to_string(note0), " ", 3) + "(" + mpc::Util::noteNames()[note0]) + ")");
-		findField("note1").lock()->setText((StrUtil::padLeft(std::to_string(note1), " ", 3) + "(" + mpc::Util::noteNames()[note1]) + ")");
+		findField("note0")->setSize(47, 9);
+		findField("note0")->setText((StrUtil::padLeft(std::to_string(note0), " ", 3) + "(" + mpc::Util::noteNames()[note0]) + ")");
+		findField("note1")->setText((StrUtil::padLeft(std::to_string(note1), " ", 3) + "(" + mpc::Util::noteNames()[note1]) + ")");
 	}
 	else
 	{
-		findField("note0").lock()->setSize(37, 9);
+		findField("note0")->setSize(37, 9);
 
 		if (note0 == 34)
-			findField("note0").lock()->setText("ALL");
+			findField("note0")->setText("ALL");
 		else
         {
             auto padIndexWithBank = program.lock()->getPadIndexFromNote(note0);
             auto padName = sampler->getPadName(padIndexWithBank);
-            findField("note0").lock()->setText(std::to_string(note0) + "/" + padName);
+            findField("note0")->setText(std::to_string(note0) + "/" + padName);
         }
 	}
 }

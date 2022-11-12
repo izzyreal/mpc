@@ -25,7 +25,7 @@ void SoundScreen::turnWheel(int i)
 	if (param == "soundname")
 	{
 		auto nameScreen = mpc.screens->get<NameScreen>("name");
-		nameScreen->setName(findField("soundname").lock()->getText());
+		nameScreen->setName(findField("soundname")->getText());
 
         auto renamer = [&](std::string& newName) {
             if (sampler->isSoundNameOccupied(newName))
@@ -63,11 +63,11 @@ void SoundScreen::displaySoundName()
 
 	if (!sound)
 	{
-		findField("soundname").lock()->setText("");
+		findField("soundname")->setText("");
 		return;
 	}
 
-	findField("soundname").lock()->setText(sound->getName());
+	findField("soundname")->setText(sound->getName());
 }
 
 void SoundScreen::displayType()
@@ -76,11 +76,11 @@ void SoundScreen::displayType()
 
 	if (!sound)
 	{
-		findLabel("type").lock()->setText("");
+		findLabel("type")->setText("");
 		return;
 	}
 
-	findLabel("type").lock()->setText("Type:" + std::string(sound->isMono() ? "MONO" : "STEREO"));
+	findLabel("type")->setText("Type:" + std::string(sound->isMono() ? "MONO" : "STEREO"));
 }
 
 void SoundScreen::displayRate()
@@ -89,11 +89,11 @@ void SoundScreen::displayRate()
 
 	if (!sound)
 	{
-		findLabel("rate").lock()->setText("");
+		findLabel("rate")->setText("");
 		return;
 	}
 
-	findLabel("rate").lock()->setText("Rate: " + std::to_string(sound->getSampleRate()) + "Hz");
+	findLabel("rate")->setText("Rate: " + std::to_string(sound->getSampleRate()) + "Hz");
 }
 
 void SoundScreen::displaySize()
@@ -102,9 +102,9 @@ void SoundScreen::displaySize()
 
 	if (!sound)
 	{
-		findLabel("size").lock()->setText("");
+		findLabel("size")->setText("");
 		return;
 	}
 
-	findLabel("size").lock()->setText("Size:" + StrUtil::padLeft(std::to_string(sound->getSampleData()->size() / 500), " ", 4) + "kbytes");
+	findLabel("size")->setText("Size:" + StrUtil::padLeft(std::to_string(sound->getSampleData()->size() / 500), " ", 4) + "kbytes");
 }

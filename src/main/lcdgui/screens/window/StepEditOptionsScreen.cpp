@@ -12,7 +12,7 @@ StepEditOptionsScreen::StepEditOptionsScreen(mpc::Mpc &mpc, const int layerIndex
 
 void StepEditOptionsScreen::open()
 {
-    findField("auto-step-increment").lock()->setAlignment(Alignment::Centered);
+    findField("auto-step-increment")->setAlignment(Alignment::Centered);
     displayAutoStepIncrement();
     displayDurationOfRecordedNotes();
     displayTcValue();
@@ -91,17 +91,17 @@ void StepEditOptionsScreen::setTcValueRecordedNotes(int i)
 
 void StepEditOptionsScreen::displayAutoStepIncrement()
 {
-    findField("auto-step-increment").lock()->setText(autoStepIncrementEnabled ? "YES" : "NO");
+    findField("auto-step-increment")->setText(autoStepIncrementEnabled ? "YES" : "NO");
 }
 
 void StepEditOptionsScreen::displayDurationOfRecordedNotes()
 {
-    findField("duration-of-recorded-notes").lock()->setText(durationOfRecordedNotesTcValue ? "TC VALUE:" : "AS PLAYED");
+    findField("duration-of-recorded-notes")->setText(durationOfRecordedNotesTcValue ? "TC VALUE:" : "AS PLAYED");
 }
 
 void StepEditOptionsScreen::displayTcValue()
 {
-    auto f = findField("tc-value").lock();
+    auto f = findField("tc-value");
     f->Hide(!durationOfRecordedNotesTcValue);
 
     if (durationOfRecordedNotesTcValue)

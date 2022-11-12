@@ -52,7 +52,7 @@ void ResampleScreen::turnWheel(int i)
 		auto nameScreen = mpc.screens->get<NameScreen>("name");
         auto resampleScreen = this;
         auto _sampler = sampler;
-		nameScreen->setName(findField("newname").lock()->getText());
+		nameScreen->setName(findField("newname")->getText());
 
         auto renamer = [_sampler, resampleScreen](std::string& newName2) {
             if (_sampler->isSoundNameOccupied(newName2))
@@ -125,22 +125,22 @@ void ResampleScreen::function(int i)
 
 void ResampleScreen::displayNewFs()
 {
-	findField("newfs").lock()->setText(std::to_string(newFs));
+	findField("newfs")->setText(std::to_string(newFs));
 }
 
 void ResampleScreen::displayQuality()
 {
-	findField("quality").lock()->setText(qualityNames[quality]);
+	findField("quality")->setText(qualityNames[quality]);
 }
 
 void ResampleScreen::displayNewBit()
 {
-	findField("newbit").lock()->setText(bitNames[newBit]);
+	findField("newbit")->setText(bitNames[newBit]);
 }
 
 void ResampleScreen::displayNewName()
 {
-	findField("newname").lock()->setText(newName);
+	findField("newname")->setText(newName);
 }
 
 void ResampleScreen::setNewFs(int i)

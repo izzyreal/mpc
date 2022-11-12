@@ -29,8 +29,8 @@ VmpcMidiPresetsScreen::VmpcMidiPresetsScreen(mpc::Mpc& mpc, const int layerIndex
 
 void VmpcMidiPresetsScreen::open()
 {
-    findChild<Label>("up").lock()->setText("\u00C7");
-    findChild<Label>("down").lock()->setText("\u00C6");
+    findChild<Label>("up")->setText("\u00C7");
+    findChild<Label>("down")->setText("\u00C6");
 
     initPresets();
     displayRows();
@@ -38,8 +38,8 @@ void VmpcMidiPresetsScreen::open()
 
 void VmpcMidiPresetsScreen::displayUpAndDown()
 {
-    findChild<Label>("up").lock()->Hide(rowOffset == 0);
-    findChild<Label>("down").lock()->Hide(rowOffset + 4 >= presets.size());
+    findChild<Label>("up")->Hide(rowOffset == 0);
+    findChild<Label>("down")->Hide(rowOffset + 4 >= presets.size());
 }
 
 void VmpcMidiPresetsScreen::function(int i)
@@ -104,7 +104,7 @@ void VmpcMidiPresetsScreen::displayRows()
 {
     for (int i = 0; i < 4; i++)
     {
-        auto name = findChild<Field>("name" + std::to_string(i)).lock();
+        auto name = findChild<Field>("name" + std::to_string(i));
 
         if (i >= presets.size())
         {

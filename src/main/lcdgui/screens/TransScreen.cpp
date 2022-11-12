@@ -13,7 +13,7 @@ TransScreen::TransScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void TransScreen::open()
 {
-	findChild("function-keys").lock()->Hide(sequencer->isPlaying());
+	findChild("function-keys")->Hide(sequencer->isPlaying());
 
 	setBar0(0);
 	setBar1(sequencer->getActiveSequence()->getLastBarIndex());
@@ -120,48 +120,48 @@ void TransScreen::setBar1(int i)
 
 void TransScreen::displayTransposeAmount()
 {
-	findField("transpose-amount").lock()->setTextPadded(transposeAmount);
+	findField("transpose-amount")->setTextPadded(transposeAmount);
 }
 
 void TransScreen::displayTr()
 {
 	auto trName = std::string(tr == -1 ? "ALL" : sequencer->getActiveSequence()->getTrack(tr)->getName());
-	findField("tr").lock()->setTextPadded(tr + 1, "0");
-	findLabel("track-name").lock()->setText(trName);
+	findField("tr")->setTextPadded(tr + 1, "0");
+	findLabel("track-name")->setText(trName);
 }
 
 void TransScreen::displayBars()
 {
-	findField("bar0").lock()->setTextPadded(std::to_string(bar0 + 1), "0");
-	findField("bar1").lock()->setTextPadded(std::to_string(bar1 + 1), "0");
+	findField("bar0")->setTextPadded(std::to_string(bar0 + 1), "0");
+	findField("bar1")->setTextPadded(std::to_string(bar1 + 1), "0");
 }
 
 void TransScreen::play()
 {
 	ScreenComponent::play();
-	findChild("function-keys").lock()->Hide(sequencer->isPlaying());
+	findChild("function-keys")->Hide(sequencer->isPlaying());
 }
 
 void TransScreen::playStart()
 {
 	ScreenComponent::playStart();
-	findChild("function-keys").lock()->Hide(sequencer->isPlaying());
+	findChild("function-keys")->Hide(sequencer->isPlaying());
 }
 
 void TransScreen::rec()
 {
 	ScreenComponent::rec();
-	findChild("function-keys").lock()->Hide(sequencer->isPlaying());
+	findChild("function-keys")->Hide(sequencer->isPlaying());
 }
 
 void TransScreen::overDub()
 {
 	ScreenComponent::overDub();
-	findChild("function-keys").lock()->Hide(sequencer->isPlaying());
+	findChild("function-keys")->Hide(sequencer->isPlaying());
 }
 
 void TransScreen::stop()
 {
 	ScreenComponent::stop();
-	findChild("function-keys").lock()->Hide(sequencer->isPlaying());
+	findChild("function-keys")->Hide(sequencer->isPlaying());
 }

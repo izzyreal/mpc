@@ -26,7 +26,7 @@ void InsertEventScreen::open()
 
 void InsertEventScreen::displayInsertEventType()
 {
-	findField("eventtype").lock()->setText(eventTypeNames[insertEventType]);
+	findField("eventtype")->setText(eventTypeNames[insertEventType]);
 }
 
 void InsertEventScreen::function(int i)

@@ -19,12 +19,12 @@ void SndParamsScreen::open()
 {
 	auto sound = sampler->getSound().lock() ? true : false;
 
-	findField("snd").lock()->setFocusable(sound);
-	findField("playx").lock()->setFocusable(sound);
-	findField("level").lock()->setFocusable(sound);
-	findField("tune").lock()->setFocusable(sound);
-	findField("beat").lock()->setFocusable(sound);
-	findField("dummy").lock()->setFocusable(!sound);
+	findField("snd")->setFocusable(sound);
+	findField("playx")->setFocusable(sound);
+	findField("level")->setFocusable(sound);
+	findField("tune")->setFocusable(sound);
+	findField("beat")->setFocusable(sound);
+	findField("dummy")->setFocusable(!sound);
 
 	displaySnd();
 	displayPlayX();
@@ -145,9 +145,9 @@ void SndParamsScreen::displayLevel()
 	auto sound = sampler->getSound().lock();
 
 	if (sound)
-		findField("level").lock()->setText(std::to_string(sound->getSndLevel()));
+		findField("level")->setText(std::to_string(sound->getSndLevel()));
 	else
-		findField("level").lock()->setText("100");
+		findField("level")->setText("100");
 }
 
 void SndParamsScreen::displayTune()
@@ -155,9 +155,9 @@ void SndParamsScreen::displayTune()
 	auto sound = sampler->getSound().lock();
 
 	if (sound)
-		findField("tune").lock()->setText(std::to_string(sound->getTune()));
+		findField("tune")->setText(std::to_string(sound->getTune()));
 	else
-		findField("tune").lock()->setText("0");
+		findField("tune")->setText("0");
 }
 
 void SndParamsScreen::displayBeat()
@@ -165,9 +165,9 @@ void SndParamsScreen::displayBeat()
 	auto sound = sampler->getSound().lock();
 
 	if (sound)
-		findField("beat").lock()->setText(std::to_string(sound->getBeatCount()));
+		findField("beat")->setText(std::to_string(sound->getBeatCount()));
 	else
-		findField("beat").lock()->setText("4");
+		findField("beat")->setText("4");
 }
 
 void SndParamsScreen::displaySampleAndNewTempo()
@@ -176,8 +176,8 @@ void SndParamsScreen::displaySampleAndNewTempo()
 
 	if (!sound || !sound->isLoopEnabled())
 	{
-		findLabel("sample-tempo").lock()->setText("");
-		findLabel("new-tempo").lock()->setText("");
+		findLabel("sample-tempo")->setText("");
+		findLabel("new-tempo")->setText("");
 		return;
 	}
 
@@ -200,7 +200,7 @@ void SndParamsScreen::displaySampleAndNewTempo()
 
 	bpmString = mpc::Util::replaceDotWithSmallSpaceDot(bpmString);
 
-	findLabel("sample-tempo").lock()->setText("Sample tempo=" + bpmString);
+	findLabel("sample-tempo")->setText("Sample tempo=" + bpmString);
 
 	auto newBpm = (int)(pow(2.0, (sound->getTune() / 120.0)) * bpm);
 	bpmString = std::to_string(newBpm);
@@ -218,7 +218,7 @@ void SndParamsScreen::displaySampleAndNewTempo()
 
 	bpmString = mpc::Util::replaceDotWithSmallSpaceDot(bpmString);
 
-	findLabel("new-tempo").lock()->setText("New tempo=" + bpmString);
+	findLabel("new-tempo")->setText("New tempo=" + bpmString);
 }
 
 void SndParamsScreen::displaySnd()
@@ -227,7 +227,7 @@ void SndParamsScreen::displaySnd()
 
 	if (sampler->getSoundCount() == 0)
 	{
-		findField("snd").lock()->setText("(no sound)");
+		findField("snd")->setText("(no sound)");
 		ls.lock()->setFocus("dummy");
 		return;
 	}
@@ -240,11 +240,11 @@ void SndParamsScreen::displaySnd()
 	if (!sound->isMono())
 		sampleName = StrUtil::padRight(sampleName, " ", 16) + "(ST)";
 
-	findField("snd").lock()->setText(sampleName);
+	findField("snd")->setText(sampleName);
 
 }
 
 void SndParamsScreen::displayPlayX()
 {
-	findField("playx").lock()->setText(playXNames[sampler->getPlayX()]);
+	findField("playx")->setText(playXNames[sampler->getPlayX()]);
 }

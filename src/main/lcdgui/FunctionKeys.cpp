@@ -15,7 +15,7 @@ FunctionKey::FunctionKey(mpc::Mpc& mpc, const std::string& name, const int xPos)
 	Component::setSize(39, 9);
 	setLocation(xPos, 51);
 
-	auto label = addChild(std::make_shared<TextComp>(mpc, name)).lock();
+	auto label = addChildT<TextComp>(mpc, name);
 	label->setSize(0, 0);
 	label->setLocation(xPos + 1, 52);
 	label->preDrawClearRect.Clear();
@@ -70,7 +70,7 @@ void FunctionKey::Draw(std::vector<std::vector<bool>>* pixels)
 
 void FunctionKey::setText(const std::string& text)
 {
-	auto label = findChild<TextComp>(name).lock();
+	auto label = findChild<TextComp>(name);
 	label->setText(text);
 
 	auto stringSize = label->GetTextEntryLength();
@@ -133,7 +133,7 @@ void FunctionKeys::setActiveArrangement(int i)
 
 	for (int j = 0; j < 6; j++)
 	{
-		auto fk = findChild<FunctionKey>("fk" + std::to_string(j)).lock();
+		auto fk = findChild<FunctionKey>("fk" + std::to_string(j));
 
 		if (!fk)
 			continue;
@@ -143,7 +143,7 @@ void FunctionKeys::setActiveArrangement(int i)
 
 		if (type != -1)
 		{
-			auto label = fk->findChild<TextComp>(fk->getName()).lock();
+			auto label = fk->findChild<TextComp>(fk->getName());
 			fk->setText(texts[activeArrangement][j]);
 			label->setInverted(type == 0);
 		}

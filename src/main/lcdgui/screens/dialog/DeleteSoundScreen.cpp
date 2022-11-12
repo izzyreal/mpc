@@ -56,5 +56,5 @@ void DeleteSoundScreen::displaySnd()
 		return;
 	}
 
-	findField("snd").lock()->setText(sampler->getSound().lock()->getName());
+	findField("snd")->setText(sampler->getSound().lock()->getName());
 }

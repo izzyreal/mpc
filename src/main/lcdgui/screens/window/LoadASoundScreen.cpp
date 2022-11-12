@@ -28,7 +28,7 @@ void LoadASoundScreen::open()
 {
 	init();
 	auto loadScreen = mpc.screens->get<LoadScreen>("load");
-	findLabel("filename").lock()->setText("File:" + loadScreen->getSelectedFileName());
+	findLabel("filename")->setText("File:" + loadScreen->getSelectedFileName());
     assignToNote = mpc.getNote();
 	displayAssignToNote();
 	mpc.addObserver(this); // Subscribe to "note" messages
@@ -163,7 +163,7 @@ void LoadASoundScreen::displayAssignToNote()
 	auto padIndex = program.lock()->getPadIndexFromNote(assignToNote);
 	auto padName = sampler->getPadName(padIndex);
 	auto noteName = std::string(assignToNote == 34 ? "--" : std::to_string(assignToNote));
-	findField("assign-to-note").lock()->setText(noteName + "/" + padName);
+	findField("assign-to-note")->setText(noteName + "/" + padName);
 }
 
 void LoadASoundScreen::update(moduru::observer::Observable* observable, nonstd::any message)

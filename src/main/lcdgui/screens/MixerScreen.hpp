@@ -53,7 +53,7 @@ private:
 
     int xPos = 0;
     int yPos = 0;
-    std::vector<std::weak_ptr<mpc::lcdgui::MixerStrip>> mixerStrips;
+    std::vector<std::shared_ptr<mpc::lcdgui::MixerStrip>> mixerStrips;
     void addMixerStrips();
     void displayMixerStrip(int i);
     void displayMixerStrips();

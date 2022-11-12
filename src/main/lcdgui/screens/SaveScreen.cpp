@@ -33,7 +33,7 @@ void SaveScreen::open()
         device = mpc.getDiskController()->getActiveDiskIndex();
     }
 
-    findField("directory").lock()->setLocation(200, 0);
+    findField("directory")->setLocation(200, 0);
 
     displaySize();
     displayType();
@@ -266,7 +266,7 @@ void SaveScreen::setType(int i)
 
 void SaveScreen::displayType()
 {
-    findField("type").lock()->setText(types[type]);
+    findField("type")->setText(types[type]);
 }
 
 void SaveScreen::displayFile()
@@ -305,7 +305,7 @@ void SaveScreen::displayFile()
             fileName = "MPC2KXL         .BIN";
     }
     
-    findField("file").lock()->setText(fileName);
+    findField("file")->setText(fileName);
 }
 
 void SaveScreen::displaySize()
@@ -335,29 +335,29 @@ void SaveScreen::displaySize()
             break;
     }
     
-    findLabel("size").lock()->setText(StrUtil::padLeft(std::to_string(size == -1 ? 0 : size), " ", 6) + "K");
+    findLabel("size")->setText(StrUtil::padLeft(std::to_string(size == -1 ? 0 : size), " ", 6) + "K");
 }
 
 void SaveScreen::displayFree()
 {
     auto freeFormatted = FileUtil::getFreeDiskSpaceFormatted(mpc::Paths::storesPath());
-    findLabel("free").lock()->setText(freeFormatted);
+    findLabel("free")->setText(freeFormatted);
 }
 
 void SaveScreen::displayDirectory()
 {
-    findField("directory").lock()->setText(mpc.getDisk().lock()->getDirectoryName());
+    findField("directory")->setText(mpc.getDisk().lock()->getDirectoryName());
 }
 
 void SaveScreen::displayDevice()
 {
-    auto dev = findChild<Field>("device").lock();
+    auto dev = findChild<Field>("device");
     dev->setText(mpc.getDisks()[device]->getVolume().label);
 }
 
 void SaveScreen::displayDeviceType()
 {
-    auto deviceTypeLabel = findChild<Label>("device-type").lock();
+    auto deviceTypeLabel = findChild<Label>("device-type");
     deviceTypeLabel->setText(mpc.getDisks()[device]->getVolume().typeShortName());
 }
 

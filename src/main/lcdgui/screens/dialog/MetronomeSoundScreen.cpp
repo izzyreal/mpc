@@ -27,54 +27,54 @@ void MetronomeSoundScreen::close()
 
 void MetronomeSoundScreen::displaySound()
 {
-    findField("sound").lock()->setText(soundNames[sound]);
-    findLabel("volume").lock()->Hide(sound != 0);
-    findField("volume").lock()->Hide(sound != 0);
-    findLabel("output").lock()->Hide(sound != 0);
-    findField("output").lock()->Hide(sound != 0);
-    findLabel("normal").lock()->Hide(sound == 0);
-    findField("normal").lock()->Hide(sound == 0);
-    findLabel("velocity-normal").lock()->Hide(sound == 0);
-    findField("velocity-normal").lock()->Hide(sound == 0);
-    findLabel("accent").lock()->Hide(sound == 0);
-    findField("accent").lock()->Hide(sound == 0);
-    findLabel("velocity-accent").lock()->Hide(sound == 0);
-    findField("velocity-accent").lock()->Hide(sound == 0);
+    findField("sound")->setText(soundNames[sound]);
+    findLabel("volume")->Hide(sound != 0);
+    findField("volume")->Hide(sound != 0);
+    findLabel("output")->Hide(sound != 0);
+    findField("output")->Hide(sound != 0);
+    findLabel("normal")->Hide(sound == 0);
+    findField("normal")->Hide(sound == 0);
+    findLabel("velocity-normal")->Hide(sound == 0);
+    findField("velocity-normal")->Hide(sound == 0);
+    findLabel("accent")->Hide(sound == 0);
+    findField("accent")->Hide(sound == 0);
+    findLabel("velocity-accent")->Hide(sound == 0);
+    findField("velocity-accent")->Hide(sound == 0);
 }
 
 void MetronomeSoundScreen::displayVolume()
 {
-    findField("volume").lock()->setTextPadded(volume);
+    findField("volume")->setTextPadded(volume);
 }
 
 void MetronomeSoundScreen::displayOutput()
 {
     auto outputText = output == 0 ? "STEREO" : "OUT" + std::to_string(output);
-    findField("output").lock()->setText(outputText);
+    findField("output")->setText(outputText);
 }
 
 void MetronomeSoundScreen::displayAccent()
 {
 	auto program = sampler.lock()->getDrumBusProgramIndex(sound);
     auto note = dynamic_cast<Program*>(sampler.lock()->getProgram(program).lock().get())->getPad(accentPad)->getNote();
-	findField("accent").lock()->setText((note == 34 ? "--" : std::to_string(note)) + "/" + sampler.lock()->getPadName(accentPad));
+	findField("accent")->setText((note == 34 ? "--" : std::to_string(note)) + "/" + sampler.lock()->getPadName(accentPad));
 }
 
 void MetronomeSoundScreen::displayNormal()
 {
     auto program = sampler.lock()->getDrumBusProgramIndex(sound);
     auto note = dynamic_cast<Program*>(sampler.lock()->getProgram(program).lock().get())->getPad(normalPad)->getNote();
-    findField("normal").lock()->setText((note == 34 ? "--" : std::to_string(note)) + "/" + sampler.lock()->getPadName(normalPad));
+    findField("normal")->setText((note == 34 ? "--" : std::to_string(note)) + "/" + sampler.lock()->getPadName(normalPad));
 }
 
 void MetronomeSoundScreen::displayAccentVelo()
 {
-    findField("velocity-accent").lock()->setTextPadded(accentVelo);
+    findField("velocity-accent")->setTextPadded(accentVelo);
 }
 
 void MetronomeSoundScreen::displayNormalVelo()
 {
-    findField("velocity-normal").lock()->setTextPadded(normalVelo);
+    findField("velocity-normal")->setTextPadded(normalVelo);
 }
 
 int MetronomeSoundScreen::getVolume()
@@ -122,7 +122,7 @@ void MetronomeSoundScreen::setSound(int i)
     {
         displayVolume();
         displayOutput();
-        findBackground().lock()->setName("metronome-sound");
+        findBackground()->setName("metronome-sound");
     }
     else
     {
@@ -130,7 +130,7 @@ void MetronomeSoundScreen::setSound(int i)
         displayNormal();
         displayAccentVelo();
         displayNormalVelo();
-        findBackground().lock()->setName("metronome-sound-empty");
+        findBackground()->setName("metronome-sound-empty");
     }
 }
 

@@ -10,22 +10,22 @@ Layer::Layer() : Component("layer")
 
 mpc::lcdgui::Background* Layer::getBackground()
 {
-	return dynamic_cast<Background*>(findChild<Background>("").lock().get());
+	return findChild<Background>("").get();
 }
 
 mpc::lcdgui::FunctionKeys* Layer::getFunctionKeys()
 {
-	return findChild<FunctionKeys>("function-keys").lock().get();
+	return findChild<FunctionKeys>("function-keys").get();
 }
 
 bool Layer::setFocus(std::string fieldName)
 {
-	auto newFocus = findField(fieldName).lock();
+	auto newFocus = findField(fieldName);
 
 	if (!newFocus || newFocus->IsHidden() || !newFocus->isFocusable())
 		return false;
 
-	auto oldFocus = findField(focus).lock();
+	auto oldFocus = findField(focus);
 
 	if (oldFocus)
 		oldFocus->loseFocus(fieldName);

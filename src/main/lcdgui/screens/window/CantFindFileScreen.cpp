@@ -9,7 +9,7 @@ CantFindFileScreen::CantFindFileScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void CantFindFileScreen::open()
 {
-	findField("file").lock()->setText(fileName);
+	findField("file")->setText(fileName);
 }
 
 void CantFindFileScreen::function(int i)

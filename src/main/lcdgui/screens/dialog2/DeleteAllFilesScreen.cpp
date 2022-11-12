@@ -21,7 +21,7 @@ void DeleteAllFilesScreen::open()
 
 void DeleteAllFilesScreen::displayDelete()
 {
-	findField("delete").lock()->setText(views[delete_]);
+	findField("delete")->setText(views[delete_]);
 }
 
 void DeleteAllFilesScreen::setDelete(int i)

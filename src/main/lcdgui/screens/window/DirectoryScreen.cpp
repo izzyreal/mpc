@@ -55,7 +55,7 @@ void DirectoryScreen::setFunctionKeys()
 		ls.lock()->setFunctionKeysArrangement(0);
 	}
 
-	findChild<Background>("").lock()->repaintUnobtrusive(findChild<FunctionKey>("fk5").lock()->getRect());
+	findBackground()->repaintUnobtrusive(findChild<FunctionKey>("fk5")->getRect());
 }
 
 void DirectoryScreen::function(int f)
@@ -543,13 +543,13 @@ void DirectoryScreen::displayLeftFields()
 	for (int i = 0; i < 5; i++)
 	{
 		if (i + yOffset0 > size - 1)
-			findField("a" + std::to_string(i)).lock()->setText(" ");
+			findField("a" + std::to_string(i))->setText(" ");
 		else
-			findField("a" + std::to_string(i)).lock()->setText(names[i + yOffset0]);
+			findField("a" + std::to_string(i))->setText(names[i + yOffset0]);
 	}
 
 	if (disk->isRoot())
-		findField("a0").lock()->setText("ROOT");
+		findField("a0")->setText("ROOT");
 }
 
 void DirectoryScreen::displayRightFields()
@@ -561,7 +561,7 @@ void DirectoryScreen::displayRightFields()
 	{
 		if (i + yOffset1 > size - 1)
 		{
-			findField("b" + std::to_string(i)).lock()->setText(" ");
+			findField("b" + std::to_string(i))->setText(" ");
 		}
 		else
 		{
@@ -574,7 +574,7 @@ void DirectoryScreen::displayRightFields()
 				ext = "." + ext;
 			}
 
-			findField("b" + std::to_string(i)).lock()->setText(name + ext);
+			findField("b" + std::to_string(i))->setText(name + ext);
 		}
 	}
 }
@@ -650,12 +650,12 @@ void DirectoryScreen::setYPos0(int i)
 
 void DirectoryScreen::drawGraphicsLeft()
 {
-	auto topLeft = findLabel("topleft").lock();
-	auto a0 = findLabel("a0i").lock();
-	auto a1 = findLabel("a1i").lock();
-	auto a2 = findLabel("a2i").lock();
-	auto a3 = findLabel("a3i").lock();
-	auto a4 = findLabel("a4i").lock();
+	auto topLeft = findLabel("topleft");
+	auto a0 = findLabel("a0i");
+	auto a1 = findLabel("a1i");
+	auto a2 = findLabel("a2i");
+	auto a3 = findLabel("a3i");
+	auto a4 = findLabel("a4i");
 	topLeft->setText(" ");
 	a0->setText(" ");
 	a1->setText(" ");
@@ -804,11 +804,11 @@ void DirectoryScreen::drawGraphicsLeft()
 
 void DirectoryScreen::drawGraphicsRight()
 {
-	auto b0 = findLabel("b0i").lock();
-	auto b1 = findLabel("b1i").lock();
-	auto b2 = findLabel("b2i").lock();
-	auto b3 = findLabel("b3i").lock();
-	auto b4 = findLabel("b4i").lock();
+	auto b0 = findLabel("b0i");
+	auto b1 = findLabel("b1i");
+	auto b2 = findLabel("b2i");
+	auto b3 = findLabel("b3i");
+	auto b4 = findLabel("b4i");
 
 	b0->setText(" ");
 	b1->setText(" ");
@@ -824,11 +824,11 @@ void DirectoryScreen::drawGraphicsRight()
 	auto parentNames = disk->getParentFileNames();
 	auto dirName = disk->getDirectoryName();
 
-	auto a0 = findField("a0").lock();
-	auto a1 = findField("a1").lock();
-	auto a2 = findField("a2").lock();
-	auto a3 = findField("a3").lock();
-	auto a4 = findField("a4").lock();
+	auto a0 = findField("a0");
+	auto a1 = findField("a1");
+	auto a2 = findField("a2");
+	auto a3 = findField("a3");
+	auto a4 = findField("a4");
 
 	if (parentNames.size() == 0)
 	{
@@ -874,11 +874,11 @@ void DirectoryScreen::drawGraphicsRight()
 		b4->setText(u8"\u00E0");
 	}
 
-	auto c0 = findLabel("c0i").lock();
-	auto c1 = findLabel("c1i").lock();
-	auto c2 = findLabel("c2i").lock();
-	auto c3 = findLabel("c3i").lock();
-	auto c4 = findLabel("c4i").lock();
+	auto c0 = findLabel("c0i");
+	auto c1 = findLabel("c1i");
+	auto c2 = findLabel("c2i");
+	auto c3 = findLabel("c3i");
+	auto c4 = findLabel("c4i");
 
 	auto file10 = getFileFromGrid(1, 0);
 

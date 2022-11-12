@@ -37,7 +37,7 @@ void LoadScreen::open()
         device = mpc.getDiskController()->getActiveDiskIndex();
     }
     
-	findField("directory").lock()->setLocation(200, 0);
+	findField("directory")->setLocation(200, 0);
 	displayView();
 
 	displayDirectory();
@@ -47,7 +47,7 @@ void LoadScreen::open()
     displayDeviceType();
 
 	displayFreeSnd();
-	findLabel("freeseq").lock()->setText("  2640K");
+	findLabel("freeseq")->setText("  2640K");
 
 	auto splitFileName = StrUtil::split(getSelectedFileName(), '.');
 	auto playable = splitFileName.size() > 1 && (StrUtil::eqIgnoreCase(splitFileName[1], "snd") || StrUtil::eqIgnoreCase(splitFileName[1], "wav"));
@@ -313,24 +313,24 @@ void LoadScreen::turnWheel(int i)
 
 void LoadScreen::displayView()
 {
-	findField("view").lock()->setText(views[view]);
+	findField("view")->setText(views[view]);
 }
 
 void LoadScreen::displayDirectory()
 {
-	findField("directory").lock()->setText(mpc.getDisk().lock()->getDirectoryName());
+	findField("directory")->setText(mpc.getDisk().lock()->getDirectoryName());
 }
 
 void LoadScreen::displayFreeSnd()
 {
-	findLabel("freesnd").lock()->setText(" " + StrUtil::padLeft(std::to_string(sampler->getFreeSampleSpace()), " ", 5) + "K");
+	findLabel("freesnd")->setText(" " + StrUtil::padLeft(std::to_string(sampler->getFreeSampleSpace()), " ", 5) + "K");
 }
 
 void LoadScreen::displayFile()
 {
 	if (mpc.getDisk().lock()->getFileNames().size() == 0)
 	{
-		findField("file").lock()->setText("");
+		findField("file")->setText("");
 		return;
 	}
 
@@ -339,7 +339,7 @@ void LoadScreen::displayFile()
 	
 	if (selectedFileName.length() != 0 && selectedFile && selectedFile->isDirectory())
 	{
-		findField("file").lock()->setText(u8"\u00C3" + StrUtil::padRight(FileUtil::splitName(selectedFileName)[0], " ", 16));
+		findField("file")->setText(u8"\u00C3" + StrUtil::padRight(FileUtil::splitName(selectedFileName)[0], " ", 16));
 	}
 	else
 	{
@@ -352,7 +352,7 @@ void LoadScreen::displayFile()
 			selectedFileName = fileName + extension;
 		}
 
-		findField("file").lock()->setText(selectedFileName);
+		findField("file")->setText(selectedFileName);
 	}
 }
 
@@ -370,11 +370,11 @@ void LoadScreen::displaySize()
 {
 	if (mpc.getDisk().lock()->getFileNames().size() == 0)
 	{
-		findLabel("size").lock()->setText("      K");
+		findLabel("size")->setText("      K");
 		return;
 	}
 	
-	findLabel("size").lock()->setText(StrUtil::padLeft(std::to_string(getFileSize()), " ", 6) + "K");
+	findLabel("size")->setText(StrUtil::padLeft(std::to_string(getFileSize()), " ", 6) + "K");
 }
 
 void LoadScreen::setView(int i)
@@ -486,13 +486,13 @@ void LoadScreen::loadSound(bool shouldBeConverted)
 
 void LoadScreen::displayDevice()
 {
-    auto dev = findChild<Field>("device").lock();
+    auto dev = findChild<Field>("device");
     dev->setText(mpc.getDisks()[device]->getVolume().label);
 }
 
 void LoadScreen::displayDeviceType()
 {
-    auto type = findChild<Label>("device-type").lock();
+    auto type = findChild<Label>("device-type");
     type->setText(mpc.getDisks()[device]->getVolume().typeShortName());
 }
 

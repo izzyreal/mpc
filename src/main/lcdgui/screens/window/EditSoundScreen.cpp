@@ -37,7 +37,7 @@ EditSoundScreen::EditSoundScreen(mpc::Mpc& mpc, const int layerIndex)
 void EditSoundScreen::open()
 {
 	auto previous = ls.lock()->getPreviousScreenName();
-	findField("create-new-program").lock()->setAlignment(Alignment::Centered);
+	findField("create-new-program")->setAlignment(Alignment::Centered);
 
 	if (previous != "name" && sampler->getSound().lock())
 	{
@@ -64,104 +64,104 @@ void EditSoundScreen::open()
 
 void EditSoundScreen::displayEdit()
 {
-	findField("edit").lock()->setText(editNames[edit]);
+	findField("edit")->setText(editNames[edit]);
 
     if (edit == 0)
     {
-        findBackground().lock()->setName("edit-sound");
-		findField("new-name").lock()->Hide(true);
-        findLabel("new-name").lock()->Hide(true);
-        findField("ratio").lock()->Hide(true);
-        findLabel("ratio").lock()->Hide(true);
-        findField("preset").lock()->Hide(true);
-        findLabel("preset").lock()->Hide(true);
-        findField("adjust").lock()->Hide(true);
-        findLabel("adjust").lock()->Hide(true);
-        findLabel("end-margin").lock()->Hide(true);
-        findField("end-margin").lock()->Hide(true);
-        findLabel("create-new-program").lock()->Hide(true);
-        findField("create-new-program").lock()->Hide(true);
+        findBackground()->setName("edit-sound");
+		findField("new-name")->Hide(true);
+        findLabel("new-name")->Hide(true);
+        findField("ratio")->Hide(true);
+        findLabel("ratio")->Hide(true);
+        findField("preset")->Hide(true);
+        findLabel("preset")->Hide(true);
+        findField("adjust")->Hide(true);
+        findLabel("adjust")->Hide(true);
+        findLabel("end-margin")->Hide(true);
+        findField("end-margin")->Hide(true);
+        findLabel("create-new-program")->Hide(true);
+        findField("create-new-program")->Hide(true);
     }
     else if (edit == 1)
     {
-        findBackground().lock()->setName("edit-loop-from-st-to-end");
-		findField("new-name").lock()->Hide(true);
-        findLabel("new-name").lock()->Hide(true);
-        findField("ratio").lock()->Hide(true);
-        findLabel("ratio").lock()->Hide(true);
-        findField("preset").lock()->Hide(true);
-        findLabel("preset").lock()->Hide(true);
-        findField("adjust").lock()->Hide(true);
-        findLabel("adjust").lock()->Hide(true);
-        findLabel("end-margin").lock()->Hide(true);
-        findField("end-margin").lock()->Hide(true);
-        findLabel("create-new-program").lock()->Hide(true);
-        findField("create-new-program").lock()->Hide(true);
+        findBackground()->setName("edit-loop-from-st-to-end");
+		findField("new-name")->Hide(true);
+        findLabel("new-name")->Hide(true);
+        findField("ratio")->Hide(true);
+        findLabel("ratio")->Hide(true);
+        findField("preset")->Hide(true);
+        findLabel("preset")->Hide(true);
+        findField("adjust")->Hide(true);
+        findLabel("adjust")->Hide(true);
+        findLabel("end-margin")->Hide(true);
+        findField("end-margin")->Hide(true);
+        findLabel("create-new-program")->Hide(true);
+        findField("create-new-program")->Hide(true);
     }
     else if (edit == 2 || edit == 3)
     {
-        findBackground().lock()->setName("edit-empty");
-		findField("new-name").lock()->Hide(false);
-        findLabel("new-name").lock()->Hide(false);
-        findField("ratio").lock()->Hide(true);
-        findLabel("ratio").lock()->Hide(true);
-        findField("preset").lock()->Hide(true);
-        findLabel("preset").lock()->Hide(true);
-        findField("adjust").lock()->Hide(true);
-        findLabel("adjust").lock()->Hide(true);
-        findLabel("end-margin").lock()->Hide(true);
-        findField("end-margin").lock()->Hide(true);
-        findLabel("create-new-program").lock()->Hide(true);
-        findField("create-new-program").lock()->Hide(true);
+        findBackground()->setName("edit-empty");
+		findField("new-name")->Hide(false);
+        findLabel("new-name")->Hide(false);
+        findField("ratio")->Hide(true);
+        findLabel("ratio")->Hide(true);
+        findField("preset")->Hide(true);
+        findLabel("preset")->Hide(true);
+        findField("adjust")->Hide(true);
+        findLabel("adjust")->Hide(true);
+        findLabel("end-margin")->Hide(true);
+        findField("end-margin")->Hide(true);
+        findLabel("create-new-program")->Hide(true);
+        findField("create-new-program")->Hide(true);
     }
     else if (edit == 4 || edit == 5 || edit == 6 || edit == 8)
     {
-        findBackground().lock()->setName("edit-execute");
-        findField("new-name").lock()->Hide(true);
-        findLabel("new-name").lock()->Hide(true);
-        findField("ratio").lock()->Hide(true);
-        findLabel("ratio").lock()->Hide(true);
-        findField("preset").lock()->Hide(true);
-        findLabel("preset").lock()->Hide(true);
-        findField("adjust").lock()->Hide(true);
-        findLabel("adjust").lock()->Hide(true);
-        findLabel("end-margin").lock()->Hide(true);
-        findField("end-margin").lock()->Hide(true);
-        findLabel("create-new-program").lock()->Hide(true);
-        findField("create-new-program").lock()->Hide(true);
+        findBackground()->setName("edit-execute");
+        findField("new-name")->Hide(true);
+        findLabel("new-name")->Hide(true);
+        findField("ratio")->Hide(true);
+        findLabel("ratio")->Hide(true);
+        findField("preset")->Hide(true);
+        findLabel("preset")->Hide(true);
+        findField("adjust")->Hide(true);
+        findLabel("adjust")->Hide(true);
+        findLabel("end-margin")->Hide(true);
+        findField("end-margin")->Hide(true);
+        findLabel("create-new-program")->Hide(true);
+        findField("create-new-program")->Hide(true);
     }
     else if (edit == 7)
     {
-        findBackground().lock()->setName("edit-empty");
-		findField("new-name").lock()->Hide(false);
-        findLabel("new-name").lock()->Hide(false);
-        findField("ratio").lock()->Hide(false);
-        findLabel("ratio").lock()->Hide(false);
-        findField("preset").lock()->Hide(false);
-        findLabel("preset").lock()->Hide(false);
-        findField("adjust").lock()->Hide(false);
-        findLabel("adjust").lock()->Hide(false);
-        findLabel("end-margin").lock()->Hide(true);
-        findField("end-margin").lock()->Hide(true);
-        findLabel("create-new-program").lock()->Hide(true);
-        findField("create-new-program").lock()->Hide(true);
+        findBackground()->setName("edit-empty");
+		findField("new-name")->Hide(false);
+        findLabel("new-name")->Hide(false);
+        findField("ratio")->Hide(false);
+        findLabel("ratio")->Hide(false);
+        findField("preset")->Hide(false);
+        findLabel("preset")->Hide(false);
+        findField("adjust")->Hide(false);
+        findLabel("adjust")->Hide(false);
+        findLabel("end-margin")->Hide(true);
+        findField("end-margin")->Hide(true);
+        findLabel("create-new-program")->Hide(true);
+        findField("create-new-program")->Hide(true);
         displayVariable();
     }
     else if(edit == 9)
     {
-        findBackground().lock()->setName("edit-empty");
-		findField("new-name").lock()->Hide(true);
-        findLabel("new-name").lock()->Hide(true);
-        findField("ratio").lock()->Hide(true);
-        findLabel("ratio").lock()->Hide(true);
-        findField("preset").lock()->Hide(true);
-        findLabel("preset").lock()->Hide(true);
-        findField("adjust").lock()->Hide(true);
-        findLabel("adjust").lock()->Hide(true);
-        findField("end-margin").lock()->Hide(false);
-		findLabel("end-margin").lock()->Hide(false);
-		findField("create-new-program").lock()->Hide(false);
-		findLabel("create-new-program").lock()->Hide(false);
+        findBackground()->setName("edit-empty");
+		findField("new-name")->Hide(true);
+        findLabel("new-name")->Hide(true);
+        findField("ratio")->Hide(true);
+        findLabel("ratio")->Hide(true);
+        findField("preset")->Hide(true);
+        findLabel("preset")->Hide(true);
+        findField("adjust")->Hide(true);
+        findLabel("adjust")->Hide(true);
+        findField("end-margin")->Hide(false);
+		findLabel("end-margin")->Hide(false);
+		findField("create-new-program")->Hide(false);
+		findLabel("create-new-program")->Hide(false);
 		displayEndMargin();
         displayCreateNewProgram();
     }
@@ -171,29 +171,29 @@ void EditSoundScreen::displayEdit()
 
 void EditSoundScreen::displayCreateNewProgram()
 {
-    findField("create-new-program").lock()->setText(createNewProgram ? "YES" : "NO");
+    findField("create-new-program")->setText(createNewProgram ? "YES" : "NO");
 }
 
 void EditSoundScreen::displayEndMargin()
 {
-    findField("end-margin").lock()->setTextPadded(endMargin);
+    findField("end-margin")->setTextPadded(endMargin);
 }
 
 void EditSoundScreen::displayVariable()
 {	
     if (edit == 2)
     {
-		findLabel("new-name").lock()->setSize(9 * 6, 9);
-		findLabel("new-name").lock()->setText("New name:");
-		findField("new-name").lock()->setLocation(findLabel("new-name").lock()->getW() + 19, 20);
-		findField("new-name").lock()->setText(newName);
+		findLabel("new-name")->setSize(9 * 6, 9);
+		findLabel("new-name")->setText("New name:");
+		findField("new-name")->setLocation(findLabel("new-name")->getW() + 19, 20);
+		findField("new-name")->setText(newName);
 	}
 	else if (edit == 3)
     {
 		auto sampleName = sampler->getSoundName(insertSoundIndex);
-		findLabel("new-name").lock()->setSize(11 * 6, 9);
-		findLabel("new-name").lock()->setText("Insert Snd:");
-		findField("new-name").lock()->setLocation(findLabel("new-name").lock()->getW() + 19, 20);
+		findLabel("new-name")->setSize(11 * 6, 9);
+		findLabel("new-name")->setText("Insert Snd:");
+		findField("new-name")->setLocation(findLabel("new-name")->getW() + 19, 20);
         std::string stereo;
 		
 		if (!sampler->getSound(insertSoundIndex).lock()->isMono())
@@ -201,20 +201,20 @@ void EditSoundScreen::displayVariable()
 			stereo = "(ST)";
 		}
 
-		findField("new-name").lock()->setText(StrUtil::padRight(sampleName, " ", 16) + stereo);
+		findField("new-name")->setText(StrUtil::padRight(sampleName, " ", 16) + stereo);
 	}
 	else if (edit == 7)
 	{
-		findLabel("new-name").lock()->setSize(9 * 6, 9);
-		findLabel("new-name").lock()->setText("New name:");
-		findField("new-name").lock()->setLocation(findLabel("new-name").lock()->getW() + 19, 20); // , 20 is that still from the old days?
-		findField("new-name").lock()->setText(newName);
+		findLabel("new-name")->setSize(9 * 6, 9);
+		findLabel("new-name")->setText("New name:");
+		findField("new-name")->setLocation(findLabel("new-name")->getW() + 19, 20); // , 20 is that still from the old days?
+		findField("new-name")->setText(newName);
 
 		auto trimmedPercentage = StrUtil::TrimDecimals(std::to_string(timeStretchRatio * 0.01), 2);
-		findField("ratio").lock()->setText(StrUtil::padLeft(trimmedPercentage, " ", 6) + "%");
+		findField("ratio")->setText(StrUtil::padLeft(trimmedPercentage, " ", 6) + "%");
 
-		findField("preset").lock()->setText(timeStretchPresetNames[timeStretchPresetIndex]);
-		findField("adjust").lock()->setText(std::to_string(timeStretchAdjust));
+		findField("preset")->setText(timeStretchPresetNames[timeStretchPresetIndex]);
+		findField("adjust")->setText(std::to_string(timeStretchAdjust));
 	}
 }
 

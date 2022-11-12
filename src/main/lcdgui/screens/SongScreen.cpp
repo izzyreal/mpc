@@ -15,11 +15,11 @@ SongScreen::SongScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void SongScreen::open()
 {
-	findField("loop").lock()->setAlignment(Alignment::Centered);
+	findField("loop")->setAlignment(Alignment::Centered);
 	for (int i = 0; i < 3; i++)
 	{
-		findField("step" + std::to_string(i)).lock()->setAlignment(Alignment::Centered);
-		findField("reps" + std::to_string(i)).lock()->setAlignment(Alignment::Centered);
+		findField("step" + std::to_string(i))->setAlignment(Alignment::Centered);
+		findField("reps" + std::to_string(i))->setAlignment(Alignment::Centered);
 	}
 
 	init();
@@ -269,12 +269,12 @@ void SongScreen::function(int i)
 
 void SongScreen::displayTempo()
 {
-	findField("tempo").lock()->setText(Util::tempoString(sequencer->getTempo()));
+	findField("tempo")->setText(Util::tempoString(sequencer->getTempo()));
 }
 
 void SongScreen::displayLoop()
 {
-	findField("loop").lock()->setText(loop ? "YES" : "NO");
+	findField("loop")->setText(loop ? "YES" : "NO");
 }
 
 void SongScreen::displaySteps()
@@ -282,9 +282,9 @@ void SongScreen::displaySteps()
 	auto song = sequencer->getSong(activeSongIndex);
 	int steps = song->getStepCount();
 
-	auto stepArray = std::vector<std::weak_ptr<mpc::lcdgui::Field>>{ findField("step0"), findField("step1"), findField("step2") };
-	auto sequenceArray = std::vector<std::weak_ptr<mpc::lcdgui::Field>>{ findField("sequence0"), findField("sequence1"), findField("sequence2") };
-	auto repsArray = std::vector<std::weak_ptr<mpc::lcdgui::Field>>{ findField("reps0"), findField("reps1"), findField("reps2") };
+	auto stepArray = std::vector<std::shared_ptr<mpc::lcdgui::Field>>{ findField("step0"), findField("step1"), findField("step2") };
+	auto sequenceArray = std::vector<std::shared_ptr<mpc::lcdgui::Field>>{ findField("sequence0"), findField("sequence1"), findField("sequence2") };
+	auto repsArray = std::vector<std::shared_ptr<mpc::lcdgui::Field>>{ findField("reps0"), findField("reps1"), findField("reps2") };
 
 	for (int i = 0; i < 3; i++)
 	{
@@ -292,23 +292,23 @@ void SongScreen::displaySteps()
 	
 		if (stepIndex >= 0 && stepIndex < steps)
 		{
-			stepArray[i].lock()->setText(std::to_string(stepIndex + 1));
+			stepArray[i]->setText(std::to_string(stepIndex + 1));
 			auto seqname = sequencer->getSequence(song->getStep(stepIndex).lock()->getSequence())->getName();
-			sequenceArray[i].lock()->setText(StrUtil::padLeft(std::to_string(song->getStep(stepIndex).lock()->getSequence() + 1), "0", 2) + "-" + seqname);
-			repsArray[i].lock()->setText(std::to_string(song->getStep(stepIndex).lock()->getRepeats()));
+			sequenceArray[i]->setText(StrUtil::padLeft(std::to_string(song->getStep(stepIndex).lock()->getSequence() + 1), "0", 2) + "-" + seqname);
+			repsArray[i]->setText(std::to_string(song->getStep(stepIndex).lock()->getRepeats()));
 		}
 		else
 		{
-			stepArray[i].lock()->setText("");
-			sequenceArray[i].lock()->setText(stepIndex == steps ? "   (end of song)" : "");
-			repsArray[i].lock()->setText("");
+			stepArray[i]->setText("");
+			sequenceArray[i]->setText(stepIndex == steps ? "   (end of song)" : "");
+			repsArray[i]->setText("");
 		}
 	}
 }
 
 void SongScreen::displayTempoSource()
 {
-	findField("tempo-source").lock()->setText(sequencer->isTempoSourceSequenceEnabled() ? "SEQ" : "MAS");
+	findField("tempo-source")->setText(sequencer->isTempoSourceSequenceEnabled() ? "SEQ" : "MAS");
 }
 
 void SongScreen::displayNow0()
@@ -335,23 +335,23 @@ void SongScreen::displayNow0()
 
 	pastBars += sequencer->getPlayedStepRepetitions() * (sequencer->getActiveSequence()->getLastBarIndex() + 1);
 	
-	findField("now0").lock()->setTextPadded(sequencer->getCurrentBarIndex() + 1 + pastBars, "0");
+	findField("now0")->setTextPadded(sequencer->getCurrentBarIndex() + 1 + pastBars, "0");
 }
 
 void SongScreen::displayNow1()
 {
-	findField("now1").lock()->setTextPadded(sequencer->getCurrentBeatIndex() + 1, "0");
+	findField("now1")->setTextPadded(sequencer->getCurrentBeatIndex() + 1, "0");
 }
 
 void SongScreen::displayNow2()
 {
-	findField("now2").lock()->setTextPadded(sequencer->getCurrentClockNumber(), "0");
+	findField("now2")->setTextPadded(sequencer->getCurrentClockNumber(), "0");
 }
 
 void SongScreen::displaySongName()
 {
 	auto song = sequencer->getSong(activeSongIndex);
-	findField("song").lock()->setText(StrUtil::padLeft(std::to_string(activeSongIndex + 1), "0", 2) + "-" + song->getName());
+	findField("song")->setText(StrUtil::padLeft(std::to_string(activeSongIndex + 1), "0", 2) + "-" + song->getName());
 }
 
 void SongScreen::setOffset(int i)
@@ -419,13 +419,13 @@ void SongScreen::update(moduru::observer::Observable* observable, nonstd::any me
 	}
 	else if (msg == "play")
     {
-        findField("sequence1").lock()->setBlinking(true);
-        findField("reps1").lock()->setBlinking(true);
+        findField("sequence1")->setBlinking(true);
+        findField("reps1")->setBlinking(true);
     }
 	else if (msg == "stop")
     {
-        findField("sequence1").lock()->setBlinking(false);
-        findField("reps1").lock()->setBlinking(false);
+        findField("sequence1")->setBlinking(false);
+        findField("reps1")->setBlinking(false);
     }
 }
 

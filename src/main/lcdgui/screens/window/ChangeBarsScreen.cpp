@@ -70,22 +70,22 @@ void ChangeBarsScreen::turnWheel(int i)
 
 void ChangeBarsScreen::displayAfterBar()
 {
-	findField("afterbar").lock()->setTextPadded(afterBar);
+	findField("afterbar")->setTextPadded(afterBar);
 }
 
 void ChangeBarsScreen::displayNumberOfBars()
 {
-	findField("numberofbars").lock()->setTextPadded(numberOfBars);
+	findField("numberofbars")->setTextPadded(numberOfBars);
 }
 
 void ChangeBarsScreen::displayFirstBar()
 {
-	findField("firstbar").lock()->setTextPadded(firstBar + 1);
+	findField("firstbar")->setTextPadded(firstBar + 1);
 }
 
 void ChangeBarsScreen::displayLastBar()
 {
-	findField("lastbar").lock()->setTextPadded(lastBar + 1);
+	findField("lastbar")->setTextPadded(lastBar + 1);
 }
 
 void ChangeBarsScreen::setLastBar(int i)

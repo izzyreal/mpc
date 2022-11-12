@@ -10,7 +10,7 @@ using namespace moduru::lang;
 NameScreen::NameScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "name", layerIndex)
 {
-	addChild(std::make_shared<Underline>());
+	addChildT<Underline>();
 }
 
 void NameScreen::mainScreen()
@@ -27,7 +27,7 @@ void NameScreen::setRenamerAndScreenToReturnTo(const std::function<void(std::str
 
 std::weak_ptr<Underline> NameScreen::findUnderline()
 {
-	return std::dynamic_pointer_cast<Underline>(findChild("underline").lock());
+	return findChild<Underline>("underline");
 }
 
 void NameScreen::open()
@@ -57,8 +57,7 @@ void NameScreen::left()
 	
 	if (editing)
 	{
-		auto field = findField(ls.lock()->getFocus()).lock();
-		field->setInverted(false);
+        findFocus()->setInverted(false);
 		drawUnderline();
 	}
 }
@@ -74,8 +73,7 @@ void NameScreen::right()
 	
 	if (editing)
 	{
-		auto field = findField(ls.lock()->getFocus()).lock();
-		field->setInverted(false);
+        findFocus()->setInverted(false);
 		drawUnderline();
 	}
 }
@@ -178,12 +176,12 @@ void NameScreen::initEditColors()
 {
     for (int i = 0; i < 16; i++)
 	{
-		auto field = findField(std::to_string(i)).lock();
+		auto field = findField(std::to_string(i));
 		field->setInverted(false);
     }
 
 	init();
-	findField(param).lock()->setInverted(false);
+	findField(param)->setInverted(false);
 }
 
 void NameScreen::setName(std::string newName)
@@ -261,44 +259,44 @@ void NameScreen::displayName()
 
     auto paddedName = StrUtil::padRight(name, " ", nameLimit);
     
-	findField("0").lock()->setText(paddedName.substr(0, 1));
-	findField("1").lock()->setText(paddedName.substr(1, 1));
-	findField("2").lock()->setText(paddedName.substr(2, 1));
-	findField("3").lock()->setText(paddedName.substr(3, 1));
-	findField("4").lock()->setText(paddedName.substr(4, 1));
-	findField("5").lock()->setText(paddedName.substr(5, 1));
-	findField("6").lock()->setText(paddedName.substr(6, 1));
-	findField("7").lock()->setText(paddedName.substr(7, 1));
+	findField("0")->setText(paddedName.substr(0, 1));
+	findField("1")->setText(paddedName.substr(1, 1));
+	findField("2")->setText(paddedName.substr(2, 1));
+	findField("3")->setText(paddedName.substr(3, 1));
+	findField("4")->setText(paddedName.substr(4, 1));
+	findField("5")->setText(paddedName.substr(5, 1));
+	findField("6")->setText(paddedName.substr(6, 1));
+	findField("7")->setText(paddedName.substr(7, 1));
 
 	if (nameLimit > 8)
 	{
-		findField("8").lock()->Hide(false);
-		findField("9").lock()->Hide(false);
-		findField("10").lock()->Hide(false);
-		findField("11").lock()->Hide(false);
-		findField("12").lock()->Hide(false);
-		findField("13").lock()->Hide(false);
-		findField("14").lock()->Hide(false);
-		findField("15").lock()->Hide(false);
-		findField("8").lock()->setText(paddedName.substr(8, 1));
-		findField("9").lock()->setText(paddedName.substr(9, 1));
-		findField("10").lock()->setText(paddedName.substr(10, 1));
-		findField("11").lock()->setText(paddedName.substr(11, 1));
-		findField("12").lock()->setText(paddedName.substr(12, 1));
-		findField("13").lock()->setText(paddedName.substr(13, 1));
-		findField("14").lock()->setText(paddedName.substr(14, 1));
-		findField("15").lock()->setText(paddedName.substr(15, 1));
+		findField("8")->Hide(false);
+		findField("9")->Hide(false);
+		findField("10")->Hide(false);
+		findField("11")->Hide(false);
+		findField("12")->Hide(false);
+		findField("13")->Hide(false);
+		findField("14")->Hide(false);
+		findField("15")->Hide(false);
+		findField("8")->setText(paddedName.substr(8, 1));
+		findField("9")->setText(paddedName.substr(9, 1));
+		findField("10")->setText(paddedName.substr(10, 1));
+		findField("11")->setText(paddedName.substr(11, 1));
+		findField("12")->setText(paddedName.substr(12, 1));
+		findField("13")->setText(paddedName.substr(13, 1));
+		findField("14")->setText(paddedName.substr(14, 1));
+		findField("15")->setText(paddedName.substr(15, 1));
 	}
 	else
 	{
-		findField("8").lock()->Hide(true);
-		findField("9").lock()->Hide(true);
-		findField("10").lock()->Hide(true);
-		findField("11").lock()->Hide(true);
-		findField("12").lock()->Hide(true);
-		findField("13").lock()->Hide(true);
-		findField("14").lock()->Hide(true);
-		findField("15").lock()->Hide(true);
+		findField("8")->Hide(true);
+		findField("9")->Hide(true);
+		findField("10")->Hide(true);
+		findField("11")->Hide(true);
+		findField("12")->Hide(true);
+		findField("13")->Hide(true);
+		findField("14")->Hide(true);
+		findField("15")->Hide(true);
 	}
 }
 

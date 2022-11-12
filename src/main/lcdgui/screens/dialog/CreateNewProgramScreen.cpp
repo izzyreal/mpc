@@ -94,12 +94,12 @@ void CreateNewProgramScreen::function(int i)
 
 void CreateNewProgramScreen::displayMidiProgramChange()
 {
-	findField("midi-program-change").lock()->setTextPadded(midiProgramChange);
+	findField("midi-program-change")->setTextPadded(midiProgramChange);
 }
 
 void CreateNewProgramScreen::displayNewName()
 {
-	findField("new-name").lock()->setText(newName);
+	findField("new-name")->setText(newName);
 }
 
 void CreateNewProgramScreen::setMidiProgramChange(int i)

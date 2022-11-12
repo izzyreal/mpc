@@ -38,10 +38,10 @@ namespace mpc::lcdgui
 		int selection;
 
 	private:
-		std::weak_ptr<MixerFader> findMixerFader();
-		std::weak_ptr<Knob> findKnob();
-		std::weak_ptr<MixerTopBackground> findMixerTopBackground();
-		std::weak_ptr<MixerFaderBackground> findMixerFaderBackground();
+		std::shared_ptr<MixerFader> findMixerFader();
+		std::shared_ptr<Knob> findKnob();
+		std::shared_ptr<MixerTopBackground> findMixerTopBackground();
+		std::shared_ptr<MixerFaderBackground> findMixerFaderBackground();
 
 	public:
 		void setValueA(int i);

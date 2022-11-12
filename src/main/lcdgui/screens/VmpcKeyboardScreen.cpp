@@ -56,8 +56,8 @@ void VmpcKeyboardScreen::open()
     screen->discardAndLeave = [this](){this->mpc.getControls().lock()->getKbMapping().lock()->importMapping();};
     screen->stayScreen = "vmpc-keyboard";
 
-    findChild<Label>("up").lock()->setText("\u00C7");
-    findChild<Label>("down").lock()->setText("\u00C6");
+    findChild<Label>("up")->setText("\u00C7");
+    findChild<Label>("down")->setText("\u00C6");
     
     setLearning(false);
     setLearnCandidate(-1);
@@ -107,8 +107,8 @@ void VmpcKeyboardScreen::down()
 void VmpcKeyboardScreen::setLearning(bool b)
 {
     learning = b;
-    findChild<TextComp>("fk2").lock()->setBlinking(learning);
-    findChild<TextComp>("fk3").lock()->setBlinking(learning);
+    findChild<TextComp>("fk2")->setBlinking(learning);
+    findChild<TextComp>("fk3")->setBlinking(learning);
     ls.lock()->setFunctionKeysArrangement(learning ? 1 : 0);
 }
 
@@ -245,8 +245,8 @@ void VmpcKeyboardScreen::updateRows()
 
     for (int i = 0; i < 5; i++)
     {
-        auto l = findChild<Label>("row" + std::to_string(i)).lock();
-        auto f = findChild<Field>("row" + std::to_string(i)).lock();
+        auto l = findChild<Label>("row" + std::to_string(i));
+        auto f = findChild<Field>("row" + std::to_string(i));
         
         int length = 15;
         auto mapping = labelKeyMap[i + rowOffset];
@@ -278,6 +278,6 @@ void VmpcKeyboardScreen::updateRows()
 void VmpcKeyboardScreen::displayUpAndDown()
 {
     auto labelKeyMapSize = mpc.getControls().lock()->getKbMapping().lock()->getLabelKeyMap().size();
-    findChild<Label>("up").lock()->Hide(rowOffset == 0);
-    findChild<Label>("down").lock()->Hide(rowOffset + 5 >= labelKeyMapSize);
+    findChild<Label>("up")->Hide(rowOffset == 0);
+    findChild<Label>("down")->Hide(rowOffset + 5 >= labelKeyMapSize);
 }

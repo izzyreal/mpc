@@ -18,7 +18,7 @@ SaveApsFileScreen::SaveApsFileScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void SaveApsFileScreen::open()
 {
-	findField("replace-same-sounds").lock()->setAlignment(Alignment::Centered); 
+	findField("replace-same-sounds")->setAlignment(Alignment::Centered);
 	displayFile();
 	displayReplaceSameSounds();
 	displaySave();
@@ -85,17 +85,17 @@ void SaveApsFileScreen::function(int i)
 void SaveApsFileScreen::displayFile()
 {
 	auto nameScreen = mpc.screens->get<NameScreen>("name");
-	findField("file").lock()->setText(fileName);
+	findField("file")->setText(fileName);
 }
 
 void SaveApsFileScreen::displaySave()
 {
 	auto saveAProgramScreen = mpc.screens->get<SaveAProgramScreen>("save-a-program");
-	findField("save").lock()->setText(apsSaveNames[saveAProgramScreen->save]);
+	findField("save")->setText(apsSaveNames[saveAProgramScreen->save]);
 }
 
 void SaveApsFileScreen::displayReplaceSameSounds()
 {
 	auto saveAProgramScreen = mpc.screens->get<SaveAProgramScreen>("save-a-program");
-	findField("replace-same-sounds").lock()->setText(std::string(saveAProgramScreen->replaceSameSounds ? "YES" : "NO"));
+	findField("replace-same-sounds")->setText(std::string(saveAProgramScreen->replaceSameSounds ? "YES" : "NO"));
 }

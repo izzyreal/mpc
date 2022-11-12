@@ -24,7 +24,7 @@ void TransmitProgramChangesScreen::turnWheel(int i)
 
 void TransmitProgramChangesScreen::displayTransmitProgramChangesInThisTrack()
 {
-	findField("inthistrack").lock()->setText(transmitProgramChangesInThisTrack ? "YES" : "NO");
+	findField("inthistrack")->setText(transmitProgramChangesInThisTrack ? "YES" : "NO");
 }
 
 bool TransmitProgramChangesScreen::isTransmitProgramChangesInThisTrackEnabled()

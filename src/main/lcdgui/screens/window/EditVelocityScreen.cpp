@@ -34,18 +34,18 @@ void EditVelocityScreen::open()
 
 	if (bus == 0)
 	{
-		findField("note0").lock()->setAlignment(Alignment::Centered, 18);
-		findField("note1").lock()->setAlignment(Alignment::Centered, 18);
-		findField("note0").lock()->setLocation(62, 42);
+		findField("note0")->setAlignment(Alignment::Centered, 18);
+		findField("note1")->setAlignment(Alignment::Centered, 18);
+		findField("note0")->setLocation(62, 42);
 	}
 	else
 	{
-		findField("note0").lock()->setAlignment(Alignment::None);
-		findField("note1").lock()->setAlignment(Alignment::None);
-		findField("note0").lock()->setLocation(61, 42);
+		findField("note0")->setAlignment(Alignment::None);
+		findField("note1")->setAlignment(Alignment::None);
+		findField("note0")->setLocation(61, 42);
 	}
 
-	findField("note1").lock()->setLocation(116, 42);
+	findField("note1")->setLocation(116, 42);
 
 	auto seq = sequencer->getActiveSequence();
 
@@ -113,12 +113,12 @@ void EditVelocityScreen::turnWheel(int i)
 void EditVelocityScreen::displayTime()
 {
 	auto sequence = sequencer->getActiveSequence().get();
-	findField("time0").lock()->setTextPadded(SeqUtil::getBarFromTick(sequence, time0) + 1, "0");
-	findField("time1").lock()->setTextPadded(SeqUtil::getBeat(sequence, time0) + 1, "0");
-	findField("time2").lock()->setTextPadded(SeqUtil::getClock(sequence, time0), "0");
-	findField("time3").lock()->setTextPadded(SeqUtil::getBarFromTick(sequence, time1) + 1, "0");
-	findField("time4").lock()->setTextPadded(SeqUtil::getBeat(sequence, time1) + 1, "0");
-	findField("time5").lock()->setTextPadded(SeqUtil::getClock(sequence, time1), "0");
+	findField("time0")->setTextPadded(SeqUtil::getBarFromTick(sequence, time0) + 1, "0");
+	findField("time1")->setTextPadded(SeqUtil::getBeat(sequence, time0) + 1, "0");
+	findField("time2")->setTextPadded(SeqUtil::getClock(sequence, time0), "0");
+	findField("time3")->setTextPadded(SeqUtil::getBarFromTick(sequence, time1) + 1, "0");
+	findField("time4")->setTextPadded(SeqUtil::getBeat(sequence, time1) + 1, "0");
+	findField("time5")->setTextPadded(SeqUtil::getClock(sequence, time1), "0");
 }
 
 void EditVelocityScreen::displayNotes()
@@ -127,28 +127,28 @@ void EditVelocityScreen::displayNotes()
 	
 	if (track.lock()->getBus() == 0)
 	{
-		findField("note0").lock()->setSize(47, 9);
-		findLabel("note1").lock()->Hide(false);
-		findField("note1").lock()->Hide(false);
-		findField("note0").lock()->setText(moduru::lang::StrUtil::padLeft(std::to_string(note0), " ", 3) + "(" + mpc::Util::noteNames()[note0] + u8"\u00D4");
-		findField("note1").lock()->setText(moduru::lang::StrUtil::padLeft(std::to_string(note1), " ", 3) + "(" + mpc::Util::noteNames()[note1] + u8"\u00D4");
+		findField("note0")->setSize(47, 9);
+		findLabel("note1")->Hide(false);
+		findField("note1")->Hide(false);
+		findField("note0")->setText(moduru::lang::StrUtil::padLeft(std::to_string(note0), " ", 3) + "(" + mpc::Util::noteNames()[note0] + u8"\u00D4");
+		findField("note1")->setText(moduru::lang::StrUtil::padLeft(std::to_string(note1), " ", 3) + "(" + mpc::Util::noteNames()[note1] + u8"\u00D4");
 	}
 	else
 	{
-		findField("note0").lock()->setSize(37, 9);
+		findField("note0")->setSize(37, 9);
 		
 		if (note0 == 34)
 		{
-            findField("note0").lock()->setText("ALL");
+            findField("note0")->setText("ALL");
 		}
 		else
 		{
             auto padName = sampler->getPadName(program.lock()->getPadIndexFromNote(note0));
-            findField("note0").lock()->setText(std::to_string(note0) + "/" + padName);
+            findField("note0")->setText(std::to_string(note0) + "/" + padName);
 		}
 		
-		findLabel("note1").lock()->Hide(true);
-		findField("note1").lock()->Hide(true);
+		findLabel("note1")->Hide(true);
+		findField("note1")->Hide(true);
 	}
 }
 
@@ -181,10 +181,10 @@ void EditVelocityScreen::setValue(int i)
 
 void EditVelocityScreen::displayValue()
 {
-	findField("value").lock()->setText(std::to_string(value));
+	findField("value")->setText(std::to_string(value));
 }
 
 void EditVelocityScreen::displayEditType()
 {
-	findField("edittype").lock()->setText(editTypeNames[editType]);
+	findField("edittype")->setText(editTypeNames[editType]);
 }

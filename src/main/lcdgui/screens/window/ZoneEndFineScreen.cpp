@@ -11,8 +11,7 @@ using namespace mpc::lcdgui::screens::window;
 ZoneEndFineScreen::ZoneEndFineScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "zone-end-fine", layerIndex)
 {
-	addChild(std::move(std::make_shared<Wave>()));
-	findWave().lock()->setFine(true);
+    addChildT<Wave>()->setFine(true);
 }
 
 void ZoneEndFineScreen::open()
@@ -20,9 +19,9 @@ void ZoneEndFineScreen::open()
     mpc.getControls().lock()->getControls()->typableParams = { "end" };
 
     displayEnd();
-	findField("end").lock()->enableTwoDots();
+	findField("end")->enableTwoDots();
 	displayLngthLabel();
-	findLabel("lngth").lock()->enableTwoDots();
+	findLabel("lngth")->enableTwoDots();
 
 	displayPlayX();
 	displayFineWave();
@@ -38,25 +37,25 @@ void ZoneEndFineScreen::displayFineWave()
 	if (!sound)
 		return;
 
-	findWave().lock()->setSampleData(sound->getSampleData(), sound->isMono(), trimScreen->view);
-	findWave().lock()->setCenterSamplePos(zoneScreen->getZoneEnd(zoneScreen->zone));
+	findWave()->setSampleData(sound->getSampleData(), sound->isMono(), trimScreen->view);
+	findWave()->setCenterSamplePos(zoneScreen->getZoneEnd(zoneScreen->zone));
 }
 
 void ZoneEndFineScreen::displayEnd()
 {
 	auto zoneScreen = mpc.screens->get<ZoneScreen>("zone");
-	findField("end").lock()->setTextPadded(zoneScreen->getZoneEnd(zoneScreen->zone), " ");
+	findField("end")->setTextPadded(zoneScreen->getZoneEnd(zoneScreen->zone), " ");
 }
 
 void ZoneEndFineScreen::displayLngthLabel()
 {
 	auto zoneScreen = mpc.screens->get<ZoneScreen>("zone");
-	findLabel("lngth").lock()->setTextPadded(zoneScreen->getZoneEnd(zoneScreen->zone) - zoneScreen->getZoneStart(zoneScreen->zone), " ");
+	findLabel("lngth")->setTextPadded(zoneScreen->getZoneEnd(zoneScreen->zone) - zoneScreen->getZoneStart(zoneScreen->zone), " ");
 }
 
 void ZoneEndFineScreen::displayPlayX()
 {
-    findField("playx").lock()->setText(playXNames[sampler->getPlayX()]);
+    findField("playx")->setText(playXNames[sampler->getPlayX()]);
 }
 
 void ZoneEndFineScreen::function(int i)
@@ -66,10 +65,10 @@ void ZoneEndFineScreen::function(int i)
 	switch (i)
 	{
 	case 1:
-		findWave().lock()->zoomPlus();
+		findWave()->zoomPlus();
 		break;
 	case 2:
-		findWave().lock()->zoomMinus();
+		findWave()->zoomMinus();
 		break;
 	case 4:
 		sampler->playX();
@@ -84,7 +83,7 @@ void ZoneEndFineScreen::turnWheel(int i)
 	auto zoneScreen = mpc.screens->get<ZoneScreen>("zone");
 
 	auto soundInc = getSoundIncrement(i);
-	auto field = findField(param).lock();
+	auto field = findField(param);
 
 	if (field->isSplit())
 		soundInc = field->getSplitIncrement(i >= 0);

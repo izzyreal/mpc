@@ -32,27 +32,27 @@ void MixerSetupScreen::displayMasterLevel() {
 		level = StrUtil::padLeft(level, " ", 5);
 	}
 
-	findField("masterlevel").lock()->setText(level);
+	findField("masterlevel")->setText(level);
 }
 
 void MixerSetupScreen::displayFxDrum() {
-	findField("fxdrum").lock()->setText(std::to_string(getFxDrum() + 1));
+	findField("fxdrum")->setText(std::to_string(getFxDrum() + 1));
 }
 
 void MixerSetupScreen::displayStereoMixSource() {
-	findField("stereomixsource").lock()->setText(isStereoMixSourceDrum() ? "DRUM" : "PROGRAM");
+	findField("stereomixsource")->setText(isStereoMixSourceDrum() ? "DRUM" : "PROGRAM");
 }
 
 void MixerSetupScreen::displayIndivFxSource() {
-	findField("indivfxsource").lock()->setText(isIndivFxSourceDrum() ? "DRUM" : "PROGRAM");
+	findField("indivfxsource")->setText(isIndivFxSourceDrum() ? "DRUM" : "PROGRAM");
 }
 
 void MixerSetupScreen::displayCopyPgmMixToDrum() {
-	findField("copypgmmixtodrum").lock()->setText(isCopyPgmMixToDrumEnabled() ? "YES" : "NO");
+	findField("copypgmmixtodrum")->setText(isCopyPgmMixToDrumEnabled() ? "YES" : "NO");
 }
 
 void MixerSetupScreen::displayRecordMixChanges() {
-	findField("recordmixchanges").lock()->setText(isRecordMixChangesEnabled() ? "YES" : "NO");
+	findField("recordmixchanges")->setText(isRecordMixChangesEnabled() ? "YES" : "NO");
 }
 
 void MixerSetupScreen::turnWheel(int i)

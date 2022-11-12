@@ -38,8 +38,8 @@ VmpcDisksScreen::VmpcDisksScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void VmpcDisksScreen::open()
 {
-    findChild<Label>("up").lock()->setText("\u00C7");
-    findChild<Label>("down").lock()->setText("\u00C6");
+    findChild<Label>("up")->setText("\u00C7");
+    findChild<Label>("down")->setText("\u00C6");
 
     mpc.getDiskController()->detectRawUsbVolumes();
 
@@ -140,10 +140,10 @@ void VmpcDisksScreen::displayRows()
     
     for (int i = 0; i < 4; i++)
     {
-        auto volume = findChild<Label>("volume" + std::to_string(i)).lock();
-        auto type = findChild<Label>("type" + std::to_string(i)).lock();
-        auto size = findChild<Label>("size" + std::to_string(i)).lock();
-        auto mode = findChild<Field>("mode" + std::to_string(i)).lock();
+        auto volume = findChild<Label>("volume" + std::to_string(i));
+        auto type = findChild<Label>("type" + std::to_string(i));
+        auto size = findChild<Label>("size" + std::to_string(i));
+        auto mode = findChild<Field>("mode" + std::to_string(i));
         
         mode->setInverted(i == row);
 
@@ -201,8 +201,8 @@ void VmpcDisksScreen::displayFunctionKeys()
 
 void VmpcDisksScreen::displayUpAndDown()
 {
-    findChild<Label>("up").lock()->Hide(rowOffset == 0);
-    findChild<Label>("down").lock()->Hide(rowOffset + 4 >= mpc.getDisks().size());
+    findChild<Label>("up")->Hide(rowOffset == 0);
+    findChild<Label>("down")->Hide(rowOffset + 4 >= mpc.getDisks().size());
 }
 
 void VmpcDisksScreen::refreshConfig()

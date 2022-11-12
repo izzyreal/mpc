@@ -9,7 +9,7 @@ using namespace moduru::lang;
 VeloEnvFilterScreen::VeloEnvFilterScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "velo-env-filter", layerIndex)
 {
-	addChild(std::make_shared<EnvGraph>(mpc));
+	addChildT<EnvGraph>(mpc);
 }
 
 void VeloEnvFilterScreen::open()
@@ -89,38 +89,38 @@ void VeloEnvFilterScreen::displayNote()
 	auto padName = sampler->getPadName(padIndex);
 	auto sampleName = soundIndex != -1 ? sampler->getSoundName(soundIndex) : "OFF";
     std::string stereo = noteParameters->getStereoMixerChannel().lock()->isStereo() && soundIndex != -1 ? "(ST)" : "";
-	findField("note").lock()->setText(std::to_string(noteParameters->getNumber()) + "/" + padName + "-" + StrUtil::padRight(sampleName, " ", 16) + stereo);
+	findField("note")->setText(std::to_string(noteParameters->getNumber()) + "/" + padName + "-" + StrUtil::padRight(sampleName, " ", 16) + stereo);
 }
 
 void VeloEnvFilterScreen::displayVelo()
 {
-	findField("velo").lock()->setTextPadded(velo, " ");
+	findField("velo")->setTextPadded(velo, " ");
 }
 
 void VeloEnvFilterScreen::displayAttack()
 {
 	auto attack = sampler->getLastNp(program.lock().get())->getFilterAttack();
 	auto decay = sampler->getLastNp(program.lock().get())->getFilterDecay();
-	findField("attack").lock()->setTextPadded(attack, " ");
-	findEnvGraph().lock()->setCoordinates(attack, decay, true);
+	findField("attack")->setTextPadded(attack, " ");
+	findEnvGraph()->setCoordinates(attack, decay, true);
 }
 
 void VeloEnvFilterScreen::displayDecay()
 {
 	auto attack = sampler->getLastNp(program.lock().get())->getFilterAttack();
 	auto decay = sampler->getLastNp(program.lock().get())->getFilterDecay();
-	findField("decay").lock()->setTextPadded(decay, " ");
-	findEnvGraph().lock()->setCoordinates(attack, decay, true);
+	findField("decay")->setTextPadded(decay, " ");
+	findEnvGraph()->setCoordinates(attack, decay, true);
 }
 
 void VeloEnvFilterScreen::displayAmount()
 {
-	findField("amount").lock()->setTextPadded(sampler->getLastNp(program.lock().get())->getFilterEnvelopeAmount(), " ");
+	findField("amount")->setTextPadded(sampler->getLastNp(program.lock().get())->getFilterEnvelopeAmount(), " ");
 }
 
 void VeloEnvFilterScreen::displayVeloFreq()
 {
-	findField("velofreq").lock()->setTextPadded(sampler->getLastNp(program.lock().get())->getVelocityToFilterFrequency(), " ");
+	findField("velofreq")->setTextPadded(sampler->getLastNp(program.lock().get())->getVelocityToFilterFrequency(), " ");
 }
 
 void VeloEnvFilterScreen::setVelo(int i)

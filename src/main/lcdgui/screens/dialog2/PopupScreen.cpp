@@ -11,7 +11,7 @@ PopupScreen::PopupScreen(mpc::Mpc& mpc)
 	: ScreenComponent(mpc, "popup", 3)
 {
 	addChild(std::make_shared<Label>(mpc, "popup", "", 43, 23, 0));
-	findChild<Label>("popup").lock()->setInverted(true);
+	findChild<Label>("popup")->setInverted(true);
 }
 
 void PopupScreen::close()
@@ -21,7 +21,7 @@ void PopupScreen::close()
 
 void PopupScreen::setText(std::string text)
 {
-	findChild<Label>("popup").lock()->setText(text);
+	findChild<Label>("popup")->setText(text);
 	SetDirty();
 }
 

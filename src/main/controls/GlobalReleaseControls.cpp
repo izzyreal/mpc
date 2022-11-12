@@ -194,7 +194,7 @@ void GlobalReleaseControls::generateNoteOff(int note)
         drum = drumScreen->drum;
     }
 
-    mpc.getEventHandler().lock()->handle(noteEvent, lTrk.get(), drum);
+    mpc.getEventHandler()->handle(noteEvent, lTrk.get(), drum);
 }
 
 void GlobalReleaseControls::overDub()

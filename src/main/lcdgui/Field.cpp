@@ -105,11 +105,11 @@ void Field::takeFocus()
 	{
 		if (name == "view")
 		{
-			auto screen = ls->findScreenComponent().lock();
-			screen->findField("fromnote").lock()->setInverted(true);
-			screen->findField("tonote").lock()->setInverted(true);
-			screen->findLabel("tonote").lock()->setInverted(true);
-			screen->findChild<Rectangle>("").lock()->setOn(true);
+			auto screen = ls->findScreenComponent();
+			screen->findField("fromnote")->setInverted(true);
+			screen->findField("tonote")->setInverted(true);
+			screen->findLabel("tonote")->setInverted(true);
+			screen->findChild<Rectangle>("")->setOn(true);
 		}
 	}
 	else if (csn == "multi-recording-setup")
@@ -143,14 +143,14 @@ void Field::loseFocus(std::string next)
 	{
 		if (name == "view")
 		{
-			auto screen = ls->findScreenComponent().lock();
-			screen->findChild<Rectangle>("").lock()->setOn(false);
+			auto screen = ls->findScreenComponent();
+			screen->findChild<Rectangle>("")->setOn(false);
 
 			if (next != "fromnote")
-				screen->findField("fromnote").lock()->setInverted(false);
+				screen->findField("fromnote")->setInverted(false);
 
-			screen->findField("tonote").lock()->setInverted(false);
-			screen->findLabel("tonote").lock()->setInverted(false);
+			screen->findField("tonote")->setInverted(false);
+			screen->findLabel("tonote")->setInverted(false);
 		}
 	}
 	
@@ -174,7 +174,7 @@ void Field::setSplit(bool b)
 	if (split)
 	{
 		if (typeModeEnabled)
-			mpc.getActiveControls().lock()->pressEnter();
+			mpc.getActiveControls()->pressEnter();
 
 		activeSplit = text.length() - 2;
 	}

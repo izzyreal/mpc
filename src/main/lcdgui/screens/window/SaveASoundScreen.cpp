@@ -92,10 +92,10 @@ void SaveASoundScreen::setFileType(int i)
 
 void SaveASoundScreen::displayFileType()
 {
-	findField("file-type").lock()->setText(std::string(fileType == 0 ? "MPC2000" : "WAV"));
+	findField("file-type")->setText(std::string(fileType == 0 ? "MPC2000" : "WAV"));
 }
 
 void SaveASoundScreen::displayFile()
 {
-	findField("file").lock()->setText(mpc.screens->get<NameScreen>("name")->getNameWithoutSpaces());
+	findField("file")->setText(mpc.screens->get<NameScreen>("name")->getNameWithoutSpaces());
 }

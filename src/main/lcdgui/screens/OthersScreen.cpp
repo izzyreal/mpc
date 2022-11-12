@@ -14,7 +14,7 @@ void OthersScreen::open()
 
 void OthersScreen::displayTapAveraging()
 {
-	findField("tapaveraging").lock()->setText(std::to_string(tapAveraging));
+	findField("tapaveraging")->setText(std::to_string(tapAveraging));
 }
 
 void OthersScreen::setTapAveraging(int i)

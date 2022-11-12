@@ -19,7 +19,7 @@ void Button::push()
 {
 	auto ls = mpc.getLayeredScreen().lock();
 
-	auto screen = ls->findScreenComponent().lock();
+	auto screen = ls->findScreenComponent();
 	
 	if (!screen)
 		return;

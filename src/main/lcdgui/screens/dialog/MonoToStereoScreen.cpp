@@ -126,7 +126,7 @@ void MonoToStereoScreen::displayLSource()
 	if (!sampler->getSound().lock())
 		return;
 
-	findField("lsource").lock()->setText(sampler->getSound().lock()->getName());
+	findField("lsource")->setText(sampler->getSound().lock()->getName());
 
 	if (sampler->getSound().lock()->isMono() && sampler->getSound().lock()->isMono())
 	{
@@ -135,7 +135,7 @@ void MonoToStereoScreen::displayLSource()
 	else
 	{
 		ls.lock()->setFunctionKeysArrangement(1);
-		findChild<Background>("").lock()->repaintUnobtrusive(findChild<FunctionKey>("fk4").lock()->getRect());
+		findChild<Background>("")->repaintUnobtrusive(findChild<FunctionKey>("fk4")->getRect());
 	}
 }
 
@@ -144,7 +144,7 @@ void MonoToStereoScreen::displayRSource()
 	if (!sampler->getSound(rSource).lock())
 		return;
 
-	findField("rsource").lock()->setText(sampler->getSoundName(rSource));
+	findField("rsource")->setText(sampler->getSoundName(rSource));
 
 	if (sampler->getSound().lock()->isMono() && sampler->getSound(rSource).lock()->isMono())
 	{
@@ -153,13 +153,13 @@ void MonoToStereoScreen::displayRSource()
 	else
 	{
 		ls.lock()->setFunctionKeysArrangement(1);
-		findChild<Background>("").lock()->repaintUnobtrusive(findChild<FunctionKey>("fk4").lock()->getRect());
+		findBackground()->repaintUnobtrusive(findChild<FunctionKey>("fk4")->getRect());
 	}
 }
 
 void MonoToStereoScreen::displayNewStName()
 {
-	findField("newstname").lock()->setText(newStName);
+	findField("newstname")->setText(newStName);
 }
 
 void MonoToStereoScreen::setRSource(int i)

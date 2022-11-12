@@ -68,12 +68,12 @@ void VmpcSettingsScreen::setInitialPadMapping(int i)
 
 void VmpcSettingsScreen::displayInitialPadMapping()
 {
-	findField("initial-pad-mapping").lock()->setText(initialPadMappingNames[initialPadMapping]);
+	findField("initial-pad-mapping")->setText(initialPadMappingNames[initialPadMapping]);
 }
 
 void VmpcSettingsScreen::display16LevelsEraseMode()
 {
-    findField("16-levels-erase-mode").lock()->setText(_16LevelsEraseModeNames[_16LevelsEraseMode]);
+    findField("16-levels-erase-mode")->setText(_16LevelsEraseModeNames[_16LevelsEraseMode]);
 }
 
 void VmpcSettingsScreen::set16LevelsEraseMode(int i)
@@ -96,7 +96,7 @@ void VmpcSettingsScreen::setAutoConvertWavs(int i)
 
 void VmpcSettingsScreen::displayAutoConvertWavs()
 {
-    findField("auto-convert-wavs").lock()->setText(autoConvertWavs == 1 ? "YES" : "ASK");
+    findField("auto-convert-wavs")->setText(autoConvertWavs == 1 ? "YES" : "ASK");
 }
 
 void VmpcSettingsScreen::setMidiControlMode(int i)
@@ -110,5 +110,5 @@ void VmpcSettingsScreen::setMidiControlMode(int i)
 
 void VmpcSettingsScreen::displayMidiControlMode()
 {
-    findField("midi-control-mode").lock()->setText(midiControlModeNames[midiControlMode]);
+    findField("midi-control-mode")->setText(midiControlModeNames[midiControlMode]);
 }

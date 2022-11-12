@@ -63,7 +63,7 @@ void SaveASequenceScreen::function(int i)
 
 void SaveASequenceScreen::displaySaveAs()
 {
-	findField("saveas").lock()->setText("MIDI FILE TYPE " + std::to_string(saveSequenceAs));
+	findField("saveas")->setText("MIDI FILE TYPE " + std::to_string(saveSequenceAs));
 }
 
 void SaveASequenceScreen::displayFile()
@@ -76,8 +76,8 @@ void SaveASequenceScreen::displayFile()
 		return;
 	}
 
-	findField("file").lock()->setText(name.substr(0, 1));
-	findLabel("file1").lock()->setText(name.substr(1));
+	findField("file")->setText(name.substr(0, 1));
+	findLabel("file1")->setText(name.substr(1));
 }
 
 void SaveASequenceScreen::setSaveSequenceAs(int i)

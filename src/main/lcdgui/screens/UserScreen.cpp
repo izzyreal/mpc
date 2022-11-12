@@ -104,46 +104,46 @@ void UserScreen::turnWheel(int i)
 
 void UserScreen::displayTempo()
 {
-	findField("tempo").lock()->setText(Util::tempoString(tempo));
+	findField("tempo")->setText(Util::tempoString(tempo));
 }
 
 void UserScreen::displayLoop()
 {
-	findField("loop").lock()->setText(loop ? "ON" : "OFF");
+	findField("loop")->setText(loop ? "ON" : "OFF");
 }
 
 void UserScreen::displayTsig()
 {
 	auto numerator = std::to_string(timeSig.getNumerator());
 	auto denominator = std::to_string(timeSig.getDenominator());
-	findField("tsig").lock()->setText(numerator + "/" + denominator);
+	findField("tsig")->setText(numerator + "/" + denominator);
 }
 
 void UserScreen::displayBars()
 {
-	findField("bars").lock()->setText(std::to_string(lastBar + 1));
+	findField("bars")->setText(std::to_string(lastBar + 1));
 }
 
 void UserScreen::displayPgm()
 {
 	if (pgm == 0)
 	{
-		findField("pgm").lock()->setText("OFF");
+		findField("pgm")->setText("OFF");
 	}
 	else
 	{
-		findField("pgm").lock()->setText(std::to_string(pgm));
+		findField("pgm")->setText(std::to_string(pgm));
 	}
 }
 
 void UserScreen::displayRecordingMode()
 {
-	findField("recordingmode").lock()->setText(recordingModeMulti ? "M" : "S");
+	findField("recordingmode")->setText(recordingModeMulti ? "M" : "S");
 }
 
 void UserScreen::displayBus()
 {
-	findField("bus").lock()->setText(busNames[bus]);
+	findField("bus")->setText(busNames[bus]);
 	displayDeviceName();
 }
 
@@ -151,23 +151,23 @@ void UserScreen::displayDeviceNumber()
 {
 	if (device == 0)
 	{
-		findField("device").lock()->setText("OFF");
+		findField("device")->setText("OFF");
 		return;
 	}
 
 	if (device >= 17)
 	{
-		findField("device").lock()->setTextPadded(std::to_string(device - 16) + "B", " ");
+		findField("device")->setTextPadded(std::to_string(device - 16) + "B", " ");
 	}
 	else
 	{
-		findField("device").lock()->setTextPadded(std::to_string(device) + "A", " ");
+		findField("device")->setTextPadded(std::to_string(device) + "A", " ");
 	}
 }
 
 void UserScreen::displayVelo()
 {
-	findField("velo").lock()->setText(std::to_string(velo));
+	findField("velo")->setText(std::to_string(velo));
 }
 
 void UserScreen::displayDeviceName()
@@ -178,11 +178,11 @@ void UserScreen::displayDeviceName()
 	{
 		if (device != 0)
 		{
-			findLabel("devicename").lock()->setText(getDeviceName(device));
+			findLabel("devicename")->setText(getDeviceName(device));
 		}
 		else
 		{
-			findLabel("devicename").lock()->setText("");
+			findLabel("devicename")->setText("");
 		}
 	}
 	else
@@ -190,11 +190,11 @@ void UserScreen::displayDeviceName()
 		if (device == 0)
 		{
 			auto programName = sampler->getProgram(mpc.getDrum(bus - 1)->getProgram()).lock()->getName();
-			findLabel("devicename").lock()->setText(programName);
+			findLabel("devicename")->setText(programName);
 		}
 		else
 		{
-			findLabel("devicename").lock()->setText(getDeviceName(device));
+			findLabel("devicename")->setText(getDeviceName(device));
 		}
 	}
 }

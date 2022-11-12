@@ -110,14 +110,14 @@ void AssignScreen::displayAssignNote()
 	
 	auto noteName = note == 34 ? "--" : std::to_string(note);
 
-	findField("assignnote").lock()->setText(noteName + "/" + padName + "-" + soundName);
+	findField("assignnote")->setText(noteName + "/" + padName + "-" + soundName);
 }
 
 void AssignScreen::displayParameter()
 {
 	init();
 	auto slider = program.lock()->getSlider();
-	findField("parameter").lock()->setText(typeNames[slider->getParameter()]);
+	findField("parameter")->setText(typeNames[slider->getParameter()]);
 }
 
 void AssignScreen::displayHighRange()
@@ -127,14 +127,14 @@ void AssignScreen::displayHighRange()
 	auto slider = program.lock()->getSlider();
 	auto sign = "";
 
-	findField("highrange").lock()->setSize(19, 9);
+	findField("highrange")->setSize(19, 9);
 
 	switch (slider->getParameter())
 	{
 	case 0:
 		value = slider->getTuneHighRange();
 		sign = value < 0 ? "-" : " ";
-		findField("highrange").lock()->setSize(25, 9);
+		findField("highrange")->setSize(25, 9);
 		break;
 	case 1:
 		value = slider->getDecayHighRange();
@@ -144,12 +144,12 @@ void AssignScreen::displayHighRange()
 		break;
 	case 3:
 		value = slider->getFilterHighRange();
-		findField("highrange").lock()->setSize(25, 9);
+		findField("highrange")->setSize(25, 9);
 		sign = value < 0 ? "-" : " ";
 		break;
 	}
 
-	findField("highrange").lock()->setText(sign + StrUtil::padLeft(std::to_string(abs(value)), " ", 3));
+	findField("highrange")->setText(sign + StrUtil::padLeft(std::to_string(abs(value)), " ", 3));
 }
 
 void AssignScreen::displayLowRange()
@@ -159,14 +159,14 @@ void AssignScreen::displayLowRange()
 	init();
 	auto slider = program.lock()->getSlider();
 	auto sign = "";
-	findField("lowrange").lock()->setSize(19, 9);
+	findField("lowrange")->setSize(19, 9);
 
 	switch (slider->getParameter())
 	{
 	case 0:
 		value = slider->getTuneLowRange();
 		sign = value < 0 ? "-" : " ";
-		findField("lowrange").lock()->setSize(25, 9);
+		findField("lowrange")->setSize(25, 9);
 		break;
 	case 1:
 		value = slider->getDecayLowRange();
@@ -177,11 +177,11 @@ void AssignScreen::displayLowRange()
 	case 3:
 		value = slider->getFilterLowRange();
 		sign = value < 0 ? "-" : " ";
-		findField("lowrange").lock()->setSize(25, 9);
+		findField("lowrange")->setSize(25, 9);
 		break;
 	}
 
-	findField("lowrange").lock()->setText(sign + StrUtil::padLeft(std::to_string(abs(value)), " ", 3));
+	findField("lowrange")->setText(sign + StrUtil::padLeft(std::to_string(abs(value)), " ", 3));
 }
 
 void AssignScreen::displayAssignNv()
@@ -189,7 +189,7 @@ void AssignScreen::displayAssignNv()
 	init();
 	auto slider = program.lock()->getSlider();
 	auto assignNvString = slider->getControlChange() == 0 ? "OFF" : std::to_string(slider->getControlChange());
-	findField("assignnv").lock()->setTextPadded(assignNvString, " ");
+	findField("assignnv")->setTextPadded(assignNvString, " ");
 }
 
 void AssignScreen::update(moduru::observer::Observable* observable, nonstd::any message)

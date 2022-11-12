@@ -51,21 +51,21 @@ void TimeDisplayScreen::turnWheel(int i)
 
 void TimeDisplayScreen::displayDisplayStyle()
 {
-	findField("displaystyle").lock()->setText(displayStyleNames[displayStyle]);
+	findField("displaystyle")->setText(displayStyleNames[displayStyle]);
 }
 
 void TimeDisplayScreen::displayStartTime()
 {
-	findField("starttime").lock()->setText(StrUtil::padLeft(std::to_string(startTime), "0", 2));
-	findField("h").lock()->setText(StrUtil::padLeft(std::to_string(h), "0", 2));
-	findField("m").lock()->setText(StrUtil::padLeft(std::to_string(m), "0", 2));
-	findField("s").lock()->setText(StrUtil::padLeft(std::to_string(s), "0", 2));
-	findField("f").lock()->setText(StrUtil::padLeft(std::to_string(f), "0", 2));
+	findField("starttime")->setText(StrUtil::padLeft(std::to_string(startTime), "0", 2));
+	findField("h")->setText(StrUtil::padLeft(std::to_string(h), "0", 2));
+	findField("m")->setText(StrUtil::padLeft(std::to_string(m), "0", 2));
+	findField("s")->setText(StrUtil::padLeft(std::to_string(s), "0", 2));
+	findField("f")->setText(StrUtil::padLeft(std::to_string(f), "0", 2));
 }
 
 void TimeDisplayScreen::displayFrameRate()
 {
-	findField("framerate").lock()->setText(frameRateNames[frameRate]);
+	findField("framerate")->setText(frameRateNames[frameRate]);
 }
 
 void TimeDisplayScreen::setDisplayStyle(int i)

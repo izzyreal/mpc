@@ -90,8 +90,8 @@ void VmpcMidiScreen::open()
         uneditedLabelCommands = labelCommands;
     }
 
-    findChild<Label>("up").lock()->setText("\u00C7");
-    findChild<Label>("down").lock()->setText("\u00C6");
+    findChild<Label>("up")->setText("\u00C7");
+    findChild<Label>("down")->setText("\u00C6");
     
     setLearning(false);
     learnCandidate.reset();
@@ -174,8 +174,8 @@ void VmpcMidiScreen::right()
 void VmpcMidiScreen::setLearning(bool b)
 {
     learning = b;
-    findChild<TextComp>("fk2").lock()->setBlinking(learning);
-    findChild<TextComp>("fk3").lock()->setBlinking(learning);
+    findChild<TextComp>("fk2")->setBlinking(learning);
+    findChild<TextComp>("fk3")->setBlinking(learning);
     ls.lock()->setFunctionKeysArrangement(learning ? 1 : 0);
 }
 
@@ -330,8 +330,8 @@ void VmpcMidiScreen::updateRows()
 {
     for (int i = 0; i < 5; i++)
     {
-        auto typeLabel = findChild<Label>("type" + std::to_string(i)).lock();
-        auto typeField = findChild<Field>("type" + std::to_string(i)).lock();
+        auto typeLabel = findChild<Label>("type" + std::to_string(i));
+        auto typeField = findChild<Field>("type" + std::to_string(i));
         
         int length = 15;
         
@@ -345,7 +345,7 @@ void VmpcMidiScreen::updateRows()
         typeField->setText(type);
         typeField->setInverted(row == i && column == 0);
 
-        auto channelField = findChild<Field>("channel" + std::to_string(i)).lock();
+        auto channelField = findChild<Field>("channel" + std::to_string(i));
 
         if (cmd.channelIndex == -1)
         {
@@ -358,7 +358,7 @@ void VmpcMidiScreen::updateRows()
 
         channelField->setInverted(row == i && column == 1);
 
-        auto valueField = findChild<Field>("value" + std::to_string(i)).lock();
+        auto valueField = findChild<Field>("value" + std::to_string(i));
 
         if (cmd.value == -1)
         {
@@ -381,6 +381,6 @@ void VmpcMidiScreen::updateRows()
 
 void VmpcMidiScreen::displayUpAndDown()
 {
-    findChild<Label>("up").lock()->Hide(rowOffset == 0);
-    findChild<Label>("down").lock()->Hide(rowOffset + 5 >= labelCommands.size());
+    findChild<Label>("up")->Hide(rowOffset == 0);
+    findChild<Label>("down")->Hide(rowOffset + 5 >= labelCommands.size());
 }

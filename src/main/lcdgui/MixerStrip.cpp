@@ -29,7 +29,7 @@ MixerStrip::MixerStrip(mpc::Mpc& mpc, int columnIndex)
 	addChild(std::move(std::make_shared<MixerFaderBackground>(MRECT(x1, 14, x1 + 14, 50))));
 
 	auto x2 = 5 + (columnIndex * 15);
-	findChild("mixer-top-background").lock()->addChild(std::move(std::make_shared<Knob>(MRECT(x2, 1, x2 + 12, 12))));
+	findChild("mixer-top-background")->addChild(std::move(std::make_shared<Knob>(MRECT(x2, 1, x2 + 12, 12))));
 
 	for (int i = 0; i < 5; i++)
 	{
@@ -51,38 +51,38 @@ MixerStrip::MixerStrip(mpc::Mpc& mpc, int columnIndex)
 
 		if (i < 2)
 		{
-			findMixerTopBackground().lock()->addChild(std::move(label));
+			findMixerTopBackground()->addChild(std::move(label));
 		}
 		else
 		{
-			findMixerFaderBackground().lock()->addChild(std::move(label));
+			findMixerFaderBackground()->addChild(std::move(label));
 		}
 	}
 
 	auto x3 = 12 + (columnIndex * 15);
-	findMixerFaderBackground().lock()->addChild(std::move(std::make_shared<MixerFader>(MRECT(x3, 15, x3 + 4, 49))));
+	findMixerFaderBackground()->addChild(std::move(std::make_shared<MixerFader>(MRECT(x3, 15, x3 + 4, 49))));
 
 	auto padName = StrUtil::padLeft(std::to_string(columnIndex + 1), "0", 2);
-	findLabel("3").lock()->setText(padName.substr(0, 1));
-	findLabel("4").lock()->setText(padName.substr(1, 2));
+	findLabel("3")->setText(padName.substr(0, 1));
+	findLabel("4")->setText(padName.substr(1, 2));
 }
 
 void MixerStrip::setBank(int i)
 {
-	findLabel("2").lock()->setText(abcd[i]);
-	findMixerFaderBackground().lock()->SetDirty();
+	findLabel("2")->setText(abcd[i]);
+	findMixerFaderBackground()->SetDirty();
 }
 
 void MixerStrip::setValueA(int i)
 {
-    findKnob().lock()->setValue(i);
-	findMixerTopBackground().lock()->SetDirty();
+    findKnob()->setValue(i);
+	findMixerTopBackground()->SetDirty();
 }
 
 void MixerStrip::setValueB(int i)
 {
-    findMixerFader().lock()->setValue(i);
-	findMixerFaderBackground().lock()->SetDirty();
+    findMixerFader()->setValue(i);
+	findMixerFaderBackground()->SetDirty();
 }
 
 void MixerStrip::initLabels()
@@ -91,25 +91,25 @@ void MixerStrip::initLabels()
 
 	if (mixerScreen->getTab() == 0)
 	{
-		findKnob().lock()->Hide(false);
-		findLabel("0").lock()->Hide(true);
-		findLabel("1").lock()->Hide(true);
+		findKnob()->Hide(false);
+		findLabel("0")->Hide(true);
+		findLabel("1")->Hide(true);
 	}
 	else if (mixerScreen->getTab() == 1)
 	{
-		findKnob().lock()->Hide(true);
-		findLabel("0").lock()->Hide(false);
-		findLabel("1").lock()->Hide(false);
-		findLabel("0").lock()->setLocation(xPos0indiv[columnIndex] - 1, yPos0indiv);
-		findLabel("1").lock()->setLocation(xPos1indiv[columnIndex] - 1, yPos1indiv);
+		findKnob()->Hide(true);
+		findLabel("0")->Hide(false);
+		findLabel("1")->Hide(false);
+		findLabel("0")->setLocation(xPos0indiv[columnIndex] - 1, yPos0indiv);
+		findLabel("1")->setLocation(xPos1indiv[columnIndex] - 1, yPos1indiv);
 	}
 	else if (mixerScreen->getTab() == 2)
 	{
-		findKnob().lock()->Hide(true);
-		findLabel("0").lock()->Hide(false);
-		findLabel("1").lock()->Hide(false);
-		findLabel("0").lock()->setLocation(xPos0fx[columnIndex], yPos0fx);
-		findLabel("1").lock()->setLocation(xPos1fx[columnIndex], yPos1fx);
+		findKnob()->Hide(true);
+		findLabel("0")->Hide(false);
+		findLabel("1")->Hide(false);
+		findLabel("0")->setLocation(xPos0fx[columnIndex], yPos0fx);
+		findLabel("1")->setLocation(xPos1fx[columnIndex], yPos1fx);
 	}
 	SetDirty();
 }
@@ -120,37 +120,37 @@ void MixerStrip::setColors()
 	{
 		for (int i = 0; i < 5; i++)
 		{
-			findLabel(std::to_string(i)).lock()->setInverted(false);
+			findLabel(std::to_string(i))->setInverted(false);
 		}
 		
-		findMixerTopBackground().lock()->setColor(false);
-		findMixerFaderBackground().lock()->setColor(false);
-		findKnob().lock()->setColor(true);
-		findMixerFader().lock()->setColor(true);
+		findMixerTopBackground()->setColor(false);
+		findMixerFaderBackground()->setColor(false);
+		findKnob()->setColor(true);
+		findMixerFader()->setColor(true);
 	}
 	else if (selection == 0)
 	{
-		findLabel("0").lock()->setInverted(true);
-		findLabel("1").lock()->setInverted(true);
-		findLabel("2").lock()->setInverted(false);
-		findLabel("3").lock()->setInverted(false);
-		findLabel("4").lock()->setInverted(false);
-		findMixerTopBackground().lock()->setColor(true);
-		findMixerFaderBackground().lock()->setColor(false);
-		findKnob().lock()->setColor(false);
-		findMixerFader().lock()->setColor(true);
+		findLabel("0")->setInverted(true);
+		findLabel("1")->setInverted(true);
+		findLabel("2")->setInverted(false);
+		findLabel("3")->setInverted(false);
+		findLabel("4")->setInverted(false);
+		findMixerTopBackground()->setColor(true);
+		findMixerFaderBackground()->setColor(false);
+		findKnob()->setColor(false);
+		findMixerFader()->setColor(true);
 	}
     else if (selection == 1)
 	{
-        findLabel("0").lock()->setInverted(false);
-        findLabel("1").lock()->setInverted(false);
-        findLabel("2").lock()->setInverted(true);
-        findLabel("3").lock()->setInverted(true);
-        findLabel("4").lock()->setInverted(true);
-		findMixerTopBackground().lock()->setColor(false);
-		findMixerFaderBackground().lock()->setColor(true);
-        findKnob().lock()->setColor(true);
-		findMixerFader().lock()->setColor(false);
+        findLabel("0")->setInverted(false);
+        findLabel("1")->setInverted(false);
+        findLabel("2")->setInverted(true);
+        findLabel("3")->setInverted(true);
+        findLabel("4")->setInverted(true);
+		findMixerTopBackground()->setColor(false);
+		findMixerFaderBackground()->setColor(true);
+        findKnob()->setColor(true);
+		findMixerFader()->setColor(false);
     }
 	SetDirty();
 }
@@ -169,38 +169,38 @@ void MixerStrip::setValueAString(std::string str)
 	{
 		if (str.length() == 1)
 		{
-			findLabel("0").lock()->setText(str);
-			findLabel("0").lock()->setLocation(xPos0indiv[columnIndex] + 2, yPos0indiv + 2);
-			findLabel("1").lock()->Hide(true);
+			findLabel("0")->setText(str);
+			findLabel("0")->setLocation(xPos0indiv[columnIndex] + 2, yPos0indiv + 2);
+			findLabel("1")->Hide(true);
 		}
 		else if (str.length() == 2)
 		{
-			findLabel("0").lock()->setLocation(xPos0indiv[columnIndex], yPos0indiv);
-			findLabel("0").lock()->setText(str.substr(0, 1));
-			findLabel("1").lock()->Hide(false);
-			findLabel("1").lock()->setText(str.substr(1, 2));
+			findLabel("0")->setLocation(xPos0indiv[columnIndex], yPos0indiv);
+			findLabel("0")->setText(str.substr(0, 1));
+			findLabel("1")->Hide(false);
+			findLabel("1")->setText(str.substr(1, 2));
 		}
 	}
 	else if (mixerScreen->getTab() == 2)
 	{
-		findLabel("0").lock()->setText(str.length() > 0 ? str.substr(0, 1) : "");
-		findLabel("1").lock()->setText(str.length() > 1 ? str.substr(1, 2) : "");
+		findLabel("0")->setText(str.length() > 0 ? str.substr(0, 1) : "");
+		findLabel("1")->setText(str.length() > 1 ? str.substr(1, 2) : "");
 	}
     
 	SetDirty();
 }
 
-std::weak_ptr<MixerFader> MixerStrip::findMixerFader()
+std::shared_ptr<MixerFader> MixerStrip::findMixerFader()
 {
-	return std::dynamic_pointer_cast<MixerFader>(findChild("mixer-fader-background").lock()->findChild("mixer-fader").lock());
+	return std::dynamic_pointer_cast<MixerFader>(findChild("mixer-fader-background")->findChild("mixer-fader"));
 }
 
-std::weak_ptr<Knob> MixerStrip::findKnob()
+std::shared_ptr<Knob> MixerStrip::findKnob()
 {
-	return std::dynamic_pointer_cast<Knob>(findChild("mixer-top-background").lock()->findChild("knob").lock());
+	return std::dynamic_pointer_cast<Knob>(findChild("mixer-top-background")->findChild("knob"));
 }
 
-std::weak_ptr<MixerTopBackground> MixerStrip::findMixerTopBackground()
+std::shared_ptr<MixerTopBackground> MixerStrip::findMixerTopBackground()
 {
 	for (auto& c : children)
 	{
@@ -212,7 +212,7 @@ std::weak_ptr<MixerTopBackground> MixerStrip::findMixerTopBackground()
 	return {};
 }
 
-std::weak_ptr<MixerFaderBackground> MixerStrip::findMixerFaderBackground()
+std::shared_ptr<MixerFaderBackground> MixerStrip::findMixerFaderBackground()
 {
 	for (auto& c : children)
 	{

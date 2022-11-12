@@ -88,7 +88,7 @@ namespace mpc {
     public:
         std::weak_ptr<lcdgui::LayeredScreen> getLayeredScreen();
         std::weak_ptr<controls::Controls> getControls();
-        std::weak_ptr<mpc::lcdgui::ScreenComponent> getActiveControls();
+        std::shared_ptr<mpc::lcdgui::ScreenComponent> getActiveControls();
         std::shared_ptr<mpc::controls::GlobalReleaseControls> getReleaseControls();
         std::weak_ptr<hardware::Hardware> getHardware();
         mpc::disk::DiskController* getDiskController();
@@ -100,7 +100,7 @@ namespace mpc {
         ctoot::mpc::MpcBasicSoundPlayerChannel* getBasicPlayer();
         std::weak_ptr<audiomidi::AudioMidiServices> getAudioMidiServices();
         std::vector<ctoot::mpc::MpcSoundPlayerChannel*> getDrums();
-        std::weak_ptr<audiomidi::EventHandler> getEventHandler();
+        std::shared_ptr<audiomidi::EventHandler> getEventHandler();
         ctoot::mpc::MpcMultiMidiSynth* getMms();
         std::weak_ptr<mpc::audiomidi::MpcMidiPorts> getMidiPorts();
         mpc::audiomidi::MpcMidiInput* getMpcMidiInput(int i);

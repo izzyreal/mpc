@@ -42,14 +42,14 @@ EventRow::EventRow(mpc::Mpc& mpc, int rowIndex)
 	int y1 = 11 + (rowIndex * 9);
 	
 	MRECT parametersRect = MRECT(x1, y1, x1 + w1, y1 + h1);
-	parameters = std::dynamic_pointer_cast<EventRowParameters>(addChild(std::make_shared<EventRowParameters>(parametersRect)).lock());
+	parameters = addChildT<EventRowParameters>(parametersRect);
 
 	for (int i = 4; i >= 0; i--)
 	{
-		auto label = parameters.lock()->addChild(std::make_shared<Label>(mpc, letters[i] + std::to_string(rowIndex), drumNoteEventLabels[i], drumNoteEventXPos[i] + 1, rowIndex * 9 + 12, drumNoteEventLabels[i].length() * 6 + 1)).lock();
+		auto label = parameters->addChild(std::make_shared<Label>(mpc, letters[i] + std::to_string(rowIndex), drumNoteEventLabels[i], drumNoteEventXPos[i] + 1, rowIndex * 9 + 12, drumNoteEventLabels[i].length() * 6 + 1));
 		labels.insert(begin(labels), std::dynamic_pointer_cast<Label>(label));
 
-		auto tf = parameters.lock()->addChild(std::make_shared<Field>(mpc, letters[i] + std::to_string(rowIndex), drumNoteEventXPos[i] + 1 + drumNoteEventLabels[i].length() * 6 + 1, rowIndex * 9 + 12, drumNoteEventSizes[i])).lock();
+		auto tf = parameters->addChild(std::make_shared<Field>(mpc, letters[i] + std::to_string(rowIndex), drumNoteEventXPos[i] + 1 + drumNoteEventLabels[i].length() * 6 + 1, rowIndex * 9 + 12, drumNoteEventSizes[i]));
 		
 		fields.insert(begin(fields), std::dynamic_pointer_cast<Field>(tf));
 	}
@@ -60,8 +60,8 @@ EventRow::EventRow(mpc::Mpc& mpc, int rowIndex)
 	w1 = 50;
 
 	MRECT horizontalBarRect = MRECT(x1, y1, x1 + w1, y1 + h1);
-	horizontalBar = std::dynamic_pointer_cast<HorizontalBar>(addChild(std::make_shared<HorizontalBar>(horizontalBarRect)).lock());
-	horizontalBar.lock()->Hide(true);
+	horizontalBar = std::dynamic_pointer_cast<HorizontalBar>(addChild(std::make_shared<HorizontalBar>(horizontalBarRect)));
+	horizontalBar->Hide(true);
 
 	setColors();
 }
@@ -140,17 +140,17 @@ void EventRow::init()
 
 void EventRow::setEmptyEventValues()
 {
-	fields[0].lock()->Hide(false);
-	labels[0].lock()->Hide(false);
-	labels[0].lock()->setText("");
-	fields[0].lock()->setText(" ");
+	fields[0]->Hide(false);
+	labels[0]->Hide(false);
+	labels[0]->setText("");
+	fields[0]->setText(" ");
 	
-	horizontalBar.lock()->Hide(true);
+	horizontalBar->Hide(true);
 
 	for (int i = 1; i < 5; i++)
 	{
-		fields[i].lock()->Hide(true);
-		labels[i].lock()->Hide(true);
+		fields[i]->Hide(true);
+		labels[i]->Hide(true);
 	}
 }
 
@@ -165,24 +165,24 @@ void EventRow::setSystemExclusiveEventValues()
     
 	for (int i = 0; i < 2; i++)
 	{
-        fields[i].lock()->Hide(false);
-        labels[i].lock()->Hide(false);
+        fields[i]->Hide(false);
+        labels[i]->Hide(false);
     }
     
 	char byteA[3];
 	sprintf(byteA, "%X", see->getByteA()); //convert number to hex
-	fields[0].lock()->setText(StrUtil::padLeft(std::string(byteA), "0", 2));
+	fields[0]->setText(StrUtil::padLeft(std::string(byteA), "0", 2));
 
 	char byteB[3];
 	sprintf(byteB, "%X", see->getByteB()); //convert number to hex
-	fields[1].lock()->setText(StrUtil::padLeft(std::string(byteB), "0", 2));
+	fields[1]->setText(StrUtil::padLeft(std::string(byteB), "0", 2));
     
-	horizontalBar.lock()->Hide(true);
+	horizontalBar->Hide(true);
 
 	for (int i = 2; i < 5; i++)
 	{
-		fields[i].lock()->Hide(true);
-		labels[i].lock()->Hide(true);
+		fields[i]->Hide(true);
+		labels[i]->Hide(true);
 	}
 }
 
@@ -195,20 +195,20 @@ void EventRow::setPolyPressureEventValues()
     
 	for (int i = 0; i < 2; i++)
 	{
-        fields[i].lock()->Hide(false);
-        labels[i].lock()->Hide(false);
+        fields[i]->Hide(false);
+        labels[i]->Hide(false);
     }
 
-    fields[0].lock()->setText(StrUtil::padLeft(std::to_string(ppe->getNote()), " ", 3) + "(" + mpc::Util::noteNames()[ppe->getNote()] + ")");
-    fields[1].lock()->setText(StrUtil::padLeft(std::to_string(ppe->getAmount()), " ", 3));
+    fields[0]->setText(StrUtil::padLeft(std::to_string(ppe->getNote()), " ", 3) + "(" + mpc::Util::noteNames()[ppe->getNote()] + ")");
+    fields[1]->setText(StrUtil::padLeft(std::to_string(ppe->getAmount()), " ", 3));
 	
-	horizontalBar.lock()->setValue(ppe->getAmount());
-    horizontalBar.lock()->Hide(false);
+	horizontalBar->setValue(ppe->getAmount());
+    horizontalBar->Hide(false);
 	
 	for (int i = 2; i < 5; i++)
 	{
-		fields[i].lock()->Hide(true);
-		labels[i].lock()->Hide(true);
+		fields[i]->Hide(true);
+		labels[i]->Hide(true);
 	}
 }
 
@@ -218,17 +218,17 @@ void EventRow::setChannelPressureEventValues()
 		return;
 
     auto cpe = std::dynamic_pointer_cast< ChannelPressureEvent>(event.lock());
-    fields[0].lock()->Hide(false);
-    labels[0].lock()->Hide(false);
-    fields[0].lock()->setText(StrUtil::padLeft(std::to_string(cpe->getAmount()), " ", 3));
+    fields[0]->Hide(false);
+    labels[0]->Hide(false);
+    fields[0]->setText(StrUtil::padLeft(std::to_string(cpe->getAmount()), " ", 3));
 
-	horizontalBar.lock()->setValue(cpe->getAmount());
-    horizontalBar.lock()->Hide(false);
+	horizontalBar->setValue(cpe->getAmount());
+    horizontalBar->Hide(false);
 
 	for (int i = 1; i < 5; i++)
 	{
-		fields[i].lock()->Hide(true);
-		labels[i].lock()->Hide(true);
+		fields[i]->Hide(true);
+		labels[i]->Hide(true);
 	}
 }
 
@@ -241,21 +241,21 @@ void EventRow::setControlChangeEventValues()
     
 	for (int i = 0; i < 2; i++)
 	{
-        fields[i].lock()->Hide(false);
-        labels[i].lock()->Hide(false);
+        fields[i]->Hide(false);
+        labels[i]->Hide(false);
     }
 
-    fields[0].lock()->setText(controlNames[cce->getController()]);
-    fields[1].lock()->setText(StrUtil::padLeft(std::to_string(cce->getAmount()), " ", 3));
+    fields[0]->setText(controlNames[cce->getController()]);
+    fields[1]->setText(StrUtil::padLeft(std::to_string(cce->getAmount()), " ", 3));
 	
-	auto lHorizontalBar = horizontalBar.lock();
+	auto lHorizontalBar = horizontalBar;
 	lHorizontalBar->setValue(cce->getAmount());
     lHorizontalBar->Hide(false);
     
 	for (int i = 2; i < 5; i++)
 	{
-		fields[i].lock()->Hide(true);
-		labels[i].lock()->Hide(true);
+		fields[i]->Hide(true);
+		labels[i]->Hide(true);
 	}
 }
 
@@ -275,40 +275,40 @@ void EventRow::setMiscEventValues()
 	if (programChangeEvent)
 	{
         parameterValue = programChangeEvent->getProgram();
-        labels[0].lock()->setText(">PROGRAM CHANGE:");
-        fields[0].lock()->setSize(3 * 6 + 1, 9);
+        labels[0]->setText(">PROGRAM CHANGE:");
+        fields[0]->setSize(3 * 6 + 1, 9);
     }
     
 	for (int i = 0; i < 2; i++)
 	{
-        fields[i].lock()->Hide(false);
-        labels[i].lock()->Hide(false);
+        fields[i]->Hide(false);
+        labels[i]->Hide(false);
     }
     
-	fields[0].lock()->setText(StrUtil::padLeft(std::to_string(parameterValue), " ", 3));
+	fields[0]->setText(StrUtil::padLeft(std::to_string(parameterValue), " ", 3));
     
 	if (pitchBendEvent)
 	{
         if(parameterValue > 0)
 		{
-            fields[0].lock()->setText("+" + StrUtil::padLeft(std::to_string(parameterValue), " ", 4));
+            fields[0]->setText("+" + StrUtil::padLeft(std::to_string(parameterValue), " ", 4));
         }
         else if(parameterValue < 0)
 		{
-            fields[0].lock()->setText("-" + StrUtil::padLeft(std::to_string(abs(parameterValue)), " ", 4));
+            fields[0]->setText("-" + StrUtil::padLeft(std::to_string(abs(parameterValue)), " ", 4));
         }
         else if(parameterValue == 0)
 		{
-            fields[0].lock()->setText("    0");
+            fields[0]->setText("    0");
         }
     }
 
-    horizontalBar.lock()->Hide(true);
+    horizontalBar->Hide(true);
 
 	for (int i = 1; i < 5; i++)
 	{
-		fields[i].lock()->Hide(true);
-		labels[i].lock()->Hide(true);
+		fields[i]->Hide(true);
+		labels[i]->Hide(true);
 	}
 }
 
@@ -321,11 +321,11 @@ void EventRow::setMixerEventValues()
 	
 	for (int i = 0; i < 3; i++)
 	{
-		fields[i].lock()->Hide(false);
-		labels[i].lock()->Hide(false);
+		fields[i]->Hide(false);
+		labels[i]->Hide(false);
 	}
 	
-	fields[0].lock()->setText(mixerParamNames[mixerEvent->getParameter()]);
+	fields[0]->setText(mixerParamNames[mixerEvent->getParameter()]);
 
 	auto sampler = mpc.getSampler().lock();
 	
@@ -336,35 +336,35 @@ void EventRow::setMixerEventValues()
 	auto nn = program->getPad(mixerEvent->getPad())->getNote();
 
     auto padName = sampler->getPadName(mixerEvent->getPad());
-    fields[1].lock()->setText(std::string(nn == 34 ? "--" : std::to_string(nn)) + "/" + padName);
+    fields[1]->setText(std::string(nn == 34 ? "--" : std::to_string(nn)) + "/" + padName);
 	
 	if (mixerEvent->getParameter() == 1)
 	{
-		labels[2].lock()->setText("P:");
+		labels[2]->setText("P:");
 		auto panning = "L";
 
 		if (mixerEvent->getValue() > 50)
 			panning = "R";
 
-		fields[2].lock()->setText(panning + StrUtil::padLeft(std::to_string(abs(mixerEvent->getValue() - 50)), " ", 2));
+		fields[2]->setText(panning + StrUtil::padLeft(std::to_string(abs(mixerEvent->getValue() - 50)), " ", 2));
 		
 		if (mixerEvent->getValue() == 50)
-			fields[2].lock()->setText("0  ");
+			fields[2]->setText("0  ");
 	}
 	else
 	{
-		labels[2].lock()->setText("L:");
-		fields[2].lock()->setText(StrUtil::padLeft(std::to_string(mixerEvent->getValue()), " ", 3));
+		labels[2]->setText("L:");
+		fields[2]->setText(StrUtil::padLeft(std::to_string(mixerEvent->getValue()), " ", 3));
 	}
 
-	auto lHorizontalBar = horizontalBar.lock();
+	auto lHorizontalBar = horizontalBar;
 	lHorizontalBar->setValue(mixerEvent->getValue() * 1.27);
 	lHorizontalBar->Hide(false);
 	
 	for (int i = 3; i < 5; i++)
 	{
-		fields[i].lock()->Hide(true);
-		labels[i].lock()->Hide(true);
+		fields[i]->Hide(true);
+		labels[i]->Hide(true);
 	}
 }
 
@@ -377,13 +377,13 @@ void EventRow::setDrumNoteEventValues()
 	
 	for (int i = 0; i < 5; i++)
 	{
-		fields[i].lock()->Hide(false);
-		labels[i].lock()->Hide(false);
+		fields[i]->Hide(false);
+		labels[i]->Hide(false);
 	}
 	
 	if (ne->getNote() < 35 || ne->getNote() > 98)
 	{
-		fields[0].lock()->setText("--/OFF");
+		fields[0]->setText("--/OFF");
 	}
 	else
 	{
@@ -392,16 +392,16 @@ void EventRow::setDrumNoteEventValues()
 			auto sampler = mpc.getSampler().lock();
 			auto program = sampler->getProgram(sampler->getDrumBusProgramIndex(bus)).lock();
             auto padName = sampler->getPadName(program->getPadIndexFromNote(ne->getNote()));
-            fields[0].lock()->setText(std::to_string(ne->getNote()) + "/" + padName);
+            fields[0]->setText(std::to_string(ne->getNote()) + "/" + padName);
 		}
 	}
 
-	fields[1].lock()->setText(noteVarParamNames[ne->getVariationType()]);
+	fields[1]->setText(noteVarParamNames[ne->getVariationType()]);
 	
 	if (ne->getVariationType() == 0)
 	{
-		fields[2].lock()->setSize(4 * 6 + 1, 9);
-		fields[2].lock()->setLocation(90, fields[2].lock()->getY());
+		fields[2]->setSize(4 * 6 + 1, 9);
+		fields[2]->setLocation(90, fields[2]->getY());
 	
 		auto noteVarValue = (ne->getVariationValue() * 2) - 128;
 		
@@ -412,15 +412,15 @@ void EventRow::setDrumNoteEventValues()
 		
 		if (noteVarValue == 0)
 		{
-			fields[2].lock()->setText("   0");
+			fields[2]->setText("   0");
 		}
 		else if (noteVarValue < 0)
 		{
-			fields[2].lock()->setText("-" + StrUtil::padLeft(std::to_string(abs(noteVarValue)), " ", 3));
+			fields[2]->setText("-" + StrUtil::padLeft(std::to_string(abs(noteVarValue)), " ", 3));
 		}
 		else if (noteVarValue > 0)
 		{
-			fields[2].lock()->setText("+" + StrUtil::padLeft(std::to_string(noteVarValue), " ", 3));
+			fields[2]->setText("+" + StrUtil::padLeft(std::to_string(noteVarValue), " ", 3));
 		}
 	}
 	else if (ne->getVariationType() == 1 || ne->getVariationType() == 2)
@@ -430,14 +430,14 @@ void EventRow::setDrumNoteEventValues()
 		if (noteVarValue > 100)
 			noteVarValue = 100;
 		
-		fields[2].lock()->setText(StrUtil::padLeft(std::to_string(noteVarValue), " ", 3));
-		fields[2].lock()->setSize(3 * 6 + 1, 9);
-		fields[2].lock()->setLocation(90 + 6, fields[2].lock()->getY());
+		fields[2]->setText(StrUtil::padLeft(std::to_string(noteVarValue), " ", 3));
+		fields[2]->setSize(3 * 6 + 1, 9);
+		fields[2]->setLocation(90 + 6, fields[2]->getY());
 	}
 	else if (ne->getVariationType() == 3)
 	{
-		fields[2].lock()->setSize(4 * 6 + 1, 9);
-		fields[2].lock()->setLocation(90, fields[2].lock()->getY());
+		fields[2]->setSize(4 * 6 + 1, 9);
+		fields[2]->setLocation(90, fields[2]->getY());
 		auto noteVarValue = ne->getVariationValue() - 50;
 		
 		if (noteVarValue > 50)
@@ -445,23 +445,23 @@ void EventRow::setDrumNoteEventValues()
 		
 		if (noteVarValue < 0)
 		{
-			fields[2].lock()->setText("-" + StrUtil::padLeft(std::to_string(abs(noteVarValue)), " ", 2));
+			fields[2]->setText("-" + StrUtil::padLeft(std::to_string(abs(noteVarValue)), " ", 2));
 		}
 		else if (noteVarValue > 0)
 		{
-			fields[2].lock()->setText("+" + StrUtil::padLeft(std::to_string(noteVarValue), " ", 2));
+			fields[2]->setText("+" + StrUtil::padLeft(std::to_string(noteVarValue), " ", 2));
 		}
 		else
 		{
-			fields[2].lock()->setText("  0");
+			fields[2]->setText("  0");
 		}
 	}
 
-	fields[3].lock()->setText(StrUtil::padLeft(std::to_string(ne->getDuration()), " ", 4));
-	fields[4].lock()->setText(StrUtil::padLeft(std::to_string(ne->getVelocity()), " ", 3));
+	fields[3]->setText(StrUtil::padLeft(std::to_string(ne->getDuration()), " ", 4));
+	fields[4]->setText(StrUtil::padLeft(std::to_string(ne->getVelocity()), " ", 3));
 	
-	horizontalBar.lock()->setValue(ne->getVelocity());
-	horizontalBar.lock()->Hide(false);
+	horizontalBar->setValue(ne->getVelocity());
+	horizontalBar->Hide(false);
 }
 
 void EventRow::setMidiNoteEventValues()
@@ -473,21 +473,21 @@ void EventRow::setMidiNoteEventValues()
 	
 	for (int i = 0; i < 3; i++)
 	{
-		fields[i].lock()->Hide(false);
-		labels[i].lock()->Hide(false);
+		fields[i]->Hide(false);
+		labels[i]->Hide(false);
 	}
 	
-	fields[0].lock()->setText(StrUtil::padLeft(std::to_string(ne->getNote()), " ", 3) + "(" + mpc::Util::noteNames()[ne->getNote()] + ")");
-	fields[1].lock()->setText(StrUtil::padLeft(std::to_string(ne->getDuration()), " ", 4));
-	fields[2].lock()->setText(std::to_string(ne->getVelocity()));
+	fields[0]->setText(StrUtil::padLeft(std::to_string(ne->getNote()), " ", 3) + "(" + mpc::Util::noteNames()[ne->getNote()] + ")");
+	fields[1]->setText(StrUtil::padLeft(std::to_string(ne->getDuration()), " ", 4));
+	fields[2]->setText(std::to_string(ne->getVelocity()));
 	
-	horizontalBar.lock()->setValue(ne->getVelocity());
-	horizontalBar.lock()->Hide(false);
+	horizontalBar->setValue(ne->getVelocity());
+	horizontalBar->Hide(false);
 
 	for (int i = 3; i < 5; i++)
 	{
-		fields[i].lock()->Hide(true);
-		labels[i].lock()->Hide(true);
+		fields[i]->Hide(true);
+		labels[i]->Hide(true);
 	}
 }
 
@@ -499,23 +499,23 @@ void EventRow::setColors()
 	{
 		if (selected && !std::dynamic_pointer_cast<EmptyEvent>(event.lock()))
 		{
-			parameters.lock()->setColor(true);
-			labels[i].lock()->setInverted(true);
+			parameters->setColor(true);
+			labels[i]->setInverted(true);
 		
-			if (ls->getFocus().compare(fields[i].lock()->getName()) == 0)
-				fields[i].lock()->setInverted(false);
+			if (ls->getFocus().compare(fields[i]->getName()) == 0)
+				fields[i]->setInverted(false);
 			else
-				fields[i].lock()->setInverted(true);
+				fields[i]->setInverted(true);
 		}
 		else
 		{
-			parameters.lock()->setColor(false);
-			labels[i].lock()->setInverted(false);
+			parameters->setColor(false);
+			labels[i]->setInverted(false);
 			
-			if (fields[i].lock()->hasFocus())
-				fields[i].lock()->setInverted(true);
+			if (fields[i]->hasFocus())
+				fields[i]->setInverted(true);
 			else
-				fields[i].lock()->setInverted(false);
+				fields[i]->setInverted(false);
 		}
 	}
 }
@@ -523,15 +523,15 @@ void EventRow::setColors()
 void EventRow::setLabelTexts(const std::vector<std::string>& labelTexts)
 {
 	for (int i = 0; i < labelTexts.size(); i++)
-		labels[i].lock()->setText(labelTexts[i]);
+		labels[i]->setText(labelTexts[i]);
 }
 
 void EventRow::setSizesAndLocations(const std::vector<int>& xPositions, const std::vector<int>& fieldWidths)
 {
 	for (int i = 0; i < xPositions.size(); i++)
 	{
-		auto tf = fields[i].lock();
-		auto label = labels[i].lock();
+		auto tf = fields[i];
+		auto label = labels[i];
 
 		auto labelTextLength = label->getText().length();
 

@@ -12,7 +12,7 @@ IgnoreTempoChangeScreen::IgnoreTempoChangeScreen(mpc::Mpc& mpc, const int layerI
 
 void IgnoreTempoChangeScreen::open()
 {
-	findField("insequence").lock()->setAlignment(Alignment::Centered);
+	findField("insequence")->setAlignment(Alignment::Centered);
 	displayIgnore();
 }
 
@@ -34,5 +34,5 @@ void IgnoreTempoChangeScreen::turnWheel(int i)
 
 void IgnoreTempoChangeScreen::displayIgnore()
 {
-	findField("insequence").lock()->setText(ignore ? "ON" : "OFF");
+	findField("insequence")->setText(ignore ? "ON" : "OFF");
 }

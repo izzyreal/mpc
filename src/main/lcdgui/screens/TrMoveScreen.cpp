@@ -15,9 +15,9 @@ TrMoveScreen::TrMoveScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void TrMoveScreen::open()
 {
-	findBackground().lock()->SetDirty();
-	findLabel("selecttrack").lock()->setText("Select track");
-	findLabel("tomove").lock()->setText("to move.");
+	findBackground()->SetDirty();
+	findLabel("selecttrack")->setText("Select track");
+	findLabel("tomove")->setText("to move.");
 
 	displaySq();
 	displayTrFields();
@@ -196,22 +196,22 @@ void TrMoveScreen::displayTrLabels()
 	
 	if (tr0.compare("") == 0)
 	{
-		findLabel("tr0").lock()->Hide(true);
+		findLabel("tr0")->Hide(true);
 	}
 	else
 	{
-		findLabel("tr0").lock()->Hide(false);
-		findLabel("tr0").lock()->setText(tr0);
+		findLabel("tr0")->Hide(false);
+		findLabel("tr0")->setText(tr0);
 	}
 
 	if (tr1.compare("") == 0)
 	{
-		findLabel("tr1").lock()->Hide(true);
+		findLabel("tr1")->Hide(true);
 	}
 	else
 	{
-		findLabel("tr1").lock()->Hide(false);
-		findLabel("tr1").lock()->setText(tr1);
+		findLabel("tr1")->Hide(false);
+		findLabel("tr1")->setText(tr1);
 	}
 }
 
@@ -222,9 +222,9 @@ void TrMoveScreen::displayTrFields()
 	
 	if (isSelected())
 	{
-		findLabel("selecttrack").lock()->Hide(true);
-		findLabel("tomove").lock()->Hide(true);
-		findField("tr").lock()->setLocation(9, 26);
+		findLabel("selecttrack")->Hide(true);
+		findLabel("tomove")->Hide(true);
+		findField("tr")->setLocation(9, 26);
 
 		auto tr0Name = sequence->getTrack(selectedTrackIndex)->getName();
 		
@@ -233,25 +233,25 @@ void TrMoveScreen::displayTrFields()
 			tr0Name = StrUtil::padRight(tr0Name, " ", 9) + u8"\u00CD";
 		}
 		
-		findField("tr").lock()->setText("Tr:" + StrUtil::padLeft(std::to_string(selectedTrackIndex + 1), "0", 2) + "-" + tr0Name);
+		findField("tr")->setText("Tr:" + StrUtil::padLeft(std::to_string(selectedTrackIndex + 1), "0", 2) + "-" + tr0Name);
 	}
 	else
 	{
-		findLabel("selecttrack").lock()->Hide(false);
-		findLabel("tomove").lock()->Hide(false);
-		findField("tr").lock()->setLocation(108, 26);
+		findLabel("selecttrack")->Hide(false);
+		findLabel("tomove")->Hide(false);
+		findField("tr")->setLocation(108, 26);
         auto trackName = sequence->getTrack(currentTrackIndex)->getName();
         auto trackIndex = StrUtil::padLeft(std::to_string(currentTrackIndex + 1), "0", 2);
-		findField("tr").lock()->setText("Tr:" + trackIndex + "-" + trackName);
+		findField("tr")->setText("Tr:" + trackIndex + "-" + trackName);
 	}
 }
 
 void TrMoveScreen::displaySq()
 {
 	auto sequence = sequencer->getActiveSequence();
-	findField("sq").lock()->setText(StrUtil::padLeft(std::to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2));
+	findField("sq")->setText(StrUtil::padLeft(std::to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2));
 	auto sequenceName = "-" + sequence->getName();
-	findLabel("sq-name").lock()->setText(sequenceName);
+	findLabel("sq-name")->setText(sequenceName);
 }
 
 bool TrMoveScreen::isSelected()

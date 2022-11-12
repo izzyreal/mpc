@@ -20,8 +20,7 @@ using namespace moduru::lang;
 ZoneScreen::ZoneScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "zone", layerIndex)
 {
-	addChild(std::move(std::make_shared<Wave>()));
-	findWave().lock()->setFine(false);
+	addChildT<Wave>()->setFine(false);
 }
 
 void ZoneScreen::open()
@@ -32,14 +31,14 @@ void ZoneScreen::open()
 		initZones();
 
 	bool sound = sampler->getSound().lock() ? true : false;
-	findField("snd").lock()->setFocusable(sound);
-	findField("playx").lock()->setFocusable(sound);
-	findField("st").lock()->setFocusable(sound);
-	findField("st").lock()->enableTwoDots();
-	findField("end").lock()->setFocusable(sound);
-	findField("end").lock()->enableTwoDots();
-	findField("zone").lock()->setFocusable(sound);
-	findField("dummy").lock()->setFocusable(!sound);
+	findField("snd")->setFocusable(sound);
+	findField("playx")->setFocusable(sound);
+	findField("st")->setFocusable(sound);
+	findField("st")->enableTwoDots();
+	findField("end")->setFocusable(sound);
+	findField("end")->enableTwoDots();
+	findField("zone")->setFocusable(sound);
+	findField("dummy")->setFocusable(!sound);
 
 	displayWave();
 	displaySnd();
@@ -140,7 +139,7 @@ void ZoneScreen::turnWheel(int i)
 		return;
 
 	auto soundInc = getSoundIncrement(i);
-	auto field = findField(param).lock();
+	auto field = findField(param);
 
 	if (field->isSplit())
 		soundInc = field->getSplitIncrement(i >= 0);
@@ -199,15 +198,15 @@ void ZoneScreen::displayWave()
 
 	if (!sound)
 	{
-		findWave().lock()->setSampleData(nullptr, true, 0);
-		findWave().lock()->setSelection(0, 0);
+		findWave()->setSampleData(nullptr, true, 0);
+		findWave()->setSelection(0, 0);
 		return;
 	}
 
 	auto sampleData = sound->getSampleData();
 	auto trimScreen = mpc.screens->get<TrimScreen>("trim");
-	findWave().lock()->setSampleData(sampleData, sampler->getSound().lock()->isMono(), trimScreen->view);
-	findWave().lock()->setSelection(getZoneStart(zone), getZoneEnd(zone));
+	findWave()->setSampleData(sampleData, sampler->getSound().lock()->isMono(), trimScreen->view);
+	findWave()->setSelection(getZoneStart(zone), getZoneEnd(zone));
 }
 
 void ZoneScreen::displaySnd()
@@ -216,7 +215,7 @@ void ZoneScreen::displaySnd()
 
 	if (!sound)
 	{
-		findField("snd").lock()->setText("(no sound)");
+		findField("snd")->setText("(no sound)");
 		ls.lock()->setFocus("dummy");
 		return;
 	}
@@ -229,22 +228,22 @@ void ZoneScreen::displaySnd()
 	if (!sound->isMono())
 		sampleName = StrUtil::padRight(sampleName, " ", 16) + "(ST)";
 
-	findField("snd").lock()->setText(sampleName);
+	findField("snd")->setText(sampleName);
 }
 
 void ZoneScreen::displayPlayX()
 {
-	findField("playx").lock()->setText(playXNames[sampler->getPlayX()]);
+	findField("playx")->setText(playXNames[sampler->getPlayX()]);
 }
 
 void ZoneScreen::displaySt()
 {
 	if (sampler->getSoundCount() != 0)
 	{
-		findField("st").lock()->setTextPadded(getZoneStart(zone), " ");
+		findField("st")->setTextPadded(getZoneStart(zone), " ");
 	}
 	else {
-		findField("st").lock()->setText("       0");
+		findField("st")->setText("       0");
 	}
 }
 
@@ -252,10 +251,10 @@ void ZoneScreen::displayEnd()
 {
 	if (sampler->getSoundCount() != 0)
 	{
-		findField("end").lock()->setTextPadded(getZoneEnd(zone), " ");
+		findField("end")->setTextPadded(getZoneEnd(zone), " ");
 	}
 	else {
-		findField("end").lock()->setText("       0");
+		findField("end")->setText("       0");
 	}
 }
 
@@ -263,11 +262,11 @@ void ZoneScreen::displayZone()
 {
 	if (sampler->getSoundCount() == 0)
 	{
-		findField("zone").lock()->setTextPadded(1);
+		findField("zone")->setTextPadded(1);
 		return;
 	}
 
-	findField("zone").lock()->setTextPadded(zone + 1);
+	findField("zone")->setTextPadded(zone + 1);
 }
 
 void ZoneScreen::initZones()
@@ -385,7 +384,7 @@ void ZoneScreen::pressEnter()
 
 	init();
 
-	auto field = ls.lock()->getFocusedLayer().lock()->findField(param).lock();
+	auto field = ls.lock()->getFocusedLayer()->findField(param);
 
 	if (!field->isTypeModeEnabled())
 		return;

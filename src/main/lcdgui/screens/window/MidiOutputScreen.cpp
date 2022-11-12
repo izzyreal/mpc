@@ -90,7 +90,7 @@ void MidiOutputScreen::function(int i)
 
 void MidiOutputScreen::displaySoftThru()
 {
-	findField("softthru").lock()->setText(softThruNames[softThru]);
+	findField("softthru")->setText(softThruNames[softThru]);
 }
 
 void MidiOutputScreen::displayDeviceName()
@@ -98,8 +98,8 @@ void MidiOutputScreen::displayDeviceName()
 	auto sequence = sequencer->getActiveSequence();
 	auto devName = sequence->getDeviceName(deviceIndex + 1);
 	
-	findField("firstletter").lock()->setText(devName.substr(0, 1));
-	findLabel("devicename").lock()->setText(devName.substr(1, devName.length()));
+	findField("firstletter")->setText(devName.substr(0, 1));
+	findLabel("devicename")->setText(devName.substr(1, devName.length()));
 
 	std::string devNumber;
 	
@@ -108,7 +108,7 @@ void MidiOutputScreen::displayDeviceName()
 	else
 		devNumber = moduru::lang::StrUtil::padLeft(std::to_string(deviceIndex + 1), " ", 2) + "A";
 
-	findField("devicenumber").lock()->setText(devNumber);
+	findField("devicenumber")->setText(devNumber);
 }
 
 void MidiOutputScreen::setSoftThru(int i)

@@ -56,5 +56,5 @@ void LoadAProgramScreen::function(int i)
 
 void LoadAProgramScreen::displayLoadReplaceSound()
 {
-	findField("load-replace-sound").lock()->setText(std::string(loadReplaceSound ? "YES" : "NO(FASTER)"));
+	findField("load-replace-sound")->setText(std::string(loadReplaceSound ? "YES" : "NO(FASTER)"));
 }

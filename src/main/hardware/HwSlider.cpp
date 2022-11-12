@@ -17,8 +17,8 @@ void Slider::setValue(int i)
 
 	value = i;
 	
-	if (mpc.getActiveControls().lock())
-		mpc.getActiveControls().lock()->setSlider(value);
+	if (mpc.getActiveControls())
+		mpc.getActiveControls()->setSlider(value);
 
 	notifyObservers(value);
 }

@@ -16,7 +16,7 @@ void MidiMonitorScreen::open()
 {
 	if (name == "midi-output-monitor")
 	{
-		mpc.getEventHandler().lock()->addObserver(this);
+		mpc.getEventHandler()->addObserver(this);
 	}
 	else if (name == "midi-input-monitor")
 	{
@@ -29,7 +29,7 @@ void MidiMonitorScreen::close()
 {
 	if (name == "midi-output-monitor")
 	{
-		mpc.getEventHandler().lock()->deleteObserver(this);
+		mpc.getEventHandler()->deleteObserver(this);
 	}
 	else if (name == "midi-input-monitor")
 	{
@@ -70,7 +70,7 @@ void MidiMonitorScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 		deviceNumber += 16;
 	
 	auto label = findLabel(std::to_string(deviceNumber));
-	label.lock()->setText(u8"\u00CC");
+	label->setText(u8"\u00CC");
 	initTimer(label);
 }
 

@@ -34,8 +34,8 @@ void MixerScreen::open()
 
     for (auto& m : mixerStrips)
     {
-        m.lock()->initLabels();
-        m.lock()->setColors();
+        m->initLabels();
+        m->setColors();
     }
 
     displayMixerStrips();
@@ -52,12 +52,12 @@ void MixerScreen::addMixerStrips()
 {
     for (int i = 0; i < 16; i++)
     {
-        mixerStrips.push_back(std::move(std::dynamic_pointer_cast<MixerStrip>(addChild(std::make_shared<MixerStrip>(mpc, i)).lock())));
-        mixerStrips.back().lock()->setBank(mpc.getBank());
+        mixerStrips.emplace_back(addChildT<MixerStrip>(mpc, i));
+        mixerStrips.back()->setBank(mpc.getBank());
     }
     
     displayMixerStrips();
-    mixerStrips[xPos].lock()->setSelection(yPos);
+    mixerStrips[xPos]->setSelection(yPos);
 }
 
 std::shared_ptr<MpcStereoMixerChannel> MixerScreen::getStereoMixerChannel(int index)
@@ -96,14 +96,14 @@ void MixerScreen::displayMixerStrip(int i)
 {
     init();
     
-    auto strip = mixerStrips[i].lock();
+    auto strip = mixerStrips[i];
     auto stereoMixer = getStereoMixerChannel(i);
     auto indivFxMixer = getIndivFxMixerChannel(i);
     
     if (!stereoMixer || !indivFxMixer)
     {
         if (tab == 0)
-            strip->findChild<Knob>("").lock()->Hide(true);
+            strip->findChild<Knob>("")->Hide(true);
         else
             strip->setValueAString("");
         
@@ -111,7 +111,7 @@ void MixerScreen::displayMixerStrip(int i)
         return;
     }
     
-    strip->findChild<Knob>("").lock()->Hide(tab > 0);
+    strip->findChild<Knob>("")->Hide(tab > 0);
     
     if (tab == 0)
     {
@@ -133,7 +133,7 @@ void MixerScreen::displayMixerStrip(int i)
         strip->setValueB(indivFxMixer->getFxSendLevel());
     }
 
-    mixerStrips[i].lock()->setSelection(xPos == i ? yPos : -1);
+    mixerStrips[i]->setSelection(xPos == i ? yPos : -1);
 }
 
 void MixerScreen::displayMixerStrips()
@@ -153,7 +153,7 @@ void MixerScreen::update(moduru::observer::Observable* o, nonstd::any arg)
     if (s == "bank")
     {
         for (auto& m : mixerStrips)
-            m.lock()->setBank(mpc.getBank());
+            m->setBank(mpc.getBank());
         
         displayMixerStrips();
     }
@@ -199,13 +199,13 @@ void MixerScreen::setLink(bool b)
     if (link)
     {
         for (auto& m : mixerStrips)
-            m.lock()->setSelection(yPos);
+            m->setSelection(yPos);
     }
     else {
         for (auto& m : mixerStrips)
-            m.lock()->setSelection(-1);
+            m->setSelection(-1);
         
-        mixerStrips[xPos].lock()->setSelection(yPos);
+        mixerStrips[xPos]->setSelection(yPos);
     }
     displayFunctionKeys();
 }
@@ -216,8 +216,8 @@ void MixerScreen::setTab(int i)
     
     for (auto& m : mixerStrips)
     {
-        m.lock()->initLabels();
-        m.lock()->setColors();
+        m->initLabels();
+        m->setColors();
     }
     
     displayMixerStrips();
@@ -241,14 +241,14 @@ void MixerScreen::setXPos(unsigned char newXPos)
     if (link)
     {
         for (auto& m : mixerStrips)
-            m.lock()->setSelection(yPos);
+            m->setSelection(yPos);
     }
     else
     {
         for (auto& m : mixerStrips)
-            m.lock()->setSelection(-1);
+            m->setSelection(-1);
 
-        mixerStrips[xPos].lock()->setSelection(yPos);
+        mixerStrips[xPos]->setSelection(yPos);
     }
 }
 
@@ -262,14 +262,14 @@ void MixerScreen::setYPos(int i)
     if (link)
     {
         for (auto& m : mixerStrips)
-            m.lock()->setSelection(yPos);
+            m->setSelection(yPos);
     }
     else
     {
         for (auto& m : mixerStrips)
-            m.lock()->setSelection(-1);
+            m->setSelection(-1);
         
-        mixerStrips[xPos].lock()->setSelection(yPos);
+        mixerStrips[xPos]->setSelection(yPos);
     }
 }
 
@@ -497,7 +497,7 @@ void MixerScreen::displayStereoFaders()
     {
         for (int i = 0; i < 16; i++)
         {
-            auto strip = mixerStrips[i].lock();
+            auto strip = mixerStrips[i];
             auto stereoMixer = getStereoMixerChannel(i);
             
             if (!stereoMixer)
@@ -519,7 +519,7 @@ void MixerScreen::displayStereoFaders()
     
     for (auto& p : padsWithSameNote)
     {
-        auto strip = mixerStrips[p - (mpc.getBank() * 16)].lock();
+        auto strip = mixerStrips[p - (mpc.getBank() * 16)];
         
         if (p >= (mpc.getBank() * 16) && p < ((mpc.getBank() + 1) * 16))
         {
@@ -540,12 +540,12 @@ void MixerScreen::displayPanning()
     {
         for (int i = 0; i < 16; i++)
         {
-            auto strip = mixerStrips[i].lock();
+            auto strip = mixerStrips[i];
             auto stereoMixer = getStereoMixerChannel(i);
             
             if (!stereoMixer)
             {
-                strip->findChild<Knob>("").lock()->Hide(true);
+                strip->findChild<Knob>("")->Hide(true);
                 continue;
             }
             
@@ -562,13 +562,13 @@ void MixerScreen::displayPanning()
     
     for (auto& p : padsWithSameNote)
     {
-        auto strip = mixerStrips[p - (mpc.getBank() * 16)].lock();
+        auto strip = mixerStrips[p - (mpc.getBank() * 16)];
         
         if (p >= (mpc.getBank() * 16) && p < ((mpc.getBank() + 1) * 16))
         {
             if (!stereoMixer)
             {
-                strip->findChild<Knob>("").lock()->Hide(true);
+                strip->findChild<Knob>("")->Hide(true);
                 continue;
             }
             
@@ -583,7 +583,7 @@ void MixerScreen::displayIndividualOutputs()
     {
         for (int i = 0; i < 16; i++)
         {
-            auto strip = mixerStrips[i].lock();
+            auto strip = mixerStrips[i];
             auto stereoMixer = getStereoMixerChannel(i);
             auto indivFxMixer = getIndivFxMixerChannel(i);
             
@@ -611,7 +611,7 @@ void MixerScreen::displayIndividualOutputs()
     
     for (auto& p : padsWithSameNote)
     {
-        auto strip = mixerStrips[p - (mpc.getBank() * 16)].lock();
+        auto strip = mixerStrips[p - (mpc.getBank() * 16)];
         
         if (p >= (mpc.getBank() * 16) && p < ((mpc.getBank() + 1) * 16))
         {
@@ -635,7 +635,7 @@ void MixerScreen::displayIndivFaders()
     {
         for (int i = 0; i < 16; i++)
         {
-            auto strip = mixerStrips[i].lock();
+            auto strip = mixerStrips[i];
             auto indivFxMixer = getIndivFxMixerChannel(i);
             
             if (!indivFxMixer)
@@ -657,7 +657,7 @@ void MixerScreen::displayIndivFaders()
     
     for (auto& p : padsWithSameNote)
     {
-        auto strip = mixerStrips[p - (mpc.getBank() * 16)].lock();
+        auto strip = mixerStrips[p - (mpc.getBank() * 16)];
         
         if (p >= (mpc.getBank() * 16) && p < ((mpc.getBank() + 1) * 16))
         {
@@ -678,7 +678,7 @@ void MixerScreen::displayFxPaths()
     {
         for (int i = 0; i < 16; i++)
         {
-            auto strip = mixerStrips[i].lock();
+            auto strip = mixerStrips[i];
             auto indivFxMixer = getIndivFxMixerChannel(i);
             
             if (!indivFxMixer)
@@ -700,7 +700,7 @@ void MixerScreen::displayFxPaths()
     
     for (auto& p : padsWithSameNote)
     {
-        auto strip = mixerStrips[p - (mpc.getBank() * 16)].lock();
+        auto strip = mixerStrips[p - (mpc.getBank() * 16)];
         
         if (p >= (mpc.getBank() * 16) && p < ((mpc.getBank() + 1) * 16))
         {
@@ -721,7 +721,7 @@ void MixerScreen::displayFxSendLevels()
     {
         for (int i = 0; i < 16; i++)
         {
-            auto strip = mixerStrips[i].lock();
+            auto strip = mixerStrips[i];
             auto indivFxMixer = getIndivFxMixerChannel(i);
             
             if (!indivFxMixer)
@@ -743,7 +743,7 @@ void MixerScreen::displayFxSendLevels()
     
     for (auto& p : padsWithSameNote)
     {
-        auto strip = mixerStrips[p - (mpc.getBank() * 16)].lock();
+        auto strip = mixerStrips[p - (mpc.getBank() * 16)];
         
         if (p >= (mpc.getBank() * 16) && p < ((mpc.getBank() + 1) * 16))
         {

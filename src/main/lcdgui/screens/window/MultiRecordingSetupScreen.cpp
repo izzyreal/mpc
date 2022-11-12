@@ -178,9 +178,9 @@ void MultiRecordingSetupScreen::displayMrsLine(int i)
 	auto seq = sequencer->getActiveSequence();
 	auto trackIndex = visibleMrsLines[i]->getTrack();
 
-	auto aField = findField("a" + std::to_string(i)).lock();
-	auto bField = findField("b" + std::to_string(i)).lock();
-	auto cField = findField("c" + std::to_string(i)).lock();
+	auto aField = findField("a" + std::to_string(i));
+	auto bField = findField("b" + std::to_string(i));
+	auto cField = findField("c" + std::to_string(i));
 
 	aField->setText(inNames[visibleMrsLines[i]->getIn()]);
 

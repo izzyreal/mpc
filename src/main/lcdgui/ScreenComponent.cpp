@@ -13,7 +13,7 @@ ScreenComponent::ScreenComponent(mpc::Mpc& mpc, const std::string& name, const i
 	ls = mpc.getLayeredScreen();
 	sampler = mpc.getSampler().lock();
 	sequencer = mpc.getSequencer().lock();
-	auto background = std::dynamic_pointer_cast<Background>(addChild(std::make_shared<Background>()).lock());
+	auto background = std::dynamic_pointer_cast<Background>(addChild(std::make_shared<Background>()));
 	background->setName(name);
 }
 
@@ -37,14 +37,14 @@ std::string ScreenComponent::getFirstField()
 	return firstField;
 }
 
-std::weak_ptr<Wave> ScreenComponent::findWave()
+std::shared_ptr<Wave> ScreenComponent::findWave()
 {
-	return std::dynamic_pointer_cast<Wave>(findChild("wave").lock());
+	return findChild<Wave>("wave");
 }
 
-std::weak_ptr<EnvGraph> ScreenComponent::findEnvGraph()
+std::shared_ptr<EnvGraph> ScreenComponent::findEnvGraph()
 {
-	return std::dynamic_pointer_cast<EnvGraph>(findChild("env-graph").lock());
+	return findChild<EnvGraph>("env-graph");
 }
 
 const int& ScreenComponent::getLayerIndex()
@@ -52,11 +52,11 @@ const int& ScreenComponent::getLayerIndex()
 	return layer;
 }
 
-std::weak_ptr<Field> ScreenComponent::findFocus()
+std::shared_ptr<Field> ScreenComponent::findFocus()
 {
 	for (auto& field : findFields())
 	{
-		if (field.lock()->hasFocus())
+		if (field->hasFocus())
 			return field;
 	}
 	return {};

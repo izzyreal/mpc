@@ -188,7 +188,7 @@ SCENARIO("All screens can be opened", "[gui]") {
 				continue;
 			}
             
-			auto layer = ls->getFocusedLayer().lock();
+			auto layer = ls->getFocusedLayer();
 			vector<vector<bool>> pixels(248, vector<bool>(60));
 			layer->Draw(&pixels);
 			int blackPixelCount = 0;

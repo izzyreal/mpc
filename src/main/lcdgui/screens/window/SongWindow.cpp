@@ -15,11 +15,11 @@ SongWindow::SongWindow(mpc::Mpc& mpc, const int layerIndex)
 
 void SongWindow::open()
 {
-	auto songNameRestLabel = findLabel("song-name-rest").lock();
-	auto defaultSongNameRestLabel = findLabel("default-name-rest").lock();
+	auto songNameRestLabel = findLabel("song-name-rest");
+	auto defaultSongNameRestLabel = findLabel("default-name-rest");
 
-	auto songNameFirstLetterField = findField("song-name-first-letter").lock();
-	auto defaultSongNameFirstLetterField = findField("default-name-first-letter").lock();
+	auto songNameFirstLetterField = findField("song-name-first-letter");
+	auto defaultSongNameFirstLetterField = findField("default-name-first-letter");
 
 	auto songScreen = mpc.screens->get<SongScreen>("song");
 	auto song = sequencer->getSong(songScreen->activeSongIndex);

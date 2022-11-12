@@ -14,7 +14,7 @@ SaveAProgramScreen::SaveAProgramScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void SaveAProgramScreen::open()
 {
-	findField("replace-same-sounds").lock()->setAlignment(Alignment::Centered);
+	findField("replace-same-sounds")->setAlignment(Alignment::Centered);
 	displayFile();
 	displaySave();
 	displayReplaceSameSounds();
@@ -77,16 +77,16 @@ void SaveAProgramScreen::setSave(int i)
 
 void SaveAProgramScreen::displaySave()
 {
-	findField("save").lock()->setText(pgmSaveNames[save]);
+	findField("save")->setText(pgmSaveNames[save]);
 }
 
 void SaveAProgramScreen::displayReplaceSameSounds()
 {
-	findField("replace-same-sounds").lock()->setText(std::string(replaceSameSounds ? "YES" : "NO"));
+	findField("replace-same-sounds")->setText(std::string(replaceSameSounds ? "YES" : "NO"));
 }
 
 void SaveAProgramScreen::displayFile()
 {
 	auto nameScreen = mpc.screens->get<NameScreen>("name");
-	findLabel("file").lock()->setText(nameScreen->getNameWithoutSpaces() + ".PGM");
+	findLabel("file")->setText(nameScreen->getNameWithoutSpaces() + ".PGM");
 }

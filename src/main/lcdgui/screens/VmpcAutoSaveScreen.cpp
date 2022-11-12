@@ -9,7 +9,7 @@ VmpcAutoSaveScreen::VmpcAutoSaveScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void VmpcAutoSaveScreen::open()
 {
-    findChild<TextComp>("msg").lock()->setText("Only applies to standalone");
+    findChild<TextComp>("msg")->setText("Only applies to standalone");
 
     displayAutoSaveOnExit();
     displayAutoLoadOnStart();
@@ -68,12 +68,12 @@ void VmpcAutoSaveScreen::setAutoLoadOnStart(int i)
 
 void VmpcAutoSaveScreen::displayAutoSaveOnExit()
 {
-    findField("auto-save-on-exit").lock()->setText(autoSaveOnExitNames[autoSaveOnExit]);
+    findField("auto-save-on-exit")->setText(autoSaveOnExitNames[autoSaveOnExit]);
 }
 
 void VmpcAutoSaveScreen::displayAutoLoadOnStart()
 {
-    findField("auto-load-on-start").lock()->setText(autoLoadOnStartNames[autoLoadOnStart]);
+    findField("auto-load-on-start")->setText(autoLoadOnStartNames[autoLoadOnStart]);
 }
 
 int VmpcAutoSaveScreen::getAutoSaveOnExit()

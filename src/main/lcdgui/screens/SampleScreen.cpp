@@ -88,13 +88,13 @@ void SampleScreen::function(int i)
 		if (mpc.getAudioMidiServices().lock()->isRecordingSound())
 		{
 			mpc.getAudioMidiServices().lock()->stopSoundRecorder(true);
-			findBackground().lock()->setName("sample");
+			findBackground()->setName("sample");
 		}
 		else if (mpc.getAudioMidiServices().lock()->getSoundRecorder().lock()->isArmed())
 		{
 			mpc.getAudioMidiServices().lock()->getSoundRecorder().lock()->setArmed(false);
 			sampler->deleteSound(sampler->getSoundCount() - 1);
-			findBackground().lock()->setName("sample");
+			findBackground()->setName("sample");
 		}
 		break;
 	case 5:
@@ -114,7 +114,7 @@ void SampleScreen::function(int i)
 		if (ams->getSoundRecorder().lock()->isArmed())
 		{
 			ams->startRecordingSound();
-			findBackground().lock()->setName("recording");
+			findBackground()->setName("recording");
 		}
 		else
 		{
@@ -123,7 +123,7 @@ void SampleScreen::function(int i)
 			auto lengthInFrames = time * (44100 * 0.1);
 			ams->getSoundRecorder().lock()->prepare(sound, lengthInFrames);
 			ams->getSoundRecorder().lock()->setArmed(true);
-			findChild<Background>("").lock()->setName("waiting-for-input-signal");
+			findBackground()->setName("waiting-for-input-signal");
 		}
 
 		break;
@@ -223,35 +223,35 @@ void SampleScreen::setPreRec(int i)
 
 void SampleScreen::displayInput()
 {
-	findField("input").lock()->setText(inputNames[input]);
+	findField("input")->setText(inputNames[input]);
 }
 
 void SampleScreen::displayThreshold()
 {
 	auto thresholdText = threshold == -64 ? u8"-\u00D9\u00DA" : std::to_string(threshold);
-	findField("threshold").lock()->setTextPadded(thresholdText);
+	findField("threshold")->setTextPadded(thresholdText);
 }
 
 void SampleScreen::displayMode()
 {
-	findField("mode").lock()->setText(modeNames[mode]);
+	findField("mode")->setText(modeNames[mode]);
 }
 
 void SampleScreen::displayTime()
 {
 	auto timeText = std::to_string(time);
 	timeText = timeText.substr(0, timeText.length() - 1) + "." + timeText.substr(timeText.length() - 1);
-	findField("time").lock()->setTextPadded(timeText);
+	findField("time")->setTextPadded(timeText);
 }
 
 void SampleScreen::displayMonitor()
 {
-	findField("monitor").lock()->setText(monitorNames[monitor]);
+	findField("monitor")->setText(monitorNames[monitor]);
 }
 
 void SampleScreen::displayPreRec()
 {
-	findField("prerec").lock()->setTextPadded(preRec);
+	findField("prerec")->setTextPadded(preRec);
 }
 
 void SampleScreen::updateVU(const float levelL, const float levelR)
@@ -299,8 +299,8 @@ void SampleScreen::updateVU(const float levelL, const float levelR)
 		rString += r;
 	}
 
-	findLabel("vuleft").lock()->setText( (mode == 0 || mode == 2) ? lString : "                                  ");
-	findLabel("vuright").lock()->setText( (mode == 1 || mode == 2) ? rString : "                                  ");
+	findLabel("vuleft")->setText( (mode == 0 || mode == 2) ? lString : "                                  ");
+	findLabel("vuright")->setText( (mode == 1 || mode == 2) ? rString : "                                  ");
 }
 
 int SampleScreen::getMode()

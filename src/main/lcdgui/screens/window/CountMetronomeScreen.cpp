@@ -11,9 +11,9 @@ CountMetronomeScreen::CountMetronomeScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void CountMetronomeScreen::open()
 {
-	findField("in-play").lock()->setAlignment(Alignment::Centered);
-	findField("in-rec").lock()->setAlignment(Alignment::Centered);
-	findField("wait-for-key").lock()->setAlignment(Alignment::Centered);
+	findField("in-play")->setAlignment(Alignment::Centered);
+	findField("in-rec")->setAlignment(Alignment::Centered);
+	findField("wait-for-key")->setAlignment(Alignment::Centered);
 
 	displayCountIn();
 	displayInPlay();
@@ -24,27 +24,27 @@ void CountMetronomeScreen::open()
 
 void CountMetronomeScreen::displayWaitForKey()
 {
-	findField("wait-for-key").lock()->setText(waitForKey ? "ON" : "OFF");
+	findField("wait-for-key")->setText(waitForKey ? "ON" : "OFF");
 }
 
 void CountMetronomeScreen::displayInRec()
 {
-	findField("in-rec").lock()->setText(inRec ? "YES" : "NO");
+	findField("in-rec")->setText(inRec ? "YES" : "NO");
 }
 
 void CountMetronomeScreen::displayRate()
 {
-	findField("rate").lock()->setText(rateNames[rate]);
+	findField("rate")->setText(rateNames[rate]);
 }
 
 void CountMetronomeScreen::displayInPlay()
 {
-	findField("in-play").lock()->setText(inPlay ? "YES" : "NO");
+	findField("in-play")->setText(inPlay ? "YES" : "NO");
 }
 
 void CountMetronomeScreen::displayCountIn()
 {
-	findField("count-in").lock()->setText(countInNames[countIn]);
+	findField("count-in")->setText(countInNames[countIn]);
 }
 
 void CountMetronomeScreen::function(int i)

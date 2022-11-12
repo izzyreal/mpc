@@ -236,59 +236,59 @@ void VmpcDirectToDiskRecorderScreen::setSplitLR(bool b)
 
 void VmpcDirectToDiskRecorderScreen::displayRate()
 {
-	findField("rate").lock()->Hide(!offline);
-	findLabel("rate").lock()->Hide(!offline);
+	findField("rate")->Hide(!offline);
+	findLabel("rate")->Hide(!offline);
 	
 	if (!offline)
 		return;
 
     std::vector<std::string> rates{ "44.1", "48.0", "88.2" };
     std::string rate = Util::replaceDotWithSmallSpaceDot(rates[sampleRate]);
-	findField("rate").lock()->setText(rate);
+	findField("rate")->setText(rate);
 }
 
 void VmpcDirectToDiskRecorderScreen::displaySong()
 {
-	findField("song").lock()->Hide(record != 3);
-	findLabel("song").lock()->Hide(record != 3);
+	findField("song")->Hide(record != 3);
+	findLabel("song")->Hide(record != 3);
 
 	if (record != 3)
 		return;
     auto songName = sequencer->getSong(song)->getName();
-	findField("song").lock()->setText(StrUtil::padLeft(std::to_string(song + 1), "0", 2) + "-" + songName);
+	findField("song")->setText(StrUtil::padLeft(std::to_string(song + 1), "0", 2) + "-" + songName);
 }
 
 void VmpcDirectToDiskRecorderScreen::displayOffline()
 {
-	findField("offline").lock()->Hide(record == 4);
-	findLabel("offline").lock()->Hide(record == 4);
+	findField("offline")->Hide(record == 4);
+	findLabel("offline")->Hide(record == 4);
 	
 	if (record != 4)
-		findField("offline").lock()->setText(offline ? "YES" : "NO");
+		findField("offline")->setText(offline ? "YES" : "NO");
 }
 
 void VmpcDirectToDiskRecorderScreen::displaySplitLR()
 {
-	findField("split-lr").lock()->setText(splitLR ? "YES" : "NO");
+	findField("split-lr")->setText(splitLR ? "YES" : "NO");
 }
 
 void VmpcDirectToDiskRecorderScreen::displayRecord()
 {
-	findField("record").lock()->setText(recordNames[record]);
+	findField("record")->setText(recordNames[record]);
 }
 
 void VmpcDirectToDiskRecorderScreen::displaySq()
 {
 	auto visible = (record >= 0 && record <= 2);
 	
-	findField("sq").lock()->Hide(!visible);
-	findLabel("sq").lock()->Hide(!visible);
+	findField("sq")->Hide(!visible);
+	findLabel("sq")->Hide(!visible);
 
 	if (!visible)
 		return;
 
     auto seqName = sequencer->getSequence(sq)->getName();
-	findField("sq").lock()->setText(StrUtil::padLeft(std::to_string(sq + 1), "0", 2) + "-" + seqName);
+	findField("sq")->setText(StrUtil::padLeft(std::to_string(sq + 1), "0", 2) + "-" + seqName);
 }
 
 void VmpcDirectToDiskRecorderScreen::displayTime()
@@ -297,8 +297,8 @@ void VmpcDirectToDiskRecorderScreen::displayTime()
 
 	for (int i = 0; i < 6; i++)
 	{
-		findField("time" + std::to_string(i)).lock()->Hide(invisible);
-		findLabel("time" + std::to_string(i)).lock()->Hide(invisible);
+		findField("time" + std::to_string(i))->Hide(invisible);
+		findLabel("time" + std::to_string(i))->Hide(invisible);
 	}
 
 	if (invisible)
@@ -306,12 +306,12 @@ void VmpcDirectToDiskRecorderScreen::displayTime()
 
 	auto sequence = sequencer->getSequence(sq);
 
-	findField("time0").lock()->setTextPadded(SeqUtil::getBar(sequence.get(), time0 ) + 1, "0");
-	findField("time1").lock()->setTextPadded(SeqUtil::getBeat(sequence.get(), time0) + 1, "0");
-	findField("time2").lock()->setTextPadded(SeqUtil::getClock(sequence.get(), time0), "0");
-	findField("time3").lock()->setTextPadded(SeqUtil::getBar(sequence.get(), time1) + 1, "0");
-	findField("time4").lock()->setTextPadded(SeqUtil::getBeat(sequence.get(), time1) + 1, "0");
-	findField("time5").lock()->setTextPadded(SeqUtil::getClock(sequence.get(), time1), "0");
+	findField("time0")->setTextPadded(SeqUtil::getBar(sequence.get(), time0 ) + 1, "0");
+	findField("time1")->setTextPadded(SeqUtil::getBeat(sequence.get(), time0) + 1, "0");
+	findField("time2")->setTextPadded(SeqUtil::getClock(sequence.get(), time0), "0");
+	findField("time3")->setTextPadded(SeqUtil::getBar(sequence.get(), time1) + 1, "0");
+	findField("time4")->setTextPadded(SeqUtil::getBeat(sequence.get(), time1) + 1, "0");
+	findField("time5")->setTextPadded(SeqUtil::getClock(sequence.get(), time1), "0");
 }
 
 bool VmpcDirectToDiskRecorderScreen::isOffline()

@@ -13,8 +13,8 @@ AssignmentViewScreen::AssignmentViewScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void AssignmentViewScreen::open()
 {
-	findField("note").lock()->setFocusable(false);
-	findField("note").lock()->setInverted(true);
+	findField("note")->setFocusable(false);
+	findField("note")->setInverted(true);
 
 	ls.lock()->setFocus(getFocusFromPadIndex());
 
@@ -143,19 +143,19 @@ void AssignmentViewScreen::displayPad(int i)
 			sampleName = StrUtil::trim(sampleName.substr(0, 8));
 	}
 
-	findField(padFocusNames[i]).lock()->setText(sampleName);
+	findField(padFocusNames[i])->setText(sampleName);
 }
 
 void AssignmentViewScreen::displayBankInfoAndNoteLabel()
 {
-	findLabel("info0").lock()->setText("Bank:" + letters[mpc.getBank()] + " Note:");
+	findLabel("info0")->setText("Bank:" + letters[mpc.getBank()] + " Note:");
 }
 
 void AssignmentViewScreen::displayNote()
 {
 	auto note = program.lock()->getPad(getPadIndexFromFocus())->getNote();
 	auto text = note == 34 ? "--" : std::to_string(note);
-	findField("note").lock()->setText(text);
+	findField("note")->setText(text);
 }
 
 void AssignmentViewScreen::displaySoundName()
@@ -165,7 +165,7 @@ void AssignmentViewScreen::displaySoundName()
 
 	if (note == 34)
 	{
-		findLabel("info2").lock()->setText("=");
+		findLabel("info2")->setText("=");
 		return;
 	}
 
@@ -182,7 +182,7 @@ void AssignmentViewScreen::displaySoundName()
 	if (soundIndex != -1 && noteParameters->getStereoMixerChannel().lock()->isStereo())
 		stereo = "(ST)";
 
-	findLabel("info2").lock()->setText("=" + StrUtil::padRight(soundName, " ", 16) + stereo);
+	findLabel("info2")->setText("=" + StrUtil::padRight(soundName, " ", 16) + stereo);
 }
 
 int AssignmentViewScreen::getPadIndexFromFocus()

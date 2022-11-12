@@ -23,13 +23,13 @@ void SaveAllFileScreen::displayFile()
 {
 	if (fileName.length() == 0)
     {
-        findField("file").lock()->setText("");
-        findLabel("file1").lock()->setText("");
+        findField("file")->setText("");
+        findLabel("file1")->setText("");
         return;
     }
 
-	findField("file").lock()->setText(fileName.substr(0, 1));
-    findLabel("file1").lock()->setText(StrUtil::padRight(fileName.substr(1), " ", 15) + ".ALL");
+	findField("file")->setText(fileName.substr(0, 1));
+    findLabel("file1")->setText(StrUtil::padRight(fileName.substr(1), " ", 15) + ".ALL");
 }
 
 void SaveAllFileScreen::turnWheel(int i)

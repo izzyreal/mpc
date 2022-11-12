@@ -133,12 +133,12 @@ void StereoToMonoScreen::displayStereoSource()
 		return;
 	}
 
-	findField("stereosource").lock()->setText(sound->getName());
+	findField("stereosource")->setText(sound->getName());
 
 	if (sound->isMono())
 	{
 		ls.lock()->setFunctionKeysArrangement(1);
-		findChild<Background>("").lock()->repaintUnobtrusive(findChild<FunctionKey>("fk4").lock()->getRect());
+		findBackground()->repaintUnobtrusive(findChild<FunctionKey>("fk4")->getRect());
 	}
 	else
 	{
@@ -148,12 +148,12 @@ void StereoToMonoScreen::displayStereoSource()
 
 void StereoToMonoScreen::displayNewLName()
 {
-	findField("newlname").lock()->setText(newLName);
+	findField("newlname")->setText(newLName);
 }
 
 void StereoToMonoScreen::displayNewRName()
 {
-	findField("newrname").lock()->setText(newRName);
+	findField("newrname")->setText(newRName);
 }
 
 void StereoToMonoScreen::setNewLName(std::string s)

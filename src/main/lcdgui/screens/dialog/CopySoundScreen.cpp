@@ -73,7 +73,7 @@ void CopySoundScreen::turnWheel(int i)
 
 void CopySoundScreen::displayNewName()
 {
-	findField("newname").lock()->setText(newName);
+	findField("newname")->setText(newName);
 }
 
 void CopySoundScreen::displaySnd()
@@ -83,7 +83,7 @@ void CopySoundScreen::displaySnd()
 		return;
 	}
 
-	findField("snd").lock()->setText(sampler->getSound().lock()->getName());
+	findField("snd")->setText(sampler->getSound().lock()->getName());
 }
 
 void CopySoundScreen::setNewName(std::string s)

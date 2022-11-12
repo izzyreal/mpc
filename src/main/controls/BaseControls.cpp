@@ -55,7 +55,7 @@ void BaseControls::init()
 {
     currentScreenName = ls->getCurrentScreenName();
     param = ls->getFocus();
-    activeField = ls->getFocusedLayer().lock()->findField(param);
+    activeField = ls->getFocusedLayer()->findField(param);
     
     auto isSampler = collectionContainsCurrentScreen(samplerScreens);
     
@@ -362,7 +362,7 @@ void BaseControls::generateNoteOn(int note, int padVelo)
         drum = drumScreen->drum;
     }
 
-    mpc.getEventHandler().lock()->handle(playableEvent, trk.get(), drum);
+    mpc.getEventHandler()->handle(playableEvent, trk.get(), drum);
 }
 
 bool BaseControls::isTypable()
@@ -384,7 +384,7 @@ void BaseControls::numpad(int i)
     
     if (!controls->isShiftPressed())
     {
-        auto field = ls->getFocusedLayer().lock()->findField(param).lock();
+        auto field = ls->getFocusedLayer()->findField(param);
         
         if (isTypable())
         {
@@ -832,7 +832,7 @@ void BaseControls::shift()
     controls->setShiftPressed(true);
     
     init();
-    auto focus = ls->getFocusedLayer().lock()->findField(param).lock();
+    auto focus = ls->getFocusedLayer()->findField(param);
     
     if (focus && focus->isTypeModeEnabled())
     {
@@ -885,7 +885,7 @@ void BaseControls::splitLeft()
 {
     init();
     
-    auto field = ls->getFocusedLayer().lock()->findField(param).lock();
+    auto field = ls->getFocusedLayer()->findField(param);
     auto controls = mpc.getControls().lock();
     
     if (!controls->isShiftPressed())
@@ -912,7 +912,7 @@ void BaseControls::splitLeft()
 void BaseControls::splitRight()
 {
     init();
-    auto field = ls->getFocusedLayer().lock()->findField(param).lock();
+    auto field = ls->getFocusedLayer()->findField(param);
     auto controls = mpc.getControls().lock();
     
     if (!controls->isShiftPressed())

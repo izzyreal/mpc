@@ -19,11 +19,11 @@ void TrackScreen::open()
 	auto activeTrackIndex = sequencer->getActiveTrackIndex();
 	auto defaultTrackName = sequencer->getDefaultTrackName(activeTrackIndex);
 
-	findField("tracknamefirstletter").lock()->setText(track.lock()->getName().substr(0, 1));
-	findLabel("tracknamerest").lock()->setText(track.lock()->getName().substr(1));
+	findField("tracknamefirstletter")->setText(track.lock()->getName().substr(0, 1));
+	findLabel("tracknamerest")->setText(track.lock()->getName().substr(1));
 
-	findField("defaultnamefirstletter").lock()->setText(defaultTrackName.substr(0, 1));
-	findLabel("defaultnamerest").lock()->setText(defaultTrackName.substr(1));
+	findField("defaultnamefirstletter")->setText(defaultTrackName.substr(0, 1));
+	findLabel("defaultnamerest")->setText(defaultTrackName.substr(1));
 }
 
 void TrackScreen::function(int i)

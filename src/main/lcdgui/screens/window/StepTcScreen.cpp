@@ -26,5 +26,5 @@ void StepTcScreen::displayTcValue()
 {
 	auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
 	auto noteValue = timingCorrectScreen->getNoteValue();
-	findField("tcvalue").lock()->setText(timingCorrectNames[noteValue]);
+	findField("tcvalue")->setText(timingCorrectNames[noteValue]);
 }

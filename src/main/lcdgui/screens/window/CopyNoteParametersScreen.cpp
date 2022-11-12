@@ -67,7 +67,7 @@ void CopyNoteParametersScreen::function(int i)
 void CopyNoteParametersScreen::displayProg0()
 {
 	auto program = sampler->getProgram(prog0).lock();
-	findField("prog0").lock()->setText(StrUtil::padLeft(std::to_string(prog0 + 1), " ", 2) + "-" + program->getName());
+	findField("prog0")->setText(StrUtil::padLeft(std::to_string(prog0 + 1), " ", 2) + "-" + program->getName());
 }
 
 void CopyNoteParametersScreen::displayNote0()
@@ -84,13 +84,13 @@ void CopyNoteParametersScreen::displayNote0()
 	if (note0 == -1)
 		sampleName = "";
 	
-	findField("note0").lock()->setText(noteText + "/" + padName + sampleName);
+	findField("note0")->setText(noteText + "/" + padName + sampleName);
 }
 
 void CopyNoteParametersScreen::displayProg1()
 {
 	auto program = sampler->getProgram(prog1).lock();
-	findField("prog1").lock()->setText(StrUtil::padLeft(std::to_string(prog1 + 1), " ", 2) + "-" + program->getName());
+	findField("prog1")->setText(StrUtil::padLeft(std::to_string(prog1 + 1), " ", 2) + "-" + program->getName());
 }
 
 void CopyNoteParametersScreen::displayNote1()
@@ -105,7 +105,7 @@ void CopyNoteParametersScreen::displayNote1()
 	if (note1 == -1)
 		sampleName = "";
 
-	findField("note1").lock()->setText(noteText + "/" + padName + sampleName);
+	findField("note1")->setText(noteText + "/" + padName + sampleName);
 }
 
 

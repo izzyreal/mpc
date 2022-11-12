@@ -74,10 +74,10 @@ void ProgramScreen::function(int i)
 
 void ProgramScreen::displayProgramName()
 {
-	findField("programname").lock()->setText(program.lock()->getName());
+	findField("programname")->setText(program.lock()->getName());
 }
 
 void ProgramScreen::displayMidiProgramChange()
 {
-	findField("midiprogramchange").lock()->setTextPadded(program.lock()->getMidiProgramChange(), " ");
+	findField("midiprogramchange")->setTextPadded(program.lock()->getMidiProgramChange(), " ");
 }

@@ -17,7 +17,7 @@ using namespace moduru::lang;
 PgmParamsScreen::PgmParamsScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "program-params", layerIndex)
 {
-	addChild(std::make_shared<EnvGraph>(mpc));
+	addChildT<EnvGraph>(mpc);
 }
 
 void PgmParamsScreen::open()
@@ -206,14 +206,14 @@ void PgmParamsScreen::displayReson()
 {
 	init();
 	auto lProgram = program.lock();
-	findField("reson").lock()->setTextPadded(sampler->getLastNp(lProgram.get())->getFilterResonance());
+	findField("reson")->setTextPadded(sampler->getLastNp(lProgram.get())->getFilterResonance());
 }
 
 void PgmParamsScreen::displayFreq()
 {
 	init();
 	auto lProgram = program.lock();
-	findField("freq").lock()->setTextPadded(sampler->getLastNp(lProgram.get())->getFilterFrequency());
+	findField("freq")->setTextPadded(sampler->getLastNp(lProgram.get())->getFilterFrequency());
 }
 
 void PgmParamsScreen::displayAttackDecay()
@@ -223,9 +223,9 @@ void PgmParamsScreen::displayAttackDecay()
 	auto attack = sampler->getLastNp(lProgram.get())->getAttack();
 	auto decay = sampler->getLastNp(lProgram.get())->getDecay();
 	auto decayModeStart = sampler->getLastNp(lProgram.get())->getDecayMode() == 1;
-	findField("attack").lock()->setTextPadded(attack);
-	findField("decay").lock()->setTextPadded(decay);
-	findEnvGraph().lock()->setCoordinates(attack, decay, decayModeStart);
+	findField("attack")->setTextPadded(attack);
+	findField("decay")->setTextPadded(decay);
+	findEnvGraph()->setCoordinates(attack, decay, decayModeStart);
 }
 
 void PgmParamsScreen::displayNote()
@@ -237,13 +237,13 @@ void PgmParamsScreen::displayNote()
     auto padName = sampler->getPadName(padIndex);
     auto sampleName = soundIndex != -1 ? sampler->getSoundName(soundIndex) : "OFF";
     std::string stereo = noteParameters->getStereoMixerChannel().lock()->isStereo() && soundIndex != -1 ? "(ST)" : "";
-    findField("note").lock()->setText(std::to_string(noteParameters->getNumber()) + "/" + padName + "-" + StrUtil::padRight(sampleName, " ", 16) + stereo);
+    findField("note")->setText(std::to_string(noteParameters->getNumber()) + "/" + padName + "-" + StrUtil::padRight(sampleName, " ", 16) + stereo);
 }
 
 void PgmParamsScreen::displayPgm()
 {
 	init();
-	findField("pgm").lock()->setTextPadded(mpcSoundPlayerChannel->getProgram() + 1, " ");
+	findField("pgm")->setTextPadded(mpcSoundPlayerChannel->getProgram() + 1, " ");
 }
 
 void PgmParamsScreen::displayTune()
@@ -253,14 +253,14 @@ void PgmParamsScreen::displayTune()
 	auto tune = sampler->getLastNp(lProgram.get())->getTune();
 	auto sign = tune < 0 ? "-" : " ";
 	auto number = StrUtil::padLeft(std::to_string(abs(tune)), " ", 3);
-	findField("tune").lock()->setText(sign + number);
+	findField("tune")->setText(sign + number);
 }
 
 void PgmParamsScreen::displayDecayMode()
 {
 	init();
 	auto lProgram = program.lock();
-	findField("dcymd").lock()->setText(decayModes[sampler->getLastNp(lProgram.get())->getDecayMode()]);
+	findField("dcymd")->setText(decayModes[sampler->getLastNp(lProgram.get())->getDecayMode()]);
 	displayAttackDecay();
 }
 
@@ -277,5 +277,5 @@ void PgmParamsScreen::displayVoiceOverlap()
     if (sound && sound->isLoopEnabled())
         mode = 2;
     
-	findField("voiceoverlap").lock()->setText(voiceOverlapModes[mode]);
+	findField("voiceoverlap")->setText(voiceOverlapModes[mode]);
 }

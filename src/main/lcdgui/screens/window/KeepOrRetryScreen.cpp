@@ -120,7 +120,7 @@ void KeepOrRetryScreen::displayNameForNewSound()
     if (!sampler->getSound().lock())
         return;
     
-    findField("name-for-new-sound").lock()->setText(sampler->getPreviewSound().lock()->getName());
+    findField("name-for-new-sound")->setText(sampler->getPreviewSound().lock()->getName());
 }
 
 void KeepOrRetryScreen::displayAssignToNote()
@@ -128,7 +128,7 @@ void KeepOrRetryScreen::displayAssignToNote()
     init();
     auto noteStr = assignToNote == 34 ? "--" : std::to_string(assignToNote);
     auto padStr = sampler->getPadName(program.lock()->getPadIndexFromNote(assignToNote));
-    findField("assign-to-note").lock()->setText(noteStr + "/" + padStr);
+    findField("assign-to-note")->setText(noteStr + "/" + padStr);
 }
 
 void KeepOrRetryScreen::update(moduru::observer::Observable* o, nonstd::any arg)

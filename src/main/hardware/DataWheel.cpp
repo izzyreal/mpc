@@ -13,7 +13,7 @@ DataWheel::DataWheel(mpc::Mpc& mpc)
 
 void DataWheel::turn(int increment)
 {
-	auto controls = mpc.getActiveControls().lock();
+	auto controls = mpc.getActiveControls();
 	
     if (controls) controls->turnWheel(increment);
 

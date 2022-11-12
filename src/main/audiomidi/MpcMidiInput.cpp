@@ -137,7 +137,7 @@ void MpcMidiInput::transport(MidiMessage *msg, int timeStamp)
 
         if (pad == -1)
         {
-            mpc.getEventHandler().lock()->handleNoThru(note, track.get(), timeStamp);
+            mpc.getEventHandler()->handleNoThru(note, track.get(), timeStamp);
 
             if (lSequencer->isRecordingOrOverdubbing())
             {
@@ -163,7 +163,7 @@ void MpcMidiInput::transport(MidiMessage *msg, int timeStamp)
             }
             else
             {
-                auto activeControls = mpc.getActiveControls().lock();
+                auto activeControls = mpc.getActiveControls();
                 activeControls->pad(pad, note->getVelocity());
             }
         }
@@ -296,7 +296,7 @@ void MpcMidiInput::handleControl(ShortMessage *shortMsg)
                     }
                     else if (func == 7)
                     {
-                        auto activeControls = mpc.getActiveControls().lock();
+                        auto activeControls = mpc.getActiveControls();
                         activeControls->tap();
                     }
                     else if (func >= 8 && func < 12)

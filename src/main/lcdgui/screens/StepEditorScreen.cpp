@@ -54,7 +54,7 @@ StepEditorScreen::StepEditorScreen(mpc::Mpc& mpc, const int layerIndex)
 	lastColumn["tempo-change"] = "a";
 
 	for (int i = 0; i < EVENT_ROW_COUNT; i++)
-		addChild(std::make_shared<EventRow>(mpc, i)).lock();
+		addChildT<EventRow>(mpc, i);
 
 	MRECT r(31, 0, 164, 9);
 	addChildT<Rectangle>("view-background", r);
@@ -68,9 +68,9 @@ void StepEditorScreen::openWindow()
 
 void StepEditorScreen::open()
 {
-	findField("tonote").lock()->setLocation(115, 0);
-	findLabel("fromnote").lock()->Hide(true);
-	auto rectangle = findChild<Rectangle>("view-background").lock();
+	findField("tonote")->setLocation(115, 0);
+	findLabel("fromnote")->Hide(true);
+	auto rectangle = findChild<Rectangle>("view-background");
 
 	lastRow = 0;
 
@@ -80,12 +80,12 @@ void StepEditorScreen::open()
 	{
 		int pgm = sampler->getDrumBusProgramIndex(track.lock()->getBus());
 		program = sampler->getProgram(pgm);
-		findField("fromnote").lock()->setAlignment(Alignment::None);
+		findField("fromnote")->setAlignment(Alignment::None);
 	}
 	else
 	{
-		findField("fromnote").lock()->setAlignment(Alignment::Centered, 18);
-		findField("tonote").lock()->setAlignment(Alignment::Centered, 18);
+		findField("fromnote")->setAlignment(Alignment::Centered, 18);
+		findField("tonote")->setAlignment(Alignment::Centered, 18);
 
 		if (lastColumn["note"] == "e")
 			lastColumn["note"] = "c";
@@ -97,9 +97,9 @@ void StepEditorScreen::open()
 	sequencer->addObserver(this);
 	track.lock()->addObserver(this);
 
-	findField("now0").lock()->setTextPadded(sequencer->getCurrentBarIndex() + 1, "0");
-	findField("now1").lock()->setTextPadded(sequencer->getCurrentBeatIndex() + 1, "0");
-	findField("now2").lock()->setTextPadded(sequencer->getCurrentClockNumber(), "0");
+	findField("now0")->setTextPadded(sequencer->getCurrentBarIndex() + 1, "0");
+	findField("now1")->setTextPadded(sequencer->getCurrentBeatIndex() + 1, "0");
+	findField("now2")->setTextPadded(sequencer->getCurrentClockNumber(), "0");
 
 	initVisibleEvents();
 
@@ -925,37 +925,37 @@ void StepEditorScreen::updateComponents()
 
 	if (view == 1 && track.lock()->getBus() != 0)
 	{
-		findField("fromnote").lock()->Hide(false);
-		findField("fromnote").lock()->setSize(37, 9);
-		findField("fromnote").lock()->setLocation(67, 0);
-		findLabel("tonote").lock()->Hide(true);
-		findField("tonote").lock()->Hide(true);
+		findField("fromnote")->Hide(false);
+		findField("fromnote")->setSize(37, 9);
+		findField("fromnote")->setLocation(67, 0);
+		findLabel("tonote")->Hide(true);
+		findField("tonote")->Hide(true);
 	}
 	else if (view == 1 && track.lock()->getBus() == 0)
 	{
-		findField("fromnote").lock()->Hide(false);
-		findField("fromnote").lock()->setLocation(61, 0);
-		findField("fromnote").lock()->setSize(47, 9);
-		findField("tonote").lock()->setSize(47, 9);
-		findLabel("tonote").lock()->Hide(false);
-		findLabel("tonote").lock()->setText("-");
-		findField("tonote").lock()->Hide(false);
+		findField("fromnote")->Hide(false);
+		findField("fromnote")->setLocation(61, 0);
+		findField("fromnote")->setSize(47, 9);
+		findField("tonote")->setSize(47, 9);
+		findLabel("tonote")->Hide(false);
+		findLabel("tonote")->setText("-");
+		findField("tonote")->Hide(false);
 	}
 	else if (view == 3)
 	{
-		auto fromNoteField = findField("fromnote").lock();
+		auto fromNoteField = findField("fromnote");
 		fromNoteField->Hide(false);
 		fromNoteField->setLocation(60, 0);
 		fromNoteField->setSize(104, 9);
 
-		findLabel("tonote").lock()->Hide(true);
-		findField("tonote").lock()->Hide(true);
+		findLabel("tonote")->Hide(true);
+		findField("tonote")->Hide(true);
 	}
 	else if (view != 1 && view != 3)
 	{
-		findField("fromnote").lock()->Hide(true);
-		findLabel("tonote").lock()->Hide(true);
-		findField("tonote").lock()->Hide(true);
+		findField("fromnote")->Hide(true);
+		findLabel("tonote")->Hide(true);
+		findField("tonote")->Hide(true);
 	}
 }
 
@@ -966,30 +966,30 @@ void StepEditorScreen::setViewNotesText()
 	if (view == 1 && track.lock()->getBus() != 0)
 	{
 		if (fromNote == 34) {
-            findField("fromnote").lock()->setText("ALL");
+            findField("fromnote")->setText("ALL");
         }
 		else
         {
             auto padName = sampler->getPadName(program.lock()->getPadIndexFromNote(fromNote));
-			findField("fromnote").lock()->setText(std::to_string(fromNote) + "/" + padName);
+			findField("fromnote")->setText(std::to_string(fromNote) + "/" + padName);
         }
 	}
 	else if (view == 1 && track.lock()->getBus() == 0)
 	{
-		findField("fromnote").lock()->setText(StrUtil::padLeft(std::to_string(noteA), " ", 3) + "(" + mpc::Util::noteNames()[noteA] + u8"\u00D4");
-		findField("tonote").lock()->setText(StrUtil::padLeft(std::to_string(noteB), " ", 3) + "(" + mpc::Util::noteNames()[noteB] + u8"\u00D4");
+		findField("fromnote")->setText(StrUtil::padLeft(std::to_string(noteA), " ", 3) + "(" + mpc::Util::noteNames()[noteA] + u8"\u00D4");
+		findField("tonote")->setText(StrUtil::padLeft(std::to_string(noteB), " ", 3) + "(" + mpc::Util::noteNames()[noteB] + u8"\u00D4");
 	}
 	else if (view == 3)
 	{
 		if (control == -1)
-			findField("fromnote").lock()->setText("   -    ALL");
+			findField("fromnote")->setText("   -    ALL");
 		else
-			findField("fromnote").lock()->setText(StrUtil::padLeft(std::to_string(control), " ", 3) + "-" + EventRow::controlNames[control]);
+			findField("fromnote")->setText(StrUtil::padLeft(std::to_string(control), " ", 3) + "-" + EventRow::controlNames[control]);
 	}
 
-	findField("view").lock()->setText(viewNames[view]);
-	auto newWidth = findField("view").lock()->getText().length() * 6 + 1;
-	findField("view").lock()->setSize(newWidth, 9);
+	findField("view")->setText(viewNames[view]);
+	auto newWidth = findField("view")->getText().length() * 6 + 1;
+	findField("view")->setSize(newWidth, 9);
 }
 
 void StepEditorScreen::setView(int i)
@@ -1003,7 +1003,7 @@ void StepEditorScreen::setView(int i)
 	updateComponents();
 	setViewNotesText();
 	setyOffset(0);
-	findChild<Rectangle>().lock()->SetDirty();
+	findChild<Rectangle>()->SetDirty();
 }
 
 void StepEditorScreen::setNoteA(int i)
@@ -1201,7 +1201,7 @@ void StepEditorScreen::removeEvents()
 
 void StepEditorScreen::displayView()
 {
-	findField("view").lock()->setText(viewNames[view]);
+	findField("view")->setText(viewNames[view]);
 }
 
 void StepEditorScreen::update(moduru::observer::Observable*, nonstd::any message)
@@ -1288,7 +1288,7 @@ void StepEditorScreen::update(moduru::observer::Observable*, nonstd::any message
 		if (sequencer->isPlaying())
 			return;
 
-		findField("now0").lock()->setTextPadded(sequencer->getCurrentBarIndex() + 1, "0");
+		findField("now0")->setTextPadded(sequencer->getCurrentBarIndex() + 1, "0");
 		setyOffset(0);
 	}
 	else if (msg == "beat")
@@ -1296,7 +1296,7 @@ void StepEditorScreen::update(moduru::observer::Observable*, nonstd::any message
 		if (sequencer->isPlaying())
 			return;
 
-		findField("now1").lock()->setTextPadded(sequencer->getCurrentBeatIndex() + 1, "0");
+		findField("now1")->setTextPadded(sequencer->getCurrentBeatIndex() + 1, "0");
 		setyOffset(0);
 	}
 	else if (msg == "clock")
@@ -1304,7 +1304,7 @@ void StepEditorScreen::update(moduru::observer::Observable*, nonstd::any message
 		if (sequencer->isPlaying())
 			return;
 
-		findField("now2").lock()->setTextPadded(sequencer->getCurrentClockNumber(), "0");
+		findField("now2")->setTextPadded(sequencer->getCurrentClockNumber(), "0");
 		setyOffset(0);
 	}
 }
@@ -1344,7 +1344,7 @@ std::vector<std::weak_ptr<EventRow>> StepEditorScreen::findEventRows()
 	std::vector<std::weak_ptr<EventRow>> result;
 
 	for (int i = 0; i < 4; i++)
-		result.push_back(std::dynamic_pointer_cast<EventRow>(findChild("event-row-" + std::to_string(i)).lock()));
+		result.push_back(std::dynamic_pointer_cast<EventRow>(findChild("event-row-" + std::to_string(i))));
 
 	return result;
 }
@@ -1353,7 +1353,7 @@ void StepEditorScreen::adhocPlayNoteEvent(const std::shared_ptr<mpc::sequencer::
 {
     auto tick = noteEvent->getTick();
     noteEvent->setTick(-1);
-    auto eventHandler = mpc.getEventHandler().lock();
+    auto eventHandler = mpc.getEventHandler();
     auto tr = track.lock().get();
 
     MidiAdapter midiAdapter;

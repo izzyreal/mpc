@@ -16,11 +16,11 @@ Component::Component(const std::string& name)
 	this->name = name;
 }
 
-void Component::sendToBack(std::weak_ptr<Component> childToSendBack)
+void Component::sendToBack(std::shared_ptr<Component> childToSendBack)
 {
 	for (int i = 0; i < children.size(); i++)
 	{
-		if (children[i] == childToSendBack.lock())
+		if (children[i] == childToSendBack)
 		{
 			auto placeHolder = children[i];
 			children.erase(begin(children) + i);
@@ -78,18 +78,18 @@ bool Component::shouldNotDraw(std::vector<std::vector<bool>>* pixels)
 	return false;
 }
 
-std::weak_ptr<Parameter> Component::findParameter(const std::string& name)
+std::shared_ptr<Parameter> Component::findParameter(const std::string& nameOfParameterToFind)
 {
 	for (auto& c : children)
 	{
 		auto candidate = std::dynamic_pointer_cast<Parameter>(c);
 
-		if (candidate && candidate->getName().compare(name) == 0)
+		if (candidate && candidate->getName() == nameOfParameterToFind)
 		{
 			return candidate;
 		}
 
-		auto secondCandidate = c->findParameter(name).lock();
+		auto secondCandidate = c->findParameter(nameOfParameterToFind);
 
 		if (secondCandidate)
 		{
@@ -102,16 +102,16 @@ std::weak_ptr<Parameter> Component::findParameter(const std::string& name)
 
 
 
-std::weak_ptr<Label> Component::findLabel(const std::string& name)
+std::shared_ptr<Label> Component::findLabel(const std::string& nameOfLabelToFind)
 {
 	for (auto& c : children)
 	{
 		auto candidate = std::dynamic_pointer_cast<Label>(c);
 
-		if (candidate && candidate->getName().compare(name) == 0)
+		if (candidate && candidate->getName() == nameOfLabelToFind)
 			return candidate;
 
-		auto secondCandidate = c->findLabel(name).lock();
+		auto secondCandidate = c->findLabel(nameOfLabelToFind);
 
 		if (secondCandidate)
 			return secondCandidate;
@@ -120,16 +120,16 @@ std::weak_ptr<Label> Component::findLabel(const std::string& name)
 	return {};
 }
 
-std::weak_ptr<Field> Component::findField(const std::string& name)
+std::shared_ptr<Field> Component::findField(const std::string& nameOfFieldToFind)
 {
 	for (auto& c : children)
 	{
 		auto candidate = std::dynamic_pointer_cast<Field>(c);
 
-		if (candidate && candidate->getName().compare(name) == 0)
+		if (candidate && candidate->getName() == nameOfFieldToFind)
 			return candidate;
 
-		auto secondCandidate = c->findField(name).lock();
+		auto secondCandidate = c->findField(nameOfFieldToFind);
 
 		if (secondCandidate)
 			return secondCandidate;
@@ -138,9 +138,9 @@ std::weak_ptr<Field> Component::findField(const std::string& name)
 	return {};
 }
 
-std::vector<std::weak_ptr<Label>> Component::findLabels()
+std::vector<std::shared_ptr<Label>> Component::findLabels()
 {
-    std::vector<std::weak_ptr<Label>> result;
+    std::vector<std::shared_ptr<Label>> result;
 
 	for (auto& c : children)
 	{
@@ -155,9 +155,9 @@ std::vector<std::weak_ptr<Label>> Component::findLabels()
 	return result;
 }
 
-std::vector<std::weak_ptr<Field>> Component::findFields()
+std::vector<std::shared_ptr<Field>> Component::findFields()
 {
-    std::vector<std::weak_ptr<Field>> result;
+    std::vector<std::shared_ptr<Field>> result;
 
 	for (auto& c : children)
 	{
@@ -173,9 +173,9 @@ std::vector<std::weak_ptr<Field>> Component::findFields()
 	return result;
 }
 
-std::vector<std::weak_ptr<Parameter>> Component::findParameters()
+std::vector<std::shared_ptr<Parameter>> Component::findParameters()
 {
-    std::vector<std::weak_ptr<Parameter>> result;
+    std::vector<std::shared_ptr<Parameter>> result;
 	
 	for (auto& c : children)
 	{
@@ -189,11 +189,11 @@ std::vector<std::weak_ptr<Parameter>> Component::findParameters()
 	return result;
 }
 
-std::weak_ptr<Component> Component::addChild(std::shared_ptr<Component> child)
+std::shared_ptr<Component> Component::addChild(std::shared_ptr<Component> child)
 {
     if (dynamic_cast<ScreenComponent*>(this))
     {
-        auto background = findBackground().lock();
+        auto background = findBackground();
 
         if (background)
         {
@@ -207,16 +207,16 @@ std::weak_ptr<Component> Component::addChild(std::shared_ptr<Component> child)
 	return children.back();
 }
 
-void Component::removeChild(std::weak_ptr<Component> child)
+void Component::removeChild(std::shared_ptr<Component> child)
 {
-	if (!child.lock())
+	if (!child)
 		return;
 
 	for (auto& c : children)
 	{
-		if (c == child.lock())
+		if (c == child)
 		{
-			children.erase(find(begin(children), end(children), child.lock()));
+			children.erase(find(begin(children), end(children), child));
 			return;
 		}
 	}
@@ -225,20 +225,20 @@ void Component::removeChild(std::weak_ptr<Component> child)
 		c->removeChild(child);
 }
 
-void Component::addChildren(std::vector<std::shared_ptr<Component>> children)
+void Component::addChildren(std::vector<std::shared_ptr<Component>> childrenToAdd)
 {
-	for (auto& c : children)
+	for (auto& c : childrenToAdd)
 		addChild(c);
 }
 
-std::weak_ptr<Component> Component::findChild(const std::string& name)
+std::shared_ptr<Component> Component::findChild(const std::string& nameOfChildToFind)
 {
 	for (auto& c : children)
 	{
-		if (c->getName().compare(name) == 0)
+		if (c->getName() == nameOfChildToFind)
 			return c;
 
-		auto candidate = c->findChild(name).lock();
+		auto candidate = c->findChild(nameOfChildToFind);
 
 		if (candidate)
 			return candidate;
@@ -279,35 +279,35 @@ void Component::Hide(bool b)
 		c->Hide(b);
 }
 
-void Component::setSize(int w, int h)
+void Component::setSize(int newW, int newH)
 {
-	if (w == this->w && h == this->h)
+	if (newW == w && newH == h)
 		return;
 
-	if (!(this->w == -1 && this->h == -1))
+	if (!(w == -1 && h == -1))
 	{
 		auto rect = getRect();
 		preDrawClearRect = preDrawClearRect.Union(&rect);
 	}
 
-	this->w = w;
-	this->h = h;
+	w = newW;
+	h = newH;
 	SetDirty();
 }
 
-void Component::setLocation(int x, int y)
+void Component::setLocation(int newX, int newY)
 {
-	if (x == this->x && y == this->y)
+	if (newX == x && newY == y)
 		return;
 
-	if (!(this->x == -1 && this->y == -1))
+	if (!(x == -1 && y == -1))
 	{
 		auto rect = getRect();
 		preDrawClearRect = preDrawClearRect.Union(&rect);
 	}
 
-	this->x = x;
-	this->y = y;
+	x = newX;
+	y = newY;
 	SetDirty();
 }
 
@@ -417,9 +417,9 @@ void Component::preDrawClear(std::vector<std::vector<bool>>* pixels)
 	preDrawClearRect.Clear();
 }
 
-std::vector<std::weak_ptr<Component>> Component::findHiddenChildren()
+std::vector<std::shared_ptr<Component>> Component::findHiddenChildren()
 {
-    std::vector<std::weak_ptr<Component>> result;
+    std::vector<std::shared_ptr<Component>> result;
 
 	for (auto& c : children)
 	{
@@ -433,7 +433,7 @@ std::vector<std::weak_ptr<Component>> Component::findHiddenChildren()
 	return result;
 }
 
-std::weak_ptr<ScreenComponent> Component::findScreenComponent()
+std::shared_ptr<ScreenComponent> Component::findScreenComponent()
 {
 	for (auto& c : children)
 	{
@@ -442,7 +442,7 @@ std::weak_ptr<ScreenComponent> Component::findScreenComponent()
 		if (candidate)
 			return candidate;
 
-		auto childCandidate = c->findScreenComponent().lock();
+		auto childCandidate = c->findScreenComponent();
 
 		if (childCandidate)
 			return childCandidate;
@@ -451,16 +451,16 @@ std::weak_ptr<ScreenComponent> Component::findScreenComponent()
 	return {};
 }
 
-std::weak_ptr<Background> Component::findBackground()
+std::shared_ptr<Background> Component::findBackground()
 {
     return findChild<Background>("");
 }
 
-void Component::deleteChildren(const std::string& name)
+void Component::deleteChildren(const std::string& nameOfChildrenToDelete)
 {
 	for (int i = children.size() - 1; i >= 0; i--)
 	{
-		if (children[i]->getName().compare(name) == 0)
+		if (children[i]->getName() == nameOfChildrenToDelete)
 			children.erase(begin(children) + i);
 	}
 }

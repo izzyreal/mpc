@@ -285,33 +285,33 @@ void BarsScreen::turnWheel(int i)
 void BarsScreen::displayCopies()
 {
 	auto eventsScreen = mpc.screens->get<EventsScreen>("events");
-	findField("copies").lock()->setTextPadded(eventsScreen->copies, " ");
+	findField("copies")->setTextPadded(eventsScreen->copies, " ");
 }
 
 void BarsScreen::displayToSq()
 {
 	auto eventsScreen = mpc.screens->get<EventsScreen>("events");
-	findField("tosq").lock()->setText(std::to_string(eventsScreen->toSq + 1));
+	findField("tosq")->setText(std::to_string(eventsScreen->toSq + 1));
 }
 
 void BarsScreen::displayFromSq()
 {
-	findField("fromsq").lock()->setText(std::to_string(sequencer->getActiveSequenceIndex() + 1));
+	findField("fromsq")->setText(std::to_string(sequencer->getActiveSequenceIndex() + 1));
 }
 
 void BarsScreen::displayAfterBar()
 {
-	findField("afterbar").lock()->setText(std::to_string(afterBar));
+	findField("afterbar")->setText(std::to_string(afterBar));
 }
 
 void BarsScreen::displayLastBar()
 {
-	findField("lastbar").lock()->setText(std::to_string(lastBar + 1));
+	findField("lastbar")->setText(std::to_string(lastBar + 1));
 }
 
 void BarsScreen::displayFirstBar()
 {
-	findField("firstbar").lock()->setText(std::to_string(firstBar + 1));
+	findField("firstbar")->setText(std::to_string(firstBar + 1));
 }
 
 void BarsScreen::setLastBar(int i, int max)

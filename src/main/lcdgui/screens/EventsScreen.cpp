@@ -54,7 +54,7 @@ void EventsScreen::open()
 {
 	sequencer->move(0);
 
-	auto note1Field = findField("note1").lock();
+	auto note1Field = findField("note1");
 
 	if (setNote1X)
 	{
@@ -278,35 +278,35 @@ void EventsScreen::turnWheel(int i)
 void EventsScreen::displayStart()
 {
 	auto seq = sequencer->getSequence(toSq);
-	findField("start0").lock()->setTextPadded(SeqUtil::getBar(seq.get(), start) + 1, "0");
-	findField("start1").lock()->setTextPadded(SeqUtil::getBeat(seq.get(), start) + 1, "0");
-	findField("start2").lock()->setTextPadded(SeqUtil::getClock(seq.get(), start), "0");
+	findField("start0")->setTextPadded(SeqUtil::getBar(seq.get(), start) + 1, "0");
+	findField("start1")->setTextPadded(SeqUtil::getBeat(seq.get(), start) + 1, "0");
+	findField("start2")->setTextPadded(SeqUtil::getClock(seq.get(), start), "0");
 }
 
 void EventsScreen::displayTime()
 {
 	auto seq = sequencer->getActiveSequence();
-	findField("time0").lock()->setTextPadded(SeqUtil::getBar(seq.get(), time0) + 1, "0");
-	findField("time1").lock()->setTextPadded(SeqUtil::getBeat(seq.get(), time0) + 1, "0");
-	findField("time2").lock()->setTextPadded(SeqUtil::getClock(seq.get(), time0), "0");
-	findField("time3").lock()->setTextPadded(SeqUtil::getBar(seq.get(), time1) + 1, "0");
-	findField("time4").lock()->setTextPadded(SeqUtil::getBeat(seq.get(), time1) + 1, "0");
-	findField("time5").lock()->setTextPadded(SeqUtil::getClock(seq.get(), time1), "0");
+	findField("time0")->setTextPadded(SeqUtil::getBar(seq.get(), time0) + 1, "0");
+	findField("time1")->setTextPadded(SeqUtil::getBeat(seq.get(), time0) + 1, "0");
+	findField("time2")->setTextPadded(SeqUtil::getClock(seq.get(), time0), "0");
+	findField("time3")->setTextPadded(SeqUtil::getBar(seq.get(), time1) + 1, "0");
+	findField("time4")->setTextPadded(SeqUtil::getBeat(seq.get(), time1) + 1, "0");
+	findField("time5")->setTextPadded(SeqUtil::getClock(seq.get(), time1), "0");
 }
 
 void EventsScreen::displayCopies()
 {
 	if (editFunctionNumber == 0)
 	{
-		findField("copies").lock()->setTextPadded(copies);
+		findField("copies")->setTextPadded(copies);
 	}
 	else if (editFunctionNumber == 1)
 	{
-		findField("copies").lock()->setTextPadded(durationValue);
+		findField("copies")->setTextPadded(durationValue);
 	}
 	else if (editFunctionNumber == 2)
 	{
-		findField("copies").lock()->setTextPadded(velocityValue);
+		findField("copies")->setTextPadded(velocityValue);
 	}
 }
 
@@ -314,123 +314,123 @@ void EventsScreen::displayMode()
 {
 	if (editFunctionNumber == 0)
 	{
-		findField("mode").lock()->setText(modeMerge ? "MERGE" : "REPLACE");
+		findField("mode")->setText(modeMerge ? "MERGE" : "REPLACE");
 	}
 	if (editFunctionNumber == 1)
 	{
-		findField("mode").lock()->setText(modeNames[durationMode]);
+		findField("mode")->setText(modeNames[durationMode]);
 	}
 	if (editFunctionNumber == 2)
 	{
-		findField("mode").lock()->setText(modeNames[velocityMode]);
+		findField("mode")->setText(modeNames[velocityMode]);
 	}
 	if (editFunctionNumber == 3)
 	{
 		if (transposeAmount == 0)
 		{
-			findField("mode").lock()->setTextPadded(0);
+			findField("mode")->setTextPadded(0);
 		}
 		else if (transposeAmount < 0)
 		{
-			findField("mode").lock()->setTextPadded(transposeAmount);
+			findField("mode")->setTextPadded(transposeAmount);
 		}
 		else
 		{
-			findField("mode").lock()->setTextPadded("+" + std::to_string(transposeAmount));
+			findField("mode")->setTextPadded("+" + std::to_string(transposeAmount));
 		}
 	}
 }
 
 void EventsScreen::displayEdit()
 {
-	findField("edit").lock()->setText(functionNames[editFunctionNumber]);
+	findField("edit")->setText(functionNames[editFunctionNumber]);
 
 	if (editFunctionNumber == 0)
 	{
-		findLabel("from-sq").lock()->setLocation(132, 1);
-		findField("from-sq").lock()->setLocation(findField("from-sq").lock()->getX(), 1);
-		findLabel("from-tr").lock()->setLocation(findLabel("from-tr").lock()->getX(), 1);
-		findField("from-tr").lock()->setLocation(findField("from-tr").lock()->getX(), 1);
-		findLabel("mode").lock()->setText("Mode:");
-		findLabel("from-sq").lock()->setText("From sq:");
-		findField("to-sq").lock()->Hide(false);
-		findField("to-tr").lock()->Hide(false);
-		findField("start0").lock()->Hide(false);
-		findField("start1").lock()->Hide(false);
-		findField("start2").lock()->Hide(false);
-		findField("copies").lock()->Hide(false);
-		findLabel("to-sq").lock()->Hide(false);
-		findLabel("to-tr").lock()->Hide(false);
-		findLabel("start0").lock()->Hide(false);
-		findLabel("start1").lock()->Hide(false);
-		findLabel("start2").lock()->Hide(false);
-		findLabel("copies").lock()->setText("Copies:");
-		findLabel("copies").lock()->setSize(7 * 6 + 1, 7);
-		findLabel("copies").lock()->setLocation(138, 39);
-		findField("copies").lock()->setLocation(findField("copies").lock()->getX(), 38);
-		findLabel("mode").lock()->setLocation(150, 20);
-		findField("mode").lock()->setSize(7 * 6 + 1, 9);
-		findField("copies").lock()->setSize(3 * 6 + 1, 9);
+		findLabel("from-sq")->setLocation(132, 1);
+		findField("from-sq")->setLocation(findField("from-sq")->getX(), 1);
+		findLabel("from-tr")->setLocation(findLabel("from-tr")->getX(), 1);
+		findField("from-tr")->setLocation(findField("from-tr")->getX(), 1);
+		findLabel("mode")->setText("Mode:");
+		findLabel("from-sq")->setText("From sq:");
+		findField("to-sq")->Hide(false);
+		findField("to-tr")->Hide(false);
+		findField("start0")->Hide(false);
+		findField("start1")->Hide(false);
+		findField("start2")->Hide(false);
+		findField("copies")->Hide(false);
+		findLabel("to-sq")->Hide(false);
+		findLabel("to-tr")->Hide(false);
+		findLabel("start0")->Hide(false);
+		findLabel("start1")->Hide(false);
+		findLabel("start2")->Hide(false);
+		findLabel("copies")->setText("Copies:");
+		findLabel("copies")->setSize(7 * 6 + 1, 7);
+		findLabel("copies")->setLocation(138, 39);
+		findField("copies")->setLocation(findField("copies")->getX(), 38);
+		findLabel("mode")->setLocation(150, 20);
+		findField("mode")->setSize(7 * 6 + 1, 9);
+		findField("copies")->setSize(3 * 6 + 1, 9);
 	}
 	else if (editFunctionNumber == 1 || editFunctionNumber == 2)
 	{
-		findLabel("from-sq").lock()->setLocation(132, 3);
-		findField("from-sq").lock()->setLocation(findField("from-sq").lock()->getX(), 3);
-		findLabel("from-tr").lock()->setLocation(findLabel("from-tr").lock()->getX(), 3);
-		findField("from-tr").lock()->setLocation(findField("from-tr").lock()->getX(), 3);
-		findLabel("mode").lock()->setText("Mode:");
-		findLabel("from-sq").lock()->setText("Edit sq:");
-		findField("to-sq").lock()->Hide(true);
-		findField("to-tr").lock()->Hide(true);
-		findField("start0").lock()->Hide(true);
-		findField("start1").lock()->Hide(true);
-		findField("start2").lock()->Hide(true);
-		findField("copies").lock()->Hide(false);
-		findLabel("to-sq").lock()->Hide(true);
-		findLabel("to-tr").lock()->Hide(true);
-		findLabel("start0").lock()->Hide(true);
-		findLabel("start1").lock()->Hide(true);
-		findLabel("start2").lock()->Hide(true);
-		findLabel("copies").lock()->setText("Value:");
-		findLabel("copies").lock()->setSize(6 * 6 + 1, 7);
-		findLabel("copies").lock()->setLocation(144, 35);
-		findField("copies").lock()->setLocation(findField("copies").lock()->getX(), 34);
+		findLabel("from-sq")->setLocation(132, 3);
+		findField("from-sq")->setLocation(findField("from-sq")->getX(), 3);
+		findLabel("from-tr")->setLocation(findLabel("from-tr")->getX(), 3);
+		findField("from-tr")->setLocation(findField("from-tr")->getX(), 3);
+		findLabel("mode")->setText("Mode:");
+		findLabel("from-sq")->setText("Edit sq:");
+		findField("to-sq")->Hide(true);
+		findField("to-tr")->Hide(true);
+		findField("start0")->Hide(true);
+		findField("start1")->Hide(true);
+		findField("start2")->Hide(true);
+		findField("copies")->Hide(false);
+		findLabel("to-sq")->Hide(true);
+		findLabel("to-tr")->Hide(true);
+		findLabel("start0")->Hide(true);
+		findLabel("start1")->Hide(true);
+		findLabel("start2")->Hide(true);
+		findLabel("copies")->setText("Value:");
+		findLabel("copies")->setSize(6 * 6 + 1, 7);
+		findLabel("copies")->setLocation(144, 35);
+		findField("copies")->setLocation(findField("copies")->getX(), 34);
 		
 		if (editFunctionNumber == 2)
 		{
-			findField("copies").lock()->setSize(3 * 6 + 1, 9);
+			findField("copies")->setSize(3 * 6 + 1, 9);
 		}
 		else
 		{
-			findField("copies").lock()->setSize(4 * 6 + 1, 9);
+			findField("copies")->setSize(4 * 6 + 1, 9);
 		}
-		findLabel("mode").lock()->setLocation(150, 20);
-		findField("mode").lock()->setSize(10 * 6 + 1, 9);
+		findLabel("mode")->setLocation(150, 20);
+		findField("mode")->setSize(10 * 6 + 1, 9);
 	}
 	else if (editFunctionNumber == 3)
 	{
-		findLabel("from-sq").lock()->setLocation(132, 3);
-		findField("from-sq").lock()->setLocation(findField("from-sq").lock()->getX(), 3);
-		findLabel("from-tr").lock()->setLocation(findLabel("from-tr").lock()->getX(), 3);
-		findField("from-tr").lock()->setLocation(findField("from-tr").lock()->getX(), 3);
-		findLabel("mode").lock()->setText("Amount:");
-		findLabel("from-sq").lock()->setText("Edit sq:");
-		findField("to-sq").lock()->Hide(true);
-		findField("to-tr").lock()->Hide(true);
-		findField("start0").lock()->Hide(true);
-		findField("start1").lock()->Hide(true);
-		findField("start2").lock()->Hide(true);
-		findField("copies").lock()->Hide(true);
-		findLabel("to-sq").lock()->Hide(true);
-		findLabel("to-tr").lock()->Hide(true);
-		findLabel("start0").lock()->Hide(true);
-		findLabel("start1").lock()->Hide(true);
-		findLabel("start2").lock()->Hide(true);
-		findLabel("copies").lock()->setText("(Except drum track)");
-		findLabel("copies").lock()->setLocation(132, 38);
-		findLabel("copies").lock()->setSize(113, 7);
-		findLabel("mode").lock()->setLocation(138, 20);
-		findField("mode").lock()->setSize(3 * 6 + 1, 9);
+		findLabel("from-sq")->setLocation(132, 3);
+		findField("from-sq")->setLocation(findField("from-sq")->getX(), 3);
+		findLabel("from-tr")->setLocation(findLabel("from-tr")->getX(), 3);
+		findField("from-tr")->setLocation(findField("from-tr")->getX(), 3);
+		findLabel("mode")->setText("Amount:");
+		findLabel("from-sq")->setText("Edit sq:");
+		findField("to-sq")->Hide(true);
+		findField("to-tr")->Hide(true);
+		findField("start0")->Hide(true);
+		findField("start1")->Hide(true);
+		findField("start2")->Hide(true);
+		findField("copies")->Hide(true);
+		findLabel("to-sq")->Hide(true);
+		findLabel("to-tr")->Hide(true);
+		findLabel("start0")->Hide(true);
+		findLabel("start1")->Hide(true);
+		findLabel("start2")->Hide(true);
+		findLabel("copies")->setText("(Except drum track)");
+		findLabel("copies")->setLocation(132, 38);
+		findLabel("copies")->setSize(113, 7);
+		findLabel("mode")->setLocation(138, 20);
+		findField("mode")->setSize(3 * 6 + 1, 9);
 	}
 	
 	displayCopies();
@@ -448,33 +448,33 @@ void EventsScreen::displayNotes()
 	
 	if (sequencer->getActiveTrack()->getBus() == 0)
 	{
-		findField("note0").lock()->setSize(47, 9);
-		findField("note1").lock()->Hide(false);
-		findLabel("note1").lock()->Hide(false);
-		findField("note0").lock()->setAlignment(Alignment::Centered, 18);
+		findField("note0")->setSize(47, 9);
+		findField("note1")->Hide(false);
+		findLabel("note1")->Hide(false);
+		findField("note0")->setAlignment(Alignment::Centered, 18);
 		displayMidiNotes();
 	}
 	else
 	{
-		findField("note0").lock()->setSize(37, 9);
-		findField("note1").lock()->Hide(true);
-		findLabel("note1").lock()->Hide(true);
-		findField("note0").lock()->setAlignment(Alignment::None);
+		findField("note0")->setSize(37, 9);
+		findField("note1")->Hide(true);
+		findLabel("note1")->Hide(true);
+		findField("note0")->setAlignment(Alignment::None);
 		displayDrumNotes();
 	}
 }
 
 void EventsScreen::displayMidiNotes()
 {
-	findField("note0").lock()->setText(StrUtil::padLeft(std::to_string(note0), " ", 3) + "(" + mpc::Util::noteNames()[note0] + u8"\u00D4");
-	findField("note1").lock()->setText(StrUtil::padLeft(std::to_string(note1), " ", 3) + "(" + mpc::Util::noteNames()[note1] + u8"\u00D4");
+	findField("note0")->setText(StrUtil::padLeft(std::to_string(note0), " ", 3) + "(" + mpc::Util::noteNames()[note0] + u8"\u00D4");
+	findField("note1")->setText(StrUtil::padLeft(std::to_string(note1), " ", 3) + "(" + mpc::Util::noteNames()[note1] + u8"\u00D4");
 }
 
 void EventsScreen::displayDrumNotes()
 {
 	if (note0 == 34)
 	{
-		findField("note0").lock()->setText("ALL");
+		findField("note0")->setText("ALL");
 	}
 	else
 	{
@@ -483,7 +483,7 @@ void EventsScreen::displayDrumNotes()
 		
 		auto noteText = StrUtil::padLeft(std::to_string(note0), " ", 2);
 		auto padName = sampler->getPadName(program->getPadIndexFromNote(note0));
-		findField("note0").lock()->setText(noteText + "/" + padName);
+		findField("note0")->setText(noteText + "/" + padName);
 	}
 }
 
@@ -621,22 +621,22 @@ void EventsScreen::setStart(int i)
 
 void EventsScreen::displayFromSq()
 {
-	findField("from-sq").lock()->setTextPadded(sequencer->getActiveSequenceIndex() + 1);
+	findField("from-sq")->setTextPadded(sequencer->getActiveSequenceIndex() + 1);
 }
 
 void EventsScreen::displayFromTr()
 {
-	findField("from-tr").lock()->setTextPadded(sequencer->getActiveTrackIndex() + 1);
+	findField("from-tr")->setTextPadded(sequencer->getActiveTrackIndex() + 1);
 }
 
 void EventsScreen::displayToSq()
 {
-	findField("to-sq").lock()->setTextPadded(toSq + 1);
+	findField("to-sq")->setTextPadded(toSq + 1);
 }
 
 void EventsScreen::displayToTr()
 {
-	findField("to-tr").lock()->setTextPadded(toTr + 1);
+	findField("to-tr")->setTextPadded(toTr + 1);
 }
 
 void EventsScreen::performCopy(int sourceStart, int sourceEnd, int toSequenceIndex, int destStart,

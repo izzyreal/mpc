@@ -60,7 +60,7 @@ void MuteAssignScreen::displayNote()
         soundName = sampler->getSoundName(sound);
     }
 
-	findField("note").lock()->setText(std::to_string(note) + "/" + padName + "-" + soundName);
+	findField("note")->setText(std::to_string(note) + "/" + padName + "-" + soundName);
 }
 
 void MuteAssignScreen::displayNote0()
@@ -70,7 +70,7 @@ void MuteAssignScreen::displayNote0()
 
 	if (note0 == 34)
 	{
-		findField("note0").lock()->setText("--");
+		findField("note0")->setText("--");
 		return;
 	}
 
@@ -83,7 +83,7 @@ void MuteAssignScreen::displayNote0()
 		soundName = sampler->getSoundName(sound);
 	}
 
-	findField("note0").lock()->setText(std::to_string(note0) + "/" + sampler->getPadName(pad) + "-" + soundName);
+	findField("note0")->setText(std::to_string(note0) + "/" + sampler->getPadName(pad) + "-" + soundName);
 }
 
 void MuteAssignScreen::displayNote1()
@@ -92,7 +92,7 @@ void MuteAssignScreen::displayNote1()
 
 	if (note1 == 34)
 	{
-		findField("note1").lock()->setText("--");
+		findField("note1")->setText("--");
 		return;
 	}
 	
@@ -105,7 +105,7 @@ void MuteAssignScreen::displayNote1()
 		soundName = sampler->getSoundName(sound);
 	}
 
-	findField("note1").lock()->setText(std::to_string(note1) + "/" + sampler->getPadName(pad) + "-" + soundName);
+	findField("note1")->setText(std::to_string(note1) + "/" + sampler->getPadName(pad) + "-" + soundName);
 }
 
 void MuteAssignScreen::update(moduru::observer::Observable* o, nonstd::any arg)

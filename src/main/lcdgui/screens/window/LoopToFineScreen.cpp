@@ -11,20 +11,19 @@ using namespace mpc::lcdgui::screens::window;
 LoopToFineScreen::LoopToFineScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "loop-to-fine", layerIndex)
 {
-	addChild(std::move(std::make_shared<Wave>()));
-	findWave().lock()->setFine(true);
+    addChildT<Wave>()->setFine(true);
 }
 
 void LoopToFineScreen::open()
 {
     mpc.getControls().lock()->getControls()->typableParams = { "to", "lngth" };
 
-    findField("loop-lngth").lock()->setAlignment(Alignment::Centered);
+    findField("loop-lngth")->setAlignment(Alignment::Centered);
 	displayTo();
-	findField("to").lock()->enableTwoDots();
+	findField("to")->enableTwoDots();
 	displayLngthField();
 	displayLoopLngth();
-	findField("lngth").lock()->enableTwoDots();
+	findField("lngth")->enableTwoDots();
 
 	displayPlayX();
 	displayFineWave();
@@ -33,7 +32,7 @@ void LoopToFineScreen::open()
 void LoopToFineScreen::displayLoopLngth()
 {
 	auto loopScreen = mpc.screens->get<LoopScreen>("loop");
-	findField("loop-lngth").lock()->setText(loopScreen->loopLngthFix ? "FIX" : "VARI");
+	findField("loop-lngth")->setText(loopScreen->loopLngthFix ? "FIX" : "VARI");
 }
 
 void LoopToFineScreen::displayLngthField()
@@ -45,7 +44,7 @@ void LoopToFineScreen::displayLngthField()
 		return;
 	}
 
-	findField("lngth").lock()->setTextPadded(sound->getEnd() - sound->getLoopTo(), " ");
+	findField("lngth")->setTextPadded(sound->getEnd() - sound->getLoopTo(), " ");
 }
 
 void LoopToFineScreen::displayFineWave()
@@ -58,13 +57,13 @@ void LoopToFineScreen::displayFineWave()
 		return;
 	}
 
-	findWave().lock()->setSampleData(sound->getSampleData(), sound->isMono(), trimScreen->view);
-	findWave().lock()->setCenterSamplePos(sound->getLoopTo());
+	findWave()->setSampleData(sound->getSampleData(), sound->isMono(), trimScreen->view);
+	findWave()->setCenterSamplePos(sound->getLoopTo());
 }
 
 void LoopToFineScreen::displayPlayX()
 {
-    findField("playx").lock()->setText(playXNames[sampler->getPlayX()]);
+    findField("playx")->setText(playXNames[sampler->getPlayX()]);
 }
 
 void LoopToFineScreen::displayTo()
@@ -76,7 +75,7 @@ void LoopToFineScreen::displayTo()
 		return;
 	}
 
-	findField("to").lock()->setTextPadded(sound->getLoopTo(), " ");
+	findField("to")->setTextPadded(sound->getLoopTo(), " ");
 }
 
 void LoopToFineScreen::function(int i)
@@ -87,10 +86,10 @@ void LoopToFineScreen::function(int i)
 	switch (i)
 	{
 	case 1:
-		findWave().lock()->zoomPlus();
+		findWave()->zoomPlus();
 		break;
 	case 2:
-		findWave().lock()->zoomMinus();
+		findWave()->zoomMinus();
 		break;
 	case 4:
 		sampler->playX();
@@ -107,7 +106,7 @@ void LoopToFineScreen::turnWheel(int i)
 	auto loopScreen = mpc.screens->get<LoopScreen>("loop");
 	
 	auto soundInc = getSoundIncrement(i);
-	auto field = findField(param).lock();
+	auto field = findField(param);
 
 	if (field->isSplit())
 		soundInc = field->getSplitIncrement(i >= 0);

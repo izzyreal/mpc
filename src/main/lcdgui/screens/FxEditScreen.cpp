@@ -20,7 +20,7 @@ FxEditScreen::FxEditScreen(mpc::Mpc& mpc, const int layerIndex)
 	{
 		int x = (i * (effectWidth + effectDistance)) + effectOffset;
 		MRECT r(x, effectY, x + effectWidth - 1, effectY + effectHeight - 1);
-		addChild(std::make_shared<Effect>(r));
+		addChildT<Effect>(r);
 	}
 
 }
@@ -117,15 +117,15 @@ void FxEditScreen::checkEffects() {
 void FxEditScreen::displayDrum()
 {
 	auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>("mixer-setup");
-	findField("drum").lock()->setText(std::to_string(mixerSetupScreen->getFxDrum() + 1));
+	findField("drum")->setText(std::to_string(mixerSetupScreen->getFxDrum() + 1));
 }
 
 void FxEditScreen::displayPgm()
 {
-	findField("pgm").lock()->setText("foo");
+	findField("pgm")->setText("foo");
 }
 
 void FxEditScreen::displayEdit()
 {
-	findField("edit").lock()->setText("foo");
+	findField("edit")->setText("foo");
 }

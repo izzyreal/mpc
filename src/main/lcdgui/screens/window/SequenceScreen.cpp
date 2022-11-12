@@ -11,11 +11,11 @@ SequenceScreen::SequenceScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void SequenceScreen::open()
 {
-	auto sequenceNameRestLabel = findLabel("sequencenamerest").lock();
-	auto defaultSequenceNameRestLabel = findLabel("defaultnamerest").lock();
+	auto sequenceNameRestLabel = findLabel("sequencenamerest");
+	auto defaultSequenceNameRestLabel = findLabel("defaultnamerest");
 
-	auto sequenceNameFirstLetterField = findField("sequencenamefirstletter").lock();
-	auto defaultSequenceNameFirstLetterField = findField("defaultnamefirstletter").lock();
+	auto sequenceNameFirstLetterField = findField("sequencenamefirstletter");
+	auto defaultSequenceNameFirstLetterField = findField("defaultnamefirstletter");
 
 	auto seq = sequencer->getActiveSequence();
 

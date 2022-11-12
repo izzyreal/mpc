@@ -55,20 +55,20 @@ void VeloPitchScreen::displayTune()
 {
 	auto value = sampler->getLastNp(program.lock().get())->getTune();
     std::string prefix = value < 0 ? "-" : " ";
-	findField("tune").lock()->setText(prefix + StrUtil::padLeft(std::to_string(abs(value)), " ", 3));
+	findField("tune")->setText(prefix + StrUtil::padLeft(std::to_string(abs(value)), " ", 3));
 }
 
 void VeloPitchScreen::displayVeloPitch()
 {
 	auto value = sampler->getLastNp(program.lock().get())->getVelocityToPitch();
     std::string prefix = value < 0 ? "-" : " ";
-	findField("velo-pitch").lock()->setText(prefix + StrUtil::padLeft(std::to_string(abs(value)), " ", 3));
+	findField("velo-pitch")->setText(prefix + StrUtil::padLeft(std::to_string(abs(value)), " ", 3));
 }
 
 
 void VeloPitchScreen::displayVelo()
 {
-	findField("velo").lock()->setText("127");
+	findField("velo")->setText("127");
 }
 
 void VeloPitchScreen::update(moduru::observer::Observable* observable, nonstd::any message)
@@ -91,5 +91,5 @@ void VeloPitchScreen::displayNote()
 	auto padName = sampler->getPadName(padIndex);
 	auto sampleName = soundIndex != -1 ? sampler->getSoundName(soundIndex) : "OFF";
     std::string stereo = noteParameters->getStereoMixerChannel().lock()->isStereo() && soundIndex != -1 ? "(ST)" : "";
-	findField("note").lock()->setText(std::to_string(noteParameters->getNumber()) + "/" + padName + "-" + StrUtil::padRight(sampleName, " ", 16) + stereo);
+	findField("note")->setText(std::to_string(noteParameters->getNumber()) + "/" + padName + "-" + StrUtil::padRight(sampleName, " ", 16) + stereo);
 }

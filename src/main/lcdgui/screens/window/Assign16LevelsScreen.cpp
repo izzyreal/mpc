@@ -152,36 +152,36 @@ void Assign16LevelsScreen::displayNote()
 
     auto noteName = note == 34 ? "--" : std::to_string(note);
 
-    findField("note").lock()->setText(noteName + "/" + padName + "-" + soundName);
+    findField("note")->setText(noteName + "/" + padName + "-" + soundName);
 }
 
 void Assign16LevelsScreen::displayParameter()
 {
-    findField("param").lock()->setText(paramNames[parameter]);
+    findField("param")->setText(paramNames[parameter]);
 }
 
 void Assign16LevelsScreen::displayType()
 {
     displayOriginalKeyPad();
 
-    findField("type").lock()->Hide(parameter != 1);
-    findLabel("type").lock()->Hide(parameter != 1);
+    findField("type")->Hide(parameter != 1);
+    findLabel("type")->Hide(parameter != 1);
 
     if (parameter != 1)
         return;
 
-    findField("type").lock()->setText(typeNames[type]);
+    findField("type")->setText(typeNames[type]);
 }
 
 void Assign16LevelsScreen::displayOriginalKeyPad()
 {
-    findField("originalkeypad").lock()->Hide(!(parameter == 1 && type == 0));
-    findLabel("originalkeypad").lock()->Hide(!(parameter == 1 && type == 0));
+    findField("originalkeypad")->Hide(!(parameter == 1 && type == 0));
+    findLabel("originalkeypad")->Hide(!(parameter == 1 && type == 0));
 
     if (type != 0)
         return;
 
-    findField("originalkeypad").lock()->setTextPadded(originalKeyPad + 1, " ");
+    findField("originalkeypad")->setTextPadded(originalKeyPad + 1, " ");
 }
 
 void Assign16LevelsScreen::openWindow()

@@ -39,7 +39,7 @@ void MidiSwScreen::displaySwitchLabels()
 {
     for (int i = 0; i < 4; i++)
     {
-        auto label = findChild<TextComp>("switch" + std::to_string(i)).lock();
+        auto label = findChild<TextComp>("switch" + std::to_string(i));
         label->setText("Switch " + std::to_string(i + 1 + xOffset));
     }
 }
@@ -50,8 +50,8 @@ void MidiSwScreen::displayCtrlsAndFunctions()
     {
         auto association = controllerToFunctionMapping[i + xOffset];
         
-        auto ctrlField = findChild<Field>("ctrl" + std::to_string(i)).lock();
-        auto functionField = findChild<Field>("function" + std::to_string(i)).lock();
+        auto ctrlField = findChild<Field>("ctrl" + std::to_string(i));
+        auto functionField = findChild<Field>("function" + std::to_string(i));
         
         auto ctrl = association.first;
         ctrlField->setText(ctrl == 0 ? "OFF" : std::to_string(ctrl - 1));

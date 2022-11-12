@@ -160,13 +160,13 @@ void SyncScreen::setReceiveMMCEnabled(bool b)
 void SyncScreen::displayShiftEarly()
 {
     if (modeIn == 0) {
-        findLabel("shift-early").lock()->Hide(true);
-        findField("shift-early").lock()->Hide(true);
+        findLabel("shift-early")->Hide(true);
+        findField("shift-early")->Hide(true);
     }
     else if (modeIn == 1)
     {
-        auto label = findLabel("shift-early").lock();
-        auto field = findField("shift-early").lock();
+        auto label = findLabel("shift-early");
+        auto field = findField("shift-early");
         label->Hide(false);
         field->Hide(false);
         field->setLocation(100, field->getY());
@@ -175,8 +175,8 @@ void SyncScreen::displayShiftEarly()
     }
     else if (modeIn == 2)
     {
-        auto label = findLabel("shift-early").lock();
-        auto field = findField("shift-early").lock();
+        auto label = findLabel("shift-early");
+        auto field = findField("shift-early");
         label->Hide(false);
         field->Hide(false);
         field->setLocation(70, field->getY());
@@ -188,7 +188,7 @@ void SyncScreen::displayShiftEarly()
 void SyncScreen::displayIn()
 {
     auto result = std::to_string(in + 1);
-    findField("in").lock()->setText(result);
+    findField("in")->setText(result);
 }
 
 void SyncScreen::displayOut()
@@ -204,29 +204,29 @@ void SyncScreen::displayOut()
         outText = "A/B";
     }
     
-    findField("out").lock()->setText(outText);
+    findField("out")->setText(outText);
 }
 
 void SyncScreen::displayModeIn()
 {
-    findField("mode-in").lock()->setText(modeNames[getModeIn()]);
+    findField("mode-in")->setText(modeNames[getModeIn()]);
 }
 
 void SyncScreen::displayModeOut()
 {
-    findField("mode-out").lock()->setText(modeNames[getModeOut()]);
+    findField("mode-out")->setText(modeNames[getModeOut()]);
 }
 
 void SyncScreen::displayReceiveMMC()
 {
     auto mmc = std::string(receiveMMCEnabled ? "ON" : "OFF");
-    findField("receive-mmc").lock()->setText(mmc);
+    findField("receive-mmc")->setText(mmc);
 }
 
 void SyncScreen::displaySendMMC()
 {
     auto mmc = std::string(sendMMCEnabled ? "ON" : "OFF");
-    findField("send-mmc").lock()->setText(mmc);
+    findField("send-mmc")->setText(mmc);
 }
 
 int SyncScreen::getModeIn()

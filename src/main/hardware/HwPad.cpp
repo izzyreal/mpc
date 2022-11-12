@@ -29,7 +29,7 @@ void HwPad::push(int velo)
 
     padIndexWithBankWhenLastPressed = index + (mpc.getBank() * 16);
 
-    auto c = mpc.getActiveControls().lock();
+    auto c = mpc.getActiveControls();
 
     if (!c)
         return;

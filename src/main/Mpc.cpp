@@ -181,7 +181,7 @@ std::weak_ptr<audiomidi::AudioMidiServices> Mpc::getAudioMidiServices()
     return audioMidiServices;
 }
 
-std::weak_ptr<audiomidi::EventHandler> Mpc::getEventHandler() {
+std::shared_ptr<audiomidi::EventHandler> Mpc::getEventHandler() {
 	return eventHandler;
 }
 
@@ -189,8 +189,8 @@ std::weak_ptr<lcdgui::LayeredScreen> Mpc::getLayeredScreen() {
 	return layeredScreen;
 }
 
-std::weak_ptr<lcdgui::ScreenComponent> Mpc::getActiveControls() {
-	return layeredScreen->findScreenComponent().lock();
+std::shared_ptr<lcdgui::ScreenComponent> Mpc::getActiveControls() {
+	return layeredScreen->findScreenComponent();
 }
 
 std::shared_ptr<mpc::controls::GlobalReleaseControls> Mpc::getReleaseControls() {

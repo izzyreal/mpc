@@ -341,7 +341,7 @@ Screens::get(const std::string &screenName, int &foundInLayer, std::string &firs
                     tfsize[i - skipCounter].GetInt()));
 
             auto parameter = components.back();
-            auto field = parameter->findField(parameterName).lock();
+            auto field = parameter->findField(parameterName);
 
             if (i == 0)
             {
@@ -886,7 +886,7 @@ std::shared_ptr <ScreenComponent> Screens::getScreenComponent(const std::string 
     else if (screenName == "mpc2000xl" || screenName == "black" || screenName == "half-black" || screenName == "empty")
     {
         screen = std::make_shared<StaticScreen>(mpc);
-        screen->findChild<Background>("").lock()->setName(screenName);
+        screen->findBackground()->setName(screenName);
     }
     else if (screenName == "sound-memory")
     {
@@ -963,7 +963,7 @@ std::shared_ptr <ScreenComponent> Screens::getScreenComponent(const std::string 
 
     if (screen)
     {
-        screen->findChild<Background>("").lock()->addChildren(children);
+        screen->findBackground()->addChildren(children);
         screen->setTransferMap(transferMap);
         screen->setFirstField(firstField);
         screens[screenName] = screen;

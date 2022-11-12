@@ -18,8 +18,8 @@ PgmAssignScreen::PgmAssignScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void PgmAssignScreen::open()
 {
-	findField("pad-assign").lock()->setAlignment(Alignment::Centered);
-	findField("pad-assign").lock()->setLocation(194, 11);
+	findField("pad-assign")->setAlignment(Alignment::Centered);
+	findField("pad-assign")->setLocation(194, 11);
 
 	mpc.addObserver(this);
 	displayNote();
@@ -230,7 +230,7 @@ void PgmAssignScreen::openWindow()
 
 void PgmAssignScreen::displayPgm()
 {
-	findField("pgm").lock()->setText(StrUtil::padLeft(std::to_string(mpcSoundPlayerChannel->getProgram() + 1), " ", 2) + "-" + program.lock()->getName());
+	findField("pgm")->setText(StrUtil::padLeft(std::to_string(mpcSoundPlayerChannel->getProgram() + 1), " ", 2) + "-" + program.lock()->getName());
 }
 
 void PgmAssignScreen::displaySoundName()
@@ -239,28 +239,28 @@ void PgmAssignScreen::displaySoundName()
 
 	if (sndNumber == -1)
 	{
-		findField("snd").lock()->setText("OFF");
-		findLabel("issoundstereo").lock()->setText("");
+		findField("snd")->setText("OFF");
+		findLabel("issoundstereo")->setText("");
 	}
 	else
 	{
 		auto name = sampler->getSoundName(sndNumber);
-		findField("snd").lock()->setText(name);
+		findField("snd")->setText(name);
 	}
 
 	if (sampler->getSoundCount() != 0 && sndNumber != -1)
 	{
 		if (sampler->getSound(sndNumber).lock()->isMono())
-			findLabel("issoundstereo").lock()->setText("");
+			findLabel("issoundstereo")->setText("");
 		else
-			findLabel("issoundstereo").lock()->setText("(ST)");
+			findLabel("issoundstereo")->setText("(ST)");
 	}
 }
 
 void PgmAssignScreen::displayPadAssign()
 {
 	init();
-	findField("pad-assign").lock()->setText(padAssign ? "MASTER" : "PROGRAM");
+	findField("pad-assign")->setText(padAssign ? "MASTER" : "PROGRAM");
 }
 
 void PgmAssignScreen::displayPadNote()
@@ -269,9 +269,9 @@ void PgmAssignScreen::displayPadNote()
 	auto lProgram = program.lock();
 
 	if (sampler->getLastPad(lProgram.get())->getNote() == 34)
-		findField("pad-note").lock()->setText("--");
+		findField("pad-note")->setText("--");
 	else
-		findField("pad-note").lock()->setText(std::to_string(sampler->getLastPad(lProgram.get())->getNote()));
+		findField("pad-note")->setText(std::to_string(sampler->getLastPad(lProgram.get())->getNote()));
 }
 
 void PgmAssignScreen::displaySoundGenerationMode()
@@ -283,35 +283,35 @@ void PgmAssignScreen::displaySoundGenerationMode()
 	if (sampler->getLastNp(lProgram.get()) != nullptr)
 	{
 		sgm = sampler->getLastNp(lProgram.get())->getSoundGenerationMode();
-		findField("mode").lock()->setText(soundGenerationModes[sgm]);
+		findField("mode")->setText(soundGenerationModes[sgm]);
 		
 		if (sgm != 0)
 		{
-			findLabel("velocity-range-lower").lock()->Hide(true);
-			findField("velocity-range-lower").lock()->Hide(true);
-			findLabel("velocity-range-upper").lock()->Hide(true);
-			findField("velocity-range-upper").lock()->Hide(true);
-			findField("optional-note-a").lock()->Hide(false);
-			findLabel("optional-note-a").lock()->Hide(false);
-			findLabel("optional-note-b").lock()->Hide(false);
-			findField("optional-note-b").lock()->Hide(false);
-			findLabel("optional-note-a").lock()->setText("Also play note:");
-			findLabel("optional-note-b").lock()->setText("Also play note:");
+			findLabel("velocity-range-lower")->Hide(true);
+			findField("velocity-range-lower")->Hide(true);
+			findLabel("velocity-range-upper")->Hide(true);
+			findField("velocity-range-upper")->Hide(true);
+			findField("optional-note-a")->Hide(false);
+			findLabel("optional-note-a")->Hide(false);
+			findLabel("optional-note-b")->Hide(false);
+			findField("optional-note-b")->Hide(false);
+			findLabel("optional-note-a")->setText("Also play note:");
+			findLabel("optional-note-b")->setText("Also play note:");
 			displayOptionalNoteA();
 			displayOptionalNoteB();
 		}
 		
 		if (sgm == 2 || sgm == 3)
 		{
-			findLabel("optional-note-a").lock()->setText("over:    , use:");
-			findLabel("optional-note-b").lock()->setText("over:    , use:");
+			findLabel("optional-note-a")->setText("over:    , use:");
+			findLabel("optional-note-b")->setText("over:    , use:");
 			
-			findLabel("velocity-range-lower").lock()->Hide(false);
-			findField("velocity-range-lower").lock()->Hide(false);
-			findLabel("velocity-range-upper").lock()->Hide(false);
-			findField("velocity-range-upper").lock()->Hide(false);
-			bringToFront(findField("velocity-range-lower").lock().get());
-			bringToFront(findField("velocity-range-upper").lock().get());
+			findLabel("velocity-range-lower")->Hide(false);
+			findField("velocity-range-lower")->Hide(false);
+			findLabel("velocity-range-upper")->Hide(false);
+			findField("velocity-range-upper")->Hide(false);
+			bringToFront(findField("velocity-range-lower").get());
+			bringToFront(findField("velocity-range-upper").get());
 			
 			displayVeloRangeLower();
 			displayVeloRangeUpper();
@@ -320,14 +320,14 @@ void PgmAssignScreen::displaySoundGenerationMode()
 
 	if (sampler->getLastNp(lProgram.get()) == nullptr || sgm == -1 || sgm == 0)
 	{
-		findLabel("velocity-range-lower").lock()->Hide(true);
-		findField("velocity-range-lower").lock()->Hide(true);
-		findLabel("velocity-range-upper").lock()->Hide(true);
-		findField("velocity-range-upper").lock()->Hide(true);
-		findLabel("optional-note-a").lock()->Hide(true);
-		findField("optional-note-a").lock()->Hide(true);
-		findLabel("optional-note-b").lock()->Hide(true);
-		findField("optional-note-b").lock()->Hide(true);
+		findLabel("velocity-range-lower")->Hide(true);
+		findField("velocity-range-lower")->Hide(true);
+		findLabel("velocity-range-upper")->Hide(true);
+		findField("velocity-range-upper")->Hide(true);
+		findLabel("optional-note-a")->Hide(true);
+		findField("optional-note-a")->Hide(true);
+		findLabel("optional-note-b")->Hide(true);
+		findField("optional-note-b")->Hide(true);
 	}
 }
 
@@ -335,14 +335,14 @@ void PgmAssignScreen::displayVeloRangeUpper()
 {
 	init();
 	auto rangeB = sampler->getLastNp(program.lock().get())->getVelocityRangeUpper();
-	findField("velocity-range-upper").lock()->setTextPadded(rangeB, " ");
+	findField("velocity-range-upper")->setTextPadded(rangeB, " ");
 }
 
 void PgmAssignScreen::displayVeloRangeLower()
 {
 	init();
 	auto rangeA = sampler->getLastNp(program.lock().get())->getVelocityRangeLower();
-	findField("velocity-range-lower").lock()->setTextPadded(rangeA, " ");
+	findField("velocity-range-lower")->setTextPadded(rangeA, " ");
 }
 
 void PgmAssignScreen::displayOptionalNoteA()
@@ -353,7 +353,7 @@ void PgmAssignScreen::displayOptionalNoteA()
 	auto padIntA = lProgram->getPadIndexFromNote(noteIntA);
 	auto noteA = noteIntA != 34 ? std::to_string(noteIntA) : "--";
 	auto padA = sampler->getPadName(padIntA);
-	findField("optional-note-a").lock()->setText(noteA + "/" + padA);
+	findField("optional-note-a")->setText(noteA + "/" + padA);
 }
 
 void PgmAssignScreen::displayOptionalNoteB()
@@ -364,19 +364,19 @@ void PgmAssignScreen::displayOptionalNoteB()
 	auto padIntB = lProgram->getPadIndexFromNote(noteIntB);
 	auto noteB = noteIntB != 34 ? std::to_string(noteIntB) : "--";
 	auto padB = sampler->getPadName(padIntB);
-	findField("optional-note-b").lock()->setText(noteB + "/" + padB);
+	findField("optional-note-b")->setText(noteB + "/" + padB);
 }
 
 void PgmAssignScreen::displayNote()
 {
 	init();
-	findField("note").lock()->setText(std::to_string(sampler->getLastNp(program.lock().get())->getNumber()));
+	findField("note")->setText(std::to_string(sampler->getLastNp(program.lock().get())->getNumber()));
 }
 
 void PgmAssignScreen::displayPad()
 {
 	init();
-	findField("pad").lock()->setText(sampler->getPadName(mpc.getPad()));
+	findField("pad")->setText(sampler->getPadName(mpc.getPad()));
 }
 
 void PgmAssignScreen::update(moduru::observer::Observable* o, nonstd::any arg)

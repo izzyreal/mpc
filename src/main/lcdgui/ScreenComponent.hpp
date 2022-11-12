@@ -43,20 +43,12 @@ namespace mpc::lcdgui
 		ctoot::mpc::MpcSoundPlayerChannel* mpcSoundPlayerChannel = nullptr;
 
 	protected:
-		std::weak_ptr<Field> findFocus();
+		std::shared_ptr<Field> findFocus();
 		void openScreen(const std::string& screenName);
 		void setLastFocus(const std::string& screenName, const std::string& newLastFocus);
 		const std::string getLastFocus(const std::string& screenName);
-		std::weak_ptr<Wave> findWave();
-		std::weak_ptr<EnvGraph> findEnvGraph();
-
-		template<typename T, typename... Args>
-		std::weak_ptr<T> addChildT(Args... args)
-		{
-			auto child = std::make_shared<T>(args...);
-			addChild(child);
-			return child;
-		}
+		std::shared_ptr<Wave> findWave();
+		std::shared_ptr<EnvGraph> findEnvGraph();
 
 	public:
 		virtual void open() {}

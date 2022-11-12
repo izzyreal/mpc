@@ -70,38 +70,38 @@ void MidiInputScreen::turnWheel(int i)
 
 void MidiInputScreen::displayPass()
 {
-	findField("pass").lock()->setText(pass ? "YES" : "NO");
+	findField("pass")->setText(pass ? "YES" : "NO");
 }
 
 void MidiInputScreen::displayType()
 {
-	findField("type").lock()->setText(typeNames[type]);
+	findField("type")->setText(typeNames[type]);
 }
 
 void MidiInputScreen::displayMidiFilter()
 {
-	findField("midifilter").lock()->setText(midiFilter ? "ON" : "OFF");
+	findField("midifilter")->setText(midiFilter ? "ON" : "OFF");
 }
 
 void MidiInputScreen::displaySustainPedalToDuration()
 {
-	findField("duration").lock()->setText(sustainPedalToDuration ? "ON" : "OFF");
+	findField("duration")->setText(sustainPedalToDuration ? "ON" : "OFF");
 }
 
 void MidiInputScreen::displayProgChangeSeq()
 {
-	findField("seq").lock()->setText(progChangeSeq ? "ON" : "OFF");
+	findField("seq")->setText(progChangeSeq ? "ON" : "OFF");
 }
 
 void MidiInputScreen::displayReceiveCh()
 {
 	if (receiveCh == -1)
 	{
-		findField("receivech").lock()->setText("ALL");
+		findField("receivech")->setText("ALL");
 	}
 	else
 	{
-		findField("receivech").lock()->setText(std::to_string(receiveCh + 1));
+		findField("receivech")->setText(std::to_string(receiveCh + 1));
 	}
 }
 

@@ -82,8 +82,8 @@ void ChangeTsigScreen::turnWheel(int i)
 
 void ChangeTsigScreen::displayBars()
 {
-	findField("bar0").lock()->setTextPadded(bar0 + 1);
-	findField("bar1").lock()->setTextPadded(bar1 + 1);
+	findField("bar0")->setTextPadded(bar0 + 1);
+	findField("bar1")->setTextPadded(bar1 + 1);
 }
 
 void ChangeTsigScreen::displayNewTsig()
@@ -93,7 +93,7 @@ void ChangeTsigScreen::displayNewTsig()
 
 	auto result = StrUtil::padLeft(std::to_string(timesignature.getNumerator()), " ", 2) +
 		"/" + StrUtil::padLeft(std::to_string(timesignature.getDenominator()), " ", 2);
-	findField("newtsig").lock()->setText(result);
+	findField("newtsig")->setText(result);
 }
 
 void ChangeTsigScreen::setBar0(int i, int max)

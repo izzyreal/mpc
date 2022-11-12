@@ -11,9 +11,9 @@ LoopBarsScreen::LoopBarsScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void LoopBarsScreen::open()
 {
-	findField("firstbar").lock()->setAlignment(Alignment::Centered);
-	findField("lastbar").lock()->setAlignment(Alignment::Centered);
-	findField("numberofbars").lock()->setAlignment(Alignment::Centered);
+	findField("firstbar")->setAlignment(Alignment::Centered);
+	findField("lastbar")->setAlignment(Alignment::Centered);
+	findField("numberofbars")->setAlignment(Alignment::Centered);
 	displayFirstBar();
 	displayLastBar();
 	displayNumberOfBars();
@@ -67,21 +67,21 @@ void LoopBarsScreen::displayLastBar()
 	
 	if (seq->isLastLoopBarEnd())
 	{
-		findField("lastbar").lock()->setText("END");
+		findField("lastbar")->setText("END");
 	}
 	else {
-		findField("lastbar").lock()->setText(std::to_string(seq->getLastLoopBarIndex() + 1));
+		findField("lastbar")->setText(std::to_string(seq->getLastLoopBarIndex() + 1));
 	}
 }
 
 void LoopBarsScreen::displayNumberOfBars()
 {
 	auto seq = sequencer->getActiveSequence();
-	findField("numberofbars").lock()->setText(std::to_string(seq->getLastLoopBarIndex() - seq->getFirstLoopBarIndex() + 1));
+	findField("numberofbars")->setText(std::to_string(seq->getLastLoopBarIndex() - seq->getFirstLoopBarIndex() + 1));
 }
 
 void LoopBarsScreen::displayFirstBar()
 {
 	auto seq = sequencer->getActiveSequence();
-	findField("firstbar").lock()->setText(std::to_string(seq->getFirstLoopBarIndex() + 1));
+	findField("firstbar")->setText(std::to_string(seq->getFirstLoopBarIndex() + 1));
 }

@@ -10,20 +10,19 @@ using namespace mpc::lcdgui::screens::window;
 EndFineScreen::EndFineScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "end-fine", layerIndex)
 {
-	addChild(std::move(std::make_shared<Wave>()));
-	findWave().lock()->setFine(true);
+	addChildT<Wave>()->setFine(true);
 }
 
 void EndFineScreen::open()
 {
     mpc.getControls().lock()->getControls()->typableParams = { "end" };
 
-    findField("smpllngth").lock()->setAlignment(Alignment::Centered);
-	findField("end").lock()->enableTwoDots();
+    findField("smpllngth")->setAlignment(Alignment::Centered);
+	findField("end")->enableTwoDots();
 	displayEnd();
 	displaySmplLngth();
 	displayLngthLabel();
-	findLabel("lngth").lock()->enableTwoDots();
+	findLabel("lngth")->enableTwoDots();
 	displayPlayX();
 	displayFineWave();
 }
@@ -37,8 +36,8 @@ void EndFineScreen::displayFineWave()
 	if (!sound)
 		return;
 
-	findWave().lock()->setSampleData(sound->getSampleData(), sound->isMono(), trimScreen->view);
-	findWave().lock()->setCenterSamplePos(sound->getEnd());
+	findWave()->setSampleData(sound->getSampleData(), sound->isMono(), trimScreen->view);
+	findWave()->setCenterSamplePos(sound->getEnd());
 }
 
 
@@ -49,7 +48,7 @@ void EndFineScreen::displayEnd()
 	if (!sound)
 		return;
 
-	findField("end").lock()->setTextPadded(sound->getEnd(), " ");
+	findField("end")->setTextPadded(sound->getEnd(), " ");
 }
 
 void EndFineScreen::displayLngthLabel()
@@ -59,18 +58,18 @@ void EndFineScreen::displayLngthLabel()
 	if (!sound)
 		return;
 
-	findLabel("lngth").lock()->setTextPadded(sound->getEnd() - sound->getStart(), " ");
+	findLabel("lngth")->setTextPadded(sound->getEnd() - sound->getStart(), " ");
 }
 
 void EndFineScreen::displaySmplLngth()
 {
 	auto trimScreen = mpc.screens->get<TrimScreen>("trim");
-    findField("smpllngth").lock()->setText(trimScreen->smplLngthFix ? "FIX" : "VARI");
+    findField("smpllngth")->setText(trimScreen->smplLngthFix ? "FIX" : "VARI");
 }
 
 void EndFineScreen::displayPlayX()
 {
-    findField("playx").lock()->setText(playXNames[sampler->getPlayX()]);
+    findField("playx")->setText(playXNames[sampler->getPlayX()]);
 }
 
 void EndFineScreen::function(int i)
@@ -80,10 +79,10 @@ void EndFineScreen::function(int i)
 	switch (i)
 	{
 	case 1:
-		findWave().lock()->zoomPlus();
+		findWave()->zoomPlus();
 		break;
 	case 2:
-		findWave().lock()->zoomMinus();
+		findWave()->zoomMinus();
 		break;
 	case 4:
 		sampler->playX();
@@ -101,7 +100,7 @@ void EndFineScreen::turnWheel(int i)
 	auto sampleLength = sound->getFrameCount();
 
 	auto soundInc = getSoundIncrement(i);
-	auto field = findField(param).lock();
+	auto field = findField(param);
 
 	if (field->isSplit())
 		soundInc = field->getSplitIncrement(i >= 0);

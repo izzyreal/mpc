@@ -62,20 +62,20 @@ void LoadASequenceFromAllScreen::displayFile()
     if (sourceSeqIndex >= sequencesFromAllFile.size())
         return;
     
-	findField("file").lock()->setTextPadded(sourceSeqIndex + 1, "0");
+	findField("file")->setTextPadded(sourceSeqIndex + 1, "0");
 
     auto candidate = sequencesFromAllFile[sourceSeqIndex];
 	
     auto name = candidate ? candidate->getName() : "(Unused)";
 	
-    findLabel("file0").lock()->setText("-" + name);
+    findLabel("file0")->setText("-" + name);
 }
 
 void LoadASequenceFromAllScreen::displayLoadInto()
 {
 	auto loadASequenceScreen = mpc.screens->get<LoadASequenceScreen>("load-a-sequence");
-	findField("load-into").lock()->setTextPadded(loadASequenceScreen->loadInto + 1, "0");
-	findLabel("load-into0").lock()->setText("-" + sequencer->getSequence(loadASequenceScreen->loadInto)->getName());
+	findField("load-into")->setTextPadded(loadASequenceScreen->loadInto + 1, "0");
+	findLabel("load-into0")->setText("-" + sequencer->getSequence(loadASequenceScreen->loadInto)->getName());
 }
 
 void LoadASequenceFromAllScreen::setSourceSeqIndex(int i)

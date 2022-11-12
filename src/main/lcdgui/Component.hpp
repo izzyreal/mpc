@@ -1,5 +1,4 @@
-#ifndef COMPONENT
-#define COMPONENT
+#pragma once
 
 #include <gui/BasicStructs.hpp>
 
@@ -25,7 +24,6 @@ namespace mpc::lcdgui
 		Component* parent = nullptr;
 		std::vector<std::shared_ptr<Component>> children;
 
-	protected:
 		std::string name = "";
 		bool hidden = false;
 		bool dirty = false;
@@ -34,22 +32,21 @@ namespace mpc::lcdgui
 		int w = -1;
 		int h = -1;
 
-	protected:
 		bool shouldNotDraw(std::vector<std::vector<bool>>* pixels);
 
 	public:
 		template<class T>
-		std::weak_ptr<T> findChild(const std::string& name = "")
+		std::shared_ptr<T> findChild(const std::string& nameOfChildToFind = "")
 		{
 			for (auto& c : children)
 			{
-				if (name.compare("") == 0 && std::dynamic_pointer_cast<T>(c))
+				if (nameOfChildToFind.empty() && std::dynamic_pointer_cast<T>(c))
 					return std::dynamic_pointer_cast<T>(c);
 
-				if (c->getName().compare(name) == 0 && std::dynamic_pointer_cast<T>(c))
+				if (c->getName() == nameOfChildToFind && std::dynamic_pointer_cast<T>(c))
 					return std::dynamic_pointer_cast<T>(c);
 
-				auto candidate = c->findChild<T>(name).lock();
+				auto candidate = c->findChild<T>(nameOfChildToFind);
 
 				if (candidate)
 					return candidate;
@@ -58,21 +55,30 @@ namespace mpc::lcdgui
 			return {};
 		}
 
-		std::weak_ptr<Component> addChild(std::shared_ptr<Component> child);
-		void removeChild(std::weak_ptr<Component> child);
+		std::shared_ptr<Component> addChild(std::shared_ptr<Component> child);
+
+        template<typename T, typename... Args>
+        std::shared_ptr<T> addChildT(Args&... args)
+        {
+            auto child = std::make_shared<T>(args...);
+            addChild(child);
+            return child;
+        }
+
+        void removeChild(std::shared_ptr<Component> child);
 		void addChildren(std::vector<std::shared_ptr<Component>> children);
-		std::weak_ptr<Component> findChild(const std::string& name);
-		std::weak_ptr<Label> findLabel(const std::string& name);
-		std::weak_ptr<Field> findField(const std::string& name);
-		std::weak_ptr<Parameter> findParameter(const std::string& name);
-		std::vector<std::weak_ptr<Label>> findLabels();
-		std::vector<std::weak_ptr<Field>> findFields();
-		std::vector<std::weak_ptr<Parameter>> findParameters();
-		std::weak_ptr<ScreenComponent> findScreenComponent();
-        std::weak_ptr<Background> findBackground();
+		std::shared_ptr<Component> findChild(const std::string& nameOfChildToFind);
+		std::shared_ptr<Label> findLabel(const std::string& name);
+		std::shared_ptr<Field> findField(const std::string& name);
+		std::shared_ptr<Parameter> findParameter(const std::string& name);
+		std::vector<std::shared_ptr<Label>> findLabels();
+		std::vector<std::shared_ptr<Field>> findFields();
+		std::vector<std::shared_ptr<Parameter>> findParameters();
+		std::shared_ptr<ScreenComponent> findScreenComponent();
+        std::shared_ptr<Background> findBackground();
         MRECT getRect();
-		std::vector<std::weak_ptr<Component>> findHiddenChildren();
-		void deleteChildren(const std::string& name);
+		std::vector<std::shared_ptr<Component>> findHiddenChildren();
+		void deleteChildren(const std::string& nameOfChildrenToDelete);
 
 	public:
 		virtual void Hide(bool b);
@@ -80,10 +86,10 @@ namespace mpc::lcdgui
 		bool IsHidden();
 		bool IsDirty();
 		MRECT getDirtyArea();
-		virtual void setSize(int width, int height);
-		void setLocation(int x, int y);
+		virtual void setSize(int newW, int newH);
+		void setLocation(int newX, int newY);
 		const std::string& getName();
-		void sendToBack(std::weak_ptr<Component> childToSendBack);
+		void sendToBack(std::shared_ptr<Component> childToSendBack);
 		bool bringToFront(Component* childToBringToFront);
 		Component* getParent();
 
@@ -98,5 +104,3 @@ namespace mpc::lcdgui
 
 	};
 }
-
-#endif // !COMPONENT

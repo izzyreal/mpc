@@ -21,9 +21,9 @@ void NextSeqScreen::open()
 {
 	selectNextSqFromScratch = true;
 
-	findLabel("tempo").lock()->setSize(12, 9);
-	findField("tempo").lock()->setLocation(18, 11);
-	findField("tempo").lock()->setLeftMargin(1);
+	findLabel("tempo")->setSize(12, 9);
+	findField("tempo")->setLocation(18, 11);
+	findField("tempo")->setLeftMargin(1);
 
 	displaySq();
 	displayNow0();
@@ -131,14 +131,14 @@ void NextSeqScreen::displaySq()
 		result.append(StrUtil::padLeft(std::to_string(sequencer->getCurrentlyPlayingSequenceIndex() + 1), "0", 2));
 		result.append("-");
 		result.append(sequencer->getCurrentlyPlayingSequence()->getName());
-		findField("sq").lock()->setText(result);
+		findField("sq")->setText(result);
 	}
 	else
 	{
 		result.append(StrUtil::padLeft(std::to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2));
 		result.append("-");
 		result.append(sequencer->getActiveSequence()->getName());
-		findField("sq").lock()->setText(result);
+		findField("sq")->setText(result);
 	}
 }
 
@@ -153,28 +153,28 @@ void NextSeqScreen::displayNextSq()
 		res = StrUtil::padLeft(std::to_string(sequencer->getNextSq() + 1), "0", 2) + "-" + seqName;
 	}
 	
-	findField("nextsq").lock()->setText(res);
+	findField("nextsq")->setText(res);
 }
 
 void NextSeqScreen::displayNow0()
 {
-	findField("now0").lock()->setTextPadded(sequencer->getCurrentBarIndex() + 1, "0");
+	findField("now0")->setTextPadded(sequencer->getCurrentBarIndex() + 1, "0");
 }
 
 void NextSeqScreen::displayNow1()
 {
-	findField("now1").lock()->setTextPadded(sequencer->getCurrentBeatIndex() + 1, "0");
+	findField("now1")->setTextPadded(sequencer->getCurrentBeatIndex() + 1, "0");
 }
 
 void NextSeqScreen::displayNow2()
 {
-	findField("now2").lock()->setTextPadded(sequencer->getCurrentClockNumber(), "0");
+	findField("now2")->setTextPadded(sequencer->getCurrentClockNumber(), "0");
 }
 
 void NextSeqScreen::displayTempo()
 {
 	displayTempoLabel();
-	findField("tempo").lock()->setText(Util::tempoString(sequencer->getTempo()));
+	findField("tempo")->setText(Util::tempoString(sequencer->getTempo()));
 }
 
 void NextSeqScreen::displayTempoLabel()
@@ -190,21 +190,21 @@ void NextSeqScreen::displayTempoLabel()
 	}
 
 	if (currentRatio != 1000)
-		findLabel("tempo").lock()->setText(u8"c\u00C0:");
+		findLabel("tempo")->setText(u8"c\u00C0:");
 	else
-		findLabel("tempo").lock()->setText(u8" \u00C0:");
+		findLabel("tempo")->setText(u8" \u00C0:");
 }
 
 void NextSeqScreen::displayTempoSource()
 {
-	findField("tempo-source").lock()->setText(sequencer->isTempoSourceSequenceEnabled() ? "(SEQ)" : "(MAS)");
+	findField("tempo-source")->setText(sequencer->isTempoSourceSequenceEnabled() ? "(SEQ)" : "(MAS)");
 }
 
 void NextSeqScreen::displayTiming()
 {
 	auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
 	auto noteValue = timingCorrectScreen->getNoteValue();
-	findField("timing").lock()->setText(SequencerScreen::timingCorrectNames[noteValue]);
+	findField("timing")->setText(SequencerScreen::timingCorrectNames[noteValue]);
 }
 
 void NextSeqScreen::update(moduru::observer::Observable* o, nonstd::any arg)

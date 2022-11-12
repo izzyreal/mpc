@@ -39,7 +39,7 @@ namespace mpc::lcdgui {
 	private:
 		const int LAYER_COUNT = 4;
 
-		std::vector<std::weak_ptr<Layer>> layers;
+		std::vector<std::shared_ptr<Layer>> layers;
 
 		// 0 = left, 1 = right, 2 = up, 3 = down
 		bool transfer(int direction);
@@ -50,9 +50,9 @@ namespace mpc::lcdgui {
 		void transferUp();
 		void transferDown();
 		int getFocusedLayerIndex();
-		std::weak_ptr<Layer> getFocusedLayer();
+		std::shared_ptr<Layer> getFocusedLayer();
 		int openScreen(std::string name); // returns layer number
-		std::weak_ptr<ScreenComponent> findScreenComponent();
+		std::shared_ptr<ScreenComponent> findScreenComponent();
 
 	private:
 		std::map<std::string, std::string> lastFocuses;

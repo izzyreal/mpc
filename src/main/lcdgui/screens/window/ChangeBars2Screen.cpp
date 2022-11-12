@@ -23,7 +23,7 @@ void ChangeBars2Screen::open()
 void ChangeBars2Screen::displayCurrent()
 {
 	auto seq = sequencer->getActiveSequence();
-	findLabel("current").lock()->setText(std::to_string(seq->getLastBarIndex() + 1));
+	findLabel("current")->setText(std::to_string(seq->getLastBarIndex() + 1));
 }
 
 void ChangeBars2Screen::function(int i)
@@ -68,10 +68,10 @@ void ChangeBars2Screen::displayNewBars()
 {
 	auto seq = sequencer->getActiveSequence();
 
-	auto message0 = findLabel("message0").lock();
-	auto message1 = findLabel("message1").lock();
+	auto message0 = findLabel("message0");
+	auto message1 = findLabel("message1");
 
-	findField("newbars").lock()->setText(StrUtil::padLeft(std::to_string(newBars + 1), " ", 3));
+	findField("newbars")->setText(StrUtil::padLeft(std::to_string(newBars + 1), " ", 3));
 
 	if (newBars == seq->getLastBarIndex())
 	{

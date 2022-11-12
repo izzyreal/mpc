@@ -62,8 +62,8 @@ void SecondSeqScreen::setSq(int i)
 void SecondSeqScreen::displaySq()
 {
     auto sqName = sequencer->getSequence(sq)->getName();
-    findField("sq").lock()->setTextPadded(sq + 1, "0");
-    findLabel("sequence-name").lock()->setText("-" + sqName);
+    findField("sq")->setTextPadded(sq + 1, "0");
+    findLabel("sequence-name")->setText("-" + sqName);
 }
 
 void SecondSeqScreen::displayFunctionKeys()

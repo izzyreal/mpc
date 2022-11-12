@@ -152,30 +152,30 @@ void AutoChromaticAssignmentScreen::displaySource()
     auto note = sampler->getLastNp(program.lock().get())->getNumber();
     auto padIndex = program.lock()->getPadIndexFromNote(note);
     auto padName = sampler->getPadName(padIndex);
-    findField("source").lock()->setText(std::to_string(note) + "/" + padName);
+    findField("source")->setText(std::to_string(note) + "/" + padName);
 }
 
 void AutoChromaticAssignmentScreen::displayTune()
 {
     std::string prefix = tune < 0 ? "-" : " ";
-    findField("tune").lock()->setText(prefix + StrUtil::padLeft(std::to_string(abs(tune)), " ", 3));
+    findField("tune")->setText(prefix + StrUtil::padLeft(std::to_string(abs(tune)), " ", 3));
 }
 
 void AutoChromaticAssignmentScreen::displayOriginalKey()
 {
     auto padName = sampler->getPadName(originalKey - 35);
-    findField("original-key").lock()->setText(std::to_string(originalKey) + "/" + padName);
+    findField("original-key")->setText(std::to_string(originalKey) + "/" + padName);
 }
 
 void AutoChromaticAssignmentScreen::displaySnd()
 {
     auto sampleName = sourceSoundIndex == -1 ? "OFF" : sampler->getSoundName(sourceSoundIndex);
     std::string stereo = sourceSoundIndex == -1 ? "" : sampler->getSound(sourceSoundIndex).lock()->isMono() ? "" : "(ST)";
-    findField("snd").lock()->setText(StrUtil::padRight(sampleName, " ", 16) + stereo);
+    findField("snd")->setText(StrUtil::padRight(sampleName, " ", 16) + stereo);
 }
 void AutoChromaticAssignmentScreen::displayProgramName()
 {
-    findField("program-name").lock()->setText(newName);
+    findField("program-name")->setText(newName);
 }
 
 void AutoChromaticAssignmentScreen::update(moduru::observer::Observable* observable, nonstd::any message)
