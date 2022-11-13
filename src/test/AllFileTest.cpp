@@ -115,7 +115,8 @@ TEST_CASE("ALL file track is on and used", "[allfile]")
 
     saveAndLoadTestAllFile(mpc);
 
-    REQUIRE(mpc.getSequencer()->getUsedSequenceCount() == 1);
+    assert(mpc.getSequencer()->getUsedSequenceCount() == 1);
+
     auto seq1 = mpc.getSequencer()->getActiveSequence();
     REQUIRE(!seq1->getTrack(60)->isUsed());
     REQUIRE(seq1->getTrack(60)->isOn());
@@ -149,7 +150,8 @@ TEST_CASE("ALL file note event", "[allfile]")
 
     saveAndLoadTestAllFile(mpc);
 
-    REQUIRE(mpc.getSequencer()->getUsedSequenceCount() == 1);
+    assert(mpc.getSequencer()->getUsedSequenceCount() == 1);
+
     auto seq1 = mpc.getSequencer()->getActiveSequence();
     auto tr1 = seq1->getTrack(63);
     auto event1 = tr1->getEvent(0);
@@ -162,4 +164,30 @@ TEST_CASE("ALL file note event", "[allfile]")
     REQUIRE(noteEvent->getTick() == 0);
     REQUIRE(noteEvent->getVariationType() == 3);
     REQUIRE(noteEvent->getVariationValue() == 20);
+}
+
+TEST_CASE("ALL file track device is remembered and restored", "[allfile]")
+{
+    mpc::Mpc mpc;
+    mpc.init(1, 1);
+    auto seq = mpc.getSequencer()->getSequence(0);
+    seq->init(1);
+    seq->getTrack(60)->setDeviceIndex(1);
+    seq->getTrack(61)->setDeviceIndex(2);
+    seq->getTrack(62)->setDeviceIndex(3);
+    seq->getTrack(63)->setDeviceIndex(4);
+    auto disk = mpc.getDisk();
+
+    deleteTestAllFile(disk);
+
+    saveAndLoadTestAllFile(mpc);
+
+    assert(mpc.getSequencer()->getUsedSequenceCount() == 1);
+
+    auto seq1 = mpc.getSequencer()->getActiveSequence();
+
+    REQUIRE(seq1->getTrack(60)->getDeviceIndex() == 1);
+    REQUIRE(seq1->getTrack(61)->getDeviceIndex() == 2);
+    REQUIRE(seq1->getTrack(62)->getDeviceIndex() == 3);
+    REQUIRE(seq1->getTrack(63)->getDeviceIndex() == 4);
 }

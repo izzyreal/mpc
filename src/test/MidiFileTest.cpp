@@ -26,10 +26,12 @@ SCENARIO("A MidiFile can be written", "[file]") {
 		auto sequencer = mpc.getSequencer();
 		auto sequence = sequencer->getSequence(0);
 		sequence->init(1);
-		auto track = sequence->getTrack(0);
-		track->setUsed(true);
+		auto track0 = sequence->getTrack(0);
+		auto track1 = sequence->getTrack(1);
+		track0->setUsed(true);
+        track0->setDeviceIndex(2);
 
-		auto noteEvent = track->addNoteEvent(0, 37);
+		auto noteEvent = track0->addNoteEvent(0, 37);
 		noteEvent->setDuration(10);
 		noteEvent->setVelocity(127);
 
@@ -38,14 +40,16 @@ SCENARIO("A MidiFile can be written", "[file]") {
         midiWriter.writeToOStream(ostream);
 		
         sequence->init(1);
-        sequence->getTrack(0)->removeEvents();
-        REQUIRE(sequence->getTrack(0)->getEvents().size() == 0);
+        track0->removeEvents();
+        REQUIRE(track0->getEvents().size() == 0);
         
         auto istream = std::make_shared<std::istringstream>(ostream->str());
         MidiReader midiReader(istream, sequence);
         midiReader.parseSequence(mpc);
         
         REQUIRE(sequence->getTrack(0)->getEvents().size() == 1);
+        REQUIRE(sequence->getTrack(0)->getDeviceIndex() == 2);
+        REQUIRE(sequence->getTrack(1)->getDeviceIndex() == 0);
 
     }
 }

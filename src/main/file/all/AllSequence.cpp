@@ -108,6 +108,7 @@ void AllSequence::applyToMpcSeq(std::shared_ptr<mpc::sequencer::Sequence> mpcSeq
         auto t = mpcSeq->getTrack(i);
         t->setUsed(at->getStatus(i) == 5 || at->getStatus(i) == 7);
         t->setName(at->getName(i));
+        t->setDeviceIndex(at->getDevice(i));
         t->setBusNumber(at->getBus(i));
         t->setProgramChange(at->getPgm(i));
         t->setOn(at->getStatus(i) == 6 || at->getStatus(i) == 7);

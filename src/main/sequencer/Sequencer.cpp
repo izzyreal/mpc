@@ -840,7 +840,7 @@ void Sequencer::copyTrackParameters(std::shared_ptr<Track> source, std::shared_p
 {
 	dest->setUsed(source->isUsed());
     dest->setOn(source->isOn());
-    dest->setDeviceNumber(source->getDevice());
+    dest->setDeviceIndex(source->getDeviceIndex());
     dest->setBusNumber(source->getBus());
     dest->setVelocityRatio(source->getVelocityRatio());
     dest->setProgramChange(source->getProgramChange());

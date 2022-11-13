@@ -17,7 +17,8 @@ Tracks::Tracks(const std::vector<char>& loadBytes)
 {
 	for (int i = 0; i < 64; i++)
     {
-		busses[i] = loadBytes[BUSSES_OFFSET + i];
+        devices[i] = loadBytes[DEVICES_OFFSET + i];
+        busses[i] = loadBytes[BUSSES_OFFSET + i];
 		pgms[i] = loadBytes[PGMS_OFFSET + i];
 		veloRatios[i] = loadBytes[VELO_RATIOS_OFFSET + i];
 		auto offset = TRACK_NAMES_OFFSET + (i * AllParser::NAME_LENGTH);
@@ -47,7 +48,8 @@ Tracks::Tracks(mpc::sequencer::Sequence* seq)
 			auto name = moduru::lang::StrUtil::padRight(t->getActualName(), " ", AllParser::NAME_LENGTH);
 			saveBytes[offset + j] = name[j];
 		}
-		
+
+        saveBytes[DEVICES_OFFSET + i] = (t->getDeviceIndex());
         saveBytes[BUSSES_OFFSET + i] = (t->getBus());
 		saveBytes[PGMS_OFFSET + i] = (t->getProgramChange());
 		saveBytes[VELO_RATIOS_OFFSET + i] = (t->getVelocityRatio());
@@ -104,6 +106,11 @@ Tracks::Tracks(mpc::sequencer::Sequence* seq)
 }
 
 std::vector<char> Tracks::PADDING1 = std::vector<char>{ (char) 232, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, (char) 232, 3 };
+
+int Tracks::getDevice(int i)
+{
+    return devices[i];
+}
 
 int Tracks::getBus(int i)
 {

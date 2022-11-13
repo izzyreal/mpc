@@ -130,7 +130,7 @@ void MultiRecordingSetupScreen::turnWheel(int i)
 		if (visibleMrsLines[yPos]->getTrack() != -1)
 		{
 			auto track = seq->getTrack(visibleMrsLines[yPos]->getTrack());
-			track->setDeviceNumber(track->getDevice() + i);
+            track->setDeviceIndex(track->getDeviceIndex() + i);
 			displayMrsLine(yPos);
 		}
 	}
@@ -203,7 +203,7 @@ void MultiRecordingSetupScreen::displayMrsLine(int i)
 	else
 	{
 		auto track = seq->getTrack(visibleMrsLines[i]->getTrack());
-		auto dev = track->getDevice();
+		auto dev = track->getDeviceIndex();
 
 		if (dev == 0)
 		{

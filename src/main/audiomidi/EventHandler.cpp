@@ -225,7 +225,7 @@ void EventHandler::midiOut(const std::shared_ptr<Event>& e, Track* track)
             noteEvent->setNote(noteEvent->getNote() + transScreen->transposeAmount);
         }
         
-        auto deviceNumber = track->getDevice() - 1;
+        auto deviceNumber = track->getDeviceIndex() - 1;
         
         if (deviceNumber < 0)
             return;
@@ -253,7 +253,7 @@ void EventHandler::midiOut(const std::shared_ptr<Event>& e, Track* track)
         
         if (!(mpc.getAudioMidiServices()->isBouncing() &&
               directToDiskRecorderScreen->offline) &&
-            track->getDevice() != 0)
+                track->getDeviceIndex() != 0)
         {
             auto fs = mpc.getAudioMidiServices()->getFrameSequencer();
             auto eventFrame = fs->getEventFrameOffset();

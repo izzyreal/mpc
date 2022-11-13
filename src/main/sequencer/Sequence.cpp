@@ -218,7 +218,7 @@ void Sequence::init(int newLastBarIndex)
 
 	for (auto& t : tracks)
 	{
-		t->setDeviceNumber(userScreen->device);
+        t->setDeviceIndex(userScreen->device);
 		t->setProgramChange(userScreen->pgm);
 		t->setBusNumber(userScreen->bus);
 		t->setVelocityRatio(userScreen->velo);

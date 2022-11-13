@@ -183,16 +183,16 @@ void SequencerScreen::displayVelo()
 
 void SequencerScreen::displayDeviceNumber()
 {
-	if (track->getDevice() == 0)
+	if (track->getDeviceIndex() == 0)
 	{
 		findField("devicenumber")->setText("OFF");
 	}
 	else
 	{
-		if (track->getDevice() >= 17)
-			findField("devicenumber")->setText(std::to_string(track->getDevice() - 16) + "B");
+		if (track->getDeviceIndex() >= 17)
+			findField("devicenumber")->setText(std::to_string(track->getDeviceIndex() - 16) + "B");
 		else
-			findField("devicenumber")->setText(std::to_string(track->getDevice()) + "A");
+			findField("devicenumber")->setText(std::to_string(track->getDeviceIndex()) + "A");
 	}
 }
 
@@ -221,7 +221,7 @@ void SequencerScreen::displayDeviceName()
 {
 	if (track->getBus() != 0)
 	{
-		if (track->getDevice() == 0)
+		if (track->getDeviceIndex() == 0)
 		{
 			int pgm = sampler->getDrumBusProgramIndex(track->getBus());
 			auto p = sampler->getProgram(pgm);
@@ -229,15 +229,15 @@ void SequencerScreen::displayDeviceName()
 		}
 		else
 		{
-			findLabel("devicename")->setText(sequencer->getActiveSequence()->getDeviceName(track->getDevice()));
+			findLabel("devicename")->setText(sequencer->getActiveSequence()->getDeviceName(track->getDeviceIndex()));
 		}
 	}
 	else if (track->getBus() == 0)
 	{
-		if (track->getDevice() == 0)
+		if (track->getDeviceIndex() == 0)
 			findLabel("devicename")->setText("NewPgm-A");
 		else
-			findLabel("devicename")->setText(sequencer->getActiveSequence()->getDeviceName(track->getDevice()));
+			findLabel("devicename")->setText(sequencer->getActiveSequence()->getDeviceName(track->getDeviceIndex()));
 	}
 }
 
@@ -589,7 +589,7 @@ void SequencerScreen::turnWheel(int i)
 	else if (param == "devicenumber")
 	{
 		checkTrackUsed();
-		track->setDeviceNumber(track->getDevice() + i);
+        track->setDeviceIndex(track->getDeviceIndex() + i);
 	}
 	else if (param == "tr")
 	{

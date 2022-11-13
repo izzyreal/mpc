@@ -344,7 +344,7 @@ int Track::getBus()
     return busNumber;
 }
 
-void Track::setDeviceNumber(int i)
+void Track::setDeviceIndex(int i)
 {
 	if (i < 0 || i > 32)
 		return;
@@ -356,7 +356,7 @@ void Track::setDeviceNumber(int i)
     notifyObservers(std::string("devicename"));
 }
 
-int Track::getDevice()
+int Track::getDeviceIndex()
 {
     return device;
 }

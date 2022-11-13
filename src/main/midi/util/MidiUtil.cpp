@@ -50,7 +50,7 @@ string MidiUtil::byteToHex(char b)
 
 	int high = (b & 240) >> 4;
 	int low = (b & 15);
-	string res = "";
+	string res;
 	res.push_back(HEX[high]);
 	res.push_back(HEX[low]);
 	return res;

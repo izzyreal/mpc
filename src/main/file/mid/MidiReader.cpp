@@ -167,6 +167,7 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
 	{
 		auto mt = midiTracks[i].lock();
         auto trackIndex = i - 1;
+        auto deviceIndex = 0;
         for (auto& e: mt->getEvents())
         {
             auto textEvent = std::dynamic_pointer_cast<meta::Text>(e.lock());
@@ -176,6 +177,13 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
                 {
                     auto payload = text.substr(trackDataPrefix.length());
                     trackIndex = stoi(payload.substr(0, 2));
+                    auto deviceIndexStr = payload.substr(2, 2);
+
+                    if (deviceIndexStr != "C0")
+                    {
+                        deviceIndex = stoi(deviceIndexStr, 0, 16) - stoi(std::string("E0"), 0, 16);
+                    }
+                    break;
                 }
             }
         }
@@ -183,6 +191,7 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
         std::vector<std::shared_ptr<NoteEvent>> noteOns;
 
 		auto track = sequence->purgeTrack(trackIndex);
+        track->setDeviceIndex(deviceIndex);
 		track->setUsed(true);
 
 		for (auto& me : mt->getEvents())

@@ -36,6 +36,7 @@
 #include <file/ByteUtil.hpp>
 
 #include <set>
+#include "midi/util/MidiUtil.hpp"
 
 using namespace mpc::midi::event;
 using namespace mpc::file::mid;
@@ -126,7 +127,16 @@ MidiWriter::MidiWriter(mpc::sequencer::Sequence* sequence)
 		auto in = std::make_shared<meta::InstrumentName>(0, 0, "        ");
 		mt->insertEvent(in);
 		auto trackNumber = moduru::lang::StrUtil::padLeft(std::to_string(t->getIndex()), "0", 2);
-		auto text = std::make_shared<meta::Text>(0, 0, "TRACK DATA:" + trackNumber + "C0006403  000107   ");
+        std::string trackDevice = t->getDeviceIndex() == 0 ? "C0" : "E0";
+
+        if (t->getDeviceIndex() > 0)
+        {
+            auto value = stoi(trackDevice, 0, 16);
+            value += t->getDeviceIndex();
+            trackDevice = mpc::midi::util::MidiUtil::byteToHex(static_cast<char>(value));
+        }
+
+		auto text = std::make_shared<meta::Text>(0, 0, "TRACK DATA:" + trackNumber + trackDevice +"006403  000107   ");
 		mt->insertEvent(text);
 		auto tn = std::make_shared<meta::TrackName>(0, 0, moduru::lang::StrUtil::padRight(t->getName(), " ", 16));
 		mt->insertEvent(tn);

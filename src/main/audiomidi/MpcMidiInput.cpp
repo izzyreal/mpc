@@ -330,7 +330,7 @@ void MpcMidiInput::midiOut(std::weak_ptr<mpc::sequencer::Event> e, mpc::sequence
 {
     auto event = e.lock();
     std::string notificationLetter;
-    auto deviceNumber = track->getDevice() - 1;
+    auto deviceNumber = track->getDeviceIndex() - 1;
 
     if (deviceNumber != -1 && deviceNumber < 32)
     {

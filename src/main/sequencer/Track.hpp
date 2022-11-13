@@ -86,8 +86,8 @@ public:
     int getProgramChange();
     void setBusNumber(int i);
     int getBus();
-    void setDeviceNumber(int i);
-    int getDevice();
+    void setDeviceIndex(int i);
+    int getDeviceIndex();
     std::shared_ptr<Event> getEvent(int i);
     void setName(std::string s);
     std::string getName();
