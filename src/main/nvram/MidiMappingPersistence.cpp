@@ -1,7 +1,5 @@
 #include "MidiMappingPersistence.hpp"
 
-#include "lcdgui/screens/VmpcMidiScreen.hpp"
-
 #include "hardware/Hardware.hpp"
 #include "hardware/HwPad.hpp"
 #include "Paths.hpp"
@@ -37,10 +35,10 @@ void MidiMappingPersistence::loadDefaultMapping(mpc::Mpc &mpc)
         labels.push_back(p->getLabel());
     }
 
-    labels.push_back("datawheel");
-    labels.push_back("slider");
-    labels.push_back("rec-gain");
-    labels.push_back("main-volume");
+    labels.emplace_back("datawheel");
+    labels.emplace_back("slider");
+    labels.emplace_back("rec-gain");
+    labels.emplace_back("main-volume");
 
     for (auto& b : hardware->getButtonLabels())
     {
@@ -63,7 +61,7 @@ void MidiMappingPersistence::saveCurrentState(mpc::Mpc& mpc)
     saveMappingToFile(mpc, f);
 }
 
-void MidiMappingPersistence::loadMappingFromFile(mpc::Mpc &mpc, std::string name)
+void MidiMappingPersistence::loadMappingFromFile(mpc::Mpc &mpc, const std::string& name)
 {
     auto dir = std::make_shared<moduru::file::Directory>(mpc::Paths::midiControllerPresetsPath(), nullptr);
 
@@ -73,12 +71,12 @@ void MidiMappingPersistence::loadMappingFromFile(mpc::Mpc &mpc, std::string name
         auto f = std::dynamic_pointer_cast<moduru::file::File>(node);
         if (f->getNameWithoutExtension() == name)
         {
-            loadMappingFromFile(mpc, *f.get());
+            loadMappingFromFile(mpc, *f);
         }
     }
 }
 
-void MidiMappingPersistence::saveMappingToFile(mpc::Mpc &mpc, std::string name)
+void MidiMappingPersistence::saveMappingToFile(mpc::Mpc &mpc, const std::string& name)
 {
     moduru::file::Directory dir(mpc::Paths::midiControllerPresetsPath(), nullptr);
 
@@ -100,33 +98,14 @@ void MidiMappingPersistence::saveMappingToFile(mpc::Mpc &mpc, std::string name)
 
 void MidiMappingPersistence::loadMappingFromFile(mpc::Mpc &mpc, moduru::file::File& f)
 {
-    auto data = std::vector<char>(f.getLength());
-    f.getData(&data);
-    int pointer = 0;
-
     auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
 
-    while (true)
-    {
-        if (pointer >= data.size())
-        {
-            break;
-        }
+    std::vector<std::pair<std::string, VmpcMidiScreen::Command>> commands;
 
-        std::string name;
-        char c;
+    loadMappingFromFile(f, commands);
 
-        while ((c = data[pointer++]) != ' ' && pointer < data.size())
-        {
-            name.push_back(c);
-        }
-
-        const bool isNote = data[pointer++] == 1;
-        const char channel = data[pointer++];
-        const char value = data[pointer++];
-        VmpcMidiScreen::Command command { isNote, channel, value };
-        vmpcMidiScreen->setLabelCommand(name, command);
-    }
+    for (auto& command : commands)
+        vmpcMidiScreen->setLabelCommand(command.first, command.second);
 }
 
 void MidiMappingPersistence::saveMappingToFile(mpc::Mpc &mpc, moduru::file::File &f)
@@ -171,4 +150,34 @@ std::vector<std::string> MidiMappingPersistence::getAvailablePresetNames()
     }
 
     return result;
+}
+
+void MidiMappingPersistence::loadMappingFromFile(moduru::file::File& f,
+                                                 std::vector<std::pair<std::string, VmpcMidiScreen::Command>>& commands)
+{
+    auto data = std::vector<char>(f.getLength());
+    f.getData(&data);
+    int pointer = 0;
+
+    while (true)
+    {
+        if (pointer >= data.size())
+        {
+            break;
+        }
+
+        std::string name;
+        char c;
+
+        while ((c = data[pointer++]) != ' ' && pointer < data.size())
+        {
+            name.push_back(c);
+        }
+
+        const bool isNote = data[pointer++] == 1;
+        const char channel = data[pointer++];
+        const char value = data[pointer++];
+
+        commands.emplace_back(std::pair<std::string, VmpcMidiScreen::Command>(name, {isNote, channel, value}));
+    }
 }

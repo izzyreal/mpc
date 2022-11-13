@@ -2,11 +2,13 @@
 #include <lcdgui/ScreenComponent.hpp>
 
 #include <string>
+#include <atomic>
 
 namespace mpc::nvram { class MidiMappingPersistence; }
-namespace mpc::audiomidi { class VmpcMidiControlMode; }
+namespace mpc::audiomidi { class VmpcMidiControlMode; class MidiDeviceDetector; class AudioMidiServices; }
+namespace mpc::lcdgui::screens::window { class VmpcKnownControllerDetectedScreen; }
 
-namespace mpc::lcdgui::screens{
+namespace mpc::lcdgui::screens {
 
     class VmpcMidiScreen
             : public mpc::lcdgui::ScreenComponent
@@ -57,6 +59,10 @@ namespace mpc::lcdgui::screens{
 
         std::vector<std::pair<std::string, Command>> uneditedLabelCommands;
         std::vector<std::pair<std::string, Command>> labelCommands;
+
+        std::atomic_bool shouldSwitch = ATOMIC_VAR_INIT(false);
+        std::vector<std::pair<std::string, Command>> realtimeSwitchCommands;
+
         void setLearning(bool b);
         void acceptLearnCandidate();
         void updateRows();
@@ -64,5 +70,8 @@ namespace mpc::lcdgui::screens{
 
         friend class mpc::nvram::MidiMappingPersistence;
         friend class mpc::audiomidi::VmpcMidiControlMode;
+        friend class mpc::audiomidi::MidiDeviceDetector;
+        friend class mpc::audiomidi::AudioMidiServices;
+        friend class mpc::lcdgui::screens::window::VmpcKnownControllerDetectedScreen;
     };
 }

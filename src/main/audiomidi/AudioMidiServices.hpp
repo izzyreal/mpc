@@ -81,6 +81,9 @@ namespace mpc::audiomidi
         // Should be called from the audio thread only!
         void changeBounceStateIfRequired();
 
+        // Should be called from the audio thread only!
+        void switchMidiControlMappingIfRequired();
+
 	private:
 		bool bouncePrepared = false;
         bool wasRecordingSound = false;

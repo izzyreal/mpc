@@ -2,10 +2,17 @@
 
 #include "RtMidi.h"
 #include "Mpc.hpp"
+#include "Paths.hpp"
+
+#include "nvram/MidiMappingPersistence.hpp"
+#include "file/File.hpp"
+#include "lcdgui/screens/window/VmpcKnownControllerDetectedScreen.hpp"
 
 #include <vector>
 
 using namespace mpc::audiomidi;
+using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui::screens::window;
 
 void MidiDeviceDetector::start(mpc::Mpc& mpc)
 {
@@ -26,7 +33,16 @@ void MidiDeviceDetector::start(mpc::Mpc& mpc)
 
             for (auto &name: allCurrentNames) {
                 if (deviceNames.emplace(name).second) {
-                    // TODO handle new MIDI device
+                    if (name.find("MPD") != std::string::npos)
+                    {
+                        moduru::file::File f(Paths::midiControllerPresetsPath() + "MPD218", nullptr);
+                        auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
+                        vmpcMidiScreen->realtimeSwitchCommands.clear();
+                        mpc::nvram::MidiMappingPersistence::loadMappingFromFile(f, vmpcMidiScreen->realtimeSwitchCommands);
+                        auto knownControllerDetectedScreen = mpc.screens->get<VmpcKnownControllerDetectedScreen>("vmpc-known-controller-detected");
+                        knownControllerDetectedScreen->controllerName = "MPD218";
+                        mpc.getLayeredScreen()->openScreen("vmpc-known-controller-detected");
+                    }
                 }
             }
 

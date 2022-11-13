@@ -273,7 +273,8 @@ namespace mpc {
                 "vmpc-auto-save",
                 "vmpc-midi",
                 "vmpc-midi-presets",
-                "vmpc-warning-settings-ignored"
+                "vmpc-warning-settings-ignored",
+                "vmpc-known-controller-detected"
         };
     };
 }

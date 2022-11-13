@@ -1,4 +1,5 @@
 #include "AudioMidiServices.hpp"
+#include "lcdgui/screens/VmpcMidiScreen.hpp"
 
 // mpc
 #include <Paths.hpp>
@@ -513,5 +514,21 @@ void AudioMidiServices::changeBounceStateIfRequired()
                 getAudioServer()->setRealTime(true);
             }
         }
+    }
+}
+
+// Should be called from the audio thread only!
+void AudioMidiServices::switchMidiControlMappingIfRequired()
+{
+    auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
+
+    if (vmpcMidiScreen->shouldSwitch.load())
+    {
+        for (auto& c : vmpcMidiScreen->realtimeSwitchCommands)
+        {
+            vmpcMidiScreen->setLabelCommand(c.first, c.second);
+        }
+
+        vmpcMidiScreen->shouldSwitch.store(false);
     }
 }

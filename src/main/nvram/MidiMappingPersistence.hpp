@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Mpc.hpp"
+#include "lcdgui/screens/VmpcMidiScreen.hpp"
 
 #include <string>
 #include <vector>
@@ -19,8 +20,9 @@ namespace mpc::nvram {
 
         // Load and save presets by filename in the default preset path.
         // See Paths::midiControllerPresetsPath.
-        static void loadMappingFromFile(mpc::Mpc& mpc, std::string name);
-        static void saveMappingToFile(mpc::Mpc& mpc, std::string name);
+        static void loadMappingFromFile(mpc::Mpc& mpc, const std::string& name);
+        static void loadMappingFromFile(moduru::file::File&, std::vector<std::pair<std::string, mpc::lcdgui::screens::VmpcMidiScreen::Command>>&);
+        static void saveMappingToFile(mpc::Mpc& mpc, const std::string& name);
 
         // Simple one-to-one mapping between file and preset name.
         // No directory structure.

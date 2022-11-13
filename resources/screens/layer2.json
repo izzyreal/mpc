@@ -900,5 +900,10 @@
  {
   "fblabels" : [ null, null, null, "CHANGE", "OK", null ],
   "fbtypes" : [ null, null, null, 1, 0, null ]
+ },
+ "vmpc-known-controller-detected":
+ {
+  "fblabels" : [ null, "NO", "YES", "NEVER", "ALWAYS", null ],
+  "fbtypes" : [ null, 1, 0, 1, 0, null ]
  }
 }

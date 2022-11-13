@@ -318,7 +318,7 @@ void VmpcMidiScreen::setLabelCommand(std::string& label, Command& c)
         }
     }
 
-    labelCommands.push_back({label, c});
+    labelCommands.emplace_back(label, c);
 }
 
 bool VmpcMidiScreen::isLearning()

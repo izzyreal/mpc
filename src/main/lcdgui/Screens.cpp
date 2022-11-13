@@ -112,6 +112,7 @@
 #include <lcdgui/screens/window/VmpcConvertAndLoadWavScreen.hpp>
 #include <lcdgui/screens/window/StepEditOptionsScreen.hpp>
 #include <lcdgui/screens/window/VmpcWarningSettingsIgnoredScreen.hpp>
+#include <lcdgui/screens/window/VmpcKnownControllerDetectedScreen.hpp>
 
 #include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
 #include <lcdgui/screens/dialog/MidiMonitorScreen.hpp>
@@ -959,6 +960,10 @@ std::shared_ptr <ScreenComponent> Screens::getScreenComponent(const std::string 
     else if (screenName == "vmpc-warning-settings-ignored")
     {
         screen = std::make_shared<VmpcWarningSettingsIgnoredScreen>(mpc, layerIndex);
+    }
+    else if (screenName == "vmpc-known-controller-detected")
+    {
+        screen = std::make_shared<VmpcKnownControllerDetectedScreen>(mpc, layerIndex);
     }
 
     if (screen)
