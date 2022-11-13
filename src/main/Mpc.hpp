@@ -43,6 +43,7 @@ namespace mpc::audiomidi {
     class AudioMidiServices;
     class MpcMidiInput;
     class MpcMidiOutput;
+    class MidiDeviceDetector;
 }
 
 namespace mpc::sequencer {
@@ -63,6 +64,7 @@ namespace mpc {
         std::shared_ptr<sequencer::Sequencer> sequencer;
         std::shared_ptr<sampler::Sampler> sampler;
         std::shared_ptr<audiomidi::AudioMidiServices> audioMidiServices;
+        std::unique_ptr<mpc::audiomidi::MidiDeviceDetector> midiDeviceDetector;
         std::vector<audiomidi::MpcMidiInput*> mpcMidiInputs;
         std::unique_ptr<mpc::disk::DiskController> diskController;
         std::shared_ptr<hardware::Hardware> hardware;

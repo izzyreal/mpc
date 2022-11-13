@@ -15,6 +15,7 @@
 #include <audiomidi/AudioMidiServices.hpp>
 #include <audiomidi/EventHandler.hpp>
 #include <audiomidi/MpcMidiInput.hpp>
+#include <audiomidi/MidiDeviceDetector.hpp>
 
 #include <sampler/Sampler.hpp>
 #include <sequencer/Sequencer.hpp>
@@ -129,6 +130,9 @@ void Mpc::init(const int inputCount, const int outputCount)
     mpc::nvram::MidiMappingPersistence::restoreLastState(*this);
 
     layeredScreen->openScreen("sequencer");
+
+    midiDeviceDetector = std::make_unique<MidiDeviceDetector>();
+    midiDeviceDetector->start(*this);
 
 	MLOG("Mpc is ready");
 }
@@ -287,6 +291,7 @@ mpc::disk::DiskController* Mpc::getDiskController()
 
 Mpc::~Mpc()
 {
+    midiDeviceDetector->stop();
     sampler->stopAllVoices(0);
     sequencer->stop();
     mpc::nvram::MidiMappingPersistence::saveCurrentState(*this);

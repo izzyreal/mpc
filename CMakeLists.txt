@@ -55,7 +55,18 @@ FetchContent_Declare(rapidjson
   SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/rapidjson
 )
 
-FetchContent_MakeAvailable(moduru akaifat ctoot filesystem rapidjson Catch2)
+set(RTMIDI_BUILD_STATIC_LIBS ON)
+set(BUILD_SHARED_LIBS OFF)
+set(RTMIDI_BUILD_TESTING OFF)
+set(RTMIDI_TARGETNAME_UNINSTALL "rtmidi_uninstall")
+
+FetchContent_Declare(rtmidi
+    GIT_REPOSITORY https://github.com/thestk/rtmidi.git
+    GIT_TAG        5.0.0
+    SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/rtmidi
+)
+
+FetchContent_MakeAvailable(rtmidi moduru akaifat ctoot filesystem rapidjson Catch2)
 
 FetchContent_GetProperties(tl-expected)
 
@@ -106,7 +117,7 @@ target_include_directories(mpc PUBLIC
     ${tl-expected_SOURCE_DIR}/include
 )
 
-target_link_libraries(mpc ctoot akaifat moduru ghc_filesystem)
+target_link_libraries(mpc ctoot akaifat moduru ghc_filesystem rtmidi)
 
 _bundle_mpc_resources(mpc)
 
