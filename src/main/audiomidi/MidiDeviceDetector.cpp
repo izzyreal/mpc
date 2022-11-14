@@ -10,6 +10,10 @@
 
 #include <vector>
 
+#ifdef _WIN32
+#include <Windows.h>
+#endif
+
 using namespace mpc::audiomidi;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
@@ -70,4 +74,48 @@ MidiDeviceDetector::~MidiDeviceDetector()
     {
         pollThread->join();
     }
+}
+
+auto MidiDeviceDetector::lower_my_priority() -> bool
+{
+#ifdef _WIN32
+        int priority{ GetThreadPriority(GetCurrentThread()) };
+        return priority != THREAD_PRIORITY_ERROR_RETURN
+            && priority > THREAD_PRIORITY_IDLE
+            && SetThreadPriority(
+                GetCurrentThread(),
+                priority > THREAD_PRIORITY_HIGHEST
+                ? THREAD_PRIORITY_HIGHEST
+                : priority > THREAD_PRIORITY_ABOVE_NORMAL
+                ? THREAD_PRIORITY_ABOVE_NORMAL
+                : priority > THREAD_PRIORITY_NORMAL
+                ? THREAD_PRIORITY_NORMAL
+                : priority > THREAD_PRIORITY_BELOW_NORMAL
+                ? THREAD_PRIORITY_BELOW_NORMAL
+                : priority > THREAD_PRIORITY_LOWEST
+                ? THREAD_PRIORITY_LOWEST
+                : THREAD_PRIORITY_IDLE)
+            != 0;
+#else
+        int policy;
+        sched_param params;
+        if (pthread_getschedparam(
+            pthread_self(), &policy, &params) == 0)
+        {
+            int const min_value{ sched_get_priority_min(policy) };
+            if (min_value != -1)
+            {
+                if (params.sched_priority > min_value)
+                {
+                    --params.sched_priority;
+                    if (pthread_setschedparam(pthread_self(), policy, &params) != -1)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+#endif
 }
