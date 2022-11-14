@@ -17,9 +17,6 @@ namespace mpc::lcdgui::screens::window {
 
         std::string controllerName;
 
-        // 0 == disabled, 1 = ask, 2 = enabled
-        int shouldAutoSwitch = 1;
-
         friend class mpc::audiomidi::MidiDeviceDetector;
     };
 }

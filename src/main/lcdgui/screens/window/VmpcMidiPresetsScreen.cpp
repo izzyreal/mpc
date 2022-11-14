@@ -12,11 +12,16 @@ using namespace mpc::nvram;
 VmpcMidiPresetsScreen::VmpcMidiPresetsScreen(mpc::Mpc& mpc, const int layerIndex)
         : ScreenComponent(mpc, "vmpc-midi-presets", layerIndex)
 {
+    initPresets();
+
     for (int i = 0; i < 4; i++)
     {
         const int y = 11 + (i * 9);
         auto nameParam = std::make_shared<Parameter>(mpc, "", "name" + std::to_string(i), 23, y + 1, 16 * 6);
         addChild(nameParam);
+
+        auto autoLoadParam = std::make_shared<Parameter>(mpc, "Auto-load:", "auto-load" + std::to_string(i), 23 + (17 * 6), y + 1, 3 * 6);
+        addChild(autoLoadParam);
     }
 
     saveMappingAndShowPopup = [this](std::string& newName1) {
@@ -32,7 +37,6 @@ void VmpcMidiPresetsScreen::open()
     findChild<Label>("up")->setText("\u00C7");
     findChild<Label>("down")->setText("\u00C6");
 
-    initPresets();
     displayRows();
 }
 
@@ -40,6 +44,20 @@ void VmpcMidiPresetsScreen::displayUpAndDown()
 {
     findChild<Label>("up")->Hide(rowOffset == 0);
     findChild<Label>("down")->Hide(rowOffset + 4 >= presets.size());
+}
+
+void VmpcMidiPresetsScreen::turnWheel(int i)
+{
+    init();
+
+    if (row + rowOffset != 0 && column == 1)
+    {
+        auto candidate = presets[row + rowOffset].autoLoadMode + i;
+        if (candidate < 0) candidate = 0;
+        else if (candidate > 2) candidate = 2;
+        presets[row + rowOffset].autoLoadMode = candidate;
+        displayRows();
+    }
 }
 
 void VmpcMidiPresetsScreen::function(int i)
@@ -60,7 +78,7 @@ void VmpcMidiPresetsScreen::function(int i)
             }
             else
             {
-                nameScreen->setName(presets[index]);
+                nameScreen->setName(presets[index].name);
                 openScreen("file-exists");
             }
             break;
@@ -77,7 +95,7 @@ void VmpcMidiPresetsScreen::function(int i)
             }
             else
             {
-                MidiMappingPersistence::loadMappingFromFile(mpc, presets[index]);
+                MidiMappingPersistence::loadMappingFromFile(mpc, presets[index].name);
             }
 
             openScreen("vmpc-midi");
@@ -90,6 +108,7 @@ void VmpcMidiPresetsScreen::up()
 {
     if (row == 0 && rowOffset == 0) return;
     if (row == 0) rowOffset--; else row--;
+    if (row + rowOffset == 0) column = 0;
     displayRows();
 }
 
@@ -97,6 +116,26 @@ void VmpcMidiPresetsScreen::down()
 {
     if (row + rowOffset + 1 >= presets.size()) return;
     if (row == 3) rowOffset++; else row++;
+    displayRows();
+}
+
+void VmpcMidiPresetsScreen::left()
+{
+    if (column == 0) return;
+    column--;
+    displayRows();
+}
+
+void VmpcMidiPresetsScreen::right()
+{
+    if (column == 1) return;
+
+    if (row + rowOffset == 0)
+    {
+        row++;
+    }
+
+    column++;
     displayRows();
 }
 
@@ -112,8 +151,17 @@ void VmpcMidiPresetsScreen::displayRows()
             continue;
         }
 
-        name->setText(presets[i + rowOffset]);
-        name->setInverted(i == row);
+        name->setText(presets[i + rowOffset].name);
+        name->setInverted(i == row && column == 0);
+
+        auto autoLoadField = findChild<Field>("auto-load" + std::to_string(i));
+        auto autoLoadLabel = findChild<Label>("auto-load" + std::to_string(i));
+
+        autoLoadField->Hide(i + rowOffset == 0);
+        autoLoadLabel->Hide(i + rowOffset == 0);
+
+        autoLoadField->setText(autoLoadModeNames[presets[i + rowOffset].autoLoadMode]);
+        autoLoadField->setInverted(i == row && column == 1);
     }
 
     displayUpAndDown();
@@ -121,11 +169,16 @@ void VmpcMidiPresetsScreen::displayRows()
 
 void VmpcMidiPresetsScreen::initPresets()
 {
-    presets.clear();
-    presets.emplace_back("New preset");
+    if (std::find_if(presets.begin(), presets.end(), [](const Preset& p) { return p.name == "New preset"; }) == presets.end())
+    {
+        presets.emplace_back(Preset{"New preset"});
+    }
 
     for (auto& name : MidiMappingPersistence::getAvailablePresetNames())
     {
-        presets.emplace_back(name);
+        if (std::find_if(presets.begin(), presets.end(), [name](const Preset& p) { return p.name == name; }) == presets.end())
+        {
+            presets.emplace_back(Preset{name});
+        }
     }
 }

@@ -1,5 +1,6 @@
 #include "VmpcKnownControllerDetectedScreen.hpp"
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
+#include "lcdgui/screens/window/VmpcMidiPresetsScreen.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
@@ -20,6 +21,12 @@ VmpcKnownControllerDetectedScreen::VmpcKnownControllerDetectedScreen(mpc::Mpc &m
 void VmpcKnownControllerDetectedScreen::function(int i)
 {
     auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
+    auto vmpcMidiPresetsScreen = mpc.screens->get<VmpcMidiPresetsScreen>("vmpc-midi-presets");
+    auto& presets = vmpcMidiPresetsScreen->presets;
+    auto preset = std::find_if(
+            presets.begin(),
+            presets.end(),
+            [this](const VmpcMidiPresetsScreen::Preset& p){ return controllerName.find(p.name) != std::string::npos; });
 
     switch (i) {
         case 1:
@@ -33,12 +40,15 @@ void VmpcKnownControllerDetectedScreen::function(int i)
             break;
         case 3:
             // NEVER
-            shouldAutoSwitch = 0;
+            if (preset != presets.end()) (*preset).autoLoadMode = 0;
             openScreen(ls->getPreviousScreenName());
             break;
         case 4:
             // ALWAYS
-            shouldAutoSwitch = 2;
+            if (preset != presets.end())
+            {
+                (*preset).autoLoadMode = 2;
+            }
             vmpcMidiScreen->shouldSwitch.store(true);
             openScreen(ls->getPreviousScreenName());
             break;
@@ -54,17 +64,26 @@ void VmpcKnownControllerDetectedScreen::displayMessage()
 
 void VmpcKnownControllerDetectedScreen::open()
 {
-    if (shouldAutoSwitch == 0)
+    auto vmpcMidiPresetsScreen = mpc.screens->get<VmpcMidiPresetsScreen>("vmpc-midi-presets");
+
+    for (auto& p : vmpcMidiPresetsScreen->presets)
     {
-        openScreen(ls->getPreviousScreenName());
-        return;
-    }
-    else if (shouldAutoSwitch == 2)
-    {
-        auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
-        vmpcMidiScreen->shouldSwitch.store(true);
-        openScreen(ls->getPreviousScreenName());
-        return;
+        if (controllerName.find(p.name) != std::string::npos)
+        {
+            if (p.autoLoadMode == VmpcMidiPresetsScreen::AutoLoadMode::NO)
+            {
+                openScreen(ls->getPreviousScreenName());
+                return;
+            }
+            else if (p.autoLoadMode == VmpcMidiPresetsScreen::AutoLoadMode::YES)
+            {
+                auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
+                vmpcMidiScreen->shouldSwitch.store(true);
+                openScreen(ls->getPreviousScreenName());
+                return;
+            }
+            break;
+        }
     }
 
     displayMessage();
