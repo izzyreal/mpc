@@ -10,7 +10,7 @@ namespace moduru::file { class File; }
 
 namespace mpc::nvram {
 
-    class MidiMappingPersistence
+    class MidiControlPersistence
     {
     public:
         // Persistence of the in-memory mapping, so it's not required
@@ -19,7 +19,7 @@ namespace mpc::nvram {
         static void saveCurrentState(mpc::Mpc& mpc);
 
         // Load and save presets by filename in the default preset path.
-        // See Paths::midiControllerPresetsPath.
+        // See Paths::midiControlPresetsPath.
         static void loadMappingFromFile(mpc::Mpc& mpc, const std::string& name);
         static void loadMappingFromFile(moduru::file::File&, std::vector<std::pair<std::string, mpc::lcdgui::screens::VmpcMidiScreen::Command>>&);
         static void saveMappingToFile(mpc::Mpc& mpc, const std::string& name);
@@ -29,7 +29,6 @@ namespace mpc::nvram {
         static std::vector<std::string> getAvailablePresetNames();
 
     private:
-        // Internal utility method to support in-memory persistence
         static void loadMappingFromFile(mpc::Mpc& mpc, moduru::file::File&);
         static void saveMappingToFile(mpc::Mpc& mpc, moduru::file::File&);
 

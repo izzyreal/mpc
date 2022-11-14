@@ -4,7 +4,7 @@
 #include <string>
 #include <atomic>
 
-namespace mpc::nvram { class MidiMappingPersistence; }
+namespace mpc::nvram { class MidiControlPersistence; }
 namespace mpc::audiomidi { class VmpcMidiControlMode; class MidiDeviceDetector; class AudioMidiServices; }
 namespace mpc::lcdgui::screens::window { class VmpcKnownControllerDetectedScreen; }
 
@@ -68,7 +68,7 @@ namespace mpc::lcdgui::screens {
         void updateRows();
         void displayUpAndDown();
 
-        friend class mpc::nvram::MidiMappingPersistence;
+        friend class mpc::nvram::MidiControlPersistence;
         friend class mpc::audiomidi::VmpcMidiControlMode;
         friend class mpc::audiomidi::MidiDeviceDetector;
         friend class mpc::audiomidi::AudioMidiServices;

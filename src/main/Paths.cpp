@@ -69,9 +69,9 @@ std::string Paths::recordingsPath()
     return recPath;
 }
 
-std::string Paths::midiControllerPresetsPath()
+std::string Paths::midiControlPresetsPath()
 {
-    static auto path = appDocumentsPath() + "MidiControllerPresets" + sep();
+    static auto path = appDocumentsPath() + "MidiControlPresets" + sep();
     return path;
 }
 

@@ -2,7 +2,7 @@
 
 #include <Util.hpp>
 
-#include "nvram/MidiMappingPersistence.hpp"
+#include "nvram/MidiControlPersistence.hpp"
 
 #include <disk/AbstractDisk.hpp>
 #include <disk/MpcFile.hpp>
@@ -161,7 +161,7 @@ void FileExistsScreen::function(int i)
 		}
         else if (previousScreen == "vmpc-midi-presets")
         {
-            MidiMappingPersistence::saveMappingToFile(mpc, nameScreen->getName());
+            MidiControlPersistence::saveMappingToFile(mpc, nameScreen->getName());
             openScreen("vmpc-midi-presets");
         }
 		break;

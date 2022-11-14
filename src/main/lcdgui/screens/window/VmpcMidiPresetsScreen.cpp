@@ -2,7 +2,7 @@
 
 #include "lcdgui/Parameter.hpp"
 #include "lcdgui/screens/dialog2/PopupScreen.hpp"
-#include "nvram/MidiMappingPersistence.hpp"
+#include "nvram/MidiControlPersistence.hpp"
 #include "NameScreen.hpp"
 
 using namespace mpc::lcdgui::screens::window;
@@ -25,7 +25,7 @@ VmpcMidiPresetsScreen::VmpcMidiPresetsScreen(mpc::Mpc& mpc, const int layerIndex
     }
 
     saveMappingAndShowPopup = [this](std::string& newName1) {
-        MidiMappingPersistence::saveMappingToFile(this->mpc, newName1);
+        MidiControlPersistence::saveMappingToFile(this->mpc, newName1);
         auto popupScreen = this->mpc.screens->get<PopupScreen>("popup");
         popupScreen->setText("Saving " + newName1);
         popupScreen->returnToScreenAfterMilliSeconds("vmpc-midi-presets", 1000);
@@ -91,11 +91,11 @@ void VmpcMidiPresetsScreen::function(int i)
 
             if (index == 0)
             {
-                MidiMappingPersistence::loadDefaultMapping(mpc);
+                MidiControlPersistence::loadDefaultMapping(mpc);
             }
             else
             {
-                MidiMappingPersistence::loadMappingFromFile(mpc, presets[index].name);
+                MidiControlPersistence::loadMappingFromFile(mpc, presets[index].name);
             }
 
             openScreen("vmpc-midi");
@@ -174,7 +174,7 @@ void VmpcMidiPresetsScreen::initPresets()
         presets.emplace_back(Preset{"New preset"});
     }
 
-    for (auto& name : MidiMappingPersistence::getAvailablePresetNames())
+    for (auto& name : MidiControlPersistence::getAvailablePresetNames())
     {
         if (std::find_if(presets.begin(), presets.end(), [name](const Preset& p) { return p.name == name; }) == presets.end())
         {

@@ -6,7 +6,7 @@
 
 #include "Paths.hpp"
 #include <nvram/NvRam.hpp>
-#include <nvram/MidiMappingPersistence.hpp>
+#include <nvram/MidiControlPersistence.hpp>
 
 #include <disk/AbstractDisk.hpp>
 
@@ -31,7 +31,14 @@
 
 #include <lcdgui/Screens.hpp>
 
+#include "file/FileUtil.hpp"
+
 #include <string>
+
+#include <cmrc/cmrc.hpp>
+#include <string_view>
+
+CMRC_DECLARE(mpc);
 
 using namespace mpc;
 using namespace mpc::lcdgui;
@@ -44,12 +51,31 @@ Mpc::Mpc()
         Paths::configPath(),
         Paths::storesPath(),
         Paths::defaultLocalVolumePath(),
-        Paths::recordingsPath()
+        Paths::recordingsPath(),
+        Paths::midiControlPresetsPath()
     };
 
     for (auto& p : requiredPaths) {
         if (!fs::exists(p))
+        {
             fs::create_directories(p);
+
+            if (p == Paths::midiControlPresetsPath())
+            {
+                auto fs = cmrc::mpc::get_filesystem();
+
+                for (auto&& entry : fs.iterate_directory("midicontrolpresets"))
+                {
+                    if (entry.is_directory()) continue;
+                    auto file = fs.open("midicontrolpresets/" + entry.filename());
+                    char* data = (char*) std::string_view(file.begin(), file.end() - file.begin()).data();
+                    auto path = fs::path(p + entry.filename());
+                    auto presetStream = moduru::file::FileUtil::fopenw(path, "wb");
+                    std::fwrite(data, sizeof data[0], file.size(), presetStream);
+                    std::fclose(presetStream);
+                }
+            }
+        }
     }
 
 	moduru::Logger::l.setPath(mpc::Paths::logFilePath());
@@ -127,7 +153,7 @@ void Mpc::init(const int inputCount, const int outputCount)
 	for (auto& screenName : screenNames)
         screens->get<ScreenComponent>(screenName);
 
-    mpc::nvram::MidiMappingPersistence::restoreLastState(*this);
+    mpc::nvram::MidiControlPersistence::restoreLastState(*this);
 
     layeredScreen->openScreen("sequencer");
 
@@ -294,7 +320,7 @@ Mpc::~Mpc()
     midiDeviceDetector->stop();
     sampler->stopAllVoices(0);
     sequencer->stop();
-    mpc::nvram::MidiMappingPersistence::saveCurrentState(*this);
+    mpc::nvram::MidiControlPersistence::saveCurrentState(*this);
 	mpc::nvram::NvRam::saveUserScreenValues(*this);
 	mpc::nvram::NvRam::saveVmpcSettings(*this);
 

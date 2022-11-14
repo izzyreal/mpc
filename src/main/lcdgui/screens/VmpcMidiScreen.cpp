@@ -2,7 +2,7 @@
 
 #include <Mpc.hpp>
 
-#include "nvram/MidiMappingPersistence.hpp"
+#include "nvram/MidiControlPersistence.hpp"
 
 #include <hardware/Hardware.hpp>
 #include <hardware/HwPad.hpp>
@@ -272,7 +272,7 @@ void VmpcMidiScreen::function(int i)
 
             if (hasMappingChanged())
             {
-                mpc::nvram::MidiMappingPersistence::saveCurrentState(mpc);
+                mpc::nvram::MidiControlPersistence::saveCurrentState(mpc);
                 popupScreen->setText("MIDI mapping saved");
                 uneditedLabelCommands = labelCommands;
             }

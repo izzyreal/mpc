@@ -1,4 +1,4 @@
-#include "MidiMappingPersistence.hpp"
+#include "MidiControlPersistence.hpp"
 
 #include "hardware/Hardware.hpp"
 #include "hardware/HwPad.hpp"
@@ -8,12 +8,13 @@
 
 using namespace mpc::nvram;
 using namespace mpc::lcdgui::screens;
+using namespace moduru::file;
 
-void MidiMappingPersistence::restoreLastState(mpc::Mpc& mpc)
+void MidiControlPersistence::restoreLastState(mpc::Mpc& mpc)
 {
     loadDefaultMapping(mpc);
 
-    moduru::file::File f(mpc::Paths::configPath() + "midimapping.ini", {});
+    File f(mpc::Paths::configPath() + "midicontrolmapping.vmp", {});
 
     if (f.exists())
     {
@@ -24,7 +25,7 @@ void MidiMappingPersistence::restoreLastState(mpc::Mpc& mpc)
     f.close();
 }
 
-void MidiMappingPersistence::loadDefaultMapping(mpc::Mpc &mpc)
+void MidiControlPersistence::loadDefaultMapping(mpc::Mpc &mpc)
 {
     std::vector<std::string> labels;
 
@@ -55,20 +56,20 @@ void MidiMappingPersistence::loadDefaultMapping(mpc::Mpc &mpc)
     }
 }
 
-void MidiMappingPersistence::saveCurrentState(mpc::Mpc& mpc)
+void MidiControlPersistence::saveCurrentState(mpc::Mpc& mpc)
 {
-    moduru::file::File f(mpc::Paths::configPath() + "midimapping.ini", {});
+    File f(mpc::Paths::configPath() + "midicontrolmapping.vmp", {});
     saveMappingToFile(mpc, f);
 }
 
-void MidiMappingPersistence::loadMappingFromFile(mpc::Mpc &mpc, const std::string& name)
+void MidiControlPersistence::loadMappingFromFile(mpc::Mpc &mpc, const std::string& name)
 {
-    auto dir = std::make_shared<moduru::file::Directory>(mpc::Paths::midiControllerPresetsPath(), nullptr);
+    auto dir = std::make_shared<Directory>(mpc::Paths::midiControlPresetsPath(), nullptr);
 
     for (auto& node : dir->listFiles())
     {
         if (node->isDirectory()) continue;
-        auto f = std::dynamic_pointer_cast<moduru::file::File>(node);
+        auto f = std::dynamic_pointer_cast<File>(node);
         if (f->getNameWithoutExtension() == name)
         {
             loadMappingFromFile(mpc, *f);
@@ -76,16 +77,16 @@ void MidiMappingPersistence::loadMappingFromFile(mpc::Mpc &mpc, const std::strin
     }
 }
 
-void MidiMappingPersistence::saveMappingToFile(mpc::Mpc &mpc, const std::string& name)
+void MidiControlPersistence::saveMappingToFile(mpc::Mpc &mpc, const std::string& name)
 {
-    moduru::file::Directory dir(mpc::Paths::midiControllerPresetsPath(), nullptr);
+    Directory dir(mpc::Paths::midiControlPresetsPath(), {});
 
     if (!dir.exists())
     {
         dir.create();
     }
 
-    moduru::file::File f(mpc::Paths::midiControllerPresetsPath() + name, nullptr);
+    File f(mpc::Paths::midiControlPresetsPath() + name, {});
 
     if (f.exists())
     {
@@ -96,7 +97,7 @@ void MidiMappingPersistence::saveMappingToFile(mpc::Mpc &mpc, const std::string&
     saveMappingToFile(mpc, f);
 }
 
-void MidiMappingPersistence::loadMappingFromFile(mpc::Mpc &mpc, moduru::file::File& f)
+void MidiControlPersistence::loadMappingFromFile(mpc::Mpc &mpc, File& f)
 {
     auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
 
@@ -108,7 +109,7 @@ void MidiMappingPersistence::loadMappingFromFile(mpc::Mpc &mpc, moduru::file::Fi
         vmpcMidiScreen->setLabelCommand(command.first, command.second);
 }
 
-void MidiMappingPersistence::saveMappingToFile(mpc::Mpc &mpc, moduru::file::File &f)
+void MidiControlPersistence::saveMappingToFile(mpc::Mpc &mpc, File &f)
 {
     auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
 
@@ -133,10 +134,10 @@ void MidiMappingPersistence::saveMappingToFile(mpc::Mpc &mpc, moduru::file::File
     f.close();
 }
 
-std::vector<std::string> MidiMappingPersistence::getAvailablePresetNames()
+std::vector<std::string> MidiControlPersistence::getAvailablePresetNames()
 {
     std::vector<std::string> result;
-    auto dir = std::make_shared<moduru::file::Directory>(mpc::Paths::midiControllerPresetsPath(), nullptr);
+    auto dir = std::make_shared<Directory>(mpc::Paths::midiControlPresetsPath(), nullptr);
 
     if (!dir->exists())
     {
@@ -152,7 +153,7 @@ std::vector<std::string> MidiMappingPersistence::getAvailablePresetNames()
     return result;
 }
 
-void MidiMappingPersistence::loadMappingFromFile(moduru::file::File& f,
+void MidiControlPersistence::loadMappingFromFile(File& f,
                                                  std::vector<std::pair<std::string, VmpcMidiScreen::Command>>& commands)
 {
     auto data = std::vector<char>(f.getLength());

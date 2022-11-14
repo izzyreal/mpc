@@ -10,7 +10,8 @@ function(_bundle_mpc_resources _target_name)
   _add_resource_files(${_target_name} ${_mpc_resources_root} fonts fnt "${total_list}")
   _add_resource_files(${_target_name} ${_mpc_resources_root} fonts bmp "${total_list}")
   _add_resource_files(${_target_name} ${_mpc_resources_root} audio wav "${total_list}")
-  
+  _add_resource_files(${_target_name} ${_mpc_resources_root} midicontrolpresets vmp "${total_list}")
+
   cmrc_add_resource_library(
     mpc_resources
     ALIAS mpc::rc

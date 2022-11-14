@@ -4,7 +4,7 @@
 #include "Mpc.hpp"
 #include "Paths.hpp"
 
-#include "nvram/MidiMappingPersistence.hpp"
+#include "nvram/MidiControlPersistence.hpp"
 #include "file/File.hpp"
 #include "lcdgui/screens/window/VmpcKnownControllerDetectedScreen.hpp"
 
@@ -39,10 +39,10 @@ void MidiDeviceDetector::start(mpc::Mpc& mpc)
                 if (deviceNames.emplace(name).second) {
                     if (name.find("MPD") != std::string::npos)
                     {
-                        moduru::file::File f(Paths::midiControllerPresetsPath() + "MPD218", nullptr);
+                        moduru::file::File f(Paths::midiControlPresetsPath() + "MPD218.vmp", {});
                         auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
                         vmpcMidiScreen->realtimeSwitchCommands.clear();
-                        mpc::nvram::MidiMappingPersistence::loadMappingFromFile(f, vmpcMidiScreen->realtimeSwitchCommands);
+                        mpc::nvram::MidiControlPersistence::loadMappingFromFile(f, vmpcMidiScreen->realtimeSwitchCommands);
                         auto knownControllerDetectedScreen = mpc.screens->get<VmpcKnownControllerDetectedScreen>("vmpc-known-controller-detected");
                         knownControllerDetectedScreen->controllerName = "MPD218";
                         mpc.getLayeredScreen()->openScreen("vmpc-known-controller-detected");
