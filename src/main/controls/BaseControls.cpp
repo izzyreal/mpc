@@ -289,9 +289,9 @@ void BaseControls::generateNoteOn(int note, int padVelo)
     mpc.getControls()->isRecPressed() &&
     tc_note != 0 &&
     !posIsLastTick;
-    
-    auto padIndex = program->getPadIndexFromNote(note);
-    
+
+    auto padIndex = program != nullptr ? program->getPadIndexFromNote(note) : - 1;
+
     if (sequencer->isRecordingOrOverdubbing() || step || recMainWithoutPlaying)
     {
         std::shared_ptr<NoteEvent> recordedEvent;
@@ -330,24 +330,38 @@ void BaseControls::generateNoteOn(int note, int padVelo)
         {
             recordedEvent->setVelocity(padVelo);
             recordedEvent->setDuration(step ? 1 : -1);
-            Util::set16LevelsValues(mpc, recordedEvent, padIndex);
-            
-            if (isSliderNote)
-                Util::setSliderNoteVariationParameters(mpc, recordedEvent, program);
+
+            if (program)
+            {
+                Util::set16LevelsValues(mpc, recordedEvent, padIndex);
+
+                if (isSliderNote)
+                {
+                    Util::setSliderNoteVariationParameters(mpc, recordedEvent, program);
+                }
+            }
 
             if (step || recMainWithoutPlaying)
+            {
                 sequencer->playMetronomeTrack();
+            }
         }
     }
     
     auto playableEvent = std::make_shared<NoteEvent>(note);
+
     playableEvent->setVelocity(padVelo);
-    
-    Util::set16LevelsValues(mpc, playableEvent, padIndex);
-    
-    if (isSliderNote)
-        Util::setSliderNoteVariationParameters(mpc, playableEvent, program);
-    
+
+    if (program)
+    {
+        Util::set16LevelsValues(mpc, playableEvent, padIndex);
+
+        if (isSliderNote)
+        {
+            Util::setSliderNoteVariationParameters(mpc, playableEvent, program);
+        }
+    }
+
     playableEvent->setDuration(0);
     playableEvent->setTick(-1);
 
