@@ -71,14 +71,7 @@ void EventHandler::handleNoThru(const std::shared_ptr<Event>& event, Track* trac
     
     if (tce && tce->getTempo() != sequencer->getTempo())
     {
-        // Currently unsure whether MASTER tempo mode supports tempo changes.
-        // I suspect it does. This would mean Sequencer would need to house a
-        // master tempo change meta track.  We'd need to route some get/set
-        // tempo calls probably. Until further notice we only allow
-        // tempo change events if the tempo source is SEQUENCE.
-        if (sequencer->isTempoSourceSequenceEnabled())
-            sequencer->setTempo(tce->getTempo());
-        
+        sequencer->setTempo(tce->getTempo());
         return;
     }
     else if (mce)

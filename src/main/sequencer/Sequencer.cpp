@@ -5,6 +5,7 @@
 
 #include <audiomidi/AudioMidiServices.hpp>
 #include <audiomidi/MpcMidiOutput.hpp>
+#include <audiomidi/MidiClockEmitter.hpp>
 
 #include <hardware/Hardware.hpp>
 #include <hardware/HwPad.hpp>
@@ -40,7 +41,7 @@ using namespace mpc::sequencer;
 using namespace moduru::lang;
 
 Sequencer::Sequencer(mpc::Mpc& mpc)
-	: mpc (mpc), reusableStartStopMsg(std::make_shared<ctoot::midi::core::ShortMessage>())
+	: mpc (mpc)
 {
 }
 
@@ -145,7 +146,9 @@ void Sequencer::setTempo(double newTempo)
 	else if (newTempo > 300.0)
 		newTempo = 300.0;
 
-	auto s = getActiveSequence();
+    mpc.getAudioMidiServices()->getMidiClockEmitter()->setTempo(newTempo);
+
+    auto s = getActiveSequence();
 	auto tce = getCurrentTempoChangeEvent();
 
 	if (!s || !s->isUsed() || !tempoSourceSequenceEnabled)
@@ -486,8 +489,6 @@ void Sequencer::play(bool fromStart)
 		ams->getFrameSequencer()->start(rate);
 	}
 
-    sendClockMsg(fromStart ? ctoot::midi::core::ShortMessage::START : ctoot::midi::core::ShortMessage::CONTINUE);
-
     notifyObservers(std::string("play"));
 }
 
@@ -599,14 +600,14 @@ void Sequencer::stop(int tick)
         return;
     }
 
-	playedStepRepetitions = 0;
+    ams->getFrameSequencer()->sendMidiSyncMsg(ctoot::midi::core::ShortMessage::STOP);
+
+    playedStepRepetitions = 0;
 	songMode = false;
 
 	lastNotifiedBar = -1;
 	lastNotifiedBeat = -1;
 	lastNotifiedClock = -1;
-
-    sendClockMsg(ctoot::midi::core::ShortMessage::STOP);
 
     auto s1 = getActiveSequence();
 	auto s2 = getCurrentlyPlayingSequence();
@@ -1159,26 +1160,6 @@ void Sequencer::goToNextEvent()
     }
 
     move(newPos);
-}
-
-void Sequencer::sendClockMsg(unsigned char status)
-{
-    auto syncScreen = mpc.screens->get<SyncScreen>("sync");
-
-    if (syncScreen->getModeOut() > 0)
-    {
-        reusableStartStopMsg->setMessage(status);
-
-        if (syncScreen->getOut() == 0 || syncScreen->getOut() == 2)
-        {
-            mpc.getMidiOutput()->enqueMessageOutputA(reusableStartStopMsg);
-        }
-
-        if (syncScreen->getOut() == 1 || syncScreen->getOut() == 2)
-        {
-            mpc.getMidiOutput()->enqueMessageOutputB(reusableStartStopMsg);
-        }
-    }
 }
 
 void Sequencer::notifyTimeDisplay()

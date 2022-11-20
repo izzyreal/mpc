@@ -30,33 +30,54 @@ struct EventAfterNFrames {
 namespace ctoot::midi::core { class ShortMessage; }
 
 namespace mpc { class Mpc; }
-namespace mpc::lcdgui::screens::window { class CountMetronomeScreen; }
+namespace mpc::lcdgui::screens::window { class CountMetronomeScreen; class TimingCorrectScreen; }
+namespace mpc::lcdgui::screens { class SequencerScreen; class UserScreen; class SyncScreen; class PunchScreen; class SongScreen; }
 
 namespace mpc::sequencer {
 
 	class Sequencer;
+    class Sequence;
 
 	class FrameSeq final
 		: public ctoot::audio::server::AudioClient
 	{
 
 	private:
-        std::shared_ptr<ctoot::midi::core::ShortMessage> clockMsg;
+        std::shared_ptr<mpc::lcdgui::screens::window::CountMetronomeScreen> countMetronomeScreen;
+        std::shared_ptr<mpc::lcdgui::screens::window::TimingCorrectScreen> timingCorrectScreen;
+        std::shared_ptr<mpc::lcdgui::screens::SequencerScreen> sequencerScreen;
+        std::shared_ptr<mpc::lcdgui::screens::UserScreen> userScreen;
+        std::shared_ptr<mpc::lcdgui::screens::SyncScreen> syncScreen;
+        std::shared_ptr<mpc::lcdgui::screens::PunchScreen> punchScreen;
+        std::shared_ptr<mpc::lcdgui::screens::SongScreen> songScreen;
+
         mpc::Mpc& mpc;
 		int frameCounter = 0;
 		bool running = false;
-		bool metronome = false;
-        std::shared_ptr<mpc::lcdgui::screens::window::CountMetronomeScreen> countMetronomeScreen;
+        bool metronome = false;
         Clock clock;
 		std::shared_ptr<Sequencer> sequencer;
 		int tickFrameOffset = 0;
+        bool wasRunning = false;
+        std::shared_ptr<ctoot::midi::core::ShortMessage> midiSyncClockMsg;
+        std::shared_ptr<ctoot::midi::core::ShortMessage> midiSyncStartStopContinueMsg;
 
-		void move(int newTickPos);
+        void move(int newTickPos);
 		void repeatPad(int duration);
-		void switchToNextSequence();
+		std::shared_ptr<mpc::sequencer::Sequence> switchToNextSequence();
         void triggerClickIfNeeded();
 
-	public:
+        void displayPunchRects();
+        void stopCountingInIfRequired();
+        bool processSongMode();
+        bool processSeqLoopEnabled();
+        void processSeqLoopDisabled();
+        void processNoteRepeat();
+        void updateTimeDisplay(unsigned int nFrames);
+        void processTempoChange();
+        void stopSequencer();
+
+    public:
         std::vector<EventAfterNFrames> eventsAfterNFrames = std::vector<EventAfterNFrames>(10);
 		void start(float sampleRate);
 		void startMetronome(int sampleRate);
@@ -67,7 +88,9 @@ namespace mpc::sequencer {
 		bool isRunning();
 		int getTickPosition();
 
-	public:
+        void sendMidiSyncMsg(unsigned char status);
+
+    public:
 		FrameSeq(mpc::Mpc& mpc);
 
 	};

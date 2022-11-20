@@ -120,13 +120,13 @@ void Mpc::init(const int inputCount, const int outputCount)
 
     screens = std::make_shared<Screens>(*this);
 
+    layeredScreen = std::make_shared<lcdgui::LayeredScreen>(*this);
+
     /*
     * AudioMidiServices requires sequencer to exist.
     */
 	audioMidiServices = std::make_shared<mpc::audiomidi::AudioMidiServices>(*this);
 	MLOG("AudioMidiServices created");
-
-    layeredScreen = std::make_shared<lcdgui::LayeredScreen>(*this);
 
     sequencer->init();
 	MLOG("Sequencer initialized");
@@ -157,7 +157,7 @@ void Mpc::init(const int inputCount, const int outputCount)
 
     layeredScreen->openScreen("sequencer");
 
-    midiDeviceDetector = std::make_unique<MidiDeviceDetector>();
+    midiDeviceDetector = std::make_unique<audiomidi::MidiDeviceDetector>();
     midiDeviceDetector->start(*this);
 
 	MLOG("Mpc is ready");

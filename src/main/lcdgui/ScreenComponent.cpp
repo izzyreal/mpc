@@ -8,11 +8,8 @@ using namespace mpc::lcdgui;
 using namespace mpc::controls;
 
 ScreenComponent::ScreenComponent(mpc::Mpc& mpc, const std::string& name, const int layer)
-	: Component(name), layer(layer), mpc(mpc)
+	: Component(name), layer(layer), mpc(mpc), ls(mpc.getLayeredScreen()), sampler(mpc.getSampler()), sequencer(mpc.getSequencer())
 {
-	ls = mpc.getLayeredScreen();
-	sampler = mpc.getSampler();
-	sequencer = mpc.getSequencer();
 	auto background = std::dynamic_pointer_cast<Background>(addChild(std::make_shared<Background>()));
 	background->setName(name);
 }

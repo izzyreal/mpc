@@ -10,6 +10,7 @@
 #include <audiomidi/SoundPlayer.hpp>
 #include <audiomidi/MonitorInputAdapter.hpp>
 #include <audiomidi/MpcMidiOutput.hpp>
+#include <audiomidi/MidiClockEmitter.hpp>
 
 #include <mpc/MpcVoice.hpp>
 #include <mpc/MpcBasicSoundPlayerChannel.hpp>
@@ -77,10 +78,11 @@ using namespace ctoot::audio::server;
 using namespace ctoot::audio::core;
 using namespace ctoot::audio::mixer;
 
-AudioMidiServices::AudioMidiServices(mpc::Mpc& mpc)
-	: mpc(mpc)
+AudioMidiServices::AudioMidiServices(mpc::Mpc& mpcToUse)
+	: mpc(mpcToUse),
+    frameSeq(std::make_shared<mpc::sequencer::FrameSeq>(mpcToUse)),
+    midiClockEmitter(std::make_shared<MidiClockEmitter>(mpcToUse))
 {
-	frameSeq = std::make_shared<mpc::sequencer::FrameSeq>(mpc);
 	AudioServices::scan();
 	ctoot::synth::SynthServices::scan();
 	ctoot::synth::SynthChannelServices::scan();
@@ -140,6 +142,7 @@ void AudioMidiServices::start(const int inputCount, const int outputCount) {
 
 	cac = std::make_shared<CompoundAudioClient>();
 	cac->add(frameSeq.get());
+	cac->add(midiClockEmitter.get());
 	cac->add(mixer.get());
 
 	mixer->getStrip("66").lock()->setInputProcess(monitorInputAdapter);
@@ -531,4 +534,9 @@ void AudioMidiServices::switchMidiControlMappingIfRequired()
 
         vmpcMidiScreen->shouldSwitch.store(false);
     }
+}
+
+std::shared_ptr<MidiClockEmitter> AudioMidiServices::getMidiClockEmitter()
+{
+    return midiClockEmitter;
 }
