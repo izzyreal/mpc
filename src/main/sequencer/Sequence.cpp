@@ -103,8 +103,6 @@ void Sequence::setLastLoopBarIndex(int i)
 		}
 		else
 		{
-			lastLoopBarIndex = i;
-			
 			notifyObservers(std::string("lastloopbar"));
 		
 			if (i < firstLoopBarIndex)
