@@ -1075,7 +1075,6 @@ void Sampler::copyProgram(const int sourceIndex, const int destIndex)
 		auto mc4 = src->getStereoMixerChannel(i).lock();
 		mc3->setLevel(mc4->getLevel());
 		mc3->setPanning(mc4->getPanning());
-		mc3->setStereo(mc4->isStereo());
 
 		auto srcPad = src->getPad(i);
 		auto destPad = dest->getPad(i);

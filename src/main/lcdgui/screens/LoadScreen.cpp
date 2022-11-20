@@ -441,49 +441,39 @@ void LoadScreen::loadSound(bool shouldBeConverted)
     soundLoader.setPreview(true);
 
     SoundLoaderResult result;
-        
-    try
-    {
-        soundLoader.loadSound(getSelectedFile(), result, shouldBeConverted);
-    }
-    catch (const std::exception& exception)
-    {
-        sampler->deleteSound(sampler->getPreviewSound());
-        
-        MLOG("A problem occurred when trying to load " + getSelectedFileName() + ": " + std::string(exception.what()));
-        MLOG(result.errorMessage);
-        openScreen("load");
-    }
+
+    auto sound = sampler->addSound();
+
+    soundLoader.loadSound(getSelectedFile(), result, sound, shouldBeConverted);
 
     auto popupScreen = mpc.screens->get<PopupScreen>("popup");
 
-    if (!result.success)
+    if (result.success)
     {
-        sampler->deleteSound(sampler->getSoundCount() - 1);
-        
-        if (result.canBeConverted) {
-            auto loadRoutine = [&]() {
-                const bool shouldBeConverted2 = true;
-                loadSound(shouldBeConverted2);
-            };
-            
-            auto convertAndLoadWavScreen = mpc.screens->get<VmpcConvertAndLoadWavScreen>("vmpc-convert-and-load-wav");
-            convertAndLoadWavScreen->setLoadRoutine(loadRoutine);
-            openScreen("vmpc-convert-and-load-wav");
-        } else {
-            openScreen("popup");
-            popupScreen->setText(result.errorMessage);
-            popupScreen->returnToScreenAfterMilliSeconds("load", 500);
-        }
-        
+        ls->openScreen("popup");
+        auto name = FileUtil::splitName(getSelectedFileName())[0];
+        auto ext = FileUtil::splitName(getSelectedFileName())[1];
+        popupScreen->setText("LOADING " + StrUtil::padRight(name, " ", 16) + "." + ext);
+        popupScreen->returnToScreenAfterMilliSeconds("load-a-sound", 300);
         return;
     }
-        
-    ls->openScreen("popup");
-    auto name = FileUtil::splitName(getSelectedFileName())[0];
-    auto ext = FileUtil::splitName(getSelectedFileName())[1];
-    popupScreen->setText("LOADING " + StrUtil::padRight(name, " ", 16) + "." + ext);
-    popupScreen->returnToScreenAfterMilliSeconds("load-a-sound", 300);
+
+    sampler->deleteSound(sound);
+
+    if (result.canBeConverted) {
+        auto loadRoutine = [&]() {
+            const bool shouldBeConverted2 = true;
+            loadSound(shouldBeConverted2);
+        };
+
+        auto convertAndLoadWavScreen = mpc.screens->get<VmpcConvertAndLoadWavScreen>("vmpc-convert-and-load-wav");
+        convertAndLoadWavScreen->setLoadRoutine(loadRoutine);
+        openScreen("vmpc-convert-and-load-wav");
+    } else {
+        openScreen("popup");
+        popupScreen->setText(result.errorMessage);
+        popupScreen->returnToScreenAfterMilliSeconds("load", 700);
+    }
 }
 
 void LoadScreen::displayDevice()

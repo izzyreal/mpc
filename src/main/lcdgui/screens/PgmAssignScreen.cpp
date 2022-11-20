@@ -155,19 +155,10 @@ void PgmAssignScreen::turnWheel(int i)
         displaySoundName();
     }
 	else if (param == "snd")
- {		
-		lastNoteParameters->setSoundIndex(sampler->getNextSoundIndex(lastNoteParameters->getSoundIndex(), i > 0));
-
+    {
+        lastNoteParameters->setSoundIndex(sampler->getNextSoundIndex(lastNoteParameters->getSoundIndex(), i > 0));
 		displaySoundName();
-
-		auto sound = sampler->getSound(lastNoteParameters->getSoundIndex());
-		
-		if (sound)
-		{
-			if (sound->isMono())
-				lastNoteParameters->getStereoMixerChannel().lock()->setStereo(false);
-        }
-	}
+    }
 	else if (param == "mode")
 	{
 		lastNoteParameters->setSoundGenMode(lastNoteParameters->getSoundGenerationMode() + i);

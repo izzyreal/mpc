@@ -428,10 +428,9 @@ wav_or_error AbstractDisk::readWavMeta(std::shared_ptr<MpcFile> f)
     return tl::make_unexpected(mpc_io_error{"Could not read WAV file: " + msg});
 }
 
-sound_or_error AbstractDisk::readWav2(std::shared_ptr<MpcFile> f, bool shouldBeConverted)
+sound_or_error AbstractDisk::readWav2(std::shared_ptr<MpcFile> f, std::shared_ptr<mpc::sampler::Sound> sound, bool shouldBeConverted)
 {
     auto sampler = mpc.getSampler();
-    auto sound = sampler->addSound();
     std::string msg;
 
     try {
@@ -526,17 +525,16 @@ sound_or_error AbstractDisk::readWav2(std::shared_ptr<MpcFile> f, bool shouldBeC
     return tl::make_unexpected(mpc_io_error{"Could not read WAV file: " + msg});
 }
 
-sound_or_error AbstractDisk::readSnd2(std::shared_ptr<MpcFile> f)
+sound_or_error AbstractDisk::readSnd2(std::shared_ptr<MpcFile> f, std::shared_ptr<mpc::sampler::Sound> sound)
 {
-    auto sound = mpc.getSampler()->addSound();
     std::string msg;
     
-    try {
+    try
+    {
         SndReader sndReader(f.get());
         
         if (sndReader.isHeaderValid())
         {
-            
             sndReader.readData(*sound->getSampleData());
             sound->setMono(sndReader.isMono());
             sound->setStart(sndReader.getStart());

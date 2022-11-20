@@ -9,19 +9,12 @@
 
 #include <lang/StrUtil.hpp>
 
-#include <cmath>
-
 using namespace mpc::sampler;
 using namespace mpc::disk;
 using namespace mpc::file::wav;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace moduru::lang;
-
-SoundLoader::SoundLoader(mpc::Mpc& _mpc)
-: mpc (_mpc)
-{
-}
 
 SoundLoader::SoundLoader(mpc::Mpc& _mpc, std::vector<std::shared_ptr<mpc::sampler::Sound>> _sounds, bool _replace)
 : mpc (_mpc), sounds (_sounds), replace (_replace)
@@ -38,7 +31,7 @@ void SoundLoader::setPreview(bool b)
     preview = b;
 }
 
-void SoundLoader::loadSound(std::shared_ptr<MpcFile> f, SoundLoaderResult& r, bool shouldBeConverted)
+void SoundLoader::loadSound(std::shared_ptr<MpcFile> f, SoundLoaderResult& r, std::shared_ptr<mpc::sampler::Sound> sound, bool shouldBeConverted)
 {
     std::string soundFileName = f->getName();
     std::string extension = f->getExtension();
@@ -47,16 +40,20 @@ void SoundLoader::loadSound(std::shared_ptr<MpcFile> f, SoundLoaderResult& r, bo
     auto sampler = mpc.getSampler();
     auto existingSoundIndex = sampler->checkExists(soundName);
  
-    sound_or_error sound;
+    sound_or_error soundOrError;
     
     if (StrUtil::eqIgnoreCase(extension, ".wav"))
     {
         bool willBeConverted = shouldBeConverted;
         auto wavMeta = mpc.getDisk()->readWavMeta(f);
         
-        if (!wavMeta.has_value()) return;
+        if (!wavMeta.has_value())
+        {
+            r.errorMessage = wavMeta.error().log_msg;
+            return;
+        }
         
-        wavMeta.map([&](mpc::file::wav::WavFile wavFile) {
+        wavMeta.map([&](mpc::file::wav::WavFile& wavFile) {
             
             const auto bitDepth = wavFile.getValidBits();
             const auto sampleRate = wavFile.getSampleRate();
@@ -74,14 +71,18 @@ void SoundLoader::loadSound(std::shared_ptr<MpcFile> f, SoundLoaderResult& r, bo
             }
         });
         
-        sound = mpc.getDisk()->readWav2(f, willBeConverted);
+        soundOrError = mpc.getDisk()->readWav2(f, sound, willBeConverted);
     }
     else if (StrUtil::eqIgnoreCase(extension, ".snd"))
     {
-        sound = mpc.getDisk()->readSnd2(f);
+        soundOrError = mpc.getDisk()->readSnd2(f, sound);
     }
-    r.soundWasAdded = true;
-    if (!sound.has_value()) return;
+
+    if (!soundOrError.has_value())
+    {
+        r.errorMessage = soundOrError.error().log_msg;
+        return;
+    }
     
     r.success = true;
     
@@ -101,15 +102,17 @@ void SoundLoader::loadSound(std::shared_ptr<MpcFile> f, SoundLoaderResult& r, bo
         if (replace)
         {
             sampler->deleteSound(existingSoundIndex);
-            sound.map([existingSoundIndex](std::shared_ptr<Sound> s) { s->setMemoryIndex(existingSoundIndex); });
+            soundOrError.map([existingSoundIndex](std::shared_ptr<Sound> s) { s->setMemoryIndex(existingSoundIndex); });
             sampler->sort();
         }
         else
         {
-            sampler->deleteSound((int)(sampler->getSoundCount()) - 1);
+            sampler->deleteSound(sound);
         }
         
         if (partOfProgram)
+        {
             r.existingIndex = existingSoundIndex;
+        }
     }
 }

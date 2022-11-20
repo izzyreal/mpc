@@ -88,7 +88,7 @@ void VeloEnvFilterScreen::displayNote()
 	auto padIndex = program->getPadIndexFromNote(noteParameters->getNumber());
 	auto padName = sampler->getPadName(padIndex);
 	auto sampleName = soundIndex != -1 ? sampler->getSoundName(soundIndex) : "OFF";
-    std::string stereo = noteParameters->getStereoMixerChannel().lock()->isStereo() && soundIndex != -1 ? "(ST)" : "";
+    std::string stereo = soundIndex != -1 && !sampler->getSound(soundIndex)->isMono() ? "(ST)" : "";
 	findField("note")->setText(std::to_string(noteParameters->getNumber()) + "/" + padName + "-" + StrUtil::padRight(sampleName, " ", 16) + stereo);
 }
 

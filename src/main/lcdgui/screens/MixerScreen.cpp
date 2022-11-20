@@ -92,13 +92,13 @@ std::shared_ptr<MpcIndivFxMixerChannel> MixerScreen::getIndivFxMixerChannel(int 
     return indivFxSourceIsDrum ? mpcSoundPlayerChannel->getIndivFxMixerChannels()[note - 35].lock() : noteParameters->getIndivFxMixerChannel().lock();
 }
 
-void MixerScreen::displayMixerStrip(int i)
+void MixerScreen::displayMixerStrip(int stripIndex)
 {
     init();
     
-    auto strip = mixerStrips[i];
-    auto stereoMixer = getStereoMixerChannel(i);
-    auto indivFxMixer = getIndivFxMixerChannel(i);
+    auto strip = mixerStrips[stripIndex];
+    auto stereoMixer = getStereoMixerChannel(stripIndex);
+    auto indivFxMixer = getIndivFxMixerChannel(stripIndex);
     
     if (!stereoMixer || !indivFxMixer)
     {
@@ -120,7 +120,8 @@ void MixerScreen::displayMixerStrip(int i)
     }
     else if (tab == 1)
     {
-        if (stereoMixer->isStereo())
+
+        if (stripHasStereoSound(stripIndex))
             strip->setValueAString(stereoNames[indivFxMixer->getOutput()]);
         else
             strip->setValueAString(monoNames[indivFxMixer->getOutput()]);
@@ -133,7 +134,7 @@ void MixerScreen::displayMixerStrip(int i)
         strip->setValueB(indivFxMixer->getFxSendLevel());
     }
 
-    mixerStrips[i]->setSelection(xPos == i ? yPos : -1);
+    mixerStrips[stripIndex]->setSelection(xPos == stripIndex ? yPos : -1);
 }
 
 void MixerScreen::displayMixerStrips()
@@ -592,8 +593,8 @@ void MixerScreen::displayIndividualOutputs()
                 strip->setValueAString("");
                 continue;
             }
-            
-            if (stereoMixer->isStereo())
+
+            if (stripHasStereoSound(i))
                 strip->setValueAString(stereoNames[indivFxMixer->getOutput()]);
             else
                 strip->setValueAString(monoNames[indivFxMixer->getOutput()]);
@@ -611,7 +612,8 @@ void MixerScreen::displayIndividualOutputs()
     
     for (auto& p : padsWithSameNote)
     {
-        auto strip = mixerStrips[p - (mpc.getBank() * 16)];
+        auto stripIndex = p - (mpc.getBank() * 16);
+        auto strip = mixerStrips[stripIndex];
         
         if (p >= (mpc.getBank() * 16) && p < ((mpc.getBank() + 1) * 16))
         {
@@ -621,7 +623,7 @@ void MixerScreen::displayIndividualOutputs()
                 continue;
             }
             
-            if (stereoMixer->isStereo())
+            if (stripHasStereoSound(stripIndex))
                 strip->setValueAString(stereoNames[indivFxMixer->getOutput()]);
             else
                 strip->setValueAString(monoNames[indivFxMixer->getOutput()]);
@@ -756,4 +758,13 @@ void MixerScreen::displayFxSendLevels()
             strip->setValueB(indivFxMixer->getFxSendLevel());
         }
     }
+}
+
+bool MixerScreen::stripHasStereoSound(int stripIndex)
+{
+    auto pad = stripIndex + (mpc.getBank() * 16);
+    auto note = program->getNoteFromPad(pad);
+    auto noteParameters = program->getNoteParameters(note);
+    auto soundIndex = noteParameters->getSoundIndex();
+    return soundIndex != -1 && !sampler->getSound(soundIndex)->isMono();
 }

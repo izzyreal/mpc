@@ -12,7 +12,7 @@ namespace mpc::file::aps
 	{
 
 	public:
-		int soundNumber;
+		int soundIndex;
 		int soundGenerationMode;
 		int velocityRangeLower;
 		int alsoPlay1;
@@ -40,7 +40,7 @@ namespace mpc::file::aps
 
 
 	public:
-		int getSoundNumber();
+		int getSoundIndex();
 		int getVoiceOverlap();
 		int getTune();
 		int getDecayMode();

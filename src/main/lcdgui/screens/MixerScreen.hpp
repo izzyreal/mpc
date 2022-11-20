@@ -55,7 +55,7 @@ private:
     int yPos = 0;
     std::vector<std::shared_ptr<mpc::lcdgui::MixerStrip>> mixerStrips;
     void addMixerStrips();
-    void displayMixerStrip(int i);
+    void displayMixerStrip(int stripIndex);
     void displayMixerStrips();
     void displayFunctionKeys();
     void displayStereoFaders();
@@ -68,7 +68,9 @@ private:
     std::shared_ptr<ctoot::mpc::MpcStereoMixerChannel> getStereoMixerChannel(int index);
     
     std::shared_ptr<ctoot::mpc::MpcIndivFxMixerChannel> getIndivFxMixerChannel(int index);
-    
+
+    bool stripHasStereoSound(int stripIndex);
+
     void setLink(bool b);
     void setTab(int i);
     void setYPos(int i);

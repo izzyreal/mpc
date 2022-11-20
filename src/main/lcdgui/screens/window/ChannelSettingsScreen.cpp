@@ -208,8 +208,10 @@ void ChannelSettingsScreen::displayOutput()
     auto noteParameters = dynamic_cast<NoteParameters *>(program->getNoteParameters(note));
     auto indivFxMixerChannel = noteParameters->getIndivFxMixerChannel().lock();
     auto stereoMixerChannel = noteParameters->getStereoMixerChannel().lock();
+    auto soundIndex = noteParameters->getSoundIndex();
+    const bool isStereo = soundIndex != -1 && !sampler->getSound(soundIndex)->isMono();
 
-    if (stereoMixerChannel->isStereo())
+    if (isStereo)
         findField("output")->setText(stereoNamesSlash[indivFxMixerChannel->getOutput()]);
     else
         findField("output")->setText(" " + std::to_string(indivFxMixerChannel->getOutput()));

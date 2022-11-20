@@ -6,7 +6,6 @@
 #include <disk/StdDisk.hpp>
 #include <disk/MpcFile.hpp>
 #include <disk/PgmToProgramConverter.hpp>
-#include <disk/ProgramImportAdapter.hpp>
 #include <disk/SoundLoader.hpp>
 #include <sampler/Program.hpp>
 #include <sequencer/Track.hpp>
@@ -86,14 +85,13 @@ std::shared_ptr<mpc::sampler::Program> ProgramLoader::loadProgram(mpc::Mpc& mpc,
 			{
 				unavailableSoundIndices.push_back(i);
                 skipCount++;
-				notFound(mpc, soundFileName, ext);
+                notFound(mpc, soundFileName);
 				continue;
 			}
 
             finalSoundIndices[i] = i - skipCount;
-            
+
             loadSound(mpc,
-                      soundFileName,
                       pgmSoundNames[i],
                       ext,
                       soundFile,
@@ -102,24 +100,30 @@ std::shared_ptr<mpc::sampler::Program> ProgramLoader::loadProgram(mpc::Mpc& mpc,
                       i);
         }
 
-		ProgramImportAdapter adapter(mpc.getSampler(), p, soundsDestIndex, unavailableSoundIndices);
-		        
-        for (auto& noteParameters : p->getNotesParameters()) {
-            
-            if (noteParameters->getSoundIndex() == -1) continue;
-                        
-            if (finalSoundIndices.find(noteParameters->getSoundIndex()) == end(finalSoundIndices)) continue;
-            
-            auto finalSoundIndex = finalSoundIndices[noteParameters->getSoundIndex()];
+        for (auto& srcNoteParams : p->getNotesParameters())
+        {
+            auto soundIndex = srcNoteParams->getSoundIndex();
 
-            noteParameters->setSoundIndex(finalSoundIndex);
+            if (soundIndex != -1 && finalSoundIndices.find(soundIndex) != end(finalSoundIndices))
+            {
+                soundIndex = finalSoundIndices[soundIndex];
+            }
+
+            if (find(begin(unavailableSoundIndices), end(unavailableSoundIndices), soundIndex) != end(unavailableSoundIndices))
+            {
+                soundIndex = -1;
+            }
+
+            srcNoteParams->setSoundIndex(soundIndex);
         }
 
         auto track = mpc.getSequencer()->getActiveTrack();
         auto loadAProgramScreen = mpc.screens->get<LoadAProgramScreen>("load-a-program");
 
         if (!loadAProgramScreen->clearProgramWhenLoading)
+        {
             mpc.getDrum(track->getBus() - 1)->setProgram(mpc.getSampler()->getProgramCount() - 1);
+        }
         
 		mpc.getLayeredScreen()->openScreen("load");
 	}
@@ -135,9 +139,9 @@ std::shared_ptr<mpc::sampler::Program> ProgramLoader::loadProgram(mpc::Mpc& mpc,
     return p;
 }
 
-void ProgramLoader::loadSound(mpc::Mpc& mpc, const std::string& soundFileName, const std::string& soundName,
- const std::string& ext, std::shared_ptr<MpcFile> soundFile, std::vector<int>* soundsDestIndex,
- const bool replace, const int loadSoundIndex)
+void ProgramLoader::loadSound(mpc::Mpc &mpc, const std::string &soundName, const std::string &ext,
+                              std::shared_ptr<MpcFile> soundFile, std::vector<int> *soundsDestIndex,
+                              const bool replace, const int loadSoundIndex)
 {
     SoundLoader soundLoader(mpc, mpc.getSampler()->getSounds(), replace);
     soundLoader.setPartOfProgram(true);
@@ -145,20 +149,18 @@ void ProgramLoader::loadSound(mpc::Mpc& mpc, const std::string& soundFileName, c
     SoundLoaderResult soundLoaderResult;
     bool shouldBeConverted = false;
 
-    try
+    auto sound = mpc.getSampler()->addSound();
+
+    soundLoader.loadSound(soundFile, soundLoaderResult, sound, shouldBeConverted);
+
+    if (!soundLoaderResult.success)
     {
-        soundLoader.loadSound(soundFile, soundLoaderResult, shouldBeConverted);
-        
-        if (soundLoaderResult.existingIndex != -1)
-            (*soundsDestIndex)[loadSoundIndex] = soundLoaderResult.existingIndex;
+        mpc.getSampler()->deleteSound(sound);
+        return;
     }
-    catch (const std::exception& e)
-    {
-        auto msg = std::string(e.what());
-        MLOG("Exception occurred in ProgramLoader::loadSound(...) -- " + msg);
-        MLOG(soundLoaderResult.errorMessage);
-        throw;
-    }
+
+    if (soundLoaderResult.existingIndex != -1)
+        (*soundsDestIndex)[loadSoundIndex] = soundLoaderResult.existingIndex;
 }
 
 void ProgramLoader::showPopup(mpc::Mpc& mpc, std::string name, std::string ext, int sampleSize)
@@ -175,7 +177,7 @@ void ProgramLoader::showPopup(mpc::Mpc& mpc, std::string name, std::string ext, 
     std::this_thread::sleep_for(std::chrono::milliseconds((int)(sleepTime * 0.2)));
 }
 
-void ProgramLoader::notFound(mpc::Mpc& mpc, std::string soundFileName, std::string ext)
+void ProgramLoader::notFound(mpc::Mpc &mpc, std::string soundFileName)
 {
 	auto cantFindFileScreen = mpc.screens->get<CantFindFileScreen>("cant-find-file");
 	auto skipAll = cantFindFileScreen->skipAll;

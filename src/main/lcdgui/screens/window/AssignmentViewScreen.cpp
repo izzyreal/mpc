@@ -160,7 +160,9 @@ void AssignmentViewScreen::displayNote()
 
 void AssignmentViewScreen::displaySoundName()
 {
-	auto padIndex = getPadIndexFromFocus();
+    init();
+
+    auto padIndex = getPadIndexFromFocus();
 	int note = program->getPad(padIndex)->getNote();
 
 	if (note == 34)
@@ -173,23 +175,16 @@ void AssignmentViewScreen::displaySoundName()
 
     std::string soundName = soundIndex == -1 ? "OFF" : sampler->getSoundName(soundIndex);
 
-	init();
-
-	auto noteParameters = sampler->getLastNp(program.get());
-
-    std::string stereo;
-
-	if (soundIndex != -1 && noteParameters->getStereoMixerChannel().lock()->isStereo())
-		stereo = "(ST)";
+    std::string stereo = soundIndex != -1 && !sampler->getSound(soundIndex)->isMono() ? "(ST)" : "";
 
 	findLabel("info2")->setText("=" + StrUtil::padRight(soundName, " ", 16) + stereo);
 }
 
 int AssignmentViewScreen::getPadIndexFromFocus()
 {
-	auto padIndex = -1;
+    init();
 
-	init();
+    int padIndex = -1;
 
 	for (int i = 0; i < padFocusNames.size(); i++)
 	{

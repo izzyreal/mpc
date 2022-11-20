@@ -111,14 +111,14 @@ void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool head
                 skipCount++;
                 
                 if (!headless)
-                    ApsLoader::handleSoundNotFound(mpc, soundFileName, ext);
+                    ApsLoader::handleSoundNotFound(mpc, soundFileName);
                 
                 continue;
             }
             
             finalSoundIndices[i] = i - skipCount;
             
-            ApsLoader::loadSound(mpc, soundFileName, ext, soundFile, false, i, headless);
+            ApsLoader::loadSound(mpc, soundFileName, ext, soundFile, headless);
         }
     }
     
@@ -133,7 +133,6 @@ void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool head
         
         for (int noteIndex = 0; noteIndex < 64; noteIndex++)
         {
-            int padnn = assignTable[noteIndex];
             newProgram->getPad(noteIndex)->setNote(assignTable[noteIndex]);
             
             auto sourceStereoMixerChannel = apsProgram->getStereoMixerChannel(noteIndex);
@@ -152,13 +151,17 @@ void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool head
             
             auto srcNoteParams = apsProgram->getNoteParameters(noteIndex);
             
-            auto soundIndex = srcNoteParams->getSoundNumber();
+            auto soundIndex = srcNoteParams->getSoundIndex();
             
             if (soundIndex != -1 && finalSoundIndices.find(soundIndex) != end(finalSoundIndices))
+            {
                 soundIndex = finalSoundIndices[soundIndex];
+            }
             
-            if (find(begin(unavailableSoundIndices), end(unavailableSoundIndices), srcNoteParams->getSoundNumber()) != end(unavailableSoundIndices))
+            if (find(begin(unavailableSoundIndices), end(unavailableSoundIndices), soundIndex) != end(unavailableSoundIndices))
+            {
                 soundIndex = -1;
+            }
             
             destNoteParams->setSoundIndex(soundIndex);
             destNoteParams->setTune(srcNoteParams->getTune());
@@ -243,11 +246,10 @@ void ApsLoader::loadSound(mpc::Mpc& mpc,
                           std::string soundFileName,
                           std::string ext,
                           std::weak_ptr<MpcFile> _soundFile,
-                          bool replace,
-                          int loadSoundIndex,
                           bool headless)
 {
     auto soundFile = _soundFile.lock();
+    const auto replace = false;
     SoundLoader soundLoader(mpc, mpc.getSampler()->getSounds(), replace);
     soundLoader.setPartOfProgram(true);
     
@@ -256,7 +258,14 @@ void ApsLoader::loadSound(mpc::Mpc& mpc,
     
     SoundLoaderResult result;
     bool shouldBeConverted = false;
-    soundLoader.loadSound(soundFile, result, shouldBeConverted);
+    auto sound = mpc.getSampler()->addSound();
+
+    soundLoader.loadSound(soundFile, result, sound, shouldBeConverted);
+
+    if  (!result.success)
+    {
+        mpc.getSampler()->deleteSound(sound);
+    }
 }
 
 void ApsLoader::showPopup(mpc::Mpc& mpc, std::string name, std::string ext, int sampleSize)
@@ -276,7 +285,7 @@ void ApsLoader::showPopup(mpc::Mpc& mpc, std::string name, std::string ext, int 
     }
 }
 
-void ApsLoader::handleSoundNotFound(mpc::Mpc& mpc, std::string soundFileName, std::string ext)
+void ApsLoader::handleSoundNotFound(mpc::Mpc &mpc, std::string soundFileName)
 {
     auto cantFindFileScreen = mpc.screens->get<CantFindFileScreen>("cant-find-file");
     auto skipAll = cantFindFileScreen->skipAll;

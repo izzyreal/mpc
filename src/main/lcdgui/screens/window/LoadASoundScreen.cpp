@@ -139,8 +139,6 @@ void LoadASoundScreen::keepSound()
             auto program = sampler->getProgram(programNumber);
             auto noteParameters = sampler->getLastNp(program.get());
             noteParameters->setSoundIndex(sampler->getSoundCount() - 1);
-            auto mixerChannel = noteParameters->getStereoMixerChannel().lock();
-            mixerChannel->setStereo(!newSoundIsMono);
         }
     };
 

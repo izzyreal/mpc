@@ -8,7 +8,7 @@ using namespace mpc::file::aps;
 
 ApsNoteParameters::ApsNoteParameters(const std::vector<char>& loadBytes)
 {
-	soundNumber = loadBytes[0] == '\xff' ? -1 : loadBytes[0];
+    soundIndex = loadBytes[0] == '\xff' ? -1 : loadBytes[0];
 	soundGenerationMode = loadBytes[2];
 	velocityRangeLower = loadBytes[3];
 	alsoPlay1 = loadBytes[4] == 0 ? 34 : loadBytes[4];
@@ -66,9 +66,9 @@ ApsNoteParameters::ApsNoteParameters(mpc::sampler::NoteParameters* np)
 	saveBytes[25] = np->getVelocityToPitch();
 }
 
-int ApsNoteParameters::getSoundNumber()
+int ApsNoteParameters::getSoundIndex()
 {
-    return soundNumber;
+    return soundIndex;
 }
 
 int ApsNoteParameters::getVoiceOverlap()

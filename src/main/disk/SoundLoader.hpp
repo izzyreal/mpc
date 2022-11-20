@@ -35,22 +35,15 @@ struct SoundLoaderResult {
     std::string errorMessage = "";
     
     bool canBeConverted = false;
-    
-    // This will be set to true when everything prior to and including
-    // adding a sound went fine. It is used by error handlers to decide
-    // whether to remove an added sound or not. See in vmpc-juce the
-    // file PadControl.cpp
-    bool soundWasAdded = false;
 };
 
 class SoundLoader
 {
 public:
-    SoundLoader(mpc::Mpc& mpc);
     SoundLoader(mpc::Mpc& mpc, std::vector<std::shared_ptr<mpc::sampler::Sound>> sounds, bool replace);
 
     void setPartOfProgram(bool);
-    void loadSound(std::shared_ptr<MpcFile>, SoundLoaderResult&, bool shouldBeConverted);
+    void loadSound(std::shared_ptr<MpcFile>, SoundLoaderResult&, std::shared_ptr<mpc::sampler::Sound>, bool shouldBeConverted);
     void setPreview(bool);
 
 private:

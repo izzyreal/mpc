@@ -21,6 +21,11 @@ void PopupScreen::close()
 
 void PopupScreen::setText(std::string text)
 {
+    if (text.size() > 28)
+    {
+        text = text.substr(0, 28);
+    }
+
 	findChild<Label>("popup")->setText(text);
 	SetDirty();
 }
