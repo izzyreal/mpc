@@ -231,8 +231,8 @@ void FrameSeq::repeatPad(int duration)
         noteEvent->setVelocity(fullLevel ? 127 : p->getPressure());
         noteEvent->setDuration(duration);
 
-        noteEvent->getNoteOff().lock()->setTick(tick + duration);
-        noteEvent->getNoteOff().lock()->setVelocity(0);
+        noteEvent->getNoteOff()->setTick(tick + duration);
+        noteEvent->getNoteOff()->setVelocity(0);
         auto eventFrame = getEventFrameOffset();
 
         MidiAdapter midiAdapter;
@@ -564,4 +564,16 @@ void FrameSeq::stopSequencer()
     sequencer->playToTick(seq->getLastTick() - 1);
     sequencer->stop();
     move(0);
+}
+
+void FrameSeq::enqueEventAfterNFrames(std::function<void()> event, unsigned long nFrames)
+{
+    for (auto &e : eventsAfterNFrames)
+    {
+        if (!e.occupied.load())
+        {
+            e.init(nFrames, event);
+            break;
+        }
+    }
 }

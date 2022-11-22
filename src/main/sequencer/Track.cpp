@@ -347,7 +347,9 @@ int Track::getBus()
 void Track::setDeviceIndex(int i)
 {
 	if (i < 0 || i > 32)
-		return;
+    {
+        return;
+    }
 
     device = i;
 
@@ -414,12 +416,16 @@ int Track::getCorrectedTickPos()
         shiftedTick += amount;
 
         if (shiftedTick < 0)
+        {
             shiftedTick = 0;
+        }
 
         auto lastTick = parent->getLastTick();
 
         if (shiftedTick > lastTick)
+        {
             shiftedTick = lastTick;
+        }
 
         correctedTickPos = shiftedTick;
     }
@@ -448,6 +454,7 @@ void Track::processRealtimeQueuedEvents()
     }
 
     for (int noteOnIndex = 0; noteOnIndex < noteOnCount; noteOnIndex++) {
+
         auto noteOn = bulkNoteOns[noteOnIndex];
 
         if (noteOn->getTick() == -2)
@@ -466,7 +473,6 @@ void Track::processRealtimeQueuedEvents()
 
         for (int noteOffIndex = 0; noteOffIndex < noteOffCount; noteOffIndex++)
         {
-
             auto noteOff = bulkNoteOffs[noteOffIndex];
 
             if (noteOff->getNote() == noteOn->getNote())
@@ -564,7 +570,7 @@ void Track::playNext()
             bool oneOrMorePadsArePressed = false;
             auto hardware = mpc.getHardware();
 
-          for (auto& p : hardware->getPads())
+            for (auto& p : hardware->getPads())
             {
               if (p->isPressed())
               {
@@ -573,8 +579,7 @@ void Track::playNext()
               }
             }
           
-            if (!_delete && oneOrMorePadsArePressed &&
-                hardware->getTopPanel()->isSixteenLevelsEnabled())
+            if (!_delete && oneOrMorePadsArePressed && hardware->getTopPanel()->isSixteenLevelsEnabled())
             {
                 auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
                 auto assign16LevelsScreen = mpc.screens->get<Assign16LevelsScreen>("assign-16-levels");

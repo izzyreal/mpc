@@ -10,17 +10,16 @@ NoteEvent::NoteEvent()
 NoteEvent::NoteEvent(int i) 
 {
 	number = i;
-	noteOff = std::make_shared<NoteEvent>(false, 0);
+	noteOff = std::make_shared<NoteEvent>(true, 0);
     noteOff->number = number;
 }
 
-NoteEvent::NoteEvent(bool /*dummyParameter*/, int _noteOnTick)
+NoteEvent::NoteEvent(bool /*dummyParameter*/, int /* noteOnTick */)
 {
 	// noteoff ctor should not create a noteoff
-    noteOnTick = _noteOnTick;
 }
 
-std::weak_ptr<NoteEvent> NoteEvent::getNoteOff()
+std::shared_ptr<NoteEvent> NoteEvent::getNoteOff()
 {
     return noteOff;
 }
@@ -119,18 +118,4 @@ void NoteEvent::CopyValuesTo(std::weak_ptr<Event> dest)
 	lDest->setNote(getNote());
     lDest->velocity = velocity;
 	lDest->setDuration(getDuration());
-}
-
-void NoteEvent::setTick(int tick)
-{
-    Event::setTick(tick);
-
-    if (noteOff)
-    {
-        noteOff->noteOnTick = tick;
-    }
-}
-
-int NoteEvent::getNoteOnTick() {
-    return noteOnTick;
 }

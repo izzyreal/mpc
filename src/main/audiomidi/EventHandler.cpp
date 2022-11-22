@@ -19,7 +19,6 @@
 #include <lcdgui/screens/MixerSetupScreen.hpp>
 #include <lcdgui/screens/TransScreen.hpp>
 #include <lcdgui/screens/SyncScreen.hpp>
-#include <lcdgui/screens/window/CountMetronomeScreen.hpp>
 #include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
 
 #include <midi/core/MidiMessage.hpp>
@@ -57,8 +56,6 @@ void EventHandler::handle(const std::shared_ptr<Event>& event, Track* track, cha
 
 void EventHandler::handleNoThru(const std::shared_ptr<Event>& event, Track* track, int timeStamp, char drum)
 {
-    auto countMetronomeScreen = mpc.screens->get<CountMetronomeScreen>("count-metronome");
-
     if (sequencer->isCountingIn() && event->getTick() != -1)
     {
         return;
@@ -114,12 +111,12 @@ void EventHandler::handleNoThru(const std::shared_ptr<Event>& event, Track* trac
                     // Each of the 4 DRUMs is routed to their respective 0-based MIDI channel.
                     // This MIDI channel is part of a MIDI system that is internal to VMPC2000XL's sound player engine.
                     midiAdapter.process(ne, drumIndex, newVelo);
-                    auto eventFrame = mpc.getAudioMidiServices()->getFrameSequencer()->getEventFrameOffset();
+
+                    auto frameSeq = mpc.getAudioMidiServices()->getFrameSequencer();
+                    auto eventFrame = frameSeq->getEventFrameOffset();
                     
                     if (timeStamp != -1)
                         eventFrame = timeStamp;
-
-                    int startTick = ne->getNoteOff().lock() ? ne->getTick() : ne->getNoteOnTick();
 
                     auto pgmIndex = sampler->getDrumBusProgramIndex(drumIndex + 1);
                     auto pgm = sampler->getProgram(pgmIndex);
@@ -128,7 +125,7 @@ void EventHandler::handleNoThru(const std::shared_ptr<Event>& event, Track* trac
                     auto audioServer = mpc.getAudioMidiServices()->getAudioServer();
                     auto durationFrames = (duration == -1 || duration == 0) ? -1 : mpc::sequencer::SeqUtil::ticksToFrames(duration, sequencer->getTempo(), audioServer->getSampleRate());
 
-                    mpc.getMms()->mpcTransport(midiAdapter.get().lock().get(), 0, ne->getVariationType(), ne->getVariationValue(), eventFrame, startTick, durationFrames);
+                    mpc.getMms()->mpcTransport(midiAdapter.get().lock().get(), 0, ne->getVariationType(), ne->getVariationValue(), eventFrame, ne->getTick(), durationFrames);
                     
                     if (audioServer->isRealTime())
                     {
@@ -147,6 +144,13 @@ void EventHandler::handleNoThru(const std::shared_ptr<Event>& event, Track* trac
                                 notifyVelo = 255;
                             
                             mpc.getHardware()->getPad(pad)->notifyObservers(notifyVelo);
+
+                            if (ne->getDuration() > 0)
+                            {
+                                frameSeq->enqueEventAfterNFrames([this, pad]() {
+                                    mpc.getHardware()->getPad(pad)->notifyObservers(255);
+                                }, durationFrames);
+                            }
                         }
                     }
                 }
@@ -197,7 +201,7 @@ void EventHandler::midiOut(const std::shared_ptr<Event>& e, Track* track)
             if (candidate != end(transposeCache))
             {
                 auto transposeParameters = *candidate;
-                auto copy = std::make_shared<NoteEvent>(true);
+                auto copy = std::make_shared<NoteEvent>(true, 0);
                 noteEvent->CopyValuesTo(copy);
                 noteEvent = copy;
                 noteEvent->setNote(noteEvent->getNote() + transposeParameters.second);

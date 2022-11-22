@@ -61,6 +61,7 @@ namespace mpc::sequencer {
         bool wasRunning = false;
         std::shared_ptr<ctoot::midi::core::ShortMessage> midiSyncClockMsg;
         std::shared_ptr<ctoot::midi::core::ShortMessage> midiSyncStartStopContinueMsg;
+        std::vector<EventAfterNFrames> eventsAfterNFrames = std::vector<EventAfterNFrames>(100);
 
         void move(int newTickPos);
 		void repeatPad(int duration);
@@ -78,7 +79,6 @@ namespace mpc::sequencer {
         void stopSequencer();
 
     public:
-        std::vector<EventAfterNFrames> eventsAfterNFrames = std::vector<EventAfterNFrames>(10);
 		void start(float sampleRate);
 		void startMetronome(int sampleRate);
 		void work(int nFrames) override;
@@ -89,6 +89,7 @@ namespace mpc::sequencer {
 		int getTickPosition();
 
         void sendMidiSyncMsg(unsigned char status);
+        void enqueEventAfterNFrames(std::function<void()>, unsigned long nFrames);
 
     public:
 		FrameSeq(mpc::Mpc& mpc);
