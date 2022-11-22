@@ -38,7 +38,7 @@ public:
     bool exists();
     std::string getName();
     bool setName(std::string s);
-    int length();
+    unsigned long length();
     void setFileData(std::vector<char>& data);
     bool del();
     std::vector<char> getBytes();

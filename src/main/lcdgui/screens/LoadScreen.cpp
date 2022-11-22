@@ -170,7 +170,7 @@ void LoadScreen::function(int i)
 	}
 	case 5:
 	{
-		if (!disk || disk->getFileNames().size() == 0)
+		if (!disk || disk->getFileNames().empty())
 			return;
 		
 		auto selectedFile = getSelectedFile();
@@ -330,7 +330,7 @@ void LoadScreen::displayFreeSnd()
 
 void LoadScreen::displayFile()
 {
-	if (mpc.getDisk()->getFileNames().size() == 0)
+	if (mpc.getDisk()->getFileNames().empty())
 	{
 		findField("file")->setText("");
 		return;
@@ -358,25 +358,46 @@ void LoadScreen::displayFile()
 	}
 }
 
-int LoadScreen::getFileSize()
+unsigned long LoadScreen::getFileSizeKb()
 {
-	auto disk = mpc.getDisk();
+	auto file = getSelectedFile();
 	
-	if (!disk->getFile(fileLoad) || disk->getFile(fileLoad)->isDirectory())
-		return 0;
-	
-	return (int) floor(disk->getFile(fileLoad)->length() / 1024.0);
+	if (!file || file->isDirectory())
+    {
+        return 0;
+    }
+
+	return static_cast<unsigned long>(ceil(file->length() / 1024.0));
 }
 
 void LoadScreen::displaySize()
 {
-	if (mpc.getDisk()->getFileNames().size() == 0)
+	if (mpc.getDisk()->getFileNames().empty())
 	{
 		findLabel("size")->setText("      K");
 		return;
 	}
-	
-	findLabel("size")->setText(StrUtil::padLeft(std::to_string(getFileSize()), " ", 6) + "K");
+
+    auto candidate = getFileSizeKb();
+
+    std::vector<std::string> units{"K", "M", "G", "T", "?"};
+
+    unsigned char counter = 0;
+
+    std::string sizeText;
+
+    while ((sizeText = std::to_string(candidate)).length() > 6 && counter <= 4)
+    {
+        candidate /= 1024;
+        counter++;
+    }
+
+    if (sizeText.length() > 6)
+    {
+        sizeText = sizeText.substr(0, 6);
+    }
+
+	findLabel("size")->setText(StrUtil::padLeft(sizeText, " ", 6) + units[counter]);
 }
 
 void LoadScreen::setView(int i)
@@ -407,7 +428,9 @@ std::string LoadScreen::getSelectedFileName()
 	auto fileNames = mpc.getDisk()->getFileNames();
 	
 	if (fileNames.size() <= fileLoad)
-		return "";
+    {
+        return "";
+    }
 
 	return fileNames[fileLoad];
 }

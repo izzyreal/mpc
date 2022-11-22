@@ -76,7 +76,7 @@ private:
     void setFileLoadWithMaxCheck(int i);
     void setFileLoad(int i);
     
-    int getFileSize();
+    unsigned long getFileSizeKb();
     
     void loadSound(bool shouldBeConverted);
     

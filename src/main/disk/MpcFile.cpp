@@ -132,7 +132,7 @@ bool MpcFile::setName(std::string s)
     }
 }
 
-int MpcFile::length()
+unsigned long MpcFile::length()
 {
     if (isDirectory()) return 0;
     if (raw) {
@@ -143,7 +143,7 @@ int MpcFile::length()
         return 0;
     }
     else
-        return fs::file_size(fs_path);
+        return static_cast<unsigned long>(fs::file_size(fs_path));
 }
 
 void MpcFile::setFileData(std::vector<char>& data)
