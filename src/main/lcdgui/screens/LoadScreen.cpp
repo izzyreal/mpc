@@ -32,6 +32,8 @@ LoadScreen::LoadScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void LoadScreen::open()
 {
+    mpc.getDisk()->initFiles();
+
     if (ls->getPreviousScreenName() != "popup")
     {
         device = mpc.getDiskController()->getActiveDiskIndex();
@@ -162,16 +164,22 @@ void LoadScreen::function(int i)
 			auto popupScreen = mpc.screens->get<PopupScreen>("popup");
 
 			if (started)
-				popupScreen->setText("Playing " + name);
+            {
+                popupScreen->setText("Playing " + name);
+            }
 			else
-				popupScreen->setText("Can't play " + name);
+            {
+                popupScreen->setText("Can't play " + name);
+            }
 		}
 		break;
 	}
 	case 5:
 	{
 		if (!disk || disk->getFileNames().empty())
-			return;
+        {
+            return;
+        }
 		
 		auto selectedFile = getSelectedFile();
 		auto ext = moduru::file::FileUtil::splitName(selectedFile->getName())[1];
@@ -460,7 +468,7 @@ void LoadScreen::setFileLoad(int i)
 
 void LoadScreen::loadSound(bool shouldBeConverted)
 {
-    SoundLoader soundLoader(mpc, sampler->getSounds(), false);
+    SoundLoader soundLoader(mpc, false);
     soundLoader.setPreview(true);
 
     SoundLoaderResult result;
@@ -492,10 +500,6 @@ void LoadScreen::loadSound(bool shouldBeConverted)
         auto convertAndLoadWavScreen = mpc.screens->get<VmpcConvertAndLoadWavScreen>("vmpc-convert-and-load-wav");
         convertAndLoadWavScreen->setLoadRoutine(loadRoutine);
         openScreen("vmpc-convert-and-load-wav");
-    } else {
-        openScreen("popup");
-        popupScreen->setText(result.errorMessage);
-        popupScreen->returnToScreenAfterMilliSeconds("load", 700);
     }
 }
 

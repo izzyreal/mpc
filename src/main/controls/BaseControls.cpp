@@ -11,8 +11,6 @@
 #include <audiomidi/AudioMidiServices.hpp>
 #include <audiomidi/EventHandler.hpp>
 
-#include <disk/AbstractDisk.hpp>
-
 #include <sampler/Pad.hpp>
 #include <sequencer/Track.hpp>
 #include <sequencer/NoteEvent.hpp>
@@ -406,8 +404,6 @@ void BaseControls::numpad(int i)
         }
     }
     
-    auto disk = mpc.getDisk();
-    
     if (controls->isShiftPressed())
     {
         switch (i)
@@ -432,8 +428,6 @@ void BaseControls::numpad(int i)
                 {
                     break;
                 }
-                
-                disk->initFiles();
                 
                 ls->openScreen("load");
                 break;

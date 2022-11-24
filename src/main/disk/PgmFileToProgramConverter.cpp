@@ -1,4 +1,4 @@
-#include <disk/PgmToProgramConverter.hpp>
+#include <disk/PgmFileToProgramConverter.hpp>
 
 #include <file/pgmreader/PRMixer.hpp>
 #include <file/pgmreader/PRPads.hpp>
@@ -21,74 +21,43 @@
 
 using namespace mpc::disk;
 using namespace mpc::sampler;
+using namespace mpc::file::pgmreader;
 
-PgmToProgramConverter::PgmToProgramConverter(std::weak_ptr<MpcFile> _file, std::weak_ptr<Sampler> sampler, const int replaceIndex)
+PgmFileToProgramConverter::PgmFileToProgramConverter(std::weak_ptr<MpcFile> _file, std::weak_ptr<Sampler> sampler, const int replaceIndex)
 {
-    auto file = _file.lock();
-    
-	if (!file->exists())
-		throw std::invalid_argument("File does not exist");
-
-	reader = new mpc::file::pgmreader::ProgramFileReader(file);
-	
-	if (!reader->getHeader()->verifyFirstTwoBytes())
-		throw std::invalid_argument("PGM first 2 bytes are incorrect");
-	
-	if (replaceIndex == -1)
-		program = sampler.lock()->addProgram();
-	else
-		program = sampler.lock()->getProgram(replaceIndex);
-
-	auto pgmSoundNames = reader->getSampleNames();
-	
-	for (int i = 0; i < reader->getHeader()->getNumberOfSamples(); i++)
-		soundNames.push_back(pgmSoundNames->getSampleName(i));
-
-	auto const programName = reader->getProgramName();
-	program.lock()->setName(programName->getProgramNameASCII());
-	setNoteParameters();
-	setMixer();
-	setSlider();
-	done = true;
+    program = loadFromFileAndConvert(_file.lock(), sampler.lock(), replaceIndex, soundNames).value_or(nullptr);
 }
 
-PgmToProgramConverter::~PgmToProgramConverter()
+void PgmFileToProgramConverter::setSlider(ProgramFileReader& reader, std::shared_ptr<Program> program)
 {
-	if (reader != nullptr)
-		delete reader;
+    auto slider = reader.getSlider();
+    auto nn = slider->getMidiNoteAssign() == 0 ? 34 : slider->getMidiNoteAssign();
+    auto pgmSlider = dynamic_cast<PgmSlider*>(program->getSlider());
+    pgmSlider->setAssignNote(nn);
+    pgmSlider->setAttackHighRange(slider->getAttackHigh());
+    pgmSlider->setAttackLowRange(slider->getAttackLow());
+    pgmSlider->setControlChange(slider->getControlChange());
+    pgmSlider->setDecayHighRange(slider->getDecayHigh());
+    pgmSlider->setDecayLowRange(slider->getDecayLow());
+    pgmSlider->setFilterHighRange(slider->getFilterHigh());
+    pgmSlider->setFilterLowRange(slider->getFilterLow());
+    pgmSlider->setTuneHighRange(slider->getTuneHigh());
+    pgmSlider->setTuneLowRange(slider->getTuneLow());
 }
 
-void PgmToProgramConverter::setSlider()
+void PgmFileToProgramConverter::setNoteParameters(ProgramFileReader& reader, std::shared_ptr<Program> program)
 {
-	auto slider = reader->getSlider();
-	auto nn = slider->getMidiNoteAssign() == 0 ? 34 : slider->getMidiNoteAssign();
-	auto pgmSlider = dynamic_cast<PgmSlider*>(program.lock()->getSlider());
-	pgmSlider->setAssignNote(nn);
-	pgmSlider->setAttackHighRange(slider->getAttackHigh());
-	pgmSlider->setAttackLowRange(slider->getAttackLow());
-	pgmSlider->setControlChange(slider->getControlChange());
-	pgmSlider->setDecayHighRange(slider->getDecayHigh());
-	pgmSlider->setDecayLowRange(slider->getDecayLow());
-	pgmSlider->setFilterHighRange(slider->getFilterHigh());
-	pgmSlider->setFilterLowRange(slider->getFilterLow());
-	pgmSlider->setTuneHighRange(slider->getTuneHigh());
-	pgmSlider->setTuneLowRange(slider->getTuneLow());
-}
-
-void PgmToProgramConverter::setNoteParameters()
-{
-	auto pgmNoteParameters = reader->getAllNoteParameters();
-	auto pgmPads = reader->getPads();
+	auto pgmNoteParameters = reader.getAllNoteParameters();
+	auto pgmPads = reader.getPads();
 	NoteParameters* programNoteParameters;
-	auto lProgram = program.lock();
-	
+
 	for (int i = 0; i < 64; i++)
 	{
 		auto padNote = pgmPads->getNote(i);
 		auto note = padNote == -1 ? 34 : padNote;
-		lProgram->getPad(i)->setNote(note);
+		program->getPad(i)->setNote(note);
 
-		programNoteParameters = dynamic_cast<NoteParameters*>(lProgram->getNoteParameters(i + 35));
+		programNoteParameters = dynamic_cast<NoteParameters*>(program->getNoteParameters(i + 35));
 		programNoteParameters->setAttack(pgmNoteParameters->getAttack(i));
 		programNoteParameters->setDecay(pgmNoteParameters->getDecay(i));
 		programNoteParameters->setDecayMode(pgmNoteParameters->getDecayMode(i));
@@ -118,14 +87,13 @@ void PgmToProgramConverter::setNoteParameters()
 	}
 }
 
-void PgmToProgramConverter::setMixer()
+void PgmFileToProgramConverter::setMixer(ProgramFileReader& reader, std::shared_ptr<Program> program)
 {
-	auto pgmMixer = reader->getMixer();
-	auto lProgram = program.lock();
+	auto pgmMixer = reader.getMixer();
 
 	for (int i = 0; i < 64; i++)
 	{
-		auto noteParameters = dynamic_cast<NoteParameters*>(lProgram->getNoteParameters(i + 35));
+		auto noteParameters = dynamic_cast<NoteParameters*>(program->getNoteParameters(i + 35));
 		auto smc = noteParameters->getStereoMixerChannel().lock();
 		auto ifmc = noteParameters->getIndivFxMixerChannel().lock();
 		
@@ -137,18 +105,57 @@ void PgmToProgramConverter::setMixer()
 	}
 }
 
-std::weak_ptr<Program> PgmToProgramConverter::get()
+std::weak_ptr<Program> PgmFileToProgramConverter::get()
 {
-	if (!done)
-		return {};
-
 	return program;
 }
 
-std::vector<std::string> PgmToProgramConverter::getSoundNames()
+std::vector<std::string> PgmFileToProgramConverter::getSoundNames()
 {
-	if (!done)
-		return {};
+   return soundNames;
+}
 
-    return soundNames;
+program_or_error PgmFileToProgramConverter::loadFromFileAndConvert(
+        std::shared_ptr<MpcFile> f,
+        std::shared_ptr<mpc::sampler::Sampler> sampler,
+        const int replaceIndex,
+        std::vector<std::string> &soundNames)
+{
+    if (!f->exists())
+    {
+        throw std::invalid_argument("File does not exist");
+    }
+
+    ProgramFileReader reader(f);
+
+    if (!reader.getHeader()->verifyFirstTwoBytes())
+    {
+        throw std::invalid_argument("PGM first 2 bytes are incorrect");
+    }
+
+    std::shared_ptr<Program> program;
+
+    if (replaceIndex == -1)
+    {
+        program = sampler->addProgram().lock();
+    }
+    else
+    {
+        program = sampler->getProgram(replaceIndex);
+    }
+
+    auto pgmSoundNames = reader.getSampleNames();
+
+    for (int i = 0; i < reader.getHeader()->getNumberOfSamples(); i++)
+    {
+        soundNames.push_back(pgmSoundNames->getSampleName(i));
+    }
+
+    auto const programName = reader.getProgramName();
+    program->setName(programName->getProgramNameASCII());
+    setNoteParameters(reader, program);
+    setMixer(reader, program);
+    setSlider(reader, program);
+
+    return program;
 }

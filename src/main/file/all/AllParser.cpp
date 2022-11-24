@@ -2,7 +2,6 @@
 
 #include <Mpc.hpp>
 
-#include <disk/MpcFile.hpp>
 #include <file/all/Count.hpp>
 #include <file/all/Defaults.hpp>
 #include <file/all/Header.hpp>
@@ -24,11 +23,6 @@
 
 using namespace mpc::file::all;
 using namespace moduru;
-
-AllParser::AllParser(mpc::Mpc& _mpc, mpc::disk::MpcFile* file)
-    : AllParser(_mpc, file->getBytes())
-{
-}
 
 AllParser::AllParser(mpc::Mpc& _mpc, const std::vector<char>& loadBytes)
 	: mpc (_mpc)

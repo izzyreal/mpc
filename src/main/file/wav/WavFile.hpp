@@ -1,5 +1,7 @@
 #pragma once
 
+#include "mpc_types.hpp"
+
 #include <vector>
 #include <memory>
 
@@ -21,7 +23,7 @@ namespace mpc::file::wav {
 	{
 	public:
         static WavFile writeWavStream(std::shared_ptr<std::ostream>, int numChannels, int numFrames, int validBits, int sampleRate);
-        static WavFile readWavStream(std::shared_ptr<std::istream>);
+        static wav_or_error readWavStream(std::shared_ptr<std::istream>);
 
 	private:
 		const static int SMPL_CHUNK_ID = 0x6C706D73; // 1819307379
@@ -46,7 +48,7 @@ namespace mpc::file::wav {
 		static const int RIFF_CHUNK_ID{ 1179011410 };
 		static const int RIFF_TYPE_ID{ 1163280727 };
 		int bytesPerSample;
-		int numFrames;
+        unsigned long numFrames;
 		double floatScale;
 		double floatOffset;
 		bool wordAlignAdjust;
@@ -54,30 +56,30 @@ namespace mpc::file::wav {
 		int sampleRate;
 		int blockAlign;
 		int validBits;
-		int bufferPointer;
-		int bytesRead;
-		int frameCounter;
+        unsigned long bufferPointer;
+		unsigned long bytesRead;
+        unsigned long frameCounter;
 		int numSampleLoops;
 		SampleLoop sampleLoop;
 
 	public:
 		int getNumChannels();
-		int getNumFrames();
-		int getFramesRemaining();
-		int getSampleRate();
+		unsigned long getNumFrames();
+
+        int getSampleRate();
 		int getValidBits();
 		int getNumSampleLoops();
 		SampleLoop& getSampleLoop();
 
 	private:
-		static int getLE(std::vector<char>& buffer, int pos, int numBytes);
-		static void putLE(int val, std::vector<char>& buffer, int pos, int numBytes);
+		static unsigned long getLE(std::vector<char>& buffer, unsigned long pos, int numBytes);
+		static void putLE(int val, std::vector<char>& buffer, unsigned long pos, int numBytes);
 		void writeSample(int val);
 		int readSample();
 
 	public:
-		int readFrames(std::vector<float>& sampleBuffer, int numFramesToRead);
-		int writeFrames(std::vector<float>& sampleBuffer, int numFramesToWrite);
+		int readFrames(std::vector<float>& sampleBuffer, unsigned long numFramesToRead);
+		int writeFrames(std::vector<float>& sampleBuffer, unsigned long numFramesToWrite);
 		void close();
 
 	};

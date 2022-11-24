@@ -5,6 +5,7 @@
 #endif
 
 using namespace mpc::file::wav;
+using namespace mpc::disk;
 
 const int WavFile::BUFFER_SIZE;
 const int WavFile::FMT_CHUNK_ID;
@@ -27,14 +28,9 @@ SampleLoop& WavFile::getSampleLoop()
     return sampleLoop;
 }
 
-int WavFile::getNumFrames()
+unsigned long WavFile::getNumFrames()
 {
     return numFrames;
-}
-
-int WavFile::getFramesRemaining()
-{
-    return numFrames - frameCounter;
 }
 
 int WavFile::getSampleRate()
@@ -122,180 +118,171 @@ WavFile WavFile::writeWavStream(std::shared_ptr<std::ostream> _ostream, int numC
     return result;
 }
 
-WavFile WavFile::readWavStream(std::shared_ptr<std::istream> _istream)
+wav_or_error WavFile::readWavStream(std::shared_ptr<std::istream> _istream)
 {
-    WavFile result;
-    result.numSampleLoops = 0;
-    result.iStream = _istream;
-    result.iStream->seekg(0, std::ios::end);
+    auto result = std::make_shared<WavFile>();
+    result->numSampleLoops = 0;
+    result->iStream = _istream;
+    result->iStream->seekg(0, std::ios::end);
 
-    auto fileSize = result.iStream->tellg();
+    auto fileSize = result->iStream->tellg();
 
-    result.iStream->seekg(0, std::ios::beg);
+    result->iStream->seekg(0, std::ios::beg);
     
-    result.iStream->read(&result.buffer[0], 12);
-    
-    auto bytesRead = result.iStream->gcount();
+    result->iStream->read(&result->buffer[0], 12);
+
+    auto bytesRead = result->iStream->gcount();
 
     auto totalBytesRead = bytesRead;
 
     if (bytesRead != 12) {
-        throw std::invalid_argument("Not enough wav file bytes for header");
+        return tl::make_unexpected(mpc_io_error_msg{ "No WAV header found" });
     }
     
-    auto riffChunkID = getLE(result.buffer, 0, 4);
-    auto chunkSize = getLE(result.buffer, 4, 4);
-    auto riffTypeID = getLE(result.buffer, 8, 4);
+    auto riffChunkID = getLE(result->buffer, 0, 4);
+    auto riffTypeID = getLE(result->buffer, 8, 4);
 
     if (riffChunkID != RIFF_CHUNK_ID) {
-        throw std::invalid_argument("Invalid Wav Header data, incorrect riff chunk ID");
+        return tl::make_unexpected(mpc_io_error_msg{ "Invalid riff chunk ID" });
     }
 
     if (riffTypeID != RIFF_TYPE_ID) {
-        throw std::invalid_argument("Invalid Wav Header data, incorrect riff type ID");
+        return tl::make_unexpected(mpc_io_error_msg{ "Invalid riff type ID" });
     }
 
-    if (chunkSize % 2 != 0) {
-        chunkSize += 1;
-    }
-    
     auto foundFormat = false;
     auto foundData = false;
     std::ios::pos_type dataPos;
 
     while (totalBytesRead + 1 < fileSize) {
 
-        result.iStream->read(&result.buffer[0], 8);
-        bytesRead = result.iStream->gcount();
+        result->iStream->read(&result->buffer[0], 8);
+        bytesRead = result->iStream->gcount();
         
         totalBytesRead += bytesRead;
 
         if (bytesRead != 8) {
-            throw std::invalid_argument("Could not read chunk header");
+            return tl::make_unexpected(mpc_io_error_msg{ "Could not read chunk header" });
         }
 
-        auto chunkID = getLE(result.buffer, 0, 4);
-        chunkSize = getLE(result.buffer, 4, 4);
+        auto chunkID = getLE(result->buffer, 0, 4);
+        auto chunkSize = getLE(result->buffer, 4, 4);
         auto numChunkBytes = (chunkSize % 2 == 1) ? chunkSize + 1 : chunkSize;
 
         if (chunkID == FMT_CHUNK_ID) {
             foundFormat = true;
-            result.iStream->read(&result.buffer[0], 16);
-            bytesRead = result.iStream->gcount();
+            result->iStream->read(&result->buffer[0], 16);
 
             totalBytesRead += chunkSize;
 
-            auto compressionCode = static_cast< int >(getLE(result.buffer, 0, 2));
+            auto compressionCode = static_cast< int >(getLE(result->buffer, 0, 2));
 
             if (compressionCode != 1) {
-                std::string exc = "Compression Code " + std::to_string(compressionCode)+ " not supported";
-                throw std::invalid_argument(exc.c_str());
+                return tl::make_unexpected(mpc_io_error_msg{ "Compressed WAV unsupported" });
             }
 
-            result.numChannels = static_cast< int >(getLE(result.buffer, 2, 2));
-            result.sampleRate = getLE(result.buffer, 4, 4);
-            result.blockAlign = static_cast< int >(getLE(result.buffer, 12, 2));
-            result.validBits = static_cast< int >(getLE(result.buffer, 14, 2));
+            result->numChannels = static_cast< int >(getLE(result->buffer, 2, 2));
+            result->sampleRate = getLE(result->buffer, 4, 4);
+            result->blockAlign = static_cast< int >(getLE(result->buffer, 12, 2));
+            result->validBits = static_cast< int >(getLE(result->buffer, 14, 2));
 
-            if (result.numChannels == 0) {
-                throw std::invalid_argument("Number of channels specified in header is equal to zero");
+            if (result->numChannels == 0) {
+                return tl::make_unexpected(mpc_io_error_msg{ "Zero channels in WAV header" });
             }
 
-            if (result.blockAlign == 0) {
-                throw std::invalid_argument("Block Align specified in header is equal to zero");
+            if (result->blockAlign == 0) {
+                return tl::make_unexpected(mpc_io_error_msg{ "Block align in header is 0" });            }
+
+            if (result->validBits < 2) {
+                return tl::make_unexpected(mpc_io_error_msg{ "Valid bits in header below 2"});
             }
 
-            if (result.validBits < 2) {
-                throw std::invalid_argument("Valid Bits specified in header is less than 2");
+            if (result->validBits > 64) {
+                return tl::make_unexpected(mpc_io_error_msg{ "Valid bits in header over 64"});
             }
 
-            if (result.validBits > 64) {
-                throw std::invalid_argument("Valid Bits specified in header is greater than 64, this is greater than a long can hold");
-            }
+            result->bytesPerSample = (result->validBits + 7) / 8;
 
-            result.bytesPerSample = (result.validBits + 7) / 8;
-
-            if (result.bytesPerSample * result.numChannels != result.blockAlign) {
-                throw std::invalid_argument("Block Align does not agree with bytes required for validBits and number of channels");
+            if (result->bytesPerSample * result->numChannels != result->blockAlign) {
+                return tl::make_unexpected(mpc_io_error_msg{ "Bad block align for format"});
             }
 
             numChunkBytes -= 16;
             
             if (numChunkBytes > 0) {
-                result.iStream->ignore(numChunkBytes);
+                result->iStream->ignore(numChunkBytes);
             }
 
         }
         else if (chunkID == DATA_CHUNK_ID)
         {
-            if (foundFormat == false)
-                throw std::invalid_argument("Data chunk found before Format chunk");
+            if (!foundFormat)
+                return tl::make_unexpected(mpc_io_error_msg{ "Data before format chunk"});
 
-            if (chunkSize % result.blockAlign != 0) {
-                throw std::invalid_argument("Data Chunk size is not multiple of Block Align");
+            if (chunkSize % result->blockAlign != 0) {
+                return tl::make_unexpected(mpc_io_error_msg{ "Bad data size for block align"});
             }
 
-            result.numFrames = chunkSize / result.blockAlign;
+            result->numFrames = chunkSize / result->blockAlign;
             foundData = true;
             totalBytesRead += chunkSize;
-            dataPos = result.iStream->tellg();
-            result.iStream->ignore(chunkSize);
+            dataPos = result->iStream->tellg();
+            result->iStream->ignore(chunkSize);
         }
         else if (chunkID == SMPL_CHUNK_ID)
         {
-            result.iStream->read(&result.buffer[0], chunkSize);
-            bytesRead = result.iStream->gcount();
+            result->iStream->read(&result->buffer[0], chunkSize);
 
             totalBytesRead += chunkSize;
 
-            result.numSampleLoops = static_cast<int>(getLE(result.buffer, NUM_SAMPLE_LOOPS, 4));
+            result->numSampleLoops = static_cast<int>(getLE(result->buffer, NUM_SAMPLE_LOOPS, 4));
 
-            if (result.numSampleLoops > 0)
+            if (result->numSampleLoops > 0)
             {
                 // For now we just take the first sample loop
-                result.sampleLoop.cuePointId = static_cast<int>(getLE(result.buffer, LIST_OF_SAMPLE_LOOPS_OFFSET, 4));
-                result.sampleLoop.type = static_cast<int>(getLE(result.buffer, LIST_OF_SAMPLE_LOOPS_OFFSET + 4, 4));
-                result.sampleLoop.start = static_cast<int>(getLE(result.buffer, LIST_OF_SAMPLE_LOOPS_OFFSET + 8, 4));
-                result.sampleLoop.end = static_cast<int>(getLE(result.buffer, LIST_OF_SAMPLE_LOOPS_OFFSET + 12, 4));
-                result.sampleLoop.fraction = static_cast<int>(getLE(result.buffer, LIST_OF_SAMPLE_LOOPS_OFFSET + 16, 4));
-                result.sampleLoop.playCount = static_cast<int>(getLE(result.buffer, LIST_OF_SAMPLE_LOOPS_OFFSET + 20, 4));
+                result->sampleLoop.cuePointId = static_cast<int>(getLE(result->buffer, LIST_OF_SAMPLE_LOOPS_OFFSET, 4));
+                result->sampleLoop.type = static_cast<int>(getLE(result->buffer, LIST_OF_SAMPLE_LOOPS_OFFSET + 4, 4));
+                result->sampleLoop.start = static_cast<int>(getLE(result->buffer, LIST_OF_SAMPLE_LOOPS_OFFSET + 8, 4));
+                result->sampleLoop.end = static_cast<int>(getLE(result->buffer, LIST_OF_SAMPLE_LOOPS_OFFSET + 12, 4));
+                result->sampleLoop.fraction = static_cast<int>(getLE(result->buffer, LIST_OF_SAMPLE_LOOPS_OFFSET + 16, 4));
+                result->sampleLoop.playCount = static_cast<int>(getLE(result->buffer, LIST_OF_SAMPLE_LOOPS_OFFSET + 20, 4));
             }
         } else {
-            result.iStream->ignore(numChunkBytes);
+            result->iStream->ignore(numChunkBytes);
             totalBytesRead += chunkSize;
         }
     }
 
-    if (foundData == false) {
-        throw std::invalid_argument("Did not find a data chunk");
+    if (!foundData) {
+        return tl::make_unexpected(mpc_io_error_msg{ "Did not find a data chunk" });
     }
 
-    if (result.validBits > 8) {
-        result.floatOffset = 0;
-        result.floatScale = 1 << (result.validBits - 1);
+    if (result->validBits > 8) {
+        result->floatOffset = 0;
+        result->floatScale = 1 << (result->validBits - 1);
     } else {
-        result.floatOffset = -1;
-        result.floatScale = 0.5 * ((1 << result.validBits) - 1);
+        result->floatOffset = -1;
+        result->floatScale = 0.5 * ((1 << result->validBits) - 1);
     }
 
-    result.bufferPointer = 0;
-    result.bytesRead = 0;
-    result.frameCounter = 0;
-    result.iStream->seekg(dataPos);
+    result->bufferPointer = 0;
+    result->bytesRead = 0;
+    result->frameCounter = 0;
+    result->iStream->seekg(dataPos);
     return result;
 }
 
-int WavFile::getLE(std::vector<char>& buffer, int pos, int numBytes)
+unsigned long WavFile::getLE(std::vector<char>& buffer, unsigned long pos, int numBytes)
 {
 	numBytes--;
 	pos += numBytes;
-	int val = buffer[pos] & 255;
+	unsigned long val = buffer[pos] & 255;
 	for (auto b = 0; b < numBytes; b++)
 		val = (val << 8) + (buffer[--pos] & 255);
 	return val;
 }
 
-void WavFile::putLE(int val, std::vector<char>& buffer, int pos, int numBytes)
+void WavFile::putLE(int val, std::vector<char>& buffer, unsigned long pos, int numBytes)
 {
 	for (auto b = 0; b < numBytes; b++) {
 		buffer[pos] = static_cast<char>(val & 255);
@@ -340,7 +327,7 @@ int WavFile::readSample()
     return val;
 }
 
-int WavFile::readFrames(std::vector<float>& sampleBuffer, int numFramesToRead)
+int WavFile::readFrames(std::vector<float>& sampleBuffer, unsigned long numFramesToRead)
 {
     int offset = 0;
     
@@ -361,7 +348,7 @@ int WavFile::readFrames(std::vector<float>& sampleBuffer, int numFramesToRead)
     return numFramesToRead;
 }
 
-int WavFile::writeFrames(std::vector<float>& sampleBuffer, int numFramesToWrite)
+int WavFile::writeFrames(std::vector<float>& sampleBuffer, unsigned long numFramesToWrite)
 {
     int offset = 0;
     for (auto f = 0; f < numFramesToWrite; f++) {

@@ -16,6 +16,12 @@ void LoadASequenceScreen::open()
 {
 	auto loadScreen = mpc.screens->get<LoadScreen>("load");
     auto midFile = loadScreen->getSelectedFile();
+
+    if (!StrUtil::eqIgnoreCase(midFile->getExtension(), "mid"))
+    {
+        return;
+    }
+
     sequence_or_error parsedMidFile = mpc.getDisk()->readMid2(midFile);
     
     if (parsedMidFile.has_value())
@@ -32,6 +38,7 @@ void LoadASequenceScreen::open()
         loadInto = index;
         displayFile();
     }
+
     displayLoadInto();
 }
 

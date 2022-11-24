@@ -125,17 +125,6 @@ std::shared_ptr<AkaiFatLfnDirectory> RawDisk::getDir()
     return std::dynamic_pointer_cast<AkaiFatLfnDirectory>(path[path.size() - 1]->getDirectory());
 }
 
-std::shared_ptr<AkaiFatLfnDirectory> RawDisk::getParentDir()
-{
-    if (path.size() == 0)
-        return root;
-
-    if (path.size() == 1)
-        return root;
-
-    return std::dynamic_pointer_cast<AkaiFatLfnDirectory>(path[path.size() - 2]->getDirectory());
-}
-
 bool RawDisk::deleteAllFiles(int extension)
 {
     auto dir = getDir();
@@ -203,11 +192,6 @@ void RawDisk::flush()
 std::string RawDisk::getTypeShortName()
 {
     return volume.typeShortName();
-}
-
-std::string RawDisk::getModeShortName()
-{
-    return volume.modeShortName();
 }
 
 uint64_t RawDisk::getTotalSize()

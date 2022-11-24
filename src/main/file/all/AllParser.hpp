@@ -1,5 +1,7 @@
 #pragma once
 
+#include "mpc_types.hpp"
+
 #include <memory>
 #include <vector>
 #include <string>
@@ -29,7 +31,7 @@ namespace mpc::file::all
 	{
 
 	public:
-		static const int NAME_LENGTH{ 16 };
+        static const int NAME_LENGTH{ 16 };
 		static const int DEV_NAME_LENGTH{ 8 };
 		static const int EMPTY_SEQ_LENGTH{ 10256 };
 		static const int EVENT_LENGTH{ 8 };
@@ -85,8 +87,7 @@ namespace mpc::file::all
 		std::vector<char>& getBytes();
 
 	public:
-		AllParser(mpc::Mpc&, mpc::disk::MpcFile*);
-        AllParser(mpc::Mpc&, const std::vector<char>& loadBytes);
+		AllParser(mpc::Mpc&, const std::vector<char>& loadBytes);
 		AllParser(mpc::Mpc&);
 		~AllParser();
 

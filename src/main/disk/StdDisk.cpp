@@ -270,8 +270,7 @@ std::shared_ptr<MpcFile> StdDisk::newFile(const std::string& newFileName)
     new_path.append(copy);
     auto result = std::make_shared<MpcFile>(new_path);
     result->getOutputStream();
-    if (result->exists()) return result;
-	return {};
+    return result;
 }
 
 std::string StdDisk::getAbsolutePath()
@@ -286,11 +285,6 @@ int StdDisk::getPathDepth() {
 std::string StdDisk::getTypeShortName()
 {
     return volume.typeShortName();
-}
-
-std::string StdDisk::getModeShortName()
-{
-    return volume.modeShortName();
 }
 
 uint64_t StdDisk::getTotalSize()

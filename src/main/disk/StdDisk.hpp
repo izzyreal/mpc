@@ -37,7 +37,7 @@ public:
     bool newFolder(const std::string& newDirName) override;
     std::string getAbsolutePath() override;
     std::string getTypeShortName() override;
-    std::string getModeShortName() override;
+
     uint64_t getTotalSize() override;
     std::string getVolumeLabel() override;
     Volume& getVolume() override { return volume; }

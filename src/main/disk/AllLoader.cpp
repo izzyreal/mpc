@@ -51,7 +51,7 @@ using namespace mpc::sequencer;
 
 void AllLoader::loadEverythingFromFile(mpc::Mpc& mpc, mpc::disk::MpcFile* f)
 {
-    AllParser allParser(mpc, f);
+    AllParser allParser(mpc, f->getBytes());
     AllLoader::loadEverythingFromAllParser(mpc, allParser);
 }
 
@@ -210,7 +210,7 @@ std::vector<std::shared_ptr<Sequence>> AllLoader::loadOnlySequencesFromFile(mpc:
 {
     std::vector<std::shared_ptr<Sequence>> mpcSequences;
 
-    AllParser allParser(mpc, f);
+    AllParser allParser(mpc, f->getBytes());
     
     auto allSequences = allParser.getAllSequences();
     

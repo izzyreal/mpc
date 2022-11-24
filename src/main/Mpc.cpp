@@ -157,7 +157,7 @@ void Mpc::init(const int inputCount, const int outputCount)
 
     layeredScreen->openScreen("sequencer");
 
-    midiDeviceDetector = std::make_unique<audiomidi::MidiDeviceDetector>();
+    midiDeviceDetector = std::make_shared<audiomidi::MidiDeviceDetector>();
     midiDeviceDetector->start(*this);
 
 	MLOG("Mpc is ready");

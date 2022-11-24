@@ -3,6 +3,8 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include <functional>
+#include "mpc_types.hpp"
 
 namespace moduru::file { class File; }
 namespace mpc { class Mpc; }
@@ -40,7 +42,7 @@ struct SoundLoaderResult {
 class SoundLoader
 {
 public:
-    SoundLoader(mpc::Mpc& mpc, std::vector<std::shared_ptr<mpc::sampler::Sound>> sounds, bool replace);
+    SoundLoader(mpc::Mpc& mpcToUse, bool replaceToUse);
 
     void setPartOfProgram(bool);
     void loadSound(std::shared_ptr<MpcFile>, SoundLoaderResult&, std::shared_ptr<mpc::sampler::Sound>, bool shouldBeConverted);
@@ -49,8 +51,13 @@ public:
 private:
     mpc::Mpc& mpc;
     bool partOfProgram = false;
-    std::vector<std::shared_ptr<mpc::sampler::Sound>> sounds;
     bool preview = false;
     bool replace = false;
+
+    sound_or_error onReadWavSuccess(
+            std::shared_ptr<mpc::file::wav::WavFile>&,
+                    std::string filenameWithoutExtension,
+                    std::shared_ptr<mpc::sampler::Sound> sound,
+                    bool shouldBeConverted);
 };
 }

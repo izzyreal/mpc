@@ -5,7 +5,7 @@
 #include <disk/AbstractDisk.hpp>
 #include <disk/StdDisk.hpp>
 #include <disk/MpcFile.hpp>
-#include <disk/PgmToProgramConverter.hpp>
+#include <disk/PgmFileToProgramConverter.hpp>
 #include <disk/SoundLoader.hpp>
 #include <sampler/Program.hpp>
 #include <sequencer/Track.hpp>
@@ -24,70 +24,67 @@
 #include <pthread.h>
 #endif // __linux__
 
+using namespace mpc::sampler;
 using namespace mpc::disk;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace moduru::lang;
 
-std::shared_ptr<mpc::sampler::Program> ProgramLoader::loadProgram(mpc::Mpc& mpc, std::shared_ptr<mpc::disk::MpcFile> file, const int replaceIndex)
+program_or_error
+ProgramLoader::loadProgram(mpc::Mpc &mpc, std::shared_ptr<mpc::disk::MpcFile> file, const int replaceIndex)
 {
     const bool replace = replaceIndex != -1;
-    
+
     auto cantFindFileScreen = mpc.screens->get<CantFindFileScreen>("cant-find-file");
     cantFindFileScreen->skipAll = false;
-    
-	auto disk = mpc.getDisk();
 
-    std::shared_ptr<sampler::Program> p;
-    
-	try
-	{
-		PgmToProgramConverter converter(file, mpc.getSampler(), replaceIndex);
-		p = converter.get().lock();
-		auto pgmSoundNames = converter.getSoundNames();
-		auto soundsDestIndex = std::vector<int>(pgmSoundNames.size());
+    auto disk = mpc.getDisk();
+
+    std::vector<std::string> pgmSoundNames;
+
+    return PgmFileToProgramConverter::loadFromFileAndConvert(
+            file,
+            mpc.getSampler(),
+            replaceIndex,
+            pgmSoundNames
+    ).map([pgmSoundNames, disk, &mpc, replace](std::shared_ptr<Program> p) {
+
+        auto soundsDestIndex = std::vector<int>(pgmSoundNames.size());
 
         std::vector<int> unavailableSoundIndices;
         std::map<int, int> finalSoundIndices;
-        
+
         int skipCount = 0;
 
-		for (int i = 0; i < pgmSoundNames.size(); i++)
-		{
-			auto ext = "snd";
+        for (int i = 0; i < pgmSoundNames.size(); i++) {
+            auto ext = "snd";
             std::shared_ptr<MpcFile> soundFile;
             std::string soundFileName = StrUtil::replaceAll(pgmSoundNames[i], ' ', "");
 
-			for (auto& f : disk->getAllFiles())
-			{
-				if (StrUtil::eqIgnoreCase(StrUtil::replaceAll(f->getName(), ' ', ""), soundFileName + ".SND"))
-				{
-					soundFile = f;
-					break;
-				}
-			}
+            for (auto &f: disk->getAllFiles()) {
+                if (StrUtil::eqIgnoreCase(StrUtil::replaceAll(f->getName(), ' ', ""), soundFileName + ".SND")) {
+                    soundFile = f;
+                    break;
+                }
+            }
 
-			if (!soundFile || !soundFile->exists())
-			{
-				for (auto& f : disk->getAllFiles())
-				{
-					if (StrUtil::eqIgnoreCase(StrUtil::replaceAll(f->getName(), ' ', ""), soundFileName + ".WAV"))
-					{
-						soundFile = f;
-						ext = "wav";
-						break;
-					}
-				}
-			}
+            if (!soundFile || !soundFile->exists()) {
+                for (auto &f: disk->getAllFiles()) {
+                    if (StrUtil::eqIgnoreCase(StrUtil::replaceAll(f->getName(), ' ', ""), soundFileName + ".WAV")) {
+                        soundFile = f;
+                        ext = "wav";
+                        break;
+                    }
+                }
+            }
 
-			if (!soundFile || !soundFile->exists())
-			{
-				unavailableSoundIndices.push_back(i);
+            if (!soundFile || !soundFile->exists()) {
+                unavailableSoundIndices.push_back(i);
                 skipCount++;
                 notFound(mpc, soundFileName);
-				continue;
-			}
+                continue;
+            }
 
             finalSoundIndices[i] = i - skipCount;
 
@@ -100,17 +97,15 @@ std::shared_ptr<mpc::sampler::Program> ProgramLoader::loadProgram(mpc::Mpc& mpc,
                       i);
         }
 
-        for (auto& srcNoteParams : p->getNotesParameters())
-        {
+        for (auto &srcNoteParams: p->getNotesParameters()) {
             auto soundIndex = srcNoteParams->getSoundIndex();
 
-            if (soundIndex != -1 && finalSoundIndices.find(soundIndex) != end(finalSoundIndices))
-            {
+            if (soundIndex != -1 && finalSoundIndices.find(soundIndex) != end(finalSoundIndices)) {
                 soundIndex = finalSoundIndices[soundIndex];
             }
 
-            if (find(begin(unavailableSoundIndices), end(unavailableSoundIndices), soundIndex) != end(unavailableSoundIndices))
-            {
+            if (find(begin(unavailableSoundIndices), end(unavailableSoundIndices), soundIndex) !=
+                end(unavailableSoundIndices)) {
                 soundIndex = -1;
             }
 
@@ -120,32 +115,23 @@ std::shared_ptr<mpc::sampler::Program> ProgramLoader::loadProgram(mpc::Mpc& mpc,
         auto track = mpc.getSequencer()->getActiveTrack();
         auto loadAProgramScreen = mpc.screens->get<LoadAProgramScreen>("load-a-program");
 
-        if (!loadAProgramScreen->clearProgramWhenLoading)
-        {
+        if (!loadAProgramScreen->clearProgramWhenLoading) {
             mpc.getDrum(track->getBus() - 1)->setProgram(mpc.getSampler()->getProgramCount() - 1);
         }
-        
-		mpc.getLayeredScreen()->openScreen("load");
-	}
-	catch (const std::exception&)
-	{
-		auto popupScreen = mpc.screens->get<PopupScreen>("popup");
-		popupScreen->setText("Wrong file format");
-		popupScreen->returnToScreenAfterInteraction("load");
-		mpc.getLayeredScreen()->openScreen("popup");
-        throw;
-	}
-    
-    return p;
+
+        mpc.getLayeredScreen()->openScreen("load");
+
+        return p;
+    });
 }
 
 void ProgramLoader::loadSound(mpc::Mpc &mpc, const std::string &soundName, const std::string &ext,
                               std::shared_ptr<MpcFile> soundFile, std::vector<int> *soundsDestIndex,
                               const bool replace, const int loadSoundIndex)
 {
-    SoundLoader soundLoader(mpc, mpc.getSampler()->getSounds(), replace);
+    SoundLoader soundLoader(mpc, replace);
     soundLoader.setPartOfProgram(true);
-    showPopup(mpc, soundName, ext, soundFile->length());
+    showLoadingSoundNamePopup(mpc, soundName, ext, soundFile->length());
     SoundLoaderResult soundLoaderResult;
     bool shouldBeConverted = false;
 
@@ -153,8 +139,7 @@ void ProgramLoader::loadSound(mpc::Mpc &mpc, const std::string &soundName, const
 
     soundLoader.loadSound(soundFile, soundLoaderResult, sound, shouldBeConverted);
 
-    if (!soundLoaderResult.success)
-    {
+    if (!soundLoaderResult.success) {
         mpc.getSampler()->deleteSound(sound);
         return;
     }
@@ -163,34 +148,33 @@ void ProgramLoader::loadSound(mpc::Mpc &mpc, const std::string &soundName, const
         (*soundsDestIndex)[loadSoundIndex] = soundLoaderResult.existingIndex;
 }
 
-void ProgramLoader::showPopup(mpc::Mpc& mpc, std::string name, std::string ext, int sampleSize)
+void ProgramLoader::showLoadingSoundNamePopup(mpc::Mpc &mpc, std::string name, std::string ext, int sampleSize)
 {
-	mpc.getLayeredScreen()->openScreen("popup");
-	auto popupScreen = mpc.screens->get<PopupScreen>("popup");
-	popupScreen->setText("Loading " + StrUtil::padRight(name, " ", 16) + "." + StrUtil::toUpper(ext));
+    mpc.getLayeredScreen()->openScreen("popup");
+    auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+    popupScreen->setText("Loading " + StrUtil::padRight(name, " ", 16) + "." + StrUtil::toUpper(ext));
 
-	auto sleepTime = sampleSize / 800;
-	
-	if (sleepTime < 300)
-		sleepTime = 300;
+    auto sleepTime = sampleSize / 800;
 
-    std::this_thread::sleep_for(std::chrono::milliseconds((int)(sleepTime * 0.2)));
+    if (sleepTime < 300)
+        sleepTime = 300;
+
+    std::this_thread::sleep_for(std::chrono::milliseconds((int) (sleepTime * 0.2)));
 }
 
 void ProgramLoader::notFound(mpc::Mpc &mpc, std::string soundFileName)
 {
-	auto cantFindFileScreen = mpc.screens->get<CantFindFileScreen>("cant-find-file");
-	auto skipAll = cantFindFileScreen->skipAll;
+    auto cantFindFileScreen = mpc.screens->get<CantFindFileScreen>("cant-find-file");
+    auto skipAll = cantFindFileScreen->skipAll;
 
-	if (!skipAll)
-	{
-		cantFindFileScreen->waitingForUser = true;
-		
-		cantFindFileScreen->fileName = soundFileName;
-		
-		mpc.getLayeredScreen()->openScreen("cant-find-file");
+    if (!skipAll) {
+        cantFindFileScreen->waitingForUser = true;
 
-		while (cantFindFileScreen->waitingForUser)
+        cantFindFileScreen->fileName = soundFileName;
+
+        mpc.getLayeredScreen()->openScreen("cant-find-file");
+
+        while (cantFindFileScreen->waitingForUser)
             std::this_thread::sleep_for(std::chrono::milliseconds(25));
-	}
+    }
 }

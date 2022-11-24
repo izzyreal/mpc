@@ -250,7 +250,7 @@ void ApsLoader::loadSound(mpc::Mpc& mpc,
 {
     auto soundFile = _soundFile.lock();
     const auto replace = false;
-    SoundLoader soundLoader(mpc, mpc.getSampler()->getSounds(), replace);
+    SoundLoader soundLoader(mpc, replace);
     soundLoader.setPartOfProgram(true);
     
     if (!headless)

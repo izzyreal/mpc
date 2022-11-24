@@ -20,11 +20,8 @@ using namespace mpc::lcdgui::screens::window;
 
 void MidiDeviceDetector::start(mpc::Mpc& mpc)
 {
-    auto rtMidiIn = std::make_shared<RtMidiIn>();
-
-    running = true;
-
-    pollThread = new std::thread([&mpc, this, rtMidiIn]{
+    pollThread = new std::thread([&mpc, this]{
+        auto rtMidiIn = std::make_shared<RtMidiIn>();
         lower_my_priority();
         running = true;
         while (running) {
