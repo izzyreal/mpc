@@ -100,13 +100,13 @@ ProgramLoader::loadProgram(mpc::Mpc &mpc, std::shared_ptr<mpc::disk::MpcFile> fi
         for (auto &srcNoteParams: p->getNotesParameters()) {
             auto soundIndex = srcNoteParams->getSoundIndex();
 
-            if (soundIndex != -1 && finalSoundIndices.find(soundIndex) != end(finalSoundIndices)) {
-                soundIndex = finalSoundIndices[soundIndex];
-            }
-
             if (find(begin(unavailableSoundIndices), end(unavailableSoundIndices), soundIndex) !=
                 end(unavailableSoundIndices)) {
                 soundIndex = -1;
+            }
+
+            if (soundIndex != -1 && finalSoundIndices.find(soundIndex) != end(finalSoundIndices)) {
+                soundIndex = finalSoundIndices[soundIndex];
             }
 
             srcNoteParams->setSoundIndex(soundIndex);
