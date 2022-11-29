@@ -15,15 +15,11 @@ namespace mpc::file::pgmreader
 	private:
 		std::vector<char> midiNotesArray;
 
-	public:
-		int padNumber = 0;
-
-	private:
+    private:
 		ProgramFileReader* programFile;
 
 	public:
-		int getPadNumber(int midiNote);
-		int getSampleNamesSize();
+        int getSampleNamesSize();
 		int getMidiNotesStart();
 		int getMidiNotesEnd();
 		std::vector<char> getMidiNotesArray();

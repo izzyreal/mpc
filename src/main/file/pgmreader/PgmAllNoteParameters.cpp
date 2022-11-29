@@ -16,17 +16,6 @@ PgmAllNoteParameters::PgmAllNoteParameters(ProgramFileReader* programFile)
 	this->programFile = programFile;
 }
 
-int PgmAllNoteParameters::getPadNumber(int midiNote)
-{
-    auto pds = programFile->getPads();
-	for (int pad = 0; pad < 64; pad++) {
-		if (midiNote == pds->getNote(pad)) {
-			padNumber = pad;
-		}
-	}
-    return padNumber;
-}
-
 int PgmAllNoteParameters::getSampleNamesSize()
 {
 	sampleNamesSize = programFile->getSampleNames()->getSampleNamesSize();
