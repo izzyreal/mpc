@@ -79,10 +79,6 @@ project(mpc)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "-fPIC")
 
-if(DEFINED ENV{APPLE_M1})
-    set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE INTERNAL "")
-endif()
-
 if(APPLE)
   set(CMAKE_OSX_DEPLOYMENT_TARGET "10.11" CACHE INTERNAL "Minimum OS X deployment version")
 endif()
@@ -127,6 +123,10 @@ endif()
 
 if(VMPC2000XL_WIN7)
     target_compile_definitions(mpc PRIVATE VMPC2000XL_WIN7)
+endif()
+
+if (IOS)
+    target_compile_definitions(rtmidi PRIVATE TARGET_OS_IPHONE=1)
 endif()
 
 ## Configure test suite application ##

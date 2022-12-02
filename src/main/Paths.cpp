@@ -20,7 +20,7 @@ std::string Paths::sep()
 std::string Paths::appDocumentsPath()
 {
 #if TARGET_OS_IOS
-    static auto path = sago::getDocumentsFolder() + sep;
+    static auto path = sago::getDocumentsFolder() + sep();
 #else
     static auto path = sago::getDocumentsFolder() + sep() + "VMPC2000XL" + sep();
 #endif
