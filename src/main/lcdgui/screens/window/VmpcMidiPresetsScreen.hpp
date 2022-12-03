@@ -29,9 +29,6 @@ public:
     void left() override;
     void right() override;
 
-    void displayUpAndDown();
-    void displayRows();
-
 private:
     std::function<void(std::string&)> saveMappingAndShowPopup;
     int row = 0;
@@ -40,6 +37,9 @@ private:
     std::string activePresetName = "New preset";
 
     void initPresets();
+
+    void displayUpAndDown();
+    void displayRows();
 
     std::vector<Preset> presets;
     std::vector<std::string> autoLoadModeNames{"NO", "ASK", "YES"};

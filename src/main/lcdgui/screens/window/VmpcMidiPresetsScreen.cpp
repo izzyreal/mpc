@@ -144,18 +144,20 @@ void VmpcMidiPresetsScreen::displayRows()
     for (int i = 0; i < 4; i++)
     {
         auto name = findChild<Field>("name" + std::to_string(i));
+        auto autoLoadField = findChild<Field>("auto-load" + std::to_string(i));
+        auto autoLoadLabel = findChild<Label>("auto-load" + std::to_string(i));
+
+        name->Hide(i >= presets.size());
+        autoLoadField->Hide(i >= presets.size());
+        autoLoadLabel->Hide(i >= presets.size());
 
         if (i >= presets.size())
         {
-            name->setText("");
             continue;
         }
 
         name->setText(presets[i + rowOffset].name);
         name->setInverted(i == row && column == 0);
-
-        auto autoLoadField = findChild<Field>("auto-load" + std::to_string(i));
-        auto autoLoadLabel = findChild<Label>("auto-load" + std::to_string(i));
 
         autoLoadField->Hide(i + rowOffset == 0);
         autoLoadLabel->Hide(i + rowOffset == 0);
