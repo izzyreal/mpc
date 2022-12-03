@@ -47,30 +47,29 @@ void SoundLoader::loadSound(std::shared_ptr<MpcFile> f, SoundLoaderResult& r, st
     if (StrUtil::eqIgnoreCase(extension, ".wav"))
     {
         bool willBeConverted = shouldBeConverted;
-        auto wavMeta = mpc.getDisk()->readWavMeta(f);
+        wav_or_error wavMetaOrError = mpc.getDisk()->readWavMeta(f);
         
-        if (!wavMeta.has_value())
+        if (!wavMetaOrError.has_value())
         {
             return;
         }
-        
-        wavMeta.map([&](std::shared_ptr<mpc::file::wav::WavFile> wavFile) {
-            
-            const auto bitDepth = wavFile->getValidBits();
-            const auto sampleRate = wavFile->getSampleRate();
-            
-            if (bitDepth == 24 || bitDepth == 32 || sampleRate > 44100) {
-                
-                auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
-                
-                if (!vmpcSettingsScreen->autoConvertWavs && !shouldBeConverted) {
-                    r.canBeConverted = true;
-                    return;
-                } else {
-                    willBeConverted = true;
-                }
+
+        auto wavMeta = wavMetaOrError.value();
+
+        const auto bitDepth = wavMeta->getValidBits();
+        const auto sampleRate = wavMeta->getSampleRate();
+
+        if (bitDepth == 24 || bitDepth == 32 || sampleRate > 44100) {
+
+            auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
+
+            if (!vmpcSettingsScreen->autoConvertWavs && !shouldBeConverted) {
+                r.canBeConverted = true;
+                return;
             }
-        });
+
+            willBeConverted = true;
+        }
 
         auto onSuccess = [&](std::shared_ptr<WavFile> wavFile){
             return onReadWavSuccess(wavFile, f->getNameWithoutExtension(), sound, willBeConverted);

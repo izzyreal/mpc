@@ -183,55 +183,45 @@ void LoadScreen::function(int i)
 		
 		auto selectedFile = getSelectedFile();
 		auto ext = moduru::file::FileUtil::splitName(selectedFile->getName())[1];
-		
-		if (StrUtil::eqIgnoreCase(ext, "snd") || StrUtil::eqIgnoreCase(ext, "wav"))
+
+        if (isSelectedFileDirectory())
+        {
+            if (disk->moveForward(getSelectedFile()->getName()))
+            {
+                mpc.getDisk()->initFiles();
+
+                fileLoad = 0;
+
+                displayView();
+                displayDirectory();
+                displayFile();
+                displaySize();
+
+                auto splitFileName = StrUtil::split(getSelectedFileName(), '.');
+                auto playable = splitFileName.size() > 1 && (StrUtil::eqIgnoreCase(splitFileName[1], "snd") || StrUtil::eqIgnoreCase(splitFileName[1], "wav"));
+                ls->setFunctionKeysArrangement(playable ? 1 : 0);
+            }
+        }
+		else if (StrUtil::eqIgnoreCase(ext, "snd") || StrUtil::eqIgnoreCase(ext, "wav"))
 		{
-            bool shouldBeConverted = false;
+            const bool shouldBeConverted = false;
 			loadSound(shouldBeConverted);
-			return;
 		}
-		
-		if (StrUtil::eqIgnoreCase(ext, "pgm"))
+		else if (StrUtil::eqIgnoreCase(ext, "pgm"))
 		{
 			openScreen("load-a-program");
-			return;
 		}
-		
-		if (StrUtil::eqIgnoreCase(ext, "mid"))
+		else if (StrUtil::eqIgnoreCase(ext, "mid"))
 		{
 			openScreen("load-a-sequence");
-			return;
 		}
-		
-		if (StrUtil::eqIgnoreCase(ext, "all"))
+		else if (StrUtil::eqIgnoreCase(ext, "all"))
 		{
 			openScreen("mpc2000xl-all-file");
-			return;
 		}
-		
-		if (StrUtil::eqIgnoreCase(ext, "aps"))
+		else if (StrUtil::eqIgnoreCase(ext, "aps"))
 		{
 			openScreen("load-aps-file");
-			return;
-		}
-
-		if (isSelectedFileDirectory())
-		{
-			if (disk->moveForward(getSelectedFile()->getName()))
-			{
-				mpc.getDisk()->initFiles();
-
-				fileLoad = 0;
-
-				displayView();
-				displayDirectory();
-				displayFile();
-				displaySize();
-
-				auto splitFileName = StrUtil::split(getSelectedFileName(), '.');
-				auto playable = splitFileName.size() > 1 && (StrUtil::eqIgnoreCase(splitFileName[1], "snd") || StrUtil::eqIgnoreCase(splitFileName[1], "wav"));
-				ls->setFunctionKeysArrangement(playable ? 1 : 0);
-			}
 		}
 		break;
 	}
