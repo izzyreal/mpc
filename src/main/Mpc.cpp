@@ -70,7 +70,7 @@ Mpc::Mpc()
                     auto file = fs.open("midicontrolpresets/" + entry.filename());
                     char* data = (char*) std::string_view(file.begin(), file.end() - file.begin()).data();
                     auto path = fs::path(p + entry.filename());
-                    auto presetStream = moduru::file::FileUtil::fopenw(path, "wb");
+                    auto presetStream = moduru::file::FileUtil::fopenw(path.string(), "wb");
                     std::fwrite(data, sizeof data[0], file.size(), presetStream);
                     std::fclose(presetStream);
                 }
