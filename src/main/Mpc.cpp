@@ -317,9 +317,19 @@ mpc::disk::DiskController* Mpc::getDiskController()
 
 Mpc::~Mpc()
 {
-    midiDeviceDetector->stop();
-    sampler->stopAllVoices(0);
-    sequencer->stop();
+    if (midiDeviceDetector)
+    {
+        midiDeviceDetector->stop();
+    }
+    if (sampler)
+    {
+        sampler->stopAllVoices(0);
+    }
+    if (sequencer)
+    {
+        sequencer->stop();
+    }
+
     mpc::nvram::MidiControlPersistence::saveCurrentState(*this);
 	mpc::nvram::NvRam::saveUserScreenValues(*this);
 	mpc::nvram::NvRam::saveVmpcSettings(*this);
@@ -331,10 +341,14 @@ Mpc::~Mpc()
 	}
 
 	if (layeredScreen)
-		layeredScreen.reset();
+    {
+        layeredScreen.reset();
+    }
 
 	if (audioMidiServices)
-		audioMidiServices->destroyServices();
+    {
+        audioMidiServices->destroyServices();
+    }
 }
 
 void Mpc::setPad(unsigned char padIndexWithBank)

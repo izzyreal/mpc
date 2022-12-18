@@ -58,9 +58,51 @@ std::shared_ptr<Sound> Sampler::getSound(int index)
     return sounds[index];
 }
 
+void Sampler::replaceSound(int index, std::shared_ptr<Sound>& newSound)
+{
+    size_t newIndex = -1;
+
+    for (size_t i = 0; i < sounds.size(); i++)
+    {
+        if (sounds[i] == newSound)
+        {
+            newIndex = i;
+            break;
+        }
+    }
+
+    if (newIndex != -1)
+    {
+        sounds[index] = sounds[newIndex];
+        sounds.erase(sounds.begin() + newIndex);
+    }
+}
+
 std::shared_ptr<Program> Sampler::getProgram(int index)
 {
     return programs[index];
+}
+
+void Sampler::nudgeSoundIndex(bool up)
+{
+    if (up)
+    {
+        if (soundIndex >= sounds.size() - 1)
+        {
+            return;
+        }
+
+        soundIndex++;
+        printf("");
+        return;
+    }
+
+    if (soundIndex == 0)
+    {
+        return;
+    }
+
+    soundIndex--;
 }
 
 void Sampler::setSoundIndex(int i)
@@ -74,7 +116,7 @@ void Sampler::setSoundIndex(int i)
 	zoneScreen->initZones();
 }
 
-int Sampler::getSoundIndex()
+short Sampler::getSoundIndex()
 {
 	return soundIndex;
 }
@@ -83,7 +125,7 @@ std::shared_ptr<Sound> Sampler::getSound()
 {
 	if (soundIndex < 0)
 	{
-		if (sounds.size() == 0)
+		if (sounds.empty())
 			return {};
 
 		// This is a bit of a hack, depending on what the real 2KXL does.
@@ -94,7 +136,7 @@ std::shared_ptr<Sound> Sampler::getSound()
 	if (soundIndex >= sounds.size())
 		return {};
 
-	return sounds[soundIndex];
+	return getSortedSounds()[soundIndex].first;
 }
 
 std::string Sampler::getPreviousScreenName()
@@ -105,19 +147,6 @@ std::string Sampler::getPreviousScreenName()
 void Sampler::setPreviousScreenName(std::string s)
 {
 	previousScreenName = s;
-}
-
-void Sampler::setInputLevel(int i)
-{
-	if (i < 0 || i > 100)
-		return;
-
-	inputLevel = i;
-}
-
-int Sampler::getInputLevel()
-{
-	return inputLevel;
 }
 
 std::vector<std::weak_ptr<MpcStereoMixerChannel>> Sampler::getDrumStereoMixerChannels(int i)
@@ -145,16 +174,11 @@ void Sampler::setMasterPadAssign(std::vector<int> v)
 	masterPadAssign = v;
 }
 
-std::vector<int>* Sampler::getAutoChromaticAssign()
-{
-	return &autoChromaticAssign;
-}
-
 void Sampler::init()
 {
     initMasterPadAssign = Pad::getPadNotes(mpc);
 
-	auto program = addProgram().lock();
+	auto program = createNewProgramAddFirstAvailableSlot().lock();
 	program->setName("NewPgm-A");
 	
 	for (int i = 0; i < 4; i++)
@@ -193,10 +217,6 @@ void Sampler::init()
     }
     
 	masterPadAssign = initMasterPadAssign;
-	autoChromaticAssign = std::vector<int>(64);
-
-	for (int i = 0; i < 64; i++)
-		autoChromaticAssign[i] = i;
 }
 
 void Sampler::playMetronome(mpc::sequencer::NoteEvent* event, int framePos)
@@ -225,7 +245,7 @@ void Sampler::playMetronome(mpc::sequencer::NoteEvent* event, int framePos)
 
 void Sampler::playPreviewSample(int start, int end, int loopTo, int overlapMode)
 {
-	if (sounds.size() == 0)
+	if (sounds.empty())
 	{
 		return;
 	}
@@ -263,14 +283,11 @@ int Sampler::getProgramCount()
 
 std::weak_ptr<Program> Sampler::addProgram(int i)
 {
-	if (programs[i])
-		return std::weak_ptr<Program>();
-
 	programs[i] = std::make_shared<Program>(mpc, this);
 	return programs[i];
 }
 
-std::weak_ptr<Program> Sampler::addProgram()
+std::weak_ptr<Program> Sampler::createNewProgramAddFirstAvailableSlot()
 {
 	for (auto& p : programs)
 	{
@@ -280,6 +297,7 @@ std::weak_ptr<Program> Sampler::addProgram()
 			return p;
 		}
 	}
+
 	return std::weak_ptr<Program>();
 }
 
@@ -309,7 +327,7 @@ std::shared_ptr<Sound> Sampler::addSound()
 
 std::shared_ptr<Sound> Sampler::addSound(int sampleRate)
 {
-	auto res = std::make_shared<Sound>(sampleRate, sounds.size());
+	auto res = std::make_shared<Sound>(sampleRate);
 	sounds.push_back(res);
 	return res;
 }
@@ -322,14 +340,6 @@ int Sampler::getSoundCount()
 std::string Sampler::getSoundName(int i)
 {
 	return sounds[i]->getName();
-}
-
-std::vector<std::string> Sampler::getSoundNames()
-{
-    std::vector<std::string> result;
-    for (int i = 0; i < getSoundCount(); i++)
-        result.push_back(sounds[i]->getName());
-    return result;
 }
 
 
@@ -352,24 +362,17 @@ std::vector<std::weak_ptr<Program>> Sampler::getPrograms()
 	return res;
 }
 
-void Sampler::replaceProgram(std::weak_ptr<Program> p, int index)
-{
-	auto sourceProgram = p.lock();
-	auto destProgram = programs[index];
-	destProgram.swap(sourceProgram);
-	deleteProgram(sourceProgram);
-}
-
-void Sampler::deleteAllPrograms(bool init)
+void Sampler::deleteAllPrograms()
 {
 	for (auto& p : programs)
-		p.reset();
+    {
+        p.reset();
+    }
 
-	if (!init)
-		return;
-
-	addProgram().lock()->setName("NewPgm-A");
-    repairProgramReferences();
+    for (int i = 0; i < 4; i++)
+    {
+        setDrumBusProgramIndex(i + 1, 0);
+    }
 }
 
 void Sampler::repairProgramReferences()
@@ -481,67 +484,26 @@ std::string Sampler::getSoundSortingTypeName()
 		return "SIZE";
 }
 
-void Sampler::sort()
+void Sampler::switchToNextSoundSortType()
 {
-	if (sounds.empty())
-		return;
+    auto s = getSound();
 
-	soundSortingType++; // This should be optional. Only when called by F1/F2/F3/F4 it should do this.
-	
-	if (soundSortingType > 2)
-		soundSortingType = 0;
+    if (soundSortingType++ > 2)
+    {
+        soundSortingType = 0;
+    }
 
-	auto currentSoundMemoryIndex = soundIndex == -1 ? -1 : sounds[soundIndex]->getMemoryIndex();
+    auto sortedSounds = getSortedSounds();
 
-	std::vector<std::string> oldSoundNames;
-	std::transform(begin(sounds), end(sounds), std::back_inserter(oldSoundNames), [](std::shared_ptr<Sound> sound) { return sound->getName(); });
-
-	switch (soundSortingType)
-	{
-	case 0:
-		stable_sort(sounds.begin(), sounds.end(), compareMemoryIndex);
-		break;
-	case 1:
-		stable_sort(sounds.begin(), sounds.end(), compareName);
-		break;
-	case 2:
-		stable_sort(sounds.begin(), sounds.end(), compareSize);
-		break;
-	}
-
-	std::vector<std::string> newSoundNames;
-	std::transform(begin(sounds), end(sounds), std::back_inserter(newSoundNames), [](std::shared_ptr<Sound> sound) { return sound->getName(); });
-
-	std::vector<NoteParameters*> correctedNoteParameters;
-
-	for (auto& program : programs)
-	{
-		if (!program)
-			continue;
-
-		for (auto noteParameters : program->getNotesParameters())
-		{
-			if (find(correctedNoteParameters.begin(), correctedNoteParameters.end(), noteParameters) != correctedNoteParameters.end())
-				continue;
-
-			if (noteParameters->getSoundIndex() != -1)
-			{
-				auto name = *find(begin(oldSoundNames), end(oldSoundNames), oldSoundNames[noteParameters->getSoundIndex()]);
-				auto newNameItr = find(begin(newSoundNames), end(newSoundNames), name);
-				auto newIndex = std::distance(begin(newSoundNames), newNameItr);
-				noteParameters->setSoundIndex(newIndex);
-				correctedNoteParameters.push_back(noteParameters);
-			}
-		}
-	}
-
-	for (int i = 0; i < sounds.size(); i++)
-	{
-		if (sounds[i]->getMemoryIndex() == currentSoundMemoryIndex) {
-			setSoundIndex(i);
-			break;
-		}
-	}
+    for (int i = 0; i < sortedSounds.size(); i++)
+    {
+        if (sortedSounds[i].first == s)
+        {
+            soundIndex = i;
+            printf("");
+            break;
+        }
+    }
 }
 
 void Sampler::deleteAllSamples()
@@ -674,22 +636,22 @@ void Sampler::playX()
 
 	auto fullEnd = end;
 
-	if (playX_ == 1)
+	if (playXMode == 1)
 	{
 		auto zoneScreen = mpc.screens->get<ZoneScreen>("zone");
 		auto zone = zoneScreen->getZone();
 		start = zone[0];
 		end = zone[1];
 	}
-	else if (playX_ == 2)
+	else if (playXMode == 2)
 	{
 		end = sound->getStart();
 	}
-	else if (playX_ == 3)
+	else if (playXMode == 3)
 	{
 		end = sound->getLoopTo();
 	}
-	else if (playX_ == 4)
+	else if (playXMode == 4)
 	{
 		start = sound->getEnd();
 		end = fullEnd;
@@ -851,9 +813,44 @@ void Sampler::deleteSound(int deleteSoundIndex)
 	deleteSound(sounds[deleteSoundIndex]);
 }
 
+void Sampler::deleteSoundWithoutRepairingPrograms(std::shared_ptr<Sound> sound)
+{
+    size_t index = -1;
+
+    for (int i = 0; i < sounds.size(); i ++)
+    {
+        if (sounds[i] == sound)
+        {
+            index = i;
+            break;
+        }
+    }
+
+    if (index == -1)
+    {
+        return;
+    }
+
+    sounds.erase(sounds.begin() + index);
+}
+
 void Sampler::deleteSound(std::weak_ptr<Sound> sound)
 {
-	auto index = sound.lock()->getMemoryIndex();
+	size_t index = -1;
+
+    for (int i = 0; i < sounds.size(); i ++)
+    {
+        if (sounds[i] == sound.lock())
+        {
+            index = i;
+            break;
+        }
+    }
+
+    if (index == -1)
+    {
+        return;
+    }
 
     for (auto& p : programs)
     {
@@ -868,55 +865,17 @@ void Sampler::deleteSound(std::weak_ptr<Sound> sound)
         }
     }
 
-	for (int i = 0; i < sounds.size(); i++)
-	{
-		if (sounds[i] == sound.lock())
-		{
-			sounds.erase(sounds.begin() + i);
-			break;
-		}
-	}
-
-	stable_sort(sounds.begin(), sounds.end(), compareMemoryIndex);
-
-	for (int i = 0; i < sounds.size(); i++)
-	{
-		auto oldMemoryIndex = sounds[i]->getMemoryIndex();
-
-		sounds[i]->setMemoryIndex(i);
-
-		for (auto& program : programs)
-		{
-			if (!program) continue;
-
-			for (auto noteParameters : program->getNotesParameters())
-			{
-				if (noteParameters->getSoundIndex() == oldMemoryIndex)
-				{
-					noteParameters->setSoundIndex(i);
-				}
-			}
-		}
-	}
-
-	switch (soundSortingType)
-	{
-	case 0:
-		stable_sort(sounds.begin(), sounds.end(), compareMemoryIndex);
-		break;
-	case 1:
-		stable_sort(sounds.begin(), sounds.end(), compareName);
-		break;
-	case 2:
-		stable_sort(sounds.begin(), sounds.end(), compareSize);
-		break;
-	}
+	sounds.erase(sounds.begin() + index);
 
 	if (soundIndex >= sounds.size())
-		soundIndex--;
-	
+    {
+        soundIndex--;
+    }
+
 	if (soundIndex < 0)
-		soundIndex = 0;
+    {
+        soundIndex = 0;
+    }
 }
 
 std::vector<float> Sampler::mergeToStereo(std::vector<float> fa0, std::vector<float> fa1)
@@ -1010,24 +969,14 @@ int Sampler::checkExists(std::string soundName)
 	return -1;
 }
 
-int Sampler::getNextSoundIndex(int j, bool up)
-{
-	auto inc = up ? 1 : -1;
-	if (j + inc < -1 || j + inc > getSoundCount() - 1)
-	{
-		return j;
-	}
-	return j + inc;
-}
-
 void Sampler::selectPreviousSound()
 {
-	setSoundIndex(getNextSoundIndex(soundIndex, false));
+    nudgeSoundIndex(false);
 }
 
 void Sampler::selectNextSound()
 {
-	setSoundIndex(getNextSoundIndex(soundIndex, true));
+    nudgeSoundIndex(true);
 }
 
 std::weak_ptr<Sound> Sampler::copySound(std::weak_ptr<Sound> source)
@@ -1096,18 +1045,6 @@ void Sampler::copyProgram(const int sourceIndex, const int destIndex)
 	destSlider->setTuneLowRange(srcSlider->getTuneLowRange());
 }
 
-bool Sampler::compareMemoryIndex(std::weak_ptr<Sound> a, std::weak_ptr<Sound> b) {
-	return a.lock()->getMemoryIndex() < b.lock()->getMemoryIndex();
-}
-
-bool Sampler::compareName(std::weak_ptr<Sound> a, std::weak_ptr<Sound> b) {
-	return a.lock()->getName() < b.lock()->getName();
-}
-
-bool Sampler::compareSize(std::weak_ptr<Sound> a, std::weak_ptr<Sound> b) {
-	return a.lock()->getFrameCount() < b.lock()->getFrameCount();
-}
-
 int Sampler::getUsedProgram(int startIndex, bool up) {
 	auto res = startIndex;
 
@@ -1144,12 +1081,12 @@ void Sampler::setPlayX(int i)
 		return;
 	}
 
-	playX_ = i;
+    playXMode = i;
 }
 
 int Sampler::getPlayX()
 {
-	return playX_;
+	return playXMode;
 }
 
 bool Sampler::isSoundNameOccupied(const std::string& name)
@@ -1159,4 +1096,61 @@ bool Sampler::isSoundNameOccupied(const std::string& name)
 			return true;
 
 	return false;
+}
+
+std::vector<std::pair<std::shared_ptr<Sound>, int>> Sampler::getSoundsSortedByName()
+{
+    std::vector<std::pair<std::shared_ptr<Sound>, int>> result;
+
+    for (int i = 0; i < sounds.size(); i++)
+    {
+        result.push_back({sounds[i], i});
+    }
+
+    std::sort(result.begin(),
+              result.end(),
+              [](const std::pair<std::shared_ptr<Sound>, int> s1, const std::pair<std::shared_ptr<Sound>, int> s2) -> bool {
+                  return s1.first->getName() < s2.first->getName();
+              });
+
+    return result;
+}
+
+std::vector<std::pair<std::shared_ptr<Sound>,int>> Sampler::getSoundsSortedBySize()
+{
+    std::vector<std::pair<std::shared_ptr<Sound>, int>> result;
+
+    for (int i = 0; i < sounds.size(); i++)
+    {
+        result.push_back({sounds[i], i});
+    }
+
+    std::sort(result.begin(),
+              result.end(),
+              [](const std::pair<std::shared_ptr<Sound>, int> s1, const std::pair<std::shared_ptr<Sound>, int> s2) -> bool {
+                  return s1.first->getFrameCount() < s2.first->getFrameCount();
+              });
+
+    return result;
+}
+
+std::vector<std::pair<std::shared_ptr<Sound>, int>> Sampler::getSortedSounds()
+{
+    if (soundSortingType == 0)
+    {
+        std::vector<std::pair<std::shared_ptr<Sound>, int>> result;
+
+        for (int i = 0; i < sounds.size(); i++)
+        {
+            result.push_back({sounds[i], i});
+        }
+
+        return result;
+    }
+    else if (soundSortingType == 1)
+    {
+        return getSoundsSortedByName();
+    }
+
+    return getSoundsSortedBySize();
 }

@@ -64,11 +64,7 @@ void FileExistsScreen::function(int i)
 		if (existingSound && loadASoundCandidate)
 		{
 			// replace
-			auto existingSoundMemoryIndex = existingSound->getMemoryIndex();
-			auto candidateSoundMemoryIndex = loadASoundCandidate->getMemoryIndex();
 			existingSound.swap(loadASoundCandidate);
-			existingSound->setMemoryIndex(existingSoundMemoryIndex);
-			loadASoundCandidate->setMemoryIndex(candidateSoundMemoryIndex);
 			sampler->deleteSound(loadASoundCandidate);
 			actionAfterAddingSound(existingSound->isMono());
 			loadASoundCandidate = {};

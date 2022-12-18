@@ -51,7 +51,7 @@ void AutoChromaticAssignmentScreen::function(int i)
             break;
         case 4:
         {
-            auto newProgram = sampler->addProgram().lock();
+            auto newProgram = sampler->createNewProgramAddFirstAvailableSlot().lock();
             newProgram->setName(newName);
             
             for (int j = 35; j <= 98; j++)

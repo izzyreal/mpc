@@ -190,7 +190,7 @@ void EditSoundScreen::displayVariable()
 	}
 	else if (edit == 3)
     {
-		auto sampleName = sampler->getSoundName(insertSoundIndex);
+		auto sampleName = sampler->getSortedSounds()[insertSoundIndex].first->getName();
 		findLabel("new-name")->setSize(11 * 6, 9);
 		findLabel("new-name")->setText("Insert Snd:");
 		findField("new-name")->setLocation(findLabel("new-name")->getW() + 19, 20);
@@ -423,7 +423,9 @@ void EditSoundScreen::function(int j)
 			newSampleData->resize(sound->getSampleData()->size());
 
 			for (int i = 0; i < newSampleData->size(); i++)
-				(*newSampleData)[i] = (*sound->getSampleData())[i];
+            {
+                (*newSampleData)[i] = (*sound->getSampleData())[i];
+            }
 
 			newSample->setMono(sound->isMono());
 			sampler->trimSample(sampler->getSoundCount() - 1, sound->getStart(), sound->getEnd());
@@ -432,7 +434,7 @@ void EditSoundScreen::function(int j)
 		else if (edit == 3)
 		{
 			// Insert sound into section start
-			auto source = sampler->getSound(insertSoundIndex);
+			auto source = sampler->getSortedSounds()[insertSoundIndex].first;
 			auto destination = sampler->getSound();
 
 			auto destinationStartFrame = sound->getStart();
@@ -720,7 +722,7 @@ void EditSoundScreen::function(int j)
 
 			if (createNewProgram)
 			{
-				auto p = sampler->addProgram().lock();
+				auto p = sampler->createNewProgramAddFirstAvailableSlot().lock();
 				p->setName(source->getName());
 
 				for (int i = 0; i < zoneCount; i++)

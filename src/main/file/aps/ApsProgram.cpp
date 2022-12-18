@@ -18,7 +18,8 @@ ApsProgram::ApsProgram(const std::vector<char>& loadBytes)
 {
 	index = loadBytes[INDEX_OFFSET];
 	auto nameBytes = VecUtil::CopyOfRange(loadBytes, NAME_OFFSET, NAME_OFFSET + NAME_LENGTH);
-	name = "";
+
+    name = "";
 	
 	for (char c : nameBytes)
 	{
@@ -27,6 +28,8 @@ ApsProgram::ApsProgram(const std::vector<char>& loadBytes)
 		
 		name.push_back(c);
 	}
+
+    name = lang::StrUtil::trim(name);
 
 	slider = new ApsSlider(VecUtil::CopyOfRange(loadBytes, SLIDER_OFFSET, SLIDER_OFFSET + SLIDER_LENGTH));
 	

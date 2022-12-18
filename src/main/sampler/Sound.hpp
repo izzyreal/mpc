@@ -11,15 +11,11 @@ namespace mpc::sampler {
 
 	private:
 		std::string name = "";
-		int memoryIndex{ -1 };
 		int numberOfBeats{ 4 };
 		ctoot::mpc::MpcSoundOscillatorControls* oscillatorControls{ nullptr };
 
 	public:
 		void setName(std::string s);
-
-	public:
-		int getMemoryIndex();
 
 	public:
 		std::vector<float>* getSampleData() override;
@@ -32,7 +28,6 @@ namespace mpc::sampler {
 		int getLastFrameIndex() override;
 		int getSndLevel() override;
 
-		void setMemoryIndex(int i);
 		void setBeatCount(int i);
 		int getBeatCount();
 		std::string getName();
@@ -50,7 +45,7 @@ namespace mpc::sampler {
 		void insertFrame(std::vector<float> frame, unsigned int index);
 
 	public:
-		Sound(int rate, int index);
+		Sound(int rate);
 		Sound();
 		~Sound();
 

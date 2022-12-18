@@ -115,8 +115,6 @@ target_include_directories(mpc PUBLIC
 
 target_link_libraries(mpc ctoot akaifat moduru ghc_filesystem rtmidi)
 
-_bundle_mpc_resources(mpc)
-
 if(MSVC)
 	target_compile_options(mpc PRIVATE "/MP")
 endif()
@@ -149,7 +147,7 @@ foreach(_source IN ITEMS ${_source_list_test})
     source_group("${_source_path_msvc}" FILES "${_source}")
 endforeach()
 
-add_executable(mpc-tests ${_source_list_test})
+add_executable(mpc-tests ${_source_list_test} src/test/SamplerTest.cpp)
 target_link_libraries(mpc-tests mpc Catch2::Catch2WithMain)
 
 if (UNIX)
@@ -170,6 +168,8 @@ endif()
 if (APPLE)
     target_link_libraries(mpc-tests stdc++ "-framework Foundation -framework Security -framework DiskArbitration -framework SystemConfiguration")
 endif()
+
+_bundle_mpc_resources(mpc)
 
 set(CPACK_SOURCE_GENERATOR "TGZ")
 set(CPACK_SOURCE_IGNORE_FILES

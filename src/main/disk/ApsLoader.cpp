@@ -62,8 +62,6 @@ void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool head
 {
     auto sampler = mpc.getSampler();
     auto disk = mpc.getDisk();
-        
-    const bool initPgms = false;
 
     // For now when this is called by JUCE's get/setState routines,
     // we trust every sound could be saved/loaded.
@@ -122,7 +120,7 @@ void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool head
         }
     }
     
-    sampler->deleteAllPrograms(initPgms);
+    sampler->deleteAllPrograms();
     
     for (auto& apsProgram : apsParser.getPrograms())
     {
@@ -251,10 +249,11 @@ void ApsLoader::loadSound(mpc::Mpc& mpc,
     auto soundFile = _soundFile.lock();
     const auto replace = false;
     SoundLoader soundLoader(mpc, replace);
-    soundLoader.setPartOfProgram(true);
-    
+
     if (!headless)
+    {
         ApsLoader::showPopup(mpc, soundFileName, ext, soundFile->length());
+    }
     
     SoundLoaderResult result;
     bool shouldBeConverted = false;

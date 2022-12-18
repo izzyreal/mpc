@@ -71,7 +71,7 @@ void CreateNewProgramScreen::function(int i)
 		openScreen("program");
 		break;
 	case 4:
-		auto newProgram = sampler->addProgram().lock();
+		auto newProgram = sampler->createNewProgramAddFirstAvailableSlot().lock();
 		newProgram->setName(newName);
 		newProgram->setMidiProgramChange(midiProgramChange);
 		

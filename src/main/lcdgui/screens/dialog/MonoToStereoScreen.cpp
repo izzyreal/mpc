@@ -51,7 +51,17 @@ void MonoToStereoScreen::turnWheel(int i)
 	}
 	else if (param == "rsource")
 	{
-		setRSource(sampler->getNextSoundIndex(rSource, i > 0));
+        auto nextSoundIndex = rSource;
+        if (i > 0 && nextSoundIndex != sampler->getSoundCount() - 1)
+        {
+            nextSoundIndex++;
+        }
+        else if (i < 0 && nextSoundIndex != 0)
+        {
+            nextSoundIndex--;
+        }
+
+		setRSource(nextSoundIndex);
 		displayRSource();
 	}
 	else if (param == "newstname")
@@ -80,8 +90,11 @@ void MonoToStereoScreen::function(int j)
 		break;
 	case 4:
 	{
-		if (!sampler->getSound()->isMono() || !sampler->getSound(rSource)->isMono())
-			return;
+        auto right = sampler->getSortedSounds()[rSource].first;
+		if (!sampler->getSound()->isMono() || !right->isMono())
+        {
+            return;
+        }
 
 		for (auto& s : sampler->getSounds())
 		{
@@ -96,7 +109,6 @@ void MonoToStereoScreen::function(int j)
 		}
 
 		auto left = sampler->getSound();
-		auto right = sampler->getSound(rSource);
 
 		std::vector<float> newSampleDataRight;
 
@@ -141,12 +153,17 @@ void MonoToStereoScreen::displayLSource()
 
 void MonoToStereoScreen::displayRSource()
 {
-	if (!sampler->getSound(rSource))
-		return;
+    if (rSource >= sampler->getSoundCount())
+    {
+        findField("rsource")->setText("");
+        return;
+    }
 
-	findField("rsource")->setText(sampler->getSoundName(rSource));
+    auto sound = sampler->getSortedSounds()[rSource];
 
-	if (sampler->getSound()->isMono() && sampler->getSound(rSource)->isMono())
+	findField("rsource")->setText(sound.first->getName());
+
+	if (sound.first->isMono() && sampler->getSound()->isMono())
 	{
 		ls->setFunctionKeysArrangement(0);
 	}

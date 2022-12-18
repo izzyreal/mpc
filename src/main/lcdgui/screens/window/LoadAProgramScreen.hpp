@@ -17,9 +17,10 @@ namespace mpc::lcdgui::screens::window
 		LoadAProgramScreen(mpc::Mpc& mpc, const int layerIndex);
 		void open() override;
 
+        void setLoadReplaceSameSound(bool b);
+
 	private:
-		bool loadReplaceSound = false;
-		bool clearProgramWhenLoading = false;
+		bool loadReplaceSameSound = false;
 
 		void displayLoadReplaceSound();
 

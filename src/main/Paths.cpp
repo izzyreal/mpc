@@ -33,12 +33,6 @@ std::string Paths::appConfigHome()
     return path;
 }
 
-std::string Paths::appConfigPath()
-{
-    static auto path = sago::getConfig() + sep() + "VMPC2000XL" + sep();
-    return path;
-}
-
 std::string Paths::configPath()
 {
     static auto path = appConfigHome() + "config" + sep();

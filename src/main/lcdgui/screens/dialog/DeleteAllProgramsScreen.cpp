@@ -18,9 +18,9 @@ void DeleteAllProgramsScreen::function(int j)
 		break;
 	case 4:
 	{
-		const bool initPgms = true;
-		sampler->deleteAllPrograms(initPgms);
-		openScreen("delete-program");
+		sampler->deleteAllPrograms();
+        sampler->createNewProgramAddFirstAvailableSlot().lock()->setName("NewPgm-A");
+        openScreen("delete-program");
 		break;
 	}
 	}

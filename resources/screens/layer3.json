@@ -110,7 +110,11 @@
  "x" : [ 85, 85, 67 ],
  "y" : [ 15, 30, 40 ],
  "tfsize" : [ 96, 96, 96 ],
- "parameters" : [ "lsource", "rsource", "newstname" ],
+ "parameters" : [
+  "lsource", [ "_", "_", "_", "rsource" ],
+  "rsource", [ "_", "_", "lsource", "newstname" ],
+  "newstname", [ "_", "_", "rsource", "_" ]
+ ],
  "fblabels" : [[ null, null, null, "CANCEL", "DO IT", null], [ null, null, null, "CANCEL", null, null]],
  "fbtypes" : [[ null, null, null, 0, 1, null ], [ null, null, null, 0, null, null ]]
 },
@@ -120,7 +124,11 @@
  "x" : [ 55, 73, 73 ],
  "y" : [ 15, 30, 40 ],
  "tfsize" : [ 96, 96, 96 ],
- "parameters" : [ "stereosource", "newlname", "newrname" ],
+ "parameters" : [
+  "stereosource", [ "_", "_", "_", "newlname" ],
+  "newlname", [ "_", "_", "stereosource", "newrname" ],
+  "newrname", [ "_", "_", "newlname", "_"]
+ ],
  "fblabels" : [[ null, null, null, "CANCEL", "DO IT", null], [ null, null, null, "CANCEL", null, null]],
  "fbtypes" : [[ null, null, null, 0, 1, null ], [ null, null, null, 0, null, null ]]
 },

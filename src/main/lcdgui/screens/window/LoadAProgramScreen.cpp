@@ -3,6 +3,8 @@
 #include <disk/AbstractDisk.hpp>
 #include <lcdgui/screens/LoadScreen.hpp>
 
+#include "mpc/MpcSoundPlayerChannel.hpp"
+
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;
 
@@ -20,9 +22,9 @@ void LoadAProgramScreen::turnWheel(int i)
 {
 	init();
 
-	if (param.compare("load-replace-sound") == 0)
+	if (param == "load-replace-sound")
 	{
-		loadReplaceSound = i > 0;
+        loadReplaceSameSound = i > 0;
 		displayLoadReplaceSound();
 	}
 }
@@ -37,24 +39,42 @@ void LoadAProgramScreen::function(int i)
 	{
 	case 2:
 	{
-		clearProgramWhenLoading = true;
-		auto oldLoadReplaceSound = loadReplaceSound;
-		loadReplaceSound = true;
-        mpc.getDisk()->readPgm2(selectedFile);
-		loadReplaceSound = oldLoadReplaceSound;
+        mpc.getSampler()->deleteAllPrograms();
+        mpc.getSampler()->deleteAllSamples();
+
+        mpc.getDisk()->readPgm2(selectedFile, mpc.getSampler()->createNewProgramAddFirstAvailableSlot().lock());
 		break;
 	}
 	case 3:
 		openScreen("load");
 		break;
-	case 4:
-		clearProgramWhenLoading = false;
-        mpc.getDisk()->readPgm2(selectedFile);
-		break;
+	case 4: {
+        auto newProgram = mpc.getSampler()->createNewProgramAddFirstAvailableSlot().lock();
+
+        mpc.getDisk()->readPgm2(selectedFile, newProgram);
+
+        // TODO Is it correct that we only set a DRUM to the new program
+        // if the active track's bus is a DRUM and not a MIDI one?
+        if (mpcSoundPlayerChannel != nullptr) {
+            for (int pgmIndex = 0; pgmIndex < 24; pgmIndex++) {
+                if (sampler->getProgram(pgmIndex) == newProgram) {
+                    mpcSoundPlayerChannel->setProgram(pgmIndex);
+                    break;
+                }
+            }
+        }
+
+        break;
+    }
 	}
 }
 
 void LoadAProgramScreen::displayLoadReplaceSound()
 {
-	findField("load-replace-sound")->setText(std::string(loadReplaceSound ? "YES" : "NO(FASTER)"));
+	findField("load-replace-sound")->setText(std::string(loadReplaceSameSound ? "YES" : "NO(FASTER)"));
+}
+
+void LoadAProgramScreen::setLoadReplaceSameSound(bool b)
+{
+    loadReplaceSameSound = b;
 }

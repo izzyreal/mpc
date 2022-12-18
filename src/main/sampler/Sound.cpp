@@ -4,16 +4,15 @@
 
 using namespace mpc::sampler;
 
-Sound::Sound(int rate, int index) 
+Sound::Sound(int rate)
 {
-	this->memoryIndex = index;
-	oscillatorControls = new ctoot::mpc::MpcSoundOscillatorControls(memoryIndex, 0);
+	oscillatorControls = new ctoot::mpc::MpcSoundOscillatorControls(0);
     setSampleRate(rate);
 }
 
 Sound::Sound() 
 {
-	oscillatorControls = new ctoot::mpc::MpcSoundOscillatorControls(-1, 0);
+	oscillatorControls = new ctoot::mpc::MpcSoundOscillatorControls(0);
 	oscillatorControls->setName("click");
 }
 
@@ -22,16 +21,6 @@ void Sound::setName(std::string s)
     name = s;
     
     notifyObservers(std::string("samplename"));
-}
-
-int Sound::getMemoryIndex()
-{
-    return memoryIndex;
-}
-
-void Sound::setMemoryIndex(int i)
-{
-    memoryIndex = i;
 }
 
 void Sound::setBeatCount(int i)

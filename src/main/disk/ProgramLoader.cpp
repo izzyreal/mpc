@@ -31,11 +31,36 @@ using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace moduru::lang;
 
-program_or_error
-ProgramLoader::loadProgram(mpc::Mpc &mpc, std::shared_ptr<mpc::disk::MpcFile> file, const int replaceIndex)
+std::shared_ptr<MpcFile> findSoundFileByFilenameWithoutExtension(mpc::Mpc& mpc, const std::string& filename, std::string& foundExtension)
 {
-    const bool replace = replaceIndex != -1;
+    std::shared_ptr<MpcFile> result;
 
+    auto disk = mpc.getDisk();
+
+    for (auto &f: disk->getAllFiles()) {
+        if (StrUtil::eqIgnoreCase(StrUtil::replaceAll(f->getName(), ' ', ""), filename + ".snd")) {
+            result = f;
+            foundExtension = "snd";
+            break;
+        }
+    }
+
+    if (!result || !result->exists()) {
+        for (auto &f: disk->getAllFiles()) {
+            if (StrUtil::eqIgnoreCase(StrUtil::replaceAll(f->getName(), ' ', ""), filename + ".wav")) {
+                result = f;
+                foundExtension = "wav";
+                break;
+            }
+        }
+    }
+
+    return result;
+}
+
+program_or_error
+ProgramLoader::loadProgram(mpc::Mpc &mpc, std::shared_ptr<mpc::disk::MpcFile> file, std::shared_ptr<mpc::sampler::Program> program)
+{
     auto cantFindFileScreen = mpc.screens->get<CantFindFileScreen>("cant-find-file");
     cantFindFileScreen->skipAll = false;
 
@@ -45,107 +70,124 @@ ProgramLoader::loadProgram(mpc::Mpc &mpc, std::shared_ptr<mpc::disk::MpcFile> fi
 
     return PgmFileToProgramConverter::loadFromFileAndConvert(
             file,
-            mpc.getSampler(),
-            replaceIndex,
+            program,
             pgmSoundNames
-    ).map([pgmSoundNames, disk, &mpc, replace](std::shared_ptr<Program> p) {
+    ).map([pgmSoundNames, disk, &mpc](std::shared_ptr<Program> p)
+    {
+        std::vector<std::pair<int, std::string>> localTable;
 
-        auto soundsDestIndex = std::vector<int>(pgmSoundNames.size());
+        for (int i = 0; i < pgmSoundNames.size(); i++)
+        {
+            auto soundFileName = StrUtil::trim(pgmSoundNames[i]);
+            localTable.push_back({i, soundFileName});
+        }
 
-        std::vector<int> unavailableSoundIndices;
-        std::map<int, int> finalSoundIndices;
+        std::vector<std::pair<int, std::string>> globalTable;
 
-        int skipCount = 0;
+        for (int i = 0; i < mpc.getSampler()->getSoundCount(); i++)
+        {
+            globalTable.push_back({i, mpc.getSampler()->getSoundName(i)});
+        }
 
-        for (int i = 0; i < pgmSoundNames.size(); i++) {
-            auto ext = "snd";
-            std::shared_ptr<MpcFile> soundFile;
-            std::string soundFileName = StrUtil::replaceAll(pgmSoundNames[i], ' ', "");
+        std::vector<int> unavailableLocalSoundIndices;
 
-            for (auto &f: disk->getAllFiles()) {
-                if (StrUtil::eqIgnoreCase(StrUtil::replaceAll(f->getName(), ' ', ""), soundFileName + ".SND")) {
-                    soundFile = f;
+        for (auto& localEntry : localTable)
+        {
+            std::string foundExtension;
+            auto soundFile = findSoundFileByFilenameWithoutExtension(mpc, localEntry.second, foundExtension);
+
+            if (!soundFile || !soundFile->exists())
+            {
+                unavailableLocalSoundIndices.push_back(localEntry.first);
+                notFound(mpc, localEntry.second);
+                continue;
+            }
+
+            const auto loadAProgramScreen = mpc.screens->get<LoadAProgramScreen>("load-a-program");
+            const bool replaceExistingSameNamedSounds = loadAProgramScreen->loadReplaceSameSound;
+
+            SoundLoader soundLoader(mpc, replaceExistingSameNamedSounds);
+
+            showLoadingSoundNamePopup(mpc, localEntry.second, foundExtension, soundFile->length());
+
+            SoundLoaderResult soundLoaderResult;
+            const bool shouldBeConverted = false;
+            auto sound = mpc.getSampler()->addSound();
+            soundLoader.loadSound(soundFile, soundLoaderResult, sound, shouldBeConverted);
+
+            if (!soundLoaderResult.success)
+            {
+                mpc.getSampler()->deleteSoundWithoutRepairingPrograms(sound);
+            }
+        }
+
+        std::vector<std::pair<int, std::string>> convertedTable = localTable;
+
+        for (auto& convertedEntry : convertedTable)
+        {
+            const auto localSoundName = convertedEntry.second;
+            bool wasFoundInGlobalTable = false;
+
+            for (auto& globalEntry : globalTable)
+            {
+                // In all cases where the sampler already has a sound by some name,
+                // we will want the loaded program to refer to this sound's index.
+                if (localSoundName == globalEntry.second)
+                {
+                    convertedEntry.first = globalEntry.first;
+                    wasFoundInGlobalTable = true;
                     break;
                 }
             }
 
-            if (!soundFile || !soundFile->exists()) {
-                for (auto &f: disk->getAllFiles()) {
-                    if (StrUtil::eqIgnoreCase(StrUtil::replaceAll(f->getName(), ' ', ""), soundFileName + ".WAV")) {
-                        soundFile = f;
-                        ext = "wav";
+            if (!wasFoundInGlobalTable)
+            {
+                convertedEntry.first = -1;
+
+                for (int sampleIndex = 0; sampleIndex < mpc.getSampler()->getSoundCount(); sampleIndex++)
+                {
+                    if (mpc.getSampler()->getSoundName(sampleIndex) == localSoundName)
+                    {
+                        convertedEntry.first = sampleIndex;
                         break;
                     }
                 }
             }
-
-            if (!soundFile || !soundFile->exists()) {
-                unavailableSoundIndices.push_back(i);
-                skipCount++;
-                notFound(mpc, soundFileName);
-                continue;
-            }
-
-            finalSoundIndices[i] = i - skipCount;
-
-            loadSound(mpc,
-                      pgmSoundNames[i],
-                      ext,
-                      soundFile,
-                      &soundsDestIndex,
-                      replace,
-                      i);
         }
 
-        for (auto &srcNoteParams: p->getNotesParameters()) {
-            auto soundIndex = srcNoteParams->getSoundIndex();
+        for (auto &srcNoteParams: p->getNotesParameters())
+        {
+            auto localSoundIndex = srcNoteParams->getSoundIndex();
 
-            if (find(begin(unavailableSoundIndices), end(unavailableSoundIndices), soundIndex) !=
-                end(unavailableSoundIndices)) {
-                soundIndex = -1;
+            std::string localSoundName;
+
+            for (auto& localEntry : localTable)
+            {
+                if (localEntry.first == localSoundIndex)
+                {
+                    localSoundName = localEntry.second;
+                    break;
+                }
             }
 
-            if (soundIndex != -1 && finalSoundIndices.find(soundIndex) != end(finalSoundIndices)) {
-                soundIndex = finalSoundIndices[soundIndex];
+            srcNoteParams->setSoundIndex(-1);
+
+            if (!localSoundName.empty())
+            {
+                for (auto& convertedEntry : convertedTable)
+                {
+                    if (convertedEntry.second == localSoundName)
+                    {
+                        srcNoteParams->setSoundIndex(convertedEntry.first);
+                        break;
+                    }
+                }
             }
-
-            srcNoteParams->setSoundIndex(soundIndex);
-        }
-
-        auto track = mpc.getSequencer()->getActiveTrack();
-        auto loadAProgramScreen = mpc.screens->get<LoadAProgramScreen>("load-a-program");
-
-        if (!loadAProgramScreen->clearProgramWhenLoading) {
-            mpc.getDrum(track->getBus() - 1)->setProgram(mpc.getSampler()->getProgramCount() - 1);
         }
 
         mpc.getLayeredScreen()->openScreen("load");
-
         return p;
     });
-}
-
-void ProgramLoader::loadSound(mpc::Mpc &mpc, const std::string &soundName, const std::string &ext,
-                              std::shared_ptr<MpcFile> soundFile, std::vector<int> *soundsDestIndex,
-                              const bool replace, const int loadSoundIndex)
-{
-    SoundLoader soundLoader(mpc, replace);
-    soundLoader.setPartOfProgram(true);
-    showLoadingSoundNamePopup(mpc, soundName, ext, soundFile->length());
-    SoundLoaderResult soundLoaderResult;
-    bool shouldBeConverted = false;
-
-    auto sound = mpc.getSampler()->addSound();
-
-    soundLoader.loadSound(soundFile, soundLoaderResult, sound, shouldBeConverted);
-
-    if (!soundLoaderResult.success) {
-        mpc.getSampler()->deleteSound(sound);
-        return;
-    }
-
-    if (soundLoaderResult.existingIndex != -1)
-        (*soundsDestIndex)[loadSoundIndex] = soundLoaderResult.existingIndex;
 }
 
 void ProgramLoader::showLoadingSoundNamePopup(mpc::Mpc &mpc, std::string name, std::string ext, int sampleSize)

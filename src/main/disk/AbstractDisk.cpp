@@ -376,14 +376,11 @@ sequence_or_error AbstractDisk::readMid2(std::shared_ptr<MpcFile> f)
     return performIoOrOpenErrorPopup(readFunc);
 }
 
-void AbstractDisk::readPgm2(std::shared_ptr<MpcFile> f)
+void AbstractDisk::readPgm2(std::shared_ptr<MpcFile> f, std::shared_ptr<Program> p)
 {
-    new std::thread([this, f]() {
-        std::function<tl::expected<bool, mpc_io_error_msg>()> readFunc = [this, f]{
-            auto loadReplaceSound = mpc.screens->get<LoadAProgramScreen>("load-a-program")->loadReplaceSound;
-            auto bus = mpc.getSequencer()->getActiveTrack()->getBus();
-            auto activePgm = bus == 0 ? 0 : mpc.getDrum(bus)->getProgram();
-            ProgramLoader::loadProgram(mpc, f, loadReplaceSound ? activePgm : -1);
+    new std::thread([this, f, p]() {
+        std::function<tl::expected<bool, mpc_io_error_msg>()> readFunc = [this, f, p]{
+            ProgramLoader::loadProgram(mpc, f, p);
             return true;
         };
 

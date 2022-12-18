@@ -23,17 +23,12 @@ SoundLoader::SoundLoader(mpc::Mpc& mpcToUse, bool replaceToUse)
 {
 }
 
-void SoundLoader::setPartOfProgram(bool b)
-{
-    partOfProgram = b;
-}
-
 void SoundLoader::setPreview(bool b)
 {
     preview = b;
 }
 
-void SoundLoader::loadSound(std::shared_ptr<MpcFile> f, SoundLoaderResult& r, std::shared_ptr<Sound> sound, bool shouldBeConverted)
+void SoundLoader::loadSound(std::shared_ptr<MpcFile> f, SoundLoaderResult& r, std::shared_ptr<Sound> sound, const bool shouldBeConverted)
 {
     std::string soundFileName = f->getName();
     std::string extension = f->getExtension();
@@ -112,31 +107,22 @@ void SoundLoader::loadSound(std::shared_ptr<MpcFile> f, SoundLoaderResult& r, st
     
     if (preview)
     {
-        r.existingIndex = existingSoundIndex;
         return;
     }
     
-    if (existingSoundIndex == -1)
-    {
-        if (partOfProgram)
-            r.existingIndex = sampler->getSoundCount() - 1;
-    }
-    else
+    if (existingSoundIndex != -1)
     {
         if (replace)
         {
-            sampler->deleteSound(existingSoundIndex);
-            soundOrError.map([existingSoundIndex](std::shared_ptr<Sound> s) { s->setMemoryIndex(existingSoundIndex); });
-            sampler->sort();
+            auto existingSound = sampler->getSound(existingSoundIndex);
+
+            soundOrError.map([existingSoundIndex, sampler, sound](std::shared_ptr<Sound> s) {
+                sampler->replaceSound(existingSoundIndex, s);
+            });
         }
         else
         {
-            sampler->deleteSound(sound);
-        }
-        
-        if (partOfProgram)
-        {
-            r.existingIndex = existingSoundIndex;
+            sampler->deleteSoundWithoutRepairingPrograms(sound);
         }
     }
 }
@@ -144,7 +130,7 @@ void SoundLoader::loadSound(std::shared_ptr<MpcFile> f, SoundLoaderResult& r, st
 sound_or_error SoundLoader::onReadWavSuccess(std::shared_ptr<mpc::file::wav::WavFile> &wavFile,
                                              std::string newSoundName,
                                              std::shared_ptr<mpc::sampler::Sound> sound,
-                                             bool shouldBeConverted)
+                                             const bool shouldBeConverted)
 {
     if (wavFile->getValidBits() != 16 && !shouldBeConverted) {
         wavFile->close();

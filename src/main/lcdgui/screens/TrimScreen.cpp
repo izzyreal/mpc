@@ -74,7 +74,7 @@ void TrimScreen::function(int f)
 	{
 	case 0:
 	{
-		sampler->sort();
+        sampler->switchToNextSoundSortType();
 		openScreen("popup");
 		auto popupScreen = mpc.screens->get<PopupScreen>("popup");
 		popupScreen->setText("Sorting by " + sampler->getSoundSortingTypeName());

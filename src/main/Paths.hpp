@@ -6,12 +6,12 @@ namespace mpc {
 class Paths
 {
 private:
+//    static std::string override
     static std::string sep();
 
 public:
     static std::string appConfigHome();
     static std::string appDocumentsPath();
-    static std::string appConfigPath();
 
     static std::string storesPath();
     static std::string defaultLocalVolumePath();

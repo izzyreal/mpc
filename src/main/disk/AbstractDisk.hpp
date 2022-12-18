@@ -83,6 +83,8 @@ namespace mpc::disk {
         virtual Volume& getVolume() = 0;
         virtual void initRoot() = 0;
 
+        void readPgm2(std::shared_ptr<MpcFile>, std::shared_ptr<mpc::sampler::Program>);
+
     private:
         std::unique_ptr<SoundSaver> soundSaver;
         std::unique_ptr<AllLoader> allLoader;
@@ -102,7 +104,7 @@ namespace mpc::disk {
         readWav2(std::shared_ptr<MpcFile>, std::function<sound_or_error(std::shared_ptr<mpc::file::wav::WavFile>)> onSuccess);
         sound_or_error readSnd2(std::shared_ptr<MpcFile>, std::function<sound_or_error(std::shared_ptr<mpc::file::sndreader::SndReader>)>);
         sequence_or_error readMid2(std::shared_ptr<MpcFile>);
-        void readPgm2(std::shared_ptr<MpcFile>);
+
         void readAps2(std::shared_ptr<MpcFile>, std::function<void()> on_success);
         void readAll2(std::shared_ptr<MpcFile>, std::function<void()> onSuccess);
         sequences_or_error readSequencesFromAll2(std::shared_ptr<MpcFile>);

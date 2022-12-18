@@ -6,8 +6,8 @@
 #include "mpc_types.hpp"
 
 namespace mpc::sampler {
-	class Sampler;
-	class Program;
+    class Sampler;
+    class Program;
 }
 
 namespace mpc::file::pgmreader {
@@ -15,31 +15,21 @@ namespace mpc::file::pgmreader {
 }
 
 namespace mpc::disk {
-	class MpcFile;
+    class MpcFile;
 }
 
 namespace mpc::disk {
-	class PgmFileToProgramConverter
-	{
+    class PgmFileToProgramConverter
+    {
+    public:
+        static program_or_error loadFromFileAndConvert(
+                std::shared_ptr<MpcFile>,
+                std::shared_ptr<mpc::sampler::Program>,
+                std::vector<std::string>& soundNames);
 
-	private:
-		std::shared_ptr<mpc::sampler::Program> program;
-		std::vector<std::string> soundNames;
-
+    private:
         static void setSlider(mpc::file::pgmreader::ProgramFileReader&, std::shared_ptr<mpc::sampler::Program>);
         static void setNoteParameters(mpc::file::pgmreader::ProgramFileReader&, std::shared_ptr<mpc::sampler::Program>);
         static void setMixer(mpc::file::pgmreader::ProgramFileReader&, std::shared_ptr<mpc::sampler::Program>);
-
-    public:
-		std::weak_ptr<mpc::sampler::Program> get();
-		std::vector<std::string> getSoundNames();
-
-        static program_or_error loadFromFileAndConvert(
-                std::shared_ptr<MpcFile>,
-                std::shared_ptr<mpc::sampler::Sampler>,
-                const int replaceIndex,
-                std::vector<std::string>& soundNames);
-
-		PgmFileToProgramConverter(std::weak_ptr<MpcFile>, std::weak_ptr<mpc::sampler::Sampler> sampler, const int replaceIndex);
-	};
+    };
 }

@@ -41,8 +41,8 @@ void DeleteProgramScreen::function(int i)
         }
         else
         {
-			const bool initPgms = true;
-			sampler->deleteAllPrograms(initPgms);
+			sampler->deleteAllPrograms();
+            sampler->createNewProgramAddFirstAvailableSlot().lock()->setName("NewPgm-A");
 		}
         
         openScreen("program");

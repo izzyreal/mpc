@@ -9,9 +9,9 @@ TEST_CASE("Delete program", "[program]")
     mpc::Mpc mpc;
     mpc.init(1, 5);
     auto sampler = mpc.getSampler();
-    sampler->addProgram();
-    sampler->addProgram();
-    sampler->addProgram();
+    sampler->createNewProgramAddFirstAvailableSlot();
+    sampler->createNewProgramAddFirstAvailableSlot();
+    sampler->createNewProgramAddFirstAvailableSlot();
     mpc.getDrum(0)->setProgram(0);
     mpc.getDrum(1)->setProgram(1);
     mpc.getDrum(2)->setProgram(2);

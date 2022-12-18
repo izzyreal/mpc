@@ -79,7 +79,7 @@ void LoopScreen::function(int f)
 		break;
 	case 1:
 	{
-		sampler->sort();
+        sampler->switchToNextSoundSortType();
 		openScreen("popup");
 		auto popupScreen = mpc.screens->get<PopupScreen>("popup");
 		popupScreen->setText("Sorting by " + sampler->getSoundSortingTypeName());

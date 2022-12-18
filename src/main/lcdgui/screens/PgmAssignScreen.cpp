@@ -156,7 +156,40 @@ void PgmAssignScreen::turnWheel(int i)
     }
 	else if (param == "snd")
     {
-        lastNoteParameters->setSoundIndex(sampler->getNextSoundIndex(lastNoteParameters->getSoundIndex(), i > 0));
+        auto currentSound = sampler->getSound(lastNoteParameters->getSoundIndex());
+        auto sortedSounds = sampler->getSortedSounds();
+
+        size_t indexInSortedSounds = -1;
+
+        for (size_t idx = 0; idx < sortedSounds.size(); idx++)
+        {
+            if (sortedSounds[idx].first == currentSound)
+            {
+                indexInSortedSounds = idx;
+                break;
+            }
+        }
+
+        auto nextSortedIndex = indexInSortedSounds;
+
+        if (i < 0)
+        {
+            if (--nextSortedIndex < 0)
+            {
+                nextSortedIndex = 0;
+            }
+        }
+        else
+        {
+            if (++nextSortedIndex >= sortedSounds.size())
+            {
+                nextSortedIndex = sortedSounds.size() - 1;
+            }
+        }
+
+        auto nextMemoryIndex = sortedSounds[nextSortedIndex].second;
+
+        lastNoteParameters->setSoundIndex(nextMemoryIndex);
 		displaySoundName();
     }
 	else if (param == "mode")
@@ -209,10 +242,11 @@ void PgmAssignScreen::openWindow()
 	}
 	else if (param == "snd")
 	{
-		auto sn = sampler->getLastNp(program.get())->getSoundIndex();
-		if (sn != -1)
+		auto soundIndex = sampler->getLastNp(program.get())->getSoundIndex();
+
+		if (soundIndex != -1)
 		{
-			sampler->setSoundIndex(sn);
+            sampler->setSoundIndex(soundIndex);
 			sampler->setPreviousScreenName("program-assign");
 			openScreen("sound");
 		}

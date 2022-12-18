@@ -50,7 +50,7 @@ void CopySoundScreen::turnWheel(int i)
 	
 	if (param == "snd")
 	{
-		sampler->setSoundIndex(sampler->getNextSoundIndex(sampler->getSoundIndex(), i > 0));
+		sampler->nudgeSoundIndex(i > 0);
 		auto newSampleName = sampler->getSoundName(sampler->getSoundIndex());
 		newSampleName = sampler->addOrIncreaseNumber(newSampleName);
 		setNewName(newSampleName);

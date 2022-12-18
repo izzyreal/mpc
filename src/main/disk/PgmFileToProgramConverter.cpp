@@ -23,11 +23,6 @@ using namespace mpc::disk;
 using namespace mpc::sampler;
 using namespace mpc::file::pgmreader;
 
-PgmFileToProgramConverter::PgmFileToProgramConverter(std::weak_ptr<MpcFile> _file, std::weak_ptr<Sampler> sampler, const int replaceIndex)
-{
-    program = loadFromFileAndConvert(_file.lock(), sampler.lock(), replaceIndex, soundNames).value_or(nullptr);
-}
-
 void PgmFileToProgramConverter::setSlider(ProgramFileReader& reader, std::shared_ptr<Program> program)
 {
     auto slider = reader.getSlider();
@@ -45,7 +40,9 @@ void PgmFileToProgramConverter::setSlider(ProgramFileReader& reader, std::shared
     pgmSlider->setTuneLowRange(slider->getTuneLow());
 }
 
-void PgmFileToProgramConverter::setNoteParameters(ProgramFileReader& reader, std::shared_ptr<Program> program)
+void PgmFileToProgramConverter::setNoteParameters(
+        ProgramFileReader& reader,
+        std::shared_ptr<Program> program)
 {
 	auto pgmNoteParameters = reader.getAllNoteParameters();
 	auto pgmPads = reader.getPads();
@@ -105,20 +102,9 @@ void PgmFileToProgramConverter::setMixer(ProgramFileReader& reader, std::shared_
 	}
 }
 
-std::weak_ptr<Program> PgmFileToProgramConverter::get()
-{
-	return program;
-}
-
-std::vector<std::string> PgmFileToProgramConverter::getSoundNames()
-{
-   return soundNames;
-}
-
 program_or_error PgmFileToProgramConverter::loadFromFileAndConvert(
         std::shared_ptr<MpcFile> f,
-        std::shared_ptr<mpc::sampler::Sampler> sampler,
-        const int replaceIndex,
+        std::shared_ptr<mpc::sampler::Program> program,
         std::vector<std::string> &soundNames)
 {
     if (!f->exists())
@@ -133,17 +119,6 @@ program_or_error PgmFileToProgramConverter::loadFromFileAndConvert(
         throw std::invalid_argument("PGM first 2 bytes are incorrect");
     }
 
-    std::shared_ptr<Program> program;
-
-    if (replaceIndex == -1)
-    {
-        program = sampler->addProgram().lock();
-    }
-    else
-    {
-        program = sampler->getProgram(replaceIndex);
-    }
-
     auto pgmSoundNames = reader.getSampleNames();
 
     for (int i = 0; i < reader.getHeader()->getNumberOfSamples(); i++)
@@ -151,8 +126,7 @@ program_or_error PgmFileToProgramConverter::loadFromFileAndConvert(
         soundNames.push_back(pgmSoundNames->getSampleName(i));
     }
 
-    auto const programName = reader.getProgramName();
-    program->setName(programName->getProgramNameASCII());
+    program->setName(f->getNameWithoutExtension());
     setNoteParameters(reader, program);
     setMixer(reader, program);
     setSlider(reader, program);

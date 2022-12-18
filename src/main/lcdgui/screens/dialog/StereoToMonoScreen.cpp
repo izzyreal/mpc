@@ -36,7 +36,7 @@ void StereoToMonoScreen::turnWheel(int i)
 
 	if (param == "stereosource")
 	{
-		sampler->setSoundIndex(sampler->getNextSoundIndex(sampler->getSoundIndex(), i > 0));
+		sampler->nudgeSoundIndex(i > 0);
 		displayStereoSource();
 	}
 	else if (param == "newlname" || param == "newrname")
