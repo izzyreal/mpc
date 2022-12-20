@@ -108,7 +108,9 @@ void Sampler::nudgeSoundIndex(bool up)
 void Sampler::setSoundIndex(int i)
 {
 	if (i < 0 || i >= sounds.size())
-		return;
+    {
+        return;
+    }
 
 	soundIndex = i;
 

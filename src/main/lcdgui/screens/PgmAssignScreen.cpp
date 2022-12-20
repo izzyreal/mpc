@@ -18,7 +18,15 @@ PgmAssignScreen::PgmAssignScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void PgmAssignScreen::open()
 {
-	findField("pad-assign")->setAlignment(Alignment::Centered);
+    auto lastNoteParameters = sampler->getLastNp(program.get());
+    auto soundIndex = lastNoteParameters->getSoundIndex();
+
+    if (soundIndex != -1)
+    {
+        sampler->setSoundIndex(soundIndex);
+    }
+
+    findField("pad-assign")->setAlignment(Alignment::Centered);
 	findField("pad-assign")->setLocation(194, 11);
 
 	mpc.addObserver(this);
@@ -204,6 +212,8 @@ void PgmAssignScreen::turnWheel(int i)
         auto nextMemoryIndex = sortedSounds[nextSortedIndex].second;
 
         lastNoteParameters->setSoundIndex(nextMemoryIndex);
+
+        sampler->setSoundIndex(nextMemoryIndex);
 
 		displaySoundName();
     }
