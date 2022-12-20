@@ -84,20 +84,15 @@ void LoadASoundScreen::function(int i)
 		controls->setF3Pressed(true);
 		auto s = sampler->getPreviewSound();
 		auto start = s->getStart();
-		auto end = s->getSampleData()->size();
+		auto end = s->getLastFrameIndex();
 		auto loopTo = -1;
-		auto overlapMode = 1;
 
 		if (s->isLoopEnabled())
 		{
 			loopTo = s->getLoopTo();
-			overlapMode = 2;
 		}
-		
-		if (!s->isMono())
-			end *= 0.5;
 
-        sampler->playPreviewSample(start, end, loopTo, overlapMode);
+        sampler->playPreviewSample(start, end, loopTo);
 		break;
 	}
 	case 3:

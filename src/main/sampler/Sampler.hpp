@@ -51,7 +51,7 @@ public:
     void finishBasicVoice();
     void init();
     void playMetronome(mpc::sequencer::NoteEvent* event, int framePos);
-    void playPreviewSample(int start, int end, int loopTo, int overlapMode);
+    void playPreviewSample(int start, int end, int loopTo);
     int getProgramCount();
 
     /**

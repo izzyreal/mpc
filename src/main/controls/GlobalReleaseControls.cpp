@@ -52,18 +52,10 @@ void GlobalReleaseControls::function(int i)
 		break;
 	case 2:
 		controls->setF3Pressed(false);
-
-		if (currentScreenName == "load-a-sound")
-			sampler->finishBasicVoice();
-
 		break;
 	case 3:
 		controls->setF4Pressed(false);
-
-		if (currentScreenName == "keep-or-retry")
-			sampler->finishBasicVoice();
-
-		break;
+        break;
 	case 4:
 		controls->setF5Pressed(false);
 

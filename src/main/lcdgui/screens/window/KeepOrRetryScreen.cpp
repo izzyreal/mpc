@@ -47,7 +47,7 @@ void KeepOrRetryScreen::function(int i)
             {
                 return;
             }
-            sampler->playPreviewSample(0, sampler->getPreviewSound()->getLastFrameIndex(), 0, 2);
+            sampler->playPreviewSample(0, sampler->getPreviewSound()->getLastFrameIndex(), 0);
             break;
         case 4:
             auto index = sampler->getSoundCount() - 1;

@@ -245,7 +245,7 @@ void Sampler::playMetronome(mpc::sequencer::NoteEvent* event, int framePos)
 	mpc.getBasicPlayer()->mpcNoteOn(soundNumber, velocity, framePos);
 }
 
-void Sampler::playPreviewSample(int start, int end, int loopTo, int overlapMode)
+void Sampler::playPreviewSample(int start, int end, int loopTo)
 {
 	if (sounds.empty())
 	{
