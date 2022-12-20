@@ -156,10 +156,24 @@ void PgmAssignScreen::turnWheel(int i)
     }
 	else if (param == "snd")
     {
-        auto currentSound = sampler->getSound(lastNoteParameters->getSoundIndex());
+        auto currentSoundIndex = lastNoteParameters->getSoundIndex();
+
+        if (currentSoundIndex == -1 && (i < 0 || sampler->getSoundCount() == 0))
+        {
+            return;
+        }
+
+        if (currentSoundIndex == 0 && i < 0)
+        {
+            lastNoteParameters->setSoundIndex(-1);
+            displaySoundName();
+            return;
+        }
+
+        auto currentSound = sampler->getSound(currentSoundIndex);
         auto sortedSounds = sampler->getSortedSounds();
 
-        size_t indexInSortedSounds = -1;
+        int indexInSortedSounds = -1;
 
         for (size_t idx = 0; idx < sortedSounds.size(); idx++)
         {
@@ -190,6 +204,7 @@ void PgmAssignScreen::turnWheel(int i)
         auto nextMemoryIndex = sortedSounds[nextSortedIndex].second;
 
         lastNoteParameters->setSoundIndex(nextMemoryIndex);
+
 		displaySoundName();
     }
 	else if (param == "mode")
