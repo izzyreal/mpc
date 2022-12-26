@@ -1,6 +1,7 @@
 #include "VmpcKnownControllerDetectedScreen.hpp"
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
-#include "lcdgui/screens/window/VmpcMidiPresetsScreen.hpp"
+
+#include "nvram/MidiControlPersistence.hpp"
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
@@ -21,12 +22,11 @@ VmpcKnownControllerDetectedScreen::VmpcKnownControllerDetectedScreen(mpc::Mpc &m
 void VmpcKnownControllerDetectedScreen::function(int i)
 {
     auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
-    auto vmpcMidiPresetsScreen = mpc.screens->get<VmpcMidiPresetsScreen>("vmpc-midi-presets");
-    auto& presets = vmpcMidiPresetsScreen->presets;
+    auto& presets = nvram::MidiControlPersistence::presets;
     auto preset = std::find_if(
             presets.begin(),
             presets.end(),
-            [this](const VmpcMidiPresetsScreen::Preset& p){ return controllerName.find(p.name) != std::string::npos; });
+            [this](const nvram::MidiControlPreset& p){ return controllerName.find(p.name) != std::string::npos; });
 
     switch (i) {
         case 1:
@@ -40,14 +40,18 @@ void VmpcKnownControllerDetectedScreen::function(int i)
             break;
         case 3:
             // NEVER
-            if (preset != presets.end()) (*preset).autoLoadMode = 0;
+            if (preset != presets.end()) (*preset).autoloadMode = nvram::MidiControlPreset::AutoLoadMode::NO;
             openScreen(ls->getPreviousScreenName());
             break;
         case 4:
             // ALWAYS
             if (preset != presets.end())
             {
-                (*preset).autoLoadMode = 2;
+                if ((*preset).autoloadMode != nvram::MidiControlPreset::AutoLoadMode::YES)
+                {
+                    (*preset).autoloadMode = nvram::MidiControlPreset::AutoLoadMode::YES;
+                    nvram::MidiControlPersistence::savePresetToFile(*preset);
+                }
             }
             vmpcMidiScreen->shouldSwitch.store(true);
             openScreen(ls->getPreviousScreenName());
@@ -64,18 +68,16 @@ void VmpcKnownControllerDetectedScreen::displayMessage()
 
 void VmpcKnownControllerDetectedScreen::open()
 {
-    auto vmpcMidiPresetsScreen = mpc.screens->get<VmpcMidiPresetsScreen>("vmpc-midi-presets");
-
-    for (auto& p : vmpcMidiPresetsScreen->presets)
+    for (auto& p : nvram::MidiControlPersistence::presets)
     {
         if (controllerName.find(p.name) != std::string::npos)
         {
-            if (p.autoLoadMode == VmpcMidiPresetsScreen::AutoLoadMode::NO)
+            if (p.autoloadMode == nvram::MidiControlPreset::AutoLoadMode::NO)
             {
                 openScreen(ls->getPreviousScreenName());
                 return;
             }
-            else if (p.autoLoadMode == VmpcMidiPresetsScreen::AutoLoadMode::YES)
+            else if (p.autoloadMode == nvram::MidiControlPreset::AutoLoadMode::YES)
             {
                 auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
                 vmpcMidiScreen->shouldSwitch.store(true);

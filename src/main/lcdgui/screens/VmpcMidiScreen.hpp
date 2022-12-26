@@ -1,10 +1,10 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
+#include "nvram/MidiControlPersistence.hpp"
 
 #include <string>
 #include <atomic>
 
-namespace mpc::nvram { class MidiControlPersistence; }
 namespace mpc::audiomidi { class VmpcMidiControlMode; class MidiDeviceDetector; class AudioMidiServices; }
 namespace mpc::lcdgui::screens::window { class VmpcKnownControllerDetectedScreen; }
 
@@ -14,24 +14,6 @@ namespace mpc::lcdgui::screens {
             : public mpc::lcdgui::ScreenComponent
     {
     public:
-        struct Command {
-            bool isNote = false;
-            int channelIndex = -2;
-            int value = -2;
-            bool isEmpty() {
-                return !isNote && channelIndex == -2 && value == -2;
-            }
-            void reset() {
-                isNote = false; channelIndex = -2; value = -2;
-            }
-            Command() {}
-            Command(bool newIsNote, int newChannelIndex, int newValue) : isNote(newIsNote), channelIndex(newChannelIndex), value(newValue) {}
-            Command(const Command& c) : isNote(c.isNote), channelIndex(c.channelIndex), value(c.value) {}
-            bool equals(const Command& other) {
-                return isNote == other.isNote && channelIndex == other.channelIndex && value == other.value;
-            }
-        };
-
         VmpcMidiScreen(mpc::Mpc&, int layerIndex);
 
         void open() override;
@@ -46,22 +28,23 @@ namespace mpc::lcdgui::screens {
 
         bool isLearning();
         void setLearnCandidate(const bool isNote, const char channelIndex, const char value);
-        void setLabelCommand(std::string& label, Command& c);
+        void updateOrAddActivePresetCommand(mpc::nvram::MidiControlCommand& c);
+        mpc::nvram::MidiControlPreset& getActivePreset();
 
     private:
         int row = 0;
         int rowOffset = 0;
         int column = 0;
-        Command learnCandidate;
+        mpc::nvram::MidiControlCommand learnCandidate;
 
         bool learning = false;
         bool hasMappingChanged();
 
-        std::vector<std::pair<std::string, Command>> uneditedLabelCommands;
-        std::vector<std::pair<std::string, Command>> labelCommands;
+        mpc::nvram::MidiControlPreset activePreset;
+        mpc::nvram::MidiControlPreset uneditedActivePresetCopy;
 
         std::atomic_bool shouldSwitch = ATOMIC_VAR_INIT(false);
-        std::vector<std::pair<std::string, Command>> realtimeSwitchCommands;
+        mpc::nvram::MidiControlPreset switchToPreset;
 
         void setLearning(bool b);
         void acceptLearnCandidate();

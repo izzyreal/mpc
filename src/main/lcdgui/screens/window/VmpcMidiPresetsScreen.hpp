@@ -1,5 +1,6 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
+#include "nvram/MidiControlPersistence.hpp"
 
 #include <vector>
 #include <string>
@@ -14,11 +15,6 @@ class VmpcMidiPresetsScreen
 {
     
 public:
-    enum AutoLoadMode { NO, ASK, YES };
-    struct Preset {
-        std::string name;
-        unsigned char autoLoadMode = AutoLoadMode::ASK;
-    };
     VmpcMidiPresetsScreen(mpc::Mpc& mpc, const int layerIndex);
 
     void open() override;
@@ -29,6 +25,8 @@ public:
     void left() override;
     void right() override;
 
+    int getActivePresetIndex();
+
 private:
     std::function<void(std::string&)> saveMappingAndShowPopup;
     int row = 0;
@@ -36,12 +34,9 @@ private:
     unsigned char column = 0;
     std::string activePresetName = "New preset";
 
-    void initPresets();
-
     void displayUpAndDown();
     void displayRows();
 
-    std::vector<Preset> presets;
     std::vector<std::string> autoLoadModeNames{"NO", "ASK", "YES"};
 
     friend class mpc::lcdgui::screens::window::VmpcKnownControllerDetectedScreen;

@@ -157,7 +157,14 @@ void FileExistsScreen::function(int i)
 		}
         else if (previousScreen == "vmpc-midi-presets")
         {
-            MidiControlPersistence::saveMappingToFile(mpc, nameScreen->getName());
+            auto& presets = MidiControlPersistence::presets;
+            auto presetIndex = mpc.screens->get<VmpcMidiPresetsScreen>("vmpc-midi-presets")->getActivePresetIndex();
+
+            const auto autoloadMode = (presetIndex >= 0 && presetIndex < presets.size()) ?
+                    presets[presetIndex].autoloadMode : MidiControlPreset::AutoLoadMode::ASK;
+
+            MidiControlPersistence::saveCurrentMappingToFile(mpc, nameScreen->getNameWithoutSpaces(), autoloadMode);
+
             openScreen("vmpc-midi-presets");
         }
 		break;

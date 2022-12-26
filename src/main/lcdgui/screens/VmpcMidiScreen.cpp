@@ -2,8 +2,6 @@
 
 #include <Mpc.hpp>
 
-#include "nvram/MidiControlPersistence.hpp"
-
 #include <hardware/Hardware.hpp>
 #include <hardware/HwPad.hpp>
 
@@ -44,7 +42,7 @@ void VmpcMidiScreen::turnWheel(int i)
 {
     init();
 
-    Command& cmd = labelCommands[row + rowOffset].second;
+    nvram::MidiControlCommand& cmd = activePreset.rows[row + rowOffset];
 
     if (column == 0)
     {
@@ -52,14 +50,14 @@ void VmpcMidiScreen::turnWheel(int i)
     }
     else if (column == 1)
     {
-        cmd.channelIndex += i;
-        if (cmd.channelIndex < -1)
+        cmd.channel += i;
+        if (cmd.channel < -1)
         {
-            cmd.channelIndex = -1;
+            cmd.channel = -1;
         }
-        else if (cmd.channelIndex > 15)
+        else if (cmd.channel > 15)
         {
-            cmd.channelIndex = 15;
+            cmd.channel = 15;
         }
     }
     else if (column == 2)
@@ -81,13 +79,21 @@ void VmpcMidiScreen::turnWheel(int i)
 void VmpcMidiScreen::open()
 {
     auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>("vmpc-discard-mapping-changes");
-    screen->discardAndLeave = [this](){this->labelCommands = this->uneditedLabelCommands; this->uneditedLabelCommands.clear();};
-    screen->saveAndLeave = [this](){this->uneditedLabelCommands.clear();};
+
+    screen->discardAndLeave = [this](){
+        this->activePreset = this->uneditedActivePresetCopy;
+        this->uneditedActivePresetCopy = nvram::MidiControlPreset();
+    };
+
+    screen->saveAndLeave = [this](){
+        this->uneditedActivePresetCopy = nvram::MidiControlPreset();
+    };
+
     screen->stayScreen = "vmpc-midi";
 
     if (ls->getPreviousScreenName() != "vmpc-discard-mapping-changes")
     {
-        uneditedLabelCommands = labelCommands;
+        uneditedActivePresetCopy = activePreset;
     }
 
     findChild<Label>("up")->setText("\u00C7");
@@ -132,7 +138,7 @@ void VmpcMidiScreen::acceptLearnCandidate()
         return;
     }
 
-    labelCommands[row + rowOffset].second = learnCandidate;
+    activePreset.rows[row + rowOffset] = learnCandidate;
 }
 
 void VmpcMidiScreen::down()
@@ -145,7 +151,7 @@ void VmpcMidiScreen::down()
     
     if (row == 4)
     {
-        if (rowOffset + 5 >= labelCommands.size())
+        if (rowOffset + 5 >= activePreset.rows.size())
             return;
         
         rowOffset++;
@@ -181,19 +187,19 @@ void VmpcMidiScreen::setLearning(bool b)
 
 bool VmpcMidiScreen::hasMappingChanged()
 {
-    if (labelCommands.size() != uneditedLabelCommands.size())
+    if (activePreset.rows.size() != uneditedActivePresetCopy.rows.size())
     {
         return true;
     }
 
-    for (int i = 0; i < labelCommands.size(); i++)
+    for (int i = 0; i < activePreset.rows.size(); i++)
     {
-        if (labelCommands[i].first != uneditedLabelCommands[i].first ||
-            !labelCommands[i].second.equals(uneditedLabelCommands[i].second))
+        if (!activePreset.rows[i].equals(uneditedActivePresetCopy.rows[i]))
         {
             return true;
         }
     }
+
     return false;
 }
 
@@ -274,7 +280,6 @@ void VmpcMidiScreen::function(int i)
             {
                 mpc::nvram::MidiControlPersistence::saveCurrentState(mpc);
                 popupScreen->setText("MIDI mapping saved");
-                uneditedLabelCommands = labelCommands;
             }
             else
             {
@@ -301,24 +306,24 @@ void VmpcMidiScreen::mainScreen()
 
 void VmpcMidiScreen::setLearnCandidate(const bool isNote, const char channelIndex, const char value)
 {
-    learnCandidate = {isNote, channelIndex, value};
+    learnCandidate.isNote = isNote;
+    learnCandidate.channel = channelIndex;
+    learnCandidate.value = value;
     updateRows();
 }
 
-void VmpcMidiScreen::setLabelCommand(std::string& label, Command& c)
+void VmpcMidiScreen::updateOrAddActivePresetCommand(nvram::MidiControlCommand &c)
 {
-    for (auto& labelCommand : labelCommands)
+    for (auto& labelCommand : activePreset.rows)
     {
-        auto label2 = labelCommand.first;
-
-        if (label == label2)
+        if (c.label == labelCommand.label)
         {
-            labelCommand.second = c;
+            labelCommand = c;
             return;
         }
     }
 
-    labelCommands.emplace_back(label, c);
+    activePreset.rows.emplace_back(c);
 }
 
 bool VmpcMidiScreen::isLearning()
@@ -335,10 +340,12 @@ void VmpcMidiScreen::updateRows()
         
         int length = 15;
         
-        auto labelText = StrUtil::padRight(labelCommands[i + rowOffset].first, " ", length) + ":";
+        auto labelText = StrUtil::padRight(activePreset.rows[i + rowOffset].label, " ", length) + ":";
         
         typeLabel->setText(labelText);
-        Command& cmd = (learning && row == i && !learnCandidate.isEmpty()) ? learnCandidate : labelCommands[i + rowOffset].second;
+        nvram::MidiControlCommand& cmd =
+                (learning && row == i && !learnCandidate.isEmpty()) ?
+                learnCandidate : activePreset.rows[i + rowOffset];
 
         std::string type = cmd.isNote ? "Note" : "CC";
 
@@ -347,13 +354,13 @@ void VmpcMidiScreen::updateRows()
 
         auto channelField = findChild<Field>("channel" + std::to_string(i));
 
-        if (cmd.channelIndex == -1)
+        if (cmd.channel == -1)
         {
             channelField->setText("all");
         }
         else
         {
-            channelField->setText("ch " + std::to_string(cmd.channelIndex + 1));
+            channelField->setText("ch " + std::to_string(cmd.channel + 1));
         }
 
         channelField->setInverted(row == i && column == 1);
@@ -382,5 +389,10 @@ void VmpcMidiScreen::updateRows()
 void VmpcMidiScreen::displayUpAndDown()
 {
     findChild<Label>("up")->Hide(rowOffset == 0);
-    findChild<Label>("down")->Hide(rowOffset + 5 >= labelCommands.size());
+    findChild<Label>("down")->Hide(rowOffset + 5 >= activePreset.rows.size());
+}
+
+mpc::nvram::MidiControlPreset& VmpcMidiScreen::getActivePreset()
+{
+    return activePreset;
 }

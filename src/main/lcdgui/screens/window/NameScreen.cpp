@@ -120,7 +120,7 @@ void NameScreen::function(int i)
 	{
 		if (find(begin(saveScreens), end(saveScreens), parameterName) != end(saveScreens))
         {
-            name = originalName;
+            nameScreenName = originalName;
             openScreen(parameterName);
         }
 		else
@@ -186,25 +186,25 @@ void NameScreen::initEditColors()
 
 void NameScreen::setName(std::string newName)
 {
-    name = newName;
+    nameScreenName = newName;
 	nameLimit = 16;
 	originalName = newName;
 }
 
 void NameScreen::setNameLimit(int i)
 {
-	name = name.substr(0, i);
+	nameScreenName = nameScreenName.substr(0, i);
 	nameLimit = i;
 }
 
 void NameScreen::setName(std::string str, int i)
 {
-	name[i] = str[0];
+	nameScreenName[i] = str[0];
 }
 
 std::string NameScreen::getNameWithoutSpaces()
 {
-	auto s = name;
+	auto s = nameScreenName;
 
 	while (!s.empty() && isspace(s.back()))
 		s.pop_back();
@@ -215,12 +215,19 @@ std::string NameScreen::getNameWithoutSpaces()
     return s;
 }
 
+std::string NameScreen::getNameWithSpaces()
+{
+    return StrUtil::trim(nameScreenName);
+}
+
 void NameScreen::changeNameCharacter(int i, bool up)
 {
-    if (i >= name.length())
-        name = StrUtil::padRight(name, " ", i + 1);
+    if (i >= nameScreenName.length())
+    {
+        nameScreenName = StrUtil::padRight(nameScreenName, " ", i + 1);
+    }
         
-	char schar = name[i];
+	char schar = nameScreenName[i];
     std::string s{ schar };
 	auto stringCounter = 0;
 	
@@ -247,17 +254,19 @@ void NameScreen::changeNameCharacter(int i, bool up)
 		s = " ";
 	else
 		s = mpc::Mpc::akaiAscii[stringCounter + change];
-	
-	name = name.substr(0, i).append(s).append(name.substr(i + 1, name.length()));
+
+    nameScreenName = nameScreenName.substr(0, i).append(s).append(nameScreenName.substr(i + 1, nameScreenName.length()));
     displayName();
 }
 
 void NameScreen::displayName()
 {
 	if (nameLimit == 0)
-		return;
+    {
+        return;
+    }
 
-    auto paddedName = StrUtil::padRight(name, " ", nameLimit);
+    auto paddedName = StrUtil::padRight(nameScreenName, " ", nameLimit);
     
 	findField("0")->setText(paddedName.substr(0, 1));
 	findField("1")->setText(paddedName.substr(1, 1));
@@ -317,12 +326,12 @@ void NameScreen::typeCharacter(char c)
         {
             if (param == std::to_string(i))
             {
-                if (i >= name.length())
+                if (i >= nameScreenName.length())
                 {
-                    name = StrUtil::padRight(name, " ", i + 1);
+                    nameScreenName = StrUtil::padRight(nameScreenName, " ", i + 1);
                 }
 
-                name[i] = charWithCasing;
+                nameScreenName[i] = charWithCasing;
                 displayName();
                 drawUnderline();
                 if (i <= 14) right();
@@ -336,12 +345,12 @@ void NameScreen::typeCharacter(char c)
         {
             if (param == std::to_string(i))
             {
-                if (i >= name.length())
+                if (i >= nameScreenName.length())
                 {
-                    name = StrUtil::padRight(name, " ", i + 1);
+                    nameScreenName = StrUtil::padRight(nameScreenName, " ", i + 1);
                 }
 
-                name[i] = charWithCasing;
+                nameScreenName[i] = charWithCasing;
 
                 editing = true;
                 initEditColors();
@@ -362,12 +371,12 @@ void NameScreen::backSpace()
     {
         if (param == std::to_string(i))
         {
-            if (i >= name.length())
+            if (i >= nameScreenName.length())
             {
-                name = StrUtil::padRight(name, " ", i + 1);
+                nameScreenName = StrUtil::padRight(nameScreenName, " ", i + 1);
             }
 
-            name = name.substr(0, i - 1) + name.substr(i);
+            nameScreenName = nameScreenName.substr(0, i - 1) + nameScreenName.substr(i);
 
             if (!editing)
             {

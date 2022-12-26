@@ -76,6 +76,7 @@ private:
     void setNameLimit(int i);
     void setName(std::string str, int i);
     std::string getNameWithoutSpaces();
+    std::string getNameWithSpaces();
     void changeNameCharacter(int i, bool up);
     void setRenamerAndScreenToReturnTo(const std::function<void(std::string&)>&, const std::string&);
     
@@ -83,7 +84,7 @@ private:
     std::function<void()> actionWhenGoingToMainScreen = [](){};
     std::string screenToReturnTo = "";
     
-    std::string name = "";
+    std::string nameScreenName = "";
     bool editing = false;
     std::string parameterName = "";
     int nameLimit = 0;

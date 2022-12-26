@@ -41,19 +41,18 @@ void VmpcMidiControlMode::processMidiInputEvent(mpc::Mpc& mpc, ctoot::midi::core
     auto hardware = mpc.getHardware();
     auto dataWheel = hardware->getDataWheel();
 
-    for (auto& labelCommand : vmpcMidiScreen->labelCommands)
+    for (auto& labelCommand : vmpcMidiScreen->activePreset.rows)
     {
-        auto command = labelCommand.second;
-        auto channelIndex = command.channelIndex;
+        auto channelIndex = labelCommand.channel;
 
         if (channelIndex >= 0 && msg->getChannel() != channelIndex)
         {
             continue;
         }
 
-        auto label = labelCommand.first;
-        auto isNote = command.isNote;
-        auto commandValue = command.value;
+        auto label = labelCommand.label;
+        auto isNote = labelCommand.isNote;
+        auto commandValue = labelCommand.value;
 
         if (msg->getData1() != commandValue)
         {

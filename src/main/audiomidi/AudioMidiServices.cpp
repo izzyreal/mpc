@@ -153,13 +153,6 @@ void AudioMidiServices::start(const int inputCount, const int outputCount) {
 	offlineServer->start();
 }
 
-void AudioMidiServices::setPreviewClickVolume(int volume)
-{
-	auto sc = mixer->getMixerControls().lock()->getStripControls("65").lock();
-	auto mmc = std::dynamic_pointer_cast<MainMixControls>(sc->find("Main").lock());
-	std::dynamic_pointer_cast<ctoot::audio::fader::FaderControl>(mmc->find("Level").lock())->setValue(static_cast<float>(volume));
-}
-
 void AudioMidiServices::setMonitorLevel(int level)
 {
 	auto sc = mixer->getMixerControls().lock()->getStripControls("66").lock();
@@ -527,12 +520,14 @@ void AudioMidiServices::switchMidiControlMappingIfRequired()
 
     if (vmpcMidiScreen->shouldSwitch.load())
     {
-        for (auto& c : vmpcMidiScreen->realtimeSwitchCommands)
-        {
-            vmpcMidiScreen->setLabelCommand(c.first, c.second);
-        }
+        vmpcMidiScreen->activePreset = vmpcMidiScreen->switchToPreset;
 
         vmpcMidiScreen->shouldSwitch.store(false);
+
+        if (mpc.getLayeredScreen()->getCurrentScreenName() == "vmpc-midi")
+        {
+            mpc.getActiveControls()->open();
+        }
     }
 }
 

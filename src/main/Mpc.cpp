@@ -45,6 +45,8 @@ using namespace mpc::lcdgui;
 
 Mpc::Mpc()
 {
+    nvram::MidiControlPersistence::loadAllPresetsFromDiskIntoMemory();
+
     std::vector<std::string> requiredPaths {
         Paths::appDocumentsPath(),
         Paths::appConfigHome(),
