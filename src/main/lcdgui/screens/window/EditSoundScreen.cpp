@@ -320,16 +320,18 @@ void EditSoundScreen::right()
 
 void EditSoundScreen::openNameScreen()
 {
-    auto nameScreen = mpc.screens->get<NameScreen>("name");
-    auto editSoundScreen = this;
-    nameScreen->setName(newName);
+    const auto enterAction = [this](std::string& nameScreenName) {
+        if (mpc.getSampler()->isSoundNameOccupied(nameScreenName))
+        {
+            return;
+        }
 
-    auto renamer = [editSoundScreen](std::string& newName1) {
-        editSoundScreen->setNewName(newName1);
+        setNewName(nameScreenName);
+        openScreen(name);
     };
 
-    nameScreen->setRenamerAndScreenToReturnTo(renamer, "edit-sound");
-    
+    const auto nameScreen = mpc.screens->get<NameScreen>("name");
+    nameScreen->initialize(newName, 16, enterAction, name);
     openScreen("name");
 }
 

@@ -45,8 +45,6 @@ using namespace mpc::lcdgui;
 
 Mpc::Mpc()
 {
-    nvram::MidiControlPersistence::loadAllPresetsFromDiskIntoMemory();
-
     std::vector<std::string> requiredPaths {
         Paths::appDocumentsPath(),
         Paths::appConfigHome(),
@@ -112,7 +110,9 @@ void Mpc::init(const int inputCount, const int outputCount)
 {
 	diskController = std::make_unique<mpc::disk::DiskController>(*this);
 
-	sequencer = std::make_shared<mpc::sequencer::Sequencer>(*this);
+    nvram::MidiControlPersistence::loadAllPresetsFromDiskIntoMemory(*this);
+
+    sequencer = std::make_shared<mpc::sequencer::Sequencer>(*this);
 	MLOG("Sequencer created");
 
 	sampler = std::make_shared<mpc::sampler::Sampler>(*this);

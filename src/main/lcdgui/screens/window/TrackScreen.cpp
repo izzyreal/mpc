@@ -43,30 +43,34 @@ void TrackScreen::function(int i)
 void TrackScreen::turnWheel(int i)
 {
 	init();
-	auto nameScreen = mpc.screens->get<NameScreen>("name");
-    std::function<void(std::string&)> renamer;
+    std::function<void(std::string&)> enterAction;
+    std::string initialNameScreenName;
     
 	if (param.find("default") != std::string::npos)
 	{
-        nameScreen->setName(sequencer->getDefaultTrackName(sequencer->getActiveTrackIndex()));
+        initialNameScreenName = sequencer->getDefaultTrackName(sequencer->getActiveTrackIndex());
         
-        renamer = [&](std::string& newName) {
-            sequencer->setDefaultTrackName(newName, sequencer->getActiveTrackIndex());
+        enterAction = [this](std::string& nameScreenName) {
+            sequencer->setDefaultTrackName(nameScreenName, sequencer->getActiveTrackIndex());
+            openScreen("sequencer");
         };
 	}
 	else
 	{
-        const auto _track = track;
-		if (!_track->isUsed())
-			_track->setUsed(true);
+		if (!track->isUsed())
+        {
+            track->setUsed(true);
+        }
 
-		nameScreen->setName(_track->getName());
+		initialNameScreenName = track->getName();
         
-        renamer = [_track](std::string& newName) {
-            _track->setName(newName);
+        enterAction = [this](std::string& newName) {
+            track->setName(newName);
+            openScreen("sequencer");
         };
 	}
 
-    nameScreen->setRenamerAndScreenToReturnTo(renamer, "sequencer");
+    auto nameScreen = mpc.screens->get<NameScreen>("name");
+    nameScreen->initialize(initialNameScreenName, 16, enterAction, "sequencer");
     openScreen("name");
 }

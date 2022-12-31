@@ -112,7 +112,7 @@
  "labels" : [ "File:", "Save:", "Replace same sounds:" ],
  "x" : [ 54, 78, 54 ],
  "y" : [ 13, 27, 39 ],
- "tfsize" : [ 120, 72, 18 ],
+ "tfsize" : [ 96, 72, 18 ],
  "parameters" : [ "file", "save", "replace-same-sounds" ],
  "fblabels" : [ null, null, null, "CANCEL", "SAVE", null ],
  "fbtypes" : [ null, null, null, 0, 1, null ]
@@ -167,12 +167,12 @@
 "save-a-sequence":
 {
  "labels" : [ "Save as:", "File:" ],
- "x" : [ 41, 57 ],
+ "x" : [ 31, 57 ],
  "y" : [ 19, 37 ],
  "tfsize" : [ 96, 6 ],
  "parameters" : [ "saveas", "file" ],
  "infowidgets" : [ "file1" ],
- "infosize" : [ 114 ],
+ "infosize" : [ 90 ],
  "infox" : [ 93 ],
  "infoy" : [ 36 ],
  "fblabels" : [ null, null, null, "CANCEL", "SAVE", null ],

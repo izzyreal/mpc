@@ -94,16 +94,13 @@ void AutoChromaticAssignmentScreen::turnWheel(int i)
     }
     else if (param == "program-name")
     {
-        auto nameScreen = mpc.screens->get<NameScreen>("name");
-        auto autoChromaticAssignmentScreen = this;
-        
-        auto renamer = [autoChromaticAssignmentScreen](std::string& newName1) {
-            autoChromaticAssignmentScreen->newName = newName1;
+        const auto enterAction = [this](std::string& nameScreenName) {
+            newName = nameScreenName;
+            openScreen(name);
         };
-        
-        nameScreen->setName(newName);
-        nameScreen->setRenamerAndScreenToReturnTo(renamer, "auto-chromatic-assignment");
-        
+
+        const auto nameScreen = mpc.screens->get<NameScreen>("name");
+        nameScreen->initialize(newName, 16, enterAction, name);
         openScreen("name");
     }
     else if (param == "snd")

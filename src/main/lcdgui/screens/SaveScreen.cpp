@@ -11,8 +11,6 @@
 #include <disk/Volume.hpp>
 #include <nvram/VolumesPersistence.hpp>
 
-#include <Util.hpp>
-
 #include <file/FileUtil.hpp>
 
 using namespace mpc::lcdgui::screens;
@@ -28,6 +26,10 @@ SaveScreen::SaveScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void SaveScreen::open()
 {
+    mpc.getDisk()->initFiles();
+
+    programIndex = 0;
+
     if (ls->getPreviousScreenName() != "popup")
     {
         device = mpc.getDiskController()->getActiveDiskIndex();
@@ -46,9 +48,13 @@ void SaveScreen::open()
     init();
 
     if (param == "device")
-        ls->setFunctionKeysArrangement(device == mpc.getDiskController()->getActiveDiskIndex() ? 0 : 1);
+    {
+        findChild<FunctionKeys>("function-keys")->setActiveArrangement(device == mpc.getDiskController()->getActiveDiskIndex() ? 0 : 1);
+    }
     else
-        ls->setFunctionKeysArrangement(0);
+    {
+        findChild<FunctionKeys>("function-keys")->setActiveArrangement(0);
+    }
 }
 
 void SaveScreen::openWindow()
@@ -131,10 +137,6 @@ void SaveScreen::function(int i)
             }
         case 5:
         {
-            std::shared_ptr<mpc::sequencer::Sequence> seq;
-            
-            auto nameScreen = mpc.screens->get<NameScreen>("name");
-            
             switch (type)
             {
                 case 0:
@@ -143,26 +145,25 @@ void SaveScreen::function(int i)
                     break;
                 }
                 case 1:
-                    seq = sequencer->getActiveSequence();
-                    if (!seq->isUsed()) return;
+                    if (!sequencer->getActiveSequence()->isUsed())
+                    {
+                        return;
+                    }
                     
-                    nameScreen->setName(seq->getName());
                     openScreen("save-a-sequence");
                     break;
                 case 2:
-                    nameScreen->setName("ALL_PGMS");
                     openScreen("save-aps-file");
                     break;
                 case 3:
-                    nameScreen->setName(mpc::Util::getFileName(program->getName()));
                     openScreen("save-a-program");
                     break;
                 case 4:
                     if (sampler->getSoundCount() == 0)
+                    {
                         break;
-                    
-                    nameScreen->setName(sampler->getSoundName(sampler->getSoundIndex()));
-                    
+                    }
+
                     openScreen("save-a-sound");
                     break;
             }
@@ -226,8 +227,25 @@ void SaveScreen::turnWheel(int i)
                 break;
             case 3:
             {
-                auto nr = sequencer->getActiveSequence()->getTrack(sequencer->getActiveTrackIndex())->getBus();
-                sampler->setDrumBusProgramIndex(nr, sampler->getDrumBusProgramIndex(nr) + i);
+                unsigned char counter = 0;
+                for (int idx = programIndex;
+                     (i < 0) ? idx >= 0 : idx < 24;
+                     (i < 0) ? idx-- : idx++)
+                {
+                    if (sampler->getProgram(idx))
+                    {
+                        programIndex = idx;
+                    }
+                    else
+                    {
+                        continue;
+                    }
+
+                    if (++counter == abs(i) + 1)
+                    {
+                        break;
+                    }
+                }
                 break;
             }
             case 4:
@@ -269,7 +287,6 @@ void SaveScreen::displayType()
 
 void SaveScreen::displayFile()
 {
-    auto seq = sequencer->getActiveSequence();
     std::string fileName;
     
     switch (type)
@@ -283,7 +300,7 @@ void SaveScreen::displayFile()
         case 1:
         {
             auto num = StrUtil::padLeft(std::to_string(sequencer->getActiveSequenceIndex() + 1), "0", 2);
-            name = seq->getName();
+            name = sequencer->getActiveSequence()->getName();
             fileName = num + "-" + name;
             break;
         }
@@ -294,13 +311,14 @@ void SaveScreen::displayFile()
             break;
         }
         case 3:
-            fileName = program->getName();
+            fileName = sampler->getProgram(programIndex)->getName();
             break;
         case 4:
             fileName = std::string(sampler->getSoundCount() == 0 ? " (No sound)" : sampler->getSound()->getName());
             break;
         case 5:
             fileName = "MPC2KXL         .BIN";
+            break;
     }
     
     findField("file")->setText(fileName);
@@ -371,4 +389,9 @@ void SaveScreen::up()
     }
 
     ScreenComponent::up();
+}
+
+unsigned char SaveScreen::getProgramIndex()
+{
+    return programIndex;
 }

@@ -4,10 +4,12 @@
 #include "Mpc.hpp"
 #include "Paths.hpp"
 
-#include "nvram/MidiControlPersistence.hpp"
-#include "file/File.hpp"
+#include "disk/AbstractDisk.hpp"
+
 #include "lcdgui/screens/window/VmpcKnownControllerDetectedScreen.hpp"
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
+
+#include "file/File.hpp"
 
 #include <vector>
 
@@ -43,8 +45,7 @@ void MidiDeviceDetector::start(mpc::Mpc &mpc)
                     {
                         moduru::file::File f(Paths::midiControlPresetsPath() + "MPD218.vmp", {});
                         auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
-                        mpc::nvram::MidiControlPersistence::loadFileIntoPreset(
-                                f,
+                        mpc.getDisk()->readMidiControlPreset(f,
                                 vmpcMidiScreen->switchToPreset);
                         auto knownControllerDetectedScreen = mpc.screens->get<VmpcKnownControllerDetectedScreen>(
                                 "vmpc-known-controller-detected");

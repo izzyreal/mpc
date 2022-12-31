@@ -61,7 +61,7 @@ namespace mpc::lcdgui
 		std::string getFirstField();
 		std::map<std::string, std::vector<std::string>>& getTransferMap();
 
-	protected:		
+	protected:
 		virtual void init() {
 	
 			auto controls = mpc.getControls()->getControls();

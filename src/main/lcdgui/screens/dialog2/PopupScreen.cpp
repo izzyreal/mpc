@@ -3,8 +3,6 @@
 #include <lcdgui/Background.hpp>
 #include <lcdgui/Label.hpp>
 
-#include <cmath>
-
 using namespace mpc::lcdgui::screens::dialog2;
 
 PopupScreen::PopupScreen(mpc::Mpc& mpc)
@@ -33,7 +31,9 @@ void PopupScreen::setText(std::string text)
 void PopupScreen::returnToScreenAfterMilliSeconds(const std::string& screenName, const int delayInMs)
 {
 	if (returnToScreenThread.joinable())
-		returnToScreenThread.join();
+    {
+        returnToScreenThread.join();
+    }
 
 	auto screen = screenName;
 	auto layeredScreen = ls;

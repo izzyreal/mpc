@@ -1,9 +1,11 @@
 #pragma once
 #include <disk/SoundSaver.hpp>
 #include <disk/AllLoader.hpp>
+#include "nvram/MidiControlPersistence.hpp"
 
 #include <vector>
 #include <string>
+#include <thread>
 
 #include <mpc_types.hpp>
 
@@ -33,6 +35,7 @@ namespace mpc::disk {
     {
     protected:
         AbstractDisk(mpc::Mpc&);
+        ~AbstractDisk();
 
         mpc::Mpc& mpc;
         const std::vector<std::string> extensions{ "", "SND", "PGM", "APS", "MID", "ALL", "WAV", "SEQ", "SET" };
@@ -61,6 +64,9 @@ namespace mpc::disk {
         void writePgm(std::shared_ptr<mpc::sampler::Program>, const std::string& fileName);
         void writeAps(const std::string& fileName);
         void writeAll(const std::string& fileName);
+        void writeMidiControlPreset(std::shared_ptr<mpc::nvram::MidiControlPreset> preset);
+
+        void readMidiControlPreset(moduru::file::File&, std::shared_ptr<mpc::nvram::MidiControlPreset>);
 
         bool checkExists(std::string fileName);
         bool deleteRecursive(std::weak_ptr<MpcFile>);
@@ -86,6 +92,7 @@ namespace mpc::disk {
         void readPgm2(std::shared_ptr<MpcFile>, std::shared_ptr<mpc::sampler::Program>);
 
     private:
+        std::thread programSoundsSaveThread = std::thread([]{});
         std::unique_ptr<SoundSaver> soundSaver;
         std::unique_ptr<AllLoader> allLoader;
 

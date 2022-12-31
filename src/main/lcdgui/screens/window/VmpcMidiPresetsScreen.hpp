@@ -15,7 +15,7 @@ class VmpcMidiPresetsScreen
 {
     
 public:
-    VmpcMidiPresetsScreen(mpc::Mpc& mpc, const int layerIndex);
+    VmpcMidiPresetsScreen(mpc::Mpc& presetName, const int layerIndex);
 
     void open() override;
     void function(int i) override;
@@ -25,10 +25,8 @@ public:
     void left() override;
     void right() override;
 
-    int getActivePresetIndex();
-
 private:
-    std::function<void(std::string&)> saveMappingAndShowPopup;
+    std::function<void(std::string&)> checkFileExistsAndSavePresetAndShowPopup;
     int row = 0;
     int rowOffset = 0;
     unsigned char column = 0;

@@ -23,15 +23,13 @@ void CreateNewProgramScreen::turnWheel(int i)
     }
     else if (param == "new-name")
     {
-        auto nameScreen = mpc.screens->get<NameScreen>("name");
-        auto createNewProgramScreen = this;
-        nameScreen->setName(newName);
-
-        auto renamer = [createNewProgramScreen](std::string& newName1) {
-            createNewProgramScreen->newName = newName1;
+        const auto enterAction = [this](std::string& nameScreenName) {
+            newName = nameScreenName;
+            openScreen(name);
         };
 
-        nameScreen->setRenamerAndScreenToReturnTo(renamer, "create-new-program");
+        const auto nameScreen = mpc.screens->get<NameScreen>("name");
+        nameScreen->initialize(newName, 16, enterAction, name);
         openScreen("name");
     }
 }

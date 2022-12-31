@@ -1,11 +1,15 @@
 #include "SaveAProgramScreen.hpp"
 
 #include <lcdgui/screens/window/NameScreen.hpp>
+#include <lcdgui/screens/dialog/FileExistsScreen.hpp>
+#include "disk/MpcFile.hpp"
+#include "lcdgui/screens/SaveScreen.hpp"
 
 #include <Util.hpp>
 #include <disk/AbstractDisk.hpp>
 
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::lcdgui::screens::dialog;
 
 SaveAProgramScreen::SaveAProgramScreen(mpc::Mpc& mpc, const int layerIndex) 
 	: ScreenComponent(mpc, "save-a-program", layerIndex)
@@ -14,7 +18,14 @@ SaveAProgramScreen::SaveAProgramScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void SaveAProgramScreen::open()
 {
-	findField("replace-same-sounds")->setAlignment(Alignment::Centered);
+    if (ls->getPreviousScreenName() == "save")
+    {
+        auto nameScreen = mpc.screens->get<NameScreen>("name");
+        auto saveScreen = mpc.screens->get<SaveScreen>("save");
+        nameScreen->setName(sampler->getProgram(saveScreen->getProgramIndex())->getName());
+    }
+
+    findField("replace-same-sounds")->setAlignment(Alignment::Centered);
 	displayFile();
 	displaySave();
 	displayReplaceSameSounds();
@@ -24,11 +35,11 @@ void SaveAProgramScreen::turnWheel(int i)
 {
 	init();
 
-	if (param.compare("save") == 0)
+	if (param == "save")
 	{
 		setSave(save + i);
 	}
-	else if (param.compare("replace-same-sounds") == 0)
+	else if (param == "replace-same-sounds")
 	{
 		replaceSameSounds = i > 0;
 		displayReplaceSameSounds();
@@ -39,8 +50,6 @@ void SaveAProgramScreen::function(int i)
 {
 	init();
 
-	auto nameScreen = mpc.screens->get<NameScreen>("name");
-
 	switch (i)
 	{
 	case 3:
@@ -48,14 +57,33 @@ void SaveAProgramScreen::function(int i)
 		break;
 	case 4:
 	{
+        auto nameScreen = mpc.screens->get<NameScreen>("name");
 		auto fileName = mpc::Util::getFileName(nameScreen->getNameWithoutSpaces()) + ".PGM";
 		auto disk = mpc.getDisk();
 
 		if (disk->checkExists(fileName))
 		{
-			nameScreen->setName(program->getName());
-			openScreen("file-exists");
-			break;
+            auto replaceAction = [this, disk, fileName]{
+                auto success = disk->getFile(fileName)->del();
+
+                if (success)
+                {
+                    disk->flush();
+                    disk->initFiles();
+                    disk->writePgm(program, fileName);
+                }
+            };
+
+            const auto initializeNameScreen = [this]{
+                auto nameScreen = mpc.screens->get<NameScreen>("name");
+                auto enterAction = [this](std::string&){ openScreen(name); };
+                nameScreen->initialize(nameScreen->getNameWithoutSpaces(), 16, enterAction, "save");
+            };
+
+            auto fileExistsScreen = mpc.screens->get<FileExistsScreen>("file-exists");
+            fileExistsScreen->initialize(replaceAction, initializeNameScreen, "save");
+            openScreen("file-exists");
+            break;
 		}
 
 		disk->writePgm(program, fileName);

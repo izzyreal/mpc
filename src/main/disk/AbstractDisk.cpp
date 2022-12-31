@@ -2,6 +2,7 @@
 
 #include <Mpc.hpp>
 #include <Util.hpp>
+#include "Paths.hpp"
 
 #include <mpc/MpcSoundPlayerChannel.hpp>
 
@@ -30,9 +31,13 @@
 #include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
 #include <file/FileUtil.hpp>
+#include <file/File.hpp>
 #include <lang/StrUtil.hpp>
 
 using namespace mpc::disk;
+
+using namespace mpc::nvram;
+
 using namespace mpc::file;
 using namespace mpc::file::wav;
 using namespace mpc::file::sndwriter;
@@ -54,6 +59,16 @@ using namespace moduru::file;
 AbstractDisk::AbstractDisk(mpc::Mpc& _mpc)
         : mpc (_mpc)
 {
+}
+
+AbstractDisk::~AbstractDisk()
+{
+    while (!programSoundsSaveThread.joinable())
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    }
+
+    programSoundsSaveThread.join();
 }
 
 std::shared_ptr<MpcFile> AbstractDisk::getFile(int i)
@@ -170,6 +185,10 @@ void AbstractDisk::writeMid(std::shared_ptr<mpc::sequencer::Sequence> s, std::st
         writer.writeToOStream(f->getOutputStream());
         flush();
         initFiles();
+        auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+        popupScreen->setText("Saving " + fileName);
+        popupScreen->returnToScreenAfterMilliSeconds("save", 400);
+        mpc.getLayeredScreen()->openScreen("popup");
         return f;
     };
 
@@ -246,6 +265,10 @@ void AbstractDisk::writePgm(std::shared_ptr<Program> p, const std::string& fileN
         auto bytes = writer.get();
         f->setFileData(bytes);
 
+        auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+        popupScreen->setText("Saving " + fileName);
+        mpc.getLayeredScreen()->openScreen("popup");
+
         auto saveAProgramScreen = mpc.screens->get<SaveAProgramScreen>("save-a-program");
 
         if (saveAProgramScreen->save != 0)
@@ -254,16 +277,36 @@ void AbstractDisk::writePgm(std::shared_ptr<Program> p, const std::string& fileN
 
             for (auto& n : p->getNotesParameters())
             {
-                if (n->getSoundIndex() != -1)
-                    sounds.push_back(mpc.getSampler()->getSound(n->getSoundIndex()));
+                const auto soundIndex = n->getSoundIndex();
+
+                if (soundIndex != -1)
+                {
+                    sounds.push_back(mpc.getSampler()->getSound(soundIndex));
+                }
             }
 
-            auto isWav = saveAProgramScreen->save == 2;
-            soundSaver = std::make_unique<SoundSaver>(mpc, sounds, isWav);
+            if (!sounds.empty())
+            {
+                if (programSoundsSaveThread.joinable())
+                {
+                    programSoundsSaveThread.join();
+                }
+
+                auto isWav = saveAProgramScreen->save == 2;
+
+                programSoundsSaveThread = std::thread([this, isWav, sounds]{
+                    std::this_thread::sleep_for(std::chrono::milliseconds(700));
+                    soundSaver = std::make_unique<SoundSaver>(mpc, sounds, isWav);
+                });
+            }
+            else
+            {
+                popupScreen->returnToScreenAfterMilliSeconds("save", 700);
+            }
         }
         else
         {
-            mpc.getLayeredScreen()->openScreen("save");
+            popupScreen->returnToScreenAfterMilliSeconds("save", 700);
         }
 
         flush();
@@ -283,24 +326,31 @@ void AbstractDisk::writeAps(const std::string& fileName)
         auto bytes = apsParser.getBytes();
         f->setFileData(bytes);
 
+        auto popupScreen = mpc.screens->get<PopupScreen>("popup");
+        popupScreen->setText("Saving " + fileName);
+        mpc.getLayeredScreen()->openScreen("popup");
+
         auto saveAProgramScreen = mpc.screens->get<SaveAProgramScreen>("save-a-program");
 
-        if (saveAProgramScreen->save != 0)
+        if (saveAProgramScreen->save != 0 && mpc.getSampler()->getSoundCount() > 0)
         {
-            soundSaver = std::make_unique<SoundSaver>(mpc, mpc.getSampler()->getSounds(), saveAProgramScreen->save == 2);
+            if (programSoundsSaveThread.joinable())
+            {
+                programSoundsSaveThread.join();
+            }
+
+            programSoundsSaveThread = std::thread([this, saveAProgramScreen]{
+                std::this_thread::sleep_for(std::chrono::milliseconds(700));
+                soundSaver = std::make_unique<SoundSaver>(mpc, mpc.getSampler()->getSounds(), saveAProgramScreen->save == 2);
+            });
         }
         else
         {
-            mpc.getLayeredScreen()->openScreen("save");
+            popupScreen->returnToScreenAfterMilliSeconds("save", 700);
         }
 
         flush();
         initFiles();
-
-        auto popupScreen = mpc.screens->get<PopupScreen>("popup");
-        popupScreen->setText("Saving " + fileName);
-        popupScreen->returnToScreenAfterMilliSeconds("save", 400);
-        mpc.getLayeredScreen()->openScreen("popup");
 
         return f;
     };
@@ -328,6 +378,92 @@ void AbstractDisk::writeAll(const std::string& fileName)
     };
 
     performIoOrOpenErrorPopup(writeFunc);
+}
+
+void AbstractDisk::writeMidiControlPreset(std::shared_ptr<MidiControlPreset> preset)
+{
+    std::function<preset_or_error()> ioFunc = [preset] {
+        std::vector<char> data;
+
+        data.push_back(preset->autoloadMode);
+
+        for (int i = 0; i < preset->name.length(); i++)
+        {
+            data.push_back(preset->name[i]);
+        }
+
+        for (int i = preset->name.length(); i < 16; i++)
+        {
+            data.push_back(' ');
+        }
+
+        for (auto& c : preset->rows)
+        {
+            MidiControlCommand r { c.label, c.isNote, c.channel, c.value };
+
+            auto rowData = r.toBytes();
+
+            for (auto& b : rowData)
+                data.push_back(b);
+        }
+
+        File f(mpc::Paths::midiControlPresetsPath() + preset->name + ".vmp", {});
+        f.del();
+        f.create();
+        f.setData(&data);
+        f.close();
+        return preset;
+    };
+
+    performIoOrOpenErrorPopup(ioFunc);
+}
+
+void AbstractDisk::readMidiControlPreset(moduru::file::File& f, std::shared_ptr<MidiControlPreset> preset)
+{
+    std::function<preset_or_error()> ioFunc = [&f, preset] {
+
+        auto data = std::vector<char>(f.getLength());
+        f.getData(&data);
+
+        preset->rows.clear();
+        preset->name = "";
+
+        preset->autoloadMode = data[0];
+
+        std::string presetName;
+
+        for (int i = 0; i < 16; i++)
+        {
+            if (data[i + 1] == ' ') continue;
+            presetName.push_back(data[i + 1]);
+        }
+
+        preset->name = presetName;
+
+        int pointer = 17;
+
+        while (pointer < data.size())
+        {
+            std::string name;
+            char c;
+
+            while ((c = data[pointer++]) != ' ' && pointer < data.size())
+            {
+                name.push_back(c);
+            }
+
+            const bool isNote = data[pointer++] == 1;
+            const char channel = data[pointer++];
+            const char value = data[pointer++];
+
+            auto cmd = MidiControlCommand{name, isNote, channel, value};
+            preset->rows.emplace_back(cmd);
+        }
+
+        return preset;
+    };
+
+    performIoOrOpenErrorPopup(ioFunc);
 }
 
 wav_or_error AbstractDisk::readWavMeta(std::shared_ptr<MpcFile> f)

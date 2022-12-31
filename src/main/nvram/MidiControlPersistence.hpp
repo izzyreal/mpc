@@ -54,28 +54,23 @@ namespace mpc::nvram {
     class MidiControlPersistence
     {
     private:
-        static void saveVmpcMidiScreenPresetToFile(mpc::Mpc& mpc, moduru::file::File &f, std::string name, int autoLoadMode);
+        static void saveVmpcMidiScreenPresetToFile(mpc::Mpc& mpc, moduru::file::File &f, std::string name);
 
     public:
+        static bool doesPresetWithNameExist(std::string name);
         static void deleteLastState();
-        static void loadFileIntoPreset(moduru::file::File&, MidiControlPreset&);
-        static void loadFileByNameIntoPreset(std::string name, MidiControlPreset&);
-        static void loadAllPresetsFromDiskIntoMemory();
-        static void savePresetToFile(MidiControlPreset &preset);
+        static void loadFileByNameIntoPreset(mpc::Mpc&, std::string name, std::shared_ptr<MidiControlPreset>);
+        static void loadAllPresetsFromDiskIntoMemory(mpc::Mpc&);
 
         static void loadDefaultMapping(Mpc &mpc);
 
         // Presets available in the default preset path,
         // loaded into memory, and maintained as presets are changed, added or deleted.
-        static std::vector<MidiControlPreset> presets;
+        static std::vector<std::shared_ptr<MidiControlPreset>> presets;
 
         // Persistence of the in-memory mapping, so it's not required
         // to save a preset explicitly before restarting the application.
         static void restoreLastState(mpc::Mpc& mpc);
         static void saveCurrentState(mpc::Mpc& mpc);
-
-        // Load and save presets by filename in the default preset path.
-        // See Paths::midiControlPresetsPath.
-        static void saveCurrentMappingToFile(mpc::Mpc& mpc, const std::string& name, int autoloadMode);
     };
 }

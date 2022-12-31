@@ -15,6 +15,7 @@
 #include <lang/StrUtil.hpp>
 #include <Logger.hpp>
 
+using namespace mpc::nvram;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
@@ -42,7 +43,7 @@ void VmpcMidiScreen::turnWheel(int i)
 {
     init();
 
-    nvram::MidiControlCommand& cmd = activePreset.rows[row + rowOffset];
+    MidiControlCommand& cmd = activePreset->rows[row + rowOffset];
 
     if (column == 0)
     {
@@ -82,11 +83,11 @@ void VmpcMidiScreen::open()
 
     screen->discardAndLeave = [this](){
         this->activePreset = this->uneditedActivePresetCopy;
-        this->uneditedActivePresetCopy = nvram::MidiControlPreset();
+        this->uneditedActivePresetCopy = std::make_shared<MidiControlPreset>();
     };
 
     screen->saveAndLeave = [this](){
-        this->uneditedActivePresetCopy = nvram::MidiControlPreset();
+        this->uneditedActivePresetCopy = std::make_shared<MidiControlPreset>();
     };
 
     screen->stayScreen = "vmpc-midi";
@@ -138,7 +139,7 @@ void VmpcMidiScreen::acceptLearnCandidate()
         return;
     }
 
-    activePreset.rows[row + rowOffset] = learnCandidate;
+    activePreset->rows[row + rowOffset] = learnCandidate;
 }
 
 void VmpcMidiScreen::down()
@@ -151,7 +152,7 @@ void VmpcMidiScreen::down()
     
     if (row == 4)
     {
-        if (rowOffset + 5 >= activePreset.rows.size())
+        if (rowOffset + 5 >= activePreset->rows.size())
             return;
         
         rowOffset++;
@@ -187,14 +188,14 @@ void VmpcMidiScreen::setLearning(bool b)
 
 bool VmpcMidiScreen::hasMappingChanged()
 {
-    if (activePreset.rows.size() != uneditedActivePresetCopy.rows.size())
+    if (activePreset->rows.size() != uneditedActivePresetCopy->rows.size())
     {
         return true;
     }
 
-    for (int i = 0; i < activePreset.rows.size(); i++)
+    for (int i = 0; i < activePreset->rows.size(); i++)
     {
-        if (!activePreset.rows[i].equals(uneditedActivePresetCopy.rows[i]))
+        if (!activePreset->rows[i].equals(uneditedActivePresetCopy->rows[i]))
         {
             return true;
         }
@@ -254,7 +255,7 @@ void VmpcMidiScreen::function(int i)
                 return;
             }
 
-            openScreen("vmpc-discard-mapping-changes");
+            openScreen("vmpc-auto-save");
             break;
         case 3:
             if (learning)
@@ -278,7 +279,7 @@ void VmpcMidiScreen::function(int i)
 
             if (hasMappingChanged())
             {
-                mpc::nvram::MidiControlPersistence::saveCurrentState(mpc);
+                MidiControlPersistence::saveCurrentState(mpc);
                 popupScreen->setText("MIDI mapping saved");
             }
             else
@@ -312,9 +313,9 @@ void VmpcMidiScreen::setLearnCandidate(const bool isNote, const char channelInde
     updateRows();
 }
 
-void VmpcMidiScreen::updateOrAddActivePresetCommand(nvram::MidiControlCommand &c)
+void VmpcMidiScreen::updateOrAddActivePresetCommand(MidiControlCommand &c)
 {
-    for (auto& labelCommand : activePreset.rows)
+    for (auto& labelCommand : activePreset->rows)
     {
         if (c.label == labelCommand.label)
         {
@@ -323,7 +324,7 @@ void VmpcMidiScreen::updateOrAddActivePresetCommand(nvram::MidiControlCommand &c
         }
     }
 
-    activePreset.rows.emplace_back(c);
+    activePreset->rows.emplace_back(c);
 }
 
 bool VmpcMidiScreen::isLearning()
@@ -340,12 +341,12 @@ void VmpcMidiScreen::updateRows()
         
         int length = 15;
         
-        auto labelText = StrUtil::padRight(activePreset.rows[i + rowOffset].label, " ", length) + ":";
+        auto labelText = StrUtil::padRight(activePreset->rows[i + rowOffset].label, " ", length) + ":";
         
         typeLabel->setText(labelText);
-        nvram::MidiControlCommand& cmd =
+        MidiControlCommand& cmd =
                 (learning && row == i && !learnCandidate.isEmpty()) ?
-                learnCandidate : activePreset.rows[i + rowOffset];
+                learnCandidate : activePreset->rows[i + rowOffset];
 
         std::string type = cmd.isNote ? "Note" : "CC";
 
@@ -389,10 +390,10 @@ void VmpcMidiScreen::updateRows()
 void VmpcMidiScreen::displayUpAndDown()
 {
     findChild<Label>("up")->Hide(rowOffset == 0);
-    findChild<Label>("down")->Hide(rowOffset + 5 >= activePreset.rows.size());
+    findChild<Label>("down")->Hide(rowOffset + 5 >= activePreset->rows.size());
 }
 
-mpc::nvram::MidiControlPreset& VmpcMidiScreen::getActivePreset()
+std::shared_ptr<MidiControlPreset> VmpcMidiScreen::getActivePreset()
 {
     return activePreset;
 }

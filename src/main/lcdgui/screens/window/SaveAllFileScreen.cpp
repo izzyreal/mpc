@@ -1,12 +1,14 @@
 #include "SaveAllFileScreen.hpp"
 
 #include <lcdgui/screens/window/NameScreen.hpp>
+#include <lcdgui/screens/dialog/FileExistsScreen.hpp>
 
 #include <Util.hpp>
 #include <disk/MpcFile.hpp>
 #include <disk/AbstractDisk.hpp>
 
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::lcdgui::screens::dialog;
 using namespace moduru::lang;
 
 SaveAllFileScreen::SaveAllFileScreen(mpc::Mpc& mpc, const int layerIndex)
@@ -16,12 +18,17 @@ SaveAllFileScreen::SaveAllFileScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void SaveAllFileScreen::open()
 {
+    if (ls->getPreviousScreenName() == "save")
+    {
+        fileName = "ALL_SEQ_SONG1";
+    }
+
 	displayFile();
 }
 
 void SaveAllFileScreen::displayFile()
 {
-	if (fileName.length() == 0)
+	if (fileName.empty())
     {
         findField("file")->setText("");
         findLabel("file1")->setText("");
@@ -36,17 +43,15 @@ void SaveAllFileScreen::turnWheel(int i)
 {
 	init();
 
-	if (param.compare("file") == 0)
+	if (param == "file")
 	{
-        const auto nameScreen = mpc.screens->get<NameScreen>("name");
-        const auto saveAllFileScreen = this;
-        
-        auto renamer = [saveAllFileScreen](std::string& newName) {
-            saveAllFileScreen->fileName = newName;
+        const auto enterAction = [this](std::string& nameScreenName) {
+            fileName = nameScreenName;
+            openScreen(name);
         };
 
-        nameScreen->setName(fileName);
-        nameScreen->setRenamerAndScreenToReturnTo(renamer, "save-all-file");
+        const auto nameScreen = mpc.screens->get<NameScreen>("name");
+        nameScreen->initialize(fileName, 16, enterAction, name);
         openScreen("name");
 	}
 }
@@ -67,7 +72,29 @@ void SaveAllFileScreen::function(int i)
 
 		if (disk->checkExists(allFileName))
 		{
-			openScreen("file-exists");
+            auto replaceAction = [disk, allFileName]{
+                auto success = disk->getFile(allFileName)->del();
+
+                if (success)
+                {
+                    disk->flush();
+                    disk->initFiles();
+                    disk->writeAll(allFileName);
+                }
+            };
+
+            const auto initializeNameScreen = [this]{
+                auto nameScreen = mpc.screens->get<NameScreen>("name");
+                auto enterAction = [this](std::string& nameScreenName){
+                    fileName = nameScreenName;
+                    openScreen(name);
+                };
+                nameScreen->initialize(fileName, 16, enterAction, "save");
+            };
+
+            auto fileExistsScreen = mpc.screens->get<FileExistsScreen>("file-exists");
+            fileExistsScreen->initialize(replaceAction, initializeNameScreen, "save");
+            openScreen("file-exists");
 			return;
 		}
 		

@@ -29,7 +29,7 @@ namespace mpc::lcdgui::screens {
         bool isLearning();
         void setLearnCandidate(const bool isNote, const char channelIndex, const char value);
         void updateOrAddActivePresetCommand(mpc::nvram::MidiControlCommand& c);
-        mpc::nvram::MidiControlPreset& getActivePreset();
+        std::shared_ptr<mpc::nvram::MidiControlPreset> getActivePreset();
 
     private:
         int row = 0;
@@ -40,11 +40,11 @@ namespace mpc::lcdgui::screens {
         bool learning = false;
         bool hasMappingChanged();
 
-        mpc::nvram::MidiControlPreset activePreset;
-        mpc::nvram::MidiControlPreset uneditedActivePresetCopy;
+        std::shared_ptr<mpc::nvram::MidiControlPreset> activePreset = std::make_shared<mpc::nvram::MidiControlPreset>();
+        std::shared_ptr<mpc::nvram::MidiControlPreset> uneditedActivePresetCopy = std::make_shared<mpc::nvram::MidiControlPreset>();
 
         std::atomic_bool shouldSwitch = ATOMIC_VAR_INIT(false);
-        mpc::nvram::MidiControlPreset switchToPreset;
+        std::shared_ptr<mpc::nvram::MidiControlPreset> switchToPreset = std::make_shared<mpc::nvram::MidiControlPreset>();
 
         void setLearning(bool b);
         void acceptLearnCandidate();

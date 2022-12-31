@@ -3,11 +3,14 @@
 #include <Util.hpp>
 
 #include <disk/AbstractDisk.hpp>
+#include <disk/MpcFile.hpp>
 
 #include <lcdgui/screens/window/SaveAProgramScreen.hpp>
 #include <lcdgui/screens/window/NameScreen.hpp>
+#include <lcdgui/screens/dialog/FileExistsScreen.hpp>
 
 using namespace mpc::lcdgui::screens::window;
+using namespace mpc::lcdgui::screens::dialog;
 
 using namespace moduru::lang;
 
@@ -18,6 +21,11 @@ SaveApsFileScreen::SaveApsFileScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void SaveApsFileScreen::open()
 {
+    if (ls->getPreviousScreenName() == "save")
+    {
+        fileName = "ALL_PGMS";
+    }
+
 	findField("replace-same-sounds")->setAlignment(Alignment::Centered);
 	displayFile();
 	displayReplaceSameSounds();
@@ -27,21 +35,19 @@ void SaveApsFileScreen::open()
 void SaveApsFileScreen::turnWheel(int i)
 {
 	init();
-	auto nameScreen = mpc.screens->get<NameScreen>("name");
 	auto saveAProgramScreen = mpc.screens->get<SaveAProgramScreen>("save-a-program");
 
 	if (param == "file")
 	{
-        const auto saveApsFileScreen = this;
-        
-        auto renamer = [saveApsFileScreen](std::string& newName) {
-            saveApsFileScreen->fileName = newName;
+        const auto enterAction = [this](std::string& nameScreenName) {
+            fileName = nameScreenName;
+            openScreen(name);
         };
 
-        nameScreen->setName(fileName);
-        nameScreen->setRenamerAndScreenToReturnTo(renamer, "save-aps-file");
+        const auto nameScreen = mpc.screens->get<NameScreen>("name");
+        nameScreen->initialize(fileName, 16, enterAction, name);
         openScreen("name");
-	}
+    }
 	else if (param == "save")
 	{
 		saveAProgramScreen->setSave(saveAProgramScreen->save + i);
@@ -72,7 +78,29 @@ void SaveApsFileScreen::function(int i)
 
         if (disk->checkExists(apsFileName))
         {
-            ls->openScreen("file-exists");
+            auto replaceAction = [this, disk, apsFileName]{
+                auto success = disk->getFile(apsFileName)->del();
+
+                if (success)
+                {
+                    disk->flush();
+                    disk->initFiles();
+                    disk->writeAps(apsFileName);
+                }
+            };
+
+            const auto initializeNameScreen = [this]{
+                auto nameScreen = mpc.screens->get<NameScreen>("name");
+                auto enterAction = [this](std::string& nameScreenName){
+                    fileName = nameScreenName;
+                    openScreen(name);
+                };
+                nameScreen->initialize(fileName, 16, enterAction, "save");
+            };
+
+            auto fileExistsScreen = mpc.screens->get<FileExistsScreen>("file-exists");
+            fileExistsScreen->initialize(replaceAction, initializeNameScreen, "save");
+            openScreen("file-exists");
             return;
         }
         
@@ -84,7 +112,6 @@ void SaveApsFileScreen::function(int i)
 
 void SaveApsFileScreen::displayFile()
 {
-	auto nameScreen = mpc.screens->get<NameScreen>("name");
 	findField("file")->setText(fileName);
 }
 

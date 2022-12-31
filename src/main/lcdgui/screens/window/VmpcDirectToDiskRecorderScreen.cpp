@@ -8,7 +8,6 @@
 #include <audio/server/NonRealTimeAudioServer.hpp>
 
 #include <lcdgui/screens/SongScreen.hpp>
-#include <lcdgui/screens/window/NameScreen.hpp>
 
 #include <Util.hpp>
 

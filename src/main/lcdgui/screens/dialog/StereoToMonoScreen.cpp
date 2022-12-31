@@ -32,8 +32,6 @@ void StereoToMonoScreen::turnWheel(int i)
 {
 	init();
 
-	auto nameScreen = mpc.screens->get<NameScreen>("name");
-
 	if (param == "stereosource")
 	{
 		sampler->nudgeSoundIndex(i > 0);
@@ -41,18 +39,24 @@ void StereoToMonoScreen::turnWheel(int i)
 	}
 	else if (param == "newlname" || param == "newrname")
 	{
-        const auto stereoToMonoScreen = this;
         const auto isL = param == "newlname";
-        
-        nameScreen->setName(isL ? newLName : newRName);
-        auto renamer = [isL, stereoToMonoScreen](std::string& newName) {
-            if (isL) stereoToMonoScreen->setNewLName(newName);
-            else stereoToMonoScreen->setNewRName(newName);
+
+        const auto enterAction = [this, isL](std::string& nameScreenName) {
+            if (mpc.getSampler()->isSoundNameOccupied(nameScreenName))
+            {
+                return;
+            }
+
+            if (isL) setNewLName(nameScreenName);
+            else setNewRName(nameScreenName);
+            openScreen(name);
         };
 
-        nameScreen->setRenamerAndScreenToReturnTo(renamer, "stereo-to-mono");
-		openScreen("name");
-	}
+        const auto nameScreen = mpc.screens->get<NameScreen>("name");
+        const auto newName = isL ? newLName : newRName;
+        nameScreen->initialize(newName, 16, enterAction, name);
+        openScreen("name");
+    }
 }
 
 void StereoToMonoScreen::function(int i)

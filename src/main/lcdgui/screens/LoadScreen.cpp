@@ -425,7 +425,7 @@ std::string LoadScreen::getSelectedFileName()
 {
 	auto fileNames = mpc.getDisk()->getFileNames();
 	
-	if (fileNames.size() <= fileLoad)
+	if (fileLoad >= fileNames.size())
     {
         return "";
     }

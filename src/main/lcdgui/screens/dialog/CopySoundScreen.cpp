@@ -58,17 +58,19 @@ void CopySoundScreen::turnWheel(int i)
 	}
 	else if (param == "newname")
 	{
-		const auto nameScreen = mpc.screens->get<NameScreen>("name");
-        const auto copySoundScreen = this;
-		nameScreen->setName(newName);
-        
-        auto renamer = [copySoundScreen](std::string& renamerNewName) {
-            copySoundScreen->setNewName(renamerNewName);
+	   const auto enterAction = [this](std::string& nameScreenName) {
+            if (mpc.getSampler()->isSoundNameOccupied(nameScreenName))
+            {
+                return;
+            }
+
+            newName = nameScreenName;
+            openScreen(name);
         };
 
-        nameScreen->setRenamerAndScreenToReturnTo(renamer, "copy-sound");
-		openScreen("name");
-	}
+        const auto nameScreen = mpc.screens->get<NameScreen>("name");
+        nameScreen->initialize(newName, 16, enterAction, name);
+        openScreen("name");	}
 }
 
 void CopySoundScreen::displayNewName()

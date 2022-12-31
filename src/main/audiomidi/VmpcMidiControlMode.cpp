@@ -41,7 +41,7 @@ void VmpcMidiControlMode::processMidiInputEvent(mpc::Mpc& mpc, ctoot::midi::core
     auto hardware = mpc.getHardware();
     auto dataWheel = hardware->getDataWheel();
 
-    for (auto& labelCommand : vmpcMidiScreen->activePreset.rows)
+    for (auto& labelCommand : vmpcMidiScreen->activePreset->rows)
     {
         auto channelIndex = labelCommand.channel;
 

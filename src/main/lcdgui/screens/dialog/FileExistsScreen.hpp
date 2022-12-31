@@ -21,7 +21,15 @@ public:
             std::shared_ptr<sampler::Sound> existing);
     void setActionAfterAddingSound(std::function<void(bool)> action);
 
+    void initialize(std::function<void()> replaceAction,
+                    std::function<void()> initializeNameScreen,
+                    std::string replaceOrCancelScreen);
+
 private:
+    std::function<void()> replaceAction;
+    std::function<void()> initializeNameScreen;
+    std::string cancelScreen;
+
     std::shared_ptr<sampler::Sound> loadASoundCandidate;
     std::shared_ptr<sampler::Sound> existingSound;
     std::function<void(bool)> actionAfterAddingSound = [](bool newSoundIsMono){};

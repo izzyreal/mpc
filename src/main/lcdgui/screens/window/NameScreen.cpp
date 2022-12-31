@@ -15,14 +15,20 @@ NameScreen::NameScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void NameScreen::mainScreen()
 {
-    actionWhenGoingToMainScreen();
+    mainScreenAction();
     ScreenComponent::mainScreen();
 }
 
-void NameScreen::setRenamerAndScreenToReturnTo(const std::function<void(std::string&)>& newRenamer, const std::string& screen)
+void NameScreen::initialize(std::string name, unsigned char nameLimitToUse,
+                             const std::function<void(std::string&)>& enterActionToUse,
+                             const std::string& cancelScreenToUse,
+                             const std::function<void()>& mainScreenActionToUse)
 {
-    renamer = newRenamer;
-    screenToReturnTo = screen;
+    setName(name);
+    setNameLimit(nameLimitToUse);
+    enterAction = enterActionToUse;
+    cancelScreen = cancelScreenToUse;
+    mainScreenAction = mainScreenActionToUse;
 }
 
 std::weak_ptr<Underline> NameScreen::findUnderline()
@@ -33,7 +39,9 @@ std::weak_ptr<Underline> NameScreen::findUnderline()
 void NameScreen::open()
 {
 	for (int i = 0; i < 16; i++)
-		findUnderline().lock()->setState(i, false);
+    {
+        findUnderline().lock()->setState(i, false);
+    }
 
 	displayName();
 }
@@ -42,8 +50,12 @@ void NameScreen::close()
 {
     ls->setLastFocus("name", "0");
     editing = false;
-    parameterName = "";
-    actionWhenGoingToMainScreen = [](){};
+
+    enterAction = [](const std::string&) {};
+    cancelScreen.clear();
+    mainScreenAction = [](){};
+	name.clear();
+	nameLimit = 16;
 }
 
 void NameScreen::left()
@@ -67,7 +79,9 @@ void NameScreen::right()
 	init();
 
 	if (stoi(param) == nameLimit - 1)
-		return;
+    {
+        return;
+    }
 	
 	ScreenComponent::right();
 	
@@ -118,40 +132,20 @@ void NameScreen::function(int i)
 	{
     case 3:
 	{
-		if (find(begin(saveScreens), end(saveScreens), parameterName) != end(saveScreens))
-        {
-            nameScreenName = originalName;
-            openScreen(parameterName);
-        }
-		else
-			openScreen(ls->getPreviousScreenName());
+        openScreen(cancelScreen);
 		break;
 	}
 	case 4:
-		saveName();
+        auto newName = getNameWithoutSpaces();
+		enterAction(newName);
 		break;
     }
 }
 
 void NameScreen::pressEnter()
 {
-	saveName();
-}
-
-void NameScreen::saveName()
-{
-    if (find(begin(saveScreens), end(saveScreens), parameterName) != end(saveScreens))
-    {
-        openScreen(parameterName);
-    }
-    else
-    {
-        auto newName = getNameWithoutSpaces();
-        renamer(newName);
-        
-        if (screenToReturnTo.length() > 0)
-            openScreen(screenToReturnTo);
-    }
+    auto newName = getNameWithoutSpaces();
+    enterAction(newName);
 }
 
 void NameScreen::drawUnderline()
@@ -161,12 +155,16 @@ void NameScreen::drawUnderline()
         std::string focus = ls->getFocus();
 	
 		if (focus.length() != 1 && focus.length() != 2)
-			return;
+        {
+            return;
+        }
 		
 		auto u = findUnderline().lock();
 		
 		for (int i = 0; i < 16; i++)
-			u->setState(i, i == stoi(focus));
+        {
+            u->setState(i, i == stoi(focus));
+        }
 
 		bringToFront(u.get());
 	}
@@ -188,7 +186,6 @@ void NameScreen::setName(std::string newName)
 {
     nameScreenName = newName;
 	nameLimit = 16;
-	originalName = newName;
 }
 
 void NameScreen::setNameLimit(int i)
@@ -207,17 +204,16 @@ std::string NameScreen::getNameWithoutSpaces()
 	auto s = nameScreenName;
 
 	while (!s.empty() && isspace(s.back()))
-		s.pop_back();
+    {
+        s.pop_back();
+    }
 
 	for (int i = 0; i < s.length(); i++)
-		if (s[i] == ' ') s[i] = '_';
+    {
+        if (s[i] == ' ') s[i] = '_';
+    }
 
     return s;
-}
-
-std::string NameScreen::getNameWithSpaces()
-{
-    return StrUtil::trim(nameScreenName);
 }
 
 void NameScreen::changeNameCharacter(int i, bool up)
@@ -389,4 +385,9 @@ void NameScreen::backSpace()
             left();
         }
     }
+}
+
+void NameScreen::setEditing(bool b)
+{
+    editing = b;
 }

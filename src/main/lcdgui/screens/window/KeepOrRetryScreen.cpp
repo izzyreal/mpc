@@ -60,16 +60,18 @@ void KeepOrRetryScreen::function(int i)
 
 void KeepOrRetryScreen::openNameScreen()
 {
-    auto nameScreen = mpc.screens->get<NameScreen>("name");
-    nameScreen->setName(sampler->getPreviewSound()->getName());
-    auto _sampler = sampler;
-    
-    auto renamer = [_sampler](std::string& newName) {
-        _sampler->getPreviewSound()->setName(newName);
+    const auto enterAction = [this](std::string& nameScreenName) {
+        if (mpc.getSampler()->isSoundNameOccupied(nameScreenName))
+        {
+            return;
+        }
+
+        sampler->getPreviewSound()->setName(nameScreenName);
+        openScreen(name);
     };
-    
-    nameScreen->setRenamerAndScreenToReturnTo(renamer, "keep-or-retry");
-    
+
+    const auto nameScreen = mpc.screens->get<NameScreen>("name");
+    nameScreen->initialize(sampler->getPreviewSound()->getName(), 16, enterAction, name);
     openScreen("name");
 }
 

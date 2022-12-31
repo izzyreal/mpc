@@ -4,7 +4,10 @@
 
 #include <sequencer/Track.hpp>
 
+#include <disk/MpcFile.hpp>
+
 #include <lcdgui/screens/LoadScreen.hpp>
+#include <lcdgui/screens/window/NameScreen.hpp>
 #include <lcdgui/screens/dialog/FileExistsScreen.hpp>
 
 #include <mpc/MpcStereoMixerChannel.hpp>
@@ -28,7 +31,7 @@ void LoadASoundScreen::open()
 {
 	init();
 	auto loadScreen = mpc.screens->get<LoadScreen>("load");
-	findLabel("filename")->setText("File:" + loadScreen->getSelectedFileName());
+	findLabel("filename")->setText("File:" + loadScreen->getSelectedFile()->getNameWithoutExtension());
     assignToNote = mpc.getNote();
 	displayAssignToNote();
 	mpc.addObserver(this); // Subscribe to "note" messages
@@ -108,22 +111,24 @@ void LoadASoundScreen::function(int i)
 
 void LoadASoundScreen::keepSound()
 {
-    auto sound = sampler->getPreviewSound();
-    auto candidateSoundName = sound->getName();
-    std::shared_ptr<mpc::sampler::Sound> existingSound;
+    auto previewSound = sampler->getPreviewSound();
+    auto candidateSoundName = previewSound->getName();
 
-    for (auto& s : sampler->getSounds())
+    int existingSoundIndex = -1;
+
+    for (int i = 0; i < sampler->getSoundCount(); i++)
     {
-        if (s == sound) continue;
+        auto s = sampler->getSound(i);
+        if (s == previewSound) continue;
 
         if (moduru::lang::StrUtil::eqIgnoreCase(s->getName(), candidateSoundName))
         {
-            existingSound = s;
+            existingSoundIndex = i;
             break;
         }
     }
 
-    auto action = [&](bool newSoundIsMono){
+    auto actionAfterLoadingSound = [this](bool newSoundIsMono){
         if (assignToNote != 34)
         {
             auto sequence = sequencer->getActiveSequence();
@@ -137,16 +142,42 @@ void LoadASoundScreen::keepSound()
         }
     };
 
-    if (existingSound)
+    if (existingSoundIndex >= 0)
     {
+        auto replaceAction = [this, existingSoundIndex, actionAfterLoadingSound]{
+            auto previewSound = sampler->getPreviewSound();
+            const auto isMono = previewSound->isMono();
+            sampler->replaceSound(existingSoundIndex, previewSound);
+            actionAfterLoadingSound(isMono);
+            openScreen("load");
+        };
+
+        const auto initializeNameScreen = [this, &actionAfterLoadingSound, &previewSound]{
+            auto nameScreen = mpc.screens->get<NameScreen>("name");
+
+            auto enterAction = [this, &actionAfterLoadingSound, &previewSound](std::string& nameScreenName){
+                if (sampler->checkExists(nameScreenName))
+                {
+                    return;
+                }
+
+                previewSound->setName(nameScreenName);
+                actionAfterLoadingSound(previewSound->isMono());
+                openScreen("load");
+            };
+
+            auto loadScreen = mpc.screens->get<LoadScreen>("load");
+            auto mainScreenAction = [&](){ sampler->deleteSound(sampler->getPreviewSound()); };
+            nameScreen->initialize(loadScreen->getSelectedFile()->getNameWithoutExtension(), 16, enterAction, "load", mainScreenAction);
+        };
+
         auto fileExistsScreen = mpc.screens->get<FileExistsScreen>("file-exists");
-        fileExistsScreen->setLoadASoundCandidateAndExistingSound(sound, existingSound);
-        fileExistsScreen->setActionAfterAddingSound(action);
+        fileExistsScreen->initialize(replaceAction, initializeNameScreen, "load");
         openScreen("file-exists");
         return;
     }
 
-    action(sound->isMono());
+    actionAfterLoadingSound(previewSound->isMono());
     openScreen("load");
 }
 

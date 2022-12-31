@@ -49,21 +49,20 @@ void ResampleScreen::turnWheel(int i)
 	}
 	else if (param == "newname")
 	{
-		auto nameScreen = mpc.screens->get<NameScreen>("name");
-        auto resampleScreen = this;
-        auto _sampler = sampler;
-		nameScreen->setName(findField("newname")->getText());
-
-        auto renamer = [_sampler, resampleScreen](std::string& newName2) {
-            if (_sampler->isSoundNameOccupied(newName2))
+        const auto enterAction = [this](std::string& nameScreenName) {
+            if (mpc.getSampler()->isSoundNameOccupied(nameScreenName))
+            {
                 return;
+            }
 
-            resampleScreen->setNewName(newName2);
+            setNewName(nameScreenName);
+            openScreen(name);
         };
 
-        nameScreen->setRenamerAndScreenToReturnTo(renamer, "resample");
-		openScreen("name");
-	}
+        const auto nameScreen = mpc.screens->get<NameScreen>("name");
+        nameScreen->initialize(findField("newname")->getText(), 16, enterAction, name);
+        openScreen("name");
+    }
 }
 
 void ResampleScreen::function(int i)

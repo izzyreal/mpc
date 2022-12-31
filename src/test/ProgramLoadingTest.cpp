@@ -152,12 +152,6 @@ TEST_CASE("Load 2 programs in Add to P & S mode", "[load-programs]")
     }
 }
 
-TEST_CASE("Foo", "[bar]")
-{
-    mpc::Mpc mpc;
-    mpc.init(1, 5);
-}
-
 void doTestWithMissingSound(mpc::Mpc& mpc,
                             const bool clear,
                             const bool replaceSameSounds,

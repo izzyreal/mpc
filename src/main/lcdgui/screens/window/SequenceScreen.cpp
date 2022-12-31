@@ -43,26 +43,29 @@ void SequenceScreen::function(int i)
 void SequenceScreen::turnWheel(int i)
 {
     init();
-    auto nameScreen = mpc.screens->get<NameScreen>("name");
-    std::function<void(std::string&)> renamer;
+    std::function<void(std::string&)> enterAction;
+    std::string initialNameScreenName;
     
     if (param.find("default") != std::string::npos)
     {
-        nameScreen->setName(sequencer->getDefaultSequenceName());
+        initialNameScreenName = sequencer->getDefaultSequenceName();
         
-        renamer = [&](std::string& newName) {
-            sequencer->setDefaultSequenceName(newName);
+        enterAction = [this](std::string& nameScreenName) {
+            sequencer->setDefaultSequenceName(nameScreenName);
+            openScreen(name);
         };
     }
     else
     {
-        nameScreen->setName(sequencer->getActiveSequence()->getName());
+        initialNameScreenName = sequencer->getActiveSequence()->getName();
         
-        renamer = [&](std::string& newName) {
-            sequencer->getActiveSequence()->setName(newName);
+        enterAction = [this](std::string& nameScreenName) {
+            sequencer->getActiveSequence()->setName(nameScreenName);
+            openScreen(name);
         };
     }
 
-    nameScreen->setRenamerAndScreenToReturnTo(renamer, "sequence");
+    auto nameScreen = mpc.screens->get<NameScreen>("name");
+    nameScreen->initialize(initialNameScreenName, 16, enterAction, name);
     openScreen("name");
 }

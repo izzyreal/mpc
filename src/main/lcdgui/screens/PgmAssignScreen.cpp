@@ -18,6 +18,7 @@ PgmAssignScreen::PgmAssignScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void PgmAssignScreen::open()
 {
+    init();
     auto lastNoteParameters = sampler->getLastNp(program.get());
     auto soundIndex = lastNoteParameters->getSoundIndex();
 

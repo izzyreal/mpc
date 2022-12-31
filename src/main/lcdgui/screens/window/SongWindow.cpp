@@ -50,30 +50,34 @@ void SongWindow::turnWheel(int i)
 {
 	init();
 
-	auto nameScreen = mpc.screens->get<NameScreen>("name");
-    auto songScreen = mpc.screens->get<SongScreen>("song");
 
-    std::function<void(std::string&)> renamer;
+    std::function<void(std::string&)> enterAction;
+    std::string initialNameScreenName;
+
+    auto songScreen = mpc.screens->get<SongScreen>("song");
 
 	if (param.find("default") != std::string::npos)
 	{
-		nameScreen->setName(songScreen->getDefaultSongName());
+		initialNameScreenName = songScreen->getDefaultSongName();
         
-        renamer = [songScreen](std::string& newName) {
+        enterAction = [songScreen, this](std::string& newName) {
             songScreen->setDefaultSongName(newName);
+            openScreen(name);
         };
 	}
 	else
 	{
         const auto songIndex = songScreen->getActiveSongIndex();
         const auto song = sequencer->getSong(songIndex);
-		nameScreen->setName(song->getName());
+		initialNameScreenName = song->getName();
         
-        renamer = [song](std::string& newName) {
+        enterAction = [song, this](std::string& newName) {
             song->setName(newName);
+            openScreen(name);
         };
 	}
 
-    nameScreen->setRenamerAndScreenToReturnTo(renamer, "song-window");
+    auto nameScreen = mpc.screens->get<NameScreen>("name");
+    nameScreen->initialize(initialNameScreenName, 16, enterAction, name);
 	openScreen("name");
 }

@@ -23,20 +23,18 @@ void ProgramScreen::turnWheel(int i)
 {
     init();
 
-	if (param.compare("programname") == 0)
+	if (param == "programname")
 	{
-        auto nameScreen = mpc.screens->get<NameScreen>("name");
-        const auto _program = program;
-        nameScreen->setName(_program->getName());
-
-        auto renamer = [_program](std::string& newName) {
-            _program->setName(newName);
+        const auto enterAction = [this](std::string& nameScreenName) {
+            program->setName(nameScreenName);
+            openScreen(name);
         };
 
-        nameScreen->setRenamerAndScreenToReturnTo(renamer, "program");
+        const auto nameScreen = mpc.screens->get<NameScreen>("name");
+        nameScreen->initialize(program->getName(), 16, enterAction, name);
         openScreen("name");
     }
-	else if (param.compare("midiprogramchange") == 0)
+	else if (param == "midiprogramchange")
 	{
 		program->setMidiProgramChange(program->getMidiProgramChange() + i);
 		displayMidiProgramChange();

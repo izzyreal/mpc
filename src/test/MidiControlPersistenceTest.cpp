@@ -5,6 +5,7 @@
 #include "hardware/Hardware.hpp"
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
 #include "nvram/MidiControlPersistence.hpp"
+#include "disk/AbstractDisk.hpp"
 
 #include "file/File.hpp"
 
@@ -25,18 +26,18 @@ TEST_CASE("Initial state", "[midi-control-persistence]")
     auto screen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
     auto activePreset = screen->getActivePreset();
 
-    REQUIRE(!activePreset.rows.empty());
+    REQUIRE(!activePreset->rows.empty());
 
     auto buttonLabels = mpc.getHardware()->getButtonLabels();
 
     for (auto &l: buttonLabels)
     {
         auto found = std::find_if(
-                activePreset.rows.begin(),
-                activePreset.rows.end(),
+                activePreset->rows.begin(),
+                activePreset->rows.end(),
                 [l](const MidiControlCommand &c) { return c.label == l; });
 
-        REQUIRE(found != activePreset.rows.end());
+        REQUIRE(found != activePreset->rows.end());
     }
 }
 
@@ -103,12 +104,12 @@ TEST_CASE("Save and load a preset", "[midi-control-persistence]")
 
     File f(mpc::Paths::midiControlPresetsPath() + "New_preset.vmp", nullptr);
     REQUIRE(f.exists());
-    MidiControlPreset preset;
-    MidiControlPersistence::loadFileIntoPreset(f, preset);
-    REQUIRE(preset.rows[0].label == "pad-1");
-    REQUIRE(preset.rows[0].value == 2);
-    REQUIRE(preset.rows[0].channel == 1);
-    REQUIRE(preset.rows[0].isNote);
+    auto preset = std::make_shared<MidiControlPreset>();
+    mpc.getDisk()->readMidiControlPreset(f, preset);
+    REQUIRE(preset->rows[0].label == "pad-1");
+    REQUIRE(preset->rows[0].value == 2);
+    REQUIRE(preset->rows[0].channel == 1);
+    REQUIRE(preset->rows[0].isNote);
 
     mpc.getLayeredScreen()->openScreen("vmpc-midi");
     mpc.getLayeredScreen()->openScreen("vmpc-midi-presets");
@@ -122,17 +123,17 @@ TEST_CASE("Save and load a preset", "[midi-control-persistence]")
     // Set Auto Load to YES
     controls->turnWheel(2);
 
-    // Press SAVE, which will open FileExistsScreen
-    controls->function(2);
-
-    controls = mpc.getActiveControls();
-
-    // Replace existing file
-    controls->function(2);
-
     f = File(mpc::Paths::midiControlPresetsPath() + "New_preset.vmp", nullptr);
     REQUIRE(f.exists());
-    MidiControlPersistence::loadFileIntoPreset(f, preset);
+    preset = std::make_shared<MidiControlPreset>();
+    mpc.getDisk()->readMidiControlPreset(f, preset);
 
-    REQUIRE(preset.autoloadMode == MidiControlPreset::AutoLoadMode::YES);
+    REQUIRE(preset->autoloadMode == MidiControlPreset::AutoLoadMode::YES);
+    REQUIRE(preset->rows[0].label == "pad-1");
+    REQUIRE(preset->rows[0].value == 2);
+    REQUIRE(preset->rows[0].channel == 1);
+    REQUIRE(preset->rows[0].isNote);
+
+    // Wait long enough for any Popup threads to have finished
+    std::this_thread::sleep_for(std::chrono::milliseconds(1100));
 }

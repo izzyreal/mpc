@@ -32,17 +32,16 @@ void MidiOutputScreen::open()
 
 void MidiOutputScreen::openNameScreen()
 {
-    auto seq = sequencer->getActiveSequence();
-    auto nameScreen = mpc.screens->get<NameScreen>("name");
     auto renameDeviceIndex = deviceIndex == 0 ? 1 : deviceIndex + 1;
-    nameScreen->setName(seq->getDeviceName(renameDeviceIndex));
-    nameScreen->setNameLimit(8);
 
-    auto renamer = [&, renameDeviceIndex](std::string& newName) {
-        sequencer->getActiveSequence()->setDeviceName(renameDeviceIndex, newName);
+    const auto enterAction = [this, renameDeviceIndex](std::string& nameScreenName) {
+        sequencer->getActiveSequence()->setDeviceName(renameDeviceIndex, nameScreenName);
+        openScreen(name);
     };
-    
-    nameScreen->setRenamerAndScreenToReturnTo(renamer, "midi-output");
+
+    const auto nameScreen = mpc.screens->get<NameScreen>("name");
+    auto seq = sequencer->getActiveSequence();
+    nameScreen->initialize(seq->getDeviceName(renameDeviceIndex), 8, enterAction, name);
     openScreen("name");
 }
 

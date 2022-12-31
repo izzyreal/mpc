@@ -17,6 +17,8 @@ namespace mpc::lcdgui::screens
 		void openWindow() override;
         void up() override;
 
+        unsigned char getProgramIndex();
+
 	private:
 		const std::vector<std::string> types {
             u8"Save All Sequences\u00CE&\u00CESongs",
@@ -28,6 +30,7 @@ namespace mpc::lcdgui::screens
 
 		int type = 0;
         int device = 0;
+        unsigned char programIndex = 0;
         void setType(int i);
 
 		void displayType();

@@ -17,6 +17,7 @@
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui::screens::window;
 using namespace mpc::controls;
 using namespace mpc::hardware;
 using namespace moduru::sys;
@@ -151,7 +152,7 @@ void KeyEventHandler::handle(const KeyEvent &keyEvent)
         {
             auto keyCodeString = kbMapping->getKeyCodeString(keyEvent.rawKeyCode);
             if (keyCodeString == "space") keyCodeString = " ";
-            auto nameScreen = mpc.screens->get<mpc::lcdgui::screens::window::NameScreen>("name");
+            auto nameScreen = mpc.screens->get<NameScreen>("name");
             if (keyCodeString.length() == 1)
             {
                 nameScreen->typeCharacter(keyCodeString[0]);

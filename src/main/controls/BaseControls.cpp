@@ -176,7 +176,7 @@ void BaseControls::function(int i)
                 else if (currentScreenName == "name")
                 {
                     auto nameScreen = mpc.screens->get<NameScreen>("name");
-                    nameScreen->editing = false;
+                    nameScreen->setEditing(false);
                     ls->setLastFocus("name", "0");
                 }
                 else if (currentScreenName == "directory")

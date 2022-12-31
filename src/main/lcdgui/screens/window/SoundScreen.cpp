@@ -24,18 +24,19 @@ void SoundScreen::turnWheel(int i)
 	
 	if (param == "soundname")
 	{
-		auto nameScreen = mpc.screens->get<NameScreen>("name");
-		nameScreen->setName(findField("soundname")->getText());
-
-        auto renamer = [&](std::string& newName) {
-            if (sampler->isSoundNameOccupied(newName))
+        const auto enterAction = [this](std::string& nameScreenName) {
+            if (mpc.getSampler()->isSoundNameOccupied(nameScreenName))
+            {
                 return;
+            }
 
-            sampler->getSound()->setName(newName);
+            sampler->getSound()->setName(nameScreenName);
+            openScreen(name);
         };
 
-        nameScreen->setRenamerAndScreenToReturnTo(renamer, "sound");
-		openScreen("name");
+        const auto nameScreen = mpc.screens->get<NameScreen>("name");
+        nameScreen->initialize(sampler->getPreviewSound()->getName(), 16, enterAction, name);
+        openScreen("name");
 	}
 }
 
