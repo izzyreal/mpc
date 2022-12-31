@@ -65,6 +65,7 @@ vector<string> screenNames = {
 "vmpc-discard-mapping-changes",
 "vmpc-warning-settings-ignored",
 "vmpc-known-controller-detected",
+"vmpc-continue-previous-session",
 "mpc2000xl-all-file",
 "copy-note-parameters",
 "assignment-view",

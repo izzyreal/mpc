@@ -905,5 +905,10 @@
  {
   "fblabels" : [ null, "NO", "YES", "NEVER", "ALWAYS", null ],
   "fbtypes" : [ null, 1, 0, 1, 0, null ]
+ },
+ "vmpc-continue-previous-session":
+ {
+  "fblabels" : [ null, "NO", "YES", "NEVER", "ALWAYS", null ],
+  "fbtypes" : [ null, 1, 0, 1, 0, null ]
  }
 }

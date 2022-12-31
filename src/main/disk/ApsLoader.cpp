@@ -63,8 +63,10 @@ void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool head
     auto sampler = mpc.getSampler();
     auto disk = mpc.getDisk();
 
-    // For now when this is called by JUCE's get/setState routines,
-    // we trust every sound could be saved/loaded.
+    // These remain empty when loading the APS without sounds.
+    // It is trusted that the caller of this method validates
+    // sound indices to make sure they actually exist. This
+    // allows loading APS and sounds in any order.
     std::vector<int> unavailableSoundIndices;
     std::map<int, int> finalSoundIndices;
     

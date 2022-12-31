@@ -32,6 +32,8 @@
 #include <lcdgui/Screens.hpp>
 
 #include "file/FileUtil.hpp"
+#include "file/File.hpp"
+#include "file/all/AllParser.hpp"
 
 #include <string>
 
@@ -43,6 +45,8 @@ CMRC_DECLARE(mpc);
 using namespace mpc;
 using namespace mpc::lcdgui;
 
+using namespace moduru::file;
+
 Mpc::Mpc()
 {
     std::vector<std::string> requiredPaths {
@@ -52,7 +56,8 @@ Mpc::Mpc()
         Paths::storesPath(),
         Paths::defaultLocalVolumePath(),
         Paths::recordingsPath(),
-        Paths::midiControlPresetsPath()
+        Paths::midiControlPresetsPath(),
+        Paths::autoSavePath()
     };
 
     for (auto& p : requiredPaths) {

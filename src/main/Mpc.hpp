@@ -274,7 +274,8 @@ namespace mpc {
                 "vmpc-midi",
                 "vmpc-midi-presets",
                 "vmpc-warning-settings-ignored",
-                "vmpc-known-controller-detected"
+                "vmpc-known-controller-detected",
+                "vmpc-continue-previous-session"
         };
     };
 }

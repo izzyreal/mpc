@@ -113,6 +113,7 @@
 #include <lcdgui/screens/window/StepEditOptionsScreen.hpp>
 #include <lcdgui/screens/window/VmpcWarningSettingsIgnoredScreen.hpp>
 #include <lcdgui/screens/window/VmpcKnownControllerDetectedScreen.hpp>
+#include <lcdgui/screens/window/VmpcContinuePreviousSessionScreen.hpp>
 
 #include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
 #include <lcdgui/screens/dialog/MidiMonitorScreen.hpp>
@@ -964,6 +965,10 @@ std::shared_ptr <ScreenComponent> Screens::getScreenComponent(const std::string 
     else if (screenName == "vmpc-known-controller-detected")
     {
         screen = std::make_shared<VmpcKnownControllerDetectedScreen>(mpc, layerIndex);
+    }
+    else if (screenName == "vmpc-continue-previous-session")
+    {
+        screen = std::make_shared<VmpcContinuePreviousSessionScreen>(mpc, layerIndex);
     }
 
     if (screen)

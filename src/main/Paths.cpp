@@ -69,6 +69,12 @@ std::string Paths::midiControlPresetsPath()
     return path;
 }
 
+std::string Paths::autoSavePath()
+{
+    static auto path = appDocumentsPath() + "AutoSave" + sep();
+    return path;
+}
+
 std::string Paths::demoDataSrcPath()
 {
     static auto demoDataPath = sago::getData() + sep() + "VMPC2000XL" + sep() + "DemoData" + sep();

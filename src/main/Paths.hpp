@@ -19,6 +19,7 @@ public:
     static std::string logFilePath();
     static std::string recordingsPath();
     static std::string midiControlPresetsPath();
+    static std::string autoSavePath();
 
     static std::string configPath();
     static std::string demoDataSrcPath();
