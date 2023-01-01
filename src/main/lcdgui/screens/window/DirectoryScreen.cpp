@@ -139,7 +139,7 @@ void DirectoryScreen::function(int f)
         };
 
         nameScreen->initialize(
-                findField("newname")->getText(),
+                getSelectedFile()->getNameWithoutExtension(),
                 file->isDirectory() ? 8 : 16,
                 enterAction,
                 name);

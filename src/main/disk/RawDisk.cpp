@@ -127,26 +127,28 @@ std::shared_ptr<AkaiFatLfnDirectory> RawDisk::getDir()
 
 bool RawDisk::deleteAllFiles(int extension)
 {
-    auto dir = getDir();
-    std::string selfStr = ".";
-    auto dirEntry = dir->getEntry(selfStr);
-    auto mpcFile = std::make_shared<MpcFile>(dirEntry);
-    
-    if (!dir || !dirEntry || !mpcFile)
-        return false;
+    std::vector<std::shared_ptr<MpcFile>> filesToDelete;
 
-    auto success = false;
-    auto files = mpcFile->listFiles();
-    
-    for (auto& f : files)
+    for (auto& key_value : getDir()->akaiNameIndex)
     {
+        auto f = std::make_shared<MpcFile>(key_value.second);
+
         if (!f->isDirectory())
         {
             if (extension == 0 || StrUtil::hasEnding(f->getName(), extensions[extension]))
-                success = f->del();
+            {
+                filesToDelete.push_back(f);
+            }
         }
     }
-    
+
+    bool success = false;
+
+    for (auto& f : filesToDelete)
+    {
+        if (f->del()) success = true;
+    }
+
     return success;
 }
 

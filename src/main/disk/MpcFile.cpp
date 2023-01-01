@@ -25,7 +25,9 @@ MpcFile::MpcFile(nonstd::any fileObject)
         rawEntry = nonstd::any_cast<std::shared_ptr<AkaiFatLfnDirectoryEntry>>(fileObject);
         raw = true;
     }
-    else throw std::runtime_error("Invalid object provided to MpcFile");
+    else {
+        throw std::runtime_error("Invalid object provided to MpcFile");
+    }
 }
 
 std::vector<std::shared_ptr<MpcFile>> MpcFile::listFiles()
