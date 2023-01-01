@@ -225,6 +225,12 @@ std::string KbMapping::getKeyCodeString(int keyCode) {
 			if (s.length() > 3) return s;
 		}
 	}
+
+    if (names.empty())
+    {
+        return "";
+    }
+
 	return kh->name(keyCode);
 }
 
