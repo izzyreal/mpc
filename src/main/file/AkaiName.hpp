@@ -11,7 +11,6 @@ namespace mpc::file
 		static std::vector<char> allowedSpecialCharacters;
 
 	private:
-		static bool isValidChar(const char& toTest);
 		static bool isCharThatShouldBeRemoved(const char& c);
 
 	private:
@@ -20,6 +19,7 @@ namespace mpc::file
 
 	public:
 		static bool isAkaiName(const std::string& name);
+        static bool isValidChar(const char& toTest);
 
 	public:
 		static std::string generate(const std::string& name, const std::vector<std::string>& usedNames = std::vector<std::string>());
