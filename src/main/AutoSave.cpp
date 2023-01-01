@@ -53,7 +53,7 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc)
     const auto soundsFile = path + "sounds.txt";
     const auto currentDirFile = path + "currentDir.txt";
 
-    std::vector<std::string> files{apsFile, allFile, soundIndexFile, lastPressedPadFile, lastPressedNoteFile, screenFile, previousSCreenFile, previousSamplerScreenFile, focusFile};
+    std::vector<std::string> files{apsFile, allFile, soundIndexFile, lastPressedPadFile, lastPressedNoteFile, screenFile, previousSCreenFile, previousSamplerScreenFile, focusFile, soundsFile, currentDirFile };
 
     std::vector<std::string> availableFiles;
 
@@ -79,7 +79,10 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc)
         for (auto &f: availableFiles)
         {
             auto stream = FileUtil::ifstreamw(f, std::ios::in | std::ios::binary);
-            std::vector<char> data((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
+            auto size1 = fs::file_size(f);
+            std::vector<char> data(size1);
+            stream.read(&data[0], size1);
+            stream.close();
 
             if (f == path + "APS.APS")
             {
@@ -97,10 +100,13 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc)
 
                 for (auto &soundName: soundNames)
                 {
-                    auto soundPath = Paths::autoSavePath() + soundName + ".SND";
-                    auto soundStream = FileUtil::ifstreamw(f, std::ios::in | std::ios::binary);
-                    std::vector<char> soundData((std::istreambuf_iterator<char>(soundStream)),
-                                                std::istreambuf_iterator<char>());
+                    auto soundPath = Paths::autoSavePath() + soundName;
+                    auto soundStream = FileUtil::ifstreamw(soundPath, std::ios::in | std::ios::binary);
+                    auto size = fs::file_size(soundPath);
+                    std::vector<char> soundData(size);
+                    soundStream.read(&soundData[0], size);
+                    soundStream.close();
+
                     SndReader sndReader(soundData);
 
                     auto sound = mpc.getSampler()->addSound(sndReader.getSampleRate());
@@ -248,33 +254,42 @@ void AutoSave::storeAutoSavedState(mpc::Mpc &mpc)
 
         auto stream = FileUtil::ofstreamw(screenFile, std::ios::out | std::ios::binary);
         stream.write(&screen[0], screen.length());
+        stream.close();
 
         stream = FileUtil::ofstreamw(previousScreenFile, std::ios::out | std::ios::binary);
         stream.write(&previousScreen[0], previousScreen.length());
+        stream.close();
 
         stream = FileUtil::ofstreamw(previousSamplerScreenFile, std::ios::out | std::ios::binary);
         stream.write(&previousSamplerScreen[0], previousSamplerScreen.length());
+        stream.close();
 
         stream = FileUtil::ofstreamw(focusFile, std::ios::out | std::ios::binary);
         stream.write(&focus[0], focus.length());
+        stream.close();
 
         stream = FileUtil::ofstreamw(currentDirFile, std::ios::out | std::ios::binary);
         stream.write(&currentDir[0], currentDir.length());
+        stream.close();
 
         stream = FileUtil::ofstreamw(soundIndexFile, std::ios::out | std::ios::binary);
         stream.put(static_cast<char>(soundIndex));
+        stream.close();
 
         stream = FileUtil::ofstreamw(lastPressedNoteFile, std::ios::out | std::ios::binary);
         stream.put(static_cast<char>(lastPressedNote));
+        stream.close();
 
         stream = FileUtil::ofstreamw(lastPressedPadFile, std::ios::out | std::ios::binary);
         stream.put(static_cast<char>(lastPressedPad));
+        stream.close();
 
         ApsParser apsParser(mpc, "stateinfo");
         auto apsBytes = apsParser.getBytes();
 
         stream = FileUtil::ofstreamw(apsFile, std::ios::out | std::ios::binary);
         stream.write(&apsBytes[0], apsBytes.size());
+        stream.close();
 
         auto sounds = mpc.getSampler()->getSounds();
 
@@ -288,6 +303,7 @@ void AutoSave::storeAutoSavedState(mpc::Mpc &mpc)
             auto soundFilePath = path + sound->getName() + ".SND";
             stream = FileUtil::ofstreamw(soundFilePath, std::ios::out | std::ios::binary);
             stream.write(&data[0], data.size());
+            stream.close();
             soundNames = soundNames.append(sound->getName() + ".SND\n");
         }
 
@@ -296,9 +312,11 @@ void AutoSave::storeAutoSavedState(mpc::Mpc &mpc)
 
         stream = FileUtil::ofstreamw(allFile, std::ios::out | std::ios::binary);
         stream.write(&allBytes[0], allBytes.size());
+        stream.close();
 
         stream = FileUtil::ofstreamw(soundsFile, std::ios::out | std::ios::binary);
         stream.write(&soundNames[0], soundNames.size());
+        stream.close();
     };
 
     if (vmpcAutoSaveScreen->getAutoSaveOnExit() == 1)
