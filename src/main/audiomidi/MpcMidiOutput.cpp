@@ -17,12 +17,12 @@ void MpcMidiOutput::panic()
     }
 }
 
-void MpcMidiOutput::enqueMessageOutputA(std::shared_ptr<ctoot::midi::core::ShortMessage> msg)
+void MpcMidiOutput::enqueueMessageOutputA(std::shared_ptr<ctoot::midi::core::ShortMessage> msg)
 {
     outputQueueA.enqueue(msg);
 }
 
-void MpcMidiOutput::enqueMessageOutputB(std::shared_ptr<ctoot::midi::core::ShortMessage> msg)
+void MpcMidiOutput::enqueueMessageOutputB(std::shared_ptr<ctoot::midi::core::ShortMessage> msg)
 {
     outputQueueB.enqueue(msg);
 }

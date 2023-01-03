@@ -38,11 +38,11 @@ void MidiClockEmitter::sendMidiClockMsg(unsigned int frameOffset)
         msg->bufferPos = frameOffset;
 
         if (syncScreen->getOut() == 0 || syncScreen->getOut() == 2) {
-            mpc.getMidiOutput()->enqueMessageOutputA(msg);
+            mpc.getMidiOutput()->enqueueMessageOutputA(msg);
         }
 
         if (syncScreen->getOut() == 1 || syncScreen->getOut() == 2) {
-            mpc.getMidiOutput()->enqueMessageOutputB(msg);
+            mpc.getMidiOutput()->enqueueMessageOutputB(msg);
         }
     }
 }

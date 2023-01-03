@@ -345,12 +345,12 @@ void FrameSeq::sendMidiSyncMsg(unsigned char status)
 
         if (syncScreen->getOut() == 0 || syncScreen->getOut() == 2)
         {
-            mpc.getMidiOutput()->enqueMessageOutputA(midiSyncMsg);
+            mpc.getMidiOutput()->enqueueMessageOutputA(midiSyncMsg);
         }
 
         if (syncScreen->getOut() == 1 || syncScreen->getOut() == 2)
         {
-            mpc.getMidiOutput()->enqueMessageOutputB(midiSyncMsg);
+            mpc.getMidiOutput()->enqueueMessageOutputB(midiSyncMsg);
         }
     }
 }
@@ -566,7 +566,7 @@ void FrameSeq::stopSequencer()
     move(0);
 }
 
-void FrameSeq::enqueEventAfterNFrames(std::function<void()> event, unsigned long nFrames)
+void FrameSeq::enqueueEventAfterNFrames(std::function<void()> event, unsigned long nFrames)
 {
     for (auto &e : eventsAfterNFrames)
     {

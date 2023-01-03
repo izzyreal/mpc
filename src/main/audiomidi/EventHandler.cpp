@@ -82,14 +82,14 @@ void EventHandler::handleNoThru(const std::shared_ptr<Event>& event, Track* trac
         switch (syncScreen->out)
         {
             case 0:
-                mpcMidiOutput->enqueMessageOutputA(clockMsg);
+                mpcMidiOutput->enqueueMessageOutputA(clockMsg);
                 break;
             case 1:
-                mpcMidiOutput->enqueMessageOutputB(clockMsg);
+                mpcMidiOutput->enqueueMessageOutputB(clockMsg);
                 break;
             case 2:
-                mpcMidiOutput->enqueMessageOutputA(clockMsg);
-                mpcMidiOutput->enqueMessageOutputB(clockMsg);
+                mpcMidiOutput->enqueueMessageOutputA(clockMsg);
+                mpcMidiOutput->enqueueMessageOutputB(clockMsg);
                 break;
         }
     }
@@ -147,8 +147,9 @@ void EventHandler::handleNoThru(const std::shared_ptr<Event>& event, Track* trac
 
                             if (ne->getDuration() > 0)
                             {
-                                frameSeq->enqueEventAfterNFrames([this, pad]() {
+                                frameSeq->enqueueEventAfterNFrames([this, pad]() {
                                     mpc.getHardware()->getPad(pad)->notifyObservers(255);
+
                                 }, durationFrames);
                             }
                         }
@@ -258,11 +259,11 @@ void EventHandler::midiOut(const std::shared_ptr<Event>& e, Track* track)
             
             if (deviceNumber < 16)
             {
-                mpcMidiOutput->enqueMessageOutputA(msg);
+                mpcMidiOutput->enqueueMessageOutputA(msg);
             }
             else
             {
-                mpcMidiOutput->enqueMessageOutputB(msg);
+                mpcMidiOutput->enqueueMessageOutputB(msg);
             }
         }
         

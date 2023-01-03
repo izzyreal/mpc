@@ -1391,7 +1391,7 @@ void StepEditorScreen::adhocPlayNoteEvent(const std::shared_ptr<mpc::sequencer::
         mms->mpcTransport(noteOffToSend.lock().get(), 0, 0, 0, 0, uniqueEnoughID, -1);
     };
 
-    frameSeq->enqueEventAfterNFrames(eventAfterNFrames, durationInFrames);
+    frameSeq->enqueueEventAfterNFrames(eventAfterNFrames, durationInFrames);
 }
 
 void StepEditorScreen::adhocPlayNoteEventsAtCurrentPosition()

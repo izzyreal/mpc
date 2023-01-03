@@ -89,7 +89,7 @@ namespace mpc::sequencer {
 		int getTickPosition();
 
         void sendMidiSyncMsg(unsigned char status);
-        void enqueEventAfterNFrames(std::function<void()>, unsigned long nFrames);
+        void enqueueEventAfterNFrames(std::function<void()> event, unsigned long nFrames);
 
     public:
 		FrameSeq(mpc::Mpc& mpc);

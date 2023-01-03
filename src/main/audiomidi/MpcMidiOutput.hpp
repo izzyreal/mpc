@@ -15,8 +15,8 @@ namespace mpc::audiomidi {
         moodycamel::ConcurrentQueue<std::shared_ptr<ctoot::midi::core::ShortMessage>> outputQueueB;
 
 	public:
-        void enqueMessageOutputA(std::shared_ptr<ctoot::midi::core::ShortMessage>);
-        void enqueMessageOutputB(std::shared_ptr<ctoot::midi::core::ShortMessage>);
+        void enqueueMessageOutputA(std::shared_ptr<ctoot::midi::core::ShortMessage>);
+        void enqueueMessageOutputB(std::shared_ptr<ctoot::midi::core::ShortMessage>);
         unsigned char dequeueOutputA(std::vector<std::shared_ptr<ctoot::midi::core::ShortMessage>>& buf);
         unsigned char dequeueOutputB(std::vector<std::shared_ptr<ctoot::midi::core::ShortMessage>>& buf);
 		void panic();
