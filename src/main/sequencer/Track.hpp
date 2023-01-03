@@ -72,13 +72,13 @@ private:
     int getCorrectedTickPos();
 
 public:
-    bool insertEventWhileRetainingSort(std::shared_ptr<Event> event, bool allowMultipleNotesOnSameTick = false);
+    bool insertEventWhileRetainingSort(const std::shared_ptr<Event>& event, bool allowMultipleNotesOnSameTick = false);
     std::shared_ptr<NoteEvent> addNoteEvent(int tick, int note);
     std::shared_ptr<Event> addEvent(int tick, const std::string& type, bool allowMultipleNotesOnSameTick = false);
     void cloneEventIntoTrack(std::shared_ptr<Event>& src, int tick, bool allowMultipleNotesOnSameTick = false);
     bool adjustDurLastEvent(int newDur);
     void removeEvent(int i);
-    void removeEvent(std::shared_ptr<Event> event);
+    void removeEvent(const std::shared_ptr<Event>& event);
     void removeEvents();
     void setVelocityRatio(int i);
     int getVelocityRatio();

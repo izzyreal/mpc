@@ -143,13 +143,14 @@ void Track::setOn(bool b)
     notifyObservers(std::string("trackon"));
 }
 
-void Track::removeEvent(std::shared_ptr<Event> event)
+void Track::removeEvent(const std::shared_ptr<Event>& event)
 {
 	for (int i = 0; i < events.size(); i++)
 	{
 		if (events[i] == event)
         {
             events.erase(events.begin() + i);
+            break;
         }
 	}
 
@@ -652,7 +653,7 @@ bool Track::isOn()
 
 bool Track::isUsed()
 {
-    return used || events.size() > 0;
+    return used || !events.empty();
 }
 
 std::vector<std::shared_ptr<Event>> Track::getEventRange(int startTick, int endTick)
@@ -921,7 +922,7 @@ std::string Track::getActualName()
     return name;
 }
 
-bool Track::insertEventWhileRetainingSort(std::shared_ptr<Event> event, bool allowMultipleNotesOnSameTick)
+bool Track::insertEventWhileRetainingSort(const std::shared_ptr<Event>& event, bool allowMultipleNotesOnSameTick)
 {
     if (!isUsed())
     {
@@ -947,20 +948,20 @@ bool Track::insertEventWhileRetainingSort(std::shared_ptr<Event> event, bool all
     {
         auto insertAt = std::find_if(events.begin(),
                                      events.end(),
-                                     [&tick](std::shared_ptr<Event> e) { return e->getTick() >= tick; });
+                                     [&tick](const std::shared_ptr<Event>& e) { return e->getTick() >= tick; });
 
         if (insertAt == events.end())
         {
-            events.push_back(event);
+            events.emplace_back(event);
         }
         else
         {
-            events.insert(insertAt, event);
+            events.emplace(insertAt, event);
         }
     }
     else
     {
-        events.push_back(event);
+        events.emplace_back(event);
     }
 
     eventIndex++;
