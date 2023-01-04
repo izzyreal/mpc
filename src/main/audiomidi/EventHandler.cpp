@@ -123,7 +123,8 @@ void EventHandler::handleNoThru(const std::shared_ptr<Event>& event, Track* trac
                     auto voiceOverlap = pgm->getNoteParameters(ne->getNote())->getVoiceOverlap();
                     auto duration = voiceOverlap == 2 ? ne->getDuration() : -1;
                     auto audioServer = mpc.getAudioMidiServices()->getAudioServer();
-                    auto durationFrames = (duration == -1 || duration == 0) ? -1 : mpc::sequencer::SeqUtil::ticksToFrames(duration, sequencer->getTempo(), audioServer->getSampleRate());
+                    auto durationFrames = (duration == -1 || duration == 0) ?
+                            -1 : SeqUtil::ticksToFrames(duration, sequencer->getTempo(), audioServer->getSampleRate());
 
                     mpc.getMms()->mpcTransport(midiAdapter.get().lock().get(), 0, ne->getVariationType(), ne->getVariationValue(), eventFrame, ne->getTick(), durationFrames);
                     
@@ -147,10 +148,11 @@ void EventHandler::handleNoThru(const std::shared_ptr<Event>& event, Track* trac
 
                             if (ne->getDuration() > 0)
                             {
-                                frameSeq->enqueueEventAfterNFrames([this, pad]() {
+                                const auto nFrames = SeqUtil::ticksToFrames(ne->getDuration(), sequencer->getTempo(), audioServer->getSampleRate());
+                                frameSeq->enqueueEventAfterNFrames([this, pad, ne, track]() {
                                     mpc.getHardware()->getPad(pad)->notifyObservers(255);
-
-                                }, durationFrames);
+                                    midiOut(ne->getNoteOff(), track);
+                                }, static_cast<unsigned long>(nFrames));
                             }
                         }
                     }
