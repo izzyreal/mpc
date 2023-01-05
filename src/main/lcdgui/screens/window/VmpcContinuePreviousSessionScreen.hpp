@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include "lcdgui/ScreenComponent.hpp"
 
 namespace mpc::lcdgui::screens::window {
