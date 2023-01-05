@@ -4,6 +4,8 @@
 
 #include "lcdgui/ScreenComponent.hpp"
 
+#include <functional>
+
 namespace mpc::lcdgui::screens::window {
     class VmpcContinuePreviousSessionScreen : public ScreenComponent {
     public:

@@ -337,6 +337,8 @@ void FrameSeq::sendMidiSyncMsg(unsigned char status)
 {
     auto midiSyncMsg = status == ShortMessage::TIMING_CLOCK ? midiSyncClockMsg : midiSyncStartStopContinueMsg;
 
+    midiSyncMsg->setMessage(status);
+
     midiSyncMsg->bufferPos = tickFrameOffset;
 
     if (syncScreen->getModeOut() > 0)

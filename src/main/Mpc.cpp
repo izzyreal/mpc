@@ -40,6 +40,10 @@
 #include <cmrc/cmrc.hpp>
 #include <string_view>
 
+#if __linux__
+#include <X11/Xlib.h>
+#endif
+
 CMRC_DECLARE(mpc);
 
 using namespace mpc;
@@ -49,6 +53,10 @@ using namespace moduru::file;
 
 Mpc::Mpc()
 {
+#if __linux__
+    XInitThreads();
+#endif
+
     std::vector<std::string> requiredPaths {
         Paths::appDocumentsPath(),
         Paths::appConfigHome(),
