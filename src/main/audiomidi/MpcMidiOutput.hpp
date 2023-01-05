@@ -2,6 +2,7 @@
 
 #include <midi/core/ShortMessage.hpp>
 #include <vector>
+#include <memory>
 
 #include "thirdp/concurrentqueue.h"
 
