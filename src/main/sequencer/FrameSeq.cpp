@@ -45,10 +45,8 @@ FrameSeq::FrameSeq(mpc::Mpc& mpc)
       punchScreen(mpc.screens->get<PunchScreen>("punch")),
       songScreen(mpc.screens->get<SongScreen>("song")),
       userScreen(mpc.screens->get<UserScreen>("user")),
-      midiSyncClockMsg(std::make_shared<ShortMessage>()),
       midiSyncStartStopContinueMsg(std::make_shared<ShortMessage>())
 {
-    midiSyncClockMsg->setMessage(ShortMessage::TIMING_CLOCK);
 }
 
 void FrameSeq::start(float sampleRate) {
@@ -335,24 +333,22 @@ void FrameSeq::triggerClickIfNeeded()
 
 void FrameSeq::sendMidiSyncMsg(unsigned char status)
 {
-    auto midiSyncMsg = status == ShortMessage::TIMING_CLOCK ? midiSyncClockMsg : midiSyncStartStopContinueMsg;
+    midiSyncStartStopContinueMsg->setMessage(status);
 
-    midiSyncMsg->setMessage(status);
-
-    midiSyncMsg->bufferPos = tickFrameOffset;
+    midiSyncStartStopContinueMsg->bufferPos = tickFrameOffset;
 
     if (syncScreen->getModeOut() > 0)
     {
-        midiSyncMsg->setMessage(status);
+        midiSyncStartStopContinueMsg->setMessage(status);
 
         if (syncScreen->getOut() == 0 || syncScreen->getOut() == 2)
         {
-            mpc.getMidiOutput()->enqueueMessageOutputA(midiSyncMsg);
+            mpc.getMidiOutput()->enqueueMessageOutputA(midiSyncStartStopContinueMsg);
         }
 
         if (syncScreen->getOut() == 1 || syncScreen->getOut() == 2)
         {
-            mpc.getMidiOutput()->enqueueMessageOutputB(midiSyncMsg);
+            mpc.getMidiOutput()->enqueueMessageOutputB(midiSyncStartStopContinueMsg);
         }
     }
 }
@@ -568,7 +564,7 @@ void FrameSeq::stopSequencer()
     move(0);
 }
 
-void FrameSeq::enqueueEventAfterNFrames(std::function<void()> event, unsigned long nFrames)
+void FrameSeq::enqueueEventAfterNFrames(const std::function<void()>& event, unsigned long nFrames)
 {
     for (auto &e : eventsAfterNFrames)
     {

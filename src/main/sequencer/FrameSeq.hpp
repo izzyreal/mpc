@@ -59,7 +59,6 @@ namespace mpc::sequencer {
 		std::shared_ptr<Sequencer> sequencer;
 		int tickFrameOffset = 0;
         bool wasRunning = false;
-        std::shared_ptr<ctoot::midi::core::ShortMessage> midiSyncClockMsg;
         std::shared_ptr<ctoot::midi::core::ShortMessage> midiSyncStartStopContinueMsg;
         std::vector<EventAfterNFrames> eventsAfterNFrames = std::vector<EventAfterNFrames>(100);
 
@@ -89,7 +88,7 @@ namespace mpc::sequencer {
 		int getTickPosition();
 
         void sendMidiSyncMsg(unsigned char status);
-        void enqueueEventAfterNFrames(std::function<void()> event, unsigned long nFrames);
+        void enqueueEventAfterNFrames(const std::function<void()>& event, unsigned long nFrames);
 
     public:
 		FrameSeq(mpc::Mpc& mpc);
