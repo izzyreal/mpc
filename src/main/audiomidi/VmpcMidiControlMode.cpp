@@ -89,7 +89,7 @@ void VmpcMidiControlMode::processMidiInputEvent(mpc::Mpc& mpc, ctoot::midi::core
             }
             else if (label == "slider")
             {
-                hardware->getSlider()->setValue(127 - controllerValue);
+                hardware->getSlider()->setValue(controllerValue);
             }
             else if (label == "rec-gain")
             {
