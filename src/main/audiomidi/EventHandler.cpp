@@ -131,7 +131,7 @@ void EventHandler::handleNoThru(const std::shared_ptr<Event>& event, Track* trac
                             if (noteEvent->getDuration() > 0)
                             {
                                 const auto nFrames = SeqUtil::ticksToFrames(noteEvent->getDuration(), sequencer->getTempo(), audioServer->getSampleRate());
-                                frameSeq->enqueueEventAfterNFrames([this, pad, noteEvent, track]() {
+                                frameSeq->enqueueEventAfterNFrames([this, pad, noteEvent, track](unsigned int frameIndex) {
                                     mpc.getHardware()->getPad(pad)->notifyObservers(255);
                                     midiOut(noteEvent->getNoteOff(), track);
                                 }, static_cast<unsigned long>(nFrames));
