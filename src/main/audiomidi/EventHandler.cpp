@@ -6,7 +6,6 @@
 
 #include <sequencer/Event.hpp>
 #include <sequencer/FrameSeq.hpp>
-#include <sequencer/MidiClockEvent.hpp>
 #include <sequencer/MixerEvent.hpp>
 #include <sequencer/Track.hpp>
 #include <sequencer/NoteEvent.hpp>
@@ -61,56 +60,32 @@ void EventHandler::handleNoThru(const std::shared_ptr<Event>& event, Track* trac
         return;
     }
     
-    auto tce = std::dynamic_pointer_cast<TempoChangeEvent>(event);
-    auto mce = std::dynamic_pointer_cast<MidiClockEvent>(event);
-    auto ne = std::dynamic_pointer_cast<NoteEvent>(event);
-    auto me = std::dynamic_pointer_cast<MixerEvent>(event);
+    auto tempoChangeEvent = std::dynamic_pointer_cast<TempoChangeEvent>(event);
+    auto noteEvent = std::dynamic_pointer_cast<NoteEvent>(event);
+    auto mixerEvent = std::dynamic_pointer_cast<MixerEvent>(event);
     
-    if (tce && tce->getTempo() != sequencer->getTempo())
+    if (tempoChangeEvent && tempoChangeEvent->getTempo() != sequencer->getTempo())
     {
-        sequencer->setTempo(tce->getTempo());
-        return;
+        sequencer->setTempo(tempoChangeEvent->getTempo());
     }
-    else if (mce)
-    {
-        auto mpcMidiOutput = mpc.getMidiOutput();
-        auto clockMsg = std::shared_ptr<ctoot::midi::core::ShortMessage>(mce->getShortMessage());
-        clockMsg->setMessage(mce->getStatus());
-
-        auto syncScreen = mpc.screens->get<SyncScreen>("sync");
-        
-        switch (syncScreen->out)
-        {
-            case 0:
-                mpcMidiOutput->enqueueMessageOutputA(clockMsg);
-                break;
-            case 1:
-                mpcMidiOutput->enqueueMessageOutputB(clockMsg);
-                break;
-            case 2:
-                mpcMidiOutput->enqueueMessageOutputA(clockMsg);
-                mpcMidiOutput->enqueueMessageOutputB(clockMsg);
-                break;
-        }
-    }
-    else if (ne)
+    else if (noteEvent)
     {
         auto drumIndex = drum == -1 ? track->getBus() - 1 : drum;
 
         if (drumIndex >= 0)
         {
-            if (ne->getDuration() != -1)
+            if (noteEvent->getDuration() != -1)
             {
                 auto isSolo = sequencer->isSoloEnabled();
                 auto eventTrackIsSoloTrack = track->getIndex() == sequencer->getActiveTrackIndex();
 
-                if (!isSolo || eventTrackIsSoloTrack || ne->getVelocity() == 0)
+                if (!isSolo || eventTrackIsSoloTrack || noteEvent->getVelocity() == 0)
                 {
-                    auto newVelo = static_cast<int>(ne->getVelocity() * (track->getVelocityRatio() * 0.01));
+                    auto newVelo = static_cast<int>(noteEvent->getVelocity() * (track->getVelocityRatio() * 0.01));
                     MidiAdapter midiAdapter;
                     // Each of the 4 DRUMs is routed to their respective 0-based MIDI channel.
                     // This MIDI channel is part of a MIDI system that is internal to VMPC2000XL's sound player engine.
-                    midiAdapter.process(ne, drumIndex, newVelo);
+                    midiAdapter.process(noteEvent, drumIndex, newVelo);
 
                     auto frameSeq = mpc.getAudioMidiServices()->getFrameSequencer();
                     auto eventFrame = frameSeq->getEventFrameOffset();
@@ -120,17 +95,24 @@ void EventHandler::handleNoThru(const std::shared_ptr<Event>& event, Track* trac
 
                     auto pgmIndex = sampler->getDrumBusProgramIndex(drumIndex + 1);
                     auto pgm = sampler->getProgram(pgmIndex);
-                    auto voiceOverlap = pgm->getNoteParameters(ne->getNote())->getVoiceOverlap();
-                    auto duration = voiceOverlap == 2 ? ne->getDuration() : -1;
+                    auto voiceOverlap = pgm->getNoteParameters(noteEvent->getNote())->getVoiceOverlap();
+                    auto duration = voiceOverlap == 2 ? noteEvent->getDuration() : -1;
                     auto audioServer = mpc.getAudioMidiServices()->getAudioServer();
                     auto durationFrames = (duration == -1 || duration == 0) ?
                             -1 : SeqUtil::ticksToFrames(duration, sequencer->getTempo(), audioServer->getSampleRate());
 
-                    mpc.getMms()->mpcTransport(midiAdapter.get().lock().get(), 0, ne->getVariationType(), ne->getVariationValue(), eventFrame, ne->getTick(), durationFrames);
+                    mpc.getMms()->mpcTransport(
+                            midiAdapter.get().lock().get(),
+                            0,
+                            noteEvent->getVariationType(),
+                            noteEvent->getVariationValue(),
+                            eventFrame,
+                            noteEvent->getTick(),
+                            static_cast<int>(durationFrames));
                     
                     if (audioServer->isRealTime())
                     {
-                        auto note = ne->getNote();
+                        auto note = noteEvent->getNote();
                         auto program = mpc.getSampler()->getProgram(mpc.getDrum(drumIndex)->getProgram());
                         
                         int pad = program->getPadIndexFromNote(note);
@@ -139,19 +121,19 @@ void EventHandler::handleNoThru(const std::shared_ptr<Event>& event, Track* trac
                         
                         if (pad >= 0 && pad <= 15)
                         {
-                            int notifyVelo = ne->getVelocity();
+                            int notifyVelo = noteEvent->getVelocity();
                             
                             if (notifyVelo == 0)
                                 notifyVelo = 255;
                             
                             mpc.getHardware()->getPad(pad)->notifyObservers(notifyVelo);
 
-                            if (ne->getDuration() > 0)
+                            if (noteEvent->getDuration() > 0)
                             {
-                                const auto nFrames = SeqUtil::ticksToFrames(ne->getDuration(), sequencer->getTempo(), audioServer->getSampleRate());
-                                frameSeq->enqueueEventAfterNFrames([this, pad, ne, track]() {
+                                const auto nFrames = SeqUtil::ticksToFrames(noteEvent->getDuration(), sequencer->getTempo(), audioServer->getSampleRate());
+                                frameSeq->enqueueEventAfterNFrames([this, pad, noteEvent, track]() {
                                     mpc.getHardware()->getPad(pad)->notifyObservers(255);
-                                    midiOut(ne->getNoteOff(), track);
+                                    midiOut(noteEvent->getNoteOff(), track);
                                 }, static_cast<unsigned long>(nFrames));
                             }
                         }
@@ -160,9 +142,9 @@ void EventHandler::handleNoThru(const std::shared_ptr<Event>& event, Track* trac
             }
         }
     }
-    else if (me)
+    else if (mixerEvent)
     {
-        auto pad = me->getPad();
+        auto pad = mixerEvent->getPad();
         auto p = sampler->getProgram(sampler->getDrumBusProgramIndex(track->getBus()));
         auto mixer = p->getStereoMixerChannel(pad).lock();
         
@@ -184,10 +166,10 @@ void EventHandler::handleNoThru(const std::shared_ptr<Event>& event, Track* trac
             }
         }
         
-        if (me->getParameter() == 0)
-            mixer->setLevel(me->getValue());
-        else if (me->getParameter() == 1)
-            mixer->setPanning(me->getValue());
+        if (mixerEvent->getParameter() == 0)
+            mixer->setLevel(mixerEvent->getValue());
+        else if (mixerEvent->getParameter() == 1)
+            mixer->setPanning(mixerEvent->getValue());
     }
 }
 
