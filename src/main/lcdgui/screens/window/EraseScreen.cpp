@@ -80,8 +80,8 @@ void EraseScreen::function(int i)
 		break;
 	case 4:
 	{
-		auto startIndex = track - 1;
-		auto lastIndex = track - 1;
+		auto startIndex = track;
+		auto lastIndex = track;
 
 		if (startIndex < 0)
 		{
