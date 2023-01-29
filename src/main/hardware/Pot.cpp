@@ -21,7 +21,7 @@ void Pot::setValue(int i) {
 
 	if (label == "vol")
 	{
-		mpc.getAudioMidiServices()->setMasterLevel(i);
+		mpc.getAudioMidiServices()->setMainLevel(i);
 	}
 	else if (label == "rec")
 	{
@@ -34,7 +34,7 @@ void Pot::setValue(int i) {
 int Pot::getValue() {
 	if (label == "vol")
 	{
-		return mpc.getAudioMidiServices()->getMasterLevel();
+		return mpc.getAudioMidiServices()->getMainLevel();
 	}
 	else if (label == "rec")
 	{

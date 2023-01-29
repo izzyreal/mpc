@@ -123,8 +123,9 @@ namespace mpc::audiomidi
 
         std::shared_ptr<SoundRecorder> getSoundRecorder();
 		std::shared_ptr<SoundPlayer> getSoundPlayer();
-		void setMasterLevel(int i);
-		int getMasterLevel();
+		void setMainLevel(int i);
+		int getMainLevel();
+        void setMixerMasterLevel(int8_t dbValue);
 		void setRecordLevel(int i);
 		int getRecordLevel();
 		void muteMonitor(bool mute);

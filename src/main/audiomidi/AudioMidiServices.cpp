@@ -215,14 +215,14 @@ void AudioMidiServices::setupMixer()
 	setAssignableMixOutLevels();
 }
 
-void AudioMidiServices::setMasterLevel(int i)
+void AudioMidiServices::setMainLevel(int i)
 {
 	auto sc = mixer->getMixerControls().lock()->getStripControls("L-R").lock();
 	auto cc = std::dynamic_pointer_cast<ctoot::control::CompoundControl>(sc->find("Main").lock());
 	std::dynamic_pointer_cast<ctoot::mpc::MpcFaderControl>(cc->find("Level").lock())->setValue(i);
 }
 
-int AudioMidiServices::getMasterLevel() {
+int AudioMidiServices::getMainLevel() {
 	auto sc = mixer->getMixerControls().lock()->getStripControls("L-R").lock();
 	auto cc = std::dynamic_pointer_cast<ctoot::control::CompoundControl>(sc->find("Main").lock());
 	auto val = std::dynamic_pointer_cast<ctoot::mpc::MpcFaderControl>(cc->find("Level").lock())->getValue();
@@ -534,4 +534,12 @@ void AudioMidiServices::switchMidiControlMappingIfRequired()
 std::shared_ptr<MidiClockEmitter> AudioMidiServices::getMidiClockEmitter()
 {
     return midiClockEmitter;
+}
+
+void AudioMidiServices::setMixerMasterLevel(int8_t dbValue)
+{
+    for(auto& v : mms->getVoices())
+    {
+        v.lock()->setMasterLevel(dbValue);
+    }
 }

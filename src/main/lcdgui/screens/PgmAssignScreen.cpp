@@ -444,3 +444,8 @@ void PgmAssignScreen::update(moduru::observer::Observable* o, nonstd::any arg)
 		displaySoundGenerationMode();
 	}
 }
+
+void PgmAssignScreen::setPadAssign(bool isMaster)
+{
+    padAssign = isMaster;
+}

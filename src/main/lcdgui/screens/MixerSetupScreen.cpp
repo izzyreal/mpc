@@ -1,6 +1,8 @@
 #include "MixerSetupScreen.hpp"
 
-#include <lcdgui/screens/DrumScreen.hpp>
+#include "lcdgui/screens/DrumScreen.hpp"
+
+#include "audiomidi/AudioMidiServices.hpp"
 
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui;
@@ -59,27 +61,27 @@ void MixerSetupScreen::turnWheel(int i)
 {
 	init();
 
-	if (param.compare("stereomixsource") == 0)
+	if (param == "stereomixsource")
 	{
 		setStereoMixSourceDrum(i > 0);
 	}
-	else if (param.compare("indivfxsource") == 0)
+	else if (param == "indivfxsource")
 	{
 		setIndivFxSourceDrum(i > 0);
 	}
-	else if (param.compare("copypgmmixtodrum") == 0)
+	else if (param == "copypgmmixtodrum")
 	{
 		setCopyPgmMixToDrumEnabled(i > 0);
 	}
-	else if (param.compare("recordmixchanges") == 0)
+	else if (param == "recordmixchanges")
 	{
 		setRecordMixChangesEnabled(i > 0);
 	}
-	else if (param.compare("masterlevel") == 0)
+	else if (param == "masterlevel")
 	{
 		setMasterLevel(masterLevel + i);
 	}
-	else if (param.compare("fxdrum") == 0)
+	else if (param == "fxdrum")
 	{
 		setFxDrum(fxDrum + i);
 	}
@@ -98,7 +100,7 @@ void MixerSetupScreen::function(int i)
 	}
 }
 
-int MixerSetupScreen::getMasterLevel()
+int MixerSetupScreen::getMasterLevel() const
 {
 	return masterLevel;
 }
@@ -107,6 +109,9 @@ void MixerSetupScreen::setMasterLevel(int i)
 {
 	if (i < -13 || i > 2) return;
 	masterLevel = i;
+
+    mpc.getAudioMidiServices()->setMixerMasterLevel(masterLevelValues[masterLevel + 13]);
+
 	displayMasterLevel();
 }
 

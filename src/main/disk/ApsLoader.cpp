@@ -1,4 +1,5 @@
 #include "ApsLoader.hpp"
+#include "lcdgui/screens/PgmAssignScreen.hpp"
 
 #include <Mpc.hpp>
 #include <disk/AbstractDisk.hpp>
@@ -240,6 +241,11 @@ void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool head
     
     auto drumScreen = mpc.screens->get<DrumScreen>("drum");
     drumScreen->setPadToIntSound(globals->isPadToIntSoundEnabled());
+    mixerSetupScreen->setMasterLevel(globals->getMasterLevel());
+
+    auto pgmAssignScreen = mpc.screens->get<PgmAssignScreen>("program-assign");
+
+    pgmAssignScreen->setPadAssign(globals->isPadAssignMaster());
 }
 
 void ApsLoader::loadSound(mpc::Mpc& mpc,

@@ -27,7 +27,9 @@ namespace mpc::lcdgui::screens {
 		void open() override;
 		void close() override;
 
-	private:
+        void setPadAssign(bool isMaster);
+
+    private:
 		const std::vector<std::string> soundGenerationModes{ "NORMAL", "SIMULT", "VEL SW", "DCY SW" };
 		bool padAssign = false;
 		void displayPgm();

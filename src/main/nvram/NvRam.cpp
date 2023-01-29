@@ -93,7 +93,7 @@ void NvRam::saveVmpcSettings(mpc::Mpc& mpc)
     (char) (vmpcAutoSaveScreen->autoSaveOnExit),
     (char) (vmpcAutoSaveScreen->autoLoadOnStart),
     (char) (audioMidiServices->getRecordLevel()),
-    (char) (audioMidiServices->getMasterLevel()),
+    (char) (audioMidiServices->getMainLevel()),
     (char) (mpc.getHardware()->getSlider()->getValue()),
     (char) (vmpcSettingsScreen->autoConvertWavs),
     (char) (othersScreen->getTapAveraging()),
@@ -115,7 +115,7 @@ void NvRam::loadVmpcSettings(mpc::Mpc& mpc)
   if (!file.exists())
   {
     audioMidiServices->setRecordLevel(DEFAULT_REC_GAIN);
-    audioMidiServices->setMasterLevel(DEFAULT_MAIN_VOLUME);
+    audioMidiServices->setMainLevel(DEFAULT_MAIN_VOLUME);
     return;
   }
   
@@ -131,7 +131,7 @@ void NvRam::loadVmpcSettings(mpc::Mpc& mpc)
   if (bytes.size() > 2) vmpcAutoSaveScreen->autoSaveOnExit = bytes[2];
   if (bytes.size() > 3) vmpcAutoSaveScreen->autoLoadOnStart = bytes[3];
   if (bytes.size() > 4) audioMidiServices->setRecordLevel(bytes[4]);
-  if (bytes.size() > 5) audioMidiServices->setMasterLevel(bytes[5]);
+  if (bytes.size() > 5) audioMidiServices->setMainLevel(bytes[5]);
   if (bytes.size() > 6) mpc.getHardware()->getSlider()->setValue(bytes[6]);
   if (bytes.size() > 7) vmpcSettingsScreen->autoConvertWavs = bytes[7];
   if (bytes.size() > 8) othersScreen->setTapAveraging(bytes[8]);
