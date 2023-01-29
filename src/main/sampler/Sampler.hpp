@@ -148,7 +148,6 @@ private:
     unsigned char soundSortingType = 0;
     std::vector<std::string> padNames;
     std::vector<std::string> abcd = std::vector<std::string>{ "A", "B", "C", "D" };
-    std::vector<float> clickSample;
     std::shared_ptr<Sound> clickSound;
     std::vector<std::string> sortNames = std::vector<std::string>{ "MEMORY", "NAME", "SIZE" };
     std::vector<std::weak_ptr<Sound>> getUsedSounds();
