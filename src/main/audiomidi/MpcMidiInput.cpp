@@ -123,11 +123,15 @@ void MpcMidiInput::transport(MidiMessage *msg, int timeStamp)
         auto s = sequencer->isPlaying() ? sequencer->getCurrentlyPlayingSequence()
                                          : sequencer->getActiveSequence();
         auto track = s->getTrack(note->getTrack());
-        auto p = sampler->getProgram(sampler->getDrumBusProgramIndex(track->getBus()));
 
-        Util::setSliderNoteVariationParameters(mpc, note, p);
+        int pad = -1;
 
-        auto pad = p->getPadIndexFromNote(note->getNote());
+        if (track->getBus() > 0)
+        {
+            auto p = sampler->getProgram(sampler->getDrumBusProgramIndex(track->getBus()));
+            Util::setSliderNoteVariationParameters(mpc, note, p);
+            pad = p->getPadIndexFromNote(note->getNote());
+        }
 
         if (note->getVelocity() != 0 && track->getBus() > 0 && track->getIndex() < 64 &&
             mpc.getControls()->isTapPressed() && sequencer->isPlaying())

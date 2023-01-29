@@ -87,55 +87,64 @@ void EventHandler::handleNoThru(const std::shared_ptr<Event>& event, Track* trac
                     // This MIDI channel is part of a MIDI system that is internal to VMPC2000XL's sound player engine.
                     midiAdapter.process(noteEvent, drumIndex, newVelo);
 
-                    auto frameSeq = mpc.getAudioMidiServices()->getFrameSequencer();
-                    auto eventFrame = frameSeq->getEventFrameOffset();
-                    
-                    if (timeStamp != -1)
-                        eventFrame = timeStamp;
-
-                    auto pgmIndex = sampler->getDrumBusProgramIndex(drumIndex + 1);
-                    auto pgm = sampler->getProgram(pgmIndex);
-                    auto voiceOverlap = pgm->getNoteParameters(noteEvent->getNote())->getVoiceOverlap();
-                    auto duration = voiceOverlap == 2 ? noteEvent->getDuration() : -1;
                     auto audioServer = mpc.getAudioMidiServices()->getAudioServer();
-                    auto durationFrames = (duration == -1 || duration == 0) ?
-                            -1 : SeqUtil::ticksToFrames(duration, sequencer->getTempo(), audioServer->getSampleRate());
+                    auto frameSeq = mpc.getAudioMidiServices()->getFrameSequencer();
+                    auto isDrumNote = noteEvent->getNote() >= 35 && noteEvent->getNote() <= 98;
 
-                    mpc.getMms()->mpcTransport(
-                            midiAdapter.get().lock().get(),
-                            0,
-                            noteEvent->getVariationType(),
-                            noteEvent->getVariationValue(),
-                            eventFrame,
-                            noteEvent->getTick(),
-                            static_cast<int>(durationFrames));
-                    
+                    if (isDrumNote)
+                    {
+                        auto eventFrame = frameSeq->getEventFrameOffset();
+
+                        if (timeStamp != -1)
+                            eventFrame = timeStamp;
+
+                        auto pgmIndex = sampler->getDrumBusProgramIndex(drumIndex + 1);
+                        auto pgm = sampler->getProgram(pgmIndex);
+                        auto voiceOverlap = pgm->getNoteParameters(noteEvent->getNote())->getVoiceOverlap();
+                        auto duration = voiceOverlap == 2 ? noteEvent->getDuration() : -1;
+                        auto durationFrames = (duration == -1 || duration == 0) ?
+                                              -1 : SeqUtil::ticksToFrames(duration, sequencer->getTempo(), audioServer->getSampleRate());
+
+                        mpc.getMms()->mpcTransport(
+                                midiAdapter.get().lock().get(),
+                                0,
+                                noteEvent->getVariationType(),
+                                noteEvent->getVariationValue(),
+                                eventFrame,
+                                noteEvent->getTick(),
+                                static_cast<int>(durationFrames));
+                    }
+
                     if (audioServer->isRealTime())
                     {
                         auto note = noteEvent->getNote();
                         auto program = mpc.getSampler()->getProgram(mpc.getDrum(drumIndex)->getProgram());
-                        
+
                         int pad = program->getPadIndexFromNote(note);
                         int bank = mpc.getBank();
-                        pad -= bank * 16;
-                        
+
+                        pad -= pad == -1 ? 0 : bank * 16;
+
                         if (pad >= 0 && pad <= 15)
                         {
                             int notifyVelo = noteEvent->getVelocity();
-                            
+
                             if (notifyVelo == 0)
                                 notifyVelo = 255;
-                            
-                            mpc.getHardware()->getPad(pad)->notifyObservers(notifyVelo);
 
-                            if (noteEvent->getDuration() > 0)
-                            {
-                                const auto nFrames = SeqUtil::ticksToFrames(noteEvent->getDuration(), sequencer->getTempo(), audioServer->getSampleRate());
-                                frameSeq->enqueueEventAfterNFrames([this, pad, noteEvent, track]() {
+                            mpc.getHardware()->getPad(pad)->notifyObservers(notifyVelo);
+                        }
+
+                        if (noteEvent->getDuration() > 0)
+                        {
+                            const auto nFrames = SeqUtil::ticksToFrames(noteEvent->getDuration(), sequencer->getTempo(), audioServer->getSampleRate());
+                            frameSeq->enqueueEventAfterNFrames([this, pad, noteEvent, track]() {
+                                if (pad >= 0 && pad <= 15)
+                                {
                                     mpc.getHardware()->getPad(pad)->notifyObservers(255);
-                                    midiOut(noteEvent->getNoteOff(), track);
-                                }, static_cast<unsigned long>(nFrames));
-                            }
+                                }
+                                midiOut(noteEvent->getNoteOff(), track);
+                            }, static_cast<unsigned long>(nFrames));
                         }
                     }
                 }
