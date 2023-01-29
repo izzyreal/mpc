@@ -512,7 +512,7 @@ void BaseControls::rec()
     {
         return;
     }
-    
+
     controls->setRecPressed(true);
 
     auto hw = mpc.getHardware();
@@ -655,9 +655,6 @@ void BaseControls::playStart()
             ls->openScreen("sequencer");
         
         sequencer->recFromStart();
-        
-        if (!sequencer->isRecording())
-            return;
     }
     else if (controls->isOverDubPressed())
     {
@@ -665,9 +662,6 @@ void BaseControls::playStart()
             ls->openScreen("sequencer");
         
         sequencer->overdubFromStart();
-        
-        if (!sequencer->isOverDubbing())
-            return;
     }
     else
     {
