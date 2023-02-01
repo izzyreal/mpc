@@ -20,16 +20,16 @@ MidiClockEmitter::MidiClockEmitter(mpc::Mpc &mpcToUse) :
 
 void MidiClockEmitter::work(int nFrames)
 {
-//    for (int frameIndex = 0; frameIndex < nFrames; frameIndex++) {
-//        if (clock.proc()) {
-//            tickCounter++;
-//            if (tickCounter >= 4)
-//            {
-//                tickCounter = 0;
-//                sendMidiClockMsg(frameIndex);
-//            }
-//        }
-//    }
+    for (int frameIndex = 0; frameIndex < nFrames; frameIndex++) {
+        if (clock.proc()) {
+            tickCounter++;
+            if (tickCounter >= 4)
+            {
+                tickCounter = 0;
+                sendMidiClockMsg(frameIndex);
+            }
+        }
+    }
 }
 
 void MidiClockEmitter::sendMidiClockMsg(unsigned int frameOffset)

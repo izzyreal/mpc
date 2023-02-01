@@ -485,7 +485,8 @@ void Sequencer::play(bool fromStart)
 	}
 	else
 	{
-		ams->getFrameSequencer()->start();
+		int rate = ams->getAudioServer()->getSampleRate();
+		ams->getFrameSequencer()->start(rate);
 	}
 
     notifyObservers(std::string("play"));
@@ -598,6 +599,8 @@ void Sequencer::stop(int tick)
         }
         return;
     }
+
+    ams->getFrameSequencer()->sendMidiSyncMsg(ctoot::midi::core::ShortMessage::STOP);
 
     playedStepRepetitions = 0;
 	songMode = false;
@@ -1524,8 +1527,7 @@ void Sequencer::setOverdubbing(bool b)
 
 void Sequencer::playMetronomeTrack()
 {
-	if (isPlaying())
-    {
+	if (isPlaying()) {
 		return;
 	}
 
@@ -1535,16 +1537,16 @@ void Sequencer::playMetronomeTrack()
 	metronomeSeq->init(8);
 	metronomeSeq->setTimeSignature(0, 3, s->getNumerator(getCurrentBarIndex()), s->getDenominator(getCurrentBarIndex()));
 	metronomeSeq->setInitialTempo(getTempo());
+	auto lAms = mpc.getAudioMidiServices();
+	auto fs = lAms->getFrameSequencer();
 	playStartTick = 0;
-    mpc.getAudioMidiServices()->getFrameSequencer()->startMetronome();
+	fs->startMetronome(lAms->getAudioServer()->getSampleRate());
 }
 
 void Sequencer::stopMetronomeTrack()
 {
 	if (!metronomeOnly)
-    {
         return;
-    }
 	
     metronomeOnly = false;
 	mpc.getAudioMidiServices()->getFrameSequencer()->stop();
