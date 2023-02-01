@@ -4,7 +4,7 @@
 #include <lcdgui/screens/WithTimesAndNotes.hpp>
 
 namespace mpc::sequencer {
-	class FrameSeq;
+	class FrameSeqBase;
 	class Track;
 }
 
@@ -49,7 +49,7 @@ namespace mpc::lcdgui::screens {
 		friend class SequencerScreen;
 		friend class TransScreen;
 		friend class SecondSeqScreen;
-		friend class mpc::sequencer::FrameSeq;
+		friend class mpc::sequencer::FrameSeqBase;
 		friend class mpc::sequencer::Track;
 
 	};
