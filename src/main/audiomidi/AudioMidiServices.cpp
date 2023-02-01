@@ -10,7 +10,6 @@
 #include <audiomidi/SoundPlayer.hpp>
 #include <audiomidi/MonitorInputAdapter.hpp>
 #include <audiomidi/MpcMidiOutput.hpp>
-#include <audiomidi/MidiClockEmitter.hpp>
 
 #include <mpc/MpcVoice.hpp>
 #include <mpc/MpcBasicSoundPlayerChannel.hpp>
@@ -80,8 +79,7 @@ using namespace ctoot::audio::mixer;
 
 AudioMidiServices::AudioMidiServices(mpc::Mpc& mpcToUse)
 	: mpc(mpcToUse),
-    frameSeq(std::make_shared<mpc::sequencer::FrameSeq>(mpcToUse)),
-    midiClockEmitter(std::make_shared<MidiClockEmitter>(mpcToUse))
+    frameSeq(std::make_shared<mpc::sequencer::FrameSeq>(mpcToUse))
 {
 	AudioServices::scan();
 	ctoot::synth::SynthServices::scan();
@@ -95,6 +93,8 @@ void AudioMidiServices::start(const int inputCount, const int outputCount) {
 
 	server = std::make_shared<ExternalAudioServer>();
 	offlineServer = std::make_shared<NonRealTimeAudioServer>(server);
+
+    frameSeq->setSampleRate(offlineServer->getSampleRate());
 
 	soundRecorder = std::make_shared<SoundRecorder>(mpc);
 	soundPlayer = std::make_shared<SoundPlayer>();
@@ -142,7 +142,6 @@ void AudioMidiServices::start(const int inputCount, const int outputCount) {
 
 	cac = std::make_shared<CompoundAudioClient>();
 	cac->add(frameSeq.get());
-	cac->add(midiClockEmitter.get());
 	cac->add(mixer.get());
 
 	mixer->getStrip("66").lock()->setInputProcess(monitorInputAdapter);
@@ -482,9 +481,10 @@ void AudioMidiServices::changeBounceStateIfRequired()
         {
             std::vector<int> rates{ 44100, 48000, 88200 };
             auto rate = rates[static_cast<size_t>(directToDiskRecorderScreen->getSampleRate())];
-            getFrameSequencer()->start(rate);
+            frameSeq->setSampleRate(offlineServer->getSampleRate());
+            frameSeq->start();
 
-            if (getAudioServer()->isRealTime())
+            if (getAudioServer()->isRealTime() && server->getSampleRate() != rate)
             {
                 server->setSampleRate(rate);
                 getAudioServer()->setRealTime(false);
@@ -492,11 +492,13 @@ void AudioMidiServices::changeBounceStateIfRequired()
         }
         else if (directToDiskRecorderScreen->getRecord() != 4)
         {
-            getFrameSequencer()->start(static_cast<int>(server->getSampleRate()));
+            frameSeq->start();
         }
 
         for (auto& diskRecorder : diskRecorders)
+        {
             diskRecorder->start();
+        }
     }
     else if (!isBouncing() && wasBouncing)
     {
@@ -529,11 +531,6 @@ void AudioMidiServices::switchMidiControlMappingIfRequired()
             mpc.getActiveControls()->open();
         }
     }
-}
-
-std::shared_ptr<MidiClockEmitter> AudioMidiServices::getMidiClockEmitter()
-{
-    return midiClockEmitter;
 }
 
 void AudioMidiServices::setMixerMasterLevel(int8_t dbValue)

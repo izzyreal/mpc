@@ -43,7 +43,6 @@ namespace ctoot::synth {
 }
 
 namespace mpc::audiomidi {
-    class MidiClockEmitter;
 	class MpcMidiOutput;
 	class DirectToDiskSettings;
 	class DiskRecorder;
@@ -104,7 +103,6 @@ namespace mpc::audiomidi
 		std::vector<std::shared_ptr<ctoot::audio::server::IOAudioProcess>> inputProcesses;
 		std::vector<ctoot::audio::server::IOAudioProcess*> outputProcesses;
 		std::shared_ptr<mpc::sequencer::FrameSeq> frameSeq;
-		std::shared_ptr<mpc::audiomidi::MidiClockEmitter> midiClockEmitter;
 		std::vector<std::shared_ptr<DiskRecorder>> diskRecorders;
 		std::shared_ptr<SoundRecorder> soundRecorder;
 		std::shared_ptr<SoundPlayer> soundPlayer;
@@ -139,7 +137,6 @@ namespace mpc::audiomidi
 		void destroyServices();
 		bool prepareBouncing(DirectToDiskSettings* settings);
 		std::shared_ptr<mpc::sequencer::FrameSeq> getFrameSequencer();
-		std::shared_ptr<MidiClockEmitter> getMidiClockEmitter();
 		bool isBouncePrepared();
 
 	public:
