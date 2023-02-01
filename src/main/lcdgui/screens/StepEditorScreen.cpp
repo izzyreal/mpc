@@ -1379,7 +1379,7 @@ void StepEditorScreen::adhocPlayNoteEvent(const std::shared_ptr<mpc::sequencer::
 
     auto durationInFrames = SeqUtil::ticksToFrames(noteEvent->getDuration(), tempo, sampleRate);
 
-    auto eventAfterNFrames = [noteEvent, tr, mms, uniqueEnoughID](unsigned int frameIndex) {
+    auto eventAfterNFrames = [noteEvent, tr, mms, uniqueEnoughID]() {
         auto noteOff = noteEvent->getNoteOff();
         auto noteOffTick = noteOff->getTick();
         noteOff->setTick(-1);
@@ -1388,7 +1388,7 @@ void StepEditorScreen::adhocPlayNoteEvent(const std::shared_ptr<mpc::sequencer::
         midiAdapter2.process(noteOff, tr->getBus() - 1, 0);
         auto noteOffToSend = midiAdapter2.get();
         noteOff->setTick(noteOffTick);
-        mms->mpcTransport(noteOffToSend.lock().get(), 0, 0, 0, frameIndex, uniqueEnoughID, -1);
+        mms->mpcTransport(noteOffToSend.lock().get(), 0, 0, 0, 0, uniqueEnoughID, -1);
     };
 
     frameSeq->enqueueEventAfterNFrames(eventAfterNFrames, durationInFrames);

@@ -27,11 +27,12 @@ bool Clock::proc()
 	pd -= floor(pd);
 	if (tmp > pd) { 
 		tickN = -1;
+		cycleCount++;
 	}
 	vpd = pd; // get the value before the increment
 			  // if (ilpd > ipd) { }
-	pd += omega;
-    vpd = vpd * ppqn_f;
+	pd += omega; lpd = pd;
+	vpd = vpd * ppqn_f;
 	dinphase = vpd; // store this as a phase that cycles from 0 to 47.999
 	vpd -= floor(vpd);
 	if (lvpd > vpd)
@@ -45,12 +46,14 @@ bool Clock::proc()
 
 void Clock::reset()
 {
-    // more than 1.0
+	lpd = rec03; // more than 1.0
 	lvpd = rec03;
 	pd = 0.0;
 	vpd = 0.0;
 	dinphase = 0.0;
+	cycleCount = 0;
 	tickN = -1;
+	tickOffset = 0;
 }
 
 void Clock::zero()
@@ -58,9 +61,24 @@ void Clock::zero()
 	pd = dinphase / (ppqn_f);
 	dinphase = dinphase - vpd;
 	pd -= omega;
-	lvpd = -0.3;
+	lvpd = lpd = -0.3;
 }
 
-double Clock::getBpm() const {
+int Clock::getTickN() {
+	return tickN;
+}
+
+int Clock::getTickPosition() {
+	auto candidate = tickN + (cycleCount * 96) + tickOffset + 1;
+	return candidate < 0 ? 0 : candidate;
+}
+
+void Clock::setTick(int n) {
+	int pos = getTickPosition();
+	int diff = (n - pos) - 1;
+	tickOffset += diff;
+}
+
+double Clock::getBpm() {
 	return bpm;
 }

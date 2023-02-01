@@ -96,8 +96,6 @@ void AudioMidiServices::start(const int inputCount, const int outputCount) {
 	server = std::make_shared<ExternalAudioServer>();
 	offlineServer = std::make_shared<NonRealTimeAudioServer>(server);
 
-    frameSeq->setSampleRate(offlineServer->getSampleRate());
-
 	soundRecorder = std::make_shared<SoundRecorder>(mpc);
 	soundPlayer = std::make_shared<SoundPlayer>();
 
@@ -484,10 +482,9 @@ void AudioMidiServices::changeBounceStateIfRequired()
         {
             std::vector<int> rates{ 44100, 48000, 88200 };
             auto rate = rates[static_cast<size_t>(directToDiskRecorderScreen->getSampleRate())];
-            frameSeq->setSampleRate(offlineServer->getSampleRate());
-            frameSeq->start();
+            getFrameSequencer()->start(rate);
 
-            if (getAudioServer()->isRealTime() && server->getSampleRate() != rate)
+            if (getAudioServer()->isRealTime())
             {
                 server->setSampleRate(rate);
                 getAudioServer()->setRealTime(false);
@@ -495,13 +492,11 @@ void AudioMidiServices::changeBounceStateIfRequired()
         }
         else if (directToDiskRecorderScreen->getRecord() != 4)
         {
-            frameSeq->start();
+            getFrameSequencer()->start(static_cast<int>(server->getSampleRate()));
         }
 
         for (auto& diskRecorder : diskRecorders)
-        {
             diskRecorder->start();
-        }
     }
     else if (!isBouncing() && wasBouncing)
     {

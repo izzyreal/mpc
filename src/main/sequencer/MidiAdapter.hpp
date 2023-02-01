@@ -21,7 +21,7 @@ namespace mpc {
 		{
 
 		private:
-			std::shared_ptr<ctoot::midi::core::ShortMessage> message;
+			std::shared_ptr<ctoot::midi::core::ShortMessage> message{};
 
 		public:
 			void process(std::weak_ptr<Event> event, int channel, int newVelo);
