@@ -53,6 +53,8 @@ void MidiControlPersistence::loadDefaultMapping(mpc::Mpc &mpc)
     }
 
     labels.emplace_back("datawheel");
+    labels.emplace_back("datawheel-up");
+    labels.emplace_back("datawheel-down");
     labels.emplace_back("slider");
     labels.emplace_back("rec-gain");
     labels.emplace_back("main-volume");

@@ -1,6 +1,9 @@
 #include "VmpcSettingsScreen.hpp"
 
+#include "lcdgui/screens/dialog2/PopupScreen.hpp"
+
 using namespace mpc::lcdgui::screens;
+using namespace mpc::lcdgui::screens::dialog2;
 
 VmpcSettingsScreen::VmpcSettingsScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "vmpc-settings", layerIndex)
@@ -13,6 +16,7 @@ void VmpcSettingsScreen::open()
     display16LevelsEraseMode();
     displayAutoConvertWavs();
     displayMidiControlMode();
+    ls->setFunctionKeysArrangement(midiControlMode == MidiControlMode::ORIGINAL ? 1 : 0);
 }
 
 void VmpcSettingsScreen::function(int i)
@@ -29,6 +33,11 @@ void VmpcSettingsScreen::function(int i)
             openScreen("vmpc-disks");
             break;
         case 4:
+            if (midiControlMode == MidiControlMode::ORIGINAL)
+            {
+                return;
+            }
+
             openScreen("vmpc-midi");
             break;
     }
@@ -53,6 +62,7 @@ void VmpcSettingsScreen::turnWheel(int i)
     else if (param == "midi-control-mode")
     {
         setMidiControlMode(midiControlMode + i);
+        ls->setFunctionKeysArrangement(midiControlMode == MidiControlMode::ORIGINAL ? 1 : 0);
     }
 }
 
@@ -111,4 +121,9 @@ void VmpcSettingsScreen::setMidiControlMode(int i)
 void VmpcSettingsScreen::displayMidiControlMode()
 {
     findField("midi-control-mode")->setText(midiControlModeNames[midiControlMode]);
+}
+
+int VmpcSettingsScreen::getMidiControlMode()
+{
+    return midiControlMode;
 }

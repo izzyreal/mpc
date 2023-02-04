@@ -139,7 +139,9 @@ void VmpcMidiScreen::acceptLearnCandidate()
         return;
     }
 
-    activePreset->rows[row + rowOffset] = learnCandidate;
+    activePreset->rows[row + rowOffset].channel = learnCandidate.channel;
+    activePreset->rows[row + rowOffset].value = learnCandidate.value;
+    activePreset->rows[row + rowOffset].isNote = learnCandidate.isNote;
 }
 
 void VmpcMidiScreen::down()
@@ -265,6 +267,7 @@ void VmpcMidiScreen::function(int i)
             
             setLearning(!learning);
             learnCandidate.reset();
+
             updateRows();
             break;
         case 5:

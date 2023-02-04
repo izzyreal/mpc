@@ -1,4 +1,5 @@
 #include "VmpcDisksScreen.hpp"
+#include "VmpcSettingsScreen.hpp"
 
 #include <lcdgui/Parameter.hpp>
 #include <lcdgui/Screens.hpp>
@@ -44,6 +45,7 @@ void VmpcDisksScreen::open()
     mpc.getDiskController()->detectRawUsbVolumes();
 
     refreshConfig();
+    displayFunctionKeys();
 }
 
 void VmpcDisksScreen::function(int i)
@@ -60,8 +62,17 @@ void VmpcDisksScreen::function(int i)
             openScreen("vmpc-auto-save");
             break;
         case 4:
+        {
+            auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
+
+            if (vmpcSettingsScreen->getMidiControlMode() == VmpcSettingsScreen::MidiControlMode::ORIGINAL)
+            {
+                return;
+            }
+
             openScreen("vmpc-midi");
             break;
+        }
         case 5:
             auto popupScreen = mpc.screens->get<PopupScreen>("popup");
             openScreen("popup");
@@ -196,7 +207,11 @@ bool VmpcDisksScreen::hasConfigChanged()
 
 void VmpcDisksScreen::displayFunctionKeys()
 {
-    ls->setFunctionKeysArrangement(hasConfigChanged() ? 0 : 1);
+    auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
+    auto midiControlMode = vmpcSettingsScreen->getMidiControlMode();
+    auto newArrangement = midiControlMode == VmpcSettingsScreen::MidiControlMode::ORIGINAL ? 1 : 0;
+    newArrangement += hasConfigChanged() ? 0 : 1;
+    ls->setFunctionKeysArrangement(newArrangement);
 }
 
 void VmpcDisksScreen::displayUpAndDown()

@@ -1,4 +1,5 @@
 #include "VmpcAutoSaveScreen.hpp"
+#include "VmpcSettingsScreen.hpp"
 
 using namespace mpc::lcdgui::screens;
 
@@ -13,6 +14,10 @@ void VmpcAutoSaveScreen::open()
 
     displayAutoSaveOnExit();
     displayAutoLoadOnStart();
+
+    auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
+    auto midiControlMode = vmpcSettingsScreen->getMidiControlMode();
+    ls->setFunctionKeysArrangement(midiControlMode == VmpcSettingsScreen::MidiControlMode::ORIGINAL ? 1 : 0);
 }
 
 void VmpcAutoSaveScreen::function(int i)
@@ -29,8 +34,17 @@ void VmpcAutoSaveScreen::function(int i)
             openScreen("vmpc-disks");
             break;
         case 4:
+        {
+            auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
+
+            if (vmpcSettingsScreen->getMidiControlMode() == VmpcSettingsScreen::MidiControlMode::ORIGINAL)
+            {
+                return;
+            }
+
             openScreen("vmpc-midi");
             break;
+        }
     }
 }
 

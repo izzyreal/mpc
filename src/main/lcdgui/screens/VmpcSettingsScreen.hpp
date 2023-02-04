@@ -23,6 +23,8 @@ namespace mpc::lcdgui::screens
 
 		void open() override;
         void function(int) override;
+
+        int getMidiControlMode();
         
 	private:
 		const std::vector<std::string> initialPadMappingNames{ "VMPC2000XL", "ORIGINAL" };
