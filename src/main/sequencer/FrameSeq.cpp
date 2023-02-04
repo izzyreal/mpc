@@ -12,7 +12,6 @@ void FrameSeq::work(int nFrames)
 {
     const bool isRunningAtStartOfBuffer = running.load();
 
-    updateTimeDisplay(nFrames);
     processTempoChange();
 
     auto seq = sequencer->getCurrentlyPlayingSequence();
@@ -44,9 +43,12 @@ void FrameSeq::work(int nFrames)
 
             if (sequencer->isCountingIn())
             {
+                sequencerPlayTickCounter++;
                 stopCountingInIfRequired();
                 continue;
             }
+
+            updateTimeDisplay();
 
             if (sequencerPlayTickCounter >= seq->getLastTick() - 1 &&
                 !sequencer->isSongModeEnabled() &&

@@ -208,8 +208,6 @@ bool Sequence::isUsed()
 
 void Sequence::init(int newLastBarIndex)
 {
-	used = true;
-
 	auto userScreen = mpc.screens->get<UserScreen>("user");
 	initialTempo = userScreen->tempo;
 	loopEnabled = userScreen->loop;
@@ -227,6 +225,7 @@ void Sequence::init(int newLastBarIndex)
 	initLoop();
     
 	setTimeSignature(0, getLastBarIndex(), userScreen->timeSig.getNumerator(), userScreen->timeSig.getDenominator());
+    used = true;
 }
 
 void Sequence::setTimeSignature(int firstBar, int tsLastBar, int num, int den)

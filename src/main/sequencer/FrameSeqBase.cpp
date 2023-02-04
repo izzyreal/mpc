@@ -125,11 +125,9 @@ unsigned int FrameSeqBase::getTickPosition() const
 
 void FrameSeqBase::move(int newTickPos)
 {
-    // Ugly hack to make sure the expected clock position is shown when
-    // sequencer->move(...) notifies observers.
-
-    sequencer->move(newTickPos);
     sequencerPlayTickCounter = newTickPos;
+    sequencer->move(newTickPos);
+    updateTimeDisplay();
 }
 
 std::shared_ptr<Sequence> FrameSeqBase::switchToNextSequence()
@@ -419,19 +417,12 @@ void FrameSeqBase::processNoteRepeat()
     }
 }
 
-void FrameSeqBase::updateTimeDisplay(unsigned int nFrames)
+void FrameSeqBase::updateTimeDisplay()
 {
-    frameCounter += static_cast<int>(nFrames);
-
-    if (frameCounter > 2048)
+    if (!sequencer->isCountingIn() && !metronome)
     {
-        if (!sequencer->isCountingIn() && !metronome)
-        {
-            sequencer->notifyTimeDisplayRealtime();
-            sequencer->notifyObservers(std::string("timesignature"));
-        }
-
-        frameCounter = 0;
+        sequencer->notifyTimeDisplayRealtime();
+        sequencer->notifyObservers(std::string("timesignature"));
     }
 }
 

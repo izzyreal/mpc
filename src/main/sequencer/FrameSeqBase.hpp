@@ -77,7 +77,7 @@ namespace mpc::sequencer {
 
         unsigned long long sequencerPlayTickCounter = 0;
 
-        void updateTimeDisplay(unsigned int nFrames);
+        void updateTimeDisplay();
 
         void processTempoChange();
 
@@ -114,7 +114,6 @@ namespace mpc::sequencer {
         std::shared_ptr<mpc::lcdgui::screens::SongScreen> songScreen;
 
         mpc::Mpc &mpc;
-        int frameCounter = 0;
         unsigned char midiClockTickCounter = 0;
         bool sequencerShouldStartPlayingOnNextLock = false;
         bool wasRunning = false;
