@@ -1342,7 +1342,14 @@ int Sequencer::getTickPosition()
 
 std::shared_ptr<Sequence> Sequencer::getCurrentlyPlayingSequence()
 {
-	return sequences[getCurrentlyPlayingSequenceIndex()];
+    auto seqIndex = getCurrentlyPlayingSequenceIndex();
+
+    if (seqIndex == -1)
+    {
+        return {};
+    }
+
+	return sequences[seqIndex];
 }
 
 void Sequencer::setActiveTrackIndex(int i)
@@ -1353,9 +1360,19 @@ void Sequencer::setActiveTrackIndex(int i)
 
 int Sequencer::getCurrentlyPlayingSequenceIndex()
 {
-	auto songScreen = mpc.screens->get<SongScreen>("song");
-	auto songSeqIndex = songMode ? songs[songScreen->getActiveSongIndex()]->getStep(songScreen->getOffset() + 1).lock()->getSequence() : -1;
-	return songMode ? songSeqIndex : currentlyPlayingSequenceIndex;
+	if (songMode)
+    {
+        auto songScreen = mpc.screens->get<SongScreen>("song");
+        auto song = songs[songScreen->getActiveSongIndex()];
+        if (!song->isUsed())
+        {
+            return -1;
+        }
+        auto songSeqIndex = songMode ? song->getStep(songScreen->getOffset() + 1).lock()->getSequence() : -1;
+        return songSeqIndex;
+    }
+
+	return currentlyPlayingSequenceIndex;
 }
 
 void Sequencer::setCurrentlyPlayingSequenceIndex(int i)
