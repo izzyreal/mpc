@@ -25,6 +25,8 @@ void FrameSeq::work(int nFrames)
             continue;
         }
 
+        processSampleRateChange();
+
         tickFrameOffset = frameIndex;
 
         displayPunchRects();

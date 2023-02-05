@@ -56,6 +56,7 @@ FrameSeqBase::FrameSeqBase(mpc::Mpc& mpc)
           msg(std::make_shared<ShortMessage>())
 {
     msg->setMessage(ShortMessage::TIMING_CLOCK);
+    clock.init(requestedSampleRate);
 }
 
 void FrameSeqBase::start() {
@@ -473,7 +474,7 @@ void FrameSeqBase::enqueueMidiSyncStart1msBeforeNextClock()
 
 void FrameSeqBase::setSampleRate(unsigned int sampleRate)
 {
-    clock.init(sampleRate);
+    requestedSampleRate = sampleRate;
 }
 
 void FrameSeqBase::processEventsAfterNFrames(int frameIndex)
@@ -528,4 +529,14 @@ bool FrameSeqBase::processTransport(bool isRunningAtStartOfBuffer, int frameInde
     }
 
     return sequencerShouldPlay;
+}
+
+void FrameSeqBase::processSampleRateChange()
+{
+    if (clock.getSampleRate() != requestedSampleRate)
+    {
+        auto bpm = clock.getBpm();
+        clock.init(requestedSampleRate);
+        clock.set_bpm(bpm);
+    }
 }

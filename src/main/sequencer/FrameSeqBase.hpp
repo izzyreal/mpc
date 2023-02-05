@@ -66,6 +66,7 @@ namespace mpc::sequencer {
         explicit FrameSeqBase(mpc::Mpc &mpc);
 
         std::atomic<bool> running{false};
+        std::atomic_int32_t requestedSampleRate{44100};
         Clock clock;
         std::shared_ptr<Sequencer> sequencer;
         bool metronome = false;
@@ -80,6 +81,8 @@ namespace mpc::sequencer {
         void updateTimeDisplay();
 
         void processTempoChange();
+
+        void processSampleRateChange();
 
         // Has to be called exactly once for each frameIndex
         void processEventsAfterNFrames(int frameIndex);
