@@ -91,8 +91,6 @@ void SequencerScreen::open()
 
 	auto punchScreen = mpc.screens->get<PunchScreen>("punch");
 
-	findChild("function-keys")->Hide(punchScreen->on || (mpc.getControls()->isErasePressed() && sequencer->isRecordingOrOverdubbing()));
-
 	if (sequencer->isSecondSequenceEnabled())
 		findBackground()->setName("sequencer-2nd");
 	else if (punchScreen->on && !sequencer->isRecordingOrOverdubbing())
@@ -107,7 +105,8 @@ void SequencerScreen::open()
     const auto footerIsInvisible = !mpc.getControls()->isNoteRepeatLocked() && !(mpc.getControls()->isErasePressed() && sequencer->isRecordingOrOverdubbing());
     
     findChild("footer-label")->Hide(footerIsInvisible);
-    findChild("function-keys")->Hide(!footerIsInvisible);
+
+    findChild("function-keys")->Hide(!footerIsInvisible || punchScreen->on || (mpc.getControls()->isErasePressed() && sequencer->isRecordingOrOverdubbing()));
 }
 
 void SequencerScreen::erase()
@@ -679,7 +678,10 @@ void SequencerScreen::turnWheel(int i)
 	}
 	else if (param == "bars")
 	{
-		openScreen("change-bars-2");
+        if (!sequencer->isPlaying())
+        {
+            openScreen("change-bars-2");
+        }
 	}
 	else if (param == "tempo")
 	{
