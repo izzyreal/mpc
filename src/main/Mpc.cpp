@@ -68,21 +68,27 @@ Mpc::Mpc()
         Paths::autoSavePath()
     };
 
-    for (auto& p : requiredPaths) {
+    auto fs = cmrc::mpc::get_filesystem();
+
+    for (auto& p : requiredPaths)
+    {
         if (!fs::exists(p))
         {
             fs::create_directories(p);
+        }
 
-            if (p == Paths::midiControlPresetsPath())
+        if (p == Paths::midiControlPresetsPath())
+        {
+            for (auto &&entry: fs.iterate_directory("midicontrolpresets"))
             {
-                auto fs = cmrc::mpc::get_filesystem();
+                if (entry.is_directory()) continue;
 
-                for (auto&& entry : fs.iterate_directory("midicontrolpresets"))
+                auto path = fs::path(p + entry.filename());
+
+                if (!fs::exists(path))
                 {
-                    if (entry.is_directory()) continue;
                     auto file = fs.open("midicontrolpresets/" + entry.filename());
-                    char* data = (char*) std::string_view(file.begin(), file.end() - file.begin()).data();
-                    auto path = fs::path(p + entry.filename());
+                    char *data = (char *) std::string_view(file.begin(), file.end() - file.begin()).data();
                     auto presetStream = moduru::file::FileUtil::fopenw(path.string(), "wb");
                     std::fwrite(data, sizeof data[0], file.size(), presetStream);
                     std::fclose(presetStream);
