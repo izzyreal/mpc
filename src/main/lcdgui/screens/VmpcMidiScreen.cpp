@@ -82,19 +82,30 @@ void VmpcMidiScreen::open()
     auto screen = mpc.screens->get<VmpcDiscardMappingChangesScreen>("vmpc-discard-mapping-changes");
 
     screen->discardAndLeave = [this](){
-        this->activePreset = this->uneditedActivePresetCopy;
-        this->uneditedActivePresetCopy = std::make_shared<MidiControlPreset>();
+        activePreset = std::make_shared<MidiControlPreset>();
+
+        for (auto& presetRow : uneditedActivePresetCopy->rows)
+        {
+            activePreset->rows.emplace_back(presetRow);
+        }
+
+        uneditedActivePresetCopy = std::make_shared<MidiControlPreset>();
     };
 
     screen->saveAndLeave = [this](){
-        this->uneditedActivePresetCopy = std::make_shared<MidiControlPreset>();
+        uneditedActivePresetCopy = std::make_shared<MidiControlPreset>();
     };
 
     screen->stayScreen = "vmpc-midi";
 
     if (ls->getPreviousScreenName() != "vmpc-discard-mapping-changes")
     {
-        uneditedActivePresetCopy = activePreset;
+        uneditedActivePresetCopy = std::make_shared<MidiControlPreset>();
+
+        for (auto& presetRow : activePreset->rows)
+        {
+            uneditedActivePresetCopy->rows.emplace_back(presetRow);
+        }
     }
 
     findChild<Label>("up")->setText("\u00C7");
