@@ -30,6 +30,12 @@ void MidiDeviceDetector::start(mpc::Mpc &mpc)
         while (running)
         {
             std::set<std::string> allCurrentNames;
+            
+            if (mpc.getLayeredScreen()->getCurrentScreenName() == "vmpc-continue-previous-session")
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(500));
+                continue;
+            }
 
             for (int i = 0; i < rtMidiIn->getPortCount(); i++)
             {
@@ -41,25 +47,30 @@ void MidiDeviceDetector::start(mpc::Mpc &mpc)
             {
                 if (deviceNames.emplace(name).second)
                 {
-                    if (name.find("MPD") != std::string::npos)
+                    MLOG("A new MIDI device was connected: " + name);
+
+                    std::string path;
+                    auto knownControllerDetectedScreen = mpc.screens->get<VmpcKnownControllerDetectedScreen>(
+                            "vmpc-known-controller-detected");
+
+                    if (name.find("MPD218") != std::string::npos)
                     {
-                        moduru::file::File f(Paths::midiControlPresetsPath() + "MPD218.vmp", {});
-                        auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
-                        mpc.getDisk()->readMidiControlPreset(f,
-                                vmpcMidiScreen->switchToPreset);
-                        auto knownControllerDetectedScreen = mpc.screens->get<VmpcKnownControllerDetectedScreen>(
-                                "vmpc-known-controller-detected");
+                        path = Paths::midiControlPresetsPath() + "MPD218.vmp";
                         knownControllerDetectedScreen->controllerName = "MPD218";
+                    }
+                    else if (name.find("iRig PADS") != std::string::npos)
+                    {
+                        path = Paths::midiControlPresetsPath() + "iRig_PADS.vmp";
+                        knownControllerDetectedScreen->controllerName = "iRig PADS";
+                    }
+
+                    if (!path.empty())
+                    {
+                        moduru::file::File f(path, {});
+                        auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
+                        mpc.getDisk()->readMidiControlPreset(f, vmpcMidiScreen->switchToPreset);
                         mpc.getLayeredScreen()->openScreen("vmpc-known-controller-detected");
                     }
-                }
-            }
-
-            for (auto &name: deviceNames)
-            {
-                if (allCurrentNames.find(name) == allCurrentNames.end())
-                {
-                    // TODO handle remove MIDI device
                 }
             }
 
