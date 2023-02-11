@@ -30,7 +30,7 @@ void MidiDeviceDetector::start(mpc::Mpc &mpc)
         while (running)
         {
             std::set<std::string> allCurrentNames;
-            
+
             if (mpc.getLayeredScreen()->getCurrentScreenName() == "vmpc-continue-previous-session")
             {
                 std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -53,7 +53,12 @@ void MidiDeviceDetector::start(mpc::Mpc &mpc)
                     auto knownControllerDetectedScreen = mpc.screens->get<VmpcKnownControllerDetectedScreen>(
                             "vmpc-known-controller-detected");
 
-                    if (name.find("MPD218") != std::string::npos)
+                    if (name.find("MPD16") != std::string::npos)
+                    {
+                        path = Paths::midiControlPresetsPath() + "MPD16.vmp";
+                        knownControllerDetectedScreen->controllerName = "MPD16";
+                    }
+                    else if (name.find("MPD218") != std::string::npos)
                     {
                         path = Paths::midiControlPresetsPath() + "MPD218.vmp";
                         knownControllerDetectedScreen->controllerName = "MPD218";
