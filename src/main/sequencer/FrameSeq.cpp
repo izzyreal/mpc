@@ -12,8 +12,6 @@ void FrameSeq::work(int nFrames)
 {
     const bool isRunningAtStartOfBuffer = running.load();
 
-    processTempoChange();
-
     auto seq = sequencer->getCurrentlyPlayingSequence();
 
     for (int frameIndex = 0; frameIndex < nFrames; frameIndex++)
@@ -29,13 +27,13 @@ void FrameSeq::work(int nFrames)
 
         tickFrameOffset = frameIndex;
 
-        displayPunchRects();
-
         const bool sequencerShouldPlay = processTransport(isRunningAtStartOfBuffer, frameIndex);
 
         if (sequencerShouldPlay)
         {
             triggerClickIfNeeded();
+            processTempoChange();
+            displayPunchRects();
 
             if (metronome)
             {
