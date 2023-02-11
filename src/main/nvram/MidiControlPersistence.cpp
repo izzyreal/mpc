@@ -39,6 +39,27 @@ void MidiControlPersistence::restoreLastState(mpc::Mpc& mpc)
     }
 
     f.close();
+
+    {
+        // Temporary hack introduced in v0.5.0.1 (v0.5.0-RC1) to address the fact
+        // that people have persisted the insane default preset that was introduced
+        // by v0.5.0.0 (v0.5.0-RC0). We check if at least 4 of the pad mappings are
+        // bad, and if yes, we load the new and sane default mapping.
+        int badMappingCounter = 0;
+
+        auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
+        auto &rows = vmpcMidiScreen->activePreset->rows;
+
+        for (auto &r: rows)
+        {
+            if (!r.label.length() >= 4 || r.label.substr(0, 4) != "pad-") continue;
+
+            const bool isBadOldDefault = r.isNote == false || r.value == -1;
+            if (isBadOldDefault) badMappingCounter += 1;
+        }
+
+        if (badMappingCounter >= 4) loadDefaultMapping(mpc);
+    }
 }
 
 void MidiControlPersistence::loadDefaultMapping(mpc::Mpc &mpc)
@@ -70,6 +91,24 @@ void MidiControlPersistence::loadDefaultMapping(mpc::Mpc &mpc)
     for (auto& label : labels)
     {
         MidiControlCommand command {label, false, -1, -1 };
+
+        if (label.length() >= 4 && label.substr(0, 4) == "pad-")
+        {
+            char pad = 1;
+
+            try {
+                const int numberStringWidth = label.length() == 5 ? 1 : 2;
+                pad = stoi(label.substr(4, numberStringWidth));
+            } catch (const std::exception&) {}
+
+            command.isNote = true;
+            command.value = 34 + pad;
+        }
+        else if (label == "slider")
+        {
+            command.value = 7;
+        }
+
         vmpcMidiScreen->updateOrAddActivePresetCommand(command);
     }
 }
