@@ -319,17 +319,5 @@ void AutoSave::storeAutoSavedState(mpc::Mpc &mpc)
         stream.close();
     };
 
-    if (vmpcAutoSaveScreen->getAutoSaveOnExit() == 1)
-    {
-        // ASK
-//        auto vmpcContinuePreviousSessionScreen = mpc.screens->get<VmpcContinuePreviousSessionScreen>(
-//                "vmpc-continue-previous-session");
-//        vmpcContinuePreviousSessionScreen->setRestoreAutoSavedStateAction(restoreAutoSavedStateAction);
-//        mpc.getLayeredScreen()->openScreen("vmpc-continue-previous-session");
-//        return;
-    }
-
-    // ALWAYS
-
     storeAutoSavedStateAction();
 }

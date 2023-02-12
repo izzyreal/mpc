@@ -129,6 +129,10 @@ void NvRam::loadVmpcSettings(mpc::Mpc& mpc)
   if (bytes.size() > 0) vmpcSettingsScreen->initialPadMapping = bytes[0];
   if (bytes.size() > 1) vmpcSettingsScreen->_16LevelsEraseMode = bytes[1];
   if (bytes.size() > 2) vmpcAutoSaveScreen->autoSaveOnExit = bytes[2];
+
+  // I've removed Ask mode out of the equation, so any auto-persisted values over 1 are now invalid.
+  if (vmpcAutoSaveScreen->autoSaveOnExit == 2) vmpcAutoSaveScreen->autoSaveOnExit = 1;
+
   if (bytes.size() > 3) vmpcAutoSaveScreen->autoLoadOnStart = bytes[3];
   if (bytes.size() > 4) audioMidiServices->setRecordLevel(bytes[4]);
   if (bytes.size() > 5) audioMidiServices->setMainLevel(bytes[5]);

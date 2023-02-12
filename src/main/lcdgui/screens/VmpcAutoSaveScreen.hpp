@@ -18,10 +18,10 @@ public:
     void function(int) override;
     
 private:
-    const std::vector<std::string> autoSaveOnExitNames{ "Disabled", "Ask", "Enabled" };
+    const std::vector<std::string> autoSaveOnExitNames{ "Disabled", "Enabled" };
     const std::vector<std::string> autoLoadOnStartNames{ "Disabled", "Ask", "Enabled" };
     
-    int autoSaveOnExit = 2;
+    int autoSaveOnExit = 1;
     int autoLoadOnStart = 1;
     
     void displayAutoSaveOnExit();
