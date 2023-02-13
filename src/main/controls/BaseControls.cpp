@@ -976,7 +976,9 @@ const std::vector<std::string> BaseControls::allowTransportScreens {
     "velo-env-filter",
     "velo-pitch",
     "mute-assign",
-    "trans"
+    "trans",
+    "mixer",
+    "mixer-setup"
 };
 
 const std::vector<std::string> BaseControls::samplerScreens {
