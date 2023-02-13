@@ -52,7 +52,7 @@ void MidiControlPersistence::restoreLastState(mpc::Mpc& mpc)
 
         for (auto &r: rows)
         {
-            if (!r.label.length() >= 4 || r.label.substr(0, 4) != "pad-") continue;
+            if (r.label.length() < 4 || r.label.substr(0, 4) != "pad-") continue;
 
             const bool isBadOldDefault = r.isNote == false || r.value == -1;
             if (isBadOldDefault) badMappingCounter += 1;
