@@ -123,8 +123,10 @@ void TrimScreen::turnWheel(int i)
 
 	auto sound = sampler->getSound();
 
-	if (param == "" || !sound)
-		return;
+	if (param.empty() || !sound)
+    {
+        return;
+    }
 
 	auto const oldLength = sound->getEnd() - sound->getStart();
 	
@@ -146,7 +148,12 @@ void TrimScreen::turnWheel(int i)
 		
 		displaySt();
 
-		if (smplLngthFix)
+        if (sound->getEnd() == sound->getStart())
+        {
+            displayEnd();
+        }
+
+        if (smplLngthFix)
 		{
 			sound->setEnd(sound->getStart() + oldLength);
 			displayEnd();
@@ -157,17 +164,25 @@ void TrimScreen::turnWheel(int i)
 	else if (param == "end")
 	{
 		if (smplLngthFix && sound->getEnd() + soundInc - oldLength < 0)
-			return;
+        {
+            return;
+        }
 		
 		sound->setEnd(sound->getEnd() + soundInc);
 		
 		displayEnd();
+
+        if (sound->getEnd() == sound->getStart())
+        {
+            displaySt();
+        }
 
 		if (smplLngthFix)
 		{
 			sound->setStart(sound->getEnd() - oldLength);
 			displaySt();
 		}
+
 		displayWave();
 	}
 	else if (param == "view")
@@ -204,7 +219,9 @@ void TrimScreen::turnWheel(int i)
 void TrimScreen::setSlider(int i)
 {
 	if (!mpc.getControls()->isShiftPressed())
-		return;
+    {
+        return;
+    }
     
 	init();
 
@@ -222,7 +239,12 @@ void TrimScreen::setSlider(int i)
 		sound->setStart(candidatePos);
 		displaySt();
 
-		if (smplLngthFix)
+        if (sound->getEnd() == sound->getStart())
+        {
+            displayEnd();
+        }
+
+        if (smplLngthFix)
 		{
 			sound->setEnd(sound->getStart() + oldLength);
 			displayEnd();
@@ -240,7 +262,12 @@ void TrimScreen::setSlider(int i)
 		sound->setEnd(candidatePos);
 		displayEnd();
 
-		if (smplLngthFix)
+        if (sound->getEnd() == sound->getStart())
+        {
+                displaySt();
+        }
+
+        if (smplLngthFix)
 		{
 			sound->setStart(sound->getEnd() - oldLength);
 			displaySt();
