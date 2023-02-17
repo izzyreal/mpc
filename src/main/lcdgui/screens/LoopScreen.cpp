@@ -53,16 +53,16 @@ void LoopScreen::openWindow()
 {
 	init();
 	
-	if (param.compare("snd") == 0)
+	if (param == "snd")
 	{
 		sampler->setPreviousScreenName("loop");
 		openScreen("sound");
 	}
-	else if (param.compare("to") == 0)
+	else if (param == "to")
 	{
 		openScreen("loop-to-fine");
 	}
-	else if (param.compare("endlength") == 0 || param.compare("endlengthvalue") == 0)
+	else if (param == "endlength" || param == "endlengthvalue")
 	{
 		openScreen("loop-end-fine");
 	}
@@ -119,8 +119,10 @@ void LoopScreen::turnWheel(int i)
     auto soundInc = getSoundIncrement(i);
 	auto sound = sampler->getSound();
 
-	if (param == "" || !sound)
-		return;
+	if (param.empty() || !sound)
+    {
+        return;
+    }
 
 	auto const oldLoopLength = sound->getEnd() - sound->getLoopTo();
     
@@ -130,12 +132,16 @@ void LoopScreen::turnWheel(int i)
 	auto field = findField(param);
 	
 	if (field->isSplit())
-		soundInc = field->getSplitIncrement(i >= 0);
+    {
+        soundInc = field->getSplitIncrement(i >= 0);
+    }
 
 	if (field->isTypeModeEnabled())
-		field->disableTypeMode();
+    {
+        field->disableTypeMode();
+    }
 
-	if (param.compare("to") == 0)
+	if (param == "to")
 	{
 		auto candidateLoopTo = sound->getLoopTo() + soundInc;
 		auto candidateEnd = candidateLoopTo + oldLoopLength;
@@ -156,21 +162,25 @@ void LoopScreen::turnWheel(int i)
 		}
 		
 		if (loopFix)
-			sound->setEnd(candidateEnd);
+        {
+            sound->setEnd(candidateEnd);
+        }
 
 		displayEndLength();
 		displayEndLengthValue();
 		displayTo();
 		displayWave();
     }
-    else if (param.compare("endlengthvalue") == 0)
+    else if (param == "endlengthvalue")
 	{
 		if (endSelected)
 		{
 			auto endCandidate = sound->getEnd() + soundInc;
 
 			if (endCandidate > sound->getFrameCount())
-				endCandidate = sound->getFrameCount();
+            {
+                endCandidate = sound->getFrameCount();
+            }
 
 			sound->setEnd(endCandidate);
 
@@ -204,23 +214,23 @@ void LoopScreen::turnWheel(int i)
 		displayTo();
 		displayWave();
     }
-	else if (param.compare("playx") == 0)
+	else if (param == "playx")
 	{
 		sampler->setPlayX(sampler->getPlayX() + i);
 		displayPlayX();
 	}
-	else if (param.compare("loop") == 0)
+	else if (param == "loop")
 	{
         sampler->getSound()->setLoopEnabled(i > 0);
         displayLoop();
 	}
-	else if (param.compare("endlength") == 0)
+	else if (param == "endlength")
 	{
 		setEndSelected(i > 0);
 		displayEndLength();
 		displayEndLengthValue();
 	}
-	else if (param.compare("snd") == 0 && i > 0)
+	else if (param == "snd" && i > 0)
 	{
 		sampler->selectNextSound();
 		displaySnd();
@@ -231,7 +241,7 @@ void LoopScreen::turnWheel(int i)
 		displayTo();
 		displayWave();
 	}
-	else if (param.compare("snd") == 0 && i < 0)
+	else if (param == "snd" && i < 0)
 	{
 		sampler->selectPreviousSound();
 		displaySnd();
@@ -259,7 +269,7 @@ void LoopScreen::setSlider(int i)
 
 	auto candidatePos = (int)((i / 124.0) * sound->getFrameCount());
 	
-	if (param.compare("to") == 0)
+	if (param == "to")
 	{
 		if (candidatePos < 0)
 			candidatePos = 0;
@@ -277,7 +287,7 @@ void LoopScreen::setSlider(int i)
 		displayTo();
 		displayWave();
 	}
-	else if (param.compare("endlengthvalue") == 0)
+	else if (param == "endlengthvalue")
 	{
 		auto maxEndPos = lengthFix ? oldLength : 0;
 
@@ -328,7 +338,7 @@ void LoopScreen::pressEnter()
 
 	if (candidate != INT_MAX)
 	{
-		if (param.compare("to") == 0)
+		if (param == "to")
 		{
 			if (loopLngthFix && candidate + oldLength > sound->getFrameCount())
 				candidate = sound->getFrameCount() - oldLength;
@@ -346,9 +356,9 @@ void LoopScreen::pressEnter()
 			displayEndLength();
 			displayWave();
 		}
-		else if (param.compare("endlengthvalue") == 0 || param.compare("end") == 0)
+		else if (param == "endlengthvalue" || param == "end")
 		{
-			if ((endSelected && param.compare("endlengthvalue") == 0) || param.compare("end") == 0)
+			if ((endSelected && param == "endlengthvalue") || param == "end")
 			{
 				if (loopLngthFix && candidate - oldLength < 0)
 					candidate = oldLength;
@@ -390,13 +400,17 @@ void LoopScreen::displaySnd()
 		return;
 	}
 
-	if (ls->getFocus().compare("dummy") == 0)
-		ls->setFocus("snd");
+	if (ls->getFocus() == "dummy")
+    {
+        ls->setFocus("snd");
+    }
 
 	auto sampleName = sound->getName();
 
 	if (!sound->isMono())
-		sampleName = StrUtil::padRight(sampleName, " ", 16) + "(ST)";
+    {
+        sampleName = StrUtil::padRight(sampleName, " ", 16) + "(ST)";
+    }
 
 	findField("snd")->setText(sampleName);
 }
