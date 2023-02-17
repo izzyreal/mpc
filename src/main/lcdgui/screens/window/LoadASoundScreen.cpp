@@ -152,11 +152,11 @@ void LoadASoundScreen::keepSound()
             openScreen("load");
         };
 
-        const auto initializeNameScreen = [this, &actionAfterLoadingSound, &previewSound]{
+        const auto initializeNameScreen = [this, actionAfterLoadingSound, previewSound]{
             auto nameScreen = mpc.screens->get<NameScreen>("name");
 
-            auto enterAction = [this, &actionAfterLoadingSound, &previewSound](std::string& nameScreenName){
-                if (sampler->checkExists(nameScreenName))
+            auto enterAction = [this, actionAfterLoadingSound, previewSound](std::string& nameScreenName){
+                if (sampler->checkExists(nameScreenName) >= 0)
                 {
                     return;
                 }
