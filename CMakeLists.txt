@@ -6,19 +6,19 @@ include(cmake/ResourceBundling.cmake)
 include(FetchContent)
 
 FetchContent_Declare(moduru
-  GIT_REPOSITORY https://github.com/izzyreal/moduru.git
+  GIT_REPOSITORY git@github.com:izzyreal/moduru.git
   GIT_TAG        master
   SOURCE_DIR     ${CMAKE_SOURCE_DIR}/editables/moduru
 )
 
 FetchContent_Declare(akaifat
-  GIT_REPOSITORY https://github.com/izzyreal/akaifat.git
+  GIT_REPOSITORY git@github.com:izzyreal/akaifat.git
   GIT_TAG        main
   SOURCE_DIR     ${CMAKE_SOURCE_DIR}/editables/akaifat
 )
 
 FetchContent_Declare(ctoot
-  GIT_REPOSITORY https://github.com/izzyreal/ctoot.git
+  GIT_REPOSITORY git@github.com:izzyreal/ctoot.git
   GIT_TAG        native-cmake
   SOURCE_DIR     ${CMAKE_SOURCE_DIR}/editables/ctoot
 )
