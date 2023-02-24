@@ -57,29 +57,31 @@ the custom_zlib field of the compress and decompress settings*/
 #endif
 
 /*deflate&zlib encoder and png encoder*/
-#ifndef LODEPNG_NO_COMPILE_ENCODER
-/*pass -DLODEPNG_NO_COMPILE_ENCODER to the compiler to disable this, or comment out LODEPNG_COMPILE_ENCODER below*/
-#define LODEPNG_COMPILE_ENCODER
-#endif
+//#ifndef LODEPNG_NO_COMPILE_ENCODER
+///*pass -DLODEPNG_NO_COMPILE_ENCODER to the compiler to disable this, or comment out LODEPNG_COMPILE_ENCODER below*/
+//#define LODEPNG_COMPILE_ENCODER
+//#endif
 
 /*the optional built in harddisk file loading and saving functions*/
-#ifndef LODEPNG_NO_COMPILE_DISK
-/*pass -DLODEPNG_NO_COMPILE_DISK to the compiler to disable this, or comment out LODEPNG_COMPILE_DISK below*/
-#define LODEPNG_COMPILE_DISK
-#endif
+//#ifndef LODEPNG_NO_COMPILE_DISK
+///*pass -DLODEPNG_NO_COMPILE_DISK to the compiler to disable this, or comment out LODEPNG_COMPILE_DISK below*/
+//#define LODEPNG_COMPILE_DISK
+//#endif
 
 /*support for chunks other than IHDR, IDAT, PLTE, tRNS, IEND: ancillary and unknown chunks*/
-#ifndef LODEPNG_NO_COMPILE_ANCILLARY_CHUNKS
-/*pass -DLODEPNG_NO_COMPILE_ANCILLARY_CHUNKS to the compiler to disable this,
-or comment out LODEPNG_COMPILE_ANCILLARY_CHUNKS below*/
-#define LODEPNG_COMPILE_ANCILLARY_CHUNKS
-#endif
+//#ifndef LODEPNG_NO_COMPILE_ANCILLARY_CHUNKS
+///*pass -DLODEPNG_NO_COMPILE_ANCILLARY_CHUNKS to the compiler to disable this,
+//or comment out LODEPNG_COMPILE_ANCILLARY_CHUNKS below*/
+//#define LODEPNG_COMPILE_ANCILLARY_CHUNKS
+//#endif
 
 /*ability to convert error numerical codes to English text string*/
 #ifndef LODEPNG_NO_COMPILE_ERROR_TEXT
 /*pass -DLODEPNG_NO_COMPILE_ERROR_TEXT to the compiler to disable this,
 or comment out LODEPNG_COMPILE_ERROR_TEXT below*/
+#if defined (DEBUG) || defined (_DEBUG) || ! (defined (NDEBUG) || defined (_NDEBUG))
 #define LODEPNG_COMPILE_ERROR_TEXT
+#endif
 #endif
 
 /*Compile the default allocators (C's free, malloc and realloc). If you disable this,

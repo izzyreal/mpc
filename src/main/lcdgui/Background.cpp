@@ -53,8 +53,6 @@ void Background::Draw(std::vector<std::vector<bool>>* pixels)
 			Component::Draw(pixels);
 			return;
 		}
-
-		std::vector<unsigned char> png_data;
 		
 		unsigned int width = 248;
 		unsigned int height = 60;
@@ -63,7 +61,7 @@ void Background::Draw(std::vector<std::vector<bool>>* pixels)
 		std::vector<unsigned char> file_data(file.begin(), file.end());
 		std::vector<unsigned char> data;
 
-		auto result = lodepng::decode(data, width, height, file_data, LCT_RGB,8);
+		lodepng::decode(data, width, height, file_data, LCT_RGB,8);
 		
 		const bool unobtrusive = !unobtrusiveRect.Empty();
 
