@@ -45,7 +45,7 @@ void Background::Draw(std::vector<std::vector<bool>>* pixels)
 	if (dirty)
 	{
 		auto fs = cmrc::mpc::get_filesystem();
-		std::string fileName = "/screens/bg/png/" + name + ".png";
+		std::string fileName = "/screens/bg/" + name + ".png";
 		
 		if (!fs.exists(fileName))
 		{
