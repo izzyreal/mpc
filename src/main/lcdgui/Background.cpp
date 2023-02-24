@@ -6,6 +6,8 @@
 #include <cmrc/cmrc.hpp>
 #include <string_view>
 
+#include "LodePNG.hpp"
+
 CMRC_DECLARE(mpc);
 
 #include <Logger.hpp>
@@ -42,29 +44,28 @@ void Background::Draw(std::vector<std::vector<bool>>* pixels)
 
 	if (dirty)
 	{
-        auto fs = cmrc::mpc::get_filesystem();
-        auto fileName = "screens/bg/" + name + ".bmp";
-        
-        if (!fs.exists(fileName))
-        {
-            MLOG("Background " + fileName + " does not exist!");
-            Component::Draw(pixels);
-            return;
-        }
-                
-        auto file = fs.open("screens/bg/" + name + ".bmp");
+		auto fs = cmrc::mpc::get_filesystem();
+		std::string fileName = "/screens/bg/" + name + ".png";
+		
+		if (!fs.exists(fileName))
+		{
+			MLOG("Background " + fileName + " does not exist!");
+			Component::Draw(pixels);
+			return;
+		}
+		
+		unsigned int width = 248;
+		unsigned int height = 60;
+		
+		auto file = fs.open(fileName);
+		std::vector<unsigned char> file_data(file.begin(), file.end());
+		std::vector<unsigned char> data;
 
-        char* data = (char*) std::string_view(file.begin(), file.end() - file.begin()).data();
-
-		int imageDataOffset = data[10];
-		int width = (unsigned char) data[18];
-		int height = 256 - (unsigned char)(data[22]);
-
-		int colorCount = (imageDataOffset - 54) / 4;
-
+		lodepng::decode(data, width, height, file_data, LCT_RGB,8);
+		
 		const bool unobtrusive = !unobtrusiveRect.Empty();
 
-        int byteCounter = imageDataOffset;
+		int byteCounter(0);
 
         for (int y = 0; y < height; y++)
 		{
@@ -74,21 +75,20 @@ void Background::Draw(std::vector<std::vector<bool>>* pixels)
 				{
 					if (x < unobtrusiveRect.L || x > unobtrusiveRect.R || y < unobtrusiveRect.T || y > unobtrusiveRect.B)
 					{
-						byteCounter++;
+						byteCounter+=3;
 						continue;
 					}
 				}
 
-				auto value = data[byteCounter++];
-
-				if ((colorCount <= 2 && value == 1) || (colorCount > 2 && value == 2))
+				if (data[byteCounter] == 0)
 				{
 					(*pixels)[x][y] = true;
 				}
-				else if (value == 0)
+				else if (data[byteCounter] == 255)
 				{
 					(*pixels)[x][y] = false;
 				}
+				byteCounter += 3;
 			}
 		}
 
