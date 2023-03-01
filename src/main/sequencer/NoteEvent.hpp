@@ -1,5 +1,6 @@
 #pragma once
 #include <sequencer/Event.hpp>
+#include <midi/core/ShortMessage.hpp>
 
 namespace mpc::sequencer
 {
@@ -39,6 +40,8 @@ public:
     
     NoteEvent(bool noteOffTrue, int /* noteOnTick */); // ctor used for noteOffs
     std::string getTypeName() override { return "note"; }
+    
+    std::shared_ptr<ctoot::midi::core::ShortMessage> createShortMessage(int channel);
     
 };
 }

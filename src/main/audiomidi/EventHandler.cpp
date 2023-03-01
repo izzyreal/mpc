@@ -82,11 +82,10 @@ void EventHandler::handleNoThru(const std::shared_ptr<Event>& event, Track* trac
                 if (!isSolo || eventTrackIsSoloTrack || noteEvent->getVelocity() == 0)
                 {
                     auto newVelo = static_cast<int>(noteEvent->getVelocity() * (track->getVelocityRatio() * 0.01));
-                    MidiAdapter midiAdapter;
                     // Each of the 4 DRUMs is routed to their respective 0-based MIDI channel.
                     // This MIDI channel is part of a MIDI system that is internal to VMPC2000XL's sound player engine.
-                    midiAdapter.process(noteEvent, drumIndex, newVelo);
-
+                    auto msg = noteEvent->createShortMessage(drumIndex);
+                    
                     auto audioServer = mpc.getAudioMidiServices()->getAudioServer();
                     auto frameSeq = mpc.getAudioMidiServices()->getFrameSequencer();
                     auto isDrumNote = noteEvent->getNote() >= 35 && noteEvent->getNote() <= 98;
@@ -106,7 +105,7 @@ void EventHandler::handleNoThru(const std::shared_ptr<Event>& event, Track* trac
                                               -1 : SeqUtil::ticksToFrames(duration, sequencer->getTempo(), audioServer->getSampleRate());
 
                         mpc.getMms()->mpcTransport(
-                                midiAdapter.get().lock().get(),
+                                msg.get(),
                                 0,
                                 noteEvent->getVariationType(),
                                 noteEvent->getVariationValue(),
@@ -226,9 +225,7 @@ void EventHandler::midiOut(const std::shared_ptr<Event>& e, Track* track)
         if (channel > 15)
             channel -= 16;
         
-        MidiAdapter midiAdapter;
-        midiAdapter.process(noteEvent, channel, -1);
-        auto msg = midiAdapter.get().lock();
+        auto msg = noteEvent->createShortMessage(channel);
         
         auto mpcMidiOutput = mpc.getMidiOutput();
 
