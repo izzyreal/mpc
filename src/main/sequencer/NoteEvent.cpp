@@ -1,7 +1,9 @@
 #include <sequencer/NoteEvent.hpp>
+#include <algorithm>
 
 
 using namespace mpc::sequencer;
+using namespace ctoot::midi::core;
 
 NoteEvent::NoteEvent()
 	: NoteEvent(60)
@@ -121,9 +123,9 @@ void NoteEvent::CopyValuesTo(std::weak_ptr<Event> dest)
 	lDest->setDuration(getDuration());
 }
 
-std::shared_ptr<ctoot::midi::core::ShortMessage> mpc::sequencer::NoteEvent::createShortMessage(int channel)
+std::shared_ptr<ShortMessage> NoteEvent::createShortMessage(int channel, int transpose)
 {
     auto msg = std::make_shared<ctoot::midi::core::ShortMessage>();
-    msg->setMessage(getVelocity() == 0 ? ctoot::midi::core::ShortMessage::NOTE_OFF : ctoot::midi::core::ShortMessage::NOTE_ON, channel, getNote(), getVelocity());
+    msg->setMessage(getVelocity() == 0 ? ShortMessage::NOTE_OFF : ShortMessage::NOTE_ON, channel, std::clamp(getNote()+transpose,0,127), getVelocity());
     return msg;
 }

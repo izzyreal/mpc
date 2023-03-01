@@ -32,6 +32,8 @@ public:
     void setVelocity(int i);
     void setVelocityZero();
     int getVelocity();
+    bool isNoteOn() { return getVelocity() > 0; }
+    bool isNoteOff() { return getVelocity() == 0; }
     
     void CopyValuesTo(std::weak_ptr<Event> dest) override;
 
@@ -41,7 +43,7 @@ public:
     NoteEvent(bool noteOffTrue, int /* noteOnTick */); // ctor used for noteOffs
     std::string getTypeName() override { return "note"; }
     
-    std::shared_ptr<ctoot::midi::core::ShortMessage> createShortMessage(int channel);
+    std::shared_ptr<ctoot::midi::core::ShortMessage> createShortMessage(int channel, int transpose = 0);
     
 };
 }
