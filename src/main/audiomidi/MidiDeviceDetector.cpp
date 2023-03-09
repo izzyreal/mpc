@@ -25,8 +25,23 @@ void MidiDeviceDetector::start(mpc::Mpc &mpc)
 {
     running = true;
     pollThread = new std::thread([&mpc, this] {
-        auto rtMidiIn = std::make_shared<RtMidiIn>();
+
+        std::shared_ptr<RtMidiIn> rtMidiIn;
+
+        // RtMidiIn instantiation throws an exception when building an LV2 in
+        // several CI/CD build environments, so when we catch an exception,
+        // the thread's work is done.
+        try
+        {
+            rtMidiIn = std::make_shared<RtMidiIn>();
+        }
+        catch (const RtMidiError& e)
+        {
+            return;
+        }
+
         lower_my_priority();
+
         while (running)
         {
             std::set<std::string> allCurrentNames;
