@@ -31,7 +31,7 @@ using namespace mpc::lcdgui::screens::window;
 using namespace moduru::file;
 using namespace moduru::lang;
 
-void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc)
+void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc, const std::string& overridePath)
 {
     auto vmpcAutoSaveScreen = mpc.screens->get<VmpcAutoSaveScreen>("vmpc-auto-save");
 
@@ -40,20 +40,20 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc)
         return;
     }
 
-    const auto path = Paths::autoSavePath();
+    const auto path = overridePath.empty() ? Paths::autoSavePath() : overridePath;
     const auto apsFile = path + "APS.APS";
     const auto allFile = path + "ALL.ALL";
     const auto soundIndexFile = path + "soundIndex.txt";
     const auto lastPressedPadFile = path + "lastPressedPad.txt";
     const auto lastPressedNoteFile = path + "lastPressedNote.txt";
     const auto screenFile = path + "screen.txt";
-    const auto previousSCreenFile = path + "previousScreen.txt";
+    const auto previousScreenFile = path + "previousScreen.txt";
     const auto previousSamplerScreenFile = path + "previousSamplerScreen.txt";
     const auto focusFile = path + "focus.txt";
     const auto soundsFile = path + "sounds.txt";
     const auto currentDirFile = path + "currentDir.txt";
 
-    std::vector<std::string> files{apsFile, allFile, soundIndexFile, lastPressedPadFile, lastPressedNoteFile, screenFile, previousSCreenFile, previousSamplerScreenFile, focusFile, soundsFile, currentDirFile };
+    std::vector<std::string> files{apsFile, allFile, soundIndexFile, lastPressedPadFile, lastPressedNoteFile, screenFile, previousScreenFile, previousSamplerScreenFile, focusFile, soundsFile, currentDirFile };
 
     std::vector<std::string> availableFiles;
 
@@ -63,7 +63,7 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc)
 
         if (fs::exists(fp))
         {
-            availableFiles.emplace_back(f);
+            availableFiles.push_back(f);
         }
     }
 
@@ -80,6 +80,12 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc)
         {
             auto stream = FileUtil::ifstreamw(f, std::ios::in | std::ios::binary);
             auto size1 = fs::file_size(f);
+
+            if (size1 == 0)
+            {
+//                continue;
+            }
+
             std::vector<char> data(size1);
             stream.read(&data[0], size1);
             stream.close();
@@ -218,7 +224,7 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc)
     restoreAutoSavedStateAction();
 }
 
-void AutoSave::storeAutoSavedState(mpc::Mpc &mpc)
+void AutoSave::storeAutoSavedState(mpc::Mpc &mpc, const std::string& overridePath)
 {
     auto vmpcAutoSaveScreen = mpc.screens->get<VmpcAutoSaveScreen>("vmpc-auto-save");
 
@@ -227,7 +233,7 @@ void AutoSave::storeAutoSavedState(mpc::Mpc &mpc)
         return;
     }
 
-    const auto path = Paths::autoSavePath();
+    const auto path = overridePath.empty() ? Paths::autoSavePath() : overridePath;
     const auto apsFile = path + "APS.APS";
     const auto allFile = path + "ALL.ALL";
     const auto soundIndexFile = path + "soundIndex.txt";
@@ -252,71 +258,98 @@ void AutoSave::storeAutoSavedState(mpc::Mpc &mpc)
         auto lastPressedNote = mpc.getNote();
         auto currentDir = mpc.getDisk()->getAbsolutePath();
 
-        auto stream = FileUtil::ofstreamw(screenFile, std::ios::out | std::ios::binary);
-        stream.write(&screen[0], screen.length());
-        stream.close();
+        if (!screen.empty())
+        {
+            auto stream = FileUtil::ofstreamw(screenFile, std::ios::out | std::ios::binary);
+            stream.write(&screen[0], screen.length());
+            stream.close();
+        }
 
-        stream = FileUtil::ofstreamw(previousScreenFile, std::ios::out | std::ios::binary);
-        stream.write(&previousScreen[0], previousScreen.length());
-        stream.close();
+        if (!previousScreen.empty())
+        {
+            auto stream = FileUtil::ofstreamw(previousScreenFile, std::ios::out | std::ios::binary);
+            stream.write(&previousScreen[0], previousScreen.length());
+            stream.close();
+        }
 
-        stream = FileUtil::ofstreamw(previousSamplerScreenFile, std::ios::out | std::ios::binary);
-        stream.write(&previousSamplerScreen[0], previousSamplerScreen.length());
-        stream.close();
+        if (!previousSamplerScreen.empty())
+        {
+            auto stream = FileUtil::ofstreamw(previousSamplerScreenFile, std::ios::out | std::ios::binary);
+            stream.write(&previousSamplerScreen[0], previousSamplerScreen.length());
+            stream.close();
+        }
 
-        stream = FileUtil::ofstreamw(focusFile, std::ios::out | std::ios::binary);
-        stream.write(&focus[0], focus.length());
-        stream.close();
+        if (!focus.empty())
+        {
+            auto stream = FileUtil::ofstreamw(focusFile, std::ios::out | std::ios::binary);
+            stream.write(&focus[0], focus.length());
+            stream.close();
+        }
 
-        stream = FileUtil::ofstreamw(currentDirFile, std::ios::out | std::ios::binary);
-        stream.write(&currentDir[0], currentDir.length());
-        stream.close();
+        if (!currentDir.empty())
+        {
+            auto stream = FileUtil::ofstreamw(currentDirFile, std::ios::out | std::ios::binary);
+            stream.write(&currentDir[0], currentDir.length());
+            stream.close();
+        }
 
-        stream = FileUtil::ofstreamw(soundIndexFile, std::ios::out | std::ios::binary);
-        stream.put(static_cast<char>(soundIndex));
-        stream.close();
+        {
+            auto stream = FileUtil::ofstreamw(soundIndexFile, std::ios::out | std::ios::binary);
+            stream.put(static_cast<char>(soundIndex));
+            stream.close();
+        }
 
-        stream = FileUtil::ofstreamw(lastPressedNoteFile, std::ios::out | std::ios::binary);
-        stream.put(static_cast<char>(lastPressedNote));
-        stream.close();
+        {
+            auto stream = FileUtil::ofstreamw(lastPressedNoteFile, std::ios::out | std::ios::binary);
+            stream.put(static_cast<char>(lastPressedNote));
+            stream.close();
+        }
 
-        stream = FileUtil::ofstreamw(lastPressedPadFile, std::ios::out | std::ios::binary);
-        stream.put(static_cast<char>(lastPressedPad));
-        stream.close();
+        {
+            auto stream = FileUtil::ofstreamw(lastPressedPadFile, std::ios::out | std::ios::binary);
+            stream.put(static_cast<char>(lastPressedPad));
+            stream.close();
+        }
 
-        ApsParser apsParser(mpc, "stateinfo");
-        auto apsBytes = apsParser.getBytes();
 
-        stream = FileUtil::ofstreamw(apsFile, std::ios::out | std::ios::binary);
-        stream.write(&apsBytes[0], apsBytes.size());
-        stream.close();
+        {
+            ApsParser apsParser(mpc, "stateinfo");
+            auto apsBytes = apsParser.getBytes();
+
+            auto stream = FileUtil::ofstreamw(apsFile, std::ios::out | std::ios::binary);
+            stream.write(&apsBytes[0], apsBytes.size());
+            stream.close();
+        }
 
         auto sounds = mpc.getSampler()->getSounds();
 
         std::string soundNames;
 
-        for (size_t i = 0; i < sounds.size(); i++)
+        for (auto& sound : sounds)
         {
-            auto sound = sounds[i];
             SndWriter sndWriter(sound.get());
             auto data = sndWriter.getSndFileArray();
             auto soundFilePath = path + sound->getName() + ".SND";
-            stream = FileUtil::ofstreamw(soundFilePath, std::ios::out | std::ios::binary);
-            stream.write(&data[0], data.size());
+            auto stream = FileUtil::ofstreamw(soundFilePath, std::ios::out | std::ios::binary);
+            stream.write(&data[0], (long) data.size());
             stream.close();
             soundNames = soundNames.append(sound->getName() + ".SND\n");
         }
 
-        AllParser allParser(mpc);
-        auto allBytes = allParser.getBytes();
+        {
+            AllParser allParser(mpc);
+            auto allBytes = allParser.getBytes();
 
-        stream = FileUtil::ofstreamw(allFile, std::ios::out | std::ios::binary);
-        stream.write(&allBytes[0], allBytes.size());
-        stream.close();
+            auto stream = FileUtil::ofstreamw(allFile, std::ios::out | std::ios::binary);
+            stream.write(&allBytes[0], allBytes.size());
+            stream.close();
+        }
 
-        stream = FileUtil::ofstreamw(soundsFile, std::ios::out | std::ios::binary);
-        stream.write(&soundNames[0], soundNames.size());
-        stream.close();
+        if (!soundNames.empty()){
+            auto stream = FileUtil::ofstreamw(soundsFile, std::ios::out | std::ios::binary);
+            stream.write(&soundNames[0], soundNames.size());
+            stream.close();
+        }
     };
 
     storeAutoSavedStateAction();

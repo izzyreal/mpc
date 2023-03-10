@@ -18,12 +18,12 @@ using namespace mpc::lcdgui::screens::window;
 void prepareApsResources(mpc::Mpc& mpc)
 {
     auto tmpDocsPath = fs::temp_directory_path();
-    tmpDocsPath.concat("/VMPC2000XL-test/");
+    tmpDocsPath.concat("VMPC2000XL-test");
     fs::remove_all(tmpDocsPath);
     fs::create_directories(tmpDocsPath);
     auto disk = mpc.getDisk();
 
-    disk->getVolume().localDirectoryPath = tmpDocsPath;
+    disk->getVolume().localDirectoryPath = tmpDocsPath.string();
     disk->initRoot();
     disk->initFiles();
 
