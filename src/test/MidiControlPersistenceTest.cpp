@@ -116,8 +116,14 @@ TEST_CASE("Save and load a preset", "[midi-control-persistence]")
 
     controls = mpc.getActiveControls();
 
-    controls->down();
-    controls->down();
+    int nameCounter = 0;
+
+    while (controls->findChild<mpc::lcdgui::Field>("name" + std::to_string(nameCounter++))->getText().find("New_preset") == std::string::npos)
+    {
+        controls->down();
+        if (nameCounter == 4) nameCounter = 3;
+    }
+
     controls->right();
 
     // Set Auto Load to YES

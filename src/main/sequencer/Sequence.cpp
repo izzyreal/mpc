@@ -480,6 +480,11 @@ void Sequence::insertBars(int barCount, int afterBar)
 
 	for (int i = afterBar; i < 999; i++)
 	{
+        if (i + barCount >= 999)
+        {
+            continue;
+        }
+
         barLengthsInTicks[i + barCount] = barLengthsInTicks[i];
 		numerators[i + barCount] = numerators[i];
 		denominators[i + barCount] = denominators[i];
