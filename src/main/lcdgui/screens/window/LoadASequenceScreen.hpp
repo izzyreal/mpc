@@ -8,11 +8,8 @@ namespace mpc::lcdgui::screens
 
 namespace mpc::lcdgui::screens::window
 {
-	class LoadASequenceFromAllSCreen;
-}
+    class LoadASequenceFromAllScreen;
 
-namespace mpc::lcdgui::screens::window
-{
 	class LoadASequenceScreen
 		: public mpc::lcdgui::ScreenComponent
 	{
