@@ -17,7 +17,7 @@ void LoadASequenceScreen::open()
 	auto loadScreen = mpc.screens->get<LoadScreen>("load");
     auto midFile = loadScreen->getSelectedFile();
 
-    if (!StrUtil::eqIgnoreCase(midFile->getExtension(), "mid"))
+    if (!StrUtil::eqIgnoreCase(midFile->getExtension(), ".mid"))
     {
         return;
     }

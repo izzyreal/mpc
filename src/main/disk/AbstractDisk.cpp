@@ -505,6 +505,11 @@ sequence_or_error AbstractDisk::readMid2(std::shared_ptr<MpcFile> f)
 
         MidiReader midiReader(fStream, newSeq);
         midiReader.parseSequence(mpc);
+        
+        if (newSeq->getName().empty())
+        {
+            newSeq->setName(f->getNameWithoutExtension());
+        }
 
         return newSeq;
     };
@@ -585,6 +590,12 @@ void AbstractDisk::showPopup(mpc_io_error_msg& msg)
     auto popupScreen = mpc.screens->get<PopupScreen>("popup");
     popupScreen->setText(msg);
     auto currentScreenName = mpc.getLayeredScreen()->getCurrentScreenName();
+
+    if (currentScreenName == "load-a-sequence")
+    {
+        currentScreenName = "load";
+    }
+
     popupScreen->returnToScreenAfterMilliSeconds(currentScreenName, 1000);
     mpc.getLayeredScreen()->openScreen("popup");
 }
