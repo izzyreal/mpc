@@ -32,7 +32,6 @@ void VmpcContinuePreviousSessionScreen::function(int i)
         case 2:
             // YES
             restoreAutoSavedStateAction();
-            openScreen(previousScreen);
             break;
         case 3:
             // NEVER
@@ -43,7 +42,6 @@ void VmpcContinuePreviousSessionScreen::function(int i)
             // ALWAYS
             autoSaveScreen->setAutoLoadOnStart(2);
             restoreAutoSavedStateAction();
-            openScreen(previousScreen);
             break;
         default:
             break;
