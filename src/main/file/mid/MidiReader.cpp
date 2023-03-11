@@ -353,13 +353,15 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
 
 bool MidiReader::isInteger(std::string s)
 {
-	try {
-		stoi(s);
-		return true;
-	}
-	catch (const std::invalid_argument&) {
-		return false;
-	}
+    for (auto& c : s)
+    {
+        if (!std::isdigit(c))
+        {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 int MidiReader::getNumberOfNoteOns(int noteValue, std::vector<std::shared_ptr<NoteOn>> allNotes)
