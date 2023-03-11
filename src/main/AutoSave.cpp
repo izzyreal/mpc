@@ -83,7 +83,7 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc, const std::string& overrideP
 
             if (size1 == 0)
             {
-//                continue;
+                continue;
             }
 
             std::vector<char> data(size1);
