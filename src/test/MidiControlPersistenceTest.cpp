@@ -62,7 +62,7 @@ TEST_CASE("VmpcMidiScreen", "[midi-control-persistence]")
     auto t3 = controls->findChild<mpc::lcdgui::Field>("value0")->getText();
     REQUIRE(t1 == "Note");
     REQUIRE(t2 == "ch 2");
-    REQUIRE(t3 == "  2");
+    REQUIRE(t3 == " 38");
 }
 
 TEST_CASE("Save and load a preset", "[midi-control-persistence]")
@@ -86,7 +86,7 @@ TEST_CASE("Save and load a preset", "[midi-control-persistence]")
     auto t3 = controls->findChild<mpc::lcdgui::Field>("value0")->getText();
     REQUIRE(t1 == "Note");
     REQUIRE(t2 == "ch 2");
-    REQUIRE(t3 == "  2");
+    REQUIRE(t3 == " 38");
 
     // Open VmpcMidiPresetsScreen
     controls->openWindow();
@@ -107,7 +107,7 @@ TEST_CASE("Save and load a preset", "[midi-control-persistence]")
     auto preset = std::make_shared<MidiControlPreset>();
     mpc.getDisk()->readMidiControlPreset(f, preset);
     REQUIRE(preset->rows[0].label == "pad-1");
-    REQUIRE(preset->rows[0].value == 2);
+    REQUIRE(preset->rows[0].value == 38);
     REQUIRE(preset->rows[0].channel == 1);
     REQUIRE(preset->rows[0].isNote);
 
@@ -136,7 +136,7 @@ TEST_CASE("Save and load a preset", "[midi-control-persistence]")
 
     REQUIRE(preset->autoloadMode == MidiControlPreset::AutoLoadMode::YES);
     REQUIRE(preset->rows[0].label == "pad-1");
-    REQUIRE(preset->rows[0].value == 2);
+    REQUIRE(preset->rows[0].value == 38);
     REQUIRE(preset->rows[0].channel == 1);
     REQUIRE(preset->rows[0].isNote);
 
