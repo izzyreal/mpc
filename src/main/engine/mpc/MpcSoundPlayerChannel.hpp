@@ -2,6 +2,7 @@
 
 #include <map>
 #include <vector>
+#include <memory>
 
 namespace ctoot::control {
 	class CompoundControl;
