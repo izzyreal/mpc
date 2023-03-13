@@ -6,7 +6,7 @@
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>
 #include <sampler/Pad.hpp>
-#include <engine/mpc/MpcSoundPlayerChannel.hpp>
+#include <engine/mpc/Drum.hpp>
 
 #include <VecUtil.hpp>
 

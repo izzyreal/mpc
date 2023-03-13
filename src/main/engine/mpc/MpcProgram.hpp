@@ -5,15 +5,15 @@
 namespace ctoot::mpc {
 
 class MpcNoteParameters;
-class MpcStereoMixerChannel;
-class MpcIndivFxMixerChannel;
+class StereoMixer;
+class IndivFxMixer;
 
 class MpcProgram {
     
 public:
     virtual MpcNoteParameters* getNoteParameters(int i) = 0;
-    virtual std::shared_ptr<MpcStereoMixerChannel> getStereoMixerChannel(int pad) = 0;
-    virtual std::shared_ptr<MpcIndivFxMixerChannel> getIndivFxMixerChannel(int pad) = 0;
+    virtual std::shared_ptr<StereoMixer> getStereoMixerChannel(int pad) = 0;
+    virtual std::shared_ptr<IndivFxMixer> getIndivFxMixerChannel(int pad) = 0;
     
 };
 }

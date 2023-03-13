@@ -25,7 +25,7 @@
 
 // ctoot
 #include <engine/audio/server/NonRealTimeAudioServer.hpp>
-#include <engine/mpc/MpcSoundPlayerChannel.hpp>
+#include <engine/mpc/Drum.hpp>
 
 // moduru
 #include <System.hpp>

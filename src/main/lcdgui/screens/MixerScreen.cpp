@@ -59,7 +59,7 @@ void MixerScreen::addMixerStrips()
     mixerStrips[xPos]->setSelection(yPos);
 }
 
-std::shared_ptr<MpcStereoMixerChannel> MixerScreen::getStereoMixerChannel(int index)
+std::shared_ptr<StereoMixer> MixerScreen::getStereoMixerChannel(int index)
 {
     const auto padIndex = index + (mpc.getBank() * 16);
     const auto pad = program->getPad(padIndex);
@@ -75,7 +75,7 @@ std::shared_ptr<MpcStereoMixerChannel> MixerScreen::getStereoMixerChannel(int in
     return stereoMixSourceIsDrum ? mpcSoundPlayerChannel().getStereoMixerChannels()[note - 35] : noteParameters->getStereoMixerChannel();
 }
 
-std::shared_ptr<MpcIndivFxMixerChannel> MixerScreen::getIndivFxMixerChannel(int index)
+std::shared_ptr<IndivFxMixer> MixerScreen::getIndivFxMixerChannel(int index)
 {
     const auto padIndex = index + (mpc.getBank() * 16);
     const auto pad = program->getPad(padIndex);

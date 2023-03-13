@@ -2,7 +2,7 @@
 
 namespace ctoot::mpc {
 
-		class MpcStereoMixerChannel
+		class StereoMixer
 		{
 
 		private:
@@ -16,8 +16,8 @@ namespace ctoot::mpc {
 			int getLevel();
 
 		public:
-			MpcStereoMixerChannel();
-            virtual ~MpcStereoMixerChannel() {}
+			StereoMixer();
+            virtual ~StereoMixer() {}
             
 		};
 }

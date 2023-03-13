@@ -2,7 +2,7 @@
 
 namespace ctoot::mpc {
 
-    class MpcIndivFxMixerChannel
+    class IndivFxMixer
     {
 
     private:
@@ -34,9 +34,9 @@ namespace ctoot::mpc {
         int getFxSendLevel();
 
     public:
-        MpcIndivFxMixerChannel();
+        IndivFxMixer();
 
-        virtual ~MpcIndivFxMixerChannel()
+        virtual ~IndivFxMixer()
         {}
 
     };

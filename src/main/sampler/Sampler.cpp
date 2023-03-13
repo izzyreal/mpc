@@ -17,10 +17,10 @@
 
 #include <engine/audio/server/NonRealTimeAudioServer.hpp>
 
-#include <engine/mpc/MpcBasicSoundPlayerChannel.hpp>
-#include <engine/mpc/MpcSoundPlayerChannel.hpp>
-#include <engine/mpc/MpcStereoMixerChannel.hpp>
-#include <engine/mpc/MpcIndivFxMixerChannel.hpp>
+#include <engine/mpc/PreviewSoundPlayer.hpp>
+#include <engine/mpc/Drum.hpp>
+#include <engine/mpc/StereoMixer.hpp>
+#include <engine/mpc/IndivFxMixer.hpp>
 
 #include <lang/StrUtil.hpp>
 
@@ -151,12 +151,12 @@ void Sampler::setPreviousScreenName(std::string s)
 	previousScreenName = s;
 }
 
-std::vector<std::shared_ptr<MpcStereoMixerChannel>>& Sampler::getDrumStereoMixerChannels(int i)
+std::vector<std::shared_ptr<StereoMixer>>& Sampler::getDrumStereoMixerChannels(int i)
 {
 	return mpc.getDrum(i).getStereoMixerChannels();
 }
 
-std::vector<std::shared_ptr<MpcIndivFxMixerChannel>>& Sampler::getDrumIndivFxMixerChannels(int i)
+std::vector<std::shared_ptr<IndivFxMixer>>& Sampler::getDrumIndivFxMixerChannels(int i)
 {
 	return mpc.getDrum(i).getIndivFxMixerChannels();
 }
@@ -951,7 +951,7 @@ int Sampler::getDrumBusProgramIndex(int busNumber)
 	return mpc.getDrum(busNumber - 1).getProgram();
 }
 
-MpcSoundPlayerChannel& Sampler::getDrum(int i)
+Drum& Sampler::getDrum(int i)
 {
 	return mpc.getDrum(i);
 }

@@ -1,29 +1,28 @@
-#include "MpcBasicSoundPlayerChannel.hpp"
+#include "PreviewSoundPlayer.hpp"
 
-#include "MpcBasicSoundPlayerControls.hpp"
 #include "MpcVoice.hpp"
 #include "MpcSampler.hpp"
 
 #include <engine/audio/fader/FaderControl.hpp>
 #include <engine/audio/mixer/MainMixControls.hpp>
+#include <utility>
 
 using namespace ctoot::mpc;
 using namespace ctoot::audio::mixer;
 using namespace ctoot::audio::fader;
-using namespace std;
 
-MpcBasicSoundPlayerChannel::MpcBasicSoundPlayerChannel(shared_ptr<MpcBasicSoundPlayerControls> controls)
+PreviewSoundPlayer::PreviewSoundPlayer(
+        std::shared_ptr<MpcSampler> samplerToUse,
+        std::shared_ptr<ctoot::audio::mixer::AudioMixer> mixerToUse,
+        std::shared_ptr<MpcVoice> voiceToUse)
+        : sampler(std::move(samplerToUse)), mixer(std::move(mixerToUse)), voice(std::move(voiceToUse))
 {
-	auto lControls = controls;
-	sampler = lControls->getSampler();
-	mixer = lControls->getMixer();
-	voice = lControls->getVoice();
 	auto sc = mixer->getMixerControls()->getStripControls("65");
-	auto mmc = dynamic_pointer_cast<MainMixControls>(sc->find("Main"));
-	fader = dynamic_pointer_cast<FaderControl>(mmc->find("Level"));
+	auto mmc =std::dynamic_pointer_cast<MainMixControls>(sc->find("Main"));
+	fader = std::dynamic_pointer_cast<FaderControl>(mmc->find("Level"));
 }
 
-void MpcBasicSoundPlayerChannel::mpcNoteOn(int soundNumber, int velocity, int frameOffset)
+void PreviewSoundPlayer::mpcNoteOn(int soundNumber, int velocity, int frameOffset)
 {
 	if (velocity == 0) {
 		return;
@@ -55,11 +54,11 @@ void MpcBasicSoundPlayerChannel::mpcNoteOn(int soundNumber, int velocity, int fr
 	voice->init(velocity, tempVars, -1, nullptr, 0, 64, -1, -1, frameOffset, soundNumber != -2, -1, -1);
 }
 
-void MpcBasicSoundPlayerChannel::finishVoice() {
+void PreviewSoundPlayer::finishVoice() {
 	voice->finish(); // stops voice immediately, without a short fade-out/decay time
 }
 
-void MpcBasicSoundPlayerChannel::connectVoice()
+void PreviewSoundPlayer::connectVoice()
 {
     mixer->getStrip("65")->setInputProcess(voice);
 }

@@ -10,11 +10,9 @@ namespace ctoot::mpc {
 
     class MpcSound;
 
-    class MpcBasicSoundPlayerControls;
-
     class MpcVoice;
 
-    class MpcBasicSoundPlayerChannel final
+    class PreviewSoundPlayer final
     {
 
     private:
@@ -32,7 +30,9 @@ namespace ctoot::mpc {
 
         void connectVoice();
 
-        explicit MpcBasicSoundPlayerChannel(std::shared_ptr<MpcBasicSoundPlayerControls> controls);
+        explicit PreviewSoundPlayer(std::shared_ptr<MpcSampler> sampler,
+                                    std::shared_ptr<ctoot::audio::mixer::AudioMixer> mixer,
+                                    std::shared_ptr<MpcVoice> voice);
 
     };
 }

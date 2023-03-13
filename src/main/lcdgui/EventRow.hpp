@@ -8,7 +8,7 @@
 
 namespace ctoot::mpc
 {
-	class MpcSoundPlayerChannel;
+	class Drum;
 }
 
 namespace mpc { class Mpc; }

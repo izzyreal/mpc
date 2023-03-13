@@ -19,8 +19,8 @@
 
 #include <sampler/Sampler.hpp>
 #include <sequencer/Sequencer.hpp>
-#include <engine/mpc/MpcBasicSoundPlayerChannel.hpp>
-#include <engine/mpc/MpcSoundPlayerChannel.hpp>
+#include <engine/mpc/PreviewSoundPlayer.hpp>
+#include <engine/mpc/Drum.hpp>
 
 #include <hardware/Hardware.hpp>
 #include <hardware/HwSlider.hpp>
@@ -201,12 +201,12 @@ std::shared_ptr<sampler::Sampler> Mpc::getSampler()
     return sampler;
 }
 
-ctoot::mpc::MpcSoundPlayerChannel& Mpc::getDrum(int i)
+ctoot::mpc::Drum& Mpc::getDrum(int i)
 {
 	return audioMidiServices->getDrum(i);
 }
 
-ctoot::mpc::MpcBasicSoundPlayerChannel& Mpc::getBasicPlayer()
+ctoot::mpc::PreviewSoundPlayer& Mpc::getBasicPlayer()
 {
 	return audioMidiServices->getBasicPlayer();
 }

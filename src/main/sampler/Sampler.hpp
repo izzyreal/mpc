@@ -11,7 +11,7 @@
 namespace ctoot::mpc {
 class MpcSound;
 class MpcProgram;
-class MpcSoundPlayerChannel;
+class Drum;
 }
 
 namespace mpc::sequencer {
@@ -107,13 +107,13 @@ public:
     void mergeToStereo(std::vector<float>* sourceLeft, std::vector<float>* sourceRight, std::vector<float>* dest);
     void setDrumBusProgramIndex(int busNumber, int programIndex);
     int getDrumBusProgramIndex(int busNumber);
-    ctoot::mpc::MpcSoundPlayerChannel& getDrum(int i);
+    ctoot::mpc::Drum& getDrum(int i);
     int getUsedProgram(int startIndex, bool up);
     int checkExists(std::string soundName);
     void selectPreviousSound();
     void selectNextSound();
-    std::vector<std::shared_ptr<ctoot::mpc::MpcStereoMixerChannel>>& getDrumStereoMixerChannels(int i);
-    std::vector<std::shared_ptr<ctoot::mpc::MpcIndivFxMixerChannel>>& getDrumIndivFxMixerChannels(int i);
+    std::vector<std::shared_ptr<ctoot::mpc::StereoMixer>>& getDrumStereoMixerChannels(int i);
+    std::vector<std::shared_ptr<ctoot::mpc::IndivFxMixer>>& getDrumIndivFxMixerChannels(int i);
     std::weak_ptr<Sound> copySound(std::weak_ptr<Sound> source);
     void copyProgram(const int sourceIndex, const int destIndex);
     std::vector<int>* getInitMasterPadAssign();

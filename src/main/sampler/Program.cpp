@@ -2,8 +2,8 @@
 #include <sampler/Sampler.hpp>
 #include <sampler/Pad.hpp>
 
-#include <engine/mpc/MpcStereoMixerChannel.hpp>
-#include <engine/mpc/MpcIndivFxMixerChannel.hpp>
+#include <engine/mpc/StereoMixer.hpp>
+#include <engine/mpc/IndivFxMixer.hpp>
 
 #include <Mpc.hpp>
 
@@ -73,14 +73,14 @@ Pad* Program::getPad(int i)
 	return pads[i];
 }
 
-std::shared_ptr<MpcStereoMixerChannel> Program::getStereoMixerChannel(int noteIndex)
+std::shared_ptr<StereoMixer> Program::getStereoMixerChannel(int noteIndex)
 {
-	return std::dynamic_pointer_cast<MpcStereoMixerChannel>(noteParameters[noteIndex]->getStereoMixerChannel());
+	return std::dynamic_pointer_cast<StereoMixer>(noteParameters[noteIndex]->getStereoMixerChannel());
 }
 
-std::shared_ptr<MpcIndivFxMixerChannel> Program::getIndivFxMixerChannel(int noteIndex)
+std::shared_ptr<IndivFxMixer> Program::getIndivFxMixerChannel(int noteIndex)
 {
-	return std::dynamic_pointer_cast<MpcIndivFxMixerChannel>(noteParameters[noteIndex]->getIndivFxMixerChannel());
+	return std::dynamic_pointer_cast<IndivFxMixer>(noteParameters[noteIndex]->getIndivFxMixerChannel());
 }
 
 int Program::getPadIndexFromNote(int note)

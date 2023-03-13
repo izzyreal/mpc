@@ -8,8 +8,8 @@
 
 namespace ctoot::mpc {
 	class MpcSampler;
-	class MpcStereoMixerChannel;
-	class MpcIndivFxMixerChannel;
+	class StereoMixer;
+	class IndivFxMixer;
 	class MpcNoteParameters;
 }
 
@@ -24,8 +24,8 @@ namespace mpc::sampler {
 	{
 
 	public:
-		std::shared_ptr<ctoot::mpc::MpcStereoMixerChannel> getStereoMixerChannel(int noteIndex) override;
-		std::shared_ptr<ctoot::mpc::MpcIndivFxMixerChannel> getIndivFxMixerChannel(int noteIndex) override;
+		std::shared_ptr<ctoot::mpc::StereoMixer> getStereoMixerChannel(int noteIndex) override;
+		std::shared_ptr<ctoot::mpc::IndivFxMixer> getIndivFxMixerChannel(int noteIndex) override;
         
 		int getPadIndexFromNote(int note);
 		

@@ -14,28 +14,28 @@ namespace ctoot::audio::mixer {
 
 namespace ctoot::mpc {
 	class MpcSampler;
-	class MpcStereoMixerChannel;
-	class MpcIndivFxMixerChannel;
+	class StereoMixer;
+	class IndivFxMixer;
 	class MpcNoteParameters;
 	class MpcVoice;
-	class MpcSoundPlayerControls;
 	class MpcMixerInterconnection;
+    class MpcMixerSetupGui;
 }
 
 namespace ctoot::mpc
 {
-	class MpcSoundPlayerChannel final
+	class Drum final
 	{
 
 	private:
 		std::map<int, int> simultA;
 		std::map<int, int> simultB;
-		std::shared_ptr<MpcSoundPlayerControls> controls;
         std::vector<std::shared_ptr<MpcVoice>> voices;
 		std::shared_ptr<MpcSampler> sampler;
 		std::shared_ptr<ctoot::audio::mixer::AudioMixer> mixer;
 		std::vector<MpcMixerInterconnection*> mixerConnections;
 		ctoot::audio::server::AudioServer* server = nullptr;
+        ctoot::mpc::MpcMixerSetupGui* mixerSetupGui = nullptr;
 
 	private:
 		int drumIndex = 0;
@@ -43,10 +43,10 @@ namespace ctoot::mpc
 		bool receivePgmChange = false;
 		bool receiveMidiVolume = false;
 		int lastReceivedMidiVolume = 127;
-		std::vector<std::shared_ptr<MpcStereoMixerChannel>> stereoMixerChannels;
-        std::vector<std::shared_ptr<MpcStereoMixerChannel>> weakStereoMixerChannels;
-		std::vector<std::shared_ptr<MpcIndivFxMixerChannel>> indivFxMixerChannels;
-        std::vector<std::shared_ptr<MpcIndivFxMixerChannel>> weakIndivFxMixerChannels;
+		std::vector<std::shared_ptr<StereoMixer>> stereoMixerChannels;
+        std::vector<std::shared_ptr<StereoMixer>> weakStereoMixerChannels;
+		std::vector<std::shared_ptr<IndivFxMixer>> indivFxMixerChannels;
+        std::vector<std::shared_ptr<IndivFxMixer>> weakIndivFxMixerChannels;
 
 	public:
 		int getProgram();
@@ -63,8 +63,8 @@ namespace ctoot::mpc
 	public:
 		void allSoundOff(int frameOffset);
 		void connectVoices();
-		std::vector<std::shared_ptr<MpcStereoMixerChannel>>& getStereoMixerChannels();
-		std::vector<std::shared_ptr<MpcIndivFxMixerChannel>>& getIndivFxMixerChannels();
+		std::vector<std::shared_ptr<StereoMixer>>& getStereoMixerChannels();
+		std::vector<std::shared_ptr<IndivFxMixer>>& getIndivFxMixerChannels();
 
 	public:
 		void mpcNoteOff(int note, int frameOffset, int noteOnStartTick);
@@ -77,8 +77,13 @@ namespace ctoot::mpc
         void stopMonoOrPolyVoiceWithSameNoteParameters(ctoot::mpc::MpcNoteParameters* noteParameters, int note);
 
 	public:
-		MpcSoundPlayerChannel(std::shared_ptr<MpcSoundPlayerControls> controls);
-		~MpcSoundPlayerChannel();
+		Drum(std::shared_ptr<MpcSampler> sampler,
+             int drumIndex,
+             std::shared_ptr<ctoot::audio::mixer::AudioMixer> mixer,
+             const std::shared_ptr<ctoot::audio::server::AudioServer>& server,
+             MpcMixerSetupGui *mixerSetupGui,
+             std::vector<std::shared_ptr<MpcVoice>> voices);
+		~Drum();
 
 	};
 }

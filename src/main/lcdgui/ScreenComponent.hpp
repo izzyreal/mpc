@@ -18,7 +18,7 @@
 #include <string>
 #include <map>
 
-#include <engine/mpc/MpcSoundPlayerChannel.hpp>
+#include <engine/mpc/Drum.hpp>
 
 namespace mpc::lcdgui
 {
@@ -42,7 +42,7 @@ namespace mpc::lcdgui
 		std::string param = "";
 		std::shared_ptr<mpc::sampler::Program> program;
 		std::shared_ptr<mpc::sequencer::Track> track;
-		ctoot::mpc::MpcSoundPlayerChannel& mpcSoundPlayerChannel() { return mpc.getControls()->getControls()->mpcSoundPlayerChannel; }
+		ctoot::mpc::Drum& mpcSoundPlayerChannel() { return mpc.getControls()->getControls()->mpcSoundPlayerChannel; }
 
 	protected:
 		std::shared_ptr<Field> findFocus();

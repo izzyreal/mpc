@@ -5,8 +5,8 @@
 #include <lcdgui/screens/MixerSetupScreen.hpp>
 #include <lcdgui/screens/MixerScreen.hpp>
 
-#include <engine/mpc/MpcStereoMixerChannel.hpp>
-#include <engine/mpc/MpcIndivFxMixerChannel.hpp>
+#include <engine/mpc/StereoMixer.hpp>
+#include <engine/mpc/IndivFxMixer.hpp>
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sampler;
@@ -35,7 +35,7 @@ void ChannelSettingsScreen::close()
 	mpc.deleteObserver(this);
 }
 
-std::shared_ptr<MpcIndivFxMixerChannel> ChannelSettingsScreen::getIndivFxMixerChannel()
+std::shared_ptr<IndivFxMixer> ChannelSettingsScreen::getIndivFxMixerChannel()
 {
 	init();
 
@@ -52,7 +52,7 @@ std::shared_ptr<MpcIndivFxMixerChannel> ChannelSettingsScreen::getIndivFxMixerCh
 	}
 }
 
-std::shared_ptr<MpcStereoMixerChannel> ChannelSettingsScreen::getStereoMixerChannel()
+std::shared_ptr<StereoMixer> ChannelSettingsScreen::getStereoMixerChannel()
 {
 	init();
 

@@ -15,7 +15,7 @@
 #include <memory>
 #include <vector>
 
-namespace ctoot::mpc { class MpcSoundPlayerChannel; }
+namespace ctoot::mpc { class Drum; }
 namespace mpc { class Mpc; }
 namespace mpc::controls { class GlobalReleaseControls; }
 
@@ -50,7 +50,7 @@ namespace mpc::controls {
 		std::vector<std::string> typableParams;
 
 		std::shared_ptr<mpc::sampler::Program> program;
-		ctoot::mpc::MpcSoundPlayerChannel& mpcSoundPlayerChannel;
+		ctoot::mpc::Drum& mpcSoundPlayerChannel;
 
 		std::shared_ptr<mpc::lcdgui::LayeredScreen> ls;
 		std::shared_ptr<mpc::lcdgui::Field> activeField;

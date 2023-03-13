@@ -12,12 +12,10 @@
 #include <audiomidi/MpcMidiOutput.hpp>
 
 #include <engine/mpc/MpcVoice.hpp>
-#include <engine/mpc/MpcBasicSoundPlayerChannel.hpp>
-#include <engine/mpc/MpcBasicSoundPlayerControls.hpp>
+#include <engine/mpc/PreviewSoundPlayer.hpp>
 #include <engine/mpc/MpcFaderControl.hpp>
 #include <engine/mpc/MpcMixerControls.hpp>
-#include <engine/mpc/MpcSoundPlayerChannel.hpp>
-#include <engine/mpc/MpcSoundPlayerControls.hpp>
+#include <engine/mpc/Drum.hpp>
 
 #include <lcdgui/screens/MixerSetupScreen.hpp>
 #include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
@@ -178,7 +176,7 @@ void AudioMidiServices::setupMixer()
 
 	/*
 	* There are 32 voices. Each voice has one channel for mixing to STEREO OUT L/R, and one channel for mixing to an ASSIGNABLE MIX OUT. These are strips 1-64.
-	* There's one channel for the MpcBasicSoundPlayerChannel, which plays the metronome, preview and playX sounds. This is strip 65.
+	* There's one channel for the PreviewSoundPlayer, which plays the metronome, preview and playX sounds. This is strip 65.
 	* Finally there's one channel to receive and monitor sampler input, this is strip 66, and one for playing quick previews, on strip 67.
 	* Hence nMixerChans = 67
 	*/
@@ -243,12 +241,12 @@ std::vector<std::string> AudioMidiServices::getOutputNames()
 	return server->getAvailableOutputNames();
 }
 
-MpcSoundPlayerChannel& AudioMidiServices::getDrum(int i)
+Drum& AudioMidiServices::getDrum(int i)
 {
 	return soundPlayerChannels[i];
 }
 
-MpcBasicSoundPlayerChannel& AudioMidiServices::getBasicPlayer()
+PreviewSoundPlayer& AudioMidiServices::getBasicPlayer()
 {
     return *basicSoundPlayerChannel.get();
 }
@@ -266,21 +264,15 @@ void AudioMidiServices::createSynth()
     {
         auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>("mixer-setup");
 
-        auto controls = std::make_shared<MpcSoundPlayerControls>(
-                std::dynamic_pointer_cast<MpcSampler>(mpc.getSampler()),
-                i,
-                mixer,
-                server,
-                mixerSetupScreen.get(),
-                voices);
-
-        soundPlayerChannels.emplace_back(controls);
-        soundPlayerChannelControls.emplace_back(controls);
+        soundPlayerChannels.emplace_back(std::dynamic_pointer_cast<MpcSampler>(mpc.getSampler()),
+                                         i,
+                                         mixer,
+                                         server,
+                                         mixerSetupScreen.get(),
+                                         voices);
     }
 
-    auto m = std::make_shared<MpcBasicSoundPlayerControls>(mpc.getSampler(), mixer, basicVoice);
-    basicSoundPlayerChannel = std::make_unique<MpcBasicSoundPlayerChannel>(m);
-    soundPlayerChannelControls.emplace_back(m);
+    basicSoundPlayerChannel = std::make_unique<PreviewSoundPlayer>(mpc.getSampler(), mixer, basicVoice);
 }
 
 void AudioMidiServices::connectVoices()

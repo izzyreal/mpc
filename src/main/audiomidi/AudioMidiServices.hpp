@@ -4,8 +4,8 @@
 #include <sequencer/FrameSeq.hpp>
 
 #include <engine/audio/mixer/AudioMixer.hpp>
-#include <engine/mpc/MpcSoundPlayerChannel.hpp>
-#include <engine/mpc/MpcBasicSoundPlayerChannel.hpp>
+#include <engine/mpc/Drum.hpp>
+#include <engine/mpc/PreviewSoundPlayer.hpp>
 
 #include <observer/Observable.hpp>
 
@@ -76,8 +76,8 @@ namespace mpc::audiomidi
         bool wasRecordingSound = false;
         bool wasBouncing = false;
         std::vector<std::shared_ptr<ctoot::control::CompoundControl>> soundPlayerChannelControls;
-        std::vector<ctoot::mpc::MpcSoundPlayerChannel> soundPlayerChannels;
-        std::unique_ptr<ctoot::mpc::MpcBasicSoundPlayerChannel> basicSoundPlayerChannel;
+        std::vector<ctoot::mpc::Drum> soundPlayerChannels;
+        std::unique_ptr<ctoot::mpc::PreviewSoundPlayer> basicSoundPlayerChannel;
 		std::vector<std::shared_ptr<ctoot::mpc::MpcVoice>> voices;
 		std::shared_ptr<ctoot::mpc::MpcVoice> basicVoice;
 		std::shared_ptr<ctoot::audio::server::AudioServer> server;
@@ -113,8 +113,8 @@ namespace mpc::audiomidi
 		void setRecordLevel(int i);
 		int getRecordLevel();
 		void muteMonitor(bool mute);
-		ctoot::mpc::MpcSoundPlayerChannel& getDrum(int i);
-        ctoot::mpc::MpcBasicSoundPlayerChannel& getBasicPlayer();
+		ctoot::mpc::Drum& getDrum(int i);
+        ctoot::mpc::PreviewSoundPlayer& getBasicPlayer();
 		void initializeDiskRecorders();
 		void closeIO();
 

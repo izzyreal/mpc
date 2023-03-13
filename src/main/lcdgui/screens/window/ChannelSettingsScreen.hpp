@@ -3,8 +3,8 @@
 
 namespace ctoot::mpc
 {
-	class MpcIndivFxMixerChannel;
-	class MpcStereoMixerChannel;
+	class IndivFxMixer;
+	class StereoMixer;
 }
 
 namespace mpc::lcdgui::screens::window
@@ -39,8 +39,8 @@ namespace mpc::lcdgui::screens::window
 		void displayFollowStereo();
 		void displayChannel();
 
-		std::shared_ptr<ctoot::mpc::MpcIndivFxMixerChannel> getIndivFxMixerChannel();
-		std::shared_ptr<ctoot::mpc::MpcStereoMixerChannel> getStereoMixerChannel();
+		std::shared_ptr<ctoot::mpc::IndivFxMixer> getIndivFxMixerChannel();
+		std::shared_ptr<ctoot::mpc::StereoMixer> getStereoMixerChannel();
 
 	};
 }

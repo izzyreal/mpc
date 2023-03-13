@@ -426,12 +426,12 @@ int NoteParameters::getNumber()
     return index + 35;
 }
 
-std::shared_ptr<MpcStereoMixerChannel> NoteParameters::getStereoMixerChannel()
+std::shared_ptr<StereoMixer> NoteParameters::getStereoMixerChannel()
 {
     return stereoMixerChannel;
 }
 
-std::shared_ptr<MpcIndivFxMixerChannel> NoteParameters::getIndivFxMixerChannel()
+std::shared_ptr<IndivFxMixer> NoteParameters::getIndivFxMixerChannel()
 {
     return indivFxMixerChannel;
 }

@@ -4,7 +4,7 @@
 #include <file/aps/ApsNoteParameters.hpp>
 #include <file/aps/ApsSlider.hpp>
 #include <file/pgmwriter/Pads.hpp>
-#include <engine/mpc/MpcStereoMixerChannel.hpp>
+#include <engine/mpc/StereoMixer.hpp>
 #include <sampler/Program.hpp>
 #include <sampler/Pad.hpp>
 
@@ -69,8 +69,8 @@ ApsProgram::ApsProgram(mpc::sampler::Program* program, int index)
 	
 	byteList.push_back({ 6 });
 
-	std::vector<std::shared_ptr<MpcStereoMixerChannel>> stereoMixerChannels(64);
-	std::vector<std::shared_ptr<MpcIndivFxMixerChannel>> indivFxMixerChannels(64);
+	std::vector<std::shared_ptr<StereoMixer>> stereoMixerChannels(64);
+	std::vector<std::shared_ptr<IndivFxMixer>> indivFxMixerChannels(64);
 	
 	for (int i = 0; i < 64; i++)
 	{
@@ -149,12 +149,12 @@ std::vector<char> ApsProgram::getBytes()
     return saveBytes;
 }
 
-MpcStereoMixerChannel ApsProgram::getStereoMixerChannel(int noteIndex)
+StereoMixer ApsProgram::getStereoMixerChannel(int noteIndex)
 {
 	return mixer->getStereoMixerChannel(noteIndex);
 }
 
-MpcIndivFxMixerChannel ApsProgram::getIndivFxMixerChannel(int noteIndex)
+IndivFxMixer ApsProgram::getIndivFxMixerChannel(int noteIndex)
 {
 	return mixer->getIndivFxMixerChannel(noteIndex);
 }
