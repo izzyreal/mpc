@@ -6,8 +6,10 @@
 #include <engine/audio/fader/FaderControl.hpp>
 
 #include <memory>
+#include <utility>
 #include <vector>
 #include <string>
+#include "engine/mpc/MpcFaderControl.hpp"
 
 namespace ctoot::audio::mixer {
 
@@ -22,38 +24,38 @@ namespace ctoot::audio::mixer {
         float smoothingFactor{0.05f};
 
     public:
-        virtual float getSmoothingFactor();
+        float getSmoothingFactor();
 
-        virtual void createAuxBusControls(std::string name, std::shared_ptr<ctoot::audio::core::ChannelFormat> format);
+        void createAuxBusControls(std::string name, std::shared_ptr<ctoot::audio::core::ChannelFormat> format);
 
-        virtual std::shared_ptr<BusControls> getBusControls(std::string name);
+        std::shared_ptr<BusControls> getBusControls(std::string name);
 
-        virtual std::shared_ptr<BusControls> getMainBusControls();
+        std::shared_ptr<BusControls> getMainBusControls();
 
-        virtual std::vector<std::shared_ptr<BusControls>> getAuxBusControls();
+        std::vector<std::shared_ptr<BusControls>> getAuxBusControls();
 
-        virtual std::shared_ptr<ctoot::audio::core::AudioControlsChain>
+        std::shared_ptr<ctoot::audio::core::AudioControlsChain>
         createStripControls(int id, std::string name);
 
-        virtual std::shared_ptr<ctoot::audio::core::AudioControlsChain>
+        std::shared_ptr<ctoot::audio::core::AudioControlsChain>
         createStripControls(int id, std::string name, bool hasMixControls);
 
-        virtual void addStripControls(std::shared_ptr<CompoundControl> cc);
+        void addStripControls(std::shared_ptr<CompoundControl> cc);
 
-        virtual std::shared_ptr<ctoot::audio::core::AudioControlsChain> getStripControls(std::string name);
+        std::shared_ptr<ctoot::audio::core::AudioControlsChain> getStripControls(std::string name);
 
-        virtual ctoot::audio::fader::FaderControl *createFaderControl(bool muted);
+        ctoot::mpc::MpcFaderControl *createFaderControl();
 
     public:
         MixerControls(std::string name, std::string mainBusName,
                       std::shared_ptr<ctoot::audio::core::ChannelFormat> channelFormat);
 
         MixerControls(std::string name)
-                : MixerControls(name, "Main", ctoot::audio::core::ChannelFormat::STEREO())
+                : MixerControls(std::move(name), "Main", ctoot::audio::core::ChannelFormat::STEREO())
         {}
 
         MixerControls(std::string name, float _smoothingFactor)
-                : MixerControls(name)
+                : MixerControls(std::move(name))
         { smoothingFactor = _smoothingFactor; };
 
     };

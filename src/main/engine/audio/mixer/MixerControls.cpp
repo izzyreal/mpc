@@ -3,7 +3,6 @@
 #include <engine/audio/mixer/BusControls.hpp>
 #include <engine/audio/core/ChannelFormat.hpp>
 
-#include <engine/audio/mixer/GainControl.hpp>
 #include <engine/audio/mixer/MixerControlsFactory.hpp>
 #include <engine/audio/mixer/MixerControlsIds.hpp>
 #include <engine/control/CompoundControl.hpp>
@@ -103,7 +102,7 @@ shared_ptr<AudioControlsChain> MixerControls::getStripControls(string name)
 	return {};
 }
 
-FaderControl* MixerControls::createFaderControl(bool muted)
+ctoot::mpc::MpcFaderControl* MixerControls::createFaderControl()
 {
-    return new GainControl(muted);
+    return new ctoot::mpc::MpcFaderControl();
 }

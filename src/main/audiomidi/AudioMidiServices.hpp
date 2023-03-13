@@ -14,7 +14,6 @@
 #include <atomic>
 
 namespace ctoot::mpc {
-	class MpcMixerControls;
 	class MpcVoice;
 }
 
@@ -26,6 +25,10 @@ namespace ctoot::audio::server {
 	class CompoundAudioClient;
 	class NonRealTimeAudioServer;
 	class AudioServer;
+}
+
+namespace ctoot::audio::mixer {
+    class MixerControls;
 }
 
 namespace ctoot::audio::system {
@@ -84,7 +87,7 @@ namespace mpc::audiomidi
 		std::shared_ptr<ctoot::audio::server::NonRealTimeAudioServer> offlineServer;
 		std::shared_ptr<ctoot::audio::system::DefaultAudioSystem> audioSystem;
 		std::shared_ptr<ctoot::audio::mixer::AudioMixer> mixer;
-		std::shared_ptr<ctoot::mpc::MpcMixerControls> mixerControls;
+		std::shared_ptr<ctoot::audio::mixer::MixerControls> mixerControls;
 		std::shared_ptr<ctoot::audio::server::CompoundAudioClient> cac;
 		std::shared_ptr<MpcMidiOutput> mpcMidiOutput;
 		std::vector<ctoot::audio::server::IOAudioProcess*> inputProcesses;

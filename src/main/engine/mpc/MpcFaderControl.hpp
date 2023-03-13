@@ -16,7 +16,7 @@ namespace ctoot::mpc {
     public:
         void setValue(float value) override;
 
-        MpcFaderControl(bool muted);
+        MpcFaderControl();
 
     };
 

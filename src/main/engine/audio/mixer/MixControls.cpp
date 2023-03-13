@@ -27,7 +27,7 @@ MixControls::MixControls(MixerControls* mixerControls, int stripId, shared_ptr<B
 	this->mixerControls = mixerControls;
 	this->busControls = busControls;
 	this->master = master;
-	gainControl = shared_ptr<FaderControl>(mixerControls->createFaderControl(false));
+	gainControl = shared_ptr<FaderControl>(mixerControls->createFaderControl());
 	auto busId = busControls->getId();
 	auto format = getChannelFormat();
 	channelCount = format->getCount();
@@ -48,8 +48,7 @@ MixControls::MixControls(MixerControls* mixerControls, int stripId, shared_ptr<B
 	derive(muteControl.get());
 	add(muteControl);
 
-	auto muted = (busId == MixerControlsIds::AUX_BUS && !master);
-	gainControl = shared_ptr<FaderControl>(mixerControls->createFaderControl(muted));
+	gainControl = shared_ptr<FaderControl>(mixerControls->createFaderControl());
 	add(gainControl);
 	derive(gainControl.get());
 }

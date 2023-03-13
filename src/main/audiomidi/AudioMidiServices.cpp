@@ -14,7 +14,7 @@
 #include <engine/mpc/MpcVoice.hpp>
 #include <engine/mpc/PreviewSoundPlayer.hpp>
 #include <engine/mpc/MpcFaderControl.hpp>
-#include <engine/mpc/MpcMixerControls.hpp>
+#include <engine/audio/mixer/MixerControls.hpp>
 #include <engine/mpc/Drum.hpp>
 
 #include <lcdgui/screens/MixerSetupScreen.hpp>
@@ -162,7 +162,7 @@ NonRealTimeAudioServer* AudioMidiServices::getAudioServer() {
 
 void AudioMidiServices::setupMixer()
 {
-	mixerControls = std::make_shared<MpcMixerControls>("MpcMixerControls", 1.f);
+	mixerControls = std::make_shared<MixerControls>("", 1.f);
 
 	// AUX#1 - #4 represent ASSIGNABLE MIX OUT 1/2, 3/4, 5/6 and 7/8
 	mixerControls->createAuxBusControls("AUX#1", ChannelFormat::STEREO());
