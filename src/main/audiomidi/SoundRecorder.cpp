@@ -82,16 +82,16 @@ void SoundRecorder::stop()
 {
 	recording = false;
 
-	if (srcLeft != NULL)
+	if (srcLeft != nullptr)
 	{
 		src_delete(srcLeft);
-		srcLeft = NULL;
+		srcLeft = nullptr;
 	}
 
-	if (srcRight != NULL)
+	if (srcRight != nullptr)
 	{
 		src_delete(srcRight);
-		srcRight = NULL;
+		srcRight = nullptr;
 	}
 
 	if (cancelled)
@@ -209,8 +209,8 @@ int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf, int nFrame
 
 		if (resample)
 		{
-			if (((mode == 0 || mode == 2) && srcLeft == NULL) ||
-				((mode == 1 || mode == 2) && srcRight == NULL))
+			if (((mode == 0 || mode == 2) && srcLeft == nullptr) ||
+				((mode == 1 || mode == 2) && srcRight == nullptr))
 			{
 				initSrc();
 			}
@@ -336,13 +336,13 @@ std::vector<float> SoundRecorder::resampleChannel(bool left, std::vector<float>&
 void SoundRecorder::initSrc() {
 	if (mode == 0 || mode == 2) {
         if (srcLeft != nullptr)
-            delete srcLeft;
+            src_delete(srcLeft);
 		srcLeft = src_new(0, 1, &srcLeftError);
 	}
 
 	if (mode == 1 || mode == 2) {
         if (srcRight != nullptr)
-            delete srcRight;
+            src_delete(srcRight);
 		srcRight = src_new(0, 1, &srcRightError);
 	}
 }
@@ -350,7 +350,7 @@ void SoundRecorder::initSrc() {
 SoundRecorder::~SoundRecorder()
 {
     if (srcLeft != nullptr)
-        delete srcLeft;
+        src_delete(srcLeft);
     if (srcRight != nullptr)
-        delete srcRight;
+        src_delete(srcRight);
 }
