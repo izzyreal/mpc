@@ -4,29 +4,21 @@
 #include <vector>
 #include <memory>
 
-namespace ctoot::control {
-	class CompoundControl;
-}
-
 namespace ctoot::audio::server {
 	class AudioServer;
 }
 
 namespace ctoot::audio::mixer {
 	class AudioMixer;
-	class MainMixControls;
 }
 
 namespace ctoot::mpc {
 	class MpcSampler;
 	class MpcStereoMixerChannel;
 	class MpcIndivFxMixerChannel;
-	class MpcProgram;
 	class MpcNoteParameters;
-	class MpcSound;
 	class MpcVoice;
 	class MpcSoundPlayerControls;
-	class MpcFaderControl;
 	class MpcMixerInterconnection;
 }
 

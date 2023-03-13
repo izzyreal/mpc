@@ -7,8 +7,6 @@ namespace ctoot::mpc {
 
 		class MpcSampler;
 		class MpcVoice;
-		class MpcSoundOscillatorControls;
-		class MpcEnvelopeControls;
 
 		class MpcBasicSoundPlayerControls
 			: public ctoot::control::CompoundControl

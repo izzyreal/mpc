@@ -28,7 +28,6 @@
 #include "lcdgui/screens/UserScreen.hpp"
 #include "lcdgui/screens/SequencerScreen.hpp"
 
-#include <engine/mpc/MpcSoundPlayerChannel.hpp>
 #include <engine/midi/ShortMessage.hpp>
 
 #include "Util.hpp"

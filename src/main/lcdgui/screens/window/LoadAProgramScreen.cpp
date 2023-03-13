@@ -3,8 +3,6 @@
 #include <disk/AbstractDisk.hpp>
 #include <lcdgui/screens/LoadScreen.hpp>
 
-#include <engine/mpc/MpcSoundPlayerChannel.hpp>
-
 #include "sequencer/Track.hpp"
 
 using namespace mpc::lcdgui::screens::window;

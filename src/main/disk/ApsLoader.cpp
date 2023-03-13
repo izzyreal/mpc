@@ -15,7 +15,6 @@
 
 #include <engine/mpc/MpcSoundPlayerChannel.hpp>
 
-#include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/DrumScreen.hpp>
 #include <lcdgui/screens/MixerSetupScreen.hpp>
 #include <lcdgui/screens/dialog2/PopupScreen.hpp>
