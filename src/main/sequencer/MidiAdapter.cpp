@@ -2,7 +2,7 @@
 
 #include <sequencer/Event.hpp>
 #include <sequencer/NoteEvent.hpp>
-#include <midi/core/ShortMessage.hpp>
+#include "midi/ShortMessage.hpp"
 
 using namespace mpc::sequencer;
 

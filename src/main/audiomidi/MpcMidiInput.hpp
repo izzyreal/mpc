@@ -3,7 +3,6 @@
 #include <observer/Observable.hpp>
 #include <sequencer/Event.hpp>
 #include <sequencer/Track.hpp>
-#include <midi/core/MidiInput.hpp>
 #include <sequencer/EventAdapter.hpp>
 #include <sequencer/MidiAdapter.hpp>
 #include "VmpcMidiControlMode.hpp"
@@ -18,7 +17,7 @@ namespace mpc::audiomidi {
 
 namespace mpc::audiomidi {
     class MpcMidiInput
-            : public moduru::observer::Observable, public virtual ctoot::midi::core::MidiInput
+            : public moduru::observer::Observable
     {
 
     public:
@@ -32,12 +31,12 @@ namespace mpc::audiomidi {
         std::unique_ptr<mpc::sequencer::MidiAdapter> midiAdapter;
         std::unique_ptr<mpc::sequencer::EventAdapter> eventAdapter;
         std::unique_ptr<VmpcMidiControlMode> midiFullControl;
-        std::string notify = "";
+        std::string notify;
 
     public:
-        std::string getName() override;
+        std::string getName();
 
-        void transport(ctoot::midi::core::MidiMessage *msg, int timestamp) override;
+        void transport(ctoot::midi::core::MidiMessage *msg, int timestamp);
 
     private:
         void midiOut(std::weak_ptr<sequencer::Event> event, sequencer::Track *track);

@@ -20,14 +20,10 @@
 #include <lcdgui/screens/SyncScreen.hpp>
 #include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
 
-#include <midi/core/MidiMessage.hpp>
-#include <midi/core/ShortMessage.hpp>
-#include <midi/core/MidiInput.hpp>
+#include "midi/MidiMessage.hpp"
+#include "midi/ShortMessage.hpp"
 
 #include <audio/server/NonRealTimeAudioServer.hpp>
-
-#include <mpc/MpcMultiMidiSynth.hpp>
-#include <mpc/MpcSoundPlayerChannel.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -105,20 +101,29 @@ void EventHandler::handleNoThru(const std::shared_ptr<Event>& event, Track* trac
                         auto durationFrames = (duration == -1 || duration == 0) ?
                                               -1 : SeqUtil::ticksToFrames(duration, sequencer->getTempo(), audioServer->getSampleRate());
 
-                        mpc.getMms()->mpcTransport(
-                                midiAdapter.get().lock().get(),
-                                0,
-                                noteEvent->getVariationType(),
-                                noteEvent->getVariationValue(),
-                                eventFrame,
-                                noteEvent->getTick(),
-                                static_cast<int>(durationFrames));
+                        if (noteEvent->getVelocity() > 0)
+                        {
+                            mpc.getDrum(drumIndex).mpcNoteOn(
+                                    noteEvent->getNote(),
+                                    noteEvent->getVelocity(),
+                                    noteEvent->getVariationType(),
+                                    noteEvent->getVariationValue(),
+                                    eventFrame,
+                                    true,
+                                    noteEvent->getTick(),
+                                    durationFrames
+                                    );
+                        }
+                        else
+                        {
+                            mpc.getDrum(drumIndex).mpcNoteOff(noteEvent->getNote(), eventFrame, noteEvent->getTick());
+                        }
                     }
 
                     if (audioServer->isRealTime())
                     {
                         auto note = noteEvent->getNote();
-                        auto program = mpc.getSampler()->getProgram(mpc.getDrum(drumIndex)->getProgram());
+                        auto program = mpc.getSampler()->getProgram(mpc.getDrum(drumIndex).getProgram());
 
                         int pad = program->getPadIndexFromNote(note);
                         int bank = mpc.getBank();
@@ -155,7 +160,7 @@ void EventHandler::handleNoThru(const std::shared_ptr<Event>& event, Track* trac
     {
         auto pad = mixerEvent->getPad();
         auto p = sampler->getProgram(sampler->getDrumBusProgramIndex(track->getBus()));
-        auto mixer = p->getStereoMixerChannel(pad).lock();
+        auto mixer = p->getStereoMixerChannel(pad);
         
         auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>("mixer-setup");
         
@@ -166,8 +171,8 @@ void EventHandler::handleNoThru(const std::shared_ptr<Event>& event, Track* trac
             if (busNumber != 0)
             {
                 auto drumIndex = busNumber - 1;
-                auto mpcSoundPlayerChannel = mpc.getDrum(drumIndex);
-                mixer = mpcSoundPlayerChannel->getStereoMixerChannels().at(pad).lock();
+                auto& mpcSoundPlayerChannel = mpc.getDrum(drumIndex);
+                mixer = mpcSoundPlayerChannel.getStereoMixerChannels().at(pad);
             }
             else
             {

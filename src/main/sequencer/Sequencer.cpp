@@ -281,7 +281,7 @@ void Sequencer::setSoloEnabled(bool b)
     {
         for (int i = 0; i < 4; i++)
         {
-            mpc.getDrum(i)->allNotesOff();
+            mpc.getDrum(i).allNotesOff();
         }
     }
 

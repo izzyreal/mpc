@@ -140,8 +140,8 @@ void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool head
             auto sourceIndivFxMixerChannel = apsProgram->getIndivFxMixerChannel(noteIndex);
             
             auto destNoteParams = dynamic_cast<NoteParameters*>(newProgram->getNoteParameters(noteIndex + 35));
-            auto destStereoMixerCh = destNoteParams->getStereoMixerChannel().lock();
-            auto destIndivFxCh = destNoteParams->getIndivFxMixerChannel().lock();
+            auto destStereoMixerCh = destNoteParams->getStereoMixerChannel();
+            auto destIndivFxCh = destNoteParams->getIndivFxMixerChannel();
             
             destIndivFxCh->setFxPath(sourceIndivFxMixerChannel.getFxPath());
             destStereoMixerCh->setLevel(sourceStereoMixerChannel.getLevel());
@@ -206,14 +206,14 @@ void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool head
     for (int i = 0; i < 4; i++)
     {
         auto m = apsParser.getDrumMixers()[i];
-        auto drum = mpc.getDrum(i);
+        auto& drum = mpc.getDrum(i);
         
         for (int noteIndex = 0; noteIndex < 64; noteIndex++)
         {
             auto apssmc = m->getStereoMixerChannel(noteIndex);
             auto apsifmc = m->getIndivFxMixerChannel(noteIndex);
-            auto drumsmc = drum->getStereoMixerChannels()[noteIndex].lock();
-            auto drumifmc = drum->getIndivFxMixerChannels()[noteIndex].lock();
+            auto drumsmc = drum.getStereoMixerChannels()[noteIndex];
+            auto drumifmc = drum.getIndivFxMixerChannels()[noteIndex];
 
             drumifmc->setFxPath(apsifmc.getFxPath());
             drumsmc->setLevel(apssmc.getLevel());
@@ -224,9 +224,9 @@ void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool head
         }
         
         auto pgm = apsParser.getDrumConfiguration(i)->getProgram();
-        drum->setProgram(pgm);
-        drum->setReceivePgmChange(apsParser.getDrumConfiguration(i)->getReceivePgmChange());
-        drum->setReceiveMidiVolume(apsParser.getDrumConfiguration(i)->getReceiveMidiVolume());
+        drum.setProgram(pgm);
+        drum.setReceivePgmChange(apsParser.getDrumConfiguration(i)->getReceivePgmChange());
+        drum.setReceiveMidiVolume(apsParser.getDrumConfiguration(i)->getReceiveMidiVolume());
     }
     
     auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>("mixer-setup");

@@ -9,12 +9,11 @@
 #include <sequencer/MixerEvent.hpp>
 #include <sequencer/Track.hpp>
 
-#include <mpc/MpcSoundPlayerChannel.hpp>
-
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui;
 using namespace mpc::controls;
 using namespace mpc::sampler;
+using namespace mpc::sequencer;
 using namespace ctoot::mpc;
 using namespace moduru::lang;
 
@@ -73,7 +72,7 @@ std::shared_ptr<MpcStereoMixerChannel> MixerScreen::getStereoMixerChannel(int in
     auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>("mixer-setup");
     bool stereoMixSourceIsDrum = mixerSetupScreen->isStereoMixSourceDrum();
     
-    return stereoMixSourceIsDrum ? mpcSoundPlayerChannel->getStereoMixerChannels()[note - 35].lock() : noteParameters->getStereoMixerChannel().lock();
+    return stereoMixSourceIsDrum ? mpcSoundPlayerChannel().getStereoMixerChannels()[note - 35] : noteParameters->getStereoMixerChannel();
 }
 
 std::shared_ptr<MpcIndivFxMixerChannel> MixerScreen::getIndivFxMixerChannel(int index)
@@ -89,7 +88,7 @@ std::shared_ptr<MpcIndivFxMixerChannel> MixerScreen::getIndivFxMixerChannel(int 
     auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>("mixer-setup");
     bool indivFxSourceIsDrum = mixerSetupScreen->isIndivFxSourceDrum();
     
-    return indivFxSourceIsDrum ? mpcSoundPlayerChannel->getIndivFxMixerChannels()[note - 35].lock() : noteParameters->getIndivFxMixerChannel().lock();
+    return indivFxSourceIsDrum ? mpcSoundPlayerChannel().getIndivFxMixerChannels()[note - 35] : noteParameters->getIndivFxMixerChannel();
 }
 
 void MixerScreen::displayMixerStrip(int stripIndex)
@@ -486,7 +485,7 @@ void MixerScreen::turnWheel(int i)
 void MixerScreen::recordMixerEvent(int pad, int param, int value)
 {
     auto track = sequencer->getActiveTrack();
-    auto e = std::dynamic_pointer_cast<mpc::sequencer::MixerEvent>(track->addEvent(sequencer->getTickPosition(), "mixer"));
+    auto e = std::dynamic_pointer_cast<MixerEvent>(track->addEvent(sequencer->getTickPosition(), "mixer"));
     e->setPadNumber(pad);
     e->setParameter(param);
     e->setValue(value);

@@ -20,10 +20,7 @@
 #include <sampler/Sampler.hpp>
 #include <sequencer/Sequencer.hpp>
 #include <mpc/MpcBasicSoundPlayerChannel.hpp>
-#include <mpc/MpcMultiMidiSynth.hpp>
 #include <mpc/MpcSoundPlayerChannel.hpp>
-
-#include <midi/core/MidiTransport.hpp>
 
 #include <hardware/Hardware.hpp>
 #include <hardware/HwSlider.hpp>
@@ -204,28 +201,14 @@ std::shared_ptr<sampler::Sampler> Mpc::getSampler()
     return sampler;
 }
 
-ctoot::mpc::MpcSoundPlayerChannel* Mpc::getDrum(int i)
+ctoot::mpc::MpcSoundPlayerChannel& Mpc::getDrum(int i)
 {
-	auto mms = audioMidiServices->getMms();
-	auto channel = mms->getChannel(i).lock().get();
-	return dynamic_cast< ctoot::mpc::MpcSoundPlayerChannel*>(channel);
+	return audioMidiServices->getDrum(i);
 }
 
-std::vector<ctoot::mpc::MpcSoundPlayerChannel*> Mpc::getDrums()
+ctoot::mpc::MpcBasicSoundPlayerChannel& Mpc::getBasicPlayer()
 {
-    std::vector<ctoot::mpc::MpcSoundPlayerChannel*> drums(4);
-	
-    for (int i = 0; i < 4; i++)
-		drums[i] = getDrum(i);
-	
-	return drums;
-}
-
-ctoot::mpc::MpcBasicSoundPlayerChannel* Mpc::getBasicPlayer()
-{
-	auto mms = audioMidiServices->getMms();
-	auto channel = mms->getChannel(4).lock().get();
-	return dynamic_cast< ctoot::mpc::MpcBasicSoundPlayerChannel*>(channel);
+	return audioMidiServices->getBasicPlayer();
 }
 
 std::shared_ptr<audiomidi::AudioMidiServices> Mpc::getAudioMidiServices()
@@ -261,11 +244,6 @@ std::vector<std::shared_ptr<mpc::disk::AbstractDisk>> Mpc::getDisks()
 
 std::vector<char> Mpc::akaiAsciiChar { ' ', '!', '#', '$', '%', '&', '\'', '(', ')', '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '_', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '}' };
 std::vector<std::string> Mpc::akaiAscii { " ", "!", "#", "$", "%", "&", "'", "(", ")", "-", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "@", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "_", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "{", "}" };
-
-ctoot::mpc::MpcMultiMidiSynth* Mpc::getMms()
-{
-	return audioMidiServices->getMms().get();
-}
 
 std::shared_ptr<audiomidi::MpcMidiOutput> Mpc::getMidiOutput()
 {

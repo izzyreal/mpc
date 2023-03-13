@@ -29,8 +29,7 @@
 #include "lcdgui/screens/SequencerScreen.hpp"
 
 #include "mpc/MpcSoundPlayerChannel.hpp"
-#include "mpc/MpcMultiMidiSynth.hpp"
-#include "midi/core/ShortMessage.hpp"
+#include "midi/ShortMessage.hpp"
 
 #include "Util.hpp"
 
@@ -109,7 +108,6 @@ void FrameSeqBase::stop()
     }
 
     running.store(false);
-    metronome = false;
     sequencerShouldStartPlayingOnNextLock = false;
     tickFrameOffset = 0;
 }
@@ -520,6 +518,7 @@ bool FrameSeqBase::processTransport(bool isRunningAtStartOfBuffer, int frameInde
             sendMidiSyncMsg(ShortMessage::STOP, frameIndex);
             wasRunning = false;
             sequencerShouldPlay = false;
+            metronome = false;
         }
         else if (sequencerShouldStartPlayingOnNextLock)
         {

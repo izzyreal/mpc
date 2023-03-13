@@ -45,7 +45,8 @@ BaseControls::BaseControls(mpc::Mpc& _mpc)
 : mpc (_mpc),
 ls (_mpc.getLayeredScreen()),
 sampler (_mpc.getSampler()),
-sequencer (_mpc.getSequencer())
+sequencer (_mpc.getSequencer()),
+mpcSoundPlayerChannel(_mpc.getDrum(0))
 {
 }
 
@@ -75,11 +76,10 @@ void BaseControls::init()
     if (drumIndex != -1)
     {
         mpcSoundPlayerChannel = sampler->getDrum(drumIndex);
-        program = sampler->getProgram(mpcSoundPlayerChannel->getProgram());
+        program = sampler->getProgram(mpcSoundPlayerChannel.getProgram());
     }
     else
     {
-        mpcSoundPlayerChannel = nullptr;
         program.reset();
     }
 }

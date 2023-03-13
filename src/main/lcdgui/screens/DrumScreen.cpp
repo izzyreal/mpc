@@ -2,8 +2,6 @@
 
 #include "SelectDrumScreen.hpp"
 
-#include <mpc/MpcSoundPlayerChannel.hpp>
-
 using namespace mpc::lcdgui::screens;
 using namespace mpc::controls;
 using namespace moduru::lang;
@@ -62,22 +60,22 @@ void DrumScreen::turnWheel(int i)
 	}
 	else if (param.compare("pgm") == 0)
 	{
-		mpcSoundPlayerChannel->setProgram(mpcSoundPlayerChannel->getProgram() + i);
+		mpcSoundPlayerChannel().setProgram(mpcSoundPlayerChannel().getProgram() + i);
 		displayPgm();
 	}
 	else if (param.compare("program-change") == 0)
 	{
-		mpcSoundPlayerChannel->setReceivePgmChange(i > 0);
+		mpcSoundPlayerChannel().setReceivePgmChange(i > 0);
 		displayPgmChange();
 	}
 	else if (param.compare("midi-volume") == 0)
 	{
-		mpcSoundPlayerChannel->setReceiveMidiVolume(i > 0);
+		mpcSoundPlayerChannel().setReceiveMidiVolume(i > 0);
 		displayMidiVolume();
 	}
 	else if (param.compare("current-val") == 0)
 	{
-		mpcSoundPlayerChannel->setLastReceivedMidiVolume(mpcSoundPlayerChannel->getLastReceivedMidiVolume() + i);
+		mpcSoundPlayerChannel().setLastReceivedMidiVolume(mpcSoundPlayerChannel().getLastReceivedMidiVolume() + i);
 		displayCurrentVal();
 	}
 	else if (param.compare("padtointernalsound") == 0)
@@ -89,7 +87,7 @@ void DrumScreen::turnWheel(int i)
 void DrumScreen::displayCurrentVal()
 {
 	init();
-	findField("current-val")->setTextPadded(mpcSoundPlayerChannel->getLastReceivedMidiVolume());
+	findField("current-val")->setTextPadded(mpcSoundPlayerChannel().getLastReceivedMidiVolume());
 }
 
 void DrumScreen::displayDrum()
@@ -104,18 +102,18 @@ void DrumScreen::displayPadToInternalSound()
 
 void DrumScreen::displayPgm()
 {
-	auto pn = mpcSoundPlayerChannel->getProgram();
+	auto pn = mpcSoundPlayerChannel().getProgram();
 	findField("pgm")->setText(StrUtil::padLeft(std::to_string(pn + 1), " ", 2) + "-" + sampler->getProgram(pn)->getName());
 }
 
 void DrumScreen::displayPgmChange()
 {
-	findField("program-change")->setText(mpcSoundPlayerChannel->receivesPgmChange() ? "RECEIVE" : "IGNORE");
+	findField("program-change")->setText(mpcSoundPlayerChannel().receivesPgmChange() ? "RECEIVE" : "IGNORE");
 }
 
 void DrumScreen::displayMidiVolume()
 {
-	findField("midi-volume")->setText(mpcSoundPlayerChannel->receivesMidiVolume() ? "RECEIVE" : "IGNORE");
+	findField("midi-volume")->setText(mpcSoundPlayerChannel().receivesMidiVolume() ? "RECEIVE" : "IGNORE");
 }
 
 bool DrumScreen::isPadToIntSound()

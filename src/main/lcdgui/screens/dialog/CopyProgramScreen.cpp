@@ -1,7 +1,5 @@
 #include "CopyProgramScreen.hpp"
 
-#include <mpc/MpcSoundPlayerChannel.hpp>
-
 using namespace mpc::lcdgui::screens::dialog;
 using namespace moduru::lang;
 
@@ -13,7 +11,7 @@ CopyProgramScreen::CopyProgramScreen(mpc::Mpc& mpc, const int layerIndex)
 void CopyProgramScreen::open()
 {
 	init();
-	pgm0 = mpcSoundPlayerChannel->getProgram();
+	pgm0 = mpcSoundPlayerChannel().getProgram();
 	pgm1 = pgm0;
 
 	displayPgm0();
@@ -36,7 +34,7 @@ void CopyProgramScreen::function(int i)
 			return;
 
 		sampler->copyProgram(pgm0, pgm1);
-		mpcSoundPlayerChannel->setProgram(pgm1);
+		mpcSoundPlayerChannel().setProgram(pgm1);
 		openScreen("program");
 		break;
 	}

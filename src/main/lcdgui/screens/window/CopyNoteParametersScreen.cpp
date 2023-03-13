@@ -1,7 +1,5 @@
 #include "CopyNoteParametersScreen.hpp"
 
-#include <mpc/MpcSoundPlayerChannel.hpp>
-
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::controls;
 using namespace moduru::lang;
@@ -17,7 +15,7 @@ void CopyNoteParametersScreen::open()
 
 	auto note = sampler->getLastNp(program.get())->getNumber();
 
-	auto programIndex = mpcSoundPlayerChannel->getProgram();
+	auto programIndex = mpcSoundPlayerChannel().getProgram();
 	setProg0(programIndex);
 	setNote0(note);
 	setProg1(programIndex);

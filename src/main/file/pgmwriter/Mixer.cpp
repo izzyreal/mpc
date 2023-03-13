@@ -13,8 +13,8 @@ Mixer::Mixer(mpc::sampler::Program* program)
 	for (int i = 0; i < 64; i++)
 	{
 		auto noteParameters = dynamic_cast<NoteParameters*>(program->getNoteParameters(i + 35));
-		auto smc = noteParameters->getStereoMixerChannel().lock();
-		auto ifmc = noteParameters->getIndivFxMixerChannel().lock();
+		auto smc = noteParameters->getStereoMixerChannel();
+		auto ifmc = noteParameters->getIndivFxMixerChannel();
 		setVolume(i, smc->getLevel());
 		setPan(i, smc->getPanning());
 		setVolumeIndividual(i, ifmc->getVolumeIndividualOut());

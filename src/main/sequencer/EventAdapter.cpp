@@ -5,8 +5,8 @@
 #include <sequencer/MidiClockEvent.hpp>
 #include <sequencer/NoteEvent.hpp>
 #include <sequencer/Sequencer.hpp>
-#include <midi/core/MidiMessage.hpp>
-#include <midi/core/ShortMessage.hpp>
+#include "midi/MidiMessage.hpp"
+#include "midi/ShortMessage.hpp"
 
 #include <lcdgui/screens/window/MultiRecordingSetupScreen.hpp>
 #include <lcdgui/screens/window/MidiInputScreen.hpp>

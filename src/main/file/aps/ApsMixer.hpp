@@ -36,7 +36,7 @@ namespace mpc::file::aps
 
 	public:
 		ApsMixer(const std::vector<char>& loadBytes);
-		ApsMixer(std::vector<std::weak_ptr<ctoot::mpc::MpcStereoMixerChannel>> smc, std::vector<std::weak_ptr<ctoot::mpc::MpcIndivFxMixerChannel>> ifmc);
+		ApsMixer(std::vector<std::shared_ptr<ctoot::mpc::MpcStereoMixerChannel>>& smc, std::vector<std::shared_ptr<ctoot::mpc::MpcIndivFxMixerChannel>>& ifmc);
 
 	};
 }

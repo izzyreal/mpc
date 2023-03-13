@@ -24,8 +24,7 @@
 
 #include <Util.hpp>
 
-#include <mpc/MpcMultiMidiSynth.hpp>
-#include <midi/core/ShortMessage.hpp>
+#include "midi/ShortMessage.hpp"
 #include <audio/server/NonRealTimeAudioServer.hpp>
 
 #include <stdexcept>
@@ -1349,17 +1348,6 @@ std::vector<std::weak_ptr<EventRow>> StepEditorScreen::findEventRows()
 
 void StepEditorScreen::adhocPlayNoteEvent(const std::shared_ptr<mpc::sequencer::NoteEvent> &noteEvent)
 {
-    auto tick = noteEvent->getTick();
-    noteEvent->setTick(-1);
-    auto tr = track.get();
-
-    MidiAdapter midiAdapter;
-
-    midiAdapter.process(noteEvent, tr->getBus() - 1, noteEvent ? noteEvent->getVelocity() : 0);
-
-    auto varType = noteEvent->getVariationType();
-    auto varValue = noteEvent->getVariationValue();
-
     int uniqueEnoughID = playSingleEventCounter++;
 
     if (playSingleEventCounter < 0)
@@ -1367,30 +1355,41 @@ void StepEditorScreen::adhocPlayNoteEvent(const std::shared_ptr<mpc::sequencer::
         playSingleEventCounter = 0;
     }
 
-    auto mms = mpc.getMms();
+    const auto bus = track->getBus();
+    const auto note = noteEvent->getNote();
+    const auto velo = noteEvent->getVelocity();
+    const auto varType = noteEvent->getVariationType();
+    const auto varValue = noteEvent->getVariationValue();
 
-    mms->mpcTransport(midiAdapter.get().lock().get(), 0, varType, varValue, 0, uniqueEnoughID, -1);
+    if (bus == 0)
+    {
+        // TODO MIDI OUT
+    }
+    else
+    {
+        mpc.getDrum(bus - 1).mpcNoteOn(note, velo, varType, varValue, 0, true, uniqueEnoughID, -1);
+        // TODO MIDI OUT
+    }
 
-    noteEvent->setTick(tick);
+    const auto noteOnStartTick = noteEvent->getTick();
 
-    auto frameSeq = mpc.getAudioMidiServices()->getFrameSequencer();
-    auto sampleRate = mpc.getAudioMidiServices()->getAudioServer()->getSampleRate();
-    auto tempo = sequencer->getTempo();
-
-    auto durationInFrames = SeqUtil::ticksToFrames(noteEvent->getDuration(), tempo, sampleRate);
-
-    auto eventAfterNFrames = [noteEvent, tr, mms, uniqueEnoughID](unsigned int frameIndex) {
-        auto noteOff = noteEvent->getNoteOff();
-        auto noteOffTick = noteOff->getTick();
-        noteOff->setTick(-1);
-        noteOff->setNote(noteEvent->getNote());
-        MidiAdapter midiAdapter2;
-        midiAdapter2.process(noteOff, tr->getBus() - 1, 0);
-        auto noteOffToSend = midiAdapter2.get();
-        noteOff->setTick(noteOffTick);
-        mms->mpcTransport(noteOffToSend.lock().get(), 0, 0, 0, frameIndex, uniqueEnoughID, -1);
+    auto eventAfterNFrames = [bus, note, noteOnStartTick, this](unsigned int frameIndex) {
+        if (bus == 0)
+        {
+            // TODO MIDI OUT
+        }
+        else
+        {
+            mpc.getDrum(bus - 1).mpcNoteOff(note, frameIndex, noteOnStartTick);
+            // TODO MIDI OUT
+        }
     };
 
+    const auto sampleRate = mpc.getAudioMidiServices()->getAudioServer()->getSampleRate();
+    const auto tempo = sequencer->getTempo();
+    const auto durationInFrames = SeqUtil::ticksToFrames(noteEvent->getDuration(), tempo, sampleRate);
+
+    auto frameSeq = mpc.getAudioMidiServices()->getFrameSequencer();
     frameSeq->enqueueEventAfterNFrames(eventAfterNFrames, durationInFrames);
 }
 

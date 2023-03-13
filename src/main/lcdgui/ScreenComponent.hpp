@@ -18,6 +18,8 @@
 #include <string>
 #include <map>
 
+#include "mpc/MpcSoundPlayerChannel.hpp"
+
 namespace mpc::lcdgui
 {
 	class ScreenComponent
@@ -40,7 +42,7 @@ namespace mpc::lcdgui
 		std::string param = "";
 		std::shared_ptr<mpc::sampler::Program> program;
 		std::shared_ptr<mpc::sequencer::Track> track;
-		ctoot::mpc::MpcSoundPlayerChannel* mpcSoundPlayerChannel = nullptr;
+		ctoot::mpc::MpcSoundPlayerChannel& mpcSoundPlayerChannel() { return mpc.getControls()->getControls()->mpcSoundPlayerChannel; }
 
 	protected:
 		std::shared_ptr<Field> findFocus();
@@ -73,7 +75,6 @@ namespace mpc::lcdgui
 			controls->init();
 			param = controls->param;
 			program = controls->program;
-			mpcSoundPlayerChannel = controls->mpcSoundPlayerChannel;
 			track = controls->track;
 		}
 

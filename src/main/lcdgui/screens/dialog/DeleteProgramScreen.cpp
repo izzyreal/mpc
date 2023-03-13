@@ -1,7 +1,5 @@
 #include "DeleteProgramScreen.hpp"
 
-#include <mpc/MpcSoundPlayerChannel.hpp>
-
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::sampler;
 using namespace moduru::lang;
@@ -17,7 +15,7 @@ void DeleteProgramScreen::open()
 
     init();
 
-    pgm = mpcSoundPlayerChannel->getProgram();
+    pgm = mpcSoundPlayerChannel().getProgram();
 
     displayPgm();
 }

@@ -2,8 +2,6 @@
 
 #include <lcdgui/screens/window/NameScreen.hpp>
 
-#include <mpc/MpcSoundPlayerChannel.hpp>
-
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::controls;
@@ -84,7 +82,7 @@ void CreateNewProgramScreen::function(int i)
 			}
 		}
 
-		mpcSoundPlayerChannel->setProgram(index);
+		mpcSoundPlayerChannel().setProgram(index);
 		openScreen("program");
 		break;
 	}

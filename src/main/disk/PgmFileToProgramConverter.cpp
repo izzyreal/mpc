@@ -91,8 +91,8 @@ void PgmFileToProgramConverter::setMixer(ProgramFileReader& reader, std::shared_
 	for (int i = 0; i < 64; i++)
 	{
 		auto noteParameters = dynamic_cast<NoteParameters*>(program->getNoteParameters(i + 35));
-		auto smc = noteParameters->getStereoMixerChannel().lock();
-		auto ifmc = noteParameters->getIndivFxMixerChannel().lock();
+		auto smc = noteParameters->getStereoMixerChannel();
+		auto ifmc = noteParameters->getIndivFxMixerChannel();
 		
 		smc->setLevel(pgmMixer->getVolume(i));
 		smc->setPanning(pgmMixer->getPan(i));

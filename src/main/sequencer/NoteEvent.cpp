@@ -76,7 +76,7 @@ void NoteEvent::setVariationTypeNumber(int i)
 
 void NoteEvent::setVariationValue(int i)
 {
-    if(i < 0 || i > 128) return;
+    if(i < 0 || i > 124) return;
 
     if(variationTypeNumber != 0 && i > 100) i = 100;
 

@@ -15,7 +15,6 @@
 namespace ctoot::mpc {
     class MpcSoundPlayerChannel;
     class MpcBasicSoundPlayerChannel;
-    class MpcMultiMidiSynth;
 }
 
 namespace mpc::hardware {
@@ -98,12 +97,10 @@ namespace mpc {
     public:
         std::shared_ptr<sequencer::Sequencer> getSequencer();
         std::shared_ptr<sampler::Sampler> getSampler();
-        ctoot::mpc::MpcSoundPlayerChannel* getDrum(int i);
-        ctoot::mpc::MpcBasicSoundPlayerChannel* getBasicPlayer();
+        ctoot::mpc::MpcSoundPlayerChannel& getDrum(int i);
+        ctoot::mpc::MpcBasicSoundPlayerChannel& getBasicPlayer();
         std::shared_ptr<audiomidi::AudioMidiServices> getAudioMidiServices();
-        std::vector<ctoot::mpc::MpcSoundPlayerChannel*> getDrums();
         std::shared_ptr<audiomidi::EventHandler> getEventHandler();
-        ctoot::mpc::MpcMultiMidiSynth* getMms();
         std::shared_ptr<mpc::audiomidi::MpcMidiOutput> getMidiOutput();
         mpc::audiomidi::MpcMidiInput* getMpcMidiInput(int i);
 

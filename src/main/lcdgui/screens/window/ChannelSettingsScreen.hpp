@@ -39,8 +39,8 @@ namespace mpc::lcdgui::screens::window
 		void displayFollowStereo();
 		void displayChannel();
 
-		std::weak_ptr<ctoot::mpc::MpcIndivFxMixerChannel> getIndivFxMixerChannel();
-		std::weak_ptr<ctoot::mpc::MpcStereoMixerChannel> getStereoMixerChannel();
+		std::shared_ptr<ctoot::mpc::MpcIndivFxMixerChannel> getIndivFxMixerChannel();
+		std::shared_ptr<ctoot::mpc::MpcStereoMixerChannel> getStereoMixerChannel();
 
 	};
 }

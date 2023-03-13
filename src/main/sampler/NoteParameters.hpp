@@ -33,8 +33,8 @@ namespace mpc::sampler
 		int getFilterEnvelopeAmount() override;
 		int getVoiceOverlap() override;
 
-		std::weak_ptr<ctoot::mpc::MpcStereoMixerChannel> getStereoMixerChannel();
-		std::weak_ptr<ctoot::mpc::MpcIndivFxMixerChannel> getIndivFxMixerChannel();
+		std::shared_ptr<ctoot::mpc::MpcStereoMixerChannel> getStereoMixerChannel();
+		std::shared_ptr<ctoot::mpc::MpcIndivFxMixerChannel> getIndivFxMixerChannel();
 
 	private:
 		std::shared_ptr<ctoot::mpc::MpcStereoMixerChannel> stereoMixerChannel = std::make_shared<ctoot::mpc::MpcStereoMixerChannel>();

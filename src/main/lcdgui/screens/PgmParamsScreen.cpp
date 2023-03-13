@@ -3,9 +3,6 @@
 #include "SelectDrumScreen.hpp"
 
 #include <sampler/NoteParameters.hpp>
-#include <sampler/Pad.hpp>
-
-#include <mpc/MpcSoundPlayerChannel.hpp>
 
 #include <lcdgui/EnvGraph.hpp>
 
@@ -121,12 +118,12 @@ void PgmParamsScreen::turnWheel(int i)
 	}
 	else if (param == "pgm")
 	{	
-		auto pgm = mpcSoundPlayerChannel->getProgram();
+		auto pgm = mpcSoundPlayerChannel().getProgram();
 		auto candidate = sampler->getUsedProgram(pgm, i > 0);
 		
 		if (candidate != pgm)
 		{
-			mpcSoundPlayerChannel->setProgram(candidate);
+			mpcSoundPlayerChannel().setProgram(candidate);
 			displayPgm();
 			displayAttackDecay();
 			displayDecayMode();
@@ -240,7 +237,7 @@ void PgmParamsScreen::displayNote()
 void PgmParamsScreen::displayPgm()
 {
 	init();
-	findField("pgm")->setTextPadded(mpcSoundPlayerChannel->getProgram() + 1, " ");
+	findField("pgm")->setTextPadded(mpcSoundPlayerChannel().getProgram() + 1, " ");
 }
 
 void PgmParamsScreen::displayTune()

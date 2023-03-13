@@ -5,6 +5,8 @@
 
 #include "mpc/MpcSoundPlayerChannel.hpp"
 
+#include "sequencer/Track.hpp"
+
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens;
 
@@ -53,12 +55,10 @@ void LoadAProgramScreen::function(int i)
 
         mpc.getDisk()->readPgm2(selectedFile, newProgram);
 
-        // TODO Is it correct that we only set a DRUM to the new program
-        // if the active track's bus is a DRUM and not a MIDI one?
-        if (mpcSoundPlayerChannel != nullptr) {
+        if (track->getBus() > 0) {
             for (int pgmIndex = 0; pgmIndex < 24; pgmIndex++) {
                 if (sampler->getProgram(pgmIndex) == newProgram) {
-                    mpcSoundPlayerChannel->setProgram(pgmIndex);
+                    mpcSoundPlayerChannel().setProgram(pgmIndex);
                     break;
                 }
             }

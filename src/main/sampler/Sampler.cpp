@@ -151,14 +151,14 @@ void Sampler::setPreviousScreenName(std::string s)
 	previousScreenName = s;
 }
 
-std::vector<std::weak_ptr<MpcStereoMixerChannel>> Sampler::getDrumStereoMixerChannels(int i)
+std::vector<std::shared_ptr<MpcStereoMixerChannel>>& Sampler::getDrumStereoMixerChannels(int i)
 {
-	return mpc.getDrums()[i]->getStereoMixerChannels();
+	return mpc.getDrum(i).getStereoMixerChannels();
 }
 
-std::vector<std::weak_ptr<MpcIndivFxMixerChannel>> Sampler::getDrumIndivFxMixerChannels(int i)
+std::vector<std::shared_ptr<MpcIndivFxMixerChannel>>& Sampler::getDrumIndivFxMixerChannels(int i)
 {
-	return mpc.getDrums()[i]->getIndivFxMixerChannels();
+	return mpc.getDrum(i).getIndivFxMixerChannels();
 }
 
 std::vector<int>* Sampler::getInitMasterPadAssign()
@@ -230,7 +230,7 @@ void Sampler::playMetronome(mpc::sequencer::NoteEvent* event, int framePos)
 
 	if (metronomeSoundScreen->getSound() != 0)
 	{
-		auto program = mpc.getDrum(metronomeSoundScreen->getSound() - 1)->getProgram();
+		auto program = mpc.getDrum(metronomeSoundScreen->getSound() - 1).getProgram();
 		auto accent = velocity == 127;
 		velocity = accent ? metronomeSoundScreen->getAccentVelo() : metronomeSoundScreen->getNormalVelo();
 		auto pad = accent ? metronomeSoundScreen->getAccentPad() : metronomeSoundScreen->getNormalPad();
@@ -242,7 +242,7 @@ void Sampler::playMetronome(mpc::sequencer::NoteEvent* event, int framePos)
 		velocity *= metronomeSoundScreen->getVolume() * 0.01;
 	}
 	
-	mpc.getBasicPlayer()->mpcNoteOn(soundNumber, velocity, framePos);
+	mpc.getBasicPlayer().mpcNoteOn(soundNumber, velocity, framePos);
 }
 
 void Sampler::playPreviewSample(int start, int end, int loopTo)
@@ -259,7 +259,7 @@ void Sampler::playPreviewSample(int start, int end, int loopTo)
 	previewSound->setStart(start);
 	previewSound->setEnd(end);
 	previewSound->setLoopTo(loopTo);
-	mpc.getBasicPlayer()->noteOn(-3, 127);
+	mpc.getBasicPlayer().mpcNoteOn(-3, 127, 0);
 	previewSound->setStart(oldStart);
 	previewSound->setEnd(oldEnd);
 	previewSound->setLoopTo(oldLoopTo);
@@ -619,12 +619,12 @@ std::weak_ptr<Sound> Sampler::createZone(std::weak_ptr<Sound> source, int start,
 
 void Sampler::stopAllVoices(int frameOffset)
 {
-	dynamic_cast<MpcSoundPlayerChannel*>(mpc.getDrums()[0])->allSoundOff(frameOffset);
+	mpc.getDrum(0).allSoundOff(frameOffset);
 }
 
 void Sampler::finishBasicVoice()
 {
-	mpc.getBasicPlayer()->finishVoice();
+	mpc.getBasicPlayer().finishVoice();
 }
 
 void Sampler::playX()
@@ -663,7 +663,7 @@ void Sampler::playX()
 	int oldEnd = sound->getEnd();
 	sound->setStart(start);
 	sound->setEnd(end);
-	mpc.getBasicPlayer()->noteOn(-4, 127);
+	mpc.getBasicPlayer().mpcNoteOn(-4, 127, 0);
 	sound->setStart(oldStart);
 	sound->setEnd(oldEnd);
 }
@@ -943,15 +943,15 @@ void Sampler::mergeToStereo(std::vector<float>* sourceLeft, std::vector<float>* 
 
 void Sampler::setDrumBusProgramIndex(int busNumber, int programIndex)
 {
-	mpc.getDrums()[busNumber - 1]->setProgram(programIndex);
+	mpc.getDrum(busNumber - 1).setProgram(programIndex);
 }
 
 int Sampler::getDrumBusProgramIndex(int busNumber)
 {
-	return mpc.getDrums()[busNumber - 1]->getProgram();
+	return mpc.getDrum(busNumber - 1).getProgram();
 }
 
-MpcSoundPlayerChannel* Sampler::getDrum(int i)
+MpcSoundPlayerChannel& Sampler::getDrum(int i)
 {
 	return mpc.getDrum(i);
 }
@@ -1014,16 +1014,16 @@ void Sampler::copyProgram(const int sourceIndex, const int destIndex)
 		auto copy = dynamic_cast<NoteParameters*>(src->getNoteParameters(i + 35))->clone(i);
 		dest->setNoteParameters(i, copy);
 		
-		auto mc1 = dest->getIndivFxMixerChannel(i).lock();
-		auto mc2 = src->getIndivFxMixerChannel(i).lock();
+		auto mc1 = dest->getIndivFxMixerChannel(i);
+		auto mc2 = src->getIndivFxMixerChannel(i);
 		mc1->setFollowStereo(mc2->isFollowingStereo());
 		mc1->setFxPath(mc2->getFxPath());
 		mc1->setFxSendLevel(mc2->getFxSendLevel());
 		mc1->setOutput(mc2->getOutput());
 		mc1->setVolumeIndividualOut(mc2->getVolumeIndividualOut());
 
-		auto mc3 = dest->getStereoMixerChannel(i).lock();
-		auto mc4 = src->getStereoMixerChannel(i).lock();
+		auto mc3 = dest->getStereoMixerChannel(i);
+		auto mc4 = src->getStereoMixerChannel(i);
 		mc3->setLevel(mc4->getLevel());
 		mc3->setPanning(mc4->getPanning());
 

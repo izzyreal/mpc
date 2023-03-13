@@ -7,7 +7,7 @@
 #include "hardware/Pot.hpp"
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
 
-#include "midi/core/ShortMessage.hpp"
+#include "midi/ShortMessage.hpp"
 
 using namespace mpc::audiomidi;
 using namespace mpc::lcdgui::screens;

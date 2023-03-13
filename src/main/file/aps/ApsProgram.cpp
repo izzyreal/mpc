@@ -12,6 +12,7 @@
 #include <VecUtil.hpp>
 
 using namespace mpc::file::aps;
+using namespace ctoot::mpc;
 using namespace moduru;
 
 ApsProgram::ApsProgram(const std::vector<char>& loadBytes)
@@ -67,16 +68,17 @@ ApsProgram::ApsProgram(mpc::sampler::Program* program, int index)
 	}
 	
 	byteList.push_back({ 6 });
-	auto smcs = std::vector<std::weak_ptr<ctoot::mpc::MpcStereoMixerChannel>>(64);
-	auto ifmcs = std::vector<std::weak_ptr<ctoot::mpc::MpcIndivFxMixerChannel>>(64);
+
+	std::vector<std::shared_ptr<MpcStereoMixerChannel>> stereoMixerChannels(64);
+	std::vector<std::shared_ptr<MpcIndivFxMixerChannel>> indivFxMixerChannels(64);
 	
 	for (int i = 0; i < 64; i++)
 	{
-		smcs[i] = program->getStereoMixerChannel(i);
-		ifmcs[i] = program->getIndivFxMixerChannel(i);
+        stereoMixerChannels[i] = program->getStereoMixerChannel(i);
+        indivFxMixerChannels[i] = program->getIndivFxMixerChannel(i);
 	}
 
-	ApsMixer apsMixer(smcs, ifmcs);
+	ApsMixer apsMixer(stereoMixerChannels, indivFxMixerChannels);
 	byteList.push_back(apsMixer.getBytes());
 	byteList.push_back({ 0, 64, 0 });
 	auto apsAssignTable = std::vector<int>(64);
@@ -147,12 +149,12 @@ std::vector<char> ApsProgram::getBytes()
     return saveBytes;
 }
 
-ctoot::mpc::MpcStereoMixerChannel ApsProgram::getStereoMixerChannel(int noteIndex)
+MpcStereoMixerChannel ApsProgram::getStereoMixerChannel(int noteIndex)
 {
 	return mixer->getStereoMixerChannel(noteIndex);
 }
 
-ctoot::mpc::MpcIndivFxMixerChannel ApsProgram::getIndivFxMixerChannel(int noteIndex)
+MpcIndivFxMixerChannel ApsProgram::getIndivFxMixerChannel(int noteIndex)
 {
 	return mixer->getIndivFxMixerChannel(noteIndex);
 }

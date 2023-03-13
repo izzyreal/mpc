@@ -12,8 +12,5 @@ namespace mpc::sequencer {
 
         // AudioClient implementation
 		void work(int nFrames) override;
-
-        // AudioClient implementation
-        void setEnabled(bool) override {};
     };
 }

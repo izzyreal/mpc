@@ -73,14 +73,14 @@ Pad* Program::getPad(int i)
 	return pads[i];
 }
 
-std::weak_ptr<MpcStereoMixerChannel> Program::getStereoMixerChannel(int noteIndex)
+std::shared_ptr<MpcStereoMixerChannel> Program::getStereoMixerChannel(int noteIndex)
 {
-	return std::dynamic_pointer_cast<MpcStereoMixerChannel>(noteParameters[noteIndex]->getStereoMixerChannel().lock());
+	return std::dynamic_pointer_cast<MpcStereoMixerChannel>(noteParameters[noteIndex]->getStereoMixerChannel());
 }
 
-std::weak_ptr<MpcIndivFxMixerChannel> Program::getIndivFxMixerChannel(int noteIndex)
+std::shared_ptr<MpcIndivFxMixerChannel> Program::getIndivFxMixerChannel(int noteIndex)
 {
-	return std::dynamic_pointer_cast<MpcIndivFxMixerChannel>(noteParameters[noteIndex]->getIndivFxMixerChannel().lock());
+	return std::dynamic_pointer_cast<MpcIndivFxMixerChannel>(noteParameters[noteIndex]->getIndivFxMixerChannel());
 }
 
 int Program::getPadIndexFromNote(int note)

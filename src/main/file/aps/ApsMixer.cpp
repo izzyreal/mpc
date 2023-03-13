@@ -4,6 +4,7 @@
 #include <mpc/MpcIndivFxMixerChannel.hpp>
 
 using namespace mpc::file::aps;
+using namespace ctoot::mpc;
 
 ApsMixer::ApsMixer(const std::vector<char>& loadBytes)
 {
@@ -17,11 +18,11 @@ ApsMixer::ApsMixer(const std::vector<char>& loadBytes)
 	}
 }
 
-ApsMixer::ApsMixer(std::vector<std::weak_ptr<ctoot::mpc::MpcStereoMixerChannel>> smcs, std::vector<std::weak_ptr<ctoot::mpc::MpcIndivFxMixerChannel>> ifmcs)
+ApsMixer::ApsMixer(std::vector<std::shared_ptr<MpcStereoMixerChannel>>& smcs, std::vector<std::shared_ptr<MpcIndivFxMixerChannel>>& ifmcs)
 {
 	for (int i = 0; i < 64; i++) {
-		auto mixerChannel = smcs[i].lock();
-		auto indivFxMixerChannel = ifmcs[i].lock();
+		auto mixerChannel = smcs[i];
+		auto indivFxMixerChannel = ifmcs[i];
 		saveBytes[(i * 6) + 0] = (int8_t)(indivFxMixerChannel->getFxPath());
 		saveBytes[(i * 6) + 1] = (int8_t)(mixerChannel->getLevel());
 		saveBytes[(i * 6) + 2] = (int8_t)((mixerChannel->getPanning()));

@@ -8,8 +8,6 @@
 #include <lcdgui/screens/ZoneScreen.hpp>
 #include <lcdgui/screens/window/NameScreen.hpp>
 
-#include <mpc/MpcSoundPlayerChannel.hpp>
-
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::controls;
 using namespace moduru::lang;
@@ -740,7 +738,7 @@ void EditSoundScreen::function(int j)
 
 				if (t->getBus() != 0)
 				{
-					mpc.getDrum(t->getBus() - 1)->setProgram(sampler->getProgramCount() - 1);
+					mpc.getDrum(t->getBus() - 1).setProgram(sampler->getProgramCount() - 1);
 				}
 			}
 		}

@@ -4,8 +4,6 @@
 
 #include <nvram/NvRam.hpp>
 
-#include <mpc/MpcSoundPlayerChannel.hpp>
-
 #include <Util.hpp>
 
 using namespace mpc::lcdgui::screens;
@@ -189,7 +187,7 @@ void UserScreen::displayDeviceName()
 	{
 		if (device == 0)
 		{
-			auto programName = sampler->getProgram(mpc.getDrum(bus - 1)->getProgram())->getName();
+			auto programName = sampler->getProgram(mpc.getDrum(bus - 1).getProgram())->getName();
 			findLabel("devicename")->setText(programName);
 		}
 		else

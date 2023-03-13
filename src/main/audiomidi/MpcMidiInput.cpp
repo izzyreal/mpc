@@ -24,8 +24,8 @@
 #include <sequencer/Track.hpp>
 #include <sequencer/NoteEvent.hpp>
 
-#include <midi/core/MidiMessage.hpp>
-#include <midi/core/ShortMessage.hpp>
+#include "midi/MidiMessage.hpp"
+#include "midi/ShortMessage.hpp"
 
 using namespace mpc::audiomidi;
 using namespace mpc::sequencer;

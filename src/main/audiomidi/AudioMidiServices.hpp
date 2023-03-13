@@ -4,6 +4,8 @@
 #include <sequencer/FrameSeq.hpp>
 
 #include <audio/mixer/AudioMixer.hpp>
+#include <mpc/MpcSoundPlayerChannel.hpp>
+#include <mpc/MpcBasicSoundPlayerChannel.hpp>
 
 #include <observer/Observable.hpp>
 
@@ -13,8 +15,6 @@
 
 namespace ctoot::mpc {
 	class MpcMixerControls;
-	class MpcMultiMidiSynth;
-	class MpcMultiSynthControls;
 	class MpcVoice;
 }
 
@@ -30,16 +30,6 @@ namespace ctoot::audio::server {
 
 namespace ctoot::audio::system {
 	class DefaultAudioSystem;
-}
-
-namespace ctoot::midi::core {
-	class DefaultConnectedMidiSystem;
-}
-
-namespace ctoot::synth {
-	class SynthRack;
-	class SynthRackControls;
-	class SynthChannelControls;
 }
 
 namespace mpc::audiomidi {
@@ -85,22 +75,19 @@ namespace mpc::audiomidi
 		bool bouncePrepared = false;
         bool wasRecordingSound = false;
         bool wasBouncing = false;
+        std::vector<std::shared_ptr<ctoot::control::CompoundControl>> soundPlayerChannelControls;
+        std::vector<ctoot::mpc::MpcSoundPlayerChannel> soundPlayerChannels;
+        std::unique_ptr<ctoot::mpc::MpcBasicSoundPlayerChannel> basicSoundPlayerChannel;
 		std::vector<std::shared_ptr<ctoot::mpc::MpcVoice>> voices;
 		std::shared_ptr<ctoot::mpc::MpcVoice> basicVoice;
-		std::vector<std::shared_ptr<ctoot::synth::SynthChannelControls>> synthChannelControls;
 		std::shared_ptr<ctoot::audio::server::AudioServer> server;
 		std::shared_ptr<ctoot::audio::server::NonRealTimeAudioServer> offlineServer;
 		std::shared_ptr<ctoot::audio::system::DefaultAudioSystem> audioSystem;
-		std::shared_ptr<ctoot::midi::core::DefaultConnectedMidiSystem> midiSystem;
 		std::shared_ptr<ctoot::audio::mixer::AudioMixer> mixer;
-		std::shared_ptr<ctoot::synth::SynthRackControls> synthRackControls;
-		std::shared_ptr<ctoot::synth::SynthRack> synthRack;
-		std::shared_ptr<ctoot::mpc::MpcMultiSynthControls> msc;
 		std::shared_ptr<ctoot::mpc::MpcMixerControls> mixerControls;
-		std::shared_ptr<ctoot::mpc::MpcMultiMidiSynth> mms;
 		std::shared_ptr<ctoot::audio::server::CompoundAudioClient> cac;
 		std::shared_ptr<MpcMidiOutput> mpcMidiOutput;
-		std::vector<std::shared_ptr<ctoot::audio::server::IOAudioProcess>> inputProcesses;
+		std::vector<ctoot::audio::server::IOAudioProcess*> inputProcesses;
 		std::vector<ctoot::audio::server::IOAudioProcess*> outputProcesses;
 		std::shared_ptr<mpc::sequencer::FrameSeq> frameSeq;
 		std::vector<std::shared_ptr<DiskRecorder>> diskRecorders;
@@ -108,7 +95,6 @@ namespace mpc::audiomidi
 		std::shared_ptr<SoundPlayer> soundPlayer;
 
 	private:
-		void destroySynth();
 		void setupMixer();
 		void setAssignableMixOutLevels();
 		void createSynth();
@@ -127,7 +113,8 @@ namespace mpc::audiomidi
 		void setRecordLevel(int i);
 		int getRecordLevel();
 		void muteMonitor(bool mute);
-		std::shared_ptr<ctoot::mpc::MpcMultiMidiSynth> getMms();
+		ctoot::mpc::MpcSoundPlayerChannel& getDrum(int i);
+        ctoot::mpc::MpcBasicSoundPlayerChannel& getBasicPlayer();
 		void initializeDiskRecorders();
 		void closeIO();
 

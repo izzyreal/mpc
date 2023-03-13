@@ -2,8 +2,6 @@
 
 #include <lcdgui/screens/window/NameScreen.hpp>
 
-#include <mpc/MpcSoundPlayerChannel.hpp>
-
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::controls;
 using namespace mpc::sampler;
@@ -71,7 +69,7 @@ void AutoChromaticAssignmentScreen::function(int i)
             {
                 if (programs[j].lock() == newProgram)
                 {
-                    mpcSoundPlayerChannel->setProgram(j);
+                    mpcSoundPlayerChannel().setProgram(j);
                     break;
                 }
             }

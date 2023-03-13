@@ -1,6 +1,6 @@
 #pragma once
 
-#include <midi/core/ShortMessage.hpp>
+#include "midi/ShortMessage.hpp"
 #include <vector>
 #include <memory>
 

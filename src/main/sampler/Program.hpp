@@ -24,8 +24,8 @@ namespace mpc::sampler {
 	{
 
 	public:
-		std::weak_ptr<ctoot::mpc::MpcStereoMixerChannel> getStereoMixerChannel(int noteIndex) override;
-		std::weak_ptr<ctoot::mpc::MpcIndivFxMixerChannel> getIndivFxMixerChannel(int noteIndex) override;
+		std::shared_ptr<ctoot::mpc::MpcStereoMixerChannel> getStereoMixerChannel(int noteIndex) override;
+		std::shared_ptr<ctoot::mpc::MpcIndivFxMixerChannel> getIndivFxMixerChannel(int noteIndex) override;
         
 		int getPadIndexFromNote(int note);
 		
