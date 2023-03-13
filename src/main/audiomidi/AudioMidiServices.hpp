@@ -3,9 +3,9 @@
 #include <Mpc.hpp>
 #include <sequencer/FrameSeq.hpp>
 
-#include <audio/mixer/AudioMixer.hpp>
-#include <mpc/MpcSoundPlayerChannel.hpp>
-#include <mpc/MpcBasicSoundPlayerChannel.hpp>
+#include <engine/audio/mixer/AudioMixer.hpp>
+#include <engine/mpc/MpcSoundPlayerChannel.hpp>
+#include <engine/mpc/MpcBasicSoundPlayerChannel.hpp>
 
 #include <observer/Observable.hpp>
 

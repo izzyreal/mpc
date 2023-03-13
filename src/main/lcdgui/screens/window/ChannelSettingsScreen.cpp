@@ -5,8 +5,8 @@
 #include <lcdgui/screens/MixerSetupScreen.hpp>
 #include <lcdgui/screens/MixerScreen.hpp>
 
-#include <mpc/MpcStereoMixerChannel.hpp>
-#include <mpc/MpcIndivFxMixerChannel.hpp>
+#include <engine/mpc/MpcStereoMixerChannel.hpp>
+#include <engine/mpc/MpcIndivFxMixerChannel.hpp>
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sampler;

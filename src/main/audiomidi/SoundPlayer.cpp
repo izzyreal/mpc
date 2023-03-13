@@ -1,7 +1,7 @@
 #include <audiomidi/SoundPlayer.hpp>
 
-#include <audio/core/AudioFormat.hpp>
-#include <audio/core/AudioBuffer.hpp>
+#include <engine/audio/core/AudioFormat.hpp>
+#include <engine/audio/core/AudioBuffer.hpp>
 
 #include <cmath>
 #include <algorithm>

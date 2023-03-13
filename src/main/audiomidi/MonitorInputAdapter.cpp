@@ -5,7 +5,7 @@
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/SampleScreen.hpp>
 
-#include <audio/core/ChannelFormat.hpp>
+#include <engine/audio/core/ChannelFormat.hpp>
 
 using namespace mpc::audiomidi;
 using namespace mpc::lcdgui;

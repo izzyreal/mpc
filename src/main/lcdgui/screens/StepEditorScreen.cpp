@@ -24,8 +24,8 @@
 
 #include <Util.hpp>
 
-#include "midi/ShortMessage.hpp"
-#include <audio/server/NonRealTimeAudioServer.hpp>
+#include <engine/midi/ShortMessage.hpp>
+#include <engine/audio/server/NonRealTimeAudioServer.hpp>
 
 #include <stdexcept>
 

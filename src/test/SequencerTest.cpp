@@ -6,7 +6,7 @@
 #include <controls/GlobalReleaseControls.hpp>
 
 #include <audiomidi/AudioMidiServices.hpp>
-#include <audio/server/NonRealTimeAudioServer.hpp>
+#include <engine/audio/server/NonRealTimeAudioServer.hpp>
 
 #include <sequencer/Sequencer.hpp>
 #include <sequencer/NoteEvent.hpp>

@@ -2,8 +2,8 @@
 #include <sampler/Sampler.hpp>
 #include <sampler/Pad.hpp>
 
-#include <mpc/MpcStereoMixerChannel.hpp>
-#include <mpc/MpcIndivFxMixerChannel.hpp>
+#include <engine/mpc/MpcStereoMixerChannel.hpp>
+#include <engine/mpc/MpcIndivFxMixerChannel.hpp>
 
 #include <Mpc.hpp>
 

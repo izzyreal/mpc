@@ -1,6 +1,6 @@
 #include <sampler/Sound.hpp>
 
-#include <mpc/MpcSoundOscillatorControls.hpp>
+#include <engine/mpc/MpcSoundOscillatorControls.hpp>
 
 using namespace mpc::sampler;
 

@@ -20,7 +20,7 @@
 #include <lcdgui/screens/window/Assign16LevelsScreen.hpp>
 #include <lcdgui/screens/window/StepEditOptionsScreen.hpp>
 
-#include <mpc/MpcSoundPlayerChannel.hpp>
+#include <engine/mpc/MpcSoundPlayerChannel.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;

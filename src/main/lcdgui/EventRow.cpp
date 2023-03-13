@@ -22,7 +22,7 @@
 #include <sequencer/PolyPressureEvent.hpp>
 #include <sequencer/ProgramChangeEvent.hpp>
 #include <sequencer/SystemExclusiveEvent.hpp>
-#include <mpc/MpcSoundPlayerChannel.hpp>
+#include <engine/mpc/MpcSoundPlayerChannel.hpp>
 
 #include <cmath>
 #include <lang/StrUtil.hpp>

@@ -15,12 +15,12 @@
 #include <lcdgui/screens/ZoneScreen.hpp>
 #include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
 
-#include <audio/server/NonRealTimeAudioServer.hpp>
+#include <engine/audio/server/NonRealTimeAudioServer.hpp>
 
-#include <mpc/MpcBasicSoundPlayerChannel.hpp>
-#include <mpc/MpcSoundPlayerChannel.hpp>
-#include <mpc/MpcStereoMixerChannel.hpp>
-#include <mpc/MpcIndivFxMixerChannel.hpp>
+#include <engine/mpc/MpcBasicSoundPlayerChannel.hpp>
+#include <engine/mpc/MpcSoundPlayerChannel.hpp>
+#include <engine/mpc/MpcStereoMixerChannel.hpp>
+#include <engine/mpc/MpcIndivFxMixerChannel.hpp>
 
 #include <lang/StrUtil.hpp>
 

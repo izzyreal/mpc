@@ -2,7 +2,7 @@
 
 #include "Mpc.hpp"
 #include "sampler/Sampler.hpp"
-#include "mpc/MpcSoundPlayerChannel.hpp"
+#include <engine/mpc/MpcSoundPlayerChannel.hpp>
 
 TEST_CASE("Delete program", "[program]")
 {

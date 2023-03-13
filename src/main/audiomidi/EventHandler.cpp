@@ -20,10 +20,10 @@
 #include <lcdgui/screens/SyncScreen.hpp>
 #include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
 
-#include "midi/MidiMessage.hpp"
-#include "midi/ShortMessage.hpp"
+#include <engine/midi/MidiMessage.hpp>
+#include <engine/midi/ShortMessage.hpp>
 
-#include <audio/server/NonRealTimeAudioServer.hpp>
+#include <engine/audio/server/NonRealTimeAudioServer.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;

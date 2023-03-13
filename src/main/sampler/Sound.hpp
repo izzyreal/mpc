@@ -1,7 +1,7 @@
 #pragma once
-#include <mpc/MpcSound.hpp>
+#include <engine/mpc/MpcSound.hpp>
 #include <observer/Observable.hpp>
-#include <mpc/MpcSoundOscillatorControls.hpp>
+#include <engine/mpc/MpcSoundOscillatorControls.hpp>
 
 namespace mpc::sampler {
 	class Sound

@@ -1,6 +1,6 @@
 #pragma once
-#include <audio/core/AudioProcessAdapter.hpp>
-#include <audio/core/AudioProcess.hpp>
+#include <engine/audio/core/AudioProcessAdapter.hpp>
+#include <engine/audio/core/AudioProcess.hpp>
 
 #include <sampler/Sound.hpp>
 

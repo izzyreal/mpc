@@ -5,8 +5,8 @@
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/SampleScreen.hpp>
 
-#include <audio/core/AudioFormat.hpp>
-#include <audio/core/AudioBuffer.hpp>
+#include <engine/audio/core/AudioFormat.hpp>
+#include <engine/audio/core/AudioBuffer.hpp>
 
 #include <cmath>
 

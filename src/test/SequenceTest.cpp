@@ -5,7 +5,7 @@
 
 #include "lcdgui/screens/BarsScreen.hpp"
 
-#include "mpc/MpcSoundPlayerChannel.hpp"
+#include <engine/mpc/MpcSoundPlayerChannel.hpp>
 
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui::screens;

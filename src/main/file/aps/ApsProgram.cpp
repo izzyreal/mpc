@@ -4,7 +4,7 @@
 #include <file/aps/ApsNoteParameters.hpp>
 #include <file/aps/ApsSlider.hpp>
 #include <file/pgmwriter/Pads.hpp>
-#include <mpc/MpcStereoMixerChannel.hpp>
+#include <engine/mpc/MpcStereoMixerChannel.hpp>
 #include <sampler/Program.hpp>
 #include <sampler/Pad.hpp>
 

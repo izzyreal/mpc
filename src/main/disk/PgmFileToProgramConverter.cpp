@@ -15,7 +15,7 @@
 
 #include <disk/MpcFile.hpp>
 
-#include <mpc/MpcNoteParameters.hpp>
+#include <engine/mpc/MpcNoteParameters.hpp>
 
 #include <stdexcept>
 

@@ -17,12 +17,6 @@ FetchContent_Declare(akaifat
   SOURCE_DIR     ${CMAKE_SOURCE_DIR}/editables/akaifat
 )
 
-FetchContent_Declare(ctoot
-  GIT_REPOSITORY https://github.com/izzyreal/ctoot.git
-  GIT_TAG        native-cmake
-  SOURCE_DIR     ${CMAKE_SOURCE_DIR}/editables/ctoot
-)
-
 set(CATCH_CONFIG_NO_CPP17_UNCAUGHT_EXCEPTIONS ON)
 
 FetchContent_Declare(Catch2
@@ -66,7 +60,7 @@ FetchContent_Declare(rtmidi
     SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/rtmidi
 )
 
-FetchContent_MakeAvailable(rtmidi moduru akaifat ctoot filesystem rapidjson Catch2)
+FetchContent_MakeAvailable(rtmidi moduru akaifat filesystem rapidjson Catch2)
 
 FetchContent_GetProperties(tl-expected)
 
@@ -110,7 +104,6 @@ add_library(mpc ${_source_list_main})
 
 target_include_directories(mpc PUBLIC
     ${_src_root_path_main}
-    ${ctoot_SOURCE_DIR}/src/main
     ${akaifat_SOURCE_DIR}/src/main
     ${moduru_SOURCE_DIR}/src/main
     ${rapidjson_SOURCE_DIR}/include
@@ -118,7 +111,7 @@ target_include_directories(mpc PUBLIC
     ${tl-expected_SOURCE_DIR}/include
 )
 
-target_link_libraries(mpc ctoot akaifat moduru ghc_filesystem rtmidi)
+target_link_libraries(mpc akaifat moduru ghc_filesystem rtmidi)
 
 if(MSVC)
 	target_compile_options(mpc PRIVATE "/MP")

@@ -1,7 +1,7 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
-#include <mpc/MpcMixerSetupGui.hpp>
+#include <engine/mpc/MpcMixerSetupGui.hpp>
 
 namespace mpc::lcdgui::screens
 {

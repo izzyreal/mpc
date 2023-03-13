@@ -1,8 +1,8 @@
 #pragma once
-#include <mpc/MpcNoteParameters.hpp>
+#include <engine/mpc/MpcNoteParameters.hpp>
 
-#include <mpc/MpcStereoMixerChannel.hpp>
-#include <mpc/MpcIndivFxMixerChannel.hpp>
+#include <engine/mpc/MpcStereoMixerChannel.hpp>
+#include <engine/mpc/MpcIndivFxMixerChannel.hpp>
 
 namespace mpc::sampler
 {

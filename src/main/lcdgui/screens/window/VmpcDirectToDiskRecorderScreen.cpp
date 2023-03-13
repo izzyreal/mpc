@@ -5,7 +5,7 @@
 
 #include <sequencer/Song.hpp>
 #include <sequencer/SeqUtil.hpp>
-#include <audio/server/NonRealTimeAudioServer.hpp>
+#include <engine/audio/server/NonRealTimeAudioServer.hpp>
 
 #include <lcdgui/screens/SongScreen.hpp>
 

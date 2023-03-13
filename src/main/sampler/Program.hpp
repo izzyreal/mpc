@@ -1,5 +1,5 @@
 #pragma once
-#include <mpc/MpcProgram.hpp>
+#include <engine/mpc/MpcProgram.hpp>
 
 #include <sampler/NoteParameters.hpp>
 #include <sampler/PgmSlider.hpp>

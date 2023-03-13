@@ -19,8 +19,8 @@
 
 #include <sampler/Sampler.hpp>
 #include <sequencer/Sequencer.hpp>
-#include <mpc/MpcBasicSoundPlayerChannel.hpp>
-#include <mpc/MpcSoundPlayerChannel.hpp>
+#include <engine/mpc/MpcBasicSoundPlayerChannel.hpp>
+#include <engine/mpc/MpcSoundPlayerChannel.hpp>
 
 #include <hardware/Hardware.hpp>
 #include <hardware/HwSlider.hpp>

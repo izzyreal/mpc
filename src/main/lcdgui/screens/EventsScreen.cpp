@@ -8,7 +8,7 @@
 
 #include <Util.hpp>
 
-#include <mpc/MpcSoundPlayerChannel.hpp>
+#include <engine/mpc/MpcSoundPlayerChannel.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;

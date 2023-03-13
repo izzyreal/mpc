@@ -13,7 +13,7 @@
 #include <sampler/NoteParameters.hpp>
 #include <sampler/PgmSlider.hpp>
 
-#include <mpc/MpcSoundPlayerChannel.hpp>
+#include <engine/mpc/MpcSoundPlayerChannel.hpp>
 
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/DrumScreen.hpp>

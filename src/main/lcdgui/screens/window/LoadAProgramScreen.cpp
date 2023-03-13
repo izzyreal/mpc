@@ -3,7 +3,7 @@
 #include <disk/AbstractDisk.hpp>
 #include <lcdgui/screens/LoadScreen.hpp>
 
-#include "mpc/MpcSoundPlayerChannel.hpp"
+#include <engine/mpc/MpcSoundPlayerChannel.hpp>
 
 #include "sequencer/Track.hpp"
 

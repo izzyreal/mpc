@@ -18,7 +18,7 @@
 #include <string>
 #include <map>
 
-#include "mpc/MpcSoundPlayerChannel.hpp"
+#include <engine/mpc/MpcSoundPlayerChannel.hpp>
 
 namespace mpc::lcdgui
 {

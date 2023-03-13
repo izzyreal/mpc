@@ -10,7 +10,7 @@
 #include <lcdgui/screens/window/NameScreen.hpp>
 #include <lcdgui/screens/dialog/FileExistsScreen.hpp>
 
-#include <mpc/MpcStereoMixerChannel.hpp>
+#include <engine/mpc/MpcStereoMixerChannel.hpp>
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog;

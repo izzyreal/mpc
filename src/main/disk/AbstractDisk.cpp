@@ -4,7 +4,7 @@
 #include <Util.hpp>
 #include "Paths.hpp"
 
-#include <mpc/MpcSoundPlayerChannel.hpp>
+#include <engine/mpc/MpcSoundPlayerChannel.hpp>
 
 #include <disk/MpcFile.hpp>
 #include <disk/ApsLoader.hpp>

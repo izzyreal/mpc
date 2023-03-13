@@ -14,7 +14,7 @@
 #include <lcdgui/screens/window/CantFindFileScreen.hpp>
 #include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
-#include <mpc/MpcSoundPlayerChannel.hpp>
+#include <engine/mpc/MpcSoundPlayerChannel.hpp>
 
 #include <lang/StrUtil.hpp>
 

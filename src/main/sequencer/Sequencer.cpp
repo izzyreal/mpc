@@ -24,8 +24,8 @@
 #include <sequencer/Step.hpp>
 
 // ctoot
-#include <audio/server/NonRealTimeAudioServer.hpp>
-#include <mpc/MpcSoundPlayerChannel.hpp>
+#include <engine/audio/server/NonRealTimeAudioServer.hpp>
+#include <engine/mpc/MpcSoundPlayerChannel.hpp>
 
 // moduru
 #include <System.hpp>

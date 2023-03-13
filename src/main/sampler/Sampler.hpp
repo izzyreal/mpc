@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mpc/MpcSampler.hpp>
+#include <engine/mpc/MpcSampler.hpp>
 
 #include <sampler/Program.hpp>
 #include <sampler/Sound.hpp>

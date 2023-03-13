@@ -28,12 +28,12 @@
 #include "lcdgui/screens/UserScreen.hpp"
 #include "lcdgui/screens/SequencerScreen.hpp"
 
-#include "mpc/MpcSoundPlayerChannel.hpp"
-#include "midi/ShortMessage.hpp"
+#include <engine/mpc/MpcSoundPlayerChannel.hpp>
+#include <engine/midi/ShortMessage.hpp>
 
 #include "Util.hpp"
 
-#include "audio/server/NonRealTimeAudioServer.hpp"
+#include <engine/audio/server/NonRealTimeAudioServer.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;

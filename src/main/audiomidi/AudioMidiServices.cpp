@@ -11,35 +11,35 @@
 #include <audiomidi/MonitorInputAdapter.hpp>
 #include <audiomidi/MpcMidiOutput.hpp>
 
-#include <mpc/MpcVoice.hpp>
-#include <mpc/MpcBasicSoundPlayerChannel.hpp>
-#include <mpc/MpcBasicSoundPlayerControls.hpp>
-#include <mpc/MpcFaderControl.hpp>
-#include <mpc/MpcMixerControls.hpp>
-#include <mpc/MpcSoundPlayerChannel.hpp>
-#include <mpc/MpcSoundPlayerControls.hpp>
+#include <engine/mpc/MpcVoice.hpp>
+#include <engine/mpc/MpcBasicSoundPlayerChannel.hpp>
+#include <engine/mpc/MpcBasicSoundPlayerControls.hpp>
+#include <engine/mpc/MpcFaderControl.hpp>
+#include <engine/mpc/MpcMixerControls.hpp>
+#include <engine/mpc/MpcSoundPlayerChannel.hpp>
+#include <engine/mpc/MpcSoundPlayerControls.hpp>
 
 #include <lcdgui/screens/MixerSetupScreen.hpp>
 #include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
 
 // ctoot
-#include <audio/core/ChannelFormat.hpp>
+#include <engine/audio/core/ChannelFormat.hpp>
 
-#include <audio/mixer/AudioMixer.hpp>
-#include <audio/mixer/AudioMixerBus.hpp>
-#include <audio/mixer/MixerControlsFactory.hpp>
-#include <audio/mixer/MixerControls.hpp>
-#include <audio/mixer/MainMixControls.hpp>
+#include <engine/audio/mixer/AudioMixer.hpp>
+#include <engine/audio/mixer/AudioMixerBus.hpp>
+#include <engine/audio/mixer/MixerControlsFactory.hpp>
+#include <engine/audio/mixer/MixerControls.hpp>
+#include <engine/audio/mixer/MainMixControls.hpp>
 
-#include <audio/server/CompoundAudioClient.hpp>
-#include <audio/server/IOAudioProcess.hpp>
-#include <audio/server/NonRealTimeAudioServer.hpp>
-#include <audio/server/ExternalAudioServer.hpp>
+#include <engine/audio/server/CompoundAudioClient.hpp>
+#include <engine/audio/server/IOAudioProcess.hpp>
+#include <engine/audio/server/NonRealTimeAudioServer.hpp>
+#include <engine/audio/server/ExternalAudioServer.hpp>
 
-#include <control/CompoundControl.hpp>
-#include <control/BooleanControl.hpp>
+#include <engine/control/CompoundControl.hpp>
+#include <engine/control/BooleanControl.hpp>
 
-#include <mpc/MpcSampler.hpp>
+#include <engine/mpc/MpcSampler.hpp>
 
 // moduru
 #include <file/FileUtil.hpp>

@@ -1,6 +1,6 @@
 #pragma once
 #include <sequencer/Event.hpp>
-#include "midi/ShortMessage.hpp"
+#include <engine/midi/ShortMessage.hpp>
 
 namespace mpc::sequencer
 {

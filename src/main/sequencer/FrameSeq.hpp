@@ -1,7 +1,7 @@
 #pragma once
 
 #include "FrameSeqBase.hpp"
-#include <audio/server/AudioClient.hpp>
+#include <engine/audio/server/AudioClient.hpp>
 
 namespace mpc::sequencer {
 
