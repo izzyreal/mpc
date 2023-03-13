@@ -4,7 +4,7 @@
 
 namespace ctoot::mpc {
 
-		class MpcEnvelopeControls
+		class EnvelopeControls
 			: public ctoot::control::CompoundControl
 		{
 
@@ -51,6 +51,6 @@ namespace ctoot::mpc {
 			float getDecayCoeff();
 
 		public:
-			MpcEnvelopeControls(int id, std::string name, int idOffset);
+			EnvelopeControls(int id, std::string name, int idOffset);
         };
 	}

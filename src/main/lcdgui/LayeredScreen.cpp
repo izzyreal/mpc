@@ -27,6 +27,10 @@
 #include <cmrc/cmrc.hpp>
 #include <string_view>
 
+#if __linux__
+#include <climits>
+#endif
+
 CMRC_DECLARE(mpc);
 
 using namespace mpc::lcdgui;

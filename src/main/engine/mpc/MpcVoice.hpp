@@ -18,8 +18,8 @@ class StateVariableFilterControls;
 namespace ctoot::mpc {
 class MpcNoteParameters;
 class MpcSound;
-class MpcEnvelopeGenerator;
-class MpcEnvelopeControls;
+class EnvelopeGenerator;
+class EnvelopeControls;
 class MpcMuteInfo;
 
 class MpcVoice
@@ -56,9 +56,9 @@ private:
     double increment = 0;
     double position = 0;
     std::vector<float>* sampleData;
-    ctoot::mpc::MpcEnvelopeGenerator* staticEnv = nullptr;
-    ctoot::mpc::MpcEnvelopeGenerator* ampEnv = nullptr;
-    ctoot::mpc::MpcEnvelopeGenerator* filterEnv = nullptr;
+    ctoot::mpc::EnvelopeGenerator* staticEnv = nullptr;
+    ctoot::mpc::EnvelopeGenerator* ampEnv = nullptr;
+    ctoot::mpc::EnvelopeGenerator* filterEnv = nullptr;
     float initialFilterValue = 0;
     bool staticDecay = 0;
     int note = -1;
@@ -75,9 +75,9 @@ private:
     ctoot::control::LawControl* fdecay = nullptr;
     ctoot::control::LawControl* shold = nullptr;
     ctoot::control::LawControl* reso = nullptr;
-    ctoot::mpc::MpcEnvelopeControls* ampEnvControls = nullptr;
-    ctoot::mpc::MpcEnvelopeControls* staticEnvControls = nullptr;
-    ctoot::mpc::MpcEnvelopeControls* filterEnvControls = nullptr;
+    ctoot::mpc::EnvelopeControls* ampEnvControls = nullptr;
+    ctoot::mpc::EnvelopeControls* staticEnvControls = nullptr;
+    ctoot::mpc::EnvelopeControls* filterEnvControls = nullptr;
     ctoot::synth::modules::filter::StateVariableFilterControls* svfControls = nullptr;
     bool finished = true;
     int stripNumber = -1;

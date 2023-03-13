@@ -3,8 +3,8 @@
 #include <engine/mpc/MpcNoteParameters.hpp>
 #include <engine/mpc/MpcSound.hpp>
 
-#include <engine/mpc/MpcEnvelopeControls.hpp>
-#include <engine/mpc/MpcEnvelopeGenerator.hpp>\
+#include <engine/mpc/EnvelopeControls.hpp>
+#include <engine/mpc/EnvelopeGenerator.hpp>\
 
 #include <engine/audio/core/AudioBuffer.hpp>
 #include <engine/control/LawControl.hpp>
@@ -24,8 +24,8 @@ std::vector<float> MpcVoice::EMPTY_FRAME = {0.f, 0.f};
 MpcVoice::MpcVoice(int _stripNumber, bool _basic)
         : stripNumber(_stripNumber), basic(_basic), frame(EMPTY_FRAME) {
     tempFrame = EMPTY_FRAME;
-    staticEnvControls = new ctoot::mpc::MpcEnvelopeControls(0, "StaticAmpEnv", AMPENV_OFFSET);
-    staticEnv = new ctoot::mpc::MpcEnvelopeGenerator(staticEnvControls);
+    staticEnvControls = new ctoot::mpc::EnvelopeControls(0, "StaticAmpEnv", AMPENV_OFFSET);
+    staticEnv = new ctoot::mpc::EnvelopeGenerator(staticEnvControls);
     shold = std::dynamic_pointer_cast<ctoot::control::LawControl>(
             staticEnvControls->getControls()[HOLD_INDEX]).get();
 
@@ -40,10 +40,10 @@ MpcVoice::MpcVoice(int _stripNumber, bool _basic)
     sdecay->setValue(STATIC_DECAY_LENGTH);
 
     if (!basic) {
-        ampEnvControls = new ctoot::mpc::MpcEnvelopeControls(0, "AmpEnv", AMPENV_OFFSET);
-        filterEnvControls = new ctoot::mpc::MpcEnvelopeControls(0, "StaticAmpEnv", AMPENV_OFFSET);
-        ampEnv = new ctoot::mpc::MpcEnvelopeGenerator(ampEnvControls);
-        filterEnv = new ctoot::mpc::MpcEnvelopeGenerator(filterEnvControls);
+        ampEnvControls = new ctoot::mpc::EnvelopeControls(0, "AmpEnv", AMPENV_OFFSET);
+        filterEnvControls = new ctoot::mpc::EnvelopeControls(0, "StaticAmpEnv", AMPENV_OFFSET);
+        ampEnv = new ctoot::mpc::EnvelopeGenerator(ampEnvControls);
+        filterEnv = new ctoot::mpc::EnvelopeGenerator(filterEnvControls);
         svfControls = new ctoot::synth::modules::filter::StateVariableFilterControls("Filter", SVF_OFFSET);
         svfControls->createControls();
         svfLeft = new ctoot::synth::modules::filter::StateVariableFilter(svfControls);
@@ -103,9 +103,7 @@ void MpcVoice::init(
     decayMode = 0;
     veloToLevel = 100;
 
-    auto lMpcSound = mpcSound;
-
-    tune = lMpcSound->getTune();
+    tune = mpcSound->getTune();
 
     if (np != nullptr) {
         tune += np->getTune();
@@ -134,10 +132,10 @@ void MpcVoice::init(
     const auto veloFactor = velocity / 127.f;
     const auto inverseVeloFactor = 1.f - veloFactor;
 
-    end = lMpcSound->getEnd();
+    end = mpcSound->getEnd();
 
-    position = lMpcSound->getStart() + (inverseVeloFactor * (veloToStart / 100.0) * lMpcSound->getLastFrameIndex());
-    sampleData = lMpcSound->getSampleData();
+    position = mpcSound->getStart() + (inverseVeloFactor * (veloToStart / 100.0) * mpcSound->getLastFrameIndex());
+    sampleData = mpcSound->getSampleData();
     attackMs = (float) ((attackValue / 100.0) * MAX_ATTACK_LENGTH_MS);
     attackMs += (float) ((veloToAttack / 100.0) * MAX_ATTACK_LENGTH_MS * veloFactor);
     finalDecayValue = decayValue < 2 ? 2 : decayValue;
@@ -145,7 +143,7 @@ void MpcVoice::init(
     staticEnv->reset();
     veloToLevelFactor = (float) (veloToLevel * 0.01);
     amplitude = (float) ((veloFactor * veloToLevelFactor) + 1.0f - veloToLevelFactor);
-    amplitude *= (lMpcSound->getSndLevel() * 0.01);
+    amplitude *= (mpcSound->getSndLevel() * 0.01);
 
     if (!basic) {
         ampEnv->reset();
@@ -180,14 +178,12 @@ void MpcVoice::initializeSamplerateDependents()
         filterEnvControls->setSampleRate(sampleRate);
     }
 
-    auto lMpcSound = mpcSound;
-
     increment = pow(2.0, ((double) (tune) / 120.0)) * (44100.0 / sampleRate);
 
     const auto veloFactor = 1.f - (velocity / 127.f);
-    auto start = lMpcSound->getStart() + (veloFactor * (veloToStart / 100.0) * lMpcSound->getLastFrameIndex());
+    auto start = mpcSound->getStart() + (veloFactor * (veloToStart / 100.0) * mpcSound->getLastFrameIndex());
 
-    auto playableSampleLength = lMpcSound->isLoopEnabled() ? INT_MAX : (int) ((end - start) / increment);
+    auto playableSampleLength = mpcSound->isLoopEnabled() ? INT_MAX : (int) ((end - start) / increment);
 
     auto attackLengthSamples = (int) (attackMs * sampleRate * 0.001);
     auto decayLengthSamples = (int) (decayMs * sampleRate * 0.001);

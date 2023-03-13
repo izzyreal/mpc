@@ -1,10 +1,10 @@
-#include <engine/mpc/MpcEnvelopeGenerator.hpp>
+#include <engine/mpc/EnvelopeGenerator.hpp>
 
-#include <engine/mpc/MpcEnvelopeControls.hpp>
+#include <engine/mpc/EnvelopeControls.hpp>
 
 using namespace ctoot::mpc;
 
-MpcEnvelopeGenerator::MpcEnvelopeGenerator(MpcEnvelopeControls* vars) 
+EnvelopeGenerator::EnvelopeGenerator(EnvelopeControls* vars)
 {
 	state = ATTACK;
 	envelope = 0.0f;
@@ -12,7 +12,7 @@ MpcEnvelopeGenerator::MpcEnvelopeGenerator(MpcEnvelopeControls* vars)
 	this->vars = vars;
 }
 
-float MpcEnvelopeGenerator::getEnvelope(bool decay)
+float EnvelopeGenerator::getEnvelope(bool decay)
 {
 	if (decay && state != COMPLETE)
 		state = DECAY;
@@ -50,17 +50,17 @@ float MpcEnvelopeGenerator::getEnvelope(bool decay)
 	return envelope;
 }
 
-bool MpcEnvelopeGenerator::isComplete()
+bool EnvelopeGenerator::isComplete()
 {
     return state == COMPLETE;
 }
 
-void MpcEnvelopeGenerator::reset()
+void EnvelopeGenerator::reset()
 {
     state = ATTACK;
     holdCounter = 0;
     envelope = 0.0f;
 }
 
-MpcEnvelopeGenerator::~MpcEnvelopeGenerator() {
+EnvelopeGenerator::~EnvelopeGenerator() {
 }
