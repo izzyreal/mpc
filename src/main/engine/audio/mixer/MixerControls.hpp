@@ -3,7 +3,7 @@
 #include <engine/control/CompoundControl.hpp>
 #include <engine/audio/mixer/BusControls.hpp>
 #include <engine/audio/core/AudioControlsChain.hpp>
-#include <engine/audio/fader/FaderControl.hpp>
+#include <engine/mpc/MpcFaderControl.hpp>
 
 #include <memory>
 #include <utility>

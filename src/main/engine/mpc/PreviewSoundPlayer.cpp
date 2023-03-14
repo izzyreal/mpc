@@ -3,13 +3,12 @@
 #include "MpcVoice.hpp"
 #include "MpcSampler.hpp"
 
-#include <engine/audio/fader/FaderControl.hpp>
+#include <engine/mpc/MpcFaderControl.hpp>
 #include <engine/audio/mixer/MainMixControls.hpp>
 #include <utility>
 
 using namespace ctoot::mpc;
 using namespace ctoot::audio::mixer;
-using namespace ctoot::audio::fader;
 
 PreviewSoundPlayer::PreviewSoundPlayer(
         std::shared_ptr<MpcSampler> samplerToUse,
@@ -19,7 +18,7 @@ PreviewSoundPlayer::PreviewSoundPlayer(
 {
 	auto sc = mixer->getMixerControls()->getStripControls("65");
 	auto mmc =std::dynamic_pointer_cast<MainMixControls>(sc->find("Main"));
-	fader = std::dynamic_pointer_cast<FaderControl>(mmc->find("Level"));
+	fader = std::dynamic_pointer_cast<MpcFaderControl>(mmc->find("Level"));
 }
 
 void PreviewSoundPlayer::mpcNoteOn(int soundNumber, int velocity, int frameOffset)

@@ -12,7 +12,7 @@
 
 using namespace ctoot::audio::mixer;
 using namespace ctoot::audio::core;
-using namespace ctoot::audio::fader;
+using namespace ctoot::mpc;
 using namespace std;
 
 MixerControls::MixerControls(string name, string mainBusName, shared_ptr<ChannelFormat> channelFormat)
@@ -102,7 +102,7 @@ shared_ptr<AudioControlsChain> MixerControls::getStripControls(string name)
 	return {};
 }
 
-ctoot::mpc::MpcFaderControl* MixerControls::createFaderControl()
+MpcFaderControl* MixerControls::createFaderControl()
 {
-    return new ctoot::mpc::MpcFaderControl();
+    return new MpcFaderControl();
 }

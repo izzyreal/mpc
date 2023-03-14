@@ -18,11 +18,13 @@
 #include <utility>
 
 using namespace ctoot::mpc;
+using namespace ctoot::audio::mixer;
+using namespace ctoot::audio::server;
 
 Drum::Drum(std::shared_ptr<MpcSampler> samplerToUse,
            int drumIndexToUse,
-           std::shared_ptr<ctoot::audio::mixer::AudioMixer> mixerToUse,
-           const std::shared_ptr<ctoot::audio::server::AudioServer>& serverToUse,
+           std::shared_ptr<AudioMixer> mixerToUse,
+           const std::shared_ptr<AudioServer>& serverToUse,
            MpcMixerSetupGui* mixerSetupGuiToUse,
            std::vector<std::shared_ptr<MpcVoice>> voicesToUse)
            : sampler(std::move(samplerToUse)), mixer(std::move(mixerToUse)),
@@ -135,15 +137,15 @@ void Drum::mpcNoteOn(int note, int velo, int varType, int varValue, int frameOff
 
 	auto sc = mixerControls->getStripControls(std::to_string(voice->getStripNumber()));
 
-	auto mmc = std::dynamic_pointer_cast<ctoot::audio::mixer::MainMixControls>(sc->find("Main"));
-	std::dynamic_pointer_cast<ctoot::audio::mixer::PanControl>(mmc->find("Pan"))->setValue(static_cast<float>(smc->getPanning() / 100.0));
-	std::dynamic_pointer_cast<ctoot::audio::fader::FaderControl>(mmc->find("Level"))->setValue(static_cast<float>(smc->getLevel()));
+	auto mmc = std::dynamic_pointer_cast<MainMixControls>(sc->find("Main"));
+	std::dynamic_pointer_cast<PanControl>(mmc->find("Pan"))->setValue(static_cast<float>(smc->getPanning() / 100.0));
+	std::dynamic_pointer_cast<MpcFaderControl>(mmc->find("Level"))->setValue(static_cast<float>(smc->getLevel()));
 
 	sc = mixerControls->getStripControls(std::to_string(voice->getStripNumber() + 32));
-	mmc = std::dynamic_pointer_cast<ctoot::audio::mixer::MainMixControls>(sc->find("Main"));
+	mmc = std::dynamic_pointer_cast<MainMixControls>(sc->find("Main"));
 
 	//We make sure the voice strip duplicages that are used for mixing to ASSIGNABLE MIX OUT are not mixed into Main.
-	auto faderControl = std::dynamic_pointer_cast<ctoot::audio::fader::FaderControl>(mmc->find("Level"));
+	auto faderControl = std::dynamic_pointer_cast<MpcFaderControl>(mmc->find("Level"));
 	if (faderControl->getValue() != 0) faderControl->setValue(0);
 
 	if (ifmc->getOutput() > 0)

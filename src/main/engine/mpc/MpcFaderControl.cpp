@@ -4,9 +4,10 @@
 #include <engine/control/LinearLaw.hpp>
 
 using namespace ctoot::mpc;
+using namespace ctoot::control;
 
 MpcFaderControl::MpcFaderControl()
-	: FaderControl(ctoot::audio::mixer::MixControlIds::GAIN, MPC_FADER_LAW(), 100)
+	: LawControl(ctoot::audio::mixer::MixControlIds::GAIN, "Level", MPC_FADER_LAW(), 0.1, 100)
 {
 	gain = 1.0f;
 }
@@ -19,5 +20,15 @@ std::shared_ptr<ctoot::control::ControlLaw> MpcFaderControl::MPC_FADER_LAW() {
 void MpcFaderControl::setValue(float value)
 {
     gain = value * 0.01f;
-    FaderControl::setValue(value);
+    LawControl::setValue(value);
+}
+
+float MpcFaderControl::getGain()
+{
+	return gain;
+}
+
+float MpcFaderControl::ATTENUATION_CUTOFF()
+{
+	return 100.0f;
 }

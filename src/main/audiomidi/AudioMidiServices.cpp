@@ -55,7 +55,6 @@ using namespace mpc::lcdgui;
 using namespace ctoot::audio::server;
 using namespace ctoot::audio::core;
 using namespace ctoot::audio::mixer;
-using namespace ctoot::audio::fader;
 using namespace ctoot::control;
 using namespace ctoot::mpc;
 
@@ -117,7 +116,7 @@ void AudioMidiServices::start(const int inputCount, const int outputCount) {
 	mixer->getStrip(std::string("67"))->setInputProcess(soundPlayer);
 	auto sc = mixer->getMixerControls()->getStripControls("67");
 	auto mmc = std::dynamic_pointer_cast<MainMixControls>(sc->find("Main"));
-	std::dynamic_pointer_cast<FaderControl>(mmc->find("Level"))->setValue(static_cast<float>(100));
+	std::dynamic_pointer_cast<MpcFaderControl>(mmc->find("Level"))->setValue(static_cast<float>(100));
 
 	cac = std::make_shared<CompoundAudioClient>();
 	cac->add(frameSeq.get());
@@ -135,7 +134,7 @@ void AudioMidiServices::setMonitorLevel(int level)
 {
 	auto sc = mixer->getMixerControls()->getStripControls("66");
 	auto mmc = std::dynamic_pointer_cast<MainMixControls>(sc->find("Main"));
-	std::dynamic_pointer_cast<FaderControl>(mmc->find("Level"))->setValue(static_cast<float>(level));
+	std::dynamic_pointer_cast<MpcFaderControl>(mmc->find("Level"))->setValue(static_cast<float>(level));
 }
 
 void AudioMidiServices::muteMonitor(bool mute)
@@ -212,7 +211,7 @@ int AudioMidiServices::getRecordLevel() {
 	// This is how we can get monitor output level
 	auto sc = mixer->getMixerControls().lock()->getStripControls("66").lock();
 	auto mmc = std::dynamic_pointer_cast<MainMixControls>(sc->find("Main").lock());
-	return static_cast<int>(std::dynamic_pointer_cast<FaderControl>(mmc->find("Level").lock())->getValue());
+	return static_cast<int>(std::dynamic_pointer_cast<MpcFaderControl>(mmc->find("Level").lock())->getValue());
 	*/
 }
 
