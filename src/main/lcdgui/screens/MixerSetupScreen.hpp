@@ -1,12 +1,10 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
-#include "engine/MpcMixerSetupGui.hpp"
-
 namespace mpc::lcdgui::screens
 {
 	class MixerSetupScreen
-		: public mpc::lcdgui::ScreenComponent, public mpc::engine::MpcMixerSetupGui
+		: public mpc::lcdgui::ScreenComponent
 	{
 
 	public:
@@ -34,8 +32,8 @@ namespace mpc::lcdgui::screens
 		bool recordMixChangesEnabled = false;
 
 	public:
-		bool isStereoMixSourceDrum() override;
-		bool isIndivFxSourceDrum() override;
+		bool isStereoMixSourceDrum();
+		bool isIndivFxSourceDrum();
 
 	public:
 		int getMasterLevel() const;

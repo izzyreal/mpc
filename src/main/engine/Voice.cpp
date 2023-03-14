@@ -1,7 +1,7 @@
 #include "Voice.hpp"
 
-#include "MpcNoteParameters.hpp"
-#include "MpcSound.hpp"
+#include "sampler/NoteParameters.hpp"
+#include <sampler/Sound.hpp>
 
 #include "EnvelopeControls.hpp"
 #include "EnvelopeGenerator.hpp"\
@@ -66,9 +66,9 @@ Voice::Voice(int _stripNumber, bool _basic)
 
 void Voice::init(
         int newVelocity,
-        std::shared_ptr<mpc::engine::MpcSound> newMpcSound,
+        std::shared_ptr<mpc::sampler::Sound> newMpcSound,
         int newNote,
-        mpc::engine::MpcNoteParameters *np,
+        mpc::sampler::NoteParameters *np,
         int newVarType,
         int newVarValue,
         int muteNote,
@@ -366,7 +366,7 @@ bool Voice::isDecaying() {
     return staticDecay;
 }
 
-MpcMuteInfo& Voice::getMuteInfo() {
+MuteInfo& Voice::getMuteInfo() {
     return muteInfo;
 }
 
@@ -381,7 +381,7 @@ int Voice::getNote() {
     return note;
 }
 
-mpc::engine::MpcNoteParameters *Voice::getNoteParameters() {
+mpc::sampler::NoteParameters *Voice::getNoteParameters() {
     return noteParameters;
 }
 

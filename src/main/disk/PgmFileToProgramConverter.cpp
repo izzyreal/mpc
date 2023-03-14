@@ -12,10 +12,9 @@
 #include <sampler/Program.hpp>
 #include <sampler/PgmSlider.hpp>
 #include <sampler/Sampler.hpp>
+#include <sampler/NoteParameters.hpp>
 
 #include <disk/MpcFile.hpp>
-
-#include "engine/MpcNoteParameters.hpp"
 
 #include <stdexcept>
 

@@ -47,7 +47,7 @@ Sampler::Sampler(mpc::Mpc& mpc)
 
 std::shared_ptr<Sound> Sampler::getPreviewSound()
 {
-    return sounds[sounds.size() - 1];
+    return sounds.back();
 }
 
 std::shared_ptr<Sound> Sampler::getSound(int index)
@@ -265,11 +265,6 @@ void Sampler::playPreviewSample(int start, int end, int loopTo)
 	previewSound->setLoopTo(oldLoopTo);
 }
 
-std::shared_ptr<MpcProgram> Sampler::getMpcProgram(int index)
-{
-	return programs[index];
-}
-
 int Sampler::getProgramCount()
 {
 	int res = 0;
@@ -406,22 +401,6 @@ void Sampler::repairProgramReferences()
             setDrumBusProgramIndex(busIndex, pgm);
 		}
 	}
-}
-
-std::shared_ptr<MpcSound> Sampler::getMpcSound(int index)
-{
-    if (index < 0 || index >= sounds.size())
-        return {};
-
-	return sounds[index];
-}
-
-std::shared_ptr<MpcSound> Sampler::getMpcPreviewSound()
-{
-	if (sounds.empty())
-		return {};
-
-	return sounds[sounds.size() - 1];
 }
 
 void Sampler::trimSample(int sampleNumber, int start, int end)
@@ -668,7 +647,7 @@ void Sampler::playX()
 	sound->setEnd(oldEnd);
 }
 
-std::shared_ptr<MpcSound> Sampler::getPlayXSound()
+std::shared_ptr<Sound> Sampler::getPlayXSound()
 {
 	return sounds[soundIndex];
 }
@@ -956,7 +935,7 @@ Drum& Sampler::getDrum(int i)
 	return mpc.getDrum(i);
 }
 
-std::shared_ptr<MpcSound> Sampler::getClickSound()
+std::shared_ptr<Sound> Sampler::getClickSound()
 {
 	return clickSound;
 }

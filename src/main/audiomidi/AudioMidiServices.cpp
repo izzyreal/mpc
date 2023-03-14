@@ -36,8 +36,6 @@
 #include <engine/control/CompoundControl.hpp>
 #include <engine/control/BooleanControl.hpp>
 
-#include "engine/MpcSampler.hpp"
-
 // moduru
 #include <file/FileUtil.hpp>
 
@@ -262,7 +260,7 @@ void AudioMidiServices::createSynth()
     {
         auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>("mixer-setup");
 
-        soundPlayerChannels.emplace_back(std::dynamic_pointer_cast<MpcSampler>(mpc.getSampler()),
+        soundPlayerChannels.emplace_back(mpc.getSampler(),
                                          i,
                                          mixer,
                                          server,

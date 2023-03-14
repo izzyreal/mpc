@@ -1,5 +1,4 @@
 #pragma once
-#include "engine/MpcProgram.hpp"
 
 #include <sampler/NoteParameters.hpp>
 #include <sampler/PgmSlider.hpp>
@@ -7,10 +6,8 @@
 #include <memory>
 
 namespace mpc::engine {
-	class MpcSampler;
 	class StereoMixer;
 	class IndivFxMixer;
-	class MpcNoteParameters;
 }
 
 namespace mpc { class Mpc; }
@@ -20,16 +17,13 @@ namespace mpc::sampler {
 	class Pad;
 
 	class Program
-		: public virtual mpc::engine::MpcProgram
 	{
 
 	public:
-		std::shared_ptr<mpc::engine::StereoMixer> getStereoMixerChannel(int noteIndex) override;
-		std::shared_ptr<mpc::engine::IndivFxMixer> getIndivFxMixerChannel(int noteIndex) override;
+		std::shared_ptr<mpc::engine::StereoMixer> getStereoMixerChannel(int noteIndex);
+		std::shared_ptr<mpc::engine::IndivFxMixer> getIndivFxMixerChannel(int noteIndex);
         
 		int getPadIndexFromNote(int note);
-		
-        mpc::engine::MpcNoteParameters* getNoteParameters(int i) override;
 
 	private:
 		Sampler* sampler = nullptr;
@@ -47,7 +41,8 @@ namespace mpc::sampler {
 		std::string getName();
 		Pad* getPad(int i);
 		std::vector<NoteParameters*> getNotesParameters();
-		mpc::sampler::PgmSlider* getSlider();
+        NoteParameters* getNoteParameters(int note);
+        mpc::sampler::PgmSlider* getSlider();
 		void setNoteParameters(int i, NoteParameters* noteParameters);
 		int getMidiProgramChange();
 		void setMidiProgramChange(int i);

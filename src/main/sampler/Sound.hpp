@@ -1,11 +1,8 @@
 #pragma once
-#include "engine/MpcSound.hpp"
 #include <observer/Observable.hpp>
 
 namespace mpc::sampler {
-	class Sound
-		: public virtual mpc::engine::MpcSound
-		, public moduru::observer::Observable
+	class Sound : public moduru::observer::Observable
 	{
 
 	private:
@@ -20,14 +17,14 @@ namespace mpc::sampler {
 	public:
 		void setName(std::string s);
 		std::vector<float>* getSampleData();
-		int getTune() override;
-		int getStart() override;
-		int getEnd() override;
-		bool isLoopEnabled() override;
-		int getLoopTo() override;
-		bool isMono() override;
-		int getLastFrameIndex() override;
-		int getSndLevel() override;
+		int getTune();
+		int getStart();
+		int getEnd();
+		bool isLoopEnabled();
+		int getLoopTo();
+		bool isMono();
+		int getLastFrameIndex();
+		int getSndLevel();
 
 		void setBeatCount(int i);
 		int getBeatCount();

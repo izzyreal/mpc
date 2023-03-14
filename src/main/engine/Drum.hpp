@@ -4,6 +4,15 @@
 #include <vector>
 #include <memory>
 
+namespace mpc::lcdgui::screens {
+    class MixerSetupScreen;
+}
+
+namespace mpc::sampler {
+    class Sampler;
+    class NoteParameters;
+}
+
 namespace mpc::engine::audio::server {
 	class AudioServer;
 }
@@ -13,13 +22,10 @@ namespace mpc::engine::audio::mixer {
 }
 
 namespace mpc::engine {
-	class MpcSampler;
 	class StereoMixer;
 	class IndivFxMixer;
-	class MpcNoteParameters;
 	class Voice;
 	class MixerInterconnection;
-    class MpcMixerSetupGui;
 }
 
 namespace mpc::engine
@@ -31,11 +37,11 @@ namespace mpc::engine
 		std::map<int, int> simultA;
 		std::map<int, int> simultB;
         std::vector<std::shared_ptr<Voice>> voices;
-		std::shared_ptr<MpcSampler> sampler;
+		std::shared_ptr<mpc::sampler::Sampler> sampler;
 		std::shared_ptr<mpc::engine::audio::mixer::AudioMixer> mixer;
 		std::vector<MixerInterconnection*> mixerConnections;
 		mpc::engine::audio::server::AudioServer* server = nullptr;
-        mpc::engine::MpcMixerSetupGui* mixerSetupGui = nullptr;
+        mpc::lcdgui::screens::MixerSetupScreen* mixerSetupScreen = nullptr;
 
 	private:
 		int drumIndex = 0;
@@ -70,18 +76,18 @@ namespace mpc::engine
 		void mpcNoteOff(int note, int frameOffset, int noteOnStartTick);
 
 	private:
-        void checkForMutes(MpcNoteParameters* np);
+        void checkForMutes(mpc::sampler::NoteParameters* np);
         void startDecayForNote(const int note,
                                const int frameOffset,
                                const int noteOnStartTick);
-        void stopMonoOrPolyVoiceWithSameNoteParameters(mpc::engine::MpcNoteParameters* noteParameters, int note);
+        void stopMonoOrPolyVoiceWithSameNoteParameters(mpc::sampler::NoteParameters* noteParameters, int note);
 
 	public:
-		Drum(std::shared_ptr<MpcSampler> sampler,
+		Drum(std::shared_ptr<mpc::sampler::Sampler> sampler,
              int drumIndex,
              std::shared_ptr<mpc::engine::audio::mixer::AudioMixer> mixer,
              const std::shared_ptr<mpc::engine::audio::server::AudioServer>& server,
-             MpcMixerSetupGui *mixerSetupGui,
+             mpc::lcdgui::screens::MixerSetupScreen* mixerSetupScreen,
              std::vector<std::shared_ptr<Voice>> voices);
 		~Drum();
 

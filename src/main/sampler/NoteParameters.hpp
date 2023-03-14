@@ -1,37 +1,40 @@
 #pragma once
-#include "engine/MpcNoteParameters.hpp"
+#include "sampler/NoteParameters.hpp"
 
 #include "engine/StereoMixer.hpp"
 #include "engine/IndivFxMixer.hpp"
+
+#include <memory>
 
 namespace mpc::sampler
 {
 	class Sampler;
 
-	class NoteParameters
-		: public virtual mpc::engine::MpcNoteParameters
+    enum VoiceOverlapMode { POLY, MONO, NOTE_OFF };
+
+    class NoteParameters
 	{
 	public:
-		int getSoundIndex() override;
-		int getSoundGenerationMode() override;
-		int getOptionalNoteA() override;
-		int getOptionalNoteB() override;
-		int getMuteAssignA() override;
-		int getMuteAssignB() override;
-		int getTune() override;
-		int getVelocityToStart() override;
-		int getAttack() override;
-		int getDecay() override;
-		int getVelocityToAttack() override;
-		int getDecayMode() override;
-		int getVeloToLevel() override;
-		int getFilterFrequency() override;
-		int getVelocityToFilterFrequency() override;
-		int getFilterAttack() override;
-		int getFilterDecay() override;
-		int getFilterResonance() override;
-		int getFilterEnvelopeAmount() override;
-		int getVoiceOverlap() override;
+		int getSoundIndex();
+		int getSoundGenerationMode();
+		int getOptionalNoteA();
+		int getOptionalNoteB();
+		int getMuteAssignA();
+		int getMuteAssignB();
+		int getTune();
+		int getVelocityToStart();
+		int getAttack();
+		int getDecay();
+		int getVelocityToAttack();
+		int getDecayMode();
+		int getVeloToLevel();
+		int getFilterFrequency();
+		int getVelocityToFilterFrequency();
+		int getFilterAttack();
+		int getFilterDecay();
+		int getFilterResonance();
+		int getFilterEnvelopeAmount();
+		int getVoiceOverlap();
 
 		std::shared_ptr<mpc::engine::StereoMixer> getStereoMixerChannel();
 		std::shared_ptr<mpc::engine::IndivFxMixer> getIndivFxMixerChannel();

@@ -1,17 +1,18 @@
 #include "PreviewSoundPlayer.hpp"
 
 #include "Voice.hpp"
-#include "MpcSampler.hpp"
 
+#include <sampler/Sampler.hpp>
 #include "FaderControl.hpp"
 #include "engine/audio/mixer/MainMixControls.hpp"
 #include <utility>
 
+using namespace mpc::sampler;
 using namespace mpc::engine;
 using namespace mpc::engine::audio::mixer;
 
 PreviewSoundPlayer::PreviewSoundPlayer(
-        std::shared_ptr<MpcSampler> samplerToUse,
+        std::shared_ptr<Sampler> samplerToUse,
         std::shared_ptr<mpc::engine::audio::mixer::AudioMixer> mixerToUse,
         std::shared_ptr<Voice> voiceToUse)
         : sampler(std::move(samplerToUse)), mixer(std::move(mixerToUse)), voice(std::move(voiceToUse))
@@ -33,7 +34,7 @@ void PreviewSoundPlayer::mpcNoteOn(int soundNumber, int velocity, int frameOffse
 		tempVars = sampler->getPlayXSound();
 	}
 	else if (soundNumber == -3) {
-		tempVars = sampler->getMpcPreviewSound();
+		tempVars = sampler->getPreviewSound();
 	}
 	else if (soundNumber == -2) {
 		tempVars = sampler->getClickSound();
@@ -42,7 +43,7 @@ void PreviewSoundPlayer::mpcNoteOn(int soundNumber, int velocity, int frameOffse
 		tempVars = {};
 	}
 	else if (soundNumber >= 0) {
-		tempVars = sampler->getMpcSound(soundNumber);
+		tempVars = sampler->getSound(soundNumber);
 	}
     
 	if (!tempVars) {

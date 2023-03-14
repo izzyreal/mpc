@@ -60,7 +60,7 @@ std::string Program::getName()
     return name;
 }
 
-MpcNoteParameters* Program::getNoteParameters(int note)
+NoteParameters* Program::getNoteParameters(int note)
 {
 	if (note < 35 || note > 98)
 		return nullptr;

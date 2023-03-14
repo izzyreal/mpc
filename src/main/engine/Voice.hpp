@@ -3,7 +3,12 @@
 #include <atomic>
 
 #include "engine/audio/core/AudioProcess.hpp"
-#include "MpcMuteInfo.hpp"
+#include "MuteInfo.hpp"
+
+namespace mpc::sampler {
+    class Sound;
+    class NoteParameters;
+}
 
 namespace mpc::engine::control {
     class LawControl;
@@ -17,15 +22,11 @@ namespace mpc::engine::filter {
 }
 
 namespace mpc::engine {
-    class MpcNoteParameters;
-
-    class MpcSound;
-
     class EnvelopeGenerator;
 
     class EnvelopeControls;
 
-    class MpcMuteInfo;
+    class MuteInfo;
 
     class Voice
             : public mpc::engine::audio::core::AudioProcess
@@ -53,9 +54,9 @@ namespace mpc::engine {
         int voiceOverlapMode;
 
         // Pointer to currently playing note parameters
-        mpc::engine::MpcNoteParameters *noteParameters = nullptr;
+        mpc::sampler::NoteParameters *noteParameters = nullptr;
 
-        std::shared_ptr<mpc::engine::MpcSound> mpcSound;
+        std::shared_ptr<mpc::sampler::Sound> mpcSound;
         int startTick = -1;
         int tune = 0;
         double increment = 0;
@@ -97,7 +98,7 @@ namespace mpc::engine {
 
     private:
         static std::vector<float> EMPTY_FRAME;
-        mpc::engine::MpcMuteInfo muteInfo;
+        mpc::engine::MuteInfo muteInfo;
         int frameOffset = 0;
         bool basic = false;
         int decayCounter = 0;
@@ -140,9 +141,9 @@ namespace mpc::engine {
         bool isFinished();
 
         void init(int velocity,
-                  std::shared_ptr<mpc::engine::MpcSound> mpcSound,
+                  std::shared_ptr<mpc::sampler::Sound> mpcSound,
                   int note,
-                  mpc::engine::MpcNoteParameters *np,
+                  mpc::sampler::NoteParameters *np,
                   int varType,
                   int varValue,
                   int muteNote,
@@ -156,7 +157,7 @@ namespace mpc::engine {
 
         int getNote();
 
-        mpc::engine::MpcNoteParameters *getNoteParameters();
+        mpc::sampler::NoteParameters *getNoteParameters();
 
         void startDecay();
 
@@ -168,7 +169,7 @@ namespace mpc::engine {
 
         bool isDecaying();
 
-        mpc::engine::MpcMuteInfo &getMuteInfo();
+        mpc::engine::MuteInfo &getMuteInfo();
 
         void startDecay(int offset);
 

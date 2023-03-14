@@ -1,34 +1,37 @@
 #include "Drum.hpp"
 
+#include <lcdgui/screens/MixerSetupScreen.hpp>
+
 #include "FaderControl.hpp"
 #include "MixerInterconnection.hpp"
 #include "Voice.hpp"
 
-#include "MpcNoteParameters.hpp"
-#include "MpcProgram.hpp"
-#include "MpcSampler.hpp"
 #include "StereoMixer.hpp"
 #include "IndivFxMixer.hpp"
-#include "MpcMixerSetupGui.hpp"
-#include "MpcSound.hpp"
+#include <sampler/Sound.hpp>
+#include <sampler/Sampler.hpp>
+#include <sampler/Program.hpp>
+#include <sampler/NoteParameters.hpp>
 #include "engine/audio/mixer/AudioMixerStrip.hpp"
 #include "engine/audio/mixer/MainMixControls.hpp"
 #include "engine/audio/mixer/PanControl.hpp"
 #include "engine/control/CompoundControl.hpp"
 #include <utility>
 
+using namespace mpc::lcdgui::screens;
+using namespace mpc::sampler;
 using namespace mpc::engine;
 using namespace mpc::engine::audio::mixer;
 using namespace mpc::engine::audio::server;
 
-Drum::Drum(std::shared_ptr<MpcSampler> samplerToUse,
+Drum::Drum(std::shared_ptr<Sampler> samplerToUse,
            int drumIndexToUse,
            std::shared_ptr<AudioMixer> mixerToUse,
            const std::shared_ptr<AudioServer>& serverToUse,
-           MpcMixerSetupGui* mixerSetupGuiToUse,
+           MixerSetupScreen* mixerSetupScreenToUse,
            std::vector<std::shared_ptr<Voice>> voicesToUse)
            : sampler(std::move(samplerToUse)), mixer(std::move(mixerToUse)),
-           server(serverToUse.get()), mixerSetupGui(mixerSetupGuiToUse),
+           server(serverToUse.get()),  mixerSetupScreen(mixerSetupScreenToUse),
            voices(std::move(voicesToUse)), drumIndex(drumIndexToUse)
 
 {
@@ -50,7 +53,7 @@ void Drum::setProgram(int i)
 	if (i < 0)
         return;
 
-    if (!sampler->getMpcProgram(i))
+    if (!sampler->getProgram(i))
         return;
 
     programNumber = i;
@@ -99,7 +102,7 @@ void Drum::mpcNoteOn(int note, int velo, int varType, int varValue, int frameOff
 	if (note < 35 || note > 98 || velo == 0)
 		return;
 
-	auto program = sampler->getMpcProgram(programNumber);
+	auto program = sampler->getProgram(programNumber);
 	auto np = program->getNoteParameters(note);
 
 	checkForMutes(np);
@@ -119,13 +122,13 @@ void Drum::mpcNoteOn(int note, int velo, int varType, int varValue, int frameOff
 	if (soundNumber == -1 || !voice)
 		return;
 
-	auto sound = sampler->getMpcSound(soundNumber);
+	auto sound = sampler->getSound(soundNumber);
 
 	auto smc = program->getStereoMixerChannel(note - 35);
 	auto ifmc = program->getIndivFxMixerChannel(note - 35);
 
-	bool sSrcDrum = mixerSetupGui->isStereoMixSourceDrum();
-	bool iSrcDrum = mixerSetupGui->isIndivFxSourceDrum();
+	bool sSrcDrum = mixerSetupScreen->isStereoMixSourceDrum();
+	bool iSrcDrum = mixerSetupScreen->isIndivFxSourceDrum();
 
 	if (sSrcDrum)
 		smc = stereoMixerChannels[note - 35];
@@ -225,7 +228,7 @@ void Drum::mpcNoteOn(int note, int velo, int varType, int varValue, int frameOff
 	}
 }
 
-void Drum::checkForMutes(MpcNoteParameters* np)
+void Drum::checkForMutes(NoteParameters* np)
 {
 	if (np->getMuteAssignA() != 34 || np->getMuteAssignB() != 34)
 	{
@@ -340,7 +343,7 @@ void Drum::startDecayForNote(const int note, const int frameOffset, const int no
 }
 
 void Drum::stopMonoOrPolyVoiceWithSameNoteParameters(
-        MpcNoteParameters* noteParameters, int note)
+        NoteParameters* noteParameters, int note)
 {
     for (auto& voice : voices)
     {

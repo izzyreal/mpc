@@ -1,7 +1,5 @@
 #pragma once
 
-#include "engine/MpcSampler.hpp"
-
 #include <sampler/Program.hpp>
 #include <sampler/Sound.hpp>
 
@@ -9,8 +7,6 @@
 #include <memory>
 
 namespace mpc::engine {
-class MpcSound;
-class MpcProgram;
 class Drum;
 }
 
@@ -24,20 +20,16 @@ class Sound;
 class Program;
 
 class Sampler final
-: public virtual mpc::engine::MpcSampler
 {
-    
+
 public:
     Sampler(mpc::Mpc&);
 
-    std::shared_ptr<mpc::engine::MpcSound> getMpcPreviewSound() override;
-    std::shared_ptr<mpc::engine::MpcSound> getPlayXSound() override;
-    std::shared_ptr<mpc::engine::MpcSound> getClickSound() override;
-    std::shared_ptr<mpc::engine::MpcSound> getMpcSound(int index) override;
-    std::shared_ptr<mpc::engine::MpcProgram> getMpcProgram(int programNumber) override;
-    
+    std::shared_ptr<mpc::sampler::Sound> getPlayXSound();
+    std::shared_ptr<mpc::sampler::Sound> getClickSound();
+    std::shared_ptr<mpc::sampler::Sound> getSound(int index);
+
     std::shared_ptr<Sound> getPreviewSound();
-    std::shared_ptr<Sound> getSound(int index);
     std::shared_ptr<Program> getProgram(int index);
 
     void nudgeSoundIndex(bool up);
@@ -121,7 +113,7 @@ public:
     void setMasterPadAssign(std::vector<int> v);
     void setPlayX(int i);
     int getPlayX();
-    
+
     static std::vector<float> mergeToStereo(std::vector<float> fa0, std::vector<float> fa1);
     static void process12Bit(std::vector<float>* data);
     static void process8Bit(std::vector<float>* data);
@@ -138,7 +130,7 @@ private:
     int soundIndex = 0;
     int playXMode = 0;
     std::string previousScreenName = "";
-    
+
     mpc::Mpc& mpc;
     std::vector<int> initMasterPadAssign;
     std::vector<int> masterPadAssign;

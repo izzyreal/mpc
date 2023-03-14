@@ -1,32 +1,32 @@
-#include "MpcMuteInfo.hpp"
+#include "MuteInfo.hpp"
 
 using namespace mpc::engine;
 
-MpcMuteInfo::MpcMuteInfo()
+MuteInfo::MuteInfo()
 {
 }
 
-void MpcMuteInfo::setNote(int note)
+void MuteInfo::setNote(int note)
 {
     this->note = note;
 }
 
-void MpcMuteInfo::setDrum(int drum)
+void MuteInfo::setDrum(int drum)
 {
     this->drum = drum;
 }
 
-int MpcMuteInfo::getNote()
+int MuteInfo::getNote()
 {
     return note;
 }
 
-int MpcMuteInfo::getDrum()
+int MuteInfo::getDrum()
 {
     return drum;
 }
 
-bool MpcMuteInfo::shouldMute(int otherNote, int otherDrum)
+bool MuteInfo::shouldMute(int otherNote, int otherDrum)
 {
     if (note == otherNote && drum == otherDrum)
     {
