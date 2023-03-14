@@ -21,7 +21,7 @@ namespace ctoot::mpc {
         std::shared_ptr<ctoot::mpc::MpcSound> tempVars;
 
         std::shared_ptr<ctoot::audio::mixer::AudioMixer> mixer;
-        std::shared_ptr<ctoot::mpc::MpcFaderControl> fader;
+        std::shared_ptr<ctoot::mpc::FaderControl> fader;
 
     public:
         void finishVoice();

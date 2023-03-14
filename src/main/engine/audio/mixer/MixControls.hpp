@@ -2,7 +2,7 @@
 
 #include <engine/audio/core/AudioControls.hpp>
 #include <engine/audio/mixer/MixVariables.hpp>
-#include <engine/mpc/MpcFaderControl.hpp>
+#include <engine/mpc/FaderControl.hpp>
 #include <engine/audio/mixer/BusControls.hpp>
 #include <engine/audio/mixer/MixerControls.hpp>
 #include <engine/control/EnumControl.hpp>
@@ -21,7 +21,7 @@ namespace ctoot::audio::mixer {
     private:
         std::shared_ptr<ctoot::control::BooleanControl> soloControl;
         std::shared_ptr<ctoot::control::BooleanControl> muteControl;
-        std::shared_ptr<ctoot::mpc::MpcFaderControl> gainControl;
+        std::shared_ptr<ctoot::mpc::FaderControl> gainControl;
         std::shared_ptr<LCRControl> lcrControl;
         std::shared_ptr<BusControls> busControls;
 

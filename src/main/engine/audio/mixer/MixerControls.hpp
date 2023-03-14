@@ -3,13 +3,13 @@
 #include <engine/control/CompoundControl.hpp>
 #include <engine/audio/mixer/BusControls.hpp>
 #include <engine/audio/core/AudioControlsChain.hpp>
-#include <engine/mpc/MpcFaderControl.hpp>
+#include <engine/mpc/FaderControl.hpp>
 
 #include <memory>
 #include <utility>
 #include <vector>
 #include <string>
-#include "engine/mpc/MpcFaderControl.hpp"
+#include "engine/mpc/FaderControl.hpp"
 
 namespace ctoot::audio::mixer {
 
@@ -44,7 +44,7 @@ namespace ctoot::audio::mixer {
 
         std::shared_ptr<ctoot::audio::core::AudioControlsChain> getStripControls(std::string name);
 
-        ctoot::mpc::MpcFaderControl *createFaderControl();
+        ctoot::mpc::FaderControl *createFaderControl();
 
     public:
         MixerControls(std::string name, std::string mainBusName,

@@ -1,7 +1,7 @@
 #include <engine/audio/mixer/MixControls.hpp>
 
 #include <engine/audio/core/ChannelFormat.hpp>
-#include <engine/mpc/MpcFaderControl.hpp>
+#include <engine/mpc/FaderControl.hpp>
 #include <engine/audio/mixer/BusControls.hpp>
 #include <engine/audio/mixer/MixControlIds.hpp>
 #include <engine/audio/mixer/BalanceControl.hpp>
@@ -27,7 +27,7 @@ MixControls::MixControls(MixerControls* mixerControls, int stripId, shared_ptr<B
 	this->mixerControls = mixerControls;
 	this->busControls = busControls;
 	this->master = master;
-	gainControl = shared_ptr<MpcFaderControl>(mixerControls->createFaderControl());
+	gainControl = shared_ptr<FaderControl>(mixerControls->createFaderControl());
 	auto busId = busControls->getId();
 	auto format = getChannelFormat();
 	channelCount = format->getCount();
@@ -48,7 +48,7 @@ MixControls::MixControls(MixerControls* mixerControls, int stripId, shared_ptr<B
 	derive(muteControl.get());
 	add(muteControl);
 
-	gainControl = shared_ptr<MpcFaderControl>(mixerControls->createFaderControl());
+	gainControl = shared_ptr<FaderControl>(mixerControls->createFaderControl());
 	add(gainControl);
 	derive(gainControl.get());
 }

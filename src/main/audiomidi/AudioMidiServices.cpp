@@ -13,7 +13,7 @@
 
 #include <engine/mpc/MpcVoice.hpp>
 #include <engine/mpc/PreviewSoundPlayer.hpp>
-#include <engine/mpc/MpcFaderControl.hpp>
+#include <engine/mpc/FaderControl.hpp>
 #include <engine/audio/mixer/MixerControls.hpp>
 #include <engine/mpc/Drum.hpp>
 
@@ -116,7 +116,7 @@ void AudioMidiServices::start(const int inputCount, const int outputCount) {
 	mixer->getStrip(std::string("67"))->setInputProcess(soundPlayer);
 	auto sc = mixer->getMixerControls()->getStripControls("67");
 	auto mmc = std::dynamic_pointer_cast<MainMixControls>(sc->find("Main"));
-	std::dynamic_pointer_cast<MpcFaderControl>(mmc->find("Level"))->setValue(static_cast<float>(100));
+	std::dynamic_pointer_cast<FaderControl>(mmc->find("Level"))->setValue(static_cast<float>(100));
 
 	cac = std::make_shared<CompoundAudioClient>();
 	cac->add(frameSeq.get());
@@ -134,7 +134,7 @@ void AudioMidiServices::setMonitorLevel(int level)
 {
 	auto sc = mixer->getMixerControls()->getStripControls("66");
 	auto mmc = std::dynamic_pointer_cast<MainMixControls>(sc->find("Main"));
-	std::dynamic_pointer_cast<MpcFaderControl>(mmc->find("Level"))->setValue(static_cast<float>(level));
+	std::dynamic_pointer_cast<FaderControl>(mmc->find("Level"))->setValue(static_cast<float>(level));
 }
 
 void AudioMidiServices::muteMonitor(bool mute)
@@ -190,13 +190,13 @@ void AudioMidiServices::setMainLevel(int i)
 {
 	auto sc = mixer->getMixerControls()->getStripControls("L-R");
 	auto cc = std::dynamic_pointer_cast<CompoundControl>(sc->find("Main"));
-	std::dynamic_pointer_cast<MpcFaderControl>(cc->find("Level"))->setValue(i);
+	std::dynamic_pointer_cast<FaderControl>(cc->find("Level"))->setValue(i);
 }
 
 int AudioMidiServices::getMainLevel() {
 	auto sc = mixer->getMixerControls()->getStripControls("L-R");
 	auto cc = std::dynamic_pointer_cast<CompoundControl>(sc->find("Main"));
-	auto val = std::dynamic_pointer_cast<MpcFaderControl>(cc->find("Level"))->getValue();
+	auto val = std::dynamic_pointer_cast<FaderControl>(cc->find("Level"))->getValue();
 	return (int)(val);
 }
 
@@ -211,7 +211,7 @@ int AudioMidiServices::getRecordLevel() {
 	// This is how we can get monitor output level
 	auto sc = mixer->getMixerControls().lock()->getStripControls("66").lock();
 	auto mmc = std::dynamic_pointer_cast<MainMixControls>(sc->find("Main").lock());
-	return static_cast<int>(std::dynamic_pointer_cast<MpcFaderControl>(mmc->find("Level").lock())->getValue());
+	return static_cast<int>(std::dynamic_pointer_cast<FaderControl>(mmc->find("Level").lock())->getValue());
 	*/
 }
 
@@ -224,7 +224,7 @@ void AudioMidiServices::setAssignableMixOutLevels()
 		std::string name = "AUX#" + std::to_string(j);
 		auto sc = mixer->getMixerControls()->getStripControls(name);
 		auto cc = std::dynamic_pointer_cast<CompoundControl>(sc->find(name));
-		std::dynamic_pointer_cast<MpcFaderControl>(cc->find("Level"))->setValue(100);
+		std::dynamic_pointer_cast<FaderControl>(cc->find("Level"))->setValue(100);
 	}
 }
 

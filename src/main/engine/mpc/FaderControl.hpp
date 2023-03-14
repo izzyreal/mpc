@@ -6,7 +6,7 @@
 
 namespace ctoot::mpc {
 
-    class MpcFaderControl : public ctoot::control::LawControl
+    class FaderControl : public ctoot::control::LawControl
     {
 
     private:
@@ -15,14 +15,12 @@ namespace ctoot::mpc {
     protected:
         float gain{0};
 
-        static float ATTENUATION_CUTOFF();
-
     public:
         float getGain();
 
         void setValue(float value) override;
 
-        MpcFaderControl();
+        FaderControl();
 
     };
 

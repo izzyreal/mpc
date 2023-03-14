@@ -1,6 +1,6 @@
 #include "Drum.hpp"
 
-#include "MpcFaderControl.hpp"
+#include "FaderControl.hpp"
 #include "MpcMixerInterconnection.hpp"
 #include "MpcVoice.hpp"
 
@@ -139,13 +139,13 @@ void Drum::mpcNoteOn(int note, int velo, int varType, int varValue, int frameOff
 
 	auto mmc = std::dynamic_pointer_cast<MainMixControls>(sc->find("Main"));
 	std::dynamic_pointer_cast<PanControl>(mmc->find("Pan"))->setValue(static_cast<float>(smc->getPanning() / 100.0));
-	std::dynamic_pointer_cast<MpcFaderControl>(mmc->find("Level"))->setValue(static_cast<float>(smc->getLevel()));
+	std::dynamic_pointer_cast<FaderControl>(mmc->find("Level"))->setValue(static_cast<float>(smc->getLevel()));
 
 	sc = mixerControls->getStripControls(std::to_string(voice->getStripNumber() + 32));
 	mmc = std::dynamic_pointer_cast<MainMixControls>(sc->find("Main"));
 
 	//We make sure the voice strip duplicages that are used for mixing to ASSIGNABLE MIX OUT are not mixed into Main.
-	auto faderControl = std::dynamic_pointer_cast<MpcFaderControl>(mmc->find("Level"));
+	auto faderControl = std::dynamic_pointer_cast<FaderControl>(mmc->find("Level"));
 	if (faderControl->getValue() != 0) faderControl->setValue(0);
 
 	if (ifmc->getOutput() > 0)
@@ -180,7 +180,7 @@ void Drum::mpcNoteOn(int note, int velo, int varType, int varValue, int frameOff
 	for (int i = 0; i < 4; i++)
 	{
 		auto auxControl = std::dynamic_pointer_cast<ctoot::control::CompoundControl>(sc->find("AUX#" + std::to_string(i + 1)));
-		auto auxLevel = std::dynamic_pointer_cast<MpcFaderControl>(auxControl->find("Level"));
+		auto auxLevel = std::dynamic_pointer_cast<FaderControl>(auxControl->find("Level"));
 
 		if (i == selectedAssignableMixOutPair)
 		{

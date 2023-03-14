@@ -102,7 +102,7 @@ shared_ptr<AudioControlsChain> MixerControls::getStripControls(string name)
 	return {};
 }
 
-MpcFaderControl* MixerControls::createFaderControl()
+FaderControl* MixerControls::createFaderControl()
 {
-    return new MpcFaderControl();
+    return new FaderControl();
 }
