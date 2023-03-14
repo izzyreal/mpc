@@ -2,16 +2,13 @@
 
 #include <memory>
 
-namespace ctoot {
-	namespace mpc {
+namespace ctoot::mpc {
+    class MpcMixerSetupGui
+    {
+    public:
+        virtual bool isStereoMixSourceDrum() = 0;
 
-		class MpcMixerSetupGui
-		{
+        virtual bool isIndivFxSourceDrum() = 0;
 
-		public:
-			virtual bool isStereoMixSourceDrum() = 0;
-			virtual bool isIndivFxSourceDrum() = 0;
-
-		};
-	}
+    };
 }

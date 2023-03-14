@@ -1,30 +1,34 @@
 #pragma once
+
 #include <engine/mpc/EnvelopeControls.hpp>
 
-namespace ctoot {
-	namespace mpc {
+namespace ctoot::mpc {
 
-		class EnvelopeGenerator
-		{
-		public:
-			enum State { ATTACK, HOLD, DECAY, COMPLETE };
+    class EnvelopeGenerator
+    {
+    public:
+        enum State
+        {
+            ATTACK, HOLD, DECAY, COMPLETE
+        };
 
-		private:
-			State state{};
-			float envelope{ 0 };
-			int holdCounter{ 0 };
-			EnvelopeControls* vars{nullptr };
+    private:
+        State state{};
+        float envelope{0};
+        int holdCounter{0};
+        EnvelopeControls *vars{nullptr};
 
-		public:
-			float getEnvelope(bool decay);
-			bool isComplete();
-			void reset();
+    public:
+        float getEnvelope(bool decay);
 
-			EnvelopeGenerator(EnvelopeControls* vars);
+        bool isComplete();
 
-			~EnvelopeGenerator();
+        void reset();
 
-		};
+        EnvelopeGenerator(EnvelopeControls *vars);
 
-	}
+        ~EnvelopeGenerator();
+
+    };
+
 }

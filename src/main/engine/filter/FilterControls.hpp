@@ -5,61 +5,57 @@
 #include <memory>
 #include <string>
 
-namespace ctoot {
+namespace ctoot::control {
+    class ControlLaw;
 
-    namespace control {
-        class ControlLaw;
+    class LawControl;
+}
 
-        class LawControl;
-    }
+namespace ctoot::synth::modules::filter {
 
-    namespace synth::modules::filter {
+    class FilterControls
+            : public ctoot::control::CompoundControl
+    {
 
-        class FilterControls
-                : public ctoot::control::CompoundControl
-        {
+    private:
+        static const int FREQUENCY{0};
+        static const int RESONANCE{1};
 
-        private:
-            static const int FREQUENCY{ 0 };
-            static const int RESONANCE{ 1 };
+        ctoot::control::LawControl *cutoffControl{nullptr};
+        ctoot::control::LawControl *resonanceControl{nullptr};
+        float cutoff{0.f}, resonance{0.f};
 
-            ctoot::control::LawControl *cutoffControl{nullptr};
-            ctoot::control::LawControl *resonanceControl{nullptr};
-            float cutoff{0.f}, resonance{0.f};
+    protected:
+        int idOffset{0};
 
-        protected:
-            int idOffset{0};
+    private:
+        int sampleRate{44100};
 
-        private:
-            int sampleRate{44100};
+    public:
+        void derive(ctoot::control::Control *c) override;
 
-        public:
-            void derive(ctoot::control::Control *c) override;
+        virtual void createControls();
 
-            virtual void createControls();
+        virtual void deriveSampleRateIndependentVariables();
 
-            virtual void deriveSampleRateIndependentVariables();
+        virtual float deriveResonance();
 
-            virtual float deriveResonance();
+        virtual float deriveCutoff();
 
-            virtual float deriveCutoff();
+        virtual ctoot::control::LawControl *createCutoffControl();
 
-            virtual ctoot::control::LawControl *createCutoffControl();
+        virtual ctoot::control::LawControl *createResonanceControl();
 
-            virtual ctoot::control::LawControl *createResonanceControl();
+    public:
+        float getCutoff();
 
-        public:
-            float getCutoff();
+        float getResonance();
 
-            float getResonance();
+    public:
+        FilterControls(int id, std::string name, int idOffset);
 
-        public:
-            FilterControls(int id, std::string name, int idOffset);
+    private:
+        static std::shared_ptr<ctoot::control::ControlLaw> SEMITONE_LAW();
 
-        private:
-            static std::shared_ptr<ctoot::control::ControlLaw> SEMITONE_LAW();
-
-        };
-
-    }
+    };
 }

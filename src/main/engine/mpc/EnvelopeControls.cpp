@@ -8,6 +8,7 @@
 #include <cmath>
 
 using namespace ctoot::mpc;
+using namespace ctoot::control;
 using namespace std;
 
 EnvelopeControls::EnvelopeControls(int id, string name, int idOffset)
@@ -19,7 +20,7 @@ EnvelopeControls::EnvelopeControls(int id, string name, int idOffset)
 	deriveSampleRateDependentVariables();
 }
 
-void EnvelopeControls::derive(ctoot::control::Control* c)
+void EnvelopeControls::derive(Control* c)
 {
 	switch (c->getId() - idOffset) {
 	case ATTACK:
@@ -80,34 +81,34 @@ float EnvelopeControls::deriveDecay()
     return deriveTimeFactor(decayControl->getValue());
 }
 
-shared_ptr<ctoot::control::ControlLaw> EnvelopeControls::ATTACK_LAW() {
-	static shared_ptr<ctoot::control::LogLaw> res = make_shared<ctoot::control::LogLaw>(0.0000001f, 3000.0f * 4.7f, "ms");
+shared_ptr<ControlLaw> EnvelopeControls::ATTACK_LAW() {
+	static shared_ptr<LogLaw> res = make_shared<LogLaw>(0.0000001f, 3000.0f * 4.7f, "ms");
 	return res;
 }
 
-shared_ptr<ctoot::control::ControlLaw> EnvelopeControls::DECAY_LAW() {
-	static shared_ptr<ctoot::control::LogLaw> res = make_shared<ctoot::control::LogLaw>(0.0000001f, 2600.0f * 4.7f, "ms");
+shared_ptr<ControlLaw> EnvelopeControls::DECAY_LAW() {
+	static shared_ptr<LogLaw> res = make_shared<LogLaw>(0.0000001f, 2600.0f * 4.7f, "ms");
 	return res;
 }
 
-shared_ptr<ctoot::control::ControlLaw> EnvelopeControls::HOLD_LAW() {
-	static shared_ptr<ctoot::control::LinearLaw> res = make_shared<ctoot::control::LinearLaw>(0.0f, FLT_MAX, "samples");
+shared_ptr<ControlLaw> EnvelopeControls::HOLD_LAW() {
+	static shared_ptr<LinearLaw> res = make_shared<LinearLaw>(0.0f, FLT_MAX, "samples");
 	return res;
 }
 
-ctoot::control::LawControl* EnvelopeControls::createAttackControl(float init)
+LawControl* EnvelopeControls::createAttackControl(float init)
 {
-	return new ctoot::control::LawControl(ATTACK + idOffset, "Attack", ATTACK_LAW(), 0.1f, init);
+	return new LawControl(ATTACK + idOffset, "Attack", ATTACK_LAW(), 0.1f, init);
 }
 
-ctoot::control::LawControl* EnvelopeControls::createHoldControl(float init)
+LawControl* EnvelopeControls::createHoldControl(float init)
 {
-	return new ctoot::control::LawControl(HOLD + idOffset, "Hold", HOLD_LAW(), 0.1f, init);
+	return new LawControl(HOLD + idOffset, "Hold", HOLD_LAW(), 0.1f, init);
 }
 
-ctoot::control::LawControl* EnvelopeControls::createDecayControl(float init)
+LawControl* EnvelopeControls::createDecayControl(float init)
 {
-	return new ctoot::control::LawControl(DECAY + idOffset, "Decay", DECAY_LAW(), 0.1f, init);
+	return new LawControl(DECAY + idOffset, "Decay", DECAY_LAW(), 0.1f, init);
 }
 
 float EnvelopeControls::getAttackCoeff()

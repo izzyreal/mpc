@@ -9,7 +9,7 @@ namespace ctoot::synth::modules::filter {
     class StateVariableFilter
     {
     public:
-        StateVariableFilter(FilterControls *variables);
+        StateVariableFilter(ctoot::synth::modules::filter::FilterControls *variables);
 
         virtual ~StateVariableFilter();
 
