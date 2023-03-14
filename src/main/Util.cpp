@@ -264,14 +264,55 @@ void Util::set16LevelsValues(mpc::Mpc& mpc, const std::shared_ptr<NoteEvent>& ev
     if (mpc.getHardware()->getTopPanel()->isSixteenLevelsEnabled())
     {
         auto assign16LevelsScreen = mpc.screens->get<Assign16LevelsScreen>("assign-16-levels");
-        
+
         auto _16l_type = assign16LevelsScreen->getType();
+        auto _16l_key = assign16LevelsScreen->getOriginalKeyPad();
+        auto _16l_note = assign16LevelsScreen->getNote();
+        auto _16l_param = assign16LevelsScreen->getParameter();
+
+        event->setNote(_16l_note);
+        event->setVariationTypeNumber(_16l_type);
+
+        if (_16l_param == 0 && event->getVelocity() != 0)
+        {
+            auto velocity = static_cast<int>((padIndex + 1) * (127.0 / 16.0));
+            event->setVelocity(velocity);
+        }
+        else if (_16l_param == 1)
+        {
+            if (_16l_type != 0)
+            {
+                auto value = static_cast<int>(floor(100 / 16.0) * (padIndex + 1));
+                event->setVariationValue(value);
+                return;
+            }
+
+            auto diff = padIndex - _16l_key;
+            auto candidate = 64 + (diff * 5);
+
+            if (candidate > 124)
+                candidate = 124;
+            else if (candidate < 4)
+                candidate = 4;
+
+            event->setVariationValue(candidate);
+        }
+    }
+}
+
+void Util::set16LevelsValues(mpc::Mpc& mpc, const std::shared_ptr<NoteOnEvent>& event, const int padIndex)
+{
+    if (mpc.getHardware()->getTopPanel()->isSixteenLevelsEnabled())
+    {
+        auto assign16LevelsScreen = mpc.screens->get<Assign16LevelsScreen>("assign-16-levels");
+        
+        auto _16l_type = NoteOnEvent::VARIATION_TYPE(assign16LevelsScreen->getType());
         auto _16l_key = assign16LevelsScreen->getOriginalKeyPad();
         auto _16l_note = assign16LevelsScreen->getNote();
         auto _16l_param = assign16LevelsScreen->getParameter();
         
         event->setNote(_16l_note);
-        event->setVariationTypeNumber(_16l_type);
+        event->setVariationType(_16l_type);
         
         if (_16l_param == 0 && event->getVelocity() != 0)
         {
@@ -356,5 +397,64 @@ void Util::setSliderNoteVariationParameters(mpc::Mpc& mpc, const std::weak_ptr<N
             n->setVariationValue(filterValue);
             break;
         }
+    }
+}
+
+void Util::setSliderNoteVariationParameters(mpc::Mpc& mpc, const std::weak_ptr<NoteOnEvent>& _n, const std::weak_ptr<mpc::sampler::Program>& program)
+{
+    auto pgm = program.lock();
+    auto n = _n.lock();
+
+    if (n->getNote() != pgm->getSlider()->getNote())
+        return;
+
+    auto sliderParam = NoteOnEvent::VARIATION_TYPE(pgm->getSlider()->getParameter());
+    n->setVariationType(sliderParam);
+    int sliderValue = mpc.getHardware()->getSlider()->getValue();
+
+    switch (sliderParam)
+    {
+    case 0:
+    {
+        auto rangeLow = pgm->getSlider()->getTuneLowRange();
+        auto rangeHigh = pgm->getSlider()->getTuneHighRange();
+
+        auto sliderRange = rangeHigh - rangeLow;
+        auto sliderRangeRatio = sliderRange / 128.0;
+        auto tuneValue = (int)(sliderValue * sliderRangeRatio * 0.5);
+        tuneValue += (120 - rangeHigh) / 2;
+        n->setVariationValue(tuneValue);
+        break;
+    }
+    case 1:
+    {
+        auto rangeLow = pgm->getSlider()->getDecayLowRange();
+        auto rangeHigh = pgm->getSlider()->getDecayHighRange();
+        auto sliderRange = rangeHigh - rangeLow;
+        auto sliderRangeRatio = sliderRange / 128.0;
+        auto decayValue = (int)(sliderValue * sliderRangeRatio);
+        n->setVariationValue(decayValue);
+        break;
+    }
+    case 2:
+    {
+        auto rangeLow = pgm->getSlider()->getAttackLowRange();
+        auto rangeHigh = pgm->getSlider()->getAttackHighRange();
+        auto sliderRange = rangeHigh - rangeLow;
+        auto sliderRangeRatio = sliderRange / 128.0;
+        auto attackValue = (int)(sliderValue * sliderRangeRatio);
+        n->setVariationValue(attackValue);
+        break;
+    }
+    case 3:
+    {
+        auto rangeLow = pgm->getSlider()->getFilterLowRange();
+        auto rangeHigh = pgm->getSlider()->getFilterHighRange();
+        auto sliderRange = rangeHigh - rangeLow;
+        auto sliderRangeRatio = sliderRange / 128.0;
+        auto filterValue = (int)(sliderValue * sliderRangeRatio);
+        n->setVariationValue(filterValue);
+        break;
+    }
     }
 }

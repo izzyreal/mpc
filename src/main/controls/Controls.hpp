@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <string>
 #include <set>
+#include "sequencer/NoteEvent.hpp"
 
 namespace mpc
 {
@@ -17,6 +18,7 @@ namespace mpc::controls
   class KeyEventHandler;
   class BaseControls;
   class GlobalReleaseControls;
+  static std::unordered_map<int, std::shared_ptr<mpc::sequencer::NoteOffEvent>> temp_offs = {};
 }
 
 namespace mpc::controls

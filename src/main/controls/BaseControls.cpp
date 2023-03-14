@@ -264,10 +264,10 @@ void BaseControls::pad(int padIndexWithBank, int velo)
         }
     }
     
-    generateNoteOn(note, velocity);
+    generateNoteOn(note, velocity, padIndexWithBank);
 }
 
-void BaseControls::generateNoteOn(int note, int padVelo)
+void BaseControls::generateNoteOn(int note, int padVelo, int padIndexWithBank)
 {
     init();
     
@@ -346,7 +346,7 @@ void BaseControls::generateNoteOn(int note, int padVelo)
         }
     }
     
-    auto playableEvent = std::make_shared<NoteEvent>(note);
+    auto playableEvent = std::make_shared<NoteOnEvent>(note);
 
     playableEvent->setVelocity(padVelo);
 
@@ -370,7 +370,7 @@ void BaseControls::generateNoteOn(int note, int padVelo)
     {
         drum = drumScreen->drum;
     }
-
+    mpc::controls::temp_offs[padIndexWithBank] = playableEvent->getNoteOff();
     mpc.getEventHandler()->handle(playableEvent, track.get(), drum);
 }
 

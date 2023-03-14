@@ -6,7 +6,7 @@
 
 namespace mpc { class Mpc; }
 
-namespace mpc::sequencer { class NoteEvent; }
+namespace mpc::sequencer { class NoteEvent; class NoteOnEvent;}
 
 namespace mpc::sampler { class Program; }
 
@@ -31,7 +31,9 @@ namespace mpc
 		static void initSequence(mpc::Mpc& mpc);
 		static void initSequence(int sequenceIndex, mpc::Mpc& mpc);
 		static void set16LevelsValues(mpc::Mpc&, const std::shared_ptr<mpc::sequencer::NoteEvent>&, const int padIndex);
+		static void set16LevelsValues(mpc::Mpc&, const std::shared_ptr<mpc::sequencer::NoteOnEvent>&, const int padIndex);
         static void setSliderNoteVariationParameters(mpc::Mpc&, const std::weak_ptr<mpc::sequencer::NoteEvent>&, const std::weak_ptr<mpc::sampler::Program>&);
+		static void setSliderNoteVariationParameters(mpc::Mpc&, const std::weak_ptr<mpc::sequencer::NoteOnEvent>&, const std::weak_ptr<mpc::sampler::Program>&);
 
 	};
 }
