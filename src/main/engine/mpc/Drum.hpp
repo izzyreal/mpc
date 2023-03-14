@@ -17,8 +17,8 @@ namespace ctoot::mpc {
 	class StereoMixer;
 	class IndivFxMixer;
 	class MpcNoteParameters;
-	class MpcVoice;
-	class MpcMixerInterconnection;
+	class Voice;
+	class MixerInterconnection;
     class MpcMixerSetupGui;
 }
 
@@ -30,10 +30,10 @@ namespace ctoot::mpc
 	private:
 		std::map<int, int> simultA;
 		std::map<int, int> simultB;
-        std::vector<std::shared_ptr<MpcVoice>> voices;
+        std::vector<std::shared_ptr<Voice>> voices;
 		std::shared_ptr<MpcSampler> sampler;
 		std::shared_ptr<ctoot::audio::mixer::AudioMixer> mixer;
-		std::vector<MpcMixerInterconnection*> mixerConnections;
+		std::vector<MixerInterconnection*> mixerConnections;
 		ctoot::audio::server::AudioServer* server = nullptr;
         ctoot::mpc::MpcMixerSetupGui* mixerSetupGui = nullptr;
 
@@ -82,7 +82,7 @@ namespace ctoot::mpc
              std::shared_ptr<ctoot::audio::mixer::AudioMixer> mixer,
              const std::shared_ptr<ctoot::audio::server::AudioServer>& server,
              MpcMixerSetupGui *mixerSetupGui,
-             std::vector<std::shared_ptr<MpcVoice>> voices);
+             std::vector<std::shared_ptr<Voice>> voices);
 		~Drum();
 
 	};

@@ -5,7 +5,7 @@
 
 namespace ctoot::mpc {
 
-		class MpcMixerInterconnection
+		class MixerInterconnection
 		{
 
 		private:
@@ -27,8 +27,8 @@ namespace ctoot::mpc {
 			bool isRightEnabled();
 
 		public:
-			MpcMixerInterconnection(std::string name, ctoot::audio::server::AudioServer* server);
-			virtual ~MpcMixerInterconnection();
+			MixerInterconnection(std::string name, ctoot::audio::server::AudioServer* server);
+			virtual ~MixerInterconnection();
 
 		};
 	}

@@ -1,6 +1,6 @@
 #include "PreviewSoundPlayer.hpp"
 
-#include "MpcVoice.hpp"
+#include "Voice.hpp"
 #include "MpcSampler.hpp"
 
 #include <engine/mpc/FaderControl.hpp>
@@ -13,7 +13,7 @@ using namespace ctoot::audio::mixer;
 PreviewSoundPlayer::PreviewSoundPlayer(
         std::shared_ptr<MpcSampler> samplerToUse,
         std::shared_ptr<ctoot::audio::mixer::AudioMixer> mixerToUse,
-        std::shared_ptr<MpcVoice> voiceToUse)
+        std::shared_ptr<Voice> voiceToUse)
         : sampler(std::move(samplerToUse)), mixer(std::move(mixerToUse)), voice(std::move(voiceToUse))
 {
 	auto sc = mixer->getMixerControls()->getStripControls("65");

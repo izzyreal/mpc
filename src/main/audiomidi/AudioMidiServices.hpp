@@ -14,7 +14,7 @@
 #include <atomic>
 
 namespace ctoot::mpc {
-	class MpcVoice;
+	class Voice;
 }
 
 namespace ctoot::audio::core {
@@ -81,8 +81,8 @@ namespace mpc::audiomidi
         std::vector<std::shared_ptr<ctoot::control::CompoundControl>> soundPlayerChannelControls;
         std::vector<ctoot::mpc::Drum> soundPlayerChannels;
         std::unique_ptr<ctoot::mpc::PreviewSoundPlayer> basicSoundPlayerChannel;
-		std::vector<std::shared_ptr<ctoot::mpc::MpcVoice>> voices;
-		std::shared_ptr<ctoot::mpc::MpcVoice> basicVoice;
+		std::vector<std::shared_ptr<ctoot::mpc::Voice>> voices;
+		std::shared_ptr<ctoot::mpc::Voice> basicVoice;
 		std::shared_ptr<ctoot::audio::server::AudioServer> server;
 		std::shared_ptr<ctoot::audio::server::NonRealTimeAudioServer> offlineServer;
 		std::shared_ptr<ctoot::audio::system::DefaultAudioSystem> audioSystem;

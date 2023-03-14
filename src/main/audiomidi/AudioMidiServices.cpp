@@ -11,7 +11,7 @@
 #include <audiomidi/MonitorInputAdapter.hpp>
 #include <audiomidi/MpcMidiOutput.hpp>
 
-#include <engine/mpc/MpcVoice.hpp>
+#include <engine/mpc/Voice.hpp>
 #include <engine/mpc/PreviewSoundPlayer.hpp>
 #include <engine/mpc/FaderControl.hpp>
 #include <engine/audio/mixer/MixerControls.hpp>
@@ -61,7 +61,7 @@ using namespace ctoot::mpc;
 AudioMidiServices::AudioMidiServices(mpc::Mpc& mpcToUse)
 	: mpc(mpcToUse)
 {
-	MpcVoice::freqTable();
+	Voice::freqTable();
     frameSeq = std::make_shared<mpc::sequencer::FrameSeq>(mpcToUse);
 }
 
@@ -252,11 +252,11 @@ PreviewSoundPlayer& AudioMidiServices::getBasicPlayer()
 
 void AudioMidiServices::createSynth()
 {
-	basicVoice = std::make_shared<MpcVoice>(65, true);
+	basicVoice = std::make_shared<Voice>(65, true);
 
     for (int i = 0; i < 32; i ++)
     {
-        voices.emplace_back(std::make_shared<MpcVoice>(i + 1, false));
+        voices.emplace_back(std::make_shared<Voice>(i + 1, false));
     }
 
     for (int i = 0; i < 4; i++)

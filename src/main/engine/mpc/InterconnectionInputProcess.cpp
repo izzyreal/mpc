@@ -1,11 +1,11 @@
 #include "InterconnectionInputProcess.hpp"
 
-#include "MpcMixerInterconnection.hpp"
+#include "MixerInterconnection.hpp"
 #include <engine/audio/core/AudioBuffer.hpp>
 
 using namespace ctoot::mpc;
 
-InterconnectionInputProcess::InterconnectionInputProcess(MpcMixerInterconnection* mmi, ctoot::audio::core::AudioBuffer* sharedBuffer)
+InterconnectionInputProcess::InterconnectionInputProcess(MixerInterconnection* mmi, ctoot::audio::core::AudioBuffer* sharedBuffer)
     : mmi(mmi)
     , sharedBuffer(sharedBuffer)
 {

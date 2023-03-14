@@ -4,7 +4,7 @@
 
 namespace ctoot::mpc {
 
-    class MpcMixerInterconnection;
+    class MixerInterconnection;
 
     class InterconnectionInputProcess
             : public ctoot::audio::core::AudioProcess
@@ -14,10 +14,10 @@ namespace ctoot::mpc {
         int processAudio(ctoot::audio::core::AudioBuffer *buffer) override;
 
     private:
-        MpcMixerInterconnection *mmi{nullptr};
+        MixerInterconnection *mmi{nullptr};
         ctoot::audio::core::AudioBuffer *sharedBuffer{nullptr};
 
     public:
-        InterconnectionInputProcess(MpcMixerInterconnection *mmi, ctoot::audio::core::AudioBuffer *sharedBuffer);
+        InterconnectionInputProcess(MixerInterconnection *mmi, ctoot::audio::core::AudioBuffer *sharedBuffer);
     };
 }

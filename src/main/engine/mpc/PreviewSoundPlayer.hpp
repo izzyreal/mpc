@@ -10,14 +10,14 @@ namespace ctoot::mpc {
 
     class MpcSound;
 
-    class MpcVoice;
+    class Voice;
 
     class PreviewSoundPlayer final
     {
 
     private:
         std::shared_ptr<ctoot::mpc::MpcSampler> sampler;
-        std::shared_ptr<ctoot::mpc::MpcVoice> voice;
+        std::shared_ptr<ctoot::mpc::Voice> voice;
         std::shared_ptr<ctoot::mpc::MpcSound> tempVars;
 
         std::shared_ptr<ctoot::audio::mixer::AudioMixer> mixer;
@@ -32,7 +32,7 @@ namespace ctoot::mpc {
 
         explicit PreviewSoundPlayer(std::shared_ptr<MpcSampler> sampler,
                                     std::shared_ptr<ctoot::audio::mixer::AudioMixer> mixer,
-                                    std::shared_ptr<MpcVoice> voice);
+                                    std::shared_ptr<Voice> voice);
 
     };
 }

@@ -1,4 +1,4 @@
-#include <engine/mpc/MpcVoice.hpp>
+#include <engine/mpc/Voice.hpp>
 
 #include <engine/mpc/MpcNoteParameters.hpp>
 #include <engine/mpc/MpcSound.hpp>
@@ -19,9 +19,9 @@
 
 using namespace ctoot::mpc;
 
-std::vector<float> MpcVoice::EMPTY_FRAME = {0.f, 0.f};
+std::vector<float> Voice::EMPTY_FRAME = {0.f, 0.f};
 
-MpcVoice::MpcVoice(int _stripNumber, bool _basic)
+Voice::Voice(int _stripNumber, bool _basic)
         : stripNumber(_stripNumber), basic(_basic), frame(EMPTY_FRAME) {
     tempFrame = EMPTY_FRAME;
     staticEnvControls = new ctoot::mpc::EnvelopeControls(0, "StaticAmpEnv", AMPENV_OFFSET);
@@ -64,7 +64,7 @@ MpcVoice::MpcVoice(int _stripNumber, bool _basic)
     }
 }
 
-void MpcVoice::init(
+void Voice::init(
         int newVelocity,
         std::shared_ptr<ctoot::mpc::MpcSound> newMpcSound,
         int newNote,
@@ -169,7 +169,7 @@ void MpcVoice::init(
     initializeSamplerateDependents();
 }
 
-void MpcVoice::initializeSamplerateDependents()
+void Voice::initializeSamplerateDependents()
 {
     staticEnvControls->setSampleRate(sampleRate);
 
@@ -214,7 +214,7 @@ void MpcVoice::initializeSamplerateDependents()
     }
 }
 
-std::vector<float>& MpcVoice::getFrame() {
+std::vector<float>& Voice::getFrame() {
     if (finished)
         return EMPTY_FRAME;
 
@@ -258,7 +258,7 @@ std::vector<float>& MpcVoice::getFrame() {
     return tempFrame;
 }
 
-void MpcVoice::readFrame() {
+void Voice::readFrame() {
     if (mpcSound->isLoopEnabled() && position > end - 1)
         position = mpcSound->getLoopTo();
 
@@ -288,10 +288,10 @@ void MpcVoice::readFrame() {
     position += increment;
 }
 
-void MpcVoice::open() {
+void Voice::open() {
 }
 
-int MpcVoice::processAudio(ctoot::audio::core::AudioBuffer *buffer, int nFrames) {
+int Voice::processAudio(ctoot::audio::core::AudioBuffer *buffer, int nFrames) {
     if (finished) {
         buffer->makeSilence();
         return AUDIO_SILENCE;
@@ -334,63 +334,63 @@ int MpcVoice::processAudio(ctoot::audio::core::AudioBuffer *buffer, int nFrames)
     return AUDIO_OK;
 }
 
-bool MpcVoice::isFinished() {
+bool Voice::isFinished() {
     return finished;
 }
 
-void MpcVoice::close() {
+void Voice::close() {
 }
 
-void MpcVoice::finish() {
+void Voice::finish() {
     finished = true;
 }
 
-void MpcVoice::startDecay() {
+void Voice::startDecay() {
     staticDecay = true;
 }
 
-int MpcVoice::getVoiceOverlap() {
+int Voice::getVoiceOverlap() {
     return mpcSound->isLoopEnabled() ? 2 : voiceOverlapMode;
 }
 
-int MpcVoice::getStripNumber() {
+int Voice::getStripNumber() {
     return stripNumber;
 }
 
-int MpcVoice::getStartTick()
+int Voice::getStartTick()
 {
     return startTick;
 }
 
-bool MpcVoice::isDecaying() {
+bool Voice::isDecaying() {
     return staticDecay;
 }
 
-MpcMuteInfo& MpcVoice::getMuteInfo() {
+MpcMuteInfo& Voice::getMuteInfo() {
     return muteInfo;
 }
 
-void MpcVoice::startDecay(int offset) {
+void Voice::startDecay(int offset) {
     if (offset > 0)
         decayCounter = offset;
     else
         startDecay();
 }
 
-int MpcVoice::getNote() {
+int Voice::getNote() {
     return note;
 }
 
-ctoot::mpc::MpcNoteParameters *MpcVoice::getNoteParameters() {
+ctoot::mpc::MpcNoteParameters *Voice::getNoteParameters() {
     return noteParameters;
 }
 
-void MpcVoice::setMasterLevel(int8_t masterLevelToUse)
+void Voice::setMasterLevel(int8_t masterLevelToUse)
 {
     masterLevel.store(masterLevelToUse);
 }
 
-std::vector<float>& MpcVoice::freqTable()
+std::vector<float>& Voice::freqTable()
 {
     static std::vector<float> res;
     if (res.empty()) {
@@ -401,7 +401,7 @@ std::vector<float>& MpcVoice::freqTable()
     return res;
 }
 
-float MpcVoice::midiFreq(float pitch)
+float Voice::midiFreq(float pitch)
 {
     if (pitch < 0)
         return freqTable()[0];
@@ -414,12 +414,12 @@ float MpcVoice::midiFreq(float pitch)
     return freqTable()[idx] * (1 - frac) + freqTable()[idx + 1] * frac;
 }
 
-float MpcVoice::midiFreqImpl(int pitch)
+float Voice::midiFreqImpl(int pitch)
 {
     return (float)(440.0 * pow(2.0, ((double)(pitch) - 69.0) / 12.0));
 }
 
-MpcVoice::~MpcVoice() {
+Voice::~Voice() {
     delete staticEnvControls;
     delete staticEnv;
 

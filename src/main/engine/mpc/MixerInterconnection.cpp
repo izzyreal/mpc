@@ -1,4 +1,4 @@
-#include "MpcMixerInterconnection.hpp"
+#include "MixerInterconnection.hpp"
 
 #include "InterconnectionInputProcess.hpp"
 #include "InterconnectionOutputProcess.hpp"
@@ -12,40 +12,40 @@ using namespace ctoot::audio::core;
 using namespace ctoot::mpc;
 using namespace std;
 
-MpcMixerInterconnection::MpcMixerInterconnection(string name, ctoot::audio::server::AudioServer* server)
+MixerInterconnection::MixerInterconnection(string name, ctoot::audio::server::AudioServer* server)
 {
 	auto const sharedBuffer = server->createAudioBuffer(name);
 	inputProcess = make_shared<InterconnectionInputProcess>(this, sharedBuffer);
 	outputProcess = make_shared<InterconnectionOutputProcess>(sharedBuffer);
 }
 
-shared_ptr<AudioProcess> MpcMixerInterconnection::getInputProcess()
+shared_ptr<AudioProcess> MixerInterconnection::getInputProcess()
 {
     return inputProcess;
 }
 
-shared_ptr<AudioProcess> MpcMixerInterconnection::getOutputProcess()
+shared_ptr<AudioProcess> MixerInterconnection::getOutputProcess()
 {
     return outputProcess;
 }
 
-void MpcMixerInterconnection::setLeftEnabled(bool b)
+void MixerInterconnection::setLeftEnabled(bool b)
 {
     leftEnabled = b;
 }
 
-void MpcMixerInterconnection::setRightEnabled(bool b)
+void MixerInterconnection::setRightEnabled(bool b)
 {
     rightEnabled = b;
 }
 
-bool MpcMixerInterconnection::isLeftEnabled() {
+bool MixerInterconnection::isLeftEnabled() {
 	return leftEnabled;
 }
 
-bool MpcMixerInterconnection::isRightEnabled() {
+bool MixerInterconnection::isRightEnabled() {
 	return rightEnabled;
 }
 
-MpcMixerInterconnection::~MpcMixerInterconnection() {
+MixerInterconnection::~MixerInterconnection() {
 }

@@ -1,8 +1,8 @@
 #include "Drum.hpp"
 
 #include "FaderControl.hpp"
-#include "MpcMixerInterconnection.hpp"
-#include "MpcVoice.hpp"
+#include "MixerInterconnection.hpp"
+#include "Voice.hpp"
 
 #include <engine/mpc/MpcNoteParameters.hpp>
 #include <engine/mpc/MpcProgram.hpp>
@@ -26,7 +26,7 @@ Drum::Drum(std::shared_ptr<MpcSampler> samplerToUse,
            std::shared_ptr<AudioMixer> mixerToUse,
            const std::shared_ptr<AudioServer>& serverToUse,
            MpcMixerSetupGui* mixerSetupGuiToUse,
-           std::vector<std::shared_ptr<MpcVoice>> voicesToUse)
+           std::vector<std::shared_ptr<Voice>> voicesToUse)
            : sampler(std::move(samplerToUse)), mixer(std::move(mixerToUse)),
            server(serverToUse.get()), mixerSetupGui(mixerSetupGuiToUse),
            voices(std::move(voicesToUse)), drumIndex(drumIndexToUse)
@@ -105,7 +105,7 @@ void Drum::mpcNoteOn(int note, int velo, int varType, int varValue, int frameOff
 	checkForMutes(np);
 	auto soundNumber = np->getSoundIndex();
 
-	std::shared_ptr<MpcVoice> voice;
+	std::shared_ptr<Voice> voice;
 
 	for (auto& v : voices)
 	{
@@ -280,7 +280,7 @@ void Drum::connectVoices()
 		auto ams1 = mixer->getStrip(std::to_string(j + 1));
 		auto voice = voices[j];
 		ams1->setInputProcess(voice);
-		auto mi = new MpcMixerInterconnection("con" + std::to_string(j), server);
+		auto mi = new MixerInterconnection("con" + std::to_string(j), server);
 		ams1->setDirectOutputProcess(mi->getInputProcess());
 		auto ams2 = mixer->getStrip(std::to_string(j + 1 + 32));
 		ams2->setInputProcess(mi->getOutputProcess());
