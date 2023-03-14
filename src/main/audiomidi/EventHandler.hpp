@@ -3,7 +3,6 @@
 #include <sequencer/Sequencer.hpp>
 #include <sampler/Sampler.hpp>
 #include <sequencer/Event.hpp>
-#include <sequencer/MidiAdapter.hpp>
 
 #include <memory>
 #include <map>

@@ -1,5 +1,6 @@
 #pragma once
 #include <sequencer/Event.hpp>
+#include <engine/midi/ShortMessage.hpp>
 
 namespace mpc::sequencer
 {
@@ -82,6 +83,8 @@ namespace mpc::sequencer
         void setVelocity(int i);
         void setVelocityZero();
         int getVelocity();
+        bool isNoteOn() { return getVelocity() > 0; }
+        bool isNoteOff() { return getVelocity() == 0; }
 
         void CopyValuesTo(std::weak_ptr<Event> dest) override;
 
@@ -91,5 +94,6 @@ namespace mpc::sequencer
         NoteEvent(bool noteOffTrue, int /* noteOnTick */); // ctor used for noteOffs
         std::string getTypeName() override { return "note"; }
 
+        std::shared_ptr<mpc::engine::midi::ShortMessage> createShortMessage(int channel, int transpose = 0);
     };
 }

@@ -2,6 +2,7 @@
 #include <algorithm>
 
 using namespace mpc::sequencer;
+using namespace mpc::engine::midi;
 
 //------------
 void mpc::sequencer::NoteOffEvent::setNote(int i)
@@ -87,11 +88,6 @@ int mpc::sequencer::NoteOnEvent::getVelocity()
 {
     return velocity;
 }
-
-
-
-
-
 
 NoteEvent::NoteEvent()
     : NoteEvent(60)
@@ -208,5 +204,14 @@ void NoteEvent::CopyValuesTo(std::weak_ptr<Event> dest)
     lDest->setVariationValue(getVariationValue());
     lDest->setNote(getNote());
     lDest->velocity = velocity;
-    lDest->setDuration(getDuration());
+
+	lDest->setDuration(getDuration());
+}
+
+std::shared_ptr<ShortMessage> NoteEvent::createShortMessage(int channel, int transpose)
+{
+    auto msg = std::make_shared<ShortMessage>();
+    msg->setMessage(getVelocity() == 0 ? ShortMessage::NOTE_OFF : ShortMessage::NOTE_ON, channel, std::clamp(getNote()+transpose,0,127), getVelocity());
+    return msg;
+
 }

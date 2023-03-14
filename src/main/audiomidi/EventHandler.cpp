@@ -78,11 +78,10 @@ void EventHandler::handleNoThru(const std::shared_ptr<Event>& event, Track* trac
                 if (!isSolo || eventTrackIsSoloTrack || noteEvent->getVelocity() == 0)
                 {
                     auto newVelo = static_cast<int>(noteEvent->getVelocity() * (track->getVelocityRatio() * 0.01));
-                    MidiAdapter midiAdapter;
                     // Each of the 4 DRUMs is routed to their respective 0-based MIDI channel.
                     // This MIDI channel is part of a MIDI system that is internal to VMPC2000XL's sound player engine.
-                    midiAdapter.process(noteEvent, drumIndex, newVelo);
-
+                    auto msg = noteEvent->createShortMessage(drumIndex);
+                    
                     auto audioServer = mpc.getAudioMidiServices()->getAudioServer();
                     auto frameSeq = mpc.getAudioMidiServices()->getFrameSequencer();
                     auto isDrumNote = noteEvent->getNote() >= 35 && noteEvent->getNote() <= 98;
@@ -193,78 +192,48 @@ void EventHandler::midiOut(const std::shared_ptr<Event>& e, Track* track)
     
     if (noteEvent)
     {
-        if (noteEvent->getVelocity() == 0 && track->getIndex() < 64)
+        int transposeAmount = 0;
+
+        if (noteEvent->isNoteOff() && track->getIndex() < 64)
         {
             auto candidate = transposeCache.find({noteEvent->getNote(), track->getIndex() });
-            
             if (candidate != end(transposeCache))
             {
-                auto transposeParameters = *candidate;
-                auto copy = std::make_shared<NoteEvent>(true, 0);
-                noteEvent->CopyValuesTo(copy);
-                noteEvent = copy;
-                noteEvent->setNote(noteEvent->getNote() + transposeParameters.second);
+                transposeAmount = candidate->second;
                 transposeCache.erase(candidate);
             }
         }
         
-        auto transScreen = mpc.screens->get<TransScreen>("trans");
-        
-        if (track->getIndex() < 64 && transScreen->transposeAmount != 0 &&
-            (transScreen->tr == -1 || transScreen->tr == noteEvent->getTrack()) &&
-            noteEvent->getVelocity() > 0)
+        else if (noteEvent->isNoteOn() && track->getIndex() < 64)
         {
-            auto copy = std::make_shared<NoteEvent>();
-            noteEvent->CopyValuesTo(copy);
-            noteEvent = copy;
-            transposeCache[{ noteEvent->getNote(), track->getIndex() }] = transScreen->transposeAmount;
-            noteEvent->setNote(noteEvent->getNote() + transScreen->transposeAmount);
+            auto transScreen = mpc.screens->get<TransScreen>("trans");
+            if (transScreen->transposeAmount != 0 && (transScreen->tr == -1 || transScreen->tr == noteEvent->getTrack()))
+            {
+                transposeAmount = transScreen->transposeAmount;
+                transposeCache[{ noteEvent->getNote(), track->getIndex() }] = transposeAmount;
+            }
         }
         
-        auto deviceNumber = track->getDeviceIndex() - 1;
+        int deviceNumber = track->getDeviceIndex() - 1; if (deviceNumber < 0) return;
+        int channel = deviceNumber%16;
         
-        if (deviceNumber < 0)
-            return;
-        
-        auto channel = deviceNumber;
-        
-        if (channel > 15)
-            channel -= 16;
-        
-        MidiAdapter midiAdapter;
-        midiAdapter.process(noteEvent, channel, -1);
-        auto msg = midiAdapter.get().lock();
-        
-        auto mpcMidiOutput = mpc.getMidiOutput();
-
-        std::string notifyLetter = "a";
-        
-        if (deviceNumber > 15)
-        {
-            deviceNumber -= 16;
-            notifyLetter = "b";
-        }
-
         auto directToDiskRecorderScreen = mpc.screens->get<VmpcDirectToDiskRecorderScreen>("vmpc-direct-to-disk-recorder");
         
-        if (!(mpc.getAudioMidiServices()->isBouncing() &&
-              directToDiskRecorderScreen->offline) &&
-                track->getDeviceIndex() != 0)
+        if (!(mpc.getAudioMidiServices()->isBouncing() && directToDiskRecorderScreen->offline) && track->getDeviceIndex() != 0)
         {
-            auto fs = mpc.getAudioMidiServices()->getFrameSequencer();
-            auto eventFrame = fs->getEventFrameOffset();
-            msg->bufferPos = eventFrame;
+            auto msg = noteEvent->createShortMessage(channel, transposeAmount);
+            msg->bufferPos = mpc.getAudioMidiServices()->getFrameSequencer()->getEventFrameOffset();
             
             if (deviceNumber < 16)
             {
-                mpcMidiOutput->enqueueMessageOutputA(msg);
+                mpc.getMidiOutput()->enqueueMessageOutputA(msg);
             }
             else
             {
-                mpcMidiOutput->enqueueMessageOutputB(msg);
+                mpc.getMidiOutput()->enqueueMessageOutputB(msg);
             }
         }
         
-        notifyObservers(notifyLetter + std::to_string(deviceNumber));
+        notifyObservers(deviceNumber < 16 ? "a" : "b" + std::to_string(channel));
     }
 }
