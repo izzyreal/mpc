@@ -9,8 +9,8 @@
 #include <engine/audio/server/AudioServer.hpp>
 
 using namespace std;
-using namespace ctoot::audio::server;
-using namespace ctoot::audio::mixer;
+using namespace mpc::engine::audio::server;
+using namespace mpc::engine::audio::mixer;
 
 AudioMixer::AudioMixer(shared_ptr<MixerControls> controls, shared_ptr<AudioServer> server)
 {
@@ -21,7 +21,7 @@ AudioMixer::AudioMixer(shared_ptr<MixerControls> controls, shared_ptr<AudioServe
 	createStrips(controls);
 }
 
-std::shared_ptr<ctoot::audio::server::AudioServer> AudioMixer::getAudioServer() {
+std::shared_ptr<mpc::engine::audio::server::AudioServer> AudioMixer::getAudioServer() {
 	return server;
 }
 
@@ -30,17 +30,17 @@ shared_ptr<MixerControls> AudioMixer::getMixerControls()
     return controls;
 }
 
-ctoot::audio::core::AudioBuffer* AudioMixer::getSharedBuffer()
+mpc::engine::audio::core::AudioBuffer* AudioMixer::getSharedBuffer()
 {
     return sharedAudioBuffer;
 }
 
-ctoot::audio::core::AudioBuffer* AudioMixer::createBuffer(string name)
+mpc::engine::audio::core::AudioBuffer* AudioMixer::createBuffer(string name)
 {
     return server->createAudioBuffer(name);
 }
 
-void AudioMixer::removeBuffer(ctoot::audio::core::AudioBuffer* buffer)
+void AudioMixer::removeBuffer(mpc::engine::audio::core::AudioBuffer* buffer)
 {
     server->removeAudioBuffer(buffer);
 }
@@ -146,7 +146,7 @@ void AudioMixer::createStrips(shared_ptr<MixerControls> mixerControls)
 	}
 }
 
-shared_ptr<AudioMixerStrip> AudioMixer::createStrip(shared_ptr<ctoot::audio::core::AudioControlsChain> controls)
+shared_ptr<AudioMixerStrip> AudioMixer::createStrip(shared_ptr<mpc::engine::audio::core::AudioControlsChain> controls)
 {
 
 	auto strip = make_shared<AudioMixerStrip>(this, controls);

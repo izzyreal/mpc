@@ -1,7 +1,7 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
-namespace ctoot::mpc
+namespace mpc::engine
 {
 	class IndivFxMixer;
 	class StereoMixer;
@@ -39,8 +39,8 @@ namespace mpc::lcdgui::screens::window
 		void displayFollowStereo();
 		void displayChannel();
 
-		std::shared_ptr<ctoot::mpc::IndivFxMixer> getIndivFxMixerChannel();
-		std::shared_ptr<ctoot::mpc::StereoMixer> getStereoMixerChannel();
+		std::shared_ptr<mpc::engine::IndivFxMixer> getIndivFxMixerChannel();
+		std::shared_ptr<mpc::engine::StereoMixer> getStereoMixerChannel();
 
 	};
 }

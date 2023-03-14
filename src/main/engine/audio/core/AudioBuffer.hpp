@@ -5,7 +5,7 @@
 
 #include <memory>
 
-namespace ctoot::audio::core
+namespace mpc::engine::audio::core
 {
 	class ChannelFormat;
 

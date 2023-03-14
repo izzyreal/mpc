@@ -2,21 +2,21 @@
 
 #include <atomic>
 
-#include <engine/audio/core/AudioProcess.hpp>
+#include "engine/audio/core/AudioProcess.hpp"
 #include "MpcMuteInfo.hpp"
 
-namespace ctoot::control {
+namespace mpc::engine::control {
     class LawControl;
     class BooleanControl;
 }
 
-namespace ctoot::synth::modules::filter {
+namespace mpc::engine::filter {
     class StateVariableFilter;
 
     class StateVariableFilterControls;
 }
 
-namespace ctoot::mpc {
+namespace mpc::engine {
     class MpcNoteParameters;
 
     class MpcSound;
@@ -28,7 +28,7 @@ namespace ctoot::mpc {
     class MpcMuteInfo;
 
     class Voice
-            : public ctoot::audio::core::AudioProcess
+            : public mpc::engine::audio::core::AudioProcess
     {
 
     private:
@@ -53,37 +53,37 @@ namespace ctoot::mpc {
         int voiceOverlapMode;
 
         // Pointer to currently playing note parameters
-        ctoot::mpc::MpcNoteParameters *noteParameters = nullptr;
+        mpc::engine::MpcNoteParameters *noteParameters = nullptr;
 
-        std::shared_ptr<ctoot::mpc::MpcSound> mpcSound;
+        std::shared_ptr<mpc::engine::MpcSound> mpcSound;
         int startTick = -1;
         int tune = 0;
         double increment = 0;
         double position = 0;
         std::vector<float> *sampleData;
-        ctoot::mpc::EnvelopeGenerator *staticEnv = nullptr;
-        ctoot::mpc::EnvelopeGenerator *ampEnv = nullptr;
-        ctoot::mpc::EnvelopeGenerator *filterEnv = nullptr;
+        mpc::engine::EnvelopeGenerator *staticEnv = nullptr;
+        mpc::engine::EnvelopeGenerator *ampEnv = nullptr;
+        mpc::engine::EnvelopeGenerator *filterEnv = nullptr;
         float initialFilterValue = 0;
         bool staticDecay = 0;
         int note = -1;
         int velocity = 0;
         float amplitude = 0;
-        ctoot::synth::modules::filter::StateVariableFilter *svfLeft = nullptr;
-        ctoot::synth::modules::filter::StateVariableFilter *svfRight = nullptr;
+        mpc::engine::filter::StateVariableFilter *svfLeft = nullptr;
+        mpc::engine::filter::StateVariableFilter *svfRight = nullptr;
         int end = 0;
-        ctoot::control::LawControl *attack = nullptr;
-        ctoot::control::LawControl *hold = nullptr;
-        ctoot::control::LawControl *decay = nullptr;
-        ctoot::control::LawControl *fattack = nullptr;
-        ctoot::control::LawControl *fhold = nullptr;
-        ctoot::control::LawControl *fdecay = nullptr;
-        ctoot::control::LawControl *shold = nullptr;
-        ctoot::control::LawControl *reso = nullptr;
-        ctoot::mpc::EnvelopeControls *ampEnvControls = nullptr;
-        ctoot::mpc::EnvelopeControls *staticEnvControls = nullptr;
-        ctoot::mpc::EnvelopeControls *filterEnvControls = nullptr;
-        ctoot::synth::modules::filter::StateVariableFilterControls *svfControls = nullptr;
+        mpc::engine::control::LawControl *attack = nullptr;
+        mpc::engine::control::LawControl *hold = nullptr;
+        mpc::engine::control::LawControl *decay = nullptr;
+        mpc::engine::control::LawControl *fattack = nullptr;
+        mpc::engine::control::LawControl *fhold = nullptr;
+        mpc::engine::control::LawControl *fdecay = nullptr;
+        mpc::engine::control::LawControl *shold = nullptr;
+        mpc::engine::control::LawControl *reso = nullptr;
+        mpc::engine::EnvelopeControls *ampEnvControls = nullptr;
+        mpc::engine::EnvelopeControls *staticEnvControls = nullptr;
+        mpc::engine::EnvelopeControls *filterEnvControls = nullptr;
+        mpc::engine::filter::StateVariableFilterControls *svfControls = nullptr;
         bool finished = true;
         int stripNumber = -1;
 
@@ -97,7 +97,7 @@ namespace ctoot::mpc {
 
     private:
         static std::vector<float> EMPTY_FRAME;
-        ctoot::mpc::MpcMuteInfo muteInfo;
+        mpc::engine::MpcMuteInfo muteInfo;
         int frameOffset = 0;
         bool basic = false;
         int decayCounter = 0;
@@ -133,16 +133,16 @@ namespace ctoot::mpc {
     public:
         void open() override;
 
-        int processAudio(ctoot::audio::core::AudioBuffer *buffer, int nFrames) override;
+        int processAudio(mpc::engine::audio::core::AudioBuffer *buffer, int nFrames) override;
 
         void close() override;
 
         bool isFinished();
 
         void init(int velocity,
-                  std::shared_ptr<ctoot::mpc::MpcSound> mpcSound,
+                  std::shared_ptr<mpc::engine::MpcSound> mpcSound,
                   int note,
-                  ctoot::mpc::MpcNoteParameters *np,
+                  mpc::engine::MpcNoteParameters *np,
                   int varType,
                   int varValue,
                   int muteNote,
@@ -156,7 +156,7 @@ namespace ctoot::mpc {
 
         int getNote();
 
-        ctoot::mpc::MpcNoteParameters *getNoteParameters();
+        mpc::engine::MpcNoteParameters *getNoteParameters();
 
         void startDecay();
 
@@ -168,7 +168,7 @@ namespace ctoot::mpc {
 
         bool isDecaying();
 
-        ctoot::mpc::MpcMuteInfo &getMuteInfo();
+        mpc::engine::MpcMuteInfo &getMuteInfo();
 
         void startDecay(int offset);
 

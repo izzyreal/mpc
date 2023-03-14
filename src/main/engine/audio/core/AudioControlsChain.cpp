@@ -2,8 +2,8 @@
 
 #include "AudioControls.hpp"
 
-using namespace ctoot::audio::core;
-using namespace ctoot::control;
+using namespace mpc::engine::audio::core;
+using namespace mpc::engine::control;
 
 AudioControlsChain::AudioControlsChain(int id, std::string name)
 	: CompoundControlChain(id, name)

@@ -14,7 +14,7 @@ using namespace mpc::lcdgui;
 using namespace mpc::controls;
 using namespace mpc::sampler;
 using namespace mpc::sequencer;
-using namespace ctoot::mpc;
+using namespace mpc::engine;
 using namespace moduru::lang;
 
 MixerScreen::MixerScreen(mpc::Mpc& mpc, const int layerIndex) 

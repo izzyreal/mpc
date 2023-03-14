@@ -3,7 +3,7 @@
 #include <engine/control/Control.hpp>
 #include <algorithm>
 
-using namespace ctoot::control;
+using namespace mpc::engine::control;
 using namespace std;
 
 CompoundControlChain::CompoundControlChain(int id, string name)

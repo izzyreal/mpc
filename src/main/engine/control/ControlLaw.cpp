@@ -1,6 +1,6 @@
 #include <engine/control/ControlLaw.hpp>
 
-using namespace ctoot::control;
+using namespace mpc::engine::control;
 using namespace std;
 
 int ControlLaw::intValue(float userVal) {

@@ -1,10 +1,10 @@
 #pragma once
-#include <engine/mpc/MpcSound.hpp>
+#include "engine/MpcSound.hpp"
 #include <observer/Observable.hpp>
 
 namespace mpc::sampler {
 	class Sound
-		: public virtual ctoot::mpc::MpcSound
+		: public virtual mpc::engine::MpcSound
 		, public moduru::observer::Observable
 	{
 

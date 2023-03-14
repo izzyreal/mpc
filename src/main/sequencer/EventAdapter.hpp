@@ -23,7 +23,7 @@
 
 namespace mpc { class Mpc; }
 
-namespace ctoot::midi::core
+namespace mpc::engine::midi
 {
 	class ShortMessage;
 	class MidiMessage;
@@ -50,10 +50,10 @@ namespace mpc::sequencer
 		std::shared_ptr<NoteEvent> noteEvent;
 
 	public:
-		void process(ctoot::midi::core::MidiMessage* msg);
+		void process(mpc::engine::midi::MidiMessage* msg);
 
 	private:
-		std::weak_ptr<Event> convert(ctoot::midi::core::ShortMessage* msg);
+		std::weak_ptr<Event> convert(mpc::engine::midi::ShortMessage* msg);
 
 	public:
 		std::weak_ptr<Event> get();

@@ -4,8 +4,8 @@
 #include <sequencer/FrameSeq.hpp>
 
 #include <engine/audio/mixer/AudioMixer.hpp>
-#include <engine/mpc/Drum.hpp>
-#include <engine/mpc/PreviewSoundPlayer.hpp>
+#include "engine/Drum.hpp"
+#include "engine/PreviewSoundPlayer.hpp"
 
 #include <observer/Observable.hpp>
 
@@ -13,25 +13,25 @@
 #include <memory>
 #include <atomic>
 
-namespace ctoot::mpc {
+namespace mpc::engine {
 	class Voice;
 }
 
-namespace ctoot::audio::core {
+namespace mpc::engine::audio::core {
 	class AudioFormat;
 }
 
-namespace ctoot::audio::server {
+namespace mpc::engine::audio::server {
 	class CompoundAudioClient;
 	class NonRealTimeAudioServer;
 	class AudioServer;
 }
 
-namespace ctoot::audio::mixer {
+namespace mpc::engine::audio::mixer {
     class MixerControls;
 }
 
-namespace ctoot::audio::system {
+namespace mpc::engine::audio::system {
 	class DefaultAudioSystem;
 }
 
@@ -54,7 +54,7 @@ namespace mpc::audiomidi
 		mpc::Mpc& mpc;
 		std::atomic<bool> bouncing = ATOMIC_VAR_INIT(false);
 		std::atomic<bool> recordingSound = ATOMIC_VAR_INIT(false);
-		std::shared_ptr<ctoot::audio::core::AudioProcess> monitorInputAdapter;
+		std::shared_ptr<mpc::engine::audio::core::AudioProcess> monitorInputAdapter;
 
 	public:
 		const bool isBouncing();
@@ -78,20 +78,20 @@ namespace mpc::audiomidi
 		bool bouncePrepared = false;
         bool wasRecordingSound = false;
         bool wasBouncing = false;
-        std::vector<std::shared_ptr<ctoot::control::CompoundControl>> soundPlayerChannelControls;
-        std::vector<ctoot::mpc::Drum> soundPlayerChannels;
-        std::unique_ptr<ctoot::mpc::PreviewSoundPlayer> basicSoundPlayerChannel;
-		std::vector<std::shared_ptr<ctoot::mpc::Voice>> voices;
-		std::shared_ptr<ctoot::mpc::Voice> basicVoice;
-		std::shared_ptr<ctoot::audio::server::AudioServer> server;
-		std::shared_ptr<ctoot::audio::server::NonRealTimeAudioServer> offlineServer;
-		std::shared_ptr<ctoot::audio::system::DefaultAudioSystem> audioSystem;
-		std::shared_ptr<ctoot::audio::mixer::AudioMixer> mixer;
-		std::shared_ptr<ctoot::audio::mixer::MixerControls> mixerControls;
-		std::shared_ptr<ctoot::audio::server::CompoundAudioClient> cac;
+        std::vector<std::shared_ptr<mpc::engine::control::CompoundControl>> soundPlayerChannelControls;
+        std::vector<mpc::engine::Drum> soundPlayerChannels;
+        std::unique_ptr<mpc::engine::PreviewSoundPlayer> basicSoundPlayerChannel;
+		std::vector<std::shared_ptr<mpc::engine::Voice>> voices;
+		std::shared_ptr<mpc::engine::Voice> basicVoice;
+		std::shared_ptr<mpc::engine::audio::server::AudioServer> server;
+		std::shared_ptr<mpc::engine::audio::server::NonRealTimeAudioServer> offlineServer;
+		std::shared_ptr<mpc::engine::audio::system::DefaultAudioSystem> audioSystem;
+		std::shared_ptr<mpc::engine::audio::mixer::AudioMixer> mixer;
+		std::shared_ptr<mpc::engine::audio::mixer::MixerControls> mixerControls;
+		std::shared_ptr<mpc::engine::audio::server::CompoundAudioClient> cac;
 		std::shared_ptr<MpcMidiOutput> mpcMidiOutput;
-		std::vector<ctoot::audio::server::IOAudioProcess*> inputProcesses;
-		std::vector<ctoot::audio::server::IOAudioProcess*> outputProcesses;
+		std::vector<mpc::engine::audio::server::IOAudioProcess*> inputProcesses;
+		std::vector<mpc::engine::audio::server::IOAudioProcess*> outputProcesses;
 		std::shared_ptr<mpc::sequencer::FrameSeq> frameSeq;
 		std::vector<std::shared_ptr<DiskRecorder>> diskRecorders;
 		std::shared_ptr<SoundRecorder> soundRecorder;
@@ -106,7 +106,7 @@ namespace mpc::audiomidi
 		void setMonitorLevel(int level);
 
     public:
-		ctoot::audio::server::NonRealTimeAudioServer* getAudioServer();
+		mpc::engine::audio::server::NonRealTimeAudioServer* getAudioServer();
 
         std::shared_ptr<SoundRecorder> getSoundRecorder();
 		std::shared_ptr<SoundPlayer> getSoundPlayer();
@@ -116,8 +116,8 @@ namespace mpc::audiomidi
 		void setRecordLevel(int i);
 		int getRecordLevel();
 		void muteMonitor(bool mute);
-		ctoot::mpc::Drum& getDrum(int i);
-        ctoot::mpc::PreviewSoundPlayer& getBasicPlayer();
+		mpc::engine::Drum& getDrum(int i);
+        mpc::engine::PreviewSoundPlayer& getBasicPlayer();
 		void initializeDiskRecorders();
 		void closeIO();
 

@@ -12,7 +12,7 @@ namespace mpc::lcdgui::screens::window {
 class ChannelSettingsScreen;
 }
 
-namespace ctoot::mpc {
+namespace mpc::engine {
 class StereoMixer;
 class IndivFxMixer;
 }
@@ -65,9 +65,9 @@ private:
     void displayFxPaths();
     void displayFxSendLevels();
     
-    std::shared_ptr<ctoot::mpc::StereoMixer> getStereoMixerChannel(int index);
+    std::shared_ptr<mpc::engine::StereoMixer> getStereoMixerChannel(int index);
     
-    std::shared_ptr<ctoot::mpc::IndivFxMixer> getIndivFxMixerChannel(int index);
+    std::shared_ptr<mpc::engine::IndivFxMixer> getIndivFxMixerChannel(int index);
 
     bool stripHasStereoSound(int stripIndex);
 

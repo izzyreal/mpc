@@ -8,7 +8,7 @@
 
 #include <stdio.h>
 
-using namespace ctoot::audio::server;
+using namespace mpc::engine::audio::server;
 using namespace std;
 
 NonRealTimeAudioServer::NonRealTimeAudioServer(shared_ptr<AudioServer> server)
@@ -168,12 +168,12 @@ void NonRealTimeAudioServer::run()
     }
 }
 
-void NonRealTimeAudioServer::removeAudioBuffer(ctoot::audio::core::AudioBuffer* buffer) {
+void NonRealTimeAudioServer::removeAudioBuffer(mpc::engine::audio::core::AudioBuffer* buffer) {
 	auto lServer = server;
 	lServer->removeAudioBuffer(buffer);
 }
 
-ctoot::audio::core::AudioBuffer* NonRealTimeAudioServer::createAudioBuffer(string name)
+mpc::engine::audio::core::AudioBuffer* NonRealTimeAudioServer::createAudioBuffer(string name)
 {
 	auto lServer = server;
 	auto buffer = lServer->createAudioBuffer(name);

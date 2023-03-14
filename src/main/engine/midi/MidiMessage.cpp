@@ -1,6 +1,6 @@
 #include "MidiMessage.hpp"
 
-using namespace ctoot::midi::core;
+using namespace mpc::engine::midi;
 using namespace std;
 
 MidiMessage::MidiMessage(const vector<char>& _data)

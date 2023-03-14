@@ -2,10 +2,10 @@
 
 #include <engine/control/LinearLaw.hpp>
 
-using namespace ctoot::audio::mixer;
+using namespace mpc::engine::audio::mixer;
 
 BalanceControl::BalanceControl() 
-	: LCRControl("Balance", ctoot::control::LinearLaw::UNITY(), 0.01f, 0.5f)
+	: LCRControl("Balance", mpc::engine::control::LinearLaw::UNITY(), 0.01f, 0.5f)
 {
 }
 

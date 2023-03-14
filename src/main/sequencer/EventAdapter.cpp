@@ -14,7 +14,7 @@
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
-using namespace ctoot::midi::core;
+using namespace mpc::engine::midi;
 
 EventAdapter::EventAdapter(mpc::Mpc& mpc, std::weak_ptr<Sequencer> sequencer)
 	: mpc(mpc)

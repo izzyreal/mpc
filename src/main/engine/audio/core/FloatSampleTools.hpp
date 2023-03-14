@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-namespace ctoot::audio::core {
+namespace mpc::engine::audio::core {
 
 	static float DEFAULT_DITHER_BITS = 0.7f;
 

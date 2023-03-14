@@ -11,8 +11,8 @@
 #include <engine/audio/mixer/MixVariables.hpp>
 #include <engine/audio/mixer/MixerControlsIds.hpp>
 
-using namespace ctoot::audio::mixer;
-using namespace ctoot::audio::core;
+using namespace mpc::engine::audio::mixer;
+using namespace mpc::engine::audio::core;
 using namespace std;
 
 AudioMixerStrip::AudioMixerStrip(AudioMixer* mixer, shared_ptr<AudioControlsChain> controlsChain)
@@ -136,7 +136,7 @@ shared_ptr<AudioProcess> AudioMixerStrip::createProcess(shared_ptr<AudioControls
 	return AudioProcessChain::createProcess(controls);
 }
 
-int AudioMixerStrip::mix(ctoot::audio::core::AudioBuffer* bufferToMix, vector<float>& gain)
+int AudioMixerStrip::mix(mpc::engine::audio::core::AudioBuffer* bufferToMix, vector<float>& gain)
 {
 	if (bufferToMix == nullptr) return 0;
 	auto ret = channelFormat->mix(buffer, bufferToMix, gain);

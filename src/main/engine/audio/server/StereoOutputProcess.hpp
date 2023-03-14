@@ -2,14 +2,14 @@
 
 #include <engine/audio/core/AudioBuffer.hpp>
 
-namespace ctoot::audio::server
+namespace mpc::engine::audio::server
 {
 	class StereoOutputProcess
 		: public AudioServerProcess
 	{
 
 	public:
-		int processAudio(ctoot::audio::core::AudioBuffer* buffer, int nFrames) override;
+		int processAudio(mpc::engine::audio::core::AudioBuffer* buffer, int nFrames) override;
 		StereoOutputProcess(std::string name);
 
 	};

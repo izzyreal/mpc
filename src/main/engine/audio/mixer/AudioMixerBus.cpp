@@ -1,8 +1,8 @@
 #include <engine/audio/mixer/AudioMixerBus.hpp>
 #include <engine/audio/mixer/AudioMixer.hpp>
 
-using namespace ctoot::audio::core;
-using namespace ctoot::audio::mixer;
+using namespace mpc::engine::audio::core;
+using namespace mpc::engine::audio::mixer;
 using namespace std;
 
 AudioMixerBus::AudioMixerBus(AudioMixer* mixer, shared_ptr<BusControls> busControls)

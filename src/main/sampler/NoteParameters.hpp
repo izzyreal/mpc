@@ -1,15 +1,15 @@
 #pragma once
-#include <engine/mpc/MpcNoteParameters.hpp>
+#include "engine/MpcNoteParameters.hpp"
 
-#include <engine/mpc/StereoMixer.hpp>
-#include <engine/mpc/IndivFxMixer.hpp>
+#include "engine/StereoMixer.hpp"
+#include "engine/IndivFxMixer.hpp"
 
 namespace mpc::sampler
 {
 	class Sampler;
 
 	class NoteParameters
-		: public virtual ctoot::mpc::MpcNoteParameters
+		: public virtual mpc::engine::MpcNoteParameters
 	{
 	public:
 		int getSoundIndex() override;
@@ -33,12 +33,12 @@ namespace mpc::sampler
 		int getFilterEnvelopeAmount() override;
 		int getVoiceOverlap() override;
 
-		std::shared_ptr<ctoot::mpc::StereoMixer> getStereoMixerChannel();
-		std::shared_ptr<ctoot::mpc::IndivFxMixer> getIndivFxMixerChannel();
+		std::shared_ptr<mpc::engine::StereoMixer> getStereoMixerChannel();
+		std::shared_ptr<mpc::engine::IndivFxMixer> getIndivFxMixerChannel();
 
 	private:
-		std::shared_ptr<ctoot::mpc::StereoMixer> stereoMixerChannel = std::make_shared<ctoot::mpc::StereoMixer>();
-		std::shared_ptr<ctoot::mpc::IndivFxMixer> indivFxMixerChannel = std::make_shared<ctoot::mpc::IndivFxMixer>();
+		std::shared_ptr<mpc::engine::StereoMixer> stereoMixerChannel = std::make_shared<mpc::engine::StereoMixer>();
+		std::shared_ptr<mpc::engine::IndivFxMixer> indivFxMixerChannel = std::make_shared<mpc::engine::IndivFxMixer>();
 		int soundIndex = -1;
 		int soundGenerationMode = 0;
 		int velocityRangeLower = 0;

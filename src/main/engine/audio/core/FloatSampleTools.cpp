@@ -7,7 +7,7 @@
 
 #include <cstdlib>
 
-using namespace ctoot::audio::core;
+using namespace mpc::engine::audio::core;
 using namespace std;
 
 FloatSampleTools::FloatSampleTools() 

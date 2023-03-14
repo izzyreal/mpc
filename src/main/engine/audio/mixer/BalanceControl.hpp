@@ -2,7 +2,7 @@
 
 #include <engine/audio/mixer/LCRControl.hpp>
 
-namespace ctoot::audio::mixer {
+namespace mpc::engine::audio::mixer {
     class BalanceControl : public LCRControl
     {
     private:

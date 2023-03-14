@@ -1,7 +1,7 @@
 #include <sampler/NoteParameters.hpp>
 
 using namespace mpc::sampler;
-using namespace ctoot::mpc;
+using namespace mpc::engine;
 
 NoteParameters::NoteParameters(const int index)
     : index(index)

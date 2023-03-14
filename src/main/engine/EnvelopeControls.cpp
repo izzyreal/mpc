@@ -1,14 +1,14 @@
 #include "EnvelopeControls.hpp"
 
-#include <engine/control/Control.hpp>
-#include <engine/control/LinearLaw.hpp>
-#include <engine/control/LogLaw.hpp>
+#include "engine/control/Control.hpp"
+#include "engine/control/LinearLaw.hpp"
+#include "engine/control/LogLaw.hpp"
 
 #include <cfloat>
 #include <cmath>
 
-using namespace ctoot::mpc;
-using namespace ctoot::control;
+using namespace mpc::engine;
+using namespace mpc::engine::control;
 using namespace std;
 
 EnvelopeControls::EnvelopeControls(int id, string name, int idOffset)

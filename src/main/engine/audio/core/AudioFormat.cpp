@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-using namespace ctoot::audio::core;
+using namespace mpc::engine::audio::core;
 using namespace std;
 
 AudioFormat::AudioFormat(float sampleRate, int sampleSizeInBits, int channels, bool signed_, bool bigEndian) {

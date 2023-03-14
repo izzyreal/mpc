@@ -1,6 +1,6 @@
 #pragma once
 
-namespace ctoot::synth::modules::filter {
+namespace mpc::engine::filter {
 
     class StateVariableFilterElement
     {

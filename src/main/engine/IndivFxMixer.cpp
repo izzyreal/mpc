@@ -1,6 +1,6 @@
 #include "IndivFxMixer.hpp"
 
-using namespace ctoot::mpc;
+using namespace mpc::engine;
 
 IndivFxMixer::IndivFxMixer()
 {

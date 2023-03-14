@@ -4,10 +4,10 @@
 #include <engine/audio/mixer/MixVariables.hpp>
 #include <engine/audio/mixer/AudioMixerStrip.hpp>
 
-namespace ctoot::audio::mixer {
+namespace mpc::engine::audio::mixer {
 
     class MixProcess
-            : public ctoot::audio::core::AudioProcess
+            : public mpc::engine::audio::core::AudioProcess
     {
 
     protected:
@@ -24,7 +24,7 @@ namespace ctoot::audio::mixer {
         virtual AudioMixerStrip *getRoutedStrip();
 
     public:
-        int processAudio(ctoot::audio::core::AudioBuffer *buffer) override;
+        int processAudio(mpc::engine::audio::core::AudioBuffer *buffer) override;
 
     public:
         MixProcess(std::shared_ptr<AudioMixerStrip> strip, std::shared_ptr<MixVariables> vars);

@@ -2,7 +2,7 @@
 
 #include "Mpc.hpp"
 #include "sampler/Sampler.hpp"
-#include <engine/mpc/Drum.hpp>
+#include "engine/Drum.hpp"
 
 TEST_CASE("Delete program", "[program]")
 {

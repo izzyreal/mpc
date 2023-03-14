@@ -1,12 +1,12 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
-#include <engine/mpc/MpcMixerSetupGui.hpp>
+#include "engine/MpcMixerSetupGui.hpp"
 
 namespace mpc::lcdgui::screens
 {
 	class MixerSetupScreen
-		: public mpc::lcdgui::ScreenComponent, public ctoot::mpc::MpcMixerSetupGui
+		: public mpc::lcdgui::ScreenComponent, public mpc::engine::MpcMixerSetupGui
 	{
 
 	public:

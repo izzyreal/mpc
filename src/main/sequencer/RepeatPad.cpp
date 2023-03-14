@@ -11,7 +11,7 @@
 #include "sequencer/SeqUtil.hpp"
 #include "sampler/Sampler.hpp"
 
-#include <engine/mpc/Drum.hpp>
+#include "engine/Drum.hpp"
 
 using namespace mpc::sequencer;
 

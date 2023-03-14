@@ -22,7 +22,7 @@
 #include <sequencer/PolyPressureEvent.hpp>
 #include <sequencer/ProgramChangeEvent.hpp>
 #include <sequencer/SystemExclusiveEvent.hpp>
-#include <engine/mpc/Drum.hpp>
+#include "engine/Drum.hpp"
 
 #include <cmath>
 #include <lang/StrUtil.hpp>

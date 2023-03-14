@@ -2,7 +2,7 @@
 
 #include "CompoundControl.hpp"
 
-using namespace ctoot::control;
+using namespace mpc::engine::control;
 
 Control::Control(int id, std::string name)
 {

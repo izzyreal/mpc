@@ -32,7 +32,7 @@ struct EventAfterNFrames
     }
 };
 
-namespace ctoot::midi::core { class ShortMessage; }
+namespace mpc::engine::midi { class ShortMessage; }
 
 namespace mpc { class Mpc; }
 
@@ -120,7 +120,7 @@ namespace mpc::sequencer {
         unsigned char midiClockTickCounter = 0;
         bool sequencerShouldStartPlayingOnNextLock = false;
         bool wasRunning = false;
-        std::shared_ptr<ctoot::midi::core::ShortMessage> midiSyncStartStopContinueMsg;
+        std::shared_ptr<mpc::engine::midi::ShortMessage> midiSyncStartStopContinueMsg;
         std::vector<EventAfterNFrames> eventsAfterNFrames = std::vector<EventAfterNFrames>(100);
 
         void move(int newTickPos);
@@ -129,7 +129,7 @@ namespace mpc::sequencer {
 
         void sendMidiClockMsg();
 
-        std::shared_ptr<ctoot::midi::core::ShortMessage> msg;
+        std::shared_ptr<mpc::engine::midi::ShortMessage> msg;
 
     public:
         void enqueueMidiSyncStart1msBeforeNextClock();

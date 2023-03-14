@@ -1,6 +1,6 @@
 #include <engine/audio/mixer/MixerControlsIds.hpp>
 
-using namespace ctoot::audio::mixer;
+using namespace mpc::engine::audio::mixer;
 
 const int MixerControlsIds::CHANNEL_STRIP;
 const int MixerControlsIds::GROUP_STRIP;

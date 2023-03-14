@@ -2,13 +2,13 @@
 
 #include "FilterControls.hpp"
 
-namespace ctoot::synth::modules::filter {
+namespace mpc::engine::filter {
 
     class StateVariableFilterControls
             : public FilterControls
     {
     public:
-        void derive(ctoot::control::Control *c) override;
+        void derive(mpc::engine::control::Control *c) override;
 
         void deriveSampleRateIndependentVariables() override;
 

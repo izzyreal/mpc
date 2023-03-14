@@ -10,9 +10,9 @@
 
 #include <algorithm>
 
-using namespace ctoot::audio::mixer;
-using namespace ctoot::audio::core;
-using namespace ctoot::mpc;
+using namespace mpc::engine::audio::mixer;
+using namespace mpc::engine::audio::core;
+using namespace mpc::engine;
 using namespace std;
 
 MixerControls::MixerControls(string name, string mainBusName, shared_ptr<ChannelFormat> channelFormat)

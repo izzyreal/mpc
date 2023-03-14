@@ -3,7 +3,7 @@
 #include "StereoOutputProcess.hpp"
 #include "../core/ChannelFormat.hpp"
 
-using namespace ctoot::audio::server;
+using namespace mpc::engine::audio::server;
 using namespace std;
 
 void ExternalAudioServer::start()
@@ -223,7 +223,7 @@ IOAudioProcess* ExternalAudioServer::openAudioInput(string name)
 	return activeInputs.back();
 }
 
-void ExternalAudioServer::closeAudioOutput(ctoot::audio::server::IOAudioProcess* output)
+void ExternalAudioServer::closeAudioOutput(mpc::engine::audio::server::IOAudioProcess* output)
 {
 	if (output == nullptr)
 		return;
@@ -240,7 +240,7 @@ void ExternalAudioServer::closeAudioOutput(ctoot::audio::server::IOAudioProcess*
 	}
 }
 
-void ExternalAudioServer::closeAudioInput(ctoot::audio::server::IOAudioProcess* input)
+void ExternalAudioServer::closeAudioInput(mpc::engine::audio::server::IOAudioProcess* input)
 {
 	if (input == nullptr)
 		return;

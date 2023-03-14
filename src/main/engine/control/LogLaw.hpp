@@ -2,7 +2,7 @@
 
 #include <engine/control/AbstractLaw.hpp>
 
-namespace ctoot::control {
+namespace mpc::engine::control {
 
     class LogLaw
             : public AbstractLaw

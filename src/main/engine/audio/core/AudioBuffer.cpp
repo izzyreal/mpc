@@ -1,7 +1,7 @@
 #include <engine/audio/core/AudioBuffer.hpp>
 #include <engine/audio/core/ChannelFormat.hpp>
 
-using namespace ctoot::audio::core;
+using namespace mpc::engine::audio::core;
 using namespace std;
 
 AudioBuffer::AudioBuffer(string name, int channelCount, int sampleCount, float sampleRate) : FloatSampleBuffer(channelCount, sampleCount, sampleRate)

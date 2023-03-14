@@ -1,6 +1,6 @@
 #include <engine/control/LinearLaw.hpp>
 
-using namespace ctoot::control;
+using namespace mpc::engine::control;
 using namespace std;
 
 LinearLaw::LinearLaw(float min, float max, string units)

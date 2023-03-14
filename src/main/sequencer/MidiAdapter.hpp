@@ -2,40 +2,37 @@
 
 #include <memory>
 
-namespace ctoot {
-	namespace midi {
-		namespace core {
-			class MidiMessage;
-			class ShortMessage;
-		}
-	}
+namespace mpc::engine::midi {
+    class MidiMessage;
+
+    class ShortMessage;
 }
 
-namespace mpc {
-	namespace sequencer {
+namespace mpc::sequencer {
 
-		class Event;
-		class NoteEvent;
+    class Event;
 
-		class MidiAdapter
-		{
+    class NoteEvent;
 
-		private:
-			std::shared_ptr<ctoot::midi::core::ShortMessage> message;
+    class MidiAdapter
+    {
 
-		public:
-			void process(std::weak_ptr<Event> event, int channel, int newVelo);
+    private:
+        std::shared_ptr<mpc::engine::midi::ShortMessage> message;
 
-		private:
-			void convert(NoteEvent* event, int channel, int newVelo);
+    public:
+        void process(std::weak_ptr<Event> event, int channel, int newVelo);
 
-		public:
-			std::weak_ptr<ctoot::midi::core::ShortMessage> get();
+    private:
+        void convert(NoteEvent *event, int channel, int newVelo);
 
-			MidiAdapter();
-			~MidiAdapter();
+    public:
+        std::weak_ptr<mpc::engine::midi::ShortMessage> get();
 
-		};
+        MidiAdapter();
 
-	}
+        ~MidiAdapter();
+
+    };
+
 }

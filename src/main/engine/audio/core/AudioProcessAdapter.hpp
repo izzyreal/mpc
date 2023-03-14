@@ -1,7 +1,7 @@
 #pragma once
 #include <engine/audio/core/AudioProcess.hpp>
 
-namespace ctoot::audio::core {
+namespace mpc::engine::audio::core {
 class AudioProcessAdapter
 : public AudioProcess
 {
@@ -10,7 +10,7 @@ protected:
     AudioProcess* process;
     
 public:
-    int processAudio(ctoot::audio::core::AudioBuffer* buf, int nFrames) override;
+    int processAudio(mpc::engine::audio::core::AudioBuffer* buf, int nFrames) override;
 
     AudioProcessAdapter(AudioProcess* process);
     

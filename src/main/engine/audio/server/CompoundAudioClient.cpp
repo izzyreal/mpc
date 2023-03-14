@@ -1,6 +1,6 @@
 #include <engine/audio/server/CompoundAudioClient.hpp>
 
-using namespace ctoot::audio::server;
+using namespace mpc::engine::audio::server;
 using namespace std;
 
 void CompoundAudioClient::work(int nFrames)

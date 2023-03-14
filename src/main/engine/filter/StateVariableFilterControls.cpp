@@ -5,7 +5,7 @@
 
 #include <cmath>
 
-using namespace ctoot::synth::modules::filter;
+using namespace mpc::engine::filter;
 using namespace std;
 
 StateVariableFilterControls::StateVariableFilterControls(string name, int idOffset)
@@ -13,7 +13,7 @@ StateVariableFilterControls::StateVariableFilterControls(string name, int idOffs
 {
 }
 
-void StateVariableFilterControls::derive(ctoot::control::Control* c)
+void StateVariableFilterControls::derive(mpc::engine::control::Control* c)
 {
 	FilterControls::derive(c);
 }

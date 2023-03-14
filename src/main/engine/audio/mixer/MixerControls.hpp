@@ -3,18 +3,18 @@
 #include <engine/control/CompoundControl.hpp>
 #include <engine/audio/mixer/BusControls.hpp>
 #include <engine/audio/core/AudioControlsChain.hpp>
-#include <engine/mpc/FaderControl.hpp>
+#include "engine/FaderControl.hpp"
 
 #include <memory>
 #include <utility>
 #include <vector>
 #include <string>
-#include "engine/mpc/FaderControl.hpp"
+#include "engine/FaderControl.hpp"
 
-namespace ctoot::audio::mixer {
+namespace mpc::engine::audio::mixer {
 
     class MixerControls
-            : public ctoot::control::CompoundControl
+            : public mpc::engine::control::CompoundControl
     {
 
     private:
@@ -26,7 +26,7 @@ namespace ctoot::audio::mixer {
     public:
         float getSmoothingFactor();
 
-        void createAuxBusControls(std::string name, std::shared_ptr<ctoot::audio::core::ChannelFormat> format);
+        void createAuxBusControls(std::string name, std::shared_ptr<mpc::engine::audio::core::ChannelFormat> format);
 
         std::shared_ptr<BusControls> getBusControls(std::string name);
 
@@ -34,24 +34,24 @@ namespace ctoot::audio::mixer {
 
         std::vector<std::shared_ptr<BusControls>> getAuxBusControls();
 
-        std::shared_ptr<ctoot::audio::core::AudioControlsChain>
+        std::shared_ptr<mpc::engine::audio::core::AudioControlsChain>
         createStripControls(int id, std::string name);
 
-        std::shared_ptr<ctoot::audio::core::AudioControlsChain>
+        std::shared_ptr<mpc::engine::audio::core::AudioControlsChain>
         createStripControls(int id, std::string name, bool hasMixControls);
 
         void addStripControls(std::shared_ptr<CompoundControl> cc);
 
-        std::shared_ptr<ctoot::audio::core::AudioControlsChain> getStripControls(std::string name);
+        std::shared_ptr<mpc::engine::audio::core::AudioControlsChain> getStripControls(std::string name);
 
-        ctoot::mpc::FaderControl *createFaderControl();
+        mpc::engine::FaderControl *createFaderControl();
 
     public:
         MixerControls(std::string name, std::string mainBusName,
-                      std::shared_ptr<ctoot::audio::core::ChannelFormat> channelFormat);
+                      std::shared_ptr<mpc::engine::audio::core::ChannelFormat> channelFormat);
 
         MixerControls(std::string name)
-                : MixerControls(std::move(name), "Main", ctoot::audio::core::ChannelFormat::STEREO())
+                : MixerControls(std::move(name), "Main", mpc::engine::audio::core::ChannelFormat::STEREO())
         {}
 
         MixerControls(std::string name, float _smoothingFactor)

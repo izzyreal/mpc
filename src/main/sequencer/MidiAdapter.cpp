@@ -8,7 +8,7 @@ using namespace mpc::sequencer;
 
 MidiAdapter::MidiAdapter() 
 {
-	message = std::make_shared<ctoot::midi::core::ShortMessage>();
+	message = std::make_shared<mpc::engine::midi::ShortMessage>();
 }
 
 void MidiAdapter::process(std::weak_ptr<Event> event, int channel, int newVelo)
@@ -21,14 +21,14 @@ void MidiAdapter::process(std::weak_ptr<Event> event, int channel, int newVelo)
 
 void MidiAdapter::convert(NoteEvent* event, int channel, int newVelo)
 {
-	auto messageType = ctoot::midi::core::ShortMessage::NOTE_ON;
+	auto messageType = mpc::engine::midi::ShortMessage::NOTE_ON;
 	if (event->getVelocity() == 0) {
-		messageType = ctoot::midi::core::ShortMessage::NOTE_OFF;
+		messageType = mpc::engine::midi::ShortMessage::NOTE_OFF;
 	}
 	message->setMessage(messageType, channel, event->getNote(), newVelo == -1 ? event->getVelocity() : newVelo);
 }
 
-std::weak_ptr<ctoot::midi::core::ShortMessage> MidiAdapter::get()
+std::weak_ptr<mpc::engine::midi::ShortMessage> MidiAdapter::get()
 {
 	return message;
 }

@@ -1,7 +1,7 @@
 #include <engine/control/CompoundControl.hpp>
 #include <engine/control/Control.hpp>
 
-using namespace ctoot::control;
+using namespace mpc::engine::control;
 using namespace std;
 
 CompoundControl::CompoundControl(int id, string name) : Control(id, name)

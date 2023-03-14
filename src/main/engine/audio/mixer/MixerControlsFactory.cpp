@@ -6,9 +6,9 @@
 #include <engine/audio/mixer/MixerControlsIds.hpp>
 #include <engine/control/CompoundControl.hpp>
 
-using namespace ctoot::audio::mixer;
-using namespace ctoot::audio::core;
-using namespace ctoot::control;
+using namespace mpc::engine::audio::mixer;
+using namespace mpc::engine::audio::core;
+using namespace mpc::engine::control;
 using namespace std;
 
 void MixerControlsFactory::createBusStrips(shared_ptr<MixerControls> mixerControls, string mainStripName,

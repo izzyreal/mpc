@@ -11,16 +11,15 @@
 #include <audiomidi/MonitorInputAdapter.hpp>
 #include <audiomidi/MpcMidiOutput.hpp>
 
-#include <engine/mpc/Voice.hpp>
-#include <engine/mpc/PreviewSoundPlayer.hpp>
-#include <engine/mpc/FaderControl.hpp>
+#include "engine/Voice.hpp"
+#include "engine/PreviewSoundPlayer.hpp"
+#include "engine/FaderControl.hpp"
 #include <engine/audio/mixer/MixerControls.hpp>
-#include <engine/mpc/Drum.hpp>
+#include "engine/Drum.hpp"
 
 #include <lcdgui/screens/MixerSetupScreen.hpp>
 #include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
 
-// ctoot
 #include <engine/audio/core/ChannelFormat.hpp>
 
 #include <engine/audio/mixer/AudioMixer.hpp>
@@ -37,7 +36,7 @@
 #include <engine/control/CompoundControl.hpp>
 #include <engine/control/BooleanControl.hpp>
 
-#include <engine/mpc/MpcSampler.hpp>
+#include "engine/MpcSampler.hpp"
 
 // moduru
 #include <file/FileUtil.hpp>
@@ -52,11 +51,11 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui;
 
-using namespace ctoot::audio::server;
-using namespace ctoot::audio::core;
-using namespace ctoot::audio::mixer;
-using namespace ctoot::control;
-using namespace ctoot::mpc;
+using namespace mpc::engine::audio::server;
+using namespace mpc::engine::audio::core;
+using namespace mpc::engine::audio::mixer;
+using namespace mpc::engine::control;
+using namespace mpc::engine;
 
 AudioMidiServices::AudioMidiServices(mpc::Mpc& mpcToUse)
 	: mpc(mpcToUse)

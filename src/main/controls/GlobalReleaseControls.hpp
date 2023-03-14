@@ -6,11 +6,6 @@
 #include "BaseControls.hpp"
 
 namespace mpc {
-	
-	namespace ctootextensions {
-		class MpcSoundPlayerChannel;
-	}
-
 	namespace sampler {
 		class Sampler;
 		class Program;

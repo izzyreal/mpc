@@ -1,6 +1,6 @@
 #include <engine/control/AbstractLaw.hpp>
 
-using namespace ctoot::control;
+using namespace mpc::engine::control;
 using namespace std;
 
 AbstractLaw::AbstractLaw(float min, float max, string units) 

@@ -6,20 +6,20 @@
 #include <string>
 #include <memory>
 
-namespace ctoot::audio::mixer {
+namespace mpc::engine::audio::mixer {
 
     class BusControls
-            : public ctoot::audio::core::AudioControls
+            : public mpc::engine::audio::core::AudioControls
     {
 
     private:
-        std::shared_ptr<ctoot::audio::core::ChannelFormat> channelFormat;
+        std::shared_ptr<mpc::engine::audio::core::ChannelFormat> channelFormat;
 
     public:
-        virtual std::shared_ptr<ctoot::audio::core::ChannelFormat> getChannelFormat();
+        virtual std::shared_ptr<mpc::engine::audio::core::ChannelFormat> getChannelFormat();
 
     public:
-        BusControls(int id, std::string name, std::shared_ptr<ctoot::audio::core::ChannelFormat> format);
+        BusControls(int id, std::string name, std::shared_ptr<mpc::engine::audio::core::ChannelFormat> format);
 
     };
 

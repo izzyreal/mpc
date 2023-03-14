@@ -2,26 +2,26 @@
 
 #include <engine/audio/core/AudioControls.hpp>
 #include <engine/audio/mixer/MixVariables.hpp>
-#include <engine/mpc/FaderControl.hpp>
+#include "engine/FaderControl.hpp"
 #include <engine/audio/mixer/BusControls.hpp>
 #include <engine/audio/mixer/MixerControls.hpp>
 #include <engine/control/EnumControl.hpp>
 
-namespace ctoot::audio::mixer {
+namespace mpc::engine::audio::mixer {
 
     class LCRControl;
 
     class MixControls
-            : public MixVariables, public ctoot::audio::core::AudioControls
+            : public MixVariables, public mpc::engine::audio::core::AudioControls
     {
 
     private:
         static float HALF_ROOT_TWO_;
 
     private:
-        std::shared_ptr<ctoot::control::BooleanControl> soloControl;
-        std::shared_ptr<ctoot::control::BooleanControl> muteControl;
-        std::shared_ptr<ctoot::mpc::FaderControl> gainControl;
+        std::shared_ptr<mpc::engine::control::BooleanControl> soloControl;
+        std::shared_ptr<mpc::engine::control::BooleanControl> muteControl;
+        std::shared_ptr<mpc::engine::FaderControl> gainControl;
         std::shared_ptr<LCRControl> lcrControl;
         std::shared_ptr<BusControls> busControls;
 
@@ -43,7 +43,7 @@ namespace ctoot::audio::mixer {
     public:
         bool isMaster() override;
 
-        std::shared_ptr<ctoot::audio::core::ChannelFormat> getChannelFormat() override;
+        std::shared_ptr<mpc::engine::audio::core::ChannelFormat> getChannelFormat() override;
 
         bool isMute();
 
@@ -56,9 +56,9 @@ namespace ctoot::audio::mixer {
         float getSmoothingFactor() override;
 
     public:
-        virtual ctoot::control::EnumControl *createRouteControl(int stripId);
+        virtual mpc::engine::control::EnumControl *createRouteControl(int stripId);
 
-        virtual ctoot::control::BooleanControl *createMuteControl();
+        virtual mpc::engine::control::BooleanControl *createMuteControl();
 
     public:
         MixControls(MixerControls *mixerControls, int stripId, std::shared_ptr<BusControls> busControls, bool isMaster);

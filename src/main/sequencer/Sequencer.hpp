@@ -10,7 +10,7 @@
 #include <cmath>
 #include <chrono>
 
-namespace ctoot::midi::core { class ShortMessage; }
+namespace mpc::engine::midi { class ShortMessage; }
 
 namespace mpc { class Mpc; }
 

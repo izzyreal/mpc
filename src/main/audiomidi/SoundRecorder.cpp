@@ -139,7 +139,7 @@ void SoundRecorder::setSampleScreenActive(bool active)
 	sampleScreenActive.store(active);
 }
 
-int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf, int nFrames)
+int SoundRecorder::processAudio(mpc::engine::audio::core::AudioBuffer* buf, int nFrames)
 {
 	auto left = buf->getChannel(0);
 	auto right = buf->getChannel(1);

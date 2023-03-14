@@ -4,22 +4,22 @@
 #include "MixerInterconnection.hpp"
 #include "Voice.hpp"
 
-#include <engine/mpc/MpcNoteParameters.hpp>
-#include <engine/mpc/MpcProgram.hpp>
-#include <engine/mpc/MpcSampler.hpp>
-#include <engine/mpc/StereoMixer.hpp>
-#include <engine/mpc/IndivFxMixer.hpp>
-#include <engine/mpc/MpcMixerSetupGui.hpp>
-#include <engine/mpc/MpcSound.hpp>
-#include <engine/audio/mixer/AudioMixerStrip.hpp>
-#include <engine/audio/mixer/MainMixControls.hpp>
-#include <engine/audio/mixer/PanControl.hpp>
-#include <engine/control/CompoundControl.hpp>
+#include "MpcNoteParameters.hpp"
+#include "MpcProgram.hpp"
+#include "MpcSampler.hpp"
+#include "StereoMixer.hpp"
+#include "IndivFxMixer.hpp"
+#include "MpcMixerSetupGui.hpp"
+#include "MpcSound.hpp"
+#include "engine/audio/mixer/AudioMixerStrip.hpp"
+#include "engine/audio/mixer/MainMixControls.hpp"
+#include "engine/audio/mixer/PanControl.hpp"
+#include "engine/control/CompoundControl.hpp"
 #include <utility>
 
-using namespace ctoot::mpc;
-using namespace ctoot::audio::mixer;
-using namespace ctoot::audio::server;
+using namespace mpc::engine;
+using namespace mpc::engine::audio::mixer;
+using namespace mpc::engine::audio::server;
 
 Drum::Drum(std::shared_ptr<MpcSampler> samplerToUse,
            int drumIndexToUse,
@@ -179,7 +179,7 @@ void Drum::mpcNoteOn(int note, int velo, int varType, int varValue, int frameOff
 
 	for (int i = 0; i < 4; i++)
 	{
-		auto auxControl = std::dynamic_pointer_cast<ctoot::control::CompoundControl>(sc->find("AUX#" + std::to_string(i + 1)));
+		auto auxControl = std::dynamic_pointer_cast<mpc::engine::control::CompoundControl>(sc->find("AUX#" + std::to_string(i + 1)));
 		auto auxLevel = std::dynamic_pointer_cast<FaderControl>(auxControl->find("Level"));
 
 		if (i == selectedAssignableMixOutPair)

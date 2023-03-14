@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-namespace ctoot::audio::server {
+namespace mpc::engine::audio::server {
 
     class NonRealTimeAudioServer
             : public AudioServer, public AudioClient
@@ -56,9 +56,9 @@ namespace ctoot::audio::server {
 
         bool isRunning() override;
 
-        ctoot::audio::core::AudioBuffer *createAudioBuffer(std::string name) override;
+        mpc::engine::audio::core::AudioBuffer *createAudioBuffer(std::string name) override;
 
-        void removeAudioBuffer(ctoot::audio::core::AudioBuffer *buffer) override;
+        void removeAudioBuffer(mpc::engine::audio::core::AudioBuffer *buffer) override;
 
         std::vector<std::string> getAvailableOutputNames() override;
 

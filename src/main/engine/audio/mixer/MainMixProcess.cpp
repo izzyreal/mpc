@@ -5,7 +5,7 @@
 #include <engine/audio/mixer/MainMixControls.hpp>
 
 using namespace std;
-using namespace ctoot::audio::mixer;
+using namespace mpc::engine::audio::mixer;
 
 MainMixProcess::MainMixProcess(shared_ptr<AudioMixerStrip> strip, shared_ptr<MixVariables> vars, AudioMixer* mixer)
 	: MixProcess(strip, vars)

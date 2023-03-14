@@ -5,9 +5,9 @@
 
 #include <vector>
 
-namespace ctoot::audio::core {
+namespace mpc::engine::audio::core {
 
-    class AudioControlsChain : public ctoot::control::CompoundControlChain
+    class AudioControlsChain : public mpc::engine::control::CompoundControlChain
     {
 
     private:

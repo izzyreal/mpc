@@ -5,7 +5,7 @@
 #include <engine/control/Control.hpp>
 #include <engine/control/EnumControl.hpp>
 
-using namespace ctoot::audio::mixer;
+using namespace mpc::engine::audio::mixer;
 using namespace std;
 
 MainMixControls::MainMixControls(MixerControls* mixerControls, int stripId, shared_ptr<BusControls> busControls, bool isMaster)
@@ -13,7 +13,7 @@ MainMixControls::MainMixControls(MixerControls* mixerControls, int stripId, shar
 {
 }
 
-ctoot::control::EnumControl* MainMixControls::createRouteControl(int stripId)
+mpc::engine::control::EnumControl* MainMixControls::createRouteControl(int stripId)
 {
 	if (stripId != MixerControlsIds::MAIN_STRIP && stripId != MixerControlsIds::AUX_STRIP) {
 		auto controls = mixerControls->getControls();
@@ -24,7 +24,7 @@ ctoot::control::EnumControl* MainMixControls::createRouteControl(int stripId)
 	return nullptr;
 }
 
-ctoot::control::EnumControl* MainMixControls::getRouteControl()
+mpc::engine::control::EnumControl* MainMixControls::getRouteControl()
 {
     return routeControl;
 }

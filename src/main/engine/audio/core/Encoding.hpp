@@ -2,7 +2,7 @@
 #include <string>
 #include <cstdint>
 
-namespace ctoot::audio::core {
+namespace mpc::engine::audio::core {
 
 	class Encoding
 	{

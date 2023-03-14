@@ -5,7 +5,7 @@
 
 #include "lcdgui/screens/EventsScreen.hpp"
 
-#include <engine/mpc/Drum.hpp>
+#include "engine/Drum.hpp"
 
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui::screens;

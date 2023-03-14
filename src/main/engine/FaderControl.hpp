@@ -1,16 +1,16 @@
 #pragma once
 
-#include <engine/control/LawControl.hpp>
+#include "engine/control/LawControl.hpp"
 
 #include <memory>
 
-namespace ctoot::mpc {
+namespace mpc::engine {
 
-    class FaderControl : public ctoot::control::LawControl
+    class FaderControl : public mpc::engine::control::LawControl
     {
 
     private:
-        static std::shared_ptr<ctoot::control::ControlLaw> MPC_FADER_LAW();
+        static std::shared_ptr<mpc::engine::control::ControlLaw> MPC_FADER_LAW();
 
     protected:
         float gain{0};

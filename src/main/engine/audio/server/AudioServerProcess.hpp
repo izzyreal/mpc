@@ -4,7 +4,7 @@
 
 #include <string>
 
-namespace ctoot::audio {
+namespace mpc::engine::audio {
 
     namespace core {
         class ChannelFormat;
@@ -20,12 +20,12 @@ namespace ctoot::audio {
             std::string name;
 
         protected:
-            std::shared_ptr<ctoot::audio::core::ChannelFormat> format;
+            std::shared_ptr<mpc::engine::audio::core::ChannelFormat> format;
 
         public:
             std::string getName() override;
 
-            std::shared_ptr<ctoot::audio::core::ChannelFormat> getChannelFormat() override;
+            std::shared_ptr<mpc::engine::audio::core::ChannelFormat> getChannelFormat() override;
 
             AudioServerProcess(std::string name);
         };

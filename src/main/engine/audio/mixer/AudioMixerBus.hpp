@@ -6,7 +6,7 @@
 #include <engine/audio/mixer/BusControls.hpp>
 #include <engine/audio/mixer/MixerControlsIds.hpp>
 
-namespace ctoot::audio::mixer {
+namespace mpc::engine::audio::mixer {
     class AudioMixer;
 
     class AudioMixerBus
@@ -14,14 +14,14 @@ namespace ctoot::audio::mixer {
 
     private:
         AudioMixer *mixer{nullptr};
-        ctoot::audio::core::AudioBuffer *buffer{nullptr};
-        std::shared_ptr<ctoot::audio::core::AudioProcess> output;
-        ctoot::audio::core::AudioProcess *meter{nullptr};
+        mpc::engine::audio::core::AudioBuffer *buffer{nullptr};
+        std::shared_ptr<mpc::engine::audio::core::AudioProcess> output;
+        mpc::engine::audio::core::AudioProcess *meter{nullptr};
         std::string name;
-        std::shared_ptr<ctoot::audio::core::ChannelFormat> channelFormat;
+        std::shared_ptr<mpc::engine::audio::core::ChannelFormat> channelFormat;
 
     public:
-        virtual ctoot::audio::core::AudioBuffer *getBuffer();
+        virtual mpc::engine::audio::core::AudioBuffer *getBuffer();
 
         virtual std::string getName();
 

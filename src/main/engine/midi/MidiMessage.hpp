@@ -2,7 +2,7 @@
 
 #include <vector>
 
-namespace ctoot::midi::core {
+namespace mpc::engine::midi {
     class MidiMessage
     {
     public:

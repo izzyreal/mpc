@@ -3,16 +3,16 @@
 #include "InterconnectionInputProcess.hpp"
 #include "InterconnectionOutputProcess.hpp"
 
-#include <engine/audio/core/AudioBuffer.hpp>
-#include <engine/audio/core/AudioProcess.hpp>
-#include <engine/audio/server/AudioServer.hpp>
+#include "engine/audio/core/AudioBuffer.hpp"
+#include "engine/audio/core/AudioProcess.hpp"
+#include "engine/audio/server/AudioServer.hpp"
 
-using namespace ctoot::audio::core;
+using namespace mpc::engine::audio::core;
 
-using namespace ctoot::mpc;
+using namespace mpc::engine;
 using namespace std;
 
-MixerInterconnection::MixerInterconnection(string name, ctoot::audio::server::AudioServer* server)
+MixerInterconnection::MixerInterconnection(string name, mpc::engine::audio::server::AudioServer* server)
 {
 	auto const sharedBuffer = server->createAudioBuffer(name);
 	inputProcess = make_shared<InterconnectionInputProcess>(this, sharedBuffer);

@@ -2,7 +2,7 @@
 
 #include <engine/control/CompoundControl.hpp>
 
-namespace ctoot::control
+namespace mpc::engine::control
 {
 	class CompoundControlChain
 		: public CompoundControl

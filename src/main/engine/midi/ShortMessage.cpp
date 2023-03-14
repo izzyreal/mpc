@@ -3,7 +3,7 @@
 #include <string>
 
 using namespace std;
-using namespace ctoot::midi::core;
+using namespace mpc::engine::midi;
 
 ShortMessage::ShortMessage()
 : ShortMessage(vector<char>(3))

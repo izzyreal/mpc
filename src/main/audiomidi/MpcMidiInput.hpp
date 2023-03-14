@@ -9,7 +9,7 @@
 
 #include <memory>
 
-namespace ctoot::midi::core { class ShortMessage; }
+namespace mpc::engine::midi { class ShortMessage; }
 
 namespace mpc::audiomidi {
     class MpcMidiOutput;
@@ -36,16 +36,16 @@ namespace mpc::audiomidi {
     public:
         std::string getName();
 
-        void transport(ctoot::midi::core::MidiMessage *msg, int timestamp);
+        void transport(mpc::engine::midi::MidiMessage *msg, int timestamp);
 
     private:
         void midiOut(std::weak_ptr<sequencer::Event> event, sequencer::Track *track);
 
-        void transportOmni(ctoot::midi::core::MidiMessage *msg, std::string outputLetter);
+        void transportOmni(mpc::engine::midi::MidiMessage *msg, std::string outputLetter);
 
-        void handleControl(ctoot::midi::core::ShortMessage *shortMsg);
+        void handleControl(mpc::engine::midi::ShortMessage *shortMsg);
 
-        void handlePolyAndNote(ctoot::midi::core::MidiMessage *msg);
+        void handlePolyAndNote(mpc::engine::midi::MidiMessage *msg);
 
     public:
         MpcMidiInput(mpc::Mpc &mpc, int index);

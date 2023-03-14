@@ -1,15 +1,15 @@
-#include <engine/mpc/Voice.hpp>
+#include "Voice.hpp"
 
-#include <engine/mpc/MpcNoteParameters.hpp>
-#include <engine/mpc/MpcSound.hpp>
+#include "MpcNoteParameters.hpp"
+#include "MpcSound.hpp"
 
-#include <engine/mpc/EnvelopeControls.hpp>
-#include <engine/mpc/EnvelopeGenerator.hpp>\
+#include "EnvelopeControls.hpp"
+#include "EnvelopeGenerator.hpp"\
 
-#include <engine/audio/core/AudioBuffer.hpp>
-#include <engine/control/LawControl.hpp>
-#include <engine/filter/StateVariableFilter.hpp>
-#include <engine/filter/StateVariableFilterControls.hpp>
+#include "engine/audio/core/AudioBuffer.hpp"
+#include "engine/control/LawControl.hpp"
+#include "engine/filter/StateVariableFilter.hpp"
+#include "engine/filter/StateVariableFilterControls.hpp"
 
 #include <cmath>
 
@@ -17,58 +17,58 @@
 #include <climits>
 #endif
 
-using namespace ctoot::mpc;
+using namespace mpc::engine;
 
 std::vector<float> Voice::EMPTY_FRAME = {0.f, 0.f};
 
 Voice::Voice(int _stripNumber, bool _basic)
         : stripNumber(_stripNumber), basic(_basic), frame(EMPTY_FRAME) {
     tempFrame = EMPTY_FRAME;
-    staticEnvControls = new ctoot::mpc::EnvelopeControls(0, "StaticAmpEnv", AMPENV_OFFSET);
-    staticEnv = new ctoot::mpc::EnvelopeGenerator(staticEnvControls);
-    shold = std::dynamic_pointer_cast<ctoot::control::LawControl>(
+    staticEnvControls = new mpc::engine::EnvelopeControls(0, "StaticAmpEnv", AMPENV_OFFSET);
+    staticEnv = new mpc::engine::EnvelopeGenerator(staticEnvControls);
+    shold = std::dynamic_pointer_cast<mpc::engine::control::LawControl>(
             staticEnvControls->getControls()[HOLD_INDEX]).get();
 
-    auto sattack = std::dynamic_pointer_cast<ctoot::control::LawControl>(
+    auto sattack = std::dynamic_pointer_cast<mpc::engine::control::LawControl>(
             staticEnvControls->getControls()[ATTACK_INDEX]).get();
 
 
-    auto sdecay = std::dynamic_pointer_cast<ctoot::control::LawControl>(
+    auto sdecay = std::dynamic_pointer_cast<mpc::engine::control::LawControl>(
             staticEnvControls->getControls()[DECAY_INDEX]).get();
 
     sattack->setValue(STATIC_ATTACK_LENGTH);
     sdecay->setValue(STATIC_DECAY_LENGTH);
 
     if (!basic) {
-        ampEnvControls = new ctoot::mpc::EnvelopeControls(0, "AmpEnv", AMPENV_OFFSET);
-        filterEnvControls = new ctoot::mpc::EnvelopeControls(0, "StaticAmpEnv", AMPENV_OFFSET);
-        ampEnv = new ctoot::mpc::EnvelopeGenerator(ampEnvControls);
-        filterEnv = new ctoot::mpc::EnvelopeGenerator(filterEnvControls);
-        svfControls = new ctoot::synth::modules::filter::StateVariableFilterControls("Filter", SVF_OFFSET);
+        ampEnvControls = new mpc::engine::EnvelopeControls(0, "AmpEnv", AMPENV_OFFSET);
+        filterEnvControls = new mpc::engine::EnvelopeControls(0, "StaticAmpEnv", AMPENV_OFFSET);
+        ampEnv = new mpc::engine::EnvelopeGenerator(ampEnvControls);
+        filterEnv = new mpc::engine::EnvelopeGenerator(filterEnvControls);
+        svfControls = new mpc::engine::filter::StateVariableFilterControls("Filter", SVF_OFFSET);
         svfControls->createControls();
-        svfLeft = new ctoot::synth::modules::filter::StateVariableFilter(svfControls);
-        svfRight = new ctoot::synth::modules::filter::StateVariableFilter(svfControls);
-        fattack = std::dynamic_pointer_cast<ctoot::control::LawControl>(
+        svfLeft = new mpc::engine::filter::StateVariableFilter(svfControls);
+        svfRight = new mpc::engine::filter::StateVariableFilter(svfControls);
+        fattack = std::dynamic_pointer_cast<mpc::engine::control::LawControl>(
                 filterEnvControls->getControls()[ATTACK_INDEX]).get();
-        fhold = std::dynamic_pointer_cast<ctoot::control::LawControl>(
+        fhold = std::dynamic_pointer_cast<mpc::engine::control::LawControl>(
                 filterEnvControls->getControls()[HOLD_INDEX]).get();
-        fdecay = std::dynamic_pointer_cast<ctoot::control::LawControl>(
+        fdecay = std::dynamic_pointer_cast<mpc::engine::control::LawControl>(
                 filterEnvControls->getControls()[DECAY_INDEX]).get();
-        attack = std::dynamic_pointer_cast<ctoot::control::LawControl>(
+        attack = std::dynamic_pointer_cast<mpc::engine::control::LawControl>(
                 ampEnvControls->getControls()[ATTACK_INDEX]).get();
-        hold = std::dynamic_pointer_cast<ctoot::control::LawControl>(
+        hold = std::dynamic_pointer_cast<mpc::engine::control::LawControl>(
                 ampEnvControls->getControls()[HOLD_INDEX]).get();
-        decay = std::dynamic_pointer_cast<ctoot::control::LawControl>(
+        decay = std::dynamic_pointer_cast<mpc::engine::control::LawControl>(
                 ampEnvControls->getControls()[DECAY_INDEX]).get();
-        reso = std::dynamic_pointer_cast<ctoot::control::LawControl>(svfControls->getControls()[RESO_INDEX]).get();
+        reso = std::dynamic_pointer_cast<mpc::engine::control::LawControl>(svfControls->getControls()[RESO_INDEX]).get();
     }
 }
 
 void Voice::init(
         int newVelocity,
-        std::shared_ptr<ctoot::mpc::MpcSound> newMpcSound,
+        std::shared_ptr<mpc::engine::MpcSound> newMpcSound,
         int newNote,
-        ctoot::mpc::MpcNoteParameters *np,
+        mpc::engine::MpcNoteParameters *np,
         int newVarType,
         int newVarValue,
         int muteNote,
@@ -291,7 +291,7 @@ void Voice::readFrame() {
 void Voice::open() {
 }
 
-int Voice::processAudio(ctoot::audio::core::AudioBuffer *buffer, int nFrames) {
+int Voice::processAudio(mpc::engine::audio::core::AudioBuffer *buffer, int nFrames) {
     if (finished) {
         buffer->makeSilence();
         return AUDIO_SILENCE;
@@ -381,7 +381,7 @@ int Voice::getNote() {
     return note;
 }
 
-ctoot::mpc::MpcNoteParameters *Voice::getNoteParameters() {
+mpc::engine::MpcNoteParameters *Voice::getNoteParameters() {
     return noteParameters;
 }
 

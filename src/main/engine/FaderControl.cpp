@@ -1,13 +1,13 @@
 #include "FaderControl.hpp"
 
-#include <engine/audio/mixer/MixControlIds.hpp>
-#include <engine/control/LinearLaw.hpp>
+#include "engine/audio/mixer/MixControlIds.hpp"
+#include "engine/control/LinearLaw.hpp"
 
-using namespace ctoot::mpc;
-using namespace ctoot::control;
+using namespace mpc::engine;
+using namespace mpc::engine::control;
 
 FaderControl::FaderControl()
-	: LawControl(ctoot::audio::mixer::MixControlIds::GAIN, "Level", MPC_FADER_LAW(), 0.1, 100)
+	: LawControl(mpc::engine::audio::mixer::MixControlIds::GAIN, "Level", MPC_FADER_LAW(), 0.1, 100)
 {
 	gain = 1.0f;
 }

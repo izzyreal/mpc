@@ -2,14 +2,14 @@
 
 #include "FilterControls.hpp"
 
-namespace ctoot::synth::modules::filter {
+namespace mpc::engine::filter {
 
     class StateVariableFilterElement;
 
     class StateVariableFilter
     {
     public:
-        StateVariableFilter(ctoot::synth::modules::filter::FilterControls *variables);
+        StateVariableFilter(mpc::engine::filter::FilterControls *variables);
 
         virtual ~StateVariableFilter();
 

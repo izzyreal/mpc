@@ -5,9 +5,9 @@
 #include <cstdint>
 
 using namespace std;
-using namespace ctoot::audio::core;
+using namespace mpc::engine::audio::core;
 
-int ChannelFormat::mix(ctoot::audio::core::AudioBuffer* destBuffer, ctoot::audio::core::AudioBuffer* sourceBuffer, vector<float>& gain)
+int ChannelFormat::mix(mpc::engine::audio::core::AudioBuffer* destBuffer, mpc::engine::audio::core::AudioBuffer* sourceBuffer, vector<float>& gain)
 {
 	auto doMix = destBuffer != sourceBuffer;
 	auto snc = sourceBuffer->getChannelCount();

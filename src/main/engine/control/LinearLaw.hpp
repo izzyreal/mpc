@@ -5,7 +5,7 @@
 
 #include <memory>
 
-namespace ctoot::control {
+namespace mpc::engine::control {
 
     class LinearLaw
             : public AbstractLaw

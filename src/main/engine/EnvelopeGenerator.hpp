@@ -1,8 +1,8 @@
 #pragma once
 
-#include <engine/mpc/EnvelopeControls.hpp>
+#include "EnvelopeControls.hpp"
 
-namespace ctoot::mpc {
+namespace mpc::engine {
 
     class EnvelopeGenerator
     {

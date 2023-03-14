@@ -3,7 +3,7 @@
 #include <engine/audio/mixer/MixProcess.hpp>
 #include <engine/audio/mixer/MixVariables.hpp>
 
-namespace ctoot::audio::mixer {
+namespace mpc::engine::audio::mixer {
 
     class MainMixProcess
             : public MixProcess
@@ -12,7 +12,7 @@ namespace ctoot::audio::mixer {
         std::shared_ptr<AudioMixerStrip> nextRoutedStrip;
 
     public:
-        ctoot::control::EnumControl *routeControl{nullptr};
+        mpc::engine::control::EnumControl *routeControl{nullptr};
 
     public:
         AudioMixerStrip *getRoutedStrip() override;

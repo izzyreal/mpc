@@ -5,12 +5,12 @@
 #include <lcdgui/screens/MixerSetupScreen.hpp>
 #include <lcdgui/screens/MixerScreen.hpp>
 
-#include <engine/mpc/StereoMixer.hpp>
-#include <engine/mpc/IndivFxMixer.hpp>
+#include "engine/StereoMixer.hpp"
+#include "engine/IndivFxMixer.hpp"
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sampler;
-using namespace ctoot::mpc;
+using namespace mpc::engine;
 using namespace moduru::lang;
 
 ChannelSettingsScreen::ChannelSettingsScreen(mpc::Mpc& mpc, const int layerIndex)

@@ -6,14 +6,14 @@
 
 #include <vector>
 
-namespace ctoot::audio::mixer {
+namespace mpc::engine::audio::mixer {
 
     class AudioMixerStrip;
 
     class AudioMixerBus;
 
     class AudioMixer final
-            : public ctoot::audio::server::AudioClient
+            : public mpc::engine::audio::server::AudioClient
     {
 
     private:
@@ -30,20 +30,20 @@ namespace ctoot::audio::mixer {
         std::vector<std::shared_ptr<AudioMixerStrip>> groupStrips;
         std::vector<std::shared_ptr<AudioMixerStrip>> auxStrips;
         std::shared_ptr<AudioMixerStrip> mainStrip;
-        std::shared_ptr<ctoot::audio::server::AudioServer> server;
-        ctoot::audio::core::AudioBuffer *sharedAudioBuffer = nullptr;
+        std::shared_ptr<mpc::engine::audio::server::AudioServer> server;
+        mpc::engine::audio::core::AudioBuffer *sharedAudioBuffer = nullptr;
 
     public:
         std::shared_ptr<MixerControls> getMixerControls();
 
-        std::shared_ptr<ctoot::audio::server::AudioServer> getAudioServer();
+        std::shared_ptr<mpc::engine::audio::server::AudioServer> getAudioServer();
 
     public:
-        ctoot::audio::core::AudioBuffer *getSharedBuffer();
+        mpc::engine::audio::core::AudioBuffer *getSharedBuffer();
 
-        ctoot::audio::core::AudioBuffer *createBuffer(std::string name);
+        mpc::engine::audio::core::AudioBuffer *createBuffer(std::string name);
 
-        void removeBuffer(ctoot::audio::core::AudioBuffer *buffer);
+        void removeBuffer(mpc::engine::audio::core::AudioBuffer *buffer);
 
     public:
         std::shared_ptr<AudioMixerStrip> getStrip(std::string name);
@@ -73,13 +73,13 @@ namespace ctoot::audio::mixer {
     public:
         void createStrips(std::shared_ptr<MixerControls> mixerControls);
 
-        std::shared_ptr<AudioMixerStrip> createStrip(std::shared_ptr<ctoot::audio::core::AudioControlsChain> controls);
+        std::shared_ptr<AudioMixerStrip> createStrip(std::shared_ptr<mpc::engine::audio::core::AudioControlsChain> controls);
 
     public:
         void close();
 
     public:
-        AudioMixer(std::shared_ptr<MixerControls> controls, std::shared_ptr<ctoot::audio::server::AudioServer> server);
+        AudioMixer(std::shared_ptr<MixerControls> controls, std::shared_ptr<mpc::engine::audio::server::AudioServer> server);
 
     };
 }

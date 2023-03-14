@@ -10,14 +10,14 @@
 using namespace mpc::audiomidi;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
-using namespace ctoot::audio::core;
+using namespace mpc::engine::audio::core;
 
 MonitorInputAdapter::MonitorInputAdapter(mpc::Mpc& mpc, AudioProcess* process)
 	: AudioProcessAdapter(process), mpc(mpc)
 {
 }
 
-int32_t MonitorInputAdapter::processAudio(ctoot::audio::core::AudioBuffer* buffer, int nFrames)
+int32_t MonitorInputAdapter::processAudio(mpc::engine::audio::core::AudioBuffer* buffer, int nFrames)
 {
 	auto ret = process->processAudio(buffer, nFrames);
 

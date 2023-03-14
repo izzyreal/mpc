@@ -5,7 +5,7 @@
 #include <vector>
 #include <string>
 
-namespace ctoot::mpc {
+namespace mpc::engine {
 	class StereoMixer;
 	class IndivFxMixer;
 }
@@ -62,8 +62,8 @@ namespace mpc::file::aps
 
 	public:
 		std::vector<char> getBytes();
-		ctoot::mpc::StereoMixer getStereoMixerChannel(int noteIndex);
-		ctoot::mpc::IndivFxMixer getIndivFxMixerChannel(int noteIndex);
+		mpc::engine::StereoMixer getStereoMixerChannel(int noteIndex);
+		mpc::engine::IndivFxMixer getIndivFxMixerChannel(int noteIndex);
 
 	public:
 		ApsProgram(const std::vector<char>& loadBytes);

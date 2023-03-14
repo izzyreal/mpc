@@ -6,7 +6,7 @@
 
 #include <cstdint>
 
-namespace ctoot::audio::core {
+namespace mpc::engine::audio::core {
 
     class AudioProcessChain
             : public AudioProcess
@@ -20,7 +20,7 @@ namespace ctoot::audio::core {
         void open() override;
 
     public:
-        int processAudio(ctoot::audio::core::AudioBuffer *buffer, int nFrames) override;
+        int processAudio(mpc::engine::audio::core::AudioBuffer *buffer, int nFrames) override;
 
         void close() override;
 

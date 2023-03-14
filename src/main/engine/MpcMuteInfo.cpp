@@ -1,6 +1,6 @@
-#include <engine/mpc/MpcMuteInfo.hpp>
+#include "MpcMuteInfo.hpp"
 
-using namespace ctoot::mpc;
+using namespace mpc::engine;
 
 MpcMuteInfo::MpcMuteInfo()
 {

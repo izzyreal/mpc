@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace ctoot::audio::server {
+namespace mpc::engine::audio::server {
     struct AudioClient
     {
         virtual void work(int nFrames) = 0;

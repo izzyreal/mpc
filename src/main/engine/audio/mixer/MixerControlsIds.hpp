@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace ctoot::audio::mixer {
+namespace mpc::engine::audio::mixer {
 
     struct MixerControlsIds
     {

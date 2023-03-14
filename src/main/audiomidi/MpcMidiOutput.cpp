@@ -1,7 +1,7 @@
 #include "MpcMidiOutput.hpp"
 
 using namespace mpc::audiomidi;
-using namespace ctoot::midi::core;
+using namespace mpc::engine::midi;
 
 void MpcMidiOutput::panic()
 {
@@ -17,22 +17,22 @@ void MpcMidiOutput::panic()
     }
 }
 
-void MpcMidiOutput::enqueueMessageOutputA(std::shared_ptr<ctoot::midi::core::ShortMessage> msg)
+void MpcMidiOutput::enqueueMessageOutputA(std::shared_ptr<mpc::engine::midi::ShortMessage> msg)
 {
     outputQueueA.enqueue(msg);
 }
 
-void MpcMidiOutput::enqueueMessageOutputB(std::shared_ptr<ctoot::midi::core::ShortMessage> msg)
+void MpcMidiOutput::enqueueMessageOutputB(std::shared_ptr<mpc::engine::midi::ShortMessage> msg)
 {
     outputQueueB.enqueue(msg);
 }
 
-unsigned char MpcMidiOutput::dequeueOutputA(std::vector<std::shared_ptr<ctoot::midi::core::ShortMessage>>& buf)
+unsigned char MpcMidiOutput::dequeueOutputA(std::vector<std::shared_ptr<mpc::engine::midi::ShortMessage>>& buf)
 {
     return static_cast<unsigned char>(outputQueueA.try_dequeue_bulk(buf.begin(), buf.size()));
 }
 
-unsigned char MpcMidiOutput::dequeueOutputB(std::vector<std::shared_ptr<ctoot::midi::core::ShortMessage>>& buf)
+unsigned char MpcMidiOutput::dequeueOutputB(std::vector<std::shared_ptr<mpc::engine::midi::ShortMessage>>& buf)
 {
     return static_cast<unsigned char>(outputQueueB.try_dequeue_bulk(buf.begin(), buf.size()));
 }

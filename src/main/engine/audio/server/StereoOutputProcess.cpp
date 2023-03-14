@@ -2,7 +2,7 @@
 
 #include <engine/audio/core/AudioBuffer.hpp>
 
-using namespace ctoot::audio::server;
+using namespace mpc::engine::audio::server;
 using namespace std;
 
 StereoOutputProcess::StereoOutputProcess(string name)
@@ -10,7 +10,7 @@ StereoOutputProcess::StereoOutputProcess(string name)
 {
 }
 
-int StereoOutputProcess::processAudio(ctoot::audio::core::AudioBuffer* buffer, int nFrames) {
+int StereoOutputProcess::processAudio(mpc::engine::audio::core::AudioBuffer* buffer, int nFrames) {
 	
 	if (!buffer->isRealTime()) {
 		return AudioProcess::AUDIO_OK;

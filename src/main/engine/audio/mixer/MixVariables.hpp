@@ -2,11 +2,11 @@
 
 #include <engine/audio/core/ChannelFormat.hpp>
 
-namespace ctoot::control {
+namespace mpc::engine::control {
     class EnumControl;
 }
 
-namespace ctoot::audio::mixer {
+namespace mpc::engine::audio::mixer {
 
     struct MixVariables
     {
@@ -21,11 +21,11 @@ namespace ctoot::audio::mixer {
 
         virtual void getChannelGains(std::vector<float> *dest) = 0;
 
-        virtual std::shared_ptr<ctoot::audio::core::ChannelFormat> getChannelFormat() = 0;
+        virtual std::shared_ptr<mpc::engine::audio::core::ChannelFormat> getChannelFormat() = 0;
 
         virtual float getSmoothingFactor() = 0;
 
-        virtual ctoot::control::EnumControl *getRouteControl()
+        virtual mpc::engine::control::EnumControl *getRouteControl()
         { return nullptr; }
     };
 }

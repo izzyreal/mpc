@@ -8,7 +8,7 @@
 #include <memory>
 #include <cstdint>
 
-namespace ctoot::audio::server {
+namespace mpc::engine::audio::server {
 
 	class AudioServer
 	{
@@ -20,15 +20,15 @@ namespace ctoot::audio::server {
 		bool running{ false };
 		std::vector<IOAudioProcess*> activeInputs;
 		std::vector<IOAudioProcess*> activeOutputs;
-		std::vector<ctoot::audio::core::AudioBuffer*> buffers;
+		std::vector<mpc::engine::audio::core::AudioBuffer*> buffers;
 
 	public:
 		virtual void resizeBuffers(int newSize);
-        virtual ctoot::audio::core::AudioBuffer* createAudioBuffer(std::string name);
-        virtual void removeAudioBuffer(ctoot::audio::core::AudioBuffer* buffer);
+        virtual mpc::engine::audio::core::AudioBuffer* createAudioBuffer(std::string name);
+        virtual void removeAudioBuffer(mpc::engine::audio::core::AudioBuffer* buffer);
 
 	public:
-        const std::vector<ctoot::audio::core::AudioBuffer*>& getBuffers();
+        const std::vector<mpc::engine::audio::core::AudioBuffer*>& getBuffers();
 		const unsigned int getBufferSize();
 
 	public:

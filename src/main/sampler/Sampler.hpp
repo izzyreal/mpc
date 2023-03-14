@@ -1,6 +1,6 @@
 #pragma once
 
-#include <engine/mpc/MpcSampler.hpp>
+#include "engine/MpcSampler.hpp"
 
 #include <sampler/Program.hpp>
 #include <sampler/Sound.hpp>
@@ -8,7 +8,7 @@
 #include <set>
 #include <memory>
 
-namespace ctoot::mpc {
+namespace mpc::engine {
 class MpcSound;
 class MpcProgram;
 class Drum;
@@ -24,17 +24,17 @@ class Sound;
 class Program;
 
 class Sampler final
-: public virtual ctoot::mpc::MpcSampler
+: public virtual mpc::engine::MpcSampler
 {
     
 public:
     Sampler(mpc::Mpc&);
 
-    std::shared_ptr<ctoot::mpc::MpcSound> getMpcPreviewSound() override;
-    std::shared_ptr<ctoot::mpc::MpcSound> getPlayXSound() override;
-    std::shared_ptr<ctoot::mpc::MpcSound> getClickSound() override;
-    std::shared_ptr<ctoot::mpc::MpcSound> getMpcSound(int index) override;
-    std::shared_ptr<ctoot::mpc::MpcProgram> getMpcProgram(int programNumber) override;
+    std::shared_ptr<mpc::engine::MpcSound> getMpcPreviewSound() override;
+    std::shared_ptr<mpc::engine::MpcSound> getPlayXSound() override;
+    std::shared_ptr<mpc::engine::MpcSound> getClickSound() override;
+    std::shared_ptr<mpc::engine::MpcSound> getMpcSound(int index) override;
+    std::shared_ptr<mpc::engine::MpcProgram> getMpcProgram(int programNumber) override;
     
     std::shared_ptr<Sound> getPreviewSound();
     std::shared_ptr<Sound> getSound(int index);
@@ -107,13 +107,13 @@ public:
     void mergeToStereo(std::vector<float>* sourceLeft, std::vector<float>* sourceRight, std::vector<float>* dest);
     void setDrumBusProgramIndex(int busNumber, int programIndex);
     int getDrumBusProgramIndex(int busNumber);
-    ctoot::mpc::Drum& getDrum(int i);
+    mpc::engine::Drum& getDrum(int i);
     int getUsedProgram(int startIndex, bool up);
     int checkExists(std::string soundName);
     void selectPreviousSound();
     void selectNextSound();
-    std::vector<std::shared_ptr<ctoot::mpc::StereoMixer>>& getDrumStereoMixerChannels(int i);
-    std::vector<std::shared_ptr<ctoot::mpc::IndivFxMixer>>& getDrumIndivFxMixerChannels(int i);
+    std::vector<std::shared_ptr<mpc::engine::StereoMixer>>& getDrumStereoMixerChannels(int i);
+    std::vector<std::shared_ptr<mpc::engine::IndivFxMixer>>& getDrumIndivFxMixerChannels(int i);
     std::weak_ptr<Sound> copySound(std::weak_ptr<Sound> source);
     void copyProgram(const int sourceIndex, const int destIndex);
     std::vector<int>* getInitMasterPadAssign();

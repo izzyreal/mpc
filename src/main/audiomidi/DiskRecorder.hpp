@@ -12,13 +12,13 @@
 namespace mpc::audiomidi {
 
 	class DiskRecorder
-		: public ctoot::audio::core::AudioProcessAdapter
+		: public mpc::engine::audio::core::AudioProcessAdapter
 
 	{
 
 	private:
 		std::string name;
-		ctoot::audio::core::AudioFormat* format = nullptr;
+		mpc::engine::audio::core::AudioFormat* format = nullptr;
 		std::ofstream fileStream;
 		std::atomic<bool> writing = ATOMIC_VAR_INIT(false);
 		int writtenByteCount = 0;
@@ -30,10 +30,10 @@ namespace mpc::audiomidi {
 		bool start();
 		bool stopEarly();
 		bool prepare(const std::string& absolutePath, int lengthInFrames, int sampleRate);
-		int processAudio(ctoot::audio::core::AudioBuffer* buf, int nFrames) override;
+		int processAudio(mpc::engine::audio::core::AudioBuffer* buf, int nFrames) override;
 
 	public:
-		DiskRecorder(ctoot::audio::core::AudioProcess* process, std::string name);
+		DiskRecorder(mpc::engine::audio::core::AudioProcess* process, std::string name);
         ~DiskRecorder();
 
 	};

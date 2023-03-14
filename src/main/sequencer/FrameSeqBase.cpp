@@ -38,7 +38,7 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::sequencer;
-using namespace ctoot::midi::core;
+using namespace mpc::engine::midi;
 
 FrameSeqBase::FrameSeqBase(mpc::Mpc& mpc)
         : mpc(mpc),
@@ -78,7 +78,7 @@ void FrameSeqBase::startMetronome() {
 
 void FrameSeqBase::sendMidiClockMsg()
 {
-    auto clockMsg = std::make_shared<ctoot::midi::core::ShortMessage>();
+    auto clockMsg = std::make_shared<mpc::engine::midi::ShortMessage>();
     clockMsg->setMessage(ShortMessage::TIMING_CLOCK);
 
     if (syncScreen->getModeOut() > 0) {

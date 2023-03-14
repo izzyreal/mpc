@@ -1,17 +1,17 @@
 #include "InterconnectionInputProcess.hpp"
 
 #include "MixerInterconnection.hpp"
-#include <engine/audio/core/AudioBuffer.hpp>
+#include "engine/audio/core/AudioBuffer.hpp"
 
-using namespace ctoot::mpc;
+using namespace mpc::engine;
 
-InterconnectionInputProcess::InterconnectionInputProcess(MixerInterconnection* mmi, ctoot::audio::core::AudioBuffer* sharedBuffer)
+InterconnectionInputProcess::InterconnectionInputProcess(MixerInterconnection* mmi, mpc::engine::audio::core::AudioBuffer* sharedBuffer)
     : mmi(mmi)
     , sharedBuffer(sharedBuffer)
 {
 }
 
-int InterconnectionInputProcess::processAudio(ctoot::audio::core::AudioBuffer* buffer)
+int InterconnectionInputProcess::processAudio(mpc::engine::audio::core::AudioBuffer* buffer)
 {
 	sharedBuffer->copyFrom(buffer);
 	if (!mmi->isLeftEnabled()) sharedBuffer->makeSilence(0);

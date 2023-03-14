@@ -3,7 +3,7 @@
 #include <engine/control/CompoundControl.hpp>
 #include <engine/control/BooleanControl.hpp>
 
-namespace ctoot::audio::core {
+namespace mpc::engine::audio::core {
 
     class AudioControls
             : public control::CompoundControl

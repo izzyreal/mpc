@@ -5,7 +5,7 @@
 //#include <cmath>
 #include <math.h>
 
-using namespace ctoot::synth::modules::filter;
+using namespace mpc::engine::filter;
 
 StateVariableFilter::StateVariableFilter(FilterControls* variables)
 {

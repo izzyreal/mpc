@@ -4,19 +4,19 @@
 #include <engine/audio/mixer/MixControls.hpp>
 #include <engine/control/EnumControl.hpp>
 
-namespace ctoot::audio::mixer {
+namespace mpc::engine::audio::mixer {
 
     class MainMixControls
             : public MixControls
     {
 
     private:
-        ctoot::control::EnumControl *routeControl{nullptr};
+        mpc::engine::control::EnumControl *routeControl{nullptr};
 
     public:
-        ctoot::control::EnumControl *createRouteControl(int stripId) override;
+        mpc::engine::control::EnumControl *createRouteControl(int stripId) override;
 
-        ctoot::control::EnumControl *getRouteControl() override;
+        mpc::engine::control::EnumControl *getRouteControl() override;
 
     public:
         MainMixControls(MixerControls *mixerControls, int stripId, std::shared_ptr<BusControls> busControls,

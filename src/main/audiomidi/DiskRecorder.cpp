@@ -9,7 +9,7 @@
 
 using namespace mpc::audiomidi;
 
-DiskRecorder::DiskRecorder(ctoot::audio::core::AudioProcess* process, std::string name)
+DiskRecorder::DiskRecorder(mpc::engine::audio::core::AudioProcess* process, std::string name)
 	: AudioProcessAdapter(process)
 {
 	this->name = name;
@@ -38,12 +38,12 @@ bool DiskRecorder::prepare(const std::string& absolutePath, int lengthInFrames, 
 	if (format != nullptr)
 		delete format;
 
-	format = new ctoot::audio::core::AudioFormat(sampleRate, 16, 2, true, false);
+	format = new mpc::engine::audio::core::AudioFormat(sampleRate, 16, 2, true, false);
 	
 	return true;
 }
 
-int DiskRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf, int nFrames)
+int DiskRecorder::processAudio(mpc::engine::audio::core::AudioBuffer* buf, int nFrames)
 {
 	auto ret = AudioProcessAdapter::processAudio(buf, nFrames);
 	

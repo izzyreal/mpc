@@ -33,7 +33,7 @@ using namespace mpc::sampler;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
-using namespace ctoot::midi::core;
+using namespace mpc::engine::midi;
 
 MpcMidiInput::MpcMidiInput(mpc::Mpc &_mpc, int _index)
         : mpc(_mpc),

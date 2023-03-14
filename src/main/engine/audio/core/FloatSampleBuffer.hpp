@@ -5,7 +5,7 @@
 #include <engine/audio/core/AudioFormat.hpp>
 #include <engine/audio/core/FloatSampleTools.hpp>
 
-namespace ctoot::audio::core {
+namespace mpc::engine::audio::core {
 class FloatSampleBuffer {
 public:
     FloatSampleBuffer();

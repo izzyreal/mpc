@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <engine/audio/core/Encoding.hpp>
 
-namespace ctoot::audio::core {
+namespace mpc::engine::audio::core {
 
     class AudioFormat final
     {

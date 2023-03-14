@@ -5,8 +5,8 @@
 #include <engine/audio/core/AudioProcess.hpp>
 
 using namespace std;
-using namespace ctoot::control;
-using namespace ctoot::audio::core;
+using namespace mpc::engine::control;
+using namespace mpc::engine::audio::core;
 
 AudioProcessChain::AudioProcessChain(shared_ptr<AudioControlsChain> controlChain)
 {
@@ -29,7 +29,7 @@ void AudioProcessChain::open()
 	}
 }
 
-int AudioProcessChain::processAudio(ctoot::audio::core::AudioBuffer* buffer, int nFrames)
+int AudioProcessChain::processAudio(mpc::engine::audio::core::AudioBuffer* buffer, int nFrames)
 {
 	for (auto& p : processes) {
 		try {

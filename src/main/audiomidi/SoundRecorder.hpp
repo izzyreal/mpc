@@ -13,7 +13,7 @@
 #include <atomic>
 
 using namespace mpc::sampler;
-using namespace ctoot::audio::core;
+using namespace mpc::engine::audio::core;
 
 /*
 * A SoundRecorder always records at 44.1KHz, like the real MPC2000XL.
@@ -59,7 +59,7 @@ namespace mpc::audiomidi
 		void start();
 		void stop();
 		void cancel();
-		int processAudio(ctoot::audio::core::AudioBuffer* buf, int nFrames) override;
+		int processAudio(mpc::engine::audio::core::AudioBuffer* buf, int nFrames) override;
 		bool isRecording();
 		unsigned int getInputGain();
 		void setInputGain(unsigned int);

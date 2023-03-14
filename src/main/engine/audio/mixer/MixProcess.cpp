@@ -1,8 +1,8 @@
 #include <engine/audio/mixer/MixProcess.hpp>
 #include <engine/audio/mixer/AudioMixerStrip.hpp>
 
-using namespace ctoot::audio::mixer;
-using namespace ctoot::audio::core;
+using namespace mpc::engine::audio::mixer;
+using namespace mpc::engine::audio::core;
 using namespace std;
 
 MixProcess::MixProcess(shared_ptr<AudioMixerStrip> strip, shared_ptr<MixVariables> vars)

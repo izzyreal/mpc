@@ -5,7 +5,7 @@
 #include <vector>
 #include <memory>
 
-namespace ctoot::audio::server {
+namespace mpc::engine::audio::server {
 
     class CompoundAudioClient final
             : public AudioClient

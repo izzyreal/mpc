@@ -1,6 +1,6 @@
 #include <engine/audio/core/ChannelFormat2.hpp>
 
-using namespace ctoot::audio::core;
+using namespace mpc::engine::audio::core;
 using namespace std;
 
 ChannelFormat2::ChannelFormat2()

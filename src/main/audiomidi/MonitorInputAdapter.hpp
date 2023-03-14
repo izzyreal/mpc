@@ -12,14 +12,14 @@ namespace mpc {
 namespace mpc::audiomidi {
 
 	class MonitorInputAdapter
-		: public ctoot::audio::core::AudioProcessAdapter
+		: public mpc::engine::audio::core::AudioProcessAdapter
 	{
 	private:
 		mpc::Mpc& mpc;
 
 	public:
-		int32_t processAudio(ctoot::audio::core::AudioBuffer* buffer, int nFrames) override;
-		MonitorInputAdapter(mpc::Mpc& mpc, ctoot::audio::core::AudioProcess* process);
+		int32_t processAudio(mpc::engine::audio::core::AudioBuffer* buffer, int nFrames) override;
+		MonitorInputAdapter(mpc::Mpc& mpc, mpc::engine::audio::core::AudioProcess* process);
 
 	};
 }

@@ -10,7 +10,7 @@
 
 #include <math.h>
 
-namespace ctoot::audio::mixer {
+namespace mpc::engine::audio::mixer {
 
     class PanControl : public LCRControl
     {

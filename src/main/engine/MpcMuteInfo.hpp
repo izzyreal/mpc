@@ -1,6 +1,6 @@
 #pragma once
 
-namespace ctoot::mpc {
+namespace mpc::engine {
     class MpcMuteInfo {
 
     private:

@@ -1,6 +1,6 @@
 #include <engine/audio/core/Encoding.hpp>
 
-using namespace ctoot::audio::core;
+using namespace mpc::engine::audio::core;
 using namespace std;
 
 Encoding::Encoding(string name)

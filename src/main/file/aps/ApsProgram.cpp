@@ -4,7 +4,7 @@
 #include <file/aps/ApsNoteParameters.hpp>
 #include <file/aps/ApsSlider.hpp>
 #include <file/pgmwriter/Pads.hpp>
-#include <engine/mpc/StereoMixer.hpp>
+#include "engine/StereoMixer.hpp"
 #include <sampler/Program.hpp>
 #include <sampler/Pad.hpp>
 
@@ -12,7 +12,7 @@
 #include <VecUtil.hpp>
 
 using namespace mpc::file::aps;
-using namespace ctoot::mpc;
+using namespace mpc::engine;
 using namespace moduru;
 
 ApsProgram::ApsProgram(const std::vector<char>& loadBytes)

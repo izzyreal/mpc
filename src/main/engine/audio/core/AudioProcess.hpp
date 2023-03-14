@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <engine/audio/core/AudioBuffer.hpp>
 
-namespace ctoot::audio::core {
+namespace mpc::engine::audio::core {
 
     class AudioProcess
     {
@@ -14,10 +14,10 @@ namespace ctoot::audio::core {
 
         virtual void open() {}
 
-        virtual int processAudio(ctoot::audio::core::AudioBuffer *buffer)
+        virtual int processAudio(mpc::engine::audio::core::AudioBuffer *buffer)
         { return processAudio(buffer, buffer->getSampleCount()); }
 
-        virtual int processAudio(ctoot::audio::core::AudioBuffer *buffer, int)
+        virtual int processAudio(mpc::engine::audio::core::AudioBuffer *buffer, int)
         { return processAudio(buffer); }
 
         virtual void close() {}

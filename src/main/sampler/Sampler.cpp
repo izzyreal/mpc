@@ -17,10 +17,10 @@
 
 #include <engine/audio/server/NonRealTimeAudioServer.hpp>
 
-#include <engine/mpc/PreviewSoundPlayer.hpp>
-#include <engine/mpc/Drum.hpp>
-#include <engine/mpc/StereoMixer.hpp>
-#include <engine/mpc/IndivFxMixer.hpp>
+#include "engine/PreviewSoundPlayer.hpp"
+#include "engine/Drum.hpp"
+#include "engine/StereoMixer.hpp"
+#include "engine/IndivFxMixer.hpp"
 
 #include <lang/StrUtil.hpp>
 
@@ -37,7 +37,7 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::sampler;
-using namespace ctoot::mpc;
+using namespace mpc::engine;
 using namespace moduru::lang;
 
 Sampler::Sampler(mpc::Mpc& mpc)

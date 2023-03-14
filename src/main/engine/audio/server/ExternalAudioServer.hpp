@@ -14,7 +14,7 @@
 #include <vector>
 #include <memory>
 
-namespace ctoot::audio::server
+namespace mpc::engine::audio::server
 {
 	class ExternalAudioServer : public AudioServer {
 
@@ -28,8 +28,8 @@ namespace ctoot::audio::server
 		std::vector<std::string> getAvailableInputNames() override;
 		IOAudioProcess* openAudioOutput(std::string name) override;
 		IOAudioProcess* openAudioInput(std::string name) override;
-		void closeAudioOutput(ctoot::audio::server::IOAudioProcess* output) override;
-		void closeAudioInput(ctoot::audio::server::IOAudioProcess* input) override;
+		void closeAudioOutput(mpc::engine::audio::server::IOAudioProcess* output) override;
+		void closeAudioInput(mpc::engine::audio::server::IOAudioProcess* input) override;
 		int getInputLatencyFrames() override;
 		int getOutputLatencyFrames() override;
 		int getTotalLatencyFrames() override;

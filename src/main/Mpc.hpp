@@ -12,7 +12,7 @@
 #include <string>
 #include <memory>
 
-namespace ctoot::mpc {
+namespace mpc::engine {
     class Drum;
     class PreviewSoundPlayer;
 }
@@ -97,8 +97,8 @@ namespace mpc {
     public:
         std::shared_ptr<sequencer::Sequencer> getSequencer();
         std::shared_ptr<sampler::Sampler> getSampler();
-        ctoot::mpc::Drum& getDrum(int i);
-        ctoot::mpc::PreviewSoundPlayer& getBasicPlayer();
+        mpc::engine::Drum& getDrum(int i);
+        mpc::engine::PreviewSoundPlayer& getBasicPlayer();
         std::shared_ptr<audiomidi::AudioMidiServices> getAudioMidiServices();
         std::shared_ptr<audiomidi::EventHandler> getEventHandler();
         std::shared_ptr<mpc::audiomidi::MpcMidiOutput> getMidiOutput();

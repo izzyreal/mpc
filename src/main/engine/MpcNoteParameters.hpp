@@ -2,7 +2,7 @@
 
 #include <memory>
 
-namespace ctoot::mpc
+namespace mpc::engine
 {
     enum VoiceOverlapMode { POLY, MONO, NOTE_OFF };
 

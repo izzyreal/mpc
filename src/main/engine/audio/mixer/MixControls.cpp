@@ -1,7 +1,7 @@
 #include <engine/audio/mixer/MixControls.hpp>
 
 #include <engine/audio/core/ChannelFormat.hpp>
-#include <engine/mpc/FaderControl.hpp>
+#include "engine/FaderControl.hpp"
 #include <engine/audio/mixer/BusControls.hpp>
 #include <engine/audio/mixer/MixControlIds.hpp>
 #include <engine/audio/mixer/BalanceControl.hpp>
@@ -14,10 +14,10 @@
 
 #include <cmath>
 
-using namespace ctoot::audio::mixer;
-using namespace ctoot::audio::core;
-using namespace ctoot::mpc;
-using namespace ctoot::control;
+using namespace mpc::engine::audio::mixer;
+using namespace mpc::engine::audio::core;
+using namespace mpc::engine;
+using namespace mpc::engine::control;
 
 using namespace std;
 

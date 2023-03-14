@@ -2,13 +2,13 @@
 #include <sampler/Sampler.hpp>
 #include <sampler/Pad.hpp>
 
-#include <engine/mpc/StereoMixer.hpp>
-#include <engine/mpc/IndivFxMixer.hpp>
+#include "engine/StereoMixer.hpp"
+#include "engine/IndivFxMixer.hpp"
 
 #include <Mpc.hpp>
 
 using namespace mpc::sampler;
-using namespace ctoot::mpc;
+using namespace mpc::engine;
 
 Program::Program(mpc::Mpc& mpc, mpc::sampler::Sampler* samplerToUse)
 {

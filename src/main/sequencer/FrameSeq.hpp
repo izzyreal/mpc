@@ -5,7 +5,7 @@
 
 namespace mpc::sequencer {
 
-	class FrameSeq final : public FrameSeqBase, public ctoot::audio::server::AudioClient
+	class FrameSeq final : public FrameSeqBase, public mpc::engine::audio::server::AudioClient
 	{
     public:
         explicit FrameSeq(mpc::Mpc& mpc);

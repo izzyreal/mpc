@@ -1,10 +1,10 @@
 #include <file/aps/ApsMixer.hpp>
 
-#include <engine/mpc/StereoMixer.hpp>
-#include <engine/mpc/IndivFxMixer.hpp>
+#include "engine/StereoMixer.hpp"
+#include "engine/IndivFxMixer.hpp"
 
 using namespace mpc::file::aps;
-using namespace ctoot::mpc;
+using namespace mpc::engine;
 
 ApsMixer::ApsMixer(const std::vector<char>& loadBytes)
 {
@@ -32,17 +32,17 @@ ApsMixer::ApsMixer(std::vector<std::shared_ptr<StereoMixer>>& smcs, std::vector<
 	}
 }
 
-ctoot::mpc::StereoMixer ApsMixer::getStereoMixerChannel(int noteIndex)
+mpc::engine::StereoMixer ApsMixer::getStereoMixerChannel(int noteIndex)
 {
-	ctoot::mpc::StereoMixer result;
+	mpc::engine::StereoMixer result;
 	result.setLevel(getLevel(noteIndex));
 	result.setPanning(getPanning(noteIndex));
 	return result;
 }
 
-ctoot::mpc::IndivFxMixer ApsMixer::getIndivFxMixerChannel(int noteIndex)
+mpc::engine::IndivFxMixer ApsMixer::getIndivFxMixerChannel(int noteIndex)
 {
-	ctoot::mpc::IndivFxMixer result;
+	mpc::engine::IndivFxMixer result;
 	result.setVolumeIndividualOut(getIndividualLevel(noteIndex));
 	result.setOutput(getIndividualOutput(noteIndex));
 	result.setFxSendLevel(getSendLevel(noteIndex));

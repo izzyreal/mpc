@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <string>
 
-namespace ctoot::control {
+namespace mpc::engine::control {
 
     class ControlLaw
     {

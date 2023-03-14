@@ -3,7 +3,7 @@
 #include <vector>
 #include <memory>
 
-namespace ctoot::mpc
+namespace mpc::engine
 {
 	class StereoMixer;
 	class IndivFxMixer;
@@ -24,8 +24,8 @@ namespace mpc::file::aps
 		std::vector<char> saveBytes = std::vector<char>(384);
 
 	public:
-		ctoot::mpc::StereoMixer getStereoMixerChannel(int noteIndex);
-		ctoot::mpc::IndivFxMixer getIndivFxMixerChannel(int noteIndex);
+		mpc::engine::StereoMixer getStereoMixerChannel(int noteIndex);
+		mpc::engine::IndivFxMixer getIndivFxMixerChannel(int noteIndex);
 		int getFxPath(int noteIndex);
 		int getLevel(int noteIndex);
 		int getPanning(int noteIndex);
@@ -36,7 +36,7 @@ namespace mpc::file::aps
 
 	public:
 		ApsMixer(const std::vector<char>& loadBytes);
-		ApsMixer(std::vector<std::shared_ptr<ctoot::mpc::StereoMixer>>& smc, std::vector<std::shared_ptr<ctoot::mpc::IndivFxMixer>>& ifmc);
+		ApsMixer(std::vector<std::shared_ptr<mpc::engine::StereoMixer>>& smc, std::vector<std::shared_ptr<mpc::engine::IndivFxMixer>>& ifmc);
 
 	};
 }

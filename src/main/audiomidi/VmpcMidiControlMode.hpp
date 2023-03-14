@@ -2,7 +2,7 @@
 
 #include "Mpc.hpp"
 
-namespace ctoot::midi::core { class ShortMessage; }
+namespace mpc::engine::midi { class ShortMessage; }
 
 namespace mpc::audiomidi {
 
@@ -11,6 +11,6 @@ namespace mpc::audiomidi {
     public:
         int previousDataWheelValue = -1;
 
-        void processMidiInputEvent(mpc::Mpc &mpc, ctoot::midi::core::ShortMessage *msg);
+        void processMidiInputEvent(mpc::Mpc &mpc, mpc::engine::midi::ShortMessage *msg);
     };
 }

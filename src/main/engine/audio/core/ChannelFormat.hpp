@@ -7,7 +7,7 @@
 #include <vector>
 #include <memory>
 
-namespace ctoot::audio::core {
+namespace mpc::engine::audio::core {
 
     class ChannelFormat
     {
@@ -19,7 +19,7 @@ namespace ctoot::audio::core {
 
         virtual std::vector<int8_t> getRight() = 0;
 
-        int mix(ctoot::audio::core::AudioBuffer *destBuffer, ctoot::audio::core::AudioBuffer *sourceBuffer,
+        int mix(mpc::engine::audio::core::AudioBuffer *destBuffer, mpc::engine::audio::core::AudioBuffer *sourceBuffer,
                 std::vector<float> &gain);
 
         static std::shared_ptr<ChannelFormat> STEREO();

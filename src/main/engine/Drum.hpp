@@ -4,15 +4,15 @@
 #include <vector>
 #include <memory>
 
-namespace ctoot::audio::server {
+namespace mpc::engine::audio::server {
 	class AudioServer;
 }
 
-namespace ctoot::audio::mixer {
+namespace mpc::engine::audio::mixer {
 	class AudioMixer;
 }
 
-namespace ctoot::mpc {
+namespace mpc::engine {
 	class MpcSampler;
 	class StereoMixer;
 	class IndivFxMixer;
@@ -22,7 +22,7 @@ namespace ctoot::mpc {
     class MpcMixerSetupGui;
 }
 
-namespace ctoot::mpc
+namespace mpc::engine
 {
 	class Drum final
 	{
@@ -32,10 +32,10 @@ namespace ctoot::mpc
 		std::map<int, int> simultB;
         std::vector<std::shared_ptr<Voice>> voices;
 		std::shared_ptr<MpcSampler> sampler;
-		std::shared_ptr<ctoot::audio::mixer::AudioMixer> mixer;
+		std::shared_ptr<mpc::engine::audio::mixer::AudioMixer> mixer;
 		std::vector<MixerInterconnection*> mixerConnections;
-		ctoot::audio::server::AudioServer* server = nullptr;
-        ctoot::mpc::MpcMixerSetupGui* mixerSetupGui = nullptr;
+		mpc::engine::audio::server::AudioServer* server = nullptr;
+        mpc::engine::MpcMixerSetupGui* mixerSetupGui = nullptr;
 
 	private:
 		int drumIndex = 0;
@@ -74,13 +74,13 @@ namespace ctoot::mpc
         void startDecayForNote(const int note,
                                const int frameOffset,
                                const int noteOnStartTick);
-        void stopMonoOrPolyVoiceWithSameNoteParameters(ctoot::mpc::MpcNoteParameters* noteParameters, int note);
+        void stopMonoOrPolyVoiceWithSameNoteParameters(mpc::engine::MpcNoteParameters* noteParameters, int note);
 
 	public:
 		Drum(std::shared_ptr<MpcSampler> sampler,
              int drumIndex,
-             std::shared_ptr<ctoot::audio::mixer::AudioMixer> mixer,
-             const std::shared_ptr<ctoot::audio::server::AudioServer>& server,
+             std::shared_ptr<mpc::engine::audio::mixer::AudioMixer> mixer,
+             const std::shared_ptr<mpc::engine::audio::server::AudioServer>& server,
              MpcMixerSetupGui *mixerSetupGui,
              std::vector<std::shared_ptr<Voice>> voices);
 		~Drum();

@@ -1,7 +1,7 @@
 #include <engine/control/LawControl.hpp>
 #include <engine/control/ControlLaw.hpp>
 
-using namespace ctoot::control;
+using namespace mpc::engine::control;
 using namespace std;
 
 LawControl::LawControl(int id, string name, shared_ptr<ControlLaw> law, float precision, float initialValue)

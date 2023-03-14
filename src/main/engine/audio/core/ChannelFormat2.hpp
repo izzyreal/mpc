@@ -3,7 +3,7 @@
 #include <engine/audio/core/ChannelFormat.hpp>
 #include <cstdint>
 
-namespace ctoot::audio::core {
+namespace mpc::engine::audio::core {
 
     class ChannelFormat2 final
             : public ChannelFormat

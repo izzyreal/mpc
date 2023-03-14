@@ -5,7 +5,7 @@
 #include <cassert>
 #include <cmath>
 
-using namespace ctoot::control;
+using namespace mpc::engine::control;
 using namespace std;
 
 LogLaw::LogLaw(float min, float max, string units) : AbstractLaw(min, max, units)

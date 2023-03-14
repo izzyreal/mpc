@@ -3,14 +3,14 @@
 
 #include <vector>
 
-namespace ctoot::audio::server
+namespace mpc::engine::audio::server
 {
 	class IOAudioProcess
-		: public ctoot::audio::core::AudioProcess
+		: public mpc::engine::audio::core::AudioProcess
 	{
 	public:
 		std::vector<float> localBuffer;
-		virtual std::shared_ptr<ctoot::audio::core::ChannelFormat> getChannelFormat() = 0;
+		virtual std::shared_ptr<mpc::engine::audio::core::ChannelFormat> getChannelFormat() = 0;
 		virtual std::string getName() = 0;
         virtual ~IOAudioProcess() {}
 

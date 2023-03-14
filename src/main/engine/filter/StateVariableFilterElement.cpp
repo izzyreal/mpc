@@ -1,6 +1,6 @@
 #include "StateVariableFilterElement.hpp"
 
-using namespace ctoot::synth::modules::filter;
+using namespace mpc::engine::filter;
 
 float StateVariableFilterElement::filter(float in, float freq, float damp)
 {

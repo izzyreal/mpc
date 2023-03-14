@@ -1,12 +1,12 @@
 #pragma once
-#include <engine/mpc/MpcProgram.hpp>
+#include "engine/MpcProgram.hpp"
 
 #include <sampler/NoteParameters.hpp>
 #include <sampler/PgmSlider.hpp>
 
 #include <memory>
 
-namespace ctoot::mpc {
+namespace mpc::engine {
 	class MpcSampler;
 	class StereoMixer;
 	class IndivFxMixer;
@@ -20,16 +20,16 @@ namespace mpc::sampler {
 	class Pad;
 
 	class Program
-		: public virtual ctoot::mpc::MpcProgram
+		: public virtual mpc::engine::MpcProgram
 	{
 
 	public:
-		std::shared_ptr<ctoot::mpc::StereoMixer> getStereoMixerChannel(int noteIndex) override;
-		std::shared_ptr<ctoot::mpc::IndivFxMixer> getIndivFxMixerChannel(int noteIndex) override;
+		std::shared_ptr<mpc::engine::StereoMixer> getStereoMixerChannel(int noteIndex) override;
+		std::shared_ptr<mpc::engine::IndivFxMixer> getIndivFxMixerChannel(int noteIndex) override;
         
 		int getPadIndexFromNote(int note);
 		
-        ctoot::mpc::MpcNoteParameters* getNoteParameters(int i) override;
+        mpc::engine::MpcNoteParameters* getNoteParameters(int i) override;
 
 	private:
 		Sampler* sampler = nullptr;

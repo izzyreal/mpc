@@ -1,6 +1,6 @@
 #include "StereoMixer.hpp"
 
-using namespace ctoot::mpc;
+using namespace mpc::engine;
 using namespace std;
 
 StereoMixer::StereoMixer()

@@ -13,7 +13,7 @@
 #include <mutex>
 
 using namespace mpc::sampler;
-using namespace ctoot::audio::core;
+using namespace mpc::engine::audio::core;
 
 namespace mpc::audiomidi
 {
@@ -47,7 +47,7 @@ private:
     
 public:
     bool start(std::shared_ptr<std::istream>, SoundPlayerFileFormat);
-    int processAudio(ctoot::audio::core::AudioBuffer* buf, int nFrames) override;
+    int processAudio(mpc::engine::audio::core::AudioBuffer* buf, int nFrames) override;
     void open() override {}
     void close() override {}
     

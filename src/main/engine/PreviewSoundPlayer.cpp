@@ -3,16 +3,16 @@
 #include "Voice.hpp"
 #include "MpcSampler.hpp"
 
-#include <engine/mpc/FaderControl.hpp>
-#include <engine/audio/mixer/MainMixControls.hpp>
+#include "FaderControl.hpp"
+#include "engine/audio/mixer/MainMixControls.hpp"
 #include <utility>
 
-using namespace ctoot::mpc;
-using namespace ctoot::audio::mixer;
+using namespace mpc::engine;
+using namespace mpc::engine::audio::mixer;
 
 PreviewSoundPlayer::PreviewSoundPlayer(
         std::shared_ptr<MpcSampler> samplerToUse,
-        std::shared_ptr<ctoot::audio::mixer::AudioMixer> mixerToUse,
+        std::shared_ptr<mpc::engine::audio::mixer::AudioMixer> mixerToUse,
         std::shared_ptr<Voice> voiceToUse)
         : sampler(std::move(samplerToUse)), mixer(std::move(mixerToUse)), voice(std::move(voiceToUse))
 {

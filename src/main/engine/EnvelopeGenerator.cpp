@@ -1,8 +1,8 @@
-#include <engine/mpc/EnvelopeGenerator.hpp>
+#include "EnvelopeGenerator.hpp"
 
-#include <engine/mpc/EnvelopeControls.hpp>
+#include "EnvelopeControls.hpp"
 
-using namespace ctoot::mpc;
+using namespace mpc::engine;
 
 EnvelopeGenerator::EnvelopeGenerator(EnvelopeControls* vars)
 {

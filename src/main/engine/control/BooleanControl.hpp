@@ -2,7 +2,7 @@
 
 #include <engine/control/Control.hpp>
 
-namespace ctoot::control {
+namespace mpc::engine::control {
     class BooleanControl : public Control
     {
 
