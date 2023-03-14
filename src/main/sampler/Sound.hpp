@@ -1,7 +1,6 @@
 #pragma once
 #include <engine/mpc/MpcSound.hpp>
 #include <observer/Observable.hpp>
-#include <engine/mpc/MpcSoundOscillatorControls.hpp>
 
 namespace mpc::sampler {
 	class Sound
@@ -10,15 +9,17 @@ namespace mpc::sampler {
 	{
 
 	private:
-		std::string name = "";
+		std::string name;
 		int numberOfBeats{ 4 };
-		ctoot::mpc::MpcSoundOscillatorControls* oscillatorControls{ nullptr };
+        bool mono = false, loopEnabled = false;
+        int sampleRate = 44100;
+        int sndLevel = 100, tune = 0;
+        int start = 0, end = 0, loopTo = 0;
+        std::vector<float> sampleData;
 
 	public:
 		void setName(std::string s);
-
-	public:
-		std::vector<float>* getSampleData() override;
+		std::vector<float>* getSampleData();
 		int getTune() override;
 		int getStart() override;
 		int getEnd() override;
@@ -41,13 +42,12 @@ namespace mpc::sampler {
 		void setLoopEnabled(bool loopEnabled);
 		void setLoopTo(int loopTo);
 		void setTune(int tune);
-		ctoot::mpc::MpcSoundOscillatorControls* getOscillatorControls();
 		void insertFrame(std::vector<float> frame, unsigned int index);
+        void insertFrames(std::vector<float>& frames, unsigned int index);
+        void insertFrames(std::vector<float>& left, std::vector<float>& right, unsigned int index);
 
 	public:
 		Sound(int rate);
-		Sound();
-		~Sound();
 
 	};
 }

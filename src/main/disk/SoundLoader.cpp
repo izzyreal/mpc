@@ -177,7 +177,7 @@ sound_or_error SoundLoader::onReadWavSuccess(std::shared_ptr<mpc::file::wav::Wav
     }
 
     if (wavFile->getSampleRate() > 44100 && shouldBeConverted) {
-        auto tempSound = std::make_shared<Sound>();
+        auto tempSound = std::make_shared<Sound>(wavFile->getSampleRate());
         Sampler::resample(*sampleData, wavFile->getSampleRate(), tempSound);
         auto tempData = *tempSound->getSampleData();
         sampleData->swap(tempData);

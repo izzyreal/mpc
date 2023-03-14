@@ -1,19 +1,10 @@
 #include <sampler/Sound.hpp>
 
-#include <engine/mpc/MpcSoundOscillatorControls.hpp>
-
 using namespace mpc::sampler;
 
 Sound::Sound(int rate)
 {
-	oscillatorControls = new ctoot::mpc::MpcSoundOscillatorControls(0);
     setSampleRate(rate);
-}
-
-Sound::Sound() 
-{
-	oscillatorControls = new ctoot::mpc::MpcSoundOscillatorControls(0);
-	oscillatorControls->setName("click");
 }
 
 void Sound::setName(std::string s)
@@ -43,109 +34,180 @@ std::string Sound::getName()
     return name;
 }
 
-std::vector<float>* Sound::getSampleData()
+void Sound::setLevel(int i)
 {
-    return oscillatorControls->getSampleData();
+    if (i < 0 || i > 200) return;
+
+    sndLevel = i;
 }
 
-int Sound::getSndLevel()
+void Sound::setTune(int i)
 {
-    return oscillatorControls->getSndLevel();
+    if (i < -120 || i > 120) return;
+
+    tune = i;
 }
 
-int Sound::getTune()
+void Sound::setLoopEnabled(bool b)
 {
-    return oscillatorControls->getTune();
+    loopEnabled = b;
 }
 
-int Sound::getStart()
+void Sound::setStart(int i)
 {
-    return oscillatorControls->getStart();
+    auto value = i;
+    if (value < 0) {
+        if (start == 0)
+            return;
+        value = 0;
+    }
+    else if (value >= getFrameCount()) {
+        if (start == getFrameCount())
+            return;
+
+        value = getFrameCount();
+    }
+
+    start = value;
+
+    if (start > end)
+        setEnd(start);
 }
 
-int Sound::getEnd()
+void Sound::setEnd(int i)
 {
-    return oscillatorControls->getEnd();
+    auto value = i;
+
+    if (value < 0) {
+
+        if (end == 0)
+            return;
+
+        value = 0;
+    }
+    else if (value > getFrameCount())
+    {
+        if (end == getFrameCount())
+            return;
+
+        value = getFrameCount();
+    }
+
+    end = value;
+
+    if (end < loopTo)
+        setLoopTo(end);
+
+    if (end < start)
+        setStart(end);
 }
 
-bool Sound::isLoopEnabled()
+void Sound::setMono(bool b)
 {
-    return oscillatorControls->isLoopEnabled();
+    mono = b;
+    end = getFrameCount();
+    loopTo = end;
 }
 
-int Sound::getLoopTo()
+void Sound::setLoopTo(int i)
 {
-    return oscillatorControls->getLoopTo();
+    auto value = i;
+
+    if (value < 0)
+        value = 0;
+    else if (value > getFrameCount())
+        value = getFrameCount();
+
+    loopTo = value;
 }
 
-bool Sound::isMono()
-{
-    return oscillatorControls->isMono();
-}
-
-int Sound::getSampleRate()
-{
-    return oscillatorControls->getSampleRate();
-}
-
-void Sound::setSampleRate(int sr) {
-	oscillatorControls->setSampleRate(sr);
-}
 
 int Sound::getLastFrameIndex()
 {
-    return oscillatorControls->getLastFrameIndex();
+    return (isMono() ? sampleData.size() : (sampleData.size() * 0.5)) - 1;
 }
 
 int Sound::getFrameCount()
 {
-    return oscillatorControls->getFrameCount();
+    return getLastFrameIndex() + 1;
 }
 
-void Sound::setMono(bool mono)
+int Sound::getTune()
 {
-    oscillatorControls->setMono(mono);
+    return tune;
 }
 
-void Sound::setEnd(int end)
+bool Sound::isLoopEnabled()
 {
-    oscillatorControls->setEnd(end);
+    return loopEnabled;
 }
 
-void Sound::setLevel(int level)
+int Sound::getStart()
 {
-    oscillatorControls->setSndLevel(level);
+    return start;
 }
 
-void Sound::setStart(int start)
+int Sound::getEnd()
 {
-    oscillatorControls->setStart(start);
+    return end;
 }
 
-void Sound::setLoopEnabled(bool loopEnabled)
+std::vector<float>* Sound::getSampleData()
 {
-    oscillatorControls->setLoopEnabled(loopEnabled);
+    return &sampleData;
 }
 
-void Sound::setLoopTo(int loopTo)
+bool Sound::isMono()
 {
-    oscillatorControls->setLoopTo(loopTo);
+    return mono;
 }
 
-void Sound::setTune(int tune)
+int Sound::getLoopTo()
 {
-    oscillatorControls->setTune(tune);
+    return loopTo;
 }
 
-ctoot::mpc::MpcSoundOscillatorControls* Sound::getOscillatorControls()
+int Sound::getSampleRate()
 {
-    return oscillatorControls;
+    return sampleRate;
 }
 
-void Sound::insertFrame(std::vector<float> frame, unsigned int index) {
-	oscillatorControls->insertFrame(frame, index);
+void Sound::setSampleRate(int sr)
+{
+    sampleRate = sr;
 }
 
-Sound::~Sound() {
-	delete oscillatorControls;
+int Sound::getSndLevel()
+{
+    return sndLevel;
+}
+
+void Sound::insertFrame(std::vector<float> frame, unsigned int index)
+{
+    if (index > getFrameCount()) {
+        return;
+    }
+
+    if (!mono) {
+        if (frame.size() < 2) return;
+        const unsigned int rightIndex = index + getFrameCount();
+        sampleData.insert(sampleData.begin() + rightIndex, frame[1]);
+    }
+
+    if (frame.size() < 1) {
+        return;
+    }
+
+    sampleData.insert(sampleData.begin() + index, frame[0]);
+}
+
+void Sound::insertFrames(std::vector<float>& frames, unsigned int index)
+{
+    sampleData.insert(sampleData.begin() + index, frames.begin(), frames.end());
+}
+
+void Sound::insertFrames(std::vector<float>& left, std::vector<float>& right, unsigned int index)
+{
+    sampleData.insert(sampleData.begin() + index + getFrameCount(), right.begin(), right.end());
+    sampleData.insert(sampleData.begin() + index, left.begin(), left.end());
 }

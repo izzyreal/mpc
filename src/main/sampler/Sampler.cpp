@@ -195,7 +195,7 @@ void Sampler::init()
 	}
 
     auto fs = cmrc::mpc::get_filesystem();
-    clickSound = std::make_shared<Sound>();
+    clickSound = std::make_shared<Sound>(44100);
     clickSound->setMono(true);
     clickSound->setLevel(100);
 

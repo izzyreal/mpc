@@ -105,8 +105,7 @@ void SoundRecorder::stop()
 
 		auto sampleScreen = mpc.screens->get<SampleScreen>("sample");
 		auto preRecFrames = (int)(44.1 * sampleScreen->preRec);
-
-		auto frameCount = s->getOscillatorControls()->getFrameCount();
+		auto frameCount = s->getFrameCount();
 
 		auto overflow = frameCount - lengthInFrames - preRecFrames; // Would be fun to check if overflow is ever not 0.
 
@@ -118,8 +117,7 @@ void SoundRecorder::stop()
 				s->getSampleData()->erase(s->getSampleData()->begin() + lengthInFrames + preRecFrames, s->getSampleData()->end());
 		}
 
-		s->setStart(preRecFrames);
-		s->setEnd(s->getOscillatorControls()->getFrameCount());
+		s->setEnd(s->getFrameCount());
 
 		mpc.getLayeredScreen()->openScreen("keep-or-retry");
 	}
@@ -203,8 +201,7 @@ int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf, int nFrame
 	if (recording)
 	{
 		auto s = sound.lock();
-		auto osc = s->getOscillatorControls();
-		auto currentLength = s->getOscillatorControls()->getFrameCount();
+		auto currentLength = s->getFrameCount();
 		auto resample = buf->getSampleRate() != 44100;
 
 		if (resample)
@@ -246,24 +243,24 @@ int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf, int nFrame
 				auto resampledRight = resampleChannel(false, preRight, buf->getSampleRate());
 
 				if (mode == 0) {
-					osc->insertFrames(resampledLeft, 0);
+					s->insertFrames(resampledLeft, 0);
 				}
 				else if (mode == 1) {
-					osc->insertFrames(resampledRight, 0);
+					s->insertFrames(resampledRight, 0);
 				}
 				else if (mode == 2) {
-					osc->insertFrames(resampledLeft, resampledRight, 0);
+					s->insertFrames(resampledLeft, resampledRight, 0);
 				}
 			}
 			else {
 				if (mode == 0) {
-					osc->insertFrames(preLeft, 0);
+					s->insertFrames(preLeft, 0);
 				}
 				else if (mode == 1) {
-					osc->insertFrames(preRight, 0);
+					s->insertFrames(preRight, 0);
 				}
 				else if (mode == 2) {
-					osc->insertFrames(preLeft, preRight, 0);
+					s->insertFrames(preLeft, preRight, 0);
 				}
 			}
 			
@@ -286,13 +283,13 @@ int SoundRecorder::processAudio(ctoot::audio::core::AudioBuffer* buf, int nFrame
 		}
 
 		if (mode == 0)
-			osc->insertFrames(left, currentLength);
+			s->insertFrames(left, currentLength);
 		else if (mode == 1)
-			osc->insertFrames(right, currentLength);
+			s->insertFrames(right, currentLength);
 		else if (mode == 2)
-			osc->insertFrames(left, right, currentLength);
+			s->insertFrames(left, right, currentLength);
 
-		if (osc->getFrameCount() >= lengthInFrames) {
+		if (s->getFrameCount() >= lengthInFrames) {
 			recording = false;
 		}
 
