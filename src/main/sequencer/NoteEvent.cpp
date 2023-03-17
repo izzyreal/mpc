@@ -3,7 +3,7 @@
 
 
 using namespace mpc::sequencer;
-using namespace ctoot::midi::core;
+using namespace mpc::engine::midi;
 
 NoteEvent::NoteEvent()
 	: NoteEvent(60)
@@ -125,7 +125,7 @@ void NoteEvent::CopyValuesTo(std::weak_ptr<Event> dest)
 
 std::shared_ptr<ShortMessage> NoteEvent::createShortMessage(int channel, int transpose)
 {
-    auto msg = std::make_shared<ctoot::midi::core::ShortMessage>();
+    auto msg = std::make_shared<mpc::engine::midi::ShortMessage>();
     msg->setMessage(getVelocity() == 0 ? ShortMessage::NOTE_OFF : ShortMessage::NOTE_ON, channel, std::clamp(getNote()+transpose,0,127), getVelocity());
     return msg;
 }

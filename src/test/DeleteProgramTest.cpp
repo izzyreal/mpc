@@ -12,15 +12,15 @@ TEST_CASE("Delete program", "[program]")
     sampler->createNewProgramAddFirstAvailableSlot();
     sampler->createNewProgramAddFirstAvailableSlot();
     sampler->createNewProgramAddFirstAvailableSlot();
-    mpc.getDrum(0)->setProgram(0);
-    mpc.getDrum(1)->setProgram(1);
-    mpc.getDrum(2)->setProgram(2);
-    mpc.getDrum(3)->setProgram(3);
+    mpc.getDrum(0).setProgram(0);
+    mpc.getDrum(1).setProgram(1);
+    mpc.getDrum(2).setProgram(2);
+    mpc.getDrum(3).setProgram(3);
 
     sampler->deleteProgram(sampler->getProgram(2));
-    REQUIRE(mpc.getDrum(2)->getProgram() == 1);
+    REQUIRE(mpc.getDrum(2).getProgram() == 1);
 
     sampler->deleteProgram(sampler->getProgram(0));
-    REQUIRE(mpc.getDrum(0)->getProgram() == 1);
+    REQUIRE(mpc.getDrum(0).getProgram() == 1);
 
 }
