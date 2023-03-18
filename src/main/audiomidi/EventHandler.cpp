@@ -43,8 +43,6 @@ void EventHandler::handle(const std::shared_ptr<Event>& event, Track* track, cha
     if (!track->isOn() && event->getTick() != -1)
         return;
     
-    auto ne = std::dynamic_pointer_cast<NoteEvent>(event);
-    
     handleNoThru(event, track, -1, drum);
     midiOut(event, track);
 }
@@ -188,6 +186,61 @@ void EventHandler::handleNoThru(const std::shared_ptr<Event>& event, Track* trac
 
 void EventHandler::midiOut(const std::shared_ptr<Event>& e, Track* track)
 {
+    auto noteEvent = std::dynamic_pointer_cast<NoteEvent>(e);
+
+    if (!noteEvent)
+    {
+        int transposeAmount = 0;
+
+        int deviceNumber = track->getDeviceIndex() - 1; if (deviceNumber < 0) return;
+        int channel = deviceNumber % 16;
+
+        auto directToDiskRecorderScreen = mpc.screens->get<VmpcDirectToDiskRecorderScreen>("vmpc-direct-to-disk-recorder");
+        
+        std::shared_ptr<mpc::engine::midi::ShortMessage> msg;
+
+        if (track->getIndex() < 64)
+        {
+            if (auto noteOnEvent = std::dynamic_pointer_cast<NoteOnEvent>(e))
+            {
+                auto transScreen = mpc.screens->get<TransScreen>("trans");
+                if (transScreen->transposeAmount != 0 && (transScreen->tr == -1 || transScreen->tr == noteOnEvent->getTrack()))
+                {
+                    transposeAmount = transScreen->transposeAmount;
+                    transposeCache[{ noteOnEvent->getNote(), track->getIndex() }] = transposeAmount;
+                }
+                msg = noteOnEvent->createShortMessage(channel, transposeAmount);
+            }
+            else if (auto noteOffEvent = std::dynamic_pointer_cast<NoteOffEvent>(e))
+            {
+                auto candidate = transposeCache.find({ noteOffEvent->getNote(), track->getIndex() });
+                if (candidate != end(transposeCache))
+                {
+                    transposeAmount = candidate->second;
+                    transposeCache.erase(candidate);
+                }
+                msg = noteOffEvent->createShortMessage(channel, transposeAmount);
+            }
+        }
+
+        if (!(mpc.getAudioMidiServices()->isBouncing() && directToDiskRecorderScreen->offline) && track->getDeviceIndex() != 0)
+        {
+            msg->bufferPos = mpc.getAudioMidiServices()->getFrameSequencer()->getEventFrameOffset();
+
+            if (deviceNumber < 16)
+            {
+                mpc.getMidiOutput()->enqueueMessageOutputA(msg);
+            }
+            else
+            {
+                mpc.getMidiOutput()->enqueueMessageOutputA(msg);
+            }
+        }
+        notifyObservers(deviceNumber < 16 ? "a" : "b" + std::to_string(channel));
+        return;
+    }
+    
+//-----------------
     auto noteEvent = std::dynamic_pointer_cast<NoteEvent>(e);
     
     if (noteEvent)

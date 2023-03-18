@@ -16,6 +16,7 @@ namespace mpc::sequencer
         int getNote();
 
         std::string getTypeName() override { return "note-off"; }
+        std::shared_ptr<mpc::engine::midi::ShortMessage> createShortMessage(int channel, int transpose = 0);
     };
 
 
@@ -51,6 +52,7 @@ namespace mpc::sequencer
         NoteOnEvent(int i = 60);
 
         std::string getTypeName() override { return "note-on"; }
+        std::shared_ptr<mpc::engine::midi::ShortMessage> createShortMessage(int channel, int transpose = 0);
 
     };
 

@@ -97,14 +97,24 @@ void GlobalReleaseControls::simplePad(int padIndexWithBank)
 
 	auto controls = mpc.getControls();
 
-  if (sequencer->isRecordingOrOverdubbing() && mpc.getControls()->isErasePressed())
-  {
-    return;
-  }
+	if (sequencer->isRecordingOrOverdubbing() && mpc.getControls()->isErasePressed())
+	{
+	return;
+	}
 
 	auto note = track->getBus() > 0 ? program->getPad(padIndexWithBank)->getNote() : padIndexWithBank + 35;
 
-	generateNoteOff(note);
+	if (controls->temp_offs.find(padIndexWithBank) != controls->temp_offs.end())
+	{
+		std::shared_ptr<mpc::sequencer::NoteOffEvent> off_event = controls->temp_offs[padIndexWithBank];
+		controls->temp_offs.erase(padIndexWithBank);
+		handleNoteOff(off_event);
+	}
+	else
+	{
+		generateNoteOff(note);
+	}
+	
 	bool posIsLastTick = sequencer->getTickPosition() == sequencer->getActiveSequence()->getLastTick();
 
 	bool maybeRecWithoutPlaying = currentScreenName == "sequencer" && !posIsLastTick;
@@ -185,6 +195,23 @@ void GlobalReleaseControls::generateNoteOff(int note)
     }
 
     mpc.getEventHandler()->handle(noteEvent, track.get(), drum);
+}
+
+void mpc::controls::GlobalReleaseControls::handleNoteOff(std::shared_ptr<mpc::sequencer::NoteOffEvent> off_event)
+{
+	init();
+
+	off_event->setTick(-1);
+
+	char drum = -1;
+	auto drumScreen = mpc.screens->get<DrumScreen>("drum");
+
+	if (collectionContainsCurrentScreen(samplerScreens))
+	{
+		drum = drumScreen->drum;
+	}
+
+	mpc.getEventHandler()->handle(off_event, track.get(), drum);
 }
 
 void GlobalReleaseControls::overDub()

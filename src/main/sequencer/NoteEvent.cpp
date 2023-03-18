@@ -14,12 +14,24 @@ int mpc::sequencer::NoteOffEvent::getNote()
 {
     return number;
 }
+std::shared_ptr<mpc::engine::midi::ShortMessage> mpc::sequencer::NoteOffEvent::createShortMessage(int channel, int transpose)
+{
+    auto msg = std::make_shared<ShortMessage>();
+    msg->setMessage(ShortMessage::NOTE_OFF, channel, std::clamp(getNote() + transpose, 0, 127), 0);
+    return msg;
+}
 //-------------
 mpc::sequencer::NoteOnEvent::NoteOnEvent(int i)
 {
     noteOff = std::shared_ptr<NoteOffEvent>(new NoteOffEvent());
     setNote(i);
-    
+}
+
+std::shared_ptr<mpc::engine::midi::ShortMessage> mpc::sequencer::NoteOnEvent::createShortMessage(int channel, int transpose)
+{
+    auto msg = std::make_shared<ShortMessage>();
+    msg->setMessage(ShortMessage::NOTE_ON, channel, std::clamp(getNote() + transpose, 0, 127), getVelocity());
+    return msg;
 }
 
 std::shared_ptr<NoteOffEvent> mpc::sequencer::NoteOnEvent::getNoteOff()

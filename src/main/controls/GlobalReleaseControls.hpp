@@ -2,6 +2,7 @@
 
 #include <string>
 #include <memory>
+#include "sequencer/NoteEvent.hpp"
 
 #include "BaseControls.hpp"
 
@@ -25,6 +26,7 @@ namespace mpc {
 
 		private:
 			void generateNoteOff(int note);
+			void handleNoteOff(std::shared_ptr<mpc::sequencer::NoteOffEvent> off_event);
 
 		public:
 			void overDub() override;

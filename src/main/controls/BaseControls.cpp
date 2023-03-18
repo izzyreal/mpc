@@ -370,8 +370,11 @@ void BaseControls::generateNoteOn(int note, int padVelo, int padIndexWithBank)
     {
         drum = drumScreen->drum;
     }
-    mpc::controls::temp_offs[padIndexWithBank] = playableEvent->getNoteOff();
+    
     mpc.getEventHandler()->handle(playableEvent, track.get(), drum);
+    
+    mpc.getControls()->temp_offs[padIndexWithBank] = playableEvent->getNoteOff();
+    
 }
 
 bool BaseControls::isTypable()
