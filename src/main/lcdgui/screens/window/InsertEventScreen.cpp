@@ -21,6 +21,7 @@ InsertEventScreen::InsertEventScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void InsertEventScreen::open()
 {
+    eventAddedBeforeLeavingTheScreen = false;
 	displayInsertEventType();
 }
 
@@ -36,11 +37,10 @@ void InsertEventScreen::function(int i)
 	switch (i)
 	{
 	case 4:
-	{
 		insertEvent();
+        eventAddedBeforeLeavingTheScreen = true;
 		openScreen("step-editor");
 		break;
-	}
 	}
 }
 
@@ -125,4 +125,9 @@ void InsertEventScreen::setInsertEventType(int i)
 	}
 	insertEventType = i;
 	displayInsertEventType();
+}
+
+bool InsertEventScreen::isEventAddedBeforeLeavingTheScreen()
+{
+    return eventAddedBeforeLeavingTheScreen;
 }

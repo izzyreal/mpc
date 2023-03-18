@@ -1,5 +1,6 @@
 #include "StepEditorScreen.hpp"
 #include "sequencer/MidiAdapter.hpp"
+#include "lcdgui/screens/window/InsertEventScreen.hpp"
 
 #include <audiomidi/AudioMidiServices.hpp>
 
@@ -99,20 +100,43 @@ void StepEditorScreen::open()
 	findField("now1")->setTextPadded(sequencer->getCurrentBeatIndex() + 1, "0");
 	findField("now2")->setTextPadded(sequencer->getCurrentClockNumber(), "0");
 
-	initVisibleEvents();
-
-	refreshEventRows();
-	refreshSelection();
+    initVisibleEvents();
 
 	auto previousScreen = ls->getPreviousScreenName();
 
-	if (previousScreen != "step-timing-correct" &&
-		previousScreen != "insert-event" &&
-		previousScreen != "paste-event")
-	{
-		auto eventType = visibleEvents[0]->getTypeName();
-		ls->setFocus(lastColumn[eventType] + "0");
-	}
+    if (previousScreen == "insert-event")
+    {
+        auto insertEventScreen = mpc.screens->get<InsertEventScreen>("insert-event");
+
+        if (insertEventScreen->isEventAddedBeforeLeavingTheScreen())
+        {
+            auto eventCount = eventsAtCurrentTick.size() - 1;
+            auto event = eventsAtCurrentTick[eventCount -1];
+            auto eventType = event->getTypeName();
+
+            if (eventCount > 4)
+            {
+                ls->setFocus(lastColumn[eventType] + "3");
+                setyOffset(eventCount - 4);
+            }
+            else
+            {
+                auto row = eventCount - 1;
+                ls->setFocus(lastColumn[eventType] + std::to_string(row));
+            }
+        }
+    }
+
+    if (previousScreen != "step-timing-correct" &&
+        previousScreen != "insert-event" &&
+        previousScreen != "paste-event")
+    {
+        auto eventType = visibleEvents[0]->getTypeName();
+        ls->setFocus(lastColumn[eventType] + "0");
+    }
+
+    refreshEventRows();
+    refreshSelection();
 }
 
 void StepEditorScreen::close()
@@ -123,7 +147,7 @@ void StepEditorScreen::close()
 
 	if (param.length() == 2)
 	{
-		int srcNumber = stoi(param.substr(1, 2));
+		int srcNumber = stoi(param.substr(1, 1));
 		auto srcLetter = param.substr(0, 1);
 		auto eventType = visibleEvents[srcNumber]->getTypeName();
 		lastColumn[eventType] = srcLetter;
@@ -183,9 +207,12 @@ void StepEditorScreen::function(int i)
 		if (param.length() != 2)
 			return;
 
-		auto rowIndex = stoi(param.substr(1, 2));
+		auto rowIndex = stoi(param.substr(1, 1));
+        auto srcLetter = param.substr(0, 1);
+        auto eventType = visibleEvents[rowIndex]->getTypeName();
+        lastColumn[eventType] = srcLetter;
 
-		if (selectionStartIndex != -1)
+        if (selectionStartIndex != -1)
 		{
 			removeEvents();
 			ls->setFocus("a0");
@@ -211,7 +238,7 @@ void StepEditorScreen::function(int i)
 		refreshEventRows();
 		refreshSelection();
 
-		auto eventType = visibleEvents[rowIndex]->getTypeName();
+		eventType = visibleEvents[rowIndex]->getTypeName();
 
 		ls->setFocus(lastColumn[eventType] + std::to_string(rowIndex));
 		break;
@@ -227,7 +254,7 @@ void StepEditorScreen::function(int i)
 		}
 		else
 		{
-			auto row = stoi(param.substr(1, 2));
+			auto row = stoi(param.substr(1, 1));
 
 			auto event = visibleEvents[row];
 
@@ -326,7 +353,7 @@ void StepEditorScreen::function(int i)
 		{
 			if (param.length() == 2)
 			{
-				auto eventNumber = stoi(param.substr(1, 2));
+				auto eventNumber = stoi(param.substr(1, 1));
 				auto event = visibleEvents[eventNumber];
 				auto noteEvent = std::dynamic_pointer_cast<NoteEvent>(event);
 
@@ -385,7 +412,7 @@ void StepEditorScreen::turnWheel(int i)
 	}
 	else if (param.length() == 2)
 	{
-		auto eventNumber = stoi(param.substr(1, 2));
+		auto eventNumber = stoi(param.substr(1, 1));
 
 		auto sysEx = std::dynamic_pointer_cast<SystemExclusiveEvent>(visibleEvents[eventNumber]);
 		auto channelPressure = std::dynamic_pointer_cast<ChannelPressureEvent>(visibleEvents[eventNumber]);
@@ -578,7 +605,7 @@ void StepEditorScreen::left()
 
 	if (param.length() == 2 && param.substr(0, 1) == "a")
 	{
-		lastRow = stoi(param.substr(1, 2));
+		lastRow = stoi(param.substr(1, 1));
 		ls->setFocus("view");
 	}
 	else
@@ -605,7 +632,7 @@ void StepEditorScreen::up()
 	{
 		auto src = param;
 		auto srcLetter = src.substr(0, 1);
-		int srcNumber = stoi(src.substr(1, 2));
+		int srcNumber = stoi(src.substr(1, 1));
 		auto controls = mpc.getControls();
 
 		if (controls->isShiftPressed() && selectionStartIndex == -1 && std::dynamic_pointer_cast<EmptyEvent>(visibleEvents[srcNumber]))
@@ -662,7 +689,7 @@ void StepEditorScreen::down()
 	{
 		auto src = param;
 		auto srcLetter = src.substr(0, 1);
-		int srcNumber = stoi(src.substr(1, 2));
+		int srcNumber = stoi(src.substr(1, 1));
 		auto controls = mpc.getControls();
 
 		if (srcNumber == 3)
@@ -700,7 +727,7 @@ void StepEditorScreen::shift()
 
 	if (param.length() == 2)
 	{
-		auto eventNumber = stoi(param.substr(1, 2));
+		auto eventNumber = stoi(param.substr(1, 1));
 		setSelectionStartIndex(eventNumber + yOffset);
 	}
 }
@@ -711,7 +738,7 @@ void StepEditorScreen::downOrUp(int increment)
 	{
 		auto src = param;
 		auto srcLetter = src.substr(0, 1);
-		int srcNumber = stoi(src.substr(1, 2));
+		int srcNumber = stoi(src.substr(1, 1));
 		auto controls = mpc.getControls();
 
 		if (srcNumber + increment != -1)
@@ -1145,7 +1172,7 @@ void StepEditorScreen::checkSelection()
 		return;
 	}
 
-	int row = stoi(focus.substr(1, 2));
+	int row = stoi(focus.substr(1, 1));
 	int eventIndex = row + yOffset;
 
 	if (eventIndex < selectionStartIndex || eventIndex > selectionEndIndex)
@@ -1229,7 +1256,7 @@ void StepEditorScreen::update(moduru::observer::Observable*, nonstd::any message
 		try
 		{
 			init();
-			eventNumber = stoi(param.substr(1, 2));
+			eventNumber = stoi(param.substr(1, 1));
 		}
 		catch (const std::invalid_argument& e)
 		{

@@ -990,17 +990,17 @@ bool Track::insertEventWhileRetainingSort(const std::shared_ptr<Event>& event, b
 
     if (insertRequired)
     {
-        auto insertAt = std::find_if(events.begin(),
-                                     events.end(),
+        auto insertAt = std::find_if(events.rbegin(),
+                                     events.rend(),
                                      [&tick](const std::shared_ptr<Event>& e) { return e->getTick() >= tick; });
 
-        if (insertAt == events.end())
+        if (insertAt == events.rend())
         {
             events.emplace_back(event);
         }
         else
         {
-            events.emplace(insertAt, event);
+            events.emplace(insertAt.base(), event);
         }
     }
     else

@@ -13,8 +13,10 @@ namespace mpc::lcdgui::screens::window {
 
 		InsertEventScreen(mpc::Mpc& mpc, const int layerIndex);
 		void open() override;
+        bool isEventAddedBeforeLeavingTheScreen();
 
 	private:
+        bool eventAddedBeforeLeavingTheScreen = false;
 		std::vector<std::string> eventTypeNames = { "NOTE", "PITCH BEND", "CONTROL CHANGE", "PROGRAM CHANGE", "CH PRESSURE", "POLY PRESSURE", "EXCLUSIVE", "MIXER" };
 		int insertEventType = 0;
 		void setInsertEventType(int i);
