@@ -247,44 +247,88 @@ std::shared_ptr<Event> Track::addEvent(int tick, const std::string& type, bool a
 	return res;
 }
 
-void Track::cloneEventIntoTrack(std::shared_ptr<Event>& src, int tick, bool allowMultipleNotesOnSameTick)
+void Track::cloneEventIntoTrack(std::shared_ptr<Event> &src, int tick, bool allowMultipleNotesOnSameTick)
 {
-	auto seq = sequencer->getActiveSequence().get();
+    auto seq = sequencer->getActiveSequence().get();
 
     std::shared_ptr<Event> res;
-	auto tce = std::dynamic_pointer_cast<TempoChangeEvent>(src);
-	auto mce = std::dynamic_pointer_cast<MidiClockEvent>(src);
-	auto ne = std::dynamic_pointer_cast<NoteEvent>(src);
-	auto me = std::dynamic_pointer_cast<MixerEvent>(src);
 
-	if (ne)
-	{
-		res = std::make_shared<NoteEvent>();
-		ne->CopyValuesTo(res);
-	}
-	else if (tce)
-	{
-		res = std::make_shared<TempoChangeEvent>(seq);
-		tce->CopyValuesTo(res);
-	}
-	else if (mce)
-	{
-		res = std::make_shared<MidiClockEvent>(0);
-		mce->CopyValuesTo(res);
-	}
-	else if (me)
-	{
-		res = std::make_shared<MixerEvent>();
-		me->CopyValuesTo(res);
-	}
+    auto cpe = std::dynamic_pointer_cast<ChannelPressureEvent>(src);
+    auto cce = std::dynamic_pointer_cast<ControlChangeEvent>(src);
+    auto ppe = std::dynamic_pointer_cast<PolyPressureEvent>(src);
+    auto pce = std::dynamic_pointer_cast<ProgramChangeEvent>(src);
+    auto see = std::dynamic_pointer_cast<SystemExclusiveEvent>(src);
+    auto tce = std::dynamic_pointer_cast<TempoChangeEvent>(src);
+    auto mce = std::dynamic_pointer_cast<MidiClockEvent>(src);
+    auto ne = std::dynamic_pointer_cast<NoteEvent>(src);
+    auto me = std::dynamic_pointer_cast<MixerEvent>(src);
+    auto pbe = std::dynamic_pointer_cast<PitchBendEvent>(src);
 
-	if (!used)
-		setUsed(true);
+    if (ne)
+    {
+        res = std::make_shared<NoteEvent>();
+        ne->CopyValuesTo(res);
+    }
+    else if (tce)
+    {
+        res = std::make_shared<TempoChangeEvent>(seq);
+        tce->CopyValuesTo(res);
+    }
+    else if (mce)
+    {
+        res = std::make_shared<MidiClockEvent>(0);
+        mce->CopyValuesTo(res);
+    }
+    else if (me)
+    {
+        res = std::make_shared<MixerEvent>();
+        me->CopyValuesTo(res);
+    }
+    else if (pbe)
+    {
+        res = std::make_shared<PitchBendEvent>();
+        pbe->CopyValuesTo(res);
+    }
+    else if (cpe)
+    {
+        res = std::make_shared<ChannelPressureEvent>();
+        cpe->CopyValuesTo(res);
+    }
+    else if (cce)
+    {
+        res = std::make_shared<ControlChangeEvent>();
+        cce->CopyValuesTo(res);
+    }
+    else if (ppe)
+    {
+        res = std::make_shared<PolyPressureEvent>();
+        ppe->CopyValuesTo(res);
+    }
+    else if (pce)
+    {
+        res = std::make_shared<ProgramChangeEvent>();
+        pce->CopyValuesTo(res);
+    }
+    else if (see)
+    {
+        res = std::make_shared<SystemExclusiveEvent>();
+        see->CopyValuesTo(res);
+    }
+
+    if (!res)
+    {
+        return;
+    }
+
+    if (!used)
+    {
+        setUsed(true);
+    }
 
     res->setTick(tick);
 
     insertEventWhileRetainingSort(res, allowMultipleNotesOnSameTick);
-	notifyObservers(std::string("step-editor"));
+    notifyObservers(std::string("step-editor"));
 }
 
 void Track::removeEvent(int i)
@@ -579,7 +623,7 @@ void Track::playNext()
                 break;
               }
             }
-          
+
             if (!_delete && oneOrMorePadsArePressed && hardware->getTopPanel()->isSixteenLevelsEnabled())
             {
                 auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
