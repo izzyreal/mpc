@@ -9,7 +9,6 @@ using namespace mpc::engine::control;
 FaderControl::FaderControl()
 	: LawControl(mpc::engine::audio::mixer::MixControlIds::GAIN, "Level", MPC_FADER_LAW(), 0.1, 100)
 {
-	gain = 1.0f;
 }
 
 std::shared_ptr<ControlLaw> FaderControl::MPC_FADER_LAW() {

@@ -13,7 +13,7 @@ namespace mpc::engine {
         static std::shared_ptr<mpc::engine::control::ControlLaw> MPC_FADER_LAW();
 
     protected:
-        float gain{0};
+        float gain = 0.0f;
 
     public:
         float getGain();
