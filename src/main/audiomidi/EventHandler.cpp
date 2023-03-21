@@ -8,7 +8,6 @@
 #include <sequencer/FrameSeq.hpp>
 #include <sequencer/MixerEvent.hpp>
 #include <sequencer/Track.hpp>
-#include <sequencer/NoteEvent.hpp>
 #include <sequencer/TempoChangeEvent.hpp>
 #include <sequencer/SeqUtil.hpp>
 
@@ -57,10 +56,92 @@ void EventHandler::handleNoThru(const std::shared_ptr<Event>& event, Track* trac
     auto tempoChangeEvent = std::dynamic_pointer_cast<TempoChangeEvent>(event);
     auto noteEvent = std::dynamic_pointer_cast<NoteEvent>(event);
     auto mixerEvent = std::dynamic_pointer_cast<MixerEvent>(event);
+
+    auto noteOnEvent = std::dynamic_pointer_cast<NoteOnEvent>(event);
+    auto noteOffEvent = std::dynamic_pointer_cast<NoteOffEvent>(event);
     
     if (tempoChangeEvent && tempoChangeEvent->getTempo() != sequencer->getTempo())
     {
         sequencer->setTempo(tempoChangeEvent->getTempo());
+    }
+    else if (noteOnEvent || noteOffEvent)
+    {
+        auto drumIndex = drum == -1 ? track->getBus() - 1 : drum;
+
+        if (drumIndex >= 0 && (noteOffEvent || noteOnEvent->isFinalized()))
+        {
+            auto isSolo = sequencer->isSoloEnabled();
+            auto eventTrackIsSoloTrack = track->getIndex() == sequencer->getActiveTrackIndex();
+
+            auto audioServer = mpc.getAudioMidiServices()->getAudioServer();
+            auto frameSeq = mpc.getAudioMidiServices()->getFrameSequencer();
+
+            auto eventFrame = timeStamp != -1 ? timeStamp : frameSeq->getEventFrameOffset();
+
+            if (noteOffEvent)
+            {
+                if (noteOffEvent->isDrumNote())
+                    mpc.getDrum(drumIndex).mpcNoteOff(noteOffEvent->getNote(), eventFrame, noteOffEvent->getTick());
+            }
+                
+            else if (noteOnEvent->isDrumNote() && !isSolo || eventTrackIsSoloTrack)
+            {
+                auto newVelo = static_cast<int>(noteOnEvent->getVelocity() * (track->getVelocityRatio() * 0.01));
+                // Each of the 4 DRUMs is routed to their respective 0-based MIDI channel.
+                // This MIDI channel is part of a MIDI system that is internal to VMPC2000XL's sound player engine.
+                //auto msg = noteEvent->createShortMessage(drumIndex);
+                    
+
+                //auto isDrumNote = noteEvent->getNote() >= 35 && noteEvent->getNote() <= 98;
+
+                auto pgmIndex = sampler->getDrumBusProgramIndex(drumIndex + 1);
+                auto pgm = sampler->getProgram(pgmIndex);
+                auto voiceOverlap = pgm->getNoteParameters(noteOnEvent->getNote())->getVoiceOverlap();
+                auto duration = voiceOverlap == 2 ? noteOnEvent->getDuration() : -1;
+                auto durationFrames = (duration == -1 || duration == 0) ?
+                                        -1 : SeqUtil::ticksToFrames(duration, sequencer->getTempo(), audioServer->getSampleRate());
+
+                mpc.getDrum(drumIndex).mpcNoteOn(
+                    noteOnEvent->getNote(),
+                    noteOnEvent->getVelocity(),
+                    noteOnEvent->getVariationType(),
+                    noteOnEvent->getVariationValue(),
+                    eventFrame,
+                    true,
+                    noteOnEvent->getTick(),
+                    durationFrames
+                );
+            }
+
+            if (audioServer->isRealTime())
+            {
+                auto note = noteOnEvent ? noteOnEvent->getNote() : noteOffEvent->getNote();
+                auto program = mpc.getSampler()->getProgram(mpc.getDrum(drumIndex).getProgram());
+
+                int pad = program->getPadIndexFromNote(note);
+                int bank = mpc.getBank();
+
+                pad -= pad == -1 ? 0 : mpc.getBank() * 16;
+
+                if (pad >= 0 && pad <= 15)
+                {
+                    int notifyVelo = noteOnEvent ? noteOnEvent->getVelocity() : 255;
+                    mpc.getHardware()->getPad(pad)->notifyObservers(notifyVelo);
+                }
+
+                if (noteOnEvent && noteOnEvent->getDuration() > 0)
+                {
+                    unsigned long nFrames = SeqUtil::ticksToFrames(noteOnEvent->getDuration(), sequencer->getTempo(), audioServer->getSampleRate());
+                    frameSeq->enqueueEventAfterNFrames([this, pad, noteOnEvent, track](int /*bufOffset*/) {
+                        if (pad >= 0 && pad <= 15)
+                        {
+                            mpc.getHardware()->getPad(pad)->notifyObservers(255);
+                        }
+                        midiOut(noteOnEvent->getNoteOff(), track);
+                    }, static_cast<unsigned long>(nFrames));
+                }
+            }
+        }
     }
     else if (noteEvent)
     {
@@ -79,12 +160,12 @@ void EventHandler::handleNoThru(const std::shared_ptr<Event>& event, Track* trac
                     // Each of the 4 DRUMs is routed to their respective 0-based MIDI channel.
                     // This MIDI channel is part of a MIDI system that is internal to VMPC2000XL's sound player engine.
                     auto msg = noteEvent->createShortMessage(drumIndex);
-                    
+
                     auto audioServer = mpc.getAudioMidiServices()->getAudioServer();
                     auto frameSeq = mpc.getAudioMidiServices()->getFrameSequencer();
-                    auto isDrumNote = noteEvent->getNote() >= 35 && noteEvent->getNote() <= 98;
+                    //auto isDrumNote = noteEvent->getNote() >= 35 && noteEvent->getNote() <= 98;
 
-                    if (isDrumNote)
+                    if (noteEvent->isDrumNote())
                     {
                         auto eventFrame = frameSeq->getEventFrameOffset();
 
@@ -96,20 +177,20 @@ void EventHandler::handleNoThru(const std::shared_ptr<Event>& event, Track* trac
                         auto voiceOverlap = pgm->getNoteParameters(noteEvent->getNote())->getVoiceOverlap();
                         auto duration = voiceOverlap == 2 ? noteEvent->getDuration() : -1;
                         auto durationFrames = (duration == -1 || duration == 0) ?
-                                              -1 : SeqUtil::ticksToFrames(duration, sequencer->getTempo(), audioServer->getSampleRate());
+                            -1 : SeqUtil::ticksToFrames(duration, sequencer->getTempo(), audioServer->getSampleRate());
 
                         if (noteEvent->getVelocity() > 0)
                         {
                             mpc.getDrum(drumIndex).mpcNoteOn(
-                                    noteEvent->getNote(),
-                                    noteEvent->getVelocity(),
-                                    noteEvent->getVariationType(),
-                                    noteEvent->getVariationValue(),
-                                    eventFrame,
-                                    true,
-                                    noteEvent->getTick(),
-                                    durationFrames
-                                    );
+                                noteEvent->getNote(),
+                                noteEvent->getVelocity(),
+                                noteEvent->getVariationType(),
+                                noteEvent->getVariationValue(),
+                                eventFrame,
+                                true,
+                                noteEvent->getTick(),
+                                durationFrames
+                            );
                         }
                         else
                         {
@@ -146,7 +227,7 @@ void EventHandler::handleNoThru(const std::shared_ptr<Event>& event, Track* trac
                                     mpc.getHardware()->getPad(pad)->notifyObservers(255);
                                 }
                                 midiOut(noteEvent->getNoteOff(), track);
-                            }, static_cast<unsigned long>(nFrames));
+                                }, static_cast<unsigned long>(nFrames));
                         }
                     }
                 }
@@ -199,28 +280,25 @@ void EventHandler::midiOut(const std::shared_ptr<Event>& e, Track* track)
         
         std::shared_ptr<mpc::engine::midi::ShortMessage> msg;
 
-        if (track->getIndex() < 64)
+        if (auto noteOnEvent = std::dynamic_pointer_cast<NoteOnEvent>(e))
         {
-            if (auto noteOnEvent = std::dynamic_pointer_cast<NoteOnEvent>(e))
+            auto transScreen = mpc.screens->get<TransScreen>("trans");
+            if (transScreen->transposeAmount != 0 && track->getIndex() < 64 && (transScreen->tr == -1 || transScreen->tr == noteOnEvent->getTrack()))
             {
-                auto transScreen = mpc.screens->get<TransScreen>("trans");
-                if (transScreen->transposeAmount != 0 && (transScreen->tr == -1 || transScreen->tr == noteOnEvent->getTrack()))
-                {
-                    transposeAmount = transScreen->transposeAmount;
-                    transposeCache[{ noteOnEvent->getNote(), track->getIndex() }] = transposeAmount;
-                }
-                msg = noteOnEvent->createShortMessage(channel, transposeAmount);
+                transposeAmount = transScreen->transposeAmount;
+                transposeCache2[noteOnEvent->getNoteOff()] = transposeAmount;
             }
-            else if (auto noteOffEvent = std::dynamic_pointer_cast<NoteOffEvent>(e))
+            msg = noteOnEvent->createShortMessage(channel, transposeAmount);
+        }
+        else if (auto noteOffEvent = std::dynamic_pointer_cast<NoteOffEvent>(e))
+        {
+            auto candidate = transposeCache2.find(noteOffEvent);
+            if (candidate != end(transposeCache2) && track->getIndex() < 64)
             {
-                auto candidate = transposeCache.find({ noteOffEvent->getNote(), track->getIndex() });
-                if (candidate != end(transposeCache))
-                {
-                    transposeAmount = candidate->second;
-                    transposeCache.erase(candidate);
-                }
-                msg = noteOffEvent->createShortMessage(channel, transposeAmount);
+                transposeAmount = candidate->second;
+                transposeCache2.erase(candidate);
             }
+            msg = noteOffEvent->createShortMessage(channel, transposeAmount);
         }
 
         if (!(mpc.getAudioMidiServices()->isBouncing() && directToDiskRecorderScreen->offline) && track->getDeviceIndex() != 0)
@@ -239,10 +317,8 @@ void EventHandler::midiOut(const std::shared_ptr<Event>& e, Track* track)
         notifyObservers(deviceNumber < 16 ? "a" : "b" + std::to_string(channel));
         return;
     }
-    
 //-----------------
-    auto noteEvent = std::dynamic_pointer_cast<NoteEvent>(e);
-    
+
     if (noteEvent)
     {
         int transposeAmount = 0;

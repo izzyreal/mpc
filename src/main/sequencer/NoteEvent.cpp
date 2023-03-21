@@ -14,6 +14,10 @@ int mpc::sequencer::NoteOffEvent::getNote()
 {
     return number;
 }
+bool mpc::sequencer::NoteOffEvent::isDrumNote()
+{
+    return number >= 35 && number <= 98;
+}
 std::shared_ptr<mpc::engine::midi::ShortMessage> mpc::sequencer::NoteOffEvent::createShortMessage(int channel, int transpose)
 {
     auto msg = std::make_shared<ShortMessage>();
@@ -99,6 +103,16 @@ void mpc::sequencer::NoteOnEvent::setVelocity(int i)
 int mpc::sequencer::NoteOnEvent::getVelocity()
 {
     return velocity;
+}
+
+bool mpc::sequencer::NoteOnEvent::isDrumNote()
+{
+    return number >= 35 && number <= 98;
+}
+
+bool mpc::sequencer::NoteOnEvent::isFinalized()
+{
+    return duration != -1;
 }
 
 NoteEvent::NoteEvent()
@@ -206,6 +220,11 @@ void NoteEvent::setVelocityZero()
 int NoteEvent::getVelocity()
 {
     return velocity;
+}
+
+bool mpc::sequencer::NoteEvent::isDrumNote()
+{
+    return number >= 35 && number <= 98;
 }
 
 void NoteEvent::CopyValuesTo(std::weak_ptr<Event> dest)

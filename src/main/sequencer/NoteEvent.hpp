@@ -14,6 +14,7 @@ namespace mpc::sequencer
         void setNote(int i);
     public:
         int getNote();
+        bool isDrumNote();
 
         std::string getTypeName() override { return "note-off"; }
         std::shared_ptr<mpc::engine::midi::ShortMessage> createShortMessage(int channel, int transpose = 0);
@@ -48,6 +49,8 @@ namespace mpc::sequencer
         int getVariationValue();
         void setVelocity(int i);
         int getVelocity();
+        bool isDrumNote();
+        bool isFinalized();
 
         NoteOnEvent(int i = 60);
 
@@ -87,6 +90,7 @@ namespace mpc::sequencer
         int getVelocity();
         bool isNoteOn() { return getVelocity() > 0; }
         bool isNoteOff() { return getVelocity() == 0; }
+        bool isDrumNote();
 
         void CopyValuesTo(std::weak_ptr<Event> dest) override;
 
