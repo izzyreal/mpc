@@ -15,7 +15,7 @@ void DeleteProgramScreen::open()
 
     init();
 
-    pgm = mpcSoundPlayerChannel().getProgram();
+    pgm = activeDrum().getProgram();
 
     displayPgm();
 }

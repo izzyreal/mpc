@@ -96,12 +96,12 @@ void PgmAssignScreen::turnWheel(int i)
 	}
 	else if (param == "pgm")
 	{
-		auto pgm = mpcSoundPlayerChannel().getProgram();
+		auto pgm = activeDrum().getProgram();
 		auto candidate = sampler->getUsedProgram(pgm, i > 0);
 
 		if (candidate != pgm)
 		{
-			mpcSoundPlayerChannel().setProgram(candidate);
+            activeDrum().setProgram(candidate);
 			displayNote();
 			displayOptionalNoteA();
 			displayOptionalNoteB();
@@ -278,7 +278,7 @@ void PgmAssignScreen::openWindow()
 
 void PgmAssignScreen::displayPgm()
 {
-	findField("pgm")->setText(StrUtil::padLeft(std::to_string(mpcSoundPlayerChannel().getProgram() + 1), " ", 2) + "-" + program->getName());
+	findField("pgm")->setText(StrUtil::padLeft(std::to_string(activeDrum().getProgram() + 1), " ", 2) + "-" + program->getName());
 }
 
 void PgmAssignScreen::displaySoundName()

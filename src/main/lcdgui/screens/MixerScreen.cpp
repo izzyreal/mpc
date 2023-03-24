@@ -72,7 +72,7 @@ std::shared_ptr<StereoMixer> MixerScreen::getStereoMixerChannel(int index)
     auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>("mixer-setup");
     bool stereoMixSourceIsDrum = mixerSetupScreen->isStereoMixSourceDrum();
     
-    return stereoMixSourceIsDrum ? mpcSoundPlayerChannel().getStereoMixerChannels()[note - 35] : noteParameters->getStereoMixerChannel();
+    return stereoMixSourceIsDrum ? activeDrum().getStereoMixerChannels()[note - 35] : noteParameters->getStereoMixerChannel();
 }
 
 std::shared_ptr<IndivFxMixer> MixerScreen::getIndivFxMixerChannel(int index)
@@ -88,7 +88,7 @@ std::shared_ptr<IndivFxMixer> MixerScreen::getIndivFxMixerChannel(int index)
     auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>("mixer-setup");
     bool indivFxSourceIsDrum = mixerSetupScreen->isIndivFxSourceDrum();
     
-    return indivFxSourceIsDrum ? mpcSoundPlayerChannel().getIndivFxMixerChannels()[note - 35] : noteParameters->getIndivFxMixerChannel();
+    return indivFxSourceIsDrum ? activeDrum().getIndivFxMixerChannels()[note - 35] : noteParameters->getIndivFxMixerChannel();
 }
 
 void MixerScreen::displayMixerStrip(int stripIndex)

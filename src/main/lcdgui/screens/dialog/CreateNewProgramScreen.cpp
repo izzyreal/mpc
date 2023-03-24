@@ -82,7 +82,7 @@ void CreateNewProgramScreen::function(int i)
 			}
 		}
 
-		mpcSoundPlayerChannel().setProgram(index);
+            activeDrum().setProgram(index);
 		openScreen("program");
 		break;
 	}

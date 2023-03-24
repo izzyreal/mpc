@@ -11,7 +11,7 @@ CopyProgramScreen::CopyProgramScreen(mpc::Mpc& mpc, const int layerIndex)
 void CopyProgramScreen::open()
 {
 	init();
-	pgm0 = mpcSoundPlayerChannel().getProgram();
+	pgm0 = activeDrum().getProgram();
 	pgm1 = pgm0;
 
 	displayPgm0();
@@ -34,7 +34,7 @@ void CopyProgramScreen::function(int i)
 			return;
 
 		sampler->copyProgram(pgm0, pgm1);
-		mpcSoundPlayerChannel().setProgram(pgm1);
+            activeDrum().setProgram(pgm1);
 		openScreen("program");
 		break;
 	}

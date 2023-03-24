@@ -69,7 +69,7 @@ void AutoChromaticAssignmentScreen::function(int i)
             {
                 if (programs[j].lock() == newProgram)
                 {
-                    mpcSoundPlayerChannel().setProgram(j);
+                    activeDrum().setProgram(j);
                     break;
                 }
             }

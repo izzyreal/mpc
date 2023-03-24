@@ -56,7 +56,7 @@ void LoadAProgramScreen::function(int i)
         if (track->getBus() > 0) {
             for (int pgmIndex = 0; pgmIndex < 24; pgmIndex++) {
                 if (sampler->getProgram(pgmIndex) == newProgram) {
-                    mpcSoundPlayerChannel().setProgram(pgmIndex);
+                    activeDrum().setProgram(pgmIndex);
                     break;
                 }
             }

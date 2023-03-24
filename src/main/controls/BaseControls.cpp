@@ -41,10 +41,10 @@ using namespace mpc::sequencer;
 
 BaseControls::BaseControls(mpc::Mpc& _mpc)
 : mpc (_mpc),
-ls (_mpc.getLayeredScreen()),
-sampler (_mpc.getSampler()),
-sequencer (_mpc.getSequencer()),
-mpcSoundPlayerChannel(&_mpc.getDrum(0))
+  ls (_mpc.getLayeredScreen()),
+  sampler (_mpc.getSampler()),
+  sequencer (_mpc.getSequencer()),
+  activeDrum(&_mpc.getDrum(0))
 {
 }
 
@@ -73,8 +73,8 @@ void BaseControls::init()
     
     if (drumIndex != -1)
     {
-        mpcSoundPlayerChannel = &sampler->getDrum(drumIndex);
-        program = sampler->getProgram(mpcSoundPlayerChannel->getProgram());
+        activeDrum = &sampler->getDrum(drumIndex);
+        program = sampler->getProgram(activeDrum->getProgram());
     }
     else
     {

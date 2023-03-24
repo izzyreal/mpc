@@ -15,7 +15,7 @@ void CopyNoteParametersScreen::open()
 
 	auto note = sampler->getLastNp(program.get())->getNumber();
 
-	auto programIndex = mpcSoundPlayerChannel().getProgram();
+	auto programIndex = activeDrum().getProgram();
 	setProg0(programIndex);
 	setNote0(note);
 	setProg1(programIndex);
