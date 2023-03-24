@@ -46,6 +46,3 @@ bool MixerInterconnection::isLeftEnabled() {
 bool MixerInterconnection::isRightEnabled() {
 	return rightEnabled;
 }
-
-MixerInterconnection::~MixerInterconnection() {
-}
