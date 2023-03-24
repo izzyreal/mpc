@@ -3,6 +3,7 @@
 #include <map>
 #include <vector>
 #include <memory>
+#include "MixerInterconnection.hpp"
 
 namespace mpc::lcdgui::screens {
     class MixerSetupScreen;
@@ -11,10 +12,6 @@ namespace mpc::lcdgui::screens {
 namespace mpc::sampler {
     class Sampler;
     class NoteParameters;
-}
-
-namespace mpc::engine::audio::server {
-	class AudioServer;
 }
 
 namespace mpc::engine::audio::mixer {
@@ -39,8 +36,7 @@ namespace mpc::engine
         std::vector<std::shared_ptr<Voice>> voices;
 		std::shared_ptr<mpc::sampler::Sampler> sampler;
 		std::shared_ptr<mpc::engine::audio::mixer::AudioMixer> mixer;
-		std::vector<MixerInterconnection*> mixerConnections;
-		mpc::engine::audio::server::AudioServer* server = nullptr;
+		std::vector<MixerInterconnection>& mixerConnections;
         mpc::lcdgui::screens::MixerSetupScreen* mixerSetupScreen = nullptr;
 
 	private:
@@ -68,7 +64,6 @@ namespace mpc::engine
 
 	public:
 		void allSoundOff(int frameOffset);
-		void connectVoices();
 		std::vector<std::shared_ptr<StereoMixer>>& getStereoMixerChannels();
 		std::vector<std::shared_ptr<IndivFxMixer>>& getIndivFxMixerChannels();
 
@@ -86,10 +81,9 @@ namespace mpc::engine
 		Drum(std::shared_ptr<mpc::sampler::Sampler> sampler,
              int drumIndex,
              std::shared_ptr<mpc::engine::audio::mixer::AudioMixer> mixer,
-             const std::shared_ptr<mpc::engine::audio::server::AudioServer>& server,
              mpc::lcdgui::screens::MixerSetupScreen* mixerSetupScreen,
-             std::vector<std::shared_ptr<Voice>> voices);
-		~Drum();
+             std::vector<std::shared_ptr<Voice>> voices,
+             std::vector<mpc::engine::MixerInterconnection>& mixerConnections);
 
 	};
 }

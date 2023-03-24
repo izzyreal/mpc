@@ -4,6 +4,7 @@
 #include <sequencer/FrameSeq.hpp>
 
 #include <engine/audio/mixer/AudioMixer.hpp>
+#include "engine/MixerInterconnection.hpp"
 #include "engine/Drum.hpp"
 #include "engine/PreviewSoundPlayer.hpp"
 
@@ -15,6 +16,7 @@
 
 namespace mpc::engine {
 	class Voice;
+    class MixerInterconnection;
 }
 
 namespace mpc::engine::audio::core {
@@ -82,7 +84,8 @@ namespace mpc::audiomidi
         std::vector<mpc::engine::Drum> soundPlayerChannels;
         std::unique_ptr<mpc::engine::PreviewSoundPlayer> basicSoundPlayerChannel;
 		std::vector<std::shared_ptr<mpc::engine::Voice>> voices;
-		std::shared_ptr<mpc::engine::Voice> basicVoice;
+        std::vector<mpc::engine::MixerInterconnection> mixerConnections;
+        std::shared_ptr<mpc::engine::Voice> basicVoice;
 		std::shared_ptr<mpc::engine::audio::server::AudioServer> server;
 		std::shared_ptr<mpc::engine::audio::server::NonRealTimeAudioServer> offlineServer;
 		std::shared_ptr<mpc::engine::audio::system::DefaultAudioSystem> audioSystem;

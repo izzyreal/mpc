@@ -33,8 +33,6 @@
 
 #include <Util.hpp>
 
-#include "engine/Drum.hpp"
-
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
@@ -46,7 +44,7 @@ BaseControls::BaseControls(mpc::Mpc& _mpc)
 ls (_mpc.getLayeredScreen()),
 sampler (_mpc.getSampler()),
 sequencer (_mpc.getSequencer()),
-mpcSoundPlayerChannel(_mpc.getDrum(0))
+mpcSoundPlayerChannel(&_mpc.getDrum(0))
 {
 }
 
@@ -75,8 +73,8 @@ void BaseControls::init()
     
     if (drumIndex != -1)
     {
-        mpcSoundPlayerChannel = sampler->getDrum(drumIndex);
-        program = sampler->getProgram(mpcSoundPlayerChannel.getProgram());
+        mpcSoundPlayerChannel = &sampler->getDrum(drumIndex);
+        program = sampler->getProgram(mpcSoundPlayerChannel->getProgram());
     }
     else
     {

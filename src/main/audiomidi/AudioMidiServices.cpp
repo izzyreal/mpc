@@ -12,7 +12,6 @@
 #include <audiomidi/MpcMidiOutput.hpp>
 
 #include "engine/Voice.hpp"
-#include "engine/PreviewSoundPlayer.hpp"
 #include "engine/FaderControl.hpp"
 #include <engine/audio/mixer/MixerControls.hpp>
 #include "engine/Drum.hpp"
@@ -25,7 +24,6 @@
 #include <engine/audio/mixer/AudioMixer.hpp>
 #include <engine/audio/mixer/AudioMixerBus.hpp>
 #include <engine/audio/mixer/MixerControlsFactory.hpp>
-#include <engine/audio/mixer/MixerControls.hpp>
 #include <engine/audio/mixer/MainMixControls.hpp>
 
 #include <engine/audio/server/CompoundAudioClient.hpp>
@@ -260,12 +258,12 @@ void AudioMidiServices::createSynth()
     {
         auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>("mixer-setup");
 
-        soundPlayerChannels.emplace_back(mpc.getSampler(),
+        soundPlayerChannels.emplace_back(Drum(mpc.getSampler(),
                                          i,
                                          mixer,
-                                         server,
                                          mixerSetupScreen.get(),
-                                         voices);
+                                         voices,
+                                         mixerConnections));
     }
 
     basicSoundPlayerChannel = std::make_unique<PreviewSoundPlayer>(mpc.getSampler(), mixer, basicVoice);
@@ -273,7 +271,18 @@ void AudioMidiServices::createSynth()
 
 void AudioMidiServices::connectVoices()
 {
-    soundPlayerChannels[0].connectVoices();
+    for (auto j = 0; j < 32; j++)
+    {
+        auto ams1 = mixer->getStrip(std::to_string(j + 1));
+        auto voice = voices[j];
+        ams1->setInputProcess(voice);
+        mixerConnections.emplace_back("con" + std::to_string(j), server.get());
+        auto& mi = mixerConnections.back();
+        ams1->setDirectOutputProcess(mi.getInputProcess());
+        auto ams2 = mixer->getStrip(std::to_string(j + 1 + 32));
+        ams2->setInputProcess(mi.getOutputProcess());
+    }
+
     basicSoundPlayerChannel->connectVoice();
 }
 

@@ -42,7 +42,7 @@ namespace mpc::lcdgui
 		std::string param = "";
 		std::shared_ptr<mpc::sampler::Program> program;
 		std::shared_ptr<mpc::sequencer::Track> track;
-		mpc::engine::Drum& mpcSoundPlayerChannel() { return mpc.getControls()->getControls()->mpcSoundPlayerChannel; }
+		mpc::engine::Drum& mpcSoundPlayerChannel() { return *mpc.getControls()->getControls()->mpcSoundPlayerChannel; }
 
 	protected:
 		std::shared_ptr<Field> findFocus();

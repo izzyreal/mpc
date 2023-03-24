@@ -50,7 +50,7 @@ namespace mpc::controls {
 		std::vector<std::string> typableParams;
 
 		std::shared_ptr<mpc::sampler::Program> program;
-		mpc::engine::Drum& mpcSoundPlayerChannel;
+		mpc::engine::Drum* mpcSoundPlayerChannel;
 
 		std::shared_ptr<mpc::lcdgui::LayeredScreen> ls;
 		std::shared_ptr<mpc::lcdgui::Field> activeField;

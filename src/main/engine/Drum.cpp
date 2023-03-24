@@ -10,7 +10,6 @@
 #include "IndivFxMixer.hpp"
 #include <sampler/Sound.hpp>
 #include <sampler/Sampler.hpp>
-#include <sampler/Program.hpp>
 #include <sampler/NoteParameters.hpp>
 #include "engine/audio/mixer/AudioMixerStrip.hpp"
 #include "engine/audio/mixer/MainMixControls.hpp"
@@ -22,17 +21,17 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::sampler;
 using namespace mpc::engine;
 using namespace mpc::engine::audio::mixer;
-using namespace mpc::engine::audio::server;
 
 Drum::Drum(std::shared_ptr<Sampler> samplerToUse,
            int drumIndexToUse,
            std::shared_ptr<AudioMixer> mixerToUse,
-           const std::shared_ptr<AudioServer>& serverToUse,
            MixerSetupScreen* mixerSetupScreenToUse,
-           std::vector<std::shared_ptr<Voice>> voicesToUse)
+           std::vector<std::shared_ptr<Voice>> voicesToUse,
+           std::vector<mpc::engine::MixerInterconnection>& mixerConnectionsToUse)
            : sampler(std::move(samplerToUse)), mixer(std::move(mixerToUse)),
-           server(serverToUse.get()),  mixerSetupScreen(mixerSetupScreenToUse),
-           voices(std::move(voicesToUse)), drumIndex(drumIndexToUse)
+           mixerSetupScreen(mixerSetupScreenToUse),
+           voices(std::move(voicesToUse)), drumIndex(drumIndexToUse),
+           mixerConnections(mixerConnectionsToUse)
 
 {
 	receivePgmChange = true;
@@ -157,19 +156,19 @@ void Drum::mpcNoteOn(int note, int velo, int varType, int varValue, int frameOff
 		{
 			if (ifmc->getOutput() % 2 == 1)
 			{
-				mixerConnections[voice->getStripNumber() - 1]->setLeftEnabled(true);
-				mixerConnections[voice->getStripNumber() - 1]->setRightEnabled(false);
+				mixerConnections[voice->getStripNumber() - 1].setLeftEnabled(true);
+				mixerConnections[voice->getStripNumber() - 1].setRightEnabled(false);
 			}
 			else
 			{
-				mixerConnections[voice->getStripNumber() - 1]->setLeftEnabled(false);
-				mixerConnections[voice->getStripNumber() - 1]->setRightEnabled(true);
+				mixerConnections[voice->getStripNumber() - 1].setLeftEnabled(false);
+				mixerConnections[voice->getStripNumber() - 1].setRightEnabled(true);
 			}
 		}
 		else
 		{
-			mixerConnections[voice->getStripNumber() - 1]->setLeftEnabled(true);
-			mixerConnections[voice->getStripNumber() - 1]->setRightEnabled(true);
+			mixerConnections[voice->getStripNumber() - 1].setLeftEnabled(true);
+			mixerConnections[voice->getStripNumber() - 1].setRightEnabled(true);
 		}
 	}
 
@@ -276,21 +275,6 @@ void Drum::allSoundOff(int frameOffset)
 	}
 }
 
-void Drum::connectVoices()
-{
-	for (auto j = 0; j < 32; j++)
-	{
-		auto ams1 = mixer->getStrip(std::to_string(j + 1));
-		auto voice = voices[j];
-		ams1->setInputProcess(voice);
-		auto mi = new MixerInterconnection("con" + std::to_string(j), server);
-		ams1->setDirectOutputProcess(mi->getInputProcess());
-		auto ams2 = mixer->getStrip(std::to_string(j + 1 + 32));
-		ams2->setInputProcess(mi->getOutputProcess());
-		mixerConnections.push_back(mi);
-	}
-}
-
 std::vector<std::shared_ptr<StereoMixer>>& Drum::getStereoMixerChannels()
 {
     return weakStereoMixerChannels;
@@ -357,12 +341,4 @@ void Drum::stopMonoOrPolyVoiceWithSameNoteParameters(
             }
         }
     }
-}
-
-Drum::~Drum() {
-	for (auto& m : mixerConnections)
-	{
-		if (m != nullptr)
-			delete m;
-	}
 }
