@@ -10,7 +10,7 @@ namespace mpc::sequencer
         bool dontDelete = false;
         int wasMoved = 0;
 
-		virtual void setTick(int relativeTick);
+		void setTick(int relativeTick);
 		int getTick();
 		int getTrack();
 		void setTrack(int i);
