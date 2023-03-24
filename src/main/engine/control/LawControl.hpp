@@ -22,8 +22,6 @@ namespace mpc::engine::control {
         virtual void setValue(float value);
 
     public:
-        int getIntValue() override;
-
         std::string getValueString() override;
 
     public:

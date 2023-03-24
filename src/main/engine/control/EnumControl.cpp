@@ -38,26 +38,4 @@ string EnumControl::getValueString()
     return nullptr;
 }
 
-int EnumControl::getIntValue()
-{
-    if (!value.has_value() || value.type() != typeid(string))
-        return -1;
-    
-    auto valueStr = nonstd::any_cast<string>(value);
-    
-    auto values = getValues();
-    
-    for (int i = 0; i < values.size(); i++)
-    {
-        auto v2 = values[i];
-        
-        if (!v2.has_value() || v2.type() != typeid(string))
-            continue;
-        
-        if (nonstd::any_cast<string>(v2) == valueStr)
-            return i;
-    }
-    
-    return -1;
-}
 

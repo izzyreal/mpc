@@ -13,15 +13,8 @@ namespace mpc::engine::control {
         int id;
         CompoundControl *parent{nullptr};
         std::string name;
-        std::string annotation;
-        bool hidden{false};
-
-    protected:
-        bool indicator{false};
 
     public:
-        virtual void setHidden(bool h);
-
         virtual int getId();
 
         CompoundControl *getParent();
@@ -40,17 +33,7 @@ namespace mpc::engine::control {
 
         virtual void setName(std::string s);
 
-        virtual void setAnnotation(std::string a);
-
-        virtual int getIntValue();
-
         virtual std::string getValueString();
-
-        virtual bool isHidden();
-
-        virtual bool isIndicator();
-
-        virtual std::string getControlPath(Control *from, std::string sep);
 
     protected:
         Control(int id, std::string name);

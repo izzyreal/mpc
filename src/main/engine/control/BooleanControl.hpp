@@ -14,8 +14,6 @@ namespace mpc::engine::control {
 
         bool getValue();
 
-        int getIntValue() override;
-
     public:
         BooleanControl(int id, std::string name, bool initialValue);
 

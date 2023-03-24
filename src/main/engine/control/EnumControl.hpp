@@ -18,14 +18,8 @@ namespace mpc::engine::control {
 
         virtual nonstd::any getValue();
 
-        virtual std::vector<nonstd::any> getValues() = 0;
-
     public:
         std::string getValueString() override;
-
-        int getIntValue() override;
-
-    public:
         EnumControl(int id, std::string name, nonstd::any value);
 
     };

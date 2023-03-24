@@ -8,42 +8,12 @@ CompoundControl::CompoundControl(int id, string name) : Control(id, name)
 {
 }
 
-vector<string> CompoundControl::getControlNamesRecursive(int generation)
-{
-	vector<string> res;
-	string indent;
-
-    for (int i = 0; i < generation; i++)
-		indent += "     ";
-
-    res.push_back("\n" + indent + getName() + " has these controls:");
-	
-    for (auto& c : controls)
-		res.push_back(indent + c->getName());
-
-    for (auto& c : controls)
-    {
-		auto cc = dynamic_pointer_cast<CompoundControl>(c);
-	
-        if (cc)
-        {
-			auto strings = cc->getControlNamesRecursive(generation + 1);
-		
-            for (auto& s : strings)
-				res.push_back(s);
-		}
-	}
-    
-	return res;
-}
-
 void CompoundControl::add(shared_ptr<Control> control)
 {
 	if (!control) return;
 	string name = control->getName();
 	control->setParent(this);
 	controls.push_back(move(control));
-    weakControls.push_back(controls.back());
 }
 
 void CompoundControl::remove(shared_ptr<Control> c)
@@ -60,7 +30,6 @@ void CompoundControl::remove(shared_ptr<Control> c)
         if (currentControl == control)
         {
 			controls.erase(begin(controls) + i);
-            weakControls.erase(begin(weakControls) + i);
 			break;
 		}
 	}
@@ -68,14 +37,14 @@ void CompoundControl::remove(shared_ptr<Control> c)
 
 vector<shared_ptr<Control>> CompoundControl::getControls()
 {
-    return weakControls;
+    return controls;
 }
 
 shared_ptr<Control> CompoundControl::find(string name)
 {
-	for (int i = 0; i < controls.size(); i++) {
-		if (controls[i]->getName() == name) {
-			return controls[i];
+	for (auto& c : controls) {
+		if (c->getName() == name) {
+			return c;
 		}
 	}
 	return {};

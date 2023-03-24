@@ -10,26 +10,19 @@ namespace mpc::engine::control {
     {
     protected:
         std::vector<std::shared_ptr<Control>> controls;
-        std::vector<std::shared_ptr<Control>> weakControls;
 
     public:
-        std::vector<std::string> getControlNamesRecursive(int generation = 0);
-
-    public:
-
         virtual void add(std::shared_ptr<Control> control);
 
-        virtual void remove(std::shared_ptr<Control> control);
+        void remove(std::shared_ptr<Control> control);
 
-    public:
-        virtual std::vector<std::shared_ptr<Control>> getControls();
+        std::vector<std::shared_ptr<Control>> getControls();
 
-        virtual std::shared_ptr<Control> find(std::string name);
+        std::shared_ptr<Control> find(std::string name);
 
-        virtual std::shared_ptr<Control> deepFind(int controlId);
+        std::shared_ptr<Control> deepFind(int controlId);
 
-    public:
-        virtual void disambiguate(std::shared_ptr<CompoundControl> c);
+        void disambiguate(std::shared_ptr<CompoundControl> c);
 
     public:
         CompoundControl(int id, std::string name);

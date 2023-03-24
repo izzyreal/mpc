@@ -19,9 +19,3 @@ bool BooleanControl::getValue()
 {
     return value;
 }
-
-int BooleanControl::getIntValue()
-{
-	return getValue() ? 1 : 0;
-}
-

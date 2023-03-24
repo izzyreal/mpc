@@ -29,8 +29,3 @@ void LawControl::setValue(float value)
 	this->value = value;
 	notifyParent(this);
 }
-
-int LawControl::getIntValue()
-{
-    return law->intValue(getValue());
-}

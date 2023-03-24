@@ -125,11 +125,7 @@ EnumControl* MixControls::createRouteControl(int stripId)
 
 BooleanControl* MixControls::createMuteControl()
 {
-    auto c = new BooleanControl(MixControlIds::MUTE, "Mute", false);
-	string name = c->getName();
-	name = name.substr(0, 1);
-    c->setAnnotation(name);
-    return c;
+    return new BooleanControl(MixControlIds::MUTE, "Mute", false);
 }
 
 string MixControls::getName()

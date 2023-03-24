@@ -14,9 +14,6 @@ namespace mpc::engine::audio::mixer {
         bool canRouteToGroups;
 
     public:
-        std::vector<nonstd::any> getValues();
-
-    public:
         RouteControl(MainMixControls *mmc, std::string defaultRoute, bool canRouteToGroups);
 
         friend class MainMixControls;
