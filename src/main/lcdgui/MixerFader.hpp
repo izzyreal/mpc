@@ -12,13 +12,11 @@ namespace mpc::lcdgui
 		bool color = true;
 
 	public:
-		virtual void setValue(int value);
-		virtual void setColor(bool on);
+		void setValue(int value);
+		void setColor(bool on);
 
-	public:
 		void Draw(std::vector<std::vector<bool>>* pixels) override;
 
-	public:
 		MixerFader(MRECT rect);
 
 	};

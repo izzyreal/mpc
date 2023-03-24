@@ -51,5 +51,5 @@ void Control::setName(std::string s)
 
 std::string Control::getValueString()
 {
-	return std::string("");
+	return {};
 }

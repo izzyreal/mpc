@@ -15,23 +15,22 @@ namespace mpc::engine::control {
         std::string name;
 
     public:
-        virtual int getId();
+        int getId();
 
         CompoundControl *getParent();
 
-        virtual ~Control() {}
 
     protected:
-        virtual void setParent(CompoundControl *c);
+        void setParent(CompoundControl *c);
 
-        virtual void notifyParent(Control *obj);
+        void notifyParent(Control *obj);
 
         virtual void derive(Control *obj);
 
     public:
-        virtual std::string getName();
+        std::string getName();
 
-        virtual void setName(std::string s);
+        void setName(std::string s);
 
         virtual std::string getValueString();
 
@@ -40,7 +39,6 @@ namespace mpc::engine::control {
 
     private:
         friend class CompoundControl;
-
         friend class CompoundControlChain;
 
     };

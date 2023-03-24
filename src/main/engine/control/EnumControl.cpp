@@ -20,11 +20,6 @@ void EnumControl::setValue(nonstd::any value)
     notifyParent(this);
 }
 
-nonstd::any EnumControl::getValue()
-{
-    return value;
-}
-
 string EnumControl::getValueString()
 {
     if (!value.has_value())

@@ -14,11 +14,8 @@ namespace mpc::engine::control {
         nonstd::any value;
 
     public:
-        virtual void setValue(nonstd::any value);
+        void setValue(nonstd::any value);
 
-        virtual nonstd::any getValue();
-
-    public:
         std::string getValueString() override;
         EnumControl(int id, std::string name, nonstd::any value);
 
