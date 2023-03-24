@@ -67,9 +67,7 @@ void EditVelocityScreen::function(int i)
 	case 4:
 		for (auto& event : track->getEvents())
 		{
-			auto ne = std::dynamic_pointer_cast<NoteEvent>(event);
-
-			if (ne)
+			if (auto ne = std::dynamic_pointer_cast<NoteOnEvent>(event))
 			{
 				if (ne->getTick() >= time0 && ne->getTick() <= time1)
 				{

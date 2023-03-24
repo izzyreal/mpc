@@ -4,7 +4,6 @@
 #include <sequencer/Event.hpp>
 #include <sequencer/Track.hpp>
 #include <sequencer/EventAdapter.hpp>
-#include <sequencer/MidiAdapter.hpp>
 #include "VmpcMidiControlMode.hpp"
 
 #include <memory>
@@ -27,8 +26,6 @@ namespace mpc::audiomidi {
         mpc::Mpc &mpc;
         std::shared_ptr<mpc::sequencer::Sequencer> sequencer;
         std::shared_ptr<mpc::sampler::Sampler> sampler;
-
-        std::unique_ptr<mpc::sequencer::MidiAdapter> midiAdapter;
         std::unique_ptr<mpc::sequencer::EventAdapter> eventAdapter;
         std::unique_ptr<VmpcMidiControlMode> midiFullControl;
         std::string notify;

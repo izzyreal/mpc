@@ -22,7 +22,7 @@ namespace mpc::controls { class GlobalReleaseControls; }
 namespace mpc::sequencer
 {
 	class Track;
-	class NoteEvent;
+	//class OldNoteEvent;
 }
 
 namespace mpc::sampler { class Program; }

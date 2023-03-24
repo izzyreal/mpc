@@ -21,7 +21,7 @@ EventAdapter::EventAdapter(mpc::Mpc& mpc, std::weak_ptr<Sequencer> sequencer)
 {
 	this->sequencer = sequencer;
 	midiClockEvent = std::make_shared<MidiClockEvent>(0);
-	noteEvent = std::make_shared<NoteEvent>(35);
+	noteEvent = std::make_shared<OldNoteEvent>(35);
 }
 
 void EventAdapter::process(MidiMessage* msg)

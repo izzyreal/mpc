@@ -63,7 +63,7 @@ namespace mpc::controls
     bool isAltPressed();
     std::weak_ptr<KbMapping> getKbMapping();
 
-    std::unordered_map<int, std::shared_ptr<mpc::sequencer::NoteOffEvent>> temp_offs = {};
+    std::unordered_map<int, std::shared_ptr<mpc::sequencer::NoteOnEvent>> temp_ons = {};
 
   private:
     std::shared_ptr<KbMapping> kbMapping;

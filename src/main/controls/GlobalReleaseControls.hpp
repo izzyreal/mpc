@@ -25,7 +25,7 @@ namespace mpc {
 			void simplePad(int padIndexWithBank);
 
 		private:
-			void generateNoteOff(int note);
+			//void generateNoteOff(int note);
 			void handleNoteOff(std::shared_ptr<mpc::sequencer::NoteOffEvent> off_event);
 
 		public:

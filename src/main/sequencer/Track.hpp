@@ -8,6 +8,7 @@
 
 #include "thirdp/concurrentqueue.h"
 #include <memory>
+#include <set>
 
 namespace mpc { class Mpc; }
 
@@ -25,10 +26,10 @@ private:
     
     std::vector<std::shared_ptr<Event>> events;
 
-    moodycamel::ConcurrentQueue<std::shared_ptr<NoteEvent>> queuedNoteOnEvents;
-    moodycamel::ConcurrentQueue<std::shared_ptr<NoteEvent>> queuedNoteOffEvents;
-    std::vector<std::shared_ptr<NoteEvent>> bulkNoteOns = std::vector<std::shared_ptr<NoteEvent>>(20);
-    std::vector<std::shared_ptr<NoteEvent>> bulkNoteOffs = std::vector<std::shared_ptr<NoteEvent>>(20);
+    moodycamel::ConcurrentQueue<std::shared_ptr<NoteOnEvent>> queuedNoteOnEvents;
+    moodycamel::ConcurrentQueue<std::shared_ptr<NoteOffEvent>> queuedNoteOffEvents;
+    std::vector<std::shared_ptr<NoteOnEvent>> bulkNoteOns = std::vector<std::shared_ptr<NoteOnEvent>>(20);
+    std::vector<std::shared_ptr<NoteOffEvent>> bulkNoteOffs = std::vector<std::shared_ptr<NoteOffEvent>>(20);
 
     mpc::sequencer::Sequence* parent{ nullptr };
     
@@ -42,7 +43,7 @@ private:
     int trackIndex = 0;
     bool used{ false };
     int eventIndex = 0;
-    std::weak_ptr<NoteEvent> lastAdded;
+    std::set<std::shared_ptr<NoteOnEvent>> unFinalized;
     bool multi{ false };
     bool _delete{ false };
 
@@ -63,20 +64,20 @@ public:
     // different thread.
     // As a bare minimum the note must be passed in, in order to
     // match against counterpart (off with on and vice versa).
-    std::shared_ptr<mpc::sequencer::NoteEvent> recordNoteOnNow(unsigned char note);
-    void recordNoteOffNow(unsigned char note);
+    std::shared_ptr<mpc::sequencer::NoteOnEvent> recordNoteOnNow(unsigned char note);
+    void recordNoteOffNow(std::shared_ptr<NoteOffEvent> off_event);
 
 private:
-    std::shared_ptr<NoteEvent> getNoteEvent(int tick, int note);
+    std::shared_ptr<NoteOnEvent> getNoteEvent(int tick, int note);
     void processRealtimeQueuedEvents();
     int getCorrectedTickPos();
 
 public:
     bool insertEventWhileRetainingSort(const std::shared_ptr<Event>& event, bool allowMultipleNotesOnSameTick = false);
-    std::shared_ptr<NoteEvent> addNoteEvent(int tick, int note);
+    std::shared_ptr<NoteOnEvent> addNoteEvent(int tick, int note);
     std::shared_ptr<Event> addEvent(int tick, const std::string& type, bool allowMultipleNotesOnSameTick = false);
     void cloneEventIntoTrack(std::shared_ptr<Event>& src, int tick, bool allowMultipleNotesOnSameTick = false);
-    bool adjustDurLastEvent(int newDur);
+    bool finalizeNoteOnEvent(std::shared_ptr<NoteOnEvent> event, int newDur);
     void removeEvent(int i);
     void removeEvent(const std::shared_ptr<Event>& event);
     void removeEvents();
@@ -111,11 +112,11 @@ public:
     void sortEvents();
 
 private:
-    std::vector<std::shared_ptr<NoteEvent>> getNoteEventsAtTick(int tick);
+    std::vector<std::shared_ptr<NoteOnEvent>> getNoteEventsAtTick(int tick);
 
 public:
-    std::vector<std::shared_ptr<NoteEvent>> getNoteEvents();
-    void timingCorrect(int fromBar, int toBar, NoteEvent* noteEvent, int stepLength);
+    std::vector<std::shared_ptr<NoteOnEvent>> getNoteEvents();
+    void timingCorrect(int fromBar, int toBar, NoteOnEvent* noteEvent, int stepLength);
     int timingCorrectTick(int fromBar, int toBar, int tick, int stepLength);
     int swingTick(int tick, int noteValue, int percentage);
 

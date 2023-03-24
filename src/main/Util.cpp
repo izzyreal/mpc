@@ -259,7 +259,7 @@ void Util::initSequence(int sequenceIndex, mpc::Mpc& mpc)
     sequencer->setActiveSequenceIndex(sequencer->getActiveSequenceIndex());
 }
 
-void Util::set16LevelsValues(mpc::Mpc& mpc, const std::shared_ptr<NoteEvent>& event, const int padIndex)
+void Util::set16LevelsValues(mpc::Mpc& mpc, const std::shared_ptr<OldNoteEvent>& event, const int padIndex)
 {
     if (mpc.getHardware()->getTopPanel()->isSixteenLevelsEnabled())
     {
@@ -341,7 +341,7 @@ void Util::set16LevelsValues(mpc::Mpc& mpc, const std::shared_ptr<NoteOnEvent>& 
     }
 }
 
-void Util::setSliderNoteVariationParameters(mpc::Mpc& mpc, const std::weak_ptr<NoteEvent>& _n, const std::weak_ptr<mpc::sampler::Program>& program)
+void Util::setSliderNoteVariationParameters(mpc::Mpc& mpc, const std::weak_ptr<OldNoteEvent>& _n, const std::weak_ptr<mpc::sampler::Program>& program)
 {
     auto pgm = program.lock();
     auto n = _n.lock();

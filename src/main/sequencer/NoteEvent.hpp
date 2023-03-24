@@ -24,12 +24,12 @@ namespace mpc::sequencer
     class NoteOnEvent : public Event
     {
     public:
-        enum VARIATION_TYPE { TUNE = 0, DECAY = 1, ATTACK = 2, FILTER = 3};
-        const int DURATION_UNKNOWN = -1;
+        enum VARIATION_TYPE { NONE = -1, TUNE_0 = 0, DECAY_1 = 1, ATTACK_2 = 2, FILTER_3 = 3};
+        static const int DURATION_UNKNOWN = -1;
     private:
         int number = 60;
         int duration = DURATION_UNKNOWN;
-        VARIATION_TYPE variationType = VARIATION_TYPE::TUNE;
+        VARIATION_TYPE variationType = VARIATION_TYPE::TUNE_0;
         int variationValue = 64;
         int velocity = 127;
 
@@ -58,9 +58,16 @@ namespace mpc::sequencer
         std::shared_ptr<mpc::engine::midi::ShortMessage> createShortMessage(int channel, int transpose = 0);
 
     };
+    static bool isDrumNote(int number) { return number >= 35 && number <= 98; }
+
+    class NoteOnEventPlayOnly : public NoteOnEvent
+    {
+    public:
+        NoteOnEventPlayOnly(int i = 60) : NoteOnEvent(i) {}
+    };
 
 
-    class NoteEvent
+    class OldNoteEvent
         : public Event
     {
 
@@ -72,10 +79,10 @@ namespace mpc::sequencer
         int velocity = 0;
 
     protected:
-        std::shared_ptr<NoteEvent> noteOff;
+        std::shared_ptr<OldNoteEvent> noteOff;
 
     public:
-        std::shared_ptr<NoteEvent> getNoteOff();
+        std::shared_ptr<OldNoteEvent> getNoteOff();
 
         void setNote(int i);
         int getNote();
@@ -94,10 +101,10 @@ namespace mpc::sequencer
 
         void CopyValuesTo(std::weak_ptr<Event> dest) override;
 
-        NoteEvent();
-        NoteEvent(int i);
+        OldNoteEvent();
+        OldNoteEvent(int i);
 
-        NoteEvent(bool noteOffTrue, int /* noteOnTick */); // ctor used for noteOffs
+        OldNoteEvent(bool noteOffTrue, int /* noteOnTick */); // ctor used for noteOffs
         std::string getTypeName() override { return "note"; }
 
         std::shared_ptr<mpc::engine::midi::ShortMessage> createShortMessage(int channel, int transpose = 0);

@@ -192,7 +192,7 @@ void BaseControls::function(int i)
     }
 }
 
-void BaseControls::pad(int padIndexWithBank, int velo)
+void BaseControls::pad(int padIndexWithBank, int velocity)
 {
     init();
     
@@ -206,7 +206,7 @@ void BaseControls::pad(int padIndexWithBank, int velo)
 
     if (hardware->getTopPanel()->isFullLevelEnabled())
     {
-      velo = 127;
+        velocity = 127;
     }
 
     if (sequencer->isRecordingOrOverdubbing() && mpc.getControls()->isErasePressed())
@@ -216,7 +216,7 @@ void BaseControls::pad(int padIndexWithBank, int velo)
         return;
     
     auto note = track->getBus() > 0 ? program->getPad(padIndexWithBank)->getNote() : padIndexWithBank + 35;
-    auto velocity = velo;
+    //auto velocity = velo;
 
     if (!mpc.getHardware()->getTopPanel()->isSixteenLevelsEnabled())
     {
@@ -228,12 +228,12 @@ void BaseControls::pad(int padIndexWithBank, int velo)
         auto mixerScreen = std::dynamic_pointer_cast<MixerScreen>(screenComponent);
         auto channelSettingsScreen = std::dynamic_pointer_cast<ChannelSettingsScreen>(screenComponent);
 
-        if (note >= 35 && note <= 98 && collectionContainsCurrentScreen(allowCentralNoteAndPadUpdateScreens))
+        if (isDrumNote(note) && collectionContainsCurrentScreen(allowCentralNoteAndPadUpdateScreens))
         {
             mpc.setNote(note);
             mpc.setPad(padIndexWithBank);
         }
-        else if (withNotes && note >= 35)
+        else if (withNotes && isDrumNote(note))
         {
             withNotes->setNote0(note);
         }
@@ -290,90 +290,78 @@ void BaseControls::generateNoteOn(int note, int padVelo, int padIndexWithBank)
 
     auto padIndex = program != nullptr ? program->getPadIndexFromNote(note) : - 1;
 
+    std::shared_ptr<NoteOnEvent> noteOnEvent;
+
     if (sequencer->isRecordingOrOverdubbing() || step || recMainWithoutPlaying)
     {
-        std::shared_ptr<NoteEvent> recordedEvent;
+        //std::shared_ptr<NoteOnEvent> recordedEvent;
         
         if (step)
         {
             if (track->getBus() == 0 || note >= 35)
             {
-                recordedEvent = track->addNoteEvent(sequencer->getTickPosition(), note);
+                noteOnEvent = track->addNoteEvent(sequencer->getTickPosition(), note);
             }
         }
         else if (recMainWithoutPlaying)
         {
-            recordedEvent = track->addNoteEvent(sequencer->getTickPosition(), note);
+            noteOnEvent = track->addNoteEvent(sequencer->getTickPosition(), note);
             int stepLength = sequencer->getTickValues()[tc_note];
             
             if (stepLength != 1)
             {
                 int bar = sequencer->getCurrentBarIndex() + 1;
-                track->timingCorrect(0, bar, recordedEvent.get(), stepLength);
+                track->timingCorrect(0, bar, noteOnEvent.get(), stepLength);
                 
-                std::vector<std::shared_ptr<Event>> events{ recordedEvent };
+                std::vector<std::shared_ptr<Event>> events{ noteOnEvent };
                 std::vector<int> noteRange {0, 127};
                 track->swing(events, tc_note, tc_swing, noteRange);
                 
-                if (recordedEvent->getTick() != sequencer->getTickPosition())
-                    sequencer->move(recordedEvent->getTick());
+                if (noteOnEvent->getTick() != sequencer->getTickPosition())
+                    sequencer->move(noteOnEvent->getTick());
             }
         }
         else
         {
-            recordedEvent = track->recordNoteOnNow(note);
+            noteOnEvent = track->recordNoteOnNow(note);
         }
         
-        if (recordedEvent)
+        noteOnEvent->setVelocity(padVelo);
+        noteOnEvent->setDuration(step ? 1 : NoteOnEvent::DURATION_UNKNOWN);
+
+        if (step || recMainWithoutPlaying)
         {
-            recordedEvent->setVelocity(padVelo);
-            recordedEvent->setDuration(step ? 1 : -1);
-
-            if (program)
-            {
-                Util::set16LevelsValues(mpc, recordedEvent, padIndex);
-
-                if (isSliderNote)
-                {
-                    Util::setSliderNoteVariationParameters(mpc, recordedEvent, program);
-                }
-            }
-
-            if (step || recMainWithoutPlaying)
-            {
-                sequencer->playMetronomeTrack();
-            }
+            sequencer->playMetronomeTrack();
         }
     }
     
-    auto playableEvent = std::make_shared<NoteOnEvent>(note);
-
-    playableEvent->setVelocity(padVelo);
-
+    else
+    {
+        auto play_event = std::make_shared<NoteOnEventPlayOnly>(note);
+        noteOnEvent = play_event;// std::dynamic_pointer_cast<NoteOnEvent>(std::make_shared<NoteOnEventPlayOnly>(note));
+        noteOnEvent->setVelocity(padVelo);
+        //playableEvent->setDuration(NoteOnEvent::DURATION_UNKNOWN);
+        noteOnEvent->setTick(-1);
+    }
+    
     if (program)
     {
-        Util::set16LevelsValues(mpc, playableEvent, padIndex);
+        Util::set16LevelsValues(mpc, noteOnEvent, padIndex);
 
         if (isSliderNote)
         {
-            Util::setSliderNoteVariationParameters(mpc, playableEvent, program);
+            Util::setSliderNoteVariationParameters(mpc, noteOnEvent, program);
         }
     }
 
-    playableEvent->setDuration(0);
-    playableEvent->setTick(-1);
-
-    char drum = -1;
     auto drumScreen = mpc.screens->get<DrumScreen>("drum");
+    char drum = collectionContainsCurrentScreen(samplerScreens) ? drumScreen->drum : -1;
 
-    if (collectionContainsCurrentScreen(samplerScreens))
-    {
-        drum = drumScreen->drum;
-    }
     
-    mpc.getEventHandler()->handle(playableEvent, track.get(), drum);
+    mpc.getEventHandler()->handle(noteOnEvent, track.get(), drum);
     
-    mpc.getControls()->temp_offs[padIndexWithBank] = playableEvent->getNoteOff();
+    assert(mpc.getControls()->temp_ons.find(padIndexWithBank) == mpc.getControls()->temp_ons.end());
+    mpc.getControls()->temp_ons[padIndexWithBank] = noteOnEvent;
     
 }
 

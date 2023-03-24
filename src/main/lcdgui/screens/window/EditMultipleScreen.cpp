@@ -45,7 +45,7 @@ void EditMultipleScreen::function(int i)
     {
         case 4:
         {
-            auto noteEvent = std::dynamic_pointer_cast<NoteEvent>(selectedEvent);
+            auto noteEvent = std::dynamic_pointer_cast<OldNoteEvent>(selectedEvent);
             
             if (noteEvent && track->getBus() != 0)
             {
@@ -57,7 +57,7 @@ void EditMultipleScreen::function(int i)
                 {
                     for (auto& event : stepEditorScreen->getSelectedEvents())
                     {
-                        auto _noteEvent = std::dynamic_pointer_cast<NoteEvent>(event);
+                        auto _noteEvent = std::dynamic_pointer_cast<OldNoteEvent>(event);
                         if (_noteEvent)
                             _noteEvent->setVariationTypeNumber(variationType);
                     }
@@ -66,7 +66,7 @@ void EditMultipleScreen::function(int i)
                 {
                     for (auto& event : stepEditorScreen->getSelectedEvents())
                     {
-                        auto _noteEvent = std::dynamic_pointer_cast<NoteEvent>(event);
+                        auto _noteEvent = std::dynamic_pointer_cast<OldNoteEvent>(event);
 
                         if (_noteEvent)
                             _noteEvent->setVariationValue(variationValue);
@@ -130,7 +130,7 @@ void EditMultipleScreen::turnWheel(int i)
     
     if (param == "value0")
     {
-        auto noteEvent = std::dynamic_pointer_cast<NoteEvent>(event);
+        auto noteEvent = std::dynamic_pointer_cast<OldNoteEvent>(event);
         
         if (noteEvent && track->getBus() != 0)
         {
@@ -197,7 +197,7 @@ void EditMultipleScreen::checkThreeParameters()
     for (auto& event : stepEditorScreen->getSelectedEvents())
     {
         
-        auto note = std::dynamic_pointer_cast<NoteEvent>(event);
+        auto note = std::dynamic_pointer_cast<OldNoteEvent>(event);
         auto controlChange = std::dynamic_pointer_cast<ControlChangeEvent>(event);
         auto polyPressure = std::dynamic_pointer_cast<PolyPressureEvent>(event);
         
@@ -216,7 +216,7 @@ void EditMultipleScreen::checkFiveParameters()
     
     for (auto& event : stepEditorScreen->getSelectedEvents())
     {
-        auto note = std::dynamic_pointer_cast<NoteEvent>(event);
+        auto note = std::dynamic_pointer_cast<OldNoteEvent>(event);
         auto programChange = std::dynamic_pointer_cast<ProgramChangeEvent>(event);
         auto controlChange = std::dynamic_pointer_cast<ControlChangeEvent>(event);
         auto channelPressure = std::dynamic_pointer_cast<ChannelPressureEvent>(event);
@@ -240,7 +240,7 @@ void EditMultipleScreen::checkNotes()
     auto stepEditorScreen = mpc.screens->get<StepEditorScreen>("step-editor");
     for (auto& event : stepEditorScreen->getSelectedEvents())
     {
-        auto note = std::dynamic_pointer_cast<NoteEvent>(event);
+        auto note = std::dynamic_pointer_cast<OldNoteEvent>(event);
         
         if (note)
             note->setNote(changeNoteTo);
@@ -268,7 +268,7 @@ void EditMultipleScreen::updateEditMultiple()
     auto event = stepEditorScreen->getSelectedEvent();
     auto letter = stepEditorScreen->getSelectedParameterLetter();
     
-    if (std::dynamic_pointer_cast<NoteEvent>(event) && track->getBus() != 0)
+    if (std::dynamic_pointer_cast<OldNoteEvent>(event) && track->getBus() != 0)
     {
         if (letter == "a" || letter == "b" || letter == "c")
         {
@@ -365,7 +365,7 @@ void EditMultipleScreen::updateEditMultiple()
         }
     }
     
-    if (std::dynamic_pointer_cast<NoteEvent>(event) && track->getBus() == 0)
+    if (std::dynamic_pointer_cast<OldNoteEvent>(event) && track->getBus() == 0)
     {
         if (letter == "a")
         {

@@ -52,11 +52,11 @@ void InsertEventScreen::insertEvent()
 	{
         const bool allowMultipleNotesOnSameTick = true;
         auto event = track->addEvent(sequencer->getTickPosition(), "note", allowMultipleNotesOnSameTick);
-		auto noteEvent = std::dynamic_pointer_cast<NoteEvent>(event);
+		auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(event);
 		noteEvent->setDuration(24);
 		noteEvent->setNote(60);
 		noteEvent->setVelocity(127);
-		noteEvent->setVariationTypeNumber(0);
+		noteEvent->setVariationType(NoteOnEvent::VARIATION_TYPE::TUNE_0);
 		noteEvent->setVariationValue(64);
 	}
 	else if (insertEventType == 1)

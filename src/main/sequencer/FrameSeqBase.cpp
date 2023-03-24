@@ -198,9 +198,7 @@ void FrameSeqBase::triggerClickIfNeeded()
 
     if (relativePos % static_cast<int>(denTicks) == 0)
     {
-        NoteEvent clickEvent(1);
-        clickEvent.setVelocity(relativePos == 0 ? 127 : 64);
-        mpc.getSampler()->playMetronome(&clickEvent, getEventFrameOffset());
+        mpc.getSampler()->playMetronome(relativePos == 0 ? 127 : 64, getEventFrameOffset());
     }
 }
 

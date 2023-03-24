@@ -79,7 +79,7 @@ void mpc::sequencer::NoteOnEvent::setVariationType(VARIATION_TYPE type)
 
 void mpc::sequencer::NoteOnEvent::setVariationValue(int i)
 {
-    if (variationType == VARIATION_TYPE::TUNE)
+    if (variationType == VARIATION_TYPE::TUNE_0)
     {
         variationValue = std::clamp(i, 0, 124);
     }
@@ -115,29 +115,29 @@ bool mpc::sequencer::NoteOnEvent::isFinalized()
     return duration != -1;
 }
 
-NoteEvent::NoteEvent()
-    : NoteEvent(60)
+OldNoteEvent::OldNoteEvent()
+    : OldNoteEvent(60)
 {
 }
 
-NoteEvent::NoteEvent(int i)
+OldNoteEvent::OldNoteEvent(int i)
 {
     number = i;
-    noteOff = std::make_shared<NoteEvent>(true, 0);
+    noteOff = std::make_shared<OldNoteEvent>(true, 0);
     noteOff->number = number;
 }
 
-NoteEvent::NoteEvent(bool /*dummyParameter*/, int /* noteOnTick */)
+OldNoteEvent::OldNoteEvent(bool /*dummyParameter*/, int /* noteOnTick */)
 {
     // noteoff ctor should not create a noteoff
 }
 
-std::shared_ptr<NoteEvent> NoteEvent::getNoteOff()
+std::shared_ptr<OldNoteEvent> OldNoteEvent::getNoteOff()
 {
     return noteOff;
 }
 
-void NoteEvent::setNote(int i)
+void OldNoteEvent::setNote(int i)
 {
     if (i < 0) return;
 
@@ -152,12 +152,12 @@ void NoteEvent::setNote(int i)
     notifyObservers(std::string("step-editor"));
 }
 
-int NoteEvent::getNote()
+int OldNoteEvent::getNote()
 {
     return number;
 }
 
-void NoteEvent::setDuration(int i)
+void OldNoteEvent::setDuration(int i)
 {
     if (i < 0 || i > 9999)
     {
@@ -168,17 +168,17 @@ void NoteEvent::setDuration(int i)
     notifyObservers(std::string("step-editor"));
 }
 
-int NoteEvent::getDuration()
+int OldNoteEvent::getDuration()
 {
     return duration;
 }
 
-int NoteEvent::getVariationType()
+int OldNoteEvent::getVariationType()
 {
     return variationTypeNumber;
 }
 
-void NoteEvent::setVariationTypeNumber(int i)
+void OldNoteEvent::setVariationTypeNumber(int i)
 {
     if (i < 0 || i > 3) return;
 
@@ -187,7 +187,7 @@ void NoteEvent::setVariationTypeNumber(int i)
     notifyObservers(std::string("step-editor"));
 }
 
-void NoteEvent::setVariationValue(int i)
+void OldNoteEvent::setVariationValue(int i)
 {
     if (i < 0 || i > 128) return;
 
@@ -198,12 +198,12 @@ void NoteEvent::setVariationValue(int i)
     notifyObservers(std::string("step-editor"));
 }
 
-int NoteEvent::getVariationValue()
+int OldNoteEvent::getVariationValue()
 {
     return variationValue;
 }
 
-void NoteEvent::setVelocity(int i)
+void OldNoteEvent::setVelocity(int i)
 {
     if (i < 1 || i > 127) return;
 
@@ -212,25 +212,25 @@ void NoteEvent::setVelocity(int i)
     notifyObservers(std::string("step-editor"));
 }
 
-void NoteEvent::setVelocityZero()
+void OldNoteEvent::setVelocityZero()
 {
     velocity = 0;
 }
 
-int NoteEvent::getVelocity()
+int OldNoteEvent::getVelocity()
 {
     return velocity;
 }
 
-bool mpc::sequencer::NoteEvent::isDrumNote()
+bool mpc::sequencer::OldNoteEvent::isDrumNote()
 {
     return number >= 35 && number <= 98;
 }
 
-void NoteEvent::CopyValuesTo(std::weak_ptr<Event> dest)
+void OldNoteEvent::CopyValuesTo(std::weak_ptr<Event> dest)
 {
     Event::CopyValuesTo(dest);
-    auto lDest = std::dynamic_pointer_cast<NoteEvent>(dest.lock());
+    auto lDest = std::dynamic_pointer_cast<OldNoteEvent>(dest.lock());
     lDest->setVariationTypeNumber(getVariationType());
     lDest->setVariationValue(getVariationValue());
     lDest->setNote(getNote());
@@ -239,7 +239,7 @@ void NoteEvent::CopyValuesTo(std::weak_ptr<Event> dest)
 	lDest->setDuration(getDuration());
 }
 
-std::shared_ptr<ShortMessage> NoteEvent::createShortMessage(int channel, int transpose)
+std::shared_ptr<ShortMessage> OldNoteEvent::createShortMessage(int channel, int transpose)
 {
     auto msg = std::make_shared<ShortMessage>();
     msg->setMessage(getVelocity() == 0 ? ShortMessage::NOTE_OFF : ShortMessage::NOTE_ON, channel, std::clamp(getNote()+transpose,0,127), getVelocity());

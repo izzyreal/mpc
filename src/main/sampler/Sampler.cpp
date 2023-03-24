@@ -221,12 +221,10 @@ void Sampler::init()
 	masterPadAssign = initMasterPadAssign;
 }
 
-void Sampler::playMetronome(mpc::sequencer::NoteEvent* event, int framePos)
+void Sampler::playMetronome(unsigned int velocity, int framePos)
 {
 	auto metronomeSoundScreen = mpc.screens->get<MetronomeSoundScreen>("metronome-sound");
 	auto soundNumber = -2;
-
-	auto velocity = event->getVelocity();
 
 	if (metronomeSoundScreen->getSound() != 0)
 	{
