@@ -73,7 +73,7 @@ void BaseControls::init()
     
     if (drumIndex != -1)
     {
-        activeDrum = &sampler->getDrum(drumIndex);
+        activeDrum = &mpc.getDrum(drumIndex);
         program = sampler->getProgram(activeDrum->getProgram());
     }
     else

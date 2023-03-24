@@ -930,11 +930,6 @@ int Sampler::getDrumBusProgramIndex(int busNumber)
 	return mpc.getDrum(busNumber - 1).getProgram();
 }
 
-Drum& Sampler::getDrum(int i)
-{
-	return mpc.getDrum(i);
-}
-
 std::shared_ptr<Sound> Sampler::getClickSound()
 {
 	return clickSound;

@@ -99,7 +99,6 @@ public:
     void mergeToStereo(std::vector<float>* sourceLeft, std::vector<float>* sourceRight, std::vector<float>* dest);
     void setDrumBusProgramIndex(int busNumber, int programIndex);
     int getDrumBusProgramIndex(int busNumber);
-    mpc::engine::Drum& getDrum(int i);
     int getUsedProgram(int startIndex, bool up);
     int checkExists(std::string soundName);
     void selectPreviousSound();
