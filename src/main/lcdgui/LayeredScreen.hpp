@@ -57,8 +57,8 @@ namespace mpc::lcdgui {
 	private:
 		std::map<std::string, std::string> lastFocuses;
 		int focusedLayerIndex{ 0 };
-		std::string currentScreenName = "";
-		std::string previousScreenName = "";
+		std::string currentScreenName;
+		std::string previousScreenName;
 
 	private:
 		FunctionKeys* getFunctionKeys();

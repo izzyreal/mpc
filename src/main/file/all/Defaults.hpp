@@ -45,7 +45,7 @@ public:
     static const int TR_STATUS_OFFSET{ 1664 };
     static const int TR_STATUS_LENGTH{ 64 };
     
-    std::string defaultSeqName = "";
+    std::string defaultSeqName;
     int tempo;
     int timeSigNum;
     int timeSigDen;

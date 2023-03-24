@@ -92,14 +92,14 @@ namespace mpc::controls {
 		void pad(int padIndexWithBank, int velo);
 
 	protected:
-		std::string param = "";
+		std::string param;
 		mpc::Mpc& mpc;
 		std::shared_ptr<mpc::sequencer::Sequencer> sequencer;
 
 	private:
 		std::shared_ptr<mpc::sampler::Sampler> sampler;
 		std::shared_ptr<mpc::sequencer::Track> track;
-		std::string currentScreenName = "";
+		std::string currentScreenName;
 		const static std::vector<std::string> allowTransportScreens;
 		const static std::vector<std::string> allowPlayScreens;
 		const static std::vector<std::string> allowCentralNoteAndPadUpdateScreens;

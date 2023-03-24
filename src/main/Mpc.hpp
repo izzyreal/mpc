@@ -72,7 +72,7 @@ namespace mpc {
         int note = 60;
 
         // For returning to a specific screen after for example opening the Name screen
-        std::string previousSamplerScreenName = "";
+        std::string previousSamplerScreenName;
 
     public:
         std::shared_ptr<mpc::lcdgui::Screens> screens;

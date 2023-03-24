@@ -26,8 +26,8 @@ namespace mpc::lcdgui::screens::dialog
 		void displayNewRName();
 		void updateNewNames();
 
-		std::string newLName = "";
-		std::string newRName = "";
+		std::string newLName;
+		std::string newRName;
 
 		void setNewLName(std::string s);
 		void setNewRName(std::string s);

@@ -128,7 +128,7 @@ private:
 
     int soundIndex = 0;
     int playXMode = 0;
-    std::string previousScreenName = "";
+    std::string previousScreenName;
 
     mpc::Mpc& mpc;
     std::vector<int> initMasterPadAssign;

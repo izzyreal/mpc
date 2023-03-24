@@ -71,7 +71,7 @@ namespace mpc::lcdgui::screens
 		int pgm = 0;
 		int velo = 0;
 		bool recordingModeMulti = false;
-		std::string sequenceName = "";
+		std::string sequenceName;
 		std::vector<std::string> trackNames;
 		int lastBar = 0;
 		mpc::sequencer::TimeSignature timeSig;

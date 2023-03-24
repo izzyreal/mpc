@@ -54,7 +54,7 @@ private:
     void setName(std::string str, int i);
 
     void changeNameCharacter(int i, bool up);
-    std::string nameScreenName = "";
+    std::string nameScreenName;
     bool editing = false;
     int nameLimit = 0;
 };

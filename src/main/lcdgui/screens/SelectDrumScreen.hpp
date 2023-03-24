@@ -23,7 +23,7 @@ namespace mpc::lcdgui::screens
 		void open() override;
 
 	private:
-		std::string redirectScreen = "";
+		std::string redirectScreen;
 
 		friend class PgmAssignScreen;
 		friend class PgmParamsScreen;

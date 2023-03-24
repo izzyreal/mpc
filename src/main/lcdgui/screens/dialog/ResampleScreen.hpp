@@ -34,7 +34,7 @@ namespace mpc::lcdgui::screens::dialog
 		void setNewBit(int i);
 		void setNewName(std::string s);
 		
-		std::string newName = "";
+		std::string newName;
 		int newFs = 44100;
 		int quality = 0;
 		int newBit = 0;

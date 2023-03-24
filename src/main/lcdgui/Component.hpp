@@ -24,7 +24,7 @@ namespace mpc::lcdgui
 		Component* parent = nullptr;
 		std::vector<std::shared_ptr<Component>> children;
 
-		std::string name = "";
+		std::string name;
 		bool hidden = false;
 		bool dirty = false;
 		int x = -1;

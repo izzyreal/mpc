@@ -32,7 +32,7 @@ private:
     std::vector<int> numerators = std::vector<int>(999);
     std::vector<int> denominators = std::vector<int>(999);
     
-    std::string name = "";
+    std::string name;
     bool loopEnabled = true;
     int lastBarIndex = -1;
     bool used = false;

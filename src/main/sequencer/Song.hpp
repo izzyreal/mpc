@@ -14,7 +14,7 @@ namespace mpc::sequencer
 	{
 
 	private:
-		std::string name = "";
+		std::string name;
 		std::vector<std::shared_ptr<Step>> steps;
 		bool loopEnabled = false;
 		int firstStep = 0;

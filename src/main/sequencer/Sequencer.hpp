@@ -66,7 +66,7 @@ namespace mpc::sequencer
 		bool undoSeqAvailable = false;
 		int playStartTick = 0;
 
-		std::string defaultSequenceName = "";
+		std::string defaultSequenceName;
 		int timeDisplayStyle = 0;
 		bool recordingModeMulti = false;
 		int frameRate = 0;

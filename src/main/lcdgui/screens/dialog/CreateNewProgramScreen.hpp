@@ -20,7 +20,7 @@ namespace mpc::lcdgui::screens::dialog
 		void turnWheel(int i) override;
 
 	private:
-		std::string newName = "";
+		std::string newName;
 		int midiProgramChange = 0;
 
 		void setMidiProgramChange(int i);

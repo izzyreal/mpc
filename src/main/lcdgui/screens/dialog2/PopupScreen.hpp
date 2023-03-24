@@ -55,6 +55,6 @@ namespace mpc::lcdgui::screens::dialog2
 
 	private:
 		std::thread returnToScreenThread;
-		std::string returnToAfterInteractionScreen = "";
+		std::string returnToAfterInteractionScreen;
 	};
 }

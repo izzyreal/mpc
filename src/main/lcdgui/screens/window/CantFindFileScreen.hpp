@@ -19,7 +19,7 @@ namespace mpc::lcdgui::screens::window
 		CantFindFileScreen(mpc::Mpc& mpc, const int layerIndex);
 
 	private:
-		std::string fileName = "";
+		std::string fileName;
 		bool skipAll = false;
 		bool waitingForUser = false;
 

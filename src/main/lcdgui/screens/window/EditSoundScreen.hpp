@@ -36,8 +36,8 @@ namespace mpc::lcdgui::screens::window {
 		int timeStretchAdjust = 0;
 		int endMargin = 30;
 		bool createNewProgram = true;
-		std::string newName = "";
-		std::string returnToScreenName = "";
+		std::string newName;
+		std::string returnToScreenName;
 
 		void setEdit(int i);
 		void setInsertSndNr(int i, int soundCount);

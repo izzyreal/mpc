@@ -34,7 +34,7 @@ private:
     
     std::shared_ptr<Sequencer> sequencer;
     int busNumber = 0;
-    std::string name = "";
+    std::string name;
     bool on{ false };
     int velocityRatio = 0;
     int programChange = 0;

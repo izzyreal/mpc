@@ -10,7 +10,7 @@ namespace mpc::midi::event::meta
 	{
 
 	public:
-		std::string mText = "";
+		std::string mText;
 
 	public:
 		void setText(std::string t);

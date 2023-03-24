@@ -25,7 +25,7 @@ struct SoundLoaderResult {
     // parse a file with a familiar extension. This is where
     // SoundLoader can store the message exactly like how it will
     // be displayed.
-    std::string errorMessage = "";
+    std::string errorMessage;
     
     bool canBeConverted = false;
 };

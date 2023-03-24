@@ -16,7 +16,7 @@ namespace mpc::lcdgui
 	{
 
 	private:
-		std::string focus = "";
+		std::string focus;
 
 	public:
 		mpc::lcdgui::Background* getBackground();

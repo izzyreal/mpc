@@ -23,7 +23,7 @@ namespace mpc::lcdgui::screens::window
 
 	private:
 		const std::vector<std::string> letters{ "A" , "B", "C", "D" };
-		std::string newName = "";
+		std::string newName;
 		int sourceSoundIndex = -1;
 		int originalKey = 67;
 		int tune = 0;

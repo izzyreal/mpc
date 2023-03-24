@@ -29,7 +29,7 @@ namespace mpc::lcdgui
 	private:
 		const int layer;
 		std::map<std::string, std::vector<std::string>> transferMap;
-		std::string firstField = "";
+		std::string firstField;
 
 	public:
 		const int& getLayerIndex();
@@ -39,7 +39,7 @@ namespace mpc::lcdgui
 		std::shared_ptr<mpc::sampler::Sampler> sampler;
 		std::shared_ptr<mpc::sequencer::Sequencer> sequencer;
 		std::shared_ptr<mpc::lcdgui::LayeredScreen> ls;
-		std::string param = "";
+		std::string param;
 		std::shared_ptr<mpc::sampler::Program> program;
 		std::shared_ptr<mpc::sequencer::Track> track;
 		mpc::engine::Drum& activeDrum() { return *mpc.getControls()->getControls()->activeDrum; }

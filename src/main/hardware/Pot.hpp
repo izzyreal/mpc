@@ -11,7 +11,7 @@ namespace mpc::hardware {
 	{
 	private:
 		mpc::Mpc& mpc;
-		std::string label = "";
+		std::string label;
 		int value{ 0 };
 
 	public:

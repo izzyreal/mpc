@@ -74,7 +74,7 @@ namespace mpc::lcdgui::screens
 		int fromNote = 34;
 		int selectionStartIndex = -1;
 		int selectionEndIndex = -1;
-		std::string selectedParameterLetter = "";
+		std::string selectedParameterLetter;
 		bool durationTcPercentageEnabled = false;
 
 	private:

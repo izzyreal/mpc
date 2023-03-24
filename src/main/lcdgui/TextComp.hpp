@@ -37,7 +37,7 @@ namespace mpc::lcdgui
 		const int FONT_WIDTH = 6;
 
 	protected:
-		std::string text = "";
+		std::string text;
 
 	public:
 		virtual void setText(const std::string& s);
