@@ -1,7 +1,5 @@
 #include "MuteAssignScreen.hpp"
 
-#include <sampler/NoteParameters.hpp>
-
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::controls;
 using namespace moduru::lang;
@@ -30,16 +28,16 @@ void MuteAssignScreen::turnWheel(int i)
     init();
 	auto lastNoteParameters = sampler->getLastNp(program.get());
 
-	if (param.compare("note") == 0)
+	if (param == "note")
 	{
 		mpc.setNote(mpc.getNote() + i);
 	}
-	else if (param.compare("note0") == 0)
+	else if (param == "note0")
 	{
 		lastNoteParameters->setMuteAssignA(lastNoteParameters->getMuteAssignA() + i);
 		displayNote0();
 	}
-	else if (param.compare("note1") == 0)
+	else if (param == "note1")
 	{
 		lastNoteParameters->setMuteAssignB(lastNoteParameters->getMuteAssignB() + i);
 		displayNote1();

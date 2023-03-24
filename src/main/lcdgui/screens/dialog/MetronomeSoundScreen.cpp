@@ -206,25 +206,25 @@ void MetronomeSoundScreen::turnWheel(int i)
 {
     init();
     
-    if (param.compare("sound") == 0) {
+    if (param == "sound") {
         setSound(sound + i);
     }
-    else if (param.compare("volume") == 0) {
+    else if (param == "volume") {
         setVolume(volume + i);
     }
-    else if (param.compare("output") == 0) {
+    else if (param == "output") {
         setOutput(output + i);
     }
-    else if (param.compare("accent") == 0) {
+    else if (param == "accent") {
         setAccentPad(accentPad + i);
     }
-    else if (param.compare("normal") == 0) {
+    else if (param == "normal") {
         setNormalPad(normalPad + i);
     }
-    else if (param.compare("velocity-accent") == 0) {
+    else if (param == "velocity-accent") {
         setAccentVelo(accentVelo + i);
     }
-    else if (param.compare("velocity-normal") == 0) {
+    else if (param == "velocity-normal") {
         setNormalVelo(normalVelo + i);
     }
 }
@@ -234,11 +234,11 @@ void MetronomeSoundScreen::update(moduru::observer::Observable* o, nonstd::any m
     init();
     auto s = nonstd::any_cast<std::string>(msg);
 
-    if (s.compare("note") == 0)
+    if (s == "note")
     {
-        if (param.compare("accent") == 0)
+        if (param == "accent")
             setAccentPad(mpc.getPad());
-        else if (param.compare("normal") == 0)
+        else if (param == "normal")
             setNormalPad(mpc.getPad());
     }
 }

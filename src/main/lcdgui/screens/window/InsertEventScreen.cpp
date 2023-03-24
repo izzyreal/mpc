@@ -111,7 +111,7 @@ void InsertEventScreen::turnWheel(int i)
 {
 	init();
 	
-	if (param.compare("eventtype") == 0)
+	if (param == "eventtype")
 	{
 		setInsertEventType(insertEventType + i);
 	}

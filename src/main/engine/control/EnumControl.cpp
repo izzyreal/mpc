@@ -54,7 +54,7 @@ int EnumControl::getIntValue()
         if (!v2.has_value() || v2.type() != typeid(string))
             continue;
         
-        if (nonstd::any_cast<string>(v2).compare(valueStr) == 0)
+        if (nonstd::any_cast<string>(v2) == valueStr)
             return i;
     }
     

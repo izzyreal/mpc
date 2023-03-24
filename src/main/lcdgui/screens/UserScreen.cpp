@@ -52,16 +52,16 @@ void UserScreen::turnWheel(int i)
 {
 	init();
 	
-	if (param.compare("tempo") == 0)
+	if (param == "tempo")
 	{
 		double newTempo = tempo + (i * 0.1);
 		setTempo(newTempo);
 	}
-	else if (param.compare("loop") == 0)
+	else if (param == "loop")
 	{
 		setLoop(i > 0);
 	}
-	else if (param.compare("tsig") == 0)
+	else if (param == "tsig")
 	{
 		if (i > 0)
 		{
@@ -74,27 +74,27 @@ void UserScreen::turnWheel(int i)
 	
 		displayTsig();
 	}
-	else if (param.compare("bars") == 0)
+	else if (param == "bars")
 	{
 		setLastBar(lastBar + i);
 	}
-	else if (param.compare("pgm") == 0)
+	else if (param == "pgm")
 	{
 		setPgm(pgm + i);
 	}
-	else if (param.compare("recordingmode") == 0)
+	else if (param == "recordingmode")
 	{
 		setRecordingModeMulti(i > 0);
 	}
-	else if (param.compare("bus") == 0)
+	else if (param == "bus")
 	{
 		setBus(bus + i);
 	}
-	else if (param.compare("device") == 0)
+	else if (param == "device")
 	{
 		setDeviceNumber(device + i);
 	}
-	else if (param.compare("velo") == 0)
+	else if (param == "velo")
 	{
 		setVelo(velo + i);
 	}

@@ -54,8 +54,8 @@ void EnvGraph::Draw(std::vector<std::vector<bool>>* pixels)
 	}
 
 	auto csn = mpc.getLayeredScreen()->getCurrentScreenName();
-	int xoff = (csn.compare("program-params") == 0) ? 76 : 92;
-	int yoff = (csn.compare("program-params") == 0) ? 16 : 22;
+	int xoff = (csn == "program-params") ? 76 : 92;
+	int yoff = (csn == "program-params") ? 16 : 22;
 
 	int width = 49;
 	int height = 27;
@@ -71,8 +71,8 @@ void EnvGraph::Draw(std::vector<std::vector<bool>>* pixels)
 		}
 	}
 	
-	xoff = (csn.compare("program-params") == 0) ? 0 : 16;
-	yoff = (csn.compare("program-params") == 0) ? 0 : 6;
+	xoff = (csn == "program-params") ? 0 : 16;
+	yoff = (csn == "program-params") ? 0 : 6;
 
 	for (auto& c : coordinates)
 	{

@@ -47,7 +47,7 @@ shared_ptr<BusControls> MixerControls::getBusControls(string name)
 
 	for (int i = 0; i < auxBusControls.size(); i++) {
 		auto busControls = auxBusControls[i];
-		if (busControls->getName().compare(name) == 0) {
+		if (busControls->getName() == name) {
 			return busControls;
 		}
 	}
@@ -91,7 +91,7 @@ shared_ptr<AudioControlsChain> MixerControls::getStripControls(string name)
 	string size = to_string(getControls().size());
 	for (int i = 0; i < (int)(getControls().size()); i++) {
 		auto c = getControls()[i];
-		if (c->getName().compare(name) == 0) {
+		if (c->getName() == name) {
 			try {
 				return dynamic_pointer_cast<AudioControlsChain>(c);
 			}

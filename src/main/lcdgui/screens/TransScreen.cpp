@@ -45,15 +45,15 @@ void TransScreen::turnWheel(int i)
 {
 	init();
 	
-	if (param.compare("tr") == 0)
+	if (param == "tr")
 	{
 		setTr(tr + i);
 	}
-	else if (param.compare("transpose-amount") == 0)
+	else if (param == "transpose-amount")
 	{
 		setTransposeAmount(transposeAmount + i);
 	}
-	else if (param.compare("bar0") == 0)
+	else if (param == "bar0")
 	{
 		auto candidate = bar0 + i;
 		
@@ -62,7 +62,7 @@ void TransScreen::turnWheel(int i)
 
 		setBar0(candidate);
 	}
-	else if (param.compare("bar1") == 0)
+	else if (param == "bar1")
 	{
 		auto candidate = bar1 + i;
 	

@@ -23,11 +23,11 @@ void LoadASequenceFromAllScreen::turnWheel(int i)
 {
 	init();
 
-	if (param.compare("file") == 0)
+	if (param == "file")
 	{
 		setSourceSeqIndex(sourceSeqIndex + i);
 	}
-	else if (param.compare("load-into") == 0)
+	else if (param == "load-into")
 	{
 		auto loadASequenceScreen = mpc.screens->get<LoadASequenceScreen>("load-a-sequence");
 		loadASequenceScreen->setLoadInto(loadASequenceScreen->loadInto + i);

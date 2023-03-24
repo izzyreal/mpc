@@ -118,7 +118,7 @@ shared_ptr<AudioProcess> AudioMixerStrip::createProcess(shared_ptr<AudioControls
 	auto mixVars = dynamic_pointer_cast<MixVariables>(controls);
 	if (mixVars) {
 		shared_ptr<AudioMixerStrip> routedStrip;
-		if (mixVars->getName().compare(mixer->getMainBus()->getName()) == 0) {
+		if (mixVars->getName() == mixer->getMainBus()->getName()) {
 			routedStrip = mixer->getMainStrip();
 			try {
 				return make_shared<MainMixProcess>(routedStrip, mixVars, mixer);

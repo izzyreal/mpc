@@ -195,7 +195,7 @@ double Sequencer::getTempo()
 	auto seq = getActiveSequence();
 	auto tce = getCurrentTempoChangeEvent();
 
-	if (mpc.getLayeredScreen()->getCurrentScreenName().compare("song") == 0)
+	if (mpc.getLayeredScreen()->getCurrentScreenName() == "song")
 	{
 		if (!seq->isUsed())
 			return 120.0;

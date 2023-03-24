@@ -54,20 +54,20 @@ void ZoneScreen::openWindow()
 {
 	init();
 
-	if (param.compare("snd") == 0)
+	if (param == "snd")
 	{
 		sampler->setPreviousScreenName("zone");
 		openScreen("sound");
 	}
-	else if (param.compare("zone") == 0)
+	else if (param == "zone")
 	{
 		openScreen("number-of-zones");
 	}
-	else if (param.compare("st") == 0)
+	else if (param == "st")
 	{
 		openScreen("zone-start-fine");
 	}
-	else if (param.compare("end") == 0)
+	else if (param == "end")
 	{
 		openScreen("zone-end-fine");
 	}
@@ -147,19 +147,19 @@ void ZoneScreen::turnWheel(int i)
 	if (field->isTypeModeEnabled())
 		field->disableTypeMode();
 
-	if (param.compare("st") == 0)
+	if (param == "st")
 	{
 		setZoneStart(zone, getZoneStart(zone) + soundInc);
 		displaySt();
 		displayWave();
 	}
-	else if (param.compare("end") == 0)
+	else if (param == "end")
 	{
 		setZoneEnd(zone, getZoneEnd(zone) + soundInc);
 		displayEnd();
 		displayWave();
 	}
-	else if (param.compare("zone") == 0)
+	else if (param == "zone")
 	{
 		setZone(zone + i);
 		displayZone();
@@ -167,12 +167,12 @@ void ZoneScreen::turnWheel(int i)
 		displayEnd();
 		displayWave();
 	}
-	else if (param.compare("playx") == 0)
+	else if (param == "playx")
 	{
 		sampler->setPlayX(sampler->getPlayX() + i);
 		displayPlayX();
 	}
-	else if (param.compare("snd") == 0 && i > 0)
+	else if (param == "snd" && i > 0)
 	{
 		sampler->selectNextSound();
 		displayEnd();
@@ -181,7 +181,7 @@ void ZoneScreen::turnWheel(int i)
 		displayWave();
 		displayZone();
 	}
-	else if (param.compare("snd") == 0 && i < 0)
+	else if (param == "snd" && i < 0)
 	{
 		sampler->selectPreviousSound();
 		displayEnd();
@@ -220,7 +220,7 @@ void ZoneScreen::displaySnd()
 		return;
 	}
 
-	if (ls->getFocus().compare("dummy") == 0)
+	if (ls->getFocus() == "dummy")
 		ls->setFocus("snd");
 
 	auto sampleName = sound->getName();
@@ -394,14 +394,14 @@ void ZoneScreen::pressEnter()
 
 	if (candidate != INT_MAX)
 	{
-		if (param.compare("st") == 0 || param.compare("start") == 0)
+		if (param == "st" || param == "start")
 		{
 			auto zoneScreen = mpc.screens->get<ZoneScreen>("zone");
 			zoneScreen->setZoneStart(zoneScreen->zone, candidate);
 			displaySt();
 			displayWave();
 		}
-		else if (param.compare("end") == 0)
+		else if (param == "end")
 		{
 			auto zoneScreen = mpc.screens->get<ZoneScreen>("zone");
 			zoneScreen->setZoneEnd(zoneScreen->zone, candidate);

@@ -19,7 +19,7 @@ void DeleteSequenceScreen::turnWheel(int i)
 {
 	init();
 	
-	if (param.compare("sq") == 0)
+	if (param == "sq")
 	{
 		sequencer->setActiveSequenceIndex(sequencer->getActiveSequenceIndex() + i);
 		displaySequenceNumberName();

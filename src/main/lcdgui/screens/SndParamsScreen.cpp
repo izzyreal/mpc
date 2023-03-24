@@ -40,7 +40,7 @@ void SndParamsScreen::openWindow()
 {
 	init();
 
-	if (param.compare("snd") == 0)
+	if (param == "snd")
 	{
 		sampler->setPreviousScreenName("params");
 		openScreen("sound");
@@ -98,12 +98,12 @@ void SndParamsScreen::turnWheel(int i)
 	init();
 	auto sound = sampler->getSound();
 
-	if (param.compare("playx") == 0)
+	if (param == "playx")
 	{
 		sampler->setPlayX(sampler->getPlayX() + i);
 		displayPlayX();
 	}
-	else if (param.compare("snd") == 0 && i > 0)
+	else if (param == "snd" && i > 0)
 	{
 		sampler->selectNextSound();
 		displayBeat();
@@ -112,7 +112,7 @@ void SndParamsScreen::turnWheel(int i)
 		displaySnd();
 		displayTune();
 	}
-	else if (param.compare("snd") == 0 && i < 0)
+	else if (param == "snd" && i < 0)
 	{
 		sampler->selectPreviousSound();
 		displayBeat();
@@ -121,18 +121,18 @@ void SndParamsScreen::turnWheel(int i)
 		displaySnd();
 		displayTune();
 	}
-	else if (param.compare("level") == 0)
+	else if (param == "level")
 	{
 		sound->setLevel(sound->getSndLevel() + i);
 		displayLevel();
 	}
-	else if (param.compare("tune") == 0)
+	else if (param == "tune")
 	{
 		sound->setTune(sound->getTune() + i);
 		displayTune();
 		displaySampleAndNewTempo();
 	}
-	else if (param.compare("beat") == 0)
+	else if (param == "beat")
 	{
 		sound->setBeatCount(sound->getBeatCount() + i);
 		displayBeat();
@@ -232,7 +232,7 @@ void SndParamsScreen::displaySnd()
 		return;
 	}
 
-	if (ls->getFocus().compare("dummy") == 0)
+	if (ls->getFocus() == "dummy")
 		ls->setFocus("snd");
 
 	auto sampleName = sound->getName();

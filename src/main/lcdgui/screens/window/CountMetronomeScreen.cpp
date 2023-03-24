@@ -64,24 +64,24 @@ void CountMetronomeScreen::turnWheel(int i)
 {
 	init();
 
-	if (param.compare("count-in") == 0)
+	if (param == "count-in")
 	{
 		setCountIn(countIn + i);
 	}
-	else if (param.compare("in-play") == 0)
+	else if (param == "in-play")
 	{
 		setInPlay(i > 0);
 	}
-	else if (param.compare("rate") == 0)
+	else if (param == "rate")
 	{
 		setRate(rate + i);
 		sequencer->getActiveSequence()->initMetaTracks();
 	}
-	else if (param.compare("in-rec") == 0)
+	else if (param == "in-rec")
 	{
 		setInRec(i > 0);
 	}
-	else if (param.compare("wait-for-key") == 0)
+	else if (param == "wait-for-key")
 	{
 		setWaitForKey(i > 0);
 	}

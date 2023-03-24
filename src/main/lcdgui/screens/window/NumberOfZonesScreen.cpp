@@ -43,7 +43,7 @@ void NumberOfZonesScreen::function(int i)
 void NumberOfZonesScreen::turnWheel(int i)
 {
 	init();
-	if (param.compare("number-of-zones") == 0)
+	if (param == "number-of-zones")
 	{
 		setNumberOfZones(numberOfZones + i);
 	}

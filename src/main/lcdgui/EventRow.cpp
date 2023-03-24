@@ -502,7 +502,7 @@ void EventRow::setColors()
 			parameters->setColor(true);
 			labels[i]->setInverted(true);
 		
-			if (ls->getFocus().compare(fields[i]->getName()) == 0)
+			if (ls->getFocus() == fields[i]->getName())
 				fields[i]->setInverted(false);
 			else
 				fields[i]->setInverted(true);

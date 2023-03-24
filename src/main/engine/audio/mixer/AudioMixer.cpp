@@ -53,7 +53,7 @@ shared_ptr<AudioMixerStrip> AudioMixer::getStrip(string name)
 shared_ptr<AudioMixerStrip> AudioMixer::getStripImpl(string name)
 {
 	for (auto& strip : strips) {
-		if (strip->getName().compare(name) == 0) {
+		if (strip->getName() == name) {
 			return strip;
 		}
 	}
@@ -116,7 +116,7 @@ shared_ptr<AudioMixerBus> AudioMixer::createBus(shared_ptr<BusControls> busContr
 shared_ptr<AudioMixerBus> AudioMixer::getBus(string name)
 {
 	for (auto& bus : busses) {
-		if (bus->getName().compare(name) == 0) {
+		if (bus->getName() == name) {
 			return bus;
 		}
 	}

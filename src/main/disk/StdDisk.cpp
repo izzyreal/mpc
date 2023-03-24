@@ -63,7 +63,7 @@ void StdDisk::renameFilesToAkai()
 
 		auto akaiName = AkaiName::generate(file->getName(), namesExcludingItself);
 		
-		if (akaiName.compare(file->getName()) == 0)
+		if (akaiName == file->getName())
         {
 			allCompatibleNames.push_back(akaiName);
 			continue;
@@ -85,7 +85,7 @@ void StdDisk::renameFilesToAkai()
 		auto shortNameGenerator = ShortNameGenerator(namesAsSet);
 		auto akaiName = shortNameGenerator.generateShortName(dir->getName()).asSimpleString();
         
-		if (akaiName.compare(dir->getName()) == 0)
+		if (akaiName == dir->getName())
         {
 			allCompatibleNames.push_back(akaiName);
 			continue;
@@ -119,7 +119,7 @@ void StdDisk::initFiles()
 		{
 			std::string name = f->getName();
 		
-			if (f->isFile() && name.find(".") != std::string::npos && name.substr(name.length() - 3).compare(extensions[view]) == 0)
+			if (f->isFile() && name.find('.') != std::string::npos && name.substr(name.length() - 3) == extensions[view])
 				files.push_back(f);
 		}
 		else {

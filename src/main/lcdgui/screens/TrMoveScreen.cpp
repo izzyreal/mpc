@@ -36,7 +36,7 @@ void TrMoveScreen::turnWheel(int i)
 	{
 		goDown();
 	}
-	else if (param.compare("sq") == 0)
+	else if (param == "sq")
 	{
 		auto eventsScreen = mpc.screens->get<EventsScreen>("events");
 		eventsScreen->setFromSq(sequencer->getActiveSequenceIndex() + i);
@@ -49,7 +49,7 @@ void TrMoveScreen::turnWheel(int i)
 void TrMoveScreen::up()
 {
 	init();
-	if (param.compare("tr") == 0)
+	if (param == "tr")
 	{
 		goUp();
 	}
@@ -58,7 +58,7 @@ void TrMoveScreen::up()
 void TrMoveScreen::down()
 {
 	init();
-	if (param.compare("tr") == 0)
+	if (param == "tr")
 	{
 		goDown();
 	}
@@ -73,7 +73,7 @@ void TrMoveScreen::left()
 {
 	init();
 
-	if (param.compare("sq") == 0)
+	if (param == "sq")
 	{
 		return;
 	}
@@ -91,7 +91,7 @@ void TrMoveScreen::right()
 {
 	init();
 
-	if (param.compare("tr") == 0)
+	if (param == "tr")
 	{
 		return;
 	}
@@ -122,7 +122,7 @@ void TrMoveScreen::function(int i)
 		}
 		break;
 	case 5:
-		if (param.compare("sq") == 0)
+		if (param == "sq")
 		{
 			break;
 		}
@@ -194,7 +194,7 @@ void TrMoveScreen::displayTrLabels()
 		tr1 = "";
 	}
 	
-	if (tr0.compare("") == 0)
+	if (tr0 == "")
 	{
 		findLabel("tr0")->Hide(true);
 	}
@@ -204,7 +204,7 @@ void TrMoveScreen::displayTrLabels()
 		findLabel("tr0")->setText(tr0);
 	}
 
-	if (tr1.compare("") == 0)
+	if (tr1 == "")
 	{
 		findLabel("tr1")->Hide(true);
 	}

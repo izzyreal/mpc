@@ -83,7 +83,7 @@ void MidiSwScreen::turnWheel(int i)
     
     const int xPos = stoi(param.substr(param.length() - 1));
     const int selectedSwitch = xOffset + xPos;
-    const int yPos = (param.substr(0, 4).compare("ctrl") == 0) ? 0 : 1;
+    const int yPos = (param.substr(0, 4) == "ctrl") ? 0 : 1;
     auto _switch = controllerToFunctionMapping[selectedSwitch];
 
     if (yPos == 0)

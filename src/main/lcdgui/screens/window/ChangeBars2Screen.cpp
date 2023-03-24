@@ -94,7 +94,7 @@ void ChangeBars2Screen::turnWheel(int i)
 {
 	init();
 
-	if (param.compare("newbars") == 0)
+	if (param == "newbars")
 		setNewBars(newBars + i);
 }
 

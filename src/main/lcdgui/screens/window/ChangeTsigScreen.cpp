@@ -58,22 +58,22 @@ void ChangeTsigScreen::turnWheel(int i)
 
 	auto seq = sequencer->getActiveSequence();
 
-	if (param.compare("bar0") == 0)
+	if (param == "bar0")
 	{
 		setBar0(bar0 + i, seq->getLastBarIndex());
 		displayBars();
 	}
-	else if (param.compare("bar1") == 0)
+	else if (param == "bar1")
 	{
 		setBar1(bar1 + i, seq->getLastBarIndex());
 		displayBars();
 	}
-	else if (param.compare("newtsig") == 0 && i > 0)
+	else if (param == "newtsig" && i > 0)
 	{
 		timesignature.increase();
 		displayNewTsig();
 	}
-	else if (param.compare("newtsig") == 0 && i < 0)
+	else if (param == "newtsig" && i < 0)
 	{
 		timesignature.decrease();
 		displayNewTsig();
@@ -88,7 +88,7 @@ void ChangeTsigScreen::displayBars()
 
 void ChangeTsigScreen::displayNewTsig()
 {
-	if (ls->getCurrentScreenName().compare("delete-sequence") == 0)
+	if (ls->getCurrentScreenName() == "delete-sequence")
 		return;
 
 	auto result = StrUtil::padLeft(std::to_string(timesignature.getNumerator()), " ", 2) +

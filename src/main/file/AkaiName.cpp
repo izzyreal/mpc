@@ -11,7 +11,7 @@ using namespace moduru::lang;
 
 bool AkaiName::isAkaiName(const std::string& name)
 {
-	return name.compare(generate(name)) == 0;
+	return name == generate(name);
 }
 
 std::vector<char> AkaiName::allowedSpecialCharacters = { '_', '^', '$', '~', '!', '#', '%', '&', '-', '{', '}', '(', ')', '@', '\\', '`' };

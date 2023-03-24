@@ -74,7 +74,7 @@ vector<shared_ptr<Control>> CompoundControl::getControls()
 shared_ptr<Control> CompoundControl::find(string name)
 {
 	for (int i = 0; i < controls.size(); i++) {
-		if (controls[i]->getName().compare(name) == 0) {
+		if (controls[i]->getName() == name) {
 			return controls[i];
 		}
 	}

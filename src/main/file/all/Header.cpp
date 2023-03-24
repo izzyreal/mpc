@@ -34,7 +34,7 @@ bool Header::verifyFileID()
 		fileIDString.push_back(c);
 	}
 	std::string shouldBe = "MPC2KXL ALL 1.00";
-	if (fileIDString.compare(shouldBe) == 0) {
+	if (fileIDString == shouldBe) {
 		verifyFileID = true;
 	}
 	return verifyFileID;

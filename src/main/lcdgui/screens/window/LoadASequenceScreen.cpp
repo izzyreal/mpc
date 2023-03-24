@@ -46,7 +46,7 @@ void LoadASequenceScreen::turnWheel(int i)
 {
 	init();
 	
-	if (param.compare("load-into") == 0)
+	if (param == "load-into")
 		setLoadInto(loadInto + i);
 }
 

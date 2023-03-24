@@ -41,7 +41,7 @@ void FxEditScreen::function(int f) {
 void FxEditScreen::turnWheel(int i)
 {
 	init();
-	if (param.compare("drum") == 0)
+	if (param == "drum")
 	{
 		auto mixerSetupScreen = mpc.screens->get<MixerSetupScreen>("mixer-setup");
 		mixerSetupScreen->setFxDrum(mixerSetupScreen->getFxDrum() + i);
@@ -94,19 +94,19 @@ void FxEditScreen::checkEffects() {
 
 	init();
 
-	if (prevParam.compare(param) != 0)
+	if (prevParam != param)
 	{
         std::vector<std::string> effects{ "dist", "filt", "mod", "echo", "rev", "mix" };
 		for (int i = 0; i < 6; i++)
 		{
 			auto effect = findEffects()[i].lock();
 		
-			if (effects[i].compare(param) == 0)
+			if (effects[i] == param)
 			{
 				effect->setFilled(true);
 			}
 
-			if (effects[i].compare(prevParam) == 0)
+			if (effects[i] == prevParam)
 			{
 				effect->setFilled(false);
 			}

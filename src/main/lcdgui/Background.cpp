@@ -93,7 +93,7 @@ void Background::Draw(std::vector<std::vector<bool>>* pixels)
 		}
 
 		// clear bottom in case height != full LCD height
-		if (name.compare("popup") != 0)
+		if (name != "popup")
 		{
 			for (int y = height; y < 60; y++)
 			{

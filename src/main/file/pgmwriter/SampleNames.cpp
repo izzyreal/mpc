@@ -30,7 +30,7 @@ SampleNames::SampleNames(mpc::sampler::Program* program, std::weak_ptr<mpc::samp
 	for (int i = 0; i < lSampler->getSoundCount(); i++) {
 		int j = -1;
 		for (int k = 0; k < finalNames.size(); k++)
-			if (finalNames[k].compare(lSampler->getSoundName(i)) == 0) {
+			if (finalNames[k] == lSampler->getSoundName(i)) {
 				j = k;
 				break;
 			}

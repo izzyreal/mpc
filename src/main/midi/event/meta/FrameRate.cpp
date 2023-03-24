@@ -37,13 +37,13 @@ FrameRate* FrameRate::fromInt(int val)
 
 FrameRate* FrameRate::valueOf(std::string a0)
 {
-	if (FRAME_RATE_24->name.compare(a0) == 0)
+	if (FRAME_RATE_24->name == a0)
 		return FRAME_RATE_24;
-	if (FRAME_RATE_25->name.compare(a0) == 0)
+	if (FRAME_RATE_25->name == a0)
 		return FRAME_RATE_25;
-	if (FRAME_RATE_30->name.compare(a0) == 0)
+	if (FRAME_RATE_30->name == a0)
 		return FRAME_RATE_30;
-	if (FRAME_RATE_30_DROP->name.compare(a0) == 0)
+	if (FRAME_RATE_30_DROP->name == a0)
 		return FRAME_RATE_30_DROP;
 	throw std::invalid_argument("Illegal argument");
 }

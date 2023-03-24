@@ -137,29 +137,29 @@ void SampleScreen::turnWheel(int i)
 
 	if (!ams->isRecordingSound())
 	{
-	    if (param.compare("input") == 0)
+	    if (param == "input")
 		{
             setInput(input + i);
         }
-		else if (param.compare("threshold") == 0)
+		else if (param == "threshold")
 		{
 			setThreshold(threshold + i);
 		}
-		else if (param.compare("mode") == 0)
+		else if (param == "mode")
 		{
 			setMode(mode + i);
 		}
-		else if (param.compare("time") == 0)
+		else if (param == "time")
 		{
 			setTime(time + i);
 		}
-		else if (param.compare("monitor") == 0)
+		else if (param == "monitor")
 		{
 			setMonitor(monitor + i);
 			bool muteMonitor = monitor == 0;
 			mpc.getAudioMidiServices()->muteMonitor(muteMonitor);
 		}
-		else if (param.compare("prerec") == 0)
+		else if (param == "prerec")
 		{
 			setPreRec(preRec + i);
 		}

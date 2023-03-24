@@ -54,31 +54,31 @@ void DrumScreen::turnWheel(int i)
 {
 	init();
 	
-	if (param.compare("drum") == 0)
+	if (param == "drum")
 	{
 		setDrum(drum + i);
 	}
-	else if (param.compare("pgm") == 0)
+	else if (param == "pgm")
 	{
         activeDrum().setProgram(activeDrum().getProgram() + i);
 		displayPgm();
 	}
-	else if (param.compare("program-change") == 0)
+	else if (param == "program-change")
 	{
         activeDrum().setReceivePgmChange(i > 0);
 		displayPgmChange();
 	}
-	else if (param.compare("midi-volume") == 0)
+	else if (param == "midi-volume")
 	{
         activeDrum().setReceiveMidiVolume(i > 0);
 		displayMidiVolume();
 	}
-	else if (param.compare("current-val") == 0)
+	else if (param == "current-val")
 	{
         activeDrum().setLastReceivedMidiVolume(activeDrum().getLastReceivedMidiVolume() + i);
 		displayCurrentVal();
 	}
-	else if (param.compare("padtointernalsound") == 0)
+	else if (param == "padtointernalsound")
 	{
 		setPadToIntSound(i > 0);
 	}
