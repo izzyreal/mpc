@@ -27,7 +27,6 @@ namespace mpc::engine::audio::mixer {
     private:
         std::vector<std::shared_ptr<AudioMixerStrip>> strips;
         std::vector<std::shared_ptr<AudioMixerStrip>> channelStrips;
-        std::vector<std::shared_ptr<AudioMixerStrip>> groupStrips;
         std::vector<std::shared_ptr<AudioMixerStrip>> auxStrips;
         std::shared_ptr<AudioMixerStrip> mainStrip;
         std::shared_ptr<mpc::engine::audio::server::AudioServer> server;

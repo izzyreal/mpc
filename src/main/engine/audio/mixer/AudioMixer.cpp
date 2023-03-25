@@ -62,11 +62,9 @@ shared_ptr<AudioMixerStrip> AudioMixer::getStripImpl(string name)
 
 void AudioMixer::work(int nFrames)
 {
-	silenceStrips(&groupStrips);
 	silenceStrips(&auxStrips);
 	mainStrip->silence();
 	evaluateStrips(&channelStrips, nFrames);
-	evaluateStrips(&groupStrips, nFrames);
 	evaluateStrips(&auxStrips, nFrames);
 	mainStrip->processBuffer(nFrames);
 	writeBusBuffers(nFrames);
@@ -155,9 +153,6 @@ shared_ptr<AudioMixerStrip> AudioMixer::createStrip(shared_ptr<mpc::engine::audi
 	case MixerControlsIds::CHANNEL_STRIP:
 		channelStrips.push_back(strip);
 		break;
-	case MixerControlsIds::GROUP_STRIP:
-		groupStrips.push_back(strip);
-		break;
 	case MixerControlsIds::AUX_STRIP:
 		auxStrips.push_back(strip);
 		break;
@@ -185,7 +180,6 @@ void AudioMixer::close()
 	strips.clear();
 
 	channelStrips.clear();
-	groupStrips.clear();
 	auxStrips.clear();
 
     busses.clear();

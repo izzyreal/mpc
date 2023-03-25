@@ -9,10 +9,6 @@ namespace mpc::engine::audio::mixer {
             : public mpc::engine::control::EnumControl
     {
 
-    private:
-        MainMixControls *mmc;
-        bool canRouteToGroups;
-
     public:
         RouteControl(MainMixControls *mmc, std::string defaultRoute, bool canRouteToGroups);
 

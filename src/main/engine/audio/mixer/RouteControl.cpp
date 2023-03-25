@@ -9,9 +9,7 @@ using namespace std;
 
 RouteControl::RouteControl(MainMixControls* mmc, string defaultRoute, bool canRouteToGroups) : EnumControl(MixControlIds::ROUTE, string("Route"), defaultRoute)
 {
-	this->mmc = mmc;
-	canRouteToGroups = true;
-	this->canRouteToGroups = canRouteToGroups;
+    canRouteToGroups = true;
 }
 
 

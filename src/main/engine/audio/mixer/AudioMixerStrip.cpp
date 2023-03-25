@@ -61,10 +61,6 @@ AudioBuffer* AudioMixerStrip::createBuffer()
 		isChannel = true;
 		return mixer->getSharedBuffer();
 	}
-	else if (id == MixerControlsIds::GROUP_STRIP) {
-		auto buf = mixer->createBuffer(getName());
-		return buf;
-	}
 	else if (id == MixerControlsIds::MAIN_STRIP) {
 		return mixer->getMainBus()->getBuffer();
 	}
