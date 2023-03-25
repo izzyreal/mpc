@@ -1,11 +1,12 @@
 #include <engine/audio/mixer/MainMixControls.hpp>
-#include <engine/audio/mixer/RouteControl.hpp>
+#include <engine/control/EnumControl.hpp>
 #include <engine/audio/mixer/MixerControls.hpp>
 #include <engine/audio/mixer/MixerControlsIds.hpp>
+#include <engine/audio/mixer/MixControlIds.hpp>
 #include <engine/control/Control.hpp>
-#include <engine/control/EnumControl.hpp>
 
 using namespace mpc::engine::audio::mixer;
+using namespace mpc::engine::control;
 using namespace std;
 
 MainMixControls::MainMixControls(MixerControls* mixerControls, int stripId, shared_ptr<BusControls> busControls, bool isMaster)
@@ -13,18 +14,17 @@ MainMixControls::MainMixControls(MixerControls* mixerControls, int stripId, shar
 {
 }
 
-mpc::engine::control::EnumControl* MainMixControls::createRouteControl(int stripId)
+EnumControl* MainMixControls::createRouteControl(int stripId)
 {
 	if (stripId != MixerControlsIds::MAIN_STRIP && stripId != MixerControlsIds::AUX_STRIP) {
 		auto controls = mixerControls->getControls();
-		auto c = controls[0];
-		routeControl = new RouteControl(this, c->getName(), stripId == MixerControlsIds::CHANNEL_STRIP);
+		routeControl = new EnumControl(MixControlIds::ROUTE, "Route", controls[0]->getName());
 		return routeControl;
 	}
 	return nullptr;
 }
 
-mpc::engine::control::EnumControl* MainMixControls::getRouteControl()
+EnumControl* MainMixControls::getRouteControl()
 {
     return routeControl;
 }
