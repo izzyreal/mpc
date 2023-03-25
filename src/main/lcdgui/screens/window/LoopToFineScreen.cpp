@@ -101,7 +101,6 @@ void LoopToFineScreen::turnWheel(int i)
 {
 	init();
 	auto sound = sampler->getSound();
-	auto startEndLength = static_cast<int>(sound->getEnd() - sound->getStart());
 	auto loopLength = static_cast<int>(sound->getEnd() - sound->getLoopTo());
 	auto loopScreen = mpc.screens->get<LoopScreen>("loop");
 	

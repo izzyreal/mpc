@@ -19,8 +19,6 @@ namespace mpc::engine::audio::mixer {
     public:
         BalanceControl();
 
-        virtual ~BalanceControl();
-
     };
 
 }

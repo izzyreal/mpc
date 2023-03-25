@@ -98,17 +98,17 @@ shared_ptr<ControlLaw> EnvelopeControls::HOLD_LAW() {
 
 LawControl* EnvelopeControls::createAttackControl(float init)
 {
-	return new LawControl(ATTACK + idOffset, "Attack", ATTACK_LAW(), 0.1f, init);
+	return new LawControl(ATTACK + idOffset, "Attack", ATTACK_LAW(), init);
 }
 
 LawControl* EnvelopeControls::createHoldControl(float init)
 {
-	return new LawControl(HOLD + idOffset, "Hold", HOLD_LAW(), 0.1f, init);
+	return new LawControl(HOLD + idOffset, "Hold", HOLD_LAW(), init);
 }
 
 LawControl* EnvelopeControls::createDecayControl(float init)
 {
-	return new LawControl(DECAY + idOffset, "Decay", DECAY_LAW(), 0.1f, init);
+	return new LawControl(DECAY + idOffset, "Decay", DECAY_LAW(), init);
 }
 
 float EnvelopeControls::getAttackCoeff()

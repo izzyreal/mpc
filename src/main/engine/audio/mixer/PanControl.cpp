@@ -5,7 +5,7 @@
 using namespace mpc::engine::audio::mixer;
 
 PanControl::PanControl()
-	: LCRControl("Pan", mpc::engine::control::LinearLaw::UNITY(), 0.01f, 0.5f)
+	: LCRControl("Pan", mpc::engine::control::LinearLaw::UNITY(), 0.5f)
 {
 	left = MixControls::HALF_ROOT_TWO();
 	right = MixControls::HALF_ROOT_TWO();

@@ -26,8 +26,7 @@ void HorizontalBar2::Draw(std::vector<std::vector<bool>>* pixels)
 	int x = rect.L;
 	int y = rect.T;
 	int x2 = x + floor(1 + value * w);
-	MRECT r(x, y, x2, y + 6);
-	
+
 	for (int i = rect.L; i <= rect.R; i++)
 	{
 		if (i > 247)

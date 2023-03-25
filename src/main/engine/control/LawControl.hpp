@@ -14,7 +14,6 @@ namespace mpc::engine::control {
     private:
         std::shared_ptr<ControlLaw> law;
         float value{0};
-        float precision{0};
 
     public:
         virtual float getValue();
@@ -25,7 +24,7 @@ namespace mpc::engine::control {
         std::string getValueString() override;
 
     public:
-        LawControl(int id, std::string name, std::shared_ptr<ControlLaw> law, float precision, float initialValue);
+        LawControl(int id, std::string name, std::shared_ptr<ControlLaw> law, float initialValue);
 
     };
 

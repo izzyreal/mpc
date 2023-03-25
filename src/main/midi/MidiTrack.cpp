@@ -71,8 +71,6 @@ void MidiTrack::readTrackData(std::vector<char>& data)
 
 	auto available = (int) in.rdbuf()->in_avail();
 
-	int eventCounter = 0;
-
 	while ( (available = (int)in.rdbuf()->in_avail() > 0) ) {
 		auto delta = mpc::midi::util::VariableLengthInt(in);
 		int value = delta.getValue();

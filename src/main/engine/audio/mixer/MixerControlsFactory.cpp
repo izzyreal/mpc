@@ -11,8 +11,7 @@ using namespace mpc::engine::audio::core;
 using namespace mpc::engine::control;
 using namespace std;
 
-void MixerControlsFactory::createBusStrips(shared_ptr<MixerControls> mixerControls, string mainStripName,
-                                           shared_ptr<ChannelFormat> mainFormat, int nreturns)
+void MixerControlsFactory::createBusStrips(shared_ptr<MixerControls> mixerControls, string mainStripName)
 {
     auto lMixerControls = mixerControls;
     lMixerControls->createStripControls(MixerControlsIds::MAIN_STRIP, mainStripName);

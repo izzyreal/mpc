@@ -7,8 +7,7 @@ namespace mpc::engine::audio::mixer {
     class MixerControlsFactory
     {
     public:
-        static void createBusStrips(std::shared_ptr<MixerControls> mixerControls, std::string mainStripName,
-                                    std::shared_ptr<mpc::engine::audio::core::ChannelFormat> mainFormat, int nreturns);
+        static void createBusStrips(std::shared_ptr<MixerControls> mixerControls, std::string mainStripName);
 
         static void createChannelStrips(std::shared_ptr<MixerControls> mixerControls, int nchannels);
 

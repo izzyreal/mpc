@@ -7,7 +7,7 @@ using namespace mpc::engine;
 using namespace mpc::engine::control;
 
 FaderControl::FaderControl()
-	: LawControl(mpc::engine::audio::mixer::MixControlIds::GAIN, "Level", MPC_FADER_LAW(), 0.1, 100)
+	: LawControl(mpc::engine::audio::mixer::MixControlIds::GAIN, "Level", MPC_FADER_LAW(), 100)
 {
 }
 

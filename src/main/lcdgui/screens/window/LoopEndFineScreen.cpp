@@ -99,11 +99,8 @@ void LoopEndFineScreen::turnWheel(int i)
 {
 	init();
 	auto sound = sampler->getSound();
-	auto startEndLength = static_cast<int>(sound->getEnd() - sound->getStart());
 	auto loopLength = static_cast<int>((sound->getEnd() - sound->getLoopTo()));
 	auto loopScreen = mpc.screens->get<LoopScreen>("loop");
-
-	auto sampleLength = sound->getFrameCount();
 
 	auto soundInc = getSoundIncrement(i);
 	auto field = findField(param);

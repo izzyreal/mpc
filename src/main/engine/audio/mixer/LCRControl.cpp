@@ -5,7 +5,7 @@
 using namespace mpc::engine::audio::mixer;
 using namespace std;
 
-LCRControl::LCRControl(string name, shared_ptr<mpc::engine::control::ControlLaw> law, float precision, float initialValue)
-	: LawControl(MixControlIds::LCR, name, law, precision, initialValue)
+LCRControl::LCRControl(string name, shared_ptr<mpc::engine::control::ControlLaw> law, float initialValue)
+	: LawControl(MixControlIds::LCR, name, law, initialValue)
 {
 }

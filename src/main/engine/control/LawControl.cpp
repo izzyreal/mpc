@@ -4,11 +4,10 @@
 using namespace mpc::engine::control;
 using namespace std;
 
-LawControl::LawControl(int id, string name, shared_ptr<ControlLaw> law, float precision, float initialValue)
+LawControl::LawControl(int id, string name, shared_ptr<ControlLaw> law, float initialValue)
 	: Control(id, name)
 {
 	this->law = law;
-	this->precision = precision;
 	this->value = initialValue;
 }
 

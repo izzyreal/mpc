@@ -164,9 +164,8 @@ void AudioMidiServices::setupMixer()
 	mixerControls->createAuxBusControls("AUX#3", ChannelFormat::STEREO());
 	mixerControls->createAuxBusControls("AUX#4", ChannelFormat::STEREO());
 
-	int nReturns = 1;
 	// L/R represents STEREO OUT L/R
-	MixerControlsFactory::createBusStrips(std::dynamic_pointer_cast<MixerControls>(mixerControls), "L-R", ChannelFormat::STEREO(), nReturns);
+	MixerControlsFactory::createBusStrips(std::dynamic_pointer_cast<MixerControls>(mixerControls), "L-R");
 
 	/*
 	* There are 32 voices. Each voice has one channel for mixing to STEREO OUT L/R, and one channel for mixing to an ASSIGNABLE MIX OUT. These are strips 1-64.
