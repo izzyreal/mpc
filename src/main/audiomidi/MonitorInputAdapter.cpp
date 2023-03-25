@@ -2,7 +2,6 @@
 
 #include <Mpc.hpp>
 
-#include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/SampleScreen.hpp>
 
 #include <engine/audio/core/ChannelFormat.hpp>

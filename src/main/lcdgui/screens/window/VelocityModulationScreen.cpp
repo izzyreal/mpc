@@ -1,7 +1,5 @@
 #include "VelocityModulationScreen.hpp"
 
-#include <sampler/NoteParameters.hpp>
-
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::controls;
 using namespace moduru::lang;

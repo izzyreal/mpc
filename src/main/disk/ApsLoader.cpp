@@ -13,8 +13,6 @@
 #include <sampler/NoteParameters.hpp>
 #include <sampler/PgmSlider.hpp>
 
-#include "engine/Drum.hpp"
-
 #include <lcdgui/screens/DrumScreen.hpp>
 #include <lcdgui/screens/MixerSetupScreen.hpp>
 #include <lcdgui/screens/dialog2/PopupScreen.hpp>

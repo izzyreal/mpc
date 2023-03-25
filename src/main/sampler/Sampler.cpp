@@ -18,15 +18,12 @@
 #include <engine/audio/server/NonRealTimeAudioServer.hpp>
 
 #include "engine/PreviewSoundPlayer.hpp"
-#include "engine/Drum.hpp"
 #include "engine/StereoMixer.hpp"
 #include "engine/IndivFxMixer.hpp"
 
 #include <lang/StrUtil.hpp>
 
 #include <thirdp/libsamplerate/samplerate.h>
-
-#include <functional>
 
 #include <cmrc/cmrc.hpp>
 #include <string_view>

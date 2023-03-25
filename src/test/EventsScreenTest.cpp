@@ -324,12 +324,6 @@ TEST_CASE("COPY6", "[events-screen]")
 
     int eventIndex = 8;
 
-    for (auto& e : tr->getEvents())
-    {
-        auto e1 = std::dynamic_pointer_cast<NoteEvent>(e);
-        printf("Tick %d, note: %d\n", e->getTick(), e1->getNote());
-    }
-
     for (int i = 8; i < 16; i++)
     {
         auto e1 = std::dynamic_pointer_cast<NoteEvent>(tr->getEvent(eventIndex++));

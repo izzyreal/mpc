@@ -6,7 +6,6 @@
 #include <disk/SoundLoader.hpp>
 #include <disk/AbstractDisk.hpp>
 #include <disk/MpcFile.hpp>
-#include <disk/Volume.hpp>
 
 #include <lcdgui/screens/window/DirectoryScreen.hpp>
 #include <lcdgui/screens/window/LoadASequenceScreen.hpp>

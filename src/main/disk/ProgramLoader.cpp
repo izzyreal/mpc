@@ -14,8 +14,6 @@
 #include <lcdgui/screens/window/CantFindFileScreen.hpp>
 #include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
-#include "engine/Drum.hpp"
-
 #include <lang/StrUtil.hpp>
 
 #include <thread>

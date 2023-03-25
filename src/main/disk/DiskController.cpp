@@ -6,7 +6,6 @@
 #include <disk/AbstractDisk.hpp>
 #include <disk/StdDisk.hpp>
 #include <disk/RawDisk.hpp>
-#include <disk/Volume.hpp>
 #include <nvram/VolumesPersistence.hpp>
 
 #include <file/FileUtil.hpp>

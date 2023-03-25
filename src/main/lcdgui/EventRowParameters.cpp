@@ -1,6 +1,5 @@
 #include "EventRowParameters.hpp"
 
-#include <Logger.hpp>
 
 using namespace mpc::lcdgui;
 

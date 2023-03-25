@@ -2,7 +2,6 @@
 
 #include <lcdgui/screens/window/NameScreen.hpp>
 
-#include <sampler/NoteParameters.hpp>
 
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::controls;

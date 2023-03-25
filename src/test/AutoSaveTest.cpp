@@ -2,7 +2,6 @@
 
 #include "Mpc.hpp"
 #include "AutoSave.hpp"
-#include "Paths.hpp"
 #include "disk/Volume.hpp"
 #include "lcdgui/screens/VmpcAutoSaveScreen.hpp"
 

@@ -1,9 +1,6 @@
 #include "VmpcSettingsScreen.hpp"
 
-#include "lcdgui/screens/dialog2/PopupScreen.hpp"
-
 using namespace mpc::lcdgui::screens;
-using namespace mpc::lcdgui::screens::dialog2;
 
 VmpcSettingsScreen::VmpcSettingsScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "vmpc-settings", layerIndex)
