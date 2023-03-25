@@ -188,9 +188,6 @@ void AudioMixer::close()
 	groupStrips.clear();
 	auxStrips.clear();
 
-	for (auto& b : busses) {
-		b->close();
-	}
     busses.clear();
 	auxBusses.clear();
 	server->removeAudioBuffer(sharedAudioBuffer);

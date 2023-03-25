@@ -8,8 +8,7 @@ using namespace std;
 AudioMixerBus::AudioMixerBus(AudioMixer* mixer, shared_ptr<BusControls> busControls)
 {
 	auto lBusControls = busControls;
-	this->mixer = mixer;
-	name = lBusControls->getName();
+    name = lBusControls->getName();
 	channelFormat = lBusControls->getChannelFormat();
 	buffer = mixer->createBuffer(name);
 	buffer->setChannelFormat(channelFormat);
@@ -36,18 +35,5 @@ void AudioMixerBus::write(int nFrames)
 
 	if (output) {
 		output->processAudio(buffer, nFrames);
-	}
-	if (meter != nullptr) {
-		meter->processAudio(buffer, nFrames);
-	}
-}
-
-void AudioMixerBus::close()
-{
-}
-
-AudioMixerBus::~AudioMixerBus() {
-	if (meter != nullptr) {
-		delete meter;
 	}
 }

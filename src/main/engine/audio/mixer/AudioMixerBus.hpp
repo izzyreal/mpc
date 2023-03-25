@@ -13,10 +13,8 @@ namespace mpc::engine::audio::mixer {
     {
 
     private:
-        AudioMixer *mixer{nullptr};
         mpc::engine::audio::core::AudioBuffer *buffer{nullptr};
         std::shared_ptr<mpc::engine::audio::core::AudioProcess> output;
-        mpc::engine::audio::core::AudioProcess *meter{nullptr};
         std::string name;
         std::shared_ptr<mpc::engine::audio::core::ChannelFormat> channelFormat;
 
@@ -29,11 +27,7 @@ namespace mpc::engine::audio::mixer {
 
         virtual void write(int nFrames);
 
-        virtual void close();
-
     public:
         AudioMixerBus(AudioMixer *mixer, std::shared_ptr<BusControls> busControls);
-
-        virtual ~AudioMixerBus();
     };
 }
