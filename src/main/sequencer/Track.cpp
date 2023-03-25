@@ -752,19 +752,17 @@ void Track::correctTimeRange(int startPos, int endPos, int stepLength)
 				break;
 
 			if (event->getTick() >= startPos && event->getTick() < endPos)
-				timingCorrect(fromBar, toBar, ne.get(), stepLength);
+				timingCorrect(fromBar, toBar, ne, stepLength);
 		}
 	}
 
 	removeDoubles();
 }
 
-void Track::timingCorrect(int fromBar, int toBar, NoteEvent* noteEvent, int stepLength)
+void Track::timingCorrect(int fromBar, int toBar, std::shared_ptr<NoteEvent> noteEvent, int stepLength)
 {
-	auto newTick = timingCorrectTick(fromBar, toBar, noteEvent->getTick(), stepLength);
-
-	if (newTick != noteEvent->getTick())
-		noteEvent->setTick(newTick);
+    auto event = std::dynamic_pointer_cast<Event>(noteEvent);
+    updateEventTick(event, timingCorrectTick(fromBar, toBar, noteEvent->getTick(), stepLength));
 }
 
 int Track::timingCorrectTick(int fromBar, int toBar, int tick, int stepLength)
@@ -966,7 +964,7 @@ void Track::swing(std::vector<std::shared_ptr<Event>>& eventsToSwing, int noteVa
 		if (ne)
 		{
 			if (ne->getNote() >= noteRange[0] && ne->getNote() <= noteRange[1])
-				ne->setTick(swingTick(ne->getTick(), noteValue, percentage));
+                updateEventTick(e, swingTick(e->getTick(), noteValue, percentage));
 		}
 	}
 }
@@ -992,13 +990,18 @@ void Track::shiftTiming(std::shared_ptr<Event> event, bool later, int amount, in
     if (!later)
         amount *= -1;
 
-    event->setTick(event->getTick() + amount);
+    int newEventTick = event->getTick() + amount;
 
-    if (event->getTick() < 0)
-        event->setTick(0);
+    if (newEventTick < 0)
+    {
+        newEventTick = 0;
+    }
+    else if (newEventTick > lastTick)
+    {
+        newEventTick = lastTick;
+    }
 
-    if (event->getTick() > lastTick)
-        event->setTick(lastTick);
+    updateEventTick(event, newEventTick);
 }
 
 std::string Track::getActualName()

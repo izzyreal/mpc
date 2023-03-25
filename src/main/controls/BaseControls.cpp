@@ -307,7 +307,7 @@ void BaseControls::generateNoteOn(int note, int padVelo)
             if (stepLength != 1)
             {
                 int bar = sequencer->getCurrentBarIndex() + 1;
-                track->timingCorrect(0, bar, recordedEvent.get(), stepLength);
+                track->timingCorrect(0, bar, recordedEvent, stepLength);
                 
                 std::vector<std::shared_ptr<Event>> events{ recordedEvent };
                 std::vector<int> noteRange {0, 127};
