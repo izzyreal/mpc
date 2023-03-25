@@ -36,14 +36,6 @@ void ExternalAudioServer::close()
 	activeOutputs.clear();
 }
 
-void ExternalAudioServer::work()
-{
-	if (buffers.size() < 1)
-		return;
-	
-	client->work(buffers[0]->getSampleCount());
-}
-
 void ExternalAudioServer::resizeBuffers(int newSize)
 {
 	for (auto& i : activeInputs)

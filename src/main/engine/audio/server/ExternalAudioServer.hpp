@@ -31,8 +31,6 @@ namespace mpc::engine::audio::server
 		void resizeBuffers(int newSize) override;
 
 	public:
-		void work() override;
-		
 		//For compatibility with the PortAudio framework
 		void work(float* inputBuffer, float* outputBuffer, int nFrames, int inputChannelCount, int outputChannelCount);
 		

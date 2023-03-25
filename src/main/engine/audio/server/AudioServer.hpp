@@ -48,7 +48,6 @@ namespace mpc::engine::audio::server {
 		virtual int getInputLatencyFrames() = 0;
 		virtual int getOutputLatencyFrames() = 0;
 		virtual int getTotalLatencyFrames() = 0;
-		virtual void work() = 0;
 
 	public:
 		AudioServer();

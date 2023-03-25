@@ -44,8 +44,6 @@ namespace mpc::engine::audio::server {
 
     public:
         // implement AudioServer
-        void work() override {}
-
         void start() override;
 
         void stop() override;
