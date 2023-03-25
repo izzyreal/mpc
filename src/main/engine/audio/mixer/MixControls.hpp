@@ -43,8 +43,6 @@ namespace mpc::engine::audio::mixer {
     public:
         bool isMaster() override;
 
-        std::shared_ptr<mpc::engine::audio::core::ChannelFormat> getChannelFormat() override;
-
         bool isMute();
 
         bool isEnabled() override;

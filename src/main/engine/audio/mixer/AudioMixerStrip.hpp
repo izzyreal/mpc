@@ -19,7 +19,6 @@ namespace mpc::engine::audio::mixer {
         std::shared_ptr<AudioProcess> input;
         std::shared_ptr<AudioProcess> directOutput;
         bool isChannel{false};
-        std::shared_ptr<mpc::engine::audio::core::ChannelFormat> channelFormat;
         int nmixed{1};
 
     public:

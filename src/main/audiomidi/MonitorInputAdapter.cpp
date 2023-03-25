@@ -4,8 +4,6 @@
 
 #include <lcdgui/screens/SampleScreen.hpp>
 
-#include <engine/audio/core/ChannelFormat.hpp>
-
 using namespace mpc::audiomidi;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -21,8 +19,7 @@ int32_t MonitorInputAdapter::processAudio(mpc::engine::audio::core::AudioBuffer*
 	auto ret = process->processAudio(buffer, nFrames);
 
 	auto sampleScreen = mpc.screens->get<SampleScreen>("sample");
-    auto mode = sampleScreen->getMode();
-    
+
 	if (sampleScreen->getMode() == 0)
 	{
         buffer->copyChannel(0, 1);

@@ -1,6 +1,5 @@
 #include <engine/audio/mixer/MixControls.hpp>
 
-#include <engine/audio/core/ChannelFormat.hpp>
 #include "engine/FaderControl.hpp"
 #include <engine/audio/mixer/BusControls.hpp>
 #include <engine/audio/mixer/MixControlIds.hpp>
@@ -29,8 +28,7 @@ MixControls::MixControls(MixerControls* mixerControls, int stripId, shared_ptr<B
 	this->master = master;
 	gainControl = shared_ptr<FaderControl>(mixerControls->createFaderControl());
 	auto busId = busControls->getId();
-	auto format = getChannelFormat();
-	channelCount = format->getCount();
+	channelCount = 2;
 
 	if (channelCount > 1) {
 		if (stripId == MixerControlsIds::CHANNEL_STRIP) {
@@ -83,12 +81,6 @@ void MixControls::derive(Control* c)
 bool MixControls::isMaster()
 {
     return master;
-}
-
-
-shared_ptr<ChannelFormat> MixControls::getChannelFormat()
-{
-    return busControls->getChannelFormat();
 }
 
 bool MixControls::isMute()

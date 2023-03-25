@@ -1,7 +1,6 @@
 #pragma once
 
 #include <engine/control/CompoundControlChain.hpp>
-#include <engine/audio/core/ChannelFormat.hpp>
 
 #include <vector>
 
@@ -13,7 +12,6 @@ namespace mpc::engine::audio::core {
     private:
         std::string sourceLabel;
         std::string sourceLocation;
-        std::shared_ptr<ChannelFormat> constraintChannelFormat;
 
     public:
         AudioControlsChain(int id, std::string name);

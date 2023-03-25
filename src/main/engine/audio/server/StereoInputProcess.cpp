@@ -15,10 +15,6 @@ int StereoInputProcess::processAudio(mpc::engine::audio::core::AudioBuffer* buff
 		return AUDIO_DISCONNECT;
 	}
 
-	if (buffer->getChannelFormat() != format) {
-		buffer->setChannelFormat(format);
-	}
-	
 	auto& left = buffer->getChannel(0);
 	auto& right = buffer->getChannel(1);
 	auto ns = nFrames <= localBuffer.size() ? nFrames : localBuffer.size();

@@ -7,14 +7,11 @@
 
 namespace mpc::engine::audio::core
 {
-	class ChannelFormat;
-
 	class AudioBuffer
 		: public FloatSampleBuffer
 	{
 
 	private:
-		std::shared_ptr<ChannelFormat> channelFormat;
 		bool realTime{ true };
 		std::string name;
 
@@ -29,12 +26,6 @@ namespace mpc::engine::audio::core
 		void setRealTime(bool realTime);
 
 	public:
-		std::shared_ptr<ChannelFormat> guessFormat();
-
-	public:
-		std::shared_ptr<ChannelFormat> getChannelFormat();
-		void setChannelFormat(std::shared_ptr<ChannelFormat> format);
-
         void swap(int a, int b);
 		float square();
 

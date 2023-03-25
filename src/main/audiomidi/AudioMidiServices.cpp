@@ -19,8 +19,6 @@
 #include <lcdgui/screens/MixerSetupScreen.hpp>
 #include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
 
-#include <engine/audio/core/ChannelFormat.hpp>
-
 #include <engine/audio/mixer/AudioMixer.hpp>
 #include <engine/audio/mixer/AudioMixerBus.hpp>
 #include <engine/audio/mixer/MixerControlsFactory.hpp>
@@ -159,10 +157,10 @@ void AudioMidiServices::setupMixer()
 	mixerControls = std::make_shared<MixerControls>("", 1.f);
 
 	// AUX#1 - #4 represent ASSIGNABLE MIX OUT 1/2, 3/4, 5/6 and 7/8
-	mixerControls->createAuxBusControls("AUX#1", ChannelFormat::STEREO());
-	mixerControls->createAuxBusControls("AUX#2", ChannelFormat::STEREO());
-	mixerControls->createAuxBusControls("AUX#3", ChannelFormat::STEREO());
-	mixerControls->createAuxBusControls("AUX#4", ChannelFormat::STEREO());
+	mixerControls->createAuxBusControls("AUX#1");
+	mixerControls->createAuxBusControls("AUX#2");
+	mixerControls->createAuxBusControls("AUX#3");
+	mixerControls->createAuxBusControls("AUX#4");
 
 	// L/R represents STEREO OUT L/R
 	MixerControlsFactory::createBusStrips(std::dynamic_pointer_cast<MixerControls>(mixerControls), "L-R");

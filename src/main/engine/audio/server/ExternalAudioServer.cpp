@@ -1,7 +1,6 @@
 #include "ExternalAudioServer.hpp"
 #include "StereoInputProcess.hpp"
 #include "StereoOutputProcess.hpp"
-#include "../core/ChannelFormat.hpp"
 
 using namespace mpc::engine::audio::server;
 using namespace std;

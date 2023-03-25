@@ -16,10 +16,6 @@ int StereoOutputProcess::processAudio(mpc::engine::audio::core::AudioBuffer* buf
 		return AudioProcess::AUDIO_OK;
 	}
 
-	if (buffer->getChannelFormat() != format) {
-		buffer->setChannelFormat(format);
-	}
-	
 	auto& left = buffer->getChannel(0);
 	auto& right = buffer->getChannel(1);
 		

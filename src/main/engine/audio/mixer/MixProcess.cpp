@@ -12,10 +12,9 @@ MixProcess::MixProcess(shared_ptr<AudioMixerStrip> strip, shared_ptr<MixVariable
 	}
 	routedStrip = strip;
 	this->vars = vars;
-	auto format = vars->getChannelFormat();
 	smoothingFactor = vars->getSmoothingFactor();
-	channelGains = vector<float>(format->getCount());
-	smoothedChannelGains = vector<float>(format->getCount());
+	channelGains = vector<float>(2);
+	smoothedChannelGains = vector<float>(2);
 }
 
 AudioMixerStrip* MixProcess::getRoutedStrip()

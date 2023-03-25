@@ -1,7 +1,6 @@
 #include <engine/audio/mixer/MixerControls.hpp>
 
 #include <engine/audio/mixer/BusControls.hpp>
-#include <engine/audio/core/ChannelFormat.hpp>
 
 #include <engine/audio/mixer/MixerControlsFactory.hpp>
 #include <engine/audio/mixer/MixerControlsIds.hpp>
@@ -15,10 +14,10 @@ using namespace mpc::engine::audio::core;
 using namespace mpc::engine;
 using namespace std;
 
-MixerControls::MixerControls(string name, string mainBusName, shared_ptr<ChannelFormat> channelFormat)
+MixerControls::MixerControls(string name, string mainBusName)
 	: CompoundControl(1, name)
 {
-	mainBusControls = make_shared<BusControls>(MixerControlsIds::MAIN_BUS, mainBusName, channelFormat);
+	mainBusControls = make_shared<BusControls>(MixerControlsIds::MAIN_BUS, mainBusName);
 }
 
 float MixerControls::getSmoothingFactor()
@@ -26,12 +25,12 @@ float MixerControls::getSmoothingFactor()
     return smoothingFactor;
 }
 
-void MixerControls::createAuxBusControls(string name, shared_ptr<ChannelFormat> format)
+void MixerControls::createAuxBusControls(string name)
 {
 	if (!canAddBusses) {
 		return;
 	}
-	auto busControls = make_shared<BusControls>(MixerControlsIds::AUX_BUS, name, format);
+	auto busControls = make_shared<BusControls>(MixerControlsIds::AUX_BUS, name);
 	auxBusControls.push_back(std::move(busControls));
 }
 

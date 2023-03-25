@@ -1,6 +1,7 @@
 #pragma once
 
-#include <engine/audio/core/ChannelFormat.hpp>
+#include <string>
+#include <vector>
 
 namespace mpc::engine::control {
     class EnumControl;
@@ -20,8 +21,6 @@ namespace mpc::engine::audio::mixer {
         virtual float getGain() = 0;
 
         virtual void getChannelGains(std::vector<float> *dest) = 0;
-
-        virtual std::shared_ptr<mpc::engine::audio::core::ChannelFormat> getChannelFormat() = 0;
 
         virtual float getSmoothingFactor() = 0;
 

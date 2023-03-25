@@ -26,7 +26,7 @@ namespace mpc::engine::audio::mixer {
     public:
         float getSmoothingFactor();
 
-        void createAuxBusControls(std::string name, std::shared_ptr<mpc::engine::audio::core::ChannelFormat> format);
+        void createAuxBusControls(std::string name);
 
         std::shared_ptr<BusControls> getBusControls(std::string name);
 
@@ -47,11 +47,10 @@ namespace mpc::engine::audio::mixer {
         mpc::engine::FaderControl *createFaderControl();
 
     public:
-        MixerControls(std::string name, std::string mainBusName,
-                      std::shared_ptr<mpc::engine::audio::core::ChannelFormat> channelFormat);
+        MixerControls(std::string name, std::string mainBusName);
 
         MixerControls(std::string name)
-                : MixerControls(std::move(name), "Main", mpc::engine::audio::core::ChannelFormat::STEREO())
+                : MixerControls(std::move(name), "Main")
         {}
 
         MixerControls(std::string name, float _smoothingFactor)

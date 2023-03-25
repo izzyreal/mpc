@@ -6,10 +6,6 @@
 
 namespace mpc::engine::audio {
 
-    namespace core {
-        class ChannelFormat;
-    }
-
     namespace server {
 
         class AudioServerProcess
@@ -19,13 +15,8 @@ namespace mpc::engine::audio {
         private:
             std::string name;
 
-        protected:
-            std::shared_ptr<mpc::engine::audio::core::ChannelFormat> format;
-
         public:
             std::string getName() override;
-
-            std::shared_ptr<mpc::engine::audio::core::ChannelFormat> getChannelFormat() override;
 
             AudioServerProcess(std::string name);
         };

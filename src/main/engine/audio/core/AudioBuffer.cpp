@@ -1,5 +1,4 @@
 #include <engine/audio/core/AudioBuffer.hpp>
-#include <engine/audio/core/ChannelFormat.hpp>
 
 using namespace mpc::engine::audio::core;
 using namespace std;
@@ -8,7 +7,6 @@ AudioBuffer::AudioBuffer(string name, int channelCount, int sampleCount, float s
 {
 	this->name = name;
 	realTime = true;
-	channelFormat = guessFormat();
 }
 
 const bool AudioBuffer::isSilent() {
@@ -52,34 +50,6 @@ void AudioBuffer::setRealTime(bool realTime)
     this->realTime = realTime;
 }
 
-
-shared_ptr<ChannelFormat> AudioBuffer::guessFormat()
-{
-    return ChannelFormat::STEREO();
-}
-
-shared_ptr<ChannelFormat> AudioBuffer::getChannelFormat()
-{
-    return channelFormat;
-}
-
-void AudioBuffer::setChannelFormat(shared_ptr<ChannelFormat> newFormat)
-{
-    auto l_newFormat = newFormat;
-    auto l_channelFormat = channelFormat;
-
-    if (l_newFormat == l_channelFormat) {
-        return;
-    }
-
-	channelFormat = l_newFormat;
-
-	if (l_newFormat) {
-		setChannelCount(l_newFormat->getCount());
-	}
-}
-
-
 void AudioBuffer::swap(int a, int b)
 {
     auto ns = getSampleCount();
@@ -113,8 +83,6 @@ float AudioBuffer::square()
 void AudioBuffer::copyFrom(AudioBuffer* src)
 {
     if(src == nullptr) return;
-
-    setChannelFormat(src->getChannelFormat());
     auto nc = getChannelCount();
     auto ns = getSampleCount();
     for (auto c = 0; c < nc; c++) {

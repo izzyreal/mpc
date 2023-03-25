@@ -1,6 +1,5 @@
 #include <engine/audio/mixer/MixerControlsFactory.hpp>
 
-#include <engine/audio/core/ChannelFormat.hpp>
 #include <engine/audio/mixer/MainMixControls.hpp>
 #include <engine/audio/mixer/MixControls.hpp>
 #include <engine/audio/mixer/MixerControlsIds.hpp>
@@ -28,7 +27,6 @@ void MixerControlsFactory::createChannelStrips(shared_ptr<MixerControls> mixerCo
 {
 
     auto mbc = mixerControls->getMainBusControls();
-    auto mainFormat = mbc->getChannelFormat();
     for (int i = 0; i < nchannels; i++)
     {
         mixerControls->createStripControls(MixerControlsIds::CHANNEL_STRIP, to_string(1 + i));

@@ -9,9 +9,7 @@ AudioMixerBus::AudioMixerBus(AudioMixer* mixer, shared_ptr<BusControls> busContr
 {
 	auto lBusControls = busControls;
     name = lBusControls->getName();
-	channelFormat = lBusControls->getChannelFormat();
 	buffer = mixer->createBuffer(name);
-	buffer->setChannelFormat(channelFormat);
 }
 
 AudioBuffer* AudioMixerBus::getBuffer()
