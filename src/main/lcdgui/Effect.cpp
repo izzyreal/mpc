@@ -53,6 +53,3 @@ void Effect::Draw(std::vector<std::vector<bool>>* pixels) {
 
 	dirty = false;
 }
-
-Effect::~Effect() {
-}

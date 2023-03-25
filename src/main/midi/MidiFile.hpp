@@ -20,37 +20,29 @@ namespace mpc::midi {
 	private:
 		static std::vector<char> IDENTIFIER;
 
-	public:
-		static const int DEFAULT_RESOLUTION{ 480 };
-
 	private:
-		int mType{};
-		int mTrackCount{};
-		int mResolution{};
-		std::vector<std::shared_ptr<MidiTrack>> mTracks{};
+		int mType = 0;
+		int mTrackCount = 0;
+		int mResolution = 96;
+		std::vector<std::shared_ptr<MidiTrack>> mTracks;
 
 	public:
 		void setType(int type);
 		int getType();
-		int getTrackCount();
-		void setResolution(int res);
-		int getResolution();
-		int getLengthInTicks();
+
+        int getLengthInTicks();
 		std::vector<std::weak_ptr<MidiTrack>> getTracks();
 		void addTrack(std::shared_ptr<MidiTrack> T);
 		void addTrack(std::shared_ptr<MidiTrack> T, int pos);
-		void removeTrack(int pos);
-		void writeToOutputStream(std::shared_ptr<std::ostream>);
+
+        void writeToOutputStream(std::shared_ptr<std::ostream>);
 
 	private:
 		void initFromBuffer(std::vector<char>& buffer);
 
 	public:
-		MidiFile();
-		MidiFile(int resolution);
-		MidiFile(int resolution, std::vector<MidiTrack*> tracks);
-		MidiFile(std::shared_ptr<std::istream>);
-		~MidiFile();
+		MidiFile() = default;
+		explicit MidiFile(std::shared_ptr<std::istream>);
 
 	};
 }

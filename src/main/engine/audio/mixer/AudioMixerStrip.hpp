@@ -49,8 +49,6 @@ namespace mpc::engine::audio::mixer {
     public:
         AudioMixerStrip(AudioMixer *mixer, std::shared_ptr<mpc::engine::audio::core::AudioControlsChain> controlsChain);
 
-        ~AudioMixerStrip();
-
     };
 
 }

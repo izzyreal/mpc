@@ -1,27 +1,21 @@
 #pragma once
+
 #include "Component.hpp"
 
-namespace mpc {
-	namespace lcdgui {
+namespace mpc::lcdgui {
 
-		class Effect
-			: public Component
-		{
+    class Effect
+            : public Component
+    {
 
-		private:
-			bool filled = false;
+    private:
+        bool filled = false;
 
-		public:
-			void setFilled(bool b);
+    public:
+        void setFilled(bool b);
+        void Draw(std::vector<std::vector<bool>> *pixels) override;
+        Effect(MRECT rect);
 
-		public:
-			void Draw(std::vector<std::vector<bool>>* pixels) override;
+    };
 
-		public:
-			Effect(MRECT rect);
-			~Effect();
-
-		};
-
-	}
 }

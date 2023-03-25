@@ -11,7 +11,7 @@ namespace mpc::engine::filter {
     public:
         StateVariableFilter(mpc::engine::filter::FilterControls *variables);
 
-        virtual ~StateVariableFilter();
+        ~StateVariableFilter();
 
     private:
         StateVariableFilterElement *element{nullptr};

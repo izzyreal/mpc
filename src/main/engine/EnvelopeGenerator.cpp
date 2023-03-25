@@ -61,6 +61,3 @@ void EnvelopeGenerator::reset()
     holdCounter = 0;
     envelope = 0.0f;
 }
-
-EnvelopeGenerator::~EnvelopeGenerator() {
-}

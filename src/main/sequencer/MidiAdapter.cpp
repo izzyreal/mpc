@@ -32,6 +32,3 @@ std::weak_ptr<mpc::engine::midi::ShortMessage> MidiAdapter::get()
 {
 	return message;
 }
-
-MidiAdapter::~MidiAdapter() {
-}

@@ -9,23 +9,6 @@
 using namespace mpc::midi;
 using namespace mpc::midi::util;
 
-MidiFile::MidiFile() 
-	: MidiFile(DEFAULT_RESOLUTION)
-{
-}
-
-MidiFile::MidiFile(int resolution) 
-: MidiFile(resolution, std::vector<MidiTrack*>(0))
-{
-}
-
-MidiFile::MidiFile(int resolution, std::vector<MidiTrack*> tracks)
-{
-	mResolution = resolution >= 0 ? resolution : DEFAULT_RESOLUTION;
-	mTrackCount = tracks.size();
-	mType = mTrackCount > 1 ? 1 : 0;
-}
-
 MidiFile::MidiFile(std::shared_ptr<std::istream> stream)
 {
 	std::vector<char> buffer(HEADER_SIZE);
@@ -56,23 +39,6 @@ void MidiFile::setType(int type)
 int MidiFile::getType()
 {
     return mType;
-}
-
-int MidiFile::getTrackCount()
-{
-    return mTrackCount;
-}
-
-void MidiFile::setResolution(int res)
-{
-	if (res >= 0) {
-		mResolution = res;
-	}
-}
-
-int MidiFile::getResolution()
-{
-    return mResolution;
 }
 
 int MidiFile::getLengthInTicks()
@@ -113,16 +79,6 @@ void MidiFile::addTrack(std::shared_ptr<MidiTrack> track, int pos)
 	mType = mTrackCount > 1 ? 1 : 0;
 }
 
-void MidiFile::removeTrack(int pos)
-{
-	if (pos < 0 || pos >= mTracks.size()) {
-		return;
-	}
-	mTracks.erase(mTracks.begin() + pos);
-	mTrackCount = mTracks.size();
-	mType = mTrackCount > 1 ? 1 : 0;
-}
-
 void MidiFile::writeToOutputStream(std::shared_ptr<std::ostream> stream)
 {
 	stream->write(&IDENTIFIER[0], IDENTIFIER.size());
@@ -148,14 +104,15 @@ void MidiFile::initFromBuffer(std::vector<char>& buffer)
     if (!mpc::midi::util::MidiUtil::bytesEqual(buffer, IDENTIFIER, 0, 4)) {
         mType = 0;
         mTrackCount = 0;
-        mResolution = DEFAULT_RESOLUTION;
         MLOG("File header does not indicate this is a MIDI file");
         return;
     }
 	mType = MidiUtil::bytesToInt(buffer, 8, 2);
     mTrackCount = MidiUtil::bytesToInt(buffer, 10, 2);
     mResolution = MidiUtil::bytesToInt(buffer, 12, 2);
-}
 
-MidiFile::~MidiFile() {
+    if (mResolution != 96)
+    {
+        MLOG("Developer warning: non-96ppq MIDI file was loaded. Most likely the event positions are incorrect.");
+    }
 }

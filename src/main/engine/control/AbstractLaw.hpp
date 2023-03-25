@@ -20,8 +20,6 @@ namespace mpc::engine::control {
     public:
         AbstractLaw(float min, float max, std::string units);
 
-        virtual ~AbstractLaw()
-        {}
     };
 
 }

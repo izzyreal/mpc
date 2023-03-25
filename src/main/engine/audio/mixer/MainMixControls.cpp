@@ -28,6 +28,3 @@ EnumControl* MainMixControls::getRouteControl()
 {
     return routeControl;
 }
-
-MainMixControls::~MainMixControls() {
-}

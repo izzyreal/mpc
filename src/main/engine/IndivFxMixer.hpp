@@ -36,8 +36,5 @@ namespace mpc::engine {
     public:
         IndivFxMixer();
 
-        virtual ~IndivFxMixer()
-        {}
-
     };
 }

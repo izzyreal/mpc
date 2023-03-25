@@ -27,8 +27,6 @@ namespace mpc::engine {
 
         EnvelopeGenerator(EnvelopeControls *vars);
 
-        ~EnvelopeGenerator();
-
     };
 
 }

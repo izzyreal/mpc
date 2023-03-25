@@ -22,8 +22,6 @@ namespace mpc::engine::audio::mixer {
         MainMixControls(MixerControls *mixerControls, int stripId, std::shared_ptr<BusControls> busControls,
                         bool isMaster);
 
-        ~MainMixControls();
-
     };
 
 }

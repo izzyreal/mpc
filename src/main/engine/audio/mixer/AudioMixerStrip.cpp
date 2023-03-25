@@ -169,6 +169,3 @@ void AudioMixerStrip::close()
     AudioProcessChain::close();
     mixer->removeBuffer(buffer);
 }
-
-AudioMixerStrip::~AudioMixerStrip() {
-}

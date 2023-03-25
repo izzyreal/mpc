@@ -265,7 +265,6 @@ MidiWriter::MidiWriter(mpc::sequencer::Sequence* sequence)
 		mf->addTrack(mt);
 	}
 	mf->setType(1);
-	mf->setResolution(96);
 }
 
 void MidiWriter::addNoteOn(std::shared_ptr<NoteOn> noteOn)

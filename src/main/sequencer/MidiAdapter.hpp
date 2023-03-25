@@ -31,8 +31,6 @@ namespace mpc::sequencer {
 
         MidiAdapter();
 
-        ~MidiAdapter();
-
     };
 
 }

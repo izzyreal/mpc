@@ -11,7 +11,6 @@ namespace mpc::engine::audio::server
 	public:
 		std::vector<float> localBuffer;
 		virtual std::string getName() = 0;
-        virtual ~IOAudioProcess() {}
 
 	};
 }
