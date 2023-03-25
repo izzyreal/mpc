@@ -288,7 +288,7 @@ void PgmAssignScreen::displaySoundName()
 	if (sndNumber == -1)
 	{
 		findField("snd")->setText("OFF");
-		findLabel("issoundstereo")->setText("");
+		findLabel("issoundstereo")->setText("    ");
 	}
 	else
 	{
@@ -299,7 +299,7 @@ void PgmAssignScreen::displaySoundName()
 	if (sampler->getSoundCount() != 0 && sndNumber != -1)
 	{
 		if (sampler->getSound(sndNumber)->isMono())
-			findLabel("issoundstereo")->setText("");
+			findLabel("issoundstereo")->setText("    ");
 		else
 			findLabel("issoundstereo")->setText("(ST)");
 	}
