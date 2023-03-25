@@ -897,6 +897,8 @@ void Track::updateEventTick(std::shared_ptr<Event>& e, int newTick)
     int currentIndex = -1;
     int newIndex = -1;
 
+    bool higherOneExists = false;
+
     for (int i = 0; i < events.size(); i++)
     {
         if (currentIndex >= 0 && newIndex >= 0)
@@ -910,13 +912,21 @@ void Track::updateEventTick(std::shared_ptr<Event>& e, int newTick)
             continue;
         }
 
-        if (events[i]->getTick() > newTick)
+        if (newIndex == -1 && events[i]->getTick() > newTick)
         {
-            newIndex = i;
+            higherOneExists = true;
+            newIndex = i - 1;
         }
     }
 
+    if (!higherOneExists)
+    {
+        newIndex = events.size() - 1;
+    }
+
     moveEvent(events, currentIndex, newIndex);
+
+    e->setTick(newTick);
 }
 
 std::vector<std::shared_ptr<NoteEvent>> Track::getNoteEvents()
@@ -967,15 +977,19 @@ void Track::swing(std::vector<std::shared_ptr<Event>>& eventsToSwing, int noteVa
 int Track::swingTick(int tick, int noteValue, int percentage)
 {
 	if (noteValue != 1 && noteValue != 3)
-		return tick;
+    {
+        return tick;
+    }
 
-	auto base = 48;
+	const int base = noteValue == 3 ? 24 : 48;
+    const int maxDistance = noteValue == 3 ? 12 : 24;
+    const int offset = (base * 2) - ((tick + base) % (base * 2));
 
-	if (noteValue == 3)
-		base = 24;
-
-	if ((tick + base) % (base * 2) == 0)
-		tick += ((percentage - 50) * (4.0 / 100.0) * (base / 2.0));
+    if (offset <= maxDistance)
+    {
+        tick += ((percentage - 50) * (4.0 / 100.0) * (base / 2.0));
+        tick += offset;
+    }
 
 	return tick;
 }

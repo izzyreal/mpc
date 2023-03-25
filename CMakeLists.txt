@@ -145,7 +145,7 @@ foreach(_source IN ITEMS ${_source_list_test})
     source_group("${_source_path_msvc}" FILES "${_source}")
 endforeach()
 
-add_executable(mpc-tests ${_source_list_test} src/test/SamplerTest.cpp)
+add_executable(mpc-tests ${_source_list_test} src/test/SamplerTest.cpp src/test/TrackTest.cpp)
 target_link_libraries(mpc-tests mpc Catch2::Catch2WithMain)
 
 if (UNIX)
