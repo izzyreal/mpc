@@ -114,6 +114,7 @@ void SoundRecorder::stop()
 				s->getSampleData()->erase(s->getSampleData()->begin() + lengthInFrames + preRecFrames, s->getSampleData()->end());
 		}
 
+        s->setStart(preRecFrames);
 		s->setEnd(s->getFrameCount());
 
 		mpc.getLayeredScreen()->openScreen("keep-or-retry");
