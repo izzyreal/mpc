@@ -879,11 +879,6 @@ void Track::removeDoubles()
 		events.erase(events.begin() + i);
 }
 
-void Track::sortEvents()
-{
-	sort(events.begin(), events.end(), tickCmp);
-}
-
 template <typename t> void moveEvent(std::vector<t>& v, size_t oldIndex, size_t newIndex)
 {
     if (oldIndex > newIndex)

@@ -107,8 +107,6 @@ public:
 public:
     // Do not call from audio thread
     void removeDoubles();
-    // Do not call from audio thread
-    void sortEvents();
 
 private:
     std::vector<std::shared_ptr<NoteEvent>> getNoteEventsAtTick(int tick);

@@ -741,6 +741,5 @@ void EventsScreen::performCopy(int sourceStart, int sourceEnd, int toSequenceInd
         }
     }
 
-    destTrack->sortEvents();
     sequencer->setActiveSequenceIndex(toSequenceIndex);
 }
