@@ -14,6 +14,7 @@
 
 #include <hardware/Hardware.hpp>
 #include <hardware/HwPad.hpp>
+#include <hardware/TopPanel.hpp>
 
 #include <lcdgui/screens/MixerSetupScreen.hpp>
 #include <lcdgui/screens/TransScreen.hpp>
@@ -125,9 +126,12 @@ void EventHandler::handleNoThru(const std::shared_ptr<Event>& event, Track* trac
                         auto program = mpc.getSampler()->getProgram(mpc.getDrum(drumIndex).getProgram());
 
                         int pad = program->getPadIndexFromNote(note);
-                        int bank = mpc.getBank();
 
-                        pad -= pad == -1 ? 0 : bank * 16;
+                        if (!mpc.getHardware()->getTopPanel()->isSixteenLevelsEnabled())
+                        {
+                            int bank = mpc.getBank();
+                            pad -= pad == -1 ? 0 : bank * 16;
+                        }
 
                         if (pad >= 0 && pad <= 15)
                         {

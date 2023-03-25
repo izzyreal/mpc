@@ -278,8 +278,7 @@ void BaseControls::generateNoteOn(int note, int padVelo)
     bool step = currentScreenName == "step-editor" && !posIsLastTick;
     
     auto tc_note = timingCorrectScreen->getNoteValue();
-    auto tc_swing = timingCorrectScreen->getSwing();
-    
+
     bool recMainWithoutPlaying = currentScreenName == "sequencer" &&
     !sequencer->isPlaying() &&
     mpc.getControls()->isRecPressed() &&
