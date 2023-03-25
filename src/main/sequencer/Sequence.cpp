@@ -139,8 +139,7 @@ void Sequence::initMetaTracks()
 void Sequence::createTempoChangeTrack()
 {
 	metaTracks[0]->removeEvents();
-	auto tce = metaTracks[0]->addEvent(0, "tempo-change");
-	std::dynamic_pointer_cast<mpc::sequencer::TempoChangeEvent>(tce)->setStepNumber(0);
+    addTempoChangeEvent(0);
 }
 
 bool Sequence::isLoopEnabled()
@@ -263,10 +262,10 @@ std::vector<std::shared_ptr<TempoChangeEvent>> Sequence::getTempoChangeEvents()
 	return res;
 }
 
-std::shared_ptr<TempoChangeEvent> Sequence::addTempoChangeEvent()
+std::shared_ptr<TempoChangeEvent> Sequence::addTempoChangeEvent(int tick)
 {
-	auto res = metaTracks[0]->addEvent(0, "tempo-change");
-	return std::dynamic_pointer_cast<TempoChangeEvent>(res);
+	auto res = metaTracks[0]->addEvent(tick, "tempo-change");
+    return std::dynamic_pointer_cast<TempoChangeEvent>(res);
 }
 
 double Sequence::getInitialTempo()
@@ -325,19 +324,6 @@ TimeSignature Sequence::getTimeSignature()
 	ts.setDenominator(denominators[bar]);
 
 	return ts;
-}
-
-void Sequence::sortTempoChangeEvents()
-{
-	metaTracks[0]->sortEvents();
-	int tceCounter = 0;
-
-	for (auto& e : metaTracks[0]->getEvents())
-	{
-		auto tce = std::dynamic_pointer_cast<TempoChangeEvent>(e);
-		tce->setStepNumber(tceCounter);
-		tceCounter++;
-	}
 }
 
 void Sequence::purgeAllTracks()

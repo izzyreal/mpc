@@ -3,6 +3,8 @@
 #include <sequencer/TempoChangeEvent.hpp>
 #include <sequencer/TimeSignature.hpp>
 
+#include <sequencer/Track.hpp>
+
 #include <lcdgui/HorizontalBar2.hpp>
 
 #include <Util.hpp>
@@ -148,7 +150,7 @@ void TempoChangeScreen::displayTempoChange0()
 	bars[0]->Hide(false);
 	
 	auto tce = visibleTempoChanges[0];
-	a0Field->setText(std::to_string(tce->getStepNumber() + 1));
+	a0Field->setText(std::to_string(offset + 1));
 	auto timeSig = sequence->getTimeSignature();
 	
 	int value = tce->getBar(timeSig.getNumerator(), timeSig.getDenominator()) + 1;
@@ -208,7 +210,7 @@ void TempoChangeScreen::displayTempoChange1()
 	f1Label->Hide(false);
 	bars[1]->Hide(false);
 
-	a1Field->setText(std::to_string(tce->getStepNumber() + 1));
+	a1Field->setText(std::to_string(offset + 2));
 	
 	auto sequence = sequencer->getActiveSequence();
 	auto timeSig = sequence->getTimeSignature();
@@ -272,7 +274,7 @@ void TempoChangeScreen::displayTempoChange2()
 	e2Label->Hide(false);
 	f2Label->Hide(false);
 	bars[2]->Hide(false);
-	a2Field->setText(std::to_string(tce->getStepNumber() + 1));
+	a2Field->setText(std::to_string(offset + 3));
 
 	auto sequence = sequencer->getActiveSequence();
 	auto timeSig = sequence->getTimeSignature();
@@ -343,12 +345,12 @@ void TempoChangeScreen::function(int j)
 	case 1:
 		if (yPos + offset >= tceList.size())
 			return;
-		
-		if (tceList[offset + yPos]->getStepNumber() == 0)
+
+        // The initial tempo change event can't be removed.
+		if (offset + yPos == 0)
 			return;
 		
 		seq->removeTempoChangeEvent(offset + yPos);
-		seq->sortTempoChangeEvents();
 
 		if (offset + yPos == tceList.size() - 1)
 			setOffset(offset - 1);
@@ -375,10 +377,8 @@ void TempoChangeScreen::function(int j)
 
 		if (nowDetected == -1)
 		{
-			auto tce = seq->addTempoChangeEvent();
-			tce->setTick(sequencer->getTickPosition());
-			seq->sortTempoChangeEvents();
-			initVisibleEvents();
+			std::shared_ptr<Event> tce = seq->addTempoChangeEvent(sequencer->getTickPosition());
+            initVisibleEvents();
 			displayTempoChange0();
 			displayTempoChange1();
 			displayTempoChange2();
@@ -403,9 +403,7 @@ void TempoChangeScreen::function(int j)
 
 		if (tceList.size() == 1)
 		{
-			auto tce = seq->addTempoChangeEvent();
-			tce->setTick(seq->getLastTick() - 1);
-			tce->setStepNumber(1);
+			seq->addTempoChangeEvent(seq->getLastTick() - 1);
 		}
 		else if (tceList.size() > 1)
 		{
@@ -420,20 +418,17 @@ void TempoChangeScreen::function(int j)
 				if (lCurrent->getTick() == 1)
 					return;
 				
-				auto tce = seq->addTempoChangeEvent();
-				tce->setTick(next.lock()->getTick() - 1);
+				seq->addTempoChangeEvent(next.lock()->getTick() - 1);
 			}
 			else if (yPos + offset > 0)
 			{
 				if (lCurrent->getTick() - 1 == lPrevious->getTick())
 					return;
 
-				auto tce = seq->addTempoChangeEvent();
-				tce->setTick(lCurrent->getTick() - 1);
-			}
+				seq->addTempoChangeEvent(lCurrent->getTick() - 1);
+            }
 		}
 
-		seq->sortTempoChangeEvents();
 		initVisibleEvents();
 		displayTempoChange0();
 		displayTempoChange1();
@@ -506,21 +501,28 @@ void TempoChangeScreen::turnWheel(int j)
 	{
 		auto event = visibleTempoChanges[i];
 
-		if (param == "b" + std::to_string(i))
+        bool mayChangePosition = true;
+
+        if (i == 0 && offset == 0)
+        {
+            mayChangePosition = false;
+        }
+
+		if (mayChangePosition && param == "b" + std::to_string(i))
 		{
 			if (j > 0)
                 event->plusOneBar(next.lock().get());
 			else
                 event->minusOneBar(previous.lock().get());
 		}
-		else if (param == "c" + std::to_string(i))
+		else if (mayChangePosition && param == "c" + std::to_string(i))
 		{
 			if (j > 0)
                 event->plusOneBeat(next.lock().get());
 			else
                 event->minusOneBeat(previous.lock().get());
 		}
-		else if (param == "d" + std::to_string(i))
+		else if (mayChangePosition && param == "d" + std::to_string(i))
 		{
 			if (j > 0)
 				event->plusOneClock(next.lock().get());

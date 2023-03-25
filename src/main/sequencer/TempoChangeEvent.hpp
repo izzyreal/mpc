@@ -14,7 +14,6 @@ namespace mpc::sequencer
 
 	private:
 		int ratio = 1000;
-		int stepNumber = 0;
 		Sequence* parent = nullptr;
 
 	public:
@@ -26,8 +25,6 @@ namespace mpc::sequencer
 		void minusOneClock(TempoChangeEvent* previous);
 		void setRatio(int i);
 		int getRatio();
-		void setStepNumber(int i);
-		int getStepNumber();
 		int getBar(int n, int d);
 		int getBeat(int n, int d);
 		int getClock(int denominator);

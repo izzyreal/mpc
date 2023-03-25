@@ -886,6 +886,46 @@ void Track::sortEvents()
 	sort(events.begin(), events.end(), tickCmp);
 }
 
+template <typename t> void moveEvent(std::vector<t>& v, size_t oldIndex, size_t newIndex)
+{
+    if (oldIndex > newIndex)
+        std::rotate(v.rend() - oldIndex - 1, v.rend() - oldIndex, v.rend() - newIndex);
+    else
+        std::rotate(v.begin() + oldIndex, v.begin() + oldIndex + 1, v.begin() + newIndex + 1);
+}
+
+void Track::updateEventTick(std::shared_ptr<Event>& e, int newTick)
+{
+    if (e->getTick() == newTick)
+    {
+        return;
+    }
+
+    int currentIndex = -1;
+    int newIndex = -1;
+
+    for (int i = 0; i < events.size(); i++)
+    {
+        if (currentIndex >= 0 && newIndex >= 0)
+        {
+            break;
+        }
+
+        if (events[i] == e)
+        {
+            currentIndex = i;
+            continue;
+        }
+
+        if (events[i]->getTick() > newTick)
+        {
+            newIndex = i;
+        }
+    }
+
+    moveEvent(events, currentIndex, newIndex);
+}
+
 std::vector<std::shared_ptr<NoteEvent>> Track::getNoteEvents()
 {
 	std::vector<std::shared_ptr<NoteEvent>> noteEvents;

@@ -773,7 +773,7 @@ void Sequencer::copySequenceParameters(std::shared_ptr<Sequence> source, std::sh
 void Sequencer::copyTempoChangeEvents(std::shared_ptr<Sequence> src, std::shared_ptr<Sequence> dst) {
 	for (auto& e1 : src->getTempoChangeEvents())
     {
-        e1->CopyValuesTo(dst->addTempoChangeEvent());
+        e1->CopyValuesTo(dst->addTempoChangeEvent(e1->getTick()));
     }
 }
 

@@ -108,12 +108,10 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
 
     for (int i = 1; i < tempoChanges.size(); i++)
     {
-        auto tce = sequence->addTempoChangeEvent();
         auto lTcMidi = tempoChanges[i].lock();
+        auto tce = sequence->addTempoChangeEvent(lTcMidi->getTick());
         auto ratio = (float)(lTcMidi->getBpm()) / initialTempo;
         tce->setRatio((int)(ratio * 1000.0));
-        tce->setStepNumber(i);
-        tce->setTick(lTcMidi->getTick());
     }
 
     if (timeSignatures.size() == 1)

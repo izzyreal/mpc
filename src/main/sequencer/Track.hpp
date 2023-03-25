@@ -114,6 +114,7 @@ private:
     std::vector<std::shared_ptr<NoteEvent>> getNoteEventsAtTick(int tick);
 
 public:
+    void updateEventTick(std::shared_ptr<Event>& e, int newTick);
     std::vector<std::shared_ptr<NoteEvent>> getNoteEvents();
     void timingCorrect(int fromBar, int toBar, NoteEvent* noteEvent, int stepLength);
     int timingCorrectTick(int fromBar, int toBar, int tick, int stepLength);

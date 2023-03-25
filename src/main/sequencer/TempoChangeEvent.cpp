@@ -16,22 +16,12 @@ TempoChangeEvent::TempoChangeEvent(Sequence* parent, int ratio)
 	this->parent = parent;
 }
 
-TempoChangeEvent::TempoChangeEvent(Sequence* parent, int ratio, int step)
-{
-	this->ratio = ratio;
-	this->parent = parent;
-	this->stepNumber = step;
-}
-
 void TempoChangeEvent::setParent(Sequence* newParent) {
 	parent = newParent;
 }
 
 void TempoChangeEvent::plusOneBar(TempoChangeEvent *next)
 {
-    if (stepNumber == 0)
-		return;
-
 	tick = parent->getFirstTickOfBar(SeqUtil::getBar(parent, tick) + 1);
 
 	if (tick > parent->getLastTick())
@@ -48,9 +38,6 @@ void TempoChangeEvent::plusOneBar(TempoChangeEvent *next)
 
 void TempoChangeEvent::minusOneBar(TempoChangeEvent *previous)
 {
-	if (stepNumber == 0)
-		return;
-
 	tick = parent->getFirstTickOfBar(SeqUtil::getBar(parent, tick) - 1);
 
 	if (tick < 0)
@@ -67,9 +54,6 @@ void TempoChangeEvent::minusOneBar(TempoChangeEvent *previous)
 
 void TempoChangeEvent::plusOneBeat(TempoChangeEvent *next)
 {
-	if (stepNumber == 0)
-		return;
-	
 	tick = parent->getFirstTickOfBeat(SeqUtil::getBar(parent, tick), SeqUtil::getBeat(parent, tick) + 1);
 
 	if (tick >= parent->getLastTick())
@@ -86,9 +70,6 @@ void TempoChangeEvent::plusOneBeat(TempoChangeEvent *next)
 
 void TempoChangeEvent::minusOneBeat(TempoChangeEvent *previous)
 {
-	if (stepNumber == 0)
-		return;
-
 	tick = parent->getFirstTickOfBeat(SeqUtil::getBar(parent, tick), SeqUtil::getBeat(parent, tick) - 1);
 
 	if (tick < 0)
@@ -105,9 +86,6 @@ void TempoChangeEvent::minusOneBeat(TempoChangeEvent *previous)
 
 void TempoChangeEvent::plusOneClock(TempoChangeEvent* next)
 {
-	if (stepNumber == 0)
-		return;
-	
 	if (next != nullptr && tick == next->getTick() - 1)
 		return;
 	
@@ -124,9 +102,6 @@ void TempoChangeEvent::plusOneClock(TempoChangeEvent* next)
 
 void TempoChangeEvent::minusOneClock(TempoChangeEvent* previous)
 {
-	if (stepNumber == 0 || tick == 0)
-		return;
-
 	if (previous != nullptr) {
 		if (tick == previous->getTick() + 1)
 			return;
@@ -150,21 +125,6 @@ void TempoChangeEvent::setRatio(int i)
 int TempoChangeEvent::getRatio()
 {
     return ratio;
-}
-
-void TempoChangeEvent::setStepNumber(int i)
-{
-	if (i < 0)
-		return;
-	
-	stepNumber = i;
-	
-	notifyObservers(std::string("tempo-change"));
-}
-
-int TempoChangeEvent::getStepNumber()
-{
-    return stepNumber;
 }
 
 int TempoChangeEvent::getBar(int n, int d)
@@ -206,5 +166,4 @@ void TempoChangeEvent::CopyValuesTo(std::weak_ptr<Event> dest)
 	Event::CopyValuesTo(dest);
 	auto lDest = std::dynamic_pointer_cast<TempoChangeEvent>(dest.lock());
 	lDest->setRatio(getRatio());
-	lDest->setStepNumber(getStepNumber());
 }

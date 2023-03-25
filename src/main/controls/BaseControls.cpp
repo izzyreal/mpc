@@ -386,7 +386,7 @@ bool BaseControls::isTypable()
 void BaseControls::numpad(int i)
 {
     init();
-    
+
     auto controls = mpc.getControls();
     
     if (!controls->isShiftPressed())

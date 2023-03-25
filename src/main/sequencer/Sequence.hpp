@@ -42,7 +42,7 @@ private:
     int firstLoopBarIndex = 0;
     int lastLoopBarIndex = 0;
     bool lastLoopBarEnd = true;
-    
+
 public:
     double getInitialTempo();
     void setInitialTempo(const double newInitialTempo);
@@ -82,14 +82,13 @@ public:
     std::vector<std::string>& getDeviceNames();
     void setDeviceNames(std::vector<std::string>& sa);
     std::vector<std::shared_ptr<TempoChangeEvent>> getTempoChangeEvents();
-    std::shared_ptr<TempoChangeEvent> addTempoChangeEvent();
+    std::shared_ptr<TempoChangeEvent> addTempoChangeEvent(int tick);
     void removeTempoChangeEvent(int i);
 
     bool isTempoChangeOn();
     void setTempoChangeOn(bool b);
     int getLastTick();
     TimeSignature getTimeSignature();
-    void sortTempoChangeEvents();
     void purgeAllTracks();
     std::shared_ptr<Track> purgeTrack(int i);
     int getDenominator(int i);
