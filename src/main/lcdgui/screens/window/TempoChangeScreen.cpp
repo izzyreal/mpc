@@ -53,22 +53,14 @@ void TempoChangeScreen::open()
 	f0Field = findField("f0");
 	f1Field = findField("f1");
 	f2Field = findField("f2");
-	a0Label = findLabel("a0");
-	a1Label = findLabel("a1");
-	a2Label = findLabel("a2");
-	b0Label = findLabel("b0");
 	b1Label = findLabel("b1");
 	b2Label = findLabel("b2");
-	c0Label = findLabel("c0");
 	c1Label = findLabel("c1");
 	c2Label = findLabel("c2");
-	d0Label = findLabel("d0");
 	d1Label = findLabel("d1");
 	d2Label = findLabel("d2");
-	e0Label = findLabel("e0");
 	e1Label = findLabel("e1");
 	e2Label = findLabel("e2");
-	f0Label = findLabel("f0");
 	f1Label = findLabel("f1");
 	f2Label = findLabel("f2");
 

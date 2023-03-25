@@ -10,7 +10,7 @@ using namespace mpc::file::sndwriter;
 SndWriter::SndWriter(mpc::sampler::Sound* sound) 
 {
     this->sound = sound;
-    sndHeaderWriter = std::make_shared<SndHeaderWriter>(this);
+    sndHeaderWriter = std::make_shared<SndHeaderWriter>();
     setValues();
 }
 const int SndWriter::HEADER_SIZE;

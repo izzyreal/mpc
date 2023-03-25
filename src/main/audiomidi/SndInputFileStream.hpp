@@ -96,20 +96,20 @@ bool snd_read_header(std::shared_ptr<std::istream> stream, int& sampleRate, int&
 
     auto name = snd_get_string(stream, 17);
     
-    auto level = snd_get_char(stream);
-    auto tune = snd_get_char(stream);
+    /*auto level =*/ snd_get_char(stream);
+    /*auto tune =*/ snd_get_char(stream);
     auto stereo = snd_get_char(stream) == 1;
 
     numChannels = stereo ? 2 : 1;
 
-    auto start = snd_get_LE(stream, 4);
-    auto end = snd_get_LE(stream, 4);
+    /*auto start =*/ snd_get_LE(stream, 4);
+    /*auto end =*/ snd_get_LE(stream, 4);
     
     numFrames = snd_get_LE(stream, 4);
 
-    auto loopLength = snd_get_LE(stream, 4);
-    auto loopEnabled = snd_get_char(stream) == 1;
-    auto beatCount = snd_get_char(stream);
+    /*auto loopLength =*/ snd_get_LE(stream, 4);
+    /*auto loopEnabled =*/ snd_get_char(stream) /*== 1*/;
+    /*auto beatCount =*/ snd_get_char(stream);
     sampleRate = snd_get_unsigned_short_LE(stream);
 
     validBits = 16;

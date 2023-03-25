@@ -3,7 +3,7 @@
 
 using namespace mpc::file::sndwriter;
 
-SndHeaderWriter::SndHeaderWriter(SndWriter* sndWriter) 
+SndHeaderWriter::SndHeaderWriter()
 {
     setFirstTwoBytes();
 }

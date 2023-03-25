@@ -34,6 +34,6 @@ namespace mpc::file::sndwriter
 		void putLE(int offset, int value);
 
 	public:
-		SndHeaderWriter(SndWriter* sndWriter);
+		SndHeaderWriter();
 	};
 }

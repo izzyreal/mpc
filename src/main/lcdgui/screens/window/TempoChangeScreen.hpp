@@ -8,7 +8,7 @@ namespace mpc::lcdgui
 	class HorizontalBar2;
 }
 
-namespace mpc::sequence
+namespace mpc::sequencer
 {
 	class TempoChangeEvent;
 }
@@ -41,22 +41,14 @@ namespace mpc::lcdgui::screens::window
 		std::shared_ptr<mpc::lcdgui::Field> f0Field;
 		std::shared_ptr<mpc::lcdgui::Field> f1Field;
 		std::shared_ptr<mpc::lcdgui::Field> f2Field;
-		std::shared_ptr<mpc::lcdgui::Label> a0Label;
-		std::shared_ptr<mpc::lcdgui::Label> a1Label;
-		std::shared_ptr<mpc::lcdgui::Label> a2Label;
-		std::shared_ptr<mpc::lcdgui::Label> b0Label;
 		std::shared_ptr<mpc::lcdgui::Label> b1Label;
 		std::shared_ptr<mpc::lcdgui::Label> b2Label;
-		std::shared_ptr<mpc::lcdgui::Label> c0Label;
 		std::shared_ptr<mpc::lcdgui::Label> c1Label;
 		std::shared_ptr<mpc::lcdgui::Label> c2Label;
-		std::shared_ptr<mpc::lcdgui::Label> d0Label;
 		std::shared_ptr<mpc::lcdgui::Label> d1Label;
 		std::shared_ptr<mpc::lcdgui::Label> d2Label;
-		std::shared_ptr<mpc::lcdgui::Label> e0Label;
 		std::shared_ptr<mpc::lcdgui::Label> e1Label;
 		std::shared_ptr<mpc::lcdgui::Label> e2Label;
-		std::shared_ptr<mpc::lcdgui::Label> f0Label;
 		std::shared_ptr<mpc::lcdgui::Label> f1Label;
 		std::shared_ptr<mpc::lcdgui::Label> f2Label;
 
