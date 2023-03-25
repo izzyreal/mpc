@@ -5,9 +5,6 @@
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/SampleScreen.hpp>
 
-#include <engine/audio/core/AudioFormat.hpp>
-#include <engine/audio/core/AudioBuffer.hpp>
-
 #include <cmath>
 
 using namespace mpc::sampler;
