@@ -15,6 +15,33 @@
 using namespace mpc::sequencer;
 using namespace std;
 
+TEST_CASE("Next step, previous step", "[sequencer]")
+{
+    mpc::Mpc mpc;
+    mpc.init(1, 5);
+    auto pos = [&]{ return mpc.getSequencer()->getTickPosition();};
+    auto seq = mpc.getSequencer()->getSequence(0);
+    seq->init(1);
+    seq->setTimeSignature(0, 1, 32);
+    seq->setTimeSignature(1, 4, 4);
+    REQUIRE(pos() == 0);
+    mpc.getSequencer()->goToNextStep();
+    // TODO User-friendlier would be if the next step starts at the beginning of a bar, which is not the
+    //  case with the above timesignatures (first bar 1/32, second bar 4/4) on the real MPC2000XL.
+    //  So the below is according to spec, but maybe we can do the user-friendlier variety at some point.
+    REQUIRE(pos() == 24);
+    mpc.getSequencer()->goToNextStep();
+    REQUIRE(pos() == 48);
+    mpc.getSequencer()->goToNextStep();
+    REQUIRE(pos() == 72);
+    mpc.getSequencer()->goToPreviousStep();
+    REQUIRE(pos() == 48);
+    mpc.getSequencer()->goToPreviousStep();
+    REQUIRE(pos() == 24);
+    mpc.getSequencer()->goToPreviousStep();
+    REQUIRE(pos() == 0);
+}
+
 SCENARIO("Can record and playback from different threads", "[sequencer]")
 {
     const int BUFFER_SIZE = 512;
