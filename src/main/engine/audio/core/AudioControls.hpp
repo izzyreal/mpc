@@ -10,8 +10,6 @@ namespace mpc::engine::audio::core {
     {
 
     public:
-        AudioControls(int id, std::string name, int bypassId);
-
         AudioControls(int id, std::string name);
 
     };

@@ -8,7 +8,7 @@ using namespace mpc::engine::audio::mixer;
 using namespace std;
 
 BusControls::BusControls(int id, string name, shared_ptr<ChannelFormat> format)
-	: AudioControls(id, name, -1)
+	: AudioControls(id, name)
 {
 	channelFormat = format;
 }
