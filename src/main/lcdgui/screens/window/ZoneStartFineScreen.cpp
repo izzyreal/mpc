@@ -82,11 +82,7 @@ void ZoneStartFineScreen::turnWheel(int i)
 {
 	init();
 	auto sound = sampler->getSound();
-	auto startEndLength = static_cast<int>(sound->getEnd() - sound->getStart());
-	auto loopLength = static_cast<int>((sound->getEnd() - sound->getLoopTo()));
-	auto zoneScreen = mpc.screens->get<ZoneScreen>("zone");
-
-	auto sampleLength = sound->getFrameCount();
+    auto zoneScreen = mpc.screens->get<ZoneScreen>("zone");
 
 	auto soundInc = getSoundIncrement(i);
 	auto field = findField(param);

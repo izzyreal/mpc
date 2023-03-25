@@ -61,8 +61,6 @@ void wav_close(std::ofstream& stream, const int sampleRate, const int frameCount
     auto bytesPerSample = (validBits + 7) / 8;
     auto blockAlign = bytesPerSample * numChannels;
 
-    auto averageBytesPerSecond = sampleRate * numChannels * bytesPerSample;
-
     auto dataChunkSize = blockAlign * frameCount;
     auto mainChunkSize = 4 + 8 + 16 + 8 + dataChunkSize;
     

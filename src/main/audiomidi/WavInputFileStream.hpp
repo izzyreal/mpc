@@ -10,7 +10,7 @@ static const int FMT_CHUNK_ID{ 544501094 };
 static const int DATA_CHUNK_ID{ 1635017060 };
 
 static const int EXPECTED_HEADER_SIZE = 44;
-static const int EXPECTED_FMT_DATA_SIZE = 16;
+//static const int EXPECTED_FMT_DATA_SIZE = 16;
 
 int wav_get_LE(std::shared_ptr<std::istream> stream, int numBytes)
 {
@@ -49,14 +49,14 @@ bool wav_read_header(std::shared_ptr<std::istream> stream, int& sampleRate, int&
 
     auto riffChunkId = wav_get_LE(stream, 4);         // Offset 0
     auto mainChunkSize = wav_get_LE(stream, 4);       // Offset 4;
-    auto riffTypeId = wav_get_LE(stream, 4);          // Offset 8
+    /*auto riffTypeId =*/ wav_get_LE(stream, 4);          // Offset 8
     auto fmtChunkId = wav_get_LE(stream, 4);          // Offset 12
     auto lengthOfFormatData = wav_get_LE(stream, 4);  // Offset 16
     auto isPCM = wav_get_LE(stream, 2) == 1;          // Offset 20
     numChannels = wav_get_LE(stream, 2);              // Offset 22
     sampleRate = wav_get_LE(stream, 4);               // Offset 24
-    auto avgBytesPerSecond = wav_get_LE(stream, 4);   // Offset 28
-    auto blockAlign = wav_get_LE(stream, 2);          // Offset 32
+    /*auto avgBytesPerSecond =*/ wav_get_LE(stream, 4);   // Offset 28
+    /*auto blockAlign =*/ wav_get_LE(stream, 2);          // Offset 32
     validBits = wav_get_LE(stream, 2);                // Offset 34
     
     if (lengthOfFormatData != 16) {
