@@ -97,9 +97,8 @@ void EndFineScreen::turnWheel(int i)
 
 	auto startEndLength = static_cast<int>(sound->getEnd() - sound->getStart());
 	auto trimScreen = mpc.screens->get<TrimScreen>("trim");
-	auto sampleLength = sound->getFrameCount();
 
-	auto soundInc = getSoundIncrement(i);
+    auto soundInc = getSoundIncrement(i);
 	auto field = findField(param);
 
 	if (field->isSplit())

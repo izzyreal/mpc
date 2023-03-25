@@ -72,7 +72,6 @@ void ExternalAudioServer::work(float* inputBuffer, float* outputBuffer, int nFra
 
 	client->work(nFrames);
 
-	auto originalOutputBuffer = outputBuffer;
 	const int outputsToProcess = outputChannelCount * 0.5;
 
 	for (int frame = 0; frame < nFrames; frame++)
@@ -90,7 +89,6 @@ void ExternalAudioServer::work(float* inputBuffer, float* outputBuffer, int nFra
 			*outputBuffer++ = activeOutputs[output]->localBuffer[(frame * 2) + 1];
 		}
 	}
-	outputBuffer = originalOutputBuffer;
 }
 
 void ExternalAudioServer::work(const float** inputBuffer, float** outputBuffer, int nFrames, int inputChannelCount, int outputChannelCount) {

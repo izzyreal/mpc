@@ -16,22 +16,13 @@ public:
     void mainScreen() override;
     void numpad(int i) override {}
 
-    void setLoadASoundCandidateAndExistingSound(
-            std::shared_ptr<sampler::Sound> candidate,
-            std::shared_ptr<sampler::Sound> existing);
-    void setActionAfterAddingSound(std::function<void(bool)> action);
-
     void initialize(std::function<void()> replaceAction,
                     std::function<void()> initializeNameScreen,
-                    std::string replaceOrCancelScreen);
+                    std::function<void()> cancelAction);
 
 private:
     std::function<void()> replaceAction;
     std::function<void()> initializeNameScreen;
-    std::string cancelScreen;
-
-    std::shared_ptr<sampler::Sound> loadASoundCandidate;
-    std::shared_ptr<sampler::Sound> existingSound;
-    std::function<void(bool)> actionAfterAddingSound = [](bool newSoundIsMono){};
+    std::function<void()> cancelAction;
 };
 }

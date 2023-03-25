@@ -125,7 +125,7 @@ EnumControl* MixControls::createRouteControl(int stripId)
 
 BooleanControl* MixControls::createMuteControl()
 {
-    return new BooleanControl(MixControlIds::MUTE, "Mute", false);
+    return new BooleanControl(MixControlIds::MUTE, "Mute");
 }
 
 string MixControls::getName()

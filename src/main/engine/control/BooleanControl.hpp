@@ -15,7 +15,7 @@ namespace mpc::engine::control {
         bool getValue();
 
     public:
-        BooleanControl(int id, std::string name, bool initialValue);
+        BooleanControl(int id, std::string name);
 
     };
 

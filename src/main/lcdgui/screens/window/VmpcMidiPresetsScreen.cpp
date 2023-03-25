@@ -54,7 +54,7 @@ VmpcMidiPresetsScreen::VmpcMidiPresetsScreen(mpc::Mpc& mpc, const int layerIndex
             };
 
             auto fileExistsScreen = this->mpc.screens->get<FileExistsScreen>("file-exists");
-            fileExistsScreen->initialize(replaceAction, initializeNameScreen, name);
+            fileExistsScreen->initialize(replaceAction, initializeNameScreen, [this]{ openScreen("vmpc-midi-presets");});
             openScreen("file-exists");
         }
         else
@@ -198,7 +198,7 @@ void VmpcMidiPresetsScreen::left()
 
 void VmpcMidiPresetsScreen::right()
 {
-    if (column == 1 || (row + rowOffset == 0 && MidiControlPersistence::presets.size() == 0)) return;
+    if (column == 1 || (row + rowOffset == 0 && MidiControlPersistence::presets.empty())) return;
 
     if (row + rowOffset == 0)
     {

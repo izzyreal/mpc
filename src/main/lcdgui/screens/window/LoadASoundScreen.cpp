@@ -170,7 +170,8 @@ void LoadASoundScreen::keepSound()
         };
 
         auto fileExistsScreen = mpc.screens->get<FileExistsScreen>("file-exists");
-        fileExistsScreen->initialize(replaceAction, initializeNameScreen, "load");
+        fileExistsScreen->initialize(replaceAction, initializeNameScreen,
+                                     [this]{ sampler->deleteSound(sampler->getPreviewSound()); openScreen("load"); });
         openScreen("file-exists");
         return;
     }

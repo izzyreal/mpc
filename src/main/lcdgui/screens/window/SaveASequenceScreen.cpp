@@ -80,7 +80,7 @@ void SaveASequenceScreen::function(int i)
             };
 
             auto fileExistsScreen = mpc.screens->get<FileExistsScreen>("file-exists");
-            fileExistsScreen->initialize(replaceAction, initializeNameScreen, "save");
+            fileExistsScreen->initialize(replaceAction, initializeNameScreen, [this]{ openScreen("save"); });
             openScreen("file-exists");
 			return;
 		}

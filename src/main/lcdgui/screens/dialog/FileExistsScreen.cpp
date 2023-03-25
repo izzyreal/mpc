@@ -1,7 +1,5 @@
 #include "FileExistsScreen.hpp"
 
-#include <Util.hpp>
-
 #include "nvram/MidiControlPersistence.hpp"
 
 #include <disk/AbstractDisk.hpp>
@@ -10,7 +8,6 @@
 #include <file/all/AllParser.hpp>
 
 #include <lcdgui/screens/window/SaveASoundScreen.hpp>
-#include "sampler/Sound.hpp"
 
 using namespace mpc::lcdgui::screens::dialog;
 using namespace mpc::lcdgui;
@@ -27,27 +24,7 @@ FileExistsScreen::FileExistsScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void FileExistsScreen::mainScreen()
 {
-	if (loadASoundCandidate && existingSound)
-	{
-		sampler->deleteSound(sampler->getPreviewSound());
-		loadASoundCandidate = {};
-		existingSound = {};
-		actionAfterAddingSound = [](bool){};
-	}
 	ScreenComponent::mainScreen();
-}
-
-void FileExistsScreen::setLoadASoundCandidateAndExistingSound(
-		std::shared_ptr<Sound> candidate,
-		std::shared_ptr<Sound> existing)
-{
-	loadASoundCandidate = candidate;
-	existingSound = existing;
-}
-
-void FileExistsScreen::setActionAfterAddingSound(std::function<void(bool)> action)
-{
-	actionAfterAddingSound = action;
 }
 
 void FileExistsScreen::function(int i)
@@ -58,7 +35,7 @@ void FileExistsScreen::function(int i)
 	    replaceAction();
         break;
 	case 3:
-        openScreen(cancelScreen);
+        cancelAction();
 		break;
 	case 4:
         initializeNameScreen();
@@ -67,9 +44,9 @@ void FileExistsScreen::function(int i)
 }
 
 void FileExistsScreen::initialize(std::function<void()> replaceActionToUse, std::function<void()> initializeNameScreenToUse,
-                                  std::string replaceOrCancelScreenToUse)
+                                  std::function<void()> cancelActionToUse)
 {
     replaceAction = replaceActionToUse;
     initializeNameScreen = initializeNameScreenToUse;
-    cancelScreen = replaceOrCancelScreenToUse;
+    cancelAction = cancelActionToUse;
 }
