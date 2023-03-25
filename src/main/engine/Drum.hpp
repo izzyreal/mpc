@@ -36,7 +36,7 @@ namespace mpc::engine
         std::vector<std::shared_ptr<Voice>> voices;
 		std::shared_ptr<mpc::sampler::Sampler> sampler;
 		std::shared_ptr<mpc::engine::audio::mixer::AudioMixer> mixer;
-		std::vector<MixerInterconnection>& mixerConnections;
+		std::vector<MixerInterconnection*>& mixerConnections;
         mpc::lcdgui::screens::MixerSetupScreen* mixerSetupScreen = nullptr;
 
 	private:
@@ -46,9 +46,7 @@ namespace mpc::engine
 		bool receiveMidiVolume = false;
 		int lastReceivedMidiVolume = 127;
 		std::vector<std::shared_ptr<StereoMixer>> stereoMixerChannels;
-        std::vector<std::shared_ptr<StereoMixer>> weakStereoMixerChannels;
 		std::vector<std::shared_ptr<IndivFxMixer>> indivFxMixerChannels;
-        std::vector<std::shared_ptr<IndivFxMixer>> weakIndivFxMixerChannels;
 
 	public:
 		int getProgram();
@@ -83,7 +81,7 @@ namespace mpc::engine
              std::shared_ptr<mpc::engine::audio::mixer::AudioMixer> mixer,
              mpc::lcdgui::screens::MixerSetupScreen* mixerSetupScreen,
              std::vector<std::shared_ptr<Voice>> voices,
-             std::vector<mpc::engine::MixerInterconnection>& mixerConnections);
+             std::vector<mpc::engine::MixerInterconnection*>& mixerConnections);
 
 	};
 }

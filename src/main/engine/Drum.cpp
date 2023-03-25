@@ -27,7 +27,7 @@ Drum::Drum(std::shared_ptr<Sampler> samplerToUse,
            std::shared_ptr<AudioMixer> mixerToUse,
            MixerSetupScreen* mixerSetupScreenToUse,
            std::vector<std::shared_ptr<Voice>> voicesToUse,
-           std::vector<mpc::engine::MixerInterconnection>& mixerConnectionsToUse)
+           std::vector<mpc::engine::MixerInterconnection*>& mixerConnectionsToUse)
            : sampler(std::move(samplerToUse)), mixer(std::move(mixerToUse)),
            mixerSetupScreen(mixerSetupScreenToUse),
            voices(std::move(voicesToUse)), drumIndex(drumIndexToUse),
@@ -39,11 +39,8 @@ Drum::Drum(std::shared_ptr<Sampler> samplerToUse,
 
 	for (int i = 0; i < 64; i++)
 	{
-		stereoMixerChannels.push_back(std::make_shared<StereoMixer>());
-        weakStereoMixerChannels.push_back(stereoMixerChannels.back());
-
-        indivFxMixerChannels.push_back(std::make_shared<IndivFxMixer>());
-        weakIndivFxMixerChannels.push_back(indivFxMixerChannels.back());
+        stereoMixerChannels.emplace_back(std::make_shared<StereoMixer>());
+        indivFxMixerChannels.emplace_back(std::make_shared<IndivFxMixer>());
 	}
 }
 
@@ -148,7 +145,7 @@ void Drum::mpcNoteOn(int note, int velo, int varType, int varValue, int frameOff
 
 	//We make sure the voice strip duplicages that are used for mixing to ASSIGNABLE MIX OUT are not mixed into Main.
 	auto faderControl = std::dynamic_pointer_cast<FaderControl>(mmc->find("Level"));
-	if (faderControl->getValue() != 0) faderControl->setValue(0);
+	faderControl->setValue(0);
 
 	if (ifmc->getOutput() > 0)
 	{
@@ -156,19 +153,19 @@ void Drum::mpcNoteOn(int note, int velo, int varType, int varValue, int frameOff
 		{
 			if (ifmc->getOutput() % 2 == 1)
 			{
-				mixerConnections[voice->getStripNumber() - 1].setLeftEnabled(true);
-				mixerConnections[voice->getStripNumber() - 1].setRightEnabled(false);
+				mixerConnections[voice->getStripNumber() - 1]->setLeftEnabled(true);
+				mixerConnections[voice->getStripNumber() - 1]->setRightEnabled(false);
 			}
 			else
 			{
-				mixerConnections[voice->getStripNumber() - 1].setLeftEnabled(false);
-				mixerConnections[voice->getStripNumber() - 1].setRightEnabled(true);
+				mixerConnections[voice->getStripNumber() - 1]->setLeftEnabled(false);
+				mixerConnections[voice->getStripNumber() - 1]->setRightEnabled(true);
 			}
 		}
 		else
 		{
-			mixerConnections[voice->getStripNumber() - 1].setLeftEnabled(true);
-			mixerConnections[voice->getStripNumber() - 1].setRightEnabled(true);
+			mixerConnections[voice->getStripNumber() - 1]->setLeftEnabled(true);
+			mixerConnections[voice->getStripNumber() - 1]->setRightEnabled(true);
 		}
 	}
 
@@ -187,14 +184,11 @@ void Drum::mpcNoteOn(int note, int velo, int varType, int varValue, int frameOff
 		if (i == selectedAssignableMixOutPair)
 		{
 			auto value = static_cast<float>(ifmc->getVolumeIndividualOut());
-
-			if (value != auxLevel->getValue())
-				auxLevel->setValue(value);
+			auxLevel->setValue(value);
 		}
 		else
 		{
-			if (auxLevel->getValue() != 0)
-				auxLevel->setValue(0);
+            auxLevel->setValue(0);
 		}
 	}
 
@@ -277,12 +271,12 @@ void Drum::allSoundOff(int frameOffset)
 
 std::vector<std::shared_ptr<StereoMixer>>& Drum::getStereoMixerChannels()
 {
-    return weakStereoMixerChannels;
+    return stereoMixerChannels;
 }
 
 std::vector<std::shared_ptr<IndivFxMixer>>& Drum::getIndivFxMixerChannels()
 {
-	return weakIndivFxMixerChannels;
+	return indivFxMixerChannels;
 }
 
 void Drum::mpcNoteOff(int note, int frameOffset, int noteOnStartTick)

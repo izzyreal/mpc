@@ -276,11 +276,11 @@ void AudioMidiServices::connectVoices()
         auto ams1 = mixer->getStrip(std::to_string(j + 1));
         auto voice = voices[j];
         ams1->setInputProcess(voice);
-        mixerConnections.emplace_back("con" + std::to_string(j), server.get());
+        mixerConnections.emplace_back(new MixerInterconnection("con" + std::to_string(j), server.get()));
         auto& mi = mixerConnections.back();
-        ams1->setDirectOutputProcess(mi.getInputProcess());
+        ams1->setDirectOutputProcess(mi->getInputProcess());
         auto ams2 = mixer->getStrip(std::to_string(j + 1 + 32));
-        ams2->setInputProcess(mi.getOutputProcess());
+        ams2->setInputProcess(mi->getOutputProcess());
     }
 
     basicSoundPlayerChannel->connectVoice();

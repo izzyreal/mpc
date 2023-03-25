@@ -84,7 +84,7 @@ namespace mpc::audiomidi
         std::vector<mpc::engine::Drum> soundPlayerChannels;
         std::unique_ptr<mpc::engine::PreviewSoundPlayer> basicSoundPlayerChannel;
 		std::vector<std::shared_ptr<mpc::engine::Voice>> voices;
-        std::vector<mpc::engine::MixerInterconnection> mixerConnections;
+        std::vector<mpc::engine::MixerInterconnection*> mixerConnections;
         std::shared_ptr<mpc::engine::Voice> basicVoice;
 		std::shared_ptr<mpc::engine::audio::server::AudioServer> server;
 		std::shared_ptr<mpc::engine::audio::server::NonRealTimeAudioServer> offlineServer;
