@@ -440,12 +440,11 @@ int Track::getCorrectedTickPos()
 
     auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
     auto tcValue = timingCorrectScreen->getNoteValue();
+    auto swingPercentage = timingCorrectScreen->getSwing();
 
     if (tcValue > 0)
     {
-        auto tcTick = timingCorrectTick(0, parent->getLastBarIndex(), pos, sequencer->getTickValues()[tcValue]);
-        tcTick = swingTick(tcTick, tcValue, timingCorrectScreen->getSwing());
-        correctedTickPos = tcTick;
+        correctedTickPos = timingCorrectTick(0, parent->getLastBarIndex(), pos, sequencer->getTickValues()[tcValue], swingPercentage);
     }
 
     if (timingCorrectScreen->getAmount() != 0)
@@ -685,11 +684,6 @@ void Track::playNext()
     eventIndex++;
 }
 
-bool Track::tickCmp(const std::shared_ptr<Event>& a, const std::shared_ptr<Event>& b)
-{
-	return a->getTick() < b->getTick();
-}
-
 bool Track::isOn()
 {
     return on;
@@ -713,7 +707,7 @@ std::vector<std::shared_ptr<Event>> Track::getEventRange(int startTick, int endT
 	return res;
 }
 
-void Track::correctTimeRange(int startPos, int endPos, int stepLength)
+void Track::correctTimeRange(int startPos, int endPos, int stepLength, int swingPercentage, int lowestNote, int highestNote)
 {
 	auto s = sequencer->getActiveSequence();
 	int accumBarLengths = 0;
@@ -744,28 +738,29 @@ void Track::correctTimeRange(int startPos, int endPos, int stepLength)
 
 	for (auto& event : events)
 	{
-		auto ne = std::dynamic_pointer_cast<NoteEvent>(event);
-
-		if (ne)
+		if (auto ne = std::dynamic_pointer_cast<NoteEvent>(event))
 		{
 			if (event->getTick() >= endPos)
 				break;
 
 			if (event->getTick() >= startPos && event->getTick() < endPos)
-				timingCorrect(fromBar, toBar, ne, stepLength);
+            {
+                if (ne->getNote() >= lowestNote && ne->getNote() <= highestNote)
+                timingCorrect(fromBar, toBar, ne, stepLength, swingPercentage);
+            }
 		}
 	}
 
 	removeDoubles();
 }
 
-void Track::timingCorrect(int fromBar, int toBar, std::shared_ptr<NoteEvent> noteEvent, int stepLength)
+void Track::timingCorrect(int fromBar, int toBar, std::shared_ptr<NoteEvent> noteEvent, int stepLength, int swingPercentage)
 {
     auto event = std::dynamic_pointer_cast<Event>(noteEvent);
-    updateEventTick(event, timingCorrectTick(fromBar, toBar, noteEvent->getTick(), stepLength));
+    updateEventTick(event, timingCorrectTick(fromBar, toBar, noteEvent->getTick(), stepLength, swingPercentage));
 }
 
-int Track::timingCorrectTick(int fromBar, int toBar, int tick, int stepLength)
+int Track::timingCorrectTick(int fromBar, int toBar, int tick, int stepLength, int swingPercentage)
 {
 	int accumBarLengths = 0;
 	int previousAccumBarLengths = 0;
@@ -831,7 +826,13 @@ int Track::timingCorrectTick(int fromBar, int toBar, int tick, int stepLength)
 		}
 	}
 
-	return tick;
+    if (swingPercentage > 50)
+    {
+        const int swingOffset = ((swingPercentage - 50.f) / 25.f) * (stepLength / 2);
+        tick += swingOffset;
+    }
+
+    return tick;
 }
 
 void Track::removeDoubles()
@@ -955,43 +956,6 @@ std::vector<std::shared_ptr<NoteEvent>> Track::getNoteEventsAtTick(int tick)
 	}
 
 	return noteEvents;
-}
-
-void Track::swing(std::vector<std::shared_ptr<Event>>& eventsToSwing, int noteValue, int percentage, std::vector<int>& noteRange)
-{
-	if (noteValue != 1 && noteValue != 3)
-		return;
-
-	for (auto& e : eventsToSwing)
-	{
-		auto ne = std::dynamic_pointer_cast<NoteEvent>(e);
-
-		if (ne)
-		{
-			if (ne->getNote() >= noteRange[0] && ne->getNote() <= noteRange[1])
-                updateEventTick(e, swingTick(e->getTick(), noteValue, percentage));
-		}
-	}
-}
-
-int Track::swingTick(int tick, int noteValue, int percentage)
-{
-	if (noteValue != 1 && noteValue != 3)
-    {
-        return tick;
-    }
-
-	const int base = noteValue == 3 ? 24 : 48;
-    const int maxDistance = noteValue == 3 ? 12 : 24;
-    const int offset = (base * 2) - ((tick + base) % (base * 2));
-
-    if (offset <= maxDistance)
-    {
-        tick += ((percentage - 50) * (4.0 / 100.0) * (base / 2.0));
-        tick += offset;
-    }
-
-	return tick;
 }
 
 void Track::shiftTiming(std::shared_ptr<Event> event, bool later, int amount, int lastTick)

@@ -307,12 +307,11 @@ void BaseControls::generateNoteOn(int note, int padVelo)
             if (stepLength != 1)
             {
                 int bar = sequencer->getCurrentBarIndex() + 1;
-                track->timingCorrect(0, bar, recordedEvent, stepLength);
+                track->timingCorrect(0, bar, recordedEvent, stepLength, timingCorrectScreen->getSwing());
                 
                 std::vector<std::shared_ptr<Event>> events{ recordedEvent };
                 std::vector<int> noteRange {0, 127};
-                track->swing(events, tc_note, tc_swing, noteRange);
-                
+
                 if (recordedEvent->getTick() != sequencer->getTickPosition())
                     sequencer->move(recordedEvent->getTick());
             }

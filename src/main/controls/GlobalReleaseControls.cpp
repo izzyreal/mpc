@@ -139,12 +139,11 @@ void GlobalReleaseControls::simplePad(int padIndexWithBank)
 		{
 			int nextPos = sequencer->getTickPosition() + stepLength;
 			auto bar = sequencer->getCurrentBarIndex() + 1;
-			nextPos = track->timingCorrectTick(0, bar, nextPos, stepLength);
+			nextPos = track->timingCorrectTick(0, bar, nextPos, stepLength, timingCorrectScreen->getSwing());
 			auto lastTick = sequencer->getActiveSequence()->getLastTick();
 
 			if (nextPos != 0 && nextPos < lastTick)
 			{
-				nextPos = track->swingTick(nextPos, noteVal, timingCorrectScreen->getSwing());
 				sequencer->move(nextPos);
 			}
 			else

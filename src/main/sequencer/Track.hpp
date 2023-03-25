@@ -46,9 +46,6 @@ private:
     bool multi{ false };
     bool _delete{ false };
 
-protected:
-    static bool tickCmp(const std::shared_ptr<Event>& a, const std::shared_ptr<Event>& b);
-
 public:
     void move(int tick, int oldTick);
     void setTrackIndex(int i);
@@ -102,7 +99,7 @@ public:
     std::vector<std::shared_ptr<Event>> getEventRange(int startTick, int endTick);
 
     // Do not call from audio thread
-    void correctTimeRange(int startPos, int endPos, int stepLength);
+    void correctTimeRange(int startPos, int endPos, int stepLength, int swingPercentage, int lowestNote, int highestNote);
     
 public:
     // Do not call from audio thread
@@ -114,11 +111,8 @@ private:
 
 public:
     std::vector<std::shared_ptr<NoteEvent>> getNoteEvents();
-    void timingCorrect(int fromBar, int toBar, std::shared_ptr<NoteEvent> noteEvent, int stepLength);
-    int timingCorrectTick(int fromBar, int toBar, int tick, int stepLength);
-    int swingTick(int tick, int noteValue, int percentage);
-
-    void swing(std::vector<std::shared_ptr<Event>>& eventsToSwing, int noteValue, int percentage, std::vector<int>& noteRange);
+    void timingCorrect(int fromBar, int toBar, std::shared_ptr<NoteEvent> noteEvent, int stepLength, int swingPercentage);
+    int timingCorrectTick(int fromBar, int toBar, int tick, int stepLength, int swingPercentage);
 
     void shiftTiming(std::shared_ptr<Event> eventsToShift, bool later, int amount, int lastTick);
 
