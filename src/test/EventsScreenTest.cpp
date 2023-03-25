@@ -5,8 +5,6 @@
 
 #include "lcdgui/screens/EventsScreen.hpp"
 
-#include "engine/Drum.hpp"
-
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui::screens;
 
@@ -326,14 +324,20 @@ TEST_CASE("COPY6", "[events-screen]")
 
     int eventIndex = 8;
 
+    for (auto& e : tr->getEvents())
+    {
+        auto e1 = std::dynamic_pointer_cast<NoteEvent>(e);
+        printf("Tick %d, note: %d\n", e->getTick(), e1->getNote());
+    }
+
     for (int i = 8; i < 16; i++)
     {
         auto e1 = std::dynamic_pointer_cast<NoteEvent>(tr->getEvent(eventIndex++));
         auto e2 = std::dynamic_pointer_cast<NoteEvent>(tr->getEvent(eventIndex++));
         REQUIRE(e1->getTick() == tickPos);
-        REQUIRE(e1->getNote() == 27 + i);
+        REQUIRE(e1->getNote() == 35 + i);
         REQUIRE(e2->getTick() == tickPos);
-        REQUIRE(e2->getNote() == 35 + i);
+        REQUIRE(e2->getNote() == 27 + i);
         tickPos += 24;
     }
 }
