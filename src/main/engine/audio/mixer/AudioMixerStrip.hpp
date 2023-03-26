@@ -33,8 +33,8 @@ namespace mpc::engine::audio::mixer {
         mpc::engine::audio::core::AudioBuffer *createBuffer();
 
     private:
-        static const int silenceCount{1000};
-        int silenceCountdown{};
+        static const int silenceCount{500};
+        int silenceCountdown;
 
     public:
         bool processBuffer(int nFrames);

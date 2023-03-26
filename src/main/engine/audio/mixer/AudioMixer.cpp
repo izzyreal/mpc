@@ -62,24 +62,40 @@ std::shared_ptr<AudioMixerStrip> AudioMixer::getStripImpl(std::string name)
 
 void AudioMixer::work(int nFrames)
 {
-    AudioMixer::silenceStrips(&auxStrips);
+    AudioMixer::silenceStrips(auxStrips);
 	mainStrip->silence();
-	AudioMixer::evaluateStrips(&channelStrips, nFrames);
-    AudioMixer::evaluateStrips(&auxStrips, nFrames);
+
+    for (int i = 0; i < 32; i++)
+    {
+        auto voiceStrip = channelStrips[i];
+
+        if (voiceStrip->processBuffer(nFrames))
+        {
+            auto indivOutStrip = channelStrips[i + 32];
+            indivOutStrip->processBuffer(nFrames);
+        }
+    }
+
+    for (int i = 64; i < channelStrips.size(); i++)
+    {
+        channelStrips[i]->processBuffer(nFrames);
+    }
+
+    AudioMixer::evaluateStrips(auxStrips, nFrames);
 	mainStrip->processBuffer(nFrames);
 	writeBusBuffers(nFrames);
 }
 
-void AudioMixer::evaluateStrips(std::vector<std::shared_ptr<AudioMixerStrip>>* stripsToEvaluate, int nFrames)
+void AudioMixer::evaluateStrips(std::vector<std::shared_ptr<AudioMixerStrip>>& stripsToEvaluate, int nFrames)
 {
-	for (auto& strip : (*stripsToEvaluate)) {
+    for (auto& strip : stripsToEvaluate) {
 		strip->processBuffer(nFrames);
 	}
 }
 
-void AudioMixer::silenceStrips(std::vector<std::shared_ptr<AudioMixerStrip>>* stripsToSilence)
+void AudioMixer::silenceStrips(std::vector<std::shared_ptr<AudioMixerStrip>>& stripsToSilence)
 {
-	for (auto& strip : (*stripsToSilence))
+	for (auto& strip : stripsToSilence)
 		strip->silence();
 }
 
