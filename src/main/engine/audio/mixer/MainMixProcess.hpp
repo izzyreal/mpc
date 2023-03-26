@@ -1,12 +1,12 @@
 #pragma once
 
 #include <engine/audio/mixer/MixProcess.hpp>
-#include <engine/audio/mixer/MixVariables.hpp>
 
 namespace mpc::engine::audio::mixer {
 
-    class MainMixProcess
-            : public MixProcess
+    class MixControls;
+
+    class MainMixProcess : public MixProcess
     {
     public:
         std::shared_ptr<AudioMixerStrip> nextRoutedStrip;
@@ -18,7 +18,7 @@ namespace mpc::engine::audio::mixer {
         AudioMixerStrip *getRoutedStrip() override;
 
     public:
-        MainMixProcess(std::shared_ptr<AudioMixerStrip> strip, std::shared_ptr<MixVariables> vars, AudioMixer *mixer);
+        MainMixProcess(const std::shared_ptr<AudioMixerStrip>& strip, const std::shared_ptr<MixControls>& mixControls, AudioMixer *mixer);
 
     };
 

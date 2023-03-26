@@ -28,7 +28,7 @@ namespace mpc::engine::control {
         virtual void derive(Control *obj);
 
     public:
-        std::string getName();
+        virtual std::string getName();
 
         void setName(std::string s);
 

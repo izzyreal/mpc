@@ -1,7 +1,6 @@
 #pragma once
 
 #include <engine/audio/core/AudioControls.hpp>
-#include <engine/audio/mixer/MixVariables.hpp>
 #include "engine/FaderControl.hpp"
 #include <engine/audio/mixer/BusControls.hpp>
 #include <engine/audio/mixer/MixerControls.hpp>
@@ -11,8 +10,7 @@ namespace mpc::engine::audio::mixer {
 
     class LCRControl;
 
-    class MixControls
-            : public MixVariables, public mpc::engine::audio::core::AudioControls
+    class MixControls : public mpc::engine::audio::core::AudioControls
     {
 
     private:
@@ -41,17 +39,17 @@ namespace mpc::engine::audio::mixer {
         void derive(Control *c) override;
 
     public:
-        bool isMaster() override;
+        bool isMaster();
 
         bool isMute();
 
-        bool isEnabled() override;
+        bool isEnabled();
 
-        float getGain() override;
+        float getGain();
 
-        void getChannelGains(std::vector<float> *dest) override;
+        void getChannelGains(std::vector<float> *dest);
 
-        float getSmoothingFactor() override;
+        float getSmoothingFactor();
 
     public:
         virtual mpc::engine::control::EnumControl *createRouteControl(int stripId);
@@ -62,7 +60,7 @@ namespace mpc::engine::audio::mixer {
         MixControls(MixerControls *mixerControls, int stripId, std::shared_ptr<BusControls> busControls, bool isMaster);
 
     public:
-        virtual std::string getName() override;
+        std::string getName() override;
 
     public:
         static float &HALF_ROOT_TWO();

@@ -39,7 +39,7 @@ namespace mpc::engine::audio::mixer {
     public:
         bool processBuffer(int nFrames);
 
-        virtual int mix(mpc::engine::audio::core::AudioBuffer *bufferToMix, std::vector<float> &gain);
+        int mix(mpc::engine::audio::core::AudioBuffer *bufferToMix, std::vector<float> &gain);
 
     public:
         std::shared_ptr<AudioProcess> createProcess(std::shared_ptr<mpc::engine::audio::core::AudioControls> controls) override;

@@ -8,14 +8,14 @@
 #include <engine/audio/mixer/AudioMixer.hpp>
 #include <engine/audio/mixer/AudioMixerBus.hpp>
 #include <engine/audio/mixer/MainMixProcess.hpp>
-#include <engine/audio/mixer/MixVariables.hpp>
+#include <engine/audio/mixer/MixControls.hpp>
 #include <engine/audio/mixer/MixerControlsIds.hpp>
 
 using namespace mpc::engine::audio::mixer;
 using namespace mpc::engine::audio::core;
 using namespace std;
 
-AudioMixerStrip::AudioMixerStrip(AudioMixer* mixer, shared_ptr<AudioControlsChain> controlsChain)
+AudioMixerStrip::AudioMixerStrip(AudioMixer* mixer,std:: shared_ptr<AudioControlsChain> controlsChain)
 	: AudioProcessChain(controlsChain)
 {
 	silenceCountdown = silenceCount;
@@ -23,7 +23,7 @@ AudioMixerStrip::AudioMixerStrip(AudioMixer* mixer, shared_ptr<AudioControlsChai
 	buffer = createBuffer();
 }
 
-void AudioMixerStrip::setInputProcess(shared_ptr<AudioProcess> input)
+void AudioMixerStrip::setInputProcess(std::shared_ptr<AudioProcess> input)
 {
 
 	if (controlChain->getId() != MixerControlsIds::CHANNEL_STRIP) {
@@ -37,7 +37,7 @@ void AudioMixerStrip::setInputProcess(shared_ptr<AudioProcess> input)
 		oldInput->close();
 }
 
-void AudioMixerStrip::setDirectOutputProcess(shared_ptr<AudioProcess> output)
+void AudioMixerStrip::setDirectOutputProcess(std::shared_ptr<AudioProcess> output)
 {
 	auto oldOutput = directOutput;
 	if (output) output->open();
@@ -107,23 +107,19 @@ bool AudioMixerStrip::processBuffer(int nFrames)
 	return true;
 }
 
-shared_ptr<AudioProcess> AudioMixerStrip::createProcess(shared_ptr<AudioControls> controls)
+std::shared_ptr<AudioProcess> AudioMixerStrip::createProcess(std::shared_ptr<AudioControls> controls)
 {
-	auto mixVars = dynamic_pointer_cast<MixVariables>(controls);
-	if (mixVars) {
-		shared_ptr<AudioMixerStrip> routedStrip;
-		if (mixVars->getName() == mixer->getMainBus()->getName()) {
+	auto mixControls = dynamic_pointer_cast<MixControls>(controls);
+
+	if (mixControls) {
+std::		shared_ptr<AudioMixerStrip> routedStrip;
+		if (mixControls->getName() == mixer->getMainBus()->getName()) {
 			routedStrip = mixer->getMainStrip();
-			try {
-				return make_shared<MainMixProcess>(routedStrip, mixVars, mixer);
-			}
-			catch (bad_cast e) {
-				printf("\n%s", e.what());
-			}
+            return std::make_shared<MainMixProcess>(routedStrip, mixControls, mixer);
 		}
 		else {
-			routedStrip = mixer->getStripImpl(mixVars->getName());
-			return make_shared<MixProcess>(routedStrip, mixVars);
+			routedStrip = mixer->getStripImpl(mixControls->getName());
+			return std::make_shared<MixProcess>(routedStrip, mixControls);
 		}
 	}
 
@@ -132,8 +128,6 @@ shared_ptr<AudioProcess> AudioMixerStrip::createProcess(shared_ptr<AudioControls
 
 int AudioMixerStrip::mix(mpc::engine::audio::core::AudioBuffer* bufferToMix, vector<float>& gain)
 {
-	if (bufferToMix == nullptr) return 0;
-
     auto doMix = buffer != bufferToMix;
     auto snc = bufferToMix->getChannelCount();
     auto dnc = buffer->getChannelCount();
