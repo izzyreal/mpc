@@ -8,11 +8,11 @@
 #include <engine/audio/mixer/MixerControlsIds.hpp>
 #include <engine/audio/server/AudioServer.hpp>
 
-using namespace std;
 using namespace mpc::engine::audio::server;
 using namespace mpc::engine::audio::mixer;
+using namespace mpc::engine::audio::core;
 
-AudioMixer::AudioMixer(shared_ptr<MixerControls> controls, shared_ptr<AudioServer> server)
+AudioMixer::AudioMixer(const std::shared_ptr<MixerControls>& controls, const std::shared_ptr<AudioServer>& server)
 {
 	this->controls = controls;
 	this->server = server;
@@ -21,36 +21,36 @@ AudioMixer::AudioMixer(shared_ptr<MixerControls> controls, shared_ptr<AudioServe
 	createStrips(controls);
 }
 
-std::shared_ptr<mpc::engine::audio::server::AudioServer> AudioMixer::getAudioServer() {
+std::shared_ptr<AudioServer> AudioMixer::getAudioServer() {
 	return server;
 }
 
-shared_ptr<MixerControls> AudioMixer::getMixerControls()
+std::shared_ptr<MixerControls> AudioMixer::getMixerControls()
 {
     return controls;
 }
 
-mpc::engine::audio::core::AudioBuffer* AudioMixer::getSharedBuffer()
+AudioBuffer* AudioMixer::getSharedBuffer()
 {
     return sharedAudioBuffer;
 }
 
-mpc::engine::audio::core::AudioBuffer* AudioMixer::createBuffer(string name)
+AudioBuffer* AudioMixer::createBuffer(std::string name)
 {
     return server->createAudioBuffer(name);
 }
 
-void AudioMixer::removeBuffer(mpc::engine::audio::core::AudioBuffer* buffer)
+void AudioMixer::removeBuffer(AudioBuffer* buffer)
 {
     server->removeAudioBuffer(buffer);
 }
 
-shared_ptr<AudioMixerStrip> AudioMixer::getStrip(string name)
+std::shared_ptr<AudioMixerStrip> AudioMixer::getStrip(std::string name)
 {
     return getStripImpl(name);
 }
 
-shared_ptr<AudioMixerStrip> AudioMixer::getStripImpl(string name)
+std::shared_ptr<AudioMixerStrip> AudioMixer::getStripImpl(std::string name)
 {
 	for (auto& strip : strips) {
 		if (strip->getName() == name) {
@@ -62,24 +62,24 @@ shared_ptr<AudioMixerStrip> AudioMixer::getStripImpl(string name)
 
 void AudioMixer::work(int nFrames)
 {
-	silenceStrips(&auxStrips);
+    AudioMixer::silenceStrips(&auxStrips);
 	mainStrip->silence();
-	evaluateStrips(&channelStrips, nFrames);
-	evaluateStrips(&auxStrips, nFrames);
+	AudioMixer::evaluateStrips(&channelStrips, nFrames);
+    AudioMixer::evaluateStrips(&auxStrips, nFrames);
 	mainStrip->processBuffer(nFrames);
 	writeBusBuffers(nFrames);
 }
 
-void AudioMixer::evaluateStrips(vector<shared_ptr<AudioMixerStrip>>* strips, int nFrames)
+void AudioMixer::evaluateStrips(std::vector<std::shared_ptr<AudioMixerStrip>>* stripsToEvaluate, int nFrames)
 {
-	for (auto& strip : (*strips)) {
+	for (auto& strip : (*stripsToEvaluate)) {
 		strip->processBuffer(nFrames);
 	}
 }
 
-void AudioMixer::silenceStrips(vector<shared_ptr<AudioMixerStrip>>* strips)
+void AudioMixer::silenceStrips(std::vector<std::shared_ptr<AudioMixerStrip>>* stripsToSilence)
 {
-	for (auto& strip : (*strips))
+	for (auto& strip : (*stripsToSilence))
 		strip->silence();
 }
 
@@ -89,15 +89,13 @@ void AudioMixer::writeBusBuffers(int nFrames)
 		bus->write(nFrames);
 }
 
-void AudioMixer::createBusses(shared_ptr<MixerControls> mixerControls)
+void AudioMixer::createBusses(std::shared_ptr<MixerControls> mixerControls)
 {
 	busses.clear();
 	auxBusses.clear();
 
-	shared_ptr<AudioMixerBus> bus;
-
 	for (auto& bc : mixerControls->getAuxBusControls()) {
-		bus = createBus(bc);
+		auto bus = createBus(bc);
 		busses.push_back(bus);
 		auxBusses.push_back(bus);
 	}
@@ -106,12 +104,12 @@ void AudioMixer::createBusses(shared_ptr<MixerControls> mixerControls)
 	busses.push_back(mainBus);
 }
 
-shared_ptr<AudioMixerBus> AudioMixer::createBus(shared_ptr<BusControls> busControls)
+std::shared_ptr<AudioMixerBus> AudioMixer::createBus(std::shared_ptr<BusControls> busControls)
 {
-	return make_shared<AudioMixerBus>(this, busControls);
+	return std::make_shared<AudioMixerBus>(this, busControls);
 }
 
-shared_ptr<AudioMixerBus> AudioMixer::getBus(string name)
+std::shared_ptr<AudioMixerBus> AudioMixer::getBus(std::string name)
 {
 	for (auto& bus : busses) {
 		if (bus->getName() == name) {
@@ -121,12 +119,12 @@ shared_ptr<AudioMixerBus> AudioMixer::getBus(string name)
 	return nullptr;
 }
 
-shared_ptr<AudioMixerBus> AudioMixer::getMainBus()
+std::shared_ptr<AudioMixerBus> AudioMixer::getMainBus()
 {
     return mainBus;
 }
 
-shared_ptr<AudioMixerStrip> AudioMixer::getMainStrip()
+std::shared_ptr<AudioMixerStrip> AudioMixer::getMainStrip()
 {
 	if (!mainStrip) {
 		return {};
@@ -134,20 +132,20 @@ shared_ptr<AudioMixerStrip> AudioMixer::getMainStrip()
 	return mainStrip;
 }
 
-void AudioMixer::createStrips(shared_ptr<MixerControls> mixerControls)
+void AudioMixer::createStrips(std::shared_ptr<MixerControls> mixerControls)
 {
 	for (auto& control : mixerControls->getControls()) {
-		auto candidate = dynamic_pointer_cast<core::AudioControlsChain>(control);
+		auto candidate = std::dynamic_pointer_cast<core::AudioControlsChain>(control);
 		if (candidate) {
 			createStrip(candidate);
 		}
 	}
 }
 
-shared_ptr<AudioMixerStrip> AudioMixer::createStrip(shared_ptr<mpc::engine::audio::core::AudioControlsChain> controls)
+std::shared_ptr<AudioMixerStrip> AudioMixer::createStrip(std::shared_ptr<AudioControlsChain> controls)
 {
 
-	auto strip = make_shared<AudioMixerStrip>(this, controls);
+	auto strip = std::make_shared<AudioMixerStrip>(this, controls);
 
 	switch (controls->getId()) {
 	case MixerControlsIds::CHANNEL_STRIP:

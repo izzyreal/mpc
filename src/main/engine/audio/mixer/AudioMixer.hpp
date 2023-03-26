@@ -52,9 +52,9 @@ namespace mpc::engine::audio::mixer {
         void work(int nFrames) override;
 
     private:
-        void evaluateStrips(std::vector<std::shared_ptr<AudioMixerStrip>> *evalStrips, int nFrames);
+        static void evaluateStrips(std::vector<std::shared_ptr<AudioMixerStrip>> *stripsToEvaluate, int nFrames);
 
-        void silenceStrips(std::vector<std::shared_ptr<AudioMixerStrip>> *evalStrips);
+        static void silenceStrips(std::vector<std::shared_ptr<AudioMixerStrip>> *stripsToSilence);
 
         void writeBusBuffers(int nFrames);
 
@@ -78,7 +78,7 @@ namespace mpc::engine::audio::mixer {
         void close();
 
     public:
-        AudioMixer(std::shared_ptr<MixerControls> controls, std::shared_ptr<mpc::engine::audio::server::AudioServer> server);
+        AudioMixer(const std::shared_ptr<MixerControls>& controls, const std::shared_ptr<mpc::engine::audio::server::AudioServer>& server);
 
     };
 }
