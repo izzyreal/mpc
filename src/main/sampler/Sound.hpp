@@ -1,6 +1,8 @@
 #pragma once
 #include <observer/Observable.hpp>
 
+#include <valarray>
+
 namespace mpc::sampler {
 	class Sound : public moduru::observer::Observable
 	{
@@ -40,8 +42,9 @@ namespace mpc::sampler {
 		void setLoopTo(int loopTo);
 		void setTune(int tune);
 		void insertFrame(std::vector<float> frame, unsigned int index);
-        void insertFrames(std::vector<float>& frames, unsigned int index);
-        void insertFrames(std::vector<float>& left, std::vector<float>& right, unsigned int index);
+
+        void insertFrames(std::valarray<float>& frames, unsigned int index);
+        void insertFrames(std::valarray<float>& left, std::valarray<float>& right, unsigned int index);
 
 	public:
 		Sound(int rate);

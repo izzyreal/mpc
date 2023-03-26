@@ -126,28 +126,27 @@ std::		shared_ptr<AudioMixerStrip> routedStrip;
 	return AudioProcessChain::createProcess(controls);
 }
 
-int AudioMixerStrip::mix(mpc::engine::audio::core::AudioBuffer* bufferToMix, vector<float>& gain)
+int AudioMixerStrip::mix(AudioBuffer* bufferToMix, vector<float>& gain)
 {
     auto doMix = buffer != bufferToMix;
     auto snc = bufferToMix->getChannelCount();
     auto dnc = buffer->getChannelCount();
 
-    auto ns = buffer->getSampleCount();
     float g;
     auto k = static_cast<float>((snc)) / dnc;
+
     for (auto i = 0; i < dnc; i++) {
         g = gain[i] * k;
         auto& in = bufferToMix->getChannel(i % snc);
         auto& out = buffer->getChannel(i);
-        if (doMix) {
-            for (auto s = 0; s < ns; s++) {
-                out[s] += in[s] * g;
-            }
+
+        if (doMix)
+        {
+            out += in * g;
         }
-        else {
-            for (auto s = 0; s < ns; s++) {
-                out[s] = in[s] * g;
-            }
+        else
+        {
+            out = in * g;
         }
     }
     auto ret = 1;

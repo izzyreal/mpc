@@ -1,42 +1,41 @@
 #include <engine/audio/server/AudioServer.hpp>
+#include <utility>
 
 using namespace mpc::engine::audio::server;
+using namespace mpc::engine::audio::core;
 using namespace std;
-
-AudioServer::AudioServer() {
-}
 
 float AudioServer::getSampleRate() {
 	return sampleRate;
 }
 
-void mpc::engine::audio::server::AudioServer::setSampleRate(int rate) {
+void AudioServer::setSampleRate(int rate) {
 	sampleRate = static_cast<float>(rate);
 	for (auto& b : buffers)
 		b->setSampleRate(sampleRate);
 }
 
-const std::vector<mpc::engine::audio::core::AudioBuffer*>& AudioServer::getBuffers() {
+const std::vector<AudioBuffer*>& AudioServer::getBuffers() {
 	return buffers;
 }
 
-const unsigned int AudioServer::getBufferSize() {
+unsigned int AudioServer::getBufferSize() const {
 	return bufferSize;
 }
 
-mpc::engine::audio::core::AudioBuffer* AudioServer::createAudioBuffer(string name) {
-	buffers.push_back(new mpc::engine::audio::core::AudioBuffer(name, 2, bufferSize, sampleRate));
+AudioBuffer* AudioServer::createAudioBuffer(string name) {
+	buffers.push_back(new AudioBuffer(std::move(name), 2, bufferSize, sampleRate));
 	return buffers.back();
 }
 
 void AudioServer::resizeBuffers(int newSize) {
 	bufferSize = newSize;
 	for (auto& b : buffers) {
-		b->changeSampleCount(bufferSize, false);
+		b->changeSampleCount(bufferSize);
 	}
 }
 
-void AudioServer::removeAudioBuffer(mpc::engine::audio::core::AudioBuffer* buffer)
+void AudioServer::removeAudioBuffer(AudioBuffer* buffer)
 {
 	for (int i = 0; i < buffers.size(); i++) {
 		if (buffers[i] == buffer) {

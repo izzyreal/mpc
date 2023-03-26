@@ -29,7 +29,7 @@ namespace mpc::engine::audio::server {
 
 	public:
         const std::vector<mpc::engine::audio::core::AudioBuffer*>& getBuffers();
-		const unsigned int getBufferSize();
+		unsigned int getBufferSize() const;
 
 	public:
 		virtual void start() = 0;
@@ -50,7 +50,6 @@ namespace mpc::engine::audio::server {
 		virtual int getTotalLatencyFrames() = 0;
 
 	public:
-		AudioServer();
 		~AudioServer();
 
 	private:

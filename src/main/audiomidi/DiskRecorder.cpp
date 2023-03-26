@@ -6,22 +6,23 @@
 #include <audiomidi/WavOutputFileStream.hpp>
 
 #include <Logger.hpp>
+#include <utility>
 
 using namespace mpc::audiomidi;
+using namespace mpc::engine::audio::core;
 
-DiskRecorder::DiskRecorder(mpc::engine::audio::core::AudioProcess* process, std::string name)
-	: AudioProcessAdapter(process)
+DiskRecorder::DiskRecorder(AudioProcess* process, std::string nameToUse)
+	: AudioProcessAdapter(process), name(std::move(nameToUse))
 {
-	this->name = name;
 }
 
-bool DiskRecorder::prepare(const std::string& absolutePath, int lengthInFrames, int sampleRate)
+bool DiskRecorder::prepare(const std::string& absolutePath, int lengthInFramesToUse, int sampleRateToUse)
 {
 	if (writing.load())
 		return false;
 
-	this->lengthInFrames = lengthInFrames;
-	this->sampleRate = sampleRate;
+	this->lengthInFrames = lengthInFramesToUse;
+	this->sampleRate = sampleRateToUse;
 
 	if (fileStream.is_open())
 		fileStream.close();
@@ -31,26 +32,26 @@ bool DiskRecorder::prepare(const std::string& absolutePath, int lengthInFrames, 
 	if (!fileStream.is_open())
 		return false;
 
-	wav_writeHeader(fileStream, sampleRate);
-	
-	lengthInBytes = lengthInFrames * 2 * 2; // assume 16 bit stereo for now
-	
+	wav_writeHeader(fileStream, sampleRateToUse);
+
+	lengthInBytes = lengthInFramesToUse * 2 * 2; // assume 16 bit stereo for now
+
 	if (format != nullptr)
 		delete format;
 
-	format = new mpc::engine::audio::core::AudioFormat(sampleRate, 16, 2, true, false);
-	
+	format = new AudioFormat(sampleRateToUse, 16, 2, true, false);
+
 	return true;
 }
 
-int DiskRecorder::processAudio(mpc::engine::audio::core::AudioBuffer* buf, int nFrames)
+int DiskRecorder::processAudio(AudioBuffer* buf, int nFrames)
 {
 	auto ret = AudioProcessAdapter::processAudio(buf, nFrames);
-	
+
 	if (writing.load())
 	{
-        std::vector<char> audioBufferAsBytes (buf->getByteArrayBufferSize(format, nFrames));
-		buf->convertToByteArray_(0, nFrames, &audioBufferAsBytes, 0, format);
+        std::vector<char> audioBufferAsBytes (FloatSampleBuffer::getByteArrayBufferSize(format, nFrames));
+		buf->convertToByteArray_(0, nFrames, audioBufferAsBytes, 0, format);
 		
 		if (audioBufferAsBytes.size() + writtenByteCount >= lengthInBytes)
 		{

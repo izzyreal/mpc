@@ -12,6 +12,8 @@
 #include <atomic>
 #include <mutex>
 
+#include <valarray>
+
 using namespace mpc::sampler;
 using namespace mpc::engine::audio::core;
 
@@ -22,7 +24,7 @@ enum SoundPlayerFileFormat { SND, WAV };
 class SoundPlayer
 : public AudioProcess
 {
-    
+
 private:
     int ingestedSourceFrameCount = 0;
     int sourceFrameCount = 0;
@@ -30,7 +32,7 @@ private:
     SoundPlayerFileFormat fileFormat;
     float fadeFactor = -1.0f;
     bool stopEarly = false;
-    
+
 private:
     std::mutex _playing;
     bool playing = false;
@@ -44,20 +46,20 @@ private:
     int srcLeftError = 0;
     int srcRightError = 0;
     std::shared_ptr<std::istream> stream;
-    
+
 public:
     bool start(std::shared_ptr<std::istream>, SoundPlayerFileFormat);
     int processAudio(mpc::engine::audio::core::AudioBuffer* buf, int nFrames) override;
     void open() override {}
     void close() override {}
-    
+
 public:
     void enableStopEarly();
     bool isPlaying();
-    
+
 private:
     void stop();
-    void resampleChannel(bool left, std::vector<float> &input, int sourceSampleRate, int destinationSampleRate);
+    void resampleChannel(bool left, std::valarray<float> &input, int sourceSampleRate, int destinationSampleRate);
     
 public:
     SoundPlayer();

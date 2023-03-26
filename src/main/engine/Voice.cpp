@@ -313,8 +313,8 @@ int Voice::processAudio(mpc::engine::audio::core::AudioBuffer *buffer, int nFram
     for (int i = 0; i < nFrames; i++) {
         frame = getFrame();
 
-        left[i] = frame[0] * masterLevelFactor;
-        right[i] = frame[1] * masterLevelFactor;
+        left[i] = frame[0];
+        right[i] = frame[1];
 
         if (decayCounter != 0) {
             if (decayCounter == 1)
@@ -325,6 +325,9 @@ int Voice::processAudio(mpc::engine::audio::core::AudioBuffer *buffer, int nFram
             decayCounter--;
         }
     }
+
+    left *= masterLevelFactor;
+    right *= masterLevelFactor;
 
     if (finished) {
         note = -1;
