@@ -137,7 +137,11 @@ void NameScreen::function(int i)
 	}
 	case 4:
         auto newName = getNameWithoutSpaces();
-		enterAction(newName);
+        if (newName.empty())
+        {
+            return;
+        }
+        enterAction(newName);
 		break;
     }
 }
@@ -145,6 +149,12 @@ void NameScreen::function(int i)
 void NameScreen::pressEnter()
 {
     auto newName = getNameWithoutSpaces();
+
+    if (newName.empty())
+    {
+        return;
+    }
+
     enterAction(newName);
 }
 
