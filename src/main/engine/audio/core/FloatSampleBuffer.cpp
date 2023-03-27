@@ -49,12 +49,12 @@ void FloatSampleBuffer::createChannels(int channelCount, int sampleCount, bool l
 	}
 }
 
-void FloatSampleBuffer::initFromByteArray_(vector<char> buffer, int offset, int byteCount, AudioFormat* format)
+void FloatSampleBuffer::initFromByteArray_(const vector<char>& buffer, int offset, int byteCount, AudioFormat* format)
 {
 	initFromByteArray_(buffer, offset, byteCount, format, LAZY_DEFAULT);
 }
 
-void FloatSampleBuffer::initFromByteArray_(vector<char> buffer, int offset, int byteCount, AudioFormat* format, bool lazy)
+void FloatSampleBuffer::initFromByteArray_(const vector<char>& buffer, int offset, int byteCount, AudioFormat* format, bool lazy)
 {
 	if (offset + byteCount > buffer.size()) {
 		return;

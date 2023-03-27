@@ -124,7 +124,7 @@ const float FloatSampleTools::invTwoPower15 = 1.f / twoPower15;
 const float FloatSampleTools::invTwoPower23 = 1.f / twoPower23;
 const float FloatSampleTools::invTwoPower31 = 1.f / twoPower31;
 
-void FloatSampleTools::byte2float(vector<char>& input, int inByteOffset, vector<vector<float>>* output, int outOffset, int frameCount, AudioFormat* format)
+void FloatSampleTools::byte2float(const vector<char>& input, int inByteOffset, vector<vector<float>>* output, int outOffset, int frameCount, AudioFormat* format)
 {
 	for (auto channel = 0; channel < format->getChannels(); channel++) {
 		if (output->size() < channel) {
@@ -140,13 +140,13 @@ void FloatSampleTools::byte2float(vector<char>& input, int inByteOffset, vector<
 	}
 }
 
-void FloatSampleTools::byte2floatGeneric(vector<char>& input, int inByteOffset, int inByteStep, vector<float>* output, int outOffset, int sampleCount, AudioFormat* format)
+void FloatSampleTools::byte2floatGeneric(const vector<char>& input, int inByteOffset, int inByteStep, vector<float>* output, int outOffset, int sampleCount, AudioFormat* format)
 {
 	auto formatType = getFormatType(format);
 	byte2floatGeneric(input, inByteOffset, inByteStep, output, outOffset, sampleCount, formatType);
 }
 
-void FloatSampleTools::byte2floatGeneric(vector<char>& input, int inByteOffset, int inByteStep, vector<float>* output, int outOffset, int sampleCount, int formatType)
+void FloatSampleTools::byte2floatGeneric(const vector<char>& input, int inByteOffset, int inByteStep, vector<float>* output, int outOffset, int sampleCount, int formatType)
 {
 	auto endCount = outOffset + sampleCount;
 	auto inIndex = inByteOffset;

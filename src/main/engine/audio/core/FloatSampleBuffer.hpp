@@ -37,8 +37,8 @@ protected:
 public:
     void insertChannel(int index, bool silent);
     void insertChannel(int index, bool silent, bool lazy);
-    void initFromByteArray_(std::vector<char> buffer, int offset, int byteCount, AudioFormat* format);
-    void initFromByteArray_(std::vector<char> buffer, int offset, int byteCount, AudioFormat* format, bool lazy);
+    void initFromByteArray_(const std::vector<char>& buffer, int offset, int byteCount, AudioFormat* format);
+    void initFromByteArray_(const std::vector<char>& buffer, int offset, int byteCount, AudioFormat* format, bool lazy);
 
     void reset();
     void reset(int channels, int sampleCount, float sampleRate);

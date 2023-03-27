@@ -47,11 +47,11 @@ namespace mpc::engine::audio::core {
 		static const float invTwoPower31;
 
 	public:
-		static void byte2float(std::vector<char>& input, int inByteOffset, std::vector<std::vector<float> >* output, int outOffset, int frameCount, AudioFormat* format);
+		static void byte2float(const std::vector<char>& input, int inByteOffset, std::vector<std::vector<float> >* output, int outOffset, int frameCount, AudioFormat* format);
 
     public:
-		static void byte2floatGeneric(std::vector<char>& input, int inByteOffset, int inByteStep, std::vector<float>* output, int outOffset, int sampleCount, AudioFormat* format);
-		static void byte2floatGeneric(std::vector<char>& input, int inByteOffset, int inByteStep, std::vector<float>* output, int outOffset, int sampleCount, int formatType);
+		static void byte2floatGeneric(const std::vector<char>& input, int inByteOffset, int inByteStep, std::vector<float>* output, int outOffset, int sampleCount, AudioFormat* format);
+		static void byte2floatGeneric(const std::vector<char>& input, int inByteOffset, int inByteStep, std::vector<float>* output, int outOffset, int sampleCount, int formatType);
 
 	private:
 		static int8_t quantize8(float sample, float ditherBits);
