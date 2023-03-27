@@ -65,8 +65,5 @@ namespace mpc::engine::audio::core {
     public:
 		static void float2byteGeneric(std::vector<float>& input, int inOffset, std::vector<char>& output, int outByteOffset, int outByteStep, int sampleCount, AudioFormat* format, float ditherBits);
 		static void float2byteGeneric(std::vector<float>& input, int inOffset, std::vector<char>& output, int outByteOffset, int outByteStep, int sampleCount, int formatType, float ditherBits);
-
-	private:
-		FloatSampleTools();
 	};
 }

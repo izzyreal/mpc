@@ -3,7 +3,6 @@
 #include <stdexcept>
 
 using namespace mpc::engine::audio::core;
-using namespace std;
 
 FloatSampleBuffer::FloatSampleBuffer() 
 {
@@ -24,7 +23,7 @@ void FloatSampleBuffer::init(int channelCount, int sampleCount, float sampleRate
 void FloatSampleBuffer::init(int channelCount, int sampleCount, float sampleRate, bool lazy)
 {
 	if (channelCount < 0 || sampleCount < 0) {
-		string error = "invalid parameters in initialization of FloatSampleBuffer.";
+		std::string error = "invalid parameters in initialization of FloatSampleBuffer.";
 		printf("ERROR: %s\n", error.c_str());
 		return;
 	}
@@ -49,12 +48,12 @@ void FloatSampleBuffer::createChannels(int channelCount, int sampleCount, bool l
 	}
 }
 
-void FloatSampleBuffer::initFromByteArray_(const vector<char>& buffer, int offset, int byteCount, AudioFormat* format)
+void FloatSampleBuffer::initFromByteArray_(const std::vector<char>& buffer, int offset, int byteCount, AudioFormat* format)
 {
 	initFromByteArray_(buffer, offset, byteCount, format, LAZY_DEFAULT);
 }
 
-void FloatSampleBuffer::initFromByteArray_(const vector<char>& buffer, int offset, int byteCount, AudioFormat* format, bool lazy)
+void FloatSampleBuffer::initFromByteArray_(const std::vector<char>& buffer, int offset, int byteCount, AudioFormat* format, bool lazy)
 {
 	if (offset + byteCount > buffer.size()) {
 		return;
@@ -86,21 +85,21 @@ int FloatSampleBuffer::getByteArrayBufferSize(AudioFormat* format, int lenInSamp
     return format->getFrameSize() * lenInSamples;
 }
 
-int FloatSampleBuffer::convertToByteArray_(int readOffset, int lenInSamples, vector<char>& buffer, int writeOffset, AudioFormat* format)
+int FloatSampleBuffer::convertToByteArray_(int readOffset, int lenInSamples, std::vector<char>& buffer, int writeOffset, AudioFormat* format)
 {
 	int byteCount = getByteArrayBufferSize(format, lenInSamples);
 	if (writeOffset + byteCount > buffer.size()) {
-		string error = "FloatSampleBuffer.convertToByteArray: buffer too small.";
+		std::string error = "FloatSampleBuffer.convertToByteArray: buffer too small.";
 		printf("ERROR: %s\n", error.c_str());
 		return -1;
 	}
 	if (format->getSampleRate() != getSampleRate()) {
-		string error = "FloatSampleBuffer.convertToByteArray: different samplerates.";
+		std::string error = "FloatSampleBuffer.convertToByteArray: different samplerates.";
 		printf("ERROR: %s\n", error.c_str());
 		return -1;
 	}
 	if (format->getChannels() != getChannelCount()) {
-		string error = "FloatSampleBuffer.convertToByteArray: different channel count.";
+		std::string error = "FloatSampleBuffer.convertToByteArray: different channel count.";
 		printf("ERROR: %s\n", error.c_str());
 		return -1;
 	}
@@ -114,7 +113,7 @@ void FloatSampleBuffer::changeSampleCount(int newSampleCount, bool keepOldSample
 	if (oldSampleCount == newSampleCount) {
 		return;
 	}
-	vector<vector<float>> oldChannels;
+	std::vector<std::vector<float>> oldChannels;
 	
 	if (keepOldSamples) {
 		for (auto c : channels) {
@@ -168,7 +167,7 @@ void FloatSampleBuffer::insertChannel(int index, bool silent, bool lazy)
 {
 	int physSize = static_cast<int>(channels.size());
 	int virtSize = getChannelCount();
-	vector<float> newChannel;
+	std::vector<float> newChannel;
     
 	if (physSize > virtSize)
     {
@@ -211,7 +210,7 @@ void FloatSampleBuffer::removeChannel(int channel, bool lazy)
 	}
 	else if (channel < getChannelCount() - 1)
     {
-		vector<float> candidate = channels[channel];
+		std::vector<float> candidate = channels[channel];
 		channels.erase(channels.begin() + channel);
 		channels.push_back(candidate);
 	}
@@ -237,7 +236,7 @@ void FloatSampleBuffer::copy(int channel, int sourceIndex, int destIndex, int le
     
 	if (sourceIndex + length > bufferCount || destIndex + length > bufferCount || sourceIndex < 0 || destIndex < 0 || length < 0)
     {
-		string error = "parameters exceed buffer size";
+		std::string error = "parameters exceed buffer size";
 		printf("ERROR: %s\n", error.c_str());
 	}
 	
@@ -263,7 +262,7 @@ void FloatSampleBuffer::setSampleRate(float sampleRate)
 {
 	if (sampleRate <= 0)
     {
-		string error = "Invalid samplerate for FloatSampleBuffer.";
+		std::string error = "Invalid samplerate for FloatSampleBuffer.";
 		printf("ERROR: %s\n", error.c_str());
 		return;
 	}
@@ -271,11 +270,11 @@ void FloatSampleBuffer::setSampleRate(float sampleRate)
     this->sampleRate = sampleRate;
 }
 
-vector<float>& FloatSampleBuffer::getChannel(int channel)
+std::vector<float>& FloatSampleBuffer::getChannel(int channel)
 {
 	if (channel < 0 || channel >= getChannelCount())
     {
-		string error = "FloatSampleBuffer: invalid channel index " + std::to_string(channel) + " was provided, only up to index " + std::to_string(channels.size() - 1) + " available.";
+		std::string error = "FloatSampleBuffer: invalid channel index " + std::to_string(channel) + " was provided, only up to index " + std::to_string(channels.size() - 1) + " available.";
 		printf("ERROR: %s\n", error.c_str());
 		throw new std::invalid_argument(error);
 	}

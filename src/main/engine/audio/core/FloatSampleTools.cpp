@@ -3,21 +3,15 @@
 #include <engine/audio/core/Encoding.hpp>
 #include <engine/audio/core/AudioFormat.hpp>
 
-#include <stdio.h>
-
+#include <cstdio>
 #include <cstdlib>
 
 using namespace mpc::engine::audio::core;
-using namespace std;
-
-FloatSampleTools::FloatSampleTools() 
-{
-}
 
 void FloatSampleTools::checkSupportedSampleSize(int ssib, int channels, int frameSize)
 {
     if((ssib * channels) != frameSize * 8) {
-		string description = "unsupported sample size: " + std::to_string(ssib) + " stored in " + std::to_string(frameSize / channels) + " bytes.";
+		std::string description = "unsupported sample size: " + std::to_string(ssib) + " stored in " + std::to_string(frameSize / channels) + " bytes.";
 		printf("ERROR: %s", description.c_str());
 		return;
 	}
@@ -27,12 +21,12 @@ int FloatSampleTools::getFormatType(AudioFormat* format)
 {
 	bool signed_ = format->getEncoding() == Encoding::PCM_SIGNED();
 	if (!signed_ && format->getEncoding() != Encoding::PCM_UNSIGNED()) {
-		string description = "unsupported encoding: only PCM encoding supported.";
+		std::string description = "unsupported encoding: only PCM encoding supported.";
 		printf("ERROR: %s", description.c_str());
 		return -1;
 	}
 	if (!signed_ && format->getSampleSizeInBits() != 8) {
-		string description = "unsupported encoding: only 8-bit can be unsigned";
+		std::string description = "unsupported encoding: only 8-bit can be unsigned";
 		printf("ERROR: %s", description.c_str());
 		return -1;
 	}
@@ -58,11 +52,11 @@ int FloatSampleTools::getFormatType(int ssib, bool signed_, bool bigEndian)
 		res = F_32;
 	}
 	if (res == 0) {
-		string description = "FloatSampleBuffer: unsupported sample size of " + to_string(ssib) + " bits per sample.";
+		std::string description = "FloatSampleBuffer: unsupported sample size of " + std::to_string(ssib) + " bits per sample.";
 		printf("ERROR: %s", description.c_str());
 	}
 	if (!signed_ && bytesPerSample > 1) {
-		string description = "FloatSampleBuffer: unsigned samples larger than 8 bit are not supported";
+		std::string description = "FloatSampleBuffer: unsigned samples larger than 8 bit are not supported";
 	}
 	if (signed_) {
 		res |= F_SIGNED;
@@ -90,7 +84,7 @@ int FloatSampleTools::getSampleSize(int formatType)
 
 std::string FloatSampleTools::formatType2Str(int formatType)
 {
-	string result = to_string(formatType) + ": ";
+	std::string result = std::to_string(formatType) + ": ";
 	switch (formatType & F_SAMPLE_WIDTH_MASK) {
 	case F_8:
 		result = result.append("8bit");
@@ -124,7 +118,7 @@ const float FloatSampleTools::invTwoPower15 = 1.f / twoPower15;
 const float FloatSampleTools::invTwoPower23 = 1.f / twoPower23;
 const float FloatSampleTools::invTwoPower31 = 1.f / twoPower31;
 
-void FloatSampleTools::byte2float(const vector<char>& input, int inByteOffset, vector<vector<float>>& output, int outOffset, int frameCount, AudioFormat* format)
+void FloatSampleTools::byte2float(const std::vector<char>& input, int inByteOffset, std::vector<std::vector<float>>& output, int outOffset, int frameCount, AudioFormat* format)
 {
 	for (auto channel = 0; channel < format->getChannels(); channel++) {
 		if (output.size() < channel) {
@@ -140,13 +134,13 @@ void FloatSampleTools::byte2float(const vector<char>& input, int inByteOffset, v
 	}
 }
 
-void FloatSampleTools::byte2floatGeneric(const vector<char>& input, int inByteOffset, int inByteStep, vector<float>& output, int outOffset, int sampleCount, AudioFormat* format)
+void FloatSampleTools::byte2floatGeneric(const std::vector<char>& input, int inByteOffset, int inByteStep, std::vector<float>& output, int outOffset, int sampleCount, AudioFormat* format)
 {
 	auto formatType = getFormatType(format);
 	byte2floatGeneric(input, inByteOffset, inByteStep, output, outOffset, sampleCount, formatType);
 }
 
-void FloatSampleTools::byte2floatGeneric(const vector<char>& input, int inByteOffset, int inByteStep, vector<float>& output, int outOffset, int sampleCount, int formatType)
+void FloatSampleTools::byte2floatGeneric(const std::vector<char>& input, int inByteOffset, int inByteStep, std::vector<float>& output, int outOffset, int sampleCount, int formatType)
 {
 	auto endCount = outOffset + sampleCount;
 	auto inIndex = inByteOffset;
@@ -177,7 +171,7 @@ void FloatSampleTools::byte2floatGeneric(const vector<char>& input, int inByteOf
 			output[outIndex] = ((input[inIndex + 3] << 24) | ((input[inIndex + 2] & 255) << 16) | ((input[inIndex + 1] & 255) << 8) | (input[inIndex] & 255)) * invTwoPower31;
 			break;
 		default:
-			string description = "unsupported format=" + formatType2Str(formatType);
+			std::string description = "unsupported format=" + formatType2Str(formatType);
 			printf("ERROR: %s", description.c_str());
 		}
 	}
@@ -247,7 +241,7 @@ int FloatSampleTools::quantize32(float sample, float ditherBits)
 	}
 }
 
-void FloatSampleTools::float2byte(vector<vector<float>>& input, int inOffset, vector<char>& output, int outByteOffset, int frameCount, AudioFormat* format, float ditherBits)
+void FloatSampleTools::float2byte(std::vector<std::vector<float>>& input, int inOffset, std::vector<char>& output, int outByteOffset, int frameCount, AudioFormat* format, float ditherBits)
 {
 	for (auto channel = 0; channel < format->getChannels(); channel++) {
 		auto data = input[channel];
@@ -257,22 +251,22 @@ void FloatSampleTools::float2byte(vector<vector<float>>& input, int inOffset, ve
 }
 
 
-void FloatSampleTools::float2byteGeneric(vector<float>& input, int inOffset, vector<char>& output, int outByteOffset, int outByteStep, int sampleCount, AudioFormat* format, float ditherBits)
+void FloatSampleTools::float2byteGeneric(std::vector<float>& input, int inOffset, std::vector<char>& output, int outByteOffset, int outByteStep, int sampleCount, AudioFormat* format, float ditherBits)
 {
 	int formatType = getFormatType(format);
 	float2byteGeneric(input, inOffset, output, outByteOffset, outByteStep, sampleCount, formatType, ditherBits);
 }
 
 
-void FloatSampleTools::float2byteGeneric(vector<float>& input, int inOffset, vector<char>& output, int outByteOffset, int outByteStep, int sampleCount, int formatType, float ditherBits)
+void FloatSampleTools::float2byteGeneric(std::vector<float>& input, int inOffset, std::vector<char>& output, int outByteOffset, int outByteStep, int sampleCount, int formatType, float ditherBits)
 {
 	if (inOffset < 0 || inOffset + sampleCount > input.size() || sampleCount < 0) {
-		string description = "invalid input index: input.length=" + to_string(input.size()) + " inOffset" + to_string(inOffset) + " sampleCount=" + to_string(sampleCount);
+		std::string description = "invalid input index: input.length=" + std::to_string(input.size()) + " inOffset" + std::to_string(inOffset) + " sampleCount=" + std::to_string(sampleCount);
 		// TO-DO Throw description
 		printf("ERROR: %s\n", description.c_str());
 	}
 	if (outByteOffset < 0 || outByteOffset + (sampleCount * outByteStep) >= (output.size() + outByteStep) || outByteStep < getSampleSize(formatType)) {
-		string description = "invalid output index: output.length= " + to_string(output.size()) + " outByteOffset=" + to_string(outByteOffset) + " outByteStep=" + to_string(outByteStep) + " sampleCount=" + to_string(sampleCount) + " format=" + formatType2Str(formatType);
+		std::string description = "invalid output index: output.length= " + std::to_string(output.size()) + " outByteOffset=" + std::to_string(outByteOffset) + " outByteStep=" + std::to_string(outByteStep) + " sampleCount=" + std::to_string(sampleCount) + " format=" + formatType2Str(formatType);
 		printf("ERROR: %s\n", description.c_str());
 	}
 
@@ -331,7 +325,7 @@ void FloatSampleTools::float2byteGeneric(vector<float>& input, int inOffset, vec
 			output[outIndex] = iSample & 255;
 			break;
 		default:
-			string description = "unsupported format=" + formatType2Str(formatType);
+			std::string description = "unsupported format=" + formatType2Str(formatType);
 			printf("ERROR: %s", description.c_str());
 		}
 	}
