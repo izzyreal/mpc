@@ -251,6 +251,17 @@ void AutoSave::storeAutoSavedState(mpc::Mpc &mpc, const std::string& overridePat
         auto layeredScreen = mpc.getLayeredScreen();
         auto screen = layeredScreen->getCurrentScreenName();
         auto previousScreen = layeredScreen->getPreviousScreenName();
+
+        if (screen == "vmpc-continue-previous-session")
+        {
+            screen = "sequencer";
+        }
+
+        if (previousScreen == "vmpc-continue-previous-session")
+        {
+            previousScreen = "sequencer";
+        }
+
         auto previousSamplerScreen = mpc.getPreviousSamplerScreenName();
         auto focus = mpc.getLayeredScreen()->getFocus();
         auto soundIndex = mpc.getSampler()->getSoundIndex();
