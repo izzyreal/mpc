@@ -45,7 +45,7 @@ public:
     int getByteArrayBufferSize(AudioFormat* format);
     int getByteArrayBufferSize(AudioFormat* format, int lenInSamples);
 
-    int convertToByteArray_(int readOffset, int lenInSamples, std::vector<char>* buffer, int writeOffset, AudioFormat* format);
+    int convertToByteArray_(int readOffset, int lenInSamples, std::vector<char>& buffer, int writeOffset, AudioFormat* format);
 
     void changeSampleCount(int newSampleCount, bool keepOldSamples);
     void makeSilence();

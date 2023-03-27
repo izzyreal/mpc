@@ -124,57 +124,57 @@ const float FloatSampleTools::invTwoPower15 = 1.f / twoPower15;
 const float FloatSampleTools::invTwoPower23 = 1.f / twoPower23;
 const float FloatSampleTools::invTwoPower31 = 1.f / twoPower31;
 
-void FloatSampleTools::byte2float(const vector<char>& input, int inByteOffset, vector<vector<float>>* output, int outOffset, int frameCount, AudioFormat* format)
+void FloatSampleTools::byte2float(const vector<char>& input, int inByteOffset, vector<vector<float>>& output, int outOffset, int frameCount, AudioFormat* format)
 {
 	for (auto channel = 0; channel < format->getChannels(); channel++) {
-		if (output->size() < channel) {
-			output->push_back(vector<float>(frameCount));
+		if (output.size() < channel) {
+			output.emplace_back(frameCount);
 		}
 		else {
 			for (int i = 0; i < frameCount; i++) {
-				(*output)[channel][i] = 0;
+				output[channel][i] = 0;
 			}
 		}
-		byte2floatGeneric(input, inByteOffset, format->getFrameSize(), &(*output)[channel], outOffset, frameCount, format);
+		byte2floatGeneric(input, inByteOffset, format->getFrameSize(), output[channel], outOffset, frameCount, format);
 		inByteOffset += format->getFrameSize() / format->getChannels();
 	}
 }
 
-void FloatSampleTools::byte2floatGeneric(const vector<char>& input, int inByteOffset, int inByteStep, vector<float>* output, int outOffset, int sampleCount, AudioFormat* format)
+void FloatSampleTools::byte2floatGeneric(const vector<char>& input, int inByteOffset, int inByteStep, vector<float>& output, int outOffset, int sampleCount, AudioFormat* format)
 {
 	auto formatType = getFormatType(format);
 	byte2floatGeneric(input, inByteOffset, inByteStep, output, outOffset, sampleCount, formatType);
 }
 
-void FloatSampleTools::byte2floatGeneric(const vector<char>& input, int inByteOffset, int inByteStep, vector<float>* output, int outOffset, int sampleCount, int formatType)
+void FloatSampleTools::byte2floatGeneric(const vector<char>& input, int inByteOffset, int inByteStep, vector<float>& output, int outOffset, int sampleCount, int formatType)
 {
 	auto endCount = outOffset + sampleCount;
 	auto inIndex = inByteOffset;
 	for (auto outIndex = outOffset; outIndex < endCount; outIndex++, inIndex += inByteStep) {
 		switch (formatType) {
 		case CT_8S:
-			(*output)[outIndex] = input[inIndex] * invTwoPower7;
+			output[outIndex] = input[inIndex] * invTwoPower7;
 			break;
 		case CT_8U:
-			(*output)[outIndex] = ((input[inIndex] & 255) - 128) * invTwoPower7;
+			output[outIndex] = ((input[inIndex] & 255) - 128) * invTwoPower7;
 			break;
 		case CT_16SB:
-			(*output)[outIndex] = ((input[inIndex] << 8) | (input[inIndex + 1] & 255)) * invTwoPower15;
+			output[outIndex] = ((input[inIndex] << 8) | (input[inIndex + 1] & 255)) * invTwoPower15;
 			break;
 		case CT_16SL:
-			(*output)[outIndex] = ((input[inIndex + 1] << 8) | (input[inIndex] & 255)) * invTwoPower15;
+			output[outIndex] = ((input[inIndex + 1] << 8) | (input[inIndex] & 255)) * invTwoPower15;
 			break;
 		case CT_24SB:
-			(*output)[outIndex] = ((input[inIndex] << 16) | ((input[inIndex + 1] & 255) << 8) | (input[inIndex + 2] & 255)) * invTwoPower23;
+			output[outIndex] = ((input[inIndex] << 16) | ((input[inIndex + 1] & 255) << 8) | (input[inIndex + 2] & 255)) * invTwoPower23;
 			break;
 		case CT_24SL:
-			(*output)[outIndex] = ((input[inIndex + 2] << 16) | ((input[inIndex + 1] & 255) << 8) | (input[inIndex] & 255)) * invTwoPower23;
+			output[outIndex] = ((input[inIndex + 2] << 16) | ((input[inIndex + 1] & 255) << 8) | (input[inIndex] & 255)) * invTwoPower23;
 			break;
 		case CT_32SB:
-			(*output)[outIndex] = ((input[inIndex] << 24) | ((input[inIndex + 1] & 255) << 16) | ((input[inIndex + 2] & 255) << 8) | (input[inIndex + 3] & 255)) * invTwoPower31;
+			output[outIndex] = ((input[inIndex] << 24) | ((input[inIndex + 1] & 255) << 16) | ((input[inIndex + 2] & 255) << 8) | (input[inIndex + 3] & 255)) * invTwoPower31;
 			break;
 		case CT_32SL:
-			(*output)[outIndex] = ((input[inIndex + 3] << 24) | ((input[inIndex + 2] & 255) << 16) | ((input[inIndex + 1] & 255) << 8) | (input[inIndex] & 255)) * invTwoPower31;
+			output[outIndex] = ((input[inIndex + 3] << 24) | ((input[inIndex + 2] & 255) << 16) | ((input[inIndex + 1] & 255) << 8) | (input[inIndex] & 255)) * invTwoPower31;
 			break;
 		default:
 			string description = "unsupported format=" + formatType2Str(formatType);
@@ -247,7 +247,7 @@ int FloatSampleTools::quantize32(float sample, float ditherBits)
 	}
 }
 
-void FloatSampleTools::float2byte(vector<vector<float>>& input, int inOffset, vector<char>* output, int outByteOffset, int frameCount, AudioFormat* format, float ditherBits)
+void FloatSampleTools::float2byte(vector<vector<float>>& input, int inOffset, vector<char>& output, int outByteOffset, int frameCount, AudioFormat* format, float ditherBits)
 {
 	for (auto channel = 0; channel < format->getChannels(); channel++) {
 		auto data = input[channel];
@@ -257,22 +257,22 @@ void FloatSampleTools::float2byte(vector<vector<float>>& input, int inOffset, ve
 }
 
 
-void FloatSampleTools::float2byteGeneric(vector<float>& input, int inOffset, vector<char>* output, int outByteOffset, int outByteStep, int sampleCount, AudioFormat* format, float ditherBits)
+void FloatSampleTools::float2byteGeneric(vector<float>& input, int inOffset, vector<char>& output, int outByteOffset, int outByteStep, int sampleCount, AudioFormat* format, float ditherBits)
 {
 	int formatType = getFormatType(format);
 	float2byteGeneric(input, inOffset, output, outByteOffset, outByteStep, sampleCount, formatType, ditherBits);
 }
 
 
-void FloatSampleTools::float2byteGeneric(vector<float>& input, int inOffset, vector<char>* output, int outByteOffset, int outByteStep, int sampleCount, int formatType, float ditherBits)
+void FloatSampleTools::float2byteGeneric(vector<float>& input, int inOffset, vector<char>& output, int outByteOffset, int outByteStep, int sampleCount, int formatType, float ditherBits)
 {
 	if (inOffset < 0 || inOffset + sampleCount > input.size() || sampleCount < 0) {
 		string description = "invalid input index: input.length=" + to_string(input.size()) + " inOffset" + to_string(inOffset) + " sampleCount=" + to_string(sampleCount);
 		// TO-DO Throw description
 		printf("ERROR: %s\n", description.c_str());
 	}
-	if (outByteOffset < 0 || outByteOffset + (sampleCount * outByteStep) >= (output->size() + outByteStep) || outByteStep < getSampleSize(formatType)) {
-		string description = "invalid output index: output.length= " + to_string(output->size()) + " outByteOffset=" + to_string(outByteOffset) + " outByteStep=" + to_string(outByteStep) + " sampleCount=" + to_string(sampleCount) + " format=" + formatType2Str(formatType);
+	if (outByteOffset < 0 || outByteOffset + (sampleCount * outByteStep) >= (output.size() + outByteStep) || outByteStep < getSampleSize(formatType)) {
+		string description = "invalid output index: output.length= " + to_string(output.size()) + " outByteOffset=" + to_string(outByteOffset) + " outByteStep=" + to_string(outByteStep) + " sampleCount=" + to_string(sampleCount) + " format=" + formatType2Str(formatType);
 		printf("ERROR: %s\n", description.c_str());
 	}
 
@@ -289,46 +289,46 @@ void FloatSampleTools::float2byteGeneric(vector<float>& input, int inOffset, vec
 
 		switch (formatType) {
 		case CT_8S:
-			(*output)[outIndex] = quantize8(input[inIndex] * twoPower7, ditherBits);
+			output[outIndex] = quantize8(input[inIndex] * twoPower7, ditherBits);
 			break;
 		case CT_8U:
-			(*output)[outIndex] = quantize8((input[inIndex] * twoPower7), ditherBits) + 128;
+			output[outIndex] = quantize8((input[inIndex] * twoPower7), ditherBits) + 128;
 			break;
 		case CT_16SB:
 			iSample = quantize16(input[inIndex] * twoPower15, ditherBits);
-			(*output)[outIndex] = iSample >> 8;
-			(*output)[outIndex + 1] = iSample & 255;
+			output[outIndex] = iSample >> 8;
+			output[outIndex + 1] = iSample & 255;
 			break;
 		case CT_16SL:
 			iSample = quantize16(input[inIndex] * twoPower15, ditherBits);
-			(*output)[outIndex + 1] = (char)(iSample >> 8);
-			(*output)[outIndex] = (char)(iSample & 255);
+			output[outIndex + 1] = (char)(iSample >> 8);
+			output[outIndex] = (char)(iSample & 255);
 			break;
 		case CT_24SB:
 			iSample = quantize24(input[inIndex] * twoPower23, ditherBits);
-			(*output)[outIndex] = iSample >> 16;
-			(*output)[outIndex + 1] = static_cast<int>(static_cast< uint32_t>(iSample) >> 8) & 255;
-			(*output)[outIndex + 2] = iSample & 255;
+			output[outIndex] = iSample >> 16;
+			output[outIndex + 1] = static_cast<int>(static_cast< uint32_t>(iSample) >> 8) & 255;
+			output[outIndex + 2] = iSample & 255;
 			break;
 		case CT_24SL:
 			iSample = quantize24(input[inIndex] * twoPower23, ditherBits);
-			(*output)[outIndex + 2] = iSample >> 16;
-			(*output)[outIndex + 1] = static_cast<int>(static_cast< uint32_t>(iSample) >> 8) & 255;
-			(*output)[outIndex] = iSample & 255;
+			output[outIndex + 2] = iSample >> 16;
+			output[outIndex + 1] = static_cast<int>(static_cast< uint32_t>(iSample) >> 8) & 255;
+			output[outIndex] = iSample & 255;
 			break;
 		case CT_32SB:
 			iSample = quantize32(input[inIndex] * twoPower31, ditherBits);
-			(*output)[outIndex] = iSample >> 24;
-			(*output)[outIndex + 1] = static_cast<int>(static_cast< uint32_t>(iSample) >> 16) & 255;
-			(*output)[outIndex + 2] = static_cast<int>(static_cast< uint32_t>(iSample) >> 8) & 255;
-			(*output)[outIndex + 3] = iSample & 255;
+			output[outIndex] = iSample >> 24;
+			output[outIndex + 1] = static_cast<int>(static_cast< uint32_t>(iSample) >> 16) & 255;
+			output[outIndex + 2] = static_cast<int>(static_cast< uint32_t>(iSample) >> 8) & 255;
+			output[outIndex + 3] = iSample & 255;
 			break;
 		case CT_32SL:
 			iSample = quantize32(input[inIndex] * twoPower31, ditherBits);
-			(*output)[outIndex + 3] = iSample >> 24;
-			(*output)[outIndex + 2] = static_cast<int>(static_cast< uint32_t>(iSample) >> 16) & 255;
-			(*output)[outIndex + 1] = static_cast<int>(static_cast< uint32_t>(iSample) >> 8) & 255;
-			(*output)[outIndex] = iSample & 255;
+			output[outIndex + 3] = iSample >> 24;
+			output[outIndex + 2] = static_cast<int>(static_cast< uint32_t>(iSample) >> 16) & 255;
+			output[outIndex + 1] = static_cast<int>(static_cast< uint32_t>(iSample) >> 8) & 255;
+			output[outIndex] = iSample & 255;
 			break;
 		default:
 			string description = "unsupported format=" + formatType2Str(formatType);

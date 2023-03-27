@@ -47,11 +47,11 @@ namespace mpc::engine::audio::core {
 		static const float invTwoPower31;
 
 	public:
-		static void byte2float(const std::vector<char>& input, int inByteOffset, std::vector<std::vector<float> >* output, int outOffset, int frameCount, AudioFormat* format);
+		static void byte2float(const std::vector<char>& input, int inByteOffset, std::vector<std::vector<float>>& output, int outOffset, int frameCount, AudioFormat* format);
 
     public:
-		static void byte2floatGeneric(const std::vector<char>& input, int inByteOffset, int inByteStep, std::vector<float>* output, int outOffset, int sampleCount, AudioFormat* format);
-		static void byte2floatGeneric(const std::vector<char>& input, int inByteOffset, int inByteStep, std::vector<float>* output, int outOffset, int sampleCount, int formatType);
+		static void byte2floatGeneric(const std::vector<char>& input, int inByteOffset, int inByteStep, std::vector<float>& output, int outOffset, int sampleCount, AudioFormat* format);
+		static void byte2floatGeneric(const std::vector<char>& input, int inByteOffset, int inByteStep, std::vector<float>& output, int outOffset, int sampleCount, int formatType);
 
 	private:
 		static int8_t quantize8(float sample, float ditherBits);
@@ -60,11 +60,11 @@ namespace mpc::engine::audio::core {
 		static int quantize32(float sample, float ditherBits);
 
 	public:
-		static void float2byte(std::vector<std::vector<float>>& input, int inOffset, std::vector<char>* output, int outByteOffset, int frameCount, AudioFormat* format, float ditherBits);
+		static void float2byte(std::vector<std::vector<float>>& input, int inOffset, std::vector<char>& output, int outByteOffset, int frameCount, AudioFormat* format, float ditherBits);
 
     public:
-		static void float2byteGeneric(std::vector<float>& input, int inOffset, std::vector<char>* output, int outByteOffset, int outByteStep, int sampleCount, AudioFormat* format, float ditherBits);
-		static void float2byteGeneric(std::vector<float>& input, int inOffset, std::vector<char>* output, int outByteOffset, int outByteStep, int sampleCount, int formatType, float ditherBits);
+		static void float2byteGeneric(std::vector<float>& input, int inOffset, std::vector<char>& output, int outByteOffset, int outByteStep, int sampleCount, AudioFormat* format, float ditherBits);
+		static void float2byteGeneric(std::vector<float>& input, int inOffset, std::vector<char>& output, int outByteOffset, int outByteStep, int sampleCount, int formatType, float ditherBits);
 
 	private:
 		FloatSampleTools();

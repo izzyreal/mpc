@@ -50,7 +50,7 @@ int DiskRecorder::processAudio(mpc::engine::audio::core::AudioBuffer* buf, int n
 	if (writing.load())
 	{
         std::vector<char> audioBufferAsBytes (buf->getByteArrayBufferSize(format, nFrames));
-		buf->convertToByteArray_(0, nFrames, &audioBufferAsBytes, 0, format);
+		buf->convertToByteArray_(0, nFrames, audioBufferAsBytes, 0, format);
 		
 		if (audioBufferAsBytes.size() + writtenByteCount >= lengthInBytes)
 		{

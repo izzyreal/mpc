@@ -62,7 +62,7 @@ void FloatSampleBuffer::initFromByteArray_(const vector<char>& buffer, int offse
 	auto thisSampleCount = byteCount / format->getFrameSize();
 	init(format->getChannels(), thisSampleCount, format->getSampleRate(), lazy);
 	originalFormatType = FloatSampleTools::getFormatType(format);
-	FloatSampleTools::byte2float(buffer, offset, &channels, 0, sampleCount, format);
+	FloatSampleTools::byte2float(buffer, offset, channels, 0, sampleCount, format);
 }
 
 
@@ -86,10 +86,10 @@ int FloatSampleBuffer::getByteArrayBufferSize(AudioFormat* format, int lenInSamp
     return format->getFrameSize() * lenInSamples;
 }
 
-int FloatSampleBuffer::convertToByteArray_(int readOffset, int lenInSamples, vector<char>* buffer, int writeOffset, AudioFormat* format)
+int FloatSampleBuffer::convertToByteArray_(int readOffset, int lenInSamples, vector<char>& buffer, int writeOffset, AudioFormat* format)
 {
 	int byteCount = getByteArrayBufferSize(format, lenInSamples);
-	if (writeOffset + byteCount > buffer->size()) {
+	if (writeOffset + byteCount > buffer.size()) {
 		string error = "FloatSampleBuffer.convertToByteArray: buffer too small.";
 		printf("ERROR: %s\n", error.c_str());
 		return -1;
