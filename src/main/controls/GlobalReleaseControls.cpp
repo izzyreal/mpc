@@ -109,9 +109,7 @@ void GlobalReleaseControls::simplePad(int padIndexWithBank)
 		track->recordNoteOffNow(note);
 	}
 
-	assert(controls->temp_ons.find(padIndexWithBank) != controls->temp_ons.end());
-	std::shared_ptr<mpc::sequencer::NoteOnEvent> on_event = controls->temp_ons[padIndexWithBank];
-	controls->temp_ons.erase(padIndexWithBank);
+	std::shared_ptr<mpc::sequencer::NoteOnEventPlayOnly> on_event = controls->retrievePlayNoteEvent(padIndexWithBank);
 	handleNoteOff(on_event);
 
 	bool posIsLastTick = sequencer->getTickPosition() == sequencer->getActiveSequence()->getLastTick();
@@ -197,7 +195,7 @@ void GlobalReleaseControls::simplePad(int padIndexWithBank)
 //    mpc.getEventHandler()->handle(noteEvent, track.get(), drum);
 //}
 
-void mpc::controls::GlobalReleaseControls::handleNoteOff(std::shared_ptr<mpc::sequencer::NoteOnEvent> onEvent)
+void mpc::controls::GlobalReleaseControls::handleNoteOff(std::shared_ptr<mpc::sequencer::NoteOnEventPlayOnly> onEvent)
 {
 	init();
 	std::shared_ptr<mpc::sequencer::NoteOffEvent> off_event = onEvent->getNoteOff();

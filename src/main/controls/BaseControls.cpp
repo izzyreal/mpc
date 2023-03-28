@@ -336,17 +336,16 @@ void BaseControls::generateNoteOn(int note, int padVelo, int padIndexWithBank)
     }
     
     auto play_event = std::make_shared<NoteOnEventPlayOnly>(note);
-    noteOnEvent = play_event;// std::dynamic_pointer_cast<NoteOnEvent>(std::make_shared<NoteOnEventPlayOnly>(note));
-    noteOnEvent->setVelocity(padVelo);
-    noteOnEvent->setTick(-1);
+    play_event->setVelocity(padVelo);
+    play_event->setTick(-1);
     
     if (program)
     {
-        Util::set16LevelsValues(mpc, noteOnEvent, padIndex);
+        Util::set16LevelsValues(mpc, play_event, padIndex);
 
         if (isSliderNote)
         {
-            Util::setSliderNoteVariationParameters(mpc, noteOnEvent, program);
+            Util::setSliderNoteVariationParameters(mpc, play_event, program);
         }
     }
 
@@ -354,10 +353,9 @@ void BaseControls::generateNoteOn(int note, int padVelo, int padIndexWithBank)
     char drum = collectionContainsCurrentScreen(samplerScreens) ? drumScreen->drum : -1;
 
     
-    mpc.getEventHandler()->handle(noteOnEvent, track.get(), drum);
+    mpc.getEventHandler()->handle(play_event, track.get(), drum);
     
-    assert(mpc.getControls()->temp_ons.find(padIndexWithBank) == mpc.getControls()->temp_ons.end());
-    mpc.getControls()->temp_ons[padIndexWithBank] = noteOnEvent;
+    assert(mpc.getControls()->storePlayNoteEvent(padIndexWithBank, play_event));
     
 }
 

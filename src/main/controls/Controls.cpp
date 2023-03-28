@@ -170,6 +170,21 @@ std::weak_ptr<KbMapping> Controls::getKbMapping()
     return kbMapping;
 }
 
+bool mpc::controls::Controls::storePlayNoteEvent(int padIndexWithBank, std::shared_ptr<mpc::sequencer::NoteOnEventPlayOnly> event)
+{
+	if (playNoteStore.find(padIndexWithBank) != playNoteStore.end()) return false;
+	playNoteStore[padIndexWithBank] = event;
+	return true;
+}
+
+std::shared_ptr<mpc::sequencer::NoteOnEventPlayOnly> mpc::controls::Controls::retrievePlayNoteEvent(int padIndexWithBank)
+{
+	if (playNoteStore.find(padIndexWithBank) == playNoteStore.end()) return nullptr;
+	auto event = playNoteStore[padIndexWithBank];
+	playNoteStore.erase(padIndexWithBank);
+	return event;
+}
+
 void Controls::setPlayPressed(bool b)
 {
     playPressed = b;

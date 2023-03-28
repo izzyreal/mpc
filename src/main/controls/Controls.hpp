@@ -63,7 +63,8 @@ namespace mpc::controls
     bool isAltPressed();
     std::weak_ptr<KbMapping> getKbMapping();
 
-    std::unordered_map<int, std::shared_ptr<mpc::sequencer::NoteOnEvent>> temp_ons = {};
+    bool storePlayNoteEvent(int padIndexWithBank, std::shared_ptr<mpc::sequencer::NoteOnEventPlayOnly> event);
+    std::shared_ptr<mpc::sequencer::NoteOnEventPlayOnly> retrievePlayNoteEvent(int padIndexWithBank);
 
   private:
     std::shared_ptr<KbMapping> kbMapping;
@@ -84,6 +85,7 @@ namespace mpc::controls
     std::shared_ptr<KeyEventHandler> keyEventHandler;
     std::shared_ptr<BaseControls> controls;
     std::shared_ptr<GlobalReleaseControls> releaseControls;
+    std::unordered_map<int, std::shared_ptr<mpc::sequencer::NoteOnEventPlayOnly>> playNoteStore = {};
 
   };
 }
