@@ -97,6 +97,10 @@ void GlobalReleaseControls::simplePad(int padIndexWithBank)
 
 	auto controls = mpc.getControls();
 
+	auto on_event = controls->retrievePlayNoteEvent(padIndexWithBank);
+	if (!on_event) return;
+	handlePlayNoteOff(on_event);
+
 	if (sequencer->isRecordingOrOverdubbing() && mpc.getControls()->isErasePressed())
 	{
 		return;
@@ -108,9 +112,6 @@ void GlobalReleaseControls::simplePad(int padIndexWithBank)
 	{
 		track->recordNoteOffNow(note);
 	}
-
-	std::shared_ptr<mpc::sequencer::NoteOnEventPlayOnly> on_event = controls->retrievePlayNoteEvent(padIndexWithBank);
-	handleNoteOff(on_event);
 
 	bool posIsLastTick = sequencer->getTickPosition() == sequencer->getActiveSequence()->getLastTick();
 
@@ -142,10 +143,10 @@ void GlobalReleaseControls::simplePad(int padIndexWithBank)
         }
 
 		sequencer->stopMetronomeTrack();
-
+		//!!!!!!!!
 		bool durationHasBeenAdjusted = track->finalizeNoteOnEvent(on_event, newDuration);
 
-		if ( (durationHasBeenAdjusted && maybeRecWithoutPlaying) || (stepRec && increment))
+		if ((durationHasBeenAdjusted && maybeRecWithoutPlaying) || (stepRec && increment))
 		{
 			int nextPos = sequencer->getTickPosition() + stepLength;
 			auto bar = sequencer->getCurrentBarIndex() + 1;
@@ -195,7 +196,7 @@ void GlobalReleaseControls::simplePad(int padIndexWithBank)
 //    mpc.getEventHandler()->handle(noteEvent, track.get(), drum);
 //}
 
-void mpc::controls::GlobalReleaseControls::handleNoteOff(std::shared_ptr<mpc::sequencer::NoteOnEventPlayOnly> onEvent)
+void mpc::controls::GlobalReleaseControls::handlePlayNoteOff(std::shared_ptr<mpc::sequencer::NoteOnEventPlayOnly> onEvent)
 {
 	init();
 	std::shared_ptr<mpc::sequencer::NoteOffEvent> off_event = onEvent->getNoteOff();

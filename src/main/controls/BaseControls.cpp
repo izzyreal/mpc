@@ -216,7 +216,6 @@ void BaseControls::pad(int padIndexWithBank, int velocity)
         return;
     
     auto note = track->getBus() > 0 ? program->getPad(padIndexWithBank)->getNote() : padIndexWithBank + 35;
-    //auto velocity = velo;
 
     if (!mpc.getHardware()->getTopPanel()->isSixteenLevelsEnabled())
     {

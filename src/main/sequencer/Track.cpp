@@ -183,8 +183,10 @@ std::shared_ptr<NoteOnEvent> Track::addNoteEvent(int tick, int note)
 	//	return candidate;
 	//}
 
-	auto res = std::dynamic_pointer_cast<NoteOnEvent>(addEvent(tick, "note"));
-	res->setNote(note);
+	//auto res = std::dynamic_pointer_cast<NoteOnEvent>(addEvent(tick, "note"));
+	auto res = std::make_shared<NoteOnEvent>(note);
+	res->setTick(tick);
+	insertEventWhileRetainingSort(res);
 
 	notifyObservers(std::string("step-editor"));
 
@@ -243,7 +245,6 @@ std::shared_ptr<Event> Track::addEvent(int tick, const std::string& type, bool a
     insertEventWhileRetainingSort(res, allowMultipleNotesOnSameTick);
 
 	notifyObservers(std::string("step-editor"));
-	notifyObservers(std::string(type) + "added");
 
 	return res;
 }
