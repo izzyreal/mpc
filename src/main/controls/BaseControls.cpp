@@ -262,7 +262,6 @@ void BaseControls::pad(int padIndexWithBank, int velocity)
             channelSettingsScreen->setNote(note);
         }
     }
-    
     generateNoteOn(note, velocity, padIndexWithBank);
 }
 
@@ -272,27 +271,10 @@ void BaseControls::generateNoteOn(int note, int padVelo, int padIndexWithBank)
     //----------
     auto play_event = std::make_shared<NoteOnEventPlayOnly>(note);
     if (!mpc.getControls()->storePlayNoteEvent(padIndexWithBank, play_event)) return ;
-    //-----------
-    auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
-
-    bool isSliderNote = program && program->getSlider()->getNote() == note;
-    
-    bool posIsLastTick = sequencer->getTickPosition() == sequencer->getActiveSequence()->getLastTick();
-    
-    bool step = currentScreenName == "step-editor" && !posIsLastTick;
-    
-    auto tc_note = timingCorrectScreen->getNoteValue();
-    auto tc_swing = timingCorrectScreen->getSwing();
-    
-    bool recMainWithoutPlaying = currentScreenName == "sequencer" &&
-        !sequencer->isPlaying() &&
-        mpc.getControls()->isRecPressed() &&
-        tc_note != 0 &&
-        !posIsLastTick;
-
-    auto padIndex = program != nullptr ? program->getPadIndexFromNote(note) : - 1;
-    //--------------
     play_event->setVelocity(padVelo);
+    
+    auto padIndex = program != nullptr ? program->getPadIndexFromNote(note) : -1;
+    bool isSliderNote = program && program->getSlider()->getNote() == note;
 
     if (program)
     {
@@ -308,6 +290,20 @@ void BaseControls::generateNoteOn(int note, int padVelo, int padIndexWithBank)
     char drum = collectionContainsCurrentScreen(samplerScreens) ? drumScreen->drum : -1;
 
     mpc.getEventHandler()->handle(play_event, track.get(), drum);
+
+    //-----------
+    auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
+    bool posIsLastTick = sequencer->getTickPosition() == sequencer->getActiveSequence()->getLastTick();
+    
+    auto tc_note = timingCorrectScreen->getNoteValue();
+    auto tc_swing = timingCorrectScreen->getSwing();
+    
+    bool step = currentScreenName == "step-editor" && !posIsLastTick;
+    bool recMainWithoutPlaying = currentScreenName == "sequencer" &&
+        !sequencer->isPlaying() &&
+        mpc.getControls()->isRecPressed() &&
+        tc_note != 0 &&
+        !posIsLastTick;
     //---------------------
     if (sequencer->isRecordingOrOverdubbing() || step || recMainWithoutPlaying)
     {
