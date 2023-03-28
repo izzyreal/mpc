@@ -335,14 +335,10 @@ void BaseControls::generateNoteOn(int note, int padVelo, int padIndexWithBank)
         }
     }
     
-    else
-    {
-        auto play_event = std::make_shared<NoteOnEventPlayOnly>(note);
-        noteOnEvent = play_event;// std::dynamic_pointer_cast<NoteOnEvent>(std::make_shared<NoteOnEventPlayOnly>(note));
-        noteOnEvent->setVelocity(padVelo);
-        //playableEvent->setDuration(NoteOnEvent::DURATION_UNKNOWN);
-        noteOnEvent->setTick(-1);
-    }
+    auto play_event = std::make_shared<NoteOnEventPlayOnly>(note);
+    noteOnEvent = play_event;// std::dynamic_pointer_cast<NoteOnEvent>(std::make_shared<NoteOnEventPlayOnly>(note));
+    noteOnEvent->setVelocity(padVelo);
+    noteOnEvent->setTick(-1);
     
     if (program)
     {

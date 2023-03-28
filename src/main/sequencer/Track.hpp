@@ -8,7 +8,7 @@
 
 #include "thirdp/concurrentqueue.h"
 #include <memory>
-#include <set>
+#include <map>
 
 namespace mpc { class Mpc; }
 
@@ -43,7 +43,7 @@ private:
     int trackIndex = 0;
     bool used{ false };
     int eventIndex = 0;
-    std::set<std::shared_ptr<NoteOnEvent>> unFinalized;
+    std::map<int,std::shared_ptr<NoteOnEvent>> unFinalized;
     bool multi{ false };
     bool _delete{ false };
 
@@ -65,7 +65,7 @@ public:
     // As a bare minimum the note must be passed in, in order to
     // match against counterpart (off with on and vice versa).
     std::shared_ptr<mpc::sequencer::NoteOnEvent> recordNoteOnNow(unsigned char note);
-    void recordNoteOffNow(std::shared_ptr<NoteOffEvent> off_event);
+    void recordNoteOffNow(unsigned char note);
 
 private:
     std::shared_ptr<NoteOnEvent> getNoteEvent(int tick, int note);

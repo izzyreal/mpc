@@ -106,6 +106,8 @@ int Track::getIndex()
 std::shared_ptr<NoteOnEvent> Track::recordNoteOnNow(unsigned char note)
 {
 	auto n = std::make_shared<NoteOnEvent>(note);
+	assert(unFinalized.find(note) == unFinalized.end());
+	unFinalized[note] = n;
     n->setTick(-2);
 	queuedNoteOnEvents.enqueue(n);
 	return n;
@@ -119,8 +121,12 @@ void Track::flushNoteCache()
     while (queuedNoteOffEvents.try_dequeue(e2)) {}
 }
 
-void Track::recordNoteOffNow(std::shared_ptr<NoteOffEvent> off_event)
+void Track::recordNoteOffNow(unsigned char note)
 {
+	auto on_event = unFinalized.find(note);
+	assert(unFinalized.find(note) != unFinalized.end());
+	auto off_event = unFinalized[note]->getNoteOff();
+	unFinalized.erase(note);
 	off_event->setTick(-2);
     queuedNoteOffEvents.enqueue(off_event);
 }
@@ -192,7 +198,7 @@ std::shared_ptr<Event> Track::addEvent(int tick, const std::string& type, bool a
 	if (type == "note")
 	{
 		res = std::make_shared<NoteOnEvent>();
-		unFinalized.insert(std::dynamic_pointer_cast<NoteOnEvent>(res));
+		//unFinalized.insert(std::dynamic_pointer_cast<NoteOnEvent>(res));
 	}
 	else if (type == "tempo-change")
 	{
@@ -546,7 +552,7 @@ void Track::playNext()
 		if (punchScreen->autoPunch == 2 && pos >= punchScreen->time0 && pos < punchScreen->time1)
 			_delete = true;
 	}
-
+	//!!!!!!!!!!!!!!!!!!!
     auto event = eventIndex >= events.size() ? std::shared_ptr<Event>() : events[eventIndex];
 	auto note = std::dynamic_pointer_cast<NoteOnEvent>(event);
 

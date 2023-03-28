@@ -63,7 +63,7 @@ namespace mpc::sequencer
     class NoteOnEventPlayOnly : public NoteOnEvent
     {
     public:
-        NoteOnEventPlayOnly(int i = 60) : NoteOnEvent(i) {}
+        NoteOnEventPlayOnly(int i = 60) : NoteOnEvent(i) {};
     };
 
 

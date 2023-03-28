@@ -26,7 +26,7 @@ namespace mpc {
 
 		private:
 			//void generateNoteOff(int note);
-			void handleNoteOff(std::shared_ptr<mpc::sequencer::NoteOffEvent> off_event);
+			void handleNoteOff(std::shared_ptr<mpc::sequencer::NoteOnEvent> onEvent);
 
 		public:
 			void overDub() override;

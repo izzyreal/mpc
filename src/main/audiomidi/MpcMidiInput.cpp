@@ -186,7 +186,7 @@ void MpcMidiInput::transport(MidiMessage *msg, int timeStamp)
             {
                 noteOff->setTick(sequencer->getTickPosition());
                 
-                track->recordNoteOffNow(noteOff);
+                track->recordNoteOffNow(noteOff->getNote());
             }
         }
         else

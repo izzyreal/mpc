@@ -99,19 +99,21 @@ void GlobalReleaseControls::simplePad(int padIndexWithBank)
 
 	if (sequencer->isRecordingOrOverdubbing() && mpc.getControls()->isErasePressed())
 	{
-	return;
+		return;
 	}
 
 	auto note = track->getBus() > 0 ? program->getPad(padIndexWithBank)->getNote() : padIndexWithBank + 35;
 
-	assert(controls->temp_ons.find(padIndexWithBank) != controls->temp_ons.end());
-	
-	std::shared_ptr<mpc::sequencer::NoteOnEvent> on_event = controls->temp_ons[padIndexWithBank];
-	std::shared_ptr<mpc::sequencer::NoteOffEvent> off_event = on_event->getNoteOff();
-	controls->temp_ons.erase(padIndexWithBank);
-	handleNoteOff(off_event);
+	if (sequencer->isRecordingOrOverdubbing())
+	{
+		track->recordNoteOffNow(note);
+	}
 
-	
+	assert(controls->temp_ons.find(padIndexWithBank) != controls->temp_ons.end());
+	std::shared_ptr<mpc::sequencer::NoteOnEvent> on_event = controls->temp_ons[padIndexWithBank];
+	controls->temp_ons.erase(padIndexWithBank);
+	handleNoteOff(on_event);
+
 	bool posIsLastTick = sequencer->getTickPosition() == sequencer->getActiveSequence()->getLastTick();
 
 	bool maybeRecWithoutPlaying = currentScreenName == "sequencer" && !posIsLastTick;
@@ -142,7 +144,7 @@ void GlobalReleaseControls::simplePad(int padIndexWithBank)
         }
 
 		sequencer->stopMetronomeTrack();
-		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 		bool durationHasBeenAdjusted = track->finalizeNoteOnEvent(on_event, newDuration);
 
 		if ( (durationHasBeenAdjusted && maybeRecWithoutPlaying) || (stepRec && increment))
@@ -195,10 +197,12 @@ void GlobalReleaseControls::simplePad(int padIndexWithBank)
 //    mpc.getEventHandler()->handle(noteEvent, track.get(), drum);
 //}
 
-void mpc::controls::GlobalReleaseControls::handleNoteOff(std::shared_ptr<mpc::sequencer::NoteOffEvent> off_event)
+void mpc::controls::GlobalReleaseControls::handleNoteOff(std::shared_ptr<mpc::sequencer::NoteOnEvent> onEvent)
 {
 	init();
-
+	std::shared_ptr<mpc::sequencer::NoteOffEvent> off_event = onEvent->getNoteOff();
+	//	if (mpc.getHardware()->getTopPanel()->isSixteenLevelsEnabled())
+//		note = assign16LevelsScreen->getNote();
 	off_event->setTick(-1);
 
 	char drum = -1;

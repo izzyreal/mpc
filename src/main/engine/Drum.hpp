@@ -27,6 +27,9 @@ namespace mpc::engine {
 	class Voice;
 	class MixerInterconnection;
 }
+namespace mpc::sequencer {
+	class NoteOnEvent;
+}
 
 namespace mpc::engine
 {
@@ -65,6 +68,7 @@ namespace mpc::engine
 		void setLastReceivedMidiVolume(int volume);
 		int getLastReceivedMidiVolume();
 		void mpcNoteOn(int note, int velo, int varType, int varValue, int frameOffset, bool firstGeneration, int startTick, int durationFrames);
+		//void mpcNoteOn(std::shared_ptr<mpc::sequencer::NoteOnEvent>& event, int frameOffset, bool firstGeneration, int durationFrames);
 
 	public:
 		void allSoundOff(int frameOffset);
