@@ -1369,16 +1369,14 @@ void StepEditorScreen::adhocPlayNoteEvent(const std::shared_ptr<mpc::sequencer::
         // TODO MIDI OUT
     }
 
-    const auto noteOnStartTick = noteEvent->getTick();
-
-    auto eventAfterNFrames = [bus, note, noteOnStartTick, this](unsigned int frameIndex) {
+    auto eventAfterNFrames = [bus, note, uniqueEnoughID, this](unsigned int frameIndex) {
         if (bus == 0)
         {
             // TODO MIDI OUT
         }
         else
         {
-            mpc.getDrum(bus - 1).mpcNoteOff(note, frameIndex, noteOnStartTick);
+            mpc.getDrum(bus - 1).mpcNoteOff(note, frameIndex, uniqueEnoughID);
             // TODO MIDI OUT
         }
     };
