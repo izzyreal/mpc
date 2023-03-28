@@ -228,7 +228,8 @@ void AutoSave::storeAutoSavedState(mpc::Mpc &mpc, const std::string& overridePat
 {
     auto vmpcAutoSaveScreen = mpc.screens->get<VmpcAutoSaveScreen>("vmpc-auto-save");
 
-    if (vmpcAutoSaveScreen->getAutoSaveOnExit() == 0)
+    if (vmpcAutoSaveScreen->getAutoSaveOnExit() == 0 ||
+        mpc.getLayeredScreen()->getCurrentScreenName() == "vmpc-continue-previous-session")
     {
         return;
     }
@@ -252,12 +253,12 @@ void AutoSave::storeAutoSavedState(mpc::Mpc &mpc, const std::string& overridePat
         auto screen = layeredScreen->getCurrentScreenName();
         auto previousScreen = layeredScreen->getPreviousScreenName();
 
-        if (screen == "vmpc-continue-previous-session")
+        if (screen == "vmpc-continue-previous-session" || screen == "vmpc-known-controller-detected")
         {
             screen = "sequencer";
         }
 
-        if (previousScreen == "vmpc-continue-previous-session")
+        if (previousScreen == "vmpc-continue-previous-session" || previousScreen == "vmpc-known-controller-detected")
         {
             previousScreen = "sequencer";
         }
