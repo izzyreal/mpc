@@ -18,7 +18,7 @@ namespace mpc::lcdgui::screens
 
 	private:
 		void downOrUp(int increment);
-        void adhocPlayNoteEvent(const std::shared_ptr<mpc::sequencer::OldNoteEvent>& noteEvent);
+        void adhocPlayNoteEvent(const std::shared_ptr<mpc::sequencer::NoteOnEvent>& noteEvent);
         void adhocPlayNoteEventsAtCurrentPosition();
 
 	public:

@@ -239,7 +239,7 @@ void StepEditorScreen::function(int i)
 			if (pitchEvent || mixerEvent || sysexEvent || maybeEmptyEvent)
 				return;
 
-			auto noteEvent = std::dynamic_pointer_cast<OldNoteEvent>(event);
+			auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(event);
 			auto pgmChangeEvent = std::dynamic_pointer_cast<ProgramChangeEvent>(event);
 			auto chPressEvent = std::dynamic_pointer_cast<ChannelPressureEvent>(event);
 			auto polyPressEvent = std::dynamic_pointer_cast<PolyPressureEvent>(event);
@@ -271,7 +271,7 @@ void StepEditorScreen::function(int i)
 				else if (isC)
 				{
 					editMultipleScreen->setVariationType(noteEvent->getVariationType());
-					editMultipleScreen->seVariationValue(noteEvent->getVariationValue());
+					editMultipleScreen->setVariationValue(noteEvent->getVariationValue());
 				}
 				else if (isD)
 				{
@@ -328,7 +328,7 @@ void StepEditorScreen::function(int i)
 			{
 				auto eventNumber = stoi(param.substr(1, 2));
 				auto event = visibleEvents[eventNumber];
-				auto noteEvent = std::dynamic_pointer_cast<OldNoteEvent>(event);
+				auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(event);
 
 				if (noteEvent)
                 {
@@ -394,7 +394,7 @@ void StepEditorScreen::turnWheel(int i)
 		auto programChange = std::dynamic_pointer_cast<ProgramChangeEvent>(visibleEvents[eventNumber]);
 		auto pitchBend = std::dynamic_pointer_cast<PitchBendEvent>(visibleEvents[eventNumber]);
 		auto mixer = std::dynamic_pointer_cast<MixerEvent>(visibleEvents[eventNumber]);
-		auto note = std::dynamic_pointer_cast<OldNoteEvent>(visibleEvents[eventNumber]);
+		auto note = std::dynamic_pointer_cast<NoteOnEvent>(visibleEvents[eventNumber]);
 
 		if (sysEx)
 		{
@@ -483,7 +483,7 @@ void StepEditorScreen::turnWheel(int i)
 			}
 			else if (param.find("b") != std::string::npos)
 			{
-				note->setVariationTypeNumber(note->getVariationType() + i);
+				note->incrementVariationType(i);
 			}
 			else if (param.find("c") != std::string::npos)
 			{
@@ -793,9 +793,9 @@ void StepEditorScreen::initVisibleEvents()
 		{
 			if ((view == 0
 				|| view == 1)
-				&& std::dynamic_pointer_cast<OldNoteEvent>(event))
+				&& std::dynamic_pointer_cast<NoteOnEvent>(event))
 			{
-				auto ne = std::dynamic_pointer_cast<OldNoteEvent>(event);
+				auto ne = std::dynamic_pointer_cast<NoteOnEvent>(event);
 
 				if (track->getBus() != 0)
 				{
@@ -1238,7 +1238,7 @@ void StepEditorScreen::update(moduru::observer::Observable*, nonstd::any message
 
 		auto eventRow = findEventRows()[eventNumber].lock();
 
-		if (std::dynamic_pointer_cast<OldNoteEvent>(visibleEvents[eventNumber]))
+		if (std::dynamic_pointer_cast<NoteOnEvent>(visibleEvents[eventNumber]))
 		{
 			if (track->getBus() != 0)
 				eventRow->setDrumNoteEventValues();
@@ -1346,7 +1346,7 @@ std::vector<std::weak_ptr<EventRow>> StepEditorScreen::findEventRows()
 	return result;
 }
 
-void StepEditorScreen::adhocPlayNoteEvent(const std::shared_ptr<mpc::sequencer::OldNoteEvent> &noteEvent)
+void StepEditorScreen::adhocPlayNoteEvent(const std::shared_ptr<mpc::sequencer::NoteOnEvent> &noteEvent)
 {
     int uniqueEnoughID = playSingleEventCounter++;
 
@@ -1398,7 +1398,7 @@ void StepEditorScreen::adhocPlayNoteEventsAtCurrentPosition()
     auto tick = sequencer->getTickPosition();
     for (auto& e : track->getEventRange(tick, tick))
     {
-        auto noteEvent = std::dynamic_pointer_cast<OldNoteEvent>(e);
+        auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(e);
         if (noteEvent)
         {
             adhocPlayNoteEvent(noteEvent);

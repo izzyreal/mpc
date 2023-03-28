@@ -71,6 +71,12 @@ mpc::sequencer::NoteOnEvent::VARIATION_TYPE mpc::sequencer::NoteOnEvent::getVari
     return variationType;
 }
 
+void mpc::sequencer::NoteOnEvent::incrementVariationType(int amount)
+{
+    variationType = VARIATION_TYPE(std::clamp(int(variationType) + amount, 0, 3));
+    notifyObservers(std::string("step-editor"));
+}
+
 void mpc::sequencer::NoteOnEvent::setVariationType(VARIATION_TYPE type)
 {
     variationType = type;

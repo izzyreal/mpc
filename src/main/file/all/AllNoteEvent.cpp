@@ -125,16 +125,14 @@ NoteOnEvent::VARIATION_TYPE AllNoteOnEvent::readVariationType(const std::vector<
     if (b1 && b2)
         return NoteOnEvent::VARIATION_TYPE::FILTER_3;
 
-    if (b1 && !b2)
+    else if (b1 && !b2)
         return NoteOnEvent::VARIATION_TYPE::ATTACK_2;
 
-    if (!b1 && b2)
+    else if (!b1 && b2)
         return NoteOnEvent::VARIATION_TYPE::DECAY_1;
 
-    if (!b1 && !b2)
+    else
         return NoteOnEvent::VARIATION_TYPE::TUNE_0;
-
-    return NoteOnEvent::VARIATION_TYPE::NONE;
 }
 
 void AllNoteOnEvent::writeVelocity(std::vector<char>& event, int v)

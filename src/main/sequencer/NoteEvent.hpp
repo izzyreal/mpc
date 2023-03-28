@@ -24,7 +24,7 @@ namespace mpc::sequencer
     class NoteOnEvent : public Event
     {
     public:
-        enum VARIATION_TYPE { NONE = -1, TUNE_0 = 0, DECAY_1 = 1, ATTACK_2 = 2, FILTER_3 = 3};
+        enum VARIATION_TYPE {TUNE_0 = 0, DECAY_1 = 1, ATTACK_2 = 2, FILTER_3 = 3};
         static const int DURATION_UNKNOWN = -1;
     private:
         int number = 60;
@@ -44,6 +44,7 @@ namespace mpc::sequencer
         void setDuration(int i);
         int getDuration();
         VARIATION_TYPE getVariationType();
+        void incrementVariationType(int amount);
         void setVariationType(VARIATION_TYPE type);
         void setVariationValue(int i);
         int getVariationValue();
