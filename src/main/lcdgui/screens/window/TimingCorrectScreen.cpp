@@ -78,7 +78,7 @@ void TimingCorrectScreen::function(int i)
             }
         }
 
-        track->correctTimeRange(time0, time1, sequencer->getTickValues()[noteValue], swing, noteRange[0], noteRange[1]);
+        track->correctTimeRange(time0, time1, getNoteValueLengthInTicks(), swing, noteRange[0], noteRange[1]);
 
         openScreen("sequencer");
 		break;
@@ -246,6 +246,11 @@ void TimingCorrectScreen::setSwing(int i)
 
 	swing = i;
 	displaySwing();
+}
+
+unsigned char TimingCorrectScreen::getNoteValueLengthInTicks()
+{
+    return noteValueLengthsInTicks[noteValue];
 }
 
 int TimingCorrectScreen::getNoteValue()

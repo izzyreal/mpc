@@ -212,8 +212,8 @@ void BaseControls::pad(int padIndexWithBank, int velo)
     
     if (controls->isNoteRepeatLocked())
         return;
-    
-    auto note = track->getBus() > 0 ? program->getPad(padIndexWithBank)->getNote() : padIndexWithBank + 35;
+
+    auto note = program ? program->getPad(padIndexWithBank)->getNote() : padIndexWithBank + 35;
     auto velocity = velo;
 
     if (!mpc.getHardware()->getTopPanel()->isSixteenLevelsEnabled())
@@ -301,7 +301,7 @@ void BaseControls::generateNoteOn(int note, int padVelo)
         else if (recMainWithoutPlaying)
         {
             recordedEvent = track->addNoteEvent(sequencer->getTickPosition(), note);
-            int stepLength = sequencer->getTickValues()[tc_note];
+            auto stepLength = timingCorrectScreen->getNoteValueLengthInTicks();
             
             if (stepLength != 1)
             {
@@ -1011,6 +1011,9 @@ const std::vector<std::string> BaseControls::samplerScreens {
     "program-assign",
     "program-params",
     "select-drum",
+    "select-mixer-drum",
     "trim",
-    "zone"
+    "zone",
+    "channel-settings",
+    "mixer-setup"
 };

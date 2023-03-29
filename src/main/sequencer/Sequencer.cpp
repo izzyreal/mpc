@@ -132,10 +132,6 @@ void Sequencer::playToTick(int targetTick)
 	}
 }
 
-std::vector<int> Sequencer::getTickValues() {
-	return TICK_VALUES;
-}
-
 void Sequencer::setTempo(double newTempo)
 {
 	if (newTempo < 30.0)
@@ -1189,11 +1185,10 @@ void Sequencer::notifyTimeDisplayRealtime()
 void Sequencer::goToPreviousStep()
 {
 	auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
-	auto noteValue = timingCorrectScreen->getNoteValue();
 
-	auto stepSize = TICK_VALUES[noteValue];
-	auto pos = getTickPosition();
-	auto stepCount = static_cast<int>(ceil(getActiveSequence()->getLastTick() / stepSize)) + 1;
+	const auto stepSize = timingCorrectScreen->getNoteValueLengthInTicks();
+	const auto pos = getTickPosition();
+	const auto stepCount = static_cast<int>(ceil(getActiveSequence()->getLastTick() / stepSize)) + 1;
     std::vector<int> stepGrid(stepCount);
 
 	for (int i = 0; i < stepGrid.size(); i++)
@@ -1221,8 +1216,8 @@ void Sequencer::goToNextStep()
 	auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
 	auto noteValue = timingCorrectScreen->getNoteValue();
 
-	auto stepSize = TICK_VALUES[noteValue];
-	auto pos = getTickPosition();
+    const auto stepSize = timingCorrectScreen->getNoteValueLengthInTicks();
+    const auto pos = getTickPosition();
 
     std::vector<int> stepGrid(ceil(getActiveSequence()->getLastTick() / stepSize));
 

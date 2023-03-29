@@ -381,7 +381,7 @@ void FrameSeqBase::processNoteRepeat()
 
     if (controls && (controls->isTapPressed() || controls->isNoteRepeatLocked()))
     {
-        int repeatIntervalTicks = sequencer->getTickValues()[timingCorrectScreen->getNoteValue()];
+        auto repeatIntervalTicks = timingCorrectScreen->getNoteValueLengthInTicks();
         int swingPercentage = timingCorrectScreen->getSwing();
         int swingOffset = (int)((swingPercentage - 50) * (4.0 * 0.01) * (repeatIntervalTicks * 0.5));
         auto shiftTiming = timingCorrectScreen->getAmount() * (timingCorrectScreen->isShiftTimingLater() ? 1 : -1);

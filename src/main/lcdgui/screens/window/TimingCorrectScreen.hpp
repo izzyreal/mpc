@@ -15,10 +15,8 @@ namespace mpc::lcdgui::screens::window
 
         void setNote0(int i) override;
 
-	public:
 		TimingCorrectScreen(mpc::Mpc& mpc, const int layerIndex);
 
-	public:
 		void open() override;
 
 	private:
@@ -32,13 +30,15 @@ namespace mpc::lcdgui::screens::window
 		void displayTime() override;
 
 	private:
-		std::vector<std::string> noteValueNames = { "OFF", "1/8", "1/8(3)", "1/16", "1/16(3)", "1/32", "1/32(3)" };
+		const std::vector<std::string> noteValueNames = { "OFF", "1/8", "1/8(3)", "1/16", "1/16(3)", "1/32", "1/32(3)" };
+        const std::vector<unsigned char> noteValueLengthsInTicks{ 1, 48, 32, 24, 16, 12, 8 };
 		bool shiftTimingLater = false;
 		int swing = 50;
 		int amount = 0;
 		int noteValue = 3;
 
 	public:
+        unsigned char getNoteValueLengthInTicks();
 		int getNoteValue();
 		void setNoteValue(int i);
 		int getSwing();

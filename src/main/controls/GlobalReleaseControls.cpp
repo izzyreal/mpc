@@ -100,7 +100,7 @@ void GlobalReleaseControls::simplePad(int padIndexWithBank)
     return;
   }
 
-	auto note = track->getBus() > 0 ? program->getPad(padIndexWithBank)->getNote() : padIndexWithBank + 35;
+    auto note = program ? program->getPad(padIndexWithBank)->getNote() : padIndexWithBank + 35;
 
 	generateNoteOff(note);
 	bool posIsLastTick = sequencer->getTickPosition() == sequencer->getActiveSequence()->getLastTick();
@@ -118,9 +118,8 @@ void GlobalReleaseControls::simplePad(int padIndexWithBank)
         const auto tcValuePercentage = stepEditOptionsScreen->getTcValuePercentage();
 
         const auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
-        const int noteVal = timingCorrectScreen->getNoteValue();
 
-        const int stepLength = sequencer->getTickValues()[noteVal];
+        const int stepLength = timingCorrectScreen->getNoteValueLengthInTicks();
 
         if (stepRec && durationIsTcValue)
         {

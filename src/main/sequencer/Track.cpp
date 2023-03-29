@@ -439,12 +439,12 @@ int Track::getCorrectedTickPos()
     auto correctedTickPos = -1;
 
     auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
-    auto tcValue = timingCorrectScreen->getNoteValue();
     auto swingPercentage = timingCorrectScreen->getSwing();
+    auto noteValueLengthInTicks = timingCorrectScreen->getNoteValueLengthInTicks();
 
-    if (tcValue > 0)
+    if (noteValueLengthInTicks > 1)
     {
-        correctedTickPos = timingCorrectTick(0, parent->getLastBarIndex(), pos, sequencer->getTickValues()[tcValue], swingPercentage);
+        correctedTickPos = timingCorrectTick(0, parent->getLastBarIndex(), pos, noteValueLengthInTicks, swingPercentage);
     }
 
     if (timingCorrectScreen->getAmount() != 0)
