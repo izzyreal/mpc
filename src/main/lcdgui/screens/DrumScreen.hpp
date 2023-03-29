@@ -1,33 +1,22 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
 
-namespace mpc::audiomidi { class EventHandler; }
-
 namespace mpc::lcdgui::screens
 {
-	class MixerScreen;
-}
-
-namespace mpc::controls
-{
-	class BaseControls;
-    class GlobalReleaseControls;
-}
-
-namespace mpc::lcdgui::screens
-{
-	class DrumScreen
-		: public mpc::lcdgui::ScreenComponent
+	class DrumScreen : public mpc::lcdgui::ScreenComponent
 	{
-
 	public:
-		void function(int f) override;
+        DrumScreen(mpc::Mpc& mpc, const int layerIndex);
+        void function(int f) override;
 		void turnWheel(int i) override;
+        void open() override;
 
-		DrumScreen(mpc::Mpc& mpc, const int layerIndex);
-		void open() override;
+        void setDrum(unsigned char i);
+        unsigned char getDrum();
+        void setPadToIntSound(bool b);
+        bool isPadToIntSound();
 
-	private:
+    private:
 		void displayCurrentVal();
 		void displayDrum();
 		void displayPadToInternalSound();
@@ -35,23 +24,8 @@ namespace mpc::lcdgui::screens
 		void displayPgmChange();
 		void displayMidiVolume();
 
-		void setDrum(int i);
-
 		bool padToInternalSound = true;
-		int drum = 0;
-
-	public:
-		void setPadToIntSound(bool b);
-		bool isPadToIntSound();
-
-	private:
-		friend class MixerScreen;
-		friend class MixerSetupScreen;
-		friend class SelectDrumScreen;
-		friend class SelectMixerDrumScreen;
-		friend class mpc::controls::BaseControls;
-		friend class mpc::controls::GlobalReleaseControls;
-		friend class mpc::audiomidi::EventHandler;
+		unsigned char drum = 0;
 
 	};
 }

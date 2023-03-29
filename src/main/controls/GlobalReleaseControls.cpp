@@ -178,7 +178,7 @@ void GlobalReleaseControls::generateNoteOff(int note)
 
     if (collectionContainsCurrentScreen(samplerScreens))
     {
-        drum = drumScreen->drum;
+        drum = drumScreen->getDrum();
     }
 
     mpc.getEventHandler()->handle(noteEvent, track.get(), drum);

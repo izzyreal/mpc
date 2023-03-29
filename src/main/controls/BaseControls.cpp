@@ -69,7 +69,7 @@ void BaseControls::init()
     
     auto drumScreen = mpc.screens->get<DrumScreen>("drum");
     
-    auto drumIndex = isSampler ? drumScreen->drum : track->getBus() - 1;
+    auto drumIndex = isSampler ? drumScreen->getDrum() : track->getBus() - 1;
     
     if (drumIndex != -1)
     {
@@ -364,7 +364,7 @@ void BaseControls::generateNoteOn(int note, int padVelo)
 
     if (collectionContainsCurrentScreen(samplerScreens))
     {
-        drum = drumScreen->drum;
+        drum = drumScreen->getDrum();
     }
 
     mpc.getEventHandler()->handle(playableEvent, track.get(), drum);
@@ -447,18 +447,26 @@ void BaseControls::numpad(int i)
             case 6:
             {
                 auto newDrum = sequencer->getActiveTrack()->getBus() - 1;
-                if (newDrum < 0) newDrum = 0;
-                auto drumScreen = mpc.screens->get<DrumScreen>("drum");
-                drumScreen->drum = newDrum;
+
+                if (newDrum >= 0)
+                {
+                    auto drumScreen = mpc.screens->get<DrumScreen>("drum");
+                    drumScreen->setDrum(newDrum);
+                }
+
                 ls->openScreen("select-drum");
                 break;
             }
             case 7:
             {
                 auto newDrum = sequencer->getActiveTrack()->getBus() - 1;
-                if (newDrum < 0) newDrum = 0;
-                auto drumScreen = mpc.screens->get<DrumScreen>("drum");
-                drumScreen->drum = newDrum;
+
+                if (newDrum >= 0)
+                {
+                    auto drumScreen = mpc.screens->get<DrumScreen>("drum");
+                    drumScreen->setDrum(newDrum);
+                }
+
                 ls->openScreen("select-mixer-drum");
                 break;
             }
@@ -979,6 +987,7 @@ const std::vector<std::string> BaseControls::allowTransportScreens {
 
 const std::vector<std::string> BaseControls::samplerScreens {
     "create-new-program",
+    "load-a-program",
     "assignment-view",
     "auto-chromatic-assignment",
     "copy-note-parameters",

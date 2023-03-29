@@ -30,7 +30,7 @@ void DrumScreen::function(int f)
 	
 	switch (f)
 	{
-    case int (0):
+    case 0:
         openScreen("program-assign");
         break;
     case 1:
@@ -43,7 +43,7 @@ void DrumScreen::function(int f)
 		openScreen("select-drum");
 		break;
 	}
-    case int (3):
+    case 3:
         openScreen("purge");
         break;
     }
@@ -127,7 +127,7 @@ void DrumScreen::setPadToIntSound(bool b)
 	displayPadToInternalSound();
 }
 
-void DrumScreen::setDrum(int i)
+void DrumScreen::setDrum(unsigned char i)
 {
 	if (i < 0 || i > 3)
 	{
@@ -143,4 +143,9 @@ void DrumScreen::setDrum(int i)
 	displayPgmChange();
 	displayMidiVolume();
 	displayCurrentVal();
+}
+
+unsigned char DrumScreen::getDrum()
+{
+    return drum;
 }
