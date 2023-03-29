@@ -31,7 +31,7 @@ namespace mpc::sequencer
         int duration = DURATION_UNKNOWN;
         VARIATION_TYPE variationType = VARIATION_TYPE::TUNE_0;
         int variationValue = 64;
-        int velocity = 127;
+        int velocity;
 
     protected:
         std::shared_ptr<NoteOffEvent> noteOff;
@@ -53,7 +53,7 @@ namespace mpc::sequencer
         bool isDrumNote();
         bool isFinalized();
 
-        NoteOnEvent(int i = 60);
+        NoteOnEvent(int i = 60, int vel = 127);
 
         std::string getTypeName() override { return "note-on"; }
         std::shared_ptr<mpc::engine::midi::ShortMessage> createShortMessage(int channel, int transpose = 0);
@@ -64,7 +64,7 @@ namespace mpc::sequencer
     class NoteOnEventPlayOnly : public NoteOnEvent
     {
     public:
-        NoteOnEventPlayOnly(int i = 60) : NoteOnEvent(i) { setTick(-1); };
+        NoteOnEventPlayOnly(int i = 60, int vel = 127) : NoteOnEvent(i,vel) { setTick(-1); };
     };
 
 

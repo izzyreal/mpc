@@ -25,10 +25,11 @@ std::shared_ptr<mpc::engine::midi::ShortMessage> mpc::sequencer::NoteOffEvent::c
     return msg;
 }
 //-------------
-mpc::sequencer::NoteOnEvent::NoteOnEvent(int i)
+mpc::sequencer::NoteOnEvent::NoteOnEvent(int i, int vel)
 {
     noteOff = std::shared_ptr<NoteOffEvent>(new NoteOffEvent());
     setNote(i);
+    setVelocity(vel);
 }
 
 std::shared_ptr<mpc::engine::midi::ShortMessage> mpc::sequencer::NoteOnEvent::createShortMessage(int channel, int transpose)

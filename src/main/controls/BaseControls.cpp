@@ -269,9 +269,8 @@ void BaseControls::generateNoteOn(int note, int padVelo, int padIndexWithBank)
 {
     init();
     //----------
-    auto play_event = std::make_shared<NoteOnEventPlayOnly>(note);
+    auto play_event = std::make_shared<NoteOnEventPlayOnly>(note, padVelo);
     if (!mpc.getControls()->storePlayNoteEvent(padIndexWithBank, play_event)) return ;
-    play_event->setVelocity(padVelo);
     
     auto padIndex = program != nullptr ? program->getPadIndexFromNote(note) : -1;
     bool isSliderNote = program && program->getSlider()->getNote() == note;
@@ -312,6 +311,7 @@ void BaseControls::generateNoteOn(int note, int padVelo, int padIndexWithBank)
         if (step && (track->getBus() == 0 || isDrumNote(note)))
         {
             recordNoteOnEvent = track->addNoteEvent(sequencer->getTickPosition(), note);
+            recordNoteOnEvent->setDuration(0);
         }
         else if (recMainWithoutPlaying)
         {
@@ -337,7 +337,7 @@ void BaseControls::generateNoteOn(int note, int padVelo, int padIndexWithBank)
         }
         
         recordNoteOnEvent->setVelocity(padVelo);
-        recordNoteOnEvent->setDuration(step ? 1 : NoteOnEvent::DURATION_UNKNOWN);
+        recordNoteOnEvent->setDuration(step ? 0 : NoteOnEvent::DURATION_UNKNOWN);
 
         if (step || recMainWithoutPlaying)
         {
