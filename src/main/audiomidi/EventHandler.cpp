@@ -83,9 +83,9 @@ void EventHandler::handleNoThru(const std::shared_ptr<Event>& event, Track* trac
                     auto pgmIndex = sampler->getDrumBusProgramIndex(drumIndex + 1);
                     auto pgm = sampler->getProgram(pgmIndex);
                     auto voiceOverlap = pgm->getNoteParameters(noteOnEvent->getNote())->getVoiceOverlap();
-                    auto duration = voiceOverlap == 2 ? noteOnEvent->getDuration() : -1;///???????????
-                    auto durationFrames = (duration == -1 || duration == 0) ?
-                        -1 : SeqUtil::ticksToFrames(duration, sequencer->getTempo(), audioServer->getSampleRate());
+                    auto duration = voiceOverlap == 2 ? noteOnEvent->getDuration() : NoteOnEvent::Duration();///???????????
+                    auto durationFrames = (duration > 0) ?
+                        SeqUtil::ticksToFrames(duration.value(), sequencer->getTempo(), audioServer->getSampleRate()) : - 1;
 
                     mpc.getDrum(drumIndex).mpcNoteOn
                     (
@@ -128,7 +128,7 @@ void EventHandler::handleNoThru(const std::shared_ptr<Event>& event, Track* trac
                             if (visible) mpc.getHardware()->getPad(pad)->notifyObservers(255);
                             midiOut(noteOnEvent->getNoteOff(), track);
                         },
-                        SeqUtil::ticksToFrames(noteOnEvent->getDuration(), sequencer->getTempo(), audioServer->getSampleRate())
+                        SeqUtil::ticksToFrames(*noteOnEvent->getDuration(), sequencer->getTempo(), audioServer->getSampleRate())
                     );
                 }
             }

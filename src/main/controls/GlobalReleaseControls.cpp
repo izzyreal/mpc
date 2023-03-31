@@ -141,7 +141,7 @@ void GlobalReleaseControls::simplePad(int padIndexWithBank)
 
 		sequencer->stopMetronomeTrack();
 		//!!!!!!!!
-		bool durationHasBeenAdjusted = track->finalizeNoteOnEvent(on_event, newDuration);
+		bool durationHasBeenAdjusted = track->finalizeNoteOnEvent(on_event->getNote(), newDuration);
 
 		if ((durationHasBeenAdjusted && maybeRecWithoutPlaying) || (stepRec && increment))
 		{

@@ -293,7 +293,7 @@ void StepEditorScreen::function(int i)
 				}
 				else if (isD)
 				{
-					editMultipleScreen->setEditValue(noteEvent->getDuration());
+					editMultipleScreen->setEditValue(noteEvent->getDuration().value());
 				}
 				else if (isE)
 				{
@@ -306,7 +306,7 @@ void StepEditorScreen::function(int i)
 				if (isA)
 					editMultipleScreen->setChangeNoteTo(noteEvent->getNote());
 				else if (isB)
-					editMultipleScreen->setEditValue(noteEvent->getDuration());
+					editMultipleScreen->setEditValue(noteEvent->getDuration().value());
 				else if (isC)
 					editMultipleScreen->setEditValue(noteEvent->getVelocity());
 			}
@@ -1382,7 +1382,7 @@ void StepEditorScreen::adhocPlayNoteEvent(const std::shared_ptr<mpc::sequencer::
 
     const auto sampleRate = mpc.getAudioMidiServices()->getAudioServer()->getSampleRate();
     const auto tempo = sequencer->getTempo();
-    const auto durationInFrames = SeqUtil::ticksToFrames(noteEvent->getDuration(), tempo, sampleRate);
+    const auto durationInFrames = SeqUtil::ticksToFrames(noteEvent->getDuration().value(), tempo, sampleRate);
 
     auto frameSeq = mpc.getAudioMidiServices()->getFrameSequencer();
     frameSeq->enqueueEventAfterNFrames(eventAfterNFrames, durationInFrames);

@@ -37,8 +37,8 @@ std::vector<char> AllNoteOnEvent::mpcEventToBytes(std::shared_ptr<NoteOnEvent> e
 		writeTrackNumber(bytes, event->getTrack());
 		writeVariationType(bytes, event->getVariationType());
 		writeVariationValue(bytes, event->getVariationValue());
-		AllEvent::writeTick(bytes, static_cast<int>(event->getTick()));
-		writeDuration(bytes, static_cast<int>(event->getDuration()));
+		AllEvent::writeTick(bytes, event->getTick());
+		writeDuration(bytes, event->getDuration().value_or(-1));
         writeVelocity(bytes, event->getVelocity());
 	}
 	catch (const std::exception& e) {

@@ -77,7 +77,7 @@ public:
     std::shared_ptr<NoteOnEvent> addNoteEvent(int tick, int note);
     std::shared_ptr<Event> addEvent(int tick, const std::string& type, bool allowMultipleNotesOnSameTick = false);
     void cloneEventIntoTrack(std::shared_ptr<Event>& src, int tick, bool allowMultipleNotesOnSameTick = false);
-    bool finalizeNoteOnEvent(std::shared_ptr<NoteOnEvent> event, int newDur);
+    bool finalizeNoteOnEvent(int note, int duration);
     void removeEvent(int i);
     void removeEvent(const std::shared_ptr<Event>& event);
     void removeEvents();

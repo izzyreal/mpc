@@ -1,6 +1,8 @@
 #pragma once
 #include <sequencer/Event.hpp>
 #include <engine/midi/ShortMessage.hpp>
+#include <optional>
+#include "assert.h"
 
 namespace mpc::sequencer
 {
@@ -25,10 +27,11 @@ namespace mpc::sequencer
     {
     public:
         enum VARIATION_TYPE {TUNE_0 = 0, DECAY_1 = 1, ATTACK_2 = 2, FILTER_3 = 3};
-        static const int DURATION_UNKNOWN = -1;
+        //static const int DURATION_UNKNOWN = -1;
+        typedef std::optional<int> Duration;
     private:
         int number = 60;
-        int duration = DURATION_UNKNOWN;
+        Duration duration;
         VARIATION_TYPE variationType = VARIATION_TYPE::TUNE_0;
         int variationValue = 64;
         int velocity;
@@ -41,8 +44,8 @@ namespace mpc::sequencer
 
         void setNote(int i);
         int getNote();
-        void setDuration(int i);
-        int getDuration();
+        void setDuration(Duration duration);
+        Duration getDuration();
         VARIATION_TYPE getVariationType();
         void incrementVariationType(int amount);
         void setVariationType(VARIATION_TYPE type);
@@ -111,4 +114,44 @@ namespace mpc::sequencer
 
         std::shared_ptr<mpc::engine::midi::ShortMessage> createShortMessage(int channel, int transpose = 0);
     };
+}
+inline int operator+(const mpc::sequencer::NoteOnEvent::Duration& duration, const int& i)
+{
+    assert(duration.has_value());
+    return *duration + i;
+}
+inline int operator+(const int& i, const mpc::sequencer::NoteOnEvent::Duration& duration)
+{
+    assert(duration.has_value());
+    return *duration + i;
+}
+inline int operator-(const mpc::sequencer::NoteOnEvent::Duration& duration, const int& i)
+{
+    assert(duration.has_value());
+    return *duration - i;
+}
+inline int operator-(const int& i, const mpc::sequencer::NoteOnEvent::Duration& duration)
+{
+    assert(duration.has_value());
+    return *duration - i;
+}
+inline int operator*(const mpc::sequencer::NoteOnEvent::Duration& duration, const int& i)
+{
+    assert(duration.has_value());
+    return *duration * i;
+}
+inline int operator*(const int& i, const mpc::sequencer::NoteOnEvent::Duration& duration)
+{
+    assert(duration.has_value());
+    return *duration * i;
+}
+inline int operator/(const mpc::sequencer::NoteOnEvent::Duration& duration, const int& i)
+{
+    assert(duration.has_value());
+    return *duration / i;
+}
+inline int operator/(const int& i, const mpc::sequencer::NoteOnEvent::Duration& duration)
+{
+    assert(duration.has_value());
+    return *duration / i;
 }

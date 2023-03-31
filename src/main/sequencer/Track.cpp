@@ -161,11 +161,11 @@ void Track::removeEvent(const std::shared_ptr<Event>& event)
 	notifyObservers(std::string("step-editor"));
 }
 
-bool Track::finalizeNoteOnEvent(std::shared_ptr<NoteOnEvent> event, int newDur)
+bool Track::finalizeNoteOnEvent(int note, int duration)
 {
-
-	event->setDuration(newDur);
-
+    auto onEvent = retrieveRecordNoteEvent(note);
+    if (!onEvent) return false;
+    onEvent->setDuration(duration);
 	notifyObservers(std::string("adjust-duration"));
 	return true;
 }
@@ -173,13 +173,14 @@ bool Track::finalizeNoteOnEvent(std::shared_ptr<NoteOnEvent> event, int newDur)
 std::shared_ptr<NoteOnEvent> Track::addNoteEvent(int tick, int note)
 {
 	// TODO Store!!!!!!
-    auto res = std::make_shared<NoteOnEvent>(note);
-	res->setTick(tick);
-	insertEventWhileRetainingSort(res);
+    auto onEvent = std::make_shared<NoteOnEvent>(note);
+    if (!storeRecordNoteEvent(note, onEvent)) return nullptr;
+    onEvent->setTick(tick);
+	insertEventWhileRetainingSort(onEvent);
 
 	notifyObservers(std::string("step-editor"));
 
-	return res;
+	return onEvent;
 }
 
 std::shared_ptr<Event> Track::addEvent(int tick, const std::string& type, bool allowMultipleNotesOnSameTick)
