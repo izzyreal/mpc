@@ -54,7 +54,7 @@ namespace mpc::controls
     bool isF6Pressed();
 
     std::weak_ptr<KeyEventHandler> getKeyEventHandler();
-    std::shared_ptr<BaseControls> getControls();
+    std::shared_ptr<BaseControls> getBaseControls();
     std::shared_ptr<GlobalReleaseControls> getReleaseControls();
 
     void setCtrlPressed(bool);
@@ -83,7 +83,7 @@ namespace mpc::controls
     bool f5Pressed = false;
     bool f6Pressed = false;
     std::shared_ptr<KeyEventHandler> keyEventHandler;
-    std::shared_ptr<BaseControls> controls;
+    std::shared_ptr<BaseControls> baseControls;
     std::shared_ptr<GlobalReleaseControls> releaseControls;
     std::unordered_map<int, std::shared_ptr<mpc::sequencer::NoteOnEventPlayOnly>> playNoteStore = {};
 

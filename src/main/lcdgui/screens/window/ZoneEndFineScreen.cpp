@@ -16,7 +16,7 @@ ZoneEndFineScreen::ZoneEndFineScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void ZoneEndFineScreen::open()
 {
-    mpc.getControls()->getControls()->typableParams = { "end" };
+    mpc.getControls()->getBaseControls()->typableParams = { "end" };
 
     displayEnd();
 	findField("end")->enableTwoDots();

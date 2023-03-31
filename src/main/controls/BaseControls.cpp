@@ -335,10 +335,12 @@ void BaseControls::generateNoteOn(int note, int padVelo, int padIndexWithBank)
         {
             recordNoteOnEvent = track->recordNoteOnNow(note);
         }
+        if(recordNoteOnEvent)
+        {
+            recordNoteOnEvent->setVelocity(padVelo);
+            recordNoteOnEvent->setDuration(step ? 0 : NoteOnEvent::DURATION_UNKNOWN);
+        }
         
-        recordNoteOnEvent->setVelocity(padVelo);
-        recordNoteOnEvent->setDuration(step ? 0 : NoteOnEvent::DURATION_UNKNOWN);
-
         if (step || recMainWithoutPlaying)
         {
             sequencer->playMetronomeTrack();

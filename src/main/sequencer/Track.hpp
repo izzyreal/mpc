@@ -8,7 +8,7 @@
 
 #include "thirdp/concurrentqueue.h"
 #include <memory>
-#include <map>
+#include <unordered_map>
 
 namespace mpc { class Mpc; }
 
@@ -43,7 +43,7 @@ private:
     int trackIndex = 0;
     bool used{ false };
     int eventIndex = 0;
-    std::map<int,std::shared_ptr<NoteOnEvent>> unFinalized;
+    std::unordered_map<int, std::shared_ptr<mpc::sequencer::NoteOnEvent>> recordNoteStore = {};
     bool multi{ false };
     bool _delete{ false };
 
@@ -71,6 +71,9 @@ private:
     std::shared_ptr<NoteOnEvent> getNoteEvent(int tick, int note);
     void processRealtimeQueuedEvents();
     int getCorrectedTickPos();
+    
+    bool storeRecordNoteEvent(int note, std::shared_ptr<mpc::sequencer::NoteOnEvent> event);
+    std::shared_ptr<mpc::sequencer::NoteOnEvent> retrieveRecordNoteEvent(int note);
 
 public:
     bool insertEventWhileRetainingSort(const std::shared_ptr<Event>& event, bool allowMultipleNotesOnSameTick = false);

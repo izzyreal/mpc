@@ -15,7 +15,7 @@ EndFineScreen::EndFineScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void EndFineScreen::open()
 {
-    mpc.getControls()->getControls()->typableParams = { "end" };
+    mpc.getControls()->getBaseControls()->typableParams = { "end" };
 
     findField("smpllngth")->setAlignment(Alignment::Centered);
 	findField("end")->enableTwoDots();

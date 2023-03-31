@@ -138,7 +138,7 @@ int LayeredScreen::openScreen(std::string screenName)
 	if (screenComponent->findFields().size() > 0)
 		returnToLastFocus(screenComponent->getFirstField());
 
-    mpc.getControls()->getControls()->typableParams.clear();
+    mpc.getControls()->getBaseControls()->typableParams.clear();
     
 	screenComponent->open();
 

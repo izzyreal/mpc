@@ -25,7 +25,7 @@ ZoneScreen::ZoneScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void ZoneScreen::open()
 {
-    mpc.getControls()->getControls()->typableParams = { "st", "end" };
+    mpc.getControls()->getBaseControls()->typableParams = { "st", "end" };
 
     if (zones.empty())
 		initZones();

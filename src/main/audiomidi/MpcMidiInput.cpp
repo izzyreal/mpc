@@ -157,9 +157,7 @@ void MpcMidiInput::transport(MidiMessage *msg, int timeStamp)
         }
         else
         {
-            auto activeControls = mpc.getActiveControls();
-            activeControls->pad(pad, noteOn->getVelocity());
-
+            mpc.getActiveControls()->pad(pad, noteOn->getVelocity());
         }
     }    
     else if (noteOff)

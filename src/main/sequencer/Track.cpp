@@ -105,12 +105,11 @@ int Track::getIndex()
 // Then we let getNextTick, from the audio thread, set the tickpos.
 std::shared_ptr<NoteOnEvent> Track::recordNoteOnNow(unsigned char note)
 {
-	auto n = std::make_shared<NoteOnEvent>(note);
-	assert(unFinalized.find(note) == unFinalized.end());
-	unFinalized[note] = n;
-    n->setTick(-2);
-	queuedNoteOnEvents.enqueue(n);
-	return n;
+	auto onEvent = std::make_shared<NoteOnEvent>(note);
+	if (!storeRecordNoteEvent(note, onEvent)) return nullptr;
+	onEvent->setTick(-2);
+	queuedNoteOnEvents.enqueue(onEvent);
+	return onEvent;
 }
 
 void Track::flushNoteCache()
@@ -123,12 +122,11 @@ void Track::flushNoteCache()
 
 void Track::recordNoteOffNow(unsigned char note)
 {
-	auto on_event = unFinalized.find(note);
-	assert(unFinalized.find(note) != unFinalized.end());
-	auto off_event = unFinalized[note]->getNoteOff();
-	unFinalized.erase(note);
-	off_event->setTick(-2);
-    queuedNoteOffEvents.enqueue(off_event);
+	auto onEvent = retrieveRecordNoteEvent(note);
+	if (!onEvent) return;
+	auto offEvent = onEvent->getNoteOff();
+	offEvent->setTick(-2);
+    queuedNoteOffEvents.enqueue(offEvent);
 }
 
 void Track::setUsed(bool b)
@@ -434,6 +432,21 @@ int Track::getCorrectedTickPos()
     }
 
     return correctedTickPos;
+}
+
+bool mpc::sequencer::Track::storeRecordNoteEvent(int note, std::shared_ptr<mpc::sequencer::NoteOnEvent> event)
+{
+	if (recordNoteStore.find(note) != recordNoteStore.end()) return false;
+	recordNoteStore[note] = event;
+	return true;
+}
+
+std::shared_ptr<mpc::sequencer::NoteOnEvent> mpc::sequencer::Track::retrieveRecordNoteEvent(int note)
+{
+	if (recordNoteStore.find(note) == recordNoteStore.end()) return nullptr;
+	auto event = recordNoteStore[note];
+	recordNoteStore.erase(note);
+	return event;
 }
 
 void Track::processRealtimeQueuedEvents()
