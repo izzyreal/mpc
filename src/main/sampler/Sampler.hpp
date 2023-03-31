@@ -10,10 +10,6 @@ namespace mpc::engine {
 class Drum;
 }
 
-namespace mpc::sequencer {
-class NoteEvent;
-}
-
 namespace mpc::sampler
 {
 class Sound;
@@ -42,7 +38,7 @@ public:
 
     void finishBasicVoice();
     void init();
-    void playMetronome(mpc::sequencer::NoteEvent* event, int framePos);
+    void playMetronome(unsigned int velocity, int framePos);
     void playPreviewSample(int start, int end, int loopTo);
     int getProgramCount();
 

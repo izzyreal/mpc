@@ -15,7 +15,7 @@ StartFineScreen::StartFineScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void StartFineScreen::open()
 {
-    mpc.getControls()->getControls()->typableParams = { "start" };
+    mpc.getControls()->getBaseControls()->typableParams = { "start" };
 
 	findField("smpllngth")->setAlignment(Alignment::Centered);
 	displayStart();

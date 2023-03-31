@@ -17,7 +17,7 @@ namespace mpc::midi::event {
 
 namespace mpc::sequencer {
 	class Sequence;
-	class NoteEvent;
+	class OldNoteEvent;
 }
 
 namespace mpc::disk {
@@ -38,6 +38,6 @@ namespace mpc::file::mid {
 		std::weak_ptr<mpc::sequencer::Sequence> dest;
 
 		int getNumberOfNoteOns(int noteValue, std::vector<std::shared_ptr<mpc::midi::event::ChannelEvent>> allNotes);
-		int getNumberOfNotes(int noteValue, std::vector<std::shared_ptr<mpc::sequencer::NoteEvent>> allNotes);
+		int getNumberOfNotes(int noteValue, std::vector<std::shared_ptr<mpc::sequencer::OldNoteEvent>> allNotes);
 	};
 }

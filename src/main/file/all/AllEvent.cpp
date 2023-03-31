@@ -17,7 +17,7 @@
 #include <sequencer/PolyPressureEvent.hpp>
 #include <sequencer/ProgramChangeEvent.hpp>
 #include <sequencer/SystemExclusiveEvent.hpp>
-
+#include <assert.h>
 #include <cmath>
 
 #include <file/BitUtil.hpp>
@@ -53,13 +53,16 @@ std::shared_ptr<Event> AllEvent::bytesToMpcEvent(const std::vector<char>& bytes)
     }
     else
     {
-        return AllNoteEvent::bytesToMpcEvent(bytes);
+        return AllNoteOnEvent::bytesToMpcEvent(bytes);
     }
 }
 
 std::vector<char> AllEvent::mpcEventToBytes(std::shared_ptr<mpc::sequencer::Event> event)
 {
-    auto note = std::dynamic_pointer_cast<mpc::sequencer::NoteEvent>(event);
+    //auto note = std::dynamic_pointer_cast<mpc::sequencer::OldNoteEvent>(event);
+    auto noteOn = std::dynamic_pointer_cast<mpc::sequencer::NoteOnEvent>(event);
+    auto noteOff = std::dynamic_pointer_cast<mpc::sequencer::NoteOffEvent>(event);
+    assert(!noteOff);
     auto polyPressure = std::dynamic_pointer_cast<mpc::sequencer::PolyPressureEvent>(event);
     auto controlChange = std::dynamic_pointer_cast<mpc::sequencer::ControlChangeEvent>(event);
     auto programChange = std::dynamic_pointer_cast<mpc::sequencer::ProgramChangeEvent>(event);
@@ -68,8 +71,10 @@ std::vector<char> AllEvent::mpcEventToBytes(std::shared_ptr<mpc::sequencer::Even
     auto sysEx = std::dynamic_pointer_cast<mpc::sequencer::SystemExclusiveEvent>(event);
     auto mixer = std::dynamic_pointer_cast<mpc::sequencer::MixerEvent>(event);
     
-    if (note)
-        return AllNoteEvent::mpcEventToBytes(note);
+    if (noteOn)
+        return AllNoteOnEvent::mpcEventToBytes(noteOn);
+    //else if (noteOff)
+    //    return AllNoteEvent::mpcEventToBytes(noteOff);
     else if (polyPressure)
         return AllPolyPressureEvent::mpcEventToBytes(polyPressure);
     else if (controlChange)
@@ -103,5 +108,5 @@ void AllEvent::writeTick(std::vector<char>& event, int tick)
     event[TICK_BYTE2_OFFSET] = ba[1];
     auto s3 = static_cast<int16_t>(floor(tick / 65536.0));
     
-    event[TICK_BYTE3_OFFSET] = BitUtil::stitchBytes(event[TICK_BYTE3_OFFSET], AllNoteEvent::DURATION_BYTE1_BIT_RANGE, static_cast<int8_t>(s3), TICK_BYTE3_BIT_RANGE);
+    event[TICK_BYTE3_OFFSET] = BitUtil::stitchBytes(event[TICK_BYTE3_OFFSET], AllNoteOnEvent::DURATION_BYTE1_BIT_RANGE, static_cast<int8_t>(s3), TICK_BYTE3_BIT_RANGE);
 }

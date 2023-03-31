@@ -16,7 +16,7 @@ LoopEndFineScreen::LoopEndFineScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void LoopEndFineScreen::open()
 {
-    mpc.getControls()->getControls()->typableParams = { "end", "lngth" };
+    mpc.getControls()->getBaseControls()->typableParams = { "end", "lngth" };
 
     findField("loop-lngth")->setAlignment(Alignment::Centered);
 	findField("end")->enableTwoDots();

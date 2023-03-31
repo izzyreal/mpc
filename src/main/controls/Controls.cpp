@@ -13,7 +13,7 @@
 using namespace mpc::controls;
 
 Controls::Controls(mpc::Mpc& _mpc)
-	: controls (std::make_shared<BaseControls>(_mpc)),
+	: baseControls (std::make_shared<BaseControls>(_mpc)),
 	releaseControls (std::make_shared<GlobalReleaseControls>(_mpc)),
 	keyEventHandler (std::make_shared<KeyEventHandler>(_mpc)),
 	kbMapping (std::make_shared<KbMapping>())
@@ -155,9 +155,9 @@ void Controls::setF6Pressed(bool b)
 	f6Pressed = b;
 }
 
-std::shared_ptr<BaseControls> Controls::getControls()
+std::shared_ptr<BaseControls> Controls::getBaseControls()
 {
-	return controls;
+	return baseControls;
 }
 
 std::shared_ptr<GlobalReleaseControls> Controls::getReleaseControls()
@@ -168,6 +168,21 @@ std::shared_ptr<GlobalReleaseControls> Controls::getReleaseControls()
 std::weak_ptr<KbMapping> Controls::getKbMapping()
 {
     return kbMapping;
+}
+
+bool mpc::controls::Controls::storePlayNoteEvent(int padIndexWithBank, std::shared_ptr<mpc::sequencer::NoteOnEventPlayOnly> event)
+{
+	if (playNoteStore.find(padIndexWithBank) != playNoteStore.end()) return false;
+	playNoteStore[padIndexWithBank] = event;
+	return true;
+}
+
+std::shared_ptr<mpc::sequencer::NoteOnEventPlayOnly> mpc::controls::Controls::retrievePlayNoteEvent(int padIndexWithBank)
+{
+	if (playNoteStore.find(padIndexWithBank) == playNoteStore.end()) return nullptr;
+	auto event = playNoteStore[padIndexWithBank];
+	playNoteStore.erase(padIndexWithBank);
+	return event;
 }
 
 void Controls::setPlayPressed(bool b)

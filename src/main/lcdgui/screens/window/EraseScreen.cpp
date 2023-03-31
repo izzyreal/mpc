@@ -104,7 +104,7 @@ void EraseScreen::function(int i)
 			for (auto k = 0; k < t->getEvents().size(); k++)
 			{
 				auto e = t->getEvent(k);
-				auto ne = std::dynamic_pointer_cast<NoteEvent>(e);
+				auto ne = std::dynamic_pointer_cast<NoteOnEvent>(e);
 
 				if (e->getTick() >= time0 && e->getTick() < time1)
 				{

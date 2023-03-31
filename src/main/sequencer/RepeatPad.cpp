@@ -48,7 +48,7 @@ void RepeatPad::process(mpc::Mpc& mpc,
 
         if (note != 34)
         {
-            auto noteEvent = std::make_shared<NoteEvent>(note);
+            auto noteEvent = std::make_shared<NoteOnEvent>(note);
             noteEvent->setTick(static_cast<int>(tickPosition));
             mpc::Util::setSliderNoteVariationParameters(mpc, noteEvent, program);
 
@@ -65,7 +65,6 @@ void RepeatPad::process(mpc::Mpc& mpc,
             noteEvent->setDuration(durationTicks);
 
             noteEvent->getNoteOff()->setTick(static_cast<int>(tickPosition) + durationTicks);
-            noteEvent->getNoteOff()->setVelocity(0);
 
             auto newVelo = static_cast<int>(noteEvent->getVelocity() * (track->getVelocityRatio() * 0.01));
 

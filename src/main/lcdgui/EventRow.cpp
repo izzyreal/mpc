@@ -73,7 +73,7 @@ void EventRow::setBus(const int newBus)
 
 void EventRow::init()
 {
-	if (std::dynamic_pointer_cast<NoteEvent>(event.lock()))
+	if (std::dynamic_pointer_cast<NoteOnEvent>(event.lock()))
 	{
 		if (bus == 0)
 		{
@@ -373,7 +373,7 @@ void EventRow::setDrumNoteEventValues()
 	if (!event.lock())
 		return;
 
-	auto ne = std::dynamic_pointer_cast<NoteEvent>(event.lock());
+	auto ne = std::dynamic_pointer_cast<NoteOnEvent>(event.lock());
 	
 	for (int i = 0; i < 5; i++)
 	{
@@ -469,7 +469,7 @@ void EventRow::setMidiNoteEventValues()
 	if (!event.lock())
 		return;
 
-	auto ne = std::dynamic_pointer_cast<NoteEvent>(event.lock());
+	auto ne = std::dynamic_pointer_cast<NoteOnEvent>(event.lock());
 	
 	for (int i = 0; i < 3; i++)
 	{

@@ -32,7 +32,7 @@ namespace mpc::engine::midi
 namespace mpc::sequencer
 {
 	class Event;
-	class NoteEvent;
+	class OldNoteEvent;
 	class MidiClockEvent;
 	class Sequencer;
 }
@@ -47,7 +47,7 @@ namespace mpc::sequencer
 		std::weak_ptr<Sequencer> sequencer;
 		std::weak_ptr<Event> event;
 		std::shared_ptr<MidiClockEvent> midiClockEvent;
-		std::shared_ptr<NoteEvent> noteEvent;
+		std::shared_ptr<OldNoteEvent> noteEvent;
 
 	public:
 		void process(mpc::engine::midi::MidiMessage* msg);

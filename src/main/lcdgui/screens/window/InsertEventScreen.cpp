@@ -1,5 +1,4 @@
 #include "InsertEventScreen.hpp"
-
 #include "TimingCorrectScreen.hpp"
 
 #include <sequencer/ChannelPressureEvent.hpp>
@@ -54,15 +53,13 @@ void InsertEventScreen::insertEvent()
 	{
         const bool allowMultipleNotesOnSameTick = true;
         auto event = track->addEvent(sequencer->getTickPosition(), "note", allowMultipleNotesOnSameTick);
-		auto noteEvent = std::dynamic_pointer_cast<NoteEvent>(event);
-		auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
-		unsigned short duration = 1;
-		switch (timingCorrectScreen->getNoteValue())
-		{}
-		noteEvent->setDuration(24);
+		auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(event);
+        auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
+        unsigned short duration = timingCorrectScreen->getNoteValueLengthInTicks();
+		noteEvent->setDuration(duration);
 		noteEvent->setNote(60);
 		noteEvent->setVelocity(127);
-		noteEvent->setVariationTypeNumber(0);
+		noteEvent->setVariationType(NoteOnEvent::VARIATION_TYPE::TUNE_0);
 		noteEvent->setVariationValue(64);
 	}
 	else if (insertEventType == 1)
