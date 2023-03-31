@@ -113,8 +113,6 @@ namespace mpc::lcdgui
 		virtual void erase() { mpc.getControls()->getControls()->erase(); }
 		virtual void setSlider(int i) { mpc.getControls()->getControls()->setSlider(i); }
 
-		virtual bool isTypable() { return mpc.getControls()->getControls()->isTypable(); }
-
 		int getSoundIncrement(int notch) { return mpc.getControls()->getControls()->getSoundIncrement(notch); }
 
 		virtual void pad(int padIndexWithBank, int velo) { mpc.getControls()->getControls()->pad(padIndexWithBank, velo); }
