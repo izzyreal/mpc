@@ -21,7 +21,7 @@ TEST_CASE("BARS1", "[bars-screen]")
 
     for (int i = 0; i < 8; i++)
     {
-        auto noteEvent = std::make_shared<NoteEvent>(35 + i);
+        auto noteEvent = std::make_shared<NoteOnEvent>(35 + i);
         noteEvent->setVelocity(127);
         noteEvent->setDuration(42);
         noteEvent->setTick(tickPos);
@@ -65,7 +65,7 @@ TEST_CASE("BARS2", "[bars-screen]")
 
     for (int i = 0; i < 8; i++)
     {
-        auto noteEvent = std::make_shared<NoteEvent>(35 + i);
+        auto noteEvent = std::make_shared<NoteOnEvent>(35 + i);
         noteEvent->setVelocity(127);
         noteEvent->setDuration(42);
         noteEvent->setTick(tickPos);
@@ -87,7 +87,7 @@ TEST_CASE("BARS2", "[bars-screen]")
 
     for (int i = 0; i < 16; i++)
     {
-        auto e = std::make_shared<NoteEvent>(35 + i);
+        auto e = std::make_shared<NoteOnEvent>(35 + i);
         toSeq->getTrack(0)->insertEventWhileRetainingSort(e, i * 24);
     }
 
@@ -101,7 +101,7 @@ TEST_CASE("BARS2", "[bars-screen]")
 
     for (int eventIndex = 0; eventIndex < 8; eventIndex++)
     {
-        auto noteEvent = std::dynamic_pointer_cast<NoteEvent>(toSeq->getTrack(0)->getEvent(eventIndex));
+        auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(toSeq->getTrack(0)->getEvent(eventIndex));
 
         REQUIRE(noteEvent->getTick() == eventIndex * 24);
         REQUIRE(noteEvent->getNote() == eventIndex + 35);

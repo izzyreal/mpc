@@ -1,5 +1,4 @@
 #include "InsertEventScreen.hpp"
-
 #include "TimingCorrectScreen.hpp"
 
 #include <sequencer/ChannelPressureEvent.hpp>
@@ -53,60 +52,58 @@ void InsertEventScreen::insertEvent()
 	if (insertEventType == 0)
 	{
         const bool allowMultipleNotesOnSameTick = true;
-        auto event = track->addEvent(sequencer->getTickPosition(), "note", allowMultipleNotesOnSameTick);
-		auto noteEvent = std::dynamic_pointer_cast<NoteEvent>(event);
-		auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
-		unsigned short duration = 1;
-		switch (timingCorrectScreen->getNoteValue())
-		{}
-		noteEvent->setDuration(24);
+		auto noteEvent = std::make_shared<NoteOnEvent>();
+        track->addEvent(sequencer->getTickPosition(), noteEvent, allowMultipleNotesOnSameTick);
+        auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
+        unsigned short duration = timingCorrectScreen->getNoteValueLengthInTicks();
+		noteEvent->setDuration(duration);
 		noteEvent->setNote(60);
 		noteEvent->setVelocity(127);
-		noteEvent->setVariationTypeNumber(0);
+		noteEvent->setVariationType(NoteOnEvent::VARIATION_TYPE::TUNE_0);
 		noteEvent->setVariationValue(64);
 	}
 	else if (insertEventType == 1)
 	{
-		auto event = track->addEvent(sequencer->getTickPosition(), "pitchbend");
-		auto pitchBendEvent = std::dynamic_pointer_cast<PitchBendEvent>(event);
+		auto pitchBendEvent = std::make_shared<PitchBendEvent>();
+		track->addEvent(sequencer->getTickPosition(), pitchBendEvent);
 		pitchBendEvent->setAmount(0);
 	}
 	else if (insertEventType == 2)
 	{
-		auto event = track->addEvent(sequencer->getTickPosition(), "controlchange");
-		auto controlChangeEvent = std::dynamic_pointer_cast<ControlChangeEvent>(event);
+		auto controlChangeEvent = std::make_shared<ControlChangeEvent>();
+		track->addEvent(sequencer->getTickPosition(), controlChangeEvent);
 		controlChangeEvent->setController(0);
 		controlChangeEvent->setAmount(0);
 	}
 	else if (insertEventType == 3)
 	{
-		auto event = track->addEvent(sequencer->getTickPosition(), "programchange");
-		auto programChangeEvent = std::dynamic_pointer_cast<ProgramChangeEvent>(event);
+		auto programChangeEvent = std::make_shared<ProgramChangeEvent>();
+		track->addEvent(sequencer->getTickPosition(), programChangeEvent);
 		programChangeEvent->setProgram(1);
 	}
 	else if (insertEventType == 4)
 	{
-		auto event = track->addEvent(sequencer->getTickPosition(), "channelpressure");
-		auto channelPressureEvent = std::dynamic_pointer_cast<ChannelPressureEvent>(event);
+		auto channelPressureEvent = std::make_shared<ChannelPressureEvent>();
+		track->addEvent(sequencer->getTickPosition(), channelPressureEvent);
 		channelPressureEvent->setAmount(0);
 	}
 	else if (insertEventType == 5)
 	{
-		auto event = track->addEvent(sequencer->getTickPosition(), "polypressure");
-		auto polyPressureEvent = std::dynamic_pointer_cast<PolyPressureEvent>(event);
+		auto polyPressureEvent = std::make_shared<PolyPressureEvent>();
+		track->addEvent(sequencer->getTickPosition(), polyPressureEvent);
 		polyPressureEvent->setNote(60);
 		polyPressureEvent->setAmount(0);
 	}
 	else if (insertEventType == 6)
 	{
-		auto event = track->addEvent(sequencer->getTickPosition(), "systemexclusive");
-		auto systemExclusiveEvent = std::dynamic_pointer_cast<SystemExclusiveEvent>(event);
+		auto systemExclusiveEvent = std::make_shared<SystemExclusiveEvent>();
+		track->addEvent(sequencer->getTickPosition(), systemExclusiveEvent);
 		systemExclusiveEvent->setByteB(247);
 	}
 	else if (insertEventType == 7)
 	{
-		auto event = track->addEvent(sequencer->getTickPosition(), "mixer");
-		auto mixerEvent = std::dynamic_pointer_cast<MixerEvent>(event);
+		auto mixerEvent = std::make_shared<MixerEvent>();
+		track->addEvent(sequencer->getTickPosition(), mixerEvent);
 		mixerEvent->setPadNumber(0);
 		mixerEvent->setParameter(0);
 		mixerEvent->setValue(0);

@@ -2,14 +2,12 @@
 
 #include <memory>
 #include <vector>
+#include "sequencer/NoteEvent.hpp"
 
-namespace mpc::sequencer {
-class NoteEvent;
-}
 
 namespace mpc::file::all {
 class AllEvent;
-class AllNoteEvent
+class AllNoteOnEvent
 {
 private:
     static const int DURATION_BYTE1_OFFSET = 2;
@@ -33,7 +31,7 @@ private:
     static int readTrackNumber(const std::vector<char>&);
     static int readVelocity(const std::vector<char>&);
     static int readVariationValue(const std::vector<char>&);
-    static int readVariationType(const std::vector<char>&);
+    static mpc::sequencer::NoteOnEvent::VARIATION_TYPE readVariationType(const std::vector<char>&);
     
     static void writeVelocity(std::vector<char>& event, int);
     static void writeTrackNumber(std::vector<char>& event, int);
@@ -44,8 +42,8 @@ private:
     friend class mpc::file::all::AllEvent;
     
 public:
-    static std::shared_ptr<mpc::sequencer::NoteEvent> bytesToMpcEvent(const std::vector<char>&);
-    static std::vector<char> mpcEventToBytes(std::shared_ptr<mpc::sequencer::NoteEvent>);
+    static std::shared_ptr<mpc::sequencer::NoteOnEvent> bytesToMpcEvent(const std::vector<char>&);
+    static std::vector<char> mpcEventToBytes(std::shared_ptr<mpc::sequencer::NoteOnEvent>);
 
 };
 }

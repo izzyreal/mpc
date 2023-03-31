@@ -73,7 +73,7 @@ void EventRow::setBus(const int newBus)
 
 void EventRow::init()
 {
-	if (std::dynamic_pointer_cast<NoteEvent>(event.lock()))
+	if (std::dynamic_pointer_cast<NoteOnEvent>(event.lock()))
 	{
 		if (bus == 0)
 		{
@@ -373,7 +373,7 @@ void EventRow::setDrumNoteEventValues()
 	if (!event.lock())
 		return;
 
-	auto ne = std::dynamic_pointer_cast<NoteEvent>(event.lock());
+	auto ne = std::dynamic_pointer_cast<NoteOnEvent>(event.lock());
 	
 	for (int i = 0; i < 5; i++)
 	{
@@ -457,7 +457,7 @@ void EventRow::setDrumNoteEventValues()
 		}
 	}
 
-	fields[3]->setText(StrUtil::padLeft(std::to_string(ne->getDuration()), " ", 4));
+	fields[3]->setText(StrUtil::padLeft(std::to_string(ne->getDuration().value_or(1)), " ", 4));
 	fields[4]->setText(StrUtil::padLeft(std::to_string(ne->getVelocity()), " ", 3));
 	
 	horizontalBar->setValue(ne->getVelocity());
@@ -469,7 +469,7 @@ void EventRow::setMidiNoteEventValues()
 	if (!event.lock())
 		return;
 
-	auto ne = std::dynamic_pointer_cast<NoteEvent>(event.lock());
+	auto ne = std::dynamic_pointer_cast<NoteOnEvent>(event.lock());
 	
 	for (int i = 0; i < 3; i++)
 	{
@@ -478,7 +478,7 @@ void EventRow::setMidiNoteEventValues()
 	}
 	
 	fields[0]->setText(StrUtil::padLeft(std::to_string(ne->getNote()), " ", 3) + "(" + mpc::Util::noteNames()[ne->getNote()] + ")");
-	fields[1]->setText(StrUtil::padLeft(std::to_string(ne->getDuration()), " ", 4));
+	fields[1]->setText(StrUtil::padLeft(std::to_string(ne->getDuration().value()), " ", 4));
 	fields[2]->setText(std::to_string(ne->getVelocity()));
 	
 	horizontalBar->setValue(ne->getVelocity());

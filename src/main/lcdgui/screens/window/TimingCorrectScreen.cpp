@@ -69,7 +69,7 @@ void TimingCorrectScreen::function(int i)
 
         for (auto& e: eventRange)
         {
-            if (auto noteEvent = std::dynamic_pointer_cast<NoteEvent>(e))
+            if (auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(e))
             {
                 if (noteEvent->getNote() >= noteRange[0] && noteEvent->getNote() <= noteRange[1])
                 {

@@ -708,7 +708,7 @@ void EventsScreen::performCopy(int sourceStart, int sourceEnd, int toSequenceInd
 
     for (auto& e : sourceTrackEvents)
     {
-        auto ne = std::dynamic_pointer_cast<NoteEvent>(e);
+        auto ne = std::dynamic_pointer_cast<NoteOnEvent>(e);
 
         if (ne)
         {

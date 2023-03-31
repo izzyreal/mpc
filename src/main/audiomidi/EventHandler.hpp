@@ -3,6 +3,7 @@
 #include <sequencer/Sequencer.hpp>
 #include <sampler/Sampler.hpp>
 #include <sequencer/Event.hpp>
+#include <sequencer/NoteEvent.hpp>
 
 #include <memory>
 #include <map>
@@ -17,7 +18,7 @@ namespace mpc::audiomidi {
 		mpc::Mpc& mpc;
 		std::shared_ptr<mpc::sequencer::Sequencer> sequencer;
 		std::shared_ptr<mpc::sampler::Sampler> sampler;
-		std::map<std::pair<int, int>, int> transposeCache;
+		std::map<std::shared_ptr<mpc::sequencer::NoteOffEvent>, int> transposeCache;
 
 	public:
 		void handle(

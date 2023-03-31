@@ -1,8 +1,13 @@
 #include <sequencer/MidiClockEvent.hpp>
+#include <assert.h>
 
 using namespace mpc::sequencer;
 
 MidiClockEvent::MidiClockEvent(int statusToUse) : status(statusToUse)
+{
+}
+
+mpc::sequencer::MidiClockEvent::MidiClockEvent(std::shared_ptr<mpc::engine::midi::ShortMessage> msg) : MidiClockEvent(msg->getStatus())
 {
 }
 

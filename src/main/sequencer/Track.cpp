@@ -80,7 +80,7 @@ void Track::move(int tick, int oldTick)
 	}
 }
 
-std::shared_ptr<NoteEvent> Track::getNoteEvent(int tick, int note) {
+std::shared_ptr<NoteOnEvent> Track::getNoteEvent(int tick, int note) {
 	auto ev = getNoteEventsAtTick(tick);
 	for (auto& e : ev)
     {
@@ -100,29 +100,13 @@ int Track::getIndex()
     return trackIndex;
 }
 
-// This is called from the UI thread. Results in incorrect tickpos.
-// We should only queue the fact that a note of n wants to be recorded.
-// Then we let getNextTick, from the audio thread, set the tickpos.
-std::shared_ptr<NoteEvent> Track::recordNoteOnNow(unsigned char note)
-{
-	auto n = std::make_shared<NoteEvent>(note);
-    n->setTick(-2);
-	queuedNoteOnEvents.enqueue(n);
-	return n;
-}
 
 void Track::flushNoteCache()
 {
-    std::shared_ptr<NoteEvent> e;
-	while (queuedNoteOnEvents.try_dequeue(e)) {}
-    while (queuedNoteOffEvents.try_dequeue(e)) {}
-}
-
-void Track::recordNoteOffNow(unsigned char note)
-{
-    auto event = std::make_shared<NoteEvent>(note);
-    event->setTick(-2);
-    queuedNoteOffEvents.enqueue(event);
+    std::shared_ptr<NoteOnEvent> e1;
+	std::shared_ptr<NoteOffEvent> e2;
+	while (queuedNoteOnEvents.try_dequeue(e1)) {}
+    while (queuedNoteOffEvents.try_dequeue(e2)) {}
 }
 
 void Track::setUsed(bool b)
@@ -157,168 +141,106 @@ void Track::removeEvent(const std::shared_ptr<Event>& event)
 	notifyObservers(std::string("step-editor"));
 }
 
-bool Track::adjustDurLastEvent(int newDur)
+// This is called from the UI thread. Results in incorrect tickpos.
+// We should only queue the fact that a note of n wants to be recorded.
+// Then we let getNextTick, from the audio thread, set the tickpos.
+std::shared_ptr<NoteOnEvent> Track::recordNoteEventASync(unsigned char note, unsigned char velocity)
 {
-	auto lLastAdded = lastAdded.lock();
-
-	if (!lLastAdded)
-		return false;
-
-	lLastAdded->setDuration(newDur);
-	lastAdded.reset();
-
-	notifyObservers(std::string("adjust-duration"));
-	return true;
+    auto onEvent = std::make_shared<NoteOnEvent>(note, velocity);
+    if (!storeNoteEvent(note, onEvent)) return nullptr;
+    onEvent->setTrack(getIndex());
+    onEvent->setTick(-2);
+    queuedNoteOnEvents.enqueue(onEvent);
+    return onEvent;
 }
 
-std::shared_ptr<NoteEvent> Track::addNoteEvent(int tick, int note)
+void Track::finalizeNoteEventASync(unsigned char note)
 {
-	auto candidate = getNoteEvent(tick, note);
-
-	if (candidate)
-	{
-		candidate->setDuration(1);
-		lastAdded = candidate;
-		return candidate;
-	}
-
-	auto res = std::dynamic_pointer_cast<NoteEvent>(addEvent(tick, "note"));
-	res->setNote(note);
-
-	notifyObservers(std::string("step-editor"));
-
-	return res;
+    auto onEvent = retrieveNoteEvent(note);
+    if (!onEvent) return;
+    auto offEvent = onEvent->getNoteOff();
+    offEvent->setTick(-2);
+    queuedNoteOffEvents.enqueue(offEvent);
 }
 
-std::shared_ptr<Event> Track::addEvent(int tick, const std::string& type, bool allowMultipleNotesOnSameTick)
+
+std::shared_ptr<NoteOnEvent> Track::recordNoteEventSynced(int tick, int note, int velocity)
 {
-	std::shared_ptr<Event> res;
-
-	if (type == "note")
-	{
-		res = std::make_shared<NoteEvent>();
-		lastAdded = std::dynamic_pointer_cast<NoteEvent>(res);
-	}
-	else if (type == "tempo-change")
-	{
-		res = std::make_shared<TempoChangeEvent>(parent);
-	}
-	else if (type == "pitchbend")
-	{
-		res = std::make_shared<PitchBendEvent>();
-	}
-	else if (type == "controlchange")
-	{
-		res = std::make_shared<ControlChangeEvent>();
-	}
-	else if (type == "programchange")
-	{
-		res = std::make_shared<ProgramChangeEvent>();
-	}
-	else if (type == "channelpressure")
-	{
-		res = std::make_shared<ChannelPressureEvent>();
-	}
-	else if (type == "polypressure")
-	{
-		res = std::make_shared<PolyPressureEvent>();
-	}
-	else if (type == "systemexclusive")
-	{
-		res = std::make_shared<SystemExclusiveEvent>();
-	}
-	else if (type == "mixer")
-	{
-		res = std::make_shared<MixerEvent>();
-	}
-
-	if (events.empty())
-	{
-		setUsed(true);
-	}
-
-	res->setTick(tick);
-
-    insertEventWhileRetainingSort(res, allowMultipleNotesOnSameTick);
-
-	notifyObservers(std::string("step-editor"));
-	notifyObservers(std::string(type) + "added");
-
-	return res;
+    auto onEvent = getNoteEvent(tick, note);
+    if (!onEvent)
+    {
+        onEvent = std::make_shared<NoteOnEvent>(note, velocity);
+        if (!storeNoteEvent(note, onEvent)) return nullptr;
+        onEvent->setTrack(this->getIndex());
+        onEvent->setTick(tick);
+        insertEventWhileRetainingSort(onEvent);
+        notifyObservers(std::string("step-editor"));
+        return onEvent;
+    }
+    else
+    {
+        if (!storeNoteEvent(note, onEvent)) return nullptr;
+        onEvent->setVelocity(velocity);
+        onEvent->resetDuration();
+        return onEvent;
+    }
+}
+bool Track::finalizeNoteEventSynced(int note, int duration)
+{
+    if (auto onEvent = retrieveNoteEvent(note))
+    {
+        auto size = events.size();
+        onEvent->setDuration(duration);
+        notifyObservers(std::string("adjust-duration"));
+        return true;
+    }
+    return false;
 }
 
-void Track::cloneEventIntoTrack(std::shared_ptr<Event> &src, int tick, bool allowMultipleNotesOnSameTick)
+void mpc::sequencer::Track::addEvent(int tick, std::shared_ptr<Event> event, bool allowMultipleNotesOnSameTick)
 {
-    auto seq = sequencer->getActiveSequence().get();
+    if (events.empty())
+    {
+        setUsed(true);
+    }
+
+    event->setTick(tick);
+
+    insertEventWhileRetainingSort(event, allowMultipleNotesOnSameTick);
+
+    notifyObservers(std::string("step-editor"));
+}
+
+void Track::cloneEventIntoTrack(std::shared_ptr<Event>& src, int tick, bool allowMultipleNotesOnSameTick)
+{
+	auto seq = sequencer->getActiveSequence().get();
 
     std::shared_ptr<Event> res;
+	auto tce = std::dynamic_pointer_cast<TempoChangeEvent>(src);
+	auto mce = std::dynamic_pointer_cast<MidiClockEvent>(src);
+	auto ne = std::dynamic_pointer_cast<NoteOnEvent>(src);
+	auto me = std::dynamic_pointer_cast<MixerEvent>(src);
 
-    auto cpe = std::dynamic_pointer_cast<ChannelPressureEvent>(src);
-    auto cce = std::dynamic_pointer_cast<ControlChangeEvent>(src);
-    auto ppe = std::dynamic_pointer_cast<PolyPressureEvent>(src);
-    auto pce = std::dynamic_pointer_cast<ProgramChangeEvent>(src);
-    auto see = std::dynamic_pointer_cast<SystemExclusiveEvent>(src);
-    auto tce = std::dynamic_pointer_cast<TempoChangeEvent>(src);
-    auto mce = std::dynamic_pointer_cast<MidiClockEvent>(src);
-    auto ne = std::dynamic_pointer_cast<NoteEvent>(src);
-    auto me = std::dynamic_pointer_cast<MixerEvent>(src);
-    auto pbe = std::dynamic_pointer_cast<PitchBendEvent>(src);
-
-    if (ne)
-    {
-        res = std::make_shared<NoteEvent>();
-        ne->CopyValuesTo(res);
-    }
-    else if (tce)
-    {
-        res = std::make_shared<TempoChangeEvent>(seq);
-        tce->CopyValuesTo(res);
-    }
-    else if (mce)
-    {
-        res = std::make_shared<MidiClockEvent>(0);
-        mce->CopyValuesTo(res);
-    }
-    else if (me)
-    {
-        res = std::make_shared<MixerEvent>();
-        me->CopyValuesTo(res);
-    }
-    else if (pbe)
-    {
-        res = std::make_shared<PitchBendEvent>();
-        pbe->CopyValuesTo(res);
-    }
-    else if (cpe)
-    {
-        res = std::make_shared<ChannelPressureEvent>();
-        cpe->CopyValuesTo(res);
-    }
-    else if (cce)
-    {
-        res = std::make_shared<ControlChangeEvent>();
-        cce->CopyValuesTo(res);
-    }
-    else if (ppe)
-    {
-        res = std::make_shared<PolyPressureEvent>();
-        ppe->CopyValuesTo(res);
-    }
-    else if (pce)
-    {
-        res = std::make_shared<ProgramChangeEvent>();
-        pce->CopyValuesTo(res);
-    }
-    else if (see)
-    {
-        res = std::make_shared<SystemExclusiveEvent>();
-        see->CopyValuesTo(res);
-    }
-
-    if (!res)
-    {
-        return;
-    }
+	if (ne)
+	{
+		res = std::make_shared<NoteOnEvent>();
+		ne->CopyValuesTo(res);
+	}
+	else if (tce)
+	{
+		res = std::make_shared<TempoChangeEvent>(seq);
+		tce->CopyValuesTo(res);
+	}
+	else if (mce)
+	{
+		res = std::make_shared<MidiClockEvent>(0);
+		mce->CopyValuesTo(res);
+	}
+	else if (me)
+	{
+		res = std::make_shared<MixerEvent>();
+		me->CopyValuesTo(res);
+	}
 
     if (!used)
     {
@@ -477,6 +399,7 @@ int Track::getCorrectedTickPos()
     return correctedTickPos;
 }
 
+
 void Track::processRealtimeQueuedEvents()
 {
     auto noteOnCount = this->queuedNoteOnEvents.try_dequeue_bulk(bulkNoteOns.begin(), 20);
@@ -594,9 +517,9 @@ void Track::playNext()
 		if (punchScreen->autoPunch == 2 && pos >= punchScreen->time0 && pos < punchScreen->time1)
 			_delete = true;
 	}
-
+	//!!!!!!!!!!!!!!!!!!!
     auto event = eventIndex >= events.size() ? std::shared_ptr<Event>() : events[eventIndex];
-	auto note = std::dynamic_pointer_cast<NoteEvent>(event);
+	auto note = std::dynamic_pointer_cast<NoteOnEvent>(event);
 
 	if (note)
     {
@@ -622,7 +545,7 @@ void Track::playNext()
                 break;
               }
             }
-
+          
             if (!_delete && oneOrMorePadsArePressed && hardware->getTopPanel()->isSixteenLevelsEnabled())
             {
                 auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
@@ -694,6 +617,15 @@ bool Track::isUsed()
     return used || !events.empty();
 }
 
+bool mpc::sequencer::Track::tickIsFreeForNote(int note, int tick)
+{
+    for (auto& noteEvent : getNoteEventsAtTick(tick)) 
+    {
+        if (noteEvent->getNote() == note) return false;
+    }
+    return true;
+}
+
 std::vector<std::shared_ptr<Event>> Track::getEventRange(int startTick, int endTick)
 {
 	std::vector<std::shared_ptr<Event>> res;
@@ -738,23 +670,22 @@ void Track::correctTimeRange(int startPos, int endPos, int stepLength, int swing
 
 	for (auto& event : events)
 	{
-		if (auto ne = std::dynamic_pointer_cast<NoteEvent>(event))
+		auto ne = std::dynamic_pointer_cast<NoteOnEvent>(event);
+
+		if (ne)
 		{
 			if (event->getTick() >= endPos)
 				break;
 
 			if (event->getTick() >= startPos && event->getTick() < endPos)
-            {
-                if (ne->getNote() >= lowestNote && ne->getNote() <= highestNote)
-                timingCorrect(fromBar, toBar, ne, stepLength, swingPercentage);
-            }
+				timingCorrect(fromBar, toBar, ne, stepLength, swingPercentage);
 		}
 	}
 
 	removeDoubles();
 }
 
-void Track::timingCorrect(int fromBar, int toBar, std::shared_ptr<NoteEvent> noteEvent, int stepLength, int swingPercentage)
+void Track::timingCorrect(int fromBar, int toBar, const std::shared_ptr<NoteOnEvent>& noteEvent, int stepLength, int swingPercentage)
 {
     auto event = std::dynamic_pointer_cast<Event>(noteEvent);
     updateEventTick(event, timingCorrectTick(fromBar, toBar, noteEvent->getTick(), stepLength, swingPercentage));
@@ -762,69 +693,69 @@ void Track::timingCorrect(int fromBar, int toBar, std::shared_ptr<NoteEvent> not
 
 int Track::timingCorrectTick(int fromBar, int toBar, int tick, int stepLength, int swingPercentage)
 {
-	int accumBarLengths = 0;
-	int previousAccumBarLengths = 0;
-	auto barNumber = 0;
-	auto numberOfSteps = 0;
-	auto sequence = sequencer->getActiveSequence();
-	int segmentStart = 0;
-	int segmentEnd = 0;
+    int accumBarLengths = 0;
+    int previousAccumBarLengths = 0;
+    auto barNumber = 0;
+    auto numberOfSteps = 0;
+    auto sequence = sequencer->getActiveSequence();
+    int segmentStart = 0;
+    int segmentEnd = 0;
 
-	for (int i = 0; i < 999; i++)
-	{
-		if (i < fromBar)
-			segmentStart += sequence->getBarLengthsInTicks()[i];
+    for (int i = 0; i < 999; i++)
+    {
+        if (i < fromBar)
+            segmentStart += sequence->getBarLengthsInTicks()[i];
 
-		if (i <= toBar) {
-			segmentEnd += sequence->getBarLengthsInTicks()[i];
-		}
-		else {
-			break;
-		}
-	}
+        if (i <= toBar) {
+            segmentEnd += sequence->getBarLengthsInTicks()[i];
+        }
+        else {
+            break;
+        }
+    }
 
-	for (int i = 0; i < 999; i++)
-	{
-		accumBarLengths += sequence->getBarLengthsInTicks()[i];
+    for (int i = 0; i < 999; i++)
+    {
+        accumBarLengths += sequence->getBarLengthsInTicks()[i];
 
-		if (tick < accumBarLengths && tick >= previousAccumBarLengths)
-		{
-			barNumber = i;
-			break;
-		}
+        if (tick < accumBarLengths && tick >= previousAccumBarLengths)
+        {
+            barNumber = i;
+            break;
+        }
 
-		previousAccumBarLengths = accumBarLengths;
-	}
+        previousAccumBarLengths = accumBarLengths;
+    }
 
-	for (int i = 1; i < 1000; i++)
-	{
-		if (sequence->getBarLengthsInTicks()[barNumber] - (i * stepLength) < 0)
-		{
-			numberOfSteps = i - 1;
-			break;
-		}
-	}
+    for (int i = 1; i < 1000; i++)
+    {
+        if (sequence->getBarLengthsInTicks()[barNumber] - (i * stepLength) < 0)
+        {
+            numberOfSteps = i - 1;
+            break;
+        }
+    }
 
-	int currentBarStart = 0;
+    int currentBarStart = 0;
 
-	for (int i = 0; i < barNumber; i++)
-		currentBarStart += sequence->getBarLengthsInTicks()[i];
+    for (int i = 0; i < barNumber; i++)
+        currentBarStart += sequence->getBarLengthsInTicks()[i];
 
-	for (int i = 0; i <= numberOfSteps; i++)
-	{
-		int stepStart = ((i - 1) * stepLength) + (stepLength / 2);
-		int stepEnd = (i * stepLength) + (stepLength / 2);
+    for (int i = 0; i <= numberOfSteps; i++)
+    {
+        int stepStart = ((i - 1) * stepLength) + (stepLength / 2);
+        int stepEnd = (i * stepLength) + (stepLength / 2);
 
-		if (tick - currentBarStart >= stepStart && tick - currentBarStart <= stepEnd)
-		{
-			tick = (i * stepLength) + currentBarStart;
+        if (tick - currentBarStart >= stepStart && tick - currentBarStart <= stepEnd)
+        {
+            tick = (i * stepLength) + currentBarStart;
 
-			if (tick >= segmentEnd)
-				tick = segmentStart;
+            if (tick >= segmentEnd)
+                tick = segmentStart;
 
-			break;
-		}
-	}
+            break;
+        }
+    }
 
     if (swingPercentage > 50)
     {
@@ -832,7 +763,7 @@ int Track::timingCorrectTick(int fromBar, int toBar, int tick, int stepLength, i
         tick += swingOffset;
     }
 
-    return tick;
+	return tick;
 }
 
 void Track::removeDoubles()
@@ -844,7 +775,7 @@ void Track::removeDoubles()
 
 	for (auto& e : events)
 	{
-		auto ne = std::dynamic_pointer_cast<NoteEvent>(e);
+		auto ne = std::dynamic_pointer_cast<NoteOnEvent>(e);
 
 		if (ne)
 		{
@@ -930,13 +861,13 @@ void Track::updateEventTick(std::shared_ptr<Event>& e, int newTick)
     e->setTick(newTick);
 }
 
-std::vector<std::shared_ptr<NoteEvent>> Track::getNoteEvents()
+std::vector<std::shared_ptr<NoteOnEvent>> Track::getNoteEvents()
 {
-	std::vector<std::shared_ptr<NoteEvent>> noteEvents;
+	std::vector<std::shared_ptr<NoteOnEvent>> noteEvents;
 
 	for (auto& e : events)
 	{
-		auto ne = std::dynamic_pointer_cast<NoteEvent>(e);
+		auto ne = std::dynamic_pointer_cast<NoteOnEvent>(e);
 
 		if (ne)
 			noteEvents.push_back(ne);
@@ -945,9 +876,9 @@ std::vector<std::shared_ptr<NoteEvent>> Track::getNoteEvents()
 	return noteEvents;
 }
 
-std::vector<std::shared_ptr<NoteEvent>> Track::getNoteEventsAtTick(int tick)
+std::vector<std::shared_ptr<NoteOnEvent>> Track::getNoteEventsAtTick(int tick)
 {
-	std::vector<std::shared_ptr<NoteEvent>> noteEvents;
+	std::vector<std::shared_ptr<NoteOnEvent>> noteEvents;
 
 	for (auto& ne : getNoteEvents())
 	{
@@ -991,11 +922,14 @@ bool Track::insertEventWhileRetainingSort(const std::shared_ptr<Event>& event, b
 
     auto tick = event->getTick();
 
-    auto noteEvent = std::dynamic_pointer_cast<NoteEvent>(event);
+    auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(event);
 
-    if (noteEvent && !allowMultipleNotesOnSameTick) {
-        for (auto &e: getNoteEventsAtTick(tick)) {
-            if (e->getNote() == noteEvent->getNote()) {
+    if (noteEvent && !allowMultipleNotesOnSameTick) 
+    {
+        for (auto &e: getNoteEventsAtTick(tick)) 
+        {
+            if (e->getNote() == noteEvent->getNote()) 
+            {
                 e.swap(noteEvent);
                 return false;
             }

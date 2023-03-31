@@ -1,15 +1,17 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
+#include <sequencer/NoteEvent.hpp>
 
 namespace mpc::lcdgui::screens
 {
 	class StepEditorScreen;
 }
+using mpc::sequencer::NoteOnEvent;
 
-namespace mpc::lcdgui::screens::window {
+namespace mpc::lcdgui::screens::window 
+{
 
-	class EditMultipleScreen
-		: public mpc::lcdgui::ScreenComponent
+	class EditMultipleScreen : public mpc::lcdgui::ScreenComponent
 	{
 
 	public:
@@ -33,7 +35,7 @@ namespace mpc::lcdgui::screens::window {
 		std::vector<std::string> doubleLabels = { "Edit type:", "Value:" };
 
 		int changeNoteTo = 35;
-		int variationType = 0;
+		NoteOnEvent::VARIATION_TYPE variationType = NoteOnEvent::VARIATION_TYPE::TUNE_0;
 		int variationValue = 0;
 		int editValue = 0;
 
@@ -45,8 +47,9 @@ namespace mpc::lcdgui::screens::window {
 		void updateDouble();
 		void setEditType(int i);
 
-		void setVariationType(int i);
-		void seVariationValue(int i);
+		void setVariationType(NoteOnEvent::VARIATION_TYPE type);
+		void incrementVariationType(int i);
+		void setVariationValue(int i);
 		void setEditValue(int i);
 
 		friend class mpc::lcdgui::screens::StepEditorScreen;

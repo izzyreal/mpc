@@ -22,7 +22,6 @@ namespace mpc::controls { class GlobalReleaseControls; }
 namespace mpc::sequencer
 {
 	class Track;
-	class NoteEvent;
 }
 
 namespace mpc::sampler { class Program; }
@@ -91,6 +90,8 @@ namespace mpc::controls {
 
 		void pad(int padIndexWithBank, int velo);
 
+		std::string getCurrentScreenName() { return currentScreenName; }
+
 	protected:
 		std::string param;
 		mpc::Mpc& mpc;
@@ -103,7 +104,7 @@ namespace mpc::controls {
 		const static std::vector<std::string> allowTransportScreens;
 		const static std::vector<std::string> allowPlayScreens;
 		const static std::vector<std::string> allowCentralNoteAndPadUpdateScreens;
-		void generateNoteOn(int note, int velo);
+		void generateNoteOn(int note, int velo, int padIndexWithBank);
 
 		friend class mpc::lcdgui::ScreenComponent;
 		friend class mpc::controls::GlobalReleaseControls;

@@ -41,6 +41,34 @@ int ShortMessage::getData2() {
     return 0;
 }
 
+bool mpc::engine::midi::ShortMessage::isNoteOn()
+{
+    return getCommand() == NOTE_ON;
+}
+
+bool mpc::engine::midi::ShortMessage::isNoteOff()
+{
+    return getCommand() == NOTE_OFF;
+}
+
+bool mpc::engine::midi::ShortMessage::isMidiClock()
+{
+    const auto s = getStatus();
+    return s == ShortMessage::TIMING_CLOCK || s == ShortMessage::START || s == ShortMessage::STOP || s == ShortMessage::CONTINUE;
+}
+
+bool mpc::engine::midi::ShortMessage::isControlChange()
+{
+    const auto s = getStatus();
+    return s >= ShortMessage::CONTROL_CHANGE && s < ShortMessage::CONTROL_CHANGE + 16;
+}
+
+bool mpc::engine::midi::ShortMessage::isChannelPressure()
+{
+    const auto s = getStatus();
+    return s >= ShortMessage::CHANNEL_PRESSURE && s < ShortMessage::CHANNEL_PRESSURE + 16;
+}
+
 int ShortMessage::getDataLength(int status) {
     // system common and system real-time messages
     switch (status) {

@@ -27,7 +27,7 @@ TEST_CASE("COPY1", "[events-screen]")
 
     for (int i = 0; i < 8; i++)
     {
-        auto noteEvent = std::make_shared<NoteEvent>(35 + i);
+        auto noteEvent = std::make_shared<NoteOnEvent>(35 + i);
         noteEvent->setVelocity(127);
         noteEvent->setDuration(42);
         noteEvent->setTick(tickPos);
@@ -55,7 +55,7 @@ TEST_CASE("COPY1", "[events-screen]")
 
     for (int i = 0; i < 16; i++)
     {
-        auto noteEvent = std::dynamic_pointer_cast<NoteEvent>(tr->getEvent(i));
+        auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(tr->getEvent(i));
         REQUIRE(noteEvent->getTick() == tickPos);
         REQUIRE(noteEvent->getNote() == 35 + (i % 8));
         tickPos += 24;
@@ -80,7 +80,7 @@ TEST_CASE("COPY2", "[events-screen]")
 
     for (int i = 0; i < 8; i++)
     {
-        auto noteEvent = std::make_shared<NoteEvent>(35 + i);
+        auto noteEvent = std::make_shared<NoteOnEvent>(35 + i);
         noteEvent->setVelocity(127);
         noteEvent->setDuration(42);
         noteEvent->setTick(tickPos);
@@ -108,7 +108,7 @@ TEST_CASE("COPY2", "[events-screen]")
 
     for (int i = 0; i < 16; i++)
     {
-        auto noteEvent = std::dynamic_pointer_cast<NoteEvent>(tr->getEvent(i));
+        auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(tr->getEvent(i));
         REQUIRE(noteEvent->getTick() == tickPos);
         REQUIRE(noteEvent->getNote() == 35 + (i % 8));
         tickPos += 24;
@@ -137,7 +137,7 @@ TEST_CASE("COPY3", "[events-screen]")
 
     for (int i = 0; i < 8; i++)
     {
-        auto noteEvent = std::make_shared<NoteEvent>(35 + i);
+        auto noteEvent = std::make_shared<NoteOnEvent>(35 + i);
         noteEvent->setVelocity(127);
         noteEvent->setDuration(42);
         noteEvent->setTick(tickPos);
@@ -167,7 +167,7 @@ TEST_CASE("COPY3", "[events-screen]")
 
     for (int i = 0; i < 15; i++)
     {
-        auto noteEvent = std::dynamic_pointer_cast<NoteEvent>(tr->getEvent(i));
+        auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(tr->getEvent(i));
         REQUIRE(noteEvent->getTick() == tickPos);
         REQUIRE(noteEvent->getNote() == 35 + (i % 8));
         tickPos += 24;
@@ -234,7 +234,7 @@ TEST_CASE("COPY5", "[events-screen]")
 
     for (int i = 0; i < 16; i++)
     {
-        auto noteEvent = std::make_shared<NoteEvent>(35 + i);
+        auto noteEvent = std::make_shared<NoteOnEvent>(35 + i);
         noteEvent->setVelocity(127);
         noteEvent->setDuration(42);
         noteEvent->setTick(tickPos);
@@ -262,7 +262,7 @@ TEST_CASE("COPY5", "[events-screen]")
 
     for (int i = 0; i < 16; i++)
     {
-        auto noteEvent = std::dynamic_pointer_cast<NoteEvent>(tr->getEvent(i));
+        auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(tr->getEvent(i));
         REQUIRE(noteEvent->getTick() == tickPos);
         REQUIRE(noteEvent->getNote() == 35 + (i % 8));
         tickPos += 24;
@@ -288,7 +288,7 @@ TEST_CASE("COPY6", "[events-screen]")
 
     for (int i = 0; i < 16; i++)
     {
-        auto noteEvent = std::make_shared<NoteEvent>(35 + i);
+        auto noteEvent = std::make_shared<NoteOnEvent>(35 + i);
         noteEvent->setVelocity(127);
         noteEvent->setDuration(42);
         noteEvent->setTick(tickPos);
@@ -316,7 +316,7 @@ TEST_CASE("COPY6", "[events-screen]")
 
     for (int i = 0; i < 8; i++)
     {
-        auto noteEvent = std::dynamic_pointer_cast<NoteEvent>(tr->getEvent(i));
+        auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(tr->getEvent(i));
         REQUIRE(noteEvent->getTick() == tickPos);
         REQUIRE(noteEvent->getNote() == 35 + i);
         tickPos += 24;
@@ -326,8 +326,8 @@ TEST_CASE("COPY6", "[events-screen]")
 
     for (int i = 8; i < 16; i++)
     {
-        auto e1 = std::dynamic_pointer_cast<NoteEvent>(tr->getEvent(eventIndex++));
-        auto e2 = std::dynamic_pointer_cast<NoteEvent>(tr->getEvent(eventIndex++));
+        auto e1 = std::dynamic_pointer_cast<NoteOnEvent>(tr->getEvent(eventIndex++));
+        auto e2 = std::dynamic_pointer_cast<NoteOnEvent>(tr->getEvent(eventIndex++));
         REQUIRE(e1->getTick() == tickPos);
         REQUIRE(e1->getNote() == 35 + i);
         REQUIRE(e2->getTick() == tickPos);

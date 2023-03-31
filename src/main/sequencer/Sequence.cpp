@@ -257,8 +257,9 @@ std::vector<std::shared_ptr<TempoChangeEvent>> Sequence::getTempoChangeEvents()
 
 std::shared_ptr<TempoChangeEvent> Sequence::addTempoChangeEvent(int tick)
 {
-	auto res = tempoChangeTrack->addEvent(tick, "tempo-change");
-    return std::dynamic_pointer_cast<TempoChangeEvent>(res);
+    auto res = std::make_shared<TempoChangeEvent>(this);
+	tempoChangeTrack->addEvent(tick, res);
+    return res;
 }
 
 double Sequence::getInitialTempo()

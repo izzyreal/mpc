@@ -95,20 +95,28 @@ void GlobalReleaseControls::simplePad(int padIndexWithBank)
 
 	auto controls = mpc.getControls();
 
-  if (sequencer->isRecordingOrOverdubbing() && mpc.getControls()->isErasePressed())
-  {
-    return;
-  }
+	auto on_event = controls->retrieveNoteEvent(padIndexWithBank);
+	if (!on_event) return;
+	handlePlayNoteOff(on_event);
+
+	if (sequencer->isRecordingOrOverdubbing() && mpc.getControls()->isErasePressed())
+	{
+		return;
+	}
 
     auto note = program ? program->getPad(padIndexWithBank)->getNote() : padIndexWithBank + 35;
 
-	generateNoteOff(note);
-	bool posIsLastTick = sequencer->getTickPosition() == sequencer->getActiveSequence()->getLastTick();
+	if (sequencer->isRecordingOrOverdubbing())
+	{
+		track->finalizeNoteEventASync(note);
+	}
 
-	bool maybeRecWithoutPlaying = currentScreenName == "sequencer" && !posIsLastTick;
-	bool stepRec = currentScreenName == "step-editor" && !posIsLastTick;
+	//bool posIsLastTick = sequencer->getTickPosition() == sequencer->getActiveSequence()->getLastTick();
 
-	if (stepRec || maybeRecWithoutPlaying)
+	bool recWithoutPlaying = mpc.getControls()->isRecMainWithoutPlaying();
+	bool stepRec = mpc.getControls()->isStepRecording();
+
+	if (mpc.getControls()->isStepRecording()|| mpc.getControls()->isRecMainWithoutPlaying())
 	{
 		auto newDuration = static_cast<int>(mpc.getAudioMidiServices()->getFrameSequencer()->getTickPosition());
 
@@ -132,9 +140,10 @@ void GlobalReleaseControls::simplePad(int padIndexWithBank)
         }
 
 		sequencer->stopMetronomeTrack();
-		bool durationHasBeenAdjusted = track->adjustDurLastEvent(newDuration);
+		//!!!!!!!!
+		bool durationHasBeenAdjusted = track->finalizeNoteEventSynced(on_event->getNote(), newDuration);
 
-		if ( (durationHasBeenAdjusted && maybeRecWithoutPlaying) || (stepRec && increment))
+		if ((durationHasBeenAdjusted && recWithoutPlaying) || (stepRec && increment))
 		{
 			int nextPos = sequencer->getTickPosition() + stepLength;
 			auto bar = sequencer->getCurrentBarIndex() + 1;
@@ -153,34 +162,53 @@ void GlobalReleaseControls::simplePad(int padIndexWithBank)
 	}
 }
 
-void GlobalReleaseControls::generateNoteOff(int note)
+//void GlobalReleaseControls::generateNoteOff(int note)
+//{
+//    init();
+//
+//	auto assign16LevelsScreen = mpc.screens->get<Assign16LevelsScreen>("assign-16-levels");
+//
+//	if (mpc.getHardware()->getTopPanel()->isSixteenLevelsEnabled())
+//		note = assign16LevelsScreen->getNote();
+//
+//	if (sequencer->isRecordingOrOverdubbing())
+//	{
+//        track->recordNoteOffNow(note);
+//	}
+//
+//    auto noteEvent = std::make_shared<mpc::sequencer::NoteEvent>(note);
+//    noteEvent->setVelocity(0);
+//    noteEvent->setDuration(0);
+//    noteEvent->setTick(-1);
+//
+//    char drum = -1;
+//    auto drumScreen = mpc.screens->get<DrumScreen>("drum");
+//
+//    if (collectionContainsCurrentScreen(samplerScreens))
+//    {
+//        drum = drumScreen->drum;
+//    }
+//
+//    mpc.getEventHandler()->handle(noteEvent, track.get(), drum);
+//}
+
+void mpc::controls::GlobalReleaseControls::handlePlayNoteOff(std::shared_ptr<mpc::sequencer::NoteOnEventPlayOnly> onEvent)
 {
-    init();
+	init();
+	std::shared_ptr<mpc::sequencer::NoteOffEvent> off_event = onEvent->getNoteOff();
+	//	if (mpc.getHardware()->getTopPanel()->isSixteenLevelsEnabled())
+//		note = assign16LevelsScreen->getNote();
+	off_event->setTick(-1);
 
-	auto assign16LevelsScreen = mpc.screens->get<Assign16LevelsScreen>("assign-16-levels");
+	char drum = -1;
+	auto drumScreen = mpc.screens->get<DrumScreen>("drum");
 
-	if (mpc.getHardware()->getTopPanel()->isSixteenLevelsEnabled())
-		note = assign16LevelsScreen->getNote();
-
-	if (sequencer->isRecordingOrOverdubbing())
+	if (collectionContainsCurrentScreen(samplerScreens))
 	{
-        track->recordNoteOffNow(note);
+		drum = drumScreen->getDrum();
 	}
 
-    auto noteEvent = std::make_shared<mpc::sequencer::NoteEvent>(note);
-    noteEvent->setVelocity(0);
-    noteEvent->setDuration(0);
-    noteEvent->setTick(-1);
-
-    char drum = -1;
-    auto drumScreen = mpc.screens->get<DrumScreen>("drum");
-
-    if (collectionContainsCurrentScreen(samplerScreens))
-    {
-        drum = drumScreen->getDrum();
-    }
-
-    mpc.getEventHandler()->handle(noteEvent, track.get(), drum);
+	mpc.getEventHandler()->handle(off_event, track.get(), drum);
 }
 
 void GlobalReleaseControls::overDub()

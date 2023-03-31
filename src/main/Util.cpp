@@ -259,19 +259,20 @@ void Util::initSequence(int sequenceIndex, mpc::Mpc& mpc)
     sequencer->setActiveSequenceIndex(sequencer->getActiveSequenceIndex());
 }
 
-void Util::set16LevelsValues(mpc::Mpc& mpc, const std::shared_ptr<NoteEvent>& event, const int padIndex)
+
+void Util::set16LevelsValues(mpc::Mpc& mpc, const std::shared_ptr<NoteOnEvent>& event, const int padIndex)
 {
     if (mpc.getHardware()->getTopPanel()->isSixteenLevelsEnabled())
     {
         auto assign16LevelsScreen = mpc.screens->get<Assign16LevelsScreen>("assign-16-levels");
         
-        auto _16l_type = assign16LevelsScreen->getType();
+        auto _16l_type = NoteOnEvent::VARIATION_TYPE(assign16LevelsScreen->getType());
         auto _16l_key = assign16LevelsScreen->getOriginalKeyPad();
         auto _16l_note = assign16LevelsScreen->getNote();
         auto _16l_param = assign16LevelsScreen->getParameter();
         
         event->setNote(_16l_note);
-        event->setVariationTypeNumber(_16l_type);
+        event->setVariationType(_16l_type);
         
         if (_16l_param == 0 && event->getVelocity() != 0)
         {
@@ -300,25 +301,25 @@ void Util::set16LevelsValues(mpc::Mpc& mpc, const std::shared_ptr<NoteEvent>& ev
     }
 }
 
-void Util::setSliderNoteVariationParameters(mpc::Mpc& mpc, const std::weak_ptr<NoteEvent>& _n, const std::weak_ptr<mpc::sampler::Program>& program)
+void Util::setSliderNoteVariationParameters(mpc::Mpc& mpc, const std::weak_ptr<NoteOnEvent>& _n, const std::weak_ptr<mpc::sampler::Program>& program)
 {
     auto pgm = program.lock();
     auto n = _n.lock();
-    
+
     if (n->getNote() != pgm->getSlider()->getNote())
         return;
-    
-    auto sliderParam = pgm->getSlider()->getParameter();
-    n->setVariationTypeNumber(sliderParam);
+
+    auto sliderParam = NoteOnEvent::VARIATION_TYPE(pgm->getSlider()->getParameter());
+    n->setVariationType(sliderParam);
     int sliderValue = mpc.getHardware()->getSlider()->getValue();
-    
+
     switch (sliderParam)
     {
         case 0:
         {
             auto rangeLow = pgm->getSlider()->getTuneLowRange();
             auto rangeHigh = pgm->getSlider()->getTuneHighRange();
-            
+
             auto sliderRange = rangeHigh - rangeLow;
             auto sliderRangeRatio = sliderRange / 128.0;
             auto tuneValue = (int)(sliderValue * sliderRangeRatio * 0.5);

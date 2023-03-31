@@ -13,16 +13,14 @@ namespace mpc::sequencer
 		void setTick(int relativeTick);
 		int getTick();
 		int getTrack();
-		void setTrack(int i);
+		virtual void setTrack(int i);
 
 		virtual void CopyValuesTo(std::weak_ptr<Event> dest);
         virtual std::string getTypeName() = 0;
 
     protected:
         int tick = 0;
-
-    private:
-        int track = 0;
-
+		int track = 0;
+    
     };
 }

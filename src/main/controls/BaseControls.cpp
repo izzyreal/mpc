@@ -212,8 +212,8 @@ void BaseControls::pad(int padIndexWithBank, int velo)
     
     if (controls->isNoteRepeatLocked())
         return;
-
-    auto note = program ? program->getPad(padIndexWithBank)->getNote() : padIndexWithBank + 35;
+    
+    auto note = track->getBus() > 0 ? program->getPad(padIndexWithBank)->getNote() : padIndexWithBank + 35;
     auto velocity = velo;
 
     if (!mpc.getHardware()->getTopPanel()->isSixteenLevelsEnabled())
@@ -261,113 +261,61 @@ void BaseControls::pad(int padIndexWithBank, int velo)
             channelSettingsScreen->setNote(note);
         }
     }
-    
-    generateNoteOn(note, velocity);
+    generateNoteOn(note, velocity, padIndexWithBank);
 }
 
-void BaseControls::generateNoteOn(int note, int padVelo)
+void BaseControls::generateNoteOn(int note, int padVelo, int padIndexWithBank)
 {
     init();
-    
-    auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
+    //----------
+    auto play_event = std::make_shared<NoteOnEventPlayOnly>(note, padVelo);
+    if (!mpc.getControls()->storeNoteEvent(padIndexWithBank, play_event)) return ;
 
+    auto padIndex = program != nullptr ? program->getPadIndexFromNote(note) : -1;
     bool isSliderNote = program && program->getSlider()->getNote() == note;
-    
-    bool posIsLastTick = sequencer->getTickPosition() == sequencer->getActiveSequence()->getLastTick();
-    
-    bool step = currentScreenName == "step-editor" && !posIsLastTick;
-    
-    auto tc_note = timingCorrectScreen->getNoteValue();
-
-    bool recMainWithoutPlaying = currentScreenName == "sequencer" &&
-    !sequencer->isPlaying() &&
-    mpc.getControls()->isRecPressed() &&
-    tc_note != 0 &&
-    !posIsLastTick;
-
-    auto padIndex = program != nullptr ? program->getPadIndexFromNote(note) : - 1;
-
-    if (sequencer->isRecordingOrOverdubbing() || step || recMainWithoutPlaying)
-    {
-        std::shared_ptr<NoteEvent> recordedEvent;
-        
-        if (step)
-        {
-            if (track->getBus() == 0 || note >= 35)
-            {
-                recordedEvent = track->addNoteEvent(sequencer->getTickPosition(), note);
-            }
-        }
-        else if (recMainWithoutPlaying)
-        {
-            recordedEvent = track->addNoteEvent(sequencer->getTickPosition(), note);
-            auto stepLength = timingCorrectScreen->getNoteValueLengthInTicks();
-            
-            if (stepLength != 1)
-            {
-                int bar = sequencer->getCurrentBarIndex() + 1;
-                track->timingCorrect(0, bar, recordedEvent, stepLength, timingCorrectScreen->getSwing());
-                
-                std::vector<std::shared_ptr<Event>> events{ recordedEvent };
-                std::vector<int> noteRange {0, 127};
-
-                if (recordedEvent->getTick() != sequencer->getTickPosition())
-                    sequencer->move(recordedEvent->getTick());
-            }
-        }
-        else
-        {
-            recordedEvent = track->recordNoteOnNow(note);
-        }
-        
-        if (recordedEvent)
-        {
-            recordedEvent->setVelocity(padVelo);
-            recordedEvent->setDuration(step ? 1 : -1);
-
-            if (program)
-            {
-                Util::set16LevelsValues(mpc, recordedEvent, padIndex);
-
-                if (isSliderNote)
-                {
-                    Util::setSliderNoteVariationParameters(mpc, recordedEvent, program);
-                }
-            }
-
-            if (step || recMainWithoutPlaying)
-            {
-                sequencer->playMetronomeTrack();
-            }
-        }
-    }
-    
-    auto playableEvent = std::make_shared<NoteEvent>(note);
-
-    playableEvent->setVelocity(padVelo);
 
     if (program)
     {
-        Util::set16LevelsValues(mpc, playableEvent, padIndex);
+        Util::set16LevelsValues(mpc, play_event, padIndex);
 
         if (isSliderNote)
         {
-            Util::setSliderNoteVariationParameters(mpc, playableEvent, program);
+            Util::setSliderNoteVariationParameters(mpc, play_event, program);
         }
     }
 
-    playableEvent->setDuration(0);
-    playableEvent->setTick(-1);
-
-    char drum = -1;
     auto drumScreen = mpc.screens->get<DrumScreen>("drum");
+    char drum = collectionContainsCurrentScreen(samplerScreens) ? drumScreen->getDrum() : -1;
 
-    if (collectionContainsCurrentScreen(samplerScreens))
+    mpc.getEventHandler()->handle(play_event, track.get(), drum);
+
+    //---------------------
+    std::shared_ptr<NoteOnEvent> recordNoteOnEvent;
+    if (sequencer->isRecordingOrOverdubbing())
     {
-        drum = drumScreen->getDrum();
+        recordNoteOnEvent = track->recordNoteEventASync(note, padVelo);
     }
+    else if (mpc.getControls()->isStepRecording() && (track->getBus() == 0 || isDrumNote(note)))
+    {
+        recordNoteOnEvent = track->recordNoteEventSynced(sequencer->getTickPosition(), note, padVelo);
+        sequencer->playMetronomeTrack();
+    }
+    else if (mpc.getControls()->isRecMainWithoutPlaying())
+    {
+        recordNoteOnEvent = track->recordNoteEventSynced(sequencer->getTickPosition(), note, padVelo);
+        auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
+        int stepLength = timingCorrectScreen->getNoteValueLengthInTicks();
 
-    mpc.getEventHandler()->handle(playableEvent, track.get(), drum);
+        if (stepLength != 1)
+        {
+            int bar = sequencer->getCurrentBarIndex() + 1;
+            track->timingCorrect(0, bar, recordNoteOnEvent, stepLength, timingCorrectScreen->getSwing());
+
+            if (recordNoteOnEvent->getTick() != sequencer->getTickPosition())
+                sequencer->move(recordNoteOnEvent->getTick());
+        }
+        sequencer->playMetronomeTrack();
+    }
 }
 
 bool BaseControls::isTypable()
@@ -384,7 +332,7 @@ bool BaseControls::isTypable()
 void BaseControls::numpad(int i)
 {
     init();
-
+    
     auto controls = mpc.getControls();
     
     if (!controls->isShiftPressed())
@@ -987,7 +935,6 @@ const std::vector<std::string> BaseControls::allowTransportScreens {
 
 const std::vector<std::string> BaseControls::samplerScreens {
     "create-new-program",
-    "load-a-program",
     "assignment-view",
     "auto-chromatic-assignment",
     "copy-note-parameters",
@@ -1011,9 +958,6 @@ const std::vector<std::string> BaseControls::samplerScreens {
     "program-assign",
     "program-params",
     "select-drum",
-    "select-mixer-drum",
     "trim",
-    "zone",
-    "channel-settings",
-    "mixer-setup"
+    "zone"
 };

@@ -484,11 +484,11 @@ void MixerScreen::turnWheel(int i)
 
 void MixerScreen::recordMixerEvent(int pad, int param, int value)
 {
-    auto track = sequencer->getActiveTrack();
-    auto e = std::dynamic_pointer_cast<MixerEvent>(track->addEvent(sequencer->getTickPosition(), "mixer"));
-    e->setPadNumber(pad);
-    e->setParameter(param);
-    e->setValue(value);
+    auto event = std::make_shared<MixerEvent>();
+    sequencer->getActiveTrack()->addEvent(sequencer->getTickPosition(), event);
+    event->setPadNumber(pad);
+    event->setParameter(param);
+    event->setValue(value);
 }
 
 void MixerScreen::displayStereoFaders()

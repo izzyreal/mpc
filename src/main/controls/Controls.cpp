@@ -10,10 +10,14 @@
 
 #include <controls/GlobalReleaseControls.hpp>
 
+#include <lcdgui/screens/window/TimingCorrectScreen.hpp>
+
 using namespace mpc::controls;
 
-Controls::Controls(mpc::Mpc& _mpc)
-	: controls (std::make_shared<BaseControls>(_mpc)),
+Controls::Controls(mpc::Mpc& _mpc) : 
+	mpc(_mpc),
+	sequencer(_mpc.getSequencer()),
+	baseControls (std::make_shared<BaseControls>(_mpc)),
 	releaseControls (std::make_shared<GlobalReleaseControls>(_mpc)),
 	keyEventHandler (std::make_shared<KeyEventHandler>(_mpc)),
 	kbMapping (std::make_shared<KbMapping>())
@@ -100,6 +104,29 @@ bool Controls::isF6Pressed()
 	return f6Pressed;
 }
 
+bool mpc::controls::Controls::isStepRecording()
+{
+	bool posIsLastTick = sequencer->getTickPosition() == sequencer->getActiveSequence()->getLastTick();
+	auto currentScreenName = getBaseControls()->getCurrentScreenName();
+	bool step = currentScreenName == "step-editor" && !posIsLastTick;
+	return step;
+}
+
+bool mpc::controls::Controls::isRecMainWithoutPlaying()
+{
+	//auto timingCorrectScreen = mpc.screens->get<mpc::lcdgui::screens::window::TimingCorrectScreen>("timing-correct")->getNoteValue();
+
+	auto tc_note = mpc.screens->get<mpc::lcdgui::screens::window::TimingCorrectScreen>("timing-correct")->getNoteValue();
+	bool posIsLastTick = sequencer->getTickPosition() == sequencer->getActiveSequence()->getLastTick();
+	auto currentScreenName = getBaseControls()->getCurrentScreenName();
+	bool recMainWithoutPlaying = currentScreenName == "sequencer" &&
+		!sequencer->isPlaying() &&
+		isRecPressed() &&
+		tc_note != 0 &&
+		!posIsLastTick;
+	return recMainWithoutPlaying;
+}
+
 void Controls::setErasePressed(bool b)
 {
 	erasePressed = b;
@@ -155,9 +182,9 @@ void Controls::setF6Pressed(bool b)
 	f6Pressed = b;
 }
 
-std::shared_ptr<BaseControls> Controls::getControls()
+std::shared_ptr<BaseControls> Controls::getBaseControls()
 {
-	return controls;
+	return baseControls;
 }
 
 std::shared_ptr<GlobalReleaseControls> Controls::getReleaseControls()
@@ -169,6 +196,7 @@ std::weak_ptr<KbMapping> Controls::getKbMapping()
 {
     return kbMapping;
 }
+
 
 void Controls::setPlayPressed(bool b)
 {
