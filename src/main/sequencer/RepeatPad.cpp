@@ -6,7 +6,6 @@
 #include "hardware/HwPad.hpp"
 #include "hardware/TopPanel.hpp"
 #include "sequencer/Track.hpp"
-#include "sequencer/MidiAdapter.hpp"
 #include "sequencer/SeqUtil.hpp"
 #include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 

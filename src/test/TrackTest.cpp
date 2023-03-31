@@ -16,13 +16,13 @@ TEST_CASE("timing-correct", "[track]")
     seq->init(0);
     auto tr = seq->getTrack(0);
 
-    auto n0 = std::dynamic_pointer_cast<NoteEvent>(tr->addEvent(12, "note"));
+    auto n0 = std::dynamic_pointer_cast<NoteOnEvent>(tr->addEvent(12, "note"));
     n0->setNote(88);
 
-    auto n0a = std::dynamic_pointer_cast<NoteEvent>(tr->addEvent(13, "note"));
+    auto n0a = std::dynamic_pointer_cast<NoteOnEvent>(tr->addEvent(13, "note"));
     n0a->setNote(89);
 
-    auto n1 = std::dynamic_pointer_cast<NoteEvent>(tr->addEvent(23, "note"));
+    auto n1 = std::dynamic_pointer_cast<NoteOnEvent>(tr->addEvent(23, "note"));
     n1->setNote(90);
 
     auto event2 = tr->addEvent(22, "note");
@@ -32,7 +32,7 @@ TEST_CASE("timing-correct", "[track]")
     REQUIRE(tr->getEvent(2) == event2);
     REQUIRE(tr->getEvent(3) == n1);
 
-    auto n2 = std::dynamic_pointer_cast<NoteEvent>(event2);
+    auto n2 = std::dynamic_pointer_cast<NoteOnEvent>(event2);
     n2->setNote(91);
     int swingPercentage = 50;
     tr->timingCorrect(0, 0, n0, 24, swingPercentage);
@@ -64,14 +64,14 @@ TEST_CASE("swing1", "[track]")
     seq->init(0);
     auto tr = seq->getTrack(0);
 
-    auto n1 = std::dynamic_pointer_cast<NoteEvent>(tr->addEvent(23, "note"));
+    auto n1 = std::dynamic_pointer_cast<NoteOnEvent>(tr->addEvent(23, "note"));
     n1->setNote(90);
 
     auto event2 = tr->addEvent(22, "note");
 
     REQUIRE(tr->getEvent(0) == event2);
 
-    auto n2 = std::dynamic_pointer_cast<NoteEvent>(event2);
+    auto n2 = std::dynamic_pointer_cast<NoteOnEvent>(event2);
     n2->setNote(91);
     auto range = std::vector<int>{91, 91};
     tr->timingCorrect(0, 0, n2, 24, 71);
@@ -99,7 +99,7 @@ TEST_CASE("quantize", "[track]")
     seq->init(0);
     auto tr = seq->getTrack(0);
 
-    auto n0 = std::dynamic_pointer_cast<NoteEvent>(tr->addEvent(0, "note"));
+    auto n0 = std::dynamic_pointer_cast<NoteOnEvent>(tr->addEvent(0, "note"));
 
     for (int i = 0; i <= 12; i++)
     {

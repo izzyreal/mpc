@@ -1,5 +1,4 @@
 #include "StepEditorScreen.hpp"
-#include "sequencer/MidiAdapter.hpp"
 #include "lcdgui/screens/window/InsertEventScreen.hpp"
 
 #include <audiomidi/AudioMidiServices.hpp>
@@ -44,7 +43,7 @@ StepEditorScreen::StepEditorScreen(mpc::Mpc& mpc, const int layerIndex)
 	lastColumn["control-change"] = "a";
 	lastColumn["midi-clock"] = "a";
 	lastColumn["mixer"] = "a";
-	lastColumn["note"] = "a";
+	lastColumn["note-on"] = "a";
 	lastColumn["pitch-bend"] = "a";
 	lastColumn["poly-pressure"] = "a";
 	lastColumn["program-change"] = "a";
@@ -85,8 +84,8 @@ void StepEditorScreen::open()
 		findField("tonote")->setAlignment(Alignment::Centered, 18);
 
         // We're in a MIDI track, and MIDI notes have only 3 columns.
-		if (lastColumn["note"] == "d" || lastColumn["note"] == "e")
-			lastColumn["note"] = "c";
+		if (lastColumn["note-on"] == "d" || lastColumn["note-on"] == "e")
+			lastColumn["note-on"] = "c";
 	}
 
 	updateComponents();

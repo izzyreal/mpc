@@ -24,6 +24,19 @@ std::shared_ptr<mpc::engine::midi::ShortMessage> mpc::sequencer::NoteOffEvent::c
     msg->setMessage(ShortMessage::NOTE_OFF, channel, std::clamp(getNote() + transpose, 0, 127), 0);
     return msg;
 }
+
+void NoteOnEvent::CopyValuesTo(std::weak_ptr<Event> dest)
+{
+    Event::CopyValuesTo(dest);
+    auto lDest = std::dynamic_pointer_cast<NoteOnEvent>(dest.lock());
+    lDest->incrementVariationType(getVariationType());
+    lDest->setVariationValue(getVariationValue());
+    lDest->setNote(getNote());
+    lDest->setVelocity(getVelocity());
+
+    lDest->setDuration(getDuration());
+}
+
 //-------------
 mpc::sequencer::NoteOnEvent::NoteOnEvent(int i, int vel)
 {

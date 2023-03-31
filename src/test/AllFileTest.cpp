@@ -9,7 +9,6 @@
 #include "disk/AbstractDisk.hpp"
 #include "disk/AllLoader.hpp"
 #include "disk/MpcFile.hpp"
-#include "file/all/AllNoteEvent.hpp"
 #include "file/all/AllParser.hpp"
 
 using namespace mpc::disk;
@@ -135,13 +134,13 @@ TEST_CASE("ALL file note event", "[allfile]")
     auto seq = mpc.getSequencer()->getSequence(0);
     seq->init(1);
     auto tr = seq->getTrack(63);
-    auto event = std::dynamic_pointer_cast<mpc::sequencer::NoteEvent>(tr->addEvent(0, "note"));
+    auto event = std::dynamic_pointer_cast<NoteOnEvent>(tr->addEvent(0, "note"));
     event->setNote(0);
     event->setTrack(tr->getIndex());
     event->setVelocity(127);
     event->setDuration(1600);
     event->setTick(0);
-    event->setVariationTypeNumber(3);
+    event->incrementVariationType(3);
     event->setVariationValue(20);
 
     auto disk = mpc.getDisk();
@@ -155,8 +154,8 @@ TEST_CASE("ALL file note event", "[allfile]")
     auto seq1 = mpc.getSequencer()->getActiveSequence();
     auto tr1 = seq1->getTrack(63);
     auto event1 = tr1->getEvent(0);
-    REQUIRE(event1->getTypeName() == "note");
-    auto noteEvent = std::dynamic_pointer_cast<mpc::sequencer::NoteEvent>(event1);
+    REQUIRE(event1->getTypeName() == "note-on");
+    auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(event1);
     REQUIRE(noteEvent->getNote() == 0);
     REQUIRE(noteEvent->getVelocity() == 127);
     REQUIRE(noteEvent->getTrack() == tr->getIndex());
