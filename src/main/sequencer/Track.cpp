@@ -103,9 +103,9 @@ int Track::getIndex()
 // This is called from the UI thread. Results in incorrect tickpos.
 // We should only queue the fact that a note of n wants to be recorded.
 // Then we let getNextTick, from the audio thread, set the tickpos.
-std::shared_ptr<NoteOnEvent> Track::recordNoteOnNow(unsigned char note)
+std::shared_ptr<NoteOnEvent> Track::recordNoteOnNow(unsigned char note, unsigned char velocity)
 {
-	auto onEvent = std::make_shared<NoteOnEvent>(note);
+	auto onEvent = std::make_shared<NoteOnEvent>(note, velocity);
 	if (!storeRecordNoteEvent(note, onEvent)) return nullptr;
 	onEvent->setTick(-2);
 	queuedNoteOnEvents.enqueue(onEvent);
@@ -170,10 +170,10 @@ bool Track::finalizeNoteOnEvent(std::shared_ptr<NoteOnEvent> event, int newDur)
 	return true;
 }
 
-std::shared_ptr<NoteOnEvent> Track::addNoteEvent(int tick, int note)
+std::shared_ptr<NoteOnEvent> Track::addNoteEvent(int tick, int note, int velocity)
 {
 	// TODO Store!!!!!!
-    auto res = std::make_shared<NoteOnEvent>(note);
+    auto res = std::make_shared<NoteOnEvent>(note, velocity);
 	res->setTick(tick);
 	insertEventWhileRetainingSort(res);
 

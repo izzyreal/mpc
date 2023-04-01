@@ -61,7 +61,7 @@ public:
     // different thread.
     // As a bare minimum the note must be passed in, in order to
     // match against counterpart (off with on and vice versa).
-    std::shared_ptr<mpc::sequencer::NoteOnEvent> recordNoteOnNow(unsigned char note);
+    std::shared_ptr<mpc::sequencer::NoteOnEvent> recordNoteOnNow(unsigned char note, unsigned char velocity = 127);
     void recordNoteOffNow(unsigned char note);
 
 private:
@@ -74,7 +74,7 @@ private:
 
 public:
     bool insertEventWhileRetainingSort(const std::shared_ptr<Event>& event, bool allowMultipleNotesOnSameTick = false);
-    std::shared_ptr<NoteOnEvent> addNoteEvent(int tick, int note);
+    std::shared_ptr<NoteOnEvent> addNoteEvent(int tick, int note, int velocity = 127);
     std::shared_ptr<Event> addEvent(int tick, const std::string& type, bool allowMultipleNotesOnSameTick = false);
     void cloneEventIntoTrack(std::shared_ptr<Event>& src, int tick, bool allowMultipleNotesOnSameTick = false);
     bool finalizeNoteOnEvent(std::shared_ptr<NoteOnEvent> event, int newDur);
