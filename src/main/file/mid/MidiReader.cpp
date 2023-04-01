@@ -161,7 +161,7 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
         sequence->setLastLoopBarIndex(lastLoopBar);
     }
 
-    std::unique_ptr<OldNoteEvent> nVariation;
+    std::unique_ptr<NoteOnEvent> nVariation;
     const int maxNoteOffTick = 999999999;
 
     const std::string trackDataPrefix = "TRACK DATA:";
@@ -194,7 +194,7 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
             }
         }
         std::vector<std::shared_ptr<ChannelEvent>> noteOffs;
-        std::vector<std::shared_ptr<OldNoteEvent>> noteOns;
+        std::vector<std::shared_ptr<NoteOnEvent>> noteOns;
 
         auto track = sequence->purgeTrack(trackIndex);
         track->setDeviceIndex(deviceIndex);
@@ -209,8 +209,8 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
 
                 if (noteOff)
                 {
-                    nVariation = std::make_unique<OldNoteEvent>();
-                    nVariation->setVariationTypeNumber(noteOff->getNoteValue());
+                    nVariation = std::make_unique<NoteOnEvent>();
+                    nVariation->incrementVariationType(noteOff->getNoteValue());
                     nVariation->setVariationValue(noteOff->getVelocity());
                 }
                 else if (noteOn)
@@ -229,13 +229,13 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
                             noteOffs.emplace_back(std::make_shared<NoteOn>(noteOn->getTick(), 0, (noteOn->getNoteValue()), 0));
                         }
 
-                        auto ne = std::make_shared<OldNoteEvent>(noteOn->getNoteValue());
+                        auto ne = std::make_shared<NoteOnEvent>(noteOn->getNoteValue());
                         ne->setTick(noteOn->getTick());
                         ne->setVelocity(noteOn->getVelocity());
 
                         if (nVariation)
                         {
-                            ne->setVariationTypeNumber(nVariation->getVariationType());
+                            ne->incrementVariationType(nVariation->getVariationType());
                             ne->setVariationValue(nVariation->getVariationValue());
                         }
                         else
@@ -261,7 +261,7 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
                 }
                 else if (noteOn)
                 {
-                    auto mpcNoteEvent = std::make_shared<OldNoteEvent>(noteOn->getNoteValue());
+                    auto mpcNoteEvent = std::make_shared<NoteOnEvent>(noteOn->getNoteValue());
                     mpcNoteEvent->setTick(noteOn->getTick());
                     mpcNoteEvent->setVelocity(noteOn->getVelocity());
                     noteOns.emplace_back(mpcNoteEvent);
@@ -271,7 +271,7 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
 
         for (auto& n: noteOns)
         {
-            auto noteOn = std::dynamic_pointer_cast<mpc::sequencer::OldNoteEvent>(track->addEvent(n->getTick(), "note"));
+            auto noteOn = std::dynamic_pointer_cast<mpc::sequencer::NoteOnEvent>(track->addEvent(n->getTick(), "note"));
             n->CopyValuesTo(noteOn);
             int indexCandidate = -1;
 
@@ -428,7 +428,7 @@ int MidiReader::getNumberOfNoteOns(int noteValue, std::vector<std::shared_ptr<Ch
     return counter;
 }
 
-int MidiReader::getNumberOfNotes(int noteValue, std::vector<std::shared_ptr<OldNoteEvent>> allNotes)
+int MidiReader::getNumberOfNotes(int noteValue, std::vector<std::shared_ptr<NoteOnEvent>> allNotes)
 {
     int counter = 0;
 

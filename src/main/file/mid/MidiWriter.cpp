@@ -141,7 +141,7 @@ MidiWriter::MidiWriter(mpc::sequencer::Sequence* sequence)
 		auto tn = std::make_shared<meta::TrackName>(0, 0, moduru::lang::StrUtil::padRight(t->getName(), " ", 16));
 		mt->insertEvent(tn);
 		for (auto& event : t->getEvents()) {
-			auto noteEvent = std::dynamic_pointer_cast<mpc::sequencer::OldNoteEvent>(event);
+			auto noteEvent = std::dynamic_pointer_cast<mpc::sequencer::NoteOnEvent>(event);
 			auto mpcSysExEvent = std::dynamic_pointer_cast<mpc::sequencer::SystemExclusiveEvent>(event);
 			auto pitchBendEvent = std::dynamic_pointer_cast<mpc::sequencer::PitchBendEvent>(event);
 			auto channelPressureEvent = std::dynamic_pointer_cast<mpc::sequencer::ChannelPressureEvent>(event);
