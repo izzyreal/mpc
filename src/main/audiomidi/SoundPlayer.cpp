@@ -159,11 +159,11 @@ int SoundPlayer::processAudio(AudioBuffer* buf, int nFrames)
 	if (resample) {
 
 		if (audioFormat->getChannels() >= 1) {
-            resampleChannel(true, sourceBuffer->getChannel(0), audioFormat->getSampleRate(), buf->getSampleRate());
+            resampleChannel(true, sourceBuffer->getChannel(0), audioFormat->getSampleRate(), buf->getSampleRate(), nFrames);
 		}
 
 		if (audioFormat->getChannels() >= 2) {
-            resampleChannel(false, sourceBuffer->getChannel(1), audioFormat->getSampleRate(), buf->getSampleRate());
+            resampleChannel(false, sourceBuffer->getChannel(1), audioFormat->getSampleRate(), buf->getSampleRate(), nFrames);
 		}
 
 		if (resampleOutputBufferLeft.available() >= nFrames) {
@@ -250,14 +250,14 @@ int SoundPlayer::processAudio(AudioBuffer* buf, int nFrames)
 }
 
 void SoundPlayer::resampleChannel(bool left, std::vector<float> &inputBuffer, int sourceSampleRate,
-                                  int destinationSampleRate)
+                                  int destinationSampleRate, int nFrames)
 {
 	auto ratio = static_cast<float>(destinationSampleRate) / static_cast<float>(sourceSampleRate);
 	auto circularInputBuffer = left ? &resampleInputBufferLeft : &resampleInputBufferRight;
 	auto circularOutputBuffer = left ? &resampleOutputBufferLeft : &resampleOutputBufferRight;
 
-	for (auto f : inputBuffer) {
-		circularInputBuffer->put(f);
+    for (int i = 0 ; i < nFrames; i++) {
+		circularInputBuffer->put(inputBuffer[i]);
 	}
 
 	std::vector<float> input;

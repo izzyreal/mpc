@@ -237,8 +237,8 @@ int SoundRecorder::processAudio(mpc::engine::audio::core::AudioBuffer* buf, int 
 
 			if (resample)
 			{
-				auto resampledLeft = resampleChannel(true, preLeft, buf->getSampleRate());
-				auto resampledRight = resampleChannel(false, preRight, buf->getSampleRate());
+				auto resampledLeft = resampleChannel(true, preLeft, buf->getSampleRate(), nFrames);
+				auto resampledRight = resampleChannel(false, preRight, buf->getSampleRate(), nFrames);
 
 				if (mode == 0) {
 					s->insertFrames(resampledLeft, 0);
@@ -269,14 +269,14 @@ int SoundRecorder::processAudio(mpc::engine::audio::core::AudioBuffer* buf, int 
 		std::vector<float> resampledLeft;
 
 		if ((mode == 0 || mode == 2) && resample) {
-			resampledLeft = resampleChannel(true, left, buf->getSampleRate());
+			resampledLeft = resampleChannel(true, left, buf->getSampleRate(), nFrames);
 			left = resampledLeft;
 		}
 
 		std::vector<float> resampledRight;
 
 		if ((mode == 1 || mode == 2) && resample) {
-			resampledRight = resampleChannel(false, right, buf->getSampleRate());
+			resampledRight = resampleChannel(false, right, buf->getSampleRate(), nFrames);
 			right = resampledRight;
 		}
 
@@ -297,13 +297,13 @@ int SoundRecorder::processAudio(mpc::engine::audio::core::AudioBuffer* buf, int 
 	return AUDIO_SILENCE;
 }
 
-std::vector<float> SoundRecorder::resampleChannel(bool left, std::vector<float>& buffer, int sourceSampleRate)
+std::vector<float> SoundRecorder::resampleChannel(bool left, std::vector<float>& buffer, int sourceSampleRate, int numFrames)
 {
 	auto ratio = 44100.f / sourceSampleRate;
 	auto circBuf = left ? &resampleBufferLeft : &resampleBufferRight;
 
-	for (auto f : buffer) {
-		circBuf->put(f);
+    for (int i = 0; i < numFrames; i++) {
+		circBuf->put(buffer[i]);
 	}
 
 	std::vector<float> input;

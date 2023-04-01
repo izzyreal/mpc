@@ -51,7 +51,7 @@ namespace mpc::audiomidi
 		bool lastSampleScreenActive = false;
 		bool armed = false;
 		void initSrc();
-		std::vector<float> resampleChannel(bool left, std::vector<float>& input, int sourceSampleRate);
+		std::vector<float> resampleChannel(bool left, std::vector<float>& input, int sourceSampleRate, int numFrames);
 
 	public:
 		void setSampleScreenActive(bool active);
