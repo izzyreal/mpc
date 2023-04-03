@@ -310,7 +310,6 @@ void BaseControls::generateNoteOn(int note, int padVelo, int padIndexWithBank)
         if (step && (track->getBus() == 0 || isDrumNote(note)))
         {
             recordNoteOnEvent = track->addNoteEvent(sequencer->getTickPosition(), note, padVelo);
-            recordNoteOnEvent->setDuration(0);
         }
         else if (recMainWithoutPlaying)
         {

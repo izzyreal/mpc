@@ -1,5 +1,6 @@
 #include <sequencer/NoteEvent.hpp>
 #include <algorithm>
+#include "assert.h"
 
 using namespace mpc::sequencer;
 using namespace mpc::engine::midi;
@@ -69,13 +70,14 @@ int mpc::sequencer::NoteOnEvent::getNote()
     return number;
 }
 
-void mpc::sequencer::NoteOnEvent::setDuration(int i)
+void mpc::sequencer::NoteOnEvent::setDuration(Duration d)
 {
-    duration = std::clamp(i,0,9999);
+    assert(d != -1);
+    duration = std::clamp(d.value(),0,9999);
     notifyObservers(std::string("step-editor"));
 }
 
-int mpc::sequencer::NoteOnEvent::getDuration()
+mpc::sequencer::NoteOnEvent::Duration mpc::sequencer::NoteOnEvent::getDuration()
 {
     return duration;
 }
@@ -132,7 +134,7 @@ bool mpc::sequencer::NoteOnEvent::isDrumNote()
 
 bool mpc::sequencer::NoteOnEvent::isFinalized()
 {
-    return duration != -1;
+    return duration.has_value();
 }
 
 OldNoteEvent::OldNoteEvent()
