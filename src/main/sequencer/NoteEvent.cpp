@@ -82,6 +82,12 @@ mpc::sequencer::NoteOnEvent::Duration mpc::sequencer::NoteOnEvent::getDuration()
     return duration;
 }
 
+void mpc::sequencer::NoteOnEvent::resetDuration()
+{
+    duration = std::nullopt;
+    notifyObservers(std::string("step-editor"));
+}
+
 mpc::sequencer::NoteOnEvent::VARIATION_TYPE mpc::sequencer::NoteOnEvent::getVariationType()
 {
     return variationType;

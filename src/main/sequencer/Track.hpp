@@ -74,10 +74,10 @@ private:
 
 public:
     bool insertEventWhileRetainingSort(const std::shared_ptr<Event>& event, bool allowMultipleNotesOnSameTick = false);
-    std::shared_ptr<NoteOnEvent> addNoteEvent(int tick, int note, int velocity = 127);
+    std::shared_ptr<NoteOnEvent> addNoteEventSync(int tick, int note, int velocity);
+    bool finalizeNoteEventSync(int note, int duration);
     std::shared_ptr<Event> addEvent(int tick, const std::string& type, bool allowMultipleNotesOnSameTick = false);
     void cloneEventIntoTrack(std::shared_ptr<Event>& src, int tick, bool allowMultipleNotesOnSameTick = false);
-    bool finalizeNoteOnEvent(int note, int duration);
     void removeEvent(int i);
     void removeEvent(const std::shared_ptr<Event>& event);
     void removeEvents();
@@ -98,6 +98,7 @@ public:
     void playNext();
     bool isOn();
     bool isUsed();
+    bool tickIsFreeForNote(int note, int tick);
 
 public:
     std::vector<std::shared_ptr<Event>> getEventRange(int startTick, int endTick);

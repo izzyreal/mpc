@@ -46,6 +46,7 @@ namespace mpc::sequencer
         int getNote();
         void setDuration(Duration duration);
         Duration getDuration();
+        void resetDuration();
         VARIATION_TYPE getVariationType();
         void incrementVariationType(int amount);
         void setVariationType(VARIATION_TYPE type);

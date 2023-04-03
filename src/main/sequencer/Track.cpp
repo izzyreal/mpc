@@ -161,26 +161,44 @@ void Track::removeEvent(const std::shared_ptr<Event>& event)
 	notifyObservers(std::string("step-editor"));
 }
 
-bool Track::finalizeNoteOnEvent(int note, int duration)
+std::shared_ptr<NoteOnEvent> Track::addNoteEventSync(int tick, int note, int velocity)
 {
-    auto onEvent = retrieveRecordNoteEvent(note);
-    if (!onEvent) return false;
-    onEvent->setDuration(duration);
-	notifyObservers(std::string("adjust-duration"));
-	return true;
+    auto onEvent = getNoteEvent(tick, note);
+    if (!onEvent)
+    {
+        onEvent = std::make_shared<NoteOnEvent>(note, velocity);
+        if (!storeRecordNoteEvent(note, onEvent)) return nullptr;
+        onEvent->setTick(tick);
+        insertEventWhileRetainingSort(onEvent);
+        notifyObservers(std::string("step-editor"));
+        return onEvent;
+    }
+    else
+    {
+        if (!storeRecordNoteEvent(note, onEvent)) return nullptr;
+        onEvent->setVelocity(velocity);
+        onEvent->resetDuration();
+        return onEvent;
+    }
 }
-
-std::shared_ptr<NoteOnEvent> Track::addNoteEvent(int tick, int note, int velocity)
+bool Track::finalizeNoteEventSync(int note, int duration)
 {
+    if (auto onEvent = retrieveRecordNoteEvent(note))
+    {
+        auto size = events.size();
+        onEvent->setDuration(duration);
+        notifyObservers(std::string("adjust-duration"));
 
-    auto onEvent = std::make_shared<NoteOnEvent>(note, velocity);
-    if (!storeRecordNoteEvent(note, onEvent)) return nullptr;
-    onEvent->setTick(tick);
-	insertEventWhileRetainingSort(onEvent);
+        return true;
+    }
+    else if (auto onEvents = getNoteEventsAtTick(mpc.getSequencer()->getTickPosition()); !onEvents.empty())
+    {
+        onEvents.front()->setDuration(duration);
+        notifyObservers(std::string("adjust-duration"));
+        return true;
+    }
+    return false;
 
-	notifyObservers(std::string("step-editor"));
-
-	return onEvent;
 }
 
 std::shared_ptr<Event> Track::addEvent(int tick, const std::string& type, bool allowMultipleNotesOnSameTick)
@@ -659,6 +677,15 @@ bool Track::isUsed()
     return used || !events.empty();
 }
 
+bool mpc::sequencer::Track::tickIsFreeForNote(int note, int tick)
+{
+    for (auto& noteEvent : getNoteEventsAtTick(tick)) 
+    {
+        if (noteEvent->getNote() == note) return false;
+    }
+    return true;
+}
+
 std::vector<std::shared_ptr<Event>> Track::getEventRange(int startTick, int endTick)
 {
 	std::vector<std::shared_ptr<Event>> res;
@@ -957,9 +984,12 @@ bool Track::insertEventWhileRetainingSort(const std::shared_ptr<Event>& event, b
 
     auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(event);
 
-    if (noteEvent && !allowMultipleNotesOnSameTick) {
-        for (auto &e: getNoteEventsAtTick(tick)) {
-            if (e->getNote() == noteEvent->getNote()) {
+    if (noteEvent && !allowMultipleNotesOnSameTick) 
+    {
+        for (auto &e: getNoteEventsAtTick(tick)) 
+        {
+            if (e->getNote() == noteEvent->getNote()) 
+            {
                 e.swap(noteEvent);
                 return false;
             }
