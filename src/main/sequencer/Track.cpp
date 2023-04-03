@@ -173,7 +173,7 @@ bool Track::finalizeNoteOnEvent(int note, int duration)
 std::shared_ptr<NoteOnEvent> Track::addNoteEvent(int tick, int note, int velocity)
 {
 
-    auto onEvent = std::make_shared<NoteOnEvent>(note);
+    auto onEvent = std::make_shared<NoteOnEvent>(note, velocity);
     if (!storeRecordNoteEvent(note, onEvent)) return nullptr;
     onEvent->setTick(tick);
 	insertEventWhileRetainingSort(onEvent);
