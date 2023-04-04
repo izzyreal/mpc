@@ -100,17 +100,6 @@ int Track::getIndex()
     return trackIndex;
 }
 
-// This is called from the UI thread. Results in incorrect tickpos.
-// We should only queue the fact that a note of n wants to be recorded.
-// Then we let getNextTick, from the audio thread, set the tickpos.
-std::shared_ptr<NoteOnEvent> Track::recordNoteOnNow(unsigned char note, unsigned char velocity)
-{
-	auto onEvent = std::make_shared<NoteOnEvent>(note, velocity);
-	if (!storeRecordNoteEvent(note, onEvent)) return nullptr;
-	onEvent->setTick(-2);
-	queuedNoteOnEvents.enqueue(onEvent);
-	return onEvent;
-}
 
 void Track::flushNoteCache()
 {
@@ -118,15 +107,6 @@ void Track::flushNoteCache()
 	std::shared_ptr<NoteOffEvent> e2;
 	while (queuedNoteOnEvents.try_dequeue(e1)) {}
     while (queuedNoteOffEvents.try_dequeue(e2)) {}
-}
-
-void Track::recordNoteOffNow(unsigned char note)
-{
-	auto onEvent = retrieveRecordNoteEvent(note);
-	if (!onEvent) return;
-	auto offEvent = onEvent->getNoteOff();
-	offEvent->setTick(-2);
-    queuedNoteOffEvents.enqueue(offEvent);
 }
 
 void Track::setUsed(bool b)
@@ -161,7 +141,29 @@ void Track::removeEvent(const std::shared_ptr<Event>& event)
 	notifyObservers(std::string("step-editor"));
 }
 
-std::shared_ptr<NoteOnEvent> Track::addNoteEventSync(int tick, int note, int velocity)
+// This is called from the UI thread. Results in incorrect tickpos.
+// We should only queue the fact that a note of n wants to be recorded.
+// Then we let getNextTick, from the audio thread, set the tickpos.
+std::shared_ptr<NoteOnEvent> Track::addNoteEventASync(unsigned char note, unsigned char velocity)
+{
+    auto onEvent = std::make_shared<NoteOnEvent>(note, velocity);
+    if (!storeRecordNoteEvent(note, onEvent)) return nullptr;
+    onEvent->setTick(-2);
+    queuedNoteOnEvents.enqueue(onEvent);
+    return onEvent;
+}
+
+void Track::finalizeNoteEventASync(unsigned char note)
+{
+    auto onEvent = retrieveRecordNoteEvent(note);
+    if (!onEvent) return;
+    auto offEvent = onEvent->getNoteOff();
+    offEvent->setTick(-2);
+    queuedNoteOffEvents.enqueue(offEvent);
+}
+
+
+std::shared_ptr<NoteOnEvent> Track::addNoteEventSynced(int tick, int note, int velocity)
 {
     auto onEvent = getNoteEvent(tick, note);
     if (!onEvent)
@@ -181,24 +183,16 @@ std::shared_ptr<NoteOnEvent> Track::addNoteEventSync(int tick, int note, int vel
         return onEvent;
     }
 }
-bool Track::finalizeNoteEventSync(int note, int duration)
+bool Track::finalizeNoteEventSynced(int note, int duration)
 {
     if (auto onEvent = retrieveRecordNoteEvent(note))
     {
         auto size = events.size();
         onEvent->setDuration(duration);
         notifyObservers(std::string("adjust-duration"));
-
-        return true;
-    }
-    else if (auto onEvents = getNoteEventsAtTick(mpc.getSequencer()->getTickPosition()); !onEvents.empty())
-    {
-        onEvents.front()->setDuration(duration);
-        notifyObservers(std::string("adjust-duration"));
         return true;
     }
     return false;
-
 }
 
 std::shared_ptr<Event> Track::addEvent(int tick, const std::string& type, bool allowMultipleNotesOnSameTick)

@@ -108,7 +108,7 @@ void GlobalReleaseControls::simplePad(int padIndexWithBank)
 
 	if (sequencer->isRecordingOrOverdubbing())
 	{
-		track->recordNoteOffNow(note);
+		track->finalizeNoteEventASync(note);
 	}
 
 	bool posIsLastTick = sequencer->getTickPosition() == sequencer->getActiveSequence()->getLastTick();
@@ -141,7 +141,7 @@ void GlobalReleaseControls::simplePad(int padIndexWithBank)
 
 		sequencer->stopMetronomeTrack();
 		//!!!!!!!!
-		bool durationHasBeenAdjusted = track->finalizeNoteEventSync(on_event->getNote(), newDuration);
+		bool durationHasBeenAdjusted = track->finalizeNoteEventSynced(on_event->getNote(), newDuration);
 
 		if ((durationHasBeenAdjusted && maybeRecWithoutPlaying) || (stepRec && increment))
 		{

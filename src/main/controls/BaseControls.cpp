@@ -309,11 +309,11 @@ void BaseControls::generateNoteOn(int note, int padVelo, int padIndexWithBank)
         
         if (step && (track->getBus() == 0 || isDrumNote(note)))
         {
-            recordNoteOnEvent = track->addNoteEventSync(sequencer->getTickPosition(), note, padVelo);
+            recordNoteOnEvent = track->addNoteEventSynced(sequencer->getTickPosition(), note, padVelo);
         }
         else if (recMainWithoutPlaying)
         {
-            recordNoteOnEvent = track->addNoteEventSync(sequencer->getTickPosition(), note, padVelo);
+            recordNoteOnEvent = track->addNoteEventSynced(sequencer->getTickPosition(), note, padVelo);
             int stepLength = timingCorrectScreen->getNoteValueLengthInTicks();
             
             if (stepLength != 1)
@@ -327,7 +327,7 @@ void BaseControls::generateNoteOn(int note, int padVelo, int padIndexWithBank)
         }
         else
         {
-            recordNoteOnEvent = track->recordNoteOnNow(note, padVelo);
+            recordNoteOnEvent = track->addNoteEventASync(note, padVelo);
         }
 
         if (step || recMainWithoutPlaying)

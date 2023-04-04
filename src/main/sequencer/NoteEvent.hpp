@@ -27,7 +27,6 @@ namespace mpc::sequencer
     {
     public:
         enum VARIATION_TYPE {TUNE_0 = 0, DECAY_1 = 1, ATTACK_2 = 2, FILTER_3 = 3};
-        //static const int DURATION_UNKNOWN = -1;
         typedef std::optional<int> Duration;
     private:
         int number = 60;
