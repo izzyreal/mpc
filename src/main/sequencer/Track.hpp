@@ -73,11 +73,11 @@ private:
 
 public:
     bool insertEventWhileRetainingSort(const std::shared_ptr<Event>& event, bool allowMultipleNotesOnSameTick = false);
-    std::shared_ptr<NoteOnEvent> addNoteEventSynced(int tick, int note, int velocity);
+    std::shared_ptr<NoteOnEvent> recordNoteEventSynced(int tick, int note, int velocity);
     bool finalizeNoteEventSynced(int note, int duration);
-    std::shared_ptr<mpc::sequencer::NoteOnEvent> addNoteEventASync(unsigned char note, unsigned char velocity);
+    std::shared_ptr<mpc::sequencer::NoteOnEvent> recordNoteEventASync(unsigned char note, unsigned char velocity);
     void finalizeNoteEventASync(unsigned char note);
-    std::shared_ptr<Event> addEvent(int tick, const std::string& type, bool allowMultipleNotesOnSameTick = false);
+    void addEvent(int tick, std::shared_ptr<Event> event, bool allowMultipleNotesOnSameTick = false);
     void cloneEventIntoTrack(std::shared_ptr<Event>& src, int tick, bool allowMultipleNotesOnSameTick = false);
     void removeEvent(int i);
     void removeEvent(const std::shared_ptr<Event>& event);

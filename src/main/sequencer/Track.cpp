@@ -144,7 +144,7 @@ void Track::removeEvent(const std::shared_ptr<Event>& event)
 // This is called from the UI thread. Results in incorrect tickpos.
 // We should only queue the fact that a note of n wants to be recorded.
 // Then we let getNextTick, from the audio thread, set the tickpos.
-std::shared_ptr<NoteOnEvent> Track::addNoteEventASync(unsigned char note, unsigned char velocity)
+std::shared_ptr<NoteOnEvent> Track::recordNoteEventASync(unsigned char note, unsigned char velocity)
 {
     auto onEvent = std::make_shared<NoteOnEvent>(note, velocity);
     if (!storeRecordNoteEvent(note, onEvent)) return nullptr;
@@ -163,7 +163,7 @@ void Track::finalizeNoteEventASync(unsigned char note)
 }
 
 
-std::shared_ptr<NoteOnEvent> Track::addNoteEventSynced(int tick, int note, int velocity)
+std::shared_ptr<NoteOnEvent> Track::recordNoteEventSynced(int tick, int note, int velocity)
 {
     auto onEvent = getNoteEvent(tick, note);
     if (!onEvent)
@@ -195,60 +195,18 @@ bool Track::finalizeNoteEventSynced(int note, int duration)
     return false;
 }
 
-std::shared_ptr<Event> Track::addEvent(int tick, const std::string& type, bool allowMultipleNotesOnSameTick)
+void mpc::sequencer::Track::addEvent(int tick, std::shared_ptr<Event> event, bool allowMultipleNotesOnSameTick)
 {
-	std::shared_ptr<Event> res;
+    if (events.empty())
+    {
+        setUsed(true);
+    }
 
-	if (type == "note")
-	{
-		res = std::make_shared<NoteOnEvent>();
-		// TODO Store!!!!!!!!!
-	}
-	else if (type == "tempo-change")
-	{
-		res = std::make_shared<TempoChangeEvent>(parent);
-	}
-	else if (type == "pitchbend")
-	{
-		res = std::make_shared<PitchBendEvent>();
-	}
-	else if (type == "controlchange")
-	{
-		res = std::make_shared<ControlChangeEvent>();
-	}
-	else if (type == "programchange")
-	{
-		res = std::make_shared<ProgramChangeEvent>();
-	}
-	else if (type == "channelpressure")
-	{
-		res = std::make_shared<ChannelPressureEvent>();
-	}
-	else if (type == "polypressure")
-	{
-		res = std::make_shared<PolyPressureEvent>();
-	}
-	else if (type == "systemexclusive")
-	{
-		res = std::make_shared<SystemExclusiveEvent>();
-	}
-	else if (type == "mixer")
-	{
-		res = std::make_shared<MixerEvent>();
-	}
+    event->setTick(tick);
 
-	if (events.empty())
-	{
-		setUsed(true);
-	}
+    insertEventWhileRetainingSort(event, allowMultipleNotesOnSameTick);
 
-	res->setTick(tick);
-
-    insertEventWhileRetainingSort(res, allowMultipleNotesOnSameTick);
-
-	notifyObservers(std::string("step-editor"));
-
-	return res;
+    notifyObservers(std::string("step-editor"));
 }
 
 void Track::cloneEventIntoTrack(std::shared_ptr<Event>& src, int tick, bool allowMultipleNotesOnSameTick)

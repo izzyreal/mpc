@@ -151,7 +151,7 @@ void MpcMidiInput::transport(MidiMessage *msg, int timeStamp)
                 //noteOn->setDuration(note->getVelocity() == 0 ? 0 : -1);
                 noteOn->setTick(sequencer->getTickPosition());
 
-                auto recordedEvent = track->addNoteEventASync(noteOn->getNote(), noteOn->getVelocity());
+                auto recordedEvent = track->recordNoteEventASync(noteOn->getNote(), noteOn->getVelocity());
                 noteOn->CopyValuesTo(recordedEvent);
             }
         }
