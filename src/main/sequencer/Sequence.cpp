@@ -22,10 +22,9 @@ Sequence::Sequence(mpc::Mpc& _mpc)
 		tracks[i]->setName(defaultTrackNames[i]);
 	}
 
-	metaTracks.push_back(std::make_shared<Track>(mpc, this, 64));
-
-	metaTracks[0]->setUsed(true);
-	metaTracks[0]->setName("tempo");
+	tempoChangeTrack = std::make_shared<Track>(mpc, this, 64);
+	tempoChangeTrack->setUsed(true);
+	tempoChangeTrack->setName("tempo");
 
 	auto userScreen = mpc.screens->get<UserScreen>("user");
 
@@ -126,19 +125,14 @@ int Sequence::getLastLoopBarIndex()
 	return lastLoopBarIndex;
 }
 
-std::vector<std::shared_ptr<Track>> Sequence::getMetaTracks()
+std::shared_ptr<Track> Sequence::getTempoChangeTrack()
 {
-    return metaTracks;
+    return tempoChangeTrack;
 }
 
-void Sequence::initMetaTracks()
+void Sequence::resetTempoChangeTrack()
 {
-	createTempoChangeTrack();
-}
-
-void Sequence::createTempoChangeTrack()
-{
-	metaTracks[0]->removeEvents();
+	tempoChangeTrack->removeEvents();
     addTempoChangeEvent(0);
 }
 
@@ -220,7 +214,7 @@ void Sequence::init(int newLastBarIndex)
 	}
 	
 	setLastBar(newLastBarIndex);
-	initMetaTracks();
+	resetTempoChangeTrack();
 	initLoop();
     
 	setTimeSignature(0, getLastBarIndex(), userScreen->timeSig.getNumerator(), userScreen->timeSig.getDenominator());
@@ -256,7 +250,7 @@ std::vector<std::shared_ptr<TempoChangeEvent>> Sequence::getTempoChangeEvents()
 {
 	std::vector<std::shared_ptr<TempoChangeEvent>> res;
 	
-	for (auto& t : metaTracks[0]->getEvents())
+	for (auto& t : tempoChangeTrack->getEvents())
 		res.push_back(std::dynamic_pointer_cast<TempoChangeEvent>(t));
 
 	return res;
@@ -264,7 +258,7 @@ std::vector<std::shared_ptr<TempoChangeEvent>> Sequence::getTempoChangeEvents()
 
 std::shared_ptr<TempoChangeEvent> Sequence::addTempoChangeEvent(int tick)
 {
-	auto res = metaTracks[0]->addEvent(tick, "tempo-change");
+	auto res = tempoChangeTrack->addEvent(tick, "tempo-change");
     return std::dynamic_pointer_cast<TempoChangeEvent>(res);
 }
 
@@ -288,7 +282,7 @@ void Sequence::setInitialTempo(const double newInitialTempo)
 
 void Sequence::removeTempoChangeEvent(int i)
 {
-	metaTracks[0]->removeEvent(i);
+	tempoChangeTrack->removeEvent(i);
 }
 
 bool Sequence::isTempoChangeOn()
@@ -665,9 +659,5 @@ void Sequence::resetTrackEventIndices(int tick)
 			t->move(tick, tick);
 	}
 	
-	for (auto& t : metaTracks)
-	{
-		if (t->isUsed())
-			t->move(tick, tick);
-	}
+    tempoChangeTrack->move(tick, tick);
 }

@@ -124,11 +124,10 @@ void Sequencer::playToTick(int targetTick)
 				track->playNext();
 		}
 
-		for (auto& track : seq->getMetaTracks())
-        {
-			while (track->getNextTick() <= targetTick)
-				track->playNext();
-		}
+        auto tempoChangeTrack = seq->getTempoChangeTrack();
+
+        while (tempoChangeTrack->getNextTick() <= targetTick)
+            tempoChangeTrack->playNext();
 	}
 }
 
@@ -738,14 +737,14 @@ std::shared_ptr<Sequence> Sequencer::copySequence(std::shared_ptr<Sequence> sour
 	for (int i = 0; i < 64; i++)
 		copyTrack(source->getTrack(i), copy->getTrack(i));
 
-	for (int i = 0; i < source->getMetaTracks().size(); i++)
-	{
-		copy->getMetaTracks()[i]->removeEvents();
-		copyTrack(source->getMetaTracks()[i], copy->getMetaTracks()[i]);
-	}
+    auto sourceTempoChangeTrack = source->getTempoChangeTrack();
+    auto copyTempoChangeTrack = copy->getTempoChangeTrack();
+	copyTempoChangeTrack->removeEvents();
 
-	for (auto& event : copy->getTempoChangeEvents())
-		event->setParent(copy.get());
+	for (auto& event : sourceTempoChangeTrack->getEvents())
+    {
+        copyTempoChangeTrack->cloneEventIntoTrack(event, event->getTick());
+    }
 
 	return copy;
 }

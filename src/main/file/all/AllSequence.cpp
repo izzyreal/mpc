@@ -129,7 +129,6 @@ void AllSequence::applyToMpcSeq(std::shared_ptr<mpc::sequencer::Sequence> mpcSeq
     for (int i = 0; i < 32; i++)
         mpcSeq->setDeviceName(i, devNames[i]);
 
-    mpcSeq->initMetaTracks();
     mpcSeq->setFirstLoopBarIndex(loopFirst);
     mpcSeq->setLastLoopBarIndex(loopLast);
     mpcSeq->setLastLoopBarIndex(loopLast);

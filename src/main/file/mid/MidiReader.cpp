@@ -394,8 +394,6 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
             }
         }
     }
-
-    sequence->initMetaTracks();
 }
 
 bool MidiReader::isInteger(std::string s)

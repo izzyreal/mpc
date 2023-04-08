@@ -75,7 +75,6 @@ void CountMetronomeScreen::turnWheel(int i)
 	else if (param == "rate")
 	{
 		setRate(rate + i);
-		sequencer->getActiveSequence()->initMetaTracks();
 	}
 	else if (param == "in-rec")
 	{
