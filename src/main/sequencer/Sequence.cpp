@@ -125,17 +125,6 @@ int Sequence::getLastLoopBarIndex()
 	return lastLoopBarIndex;
 }
 
-std::shared_ptr<Track> Sequence::getTempoChangeTrack()
-{
-    return tempoChangeTrack;
-}
-
-void Sequence::resetTempoChangeTrack()
-{
-	tempoChangeTrack->removeEvents();
-    addTempoChangeEvent(0);
-}
-
 bool Sequence::isLoopEnabled()
 {
 	return loopEnabled;
@@ -214,8 +203,13 @@ void Sequence::init(int newLastBarIndex)
 	}
 	
 	setLastBar(newLastBarIndex);
-	resetTempoChangeTrack();
-	initLoop();
+
+    tempoTrackIsInitialized.store(false);
+    tempoChangeTrack->removeEvents();
+    addTempoChangeEvent(0);
+    tempoTrackIsInitialized.store(true);
+
+    initLoop();
     
 	setTimeSignature(0, getLastBarIndex(), userScreen->timeSig.getNumerator(), userScreen->timeSig.getDenominator());
     used = true;
@@ -248,6 +242,11 @@ void Sequence::setDeviceNames(std::vector<std::string>& sa)
 
 std::vector<std::shared_ptr<TempoChangeEvent>> Sequence::getTempoChangeEvents()
 {
+    if (!tempoTrackIsInitialized.load())
+    {
+        return {};
+    }
+
 	std::vector<std::shared_ptr<TempoChangeEvent>> res;
 	
 	for (auto& t : tempoChangeTrack->getEvents())

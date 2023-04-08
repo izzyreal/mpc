@@ -10,6 +10,7 @@ namespace mpc::sequencer {
 class Track;
 class TimeSignature;
 class TempoChangeEvent;
+class Sequencer;
 }
 
 namespace mpc::sequencer {
@@ -19,6 +20,7 @@ class Sequence final
 {
     
 private:
+    std::atomic_bool tempoTrackIsInitialized { false };
     mpc::Mpc& mpc;
     double initialTempo = 120.0;
     
@@ -43,6 +45,8 @@ private:
     int lastLoopBarIndex = 0;
     bool lastLoopBarEnd = true;
 
+    friend class Sequencer;
+
 public:
     double getInitialTempo();
     void setInitialTempo(const double newInitialTempo);
@@ -56,9 +60,6 @@ public:
     void setLastLoopBarIndex(int i);
     int getLastLoopBarIndex();
 
-public:
-    void resetTempoChangeTrack();
-    
     static bool trackIndexComparator(std::shared_ptr<Track>& t0, std::shared_ptr<Track>& t1);
     
 public:
@@ -77,7 +78,6 @@ public:
     void setTimeSignature(int firstBar, int tsLastBar, int num, int den);
     void setTimeSignature(int barIndex, int num, int den);
     std::vector<std::shared_ptr<Track>> getTracks();
-    std::shared_ptr<Track> getTempoChangeTrack();
     std::vector<std::string>& getDeviceNames();
     void setDeviceNames(std::vector<std::string>& sa);
     std::vector<std::shared_ptr<TempoChangeEvent>> getTempoChangeEvents();

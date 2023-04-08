@@ -124,10 +124,8 @@ void Sequencer::playToTick(int targetTick)
 				track->playNext();
 		}
 
-        auto tempoChangeTrack = seq->getTempoChangeTrack();
-
-        while (tempoChangeTrack->getNextTick() <= targetTick)
-            tempoChangeTrack->playNext();
+        while (seq->tempoChangeTrack->getNextTick() <= targetTick)
+            seq->tempoChangeTrack->playNext();
 	}
 }
 
@@ -186,7 +184,6 @@ double Sequencer::getTempo()
 		return tempo;
 
 	auto seq = getActiveSequence();
-	auto tce = getCurrentTempoChangeEvent();
 
 	if (mpc.getLayeredScreen()->getCurrentScreenName() == "song")
 	{
@@ -194,7 +191,9 @@ double Sequencer::getTempo()
 			return 120.0;
 	}
 
-	if (tempoSourceSequenceEnabled)
+    auto tce = getCurrentTempoChangeEvent();
+
+    if (tempoSourceSequenceEnabled)
 	{
 		auto ignoreTempoChangeScreen = mpc.screens->get<IgnoreTempoChangeScreen>("ignore-tempo-change");
 
@@ -230,7 +229,9 @@ std::shared_ptr<TempoChangeEvent> Sequencer::getCurrentTempoChangeEvent()
 	}
 	
 	if (index == -1)
-		index++;
+    {
+        return {};
+    }
 
 	return s->getTempoChangeEvents()[index];
 }
@@ -706,9 +707,7 @@ void Sequencer::purgeAllSequences()
 }
 
 void Sequencer::purgeSequence(int i) {
-	sequences[i].reset();
-	auto sequence = std::make_shared<Sequence>(mpc);
-	sequences[i].swap(sequence);
+	sequences[i] = std::make_shared<Sequence>(mpc);
 	sequences[i]->resetTrackEventIndices(position);
 	std::string res = defaultSequenceName;
 	res.append(StrUtil::padLeft(std::to_string(i + 1), "0", 2));
@@ -737,13 +736,11 @@ std::shared_ptr<Sequence> Sequencer::copySequence(std::shared_ptr<Sequence> sour
 	for (int i = 0; i < 64; i++)
 		copyTrack(source->getTrack(i), copy->getTrack(i));
 
-    auto sourceTempoChangeTrack = source->getTempoChangeTrack();
-    auto copyTempoChangeTrack = copy->getTempoChangeTrack();
-	copyTempoChangeTrack->removeEvents();
+    copy->tempoChangeTrack->removeEvents();
 
-	for (auto& event : sourceTempoChangeTrack->getEvents())
+	for (auto& event : source->tempoChangeTrack->getEvents())
     {
-        copyTempoChangeTrack->cloneEventIntoTrack(event, event->getTick());
+        copy->tempoChangeTrack->cloneEventIntoTrack(event, event->getTick());
     }
 
 	return copy;
