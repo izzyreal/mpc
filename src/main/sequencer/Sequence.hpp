@@ -3,6 +3,7 @@
 #include <Mpc.hpp>
 
 #include <memory>
+#include <atomic>
 
 namespace mpc { class Mpc; }
 
