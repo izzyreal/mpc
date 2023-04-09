@@ -15,8 +15,8 @@ using namespace mpc::audiomidi;
 
 SoundPlayer::SoundPlayer()
 {
-	srcLeft = src_new(0, 1, &srcLeftError);
-	srcRight = src_new(0, 1, &srcRightError);
+    srcLeft = src_new(0, 1, &srcLeftError);
+    srcRight = src_new(0, 1, &srcRightError);
 }
 
 SoundPlayer::~SoundPlayer()
@@ -26,262 +26,262 @@ SoundPlayer::~SoundPlayer()
 }
 
 bool SoundPlayer::start(std::shared_ptr<std::istream> _istream, SoundPlayerFileFormat f) {
-	std::unique_lock<std::mutex> guard(_playing);
+    std::unique_lock<std::mutex> guard(_playing);
 
-	if (playing) return false;
+    if (playing) return false;
 
     fileFormat = f;
-    
-	int validBits;
-	int sourceSampleRate;
-	int sourceNumChannels;
 
-	bool valid = false;
-    
+    int validBits;
+    int sourceSampleRate;
+    int sourceNumChannels;
+
+    bool valid = false;
+
     stream = _istream;
-    
-	if (fileFormat == WAV)
+
+    if (fileFormat == WAV)
     {
-		valid = wav_read_header(stream, sourceSampleRate, validBits, sourceNumChannels, sourceFrameCount);
-	}
-	else if (fileFormat == SND) {
-		valid = snd_read_header(stream, sourceSampleRate, validBits, sourceNumChannels, sourceFrameCount);
-	}
+        valid = wav_read_header(stream, sourceSampleRate, validBits, sourceNumChannels, sourceFrameCount);
+    }
+    else if (fileFormat == SND) {
+        valid = snd_read_header(stream, sourceSampleRate, validBits, sourceNumChannels, sourceFrameCount);
+    }
 
-	if (!valid) {
-		return false;
-	}
+    if (!valid) {
+        return false;
+    }
 
-	audioFormat = std::make_shared<AudioFormat>(sourceSampleRate, validBits, sourceNumChannels, true, false);
+    audioFormat = std::make_shared<AudioFormat>(sourceSampleRate, validBits, sourceNumChannels, true, false);
 
-	src_reset(srcLeft);
-	src_reset(srcRight);
-	
-	fadeFactor = -1.0f;
-	stopEarly = false;
+    src_reset(srcLeft);
+    src_reset(srcRight);
 
-	playing = true;
-	
-	return true;
+    fadeFactor = -1.0f;
+    stopEarly = false;
+
+    playing = true;
+
+    return true;
 }
 
 void SoundPlayer::enableStopEarly()
 {
 
-	std::unique_lock<std::mutex> guard(_playing);
+    std::unique_lock<std::mutex> guard(_playing);
 
-	stopEarly = true;
-	fadeFactor = 1.0f;
+    stopEarly = true;
+    fadeFactor = 1.0f;
 }
 
 void SoundPlayer::stop()
 {
-	std::unique_lock<std::mutex> guard(_playing);
+    std::unique_lock<std::mutex> guard(_playing);
 
-	if (!playing) {
-		return;
-	}
+    if (!playing) {
+        return;
+    }
 
-	playing = false;
-	
-	ingestedSourceFrameCount = 0;
+    playing = false;
 
-	resampleInputBufferLeft.reset();
-	resampleInputBufferRight.reset();
-	resampleOutputBufferLeft.reset();
-	resampleOutputBufferRight.reset();
+    ingestedSourceFrameCount = 0;
+
+    resampleInputBufferLeft.reset();
+    resampleInputBufferRight.reset();
+    resampleOutputBufferLeft.reset();
+    resampleOutputBufferRight.reset();
 
 }
 
 int SoundPlayer::processAudio(AudioBuffer* buf, int nFrames)
 {
-	std::unique_lock<std::mutex> guard(_playing);
+    std::unique_lock<std::mutex> guard(_playing);
 
-	auto& left = buf->getChannel(0);
-	auto& right = buf->getChannel(1);
+    auto& left = buf->getChannel(0);
+    auto& right = buf->getChannel(1);
 
-	if (!playing) {
-		buf->makeSilence();
-		return AUDIO_SILENCE;
-	}
+    if (!playing) {
+        buf->makeSilence();
+        return AUDIO_SILENCE;
+    }
 
     auto resampleRatio = static_cast<float>(audioFormat->getSampleRate()) / static_cast<float>(buf->getSampleRate());
 
-	auto frameCountToRead = (int) ceil(resampleRatio * nFrames);
-	
-	auto shouldStop = false;
+    auto frameCountToRead = (int) ceil(resampleRatio * nFrames);
 
-	if (ingestedSourceFrameCount + frameCountToRead >= sourceFrameCount) {
-		shouldStop = true;
-		frameCountToRead = sourceFrameCount - ingestedSourceFrameCount;
-	}
+    auto shouldStop = false;
 
-	auto sourceBuffer = std::make_shared<AudioBuffer>("temp", audioFormat->getChannels(), frameCountToRead, audioFormat->getSampleRate());
-	std::vector<char> byteBuffer(sourceBuffer->getByteArrayBufferSize(audioFormat.get()));
+    if (ingestedSourceFrameCount + frameCountToRead >= sourceFrameCount) {
+        shouldStop = true;
+        frameCountToRead = sourceFrameCount - ingestedSourceFrameCount;
+    }
 
-	if (fileFormat == WAV || (fileFormat == SND && audioFormat->getChannels() == 1)) {
-		stream->read(&byteBuffer[0], byteBuffer.size());
-	}
-	else {
-		auto bytesPerChannel = (int) (byteBuffer.size() * 0.5);
-		
-		std::vector<char> byteBufferLeft(bytesPerChannel);
-		std::vector<char> byteBufferRight(bytesPerChannel);
-		
-		auto totalChannelLengthInBytes = sourceFrameCount * (audioFormat->getSampleSizeInBits() / 8);
+    auto sourceBuffer = std::make_shared<AudioBuffer>("temp", audioFormat->getChannels(), frameCountToRead, audioFormat->getSampleRate());
+    std::vector<char> byteBuffer(sourceBuffer->getByteArrayBufferSize(audioFormat.get()));
 
-		stream->read(&byteBufferLeft[0], bytesPerChannel);
-		stream->seekg(-bytesPerChannel + totalChannelLengthInBytes, std::ios_base::cur);
+    if (fileFormat == WAV || (fileFormat == SND && audioFormat->getChannels() == 1)) {
+        stream->read(&byteBuffer[0], byteBuffer.size());
+    }
+    else {
+        auto bytesPerChannel = (int) (byteBuffer.size() * 0.5);
 
-		stream->read(&byteBufferRight[0], bytesPerChannel);
+        std::vector<char> byteBufferLeft(bytesPerChannel);
+        std::vector<char> byteBufferRight(bytesPerChannel);
 
-		stream->seekg(-totalChannelLengthInBytes, std::ios_base::cur);
-		
-		int byteCounter = 0;
+        auto totalChannelLengthInBytes = sourceFrameCount * (audioFormat->getSampleSizeInBits() / 8);
 
-		for (int i = 0; i < byteBuffer.size(); i += 4) {
-			byteBuffer[i] = byteBufferLeft[byteCounter];
-			byteBuffer[i + 1] = byteBufferLeft[byteCounter + 1];
-			byteBuffer[i + 2] = byteBufferRight[byteCounter];
-			byteBuffer[i + 3] = byteBufferRight[byteCounter + 1];
-			byteCounter += 2;
-		}
-	}
-	
-	sourceBuffer->initFromByteArray_(byteBuffer, 0, byteBuffer.size(), audioFormat.get());
+        stream->read(&byteBufferLeft[0], bytesPerChannel);
+        stream->seekg(-bytesPerChannel + totalChannelLengthInBytes, std::ios_base::cur);
 
-	if (shouldStop) {
-		buf->makeSilence();
-	}
+        stream->read(&byteBufferRight[0], bytesPerChannel);
+
+        stream->seekg(-totalChannelLengthInBytes, std::ios_base::cur);
+
+        int byteCounter = 0;
+
+        for (int i = 0; i < byteBuffer.size(); i += 4) {
+            byteBuffer[i] = byteBufferLeft[byteCounter];
+            byteBuffer[i + 1] = byteBufferLeft[byteCounter + 1];
+            byteBuffer[i + 2] = byteBufferRight[byteCounter];
+            byteBuffer[i + 3] = byteBufferRight[byteCounter + 1];
+            byteCounter += 2;
+        }
+    }
+
+    sourceBuffer->initFromByteArray_(byteBuffer, 0, byteBuffer.size(), audioFormat.get());
+
+    if (shouldStop) {
+        buf->makeSilence();
+    }
 
     const bool resample = buf->getSampleRate() != audioFormat->getSampleRate();
 
-	if (resample) {
+    if (resample) {
 
-		if (audioFormat->getChannels() >= 1) {
-            resampleChannel(true, sourceBuffer->getChannel(0), audioFormat->getSampleRate(), buf->getSampleRate(), nFrames);
-		}
+        if (audioFormat->getChannels() >= 1) {
+            resampleChannel(true, sourceBuffer->getChannel(0), audioFormat->getSampleRate(), buf->getSampleRate());
+        }
 
-		if (audioFormat->getChannels() >= 2) {
-            resampleChannel(false, sourceBuffer->getChannel(1), audioFormat->getSampleRate(), buf->getSampleRate(), nFrames);
-		}
+        if (audioFormat->getChannels() >= 2) {
+            resampleChannel(false, sourceBuffer->getChannel(1), audioFormat->getSampleRate(), buf->getSampleRate());
+        }
 
-		if (resampleOutputBufferLeft.available() >= nFrames) {
+        if (resampleOutputBufferLeft.available() >= nFrames) {
 
-			for (int i = 0; i < nFrames; i++) {
-				left[i] = resampleOutputBufferLeft.get();
-			}
+            for (int i = 0; i < nFrames; i++) {
+                left[i] = resampleOutputBufferLeft.get();
+            }
 
-			if (audioFormat->getChannels() == 1) {
-				buf->copyChannel(0, 1);
-			}
-			else {
-				for (int i = 0; i < nFrames; i++) {
-					right[i] = resampleOutputBufferRight.get();
-				}
-			}
-		}
-		else if (shouldStop && resampleOutputBufferLeft.available() > 0) {
+            if (audioFormat->getChannels() == 1) {
+                buf->copyChannel(0, 1);
+            }
+            else {
+                for (int i = 0; i < nFrames; i++) {
+                    right[i] = resampleOutputBufferRight.get();
+                }
+            }
+        }
+        else if (shouldStop && resampleOutputBufferLeft.available() > 0) {
 
-			auto remaining = resampleOutputBufferLeft.available();
+            auto remaining = resampleOutputBufferLeft.available();
 
-			for (int i = 0; i < std::min( (int) remaining, nFrames); i++) {
-				left[i] = resampleOutputBufferLeft.get();
-			}
+            for (int i = 0; i < std::min( (int) remaining, nFrames); i++) {
+                left[i] = resampleOutputBufferLeft.get();
+            }
 
-			if (audioFormat->getChannels() == 1) {
-				buf->copyChannel(0, 1);
-			}
-			else {
-				for (int i = 0; i < std::min( (int)remaining, nFrames); i++) {
-					right[i] = resampleOutputBufferRight.get();
-				}
-			}
-		}
-	}
-	else {
+            if (audioFormat->getChannels() == 1) {
+                buf->copyChannel(0, 1);
+            }
+            else {
+                for (int i = 0; i < std::min( (int)remaining, nFrames); i++) {
+                    right[i] = resampleOutputBufferRight.get();
+                }
+            }
+        }
+    }
+    else {
 
-		auto frameCountToWrite = std::min(sourceBuffer->getSampleCount(), nFrames);
-		if (sourceBuffer->getChannelCount() == 1) {
-			
-			for (int i = 0; i < frameCountToWrite; i++) {
-				left[i] = sourceBuffer->getChannel(0)[i];
-				right[i] = left[i];
-			}
-		}
-		else {
-			for (int i = 0; i < frameCountToWrite; i++) {
-				left[i] = sourceBuffer->getChannel(0)[i];
-				right[i] = sourceBuffer->getChannel(1)[i];
-			}
-		}
-	}
+        auto frameCountToWrite = std::min(sourceBuffer->getSampleCount(), nFrames);
+        if (sourceBuffer->getChannelCount() == 1) {
 
-	ingestedSourceFrameCount += frameCountToRead;
+            for (int i = 0; i < frameCountToWrite; i++) {
+                left[i] = sourceBuffer->getChannel(0)[i];
+                right[i] = left[i];
+            }
+        }
+        else {
+            for (int i = 0; i < frameCountToWrite; i++) {
+                left[i] = sourceBuffer->getChannel(0)[i];
+                right[i] = sourceBuffer->getChannel(1)[i];
+            }
+        }
+    }
 
-	if (stopEarly) {
-		int bufferIndex = 0;
+    ingestedSourceFrameCount += frameCountToRead;
 
-		while (fadeFactor >= 0.0f && bufferIndex < nFrames) {
-			left[bufferIndex] = left[bufferIndex] * fadeFactor;
-			right[bufferIndex] = right[bufferIndex] * fadeFactor;
-			fadeFactor -= 0.002f;
-			bufferIndex++;
-		}
+    if (stopEarly) {
+        int bufferIndex = 0;
 
-		if (bufferIndex != nFrames) {
-			for (int i = bufferIndex; i < nFrames; i++) {
-				left[i] = 0;
-				right[i] = 0;
-			}
-		}
-	}
+        while (fadeFactor >= 0.0f && bufferIndex < nFrames) {
+            left[bufferIndex] = left[bufferIndex] * fadeFactor;
+            right[bufferIndex] = right[bufferIndex] * fadeFactor;
+            fadeFactor -= 0.002f;
+            bufferIndex++;
+        }
+
+        if (bufferIndex != nFrames) {
+            for (int i = bufferIndex; i < nFrames; i++) {
+                left[i] = 0;
+                right[i] = 0;
+            }
+        }
+    }
 
 
-	if (shouldStop || (stopEarly && fadeFactor < 0) ) {
-		guard.unlock();
-		stop();
-	}
-	else {
-		guard.unlock();
-	}
+    if (shouldStop || (stopEarly && fadeFactor < 0) ) {
+        guard.unlock();
+        stop();
+    }
+    else {
+        guard.unlock();
+    }
 
-	return AUDIO_OK;
+    return AUDIO_OK;
 }
 
 void SoundPlayer::resampleChannel(bool left, std::vector<float> &inputBuffer, int sourceSampleRate,
-                                  int destinationSampleRate, int nFrames)
+                                  int destinationSampleRate)
 {
-	auto ratio = static_cast<float>(destinationSampleRate) / static_cast<float>(sourceSampleRate);
-	auto circularInputBuffer = left ? &resampleInputBufferLeft : &resampleInputBufferRight;
-	auto circularOutputBuffer = left ? &resampleOutputBufferLeft : &resampleOutputBufferRight;
+    auto ratio = static_cast<float>(destinationSampleRate) / static_cast<float>(sourceSampleRate);
+    auto circularInputBuffer = left ? &resampleInputBufferLeft : &resampleInputBufferRight;
+    auto circularOutputBuffer = left ? &resampleOutputBufferLeft : &resampleOutputBufferRight;
 
-    for (int i = 0 ; i < nFrames; i++) {
-		circularInputBuffer->put(inputBuffer[i]);
-	}
+    for (auto f : inputBuffer) {
+        circularInputBuffer->put(f);
+    }
 
-	std::vector<float> input;
-	while (!circularInputBuffer->empty()) {
-		input.push_back(circularInputBuffer->get());
-	}
+    std::vector<float> input;
+    while (!circularInputBuffer->empty()) {
+        input.push_back(circularInputBuffer->get());
+    }
 
-	auto output = std::vector<float>(ceil(input.size() * ratio));
+    auto output = std::vector<float>(ceil(input.size() * ratio));
 
-	SRC_DATA data;
-	data.data_in = &input[0];
-	data.input_frames = input.size();
-	data.data_out = &output[0];
-	data.output_frames = output.size();
-	data.end_of_input = 0;
-	data.src_ratio = ratio;
+    SRC_DATA data;
+    data.data_in = &input[0];
+    data.input_frames = input.size();
+    data.data_out = &output[0];
+    data.output_frames = output.size();
+    data.end_of_input = 0;
+    data.src_ratio = ratio;
 
-	src_process(left ? srcLeft : srcRight, &data);
+    src_process(left ? srcLeft : srcRight, &data);
 
-	circularInputBuffer->move(-(input.size() - data.input_frames_used));
+    circularInputBuffer->move(-(input.size() - data.input_frames_used));
 
-	for (int i = 0; i < data.output_frames_gen; i++) {
-		circularOutputBuffer->put(output[i]);
-	}
+    for (int i = 0; i < data.output_frames_gen; i++) {
+        circularOutputBuffer->put(output[i]);
+    }
 }
 
 bool SoundPlayer::isPlaying()
