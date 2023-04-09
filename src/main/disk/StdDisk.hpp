@@ -23,8 +23,7 @@ private:
     std::vector<std::string> path;
     void initParentFiles();
     std::shared_ptr<MpcFile> getParentDir();
-    void renameFilesToAkai();
-    
+
 public:
     std::shared_ptr<MpcFile> newFile(const std::string& newFileName) override;
     void initFiles() override;

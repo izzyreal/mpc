@@ -38,14 +38,12 @@ bool SoundPlayer::start(std::shared_ptr<std::istream> _istream, SoundPlayerFileF
 
     bool valid = false;
 
-    stream = _istream;
-
     if (fileFormat == WAV)
     {
-        valid = wav_read_header(stream, sourceSampleRate, validBits, sourceNumChannels, sourceFrameCount);
+        valid = wav_read_header(_istream, sourceSampleRate, validBits, sourceNumChannels, sourceFrameCount);
     }
     else if (fileFormat == SND) {
-        valid = snd_read_header(stream, sourceSampleRate, validBits, sourceNumChannels, sourceFrameCount);
+        valid = snd_read_header(_istream, sourceSampleRate, validBits, sourceNumChannels, sourceFrameCount);
     }
 
     if (!valid) {
@@ -59,6 +57,8 @@ bool SoundPlayer::start(std::shared_ptr<std::istream> _istream, SoundPlayerFileF
 
     fadeFactor = -1.0f;
     stopEarly = false;
+
+    stream = _istream;
 
     playing = true;
 
@@ -84,13 +84,14 @@ void SoundPlayer::stop()
 
     playing = false;
 
+    stream.reset();
+
     ingestedSourceFrameCount = 0;
 
     resampleInputBufferLeft.reset();
     resampleInputBufferRight.reset();
     resampleOutputBufferLeft.reset();
     resampleOutputBufferRight.reset();
-
 }
 
 int SoundPlayer::processAudio(AudioBuffer* buf, int nFrames)
