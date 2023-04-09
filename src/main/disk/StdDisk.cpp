@@ -37,6 +37,23 @@ void StdDisk::flush()
     volume.flush();
 }
 
+#ifdef _WIN32
+std::string generateRandomName(const int len) {
+    static const char alphanum[] =
+            "0123456789"
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            "abcdefghijklmnopqrstuvwxyz";
+    std::string tmp_s;
+    tmp_s.reserve(len);
+
+    for (int i = 0; i < len; ++i) {
+        tmp_s += alphanum[rand() % (sizeof(alphanum) - 1)];
+    }
+
+    return tmp_s;
+}
+#endif
+
 void StdDisk::renameFilesToAkai()
 {
 	auto dirContent = getDir()->listFiles();
@@ -70,6 +87,10 @@ void StdDisk::renameFilesToAkai()
 		}
 
 		allCompatibleNames.push_back(akaiName);
+#ifdef _WIN32
+        auto randomName = generateRandomName(16);
+        file->setName(randomName);
+#endif
         file->setName(akaiName);
 	}
 	
@@ -95,7 +116,11 @@ void StdDisk::renameFilesToAkai()
 			akaiName = akaiName.substr(0, akaiName.find_last_of("."));
 
 		allCompatibleNames.push_back(akaiName);
-		dir->setName(akaiName);
+#ifdef _WIN32
+        auto randomName = generateRandomName(16);
+        dir->setName(randomName);
+#endif
+        dir->setName(akaiName);
 	}
 }
 
