@@ -4,10 +4,7 @@
 #include <Paths.hpp>
 #include <disk/AbstractDisk.hpp>
 
-#include "file/FileUtil.hpp"
-
 #include <rapidjson/document.h>
-#include "rapidjson/filewritestream.h"
 #include <rapidjson/writer.h>
 
 using namespace mpc::nvram;
@@ -21,24 +18,27 @@ Document read()
 {
     Document result;
 
-    auto fp = moduru::file::FileUtil::fopenw(volumesPersistencePath.c_str(), "r");
+    const auto path = fs::path(volumesPersistencePath);
     
-    if (fp != NULL)
+    if (fs::exists(path))
     {
-        char buf[bufSize];
-        fgets(buf, bufSize, fp);
-        result.Parse(buf);
-        fclose(fp);
+        const auto bytes = get_file_data(path);
+        result.Parse(bytes.data());
     }
     
     if (!result.IsObject())
+    {
         result.SetObject();
+    }
     
     if (!result.HasMember("volumes"))
+    {
         result.AddMember("volumes", Value().SetArray(), result.GetAllocator());
+    }
 
     return result;
 }
+
 std::string VolumesPersistence::getPersistedActiveUUID()
 {
     Document doc = read();
@@ -84,28 +84,28 @@ void VolumesPersistence::save(mpc::Mpc & mpc)
     {
         (*i)["active"].Swap(Value().SetBool(false));
         auto uuid = (*i)["uuid"].GetString();
-        alreadyPersistedUUIDs.emplace_back(std::string(uuid));
+        alreadyPersistedUUIDs.emplace_back(uuid);
     }
     
     auto activeUUID = mpc.getDisk()->getVolume().volumeUUID;
     
     auto disks = mpc.getDisks();
         
-    for (int i = 0; i < disks.size(); i++)
+    for (const auto & disk : disks)
     {
-        auto& diskVol = disks[i]->getVolume();
+        auto& diskVol = disk->getVolume();
      
         bool alreadyPersisted = std::find(begin(alreadyPersistedUUIDs), end(alreadyPersistedUUIDs), diskVol.volumeUUID) != end(alreadyPersistedUUIDs);
         
         if (alreadyPersisted)
         {
-            for (auto i = volumes.GetArray().Begin(); i != volumes.GetArray().End(); i++)
+            for (auto j = volumes.GetArray().Begin(); j != volumes.GetArray().End(); j++)
             {
-                auto uuid = (*i)["uuid"].GetString();
+                auto uuid = (*j)["uuid"].GetString();
                 if (std::string(uuid) == diskVol.volumeUUID)
                 {
-                    (*i)["mode"].Swap(Value().SetInt(diskVol.mode));
-                    (*i)["active"].Swap(Value().SetBool(uuid == activeUUID));
+                    (*j)["mode"].Swap(Value().SetInt(diskVol.mode));
+                    (*j)["active"].Swap(Value().SetBool(uuid == activeUUID));
                     break;
                 }
             }
@@ -120,13 +120,13 @@ void VolumesPersistence::save(mpc::Mpc & mpc)
         }
     }
 
-    auto fp = moduru::file::FileUtil::fopenw(volumesPersistencePath.c_str(), "w");
+    const auto path = fs::path(volumesPersistencePath);
+    StringBuffer buffer;
 
-    char writeBuffer[bufSize];
-    FileWriteStream os(fp, writeBuffer, sizeof(writeBuffer));
-    
-    Writer<FileWriteStream> writer(os);
-    
+    Writer<StringBuffer> writer(buffer);
     d.Accept(writer);
-    fclose(fp);
+
+    const char* data = buffer.GetString();
+
+    set_file_data(path, {data, data + buffer.GetSize() });
 }

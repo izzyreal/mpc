@@ -7,8 +7,6 @@
 #include "nvram/MidiControlPersistence.hpp"
 #include "disk/AbstractDisk.hpp"
 
-#include "file/File.hpp"
-
 using namespace mpc::nvram;
 using namespace mpc::lcdgui::screens;
 using namespace moduru::file;

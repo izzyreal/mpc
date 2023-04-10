@@ -9,8 +9,6 @@
 #include "lcdgui/screens/window/VmpcKnownControllerDetectedScreen.hpp"
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
 
-#include "file/File.hpp"
-
 #include <vector>
 
 #ifdef _WIN32
