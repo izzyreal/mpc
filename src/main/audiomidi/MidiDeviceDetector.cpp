@@ -62,23 +62,23 @@ void MidiDeviceDetector::start(mpc::Mpc &mpc)
                 {
                     MLOG("A new MIDI device was connected: " + name);
 
-                    std::string path;
+                    fs::path path;
                     auto knownControllerDetectedScreen = mpc.screens->get<VmpcKnownControllerDetectedScreen>(
                             "vmpc-known-controller-detected");
 
                     if (name.find("MPD16") != std::string::npos)
                     {
-                        path = Paths::midiControlPresetsPath() + "MPD16.vmp";
+                        path = Paths::midiControlPresetsPath() / "MPD16.vmp";
                         knownControllerDetectedScreen->controllerName = "MPD16";
                     }
                     else if (name.find("MPD218") != std::string::npos)
                     {
-                        path = Paths::midiControlPresetsPath() + "MPD218.vmp";
+                        path = Paths::midiControlPresetsPath() / "MPD218.vmp";
                         knownControllerDetectedScreen->controllerName = "MPD218";
                     }
                     else if (name.find("iRig PADS") != std::string::npos)
                     {
-                        path = Paths::midiControlPresetsPath() + "iRig_PADS.vmp";
+                        path = Paths::midiControlPresetsPath() / "iRig_PADS.vmp";
                         knownControllerDetectedScreen->controllerName = "iRig PADS";
                     }
 

@@ -50,9 +50,8 @@ Mpc::Mpc()
     XInitThreads();
 #endif
 
-    std::vector<std::string> requiredPaths {
+    std::vector<fs::path> requiredPaths {
         Paths::appDocumentsPath(),
-        Paths::appConfigHome(),
         Paths::configPath(),
         Paths::storesPath(),
         Paths::defaultLocalVolumePath(),
@@ -76,7 +75,7 @@ Mpc::Mpc()
             {
                 if (entry.is_directory()) continue;
 
-                auto path = fs::path(p + entry.filename());
+                auto path = fs::path(p / entry.filename());
 
                 if (!fs::exists(path))
                 {
@@ -98,18 +97,18 @@ Mpc::Mpc()
 	{
 		try
 		{
-			MLOG("Copying demo data into " + demoDest);
+			MLOG("Copying demo data into " + demoDest.string());
 			fs::copy(demoSrc, demoDest, fs::copy_options::recursive | fs::copy_options::overwrite_existing);
 		}
 		catch (std::exception& e)
 		{
             std::string errorMsg = e.what();
-			MLOG("An error occurred while copying demo data from " + demoSrc + " to " + demoDest);
+			MLOG("An error occurred while copying demo data from " + demoSrc.string() + " to " + demoDest.string());
 		}
 	}
 	else
 	{
-		MLOG(demoDest + " already exists, it will not be touched.");
+		MLOG(demoDest.string() + " already exists, it will not be touched.");
 	}
 #endif
 

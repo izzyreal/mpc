@@ -99,7 +99,7 @@ TEST_CASE("Save and load a preset", "[midi-control-persistence]")
     // Save the preset by pressing ENTER in NameScreen
     controls->function(4);
 
-    const auto newPresetPath = fs::path(mpc::Paths::midiControlPresetsPath() + "New_preset.vmp");
+    const auto newPresetPath = mpc::Paths::midiControlPresetsPath() / "New_preset.vmp";
 
     REQUIRE(fs::exists(newPresetPath));
     auto preset = std::make_shared<MidiControlPreset>();

@@ -38,18 +38,18 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc, const std::string& overrideP
         return;
     }
 
-    const auto path = overridePath.empty() ? Paths::autoSavePath() : overridePath;
-    const auto apsFile = path + "APS.APS";
-    const auto allFile = path + "ALL.ALL";
-    const auto soundIndexFile = path + "soundIndex.txt";
-    const auto lastPressedPadFile = path + "lastPressedPad.txt";
-    const auto lastPressedNoteFile = path + "lastPressedNote.txt";
-    const auto screenFile = path + "screen.txt";
-    const auto previousScreenFile = path + "previousScreen.txt";
-    const auto previousSamplerScreenFile = path + "previousSamplerScreen.txt";
-    const auto focusFile = path + "focus.txt";
-    const auto soundsFile = path + "sounds.txt";
-    const auto currentDirFile = path + "currentDir.txt";
+    const auto path = overridePath.empty() ? Paths::autoSavePath() : fs::path(overridePath);
+    const auto apsFile = path / "APS.APS";
+    const auto allFile = path / "ALL.ALL";
+    const auto soundIndexFile = path / "soundIndex.txt";
+    const auto lastPressedPadFile = path / "lastPressedPad.txt";
+    const auto lastPressedNoteFile = path / "lastPressedNote.txt";
+    const auto screenFile = path / "screen.txt";
+    const auto previousScreenFile = path / "previousScreen.txt";
+    const auto previousSamplerScreenFile = path / "previousSamplerScreen.txt";
+    const auto focusFile = path / "focus.txt";
+    const auto soundsFile = path / "sounds.txt";
+    const auto currentDirFile = path / "currentDir.txt";
 
     std::vector<fs::path> files{apsFile, allFile, soundIndexFile, lastPressedPadFile, lastPressedNoteFile, screenFile, previousScreenFile, previousSamplerScreenFile, focusFile, soundsFile, currentDirFile };
 
@@ -70,7 +70,7 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc, const std::string& overrideP
 
     const auto restoreAutoSavedStateAction = [&mpc, availableFiles, path] {
 
-        std::map<std::string, std::vector<char>> processInOrder;
+        std::map<fs::path, std::vector<char>> processInOrder;
 
         for (auto &f : availableFiles)
         {
@@ -83,23 +83,23 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc, const std::string& overrideP
 
             const auto data = get_file_data(f);
 
-            if (f == path + "APS.APS")
+            if (f == path / "APS.APS")
             {
                 ApsParser apsParser(mpc, data);
                 disk::ApsLoader::loadFromParsedAps(apsParser, mpc, true, true);
             }
-            else if (f == path + "ALL.ALL")
+            else if (f == path / "ALL.ALL")
             {
                 AllParser allParser(mpc, data);
                 disk::AllLoader::loadEverythingFromAllParser(mpc, allParser);
             }
-            else if (f == path + "sounds.txt")
+            else if (f == path / "sounds.txt")
             {
                 auto soundNames = StrUtil::split(std::string(data.begin(), data.end()), '\n');
 
                 for (auto &soundName: soundNames)
                 {
-                    auto soundPath = fs::path(Paths::autoSavePath() + soundName);
+                    const auto soundPath = Paths::autoSavePath() / soundName;
 
                     auto soundData = get_file_data(soundPath);
 
@@ -125,9 +125,9 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc, const std::string& overrideP
         }
 
         const auto setIntProperty = [&processInOrder, path](const std::string& prop, const std::function<void(int v)>& setter) {
-            if (processInOrder.find(path + prop) != processInOrder.end())
+            if (processInOrder.find(path / prop) != processInOrder.end())
             {
-                std::vector<char> str = processInOrder[path + prop];
+                std::vector<char> str = processInOrder[path / prop];
                 try
                 {
                     auto value = str[0];
@@ -138,9 +138,9 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc, const std::string& overrideP
         };
 
         const auto getStringProperty = [&processInOrder, path](const std::string& prop) -> std::string {
-            if (processInOrder.find(path + prop) != processInOrder.end())
+            if (processInOrder.find(path / prop) != processInOrder.end())
             {
-                return {processInOrder[path + prop].begin(), processInOrder[path + prop].end()};
+                return {processInOrder[path / prop].begin(), processInOrder[path / prop].end()};
             } else return {};
         };
 
@@ -149,9 +149,8 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc, const std::string& overrideP
         setIntProperty("lastPressedPad.txt", [&mpc](int v){mpc.setPad(v);});
 
         auto currentDir = fs::path(getStringProperty("currentDir.txt"));
-        auto storesPath = fs::path(mpc::Paths::storesPath() + "MPC2000XL");
 
-        auto relativePath = relative(currentDir, storesPath);
+        auto relativePath = fs::relative(currentDir, mpc::Paths::defaultLocalVolumePath());
 
         for (auto& pathSegment : relativePath)
         {
@@ -218,18 +217,18 @@ void AutoSave::storeAutoSavedState(mpc::Mpc &mpc, const std::string& overridePat
         return;
     }
 
-    const auto path = overridePath.empty() ? Paths::autoSavePath() : overridePath;
-    const auto apsFile = path + "APS.APS";
-    const auto allFile = path + "ALL.ALL";
-    const auto soundIndexFile = path + "soundIndex.txt";
-    const auto lastPressedPadFile = path + "lastPressedPad.txt";
-    const auto lastPressedNoteFile = path + "lastPressedNote.txt";
-    const auto screenFile = path + "screen.txt";
-    const auto previousScreenFile = path + "previousScreen.txt";
-    const auto previousSamplerScreenFile = path + "previousSamplerScreen.txt";
-    const auto focusFile = path + "focus.txt";
-    const auto soundsFile = path + "sounds.txt";
-    const auto currentDirFile = path + "currentDir.txt";
+    const auto path = overridePath.empty() ? Paths::autoSavePath() : fs::path(overridePath);
+    const auto apsFile = path / "APS.APS";
+    const auto allFile = path / "ALL.ALL";
+    const auto soundIndexFile = path / "soundIndex.txt";
+    const auto lastPressedPadFile = path / "lastPressedPad.txt";
+    const auto lastPressedNoteFile = path / "lastPressedNote.txt";
+    const auto screenFile = path / "screen.txt";
+    const auto previousScreenFile = path / "previousScreen.txt";
+    const auto previousSamplerScreenFile = path / "previousSamplerScreen.txt";
+    const auto focusFile = path / "focus.txt";
+    const auto soundsFile = path / "sounds.txt";
+    const auto currentDirFile = path / "currentDir.txt";
 
     std::function<void()> storeAutoSavedStateAction = [&](){
 
@@ -287,7 +286,7 @@ void AutoSave::storeAutoSavedState(mpc::Mpc &mpc, const std::string& overridePat
         {
             SndWriter sndWriter(sound.get());
             auto data = sndWriter.getSndFileArray();
-            auto soundFilePath = path + sound->getName() + ".SND";
+            auto soundFilePath = path / (sound->getName() + ".SND");
             set_file_data(soundFilePath, data);
             soundNames = soundNames.append(sound->getName() + ".SND\n");
         }

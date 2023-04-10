@@ -1,7 +1,5 @@
 #include "Paths.hpp"
 
-#include <file/FileUtil.hpp>
-
 #include <thirdp/PlatformFolders/platform_folders.h>
 
 #ifdef __APPLE__
@@ -9,80 +7,73 @@
 #endif
 
 using namespace mpc;
-using namespace moduru::file;
 
-std::string Paths::sep()
-{
-    static auto res = FileUtil::getSeparator();
-    return res;
-}
-
-std::string Paths::appDocumentsPath()
+fs::path Paths::appDocumentsPath()
 {
 #if TARGET_OS_IOS
     static auto path = sago::getDocumentsFolder() + sep();
 #else
-    static auto path = sago::getDocumentsFolder() + sep() + "VMPC2000XL" + sep();
+    static auto path = fs::path(sago::getDocumentsFolder()) / "VMPC2000XL";
 #endif
     return path;
 }
 
-std::string Paths::appConfigHome()
+fs::path Paths::appConfigHome()
 {
-    static auto path = sago::getConfigHome() + sep() + "VMPC2000XL" + sep();
+    static auto path = fs::path(sago::getConfigHome()) / "VMPC2000XL";
     return path;
 }
 
-std::string Paths::configPath()
+fs::path Paths::configPath()
 {
-    static auto path = appConfigHome() + "config" + sep();
+    static auto path = appConfigHome() / "config";
     return path;
 }
 
-std::string Paths::storesPath()
+fs::path Paths::storesPath()
 {
-  static auto storesPath = appDocumentsPath() + "Volumes" + sep();
+  static auto storesPath = appDocumentsPath() / "Volumes";
   return storesPath;
 }
 
-std::string Paths::defaultLocalVolumePath()
+fs::path Paths::defaultLocalVolumePath()
 {
-    static auto storesPath = appDocumentsPath() + "Volumes" + sep() + "MPC2000XL";
+    static auto storesPath = appDocumentsPath() / "Volumes" / "MPC2000XL";
     return storesPath;
 }
 
-std::string Paths::logFilePath()
+fs::path Paths::logFilePath()
 {
-  static auto logFilePath = appDocumentsPath() + "vmpc.log";
+  static auto logFilePath = appDocumentsPath() / "vmpc.log";
   return logFilePath;
 }
 
-std::string Paths::recordingsPath()
+fs::path Paths::recordingsPath()
 {
-    static auto recPath = appDocumentsPath() + "Recordings" + sep();
+    static auto recPath = appDocumentsPath() / "Recordings";
     return recPath;
 }
 
-std::string Paths::midiControlPresetsPath()
+fs::path Paths::midiControlPresetsPath()
 {
-    static auto path = appDocumentsPath() + "MidiControlPresets" + sep();
+    static auto path = appDocumentsPath() / "MidiControlPresets";
     return path;
 }
 
-std::string Paths::autoSavePath()
+fs::path Paths::autoSavePath()
 {
-    static auto path = appDocumentsPath() + "AutoSave" + sep();
+    static auto path = appDocumentsPath() / "AutoSave";
     return path;
 }
 
-std::string Paths::demoDataSrcPath()
+fs::path Paths::demoDataSrcPath()
 {
-    static auto demoDataPath = sago::getData() + sep() + "VMPC2000XL" + sep() + "DemoData" + sep();
+    static auto demoDataPath = fs::path(sago::getData()) / "VMPC2000XL" / "DemoData";
     return demoDataPath;
 }
 
-std::string Paths::demoDataDestPath()
+fs::path Paths::demoDataDestPath()
 {
-    static auto demoDataPath = defaultLocalVolumePath() + sep() + "Demos" + sep();
+    static auto demoDataPath = defaultLocalVolumePath() / "Demos";
     return demoDataPath;
 }

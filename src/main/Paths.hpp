@@ -1,29 +1,27 @@
 #pragma once
 
-#include <string>
+#include "mpc_fs.hpp"
 
 namespace mpc {
 class Paths
 {
 private:
-//    static std::string override
-    static std::string sep();
+    static fs::path appConfigHome();
 
 public:
-    static std::string appConfigHome();
-    static std::string appDocumentsPath();
+    static fs::path appDocumentsPath();
 
-    static std::string storesPath();
-    static std::string defaultLocalVolumePath();
+    static fs::path storesPath();
+    static fs::path defaultLocalVolumePath();
 
-    static std::string logFilePath();
-    static std::string recordingsPath();
-    static std::string midiControlPresetsPath();
-    static std::string autoSavePath();
+    static fs::path logFilePath();
+    static fs::path recordingsPath();
+    static fs::path midiControlPresetsPath();
+    static fs::path autoSavePath();
 
-    static std::string configPath();
-    static std::string demoDataSrcPath();
-    static std::string demoDataDestPath();
+    static fs::path configPath();
+    static fs::path demoDataSrcPath();
+    static fs::path demoDataDestPath();
 
 };
 }

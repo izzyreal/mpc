@@ -17,7 +17,7 @@ void MidiControlPersistence::restoreLastState(mpc::Mpc& mpc)
 {
     loadDefaultMapping(mpc);
 
-    const auto lastStatePath = fs::path(mpc::Paths::configPath() + "midicontrolmapping.vmp");
+    const auto lastStatePath = mpc::Paths::configPath() / "midicontrolmapping.vmp";
 
     if (fs::exists(lastStatePath))
     {
@@ -109,7 +109,7 @@ void MidiControlPersistence::loadDefaultMapping(mpc::Mpc &mpc)
 
 void MidiControlPersistence::saveCurrentState(mpc::Mpc& mpc)
 {
-    const auto path = fs::path(mpc::Paths::configPath() + "midicontrolmapping.vmp");
+    const auto path = mpc::Paths::configPath() / "midicontrolmapping.vmp";
 
     try
     {
@@ -161,7 +161,7 @@ void MidiControlPersistence::loadFileByNameIntoPreset(
         std::shared_ptr<MidiControlPreset> preset
 )
 {
-    auto presetsPath = fs::path(mpc::Paths::midiControlPresetsPath());
+    auto presetsPath = mpc::Paths::midiControlPresetsPath();
 
     assert(fs::exists(presetsPath) && fs::is_directory(presetsPath));
 
@@ -184,7 +184,7 @@ void MidiControlPersistence::loadAllPresetsFromDiskIntoMemory(mpc::Mpc& mpc)
 {
     presets.clear();
 
-    auto presetsPath = fs::path(mpc::Paths::midiControlPresetsPath());
+    auto presetsPath = mpc::Paths::midiControlPresetsPath();
     assert(fs::exists(presetsPath) && fs::is_directory(presetsPath));
 
     for (auto& e : fs::directory_iterator(presetsPath))
@@ -201,7 +201,7 @@ void MidiControlPersistence::loadAllPresetsFromDiskIntoMemory(mpc::Mpc& mpc)
 
 void MidiControlPersistence::deleteLastState()
 {
-    auto lastStatePath = fs::path(mpc::Paths::configPath() + "midicontrolmapping.vmp");
+    auto lastStatePath = mpc::Paths::configPath() / "midicontrolmapping.vmp";
 
     if (fs::exists(lastStatePath))
     {
@@ -211,7 +211,7 @@ void MidiControlPersistence::deleteLastState()
 
 bool MidiControlPersistence::doesPresetWithNameExist(std::string name)
 {
-    auto path_it = fs::directory_iterator(fs::path(mpc::Paths::midiControlPresetsPath()));
+    auto path_it = fs::directory_iterator(mpc::Paths::midiControlPresetsPath());
 
     return std::any_of(fs::begin(path_it), fs::end(path_it), [name](const fs::directory_entry& e){
         return !fs::is_directory(e) && StrUtil::eqIgnoreCase(e.path().stem(), name);

@@ -1,7 +1,6 @@
 #include "KbMapping.hpp"
 #include <sys/KeyCodes.hpp>
 #include <Paths.hpp>
-#include "../mpc_fs.hpp"
 
 #include <Logger.hpp>
 
@@ -16,7 +15,7 @@ KbMapping::KbMapping()
 const key_helper_t* mpc::controls::KbMapping::kh = &key_helper_t::instance();
 
 void KbMapping::exportMapping() {
-	auto path = fs::path(mpc::Paths::configPath() + "keys.txt");
+	const auto path = mpc::Paths::configPath() / "keys.txt";
 
     std::vector<char> bytes;
 	
@@ -41,7 +40,7 @@ void KbMapping::exportMapping() {
 void KbMapping::importMapping()
 {
     labelKeyMap.clear();
-    auto path = fs::path(mpc::Paths::configPath() + "keys.txt");
+    const auto path = mpc::Paths::configPath() / "keys.txt";
 
     if (!fs::exists(path))
     {

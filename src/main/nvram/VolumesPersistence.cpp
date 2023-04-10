@@ -11,7 +11,7 @@ using namespace mpc::nvram;
 using namespace mpc::disk;
 using namespace rapidjson;
 
-const auto volumesPersistencePath = mpc::Paths::configPath() + "volumes.json";
+const auto volumesPersistencePath = mpc::Paths::configPath() / "volumes.json";
 const size_t bufSize = 2048;
 
 Document read()

@@ -336,7 +336,7 @@ bool AudioMidiServices::prepareBouncing(DirectToDiskSettings* settings)
 	for (int i = 0; i < diskRecorders.size(); i++)
 	{
 		auto eapa = diskRecorders[i];
-		auto absolutePath = mpc::Paths::recordingsPath() + indivFileNames[i];
+		auto absolutePath = mpc::Paths::recordingsPath() / indivFileNames[i];
 
 		if (!eapa->prepare(absolutePath, settings->lengthInFrames, settings->sampleRate))
 			return false;

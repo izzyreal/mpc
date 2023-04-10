@@ -397,7 +397,7 @@ void AbstractDisk::writeMidiControlPreset(std::shared_ptr<MidiControlPreset> pre
                 data.push_back(b);
         }
 
-        auto presetPath = fs::path(mpc::Paths::midiControlPresetsPath() + preset->name + ".vmp");
+        auto presetPath = mpc::Paths::midiControlPresetsPath() / (preset->name + ".vmp");
 
         set_file_data(presetPath, data);
 
