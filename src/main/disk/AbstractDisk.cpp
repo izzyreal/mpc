@@ -28,8 +28,6 @@
 #include <lcdgui/screens/window/SaveAProgramScreen.hpp>
 #include <lcdgui/screens/dialog2/PopupScreen.hpp>
 
-#include <file/FileUtil.hpp>
-#include <file/File.hpp>
 #include <lang/StrUtil.hpp>
 
 using namespace mpc::disk;
@@ -52,7 +50,6 @@ using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::sampler;
 
 using namespace moduru::lang;
-using namespace moduru::file;
 
 AbstractDisk::AbstractDisk(mpc::Mpc& _mpc)
         : mpc (_mpc)
@@ -197,19 +194,14 @@ bool AbstractDisk::checkExists(std::string fileName)
 {
     initFiles();
 
-    auto fileNameSplit = FileUtil::splitName(fileName);
+    const auto path = fs::path(fileName);
 
-    for (auto& file : getAllFiles())
-    {
-        auto name = FileUtil::splitName(file->getName());
-        auto nameIsSame = StrUtil::eqIgnoreCase(name[0], fileNameSplit[0]);
-        auto extIsSame = StrUtil::eqIgnoreCase(name[1], fileNameSplit[1]);
-
-        if (nameIsSame && extIsSame)
-            return true;
-    }
-
-    return false;
+    return std::any_of(allFiles.begin(), allFiles.end(), [path](const std::shared_ptr<MpcFile>& file){
+        const auto path2 = fs::path(file->getName());
+        const auto nameIsSame = StrUtil::eqIgnoreCase(path2.stem(), path.stem());
+        const auto extIsSame = StrUtil::eqIgnoreCase(path2.extension(), path.extension());
+        return nameIsSame && extIsSame;
+    });
 }
 
 std::shared_ptr<MpcFile> AbstractDisk::getFile(const std::string& fileName)
@@ -385,9 +377,9 @@ void AbstractDisk::writeMidiControlPreset(std::shared_ptr<MidiControlPreset> pre
 
         data.push_back(preset->autoloadMode);
 
-        for (int i = 0; i < preset->name.length(); i++)
+        for (char i : preset->name)
         {
-            data.push_back(preset->name[i]);
+            data.push_back(i);
         }
 
         for (int i = preset->name.length(); i < 16; i++)
@@ -405,23 +397,21 @@ void AbstractDisk::writeMidiControlPreset(std::shared_ptr<MidiControlPreset> pre
                 data.push_back(b);
         }
 
-        File f(mpc::Paths::midiControlPresetsPath() + preset->name + ".vmp", {});
-        f.del();
-        f.create();
-        f.setData(&data);
-        f.close();
+        auto presetPath = fs::path(mpc::Paths::midiControlPresetsPath() + preset->name + ".vmp");
+
+        set_file_data(presetPath, data);
+
         return preset;
     };
 
     performIoOrOpenErrorPopup(ioFunc);
 }
 
-void AbstractDisk::readMidiControlPreset(moduru::file::File& f, std::shared_ptr<MidiControlPreset> preset)
+void AbstractDisk::readMidiControlPreset(fs::path p, std::shared_ptr<MidiControlPreset> preset)
 {
-    std::function<preset_or_error()> ioFunc = [&f, preset] {
+    std::function<preset_or_error()> ioFunc = [p, preset] {
 
-        auto data = std::vector<char>(f.getLength());
-        f.getData(&data);
+        auto data = get_file_data(p);
 
         preset->rows.clear();
         preset->name = "";

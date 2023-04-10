@@ -8,6 +8,7 @@
 #include <thread>
 
 #include <mpc_types.hpp>
+#include <mpc_fs.hpp>
 
 namespace mpc { class Mpc; }
 
@@ -66,7 +67,7 @@ namespace mpc::disk {
         void writeAll(const std::string& fileName);
         void writeMidiControlPreset(std::shared_ptr<mpc::nvram::MidiControlPreset> preset);
 
-        void readMidiControlPreset(moduru::file::File&, std::shared_ptr<mpc::nvram::MidiControlPreset>);
+        void readMidiControlPreset(fs::path p, std::shared_ptr<mpc::nvram::MidiControlPreset>);
 
         bool checkExists(std::string fileName);
         bool deleteRecursive(std::weak_ptr<MpcFile>);

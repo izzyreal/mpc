@@ -1,11 +1,10 @@
 #pragma once
 
 #include "Mpc.hpp"
+#include "mpc_fs.hpp"
 
 #include <string>
 #include <vector>
-
-namespace moduru::file { class File; }
 
 namespace mpc::nvram {
     struct MidiControlCommand {
@@ -54,7 +53,7 @@ namespace mpc::nvram {
     class MidiControlPersistence
     {
     private:
-        static void saveVmpcMidiScreenPresetToFile(mpc::Mpc& mpc, moduru::file::File &f, std::string name);
+        static void saveVmpcMidiScreenPresetToFile(mpc::Mpc& mpc, fs::path p, std::string name);
 
     public:
         static bool doesPresetWithNameExist(std::string name);

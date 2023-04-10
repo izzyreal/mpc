@@ -102,10 +102,11 @@ TEST_CASE("Save and load a preset", "[midi-control-persistence]")
     // Save the preset by pressing ENTER in NameScreen
     controls->function(4);
 
-    File f(mpc::Paths::midiControlPresetsPath() + "New_preset.vmp", nullptr);
-    REQUIRE(f.exists());
+    const auto newPresetPath = fs::path(mpc::Paths::midiControlPresetsPath() + "New_preset.vmp");
+
+    REQUIRE(fs::exists(newPresetPath));
     auto preset = std::make_shared<MidiControlPreset>();
-    mpc.getDisk()->readMidiControlPreset(f, preset);
+    mpc.getDisk()->readMidiControlPreset(newPresetPath, preset);
     REQUIRE(preset->rows[0].label == "pad-1");
     REQUIRE(preset->rows[0].value == 38);
     REQUIRE(preset->rows[0].channel == 1);
@@ -129,10 +130,9 @@ TEST_CASE("Save and load a preset", "[midi-control-persistence]")
     // Set Auto Load to YES
     controls->turnWheel(2);
 
-    f = File(mpc::Paths::midiControlPresetsPath() + "New_preset.vmp", nullptr);
-    REQUIRE(f.exists());
+    REQUIRE(fs::exists(newPresetPath));
     preset = std::make_shared<MidiControlPreset>();
-    mpc.getDisk()->readMidiControlPreset(f, preset);
+    mpc.getDisk()->readMidiControlPreset(newPresetPath, preset);
 
     REQUIRE(preset->autoloadMode == MidiControlPreset::AutoLoadMode::YES);
     REQUIRE(preset->rows[0].label == "pad-1");

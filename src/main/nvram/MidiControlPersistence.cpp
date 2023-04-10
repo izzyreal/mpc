@@ -4,14 +4,11 @@
 #include "hardware/HwPad.hpp"
 #include "Paths.hpp"
 #include "disk/AbstractDisk.hpp"
-#include "file/File.hpp"
-#include "file/Directory.hpp"
 #include "lang/StrUtil.hpp"
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
 
 using namespace mpc::nvram;
 using namespace mpc::lcdgui::screens;
-using namespace moduru::file;
 using namespace moduru::lang;
 
 std::vector<std::shared_ptr<MidiControlPreset>> MidiControlPersistence::presets;
@@ -20,15 +17,14 @@ void MidiControlPersistence::restoreLastState(mpc::Mpc& mpc)
 {
     loadDefaultMapping(mpc);
 
-    File f(mpc::Paths::configPath() + "midicontrolmapping.vmp", {});
+    const auto lastStatePath = fs::path(mpc::Paths::configPath() + "midicontrolmapping.vmp");
 
-    if (f.exists())
+    if (fs::exists(lastStatePath))
     {
         try
         {
             auto &preset = mpc.screens->get<VmpcMidiScreen>("vmpc-midi")->activePreset;
-            mpc.getDisk()->readMidiControlPreset(f, preset);
-            f.close();
+            mpc.getDisk()->readMidiControlPreset(lastStatePath, preset);
         }
         catch (const std::exception& e)
         {
@@ -37,8 +33,6 @@ void MidiControlPersistence::restoreLastState(mpc::Mpc& mpc)
             loadDefaultMapping(mpc);
         }
     }
-
-    f.close();
 
     {
         // Temporary hack introduced in v0.5.0.1 (v0.5.0-RC1) to address the fact
@@ -115,21 +109,20 @@ void MidiControlPersistence::loadDefaultMapping(mpc::Mpc &mpc)
 
 void MidiControlPersistence::saveCurrentState(mpc::Mpc& mpc)
 {
-    const auto path = mpc::Paths::configPath() + "midicontrolmapping.vmp";
+    const auto path = fs::path(mpc::Paths::configPath() + "midicontrolmapping.vmp");
 
     try
     {
-        File f(path, {});
-        saveVmpcMidiScreenPresetToFile(mpc, f, "currentstate");
+        saveVmpcMidiScreenPresetToFile(mpc, path, "currentstate");
     }
     catch (const std::exception& e)
     {
         MLOG("Error while saving NVRAM MIDI control preset: " + std::string(e.what()));
-        MLOG("If the error persists, delete " + path + ", if it exists." );
+        MLOG("If the error persists, delete " + path.string() + ", if it exists." );
     }
 }
 
-void MidiControlPersistence::saveVmpcMidiScreenPresetToFile(mpc::Mpc &mpc, File &f, std::string name)
+void MidiControlPersistence::saveVmpcMidiScreenPresetToFile(mpc::Mpc &mpc, fs::path p, std::string name)
 {
     auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
 
@@ -139,9 +132,9 @@ void MidiControlPersistence::saveVmpcMidiScreenPresetToFile(mpc::Mpc &mpc, File 
 
     data.push_back(preset->autoloadMode);
 
-    for (int i = 0; i < name.length(); i++)
+    for (char i : name)
     {
-        data.push_back(name[i]);
+        data.push_back(i);
     }
 
     for (int i = name.length(); i < 16; i++)
@@ -159,8 +152,7 @@ void MidiControlPersistence::saveVmpcMidiScreenPresetToFile(mpc::Mpc &mpc, File 
             data.push_back(b);
     }
 
-    f.setData(&data);
-    f.close();
+    set_file_data(p, data);
 }
 
 void MidiControlPersistence::loadFileByNameIntoPreset(
@@ -169,20 +161,20 @@ void MidiControlPersistence::loadFileByNameIntoPreset(
         std::shared_ptr<MidiControlPreset> preset
 )
 {
-    auto dir = std::make_shared<Directory>(mpc::Paths::midiControlPresetsPath(), nullptr);
+    auto presetsPath = fs::path(mpc::Paths::midiControlPresetsPath());
 
-    for (auto& node : dir->listFiles())
+    assert(fs::exists(presetsPath) && fs::is_directory(presetsPath));
+
+    for (auto& e : fs::directory_iterator(presetsPath))
     {
-        if (node->isDirectory())
+        if (fs::is_directory(e))
         {
             continue;
         }
 
-        auto f = std::dynamic_pointer_cast<File>(node);
-
-        if (f->getNameWithoutExtension() == name)
+        if (e.path().stem() == name)
         {
-            mpc.getDisk()->readMidiControlPreset(*f.get(), preset);
+            mpc.getDisk()->readMidiControlPreset(e.path(), preset);
             break;
         }
     }
@@ -192,49 +184,36 @@ void MidiControlPersistence::loadAllPresetsFromDiskIntoMemory(mpc::Mpc& mpc)
 {
     presets.clear();
 
-    auto dir = std::make_shared<Directory>(mpc::Paths::midiControlPresetsPath(), nullptr);
+    auto presetsPath = fs::path(mpc::Paths::midiControlPresetsPath());
+    assert(fs::exists(presetsPath) && fs::is_directory(presetsPath));
 
-    for (auto& node : dir->listFiles())
+    for (auto& e : fs::directory_iterator(presetsPath))
     {
-        if (node->isDirectory())
+        if (fs::is_directory(e))
         {
             continue;
         }
 
-        auto f = std::dynamic_pointer_cast<File>(node);
         auto preset = presets.emplace_back(std::make_shared<MidiControlPreset>());
-        mpc.getDisk()->readMidiControlPreset(*f.get(), preset);
+        mpc.getDisk()->readMidiControlPreset(e.path(), preset);
     }
 }
 
 void MidiControlPersistence::deleteLastState()
 {
-    File f(mpc::Paths::configPath() + "midicontrolmapping.vmp", {});
+    auto lastStatePath = fs::path(mpc::Paths::configPath() + "midicontrolmapping.vmp");
 
-    if (f.exists())
+    if (fs::exists(lastStatePath))
     {
-        f.del();
+        fs::remove(lastStatePath);
     }
 }
 
 bool MidiControlPersistence::doesPresetWithNameExist(std::string name)
 {
-    auto dir = std::make_shared<Directory>(mpc::Paths::midiControlPresetsPath(), nullptr);
+    auto path_it = fs::directory_iterator(fs::path(mpc::Paths::midiControlPresetsPath()));
 
-    for (auto& node : dir->listFiles())
-    {
-        if (node->isDirectory())
-        {
-            continue;
-        }
-
-        auto f = std::dynamic_pointer_cast<File>(node);
-
-        if (StrUtil::eqIgnoreCase(f->getNameWithoutExtension(), name))
-        {
-            return true;
-        }
-    }
-
-    return false;
+    return std::any_of(fs::begin(path_it), fs::end(path_it), [name](const fs::directory_entry& e){
+        return !fs::is_directory(e) && StrUtil::eqIgnoreCase(e.path().stem(), name);
+    });
 }

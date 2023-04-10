@@ -86,9 +86,8 @@ void MidiDeviceDetector::start(mpc::Mpc &mpc)
 
                     if (!path.empty())
                     {
-                        moduru::file::File f(path, {});
                         auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
-                        mpc.getDisk()->readMidiControlPreset(f, vmpcMidiScreen->switchToPreset);
+                        mpc.getDisk()->readMidiControlPreset(path, vmpcMidiScreen->switchToPreset);
                         mpc.getLayeredScreen()->openScreen("vmpc-known-controller-detected");
                     }
                 }
