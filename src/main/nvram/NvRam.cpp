@@ -17,23 +17,20 @@
 
 #include <file/all/Defaults.hpp>
 
-#include <file/File.hpp>
-#include <file/FileUtil.hpp>
-
 using namespace mpc::nvram;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
-using namespace moduru::file;
 
 void NvRam::loadUserScreenValues(mpc::Mpc& mpc)
 {
-  std::string path = mpc::Paths::configPath() + "nvram.vmp";
-  auto file = File(path, nullptr);
+  const auto path = fs::path(mpc::Paths::configPath() + "nvram.vmp");
+
+  if (!fs::exists(path))
+  {
+      return;
+  }
   
-  if (!file.exists())
-    return;
-  
-  auto defaults = DefaultsParser::AllDefaultsFromFile(mpc, file);
+  auto defaults = DefaultsParser::AllDefaultsFromFile(mpc, path);
   auto userScreen = mpc.screens->get<UserScreen>("user");
   
   userScreen->lastBar = defaults.getBarCount() - 1;
@@ -58,18 +55,8 @@ void NvRam::loadUserScreenValues(mpc::Mpc& mpc)
 void NvRam::saveUserScreenValues(mpc::Mpc& mpc)
 {
   DefaultsParser dp(mpc);
-
-  std::string fileName = mpc::Paths::configPath() + "nvram.vmp";
-  
-  File file(fileName, nullptr);
-  
-  if (!file.exists())
-    file.create();
-  
-  auto stream = FileUtil::ofstreamw(fileName, std::ios::binary | std::ios::out);
-  auto bytes = dp.getBytes();
-  stream.write(&bytes[0], bytes.size());
-  stream.close();
+  auto path = fs::path(mpc::Paths::configPath() + "nvram.vmp");
+  set_file_data(path, dp.getBytes());
 }
 
 void NvRam::saveVmpcSettings(mpc::Mpc& mpc)
@@ -79,13 +66,7 @@ void NvRam::saveVmpcSettings(mpc::Mpc& mpc)
   auto othersScreen = mpc.screens->get<OthersScreen>("others");
   
   auto audioMidiServices  = mpc.getAudioMidiServices();
-  std::string fileName = mpc::Paths::configPath() + "vmpc-specific.ini";
-  
-  File file(fileName, nullptr);
-  
-  if (!file.exists()) file.create();
-  
-  auto stream = FileUtil::ofstreamw(fileName, std::ios::binary | std::ios::out);
+  auto path = fs::path(mpc::Paths::configPath() + "vmpc-specific.ini");
   
   std::vector<char> bytes{
     (char) (vmpcSettingsScreen->initialPadMapping),
@@ -100,19 +81,17 @@ void NvRam::saveVmpcSettings(mpc::Mpc& mpc)
     (char) (othersScreen->getContrast()),
     (char) (vmpcSettingsScreen->midiControlMode)
   };
-  
-  stream.write(&bytes[0], bytes.size());
-  stream.close();
+
+  set_file_data(path, bytes);
 }
 
 void NvRam::loadVmpcSettings(mpc::Mpc& mpc)
 {
-    std::string path = mpc::Paths::configPath() + "vmpc-specific.ini";
-  File file(path, nullptr);
-  
   auto audioMidiServices  = mpc.getAudioMidiServices();
-  
-  if (!file.exists())
+
+  auto path = fs::path(mpc::Paths::configPath() + "vmpc-specific.ini");
+
+  if (!fs::exists(path))
   {
     audioMidiServices->setRecordLevel(DEFAULT_REC_GAIN);
     audioMidiServices->setMainLevel(DEFAULT_MAIN_VOLUME);
@@ -123,8 +102,7 @@ void NvRam::loadVmpcSettings(mpc::Mpc& mpc)
   auto vmpcAutoSaveScreen = mpc.screens->get<VmpcAutoSaveScreen>("vmpc-auto-save");
   auto othersScreen = mpc.screens->get<OthersScreen>("others");
   
-  std::vector<char> bytes;
-  file.getData(&bytes);
+  auto bytes = get_file_data(path);
   
   if (bytes.size() > 0) vmpcSettingsScreen->initialPadMapping = bytes[0];
   if (bytes.size() > 1) vmpcSettingsScreen->_16LevelsEraseMode = bytes[1];

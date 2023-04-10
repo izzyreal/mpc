@@ -1,6 +1,6 @@
 #pragma once
 
-#include <file/File.hpp>
+#include "../mpc_fs.hpp"
 
 #include <vector>
 
@@ -18,7 +18,7 @@ namespace mpc::nvram
 	{
 
 	public:
-		static mpc::file::all::Defaults AllDefaultsFromFile(mpc::Mpc& mpc, moduru::file::File& file);
+		static mpc::file::all::Defaults AllDefaultsFromFile(mpc::Mpc& mpc, fs::path file);
 		std::vector<char> saveBytes;
 		std::vector<char> getBytes();
 
