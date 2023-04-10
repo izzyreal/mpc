@@ -31,7 +31,7 @@ void DiskController::initDisks()
     defaultVolume.type = LOCAL_DIRECTORY;
     defaultVolume.mode = READ_WRITE;
     defaultVolume.label = "DEFAULT";
-    defaultVolume.localDirectoryPath = mpc::Paths::defaultLocalVolumePath();
+    defaultVolume.localDirectoryPath = mpc::Paths::defaultLocalVolumePath().string();
 #ifdef _WIN32
     defaultVolume.volumeSize = moduru::file::FileUtil::getTotalDiskSpace(defaultVolume.localDirectoryPath.substr(0, 1));
 #else

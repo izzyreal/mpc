@@ -43,7 +43,7 @@ void DirectoryScreen::setFunctionKeys()
 {
 	if (getSelectedFile())
 	{
-		auto ext = fs::path(getSelectedFile()->getName()).extension();
+		auto ext = fs::path(getSelectedFile()->getName()).extension().string();
 		auto playable = StrUtil::eqIgnoreCase(ext, ".snd") || StrUtil::eqIgnoreCase(ext, ".wav");
 		ls->setFunctionKeysArrangement(playable ? 1 : 0);
 	}
@@ -208,7 +208,7 @@ void DirectoryScreen::function(int f)
 
 		if (!file->isDirectory())
 		{
-            auto ext = fs::path(file->getName()).extension();
+            auto ext = fs::path(file->getName()).extension().string();
             
             bool isWav = StrUtil::eqIgnoreCase(ext, ".wav");
             bool isSnd = StrUtil::eqIgnoreCase(ext, ".snd");
@@ -566,7 +566,7 @@ void DirectoryScreen::displayRightFields()
 		else
 		{
 			auto fileName = fs::path(disk->getFileName(i + yOffset1));
-			auto name = moduru::lang::StrUtil::padRight(fileName.stem(), " ", 16);
+			auto name = moduru::lang::StrUtil::padRight(fileName.stem().string(), " ", 16);
 			auto ext = fileName.extension().string();
 
 			findField("b" + std::to_string(i))->setText(name + ext);

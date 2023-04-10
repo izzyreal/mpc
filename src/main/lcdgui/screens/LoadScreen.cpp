@@ -47,7 +47,7 @@ void LoadScreen::open()
 	displayFreeSnd();
 	findLabel("freeseq")->setText("  2640K");
 
-	auto ext = fs::path(getSelectedFileName()).extension();
+	auto ext = fs::path(getSelectedFileName()).extension().string();
 	auto playable = StrUtil::eqIgnoreCase(ext, ".snd") || StrUtil::eqIgnoreCase(ext, ".wav");
     
     init();
@@ -143,7 +143,7 @@ void LoadScreen::function(int i)
 		if (!file->isDirectory())
 		{
             
-            auto ext = fs::path(file->getName()).extension();
+            auto ext = fs::path(file->getName()).extension().string();
             
             bool isWav = StrUtil::eqIgnoreCase(ext, ".wav");
             bool isSnd = StrUtil::eqIgnoreCase(ext, ".snd");
@@ -178,7 +178,7 @@ void LoadScreen::function(int i)
         }
 		
 		auto selectedFile = getSelectedFile();
-		auto ext = fs::path(selectedFile->getName()).extension();
+		auto ext = fs::path(selectedFile->getName()).extension().string();
 
         if (isSelectedFileDirectory())
         {
@@ -193,7 +193,7 @@ void LoadScreen::function(int i)
                 displayFile();
                 displaySize();
 
-                auto ext = fs::path(getSelectedFileName()).extension();
+                auto ext = fs::path(getSelectedFileName()).extension().string();
                 auto playable = StrUtil::eqIgnoreCase(ext, ".snd") || StrUtil::eqIgnoreCase(ext, ".wav");
                 ls->setFunctionKeysArrangement(playable ? 1 : 0);
             }
@@ -302,8 +302,8 @@ void LoadScreen::turnWheel(int i)
         return;
     }
 
-	auto newSelectedFile = fs::path(getSelectedFileName());
-	auto playable = StrUtil::eqIgnoreCase(newSelectedFile.extension(), ".snd") || StrUtil::eqIgnoreCase(newSelectedFile.extension(), ".wav");
+	auto newSelectedFileExtension = fs::path(getSelectedFileName()).extension().string();
+	auto playable = StrUtil::eqIgnoreCase(newSelectedFileExtension, ".snd") || StrUtil::eqIgnoreCase(newSelectedFileExtension, ".wav");
 	ls->setFunctionKeysArrangement(playable ? 1 : 0);
 }
 
@@ -335,7 +335,7 @@ void LoadScreen::displayFile()
 	
 	if (selectedFileName.length() != 0 && selectedFile && selectedFile->isDirectory())
 	{
-		findField("file")->setText(u8"\u00C3" + StrUtil::padRight(fs::path(selectedFileName).stem(), " ", 16));
+		findField("file")->setText(u8"\u00C3" + StrUtil::padRight(fs::path(selectedFileName).stem().string(), " ", 16));
 	}
 	else
 	{
@@ -469,7 +469,7 @@ void LoadScreen::loadSound(bool shouldBeConverted)
     {
         ls->openScreen("popup");
         auto path = fs::path(getSelectedFileName());
-        auto name = path.stem();
+        auto name = path.stem().string();
         auto ext = path.extension().string();
         popupScreen->setText("LOADING " + StrUtil::padRight(name, " ", 16) + "." + ext);
         popupScreen->returnToScreenAfterMilliSeconds("load-a-sound", 300);
@@ -510,7 +510,7 @@ void LoadScreen::up()
 	{
 		device = mpc.getDiskController()->activeDiskIndex;
 		displayDevice();
-		auto ext = fs::path(getSelectedFileName()).extension();
+		auto ext = fs::path(getSelectedFileName()).extension().string();
 		auto playable = StrUtil::eqIgnoreCase(ext, ".snd") || StrUtil::eqIgnoreCase(ext, ".wav");
 		ls->setFunctionKeysArrangement(playable ? 1 : 0);
 	}

@@ -198,8 +198,8 @@ bool AbstractDisk::checkExists(std::string fileName)
 
     return std::any_of(allFiles.begin(), allFiles.end(), [path](const std::shared_ptr<MpcFile>& file){
         const auto path2 = fs::path(file->getName());
-        const auto nameIsSame = StrUtil::eqIgnoreCase(path2.stem(), path.stem());
-        const auto extIsSame = StrUtil::eqIgnoreCase(path2.extension(), path.extension());
+        const auto nameIsSame = StrUtil::eqIgnoreCase(path2.stem().string(), path.stem().string());
+        const auto extIsSame = StrUtil::eqIgnoreCase(path2.extension().string(), path.extension().string());
         return nameIsSame && extIsSame;
     });
 }

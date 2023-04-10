@@ -7,6 +7,8 @@
 #include "lang/StrUtil.hpp"
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
 
+#include <cassert>
+
 using namespace mpc::nvram;
 using namespace mpc::lcdgui::screens;
 using namespace moduru::lang;
@@ -214,6 +216,6 @@ bool MidiControlPersistence::doesPresetWithNameExist(std::string name)
     auto path_it = fs::directory_iterator(mpc::Paths::midiControlPresetsPath());
 
     return std::any_of(fs::begin(path_it), fs::end(path_it), [name](const fs::directory_entry& e){
-        return !fs::is_directory(e) && StrUtil::eqIgnoreCase(e.path().stem(), name);
+        return !fs::is_directory(e) && StrUtil::eqIgnoreCase(e.path().stem().string(), name);
     });
 }

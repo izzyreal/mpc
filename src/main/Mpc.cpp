@@ -87,7 +87,7 @@ Mpc::Mpc()
         }
     }
 
-	moduru::Logger::l.setPath(mpc::Paths::logFilePath());
+	moduru::Logger::l.setPath(mpc::Paths::logFilePath().string());
 
 #ifndef __linux__
     auto demoSrc = Paths::demoDataSrcPath();

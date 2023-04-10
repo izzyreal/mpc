@@ -154,7 +154,7 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc, const std::string& overrideP
 
         for (auto& pathSegment : relativePath)
         {
-            mpc.getDisk()->moveForward(pathSegment);
+            mpc.getDisk()->moveForward(pathSegment.string());
             mpc.getDisk()->initFiles();
         }
 

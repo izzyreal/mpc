@@ -1,5 +1,7 @@
 #pragma once
 
+#define NOMINMAX
+
 #include <lcdgui/LayeredScreen.hpp>
 
 #include <disk/DiskController.hpp>
