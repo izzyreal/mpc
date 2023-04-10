@@ -1,16 +1,18 @@
 #pragma once
+
 #include <fstream>
 #include <vector>
-#include <string>
+
+#include "../mpc_fs.hpp"
 
 static const int RIFF_CHUNK_ID{ 1179011410 };
 static const int RIFF_TYPE_ID{ 1163280727 };
 static const int FMT_CHUNK_ID{ 544501094 };
 static const int DATA_CHUNK_ID{ 1635017060 };
 
-std::ofstream wav_init_ofstream(const std::string& path)
+std::ofstream wav_init_ofstream(const fs::path& path)
 {
-    std::ofstream result(path.c_str(), std::ios::out | std::ios::binary);
+    std::ofstream result(path, std::ios::out | std::ios::binary);
 	return result;
 }
 
@@ -53,7 +55,7 @@ void wav_write_bytes(std::ofstream& stream, const std::vector<char>& bytes)
     stream.write((char*)(&bytes[0]), bytes.size());
 }
 
-void wav_close(std::ofstream& stream, const int sampleRate, const int frameCount)
+void wav_close(std::ofstream &stream, const int frameCount)
 {
     const int numChannels = 2;
     const int validBits = 16;

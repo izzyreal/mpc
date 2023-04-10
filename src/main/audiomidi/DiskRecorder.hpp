@@ -1,4 +1,7 @@
 #pragma once
+
+#include "../mpc_fs.hpp"
+
 #include <engine/audio/core/AudioProcessAdapter.hpp>
 #include <engine/audio/core/AudioProcess.hpp>
 
@@ -24,12 +27,11 @@ namespace mpc::audiomidi {
 		int writtenByteCount = 0;
 		int lengthInFrames = 0;
 		int lengthInBytes = 0;
-		int sampleRate = 0;
 
 	public:
 		bool start();
 		bool stopEarly();
-		bool prepare(const std::string& absolutePath, int lengthInFrames, int sampleRate);
+		bool prepare(const fs::path& absolutePath, int lengthInFrames, int sampleRate);
 		int processAudio(mpc::engine::audio::core::AudioBuffer* buf, int nFrames) override;
 
 	public:

@@ -15,13 +15,12 @@ DiskRecorder::DiskRecorder(mpc::engine::audio::core::AudioProcess* process, std:
 	this->name = name;
 }
 
-bool DiskRecorder::prepare(const std::string& absolutePath, int lengthInFrames, int sampleRate)
+bool DiskRecorder::prepare(const fs::path& absolutePath, int lengthInFrames, int sampleRate)
 {
 	if (writing.load())
 		return false;
 
 	this->lengthInFrames = lengthInFrames;
-	this->sampleRate = sampleRate;
 
 	if (fileStream.is_open())
 		fileStream.close();
@@ -63,10 +62,9 @@ int DiskRecorder::processAudio(mpc::engine::audio::core::AudioBuffer* buf, int n
 
 		if (!writing.load() && fileStream.is_open())
 		{
-			wav_close(fileStream, sampleRate, lengthInFrames);
+            wav_close(fileStream, lengthInFrames);
 			lengthInBytes = 0;
 			lengthInFrames = 0;
-			sampleRate = 0;
 
 			if (format != nullptr)
 			{
@@ -99,12 +97,11 @@ bool DiskRecorder::stopEarly()
 
 	auto writtenFrames = writtenByteCount / 4;
 
-	wav_close(fileStream, sampleRate, writtenFrames);
+    wav_close(fileStream, writtenFrames);
 
 	writtenByteCount = 0;
 	lengthInBytes = 0;
 	lengthInFrames = 0;
-	sampleRate = 0;
 
 	if (format != nullptr)
 	{
