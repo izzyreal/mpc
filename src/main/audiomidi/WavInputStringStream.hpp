@@ -136,8 +136,3 @@ bool wav_read_header(std::istringstream& stream, int& sampleRate, int& validBits
 
     return true;
 }
-
-void wav_read_bytes(std::istringstream& stream, const std::vector<char>& bytes)
-{
-   stream.read((char*)(&bytes[0]), bytes.size());
-}

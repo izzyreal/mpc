@@ -14,15 +14,12 @@
 
 #include <nvram/VolumesPersistence.hpp>
 
-#include <file/FileUtil.hpp>
-
 using namespace mpc::disk;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace mpc::sampler;
 using namespace moduru::lang;
-using namespace moduru::file;
 
 LoadScreen::LoadScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "load", layerIndex)
@@ -50,8 +47,8 @@ void LoadScreen::open()
 	displayFreeSnd();
 	findLabel("freeseq")->setText("  2640K");
 
-	auto splitFileName = StrUtil::split(getSelectedFileName(), '.');
-	auto playable = splitFileName.size() > 1 && (StrUtil::eqIgnoreCase(splitFileName[1], "snd") || StrUtil::eqIgnoreCase(splitFileName[1], "wav"));
+	auto ext = fs::path(getSelectedFileName()).extension();
+	auto playable = StrUtil::eqIgnoreCase(ext, ".snd") || StrUtil::eqIgnoreCase(ext, ".wav");
     
     init();
     
@@ -146,10 +143,10 @@ void LoadScreen::function(int i)
 		if (!file->isDirectory())
 		{
             
-            auto ext = FileUtil::splitName(file->getName())[1];
+            auto ext = fs::path(file->getName()).extension();
             
-            bool isWav = StrUtil::eqIgnoreCase(ext, "wav");
-            bool isSnd = StrUtil::eqIgnoreCase(ext, "snd");
+            bool isWav = StrUtil::eqIgnoreCase(ext, ".wav");
+            bool isSnd = StrUtil::eqIgnoreCase(ext, ".snd");
 
             if (!isWav && !isSnd) return;
                 
@@ -181,7 +178,7 @@ void LoadScreen::function(int i)
         }
 		
 		auto selectedFile = getSelectedFile();
-		auto ext = moduru::file::FileUtil::splitName(selectedFile->getName())[1];
+		auto ext = fs::path(selectedFile->getName()).extension();
 
         if (isSelectedFileDirectory())
         {
@@ -196,29 +193,29 @@ void LoadScreen::function(int i)
                 displayFile();
                 displaySize();
 
-                auto splitFileName = StrUtil::split(getSelectedFileName(), '.');
-                auto playable = splitFileName.size() > 1 && (StrUtil::eqIgnoreCase(splitFileName[1], "snd") || StrUtil::eqIgnoreCase(splitFileName[1], "wav"));
+                auto ext = fs::path(getSelectedFileName()).extension();
+                auto playable = StrUtil::eqIgnoreCase(ext, ".snd") || StrUtil::eqIgnoreCase(ext, ".wav");
                 ls->setFunctionKeysArrangement(playable ? 1 : 0);
             }
         }
-		else if (StrUtil::eqIgnoreCase(ext, "snd") || StrUtil::eqIgnoreCase(ext, "wav"))
+		else if (StrUtil::eqIgnoreCase(ext, ".snd") || StrUtil::eqIgnoreCase(ext, ".wav"))
 		{
             const bool shouldBeConverted = false;
 			loadSound(shouldBeConverted);
 		}
-		else if (StrUtil::eqIgnoreCase(ext, "pgm"))
+		else if (StrUtil::eqIgnoreCase(ext, ".pgm"))
 		{
 			openScreen("load-a-program");
 		}
-		else if (StrUtil::eqIgnoreCase(ext, "mid"))
+		else if (StrUtil::eqIgnoreCase(ext, ".mid"))
 		{
 			openScreen("load-a-sequence");
 		}
-		else if (StrUtil::eqIgnoreCase(ext, "all"))
+		else if (StrUtil::eqIgnoreCase(ext, ".all"))
 		{
 			openScreen("mpc2000xl-all-file");
 		}
-		else if (StrUtil::eqIgnoreCase(ext, "aps"))
+		else if (StrUtil::eqIgnoreCase(ext, ".aps"))
 		{
 			openScreen("load-aps-file");
 		}
@@ -305,8 +302,8 @@ void LoadScreen::turnWheel(int i)
         return;
     }
 
-	auto splitFileName = StrUtil::split(getSelectedFileName(), '.');
-	auto playable = splitFileName.size() > 1 && (StrUtil::eqIgnoreCase(splitFileName[1], "snd") || StrUtil::eqIgnoreCase(splitFileName[1], "wav"));
+	auto newSelectedFile = fs::path(getSelectedFileName());
+	auto playable = StrUtil::eqIgnoreCase(newSelectedFile.extension(), ".snd") || StrUtil::eqIgnoreCase(newSelectedFile.extension(), ".wav");
 	ls->setFunctionKeysArrangement(playable ? 1 : 0);
 }
 
@@ -338,11 +335,11 @@ void LoadScreen::displayFile()
 	
 	if (selectedFileName.length() != 0 && selectedFile && selectedFile->isDirectory())
 	{
-		findField("file")->setText(u8"\u00C3" + StrUtil::padRight(FileUtil::splitName(selectedFileName)[0], " ", 16));
+		findField("file")->setText(u8"\u00C3" + StrUtil::padRight(fs::path(selectedFileName).stem(), " ", 16));
 	}
 	else
 	{
-		auto periodIndex = selectedFileName.find_last_of(".");
+		auto periodIndex = selectedFileName.find_last_of('.');
 
 		if (periodIndex != std::string::npos)
 		{
@@ -471,8 +468,9 @@ void LoadScreen::loadSound(bool shouldBeConverted)
     if (result.success)
     {
         ls->openScreen("popup");
-        auto name = FileUtil::splitName(getSelectedFileName())[0];
-        auto ext = FileUtil::splitName(getSelectedFileName())[1];
+        auto path = fs::path(getSelectedFileName());
+        auto name = path.stem();
+        auto ext = path.extension().string();
         popupScreen->setText("LOADING " + StrUtil::padRight(name, " ", 16) + "." + ext);
         popupScreen->returnToScreenAfterMilliSeconds("load-a-sound", 300);
         return;
@@ -512,8 +510,8 @@ void LoadScreen::up()
 	{
 		device = mpc.getDiskController()->activeDiskIndex;
 		displayDevice();
-		auto splitFileName = StrUtil::split(getSelectedFileName(), '.');
-		auto playable = splitFileName.size() > 1 && (StrUtil::eqIgnoreCase(splitFileName[1], "snd") || StrUtil::eqIgnoreCase(splitFileName[1], "wav"));
+		auto ext = fs::path(getSelectedFileName()).extension();
+		auto playable = StrUtil::eqIgnoreCase(ext, ".snd") || StrUtil::eqIgnoreCase(ext, ".wav");
 		ls->setFunctionKeysArrangement(playable ? 1 : 0);
 	}
 

@@ -32,9 +32,6 @@
 #include <engine/control/CompoundControl.hpp>
 #include <engine/control/BooleanControl.hpp>
 
-// moduru
-#include <file/FileUtil.hpp>
-
 // stl
 #include <cmath>
 #include <string>
@@ -335,7 +332,6 @@ void AudioMidiServices::closeIO()
 bool AudioMidiServices::prepareBouncing(DirectToDiskSettings* settings)
 {
 	auto indivFileNames = std::vector<std::string>{ "L-R.wav", "1-2.wav", "3-4.wav", "5-6.wav", "7-8.wav" };
-	std::string sep = moduru::file::FileUtil::getSeparator();
 
 	for (int i = 0; i < diskRecorders.size(); i++)
 	{

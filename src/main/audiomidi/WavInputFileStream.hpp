@@ -2,8 +2,6 @@
 #include <istream>
 #include <vector>
 
-#include <file/FileUtil.hpp>
-
 static const int RIFF_CHUNK_ID{ 1179011410 };
 static const int RIFF_TYPE_ID{ 1163280727 };
 static const int FMT_CHUNK_ID{ 544501094 };
@@ -12,20 +10,19 @@ static const int DATA_CHUNK_ID{ 1635017060 };
 static const int EXPECTED_HEADER_SIZE = 44;
 //static const int EXPECTED_FMT_DATA_SIZE = 16;
 
-int wav_get_LE(std::shared_ptr<std::istream> stream, int numBytes)
+int wav_get_LE(const std::shared_ptr<std::istream>& stream, int numBytes)
 {
     if (numBytes < 1 || numBytes > 4)
     {
         return 0;
     }
 
-    int pos = 0;
     char buffer[4];
 
     stream->read(buffer, numBytes);
     
     numBytes--;
-    pos = numBytes;
+    auto pos = numBytes;
 
     int val = buffer[pos] & 255;
 
@@ -35,7 +32,7 @@ int wav_get_LE(std::shared_ptr<std::istream> stream, int numBytes)
     return val;
 }
 
-bool wav_read_header(std::shared_ptr<std::istream> stream, int& sampleRate, int& validBits, int& numChannels, int& numFrames)
+bool wav_read_header(const std::shared_ptr<std::istream>& stream, int& sampleRate, int& validBits, int& numChannels, int& numFrames)
 {    
     stream->seekg(0, stream->end);
 
@@ -125,9 +122,4 @@ bool wav_read_header(std::shared_ptr<std::istream> stream, int& sampleRate, int&
 
     numFrames = (dataChunkSize / (validBits / 8)) / numChannels;
     return true;
-}
-
-void wav_read_bytes(std::shared_ptr<std::istream> stream, const std::vector<char>& bytes)
-{
-   stream->read((char*)(&bytes[0]), bytes.size());
 }

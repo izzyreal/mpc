@@ -28,7 +28,6 @@
 
 #include <lcdgui/Screens.hpp>
 
-#include "file/FileUtil.hpp"
 #include "file/all/AllParser.hpp"
 
 #include <string>
@@ -83,9 +82,7 @@ Mpc::Mpc()
                 {
                     auto file = fs.open("midicontrolpresets/" + entry.filename());
                     char *data = (char *) std::string_view(file.begin(), file.end() - file.begin()).data();
-                    auto presetStream = moduru::file::FileUtil::fopenw(path.string(), "wb");
-                    std::fwrite(data, sizeof data[0], file.size(), presetStream);
-                    std::fclose(presetStream);
+                    set_file_data(path, data);
                 }
             }
         }

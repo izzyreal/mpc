@@ -1,8 +1,6 @@
 #include "Background.hpp"
 #include <Paths.hpp>
 
-#include <file/FileUtil.hpp>
-
 #include <cmrc/cmrc.hpp>
 #include <string_view>
 

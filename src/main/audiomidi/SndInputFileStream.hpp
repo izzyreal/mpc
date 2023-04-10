@@ -7,8 +7,6 @@
 #include <string.h> // For strcmp
 #endif
 
-#include <file/FileUtil.hpp>
-
 const char ID[] = { 0x01, 0x04, '\0' };
 
 const int ID_INDEX = 0; // 2 byte ANSI string of a number greater than '10' and equal to or smaller than '15'

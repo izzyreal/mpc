@@ -13,15 +13,12 @@
 
 #include <Util.hpp>
 
-#include <file/FileUtil.hpp>
-
 using namespace mpc::disk;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace moduru::lang;
-using namespace moduru::file;
 
 DirectoryScreen::DirectoryScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "directory", layerIndex)
@@ -46,8 +43,8 @@ void DirectoryScreen::setFunctionKeys()
 {
 	if (getSelectedFile())
 	{
-		auto splitFileName = StrUtil::split(getSelectedFile()->getName(), '.');
-		auto playable = splitFileName.size() > 1 && (StrUtil::eqIgnoreCase(splitFileName[1], "snd") || StrUtil::eqIgnoreCase(splitFileName[1], "wav"));
+		auto ext = fs::path(getSelectedFile()->getName()).extension();
+		auto playable = StrUtil::eqIgnoreCase(ext, ".snd") || StrUtil::eqIgnoreCase(ext, ".wav");
 		ls->setFunctionKeysArrangement(playable ? 1 : 0);
 	}
 	else
@@ -211,10 +208,10 @@ void DirectoryScreen::function(int f)
 
 		if (!file->isDirectory())
 		{
-            auto ext = FileUtil::splitName(file->getName())[1];
+            auto ext = fs::path(file->getName()).extension();
             
-            bool isWav = StrUtil::eqIgnoreCase(ext, "wav");
-            bool isSnd = StrUtil::eqIgnoreCase(ext, "snd");
+            bool isWav = StrUtil::eqIgnoreCase(ext, ".wav");
+            bool isSnd = StrUtil::eqIgnoreCase(ext, ".snd");
 
             if (!isWav && !isSnd) return;
 
@@ -568,14 +565,9 @@ void DirectoryScreen::displayRightFields()
 		}
 		else
 		{
-			auto fileName = disk->getFileName(i + yOffset1);
-			auto name = StrUtil::padRight(FileUtil::splitName(fileName)[0], " ", 16);
-			auto ext = FileUtil::splitName(fileName)[1];
-
-			if (ext.length() > 0)
-			{
-				ext = "." + ext;
-			}
+			auto fileName = fs::path(disk->getFileName(i + yOffset1));
+			auto name = moduru::lang::StrUtil::padRight(fileName.stem(), " ", 16);
+			auto ext = fileName.extension().string();
 
 			findField("b" + std::to_string(i))->setText(name + ext);
 		}
