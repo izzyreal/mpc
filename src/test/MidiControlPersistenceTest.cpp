@@ -9,7 +9,6 @@
 
 using namespace mpc::nvram;
 using namespace mpc::lcdgui::screens;
-using namespace moduru::file;
 
 TEST_CASE("Initial state", "[midi-control-persistence]")
 {

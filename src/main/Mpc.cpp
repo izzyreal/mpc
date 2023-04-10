@@ -45,8 +45,6 @@ CMRC_DECLARE(mpc);
 using namespace mpc;
 using namespace mpc::lcdgui;
 
-using namespace moduru::file;
-
 Mpc::Mpc()
 {
 #if __linux__

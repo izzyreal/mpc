@@ -39,3 +39,9 @@ inline void set_file_data(fs::path p, const std::vector<char>& bytes)
     std::ofstream ofs(p, std::ios::out | std::ios::binary);
     ofs.write(bytes.data(), bytes.size());
 }
+
+inline void set_file_data(fs::path p, const std::string& bytes)
+{
+    std::ofstream ofs(p, std::ios::out | std::ios::binary);
+    ofs.write(bytes.data(), bytes.size());
+}

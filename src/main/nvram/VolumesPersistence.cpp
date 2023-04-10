@@ -128,5 +128,5 @@ void VolumesPersistence::save(mpc::Mpc & mpc)
 
     const char* data = buffer.GetString();
 
-    set_file_data(path, {data, data + buffer.GetSize() });
+    set_file_data(path, std::vector<char>{data, data + buffer.GetSize() });
 }
