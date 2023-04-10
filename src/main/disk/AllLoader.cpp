@@ -17,7 +17,6 @@
 #include <file/all/Header.hpp>
 
 #include <disk/MpcFile.hpp>
-#include <file/FsNode.hpp>
 
 #include <sequencer/Sequence.hpp>
 #include <sequencer/Track.hpp>
@@ -38,8 +37,6 @@
 #include <lcdgui/screens/MidiSwScreen.hpp>
 
 #include <lcdgui/screens/dialog/MetronomeSoundScreen.hpp>
-
-#include <stdexcept>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;

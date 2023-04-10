@@ -1,7 +1,6 @@
 #include <disk/MpcFile.hpp>
 
 #include <lang/StrUtil.hpp>
-#include <file/FileUtil.hpp>
 
 #include <fat/AkaiFatLfnDirectoryEntry.hpp>
 
@@ -9,7 +8,6 @@
 
 using namespace mpc::disk;
 using namespace moduru::lang;
-using namespace moduru::file;
 using namespace akaifat::fat;
 
 MpcFile::MpcFile(nonstd::any fileObject)
@@ -217,7 +215,7 @@ std::shared_ptr<std::istream> MpcFile::getInputStream()
     if (raw) {
         return std::dynamic_pointer_cast<akaifat::fat::FatFile>(rawEntry->getFile())->getInputStream();
     } else {
-        return std::make_shared<std::ifstream>(std::move(FileUtil::ifstreamw(fs_path.string(), std::ios::in | std::ios::binary)));
+        return std::make_shared<std::ifstream>(fs_path, std::ios::in | std::ios::binary);
     }
 }
 
@@ -226,6 +224,6 @@ std::shared_ptr<std::ostream> MpcFile::getOutputStream()
     if (raw) {
         return std::dynamic_pointer_cast<akaifat::fat::FatFile>(rawEntry->getFile())->getOutputStream();
     } else {
-        return std::make_shared<std::ofstream>(std::move(FileUtil::ofstreamw(fs_path.string(), std::ios::out | std::ios::binary)));
+        return std::make_shared<std::ofstream>(fs_path, std::ios::out | std::ios::binary);
     }
 }

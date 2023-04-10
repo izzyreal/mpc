@@ -176,7 +176,7 @@ std::string RawDisk::getAbsolutePath()
 	std::string pathString = "";
 	
     for (auto& entry : path)
-		pathString = pathString + FileUtil::getSeparator() + entry->getAkaiName();
+		pathString = pathString + "/" + entry->getAkaiName();
     
 	return pathString;
 }
