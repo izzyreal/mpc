@@ -6,7 +6,6 @@
 #include <functional>
 #include "mpc_types.hpp"
 
-namespace moduru::file { class File; }
 namespace mpc { class Mpc; }
 namespace mpc::file::wav { class WavFile; }
 namespace mpc::sampler { class Sound; }

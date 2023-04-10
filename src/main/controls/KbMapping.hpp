@@ -17,7 +17,7 @@ public:
     int getKeyCodeFromLabel(const std::string& label);
     std::string getHardwareComponentLabelAssociatedWithKeycode(int keyCode);
     static std::string getKeyCodeString(int keyCode);
-    void setKeyCodeForLabel(const int keyCode, std::string label);
+    void setKeyCodeForLabel(const int keyCode, const std::string& label);
 
     void exportMapping();
     void importMapping();

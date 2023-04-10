@@ -1,7 +1,7 @@
 #include "KbMapping.hpp"
 #include <sys/KeyCodes.hpp>
-#include <file/File.hpp>
 #include <Paths.hpp>
+#include "../mpc_fs.hpp"
 
 #include <Logger.hpp>
 
@@ -16,14 +16,8 @@ KbMapping::KbMapping()
 const key_helper_t* mpc::controls::KbMapping::kh = &key_helper_t::instance();
 
 void KbMapping::exportMapping() {
-	auto path = mpc::Paths::configPath() + "keys.txt";
-	moduru::file::File f(path, nullptr);
-	
-    if (f.exists())
-		f.del();
-	else
-		f.create();
-	
+	auto path = fs::path(mpc::Paths::configPath() + "keys.txt");
+
     std::vector<char> bytes;
 	
     for (auto& mapping : labelKeyMap)
@@ -41,26 +35,22 @@ void KbMapping::exportMapping() {
         bytes.push_back('\n');
 	}
     
-	f.setData(&bytes);
-	f.close();
+	set_file_data(path, bytes);
 }
 
 void KbMapping::importMapping()
 {
     labelKeyMap.clear();
-    auto path = mpc::Paths::configPath() + "keys.txt";
-    moduru::file::File f(path, nullptr);
-    
-    if (!f.exists())
+    auto path = fs::path(mpc::Paths::configPath() + "keys.txt");
+
+    if (!fs::exists(path))
     {
         MLOG("Initializing default key mapping...");
         initializeDefaults();
         return;
     }
     
-    std::vector<char> bytes(f.getLength());
-    
-    f.getData(&bytes);
+    auto bytes = get_file_data(path);
 
     std::string label;
     std::string keyCode;
@@ -228,13 +218,13 @@ std::string KbMapping::getKeyCodeString(int keyCode) {
 
     if (names.empty())
     {
-        return "";
+        return {};
     }
 
 	return kh->name(keyCode);
 }
 
-void KbMapping::setKeyCodeForLabel(const int keyCode, std::string label)
+void KbMapping::setKeyCodeForLabel(const int keyCode, const std::string& label)
 {
     for (auto& kv : labelKeyMap)
     {
