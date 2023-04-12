@@ -79,7 +79,7 @@ public:
     std::string getPadName(int i);
     std::vector<std::weak_ptr<Program>> getPrograms();
     void deleteSound(int deleteSoundIndex);
-    void deleteSound(std::weak_ptr<Sound> sound);
+    void deleteSound(const std::shared_ptr<Sound>& sound);
     void deleteSoundWithoutRepairingPrograms(std::shared_ptr<Sound> sound);
     void trimSample(int sampleNumber, int start, int end);
     void deleteSection(const unsigned int sampleNumber, const unsigned int start, const unsigned int end);
@@ -141,7 +141,7 @@ private:
     std::vector<std::string> abcd = std::vector<std::string>{ "A", "B", "C", "D" };
     std::shared_ptr<Sound> clickSound;
     std::vector<std::string> sortNames = std::vector<std::string>{ "MEMORY", "NAME", "SIZE" };
-    std::vector<std::weak_ptr<Sound>> getUsedSounds();
+    std::vector<std::shared_ptr<Sound>> getUsedSounds();
     int getLastInt(std::string s);
     std::string addOrIncreaseNumber2(std::string s);
     void trimSample(std::weak_ptr<Sound>, int start, int end);

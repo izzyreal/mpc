@@ -7,8 +7,6 @@
 #include "mpc_fs.hpp"
 #include "disk/SoundLoader.hpp"
 
-#include <thread>
-
 #include <cmrc/cmrc.hpp>
 #include <string_view>
 
@@ -287,4 +285,92 @@ TEST_CASE("Sort does not corrupt note parameter sound indices", "[sampler]")
         REQUIRE(soundName() == "sound" + std::to_string(expected[i]));
         controls->turnWheel(1);
     }
+}
+
+TEST_CASE("Delete sound 1", "[sampler]")
+{
+    mpc::Mpc mpc;
+    mpc.init(1, 5);
+
+    auto sampler = mpc.getSampler();
+    auto program = sampler->getProgram(0);
+
+    for (int i = 0; i < 10; i++)
+    {
+        sampler->addSound();
+
+        if (i % 2 == 0)
+        {
+            program->getNoteParameters(i + 35)->setSoundIndex(i);
+        }
+    }
+
+    REQUIRE(program->getNoteParameters(0 + 35)->getSoundIndex() == 0);
+    sampler->deleteSound(0);
+    REQUIRE(program->getNoteParameters(0 + 35)->getSoundIndex() == -1);
+}
+
+TEST_CASE("Delete sound 2", "[sampler]")
+{
+    mpc::Mpc mpc;
+    mpc.init(1, 5);
+
+    auto sampler = mpc.getSampler();
+    auto program = sampler->getProgram(0);
+
+    for (int i = 0; i < 10; i++)
+    {
+        sampler->addSound();
+
+        if (i % 2 == 0)
+        {
+            program->getNoteParameters(i + 35)->setSoundIndex(i);
+        }
+    }
+
+    REQUIRE(program->getNoteParameters(0 + 35)->getSoundIndex() == 0);
+    sampler->deleteSound(1);
+    REQUIRE(program->getNoteParameters(0 + 35)->getSoundIndex() == 0);
+}
+
+TEST_CASE("Purge unused sounds", "[sampler]")
+{
+    mpc::Mpc mpc;
+    mpc.init(1, 5);
+
+    auto sampler = mpc.getSampler();
+    auto program = sampler->getProgram(0);
+
+    for (int i = 0; i < 10; i++)
+    {
+        sampler->addSound()->setName("sound" + std::to_string(i));
+
+        if (i % 2 == 0)
+        {
+            program->getNoteParameters(i + 35)->setSoundIndex(i);
+        }
+    }
+
+    REQUIRE(sampler->getUnusedSampleCount() == 5);
+
+    sampler->purge();
+
+    REQUIRE(sampler->getUnusedSampleCount() == 0);
+
+    auto params = program->getNotesParameters();
+    REQUIRE(params[0]->getSoundIndex() == 0);
+    REQUIRE(params[1]->getSoundIndex() == -1);
+    REQUIRE(params[2]->getSoundIndex() == 1);
+    REQUIRE(params[3]->getSoundIndex() == -1);
+    REQUIRE(params[4]->getSoundIndex() == 2);
+    REQUIRE(params[5]->getSoundIndex() == -1);
+    REQUIRE(params[6]->getSoundIndex() == 3);
+    REQUIRE(params[7]->getSoundIndex() == -1);
+    REQUIRE(params[8]->getSoundIndex() == 4);
+    REQUIRE(params[9]->getSoundIndex() == -1);
+    REQUIRE(sampler->getSound(0)->getName() == "sound0");
+    REQUIRE(sampler->getSound(1)->getName() == "sound2");
+    REQUIRE(sampler->getSound(2)->getName() == "sound4");
+    REQUIRE(sampler->getSound(3)->getName() == "sound6");
+    REQUIRE(sampler->getSound(4)->getName() == "sound8");
 }

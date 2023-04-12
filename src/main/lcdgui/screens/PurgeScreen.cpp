@@ -11,8 +11,9 @@ PurgeScreen::PurgeScreen(mpc::Mpc& mpc, const int layerIndex)
 
 void PurgeScreen::open()
 {
-	findLabel("value")->setTextPadded(sampler->getUnusedSampleCount(), " ");
-	ls->setFunctionKeysArrangement(sampler->getUnusedSampleCount() > 0 ? 1 : 0);
+	const auto unusedSampleCount = sampler->getUnusedSampleCount();
+	findLabel("value")->setTextPadded(unusedSampleCount, " ");
+	ls->setFunctionKeysArrangement(unusedSampleCount > 0 ? 1 : 0);
 }
 
 void PurgeScreen::function(int f)
@@ -38,6 +39,10 @@ void PurgeScreen::function(int f)
 		break;
 	}
 	case 5:
+        if (sampler->getUnusedSampleCount() == 0)
+        {
+            return;
+        }
 		sampler->purge();
 		open();
 		break;

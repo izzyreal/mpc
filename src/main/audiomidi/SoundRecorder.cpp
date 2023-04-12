@@ -93,7 +93,7 @@ void SoundRecorder::stop()
 
 	if (cancelled)
 	{
-		mpc.getSampler()->deleteSound(sound);
+		mpc.getSampler()->deleteSound(sound.lock());
 		cancelled = false;
 	}
 	else

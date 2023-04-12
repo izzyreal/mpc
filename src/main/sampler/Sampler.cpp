@@ -9,7 +9,6 @@
 #include <sampler/Program.hpp>
 #include <sampler/Sound.hpp>
 #include <sequencer/NoteEvent.hpp>
-#include <sequencer/Sequencer.hpp>
 #include <sequencer/Track.hpp>
 
 #include <lcdgui/screens/ZoneScreen.hpp>
@@ -57,7 +56,7 @@ std::shared_ptr<Sound> Sampler::getSound(int index)
 
 void Sampler::replaceSound(int index, std::shared_ptr<Sound>& newSound)
 {
-    size_t newIndex = -1;
+    int newIndex = -1;
 
     for (size_t i = 0; i < sounds.size(); i++)
     {
@@ -743,9 +742,9 @@ NoteParameters* Sampler::getLastNp(Program* program)
 	return dynamic_cast<mpc::sampler::NoteParameters*>(program->getNoteParameters(mpc.getNote()));
 }
 
-std::vector<std::weak_ptr<Sound>> Sampler::getUsedSounds()
+std::vector<std::shared_ptr<Sound>> Sampler::getUsedSounds()
 {
-	std::set<std::weak_ptr<Sound>, std::owner_less<std::weak_ptr<Sound>>> usedSounds;
+	std::set<std::shared_ptr<Sound>> usedSounds;
 
 	for (auto& p : programs)
 	{
@@ -755,10 +754,10 @@ std::vector<std::weak_ptr<Sound>> Sampler::getUsedSounds()
 		for (auto& nn : p->getNotesParameters())
 		{
 			if (nn->getSoundIndex() != -1)
-				usedSounds.emplace(sounds[nn->getSoundIndex()]);
+				usedSounds.insert(sounds[nn->getSoundIndex()]);
 		}
 	}
-	return std::vector<std::weak_ptr<Sound>>(begin(usedSounds), end(usedSounds));
+	return {begin(usedSounds), end(usedSounds)};
 }
 
 int Sampler::getUnusedSampleCount()
@@ -770,18 +769,18 @@ void Sampler::purge()
 {
 	auto usedSounds = getUsedSounds();
 
-	for (int i = 0; i < sounds.size(); i++)
+	for (int i = sounds.size() - 1; i >= 0; i--)
 	{
-		auto maybeUsedSound = sounds[i];
-		const auto pos = find_if(begin(usedSounds), end(usedSounds), [&maybeUsedSound](const std::weak_ptr<Sound>& sound) {
-			return sound.lock() == maybeUsedSound;
+        auto maybeUnusedSound = sounds[i];
+
+		const auto pos = find_if(begin(usedSounds), end(usedSounds), [&maybeUnusedSound](const std::shared_ptr<Sound>& sound) {
+			return sound == maybeUnusedSound;
 		});
 		
 		if (pos == usedSounds.end())
 		{
-			deleteSound(maybeUsedSound);
-			i--;
-		}
+            deleteSound(maybeUnusedSound);
+        }
 	}
 }
 
@@ -793,7 +792,7 @@ void Sampler::deleteSound(int deleteSoundIndex)
 
 void Sampler::deleteSoundWithoutRepairingPrograms(std::shared_ptr<Sound> sound)
 {
-    size_t index = -1;
+    int index = -1;
 
     for (int i = 0; i < sounds.size(); i ++)
     {
@@ -812,13 +811,13 @@ void Sampler::deleteSoundWithoutRepairingPrograms(std::shared_ptr<Sound> sound)
     sounds.erase(sounds.begin() + index);
 }
 
-void Sampler::deleteSound(std::weak_ptr<Sound> sound)
+void Sampler::deleteSound(const std::shared_ptr<Sound>& sound)
 {
-	size_t index = -1;
+	int index = -1;
 
     for (int i = 0; i < sounds.size(); i ++)
     {
-        if (sounds[i] == sound.lock())
+        if (sounds[i] == sound)
         {
             index = i;
             break;
@@ -840,10 +839,14 @@ void Sampler::deleteSound(std::weak_ptr<Sound> sound)
             {
                 n->setSoundIndex(-1);
             }
+            else if (n->getSoundIndex() > index)
+            {
+                n->setSoundIndex(n->getSoundIndex() - 1);
+            }
         }
     }
 
-	sounds.erase(sounds.begin() + index);
+    sounds.erase(sounds.begin() + index);
 
 	if (soundIndex >= sounds.size())
     {
