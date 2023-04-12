@@ -471,7 +471,7 @@ void LoadScreen::loadSound(bool shouldBeConverted)
         auto path = fs::path(getSelectedFileName());
         auto name = path.stem().string();
         auto ext = path.extension().string();
-        popupScreen->setText("LOADING " + StrUtil::padRight(name, " ", 16) + "." + ext);
+        popupScreen->setText("LOADING " + StrUtil::padRight(name, " ", 16) + ext);
         popupScreen->returnToScreenAfterMilliSeconds("load-a-sound", 300);
         return;
     }
