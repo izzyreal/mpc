@@ -11,7 +11,7 @@ using namespace mpc;
 fs::path Paths::appDocumentsPath()
 {
 #if TARGET_OS_IOS
-    static auto path = sago::getDocumentsFolder() + sep();
+    static auto path = fs::path(sago::getDocumentsFolder());
 #else
     static auto path = fs::path(sago::getDocumentsFolder()) / "VMPC2000XL";
 #endif
