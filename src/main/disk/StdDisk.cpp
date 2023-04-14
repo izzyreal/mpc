@@ -10,15 +10,9 @@
 
 #include <lcdgui/screens/LoadScreen.hpp>
 
-#include <raw/fat/ShortName.hpp>
-#include <raw/fat/ShortNameGenerator.hpp>
-
 #include <lang/StrUtil.hpp>
 
-#include <set>
-
 using namespace moduru::lang;
-using namespace moduru::raw::fat;
 using namespace mpc::disk;
 using namespace mpc::file;
 using namespace mpc::lcdgui;
@@ -73,7 +67,7 @@ void StdDisk::initFiles()
 void StdDisk::initParentFiles()
 {
 	parentFiles.clear();
-	if (path.size() == 0) return;
+	if (path.empty()) return;
 
 	auto temp = getParentDir()->listFiles();
 	
@@ -86,7 +80,7 @@ void StdDisk::initParentFiles()
 
 std::string StdDisk::getDirectoryName()
 {
-	if (path.size() == 0)
+	if (path.empty())
 		return "ROOT";
 	
 	return path[ (int) (path.size()) - 1];
@@ -94,7 +88,7 @@ std::string StdDisk::getDirectoryName()
 
 bool StdDisk::moveBack()
 {
-	if (path.size() <= 0)
+	if (path.empty())
 		return false;
 
 	int lastPathIndex = (int)(path.size()) - 1;
@@ -121,7 +115,7 @@ bool StdDisk::moveForward(const std::string& directoryName)
 
 std::shared_ptr<MpcFile> StdDisk::getDir()
 {
-	if (path.size() == 0)
+	if (path.empty())
         return root;
     
     auto mpcFile = root;
@@ -147,7 +141,7 @@ std::shared_ptr<MpcFile> StdDisk::getDir()
 
 std::shared_ptr<MpcFile> StdDisk::getParentDir()
 {
-	if (path.size() == 0)
+	if (path.empty())
         return {};
 
 	if (path.size() == 1)
