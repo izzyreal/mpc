@@ -1,7 +1,6 @@
 #include <sequencer/Track.hpp>
 
 #include <Mpc.hpp>
-#include <controls/Controls.hpp>
 #include <audiomidi/EventHandler.hpp>
 
 #include <sequencer/Event.hpp>
@@ -10,12 +9,6 @@
 #include <sequencer/MidiClockEvent.hpp>
 #include <sequencer/MixerEvent.hpp>
 #include <sequencer/TempoChangeEvent.hpp>
-#include <sequencer/PitchBendEvent.hpp>
-#include <sequencer/ControlChangeEvent.hpp>
-#include <sequencer/ProgramChangeEvent.hpp>
-#include <sequencer/SystemExclusiveEvent.hpp>
-#include <sequencer/PolyPressureEvent.hpp>
-#include <sequencer/ChannelPressureEvent.hpp>
 
 #include <lcdgui/screens/PunchScreen.hpp>
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
@@ -185,6 +178,7 @@ std::shared_ptr<NoteOnEvent> Track::recordNoteEventSynced(int tick, int note, in
         return onEvent;
     }
 }
+
 bool Track::finalizeNoteEventSynced(int note, int duration)
 {
     if (auto onEvent = retrieveNoteEvent(note))

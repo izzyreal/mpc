@@ -271,9 +271,8 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
 
         for (auto& n: noteOns)
         {
-            auto noteOn = std::make_shared<mpc::sequencer::NoteOnEvent>();
-            track->addEvent(n->getTick(), noteOn);
-            n->CopyValuesTo(noteOn);
+            auto noteOn = track->recordNoteEventSynced(n->getTick(), n->getNote(), n->getVelocity());
+
             int indexCandidate = -1;
 
             for (int k = 0; k < noteOffs.size(); k++)

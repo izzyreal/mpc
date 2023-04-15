@@ -16,23 +16,24 @@ TEST_CASE("timing-correct", "[track]")
     seq->init(0);
     auto tr = seq->getTrack(0);
 
-    auto n0 = std::dynamic_pointer_cast<NoteOnEvent>(tr->addEvent(12, "note"));
-    n0->setNote(88);
+    auto n0 = tr->recordNoteEventSynced(12, 88, 127);
+    tr->finalizeNoteEventSynced(88, 1);
 
-    auto n0a = std::dynamic_pointer_cast<NoteOnEvent>(tr->addEvent(13, "note"));
-    n0a->setNote(89);
+    auto n0a = tr->recordNoteEventSynced(13, 89, 127);
+    tr->finalizeNoteEventSynced(89, 1);
 
-    auto n1 = std::dynamic_pointer_cast<NoteOnEvent>(tr->addEvent(23, "note"));
-    n1->setNote(90);
+    auto n1 = tr->recordNoteEventSynced(23, 90, 127);
+    tr->finalizeNoteEventSynced(90, 1);
 
-    auto event2 = tr->addEvent(22, "note");
+    auto event2 = tr->recordNoteEventSynced(22, 60, 127);
+    tr->finalizeNoteEventSynced(60, 1);
 
     REQUIRE(tr->getEvent(0) == n0);
     REQUIRE(tr->getEvent(1) == n0a);
     REQUIRE(tr->getEvent(2) == event2);
     REQUIRE(tr->getEvent(3) == n1);
 
-    auto n2 = std::dynamic_pointer_cast<NoteOnEvent>(event2);
+    auto n2 = event2;
     n2->setNote(91);
     int swingPercentage = 50;
     tr->timingCorrect(0, 0, n0, 24, swingPercentage);
@@ -64,15 +65,15 @@ TEST_CASE("swing1", "[track]")
     seq->init(0);
     auto tr = seq->getTrack(0);
 
-    auto n1 = std::dynamic_pointer_cast<NoteOnEvent>(tr->addEvent(23, "note"));
-    n1->setNote(90);
+    auto n1 = tr->recordNoteEventSynced(23, 90, 127);
+    tr->finalizeNoteEventSynced(90, 1);
 
-    auto event2 = tr->addEvent(22, "note");
+    auto event2 = tr->recordNoteEventSynced(22, 91, 127);
+    tr->finalizeNoteEventSynced(91, 1);
 
     REQUIRE(tr->getEvent(0) == event2);
 
-    auto n2 = std::dynamic_pointer_cast<NoteOnEvent>(event2);
-    n2->setNote(91);
+    auto n2 = event2;
     auto range = std::vector<int>{91, 91};
     tr->timingCorrect(0, 0, n2, 24, 71);
 
@@ -99,7 +100,8 @@ TEST_CASE("quantize", "[track]")
     seq->init(0);
     auto tr = seq->getTrack(0);
 
-    auto n0 = std::dynamic_pointer_cast<NoteOnEvent>(tr->addEvent(0, "note"));
+    auto n0 = tr->recordNoteEventSynced(0, 60, 127);
+    tr->finalizeNoteEventSynced(60, 1);
 
     for (int i = 0; i <= 12; i++)
     {
