@@ -11,7 +11,6 @@ namespace mpc {
 }
 
 namespace mpc::midi::event {
-	class NoteOn;
     class ChannelEvent;
 }
 

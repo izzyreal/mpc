@@ -9,6 +9,7 @@
 #include "thirdp/concurrentqueue.h"
 #include <memory>
 #include <unordered_map>
+#include "sequencer/NoteEventStore.hpp"
 
 namespace mpc { class Mpc; }
 
@@ -16,8 +17,9 @@ namespace mpc::sequencer {
 
     class FrameSeq;
 
-class Track
-: public moduru::observer::Observable
+class Track : 
+    public moduru::observer::Observable,
+    public mpc::sequencer::NoteEventStore<int, mpc::sequencer::NoteOnEvent>
 {
     
 private:
@@ -43,7 +45,6 @@ private:
     int trackIndex = 0;
     bool used{ false };
     int eventIndex = 0;
-    std::unordered_map<int, std::shared_ptr<mpc::sequencer::NoteOnEvent>> recordNoteStore = {};
     bool multi{ false };
     bool _delete{ false };
 
@@ -67,9 +68,6 @@ private:
     std::shared_ptr<NoteOnEvent> getNoteEvent(int tick, int note);
     void processRealtimeQueuedEvents();
     int getCorrectedTickPos();
-
-    bool storeRecordNoteEvent(int note, std::shared_ptr<mpc::sequencer::NoteOnEvent> event);
-    std::shared_ptr<mpc::sequencer::NoteOnEvent> retrieveRecordNoteEvent(int note);
 
 public:
     bool insertEventWhileRetainingSort(const std::shared_ptr<Event>& event, bool allowMultipleNotesOnSameTick = false);
@@ -120,7 +118,7 @@ public:
     void timingCorrect(int fromBar, int toBar, const std::shared_ptr<NoteOnEvent>& noteEvent, int stepLength, int swingPercentage);
     int timingCorrectTick(int fromBar, int toBar, int tick, int stepLength, int swingPercentage);
 
-    void swing(std::vector<std::shared_ptr<Event>>& eventsToSwing, int noteValue, int percentage, std::vector<int>& noteRange);
+    //void swing(std::vector<std::shared_ptr<Event>>& eventsToSwing, int noteValue, int percentage, std::vector<int>& noteRange);
 
     void shiftTiming(std::shared_ptr<Event> eventsToShift, bool later, int amount, int lastTick);
 

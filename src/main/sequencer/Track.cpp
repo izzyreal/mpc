@@ -147,7 +147,8 @@ void Track::removeEvent(const std::shared_ptr<Event>& event)
 std::shared_ptr<NoteOnEvent> Track::recordNoteEventASync(unsigned char note, unsigned char velocity)
 {
     auto onEvent = std::make_shared<NoteOnEvent>(note, velocity);
-    if (!storeRecordNoteEvent(note, onEvent)) return nullptr;
+    if (!storeNoteEvent(note, onEvent)) return nullptr;
+    onEvent->setTrack(getIndex());
     onEvent->setTick(-2);
     queuedNoteOnEvents.enqueue(onEvent);
     return onEvent;
@@ -155,7 +156,7 @@ std::shared_ptr<NoteOnEvent> Track::recordNoteEventASync(unsigned char note, uns
 
 void Track::finalizeNoteEventASync(unsigned char note)
 {
-    auto onEvent = retrieveRecordNoteEvent(note);
+    auto onEvent = retrieveNoteEvent(note);
     if (!onEvent) return;
     auto offEvent = onEvent->getNoteOff();
     offEvent->setTick(-2);
@@ -169,7 +170,8 @@ std::shared_ptr<NoteOnEvent> Track::recordNoteEventSynced(int tick, int note, in
     if (!onEvent)
     {
         onEvent = std::make_shared<NoteOnEvent>(note, velocity);
-        if (!storeRecordNoteEvent(note, onEvent)) return nullptr;
+        if (!storeNoteEvent(note, onEvent)) return nullptr;
+        onEvent->setTrack(this->getIndex());
         onEvent->setTick(tick);
         insertEventWhileRetainingSort(onEvent);
         notifyObservers(std::string("step-editor"));
@@ -177,7 +179,7 @@ std::shared_ptr<NoteOnEvent> Track::recordNoteEventSynced(int tick, int note, in
     }
     else
     {
-        if (!storeRecordNoteEvent(note, onEvent)) return nullptr;
+        if (!storeNoteEvent(note, onEvent)) return nullptr;
         onEvent->setVelocity(velocity);
         onEvent->resetDuration();
         return onEvent;
@@ -185,7 +187,7 @@ std::shared_ptr<NoteOnEvent> Track::recordNoteEventSynced(int tick, int note, in
 }
 bool Track::finalizeNoteEventSynced(int note, int duration)
 {
-    if (auto onEvent = retrieveRecordNoteEvent(note))
+    if (auto onEvent = retrieveNoteEvent(note))
     {
         auto size = events.size();
         onEvent->setDuration(duration);
@@ -397,20 +399,6 @@ int Track::getCorrectedTickPos()
     return correctedTickPos;
 }
 
-bool mpc::sequencer::Track::storeRecordNoteEvent(int note, std::shared_ptr<mpc::sequencer::NoteOnEvent> event)
-{
-	if (recordNoteStore.find(note) != recordNoteStore.end()) return false;
-	recordNoteStore[note] = event;
-	return true;
-}
-
-std::shared_ptr<mpc::sequencer::NoteOnEvent> mpc::sequencer::Track::retrieveRecordNoteEvent(int note)
-{
-	if (recordNoteStore.find(note) == recordNoteStore.end()) return nullptr;
-	auto event = recordNoteStore[note];
-	recordNoteStore.erase(note);
-	return event;
-}
 
 void Track::processRealtimeQueuedEvents()
 {

@@ -4,8 +4,7 @@
 #include <vector>
 
 namespace mpc::engine::midi {
-class ShortMessage final
-: public MidiMessage
+class ShortMessage final : public MidiMessage
 {
     
 public:
@@ -20,10 +19,15 @@ public:
     static const int TIMING_CLOCK{ 248 };
 
 public:
-    virtual int getChannel();
-    virtual int getCommand();
-    virtual int getData1();
-    virtual int getData2();
+    int getChannel();
+    int getCommand();
+    int getData1();
+    int getData2();
+    bool isNoteOn();
+    bool isNoteOff();
+    bool isMidiClock();
+    bool isControlChange();
+    bool isChannelPressure();
     
 public:
     int getDataLength(int status);

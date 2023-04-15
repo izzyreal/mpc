@@ -269,7 +269,7 @@ void BaseControls::generateNoteOn(int note, int padVelo, int padIndexWithBank)
     init();
     //----------
     auto play_event = std::make_shared<NoteOnEventPlayOnly>(note, padVelo);
-    if (!mpc.getControls()->storePlayNoteEvent(padIndexWithBank, play_event)) return ;
+    if (!mpc.getControls()->storeNoteEvent(padIndexWithBank, play_event)) return ;
 
     auto padIndex = program != nullptr ? program->getPadIndexFromNote(note) : -1;
     bool isSliderNote = program && program->getSlider()->getNote() == note;
@@ -289,51 +289,32 @@ void BaseControls::generateNoteOn(int note, int padVelo, int padIndexWithBank)
 
     mpc.getEventHandler()->handle(play_event, track.get(), drum);
 
-    //-----------
-    auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
-    bool posIsLastTick = sequencer->getTickPosition() == sequencer->getActiveSequence()->getLastTick();
-
-    auto tc_note = timingCorrectScreen->getNoteValue();
-    auto tc_swing = timingCorrectScreen->getSwing();
-
-    bool step = currentScreenName == "step-editor" && !posIsLastTick;
-    bool recMainWithoutPlaying = currentScreenName == "sequencer" &&
-        !sequencer->isPlaying() &&
-        mpc.getControls()->isRecPressed() &&
-        tc_note != 0 &&
-        !posIsLastTick;
     //---------------------
-    if (sequencer->isRecordingOrOverdubbing() || step || recMainWithoutPlaying)
+    std::shared_ptr<NoteOnEvent> recordNoteOnEvent;
+    if (sequencer->isRecordingOrOverdubbing())
     {
-        std::shared_ptr<NoteOnEvent> recordNoteOnEvent;
-        
-        if (step && (track->getBus() == 0 || isDrumNote(note)))
-        {
-            recordNoteOnEvent = track->recordNoteEventSynced(sequencer->getTickPosition(), note, padVelo);
-        }
-        else if (recMainWithoutPlaying)
-        {
-            recordNoteOnEvent = track->recordNoteEventSynced(sequencer->getTickPosition(), note, padVelo);
-            int stepLength = timingCorrectScreen->getNoteValueLengthInTicks();
-            
-            if (stepLength != 1)
-            {
-                int bar = sequencer->getCurrentBarIndex() + 1;
-                track->timingCorrect(0, bar, recordNoteOnEvent, stepLength, timingCorrectScreen->getSwing());
+        recordNoteOnEvent = track->recordNoteEventASync(note, padVelo);
+    }
+    else if (mpc.getControls()->isStepRecording() && (track->getBus() == 0 || isDrumNote(note)))
+    {
+        recordNoteOnEvent = track->recordNoteEventSynced(sequencer->getTickPosition(), note, padVelo);
+        sequencer->playMetronomeTrack();
+    }
+    else if (mpc.getControls()->isRecMainWithoutPlaying())
+    {
+        recordNoteOnEvent = track->recordNoteEventSynced(sequencer->getTickPosition(), note, padVelo);
+        auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
+        int stepLength = timingCorrectScreen->getNoteValueLengthInTicks();
 
-                if (recordNoteOnEvent->getTick() != sequencer->getTickPosition())
-                    sequencer->move(recordNoteOnEvent->getTick());
-            }
-        }
-        else
+        if (stepLength != 1)
         {
-            recordNoteOnEvent = track->recordNoteEventASync(note, padVelo);
-        }
+            int bar = sequencer->getCurrentBarIndex() + 1;
+            track->timingCorrect(0, bar, recordNoteOnEvent, stepLength, timingCorrectScreen->getSwing());
 
-        if (step || recMainWithoutPlaying)
-        {
-            sequencer->playMetronomeTrack();
+            if (recordNoteOnEvent->getTick() != sequencer->getTickPosition())
+                sequencer->move(recordNoteOnEvent->getTick());
         }
+        sequencer->playMetronomeTrack();
     }
 }
 

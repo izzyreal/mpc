@@ -3,8 +3,10 @@
 #include <observer/Observable.hpp>
 #include <sequencer/Event.hpp>
 #include <sequencer/Track.hpp>
-#include <sequencer/EventAdapter.hpp>
+#include <sequencer/MidiClockEvent.hpp>
+#include <utility>
 #include "VmpcMidiControlMode.hpp"
+#include "sequencer/NoteEventStore.hpp"
 
 #include <memory>
 
@@ -15,8 +17,9 @@ namespace mpc::audiomidi {
 }
 
 namespace mpc::audiomidi {
-    class MpcMidiInput
-            : public moduru::observer::Observable
+    class MpcMidiInput : 
+        public moduru::observer::Observable,
+        public mpc::sequencer::NoteEventStore<std::pair<int/*track*/,int/*note*/>, mpc::sequencer::NoteOnEventPlayOnly>
     {
 
     public:
@@ -26,7 +29,6 @@ namespace mpc::audiomidi {
         mpc::Mpc &mpc;
         std::shared_ptr<mpc::sequencer::Sequencer> sequencer;
         std::shared_ptr<mpc::sampler::Sampler> sampler;
-        std::unique_ptr<mpc::sequencer::EventAdapter> eventAdapter;
         std::unique_ptr<VmpcMidiControlMode> midiFullControl;
         std::string notify;
 
@@ -39,10 +41,15 @@ namespace mpc::audiomidi {
         void midiOut(std::weak_ptr<sequencer::Event> event, sequencer::Track *track);
 
         void transportOmni(mpc::engine::midi::MidiMessage *msg, std::string outputLetter);
+        
+        std::shared_ptr<mpc::sequencer::NoteOnEvent> handleNoteOn(mpc::engine::midi::ShortMessage* msg, const int& timeStamp);
+        std::shared_ptr<mpc::sequencer::NoteOffEvent> handleNoteOff(mpc::engine::midi::ShortMessage* msg, const int& timeStamp);
 
-        void handleControl(mpc::engine::midi::ShortMessage *shortMsg);
+        std::shared_ptr<mpc::sequencer::MidiClockEvent> handleMidiClock(mpc::engine::midi::ShortMessage* msg);
 
-        void handlePolyAndNote(mpc::engine::midi::MidiMessage *msg);
+        void handleControlChange(mpc::engine::midi::ShortMessage* msg);
+
+        void handleChannelPressure(mpc::engine::midi::ShortMessage* msg);
 
     public:
         MpcMidiInput(mpc::Mpc &mpc, int index);

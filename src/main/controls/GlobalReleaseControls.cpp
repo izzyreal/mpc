@@ -95,7 +95,7 @@ void GlobalReleaseControls::simplePad(int padIndexWithBank)
 
 	auto controls = mpc.getControls();
 
-	auto on_event = controls->retrievePlayNoteEvent(padIndexWithBank);
+	auto on_event = controls->retrieveNoteEvent(padIndexWithBank);
 	if (!on_event) return;
 	handlePlayNoteOff(on_event);
 
@@ -111,12 +111,12 @@ void GlobalReleaseControls::simplePad(int padIndexWithBank)
 		track->finalizeNoteEventASync(note);
 	}
 
-	bool posIsLastTick = sequencer->getTickPosition() == sequencer->getActiveSequence()->getLastTick();
+	//bool posIsLastTick = sequencer->getTickPosition() == sequencer->getActiveSequence()->getLastTick();
 
-	bool maybeRecWithoutPlaying = currentScreenName == "sequencer" && !posIsLastTick;
-	bool stepRec = currentScreenName == "step-editor" && !posIsLastTick;
+	bool recWithoutPlaying = mpc.getControls()->isRecMainWithoutPlaying();
+	bool stepRec = mpc.getControls()->isStepRecording();
 
-	if (stepRec || maybeRecWithoutPlaying)
+	if (mpc.getControls()->isStepRecording()|| mpc.getControls()->isRecMainWithoutPlaying())
 	{
 		auto newDuration = static_cast<int>(mpc.getAudioMidiServices()->getFrameSequencer()->getTickPosition());
 
@@ -143,7 +143,7 @@ void GlobalReleaseControls::simplePad(int padIndexWithBank)
 		//!!!!!!!!
 		bool durationHasBeenAdjusted = track->finalizeNoteEventSynced(on_event->getNote(), newDuration);
 
-		if ((durationHasBeenAdjusted && maybeRecWithoutPlaying) || (stepRec && increment))
+		if ((durationHasBeenAdjusted && recWithoutPlaying) || (stepRec && increment))
 		{
 			int nextPos = sequencer->getTickPosition() + stepLength;
 			auto bar = sequencer->getCurrentBarIndex() + 1;

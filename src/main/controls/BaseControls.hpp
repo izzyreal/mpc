@@ -90,6 +90,8 @@ namespace mpc::controls {
 
 		void pad(int padIndexWithBank, int velo);
 
+		std::string getCurrentScreenName() { return currentScreenName; }
+
 	protected:
 		std::string param;
 		mpc::Mpc& mpc;

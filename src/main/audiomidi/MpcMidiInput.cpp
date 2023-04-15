@@ -11,13 +11,18 @@
 #include <audiomidi/EventHandler.hpp>
 #include <audiomidi/MpcMidiOutput.hpp>
 #include <audiomidi/VmpcMidiControlMode.hpp>
+#include <audiomidi/AudioMidiServices.hpp>
 #include <controls/GlobalReleaseControls.hpp>
+
 
 #include <lcdgui/screens/SyncScreen.hpp>
 #include <lcdgui/screens/VmpcSettingsScreen.hpp>
 #include <lcdgui/screens/MidiSwScreen.hpp>
 #include <lcdgui/screens/window/MidiInputScreen.hpp>
 #include <lcdgui/screens/window/MidiOutputScreen.hpp>
+#include <lcdgui/screens/window/MultiRecordingSetupScreen.hpp>
+#include <lcdgui/screens/window/TimingCorrectScreen.hpp>
+#include <lcdgui/screens/window/StepEditOptionsScreen.hpp>
 
 #include <sequencer/Event.hpp>
 #include <sequencer/MidiClockEvent.hpp>
@@ -40,7 +45,6 @@ MpcMidiInput::MpcMidiInput(mpc::Mpc &_mpc, int _index)
           sequencer(_mpc.getSequencer()),
           sampler(_mpc.getSampler()),
           index(_index),
-          eventAdapter(std::make_unique<EventAdapter>(mpc, sequencer)),
           midiFullControl(std::make_unique<VmpcMidiControlMode>())
 {
 }
@@ -50,253 +54,78 @@ std::string MpcMidiInput::getName()
     return "mpcmidiin" + std::to_string(index);
 }
 
-void MpcMidiInput::transport(MidiMessage *msg, int timeStamp)
+void MpcMidiInput::transport(MidiMessage *midiMsg, int timeStamp)
 {
-    auto shortMsg = dynamic_cast<ShortMessage *>(msg);
+    auto msg = dynamic_cast<ShortMessage*>(midiMsg);
 
     auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
+    auto midiInputScreen = mpc.screens->get<MidiInputScreen>("midi-input");
 
     if (vmpcSettingsScreen->midiControlMode == VmpcSettingsScreen::MidiControlMode::VMPC)
     {
-        midiFullControl->processMidiInputEvent(mpc, shortMsg);
+        midiFullControl->processMidiInputEvent(mpc, msg);
         return;
     }
-
-    eventAdapter->process(msg);
-
-    auto status = msg->getStatus();
-    std::string notificationMessage = std::string(index == 0 ? "a" : "b");
-
-    auto channel = shortMsg->getChannel();
-
-    notificationMessage += std::to_string(channel);
-
-    notifyObservers(notificationMessage);
-
-    auto isControl = status >= ShortMessage::CONTROL_CHANGE && status < ShortMessage::CONTROL_CHANGE + 16;
-
-    if (isControl)
-    {
-        handleControl(shortMsg);
-    }
-    else
-    {
-        handlePolyAndNote(msg);
-    }
-
-    auto event = eventAdapter->get().lock();
-
-    if (!event)
+    std::shared_ptr<mpc::sequencer::Event> event;
+    if (midiInputScreen->getReceiveCh() != -1 && msg->getChannel() != midiInputScreen->getReceiveCh())
     {
         return;
     }
-
-    auto mce = std::dynamic_pointer_cast<mpc::sequencer::MidiClockEvent>(event);
-    //auto note = std::dynamic_pointer_cast<mpc::sequencer::NoteEvent>(event);
-    auto noteOn = std::dynamic_pointer_cast<mpc::sequencer::NoteOnEvent>(event);
-    auto noteOff = std::dynamic_pointer_cast<mpc::sequencer::NoteOffEvent>(event);
-
-    auto syncScreen = mpc.screens->get<SyncScreen>("sync");
-
-    std::shared_ptr<mpc::sequencer::Track> track;
-
-    if (mce && syncScreen->in == index)
+    else if (msg->isMidiClock())
     {
-        if (syncScreen->getModeIn() != 0)
-        {
-            switch (mce->getStatus())
-            {
-                case ShortMessage::START:
-                    sequencer->playFromStart();
-                    break;
-                case ShortMessage::CONTINUE:
-                    sequencer->play();
-                    break;
-                case ShortMessage::STOP:
-                    sequencer->stop();
-                    break;
-                case ShortMessage::TIMING_CLOCK:
-                    break;
-            }
-        }
+        event = handleMidiClock(msg);
     }
-    else if (noteOn)
+    else if (msg->isNoteOn() || msg->isNoteOff())
     {
-        noteOn->setTick(-1);
-        auto s = sequencer->isPlaying() ? sequencer->getCurrentlyPlayingSequence()
-            : sequencer->getActiveSequence();
-        track = s->getTrack(noteOn->getTrack());
-
-        int pad = -1;
-
-        if (track->getBus() > 0)
+        if (msg->isNoteOn())
         {
-            auto p = sampler->getProgram(sampler->getDrumBusProgramIndex(track->getBus()));
-            Util::setSliderNoteVariationParameters(mpc, noteOn, p);
-            pad = p->getPadIndexFromNote(noteOn->getNote());
+            event = handleNoteOn(msg, timeStamp);
+        }
+        else if (msg->isNoteOff())
+        {
+            event = handleNoteOff(msg, timeStamp);
         }
 
-        if (track->getBus() > 0 && track->getIndex() < 64 &&
-            mpc.getControls()->isTapPressed() && sequencer->isPlaying())
-        {
-            return;
-        }
-
-        if (pad == -1)
-        {
-            mpc.getEventHandler()->handleNoThru(noteOn, track.get(), timeStamp);
-
-            if (sequencer->isRecordingOrOverdubbing())
-            {
-                //noteOn->setDuration(note->getVelocity() == 0 ? 0 : -1);
-                noteOn->setTick(sequencer->getTickPosition());
-
-                auto recordedEvent = track->recordNoteEventASync(noteOn->getNote(), noteOn->getVelocity());
-                noteOn->CopyValuesTo(recordedEvent);
-            }
-        }
-        else
-        {
-            mpc.getActiveControls()->pad(pad, noteOn->getVelocity());
-        }
-    }    
-    else if (noteOff)
-    {
-        noteOff->setTick(-1);
-        auto s = sequencer->isPlaying() ? sequencer->getCurrentlyPlayingSequence()
-            : sequencer->getActiveSequence();
-        track = s->getTrack(noteOff->getTrack());
-
-        int pad = -1;
-
-        if (track->getBus() > 0)
-        {
-            auto p = sampler->getProgram(sampler->getDrumBusProgramIndex(track->getBus()));
-            //Util::setSliderNoteVariationParameters(mpc, noteOff, p);
-            pad = p->getPadIndexFromNote(noteOff->getNote());
-        }
-
-        if (pad == -1)
-        {
-            mpc.getEventHandler()->handleNoThru(noteOff, track.get(), timeStamp);
-
-            if (sequencer->isRecordingOrOverdubbing())
-            {
-                noteOff->setTick(sequencer->getTickPosition());
-                
-                track->finalizeNoteEventASync(noteOff->getNote());
-            }
-        }
-        else
-        {
-            mpc.getReleaseControls()->simplePad(pad);
-        }
-    }
-    if (noteOn || noteOff)
-    {
-        auto midiOutputScreen = mpc.screens->get<MidiOutputScreen>("midi-output");
-
-        switch (midiOutputScreen->getSoftThru())
-        {
-        case 0:
-            break;
-        case 1:
-            midiOut(eventAdapter->get(), track.get());
-            break;
-        case 2:
-            transportOmni(msg, "a");
-            break;
-        case 3:
-            transportOmni(msg, "b");
-            break;
-        case 4:
-            transportOmni(msg, "a");
-            transportOmni(msg, "b");
-            break;
-        }
-    }
-    /*else if (note)
-    {
-        note->setTick(-1);
-        auto s = sequencer->isPlaying() ? sequencer->getCurrentlyPlayingSequence()
-                                         : sequencer->getActiveSequence();
-        auto track = s->getTrack(note->getTrack());
-
-        int pad = -1;
-
-        if (track->getBus() > 0)
-        {
-            auto p = sampler->getProgram(sampler->getDrumBusProgramIndex(track->getBus()));
-            Util::setSliderNoteVariationParameters(mpc, note, p);
-            pad = p->getPadIndexFromNote(note->getNote());
-        }
-
-        if (note->getVelocity() != 0 && track->getBus() > 0 && track->getIndex() < 64 &&
-            mpc.getControls()->isTapPressed() && sequencer->isPlaying())
-        {
-            return;
-        }
-
-        if (pad == -1)
-        {
-            mpc.getEventHandler()->handleNoThru(note, track.get(), timeStamp);
-
-            if (sequencer->isRecordingOrOverdubbing())
-            {
-                note->setDuration(note->getVelocity() == 0 ? 0 : -1);
-                note->setTick(sequencer->getTickPosition());
-
-                if (note->getVelocity() == 0)
-                {
-                    track->recordNoteOffNow(note->getNote());
-                }
-                else
-                {
-                    auto recordedEvent = track->recordNoteOnNow(note->getNote());
-                    note->CopyValuesTo(recordedEvent);
-                }
-            }
-        }
-        else
-        {
-            if (note->getVelocity() == 0)
-            {
-                mpc.getReleaseControls()->simplePad(pad);
-            }
-            else
-            {
-                auto activeControls = mpc.getActiveControls();
-                activeControls->pad(pad, note->getVelocity());
-            }
-        }
-
-        auto midiOutputScreen = mpc.screens->get<MidiOutputScreen>("midi-output");
-
-        switch (midiOutputScreen->getSoftThru())
+        switch (mpc.screens->get<MidiOutputScreen>("midi-output")->getSoftThru())
         {
             case 0:
                 break;
             case 1:
-                midiOut(eventAdapter->get(), track.get());
+                //midiOut(event, track.get());
                 break;
             case 2:
-                transportOmni(msg, "a");
+                transportOmni(midiMsg, "a");
                 break;
             case 3:
-                transportOmni(msg, "b");
+                transportOmni(midiMsg, "b");
                 break;
             case 4:
-                transportOmni(msg, "a");
-                transportOmni(msg, "b");
+                transportOmni(midiMsg, "a");
+                transportOmni(midiMsg, "b");
                 break;
         }
-    }*/
+
+    }
+    else if (msg->isControlChange())
+    {
+        handleControlChange(msg);
+    }
+    else if (msg->isChannelPressure())
+    {
+        handleChannelPressure(msg);
+    }
+
+    if (event)//?????????
+    {
+        std::string notificationMessage = std::string(index == 0 ? "a" : "b") + std::to_string(msg->getChannel());
+        notifyObservers(notificationMessage);
+    }
 }
 
-void MpcMidiInput::handleControl(ShortMessage *shortMsg)
+void MpcMidiInput::handleControlChange(mpc::engine::midi::ShortMessage* msg)
 {
-    const auto controller = shortMsg->getData1();
-    const auto value = shortMsg->getData2();
+    const auto controller = msg->getData1();
+    const auto value = msg->getData2();
 
     auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
     auto hardware = mpc.getHardware();
@@ -317,7 +146,7 @@ void MpcMidiInput::handleControl(ShortMessage *shortMsg)
     auto midiSwScreen = mpc.screens->get<MidiSwScreen>("midi-sw");
 
     if (midiInputScreen->getReceiveCh() == -1 ||
-        midiInputScreen->getReceiveCh() == shortMsg->getChannel())
+        midiInputScreen->getReceiveCh() == msg->getChannel())
     {
         std::vector<int> processedControllers;
 
@@ -472,7 +301,187 @@ void MpcMidiInput::transportOmni(MidiMessage *msg, std::string outputLetter)
     }
 }
 
-void MpcMidiInput::handlePolyAndNote(MidiMessage *msg)
+std::shared_ptr<mpc::sequencer::NoteOnEvent> mpc::audiomidi::MpcMidiInput::handleNoteOn(mpc::engine::midi::ShortMessage* msg, const int& timeStamp)
+{
+    auto midiNoteOn = std::make_shared<NoteOnEventPlayOnly>(msg);
+    int trackNumber;
+    if (sequencer->isRecordingModeMulti())
+    {
+        auto mrs = mpc.screens->get<MultiRecordingSetupScreen>("multi-recording-setup")->getMrsLines();
+        trackNumber = mrs[msg->getChannel()]->getTrack();
+    }
+    else
+    {
+        trackNumber = sequencer->getActiveTrackIndex();
+    }
+    auto s = sequencer->isPlaying() ? sequencer->getCurrentlyPlayingSequence()
+        : sequencer->getActiveSequence();
+    auto track = s->getTrack(trackNumber);
+
+    int pad = -1;
+    auto bus = track->getBus();
+    if (bus > 0)
+    {
+        pad = sampler->getProgram(sampler->getDrumBusProgramIndex(bus))->getPadIndexFromNote(midiNoteOn->getNote());
+        //Util::setSliderNoteVariationParameters(mpc, midiNoteOn, p);
+    }
+
+    if (bus > 0 && track->getIndex() < 64 &&
+        mpc.getControls()->isTapPressed() && sequencer->isPlaying())
+    {
+        return nullptr;
+    }
+
+    if (pad != -1)
+    {
+        mpc.getActiveControls()->pad(pad, midiNoteOn->getVelocity());
+        return nullptr;
+    }
+    else
+    {
+        if (!storeNoteEvent(std::pair<int, int>(trackNumber, midiNoteOn->getNote()),midiNoteOn)) return nullptr;
+        if (sequencer->isRecordingOrOverdubbing())
+        {
+            track->recordNoteEventASync(midiNoteOn->getNote(), midiNoteOn->getVelocity());
+        }
+        else if (mpc.getControls()->isStepRecording())
+        {
+            track->recordNoteEventSynced(sequencer->getTickPosition(), midiNoteOn->getNote(), midiNoteOn->getVelocity());
+        }
+        else if (mpc.getControls()->isRecMainWithoutPlaying())
+        {
+            auto recordNoteOnEvent = track->recordNoteEventSynced(sequencer->getTickPosition(), midiNoteOn->getNote(), midiNoteOn->getVelocity());
+            auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
+            int stepLength = timingCorrectScreen->getNoteValueLengthInTicks();
+
+            if (stepLength != 1)
+            {
+                int bar = sequencer->getCurrentBarIndex() + 1;
+                track->timingCorrect(0, bar, recordNoteOnEvent, stepLength, timingCorrectScreen->getSwing());
+
+                if (recordNoteOnEvent->getTick() != sequencer->getTickPosition())
+                    sequencer->move(recordNoteOnEvent->getTick());
+            }
+        }
+        mpc.getEventHandler()->handleNoThru(midiNoteOn, track.get(), timeStamp);
+    }
+    return midiNoteOn;
+}
+
+std::shared_ptr<mpc::sequencer::NoteOffEvent> mpc::audiomidi::MpcMidiInput::handleNoteOff(mpc::engine::midi::ShortMessage* msg, const int& timeStamp)
+{
+    int note = msg->getData1();
+    int trackNumber;
+    if (sequencer->isRecordingModeMulti())
+    {
+        auto mrs = mpc.screens->get<MultiRecordingSetupScreen>("multi-recording-setup")->getMrsLines();
+        trackNumber = mrs[msg->getChannel()]->getTrack();
+    }
+    else
+    {
+        trackNumber = sequencer->getActiveTrackIndex();
+    }
+    
+    auto s = sequencer->isPlaying() ? sequencer->getCurrentlyPlayingSequence()
+        : sequencer->getActiveSequence();
+    auto track = s->getTrack(trackNumber);
+
+    int pad = -1;
+
+    if (track->getBus() > 0)
+    {
+        pad = sampler->getProgram(sampler->getDrumBusProgramIndex(track->getBus()))->getPadIndexFromNote(msg->getData1());
+        //Util::setSliderNoteVariationParameters(mpc, noteOff, p);
+    }
+
+    if (pad != -1)
+    {
+        mpc.getReleaseControls()->simplePad(pad);
+        return nullptr;
+    }
+    else if (auto storedmidiNoteOn = retrieveNoteEvent(std::pair<int, int>(trackNumber, note)); storedmidiNoteOn)
+    {
+        auto step = mpc.getControls()->isStepRecording();
+        auto recWithoutPlaying = mpc.getControls()->isRecMainWithoutPlaying();
+        if (sequencer->isRecordingOrOverdubbing())
+        {
+            track->finalizeNoteEventASync(note);
+        }
+        else if (step || recWithoutPlaying)
+        {
+            auto newDuration = static_cast<int>(mpc.getAudioMidiServices()->getFrameSequencer()->getTickPosition());
+
+            const auto stepEditOptionsScreen = mpc.screens->get<StepEditOptionsScreen>("step-edit-options");
+            const auto increment = stepEditOptionsScreen->isAutoStepIncrementEnabled();
+            const auto durationIsTcValue = stepEditOptionsScreen->isDurationOfRecordedNotesTcValue();
+            const auto tcValuePercentage = stepEditOptionsScreen->getTcValuePercentage();
+
+            const auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
+
+            const int stepLength = timingCorrectScreen->getNoteValueLengthInTicks();
+
+            if (step && durationIsTcValue)
+            {
+                newDuration = static_cast<int>(stepLength * (tcValuePercentage * 0.01));
+
+                if (newDuration < 1)
+                {
+                    newDuration = 1;
+                }
+            }
+
+            sequencer->stopMetronomeTrack();
+            bool durationHasBeenAdjusted = track->finalizeNoteEventSynced(note, newDuration);
+
+            if ((durationHasBeenAdjusted && recWithoutPlaying) || (step && increment))
+            {
+                int nextPos = sequencer->getTickPosition() + stepLength;
+                auto bar = sequencer->getCurrentBarIndex() + 1;
+                nextPos = track->timingCorrectTick(0, bar, nextPos, stepLength, timingCorrectScreen->getSwing());
+                auto lastTick = sequencer->getActiveSequence()->getLastTick();
+
+                if (nextPos != 0 && nextPos < lastTick)
+                {
+                    sequencer->move(nextPos);
+                }
+                else
+                {
+                    sequencer->move(lastTick);
+                }
+            }
+        }
+        mpc.getEventHandler()->handleNoThru(storedmidiNoteOn->getNoteOff(), track.get(), timeStamp);
+        return storedmidiNoteOn->getNoteOff();
+    }
+    return nullptr;
+}
+
+std::shared_ptr<mpc::sequencer::MidiClockEvent> mpc::audiomidi::MpcMidiInput::handleMidiClock(mpc::engine::midi::ShortMessage* msg)
+{
+    auto mce = std::make_shared<mpc::sequencer::MidiClockEvent>(msg->getStatus());
+    auto syncScreen = mpc.screens->get<SyncScreen>("sync");
+    
+    if (syncScreen->in == index && syncScreen->getModeIn() != 0)
+    {
+        switch (mce->getStatus())
+        {
+        case ShortMessage::START:
+            sequencer->playFromStart();
+            break;
+        case ShortMessage::CONTINUE:
+            sequencer->play();
+            break;
+        case ShortMessage::STOP:
+            sequencer->stop();
+            break;
+        case ShortMessage::TIMING_CLOCK:
+            break;
+        }
+    }
+    return mce;
+}
+
+void MpcMidiInput::handleChannelPressure(mpc::engine::midi::ShortMessage* msg)
 {
     auto s = sequencer->getActiveSequence();
     auto t = s->getTrack(sequencer->getActiveTrackIndex());
@@ -486,20 +495,20 @@ void MpcMidiInput::handlePolyAndNote(MidiMessage *msg)
                 status >= ShortMessage::CHANNEL_PRESSURE && status < ShortMessage::CHANNEL_PRESSURE + 16;
         if (isChannelPressure)
         {
-            auto channelPressureValue = (*msg->getMessage())[1];
+            //auto channelPressureValue = (*msg->getMessage())[1];
 
-            // Alternatively we could process these like note offs,
-            // but this seems better.
-            if (channelPressureValue > 0)
-            {
-                for (auto &p: mpc.getHardware()->getPads())
-                {
-                    if (p->isPressed())
-                    {
-                        p->setPressure(channelPressureValue);
-                    }
-                }
-            }
+            //// Alternatively we could process these like note offs,
+            //// but this seems better.
+            //if (channelPressureValue > 0)
+            //{
+            //    for (auto &p: mpc.getHardware()->getPads())
+            //    {
+            //        if (p->isPressed())
+            //        {
+            //            p->setPressure(channelPressureValue);
+            //        }
+            //    }
+            //}
         }
     }
 }
