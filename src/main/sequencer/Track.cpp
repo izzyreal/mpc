@@ -224,6 +224,7 @@ void Track::cloneEventIntoTrack(std::shared_ptr<Event>& src, int tick, bool allo
 	{
 		res = std::make_shared<TempoChangeEvent>(seq);
 		tce->CopyValuesTo(res);
+        std::dynamic_pointer_cast<TempoChangeEvent>(res)->setParent(parent);
 	}
 	else if (mce)
 	{
