@@ -602,7 +602,7 @@ void Sampler::finishBasicVoice()
 
 void Sampler::playX()
 {
-	auto sound = sounds[soundIndex];
+    auto sound = getSortedSounds()[soundIndex].first;
 	auto start = 0;
 	auto end = sound->getSampleData()->size() - 1;
 
@@ -643,7 +643,7 @@ void Sampler::playX()
 
 std::shared_ptr<Sound> Sampler::getPlayXSound()
 {
-	return sounds[soundIndex];
+	return getSortedSounds()[soundIndex].first;
 }
 
 int Sampler::getFreeSampleSpace()
