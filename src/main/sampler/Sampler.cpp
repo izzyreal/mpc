@@ -463,7 +463,7 @@ void Sampler::switchToNextSoundSortType()
 {
     auto s = getSound();
 
-    if (soundSortingType++ > 2)
+    if (soundSortingType++ >= 2)
     {
         soundSortingType = 0;
     }
