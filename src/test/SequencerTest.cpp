@@ -12,6 +12,8 @@
 #include <sequencer/NoteEvent.hpp>
 #include <sequencer/Track.hpp>
 
+#include <file/all/Defaults.hpp>
+
 using namespace mpc::sequencer;
 using namespace std;
 
@@ -154,4 +156,41 @@ SCENARIO("Can record and playback from different threads", "[sequencer]")
         // For - 1 explanation, see humanTickPositions comment
         REQUIRE(track->getEvents().size() == humanTickPositions.size() - 1);
     }
+}
+
+TEST_CASE("Copy sequence", "[sequencer]")
+{
+    mpc::Mpc mpc;
+    mpc.init(1, 5);
+    auto sequencer = mpc.getSequencer();
+    sequencer->setTempo(121);
+
+    REQUIRE(sequencer->getTempo() == 121);
+
+    auto seq1 = sequencer->getActiveSequence();
+    seq1->init(2);
+
+    REQUIRE(seq1->getInitialTempo() == 120);
+
+    sequencer->setTempo(119);
+
+    REQUIRE(seq1->getInitialTempo() == 119);
+
+    sequencer->copySequence(0, 1);
+
+    auto seq2 = sequencer->getSequence(1);
+
+    REQUIRE(seq2->getTempoChangeEvents().size() == 1);
+    REQUIRE(seq2->getInitialTempo() == 119);
+
+    sequencer->setTempo(122);
+
+    REQUIRE(seq1->getInitialTempo() == 122);
+    REQUIRE(seq2->getInitialTempo() == 119);
+
+    sequencer->setActiveSequenceIndex(1);
+    sequencer->setTempo(123);
+
+    REQUIRE(seq1->getInitialTempo() == 122);
+    REQUIRE(seq2->getInitialTempo() == 123);
 }
