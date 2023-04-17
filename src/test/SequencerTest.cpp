@@ -2,19 +2,21 @@
 
 #include <Mpc.hpp>
 
-#include <lcdgui/ScreenComponent.hpp>
+#include <lcdgui/screens/window/TimingCorrectScreen.hpp>
 #include <controls/GlobalReleaseControls.hpp>
 
 #include <audiomidi/AudioMidiServices.hpp>
 #include <engine/audio/server/NonRealTimeAudioServer.hpp>
 
-#include <sequencer/Sequencer.hpp>
-#include <sequencer/NoteEvent.hpp>
 #include <sequencer/Track.hpp>
 
 #include <file/all/Defaults.hpp>
 
+#include <hardware/Hardware.hpp>
+#include <hardware/HwPad.hpp>
+
 using namespace mpc::sequencer;
+using namespace mpc::lcdgui::screens::window;
 using namespace std;
 
 TEST_CASE("Next step, previous step", "[sequencer]")
@@ -193,4 +195,56 @@ TEST_CASE("Copy sequence", "[sequencer]")
 
     REQUIRE(seq1->getInitialTempo() == 122);
     REQUIRE(seq2->getInitialTempo() == 123);
+}
+
+TEST_CASE("Undo", "[sequencer]")
+{
+    const int BUFFER_SIZE = 4096;
+
+    mpc::Mpc mpc;
+    mpc.init(0, 1);
+
+    auto sequencer = mpc.getSequencer();
+    sequencer->setCountEnabled(false);
+
+    auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
+    timingCorrectScreen->setNoteValue(0);
+
+    auto seq = sequencer->getActiveSequence();
+    seq->init(2);
+
+    sequencer->setTempo(121);
+
+    auto server = mpc.getAudioMidiServices()->getAudioServer();
+    server->resizeBuffers(BUFFER_SIZE);
+    server->setSampleRate(44100);
+
+    sequencer->recFromStart();
+
+    auto pads = mpc.getHardware()->getPads();
+
+    for (int i = 0; i < 20; i++)
+    {
+        if (i % 2 == 0) pads[0]->push(127); else pads[0]->release();
+        server->work((float*)nullptr, (float*)nullptr, BUFFER_SIZE, 0, 1);
+    }
+
+    sequencer->stop();
+    auto tr = seq->getTrack(0);
+    REQUIRE(tr->getEvents().size() == 10);
+
+    sequencer->undoSeq();
+
+    seq = sequencer->getActiveSequence();
+    tr = seq->getTrack(0);
+
+    REQUIRE(seq->isUsed());
+    REQUIRE(sequencer->getTempo() == 121);
+    REQUIRE(tr->getEvents().empty());
+
+    sequencer->undoSeq();
+
+    seq = sequencer->getActiveSequence();
+    tr = seq->getTrack(0);
+    REQUIRE(tr->getEvents().size() == 10);
 }
