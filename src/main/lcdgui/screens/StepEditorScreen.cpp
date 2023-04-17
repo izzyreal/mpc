@@ -65,6 +65,8 @@ void StepEditorScreen::openWindow()
 
 void StepEditorScreen::open()
 {
+    mpc.getSequencer()->storeActiveSequenceInUndoPlaceHolder();
+
 	findField("tonote")->setLocation(115, 0);
 	findLabel("fromnote")->Hide(true);
 
@@ -139,7 +141,7 @@ void StepEditorScreen::open()
 
 void StepEditorScreen::close()
 {
-	sequencer->deleteObserver(this);
+    sequencer->deleteObserver(this);
 	track->deleteObserver(this);
 
     storeColumnForEventAtActiveRow();
@@ -151,6 +153,7 @@ void StepEditorScreen::close()
 		nextScreen != "paste-event")
 	{
 		track->removeDoubles();
+        sequencer->resetUndo();
 	}
 
 	for (auto& e : visibleEvents)

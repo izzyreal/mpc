@@ -51,7 +51,7 @@ namespace mpc::sequencer
 		int activeSequenceIndex = 0;
 		int currentlyPlayingSequenceIndex = 0;
 		bool songMode = false;
-		int playedStepRepetitions = 0;
+		int playedStepRepetitions = 0; // Part of SONG mode
 		bool endOfSong = false;
 
 		std::vector<std::shared_ptr<Sequence>> sequences = std::vector<std::shared_ptr<Sequence>>(99);
@@ -118,8 +118,10 @@ namespace mpc::sequencer
 		void trackUp();
 		void trackDown();
 		bool isPlaying();
-		int getPlayedStepRepetitions();
         void setEndOfSong(bool b);
+
+        // Repititions of steps in SONG mode (not step editor)
+        int getPlayedStepRepetitions();
 		void incrementPlayedStepRepetitions();
 		void resetPlayedStepRepetitions();
 
