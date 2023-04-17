@@ -152,7 +152,12 @@ int LayeredScreen::openScreen(std::string screenName)
 	auto isNextSeqScreen = find(begin(nextSeqScreens), end(nextSeqScreens), currentScreenName) != end(nextSeqScreens);
 	
 	if (!isNextSeqScreen || (currentScreenName == "sequencer" && !mpc.getSequencer()->isPlaying()))
-		mpc.getSequencer()->setNextSq(-1);
+    {
+        if (mpc.getSequencer()->getNextSq() != -1)
+        {
+            mpc.getSequencer()->setNextSq(-1);
+        }
+    }
 
 	return focusedLayerIndex;
 }
