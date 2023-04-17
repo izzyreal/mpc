@@ -1499,6 +1499,12 @@ void Sequencer::storeActiveSequenceInUndoPlaceHolder()
 	undoSeqAvailable = true;
 }
 
+void Sequencer::resetUndo()
+{
+    undoPlaceHolder.reset();
+    undoSeqAvailable = false;
+}
+
 bool Sequencer::isOverDubbing()
 {
     return overdubbing;

@@ -186,6 +186,7 @@ namespace mpc::sequencer
 		void setSecondSequenceEnabled(bool b);
 		void flushTrackNoteCache();
 		void storeActiveSequenceInUndoPlaceHolder();
+		void resetUndo();
 		bool isOverDubbing();
 		int getPlayStartTick();
 

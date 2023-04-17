@@ -169,8 +169,10 @@ void SequencerScreen::close()
 		auto punchScreen = mpc.screens->get<PunchScreen>("punch");
 		punchScreen->on = false;
 	}
-    
-	sequencer->deleteObserver(this);
+
+    sequencer->resetUndo();
+
+    sequencer->deleteObserver(this);
 	sequence.lock()->deleteObserver(this);
 	track->deleteObserver(this);
 }
