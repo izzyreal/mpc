@@ -519,11 +519,6 @@ void StepEditorScreen::turnWheel(int i)
 		}
 	}
 
-    if (param.find("now") != std::string::npos)
-    {
-        adhocPlayNoteEventsAtCurrentPosition();
-    }
-
 	refreshSelection();
 }
 
