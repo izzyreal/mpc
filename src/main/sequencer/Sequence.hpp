@@ -60,8 +60,6 @@ public:
     int getFirstLoopBarIndex();
     void setLastLoopBarIndex(int i);
     int getLastLoopBarIndex();
-
-    static bool trackIndexComparator(std::shared_ptr<Track>& t0, std::shared_ptr<Track>& t1);
     
 public:
     bool isLoopEnabled();
