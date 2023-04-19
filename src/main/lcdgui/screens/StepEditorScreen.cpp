@@ -1,7 +1,6 @@
 #include "StepEditorScreen.hpp"
 #include "lcdgui/screens/window/InsertEventScreen.hpp"
 
-#include <audiomidi/AudioMidiServices.hpp>
 #include <audiomidi/EventHandler.hpp>
 
 #include <hardware/Hardware.hpp>
@@ -21,12 +20,8 @@
 #include <sequencer/PolyPressureEvent.hpp>
 #include <sequencer/ProgramChangeEvent.hpp>
 #include <sequencer/SystemExclusiveEvent.hpp>
-#include <sequencer/SeqUtil.hpp>
 
 #include <Util.hpp>
-
-#include <engine/midi/ShortMessage.hpp>
-#include <engine/audio/server/NonRealTimeAudioServer.hpp>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens::window;
@@ -167,6 +162,18 @@ void StepEditorScreen::close()
         if (e) e->deleteObserver(this);
     }
 
+    for (auto& e : selectedEvents)
+    {
+        if (e) e->deleteObserver(this);
+    }
+
+    if (selectedEvent) selectedEvent->deleteObserver(this);
+
+    for (auto& e : placeHolder)
+    {
+        if (e) e->deleteObserver(this);
+    }
+
 	clearSelection();
 }
 
@@ -190,7 +197,7 @@ void StepEditorScreen::function(int i)
 		else if (selectionStartIndex == -1 && param.length() == 2)
 		{
 			// CopySelectedNote
-			auto eventIndex = stoi(param.substr(1, 1));
+			auto eventIndex = getActiveRow();
 			auto maybeEmptyEvent = std::dynamic_pointer_cast<EmptyEvent>(visibleEvents[eventIndex]);
 
 			if (!maybeEmptyEvent)
@@ -202,8 +209,8 @@ void StepEditorScreen::function(int i)
 		if (param.length() != 2)
 			return;
 
-		auto rowIndex = stoi(param.substr(1, 1));
-        auto srcLetter = param.substr(0, 1);
+		auto rowIndex = getActiveRow();
+        auto srcLetter = getActiveColumn();
         auto eventType = visibleEvents[rowIndex]->getTypeName();
         lastColumn[eventType] = srcLetter;
 
@@ -249,7 +256,7 @@ void StepEditorScreen::function(int i)
 		}
 		else
 		{
-			auto row = stoi(param.substr(1, 1));
+			auto row = getActiveRow();
 
 			auto event = visibleEvents[row];
 
@@ -267,7 +274,7 @@ void StepEditorScreen::function(int i)
 			auto polyPressEvent = std::dynamic_pointer_cast<PolyPressureEvent>(event);
 			auto controlChangeEvent = std::dynamic_pointer_cast<ControlChangeEvent>(event);
 
-			auto column = param.substr(0, 1);
+			auto column = getActiveColumn();
 
 			bool isA = column == "a";
 			bool isB = column == "b";
@@ -340,7 +347,7 @@ void StepEditorScreen::function(int i)
 		break;
 	}
 	case 4:
-		if (placeHolder.size() != 0)
+		if (!placeHolder.empty())
 			openScreen("paste-event");
 		break;
 	case 5:
@@ -348,7 +355,7 @@ void StepEditorScreen::function(int i)
 		{
 			if (param.length() == 2)
 			{
-				auto eventNumber = stoi(param.substr(1, 1));
+				auto eventNumber = getActiveRow();
 				auto event = visibleEvents[eventNumber];
 				auto noteEvent = std::dynamic_pointer_cast<NoteOnEvent>(event);
 
@@ -412,7 +419,7 @@ void StepEditorScreen::turnWheel(int i)
 	}
 	else if (param.length() == 2)
 	{
-		auto eventNumber = stoi(param.substr(1, 1));
+		auto eventNumber = getActiveRow();
 
         if (auto sysEx = std::dynamic_pointer_cast<SystemExclusiveEvent>(visibleEvents[eventNumber]))
 		{
@@ -592,9 +599,9 @@ void StepEditorScreen::left()
 {
 	init();
 
-	if (param.length() == 2 && param.substr(0, 1) == "a")
+	if (param.length() == 2 && getActiveColumn() == "a")
 	{
-		lastRow = stoi(param.substr(1, 1));
+		lastRow = getActiveRow();
 		ls->setFocus("view");
 	}
 	else
@@ -716,7 +723,7 @@ void StepEditorScreen::shift()
 
 	if (param.length() == 2)
 	{
-		auto eventNumber = stoi(param.substr(1, 1));
+		auto eventNumber = getActiveRow();
 		setSelectionStartIndex(eventNumber + yOffset);
 	}
 }
@@ -1288,25 +1295,16 @@ void StepEditorScreen::update(moduru::observer::Observable*, nonstd::any message
 	}
 	else if (msg == "bar")
 	{
-		if (sequencer->isPlaying())
-			return;
-
 		findField("now0")->setTextPadded(sequencer->getCurrentBarIndex() + 1, "0");
 		setyOffset(0);
 	}
 	else if (msg == "beat")
 	{
-		if (sequencer->isPlaying())
-			return;
-
 		findField("now1")->setTextPadded(sequencer->getCurrentBeatIndex() + 1, "0");
 		setyOffset(0);
 	}
 	else if (msg == "clock")
 	{
-		if (sequencer->isPlaying())
-			return;
-
 		findField("now2")->setTextPadded(sequencer->getCurrentClockNumber(), "0");
 		setyOffset(0);
 	}

@@ -45,8 +45,6 @@ private:
     int trackIndex = 0;
     bool used{ false };
     int eventIndex = 0;
-    bool multi{ false };
-    bool _delete{ false };
 
 public:
     void move(int tick, int oldTick);

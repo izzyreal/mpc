@@ -92,10 +92,7 @@ void Drum::setLastReceivedMidiVolume(int volume)
 
 	lastReceivedMidiVolume = volume;
 }
-//void Drum::mpcNoteOn(std::shared_ptr<mpc::sequencer::NoteOnEvent> event, int frameOffset, bool firstGeneration, int durationFrames)
-//{
-//
-//}
+
 void Drum::mpcNoteOn(int note, int velo, int varType, int varValue, int frameOffset, bool firstGeneration, int startTick, int durationFrames)
 {
 	if (note < 35 || note > 98 || velo == 0)

@@ -490,10 +490,12 @@ int Track::getNextTick()
 void Track::playNext()
 {
 	if (eventIndex >= events.size())
-		return;
+    {
+        return;
+    }
 
-	multi = sequencer->isRecordingModeMulti();
-	_delete = sequencer->isRecording() && (trackIndex == sequencer->getActiveTrackIndex() || multi) && (trackIndex < 64);
+	auto recordingModeIsMulti = sequencer->isRecordingModeMulti();
+	auto _delete = sequencer->isRecording() && (trackIndex == sequencer->getActiveTrackIndex() || recordingModeIsMulti) && (trackIndex < 64);
 
 	auto punchScreen = mpc.screens->get<PunchScreen>("punch");
 
@@ -514,23 +516,19 @@ void Track::playNext()
 	}
 	//!!!!!!!!!!!!!!!!!!!
     auto event = eventIndex >= events.size() ? std::shared_ptr<Event>() : events[eventIndex];
-	auto note = std::dynamic_pointer_cast<NoteOnEvent>(event);
+    auto hardware = mpc.getHardware();
 
-	if (note)
+	if (auto note = std::dynamic_pointer_cast<NoteOnEvent>(event))
     {
         note->setTrack(trackIndex);
 
         if (sequencer->isOverDubbing() &&
             mpc.getControls()->isErasePressed() &&
-            (trackIndex == sequencer->getActiveTrackIndex() || multi) &&
+            (trackIndex == sequencer->getActiveTrackIndex() || recordingModeIsMulti) &&
             trackIndex < 64 &&
             busNumber > 0)
         {
-            auto pgmIndex = mpc.getSampler()->getDrumBusProgramIndex(busNumber);
-            auto pgm = mpc.getSampler()->getProgram(pgmIndex);
-
             bool oneOrMorePadsArePressed = false;
-            auto hardware = mpc.getHardware();
 
             for (auto& p : hardware->getPads())
             {
@@ -628,7 +626,9 @@ std::vector<std::shared_ptr<Event>> Track::getEventRange(int startTick, int endT
 	for (auto& e : events)
 	{
 		if (e->getTick() >= startTick && e->getTick() <= endTick)
-			res.push_back(e);
+        {
+            res.push_back(e);
+        }
 	}
 
 	return res;

@@ -63,7 +63,7 @@ namespace mpc::lcdgui::screens
 	private:
         int playSingleEventCounter = 0;
 		const std::vector<std::string> viewNames { "ALL EVENTS", "NOTES", "PITCH BEND", "CTRL:", "PROG CHANGE", "CH PRESSURE", "POLY PRESS", "EXCLUSIVE" };
-		std::shared_ptr<mpc::sequencer::EmptyEvent> emptyEvent = std::make_shared<mpc::sequencer::EmptyEvent>();
+		const std::shared_ptr<mpc::sequencer::EmptyEvent> emptyEvent = std::make_shared<mpc::sequencer::EmptyEvent>();
 		std::vector<std::shared_ptr<mpc::sequencer::Event>> visibleEvents;
 		std::vector<std::shared_ptr<mpc::sequencer::Event>> eventsAtCurrentTick;
 		std::vector<std::shared_ptr<mpc::sequencer::Event>> placeHolder;
