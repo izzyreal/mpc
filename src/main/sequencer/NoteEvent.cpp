@@ -28,13 +28,12 @@ std::shared_ptr<mpc::engine::midi::ShortMessage> mpc::sequencer::NoteOffEvent::c
 
 void NoteOnEvent::CopyValuesTo(std::weak_ptr<Event> dest)
 {
-    Event::CopyValuesTo(dest);
     auto lDest = std::dynamic_pointer_cast<NoteOnEvent>(dest.lock());
-    lDest->incrementVariationType(getVariationType());
+    Event::CopyValuesTo(dest);
+    lDest->setVariationType(getVariationType());
     lDest->setVariationValue(getVariationValue());
     lDest->setNote(getNote());
     lDest->setVelocity(getVelocity());
-
     lDest->setDuration(getDuration());
 }
 

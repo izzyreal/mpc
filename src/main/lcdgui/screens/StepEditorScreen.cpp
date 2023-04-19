@@ -2,6 +2,7 @@
 #include "lcdgui/screens/window/InsertEventScreen.hpp"
 
 #include <audiomidi/AudioMidiServices.hpp>
+#include <audiomidi/EventHandler.hpp>
 
 #include <hardware/Hardware.hpp>
 #include <hardware/HwPad.hpp>
@@ -517,11 +518,6 @@ void StepEditorScreen::turnWheel(int i)
 			}
 		}
 	}
-
-    if (param.find("now") != std::string::npos)
-    {
-        adhocPlayNoteEventsAtCurrentPosition();
-    }
 
 	refreshSelection();
 }
@@ -1348,47 +1344,19 @@ int StepEditorScreen::getYOffset()
 
 void StepEditorScreen::adhocPlayNoteEvent(const std::shared_ptr<mpc::sequencer::NoteOnEvent> &noteEvent)
 {
-    int uniqueEnoughID = playSingleEventCounter++;
+	auto adhoc = std::make_shared<NoteOnEventPlayOnly>();
+	noteEvent->CopyValuesTo(adhoc);
+	const auto bus = track->getBus();
 
-    if (playSingleEventCounter < 0)
+    if (bus != 0)
     {
-        playSingleEventCounter = 0;
-    }
-
-    const auto bus = track->getBus();
-    const auto note = noteEvent->getNote();
-    const auto velo = noteEvent->getVelocity();
-    const auto varType = noteEvent->getVariationType();
-    const auto varValue = noteEvent->getVariationValue();
-
-    if (bus == 0)
-    {
-        // TODO MIDI OUT
+		mpc.getEventHandler()->handle(adhoc, track.get(), bus-1);
+		// TODO MIDI OUT
     }
     else
     {
-        mpc.getDrum(bus - 1).mpcNoteOn(note, velo, varType, varValue, 0, true, uniqueEnoughID, -1);
         // TODO MIDI OUT
     }
-
-    auto eventAfterNFrames = [bus, note, uniqueEnoughID, this](unsigned int frameIndex) {
-        if (bus == 0)
-        {
-            // TODO MIDI OUT
-        }
-        else
-        {
-            mpc.getDrum(bus - 1).mpcNoteOff(note, frameIndex, uniqueEnoughID);
-            // TODO MIDI OUT
-        }
-    };
-
-    const auto sampleRate = mpc.getAudioMidiServices()->getAudioServer()->getSampleRate();
-    const auto tempo = sequencer->getTempo();
-    const auto durationInFrames = SeqUtil::ticksToFrames(noteEvent->getDuration().value(), tempo, sampleRate);
-
-    auto frameSeq = mpc.getAudioMidiServices()->getFrameSequencer();
-    frameSeq->enqueueEventAfterNFrames(eventAfterNFrames, durationInFrames);
 }
 
 void StepEditorScreen::resetYPosAndYOffset()
