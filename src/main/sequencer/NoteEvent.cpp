@@ -136,7 +136,8 @@ int mpc::sequencer::NoteOnEvent::getVariationValue()
 
 void mpc::sequencer::NoteOnEvent::setVelocity(int i)
 {
-    velocity = std::clamp(i, 1, 127);;
+    velocity = std::clamp(i, 1, 127);
+    notifyObservers(std::string("step-editor"));
 }
 
 int mpc::sequencer::NoteOnEvent::getVelocity()
