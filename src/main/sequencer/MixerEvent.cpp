@@ -10,7 +10,7 @@ void MixerEvent::setParameter(int i)
 	notifyObservers(std::string("step-editor"));
 }
 
-int MixerEvent::getParameter()
+int MixerEvent::getParameter() const
 {
     return mixerParameter;
 }
@@ -24,7 +24,7 @@ void MixerEvent::setPadNumber(int i)
     notifyObservers(std::string("step-editor"));
 }
 
-int MixerEvent::getPad()
+int MixerEvent::getPad() const
 {
     return padNumber;
 }
@@ -38,9 +38,16 @@ void MixerEvent::setValue(int i)
     notifyObservers(std::string("step-editor"));
 }
 
-int MixerEvent::getValue()
+int MixerEvent::getValue() const
 {
     return mixerParameterValue;
+}
+
+mpc::sequencer::MixerEvent::MixerEvent(const MixerEvent& event) : Event(event)
+{
+    setPadNumber(event.getPad());
+    setParameter(event.getParameter());
+    setValue(event.getValue());
 }
 
 void MixerEvent::CopyValuesTo(std::weak_ptr<Event> dest) {

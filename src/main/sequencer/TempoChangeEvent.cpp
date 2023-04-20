@@ -16,6 +16,11 @@ TempoChangeEvent::TempoChangeEvent(Sequence* parent, int ratio)
 	this->parent = parent;
 }
 
+mpc::sequencer::TempoChangeEvent::TempoChangeEvent(const TempoChangeEvent& event) : Event(event)
+{
+	setRatio(event.getRatio());
+}
+
 void TempoChangeEvent::setParent(Sequence* newParent) {
 	parent = newParent;
 }
@@ -122,7 +127,7 @@ void TempoChangeEvent::setRatio(int i)
 	notifyObservers(std::string("tempo-change"));
 }
 
-int TempoChangeEvent::getRatio()
+int TempoChangeEvent::getRatio() const
 {
     return ratio;
 }

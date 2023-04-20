@@ -14,12 +14,14 @@ namespace mpc::sequencer
 
 	public:
 		void setParameter(int i);
-		int getParameter();
+		int getParameter() const;
 		void setPadNumber(int i);
-		int getPad();
+		int getPad() const;
 		void setValue(int i);
-		int getValue();
+		int getValue() const;
 
+		MixerEvent() = default;
+		MixerEvent(const MixerEvent&);
 		void CopyValuesTo(std::weak_ptr<Event> dest) override;
 
 		std::string getTypeName() override { return "mixer"; }

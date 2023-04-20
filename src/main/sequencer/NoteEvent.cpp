@@ -58,7 +58,6 @@ mpc::sequencer::NoteOnEvent::NoteOnEvent(const NoteOnEvent& event) : Event(event
     setDuration(event.duration);
     setVariationType(event.variationType);
     setVariationValue(event.variationValue);
-
 }
 
 std::shared_ptr<mpc::engine::midi::ShortMessage> mpc::sequencer::NoteOnEvent::createShortMessage(int channel, int transpose)

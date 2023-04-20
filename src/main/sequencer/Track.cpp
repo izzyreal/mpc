@@ -210,30 +210,25 @@ void Track::cloneEventIntoTrack(std::shared_ptr<Event>& src, int tick, bool allo
 	auto seq = sequencer->getActiveSequence().get();
 
     std::shared_ptr<Event> res;
-	auto tce = std::dynamic_pointer_cast<TempoChangeEvent>(src);
-	auto mce = std::dynamic_pointer_cast<MidiClockEvent>(src);
-	auto ne = std::dynamic_pointer_cast<NoteOnEvent>(src);
-	auto me = std::dynamic_pointer_cast<MixerEvent>(src);
 
-	if (ne)
+	if (auto ne = std::dynamic_pointer_cast<NoteOnEvent>(src); ne)
 	{
 		res = std::make_shared<NoteOnEvent>(*ne);
 	}
-	else if (tce)
+	else if (auto tce = std::dynamic_pointer_cast<TempoChangeEvent>(src); tce)
 	{
-		res = std::make_shared<TempoChangeEvent>(seq);
-		tce->CopyValuesTo(res);
-        std::dynamic_pointer_cast<TempoChangeEvent>(res)->setParent(parent);
+		auto t = std::make_shared<TempoChangeEvent>(*tce);
+        t->setParent(parent);
+        res = t;
 	}
-	else if (mce)
+	else if (auto mce = std::dynamic_pointer_cast<MidiClockEvent>(src); mce)
 	{
-		res = std::make_shared<MidiClockEvent>(0);
-		mce->CopyValuesTo(res);
+		res = std::make_shared<MidiClockEvent>(*mce);
 	}
-	else if (me)
+	else if (auto me = std::dynamic_pointer_cast<MixerEvent>(src); me)
 	{
-		res = std::make_shared<MixerEvent>();
-		me->CopyValuesTo(res);
+		res = std::make_shared<MixerEvent>(*me);
+
 	}
 
     if (!used)
