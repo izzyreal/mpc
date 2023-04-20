@@ -217,8 +217,7 @@ void Track::cloneEventIntoTrack(std::shared_ptr<Event>& src, int tick, bool allo
 
 	if (ne)
 	{
-		res = std::make_shared<NoteOnEvent>();
-		ne->CopyValuesTo(res);
+		res = std::make_shared<NoteOnEvent>(*ne);
 	}
 	else if (tce)
 	{

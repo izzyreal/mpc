@@ -11,12 +11,14 @@ namespace mpc::sequencer
         int wasMoved = 0;
 
 		void setTick(int relativeTick);
-		int getTick();
-		int getTrack();
+		int getTick() const;
 		virtual void setTrack(int i);
+		int getTrack() const;
 
 		virtual void CopyValuesTo(std::weak_ptr<Event> dest);
         virtual std::string getTypeName() = 0;
+		Event() = default;
+		Event(const Event&);
 
     protected:
         int tick = 0;

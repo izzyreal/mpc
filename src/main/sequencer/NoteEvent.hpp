@@ -59,10 +59,12 @@ namespace mpc::sequencer
 
         NoteOnEvent(int i = 60, int vel = 127);
         NoteOnEvent(mpc::engine::midi::ShortMessage* msg);
+        NoteOnEvent(const NoteOnEvent&);
 
         std::string getTypeName() override { return "note-on"; }
         std::shared_ptr<mpc::engine::midi::ShortMessage> createShortMessage(int channel, int transpose = 0);
         void CopyValuesTo(std::weak_ptr<Event> dest) override;
+
 
     };
     static bool isDrumNote(int number) { return number >= 35 && number <= 98; }
@@ -72,6 +74,7 @@ namespace mpc::sequencer
     public:
         NoteOnEventPlayOnly(int i = 60, int vel = 127) : NoteOnEvent(i,vel) { setTick(-1); };
         NoteOnEventPlayOnly(mpc::engine::midi::ShortMessage* msg) : NoteOnEvent(msg) { setTick(-1); }
+        NoteOnEventPlayOnly(const NoteOnEventPlayOnly& event) : NoteOnEvent(event) { setTick(-1); };
     };
 }
 inline int operator+(const mpc::sequencer::NoteOnEvent::Duration& duration, const int& i)
