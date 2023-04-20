@@ -14,7 +14,6 @@
 #include <sampler/Pad.hpp>
 #include <sequencer/Track.hpp>
 #include <sequencer/NoteEvent.hpp>
-#include <sequencer/Sequencer.hpp>
 
 #include <lcdgui/Layer.hpp>
 
@@ -267,30 +266,34 @@ void BaseControls::pad(int padIndexWithBank, int velo)
 void BaseControls::generateNoteOn(int note, int padVelo, int padIndexWithBank)
 {
     init();
-    //----------
-    auto play_event = std::make_shared<NoteOnEventPlayOnly>(note, padVelo);
-    if (!mpc.getControls()->storeNoteEvent(padIndexWithBank, play_event)) return ;
 
-    auto padIndex = program != nullptr ? program->getPadIndexFromNote(note) : -1;
-    bool isSliderNote = program && program->getSlider()->getNote() == note;
+    const bool is16LevelsEnabled = mpc.getHardware()->getTopPanel()->isSixteenLevelsEnabled();
 
-    if (program)
+    const auto play_event = std::make_shared<NoteOnEventPlayOnly>(note, padVelo);
+
+    if (!mpc.getControls()->storeNoteEvent(padIndexWithBank, play_event))
     {
-        Util::set16LevelsValues(mpc, play_event, padIndex);
-
-        if (isSliderNote)
-        {
-            Util::setSliderNoteVariationParameters(mpc, play_event, program);
-        }
+        return;
     }
 
-    auto drumScreen = mpc.screens->get<DrumScreen>("drum");
-    char drum = collectionContainsCurrentScreen(samplerScreens) ? drumScreen->getDrum() : -1;
+    const auto padIndex = program ? program->getPadIndexFromNote(note) : -1;
+    Util::set16LevelsValues(mpc, play_event, padIndex);
+
+    const bool isSliderNote = program && program->getSlider()->getNote() == note;
+
+    if (program && isSliderNote)
+    {
+        Util::setSliderNoteVariationParameters(mpc, play_event, program);
+    }
+
+    const auto drumScreen = mpc.screens->get<DrumScreen>("drum");
+    const char drum = collectionContainsCurrentScreen(samplerScreens) ? drumScreen->getDrum() : -1;
 
     mpc.getEventHandler()->handle(play_event, track.get(), drum);
 
     //---------------------
     std::shared_ptr<NoteOnEvent> recordNoteOnEvent;
+
     if (sequencer->isRecordingOrOverdubbing())
     {
         recordNoteOnEvent = track->recordNoteEventASync(note, padVelo);
@@ -315,6 +318,19 @@ void BaseControls::generateNoteOn(int note, int padVelo, int padIndexWithBank)
                 sequencer->move(recordNoteOnEvent->getTick());
         }
         sequencer->playMetronomeTrack();
+    }
+
+    if (recordNoteOnEvent)
+    {
+        if (is16LevelsEnabled)
+        {
+            Util::set16LevelsValues(mpc, recordNoteOnEvent, padIndex);
+        }
+
+        if (program && isSliderNote)
+        {
+            Util::setSliderNoteVariationParameters(mpc, recordNoteOnEvent, program);
+        }
     }
 }
 
