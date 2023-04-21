@@ -9,6 +9,12 @@
 #include <sequencer/MidiClockEvent.hpp>
 #include <sequencer/MixerEvent.hpp>
 #include <sequencer/TempoChangeEvent.hpp>
+#include <sequencer/PitchBendEvent.hpp>
+#include <sequencer/ControlChangeEvent.hpp>
+#include <sequencer/ProgramChangeEvent.hpp>
+#include <sequencer/ChannelPressureEvent.hpp>
+#include <sequencer/PolyPressureEvent.hpp>
+#include <sequencer/SystemExclusiveEvent.hpp>
 
 #include <lcdgui/screens/PunchScreen.hpp>
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
@@ -213,12 +219,6 @@ void Track::cloneEventIntoTrack(std::shared_ptr<Event>& src, int tick, bool allo
 	{
 		clone = std::make_shared<NoteOnEvent>(*source);
 	}
-	else if (auto source = std::dynamic_pointer_cast<TempoChangeEvent>(src))
-	{
-		auto t = std::make_shared<TempoChangeEvent>(*source);
-        t->setParent(parent);
-        clone = t;
-	}
 	else if (auto source = std::dynamic_pointer_cast<MidiClockEvent>(src))
 	{
 		clone = std::make_shared<MidiClockEvent>(*source);
@@ -227,6 +227,36 @@ void Track::cloneEventIntoTrack(std::shared_ptr<Event>& src, int tick, bool allo
 	{
 		clone = std::make_shared<MixerEvent>(*source);
 	}
+    else if (auto source = std::dynamic_pointer_cast<ChannelPressureEvent>(src))
+    {
+        clone = std::make_shared<ChannelPressureEvent>(*source);
+    }
+    else if (auto source = std::dynamic_pointer_cast<PolyPressureEvent>(src))
+    {
+        clone = std::make_shared<PolyPressureEvent>(*source);
+    }
+    else if (auto source = std::dynamic_pointer_cast<PitchBendEvent>(src))
+    {
+        clone = std::make_shared<PitchBendEvent>(*source);
+    }
+    else if (auto source = std::dynamic_pointer_cast<TempoChangeEvent>(src))
+    {
+        auto t = std::make_shared<TempoChangeEvent>(*source);
+        t->setParent(parent);
+        clone = t;
+    }
+    else if (auto source = std::dynamic_pointer_cast<ControlChangeEvent>(src))
+    {
+        clone = std::make_shared<ControlChangeEvent>(*source);
+    }
+    else if (auto source = std::dynamic_pointer_cast<ProgramChangeEvent>(src))
+    {
+        clone = std::make_shared<ProgramChangeEvent>(*source);
+    }
+    else if (auto source = std::dynamic_pointer_cast<SystemExclusiveEvent>(src))
+    {
+        clone = std::make_shared<SystemExclusiveEvent>(*source);
+    }
     clone->setTick(tick);
     
     if (!used) setUsed(true);

@@ -10,9 +10,14 @@ void ProgramChangeEvent::setProgram(int i)
 	notifyObservers(std::string("step-editor"));
 }
 
-int ProgramChangeEvent::getProgram()
+int ProgramChangeEvent::getProgram() const
 {
     return programChangeValue;
+}
+
+mpc::sequencer::ProgramChangeEvent::ProgramChangeEvent(const ProgramChangeEvent& event) : Event(event)
+{
+	setProgram(event.getProgram());
 }
 
 void ProgramChangeEvent::CopyValuesTo(std::weak_ptr<Event> dest) {

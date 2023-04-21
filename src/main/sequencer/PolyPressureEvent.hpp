@@ -13,10 +13,12 @@ namespace mpc::sequencer
 
 	public:
 		void setNote(int i);
-		int getNote();
+		int getNote() const;
 		void setAmount(int i);
-		int getAmount();
+		int getAmount() const;
 
+		PolyPressureEvent() = default;
+		PolyPressureEvent(const PolyPressureEvent& event);
 		void CopyValuesTo(std::weak_ptr<Event> dest) override;
 
 		std::string getTypeName() override { return "poly-pressure"; }

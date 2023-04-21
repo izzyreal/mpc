@@ -11,9 +11,14 @@ void PitchBendEvent::setAmount(int i)
     notifyObservers(std::string("step-editor"));
 }
 
-int PitchBendEvent::getAmount()
+int PitchBendEvent::getAmount() const
 {
     return pitchBendAmount;
+}
+
+mpc::sequencer::PitchBendEvent::PitchBendEvent(const PitchBendEvent& event) : Event(event)
+{
+    setAmount(event.getAmount());
 }
 
 void PitchBendEvent::CopyValuesTo(std::weak_ptr<Event> dest) {

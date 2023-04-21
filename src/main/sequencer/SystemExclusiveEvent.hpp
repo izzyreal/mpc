@@ -16,8 +16,10 @@ namespace mpc::sequencer
 		void setByteB(unsigned char i);
 		unsigned char getByteB();
 		void setBytes(const std::vector<unsigned char>& ba);
-		std::vector<unsigned char>& getBytes();
+		const std::vector<unsigned char>& getBytes() const;
 
+		SystemExclusiveEvent() = default;
+		SystemExclusiveEvent(const SystemExclusiveEvent& event);
 		void CopyValuesTo(std::weak_ptr<Event> dest) override;
 		std::string getTypeName() override { return "system-exclusive"; }
 

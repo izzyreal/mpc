@@ -10,9 +10,14 @@ void ChannelPressureEvent::setAmount(int i)
 	notifyObservers(std::string("step-editor"));
 }
 
-int ChannelPressureEvent::getAmount()
+int ChannelPressureEvent::getAmount() const
 {
     return channelPressureValue;
+}
+
+mpc::sequencer::ChannelPressureEvent::ChannelPressureEvent(const ChannelPressureEvent& event) : Event(event)
+{
+	setAmount(event.getAmount());
 }
 
 void ChannelPressureEvent::CopyValuesTo(std::weak_ptr<Event> dest) {

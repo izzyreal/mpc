@@ -15,10 +15,13 @@ namespace mpc::sequencer
 
 	public:
 		void setController(int i);
-		int getController();
+		int getController() const;
 		void setAmount(int i);
-		int getAmount();
+		int getAmount() const;
 
+
+		ControlChangeEvent() = default;
+		ControlChangeEvent(const ControlChangeEvent& event);
 		void CopyValuesTo(std::weak_ptr<Event> dest) override;
 
 		std::string getTypeName() override { return "control-change"; }

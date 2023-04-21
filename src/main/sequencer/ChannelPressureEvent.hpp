@@ -14,8 +14,10 @@ namespace mpc::sequencer
 
 	public:
 		void setAmount(int i);
-		int getAmount();
+		int getAmount() const ;
 
+		ChannelPressureEvent() = default;
+		ChannelPressureEvent(const ChannelPressureEvent& event);
 		void CopyValuesTo(std::weak_ptr<Event> dest) override;
 
 		std::string getTypeName() override { return "channel-pressure"; }

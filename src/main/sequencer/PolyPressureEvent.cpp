@@ -10,7 +10,7 @@ void PolyPressureEvent::setNote(int i)
     notifyObservers(std::string("step-editor"));
 }
 
-int PolyPressureEvent::getNote()
+int PolyPressureEvent::getNote() const
 {
     return note;
 }
@@ -25,9 +25,15 @@ void PolyPressureEvent::setAmount(int i)
     notifyObservers(std::string("step-editor"));
 }
 
-int PolyPressureEvent::getAmount()
+int PolyPressureEvent::getAmount() const
 {
     return polyPressureValue;
+}
+
+mpc::sequencer::PolyPressureEvent::PolyPressureEvent(const PolyPressureEvent& event) : Event(event)
+{
+    setAmount(event.getAmount());
+    setNote(event.getNote());
 }
 
 void PolyPressureEvent::CopyValuesTo(std::weak_ptr<Event> dest) {

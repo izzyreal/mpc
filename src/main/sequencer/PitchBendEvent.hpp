@@ -12,8 +12,11 @@ namespace mpc::sequencer
 
 	public:
 		void setAmount(int i);
-		int getAmount();
+		int getAmount() const;
 
+		PitchBendEvent() = default;
+		PitchBendEvent(const PitchBendEvent&);
+		
 		void CopyValuesTo(std::weak_ptr<Event> dest) override;
 
 		std::string getTypeName() override { return "pitch-bend"; }

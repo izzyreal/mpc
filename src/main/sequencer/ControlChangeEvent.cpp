@@ -10,7 +10,7 @@ void ControlChangeEvent::setController(int i)
 	notifyObservers(std::string("step-editor"));
 }
 
-int ControlChangeEvent::getController()
+int ControlChangeEvent::getController() const
 {
     return controllerNumber;
 }
@@ -24,9 +24,15 @@ void ControlChangeEvent::setAmount(int i)
     notifyObservers(std::string("step-editor"));
 }
 
-int ControlChangeEvent::getAmount()
+int ControlChangeEvent::getAmount() const
 {
     return controllerValue;
+}
+
+mpc::sequencer::ControlChangeEvent::ControlChangeEvent(const ControlChangeEvent& event) : Event(event)
+{
+	setAmount(event.getAmount());
+	setController(event.getController());
 }
 
 void ControlChangeEvent::CopyValuesTo(std::weak_ptr<Event> dest) {

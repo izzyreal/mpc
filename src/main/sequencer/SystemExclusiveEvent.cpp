@@ -41,9 +41,14 @@ void SystemExclusiveEvent::setBytes(const std::vector<unsigned char>& ba)
     bytes = ba;
 }
 
-std::vector<unsigned char>& SystemExclusiveEvent::getBytes()
+const std::vector<unsigned char>& SystemExclusiveEvent::getBytes() const
 {
     return bytes;
+}
+
+mpc::sequencer::SystemExclusiveEvent::SystemExclusiveEvent(const SystemExclusiveEvent& event) : Event(event)
+{
+    setBytes(event.getBytes());
 }
 
 void SystemExclusiveEvent::CopyValuesTo(std::weak_ptr<Event> dest)
