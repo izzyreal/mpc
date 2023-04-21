@@ -50,6 +50,16 @@ mpc::sequencer::NoteOnEvent::NoteOnEvent(mpc::engine::midi::ShortMessage* msg) :
     assert(msg->getCommand() == ShortMessage::NOTE_ON);
 }
 
+mpc::sequencer::NoteOnEvent::NoteOnEvent(const NoteOnEvent& event) : Event(event)
+{
+    noteOff = std::shared_ptr<NoteOffEvent>(new NoteOffEvent());
+    setNote(event.number);
+    setVelocity(event.velocity);
+    setDuration(event.duration);
+    setVariationType(event.variationType);
+    setVariationValue(event.variationValue);
+}
+
 std::shared_ptr<mpc::engine::midi::ShortMessage> mpc::sequencer::NoteOnEvent::createShortMessage(int channel, int transpose)
 {
     auto msg = std::make_shared<ShortMessage>();

@@ -207,44 +207,31 @@ void mpc::sequencer::Track::addEvent(int tick, std::shared_ptr<Event> event, boo
 
 void Track::cloneEventIntoTrack(std::shared_ptr<Event>& src, int tick, bool allowMultipleNotesOnSameTick)
 {
-	auto seq = sequencer->getActiveSequence().get();
+    std::shared_ptr<Event> clone;
 
-    std::shared_ptr<Event> res;
-	auto tce = std::dynamic_pointer_cast<TempoChangeEvent>(src);
-	auto mce = std::dynamic_pointer_cast<MidiClockEvent>(src);
-	auto ne = std::dynamic_pointer_cast<NoteOnEvent>(src);
-	auto me = std::dynamic_pointer_cast<MixerEvent>(src);
-
-	if (ne)
+	if (auto source = std::dynamic_pointer_cast<NoteOnEvent>(src))
 	{
-		res = std::make_shared<NoteOnEvent>();
-		ne->CopyValuesTo(res);
+		clone = std::make_shared<NoteOnEvent>(*source);
 	}
-	else if (tce)
+	else if (auto source = std::dynamic_pointer_cast<TempoChangeEvent>(src))
 	{
-		res = std::make_shared<TempoChangeEvent>(seq);
-		tce->CopyValuesTo(res);
-        std::dynamic_pointer_cast<TempoChangeEvent>(res)->setParent(parent);
+		auto t = std::make_shared<TempoChangeEvent>(*source);
+        t->setParent(parent);
+        clone = t;
 	}
-	else if (mce)
+	else if (auto source = std::dynamic_pointer_cast<MidiClockEvent>(src))
 	{
-		res = std::make_shared<MidiClockEvent>(0);
-		mce->CopyValuesTo(res);
+		clone = std::make_shared<MidiClockEvent>(*source);
 	}
-	else if (me)
+	else if (auto source = std::dynamic_pointer_cast<MixerEvent>(src))
 	{
-		res = std::make_shared<MixerEvent>();
-		me->CopyValuesTo(res);
+		clone = std::make_shared<MixerEvent>(*source);
 	}
+    clone->setTick(tick);
+    
+    if (!used) setUsed(true);
 
-    if (!used)
-    {
-        setUsed(true);
-    }
-
-    res->setTick(tick);
-
-    insertEventWhileRetainingSort(res, allowMultipleNotesOnSameTick);
+    insertEventWhileRetainingSort(clone, allowMultipleNotesOnSameTick);
     notifyObservers(std::string("step-editor"));
 }
 
@@ -551,7 +538,6 @@ void Track::playNext()
                 else if (vmpcSettingsScreen->_16LevelsEraseMode == 1)
                 {
                     const auto& varValue = note->getVariationValue();
-                    std::vector<int> pressedNotes;
                     auto _16l_key = assign16LevelsScreen->getOriginalKeyPad();
                     auto _16l_type = assign16LevelsScreen->getType();
 

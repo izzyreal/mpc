@@ -24,14 +24,11 @@ namespace mpc::sequencer
 		void plusOneClock(TempoChangeEvent* next);
 		void minusOneClock(TempoChangeEvent* previous);
 		void setRatio(int i);
-		int getRatio();
+		int getRatio() const;
 		int getBar(int n, int d);
 		int getBeat(int n, int d);
 		int getClock(int denominator);
 		double getTempo();
-
-	public:
-		void CopyValuesTo(std::weak_ptr<Event> dest) override;
 
 	public:
 		// Smelly smelly smelly
@@ -41,6 +38,10 @@ namespace mpc::sequencer
 		TempoChangeEvent(Sequence* parent);
 		TempoChangeEvent(Sequence* parent, int ratio);
 		TempoChangeEvent(Sequence* parent, int ratio, int step);
+		TempoChangeEvent(const TempoChangeEvent&);
+
+		void CopyValuesTo(std::weak_ptr<Event> dest) override;
+
 		std::string getTypeName() override { return "tempo-change"; }
 
 	};

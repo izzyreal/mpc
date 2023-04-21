@@ -529,6 +529,11 @@ void Sequence::insertBars(int barCount, int afterBar)
 	notifyObservers(std::string("timesignature"));
 }
 
+bool trackIndexComparator(const std::shared_ptr<Track>& t0, const std::shared_ptr<Track>& t1)
+{
+	return t0->getIndex() < t1->getIndex();
+}
+
 void Sequence::moveTrack(int source, int destination)
 {
 	if (source == destination)
@@ -618,11 +623,6 @@ void Sequence::setNumeratorsAndDenominators(std::vector<int>& newNumerators, std
 {
 	numerators = newNumerators;
 	denominators = newDenominators;
-}
-
-bool Sequence::trackIndexComparator(std::shared_ptr<Track>& t0, std::shared_ptr<Track>& t1)
-{
-	return t0->getIndex() < t1->getIndex();
 }
 
 int Sequence::getFirstTickOfBeat(int bar, int beat)
