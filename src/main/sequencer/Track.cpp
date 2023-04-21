@@ -538,7 +538,6 @@ void Track::playNext()
                 else if (vmpcSettingsScreen->_16LevelsEraseMode == 1)
                 {
                     const auto& varValue = note->getVariationValue();
-                    std::vector<int> pressedNotes;
                     auto _16l_key = assign16LevelsScreen->getOriginalKeyPad();
                     auto _16l_type = assign16LevelsScreen->getType();
 
