@@ -22,11 +22,13 @@ namespace mpc::lcdgui::screens
 		VmpcSettingsScreen(mpc::Mpc& mpc, const int layerIndex);
 
 		void open() override;
+		void close() override;
         void function(int) override;
 
         int getMidiControlMode();
         
 	private:
+        std::shared_ptr<mpc::lcdgui::Background> easterEgg;
 		const std::vector<std::string> initialPadMappingNames{ "VMPC2000XL", "ORIGINAL" };
         const std::vector<std::string> _16LevelsEraseModeNames{ "All levels", "Only pressed level" };
         const std::vector<std::string> midiControlModeNames{ "VMPC, see MIDI tab", "ORIGINAL" };

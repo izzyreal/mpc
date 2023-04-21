@@ -5,6 +5,10 @@ using namespace mpc::lcdgui::screens;
 VmpcSettingsScreen::VmpcSettingsScreen(mpc::Mpc& mpc, const int layerIndex)
 	: ScreenComponent(mpc, "vmpc-settings", layerIndex)
 {
+    easterEgg = std::make_shared<Background>();
+    easterEgg->Hide(true);
+    easterEgg->setName("jd");
+    addChild(easterEgg);
 }
 
 void VmpcSettingsScreen::open()
@@ -14,6 +18,15 @@ void VmpcSettingsScreen::open()
     displayAutoConvertWavs();
     displayMidiControlMode();
     ls->setFunctionKeysArrangement(midiControlMode == MidiControlMode::ORIGINAL ? 1 : 0);
+}
+
+void VmpcSettingsScreen::close()
+{
+    if (!easterEgg->IsHidden())
+    {
+        easterEgg->setScrolling(false);
+        easterEgg->Hide(true);
+    }
 }
 
 void VmpcSettingsScreen::function(int i)
@@ -36,6 +49,20 @@ void VmpcSettingsScreen::function(int i)
             }
 
             openScreen("vmpc-midi");
+            break;
+        case 5:
+            if (easterEgg->IsHidden())
+            {
+                easterEgg->Hide(false);
+                bringToFront(easterEgg.get());
+                easterEgg->setScrolling(true);
+            }
+            else
+            {
+                easterEgg->setScrolling(false);
+                easterEgg->Hide(true);
+                SetDirty();
+            }
             break;
     }
 }

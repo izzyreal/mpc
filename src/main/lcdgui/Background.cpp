@@ -54,16 +54,30 @@ void Background::Draw(std::vector<std::vector<bool>>* pixels)
 		
 		unsigned int width = 248;
 		unsigned int height = 60;
+
+        if (name == "jd")
+        {
+            height = 360;
+        }
 		
 		auto file = fs.open(fileName);
 		std::vector<unsigned char> file_data(file.begin(), file.end());
 		std::vector<unsigned char> data;
 
-		lodepng::decode(data, width, height, file_data, LCT_RGB,8);
-		
+		lodepng::decode(data, width, height, file_data, LCT_RGB, 8);
+
+        if (name == "jd")
+        {
+            height = 60;
+        }
+
 		const bool unobtrusive = !unobtrusiveRect.Empty();
 
 		int byteCounter(0);
+
+        int byteCounterOffset = (scrollOffset * width) * 3;
+
+        byteCounter += byteCounterOffset;
 
         for (int y = 0; y < height; y++)
 		{
@@ -104,4 +118,50 @@ void Background::Draw(std::vector<std::vector<bool>>* pixels)
 	}
 
 	Component::Draw(pixels);
+}
+
+void Background::setScrolling(bool b)
+{
+    scrolling = b;
+    scrollOffset = 0;
+
+    if (!scrolling)
+    {
+        scrollingDown = false;
+        while (!scrollThread->joinable())
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
+        scrollThread->join();
+    }
+    else
+    {
+        scrollingDown = true;
+        scrollThread = std::make_unique<std::thread>([&] {
+            while (scrolling)
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(30));
+
+                if (scrollingDown)
+                {
+                    scrollOffset += 1;
+                }
+                else if (scrolling)
+                {
+                    scrollOffset -= 1;
+                }
+
+                if (scrollOffset >= 300)
+                {
+                    scrollingDown = false;
+                }
+                else if (scrollOffset <= 0)
+                {
+                    scrollingDown = true;
+                }
+
+                SetDirty();
+            }
+        });
+    }
 }
