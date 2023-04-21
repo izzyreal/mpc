@@ -165,10 +165,3 @@ double TempoChangeEvent::getTempo()
 	
 	return tempo;
 }
-
-void TempoChangeEvent::CopyValuesTo(std::weak_ptr<Event> dest)
-{
-	Event::CopyValuesTo(dest);
-	auto lDest = std::dynamic_pointer_cast<TempoChangeEvent>(dest.lock());
-	lDest->setRatio(getRatio());
-}

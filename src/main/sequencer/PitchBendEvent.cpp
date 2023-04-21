@@ -20,9 +20,3 @@ mpc::sequencer::PitchBendEvent::PitchBendEvent(const PitchBendEvent& event) : Ev
 {
     setAmount(event.getAmount());
 }
-
-void PitchBendEvent::CopyValuesTo(std::weak_ptr<Event> dest) {
-	Event::CopyValuesTo(dest);
-	auto lDest = std::dynamic_pointer_cast<PitchBendEvent>(dest.lock());
-	lDest->setAmount(getAmount());
-}

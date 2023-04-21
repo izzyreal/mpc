@@ -35,10 +35,3 @@ mpc::sequencer::PolyPressureEvent::PolyPressureEvent(const PolyPressureEvent& ev
     setAmount(event.getAmount());
     setNote(event.getNote());
 }
-
-void PolyPressureEvent::CopyValuesTo(std::weak_ptr<Event> dest) {
-	Event::CopyValuesTo(dest);
-	auto lDest = std::dynamic_pointer_cast<PolyPressureEvent>(dest.lock());
-	lDest->setAmount(getAmount());
-	lDest->setNote(getNote());
-}

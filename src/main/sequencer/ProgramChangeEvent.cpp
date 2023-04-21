@@ -19,9 +19,3 @@ mpc::sequencer::ProgramChangeEvent::ProgramChangeEvent(const ProgramChangeEvent&
 {
 	setProgram(event.getProgram());
 }
-
-void ProgramChangeEvent::CopyValuesTo(std::weak_ptr<Event> dest) {
-	Event::CopyValuesTo(dest);
-	auto lDest = std::dynamic_pointer_cast<ProgramChangeEvent>(dest.lock());
-	lDest->setProgram(getProgram());
-}

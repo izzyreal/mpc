@@ -40,8 +40,6 @@ namespace mpc::sequencer
 		TempoChangeEvent(Sequence* parent, int ratio, int step);
 		TempoChangeEvent(const TempoChangeEvent&);
 
-		void CopyValuesTo(std::weak_ptr<Event> dest) override;
-
 		std::string getTypeName() override { return "tempo-change"; }
 
 	};

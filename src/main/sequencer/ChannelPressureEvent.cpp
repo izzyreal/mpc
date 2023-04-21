@@ -19,9 +19,3 @@ mpc::sequencer::ChannelPressureEvent::ChannelPressureEvent(const ChannelPressure
 {
 	setAmount(event.getAmount());
 }
-
-void ChannelPressureEvent::CopyValuesTo(std::weak_ptr<Event> dest) {
-	auto lDest = std::dynamic_pointer_cast<ChannelPressureEvent>(dest.lock());
-	Event::CopyValuesTo(dest);
-	lDest->setAmount(this->getAmount());
-}

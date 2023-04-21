@@ -15,7 +15,6 @@ namespace mpc::sequencer
 		virtual void setTrack(int i);
 		int getTrack() const;
 
-		virtual void CopyValuesTo(std::weak_ptr<Event> dest);
         virtual std::string getTypeName() = 0;
 		Event() = default;
 		Event(const Event&);

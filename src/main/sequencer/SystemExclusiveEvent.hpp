@@ -20,7 +20,6 @@ namespace mpc::sequencer
 
 		SystemExclusiveEvent() = default;
 		SystemExclusiveEvent(const SystemExclusiveEvent& event);
-		void CopyValuesTo(std::weak_ptr<Event> dest) override;
 		std::string getTypeName() override { return "system-exclusive"; }
 
 	};

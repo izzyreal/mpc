@@ -63,7 +63,6 @@ namespace mpc::sequencer
 
         std::string getTypeName() override { return "note-on"; }
         std::shared_ptr<mpc::engine::midi::ShortMessage> createShortMessage(int channel, int transpose = 0);
-        void CopyValuesTo(std::weak_ptr<Event> dest) override;
 
 
     };

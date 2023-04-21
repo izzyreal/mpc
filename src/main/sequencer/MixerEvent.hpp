@@ -22,7 +22,6 @@ namespace mpc::sequencer
 
 		MixerEvent() = default;
 		MixerEvent(const MixerEvent&);
-		void CopyValuesTo(std::weak_ptr<Event> dest) override;
 
 		std::string getTypeName() override { return "mixer"; }
 

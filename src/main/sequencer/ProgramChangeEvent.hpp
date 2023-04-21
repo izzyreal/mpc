@@ -16,7 +16,6 @@ namespace mpc::sequencer
 
 		ProgramChangeEvent() = default;
 		ProgramChangeEvent(const ProgramChangeEvent& event);
-		void CopyValuesTo(std::weak_ptr<Event> dest) override;
 
 		std::string getTypeName() override { return "program-change"; }
 

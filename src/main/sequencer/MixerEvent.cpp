@@ -50,10 +50,3 @@ mpc::sequencer::MixerEvent::MixerEvent(const MixerEvent& event) : Event(event)
     setValue(event.getValue());
 }
 
-void MixerEvent::CopyValuesTo(std::weak_ptr<Event> dest) {
-	Event::CopyValuesTo(dest);
-	auto lDest = std::dynamic_pointer_cast<MixerEvent>(dest.lock());
-	lDest->setPadNumber(getPad());
-	lDest->setParameter(getParameter());
-	lDest->setValue(getValue());
-}

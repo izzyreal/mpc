@@ -50,10 +50,3 @@ mpc::sequencer::SystemExclusiveEvent::SystemExclusiveEvent(const SystemExclusive
 {
     setBytes(event.getBytes());
 }
-
-void SystemExclusiveEvent::CopyValuesTo(std::weak_ptr<Event> dest)
-{
-	Event::CopyValuesTo(dest);
-	auto lDest = std::dynamic_pointer_cast<SystemExclusiveEvent>(dest.lock());
-	lDest->setBytes(getBytes());
-}
