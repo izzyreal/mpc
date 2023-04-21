@@ -51,7 +51,7 @@ void TransposePermanentScreen::function(int i)
 				n->setNote(n->getNote() + transScreen->transposeAmount);
 			}
 		}
-
+		transScreen->setTransposeAmount(0);
 		openScreen("sequencer");
 		break;
 	}
