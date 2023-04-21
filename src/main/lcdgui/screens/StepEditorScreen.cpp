@@ -1340,10 +1340,9 @@ int StepEditorScreen::getYOffset()
 	return yOffset;
 }
 
-void StepEditorScreen::adhocPlayNoteEvent(const std::shared_ptr<mpc::sequencer::NoteOnEvent> &noteEvent)
+void StepEditorScreen::adhocPlayNoteEvent(const std::shared_ptr<mpc::sequencer::NoteOnEvent>&noteEvent)
 {
-	auto adhoc = std::make_shared<NoteOnEventPlayOnly>();
-	noteEvent->CopyValuesTo(adhoc);
+	auto adhoc = std::make_shared<NoteOnEventPlayOnly>(*noteEvent);
 	const auto bus = track->getBus();
 
     if (bus != 0)

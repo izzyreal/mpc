@@ -75,6 +75,7 @@ namespace mpc::sequencer
         NoteOnEventPlayOnly(int i = 60, int vel = 127) : NoteOnEvent(i,vel) { setTick(-1); };
         NoteOnEventPlayOnly(mpc::engine::midi::ShortMessage* msg) : NoteOnEvent(msg) { setTick(-1); }
         NoteOnEventPlayOnly(const NoteOnEventPlayOnly& event) : NoteOnEvent(event) { setTick(-1); };
+        NoteOnEventPlayOnly(const NoteOnEvent& event) : NoteOnEvent(event) { setTick(-1); };
     };
 }
 inline int operator+(const mpc::sequencer::NoteOnEvent::Duration& duration, const int& i)
