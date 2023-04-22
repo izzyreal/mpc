@@ -5,6 +5,8 @@
 #include <lcdgui/Screens.hpp>
 #include <lcdgui/screens/SampleScreen.hpp>
 
+#include <SampleOps.hpp>
+
 #include <cmath>
 
 using namespace mpc::sampler;
@@ -145,7 +147,10 @@ int SoundRecorder::processAudio(mpc::engine::audio::core::AudioBuffer* buf, int 
 	applyGain(inputGain * 0.01, left);
 	applyGain(inputGain * 0.01, right);
 
-	auto sampleScreen = mpc.screens->get<SampleScreen>("sample");
+    mpc::sampleops::clamp_mean_normalized_floats(left);
+    mpc::sampleops::clamp_mean_normalized_floats(right);
+
+    auto sampleScreen = mpc.screens->get<SampleScreen>("sample");
 
 	if (sampleScreenActive.load())
 	{
