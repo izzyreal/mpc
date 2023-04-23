@@ -199,6 +199,7 @@ void BaseControls::pad(int padIndexWithBank, int velo)
     
     auto controls = mpc.getControls();
     auto hardware = mpc.getHardware();
+    controls->pressPad(padIndexWithBank);
 
     if (controls->isTapPressed() && sequencer->isPlaying())
     {
@@ -273,27 +274,23 @@ void BaseControls::generateNoteOn(int note, int padVelo, int padIndexWithBank)
 
     const bool is16LevelsEnabled = mpc.getHardware()->getTopPanel()->isSixteenLevelsEnabled();
 
-    const auto play_event = std::make_shared<NoteOnEventPlayOnly>(note, padVelo);
-
-    if (!mpc.getControls()->storeNoteEvent(padIndexWithBank, play_event))
-    {
-        return;
-    }
+    const auto playOnEvent = std::make_shared<NoteOnEventPlayOnly>(note, padVelo);
 
     const auto padIndex = program ? program->getPadIndexFromNote(note) : -1;
-    Util::set16LevelsValues(mpc, play_event, padIndex);
+    Util::set16LevelsValues(mpc, playOnEvent, padIndex);
 
     const bool isSliderNote = program && program->getSlider()->getNote() == note;
 
     if (program && isSliderNote)
     {
-        Util::setSliderNoteVariationParameters(mpc, play_event, program);
+        Util::setSliderNoteVariationParameters(mpc, playOnEvent, program);
     }
 
     const auto drumScreen = mpc.screens->get<DrumScreen>("drum");
     const char drum = collectionContainsCurrentScreen(samplerScreens) ? drumScreen->getDrum() : -1;
 
-    mpc.getEventHandler()->handle(play_event, track.get(), drum);
+    mpc.getControls()->storePlayNoteEvent(padIndexWithBank, playOnEvent);
+    mpc.getEventHandler()->handle(playOnEvent, track.get(), drum);
 
     //---------------------
     std::shared_ptr<NoteOnEvent> recordNoteOnEvent;
@@ -335,6 +332,7 @@ void BaseControls::generateNoteOn(int note, int padVelo, int padIndexWithBank)
         {
             Util::setSliderNoteVariationParameters(mpc, recordNoteOnEvent, program);
         }
+        mpc.getControls()->storeRecordNoteEvent(padIndexWithBank, recordNoteOnEvent);
     }
 }
 

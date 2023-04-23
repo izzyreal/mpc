@@ -19,7 +19,7 @@ namespace mpc::audiomidi {
 namespace mpc::audiomidi {
     class MpcMidiInput : 
         public moduru::observer::Observable,
-        public mpc::sequencer::NoteEventStore<std::pair<int/*track*/,int/*note*/>, mpc::sequencer::NoteOnEventPlayOnly>
+        public mpc::sequencer::NoteEventStore<std::pair<int/*track*/,int/*note*/>>
     {
     private:
         int index = 0;

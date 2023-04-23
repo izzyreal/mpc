@@ -114,8 +114,6 @@ bool mpc::controls::Controls::isStepRecording()
 
 bool mpc::controls::Controls::isRecMainWithoutPlaying()
 {
-	//auto timingCorrectScreen = mpc.screens->get<mpc::lcdgui::screens::window::TimingCorrectScreen>("timing-correct")->getNoteValue();
-
 	auto tc_note = mpc.screens->get<mpc::lcdgui::screens::window::TimingCorrectScreen>("timing-correct")->getNoteValue();
 	bool posIsLastTick = sequencer->getTickPosition() == sequencer->getActiveSequence()->getLastTick();
 	auto currentScreenName = getBaseControls()->getCurrentScreenName();
@@ -125,6 +123,16 @@ bool mpc::controls::Controls::isRecMainWithoutPlaying()
 		tc_note != 0 &&
 		!posIsLastTick;
 	return recMainWithoutPlaying;
+}
+
+bool mpc::controls::Controls::isPadPressed(int pad)
+{
+	return pressedPads.find(pad) != pressedPads.end();
+}
+
+bool mpc::controls::Controls::arePadsPressed()
+{
+	return !pressedPads.empty();
 }
 
 void Controls::setErasePressed(bool b)
@@ -150,6 +158,24 @@ void Controls::setTapPressed(bool b)
 void Controls::setNoteRepeatLocked(bool b)
 {
     noteRepeatLocked = b;
+}
+
+void mpc::controls::Controls::pressPad(int pad)
+{
+	pressedPads[pad]++;
+}
+
+void mpc::controls::Controls::unpressPad(int pad)
+{
+	//if (pressedPads[pad] != 0)
+	--pressedPads[pad];
+	if (pressedPads[pad] < 1)
+		pressedPads.erase(pad);
+}
+
+void mpc::controls::Controls::clearAllPadStates()
+{
+	pressedPads.clear();
 }
 
 void Controls::setGoToPressed(bool b)

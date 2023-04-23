@@ -18,8 +18,7 @@ namespace mpc::sequencer {
     class FrameSeq;
 
 class Track : 
-    public moduru::observer::Observable,
-    public mpc::sequencer::NoteEventStore<int, mpc::sequencer::NoteOnEvent>
+    public moduru::observer::Observable
 {
     
 private:
@@ -70,9 +69,9 @@ private:
 public:
     bool insertEventWhileRetainingSort(const std::shared_ptr<Event>& event, bool allowMultipleNotesOnSameTick = false);
     std::shared_ptr<NoteOnEvent> recordNoteEventSynced(int tick, int note, int velocity);
-    bool finalizeNoteEventSynced(int note, int duration);
+    bool finalizeNoteEventSynced(std::shared_ptr<mpc::sequencer::NoteOnEvent> event, int duration);
     std::shared_ptr<mpc::sequencer::NoteOnEvent> recordNoteEventASync(unsigned char note, unsigned char velocity);
-    void finalizeNoteEventASync(unsigned char note);
+    void finalizeNoteEventASync(std::shared_ptr<mpc::sequencer::NoteOnEvent> event);
     void addEvent(int tick, std::shared_ptr<Event> event, bool allowMultipleNotesOnSameTick = false);
     void cloneEventIntoTrack(std::shared_ptr<Event>& src, int tick, bool allowMultipleNotesOnSameTick = false);
     void removeEvent(int i);
