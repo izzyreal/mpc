@@ -94,12 +94,15 @@ void GlobalReleaseControls::simplePad(int padIndexWithBank)
 	init();
 
 	auto controls = mpc.getControls();
+	controls->unpressPad(padIndexWithBank);
 
-	auto on_event = controls->retrieveNoteEvent(padIndexWithBank);
-	if (!on_event) return;
-	handlePlayNoteOff(on_event);
+	auto playOnEvent = controls->retrievePlayNoteEvent(padIndexWithBank);
+	if (!playOnEvent) return;
+	handlePlayNoteOff(playOnEvent);
+	auto recordOnEvent = controls->retrieveRecordNoteEvent(padIndexWithBank);
+	if (!recordOnEvent) return;
 
-	if (sequencer->isRecordingOrOverdubbing() && mpc.getControls()->isErasePressed())
+	if (sequencer->isRecordingOrOverdubbing() && controls->isErasePressed())
 	{
 		return;
 	}
@@ -108,22 +111,20 @@ void GlobalReleaseControls::simplePad(int padIndexWithBank)
 
 	if (sequencer->isRecordingOrOverdubbing())
 	{
-		track->finalizeNoteEventASync(note);
+		track->finalizeNoteEventASync(recordOnEvent);
 	}
 
-	//bool posIsLastTick = sequencer->getTickPosition() == sequencer->getActiveSequence()->getLastTick();
+	bool recWithoutPlaying = controls->isRecMainWithoutPlaying();
+	bool stepRec = controls->isStepRecording();
 
-	bool recWithoutPlaying = mpc.getControls()->isRecMainWithoutPlaying();
-	bool stepRec = mpc.getControls()->isStepRecording();
-
-	if (mpc.getControls()->isStepRecording()|| mpc.getControls()->isRecMainWithoutPlaying())
+	if (controls->isStepRecording()|| controls->isRecMainWithoutPlaying())
 	{
 		auto newDuration = static_cast<int>(mpc.getAudioMidiServices()->getFrameSequencer()->getTickPosition());
 
         const auto stepEditOptionsScreen = mpc.screens->get<StepEditOptionsScreen>("step-edit-options");
-        const auto increment = stepEditOptionsScreen->isAutoStepIncrementEnabled();
-        const auto durationIsTcValue = stepEditOptionsScreen->isDurationOfRecordedNotesTcValue();
-        const auto tcValuePercentage = stepEditOptionsScreen->getTcValuePercentage();
+        const bool increment = stepEditOptionsScreen->isAutoStepIncrementEnabled();
+        const bool durationIsTcValue = stepEditOptionsScreen->isDurationOfRecordedNotesTcValue();
+        const int tcValuePercentage = stepEditOptionsScreen->getTcValuePercentage();
 
         const auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
 
@@ -138,10 +139,10 @@ void GlobalReleaseControls::simplePad(int padIndexWithBank)
                 newDuration = 1;
             }
         }
+		
+		if (!controls->arePadsPressed()) sequencer->stopMetronomeTrack();
 
-		sequencer->stopMetronomeTrack();
-		//!!!!!!!!
-		bool durationHasBeenAdjusted = track->finalizeNoteEventSynced(on_event->getNote(), newDuration);
+		bool durationHasBeenAdjusted = track->finalizeNoteEventSynced(recordOnEvent, newDuration);
 
 		if ((durationHasBeenAdjusted && recWithoutPlaying) || (stepRec && increment))
 		{

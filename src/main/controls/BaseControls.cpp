@@ -193,12 +193,62 @@ void BaseControls::function(int i)
     }
 }
 
+void mpc::controls::BaseControls::various(int note, std::optional<int> padIndexWithBank)
+{
+    if (!mpc.getHardware()->getTopPanel()->isSixteenLevelsEnabled())
+    {
+        auto screenComponent = mpc.screens->getScreenComponent(currentScreenName);
+        auto withNotes = std::dynamic_pointer_cast<WithTimesAndNotes>(screenComponent);
+        auto assign16LevelsScreen = std::dynamic_pointer_cast<Assign16LevelsScreen>(screenComponent);
+        auto stepEditorScreen = std::dynamic_pointer_cast<StepEditorScreen>(screenComponent);
+        auto editMultipleScreen = std::dynamic_pointer_cast<EditMultipleScreen>(screenComponent);
+        auto mixerScreen = std::dynamic_pointer_cast<MixerScreen>(screenComponent);
+        auto channelSettingsScreen = std::dynamic_pointer_cast<ChannelSettingsScreen>(screenComponent);
+
+        if (isDrumNote(note) && collectionContainsCurrentScreen(allowCentralNoteAndPadUpdateScreens))
+        {
+            mpc.setNote(note);
+            if (padIndexWithBank) mpc.setPad(*padIndexWithBank);
+        }
+        else if (withNotes && note >= 35)
+        {
+            withNotes->setNote0(note);
+        }
+        else if (assign16LevelsScreen)
+        {
+            assign16LevelsScreen->setNote(note);
+        }
+        else if (editMultipleScreen)
+        {
+            editMultipleScreen->setChangeNoteTo(note);
+        }
+        else if (stepEditorScreen && param == "fromnote" && note > 34)
+        {
+            stepEditorScreen->setFromNote(note);
+        }
+        else if (mixerScreen && padIndexWithBank)
+        {
+            unsigned char bankStartPadIndex = mpc.getBank() * 16;
+            unsigned char bankEndPadIndex = bankStartPadIndex + 16;
+            if (*padIndexWithBank >= bankStartPadIndex && *padIndexWithBank < bankEndPadIndex)
+            {
+                mixerScreen->setXPos(*padIndexWithBank % 16);
+            }
+        }
+        else if (channelSettingsScreen)
+        {
+            channelSettingsScreen->setNote(note);
+        }
+    }
+}
+
 void BaseControls::pad(int padIndexWithBank, int velo)
 {
     init();
     
     auto controls = mpc.getControls();
     auto hardware = mpc.getHardware();
+    controls->pressPad(padIndexWithBank);
 
     if (controls->isTapPressed() && sequencer->isPlaying())
     {
@@ -219,51 +269,8 @@ void BaseControls::pad(int padIndexWithBank, int velo)
     auto note = track->getBus() > 0 ? program->getPad(padIndexWithBank)->getNote() : padIndexWithBank + 35;
     auto velocity = velo;
 
-    if (!mpc.getHardware()->getTopPanel()->isSixteenLevelsEnabled())
-    {
-        auto screenComponent = mpc.screens->getScreenComponent(currentScreenName);
-        auto withNotes = std::dynamic_pointer_cast<WithTimesAndNotes>(screenComponent);
-        auto assign16LevelsScreen = std::dynamic_pointer_cast<Assign16LevelsScreen>(screenComponent);
-        auto stepEditorScreen = std::dynamic_pointer_cast<StepEditorScreen>(screenComponent);
-        auto editMultipleScreen = std::dynamic_pointer_cast<EditMultipleScreen>(screenComponent);
-        auto mixerScreen = std::dynamic_pointer_cast<MixerScreen>(screenComponent);
-        auto channelSettingsScreen = std::dynamic_pointer_cast<ChannelSettingsScreen>(screenComponent);
-
-        if (note >= 35 && note <= 98 && collectionContainsCurrentScreen(allowCentralNoteAndPadUpdateScreens))
-        {
-            mpc.setNote(note);
-            mpc.setPad(padIndexWithBank);
-        }
-        else if (withNotes && note >= 35)
-        {
-            withNotes->setNote0(note);
-        }
-        else if (assign16LevelsScreen)
-        {
-            assign16LevelsScreen->setNote(note);
-        }
-        else if (editMultipleScreen)
-        {
-            editMultipleScreen->setChangeNoteTo(note);
-        }
-        else if (stepEditorScreen && param == "fromnote" && note > 34)
-        {
-            stepEditorScreen->setFromNote(note);
-        }
-        else if (mixerScreen)
-        {
-            unsigned char bankStartPadIndex = mpc.getBank() * 16;
-            unsigned char bankEndPadIndex = bankStartPadIndex + 16;
-            if (padIndexWithBank >= bankStartPadIndex && padIndexWithBank < bankEndPadIndex)
-            {
-                mixerScreen->setXPos(padIndexWithBank % 16);
-            }
-        }
-        else if (channelSettingsScreen)
-        {
-            channelSettingsScreen->setNote(note);
-        }
-    }
+    various(note, padIndexWithBank);
+   
     generateNoteOn(note, velocity, padIndexWithBank);
 }
 
@@ -273,27 +280,23 @@ void BaseControls::generateNoteOn(int note, int padVelo, int padIndexWithBank)
 
     const bool is16LevelsEnabled = mpc.getHardware()->getTopPanel()->isSixteenLevelsEnabled();
 
-    const auto play_event = std::make_shared<NoteOnEventPlayOnly>(note, padVelo);
-
-    if (!mpc.getControls()->storeNoteEvent(padIndexWithBank, play_event))
-    {
-        return;
-    }
+    const auto playOnEvent = std::make_shared<NoteOnEventPlayOnly>(note, padVelo);
 
     const auto padIndex = program ? program->getPadIndexFromNote(note) : -1;
-    Util::set16LevelsValues(mpc, play_event, padIndex);
+    Util::set16LevelsValues(mpc, playOnEvent, padIndex);
 
     const bool isSliderNote = program && program->getSlider()->getNote() == note;
 
     if (program && isSliderNote)
     {
-        Util::setSliderNoteVariationParameters(mpc, play_event, program);
+        Util::setSliderNoteVariationParameters(mpc, playOnEvent, program);
     }
 
     const auto drumScreen = mpc.screens->get<DrumScreen>("drum");
     const char drum = collectionContainsCurrentScreen(samplerScreens) ? drumScreen->getDrum() : -1;
 
-    mpc.getEventHandler()->handle(play_event, track.get(), drum);
+    mpc.getControls()->storePlayNoteEvent(padIndexWithBank, playOnEvent);
+    mpc.getEventHandler()->handle(playOnEvent, track.get(), drum);
 
     //---------------------
     std::shared_ptr<NoteOnEvent> recordNoteOnEvent;
@@ -335,6 +338,7 @@ void BaseControls::generateNoteOn(int note, int padVelo, int padIndexWithBank)
         {
             Util::setSliderNoteVariationParameters(mpc, recordNoteOnEvent, program);
         }
+        mpc.getControls()->storeRecordNoteEvent(padIndexWithBank, recordNoteOnEvent);
     }
 }
 

@@ -88,6 +88,7 @@ namespace mpc::controls {
 
 		virtual bool isTypable();
 
+		void various(int note, std::optional<int> padIndexWithBank = std::nullopt);
 		void pad(int padIndexWithBank, int velo);
 
 		std::string getCurrentScreenName() { return currentScreenName; }

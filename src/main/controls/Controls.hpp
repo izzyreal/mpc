@@ -3,6 +3,7 @@
 #include <memory>
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 #include <string>
 #include <set>
 #include "sequencer/NoteEvent.hpp"
@@ -27,7 +28,7 @@ namespace mpc::sequencer
 
 namespace mpc::controls
 {
-    class Controls : public mpc::sequencer::NoteEventStore<int, mpc::sequencer::NoteOnEventPlayOnly> 
+    class Controls : public mpc::sequencer::NoteEventStore<int> 
     {
     public:
         Controls(mpc::Mpc &mpc);
@@ -44,6 +45,10 @@ namespace mpc::controls
         void setF5Pressed(bool);
         void setF6Pressed(bool);
         void setNoteRepeatLocked(bool);
+        
+        void pressPad(int);
+        void unpressPad(int);
+        void clearAllPadStates();
 
         bool isErasePressed();
         bool isRecPressed();
@@ -59,6 +64,9 @@ namespace mpc::controls
         bool isF6Pressed();
         bool isStepRecording();
         bool isRecMainWithoutPlaying();
+        
+        bool isPadPressed(int);
+        bool arePadsPressed();
 
         std::weak_ptr<KeyEventHandler> getKeyEventHandler();
         std::shared_ptr<BaseControls> getBaseControls();
@@ -91,5 +99,6 @@ namespace mpc::controls
         std::shared_ptr<KeyEventHandler> keyEventHandler;
         std::shared_ptr<BaseControls> baseControls;
         std::shared_ptr<GlobalReleaseControls> releaseControls;
+        std::unordered_map<int/*index*/, int/*count*/> pressedPads;
     };
 }
