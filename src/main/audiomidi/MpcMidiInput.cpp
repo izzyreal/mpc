@@ -303,7 +303,7 @@ void MpcMidiInput::transportOmni(MidiMessage *msg, std::string outputLetter)
 
 std::shared_ptr<mpc::sequencer::NoteOnEvent> mpc::audiomidi::MpcMidiInput::handleNoteOn(mpc::engine::midi::ShortMessage* msg, const int& timeStamp)
 {
-    auto midiNoteOn = std::make_shared<NoteOnEventPlayOnly>(msg);
+    auto playMidiNoteOn = std::make_shared<NoteOnEventPlayOnly>(msg);
     int trackNumber;
     if (sequencer->isRecordingModeMulti())
     {
@@ -322,8 +322,8 @@ std::shared_ptr<mpc::sequencer::NoteOnEvent> mpc::audiomidi::MpcMidiInput::handl
     auto bus = track->getBus();
     if (bus > 0)
     {
-        pad = sampler->getProgram(sampler->getDrumBusProgramIndex(bus))->getPadIndexFromNote(midiNoteOn->getNote());
-        //Util::setSliderNoteVariationParameters(mpc, midiNoteOn, p);
+        pad = sampler->getProgram(sampler->getDrumBusProgramIndex(bus))->getPadIndexFromNote(playMidiNoteOn->getNote());
+        //Util::setSliderNoteVariationParameters(mpc, midiNoteOn, p);??????????
     }
 
     if (bus > 0 && track->getIndex() < 64 &&
@@ -334,38 +334,44 @@ std::shared_ptr<mpc::sequencer::NoteOnEvent> mpc::audiomidi::MpcMidiInput::handl
 
     if (pad != -1)
     {
-        mpc.getActiveControls()->pad(pad, midiNoteOn->getVelocity());
+        mpc.getActiveControls()->pad(pad, playMidiNoteOn->getVelocity());
         return nullptr;
     }
     else
     {
-        if (!storeNoteEvent(std::pair<int, int>(trackNumber, midiNoteOn->getNote()),midiNoteOn)) return nullptr;
+        storePlayNoteEvent(std::pair<int, int>(trackNumber, playMidiNoteOn->getNote()), playMidiNoteOn);
+        auto recordMidiNoteOn = std::make_shared<NoteOnEvent>(msg);
+        
         if (sequencer->isRecordingOrOverdubbing())
         {
-            track->recordNoteEventASync(midiNoteOn->getNote(), midiNoteOn->getVelocity());
+            recordMidiNoteOn = track->recordNoteEventASync(playMidiNoteOn->getNote(), playMidiNoteOn->getVelocity());
         }
         else if (mpc.getControls()->isStepRecording())
         {
-            track->recordNoteEventSynced(sequencer->getTickPosition(), midiNoteOn->getNote(), midiNoteOn->getVelocity());
+            recordMidiNoteOn = track->recordNoteEventSynced(sequencer->getTickPosition(), playMidiNoteOn->getNote(), playMidiNoteOn->getVelocity());
         }
         else if (mpc.getControls()->isRecMainWithoutPlaying())
         {
-            auto recordNoteOnEvent = track->recordNoteEventSynced(sequencer->getTickPosition(), midiNoteOn->getNote(), midiNoteOn->getVelocity());
+            recordMidiNoteOn = track->recordNoteEventSynced(sequencer->getTickPosition(), playMidiNoteOn->getNote(), playMidiNoteOn->getVelocity());
             auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
             int stepLength = timingCorrectScreen->getNoteValueLengthInTicks();
 
             if (stepLength != 1)
             {
                 int bar = sequencer->getCurrentBarIndex() + 1;
-                track->timingCorrect(0, bar, recordNoteOnEvent, stepLength, timingCorrectScreen->getSwing());
+                track->timingCorrect(0, bar, recordMidiNoteOn, stepLength, timingCorrectScreen->getSwing());
 
-                if (recordNoteOnEvent->getTick() != sequencer->getTickPosition())
-                    sequencer->move(recordNoteOnEvent->getTick());
+                if (recordMidiNoteOn->getTick() != sequencer->getTickPosition())
+                    sequencer->move(recordMidiNoteOn->getTick());
             }
         }
-        mpc.getEventHandler()->handleNoThru(midiNoteOn, track.get(), timeStamp);
+        if (recordMidiNoteOn)
+        {
+            storeRecordNoteEvent(std::pair<int, int>(trackNumber, recordMidiNoteOn->getNote()), recordMidiNoteOn);
+        }
+        
     }
-    return midiNoteOn;
+    return playMidiNoteOn;
 }
 
 std::shared_ptr<mpc::sequencer::NoteOffEvent> mpc::audiomidi::MpcMidiInput::handleNoteOff(mpc::engine::midi::ShortMessage* msg, const int& timeStamp)
@@ -399,13 +405,13 @@ std::shared_ptr<mpc::sequencer::NoteOffEvent> mpc::audiomidi::MpcMidiInput::hand
         mpc.getReleaseControls()->simplePad(pad);
         return nullptr;
     }
-    else if (auto storedmidiNoteOn = retrieveNoteEvent(std::pair<int, int>(trackNumber, note)); storedmidiNoteOn)
+    else if (auto storedRecordMidiNoteOn = retrieveRecordNoteEvent(std::pair<int, int>(trackNumber, note)))
     {
         auto step = mpc.getControls()->isStepRecording();
         auto recWithoutPlaying = mpc.getControls()->isRecMainWithoutPlaying();
         if (sequencer->isRecordingOrOverdubbing())
         {
-            track->finalizeNoteEventASync(note);
+            track->finalizeNoteEventASync(storedRecordMidiNoteOn);
         }
         else if (step || recWithoutPlaying)
         {
@@ -431,7 +437,7 @@ std::shared_ptr<mpc::sequencer::NoteOffEvent> mpc::audiomidi::MpcMidiInput::hand
             }
 
             sequencer->stopMetronomeTrack();
-            bool durationHasBeenAdjusted = track->finalizeNoteEventSynced(note, newDuration);
+            bool durationHasBeenAdjusted = track->finalizeNoteEventSynced(storedRecordMidiNoteOn, newDuration);
 
             if ((durationHasBeenAdjusted && recWithoutPlaying) || (step && increment))
             {
@@ -449,7 +455,10 @@ std::shared_ptr<mpc::sequencer::NoteOffEvent> mpc::audiomidi::MpcMidiInput::hand
                     sequencer->move(lastTick);
                 }
             }
-        }
+        }  
+    }
+    if (auto storedmidiNoteOn = retrievePlayNoteEvent(std::pair<int, int>(trackNumber, note)))
+    {
         mpc.getEventHandler()->handleNoThru(storedmidiNoteOn->getNoteOff(), track.get(), timeStamp);
         return storedmidiNoteOn->getNoteOff();
     }

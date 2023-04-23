@@ -146,22 +146,17 @@ void Track::removeEvent(const std::shared_ptr<Event>& event)
 std::shared_ptr<NoteOnEvent> Track::recordNoteEventASync(unsigned char note, unsigned char velocity)
 {
     auto onEvent = std::make_shared<NoteOnEvent>(note, velocity);
-    if (!storeNoteEvent(note, onEvent)) return nullptr;
     onEvent->setTrack(getIndex());
     onEvent->setTick(-2);
     queuedNoteOnEvents.enqueue(onEvent);
     return onEvent;
 }
-
-void Track::finalizeNoteEventASync(unsigned char note)
+void mpc::sequencer::Track::finalizeNoteEventASync(std::shared_ptr<mpc::sequencer::NoteOnEvent> event)
 {
-    auto onEvent = retrieveNoteEvent(note);
-    if (!onEvent) return;
-    auto offEvent = onEvent->getNoteOff();
+    auto offEvent = event->getNoteOff();
     offEvent->setTick(-2);
     queuedNoteOffEvents.enqueue(offEvent);
 }
-
 
 std::shared_ptr<NoteOnEvent> Track::recordNoteEventSynced(int tick, int note, int velocity)
 {
@@ -169,7 +164,6 @@ std::shared_ptr<NoteOnEvent> Track::recordNoteEventSynced(int tick, int note, in
     if (!onEvent)
     {
         onEvent = std::make_shared<NoteOnEvent>(note, velocity);
-        if (!storeNoteEvent(note, onEvent)) return nullptr;
         onEvent->setTrack(this->getIndex());
         onEvent->setTick(tick);
         insertEventWhileRetainingSort(onEvent);
@@ -178,23 +172,17 @@ std::shared_ptr<NoteOnEvent> Track::recordNoteEventSynced(int tick, int note, in
     }
     else
     {
-        if (!storeNoteEvent(note, onEvent)) return nullptr;
         onEvent->setVelocity(velocity);
         onEvent->resetDuration();
         return onEvent;
     }
 }
-
-bool Track::finalizeNoteEventSynced(int note, int duration)
+bool mpc::sequencer::Track::finalizeNoteEventSynced(std::shared_ptr<mpc::sequencer::NoteOnEvent> event, int duration)
 {
-    if (auto onEvent = retrieveNoteEvent(note))
-    {
-        auto size = events.size();
-        onEvent->setDuration(duration);
-        notifyObservers(std::string("adjust-duration"));
-        return true;
-    }
-    return false;
+    auto old_duration = event->getDuration();
+    event->setDuration(duration);
+    notifyObservers(std::string("adjust-duration"));
+    return old_duration != duration;
 }
 
 void mpc::sequencer::Track::addEvent(int tick, std::shared_ptr<Event> event, bool allowMultipleNotesOnSameTick)

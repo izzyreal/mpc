@@ -30,10 +30,8 @@ void HwPad::push(int velo)
     padIndexWithBankWhenLastPressed = index + (mpc.getBank() * 16);
 
     auto c = mpc.getActiveControls();
-
     if (!c)
         return;
-
     c->pad(padIndexWithBankWhenLastPressed, velo);
 }
 
@@ -53,7 +51,6 @@ void HwPad::release()
         padIndexWithBankWhenLastPressed = -1;
         return;
     }
-
     c->simplePad(padIndexWithBankWhenLastPressed);
 
     padIndexWithBankWhenLastPressed = -1;
