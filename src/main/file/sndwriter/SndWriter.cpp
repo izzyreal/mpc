@@ -5,6 +5,8 @@
 
 #include <file/ByteUtil.hpp>
 
+#include <SampleOps.hpp>
+
 using namespace mpc::file::sndwriter;
 
 SndWriter::SndWriter(mpc::sampler::Sound* sound) 
@@ -97,7 +99,8 @@ void SndWriter::setSampleData(const std::vector<float>& fa, bool mono)
 	
 	auto bytePos = SndWriter::HEADER_SIZE;
 	for (int i = 0; i < fa.size(); i++) {
-		buffer = moduru::file::ByteUtil::short2bytes(fa[sPos++] * 32768);
+        auto shortres = mpc::sampleops::mean_normalized_float_to_short(fa[sPos++]);
+		buffer = moduru::file::ByteUtil::short2bytes(shortres);
 		sndFileArray[bytePos++] = buffer[0];
 		sndFileArray[bytePos++] = buffer[1];
 	}
