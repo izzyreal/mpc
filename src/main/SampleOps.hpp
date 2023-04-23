@@ -24,4 +24,9 @@ namespace mpc::sampleops {
         auto rounded = static_cast<int16_t>(std::round(scaled));
         return std::max(static_cast<int16_t>(-32768), std::min(rounded, static_cast<int16_t>(32767)));
     }
+
+    inline float short_to_float(const int16_t s)
+    {
+        return static_cast<float>(s) / 32768;
+    }
 }

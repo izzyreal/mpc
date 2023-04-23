@@ -3,9 +3,10 @@
 #include <disk/MpcFile.hpp>
 #include <file/sndreader/SndHeaderReader.hpp>
 
-#include <Logger.hpp>
+#include <SampleOps.hpp>
 
 using namespace mpc::file::sndreader;
+using namespace mpc::sampleops;
 
 SndReader::SndReader(mpc::disk::MpcFile* soundFile)
 : SndReader(soundFile->getBytes())
@@ -90,7 +91,7 @@ void SndReader::readData(std::vector<float>& dest)
     for (int i = 0; i < length; ++i)
     {
 		short value = shorts[i];
-		auto f = static_cast<float>(value / 32768.0);
+		auto f = short_to_float(value);
 	
         if (f < -1)
 			f = -1.0f;
