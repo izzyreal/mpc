@@ -2,6 +2,8 @@
 
 #include <cstdint>
 #include <vector>
+#include <algorithm>
+#include <cmath>
 
 namespace mpc::sampleops {
 
@@ -21,8 +23,8 @@ namespace mpc::sampleops {
     inline int16_t mean_normalized_float_to_short(const float &f)
     {
         float scaled = f * 32768.0f;
-        auto rounded = static_cast<int16_t>(std::round(scaled));
-        return std::max(static_cast<int16_t>(-32768), std::min(rounded, static_cast<int16_t>(32767)));
+        auto rounded = static_cast<int16_t>(std::roundf(scaled));
+        return std::max<int16_t>(static_cast<int16_t>(-32768), std::min<int16_t>(rounded, static_cast<int16_t>(32767)));
     }
 
     inline float short_to_float(const int16_t s)
