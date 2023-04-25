@@ -191,7 +191,7 @@ void MidiControlPersistence::loadAllPresetsFromDiskIntoMemory(mpc::Mpc& mpc)
 
     for (auto& e : fs::directory_iterator(presetsPath))
     {
-        if (fs::is_directory(e))
+        if (fs::is_directory(e) || !StrUtil::eqIgnoreCase(e.path().extension(), ".vmp"))
         {
             continue;
         }

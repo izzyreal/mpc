@@ -82,7 +82,7 @@ void MidiDeviceDetector::start(mpc::Mpc &mpc)
                         knownControllerDetectedScreen->controllerName = "iRig PADS";
                     }
 
-                    if (!path.empty())
+                    if (!path.empty() && fs::exists(path))
                     {
                         auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
                         mpc.getDisk()->readMidiControlPreset(path, vmpcMidiScreen->switchToPreset);

@@ -80,7 +80,7 @@ Mpc::Mpc()
                 if (!fs::exists(path))
                 {
                     auto file = fs.open("midicontrolpresets/" + entry.filename());
-                    char *data = (char *) std::string_view(file.begin(), file.end() - file.begin()).data();
+                    std::vector<char> data(file.begin(), file.end());
                     set_file_data(path, data);
                 }
             }
