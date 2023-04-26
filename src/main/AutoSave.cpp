@@ -190,6 +190,19 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc, const std::string& overrideP
         }
 
         layeredScreen->setDirty();
+
+        // Sometimes after a crash sounds are not loaded.
+        // The below is to prevent further crashing.
+        for (auto& p : mpc.getSampler()->getPrograms())
+        {
+            for (auto& n : p.lock()->getNotesParameters())
+            {
+                if (n->getSoundIndex() >= mpc.getSampler()->getSoundCount())
+                {
+                    n->setSoundIndex(-1);
+                }
+            }
+        }
     };
 
     if (vmpcAutoSaveScreen->getAutoLoadOnStart() == 1)
