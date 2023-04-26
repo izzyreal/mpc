@@ -98,7 +98,9 @@ void MixerScreen::displayMixerStrip(int stripIndex)
     auto strip = mixerStrips[stripIndex];
     auto stereoMixer = getStereoMixerChannel(stripIndex);
     auto indivFxMixer = getIndivFxMixerChannel(stripIndex);
-    
+
+    strip->setBank(mpc.getBank());
+
     if (!stereoMixer || !indivFxMixer)
     {
         if (tab == 0)
