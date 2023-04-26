@@ -22,25 +22,29 @@ class HwPad;
 
 namespace mpc::hardware
 {
-class Hardware final
-: public moduru::observer::Observable
+
+class PadAndButtonKeyboard;
+
+class Hardware final : public moduru::observer::Observable
 {
-    
+
 private:
+    PadAndButtonKeyboard* padAndButtonKeyboard;
     std::vector<std::string> buttonLabels;
     std::vector<std::shared_ptr<HwComponent>> components;
-    
+
     std::shared_ptr<TopPanel> topPanel;
     std::vector<std::shared_ptr<HwPad>> pads;
     std::vector<std::shared_ptr<Button>> buttons;
     std::vector<std::shared_ptr<Led>> leds;
-    
+
     std::shared_ptr<DataWheel> dataWheel;
     std::shared_ptr<Slider> slider;
     std::shared_ptr<Pot> recPot;
     std::shared_ptr<Pot> volPot;
-    
+
 public:
+    PadAndButtonKeyboard* getPadAndButtonKeyboard();
     std::shared_ptr<TopPanel> getTopPanel();
     std::vector<std::string>& getButtonLabels();
     std::shared_ptr<HwPad> getPad(int index);
@@ -54,8 +58,8 @@ public:
     std::shared_ptr<Slider> getSlider();
 
     std::shared_ptr<HwComponent> getComponentByLabel(const std::string& label);
-    
+
     Hardware(mpc::Mpc& mpc);
-    
+
 };
 }

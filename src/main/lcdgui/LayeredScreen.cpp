@@ -16,6 +16,7 @@
 #include <lcdgui/ScreenComponent.hpp>
 #include <lcdgui/screens/SampleScreen.hpp>
 
+#include <hardware/PadAndButtonKeyboard.hpp>
 #include <hardware/Hardware.hpp>
 #include <hardware/Led.hpp>
 
@@ -76,42 +77,52 @@ std::shared_ptr<ScreenComponent> LayeredScreen::findScreenComponent()
 	return getFocusedLayer()->findScreenComponent();
 }
 
-int LayeredScreen::openScreen(std::string screenName)
+int LayeredScreen::openScreen(std::string newScreenName)
 {
-	if (currentScreenName == screenName)
-		return -1;
+	if (currentScreenName == newScreenName)
+    {
+        return -1;
+    }
 
-    auto screenComponent = mpc.screens->getScreenComponent(screenName);
+    auto screenComponent = mpc.screens->getScreenComponent(newScreenName);
 
     if (!screenComponent)
+    {
         return -1;
+    }
     
 	auto ams = mpc.getAudioMidiServices();
 
-	if (currentScreenName == "song" && mpc.getSequencer()->isPlaying())
-		return -1;
-
-	if (currentScreenName == "sample")
+    if (currentScreenName == "song" && mpc.getSequencer()->isPlaying())
+    {
+        return -1;
+    }
+    else if (currentScreenName == "sample")
 	{
 		ams->muteMonitor(true);
 		ams->getSoundRecorder()->setSampleScreenActive(false);
 	}
-	else if (screenName == "sample")
+    else if (currentScreenName == "erase" || currentScreenName == "timing-correct")
+    {
+        // This field may not be visible the next time we visit this screen.
+        // Like the real 2KXL we always set focus to the first Notes: field
+        // if the current focus is hte second Notes: field.
+        if (getFocus() == "note1")
+            setFocus("note0");
+    }
+
+    if (newScreenName == "sample")
 	{
 		auto sampleScreen = mpc.screens->get<SampleScreen>("sample");
 		bool muteMonitor = sampleScreen->getMonitor() == 0;
 		ams->muteMonitor(muteMonitor);
 		ams->getSoundRecorder()->setSampleScreenActive(true);
 	}
-
-	if (currentScreenName == "erase" || currentScreenName == "timing-correct")
-	{
-		// This field may not be visible the next time we visit this screen.
-		// Like the real 2KXL we always set focus to the first Notes: field
-		// if the current focus is hte second Notes: field.
-		if (getFocus() == "note1")
-			setFocus("note0");
-	}
+    else if (newScreenName == "name")
+    {
+        mpc.getHardware()->getPadAndButtonKeyboard()->resetPreviousPad();
+        mpc.getHardware()->getPadAndButtonKeyboard()->resetPressedZeroTimes();
+    }
 
     auto focus = getFocusedLayer()->findField(getFocus());
 
@@ -121,7 +132,7 @@ int LayeredScreen::openScreen(std::string screenName)
         focus->loseFocus("");
 
     if (currentScreenName != "popup") previousScreenName = currentScreenName;
-	currentScreenName = screenName;
+	currentScreenName = newScreenName;
 
 	auto oldScreenComponent = getFocusedLayer()->findScreenComponent();
 

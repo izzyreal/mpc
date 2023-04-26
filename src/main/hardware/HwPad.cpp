@@ -2,10 +2,12 @@
 
 #include <Mpc.hpp>
 
+#include <lcdgui/screens/OpensNameScreen.hpp>
 #include <lcdgui/ScreenComponent.hpp>
 #include <controls/GlobalReleaseControls.hpp>
 
 using namespace mpc::hardware;
+using namespace mpc::lcdgui::screens;
 
 HwPad::HwPad(mpc::Mpc& mpc, int index)
         : HwComponent(mpc, "pad-" + std::to_string(index + 1))
@@ -20,6 +22,13 @@ int HwPad::getIndex()
 
 void HwPad::push(int velo)
 {
+    if (auto opensNameScreen = std::dynamic_pointer_cast<OpensNameScreen>(mpc.getActiveControls()))
+    {
+        opensNameScreen->openNameScreen();
+    }
+
+    HwComponent::push(velo);
+
     if (isPressed())
     {
         return;

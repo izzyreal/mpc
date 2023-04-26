@@ -84,20 +84,24 @@ void BaseControls::init()
 void BaseControls::left()
 {
     init();
-    
+
     if (!activeField)
+    {
         return;
+    }
     
     if (param == "dummy")
+    {
         return;
-    
+    }
+
     ls->transferLeft();
 }
 
 void BaseControls::right()
 {
     init();
-    
+
     if (!activeField)
         return;
     

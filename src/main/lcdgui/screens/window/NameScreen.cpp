@@ -1,5 +1,7 @@
 #include "NameScreen.hpp"
 
+#include "hardware/Hardware.hpp"
+#include "hardware/PadAndButtonKeyboard.hpp"
 #include <lcdgui/Underline.hpp>
 
 using namespace mpc::lcdgui::screens::window;
@@ -69,6 +71,7 @@ void NameScreen::left()
 	
 	if (editing)
 	{
+        mpc.getHardware()->getPadAndButtonKeyboard()->resetPreviousPad();
         findFocus()->setInverted(false);
 		drawUnderline();
 	}
@@ -87,6 +90,7 @@ void NameScreen::right()
 	
 	if (editing)
 	{
+        mpc.getHardware()->getPadAndButtonKeyboard()->resetPreviousPad();
         findFocus()->setInverted(false);
 		drawUnderline();
 	}
@@ -318,10 +322,9 @@ void NameScreen::displayName()
 void NameScreen::typeCharacter(char c)
 {
     init();
-    auto charWithCasing = static_cast<char>(mpc.getControls()->isShiftPressed() ? toupper(c) : tolower(c));
 
     if (std::find(mpc::Mpc::akaiAsciiChar.begin(), mpc::Mpc::akaiAsciiChar.end(),
-            charWithCasing) == mpc::Mpc::akaiAsciiChar.end())
+            c) == mpc::Mpc::akaiAsciiChar.end())
     {
         return;
     }
@@ -337,7 +340,7 @@ void NameScreen::typeCharacter(char c)
                     nameScreenName = StrUtil::padRight(nameScreenName, " ", i + 1);
                 }
 
-                nameScreenName[i] = charWithCasing;
+                nameScreenName[i] = c;
                 displayName();
                 drawUnderline();
                 if (i <= 14) right();
@@ -356,7 +359,7 @@ void NameScreen::typeCharacter(char c)
                     nameScreenName = StrUtil::padRight(nameScreenName, " ", i + 1);
                 }
 
-                nameScreenName[i] = charWithCasing;
+                nameScreenName[i] = c;
 
                 editing = true;
                 initEditColors();

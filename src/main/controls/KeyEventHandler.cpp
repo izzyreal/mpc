@@ -151,11 +151,18 @@ void KeyEventHandler::handle(const KeyEvent &keyEvent)
             label != "f5" && label != "datawheel-down" && label != "datawheel-up" && label != "main-screen")
         {
             auto keyCodeString = kbMapping->getKeyCodeString(keyEvent.rawKeyCode);
-            if (keyCodeString == "space") keyCodeString = " ";
+
+            if (keyCodeString == "space")
+            {
+                keyCodeString = " ";
+            }
+
             auto nameScreen = mpc.screens->get<NameScreen>("name");
+
             if (keyCodeString.length() == 1)
             {
-                nameScreen->typeCharacter(keyCodeString[0]);
+                auto charWithCasing = static_cast<char>(mpc.getControls()->isShiftPressed() ? toupper(keyCodeString[0]) : tolower(keyCodeString[0]));
+                nameScreen->typeCharacter(charWithCasing);
                 return;
             }
 

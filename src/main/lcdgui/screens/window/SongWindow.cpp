@@ -46,7 +46,7 @@ void SongWindow::function(int i)
 	}
 }
 
-void SongWindow::turnWheel(int i)
+void SongWindow::openNameScreen()
 {
 	init();
 

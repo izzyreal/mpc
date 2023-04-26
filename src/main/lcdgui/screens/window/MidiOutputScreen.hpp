@@ -1,16 +1,18 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/screens/OpensNameScreen.hpp"
 
 namespace mpc::lcdgui::screens::window {
 
 	class MidiOutputScreen
-		: public mpc::lcdgui::ScreenComponent
+		: public mpc::lcdgui::ScreenComponent, public mpc::lcdgui::screens::OpensNameScreen
 	{
 
 	public:
 		void turnWheel(int i) override;
 		void function(int i) override;
         void right() override;
+        void openNameScreen() override;
 
 	public:
 		MidiOutputScreen(mpc::Mpc& mpc, const int layerIndex);
@@ -26,7 +28,6 @@ namespace mpc::lcdgui::screens::window {
 		void displayDeviceName();
 		void setSoftThru(int i);
 		void setDeviceIndex(int i);
-        void openNameScreen();
 
 	public:
 		int getSoftThru();

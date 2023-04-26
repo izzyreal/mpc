@@ -32,17 +32,20 @@ void MidiOutputScreen::open()
 
 void MidiOutputScreen::openNameScreen()
 {
-    auto renameDeviceIndex = deviceIndex == 0 ? 1 : deviceIndex + 1;
+    if (param == "firstletter")
+    {
+        auto renameDeviceIndex = deviceIndex == 0 ? 1 : deviceIndex + 1;
 
-    const auto enterAction = [this, renameDeviceIndex](std::string& nameScreenName) {
-        sequencer->getActiveSequence()->setDeviceName(renameDeviceIndex, nameScreenName);
-        openScreen(name);
-    };
+        const auto enterAction = [this, renameDeviceIndex](std::string &nameScreenName) {
+            sequencer->getActiveSequence()->setDeviceName(renameDeviceIndex, nameScreenName);
+            openScreen(name);
+        };
 
-    const auto nameScreen = mpc.screens->get<NameScreen>("name");
-    auto seq = sequencer->getActiveSequence();
-    nameScreen->initialize(seq->getDeviceName(renameDeviceIndex), 8, enterAction, name);
-    openScreen("name");
+        const auto nameScreen = mpc.screens->get<NameScreen>("name");
+        auto seq = sequencer->getActiveSequence();
+        nameScreen->initialize(seq->getDeviceName(renameDeviceIndex), 8, enterAction, name);
+        openScreen("name");
+    }
 }
 
 void MidiOutputScreen::right()
@@ -58,11 +61,7 @@ void MidiOutputScreen::turnWheel(int i)
 {
 	init();
 		
-	if (param == "firstletter")
-	{
-        openNameScreen();
-	}
-	else if (param == "softthru")
+	if (param == "softthru")
 	{
 		setSoftThru(softThru + i);
 	}

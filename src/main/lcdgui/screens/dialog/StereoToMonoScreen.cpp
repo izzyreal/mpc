@@ -37,8 +37,12 @@ void StereoToMonoScreen::turnWheel(int i)
 		sampler->nudgeSoundIndex(i > 0);
 		displayStereoSource();
 	}
-	else if (param == "newlname" || param == "newrname")
-	{
+}
+
+void StereoToMonoScreen::openNameScreen()
+{
+    if (param == "newlname" || param == "newrname")
+    {
         const auto isL = param == "newlname";
 
         const auto enterAction = [this, isL](std::string& nameScreenName) {

@@ -318,19 +318,22 @@ void EditSoundScreen::right()
 
 void EditSoundScreen::openNameScreen()
 {
-    const auto enterAction = [this](std::string& nameScreenName) {
-        if (mpc.getSampler()->isSoundNameOccupied(nameScreenName))
-        {
-            return;
-        }
+    if (param == "new-name" && (edit == 2 || edit == 7))
+    {
+        const auto enterAction = [this](std::string &nameScreenName) {
+            if (mpc.getSampler()->isSoundNameOccupied(nameScreenName))
+            {
+                return;
+            }
 
-        setNewName(nameScreenName);
-        openScreen(name);
-    };
+            setNewName(nameScreenName);
+            openScreen(name);
+        };
 
-    const auto nameScreen = mpc.screens->get<NameScreen>("name");
-    nameScreen->initialize(newName, 16, enterAction, name);
-    openScreen("name");
+        const auto nameScreen = mpc.screens->get<NameScreen>("name");
+        nameScreen->initialize(newName, 16, enterAction, name);
+        openScreen("name");
+    }
 }
 
 void EditSoundScreen::turnWheel(int i)
@@ -340,10 +343,6 @@ void EditSoundScreen::turnWheel(int i)
 	if (param == "edit")
 	{
 		setEdit(edit + i);
-	}
-	else if (param == "new-name" && (edit == 2 || edit == 7))
-	{
-        openNameScreen();
 	}
 	else if (param == "new-name" && edit == 3)
 	{

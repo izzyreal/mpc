@@ -39,7 +39,7 @@ void SaveAllFileScreen::displayFile()
     findLabel("file1")->setText(StrUtil::padRight(fileName.substr(1), " ", 15) + ".ALL");
 }
 
-void SaveAllFileScreen::turnWheel(int i)
+void SaveAllFileScreen::openNameScreen()
 {
 	init();
 

@@ -1,10 +1,11 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
+#include <lcdgui/screens/OpensNameScreen.hpp>
 
 namespace mpc::lcdgui::screens::window {
 
 	class EditSoundScreen
-		: public mpc::lcdgui::ScreenComponent
+		: public mpc::lcdgui::ScreenComponent, public mpc::lcdgui::screens::OpensNameScreen
 	{
 
 	public:
@@ -27,7 +28,7 @@ namespace mpc::lcdgui::screens::window {
 		void displayCreateNewProgram();
 		void displayEndMargin();
 		void displayVariable();
-        void openNameScreen();
+        void openNameScreen() override;
         
 		int edit = 0;
 		int insertSoundIndex = 0;

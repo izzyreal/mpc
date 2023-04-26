@@ -51,7 +51,7 @@ namespace mpc::lcdgui {
 		void transferDown();
 		int getFocusedLayerIndex();
 		std::shared_ptr<Layer> getFocusedLayer();
-		int openScreen(std::string name); // returns layer number
+		int openScreen(std::string newScreenName); // returns layer number
 		std::shared_ptr<ScreenComponent> findScreenComponent();
 
 	private:

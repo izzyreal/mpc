@@ -18,7 +18,7 @@ void SoundScreen::open()
 	displaySize();
 }
 
-void SoundScreen::turnWheel(int i)
+void SoundScreen::openNameScreen()
 {
 	init();
 	

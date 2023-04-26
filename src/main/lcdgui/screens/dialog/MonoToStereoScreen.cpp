@@ -64,8 +64,14 @@ void MonoToStereoScreen::turnWheel(int i)
 		setRSource(nextSoundIndex);
 		displayRSource();
 	}
-	else if (param == "newstname")
-	{
+}
+
+void MonoToStereoScreen::openNameScreen()
+{
+    init();
+
+    if (param == "newstname")
+    {
         const auto enterAction = [this](std::string& nameScreenName) {
             if (mpc.getSampler()->isSoundNameOccupied(nameScreenName))
             {
@@ -79,7 +85,7 @@ void MonoToStereoScreen::turnWheel(int i)
         const auto nameScreen = mpc.screens->get<NameScreen>("name");
         nameScreen->initialize(newStName, 16, enterAction, name);
         openScreen("name");
-	}
+    }
 }
 
 void MonoToStereoScreen::function(int j)

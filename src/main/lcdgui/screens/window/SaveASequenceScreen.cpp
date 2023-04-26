@@ -35,12 +35,16 @@ void SaveASequenceScreen::turnWheel(int i)
 	{
 		setSaveSequenceAs(saveSequenceAs + i);
 	}
-	else if (param == "file")
-	{
+}
+
+void SaveASequenceScreen::openNameScreen()
+{
+    if (param == "file")
+    {
         const auto nameScreen = mpc.screens->get<NameScreen>("name");
         nameScreen->initialize(sequencer->getActiveSequence()->getName(), 16, [this](std::string&) {
-                openScreen(name);
-            }, name);
+            openScreen(name);
+        }, name);
         openScreen("name");
     }
 }

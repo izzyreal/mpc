@@ -59,19 +59,24 @@ void KeepOrRetryScreen::function(int i)
 
 void KeepOrRetryScreen::openNameScreen()
 {
-    const auto enterAction = [this](std::string& nameScreenName) {
-        if (mpc.getSampler()->isSoundNameOccupied(nameScreenName))
-        {
-            return;
-        }
+    init();
 
-        sampler->getPreviewSound()->setName(nameScreenName);
-        openScreen(name);
-    };
+    if (param == "name-for-new-sound")
+    {
+        const auto enterAction = [this](std::string &nameScreenName) {
+            if (mpc.getSampler()->isSoundNameOccupied(nameScreenName))
+            {
+                return;
+            }
 
-    const auto nameScreen = mpc.screens->get<NameScreen>("name");
-    nameScreen->initialize(sampler->getPreviewSound()->getName(), 16, enterAction, name);
-    openScreen("name");
+            sampler->getPreviewSound()->setName(nameScreenName);
+            openScreen(name);
+        };
+
+        const auto nameScreen = mpc.screens->get<NameScreen>("name");
+        nameScreen->initialize(sampler->getPreviewSound()->getName(), 16, enterAction, name);
+        openScreen("name");
+    }
 }
 
 void KeepOrRetryScreen::right()
@@ -86,11 +91,7 @@ void KeepOrRetryScreen::turnWheel(int i)
 {
     init();
     
-    if (param == "name-for-new-sound")
-    {
-        openNameScreen();
-    }
-    else if (param == "assign-to-note")
+    if (param == "assign-to-note")
     {
         auto newAssignToNote = assignToNote + i;
 

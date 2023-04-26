@@ -1,0 +1,35 @@
+#pragma once
+
+#include <map>
+#include <string>
+
+/**
+ * This class handles typing a name in the NameScreen via the pads (old mobile phone style).
+ */
+
+namespace mpc { class Mpc; }
+
+namespace mpc::hardware {
+
+    class PadAndButtonKeyboard
+    {
+    private:
+        static std::unordered_map<std::string, std::string> charMap();
+
+        mpc::Mpc& mpc;
+
+        bool upperCase = false;
+
+        std::unordered_map<std::string, bool> pressedZeroTimes;
+
+        std::string previousPad;
+
+    public:
+        PadAndButtonKeyboard(mpc::Mpc&);
+        void pressHardwareComponent(const std::string& label);
+        void resetPreviousPad();
+        void resetPressedZeroTimes();
+
+    };
+
+}

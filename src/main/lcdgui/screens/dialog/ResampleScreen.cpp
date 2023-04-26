@@ -47,8 +47,14 @@ void ResampleScreen::turnWheel(int i)
 	{
 		setQuality(quality + i);
 	}
-	else if (param == "newname")
-	{
+}
+
+void ResampleScreen::openNameScreen()
+{
+    init();
+
+    if (param == "newname")
+    {
         const auto enterAction = [this](std::string& nameScreenName) {
             if (mpc.getSampler()->isSoundNameOccupied(nameScreenName))
             {

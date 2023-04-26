@@ -9,12 +9,16 @@
 #include "Pot.hpp"
 #include "HwSlider.hpp"
 
+#include "PadAndButtonKeyboard.hpp"
+
 #include <Mpc.hpp>
 
 using namespace mpc::hardware;
 
 Hardware::Hardware(mpc::Mpc& mpc)
 {
+    padAndButtonKeyboard = new PadAndButtonKeyboard(mpc);
+
     topPanel = std::make_shared<TopPanel>();
     
     buttonLabels = { "left", "right", "up", "down",	"rec", "overdub", "stop", "play", "play-start", "main-screen", "prev-step-event", "next-step-event", "go-to", "prev-bar-start", "next-bar-end", "tap", "next-seq", "track-mute", "open-window", "full-level", "sixteen-levels", "f1", "f2", "f3", "f4", "f5", "f6", "shift", "enter", "undo-seq", "erase", "after", "bank-a", "bank-b", "bank-c", "bank-d", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
@@ -120,4 +124,9 @@ std::shared_ptr<HwComponent> Hardware::getComponentByLabel(const std::string& la
     }
     
     return {};
+}
+
+PadAndButtonKeyboard* Hardware::getPadAndButtonKeyboard()
+{
+    return padAndButtonKeyboard;
 }

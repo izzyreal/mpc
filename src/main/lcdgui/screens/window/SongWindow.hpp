@@ -1,10 +1,11 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/screens/OpensNameScreen.hpp"
 
 namespace mpc::lcdgui::screens::window
 {
 	class SongWindow
-		: public mpc::lcdgui::ScreenComponent
+		: public mpc::lcdgui::ScreenComponent, public mpc::lcdgui::screens::OpensNameScreen
 	{
 
 	public:
@@ -12,10 +13,8 @@ namespace mpc::lcdgui::screens::window
 	
 	public:
 		void open() override;
-
-	public:
+        void openNameScreen() override;
 		void function(int i) override;
-		void turnWheel(int i) override;
 
 	};
 }

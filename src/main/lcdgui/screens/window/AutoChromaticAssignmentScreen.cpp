@@ -90,17 +90,6 @@ void AutoChromaticAssignmentScreen::turnWheel(int i)
         displaySource();
         setSourceSoundIndex(sampler->getLastNp(program.get())->getSoundIndex());
     }
-    else if (param == "program-name")
-    {
-        const auto enterAction = [this](std::string& nameScreenName) {
-            newName = nameScreenName;
-            openScreen(name);
-        };
-
-        const auto nameScreen = mpc.screens->get<NameScreen>("name");
-        nameScreen->initialize(newName, 16, enterAction, name);
-        openScreen("name");
-    }
     else if (param == "snd")
     {
         setSourceSoundIndex(sourceSoundIndex + i);
@@ -112,6 +101,23 @@ void AutoChromaticAssignmentScreen::turnWheel(int i)
     else if (param == "tune")
     {
         setTune(tune + i);
+    }
+}
+
+void AutoChromaticAssignmentScreen::openNameScreen()
+{
+    init();
+
+    if (param == "program-name")
+    {
+        const auto enterAction = [this](std::string& nameScreenName) {
+            newName = nameScreenName;
+            openScreen(name);
+        };
+
+        const auto nameScreen = mpc.screens->get<NameScreen>("name");
+        nameScreen->initialize(newName, 16, enterAction, name);
+        openScreen("name");
     }
 }
 

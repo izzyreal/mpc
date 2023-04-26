@@ -19,12 +19,12 @@ void ProgramScreen::open()
 	displayMidiProgramChange();
 }
 
-void ProgramScreen::turnWheel(int i)
+void ProgramScreen::openNameScreen()
 {
     init();
 
-	if (param == "programname")
-	{
+    if (param == "programname")
+    {
         const auto enterAction = [this](std::string& nameScreenName) {
             program->setName(nameScreenName);
             openScreen(name);
@@ -34,7 +34,13 @@ void ProgramScreen::turnWheel(int i)
         nameScreen->initialize(program->getName(), 16, enterAction, name);
         openScreen("name");
     }
-	else if (param == "midiprogramchange")
+}
+
+void ProgramScreen::turnWheel(int i)
+{
+    init();
+
+	if (param == "midiprogramchange")
 	{
 		program->setMidiProgramChange(program->getMidiProgramChange() + i);
 		displayMidiProgramChange();

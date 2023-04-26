@@ -1,5 +1,6 @@
 #pragma once
 #include <lcdgui/ScreenComponent.hpp>
+#include "lcdgui/screens/OpensNameScreen.hpp"
 
 namespace mpc::lcdgui::screens {
 class SaveScreen;
@@ -16,13 +17,12 @@ class FileExistsScreen;
 namespace mpc::lcdgui::screens::window
 {
 class SaveAllFileScreen
-: public mpc::lcdgui::ScreenComponent
+: public mpc::lcdgui::ScreenComponent, public mpc::lcdgui::screens::OpensNameScreen
 {
     
 public:
-    void turnWheel(int i) override;
     void function(int i) override;
-    
+    void openNameScreen() override;
     void open() override;
     
     SaveAllFileScreen(mpc::Mpc& mpc, const int layerIndex);

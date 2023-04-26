@@ -15,8 +15,8 @@ namespace mpc::hardware {
         const std::string label;
         
 	public:
-        virtual void push() {}
-        virtual void push(int /* velocity */) {}
+        virtual void push();
+        virtual void push(int /* velocity */);
         virtual void release() {}
 
         std::string getLabel();
