@@ -195,6 +195,11 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc, const std::string& overrideP
         // The below is to prevent further crashing.
         for (auto& p : mpc.getSampler()->getPrograms())
         {
+            if (!p.lock())
+            {
+                continue;
+            }
+            
             for (auto& n : p.lock()->getNotesParameters())
             {
                 if (n->getSoundIndex() >= mpc.getSampler()->getSoundCount())
