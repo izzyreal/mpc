@@ -63,8 +63,8 @@ void MpcMidiInput::transport(MidiMessage *midiMsg, int timeStamp)
 
     if (vmpcSettingsScreen->midiControlMode == VmpcSettingsScreen::MidiControlMode::VMPC)
     {
-        midiFullControl->processMidiInputEvent(mpc, msg);
-        return;
+        //midiFullControl->processMidiInputEvent(mpc, msg);
+        //return;
     }
     std::shared_ptr<mpc::sequencer::Event> event;
     if (midiInputScreen->getReceiveCh() != -1 && msg->getChannel() != midiInputScreen->getReceiveCh())
@@ -323,14 +323,13 @@ std::shared_ptr<mpc::sequencer::NoteOnEvent> mpc::audiomidi::MpcMidiInput::handl
     if (bus > 0)
     {
         pad = sampler->getProgram(sampler->getDrumBusProgramIndex(bus))->getPadIndexFromNote(playMidiNoteOn->getNote());
-        //Util::setSliderNoteVariationParameters(mpc, midiNoteOn, p);??????????
+        if (track->getIndex() < 64 && mpc.getControls()->isTapPressed() && sequencer->isPlaying())
+        {
+            return nullptr;
+        }
     }
 
-    if (bus > 0 && track->getIndex() < 64 &&
-        mpc.getControls()->isTapPressed() && sequencer->isPlaying())
-    {
-        return nullptr;
-    }
+
 
     if (pad != -1)
     {
@@ -349,10 +348,12 @@ std::shared_ptr<mpc::sequencer::NoteOnEvent> mpc::audiomidi::MpcMidiInput::handl
         else if (mpc.getControls()->isStepRecording())
         {
             recordMidiNoteOn = track->recordNoteEventSynced(sequencer->getTickPosition(), playMidiNoteOn->getNote(), playMidiNoteOn->getVelocity());
+            sequencer->playMetronomeTrack();
         }
         else if (mpc.getControls()->isRecMainWithoutPlaying())
         {
             recordMidiNoteOn = track->recordNoteEventSynced(sequencer->getTickPosition(), playMidiNoteOn->getNote(), playMidiNoteOn->getVelocity());
+            sequencer->playMetronomeTrack();
             auto timingCorrectScreen = mpc.screens->get<TimingCorrectScreen>("timing-correct");
             int stepLength = timingCorrectScreen->getNoteValueLengthInTicks();
 
@@ -397,7 +398,6 @@ std::shared_ptr<mpc::sequencer::NoteOffEvent> mpc::audiomidi::MpcMidiInput::hand
     if (track->getBus() > 0)
     {
         pad = sampler->getProgram(sampler->getDrumBusProgramIndex(track->getBus()))->getPadIndexFromNote(msg->getData1());
-        //Util::setSliderNoteVariationParameters(mpc, noteOff, p);
     }
 
     if (pad != -1)

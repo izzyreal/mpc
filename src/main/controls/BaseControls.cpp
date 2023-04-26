@@ -226,7 +226,7 @@ void BaseControls::pad(int padIndexWithBank, int velo)
         auto mixerScreen = std::dynamic_pointer_cast<MixerScreen>(screenComponent);
         auto channelSettingsScreen = std::dynamic_pointer_cast<ChannelSettingsScreen>(screenComponent);
 
-        if (note >= 35 && note <= 98 && collectionContainsCurrentScreen(allowCentralNoteAndPadUpdateScreens))
+        if (isDrumNote(note) && collectionContainsCurrentScreen(allowCentralNoteAndPadUpdateScreens))
         {
             mpc.setNote(note);
             mpc.setPad(padIndexWithBank);

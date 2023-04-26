@@ -114,8 +114,6 @@ void GlobalReleaseControls::simplePad(int padIndexWithBank)
 		track->finalizeNoteEventASync(recordOnEvent);
 	}
 
-	//bool posIsLastTick = sequencer->getTickPosition() == sequencer->getActiveSequence()->getLastTick();
-
 	bool recWithoutPlaying = controls->isRecMainWithoutPlaying();
 	bool stepRec = controls->isStepRecording();
 
