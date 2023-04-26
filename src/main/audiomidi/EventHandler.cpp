@@ -75,7 +75,7 @@ void EventHandler::handleNoThru(const std::shared_ptr<Event>& event, Track* trac
             {
                 mpc.getDrum(drumIndex).mpcNoteOff(noteOffEvent->getNote(), eventFrame, noteOffEvent->getTick());
             }
-            else if (noteOnEvent->isDrumNote() && (noteOnEvent->isFinalized() || noteOnEventPlayOnly))
+            else if (noteOnEvent && noteOnEvent->isDrumNote() && (noteOnEvent->isFinalized() || noteOnEventPlayOnly))
             {
                 if (!sequencer->isSoloEnabled() || track->getIndex() == sequencer->getActiveTrackIndex())
                 {
