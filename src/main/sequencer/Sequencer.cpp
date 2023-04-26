@@ -70,7 +70,6 @@ void Sequencer::init()
 	tempo = 120.0;
 
 	metronomeOnly = false;
-	metronomeSeq = nullptr;
 	activeSequenceIndex = 0;
 	currentlyPlayingSequenceIndex = 0;
 	songMode = false;
@@ -102,7 +101,7 @@ std::shared_ptr<Track> Sequencer::getActiveTrack()
 void Sequencer::playToTick(int targetTick)
 {
 	auto seqIndex = songMode ? getSongSequenceIndex() : currentlyPlayingSequenceIndex;
-	auto seq = metronomeOnly ? metronomeSeq.get() : sequences[seqIndex].get();
+	auto seq = sequences[seqIndex].get();
 	auto secondSequenceScreen = mpc.screens->get<SecondSeqScreen>("second-seq");
 
 	for (int i = 0; i < 2; i++)
@@ -118,11 +117,14 @@ void Sequencer::playToTick(int targetTick)
 				break;
 		}
 
-		for (auto& track : seq->getTracks())
+        if (!metronomeOnly)
         {
-			while (track->getNextTick() <= targetTick)
-				track->playNext();
-		}
+            for (auto &track: seq->getTracks())
+            {
+                while (track->getNextTick() <= targetTick)
+                    track->playNext();
+            }
+        }
 
         while (seq->tempoChangeTrack->getNextTick() <= targetTick)
             seq->tempoChangeTrack->playNext();
@@ -1541,11 +1543,6 @@ void Sequencer::playMetronomeTrack()
 	}
 
 	metronomeOnly = true;
-	metronomeSeq = std::make_unique<Sequence>(mpc);
-	auto s = getActiveSequence();
-	metronomeSeq->init(8);
-	metronomeSeq->setTimeSignature(0, 3, s->getNumerator(getCurrentBarIndex()), s->getDenominator(getCurrentBarIndex()));
-	metronomeSeq->setInitialTempo(getTempo());
 	playStartTick = 0;
     mpc.getAudioMidiServices()->getFrameSequencer()->startMetronome();
 }

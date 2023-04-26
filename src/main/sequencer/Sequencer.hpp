@@ -47,7 +47,6 @@ namespace mpc::sequencer
 		int lastNotifiedClock = -1;
 		std::shared_ptr<Sequence> placeHolder;
 		bool metronomeOnly = false;
-		std::unique_ptr<mpc::sequencer::Sequence> metronomeSeq;
 		int activeSequenceIndex = 0;
 		int currentlyPlayingSequenceIndex = 0;
 		bool songMode = false;
