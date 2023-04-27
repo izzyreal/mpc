@@ -208,6 +208,21 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc, const std::string& overrideP
                 }
             }
         }
+
+        if (mpc.getSampler()->getProgramCount() == 0)
+        {
+            mpc.getSampler()->addProgram(0);
+        }
+
+        for (int i = 0; i < 4; i++)
+        {
+            auto d = mpc.getDrum(i);
+
+            if (!mpc.getSampler()->getProgram(d.getProgram()))
+            {
+                d.setProgram(0);
+            }
+        }
     };
 
     if (vmpcAutoSaveScreen->getAutoLoadOnStart() == 1)
