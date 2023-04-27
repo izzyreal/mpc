@@ -1,5 +1,7 @@
 #include "StdDisk.hpp"
 
+#include <algorithm>
+
 #include <Mpc.hpp>
 
 #include "AkaiFileRenamer.hpp"
@@ -60,8 +62,23 @@ void StdDisk::initFiles()
 			files.push_back(f);
 		}
 	}
-    
+
+    std::sort(files.begin(), files.end(),
+              [](const std::shared_ptr<MpcFile> &f1, const std::shared_ptr<MpcFile> &f2) {
+                  return f1->getName() < f2->getName();
+              });
+
+    std::sort(files.begin(), files.end(),
+              [](const std::shared_ptr<MpcFile> &f1, const std::shared_ptr<MpcFile> &f2) {
+                      return f1->isDirectory() && f2->isFile();
+              });
+
 	initParentFiles();
+
+    std::sort(parentFiles.begin(), parentFiles.end(),
+              [](const std::shared_ptr<MpcFile> &f1, const std::shared_ptr<MpcFile> &f2) {
+                  return f1->getName() < f2->getName();
+              });
 }
 
 void StdDisk::initParentFiles()
