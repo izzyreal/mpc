@@ -979,5 +979,6 @@ const std::vector<std::string> BaseControls::samplerScreens {
     "program-params",
     "select-drum",
     "trim",
-    "zone"
+    "zone",
+    "load-a-sound"
 };
