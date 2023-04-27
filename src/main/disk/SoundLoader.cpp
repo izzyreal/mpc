@@ -197,6 +197,11 @@ sound_or_error SoundLoader::onReadWavSuccess(std::shared_ptr<mpc::file::wav::Wav
         sound->setLoopEnabled(true);
     }
 
+    if (sound->getLoopTo() == sound->getFrameCount())
+    {
+        sound->setLoopTo(0);
+    }
+
     const auto tuneFactor = (float) (sound->getSampleRate() / 44100.0);
     const auto rateToTuneBase = (float) (pow(2, (1.0 / 12.0)));
 
