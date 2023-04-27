@@ -127,17 +127,14 @@ void LoadASoundScreen::keepSound()
     }
 
     auto actionAfterLoadingSound = [this](bool newSoundIsMono){
+        auto soundIndex = sampler->getSoundCount() - 1;
+
         if (assignToNote != 34)
         {
-            auto sequence = sequencer->getActiveSequence();
-            auto track = sequence->getTrack(sequencer->getActiveTrackIndex());
-
-            auto bus = track->getBus();
-            auto programNumber = sampler->getDrumBusProgramIndex(bus);
-            auto program = sampler->getProgram(programNumber);
-            auto noteParameters = sampler->getLastNp(program.get());
-            noteParameters->setSoundIndex(sampler->getSoundCount() - 1);
+            program->getNoteParameters(assignToNote)->setSoundIndex(soundIndex);
         }
+
+        sampler->setSoundIndex(soundIndex);
     };
 
     if (existingSoundIndex >= 0)

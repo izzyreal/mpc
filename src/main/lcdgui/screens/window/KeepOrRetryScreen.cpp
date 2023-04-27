@@ -50,7 +50,12 @@ void KeepOrRetryScreen::function(int i)
             break;
         case 4:
             auto index = sampler->getSoundCount() - 1;
-            sampler->getLastNp(program.get())->setSoundIndex(index);
+
+            if (assignToNote != 34)
+            {
+                program->getNoteParameters(assignToNote)->setSoundIndex(index);
+            }
+
             sampler->setSoundIndex(index);
             openScreen("sample");
             break;
