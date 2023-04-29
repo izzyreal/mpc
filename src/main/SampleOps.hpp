@@ -23,8 +23,8 @@ namespace mpc::sampleops {
     inline int16_t mean_normalized_float_to_short(const float &f)
     {
         float scaled = f * 32768.0f;
-        auto rounded = static_cast<int16_t>(std::roundf(scaled));
-        return std::max<int16_t>(static_cast<int16_t>(-32768), std::min<int16_t>(rounded, static_cast<int16_t>(32767)));
+        float clamped = std::max(-32768.0f, std::min(scaled, 32767.0f));
+        return static_cast<int16_t>(std::roundf(clamped));
     }
 
     inline float short_to_float(const int16_t s)

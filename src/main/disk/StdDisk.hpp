@@ -33,6 +33,7 @@ public:
     void close() override;
     void flush() override;
     bool deleteAllFiles(int extensionIndex) override;
+    bool deleteRecursive(std::weak_ptr<MpcFile>) override;
     bool newFolder(const std::string& newDirName) override;
     std::string getAbsolutePath() override;
     std::string getTypeShortName() override;

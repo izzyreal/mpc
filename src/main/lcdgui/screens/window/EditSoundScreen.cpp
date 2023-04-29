@@ -1,7 +1,6 @@
 #include "EditSoundScreen.hpp"
 
 #include <sampler/TimeStretch1.hpp>
-#include <sampler/Pad.hpp>
 
 #include <sequencer/Track.hpp>
 
@@ -655,7 +654,6 @@ void EditSoundScreen::function(int j)
 		}
         else if (edit == 8)
         {
-            auto source = sampler->getSound();
             auto start = sound->getStart();
             auto end = sound->getEnd();
             
@@ -671,27 +669,32 @@ void EditSoundScreen::function(int j)
             }
 
             float peak = 0.0f;
+            auto& sampleData = *sound->getSampleData();
             
             for (int i = start; i < end; i++)
             {
-                float v = abs((*sound->getSampleData())[i]);
+                float v = abs(sampleData[i]);
                 peak = std::max(peak, v);
 
-                if (!sound->isMono()) {
-                    v = (*sound->getSampleData())[(i + sound->getFrameCount())];
+                if (!sound->isMono())
+                {
+                    v = abs(sampleData[(i + sound->getFrameCount())]);
                     peak = std::max(peak, v);
                 }
             }
             
             peak = std::min(1.0f, peak);
             
-            float factor = 1.0 / peak;
+            float factor = 1.0f / peak;
 
             for (int i = start; i < end; i++)
             {
-                (*sound->getSampleData())[i] *= factor;
+                sampleData[i] *= factor;
+
                 if (!sound->isMono())
-                    (*sound->getSampleData())[(i + sound->getFrameCount())] *= factor;
+                {
+                    sampleData[(i + sound->getFrameCount())] *= factor;
+                }
             }
             
             openScreen(returnToScreenName);

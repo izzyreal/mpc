@@ -70,7 +70,7 @@ namespace mpc::disk {
         void readMidiControlPreset(fs::path p, std::shared_ptr<mpc::nvram::MidiControlPreset>);
 
         bool checkExists(std::string fileName);
-        bool deleteRecursive(std::weak_ptr<MpcFile>);
+        virtual bool deleteRecursive(std::weak_ptr<MpcFile>);
 
         bool isRoot();
 

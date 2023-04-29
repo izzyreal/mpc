@@ -206,6 +206,11 @@ bool StdDisk::deleteAllFiles(int extensionIndex)
 	return success;
 }
 
+bool StdDisk::deleteRecursive(std::weak_ptr<MpcFile> f)
+{
+    return fs::remove_all(f.lock()->fs_path) != 0;
+}
+
 bool StdDisk::newFolder(const std::string& newDirName)
 {
     std::string copy = StrUtil::toUpper(StrUtil::replaceAll(newDirName, ' ', "_"));
