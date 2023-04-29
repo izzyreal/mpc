@@ -64,13 +64,13 @@ void StdDisk::initFiles()
 	}
 
     std::sort(files.begin(), files.end(),
-              [](const std::shared_ptr<MpcFile> &f1, const std::shared_ptr<MpcFile> &f2) {
+              [](const std::shared_ptr<MpcFile>& f1, const std::shared_ptr<MpcFile>& f2) {
                   return f1->getName() < f2->getName();
               });
 
-    std::sort(files.begin(), files.end(),
-              [](const std::shared_ptr<MpcFile> &f1, const std::shared_ptr<MpcFile> &f2) {
-                      return f1->isDirectory() && f2->isFile();
+    std::stable_partition(files.begin(), files.end(),
+              [](const std::shared_ptr<MpcFile>& f) {
+                      return f->isDirectory();
               });
 
 	initParentFiles();
