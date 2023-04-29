@@ -8,7 +8,6 @@
 #include <sampler/Pad.hpp>
 #include <sampler/Program.hpp>
 #include <sampler/Sound.hpp>
-#include <sequencer/NoteEvent.hpp>
 #include <sequencer/Track.hpp>
 
 #include <lcdgui/screens/ZoneScreen.hpp>
@@ -550,6 +549,32 @@ void Sampler::process8Bit(std::vector<float>* fa)
 			(*fa)[j] = f;
 		}
 	}
+}
+
+std::vector<float> Sampler::resampleSingleChannel(std::vector<float>& input, int sourceRate, int destRate)
+{
+    const auto ratio = (double) destRate / sourceRate;
+    const auto outputFrameCount = static_cast<int>(ceil(input.size() * ratio));
+
+    std::vector<float> result(outputFrameCount);
+
+    SRC_DATA srcData;
+    srcData.data_in = &input[0];
+    srcData.input_frames = input.size();
+    srcData.data_out = &result[0];
+    srcData.output_frames = outputFrameCount;
+    srcData.src_ratio = 1.0 / ratio;
+
+    auto error = src_simple(&srcData, 0, 1);
+
+    if (error != 0)
+    {
+        const char* errormsg = src_strerror(error);
+        std::string errorStr(errormsg);
+        MLOG("libsamplerate error: " + errorStr);
+    }
+
+    return result;
 }
 
 void Sampler::resample(std::vector<float>& data, int sourceRate, std::shared_ptr<Sound> destSnd)

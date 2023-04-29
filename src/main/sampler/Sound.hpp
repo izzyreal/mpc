@@ -42,6 +42,9 @@ namespace mpc::sampler {
 		void insertFrame(std::vector<float> frame, unsigned int index);
         void insertFrames(std::vector<float>& frames, unsigned int index);
         void insertFrames(std::vector<float>& left, std::vector<float>& right, unsigned int index);
+        void appendFrames(std::vector<float>& frames);
+        void appendFrames(std::vector<float>& left, std::vector<float>& right);
+        void removeFramesFromEnd(int numFramesToRemove);
 
 	public:
 		Sound(int rate);

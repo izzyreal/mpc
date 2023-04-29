@@ -2,6 +2,7 @@
 
 #include <audiomidi/AudioMidiServices.hpp>
 #include <audiomidi/SoundRecorder.hpp>
+#include <engine/audio/server/NonRealTimeAudioServer.hpp>
 
 #include <cmath>
 
@@ -121,7 +122,7 @@ void SampleScreen::function(int i)
 			auto sound = sampler->addSound();
 			sound->setName(sampler->addOrIncreaseNumber("sound1"));
 			auto lengthInFrames = time * (44100 * 0.1);
-			ams->getSoundRecorder()->prepare(sound, lengthInFrames);
+			ams->getSoundRecorder()->prepare(sound, lengthInFrames, ams->getAudioServer()->getSampleRate());
 			ams->getSoundRecorder()->setArmed(true);
 			findBackground()->setName("waiting-for-input-signal");
 		}

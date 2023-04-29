@@ -203,11 +203,33 @@ void Sound::insertFrame(std::vector<float> frame, unsigned int index)
 
 void Sound::insertFrames(std::vector<float>& frames, unsigned int index)
 {
+    assert(mono);
     sampleData.insert(sampleData.begin() + index, frames.begin(), frames.end());
 }
 
 void Sound::insertFrames(std::vector<float>& left, std::vector<float>& right, unsigned int index)
 {
+    assert(!mono);
     sampleData.insert(sampleData.begin() + index + getFrameCount(), right.begin(), right.end());
     sampleData.insert(sampleData.begin() + index, left.begin(), left.end());
+}
+
+void Sound::appendFrames(std::vector<float> &frames)
+{
+    insertFrames(frames, getFrameCount());
+}
+
+void Sound::appendFrames(std::vector<float> &left, std::vector<float> &right)
+{
+    insertFrames(left, right, getFrameCount());
+}
+
+void Sound::removeFramesFromEnd(int numFramesToRemove)
+{
+    if (!mono)
+    {
+        sampleData.erase(sampleData.end() - getFrameCount() - numFramesToRemove, sampleData.end() - getFrameCount());
+    }
+
+    sampleData.erase(sampleData.end() - numFramesToRemove, sampleData.end());
 }

@@ -426,6 +426,8 @@ void AudioMidiServices::changeSoundRecorderStateIfRequired()
   {
     soundRecorder->stop();
     stopSoundRecorder();
+    wasRecordingSound = false;
+    return;
   }
 
   if (!wasRecordingSound && isRecordingSound())

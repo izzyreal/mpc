@@ -113,15 +113,10 @@ public:
     static void process12Bit(std::vector<float>* data);
     static void process8Bit(std::vector<float>* data);
     static void resample(std::vector<float>& data, int sourceRate, std::shared_ptr<Sound> destSnd);
+    static std::vector<float> resampleSingleChannel(std::vector<float>& input, int sourceRate, int destRate);
     std::vector<std::pair<std::shared_ptr<Sound>, int>> getSortedSounds();
-//    short getSortedSoundIndex();
-//    void setSortedSoundIndex(short newSortedSoundIndex);
 
 private:
-//    static bool compareMemoryIndex(std::weak_ptr<Sound> a, std::weak_ptr<Sound> b);
-//    static bool compareName(std::weak_ptr<Sound> a, std::weak_ptr<Sound> b);
-//    static bool compareSize(std::weak_ptr<Sound> a, std::weak_ptr<Sound> b);
-
     int soundIndex = 0;
     int playXMode = 0;
     std::string previousScreenName;
