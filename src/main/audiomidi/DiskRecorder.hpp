@@ -7,6 +7,8 @@
 
 #include <fstream>
 #include <string>
+#include <vector>
+#include <utility>
 
 #ifdef __linux__
 #include <atomic>
@@ -20,9 +22,12 @@ namespace mpc::audiomidi {
 	{
 
 	private:
-		std::string name;
+        static const std::vector<std::pair<std::string, std::string>> fileNamesMono;
+        static const std::vector<std::string> fileNamesStereo;
+
+        int index = 0;
 		mpc::engine::audio::core::AudioFormat* format = nullptr;
-		std::ofstream fileStream;
+		std::vector<std::ofstream> fileStreams;
 		std::atomic<bool> writing = ATOMIC_VAR_INIT(false);
 		int writtenByteCount = 0;
 		int lengthInFrames = 0;
@@ -31,11 +36,11 @@ namespace mpc::audiomidi {
 	public:
 		bool start();
 		bool stopEarly();
-		bool prepare(const fs::path& absolutePath, int lengthInFrames, int sampleRate);
+		bool prepare(int lengthInFrames, int sampleRate, bool isStereo);
 		int processAudio(mpc::engine::audio::core::AudioBuffer* buf, int nFrames) override;
 
 	public:
-		DiskRecorder(mpc::engine::audio::core::AudioProcess* process, std::string name);
+		DiskRecorder(mpc::engine::audio::core::AudioProcess* process, int index);
         ~DiskRecorder();
 
 	};

@@ -2,7 +2,6 @@
 #include "lcdgui/screens/VmpcMidiScreen.hpp"
 
 // mpc
-#include <Paths.hpp>
 #include <Mpc.hpp>
 #include <audiomidi/DirectToDiskSettings.hpp>
 #include <audiomidi/DiskRecorder.hpp>
@@ -289,7 +288,7 @@ void AudioMidiServices::initializeDiskRecorders()
 {
     for (int i = 0; i < outputProcesses.size(); i++)
     {
-        auto diskRecorder = std::make_shared<DiskRecorder>(outputProcesses[i], "diskwriter" + std::to_string(i));
+        auto diskRecorder = std::make_shared<DiskRecorder>(outputProcesses[i], i);
 
         diskRecorders.push_back(diskRecorder);
 
@@ -331,15 +330,14 @@ void AudioMidiServices::closeIO()
 
 bool AudioMidiServices::prepareBouncing(DirectToDiskSettings* settings)
 {
-	auto indivFileNames = std::vector<std::string>{ "L-R.wav", "1-2.wav", "3-4.wav", "5-6.wav", "7-8.wav" };
-
 	for (int i = 0; i < diskRecorders.size(); i++)
 	{
 		auto eapa = diskRecorders[i];
-		auto absolutePath = mpc::Paths::recordingsPath() / indivFileNames[i];
 
-		if (!eapa->prepare(absolutePath, settings->lengthInFrames, settings->sampleRate))
-			return false;
+		if (!eapa->prepare(settings->lengthInFrames, settings->sampleRate, !settings->split))
+        {
+            return false;
+        }
 	}
 
 	bouncePrepared = true;
@@ -453,16 +451,20 @@ void AudioMidiServices::changeBounceStateIfRequired()
 
         if (directToDiskRecorderScreen->isOffline())
         {
-            std::vector<int> rates{ 44100, 48000, 88200 };
-            auto rate = rates[static_cast<size_t>(directToDiskRecorderScreen->getSampleRate())];
-            frameSeq->setSampleRate(offlineServer->getSampleRate());
+//            std::vector<int> rates{ 44100, 48000, 88200 };
+//            auto rate = rates[static_cast<size_t>(directToDiskRecorderScreen->getSampleRate())];
+//            frameSeq->setSampleRate(offlineServer->getSampleRate());
             frameSeq->start();
 
-            if (getAudioServer()->isRealTime() && server->getSampleRate() != rate)
+            if (getAudioServer()->isRealTime())
             {
-                server->setSampleRate(rate);
                 getAudioServer()->setRealTime(false);
             }
+
+//            if (server->getSampleRate() != rate)
+//            {
+//                server->setSampleRate(rate);
+//            }
         }
         else if (directToDiskRecorderScreen->getRecord() != 4)
         {
@@ -482,7 +484,7 @@ void AudioMidiServices::changeBounceStateIfRequired()
         {
             if (!getAudioServer()->isRealTime())
             {
-                server->setSampleRate(static_cast<int>(getAudioServer()->getSampleRate()));
+//                server->setSampleRate(static_cast<int>(getAudioServer()->getSampleRate()));
                 getAudioServer()->setRealTime(true);
             }
         }

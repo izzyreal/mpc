@@ -84,10 +84,9 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
         std::vector<int> rates{ 44100, 48000, 88200 };
 		auto rate = rates[sampleRate];
 
-		if (!offline)
-			rate = mpc.getAudioMidiServices()->getAudioServer()->getSampleRate();
+//		if (!offline)
+        rate = mpc.getAudioMidiServices()->getAudioServer()->getSampleRate();
 
-		auto split = false;
 		auto sequence = sequencer->getSequence(seq);
         loopWasEnabled = sequence->isLoopEnabled();
 
@@ -98,7 +97,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 			openScreen("sequencer");
 			if (loopWasEnabled) sequence->setLoopEnabled(false);
 			auto lengthInFrames = SeqUtil::sequenceFrameLength(sequence.get(), 0, sequence->getLastTick(), rate);
-			auto settings = std::make_unique<DirectToDiskSettings>(lengthInFrames, outputFolder, split, rate);
+			auto settings = std::make_unique<DirectToDiskSettings>(lengthInFrames, outputFolder, splitLR, rate);
 			
 			if (!mpc.getAudioMidiServices()->prepareBouncing(settings.get()))
 				openScreen("vmpc-file-in-use");
@@ -111,7 +110,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 		{
 			openScreen("sequencer");
 			auto lengthInFrames = SeqUtil::loopFrameLength(sequence.get(), rate);
-			auto settings = std::make_unique<DirectToDiskSettings>(lengthInFrames, outputFolder, split, rate);
+			auto settings = std::make_unique<DirectToDiskSettings>(lengthInFrames, outputFolder, splitLR, rate);
             if (loopWasEnabled) sequence->setLoopEnabled(false);
 			sequencer->move(sequence->getLoopStart());
 
@@ -126,7 +125,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 		{
 			openScreen("sequencer");
 			auto lengthInFrames = SeqUtil::sequenceFrameLength(sequence.get(), time0, time1, rate);
-			auto settings = std::make_unique<DirectToDiskSettings>(lengthInFrames, outputFolder, split, rate);
+			auto settings = std::make_unique<DirectToDiskSettings>(lengthInFrames, outputFolder, splitLR, rate);
             if (loopWasEnabled) sequence->setLoopEnabled(false);
 			sequencer->move(time0);
 			
@@ -145,7 +144,7 @@ void VmpcDirectToDiskRecorderScreen::function(int i)
 				return;
 
 			auto lengthInFrames = SeqUtil::songFrameLength(mpcSong.get(), sequencer.get(), rate);
-			auto settings = std::make_unique<DirectToDiskSettings>(lengthInFrames, outputFolder, split, rate);
+			auto settings = std::make_unique<DirectToDiskSettings>(lengthInFrames, outputFolder, splitLR, rate);
 
 			openScreen("song");
 
@@ -235,15 +234,17 @@ void VmpcDirectToDiskRecorderScreen::setSplitLR(bool b)
 
 void VmpcDirectToDiskRecorderScreen::displayRate()
 {
-	findField("rate")->Hide(!offline);
-	findLabel("rate")->Hide(!offline);
-	
-	if (!offline)
-		return;
+	findField("rate")->Hide(true);
+	findLabel("rate")->Hide(true);
+//	findField("rate")->Hide(!offline);
+//	findLabel("rate")->Hide(!offline);
 
-    std::vector<std::string> rates{ "44.1", "48.0", "88.2" };
-    std::string rate = Util::replaceDotWithSmallSpaceDot(rates[sampleRate]);
-	findField("rate")->setText(rate);
+//	if (!offline)
+//		return;
+//
+//    std::vector<std::string> rates{ "44.1", "48.0", "88.2" };
+//    std::string rate = Util::replaceDotWithSmallSpaceDot(rates[sampleRate]);
+//	findField("rate")->setText(rate);
 }
 
 void VmpcDirectToDiskRecorderScreen::displaySong()

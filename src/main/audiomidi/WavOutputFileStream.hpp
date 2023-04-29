@@ -25,9 +25,8 @@ void wav_putLE(std::ofstream& stream, int val, int numBytes)
     }
 }
 
-void wav_writeHeader(std::ofstream& stream, const int sampleRate)
+void wav_writeHeader(std::ofstream& stream, const int sampleRate, int numChannels)
 {
-	const int numChannels = 2;
 	const int validBits = 16;
 
 	auto bytesPerSample = (validBits + 7) / 8;
