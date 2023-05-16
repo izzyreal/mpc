@@ -5,21 +5,21 @@
 
 using namespace mpc::audiomidi;
 
-void MidiClockInput::handleTimingMessage(double bufOffsetMs)
+MidiClockInput::MidiClockInput()
+{
+    const double delta120Bpm = 1.0 / 48.0;
+    std::fill(deltas.begin(), deltas.end(), delta120Bpm);
+}
+
+void MidiClockInput::handleTimingMessage(double bufOffsetSeconds)
 {
     const auto now = std::chrono::high_resolution_clock::now();
 
-    const bool firstCall = previousNow == zero;
-
-    if (firstCall)
-    {
-        previousNow = now;
-        return;
-    }
-
     unsigned long delta = std::chrono::duration_cast<std::chrono::nanoseconds>(now-previousNow).count();
 
-    const double deltaInSeconds = (delta / 1000000000.0) + (bufOffsetMs * 1000);
+    const double deltaInSeconds = (delta / 1000000000.0) + (bufOffsetSeconds / 1000);
+
+    printf("D: %f\n", deltaInSeconds);
 
     deltas[deltaPointer++] = deltaInSeconds;
 

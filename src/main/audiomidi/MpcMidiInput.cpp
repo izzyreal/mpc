@@ -476,8 +476,8 @@ std::shared_ptr<mpc::sequencer::MidiClockEvent> MpcMidiInput::handleMidiClock(Sh
         {
             auto server = mpc.getAudioMidiServices()->getAudioServer();
             auto sr = server->getSampleRate();
-            auto bufOffsetMs = bufOffset * (1.0/sr);
-            midiClockInput.handleTimingMessage(bufOffsetMs);
+            auto bufOffsetSeconds = bufOffset * (1.0/sr);
+            midiClockInput.handleTimingMessage(bufOffsetSeconds);
             break;
         }
         }

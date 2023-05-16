@@ -6,6 +6,7 @@
 namespace mpc::audiomidi {
     class MidiClockInput {
     public:
+        MidiClockInput();
         void handleTimingMessage(double bufOffsetMs);
 
     private:
