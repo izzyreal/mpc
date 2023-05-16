@@ -1,5 +1,7 @@
 #pragma once
 
+#include "MidiClockInput.hpp"
+
 #include <observer/Observable.hpp>
 #include <sequencer/Event.hpp>
 #include <sequencer/Track.hpp>
@@ -28,6 +30,7 @@ namespace mpc::audiomidi {
         std::shared_ptr<mpc::sampler::Sampler> sampler;
         std::unique_ptr<VmpcMidiControlMode> midiFullControl;
         std::string notify;
+        MidiClockInput midiClockInput;
 
     public:
         void transport(mpc::engine::midi::MidiMessage *msg, int timestamp);

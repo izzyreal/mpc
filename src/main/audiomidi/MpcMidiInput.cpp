@@ -14,7 +14,6 @@
 #include <audiomidi/AudioMidiServices.hpp>
 #include <controls/GlobalReleaseControls.hpp>
 
-
 #include <lcdgui/screens/SyncScreen.hpp>
 #include <lcdgui/screens/VmpcSettingsScreen.hpp>
 #include <lcdgui/screens/MidiSwScreen.hpp>
@@ -470,6 +469,7 @@ std::shared_ptr<mpc::sequencer::MidiClockEvent> MpcMidiInput::handleMidiClock(mp
             sequencer->stop();
             break;
         case ShortMessage::TIMING_CLOCK:
+            midiClockInput.handleTimingMessage();
             break;
         }
     }
