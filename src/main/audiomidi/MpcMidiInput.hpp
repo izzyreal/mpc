@@ -21,11 +21,8 @@ namespace mpc::audiomidi {
         public moduru::observer::Observable,
         public mpc::sequencer::NoteEventStore<std::pair<int/*track*/,int/*note*/>, mpc::sequencer::NoteOnEventPlayOnly>
     {
-
-    public:
-        int index = 0;
-
     private:
+        int index = 0;
         mpc::Mpc &mpc;
         std::shared_ptr<mpc::sequencer::Sequencer> sequencer;
         std::shared_ptr<mpc::sampler::Sampler> sampler;
@@ -33,8 +30,6 @@ namespace mpc::audiomidi {
         std::string notify;
 
     public:
-        std::string getName();
-
         void transport(mpc::engine::midi::MidiMessage *msg, int timestamp);
 
     private:

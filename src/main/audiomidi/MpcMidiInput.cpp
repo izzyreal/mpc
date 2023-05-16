@@ -49,11 +49,6 @@ MpcMidiInput::MpcMidiInput(mpc::Mpc &_mpc, int _index)
 {
 }
 
-std::string MpcMidiInput::getName()
-{
-    return "mpcmidiin" + std::to_string(index);
-}
-
 void MpcMidiInput::transport(MidiMessage *midiMsg, int timeStamp)
 {
     auto msg = dynamic_cast<ShortMessage*>(midiMsg);

@@ -127,7 +127,7 @@ void Mpc::init(const int inputCount, const int outputCount)
 	sampler = std::make_shared<mpc::sampler::Sampler>(*this);
 	MLOG("Sampler created");
 
-	mpcMidiInputs = std::vector<mpc::audiomidi::MpcMidiInput*>{ new mpc::audiomidi::MpcMidiInput(*this, 0), new mpc::audiomidi::MpcMidiInput(*this, 1) };
+	mpcMidiInputs = { new mpc::audiomidi::MpcMidiInput(*this, 0), new mpc::audiomidi::MpcMidiInput(*this, 1) };
 
     screens = std::make_shared<Screens>(*this);
 
