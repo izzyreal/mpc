@@ -14,7 +14,6 @@
 #include <audiomidi/AudioMidiServices.hpp>
 #include <controls/GlobalReleaseControls.hpp>
 
-
 #include <lcdgui/screens/SyncScreen.hpp>
 #include <lcdgui/screens/VmpcSettingsScreen.hpp>
 #include <lcdgui/screens/MidiSwScreen.hpp>
@@ -39,6 +38,7 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::engine::midi;
+using namespace mpc::engine::audio::server;
 
 MpcMidiInput::MpcMidiInput(mpc::Mpc &_mpc, int _index)
         : mpc(_mpc),
@@ -47,6 +47,7 @@ MpcMidiInput::MpcMidiInput(mpc::Mpc &_mpc, int _index)
           index(_index),
           midiFullControl(std::make_unique<VmpcMidiControlMode>())
 {
+    midiClockInput.onTempoChange = [this](double newTempo) { sequencer->setTempo(newTempo); };
 }
 
 void MpcMidiInput::transport(MidiMessage *midiMsg, int timeStamp)
@@ -56,19 +57,17 @@ void MpcMidiInput::transport(MidiMessage *midiMsg, int timeStamp)
     auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
     auto midiInputScreen = mpc.screens->get<MidiInputScreen>("midi-input");
 
-    if (vmpcSettingsScreen->midiControlMode == VmpcSettingsScreen::MidiControlMode::VMPC)
+    if (!msg->isMidiClock() && vmpcSettingsScreen->midiControlMode == VmpcSettingsScreen::MidiControlMode::VMPC)
     {
         midiFullControl->processMidiInputEvent(mpc, msg);
         return;
     }
+
     std::shared_ptr<mpc::sequencer::Event> event;
+
     if (midiInputScreen->getReceiveCh() != -1 && msg->getChannel() != midiInputScreen->getReceiveCh())
     {
         return;
-    }
-    else if (msg->isMidiClock())
-    {
-        event = handleMidiClock(msg);
     }
     else if (msg->isNoteOn() || msg->isNoteOff())
     {
@@ -296,7 +295,7 @@ void MpcMidiInput::transportOmni(MidiMessage *msg, std::string outputLetter)
     }
 }
 
-std::shared_ptr<mpc::sequencer::NoteOnEvent> mpc::audiomidi::MpcMidiInput::handleNoteOn(mpc::engine::midi::ShortMessage* msg, const int& timeStamp)
+std::shared_ptr<mpc::sequencer::NoteOnEvent> MpcMidiInput::handleNoteOn(mpc::engine::midi::ShortMessage* msg, const int& timeStamp)
 {
     auto midiNoteOn = std::make_shared<NoteOnEventPlayOnly>(msg);
     int trackNumber;
@@ -363,7 +362,7 @@ std::shared_ptr<mpc::sequencer::NoteOnEvent> mpc::audiomidi::MpcMidiInput::handl
     return midiNoteOn;
 }
 
-std::shared_ptr<mpc::sequencer::NoteOffEvent> mpc::audiomidi::MpcMidiInput::handleNoteOff(mpc::engine::midi::ShortMessage* msg, const int& timeStamp)
+std::shared_ptr<mpc::sequencer::NoteOffEvent> MpcMidiInput::handleNoteOff(mpc::engine::midi::ShortMessage* msg, const int& timeStamp)
 {
     int note = msg->getData1();
     int trackNumber;
@@ -451,7 +450,7 @@ std::shared_ptr<mpc::sequencer::NoteOffEvent> mpc::audiomidi::MpcMidiInput::hand
     return nullptr;
 }
 
-std::shared_ptr<mpc::sequencer::MidiClockEvent> mpc::audiomidi::MpcMidiInput::handleMidiClock(mpc::engine::midi::ShortMessage* msg)
+std::shared_ptr<mpc::sequencer::MidiClockEvent> MpcMidiInput::handleMidiClock(ShortMessage* msg, const double framePos)
 {
     auto mce = std::make_shared<mpc::sequencer::MidiClockEvent>(msg->getStatus());
     auto syncScreen = mpc.screens->get<SyncScreen>("sync");
@@ -460,16 +459,21 @@ std::shared_ptr<mpc::sequencer::MidiClockEvent> mpc::audiomidi::MpcMidiInput::ha
     {
         switch (mce->getStatus())
         {
+
         case ShortMessage::START:
-            sequencer->playFromStart();
+            // TODO Arm sequencer to start playing when the next TIMING_CLOCK event comes in.
+//            sequencer->playFromStart();
+            midiClockInput.handleStartMessage();
             break;
         case ShortMessage::CONTINUE:
-            sequencer->play();
+            // TODO Arm sequencer to continue playing when the next TIMING_CLOCK event comes in.
+//            sequencer->play();
             break;
         case ShortMessage::STOP:
             sequencer->stop();
             break;
         case ShortMessage::TIMING_CLOCK:
+            midiClockInput.handleTimingMessage(framePos);
             break;
         }
     }
@@ -506,4 +510,9 @@ void MpcMidiInput::handleChannelPressure(mpc::engine::midi::ShortMessage* msg)
             //}
         }
     }
+}
+
+void MpcMidiInput::setSampleRate(double sampleRate)
+{
+    midiClockInput.setSampleRate(sampleRate);
 }
