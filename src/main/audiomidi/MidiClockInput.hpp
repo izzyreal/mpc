@@ -8,12 +8,13 @@ namespace mpc::audiomidi {
     public:
         MidiClockInput();
         void handleTimingMessage(double bufOffsetMs);
+        void handleStartMessage();
 
     private:
-        unsigned int DELTA_COUNT = 30;
+        unsigned int DELTA_COUNT = 100;
         std::vector<double> deltas = std::vector<double>(DELTA_COUNT);
         unsigned int deltaPointer = 0;
         std::chrono::time_point<std::chrono::high_resolution_clock, std::chrono::nanoseconds> previousNow;
-        std::chrono::time_point<std::chrono::high_resolution_clock, std::chrono::nanoseconds> zero;
+        const std::chrono::time_point<std::chrono::high_resolution_clock, std::chrono::nanoseconds> zero;
     };
 }

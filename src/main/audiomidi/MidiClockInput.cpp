@@ -15,6 +15,14 @@ void MidiClockInput::handleTimingMessage(double bufOffsetSeconds)
 {
     const auto now = std::chrono::high_resolution_clock::now();
 
+    const bool firstCall = previousNow == zero;
+
+    if (firstCall)
+    {
+        previousNow = now;
+        return;
+    }
+
     unsigned long delta = std::chrono::duration_cast<std::chrono::nanoseconds>(now-previousNow).count();
 
     const double deltaInSeconds = (delta / 1000000000.0) + (bufOffsetSeconds / 1000);
@@ -34,4 +42,9 @@ void MidiClockInput::handleTimingMessage(double bufOffsetSeconds)
     auto averageBpm = (1.0 / (averageDelta * 24.0)) * 60.0;
 
     printf("Avg BPM: %f\n", averageBpm);
+}
+
+void MidiClockInput::handleStartMessage()
+{
+    previousNow = zero;
 }

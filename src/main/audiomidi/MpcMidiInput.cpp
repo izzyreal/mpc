@@ -463,11 +463,15 @@ std::shared_ptr<mpc::sequencer::MidiClockEvent> MpcMidiInput::handleMidiClock(Sh
     {
         switch (mce->getStatus())
         {
+
         case ShortMessage::START:
-            sequencer->playFromStart();
+            // TODO Arm sequencer to start playing when the next TIMING_CLOCK event comes in.
+//            sequencer->playFromStart();
+            midiClockInput.handleStartMessage();
             break;
         case ShortMessage::CONTINUE:
-            sequencer->play();
+            // TODO Arm sequencer to continue playing when the next TIMING_CLOCK event comes in.
+//            sequencer->play();
             break;
         case ShortMessage::STOP:
             sequencer->stop();
