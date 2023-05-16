@@ -28,6 +28,7 @@
 #include <sequencer/Track.hpp>
 #include <sequencer/NoteEvent.hpp>
 
+#include <engine/audio/server/NonRealTimeAudioServer.hpp>
 #include <engine/midi/MidiMessage.hpp>
 #include <engine/midi/ShortMessage.hpp>
 
@@ -38,6 +39,7 @@ using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::engine::midi;
+using namespace mpc::engine::audio::server;
 
 MpcMidiInput::MpcMidiInput(mpc::Mpc &_mpc, int _index)
         : mpc(_mpc),
@@ -60,14 +62,16 @@ void MpcMidiInput::transport(MidiMessage *midiMsg, int timeStamp)
         midiFullControl->processMidiInputEvent(mpc, msg);
         return;
     }
+
     std::shared_ptr<mpc::sequencer::Event> event;
+
     if (midiInputScreen->getReceiveCh() != -1 && msg->getChannel() != midiInputScreen->getReceiveCh())
     {
         return;
     }
     else if (msg->isMidiClock())
     {
-        event = handleMidiClock(msg);
+        event = handleMidiClock(msg, timeStamp);
     }
     else if (msg->isNoteOn() || msg->isNoteOff())
     {
@@ -450,7 +454,7 @@ std::shared_ptr<mpc::sequencer::NoteOffEvent> MpcMidiInput::handleNoteOff(mpc::e
     return nullptr;
 }
 
-std::shared_ptr<mpc::sequencer::MidiClockEvent> MpcMidiInput::handleMidiClock(mpc::engine::midi::ShortMessage* msg)
+std::shared_ptr<mpc::sequencer::MidiClockEvent> MpcMidiInput::handleMidiClock(ShortMessage* msg, const int bufOffset)
 {
     auto mce = std::make_shared<mpc::sequencer::MidiClockEvent>(msg->getStatus());
     auto syncScreen = mpc.screens->get<SyncScreen>("sync");
@@ -469,8 +473,13 @@ std::shared_ptr<mpc::sequencer::MidiClockEvent> MpcMidiInput::handleMidiClock(mp
             sequencer->stop();
             break;
         case ShortMessage::TIMING_CLOCK:
-            midiClockInput.handleTimingMessage();
+        {
+            auto server = mpc.getAudioMidiServices()->getAudioServer();
+            auto sr = server->getSampleRate();
+            auto bufOffsetMs = bufOffset * (1.0/sr);
+            midiClockInput.handleTimingMessage(bufOffsetMs);
             break;
+        }
         }
     }
     return mce;
