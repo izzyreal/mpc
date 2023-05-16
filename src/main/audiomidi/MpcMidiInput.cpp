@@ -56,7 +56,7 @@ void MpcMidiInput::transport(MidiMessage *midiMsg, int timeStamp)
     auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
     auto midiInputScreen = mpc.screens->get<MidiInputScreen>("midi-input");
 
-    if (vmpcSettingsScreen->midiControlMode == VmpcSettingsScreen::MidiControlMode::VMPC)
+    if (!msg->isMidiClock() && vmpcSettingsScreen->midiControlMode == VmpcSettingsScreen::MidiControlMode::VMPC)
     {
         midiFullControl->processMidiInputEvent(mpc, msg);
         return;
@@ -296,7 +296,7 @@ void MpcMidiInput::transportOmni(MidiMessage *msg, std::string outputLetter)
     }
 }
 
-std::shared_ptr<mpc::sequencer::NoteOnEvent> mpc::audiomidi::MpcMidiInput::handleNoteOn(mpc::engine::midi::ShortMessage* msg, const int& timeStamp)
+std::shared_ptr<mpc::sequencer::NoteOnEvent> MpcMidiInput::handleNoteOn(mpc::engine::midi::ShortMessage* msg, const int& timeStamp)
 {
     auto midiNoteOn = std::make_shared<NoteOnEventPlayOnly>(msg);
     int trackNumber;
@@ -363,7 +363,7 @@ std::shared_ptr<mpc::sequencer::NoteOnEvent> mpc::audiomidi::MpcMidiInput::handl
     return midiNoteOn;
 }
 
-std::shared_ptr<mpc::sequencer::NoteOffEvent> mpc::audiomidi::MpcMidiInput::handleNoteOff(mpc::engine::midi::ShortMessage* msg, const int& timeStamp)
+std::shared_ptr<mpc::sequencer::NoteOffEvent> MpcMidiInput::handleNoteOff(mpc::engine::midi::ShortMessage* msg, const int& timeStamp)
 {
     int note = msg->getData1();
     int trackNumber;
@@ -451,7 +451,7 @@ std::shared_ptr<mpc::sequencer::NoteOffEvent> mpc::audiomidi::MpcMidiInput::hand
     return nullptr;
 }
 
-std::shared_ptr<mpc::sequencer::MidiClockEvent> mpc::audiomidi::MpcMidiInput::handleMidiClock(mpc::engine::midi::ShortMessage* msg)
+std::shared_ptr<mpc::sequencer::MidiClockEvent> MpcMidiInput::handleMidiClock(mpc::engine::midi::ShortMessage* msg)
 {
     auto mce = std::make_shared<mpc::sequencer::MidiClockEvent>(msg->getStatus());
     auto syncScreen = mpc.screens->get<SyncScreen>("sync");
