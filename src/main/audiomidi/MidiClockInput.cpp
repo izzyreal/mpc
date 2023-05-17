@@ -1,11 +1,14 @@
 #include "MidiClockInput.hpp"
 
+#include "Mpc.hpp"
+#include "sequencer/Sequencer.hpp"
+
 #include <cstdio>
 #include <numeric>
 
 using namespace mpc::audiomidi;
 
-MidiClockInput::MidiClockInput()
+MidiClockInput::MidiClockInput(mpc::Mpc& mpcToUse) : mpc(mpcToUse)
 {
     const double delta120Bpm = 1.0 / 48.0;
     std::fill(deltas.begin(), deltas.end(), delta120Bpm);
@@ -17,17 +20,25 @@ void MidiClockInput::handleTimingMessage(double bufOffsetSeconds)
 
     const bool firstCall = previousNow == zero;
 
+    if (startIsArmed)
+    {
+        startIsArmed = false;
+        mpc.getSequencer()->playFromStart();
+    }
+
     if (firstCall)
     {
         previousNow = now;
         return;
     }
 
+
+
     unsigned long delta = std::chrono::duration_cast<std::chrono::nanoseconds>(now-previousNow).count();
 
     const double deltaInSeconds = (delta / 1000000000.0) + (bufOffsetSeconds / 1000);
 
-    printf("D: %f\n", deltaInSeconds);
+//    printf("D: %f\n", deltaInSeconds);
 
     deltas[deltaPointer++] = deltaInSeconds;
 
@@ -41,10 +52,13 @@ void MidiClockInput::handleTimingMessage(double bufOffsetSeconds)
 
     auto averageBpm = (1.0 / (averageDelta * 24.0)) * 60.0;
 
-    printf("Avg BPM: %f\n", averageBpm);
+//    printf("Avg BPM: %f\n", averageBpm);
+
+    mpc.getSequencer()->setTempo(averageBpm);
 }
 
 void MidiClockInput::handleStartMessage()
 {
     previousNow = zero;
+    startIsArmed = true;
 }

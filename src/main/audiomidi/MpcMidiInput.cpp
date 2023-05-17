@@ -46,7 +46,8 @@ MpcMidiInput::MpcMidiInput(mpc::Mpc &_mpc, int _index)
           sequencer(_mpc.getSequencer()),
           sampler(_mpc.getSampler()),
           index(_index),
-          midiFullControl(std::make_unique<VmpcMidiControlMode>())
+          midiFullControl(std::make_unique<VmpcMidiControlMode>()),
+          midiClockInput(_mpc)
 {
 }
 
