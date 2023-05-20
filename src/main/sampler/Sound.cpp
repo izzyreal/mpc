@@ -1,5 +1,7 @@
 #include <sampler/Sound.hpp>
 
+#include <cassert>
+
 using namespace mpc::sampler;
 
 Sound::Sound(int rate)
