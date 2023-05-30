@@ -21,7 +21,7 @@ set(CATCH_CONFIG_NO_CPP17_UNCAUGHT_EXCEPTIONS ON)
 
 FetchContent_Declare(Catch2
   GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-  GIT_TAG        v3.1.0
+  GIT_TAG        v3.3.2
   SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/Catch2
 )
 
