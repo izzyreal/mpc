@@ -199,9 +199,12 @@ void BaseControls::pad(int padIndexWithBank, int velo)
     
     auto controls = mpc.getControls();
     auto hardware = mpc.getHardware();
+
+    const bool padWasNotDown = !controls->isPadPressed(padIndexWithBank);
+
     controls->pressPad(padIndexWithBank);
 
-    if (controls->isTapPressed() && sequencer->isPlaying())
+    if ((controls->isNoteRepeatLocked() || controls->isTapPressed()) && sequencer->isPlaying() && padWasNotDown)
     {
         return;
     }
@@ -213,10 +216,7 @@ void BaseControls::pad(int padIndexWithBank, int velo)
 
     if (sequencer->isRecordingOrOverdubbing() && mpc.getControls()->isErasePressed())
         return;
-    
-    if (controls->isNoteRepeatLocked())
-        return;
-    
+
     auto note = track->getBus() > 0 ? program->getPad(padIndexWithBank)->getNote() : padIndexWithBank + 35;
     auto velocity = velo;
 
@@ -672,8 +672,8 @@ void BaseControls::mainScreen()
 void BaseControls::tap()
 {
     init();
-    auto controls = mpc.getControls();
-    controls->setTapPressed(true);
+
+    mpc.getControls()->setTapPressed(true);
     sequencer->tap();
 }
 

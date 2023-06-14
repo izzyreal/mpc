@@ -119,6 +119,13 @@ void SequencerScreen::erase()
 
 void SequencerScreen::tap()
 {
+    auto controls = mpc.getControls();
+
+    if (controls->isTapPressed())
+    {
+        return;
+    }
+
     if (sequencer->isPlaying())
     {
         if (mpc.getControls()->isNoteRepeatLocked())
@@ -236,7 +243,7 @@ void SequencerScreen::displayDeviceName()
 	else if (track->getBus() == 0)
 	{
 		if (track->getDeviceIndex() == 0)
-			findLabel("devicename")->setText("NewPgm-A");
+			findLabel("devicename")->setText(" ");
 		else
 			findLabel("devicename")->setText(sequencer->getActiveSequence()->getDeviceName(track->getDeviceIndex()));
 	}

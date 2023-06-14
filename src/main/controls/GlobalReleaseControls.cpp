@@ -17,7 +17,6 @@
 #include <lcdgui/screens/StepEditorScreen.hpp>
 #include <lcdgui/screens/DrumScreen.hpp>
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
-#include <lcdgui/screens/window/Assign16LevelsScreen.hpp>
 #include <lcdgui/screens/window/StepEditOptionsScreen.hpp>
 
 using namespace mpc::lcdgui;
@@ -107,14 +106,10 @@ void GlobalReleaseControls::simplePad(int padIndexWithBank)
 		return;
 	}
 
-    auto note = program ? program->getPad(padIndexWithBank)->getNote() : padIndexWithBank + 35;
-
 	if (sequencer->isRecordingOrOverdubbing())
 	{
 		track->finalizeNoteEventASync(recordOnEvent);
 	}
-
-	//bool posIsLastTick = sequencer->getTickPosition() == sequencer->getActiveSequence()->getLastTick();
 
 	bool recWithoutPlaying = controls->isRecMainWithoutPlaying();
 	bool stepRec = controls->isStepRecording();

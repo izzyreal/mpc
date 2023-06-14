@@ -127,7 +127,7 @@ bool mpc::controls::Controls::isRecMainWithoutPlaying()
 
 bool mpc::controls::Controls::isPadPressed(int pad)
 {
-	return pressedPads.find(pad) != pressedPads.end();
+	return pressedPads.count(pad) > 0;
 }
 
 bool mpc::controls::Controls::arePadsPressed()
@@ -162,7 +162,12 @@ void Controls::setNoteRepeatLocked(bool b)
 
 void mpc::controls::Controls::pressPad(int pad)
 {
-	pressedPads[pad]++;
+    if (!pressedPads.emplace(pad, 0).second)
+    {
+        pressedPads[pad]++;
+    }
+
+    assert(pressedPads.count(pad) > 0);
 }
 
 void mpc::controls::Controls::unpressPad(int pad)
