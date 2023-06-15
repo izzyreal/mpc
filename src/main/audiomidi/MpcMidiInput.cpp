@@ -329,8 +329,6 @@ std::shared_ptr<mpc::sequencer::NoteOnEvent> mpc::audiomidi::MpcMidiInput::handl
         }
     }
 
-
-
     if (pad != -1)
     {
         mpc.getActiveControls()->pad(pad, playMidiNoteOn->getVelocity());
@@ -338,9 +336,11 @@ std::shared_ptr<mpc::sequencer::NoteOnEvent> mpc::audiomidi::MpcMidiInput::handl
     }
     else
     {
+        mpc.getControls()->getBaseControls()->various(playMidiNoteOn->getNote());
+        mpc.getEventHandler()->handleNoThru(playMidiNoteOn, track.get(), timeStamp);
         storePlayNoteEvent(std::pair<int, int>(trackNumber, playMidiNoteOn->getNote()), playMidiNoteOn);
-        auto recordMidiNoteOn = std::make_shared<NoteOnEvent>(msg);
         
+        auto recordMidiNoteOn = std::make_shared<NoteOnEvent>(msg);
         if (sequencer->isRecordingOrOverdubbing())
         {
             recordMidiNoteOn = track->recordNoteEventASync(playMidiNoteOn->getNote(), playMidiNoteOn->getVelocity());
