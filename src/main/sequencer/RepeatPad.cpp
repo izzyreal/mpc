@@ -2,10 +2,13 @@
 
 #include "Mpc.hpp"
 #include "Util.hpp"
+#include "audiomidi/MpcMidiOutput.hpp"
+#include "audiomidi/AudioMidiServices.hpp"
 #include "hardware/Hardware.hpp"
 #include "hardware/HwPad.hpp"
 #include "hardware/TopPanel.hpp"
 #include "sequencer/Track.hpp"
+#include "sequencer/FrameSeq.hpp"
 #include "sequencer/SeqUtil.hpp"
 #include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 
@@ -27,12 +30,13 @@ void RepeatPad::process(mpc::Mpc& mpc,
     auto sequencer = mpc.getSequencer();
     auto track = sequencer->getActiveTrack();
 
-    if (track->getBus() == 0)
+    std::shared_ptr<mpc::sampler::Program> program;
+
+    if (track->getBus() > 0)
     {
-        return;
+        program = mpc.getSampler()->getProgram(mpc.getDrum(track->getBus() - 1).getProgram());
     }
 
-    auto program = mpc.getSampler()->getProgram(mpc.getDrum(track->getBus() - 1).getProgram());
     auto hardware = mpc.getHardware();
     auto fullLevel = hardware->getTopPanel()->isFullLevelEnabled();
     auto sixteenLevels = hardware->getTopPanel()->isSixteenLevelsEnabled();
@@ -44,59 +48,85 @@ void RepeatPad::process(mpc::Mpc& mpc,
     {
         if (!p->isPressed()) continue;
 
-        if (!sixteenLevels)
+        if (!sixteenLevels && program)
         {
             auto padIndex = p->getPadIndexWithBankWhenLastPressed();
             note = program->getNoteFromPad(padIndex);
         }
 
-        if (note != 34)
+        auto noteEvent = std::make_shared<NoteOnEvent>(note);
+        noteEvent->setTick(static_cast<int>(tickPosition));
+
+        if (program)
         {
-            auto noteEvent = std::make_shared<NoteOnEvent>(note);
-            noteEvent->setTick(static_cast<int>(tickPosition));
             mpc::Util::setSliderNoteVariationParameters(mpc, noteEvent, program);
+        }
 
-            if (sixteenLevels)
-            {
-                noteEvent->setVelocity(127);
-                mpc::Util::set16LevelsValues(mpc, noteEvent, p->getIndex());
-                note = noteEvent->getNote();
-            }
-            else
-            {
-                noteEvent->setVelocity(fullLevel ? 127 : p->getPressure());
-            }
+        if (sixteenLevels)
+        {
+            noteEvent->setVelocity(127);
+            mpc::Util::set16LevelsValues(mpc, noteEvent, p->getIndex());
+            note = noteEvent->getNote();
+        }
+        else
+        {
+            noteEvent->setVelocity(fullLevel ? 127 : p->getPressure());
+        }
 
-            noteEvent->setDuration(durationTicks);
+        noteEvent->setDuration(durationTicks);
 
-            noteEvent->getNoteOff()->setTick(static_cast<int>(tickPosition) + durationTicks);
+        noteEvent->getNoteOff()->setTick(static_cast<int>(tickPosition) + durationTicks);
 
-            auto newVelo = static_cast<int>(noteEvent->getVelocity() * (track->getVelocityRatio() * 0.01));
+        const auto velocityBeforeTrackVelocityRatioApplied = noteEvent->getVelocity();
 
-            auto durationFrames = static_cast<int>(durationTicks == -1 ? -1 :
-                    SeqUtil::ticksToFrames(durationTicks, tempo, sampleRate));
+        noteEvent->setVelocity(noteEvent->getVelocity() * (track->getVelocityRatio() * 0.01));
 
+        const auto durationFrames = static_cast<int>(durationTicks == -1 ? -1 :
+                                               SeqUtil::ticksToFrames(durationTicks, tempo, sampleRate));
+
+        if (track->getBus() > 0 && note != 34)
+        {
             auto voiceOverlap = program->getNoteParameters(note)->getVoiceOverlap();
 
-            mpc.getDrum(track->getBus() - 1).mpcNoteOff(note, 0, 0);
             mpc.getDrum(track->getBus() - 1).mpcNoteOn(
-                note, newVelo, noteEvent->getVariationType(), noteEvent->getVariationValue(), eventFrameOffset, true, -1,
+                note, noteEvent->getVelocity(), noteEvent->getVariationType(), noteEvent->getVariationValue(), eventFrameOffset, true, -1,
                 voiceOverlap == 2 ? durationFrames : -1);
-
-            if (!sixteenLevels)
-            {
-                p->notifyObservers(newVelo);
-            }
-            else
-            {
-                auto sixteenLevelsPad = program->getPadIndexFromNote(note) % 16;
-                hardware->getPad(sixteenLevelsPad)->notifyObservers(newVelo);
-            }
-
-            if (sequencer->isRecordingOrOverdubbing())
-            {
-                track->insertEventWhileRetainingSort(noteEvent);
-            }
         }
+
+        if (track->getDeviceIndex() > 0)
+        {
+            const auto noteOnMsg = noteEvent->createShortMessage((track->getDeviceIndex() - 1) % 16);
+            noteOnMsg->bufferPos = eventFrameOffset;
+            mpc.getMidiOutput()->enqueueMessageOutputA(noteOnMsg);
+        }
+
+        if (sequencer->isRecordingOrOverdubbing())
+        {
+            noteEvent->setVelocity(velocityBeforeTrackVelocityRatioApplied);
+            track->insertEventWhileRetainingSort(noteEvent);
+        }
+
+        mpc.getAudioMidiServices()->getFrameSequencer()->enqueueEventAfterNFrames(
+                [&mpc, track, note, noteEvent, tickPosition, sixteenLevels, hardware, program, p]
+                (const int bufferOffset){
+            if (track->getBus() > 0)
+            {
+                mpc.getDrum(track->getBus() - 1).mpcNoteOff(note, bufferOffset, tickPosition);
+            }
+
+            if (track->getDeviceIndex() > 0)
+            {
+                const auto noteOffMsg = noteEvent->getNoteOff()->createShortMessage((track->getDeviceIndex() - 1) % 16);
+                noteOffMsg->bufferPos = bufferOffset;
+                mpc.getMidiOutput()->enqueueMessageOutputA(noteOffMsg);
+            }
+            const auto padToNotify = sixteenLevels ? hardware->getPad(program->getPadIndexFromNote(note) % 16) : p;
+
+            padToNotify->notifyObservers(255);
+        }, durationFrames - 1);
+
+        const auto padToNotify = sixteenLevels ? hardware->getPad(program->getPadIndexFromNote(note) % 16) : p;
+
+        padToNotify->notifyObservers(noteEvent->getVelocity());
     }
 }
