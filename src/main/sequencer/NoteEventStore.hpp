@@ -38,7 +38,6 @@ namespace mpc::sequencer
 	template<typename IndexType>
 	inline std::shared_ptr<NoteOnEventPlayOnly> NoteEventStore<IndexType>::retrievePlayNoteEvent(IndexType index)
 	{
-		assert(!playStore[index].empty());
 		if (playStore[index].empty()) return nullptr;
 		auto event = playStore[index].front();
 		playStore[index].pop();
@@ -53,7 +52,6 @@ namespace mpc::sequencer
 	template<typename IndexType>
 	inline std::shared_ptr<NoteOnEvent> NoteEventStore<IndexType>::retrieveRecordNoteEvent(IndexType index)
 	{
-		assert(!recordStore[index].empty());
 		if (recordStore[index].empty()) return nullptr;
 		auto event = recordStore[index].front();
 		recordStore[index].pop();
