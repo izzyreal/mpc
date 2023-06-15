@@ -1,4 +1,5 @@
 #include "GlobalReleaseControls.hpp"
+#include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 
 #include <Mpc.hpp>
 #include <audiomidi/AudioMidiServices.hpp>
@@ -17,7 +18,6 @@
 #include <lcdgui/screens/StepEditorScreen.hpp>
 #include <lcdgui/screens/DrumScreen.hpp>
 #include <lcdgui/screens/window/TimingCorrectScreen.hpp>
-#include <lcdgui/screens/window/Assign16LevelsScreen.hpp>
 #include <lcdgui/screens/window/StepEditOptionsScreen.hpp>
 
 using namespace mpc::lcdgui;
@@ -94,6 +94,20 @@ void GlobalReleaseControls::simplePad(int padIndexWithBank)
 	init();
 
 	auto controls = mpc.getControls();
+
+    if (currentScreenName == "sequencer" && sequencer->isPlaying())
+    {
+        auto padIndexToNotify = padIndexWithBank % 16;
+
+        if (program && mpc.getHardware()->getTopPanel()->isSixteenLevelsEnabled())
+        {
+            auto assign16LevelsScreen = mpc.screens->get<Assign16LevelsScreen>("assign-16-levels");
+            padIndexToNotify = program->getPadIndexFromNote(assign16LevelsScreen->getNote()) % 16;
+        }
+
+        mpc.getHardware()->getPad(padIndexToNotify)->notifyObservers(255);
+    }
+
 	controls->unpressPad(padIndexWithBank);
 
 	auto playOnEvent = controls->retrievePlayNoteEvent(padIndexWithBank);
@@ -106,8 +120,6 @@ void GlobalReleaseControls::simplePad(int padIndexWithBank)
 	{
 		return;
 	}
-
-    auto note = program ? program->getPad(padIndexWithBank)->getNote() : padIndexWithBank + 35;
 
 	if (sequencer->isRecordingOrOverdubbing())
 	{

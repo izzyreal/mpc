@@ -19,10 +19,15 @@ void RepeatPad::process(mpc::Mpc& mpc,
                         double tempo,
                         float sampleRate)
 {
+    if (mpc.getLayeredScreen()->getCurrentScreenName() != "sequencer")
+    {
+        return;
+    }
+
     auto sequencer = mpc.getSequencer();
     auto track = sequencer->getActiveTrack();
 
-    if (!mpc.getControls()->getBaseControls()->currentScreenAllowsPlay() || track->getBus() == 0)
+    if (track->getBus() == 0)
     {
         return;
     }
@@ -55,6 +60,7 @@ void RepeatPad::process(mpc::Mpc& mpc,
             {
                 noteEvent->setVelocity(127);
                 mpc::Util::set16LevelsValues(mpc, noteEvent, p->getIndex());
+                note = noteEvent->getNote();
             }
             else
             {

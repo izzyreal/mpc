@@ -119,6 +119,11 @@ void SequencerScreen::erase()
 
 void SequencerScreen::tap()
 {
+    if (mpc.getControls()->isTapPressed())
+    {
+        return;
+    }
+
     if (sequencer->isPlaying())
     {
         if (mpc.getControls()->isNoteRepeatLocked())
@@ -144,6 +149,7 @@ void SequencerScreen::shift()
     {
         mpc.getControls()->setNoteRepeatLocked(true);
     }
+
     ScreenComponent::shift();
 }
 
