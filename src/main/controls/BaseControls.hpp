@@ -39,6 +39,7 @@ namespace mpc::controls {
 	public:
 		BaseControls(mpc::Mpc&);
 
+        bool currentScreenAllowsPlay();
         bool collectionContainsCurrentScreen(const std::vector<std::string>&);
         const static std::vector<std::string> samplerScreens;
 
@@ -102,8 +103,8 @@ namespace mpc::controls {
 		std::shared_ptr<mpc::sampler::Sampler> sampler;
 		std::shared_ptr<mpc::sequencer::Track> track;
 		std::string currentScreenName;
-		const static std::vector<std::string> allowTransportScreens;
-		const static std::vector<std::string> allowPlayScreens;
+		const static std::vector<std::string> screensThatAllowPlayAndRecord;
+		const static std::vector<std::string> screensThatOnlyAllowPlay;
 		const static std::vector<std::string> allowCentralNoteAndPadUpdateScreens;
 		void generateNoteOn(int note, int velo, int padIndexWithBank);
 

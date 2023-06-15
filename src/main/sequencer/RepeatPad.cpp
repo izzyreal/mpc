@@ -22,7 +22,7 @@ void RepeatPad::process(mpc::Mpc& mpc,
     auto sequencer = mpc.getSequencer();
     auto track = sequencer->getActiveTrack();
 
-    if (mpc.getLayeredScreen()->getCurrentScreenName() != "sequencer" || track->getBus() == 0)
+    if (!mpc.getControls()->getBaseControls()->currentScreenAllowsPlay() || track->getBus() == 0)
     {
         return;
     }

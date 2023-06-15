@@ -248,9 +248,12 @@ void BaseControls::pad(int padIndexWithBank, int velo)
     
     auto controls = mpc.getControls();
     auto hardware = mpc.getHardware();
+
+    const auto padWasNotPressed = !controls->isPadPressed(padIndexWithBank);
+
     controls->pressPad(padIndexWithBank);
 
-    if (controls->isTapPressed() && sequencer->isPlaying())
+    if ((controls->isTapPressed() || controls->isNoteRepeatLocked()) && sequencer->isPlaying() && padWasNotPressed)
     {
         return;
     }
@@ -477,7 +480,7 @@ void BaseControls::rec()
 {
     init();
 
-    if (collectionContainsCurrentScreen(allowPlayScreens))
+    if (collectionContainsCurrentScreen(screensThatOnlyAllowPlay))
     {
         return;
     }
@@ -499,7 +502,7 @@ void BaseControls::rec()
         sequencer->setOverdubbing(false);
     }
 
-    if (!collectionContainsCurrentScreen(allowTransportScreens))
+    if (!collectionContainsCurrentScreen(screensThatAllowPlayAndRecord))
     {
         ls->openScreen("sequencer");
     }
@@ -509,7 +512,7 @@ void BaseControls::overDub()
 {
     init();
 
-    if (collectionContainsCurrentScreen(allowPlayScreens))
+    if (collectionContainsCurrentScreen(screensThatOnlyAllowPlay))
     {
         return;
     }
@@ -526,8 +529,10 @@ void BaseControls::overDub()
         sequencer->setOverdubbing(false);
     }
 
-    if (find(begin(allowTransportScreens), end(allowTransportScreens), currentScreenName) == end(allowTransportScreens))
+    if (!collectionContainsCurrentScreen(screensThatAllowPlayAndRecord))
+    {
         ls->openScreen("sequencer");
+    }
 }
 
 void BaseControls::stop()
@@ -546,7 +551,7 @@ void BaseControls::stop()
     
     sequencer->stop();
     
-    if (!collectionContainsCurrentScreen(allowPlayScreens) && !collectionContainsCurrentScreen(allowTransportScreens))
+    if (!currentScreenAllowsPlay())
     {
         ls->openScreen("sequencer");
     }
@@ -583,15 +588,19 @@ void BaseControls::play()
     {
         if (controls->isRecPressed())
         {
-            if (find(begin(allowTransportScreens), end(allowTransportScreens), currentScreenName) == end(allowTransportScreens))
+            if (!collectionContainsCurrentScreen(screensThatAllowPlayAndRecord))
+            {
                 ls->openScreen("sequencer");
+            }
             
             sequencer->rec();
         }
         else if (controls->isOverDubPressed())
         {
-            if (find(begin(allowTransportScreens), end(allowTransportScreens), currentScreenName) == end(allowTransportScreens))
+            if (!collectionContainsCurrentScreen(screensThatAllowPlayAndRecord))
+            {
                 ls->openScreen("sequencer");
+            }
             
             sequencer->overdub();
         }
@@ -602,7 +611,7 @@ void BaseControls::play()
             }
             else
             {
-                if (!collectionContainsCurrentScreen(allowPlayScreens) && !collectionContainsCurrentScreen(allowTransportScreens))
+                if (!currentScreenAllowsPlay())
                 {
                     ls->openScreen("sequencer");
                 }
@@ -627,15 +636,19 @@ void BaseControls::playStart()
     
     if (controls->isRecPressed())
     {
-        if (find(begin(allowTransportScreens), end(allowTransportScreens), currentScreenName) == end(allowTransportScreens))
+        if (!collectionContainsCurrentScreen(screensThatAllowPlayAndRecord))
+        {
             ls->openScreen("sequencer");
+        }
         
         sequencer->recFromStart();
     }
     else if (controls->isOverDubPressed())
     {
-        if (find(begin(allowTransportScreens), end(allowTransportScreens), currentScreenName) == end(allowTransportScreens))
+        if (!collectionContainsCurrentScreen(screensThatAllowPlayAndRecord))
+        {
             ls->openScreen("sequencer");
+        }
         
         sequencer->overdubFromStart();
     }
@@ -647,7 +660,7 @@ void BaseControls::playStart()
         }
         else
         {
-            if (!collectionContainsCurrentScreen(allowPlayScreens) && !collectionContainsCurrentScreen(allowTransportScreens))
+            if (!currentScreenAllowsPlay())
             {
                 ls->openScreen("sequencer");
             }
@@ -905,6 +918,12 @@ void BaseControls::splitRight()
     }
 }
 
+
+bool BaseControls::currentScreenAllowsPlay()
+{
+    return collectionContainsCurrentScreen(screensThatOnlyAllowPlay) || collectionContainsCurrentScreen(screensThatAllowPlayAndRecord);
+}
+
 bool BaseControls::collectionContainsCurrentScreen(const std::vector<std::string>& v)
 {
     return find(
@@ -914,7 +933,7 @@ bool BaseControls::collectionContainsCurrentScreen(const std::vector<std::string
     ) != v.end();
 }
 
-const std::vector<std::string> BaseControls::allowPlayScreens {
+const std::vector<std::string> BaseControls::screensThatOnlyAllowPlay {
     "song",
     "track-mute",
     "next-seq",
@@ -933,7 +952,7 @@ const std::vector<std::string> BaseControls::allowCentralNoteAndPadUpdateScreens
     "load-a-sound"
 };
 
-const std::vector<std::string> BaseControls::allowTransportScreens {
+const std::vector<std::string> BaseControls::screensThatAllowPlayAndRecord {
     "sequencer",
     "select-drum",
     "select-mixer-drum",
@@ -954,7 +973,8 @@ const std::vector<std::string> BaseControls::allowTransportScreens {
     "mute-assign",
     "trans",
     "mixer",
-    "mixer-setup"
+    "mixer-setup",
+    "channel-settings"
 };
 
 const std::vector<std::string> BaseControls::samplerScreens {
@@ -979,6 +999,8 @@ const std::vector<std::string> BaseControls::samplerScreens {
     "drum",
     "loop",
     "mixer",
+    "mixer-setup",
+    "channel-settings",
     "program-assign",
     "program-params",
     "select-drum",

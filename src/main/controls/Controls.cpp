@@ -162,7 +162,12 @@ void Controls::setNoteRepeatLocked(bool b)
 
 void mpc::controls::Controls::pressPad(int pad)
 {
-	pressedPads[pad]++;
+    if (!pressedPads.emplace(pad, 0).second)
+    {
+        pressedPads[pad]++;
+    }
+
+    assert(pressedPads.count(pad) > 0);
 }
 
 void mpc::controls::Controls::unpressPad(int pad)
