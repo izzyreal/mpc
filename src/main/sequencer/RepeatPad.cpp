@@ -112,6 +112,9 @@ void RepeatPad::process(mpc::Mpc& mpc,
             if (track->getBus() > 0)
             {
                 mpc.getDrum(track->getBus() - 1).mpcNoteOff(note, bufferOffset, tickPosition);
+                const auto padToNotify = sixteenLevels ? hardware->getPad(program->getPadIndexFromNote(note) % 16) : p;
+
+                padToNotify->notifyObservers(255);
             }
 
             if (track->getDeviceIndex() > 0)
@@ -120,9 +123,6 @@ void RepeatPad::process(mpc::Mpc& mpc,
                 noteOffMsg->bufferPos = bufferOffset;
                 mpc.getMidiOutput()->enqueueMessageOutputA(noteOffMsg);
             }
-            const auto padToNotify = sixteenLevels ? hardware->getPad(program->getPadIndexFromNote(note) % 16) : p;
-
-            padToNotify->notifyObservers(255);
         }, durationFrames - 1);
 
         const auto padToNotify = sixteenLevels ? hardware->getPad(program->getPadIndexFromNote(note) % 16) : p;
