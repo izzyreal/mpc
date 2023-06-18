@@ -11,7 +11,6 @@ namespace mpc::audiomidi {
     public:
         int previousDataWheelValue = -1;
 
-        //void processMidiInputEvent(mpc::Mpc &mpc, std::shared_ptr<mpc::engine::midi::ShortMessage> msg);
         void processMidiInputEvent(mpc::Mpc &mpc, mpc::engine::midi::ShortMessage* msg);
     };
 }

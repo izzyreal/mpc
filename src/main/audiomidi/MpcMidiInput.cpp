@@ -51,17 +51,19 @@ MpcMidiInput::MpcMidiInput(mpc::Mpc &_mpc, int _index)
 
 void MpcMidiInput::transport(MidiMessage *midiMsg, int timeStamp)
 {
-    auto msg = dynamic_cast<ShortMessage*>(midiMsg);
+    const auto msg = dynamic_cast<ShortMessage*>(midiMsg);
 
-    auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
-    auto midiInputScreen = mpc.screens->get<MidiInputScreen>("midi-input");
+    const auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
+    const auto midiInputScreen = mpc.screens->get<MidiInputScreen>("midi-input");
 
     if (vmpcSettingsScreen->midiControlMode == VmpcSettingsScreen::MidiControlMode::VMPC)
     {
-        //midiFullControl->processMidiInputEvent(mpc, msg);
-        //return;
+        midiFullControl->processMidiInputEvent(mpc, msg);
+        return;
     }
+
     std::shared_ptr<mpc::sequencer::Event> event;
+
     if (midiInputScreen->getReceiveCh() != -1 && msg->getChannel() != midiInputScreen->getReceiveCh())
     {
         return;
@@ -110,7 +112,7 @@ void MpcMidiInput::transport(MidiMessage *midiMsg, int timeStamp)
         handleChannelPressure(msg);
     }
 
-    if (event)//?????????
+    if (event)
     {
         std::string notificationMessage = std::string(index == 0 ? "a" : "b") + std::to_string(msg->getChannel());
         notifyObservers(notificationMessage);
@@ -452,6 +454,7 @@ std::shared_ptr<mpc::sequencer::NoteOffEvent> mpc::audiomidi::MpcMidiInput::hand
             }
         }  
     }
+
     if (auto storedmidiNoteOn = retrievePlayNoteEvent(std::pair<int, int>(trackNumber, note)))
     {
         mpc.getEventHandler()->handleNoThru(storedmidiNoteOn->getNoteOff(), track.get(), timeStamp);
@@ -494,25 +497,17 @@ void MpcMidiInput::handleChannelPressure(mpc::engine::midi::ShortMessage* msg)
 
     if (bus != 0)
     {
-        auto status = msg->getStatus();
-        auto isChannelPressure =
-                status >= ShortMessage::CHANNEL_PRESSURE && status < ShortMessage::CHANNEL_PRESSURE + 16;
-        if (isChannelPressure)
-        {
-            //auto channelPressureValue = (*msg->getMessage())[1];
+        auto channelPressureValue = (*msg->getMessage())[1];
 
-            //// Alternatively we could process these like note offs,
-            //// but this seems better.
-            //if (channelPressureValue > 0)
-            //{
-            //    for (auto &p: mpc.getHardware()->getPads())
-            //    {
-            //        if (p->isPressed())
-            //        {
-            //            p->setPressure(channelPressureValue);
-            //        }
-            //    }
-            //}
+        if (channelPressureValue > 0)
+        {
+            for (auto &p: mpc.getHardware()->getPads())
+            {
+                if (p->isPressed())
+                {
+                    p->setPressure(channelPressureValue);
+                }
+            }
         }
     }
 }

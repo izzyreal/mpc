@@ -2,6 +2,7 @@
 
 #include "hardware/Hardware.hpp"
 #include "hardware/HwComponent.hpp"
+#include "hardware/HwPad.hpp"
 #include "hardware/DataWheel.hpp"
 #include "hardware/HwSlider.hpp"
 #include "hardware/Pot.hpp"
@@ -20,12 +21,29 @@ void VmpcMidiControlMode::processMidiInputEvent(mpc::Mpc& mpc, mpc::engine::midi
     auto isNoteOn = status >= ShortMessage::NOTE_ON && status < ShortMessage::NOTE_ON + 16;
     auto isNoteOff = status >= ShortMessage::NOTE_OFF && status < ShortMessage::NOTE_OFF + 16;
 
+    auto isChannelPressure = msg->isChannelPressure();
+
+    const auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
+    const auto hardware = mpc.getHardware();
+
+    if (isChannelPressure)
+    {
+        if (const auto newPressure = msg->getData1(); newPressure > 0)
+        {
+            for (auto& p : hardware->getPads())
+            {
+                if (!p->isPressed()) continue;
+                p->setPressure(newPressure);
+            }
+        }
+
+        return;
+    }
+
     if (!isNoteOn && !isNoteOff && !isControl)
     {
         return;
     }
-
-    auto vmpcMidiScreen = mpc.screens->get<VmpcMidiScreen>("vmpc-midi");
 
     if (vmpcMidiScreen->isLearning())
     {
@@ -38,7 +56,6 @@ void VmpcMidiControlMode::processMidiInputEvent(mpc::Mpc& mpc, mpc::engine::midi
         return;
     }
 
-    auto hardware = mpc.getHardware();
     auto dataWheel = hardware->getDataWheel();
 
     for (auto& labelCommand : vmpcMidiScreen->activePreset->rows)
