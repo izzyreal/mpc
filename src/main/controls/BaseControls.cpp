@@ -286,8 +286,7 @@ void BaseControls::generateNoteOn(int note, int padVelo, int padIndexWithBank)
 
     const auto playOnEvent = std::make_shared<NoteOnEventPlayOnly>(note, padVelo);
 
-    const auto padIndex = program ? program->getPadIndexFromNote(note) : -1;
-    Util::set16LevelsValues(mpc, playOnEvent, padIndex);
+    Util::set16LevelsValues(mpc, playOnEvent, padIndexWithBank % 16);
 
     const bool isSliderNote = program && program->getSlider()->getNote() == note;
 
@@ -335,7 +334,7 @@ void BaseControls::generateNoteOn(int note, int padVelo, int padIndexWithBank)
     {
         if (is16LevelsEnabled)
         {
-            Util::set16LevelsValues(mpc, recordNoteOnEvent, padIndex);
+            Util::set16LevelsValues(mpc, recordNoteOnEvent, padIndexWithBank);
         }
 
         if (program && isSliderNote)
