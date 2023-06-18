@@ -20,10 +20,11 @@
 #include <lcdgui/screens/SyncScreen.hpp>
 #include <lcdgui/screens/window/VmpcDirectToDiskRecorderScreen.hpp>
 
-#include <engine/midi/MidiMessage.hpp>
 #include <engine/midi/ShortMessage.hpp>
 
 #include <engine/audio/server/NonRealTimeAudioServer.hpp>
+
+#include <algorithm>
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
@@ -41,7 +42,9 @@ sampler (_mpc.getSampler())
 void EventHandler::handle(const std::shared_ptr<Event>& event, Track* track, char drum)
 {
     if (!track->isOn() && event->getTick() != -1)
+    {
         return;
+    }
 
     handleNoThru(event, track, -1, drum);
     midiOut(event, track);
@@ -79,12 +82,12 @@ void EventHandler::handleNoThru(const std::shared_ptr<Event>& event, Track* trac
             {
                 if (!sequencer->isSoloEnabled() || track->getIndex() == sequencer->getActiveTrackIndex())
                 {
-                    auto newVelo = static_cast<int>(noteOnEvent->getVelocity() * (track->getVelocityRatio() * 0.01));
-                    auto pgmIndex = sampler->getDrumBusProgramIndex(drumIndex + 1);
-                    auto pgm = sampler->getProgram(pgmIndex);
-                    auto voiceOverlap = pgm->getNoteParameters(noteOnEvent->getNote())->getVoiceOverlap();
-                    auto duration = voiceOverlap == 2 ? noteOnEvent->getDuration() : NoteOnEvent::Duration();
-                    auto durationFrames = (duration > 0) ?
+                    const auto newVelo = std::clamp<int>(static_cast<int>(noteOnEvent->getVelocity() * (track->getVelocityRatio() * 0.01)), 1, 127);
+                    const auto pgmIndex = sampler->getDrumBusProgramIndex(drumIndex + 1);
+                    const auto pgm = sampler->getProgram(pgmIndex);
+                    const auto voiceOverlap = pgm->getNoteParameters(noteOnEvent->getNote())->getVoiceOverlap();
+                    const auto duration = voiceOverlap == 2 ? noteOnEvent->getDuration() : NoteOnEvent::Duration();
+                    const auto durationFrames = (duration > 0) ?
                         SeqUtil::ticksToFrames(duration.value(), sequencer->getTempo(), audioServer->getSampleRate()) : - 1;
 
                     mpc.getDrum(drumIndex).mpcNoteOn
