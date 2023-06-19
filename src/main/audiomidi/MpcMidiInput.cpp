@@ -54,7 +54,6 @@ void MpcMidiInput::transport(MidiMessage *midiMsg, int timeStamp)
     const auto msg = dynamic_cast<ShortMessage*>(midiMsg);
 
     const auto vmpcSettingsScreen = mpc.screens->get<VmpcSettingsScreen>("vmpc-settings");
-    const auto midiInputScreen = mpc.screens->get<MidiInputScreen>("midi-input");
 
     if (vmpcSettingsScreen->midiControlMode == VmpcSettingsScreen::MidiControlMode::VMPC)
     {
@@ -63,6 +62,8 @@ void MpcMidiInput::transport(MidiMessage *midiMsg, int timeStamp)
     }
 
     std::shared_ptr<Event> event;
+
+    const auto midiInputScreen = mpc.screens->get<MidiInputScreen>("midi-input");
 
     if (midiInputScreen->getReceiveCh() != -1 && msg->getChannel() != midiInputScreen->getReceiveCh())
     {
