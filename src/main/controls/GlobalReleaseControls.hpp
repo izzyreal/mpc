@@ -15,7 +15,7 @@ namespace mpc::controls {
         void simplePad(int padIndexWithBank);
 
     private:
-        void handlePlayNoteOff(std::shared_ptr<mpc::sequencer::NoteOnEventPlayOnly> onEvent);
+        void handlePlayNoteOff(const std::shared_ptr<mpc::sequencer::NoteOnEventPlayOnly>& onEvent);
 
     public:
         void overDub() override;
