@@ -62,7 +62,7 @@ void MpcMidiInput::transport(MidiMessage *midiMsg, int timeStamp)
         return;
     }
 
-    std::shared_ptr<mpc::sequencer::Event> event;
+    std::shared_ptr<Event> event;
 
     if (midiInputScreen->getReceiveCh() != -1 && msg->getChannel() != midiInputScreen->getReceiveCh())
     {
@@ -85,8 +85,6 @@ void MpcMidiInput::transport(MidiMessage *midiMsg, int timeStamp)
 
         switch (mpc.screens->get<MidiOutputScreen>("midi-output")->getSoftThru())
         {
-            case 0:
-                break;
             case 1:
                 //midiOut(event, track.get());
                 break;
@@ -119,7 +117,7 @@ void MpcMidiInput::transport(MidiMessage *midiMsg, int timeStamp)
     }
 }
 
-void MpcMidiInput::handleControlChange(mpc::engine::midi::ShortMessage* msg)
+void MpcMidiInput::handleControlChange(ShortMessage* msg)
 {
     const auto controller = msg->getData1();
     const auto value = msg->getData2();
@@ -254,10 +252,10 @@ void MpcMidiInput::handleControlChange(mpc::engine::midi::ShortMessage* msg)
     }
 }
 
-void MpcMidiInput::midiOut(std::weak_ptr<mpc::sequencer::Event> e, mpc::sequencer::Track *track)
+void MpcMidiInput::midiOut(Track* track)
 {
-    auto event = e.lock();
     std::string notificationLetter;
+
     auto deviceNumber = track->getDeviceIndex() - 1;
 
     if (deviceNumber != -1 && deviceNumber < 32)
@@ -268,10 +266,7 @@ void MpcMidiInput::midiOut(std::weak_ptr<mpc::sequencer::Event> e, mpc::sequence
         {
             channel -= 16;
         }
-
     }
-
-    auto mpcMidiOutput = mpc.getMidiOutput();
 
     notificationLetter = "a";
 
@@ -287,7 +282,7 @@ void MpcMidiInput::midiOut(std::weak_ptr<mpc::sequencer::Event> e, mpc::sequence
     }
 }
 
-void MpcMidiInput::transportOmni(MidiMessage *msg, std::string outputLetter)
+void MpcMidiInput::transportOmni(MidiMessage *msg, const std::string& outputLetter)
 {
     auto mpcMidiOutput = mpc.getMidiOutput();
     auto screenName = mpc.getLayeredScreen()->getCurrentScreenName();
@@ -298,7 +293,7 @@ void MpcMidiInput::transportOmni(MidiMessage *msg, std::string outputLetter)
     }
 }
 
-std::shared_ptr<mpc::sequencer::NoteOnEvent> mpc::audiomidi::MpcMidiInput::handleNoteOn(mpc::engine::midi::ShortMessage* msg, const int& timeStamp)
+std::shared_ptr<NoteOnEvent> MpcMidiInput::handleNoteOn(ShortMessage* msg, const int& timeStamp)
 {
     auto playMidiNoteOn = std::make_shared<NoteOnEventPlayOnly>(msg);
     int trackNumber;
@@ -372,7 +367,7 @@ std::shared_ptr<mpc::sequencer::NoteOnEvent> mpc::audiomidi::MpcMidiInput::handl
     return playMidiNoteOn;
 }
 
-std::shared_ptr<mpc::sequencer::NoteOffEvent> mpc::audiomidi::MpcMidiInput::handleNoteOff(mpc::engine::midi::ShortMessage* msg, const int& timeStamp)
+std::shared_ptr<NoteOffEvent> MpcMidiInput::handleNoteOff(ShortMessage* msg, const int& timeStamp)
 {
     int note = msg->getData1();
     int trackNumber;
@@ -463,9 +458,9 @@ std::shared_ptr<mpc::sequencer::NoteOffEvent> mpc::audiomidi::MpcMidiInput::hand
     return nullptr;
 }
 
-std::shared_ptr<mpc::sequencer::MidiClockEvent> mpc::audiomidi::MpcMidiInput::handleMidiClock(mpc::engine::midi::ShortMessage* msg)
+std::shared_ptr<MidiClockEvent> MpcMidiInput::handleMidiClock(ShortMessage* msg)
 {
-    auto mce = std::make_shared<mpc::sequencer::MidiClockEvent>(msg->getStatus());
+    auto mce = std::make_shared<MidiClockEvent>(msg->getStatus());
     auto syncScreen = mpc.screens->get<SyncScreen>("sync");
     
     if (syncScreen->in == index && syncScreen->getModeIn() != 0)
@@ -488,26 +483,19 @@ std::shared_ptr<mpc::sequencer::MidiClockEvent> mpc::audiomidi::MpcMidiInput::ha
     return mce;
 }
 
-void MpcMidiInput::handleChannelPressure(mpc::engine::midi::ShortMessage* msg)
+void MpcMidiInput::handleChannelPressure(ShortMessage* msg)
 {
     auto s = sequencer->getActiveSequence();
-    auto t = s->getTrack(sequencer->getActiveTrackIndex());
+    auto channelPressureValue = (*msg->getMessage())[1];
 
-    auto bus = t->getBus();
-
-    if (bus != 0)
+    if (channelPressureValue > 0)
     {
-        auto channelPressureValue = (*msg->getMessage())[1];
-
-        if (channelPressureValue > 0)
+        for (auto& p: mpc.getHardware()->getPads())
         {
-            for (auto &p: mpc.getHardware()->getPads())
-            {
-                if (p->isPressed())
-                {
-                    p->setPressure(channelPressureValue);
-                }
-            }
+        if (p->isPressed())
+        {
+            p->setPressure(channelPressureValue);
+        }
         }
     }
 }

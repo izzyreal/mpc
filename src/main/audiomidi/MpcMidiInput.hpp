@@ -33,9 +33,9 @@ namespace mpc::audiomidi {
         void transport(mpc::engine::midi::MidiMessage *msg, int timestamp);
 
     private:
-        void midiOut(std::weak_ptr<sequencer::Event> event, sequencer::Track *track);
+        void midiOut(sequencer::Track* track);
 
-        void transportOmni(mpc::engine::midi::MidiMessage *msg, std::string outputLetter);
+        void transportOmni(mpc::engine::midi::MidiMessage *msg, const std::string& outputLetter);
         
         std::shared_ptr<mpc::sequencer::NoteOnEvent> handleNoteOn(mpc::engine::midi::ShortMessage* msg, const int& timeStamp);
         std::shared_ptr<mpc::sequencer::NoteOffEvent> handleNoteOff(mpc::engine::midi::ShortMessage* msg, const int& timeStamp);
