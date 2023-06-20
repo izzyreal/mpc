@@ -88,7 +88,7 @@ void EventHandler::handleNoThru(const std::shared_ptr<Event>& event, Track* trac
                     const auto voiceOverlap = pgm->getNoteParameters(noteOnEvent->getNote())->getVoiceOverlap();
                     const auto duration = voiceOverlap == 2 ? noteOnEvent->getDuration() : NoteOnEvent::Duration();
                     const auto durationFrames = (duration > 0) ?
-                        SeqUtil::ticksToFrames(duration.value(), sequencer->getTempo(), audioServer->getSampleRate()) : - 1;
+                        SeqUtil::ticksToFrames(*duration, sequencer->getTempo(), audioServer->getSampleRate()) : - 1;
 
                     mpc.getDrum(drumIndex).mpcNoteOn
                     (

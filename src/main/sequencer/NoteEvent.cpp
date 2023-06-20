@@ -81,7 +81,7 @@ int mpc::sequencer::NoteOnEvent::getNote()
 
 void mpc::sequencer::NoteOnEvent::setDuration(Duration d)
 {
-    if (d) duration = std::clamp(d.value(),0,9999);
+    if (d) duration = std::clamp(*d,0,9999);
     notifyObservers(std::string("step-editor"));
 }
 

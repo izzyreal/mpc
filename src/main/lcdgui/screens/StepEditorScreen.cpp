@@ -304,7 +304,7 @@ void StepEditorScreen::function(int i)
 				}
 				else if (isD)
 				{
-					editMultipleScreen->setEditValue(noteEvent->getDuration().value());
+					editMultipleScreen->setEditValue(*noteEvent->getDuration());
 				}
 				else if (isE)
 				{
@@ -317,7 +317,7 @@ void StepEditorScreen::function(int i)
 				if (isA)
 					editMultipleScreen->setChangeNoteTo(noteEvent->getNote());
 				else if (isB)
-					editMultipleScreen->setEditValue(noteEvent->getDuration().value());
+					editMultipleScreen->setEditValue(*noteEvent->getDuration());
 				else if (isC)
 					editMultipleScreen->setEditValue(noteEvent->getVelocity());
 			}

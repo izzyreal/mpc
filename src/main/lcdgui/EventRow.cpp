@@ -478,7 +478,7 @@ void EventRow::setMidiNoteEventValues()
 	}
 	
 	fields[0]->setText(StrUtil::padLeft(std::to_string(ne->getNote()), " ", 3) + "(" + mpc::Util::noteNames()[ne->getNote()] + ")");
-	fields[1]->setText(StrUtil::padLeft(std::to_string(ne->getDuration().value()), " ", 4));
+	fields[1]->setText(StrUtil::padLeft(std::to_string(*ne->getDuration()), " ", 4));
 	fields[2]->setText(std::to_string(ne->getVelocity()));
 	
 	horizontalBar->setValue(ne->getVelocity());
