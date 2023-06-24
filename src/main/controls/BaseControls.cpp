@@ -193,7 +193,7 @@ void BaseControls::function(int i)
     }
 }
 
-void mpc::controls::BaseControls::various(int note, std::optional<int> padIndexWithBank)
+void BaseControls::various(int note, std::optional<int> padIndexWithBank)
 {
     if (!mpc.getHardware()->getTopPanel()->isSixteenLevelsEnabled())
     {

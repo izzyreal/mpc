@@ -109,6 +109,6 @@ namespace mpc::controls {
 		void generateNoteOn(int note, int velo, int padIndexWithBank);
 
 		friend class mpc::lcdgui::ScreenComponent;
-		friend class mpc::controls::GlobalReleaseControls;
+		friend class GlobalReleaseControls;
 	};
 }

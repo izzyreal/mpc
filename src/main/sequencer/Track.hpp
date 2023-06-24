@@ -32,7 +32,7 @@ private:
     std::vector<std::shared_ptr<NoteOnEvent>> bulkNoteOns = std::vector<std::shared_ptr<NoteOnEvent>>(20);
     std::vector<std::shared_ptr<NoteOffEvent>> bulkNoteOffs = std::vector<std::shared_ptr<NoteOffEvent>>(20);
 
-    mpc::sequencer::Sequence* parent{ nullptr };
+    Sequence* parent{ nullptr };
     
     std::shared_ptr<Sequencer> sequencer;
     int busNumber = 0;
@@ -53,14 +53,6 @@ public:
     void setUsed(bool b);
     void setOn(bool b);
 
-    // The below 2 methods are threadsafe, intended for the UI
-    // thread (keyboard, mouse) to record notes.
-    // MIDI will also go through this, in case that runs on a
-    // different thread.
-    // As a bare minimum the note must be passed in, in order to
-    // match against counterpart (off with on and vice versa).
-
-
 private:
     std::shared_ptr<NoteOnEvent> getNoteEvent(int tick, int note);
     void processRealtimeQueuedEvents();
@@ -69,9 +61,9 @@ private:
 public:
     bool insertEventWhileRetainingSort(const std::shared_ptr<Event>& event, bool allowMultipleNotesOnSameTick = false);
     std::shared_ptr<NoteOnEvent> recordNoteEventSynced(int tick, int note, int velocity);
-    bool finalizeNoteEventSynced(std::shared_ptr<mpc::sequencer::NoteOnEvent> event, int duration);
-    std::shared_ptr<mpc::sequencer::NoteOnEvent> recordNoteEventASync(unsigned char note, unsigned char velocity);
-    void finalizeNoteEventASync(std::shared_ptr<mpc::sequencer::NoteOnEvent> event);
+    bool finalizeNoteEventSynced(std::shared_ptr<NoteOnEvent> event, int duration);
+    std::shared_ptr<NoteOnEvent> recordNoteEventASync(unsigned char note, unsigned char velocity);
+    void finalizeNoteEventASync(std::shared_ptr<NoteOnEvent> event);
     void addEvent(int tick, std::shared_ptr<Event> event, bool allowMultipleNotesOnSameTick = false);
     void cloneEventIntoTrack(std::shared_ptr<Event>& src, int tick, bool allowMultipleNotesOnSameTick = false);
     void removeEvent(int i);
@@ -121,11 +113,11 @@ public:
 
     std::string getActualName();
     
-    Track(mpc::Mpc& mpc, mpc::sequencer::Sequence* parent, int i);
+    Track(mpc::Mpc& mpc, Sequence* parent, int i);
     
 private:
     friend class Sequence;
-    friend class mpc::sequencer::FrameSeq;
+    friend class FrameSeq;
     
 };
 }

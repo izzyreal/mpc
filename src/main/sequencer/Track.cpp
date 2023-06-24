@@ -32,7 +32,7 @@ using namespace mpc::lcdgui::screens::window;
 
 using namespace mpc::sequencer;
 
-Track::Track(mpc::Mpc& mpc, mpc::sequencer::Sequence* parent, int i)
+Track::Track(mpc::Mpc& mpc, Sequence* parent, int i)
 	: mpc(mpc)
 {
 	this->parent = parent;
@@ -151,7 +151,7 @@ std::shared_ptr<NoteOnEvent> Track::recordNoteEventASync(unsigned char note, uns
     queuedNoteOnEvents.enqueue(onEvent);
     return onEvent;
 }
-void mpc::sequencer::Track::finalizeNoteEventASync(std::shared_ptr<mpc::sequencer::NoteOnEvent> event)
+void Track::finalizeNoteEventASync(std::shared_ptr<NoteOnEvent> event)
 {
     auto offEvent = event->getNoteOff();
     offEvent->setTick(-2);
@@ -177,7 +177,7 @@ std::shared_ptr<NoteOnEvent> Track::recordNoteEventSynced(int tick, int note, in
         return onEvent;
     }
 }
-bool mpc::sequencer::Track::finalizeNoteEventSynced(std::shared_ptr<mpc::sequencer::NoteOnEvent> event, int duration)
+bool Track::finalizeNoteEventSynced(std::shared_ptr<NoteOnEvent> event, int duration)
 {
     auto old_duration = event->getDuration();
     event->setDuration(duration);
@@ -185,7 +185,7 @@ bool mpc::sequencer::Track::finalizeNoteEventSynced(std::shared_ptr<mpc::sequenc
     return old_duration != duration;
 }
 
-void mpc::sequencer::Track::addEvent(int tick, std::shared_ptr<Event> event, bool allowMultipleNotesOnSameTick)
+void Track::addEvent(int tick, std::shared_ptr<Event> event, bool allowMultipleNotesOnSameTick)
 {
     if (events.empty())
     {
@@ -614,7 +614,7 @@ bool Track::isUsed()
     return used || !events.empty();
 }
 
-bool mpc::sequencer::Track::tickIsFreeForNote(int note, int tick)
+bool Track::tickIsFreeForNote(int note, int tick)
 {
     for (auto& noteEvent : getNoteEventsAtTick(tick)) 
     {
