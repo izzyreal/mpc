@@ -100,8 +100,6 @@ namespace mpc::lcdgui::screens
 		void displayView();
 
 	public:
-		void finalizeSelection(int i);
-
 		std::vector<std::shared_ptr<mpc::sequencer::Event>>& getVisibleEvents();
 		std::vector<std::shared_ptr<mpc::sequencer::Event>>& getSelectedEvents();
 		std::shared_ptr<mpc::sequencer::Event> getSelectedEvent();

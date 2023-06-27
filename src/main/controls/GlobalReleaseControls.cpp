@@ -216,15 +216,6 @@ void GlobalReleaseControls::shift()
 {
 	auto controls = mpc.getControls();
 	controls->setShiftPressed(false);
-	init();
-
-	if (currentScreenName == "step-editor" && param.length() == 2)
-	{
-		auto eventNumber = stoi(param.substr(1, 2));
-		auto stepEditorScreen = mpc.screens->get<StepEditorScreen>("step-editor");
-		auto res = eventNumber + stepEditorScreen->getYOffset();
-		stepEditorScreen->finalizeSelection(res);
-	}
 }
 
 void GlobalReleaseControls::erase()

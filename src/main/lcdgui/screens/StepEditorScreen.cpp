@@ -125,7 +125,8 @@ void StepEditorScreen::open()
 
     if (previousScreen != "step-timing-correct" &&
         previousScreen != "insert-event" &&
-        previousScreen != "paste-event")
+        previousScreen != "paste-event" &&
+        previousScreen != "edit-multiple")
     {
         auto eventType = visibleEvents[0]->getTypeName();
         ls->setFocus(lastColumn[eventType] + "0");
@@ -146,7 +147,8 @@ void StepEditorScreen::close()
 
 	if (nextScreen != "step-timing-correct" &&
 		nextScreen != "insert-event" &&
-		nextScreen != "paste-event")
+		nextScreen != "paste-event" &&
+        nextScreen != "edit-multiple")
 	{
 		track->removeDoubles();
         sequencer->resetUndo();
@@ -1125,20 +1127,6 @@ void StepEditorScreen::setSelectionEndIndex(int i)
 		return;
 
 	selectionEndIndex = i;
-	refreshSelection();
-}
-
-void StepEditorScreen::finalizeSelection(int i)
-{
-	selectionEndIndex = i;
-
-	if (selectionEndIndex < selectionStartIndex)
-	{
-		auto oldSelectionStartIndex = selectionStartIndex;
-		selectionStartIndex = selectionEndIndex;
-		selectionEndIndex = oldSelectionStartIndex;
-	}
-
 	refreshSelection();
 }
 
