@@ -66,7 +66,7 @@ void TextComp::Draw(std::vector<std::vector<bool>>* pixels)
 		{
 			for (int y1 = rect.T; y1 < rect.B - 1; y1++)
 			{
-				(*pixels)[x1][y1] = inverted;
+				(*pixels)[x1][y1] = isInverted();
 			}
 		}
 	}
@@ -150,7 +150,7 @@ void TextComp::Draw(std::vector<std::vector<bool>>* pixels)
 					if (h <= 7)
 						ypos--;
 
-					(*pixels)[xpos][ypos] = !inverted;
+					(*pixels)[xpos][ypos] = !isInverted();
 
 					if (field != nullptr && field->isSplit())
 						(*pixels)[xpos][ypos] = charCounter > field->getActiveSplit();
@@ -206,6 +206,20 @@ void TextComp::setInverted(bool b)
 		inverted = b;
 		SetDirty();
 	}
+}
+
+void TextComp::setDoubleInverted(bool b)
+{
+	if (doubleInverted != b)
+	{
+		doubleInverted = b;
+		SetDirty();
+	}
+}
+
+bool TextComp::isInverted()
+{
+    return (inverted && !doubleInverted) || (!inverted && doubleInverted);
 }
 
 std::string TextComp::getName()

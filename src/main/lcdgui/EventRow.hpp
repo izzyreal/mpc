@@ -74,6 +74,8 @@ namespace mpc::lcdgui
 		int bus = -1;
 		int rowIndex = 0;
 
+        bool isEmptyEvent();
+
 	public:
 		void setBus(const int newBus);
 		void init();

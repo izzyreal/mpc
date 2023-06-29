@@ -533,6 +533,7 @@ void StepEditorScreen::turnWheel(int i)
 
 void StepEditorScreen::setSequencerTickPos(const std::function<void()>& tickPosSetter)
 {
+//    clearSelection();
     storeColumnForEventAtActiveRow();
 
     auto oldTickPos = sequencer->getTickPosition();
@@ -1143,7 +1144,14 @@ void StepEditorScreen::setSelectedEvents()
 	}
 
 	for (int i = firstEventIndex; i < lastEventIndex + 1; i++)
-		selectedEvents.push_back(eventsAtCurrentTick[i]);
+    {
+        if (i >= eventsAtCurrentTick.size())
+        {
+            break;
+        }
+
+        selectedEvents.push_back(eventsAtCurrentTick[i]);
+    }
 }
 
 void StepEditorScreen::checkSelection()

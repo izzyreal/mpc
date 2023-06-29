@@ -74,9 +74,9 @@ void Field::Draw(std::vector<std::vector<bool>>* pixels)
 				continue;
 
 			if (typeModeEnabled && j - r.T <= 7)
-				(*pixels)[i][j] = !inverted;
+				(*pixels)[i][j] = !isInverted();
 			else
-				(*pixels)[i][j] = inverted;
+				(*pixels)[i][j] = isInverted();
 		}
 	}
 
@@ -127,7 +127,7 @@ void Field::takeFocus()
 	}
 
 	focus = true;
-	inverted = true;
+    inverted = true;
 	SetDirty();
 }
 
@@ -137,7 +137,7 @@ void Field::loseFocus(std::string next)
 	csn = ls->getCurrentScreenName();
 
 	focus = false;
-	inverted = false;
+    setInverted(false);
 
 	if (csn == "step-editor")
 	{

@@ -33,8 +33,10 @@ namespace mpc::lcdgui
 
 	protected:
 		bool inverted = false;
+		bool doubleInverted = false;
 		const int FONT_HEIGHT = 7;
 		const int FONT_WIDTH = 6;
+        bool isInverted();
 
 	protected:
 		std::string text;
@@ -47,6 +49,7 @@ namespace mpc::lcdgui
 		void enableTwoDots();
 		void setBlinking(bool b);
 		void setInverted(bool b);
+		void setDoubleInverted(bool b);
 		void setAlignment(const Alignment newAlignment, int endX = -1);
 		int getX();
 		int getY();
