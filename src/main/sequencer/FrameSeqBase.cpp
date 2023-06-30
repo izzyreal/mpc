@@ -4,9 +4,9 @@
 
 #include "Mpc.hpp"
 
-#include "audiomidi/EventHandler.hpp"
-#include "audiomidi/MpcMidiOutput.hpp"
 #include "audiomidi/AudioMidiServices.hpp"
+#include "audiomidi/EventHandler.hpp"
+#include "audiomidi/MidiOutput.hpp"
 
 #include "hardware/Hardware.hpp"
 #include "hardware/HwPad.hpp"

@@ -42,8 +42,8 @@ namespace mpc::lcdgui {
 namespace mpc::audiomidi {
     class EventHandler;
     class AudioMidiServices;
-    class MpcMidiInput;
-    class MpcMidiOutput;
+    class MidiInput;
+    class MidiOutput;
     class MidiDeviceDetector;
 }
 
@@ -66,7 +66,8 @@ namespace mpc {
         std::shared_ptr<sampler::Sampler> sampler;
         std::shared_ptr<audiomidi::AudioMidiServices> audioMidiServices;
         std::shared_ptr<mpc::audiomidi::MidiDeviceDetector> midiDeviceDetector;
-        std::vector<audiomidi::MpcMidiInput*> mpcMidiInputs;
+        std::vector<audiomidi::MidiInput*> midiInputs;
+        std::shared_ptr<audiomidi::MidiOutput> midiOutput;
         std::unique_ptr<mpc::disk::DiskController> diskController;
         std::shared_ptr<hardware::Hardware> hardware;
         int bank = 0;
@@ -87,6 +88,7 @@ namespace mpc {
         int getPad();
         std::string getPreviousSamplerScreenName();
         void setPreviousSamplerScreenName(std::string s);
+        void panic();
 
     public:
         std::shared_ptr<lcdgui::LayeredScreen> getLayeredScreen();
@@ -103,8 +105,8 @@ namespace mpc {
         mpc::engine::PreviewSoundPlayer& getBasicPlayer();
         std::shared_ptr<audiomidi::AudioMidiServices> getAudioMidiServices();
         std::shared_ptr<audiomidi::EventHandler> getEventHandler();
-        std::shared_ptr<mpc::audiomidi::MpcMidiOutput> getMidiOutput();
-        mpc::audiomidi::MpcMidiInput* getMpcMidiInput(int i);
+        std::shared_ptr<mpc::audiomidi::MidiOutput> getMidiOutput();
+        mpc::audiomidi::MidiInput* getMpcMidiInput(int i);
 
     public:
         std::shared_ptr<mpc::disk::AbstractDisk> getDisk();

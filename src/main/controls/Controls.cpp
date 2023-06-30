@@ -172,10 +172,12 @@ void mpc::controls::Controls::pressPad(int pad)
 
 void mpc::controls::Controls::unpressPad(int pad)
 {
-	//if (pressedPads[pad] != 0)
 	--pressedPads[pad];
+
 	if (pressedPads[pad] < 1)
-		pressedPads.erase(pad);
+    {
+        pressedPads.erase(pad);
+    }
 }
 
 void mpc::controls::Controls::clearAllPadStates()

@@ -38,7 +38,7 @@ namespace mpc::engine::audio::system {
 }
 
 namespace mpc::audiomidi {
-	class MpcMidiOutput;
+	class MidiOutput;
 	class DirectToDiskSettings;
 	class DiskRecorder;
 	class SoundRecorder;
@@ -92,7 +92,7 @@ namespace mpc::audiomidi
 		std::shared_ptr<mpc::engine::audio::mixer::AudioMixer> mixer;
 		std::shared_ptr<mpc::engine::audio::mixer::MixerControls> mixerControls;
 		std::shared_ptr<mpc::engine::audio::server::CompoundAudioClient> cac;
-		std::shared_ptr<MpcMidiOutput> mpcMidiOutput;
+		std::shared_ptr<MidiOutput> midiOutput;
 		std::vector<mpc::engine::audio::server::IOAudioProcess*> inputProcesses;
 		std::vector<mpc::engine::audio::server::IOAudioProcess*> outputProcesses;
 		std::shared_ptr<mpc::sequencer::FrameSeq> frameSeq;
@@ -126,7 +126,7 @@ namespace mpc::audiomidi
 
 	public:
 		void connectVoices();
-		std::shared_ptr<MpcMidiOutput> getMidiPorts();
+		std::shared_ptr<MidiOutput> getMidiOutput();
 		void destroyServices();
 		bool prepareBouncing(DirectToDiskSettings* settings);
 		std::shared_ptr<mpc::sequencer::FrameSeq> getFrameSequencer();

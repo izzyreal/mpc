@@ -5,10 +5,9 @@
 #include <Mpc.hpp>
 #include <audiomidi/DirectToDiskSettings.hpp>
 #include <audiomidi/DiskRecorder.hpp>
-#include <audiomidi/SoundRecorder.hpp>
-#include <audiomidi/SoundPlayer.hpp>
 #include <audiomidi/MonitorInputAdapter.hpp>
-#include <audiomidi/MpcMidiOutput.hpp>
+#include <audiomidi/SoundPlayer.hpp>
+#include <audiomidi/SoundRecorder.hpp>
 
 #include "engine/Voice.hpp"
 #include "engine/FaderControl.hpp"
@@ -96,8 +95,6 @@ void AudioMidiServices::start(const int inputCount, const int outputCount) {
 	}
 
 	connectVoices();
-
-    mpcMidiOutput = std::make_shared<MpcMidiOutput>();
 
 	initializeDiskRecorders();
 
@@ -277,11 +274,6 @@ void AudioMidiServices::connectVoices()
     }
 
     basicSoundPlayerChannel->connectVoice();
-}
-
-std::shared_ptr<MpcMidiOutput> AudioMidiServices::getMidiPorts()
-{
-	return mpcMidiOutput;
 }
 
 void AudioMidiServices::initializeDiskRecorders()

@@ -1,18 +1,18 @@
-#include "MpcMidiInput.hpp"
+#include "MidiInput.hpp"
 
 #include <Mpc.hpp>
 #include <Util.hpp>
-#include <hardware/Hardware.hpp>
+#include <audiomidi/AudioMidiServices.hpp>
+#include <audiomidi/EventHandler.hpp>
+#include <audiomidi/MidiOutput.hpp>
+#include <audiomidi/VmpcMidiControlMode.hpp>
+#include <controls/GlobalReleaseControls.hpp>
+#include <hardware/Button.hpp>
 #include <hardware/DataWheel.hpp>
+#include <hardware/Hardware.hpp>
 #include <hardware/HwPad.hpp>
 #include <hardware/HwSlider.hpp>
-#include <hardware/Button.hpp>
 #include <hardware/Pot.hpp>
-#include <audiomidi/EventHandler.hpp>
-#include <audiomidi/MpcMidiOutput.hpp>
-#include <audiomidi/VmpcMidiControlMode.hpp>
-#include <audiomidi/AudioMidiServices.hpp>
-#include <controls/GlobalReleaseControls.hpp>
 
 
 #include <lcdgui/screens/SyncScreen.hpp>
@@ -40,7 +40,7 @@ using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::engine::midi;
 
-MpcMidiInput::MpcMidiInput(mpc::Mpc &_mpc, int _index)
+MidiInput::MidiInput(mpc::Mpc &_mpc, int _index)
         : mpc(_mpc),
           sequencer(_mpc.getSequencer()),
           sampler(_mpc.getSampler()),
@@ -49,7 +49,7 @@ MpcMidiInput::MpcMidiInput(mpc::Mpc &_mpc, int _index)
 {
 }
 
-void MpcMidiInput::transport(MidiMessage *midiMsg, int timeStamp)
+void MidiInput::transport(MidiMessage *midiMsg, int timeStamp)
 {
     const auto msg = dynamic_cast<ShortMessage*>(midiMsg);
 
@@ -118,7 +118,7 @@ void MpcMidiInput::transport(MidiMessage *midiMsg, int timeStamp)
     }
 }
 
-void MpcMidiInput::handleControlChange(ShortMessage* msg)
+void MidiInput::handleControlChange(ShortMessage* msg)
 {
     const auto controller = msg->getData1();
     const auto value = msg->getData2();
@@ -253,7 +253,7 @@ void MpcMidiInput::handleControlChange(ShortMessage* msg)
     }
 }
 
-void MpcMidiInput::midiOut(Track* track)
+void MidiInput::midiOut(Track* track)
 {
     std::string notificationLetter;
 
@@ -283,7 +283,7 @@ void MpcMidiInput::midiOut(Track* track)
     }
 }
 
-void MpcMidiInput::transportOmni(MidiMessage *msg, const std::string& outputLetter)
+void MidiInput::transportOmni(MidiMessage *msg, const std::string& outputLetter)
 {
     auto mpcMidiOutput = mpc.getMidiOutput();
     auto screenName = mpc.getLayeredScreen()->getCurrentScreenName();
@@ -294,7 +294,7 @@ void MpcMidiInput::transportOmni(MidiMessage *msg, const std::string& outputLett
     }
 }
 
-std::shared_ptr<NoteOnEvent> MpcMidiInput::handleNoteOn(ShortMessage* msg, const int& timeStamp)
+std::shared_ptr<NoteOnEvent> MidiInput::handleNoteOn(ShortMessage* msg, const int& timeStamp)
 {
     auto playMidiNoteOn = std::make_shared<NoteOnEventPlayOnly>(msg);
     int trackNumber;
@@ -368,7 +368,7 @@ std::shared_ptr<NoteOnEvent> MpcMidiInput::handleNoteOn(ShortMessage* msg, const
     return playMidiNoteOn;
 }
 
-std::shared_ptr<NoteOffEvent> MpcMidiInput::handleNoteOff(ShortMessage* msg, const int& timeStamp)
+std::shared_ptr<NoteOffEvent> MidiInput::handleNoteOff(ShortMessage* msg, const int& timeStamp)
 {
     int note = msg->getData1();
     int trackNumber;
@@ -459,7 +459,7 @@ std::shared_ptr<NoteOffEvent> MpcMidiInput::handleNoteOff(ShortMessage* msg, con
     return nullptr;
 }
 
-std::shared_ptr<MidiClockEvent> MpcMidiInput::handleMidiClock(ShortMessage* msg)
+std::shared_ptr<MidiClockEvent> MidiInput::handleMidiClock(ShortMessage* msg)
 {
     auto mce = std::make_shared<MidiClockEvent>(msg->getStatus());
     auto syncScreen = mpc.screens->get<SyncScreen>("sync");
@@ -484,7 +484,7 @@ std::shared_ptr<MidiClockEvent> MpcMidiInput::handleMidiClock(ShortMessage* msg)
     return mce;
 }
 
-void MpcMidiInput::handleChannelPressure(ShortMessage* msg)
+void MidiInput::handleChannelPressure(ShortMessage* msg)
 {
     auto s = sequencer->getActiveSequence();
     auto channelPressureValue = (*msg->getMessage())[1];

@@ -2,7 +2,7 @@
 
 #include <Mpc.hpp>
 #include <audiomidi/AudioMidiServices.hpp>
-#include <audiomidi/MpcMidiOutput.hpp>
+#include <audiomidi/MidiOutput.hpp>
 
 #include <sequencer/Event.hpp>
 #include <sequencer/FrameSeq.hpp>

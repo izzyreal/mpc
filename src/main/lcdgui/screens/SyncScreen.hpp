@@ -4,7 +4,7 @@
 namespace mpc::audiomidi
 {
 	class EventHandler;
-	class MpcMidiInput;
+	class MidiInput;
 }
 
 namespace mpc::file::all
@@ -72,7 +72,7 @@ namespace mpc::lcdgui::screens
 
 	private:
 		friend class mpc::audiomidi::EventHandler;
-		friend class mpc::audiomidi::MpcMidiInput;
+		friend class mpc::audiomidi::MidiInput;
 		friend class mpc::disk::AllLoader;
 		friend class mpc::file::all::MidiSyncMisc;
 		friend class mpc::file::all::Misc;

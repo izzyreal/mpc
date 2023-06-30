@@ -13,11 +13,11 @@
 namespace mpc::engine::midi { class ShortMessage; }
 
 namespace mpc::audiomidi {
-    class MpcMidiOutput;
+    class MidiOutput;
 }
 
 namespace mpc::audiomidi {
-    class MpcMidiInput : 
+    class MidiInput :
         public moduru::observer::Observable,
         public mpc::sequencer::NoteEventStore<std::pair<int/*track*/,int/*note*/>>
     {
@@ -47,7 +47,7 @@ namespace mpc::audiomidi {
         void handleChannelPressure(mpc::engine::midi::ShortMessage* msg);
 
     public:
-        MpcMidiInput(mpc::Mpc &mpc, int index);
+        MidiInput(mpc::Mpc &mpc, int index);
 
     };
 }

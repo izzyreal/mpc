@@ -14,8 +14,9 @@
 
 #include <audiomidi/AudioMidiServices.hpp>
 #include <audiomidi/EventHandler.hpp>
-#include <audiomidi/MpcMidiInput.hpp>
 #include <audiomidi/MidiDeviceDetector.hpp>
+#include <audiomidi/MidiInput.hpp>
+#include <audiomidi/MidiOutput.hpp>
 
 #include <sampler/Sampler.hpp>
 #include <sequencer/Sequencer.hpp>
@@ -127,7 +128,9 @@ void Mpc::init(const int inputCount, const int outputCount)
 	sampler = std::make_shared<mpc::sampler::Sampler>(*this);
 	MLOG("Sampler created");
 
-	mpcMidiInputs = { new mpc::audiomidi::MpcMidiInput(*this, 0), new mpc::audiomidi::MpcMidiInput(*this, 1) };
+    midiInputs = { new mpc::audiomidi::MidiInput(*this, 0), new mpc::audiomidi::MidiInput(*this, 1) };
+
+    midiOutput = std::make_shared<audiomidi::MidiOutput>();
 
     screens = std::make_shared<Screens>(*this);
 
@@ -238,14 +241,14 @@ std::vector<std::shared_ptr<mpc::disk::AbstractDisk>> Mpc::getDisks()
 std::vector<char> Mpc::akaiAsciiChar { ' ', '!', '#', '$', '%', '&', '\'', '(', ')', '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '_', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '}' };
 std::vector<std::string> Mpc::akaiAscii { " ", "!", "#", "$", "%", "&", "'", "(", ")", "-", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "@", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "_", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "{", "}" };
 
-std::shared_ptr<audiomidi::MpcMidiOutput> Mpc::getMidiOutput()
+std::shared_ptr<audiomidi::MidiOutput> Mpc::getMidiOutput()
 {
-	return audioMidiServices->getMidiPorts();
+	return midiOutput;
 }
 
-audiomidi::MpcMidiInput* Mpc::getMpcMidiInput(int i)
+audiomidi::MidiInput* Mpc::getMpcMidiInput(int i)
 {
-	return mpcMidiInputs[i];
+	return midiInputs[i];
 }
 
 void Mpc::setBank(int i)
@@ -326,7 +329,7 @@ Mpc::~Mpc()
 	mpc::nvram::NvRam::saveUserScreenValues(*this);
 	mpc::nvram::NvRam::saveVmpcSettings(*this);
 
-	for (auto& m : mpcMidiInputs)
+	for (auto& m : midiInputs)
 	{
 		if (m != nullptr)
 			delete m;
@@ -353,4 +356,11 @@ void Mpc::setPad(unsigned char padIndexWithBank)
     pad = padIndexWithBank;
 
     notifyObservers(std::string("pad"));
+}
+
+void Mpc::panic()
+{
+    controls->clearAllPadStates();
+    controls->clearStores();
+    midiOutput->panic();
 }

@@ -8,8 +8,8 @@
 
 namespace mpc::audiomidi {
 
-	class MpcMidiOutput
-	{
+	class MidiOutput
+    {
 
 	private:
         moodycamel::ConcurrentQueue<std::shared_ptr<mpc::engine::midi::ShortMessage>> outputQueueA;

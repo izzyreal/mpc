@@ -2,15 +2,15 @@
 
 #include "Mpc.hpp"
 #include "Util.hpp"
-#include "audiomidi/MpcMidiOutput.hpp"
 #include "audiomidi/AudioMidiServices.hpp"
+#include "audiomidi/MidiOutput.hpp"
 #include "hardware/Hardware.hpp"
 #include "hardware/HwPad.hpp"
 #include "hardware/TopPanel.hpp"
-#include "sequencer/Track.hpp"
+#include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
 #include "sequencer/FrameSeq.hpp"
 #include "sequencer/SeqUtil.hpp"
-#include "lcdgui/screens/window/Assign16LevelsScreen.hpp"
+#include "sequencer/Track.hpp"
 
 using namespace mpc::sequencer;
 using namespace mpc::lcdgui::screens::window;
