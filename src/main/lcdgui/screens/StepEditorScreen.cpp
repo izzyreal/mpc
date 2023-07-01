@@ -353,7 +353,14 @@ void StepEditorScreen::function(int i)
 			openScreen("paste-event");
 		break;
 	case 5:
-		if (selectionStartIndex == -1)
+        if (mpc.getControls()->isF6Pressed())
+        {
+            return;
+        }
+
+        mpc.getControls()->setF6Pressed(true);
+
+        if (selectionStartIndex == -1)
 		{
 			if (param.length() == 2)
 			{
@@ -533,7 +540,6 @@ void StepEditorScreen::turnWheel(int i)
 
 void StepEditorScreen::setSequencerTickPos(const std::function<void()>& tickPosSetter)
 {
-//    clearSelection();
     storeColumnForEventAtActiveRow();
 
     auto oldTickPos = sequencer->getTickPosition();
@@ -1338,18 +1344,9 @@ int StepEditorScreen::getYOffset()
 
 void StepEditorScreen::adhocPlayNoteEvent(const std::shared_ptr<mpc::sequencer::NoteOnEvent>&noteEvent)
 {
-	auto adhoc = std::make_shared<NoteOnEventPlayOnly>(*noteEvent);
+	const auto adhoc = std::make_shared<NoteOnEventPlayOnly>(*noteEvent);
 	const auto bus = track->getBus();
-
-    if (bus != 0)
-    {
-		mpc.getEventHandler()->handle(adhoc, track.get(), bus-1);
-		// TODO MIDI OUT
-    }
-    else
-    {
-        // TODO MIDI OUT
-    }
+    mpc.getEventHandler()->handle(adhoc, track.get(), bus-1);
 }
 
 void StepEditorScreen::resetYPosAndYOffset()

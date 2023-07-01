@@ -64,15 +64,16 @@ void EventHandler::handleNoThru(const std::shared_ptr<Event>& event, Track* trac
     auto noteOnEventPlayOnly = std::dynamic_pointer_cast<NoteOnEventPlayOnly>(event);
     auto noteOffEvent = std::dynamic_pointer_cast<NoteOffEvent>(event);
 
+    const auto audioMidiServices = mpc.getAudioMidiServices();
+    const auto frameSeq = audioMidiServices->getFrameSequencer();
+    const auto audioServer = audioMidiServices->getAudioServer();
+
     if (noteOnEvent || noteOffEvent)
     {
 
         if (auto drumIndex = drum == -1 ? track->getBus() - 1 : drum; drumIndex >= 0)
         {
-            auto frameSeq = mpc.getAudioMidiServices()->getFrameSequencer();
             auto eventFrame = timeStamp != -1 ? timeStamp : frameSeq->getEventFrameOffset();
-
-            auto audioServer = mpc.getAudioMidiServices()->getAudioServer();
 
             if (noteOffEvent && noteOffEvent->isDrumNote())
             {
@@ -192,6 +193,20 @@ void EventHandler::midiOut(const std::shared_ptr<Event>& e, Track* track)
             transposeCache[noteOnEvent->getNoteOff()] = transposeAmount;
         }
         msg = noteOnEvent->createShortMessage(channel, transposeAmount);
+
+        const auto audioMidiServices = mpc.getAudioMidiServices();
+        const auto frameSeq = audioMidiServices->getFrameSequencer();
+        const auto audioServer = audioMidiServices->getAudioServer();
+
+        if (noteOnEvent->isFinalized())
+        {
+            frameSeq->enqueueEventAfterNFrames([this, noteOnEvent, track](int)
+                {
+                    midiOut(noteOnEvent->getNoteOff(), track);
+                },
+                SeqUtil::ticksToFrames(*noteOnEvent->getDuration(), sequencer->getTempo(), audioServer->getSampleRate())
+            );
+        }
     }
     else if (auto noteOffEvent = std::dynamic_pointer_cast<NoteOffEvent>(e))
     {
