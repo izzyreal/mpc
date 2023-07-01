@@ -59,7 +59,6 @@ std::shared_ptr<Event> AllEvent::bytesToMpcEvent(const std::vector<char>& bytes)
 
 std::vector<char> AllEvent::mpcEventToBytes(std::shared_ptr<mpc::sequencer::Event> event)
 {
-    //auto note = std::dynamic_pointer_cast<mpc::sequencer::OldNoteEvent>(event);
     auto noteOn = std::dynamic_pointer_cast<mpc::sequencer::NoteOnEvent>(event);
     auto noteOff = std::dynamic_pointer_cast<mpc::sequencer::NoteOffEvent>(event);
     assert(!noteOff);
@@ -73,8 +72,6 @@ std::vector<char> AllEvent::mpcEventToBytes(std::shared_ptr<mpc::sequencer::Even
     
     if (noteOn)
         return AllNoteOnEvent::mpcEventToBytes(noteOn);
-    //else if (noteOff)
-    //    return AllNoteEvent::mpcEventToBytes(noteOff);
     else if (polyPressure)
         return AllPolyPressureEvent::mpcEventToBytes(polyPressure);
     else if (controlChange)
