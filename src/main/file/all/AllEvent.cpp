@@ -57,35 +57,42 @@ std::shared_ptr<Event> AllEvent::bytesToMpcEvent(const std::vector<char>& bytes)
     }
 }
 
-std::vector<char> AllEvent::mpcEventToBytes(std::shared_ptr<mpc::sequencer::Event> event)
+std::vector<char> AllEvent::mpcEventToBytes(std::shared_ptr<Event> event)
 {
-    auto noteOn = std::dynamic_pointer_cast<mpc::sequencer::NoteOnEvent>(event);
-    auto noteOff = std::dynamic_pointer_cast<mpc::sequencer::NoteOffEvent>(event);
-    assert(!noteOff);
-    auto polyPressure = std::dynamic_pointer_cast<mpc::sequencer::PolyPressureEvent>(event);
-    auto controlChange = std::dynamic_pointer_cast<mpc::sequencer::ControlChangeEvent>(event);
-    auto programChange = std::dynamic_pointer_cast<mpc::sequencer::ProgramChangeEvent>(event);
-    auto channelPressure = std::dynamic_pointer_cast<mpc::sequencer::ChannelPressureEvent>(event);
-    auto pitchBend = std::dynamic_pointer_cast<mpc::sequencer::PitchBendEvent>(event);
-    auto sysEx = std::dynamic_pointer_cast<mpc::sequencer::SystemExclusiveEvent>(event);
-    auto mixer = std::dynamic_pointer_cast<mpc::sequencer::MixerEvent>(event);
+    assert(!std::dynamic_pointer_cast<NoteOffEvent>(event));
     
-    if (noteOn)
+    if (const auto noteOn = std::dynamic_pointer_cast<NoteOnEvent>(event); noteOn)
+    {
         return AllNoteOnEvent::mpcEventToBytes(noteOn);
-    else if (polyPressure)
+    }
+    else if (const auto polyPressure = std::dynamic_pointer_cast<PolyPressureEvent>(event); polyPressure)
+    {
         return AllPolyPressureEvent::mpcEventToBytes(polyPressure);
-    else if (controlChange)
+    }
+    else if (const auto controlChange = std::dynamic_pointer_cast<ControlChangeEvent>(event); controlChange)
+    {
         return AllControlChangeEvent::mpcEventToBytes(controlChange);
-    else if (programChange)
+    }
+    else if (const auto programChange = std::dynamic_pointer_cast<ProgramChangeEvent>(event); programChange)
+    {
         return AllProgramChangeEvent::mpcEventToBytes(programChange);
-    else if (channelPressure)
+    }
+    else if (const auto channelPressure = std::dynamic_pointer_cast<ChannelPressureEvent>(event); channelPressure)
+    {
         return AllChannelPressureEvent::mpcEventToBytes(channelPressure);
-    else if (pitchBend)
+    }
+    else if (const auto pitchBend = std::dynamic_pointer_cast<PitchBendEvent>(event); pitchBend)
+    {
         return AllPitchBendEvent::mpcEventToBytes(pitchBend);
-    else if (sysEx)
+    }
+    else if (const auto sysEx = std::dynamic_pointer_cast<SystemExclusiveEvent>(event); sysEx)
+    {
         return AllSysExEvent::mpcEventToBytes(sysEx);
-    else if (mixer)
+    }
+    else if (const auto mixer = std::dynamic_pointer_cast<MixerEvent>(event); mixer)
+    {
         return AllSysExEvent::mpcEventToBytes(mixer);
+    }
 }
 
 int AllEvent::readTick(const std::vector<char>& bytes)

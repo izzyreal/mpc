@@ -339,15 +339,12 @@ int AllSequence::getSegmentCount(mpc::sequencer::Sequence* seq)
         
         for (auto& e : track->getEvents())
         {
-            auto sysExEvent = std::dynamic_pointer_cast<mpc::sequencer::SystemExclusiveEvent>(e);
-            auto mixerEvent = std::dynamic_pointer_cast<mpc::sequencer::MixerEvent>(e);
-            
-            if (sysExEvent)
+            if (const auto sysExEvent = std::dynamic_pointer_cast<mpc::sequencer::SystemExclusiveEvent>(e); sysExEvent)
             {
                 int dataSegments = (int)(ceil((int)(sysExEvent->getBytes().size()) / 8.0));
                 segmentCount += dataSegments + 2;
             }
-            else if (mixerEvent)
+            else if (const auto mixerEvent = std::dynamic_pointer_cast<mpc::sequencer::MixerEvent>(e); mixerEvent)
             {
                 segmentCount += 4;
             }

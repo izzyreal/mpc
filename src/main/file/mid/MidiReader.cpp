@@ -57,12 +57,7 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
 
     for (auto& event : midiTracks[0].lock()->getEvents())
     {
-        auto textEvent = std::dynamic_pointer_cast<meta::Text>(event.lock());
-        auto trackNameEvent = std::dynamic_pointer_cast<meta::TrackName>(event.lock());
-        auto tempoEvent = std::dynamic_pointer_cast<meta::Tempo>(event.lock());
-        auto timeSigEvent = std::dynamic_pointer_cast<meta::TimeSignature>(event.lock());
-
-        if (textEvent)
+        if (const auto textEvent = std::dynamic_pointer_cast<meta::Text>(event.lock()); textEvent)
         {
             auto text = textEvent->getText();
 
@@ -82,17 +77,19 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
             if (isInteger(text.substr(23, 26)))
                 lastLoopBar = stoi(text.substr(23, 26));
         }
-        else if (trackNameEvent && trackNameEvent->getTrackName().find("MPC2000XL 1.00  ") != std::string::npos)
+        else if (const auto trackNameEvent = std::dynamic_pointer_cast<meta::TrackName>(event.lock());
+                 trackNameEvent && trackNameEvent->getTrackName().find("MPC2000XL 1.00  ") != std::string::npos)
         {
             isMpc2000XlMidiFile = true;
             auto sequenceName = trackNameEvent->getTrackName().substr(16);
             sequence->setName(sequenceName);
         }
-        else if (tempoEvent)
+        else if (const auto tempoEvent = std::dynamic_pointer_cast<meta::Tempo>(event.lock()); tempoEvent)
         {
             tempoChanges.push_back(tempoEvent);
         }
-        else if (timeSigEvent) {
+        else if (const auto timeSigEvent = std::dynamic_pointer_cast<meta::TimeSignature>(event.lock()); timeSigEvent)
+        {
             timeSignatures.push_back(timeSigEvent);
         }
     }
@@ -320,16 +317,7 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
 
         for (auto& me : mt->getEvents())
         {
-
-            auto sysEx = std::dynamic_pointer_cast<mpc::midi::event::SystemExclusiveEvent>(me.lock());
-            auto noteAfterTouch = std::dynamic_pointer_cast<NoteAftertouch>(me.lock());
-            auto channelAfterTouch = std::dynamic_pointer_cast<ChannelAftertouch>(me.lock());
-            auto programChange = std::dynamic_pointer_cast<ProgramChange>(me.lock());
-            auto trackName = std::dynamic_pointer_cast<meta::TrackName>(me.lock());
-            auto controller = std::dynamic_pointer_cast<Controller>(me.lock());
-            auto pitchBend = std::dynamic_pointer_cast<PitchBend>(me.lock());
-
-            if (sysEx)
+            if (const auto sysEx = std::dynamic_pointer_cast<mpc::midi::event::SystemExclusiveEvent>(me.lock()); sysEx)
             {
                 auto sysExEventBytes = sysEx->getData();
 
@@ -363,37 +351,37 @@ void MidiReader::parseSequence(mpc::Mpc& mpc)
                     see->setBytes(tmp);
                 }
             }
-            else if (noteAfterTouch)
+            else if (const auto noteAfterTouch = std::dynamic_pointer_cast<NoteAftertouch>(me.lock()); noteAfterTouch)
             {
                 auto ppe = std::make_shared<PolyPressureEvent>();
                 track->addEvent(noteAfterTouch->getTick(), ppe);
                 ppe->setNote(noteAfterTouch->getNoteValue());
                 ppe->setAmount(noteAfterTouch->getAmount());
             }
-            else if (channelAfterTouch)
+            else if (const auto channelAfterTouch = std::dynamic_pointer_cast<ChannelAftertouch>(me.lock()); channelAfterTouch)
             {
                 auto cpe = std::make_shared<ChannelPressureEvent>();
                 track->addEvent(channelAfterTouch->getTick(), cpe);
                 cpe->setAmount(channelAfterTouch->getAmount());
             }
-            else if (programChange)
+            else if (const auto programChange = std::dynamic_pointer_cast<ProgramChange>(me.lock()); programChange)
             {
                 auto pce = std::make_shared<ProgramChangeEvent>();
                 track->addEvent(programChange->getTick(), pce);
                 pce->setProgram(programChange->getProgramNumber() + 1);
             }
-            else if (trackName && !trackName->getTrackName().empty())
+            else if (const auto trackName = std::dynamic_pointer_cast<meta::TrackName>(me.lock()); trackName && !trackName->getTrackName().empty())
             {
                 track->setName(trackName->getTrackName());
             }
-            else if (controller)
+            else if (const auto controller = std::dynamic_pointer_cast<Controller>(me.lock()); controller)
             {
                 auto cce = std::make_shared<ControlChangeEvent>();
                 track->addEvent(controller->getTick(), cce);
                 cce->setController(controller->getControllerType());
                 cce->setAmount(controller->getValue());
             }
-            else if (pitchBend)
+            else if (const auto pitchBend = std::dynamic_pointer_cast<PitchBend>(me.lock()); pitchBend)
             {
                 auto pbe = std::make_shared<PitchBendEvent>();
                 track->addEvent(pitchBend->getTick(), pbe);
