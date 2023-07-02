@@ -121,7 +121,7 @@ namespace mpc::sequencer {
         bool sequencerShouldStartPlayingOnNextLock = false;
         bool wasRunning = false;
         std::shared_ptr<mpc::engine::midi::ShortMessage> midiSyncStartStopContinueMsg;
-        std::vector<EventAfterNFrames> eventsAfterNFrames = std::vector<EventAfterNFrames>(100);
+        std::vector<EventAfterNFrames> eventsAfterNFrames = std::vector<EventAfterNFrames>(50);
 
         void move(int newTickPos);
 
