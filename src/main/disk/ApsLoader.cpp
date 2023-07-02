@@ -120,7 +120,7 @@ void ApsLoader::loadFromParsedAps(ApsParser& apsParser, mpc::Mpc& mpc, bool head
         }
     }
     
-    sampler->deleteAllPrograms();
+    sampler->deleteAllPrograms(/*createDefaultProgram=*/false);
     
     for (auto& apsProgram : apsParser.getPrograms())
     {

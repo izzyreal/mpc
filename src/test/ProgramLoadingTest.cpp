@@ -70,7 +70,7 @@ void doTest(mpc::Mpc& mpc,
     disk->initFiles();
     auto pgmFile1 = disk->getFile("PROGRAM1.PGM");
 
-    mpc.getSampler()->deleteAllPrograms();
+    mpc.getSampler()->deleteAllPrograms(/*createDefaultProgram=*/false);
     mpc.getSampler()->deleteAllSamples();
 
     p1 = mpc.getSampler()->createNewProgramAddFirstAvailableSlot().lock();
@@ -90,7 +90,7 @@ void doTest(mpc::Mpc& mpc,
 
     if (clear)
     {
-        mpc.getSampler()->deleteAllPrograms();
+        mpc.getSampler()->deleteAllPrograms(/*createDefaultProgram=*/false);
         mpc.getSampler()->deleteAllSamples();
     }
 
@@ -172,7 +172,7 @@ void doTestWithMissingSound(mpc::Mpc& mpc,
 
     auto pgmFile1 = disk->getFile("PROGRAM1.PGM");
 
-    mpc.getSampler()->deleteAllPrograms();
+    mpc.getSampler()->deleteAllPrograms(/*createDefaultProgram=*/false);
     mpc.getSampler()->deleteAllSamples();
 
     p1 = mpc.getSampler()->createNewProgramAddFirstAvailableSlot().lock();
@@ -219,7 +219,7 @@ void doTestWithMissingSound(mpc::Mpc& mpc,
 
     if (clear)
     {
-        mpc.getSampler()->deleteAllPrograms();
+        mpc.getSampler()->deleteAllPrograms(/*createDefaultProgram=*/false);
         mpc.getSampler()->deleteAllSamples();
     }
 

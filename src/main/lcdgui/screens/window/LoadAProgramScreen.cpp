@@ -39,10 +39,10 @@ void LoadAProgramScreen::function(int i)
 	{
 	case 2:
 	{
-        mpc.getSampler()->deleteAllPrograms();
+        mpc.getSampler()->deleteAllPrograms(/*createDefaultProgram=*/true);
         mpc.getSampler()->deleteAllSamples();
 
-        mpc.getDisk()->readPgm2(selectedFile, mpc.getSampler()->createNewProgramAddFirstAvailableSlot().lock());
+        mpc.getDisk()->readPgm2(selectedFile, mpc.getSampler()->getProgram(0));
 		break;
 	}
 	case 3:

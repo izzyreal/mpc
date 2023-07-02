@@ -18,8 +18,7 @@ void DeleteAllProgramsScreen::function(int j)
 		break;
 	case 4:
 	{
-		sampler->deleteAllPrograms();
-        sampler->createNewProgramAddFirstAvailableSlot().lock()->setName("NewPgm-A");
+		sampler->deleteAllPrograms(/*createDefaultProgram=*/true);
         openScreen("delete-program");
 		break;
 	}

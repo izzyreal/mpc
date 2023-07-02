@@ -57,12 +57,12 @@ public:
      * This method deletes all programs and sets all DRUMs to program
      * index 0.
      *
-     * Use this method with caution. It brings the MPC2000XL in an invalid
-     * state, as there should always be one valid program. Callers of this
-     * method have the responsibility to add at least one program after
-     * making the call.
+     * It optionally creates a new program. Be aware that the MPC2000XL
+     * always has a valid program in memory, so if createDefaultProgram
+     * is false, the caller must make sure there is at least 1 valid
+     * program created after the invocation.
      */
-    void deleteAllPrograms();
+    void deleteAllPrograms(bool createDefaultProgram);
 
     void repairProgramReferences();
     std::vector<std::shared_ptr<Sound>>& getSounds();

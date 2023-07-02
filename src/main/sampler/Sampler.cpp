@@ -279,11 +279,21 @@ std::weak_ptr<Program> Sampler::addProgram(int i)
 
 std::weak_ptr<Program> Sampler::createNewProgramAddFirstAvailableSlot()
 {
-	for (auto& p : programs)
+    const bool repairDrumPrograms = getProgramCount() == 0;
+
+ 	for (auto& p : programs)
 	{
 		if (!p)
 		{
 			p = std::make_shared<Program>(mpc, this);
+
+            if (repairDrumPrograms)
+            {
+                for (int i = 0; i < 4; i++)
+                {
+                    setDrumBusProgramIndex(i + 1, 0);
+                }
+            }
 			return p;
 		}
 	}
@@ -352,16 +362,16 @@ std::vector<std::weak_ptr<Program>> Sampler::getPrograms()
 	return res;
 }
 
-void Sampler::deleteAllPrograms()
+void Sampler::deleteAllPrograms(bool createDefaultProgram)
 {
 	for (auto& p : programs)
     {
         p.reset();
     }
 
-    for (int i = 0; i < 4; i++)
+    if (createDefaultProgram)
     {
-        setDrumBusProgramIndex(i + 1, 0);
+        createNewProgramAddFirstAvailableSlot().lock()->setName("NewPgm-A");
     }
 }
 
