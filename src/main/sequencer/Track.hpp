@@ -86,7 +86,6 @@ public:
     void playNext();
     bool isOn();
     bool isUsed();
-    bool tickIsFreeForNote(int note, int tick);
 
 public:
     std::vector<std::shared_ptr<Event>> getEventRange(int startTick, int endTick);
@@ -99,7 +98,6 @@ public:
     void removeDoubles();
 
 private:
-    std::vector<std::shared_ptr<NoteOnEvent>> getNoteEventsAtTick(int tick);
     void updateEventTick(std::shared_ptr<Event>& e, int newTick);
 
 public:

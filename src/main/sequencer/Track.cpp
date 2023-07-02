@@ -80,12 +80,14 @@ void Track::move(int tick, int oldTick)
 }
 
 std::shared_ptr<NoteOnEvent> Track::getNoteEvent(int tick, int note) {
-	auto ev = getNoteEventsAtTick(tick);
-	for (auto& e : ev)
+    for (auto& e : events)
     {
-		if (e->getNote() == note)
-			return e;
-	}
+        if (const auto e2 = std::dynamic_pointer_cast<NoteOnEvent>(e);
+            e2 && e2->getTick() == tick && e2->getNote() == note)
+        {
+            return e2;
+        }
+    }
 	return {};
 }
 
@@ -614,15 +616,6 @@ bool Track::isUsed()
     return used || !events.empty();
 }
 
-bool Track::tickIsFreeForNote(int note, int tick)
-{
-    for (auto& noteEvent : getNoteEventsAtTick(tick)) 
-    {
-        if (noteEvent->getNote() == note) return false;
-    }
-    return true;
-}
-
 std::vector<std::shared_ptr<Event>> Track::getEventRange(int startTick, int endTick)
 {
 	std::vector<std::shared_ptr<Event>> res;
@@ -875,19 +868,6 @@ std::vector<std::shared_ptr<NoteOnEvent>> Track::getNoteEvents()
 	return noteEvents;
 }
 
-std::vector<std::shared_ptr<NoteOnEvent>> Track::getNoteEventsAtTick(int tick)
-{
-	std::vector<std::shared_ptr<NoteOnEvent>> noteEvents;
-
-	for (auto& ne : getNoteEvents())
-	{
-		if (ne->getTick() == tick)
-			noteEvents.push_back(ne);
-	}
-
-	return noteEvents;
-}
-
 void Track::shiftTiming(std::shared_ptr<Event> event, bool later, int amount, int lastTick)
 {
     if (!later)
@@ -925,11 +905,12 @@ bool Track::insertEventWhileRetainingSort(const std::shared_ptr<Event>& event, b
 
     if (noteEvent && !allowMultipleNotesOnSameTick) 
     {
-        for (auto &e: getNoteEventsAtTick(tick)) 
+        for (auto& e : events)
         {
-            if (e->getNote() == noteEvent->getNote()) 
+            if (auto e2 = std::dynamic_pointer_cast<NoteOnEvent>(e);
+                e2 && e2->getTick() == tick && e2->getNote() == noteEvent->getNote())
             {
-                e.swap(noteEvent);
+                e2.swap(noteEvent);
                 return false;
             }
         }
