@@ -28,7 +28,14 @@ void SaveScreen::open()
 {
     mpc.getDisk()->initFiles();
 
-    programIndex = 0;
+    for (int i = 0; i < 24; i++)
+    {
+        if (sampler->getProgram(i))
+        {
+            programIndex = i;
+            break;
+        }
+    }
 
     if (ls->getPreviousScreenName() != "popup")
     {
@@ -228,6 +235,7 @@ void SaveScreen::turnWheel(int i)
             case 3:
             {
                 unsigned char counter = 0;
+
                 for (int idx = programIndex;
                      (i < 0) ? idx >= 0 : idx < 24;
                      (i < 0) ? idx-- : idx++)
@@ -274,7 +282,19 @@ void SaveScreen::setType(int i)
         return;
     
     type = i;
-    
+
+    if (i == 3)
+    {
+        for (int j = 0; j < 24; j++)
+        {
+            if (sampler->getProgram(j))
+            {
+                programIndex = j;
+                break;
+            }
+        }
+    }
+
     displayType();
     displayFile();
     displaySize();
