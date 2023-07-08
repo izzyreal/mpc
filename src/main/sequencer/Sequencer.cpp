@@ -394,7 +394,7 @@ void Sequencer::play(bool fromStart)
     endOfSong = false;
 	auto songScreen = mpc.screens->get<SongScreen>("song");
 	auto currentSong = songs[songScreen->getActiveSongIndex()];
-    
+
 	std::shared_ptr<Step> currentStep;
 
 	if (songMode)
@@ -404,10 +404,10 @@ void Sequencer::play(bool fromStart)
 
 		if (fromStart)
 			songScreen->setOffset(-1);
-		
+
 		if (songScreen->getOffset() + 1 > currentSong->getStepCount() - 1)
 			return;
-		
+
 		int step = songScreen->getOffset() + 1;
 		
 		if (step > currentSong->getStepCount())
@@ -1357,11 +1357,15 @@ int Sequencer::getCurrentlyPlayingSequenceIndex()
     {
         auto songScreen = mpc.screens->get<SongScreen>("song");
         auto song = songs[songScreen->getActiveSongIndex()];
+
         if (!song->isUsed())
         {
             return -1;
         }
-        auto songSeqIndex = songMode ? song->getStep(songScreen->getOffset() + 1).lock()->getSequence() : -1;
+
+        const auto seqIndexShouldBeDerivedFromSongStep = songMode && songScreen->getOffset() + 1 < song->getStepCount();
+
+        auto songSeqIndex = seqIndexShouldBeDerivedFromSongStep ? song->getStep(songScreen->getOffset() + 1).lock()->getSequence() : -1;
         return songSeqIndex;
     }
 
