@@ -153,7 +153,8 @@ std::shared_ptr<NoteOnEvent> Track::recordNoteEventASync(unsigned char note, uns
     queuedNoteOnEvents.enqueue(onEvent);
     return onEvent;
 }
-void Track::finalizeNoteEventASync(std::shared_ptr<NoteOnEvent> event)
+
+void Track::finalizeNoteEventASync(const std::shared_ptr<NoteOnEvent>& event)
 {
     auto offEvent = event->getNoteOff();
     offEvent->setTick(-2);
@@ -179,7 +180,8 @@ std::shared_ptr<NoteOnEvent> Track::recordNoteEventSynced(int tick, int note, in
         return onEvent;
     }
 }
-bool Track::finalizeNoteEventSynced(std::shared_ptr<NoteOnEvent> event, int duration)
+
+bool Track::finalizeNoteEventSynced(const std::shared_ptr<NoteOnEvent>& event, int duration)
 {
     auto old_duration = event->getDuration();
     event->setDuration(duration);
@@ -187,7 +189,7 @@ bool Track::finalizeNoteEventSynced(std::shared_ptr<NoteOnEvent> event, int dura
     return old_duration != duration;
 }
 
-void Track::addEvent(int tick, std::shared_ptr<Event> event, bool allowMultipleNotesOnSameTick)
+void Track::addEvent(int tick, const std::shared_ptr<Event>& event, bool allowMultipleNotesOnSameTick)
 {
     if (events.empty())
     {
@@ -521,7 +523,7 @@ void Track::playNext()
 		if (punchScreen->autoPunch == 2 && pos >= punchScreen->time0 && pos < punchScreen->time1)
 			_delete = true;
 	}
-	//!!!!!!!!!!!!!!!!!!!
+
     auto event = eventIndex >= events.size() ? std::shared_ptr<Event>() : events[eventIndex];
     auto hardware = mpc.getHardware();
 
