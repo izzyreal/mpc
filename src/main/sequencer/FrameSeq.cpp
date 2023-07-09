@@ -14,6 +14,9 @@ void FrameSeq::work(int nFrames)
 
     auto seq = sequencer->getCurrentlyPlayingSequence();
 
+    bool songHasStopped = false;
+    bool normalPlayHasStopped = false;
+
     for (int frameIndex = 0; frameIndex < nFrames; frameIndex++)
     {
         processEventsAfterNFrames(frameIndex);
@@ -59,8 +62,9 @@ void FrameSeq::work(int nFrames)
             }
             else if (sequencer->isSongModeEnabled())
             {
-                if (processSongMode())
+                if (!songHasStopped && processSongMode())
                 {
+                    songHasStopped = true;
                     continue;
                 }
             }
@@ -73,11 +77,17 @@ void FrameSeq::work(int nFrames)
             }
             else
             {
-                processSeqLoopDisabled();
+                if (!normalPlayHasStopped && processSeqLoopDisabled())
+                {
+                    normalPlayHasStopped = true;
+                }
             }
 
-            sequencer->playToTick(static_cast<int>(sequencerPlayTickCounter));
-            processNoteRepeat();
+            if (!songHasStopped && !normalPlayHasStopped)
+            {
+                sequencer->playToTick(static_cast<int>(sequencerPlayTickCounter));
+                processNoteRepeat();
+            }
 
             sequencerPlayTickCounter++;
         }

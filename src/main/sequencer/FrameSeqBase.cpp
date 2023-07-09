@@ -274,7 +274,6 @@ bool FrameSeqBase::processSongMode()
 
         if (doneRepeating && songScreen->isLoopEnabled() && step == song->getLastStep())
         {
-            sequencer->playToTick(seq->getLastTick() - 1);
             sequencer->resetPlayedStepRepetitions();
             songScreen->setOffset(song->getFirstStep() - 1);
             auto newStep = song->getStep(songScreen->getOffset() + 1).lock();
@@ -295,8 +294,6 @@ bool FrameSeqBase::processSongMode()
         }
         else
         {
-            sequencer->playToTick(seq->getLastTick() - 1);
-
             if (doneRepeating)
             {
                 sequencer->resetPlayedStepRepetitions();
@@ -309,6 +306,10 @@ bool FrameSeqBase::processSongMode()
                     stopSequencer();
                     return true;
                 }
+            }
+            else
+            {
+                sequencer->playToTick(seq->getLastTick() - 1);
             }
             move(0);
         }
@@ -354,7 +355,7 @@ bool FrameSeqBase::processSeqLoopEnabled()
     return false;
 }
 
-void FrameSeqBase::processSeqLoopDisabled()
+bool FrameSeqBase::processSeqLoopDisabled()
 {
     auto seq = sequencer->getCurrentlyPlayingSequence();
 
@@ -370,7 +371,11 @@ void FrameSeqBase::processSeqLoopDisabled()
             sequencer->stop(seq->getLastTick());
             sequencer->move(seq->getLastTick());
         }
+
+        return true;
     }
+
+    return false;
 }
 
 void FrameSeqBase::processNoteRepeat()
@@ -436,7 +441,6 @@ void FrameSeqBase::processTempoChange()
 void FrameSeqBase::stopSequencer()
 {
     auto seq = sequencer->getCurrentlyPlayingSequence();
-    sequencer->playToTick(seq->getLastTick() - 1);
     sequencer->stop();
     move(0);
 }
@@ -510,18 +514,19 @@ bool FrameSeqBase::processTransport(bool isRunningAtStartOfBuffer, int frameInde
             sequencerShouldStartPlayingOnNextLock = true;
             sequencerPlayTickCounter = sequencer->getPlayStartTick();
         }
-        else if (wasRunning && !isRunningAtStartOfBuffer)
-        {
-            sendMidiSyncMsg(ShortMessage::STOP, frameIndex);
-            wasRunning = false;
-            sequencerShouldPlay = false;
-            metronome = false;
-        }
         else if (sequencerShouldStartPlayingOnNextLock)
         {
             sequencerShouldPlay = true;
             sequencerShouldStartPlayingOnNextLock = false;
         }
+    }
+
+    if (wasRunning && !isRunningAtStartOfBuffer)
+    {
+        sendMidiSyncMsg(ShortMessage::STOP, frameIndex);
+        wasRunning = false;
+        sequencerShouldPlay = false;
+        metronome = false;
     }
 
     return sequencerShouldPlay;

@@ -101,7 +101,7 @@ namespace mpc::sequencer {
 
         bool processSeqLoopEnabled();
 
-        void processSeqLoopDisabled();
+        bool processSeqLoopDisabled();
 
         void processNoteRepeat();
 
