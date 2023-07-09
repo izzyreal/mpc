@@ -81,7 +81,5 @@ void FrameSeq::work(int nFrames)
 
             sequencerPlayTickCounter++;
         }
-
-        continuousTickCounter++;
     }
 }

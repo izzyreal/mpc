@@ -74,8 +74,6 @@ namespace mpc::sequencer {
         // Offset of current tick within current buffer
         unsigned short tickFrameOffset = 0;
 
-        unsigned long long continuousTickCounter = 0;
-
         unsigned long long sequencerPlayTickCounter = 0;
 
         void updateTimeDisplay();
