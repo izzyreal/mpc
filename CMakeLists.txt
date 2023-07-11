@@ -56,7 +56,7 @@ set(RTMIDI_TARGETNAME_UNINSTALL "rtmidi_uninstall")
 
 FetchContent_Declare(rtmidi
     GIT_REPOSITORY https://github.com/thestk/rtmidi.git
-    GIT_TAG        5.0.0
+    GIT_TAG        master
     SOURCE_DIR     ${CMAKE_SOURCE_DIR}/deps/rtmidi
 )
 
