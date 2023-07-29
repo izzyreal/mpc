@@ -1,3 +1,50 @@
+## v0.5.1
+* Updated documentation: https://vmpcdocs.izmar.nl
+* Documentation also [available in PDF](https://vmpcdocs.izmar.nl/vmpc2000xl.pdf).
+* Song mode: Do not crash when pressing PLAY when (end of song) is selected.
+* Fixed Delete All Programs.
+* Fixed step editor cosmetic issue when changing sequencer position while events are selected.
+* Fix polyphonic recording.
+* Implement transpose (MIDI only, like the original).
+* Type names in the Name window via pads and buttons.
+* Auxiliary LCD (which can be opened by double-clicking the LCD) now has a maximize button.
+* Show all keyboard mappings when hovering over the keyboard button in the top-right.
+* Note repeat MIDI output.
+* Fix maximum number of audio output channels. It was limited to a single stereo pair.
+* Fix 16-level note repeats.
+* Improve step editor navigation (remember active field when you were last in that screen better).
+* Playing events in the step editor now results in the correct duration.
+* PURGE to remove all unused samples is now working correctly.
+* Fix `~/Documents/VMPC2000XL/Volumes/MPC2000XL` file renaming on Windows. For example if you've copied a samplepack over, the names usually need to be shortened. This was messed up and now it's better.
+* Load MIDI files that were exported from Ableton Live.
+* Fix macOS audio input.
+* Fix macOS occasional keyboard focus issue.
+* 2MB smaller binaries.
+* Fix looping sounds.
+* Fix Velo to Start.
+* Allow play / rec / overdub in mixer screens.
+* When you load a sound with a name that already exists (case insensitive) you have the option to rename or replace. The functionality of renaming was broken, and this is now fixed.
+* In TRIM screen `St:` or `End:` field didn't update if their values are the same. Fixed.
+* Fixed a display bug when using Punch.
+* The Change Bars screen was openable (by turning the DATA wheel on the Bars field in the MAIN screen) while playing. This is now blocked.
+* Added Akai MPD16 and IK iRig PADS to bundled MIDI controller presets
+* Restore the bundled MIDI control presets (currently only 3, for MPD218, MPD16 and iRig PADS) by removing them from `~/Documents/VMPC2000XL/MidiControlPresets` and restarting VMPC2000XL.
+* The number pad labels have been redesigned to be more legible.
+* Official Windows 7 32/64 bit support. No more need to email me for Windows 7.
+* [openSUSE, Fedora, Ubuntu and Debian packages]( https://software.opensuse.org//download.html?project=multimedia%3Aproaudio&package=vmpc2000xl).
+* Use your favorite MIDI controller with VMPC2000XL. Go to Shift + 0 for VMPC settings, set 'MIDI control mode' to 'VMPC' and press F5 to go to the MIDI tab. Use LEARN to create a controller preset. Your active preset will be auto-saved. To name and manage multiple presets, press OPEN WINDOW. Presets are stored in `~/Documents/VMPC2000XL/MidiControlPresets`. Let me know which controller you use and I'll try to add it to VMPC2000XL's bundled presets. Currently the only bundled presets are for the Akai MPD218, Akai MPD16 and iRig PADS.
+* Hold Alt/Option/Ctrl while hovering over a keyboard-controllable component to see its key.
+* iOS version is ready for early access. Send me an email and I'll add you to the TestFlight programme.
+* Songs are now persisted correctly.
+* You can now type names in the Name screen with your computer keyboard.
+* Standalone version now has a native window border. The "Options" button for Audio/MIDI Settings has been replaced by the gear icon in the top-right.
+* Resizable auxiliary LCD, for example to put on another monitor. Double-click it to open or close auxiliary display.
+* Auto-converting of WAVs is enabled by default.
+* Improved MIDI sync out accuracy in standalone.
+* Sync to incoming MIDI clock and transmit MIDI clock are enabled by default.
+* 'Master level' in 'Mixer setup' now actually affects volume.
+* [macOS] Separate utility ['FAT16 Mount Blocker'](https://drive.google.com/file/d/1xTA4-yKwb0oVeSN1okQbWHkYMRW-aaSg/view?usp=sharing) to prevent macOS from corrupting your MPC2000XL CF cards and other media. Just start the app, and as long as it's running in the background it will mount all FAT16 volumes as read-only. Note that if you only use up to 8 characters for your sound names, there is no corruption and hence no need for this utility. If you use up to 16 characters, you should use this utility.
+
 ## v0.4.4 (13-5-2022)
 * Fix crash when loading 24 or 32 bit WAV files
 * Fix stuck modifier keys when changing focus (DATA wheel is incrementing too much)
