@@ -1,7 +1,7 @@
 ## v0.5.1
 * Updated documentation: https://vmpcdocs.izmar.nl
 * Documentation also [available in PDF](https://vmpcdocs.izmar.nl/vmpc2000xl.pdf).
-* Song mode: Do not crash when pressing PLAY when (end of song) is selected.
+* Song mode: Do not crash when pressing PLAY when `(end of song)` is selected.
 * Fixed Delete All Programs.
 * Fixed step editor cosmetic issue when changing sequencer position while events are selected.
 * Fix polyphonic recording.
