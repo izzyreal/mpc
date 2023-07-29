@@ -6,7 +6,7 @@
 * Fixed step editor cosmetic issue when changing sequencer position while events are selected.
 * Fix polyphonic recording.
 * Implement transpose (MIDI only, like the original).
-* Type names in the Name window via pads and buttons.
+* Type names in the Name window via keyboard, pads and buttons.
 * Auxiliary LCD (which can be opened by double-clicking the LCD) now has a maximize button.
 * Show all keyboard mappings when hovering over the keyboard button in the top-right.
 * Note repeat MIDI output.
@@ -36,7 +36,6 @@
 * Hold Alt/Option/Ctrl while hovering over a keyboard-controllable component to see its key.
 * iOS version is ready for early access. Send me an email and I'll add you to the TestFlight programme.
 * Songs are now persisted correctly.
-* You can now type names in the Name screen with your computer keyboard.
 * Standalone version now has a native window border. The "Options" button for Audio/MIDI Settings has been replaced by the gear icon in the top-right.
 * Resizable auxiliary LCD, for example to put on another monitor. Double-click it to open or close auxiliary display.
 * Auto-converting of WAVs is enabled by default.
