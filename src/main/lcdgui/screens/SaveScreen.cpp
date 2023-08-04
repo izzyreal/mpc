@@ -383,22 +383,7 @@ void SaveScreen::displayFree()
         MLOG("An exception occurred when SaveScreen::displayFree was trying to query available space!");
     }
 
-    const static std::vector<std::string> units = {"B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"};
-    size_t unit = 0;
-
-    auto adjustedSize = availableSpaceInBytes;
-#ifdef __APPLE__
-    const auto denominator = 1000;
-#else
-    const auto denominator = 1024;
-#endif
-
-    while (adjustedSize >= denominator && unit < units.size() - 1) {
-        unit++;
-        adjustedSize /= denominator;
-    }
-
-    const auto text = std::to_string(static_cast<int>(floor(adjustedSize))) + units[unit];
+    const auto text = byte_count_to_short_string(availableSpaceInBytes);
     findLabel("free")->setText(text);
 }
 

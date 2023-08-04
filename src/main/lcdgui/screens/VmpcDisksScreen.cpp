@@ -117,34 +117,6 @@ void VmpcDisksScreen::turnWheel(int i)
     displayFunctionKeys();
 }
 
-std::string formatFileSize(uint64_t size)
-{
-    std::string hrSize = "";
-    uint64_t b = size;
-    float k = size / 1024.0;
-    float m = (size / 1024.0) / 1024.0;
-    float g = ((size / 1024.0) / 1024.0) / 1024.0;
-    float t = (((size / 1024.0) / 1024.0) / 1024.0) / 1024.0;
-
-    if(t > 1)
-    {
-        hrSize = StrUtil::TrimDecimals(t, 1) + "T";
-    } else if(g > 1)
-    {
-        hrSize = std::to_string((int)round(g)) + "G";
-    } else if(m > 1)
-    {
-        hrSize = std::to_string((int)round(m)) + "M";
-    } else if(k > 1)
-    {
-        hrSize = std::to_string((int)round(k)) + "K";
-    } else
-    {
-        hrSize = std::to_string(b) + "B";
-    }
-    return hrSize;
-}
-
 void VmpcDisksScreen::displayRows()
 {
     auto disks = mpc.getDisks();
@@ -171,7 +143,7 @@ void VmpcDisksScreen::displayRows()
         
         volume->setText(disk->getVolumeLabel());
         type->setText(disk->getTypeShortName());
-        size->setText(formatFileSize(disk->getTotalSize()));
+        size->setText(byte_count_to_short_string(disk->getTotalSize(), /*one_letter_suffix = */ true));
         mode->setText(Volume::modeShortName(config[disk->getVolume().volumeUUID]));
     }
     

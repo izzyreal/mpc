@@ -45,3 +45,23 @@ inline void set_file_data(fs::path p, const std::string& bytes)
     std::ofstream ofs(p, std::ios::out | std::ios::binary);
     ofs.write(bytes.data(), bytes.size());
 }
+
+inline std::string byte_count_to_short_string(uintmax_t byte_count, bool one_letter_suffix = false)
+{
+    const static std::vector<std::string> units = {"B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"};
+    size_t unit = 0;
+
+    auto adjustedSize = byte_count;
+#ifdef __APPLE__
+    const auto denominator = 1000;
+#else
+    const auto denominator = 1024;
+#endif
+
+    while (adjustedSize >= denominator && unit < units.size() - 1) {
+        unit++;
+        adjustedSize /= denominator;
+    }
+
+    return std::to_string(static_cast<int>(floor(adjustedSize))) + (one_letter_suffix ? units[unit].substr(0, 1) : units[unit]);
+}
