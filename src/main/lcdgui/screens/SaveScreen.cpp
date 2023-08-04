@@ -1,5 +1,7 @@
 #include "SaveScreen.hpp"
 
+#include <cstdint>
+
 #include <Paths.hpp>
 #include <sequencer/Track.hpp>
 #include <lcdgui/screens/window/NameScreen.hpp>
@@ -11,13 +13,10 @@
 #include <disk/Volume.hpp>
 #include <nvram/VolumesPersistence.hpp>
 
-#include <file/FileUtil.hpp>
-
 using namespace mpc::lcdgui::screens;
 using namespace mpc::lcdgui::screens::window;
 using namespace mpc::lcdgui::screens::dialog2;
 using namespace moduru::lang;
-using namespace moduru::file;
 
 SaveScreen::SaveScreen(mpc::Mpc& mpc, const int layerIndex) 
 : ScreenComponent(mpc, "save", layerIndex)
@@ -376,8 +375,31 @@ void SaveScreen::displaySize()
 
 void SaveScreen::displayFree()
 {
-    auto freeFormatted = FileUtil::getFreeDiskSpaceFormatted(mpc::Paths::storesPath().string());
-    findLabel("free")->setText(freeFormatted);
+    std::uintmax_t availableSpaceInBytes = 0;
+
+    try {
+        availableSpaceInBytes = fs::space(mpc::Paths::storesPath()).free;
+    } catch (fs::filesystem_error&) {
+        MLOG("An exception occurred when SaveScreen::displayFree was trying to query available space!");
+    }
+
+    const static std::vector<std::string> units = {"B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"};
+    size_t unit = 0;
+
+    auto adjustedSize = availableSpaceInBytes;
+#ifdef __APPLE__
+    const auto denominator = 1000;
+#else
+    const auto denominator = 1024;
+#endif
+
+    while (adjustedSize >= denominator && unit < units.size() - 1) {
+        unit++;
+        adjustedSize /= denominator;
+    }
+
+    const auto text = std::to_string(static_cast<int>(floor(adjustedSize))) + units[unit];
+    findLabel("free")->setText(text);
 }
 
 void SaveScreen::displayDirectory()
