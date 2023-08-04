@@ -11,7 +11,7 @@
 namespace akaifat::fat { class AkaiFatLfnDirectoryEntry; }
 
 /*
- * An MpcFile contains either an AkaiFatLongFileNameDirectoryEntry or a moduru::file::FileSystemNode.
+ * An MpcFile contains either an akaifat::fat::AkaiFatLfnDirectoryEntry or a fs::path.
  * Check each implementation for how low-level file IO is handled.
  *
  * The MpcFile sits at the same level as the AbstractDisk -- it lives in the world of the virtual MPC2000XL
