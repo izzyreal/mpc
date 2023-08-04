@@ -8,8 +8,6 @@
 #include <disk/RawDisk.hpp>
 #include <nvram/VolumesPersistence.hpp>
 
-#include <file/FileUtil.hpp>
-
 #include <util/RemovableVolumes.h>
 
 using namespace mpc::disk;
@@ -32,11 +30,7 @@ void DiskController::initDisks()
     defaultVolume.mode = READ_WRITE;
     defaultVolume.label = "DEFAULT";
     defaultVolume.localDirectoryPath = mpc::Paths::defaultLocalVolumePath().string();
-#ifdef _WIN32
-    defaultVolume.volumeSize = moduru::file::FileUtil::getTotalDiskSpace(defaultVolume.localDirectoryPath.substr(0, 1));
-#else
-    defaultVolume.volumeSize = moduru::file::FileUtil::getTotalDiskSpace();
-#endif
+    defaultVolume.volumeSize = fs::space(defaultVolume.localDirectoryPath).capacity;
     disks.back()->initRoot();
     
     MLOG("Disk root initialized");

@@ -378,7 +378,7 @@ void SaveScreen::displayFree()
     std::uintmax_t availableSpaceInBytes = 0;
 
     try {
-        availableSpaceInBytes = fs::space(mpc::Paths::storesPath()).free;
+        availableSpaceInBytes = fs::space(mpc::Paths::storesPath()).available;
     } catch (fs::filesystem_error&) {
         MLOG("An exception occurred when SaveScreen::displayFree was trying to query available space!");
     }
