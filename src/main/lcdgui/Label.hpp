@@ -2,7 +2,6 @@
 #include <string>
 
 #include "TextComp.hpp"
-#include <gui/BMFParser.hpp>
 
 namespace mpc { class Mpc; }
 

@@ -4,12 +4,11 @@
 
 #include <math/Math.hpp>
 
-#include <gui/Bressenham.hpp>
+#include "Bressenham.hpp"
 
 #include <cmath>
 
 using namespace mpc::lcdgui;
-using namespace moduru::gui;
 
 Wave::Wave() : Component("wave")
 {

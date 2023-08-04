@@ -1,14 +1,11 @@
 #include <lcdgui/Knob.hpp>
 
 #include <Util.hpp>
-#include <gui/Bressenham.hpp>
-
-//#include <Logger.hpp>
+#include "Bressenham.hpp"
 
 #include <cmath>
 
 using namespace mpc::lcdgui;
-using namespace moduru::gui;
 
 Knob::Knob(MRECT rect)
 	: Component("knob")

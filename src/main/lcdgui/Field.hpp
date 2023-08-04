@@ -1,6 +1,5 @@
 #pragma once
 
-#include <gui/BMFParser.hpp>
 #include "TextComp.hpp"
 
 #include <memory>

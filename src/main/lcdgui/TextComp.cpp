@@ -112,7 +112,7 @@ void TextComp::Draw(std::vector<std::vector<bool>>* pixels)
 
 	while (next != UTF8_END && next >= 0)
 	{
-		moduru::gui::bmfont_char current_char;
+		bmfont_char current_char;
 		current_char = font.chars[next];
 		atlasx = current_char.x;
 		atlasy = current_char.y;

@@ -2,7 +2,7 @@
 
 #include "Screens.hpp"
 
-#include <gui/BasicStructs.hpp>
+#include "BasicStructs.hpp"
 
 #include <Mpc.hpp>
 
@@ -49,7 +49,7 @@ LayeredScreen::LayeredScreen(mpc::Mpc& mpc)
     auto bmpFile = fs.open("fonts/mpc2000xl-font_0.bmp");
     char* bmpData = (char*) std::string_view(bmpFile.begin(), bmpFile.end() - bmpFile.begin()).data();
 
-	moduru::gui::BMFParser bmfParser(fntData, fntFile.size(), bmpData, bmpFile.size());
+	BMFParser bmfParser(fntData, fntFile.size(), bmpData, bmpFile.size());
 
 	font = bmfParser.getLoadedFont();
 	atlas = bmfParser.getAtlas();

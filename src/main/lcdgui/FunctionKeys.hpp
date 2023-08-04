@@ -2,8 +2,6 @@
 
 #include <lcdgui/Component.hpp>
 
-#include <gui/BMFParser.hpp>
-
 #include <string>
 #include <vector>
 

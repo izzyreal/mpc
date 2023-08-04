@@ -1,6 +1,6 @@
 #pragma once
 
-#include <gui/BasicStructs.hpp>
+#include "BasicStructs.hpp"
 
 #include <vector>
 #include <string>

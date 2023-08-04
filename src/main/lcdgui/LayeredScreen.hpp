@@ -5,9 +5,9 @@
 #include <string>
 #include <map>
 
-#include <gui/BMFParser.hpp>
+#include "BMFParser.hpp"
 
-#include <gui/BasicStructs.hpp>
+#include "BasicStructs.hpp"
 
 namespace mpc { class Mpc; }
 
@@ -34,7 +34,7 @@ namespace mpc::lcdgui {
 
 	public:
 		std::vector<std::vector<bool>> atlas;
-		moduru::gui::bmfont font;
+		bmfont font;
 
 	private:
 		const int LAYER_COUNT = 4;
