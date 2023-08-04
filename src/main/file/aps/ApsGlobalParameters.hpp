@@ -11,7 +11,6 @@ namespace mpc::file::aps
 	class ApsGlobalParameters
 	{
 	private:
-		mpc::Mpc& mpc;
 		bool padToInternalSound;
 		bool padAssignMaster;
 		bool stereoMixSourceDrum;
@@ -45,7 +44,7 @@ namespace mpc::file::aps
 		std::vector<char> getBytes();
 
 	public:
-		ApsGlobalParameters(mpc::Mpc& mpc, const std::vector<char>& loadBytes);
+        ApsGlobalParameters(const std::vector<char>& loadBytes);
 		ApsGlobalParameters(mpc::Mpc& mpc);
 
 	};

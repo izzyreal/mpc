@@ -1,7 +1,6 @@
 #include <file/aps/ApsParser.hpp>
 
 #include <Mpc.hpp>
-#include <disk/MpcFile.hpp>
 
 #include <sampler/Program.hpp>
 #include <sampler/Sampler.hpp>
@@ -15,12 +14,7 @@ using namespace mpc::file::aps;
 using namespace mpc::disk;
 using namespace mpc::sampler;
 
-ApsParser::ApsParser(mpc::Mpc& mpc, std::weak_ptr<MpcFile> file)
-: ApsParser(mpc, file.lock()->getBytes())
-{
-}
-
-ApsParser::ApsParser(mpc::Mpc &mpc, const std::vector<char> &loadBytes)
+ApsParser::ApsParser(const std::vector<char>& loadBytes)
 {
     if (loadBytes.empty())
     {
@@ -37,7 +31,7 @@ ApsParser::ApsParser(mpc::Mpc &mpc, const std::vector<char> &loadBytes)
     auto const nameOffset = soundNamesEnd + PAD_LENGTH1;
     apsName = std::make_unique<ApsName>(VecUtil::CopyOfRange(loadBytes, nameOffset, nameEnd));
     auto const parametersEnd = nameEnd + PARAMETERS_LENGTH;
-    globalParameters = std::make_unique<ApsGlobalParameters>(mpc, VecUtil::CopyOfRange(loadBytes, nameEnd, parametersEnd));
+    globalParameters = std::make_unique<ApsGlobalParameters>(VecUtil::CopyOfRange(loadBytes, nameEnd, parametersEnd));
     auto const maTableEnd = parametersEnd + TABLE_LENGTH;
     maTable = std::make_unique<ApsAssignTable>(VecUtil::CopyOfRange(loadBytes, parametersEnd, maTableEnd));
     int const drum1MixerOffset = maTableEnd + PAD_LENGTH2;

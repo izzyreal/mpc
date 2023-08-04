@@ -14,8 +14,7 @@ using namespace mpc::lcdgui::screens;
 using namespace moduru::file;
 using namespace mpc::file::aps;
 
-ApsGlobalParameters::ApsGlobalParameters(mpc::Mpc& mpc, const std::vector<char>& loadBytes)
-	: mpc(mpc)
+ApsGlobalParameters::ApsGlobalParameters(const std::vector<char>& loadBytes)
 {
 	padToInternalSound = BitUtil::getBits(loadBytes[0])[7] == '1';
 	padAssignMaster = BitUtil::getBits(loadBytes[1])[7] == '1';
@@ -28,7 +27,6 @@ ApsGlobalParameters::ApsGlobalParameters(mpc::Mpc& mpc, const std::vector<char>&
 }
 
 ApsGlobalParameters::ApsGlobalParameters(mpc::Mpc& mpc)
-	: mpc(mpc)
 {
 	saveBytes = std::vector<char>(ApsParser::PARAMETERS_LENGTH);
 	

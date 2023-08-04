@@ -2,7 +2,6 @@
 #include "lcdgui/screens/PgmAssignScreen.hpp"
 
 #include <Mpc.hpp>
-#include <disk/AbstractDisk.hpp>
 #include <disk/StdDisk.hpp>
 #include <disk/MpcFile.hpp>
 #include <disk/SoundLoader.hpp>
@@ -39,7 +38,7 @@ void ApsLoader::load(mpc::Mpc& mpc, std::shared_ptr<MpcFile> file)
     auto cantFindFileScreen = mpc.screens->get<CantFindFileScreen>("cant-find-file");
     cantFindFileScreen->skipAll = false;
 
-    ApsParser apsParser(mpc, file);
+    ApsParser apsParser(file->getBytes());
     
     if (!apsParser.isHeaderValid())
     {

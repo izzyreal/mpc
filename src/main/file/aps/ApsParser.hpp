@@ -65,8 +65,7 @@ public:
     std::vector<char> getBytes();
     
 public:
-    ApsParser(mpc::Mpc &, const std::vector<char> &loadBytes);
-    ApsParser(mpc::Mpc&, std::weak_ptr<mpc::disk::MpcFile> file);
+    ApsParser(const std::vector<char>& loadBytes);
     ApsParser(mpc::Mpc&, std::string apsNameString);
 };
 }

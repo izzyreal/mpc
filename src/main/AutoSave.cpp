@@ -85,7 +85,7 @@ void AutoSave::restoreAutoSavedState(mpc::Mpc &mpc, const std::string& overrideP
 
             if (f == path / "APS.APS")
             {
-                ApsParser apsParser(mpc, data);
+                ApsParser apsParser(data);
                 disk::ApsLoader::loadFromParsedAps(apsParser, mpc, true, true);
             }
             else if (f == path / "ALL.ALL")
