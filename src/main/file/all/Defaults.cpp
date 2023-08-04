@@ -12,7 +12,6 @@
 using namespace mpc::file::all;
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens;
-using namespace moduru::file;
 using namespace moduru::lang;
 
 std::vector<char> Defaults::UNKNOWN1 = { 1, 0, 0, 1, 1, 0 };
@@ -68,7 +67,7 @@ Defaults::Defaults(mpc::Mpc& mpc)
 		lastBar = 0;
 	}
 
-	auto unknownNumberBytes = moduru::file::ByteUtil::uint2bytes((lastBar + 1) * 2000000);
+	auto unknownNumberBytes = ByteUtil::uint2bytes((lastBar + 1) * 2000000);
 
 	for (int i = 0; i < 4; i++)
 	{
@@ -207,7 +206,7 @@ void Defaults::setLastTick()
 	auto userScreen = mpc.screens->get<UserScreen>("user");
 	auto lastTick = (userScreen->lastBar + 1) * 384;
 
-	auto b = moduru::file::ByteUtil::ushort2bytes(lastTick);
+	auto b = ByteUtil::ushort2bytes(lastTick);
 	
 	saveBytes[LAST_TICK_BYTE1_OFFSET] = b[0];
 	saveBytes[LAST_TICK_BYTE2_OFFSET] = b[1];
@@ -216,7 +215,7 @@ void Defaults::setLastTick()
 void Defaults::setBarCount()
 {
 	auto userScreen = mpc.screens->get<UserScreen>("user");
-	auto ba = moduru::file::ByteUtil::ushort2bytes(userScreen->lastBar + 1);
+	auto ba = ByteUtil::ushort2bytes(userScreen->lastBar + 1);
 	saveBytes[BAR_COUNT_BYTE1_OFFSET] = ba[0];
 	saveBytes[BAR_COUNT_BYTE2_OFFSET] = ba[1];
 }
@@ -268,7 +267,7 @@ void Defaults::setNames()
 void Defaults::setTempo()
 {
 	auto userScreen = mpc.screens->get<UserScreen>("user");
-	auto tempoBytes = moduru::file::ByteUtil::ushort2bytes(static_cast<int>(userScreen->tempo * 10.0));
+	auto tempoBytes = ByteUtil::ushort2bytes(static_cast<int>(userScreen->tempo * 10.0));
 	saveBytes[TEMPO_BYTE1_OFFSET] = tempoBytes[0];
 	saveBytes[TEMPO_BYTE2_OFFSET] = tempoBytes[1];
 }

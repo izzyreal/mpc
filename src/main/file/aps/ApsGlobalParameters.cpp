@@ -11,7 +11,6 @@
 
 using namespace mpc::lcdgui;
 using namespace mpc::lcdgui::screens; 
-using namespace moduru::file;
 using namespace mpc::file::aps;
 
 ApsGlobalParameters::ApsGlobalParameters(const std::vector<char>& loadBytes)

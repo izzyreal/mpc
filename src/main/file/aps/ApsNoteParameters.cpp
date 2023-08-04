@@ -18,7 +18,7 @@ ApsNoteParameters::ApsNoteParameters(const std::vector<char>& loadBytes)
 	mute1 = loadBytes[8] == 0 ? 34 : loadBytes[8];
 	mute2 = loadBytes[9] == 0 ? 34 : loadBytes[9];
 	auto buf = std::vector<char>{ loadBytes[10], loadBytes[11] };
-	tune = moduru::file::ByteUtil::bytes2short(buf);
+	tune = ByteUtil::bytes2short(buf);
 	attack = loadBytes[12];
 	decay = loadBytes[13];
 	decayMode = loadBytes[14];
@@ -47,7 +47,7 @@ ApsNoteParameters::ApsNoteParameters(mpc::sampler::NoteParameters* np)
 	saveBytes[7] = np->getVoiceOverlap();
 	saveBytes[8] = np->getMuteAssignA() == 34 ? 0 : np->getMuteAssignA();
 	saveBytes[9] = np->getMuteAssignB() == 34 ? 0 : np->getMuteAssignB();
-	auto buf = moduru::file::ByteUtil::ushort2bytes(np->getTune());
+	auto buf = ByteUtil::ushort2bytes(np->getTune());
 	saveBytes[10] = buf[0];
 	saveBytes[11] = buf[1];
 	saveBytes[12] = np->getAttack();

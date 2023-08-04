@@ -100,7 +100,7 @@ int PgmAllNoteParameters::getTune(int midiNote)
 	auto startPos = (midiNote * 25) + 9;
 	auto endPos = (midiNote * 25) + 11;
 	auto tuneBytes = VecUtil::CopyOfRange(getMidiNotesArray(), startPos, endPos);
-	return moduru::file::ByteUtil::bytes2short(tuneBytes);
+	return ByteUtil::bytes2short(tuneBytes);
 }
 
 int PgmAllNoteParameters::getAttack(int midiNote)

@@ -100,7 +100,7 @@ void SndWriter::setSampleData(const std::vector<float>& fa, bool mono)
 	auto bytePos = SndWriter::HEADER_SIZE;
 	for (int i = 0; i < fa.size(); i++) {
         auto shortres = mpc::sampleops::mean_normalized_float_to_short(fa[sPos++]);
-		buffer = moduru::file::ByteUtil::short2bytes(shortres);
+		buffer = ByteUtil::short2bytes(shortres);
 		sndFileArray[bytePos++] = buffer[0];
 		sndFileArray[bytePos++] = buffer[1];
 	}

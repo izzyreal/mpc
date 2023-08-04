@@ -38,5 +38,5 @@ void Pads::setPadMidiNote(int pad, int padMidiNote)
 
 std::vector<char> Pads::getFxBoardSettings()
 {
-    return moduru::file::ByteUtil::hexToBytes(fxBoardSettings);
+    return ByteUtil::hexToBytes(fxBoardSettings);
 }

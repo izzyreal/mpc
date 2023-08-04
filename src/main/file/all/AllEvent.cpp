@@ -25,7 +25,6 @@
 
 using namespace mpc::file::all;
 using namespace mpc::sequencer;
-using namespace moduru::file;
 
 std::vector<int> AllEvent::TICK_BYTE3_BIT_RANGE = std::vector<int>{ 0, 3 };
 

@@ -72,7 +72,7 @@ SequenceNames::SequenceNames(mpc::Mpc& mpc)
 				lastEventIndex = 641;
 			}
 
-			auto eventCountBytes = moduru::file::ByteUtil::ushort2bytes(lastEventIndex);
+			auto eventCountBytes = ByteUtil::ushort2bytes(lastEventIndex);
 			saveBytes[offset + LAST_EVENT_INDEX_OFFSET] = eventCountBytes[0];
 			saveBytes[offset + LAST_EVENT_INDEX_OFFSET + 1] = eventCountBytes[1];
 		}

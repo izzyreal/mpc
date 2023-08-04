@@ -1,9 +1,7 @@
 #include <file/aps/ApsDrumConfiguration.hpp>
 
 #include <file/BitUtil.hpp>
-#include <string>
 
-using namespace moduru::file;
 using namespace mpc::file::aps;
 
 ApsDrumConfiguration::ApsDrumConfiguration(const std::vector<char>& loadBytes)

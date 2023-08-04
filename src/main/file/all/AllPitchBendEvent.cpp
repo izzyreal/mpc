@@ -7,7 +7,6 @@
 
 using namespace mpc::file::all;
 using namespace mpc::sequencer;
-using namespace moduru::file;
 
 std::shared_ptr<PitchBendEvent> AllPitchBendEvent::bytesToMpcEvent(const std::vector<char>& bytes)
 {

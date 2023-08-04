@@ -87,13 +87,13 @@ Tracks::Tracks(mpc::sequencer::Sequence* seq)
 	auto lastTick = static_cast<int>(seq->getLastTick());
 	auto remainder = lastTick % 65535;
 	auto large = static_cast<int>(floor(lastTick / 65536.0));
-	auto lastTickBytes = moduru::file::ByteUtil::ushort2bytes(remainder);
+	auto lastTickBytes = ByteUtil::ushort2bytes(remainder);
 	saveBytes[LAST_TICK_BYTE1_OFFSET] = lastTickBytes[0];
 	saveBytes[LAST_TICK_BYTE2_OFFSET] = lastTickBytes[1];
 	saveBytes[LAST_TICK_BYTE3_OFFSET] = (large);
 	
-    auto unknown32BitIntBytes1 = moduru::file::ByteUtil::uint2bytes(10000000);
-	auto unknown32BitIntBytes2 = moduru::file::ByteUtil::uint2bytes((int)(seq->getLastTick() * 5208.333333333333));
+    auto unknown32BitIntBytes1 = ByteUtil::uint2bytes(10000000);
+	auto unknown32BitIntBytes2 = ByteUtil::uint2bytes((int)(seq->getLastTick() * 5208.333333333333));
     
 	for (int j = 0; j < 4; j++)
     {

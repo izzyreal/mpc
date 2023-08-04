@@ -9,7 +9,6 @@
 
 using namespace mpc::file::all;
 using namespace mpc::sequencer;
-using namespace moduru::file;
 
 std::shared_ptr<NoteOnEvent> AllNoteOnEvent::bytesToMpcEvent(const std::vector<char>& bytes)
 {

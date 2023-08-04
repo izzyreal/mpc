@@ -83,14 +83,14 @@ void SndHeaderWriter::setBeatCount(int i)
 
 void SndHeaderWriter::setSampleRate(int i)
 {
-	auto shortBytes = moduru::file::ByteUtil::short2bytes(i - 65536);
+	auto shortBytes = ByteUtil::short2bytes(i - 65536);
     headerArray[40] = shortBytes[0];
     headerArray[41] = shortBytes[1];
 }
 
 void SndHeaderWriter::putLE(int offset, int value)
 {
-	auto ba = moduru::file::ByteUtil::uint2bytes(value);
+	auto ba = ByteUtil::uint2bytes(value);
     for (auto j = 0; j < ba.size(); j++) {
         headerArray[j + offset] = ba[j];
     }

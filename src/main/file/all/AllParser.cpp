@@ -93,7 +93,7 @@ AllParser::AllParser(mpc::Mpc& _mpc)
 		chunks.push_back(allSeq.getBytes());
 	}
 	
-	saveBytes = moduru::file::ByteUtil::stitchByteArrays(chunks);
+	saveBytes = ByteUtil::stitchByteArrays(chunks);
 }
 
 AllParser::~AllParser()

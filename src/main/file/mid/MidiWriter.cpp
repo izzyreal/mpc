@@ -186,7 +186,7 @@ MidiWriter::MidiWriter(mpc::sequencer::Sequence* sequence)
 			}
 			else if (pitchBendEvent)
 			{
-				auto amountBytes = moduru::file::ByteUtil::ushort2bytes(pitchBendEvent->getAmount() + 8192);
+				auto amountBytes = ByteUtil::ushort2bytes(pitchBendEvent->getAmount() + 8192);
 				auto pb = std::make_shared<PitchBend>(pitchBendEvent->getTick(), 1, (int)(amountBytes[0] & 255), (int)(amountBytes[1] & 255));
 				pb->setBendAmount(pitchBendEvent->getAmount() + 8192);
 				miscEvents.push_back(pb);

@@ -61,28 +61,28 @@ bool SndHeaderReader::isMono()
 int SndHeaderReader::getStart()
 {
     auto startArray = moduru::VecUtil::CopyOfRange(headerArray, 22, 26);
-	auto start = moduru::file::ByteUtil::bytes2uint(startArray);
+	auto start = ByteUtil::bytes2uint(startArray);
     return start;
 }
 
 int SndHeaderReader::getEnd()
 {
 	auto endArray = moduru::VecUtil::CopyOfRange(headerArray, 26, 30);
-	auto end = moduru::file::ByteUtil::bytes2uint(endArray);
+	auto end = ByteUtil::bytes2uint(endArray);
 	return end;
 }
 
 int SndHeaderReader::getNumberOfFrames()
 {
 	auto numberOfFramesArray = moduru::VecUtil::CopyOfRange(headerArray, 30, 34);
-	int numberOfFrames = moduru::file::ByteUtil::bytes2uint(numberOfFramesArray);
+	int numberOfFrames = ByteUtil::bytes2uint(numberOfFramesArray);
 	return numberOfFrames;
 }
 
 int SndHeaderReader::getLoopLength()
 {
 	auto loopLengthArray = moduru::VecUtil::CopyOfRange(headerArray, 34, 38);
-	auto loopLength = moduru::file::ByteUtil::bytes2uint(loopLengthArray);
+	auto loopLength = ByteUtil::bytes2uint(loopLengthArray);
 	return loopLength;
 }
 
@@ -100,6 +100,6 @@ int SndHeaderReader::getNumberOfBeats()
 int SndHeaderReader::getSampleRate()
 {
 	auto rateArray = moduru::VecUtil::CopyOfRange(headerArray, 40, 42);
-	auto rate = moduru::file::ByteUtil::bytes2ushort(rateArray);
+	auto rate = ByteUtil::bytes2ushort(rateArray);
 	return static_cast<int>(rate);
 }
